@@ -134,5 +134,3 @@ services:
       args:
         - BUILDKIT_INLINE_CACHE=1
 
-volumes:
-  pnpm_cache:

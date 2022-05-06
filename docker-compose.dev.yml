@@ -6,7 +6,7 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     volumes:
-      - "./db:/var/lib/mysql"
+      - "db:/var/lib/mysql"
     ports:
       - 3306:3306
 
@@ -29,5 +29,6 @@ networks:
     name: scow
 
 volumes:
+  db:
   jobtabledb:
     name: jobtabledb
