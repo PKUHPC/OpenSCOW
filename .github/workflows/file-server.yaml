@@ -1,0 +1,31 @@
+name: Build and Archive file-server
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    name: Build and Archive file-server
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: pnpm/action-setup@v2.0.1
+        with:
+          version: 7.0.0
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm i --frozen-lockfile
+      - name: Build website
+        run: pnpm run --filter file-server... build
+
+      - name: Archive file-server
+        uses: actions/upload-artifact@v3
+        with:
+          name: file-server
+          path: apps/file-server/build/file-server
