@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <id>https://PKUHPC.github.io/SCOW/blog</id>
+    <title>SCOW Blog</title>
+    <updated>2022-04-01T00:00:00.000Z</updated>
+    <generator>https://github.com/jpmonette/feed</generator>
+    <link rel="alternate" href="https://PKUHPC.github.io/SCOW/blog"/>
+    <subtitle>SCOW Blog</subtitle>
+    <icon>https://PKUHPC.github.io/SCOW/img/favicon.ico</icon>
+    <entry>
+        <title type="html"><![CDATA[scow文档上线]]></title>
+        <id>docs-online</id>
+        <link href="https://PKUHPC.github.io/SCOW/blog/docs-online"/>
+        <updated>2022-04-01T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[scow文档网站上线！]]></summary>
+        <content type="html"><![CDATA[<p>scow文档网站上线！</p>]]></content>
+        <author>
+            <name>Chen Junda</name>
+            <uri>https://ddadaal.me</uri>
+        </author>
+        <category label="scow" term="scow"/>
+    </entry>
+</feed>
