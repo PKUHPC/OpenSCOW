@@ -17,6 +17,7 @@ const config = {
   favicon: 'img/favicon.ico',
   organizationName: variables.ORGANIZATION_NAME,
   projectName: variables.PROJECT_NAME,
+  trailingSlash: false,
 
   presets: [
     [

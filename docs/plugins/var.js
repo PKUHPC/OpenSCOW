@@ -1,13 +1,14 @@
 // @ts-check
 
-const BASE_PATH = process.env.BASE_PATH || "/";
 const ORGANIZATION_NAME = "PKUHPC";
 const PROJECT_NAME = "SCOW";
-const GIT_PLATFORM = process.env.GIT_PLATFORM || "github.com";
+// gitee or github
+const GIT_PLATFORM = process.env.GIT_PLATFORM || "github";
 const CR_URL = process.env.CR_URL || "https://ccimage.pku.edu.cn/chenjunda/scow";
-const REPO_URL = `https://${GIT_PLATFORM}/${ORGANIZATION_NAME}/${PROJECT_NAME}`;
+const REPO_URL = `https://${GIT_PLATFORM}.com/${ORGANIZATION_NAME}/${PROJECT_NAME}`;
 const REPO_FILE_URL = `${REPO_URL}/blob/master`;
-const DOCS_URL = process.env.DOCS_URL;
+const DOCS_URL = `https://${ORGANIZATION_NAME}.${GIT_PLATFORM}.io`;
+const BASE_PATH = process.env.BASE_PATH || `/${PROJECT_NAME}/`;
 
 const variables = {
   BASE_PATH,
@@ -29,6 +30,7 @@ const replace = (template) => {
   return template.replace(/%([a-zA-Z0-9_]+)%/g, (_, p1) => variables[p1] ?? "");
 }
 
+const { partialUpdateObject } = require("@algolia/client-search");
 const visit = require('unist-util-visit');
 
 const types = [
