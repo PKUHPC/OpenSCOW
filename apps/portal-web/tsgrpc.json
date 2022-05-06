@@ -1,0 +1,14 @@
+{
+  "binPath": "../../node_modules/.bin",
+  "protos": [
+    {
+      "path": "../../protos",
+      "files": "../../protos/vnc/**/*.proto",
+      "name": "."
+    }
+  ],
+  "params": [
+    "--ts_proto_opt=unrecognizedEnum=false",
+    "--ts_proto_opt=useDate=string"
+  ]
+}

@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package scow.server;
+
+import "google/protobuf/timestamp.proto";
+import "common/money.proto";
+import "common/job.proto";
+
+message GetTenantInfoRequest { string tenant_name = 1; }
+
+// NOT_FOUND: tenant is not found
+message GetTenantInfoReply {
+  common.Money balance = 1;
+  uint32 account_count = 2;
+  uint32 user_count = 3;
+
+  message AdminInfo {
+    string user_id = 1;
+    string user_name = 2;
+  }
+
+  repeated AdminInfo admins = 4;
+}
+
+service TenantService {
+  rpc GetTenantInfo(GetTenantInfoRequest) returns (GetTenantInfoReply);
+}

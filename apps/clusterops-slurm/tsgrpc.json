@@ -1,0 +1,13 @@
+{
+  "binPath": "../../node_modules/.bin",
+  "protos": [
+    {
+      "path": "../../protos",
+      "files": "../../protos/clusterops/**/*.proto",
+      "name": "."
+    }
+  ],
+  "params": [
+    "--ts_proto_opt=unrecognizedEnum=false"
+  ]
+}

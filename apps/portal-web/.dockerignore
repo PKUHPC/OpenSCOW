@@ -1,0 +1,6 @@
+.vscode/
+build/
+nginx/
+node_modules/
+.env
+.next/

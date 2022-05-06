@@ -1,0 +1,228 @@
+syntax = "proto3";
+
+package scow.server;
+
+import "common/money.proto";
+import "google/protobuf/timestamp.proto";
+
+enum UserStatus {
+  UNBLOCKED = 0;
+  BLOCKED = 1;
+}
+
+message GetUserStatusRequest {
+  string tenant_name = 1;
+  string user_id = 2;
+}
+
+message AccountStatus {
+  UserStatus user_status = 1;
+  bool account_blocked = 2;
+  optional common.Money job_charge_limit = 3;
+  optional common.Money used_job_charge = 4;
+  common.Money balance = 5;
+}
+
+message GetUserStatusReply {
+  // account and its status
+  map<string, AccountStatus> account_statuses = 1;
+  // cluster and quota
+  map<string, uint64> storage_quotas = 2;
+}
+
+message QueryUsedStorageQuotaRequest {
+  string tenant_name = 1;
+  string user_id = 2;
+  string cluster = 3;
+}
+
+message QueryUsedStorageQuotaReply { uint64 used = 1; }
+
+message GetAccountUsersRequest {
+  string tenant_name = 1;
+  string account_name = 2;
+}
+
+message AccountUserInfo {
+  string user_id = 1;
+  string name = 2;
+  UserStatus status = 3;
+  UserRole role = 4;
+  // cluster and quota
+  map<string, uint64> storage_quotas = 5;
+  optional common.Money job_charge_limit = 6;
+  optional common.Money used_job_charge_limit = 7;
+}
+
+message GetAccountUsersReply { repeated AccountUserInfo results = 1; }
+
+message QueryIsUserInAccountRequest {
+  string tenant_name = 1;
+  string user_id = 2;
+  string account_name = 3;
+}
+
+message QueryIsUserInAccountReply { bool result = 1; }
+
+message UnblockUserInAccountRequest {
+  string tenant_name = 1;
+  string user_id = 2;
+  string account_name = 3;
+}
+
+// NOT_FOUND: user_id or account_name is not found.
+// FAILED_PRECONDITION: user is already unblocked
+message UnblockUserInAccountReply {}
+
+message BlockUserInAccountRequest {
+  string tenant_name = 1;
+  string user_id = 2;
+  string account_name = 3;
+}
+
+// NOT_FOUND: user_id or account_name is not found.
+// FAILED_PRECONDITION: user is already blocked
+message BlockUserInAccountReply {}
+
+message RemoveUserFromAccountRequest {
+  string tenant_name = 1;
+  string user_id = 2;
+  string account_name = 3;
+}
+
+// NOT_FOUND: user_id is not found.
+// OUT_OF_RANGE: user is the owner of the account
+message RemoveUserFromAccountReply {}
+
+message AddUserToAccountRequest {
+  string tenant_name = 1;
+  string user_id = 2;
+  string account_name = 3;
+}
+
+// ALREADY_EXISTS: user already in the account
+// NOT_FOUND: account is not found.
+message AddUserToAccountReply {}
+
+message SetAsAdminRequest {
+  string tenant_name = 1;
+  string user_id = 2;
+  string account_name = 3;
+}
+
+// FAILED_PRECONDITION: the user is already admin
+// NOT_FOUND: user is not found.
+message SetAsAdminReply {}
+
+message UnsetAdminRequest {
+  string tenant_name = 1;
+  string user_id = 2;
+  string account_name = 3;
+}
+
+// FAILED_PRECONDITION: the user is already not admin
+// NOT_FOUND: user is not found.
+message UnsetAdminReply {}
+
+message CreateUserRequest {
+  string tenant_name = 1;
+  string identity_id = 2;
+  string name = 3;
+  string email = 4;
+  string password = 5;
+}
+
+// ALREADY_EXISTS: user with id already exists
+message CreateUserReply {
+  // The id of the new user
+  // Must be monotonically increasing
+  uint32 id = 1;
+}
+
+message DeleteUserRequest {
+  string tenant_name = 1;
+  string user_id = 2;
+}
+
+// FAILED_PRECONDITION: the user is an owner of an account.
+// NOT_FOUND: user is not found
+message DeleteUserReply {}
+
+message GetNameRequest {
+  string tenant_name = 1;
+  string user_id = 2;
+}
+
+// NOT_FOUND: user is not found
+message GetNameReply { string name = 1; }
+
+message GetUsersRequest { string tenant_name = 1; }
+
+message User {
+  string tenant_name = 1;
+  string user_id = 2;
+  string name = 3;
+  string email = 4;
+  google.protobuf.Timestamp create_time = 5;
+  repeated AccountAffiliation account_affiliations = 6;
+  repeated PlatformRole platform_roles = 7;
+}
+
+message GetUserInfoRequest { string user_id = 1; }
+
+enum UserRole {
+  USER = 0;
+  ADMIN = 1;
+  OWNER = 2;
+}
+
+message AccountAffiliation {
+  string account_name = 1;
+  UserRole role = 2;
+}
+
+enum PlatformRole {
+  PLATFORM_ADMIN = 0;
+  PLATFORM_FINANCE = 1;
+}
+
+enum TenantRole {
+  TENANT_ADMIN = 0;
+  TENANT_FINANCE = 1;
+}
+
+message GetUserInfoReply {
+  repeated AccountAffiliation affiliations = 1;
+  repeated PlatformRole platform_roles = 2;
+  repeated TenantRole tenant_roles = 3;
+  string name = 4;
+  string tenant_name = 5;
+}
+
+message GetUsersReply { repeated User users = 1; }
+
+service UserService {
+
+  rpc GetUsers(GetUsersRequest) returns (GetUsersReply);
+
+  rpc GetUserInfo(GetUserInfoRequest) returns (GetUserInfoReply);
+
+  rpc GetAccountUsers(GetAccountUsersRequest) returns (GetAccountUsersReply);
+  rpc QueryIsUserInAccount(QueryIsUserInAccountRequest)
+      returns (QueryIsUserInAccountReply);
+  rpc GetUserStatus(GetUserStatusRequest) returns (GetUserStatusReply);
+  rpc QueryUsedStorageQuota(QueryUsedStorageQuotaRequest)
+      returns (QueryUsedStorageQuotaReply);
+  rpc CreateUser(CreateUserRequest) returns (CreateUserReply);
+  rpc DeleteUser(DeleteUserRequest) returns (DeleteUserReply);
+  rpc AddUserToAccount(AddUserToAccountRequest) returns (AddUserToAccountReply);
+  rpc RemoveUserFromAccount(RemoveUserFromAccountRequest)
+      returns (RemoveUserFromAccountReply);
+  rpc BlockUserInAccount(BlockUserInAccountRequest)
+      returns (BlockUserInAccountReply);
+  rpc UnblockUserInAccount(UnblockUserInAccountRequest)
+      returns (UnblockUserInAccountReply);
+  rpc SetAsAdmin(SetAsAdminRequest) returns (SetAsAdminReply);
+  rpc UnsetAdmin(UnsetAdminRequest) returns (UnsetAdminReply);
+  rpc GetName(GetNameRequest) returns (GetNameReply);
+}

@@ -1,0 +1,8 @@
+{
+  "typescript.tsdk": "node_modules\\typescript\\lib",
+  "protoc": {
+    "options": [
+      "--proto_path=./protos"
+    ],
+  }
+}

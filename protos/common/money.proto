@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package scow.common;
+
+message Money {
+  bool positive = 1;
+  uint64 yuan = 2;
+  uint32 mills = 3;
+}

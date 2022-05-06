@@ -1,0 +1,14 @@
+{
+  "accounts": {
+    "a_abc": {
+      "abc": "allowed!,owner",
+      "yhh": "blocked!"
+    },
+    "a_b": {
+      "yhh": "allowed!,owner"
+    }
+  },
+  "names": {
+    "abc": "abcName"
+  }
+}

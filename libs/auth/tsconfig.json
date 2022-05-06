@@ -1,0 +1,24 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "build",
+    "declaration": true,
+    "baseUrl": "./",
+    "paths": {
+      "src/*": [
+        "src/*"
+      ],
+      "tests/*": [
+        "tests/*"
+      ]
+    }
+  },
+  "include": [
+    "src/**/*.ts",
+    "tests/**/*.ts",
+    "__mocks__/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

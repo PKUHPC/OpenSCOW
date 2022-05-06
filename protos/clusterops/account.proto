@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+package scow.clusterops;
+
+message CreateAccountRequest {
+    string account_name = 1;
+    string owner_id = 2;
+}
+
+// ALREADY_EXISTS: account_name is taken
+message CreateAccountReply {
+}
+
+message DeleteAccountRequest {
+    string account_name = 1;
+}
+
+// NOT_FOUND: account name is not found.
+message DeleteAccountReply {
+}
+
+message BlockAccountRequest {
+  string account_name = 1;
+}
+
+// NOT_FOUND: account is not found.
+message BlockAccountReply {
+  bool executed = 1;
+}
+
+message UnblockAccountRequest {
+  string account_name = 1;
+}
+
+// NOT_FOUND: account is not found.
+message UnblockAccountReply {
+  bool executed = 1;
+}
+
+service AccountService {
+    rpc DeleteAccount(DeleteAccountRequest) returns (DeleteAccountReply);
+    rpc CreateAccount(CreateAccountRequest) returns (CreateAccountReply);
+
+    rpc BlockAccount(BlockAccountRequest) returns (BlockAccountReply);
+    rpc UnblockAccount(UnblockAccountRequest) returns (UnblockAccountReply);
+
+
+}

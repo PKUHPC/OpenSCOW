@@ -1,0 +1,8 @@
+{
+  "hpc01.compute.low": "0.04",
+  "hpc01.compute.normal": "0.06",
+  "hpc01.compute.high": "0.08",
+  "hpc01.GPU.low": "10.00",
+  "hpc01.GPU.normal": "12.00",
+  "hpc01.GPU.high": "14.00"
+}

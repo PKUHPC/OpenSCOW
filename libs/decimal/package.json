@@ -1,0 +1,19 @@
+{
+  "name": "@scow/lib-decimal",
+  "version": "1.0.0",
+  "description": "",
+  "main": "build/index.js",
+  "scripts": {
+    "build": "rimraf build && tsc -p tsconfig.build.json",
+    "test": "jest"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bignumber.js": "^9.0.2"
+  },
+  "volta": {
+    "extends": "../../package.json"
+  }
+}

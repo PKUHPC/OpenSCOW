@@ -1,0 +1,32 @@
+---
+sidebar_position: 1
+title: 前端
+---
+
+# 部署门户前端
+
+门户前端为用户提供门户系统的web内容。
+
+## 编写集群信息
+
+请参考[集群信息 clusters](../../common/deployment/clusters.mdx)编写集群信息。
+
+## 安装和配置门户系统前端项目
+
+在`docker-compose.yml`文件的`services`部分增加以下内容。
+
+- 如果您的前端项目将会部署在域名的根目录下，则请使用`portal-web-root`镜像；
+- 如果将会部署在`/portal`路径下，请使用`portal-web-portal`镜像。
+- 若都不是，请参考[自定义前端相对路径](../../common/customization/customize-basepath.md)。
+
+```yaml title=docker-compose.yml
+  portal-web:
+    # 根据上文选择合适的镜像
+    image: %CR_URL%/portal-web-root
+    volumes:
+      - "./config:/etc/scow"
+    environment:
+      # 可选配置
+```
+
+运行`docker compose up -d`启动前端项目。

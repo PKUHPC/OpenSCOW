@@ -1,0 +1,148 @@
+<mxfile host="65bd71144e">
+    <diagram id="Pjbi3EagdmSRB1L1AeHt" name="Page-1">
+        <mxGraphModel dx="1106" dy="758" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="24" value="service" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;verticalAlign=top;" vertex="1" parent="1">
+                    <mxGeometry x="337.69" y="510" width="512.31" height="200" as="geometry"/>
+                </mxCell>
+                <mxCell id="2" value="登录/计算节点" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;verticalAlign=top;" vertex="1" parent="1">
+                    <mxGeometry x="150" y="250" width="390" height="200" as="geometry"/>
+                </mxCell>
+                <mxCell id="5" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="3" target="7">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="180" y="420" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="10" value="HTTP/WebSocket" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="5">
+                    <mxGeometry x="-0.2092" y="-2" relative="1" as="geometry">
+                        <mxPoint x="13" y="-2" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="3" value="客户端浏览器" style="whiteSpace=wrap;html=1;fillColor=none;" vertex="1" parent="1">
+                    <mxGeometry x="100" y="580" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="13" style="edgeStyle=none;html=1;entryX=0.455;entryY=0.992;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="4" target="12">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="14" value="TCP" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="13">
+                    <mxGeometry x="-0.2943" y="2" relative="1" as="geometry">
+                        <mxPoint x="12" y="2" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="4" value="websockify" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;" vertex="1" parent="1">
+                    <mxGeometry x="190" y="370" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="18" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="7" target="15">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="19" value="HTTP" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="18">
+                    <mxGeometry x="-0.4915" y="-3" relative="1" as="geometry">
+                        <mxPoint x="10" y="-3" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="25" style="edgeStyle=none;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="7" target="4">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="26" value="WebSocket" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="25">
+                    <mxGeometry x="-0.3052" y="1" relative="1" as="geometry">
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="32" style="edgeStyle=none;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="7" target="61">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="690" y="440" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="33" value="WebSocket" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="32">
+                    <mxGeometry x="0.1516" y="1" relative="1" as="geometry">
+                        <mxPoint x="-92" y="49" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="39" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="7" target="34">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="43" value="HTTP" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="39">
+                    <mxGeometry x="-0.2798" y="-2" relative="1" as="geometry">
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="48" style="edgeStyle=none;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.25;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="7" target="46">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="49" value="WebSocket" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="48">
+                    <mxGeometry x="0.4652" y="2" relative="1" as="geometry">
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="67" style="edgeStyle=none;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="7" target="66">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="7" value="nginx" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;" vertex="1" parent="1">
+                    <mxGeometry x="354" y="585" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="12" value="turbovnc server" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;" vertex="1" parent="1">
+                    <mxGeometry x="190" y="280" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="15" value="novnc（静态文件）" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;" vertex="1" parent="1">
+                    <mxGeometry x="640" y="630" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="40" style="edgeStyle=none;html=1;exitX=0.25;exitY=0;exitDx=0;exitDy=0;entryX=0.945;entryY=1;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="34" target="2">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="41" style="edgeStyle=none;html=1;exitX=0.75;exitY=0;exitDx=0;exitDy=0;entryX=0.484;entryY=0.998;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="34" target="58">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="731.2899999999997" y="481.4000000000001" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="42" value="SSH，作为对应用户启动X Server" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="41">
+                    <mxGeometry x="-0.1902" y="-1" relative="1" as="geometry">
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="34" value="scow" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;" vertex="1" parent="1">
+                    <mxGeometry x="640" y="555" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="45" value="turbovnc server" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;" vertex="1" parent="1">
+                    <mxGeometry x="380" y="280" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="47" style="edgeStyle=none;html=1;entryX=0.391;entryY=1.054;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="46" target="45">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="46" value="websockify" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;" vertex="1" parent="1">
+                    <mxGeometry x="380" y="370" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="58" value="登录/计算节点" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;verticalAlign=top;" vertex="1" parent="1">
+                    <mxGeometry x="560" y="250" width="390" height="200" as="geometry"/>
+                </mxCell>
+                <mxCell id="59" style="edgeStyle=none;html=1;entryX=0.455;entryY=0.992;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="61" target="63">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="60" value="TCP" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="59">
+                    <mxGeometry x="-0.2943" y="2" relative="1" as="geometry">
+                        <mxPoint x="12" y="2" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="61" value="websockify" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;" vertex="1" parent="1">
+                    <mxGeometry x="600" y="370" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="62" value="WebSocket" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="1">
+                    <mxGeometry x="819.0691905951217" y="463.44419790974166" as="geometry"/>
+                </mxCell>
+                <mxCell id="63" value="turbovnc server" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;" vertex="1" parent="1">
+                    <mxGeometry x="600" y="280" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="64" value="turbovnc server" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;" vertex="1" parent="1">
+                    <mxGeometry x="790" y="280" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="65" style="edgeStyle=none;html=1;entryX=0.391;entryY=1.054;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="66" target="64">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="66" value="websockify" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;" vertex="1" parent="1">
+                    <mxGeometry x="790" y="370" width="120" height="60" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

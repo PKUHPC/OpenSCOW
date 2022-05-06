@@ -1,0 +1,41 @@
+{
+  "name": "@scow/vnc-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "dotenv -e env/.env.dev -- npx nodemon --watch src -e ts,tsx --exec npx ts-node -r tsconfig-paths/register src/index.ts",
+    "build": "npm run protos && rimraf build && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
+    "serve": "node build/index.js",
+    "test": "jest",
+    "protos": "tsgrpc-cli protos",
+    "orm": "dotenv -e env/.env.dev -- npx mikro-orm"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@ddadaal/tsgrpc-server": "^0.12.0",
+    "@scow/config": "workspace:*",
+    "@grpc/grpc-js": "^1.6.7",
+    "shell-quote": "^1.7.3",
+    "node-ssh": "^12.0.4"
+  },
+  "devDependencies": {
+    "@types/node-cron": "^3.0.1",
+    "@ddadaal/tsgrpc-cli": "^0.11.0",
+    "@types/google-protobuf": "^3.15.6",
+    "@types/shell-quote": "^1.7.1",
+    "@types/ssh2": "^0.5.52"
+  },
+  "mikro-orm": {
+    "useTsNode": true,
+    "configPaths": [
+      "./src/mikro-orm.config.ts",
+      "./src/mikro-orm.config.js"
+    ]
+  },
+  "volta": {
+    "extends": "../../package.json"
+  }
+}

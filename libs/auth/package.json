@@ -1,0 +1,22 @@
+{
+  "name": "@scow/lib-auth",
+  "version": "1.0.0",
+  "description": "",
+  "main": "build/index.js",
+  "scripts": {
+    "build": "rimraf build && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
+    "test": "jest"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "undici": "^5.0.0"
+  },
+  "devDependencies": {
+    "pino": "^7.11.0"
+  },
+  "volta": {
+    "extends": "../../package.json"
+  }
+}

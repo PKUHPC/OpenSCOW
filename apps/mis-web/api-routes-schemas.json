@@ -1,0 +1,2777 @@
+{
+  "routes": {
+    "GetIconSchema": {
+      "type": "object",
+      "properties": {
+        "method": {
+          "type": "string",
+          "const": "GET"
+        },
+        "query": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "favicon",
+                "192",
+                "512"
+              ]
+            }
+          },
+          "required": [
+            "type"
+          ],
+          "additionalProperties": false
+        },
+        "responses": {
+          "type": "object",
+          "properties": {
+            "200": {}
+          },
+          "required": [
+            "200"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "method",
+        "query",
+        "responses"
+      ],
+      "additionalProperties": false,
+      "$id": "GetIconSchema",
+      "title": "GetIconSchema"
+    },
+    "GetWhitelistedAccountsSchema": {
+      "type": "object",
+      "properties": {
+        "method": {
+          "type": "string",
+          "const": "GET"
+        },
+        "responses": {
+          "type": "object",
+          "properties": {
+            "200": {
+              "type": "object",
+              "properties": {
+                "results": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "WhitelistedAccount#"
+                  }
+                }
+              },
+              "required": [
+                "results"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "200"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "method",
+        "responses"
+      ],
+      "additionalProperties": false,
+      "$id": "GetWhitelistedAccountsSchema",
+      "title": "GetWhitelistedAccountsSchema"
+    },
+    "WhitelistAccountSchema": {
+      "type": "object",
+      "properties": {
+        "method": {
+          "type": "string",
+          "const": "PUT"
+        },
+        "body": {
+          "type": "object",
+          "properties": {
+            "accountName": {
+              "type": "string"
+            },
+            "comment": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "accountName",
+            "comment"
+          ],
+          "additionalProperties": false
+        },
+        "responses": {
+          "type": "object",
+          "properties": {
+            "204": {
+              "type": "null"
+            },
+            "404": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "204",
+            "404"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "method",
+        "body",
+        "responses"
+      ],
+      "additionalProperties": false,
+      "$id": "WhitelistAccountSchema",
+      "title": "WhitelistAccountSchema"
+    },
+    "GetJobInfoSchema": {
+      "type": "object",
+      "properties": {
+        "method": {
+          "type": "string",
+          "const": "GET"
+        },
+        "query": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "page": {
+              "type": "number",
+              "minimum": 1
+            },
+            "pageSize": {
+              "type": "number"
+            },
+            "jobEndTimeStart": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "jobEndTimeEnd": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "jobId": {
+              "type": "number",
+              "minimum": 1
+            },
+            "userId": {
+              "type": "string",
+              "description": "如果是平台管理员，或者userId是自己，或者（设置了accountName，而且当前用户是accountName账户的管理员或者拥有者），那么   显示userId用户在accountName中的作业 否则：403"
+            },
+            "accountName": {
+              "type": "string"
+            },
+            "clusters": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "jobEndTimeEnd",
+            "jobEndTimeStart"
+          ]
+        },
+        "responses": {
+          "type": "object",
+          "properties": {
+            "200": {
+              "$ref": "GetJobsReply#"
+            },
+            "403": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "200",
+            "403"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "method",
+        "query",
+        "responses"
+      ],
+      "additionalProperties": false,
+      "$id": "GetJobInfoSchema",
+      "title": "GetJobInfoSchema"
+    },
+    "ChangeJobPriceSchema": {
+      "type": "object",
+      "properties": {
+        "method": {
+          "type": "string",
+          "const": "PATCH"
+        },
+        "body": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "reason": {
+              "type": "string"
+            },
+            "price": {
+              "type": "number",
+              "minimum": 0
+            },
+            "target": {
+              "type": "string",
+              "enum": [
+                "tenant",
+                "account"
+              ],
+              "description": "which price to change"
+            },
+            "jobEndTimeStart": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "jobEndTimeEnd": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "jobId": {
+              "type": "number",
+              "minimum": 1
+            },
+            "userId": {
+              "type": "string",
+              "description": "如果是平台管理员，或者userId是自己，或者（设置了accountName，而且当前用户是accountName账户的管理员或者拥有者），那么   显示userId用户在accountName中的作业 否则：403"
+            },
+            "accountName": {
+              "type": "string"
+            },
+            "clusters": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "jobEndTimeEnd",
+            "jobEndTimeStart",
+            "price",
+            "reason",
+            "target"
+          ]
+        },
+        "responses": {
+          "type": "object",
+          "properties": {
+            "200": {
+              "type": "object",
+              "properties": {
+                "count": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "count"
+              ],
+              "additionalProperties": false
+            },
+            "403": {
+              "type": "null",
+              "description": "非租户管理员不能修改作业的账户价格；非平台管理员不能修改作业的租户价格"
+            },
+            "404": {
+              "type": "null",
+              "description": "作业未找到"
+            }
+          },
+          "required": [
+            "200",
+            "404",
+            "403"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "method",
+        "body",
+        "responses"
+      ],
+      "additionalProperties": false,
+      "$id": "ChangeJobPriceSchema",
+      "title": "ChangeJobPriceSchema"
+    },
+    "ChangeStorageQuotaSchema": {
+      "type": "object",
+      "properties": {
+        "method": {
+          "type": "string",
+          "const": "PUT"
+        },
+        "body": {
+          "type": "object",
+          "properties": {
+            "cluster": {
+              "type": "string"
+            },
+            "userId": {
+              "type": "string"
+            },
+            "mode": {
+              "$ref": "ChangeStorageMode#"
+            },
+            "value": {
+              "type": "number",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "cluster",
+            "userId",
+            "mode",
+            "value"
+          ],
+          "additionalProperties": false
+        },
+        "responses": {
+          "type": "object",
+          "properties": {
+            "200": {
+              "type": "object",
+              "properties": {
+                "currentQuota": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "currentQuota"
+              ],
+              "additionalProperties": false
+            },
+            "400": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "string",
+                  "const": "DELTA_NOT_VALID"
+                }
+              },
+              "required": [
+                "code"
+              ],
+              "additionalProperties": false
+            },
+            "404": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "200",
+            "400",
+            "404"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "method",
+        "body",
+        "responses"
+      ],
+      "additionalProperties": false,
+      "$id": "ChangeStorageQuotaSchema",
+      "title": "ChangeStorageQuotaSchema"
+    },
+    "CreateAccountSchema": {
+      "type": "object",
+      "properties": {
+        "method": {
+          "type": "string",
+          "const": "POST"
+        },
+        "body": {
+          "type": "object",
+          "properties": {
+            "accountName": {
+              "type": "string",
+              "description": "账户名",
+              "pattern": "^[a-z0-9_]+$"
+            },
+            "ownerId": {
+              "type": "string"
+            },
+            "ownerName": {
+              "type": "string"
+            },
+            "comment": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "accountName",
+            "ownerId",
+            "ownerName",
+            "comment"
+          ],
+          "additionalProperties": false
+        },
+        "responses": {
+          "type": "object",
+          "properties": {
+            "200": {
+              "type": "null"
+            },
+            "400": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "string",
+                  "enum": [
+                    "ID_NAME_NOT_MATCH",
+                    "ACCOUNT_NAME_NOT_VALID"
+                  ]
+                }
+              },
+              "required": [
+                "code"
+              ],
+              "additionalProperties": false
+            },
+            "404": {
+              "type": "null",
+              "description": "ownerId不存在"
+            },
+            "409": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "200",
+            "400",
+            "404",
+            "409"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "method",
+        "body",
+        "responses"
+      ],
+      "additionalProperties": false,
+      "$id": "CreateAccountSchema",
+      "title": "CreateAccountSchema"
+    },
+    "GetAccountsSchema": {
+      "type": "object",
+      "properties": {
+        "method": {
+          "type": "string",
+          "const": "GET"
+        },
+        "responses": {
+          "type": "object",
+          "properties": {
+            "200": {
+              "type": "object",
+              "properties": {
+                "results": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "AdminAccountInfo#"
+                  }
+                }
+              },
+              "required": [
+                "results"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "200"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "method",
+        "responses"
+      ],
+      "additionalProperties": false,
+      "$id": "GetAccountsSchema",
+      "title": "GetAccountsSchema"
+    },
+    "GetAllPlatformUsersSchema": {
+      "type": "object",
+      "properties": {
+        "method": {
+          "type": "string",
+          "const": "GET"
+        },
+        "responses": {
+          "type": "object",
+          "properties": {
+            "200": {
+              "type": "object",
+              "properties": {
+                "results": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "FullUserInfo#"
+                  }
+                }
+              },
+              "required": [
+                "results"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "200"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "method",
+        "responses"
+      ],
+      "additionalProperties": false,
+      "$id": "GetAllPlatformUsersSchema",
+      "title": "GetAllPlatformUsersSchema"
+    },
+    "QueryStorageQuotaSchema": {
+      "type": "object",
+      "properties": {
+        "method": {
+          "type": "string",
+          "const": "GET"
+        },
+        "query": {
+          "type": "object",
+          "properties": {
+            "cluster": {
+              "type": "string"
+            },
+            "userId": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "cluster",
+            "userId"
+          ],
+          "additionalProperties": false
+        },
+        "responses": {
+          "type": "object",
+          "properties": {
+            "200": {
+              "type": "object",
+              "properties": {
+                "currentQuota": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "currentQuota"
+              ],
+              "additionalProperties": false
+            },
+            "404": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "200",
+            "404"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "method",
+        "query",
+        "responses"
+      ],
+      "additionalProperties": false,
+      "$id": "QueryStorageQuotaSchema",
+      "title": "QueryStorageQuotaSchema"
+    },
+    "AuthCallbackSchema": {
+      "type": "object",
+      "properties": {
+        "method": {
+          "type": "string",
+          "const": "GET"
+        },
+        "query": {
+          "type": "object",
+          "properties": {
+            "token": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "token"
+          ],
+          "additionalProperties": false
+        },
+        "responses": {
+          "type": "object",
+          "properties": {
+            "200": {
+              "type": "null"
+            },
+            "403": {
+              "type": "null",
+              "description": "the token is invalid"
+            }
+          },
+          "required": [
+            "200",
+            "403"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "method",
+        "query",
+        "responses"
+      ],
+      "additionalProperties": false,
+      "$id": "AuthCallbackSchema",
+      "title": "AuthCallbackSchema"
+    },
+    "LogoutSchema": {
+      "type": "object",
+      "properties": {
+        "method": {
+          "type": "string",
+          "const": "DELETE"
+        },
+        "responses": {
+          "type": "object",
+          "properties": {
+            "204": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "204"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "method",
+        "responses"
+      ],
+      "additionalProperties": false,
+      "$id": "LogoutSchema",
+      "title": "LogoutSchema"
+    },
+    "AuthLogoutSchema": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "object",
+          "properties": {
+            "token": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "token"
+          ],
+          "additionalProperties": false
+        },
+        "responses": {
+          "type": "object",
+          "properties": {
+            "204": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "204"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "query",
+        "responses"
+      ],
+      "additionalProperties": false,
+      "$id": "AuthLogoutSchema",
+      "title": "AuthLogoutSchema"
+    },
+    "ValidateTokenSchema": {
+      "type": "object",
+      "properties": {
+        "method": {
+          "type": "string",
+          "const": "GET"
+        },
+        "query": {
+          "type": "object",
+          "properties": {
+            "token": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "token"
+          ],
+          "additionalProperties": false
+        },
+        "responses": {
+          "type": "object",
+          "properties": {
+            "200": {
+              "$ref": "UserInfo#"
+            },
+            "403": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "200",
+            "403"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "method",
+        "query",
+        "responses"
+      ],
+      "additionalProperties": false,
+      "$id": "ValidateTokenSchema",
+      "title": "ValidateTokenSchema"
+    },
+    "GetUserStatusSchema": {
+      "type": "object",
+      "properties": {
+        "method": {
+          "type": "string",
+          "const": "GET"
+        },
+        "responses": {
+          "type": "object",
+          "properties": {
+            "200": {
+              "$ref": "GetUserStatusReply#"
+            }
+          },
+          "required": [
+            "200"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "method",
+        "responses"
+      ],
+      "additionalProperties": false,
+      "$id": "GetUserStatusSchema",
+      "title": "GetUserStatusSchema"
+    },
+    "GetChargesSchema": {
+      "type": "object",
+      "properties": {
+        "method": {
+          "type": "string",
+          "const": "GET"
+        },
+        "query": {
+          "type": "object",
+          "properties": {
+            "startTime": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "endTime": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "accountName": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "startTime",
+            "endTime",
+            "accountName"
+          ],
+          "additionalProperties": false
+        },
+        "responses": {
+          "type": "object",
+          "properties": {
+            "200": {
+              "type": "object",
+              "properties": {
+                "results": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "ChargeInfo#"
+                  }
+                },
+                "total": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "results",
+                "total"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "200"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "method",
+        "query",
+        "responses"
+      ],
+      "additionalProperties": false,
+      "$id": "GetChargesSchema",
+      "title": "GetChargesSchema"
+    },
+    "GetUsedPayTypesSchema": {
+      "type": "object",
+      "properties": {
+        "method": {
+          "type": "string",
+          "const": "GET"
+        },
+        "responses": {
+          "type": "object",
+          "properties": {
+            "200": {
+              "type": "object",
+              "properties": {
+                "types": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "required": [
+                "types"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "200"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "method",
+        "responses"
+      ],
+      "additionalProperties": false,
+      "$id": "GetUsedPayTypesSchema",
+      "title": "GetUsedPayTypesSchema"
+    },
+    "FinancePaySchema": {
+      "type": "object",
+      "properties": {
+        "method": {
+          "type": "string",
+          "const": "POST"
+        },
+        "body": {
+          "type": "object",
+          "properties": {
+            "amount": {
+              "type": "number"
+            },
+            "accountName": {
+              "type": "string"
+            },
+            "comment": {
+              "type": "string"
+            },
+            "type": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "amount",
+            "accountName",
+            "type"
+          ],
+          "additionalProperties": false
+        },
+        "responses": {
+          "type": "object",
+          "properties": {
+            "200": {
+              "type": "object",
+              "properties": {
+                "balance": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "balance"
+              ],
+              "additionalProperties": false
+            },
+            "404": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "200",
+            "404"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "method",
+        "body",
+        "responses"
+      ],
+      "additionalProperties": false,
+      "$id": "FinancePaySchema",
+      "title": "FinancePaySchema"
+    },
+    "GetPaymentsSchema": {
+      "type": "object",
+      "properties": {
+        "method": {
+          "type": "string",
+          "const": "GET"
+        },
+        "query": {
+          "type": "object",
+          "properties": {
+            "startTime": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "endTime": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "accountName": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "startTime",
+            "endTime"
+          ],
+          "additionalProperties": false
+        },
+        "responses": {
+          "type": "object",
+          "properties": {
+            "200": {
+              "type": "object",
+              "properties": {
+                "results": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "PaymentInfo#"
+                  }
+                },
+                "total": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "results",
+                "total"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "200"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "method",
+        "query",
+        "responses"
+      ],
+      "additionalProperties": false,
+      "$id": "GetPaymentsSchema",
+      "title": "GetPaymentsSchema"
+    },
+    "ChangeJobTimeLimitSchema": {
+      "type": "object",
+      "properties": {
+        "method": {
+          "type": "string",
+          "const": "PATCH"
+        },
+        "body": {
+          "type": "object",
+          "properties": {
+            "cluster": {
+              "type": "string"
+            },
+            "jobId": {
+              "type": "string"
+            },
+            "delta": {
+              "type": "number",
+              "description": "时间变化，单位分钟"
+            }
+          },
+          "required": [
+            "cluster",
+            "jobId",
+            "delta"
+          ],
+          "additionalProperties": false
+        },
+        "responses": {
+          "type": "object",
+          "properties": {
+            "204": {
+              "type": "null"
+            },
+            "403": {
+              "type": "null",
+              "description": "用户不能修改这个作业的时限"
+            },
+            "404": {
+              "type": "null",
+              "description": "作业未找到"
+            }
+          },
+          "required": [
+            "204",
+            "403",
+            "404"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "method",
+        "body",
+        "responses"
+      ],
+      "additionalProperties": false,
+      "$id": "ChangeJobTimeLimitSchema",
+      "title": "ChangeJobTimeLimitSchema"
+    },
+    "GetJobByBiJobIndexSchema": {
+      "type": "object",
+      "properties": {
+        "method": {
+          "type": "string",
+          "const": "GET"
+        },
+        "query": {
+          "type": "object",
+          "properties": {
+            "biJobIndex": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "biJobIndex"
+          ],
+          "additionalProperties": false
+        },
+        "responses": {
+          "type": "object",
+          "properties": {
+            "200": {
+              "type": "object",
+              "properties": {
+                "info": {
+                  "$ref": "JobInfo#"
+                }
+              },
+              "required": [
+                "info"
+              ],
+              "additionalProperties": false
+            },
+            "404": {
+              "type": "null",
+              "description": "作业未找到"
+            }
+          },
+          "required": [
+            "200",
+            "404"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "method",
+        "query",
+        "responses"
+      ],
+      "additionalProperties": false,
+      "$id": "GetJobByBiJobIndexSchema",
+      "title": "GetJobByBiJobIndexSchema"
+    },
+    "QueryJobTimeLimitSchema": {
+      "type": "object",
+      "properties": {
+        "method": {
+          "type": "string",
+          "const": "GET"
+        },
+        "query": {
+          "type": "object",
+          "properties": {
+            "cluster": {
+              "type": "string"
+            },
+            "jobId": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "cluster",
+            "jobId"
+          ],
+          "additionalProperties": false
+        },
+        "responses": {
+          "type": "object",
+          "properties": {
+            "200": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "result"
+              ],
+              "additionalProperties": false
+            },
+            "403": {
+              "type": "null"
+            },
+            "404": {
+              "type": "null",
+              "description": "Job没有找到"
+            }
+          },
+          "required": [
+            "200",
+            "403",
+            "404"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "method",
+        "query",
+        "responses"
+      ],
+      "additionalProperties": false,
+      "$id": "QueryJobTimeLimitSchema",
+      "title": "QueryJobTimeLimitSchema"
+    },
+    "GetRunningJobsSchema": {
+      "type": "object",
+      "properties": {
+        "method": {
+          "type": "string",
+          "const": "GET"
+        },
+        "query": {
+          "type": "object",
+          "properties": {
+            "userId": {
+              "type": "string",
+              "description": "如果是平台管理员，那么不输入租户名，否则都只看当前租户的 如果userId是自己，或者（设置了accountName，而且当前用户是accountName账户的管理员或者拥有者），那么   显示userId用户在accountName中的作业 否则：403"
+            },
+            "accountName": {
+              "type": "string"
+            },
+            "cluster": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "cluster"
+          ],
+          "additionalProperties": false
+        },
+        "responses": {
+          "type": "object",
+          "properties": {
+            "200": {
+              "type": "object",
+              "properties": {
+                "results": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "RunningJob#"
+                  }
+                }
+              },
+              "required": [
+                "results"
+              ],
+              "additionalProperties": false
+            },
+            "403": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "200",
+            "403"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "method",
+        "query",
+        "responses"
+      ],
+      "additionalProperties": false,
+      "$id": "GetRunningJobsSchema",
+      "title": "GetRunningJobsSchema"
+    },
+    "ChangePasswordSchema": {
+      "type": "object",
+      "properties": {
+        "method": {
+          "type": "string",
+          "const": "PATCH"
+        },
+        "body": {
+          "type": "object",
+          "properties": {
+            "oldPassword": {
+              "type": "string"
+            },
+            "newPassword": {
+              "type": "string",
+              "pattern": "^(?=.*\\d)(?=.*[a-zA-Z])(?=.*[`~!@#\\$%^&*()_+\\-[\\];',./{}|:\"<>?]).{8,}$"
+            }
+          },
+          "required": [
+            "oldPassword",
+            "newPassword"
+          ],
+          "additionalProperties": false
+        },
+        "responses": {
+          "type": "object",
+          "properties": {
+            "204": {
+              "type": "null",
+              "description": "更改成功"
+            },
+            "412": {
+              "type": "null",
+              "description": "密码不正确"
+            },
+            "501": {
+              "type": "null",
+              "description": "本功能在当前配置下不可用。"
+            }
+          },
+          "required": [
+            "204",
+            "412",
+            "501"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "method",
+        "body",
+        "responses"
+      ],
+      "additionalProperties": false,
+      "$id": "ChangePasswordSchema",
+      "title": "ChangePasswordSchema"
+    },
+    "AddUserToAccountSchema": {
+      "type": "object",
+      "properties": {
+        "method": {
+          "type": "string",
+          "const": "POST"
+        },
+        "body": {
+          "type": "object",
+          "properties": {
+            "identityId": {
+              "type": "string"
+            },
+            "accountName": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "identityId",
+            "accountName",
+            "name"
+          ],
+          "additionalProperties": false
+        },
+        "responses": {
+          "type": "object",
+          "properties": {
+            "204": {
+              "type": "null"
+            },
+            "400": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "string",
+                  "const": "ID_NAME_NOT_MATCH"
+                }
+              },
+              "required": [
+                "code"
+              ],
+              "additionalProperties": false
+            },
+            "404": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "string",
+                  "enum": [
+                    "ACCOUNT_NOT_FOUND",
+                    "USER_NOT_FOUND"
+                  ]
+                }
+              },
+              "required": [
+                "code"
+              ],
+              "additionalProperties": false
+            },
+            "409": {
+              "type": "null",
+              "description": "用户已经存在"
+            }
+          },
+          "required": [
+            "204",
+            "400",
+            "404",
+            "409"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "method",
+        "body",
+        "responses"
+      ],
+      "additionalProperties": false,
+      "$id": "AddUserToAccountSchema",
+      "title": "AddUserToAccountSchema"
+    },
+    "BlockUserInAccountSchema": {
+      "type": "object",
+      "properties": {
+        "method": {
+          "type": "string",
+          "const": "PUT"
+        },
+        "body": {
+          "type": "object",
+          "properties": {
+            "accountName": {
+              "type": "string"
+            },
+            "identityId": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "accountName",
+            "identityId"
+          ],
+          "additionalProperties": false
+        },
+        "responses": {
+          "type": "object",
+          "properties": {
+            "200": {
+              "type": "object",
+              "properties": {
+                "executed": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "executed"
+              ],
+              "additionalProperties": false
+            },
+            "404": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "200",
+            "404"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "method",
+        "body",
+        "responses"
+      ],
+      "additionalProperties": false,
+      "$id": "BlockUserInAccountSchema",
+      "title": "BlockUserInAccountSchema"
+    },
+    "CreateUserSchema": {
+      "type": "object",
+      "properties": {
+        "method": {
+          "type": "string",
+          "const": "POST"
+        },
+        "body": {
+          "type": "object",
+          "properties": {
+            "identityId": {
+              "type": "string",
+              "description": "用户ID",
+              "pattern": "^[a-z0-9_]+$"
+            },
+            "name": {
+              "type": "string"
+            },
+            "email": {
+              "type": "string"
+            },
+            "password": {
+              "type": "string",
+              "description": "密码",
+              "pattern": "^(?=.*\\d)(?=.*[a-zA-Z])(?=.*[`~!@#\\$%^&*()_+\\-[\\];',./{}|:\"<>?]).{8,}$"
+            }
+          },
+          "required": [
+            "identityId",
+            "name",
+            "email",
+            "password"
+          ],
+          "additionalProperties": false
+        },
+        "responses": {
+          "type": "object",
+          "properties": {
+            "204": {
+              "type": "null"
+            },
+            "409": {
+              "type": "null",
+              "description": "用户已经存在"
+            },
+            "501": {
+              "type": "null",
+              "description": "本功能在当前配置下不可用"
+            }
+          },
+          "required": [
+            "204",
+            "409",
+            "501"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "method",
+        "body",
+        "responses"
+      ],
+      "additionalProperties": false,
+      "$id": "CreateUserSchema",
+      "title": "CreateUserSchema"
+    },
+    "GetAccountUsersSchema": {
+      "type": "object",
+      "properties": {
+        "method": {
+          "type": "string",
+          "const": "GET"
+        },
+        "query": {
+          "type": "object",
+          "properties": {
+            "accountName": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "accountName"
+          ],
+          "additionalProperties": false
+        },
+        "responses": {
+          "type": "object",
+          "properties": {
+            "200": {
+              "type": "object",
+              "properties": {
+                "results": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "AccountUserInfo#"
+                  }
+                }
+              },
+              "required": [
+                "results"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "200"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "method",
+        "query",
+        "responses"
+      ],
+      "additionalProperties": false,
+      "$id": "GetAccountUsersSchema",
+      "title": "GetAccountUsersSchema"
+    },
+    "CancelJobChargeLimitSchema": {
+      "type": "object",
+      "properties": {
+        "method": {
+          "type": "string",
+          "const": "DELETE"
+        },
+        "body": {
+          "type": "object",
+          "properties": {
+            "accountName": {
+              "type": "string"
+            },
+            "userId": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "accountName",
+            "userId"
+          ],
+          "additionalProperties": false
+        },
+        "responses": {
+          "type": "object",
+          "properties": {
+            "204": {
+              "type": "null"
+            },
+            "404": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "204",
+            "404"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "method",
+        "body",
+        "responses"
+      ],
+      "additionalProperties": false,
+      "$id": "CancelJobChargeLimitSchema",
+      "title": "CancelJobChargeLimitSchema"
+    },
+    "SetJobChargeLimitSchema": {
+      "type": "object",
+      "properties": {
+        "method": {
+          "type": "string",
+          "const": "PUT"
+        },
+        "body": {
+          "type": "object",
+          "properties": {
+            "accountName": {
+              "type": "string"
+            },
+            "userId": {
+              "type": "string"
+            },
+            "limit": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "accountName",
+            "userId",
+            "limit"
+          ],
+          "additionalProperties": false
+        },
+        "responses": {
+          "type": "object",
+          "properties": {
+            "204": {
+              "type": "null"
+            },
+            "404": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "204",
+            "404"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "method",
+        "body",
+        "responses"
+      ],
+      "additionalProperties": false,
+      "$id": "SetJobChargeLimitSchema",
+      "title": "SetJobChargeLimitSchema"
+    },
+    "RemoveUserFromAccountSchema": {
+      "type": "object",
+      "properties": {
+        "method": {
+          "type": "string",
+          "const": "DELETE"
+        },
+        "body": {
+          "type": "object",
+          "properties": {
+            "accountName": {
+              "type": "string"
+            },
+            "identityId": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "accountName",
+            "identityId"
+          ],
+          "additionalProperties": false
+        },
+        "responses": {
+          "type": "object",
+          "properties": {
+            "204": {
+              "type": "null"
+            },
+            "404": {
+              "type": "null"
+            },
+            "406": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "204",
+            "404",
+            "406"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "method",
+        "body",
+        "responses"
+      ],
+      "additionalProperties": false,
+      "$id": "RemoveUserFromAccountSchema",
+      "title": "RemoveUserFromAccountSchema"
+    },
+    "SetAdminSchema": {
+      "type": "object",
+      "properties": {
+        "method": {
+          "type": "string",
+          "const": "PUT"
+        },
+        "body": {
+          "type": "object",
+          "properties": {
+            "accountName": {
+              "type": "string"
+            },
+            "identityId": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "accountName",
+            "identityId"
+          ],
+          "additionalProperties": false
+        },
+        "responses": {
+          "type": "object",
+          "properties": {
+            "200": {
+              "type": "object",
+              "properties": {
+                "executed": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "executed"
+              ],
+              "additionalProperties": false
+            },
+            "404": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "200",
+            "404"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "method",
+        "body",
+        "responses"
+      ],
+      "additionalProperties": false,
+      "$id": "SetAdminSchema",
+      "title": "SetAdminSchema"
+    },
+    "QueryStorageUsageSchema": {
+      "type": "object",
+      "properties": {
+        "method": {
+          "type": "string",
+          "const": "GET"
+        },
+        "query": {
+          "type": "object",
+          "properties": {
+            "cluster": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "cluster"
+          ],
+          "additionalProperties": false
+        },
+        "responses": {
+          "type": "object",
+          "properties": {
+            "200": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "result"
+              ],
+              "additionalProperties": false
+            },
+            "404": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "200",
+            "404"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "method",
+        "query",
+        "responses"
+      ],
+      "additionalProperties": false,
+      "$id": "QueryStorageUsageSchema",
+      "title": "QueryStorageUsageSchema"
+    },
+    "UnblockUserInAccountSchema": {
+      "type": "object",
+      "properties": {
+        "method": {
+          "type": "string",
+          "const": "PUT"
+        },
+        "body": {
+          "type": "object",
+          "properties": {
+            "accountName": {
+              "type": "string"
+            },
+            "identityId": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "accountName",
+            "identityId"
+          ],
+          "additionalProperties": false
+        },
+        "responses": {
+          "type": "object",
+          "properties": {
+            "200": {
+              "type": "object",
+              "properties": {
+                "executed": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "executed"
+              ],
+              "additionalProperties": false
+            },
+            "404": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "200",
+            "404"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "method",
+        "body",
+        "responses"
+      ],
+      "additionalProperties": false,
+      "$id": "UnblockUserInAccountSchema",
+      "title": "UnblockUserInAccountSchema"
+    },
+    "UnsetAdminSchema": {
+      "type": "object",
+      "properties": {
+        "method": {
+          "type": "string",
+          "const": "PUT"
+        },
+        "body": {
+          "type": "object",
+          "properties": {
+            "accountName": {
+              "type": "string"
+            },
+            "identityId": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "accountName",
+            "identityId"
+          ],
+          "additionalProperties": false
+        },
+        "responses": {
+          "type": "object",
+          "properties": {
+            "200": {
+              "type": "object",
+              "properties": {
+                "executed": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "executed"
+              ],
+              "additionalProperties": false
+            },
+            "404": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "200",
+            "404"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "method",
+        "body",
+        "responses"
+      ],
+      "additionalProperties": false,
+      "$id": "UnsetAdminSchema",
+      "title": "UnsetAdminSchema"
+    },
+    "DewhitelistAccountSchema": {
+      "type": "object",
+      "properties": {
+        "method": {
+          "type": "string",
+          "const": "DELETE"
+        },
+        "body": {
+          "type": "object",
+          "properties": {
+            "accountName": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "accountName"
+          ],
+          "additionalProperties": false
+        },
+        "responses": {
+          "type": "object",
+          "properties": {
+            "204": {
+              "type": "null"
+            },
+            "404": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "204",
+            "404"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "method",
+        "body",
+        "responses"
+      ],
+      "additionalProperties": false,
+      "$id": "DewhitelistAccountSchema",
+      "title": "DewhitelistAccountSchema"
+    }
+  },
+  "models": {
+    "NamedParameters%3Ctypeof%20_parseHostname%3E": {
+      "type": "object",
+      "properties": {
+        "host": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "$id": "NamedParameters%3Ctypeof%20_parseHostname%3E",
+      "title": "NamedParameters%3Ctypeof%20_parseHostname%3E"
+    },
+    "WhitelistedAccount": {
+      "type": "object",
+      "properties": {
+        "accountName": {
+          "type": "string"
+        },
+        "ownerId": {
+          "type": "string"
+        },
+        "ownerName": {
+          "type": "string"
+        },
+        "addTime": {
+          "type": "string"
+        },
+        "operatorId": {
+          "type": "string"
+        },
+        "comment": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "accountName",
+        "ownerId",
+        "ownerName",
+        "operatorId",
+        "comment"
+      ],
+      "additionalProperties": false,
+      "$id": "WhitelistedAccount",
+      "title": "WhitelistedAccount"
+    },
+    "GetJobFilter": {
+      "type": "object",
+      "properties": {
+        "jobEndTimeStart": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "jobEndTimeEnd": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "jobId": {
+          "type": "number",
+          "minimum": 1
+        },
+        "userId": {
+          "type": "string",
+          "description": "如果是平台管理员，或者userId是自己，或者（设置了accountName，而且当前用户是accountName账户的管理员或者拥有者），那么   显示userId用户在accountName中的作业 否则：403"
+        },
+        "accountName": {
+          "type": "string"
+        },
+        "clusters": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "jobEndTimeStart",
+        "jobEndTimeEnd"
+      ],
+      "additionalProperties": false,
+      "$id": "GetJobFilter",
+      "title": "GetJobFilter"
+    },
+    "GetJobsReply": {
+      "type": "object",
+      "properties": {
+        "totalCount": {
+          "type": "number"
+        },
+        "jobs": {
+          "type": "array",
+          "items": {
+            "$ref": "JobInfo#"
+          }
+        },
+        "totalAccountPrice": {
+          "$ref": "Money#"
+        },
+        "totalTenantPrice": {
+          "$ref": "Money#"
+        }
+      },
+      "required": [
+        "totalCount",
+        "jobs"
+      ],
+      "additionalProperties": false,
+      "$id": "GetJobsReply",
+      "title": "GetJobsReply"
+    },
+    "JobInfo": {
+      "type": "object",
+      "properties": {
+        "biJobIndex": {
+          "type": "number"
+        },
+        "idJob": {
+          "type": "number"
+        },
+        "account": {
+          "type": "string"
+        },
+        "user": {
+          "type": "string"
+        },
+        "partition": {
+          "type": "string"
+        },
+        "nodelist": {
+          "type": "string"
+        },
+        "jobName": {
+          "type": "string"
+        },
+        "cluster": {
+          "type": "string"
+        },
+        "timeSubmit": {
+          "type": "string"
+        },
+        "timeStart": {
+          "type": "string"
+        },
+        "timeEnd": {
+          "type": "string"
+        },
+        "gpu": {
+          "type": "number"
+        },
+        "cpusReq": {
+          "type": "number"
+        },
+        "memReq": {
+          "type": "number"
+        },
+        "nodesReq": {
+          "type": "number"
+        },
+        "cpusAlloc": {
+          "type": "number"
+        },
+        "memAlloc": {
+          "type": "number"
+        },
+        "nodesAlloc": {
+          "type": "number"
+        },
+        "timelimit": {
+          "type": "number"
+        },
+        "timeUsed": {
+          "type": "number"
+        },
+        "timeWait": {
+          "type": "number"
+        },
+        "qos": {
+          "type": "string"
+        },
+        "recordTime": {
+          "type": "string"
+        },
+        "accountPrice": {
+          "$ref": "Money#"
+        },
+        "tenantPrice": {
+          "$ref": "Money#"
+        }
+      },
+      "required": [
+        "biJobIndex",
+        "idJob",
+        "account",
+        "user",
+        "partition",
+        "nodelist",
+        "jobName",
+        "cluster",
+        "gpu",
+        "cpusReq",
+        "memReq",
+        "nodesReq",
+        "cpusAlloc",
+        "memAlloc",
+        "nodesAlloc",
+        "timelimit",
+        "timeUsed",
+        "timeWait",
+        "qos"
+      ],
+      "additionalProperties": false,
+      "$id": "JobInfo",
+      "title": "JobInfo"
+    },
+    "Money": {
+      "type": "object",
+      "properties": {
+        "positive": {
+          "type": "boolean"
+        },
+        "yuan": {
+          "type": "number"
+        },
+        "mills": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "positive",
+        "yuan",
+        "mills"
+      ],
+      "additionalProperties": false,
+      "$id": "Money",
+      "title": "Money"
+    },
+    "ChangeStorageMode": {
+      "type": "string",
+      "enum": [
+        "INCREASE",
+        "DECREASE",
+        "SET"
+      ],
+      "$id": "ChangeStorageMode",
+      "title": "ChangeStorageMode"
+    },
+    "AdminAccountInfo": {
+      "$ref": "RequiredBy%3CAccount%2C%22balance%22%3E#",
+      "$id": "AdminAccountInfo",
+      "title": "AdminAccountInfo"
+    },
+    "RequiredBy%3CAccount%2C%22balance%22%3E": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "balance": {
+          "$ref": "Money#"
+        },
+        "tenantName": {
+          "type": "string"
+        },
+        "accountName": {
+          "type": "string"
+        },
+        "userCount": {
+          "type": "number"
+        },
+        "blocked": {
+          "type": "boolean"
+        },
+        "ownerId": {
+          "type": "string"
+        },
+        "ownerName": {
+          "type": "string"
+        },
+        "comment": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "accountName",
+        "blocked",
+        "comment",
+        "ownerId",
+        "ownerName",
+        "tenantName",
+        "userCount"
+      ],
+      "$id": "RequiredBy%3CAccount%2C%22balance%22%3E",
+      "title": "RequiredBy%3CAccount%2C%22balance%22%3E"
+    },
+    "Pick%3CAccount%2CExclude%3C(%22tenantName%22%7C%22accountName%22%7C%22userCount%22%7C%22blocked%22%7C%22ownerId%22%7C%22ownerName%22%7C%22comment%22%7C%22balance%22)%2C%22balance%22%3E%3E": {
+      "type": "object",
+      "properties": {
+        "tenantName": {
+          "type": "string"
+        },
+        "accountName": {
+          "type": "string"
+        },
+        "userCount": {
+          "type": "number"
+        },
+        "blocked": {
+          "type": "boolean"
+        },
+        "ownerId": {
+          "type": "string"
+        },
+        "ownerName": {
+          "type": "string"
+        },
+        "comment": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "tenantName",
+        "accountName",
+        "userCount",
+        "blocked",
+        "ownerId",
+        "ownerName",
+        "comment"
+      ],
+      "additionalProperties": false,
+      "$id": "Pick%3CAccount%2CExclude%3C(%22tenantName%22%7C%22accountName%22%7C%22userCount%22%7C%22blocked%22%7C%22ownerId%22%7C%22ownerName%22%7C%22comment%22%7C%22balance%22)%2C%22balance%22%3E%3E",
+      "title": "Pick%3CAccount%2CExclude%3C(%22tenantName%22%7C%22accountName%22%7C%22userCount%22%7C%22blocked%22%7C%22ownerId%22%7C%22ownerName%22%7C%22comment%22%7C%22balance%22)%2C%22balance%22%3E%3E"
+    },
+    "NamedParameters%3Ctypeof%20getAccounts%3E": {
+      "type": "object",
+      "properties": {
+        "req": {
+          "$ref": "GetAccountsRequest#"
+        }
+      },
+      "required": [
+        "req"
+      ],
+      "additionalProperties": false,
+      "$id": "NamedParameters%3Ctypeof%20getAccounts%3E",
+      "title": "NamedParameters%3Ctypeof%20getAccounts%3E"
+    },
+    "GetAccountsRequest": {
+      "type": "object",
+      "properties": {
+        "tenantName": {
+          "type": "string"
+        },
+        "accountName": {
+          "type": "string",
+          "description": "returns all accounts if not set"
+        }
+      },
+      "required": [
+        "tenantName"
+      ],
+      "additionalProperties": false,
+      "$id": "GetAccountsRequest",
+      "title": "GetAccountsRequest"
+    },
+    "FullUserInfo": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "createTime": {
+          "type": "string"
+        },
+        "accountAffiliations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "accountName": {
+                "type": "string"
+              },
+              "role": {
+                "$ref": "UserRole#"
+              }
+            },
+            "required": [
+              "accountName",
+              "role"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "platformRoles": {
+          "type": "array",
+          "items": {
+            "$ref": "PlatformRole#"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "email",
+        "createTime",
+        "accountAffiliations",
+        "platformRoles"
+      ],
+      "additionalProperties": false,
+      "$id": "FullUserInfo",
+      "title": "FullUserInfo"
+    },
+    "UserRole": {
+      "type": "number",
+      "enum": [
+        0,
+        1,
+        2
+      ],
+      "$id": "UserRole",
+      "title": "UserRole"
+    },
+    "PlatformRole": {
+      "type": "number",
+      "enum": [
+        0,
+        1
+      ],
+      "$id": "PlatformRole",
+      "title": "PlatformRole"
+    },
+    "UserInfo": {
+      "type": "object",
+      "properties": {
+        "identityId": {
+          "type": "string"
+        },
+        "tenant": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "accountAffiliations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "accountName": {
+                "type": "string"
+              },
+              "role": {
+                "$ref": "UserRole#"
+              }
+            },
+            "required": [
+              "accountName",
+              "role"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "platformRoles": {
+          "type": "array",
+          "items": {
+            "$ref": "PlatformRole#"
+          }
+        },
+        "tenantRoles": {
+          "type": "array",
+          "items": {
+            "$ref": "TenantRole#"
+          }
+        }
+      },
+      "required": [
+        "identityId",
+        "tenant",
+        "name",
+        "accountAffiliations",
+        "platformRoles",
+        "tenantRoles"
+      ],
+      "additionalProperties": false,
+      "$id": "UserInfo",
+      "title": "UserInfo"
+    },
+    "TenantRole": {
+      "type": "number",
+      "enum": [
+        0,
+        1
+      ],
+      "$id": "TenantRole",
+      "title": "TenantRole"
+    },
+    "GetUserStatusReply": {
+      "type": "object",
+      "properties": {
+        "accountStatuses": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "AccountStatus#"
+          },
+          "description": "account and its status"
+        },
+        "storageQuotas": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number"
+          },
+          "description": "cluster and quota"
+        }
+      },
+      "required": [
+        "accountStatuses",
+        "storageQuotas"
+      ],
+      "additionalProperties": false,
+      "$id": "GetUserStatusReply",
+      "title": "GetUserStatusReply"
+    },
+    "AccountStatus": {
+      "type": "object",
+      "properties": {
+        "userStatus": {
+          "$ref": "UserStatus#"
+        },
+        "accountBlocked": {
+          "type": "boolean"
+        },
+        "jobChargeLimit": {
+          "$ref": "Money#"
+        },
+        "usedJobCharge": {
+          "$ref": "Money#"
+        },
+        "balance": {
+          "$ref": "Money#"
+        }
+      },
+      "required": [
+        "userStatus",
+        "accountBlocked"
+      ],
+      "additionalProperties": false,
+      "$id": "AccountStatus",
+      "title": "AccountStatus"
+    },
+    "UserStatus": {
+      "type": "number",
+      "enum": [
+        0,
+        1
+      ],
+      "$id": "UserStatus",
+      "title": "UserStatus"
+    },
+    "ChargeInfo": {
+      "type": "object",
+      "properties": {
+        "index": {
+          "type": "number"
+        },
+        "accountName": {
+          "type": "string"
+        },
+        "time": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "amount": {
+          "type": "number"
+        },
+        "comment": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "index",
+        "accountName",
+        "time",
+        "type",
+        "amount",
+        "comment"
+      ],
+      "additionalProperties": false,
+      "$id": "ChargeInfo",
+      "title": "ChargeInfo"
+    },
+    "PaymentInfo": {
+      "type": "object",
+      "properties": {
+        "index": {
+          "type": "number"
+        },
+        "accountName": {
+          "type": "string"
+        },
+        "time": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "amount": {
+          "type": "number"
+        },
+        "comment": {
+          "type": "string"
+        },
+        "ipAddress": {
+          "type": "string"
+        },
+        "operatorId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "index",
+        "accountName",
+        "time",
+        "type",
+        "amount",
+        "comment",
+        "ipAddress",
+        "operatorId"
+      ],
+      "additionalProperties": false,
+      "$id": "PaymentInfo",
+      "title": "PaymentInfo"
+    },
+    "ChangeMode": {
+      "type": "string",
+      "enum": [
+        "INCREASE",
+        "DECREASE"
+      ],
+      "$id": "ChangeMode",
+      "title": "ChangeMode"
+    },
+    "RunningJob": {
+      "type": "object",
+      "properties": {
+        "jobId": {
+          "type": "string"
+        },
+        "partition": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "user": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        },
+        "runningTime": {
+          "type": "string"
+        },
+        "nodes": {
+          "type": "string"
+        },
+        "nodesOrReason": {
+          "type": "string"
+        },
+        "account": {
+          "type": "string"
+        },
+        "cores": {
+          "type": "string"
+        },
+        "qos": {
+          "type": "string"
+        },
+        "submissionTime": {
+          "type": "string"
+        },
+        "nodesToBeUsed": {
+          "type": "string"
+        },
+        "timeLimit": {
+          "type": "string",
+          "description": "days-hours:minutes:seconds. The value may be  \"NOT_SET\"  if not yet established or \"UNLIMITED\" for no limit.  (Valid for jobs and job steps)"
+        }
+      },
+      "required": [
+        "jobId",
+        "partition",
+        "name",
+        "user",
+        "state",
+        "runningTime",
+        "nodes",
+        "nodesOrReason",
+        "account",
+        "cores",
+        "qos",
+        "submissionTime",
+        "nodesToBeUsed",
+        "timeLimit"
+      ],
+      "additionalProperties": false,
+      "$id": "RunningJob",
+      "title": "RunningJob"
+    },
+    "AccountUserInfo": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "UserStatus#"
+        },
+        "role": {
+          "$ref": "UserRole#"
+        },
+        "storageQuotas": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number"
+          },
+          "description": "cluster and quota"
+        },
+        "jobChargeLimit": {
+          "$ref": "Money#"
+        },
+        "usedJobChargeLimit": {
+          "$ref": "Money#"
+        }
+      },
+      "required": [
+        "userId",
+        "name",
+        "status",
+        "role",
+        "storageQuotas"
+      ],
+      "additionalProperties": false,
+      "$id": "AccountUserInfo",
+      "title": "AccountUserInfo"
+    }
+  }
+}

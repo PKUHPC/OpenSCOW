@@ -1,0 +1,31 @@
+{
+  "name": "@scow/clusterops-slurm",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon --watch src -e ts --exec \"npx dotenv -e env/.env.dev -- npx ts-node -r tsconfig-paths/register src/index.ts\"",
+    "build": "npm run protos && rimraf build && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
+    "serve": "node build/index.js",
+    "protos": "tsgrpc-cli protos"
+  },
+  "dependencies": {
+    "@ddadaal/tsgrpc-server": "^0.12.0",
+    "@scow/config": "workspace:*",
+    "@grpc/grpc-js": "^1.6.7",
+    "node-ssh": "^12.0.4"
+  },
+  "devDependencies": {
+    "@ddadaal/tsgrpc-cli": "^0.11.0",
+    "@types/google-protobuf": "^3.15.6",
+    "@types/rimraf": "^3.0.2",
+    "@types/wait-on": "^5.3.1",
+    "@types/node-ssh": "^7.0.1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "volta": {
+    "extends": "../../package.json"
+  }
+}

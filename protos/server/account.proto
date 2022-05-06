@@ -1,0 +1,107 @@
+syntax = "proto3";
+
+package scow.server;
+
+import "common/money.proto";
+import "google/protobuf/timestamp.proto";
+
+message BlockAccountRequest {
+  string tenant_name = 1;
+  string account_name = 2;
+}
+
+// NOT_FOUND: account is not found.
+message BlockAccountReply {
+  enum Result {
+    OK = 0;
+    ALREADY_BLOCKED = 1;
+    WHITELISTED = 2;
+  }
+  Result result = 1;
+}
+
+message UnblockAccountRequest {
+  string tenant_name = 1;
+  string account_name = 2;
+}
+
+// NOT_FOUND: account is not found.
+message UnblockAccountReply { bool executed = 1; }
+
+message GetWhitelistedAccountsRequest { string tenant_name = 1; }
+
+message WhitelistedAccount {
+  string account_name = 1;
+  string owner_id = 2;
+  string owner_name = 3;
+  google.protobuf.Timestamp add_time = 4;
+  string operator_id = 5;
+  string comment = 6;
+}
+
+message GetWhitelistedAccountsReply {
+  repeated WhitelistedAccount accounts = 1;
+}
+
+message WhitelistAccountRequest {
+  string tenant_name = 1;
+  string account_name = 2;
+  string operator_id = 3;
+  string comment = 4;
+}
+
+// NOT_FOUND: account is not found.
+message WhitelistAccountReply { bool executed = 1; }
+
+message DewhitelistAccountRequest {
+  string tenant_name = 1;
+  string account_name = 2;
+}
+
+// NOT_FOUND: account is not found.
+message DewhitelistAccountReply { bool executed = 1; }
+
+message CreateAccountRequest {
+  string tenant_name = 1;
+  string account_name = 2;
+  string owner_id = 3;
+  string comment = 4;
+}
+
+// ALREADY_EXISTS: Account already exists.
+// NOT_FOUND: owner user doesn't exist
+message CreateAccountReply {}
+
+message GetAccountsRequest {
+  string tenant_name = 1;
+  // returns all accounts if not set
+  optional string account_name = 2;
+}
+
+message Account {
+  string tenant_name = 1;
+  string account_name = 2;
+  uint64 user_count = 3;
+  bool blocked = 4;
+  string owner_id = 5;
+  string owner_name = 6;
+  string comment = 7;
+  common.Money balance = 8;
+}
+
+message GetAccountsReply { repeated Account results = 1; }
+
+service AccountService {
+
+  rpc CreateAccount(CreateAccountRequest) returns (CreateAccountReply);
+  rpc GetAccounts(GetAccountsRequest) returns (GetAccountsReply);
+
+  rpc BlockAccount(BlockAccountRequest) returns (BlockAccountReply);
+  rpc UnblockAccount(UnblockAccountRequest) returns (UnblockAccountReply);
+
+  rpc GetWhitelistedAccounts(GetWhitelistedAccountsRequest)
+      returns (GetWhitelistedAccountsReply);
+  rpc WhitelistAccount(WhitelistAccountRequest) returns (WhitelistAccountReply);
+  rpc DewhitelistAccount(DewhitelistAccountRequest)
+      returns (DewhitelistAccountReply);
+}

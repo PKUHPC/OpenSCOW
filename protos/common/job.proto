@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package scow.common.job;
+
+message RunningJob {
+  string job_id = 1;
+  string partition = 2;
+  string name = 3;
+  string user = 4;
+  string state = 5;
+  string running_time = 6;
+  string nodes = 7;
+  string nodes_or_reason = 8;
+  string account = 9;
+  string cores = 10;
+  string qos = 11;
+  string submission_time = 12;
+  string nodes_to_be_used = 13;
+
+  /**
+  days-hours:minutes:seconds.
+  The value may be  "NOT_SET"  if not yet established or "UNLIMITED" for no
+  limit.  (Valid for jobs and job steps)
+   */
+  string time_limit = 14;
+}

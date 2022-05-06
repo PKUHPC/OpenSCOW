@@ -1,0 +1,75 @@
+stages:
+  - build
+  - deploy
+
+before_script:
+  - /shared/connect -u $IAAA_USERNAME -p "$(echo $IAAA_PASSWORD | base64 -d)"
+
+  - mkdir -p ~/.docker/cli-plugins/
+  - cp /shared/docker-compose ~/.docker/cli-plugins/
+  - chmod +x ~/.docker/cli-plugins/docker-compose
+
+
+after_script:
+  - /shared/connect -c
+
+build-containers:
+  stage: build
+  image: docker
+  retry: 2
+
+  only:
+    - master
+
+  cache:
+    - key: $CI_COMMIT_REF_SLUG
+      paths:
+        - .pnpm-store
+
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker info
+    # build one and download packages for the root project
+    - docker compose build auth
+    - docker compose build
+    - docker compose push
+
+build-file-server:
+  stage: build
+  image: node:16
+
+  only:
+    - master
+
+  variables:
+    PKG_CACHE_PATH: .pkg-cache
+
+  cache:
+    - key: $CI_COMMIT_REF_SLUG
+      paths:
+        - .pnpm-store
+        - $PKG_CACHE_PATH
+
+  script:
+    - npm install -g pnpm
+    - pnpm config set store-dir .pnpm-store
+    - pnpm install
+    - PKG_CACHE_PATH=$PKG_CACHE_PATH pnpm --filter file-server... run build
+
+  artifacts:
+    expire_in: 1 days
+    name: file-server
+    paths:
+      - apps/file-server/build/file-server
+
+deploy-job:
+  allow_failure: true
+
+  stage: deploy
+  image: node:17-alpine
+
+  only:
+    - master
+
+  script:
+    - node --experimental-fetch scripts/deploy.mjs

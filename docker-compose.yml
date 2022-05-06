@@ -1,0 +1,138 @@
+version: "3"
+
+services:
+
+  gateway:
+    image: $IMAGE_BASE/gateway
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile.gateway
+      cache_from:
+        - $IMAGE_BASE/gateway
+      args:
+        - BUILDKIT_INLINE_CACHE=1
+    ports:
+      - 29923:80
+    volumes:
+      - ./apps/gateway/nginx.conf:/etc/nginx/templates/default.conf.template
+    environment:
+      FILE_SERVERS: hpc01=192.168.88.240 # dummy
+
+  mis-web-mis:
+    image: $IMAGE_BASE/mis-web-mis
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile.mis-web
+      cache_from:
+        - $IMAGE_BASE/mis-web
+      args:
+        - BUILDKIT_INLINE_CACHE=1
+        - BASE_PATH=/mis
+
+  mis-web-root:
+    image: $IMAGE_BASE/mis-web-root
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile.mis-web
+      cache_from:
+        - $IMAGE_BASE/mis-web-root
+      args:
+        - BUILDKIT_INLINE_CACHE=1
+        - BASE_PATH=
+
+  portal-web-portal:
+    image: $IMAGE_BASE/portal-web-portal
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile.portal-web
+      cache_from:
+        - $IMAGE_BASE/mis-web
+      args:
+        - BUILDKIT_INLINE_CACHE=1
+        - BASE_PATH=/portal
+
+  portal-web-root:
+    image: $IMAGE_BASE/portal-web-root
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile.portal-web
+      cache_from:
+        - $IMAGE_BASE/mis-web
+      args:
+        - BUILDKIT_INLINE_CACHE=1
+        - BASE_PATH=
+
+  docs:
+    image: $IMAGE_BASE/docs
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile.docs
+      cache_from:
+        - $IMAGE_BASE/docs
+      args:
+        - BUILDKIT_INLINE_CACHE=1
+        - BASE_PATH=/docs/
+
+
+  # billing-bill:
+  #   image: $IMAGE_BASE/billing-bill
+  #   build:
+  #     context: .
+  #     dockerfile: dockerfiles/Dockerfile.billing-bill
+  #     cache_from:
+  #       - $IMAGE_BASE/billing-bill
+  #     args:
+  #       - BUILDKIT_INLINE_CACHE=1
+
+  mis-server:
+    image: $IMAGE_BASE/mis-server
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile.mis-server
+      cache_from:
+        - $IMAGE_BASE/mis-server
+      args:
+        - BUILDKIT_INLINE_CACHE=1
+
+  shell-server:
+    image: $IMAGE_BASE/shell-server
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile.shell-server
+      cache_from:
+        - $IMAGE_BASE/shell-server
+      args:
+        - BUILDKIT_INLINE_CACHE=1
+
+  vnc-server:
+    image: $IMAGE_BASE/vnc-server
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile.vnc-server
+      cache_from:
+        - $IMAGE_BASE/vnc-server
+      args:
+        - BUILDKIT_INLINE_CACHE=1
+
+  auth:
+    image: $IMAGE_BASE/auth
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile.auth
+      cache_from:
+        - $IMAGE_BASE/auth
+      args:
+        - BUILDKIT_INLINE_CACHE=1
+
+  clusterops-slurm:
+    image: $IMAGE_BASE/clusterops-slurm
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile.clusterops-slurm
+      cache_from:
+        - $IMAGE_BASE/clusterops-slurm
+      args:
+        - BUILDKIT_INLINE_CACHE=1
+
+volumes:
+  pnpm_cache:

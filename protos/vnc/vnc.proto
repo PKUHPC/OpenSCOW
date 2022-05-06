@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package scow.vnc;
+
+message LaunchDesktopRequest { string username = 1; }
+
+message LaunchDesktopReply {
+  bool already_running = 1;
+  string node = 2;
+  string password = 3;
+  uint32 display_id = 4;
+  uint32 port = 5;
+}
+
+message RefreshOTPPasswordRequest {
+  string username = 1;
+  string node = 2;
+  uint32 display_id = 3;
+}
+
+// NOT_FOUND: node is not found, display_id is not found
+message RefreshOTPPasswordReply { string password = 1; }
+
+service VncService {
+  rpc LaunchDesktop(LaunchDesktopRequest) returns (LaunchDesktopReply);
+  rpc RefreshOTPPassword(RefreshOTPPasswordRequest)
+      returns (RefreshOTPPasswordReply);
+}

@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package scow.mq;
+
+import "mq/option.proto";
+
+message AccountCreatedMessage {
+  option (mq_queue) = "account_created";
+  string account_name = 1;
+}

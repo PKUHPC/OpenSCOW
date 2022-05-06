@@ -1,0 +1,98 @@
+<mxfile host="65bd71144e">
+    <diagram id="vxhlQh3RZwGnh8x3k_s3" name="Page-1">
+        <mxGraphModel dx="1106" dy="758" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="45" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="220" y="410" width="290" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="37" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="90" y="110" width="420" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="36" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="220" y="280" width="290" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="2" style="edgeStyle=none;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.352;entryY=1.01;entryDx=0;entryDy=0;startArrow=none;startFill=0;entryPerimeter=0;" parent="1" source="6" target="40" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="3" value="HTTP协议（为了携带cookie）" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="2" vertex="1" connectable="0">
+                    <mxGeometry x="-0.2485" relative="1" as="geometry">
+                        <mxPoint x="-12" y="12" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="6" value="浏览器" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="70" y="350" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="7" style="edgeStyle=none;html=1;exitX=0.118;exitY=-0.072;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;exitPerimeter=0;" parent="1" source="14" target="15" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="8" value="从cookie中获得token验证用户信息" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="7" vertex="1" connectable="0">
+                    <mxGeometry x="-0.2158" y="-3" relative="1" as="geometry">
+                        <mxPoint x="10" y="-15" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="11" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="26" target="17" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="28" value="mount" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="11" vertex="1" connectable="0">
+                    <mxGeometry x="-0.3986" y="-1" relative="1" as="geometry">
+                        <mxPoint x="12" y="-1" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="29" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="14" target="16" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="30" value="mount" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="29" vertex="1" connectable="0">
+                    <mxGeometry x="-0.3692" y="2" relative="1" as="geometry">
+                        <mxPoint x="11" y="2" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="14" value="文件服务器" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="260" y="300" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="15" value="redis：认证信息" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="330" y="150" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="16" value="集群1的文件系统" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="550" y="300" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="17" value="集群2的文件系统" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="550" y="430" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="34" style="edgeStyle=none;html=1;exitX=0.75;exitY=0;exitDx=0;exitDy=0;entryX=0.604;entryY=1.07;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" source="26" target="15" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="26" value="文件服务器" style="whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="260" y="430" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="35" value="从cookie中获得token验证用户信息" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="1" vertex="1" connectable="0">
+                    <mxGeometry x="329.9992440652357" y="389.99617185607434" as="geometry"/>
+                </mxCell>
+                <mxCell id="38" value="集群的登录节点" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+                    <mxGeometry x="390" y="280" width="120" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="39" value="service" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+                    <mxGeometry x="170" y="110" width="120" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="42" style="edgeStyle=none;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;" edge="1" parent="1" source="40" target="14">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="43" value="将文件服务的请求转发到对应的文件服务器" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="42">
+                    <mxGeometry x="-0.2224" y="-1" relative="1" as="geometry">
+                        <mxPoint x="-7" y="18" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="44" style="edgeStyle=none;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;" edge="1" parent="1" source="40" target="26">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="40" value="nginx" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="100" y="150" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="46" value="集群的登录节点" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+                    <mxGeometry x="390" y="410" width="120" height="30" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

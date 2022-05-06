@@ -1,0 +1,51 @@
+import createError from "@fastify/error";
+import fastify, { FastifyInstance, FastifyPluginAsync, FastifyPluginCallback } from "fastify";
+import gracefulShutdown from "fastify-graceful-shutdown";
+import { config } from "src/config";
+import { plugins } from "src/plugins";
+import { routes }  from "src/routes";
+
+type Plugin = FastifyPluginAsync | FastifyPluginCallback;
+type PluginOverrides = Map<Plugin, Plugin>;
+
+function applyPlugins(server: FastifyInstance, pluginOverrides?: PluginOverrides) {
+  plugins.forEach((plugin) => {
+    server.register(pluginOverrides && pluginOverrides.has(plugin)
+      ? pluginOverrides.get(plugin)!
+      : plugin);
+  });
+}
+
+const ValidationError = createError("BAD_REQUEST", "Errors occurred when validating %s. Errors are \n%o", 400);
+
+export function buildApp(pluginOverrides?: PluginOverrides) {
+
+  const server = fastify({
+    logger: { level: config.LOG_LEVEL },
+    ajv: {
+      customOptions: {
+        coerceTypes: "array",
+      },
+    },
+    schemaErrorFormatter: (errors, dataVar) => {
+      return new ValidationError(dataVar, errors);
+    },
+  });
+
+  server.log.info(`Loaded config: \n${JSON.stringify(config, null, 2)}`);
+
+  applyPlugins(server, pluginOverrides);
+
+  server.register(gracefulShutdown);
+
+  routes.forEach((r) => server.register(r));
+
+  return server;
+}
+
+export async function startServer(server: FastifyInstance) {
+  await server.listen(config.PORT, config.HOST).catch((err) => {
+    server.log.error(err);
+    throw err;
+  });
+}

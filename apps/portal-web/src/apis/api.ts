@@ -1,0 +1,20 @@
+/* eslint-disable max-len */
+
+import { fromApi } from "@ddadaal/next-typed-api-routes-runtime/lib/client";
+import { join } from "path";
+import type { GetIconSchema } from "src/pages/api//icon";
+import type { AuthCallbackSchema } from "src/pages/api/auth/callback";
+import type { LogoutSchema } from "src/pages/api/auth/logout";
+import type { ValidateTokenSchema } from "src/pages/api/auth/validateToken";
+import type { ChangePasswordSchema } from "src/pages/api/profile/changePassword";
+import type { LaunchDesktopSchema } from "src/pages/api/vnc/launchDesktop";
+
+
+export const api = {
+  authCallback: fromApi<AuthCallbackSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/auth/callback")),
+  logout: fromApi<LogoutSchema>("DELETE", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/auth/logout")),
+  validateToken: fromApi<ValidateTokenSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/auth/validateToken")),
+  getIcon: fromApi<GetIconSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api//icon")),
+  changePassword: fromApi<ChangePasswordSchema>("PATCH", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/profile/changePassword")),
+  launchDesktop: fromApi<LaunchDesktopSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/vnc/launchDesktop")),
+};

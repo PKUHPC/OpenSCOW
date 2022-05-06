@@ -1,0 +1,1355 @@
+{
+  "namespaces": [],
+  "tables": [
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "mappedType": "integer"
+        },
+        "time": {
+          "name": "time",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 0,
+          "mappedType": "datetime"
+        },
+        "tenant_name": {
+          "name": "tenant_name",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "string"
+        },
+        "account_name": {
+          "name": "account_name",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "string"
+        },
+        "type": {
+          "name": "type",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "string"
+        },
+        "amount": {
+          "name": "amount",
+          "type": "DECIMAL(19,4)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false
+        },
+        "comment": {
+          "name": "comment",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "string"
+        }
+      },
+      "name": "charge_record",
+      "indexes": [
+        {
+          "keyName": "PRIMARY",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {}
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "mappedType": "integer"
+        },
+        "time": {
+          "name": "time",
+          "type": "DATETIME(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 0,
+          "mappedType": "datetime"
+        },
+        "tenant_name": {
+          "name": "tenant_name",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "string"
+        },
+        "account_name": {
+          "name": "account_name",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "string"
+        },
+        "type": {
+          "name": "type",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "string"
+        },
+        "amount": {
+          "name": "amount",
+          "type": "DECIMAL(19,4)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false
+        },
+        "operator_id": {
+          "name": "operator_id",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "string"
+        },
+        "ip_address": {
+          "name": "ip_address",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "string"
+        },
+        "comment": {
+          "name": "comment",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "string"
+        }
+      },
+      "name": "pay_record",
+      "indexes": [
+        {
+          "keyName": "PRIMARY",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {}
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "mappedType": "integer"
+        },
+        "jobs": {
+          "name": "jobs",
+          "type": "json",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "comment": "{ biJobIndex: number; tenantPrice: tenantPrice.toFixed(4), accountPrice: accountPrice.toFixed(4) }[]",
+          "mappedType": "json"
+        },
+        "reason": {
+          "name": "reason",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "string"
+        },
+        "new_tenant_price": {
+          "name": "new_tenant_price",
+          "type": "DECIMAL(19,4)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true
+        },
+        "new_account_price": {
+          "name": "new_account_price",
+          "type": "DECIMAL(19,4)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true
+        },
+        "operator_id": {
+          "name": "operator_id",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "string"
+        },
+        "ip_address": {
+          "name": "ip_address",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "string"
+        },
+        "time": {
+          "name": "time",
+          "type": "DATETIME(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 0,
+          "mappedType": "datetime"
+        }
+      },
+      "name": "job_price_change",
+      "indexes": [
+        {
+          "keyName": "PRIMARY",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {}
+    },
+    {
+      "columns": {
+        "bi_job_index": {
+          "name": "bi_job_index",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "mappedType": "integer"
+        },
+        "id_job": {
+          "name": "id_job",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "integer"
+        },
+        "account": {
+          "name": "account",
+          "type": "varchar(20)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 20,
+          "comment": "账户",
+          "mappedType": "string"
+        },
+        "user": {
+          "name": "user",
+          "type": "varchar(20)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 20,
+          "comment": "用户名",
+          "mappedType": "string"
+        },
+        "partition": {
+          "name": "partition",
+          "type": "tinytext",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "comment": "分区"
+        },
+        "nodelist": {
+          "name": "nodelist",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 65535,
+          "comment": "使用节点列表",
+          "mappedType": "text"
+        },
+        "job_name": {
+          "name": "job_name",
+          "type": "tinytext",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "comment": "作业名"
+        },
+        "cluster": {
+          "name": "cluster",
+          "type": "varchar(50)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 50,
+          "comment": "集群名",
+          "mappedType": "string"
+        },
+        "time_submit": {
+          "name": "time_submit",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 0,
+          "comment": "提交时间",
+          "mappedType": "datetime"
+        },
+        "time_start": {
+          "name": "time_start",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 0,
+          "comment": "开始时间",
+          "mappedType": "datetime"
+        },
+        "time_end": {
+          "name": "time_end",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 0,
+          "comment": "结束时间",
+          "mappedType": "datetime"
+        },
+        "gpu": {
+          "name": "gpu",
+          "type": "int(10)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "comment": "使用GPU数。来自gres_req字段",
+          "mappedType": "integer"
+        },
+        "cpus_req": {
+          "name": "cpus_req",
+          "type": "int unsigned",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "comment": "申请CPU数tres_req",
+          "mappedType": "integer"
+        },
+        "mem_req": {
+          "name": "mem_req",
+          "type": "int unsigned",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "comment": "申请的内存，单位MB，来自tres_req",
+          "mappedType": "integer"
+        },
+        "nodes_req": {
+          "name": "nodes_req",
+          "type": "int unsigned",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "comment": "申请节点数,tres_req",
+          "mappedType": "integer"
+        },
+        "cpus_alloc": {
+          "name": "cpus_alloc",
+          "type": "int unsigned",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "comment": "分配CPU数tres_alloc",
+          "mappedType": "integer"
+        },
+        "mem_alloc": {
+          "name": "mem_alloc",
+          "type": "int unsigned",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "comment": "分配的内存，单位MB，来自tres_alloc",
+          "mappedType": "integer"
+        },
+        "nodes_alloc": {
+          "name": "nodes_alloc",
+          "type": "int unsigned",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "comment": "分配节点数tres_alloc",
+          "mappedType": "integer"
+        },
+        "timelimit": {
+          "name": "timelimit",
+          "type": "int unsigned",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "comment": "作业时间限制",
+          "mappedType": "integer"
+        },
+        "time_used": {
+          "name": "time_used",
+          "type": "bigint unsigned",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "comment": "作业执行时间",
+          "mappedType": "bigint"
+        },
+        "time_wait": {
+          "name": "time_wait",
+          "type": "bigint unsigned",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "comment": "作业等待时间",
+          "mappedType": "bigint"
+        },
+        "qos": {
+          "name": "qos",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "comment": "QOS",
+          "mappedType": "string"
+        },
+        "record_time": {
+          "name": "record_time",
+          "type": "timestamp",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 0,
+          "default": "CURRENT_TIMESTAMP",
+          "comment": "记录时间",
+          "mappedType": "datetime"
+        },
+        "tenant": {
+          "name": "tenant",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "string"
+        },
+        "account_billing_item_id": {
+          "name": "account_billing_item_id",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "default": "'UNKNOWN'",
+          "mappedType": "string"
+        },
+        "tenant_billing_item_id": {
+          "name": "tenant_billing_item_id",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "default": "'UNKNOWN'",
+          "mappedType": "string"
+        },
+        "tenant_price": {
+          "name": "tenant_price",
+          "type": "DECIMAL(19,4)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "default": "0.0000"
+        },
+        "account_price": {
+          "name": "account_price",
+          "type": "DECIMAL(19,4)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "default": "0.0000"
+        }
+      },
+      "name": "job_info",
+      "indexes": [
+        {
+          "columnNames": [
+            "id_job"
+          ],
+          "composite": false,
+          "keyName": "idJob",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "account"
+          ],
+          "composite": false,
+          "keyName": "account",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "user"
+          ],
+          "composite": false,
+          "keyName": "user",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "time_submit"
+          ],
+          "composite": false,
+          "keyName": "time_submit",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "time_start"
+          ],
+          "composite": false,
+          "keyName": "time_start",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "time_end"
+          ],
+          "composite": false,
+          "keyName": "time_end",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "time_used"
+          ],
+          "composite": false,
+          "keyName": "time_used",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "time_wait"
+          ],
+          "composite": false,
+          "keyName": "time_wait",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "record_time"
+          ],
+          "composite": false,
+          "keyName": "record_time",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "keyName": "PRIMARY",
+          "columnNames": [
+            "bi_job_index"
+          ],
+          "composite": false,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {}
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "mappedType": "integer"
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "string"
+        },
+        "balance": {
+          "name": "balance",
+          "type": "DECIMAL(19,4)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "default": "0.0000"
+        }
+      },
+      "name": "tenant",
+      "indexes": [
+        {
+          "columnNames": [
+            "name"
+          ],
+          "composite": false,
+          "keyName": "tenant_name_unique",
+          "primary": false,
+          "unique": true
+        },
+        {
+          "keyName": "PRIMARY",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {}
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "mappedType": "integer"
+        },
+        "item_id": {
+          "name": "item_id",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "string"
+        },
+        "path": {
+          "name": "path",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "comment": "集群,分区[,qos]",
+          "mappedType": "text"
+        },
+        "description": {
+          "name": "description",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "string"
+        },
+        "tenant_id": {
+          "name": "tenant_id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "integer"
+        },
+        "price": {
+          "name": "price",
+          "type": "DECIMAL(19,4)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false
+        },
+        "amount": {
+          "name": "amount",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "comment": "max-cpusAlloc-mem, max-gpu-cpusAlloc, gpu, cpusAlloc",
+          "mappedType": "string"
+        },
+        "create_time": {
+          "name": "create_time",
+          "type": "DATETIME(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 0,
+          "mappedType": "datetime"
+        }
+      },
+      "name": "job_price_item",
+      "indexes": [
+        {
+          "columnNames": [
+            "item_id"
+          ],
+          "composite": false,
+          "keyName": "job_price_item_item_id_unique",
+          "primary": false,
+          "unique": true
+        },
+        {
+          "columnNames": [
+            "tenant_id"
+          ],
+          "composite": false,
+          "keyName": "job_price_item_tenant_id_index",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "keyName": "PRIMARY",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "job_price_item_tenant_id_foreign": {
+          "constraintName": "job_price_item_tenant_id_foreign",
+          "columnNames": [
+            "tenant_id"
+          ],
+          "localTableName": "job_price_item",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "tenant",
+          "deleteRule": "set null",
+          "updateRule": "cascade"
+        }
+      }
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "mappedType": "integer"
+        },
+        "tenant_id": {
+          "name": "tenant_id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "integer"
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "string"
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "string"
+        },
+        "email": {
+          "name": "email",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "string"
+        },
+        "create_time": {
+          "name": "create_time",
+          "type": "DATETIME(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 0,
+          "default": "current_timestamp(0)",
+          "mappedType": "datetime"
+        },
+        "tenant_roles": {
+          "name": "tenant_roles",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "comment": "TENANT_FINANCE, TENANT_ADMIN",
+          "mappedType": "text"
+        },
+        "platform_roles": {
+          "name": "platform_roles",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "comment": "PLATFORM_FINANCE, PLATFORM_ADMIN",
+          "mappedType": "text"
+        }
+      },
+      "name": "user",
+      "indexes": [
+        {
+          "columnNames": [
+            "tenant_id"
+          ],
+          "composite": false,
+          "keyName": "user_tenant_id_index",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "user_id"
+          ],
+          "composite": false,
+          "keyName": "user_user_id_unique",
+          "primary": false,
+          "unique": true
+        },
+        {
+          "keyName": "PRIMARY",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "user_tenant_id_foreign": {
+          "constraintName": "user_tenant_id_foreign",
+          "columnNames": [
+            "tenant_id"
+          ],
+          "localTableName": "user",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "tenant",
+          "updateRule": "cascade"
+        }
+      }
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "mappedType": "integer"
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "integer"
+        },
+        "cluster": {
+          "name": "cluster",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "string"
+        },
+        "storage_quota": {
+          "name": "storage_quota",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "integer"
+        }
+      },
+      "name": "storage_quota",
+      "indexes": [
+        {
+          "columnNames": [
+            "user_id"
+          ],
+          "composite": false,
+          "keyName": "storage_quota_user_id_index",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "keyName": "PRIMARY",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "storage_quota_user_id_foreign": {
+          "constraintName": "storage_quota_user_id_foreign",
+          "columnNames": [
+            "user_id"
+          ],
+          "localTableName": "storage_quota",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "user",
+          "deleteRule": "CASCADE",
+          "updateRule": "cascade"
+        }
+      }
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "mappedType": "integer"
+        },
+        "time": {
+          "name": "time",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 0,
+          "mappedType": "datetime"
+        },
+        "comment": {
+          "name": "comment",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "string"
+        },
+        "operator_id": {
+          "name": "operator_id",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "string"
+        }
+      },
+      "name": "account_whitelist",
+      "indexes": [
+        {
+          "keyName": "PRIMARY",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {}
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "mappedType": "integer"
+        },
+        "account_name": {
+          "name": "account_name",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "string"
+        },
+        "tenant_id": {
+          "name": "tenant_id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "integer"
+        },
+        "blocked": {
+          "name": "blocked",
+          "type": "tinyint(1)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "boolean"
+        },
+        "whitelist_id": {
+          "name": "whitelist_id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "integer"
+        },
+        "comment": {
+          "name": "comment",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "default": "''",
+          "mappedType": "string"
+        },
+        "balance": {
+          "name": "balance",
+          "type": "DECIMAL(19,4)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "default": "0.0000"
+        }
+      },
+      "name": "account",
+      "indexes": [
+        {
+          "columnNames": [
+            "account_name"
+          ],
+          "composite": false,
+          "keyName": "account_account_name_unique",
+          "primary": false,
+          "unique": true
+        },
+        {
+          "columnNames": [
+            "tenant_id"
+          ],
+          "composite": false,
+          "keyName": "account_tenant_id_index",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "whitelist_id"
+          ],
+          "composite": false,
+          "keyName": "account_whitelist_id_unique",
+          "primary": false,
+          "unique": true
+        },
+        {
+          "keyName": "PRIMARY",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "account_tenant_id_foreign": {
+          "constraintName": "account_tenant_id_foreign",
+          "columnNames": [
+            "tenant_id"
+          ],
+          "localTableName": "account",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "tenant",
+          "updateRule": "cascade"
+        },
+        "account_whitelist_id_foreign": {
+          "constraintName": "account_whitelist_id_foreign",
+          "columnNames": [
+            "whitelist_id"
+          ],
+          "localTableName": "account",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "account_whitelist",
+          "deleteRule": "set null",
+          "updateRule": "cascade"
+        }
+      }
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "mappedType": "integer"
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "integer"
+        },
+        "account_id": {
+          "name": "account_id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "integer"
+        },
+        "status": {
+          "name": "status",
+          "type": "varchar(10)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "comment": "UNBLOCKED, BLOCKED",
+          "mappedType": "string"
+        },
+        "role": {
+          "name": "role",
+          "type": "varchar(10)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "comment": "USER, ADMIN, OWNER",
+          "mappedType": "string"
+        },
+        "used_job_charge": {
+          "name": "used_job_charge",
+          "type": "DECIMAL(19,4)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true
+        },
+        "job_charge_limit": {
+          "name": "job_charge_limit",
+          "type": "DECIMAL(19,4)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true
+        }
+      },
+      "name": "user_account",
+      "indexes": [
+        {
+          "columnNames": [
+            "user_id"
+          ],
+          "composite": false,
+          "keyName": "user_account_user_id_index",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "account_id"
+          ],
+          "composite": false,
+          "keyName": "user_account_account_id_index",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "keyName": "PRIMARY",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "user_account_user_id_foreign": {
+          "constraintName": "user_account_user_id_foreign",
+          "columnNames": [
+            "user_id"
+          ],
+          "localTableName": "user_account",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "user",
+          "deleteRule": "CASCADE",
+          "updateRule": "cascade"
+        },
+        "user_account_account_id_foreign": {
+          "constraintName": "user_account_account_id_foreign",
+          "columnNames": [
+            "account_id"
+          ],
+          "localTableName": "user_account",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "account",
+          "deleteRule": "CASCADE",
+          "updateRule": "cascade"
+        }
+      }
+    }
+  ]
+}

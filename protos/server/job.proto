@@ -1,0 +1,132 @@
+syntax = "proto3";
+
+package scow.server;
+
+import "google/protobuf/timestamp.proto";
+import "common/money.proto";
+import "common/job.proto";
+
+message JobInfo {
+  uint64 bi_job_index = 1;
+  uint32 id_job = 2;
+  string account = 3;
+  string user = 4;
+  string partition = 5;
+  string nodelist = 6;
+  string job_name = 7;
+  string cluster = 8;
+  google.protobuf.Timestamp time_submit = 9;
+  google.protobuf.Timestamp time_start = 10;
+  google.protobuf.Timestamp time_end = 11;
+  int32 gpu = 12;
+  uint32 cpus_req = 13;
+  uint32 mem_req = 14;
+  uint32 nodes_req = 15;
+  uint32 cpus_alloc = 16;
+  uint32 mem_alloc = 17;
+  uint32 nodes_alloc = 18;
+  uint32 timelimit = 19;
+  uint64 time_used = 20;
+  uint64 time_wait = 21;
+  string qos = 22;
+  google.protobuf.Timestamp record_time = 23;
+  common.Money account_price = 24;
+  common.Money tenant_price = 25;
+}
+
+message JobFilter {
+  // if neither account_name and user_id is set, query the account from tenant
+  string tenant_name = 1;
+  optional string user_id = 2;
+  optional string account_name = 3;
+  optional google.protobuf.Timestamp job_end_time_start = 4;
+  optional google.protobuf.Timestamp job_end_time_end = 5;
+  optional uint64 job_id = 6;
+  // if length === 0, get from all clusters
+  repeated string clusters = 7;
+}
+
+message GetJobsRequest {
+  JobFilter filter = 1;
+  uint32 page = 2;
+  // if undefined or 0, page_size is 10
+  optional uint64 page_size = 3;
+}
+
+message GetJobsReply {
+  uint64 total_count = 1;
+  repeated JobInfo jobs = 2;
+  common.Money total_account_price = 3;
+  common.Money total_tenant_price = 4;
+}
+
+message ChangeJobPriceRequest {
+  JobFilter filter = 1;
+  optional common.Money account_price = 2;
+  optional common.Money tenant_price = 3;
+  string reason = 4;
+  string operator_id = 5;
+  string ip_address = 6;
+}
+
+// NOT_FOUND: job is not found
+message ChangeJobPriceReply { uint64 count = 1; }
+
+message GetJobByBiJobIndexRequest { string bi_job_index = 1; }
+
+// NOT_FOUND: job is not found
+message GetJobByBiJobIndexReply { JobInfo info = 1; }
+
+message GetRunningJobsRequest {
+  string cluster = 1;
+  optional string user_id = 2;
+  // if account_name is set, query the account_name
+  // if account is not set and tenant is set, query the tenant
+  optional string tenant_name = 3;
+  optional string account_name = 4;
+  repeated string job_id_list = 5;
+}
+
+message GetRunningJobsReply { repeated common.job.RunningJob jobs = 1; }
+
+message ChangeJobTimeLimitRequest {
+  string cluster = 1;
+  string job_id = 2;
+  int64 delta = 3;
+}
+
+// NOT_FOUND: cluster or job_id is not found.
+message ChangeJobTimeLimitReply {}
+
+message QueryJobTimeLimitRequest {
+  string cluster = 1;
+  string job_id = 2;
+}
+
+message GetBillingItemsRequest {
+  // if not specified, return default
+  optional string tenant_name = 1;
+}
+
+message GetBillingItemsReply {
+  map<string, common.Money> items = 1;
+}
+
+// NOT_FOUND: cluster or job_id is not found.
+message QueryJobTimeLimitReply { uint64 limit = 1; }
+
+service JobService {
+  rpc GetJobs(GetJobsRequest) returns (GetJobsReply);
+  rpc GetJobByBiJobIndex(GetJobByBiJobIndexRequest)
+      returns (GetJobByBiJobIndexReply);
+  rpc ChangeJobPrice(ChangeJobPriceRequest) returns (ChangeJobPriceReply);
+
+  rpc GetRunningJobs(GetRunningJobsRequest) returns (GetRunningJobsReply);
+
+  rpc ChangeJobTimeLimit(ChangeJobTimeLimitRequest)
+      returns (ChangeJobTimeLimitReply);
+  rpc QueryJobTimeLimit(QueryJobTimeLimitRequest)
+      returns (QueryJobTimeLimitReply);
+
+  rpc GetBillingItems(GetBillingItemsRequest) returns (GetBillingItemsReply);
+}

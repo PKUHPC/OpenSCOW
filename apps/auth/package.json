@@ -1,0 +1,36 @@
+{
+  "name": "@scow/auth",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "rimraf build && tsc -p tsconfig.json && tsc-alias -p tsconfig.json",
+    "dev": "nodemon --watch src -e ts --exec \"npx dotenv -e env/.env.dev -- npx ts-node -r tsconfig-paths/register src/index.ts\"",
+    "devenv": "docker compose -f devenv.yml up -d",
+    "devenv:stop": "docker compose -f devenv.yml down"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@scow/config": "workspace:*",
+    "@sinclair/typebox": "^0.23.5",
+    "fastify": "^3.29.0",
+    "@fastify/error": "^2.0.0",
+    "ioredis": "^5.0.4",
+    "fastify-graceful-shutdown": "^3.1.0",
+    "fastify-plugin": "^3.0.1",
+    "nanoid": "^3.3.3",
+    "ldapjs": "^2.3.2",
+    "@fastify/formbody": "^6.0.0",
+    "@fastify/static": "^5.0.0",
+    "asn1": "^0.2.6"
+  },
+  "devDependencies": {
+    "@types/ldapjs": "^2.2.2",
+    "@types/asn1": "^0.2.0"
+  },
+  "volta": {
+    "extends": "../../package.json"
+  }
+}

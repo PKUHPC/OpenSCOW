@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package scow.clusterops;
+
+enum ChangeStorageQuotaMode {
+    INCREASE = 0;
+    DECREASE = 1;
+    SET = 2;
+}
+
+message ChangeStorageQuotaRequest {
+    string userId = 1;
+    ChangeStorageQuotaMode mode = 2;
+    uint64 value = 3;
+}
+
+// NOT_FOUND: if user is not found
+// INVALID_ARGUMENT: is the value is not valid.
+message ChangeStorageQuotaReply {
+    uint64 current_quota = 1;
+}
+
+message QueryUsedStorageQuotaRequest {
+    string user_id = 1;
+}
+
+// NOT_FOUND: if user is not found.
+message QueryUsedStorageQuotaReply {
+    // 单位：字节
+    uint64 used = 1;
+}
+
+service StorageService {
+    rpc ChangeStorageQuota(ChangeStorageQuotaRequest) returns (ChangeStorageQuotaReply);
+    rpc QueryUsedStorageQuota(QueryUsedStorageQuotaRequest) returns (QueryUsedStorageQuotaReply);
+}

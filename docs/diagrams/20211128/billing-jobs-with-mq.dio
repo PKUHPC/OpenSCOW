@@ -1,0 +1,79 @@
+<mxfile host="65bd71144e">
+    <diagram id="wTzxf0bfVCZFavztJdcv" name="Page-1">
+        <mxGraphModel dx="778" dy="539" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="2" style="edgeStyle=none;html=1;entryX=0;entryY=0.75;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="6" target="20">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="3" value="每个作业的账户和价格" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="2">
+                    <mxGeometry x="-0.2667" y="-1" relative="1" as="geometry">
+                        <mxPoint x="50" y="-1" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="4" style="edgeStyle=none;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="6" target="13">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="5" style="edgeStyle=none;html=1;" edge="1" parent="1" source="6" target="19">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="6" value="任务信息系统" style="whiteSpace=wrap;html=1;fontSize=18;" vertex="1" parent="1">
+                    <mxGeometry x="90" y="210" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="7" style="edgeStyle=none;html=1;entryX=0.5;entryY=-0.25;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="10" target="14">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="8" style="edgeStyle=none;html=1;entryX=0.75;entryY=1;entryDx=0;entryDy=0;entryPerimeter=0;exitX=0.699;exitY=0.011;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="10" target="20">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="9" value="封锁欠费的账户" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="8">
+                    <mxGeometry x="-0.0793" relative="1" as="geometry">
+                        <mxPoint x="39" y="-15" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="10" value="&lt;font style=&quot;font-size: 18px&quot;&gt;收费系统&lt;/font&gt;" style="whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="354" y="210" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="11" style="edgeStyle=none;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="12" target="15">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="12" value="&lt;font style=&quot;font-size: 18px&quot;&gt;用户账户管理&lt;/font&gt;" style="whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="590" y="210" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="13" value="" style="shape=datastore;whiteSpace=wrap;html=1;fontSize=18;" vertex="1" parent="1">
+                    <mxGeometry x="130" y="310" width="40" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="14" value="" style="shape=datastore;whiteSpace=wrap;html=1;fontSize=18;" vertex="1" parent="1">
+                    <mxGeometry x="393" y="310" width="40" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="15" value="" style="shape=datastore;whiteSpace=wrap;html=1;fontSize=18;" vertex="1" parent="1">
+                    <mxGeometry x="630" y="310" width="40" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="16" value="每个任务和对应的价格" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;" vertex="1" parent="1">
+                    <mxGeometry x="80" y="360" width="140" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="17" value="每个账户的余额" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;" vertex="1" parent="1">
+                    <mxGeometry x="363" y="360" width="100" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="18" value="账户是否被封锁" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;" vertex="1" parent="1">
+                    <mxGeometry x="600" y="360" width="100" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="19" value="job_table" style="shape=datastore;whiteSpace=wrap;html=1;fontSize=18;" vertex="1" parent="1">
+                    <mxGeometry x="110" y="80" width="70" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="22" style="edgeStyle=none;html=1;entryX=0.078;entryY=-0.001;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="20" target="10">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="400" y="211" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="23" style="edgeStyle=none;html=1;entryX=0.451;entryY=-0.035;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="20" target="12">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="20" value="" style="points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;gradientColor=#FF4F8B;gradientDirection=north;fillColor=#BC1356;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.mq;" vertex="1" parent="1">
+                    <mxGeometry x="374" y="76" width="78" height="78" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

@@ -1,0 +1,50 @@
+{
+  "name": "@scow/mis-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "dotenv -e env/.env.dev -- npx nodemon --watch src -e ts,tsx --exec npx ts-node -r tsconfig-paths/register src/index.ts",
+    "build": "npm run protos && rimraf build && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
+    "serve": "node build/index.js",
+    "test": "jest",
+    "protos": "tsgrpc-cli protos",
+    "orm": "dotenv -e env/.env.dev -- npx mikro-orm"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@ddadaal/tsgrpc-server": "^0.12.0",
+    "@ddadaal/tsgrpc-utils": "^0.12.0",
+    "@grpc/grpc-js": "^1.6.7",
+    "@mikro-orm/core": "^5.1.3",
+    "@mikro-orm/cli": "^5.1.3",
+    "@mikro-orm/mysql": "^5.1.3",
+    "@mikro-orm/mariadb": "^5.1.3",
+    "@mikro-orm/migrations": "^5.1.3",
+    "@scow/lib-decimal": "workspace:*",
+    "@scow/config": "workspace:*",
+    "wait-on": "^6.0.1",
+    "@sinclair/typebox": "^0.23.5",
+    "node-cron": "^3.0.0",
+    "undici": "^5.0.0",
+    "dotenv": "^16.0.0"
+  },
+  "devDependencies": {
+    "@types/node-cron": "^3.0.1",
+    "@ddadaal/tsgrpc-cli": "^0.11.0",
+    "@types/google-protobuf": "^3.15.6",
+    "@types/wait-on": "^5.3.1"
+  },
+  "mikro-orm": {
+    "useTsNode": true,
+    "configPaths": [
+      "./src/mikro-orm.config.ts",
+      "./src/mikro-orm.config.js"
+    ]
+  },
+  "volta": {
+    "extends": "../../package.json"
+  }
+}

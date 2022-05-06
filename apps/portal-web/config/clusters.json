@@ -1,0 +1,33 @@
+{
+  "hpc01": {
+    "displayName": "hpc01Name",
+    "partitions": {
+      "compute": {
+        "nodes": 3,
+        "mem": 262144,
+        "cores": 32,
+        "gpus": 0,
+        "qos": [
+          "low",
+          "normal",
+          "high"
+        ],
+        "unit": "cpusAlloc",
+        "comment": "说明"
+      },
+      "GPU": {
+        "nodes": 1,
+        "mem": 262144,
+        "cores": 48,
+        "gpus": 8,
+        "qos": [
+          "low",
+          "normal",
+          "high"
+        ],
+        "unit": "gpu",
+        "comment": "说明"
+      }
+    }
+  }
+}

@@ -1,0 +1,155 @@
+---
+sidebar_position: 2
+title: 计费收费
+---
+
+# 计费收费
+
+系统目前采用一个独立的财务系统。
+
+收费：
+
+- 系统采用预付费制，每个租户和账户具有余额
+- 平台管理员可以给租户增加余额，租户管理员可以给账户增加余额
+- 在数据库中余额存储到小数点后4位，前台显示3位
+
+计费：
+
+- 系统的计费收费模型按照集群、分区和QOS进行收费
+  - 参考[北大高性能平台收费标准](https://hpc.pku.edu.cn/guide_6.html)设计
+- 系统支持多级计费：平台对租户使用一个统一的收费标准，而租户可以自定义租户内的账户的费用标准
+
+## 计费规则
+
+服务器会定期地从**源作业信息数据库**中获取已完成的作业信息，并根据规则对租户和账户进行扣费操作。
+
+系统计费以**费用项目 price item**为基础，每个计费项有独特的ID以及价格，每个(集群,分区,QOS)项应该有一个独特的计费项。计费项一旦创建和分配不能被重新分配、修改或者删除，如果您想修改一个计费项的价格，您需要创建一个新的计费项。
+
+费用项目的信息存放在数据库的`job_price_item`表中。每次需要计算价格时，服务器将会从数据库中取得所有计费项，并得到每个(集群,分区,QOS)的最新的计费规则。如果在[集群信息配置文件](../../common/deployment/clusters.mdx)的某个QOS不存在费用项，服务器将会报错。
+
+每个作业的费用计算方法如下：
+
+> 四舍五入(作业持续小时 (`timeUsed` / 3600) x 用量 x 所适用的费用项目的价格)
+
+每个作业的用量由计费策略(amount)确定，支持的计费策略取值如下：
+
+| amount | 总量算法 |
+| -- | -- |
+| `max-cpusAlloc-mem` | `cpusAlloc` |
+| `gpu` | `gpu` |
+| `max-gpu-cpusAlloc` | `max(gpu, 向上取整(cpusAlloc / (分区核心数/分区gpu数)))` |
+| `cpusAlloc` | `max(cpusAlloc, 向上取整(memReq / (分区内存量/分区核心数)))` |
+
+在计算过程中如果发现了其他策略，则整个作业的费用为0。
+
+## 快速创建计费规则
+
+您可以创建一个`config/priceItems.{json|yml|yaml}`文件，定义(集群,分区,QOS)项以及对应的费用项目，服务器可以快速根据这些信息在数据库中创建费用项目。文件格式以及各个字段的解释请参考下列yaml文件的注释。
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+<Tabs>
+  <TabItem value="config/priceItems.yml" default>
+
+```yaml
+default: # 默认规则，对所有集群和租户生效
+  hpc01: # 对hpc01集群的...
+    compute: # compute分区的...
+      low: # QOS为low的任务
+        id: HPC01 # 费用项目ID为HPC01
+        price: '1.00' # 基础价格为1.00，字符串形式
+        amount: 'cpusAlloc' # 计费策略，看上文
+      normal:
+        id: HPC02
+        price: '2.00'
+        amount: 'cpusAlloc'
+      high:
+        id: HPC03
+        price: '3.00'
+        amount: 'cpusAlloc'
+    GPU: # 如果整个分区的费用相同，您也可以给一整个分区定义一个费用项目
+      id: HPC04
+      price: '10.00'
+      amount: 'cpusAlloc'
+tenant_1: # 对租户tenant_1的账户用户发起的任务，在默认规则的基础上，覆盖以下配置
+  hpc01:
+    GPU:
+      low:
+        id: HPC07 # 对租户tenant_1的hpc01.GPU.low的任务，价格为12.00
+        price: '12.00'
+        amount: 'cpusAlloc'
+```
+
+  </TabItem>
+  <TabItem value="config/priceItems.json" default>
+
+```json
+{
+  "default": {
+    "hpc01": {
+      "compute": {
+        "low": {
+          "id": "HPC01",
+          "price": "1.00",
+          "amount": "cpusAlloc"
+         },
+        "normal": {
+          "id": "HPC02",
+          "price": "2.00",
+          "amount": "cpusAlloc"
+         },
+        "high": {
+          "id": "HPC03",
+          "price": "3.00",
+          "amount": "cpusAlloc"
+         }
+      },
+      "GPU": {
+        "low": {
+          "id": "HPC04",
+          "price": "10.00",
+          "amount": "cpusAlloc"
+         },
+        "normal": {
+          "id": "HPC05",
+          "price": "20.00",
+          "amount": "cpusAlloc"
+         },
+        "high": {
+          "id": "HPC06",
+          "price": "30.00",
+          "amount": "cpusAlloc"
+         }
+      }
+    }
+  },
+  "tenant_1": {
+    "hpc01": {
+      "GPU": {
+        "low": {
+          "id": "HPC07",
+          "price": "12.00",
+          "amount": "cpusAlloc"
+         }
+      }
+    }
+  }
+}
+```
+
+  </TabItem>
+</Tabs>
+
+
+
+注意事项：
+
+1. 每个计费项应该只出现一次。即使多个QOS费用相同，也应该定义两个计费项
+2. 数据库中不存在具有相同计费项名的行
+
+在数据库正在运行、`docker-compose.yml`配置编写完成的条件下，运行以下命令快速在数据库中创建费用项信息：
+
+```bash
+docker compose run mis-server createPriceItems
+```
