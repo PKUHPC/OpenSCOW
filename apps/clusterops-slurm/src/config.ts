@@ -16,6 +16,8 @@ export const config = envConfig({
   MYSQL_PASSWORD: str({ desc: "slurm.sh所需要的数据库密码" }),
   BASE_PARTITIONS: str({ desc: "所有分区，以逗号分隔", example: "GPU,CPU" }),
 
+  ASSOC_TABLE: str({ desc: "slurm数据库中保存用户账户关系(association)的表名", default: "pkuhpc_assoc_table" }),
+
   SSH_PRIVATE_KEY_PATH: str({ desc: "SSH私钥目录", default: path.join(homedir(), ".ssh", "id_rsa") }),
 
 });

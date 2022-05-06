@@ -56,6 +56,7 @@ export const slurmPlugin = plugin(async (s) => {
       const result = await s.ext.executeScript(config.SLURM_SCRIPT_PATH, params, {
         MYSQL_PASSWORD: config.MYSQL_PASSWORD,
         BASE_PARTITIONS: partitions,
+        ASSOC_TABLE: config.ASSOC_TABLE,
       });
       return result;
     }));

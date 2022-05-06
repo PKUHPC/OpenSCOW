@@ -201,6 +201,7 @@ basePartition=($BASE_PARTITIONS)
 allPartition=("compute")
 declare -A exclPartition
 exclPartition=([compute]="20" )
+assoc_table=$ASSOC_TABLE
 
 addUser() #abandon !!!!!2017-09-24
 {
@@ -263,7 +264,7 @@ addToAcct(){
         username=$4
         acct=`sacctmgr -n show acct $2`
         user=`sacctmgr -n show user $4`
-        user_acct=`$mysql --skip-column-names slurm_acct_db -e "select * from pkuhpc_assoc_table where user='$4' and acct='$2' and deleted=0"`
+        user_acct=`$mysql --skip-column-names slurm_acct_db -e "select * from $assoc_table where user='$4' and acct='$2' and deleted=0"`
         Is_partition=`sinfo | awk {'print $1'} | sed '1d' | sort -u`
         user2=`ldapsearch -x  uid=$4 | grep homeDirectory`
         if [ "$acct" != "" ] ; then
@@ -311,7 +312,7 @@ addShareNode(){
             sacctmgr -i add qos $2
             sacctmgr -i modify qos $2 set GrpCPUs=$4
             ## find all users in the account and add these
-            result=`$mysql --skip-column-names slurm_acct_db -e "select user from pkuhpc_assoc_table where acct='$2' and deleted=0 and partition='$3'" | sort -u `
+            result=`$mysql --skip-column-names slurm_acct_db -e "select user from $assoc_table where acct='$2' and deleted=0 and partition='$3'" | sort -u `
             for line in $result
             do
                 sacctmgr -i modify user where name=$line account=$2 partition=$3 set qos+=$2 DefaultQOS=low
@@ -349,7 +350,7 @@ addExclNode(){
             echo $2: $newnode >> /etc/clustershell/groups.d/local.cfg
 
             ## find all users in the account and add these
-            result=`$mysql --skip-column-names slurm_acct_db -e "select user from pkuhpc_assoc_table where acct='$2' and deleted=0" | sort -u`
+            result=`$mysql --skip-column-names slurm_acct_db -e "select user from $assoc_table where acct='$2' and deleted=0" | sort -u`
             for line in $result
             do
                 sacctmgr -i create user name=$line account=$2 partition=$2
@@ -373,7 +374,7 @@ delUser(){
         else
             sacctmgr -i delete user name=$2
             ## delete ralated null account
-            acct=`$mysql --skip-column-names slurm_acct_db -e "select DISTINCT acct from pkuhpc_assoc_table where user='$2' and deleted=0"`
+            acct=`$mysql --skip-column-names slurm_acct_db -e "select DISTINCT acct from $assoc_table where user='$2' and deleted=0"`
         fi
     else
         echo -e "$delUser\n"
@@ -398,17 +399,17 @@ delAcct(){ ## attention: ensure this account is not any user's default account
                 echo "This acct is running some jobs!"
                 exit 8
             fi
-            user=`$mysql --skip-column-names slurm_acct_db -e "select user from pkuhpc_assoc_table where acct='$2' and deleted=0 " | sort -u`
+            user=`$mysql --skip-column-names slurm_acct_db -e "select user from $assoc_table where acct='$2' and deleted=0 " | sort -u`
             for line in $user
             do
-                user_acct=`$mysql --skip-column-names slurm_acct_db -e "select acct from pkuhpc_assoc_table where user='$line' and deleted=0" | sort -u | sed "s/^$2$//g"`
+                user_acct=`$mysql --skip-column-names slurm_acct_db -e "select acct from $assoc_table where user='$line' and deleted=0" | sort -u | sed "s/^$2$//g"`
                 if [ "$user_acct" == "" ] ; then  ## users that only have an account, we should delete these users before delete account
                     /root/HPCSH/slurm -v $line
                 else
                     choose=`echo $user_acct | awk {'print $1'}`
              #       echo "choose="$choose
                     #wrong if the default account is not $2 , user's default account shouldn't change
-                    defAcct=`$mysql --skip-column-names slurm_acct_db -e "select acct from pkuhpc_assoc_table where user="$line" and deleted=0 and is_def=1" | sort | uniq`
+                    defAcct=`$mysql --skip-column-names slurm_acct_db -e "select acct from $assoc_table where user="$line" and deleted=0 and is_def=1" | sort | uniq`
                     if [ "$defAcct" = "$2" ] ; then
                         sacctmgr -i update user set DefaultAccount=$choose where user=$line
                     fi
@@ -450,19 +451,19 @@ delFromAcct(){   #####2017-08-31   not rewrite it
             echo "This account $2 is not exist"
             exit 7
         fi
-        user=`$mysql --skip-column-names slurm_acct_db -e "select user from pkuhpc_assoc_table where acct='$2' and deleted=0 " | sort -u`
+        user=`$mysql --skip-column-names slurm_acct_db -e "select user from $assoc_table where acct='$2' and deleted=0 " | sort -u`
         shift 2
         while [ $1 ]
         do
             if echo "${user[@]}" | grep -w "$1" > /dev/null ; then
-                user_acct=`$mysql --skip-column-names slurm_acct_db -e "select acct from pkuhpc_assoc_table where user='$1' and deleted=0" | sort -u | sed "s/^$acct$//g"`
+                user_acct=`$mysql --skip-column-names slurm_acct_db -e "select acct from $assoc_table where user='$1' and deleted=0" | sort -u | sed "s/^$acct$//g"`
                 if [ "$user_acct" = "" ] ; then ## user only has one account, that's $2=acct
                     echo "here only one account!"
                     /root/HPCSH/slurm -v $1
                 else
                     choose=`echo $user_acct | awk {'print $1'}`
                     #wrong if the default account is not $2 , user's default account shouldn't change
-                    defAcct=`$mysql --skip-column-names slurm_acct_db -e "select acct from pkuhpc_assoc_table where user="$1" and deleted=0 and is_def=1" | sort | uniq`
+                    defAcct=`$mysql --skip-column-names slurm_acct_db -e "select acct from $assoc_table where user="$1" and deleted=0 and is_def=1" | sort | uniq`
                     #echo defAcct=$defAcct
                     if [ "$defAcct" = "$acct" ] ; then
                         sacctmgr -i update user set DefaultAccount=$choose where user=$1
@@ -473,7 +474,7 @@ delFromAcct(){   #####2017-08-31   not rewrite it
                         exit 8
                     fi
                     sacctmgr -i delete user name=$1 account=$acct
-                   # $mysql slurm_acct_db -e "delete from pkuhpc_assoc_table where user='$1'"
+                   # $mysql slurm_acct_db -e "delete from $assoc_table where user='$1'"
                     qos_name=`$mysql --skip-column-names slurm_acct_db -e "select name from qos_table where name='$acct' and deleted='0'"`
                     if [ "$qos_name" != "" ] ; then
                         sacctmgr -i modify user $1 set qos-=$acct
@@ -516,7 +517,7 @@ delExclNode(){
         sed -i "s/\($part: \).*/\1$last/" /etc/clustershell/groups.d/local.cfg
         sed -i "/^$2:/d" /etc/clustershell/groups.d/local.cfg
         ## find all users in the account and add these
-        result=`$mysql slurm_acct_db -e "select user from pkuhpc_assoc_table where acct='$2' and deleted=0"`
+        result=`$mysql slurm_acct_db -e "select user from $assoc_table where acct='$2' and deleted=0"`
         for line in ${result#*user}
         do
             sacctmgr -i delete user name=$line account=$2 partition=$2
@@ -537,7 +538,7 @@ delShareNode(){
             echo -e "\nThis qos $2 is not exist!"
         else
             sacctmgr -i delete qos $2
-            result=`$mysql --skip-column-names slurm_acct_db -e "select user from pkuhpc_assoc_table where acct='$2' and deleted=0"`
+            result=`$mysql --skip-column-names slurm_acct_db -e "select user from $assoc_table where acct='$2' and deleted=0"`
             Is_partition=`sinfo | awk {'print $1'} | sed '1d' | sort -u`
             for line in $Is_partition
             do
@@ -656,7 +657,7 @@ blockUserfromAcct(){
 #block a user named test from an account named acct
 #./slurm -o acct test
     if [[ $# == 3 ]] ; then
-        #user=`$mysql --skip-column-names slurm_acct_db -e "select user from pkuhpc_assoc_table where acct='$2' and deleted=0 " | sort -u`
+        #user=`$mysql --skip-column-names slurm_acct_db -e "select user from $assoc_table where acct='$2' and deleted=0 " | sort -u`
         acct=`sacctmgr -n show acct $2`
         if [ "$acct" == "" ] ; then
             echo "Account $2 is not exist!"
@@ -793,7 +794,7 @@ queryUserInAcct(){
             echo "User $3 is not exist in account $2"
             exit 4
         else
-            MaxSubmitJobs=`$mysql --skip-column-names slurm_acct_db -e " select distinct max_submit_jobs from pkuhpc_assoc_table where acct='$2' and user='$3'"`
+            MaxSubmitJobs=`$mysql --skip-column-names slurm_acct_db -e " select distinct max_submit_jobs from $assoc_table where acct='$2' and user='$3'"`
             if [ "$MaxSubmitJobs" == "NULL" ] ; then
                 echo "User $3 is allowed in account $2!"
                 exit 0
@@ -879,7 +880,7 @@ AllUserInAcct(){
             echo "Account $2 is not exist!"
             exit 7
         fi
-        user_acct=`$mysql --skip-column-names slurm_acct_db -e "select distinct user,qos from pkuhpc_assoc_table where acct='$2' and deleted='0'"`
+        user_acct=`$mysql --skip-column-names slurm_acct_db -e "select distinct user,qos from $assoc_table where acct='$2' and deleted='0'"`
         if [ "$user_acct" == "" ] ; then
             echo "There is no user in account $2!"
             exit 0
@@ -894,7 +895,7 @@ AllUserInAcct(){
                 shift 1
                 continue
             fi
-            MaxSubmitJobs=`$mysql --skip-column-names slurm_acct_db -e " select distinct max_submit_jobs from pkuhpc_assoc_table where acct='$acct' and user='$1'"`
+            MaxSubmitJobs=`$mysql --skip-column-names slurm_acct_db -e " select distinct max_submit_jobs from $assoc_table where acct='$acct' and user='$1'"`
             if [ "$MaxSubmitJobs" == "NULL" ] ; then
                 echo "$1 : allowd!"
             else
@@ -923,7 +924,7 @@ AllUserInAllAcct(){
 
         for acct in $all_acct
         do
-            user_acct=`$mysql --skip-column-names slurm_acct_db -e "select distinct user from pkuhpc_assoc_table where acct='$acct' and deleted='0'"`
+            user_acct=`$mysql --skip-column-names slurm_acct_db -e "select distinct user from $assoc_table where acct='$acct' and deleted='0'"`
             if [ "$user_acct" == "" ] ; then
                 echo $acct
                 echo "There is no user in account $2!"
@@ -936,7 +937,7 @@ AllUserInAllAcct(){
             set -- `echo $user_acct`
             while [ $1 ]
             do
-                MaxSubmitJobs=`$mysql --skip-column-names slurm_acct_db -e " select distinct max_submit_jobs from pkuhpc_assoc_table where acct='$acct' and user='$1'"`
+                MaxSubmitJobs=`$mysql --skip-column-names slurm_acct_db -e " select distinct max_submit_jobs from $assoc_table where acct='$acct' and user='$1'"`
                 if [ "$MaxSubmitJobs" == "NULL" ] ; then
                     echo "$1 : allowed!"
                 else
