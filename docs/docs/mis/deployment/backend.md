@@ -55,10 +55,10 @@ volumes:
       # 源作业信息数据库的数据库信息
       FETCH_JOBS_DB_HOST: 192.168.88.227
       FETCH_JOBS_DB_PORT: 3306
-      FETCH_JOBS_DB_USER: scow
-      FETCH_JOBS_DB_PASSWORD: FXl944+q
-      FETCH_JOBS_DB_DBNAME: hpc01
-      FETCH_JOBS_DB_TABLE_NAME: job_table
+      FETCH_JOBS_DB_USER: 源作业信息表的用户名
+      FETCH_JOBS_DB_PASSWORD: 源作业信息表的密码
+      FETCH_JOBS_DB_DBNAME: 源作业信息表所在的数据库
+      FETCH_JOBS_DB_TABLE_NAME: 源作业信息表的表名
 
       # 从源作业信息数据库里获取信息的周期的cron表示
       FETCH_JOBS_PERIODIC_FETCH_CRON: "10 */10 * * * *"
