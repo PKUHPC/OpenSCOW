@@ -7,6 +7,12 @@ title: 服务端
 
 运营系统服务端保存并执行运维操作相关业务逻辑。
 
+## 部署源作业信息数据库
+
+服务器会定期地从**源作业信息数据库**中获取已完成的作业信息，并根据规则对租户和账户进行扣费操作。详细计费规则请参考[计费收费](../business/billing.mdx)。本节介绍部署计费所需要的源作业信息数据库。
+
+请参考[export-jobs](https://%GIT_PLATFORM%.com/%ORGANIZATION_NAME%/export-jobs)项目配置源作业信息数据库。
+
 ## 部署数据库
 
 运营系统目前支持MySQL 8.0及以上版本的数据库。在`docker-compose.yml`中安装并配置数据库：
