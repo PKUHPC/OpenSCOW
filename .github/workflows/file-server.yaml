@@ -24,12 +24,12 @@ jobs:
 
       - name: Test file-server
         working-directory: apps/file-server
-        run: pnpm test
+        run: pnpm test:ci
 
       - name: Upload test converage
         uses: codecov/codecov-action@v2
         with:
-          files: apps/file-server/coverage/lcov.info
+          files: ./apps/file-server/coverage/test/lcov.info
           flags: unittest
           name: codecov-file-server
 
