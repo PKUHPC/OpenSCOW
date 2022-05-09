@@ -21,7 +21,7 @@ jobs:
 
     strategy:
       matrix:
-        image: ["gateway", "docs", "mis-server", "shell-server", "vnc-server", "auth", "clusterops-slurm"]
+        image: ["gateway", "mis-server", "shell-server", "vnc-server", "auth", "clusterops-slurm"]
 
     steps:
       - uses: actions/checkout@v3
