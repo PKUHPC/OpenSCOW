@@ -15,7 +15,7 @@
     "devenv:stop": "docker-compose -f dev/devenv.yml down",
     "generate": "tsgrpc-cli protos && ntar schema",
     "protos": "tsgrpc-cli protos",
-    "cloneNoVnc": "git -C ./public/vnc pull || git clone -c advice.detachedHead=false --depth=1 --branch v1.3.0 https://cccode.pku.edu.cn/chenjunda/NoVNC ./public/vnc"
+    "cloneNoVnc": "git -C ./public/vnc pull || git clone -c advice.detachedHead=false --depth=1 --branch v1.3.0 https://github.com/novnc/noVNC ./public/vnc"
   },
   "dependencies": {
     "@ant-design/icons": "^4.7.0",
