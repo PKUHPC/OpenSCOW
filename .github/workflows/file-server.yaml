@@ -22,6 +22,9 @@ jobs:
       - name: Install dependencies
         run: pnpm i --frozen-lockfile
 
+      - name: Build file-server's dependencies
+        run: pnpm run --filter file-server^... build
+
       - name: Test file-server
         working-directory: apps/file-server
         run: pnpm test:ci
@@ -34,7 +37,7 @@ jobs:
           name: codecov-file-server
 
       - name: Build file-server
-        run: pnpm run --filter file-server... build
+        run: pnpm run --filter file-server build
 
       - name: Archive file-server
         uses: actions/upload-artifact@v3
