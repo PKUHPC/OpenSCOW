@@ -23,8 +23,13 @@ jobs:
 
       - name: Install dependencies
         run: pnpm i --frozen-lockfile
+
       - name: Build website
         run: pnpm run --filter docs... build
+        env:
+          GIT_PLATFORM: github
+          CR_URL: https://ghcr.io/PKUHPC/scow
+          BASE_PATH: /SCOW
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
