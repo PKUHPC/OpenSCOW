@@ -48,19 +48,19 @@ jobs:
 
           - name: mis-web-root
             file: mis-web
-            build_args: BASE_PATH=""
+            build_args: BASE_PATH=/
 
           - name: mis-web-mis
             file: mis-web
-            build_args: BASE_PATH="/mis"
+            build_args: BASE_PATH=/mis
 
           - name: portal-web-root
             file: portal-web
-            build_args: BASE_PATH=""
+            build_args: BASE_PATH=/
 
           - name: portal-web-portal
             file: portal-web
-            build_args: BASE_PATH="/portal"
+            build_args: BASE_PATH=/portal
 
 
     steps:
