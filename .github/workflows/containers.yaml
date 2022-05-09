@@ -21,7 +21,47 @@ jobs:
 
     strategy:
       matrix:
-        image: ["gateway", "mis-server", "shell-server", "vnc-server", "auth", "clusterops-slurm"]
+        include:
+          - name: gateway
+            file: gateway
+            build_args: ""
+
+          - name: mis-server
+            file: mis-server
+            build_args: ""
+
+          - name: shell-server
+            file: shell-server
+            build_args: ""
+
+          - name: vnc-server
+            file: vnc-server
+            build_args: ""
+
+          - name: auth
+            file: auth
+            build_args: ""
+
+          - name: clusterops-slurm
+            file: clusterops-slurm
+            build_args: ""
+
+          - name: mis-web-root
+            file: mis-web
+            build_args: BASE_PATH=""
+
+          - name: mis-web-mis
+            file: mis-web
+            build_args: BASE_PATH="/mis"
+
+          - name: portal-web-root
+            file: portal-web
+            build_args: BASE_PATH=""
+
+          - name: portal-web-portal
+            file: portal-web
+            build_args: BASE_PATH="/portal"
+
 
     steps:
       - uses: actions/checkout@v3
@@ -37,13 +77,14 @@ jobs:
         id: meta
         uses: docker/metadata-action@v4
         with:
-          images: ${{ env.REGISTRY }}/${{ github.repository }}/${{ matrix.image }}
+          images: ${{ env.REGISTRY }}/${{ github.repository }}/${{ matrix.name }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v3
         with:
           context: .
           push: true
+          build-args: ${{ matrix.build_args }}
           tags: ${{ steps.meta.outputs.tags }}
-          file: dockerfiles/Dockerfile.${{ matrix.image }}
+          file: dockerfiles/Dockerfile.${{ matrix.file }}
           labels: ${{ steps.meta.outputs.labels }}
