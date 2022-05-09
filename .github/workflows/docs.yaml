@@ -28,7 +28,7 @@ jobs:
         run: pnpm run --filter docs... build
         env:
           GIT_PLATFORM: github
-          CR_URL: https://ghcr.io/PKUHPC/scow
+          CR_URL: ghcr.io/pkuhpc/scow
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
