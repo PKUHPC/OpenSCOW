@@ -21,8 +21,20 @@ jobs:
 
       - name: Install dependencies
         run: pnpm i --frozen-lockfile
-      - name: Build website
+
+      - name: Build file-server
         run: pnpm run --filter file-server... build
+
+      - name: Test file-server
+        working-directory: apps/file-server
+        run: pnpm test
+
+      - name: Upload test converage
+        uses: codecov/codecov-action@v2
+        with:
+          files: apps/file-server/coverage/lcov.info
+          flags: unittest
+          name: codecov-file-server
 
       - name: Archive file-server
         uses: actions/upload-artifact@v3
