@@ -1,0 +1,49 @@
+name: Deploy and Push Containers
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+
+env:
+  REGISTRY: ghcr.io
+
+jobs:
+  build:
+
+    permissions:
+      contents: read
+      packages: write
+
+    name: Build and Push Containers
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        image: ["gateway", "docs", "mis-server", "shell-server", "vnc-server", "auth", "clusterops-slurm"]
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Log in to the GitHub Container registry
+        uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ env.REGISTRY }}/${{ github.repository }}/${{ matrix.image }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          file: dockerfiles/Dockerfile.${{ matrix.image }}
+          labels: ${{ steps.meta.outputs.labels }}
