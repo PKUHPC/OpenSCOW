@@ -77,7 +77,7 @@ export const createLdapAuthProvider = (f: FastifyInstance) => {
           }
         }
 
-        const groupDn = `cn=${info.identityId},${config.LDAP_ADD_GROUP_BASE}`;
+        const groupDn = `${config.LDAP_ATTR_GROUP_USER_ID}=${info.identityId},${config.LDAP_ADD_GROUP_BASE}`;
         const groupEntry = {
           objectClass: ["posixGroup"],
           memberUid: info.identityId,

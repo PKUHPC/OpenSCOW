@@ -30,6 +30,7 @@ title: "auth"
 |`LDAP_ADD_HOME_DIR`|字符串|LDAP增加用户时，用户的homeDirectory值。使用{userId}代替新用户的用户名|/nfs/{userId}|
 |`LDAP_ADD_USER_TO_GROUP`|字符串|LDAP增加用户时，应该把用户增加到哪个Group下。如果不填，创建用户后不会增加用户到Group|不设置|
 |`LDAP_ADD_UID_START`|数字|LDAP创建用户时，uid从多少开始。生成的用户的uid等于此值加上用户账户中创建的用户ID。创建的Group的gid和uid和此相同。|66000|
+|`LDAP_ATTR_GROUP_USER_ID`|字符串|LDAP中用户对应的组的实体表示用户ID的属性名|**必填**|
 |`LDAP_ATTR_UID`|字符串|LDAP中对应用户的id的属性名。认证类型为ldap必填|**必填**|
 |`LDAP_ATTR_NAME`|字符串|<br/>    LDAP中对应用户的姓名的属性名。<br/>    此字段用于在创建用户的时候把姓名信息填入LDAP，以及验证ID和姓名是否匹配。<br/>    本系统返回的姓名总是以用户账户系统中保存的信息为准。<br/>  |**必填**|
 |`LDAP_ATTR_MAIL`|字符串|LDAP中对应用户的邮箱的属性名。可不填。此字段只用于在创建用户的时候把邮件信息填入LDAP。|不设置|

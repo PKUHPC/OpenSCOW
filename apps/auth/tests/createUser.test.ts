@@ -27,7 +27,7 @@ it("creates user and group", async () => {
   };
 
   const userDn = `${config.LDAP_ATTR_UID}=${user.identityId},${config.LDAP_ADD_USER_BASE}`;
-  const groupDn = `cn=${user.identityId},${config.LDAP_ADD_GROUP_BASE}`;
+  const groupDn = `${config.LDAP_ATTR_GROUP_USER_ID}=${user.identityId},${config.LDAP_ADD_GROUP_BASE}`;
 
   await useLdap(server.log)(async (client) => {
 

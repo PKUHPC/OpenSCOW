@@ -33,7 +33,7 @@ title: LDAP
 
 | 属性名                         | 值                                                  |
 | ------------------------------ | --------------------------------------------------- |
-| DN                             | `{LDAP_ATTR_UID}=用户名,{LDAP_ADD_USER_BASE}`  |
+| DN                             | `{LDAP_ATTR_UID}=用户名,{LDAP_ADD_USER_BASE}`       |
 | `LDAP_ATTR_UID`                | 用户名                                              |
 | `LDAP_ATTR_NAME`               | 用户姓名                                            |
 | sn                             | 用户名                                              |
@@ -46,12 +46,12 @@ title: LDAP
 
 3. 创建一个新的entry作为group，其DN以及属性值如下表所示。
 
-| 属性名      | 值                                                |
-| ----------- | ------------------------------------------------- |
-| DN          | `{LDAP_ATTR_UID}=用户名,{LDAP_ADD_GROUP_BASE}` |
-| objectClass | ["posixGroup"]                                    |
-| memberUid   | 用户名                                            |
-| gidNumber   | 同用户的uidNumber                                 |
+| 属性名      | 值                                                       |
+| ----------- | -------------------------------------------------------- |
+| DN          | `{LDAP_ATTR_GROUP_USER_ID}=用户名,{LDAP_ADD_GROUP_BASE}` |
+| objectClass | ["posixGroup"]                                           |
+| memberUid   | 用户名                                                   |
+| gidNumber   | 同用户的uidNumber                                        |
 
 4. 设置新用户的密码为用户输入的密码
 
@@ -108,6 +108,7 @@ LDAP认证系统将认证信息存放在redis中，所以在部署认证系统�
       LDAP_ADD_USER_BASE: "ou=People,ou={ou},o={dn}"
       LDAP_ADD_GROUP_BASE: "ou=Group,ou={ou},o={dn}"
       LDAP_ATTR_UID: uid
+      LDAP_ATTR_GROUP_USER_ID: cn
       LDAP_ATTR_NAME: cn
       LDAP_ATTR_MAIL: mail
 ```

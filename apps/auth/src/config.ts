@@ -29,6 +29,7 @@ export const config = envConfig({
     desc: "LDAP创建用户时，uid从多少开始。生成的用户的uid等于此值加上用户账户中创建的用户ID。创建的Group的gid和uid和此相同。",
     default: 66000,
   }),
+  LDAP_ATTR_GROUP_USER_ID: str({ desc: "LDAP中用户对应的组的实体表示用户ID的属性名" }),
   LDAP_ATTR_UID: str({ desc: "LDAP中对应用户的id的属性名。认证类型为ldap必填" }),
   LDAP_ATTR_NAME: str({ desc: `
     LDAP中对应用户的姓名的属性名。
