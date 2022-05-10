@@ -28,12 +28,6 @@ Phrase="wrongpassword"
 #   echo `slappasswd -s secret`
 #
 
-#   remove openldap before install
-
-yum -y remove openldap-servers openldap-clients nss-pam-ldapd
-rm -rf /etc/openldap
-rm -rf /var/lib/ldap/*
-
 DN="o=$dn"
 OU="ou=$ou"
 
@@ -63,13 +57,38 @@ OU="ou=$ou"
 ##### install
 #[1] Install OpenLDAP Server.
 echo "Step 1: Install OpenLDAP Server."
-yum -y install openldap-servers openldap-clients
+
+# if is in docker
+
+if [ $1 = 'docker' ]; then
+  IN_DOCKER=1
+fi
+
+# remove openldap before install
+if ! [[ -n IN_DOCKER ]]; then
+  exit 1
+  yum -y remove openldap-servers openldap-clients nss-pam-ldapd
+  rm -rf /etc/openldap
+  rm -rf /var/lib/ldap/*
+fi
+
+yum install -y openldap-servers openldap-clients nss-pam-ldapd
+
+if [[ -n $IN_DOCKER ]]; then
+
+  yum install -y openssl
+
+  echo "Starting slapd directly"
+  slapd -u ldap -h "ldap:/// ldapi:///"
+else
+  echo "Starting slapd using systemctl"
+  systemctl start slapd
+  systemctl enable slapd
+fi
 
 # Create backend database.
 cp /usr/share/openldap-servers/DB_CONFIG.example /var/lib/ldap/DB_CONFIG
 chown -R ldap. /var/lib/ldap/DB_CONFIG
-systemctl start slapd
-systemctl enable slapd
 
 #[2] Set OpenLDAP admin password.
 #generate encrypted password
@@ -228,6 +247,11 @@ ldapmodify -Y EXTERNAL -H ldapi:/// -f /etc/pki/tls/certs/mod_ssl.ldif
 
 sed -i '/^SLAPD_URLS=.*/d' /etc/sysconfig/slapd
 sed -i '9aSLAPD_URLS="ldapi:/// ldap:/// ldaps:///"' /etc/sysconfig/slapd
-systemctl restart slapd
+
+if [ -n $IN_DOCKER ]; then
+  kill -INT $(cat /var/run/openldap/slapd.pid)
+else
+  systemctl restart slapd
+fi
 
 echo "finished!"

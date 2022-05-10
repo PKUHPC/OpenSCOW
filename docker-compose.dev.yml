@@ -24,6 +24,13 @@ services:
     ports:
       - 3307:3306
 
+  ldap:
+    image: ldaptest
+    build:
+      dockerfile: scripts/ldap/Dockerfile
+    ports:
+      - 389:389
+
 networks:
   default:
     name: scow
