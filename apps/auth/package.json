@@ -4,10 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "rimraf build && tsc -p tsconfig.json && tsc-alias -p tsconfig.json",
+    "build": "rimraf build && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
     "dev": "nodemon --watch src -e ts --exec \"npx dotenv -e env/.env.dev -- npx ts-node -r tsconfig-paths/register src/index.ts\"",
-    "devenv": "docker compose -f devenv.yml up -d",
-    "devenv:stop": "docker compose -f devenv.yml down"
+    "test": "jest",
+    "test:ci": "jest --ci --coverage"
   },
   "keywords": [],
   "author": "",
