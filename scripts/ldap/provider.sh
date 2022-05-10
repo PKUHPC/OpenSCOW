@@ -7,8 +7,6 @@ dn="pku"
 ou="hpc"
 # LDAP admin password
 adminPasswd="admin"
-# directory manager's password
-direManaPasswd="slapd"
 
 ## SSL Certificates configurations
 Country="CN"
@@ -95,8 +93,6 @@ ldapadd -Y EXTERNAL -H ldapi:/// -f /etc/openldap/schema/inetorgperson.ldif
 
 #[4]Set your domain name on LDAP DB.
 echo "Step 4:Set your domain name on LDAP DB."
-# generate directory manager's password
-pw2=$(slappasswd -s $direManaPasswd)
 
 cat >>/etc/openldap/chdomain.ldif <<EOF
 # replace to your own domain name for "dc=***,dc=***" section
@@ -120,7 +116,7 @@ olcRootDN: cn=Manager,$OU,$DN
 dn: olcDatabase={2}hdb,cn=config
 changetype: modify
 add: olcRootPW
-olcRootPW: $pw2
+olcRootPW: $pw
 
 dn: olcDatabase={2}hdb,cn=config
 changetype: modify
@@ -156,7 +152,7 @@ dn: ou=Group,$OU,$DN
 objectClass: organizationalUnit
 ou: Group
 EOF
-ldapadd -x -D cn=Manager,$OU,$DN -W -f /etc/openldap/basedomain.ldif
+ldapadd -x -D cn=Manager,$OU,$DN -w $adminPasswd -f /etc/openldap/basedomain.ldif
 
 #[5]    If Firewalld is running, allow LDAP service. LDAP uses 389/TCP.
 echo "Step 5:If Firewalld is running, allow LDAP service. LDAP uses 389/TCP."
