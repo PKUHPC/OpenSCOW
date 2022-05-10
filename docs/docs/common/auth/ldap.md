@@ -56,8 +56,6 @@ title: LDAP
 4. 设置新用户的密码为用户输入的密码
 
 
-
-
 ## 安装并配置LDAP认证服务
 
 ### 部署redis
@@ -112,4 +110,17 @@ LDAP认证系统将认证信息存放在redis中，所以在部署认证系统�
       LDAP_ATTR_UID: uid
       LDAP_ATTR_NAME: cn
       LDAP_ATTR_MAIL: mail
+```
+
+## LDAP镜像
+
+您还可以使用我们提供的已经配置好的LDAP docker镜像进行体验。注意，此镜像仅用于测试和功能体验，请勿用于生产环境！
+
+```bash
+# 在整个项目的根目录构建镜像 
+docker build -f scripts/ldap/Dockerfile -t ldap .
+
+# 启动镜像。服务在389端口监听。
+# 管理员用户为cn=Manager,ou=hpc,o=pku，密码为admin
+docker run -p 389:389 ldap
 ```
