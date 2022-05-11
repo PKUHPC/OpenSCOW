@@ -30,6 +30,8 @@ services:
       dockerfile: scripts/ldap/Dockerfile
     ports:
       - 389:389
+    volumes:
+      - ldap:/var/lib/ldap
 
 networks:
   default:
@@ -37,5 +39,6 @@ networks:
 
 volumes:
   db:
+  ldap:
   jobtabledb:
     name: jobtabledb
