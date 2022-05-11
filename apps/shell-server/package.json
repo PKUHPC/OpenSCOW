@@ -9,8 +9,7 @@
   "scripts": {
     "dev": "dotenv -e env/.env.dev -- npx nodemon --watch src -e ts,tsx --exec npx ts-node -r tsconfig-paths/register src/index.ts",
     "build": "rimraf build && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
-    "serve": "node build/index.js",
-    "test": "jest"
+    "serve": "node build/index.js"
   },
   "dependencies": {
     "@scow/config": "workspace:*",

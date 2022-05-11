@@ -7,7 +7,8 @@
     "prune": "pnpm clean --yes && pnpm bootstrap --ci -- --production",
     "devenv": "docker compose -f docker-compose.dev.yml up -d",
     "devenv:stop": "docker compose -f docker-compose.dev.yml down",
-    "test": "pnpm run test"
+    "test": "pnpm run -r test",
+    "test:ci": "pnpm run -r test:ci"
   },
   "devDependencies": {
     "@ddadaal/eslint-config": "^1.3.0",

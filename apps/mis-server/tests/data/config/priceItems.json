@@ -5,50 +5,50 @@
         "low": {
           "id": "HPC01",
           "price": "0.04",
-          "strategy": "max-cpusAlloc-mem"
+          "amount": "max-cpusAlloc-mem"
         },
         "normal": {
           "id": "HPC02",
           "price": "0.06",
-          "strategy": "max-cpusAlloc-mem"
+          "amount": "max-cpusAlloc-mem"
         },
         "high": {
           "id": "HPC03",
           "price": "0.08",
-          "strategy": "max-cpusAlloc-mem"
+          "amount": "max-cpusAlloc-mem"
         },
         "cryoem": {
           "id": "HPC04",
           "price": "0.04",
-          "strategy": "max-cpusAlloc-mem"
+          "amount": "max-cpusAlloc-mem"
         }
       },
       "GPU": {
         "low": {
           "id": "HPC05",
           "price": "2.50",
-          "strategy": "max-gpu-cpusAlloc"
+          "amount": "max-gpu-cpusAlloc"
         },
         "normal": {
           "id": "HPC06",
           "price": "3.75",
-          "strategy": "max-gpu-cpusAlloc"
+          "amount": "max-gpu-cpusAlloc"
         },
         "high": {
           "id": "HPC07",
           "price": "5.00",
-          "strategy": "max-gpu-cpusAlloc"
+          "amount": "max-gpu-cpusAlloc"
         },
         "cryoem": {
           "id": "HPC08",
           "price": "2.50",
-          "strategy": "max-gpu-cpusAlloc"
+          "amount": "max-gpu-cpusAlloc"
         }
       },
       "life": {
         "id": "HPC09",
         "price": "0.00",
-        "strategy": "gpu"
+        "amount": "gpu"
       }
     },
     "hpc01": {
@@ -56,34 +56,34 @@
         "low": {
           "id": "HPC10",
           "price": "0.05",
-          "strategy": "cpusAlloc"
+          "amount": "cpusAlloc"
         },
         "normal": {
           "id": "HPC11",
           "price": "0.06",
-          "strategy": "cpusAlloc"
+          "amount": "cpusAlloc"
         },
         "high": {
           "id": "HPC12",
           "price": "0.07",
-          "strategy": "cpusAlloc"
+          "amount": "cpusAlloc"
         }
       },
       "gpu": {
         "low": {
           "id": "HPC13",
           "price": "4.00",
-          "strategy": "gpu"
+          "amount": "gpu"
         },
         "normal": {
           "id": "HPC14",
           "price": "5.00",
-          "strategy": "gpu"
+          "amount": "gpu"
         },
         "high": {
           "id": "HPC15",
           "price": "6.00",
-          "strategy": "gpu"
+          "amount": "gpu"
         }
       }
     }
@@ -94,7 +94,7 @@
         "low": {
           "id": "HPC100",
           "price": "0.08",
-          "strategy": "max-cpusAlloc-mem"
+          "amount": "max-cpusAlloc-mem"
         }
       }
     }

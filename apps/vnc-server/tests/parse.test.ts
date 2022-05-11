@@ -1,4 +1,12 @@
+import { Server } from "@ddadaal/tsgrpc-server";
+import { createServer } from "src/app";
 import { parseDisplayId, parseListOutput, parseOtp } from "src/services/VncService";
+
+let server: Server;
+
+beforeEach(async () => {
+  server = await createServer();
+});
 
 const startOutput = `
 Desktop 'TurboVNC: login01:1 (2001213077)' started on display login01:1
@@ -12,38 +20,30 @@ Starting applications specified in ./xstartup
 Log file is /nfs/2001213077/.vnc/login01:1.log
 `;
 
-it("parses display id from output", async () => {
-
-  const test = (output: string, expected: number) => {
-    expect(parseDisplayId(output, pino())).toBe(expected);
-  };
-
-  test(startOutput, 1);
-
+it.each([
+  [startOutput, 1],
+])("parses display id from output", async (output, expected) => {
+  expect(parseDisplayId(output, server.logger)).toBe(expected);
 });
 
-it("parses OTP from output", async () => {
-
-  const test = (output: string, expected: string) => {
-    expect(parseOtp(output, pino())).toBe(expected);
-  };
-
-  test("Full control one-time password: 32582749", "32582749");
-
-  test(startOutput, "67159149");
-
+it.each([
+  ["Full control one-time password: 32582749", "32582749"],
+  [startOutput, "67159149"],
+])("parses OTP from output", async (output, expected) => {
+  expect(parseOtp(output, server.logger)).toBe(expected);
 });
 
-it("parses list", async () => {
-  const test = (output: string, expected: number[]) => {
-    expect(parseListOutput(output)).toIncludeSameMembers(expected);
-  };
-
-  test(`
+const listOutput = `
 TurboVNC sessions:
 
 X DISPLAY #     PROCESS ID      NOVNC PROCESS ID
 :1\t\t21468
 :2\t\t22284
-`, [1, 2]);
+`;
+
+it.each([
+  [listOutput, [1,2]],
+])("parses list", (output, expected) => {
+  expect(parseListOutput(output)).toIncludeSameMembers(expected);
 });
+
