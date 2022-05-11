@@ -32,8 +32,11 @@ AUTH_URL=http://service:7575
 # 用户的home目录模板，用{userId}替代用户名
 USER_HOME=/nfs/{userId}
 ```
+
 3. 下载[helper.sh](%REPO_FILE_URL%/apps/file-server/helper.sh)并放到目录里，并给此脚本设置可执行权限
 4. 运行`./bin.sh pull`下载服务
+    - 如果您从其他方式获得了文件管理服务的二进制文件（如从源码构建），那么不需要运行`pull`下载服务
+    - 请将下载好的二进制文件放到此目录中，并改名为`file-server`并给可执行权限，然后进行下一步
 5. 运行`./bin.sh up -d`在后台运行服务
 
 ## 配置门户前端
