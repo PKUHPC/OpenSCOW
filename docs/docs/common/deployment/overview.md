@@ -39,6 +39,8 @@ docker compose build
 5. 安装依赖并构建项目
 
 ```bash
+# 如果是通过官网的安装脚本安装的pnpm，那么运行以下命令安装node-gyp；否则不需要单独运行以下命令
+pnpm i -g node-gyp
 pnpm i
 pnpm run build
 ```
