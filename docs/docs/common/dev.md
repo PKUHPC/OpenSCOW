@@ -46,8 +46,8 @@ pnpm install -g node-gyp
 # 在根目录下，安装依赖
 pnpm i
 
-# 构建一次所有包，生成所有的proto文件以及依赖文件
-pnpm run build
+# 准备开发需要的库和代码：构建依赖库，生成各种代码
+pnpm prepareDev
 ```
 
 ### 为什么不采用其他monorepo管理方案？
