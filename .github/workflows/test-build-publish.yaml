@@ -1,4 +1,4 @@
-name: Deploy and Push Containers
+name: Test, Build and Publish Projects
 
 on:
   workflow_dispatch:
@@ -10,13 +10,73 @@ env:
   REGISTRY: ghcr.io
 
 jobs:
-  build:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: pnpm/action-setup@v2.0.1
+        with:
+          version: 7.0.1
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm i --frozen-lockfile
+
+      - name: Start dev env for db testing
+        run: pnpm devenv
+
+      - name: Check running containers
+        run: docker ps
+
+      - name: Run tests
+        run: pnpm test:ci
+
+      - name: Upload test converage
+        uses: codecov/codecov-action@v2
+        with:
+          files: ./apps/file-server/coverage/test/lcov.info,./apps/auth/coverage/test/lcov.info,./apps/vnc-server/coverage/test/lcov.info,./apps/mis-server/coverage/test/lcov.info
+
+  build-file-server:
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: pnpm/action-setup@v2.0.1
+        with:
+          version: 7.0.1
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm i --frozen-lockfile
+
+      - name: Build file-server
+        run: pnpm run --filter file-server... build
+
+      - name: Archive file-server
+        uses: actions/upload-artifact@v3
+        with:
+          name: file-server
+          path: apps/file-server/build/file-server
+
+  build-containers:
+    needs: test
 
     permissions:
       contents: read
       packages: write
 
-    name: Build and Push Containers
+    name: Build and Publish
     runs-on: ubuntu-latest
 
     strategy:
@@ -61,7 +121,6 @@ jobs:
           - name: portal-web-portal
             file: portal-web
             build_args: BASE_PATH=/portal
-
 
     steps:
       - uses: actions/checkout@v3
