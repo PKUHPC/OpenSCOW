@@ -29,6 +29,9 @@ jobs:
       - name: Install dependencies
         run: pnpm i --frozen-lockfile
 
+      - name: Build libs
+        run: pnpm build:libs
+
       - name: Start dev env for db testing
         run: pnpm devenv
 

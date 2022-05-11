@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "build": "pnpm run -r build",
-    "build:libs": "pnpm run build --scope @scow/lib-*",
+    "build:libs": "pnpm --filter './libs/**' run build",
     "prune": "pnpm clean --yes && pnpm bootstrap --ci -- --production",
     "devenv": "docker compose -f docker-compose.dev.yml up -d",
     "devenv:stop": "docker compose -f docker-compose.dev.yml down",
