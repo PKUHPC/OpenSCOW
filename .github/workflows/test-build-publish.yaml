@@ -79,7 +79,6 @@ jobs:
       contents: read
       packages: write
 
-    name: Build and Publish
     runs-on: ubuntu-latest
 
     strategy:
