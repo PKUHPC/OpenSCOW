@@ -1,8 +1,7 @@
 # SCOW
 
-![docs](https://github.com/PKUHPC/SCOW/actions/workflows/docs.yaml/badge.svg)
-![containers](https://github.com/PKUHPC/SCOW/actions/workflows/containers.yaml/badge.svg)
-![file-server](https://github.com/PKUHPC/SCOW/actions/workflows/file-server.yaml/badge.svg)
+![Docs](https://github.com/PKUHPC/SCOW/actions/workflows/docs.yaml/badge.svg)
+![Build](https://github.com/PKUHPC/SCOW/actions/workflows/test-build-publish.yaml/badge.svg)
 [![codecov](https://codecov.io/gh/PKUHPC/SCOW/branch/master/graph/badge.svg?token=S9JCB2DXML)](https://codecov.io/gh/PKUHPC/SCOW)
 
 Super Computing On Web.
