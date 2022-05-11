@@ -2,9 +2,8 @@ import { Static, TSchema } from "@sinclair/typebox";
 import fs from "fs";
 import { load } from "js-yaml";
 import { join } from "path";
+import { CONFIG_BASE_PATH } from "src/constants";
 import { validateObject } from "src/validation";
-
-export const CONFIG_BASE_PATH = "/etc/scow";
 
 const candidates = [
   ["yml", load],

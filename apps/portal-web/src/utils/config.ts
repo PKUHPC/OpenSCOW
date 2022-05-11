@@ -1,3 +1,4 @@
+import { CONFIG_BASE_PATH } from "@scow/config/build/constants";
 import getConfig from "next/config";
 import { join } from "path";
 
@@ -38,3 +39,5 @@ export const publicConfig: PublicRuntimeConfig = getConfig().publicRuntimeConfig
 export type Cluster = { id: string; name: string; }
 
 export const CLUSTERS: Cluster[] = Object.entries(publicConfig.CLUSTER_NAMES).map(([id, name]) => ({ id, name }));
+
+export const CONFIG_PATH = process.env.NODE_ENV === "production" ? CONFIG_BASE_PATH : ".";

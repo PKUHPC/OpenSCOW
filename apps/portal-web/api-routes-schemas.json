@@ -325,17 +325,6 @@
       "additionalProperties": false,
       "$id": "UserInfo",
       "title": "UserInfo"
-    },
-    "NamedParameters%3Ctypeof%20_parseHostname%3E": {
-      "type": "object",
-      "properties": {
-        "host": {
-          "type": "string"
-        }
-      },
-      "additionalProperties": false,
-      "$id": "NamedParameters%3Ctypeof%20_parseHostname%3E",
-      "title": "NamedParameters%3Ctypeof%20_parseHostname%3E"
     }
   }
 }

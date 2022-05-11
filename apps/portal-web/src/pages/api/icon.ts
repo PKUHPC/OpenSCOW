@@ -2,6 +2,7 @@ import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import fs from "fs";
 import { contentType } from "mime-types";
 import path from "path";
+import { CONFIG_PATH } from "src/utils/config";
 import { getHostname } from "src/utils/host";
 
 export interface GetIconSchema {
@@ -17,11 +18,9 @@ export interface GetIconSchema {
   }
 }
 
-const BUILTIN_DIR = "icons";
-const ICONS_DIR = process.env.NODE_ENV === "production" ? "/etc/scow/icons" : BUILTIN_DIR;
-const DEFAULT_DIR = "default";
+const ICONS_DIR = path.join(CONFIG_PATH, "icons");
 
-const BUILTIN_DEFAULT_DIR = path.join(BUILTIN_DIR, DEFAULT_DIR);
+const BUILTIN_DEFAULT_DIR = path.join(ICONS_DIR, "default");
 
 const FILE_NAMES = {
   "favicon": "favicon.ico",
@@ -29,25 +28,11 @@ const FILE_NAMES = {
   "512": "512.png",
 };
 
-function _parseHostname(host: string | undefined) {
-  if (!host) { return undefined; }
-  const splitted = host.split(":");
-  if (splitted.length >= 2) {
-    return splitted.slice(0, splitted.length - 1 ).join();
-  } else {
-    return host;
-  }
-}
-
 export default /*#__PURE__*/route<GetIconSchema>("GetIconSchema", async (req, res) => {
 
   const hostname = getHostname(req);
 
   let dir = hostname ? path.join(ICONS_DIR, hostname) : BUILTIN_DEFAULT_DIR;
-
-  if (!fs.existsSync(dir)) {
-    dir = path.join(ICONS_DIR, DEFAULT_DIR);
-  }
 
   if (!fs.existsSync(dir)) {
     dir = BUILTIN_DEFAULT_DIR;
