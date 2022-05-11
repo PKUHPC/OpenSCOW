@@ -6,9 +6,9 @@ import { Decimal, decimalToMoney } from "@scow/lib-decimal";
 import { createServer } from "src/app";
 import { UserAccount, UserStatus } from "src/entities/UserAccount";
 import { JobChargeLimitServiceClient } from "src/generated/server/jobChargeLimit";
-import { ormConfigs } from "src/plugins/orm";
 import { reloadEntity } from "src/utils/orm";
 import { InitialData, insertInitialData } from "tests/data/data";
+import { dropDatabase } from "tests/data/helpers";
 
 let server: Server;
 let em: SqlEntityManager;
@@ -30,7 +30,7 @@ beforeEach(async () => {
 });
 
 afterEach(async () => {
-  await server.ext.orm.getSchemaGenerator().dropDatabase(ormConfigs.dbName!);
+  await dropDatabase(server.ext.orm);
   await server.close();
 });
 

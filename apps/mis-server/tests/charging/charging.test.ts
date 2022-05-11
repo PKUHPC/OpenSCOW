@@ -10,9 +10,9 @@ import { ChargeRecord } from "src/entities/ChargeRecord";
 import { PayRecord } from "src/entities/PayRecord";
 import { Tenant } from "src/entities/Tenant";
 import { ChargeRequest, ChargingServiceClient, PaymentRecord, PayRequest } from "src/generated/server/charging";
-import { ormConfigs } from "src/plugins/orm";
 import { range } from "src/utils/array";
 import { reloadEntity } from "src/utils/orm";
+import { dropDatabase } from "tests/data/helpers";
 
 
 let server: Server;
@@ -36,7 +36,7 @@ beforeEach(async () => {
 });
 
 afterEach(async () => {
-  await server.ext.orm.getSchemaGenerator().dropDatabase(ormConfigs.dbName!);
+  await dropDatabase(server.ext.orm);
   await server.close();
 });
 

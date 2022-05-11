@@ -4,8 +4,8 @@ import { ChannelCredentials } from "@grpc/grpc-js";
 import { decimalToMoney } from "@scow/lib-decimal";
 import { createServer } from "src/app";
 import { GetTenantInfoReply, TenantServiceClient } from "src/generated/server/tenant";
-import { ormConfigs } from "src/plugins/orm";
 import { InitialData, insertInitialData } from "tests/data/data";
+import { dropDatabase } from "tests/data/helpers";
 
 
 let server: Server;
@@ -24,7 +24,7 @@ beforeEach(async () => {
 });
 
 afterEach(async () => {
-  await server.ext.orm.getSchemaGenerator().dropDatabase(ormConfigs.dbName!);
+  await dropDatabase(server.ext.orm);
   await server.close();
 });
 

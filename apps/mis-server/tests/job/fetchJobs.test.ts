@@ -1,18 +1,16 @@
 /* eslint-disable max-len */
 import { Server } from "@ddadaal/tsgrpc-server";
-import { MikroORM } from "@mikro-orm/core";
 import { MySqlDriver, SqlEntityManager } from "@mikro-orm/mysql";
 import { Decimal } from "@scow/lib-decimal";
 import { createServer } from "src/app";
 import { JobInfo } from "src/entities/JobInfo";
 import { OriginalJob } from "src/entities/OriginalJob";
 import { UserStatus } from "src/entities/UserAccount";
-import { ormConfigs } from "src/plugins/orm";
 import { createPriceItems } from "src/tasks/createBillingItems";
 import { createSourceDbOrm, fetchJobs } from "src/tasks/fetch";
 import { reloadEntities } from "src/utils/orm";
 import { InitialData, insertInitialData } from "tests/data/data";
-import { clearAndClose } from "tests/data/helpers";
+import { clearAndClose, dropDatabase } from "tests/data/helpers";
 
 import testData from "./testData.json";
 
@@ -26,16 +24,9 @@ beforeEach(async () => {
 
   server = await createServer();
 
-  {
-    const orm = await MikroORM.init(ormConfigs);
-    await orm.getSchemaGenerator().ensureDatabase();
-    await orm.getMigrator().up();
-    await createPriceItems(orm.em.fork(), server.logger, "tests/data/config");
-    await orm.close();
-  }
-
-
   initialEm = server.ext.orm.em.fork();
+
+  await createPriceItems(initialEm, server.logger, "tests/data/config");
 
   data = await insertInitialData(initialEm);
 
@@ -55,7 +46,7 @@ beforeEach(async () => {
 
 afterEach(async () => {
   await clearAndClose(jobTableOrm.dbConnection);
-  await server.ext.orm.getSchemaGenerator().dropDatabase(ormConfigs.dbName!);
+  await dropDatabase(server.ext.orm);
   await server.close();
 });
 

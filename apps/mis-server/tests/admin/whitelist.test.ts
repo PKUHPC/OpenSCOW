@@ -7,9 +7,9 @@ import { createServer } from "src/app";
 import { Account } from "src/entities/Account";
 import { AccountWhitelist } from "src/entities/AccountWhitelist";
 import { AccountServiceClient } from "src/generated/server/account";
-import { ormConfigs } from "src/plugins/orm";
 import { reloadEntity , toRef } from "src/utils/orm";
 import { InitialData, insertInitialData } from "tests/data/data";
+import { dropDatabase } from "tests/data/helpers";
 
 let server: Server;
 let em: SqlEntityManager;
@@ -31,7 +31,7 @@ beforeEach(async () => {
 });
 
 afterEach(async () => {
-  await server.ext.orm.getSchemaGenerator().dropDatabase(ormConfigs.dbName!);
+  await dropDatabase(server.ext.orm);
   await server.close();
 });
 

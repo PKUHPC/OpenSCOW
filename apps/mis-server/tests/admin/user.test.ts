@@ -8,9 +8,9 @@ import { Tenant } from "src/entities/Tenant";
 import { User } from "src/entities/User";
 import { UserAccount, UserRole, UserStatus } from "src/entities/UserAccount";
 import { UserServiceClient } from "src/generated/server/user";
-import { ormConfigs } from "src/plugins/orm";
 import { reloadEntity } from "src/utils/orm";
 import { insertInitialData } from "tests/data/data";
+import { dropDatabase } from "tests/data/helpers";
 import { fetch } from "undici";
 
 const anotherTenant = "anotherTenant";
@@ -35,7 +35,7 @@ beforeEach(async () => {
 });
 
 afterEach(async () => {
-  await server.ext.orm.getSchemaGenerator().dropDatabase(ormConfigs.dbName!);
+  await dropDatabase(server.ext.orm);
   await server.close();
 });
 

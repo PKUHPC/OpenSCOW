@@ -8,11 +8,11 @@ import { JobInfo } from "src/entities/JobInfo";
 import { JobPriceChange } from "src/entities/JobPriceChange";
 import { UserAccount } from "src/entities/UserAccount";
 import { JobServiceClient } from "src/generated/server/job";
-import { ormConfigs } from "src/plugins/orm";
 import { range } from "src/utils/array";
 import { UNKNOWN_PRICE_ITEM } from "src/utils/constants";
 import { reloadEntities } from "src/utils/orm";
 import { InitialData, insertInitialData } from "tests/data/data";
+import { dropDatabase } from "tests/data/helpers";
 
 let server: Server;
 let em: SqlEntityManager;
@@ -30,7 +30,7 @@ beforeEach(async () => {
 });
 
 afterEach(async () => {
-  await server.ext.orm.getSchemaGenerator().dropDatabase(ormConfigs.dbName!);
+  await dropDatabase(server.ext.orm);
   await server.close();
 });
 

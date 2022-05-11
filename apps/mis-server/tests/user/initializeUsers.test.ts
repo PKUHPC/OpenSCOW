@@ -1,39 +1,32 @@
 /* eslint-disable max-len */
-import { Logger } from "@ddadaal/tsgrpc-server";
+import { Server } from "@ddadaal/tsgrpc-server";
 import { MikroORM } from "@mikro-orm/core";
 import { MySqlDriver } from "@mikro-orm/mysql";
 import { createServer } from "src/app";
 import { Account } from "src/entities/Account";
 import { User } from "src/entities/User";
 import { UserAccount, UserRole, UserStatus } from "src/entities/UserAccount";
-import { ormConfigs } from "src/plugins/orm";
 import { initializeUsers } from "src/tasks/initializeUsers";
-import { clearAndClose } from "tests/data/helpers";
+import {  dropDatabase } from "tests/data/helpers";
 
 import usersJson from "../data/config/users.json";
 
-let logger: Logger;
+let server: Server;
 let orm: MikroORM<MySqlDriver>;
 
 beforeEach(async () => {
-  logger =  (await createServer()).logger;
+  server = await createServer();
 
-  orm = await MikroORM.init<MySqlDriver>({
-    ...ormConfigs,
-    logger: (msg) => logger.info(msg),
-  });
-
-  await orm.getSchemaGenerator().ensureDatabase();
-  await orm.getMigrator().up();
-
+  orm = server.ext.orm;
 });
 
 afterEach(async () => {
-  await clearAndClose(orm);
+  await dropDatabase(orm);
+  await server.close();
 });
 
 it("imports users and accounts from users.json", async () => {
-  await initializeUsers(orm.em.fork(), true, logger, "tests/data/config");
+  await initializeUsers(orm.em.fork(), true, server.logger, "tests/data/config");
 
   const em = orm.em.fork();
 

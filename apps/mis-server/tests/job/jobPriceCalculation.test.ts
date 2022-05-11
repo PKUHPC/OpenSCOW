@@ -1,26 +1,21 @@
 /* eslint-disable max-len */
-import { Logger } from "@ddadaal/tsgrpc-server";
+import { Server } from "@ddadaal/tsgrpc-server";
 import { MikroORM } from "@mikro-orm/core";
 import { MySqlDriver } from "@mikro-orm/mysql";
 import { Decimal } from "@scow/lib-decimal";
 import { createServer } from "src/app";
 import { JobPriceItem } from "src/entities/JobPriceItem";
 import { Tenant } from "src/entities/Tenant";
-import { ormConfigs } from "src/plugins/orm";
 import { calculateJobPrice, createPriceMap } from "src/plugins/price";
 import { createPriceItems } from "src/tasks/createBillingItems";
-import { clearAndClose } from "tests/data/helpers";
+import { dropDatabase } from "tests/data/helpers";
 
-let logger: Logger;
+let server: Server;
 let orm: MikroORM<MySqlDriver>;
 
 beforeEach(async () => {
-  logger =  (await createServer()).logger;
-
-  orm = await MikroORM.init<MySqlDriver>({
-    ...ormConfigs,
-    logger: (msg) => logger.info(msg),
-  });
+  server =  await createServer();
+  orm = server.ext.orm;
 
   await orm.getSchemaGenerator().ensureDatabase();
   await orm.getMigrator().up();
@@ -32,7 +27,8 @@ beforeEach(async () => {
 });
 
 afterEach(async () => {
-  await clearAndClose(orm);
+  await dropDatabase(orm);
+  await server.close();
 });
 
 interface PriceItem {
@@ -62,7 +58,7 @@ const expectedPriceItems: PriceItem[] = [
 ];
 
 it("creates billing items in db", async () => {
-  await createPriceItems(orm.em.fork(), logger, "tests/data/config");
+  await createPriceItems(orm.em.fork(), server.logger, "tests/data/config");
 
   const em = orm.em.fork();
 
@@ -80,9 +76,9 @@ it("creates billing items in db", async () => {
 });
 
 it("calculates price", async () => {
-  await createPriceItems(orm.em.fork(), logger, "tests/data/config");
+  await createPriceItems(orm.em.fork(), server.logger, "tests/data/config");
 
-  const priceMap = await createPriceMap(orm.em, logger);
+  const priceMap = await createPriceMap(orm.em, server.logger);
 
 
   // obtain test data by running the following data in db
@@ -92,7 +88,7 @@ it("calculates price", async () => {
   const wrongPrices = [] as { biJobIndex: number; tenantPrice: { expected: number; actual: number }; accountPrice: { expected: number; actual: number } }[];
 
   testData.forEach((t) => {
-    const price = calculateJobPrice(t, priceMap.getPriceItem, logger);
+    const price = calculateJobPrice(t, priceMap.getPriceItem, server.logger);
     if (price.tenant.price.toNumber() !== t.tenantPrice || price.account.price.toNumber() !== t.accountPrice) {
       wrongPrices.push({
         biJobIndex: t.biJobIndex,
