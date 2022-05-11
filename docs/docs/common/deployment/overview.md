@@ -26,9 +26,9 @@ git clone %REPO_URL% --depth=1
 
 3. 修改`.env`目录中的`IMAGE_BASE`变量，以设置各个镜像的tag的前缀。
 
-构建好的镜像的tag为`$IMAGE_BASE/组件名`，如`$IMAGE_BASE/gateway`等。
+构建好的镜像的tag为`$IMAGE_BASE/组件名`。在后面的部署中，将docker-compose.yml中image修改为对应的值。
 
-在后面的部署中，将docker-compose.yml中image修改为对应的值。例如将`%CR_URL%/gateway`修改为`$IMAGE_BASE/gateway`。
+例如，如果`IMAGE_BASE=myimage.com/scow`，那么网关服务的tag为`myimage.com/scow/gateway`。在后续部署gateway时，将`%CR_URL%/gateway`修改为`myimage.com/scow/gateway`。
 
 4. 构建镜像
 
@@ -40,10 +40,10 @@ docker compose build
 
 ```bash
 pnpm i
-pnpm run -r build
+pnpm run build
 ```
 
-6. 二进制文件所在的位置如下表
+6. 二进制文件所在的位置如下表。部署对应的项目时将会有相应的如何使用已有二进制文件的提示。
 
 | 项目          | 目录                                 |
 | ------------- | ------------------------------------ |
