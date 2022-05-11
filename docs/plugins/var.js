@@ -30,12 +30,12 @@ const replace = (template) => {
   return template.replace(/%([a-zA-Z0-9_]+)%/g, (_, p1) => variables[p1] ?? "");
 }
 
-const { partialUpdateObject } = require("@algolia/client-search");
 const visit = require('unist-util-visit');
 
 const types = [
   { type: "link", property: "url" },
   { type: "code", property: "value" },
+  { type: "inlineCode", property: "value" },
 ]
 
 const plugin = (options) => {
