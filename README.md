@@ -10,7 +10,7 @@ For details, check out https://PKUHPC.github.io/SCOW.
 
 ## Overview
 
-SCOW is an HPC portal and management information system (MIS) for HPC users and managers. 
+SCOW is an HPC portal and management information system (MIS) for HPC users and system administrators. 
 
 **HPC portal** enables HPC users to access HPC resources with only a modern browser anywhere, anytime and with any device.
 
