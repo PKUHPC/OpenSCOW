@@ -38,4 +38,4 @@ export type Cluster = { id: string; name: string; }
 
 export const CLUSTERS: Cluster[] = Object.entries(publicConfig.CLUSTERS).map(([id, name]) => ({ id, name }));
 
-export const CONFIG_PATH = process.env.NODE_ENV === "production" ? CONFIG_BASE_PATH : ".";
+export const CONFIG_PATH = process.env.NODE_ENV === "production" ? CONFIG_BASE_PATH : "config";
