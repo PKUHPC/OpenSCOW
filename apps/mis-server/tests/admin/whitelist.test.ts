@@ -4,6 +4,7 @@ import { ChannelCredentials } from "@grpc/grpc-js";
 import { SqlEntityManager } from "@mikro-orm/mysql";
 import { Decimal } from "@scow/lib-decimal";
 import { createServer } from "src/app";
+import { charge } from "src/bl/charging";
 import { Account } from "src/entities/Account";
 import { AccountWhitelist } from "src/entities/AccountWhitelist";
 import { AccountServiceClient } from "src/generated/server/account";
@@ -72,5 +73,36 @@ it("blocks account when it is dewhitelisted and balance is < 0", async () => {
   await reloadEntity(a);
 
   expect(a.blocked).toBeTrue();
+});
+
+it("charges user but don't block account if account is whitelist", async () => {
+  a.balance = new Decimal(1);
+
+  a.blocked = false;
+  a.whitelist = toRef(new AccountWhitelist({
+    account : a,
+    comment: "123",
+    operatorId: "123",
+  }));
+
+  await em.flush();
+
+  const { currentBalance, previousBalance } = await charge({
+    amount: new Decimal(2),
+    comment: "",
+    target: a,
+    type: "haha",
+  }, em.fork(), server.logger, server.ext);
+
+  await reloadEntity(a);
+
+  expect(currentBalance.toNumber()).toBe(-1);
+  expect(previousBalance.toNumber()).toBe(1);
+
+  expect(a.blocked).toBeFalse();
+
+
+
+
 });
 

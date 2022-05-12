@@ -39,12 +39,19 @@ export class Account {
     balance: Decimal = new Decimal(0);
 
   /**
-     * Call flush after this.
-     * this didn't consider whitelist
-     * */
-  async block(clusterPlugin: ClusterPlugin["clusters"]) {
+   * Blocks the account in the slurm.
+   * If it is whitelisted, it doesn't block.
+   * Call flush after this.
+   *
+   * @returns Operation result
+  **/
+  async block(clusterPlugin: ClusterPlugin["clusters"]): Promise<"AlreadyBlocked" | "Whitelisted" | "OK"> {
 
-    if (this.blocked) { return; }
+    if (this.blocked) { return "AlreadyBlocked"; }
+
+    if (this.whitelist) {
+      return "Whitelisted";
+    }
 
     await clusterPlugin.callOnAll(
       AccountServiceClient,
@@ -54,6 +61,7 @@ export class Account {
     );
 
     this.blocked = true;
+    return "OK";
   }
 
   /**

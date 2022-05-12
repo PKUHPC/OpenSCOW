@@ -32,9 +32,6 @@ export const accountServiceServer = plugin((server) => {
           return [{ result: BlockAccountReply_Result.ALREADY_BLOCKED }];
         }
 
-        if (account.whitelist) {
-          return [{ result: BlockAccountReply_Result.WHITELISTED }];
-        }
 
         await account.block(server.ext.clusters);
       });
@@ -228,13 +225,14 @@ export const accountServiceServer = plugin((server) => {
       }
 
       em.remove(account.whitelist);
+      account.whitelist = undefined;
 
       logger.info("Remove account %s from whitelist",
         accountName,
       );
 
       if (account.balance.isNegative()) {
-        logger.info("Account %s has negative balance. Blocking the account.", account.accountName);
+        logger.info("Account %s is out of balance and not whitelisted. Block the account.", account.accountName);
         await account.block(server.ext.clusters);
       }
 
