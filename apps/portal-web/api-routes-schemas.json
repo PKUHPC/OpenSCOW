@@ -199,6 +199,47 @@
       "$id": "GetIconSchema",
       "title": "GetIconSchema"
     },
+    "SubmitJobSchema": {
+      "type": "object",
+      "properties": {
+        "method": {
+          "type": "string",
+          "const": "POST"
+        },
+        "body": {
+          "$ref": "SubmitJobInfo#"
+        },
+        "responses": {
+          "type": "object",
+          "properties": {
+            "201": {
+              "type": "object",
+              "properties": {
+                "jobId": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "jobId"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "201"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "method",
+        "body",
+        "responses"
+      ],
+      "additionalProperties": false,
+      "$id": "SubmitJobSchema",
+      "title": "SubmitJobSchema"
+    },
     "ChangePasswordSchema": {
       "type": "object",
       "properties": {
@@ -386,6 +427,24 @@
       "additionalProperties": false,
       "$id": "UserInfo",
       "title": "UserInfo"
+    },
+    "SubmitJobInfo": {
+      "type": "object",
+      "properties": {
+        "cluster": {
+          "type": "string"
+        },
+        "command": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "cluster",
+        "command"
+      ],
+      "additionalProperties": false,
+      "$id": "SubmitJobInfo",
+      "title": "SubmitJobInfo"
     },
     "RunningJob": {
       "type": "object",

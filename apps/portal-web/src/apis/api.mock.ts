@@ -47,6 +47,8 @@ export const mockApi: MockApi<typeof api> = {
   validateToken: async () => MOCK_USER_INFO,
 
   getRunningJobs: async () => ({ results: [runningJob]}),
+
+  submitJob: async () => ({ jobId: 10 }),
 };
 
 export const MOCK_USER_INFO = {

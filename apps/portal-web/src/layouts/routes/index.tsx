@@ -20,11 +20,13 @@ export const userRoutes: NavItemProps[] = [
     text: "作业",
     path: "/jobs",
     clickToPath: "/jobs/runningJobs",
-    children: [{
-      Icon: BookOutlined,
-      text: "未结束的作业",
-      path: "/jobs/runningJobs",
-    }],
+    children: [
+      {
+        Icon: BookOutlined,
+        text: "未结束的作业",
+        path: "/jobs/runningJobs",
+      },
+    ],
   },
   ...publicConfig.ENABLE_SHELL ? [{
     Icon: MacCommandOutlined,
