@@ -46,10 +46,9 @@ COPY --from=builder /app/apps/mis-web/node_modules ./node_modules
 COPY --from=builder /app/apps/mis-web/next.config.js ./
 COPY --from=builder /app/apps/mis-web/config.js ./
 COPY --from=builder /app/apps/mis-web/public ./public
+COPY --from=builder /app/apps/mis-web/assets ./assets
 COPY --from=builder /app/apps/mis-web/api-routes-schemas.json ./api-routes-schemas.json
 COPY --from=builder /app/apps/mis-web/.next ./.next
-
-COPY --from=builder /app/apps/mis-web/config/icons/default /etc/scow/config/icons/default
 
 EXPOSE 3000
 

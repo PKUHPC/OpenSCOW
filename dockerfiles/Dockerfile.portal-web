@@ -48,12 +48,12 @@ COPY --from=builder /app/apps/portal-web/node_modules ./node_modules
 COPY --from=builder /app/apps/portal-web/next.config.js ./
 COPY --from=builder /app/apps/portal-web/config.js ./
 COPY --from=builder /app/apps/portal-web/public ./public
+COPY --from=builder /app/apps/portal-web/assets ./assets
 COPY --from=builder /app/apps/portal-web/api-routes-schemas.json ./api-routes-schemas.json
 COPY --from=builder /app/apps/portal-web/.next ./.next
 
 EXPOSE 3000
 
-COPY --from=builder /app/apps/portal-web/config/icons/default /etc/scow/config/icons/default
 
 ENV NODE_ENV production
 ARG BASE_PATH=""
