@@ -9,6 +9,8 @@ export interface ServerRuntimeConfig {
   AUTH_EXTERNAL_URL: string;
   AUTH_INTERNAL_URL: string;
 
+  CLUSTEROPS_SERVERS: {[clusterId: string]: string };
+
   DEFAULT_FOOTER_TEXT: string;
   FOOTER_TEXTS: {[hostname: string]: string };
 

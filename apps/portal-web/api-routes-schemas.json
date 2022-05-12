@@ -199,60 +199,6 @@
       "$id": "GetIconSchema",
       "title": "GetIconSchema"
     },
-    "LaunchDesktopSchema": {
-      "type": "object",
-      "properties": {
-        "method": {
-          "type": "string",
-          "const": "POST"
-        },
-        "body": {
-          "type": "object",
-          "additionalProperties": false
-        },
-        "responses": {
-          "type": "object",
-          "properties": {
-            "200": {
-              "type": "object",
-              "properties": {
-                "node": {
-                  "type": "string"
-                },
-                "port": {
-                  "type": "number"
-                },
-                "password": {
-                  "type": "string"
-                }
-              },
-              "required": [
-                "node",
-                "port",
-                "password"
-              ],
-              "additionalProperties": false
-            },
-            "501": {
-              "type": "null"
-            }
-          },
-          "required": [
-            "200",
-            "501"
-          ],
-          "additionalProperties": false
-        }
-      },
-      "required": [
-        "method",
-        "body",
-        "responses"
-      ],
-      "additionalProperties": false,
-      "$id": "LaunchDesktopSchema",
-      "title": "LaunchDesktopSchema"
-    },
     "ChangePasswordSchema": {
       "type": "object",
       "properties": {
@@ -309,6 +255,121 @@
       "additionalProperties": false,
       "$id": "ChangePasswordSchema",
       "title": "ChangePasswordSchema"
+    },
+    "LaunchDesktopSchema": {
+      "type": "object",
+      "properties": {
+        "method": {
+          "type": "string",
+          "const": "POST"
+        },
+        "body": {
+          "type": "object",
+          "additionalProperties": false
+        },
+        "responses": {
+          "type": "object",
+          "properties": {
+            "200": {
+              "type": "object",
+              "properties": {
+                "node": {
+                  "type": "string"
+                },
+                "port": {
+                  "type": "number"
+                },
+                "password": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "node",
+                "port",
+                "password"
+              ],
+              "additionalProperties": false
+            },
+            "501": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "200",
+            "501"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "method",
+        "body",
+        "responses"
+      ],
+      "additionalProperties": false,
+      "$id": "LaunchDesktopSchema",
+      "title": "LaunchDesktopSchema"
+    },
+    "GetRunningJobsSchema": {
+      "type": "object",
+      "properties": {
+        "method": {
+          "type": "string",
+          "const": "GET"
+        },
+        "query": {
+          "type": "object",
+          "properties": {
+            "userId": {
+              "type": "string"
+            },
+            "cluster": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "userId",
+            "cluster"
+          ],
+          "additionalProperties": false
+        },
+        "responses": {
+          "type": "object",
+          "properties": {
+            "200": {
+              "type": "object",
+              "properties": {
+                "results": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "RunningJob#"
+                  }
+                }
+              },
+              "required": [
+                "results"
+              ],
+              "additionalProperties": false
+            },
+            "403": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "200",
+            "403"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "method",
+        "query",
+        "responses"
+      ],
+      "additionalProperties": false,
+      "$id": "GetRunningJobsSchema",
+      "title": "GetRunningJobsSchema"
     }
   },
   "models": {
@@ -325,6 +386,73 @@
       "additionalProperties": false,
       "$id": "UserInfo",
       "title": "UserInfo"
+    },
+    "RunningJob": {
+      "type": "object",
+      "properties": {
+        "jobId": {
+          "type": "string"
+        },
+        "partition": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "user": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        },
+        "runningTime": {
+          "type": "string"
+        },
+        "nodes": {
+          "type": "string"
+        },
+        "nodesOrReason": {
+          "type": "string"
+        },
+        "account": {
+          "type": "string"
+        },
+        "cores": {
+          "type": "string"
+        },
+        "qos": {
+          "type": "string"
+        },
+        "submissionTime": {
+          "type": "string"
+        },
+        "nodesToBeUsed": {
+          "type": "string"
+        },
+        "timeLimit": {
+          "type": "string",
+          "description": "days-hours:minutes:seconds. The value may be  \"NOT_SET\"  if not yet established or \"UNLIMITED\" for no limit.  (Valid for jobs and job steps)"
+        }
+      },
+      "required": [
+        "jobId",
+        "partition",
+        "name",
+        "user",
+        "state",
+        "runningTime",
+        "nodes",
+        "nodesOrReason",
+        "account",
+        "cores",
+        "qos",
+        "submissionTime",
+        "nodesToBeUsed",
+        "timeLimit"
+      ],
+      "additionalProperties": false,
+      "$id": "RunningJob",
+      "title": "RunningJob"
     }
   }
 }

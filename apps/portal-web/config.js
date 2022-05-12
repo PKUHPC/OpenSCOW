@@ -27,6 +27,8 @@ const specs = {
 
   ENABLE_VNC: bool({ desc: "是否启用远程桌面功能", default: false }),
 
+  CLUSTEROPS_SERVERS: str({ desc: "集群名和对应的clusterops地址。格式：集群名=对应clusterops地址,集群名=对应clusterops地址" }),
+
   DEFAULT_FOOTER_TEXT: str({ desc: "默认footer文本", default: "" }),
   FOOTER_TEXTS: str({ desc: "根据域名(hostname，不包括port)不同，显示在footer上的文本。格式：域名=文本,域名=文本", default: "" }),
 
@@ -61,6 +63,7 @@ const serverRuntimeConfig = {
   DEFAULT_PRIMARY_COLOR: config.DEFAULT_PRIMARY_COLOR,
   FOOTER_TEXTS: parseKeyValue(config.FOOTER_TEXTS),
   PRIMARY_COLORS: parseKeyValue(config.PRIMARY_COLORS),
+  CLUSTEROPS_SERVERS: parseKeyValue(config.CLUSTEROPS_SERVERS),
 };
 
 /**
