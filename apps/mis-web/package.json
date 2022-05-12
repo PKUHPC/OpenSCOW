@@ -52,7 +52,6 @@
     "@types/styled-components": "^5.1.25",
     "@types/mime-types": "^2.1.1",
     "babel-plugin-import": "^1.13.5",
-    "cross-env": "^7.0.3",
     "postcss": "^8.4.13",
     "webpack": "^5.72.0"
   },
