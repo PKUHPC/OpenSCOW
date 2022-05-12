@@ -11,7 +11,7 @@
     "test": "pnpm run -r test",
     "test:ci": "pnpm run -r test:ci",
     "prepare": "husky install",
-    "lint": "eslint '**/*.ts' '**/*.tsx'"
+    "lint": "eslint --cache '**/*.ts' '**/*.tsx'"
   },
   "devDependencies": {
     "@ddadaal/eslint-config": "^1.3.0",
