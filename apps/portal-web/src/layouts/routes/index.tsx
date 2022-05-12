@@ -15,6 +15,17 @@ export const userRoutes: NavItemProps[] = [
     text: "仪表盘",
     path: "/dashboard",
   },
+  {
+    Icon: BookOutlined,
+    text: "作业",
+    path: "/jobs",
+    clickToPath: "/jobs/runningJobs",
+    children: [{
+      Icon: BookOutlined,
+      text: "未结束的作业",
+      path: "/jobs/runningJobs",
+    }],
+  },
   ...publicConfig.ENABLE_SHELL ? [{
     Icon: MacCommandOutlined,
     text: "Shell",
@@ -28,17 +39,6 @@ export const userRoutes: NavItemProps[] = [
       path: `/shell/${id}`,
     })),
   }] : [],
-  {
-    Icon: BookOutlined,
-    text: "作业",
-    path: "/jobs",
-    clickToPath: "/jobs/runningJobs",
-    children: [{
-      Icon: BookOutlined,
-      text: "未结束的作业",
-      path: "/jobs/runningJobs",
-    }],
-  },
   ...publicConfig.ENABLE_VNC ? [{
     Icon: DesktopOutlined,
     text: "桌面",
