@@ -66,6 +66,10 @@ pnpm prepareDev
 - 所有根据proto生成的文件都应该被gitignore和dockerignore，在容器中构建时需要现场生成
 - 根目录的`docker-compose.yml`应该只用于容器构建
 
+## 代码风格检查
+
+项目使用[eslint](https://eslint.org)进行代码风格规范和检查。eslint的配置采用[`@ddadaal/eslint-config`](https://github.com/ddadaal/eslint-config)。项目使用[husky](https://github.com/typicode/husky)设置了一个pre-commit的git hook，在提交前运行`eslint`进行代码风格检查，如果代码风格检查没有通过则无法commit。
+
 ## CI
 
 所有往master分支的commit都会触发CI。CI会构建所有组件，把组件push到registry中，然后触发测试集群的部署。
