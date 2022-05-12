@@ -21,7 +21,10 @@ export interface GetIconSchema {
 
 const CUSTOM_ICONS_DIR = path.join(CONFIG_PATH, "icons");
 
+const CUSTOM_DEFAULT_DIR = path.join(CUSTOM_ICONS_DIR, "default");
 const BUILTIN_DEFAULT_DIR = "assets/icons";
+
+const DEFAULT_DIR = fs.existsSync(CUSTOM_DEFAULT_DIR) ? CUSTOM_DEFAULT_DIR : BUILTIN_DEFAULT_DIR;
 
 const FILE_NAMES = {
   "favicon": "favicon.ico",
@@ -33,10 +36,10 @@ export default /*#__PURE__*/route<GetIconSchema>("GetIconSchema", async (req, re
 
   const hostname = getHostname(req);
 
-  let dir = hostname ? path.join(CUSTOM_ICONS_DIR, hostname) : BUILTIN_DEFAULT_DIR;
+  let dir = hostname ? path.join(CUSTOM_ICONS_DIR, hostname) : DEFAULT_DIR;
 
   if (!fs.existsSync(dir)) {
-    dir = BUILTIN_DEFAULT_DIR;
+    dir = DEFAULT_DIR;
   }
 
   let imagePath = path.join(dir, FILE_NAMES[req.query.type]);
