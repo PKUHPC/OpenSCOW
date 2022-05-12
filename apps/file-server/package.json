@@ -8,7 +8,8 @@
     "build": "rimraf build && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.json && pkg .",
     "dev": "nodemon --watch src -e ts --exec \"npx dotenv -e env/.env.dev -- npx ts-node -r tsconfig-paths/register src/index.ts\"",
     "test": "jest",
-    "test:ci": "jest --ci --coverage"
+    "test:ci": "jest --ci --coverage",
+    "genApi": "dotenv -e env/.env.dev -- ts-node -r tsconfig-paths/register src/genSchema.ts"
   },
   "keywords": [],
   "author": "",
@@ -35,7 +36,8 @@
     "@ddadaal/tsgrpc-cli": "^0.11.0",
     "form-data": "^4.0.0",
     "@types/shell-quote": "^1.7.1",
-    "@types/mime-types": "^2.1.1"
+    "@types/mime-types": "^2.1.1",
+    "@fastify/swagger": "^6.0.1"
   },
   "volta": {
     "extends": "../../package.json"
