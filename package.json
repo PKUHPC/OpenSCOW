@@ -9,7 +9,9 @@
     "devenv": "docker compose -f docker-compose.dev.yml up -d",
     "devenv:stop": "docker compose -f docker-compose.dev.yml down",
     "test": "pnpm run -r test",
-    "test:ci": "pnpm run -r test:ci"
+    "test:ci": "pnpm run -r test:ci",
+    "prepare": "husky install",
+    "lint": "eslint '**/*.ts' '**/*.tsx'"
   },
   "devDependencies": {
     "@ddadaal/eslint-config": "^1.3.0",
@@ -34,7 +36,8 @@
     "tsconfig-paths": "^3.14.1",
     "typescript": "^4.6",
     "pkg": "^5.6.0",
-    "nodemon": "^2.0.16"
+    "nodemon": "^2.0.16",
+    "husky": "^8.0.0"
   },
   "volta": {
     "node": "16.15.0"
