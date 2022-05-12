@@ -1,5 +1,5 @@
 ---
-sidebar_position: 1
+sidebar_position: 6
 title: 集群操作层
 ---
 
@@ -9,7 +9,7 @@ clusterops是对集群操作的抽象层。
 
 目前，我们只支持slurm。要部署slurm的clusterops，需要满足以下要求：
 
-1. 每个集群需要有一个节点上安装了slurm（称为**slurm节点**），并能够使用`sacct`等命令
+1. 每个集群需要有一个节点上安装了slurm（称为**slurm节点**），并能够使用`sacct`, `squeue`等命令
 2. 服务节点可以免密以root SSH登录到各个集群的slurm节点
 
 ## 部署slurm.sh

@@ -60,3 +60,4 @@ pnpm run build
 2. [部署认证系统](./auth.md)
 3. [部署网关](./gateway.md)
 4. [编写集群信息配置文件](./clusters.mdx)
+5. [部署集群操作层](./clusterops.md)

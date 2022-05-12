@@ -18,6 +18,7 @@ title: "portal-web"
 |`ENABLE_SHELL`|布尔值|是否启用Shell功能|false|
 |`FILE_SERVERS`|字符串|启用文件管理功能的集群。格式：集群名,集群名。如果为空，则关闭文件管理的功能||
 |`ENABLE_VNC`|布尔值|是否启用远程桌面功能|false|
+|`CLUSTEROPS_SERVERS`|字符串|集群名和对应的clusterops地址。格式：集群名=对应clusterops地址,集群名=对应clusterops地址|**必填**|
 |`DEFAULT_FOOTER_TEXT`|字符串|默认footer文本||
 |`FOOTER_TEXTS`|字符串|根据域名(hostname，不包括port)不同，显示在footer上的文本。格式：域名=文本,域名=文本||
 |`DEFAULT_PRIMARY_COLOR`|字符串|默认主题色|#9B0000|

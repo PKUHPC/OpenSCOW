@@ -26,6 +26,8 @@ title: 前端
     volumes:
       - "./config:/etc/scow"
     environment:
+      # 必须配置：集群ID=集群操作层的IP,集群ID=集群操作层的IP
+      CLUSTEROPS_SERVERS: hpc01=clusterops-hpc01:5000
       # 可选配置
 ```
 
