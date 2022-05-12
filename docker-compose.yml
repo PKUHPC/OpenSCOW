@@ -3,13 +3,13 @@ version: "3"
 services:
 
   gateway:
-    image: $IMAGE_BASE/gateway
+    image: $IMAGE_BASE/gateway:$TAG
     build:
       context: .
       dockerfile: dockerfiles/Dockerfile.gateway
 
   mis-web-mis:
-    image: $IMAGE_BASE/mis-web-mis
+    image: $IMAGE_BASE/mis-web-mis:$TAG
     build:
       context: .
       dockerfile: dockerfiles/Dockerfile.mis-web
@@ -17,7 +17,7 @@ services:
         - BASE_PATH=/mis
 
   mis-web-root:
-    image: $IMAGE_BASE/mis-web-root
+    image: $IMAGE_BASE/mis-web-root:$TAG
     build:
       context: .
       dockerfile: dockerfiles/Dockerfile.mis-web
@@ -25,7 +25,7 @@ services:
         - BASE_PATH=
 
   portal-web-portal:
-    image: $IMAGE_BASE/portal-web-portal
+    image: $IMAGE_BASE/portal-web-portal:$TAG
     build:
       context: .
       dockerfile: dockerfiles/Dockerfile.portal-web
@@ -33,47 +33,39 @@ services:
         - BASE_PATH=/portal
 
   portal-web-root:
-    image: $IMAGE_BASE/portal-web-root
+    image: $IMAGE_BASE/portal-web-root:$TAG
     build:
       context: .
       dockerfile: dockerfiles/Dockerfile.portal-web
       args:
         - BASE_PATH=
 
-  docs:
-    image: $IMAGE_BASE/docs
-    build:
-      context: .
-      dockerfile: dockerfiles/Dockerfile.docs
-      args:
-        - BASE_PATH=/docs/
-
   mis-server:
-    image: $IMAGE_BASE/mis-server
+    image: $IMAGE_BASE/mis-server:$TAG
     build:
       context: .
       dockerfile: dockerfiles/Dockerfile.mis-server
 
   shell-server:
-    image: $IMAGE_BASE/shell-server
+    image: $IMAGE_BASE/shell-server:$TAG
     build:
       context: .
       dockerfile: dockerfiles/Dockerfile.shell-server
 
   vnc-server:
-    image: $IMAGE_BASE/vnc-server
+    image: $IMAGE_BASE/vnc-server:$TAG
     build:
       context: .
       dockerfile: dockerfiles/Dockerfile.vnc-server
 
   auth:
-    image: $IMAGE_BASE/auth
+    image: $IMAGE_BASE/auth:$TAG
     build:
       context: .
       dockerfile: dockerfiles/Dockerfile.auth
 
   clusterops-slurm:
-    image: $IMAGE_BASE/clusterops-slurm
+    image: $IMAGE_BASE/clusterops-slurm:$TAG
     build:
       context: .
       dockerfile: dockerfiles/Dockerfile.clusterops-slurm
