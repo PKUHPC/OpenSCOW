@@ -10,7 +10,7 @@ export async function createServer() {
     logger: { level: config.LOG_LEVEL },
   });
 
-  server.logger.info("Loaded config: %o", config);
+  server.logger.info({ config }, "Loaded config");
 
   for (const plugin of plugins) {
     await server.register(plugin);

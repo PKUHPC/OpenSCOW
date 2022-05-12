@@ -33,7 +33,7 @@ export function buildApp(pluginOverrides?: PluginOverrides) {
     },
   });
 
-  server.log.info(`Loaded config: \n${JSON.stringify(config, null, 2)}`);
+  server.log.info({ config }, "Loaded config");
 
   applyPlugins(server, pluginOverrides);
 
