@@ -2,7 +2,6 @@
   "name": "@scow/mis-web",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://academycloud.ddadaal.me",
   "scripts": {
     "dev": "cross-env NEXT_PUBLIC_USE_MOCK=1 next dev",
     "devapi": "cross-env NEXT_PUBLIC_USE_MOCK=0 next dev",
