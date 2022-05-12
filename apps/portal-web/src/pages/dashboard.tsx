@@ -8,7 +8,7 @@ import { Head } from "src/utils/head";
 
 interface Props { }
 
-export const DashboardPage: NextPage<Props> = requireAuth(() => true)((props: Props) => {
+export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
 
   const userStore = useStore(UserStore);
   const router = useRouter();
