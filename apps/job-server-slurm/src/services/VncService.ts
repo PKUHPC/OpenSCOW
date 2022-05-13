@@ -3,6 +3,7 @@ import { NodeSSH } from "node-ssh";
 import path from "path";
 import { config, LOGIN_NODES } from "src/config";
 import { VncServiceServer, VncServiceService } from "src/generated/portal/vnc";
+import { loggedExec } from "src/plugins/ssh";
 import { displayIdToPort } from "src/utils/port";
 
 
@@ -50,32 +51,34 @@ const vncPasswdPath = path.join(config.TURBOVNC_PATH, "bin", "vncpasswd");
 
 export const vncServiceServer = plugin((server) => {
 
-  const refreshPassword = async (ssh: NodeSSH, username: string, displayId: number) => {
-    const { stderr } = await server.ext.runAsUser(ssh, username, vncPasswdPath, "-o", "-display", ":" + displayId);
-    return parseOtp(stderr, server.logger);
+  const refreshPassword = async (ssh: NodeSSH, logger: Logger, displayId: number) => {
+    const resp = await loggedExec(ssh, logger, true,
+      vncPasswdPath, ["-o", "-display", ":" + displayId]);
+
+    return parseOtp(resp.stderr, server.logger);
   };
 
   server.addService<VncServiceServer>(VncServiceService, {
-    launchDesktop: async ({ request }) => {
+    launchDesktop: async ({ request, logger }) => {
       const { username }  = request;
 
       const node = Object.keys(LOGIN_NODES)[0];
 
-      return await server.ext.connect(node, async (ssh, nodeAddr) => {
+      return await server.ext.connect(node, username, logger, async (ssh, nodeAddr) => {
 
         // find if the user has running session
-        let resp = await server.ext.runAsUser(ssh, username,
-          vncServerPath, "-list",
+        let resp = await loggedExec(ssh, logger, true,
+          vncServerPath, ["-list"],
         );
 
         const ids = parseListOutput(resp.stdout);
 
         if (ids.length === 0) {
           // start a session
-          resp = await server.ext.runAsUser(ssh, username,
+          resp = await loggedExec(ssh, logger, true,
             // explicitly set securitytypes to avoid requiring setting vnc passwd
             // TODO adds more desktop supprt other than xfce
-            vncServerPath, "-securitytypes", "OTP", "-otp", "-wm", "xfce");
+            vncServerPath, ["-securitytypes", "OTP", "-otp", "-wm", "xfce"]);
 
           // parse the OTP from output. the output was in stderr
           const password = parseOtp(resp.stderr, server.logger);
@@ -92,7 +95,7 @@ export const vncServiceServer = plugin((server) => {
           const displayId = ids[0];
 
           // refresh the otp
-          const password = await refreshPassword(ssh, username, displayId);
+          const password = await refreshPassword(ssh, logger, displayId);
 
           return [{ alreadyRunning: true, displayId, node: nodeAddr, port: displayIdToPort(displayId), password }];
 
@@ -101,11 +104,11 @@ export const vncServiceServer = plugin((server) => {
 
     },
 
-    refreshOTPPassword: async ({ request }) => {
+    refreshOTPPassword: async ({ request, logger }) => {
       const { displayId, node, username } = request;
 
-      return await server.ext.connect(node, async (ssh) => {
-        const password = await refreshPassword(ssh, username, displayId);
+      return await server.ext.connect(node, username, logger, async (ssh) => {
+        const password = await refreshPassword(ssh, logger, displayId);
 
         return [{ password }];
       });

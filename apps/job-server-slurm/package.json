@@ -20,9 +20,7 @@
     "@ddadaal/tsgrpc-server": "^0.12.0",
     "@scow/config": "workspace:*",
     "@grpc/grpc-js": "^1.6.7",
-    "node-ssh": "^12.0.4",
-    "tmp-promise": "^3.0.3",
-    "rimraf": "^3.0.2"
+    "node-ssh": "^12.0.4"
   },
   "devDependencies": {
     "@types/node-cron": "^3.0.1",
