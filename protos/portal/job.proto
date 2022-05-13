@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package scow.portal.job;
+
+import "common/job.proto";
+
+message GetRunningJobsRequest { string user_id = 1; }
+
+message GetRunningJobsReply { repeated common.job.RunningJob jobs = 1; }
+
+service JobService {
+  rpc GetRunningJobs(GetRunningJobsRequest) returns (GetRunningJobsReply);
+}

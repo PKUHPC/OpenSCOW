@@ -1,5 +1,5 @@
 ---
-sidebar_position: 6
+sidebar_position: 2
 title: 集群操作层
 ---
 

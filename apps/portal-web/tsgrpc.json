@@ -3,7 +3,7 @@
   "protos": [
     {
       "path": "../../protos",
-      "files": "../../protos/{vnc/**/*.proto,clusterops/job.proto}",
+      "files": "../../protos/{portal/**/*.proto,common/job.proto}",
       "name": "."
     }
   ],

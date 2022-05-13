@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package scow.vnc;
+package scow.portal.vnc;
 
 message LaunchDesktopRequest { string username = 1; }
 

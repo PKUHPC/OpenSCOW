@@ -1,6 +1,7 @@
 import { Server } from "@ddadaal/tsgrpc-server";
 import { config } from "src/config";
 import { plugins } from "src/plugins";
+import { jobServiceServer } from "src/services/JobService";
 import { vncServiceServer } from "src/services/VncService";
 
 export async function createServer() {
@@ -17,6 +18,7 @@ export async function createServer() {
   }
 
   await server.register(vncServiceServer);
+  await server.register(jobServiceServer);
 
   return server;
 }

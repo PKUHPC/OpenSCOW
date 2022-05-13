@@ -3,7 +3,7 @@ import { NextPage } from "next";
 import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { NotFoundPage } from "src/components/errorPages/NotFoundPage";
-import { publicConfig } from "src/utils/config";
+import { CLUSTERS, publicConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
 
 export const DesktopIndexPage: NextPage = requireAuth(() => true)(() => {
@@ -13,7 +13,7 @@ export const DesktopIndexPage: NextPage = requireAuth(() => true)(() => {
   }
 
   const onClick = async () => {
-    const resp = await api.launchDesktop({ body: { } });
+    const resp = await api.launchDesktop({ body: { cluster: CLUSTERS[0].id } });
 
     const params = new URLSearchParams({
       path: `/vnc-server/${resp.node}/${resp.port}`,

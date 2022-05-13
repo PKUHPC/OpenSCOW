@@ -11,7 +11,7 @@ RUN pnpm fetch
 COPY package.json pnpm-workspace.yaml .npmrc ./
 
 COPY libs/config ./libs/config
-COPY apps/vnc-server ./apps/vnc-server
+COPY apps/job-server-slurm ./apps/job-server-slurm
 
 # Must run twice
 # First run doesn't create node_modules on libs
@@ -36,10 +36,10 @@ COPY --from=builder /app/libs/config/package.json .
 COPY --from=builder /app/libs/config/node_modules/ ./node_modules
 COPY --from=builder /app/libs/config/build/ ./build
 
-WORKDIR /app/apps/vnc-server
-COPY --from=builder /app/apps/vnc-server/package.json .
-COPY --from=builder /app/apps/vnc-server/node_modules/ ./node_modules
-COPY --from=builder /app/apps/vnc-server/build ./src
+WORKDIR /app/apps/job-server-slurm
+COPY --from=builder /app/apps/job-server-slurm/package.json .
+COPY --from=builder /app/apps/job-server-slurm/node_modules/ ./node_modules
+COPY --from=builder /app/apps/job-server-slurm/build ./src
 
 # Serve
 EXPOSE 5000

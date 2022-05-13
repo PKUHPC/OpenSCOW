@@ -1,6 +1,7 @@
 // @ts-check
 
 const { envConfig, str, bool, parseKeyValue, parseArray } = require("@scow/config");
+const { join } = require("path");
 
 const building = process.env.BUILDING;
 const dev = process.env.NODE_ENV === "development"
@@ -14,6 +15,7 @@ if (dev) {
   require("dotenv").config({ path: "env/.env.dev" });
 }
 
+
 const specs = {
 
   AUTH_EXTERNAL_URL: str({ desc: "认证服务外网地址", default: "/auth" }),
@@ -25,9 +27,9 @@ const specs = {
 
   FILE_SERVERS: str({ desc: "启用文件管理功能的集群。格式：集群名,集群名。如果为空，则关闭文件管理的功能", default: "" }),
 
-  ENABLE_VNC: bool({ desc: "是否启用远程桌面功能", default: false }),
+  JOB_SERVERS: str({ desc: "作业服务器的地址。格式：集群ID=地址,集群ID=地址", default: "" }),
 
-  CLUSTEROPS_SERVERS: str({ desc: "集群名和对应的clusterops地址。格式：集群名=对应clusterops地址,集群名=对应clusterops地址" }),
+  ENABLE_VNC: bool({ desc: "是否启动VNC功能", default: false }),
 
   DEFAULT_FOOTER_TEXT: str({ desc: "默认footer文本", default: "" }),
   FOOTER_TEXTS: str({ desc: "根据域名(hostname，不包括port)不同，显示在footer上的文本。格式：域名=文本,域名=文本", default: "" }),
@@ -63,7 +65,7 @@ const serverRuntimeConfig = {
   DEFAULT_PRIMARY_COLOR: config.DEFAULT_PRIMARY_COLOR,
   FOOTER_TEXTS: parseKeyValue(config.FOOTER_TEXTS),
   PRIMARY_COLORS: parseKeyValue(config.PRIMARY_COLORS),
-  CLUSTEROPS_SERVERS: parseKeyValue(config.CLUSTEROPS_SERVERS),
+  JOB_SERVERS: parseKeyValue(config.JOB_SERVERS),
 };
 
 /**

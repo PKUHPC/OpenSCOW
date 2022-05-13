@@ -2,7 +2,7 @@ import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { NodeSSH, SSHExecCommandResponse } from "node-ssh";
-import { config, nodes } from "src/config";
+import { ALL_NODES, COMPUTE_NODES, config, LOGIN_NODES } from "src/config";
 
 export interface SshPlugin {
   connect: <T>(node: string, run: (ssh: NodeSSH, nodeAddr: string) => Promise<T>) => Promise<T>,
@@ -14,11 +14,12 @@ export const sshPlugin = plugin(async (s) => {
 
   const logger = s.logger.child({ plugin: "slurm" });
 
-  logger.info("Known nodes %o", nodes);
+  logger.info("Known login nodes %o", LOGIN_NODES);
+  logger.info("Known compute nodes %o", COMPUTE_NODES);
 
   s.addExtension("connect", <SshPlugin["connect"]>(
     async (node, run) => {
-      const nodeAddr = nodes[node];
+      const nodeAddr = ALL_NODES[node];
       if (!nodeAddr) { throw new Error(`Unknown node ${node}`); }
 
       const ssh = new NodeSSH();

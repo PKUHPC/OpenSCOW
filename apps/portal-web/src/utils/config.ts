@@ -2,14 +2,14 @@ import { CONFIG_BASE_PATH } from "@scow/config/build/constants";
 import getConfig from "next/config";
 import { join } from "path";
 
-export const VNC_SERVER_URL = join(process.env.NEXT_PUBLIC_BASE_PATH || "", "vnc-server:5000");
+// publicly accessible URLS. should not be configurable
 export const SHELL_SERVER_URL = join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/shell-server/socket.io");
 
 export interface ServerRuntimeConfig {
   AUTH_EXTERNAL_URL: string;
   AUTH_INTERNAL_URL: string;
 
-  CLUSTEROPS_SERVERS: {[clusterId: string]: string };
+  JOB_SERVERS: {[clusterId: string]: string };
 
   DEFAULT_FOOTER_TEXT: string;
   FOOTER_TEXTS: {[hostname: string]: string };

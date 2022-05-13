@@ -20,18 +20,18 @@ title: 桌面
 - **桌面节点**已安装TurboVNC（[官方安装教程](https://turbovnc.org/Downloads/YUM)）
 - **桌面节点**已经安装xfce
 
-## 在服务节点上部署桌面服务
+## 部署作业管理服务器
+
+请参考[作业功能部署文档](./job.md#部署file-server-slurm)部署作业管理服务器，并在每个作业管理服务器上增加以下配置
 
 在服务节点的`docker-compose.yml`的`services`部分上安装并配置服务：
 
 ```yml title=docker-compose.yml
-  vnc-server:
-    image: %CR_URL%/vnc-server
-    volumes:
-      - /root/.ssh:/root/.ssh
+  file-server-hpc01:
+    # ...
     environment:
-      # 节点ID=节点IP,节点ID=节点IP。节点ID可以自定义，目前只会使用第一个节点
-      NODES: login01=192.168.88.240
+      # 启动VNC服务
+      ENABLE_VNC: 1
       # turbovnc的安装目录。默认为/opt/TurboVNC，如果为默认可以不设置
       # TURBOVNC_PATH: /opt/TurboVNC
 ```

@@ -52,11 +52,11 @@ services:
       context: .
       dockerfile: dockerfiles/Dockerfile.shell-server
 
-  vnc-server:
-    image: $IMAGE_BASE/vnc-server:$TAG
+  job-server-slurm:
+    image: $IMAGE_BASE/job-server-slurm:$TAG
     build:
       context: .
-      dockerfile: dockerfiles/Dockerfile.vnc-server
+      dockerfile: dockerfiles/Dockerfile.job-server-slurm
 
   auth:
     image: $IMAGE_BASE/auth:$TAG

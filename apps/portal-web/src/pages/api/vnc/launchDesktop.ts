@@ -1,16 +1,15 @@
 import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-utils";
 import { authenticate } from "src/auth/server";
-import { VncServiceClient } from "src/generated/vnc/vnc";
-import { getVncClient } from "src/utils/client";
+import { VncServiceClient } from "src/generated/portal/vnc";
+import { getJobServerClient } from "src/utils/client";
 import { publicConfig } from "src/utils/config";
 
 export interface LaunchDesktopSchema {
   method: "POST";
 
   body: {
-
-
+    cluster: string;
   }
 
   responses: {
@@ -36,7 +35,7 @@ export default /*#__PURE__*/route<LaunchDesktopSchema>("LaunchDesktopSchema", as
 
   if (!info) { return; }
 
-  const client = getVncClient(VncServiceClient);
+  const client = getJobServerClient(req.body.cluster, VncServiceClient);
 
   return await asyncClientCall(client, "launchDesktop", {
     username: info.identityId,

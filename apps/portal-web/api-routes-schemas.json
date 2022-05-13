@@ -306,6 +306,14 @@
         },
         "body": {
           "type": "object",
+          "properties": {
+            "cluster": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "cluster"
+          ],
           "additionalProperties": false
         },
         "responses": {
