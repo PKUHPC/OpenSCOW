@@ -51,7 +51,7 @@ export const userRoutes: NavItemProps[] = [
     text: "文件管理",
     path: "/files",
     clickToPath: publicConfig.FILE_SERVERS.length === 1
-      ? `/files/${publicConfig.FILE_SERVERS[0]}` : undefined,
+      ? `/files/${publicConfig.FILE_SERVERS[0]}/~` : undefined,
     clickable: publicConfig.FILE_SERVERS.length === 1,
     children: publicConfig.FILE_SERVERS.map((cluster) => ({
       Icon: FolderOutlined,
