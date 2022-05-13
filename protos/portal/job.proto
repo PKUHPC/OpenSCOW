@@ -8,6 +8,16 @@ message GetRunningJobsRequest { string user_id = 1; }
 
 message GetRunningJobsReply { repeated common.job.RunningJob jobs = 1; }
 
+message SubmitJobRequest {
+  string user_id = 1;
+  string job_name = 2;
+  string command = 3;
+}
+
+// UNAVAILABLE: if sbatch fails, the details is the stderr
+message SubmitJobReply { uint64 job_id = 1; }
+
 service JobService {
   rpc GetRunningJobs(GetRunningJobsRequest) returns (GetRunningJobsReply);
+  rpc SubmitJob(SubmitJobRequest) returns (SubmitJobReply);
 }

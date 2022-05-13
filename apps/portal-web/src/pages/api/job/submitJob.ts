@@ -1,9 +1,14 @@
 import { route } from "@ddadaal/next-typed-api-routes-runtime";
+import { asyncClientCall } from "@ddadaal/tsgrpc-utils";
+import { status } from "@grpc/grpc-js";
 import { authenticate } from "src/auth/server";
+import { JobServiceClient } from "src/generated/portal/job";
+import { getJobServerClient } from "src/utils/client";
 
 export interface SubmitJobInfo {
   cluster: string;
   command: string;
+  jobName: string;
 }
 
 export interface SubmitJobSchema {
@@ -16,6 +21,10 @@ export interface SubmitJobSchema {
     201: {
       jobId: number;
     }
+
+    409: {
+      output: string;
+    }
   }
 }
 
@@ -27,8 +36,19 @@ export default route<SubmitJobSchema>("SubmitJobSchema", async (req, res) => {
 
   if (!info) { return; }
 
-  // STUB
-  return { 201: { jobId: 10 } };
+  const { cluster, command, jobName } = req.body;
 
+  const client = getJobServerClient(cluster, JobServiceClient);
 
+  return await asyncClientCall(client, "submitJob", {
+    userId: info.identityId,
+    command: command,
+    jobName: jobName,
+  })
+    .then(({ jobId }) => ({ 201: { jobId } }))
+    .catch((e) => {
+      if (e.code === status.UNAVAILABLE) {
+        return { 409: { output: e.details } };
+      } else { throw e;}
+    });
 });

@@ -223,10 +223,23 @@
                 "jobId"
               ],
               "additionalProperties": false
+            },
+            "409": {
+              "type": "object",
+              "properties": {
+                "output": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "output"
+              ],
+              "additionalProperties": false
             }
           },
           "required": [
-            "201"
+            "201",
+            "409"
           ],
           "additionalProperties": false
         }
@@ -444,11 +457,15 @@
         },
         "command": {
           "type": "string"
+        },
+        "jobName": {
+          "type": "string"
         }
       },
       "required": [
         "cluster",
-        "command"
+        "command",
+        "jobName"
       ],
       "additionalProperties": false,
       "$id": "SubmitJobInfo",

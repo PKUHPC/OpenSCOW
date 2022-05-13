@@ -169,11 +169,13 @@ importers:
       '@types/node-cron': ^3.0.1
       '@types/ssh2': ^0.5.52
       node-ssh: ^12.0.4
+      tmp-promise: ^3.0.3
     dependencies:
       '@ddadaal/tsgrpc-server': 0.12.0
       '@grpc/grpc-js': 1.6.7
       '@scow/config': link:../../libs/config
       node-ssh: 12.0.4
+      tmp-promise: 3.0.3
     devDependencies:
       '@ddadaal/tsgrpc-cli': 0.11.0
       '@types/google-protobuf': 3.15.6
@@ -13439,6 +13441,19 @@ packages:
 
   /tiny-warning/1.0.3:
     resolution: {integrity: sha512-lBN9zLN/oAf68o3zNXYrdCt1kP8WsiGW8Oo2ka41b2IM5JL/S1CTyX1rW0mb/zSuJun0ZUrDxx4sqvYS2FWzPA==}
+
+  /tmp-promise/3.0.3:
+    resolution: {integrity: sha512-RwM7MoPojPxsOBYnyd2hy0bxtIlVrihNs9pj5SUvY8Zz1sQcQG2tG1hSr8PDxfgEB8RNKDhqbIlroIarSNDNsQ==}
+    dependencies:
+      tmp: 0.2.1
+    dev: false
+
+  /tmp/0.2.1:
+    resolution: {integrity: sha512-76SUhtfqR2Ijn+xllcI5P1oyannHNHByD80W1q447gU3mp9G9PSpGdWmjUOHRDPiHYacIk66W7ubDTuPF3BEtQ==}
+    engines: {node: '>=8.17.0'}
+    dependencies:
+      rimraf: 3.0.2
+    dev: false
 
   /tmpl/1.0.5:
     resolution: {integrity: sha512-3f0uOEAQwIqGuWW2MVzYg8fV/QNnc/IpuJNG837rLuczAaLVHslWHZQj4IGiEl5Hs3kkbhwL9Ab7Hrsmuj+Smw==}

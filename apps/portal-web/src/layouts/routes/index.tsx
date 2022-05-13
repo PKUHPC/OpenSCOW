@@ -4,7 +4,8 @@ import {
   DashboardOutlined,
   DesktopOutlined,
   FolderOutlined,
-  MacCommandOutlined } from "@ant-design/icons";
+  MacCommandOutlined,
+  PlusCircleOutlined } from "@ant-design/icons";
 import React from "react";
 import { NavItemProps } from "src/layouts/NavItemProps";
 import { CLUSTERS, publicConfig } from "src/utils/config";
@@ -25,6 +26,11 @@ export const userRoutes: NavItemProps[] = [
         Icon: BookOutlined,
         text: "未结束的作业",
         path: "/jobs/runningJobs",
+      },
+      {
+        Icon: PlusCircleOutlined,
+        text: "提交作业",
+        path: "/jobs/submit",
       },
     ],
   },
