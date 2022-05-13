@@ -14,10 +14,7 @@ export const config = envConfig({
 
   CLUSTERS: str({ desc: "集群名和地址。格式：集群名=对应登录节点地址,集群名=对应登录节点地址" }),
 
-  ADMIN_KEY: str({ desc: "带有这个key的请求可以访问/publicKey路径，访问时服务器将会把自己的public key加到所有集群的用户的authorized_keys里去" }),
-
   SSH_PRIVATE_KEY_PATH: str({ desc: "SSH私钥路径", default: path.join(homedir(), ".ssh", "id_rsa") }),
-  SSH_PUBLIC_KEY_PATH: str({ desc: "SSH公钥路径", default: path.join(homedir(), ".ssh", "id_rsa.pub") }),
 
 });
 

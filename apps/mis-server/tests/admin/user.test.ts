@@ -9,9 +9,12 @@ import { User } from "src/entities/User";
 import { UserAccount, UserRole, UserStatus } from "src/entities/UserAccount";
 import { UserServiceClient } from "src/generated/server/user";
 import { reloadEntity } from "src/utils/orm";
+jest.mock("src/utils/ssh");
+import { insertKey } from "src/utils/ssh";
 import { insertInitialData } from "tests/data/data";
 import { dropDatabase } from "tests/data/helpers";
 import { fetch } from "undici";
+
 
 const anotherTenant = "anotherTenant";
 
@@ -71,20 +74,7 @@ it("creates user", async () => {
     },
   );
 
-  expect(fetch).toHaveBeenNthCalledWith(
-    2,
-    config.SHELL_SERVER_URL + "/publicKey",
-    {
-      method: "POST",
-      body: JSON.stringify({
-        user: userId,
-      }),
-      headers: {
-        "content-type": "application/json",
-        authorization: config.SHELL_SERVER_ADMIN_KEY,
-      },
-    },
-  );
+  expect(insertKey).toHaveBeenCalledWith(userId, expect.anything());
 });
 
 

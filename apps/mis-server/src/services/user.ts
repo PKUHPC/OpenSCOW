@@ -20,6 +20,7 @@ import {
   UserRole as PFUserRole,  UserServiceServer,
   UserServiceService,
   UserStatus as PFUserStatus } from "src/generated/server/user";
+import { insertKey } from "src/utils/ssh";
 import { fetch } from "undici";
 
 export const userServiceServer = plugin((server) => {
@@ -334,41 +335,26 @@ export const userServiceServer = plugin((server) => {
 
       logger.info("Calling auth completed. %o", rep);
 
-      if (rep.ok) {
-        // if shell server is enabled, call to insert the key
+      if (!rep.ok) {
+        await em.removeAndFlush(user);
 
-        if (config.SHELL_SERVER_URL) {
-          logger.info("Call shell-server %s to setup login for %s", config.SHELL_SERVER_URL, identityId);
-          const res = await fetch(config.SHELL_SERVER_URL + "/publicKey", {
-            method: "POST",
-            body: JSON.stringify({
-              user: identityId,
-            }),
-            headers: {
-              "content-type": "application/json",
-              authorization: config.SHELL_SERVER_ADMIN_KEY,
-            },
-          });
-
-          if (res.ok) {
-            logger.info("Setup login for %s success", identityId);
-          } else {
-            logger.error("Setup login for %s failed. reason: %o", identityId, await res.text());
-          }
+        if (rep.status === 409) {
+          throw <ServiceError> { code: Status.ALREADY_EXISTS };
         }
 
-        return [{ id: user.id }];
+        logger.info("Error creating user in auth. code: %d, body: %o", rep.status, await rep.text());
+
+        throw <ServiceError> { code: Status.INTERNAL, message: "Error creating user in auth" };
       }
 
-      await em.removeAndFlush(user);
+      if (config.INSERT_SSH_KEY_WHEN_CREATING_USER) {
+        logger.info("Inserting SSH public key to login nodes");
 
-      if (rep.status === 409) {
-        throw <ServiceError> { code: Status.ALREADY_EXISTS };
+        await insertKey(identityId, logger);
+        logger.info("Setup login for %s success", identityId);
       }
 
-      logger.info("Error creating user in auth. code: %d, body: %o", rep.status, await rep.text());
-
-      throw <ServiceError> { code: Status.INTERNAL, message: "Error creating user in auth" };
+      return [{ id: user.id }];
     },
 
     deleteUser: async ({ request, em }) => {

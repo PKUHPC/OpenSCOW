@@ -1,4 +1,6 @@
-import { bool,envConfig, host, num, port, portOrZero, str  } from "@scow/config";
+import { bool,envConfig, host, num, parseKeyValue, port, portOrZero, str  } from "@scow/config";
+import os from "os";
+import path from "path";
 
 export const config = envConfig({
   HOST: host({ default: "0.0.0.0", desc: "监听地址" }),
@@ -18,17 +20,24 @@ export const config = envConfig({
 
   AUTH_URL: str({ desc: "认证服务的地址。一定要加协议(http://)", default: "http://auth:5000" }),
 
-  SHELL_SERVER_URL: str({
+  INSERT_SSH_KEY_WHEN_CREATING_USER: bool({ desc: "是否在创建用户后给用户插入登录所需要的SSH公钥",  default: false }),
+
+  INSERT_SSH_KEY_LOGIN_NODES: str({
     desc: `
-      如果部署了shell-server，本系统将在创建用户完成后通知shell-server配置新用户的shell免密登录。
-      通过此配置设定shell server服务地址。一定要加协议(http://)。
-      如果不设置，将会不通知
+各个集群的其中一个登录节点的地址。集群中的存储应该是共享的，只要在一个登录节点上插入公钥就够了。
+格式：集群ID=节点地址,集群ID=节点地址
     `,
-    default: undefined,
+    default: "",
   }),
-  SHELL_SERVER_ADMIN_KEY: str({
-    desc: "通知shell-server时用来鉴权的admin key。要和shell-server的ADMIN_KEY配置相同",
-    default: undefined,
+
+  INSERT_SSH_KEY_PUBLIC_KEY_PATH: str({
+    desc: "要插入的公钥的路径",
+    default: path.join(os.homedir(), ".ssh/id_rsa.pub"),
+  }),
+
+  INSERT_SSH_KEY_PRIVATE_KEY_PATH: str({
+    desc: "要插入的私钥的路径",
+    default: path.join(os.homedir(), ".ssh/id_rsa"),
   }),
 
   // 获取作业信息的配置
@@ -56,3 +65,5 @@ export const config = envConfig({
   }),
 
 });
+
+export const INSERT_SSH_KEY_LOGIN_NODES = parseKeyValue(config.INSERT_SSH_KEY_LOGIN_NODES);

@@ -44,6 +44,7 @@ volumes:
     image: %CR_URL%/mis-server
     volumes:
       - "./config:/etc/scow"
+      - /root/.ssh:/root/.ssh
     environment:
       # 数据库的域名、端口、用户名、密码以及存放数据的数据库名
       DB_HOST: db
@@ -63,7 +64,13 @@ volumes:
       # 从源作业信息数据库里获取信息的周期的cron表示
       FETCH_JOBS_PERIODIC_FETCH_CRON: "10 */10 * * * *"
 
-      # 如果部署了终端功能，配置终端服务的地址以及admin key
+      # 如果配置了门户，本服务支持在用户创建时，将SSH公钥插入到每个集群的用户的authorized_keys中
+      # 设置此配置为true打开此功能
+      INSERT_SSH_KEY_WHEN_CREATING_USER: true
+      # 设置此配置，设定每个集群的其中一个登录节点
+      INSERT_SSH_KEY_LOGIN_NODES: hpc01=login01,hpc02=login02
+
+      # 如果部署了门户，可以
       SHELL_SERVER_URL: http://shell-server:5000
       SHELL_SERVER_ADMIN_KEY: 和终端服务的ADMIN_KEY相同
 

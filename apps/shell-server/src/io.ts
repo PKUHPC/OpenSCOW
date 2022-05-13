@@ -3,7 +3,7 @@ import fp from "fastify-plugin";
 import fastifyIO from "fastify-socket.io";
 import * as pty from "node-pty";
 import { UserInfo } from "src/auth";
-import { clusters } from "src/config";
+import { clusters, config } from "src/config";
 import { queryToIntOrDefault, queryToString } from "src/utils";
 
 export const ioPlugin = fp(async (server) => {
@@ -32,7 +32,12 @@ export function registerConnectionHandler(server: FastifyInstance) {
     // create a pty and connect to ssh
     // if path is empty, it will be home page
     const host = `${identityId}@${clusters[cluster]}`;
-    const args = path ? [host, "-t", "cd '" + path.replace(/\'/g, "'\\''") + "' ; exec ${SHELL} -l"] : [host];
+
+    const args = [host, "-i", config.SSH_PRIVATE_KEY_PATH.replace("\"", "'")];
+    if (path) {
+      args.push("-t", "cd '" + path.replace(/\'/g, "'\\''") + "' ; exec ${SHELL} -l");
+    }
+
     const ptyProcess = pty.spawn("ssh", args, {
       name: "xterm-color",
       cols: queryToIntOrDefault(cols, 80),

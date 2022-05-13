@@ -16,7 +16,6 @@ title: 终端
 在`docker-compose.yml`文件的`services`部分增加以下内容，且
 
 - 使用`集群ID=集群登录节点地址,集群ID=集群登录节点地址`的格式定义`CLUSTERS`配置
-- 生成一个足够强的密码，并将其设置为`ADMIN_KEY`配置
 
 ```yaml title=docker-compose.yml
   shell-server:
@@ -25,7 +24,6 @@ title: 终端
       - /root/.ssh:/root/.ssh
     environment:
       CLUSTERS: "hpc01=192.168.88.240"
-      ADMIN_KEY: 随便设置一个强密码
 ```
 
 ## 配置门户前端
