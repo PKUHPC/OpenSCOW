@@ -17,6 +17,7 @@ export const jobServiceServer = plugin((server) => {
           "squeue",
           "-o",
           `'${["%A", "%P", "%j", "%u", "%T", "%M", "%D", "%R", "%a", "%C", "%q", "%V", "%Y", "%l"].join(separator)}'`,
+          "--noheader",
           "-u", userId,
         );
 
