@@ -40,6 +40,9 @@ jobs:
       - name: Check running containers
         run: docker ps
 
+      - name: Generate SSH key pairs for test
+        run: ssh-keygen -t rsa -q -f "$HOME/.ssh/id_rsa" -N ""
+
       - name: Run tests
         run: pnpm test:ci
 
