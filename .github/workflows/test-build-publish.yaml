@@ -46,7 +46,7 @@ jobs:
       - name: Upload test converage
         uses: codecov/codecov-action@v2
         with:
-          files: ./apps/file-server/coverage/test/lcov.info,./apps/auth/coverage/test/lcov.info,./apps/vnc-server/coverage/test/lcov.info,./apps/mis-server/coverage/test/lcov.info
+          files: ./apps/file-server/coverage/test/lcov.info,./apps/auth/coverage/test/lcov.info,./apps/job-server-slurm/coverage/test/lcov.info,./apps/mis-server/coverage/test/lcov.info
 
   build-file-server:
     needs: test
@@ -98,8 +98,8 @@ jobs:
             file: shell-server
             build_args: ""
 
-          - name: vnc-server
-            file: vnc-server
+          - name: job-server-slurm
+            file: job-server-slurm
             build_args: ""
 
           - name: auth
