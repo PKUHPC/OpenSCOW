@@ -1,4 +1,4 @@
-import { envConfig, getDocFromSpec, host, parsePlaceholder, portOrZero, regex, str } from "src/envConfig";
+import { envConfig, parsePlaceholder, port, regex, str } from "src/envConfig";
 
 it.each([
   ["123", {}, "123"],
@@ -15,14 +15,14 @@ it("return specs as _spec", async () => {
   expect(obj._specs).toBe(spec);
 });
 
-it("accepts 0 for portOrZero", async () => {
+it("accepts 0 for port", async () => {
 
   const key = "TEST";
 
   process.env[key] = "0";
 
   const config = envConfig({
-    [key]: portOrZero({ desc: "test port or zero " }),
+    [key]: port({ desc: "test port or zero " }),
   });
 
   expect(config[key]).toBe(0);
@@ -53,18 +53,3 @@ it.each([
   }
 });
 
-it.each([
-  [{
-    TEST: regex({ desc: "regex" }),
-    STR: str({ desc: "str", choices: ["123", "456"]}),
-    HOST: host({ desc: "host", default: "1" }),
-  }, `
-| 名字 | 类型 | 描述 | 默认值 |
-| -- | -- | -- | -- |
-|\`TEST\`|正则表达式|regex|**必填**|
-|\`STR\`|字符串|str<br/>可选项：123,456|**必填**|
-|\`HOST\`|主机名|host|1|
-`],
-])("test doc generator", (spec, expected) => {
-  expect(getDocFromSpec(spec)).toBe(expected);
-});

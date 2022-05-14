@@ -1,10 +1,10 @@
-import { bool, envConfig, host, parseKeyValue,portOrZero, str } from "@scow/config";
+import { bool, envConfig, host, parseKeyValue,port, str } from "@scow/config";
 import { homedir } from "os";
 import path from "path";
 
 export const config = envConfig({
   HOST: host({ default: "0.0.0.0", desc: "监听地址" }),
-  PORT: portOrZero({ default: 5000, desc: "监听端口" }),
+  PORT: port({ default: 5000, desc: "监听端口" }),
   LOG_LEVEL: str({
     default: "info",
     desc: "日志等级",
