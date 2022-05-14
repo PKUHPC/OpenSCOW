@@ -3,6 +3,7 @@ import moment from "moment";
 import React, { useState } from "react";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
+import { Editor } from "src/components/Editor";
 import { Cluster, CLUSTERS } from "src/utils/config";
 
 interface JobForm {
@@ -51,7 +52,7 @@ export const SubmitJobForm: React.FC = ({}) => {
         <Input />
       </Form.Item>
       <Form.Item label="命令" name="command" rules={[{ required: true }]}>
-        <Input.TextArea autoSize={{ minRows: 8 }} />
+        <Editor language="shell" height="50vh" />
       </Form.Item>
       <Form.Item>
         <Button type="primary" htmlType="submit" loading={loading}>

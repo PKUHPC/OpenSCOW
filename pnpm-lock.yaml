@@ -319,6 +319,7 @@ importers:
       '@ddadaal/tsgrpc-cli': ^0.11.0
       '@ddadaal/tsgrpc-utils': ^0.12.0
       '@grpc/grpc-js': ^1.6.7
+      '@monaco-editor/react': ^4.4.5
       '@newhighsco/next-plugin-svgr': ^3.0.49
       '@next/bundle-analyzer': ^12.1.5
       '@scow/config': workspace:*
@@ -336,6 +337,7 @@ importers:
       less: ^4.1.2
       mime-types: ^2.1.35
       moment: ^2.29.3
+      monaco-editor: ^0.33.0
       next: ^12.1.5
       next-compose-plugins: ^2.2.1
       next-transpile-modules: ^9.0.0
@@ -360,6 +362,7 @@ importers:
       '@ddadaal/next-typed-api-routes-runtime': 0.3.2_next@12.1.6
       '@ddadaal/tsgrpc-utils': 0.12.0_@grpc+grpc-js@1.6.7
       '@grpc/grpc-js': 1.6.7
+      '@monaco-editor/react': 4.4.5_m23risk2t2ktwbmyoufat5z4ue
       '@newhighsco/next-plugin-svgr': 3.0.50_next@12.1.6+webpack@5.72.1
       '@scow/config': link:../../libs/config
       '@scow/lib-decimal': link:../../libs/decimal
@@ -369,6 +372,7 @@ importers:
       less: 4.1.2
       mime-types: 2.1.35
       moment: 2.29.3
+      monaco-editor: 0.33.0
       next: 12.1.6_sfoxds7t5ydpegc3knd667wn6m
       next-compose-plugins: 2.2.1
       next-transpile-modules: 9.0.0
@@ -3492,6 +3496,29 @@ packages:
       - sqlite3
       - supports-color
       - tedious
+    dev: false
+
+  /@monaco-editor/loader/1.3.2_monaco-editor@0.33.0:
+    resolution: {integrity: sha512-BTDbpHl3e47r3AAtpfVFTlAi7WXv4UQ/xZmz8atKl4q7epQV5e7+JbigFDViWF71VBi4IIBdcWP57Hj+OWuc9g==}
+    peerDependencies:
+      monaco-editor: '>= 0.21.0 < 1'
+    dependencies:
+      monaco-editor: 0.33.0
+      state-local: 1.0.7
+    dev: false
+
+  /@monaco-editor/react/4.4.5_m23risk2t2ktwbmyoufat5z4ue:
+    resolution: {integrity: sha512-IImtzU7sRc66OOaQVCG+5PFHkSWnnhrUWGBuH6zNmH2h0YgmAhcjHZQc/6MY9JWEbUtVF1WPBMJ9u1XuFbRrVA==}
+    peerDependencies:
+      monaco-editor: '>= 0.25.0 < 1'
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0
+      react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
+    dependencies:
+      '@monaco-editor/loader': 1.3.2_monaco-editor@0.33.0
+      monaco-editor: 0.33.0
+      prop-types: 15.8.1
+      react: 17.0.2
+      react-dom: 17.0.2_react@17.0.2
     dev: false
 
   /@newhighsco/next-plugin-svgr/3.0.50_next@12.1.6+webpack@5.72.1:
@@ -9892,6 +9919,10 @@ packages:
     resolution: {integrity: sha512-c6YRvhEo//6T2Jz/vVtYzqBzwvPT95JBQ+smCytzf7c50oMZRsR/a4w88aD34I+/QVSfnoAnSBFPJHItlOMJVw==}
     dev: false
 
+  /monaco-editor/0.33.0:
+    resolution: {integrity: sha512-VcRWPSLIUEgQJQIE0pVT8FcGBIgFoxz7jtqctE+IiCxWugD0DwgyQBcZBhdSrdMC84eumoqMZsGl2GTreOzwqw==}
+    dev: false
+
   /moo/0.5.1:
     resolution: {integrity: sha512-I1mnb5xn4fO80BH9BLcF0yLypy2UKl+Cb01Fu0hJRkJjlCRtxZMWkTdAtDd5ZqCOxtCkhmRwyI57vWT+1iZ67w==}
     dev: false
@@ -13022,6 +13053,10 @@ packages:
 
   /standard-as-callback/2.1.0:
     resolution: {integrity: sha512-qoRRSyROncaz1z0mvYqIE4lCd9p2R90i6GxW3uZv5ucSu8tU7B5HXUP1gG8pVZsYNVaXjk8ClXHPttLyxAL48A==}
+    dev: false
+
+  /state-local/1.0.7:
+    resolution: {integrity: sha512-HTEHMNieakEnoe33shBYcZ7NX83ACUjCu8c40iOGEZsngj9zRnkqS9j1pqQPXwobB0ZcVTk27REb7COQ0UR59w==}
     dev: false
 
   /state-toggle/1.0.3:

@@ -42,7 +42,9 @@
     "socket.io-client": "4.5.0",
     "mime-types": "^2.1.35",
     "react-is": "^18.1.0",
-    "moment": "^2.29.3"
+    "moment": "^2.29.3",
+    "monaco-editor": "^0.33.0",
+    "@monaco-editor/react": "^4.4.5"
   },
   "devDependencies": {
     "@ddadaal/next-typed-api-routes-cli": "0.4.0",
