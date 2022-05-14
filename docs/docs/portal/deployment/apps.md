@@ -16,15 +16,13 @@ title: 桌面
 请确认集群配置满足以下条件：
 
 - **服务节点**可以连接到各个**桌面节点**
-- **服务节点**可以免密以root SSH登录到各个**桌面节点**，并且**服务节点**的`/root/.ssh`目录下有登录所需要的`id_rsa.pub`和`id_rsa`文件
+- **服务节点**可以免密以任何用户SSH登录到各个**桌面节点**，并且**服务节点**的`/root/.ssh`目录下有登录所需要的`id_rsa.pub`和`id_rsa`文件
 - **桌面节点**已安装TurboVNC（[官方安装教程](https://turbovnc.org/Downloads/YUM)）
 - **桌面节点**已经安装xfce
 
 ## 部署作业管理服务器
 
-请参考[作业功能部署文档](./job.md#部署file-server-slurm)部署作业管理服务器，并在每个作业管理服务器上增加以下配置
-
-在服务节点的`docker-compose.yml`的`services`部分上安装并配置服务：
+请参考[作业功能部署文档](./job.md#部署file-server-slurm)部署作业管理服务器，并在每个作业管理服务器上增加以下配置：
 
 ```yml title=docker-compose.yml
   file-server-hpc01:
