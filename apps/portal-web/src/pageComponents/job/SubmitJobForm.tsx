@@ -1,4 +1,4 @@
-import { Button, Form, Input, message, Modal } from "antd";
+import { Button, Col, Form, Input, message, Modal, Row } from "antd";
 import moment from "moment";
 import React, { useState } from "react";
 import { api } from "src/apis";
@@ -45,12 +45,18 @@ export const SubmitJobForm: React.FC = ({}) => {
       }}
       onFinish={submit}
     >
-      <Form.Item label="集群" name="cluster" rules={[{ required: true }]}>
-        <SingleClusterSelector />
-      </Form.Item>
-      <Form.Item label="作业名" name="jobName" rules={[{ required: true }]}>
-        <Input />
-      </Form.Item>
+      <Row gutter={4}>
+        <Col span={24} sm={12}>
+          <Form.Item label="集群" name="cluster" rules={[{ required: true }]}>
+            <SingleClusterSelector />
+          </Form.Item>
+        </Col>
+        <Col span={24} sm={12}>
+          <Form.Item label="作业名" name="jobName" rules={[{ required: true }]}>
+            <Input />
+          </Form.Item>
+        </Col>
+      </Row>
       <Form.Item label="命令" name="command" rules={[{ required: true }]}>
         <Editor language="shell" height="50vh" />
       </Form.Item>
