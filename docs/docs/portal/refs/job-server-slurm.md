@@ -19,7 +19,7 @@ title: "job-server-slurm"
 |`COMPUTE_NODES`|字符串|计算节点ID=计算节点IP<br/>示例：cn1=cn1,cn2=cn2|**必填**|
 |`ENABLE_VNC`|布尔值|在所有节点上启动VNC服务|false|
 |`TURBOVNC_PATH`|字符串|TurboVNC的安装路径|/opt/TurboVNC|
-|`SSH_PRIVATE_KEY_PATH`|字符串|SSH私钥目录|/home/ddadaal/.ssh/id_rsa|
+|`SSH_PRIVATE_KEY_PATH`|字符串|SSH私钥目录|~/.ssh/id_rsa|
 
 <!-- ENV TABLE END -->
 

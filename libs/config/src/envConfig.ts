@@ -1,6 +1,7 @@
 import { customCleanEnv, EnvError, makeValidator, Spec,
   strictProxyMiddleware, ValidatorSpec  } from "envalid";
 import * as envalid from "envalid";
+import os from "os";
 
 /**
  * Replace ${a} to valueObj[a]. If valueObj[a] is undefined, replace with ""
@@ -53,7 +54,13 @@ export function getDocFromSpec(spec: Record<string, Validator<any>>) {
     docNames[func.name],
     // eslint-disable-next-line max-len
     `${spec.desc ? spec.desc.replaceAll("\n", "<br/>"): ""}${spec.choices ? "<br/>可选项："+spec.choices.join(",") :""}${spec.example ? "<br/>示例：" + spec.example : ""}`,
-    "default" in spec ? (spec.default === undefined ? "不设置": spec.default) : "**必填**",
+    "default" in spec ?
+      (spec.default === undefined
+        ? "不设置"
+        : (typeof spec.default === "string"
+          ? spec.default.replace(os.homedir(), "~")
+          : spec.default))
+      : "**必填**",
   ].join("|");
     docs += "|\n";
   });

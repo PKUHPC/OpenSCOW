@@ -23,7 +23,7 @@ title: "clusterops-slurm"
 |`MYSQL_PASSWORD`|字符串|slurm.sh所需要的数据库密码|**必填**|
 |`BASE_PARTITIONS`|字符串|所有分区，以逗号分隔<br/>示例：GPU,CPU|**必填**|
 |`ASSOC_TABLE`|字符串|slurm数据库中保存用户账户关系(association)的表名|pkuhpc_assoc_table|
-|`SSH_PRIVATE_KEY_PATH`|字符串|SSH私钥目录|/home/ddadaal/.ssh/id_rsa|
+|`SSH_PRIVATE_KEY_PATH`|字符串|SSH私钥目录|~/.ssh/id_rsa|
 
 <!-- ENV TABLE END -->
 
