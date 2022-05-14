@@ -1,4 +1,5 @@
 import { Server } from "@ddadaal/tsgrpc-server";
+import { omitConfigSpec } from "@scow/config";
 import { config } from "src/config";
 import { plugins } from "src/plugins";
 import { jobServiceServer } from "src/services/JobService";
@@ -11,7 +12,7 @@ export async function createServer() {
     logger: { level: config.LOG_LEVEL },
   });
 
-  server.logger.info({ config }, "Loaded config");
+  server.logger.info({ config: omitConfigSpec(config) }, "Loaded config");
 
   for (const plugin of plugins) {
     await server.register(plugin);

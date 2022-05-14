@@ -1,4 +1,4 @@
-import { envConfig, parsePlaceholder, port, regex, str } from "src/envConfig";
+import { envConfig, omitConfigSpec, parsePlaceholder, port, regex, str } from "src/envConfig";
 
 it.each([
   ["123", {}, "123"],
@@ -53,3 +53,14 @@ it.each([
   }
 });
 
+it("removes _specs property from config object", async () => {
+
+  const key = "TEST";
+  process.env[key] = "asd";
+
+  const config = envConfig({
+    [key]: regex({ desc: "regex" }),
+  });
+
+  expect(omitConfigSpec(config)).toEqual({ [key]: process.env[key] });
+});

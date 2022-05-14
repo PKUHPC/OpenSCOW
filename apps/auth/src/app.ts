@@ -1,4 +1,5 @@
 import createError from "@fastify/error";
+import { omitConfigSpec } from "@scow/config";
 import fastify, { FastifyInstance, FastifyPluginAsync, FastifyPluginCallback } from "fastify";
 import gracefulShutdown from "fastify-graceful-shutdown";
 
@@ -33,7 +34,7 @@ export function buildApp(pluginOverrides?: PluginOverrides) {
     },
   });
 
-  server.log.info({ config }, "Loaded config");
+  server.log.info({ config: omitConfigSpec(config) }, "Loaded config");
 
   applyPlugins(server, pluginOverrides);
 
