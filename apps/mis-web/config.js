@@ -4,6 +4,7 @@ const { envConfig, str, bool, num, parseKeyValue, regex } = require("@scow/confi
 
 const building = process.env.BUILDING;
 const dev = process.env.NODE_ENV === "development";
+const production = process.env.NODE_ENV === "production";
 
 // load .env.build if in build
 if (building) {
@@ -50,12 +51,14 @@ const path = require("path");
 /**
  * @type {import("@scow/config/build/appConfig/clusters").Clusters}
  */
-const clusters = getConfigFromFile(clustersConfig.schema, clustersConfig.name, false, path.join(__dirname, "config"));
+const clusters = getConfigFromFile(clustersConfig.schema, clustersConfig.name, false,
+  production ? undefined : path.join(__dirname, "config"))
 
 /**
  * @type {import("@scow/config/build/appConfig/clusterTexts").ClusterTexts}
  */
-const clusterTexts = getConfigFromFile(clusterTextsConfig.schema, clusterTextsConfig.name, false, path.join(__dirname, "config"));
+const clusterTexts = getConfigFromFile(clusterTextsConfig.schema, clusterTextsConfig.name, false,
+  production ? undefined : path.join(__dirname, "config"));
 
 /**
  * @type {import ("./src/utils/config").ServerRuntimeConfig}
