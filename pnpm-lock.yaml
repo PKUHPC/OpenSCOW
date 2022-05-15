@@ -314,12 +314,19 @@ importers:
     specifiers:
       '@ant-design/icons': ^4.7.0
       '@artsy/fresnel': ^3.5.0
+      '@codemirror/autocomplete': ^0.20.0
+      '@codemirror/basic-setup': ^0.20.0
+      '@codemirror/commands': ^0.20.0
+      '@codemirror/language': ^0.20.0
+      '@codemirror/legacy-modes': ^0.20.0
+      '@codemirror/state': ^0.20.0
+      '@codemirror/theme-one-dark': ^0.20.0
+      '@codemirror/view': ^0.20.4
       '@ddadaal/next-typed-api-routes-cli': 0.4.0
       '@ddadaal/next-typed-api-routes-runtime': 0.3.2
       '@ddadaal/tsgrpc-cli': ^0.11.0
       '@ddadaal/tsgrpc-utils': ^0.12.0
       '@grpc/grpc-js': ^1.6.7
-      '@monaco-editor/react': ^4.4.5
       '@newhighsco/next-plugin-svgr': ^3.0.49
       '@next/bundle-analyzer': ^12.1.5
       '@scow/config': workspace:*
@@ -337,7 +344,6 @@ importers:
       less: ^4.1.2
       mime-types: ^2.1.35
       moment: ^2.29.3
-      monaco-editor: ^0.33.0
       next: ^12.1.5
       next-compose-plugins: ^2.2.1
       next-transpile-modules: ^9.0.0
@@ -359,10 +365,17 @@ importers:
     dependencies:
       '@ant-design/icons': 4.7.0_sfoxds7t5ydpegc3knd667wn6m
       '@artsy/fresnel': 3.5.0_react@17.0.2
+      '@codemirror/autocomplete': 0.20.0
+      '@codemirror/basic-setup': 0.20.0
+      '@codemirror/commands': 0.20.0
+      '@codemirror/language': 0.20.0
+      '@codemirror/legacy-modes': 0.20.0
+      '@codemirror/state': 0.20.0
+      '@codemirror/theme-one-dark': 0.20.0
+      '@codemirror/view': 0.20.4
       '@ddadaal/next-typed-api-routes-runtime': 0.3.2_next@12.1.6
       '@ddadaal/tsgrpc-utils': 0.12.0_@grpc+grpc-js@1.6.7
       '@grpc/grpc-js': 1.6.7
-      '@monaco-editor/react': 4.4.5_m23risk2t2ktwbmyoufat5z4ue
       '@newhighsco/next-plugin-svgr': 3.0.50_next@12.1.6+webpack@5.72.1
       '@scow/config': link:../../libs/config
       '@scow/lib-decimal': link:../../libs/decimal
@@ -372,7 +385,6 @@ importers:
       less: 4.1.2
       mime-types: 2.1.35
       moment: 2.29.3
-      monaco-editor: 0.33.0
       next: 12.1.6_sfoxds7t5ydpegc3knd667wn6m
       next-compose-plugins: 2.2.1
       next-transpile-modules: 9.0.0
@@ -2014,6 +2026,89 @@ packages:
     resolution: {integrity: sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==}
     dev: true
 
+  /@codemirror/autocomplete/0.20.0:
+    resolution: {integrity: sha512-F6VOM8lImn5ApqxJcaWgdl7hhlw8B5yAfZJGlsQifcpNotkZOMND61mBFZ84OmSLWxtT8/smkSeLvJupKbjP9w==}
+    dependencies:
+      '@codemirror/language': 0.20.0
+      '@codemirror/state': 0.20.0
+      '@codemirror/view': 0.20.4
+      '@lezer/common': 0.16.0
+    dev: false
+
+  /@codemirror/basic-setup/0.20.0:
+    resolution: {integrity: sha512-W/ERKMLErWkrVLyP5I8Yh8PXl4r+WFNkdYVSzkXYPQv2RMPSkWpr2BgggiSJ8AHF/q3GuApncDD8I4BZz65fyg==}
+    dependencies:
+      '@codemirror/autocomplete': 0.20.0
+      '@codemirror/commands': 0.20.0
+      '@codemirror/language': 0.20.0
+      '@codemirror/lint': 0.20.2
+      '@codemirror/search': 0.20.1
+      '@codemirror/state': 0.20.0
+      '@codemirror/view': 0.20.4
+    dev: false
+
+  /@codemirror/commands/0.20.0:
+    resolution: {integrity: sha512-v9L5NNVA+A9R6zaFvaTbxs30kc69F6BkOoiEbeFw4m4I0exmDEKBILN6mK+GksJtvTzGBxvhAPlVFTdQW8GB7Q==}
+    dependencies:
+      '@codemirror/language': 0.20.0
+      '@codemirror/state': 0.20.0
+      '@codemirror/view': 0.20.4
+      '@lezer/common': 0.16.0
+    dev: false
+
+  /@codemirror/language/0.20.0:
+    resolution: {integrity: sha512-lPsF5Y2ZFd5lZ9+7HXTxu57Po3dms3+7q2iAffzrbis2wyJo0lzi/j2312EKStEzwd0pGGpvrUk2dEd333N2jw==}
+    dependencies:
+      '@codemirror/state': 0.20.0
+      '@codemirror/view': 0.20.4
+      '@lezer/common': 0.16.0
+      '@lezer/highlight': 0.16.0
+      '@lezer/lr': 0.16.3
+    dev: false
+
+  /@codemirror/legacy-modes/0.20.0:
+    resolution: {integrity: sha512-SYllodnzD8OI6Y6NoFzCv+77cU9aTdfqDO0Zn8j5PbjUIAD+pIofwHAvecd9/ePLAICr+EYCEuqUxldHAR+pLQ==}
+    dependencies:
+      '@codemirror/language': 0.20.0
+    dev: false
+
+  /@codemirror/lint/0.20.2:
+    resolution: {integrity: sha512-xEH3wlzoFLEhPEeMVRNoQIhoTCMEtXhVxemGh3FYjLfl/CL3B2Wz+CU7ooP5SKhN1le7JqUNSfiTArFP+IzFuw==}
+    dependencies:
+      '@codemirror/state': 0.20.0
+      '@codemirror/view': 0.20.4
+      crelt: 1.0.5
+    dev: false
+
+  /@codemirror/search/0.20.1:
+    resolution: {integrity: sha512-ROe6gRboQU5E4z6GAkNa2kxhXqsGNbeLEisbvzbOeB7nuDYXUZ70vGIgmqPu0tB+1M3F9yWk6W8k2vrFpJaD4Q==}
+    dependencies:
+      '@codemirror/state': 0.20.0
+      '@codemirror/view': 0.20.4
+      crelt: 1.0.5
+    dev: false
+
+  /@codemirror/state/0.20.0:
+    resolution: {integrity: sha512-R3XrAWCS5Xm9lx+4pDET4EUPEg+8bDfAa5zoOFIhx+VChsfew9Vy33dAjCXS5ES4Q8UecW4WM4UudmUFpZ+86A==}
+    dev: false
+
+  /@codemirror/theme-one-dark/0.20.0:
+    resolution: {integrity: sha512-iqTKaiOZddwlc2rYF+9D60Gfyz9EsSawVejSjyP2FCtOwZ1X0frG5/ByTKH5FBDD2+P7W8+h/OIG4r5dWq4bgA==}
+    dependencies:
+      '@codemirror/language': 0.20.0
+      '@codemirror/state': 0.20.0
+      '@codemirror/view': 0.20.4
+      '@lezer/highlight': 0.16.0
+    dev: false
+
+  /@codemirror/view/0.20.4:
+    resolution: {integrity: sha512-6yprcc0/39EzI6y9Jm/J5F9lFzQik0yj8gE3CO/wOCQ4vd3Drol114mMK91LGtKrfoS0MFKVGulw0TdfN49Bfw==}
+    dependencies:
+      '@codemirror/state': 0.20.0
+      style-mod: 4.0.0
+      w3c-keyname: 2.2.4
+    dev: false
+
   /@colors/colors/1.5.0:
     resolution: {integrity: sha512-ooWCrlZP11i8GImSjTHYHLkvFDP48nS4+204nGb1RiX/WXYHmJA2III9/e2DWVabCESdW7hBAEzHRqUn9OUVvQ==}
     engines: {node: '>=0.1.90'}
@@ -3171,6 +3266,22 @@ packages:
     resolution: {integrity: sha512-Hcv+nVC0kZnQ3tD9GVu5xSMR4VVYOteQIr/hwFPVEvPdlXqgGEuRjiheChHgdM+JyqdgNcmzZOX/tnl0JOiI7A==}
     dev: false
 
+  /@lezer/common/0.16.0:
+    resolution: {integrity: sha512-H6sPCku+asKWYaNjwfQ1Uvcay9UP1Pdzu4qpy8GtRZ0cKT2AAGnj9MQGiRtY18MDntvhYRJxNGv7FNWOSV/e8A==}
+    dev: false
+
+  /@lezer/highlight/0.16.0:
+    resolution: {integrity: sha512-iE5f4flHlJ1g1clOStvXNLbORJoiW4Kytso6ubfYzHnaNo/eo5SKhxs4wv/rtvwZQeZrK3we8S9SyA7OGOoRKQ==}
+    dependencies:
+      '@lezer/common': 0.16.0
+    dev: false
+
+  /@lezer/lr/0.16.3:
+    resolution: {integrity: sha512-pau7um4eAw94BEuuShUIeQDTf3k4Wt6oIUOYxMmkZgDHdqtIcxWND4LRxi8nI9KuT4I1bXQv67BCapkxt7Ywqw==}
+    dependencies:
+      '@lezer/common': 0.16.0
+    dev: false
+
   /@mapbox/node-pre-gyp/1.0.9:
     resolution: {integrity: sha512-aDF3S3rK9Q2gey/WAttUlISduDItz5BU3306M9Eyv6/oS40aMprnopshtlKTykxRNIBEZuRMaZAnbrQ4QtKGyw==}
     hasBin: true
@@ -3496,29 +3607,6 @@ packages:
       - sqlite3
       - supports-color
       - tedious
-    dev: false
-
-  /@monaco-editor/loader/1.3.2_monaco-editor@0.33.0:
-    resolution: {integrity: sha512-BTDbpHl3e47r3AAtpfVFTlAi7WXv4UQ/xZmz8atKl4q7epQV5e7+JbigFDViWF71VBi4IIBdcWP57Hj+OWuc9g==}
-    peerDependencies:
-      monaco-editor: '>= 0.21.0 < 1'
-    dependencies:
-      monaco-editor: 0.33.0
-      state-local: 1.0.7
-    dev: false
-
-  /@monaco-editor/react/4.4.5_m23risk2t2ktwbmyoufat5z4ue:
-    resolution: {integrity: sha512-IImtzU7sRc66OOaQVCG+5PFHkSWnnhrUWGBuH6zNmH2h0YgmAhcjHZQc/6MY9JWEbUtVF1WPBMJ9u1XuFbRrVA==}
-    peerDependencies:
-      monaco-editor: '>= 0.25.0 < 1'
-      react: ^16.8.0 || ^17.0.0 || ^18.0.0
-      react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
-    dependencies:
-      '@monaco-editor/loader': 1.3.2_monaco-editor@0.33.0
-      monaco-editor: 0.33.0
-      prop-types: 15.8.1
-      react: 17.0.2
-      react-dom: 17.0.2_react@17.0.2
     dev: false
 
   /@newhighsco/next-plugin-svgr/3.0.50_next@12.1.6+webpack@5.72.1:
@@ -5959,6 +6047,10 @@ packages:
   /create-require/1.1.1:
     resolution: {integrity: sha512-dcKFX3jn0MpIaXjisoRvexIJVEKzaq7z2rZKxf+MSr9TkdmHmsU4m2lcLojrj/FHl8mk5VxMmYA+ftRkP/3oKQ==}
     dev: true
+
+  /crelt/1.0.5:
+    resolution: {integrity: sha512-+BO9wPPi+DWTDcNYhr/W90myha8ptzftZT+LwcmUbbok0rcP/fequmFYCw8NMoH7pkAZQzU78b3kYrlua5a9eA==}
+    dev: false
 
   /cross-env/7.0.3:
     resolution: {integrity: sha512-+/HKd6EgcQCJGh2PSjZuUitQBQynKor4wrFbRg4DtAgS1aWO+gU52xpH7M9ScGgXSYmAVS9bIJ8EzuaGw0oNAw==}
@@ -9919,10 +10011,6 @@ packages:
     resolution: {integrity: sha512-c6YRvhEo//6T2Jz/vVtYzqBzwvPT95JBQ+smCytzf7c50oMZRsR/a4w88aD34I+/QVSfnoAnSBFPJHItlOMJVw==}
     dev: false
 
-  /monaco-editor/0.33.0:
-    resolution: {integrity: sha512-VcRWPSLIUEgQJQIE0pVT8FcGBIgFoxz7jtqctE+IiCxWugD0DwgyQBcZBhdSrdMC84eumoqMZsGl2GTreOzwqw==}
-    dev: false
-
   /moo/0.5.1:
     resolution: {integrity: sha512-I1mnb5xn4fO80BH9BLcF0yLypy2UKl+Cb01Fu0hJRkJjlCRtxZMWkTdAtDd5ZqCOxtCkhmRwyI57vWT+1iZ67w==}
     dev: false
@@ -13055,10 +13143,6 @@ packages:
     resolution: {integrity: sha512-qoRRSyROncaz1z0mvYqIE4lCd9p2R90i6GxW3uZv5ucSu8tU7B5HXUP1gG8pVZsYNVaXjk8ClXHPttLyxAL48A==}
     dev: false
 
-  /state-local/1.0.7:
-    resolution: {integrity: sha512-HTEHMNieakEnoe33shBYcZ7NX83ACUjCu8c40iOGEZsngj9zRnkqS9j1pqQPXwobB0ZcVTk27REb7COQ0UR59w==}
-    dev: false
-
   /state-toggle/1.0.3:
     resolution: {integrity: sha512-d/5Z4/2iiCnHw6Xzghyhb+GcmF89bxwgXG60wjIiZaxnymbyOmI8Hk4VqHXiVVp6u2ysaskFfXg3ekCj4WNftQ==}
     dev: false
@@ -13230,6 +13314,10 @@ packages:
   /strip-json-comments/3.1.1:
     resolution: {integrity: sha512-6fPc+R4ihwqP6N/aIv2f1gMH8lOVtWQHoqC4yK6oSDVVocumAsfCqjkXnqiYMhmMwS/mEHLp7Vehlt3ql6lEig==}
     engines: {node: '>=8'}
+
+  /style-mod/4.0.0:
+    resolution: {integrity: sha512-OPhtyEjyyN9x3nhPsu76f52yUGXiZcgvsrFVtvTkyGRQJ0XK+GPc6ov1z+lRpbeabka+MYEQxOYRnt5nF30aMw==}
+    dev: false
 
   /style-to-object/0.3.0:
     resolution: {integrity: sha512-CzFnRRXhzWIdItT3OmF8SQfWyahHhjq3HwcMNCNLn+N7klOOqPjMeG/4JSu77D7ypZdGvSzvkrbyeTMizz2VrA==}
@@ -14097,6 +14185,10 @@ packages:
     dependencies:
       browser-process-hrtime: 1.0.0
     dev: true
+
+  /w3c-keyname/2.2.4:
+    resolution: {integrity: sha512-tOhfEwEzFLJzf6d1ZPkYfGj+FWhIpBux9ppoP3rlclw3Z0BZv3N7b7030Z1kYth+6rDuAsXUFr+d0VE6Ed1ikw==}
+    dev: false
 
   /w3c-xmlserializer/2.0.0:
     resolution: {integrity: sha512-4tzD0mF8iSiMiNs30BiLO3EpfGLZUT2MSX/G+o7ZywDzliWQ3OPtTZ0PTC3B3ca1UAf4cJMHB+2Bf56EriJuRA==}

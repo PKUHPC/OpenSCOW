@@ -74,7 +74,7 @@ export const SubmitJobForm: React.FC = ({}) => {
         </Col>
       </Row>
       <Form.Item label="命令" name="command" rules={[{ required: true }]}>
-        <Editor language="shell" height="50vh" />
+        <Editor height="50vh" />
       </Form.Item>
       <Form.Item>
         <Button type="primary" htmlType="submit" loading={loading}>
