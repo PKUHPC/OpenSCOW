@@ -44,6 +44,8 @@ COPY --from=builder /app/apps/job-server-slurm/build ./src
 # Serve
 EXPOSE 5000
 
+ENV NODE_ENV production
+
 # Run node directly to support graceful shutdown
 ENTRYPOINT [ "node", "--preserve-symlinks", "src/index.js" ]
 

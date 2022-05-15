@@ -55,6 +55,8 @@ COPY --from=builder /app/apps/mis-server/package.json .
 COPY --from=builder /app/apps/mis-server/node_modules/ ./node_modules
 COPY --from=builder /app/apps/mis-server/build/ ./src
 
+ENV NODE_ENV production
+
 ENTRYPOINT [ "node", "src/index.js" ]
 
 

@@ -50,5 +50,7 @@ COPY --from=builder /app/apps/shell-server/package.json .
 COPY --from=builder /app/apps/shell-server/node_modules/ ./node_modules
 COPY --from=builder /app/apps/shell-server/build/ ./src
 
+ENV NODE_ENV production
+
 ENTRYPOINT [ "node", "src/index.js" ]
 
