@@ -5,7 +5,7 @@ const { join } = require("path");
 
 const building = process.env.BUILDING;
 const dev = process.env.NODE_ENV === "development"
-const production = process.env.NODE_ENV === "production";
+const production = !building && process.env.NODE_ENV === "production";
 
 
 // load .env.build if in build
