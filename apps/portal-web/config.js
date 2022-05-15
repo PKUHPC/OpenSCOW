@@ -37,6 +37,12 @@ const specs = {
   DEFAULT_FOOTER_TEXT: str({ desc: "默认footer文本", default: "" }),
   FOOTER_TEXTS: str({ desc: "根据域名(hostname，不包括port)不同，显示在footer上的文本。格式：域名=文本,域名=文本", default: "" }),
 
+  DEFAULT_HOME_TEXT: str({ desc: "默认主页文本", default: "北京大学计算中心成立于1963年，是集计算中心管理信息中心和网络中心于一体的实体单位，是独立建制的全校大型综合实验室，负责学校信息化基础设施的建设、开发与运行服务工作。" }), 
+  HOME_TEXTS: str({ desc: "根据域名(hostname，不包括port)不同，显示在主页上的文本。格式：域名=文本,域名=文本", default: "" }),
+
+  DEFAULT_HOME_TITLE: str({ desc: "默认主页标题", default: "北京大学计算中心高性能计算平台交互式工具" }),
+  HOME_TITLES: str({ desc: "根据域名(hostname，不包括port)不同，显示在主页上的标题。格式：域名=标题,域名=标题", default: "" }),
+
   DEFAULT_PRIMARY_COLOR: str({ desc: "默认主题色", default: "#9B0000" }),
   PRIMARY_COLORS: str({ desc: "根据域名(hostname，不包括port)不同，应用的主题色。格式：域名=颜色,域名=颜色", default: "" }),
 
@@ -90,6 +96,11 @@ const publicRuntimeConfig = {
   ENABLE_VNC: config.ENABLE_VNC,
 
   MIS_PATH: config.MIS_PATH,
+
+  DEFAULT_HOME_TEXT: config.DEFAULT_HOME_TEXT,
+  HOME_TEXTS: parseKeyValue(config.HOME_TEXTS),
+  DEFAULT_HOME_TITLE: config.DEFAULT_HOME_TITLE,
+  HOME_TITLES: parseKeyValue(config.HOME_TITLES),
 }
 
 if (!building) {
