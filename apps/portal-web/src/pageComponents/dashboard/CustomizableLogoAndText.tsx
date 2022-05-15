@@ -2,40 +2,61 @@ import { Divider } from "antd";
 import Image from "next/image";
 import React from "react";
 import { publicConfig } from "src/utils/config";
+import styled from "styled-components";
 
 
 interface Props {
   hostname: string | undefined;
 }
+
+const Container = styled.div`
+`;
+
+const Logo = styled.div`
+  position: relative;
+  width: 100%;
+  padding-bottom: 8%;
+`;
+
+const TitleAndText = styled.div`
+  display: flex;
+  justify-content: center;
+  margin-top: 3%;
+  margin-left: 20%;
+  margin-right: 20%;
+  flex-direction: column;
+`;
+
+const Title = styled.h1`
+  align-self: center;
+`;
+
+const Text = styled.p`
+  text-indent: 2rem ; 
+`;
+
 export const CustomizableLogoAndText: React.FC<Props> = ({ hostname }) => {
 
   return (
-    <div>
-      <div style={{ position: "relative", width: "100%", paddingBottom: "8%" }} >
+    <Container>
+      <Logo >
         <Image
           alt="logo"
           src="/api/logo"
           layout="fill"
           objectFit="contain"
         />
-      </div>
-      <div style={{
-        display: "flex",
-        justifyContent: "center",
-        marginTop: "3%",
-        marginLeft: "20%",
-        marginRight: "20%",
-        flexDirection: "column",
-      }}>
-        <h1 style={{ alignSelf: "center" }}>
+      </Logo>
+      <TitleAndText>
+        <Title>
           {(hostname && publicConfig.HOME_TITLES[hostname]) ?? publicConfig.DEFAULT_HOME_TITLE}
-        </h1>
+        </Title>
         <Divider />
-        <p style={{ textIndent: "2rem" }}>
+        <Text>
           {(hostname && publicConfig.HOME_TEXTS[hostname]) ?? publicConfig.DEFAULT_HOME_TEXT}
-        </p>
-      </div>
-    </div>
+        </Text>
+      </TitleAndText>
+    </Container>
 
   );
 };
