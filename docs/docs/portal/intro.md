@@ -10,7 +10,7 @@ title: 简介
 # 部署
 
 1. [前端](./deployment/web.mdx)
-2. [作业管理](./deployment/jobs.md)
+2. [作业管理](./deployment/jobs.mdx)
 3. [终端](./deployment/shell.md)
 4. [文件服务](./deployment/file.md)
 5. [交互式应用](./deployment/apps.md)

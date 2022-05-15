@@ -22,10 +22,10 @@ title: 桌面
 
 ## 部署作业管理服务器
 
-请参考[作业功能部署文档](./job.md#部署file-server-slurm)部署作业管理服务器，并在每个作业管理服务器上增加以下配置：
+请参考[作业功能部署文档](./jobs.mdx#部署file-server-slurm)部署作业管理服务器，并在作业管理服务器上增加以下配置：
 
 ```yml title=docker-compose.yml
-  file-server-hpc01:
+  file-server:
     # ...
     environment:
       # 启动VNC服务
