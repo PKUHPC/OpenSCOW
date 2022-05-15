@@ -37,7 +37,7 @@ export function getConfigFromFile<T extends TSchema>(
     }
   }
 
-  if (allowNotExistent) {
+  if (!allowNotExistent) {
     throw new Error(`No config named ${filename} exists.`);
   } else {
     return undefined;
