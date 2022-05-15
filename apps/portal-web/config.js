@@ -52,9 +52,7 @@ const path = require("path");
 /**
  * @type {import("@scow/config/build/appConfig/clusters").Clusters}
  */
-const clusters = (dev || building)
-  ? JSON.parse(fs.readFileSync(path.resolve(__dirname, "config/clusters.json"), "utf-8"))
-  : getConfigFromFile(clustersConfig.schema, clustersConfig.name);
+const clusters = getConfigFromFile(clustersConfig.schema, clustersConfig.name, false, path.join(__dirname, "config"));
 
 /**
  * @type {import("./src/utils/config").ServerRuntimeConfig}

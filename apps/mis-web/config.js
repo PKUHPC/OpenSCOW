@@ -50,16 +50,12 @@ const path = require("path");
 /**
  * @type {import("@scow/config/build/appConfig/clusters").Clusters}
  */
-const clusters = (dev || building)
-  ? JSON.parse(fs.readFileSync(path.resolve(__dirname, "config/clusters.json"), "utf-8"))
-  : getConfigFromFile(clustersConfig.schema, clustersConfig.name);
+const clusters = getConfigFromFile(clustersConfig.schema, clustersConfig.name, false, path.join(__dirname, "config"));
 
 /**
  * @type {import("@scow/config/build/appConfig/clusterTexts").ClusterTexts}
  */
-const clusterTexts = (dev || building)
-  ? JSON.parse(fs.readFileSync(path.resolve(__dirname, "config/clusterTexts.json"), "utf-8"))
-  : getConfigFromFile(clusterTextsConfig.schema, clusterTextsConfig.name);
+const clusterTexts = getConfigFromFile(clusterTextsConfig.schema, clusterTextsConfig.name, false, path.join(__dirname, "config"));
 
 /**
  * @type {import ("./src/utils/config").ServerRuntimeConfig}

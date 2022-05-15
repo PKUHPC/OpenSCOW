@@ -18,5 +18,5 @@ export const config = envConfig({
 
 });
 
-export const clustersConfig = getConfigFromFile(clustersConfigInfo.schema, clustersConfigInfo.name);
+export const clustersConfig = getConfigFromFile(clustersConfigInfo.schema, clustersConfigInfo.name, false);
 

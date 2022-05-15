@@ -2,7 +2,9 @@ import { Static, TSchema } from "@sinclair/typebox";
 import Ajv from "ajv/dist/2019";
 import addFormats from "ajv-formats";
 
-export const createAjv = () => addFormats(new Ajv({}), [
+export const createAjv = () => addFormats(new Ajv({
+  useDefaults: true,
+}), [
   "date-time",
   "time",
   "date",
