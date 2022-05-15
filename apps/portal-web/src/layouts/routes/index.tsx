@@ -16,7 +16,7 @@ export const userRoutes: NavItemProps[] = [
     text: "仪表盘",
     path: "/dashboard",
   },
-  {
+  ...publicConfig.ENABLE_JOB_MANAGEMENT ? [{
     Icon: BookOutlined,
     text: "作业",
     path: "/jobs",
@@ -33,7 +33,7 @@ export const userRoutes: NavItemProps[] = [
         path: "/jobs/submit",
       },
     ],
-  },
+  }]: [],
   ...publicConfig.ENABLE_SHELL ? [{
     Icon: MacCommandOutlined,
     text: "Shell",

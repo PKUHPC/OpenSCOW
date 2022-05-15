@@ -2,11 +2,11 @@ import { Logger, plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { NodeSSH, SSHExecOptions } from "node-ssh";
-import { ALL_NODES, COMPUTE_NODES, config, LOGIN_NODES } from "src/config";
+import { config } from "src/config";
 
 export interface SshPlugin {
-  connect: <T>(node: string, username: string, logger: Logger,
-    run: (ssh: NodeSSH, nodeAddr: string) => Promise<T>) => Promise<T>,
+  connect: <T>(addr: string, username: string, logger: Logger,
+    run: (ssh: NodeSSH, addr: string) => Promise<T>) => Promise<T>,
 }
 
 export async function loggedExec(ssh: NodeSSH, logger: Logger, throwIfFailed: boolean,
@@ -27,22 +27,17 @@ export async function loggedExec(ssh: NodeSSH, logger: Logger, throwIfFailed: bo
 
 export const sshPlugin = plugin(async (s) => {
 
-  s.logger.info("Known login nodes %o", LOGIN_NODES);
-  s.logger.info("Known compute nodes %o", COMPUTE_NODES);
-
   s.addExtension("connect", <SshPlugin["connect"]>(
-    async (node, username, logger, run) => {
-      const nodeAddr = ALL_NODES[node];
-      if (!nodeAddr) { throw new Error(`Unknown node ${node}`); }
+    async (addr, username, logger, run) => {
 
       const ssh = new NodeSSH();
 
-      await ssh.connect({ host: nodeAddr, username, privateKey: config.SSH_PRIVATE_KEY_PATH });
-      logger.info("Connected to %s (addr: %s) as %s", node, nodeAddr, username);
+      await ssh.connect({ host: addr, username, privateKey: config.SSH_PRIVATE_KEY_PATH });
+      logger.info("Connected to addr as %s", addr, username);
 
-      const value = await run(ssh, nodeAddr).finally(() => {
+      const value = await run(ssh, addr).finally(() => {
         ssh.dispose();
-        logger.info("Disconnected from %s (addr: %s) as %s", node, nodeAddr, username);
+        logger.info("Disconnected from %s as %s", addr, username);
       });
 
       return value;

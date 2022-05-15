@@ -2,7 +2,10 @@ syntax = "proto3";
 
 package scow.portal.vnc;
 
-message LaunchDesktopRequest { string username = 1; }
+message LaunchDesktopRequest {
+  string cluster = 1;
+  string username = 2;
+}
 
 message LaunchDesktopReply {
   bool already_running = 1;
@@ -13,9 +16,10 @@ message LaunchDesktopReply {
 }
 
 message RefreshOTPPasswordRequest {
-  string username = 1;
-  string node = 2;
-  uint32 display_id = 3;
+  string cluster = 1;
+  string username = 2;
+  string node = 3;
+  uint32 display_id = 4;
 }
 
 // NOT_FOUND: node is not found, display_id is not found

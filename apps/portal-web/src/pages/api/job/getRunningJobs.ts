@@ -35,9 +35,10 @@ export default route<GetRunningJobsSchema>("GetRunningJobsSchema", async (req, r
 
   const { cluster, userId } = req.query;
 
-  const client = getJobServerClient(cluster, JobServiceClient);
+  const client = getJobServerClient(JobServiceClient);
 
   const resp = await asyncClientCall(client, "getRunningJobs", {
+    cluster,
     userId,
   });
 

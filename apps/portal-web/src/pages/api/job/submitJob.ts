@@ -38,9 +38,10 @@ export default route<SubmitJobSchema>("SubmitJobSchema", async (req, res) => {
 
   const { cluster, command, jobName } = req.body;
 
-  const client = getJobServerClient(cluster, JobServiceClient);
+  const client = getJobServerClient(JobServiceClient);
 
   return await asyncClientCall(client, "submitJob", {
+    cluster,
     userId: info.identityId,
     command: command,
     jobName: jobName,

@@ -4,14 +4,18 @@ package scow.portal.job;
 
 import "common/job.proto";
 
-message GetRunningJobsRequest { string user_id = 1; }
+message GetRunningJobsRequest {
+  string cluster = 1;
+  string user_id = 2;
+}
 
 message GetRunningJobsReply { repeated common.job.RunningJob jobs = 1; }
 
 message SubmitJobRequest {
-  string user_id = 1;
-  string job_name = 2;
-  string command = 3;
+  string cluster = 1;
+  string user_id = 2;
+  string job_name = 3;
+  string command = 4;
 }
 
 // UNAVAILABLE: if sbatch fails, the details is the stderr

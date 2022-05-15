@@ -35,9 +35,10 @@ export default /*#__PURE__*/route<LaunchDesktopSchema>("LaunchDesktopSchema", as
 
   if (!info) { return; }
 
-  const client = getJobServerClient(req.body.cluster, VncServiceClient);
+  const client = getJobServerClient(VncServiceClient);
 
   return await asyncClientCall(client, "launchDesktop", {
+    cluster: req.body.cluster,
     username: info.identityId,
   })
     .then(({ node, password, port }) => {

@@ -1,9 +1,10 @@
 import { Logger, plugin } from "@ddadaal/tsgrpc-server";
 import { NodeSSH } from "node-ssh";
 import path from "path";
-import { config, LOGIN_NODES } from "src/config";
+import { clustersConfig, config } from "src/config";
 import { VncServiceServer, VncServiceService } from "src/generated/portal/vnc";
 import { loggedExec } from "src/plugins/ssh";
+import { checkClusterExistence } from "src/utils/check";
 import { displayIdToPort } from "src/utils/port";
 
 
@@ -60,9 +61,11 @@ export const vncServiceServer = plugin((server) => {
 
   server.addService<VncServiceServer>(VncServiceService, {
     launchDesktop: async ({ request, logger }) => {
-      const { username }  = request;
+      const { cluster, username }  = request;
 
-      const node = Object.keys(LOGIN_NODES)[0];
+      checkClusterExistence(cluster);
+
+      const node = clustersConfig[cluster].loginNodes[0];
 
       return await server.ext.connect(node, username, logger, async (ssh, nodeAddr) => {
 

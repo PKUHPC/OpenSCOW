@@ -27,7 +27,8 @@ const specs = {
 
   FILE_SERVERS: str({ desc: "启用文件管理功能的集群。格式：集群名,集群名。如果为空，则关闭文件管理的功能", default: "" }),
 
-  JOB_SERVERS: str({ desc: "作业服务器的地址。格式：集群ID=地址,集群ID=地址", default: "" }),
+  ENABLE_JOB_MANAGEMENT: bool({ desc: "是否启动作业管理功能", default: false }),
+  JOB_SERVER: str({ desc: "作业服务器的地址", default: "job-server:5000" }),
 
   ENABLE_VNC: bool({ desc: "是否启动VNC功能", default: false }),
 
@@ -65,7 +66,7 @@ const serverRuntimeConfig = {
   DEFAULT_PRIMARY_COLOR: config.DEFAULT_PRIMARY_COLOR,
   FOOTER_TEXTS: parseKeyValue(config.FOOTER_TEXTS),
   PRIMARY_COLORS: parseKeyValue(config.PRIMARY_COLORS),
-  JOB_SERVERS: parseKeyValue(config.JOB_SERVERS),
+  JOB_SERVER: config.JOB_SERVER,
 };
 
 /**
@@ -84,6 +85,7 @@ const publicRuntimeConfig = {
 
   FILE_SERVERS: parseArray(config.FILE_SERVERS),
 
+  ENABLE_JOB_MANAGEMENT: config.ENABLE_JOB_MANAGEMENT,
   ENABLE_VNC: config.ENABLE_VNC,
 
   MIS_PATH: config.MIS_PATH,
