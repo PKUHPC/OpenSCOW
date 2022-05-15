@@ -35,6 +35,12 @@ export interface PublicRuntimeConfig {
   ENABLE_JOB_MANAGEMENT: boolean;
 
   MIS_PATH: string;
+
+  DEFAULT_HOME_TEXT: string;
+  HOME_TEXTS: {[hostname: string]: string };
+
+  DEFAULT_HOME_TITLE: string;
+  HOME_TITLES: {[hostname: string]: string };
 }
 
 export const runtimeConfig: ServerRuntimeConfig = getConfig().serverRuntimeConfig;
