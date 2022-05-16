@@ -43,18 +43,15 @@ export const Shell: React.FC<Props> = ({ user, cluster, path }) => {
       term.loadAddon(fitAddon);
       term.open(container.current);
 
-      const resize = () => {
-        fitAddon.fit();
-      };
-
-
       term.write(
         `\r\n*** Connecting to cluster ${payload.cluster} as ${user.identityId} to ` +
         `${path ? "path " + path : "home path"} ***\r\n`,
       );
 
-
-      const resizeObserver = new ResizeObserver(resize);
+      const resizeObserver = new ResizeObserver(() => {
+        fitAddon.fit();
+        socket.emit("resize", { cols: term.cols, rows: term.rows });
+      });
 
       resizeObserver.observe(container.current);
 
@@ -66,7 +63,7 @@ export const Shell: React.FC<Props> = ({ user, cluster, path }) => {
 
       socket.on("connect", () => {
         term.clear();
-        resize();
+
         term.onData((data) => {
           socket.emit("data", data);
         });
@@ -90,6 +87,9 @@ export const Shell: React.FC<Props> = ({ user, cluster, path }) => {
 
       return () => {
         socket.disconnect();
+        if (container.current){
+          resizeObserver.unobserve(container.current) ;
+        }
       };
     }
   }, [container.current]);
