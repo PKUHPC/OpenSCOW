@@ -97,10 +97,6 @@ jobs:
             file: mis-server
             build_args: ""
 
-          - name: shell-server
-            file: shell-server
-            build_args: ""
-
           - name: job-server-slurm
             file: job-server-slurm
             build_args: ""

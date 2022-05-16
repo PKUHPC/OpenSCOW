@@ -46,12 +46,6 @@ services:
       context: .
       dockerfile: dockerfiles/Dockerfile.mis-server
 
-  shell-server:
-    image: $IMAGE_BASE/shell-server:$TAG
-    build:
-      context: .
-      dockerfile: dockerfiles/Dockerfile.shell-server
-
   job-server-slurm:
     image: $IMAGE_BASE/job-server-slurm:$TAG
     build:

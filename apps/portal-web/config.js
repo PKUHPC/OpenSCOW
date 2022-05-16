@@ -1,8 +1,8 @@
 // @ts-check
 
 const { envConfig, str, bool, parseKeyValue, parseArray } = require("@scow/config");
-const { join } = require("path");
-
+const path = require("path");
+const { homedir } = require("os");
 const building = process.env.BUILDING;
 const dev = process.env.NODE_ENV === "development"
 const production = !building && process.env.NODE_ENV === "production";
@@ -25,7 +25,6 @@ const specs = {
 
   ENABLE_CHANGE_PASSWORD: bool({ desc: "是否支持用户更改自己的密码", default: false }),
 
-  ENABLE_SHELL: bool({ desc: "是否启用Shell功能", default: false }),
 
   FILE_SERVERS: str({ desc: "启用文件管理功能的集群。格式：集群名,集群名。如果为空，则关闭文件管理的功能", default: "" }),
 
@@ -37,7 +36,7 @@ const specs = {
   DEFAULT_FOOTER_TEXT: str({ desc: "默认footer文本", default: "" }),
   FOOTER_TEXTS: str({ desc: "根据域名(hostname，不包括port)不同，显示在footer上的文本。格式：域名=文本,域名=文本", default: "" }),
 
-  DEFAULT_HOME_TEXT: str({ desc: "默认主页文本", default: "北京大学计算中心成立于1963年，是集计算中心管理信息中心和网络中心于一体的实体单位，是独立建制的全校大型综合实验室，负责学校信息化基础设施的建设、开发与运行服务工作。" }), 
+  DEFAULT_HOME_TEXT: str({ desc: "默认主页文本", default: "北京大学计算中心成立于1963年，是集计算中心管理信息中心和网络中心于一体的实体单位，是独立建制的全校大型综合实验室，负责学校信息化基础设施的建设、开发与运行服务工作。" }),
   HOME_TEXTS: str({ desc: "根据域名(hostname，不包括port)不同，显示在主页上的文本。格式：域名=文本,域名=文本", default: "" }),
 
   DEFAULT_HOME_TITLE: str({ desc: "默认主页标题", default: "北京大学计算中心高性能计算平台交互式工具" }),
@@ -47,6 +46,9 @@ const specs = {
   PRIMARY_COLORS: str({ desc: "根据域名(hostname，不包括port)不同，应用的主题色。格式：域名=颜色,域名=颜色", default: "" }),
 
   MIS_PATH: str({ desc: "管理系统的链接。如果不设置，则不显示到管理系统的链接", default: undefined }),
+
+  ENABLE_SHELL: bool({ desc: "是否启用Shell功能", default: false }),
+  SSH_PRIVATE_KEY_PATH: str({ desc: "SSH私钥路径", default: path.join(homedir(), ".ssh", "id_rsa") }),
 };
 
 const config = envConfig(specs, process.env);
@@ -54,8 +56,6 @@ const config = envConfig(specs, process.env);
 // load clusters.json
 const { getConfigFromFile } = require("@scow/config");
 const { clustersConfig } = require("@scow/config/build/appConfig/clusters");
-const fs = require("fs");
-const path = require("path");
 
 /**
  * @type {import("@scow/config/build/appConfig/clusters").Clusters}
@@ -74,6 +74,8 @@ const serverRuntimeConfig = {
   FOOTER_TEXTS: parseKeyValue(config.FOOTER_TEXTS),
   PRIMARY_COLORS: parseKeyValue(config.PRIMARY_COLORS),
   JOB_SERVER: config.JOB_SERVER,
+  SSH_PRIVATE_KEY_PATH: config.SSH_PRIVATE_KEY_PATH,
+  CLUSTERS_CONFIG: clusters,
 };
 
 /**

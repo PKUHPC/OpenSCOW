@@ -64,7 +64,7 @@ hpc01: # 集群ID
   job-server:
     image: %CR_URL%/job-server-slurm
     volumes:
-      - ./config:/etc/scow
+      # 将SSH目录映射进去
       - /root/.ssh:/root/.ssh
 ```
 

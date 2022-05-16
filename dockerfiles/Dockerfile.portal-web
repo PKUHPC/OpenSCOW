@@ -34,6 +34,8 @@ RUN rm -rf node_modules && pnpm install -r --prod --offline
 
 FROM node:16.15-alpine3.15 AS runner
 
+RUN apk add --no-cache openssh-client
+
 WORKDIR /app
 COPY --from=builder /app/node_modules ./node_modules
 

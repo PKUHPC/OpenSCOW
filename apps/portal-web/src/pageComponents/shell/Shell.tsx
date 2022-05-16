@@ -1,7 +1,7 @@
+import { join } from "path";
 import { useEffect, useRef } from "react";
 import { io } from "socket.io-client";
 import { User } from "src/stores/UserStore";
-import { SHELL_SERVER_URL } from "src/utils/config";
 import styled from "styled-components";
 import { Terminal } from "xterm";
 import { FitAddon } from "xterm-addon-fit";
@@ -58,10 +58,8 @@ export const Shell: React.FC<Props> = ({ user, cluster, path }) => {
 
       resizeObserver.observe(container.current);
 
-      const url = new URL(SHELL_SERVER_URL, location.origin);
-
-      const socket = io(url.origin, {
-        path: url.pathname,
+      const socket = io({
+        path: join(process.env.NEXT_PUBLIC_BASE_PATH, "/api/shell/socketio"),
         query: payload,
         auth: { token: user.token },
       });

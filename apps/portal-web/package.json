@@ -50,7 +50,9 @@
     "@codemirror/theme-one-dark": "^0.20.0",
     "@codemirror/language": "^0.20.0",
     "@codemirror/commands": "^0.20.0",
-    "@codemirror/autocomplete": "^0.20.0"
+    "@codemirror/autocomplete": "^0.20.0",
+    "socket.io": "^4.5.0",
+    "node-pty": "^0.11.0-beta19"
   },
   "devDependencies": {
     "@ddadaal/next-typed-api-routes-cli": "0.4.0",

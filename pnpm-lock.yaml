@@ -347,6 +347,7 @@ importers:
       next: ^12.1.5
       next-compose-plugins: ^2.2.1
       next-transpile-modules: ^9.0.0
+      node-pty: ^0.11.0-beta19
       nookies: ^2.5.2
       nprogress: ^0.2.0
       postcss: ^8.4.13
@@ -355,6 +356,7 @@ importers:
       react-dom: ^17.0.2
       react-is: ^18.1.0
       simstate: ^3.0.0
+      socket.io: ^4.5.0
       socket.io-client: 4.5.0
       styled-components: ^5.3.5
       tslib: ^2.4.0
@@ -388,6 +390,7 @@ importers:
       next: 12.1.6_sfoxds7t5ydpegc3knd667wn6m
       next-compose-plugins: 2.2.1
       next-transpile-modules: 9.0.0
+      node-pty: 0.11.0-beta9
       nookies: 2.5.2
       nprogress: 0.2.0
       react: 17.0.2
@@ -395,6 +398,7 @@ importers:
       react-dom: 17.0.2_react@17.0.2
       react-is: 18.1.0
       simstate: 3.0.0_react@17.0.2
+      socket.io: 4.5.0
       socket.io-client: 4.5.0
       styled-components: 5.3.5_ukrbqhh2t6r2q67fyfhmpyy5um
       tslib: 2.4.0
@@ -10224,6 +10228,13 @@ packages:
 
   /node-pty/0.10.1:
     resolution: {integrity: sha512-JTdtUS0Im/yRsWJSx7yiW9rtpfmxqxolrtnyKwPLI+6XqTAPW/O2MjS8FYL4I5TsMbH2lVgDb2VMjp+9LoQGNg==}
+    requiresBuild: true
+    dependencies:
+      nan: 2.15.0
+    dev: false
+
+  /node-pty/0.11.0-beta9:
+    resolution: {integrity: sha512-bU/2zYV6xBMVMHaMe+yr4WEw36PCA0hyZ7A0IBQFWy5l1vjsD52sZ9sGJk+dH7bw3xpuBLHMh9Eq4Di8rJz4IQ==}
     requiresBuild: true
     dependencies:
       nan: 2.15.0

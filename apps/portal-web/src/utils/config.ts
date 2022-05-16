@@ -1,9 +1,6 @@
+import { Clusters } from "@scow/config/build/appConfig/clusters";
 import { CONFIG_BASE_PATH } from "@scow/config/build/constants";
 import getConfig from "next/config";
-import { join } from "path";
-
-// publicly accessible URLS. should not be configurable
-export const SHELL_SERVER_URL = join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/shell-server/socket.io");
 
 export interface ServerRuntimeConfig {
   AUTH_EXTERNAL_URL: string;
@@ -16,6 +13,10 @@ export interface ServerRuntimeConfig {
 
   DEFAULT_PRIMARY_COLOR: string;
   PRIMARY_COLORS: {[hostname: string]: string };
+
+  SSH_PRIVATE_KEY_PATH: string;
+
+  CLUSTERS_CONFIG: Clusters;
 }
 
 
