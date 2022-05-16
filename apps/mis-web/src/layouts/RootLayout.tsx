@@ -29,6 +29,7 @@ const ContentPart = styled.div`
   flex: 1;
   flex-direction: column;
   width: 100%;
+  overflow-x: scroll;
 `;
 
 const Content = styled(Layout.Content)`
@@ -39,7 +40,6 @@ const Content = styled(Layout.Content)`
 `;
 
 const StyledLayout = styled(Layout)`
-  position: relative;
 `;
 
 
