@@ -56,7 +56,7 @@ export const Shell: React.FC<Props> = ({ user, cluster, path }) => {
       resizeObserver.observe(container.current);
 
       const socket = io({
-        path: join(process.env.NEXT_PUBLIC_BASE_PATH, "/api/shell/socketio"),
+        path: join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/shell/socketio"),
         query: payload,
         auth: { token: user.token },
       });

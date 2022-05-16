@@ -13,7 +13,7 @@ declare module "*.svg" {
 
 declare namespace NodeJS {
   export interface ProcessEnv {
-    NEXT_PUBLIC_BASE_PATH: string;
-    NEXT_PUBLIC_USE_MOCK: string;
+    NEXT_PUBLIC_BASE_PATH: string | undefined;
+    NEXT_PUBLIC_USE_MOCK: string | undefined;
   }
 }
