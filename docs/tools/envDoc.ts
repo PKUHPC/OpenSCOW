@@ -74,7 +74,6 @@ const config = [
   { app: "mis-web", configFile: "config", md: "mis/refs/mis-web.md" },
   { app: "file-server", md: "portal/refs/file-server.md" },
   { app: "portal-web", configFile: "config", md: "portal/refs/portal-web.md" },
-  { app: "shell-server", md: "portal/refs/shell-server.md" },
   { app: "job-server-slurm", md: "portal/refs/job-server-slurm.md" },
 ] as EnvConfig[];
 

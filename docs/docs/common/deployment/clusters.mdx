@@ -16,6 +16,12 @@ import TabItem from '@theme/TabItem';
 ```yaml
 hpc01: # 集群ID
   displayName: hpc01Name # 集群的名称
+  loginNodes: # 各个登录节点的IP
+    - login01
+    - login02
+  computeNodes: # 各个计算节点的IP
+    - cn01
+    - cn02
   partitions: # 集群的各个分区
     compute: # 分区名
       nodes: 28 # 分区内节点数
@@ -46,6 +52,14 @@ hpc01: # 集群ID
 {
   "hpc01": {
     "displayName": "hpc01Name",
+    "loginNodes": [
+      "login01",
+      "login02"
+    ],
+    "computeNodes": [
+      "cn01",
+      "cn02"
+    ],
     "partitions": {
       "compute": {
         "nodes": 28,
