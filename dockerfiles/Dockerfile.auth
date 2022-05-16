@@ -9,8 +9,9 @@ COPY pnpm-lock.yaml ./
 RUN pnpm fetch
 
 COPY package.json pnpm-workspace.yaml .npmrc ./
-COPY libs/config ./libs/config
-COPY apps/auth ./apps/auth
+
+COPY libs/config/package.json ./libs/config/
+COPY apps/auth/package.json ./apps/auth/
 
 # Must run twice
 # First run doesn't create node_modules on libs
@@ -20,6 +21,10 @@ RUN pnpm install --offline
 COPY tsconfig.json .eslintrc.json ./
 
 COPY protos ./protos
+
+COPY libs/config ./libs/config
+COPY apps/auth ./apps/auth
+
 
 RUN pnpm run build
 

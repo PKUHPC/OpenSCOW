@@ -10,10 +10,10 @@ RUN pnpm fetch
 
 COPY package.json pnpm-workspace.yaml .npmrc ./
 
-COPY libs/config ./libs/config
-COPY libs/auth ./libs/auth
-COPY libs/decimal ./libs/decimal
-COPY apps/mis-server ./apps/mis-server
+COPY libs/config/package.json ./libs/config/
+COPY libs/auth/package.json ./libs/auth/
+COPY libs/decimal/package.json ./libs/decimal/
+COPY apps/mis-server/package.json ./apps/mis-server/
 
 # Must run twice
 # First run doesn't create node_modules on libs
@@ -24,7 +24,10 @@ COPY tsconfig.json .eslintrc.json ./
 
 COPY protos ./protos
 
-VOLUME [ "/root/.pkg-cache" ]
+COPY libs/config ./libs/config
+COPY libs/auth ./libs/auth
+COPY libs/decimal ./libs/decimal
+COPY apps/mis-server ./apps/mis-server
 
 RUN pnpm run build
 

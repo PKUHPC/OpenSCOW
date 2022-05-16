@@ -12,9 +12,9 @@ RUN apk add git
 
 COPY package.json pnpm-workspace.yaml .npmrc ./
 
-COPY libs/config ./libs/config
-COPY libs/decimal ./libs/decimal
-COPY apps/portal-web ./apps/portal-web
+COPY libs/config/package.json ./libs/config/
+COPY libs/decimal/package.json ./libs/decimal/
+COPY apps/portal-web/package.json ./apps/portal-web/
 
 # Must run twice
 # First run doesn't create node_modules on libs
@@ -24,6 +24,11 @@ RUN pnpm install --offline
 COPY tsconfig.json .eslintrc.json ./
 
 COPY protos ./protos
+
+COPY libs/config ./libs/config
+COPY libs/decimal ./libs/decimal
+COPY apps/portal-web ./apps/portal-web
+
 
 ARG BASE_PATH="/"
 ENV NEXT_PUBLIC_BASE_PATH=${BASE_PATH}

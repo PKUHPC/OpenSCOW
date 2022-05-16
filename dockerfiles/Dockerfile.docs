@@ -10,15 +10,19 @@ RUN pnpm fetch
 
 COPY package.json pnpm-workspace.yaml .npmrc ./
 
-COPY libs/config ./libs/config
-COPY docs ./docs
+COPY libs/config/package.json ./libs/config/
+COPY docs/package.json ./docs/
 
 # Must run twice
 # First run doesn't create node_modules on libs
 RUN pnpm install
 RUN pnpm install
 
+
 COPY tsconfig.json .eslintrc.json ./
+
+COPY libs/config ./libs/config
+COPY docs ./docs
 
 ARG BASE_PATH="/"
 ENV BASE_PATH=${BASE_PATH}
