@@ -419,28 +419,6 @@ importers:
       postcss: 8.4.13
       webpack: 5.72.1
 
-  apps/shell-server:
-    specifiers:
-      '@scow/config': workspace:*
-      '@scow/lib-auth': workspace:*
-      '@sinclair/typebox': ^0.23.5
-      fastify: ^3.29.0
-      fastify-graceful-shutdown: ^3.1.0
-      fastify-plugin: ^3.0.1
-      fastify-socket.io: ^3.0.0
-      node-pty: ^0.10.1
-      socket.io: ^4.4.0
-    dependencies:
-      '@scow/config': link:../../libs/config
-      '@scow/lib-auth': link:../../libs/auth
-      '@sinclair/typebox': 0.23.5
-      fastify: 3.29.0
-      fastify-graceful-shutdown: 3.1.0
-      fastify-plugin: 3.0.1
-      fastify-socket.io: 3.0.0_socket.io@4.5.0
-      node-pty: 0.10.1
-      socket.io: 4.5.0
-
   docs:
     specifiers:
       '@algolia/client-search': ^4.9.1
@@ -7345,15 +7323,6 @@ packages:
   /fastify-plugin/3.0.1:
     resolution: {integrity: sha512-qKcDXmuZadJqdTm6vlCqioEbyewF60b/0LOFCcYN1B6BIZGlYJumWWOYs70SFYLDAH4YqdE1cxH/RKMG7rFxgA==}
 
-  /fastify-socket.io/3.0.0_socket.io@4.5.0:
-    resolution: {integrity: sha512-rVNs6NPY6ZoUQFMxZCRQreQpNyNkyKXrTbzXXzw55/grEegTW0meKBI02JAyWd2/T+k7nKB+d/7aNhYlB/Q5Bg==}
-    peerDependencies:
-      socket.io: ^4.4.0
-    dependencies:
-      fastify-plugin: 3.0.1
-      socket.io: 4.5.0
-    dev: false
-
   /fastify/3.29.0:
     resolution: {integrity: sha512-zXSiDTdHJCHcmDrSje1f1RfzTmUTjMtHnPhh6cdokgfHhloQ+gy0Du+KlEjwTbcNC3Djj4GAsBzl6KvfI9Ah2g==}
     dependencies:
@@ -10225,13 +10194,6 @@ packages:
   /node-int64/0.4.0:
     resolution: {integrity: sha1-h6kGXNs1XTGC2PlM4RGIuCXGijs=}
     dev: true
-
-  /node-pty/0.10.1:
-    resolution: {integrity: sha512-JTdtUS0Im/yRsWJSx7yiW9rtpfmxqxolrtnyKwPLI+6XqTAPW/O2MjS8FYL4I5TsMbH2lVgDb2VMjp+9LoQGNg==}
-    requiresBuild: true
-    dependencies:
-      nan: 2.15.0
-    dev: false
 
   /node-pty/0.11.0-beta9:
     resolution: {integrity: sha512-bU/2zYV6xBMVMHaMe+yr4WEw36PCA0hyZ7A0IBQFWy5l1vjsD52sZ9sGJk+dH7bw3xpuBLHMh9Eq4Di8rJz4IQ==}
