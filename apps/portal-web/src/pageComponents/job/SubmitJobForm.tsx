@@ -33,11 +33,19 @@ export const SubmitJobForm: React.FC = ({}) => {
     setLoading(true);
 
     await api.submitJob({ body: { cluster: cluster.id, command, jobName } })
-      .httpError(409, ({ output }) => {
-        Modal.error({
-          title: "提交作业失败",
-          content: output,
-        });
+      .httpError(409, (e) => {
+        const { result, message: serverMessage  } = e;
+        if (result === "ALREADY_EXISTS") {
+          message.error("作业名已经存在。正在生成新作业名");
+          reloadJobName();
+        } else if (result === "SBATCH_FAILED") {
+          Modal.error({
+            title: "提交作业失败",
+            content: serverMessage,
+          });
+        } else {
+          throw e;
+        }
       })
       .then(({ jobId }) => {
         message.success("提交成功！您的新作业ID为：" + jobId);

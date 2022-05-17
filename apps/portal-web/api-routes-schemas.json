@@ -253,12 +253,20 @@
             "409": {
               "type": "object",
               "properties": {
-                "output": {
+                "result": {
+                  "type": "string",
+                  "enum": [
+                    "SBATCH_FAILED",
+                    "ALREADY_EXISTS"
+                  ]
+                },
+                "message": {
                   "type": "string"
                 }
               },
               "required": [
-                "output"
+                "result",
+                "message"
               ],
               "additionalProperties": false
             }

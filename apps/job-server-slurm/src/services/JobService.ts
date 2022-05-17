@@ -32,16 +32,23 @@ export const jobServiceServer = plugin((server) => {
         const jobScriptName = "job.sh";
         const dir = `jobs/${jobName}`;
         const scriptPath = join(dir, jobScriptName);
-        const rootSFTP = await ssh.requestSFTP();
+        const sftp = await ssh.requestSFTP();
 
-        await ssh.mkdir(dir, undefined, rootSFTP);
+        await new Promise<void>((res, rej) => {
+          sftp.exists(dir, (err) => {
+            if (err) { res(); }
+            rej(<ServiceError>{ code: status.ALREADY_EXISTS, message: `dir ${dir} already exists` });
+          });
+        });
+
+        await ssh.mkdir(dir, undefined, sftp);
 
         // create a tmp file and send the file into the cluster
         await withTmpFile(async ({ path, fd }) => { // write the command into the tmp file
           await fd.writeFile(command);
 
           // send the file into the dir
-          await ssh.putFile(path, scriptPath, rootSFTP);
+          await ssh.putFile(path, scriptPath, sftp);
         });
 
         // use sbatch to allocate the script

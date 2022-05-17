@@ -19,6 +19,7 @@ message SubmitJobRequest {
 }
 
 // UNAVAILABLE: if sbatch fails, the details is the stderr
+// ALREADY_EXISTS: the job name already exists
 message SubmitJobReply { uint64 job_id = 1; }
 
 service JobService {

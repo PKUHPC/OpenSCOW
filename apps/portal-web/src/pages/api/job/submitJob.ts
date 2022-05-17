@@ -23,9 +23,10 @@ export interface SubmitJobSchema {
     }
 
     409: {
-      output: string;
+      result: "SBATCH_FAILED" | "ALREADY_EXISTS";
+      message: string;
     }
-  }
+   }
 }
 
 const auth = authenticate(() => true);
@@ -49,7 +50,11 @@ export default route<SubmitJobSchema>("SubmitJobSchema", async (req, res) => {
     .then(({ jobId }) => ({ 201: { jobId } }))
     .catch((e) => {
       if (e.code === status.UNAVAILABLE) {
-        return { 409: { output: e.details } };
-      } else { throw e;}
+        return { 409: { result: "SBATCH_FAILED", message: e.details } } as const;
+      } else if (e.code === status.ALREADY_EXISTS) {
+        return { 409: { result: "ALREADY_EXISTS", message: e.message } } as const;
+      } else {
+        throw e;
+      }
     });
 });
