@@ -18,5 +18,8 @@ export async function withTmpFile<T>(fn: (args: {path: string, fd: FileHandle}) 
 
   const fd = await fs.promises.open(filePath, "w+");
 
-  return fn({ path: filePath, fd }).finally(() => fd.close());
+  return fn({ path: filePath, fd }).finally(async () => {
+    await fd.close();
+    await fs.promises.rm(filePath, { force: true });
+  });
 }
