@@ -12,7 +12,6 @@
           "normal",
           "high"
         ],
-        "unit": "cpusAlloc",
         "comment": "说明"
       },
       "GPU": {
@@ -23,9 +22,33 @@
         "qos": [
           "low",
           "normal",
-          "high"
+          "high",
+          "highest"
         ],
-        "unit": "gpu",
+        "comment": "说明"
+      }
+    }
+  },
+  "hpc02": {
+    "displayName": "hpc02Name",
+    "partitions": {
+      "GPU": {
+        "nodes": 2,
+        "mem": 262144,
+        "cores": 29,
+        "gpus": 8,
+        "qos": [
+          "normal",
+          "high",
+          "highest"
+        ],
+        "comment": "说明"
+      },
+      "another": {
+        "nodes": 2,
+        "mem": 262144,
+        "cores": 29,
+        "gpus": 8,
         "comment": "说明"
       }
     }

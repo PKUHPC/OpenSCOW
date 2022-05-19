@@ -42,6 +42,8 @@ export interface PublicRuntimeConfig {
 
   DEFAULT_HOME_TITLE: string;
   HOME_TITLES: {[hostname: string]: string };
+
+  CLUSTERS_CONFIG: Clusters;
 }
 
 export const runtimeConfig: ServerRuntimeConfig = getConfig().serverRuntimeConfig;

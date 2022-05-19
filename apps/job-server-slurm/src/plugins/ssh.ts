@@ -20,6 +20,8 @@ export async function loggedExec(ssh: NodeSSH, logger: Logger, throwIfFailed: bo
         message: "Command execution failed.",
       };
     }
+  } else {
+    logger.debug("Command %o completed. stdout %s, stderr %s", [cmd, ...parameters], resp.stdout, resp.stderr);
   }
   return resp;
 }
@@ -33,7 +35,7 @@ export const sshPlugin = plugin(async (s) => {
       const ssh = new NodeSSH();
 
       await ssh.connect({ host: addr, username, privateKey: config.SSH_PRIVATE_KEY_PATH });
-      logger.info("Connected to addr as %s", addr, username);
+      logger.info("Connected to %s as %s", addr, username);
 
       const value = await run(ssh, addr).finally(() => {
         ssh.dispose();

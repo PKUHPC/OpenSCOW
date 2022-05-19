@@ -15,14 +15,38 @@ message SubmitJobRequest {
   string cluster = 1;
   string user_id = 2;
   string job_name = 3;
-  string command = 4;
+  string script = 4;
 }
 
 // UNAVAILABLE: if sbatch fails, the details is the stderr
 // ALREADY_EXISTS: the job name already exists
 message SubmitJobReply { uint64 job_id = 1; }
 
+message GenerateJobScriptRequest {
+  string job_name = 1;
+  string account = 2;
+  optional string partition = 3;
+  optional string qos = 4;
+  uint32 node_count = 5;
+  uint32 core_count = 6;
+  // in minutes
+  uint32 max_time = 7;
+  string command = 8;
+}
+
+message GenerateJobScriptReply { string script = 1; }
+
+message GetAccountsRequest {
+  string cluster = 1;
+  string user_id = 2;
+}
+
+message GetAccountsReply { repeated string accounts = 1; }
+
 service JobService {
   rpc GetRunningJobs(GetRunningJobsRequest) returns (GetRunningJobsReply);
+  rpc GetAccounts(GetAccountsRequest) returns (GetAccountsReply);
+  rpc GenerateJobScript(GenerateJobScriptRequest)
+      returns (GenerateJobScriptReply);
   rpc SubmitJob(SubmitJobRequest) returns (SubmitJobReply);
 }

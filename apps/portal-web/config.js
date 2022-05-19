@@ -103,6 +103,8 @@ const publicRuntimeConfig = {
   HOME_TEXTS: parseKeyValue(config.HOME_TEXTS),
   DEFAULT_HOME_TITLE: config.DEFAULT_HOME_TITLE,
   HOME_TITLES: parseKeyValue(config.HOME_TITLES),
+
+  CLUSTERS_CONFIG: clusters,
 }
 
 if (!building) {

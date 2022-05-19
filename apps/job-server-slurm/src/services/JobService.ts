@@ -14,14 +14,58 @@ export function parseSbatchOutput(output: string): number {
   return +splitted[splitted.length-1];
 }
 
-
-
 export const jobServiceServer = plugin((server) => {
 
   server.addService<JobServiceServer>(JobServiceService, {
 
+    getAccounts: async ({ request, logger }) => {
+      const { cluster, userId }  = request;
+
+      const node = clustersConfig[cluster].loginNodes[0];
+      const accounts = await server.ext.connect(node, userId, logger, async (ssh) => {
+        const { stdout } = await loggedExec(ssh, logger, true,
+          "sacctmgr", ["show", "ass", `user=${userId}`, "format=account%20"]);
+
+        /**
+          Account
+      --------------------
+      {account1}
+      {account2}
+         */
+
+        const accounts = stdout.split("\n").slice(2).map((x) => x.trim());
+
+        return accounts;
+      });
+
+      return [{ accounts }];
+    },
+
+    generateJobScript: async ({ request }) => {
+      const { jobName, account, coreCount, maxTime, nodeCount, partition, qos, command } = request;
+
+      let script = "#!/bin/bash\n";
+
+      function append(param: string) {
+        script += "#SBATCH " + param + "\n";
+      }
+
+      append("-A " + account);
+      append("--partition=" + partition);
+      append("--qos=" + qos);
+      append("-J " + jobName);
+      append("--nodes=" + nodeCount);
+      append("-c " + coreCount);
+      append("--time=" + maxTime);
+
+      script += "\n";
+      script += command;
+
+      return [{ script }];
+    },
+
     submitJob: async ({ request, logger }) => {
-      const { cluster, command, jobName, userId } = request;
+      const { cluster, script, jobName, userId } = request;
 
       checkClusterExistence(cluster);
 
@@ -34,18 +78,29 @@ export const jobServiceServer = plugin((server) => {
         const scriptPath = join(dir, jobScriptName);
         const sftp = await ssh.requestSFTP();
 
-        await new Promise<void>((res, rej) => {
-          sftp.exists(dir, (err) => {
-            if (err) { res(); }
-            rej(<ServiceError>{ code: status.ALREADY_EXISTS, message: `dir ${dir} already exists` });
-          });
-        });
+        // Why not ssh.mkdir? Reports error if exists.
 
-        await ssh.mkdir(dir, undefined, sftp);
+        const resp = await loggedExec(ssh, logger, false, "mkdir", [dir]);
+
+        if (resp.code !== 0) {
+          if (resp.stderr.includes("File exists")) {
+            throw <ServiceError> {
+              code: status.ALREADY_EXISTS,
+              message: `dir ${dir} already exists.`,
+            };
+          } else {
+            logger.error("mkdir %s failed. stdout %s, stderr %s", dir, resp.stdout, resp.stderr);
+            throw <ServiceError> {
+              code: status.INTERNAL,
+              message: "error when mkdir job",
+            };
+          }
+        }
 
         // create a tmp file and send the file into the cluster
         await withTmpFile(async ({ path, fd }) => { // write the command into the tmp file
-          await fd.writeFile(command);
+
+          await fd.writeFile(script);
 
           // send the file into the dir
           await ssh.putFile(path, scriptPath, sftp);

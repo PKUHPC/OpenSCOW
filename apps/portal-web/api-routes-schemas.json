@@ -199,31 +199,66 @@
       "$id": "GetIconSchema",
       "title": "GetIconSchema"
     },
-    "GetLogoSchema": {
+    "GetRunningJobsSchema": {
       "type": "object",
       "properties": {
         "method": {
           "type": "string",
           "const": "GET"
         },
+        "query": {
+          "type": "object",
+          "properties": {
+            "userId": {
+              "type": "string"
+            },
+            "cluster": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "userId",
+            "cluster"
+          ],
+          "additionalProperties": false
+        },
         "responses": {
           "type": "object",
           "properties": {
-            "200": {}
+            "200": {
+              "type": "object",
+              "properties": {
+                "results": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "RunningJob#"
+                  }
+                }
+              },
+              "required": [
+                "results"
+              ],
+              "additionalProperties": false
+            },
+            "403": {
+              "type": "null"
+            }
           },
           "required": [
-            "200"
+            "200",
+            "403"
           ],
           "additionalProperties": false
         }
       },
       "required": [
         "method",
+        "query",
         "responses"
       ],
       "additionalProperties": false,
-      "$id": "GetLogoSchema",
-      "title": "GetLogoSchema"
+      "$id": "GetRunningJobsSchema",
+      "title": "GetRunningJobsSchema"
     },
     "SubmitJobSchema": {
       "type": "object",
@@ -250,10 +285,22 @@
               ],
               "additionalProperties": false
             },
+            "400": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "message"
+              ],
+              "additionalProperties": false
+            },
             "409": {
               "type": "object",
               "properties": {
-                "result": {
+                "code": {
                   "type": "string",
                   "enum": [
                     "SBATCH_FAILED",
@@ -265,7 +312,7 @@
                 }
               },
               "required": [
-                "result",
+                "code",
                 "message"
               ],
               "additionalProperties": false
@@ -273,6 +320,7 @@
           },
           "required": [
             "201",
+            "400",
             "409"
           ],
           "additionalProperties": false
@@ -286,6 +334,32 @@
       "additionalProperties": false,
       "$id": "SubmitJobSchema",
       "title": "SubmitJobSchema"
+    },
+    "GetLogoSchema": {
+      "type": "object",
+      "properties": {
+        "method": {
+          "type": "string",
+          "const": "GET"
+        },
+        "responses": {
+          "type": "object",
+          "properties": {
+            "200": {}
+          },
+          "required": [
+            "200"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "method",
+        "responses"
+      ],
+      "additionalProperties": false,
+      "$id": "GetLogoSchema",
+      "title": "GetLogoSchema"
     },
     "ChangePasswordSchema": {
       "type": "object",
@@ -406,7 +480,7 @@
       "$id": "LaunchDesktopSchema",
       "title": "LaunchDesktopSchema"
     },
-    "GetRunningJobsSchema": {
+    "GetAccountsSchema": {
       "type": "object",
       "properties": {
         "method": {
@@ -416,15 +490,11 @@
         "query": {
           "type": "object",
           "properties": {
-            "userId": {
-              "type": "string"
-            },
             "cluster": {
               "type": "string"
             }
           },
           "required": [
-            "userId",
             "cluster"
           ],
           "additionalProperties": false
@@ -435,25 +505,21 @@
             "200": {
               "type": "object",
               "properties": {
-                "results": {
+                "accounts": {
                   "type": "array",
                   "items": {
-                    "$ref": "RunningJob#"
+                    "type": "string"
                   }
                 }
               },
               "required": [
-                "results"
+                "accounts"
               ],
               "additionalProperties": false
-            },
-            "403": {
-              "type": "null"
             }
           },
           "required": [
-            "200",
-            "403"
+            "200"
           ],
           "additionalProperties": false
         }
@@ -464,8 +530,8 @@
         "responses"
       ],
       "additionalProperties": false,
-      "$id": "GetRunningJobsSchema",
-      "title": "GetRunningJobsSchema"
+      "$id": "GetAccountsSchema",
+      "title": "GetAccountsSchema"
     }
   },
   "models": {
@@ -482,28 +548,6 @@
       "additionalProperties": false,
       "$id": "UserInfo",
       "title": "UserInfo"
-    },
-    "SubmitJobInfo": {
-      "type": "object",
-      "properties": {
-        "cluster": {
-          "type": "string"
-        },
-        "command": {
-          "type": "string"
-        },
-        "jobName": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "cluster",
-        "command",
-        "jobName"
-      ],
-      "additionalProperties": false,
-      "$id": "SubmitJobInfo",
-      "title": "SubmitJobInfo"
     },
     "RunningJob": {
       "type": "object",
@@ -571,6 +615,50 @@
       "additionalProperties": false,
       "$id": "RunningJob",
       "title": "RunningJob"
+    },
+    "SubmitJobInfo": {
+      "type": "object",
+      "properties": {
+        "cluster": {
+          "type": "string"
+        },
+        "partition": {
+          "type": "string"
+        },
+        "nodeCount": {
+          "type": "number"
+        },
+        "coreCount": {
+          "type": "number"
+        },
+        "command": {
+          "type": "string"
+        },
+        "jobName": {
+          "type": "string"
+        },
+        "qos": {
+          "type": "string"
+        },
+        "maxTime": {
+          "type": "number"
+        },
+        "account": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "cluster",
+        "nodeCount",
+        "coreCount",
+        "command",
+        "jobName",
+        "maxTime",
+        "account"
+      ],
+      "additionalProperties": false,
+      "$id": "SubmitJobInfo",
+      "title": "SubmitJobInfo"
     }
   }
 }

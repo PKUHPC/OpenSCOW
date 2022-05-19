@@ -4,3 +4,4 @@ nginx/
 node_modules/
 .env
 .next/
+public/vnc/
