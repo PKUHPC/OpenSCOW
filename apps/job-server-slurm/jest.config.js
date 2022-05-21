@@ -16,7 +16,7 @@ module.exports = {
   testMatch: [
     "<rootDir>/tests/**/*.test.ts?(x)",
   ],
-  coverageDirectory: `coverage/${process.env.NODE_ENV}`,
+  coverageDirectory: `coverage`,
   testTimeout: 30000,
   coverageReporters: ["lcov"],
   setupFilesAfterEnv: ["jest-extended/all"],

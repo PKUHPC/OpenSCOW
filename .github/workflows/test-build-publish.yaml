@@ -49,7 +49,7 @@ jobs:
       - name: Upload test converage
         uses: codecov/codecov-action@v2
         with:
-          files: ./libs/auth/coverage/test/lcov.info,./libs/config/coverage/test/lcov.info,./libs/decimal/coverage/test/lcov.info,./apps/file-server/coverage/test/lcov.info,./apps/auth/coverage/test/lcov.info,./apps/job-server-slurm/coverage/test/lcov.info,./apps/mis-server/coverage/test/lcov.info
+          files: ./libs/auth/coverage/lcov.info,./libs/config/coverage/lcov.info,./libs/decimal/coverage/lcov.info,./apps/file-server/coverage/lcov.info,./apps/auth/coverage/lcov.info,./apps/job-server-slurm/coverage/lcov.info,./apps/mis-server/coverage/lcov.info
 
   build-file-server:
     needs: test
