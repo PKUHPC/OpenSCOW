@@ -1,5 +1,5 @@
 import { Server } from "@ddadaal/tsgrpc-server";
-import { config } from "src/config";
+import { config } from "src/config/env";
 import { plugins } from "src/plugins";
 import { accountServiceServer } from "src/services/account";
 import { adminServiceServer } from "src/services/admin";

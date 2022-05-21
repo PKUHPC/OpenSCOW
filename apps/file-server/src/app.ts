@@ -2,7 +2,7 @@ import createError from "@fastify/error";
 import { omitConfigSpec } from "@scow/config";
 import fastify, { FastifyInstance, FastifyPluginAsync, FastifyPluginCallback } from "fastify";
 import gracefulShutdown from "fastify-graceful-shutdown";
-import { config } from "src/config";
+import { config } from "src/config/env";
 import { plugins } from "src/plugins";
 import { routes }  from "src/routes";
 

@@ -1,6 +1,6 @@
 import { FastifyLoggerInstance } from "fastify";
 import ldapjs from "ldapjs";
-import { config } from "src/config";
+import { config } from "src/config/env";
 import { promisify } from "util";
 
 export const useLdap = (

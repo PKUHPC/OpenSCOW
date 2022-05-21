@@ -49,7 +49,7 @@ export function getDocFromSpec(spec: Record<string, Validator<any>>) {
   return docs;
 }
 
-export function genConfigTable(pack: string, configFile = "src/config") {
+export function genConfigTable(pack: string, configFile = "src/config/env") {
   const appPath = resolve(join("../apps", pack));
   dotenv.config({ path: join(appPath, "env/.env.dev" ) });
 

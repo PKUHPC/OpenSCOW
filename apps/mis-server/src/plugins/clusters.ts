@@ -2,7 +2,7 @@ import { createReqIdGen, Logger, plugin } from "@ddadaal/tsgrpc-server";
 import { asyncClientCall } from "@ddadaal/tsgrpc-utils";
 import { ChannelCredentials, Client, ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
-import { config } from "src/config";
+import { config } from "src/config/env";
 
 type ClientConstructor<TClient> =
   new (address: string, credentials: ChannelCredentials) => TClient;

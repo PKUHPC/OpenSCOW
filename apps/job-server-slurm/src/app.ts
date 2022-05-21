@@ -1,6 +1,6 @@
 import { Server } from "@ddadaal/tsgrpc-server";
 import { omitConfigSpec } from "@scow/config";
-import { config } from "src/config";
+import { config } from "src/config/env";
 import { plugins } from "src/plugins";
 import { jobServiceServer } from "src/services/JobService";
 import { vncServiceServer } from "src/services/VncService";

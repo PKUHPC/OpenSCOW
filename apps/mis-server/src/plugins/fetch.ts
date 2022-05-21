@@ -1,6 +1,6 @@
 import { plugin } from "@ddadaal/tsgrpc-server";
 import cron from "node-cron";
-import { config } from "src/config";
+import { config } from "src/config/env";
 import { fetchJobs } from "src/tasks/fetch";
 
 export interface FetchPlugin {

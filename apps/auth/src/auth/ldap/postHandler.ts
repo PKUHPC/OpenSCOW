@@ -5,7 +5,7 @@ import ldapjs from "ldapjs";
 import { cacheInfo } from "src/auth/cacheInfo";
 import { findUser, useLdap } from "src/auth/ldap/helpers";
 import { serveLoginHtml } from "src/auth/ldap/loginHtml";
-import { config } from "src/config";
+import { config } from "src/config/env";
 import { redirectToWeb } from "src/routes/callback";
 
 export function registerPostHandler(f: FastifyInstance) {

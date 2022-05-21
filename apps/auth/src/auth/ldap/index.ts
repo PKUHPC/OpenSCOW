@@ -6,7 +6,7 @@ import { extractUserInfoFromEntry, findUser, searchOne, useLdap } from "src/auth
 import { serveLoginHtml } from "src/auth/ldap/loginHtml";
 import { modifyPassword, modifyPasswordAsSelf } from "src/auth/ldap/password";
 import { registerPostHandler } from "src/auth/ldap/postHandler";
-import { config } from "src/config";
+import { config } from "src/config/env";
 import { promisify } from "util";
 
 const addAttributes = parseKeyValue(config.LDAP_ADD_ATTRS);

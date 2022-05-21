@@ -1,6 +1,6 @@
 import { Static, Type } from "@sinclair/typebox";
 import fp from "fastify-plugin";
-import { AUTH_REDIRECT_URL } from "src/config";
+import { AUTH_REDIRECT_URL } from "src/config/env";
 
 const QuerystringSchema = Type.Object({
   callbackUrl: Type.Optional(Type.String()),

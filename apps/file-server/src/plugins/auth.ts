@@ -2,7 +2,7 @@ import cookie from "@fastify/cookie";
 import { parsePlaceholder } from "@scow/config";
 import { validateToken } from "@scow/lib-auth";
 import fp from "fastify-plugin";
-import { config, TOKEN_COOKIE_HEADER } from "src/config";
+import { config, TOKEN_COOKIE_HEADER } from "src/config/env";
 
 export interface UserInfo {
   identityId: string;

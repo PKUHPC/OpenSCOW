@@ -3,7 +3,7 @@ import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { parseArray } from "@scow/config";
 import { NodeSSH, SSHExecCommandResponse } from "node-ssh";
-import { config } from "src/config";
+import { config } from "src/config/env";
 
 export interface SlurmPlugin {
   executeSlurmScript: (cmds: string[]) => Promise<SSHExecCommandResponse>;

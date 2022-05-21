@@ -2,7 +2,7 @@ import { FastifyInstance } from "fastify";
 import { NoSuchObjectError } from "ldapjs";
 import { buildApp } from "src/app";
 import { findUser, useLdap } from "src/auth/ldap/helpers";
-import { config } from "src/config";
+import { config } from "src/config/env";
 
 let server: FastifyInstance;
 

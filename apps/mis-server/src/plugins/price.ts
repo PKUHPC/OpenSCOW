@@ -1,8 +1,8 @@
 import { Logger, plugin } from "@ddadaal/tsgrpc-server";
 import { MySqlDriver, SqlEntityManager } from "@mikro-orm/mysql";
 import { Decimal } from "@scow/lib-decimal";
+import { clusters } from "src/config/clusters";
 import { AmountStrategy, JobPriceItem } from "src/entities/JobPriceItem";
-import { clusters } from "src/utils/clusterSpecs";
 import { DEFAULT_TENANT_NAME, UNKNOWN_PRICE_ITEM } from "src/utils/constants";
 
 export interface JobInfo {

@@ -1,6 +1,6 @@
 import { randomUUID } from "crypto";
 import { FastifyRequest } from "fastify";
-import { config } from "src/config";
+import { config } from "src/config/env";
 
 const testUsers: Record<string, string> = config.TEST_USERS.split(",").reduce((prev, curr) => {
   const [from, to] = curr.split("=");

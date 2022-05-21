@@ -1,6 +1,6 @@
 import swagger from "@fastify/swagger";
 import fp from "fastify-plugin";
-import { TOKEN_COOKIE_HEADER } from "src/config";
+import { TOKEN_COOKIE_HEADER } from "src/config/env";
 
 export const swaggerPlugin = fp(async (f) => {
   f.register(swagger, {

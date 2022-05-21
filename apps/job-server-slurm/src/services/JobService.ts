@@ -1,11 +1,11 @@
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError, status } from "@grpc/grpc-js";
 import { join } from "path";
-import { config } from "src/config";
+import { checkClusterExistence, clustersConfig } from "src/config/clusters";
+import { config } from "src/config/env";
 import { RunningJob } from "src/generated/common/job";
 import { JobServiceServer, JobServiceService } from "src/generated/portal/job";
 import { loggedExec } from "src/plugins/ssh";
-import { checkClusterExistence, clustersConfig } from "src/utils/clusters";
 import { withTmpFile } from "src/utils/tmp";
 
 export function parseSbatchOutput(output: string): number {

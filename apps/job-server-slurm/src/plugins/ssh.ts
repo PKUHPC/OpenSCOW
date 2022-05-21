@@ -2,7 +2,7 @@ import { Logger, plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { NodeSSH, SSHExecOptions } from "node-ssh";
-import { config } from "src/config";
+import { config } from "src/config/env";
 
 export interface SshPlugin {
   connect: <T>(addr: string, username: string, logger: Logger,

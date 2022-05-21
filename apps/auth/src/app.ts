@@ -2,8 +2,8 @@ import createError from "@fastify/error";
 import { omitConfigSpec } from "@scow/config";
 import fastify, { FastifyInstance, FastifyPluginAsync, FastifyPluginCallback } from "fastify";
 import gracefulShutdown from "fastify-graceful-shutdown";
+import { config } from "src/config/env";
 
-import { config } from "./config";
 import { plugins } from "./plugins";
 import { routes }  from "./routes";
 

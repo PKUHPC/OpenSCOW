@@ -2,10 +2,10 @@ import { Logger, plugin } from "@ddadaal/tsgrpc-server";
 import { clustersConfig } from "@scow/config/build/appConfig/clusters";
 import { NodeSSH } from "node-ssh";
 import path from "path";
-import { config } from "src/config";
+import { checkClusterExistence } from "src/config/clusters";
+import { config } from "src/config/env";
 import { VncServiceServer, VncServiceService } from "src/generated/portal/vnc";
 import { loggedExec } from "src/plugins/ssh";
-import { checkClusterExistence } from "src/utils/clusters";
 import { displayIdToPort } from "src/utils/port";
 
 

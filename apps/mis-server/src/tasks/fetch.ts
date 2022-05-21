@@ -5,7 +5,7 @@ import { MikroORM, QueryOrder } from "@mikro-orm/core";
 import { MariaDbDriver } from "@mikro-orm/mariadb";
 import { SqlEntityManager } from "@mikro-orm/mysql";
 import { charge } from "src/bl/charging";
-import { config } from "src/config";
+import { config } from "src/config/env";
 import { Account } from "src/entities/Account";
 import { JobInfo } from "src/entities/JobInfo";
 import { OriginalJob } from "src/entities/OriginalJob";

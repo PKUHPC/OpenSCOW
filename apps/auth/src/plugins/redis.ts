@@ -1,6 +1,6 @@
 import fp from "fastify-plugin";
 import Redis from "ioredis";
-import { config } from "src/config";
+import { config } from "src/config/env";
 
 export interface UserInfo {
   identityId: string;

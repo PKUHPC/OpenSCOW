@@ -1,7 +1,7 @@
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { MikroORM, Options } from "@mikro-orm/core";
 import { MySqlDriver } from "@mikro-orm/mysql";
-import { config } from "src/config";
+import { config } from "src/config/env";
 
 import { entities } from "../entities";
 

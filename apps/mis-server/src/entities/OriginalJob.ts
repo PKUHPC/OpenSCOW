@@ -1,5 +1,5 @@
 import { Entity, Index, PrimaryKey, Property } from "@mikro-orm/core";
-import { config } from "src/config";
+import { config } from "src/config/env";
 
 @Entity({ tableName: config.FETCH_JOBS_DB_TABLE_NAME })
 export class OriginalJob {

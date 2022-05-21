@@ -1,6 +1,6 @@
 import { Static, Type } from "@sinclair/typebox";
 import fp from "fastify-plugin";
-import { config } from "src/config";
+import { config } from "src/config/env";
 
 const QuerystringSchema = Type.Object({
   token: Type.String(),

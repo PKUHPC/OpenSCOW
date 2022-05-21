@@ -1,5 +1,5 @@
 import { FastifyReply, FastifyRequest } from "fastify";
-import { AUTH_EXTERNAL_URL, FAVICON_URL, FOOTER_TEXTS } from "src/config";
+import { AUTH_EXTERNAL_URL, FAVICON_URL, FOOTER_TEXTS } from "src/config/env";
 
 function parseHostname(req: FastifyRequest): string | undefined {
 

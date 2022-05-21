@@ -199,6 +199,32 @@
       "$id": "GetIconSchema",
       "title": "GetIconSchema"
     },
+    "GetLogoSchema": {
+      "type": "object",
+      "properties": {
+        "method": {
+          "type": "string",
+          "const": "GET"
+        },
+        "responses": {
+          "type": "object",
+          "properties": {
+            "200": {}
+          },
+          "required": [
+            "200"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "method",
+        "responses"
+      ],
+      "additionalProperties": false,
+      "$id": "GetLogoSchema",
+      "title": "GetLogoSchema"
+    },
     "GetRunningJobsSchema": {
       "type": "object",
       "properties": {
@@ -334,32 +360,6 @@
       "additionalProperties": false,
       "$id": "SubmitJobSchema",
       "title": "SubmitJobSchema"
-    },
-    "GetLogoSchema": {
-      "type": "object",
-      "properties": {
-        "method": {
-          "type": "string",
-          "const": "GET"
-        },
-        "responses": {
-          "type": "object",
-          "properties": {
-            "200": {}
-          },
-          "required": [
-            "200"
-          ],
-          "additionalProperties": false
-        }
-      },
-      "required": [
-        "method",
-        "responses"
-      ],
-      "additionalProperties": false,
-      "$id": "GetLogoSchema",
-      "title": "GetLogoSchema"
     },
     "ChangePasswordSchema": {
       "type": "object",

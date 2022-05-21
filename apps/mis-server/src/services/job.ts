@@ -6,7 +6,7 @@ import { FilterQuery, QueryOrder } from "@mikro-orm/core";
 import { MySqlDriver, SqlEntityManager } from "@mikro-orm/mysql";
 import { Decimal, decimalToMoney, moneyToNumber } from "@scow/lib-decimal";
 import { charge, pay } from "src/bl/charging";
-import { config } from "src/config";
+import { config } from "src/config/env";
 import { Account } from "src/entities/Account";
 import { JobInfo as JobInfoEntity } from "src/entities/JobInfo";
 import { JobPriceChange } from "src/entities/JobPriceChange";
