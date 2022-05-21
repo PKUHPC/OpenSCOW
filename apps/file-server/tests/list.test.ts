@@ -1,6 +1,6 @@
 import { FastifyInstance } from "fastify";
 import { buildApp } from "src/app";
-import { TOKEN_COOKIE_HEADER } from "src/config";
+import { TOKEN_COOKIE_HEADER } from "src/config/env";
 import { Responses } from "src/routes/list";
 import { actualPath, createTestItems, removeGracefulShutdown, removeTestItems, TOKEN } from "tests/utils";
 

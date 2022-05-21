@@ -1,7 +1,7 @@
 import { randomUUID } from "crypto";
 import { FastifyInstance } from "fastify";
 import { buildApp } from "src/app";
-import { TOKEN_COOKIE_HEADER } from "src/config";
+import { TOKEN_COOKIE_HEADER } from "src/config/env";
 import { actualPath,createTestItems, removeGracefulShutdown, removeTestItems } from "tests/utils";
 
 let server: FastifyInstance;

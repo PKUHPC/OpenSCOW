@@ -1,7 +1,7 @@
 import { FastifyInstance } from "fastify";
 import fs from "fs";
 import { buildApp } from "src/app";
-import { TOKEN_COOKIE_HEADER } from "src/config";
+import { TOKEN_COOKIE_HEADER } from "src/config/env";
 import { actualPath, createTestItems, removeGracefulShutdown, removeTestItems, TOKEN } from "tests/utils";
 
 let server: FastifyInstance;

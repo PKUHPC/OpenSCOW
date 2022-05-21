@@ -2,7 +2,7 @@ import { FastifyInstance } from "fastify";
 import fs from "fs";
 import { join } from "path";
 import { buildApp } from "src/app";
-import { TOKEN_COOKIE_HEADER } from "src/config";
+import { TOKEN_COOKIE_HEADER } from "src/config/env";
 import { actualPath, createFile, createTestItems, removeGracefulShutdown,
   removeTestItems, TOKEN } from "tests/utils";
 
