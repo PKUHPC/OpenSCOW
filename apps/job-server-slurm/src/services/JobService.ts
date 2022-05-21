@@ -1,11 +1,11 @@
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError, status } from "@grpc/grpc-js";
 import { join } from "path";
-import { clustersConfig } from "src/config";
+import { config } from "src/config";
 import { RunningJob } from "src/generated/common/job";
 import { JobServiceServer, JobServiceService } from "src/generated/portal/job";
 import { loggedExec } from "src/plugins/ssh";
-import { checkClusterExistence } from "src/utils/check";
+import { checkClusterExistence, clustersConfig } from "src/utils/clusters";
 import { withTmpFile } from "src/utils/tmp";
 
 export function parseSbatchOutput(output: string): number {
@@ -74,7 +74,7 @@ export const jobServiceServer = plugin((server) => {
       return await server.ext.connect(node, userId, logger, async (ssh) => {
         // create a dir named job name
         const jobScriptName = "job.sh";
-        const dir = `jobs/${jobName}`;
+        const dir = join(config.JOBS_DIR, jobName);
         const scriptPath = join(dir, jobScriptName);
         const sftp = await ssh.requestSFTP();
 

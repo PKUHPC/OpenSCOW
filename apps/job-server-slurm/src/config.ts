@@ -1,5 +1,4 @@
-import { bool, envConfig, getConfigFromFile, host, port, str } from "@scow/config";
-import { clustersConfig as clustersConfigInfo } from "@scow/config/build/appConfig/clusters";
+import { bool, envConfig, host, port, str } from "@scow/config";
 import { homedir } from "os";
 import path from "path";
 
@@ -16,7 +15,8 @@ export const config = envConfig({
 
   SSH_PRIVATE_KEY_PATH: str({ desc: "SSH私钥目录", default: path.join(homedir(), ".ssh", "id_rsa") }),
 
+  JOBS_DIR: str({ desc: "存放作业脚本以及相关内容的父目录，相对于用户的家目录", default: "jobs" }),
+
 });
 
-export const clustersConfig = getConfigFromFile(clustersConfigInfo.schema, clustersConfigInfo.name, false);
 
