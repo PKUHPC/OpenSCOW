@@ -36,28 +36,28 @@ afterEach(() => {
   fs.rmSync(folderPath, { recursive: true });
 });
 
-function runTest(createdFiles: Ext[], expectedLoaded: Ext | undefined) {
+function runTest(createdFiles: readonly Ext[], expectedLoaded: Ext | undefined) {
   createdFiles.forEach(createConfig);
 
-  const obj = getConfigFromFile(Schema, configName, false, folderPath);
+  const mustExists = expectedLoaded !== undefined;
+  // @ts-ignore
+  const obj = getConfigFromFile(Schema, configName, !mustExists, folderPath);
 
-  if (expectedLoaded) {
-    expect(obj.loaded).toBe(expectedLoaded);
+  if (mustExists) {
+    expect(obj?.loaded).toBe(expectedLoaded);
   }
 }
 
-function defineTest(createdFiles: Ext[], expectedLoaded: Ext) {
+it.each([
+  [["yml"], "yml"],
+  [["yaml"], "yaml"],
+  [["json"], "json"],
+  [["yml", "yaml"], "yml"],
+  [["yaml", "json"], "yaml"],
+] as const)("creates %o, should load %o", async (createdExts: readonly Ext[], expectedLoaded: Ext) => {
+  runTest(createdExts, expectedLoaded);
+});
 
-  it(`create ${createdFiles.join(", ")} and should load ${expectedLoaded}`, () => {
-    runTest(createdFiles, expectedLoaded);
-  });
-}
-
-defineTest(["yml"], "yml");
-defineTest(["yaml"], "yaml");
-defineTest(["json"], "json");
-defineTest(["yml", "yaml"], "yml");
-defineTest(["yaml", "json"], "yaml");
 
 it("reports error if config not exist", async () => {
   expect(() => runTest([], "yml")).toThrow();
