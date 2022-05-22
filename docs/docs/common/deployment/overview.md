@@ -20,25 +20,26 @@ title: 简介
     - [docker compose](https://docs.docker.com/compose/install/)
     - [volta](https://volta.sh/)：管理node环境
     - [pnpm](https://pnpm.io/pnpm-cli)
+
 2. 从仓库clone项目
 
-```
+```bash
 git clone %REPO_URL% --depth=1
 ```
 
-3. 修改`.env`目录中的`IMAGE_BASE`变量，以设置各个镜像的tag的前缀。
-
-构建好的镜像的tag为`$IMAGE_BASE/组件名`。在后面的部署中，将docker-compose.yml中image修改为对应的值。
-
-例如，如果`IMAGE_BASE=myimage.com/scow`，那么网关服务的tag为`myimage.com/scow/gateway`。在后续部署gateway时，将`%CR_URL%/gateway`修改为`myimage.com/scow/gateway`。
-
-4. 构建镜像
+3. 构建镜像
 
 ```bash
 docker compose build
 ```
 
-5. 安装依赖并构建项目
+如果您需要修改构建的镜像的tag，那么您可以修改`.env`目录中的`IMAGE_BASE`和`TAG`变量，构建好的镜像的tag为`$IMAGE_BASE/组件名:$TAG`。在后面的部署中，将docker-compose.yml中image修改为对应的值。
+
+例如，如果`IMAGE_BASE=myimage.com/scow`，那么网关服务的tag为`myimage.com/scow/gateway`。在后续部署gateway时，将`%CR_URL%/gateway`修改为`myimage.com/scow/gateway`。
+
+仓库中的`.env`文件中设置的`IMAGE_BASE`和`TAG`变量的值与文档中所使用的镜像tag相同，所以如果您没有修改`.env`中的值，那么您在按文档部署时不需要修改`image`的值。
+
+4. 如果要部署需要二进制文件的服务（如文件管理），那么您需要在本地构建项目。安装依赖并构建项目：
 
 ```bash
 # 如果是通过官网的安装脚本安装的pnpm，那么运行以下命令安装node-gyp；否则不需要单独运行以下命令
@@ -47,7 +48,7 @@ pnpm i
 pnpm run build
 ```
 
-6. 二进制文件所在的位置如下表。部署对应的项目时将会有相应的如何使用已有二进制文件的提示。
+二进制文件所在的位置如下表。部署对应的项目时将会有相应的如何使用已有二进制文件的提示。
 
 | 项目          | 目录                                 |
 | ------------- | ------------------------------------ |
