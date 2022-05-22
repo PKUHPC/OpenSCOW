@@ -1,7 +1,7 @@
 import { JsonFetchResultPromiseLike } from "@ddadaal/next-typed-api-routes-runtime/lib/client";
 import { api } from "src/apis/api";
-import { RunningJob } from "src/generated/common/job";
-import { UserInfo } from "src/models/User";
+import type { RunningJob } from "src/generated/common/job";
+import type { UserInfo } from "src/models/User";
 
 export type MockApi<TApi extends Record<
   string,
@@ -33,6 +33,24 @@ export const runningJob: RunningJob = {
 };
 
 export const mockApi: MockApi<typeof api> = {
+
+  getSavedJob: async () => ({
+    jobInfo: {
+      account: "123",
+      command: "123",
+      coreCount: 2,
+      jobName: "123",
+      maxTime: 123,
+      nodeCount: 4,
+      partition: "low",
+      qos: "low",
+    },
+  }),
+
+  getSavedJobs: async () => ({ results: [{
+    jobName: "123", comment: "1234", submitTime: new Date().toString(),
+    dirPath: "jobs/123",
+  }]}),
 
   getIcon: async () => undefined,
 

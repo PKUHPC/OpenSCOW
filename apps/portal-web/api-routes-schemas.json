@@ -286,6 +286,147 @@
       "$id": "GetRunningJobsSchema",
       "title": "GetRunningJobsSchema"
     },
+    "GetSavedJobSchema": {
+      "type": "object",
+      "properties": {
+        "method": {
+          "type": "string",
+          "const": "GET"
+        },
+        "query": {
+          "type": "object",
+          "properties": {
+            "cluster": {
+              "type": "string"
+            },
+            "jobName": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "cluster",
+            "jobName"
+          ],
+          "additionalProperties": false
+        },
+        "responses": {
+          "type": "object",
+          "properties": {
+            "200": {
+              "type": "object",
+              "properties": {
+                "jobInfo": {
+                  "$ref": "JobInfo#"
+                }
+              },
+              "required": [
+                "jobInfo"
+              ],
+              "additionalProperties": false
+            },
+            "400": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "message"
+              ],
+              "additionalProperties": false
+            },
+            "404": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "200",
+            "400",
+            "404"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "method",
+        "query",
+        "responses"
+      ],
+      "additionalProperties": false,
+      "$id": "GetSavedJobSchema",
+      "title": "GetSavedJobSchema"
+    },
+    "GetSavedJobsSchema": {
+      "type": "object",
+      "properties": {
+        "method": {
+          "type": "string",
+          "const": "GET"
+        },
+        "query": {
+          "type": "object",
+          "properties": {
+            "cluster": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "cluster"
+          ],
+          "additionalProperties": false
+        },
+        "responses": {
+          "type": "object",
+          "properties": {
+            "200": {
+              "type": "object",
+              "properties": {
+                "results": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "SavedJob#"
+                  }
+                }
+              },
+              "required": [
+                "results"
+              ],
+              "additionalProperties": false
+            },
+            "400": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "message"
+              ],
+              "additionalProperties": false
+            },
+            "404": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "200",
+            "400",
+            "404"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "method",
+        "query",
+        "responses"
+      ],
+      "additionalProperties": false,
+      "$id": "GetSavedJobsSchema",
+      "title": "GetSavedJobsSchema"
+    },
     "SubmitJobSchema": {
       "type": "object",
       "properties": {
@@ -616,6 +757,74 @@
       "$id": "RunningJob",
       "title": "RunningJob"
     },
+    "JobInfo": {
+      "type": "object",
+      "properties": {
+        "jobName": {
+          "type": "string"
+        },
+        "account": {
+          "type": "string"
+        },
+        "partition": {
+          "type": "string"
+        },
+        "qos": {
+          "type": "string"
+        },
+        "nodeCount": {
+          "type": "number"
+        },
+        "coreCount": {
+          "type": "number"
+        },
+        "maxTime": {
+          "type": "number",
+          "description": "in minutes"
+        },
+        "command": {
+          "type": "string"
+        },
+        "comment": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "jobName",
+        "account",
+        "nodeCount",
+        "coreCount",
+        "maxTime",
+        "command"
+      ],
+      "additionalProperties": false,
+      "$id": "JobInfo",
+      "title": "JobInfo"
+    },
+    "SavedJob": {
+      "type": "object",
+      "properties": {
+        "jobName": {
+          "type": "string"
+        },
+        "submitTime": {
+          "type": "string"
+        },
+        "comment": {
+          "type": "string"
+        },
+        "dirPath": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "jobName",
+        "dirPath"
+      ],
+      "additionalProperties": false,
+      "$id": "SavedJob",
+      "title": "SavedJob"
+    },
     "SubmitJobInfo": {
       "type": "object",
       "properties": {
@@ -644,6 +853,9 @@
           "type": "number"
         },
         "account": {
+          "type": "string"
+        },
+        "comment": {
           "type": "string"
         }
       },

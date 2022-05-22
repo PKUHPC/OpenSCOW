@@ -3,6 +3,7 @@ syntax = "proto3";
 package scow.portal.job;
 
 import "common/job.proto";
+import "google/protobuf/timestamp.proto";
 
 message GetRunningJobsRequest {
   string cluster = 1;
@@ -14,7 +15,7 @@ message GetRunningJobsReply { repeated common.job.RunningJob jobs = 1; }
 message SubmitJobRequest {
   string cluster = 1;
   string user_id = 2;
-  string job_name = 3;
+  JobInfo job_info = 3;
   string script = 4;
 }
 
@@ -22,7 +23,7 @@ message SubmitJobRequest {
 // ALREADY_EXISTS: the job name already exists
 message SubmitJobReply { uint64 job_id = 1; }
 
-message GenerateJobScriptRequest {
+message JobInfo {
   string job_name = 1;
   string account = 2;
   optional string partition = 3;
@@ -32,7 +33,10 @@ message GenerateJobScriptRequest {
   // in minutes
   uint32 max_time = 7;
   string command = 8;
+  optional string comment = 9;
 }
+
+message GenerateJobScriptRequest { JobInfo job_info = 1; }
 
 message GenerateJobScriptReply { string script = 1; }
 
@@ -43,10 +47,34 @@ message GetAccountsRequest {
 
 message GetAccountsReply { repeated string accounts = 1; }
 
+message GetSavedJobsRequest {
+  string cluster = 1;
+  string user_id = 2;
+}
+
+message SavedJob {
+  string job_name = 1;
+  google.protobuf.Timestamp submit_time = 2;
+  optional string comment = 3;
+  string dir_path = 4;
+}
+
+message GetSavedJobsReply { repeated SavedJob results = 1; }
+
+message GetSavedJobRequest {
+  string cluster = 1;
+  string user_id = 2;
+  string job_name = 3;
+}
+
+message GetSavedJobReply { JobInfo job_info = 1; }
+
 service JobService {
   rpc GetRunningJobs(GetRunningJobsRequest) returns (GetRunningJobsReply);
   rpc GetAccounts(GetAccountsRequest) returns (GetAccountsReply);
   rpc GenerateJobScript(GenerateJobScriptRequest)
       returns (GenerateJobScriptReply);
   rpc SubmitJob(SubmitJobRequest) returns (SubmitJobReply);
+  rpc GetSavedJobs(GetSavedJobsRequest) returns (GetSavedJobsReply);
+  rpc GetSavedJob(GetSavedJobRequest) returns (GetSavedJobReply);
 }

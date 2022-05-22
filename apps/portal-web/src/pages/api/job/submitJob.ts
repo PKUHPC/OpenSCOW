@@ -2,7 +2,7 @@ import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-utils";
 import { status } from "@grpc/grpc-js";
 import { authenticate } from "src/auth/server";
-import { JobServiceClient } from "src/generated/portal/job";
+import { JobInfo, JobServiceClient } from "src/generated/portal/job";
 import { getJobServerClient } from "src/utils/client";
 import { publicConfig } from "src/utils/config";
 
@@ -16,6 +16,7 @@ export interface SubmitJobInfo {
   qos: string | undefined;
   maxTime: number;
   account: string;
+  comment?: string;
 }
 
 export interface SubmitJobSchema {
@@ -48,7 +49,7 @@ export default route<SubmitJobSchema>("SubmitJobSchema", async (req, res) => {
 
   if (!info) { return; }
 
-  const { cluster, command, jobName, coreCount, maxTime, nodeCount, partition, qos, account } = req.body;
+  const { cluster, command, jobName, coreCount, maxTime, nodeCount, partition, qos, account, comment } = req.body;
 
   // validate the parameters
   if (!(cluster in publicConfig.CLUSTERS_CONFIG)) {
@@ -57,7 +58,7 @@ export default route<SubmitJobSchema>("SubmitJobSchema", async (req, res) => {
 
   const client = getJobServerClient(JobServiceClient);
 
-  const { script } = await asyncClientCall(client, "generateJobScript", {
+  const jobInfo: JobInfo = {
     jobName,
     coreCount,
     maxTime,
@@ -66,12 +67,17 @@ export default route<SubmitJobSchema>("SubmitJobSchema", async (req, res) => {
     qos,
     account,
     command,
+    comment,
+  };
+
+  const { script } = await asyncClientCall(client, "generateJobScript", {
+    jobInfo,
   });
 
   return await asyncClientCall(client, "submitJob", {
     cluster,
     userId: info.identityId,
-    jobName,
+    jobInfo,
     script,
   })
     .then(({ jobId }) => ({ 201: { jobId } }))

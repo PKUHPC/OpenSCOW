@@ -1,17 +1,41 @@
 import { plugin } from "@ddadaal/tsgrpc-server";
+import { ensureNotUndefined } from "@ddadaal/tsgrpc-utils";
 import { ServiceError, status } from "@grpc/grpc-js";
 import { join } from "path";
 import { checkClusterExistence, clustersConfig } from "src/config/clusters";
 import { config } from "src/config/env";
 import { RunningJob } from "src/generated/common/job";
-import { JobServiceServer, JobServiceService } from "src/generated/portal/job";
+import { JobServiceServer, JobServiceService, SavedJob } from "src/generated/portal/job";
 import { loggedExec } from "src/plugins/ssh";
 import { withTmpFile } from "src/utils/tmp";
+import { SFTPWrapper } from "ssh2";
+import { promisify } from "util";
 
 export function parseSbatchOutput(output: string): number {
   // Submitted batch job 34987
   const splitted = output.split(" ");
   return +splitted[splitted.length-1];
+}
+
+
+const exists = (sftp: SFTPWrapper, path: string) => new Promise<boolean>((res) => {
+  sftp.stat(path, (err) => res(err === undefined));
+});
+
+const jobScriptName = "job.sh";
+const jobMetadataName = "metadata.json";
+
+interface JobMetadata {
+  jobName: string;
+  account: string;
+  partition: string;
+  qos: string;
+  nodeCount: number;
+  coreCount: number;
+  maxTime: number;
+  command: string;
+  comment: string;
+  submitTime: string;
 }
 
 export const jobServiceServer = plugin((server) => {
@@ -42,7 +66,8 @@ export const jobServiceServer = plugin((server) => {
     },
 
     generateJobScript: async ({ request }) => {
-      const { jobName, account, coreCount, maxTime, nodeCount, partition, qos, command } = request;
+      const { jobInfo: { jobName, account, coreCount, maxTime, nodeCount, partition, qos, command } }
+        = ensureNotUndefined(request, ["jobInfo"]);
 
       let script = "#!/bin/bash\n";
 
@@ -65,37 +90,39 @@ export const jobServiceServer = plugin((server) => {
     },
 
     submitJob: async ({ request, logger }) => {
-      const { cluster, script, jobName, userId } = request;
+      const { cluster, script, jobInfo, userId } = ensureNotUndefined(request, ["jobInfo"]);
 
       checkClusterExistence(cluster);
 
       const node = clustersConfig[cluster].loginNodes[0];
 
       return await server.ext.connect(node, userId, logger, async (ssh) => {
-        // create a dir named job name
-        const jobScriptName = "job.sh";
-        const dir = join(config.JOBS_DIR, jobName);
-        const scriptPath = join(dir, jobScriptName);
+
         const sftp = await ssh.requestSFTP();
 
-        // Why not ssh.mkdir? Reports error if exists.
+        // create a dir named job name
+        const dir = join(config.JOBS_DIR, jobInfo.jobName);
 
-        const resp = await loggedExec(ssh, logger, false, "mkdir", [dir]);
+        // mkdir JOBS_DIR
+        await ssh.mkdir(config.JOBS_DIR);
 
-        if (resp.code !== 0) {
-          if (resp.stderr.includes("File exists")) {
-            throw <ServiceError> {
-              code: status.ALREADY_EXISTS,
-              message: `dir ${dir} already exists.`,
-            };
-          } else {
-            logger.error("mkdir %s failed. stdout %s, stderr %s", dir, resp.stdout, resp.stderr);
-            throw <ServiceError> {
-              code: status.INTERNAL,
-              message: "error when mkdir job",
-            };
-          }
+        // Query if job folder exists
+        if (await exists(sftp, dir)) {
+          throw <ServiceError> {
+            code: status.ALREADY_EXISTS,
+            message: `dir ${dir} already exists.`,
+          };
         }
+
+        await ssh.mkdir(dir);
+
+        // saved metadata json
+        await promisify(sftp.writeFile.bind(sftp))(join(dir, jobMetadataName), JSON.stringify({
+          ...jobInfo,
+          submitTime: new Date().toISOString(),
+        } as JobMetadata));
+
+        const scriptPath = join(dir, jobScriptName);
 
         // create a tmp file and send the file into the cluster
         await withTmpFile(async ({ path, fd }) => { // write the command into the tmp file
@@ -126,6 +153,58 @@ export const jobServiceServer = plugin((server) => {
         return [{ jobId }];
       });
 
+    },
+
+    getSavedJob: async ({ request, logger }) => {
+      const { cluster, jobName, userId } = request;
+
+      const node = clustersConfig[cluster].loginNodes[0];
+
+      return await server.ext.connect(node, userId, logger, async (ssh) => {
+        const sftp = await ssh.requestSFTP();
+
+        const dir = join(config.JOBS_DIR, jobName);
+        const metadataPath = join(dir, jobMetadataName);
+
+        const content = await promisify(sftp.readFile.bind(sftp))(metadataPath);
+
+        const data = JSON.parse(content.toString()) as JobMetadata;
+
+        return [{ jobInfo: data }];
+      });
+    },
+
+    getSavedJobs: async ({ request, logger }) => {
+      const { cluster, userId } = request;
+
+      const node = clustersConfig[cluster].loginNodes[0];
+
+      return await server.ext.connect(node, userId, logger, async (ssh) => {
+        const sftp = await ssh.requestSFTP();
+
+        if (!await exists(sftp, config.JOBS_DIR)) { return [{ results: []}]; }
+
+        const list = await promisify(sftp.readdir.bind(sftp))(config.JOBS_DIR);
+
+        const results = (await Promise.all(list.map(async ({ filename }) => {
+          const jobDir = join(config.JOBS_DIR, filename);
+          const metadataPath = join(jobDir, jobMetadataName);
+
+          if (!await exists(sftp, config.JOBS_DIR)) {
+            return undefined;
+          }
+          const content = await promisify(sftp.readFile.bind(sftp))(metadataPath);
+          const data = JSON.parse(content.toString()) as JobMetadata;
+
+          const absJobDir = await promisify(sftp.realpath.bind(sftp))(jobDir);
+
+          return { jobName: data.jobName, submitTime: new Date(data.submitTime),
+            comment: data.comment,  dirPath: absJobDir,
+          };
+        }))).filter((x) => x) as SavedJob[];
+
+        return [{ results }];
+      });
     },
 
     getRunningJobs: async ({ request, logger }) => {

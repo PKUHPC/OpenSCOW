@@ -1,8 +1,8 @@
 import { ReloadOutlined } from "@ant-design/icons";
-import { Button, Col, Form, InputNumber, message, Modal, Row, Select, Tooltip } from "antd";
+import { Button, Col, Form, Input, InputNumber, message, Modal, Row, Select, Tooltip } from "antd";
 import { useWatch } from "antd/lib/form/Form";
 import moment from "moment";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { Editor } from "src/components/Editor";
@@ -20,6 +20,7 @@ interface JobForm {
   qos: string | undefined;
   maxTime: number;
   account: string;
+  comment: string;
 }
 
 function genJobName() {
@@ -53,8 +54,11 @@ const initialValues = {
 } as JobForm;
 
 
+interface Props {
+  initial?: typeof initialValues;
+}
 
-export const SubmitJobForm: React.FC = ({}) => {
+export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
 
   const [form] = Form.useForm<JobForm>();
   const [loading, setLoading] = useState(false);
@@ -65,13 +69,13 @@ export const SubmitJobForm: React.FC = ({}) => {
 
   const submit = async () => {
     const { cluster, command, jobName, coreCount,
-      maxTime, nodeCount, partition, qos, account } = await form.validateFields();
+      maxTime, nodeCount, partition, qos, account, comment } = await form.validateFields();
 
     setLoading(true);
 
     await api.submitJob({ body: {
       cluster: cluster.id, command, jobName, account,
-      coreCount, maxTime, nodeCount, partition, qos,
+      coreCount, maxTime, nodeCount, partition, qos, comment,
     } })
       .httpError(409, (e) => {
         const { code, message: serverMessage  } = e;
@@ -93,15 +97,25 @@ export const SubmitJobForm: React.FC = ({}) => {
       .finally(() => setLoading(false));
   };
 
-  const cluster = useWatch("cluster", form) ?? initialValues.cluster;
-  const partition = useWatch("partition", form) ?? initialValues.partition;
+  const cluster = useWatch("cluster", form) ?? initial.cluster;
+
+  const partition = useWatch("partition", form) ?? initial.partition;
+
+  // if partition is no longer available, use the first partition of the cluster
+  useEffect(() => {
+    if (!getPartitionInfo(cluster, partition)) {
+      form.setFieldsValue({ partition: firstPartition(cluster)[0] });
+    }
+  }, [partition]);
+
+  console.log(partition);
 
   const currentPartitionInfo = useMemo(() => getPartitionInfo(cluster, partition), [cluster, partition]);
 
   return (
     <Form<JobForm>
       form={form}
-      initialValues={initialValues}
+      initialValues={initial}
       onFinish={submit}
       onValuesChange={(changed) => {
         if (changed.cluster) {
@@ -189,6 +203,9 @@ export const SubmitJobForm: React.FC = ({}) => {
           </Form.Item>
         </Col>
       </Row>
+      <Form.Item label="备注" name="comment">
+        <Input.TextArea />
+      </Form.Item>
       <Form.Item<JobForm>>
         <Button type="primary" htmlType="submit" loading={loading}>
           提交

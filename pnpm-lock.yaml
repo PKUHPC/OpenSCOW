@@ -163,6 +163,7 @@ importers:
     specifiers:
       '@ddadaal/tsgrpc-cli': ^0.11.0
       '@ddadaal/tsgrpc-server': ^0.12.0
+      '@ddadaal/tsgrpc-utils': ^0.12.0
       '@grpc/grpc-js': ^1.6.7
       '@scow/config': workspace:*
       '@types/google-protobuf': ^3.15.6
@@ -171,6 +172,7 @@ importers:
       node-ssh: ^12.0.4
     dependencies:
       '@ddadaal/tsgrpc-server': 0.12.0
+      '@ddadaal/tsgrpc-utils': 0.12.0_@grpc+grpc-js@1.6.7
       '@grpc/grpc-js': 1.6.7
       '@scow/config': link:../../libs/config
       node-ssh: 12.0.4

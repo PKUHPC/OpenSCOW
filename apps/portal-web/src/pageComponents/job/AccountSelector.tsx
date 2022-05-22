@@ -19,7 +19,15 @@ export const AccountSelector: React.FC<Props> = ({ cluster, onChange, value }) =
     return api.getAccounts({ query: { cluster } });
   }, [cluster, userStore.user]);
 
-  const { data, isLoading, reload } = useAsync({ promiseFn, watch: userStore.user });
+  const { data, isLoading, reload } = useAsync({
+    promiseFn,
+    watch: userStore.user,
+    onResolve: ({ accounts }) => {
+      if (value && !accounts.includes(value)) {
+        onChange?.(accounts[0]);
+      }
+    },
+  });
 
   return (
     <Input.Group compact>
