@@ -40,9 +40,8 @@ export const BigScreenMenu: React.FC<Props> = ({
               selectedKeys={selectedKeys}
               style={{ border: 0 }}
               forceSubMenuRender
-            >
-              {createMenuItems(routes, true)}
-            </Menu>
+              items={createMenuItems(routes, true)}
+            />
           ) : undefined
       }
     </Container>

@@ -1,4 +1,4 @@
-import { Menu } from "antd";
+import { ItemType } from "antd/lib/menu/hooks/useItems";
 import Link from "next/link";
 import Router from "next/router";
 import React from "react";
@@ -7,59 +7,45 @@ import { NavItemProps } from "src/layouts/NavItemProps";
 import { iconToNode } from "src/layouts/routes";
 import { arrayContainsElement } from "src/utils/array";
 
-export const renderLogoutLink = (logout: () => void) => (
-  <Menu.Item key="logout">
-    <Link href="/">
-      <a onClick={logout}>
-        退出登录
-      </a>
-    </Link>
-  </Menu.Item>
-);
-
-
 export function createMenuItems(
   routes: NavItemProps[],
   parentClickable: boolean,
 ) {
-  function createMenuItem(route: NavItemProps) {
 
+  function createMenuItem(route: NavItemProps) {
     if (arrayContainsElement(route.children)) {
-      return (
-        <Menu.SubMenu
-          key={route.path}
-          icon={iconToNode(route.Icon)}
-          onTitleClick={(route.clickable ?? parentClickable)
-            ? () => {
-              const target = route.clickToPath ?? route.path;
-              if (route.openInNewPage) {
-                window.open(target);
-              } else {
-                Router.push(target);
-              }
+      return {
+        icon: iconToNode(route.Icon),
+        key: route.path,
+        title: route.text,
+        label: route.text,
+        onTitleClick:(route.clickable ?? parentClickable)
+          ? () => {
+            const target = route.clickToPath ?? route.path;
+            if (route.openInNewPage) {
+              window.open(target);
+            } else {
+              Router.push(target);
             }
-            : undefined}
-          title={route.text}
-        >
-          {createMenuItems(route.children, parentClickable)}
-        </Menu.SubMenu>
-      );
+          }
+          : undefined,
+        children: createMenuItems(route.children, parentClickable),
+      } as ItemType;
     }
 
-
-    return (
-      <Menu.Item
-        key={route.path}
-        icon={iconToNode(route.Icon)}
-      >
+    return {
+      icon: iconToNode(route.Icon),
+      key: route.path,
+      label: (
         <Link href={route.clickToPath ?? route.path}>
           <a {...route.openInNewPage ? { target: "_blank" } : {}}>
             {route.text}
           </a>
         </Link>
-      </Menu.Item>
-    );
+      ),
+    } as ItemType;
   }
+
   const items = routes.map((r) => createMenuItem(r));
 
   return items;

@@ -109,8 +109,8 @@ export const SideNav: React.FC<Props> = ({
           onOpenChange={setOpenKeys}
           // defaultOpenKeys={parentKeys}
           style={{ height: "100%", borderRight: 0 }}
+          items={createMenuItems(routes, false)}
         >
-          {createMenuItems(routes, false)}
         </Menu>
       </StyledSider>
     </>
