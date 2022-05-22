@@ -53,18 +53,37 @@ export const getFileRoute = fp(async (f) => {
 
       const filename = basename(path).replace("\"", "\\\"");
 
+
       if (download) {
         return rep
-          .header("Content-Type", contentType(basename(filename)) || "application/octet-stream")
+          .header("Content-Type", getContentType(filename, "application/octet-stream"))
           .header("Content-Disposition", `attachment; filename="${filename}"`)
           .sendFile(path, "/");
       } else {
         const stream = fs.createReadStream(path);
         return rep
-          .header("Content-Type", "text/plain")
+          .header("Content-Type", getContentType(filename, "text/plain; charset=utf-8"))
           .header("Content-Disposition", `inline; filename="${filename}"`)
           .send(stream);
       }
 
     });
 });
+
+// if the contentType is one of these, they can be previewed
+// return as text/plain
+const textFiles = ["application/x-sh"];
+
+function getContentType(filename: string, defaultValue: string) {
+  const type = contentType(basename(filename));
+
+  if (!type) {
+    return defaultValue;
+  }
+
+  if (textFiles.some((x) => type.startsWith(x))) {
+    return "text/plain; charset=utf-8";
+  }
+
+  return type;
+}
