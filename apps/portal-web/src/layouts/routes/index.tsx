@@ -41,11 +41,11 @@ export const userRoutes: NavItemProps[] = [
     clickToPath: CLUSTERS.length === 1 ? `/shell/${CLUSTERS[0].id}` : undefined,
     clickable: CLUSTERS.length === 1,
     children: CLUSTERS.map(({ name, id }) => ({
-      extraLinkProps: { target: "_blank" },
+      openInNewPage: true,
       Icon: CloudServerOutlined,
       text: name,
       path: `/shell/${id}`,
-    })),
+    }) as NavItemProps),
   }] : [],
   ...publicConfig.ENABLE_VNC ? [{
     Icon: DesktopOutlined,

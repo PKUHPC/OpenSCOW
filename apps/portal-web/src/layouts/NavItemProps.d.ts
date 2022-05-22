@@ -7,6 +7,6 @@ export interface NavItemProps {
   Icon: React.ReactNode | React.ForwardRefExoticComponent<{}>;
   match?: (spec: string, pathname: string) => boolean;
   children?: NavItemProps[];
-  clickable?: boolean
-  extraLinkProps?: object;
+  clickable?: boolean;
+  openInNewPage?: boolean;
 }

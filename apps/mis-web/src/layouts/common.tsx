@@ -30,7 +30,14 @@ export function createMenuItems(
           key={route.path}
           icon={iconToNode(route.Icon)}
           onTitleClick={(route.clickable ?? parentClickable)
-            ? () => Router.push(route.clickToPath ?? route.path)
+            ? () => {
+              const target = route.clickToPath ?? route.path;
+              if (route.openInNewPage) {
+                window.open(target);
+              } else {
+                Router.push(target);
+              }
+            }
             : undefined}
           title={route.text}
         >
@@ -46,7 +53,7 @@ export function createMenuItems(
         icon={iconToNode(route.Icon)}
       >
         <Link href={route.clickToPath ?? route.path}>
-          <a {...route.extraLinkProps}>
+          <a {...route.openInNewPage ? { target: "_blank" } : {}}>
             {route.text}
           </a>
         </Link>

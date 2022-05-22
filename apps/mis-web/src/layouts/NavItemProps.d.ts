@@ -8,5 +8,5 @@ export interface NavItemProps {
   match?: (spec: string, pathname: string) => boolean;
   children?: NavItemProps[];
   clickable?: boolean
-  extraLinkProps?: object;
+  openInNewPage?: boolean;
 }
