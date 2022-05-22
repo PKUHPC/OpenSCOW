@@ -25,3 +25,5 @@ yarn-error.log*
 .next/
 
 public/novnc
+
+api-routes-schemas.json

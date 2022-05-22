@@ -5,3 +5,5 @@ node_modules/
 .env
 .next/
 public/vnc/
+
+api-routes-schemas.json

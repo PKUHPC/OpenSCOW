@@ -4,3 +4,5 @@ nginx/
 node_modules/
 .env
 .next/
+
+api-routes-schemas.json
