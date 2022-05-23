@@ -28,12 +28,12 @@ export const DesktopTableActions: React.FC<Props> = ({ ischange, setchange, reco
             });
             
             const params = new URLSearchParams({
-              host: `${resp.node}`,
-              port: `${resp.port}`,
+              path: `/vnc-server/${resp.node}/${resp.port}`,
               password: resp.password,
               autoconnect: "true",
               reconnect: "true",
             });
+        
             window.open("/vnc/vnc.html?" + params.toString(), "_blank");
           }}
         >
