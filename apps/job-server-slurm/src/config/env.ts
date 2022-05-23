@@ -1,4 +1,4 @@
-import { bool, envConfig, host, port, str } from "@scow/config";
+import { bool, envConfig, host, num, port, str } from "@scow/config";
 import { homedir } from "os";
 import path from "path";
 
@@ -16,6 +16,8 @@ export const config = envConfig({
   SSH_PRIVATE_KEY_PATH: str({ desc: "SSH私钥目录", default: path.join(homedir(), ".ssh", "id_rsa") }),
 
   JOBS_DIR: str({ desc: "存放作业脚本以及相关内容的父目录，相对于用户的家目录", default: "jobs" }),
+
+  MAX_DISPLAY: num({ desc:"最大连接桌面数量", default: 3 }),
 
 });
 

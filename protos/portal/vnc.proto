@@ -5,15 +5,56 @@ package scow.portal.vnc;
 message LaunchDesktopRequest {
   string cluster = 1;
   string username = 2;
+  uint32 display_id = 3;
 }
 
 message LaunchDesktopReply {
+  string node = 1;
+  string password = 2;
+  uint32 port = 3;
+}
+
+message ListDesktopRequest {
+  repeated string clusters = 1;
+  string username = 2;
+}
+
+
+message ListDesktopReply {
+  message ConnectionInfo{
+    string node_addr = 1;
+    string cluster = 2;
+    repeated uint32 display_id = 3;
+  }
   bool already_running = 1;
+  repeated ConnectionInfo Connection_info = 2;
+}
+
+message CreateDesktopRequest {
+  string cluster = 1;
+  string username = 2;
+}
+
+message CreateDesktopReply {
+  bool create_success = 1;
   string node = 2;
   string password = 3;
   uint32 display_id = 4;
   uint32 port = 5;
+  uint32 already_display = 6;
+  uint32 max_display = 7;
 }
+
+message KillDesktopRequest {
+  string cluster = 1;
+  string username = 2;
+  uint32 display_id = 3;
+}
+
+message KillDesktopReply {
+  bool kill_success = 1;
+}
+
 
 message RefreshOTPPasswordRequest {
   string cluster = 1;
@@ -27,6 +68,9 @@ message RefreshOTPPasswordReply { string password = 1; }
 
 service VncService {
   rpc LaunchDesktop(LaunchDesktopRequest) returns (LaunchDesktopReply);
+  rpc ListDesktop(ListDesktopRequest) returns (ListDesktopReply);
+  rpc CreateDesktop(CreateDesktopRequest) returns (CreateDesktopReply);
+  rpc KillDesktop(KillDesktopRequest) returns (KillDesktopReply);
   rpc RefreshOTPPassword(RefreshOTPPasswordRequest)
       returns (RefreshOTPPasswordReply);
 }

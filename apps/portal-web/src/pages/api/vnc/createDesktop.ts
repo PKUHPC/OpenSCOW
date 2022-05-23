@@ -5,19 +5,21 @@ import { VncServiceClient } from "src/generated/portal/vnc";
 import { getJobServerClient } from "src/utils/client";
 import { publicConfig } from "src/utils/config";
 
-export interface LaunchDesktopSchema {
+export interface CreateDesktopSchema {
   method: "POST";
 
   body: {
-    displayId: number;
     cluster: string;
   }
 
   responses: {
     200: {
+      createSuccess: boolean;  
       node: string;
       port: number;
       password: string;
+      alreadyDisplay: number;
+      maxDisplay: number;
     };
     // 功能没有启用
     501: null;
@@ -26,7 +28,7 @@ export interface LaunchDesktopSchema {
 
 const auth = authenticate(() => true);
 
-export default /*#__PURE__*/route<LaunchDesktopSchema>("LaunchDesktopSchema", async (req, res) => {
+export default /*#__PURE__*/route<CreateDesktopSchema>("CreateDesktopSchema", async (req, res) => {
 
   if (!publicConfig.ENABLE_VNC) {
     return { 501: null };
@@ -38,12 +40,11 @@ export default /*#__PURE__*/route<LaunchDesktopSchema>("LaunchDesktopSchema", as
 
   const client = getJobServerClient(VncServiceClient);
 
-  return await asyncClientCall(client, "launchDesktop", {
+  return await asyncClientCall(client, "createDesktop", {
     cluster: req.body.cluster,
     username: info.identityId,
-    displayId: req.body.displayId,
   })
-    .then(({ node, password, port }) => {
-      return { 200: { node, password, port } };
+    .then(({ createSuccess, node, password, port, alreadyDisplay, maxDisplay  }) => {
+      return { 200: { createSuccess, node, password, port, alreadyDisplay, maxDisplay } };
     });
 });

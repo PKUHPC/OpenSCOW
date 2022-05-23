@@ -5,7 +5,7 @@ import { VncServiceClient } from "src/generated/portal/vnc";
 import { getJobServerClient } from "src/utils/client";
 import { publicConfig } from "src/utils/config";
 
-export interface LaunchDesktopSchema {
+export interface KillDesktopSchema {
   method: "POST";
 
   body: {
@@ -15,9 +15,7 @@ export interface LaunchDesktopSchema {
 
   responses: {
     200: {
-      node: string;
-      port: number;
-      password: string;
+      killSuccess: boolean;
     };
     // 功能没有启用
     501: null;
@@ -26,7 +24,7 @@ export interface LaunchDesktopSchema {
 
 const auth = authenticate(() => true);
 
-export default /*#__PURE__*/route<LaunchDesktopSchema>("LaunchDesktopSchema", async (req, res) => {
+export default /*#__PURE__*/route<KillDesktopSchema>("KillDesktopSchema", async (req, res) => {
 
   if (!publicConfig.ENABLE_VNC) {
     return { 501: null };
@@ -38,12 +36,12 @@ export default /*#__PURE__*/route<LaunchDesktopSchema>("LaunchDesktopSchema", as
 
   const client = getJobServerClient(VncServiceClient);
 
-  return await asyncClientCall(client, "launchDesktop", {
+  return await asyncClientCall(client, "killDesktop", {
     cluster: req.body.cluster,
     username: info.identityId,
     displayId: req.body.displayId,
   })
-    .then(({ node, password, port }) => {
-      return { 200: { node, password, port } };
+    .then(({ killSuccess }) => {
+      return { 200: { killSuccess } };
     });
 });

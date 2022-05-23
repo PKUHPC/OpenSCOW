@@ -1,23 +1,20 @@
 import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-utils";
 import { authenticate } from "src/auth/server";
-import { VncServiceClient } from "src/generated/portal/vnc";
+import { ListDesktopReply,VncServiceClient  } from "src/generated/portal/vnc";
 import { getJobServerClient } from "src/utils/client";
 import { publicConfig } from "src/utils/config";
 
-export interface LaunchDesktopSchema {
+export interface ListDesktopSchema {
   method: "POST";
 
   body: {
-    displayId: number;
-    cluster: string;
+    clusters: string[];
   }
 
   responses: {
     200: {
-      node: string;
-      port: number;
-      password: string;
+        listDesktopReply : ListDesktopReply;
     };
     // 功能没有启用
     501: null;
@@ -26,7 +23,7 @@ export interface LaunchDesktopSchema {
 
 const auth = authenticate(() => true);
 
-export default /*#__PURE__*/route<LaunchDesktopSchema>("LaunchDesktopSchema", async (req, res) => {
+export default /*#__PURE__*/route<ListDesktopSchema>("ListDesktopSchema", async (req, res) => {
 
   if (!publicConfig.ENABLE_VNC) {
     return { 501: null };
@@ -38,12 +35,11 @@ export default /*#__PURE__*/route<LaunchDesktopSchema>("LaunchDesktopSchema", as
 
   const client = getJobServerClient(VncServiceClient);
 
-  return await asyncClientCall(client, "launchDesktop", {
-    cluster: req.body.cluster,
+  return await asyncClientCall(client, "listDesktop", {
+    clusters: req.body.clusters,
     username: info.identityId,
-    displayId: req.body.displayId,
   })
-    .then(({ node, password, port }) => {
-      return { 200: { node, password, port } };
+    .then((listDesktopReply) => {
+      return { 200:  { listDesktopReply }  };
     });
 });

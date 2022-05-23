@@ -13,7 +13,10 @@ import type { GetSavedJobSchema } from "src/pages/api/job/getSavedJob";
 import type { GetSavedJobsSchema } from "src/pages/api/job/getSavedJobs";
 import type { SubmitJobSchema } from "src/pages/api/job/submitJob";
 import type { ChangePasswordSchema } from "src/pages/api/profile/changePassword";
+import type { CreateDesktopSchema } from "src/pages/api/vnc/createDesktop";
+import type { KillDesktopSchema } from "src/pages/api/vnc/killDesktop";
 import type { LaunchDesktopSchema } from "src/pages/api/vnc/launchDesktop";
+import type { ListDesktopSchema } from "src/pages/api/vnc/listDesktop";
 
 
 export const api = {
@@ -28,5 +31,9 @@ export const api = {
   submitJob: fromApi<SubmitJobSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/job/submitJob")),
   getLogo: fromApi<GetLogoSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api//logo")),
   changePassword: fromApi<ChangePasswordSchema>("PATCH", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/profile/changePassword")),
+  createDesktop: fromApi<CreateDesktopSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/vnc/createDesktop")),
+  killDesktop: fromApi<KillDesktopSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/vnc/killDesktop")),
   launchDesktop: fromApi<LaunchDesktopSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/vnc/launchDesktop")),
+  listDesktop: fromApi<ListDesktopSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/vnc/listDesktop")),
 };
+  
