@@ -45,6 +45,7 @@ export const userRoutes: NavItemProps[] = [
     text: "Shell",
     path: "/shell",
     clickToPath: CLUSTERS.length === 1 ? `/shell/${CLUSTERS[0].id}` : undefined,
+    openInNewPage: true,
     clickable: CLUSTERS.length === 1,
     children: CLUSTERS.map(({ name, id }) => ({
       openInNewPage: true,
@@ -52,7 +53,7 @@ export const userRoutes: NavItemProps[] = [
       text: name,
       path: `/shell/${id}`,
     }) as NavItemProps),
-  }] : [],
+  } as NavItemProps] : [],
   ...publicConfig.ENABLE_VNC ? [{
     Icon: DesktopOutlined,
     text: "桌面",
