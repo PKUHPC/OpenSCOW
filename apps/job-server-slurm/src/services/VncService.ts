@@ -166,7 +166,7 @@ export const vncServiceServer = plugin((server) => {
         await loggedExec(ssh, logger, true,
           vncServerPath, ["-kill", ":" + displayId]);
 
-        return [ null ];
+        return [ {} ];
       });
 
     },

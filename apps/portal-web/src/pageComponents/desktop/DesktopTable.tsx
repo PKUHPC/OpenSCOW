@@ -29,7 +29,7 @@ export const DesktopTable: React.FC<Props> = () => {
   const [data, setData] = useState<DesktopItem[]>();
 
   //Table loading
-  const [tableLoading, settableLoading] = useState(false);
+  const [tableLoading, setTableLoading] = useState(false);
 
   //Is the table visible
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -40,7 +40,7 @@ export const DesktopTable: React.FC<Props> = () => {
   useEffect(() => {
     const getdatas = async () => {
       //Table load when fetching data
-      settableLoading(true);
+      setTableLoading(true);
 
       //List all desktop
       const { result } = await api.listDesktop({ body: { clusters: CLUSTERS.map((x) => x.id) } });
@@ -49,13 +49,13 @@ export const DesktopTable: React.FC<Props> = () => {
       const connectList: ListDesktopReply_Connection[] = result.connection;
 
       //Splice data
-      await connectList.forEach((x)=>{
+      connectList.forEach((x)=>{
         x.displayId.forEach((y) => {
           desktopList.push({ desktop: `${x.clusterName}:${y}`,clusterId:`${x.clusterId}`, node: `${x.node}` });
         });
       });
 
-      settableLoading(false);
+      setTableLoading(false);
       setData(desktopList);
     };
     getdatas();
