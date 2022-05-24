@@ -1,6 +1,6 @@
 import { Static, Type } from "@sinclair/typebox";
 
-const ClustersSchema = Type.Record(
+export const ClustersConfigSchema = Type.Record(
   Type.String({ description: "集群ID" }),
   Type.Object({
     displayName: Type.String({ description: "集群的显示名称" }),
@@ -20,9 +20,6 @@ const ClustersSchema = Type.Record(
   }),
 );
 
-export const clustersConfig = {
-  name: "clusters",
-  schema: ClustersSchema,
-};
+export const ClustersConfigName = "clusters";
 
-export type Clusters = Static<typeof ClustersSchema>;
+export type Clusters = Static<typeof ClustersConfigSchema>;

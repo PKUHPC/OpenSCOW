@@ -1,6 +1,6 @@
 import { Static, Type } from "@sinclair/typebox";
 
-const ClusterTextsSchema = Type.Record(
+export const ClusterTextsConfigSchema = Type.Record(
   Type.String({ description: "租户，如果为default则是对所有租户" }),
   Type.Object({
     clusterComment:Type.Optional(Type.String({ description: "集群说明" })),
@@ -11,9 +11,6 @@ const ClusterTextsSchema = Type.Record(
   ),
 );
 
-export const clusterTextsConfig = {
-  name: "clusterTexts",
-  schema: ClusterTextsSchema,
-};
+export const ClusterTextsConfigName = "clusterTexts";
 
-export type ClusterTexts = Static<typeof ClusterTextsSchema>;
+export type ClusterTexts = Static<typeof ClusterTextsConfigSchema>;

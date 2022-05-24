@@ -55,12 +55,12 @@ const config = envConfig(specs, process.env);
 
 // load clusters.json
 const { getConfigFromFile } = require("@scow/config");
-const { clustersConfig } = require("@scow/config/build/appConfig/clusters");
+const { ClustersConfigName, ClustersConfigSchema } = require("@scow/config/build/appConfig/clusters");
 
 /**
  * @type {import("@scow/config/build/appConfig/clusters").Clusters}
  */
-const clusters = getConfigFromFile(clustersConfig.schema, clustersConfig.name, false,
+const clusters = getConfigFromFile(ClustersConfigSchema, ClustersConfigName, false,
   production ? undefined : path.join(__dirname, "config"));
 
 /**

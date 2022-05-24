@@ -1,8 +1,8 @@
 import { ServiceError, status } from "@grpc/grpc-js";
 import { getConfigFromFile } from "@scow/config";
-import { clustersConfig as clustersConfigInfo } from "@scow/config/build/appConfig/clusters";
+import { ClustersConfigName, ClustersConfigSchema } from "@scow/config/build/appConfig/clusters";
 
-export const clustersConfig = getConfigFromFile(clustersConfigInfo.schema, clustersConfigInfo.name, false);
+export const clustersConfig = getConfigFromFile(ClustersConfigSchema, ClustersConfigName, false);
 
 export function checkClusterExistence(cluster: string) {
   if (!clustersConfig[cluster]) {
