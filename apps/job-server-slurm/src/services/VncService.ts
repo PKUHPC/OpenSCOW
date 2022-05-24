@@ -1,10 +1,11 @@
 import { Logger, plugin } from "@ddadaal/tsgrpc-server";
+import { ServiceError, status } from "@grpc/grpc-js";
 import { clustersConfig } from "@scow/config/build/appConfig/clusters";
 import { NodeSSH } from "node-ssh";
 import path from "path";
 import { checkClusterExistence } from "src/config/clusters";
 import { config } from "src/config/env";
-import { VncServiceServer, VncServiceService } from "src/generated/portal/vnc";
+import { ListDesktopReply_Connection, VncServiceServer, VncServiceService } from "src/generated/portal/vnc";
 import { loggedExec } from "src/plugins/ssh";
 import { displayIdToPort } from "src/utils/port";
 
@@ -53,6 +54,12 @@ const vncPasswdPath = path.join(config.TURBOVNC_PATH, "bin", "vncpasswd");
 
 export const vncServiceServer = plugin((server) => {
 
+  async function asyncForEach<T>(array: T[], callback: (arg: T) => Promise<void>): Promise<void> {
+    for (let index = 0; index < array.length; index++) {
+      await callback(array[index]);
+    }
+  }
+
   const refreshPassword = async (ssh: NodeSSH, logger: Logger, displayId: number) => {
     const resp = await loggedExec(ssh, logger, true,
       vncPasswdPath, ["-o", "-display", ":" + displayId]);
@@ -62,12 +69,57 @@ export const vncServiceServer = plugin((server) => {
 
   server.addService<VncServiceServer>(VncServiceService, {
     launchDesktop: async ({ request, logger }) => {
-      const { cluster, username }  = request;
+      const { cluster, username, displayId } = request;
 
       checkClusterExistence(cluster);
-
       const node = clustersConfig[cluster].loginNodes[0];
 
+      return await server.ext.connect(node, username, logger, async (ssh, nodeAddr) => {
+
+        // refresh the otp
+        const password = await refreshPassword(ssh, logger, displayId);
+
+        return [{ node: nodeAddr, port: displayIdToPort(displayId), password }];
+      });
+    },
+
+    listDesktop: async ({ request, logger }) => {
+      const { clusters, username } = request;
+
+      const connectList: ListDesktopReply_Connection[] = [];
+
+      await asyncForEach(clusters, async (x:string) => {
+
+        checkClusterExistence(x);
+        const node = clustersConfig[x].loginNodes[0];
+        const clusterName = clustersConfig[x].displayName;
+        const clusterId = x;
+
+        await server.ext.connect(node, username, logger, async (ssh, nodeAddr) => {
+
+          // list all running session
+          const resp = await loggedExec(ssh, logger, true,
+            vncServerPath, ["-list"],
+          );
+
+          const ids = parseListOutput(resp.stdout);
+          connectList.push({
+            node:nodeAddr,
+            clusterName:clusterName,
+            clusterId:clusterId,
+            displayId:ids,
+          });         
+        });
+      });
+      return [{ connection:connectList }];
+    },
+
+    createDesktop: async ({ request, logger }) => {
+      const { cluster , username } = request;
+
+      checkClusterExistence(cluster);
+      const node = clustersConfig[cluster].loginNodes[0];
+      
       return await server.ext.connect(node, username, logger, async (ssh, nodeAddr) => {
 
         // find if the user has running session
@@ -76,8 +128,7 @@ export const vncServiceServer = plugin((server) => {
         );
 
         const ids = parseListOutput(resp.stdout);
-
-        if (ids.length === 0) {
+        if (ids.length < config.MAX_DISPLAY) {
           // start a session
           resp = await loggedExec(ssh, logger, true,
             // explicitly set securitytypes to avoid requiring setting vnc passwd
@@ -90,20 +141,32 @@ export const vncServiceServer = plugin((server) => {
           // parse display id from output
           const displayId = parseDisplayId(resp.stderr, server.logger);
 
-          // start websockify
           const port = displayIdToPort(displayId);
 
-          return [{ alreadyRunning: false, node: nodeAddr, password, port, displayId }];
+          return [{ node: nodeAddr, password, port }];
         } else {
-
-          const displayId = ids[0];
-
-          // refresh the otp
-          const password = await refreshPassword(ssh, logger, displayId);
-
-          return [{ alreadyRunning: true, displayId, node: nodeAddr, port: displayIdToPort(displayId), password }];
-
+          throw <ServiceError> {
+            code: status.RESOURCE_EXHAUSTED,
+            message: "VNC desktop has exceeded the maximum",
+            details: `${config.MAX_DISPLAY}` ,
+          };
         }
+      });
+    },
+
+    killDesktop: async ({ request, logger }) => {
+      const { cluster, username, displayId } = request;
+
+      checkClusterExistence(cluster);
+      const node = clustersConfig[cluster].loginNodes[0];
+
+      return await server.ext.connect(node, username, logger, async (ssh, nodeAddr) => {
+        
+        //kill specific desktop
+        await loggedExec(ssh, logger, true,
+          vncServerPath, ["-kill", ":" + displayId]);
+
+        return [ {} ];
       });
 
     },
