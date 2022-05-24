@@ -1,9 +1,8 @@
 import { Logger, plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError, status } from "@grpc/grpc-js";
-import { clustersConfig } from "@scow/config/build/appConfig/clusters";
 import { NodeSSH } from "node-ssh";
 import path from "path";
-import { checkClusterExistence } from "src/config/clusters";
+import { checkClusterExistence, clustersConfig  } from "src/config/clusters";
 import { config } from "src/config/env";
 import { ListDesktopReply_Connection, VncServiceServer, VncServiceService } from "src/generated/portal/vnc";
 import { loggedExec } from "src/plugins/ssh";
@@ -108,7 +107,7 @@ export const vncServiceServer = plugin((server) => {
             clusterName:clusterName,
             clusterId:clusterId,
             displayId:ids,
-          });         
+          });
         });
       });
       return [{ connection:connectList }];
@@ -119,7 +118,7 @@ export const vncServiceServer = plugin((server) => {
 
       checkClusterExistence(cluster);
       const node = clustersConfig[cluster].loginNodes[0];
-      
+
       return await server.ext.connect(node, username, logger, async (ssh, nodeAddr) => {
 
         // find if the user has running session
@@ -161,7 +160,7 @@ export const vncServiceServer = plugin((server) => {
       const node = clustersConfig[cluster].loginNodes[0];
 
       return await server.ext.connect(node, username, logger, async (ssh, nodeAddr) => {
-        
+
         //kill specific desktop
         await loggedExec(ssh, logger, true,
           vncServerPath, ["-kill", ":" + displayId]);
