@@ -60,6 +60,27 @@ export const mockApi: MockApi<typeof api> = {
 
   launchDesktop: async () => ({ node: "login01", password: "123",port: 1234 }),
 
+  listDesktop: async () => ({
+    result: {
+      connection: [{
+        node: "login01",
+        clusterName: "hpc01_name",
+        clusterId: "hpc01",
+        displayId: [1, 2, 3],
+      }],
+    },
+  }),
+
+  createDesktop: async () => (
+    {
+      node: "login01",
+      password: "123",
+      port: 1234,
+    }),
+
+  killDesktop: async () => ({ message: "success!" }),
+
+
   logout: async () => null,
 
   authCallback: async () => undefined as never,

@@ -15,7 +15,7 @@ export interface KillDesktopSchema {
 
   responses: {
     200: {
-      killSuccess: boolean;
+      message: string;
     };
     // 功能没有启用
     501: null;
@@ -41,7 +41,7 @@ export default /*#__PURE__*/route<KillDesktopSchema>("KillDesktopSchema", async 
     username: info.identityId,
     displayId: req.body.displayId,
   })
-    .then(({ killSuccess }) => {
-      return { 200: { killSuccess } };
+    .then(() => {
+      return { 200: { message:"success" } };
     });
 });

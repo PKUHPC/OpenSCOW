@@ -1,5 +1,6 @@
 import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-utils";
+import { status } from "@grpc/grpc-js";
 import { authenticate } from "src/auth/server";
 import { VncServiceClient } from "src/generated/portal/vnc";
 import { getJobServerClient } from "src/utils/client";
@@ -14,13 +15,14 @@ export interface CreateDesktopSchema {
 
   responses: {
     200: {
-      createSuccess: boolean;  
       node: string;
       port: number;
       password: string;
-      alreadyDisplay: number;
-      maxDisplay: number;
     };
+    409: {
+      code: "RESOURCE_EXHAUSTED";
+      message: string;
+    }
     // 功能没有启用
     501: null;
   }
@@ -44,7 +46,13 @@ export default /*#__PURE__*/route<CreateDesktopSchema>("CreateDesktopSchema", as
     cluster: req.body.cluster,
     username: info.identityId,
   })
-    .then(({ createSuccess, node, password, port, alreadyDisplay, maxDisplay  }) => {
-      return { 200: { createSuccess, node, password, port, alreadyDisplay, maxDisplay } };
+    .then(({  node, password, port }) => {
+      return { 200: { node, password, port } };
+    }).catch((e) => {
+      if (e.code === status.RESOURCE_EXHAUSTED) {
+        return { 409: { code: "RESOURCE_EXHAUSTED", message: e.details } } as const;
+      } else {
+        throw e;
+      }
     });
 });

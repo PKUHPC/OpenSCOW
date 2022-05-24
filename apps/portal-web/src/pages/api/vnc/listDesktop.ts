@@ -14,7 +14,7 @@ export interface ListDesktopSchema {
 
   responses: {
     200: {
-        listDesktopReply : ListDesktopReply;
+        result : ListDesktopReply;
     };
     // 功能没有启用
     501: null;
@@ -39,7 +39,7 @@ export default /*#__PURE__*/route<ListDesktopSchema>("ListDesktopSchema", async 
     clusters: req.body.clusters,
     username: info.identityId,
   })
-    .then((listDesktopReply) => {
-      return { 200:  { listDesktopReply }  };
+    .then((result) => {
+      return { 200: { result } };
     });
 });

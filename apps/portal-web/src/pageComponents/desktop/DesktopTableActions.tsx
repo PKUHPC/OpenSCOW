@@ -1,18 +1,17 @@
 import { Popconfirm, Space } from "antd";
-import React, { useEffect, useState } from "react";
-import { api as realApi } from "src/apis/api";
-
+import React, { useState } from "react";
+import { api } from "src/apis";
+import type { DesktopItem } from "src/pageComponents/desktop/DesktopTable";
 interface Props {
-  ischange: boolean,
-  setchange,
-  record,
+  isChange: boolean,
+  setChange: React.Dispatch<React.SetStateAction<boolean>>,
+  record: DesktopItem,
 }
 
-export const DesktopTableActions: React.FC<Props> = ({ ischange, setchange, record }) => {
+export const DesktopTableActions: React.FC<Props> = ({ isChange, setChange, record }) => {
   
   //Is the popconfirm visible
   const [isPopconfirmVisible, setisPopconfirmVisible] = useState(false);
-
   return (
     <div>
       <Space size="middle">
@@ -20,10 +19,10 @@ export const DesktopTableActions: React.FC<Props> = ({ ischange, setchange, reco
           onClick={async () => {
 
             //launch desktop
-            const resp = await realApi.launchDesktop({
+            const resp = await api.launchDesktop({
               body: {
-                cluster: record.desktop.split(":")[0],
-                displayId: record.desktop.split(":")[1],
+                cluster: record.clusterId,
+                displayId: Number(record.desktop.split(":")[1]),
               },
             });
             
@@ -33,7 +32,7 @@ export const DesktopTableActions: React.FC<Props> = ({ ischange, setchange, reco
               autoconnect: "true",
               reconnect: "true",
             });
-        
+
             window.open("/vnc/vnc.html?" + params.toString(), "_blank");
           }}
         >
@@ -47,14 +46,13 @@ export const DesktopTableActions: React.FC<Props> = ({ ischange, setchange, reco
             setisPopconfirmVisible(false);
 
             //kill desktop
-            await realApi.killDesktop({
+            await api.killDesktop({
               body: {
-                cluster: record.desktop.split(":")[0],
-                displayId: record.desktop.split(":")[1],
+                cluster: record.clusterId,
+                displayId: Number(record.desktop.split(":")[1]),
               },
             });
-
-            setchange(!ischange);
+            setChange(!isChange); 
           }}
           onCancel={() => {
             setisPopconfirmVisible(false);

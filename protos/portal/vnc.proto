@@ -21,13 +21,13 @@ message ListDesktopRequest {
 
 
 message ListDesktopReply {
-  message ConnectionInfo{
-    string node_addr = 1;
-    string cluster = 2;
-    repeated uint32 display_id = 3;
+  message Connection{
+    string node = 1;
+    string cluster_name = 2;
+    string cluster_id = 3;
+    repeated uint32 display_id = 4;
   }
-  bool already_running = 1;
-  repeated ConnectionInfo Connection_info = 2;
+  repeated Connection connection = 1;
 }
 
 message CreateDesktopRequest {
@@ -35,14 +35,11 @@ message CreateDesktopRequest {
   string username = 2;
 }
 
+// RESOURCE_EXHAUSTED: if VNC desktop reaches maximum, the details is the already/maximum.
 message CreateDesktopReply {
-  bool create_success = 1;
-  string node = 2;
-  string password = 3;
-  uint32 display_id = 4;
-  uint32 port = 5;
-  uint32 already_display = 6;
-  uint32 max_display = 7;
+  string node = 1;
+  string password = 2;
+  uint32 port = 3;
 }
 
 message KillDesktopRequest {
@@ -52,7 +49,6 @@ message KillDesktopRequest {
 }
 
 message KillDesktopReply {
-  bool kill_success = 1;
 }
 
 
