@@ -1,11 +1,16 @@
-import { Button, Col, Form, Modal, Row, Table } from "antd";
+import { PlusOutlined } from "@ant-design/icons";
+import { Table } from "antd";
 import { ColumnsType } from "antd/lib/table";
-import React, { useCallback, useState } from "react";
+import React, { useCallback } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
-import { SingleClusterSelector } from "src/components/ClusterSelector";
-import { DesktopTableActions, openDesktop } from "src/pageComponents/desktop/DesktopTableActions";
+import { ModalButton } from "src/components/ModalLink";
+import { PageTitle } from "src/components/PageTitle";
+import { DesktopTableActions } from "src/pageComponents/desktop/DesktopTableActions";
+import { NewDesktopTableModal } from "src/pageComponents/desktop/NewDesktopTableModal";
 import { Cluster, CLUSTERS, CLUSTERS_ID_MAP } from "src/utils/config";
+
+const NewDesktopTableModalButton = ModalButton(NewDesktopTableModal, { type: "primary", icon: <PlusOutlined /> });
 
 interface Props {
 
@@ -19,14 +24,6 @@ export type DesktopItem = {
 
 export const DesktopTable: React.FC<Props> = () => {
 
-  type ClusterInfo = {
-    cluster: string,
-  }
-
-  //Is the modal visible
-  const [isModalVisible, setIsModalVisible] = useState(false);
-
-  const [form] = Form.useForm<ClusterInfo>();
 
   const { data, isLoading, reload } = useAsync({
     promiseFn: useCallback(async () => {
@@ -77,69 +74,21 @@ export const DesktopTable: React.FC<Props> = () => {
       ),
     },
   ];
-
-  const onClick = async (values) => {
-
-    setIsModalVisible(false);
-
-    //Create new desktop
-    const resp = await api.createDesktop({ body: { cluster: values["cluster"].id } })
-      .httpError(409, (e) => {
-        const { code, message:serverMessage } = e;
-        if (code === "RESOURCE_EXHAUSTED") {
-          Modal.error({
-            title: "新建桌面失败",
-            content: `该集群桌面数目达到最大限制。已经创建了${serverMessage}个桌面，最多可创建${serverMessage}个桌面。`,
-          });
-        } else {
-          throw e;
-        }
-      });
-
-    openDesktop(resp.node, resp.port, resp.password);
-    reload();
-  };
-
   return (
-    <div >
-      <Button type="primary" onClick={() => { setIsModalVisible(true); }} style={{ marginBottom: "20px" }}>
+    <div>
+      <PageTitle titleText="登录节点上的桌面">
+        <NewDesktopTableModalButton reload={reload}>
         新建桌面
-      </Button >
-      <Modal
-        title="新建桌面"
-        visible={isModalVisible}
-        onCancel={() => {
-          setIsModalVisible(false);
-        }}
-        footer={null}
-      >
-        <Form
-          form={form}
-          onFinish={onClick}
-          style={{ margin:"10%" }} >
-          <Form.Item
-            label="集群"
-            name="cluster"
-            rules={[
-              {
-                required: true,
-                message: "请选择一个集群!",
-              },
-            ]}>
-            <SingleClusterSelector />
-          </Form.Item>
-          <Form.Item>
-            <Row>
-              <Col span={24} style={{ textAlign: "right" }}>
-                <Button type="primary" htmlType="submit">
-                  新建
-                </Button>
-              </Col>
-            </Row>
-          </Form.Item>
-        </Form>
-      </Modal>
-      <Table dataSource={data} columns={columns} rowKey={(record) => record.desktopId} loading={isLoading} />
+        </NewDesktopTableModalButton>
+      </PageTitle>
+
+      <Table
+        dataSource={data}
+        columns={columns}
+        rowKey={(record) => record.desktopId}
+        loading={isLoading}
+        pagination={false}
+      />
     </div>
   );
 };

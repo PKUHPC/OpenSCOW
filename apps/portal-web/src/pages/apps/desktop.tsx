@@ -10,7 +10,7 @@ export const DesktopIndexPage: NextPage = requireAuth(() => true)(() => {
   if (!publicConfig.ENABLE_VNC) {
     return <NotFoundPage />;
   }
-  
+
   return (
     <div>
       <Head title="桌面" />
