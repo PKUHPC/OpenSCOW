@@ -1,12 +1,14 @@
-import { Server as NetServer, Socket } from "net";
+import ProxyServer from "http-proxy";
+import { Server, Socket } from "net";
 import { NextApiResponse } from "next";
 import { Server as SocketIOServer } from "socket.io";
 
 
 export type NextApiResponseServerIO = NextApiResponse & {
   socket: Socket & {
-    server: NetServer & {
+    server: Server & {
       io: SocketIOServer;
+      proxy: ProxyServer;
     };
   };
 };

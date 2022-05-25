@@ -1,16 +1,15 @@
+import { IncomingMessage } from "http";
 import type { NextApiRequest, NextApiResponse, NextPageContext } from "next";
 import { getTokenFromCookie } from "src/auth/cookie";
 import type { Check } from "src/auth/requireAuth";
 import { validateToken } from "src/auth/token";
 import type { UserInfo } from "src/models/User";
 
-type RequestType = NextApiRequest | NextPageContext["req"];
+type RequestType = IncomingMessage | NextApiRequest | NextPageContext["req"];
 
 export type AuthResultError = 401 | 403;
 
 export async function checkCookie(check: Check, req: RequestType): Promise<AuthResultError | UserInfo> {
-
-
   const token = getTokenFromCookie({ req });
 
   if (!token) {

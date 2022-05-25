@@ -2,7 +2,7 @@ import { NextApiRequest } from "next";
 import * as pty from "node-pty";
 import { join } from "path";
 import { Server as ServerIO } from "socket.io";
-import { validateToken } from "src/auth/token";
+import { checkCookie } from "src/auth/server";
 import { NextApiResponseServerIO } from "src/types/socket";
 import { runtimeConfig } from "src/utils/config";
 import { queryToIntOrDefault, queryToString } from "src/utils/querystring";
@@ -23,11 +23,9 @@ export default async (req: NextApiRequest, res: NextApiResponseServerIO) => {
 
     io.on("connection", async (socket) => {
 
-      const token = socket.handshake.auth.token;
+      const user = await checkCookie(() => true, socket.request);
 
-      const user = token ? await validateToken(token) : undefined;
-
-      if (!user) {
+      if (typeof user === "number") {
         console.log("[io] token is not valid");
         socket.emit("data", "token is not valid");
         socket.disconnect();

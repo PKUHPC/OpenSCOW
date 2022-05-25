@@ -343,6 +343,7 @@ importers:
       '@types/url-join': ^4.0.1
       antd: ^4.20.1
       google-protobuf: ^3.20.1
+      http-proxy: ^1.18.1
       less: ^4.1.2
       mime-types: ^2.1.35
       moment: ^2.29.3
@@ -386,6 +387,7 @@ importers:
       '@sinclair/typebox': 0.23.5
       antd: 4.20.4_sfoxds7t5ydpegc3knd667wn6m
       google-protobuf: 3.20.1
+      http-proxy: 1.18.1
       less: 4.1.2
       mime-types: 2.1.35
       moment: 2.29.3

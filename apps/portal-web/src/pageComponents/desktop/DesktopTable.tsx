@@ -1,10 +1,10 @@
-import { Button, Col, Form, Modal, Row, Select, Table } from "antd";
+import { Button, Col, Form, Modal, Row, Table } from "antd";
 import React, { useEffect, useState } from "react";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
-import type { ListDesktopReply_Connection } from "src/generated/portal/vnc"; 
-import { DesktopTableActions } from "src/pageComponents/desktop/DesktopTableActions";
-import { CLUSTERS, publicConfig } from "src/utils/config";
+import type { ListDesktopReply_Connection } from "src/generated/portal/vnc";
+import { DesktopTableActions, openDesktop } from "src/pageComponents/desktop/DesktopTableActions";
+import { CLUSTERS } from "src/utils/config";
 
 interface Props {
 
@@ -93,10 +93,10 @@ export const DesktopTable: React.FC<Props> = () => {
   const onClick = async (values) => {
 
     setIsModalVisible(false);
-    
+
     //Create new desktop
     const resp = await api.createDesktop({ body: { cluster: values["cluster"].id } })
-      .httpError(409, (e) => { 
+      .httpError(409, (e) => {
         const { code, message:serverMessage } = e;
         if (code === "RESOURCE_EXHAUSTED") {
           Modal.error({
@@ -108,14 +108,7 @@ export const DesktopTable: React.FC<Props> = () => {
         }
       });
 
-    const params = new URLSearchParams({
-      path: `/vnc-server/${resp.node}/${resp.port}`,
-      password: resp.password,
-      autoconnect: "true",
-      reconnect: "true",
-    });
-    
-    window.open("/vnc/vnc.html?" + params.toString(), "_blank");
+    openDesktop(resp.node, resp.port, resp.password);
     setChange(!isChange);
   };
 
@@ -136,9 +129,9 @@ export const DesktopTable: React.FC<Props> = () => {
           form={form}
           onFinish={onClick}
           style={{ margin:"10%" }} >
-          <Form.Item 
-            label="集群" 
-            name="cluster" 
+          <Form.Item
+            label="集群"
+            name="cluster"
             rules={[
               {
                 required: true,

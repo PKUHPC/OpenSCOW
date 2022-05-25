@@ -1,4 +1,5 @@
 import { Popconfirm, Space } from "antd";
+import { join } from "path";
 import React, { useState } from "react";
 import { api } from "src/apis";
 import type { DesktopItem } from "src/pageComponents/desktop/DesktopTable";
@@ -8,8 +9,20 @@ interface Props {
   record: DesktopItem,
 }
 
+export const openDesktop = (node: string, port: number, password: string) => {
+
+  const params = new URLSearchParams({
+    path: join(process.env.NEXT_PUBLIC_BASE_PATH ?? "", `api/proxy/${node}/${port}`),
+    password: password,
+    autoconnect: "true",
+    reconnect: "true",
+  });
+
+  window.open("/vnc/vnc.html?" + params.toString(), "_blank");
+};
+
 export const DesktopTableActions: React.FC<Props> = ({ isChange, setChange, record }) => {
-  
+
   //Is the popconfirm visible
   const [isPopconfirmVisible, setisPopconfirmVisible] = useState(false);
   return (
@@ -25,20 +38,13 @@ export const DesktopTableActions: React.FC<Props> = ({ isChange, setChange, reco
                 displayId: Number(record.desktop.split(":")[1]),
               },
             });
-            
-            const params = new URLSearchParams({
-              path: `/vnc-server/${resp.node}/${resp.port}`,
-              password: resp.password,
-              autoconnect: "true",
-              reconnect: "true",
-            });
 
-            window.open("/vnc/vnc.html?" + params.toString(), "_blank");
+            openDesktop(resp.node, resp.port, resp.password);
           }}
         >
           启动
         </a>
-       
+
         <Popconfirm
           title="删除后不可恢复，你确定要删除吗?"
           visible={isPopconfirmVisible}
@@ -52,7 +58,7 @@ export const DesktopTableActions: React.FC<Props> = ({ isChange, setChange, reco
                 displayId: Number(record.desktop.split(":")[1]),
               },
             });
-            setChange(!isChange); 
+            setChange(!isChange);
           }}
           onCancel={() => {
             setisPopconfirmVisible(false);

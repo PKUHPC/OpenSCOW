@@ -24,6 +24,7 @@
     "@sinclair/typebox": "^0.23.5",
     "antd": "^4.20.1",
     "google-protobuf": "^3.20.1",
+    "http-proxy": "^1.18.1",
     "less": "^4.1.2",
     "next": "^12.1.5",
     "next-compose-plugins": "^2.2.1",
