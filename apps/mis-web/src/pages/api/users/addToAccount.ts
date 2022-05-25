@@ -33,7 +33,7 @@ export interface AddUserToAccountSchema {
   }
 }
 
-export default /*#__PURE__*/route<AddUserToAccountSchema>("AddUserToAccountSchema", async (req, res) => {
+export default /* #__PURE__*/route<AddUserToAccountSchema>("AddUserToAccountSchema", async (req, res) => {
   const { identityId, accountName, name } = req.body;
 
   const auth = authenticate((u) =>

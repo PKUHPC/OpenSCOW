@@ -89,7 +89,7 @@ const StorageForm: React.FC = () => {
           {
             currentLoading
               ? "查询中……"
-              :current === undefined
+              : current === undefined
                 ? "请点击查询"
                 : `${Math.floor(current / 60)} 分钟${current % 60 === 0 ? "" : ` ${current % 60}秒`}`
           }

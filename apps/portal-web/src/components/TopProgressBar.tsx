@@ -17,7 +17,7 @@ function load() {
 
   state = "loading";
 
-  timer = setTimeout(function () {
+  timer = setTimeout(function() {
     NProgress.start();
   }, delay); // only show progress bar if it takes longer than the delay
 }
@@ -48,12 +48,12 @@ export function decrementRequest() {
 }
 
 // register HTTP request loading
-if (!isServer()){
+if (!isServer()) {
   prefetchEvent.register(incrementRequest);
   finallyEvent.register(decrementRequest);
 }
 
-export default function Dummy () {
+export default function Dummy() {
   return null;
 }
 

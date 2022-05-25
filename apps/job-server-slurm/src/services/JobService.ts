@@ -14,7 +14,7 @@ import { promisify } from "util";
 export function parseSbatchOutput(output: string): number {
   // Submitted batch job 34987
   const splitted = output.split(" ");
-  return +splitted[splitted.length-1];
+  return +splitted[splitted.length - 1];
 }
 
 

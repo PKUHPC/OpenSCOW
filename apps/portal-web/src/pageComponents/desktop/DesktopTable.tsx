@@ -27,12 +27,12 @@ export const DesktopTable: React.FC<Props> = () => {
 
   const { data, isLoading, reload } = useAsync({
     promiseFn: useCallback(async () => {
-      //List all desktop
+      // List all desktop
       const { result } = await api.listDesktops({ body: { clusters: CLUSTERS.map((x) => x.id) } });
 
       const desktopList: DesktopItem[] = [];
 
-      //Splice data
+      // Splice data
       result.connections.forEach((x)=>{
         x.displayId.forEach((displayId) => {
           desktopList.push({ desktopId: displayId, cluster: CLUSTERS_ID_MAP[x.cluster], addr: x.node });

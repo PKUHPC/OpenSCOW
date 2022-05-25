@@ -189,7 +189,7 @@ export const RunningJobInfoTable: React.FC<JobInfoTableProps> = ({
 
   return (
     <>
-      {selection ?(
+      {selection ? (
         <TableTitle>
           <Space>
             <BatchChangeJobTimeLimitButton
@@ -212,7 +212,7 @@ export const RunningJobInfoTable: React.FC<JobInfoTableProps> = ({
               name: record.name,
             }),
           },
-        }: {})}
+        } : {})}
         dataSource={data}
         loading={isLoading}
         pagination={{ showSizeChanger: true }}

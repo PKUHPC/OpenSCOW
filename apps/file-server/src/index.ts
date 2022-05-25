@@ -7,7 +7,7 @@ const index = process.argv.indexOf(WORKER_MARKER);
 
 if (index >= 0) {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
-  runWorker(process.argv.slice(index+1));
+  runWorker(process.argv.slice(index + 1));
 }
 
 import { buildApp, startServer } from "src/app";

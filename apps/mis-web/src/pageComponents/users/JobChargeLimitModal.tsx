@@ -41,7 +41,7 @@ export const JobChargeLimitModal: React.FC<Props> = ({
 
   return (
     <Modal
-      title={`${currentLimit === undefined ? "设置": "修改"}用户作业费用限额`}
+      title={`${currentLimit === undefined ? "设置" : "修改"}用户作业费用限额`}
       visible={visible}
       onCancel={onClose}
       confirmLoading={loading}

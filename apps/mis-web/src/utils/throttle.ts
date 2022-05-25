@@ -1,4 +1,4 @@
-export function throttle<T extends (...args: any[]) => any>
+export function throttle<T extends(...args: any[]) => any>
 (fn: T, wait = 500): (...args: Parameters<T>) => ReturnType<T> {
   // 上一次执行 fn 的时间
   let previous = 0;

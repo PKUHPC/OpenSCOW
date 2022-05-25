@@ -76,7 +76,7 @@ export const PathBar: React.FC<Props> = ({ path, loading, reload, go, fullUrl })
                 </Link>
                 {pathSegments.map((x, i) => (
                   <>
-                    <Link href={fullUrl(pathSegments.slice(0, i+1).join("/"))} key={i} passHref>
+                    <Link href={fullUrl(pathSegments.slice(0, i + 1).join("/"))} key={i} passHref>
                       <a onClick={(e) => e.stopPropagation()}>
                         {x}
                       </a>

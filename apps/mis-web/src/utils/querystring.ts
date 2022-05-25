@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 type QueryValue = string | string[] | null | undefined;
 
 export function queryToString(input: QueryValue): string {
-  return Array.isArray(input) ? input[input.length-1] : (input ?? "");
+  return Array.isArray(input) ? input[input.length - 1] : (input ?? "");
 }
 
 export function queryToIntOrDefault(input: QueryValue, defaultValue: number): number;

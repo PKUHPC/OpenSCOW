@@ -32,7 +32,7 @@ const FILE_NAMES = {
   "512": "512.png",
 };
 
-export default /*#__PURE__*/route<GetIconSchema>("GetIconSchema", async (req, res) => {
+export default /* #__PURE__*/route<GetIconSchema>("GetIconSchema", async (req, res) => {
 
   const hostname = getHostname(req);
 
@@ -56,7 +56,7 @@ export default /*#__PURE__*/route<GetIconSchema>("GetIconSchema", async (req, re
   });
 
   const readStream = fs.createReadStream(imagePath);
-  await new Promise(function (resolve) {
+  await new Promise(function(resolve) {
     readStream.pipe(res);
     readStream.on("end", resolve);
   });

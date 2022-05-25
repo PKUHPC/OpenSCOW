@@ -99,7 +99,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
     const paths = path.split("/");
 
     const newPath = paths.length === 1
-      ? path : "/" + paths.slice(0, paths.length-1).join("/");
+      ? path : "/" + paths.slice(0, paths.length - 1).join("/");
 
     Router.push(fullUrl(newPath));
   };
@@ -173,7 +173,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
           message.success(`${operationTexts[operation.op]}${allCount}项成功！`);
           setOperation(undefined);
         } else {
-          message.error(`${operationTexts[operation.op]}成功${successfulCount}项，失败${allCount-successfulCount}项`);
+          message.error(`${operationTexts[operation.op]}成功${successfulCount}项，失败${allCount - successfulCount}项`);
           setOperation((o) => o && ({ ...o, started: false }));
         }
       }).catch((e) => {
@@ -340,7 +340,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
           onDoubleClick: () => {
             if (r.type === "dir") {
               Router.push(fullUrl(join(path, r.name)));
-            } else if (r.type ==="file") {
+            } else if (r.type === "file") {
               const href = urlToDownload(cluster, join(path, r.name), false);
               openPreviewLink(href);
             }

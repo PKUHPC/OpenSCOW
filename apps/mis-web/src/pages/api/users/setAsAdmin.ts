@@ -23,7 +23,7 @@ export interface SetAdminSchema {
   }
 }
 
-export default /*#__PURE__*/route<SetAdminSchema>("SetAdminSchema", async (req, res) => {
+export default /* #__PURE__*/route<SetAdminSchema>("SetAdminSchema", async (req, res) => {
   const { identityId, accountName } = req.body;
 
   const auth = authenticate((u) =>

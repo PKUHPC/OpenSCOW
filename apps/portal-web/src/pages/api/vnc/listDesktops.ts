@@ -23,7 +23,7 @@ export interface ListDesktopsSchema {
 
 const auth = authenticate(() => true);
 
-export default /*#__PURE__*/route<ListDesktopsSchema>("ListDesktopsSchema", async (req, res) => {
+export default /* #__PURE__*/route<ListDesktopsSchema>("ListDesktopsSchema", async (req, res) => {
 
   if (!publicConfig.ENABLE_VNC) {
     return { 501: null };

@@ -23,7 +23,7 @@ export interface BlockUserInAccountSchema {
   }
 }
 
-export default /*#__PURE__*/route<BlockUserInAccountSchema>("BlockUserInAccountSchema", async (req, res) => {
+export default /* #__PURE__*/route<BlockUserInAccountSchema>("BlockUserInAccountSchema", async (req, res) => {
   const { identityId, accountName } = req.body;
 
   const auth = authenticate((u) =>

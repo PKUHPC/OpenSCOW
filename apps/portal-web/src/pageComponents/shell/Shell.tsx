@@ -87,8 +87,8 @@ export const Shell: React.FC<Props> = ({ user, cluster, path }) => {
 
       return () => {
         socket.disconnect();
-        if (container.current){
-          resizeObserver.unobserve(container.current) ;
+        if (container.current) {
+          resizeObserver.unobserve(container.current);
         }
       };
     }

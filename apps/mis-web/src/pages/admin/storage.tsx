@@ -87,7 +87,7 @@ const StorageForm: React.FC = () => {
           {
             currentLoading
               ? "查询中……"
-              :current === undefined
+              : current === undefined
                 ? "请点击查询"
                 : `${current} TB`
           }

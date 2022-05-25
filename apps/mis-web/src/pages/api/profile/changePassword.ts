@@ -27,7 +27,7 @@ export interface ChangePasswordSchema {
 }
 
 
-export default /*#__PURE__*/route<ChangePasswordSchema>("ChangePasswordSchema", async (req, res) => {
+export default /* #__PURE__*/route<ChangePasswordSchema>("ChangePasswordSchema", async (req, res) => {
 
   if (!publicConfig.ENABLE_CHANGE_PASSWORD) {
     return { 501: null };

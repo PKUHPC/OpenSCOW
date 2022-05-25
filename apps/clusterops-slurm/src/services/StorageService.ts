@@ -56,7 +56,7 @@ export const storageServiceServer = plugin((server) => {
           "P": 5,
         };
 
-        const unit = val[val.length-1];
+        const unit = val[val.length - 1];
 
         const pow = units[unit] ?? 0;
 
@@ -75,7 +75,7 @@ export const storageServiceServer = plugin((server) => {
         [ChangeStorageQuotaMode.SET]: "-x",
       };
 
-      const result = await server.ext.executeSlurmScript([command[mode], userId, value+""]);
+      const result = await server.ext.executeSlurmScript([command[mode], userId, value + ""]);
 
       handleError(result, { 4: Status.NOT_FOUND });
 

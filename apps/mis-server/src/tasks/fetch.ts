@@ -77,7 +77,7 @@ export async function fetchJobs(
 
     const latestIndex = await getLatestIndex(em, logger);
 
-    const startIndex = Math.max(latestIndex+1, config.FETCH_JOBS_START_INDEX);
+    const startIndex = Math.max(latestIndex + 1, config.FETCH_JOBS_START_INDEX);
     logger.info(`Fetching new info from ${startIndex}`);
 
     // Fetch new info
@@ -93,8 +93,8 @@ export async function fetchJobs(
 
     logger.info(`Batch size is ${batchSize}. ${loopCount} rounds to complete.`);
 
-    for (let i = 0; i<loopCount; i++) {
-      logger.info(`Fetching next batch from ${i * batchSize}. Round ${i+1}/${loopCount}`);
+    for (let i = 0; i < loopCount; i++) {
+      logger.info(`Fetching next batch from ${i * batchSize}. Round ${i + 1}/${loopCount}`);
 
       const info = await sourceEm.find(OriginalJob, {
         biJobIndex: { $gte: startIndex + i * batchSize },
@@ -193,7 +193,7 @@ export async function fetchJobs(
 
         }));
 
-        logger.info(`Round ${i+1}/${loopCount} completed and persisted. Wait 2 seconds for next round.`);
+        logger.info(`Round ${i + 1}/${loopCount} completed and persisted. Wait 2 seconds for next round.`);
       });
 
       await new Promise((res) => setTimeout(res, 2000));

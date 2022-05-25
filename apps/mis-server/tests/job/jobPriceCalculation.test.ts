@@ -69,7 +69,7 @@ it("creates billing items in db", async () => {
       itemId: x.itemId,
       price: x.price,
       path: x.path,
-      ...x.tenant ? { tenant: x.tenant.getEntity().name }: undefined,
+      ...x.tenant ? { tenant: x.tenant.getEntity().name } : undefined,
     }).toEqual(expectedPriceItems.find((e) => e.itemId === x.itemId));
   });
 

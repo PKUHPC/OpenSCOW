@@ -1,6 +1,6 @@
 import type { Awaited } from "@ddadaal/next-typed-api-routes-runtime/lib/client";
 
-export function debounce<F extends (...args: any[]) => any>(
+export function debounce<F extends(...args: any[]) => any>(
   func: F,
   interval = 200,
 ): (this: ThisParameterType<F>, ...args: Parameters<F>) => Promise<Awaited<ReturnType<F>>>

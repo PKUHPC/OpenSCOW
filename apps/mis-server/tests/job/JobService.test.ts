@@ -121,8 +121,8 @@ it("changes job prices", async () => {
 
   // check balances
   expect(data.tenant.balance.toNumber()).toBe(prevTenantBalance.minus(0.4).toNumber()); // 1-1.7+2-1.7
-  expect(data.accountA.balance.toNumber()).toBe(prevABalance.plus(2-1.6).toNumber());
-  expect(data.accountB.balance.toNumber()).toBe(prevBBalance.plus(4-1.6).toNumber());
+  expect(data.accountA.balance.toNumber()).toBe(prevABalance.plus(2 - 1.6).toNumber());
+  expect(data.accountB.balance.toNumber()).toBe(prevBBalance.plus(4 - 1.6).toNumber());
 });
 
 it("returns 10 jobs if pageSize is undefined or 0", async () => {

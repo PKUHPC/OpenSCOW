@@ -27,7 +27,7 @@ export const NewDesktopTableModal: React.FC<Props> = ({ visible, onClose, reload
 
     setSubmitting(true);
 
-    //Create new desktop
+    // Create new desktop
     await api.createDesktop({ body: { cluster: values.cluster.id } })
       .httpError(409, (e) => {
         const { code, message:serverMessage } = e;

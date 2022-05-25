@@ -12,7 +12,7 @@ export function parsePlaceholder(str: string, valueObj: object) {
   return str.replace(/\$\{([a-zA-Z0-9_]+)\}/g, (_, p1: string) => valueObj[p1] ?? "");
 }
 
-export type Validator<T> = readonly [((spec?: Spec<T>) => ValidatorSpec<T>), Spec<T>] ;
+export type Validator<T> = readonly [((spec?: Spec<T>) => ValidatorSpec<T>), Spec<T>];
 
 function parsePlaceholders(env: Record<string, any>, rawEnv: any) {
   for (const k in env) {

@@ -7,7 +7,7 @@ import { config } from "src/config/env";
 
 export interface SlurmPlugin {
   executeSlurmScript: (cmds: string[]) => Promise<SSHExecCommandResponse>;
-  executeScript: (cmd: string, parameters: string[], env?: NodeJS.ProcessEnv ) => Promise<SSHExecCommandResponse>;
+  executeScript: (cmd: string, parameters: string[], env?: NodeJS.ProcessEnv) => Promise<SSHExecCommandResponse>;
 }
 
 export const slurmPlugin = plugin(async (s) => {

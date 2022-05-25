@@ -26,7 +26,7 @@ export interface LaunchDesktopSchema {
 
 const auth = authenticate(() => true);
 
-export default /*#__PURE__*/route<LaunchDesktopSchema>("LaunchDesktopSchema", async (req, res) => {
+export default /* #__PURE__*/route<LaunchDesktopSchema>("LaunchDesktopSchema", async (req, res) => {
 
   if (!publicConfig.ENABLE_VNC) {
     return { 501: null };

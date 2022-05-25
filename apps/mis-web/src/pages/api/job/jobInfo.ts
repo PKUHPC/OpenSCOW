@@ -67,7 +67,7 @@ export const getJobInfo = async (request: GetJobsRequest) => {
 };
 
 
-export default /*#__PURE__*/route<GetJobInfoSchema>("GetJobInfoSchema", async (req, res) => {
+export default /* #__PURE__*/route<GetJobInfoSchema>("GetJobInfoSchema", async (req, res) => {
   const auth = authenticate((u) =>
     u.tenantRoles.includes(TenantRole.TENANT_ADMIN) || u.accountAffiliations.length > 0);
 

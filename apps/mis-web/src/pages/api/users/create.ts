@@ -39,7 +39,7 @@ export interface CreateUserSchema {
   }
 }
 
-export default /*#__PURE__*/route<CreateUserSchema>("CreateUserSchema", async (req, res) => {
+export default /* #__PURE__*/route<CreateUserSchema>("CreateUserSchema", async (req, res) => {
 
   if (!publicConfig.ENABLE_CREATE_USER) {
     return { 501: null };

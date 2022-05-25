@@ -24,7 +24,7 @@ export interface SetJobChargeLimitSchema {
   }
 }
 
-export default /*#__PURE__*/route<SetJobChargeLimitSchema>("SetJobChargeLimitSchema", async (req, res) => {
+export default /* #__PURE__*/route<SetJobChargeLimitSchema>("SetJobChargeLimitSchema", async (req, res) => {
 
   const { accountName, userId, limit } = req.body;
 

@@ -14,7 +14,7 @@ export const RunningJobInfo = {
 };
 
 function pad(num: number) {
-  return num >= 10 ? num : "0"+num;
+  return num >= 10 ? num : "0" + num;
 }
 
 function calculateRunningOrQueueTime(r: RunningJob) {
@@ -30,9 +30,9 @@ function calculateRunningOrQueueTime(r: RunningJob) {
   const days = hours / 24;
 
   let text = "";
-  text += days >= 1 ? Math.floor(days)+"-" : "";
+  text += days >= 1 ? Math.floor(days) + "-" : "";
   const hoursModulo = Math.floor(hours % 24);
-  text += hours >= 1 ? pad(hoursModulo)+":" : "";
+  text += hours >= 1 ? pad(hoursModulo) + ":" : "";
   const minModulo = Math.floor(minutes % 60);
   text += pad(minModulo);
   text += ":";

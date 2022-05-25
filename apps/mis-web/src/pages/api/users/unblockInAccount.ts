@@ -23,7 +23,7 @@ export interface UnblockUserInAccountSchema {
   }
 }
 
-export default /*#__PURE__*/route<UnblockUserInAccountSchema>("UnblockUserInAccountSchema", async (req, res) => {
+export default /* #__PURE__*/route<UnblockUserInAccountSchema>("UnblockUserInAccountSchema", async (req, res) => {
   const { identityId, accountName } = req.body;
 
   const auth = authenticate((u) =>

@@ -22,7 +22,7 @@ const BUILTIN_DEFAULT_DIR = "assets/logo";
 
 const DEFAULT_DIR = fs.existsSync(CUSTOM_DEFAULT_DIR) ? CUSTOM_DEFAULT_DIR : BUILTIN_DEFAULT_DIR;
 
-export default /*#__PURE__*/route<GetLogoSchema>("GetLogoSchema", async (req, res) => {
+export default /* #__PURE__*/route<GetLogoSchema>("GetLogoSchema", async (req, res) => {
 
   const hostname = getHostname(req);
 
@@ -48,7 +48,7 @@ export default /*#__PURE__*/route<GetLogoSchema>("GetLogoSchema", async (req, re
   });
 
   const readStream = fs.createReadStream(imagePath);
-  await new Promise(function (resolve) {
+  await new Promise(function(resolve) {
     readStream.pipe(res);
     readStream.on("end", resolve);
   });

@@ -50,7 +50,7 @@ it("uploads file", async () => {
 
   expect(rep.statusCode).toBe(201);
 
-  const stat =await fs.promises.stat(filePath);
+  const stat = await fs.promises.stat(filePath);
   expect(stat.size).toBe(size);
   expect(stat.uid).toBe(TEST_USER_UID);
 });

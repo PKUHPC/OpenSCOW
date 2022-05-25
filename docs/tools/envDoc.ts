@@ -34,7 +34,7 @@ export function getDocFromSpec(spec: Record<string, Validator<any>>) {
     docNames[func.name],
     // @ts-ignore
     // eslint-disable-next-line max-len
-    `${spec.desc ? spec.desc.replaceAll("\n", "<br/>"): ""}${spec.choices ? "<br/>可选项："+spec.choices.join(",") :""}${spec.example ? "<br/>示例：" + spec.example : ""}`,
+    `${spec.desc ? spec.desc.replaceAll("\n", "<br/>") : ""}${spec.choices ? "<br/>可选项：" + spec.choices.join(",") : ""}${spec.example ? "<br/>示例：" + spec.example : ""}`,
     "default" in spec ?
       (spec.default === undefined
         ? "不设置"
@@ -51,7 +51,7 @@ export function getDocFromSpec(spec: Record<string, Validator<any>>) {
 
 export function genConfigTable(pack: string, configFile = "src/config/env") {
   const appPath = resolve(join("../apps", pack));
-  dotenv.config({ path: join(appPath, "env/.env.dev" ) });
+  dotenv.config({ path: join(appPath, "env/.env.dev") });
 
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { config } = require(join(appPath, configFile));
@@ -82,7 +82,7 @@ const TABLE_END = "<!-- ENV TABLE END -->";
 
 for (const { app, configFile, md } of config) {
 
-  const mdPath =path.join("docs", md);
+  const mdPath = path.join("docs", md);
 
   console.log(`Writing ${app} env config to ${mdPath}`);
 
@@ -90,9 +90,9 @@ for (const { app, configFile, md } of config) {
 
   const content = fs.readFileSync(mdPath, "utf-8");
 
-  const beginning = content.substring(0, content.indexOf(TABLE_START)-1);
+  const beginning = content.substring(0, content.indexOf(TABLE_START) - 1);
 
-  const ending = content.substring(content.indexOf(TABLE_END) + TABLE_END.length+1);
+  const ending = content.substring(content.indexOf(TABLE_END) + TABLE_END.length + 1);
 
   const newContent = [
     beginning,

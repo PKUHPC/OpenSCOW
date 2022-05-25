@@ -22,7 +22,7 @@ export interface CancelJobChargeLimitSchema {
   }
 }
 
-export default /*#__PURE__*/route<CancelJobChargeLimitSchema>("CancelJobChargeLimitSchema", async (req, res) => {
+export default /* #__PURE__*/route<CancelJobChargeLimitSchema>("CancelJobChargeLimitSchema", async (req, res) => {
 
   const { accountName, userId } = req.body;
 

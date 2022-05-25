@@ -85,7 +85,7 @@ export async function initializeUsers(em: SqlEntityManager, whitelistAll = false
   await em.persistAndFlush([...Object.values(usersMap), ...accounts, ...userAccounts]);
 
   logger.info(`User initialization success. ${accounts.length} accounts, ${Object.keys(usersMap).length} users.`);
-  if (idsWithoutName.length !== 0){
+  if (idsWithoutName.length !== 0) {
     logger.warn(`${idsWithoutName.length} users don't have names.`);
     logger.warn(idsWithoutName.join(", "));
   }

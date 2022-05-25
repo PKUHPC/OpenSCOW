@@ -49,7 +49,7 @@ const mockFileList = (times: number, date: string) => {
   ] as FileInfo[];
 
   return range(0, times).map((x) => {
-    const item =base[x%3];
+    const item = base[x % 3];
     return { ...item, name: item.name + x };
   });
 };

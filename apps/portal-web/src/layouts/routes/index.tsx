@@ -39,7 +39,7 @@ export const userRoutes: NavItemProps[] = [
         path: "/jobs/savedJobs",
       },
     ],
-  }]: [],
+  }] : [],
   ...publicConfig.ENABLE_SHELL ? [{
     Icon: MacCommandOutlined,
     text: "Shell",

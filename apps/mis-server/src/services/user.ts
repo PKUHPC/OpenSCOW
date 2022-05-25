@@ -319,7 +319,7 @@ export const userServiceServer = plugin((server) => {
       }
 
       // call auth
-      const rep = await fetch(config.AUTH_URL+"/user", {
+      const rep = await fetch(config.AUTH_URL + "/user", {
         method: "POST",
         body: JSON.stringify({
           identityId,

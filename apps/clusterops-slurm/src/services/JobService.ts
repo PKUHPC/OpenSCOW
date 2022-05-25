@@ -57,13 +57,13 @@ export const jobServiceServer = plugin((server) => {
         ? [0, ...results]
         : results;
 
-      return [{ limit: s + m*60 + h*60*60 + d*60*60*24 }];
+      return [{ limit: s + m * 60 + h * 60 * 60 + d * 60 * 60 * 24 }];
     },
 
     changeJobTimeLimit: async ({ request }) => {
       const { delta, jobId } = request;
 
-      const result = await server.ext.executeSlurmScript(["-n", jobId, delta+""]);
+      const result = await server.ext.executeSlurmScript(["-n", jobId, delta + ""]);
 
       handleError(result, { 7: Status.NOT_FOUND });
 

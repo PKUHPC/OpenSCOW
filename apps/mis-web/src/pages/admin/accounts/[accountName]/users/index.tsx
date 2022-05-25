@@ -38,7 +38,7 @@ export const AccountUsersPage: NextPage = requireAuth(
 
     const { data, isLoading, reload } = useAsync({ promiseFn, watch: refreshToken });
 
-    const title =`账户${accountName}的用户`;
+    const title = `账户${accountName}的用户`;
 
     return (
       <div>

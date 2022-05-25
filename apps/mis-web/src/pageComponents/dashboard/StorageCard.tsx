@@ -27,13 +27,13 @@ function byteToBiggestUnit(quota: number) {
   }
 
   let val = quota;
-  for (let i =0;i<units.length;i++) {
+  for (let i = 0; i < units.length; i++) {
     val /= Math.pow(1024, i);
     if (val < 1024) {
       return toString(val, i);
     }
   }
-  return toString(val, units.length-1);
+  return toString(val, units.length - 1);
 }
 
 export const StorageCard: React.FC<Props> = ({

@@ -44,7 +44,7 @@ export function parseDisplayId(output: string, logger: Logger): number {
   if (!firstNonEmptyLine) { fail(); }
 
   const contents = firstNonEmptyLine.split(":");
-  return +contents[contents.length-1];
+  return +contents[contents.length - 1];
 
 }
 
@@ -159,7 +159,7 @@ export const vncServiceServer = plugin((server) => {
 
       return await server.ext.connect(node, username, logger, async (ssh) => {
 
-        //kill specific desktop
+        // kill specific desktop
         await loggedExec(ssh, logger, true,
           vncServerPath, ["-kill", ":" + displayId]);
 

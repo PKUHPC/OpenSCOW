@@ -25,7 +25,7 @@ export interface RemoveUserFromAccountSchema {
   }
 }
 
-export default /*#__PURE__*/route<RemoveUserFromAccountSchema>("RemoveUserFromAccountSchema", async (req, res) => {
+export default /* #__PURE__*/route<RemoveUserFromAccountSchema>("RemoveUserFromAccountSchema", async (req, res) => {
   const { identityId, accountName } = req.body;
 
   const auth = authenticate((u) =>

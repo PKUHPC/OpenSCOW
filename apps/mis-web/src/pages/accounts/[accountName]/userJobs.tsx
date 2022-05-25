@@ -18,7 +18,7 @@ export const UserJobsPage: NextPage = requireAuth(
     const userId = queryToString(router.query.userId) || undefined;
     const accountName = queryToString(router.query.accountName) || "";
 
-    const title=  `用户${userId}在账户${accountName}下运行的作业`;
+    const title =  `用户${userId}在账户${accountName}下运行的作业`;
 
     return (
       <div>

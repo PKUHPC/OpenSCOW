@@ -10,8 +10,8 @@ interface Props {
 }
 
 export const ForbiddenPage: React.FC<Props> = ({
-  title ="不允许访问此页面",
-  subTitle="系统不允许您访问此页面。",
+  title = "不允许访问此页面",
+  subTitle = "系统不允许您访问此页面。",
 }) => {
   return (
     <>

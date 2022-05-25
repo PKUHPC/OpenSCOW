@@ -15,7 +15,7 @@ export const ChargesPage: NextPage = requireAuth(
 
   const accountName = useAccountPagesAccountName();
 
-  const title =`账户${accountName}扣费记录`;
+  const title = `账户${accountName}扣费记录`;
 
   return (
     <div>

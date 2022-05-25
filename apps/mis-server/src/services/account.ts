@@ -156,7 +156,7 @@ export const accountServiceServer = plugin((server) => {
       });
 
       const owners = await em.find(UserAccount, {
-        account: { accountName: results.map((x) => x.account.$.accountName ), tenant: { name: tenantName } },
+        account: { accountName: results.map((x) => x.account.$.accountName), tenant: { name: tenantName } },
         role: EntityUserRole.OWNER,
       }, { populate: ["user"]});
 

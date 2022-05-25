@@ -23,7 +23,7 @@ export const openDesktop = (node: string, port: number, password: string) => {
 
 export const DesktopTableActions: React.FC<Props> = ({ reload, record }) => {
 
-  //Is the popconfirm visible
+  // Is the popconfirm visible
   const [isPopconfirmVisible, setIsPopconfirmVisible] = useState(false);
   return (
     <div>
@@ -31,7 +31,7 @@ export const DesktopTableActions: React.FC<Props> = ({ reload, record }) => {
         <a
           onClick={async () => {
 
-            //launch desktop
+            // launch desktop
             const resp = await api.launchDesktop({
               body: {
                 cluster: record.cluster.id,
@@ -51,7 +51,7 @@ export const DesktopTableActions: React.FC<Props> = ({ reload, record }) => {
           onConfirm={async () => {
             setIsPopconfirmVisible(false);
 
-            //kill desktop
+            // kill desktop
             await api.killDesktop({
               body: {
                 cluster: record.cluster.id,
