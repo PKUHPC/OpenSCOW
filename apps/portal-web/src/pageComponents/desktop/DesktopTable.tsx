@@ -1,4 +1,5 @@
 import { Button, Col, Form, Modal, Row, Table } from "antd";
+import { ColumnsType } from "antd/lib/table";
 import React, { useCallback, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
@@ -46,30 +47,32 @@ export const DesktopTable: React.FC<Props> = () => {
     }, []),
   });
 
-  const columns = [
+  const columns: ColumnsType<DesktopItem> = [
     {
-      title: "桌面",
-      dataIndex: "desktop",
-      key: "desktop",
+      title: "桌面ID",
+      dataIndex: "desktopId",
+      key: "desktopId",
       width: "30%",
     },
     {
       title: "地址",
-      dataIndex: "node",
-      key: "node",
+      dataIndex: "addr",
+      key: "addr",
       width: "30%",
     },
     {
-      title: "集群ID",
-      dataIndex: "clusterId",
-      key: "clusterId",
+      title: "集群",
+      dataIndex: "cluster",
       width: "20%",
+      render: (_, record) => (
+        record.cluster.name
+      ),
     },
     {
       title: "操作",
       key: "action",
       width: "20%",
-      render: (_, record:DesktopItem) => (
+      render: (_, record) => (
         <DesktopTableActions reload={reload} record={record} />
       ),
     },
