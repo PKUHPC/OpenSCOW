@@ -95,7 +95,8 @@ export const ChargeForm: React.FC = () => {
             onClick={(type) => form.setFieldsValue({ type })}
           />
         </div>
-      }>
+      }
+      >
         <Input />
       </Form.Item>
       <Form.Item name="comment" label="备注">

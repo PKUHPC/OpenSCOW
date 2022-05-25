@@ -44,7 +44,8 @@ export const AccountTable: React.FC<Props> = ({
           initialValues={query}
           onFinish={async () => {
             setQuery(await form.validateFields());
-          }}>
+          }}
+        >
           <Form.Item label="账户" name="accountName">
             <Input />
           </Form.Item>
@@ -80,7 +81,8 @@ export const AccountTable: React.FC<Props> = ({
           render={(b: Money) => moneyToString(b) + " 元" }
         />
         <Table.Column<Account> dataIndex="blocked" title="状态"
-          render={(blocked) => blocked ? <Tag color="red">封锁</Tag> : <Tag color="green">正常</Tag>} />
+          render={(blocked) => blocked ? <Tag color="red">封锁</Tag> : <Tag color="green">正常</Tag>}
+        />
         <Table.Column<Account> title="操作"
           render={(_, r) => (
             <Space split={<Divider type="vertical" />}>

@@ -262,10 +262,9 @@ export const JobInfoTable: React.FC<JobInfoTableProps> = ({
         <Table.Column<JobInfo> dataIndex="timeEnd" title="结束时间"
           render={(time: string) => formatDateTime(time)}
         />
-
         {
-          showedPrices.map((v) => (
-            <Table.Column<JobInfo> dataIndex={`${v}Price`} title={finalPriceText[v]}
+          showedPrices.map((v, i) => (
+            <Table.Column<JobInfo> key={i} dataIndex={`${v}Price`} title={finalPriceText[v]}
               render={(price: Money) => moneyToString(price) + " 元"}
             />
           ))

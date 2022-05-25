@@ -33,7 +33,8 @@ export const ChangePasswordForm: React.FC = () => {
   return (
     <Spin spinning={loading}>
       <Form initialValues={undefined}
-        layout="vertical" form={form} onFinish={onFinish}>
+        layout="vertical" form={form} onFinish={onFinish}
+      >
         <Form.Item
           rules={[{ required: true }]}
           label="原密码"

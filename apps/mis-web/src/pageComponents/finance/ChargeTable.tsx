@@ -51,7 +51,8 @@ export const ChargeTable: React.FC<Props> = ({ accountName, showAccountName }) =
           onFinish={async () => {
             const { time } = await form.validateFields();
             setQuery({ time });
-          }}>
+          }}
+        >
           <Form.Item label="时间" name="time">
             <DatePicker.RangePicker allowClear={false} ranges={defaultRanges()} />
           </Form.Item>

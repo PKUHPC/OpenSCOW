@@ -275,7 +275,8 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
             移动选中
           </Button>
           <Button icon={<SnippetsOutlined />} onClick={paste}
-            disabled={!operation || operation.started || operation.originalPath === path}>
+            disabled={!operation || operation.started || operation.originalPath === path}
+          >
             粘贴到此处
           </Button>
           {
@@ -298,7 +299,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
         <Space wrap>
           {
             publicConfig.ENABLE_SHELL ? (
-              <a href={`/shell/${cluster}${path}`} target="_blank">
+              <a href={`/shell/${cluster}${path}`} target="_blank" rel="noreferrer">
                 <Button icon={<MacCommandOutlined />}>
                   在终端中打开
                 </Button>
@@ -368,7 +369,8 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
               <a onClick={() => {
                 const href = urlToDownload(cluster, join(path, r.name), false);
                 openPreviewLink(href);
-              }}>
+              }}
+              >
                 {r.name}
               </a>
             )

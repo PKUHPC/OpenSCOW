@@ -93,7 +93,8 @@ const InfoTable: React.FC<InfoTableProps> = ({
         )}
       />
       <Table.Column<SavedJob> dataIndex="submitTime" title="提交时间"
-        render={(v) => formatDateTime(v)} />
+        render={(v) => formatDateTime(v)}
+      />
       <Table.Column<SavedJob> dataIndex="comment" title="备注" />
       <Table.Column<SavedJob> title="更多"
         render={(_, r) => (
@@ -104,7 +105,8 @@ const InfoTable: React.FC<InfoTableProps> = ({
                 cluster: cluster.id,
                 jobName: r.jobName,
               },
-            }}>
+            }}
+            >
               作为模板提交作业
             </Link>
           </Space>

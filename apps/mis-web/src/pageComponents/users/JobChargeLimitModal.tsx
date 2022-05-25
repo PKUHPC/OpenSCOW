@@ -80,7 +80,8 @@ export const JobChargeLimitModal: React.FC<Props> = ({
                         });
                     },
                   });
-                }}>
+                }}
+                >
                   取消限额
                 </a>
               </Space>

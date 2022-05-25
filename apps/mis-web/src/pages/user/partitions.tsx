@@ -111,8 +111,8 @@ export const PartitionsPage: NextPage<Props> = ({ items, text }) => {
         ) : undefined
       }
       {
-        text?.extras?.map(({ title, content }) => (
-          <div>
+        text?.extras?.map(({ title, content }, i) => (
+          <div key={i}>
             <Divider />
             <PageTitle titleText={title} />
             <ContentContainer>{content}</ContentContainer>

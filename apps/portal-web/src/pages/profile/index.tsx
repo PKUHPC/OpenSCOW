@@ -1,6 +1,5 @@
 import { Descriptions } from "antd";
 import { NextPage } from "next";
-import React from "react";
 import { requireAuth } from "src/auth/requireAuth";
 import { Section } from "src/components/Section";
 import { ChangePasswordForm } from "src/pageComponents/profile/ChangePasswordForm";

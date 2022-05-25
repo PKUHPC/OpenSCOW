@@ -12,7 +12,7 @@ export const ShellIndexPage: NextPage = requireAuth(() => true)(() => {
         启动以下集群的终端：
       </h1>
       {CLUSTERS.map(({ id, name }) => (
-        <a href={`/shell/${id}`} target="__blank">
+        <a key={id} href={`/shell/${id}`} target="__blank">
           <Button>
             {name}
           </Button>

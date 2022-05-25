@@ -1,5 +1,5 @@
 import { Form, Modal } from "antd";
-import { useState } from "react";
+import React, { useState } from "react";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { openDesktop } from "src/pageComponents/desktop/DesktopTableActions";
@@ -65,7 +65,8 @@ export const NewDesktopTableModal: React.FC<Props> = ({ visible, onClose, reload
             {
               required: true,
             },
-          ]}>
+          ]}
+        >
           <SingleClusterSelector />
         </Form.Item>
       </Form>

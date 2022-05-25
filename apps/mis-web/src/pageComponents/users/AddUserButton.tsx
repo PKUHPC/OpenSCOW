@@ -102,7 +102,8 @@ export const AddUserButton: React.FC<Props> = ({ refresh, accountName }) => {
       <CreateUserModal onClose={() => {
         setCreateUserShown(false);
         setModalShow(true);
-      }} visible={createUserShow} />
+      }} visible={createUserShow}
+      />
       <Button type="primary" icon={<PlusOutlined />} onClick={() => setModalShow(true)}>
       添加用户
       </Button>

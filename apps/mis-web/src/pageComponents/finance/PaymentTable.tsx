@@ -57,7 +57,8 @@ export const PaymentTable: React.FC<Props> = ({
           onFinish={async () => {
             const { accountName, time } = await form.validateFields();
             setQuery({ accountName, time });
-          }}>
+          }}
+        >
           {
             accountNames
               ? accountNames.length === 1

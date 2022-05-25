@@ -1,4 +1,3 @@
-import React from "react";
 import { ForbiddenPage } from "src/components/errorPages/ForbiddenPage";
 import { UserRole } from "src/models/User";
 import type { User } from "src/stores/UserStore";

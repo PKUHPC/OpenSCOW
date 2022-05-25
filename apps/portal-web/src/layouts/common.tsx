@@ -1,7 +1,6 @@
 import { ItemType } from "antd/lib/menu/hooks/useItems";
 import Link from "next/link";
 import Router from "next/router";
-import React from "react";
 import { match } from "src/layouts/matchers";
 import { NavItemProps } from "src/layouts/NavItemProps";
 import { iconToNode } from "src/layouts/routes";

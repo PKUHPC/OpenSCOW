@@ -127,11 +127,13 @@ export const ChangeJobTimeLimitModal: React.FC<Props> = ({ visible, onClose, dat
       {
         completionStatus.current
           ? (
-            ((curr: CompletionStatus) => <Progress
-              percent={(curr.success + curr.failed.length) / curr.total * 100}
-              success={{ percent: curr.success / curr.total * 100 }}
-              format={() => `${curr.success} / ${curr.total}`}
-            />)(completionStatus.current)
+            ((curr: CompletionStatus) => (
+              <Progress
+                percent={(curr.success + curr.failed.length) / curr.total * 100}
+                success={{ percent: curr.success / curr.total * 100 }}
+                format={() => `${curr.success} / ${curr.total}`}
+              />
+            ))(completionStatus.current)
           ) : (
             <Progress
               percent={0}
@@ -144,7 +146,7 @@ export const ChangeJobTimeLimitModal: React.FC<Props> = ({ visible, onClose, dat
         arrayContainsElement(completionStatus?.current?.failed)
           ? (
             <Form.Item label="修改失败的作业">
-              {completionStatus.current!.failed.map((x) => <strong>{x}</strong>)}
+              {completionStatus.current!.failed.map((x) => <strong key={x.jobId}>{x.jobId}</strong>)}
             </Form.Item>
           ) : undefined
       }

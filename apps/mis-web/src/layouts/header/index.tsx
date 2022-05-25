@@ -98,7 +98,8 @@ export const Header: React.FC<Props> = ({
               userStore.user
                 ? join(publicConfig.PORTAL_PATH, "/api/auth/callback?token=" + userStore.user?.token)
                 : publicConfig.PORTAL_PATH
-            }>
+            }
+            >
 
               <ArrowRightOutlined /> 门户
             </a>

@@ -53,7 +53,8 @@ export const PathBar: React.FC<Props> = ({ path, loading, reload, go, fullUrl })
     <Bar onBlur={() => {
       setInput(path);
       setState("bar");
-    }}>
+    }}
+    >
       {state === "input"
         ? (
           <Input.Search
@@ -90,7 +91,8 @@ export const PathBar: React.FC<Props> = ({ path, loading, reload, go, fullUrl })
             <Button onClick={(e) => {
               e.stopPropagation();
               goOrReload();
-            }} icon={icon} />
+            }} icon={icon}
+            />
           </>
         )
       }

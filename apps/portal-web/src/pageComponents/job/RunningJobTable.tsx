@@ -153,7 +153,8 @@ export const RunningJobInfoTable: React.FC<JobInfoTableProps> = ({
         />
       </Table>
       <RunningJobDrawer show={previewItem !== undefined}
-        item={previewItem} onClose={() => setPreviewItem(undefined)} />
+        item={previewItem} onClose={() => setPreviewItem(undefined)}
+      />
     </>
   );
 };

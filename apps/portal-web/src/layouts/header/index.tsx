@@ -99,7 +99,8 @@ export const Header: React.FC<Props> = ({
               userStore.user
                 ? join(publicConfig.MIS_PATH, "/api/auth/callback?token=" + userStore.user?.token)
                 : publicConfig.MIS_PATH
-            }>
+            }
+            >
               <ArrowRightOutlined /> 管理系统
             </a>
           </HeaderItem>

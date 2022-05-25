@@ -38,7 +38,8 @@ export const AdminUserTable: React.FC<Props> = ({
           initialValues={query}
           onFinish={async () => {
             setQuery(await form.validateFields());
-          }}>
+          }}
+        >
           <Form.Item label="用户ID或者姓名" name="idOrName">
             <Input />
           </Form.Item>

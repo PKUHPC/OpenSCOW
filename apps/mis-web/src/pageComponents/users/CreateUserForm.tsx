@@ -28,7 +28,8 @@ export const CreateUserForm: React.FC<RequiredBy<FormProps<FormFields>, "form">>
         <Input />
       </Form.Item>
       <Form.Item label="用户邮箱" name="email"
-        rules={[{ required: true }, emailRule]}>
+        rules={[{ required: true }, emailRule]}
+      >
         <Input />
       </Form.Item>
       <Form.Item
