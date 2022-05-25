@@ -12,7 +12,7 @@ import { useEffect, useRef } from "react";
 import { createStore, StoreProvider, useStore } from "simstate";
 import { MOCK_USER_INFO } from "src/apis/api.mock";
 import { USE_MOCK } from "src/apis/useMock";
-import { getTokenFromCookie } from "src/auth/cookie";
+import { getTokenFromCookie, setTokenCookie } from "src/auth/cookie";
 import { RootLayout } from "src/layouts/RootLayout";
 import { ValidateTokenSchema } from "src/pages/api/auth/validateToken";
 import {
@@ -108,10 +108,12 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
   if (isServer()) {
 
     if (USE_MOCK) {
+      const token = "123";
       extra.userInfo = {
         ...MOCK_USER_INFO,
-        token: "123",
+        token,
       };
+      setTokenCookie(appContext.ctx, token);
     } else {
       const token = getTokenFromCookie(appContext.ctx);
 

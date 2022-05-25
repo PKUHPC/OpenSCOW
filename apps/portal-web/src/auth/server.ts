@@ -1,6 +1,4 @@
 import type { NextApiRequest, NextApiResponse, NextPageContext } from "next";
-import { MOCK_USER_INFO } from "src/apis/api.mock";
-import { USE_MOCK } from "src/apis/useMock";
 import { getTokenFromCookie } from "src/auth/cookie";
 import type { Check } from "src/auth/requireAuth";
 import { validateToken } from "src/auth/token";
@@ -12,9 +10,6 @@ export type AuthResultError = 401 | 403;
 
 export async function checkCookie(check: Check, req: RequestType): Promise<AuthResultError | UserInfo> {
 
-  if (USE_MOCK) {
-    return MOCK_USER_INFO;
-  }
 
   const token = getTokenFromCookie({ req });
 

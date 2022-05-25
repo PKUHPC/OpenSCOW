@@ -1,6 +1,8 @@
 import { jsonFetch } from "@ddadaal/next-typed-api-routes-runtime/lib/client";
 import { asyncClientCall } from "@ddadaal/tsgrpc-utils";
 import path from "path";
+import { MOCK_USER_INFO } from "src/apis/api.mock";
+import { USE_MOCK } from "src/apis/useMock";
 import { GetUserInfoReply,UserServiceClient } from "src/generated/server/user";
 import { UserInfo } from "src/models/User";
 import { getClient } from "src/utils/client";
@@ -15,6 +17,10 @@ interface AuthValidateTokenSchema {
 }
 
 export async function validateToken(token: string): Promise<UserInfo | undefined> {
+
+  if (USE_MOCK) {
+    return MOCK_USER_INFO;
+  }
 
   const resp = await jsonFetch<AuthValidateTokenSchema>({
     method: "GET",
