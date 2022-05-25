@@ -16,7 +16,7 @@ import type { ChangePasswordSchema } from "src/pages/api/profile/changePassword"
 import type { CreateDesktopSchema } from "src/pages/api/vnc/createDesktop";
 import type { KillDesktopSchema } from "src/pages/api/vnc/killDesktop";
 import type { LaunchDesktopSchema } from "src/pages/api/vnc/launchDesktop";
-import type { ListDesktopSchema } from "src/pages/api/vnc/listDesktop";
+import type { ListDesktopsSchema } from "src/pages/api/vnc/listDesktops";
 
 
 export const api = {
@@ -34,6 +34,5 @@ export const api = {
   createDesktop: fromApi<CreateDesktopSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/vnc/createDesktop")),
   killDesktop: fromApi<KillDesktopSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/vnc/killDesktop")),
   launchDesktop: fromApi<LaunchDesktopSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/vnc/launchDesktop")),
-  listDesktop: fromApi<ListDesktopSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/vnc/listDesktop")),
+  listDesktops: fromApi<ListDesktopsSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/vnc/listDesktops")),
 };
-  

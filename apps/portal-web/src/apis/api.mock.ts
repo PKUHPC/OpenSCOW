@@ -60,12 +60,11 @@ export const mockApi: MockApi<typeof api> = {
 
   launchDesktop: async () => ({ node: "login01", password: "123",port: 1234 }),
 
-  listDesktop: async () => ({
+  listDesktops: async () => ({
     result: {
-      connection: [{
+      connections: [{
         node: "login01",
-        clusterName: "hpc01_name",
-        clusterId: "hpc01",
+        cluster: "hpc01",
         displayId: [1, 2, 3],
       }],
     },

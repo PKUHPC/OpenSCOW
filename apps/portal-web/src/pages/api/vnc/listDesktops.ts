@@ -1,11 +1,11 @@
 import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-utils";
 import { authenticate } from "src/auth/server";
-import { ListDesktopReply,VncServiceClient  } from "src/generated/portal/vnc";
+import { ListDesktopsReply, VncServiceClient  } from "src/generated/portal/vnc";
 import { getJobServerClient } from "src/utils/client";
 import { publicConfig } from "src/utils/config";
 
-export interface ListDesktopSchema {
+export interface ListDesktopsSchema {
   method: "POST";
 
   body: {
@@ -14,7 +14,7 @@ export interface ListDesktopSchema {
 
   responses: {
     200: {
-        result : ListDesktopReply;
+        result : ListDesktopsReply;
     };
     // 功能没有启用
     501: null;
@@ -23,7 +23,7 @@ export interface ListDesktopSchema {
 
 const auth = authenticate(() => true);
 
-export default /*#__PURE__*/route<ListDesktopSchema>("ListDesktopSchema", async (req, res) => {
+export default /*#__PURE__*/route<ListDesktopsSchema>("ListDesktopsSchema", async (req, res) => {
 
   if (!publicConfig.ENABLE_VNC) {
     return { 501: null };
@@ -35,7 +35,7 @@ export default /*#__PURE__*/route<ListDesktopSchema>("ListDesktopSchema", async 
 
   const client = getJobServerClient(VncServiceClient);
 
-  return await asyncClientCall(client, "listDesktop", {
+  return await asyncClientCall(client, "listDesktops", {
     clusters: req.body.clusters,
     username: info.identityId,
   })

@@ -3,10 +3,10 @@ import { join } from "path";
 import React, { useState } from "react";
 import { api } from "src/apis";
 import type { DesktopItem } from "src/pageComponents/desktop/DesktopTable";
+
 interface Props {
-  isChange: boolean,
-  setChange: React.Dispatch<React.SetStateAction<boolean>>,
-  record: DesktopItem,
+  reload: () => void;
+  record: DesktopItem;
 }
 
 export const openDesktop = (node: string, port: number, password: string) => {
@@ -21,10 +21,10 @@ export const openDesktop = (node: string, port: number, password: string) => {
   window.open("/vnc/vnc.html?" + params.toString(), "_blank");
 };
 
-export const DesktopTableActions: React.FC<Props> = ({ isChange, setChange, record }) => {
+export const DesktopTableActions: React.FC<Props> = ({ reload, record }) => {
 
   //Is the popconfirm visible
-  const [isPopconfirmVisible, setisPopconfirmVisible] = useState(false);
+  const [isPopconfirmVisible, setIsPopconfirmVisible] = useState(false);
   return (
     <div>
       <Space size="middle">
@@ -34,8 +34,8 @@ export const DesktopTableActions: React.FC<Props> = ({ isChange, setChange, reco
             //launch desktop
             const resp = await api.launchDesktop({
               body: {
-                cluster: record.clusterId,
-                displayId: Number(record.desktop.split(":")[1]),
+                cluster: record.cluster.id,
+                displayId: record.desktopId,
               },
             });
 
@@ -49,25 +49,27 @@ export const DesktopTableActions: React.FC<Props> = ({ isChange, setChange, reco
           title="删除后不可恢复，你确定要删除吗?"
           visible={isPopconfirmVisible}
           onConfirm={async () => {
-            setisPopconfirmVisible(false);
+            setIsPopconfirmVisible(false);
 
             //kill desktop
             await api.killDesktop({
               body: {
-                cluster: record.clusterId,
-                displayId: Number(record.desktop.split(":")[1]),
+                cluster: record.cluster.id,
+                displayId: record.desktopId,
               },
             });
-            setChange(!isChange);
+
+            reload();
+
           }}
           onCancel={() => {
-            setisPopconfirmVisible(false);
+            setIsPopconfirmVisible(false);
           }}
         >
 
           <a
             onClick={() => {
-              setisPopconfirmVisible(true);
+              setIsPopconfirmVisible(true);
             }}
           >
             删除

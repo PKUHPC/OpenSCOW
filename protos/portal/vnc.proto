@@ -14,20 +14,20 @@ message LaunchDesktopReply {
   uint32 port = 3;
 }
 
-message ListDesktopRequest {
+message ListDesktopsRequest {
   repeated string clusters = 1;
   string username = 2;
 }
 
+message ListDesktopsReply {
 
-message ListDesktopReply {
-  message Connection{
+  message Connection {
     string node = 1;
-    string cluster_name = 2;
-    string cluster_id = 3;
-    repeated uint32 display_id = 4;
+    string cluster = 2;
+    repeated uint32 display_id = 3;
   }
-  repeated Connection connection = 1;
+
+  repeated Connection connections = 1;
 }
 
 message CreateDesktopRequest {
@@ -35,7 +35,8 @@ message CreateDesktopRequest {
   string username = 2;
 }
 
-// RESOURCE_EXHAUSTED: if VNC desktop reaches maximum, the details is the already/maximum.
+// RESOURCE_EXHAUSTED: if VNC desktop reaches maximum, the details is the
+// already/maximum.
 message CreateDesktopReply {
   string node = 1;
   string password = 2;
@@ -48,9 +49,7 @@ message KillDesktopRequest {
   uint32 display_id = 3;
 }
 
-message KillDesktopReply {
-}
-
+message KillDesktopReply {}
 
 message RefreshOTPPasswordRequest {
   string cluster = 1;
@@ -64,7 +63,7 @@ message RefreshOTPPasswordReply { string password = 1; }
 
 service VncService {
   rpc LaunchDesktop(LaunchDesktopRequest) returns (LaunchDesktopReply);
-  rpc ListDesktop(ListDesktopRequest) returns (ListDesktopReply);
+  rpc ListDesktops(ListDesktopsRequest) returns (ListDesktopsReply);
   rpc CreateDesktop(CreateDesktopRequest) returns (CreateDesktopReply);
   rpc KillDesktop(KillDesktopRequest) returns (KillDesktopReply);
   rpc RefreshOTPPassword(RefreshOTPPasswordRequest)

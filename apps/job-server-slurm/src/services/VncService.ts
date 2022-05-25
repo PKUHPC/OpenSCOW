@@ -4,7 +4,7 @@ import { NodeSSH } from "node-ssh";
 import path from "path";
 import { checkClusterExistence, clustersConfig  } from "src/config/clusters";
 import { config } from "src/config/env";
-import { ListDesktopReply_Connection, VncServiceServer, VncServiceService } from "src/generated/portal/vnc";
+import { ListDesktopsReply_Connection, VncServiceServer, VncServiceService } from "src/generated/portal/vnc";
 import { loggedExec } from "src/plugins/ssh";
 import { displayIdToPort } from "src/utils/port";
 
@@ -82,17 +82,16 @@ export const vncServiceServer = plugin((server) => {
       });
     },
 
-    listDesktop: async ({ request, logger }) => {
+    listDesktops: async ({ request, logger }) => {
       const { clusters, username } = request;
 
-      const connectList: ListDesktopReply_Connection[] = [];
+      const connectList: ListDesktopsReply_Connection[] = [];
 
-      await asyncForEach(clusters, async (x:string) => {
+      await asyncForEach(clusters, async (clusterId) => {
 
-        checkClusterExistence(x);
-        const node = clustersConfig[x].loginNodes[0];
-        const clusterName = clustersConfig[x].displayName;
-        const clusterId = x;
+        checkClusterExistence(clusterId);
+
+        const node = clustersConfig[clusterId].loginNodes[0];
 
         await server.ext.connect(node, username, logger, async (ssh, nodeAddr) => {
 
@@ -103,14 +102,13 @@ export const vncServiceServer = plugin((server) => {
 
           const ids = parseListOutput(resp.stdout);
           connectList.push({
-            node:nodeAddr,
-            clusterName:clusterName,
-            clusterId:clusterId,
-            displayId:ids,
+            node: nodeAddr,
+            cluster: clusterId,
+            displayId: ids,
           });
         });
       });
-      return [{ connection:connectList }];
+      return [{ connections: connectList }];
     },
 
     createDesktop: async ({ request, logger }) => {
@@ -159,7 +157,7 @@ export const vncServiceServer = plugin((server) => {
       checkClusterExistence(cluster);
       const node = clustersConfig[cluster].loginNodes[0];
 
-      return await server.ext.connect(node, username, logger, async (ssh, nodeAddr) => {
+      return await server.ext.connect(node, username, logger, async (ssh) => {
 
         //kill specific desktop
         await loggedExec(ssh, logger, true,

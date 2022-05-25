@@ -53,4 +53,9 @@ export type Cluster = { id: string; name: string; }
 
 export const CLUSTERS: Cluster[] = Object.entries(publicConfig.CLUSTER_NAMES).map(([id, name]) => ({ id, name }));
 
+export const CLUSTERS_ID_MAP = CLUSTERS.reduce((prev, curr) => {
+  prev[curr.id] = curr;
+  return prev;
+}, {} as Record<string, Cluster>);
+
 export const CONFIG_PATH = process.env.NODE_ENV === "production" ? CONFIG_BASE_PATH : "config";

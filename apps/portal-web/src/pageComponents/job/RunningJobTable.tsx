@@ -6,8 +6,7 @@ import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { runningJobId, RunningJobInfo } from "src/models/job";
 import { RunningJobDrawer } from "src/pageComponents/job/RunningJobDrawer";
-import type { Cluster } from "src/utils/config";
-import { CLUSTERS } from "src/utils/config";
+import { Cluster, CLUSTERS,CLUSTERS_ID_MAP  } from "src/utils/config";
 
 interface FilterForm {
   jobId: number | undefined;
@@ -18,10 +17,7 @@ interface Props {
   userId: string;
 }
 
-const clustersIdMap = CLUSTERS.reduce((prev, curr) => {
-  prev[curr.id] = curr;
-  return prev;
-}, {} as Record<string, Cluster>);
+
 
 
 export const RunningJobQueryTable: React.FC<Props> = ({
@@ -54,7 +50,7 @@ export const RunningJobQueryTable: React.FC<Props> = ({
       filtered = filtered.filter((x) => x.jobId === query.jobId + "");
     }
 
-    return filtered.map((x) => RunningJobInfo.fromGrpc(x, clustersIdMap[query.cluster.id]));
+    return filtered.map((x) => RunningJobInfo.fromGrpc(x, CLUSTERS_ID_MAP[query.cluster.id]));
   }, [data, query.jobId]);
 
   return (

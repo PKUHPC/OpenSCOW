@@ -1,19 +1,19 @@
 import { Button, Col, Form, Modal, Row, Table } from "antd";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
+import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
-import type { ListDesktopReply_Connection } from "src/generated/portal/vnc";
 import { DesktopTableActions, openDesktop } from "src/pageComponents/desktop/DesktopTableActions";
-import { CLUSTERS } from "src/utils/config";
+import { Cluster, CLUSTERS, CLUSTERS_ID_MAP } from "src/utils/config";
 
 interface Props {
 
 }
 
 export type DesktopItem = {
-  desktop: string,
-  clusterId: string,
-  node: string,
+  desktopId: number,
+  cluster: Cluster,
+  addr: string,
 }
 
 export const DesktopTable: React.FC<Props> = () => {
@@ -22,44 +22,29 @@ export const DesktopTable: React.FC<Props> = () => {
     cluster: string,
   }
 
-  //Has the table changed
-  const [isChange, setChange] = useState(false);
-
-  //Table data
-  const [data, setData] = useState<DesktopItem[]>();
-
-  //Table loading
-  const [tableLoading, setTableLoading] = useState(false);
-
-  //Is the table visible
+  //Is the modal visible
   const [isModalVisible, setIsModalVisible] = useState(false);
 
   const [form] = Form.useForm<ClusterInfo>();
 
-  //Get table data
-  useEffect(() => {
-    const getdatas = async () => {
-      //Table load when fetching data
-      setTableLoading(true);
-
+  const { data, isLoading, reload } = useAsync({
+    promiseFn: useCallback(async () => {
       //List all desktop
-      const { result } = await api.listDesktop({ body: { clusters: CLUSTERS.map((x) => x.id) } });
+      const { result } = await api.listDesktops({ body: { clusters: CLUSTERS.map((x) => x.id) } });
 
       const desktopList: DesktopItem[] = [];
-      const connectList: ListDesktopReply_Connection[] = result.connection;
 
       //Splice data
-      connectList.forEach((x)=>{
-        x.displayId.forEach((y) => {
-          desktopList.push({ desktop: `${x.clusterName}:${y}`,clusterId:`${x.clusterId}`, node: `${x.node}` });
+      result.connections.forEach((x)=>{
+        x.displayId.forEach((displayId) => {
+          desktopList.push({ desktopId: displayId, cluster: CLUSTERS_ID_MAP[x.cluster], addr: x.node });
         });
       });
 
-      setTableLoading(false);
-      setData(desktopList);
-    };
-    getdatas();
-  }, [isChange]);
+      return desktopList;
+
+    }, []),
+  });
 
   const columns = [
     {
@@ -85,7 +70,7 @@ export const DesktopTable: React.FC<Props> = () => {
       key: "action",
       width: "20%",
       render: (_, record:DesktopItem) => (
-        <DesktopTableActions isChange={isChange} setChange={setChange} record={record} />
+        <DesktopTableActions reload={reload} record={record} />
       ),
     },
   ];
@@ -109,7 +94,7 @@ export const DesktopTable: React.FC<Props> = () => {
       });
 
     openDesktop(resp.node, resp.port, resp.password);
-    setChange(!isChange);
+    reload();
   };
 
   return (
@@ -151,7 +136,7 @@ export const DesktopTable: React.FC<Props> = () => {
           </Form.Item>
         </Form>
       </Modal>
-      < Table dataSource={data} columns={columns} rowKey={(record) => record.desktop} loading={tableLoading} />
+      <Table dataSource={data} columns={columns} rowKey={(record) => record.desktopId} loading={isLoading} />
     </div>
   );
 };
