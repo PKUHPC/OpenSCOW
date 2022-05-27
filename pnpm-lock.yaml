@@ -27,7 +27,7 @@ importers:
       ts-jest: 27.1.5
       ts-node: 10.8.0
       tsc-alias: 1.6.7
-      tsconfig-paths: 3.14.1
+      tsconfig-paths: 4.0.0
       typescript: 4.7.2
     devDependencies:
       '@ddadaal/eslint-config': 1.4.0_o5i2upf6afg5l4a47bh3nsus3y
@@ -53,7 +53,7 @@ importers:
       ts-jest: 27.1.5_ka57xbdzac5io3ooy4yi4ht3qe
       ts-node: 10.8.0_smgpfffxrhk5i4ijhe3532b4hq
       tsc-alias: 1.6.7
-      tsconfig-paths: 3.14.1
+      tsconfig-paths: 4.0.0
       typescript: 4.7.2
 
   apps/auth:
@@ -13832,6 +13832,14 @@ packages:
       json5: 1.0.1
       minimist: 1.2.6
       strip-bom: 3.0.0
+
+  /tsconfig-paths/4.0.0:
+    resolution: {integrity: sha512-SLBg2GBKlR6bVtMgJJlud/o3waplKtL7skmLkExomIiaAtLGtVsoXIqP3SYdjbcH9lq/KVv7pMZeCBpLYOit6Q==}
+    dependencies:
+      json5: 2.2.1
+      minimist: 1.2.6
+      strip-bom: 3.0.0
+    dev: true
 
   /tslib/1.10.0:
     resolution: {integrity: sha512-qOebF53frne81cf0S9B41ByenJ3/IuH8yJKngAX35CmiZySA0khhkovshKK+jGCaMnVomla7gVlIcc3EvKPbTQ==}
