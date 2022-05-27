@@ -69,7 +69,7 @@ importers:
       fastify: 3.29.0
       fastify-graceful-shutdown: 3.1.0
       fastify-plugin: 3.0.1
-      ioredis: 5.0.4
+      ioredis: 5.0.5
       ldapjs: 2.3.2
       nanoid: 3.3.4
     dependencies:
@@ -82,7 +82,7 @@ importers:
       fastify: 3.29.0
       fastify-graceful-shutdown: 3.1.0
       fastify-plugin: 3.0.1
-      ioredis: 5.0.4
+      ioredis: 5.0.5
       ldapjs: 2.3.2
       nanoid: 3.3.4
     devDependencies:
@@ -8435,8 +8435,8 @@ packages:
     dependencies:
       loose-envify: 1.4.0
 
-  /ioredis/5.0.4:
-    resolution: {integrity: sha512-qFJw3MnPNsJF1lcIOP3vztbsasOXK3nDdNAgjQj7t7/Bn/w10PGchTOpqylQNxjzPbLoYDu34LjeJtSWiKBntQ==}
+  /ioredis/5.0.5:
+    resolution: {integrity: sha512-H+u9YB/cBckDO5lt5+S34gGN1EuIBjjaXk31LivQWfX3G1cqZPYCiwF9qCOkqK2NsKVk+saoUN+fLBz5tc2gFw==}
     engines: {node: '>=12.22.0'}
     dependencies:
       '@ioredis/commands': 1.1.1
