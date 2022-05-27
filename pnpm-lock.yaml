@@ -58,7 +58,7 @@ importers:
 
   apps/auth:
     specifiers:
-      '@fastify/error': ^2.0.0
+      '@fastify/error': ^3.0.0
       '@fastify/formbody': ^6.0.0
       '@fastify/static': ^5.0.0
       '@scow/config': workspace:*
@@ -73,7 +73,7 @@ importers:
       ldapjs: ^2.3.2
       nanoid: ^3.3.3
     dependencies:
-      '@fastify/error': 2.0.0
+      '@fastify/error': 3.0.0
       '@fastify/formbody': 6.0.1
       '@fastify/static': 5.0.2
       '@scow/config': link:../../libs/config
@@ -116,7 +116,7 @@ importers:
     specifiers:
       '@ddadaal/tsgrpc-cli': 0.11.0
       '@fastify/cookie': ^6.0.0
-      '@fastify/error': ^2.0.0
+      '@fastify/error': ^3.0.0
       '@fastify/formbody': ^6.0.0
       '@fastify/multipart': ^6.0.0
       '@fastify/static': ^5.0.0
@@ -137,7 +137,7 @@ importers:
       shell-quote: ^1.7.3
     dependencies:
       '@fastify/cookie': 6.0.0
-      '@fastify/error': 2.0.0
+      '@fastify/error': 3.0.0
       '@fastify/formbody': 6.0.1
       '@fastify/multipart': 6.0.0
       '@fastify/static': 5.0.2
@@ -2938,6 +2938,10 @@ packages:
 
   /@fastify/error/2.0.0:
     resolution: {integrity: sha512-wI3fpfDT0t7p8E6dA2eTECzzOd+bZsZCJ2Hcv+Onn2b7ZwK3RwD27uW2QDaMtQhAfWQQP+WNK7nKf0twLsBf9w==}
+    dev: false
+
+  /@fastify/error/3.0.0:
+    resolution: {integrity: sha512-dPRyT40GiHRzSCll3/Jn2nPe25+E1VXc9tDwRAIKwFCxd5Np5wzgz1tmooWG3sV0qKgrBibihVoCna2ru4SEFg==}
     dev: false
 
   /@fastify/formbody/6.0.1:
