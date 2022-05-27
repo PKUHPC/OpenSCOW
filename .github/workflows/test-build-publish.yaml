@@ -47,7 +47,7 @@ jobs:
         run: pnpm test:ci
 
       - name: Upload test converage
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v3
         with:
           files: ./libs/auth/coverage/lcov.info,./libs/config/coverage/lcov.info,./libs/decimal/coverage/lcov.info,./apps/file-server/coverage/lcov.info,./apps/auth/coverage/lcov.info,./apps/job-server-slurm/coverage/lcov.info,./apps/mis-server/coverage/lcov.info
 
