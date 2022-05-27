@@ -32,7 +32,7 @@ const Title = styled.h1`
 `;
 
 const Text = styled.p`
-  text-indent: 2rem ; 
+  text-indent: 2rem ;
 `;
 
 export const CustomizableLogoAndText: React.FC<Props> = ({ hostname }) => {
@@ -42,7 +42,7 @@ export const CustomizableLogoAndText: React.FC<Props> = ({ hostname }) => {
       <Logo >
         <Image
           alt="logo"
-          src="/api/logo"
+          src="/api/logo/"
           layout="fill"
           objectFit="contain"
         />
