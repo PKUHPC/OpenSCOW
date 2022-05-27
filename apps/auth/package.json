@@ -27,8 +27,8 @@
     "asn1": "^0.2.6"
   },
   "devDependencies": {
-    "@types/ldapjs": "^2.2.2",
-    "@types/asn1": "^0.2.0"
+    "@types/ldapjs": "2.2.2",
+    "@types/asn1": "0.2.0"
   },
   "volta": {
     "extends": "../../package.json"
