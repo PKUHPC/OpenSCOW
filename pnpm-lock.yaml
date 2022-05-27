@@ -359,8 +359,8 @@ importers:
       react-dom: ^17.0.2
       react-is: ^18.1.0
       simstate: ^3.0.0
-      socket.io: ^4.5.0
-      socket.io-client: 4.5.0
+      socket.io: 4.5.1
+      socket.io-client: 4.5.1
       styled-components: ^5.3.5
       tslib: ^2.4.0
       typescript: ^4.6.4
@@ -402,8 +402,8 @@ importers:
       react-dom: 17.0.2_react@17.0.2
       react-is: 18.1.0
       simstate: 3.0.0_react@17.0.2
-      socket.io: 4.5.0
-      socket.io-client: 4.5.0
+      socket.io: 4.5.1
+      socket.io-client: 4.5.1
       styled-components: 5.3.5_ukrbqhh2t6r2q67fyfhmpyy5um
       tslib: 2.4.0
       typescript: 4.6.4
@@ -12079,7 +12079,6 @@ packages:
       object-assign: 4.1.1
       react: 17.0.2
       scheduler: 0.20.2
-    dev: false
 
   /react-error-overlay/6.0.11:
     resolution: {integrity: sha512-/6UZ2qgEyH2aqzYZgQPxEnz33NJ2gNsnHA2o5+o4wW9bLM/JYQitNP9xPhsXwC08hMMovfGe/8retsdDsczPRg==}
@@ -12210,7 +12209,6 @@ packages:
     dependencies:
       loose-envify: 1.4.0
       object-assign: 4.1.1
-    dev: false
 
   /readable-stream/2.3.7:
     resolution: {integrity: sha512-Ebho8K4jIbHAxnuxi7o42OrZgF/ZTNcsZj6nRKyUmkhLFq8CHItp/fy6hQZuZmP/n3yZ9VBUbp4zz/mX8hmYPw==}
@@ -12617,7 +12615,6 @@ packages:
     dependencies:
       loose-envify: 1.4.0
       object-assign: 4.1.1
-    dev: false
 
   /schema-utils/2.7.0:
     resolution: {integrity: sha512-0ilKFI6QQF5nxDZLFn2dMjvc4hjg/Wkg7rHd3jK6/A4a1Hl9VFdQWvgB1UMGoU94pad1P/8N7fMcEnLnSiju8A==}
@@ -12941,8 +12938,8 @@ packages:
     resolution: {integrity: sha512-W4N+o69rkMEGVuk2D/cvca3uYsvGlMwsySWV447y99gUPghxq42BxqLNMndb+a1mm/5/7NeXVQS7RLa2XyXvYg==}
     dev: false
 
-  /socket.io-client/4.5.0:
-    resolution: {integrity: sha512-HW61c1G7OrYGxaI79WRn17+b03iBCdvhBj4iqyXHBoL5M8w2MSO/vChsjA93knG4GYEai1/vbXWJna9dzxXtSg==}
+  /socket.io-client/4.5.1:
+    resolution: {integrity: sha512-e6nLVgiRYatS+AHXnOnGi4ocOpubvOUCGhyWw8v+/FxW8saHkinG6Dfhi9TU0Kt/8mwJIAASxvw6eujQmjdZVA==}
     engines: {node: '>=10.0.0'}
     dependencies:
       '@socket.io/component-emitter': 3.1.0
@@ -12976,8 +12973,8 @@ packages:
       - supports-color
     dev: false
 
-  /socket.io/4.5.0:
-    resolution: {integrity: sha512-slTYqU2jCgMjXwresG8grhUi/cC6GjzmcfqArzaH3BN/9I/42eZk9yamNvZJdBfTubkjEdKAKs12NEztId+bUA==}
+  /socket.io/4.5.1:
+    resolution: {integrity: sha512-0y9pnIso5a9i+lJmsCdtmTTgJFFSvNQKDnPQRz28mGNnxbmqYg2QPtJTLFxhymFZhAIn50eHAKzJeiNaKr+yUQ==}
     engines: {node: '>=10.0.0'}
     dependencies:
       accepts: 1.3.8
