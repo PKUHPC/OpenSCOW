@@ -3,7 +3,8 @@
     "config:base"
   ],
   "ignorePaths": [
-    "docker-compose.dev.yml"
+    "docker-compose.dev.yml",
+    "scripts/ldap/Dockerfile"
   ],
   "packageRules": [
     {
