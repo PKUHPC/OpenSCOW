@@ -129,14 +129,14 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Log in to the GitHub Container registry
-        uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
+        uses: docker/login-action@d398f07826957cd0a18ea1b059cf1207835e60bc
         with:
           registry: ${{ env.GITHUB_CR }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Log in to the Aliyun CR
-        uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
+        uses: docker/login-action@d398f07826957cd0a18ea1b059cf1207835e60bc
         with:
           registry: ${{ env.ALIYUN_CR }}
           username: ${{ secrets.ALIYUN_CR_USERNAME }}
