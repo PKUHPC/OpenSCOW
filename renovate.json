@@ -13,7 +13,7 @@
       "matchPackagePatterns": [
         "@mdx-js/react"
       ],
-      "allowedVersion": "<2"
+      "allowedVersions": "<2"
     }
   ]
 }
