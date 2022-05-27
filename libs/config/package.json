@@ -12,11 +12,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "envalid": "^7.3.1",
-    "js-yaml": "^4.1.0",
-    "ajv": "^8.11.0",
-    "@sinclair/typebox": "^0.23.5",
-    "ajv-formats": "^2.1.1"
+    "envalid": "7.3.1",
+    "js-yaml": "4.1.0",
+    "ajv": "8.11.0",
+    "@sinclair/typebox": "0.23.5",
+    "ajv-formats": "2.1.1"
   },
   "devDependencies": {
     "@types/js-yaml": "4.0.5"

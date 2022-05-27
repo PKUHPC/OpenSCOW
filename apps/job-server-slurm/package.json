@@ -17,11 +17,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@ddadaal/tsgrpc-server": "^0.12.0",
-    "@ddadaal/tsgrpc-utils": "^0.12.0",
+    "@ddadaal/tsgrpc-server": "0.12.0",
+    "@ddadaal/tsgrpc-utils": "0.12.0",
     "@scow/config": "workspace:*",
-    "@grpc/grpc-js": "^1.6.7",
-    "node-ssh": "^12.0.4"
+    "@grpc/grpc-js": "1.6.7",
+    "node-ssh": "12.0.4"
   },
   "devDependencies": {
     "@types/node-cron": "3.0.1",

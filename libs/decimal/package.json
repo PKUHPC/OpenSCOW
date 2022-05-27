@@ -12,7 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "bignumber.js": "^9.0.2"
+    "bignumber.js": "9.0.2"
   },
   "volta": {
     "extends": "../../package.json"
