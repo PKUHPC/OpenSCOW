@@ -25,7 +25,11 @@ const STATUS_TEXT = {
 
 export default async (req: NextApiRequest, res: NextApiResponseServerIO) => {
   if (!res.socket.server.proxy) {
-    const proxy = res.socket.server.proxy = createProxyServer();
+    const proxy = res.socket.server.proxy = createProxyServer({
+      changeOrigin: true,
+      autoRewrite: true,
+      ignorePath: true,
+    });
 
     res.socket.server.on("upgrade", async (req: NextApiRequest, socket: Socket, head) => {
 
