@@ -1,5 +1,19 @@
 {
   "extends": [
     "config:base"
+  ],
+  "ignorePaths": [
+    "docker-compose.dev.yml"
+  ],
+  "packageRules": [
+    {
+      "matchFiles": [
+        "docs/package.json"
+      ],
+      "matchPackagePatterns": [
+        "@mdx-js/react"
+      ],
+      "allowedVersion": "<2"
+    }
   ]
 }
