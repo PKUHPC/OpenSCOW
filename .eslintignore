@@ -8,3 +8,5 @@ out
 **/build/
 
 **/migrations
+
+**/next-env.d.ts
