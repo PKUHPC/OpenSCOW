@@ -1,4 +1,4 @@
-FROM node:16.15-alpine3.15 AS builder
+FROM node:16-alpine@sha256:bb776153f81d6e931211e3cadd7eef92c811e7086993b685d1f40242d486b9bb AS builder
 
 RUN apk update && apk add libc6-compat python3 make gcc g++
 
@@ -30,7 +30,7 @@ RUN pnpm run build
 
 RUN rm -rf node_modules && pnpm install -r --prod --offline
 
-FROM node:16.15-alpine3.15 AS runner
+FROM node:16-alpine@sha256:bb776153f81d6e931211e3cadd7eef92c811e7086993b685d1f40242d486b9bb AS runner
 
 WORKDIR /app
 COPY --from=builder /app/node_modules ./node_modules
