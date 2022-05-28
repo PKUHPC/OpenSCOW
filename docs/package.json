@@ -16,8 +16,8 @@
     "writeEnvDocs": "ts-node tools/envDoc.ts"
   },
   "dependencies": {
-    "@docusaurus/core": "2.0.0-beta.20",
-    "@docusaurus/preset-classic": "2.0.0-beta.20",
+    "@docusaurus/core": "2.0.0-beta.21",
+    "@docusaurus/preset-classic": "2.0.0-beta.21",
     "@mdx-js/react": "1.6.22",
     "@svgr/webpack": "6.2.1",
     "clsx": "1.1.1",
@@ -29,7 +29,7 @@
   },
   "devDependencies": {
     "@algolia/client-search": "4.13.1",
-    "@docusaurus/module-type-aliases": "2.0.0-beta.20",
+    "@docusaurus/module-type-aliases": "2.0.0-beta.21",
     "@scow/config": "workspace:*",
     "@tsconfig/docusaurus": "1.0.5",
     "@types/react": "17.0.45",
