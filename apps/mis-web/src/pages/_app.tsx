@@ -19,7 +19,6 @@ import {
   User, UserStore,
 } from "src/stores/UserStore";
 import { GlobalStyle } from "src/styles/globalStyle";
-import { MediaContextProvider } from "src/styles/media";
 import { AntdConfigProvider } from "src/utils/AntdConfigProvider";
 import { runtimeConfig } from "src/utils/config";
 import { getHostname } from "src/utils/host";
@@ -83,11 +82,9 @@ function MyApp({ Component, pageProps, extra }: Props) {
         <AntdConfigProvider color={primaryColor}>
           <FailEventHandler />
           <TopProgressBar />
-          <MediaContextProvider>
-            <RootLayout footerText={footerText}>
-              <Component {...pageProps} />
-            </RootLayout>
-          </MediaContextProvider>
+          <RootLayout footerText={footerText}>
+            <Component {...pageProps} />
+          </RootLayout>
         </AntdConfigProvider>
       </StoreProvider>
     </>

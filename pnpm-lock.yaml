@@ -230,7 +230,6 @@ importers:
   apps/mis-web:
     specifiers:
       '@ant-design/icons': 4.7.0
-      '@artsy/fresnel': 3.5.0
       '@ddadaal/next-typed-api-routes-cli': 0.4.0
       '@ddadaal/next-typed-api-routes-runtime': 0.3.2
       '@ddadaal/tsgrpc-cli': 0.11.0
@@ -245,8 +244,8 @@ importers:
       '@types/mime-types': 2.1.1
       '@types/node': 17.0.35
       '@types/nprogress': 0.2.0
-      '@types/react': 17.0.45
-      '@types/react-dom': 17.0.17
+      '@types/react': 18.0.9
+      '@types/react-dom': 18.0.5
       '@types/styled-components': 5.1.25
       antd: 4.20.6
       babel-plugin-import: 1.13.5
@@ -260,9 +259,9 @@ importers:
       nookies: 2.5.2
       nprogress: 0.2.0
       postcss: 8.4.14
-      react: 17.0.2
+      react: 18.1.0
       react-async: 10.0.1
-      react-dom: 17.0.2
+      react-dom: 18.1.0
       react-is: 18.1.0
       simstate: 3.0.0
       styled-components: 5.3.5
@@ -271,7 +270,6 @@ importers:
       webpack: 5.72.1
     dependencies:
       '@ant-design/icons': 4.7.0_sfoxds7t5ydpegc3knd667wn6m
-      '@artsy/fresnel': 3.5.0_react@17.0.2
       '@ddadaal/next-typed-api-routes-runtime': 0.3.2_next@12.1.6
       '@ddadaal/tsgrpc-utils': 0.12.0_@grpc+grpc-js@1.6.7
       '@grpc/grpc-js': 1.6.7
@@ -305,8 +303,8 @@ importers:
       '@types/mime-types': 2.1.1
       '@types/node': 17.0.35
       '@types/nprogress': 0.2.0
-      '@types/react': 17.0.45
-      '@types/react-dom': 17.0.17
+      '@types/react': 18.0.9
+      '@types/react-dom': 18.0.5
       '@types/styled-components': 5.1.25
       babel-plugin-import: 1.13.5
       postcss: 8.4.14
@@ -2658,7 +2656,7 @@ packages:
     peerDependencies:
       react: '*'
     dependencies:
-      '@types/react': 17.0.45
+      '@types/react': 18.0.9
       prop-types: 15.8.1
       react: 17.0.2
     dev: false
@@ -4200,7 +4198,7 @@ packages:
   /@types/hoist-non-react-statics/3.3.1:
     resolution: {integrity: sha512-iMIqiko6ooLrTh1joXodJK5X9xeEALT1kM5G3ZLhD3hszxBdIEd5C75U834D9mLcINgD4OyZf5uQXjkuYydWvA==}
     dependencies:
-      '@types/react': 17.0.45
+      '@types/react': 18.0.9
       hoist-non-react-statics: 3.3.2
     dev: true
 
@@ -4332,6 +4330,12 @@ packages:
       '@types/react': 17.0.45
     dev: true
 
+  /@types/react-dom/18.0.5:
+    resolution: {integrity: sha512-OWPWTUrY/NIrjsAPkAk1wW9LZeIjSvkXRhclsFO8CZcZGCOg2G0YZy4ft+rOyYxy8B7ui5iZzi9OkDebZ7/QSA==}
+    dependencies:
+      '@types/react': 18.0.9
+    dev: true
+
   /@types/react-router-config/5.0.6:
     resolution: {integrity: sha512-db1mx37a1EJDf1XeX8jJN7R3PZABmJQXR8r28yUjVMFSjkmnQo6X6pOEEmNl+Tp2gYQOGPdYbFIipBtdElZ3Yg==}
     dependencies:
@@ -4354,6 +4358,13 @@ packages:
 
   /@types/react/17.0.45:
     resolution: {integrity: sha512-YfhQ22Lah2e3CHPsb93tRwIGNiSwkuz1/blk4e6QrWS0jQzCSNbGLtOEYhPg02W0yGTTmpajp7dCTbBAMN3qsg==}
+    dependencies:
+      '@types/prop-types': 15.7.5
+      '@types/scheduler': 0.16.2
+      csstype: 3.1.0
+
+  /@types/react/18.0.9:
+    resolution: {integrity: sha512-9bjbg1hJHUm4De19L1cHiW0Jvx3geel6Qczhjd0qY5VKVE2X5+x77YxAepuCwVh4vrgZJdgEJw48zrhRIeF4Nw==}
     dependencies:
       '@types/prop-types': 15.7.5
       '@types/scheduler': 0.16.2
@@ -4428,7 +4439,7 @@ packages:
     resolution: {integrity: sha512-fgwl+0Pa8pdkwXRoVPP9JbqF0Ivo9llnmsm+7TCI330kbPIFd9qv1Lrhr37shf4tnxCOSu+/IgqM7uJXLWZZNQ==}
     dependencies:
       '@types/hoist-non-react-statics': 3.3.1
-      '@types/react': 17.0.45
+      '@types/react': 18.0.9
       csstype: 3.1.0
     dev: true
 
