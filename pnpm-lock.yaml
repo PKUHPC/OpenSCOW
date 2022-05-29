@@ -263,7 +263,7 @@ importers:
       react-async: 10.0.1
       react-dom: 18.1.0
       react-is: 18.1.0
-      simstate: 3.0.0
+      simstate: 3.0.1
       styled-components: 5.3.5
       tslib: 2.4.0
       typescript: 4.7.2
@@ -291,7 +291,7 @@ importers:
       react-async: 10.0.1_react@18.1.0
       react-dom: 18.1.0_react@18.1.0
       react-is: 18.1.0
-      simstate: 3.0.0_react@18.1.0
+      simstate: 3.0.1_react@18.1.0
       styled-components: 5.3.5_4klixn56hmiqf6hh5nx3jyckvq
       tslib: 2.4.0
       typescript: 4.7.2
@@ -355,7 +355,7 @@ importers:
       react-async: 10.0.1
       react-dom: 18.1.0
       react-is: 18.1.0
-      simstate: 3.0.0
+      simstate: 3.0.1
       socket.io: 4.5.1
       socket.io-client: 4.5.1
       styled-components: 5.3.5
@@ -397,7 +397,7 @@ importers:
       react-async: 10.0.1_react@18.1.0
       react-dom: 18.1.0_react@18.1.0
       react-is: 18.1.0
-      simstate: 3.0.0_react@18.1.0
+      simstate: 3.0.1_react@18.1.0
       socket.io: 4.5.1
       socket.io-client: 4.5.1
       styled-components: 5.3.5_4klixn56hmiqf6hh5nx3jyckvq
@@ -2645,7 +2645,7 @@ packages:
     peerDependencies:
       react: '*'
     dependencies:
-      '@types/react': 17.0.45
+      '@types/react': 18.0.9
       prop-types: 15.8.1
       react: 17.0.2
     dev: false
@@ -4355,7 +4355,6 @@ packages:
       '@types/prop-types': 15.7.5
       '@types/scheduler': 0.16.2
       csstype: 3.1.0
-    dev: true
 
   /@types/responselike/1.0.0:
     resolution: {integrity: sha512-85Y2BjiufFzaMIlvJDvTTB8Fxl2xfLo4HgmHzVBz08w4wDePCTjYw66PdrolO0kzli3yam/YCgRufyo1DdQVTA==}
@@ -11994,7 +11993,6 @@ packages:
       object-assign: 4.1.1
       react: 17.0.2
       scheduler: 0.20.2
-    dev: false
 
   /react-dom/18.1.0_react@18.1.0:
     resolution: {integrity: sha512-fU1Txz7Budmvamp7bshe4Zi32d0ll7ect+ccxNu9FlObT605GOEB8BfO4tmRJ39R5Zj831VCpvQ05QPBW5yb+w==}
@@ -12134,7 +12132,6 @@ packages:
     dependencies:
       loose-envify: 1.4.0
       object-assign: 4.1.1
-    dev: false
 
   /react/18.1.0:
     resolution: {integrity: sha512-4oL8ivCz5ZEPyclFQXaNksK3adutVS8l2xzZU0cqEFrE9Sb7fC0EFK5uEk74wIreL1DERyjvsU915j1pcT2uEQ==}
@@ -12542,7 +12539,6 @@ packages:
     dependencies:
       loose-envify: 1.4.0
       object-assign: 4.1.1
-    dev: false
 
   /scheduler/0.22.0:
     resolution: {integrity: sha512-6QAm1BgQI88NPYymgGQLCZgvep4FyePDWFpXVK+zNSUgHwlqpJy8VEh8Et0KxTACS4VWwMousBElAZOH9nkkoQ==}
@@ -12821,8 +12817,8 @@ packages:
       simple-concat: 1.0.1
     dev: true
 
-  /simstate/3.0.0_react@18.1.0:
-    resolution: {integrity: sha512-0DGptU5T77zkd9nJBuSj727OItl23+1XJQLMx02rSQF7D4H/FsA1w0I9o5PbZUcULBHF+WTc1jDclOJVyMAmSg==}
+  /simstate/3.0.1_react@18.1.0:
+    resolution: {integrity: sha512-H2vufxjgfQ7Hxf7KGN0p2GNznjd8i+E6o8fegZFLjY+aVPUY8o+paYrVlNKa7GWSuW0WtchO8/ENTMiUdkMMsA==}
     peerDependencies:
       react: '>=16.8.0'
     dependencies:
