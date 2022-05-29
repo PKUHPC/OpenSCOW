@@ -1,4 +1,4 @@
-import { Entity, IdentifiedReference, OneToOne,PrimaryKey, Property } from "@mikro-orm/core";
+import { Entity, IdentifiedReference, OneToOne, PrimaryKey, Property } from "@mikro-orm/core";
 import { Account } from "src/entities/Account";
 import { EntityOrRef, toRef } from "src/utils/orm";
 

@@ -8,7 +8,7 @@ import { charge } from "src/bl/charging";
 import { Account } from "src/entities/Account";
 import { AccountWhitelist } from "src/entities/AccountWhitelist";
 import { AccountServiceClient } from "src/generated/server/account";
-import { reloadEntity , toRef } from "src/utils/orm";
+import { reloadEntity, toRef } from "src/utils/orm";
 import { InitialData, insertInitialData } from "tests/data/data";
 import { dropDatabase } from "tests/data/helpers";
 

@@ -1,5 +1,5 @@
-export function throttle<T extends(...args: any[]) => any>
-(fn: T, wait = 500): (...args: Parameters<T>) => ReturnType<T> {
+export function throttle<T extends(...args: any[]) => any>(fn: T, wait = 500):
+(...args: Parameters<T>) => ReturnType<T> {
   // 上一次执行 fn 的时间
   let previous = 0;
   // 将 throttle 处理结果当作函数返回

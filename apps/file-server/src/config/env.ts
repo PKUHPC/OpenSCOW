@@ -1,4 +1,4 @@
-import { envConfig, host, port,str } from "@scow/config";
+import { envConfig, host, port, str } from "@scow/config";
 
 export const TOKEN_COOKIE_HEADER = "SCOW_USER";
 

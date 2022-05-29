@@ -3,7 +3,7 @@ import { CloseOutlined,
   DeleteOutlined, FileAddOutlined, FileOutlined, FolderAddOutlined,
   FolderOutlined,   HomeOutlined, LeftOutlined, MacCommandOutlined, RightOutlined,
   ScissorOutlined, SnippetsOutlined, UploadOutlined, UpOutlined } from "@ant-design/icons";
-import { Button, Divider,message, Modal, Space, Table } from "antd";
+import { Button, Divider, message, Modal, Space, Table } from "antd";
 import Link from "next/link";
 import Router from "next/router";
 import { join } from "path";

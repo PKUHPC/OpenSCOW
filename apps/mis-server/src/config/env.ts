@@ -1,4 +1,4 @@
-import { bool,envConfig, host, num, parseKeyValue, port, str  } from "@scow/config";
+import { bool, envConfig, host, num, parseKeyValue, port, str  } from "@scow/config";
 import os from "os";
 import path from "path";
 

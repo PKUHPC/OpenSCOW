@@ -3,7 +3,7 @@ import fs from "fs";
 import { buildApp } from "src/app";
 import { TOKEN_COOKIE_HEADER } from "src/config/env";
 import { actualPath,  createTestItems, mockFileForm,
-  removeGracefulShutdown, removeTestItems, TEST_USER_UID,TOKEN } from "tests/utils";
+  removeGracefulShutdown, removeTestItems, TEST_USER_UID, TOKEN } from "tests/utils";
 
 let server: FastifyInstance;
 

@@ -7,7 +7,7 @@ export const ClusterTextsConfigSchema = Type.Record(
     extras: Type.Optional(Type.Array(Type.Object({
       title: Type.String({ description: "标题" }),
       content: Type.String({ description: "内容" }),
-    }))) },{ description: "其他内容" },
+    }))) }, { description: "其他内容" },
   ),
 );
 

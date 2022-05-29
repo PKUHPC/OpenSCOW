@@ -42,7 +42,7 @@ X DISPLAY #     PROCESS ID      NOVNC PROCESS ID
 `;
 
 it.each([
-  [listOutput, [1,2]],
+  [listOutput, [1, 2]],
 ])("parses list", (output, expected) => {
   expect(parseListOutput(output)).toIncludeSameMembers(expected);
 });

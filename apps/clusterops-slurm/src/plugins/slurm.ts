@@ -51,7 +51,7 @@ export const slurmPlugin = plugin(async (s) => {
 
   const partitions = parseArray(config.BASE_PARTITIONS).map((x) => "\"" + x + "\"").join(" ");
 
-  s.addExtension("executeSlurmScript",<SlurmPlugin["executeSlurmScript"]>(
+  s.addExtension("executeSlurmScript", <SlurmPlugin["executeSlurmScript"]>(
     async (params: string[]) => {
       const result = await s.ext.executeScript(config.SLURM_SCRIPT_PATH, params, {
         MYSQL_PASSWORD: config.MYSQL_PASSWORD,

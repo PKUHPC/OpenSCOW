@@ -1,4 +1,4 @@
-import { Button, Form, Input, message,Spin } from "antd";
+import { Button, Form, Input, message, Spin } from "antd";
 import React, { useState } from "react";
 import { api } from "src/apis";
 import { confirmPasswordFormItemProps, passwordRule } from "src/utils/form";

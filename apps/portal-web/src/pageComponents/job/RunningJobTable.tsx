@@ -6,7 +6,7 @@ import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { runningJobId, RunningJobInfo } from "src/models/job";
 import { RunningJobDrawer } from "src/pageComponents/job/RunningJobDrawer";
-import { Cluster, CLUSTERS,CLUSTERS_ID_MAP  } from "src/utils/config";
+import { Cluster, CLUSTERS, CLUSTERS_ID_MAP  } from "src/utils/config";
 
 interface FilterForm {
   jobId: number | undefined;

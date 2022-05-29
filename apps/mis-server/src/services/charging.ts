@@ -2,7 +2,7 @@ import { plugin } from "@ddadaal/tsgrpc-server";
 import { ensureNotUndefined } from "@ddadaal/tsgrpc-utils";
 import { ServiceError, status } from "@grpc/grpc-js";
 import { LockMode, QueryOrder } from "@mikro-orm/core";
-import { Decimal , decimalToMoney, moneyToNumber } from "@scow/lib-decimal";
+import { Decimal, decimalToMoney, moneyToNumber } from "@scow/lib-decimal";
 import { charge, pay } from "src/bl/charging";
 import { Account } from "src/entities/Account";
 import { ChargeRecord } from "src/entities/ChargeRecord";

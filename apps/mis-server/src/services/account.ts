@@ -7,7 +7,7 @@ import { Account } from "src/entities/Account";
 import { AccountWhitelist } from "src/entities/AccountWhitelist";
 import { Tenant } from "src/entities/Tenant";
 import { User } from "src/entities/User";
-import { UserAccount, UserRole as EntityUserRole,UserStatus } from "src/entities/UserAccount";
+import { UserAccount, UserRole as EntityUserRole, UserStatus } from "src/entities/UserAccount";
 import { AccountServiceClient } from "src/generated/clusterops/account";
 import { AccountServiceServer, AccountServiceService,
   BlockAccountReply_Result } from "src/generated/server/account";

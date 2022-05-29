@@ -1,7 +1,7 @@
 import { ForbiddenPage } from "src/components/errorPages/ForbiddenPage";
 import { UserRole } from "src/models/User";
 import type { User } from "src/stores/UserStore";
-import { queryToString,useQuerystring } from "src/utils/querystring";
+import { queryToString, useQuerystring } from "src/utils/querystring";
 
 export const checkQueryAccountNameIsAdmin = (u: User) => {
   const query = useQuerystring();

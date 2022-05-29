@@ -13,7 +13,7 @@ import { UnifiedErrorPage } from "src/components/errorPages/UnifiedErrorPage";
 import { AccountStatus } from "src/generated/server/user";
 import { AccountInfoSection } from "src/pageComponents/dashboard/AccountInfoSection";
 import { JobsSection } from "src/pageComponents/dashboard/JobsSection";
-import { getUserStatus , GetUserStatusSchema } from "src/pages/api/dashboard/status";
+import { getUserStatus, GetUserStatusSchema } from "src/pages/api/dashboard/status";
 import { UserStore } from "src/stores/UserStore";
 import { Head } from "src/utils/head";
 

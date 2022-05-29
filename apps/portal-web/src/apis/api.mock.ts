@@ -58,7 +58,7 @@ export const mockApi: MockApi<typeof api> = {
 
   getAccounts: async () => ({ accounts: ["hpc01", "hpc02"]}),
 
-  launchDesktop: async () => ({ node: "login01", password: "123",port: 1234 }),
+  launchDesktop: async () => ({ node: "login01", password: "123", port: 1234 }),
 
   listDesktops: async () => ({
     result: {

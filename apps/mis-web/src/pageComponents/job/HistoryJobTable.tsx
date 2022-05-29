@@ -1,5 +1,5 @@
 import { HttpError } from "@ddadaal/next-typed-api-routes-runtime";
-import { Button, DatePicker,Divider, Form, Input, InputNumber, message, Select, Table } from "antd";
+import { Button, DatePicker, Divider, Form, Input, InputNumber, message, Select, Table } from "antd";
 import moment from "moment";
 import React, { useCallback, useRef, useState } from "react";
 import { useAsync } from "react-async";

@@ -1,7 +1,7 @@
 import { Logger } from "@ddadaal/tsgrpc-server";
 import fs from "fs";
 import { NodeSSH } from "node-ssh";
-import { config , INSERT_SSH_KEY_LOGIN_NODES } from "src/config/env";
+import { config, INSERT_SSH_KEY_LOGIN_NODES } from "src/config/env";
 
 const connectAsRoot = async <T>(ip: string, run: (ssh: NodeSSH) => Promise<T>) => {
 

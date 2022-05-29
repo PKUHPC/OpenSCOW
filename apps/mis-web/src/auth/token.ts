@@ -3,7 +3,7 @@ import { asyncClientCall } from "@ddadaal/tsgrpc-utils";
 import path from "path";
 import { MOCK_USER_INFO } from "src/apis/api.mock";
 import { USE_MOCK } from "src/apis/useMock";
-import { GetUserInfoReply,UserServiceClient } from "src/generated/server/user";
+import { GetUserInfoReply, UserServiceClient } from "src/generated/server/user";
 import { UserInfo } from "src/models/User";
 import { getClient } from "src/utils/client";
 import { runtimeConfig } from "src/utils/config";

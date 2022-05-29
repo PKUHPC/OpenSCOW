@@ -112,7 +112,7 @@ export const vncServiceServer = plugin((server) => {
     },
 
     createDesktop: async ({ request, logger }) => {
-      const { cluster , username } = request;
+      const { cluster, username } = request;
 
       checkClusterExistence(cluster);
       const node = clustersConfig[cluster].loginNodes[0];
@@ -145,7 +145,7 @@ export const vncServiceServer = plugin((server) => {
           throw <ServiceError> {
             code: status.RESOURCE_EXHAUSTED,
             message: "VNC desktop has exceeded the maximum",
-            details: `${config.MAX_DISPLAY}` ,
+            details: `${config.MAX_DISPLAY}`,
           };
         }
       });

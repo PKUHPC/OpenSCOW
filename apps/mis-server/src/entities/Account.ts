@@ -7,7 +7,7 @@ import { Tenant } from "src/entities/Tenant";
 import { UserAccount } from "src/entities/UserAccount";
 import { AccountServiceClient } from "src/generated/clusterops/account";
 import { ClusterPlugin } from "src/plugins/clusters";
-import { DECIMAL_DEFAULT_RAW,DecimalType } from "src/utils/decimal";
+import { DECIMAL_DEFAULT_RAW, DecimalType } from "src/utils/decimal";
 import { EntityOrRef, toRef } from "src/utils/orm";
 
 @Entity()

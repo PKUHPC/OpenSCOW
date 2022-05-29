@@ -3,7 +3,7 @@ import { asyncClientCall } from "@ddadaal/tsgrpc-utils";
 import { ChannelCredentials } from "@grpc/grpc-js";
 import * as grpc from "@grpc/grpc-js";
 import { SqlEntityManager } from "@mikro-orm/mysql";
-import { Decimal,moneyToNumber, numberToMoney  } from "@scow/lib-decimal";
+import { Decimal, moneyToNumber, numberToMoney  } from "@scow/lib-decimal";
 import { createServer } from "src/app";
 import { Account } from "src/entities/Account";
 import { ChargeRecord } from "src/entities/ChargeRecord";

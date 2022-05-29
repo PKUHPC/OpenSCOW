@@ -8,7 +8,7 @@ import { PageTitle } from "src/components/PageTitle";
 import { SubmitJobForm } from "src/pageComponents/job/SubmitJobForm";
 import { CLUSTERS } from "src/utils/config";
 import { Head } from "src/utils/head";
-import { queryToString,useQuerystring } from "src/utils/querystring";
+import { queryToString, useQuerystring } from "src/utils/querystring";
 
 export const SubmitJobPage: NextPage = requireAuth(() => true)(
   () => {

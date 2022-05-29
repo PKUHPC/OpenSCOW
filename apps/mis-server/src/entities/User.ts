@@ -3,7 +3,7 @@ import { ArrayType, Collection, Entity, IdentifiedReference,
 import { StorageQuota } from "src/entities/StorageQuota";
 import { Tenant } from "src/entities/Tenant";
 import { UserAccount } from "src/entities/UserAccount";
-import { DATETIME_TYPE , EntityOrRef, toRef } from "src/utils/orm";
+import { DATETIME_TYPE, EntityOrRef, toRef } from "src/utils/orm";
 
 export enum PlatformRole {
   PLATFORM_FINANCE = "PLATFORM_FINANCE",

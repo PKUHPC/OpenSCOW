@@ -1,4 +1,4 @@
-import { useCallback,useState } from "react";
+import { useCallback, useState } from "react";
 import { api } from "src/apis";
 import { destroyUserInfoCookie } from "src/auth/cookie";
 

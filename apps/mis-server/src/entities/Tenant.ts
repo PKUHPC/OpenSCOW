@@ -1,6 +1,6 @@
 import { Entity, PrimaryKey, Property } from "@mikro-orm/core";
 import { Decimal } from "@scow/lib-decimal";
-import { DECIMAL_DEFAULT_RAW,DecimalType } from "src/utils/decimal";
+import { DECIMAL_DEFAULT_RAW, DecimalType } from "src/utils/decimal";
 
 @Entity()
 export class Tenant {
