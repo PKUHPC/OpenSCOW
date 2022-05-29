@@ -33,7 +33,7 @@
     "react": "18.1.0",
     "react-async": "10.0.1",
     "react-dom": "18.1.0",
-    "simstate": "3.0.0",
+    "simstate": "3.0.1",
     "styled-components": "5.3.5",
     "tslib": "2.4.0",
     "typescript": "4.7.2",

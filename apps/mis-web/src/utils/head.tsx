@@ -1,8 +1,8 @@
 import NextHead from "next/head";
 
-interface Props {
+type Props = React.PropsWithChildren<{
   title: string;
-}
+}>;
 
 export const Head: React.FC<Props> = ({ title, children }) => {
   return (

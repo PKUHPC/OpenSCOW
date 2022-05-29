@@ -1,7 +1,7 @@
 import { Layout } from "antd";
 import useBreakpoint from "antd/lib/grid/hooks/useBreakpoint";
 import { useRouter } from "next/router";
-import React, { useState } from "react";
+import React, { PropsWithChildren, useState } from "react";
 import { Footer } from "src/layouts/Footer";
 import { Header } from "src/layouts/header";
 import { match } from "src/layouts/matchers";
@@ -12,9 +12,9 @@ import styled from "styled-components";
 // import logo from "src/assets/logo-no-text.svg";
 
 
-interface Props {
+type Props = PropsWithChildren<{
   footerText: string;
-}
+}>;
 
 const Root = styled.div`
   min-height: 100vh;

@@ -1,7 +1,7 @@
 import { ReloadOutlined, RightOutlined } from "@ant-design/icons";
 import { Button, Input, Space } from "antd";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import styled from "styled-components";
 
 interface Props {
@@ -75,7 +75,7 @@ export const PathBar: React.FC<Props> = ({ path, loading, reload, go, fullUrl })
                   </a>
                 </Link>
                 {pathSegments.map((x, i) => (
-                  <>
+                  <Fragment key={x}>
                     <Link href={fullUrl(pathSegments.slice(0, i + 1).join("/"))} key={i} passHref>
                       <a onClick={(e) => e.stopPropagation()}>
                         {x}
@@ -84,7 +84,7 @@ export const PathBar: React.FC<Props> = ({ path, loading, reload, go, fullUrl })
                     <span>
                     /
                     </span>
-                  </>
+                  </Fragment>
                 ))}
               </Space>
             </BarStateBar>

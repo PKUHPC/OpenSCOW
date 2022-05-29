@@ -7,13 +7,13 @@ import { NotFoundPage } from "src/components/errorPages/NotFoundPage";
 import { PageTitle } from "src/components/PageTitle";
 import { FormLayout } from "src/layouts/FormLayout";
 import { TenantRole } from "src/models/User";
-import { CreateUserForm as FormComponent, FormFields } from "src/pageComponents/users/CreateUserForm";
+import { CreateUserForm, CreateUserFormFields } from "src/pageComponents/users/CreateUserForm";
 import { publicConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
 
-const CreateUserForm: React.FC = () => {
+const CreateUserPageForm: React.FC = () => {
 
-  const [form] = Form.useForm<FormFields>();
+  const [form] = Form.useForm<CreateUserFormFields>();
 
   const [loading, setLoading] = useState(false);
 
@@ -31,18 +31,19 @@ const CreateUserForm: React.FC = () => {
   };
 
   return (
-    <FormComponent form={form}
+    <Form form={form}
       wrapperCol={{ span: 20 }}
       labelCol={{ span: 4 }}
       labelAlign="right"
       onFinish={onOk}
     >
+      <CreateUserForm />
       <Form.Item wrapperCol={{ span: 6, offset: 4 }}>
         <Button type="primary" htmlType="submit" loading={loading}>
           提交
         </Button>
       </Form.Item>
-    </FormComponent>
+    </Form>
   );
 };
 
@@ -58,7 +59,7 @@ export const CreateUserPage: NextPage = requireAuth((i) => i.tenantRoles.include
         <Head title="创建用户" />
         <PageTitle titleText="创建用户" />
         <FormLayout>
-          <CreateUserForm />
+          <CreateUserPageForm />
         </FormLayout>
       </div>
     );

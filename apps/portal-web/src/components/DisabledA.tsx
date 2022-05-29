@@ -1,11 +1,11 @@
 import { Tooltip } from "antd";
-import React from "react";
+import React, { PropsWithChildren } from "react";
 
-interface Props {
+type Props = PropsWithChildren<{
   onClick?: () => void;
   disabled?: boolean;
   message?: React.ReactNode;
-}
+}>;
 
 export const DisabledA: React.FC<Props> = React.forwardRef(({  onClick, disabled, message, children }, ref) => {
 

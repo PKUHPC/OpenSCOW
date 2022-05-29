@@ -1,7 +1,7 @@
-import { message,notification } from "antd";
+import { message, notification } from "antd";
 import { MessageInstance } from "antd/lib/message";
 import { NotificationInstance } from "antd/lib/notification";
-import React, { useMemo } from "react";
+import React, { PropsWithChildren, useMemo } from "react";
 
 const AntdContextHelperContext =
   React.createContext<{
@@ -9,7 +9,9 @@ const AntdContextHelperContext =
     message: MessageInstance;
   } | undefined>(undefined);
 
-export const AntdContextHelper: React.FC = ({ children }) => {
+type Props = PropsWithChildren<{}>;
+
+export const AntdContextHelper: React.FC<Props> = ({ children }) => {
   const [notifyApi, contextHolder] = notification.useNotification();
   const [messageApi, mch] = message.useMessage();
 

@@ -9,7 +9,9 @@ const AntdContextHelperContext =
     message: MessageInstance;
   } | undefined>(undefined);
 
-export const AntdContextHelper: React.FC = ({ children }) => {
+type Props = React.PropsWithChildren<{}>;
+
+export const AntdContextHelper: React.FC<Props> = ({ children }) => {
   const [notifyApi, contextHolder] = notification.useNotification();
   const [messageApi, mch] = message.useMessage();
 

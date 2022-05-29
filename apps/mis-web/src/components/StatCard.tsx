@@ -2,9 +2,9 @@ import { Card } from "antd";
 import React from "react";
 import styled from "styled-components";
 
-interface Props {
+type Props = React.PropsWithChildren<{
   title: React.ReactNode;
-}
+}>;
 
 const Title = styled.h3`
   font-weight: 600;

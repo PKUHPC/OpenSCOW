@@ -1,10 +1,10 @@
 import { RefreshLink } from "src/utils/refreshToken";
 import styled from "styled-components";
 
-interface Props {
+type Props = React.PropsWithChildren<{
   isLoading: boolean;
   reload: () => void;
-}
+}>;
 
 const Container = styled.div`
   display: flex;

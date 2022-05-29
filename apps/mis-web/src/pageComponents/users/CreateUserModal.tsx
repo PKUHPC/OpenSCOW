@@ -1,7 +1,7 @@
 import { Form, message, Modal } from "antd";
 import React, { useState } from "react";
 import { api } from "src/apis";
-import { CreateUserForm, FormFields } from "src/pageComponents/users/CreateUserForm";
+import { CreateUserForm, CreateUserFormFields } from "src/pageComponents/users/CreateUserForm";
 
 interface Props {
   visible: boolean;
@@ -11,7 +11,7 @@ interface Props {
 export const CreateUserModal: React.FC<Props> = ({
   onClose, visible,
 }) => {
-  const [form] = Form.useForm<FormFields>();
+  const [form] = Form.useForm<CreateUserFormFields>();
   const [loading, setLoading] = useState(false);
 
   const onOk = async () => {
@@ -36,7 +36,9 @@ export const CreateUserModal: React.FC<Props> = ({
       onOk={onOk}
     >
       <p>用户不存在，请输入用户信息以创建用户。</p>
-      <CreateUserForm form={form}/>
+      <Form form={form}>
+        <CreateUserForm />
+      </Form>
     </Modal>
 
   );

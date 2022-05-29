@@ -62,7 +62,7 @@ export const HistoryJobDrawer: React.FC<Props> = (props) => {
             {drawerItems.map((([label, key, format, show]) => (
               (!show || show(props)) ? (
                 <Descriptions.Item key={item.idJob} label={typeof label === "string" ? label : label(props)}>
-                  {format ? format(item[key]) : item[key]}
+                  {format ? format(item[key]) : item[key] as string}
                 </Descriptions.Item>
               ) : undefined
             ))).filter((x) => x)}

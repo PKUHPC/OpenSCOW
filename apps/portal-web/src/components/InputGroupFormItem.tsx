@@ -1,10 +1,10 @@
 import { Input } from "antd";
 
-export interface Props {
+type Props = React.PropsWithChildren<{
   value?: string;
   onChange?: (value: string) => void;
   deltaWidth: string;
-}
+}>;
 
 export const InputGroupFormItem: React.FC<Props> = ({ children, deltaWidth, value, onChange }) => (
   <Input.Group compact >

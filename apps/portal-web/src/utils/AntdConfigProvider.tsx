@@ -5,9 +5,9 @@ import React, { useEffect } from "react";
 
 moment.locale("zh-CN");
 
-interface Props {
+type Props = React.PropsWithChildren<{
   color: string;
-}
+}>;
 
 export const AntdConfigProvider: React.FC<Props> = ({ children, color }) => {
 

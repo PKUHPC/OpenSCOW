@@ -1,11 +1,11 @@
 import React from "react";
 import styled from "styled-components";
 
-interface Props {
+type Props = React.PropsWithChildren<{
   title: React.ReactNode;
   extra?: React.ReactNode;
   className?: string;
-}
+}>;
 
 const Container = styled.div`
 `;

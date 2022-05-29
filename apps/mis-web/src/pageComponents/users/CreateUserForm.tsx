@@ -1,9 +1,8 @@
-import { RequiredBy } from "@ddadaal/tsgrpc-utils";
-import { Form, FormProps, Input } from "antd";
+import { Form, Input } from "antd";
 import React from "react";
 import { confirmPasswordFormItemProps, emailRule, passwordRule } from "src/utils/form";
 
-export interface FormFields {
+export interface CreateUserFormFields {
   identityId: string;
   name: string;
   email: string;
@@ -11,12 +10,13 @@ export interface FormFields {
   confirmPassword: string;
 }
 
+export const CreateUserForm: React.FC = () => {
 
-export const CreateUserForm: React.FC<RequiredBy<FormProps<FormFields>, "form">> = ({ form, children, ...props }) => {
+  const form = Form.useFormInstance<CreateUserFormFields>();
 
   return (
-    <Form form={form} {...props}>
-      <Form.Item label="用户ID" name="identityId" required
+    <>
+      <Form.Item label="用户ID" name="identityId"
         rules={[
           { pattern: /^[a-z0-9_]+$/, message: "只能由小写英文字符、数字和下划线组成" },
           { required: true },
@@ -24,7 +24,7 @@ export const CreateUserForm: React.FC<RequiredBy<FormProps<FormFields>, "form">>
       >
         <Input placeholder="只能由小写英文字符、数字和下划线组成" />
       </Form.Item>
-      <Form.Item label="用户姓名" name="name" required>
+      <Form.Item label="用户姓名" name="name" rules={[{ required: true }]}>
         <Input />
       </Form.Item>
       <Form.Item label="用户邮箱" name="email"
@@ -47,7 +47,6 @@ export const CreateUserForm: React.FC<RequiredBy<FormProps<FormFields>, "form">>
       >
         <Input.Password />
       </Form.Item>
-      {children}
-    </Form>
+    </>
   );
 };

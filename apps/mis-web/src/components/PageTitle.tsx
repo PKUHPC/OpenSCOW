@@ -15,12 +15,12 @@ export const TitleText = styled.h1`
   font-size: 16px;
 `;
 
-interface PageTitleProps {
+type PageTitleProps = React.PropsWithChildren<{
   beforeTitle?: React.ReactNode;
   titleText: React.ReactNode;
   isLoading?: boolean;
   reload?: () => void;
-}
+}>;
 
 
 export const PageTitle: React.FC<PageTitleProps> = ({

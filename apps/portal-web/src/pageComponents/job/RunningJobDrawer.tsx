@@ -1,5 +1,6 @@
 import { Descriptions, Drawer } from "antd";
 import { RunningJobInfo } from "src/models/job";
+import { Cluster } from "src/utils/config";
 import { formatDateTime } from "src/utils/datetime";
 
 interface Props {
@@ -10,7 +11,7 @@ interface Props {
 
 
 const drawerItems = [
-  ["集群", "cluster", (v) => v.name],
+  ["集群", "cluster", (v: Cluster) => v.name],
   ["作业ID", "jobId"],
   ["账户", "account"],
   ["作业名", "name"],
@@ -45,7 +46,7 @@ export const RunningJobDrawer: React.FC<Props> = ({
           >
             {drawerItems.map((([label, key, format]) => (
               <Descriptions.Item key={item.jobId} label={label}>
-                {format ? format(item[key], item) : item[key]}
+                {format ? format(item[key], item) : item[key] as string}
               </Descriptions.Item>
             )))}
           </Descriptions>

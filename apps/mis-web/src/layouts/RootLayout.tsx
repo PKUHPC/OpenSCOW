@@ -14,9 +14,9 @@ import styled from "styled-components";
 // import logo from "src/assets/logo-no-text.svg";
 
 
-interface Props {
+type Props = React.PropsWithChildren<{
   footerText: string;
-}
+}>;
 
 const Root = styled.div`
   min-height: 100vh;

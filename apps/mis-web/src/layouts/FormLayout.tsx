@@ -13,9 +13,9 @@ export const ChildrenContainer = styled.div`
   margin: 16px 0;
 `;
 
-interface Props {
+type Props = React.PropsWithChildren<{
   maxWidth?: number;
-}
+}>;
 
 export const FormLayout: React.FC<Props> = ({
   children,

@@ -17,3 +17,10 @@ declare namespace NodeJS {
     NEXT_PUBLIC_USE_MOCK: string | undefined;
   }
 }
+
+declare namespace React {
+  interface FC<P = {}> {
+    (props: P, context?: any): ReactElement<any, any> | null;
+    children: JSX.Element;
+  }
+}
