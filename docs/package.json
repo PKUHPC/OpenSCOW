@@ -33,8 +33,8 @@
     "@scow/config": "workspace:*",
     "@tsconfig/docusaurus": "1.0.5",
     "@types/react": "17.0.45",
-    "typescript": "4.7.2",
-    "webpack": "5.72.1"
+    "webpack": "5.72.1",
+    "typescript": "4.7.2"
   },
   "browserslist": {
     "production": [
