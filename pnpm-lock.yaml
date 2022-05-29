@@ -4,7 +4,7 @@ importers:
 
   .:
     specifiers:
-      '@ddadaal/eslint-config': 1.4.0
+      '@ddadaal/eslint-config': 1.5.0
       '@types/jest': 27.5.1
       '@types/node': 17.0.35
       '@types/rimraf': 3.0.2
@@ -30,7 +30,7 @@ importers:
       tsconfig-paths: 4.0.0
       typescript: 4.7.2
     devDependencies:
-      '@ddadaal/eslint-config': 1.4.0_i4fwrl6wmixrdnjbrpappslwwa
+      '@ddadaal/eslint-config': 1.5.0_i4fwrl6wmixrdnjbrpappslwwa
       '@types/jest': 27.5.1
       '@types/node': 17.0.35
       '@types/rimraf': 3.0.2
@@ -2102,8 +2102,8 @@ packages:
     engines: {node: '>=10'}
     dev: false
 
-  /@ddadaal/eslint-config/1.4.0_i4fwrl6wmixrdnjbrpappslwwa:
-    resolution: {integrity: sha512-scXuSrYi/EvSD7QRd6sPDxFDmQtWqJ14oX+Mrag+lWuV+MQLUeYm4V3u32hdu5GHtKknkOpVxSALxr8opW/Cug==}
+  /@ddadaal/eslint-config/1.5.0_i4fwrl6wmixrdnjbrpappslwwa:
+    resolution: {integrity: sha512-Vsxc7fqUZEWt/UxLCBUcuVBvy1yn/SjVZMLrQQ+XSfW8V9uJ2cNCVuWi8wCjy+KlMVWe6mTTPQDQCeprn88NLA==}
     peerDependencies:
       '@typescript-eslint/eslint-plugin': ^4 || ^5
       eslint: ^7 || ^8
@@ -2645,7 +2645,7 @@ packages:
     peerDependencies:
       react: '*'
     dependencies:
-      '@types/react': 17.0.45
+      '@types/react': 18.0.9
       prop-types: 15.8.1
       react: 17.0.2
     dev: false
@@ -4355,7 +4355,6 @@ packages:
       '@types/prop-types': 15.7.5
       '@types/scheduler': 0.16.2
       csstype: 3.1.0
-    dev: true
 
   /@types/responselike/1.0.0:
     resolution: {integrity: sha512-85Y2BjiufFzaMIlvJDvTTB8Fxl2xfLo4HgmHzVBz08w4wDePCTjYw66PdrolO0kzli3yam/YCgRufyo1DdQVTA==}
@@ -11994,7 +11993,6 @@ packages:
       object-assign: 4.1.1
       react: 17.0.2
       scheduler: 0.20.2
-    dev: false
 
   /react-dom/18.1.0_react@18.1.0:
     resolution: {integrity: sha512-fU1Txz7Budmvamp7bshe4Zi32d0ll7ect+ccxNu9FlObT605GOEB8BfO4tmRJ39R5Zj831VCpvQ05QPBW5yb+w==}
@@ -12134,7 +12132,6 @@ packages:
     dependencies:
       loose-envify: 1.4.0
       object-assign: 4.1.1
-    dev: false
 
   /react/18.1.0:
     resolution: {integrity: sha512-4oL8ivCz5ZEPyclFQXaNksK3adutVS8l2xzZU0cqEFrE9Sb7fC0EFK5uEk74wIreL1DERyjvsU915j1pcT2uEQ==}
@@ -12542,7 +12539,6 @@ packages:
     dependencies:
       loose-envify: 1.4.0
       object-assign: 4.1.1
-    dev: false
 
   /scheduler/0.22.0:
     resolution: {integrity: sha512-6QAm1BgQI88NPYymgGQLCZgvep4FyePDWFpXVK+zNSUgHwlqpJy8VEh8Et0KxTACS4VWwMousBElAZOH9nkkoQ==}
