@@ -102,7 +102,7 @@ export const clustersPlugin = plugin(async (f) => {
 
       const subLogger = logger.child({ clusterOpId });
 
-      logger.trace(`Executing ${method} on cluster ${cluster}. req: ${JSON.stringify(req)}`);
+      logger.trace(`Executing ${String(method)} on cluster ${cluster}. req: ${JSON.stringify(req)}`);
 
       return await asyncClientCall(getClient(ctor, addr), method, req)
         .then((v) => {
@@ -122,7 +122,7 @@ export const clustersPlugin = plugin(async (f) => {
       const subLogger = logger.child({ clusterOpId });
 
       const results = await Promise.all(Object.entries(clusters).map(async ([name, addr]) => {
-        subLogger.trace(`Executing ${execute.method} on all clusters. req: ${JSON.stringify(execute.req)}`);
+        subLogger.trace(`Executing ${String(execute.method)} on all clusters. req: ${JSON.stringify(execute.req)}`);
 
         return await asyncClientCall(getClient(clientCtor, addr), execute.method, execute.req)
           .then(() => {
@@ -141,11 +141,11 @@ export const clustersPlugin = plugin(async (f) => {
       if (successfulCluster.length < Object.keys(clusters).length) {
         if (undo) {
           subLogger.warn(`
-          Undo ${execute.method} on previously successful clusters
+          Undo ${String(execute.method)} on previously successful clusters
           ${successfulCluster.map(([name]) => name).join(",")}
         `);
 
-          subLogger.warn(`Undo method ${undo.method}, req: ${JSON.stringify(undo.req)}`);
+          subLogger.warn(`Undo method ${String(undo.method)}, req: ${JSON.stringify(undo.req)}`);
 
           const results = await Promise.all(successfulCluster
             .map(async ([name, addr]) => {
@@ -163,11 +163,11 @@ export const clustersPlugin = plugin(async (f) => {
           const failedClusters = results.filter((x) => typeof x === "string") as string[];
 
           if (failedClusters.length > 0) {
-            subLogger.error(`Failed to undo ${execute.method} on ${failedClusters.join(",")}.`);
+            subLogger.error(`Failed to undo ${String(execute.method)} on ${failedClusters.join(",")}.`);
           }
         } else {
           subLogger.warn(`
-            ${execute.method} only succeeds on clusters
+            ${String(execute.method)} only succeeds on clusters
             ${successfulCluster.map(([name]) => name).join(",")}
         `);
         }
