@@ -52,7 +52,8 @@
     "@codemirror/commands": "0.20.0",
     "@codemirror/autocomplete": "0.20.2",
     "socket.io": "4.5.1",
-    "node-pty": "0.11.0-beta9"
+    "node-pty": "0.11.0-beta9",
+    "random-words": "1.1.2"
   },
   "devDependencies": {
     "@ddadaal/next-typed-api-routes-cli": "0.4.0",
@@ -65,6 +66,7 @@
     "@types/react-dom": "18.0.5",
     "@types/styled-components": "5.1.25",
     "@types/url-join": "4.0.1",
+    "@types/random-words": "1.1.2",
     "postcss": "8.4.14",
     "webpack": "5.72.1"
   },

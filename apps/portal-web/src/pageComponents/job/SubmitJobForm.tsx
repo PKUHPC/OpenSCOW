@@ -1,7 +1,7 @@
 import { ReloadOutlined } from "@ant-design/icons";
 import { Button, Col, Form, Input, InputNumber, message, Modal, Row, Select, Tooltip } from "antd";
 import { useWatch } from "antd/lib/form/Form";
-import moment from "moment";
+import randomWords from "random-words";
 import React, { useEffect, useMemo, useState } from "react";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
@@ -24,7 +24,7 @@ interface JobForm {
 }
 
 function genJobName() {
-  return moment().format("YYYYMMDDhhmmss");
+  return randomWords({ exactly: 2, join: "-" });
 }
 
 const getPartitionInfo = (cluster: Cluster, partition: string | undefined) => {
