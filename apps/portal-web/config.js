@@ -57,11 +57,12 @@ const config = envConfig(specs, process.env);
 const { getConfigFromFile } = require("@scow/config");
 const { ClustersConfigName, ClustersConfigSchema } = require("@scow/config/build/appConfig/clusters");
 
+const configPath = production ? undefined : path.join(__dirname, "config");
+
 /**
  * @type {import("@scow/config/build/appConfig/clusters").Clusters}
  */
-const clusters = getConfigFromFile(ClustersConfigSchema, ClustersConfigName, false,
-  production ? undefined : path.join(__dirname, "config"));
+const clusters = getConfigFromFile(ClustersConfigSchema, ClustersConfigName, false, configPath);
 
 /**
  * @type {import("./src/utils/config").ServerRuntimeConfig}
@@ -77,6 +78,26 @@ const serverRuntimeConfig = {
   SSH_PRIVATE_KEY_PATH: config.SSH_PRIVATE_KEY_PATH,
   CLUSTERS_CONFIG: clusters,
 };
+
+
+function getApps() {
+  // get available apps
+  const fs = require("fs");
+  const { APP_SERVER_CONFIG_BASE_PATH, AppServerConfigSchema } = require("@scow/config/build/appConfig/appServer");
+
+  const appsPath = path.join(configPath, APP_SERVER_CONFIG_BASE_PATH);
+
+  if (!fs.existsSync(appsPath)) {
+    return [];
+  }
+
+  const apps = fs.readdirSync(appsPath);
+
+  return apps.map((filename) => {
+    const info = getConfigFromFile(AppServerConfigSchema, filename, false, appsPath);
+    return { id: info.id, name: info.name };
+  });
+}
 
 /**
  * @type {import("./src/utils/config").PublicRuntimeConfig}
@@ -105,6 +126,8 @@ const publicRuntimeConfig = {
   HOME_TITLES: parseKeyValue(config.HOME_TITLES),
 
   CLUSTERS_CONFIG: clusters,
+
+  APPS: getApps(),
 }
 
 if (!building) {

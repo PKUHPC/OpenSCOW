@@ -1,4 +1,5 @@
 import {
+  AppleOutlined,
   BookOutlined,
   CloudServerOutlined,
   DashboardOutlined,
@@ -54,11 +55,35 @@ export const userRoutes: NavItemProps[] = [
       path: `/shell/${id}`,
     }) as NavItemProps),
   } as NavItemProps] : [],
-  ...publicConfig.ENABLE_VNC ? [{
-    Icon: DesktopOutlined,
-    text: "桌面",
-    path: "/apps/desktop",
-  }] : [],
+  {
+    Icon: AppleOutlined,
+    text: "交互式应用",
+    clickToPath: "/apps/desktop",
+    path: "/apps",
+    children: [
+      {
+        Icon: DesktopOutlined,
+        text: "桌面",
+        path: "/apps/desktop",
+      },
+      {
+        Icon: DesktopOutlined,
+        text: "应用",
+        path: "/apps/sessions",
+      },
+      {
+        Icon: DesktopOutlined,
+        text: "创建应用",
+        clickable: false,
+        path: "/apps/create",
+        children: publicConfig.APPS.map(({ id, name }) => ({
+          Icon: DesktopOutlined,
+          text: name,
+          path: `/apps/create/${id}`,
+        })),
+      },
+    ],
+  },
   ...publicConfig.FILE_SERVERS.length > 0 ? [{
     Icon: FolderOutlined,
     text: "文件管理",

@@ -1,4 +1,4 @@
-import { parseSbatchOutput } from "src/services/JobService";
+import { parseSbatchOutput } from "src/bl/submitJob";
 
 it.each([
   ["Submitted batch job 34987", 34987],

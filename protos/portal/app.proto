@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+package scow.portal.app;
+import "google/protobuf/timestamp.proto";
+
+message CreateAppRequest {
+  string cluster = 1;
+  string app_id = 2;
+  string user_id = 3;
+
+  message Params {
+    string account = 1;
+    optional string partition = 2;
+    optional string qos = 3;
+    uint32 node_count = 4;
+    uint32 core_count = 5;
+    // in minutes
+    uint32 max_time = 6;
+  }
+
+  Params params = 4;
+}
+
+message CreateAppReply {
+  string session_id = 1;
+  uint32 job_id = 2;
+}
+
+message GetSessionsRequest {
+  string cluster = 1;
+  string user_id = 2;
+}
+
+message AppSession {
+
+  enum State {
+    PREPARING = 0;
+    RUNNING = 1;
+    ENDED = 2;
+  }
+
+  message Address {
+    string host = 1;
+    uint32 port = 2;
+  }
+
+  string session_id = 1;
+  uint32 job_id = 2;
+  google.protobuf.Timestamp submit_time = 3;
+  string app_id = 4;
+  State state = 5;
+  optional Address address = 6;
+}
+
+message GetSessionsReply { repeated AppSession sessions = 1; }
+
+service AppService {
+  rpc CreateApp(CreateAppRequest) returns (CreateAppReply);
+  rpc GetSessions(GetSessionsRequest) returns (GetSessionsReply);
+}
