@@ -22,6 +22,10 @@ interface SessionMetadata {
 
 const SCRIPT_TMP_FOLDER = join(os.tmpdir(), "scow", "apps");
 
+if (!fs.existsSync(SCRIPT_TMP_FOLDER)) {
+  fs.mkdirSync(SCRIPT_TMP_FOLDER, { recursive: true });
+}
+
 const SESSION_METADATA_NAME = "session.json";
 
 const INFO_FILE = "SESSION_INFO";
@@ -39,58 +43,57 @@ export const appServiceServer = plugin((server) => {
         await fs.promises.writeFile(scriptPath, appConfig.script);
       }
 
+      const node = clustersConfig[cluster].loginNodes[0];
+
       const jobName = randomUUID();
 
-      // get a free port
-      // TODO this requires python. maybe a bash script?
+      return await server.ext.connect(node, userId, logger, async (ssh) => {
 
-      const result = await submitJob({
-        cluster,
-        logger,
-        sshPlugin: server.ext,
-        userId,
-        jobInfo: {
-          jobName,
-          command: appConfig.script,
-          account: account,
-          coreCount: coreCount,
-          maxTime: maxTime,
-          nodeCount: 1,
-          partition: partition,
-          qos: qos,
-        },
-      });
+        const result = await submitJob({
+          logger,
+          ssh,
+          jobInfo: {
+            jobName,
+            command: appConfig.script,
+            account: account,
+            coreCount: coreCount,
+            maxTime: maxTime,
+            nodeCount: 1,
+            partition: partition,
+            qos: qos,
+          },
+        });
 
-      if (result.code === "ALREADY_EXISTS") {
+        if (result.code === "ALREADY_EXISTS") {
         // this is very unlikely to happen, because job name is UUID
-        throw <ServiceError> {
-          code: status.ALREADY_EXISTS,
-          message: `dir ${result.dir} already exists.`,
+          throw <ServiceError> {
+            code: status.ALREADY_EXISTS,
+            message: `dir ${result.dir} already exists.`,
+          };
+        }
+
+        if (result.code === "SBATCH_FAILED") {
+          throw <ServiceError> {
+            code: status.UNAVAILABLE,
+            message: "slurm job submission failed.",
+            details: result.message,
+          };
+        }
+
+        // write session metadata
+        const metadata: SessionMetadata = {
+          jobId: result.jobId,
+          sessionId: jobName,
+          submitTime: result.metadata.submitTime,
+          appId,
         };
-      }
 
-      if (result.code === "SBATCH_FAILED") {
-        throw <ServiceError> {
-          code: status.UNAVAILABLE,
-          message: "slurm job submission failed.",
-          details: result.message,
-        };
-      }
+        const writeFile = promisify(result.sftp.writeFile.bind(result.sftp));
 
-      // write session metadata
-      const metadata: SessionMetadata = {
-        jobId: result.jobId,
-        sessionId: jobName,
-        submitTime: result.metadata.submitTime,
-        appId,
-      };
+        await writeFile(join(result.dir, SESSION_METADATA_NAME), JSON.stringify(metadata));
 
-
-
-      await fs.promises.writeFile(join(result.dir, SESSION_METADATA_NAME), JSON.stringify(metadata));
-
-      return [{ jobId: metadata.jobId, sessionId: metadata.sessionId }];
-
+        return [{ jobId: metadata.jobId, sessionId: metadata.sessionId }];
+      });
     },
 
     getSessions: async ({ request, logger }) => {
@@ -111,10 +114,9 @@ export const appServiceServer = plugin((server) => {
           const jobDir = join(config.JOBS_DIR, filename);
           const metadataPath = join(jobDir, SESSION_METADATA_NAME);
 
-          if (!await sftpExists(sftp, config.JOBS_DIR)) {
+          if (!await sftpExists(sftp, metadataPath)) {
             return;
           }
-
 
           const readFile = promisify(sftp.readFile.bind(sftp));
 
@@ -123,10 +125,10 @@ export const appServiceServer = plugin((server) => {
 
           // try to read the info file
           const infoFilePath = join(jobDir, INFO_FILE);
-          const infoFileExists = await sftpExists(sftp, infoFilePath);
 
           let address: AppSession_Address | undefined = undefined;
-          if (infoFileExists) {
+
+          if (await sftpExists(sftp, infoFilePath)) {
             const content = (await readFile(infoFilePath)).toString();
 
             // FORMAT: HOST:PORT

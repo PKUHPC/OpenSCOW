@@ -10,7 +10,7 @@ export async function queryJobInfo(ssh: NodeSSH, logger: Logger, params: string[
     "squeue",
     [
       "-o",
-      `'${["%A", "%P", "%j", "%u", "%T", "%M", "%D", "%R", "%a", "%C", "%q", "%V", "%Y", "%l"].join(SEPARATOR)}'`,
+      ["%A", "%P", "%j", "%u", "%T", "%M", "%D", "%R", "%a", "%C", "%q", "%V", "%Y", "%l"].join(SEPARATOR),
       "--noheader",
       ...params,
     ],

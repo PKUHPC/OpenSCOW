@@ -5,7 +5,6 @@ import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
-import { PageTitle } from "src/components/PageTitle";
 import { AppSession } from "src/generated/portal/app";
 import { Cluster, CLUSTERS, publicConfig } from "src/utils/config";
 import { formatDateTime } from "src/utils/datetime";
@@ -73,9 +72,11 @@ export const AppSessionsTable: React.FC<Props> = () => {
             record.address ? (
               <Link
                 href={`/api/proxy/${record.address.host}/${record.address.port}/`}
-                target="_blank" rel="noreferrer"
+                passHref
               >
-                连接
+                <a target="_blank">
+                  连接
+                </a>
               </Link>
             ) : undefined
           }
@@ -85,7 +86,6 @@ export const AppSessionsTable: React.FC<Props> = () => {
   ];
   return (
     <div>
-      <PageTitle titleText="交互式应用" />
       <FilterFormContainer>
         <Form<FilterForm>
           layout="inline"

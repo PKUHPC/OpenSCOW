@@ -51,30 +51,33 @@ export const jobServiceServer = plugin((server) => {
     submitJob: async ({ request, logger }) => {
       const { cluster, jobInfo, userId } = ensureNotUndefined(request, ["jobInfo"]);
 
-      const reply = await submitJob({
-        cluster,
-        jobInfo,
-        logger,
-        sshPlugin: server.ext,
-        userId,
+      const node = clustersConfig[cluster].loginNodes[0];
+
+      return await server.ext.connect(node, userId, logger, async (ssh) => {
+
+        const reply = await submitJob({
+          jobInfo,
+          logger,
+          ssh,
+        });
+
+        if (reply.code === "ALREADY_EXISTS") {
+          throw <ServiceError> {
+            code: status.ALREADY_EXISTS,
+            message: `dir ${reply.dir} already exists.`,
+          };
+        }
+
+        if (reply.code === "SBATCH_FAILED") {
+          throw <ServiceError> {
+            code: status.UNAVAILABLE,
+            message: "slurm job submission failed.",
+            details: reply.message,
+          };
+        }
+
+        return [{ jobId: reply.jobId }];
       });
-
-      if (reply.code === "ALREADY_EXISTS") {
-        throw <ServiceError> {
-          code: status.ALREADY_EXISTS,
-          message: `dir ${reply.dir} already exists.`,
-        };
-      }
-
-      if (reply.code === "SBATCH_FAILED") {
-        throw <ServiceError> {
-          code: status.UNAVAILABLE,
-          message: "slurm job submission failed.",
-          details: reply.message,
-        };
-      }
-
-      return [{ jobId: reply.jobId }];
     },
 
     getSavedJob: async ({ request, logger }) => {
