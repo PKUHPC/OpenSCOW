@@ -136,9 +136,10 @@ export const appServiceServer = plugin((server) => {
 
         }));
 
-        // query the state of jobs
+        // using squeue to query the running jobs of the user
+        // and update the states of the sessions
         const jobs = [...resultMap.values()];
-        const states = await queryJobInfo(ssh, logger, ["-j", [...jobs.values()].map((x) => x.jobId).join(",")]);
+        const states = await queryJobInfo(ssh, logger, ["-u", userId]);
         states.forEach((x) => {
           const job = resultMap.get(+x.jobId);
           if (job) {
