@@ -1,4 +1,4 @@
-import { Button, Form, Space, Table, TableColumnsType } from "antd";
+import { Button, Form, message, Popconfirm, Space, Table, TableColumnsType } from "antd";
 import Link from "next/link";
 import React, { useCallback, useState } from "react";
 import { useAsync } from "react-async";
@@ -69,15 +69,32 @@ export const AppSessionsTable: React.FC<Props> = () => {
       render: (_, record) => (
         <Space>
           {
-            record.address ? (
-              <Link
-                href={`/api/proxy/${record.address.host}/${record.address.port}/`}
-                passHref
-              >
-                <a target="_blank">
+            (record.state === "RUNNING" && record.address) ? (
+              <>
+                <Link
+                  href={`/api/proxy/${record.address.host}/${record.address.port}/`}
+                  passHref
+                >
+                  <a target="_blank">
                   连接
-                </a>
-              </Link>
+                  </a>
+                </Link>
+                <Popconfirm
+                  title="确定结束这个任务吗？"
+                  onConfirm={async () =>
+                    api.cancelJob({ body: {
+                      cluster: query.cluster.id,
+                      jobId: record.jobId,
+                    } })
+                      .then(() => {
+                        message.success("任务结束请求已经提交！");
+                        reload();
+                      })
+                  }
+                >
+                  <a>结束</a>
+                </Popconfirm>
+              </>
             ) : undefined
           }
         </Space>

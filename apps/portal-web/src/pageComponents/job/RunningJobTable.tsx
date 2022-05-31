@@ -1,4 +1,4 @@
-import { Button, Form, InputNumber, Space, Table } from "antd";
+import { Button, Form, InputNumber, message, Popconfirm, Space, Table } from "antd";
 import React, { useCallback, useMemo, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
@@ -99,7 +99,7 @@ type JobInfoTableProps = {
 };
 
 export const RunningJobInfoTable: React.FC<JobInfoTableProps> = ({
-  data,  isLoading,  showAccount, showCluster, showUser,
+  data,  isLoading,  showAccount, showCluster, showUser, reload,
 }) => {
 
   const [previewItem, setPreviewItem] = useState<RunningJobInfo | undefined>(undefined);
@@ -148,6 +148,21 @@ export const RunningJobInfoTable: React.FC<JobInfoTableProps> = ({
           render={(_, r) => (
             <Space>
               <a onClick={() => setPreviewItem(r)}>详情</a>
+              <Popconfirm
+                title="确定结束这个任务吗？"
+                onConfirm={async () =>
+                  api.cancelJob({ body: {
+                    cluster: r.cluster.id,
+                    jobId: +r.jobId,
+                  } })
+                    .then(() => {
+                      message.success("任务结束请求已经提交！");
+                      reload();
+                    })
+                }
+              >
+                <a>结束</a>
+              </Popconfirm>
             </Space>
           )}
         />

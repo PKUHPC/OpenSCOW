@@ -7,6 +7,7 @@ import type { GetLogoSchema } from "src/pages/api//logo";
 import type { AuthCallbackSchema } from "src/pages/api/auth/callback";
 import type { LogoutSchema } from "src/pages/api/auth/logout";
 import type { ValidateTokenSchema } from "src/pages/api/auth/validateToken";
+import type { CancelJobSchema } from "src/pages/api/job/cancelJob";
 import type { CreateAppSchema } from "src/pages/api/job/createApp";
 import type { GetAccountsSchema } from "src/pages/api/job/getAccounts";
 import type { GetRunningJobsSchema } from "src/pages/api/job/getRunningJobs";
@@ -26,6 +27,7 @@ export const api = {
   logout: fromApi<LogoutSchema>("DELETE", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/auth/logout")),
   validateToken: fromApi<ValidateTokenSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/auth/validateToken")),
   getIcon: fromApi<GetIconSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api//icon")),
+  cancelJob: fromApi<CancelJobSchema>("DELETE", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/job/cancelJob")),
   createApp: fromApi<CreateAppSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/job/createApp")),
   getAccounts: fromApi<GetAccountsSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/job/getAccounts")),
   getRunningJobs: fromApi<GetRunningJobsSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/job/getRunningJobs")),

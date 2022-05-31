@@ -146,5 +146,17 @@ export const jobServiceServer = plugin((server) => {
       });
 
     },
+
+    cancelJob: async ({ request, logger }) => {
+      const { cluster, jobId, userId } = request;
+
+      const node = clustersConfig[cluster].loginNodes[0];
+
+      return await server.ext.connect(node, userId, logger, async (ssh) => {
+        await loggedExec(ssh, logger, true, "scancel", [jobId + ""]);
+        return [{}];
+      });
+    },
+
   });
 });
