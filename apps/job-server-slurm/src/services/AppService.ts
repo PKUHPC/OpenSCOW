@@ -3,8 +3,6 @@ import { ServiceError, status } from "@grpc/grpc-js";
 import { getConfigFromFile } from "@scow/config";
 import { APP_SERVER_CONFIG_BASE_PATH, AppServerConfigSchema } from "@scow/config/build/appConfig/appServer";
 import { randomUUID } from "crypto";
-import fs from "fs";
-import os from "os";
 import { join } from "path";
 import { queryJobInfo } from "src/bl/queryJobInfo";
 import { sftpExists, submitJob } from "src/bl/submitJob";
@@ -20,12 +18,6 @@ interface SessionMetadata {
   submitTime: string;
 }
 
-const SCRIPT_TMP_FOLDER = join(os.tmpdir(), "scow", "apps");
-
-if (!fs.existsSync(SCRIPT_TMP_FOLDER)) {
-  fs.mkdirSync(SCRIPT_TMP_FOLDER, { recursive: true });
-}
-
 const SESSION_METADATA_NAME = "session.json";
 
 const INFO_FILE = "SESSION_INFO";
@@ -37,11 +29,6 @@ export const appServiceServer = plugin((server) => {
 
       // prepare script file
       const appConfig = getConfigFromFile(AppServerConfigSchema, join(APP_SERVER_CONFIG_BASE_PATH, appId));
-      const scriptPath = join(SCRIPT_TMP_FOLDER, appConfig.id + ".sh");
-
-      if (!fs.existsSync(scriptPath)) {
-        await fs.promises.writeFile(scriptPath, appConfig.script);
-      }
 
       const node = clustersConfig[cluster].loginNodes[0];
 
