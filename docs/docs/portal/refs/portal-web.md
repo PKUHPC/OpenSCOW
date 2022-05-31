@@ -18,7 +18,8 @@ title: "portal-web"
 |`FILE_SERVERS`|字符串|启用文件管理功能的集群。格式：集群名,集群名。如果为空，则关闭文件管理的功能||
 |`ENABLE_JOB_MANAGEMENT`|布尔值|是否启动作业管理功能|false|
 |`JOB_SERVER`|字符串|作业服务器的地址|job-server:5000|
-|`ENABLE_VNC`|布尔值|是否启动VNC功能|false|
+|`ENABLE_LOGIN_DESKTOP`|布尔值|是否启动登录节点上的桌面功能|false|
+|`ENABLE_APPS`|布尔值|是否启动交互式任务功能|false|
 |`DEFAULT_FOOTER_TEXT`|字符串|默认footer文本||
 |`FOOTER_TEXTS`|字符串|根据域名(hostname，不包括port)不同，显示在footer上的文本。格式：域名=文本,域名=文本||
 |`DEFAULT_HOME_TEXT`|字符串|默认主页文本|北京大学计算中心成立于1963年，是集计算中心管理信息中心和网络中心于一体的实体单位，是独立建制的全校大型综合实验室，负责学校信息化基础设施的建设、开发与运行服务工作。|

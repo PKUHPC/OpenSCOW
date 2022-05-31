@@ -8,7 +8,9 @@ import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { Editor } from "src/components/Editor";
 import { InputGroupFormItem } from "src/components/InputGroupFormItem";
 import { AccountSelector } from "src/pageComponents/job/AccountSelector";
-import { Cluster, CLUSTERS, publicConfig } from "src/utils/config";
+import { Cluster, publicConfig } from "src/utils/config";
+import { defaultCluster, defaultPartitionInfo,
+  defaultPartitionName, firstPartition, getPartitionInfo } from "src/utils/jobForm";
 
 interface JobForm {
   cluster: Cluster;
@@ -27,32 +29,16 @@ function genJobName() {
   return randomWords({ exactly: 2, join: "-" });
 }
 
-const getPartitionInfo = (cluster: Cluster, partition: string | undefined) => {
-  return partition
-    ? publicConfig.CLUSTERS_CONFIG[cluster.id].partitions[partition]
-    : undefined;
-};
-
-function firstPartition(cluster: Cluster) {
-  const partitionName = Object.keys(publicConfig.CLUSTERS_CONFIG[cluster.id].partitions)[0];
-  return [partitionName, getPartitionInfo(cluster, partitionName)] as const;
-}
-
-const defaultCluster = CLUSTERS[0];
-
-const [defaultPartitionName, defaultPartitionInfo] = firstPartition(defaultCluster);
 
 const initialValues = {
   cluster: defaultCluster,
   command: "",
-  jobName: genJobName(),
   partition: defaultPartitionName,
   nodeCount: 1,
   coreCount: 1,
   qos: defaultPartitionInfo?.qos?.[0] ?? null,
   maxTime: 30,
 } as JobForm;
-
 
 interface Props {
   initial?: typeof initialValues;
@@ -108,8 +94,6 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
     }
   }, [partition]);
 
-  console.log(partition);
-
   const currentPartitionInfo = useMemo(() => getPartitionInfo(cluster, partition), [cluster, partition]);
 
   return (
@@ -149,7 +133,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
       <Row gutter={4}>
         <Col span={24} sm={12}>
           <Form.Item<JobForm> label="账户" name="account"
-            rules={[{ required: true }]}
+            rules={[{ required: true }]} dependencies={["cluster"]}
           >
             <AccountSelector cluster={cluster.id} />
           </Form.Item>

@@ -1,21 +1,20 @@
 import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-utils";
 import { authenticate } from "src/auth/server";
-import { VncServiceClient } from "src/generated/portal/vnc";
+import { ListDesktopsReply, VncServiceClient  } from "src/generated/portal/vnc";
 import { getJobServerClient } from "src/utils/client";
 import { publicConfig } from "src/utils/config";
 
-export interface KillDesktopSchema {
+export interface ListDesktopsSchema {
   method: "POST";
 
   body: {
-    displayId: number;
-    cluster: string;
+    clusters: string[];
   }
 
   responses: {
     200: {
-      message: string;
+        result : ListDesktopsReply;
     };
     // 功能没有启用
     501: null;
@@ -24,9 +23,9 @@ export interface KillDesktopSchema {
 
 const auth = authenticate(() => true);
 
-export default /* #__PURE__*/route<KillDesktopSchema>("KillDesktopSchema", async (req, res) => {
+export default /* #__PURE__*/route<ListDesktopsSchema>("ListDesktopsSchema", async (req, res) => {
 
-  if (!publicConfig.ENABLE_VNC) {
+  if (!publicConfig.ENABLE_LOGIN_DESKTOP) {
     return { 501: null };
   }
 
@@ -36,12 +35,11 @@ export default /* #__PURE__*/route<KillDesktopSchema>("KillDesktopSchema", async
 
   const client = getJobServerClient(VncServiceClient);
 
-  return await asyncClientCall(client, "killDesktop", {
-    cluster: req.body.cluster,
+  return await asyncClientCall(client, "listDesktops", {
+    clusters: req.body.clusters,
     username: info.identityId,
-    displayId: req.body.displayId,
   })
-    .then(() => {
-      return { 200: { message:"success" } };
+    .then((result) => {
+      return { 200: { result } };
     });
 });

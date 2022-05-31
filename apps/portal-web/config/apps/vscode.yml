@@ -1,0 +1,6 @@
+id: vscode
+name: VSCode
+nodes:
+  - t001
+script: |
+  echo find

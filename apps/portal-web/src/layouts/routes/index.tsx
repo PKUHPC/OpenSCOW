@@ -3,9 +3,12 @@ import {
   CloudServerOutlined,
   DashboardOutlined,
   DesktopOutlined,
+  EyeOutlined,
   FolderOutlined,
+  Loading3QuartersOutlined,
   MacCommandOutlined,
   PlusCircleOutlined,
+  PlusOutlined,
   SaveOutlined } from "@ant-design/icons";
 import React from "react";
 import { NavItemProps } from "src/layouts/NavItemProps";
@@ -54,10 +57,34 @@ export const userRoutes: NavItemProps[] = [
       path: `/shell/${id}`,
     }) as NavItemProps),
   } as NavItemProps] : [],
-  ...publicConfig.ENABLE_VNC ? [{
+  ...publicConfig.ENABLE_LOGIN_DESKTOP ? [{
     Icon: DesktopOutlined,
     text: "桌面",
-    path: "/apps/desktop",
+    path: "/desktop",
+  }] : [],
+  ...publicConfig.ENABLE_APPS ? [{
+    Icon: EyeOutlined,
+    text: "交互式应用",
+    path: "/apps",
+    clickToPath: "/apps/sessions",
+    children: [
+      {
+        Icon: Loading3QuartersOutlined,
+        text: "运行中的应用",
+        path: "/apps/sessions",
+      },
+      {
+        Icon: PlusOutlined,
+        text: "创建应用",
+        clickable: false,
+        path: "/apps/create",
+        children: publicConfig.APPS.map(({ id, name }) => ({
+          Icon: DesktopOutlined,
+          text: name,
+          path: `/apps/create/${id}`,
+        })),
+      },
+    ],
   }] : [],
   ...publicConfig.FILE_SERVERS.length > 0 ? [{
     Icon: FolderOutlined,

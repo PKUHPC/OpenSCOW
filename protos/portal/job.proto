@@ -69,6 +69,14 @@ message GetSavedJobRequest {
 
 message GetSavedJobReply { JobInfo job_info = 1; }
 
+message CancelJobRequest {
+  string cluster = 1;
+  string user_id = 2;
+  uint32 job_id = 3;
+}
+
+message CancelJobReply {}
+
 service JobService {
   rpc GetRunningJobs(GetRunningJobsRequest) returns (GetRunningJobsReply);
   rpc GetAccounts(GetAccountsRequest) returns (GetAccountsReply);
@@ -77,4 +85,5 @@ service JobService {
   rpc SubmitJob(SubmitJobRequest) returns (SubmitJobReply);
   rpc GetSavedJobs(GetSavedJobsRequest) returns (GetSavedJobsReply);
   rpc GetSavedJob(GetSavedJobRequest) returns (GetSavedJobReply);
+  rpc CancelJob(CancelJobRequest) returns (CancelJobReply);
 }

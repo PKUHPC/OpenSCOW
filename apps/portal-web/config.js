@@ -31,7 +31,9 @@ const specs = {
   ENABLE_JOB_MANAGEMENT: bool({ desc: "是否启动作业管理功能", default: false }),
   JOB_SERVER: str({ desc: "作业服务器的地址", default: "job-server:5000" }),
 
-  ENABLE_VNC: bool({ desc: "是否启动VNC功能", default: false }),
+  ENABLE_LOGIN_DESKTOP: bool({ desc: "是否启动登录节点上的桌面功能", default: false }),
+
+  ENABLE_APPS: bool({ desc: "是否启动交互式任务功能", default: false }),
 
   DEFAULT_FOOTER_TEXT: str({ desc: "默认footer文本", default: "" }),
   FOOTER_TEXTS: str({ desc: "根据域名(hostname，不包括port)不同，显示在footer上的文本。格式：域名=文本,域名=文本", default: "" }),
@@ -54,14 +56,15 @@ const specs = {
 const config = envConfig(specs, process.env);
 
 // load clusters.json
-const { getConfigFromFile } = require("@scow/config");
+const { getConfigFromFile, CONFIG_BASE_PATH } = require("@scow/config");
 const { ClustersConfigName, ClustersConfigSchema } = require("@scow/config/build/appConfig/clusters");
+
+const configPath = production ? undefined : path.join(__dirname, "config");
 
 /**
  * @type {import("@scow/config/build/appConfig/clusters").Clusters}
  */
-const clusters = getConfigFromFile(ClustersConfigSchema, ClustersConfigName, false,
-  production ? undefined : path.join(__dirname, "config"));
+const clusters = getConfigFromFile(ClustersConfigSchema, ClustersConfigName, false, configPath);
 
 /**
  * @type {import("./src/utils/config").ServerRuntimeConfig}
@@ -77,6 +80,28 @@ const serverRuntimeConfig = {
   SSH_PRIVATE_KEY_PATH: config.SSH_PRIVATE_KEY_PATH,
   CLUSTERS_CONFIG: clusters,
 };
+
+
+function getApps() {
+  // get available apps
+  const fs = require("fs");
+  const { APP_SERVER_CONFIG_BASE_PATH, AppServerConfigSchema } = require("@scow/config/build/appConfig/appServer");
+
+  const appsPath = path.join(configPath || CONFIG_BASE_PATH, APP_SERVER_CONFIG_BASE_PATH);
+  console.log(appsPath);
+
+  if (!fs.existsSync(appsPath)) {
+    return [];
+  }
+
+  const apps = fs.readdirSync(appsPath);
+
+  return apps.map((filename) => {
+    const info = getConfigFromFile(AppServerConfigSchema,
+      path.join(APP_SERVER_CONFIG_BASE_PATH, path.basename(filename, path.extname(filename))), false, configPath);
+    return { id: info.id, name: info.name };
+  });
+}
 
 /**
  * @type {import("./src/utils/config").PublicRuntimeConfig}
@@ -95,7 +120,9 @@ const publicRuntimeConfig = {
   FILE_SERVERS: parseArray(config.FILE_SERVERS),
 
   ENABLE_JOB_MANAGEMENT: config.ENABLE_JOB_MANAGEMENT,
-  ENABLE_VNC: config.ENABLE_VNC,
+  ENABLE_LOGIN_DESKTOP: config.ENABLE_LOGIN_DESKTOP,
+
+  ENABLE_APPS: config.ENABLE_APPS,
 
   MIS_PATH: config.MIS_PATH,
 
@@ -105,6 +132,8 @@ const publicRuntimeConfig = {
   HOME_TITLES: parseKeyValue(config.HOME_TITLES),
 
   CLUSTERS_CONFIG: clusters,
+
+  APPS: getApps(),
 }
 
 if (!building) {

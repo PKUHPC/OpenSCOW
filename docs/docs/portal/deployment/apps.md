@@ -1,38 +1,23 @@
 ---
-sidebar_position: 4
-title: 桌面
+sidebar_position: 5
+title: 交互式应用
 ---
 
-# 部署桌面功能
+# 部署交互式应用
 
-桌面功能能够让用户在浏览器上就能访问集群的桌面，并进行GUI操作。
+交互式应用功能能够让用户在浏览器上使用集群资源启动应用，并通过浏览器使用这些应用。
 
 ## 前提条件
 
-目前，桌面功能仅支持登录到单个节点，且只支持xfce桌面。对计算节点上启动桌面以及使用其他桌面的功能的支持正在开发中。
-
-下文中将启动桌面的节点称为**桌面节点**。
-
 请确认集群配置满足以下条件：
 
-- **服务节点**可以免密以任何用户SSH登录到各个**桌面节点**，并且**服务节点**的`/root/.ssh`目录下有登录所需要的`id_rsa.pub`和`id_rsa`文件
-- **桌面节点**已安装TurboVNC（[官方安装教程](https://turbovnc.org/Downloads/YUM)）
-- **桌面节点**已经安装xfce
-- [集群配置文件](../../common/deployment/clusters.mdx)中需要使用此功能的集群已指定至少一个登录节点
+- [集群配置文件](../../common/deployment/clusters.mdx)中需要使用此功能的集群已指定至少一个登录节点和一个计算节点
+- **服务节点**可以免密以任何用户SSH登录到各个**登录节点**，并且**服务节点**的`/root/.ssh`目录下有登录所需要的`id_rsa.pub`和`id_rsa`文件
+- **服务节点**以及**门户前端**容器可以使用集群配置文件中的地址访问到会启动应用的任何一个节点和任何端口
 
 ## 部署作业管理服务器
 
-请参考[作业功能部署文档](./jobs.md#部署job-server-slurm)部署作业管理服务器，并在作业管理服务器上增加以下配置：
-
-```yml title=docker-compose.yml
-  job-server:
-    # ...
-    environment:
-      # 启动VNC服务
-      ENABLE_VNC: 1
-      # turbovnc的安装目录。默认为/opt/TurboVNC，如果为默认可以不设置
-      # TURBOVNC_PATH: /opt/TurboVNC
-```
+请参考[作业功能部署文档](./jobs.md#部署job-server-slurm)部署作业管理服务器。
 
 ## 配置门户前端
 
@@ -42,7 +27,17 @@ title: 桌面
   portal-web:
     # ...
     environment:
-      ENABLE_VNC: 1
+      ENABLE_APPS: 1
 ```
 
 运行`docker compose up -d`更新系统。
+
+## 编写应用配置文件
+
+请参考[交互式应用](../apps/intro.md)编写交互式应用的配置文件。
+
+每次修改配置文件后需要重启作业管理服务器和门户前端。
+
+```bash
+docker compose restart portal-web job-server
+```

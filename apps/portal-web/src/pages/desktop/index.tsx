@@ -7,7 +7,7 @@ import { Head } from "src/utils/head";
 
 export const DesktopIndexPage: NextPage = requireAuth(() => true)(() => {
 
-  if (!publicConfig.ENABLE_VNC) {
+  if (!publicConfig.ENABLE_LOGIN_DESKTOP) {
     return <NotFoundPage />;
   }
 

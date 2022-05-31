@@ -34,6 +34,17 @@ export const runningJob: RunningJob = {
 
 export const mockApi: MockApi<typeof api> = {
 
+  createAppSession: async () => ({ jobId: 123, sessionId: "is" }),
+
+  cancelJob: async () => null,
+
+  getAppSessions: async () => ({ sessions: [
+    { jobId: 100, sessionId: "123", appId: "vscode", state: "PENDING",
+      submitTime: new Date().toISOString() },
+    { jobId: 101, sessionId: "124", appId: "vscode", state: "RUNNING",
+      submitTime: new Date().toISOString(), address: { host: "127.0.0.1", port: 3000 } },
+  ]}),
+
   getSavedJob: async () => ({
     jobInfo: {
       account: "123",
