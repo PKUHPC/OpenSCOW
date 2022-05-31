@@ -202,7 +202,7 @@ importers:
       dotenv: 16.0.1
       node-cron: 3.0.0
       node-ssh: 12.0.4
-      undici: 5.3.0
+      undici: 5.4.0
       wait-on: 6.0.1
     dependencies:
       '@ddadaal/tsgrpc-server': 0.12.0
@@ -219,7 +219,7 @@ importers:
       dotenv: 16.0.1
       node-cron: 3.0.0
       node-ssh: 12.0.4
-      undici: 5.3.0
+      undici: 5.4.0
       wait-on: 6.0.1
     devDependencies:
       '@ddadaal/tsgrpc-cli': 0.11.0
@@ -463,9 +463,9 @@ importers:
   libs/auth:
     specifiers:
       pino: 7.11.0
-      undici: 5.3.0
+      undici: 5.4.0
     dependencies:
-      undici: 5.3.0
+      undici: 5.4.0
     devDependencies:
       pino: 7.11.0
 
@@ -13854,8 +13854,8 @@ packages:
     resolution: {integrity: sha512-WxONCrssBM8TSPRqN5EmsjVrsv4A8X12J4ArBiiayv3DyyG3ZlIg6yysuuSYdZsVz3TKcTg2fd//Ujd4CHV1iA==}
     dev: true
 
-  /undici/5.3.0:
-    resolution: {integrity: sha512-8LxC/xmR2GCE4q1heE1sJxVnnf5S6yQ2dObvMFBBWkB8aQlaqNuWovgRFWRMB7KUdLPGZfOTTmUeeLEJYX56iQ==}
+  /undici/5.4.0:
+    resolution: {integrity: sha512-A1SRXysDg7J+mVP46jF+9cKANw0kptqSFZ8tGyL+HBiv0K1spjxPX8Z4EGu+Eu6pjClJUBdnUPlxrOafR668/g==}
     engines: {node: '>=12.18'}
     dev: false
 
