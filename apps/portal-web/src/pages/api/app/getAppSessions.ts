@@ -4,7 +4,7 @@ import { authenticate } from "src/auth/server";
 import { AppServiceClient, AppSession } from "src/generated/portal/app";
 import { getJobServerClient } from "src/utils/client";
 
-export interface GetSessionsSchema {
+export interface GetAppSessionsSchema {
   method: "GET";
 
   query: {
@@ -20,7 +20,7 @@ export interface GetSessionsSchema {
 
 const auth = authenticate(() => true);
 
-export default /* #__PURE__*/route<GetSessionsSchema>("GetSessionsSchema", async (req, res) => {
+export default /* #__PURE__*/route<GetAppSessionsSchema>("GetAppSessionsSchema", async (req, res) => {
 
   const info = await auth(req, res);
 

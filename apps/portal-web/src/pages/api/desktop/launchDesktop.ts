@@ -1,15 +1,15 @@
 import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-utils";
-import { status } from "@grpc/grpc-js";
 import { authenticate } from "src/auth/server";
 import { VncServiceClient } from "src/generated/portal/vnc";
 import { getJobServerClient } from "src/utils/client";
 import { publicConfig } from "src/utils/config";
 
-export interface CreateDesktopSchema {
+export interface LaunchDesktopSchema {
   method: "POST";
 
   body: {
+    displayId: number;
     cluster: string;
   }
 
@@ -19,10 +19,6 @@ export interface CreateDesktopSchema {
       port: number;
       password: string;
     };
-    409: {
-      code: "RESOURCE_EXHAUSTED";
-      message: string;
-    }
     // 功能没有启用
     501: null;
   }
@@ -30,9 +26,9 @@ export interface CreateDesktopSchema {
 
 const auth = authenticate(() => true);
 
-export default /* #__PURE__*/route<CreateDesktopSchema>("CreateDesktopSchema", async (req, res) => {
+export default /* #__PURE__*/route<LaunchDesktopSchema>("LaunchDesktopSchema", async (req, res) => {
 
-  if (!publicConfig.ENABLE_VNC) {
+  if (!publicConfig.ENABLE_LOGIN_DESKTOP) {
     return { 501: null };
   }
 
@@ -42,17 +38,12 @@ export default /* #__PURE__*/route<CreateDesktopSchema>("CreateDesktopSchema", a
 
   const client = getJobServerClient(VncServiceClient);
 
-  return await asyncClientCall(client, "createDesktop", {
+  return await asyncClientCall(client, "launchDesktop", {
     cluster: req.body.cluster,
     username: info.identityId,
+    displayId: req.body.displayId,
   })
-    .then(({  node, password, port }) => {
+    .then(({ node, password, port }) => {
       return { 200: { node, password, port } };
-    }).catch((e) => {
-      if (e.code === status.RESOURCE_EXHAUSTED) {
-        return { 409: { code: "RESOURCE_EXHAUSTED", message: e.details } } as const;
-      } else {
-        throw e;
-      }
     });
 });

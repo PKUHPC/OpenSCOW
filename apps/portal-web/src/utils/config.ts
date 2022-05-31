@@ -31,9 +31,11 @@ export interface PublicRuntimeConfig {
   /** cluster id */
   FILE_SERVERS: string[];
 
-  ENABLE_VNC: boolean;
+  ENABLE_LOGIN_DESKTOP: boolean;
 
   ENABLE_JOB_MANAGEMENT: boolean;
+
+  ENABLE_APPS: boolean;
 
   MIS_PATH: string;
 

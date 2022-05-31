@@ -5,7 +5,7 @@ import { authenticate } from "src/auth/server";
 import { AppServiceClient } from "src/generated/portal/app";
 import { getJobServerClient } from "src/utils/client";
 
-export interface CreateAppSchema {
+export interface CreateAppSessionSchema {
   method: "POST";
 
   body: {
@@ -38,7 +38,7 @@ export interface CreateAppSchema {
 
 const auth = authenticate(() => true);
 
-export default /* #__PURE__*/route<CreateAppSchema>("CreateAppSchema", async (req, res) => {
+export default /* #__PURE__*/route<CreateAppSessionSchema>("CreateAppSessionSchema", async (req, res) => {
 
   const info = await auth(req, res);
 

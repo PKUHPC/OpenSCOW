@@ -1,7 +1,7 @@
 import { NextPage } from "next";
 import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
-import { AppSessionsTable } from "src/pageComponents/desktop/AppSessionsTable";
+import { AppSessionsTable } from "src/pageComponents/app/AppSessionsTable";
 import { Head } from "src/utils/head";
 
 export const SessionsIndexPage: NextPage = requireAuth(() => true)(() => {

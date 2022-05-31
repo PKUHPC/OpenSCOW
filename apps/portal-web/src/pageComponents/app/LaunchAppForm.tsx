@@ -41,7 +41,7 @@ export const LaunchAppForm: React.FC<Props> = ({ config }) => {
     const { cluster, coreCount, partition, qos, account, maxTime } = await form.validateFields();
 
     setLoading(true);
-    await api.createApp({ body: {
+    await api.createAppSession({ body: {
       cluster: cluster.id,
       appId: config.id,
       coreCount,

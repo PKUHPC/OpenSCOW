@@ -6,7 +6,7 @@ import { requireAuth } from "src/auth/requireAuth";
 import { SSRProps } from "src/auth/server";
 import { UnifiedErrorPage } from "src/components/errorPages/UnifiedErrorPage";
 import { PageTitle } from "src/components/PageTitle";
-import { LaunchAppForm } from "src/pageComponents/desktop/LaunchAppForm";
+import { LaunchAppForm } from "src/pageComponents/app/LaunchAppForm";
 import { Head } from "src/utils/head";
 import { queryToString } from "src/utils/querystring";
 

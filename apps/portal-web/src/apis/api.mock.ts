@@ -34,11 +34,11 @@ export const runningJob: RunningJob = {
 
 export const mockApi: MockApi<typeof api> = {
 
-  createApp: async () => ({ jobId: 123, sessionId: "is" }),
+  createAppSession: async () => ({ jobId: 123, sessionId: "is" }),
 
   cancelJob: async () => null,
 
-  getSessions: async () => ({ sessions: [
+  getAppSessions: async () => ({ sessions: [
     { jobId: 100, sessionId: "123", appId: "vscode", state: "PENDING",
       submitTime: new Date().toISOString() },
     { jobId: 101, sessionId: "124", appId: "vscode", state: "RUNNING",

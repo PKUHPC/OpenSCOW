@@ -31,7 +31,9 @@ const specs = {
   ENABLE_JOB_MANAGEMENT: bool({ desc: "是否启动作业管理功能", default: false }),
   JOB_SERVER: str({ desc: "作业服务器的地址", default: "job-server:5000" }),
 
-  ENABLE_VNC: bool({ desc: "是否启动VNC功能", default: false }),
+  ENABLE_LOGIN_DESKTOP: bool({ desc: "是否启动登录节点上的桌面功能", default: false }),
+
+  ENABLE_APPS: bool({ desc: "是否启动交互式任务功能", default: false }),
 
   DEFAULT_FOOTER_TEXT: str({ desc: "默认footer文本", default: "" }),
   FOOTER_TEXTS: str({ desc: "根据域名(hostname，不包括port)不同，显示在footer上的文本。格式：域名=文本,域名=文本", default: "" }),
@@ -118,7 +120,9 @@ const publicRuntimeConfig = {
   FILE_SERVERS: parseArray(config.FILE_SERVERS),
 
   ENABLE_JOB_MANAGEMENT: config.ENABLE_JOB_MANAGEMENT,
-  ENABLE_VNC: config.ENABLE_VNC,
+  ENABLE_LOGIN_DESKTOP: config.ENABLE_LOGIN_DESKTOP,
+
+  ENABLE_APPS: config.ENABLE_APPS,
 
   MIS_PATH: config.MIS_PATH,
 

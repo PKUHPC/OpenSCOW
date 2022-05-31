@@ -31,7 +31,7 @@ export const AppSessionsTable: React.FC<Props> = () => {
   const { data, isLoading, reload } = useAsync({
     promiseFn: useCallback(async () => {
       // List all desktop
-      const { sessions } = await api.getSessions({ query: { cluster: query.cluster.id } });
+      const { sessions } = await api.getAppSessions({ query: { cluster: query.cluster.id } });
 
       return sessions;
 
