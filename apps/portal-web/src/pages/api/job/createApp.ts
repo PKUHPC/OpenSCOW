@@ -11,6 +11,11 @@ export interface CreateAppSchema {
   body: {
     cluster: string;
     appId: string;
+    account: string;
+    partition: string | undefined;
+    qos: string | undefined;
+    coreCount: number;
+    maxTime: number;
   }
 
   responses: {
@@ -41,12 +46,17 @@ export default /* #__PURE__*/route<CreateAppSchema>("CreateAppSchema", async (re
 
   const client = getJobServerClient(AppServiceClient);
 
-  const { appId, cluster } = req.body;
+  const { appId, cluster, coreCount, partition, qos, account, maxTime } = req.body;
 
   return await asyncClientCall(client, "createApp", {
     cluster,
     appId,
     userId: info.identityId,
+    coreCount,
+    account,
+    maxTime,
+    partition,
+    qos,
   })
     .then(({ jobId, sessionId }) => {
       return { 200: { jobId, sessionId } };

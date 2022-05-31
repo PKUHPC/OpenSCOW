@@ -1,5 +1,4 @@
 import { plugin } from "@ddadaal/tsgrpc-server";
-import { ensureNotUndefined } from "@ddadaal/tsgrpc-utils";
 import { ServiceError, status } from "@grpc/grpc-js";
 import { getConfigFromFile } from "@scow/config";
 import { APP_SERVER_CONFIG_BASE_PATH, AppServerConfigSchema } from "@scow/config/build/appConfig/appServer";
@@ -30,7 +29,7 @@ const INFO_FILE = "SESSION_INFO";
 export const appServiceServer = plugin((server) => {
   server.addService<AppServiceServer>(AppServiceService, {
     createApp: async ({ request, logger }) => {
-      const { appId, cluster, userId, params } = ensureNotUndefined(request, ["params"]);
+      const { appId, cluster, userId, account, coreCount, maxTime, partition, qos } = request;
 
       // prepare script file
       const appConfig = getConfigFromFile(AppServerConfigSchema, join(APP_SERVER_CONFIG_BASE_PATH, appId));
@@ -53,12 +52,12 @@ export const appServiceServer = plugin((server) => {
         jobInfo: {
           jobName,
           command: appConfig.script,
-          account: params.account,
-          coreCount: params.coreCount,
-          maxTime: params.maxTime,
-          nodeCount: params.nodeCount,
-          partition: params.partition,
-          qos: params.qos,
+          account: account,
+          coreCount: coreCount,
+          maxTime: maxTime,
+          nodeCount: 1,
+          partition: partition,
+          qos: qos,
         },
       });
 

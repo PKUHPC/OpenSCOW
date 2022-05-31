@@ -54,7 +54,7 @@ const specs = {
 const config = envConfig(specs, process.env);
 
 // load clusters.json
-const { getConfigFromFile } = require("@scow/config");
+const { getConfigFromFile, CONFIG_BASE_PATH } = require("@scow/config");
 const { ClustersConfigName, ClustersConfigSchema } = require("@scow/config/build/appConfig/clusters");
 
 const configPath = production ? undefined : path.join(__dirname, "config");
@@ -85,7 +85,7 @@ function getApps() {
   const fs = require("fs");
   const { APP_SERVER_CONFIG_BASE_PATH, AppServerConfigSchema } = require("@scow/config/build/appConfig/appServer");
 
-  const appsPath = path.join(configPath, APP_SERVER_CONFIG_BASE_PATH);
+  const appsPath = path.join(configPath || CONFIG_BASE_PATH, APP_SERVER_CONFIG_BASE_PATH);
   console.log(appsPath);
 
   if (!fs.existsSync(appsPath)) {

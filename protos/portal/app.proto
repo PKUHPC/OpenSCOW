@@ -8,17 +8,12 @@ message CreateAppRequest {
   string app_id = 2;
   string user_id = 3;
 
-  message Params {
-    string account = 1;
-    optional string partition = 2;
-    optional string qos = 3;
-    uint32 node_count = 4;
-    uint32 core_count = 5;
-    // in minutes
-    uint32 max_time = 6;
-  }
-
-  Params params = 4;
+  string account = 4;
+  optional string partition = 5;
+  optional string qos = 6;
+  uint32 core_count = 7;
+  // in minutes
+  uint32 max_time = 8;
 }
 
 message CreateAppReply {
