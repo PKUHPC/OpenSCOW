@@ -1,4 +1,4 @@
-import { bool, envConfig, host, num, port, str } from "@scow/config";
+import { envConfig, host, num, port, str } from "@scow/config";
 import { homedir } from "os";
 import path from "path";
 
@@ -10,7 +10,6 @@ export const config = envConfig({
     desc: "日志等级",
   }),
 
-  ENABLE_VNC: bool({ desc: "在所有节点上启动VNC服务", default: false }),
   TURBOVNC_PATH: str({ desc: "TurboVNC的安装路径", default: "/opt/TurboVNC" }),
 
   SSH_PRIVATE_KEY_PATH: str({ desc: "SSH私钥目录", default: path.join(homedir(), ".ssh", "id_rsa") }),
