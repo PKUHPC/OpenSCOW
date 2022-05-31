@@ -1,17 +1,8 @@
 import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-utils";
 import { authenticate } from "src/auth/server";
-import { AppServiceClient, AppSession_Address, AppSession_State } from "src/generated/portal/app";
+import { AppServiceClient, AppSession } from "src/generated/portal/app";
 import { getJobServerClient } from "src/utils/client";
-
-export interface AppSession {
-  sessionId: string;
-  jobId: number;
-  submitTime?: string;
-  appId: string;
-  state: AppSession_State;
-  address?: AppSession_Address | undefined;
-}
 
 export interface GetSessionsSchema {
   method: "GET";

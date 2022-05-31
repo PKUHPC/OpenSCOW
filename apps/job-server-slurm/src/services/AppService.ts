@@ -7,16 +7,17 @@ import { randomUUID } from "crypto";
 import fs from "fs";
 import os from "os";
 import { join } from "path";
+import { queryJobInfo } from "src/bl/queryJobInfo";
 import { sftpExists, submitJob } from "src/bl/submitJob";
 import { clustersConfig } from "src/config/clusters";
 import { config } from "src/config/env";
-import { AppServiceServer,
-  AppServiceService, AppSession, AppSession_Address, AppSession_State } from "src/generated/portal/app";
+import { AppServiceServer, AppServiceService, AppSession, AppSession_Address } from "src/generated/portal/app";
 import { promisify } from "util";
 
 interface SessionMetadata {
   sessionId: string;
   jobId: number;
+  appId: string;
   submitTime: string;
 }
 
@@ -82,6 +83,7 @@ export const appServiceServer = plugin((server) => {
         jobId: result.jobId,
         sessionId: jobName,
         submitTime: result.metadata.submitTime,
+        appId,
       };
 
 
@@ -104,12 +106,14 @@ export const appServiceServer = plugin((server) => {
 
         const list = await promisify(sftp.readdir.bind(sftp))(config.JOBS_DIR);
 
-        const results = (await Promise.all(list.map(async ({ filename }) => {
+        const resultMap: Map<number, AppSession> = new Map();
+
+        await Promise.all(list.map(async ({ filename }) => {
           const jobDir = join(config.JOBS_DIR, filename);
           const metadataPath = join(jobDir, SESSION_METADATA_NAME);
 
           if (!await sftpExists(sftp, config.JOBS_DIR)) {
-            return undefined;
+            return;
           }
 
 
@@ -133,17 +137,28 @@ export const appServiceServer = plugin((server) => {
             address = { host, port: +port };
           }
 
-          return {
+          resultMap.set(sessionMetadata.jobId, {
             jobId: sessionMetadata.jobId,
+            appId: sessionMetadata.appId,
             sessionId: sessionMetadata.sessionId,
             submitTime: new Date(sessionMetadata.submitTime),
-            state: infoFileExists ? AppSession_State.RUNNING : AppSession_State.PREPARING,
+            state: "ENDED",
             address,
-          } as AppSession;
+          });
 
-        }))).filter((x) => x) as AppSession[];
+        }));
 
-        return [{ sessions: results }];
+        // query the state of jobs
+        const jobs = [...resultMap.values()];
+        const states = await queryJobInfo(ssh, logger, ["-j", [...jobs.values()].map((x) => x.jobId).join(",")]);
+        states.forEach((x) => {
+          const job = resultMap.get(+x.jobId);
+          if (job) {
+            job.state = x.state;
+          }
+        });
+
+        return [{ sessions: jobs }];
       });
     },
   });

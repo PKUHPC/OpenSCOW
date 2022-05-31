@@ -86,6 +86,7 @@ function getApps() {
   const { APP_SERVER_CONFIG_BASE_PATH, AppServerConfigSchema } = require("@scow/config/build/appConfig/appServer");
 
   const appsPath = path.join(configPath, APP_SERVER_CONFIG_BASE_PATH);
+  console.log(appsPath);
 
   if (!fs.existsSync(appsPath)) {
     return [];
@@ -94,7 +95,8 @@ function getApps() {
   const apps = fs.readdirSync(appsPath);
 
   return apps.map((filename) => {
-    const info = getConfigFromFile(AppServerConfigSchema, filename, false, appsPath);
+    const info = getConfigFromFile(AppServerConfigSchema,
+      path.join(APP_SERVER_CONFIG_BASE_PATH, path.basename(filename, path.extname(filename))), false, configPath);
     return { id: info.id, name: info.name };
   });
 }

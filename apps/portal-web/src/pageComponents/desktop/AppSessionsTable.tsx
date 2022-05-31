@@ -7,7 +7,8 @@ import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { PageTitle } from "src/components/PageTitle";
 import { AppSession } from "src/generated/portal/app";
-import { Cluster, CLUSTERS } from "src/utils/config";
+import { Cluster, CLUSTERS, publicConfig } from "src/utils/config";
+import { formatDateTime } from "src/utils/datetime";
 
 interface Props {
 
@@ -50,7 +51,18 @@ export const AppSessionsTable: React.FC<Props> = () => {
     {
       title: "应用",
       dataIndex: "appId",
+      render: (appId: string) => publicConfig.APPS.find((x) => x.id === appId)?.name ?? appId,
     },
+    {
+      title: "提交时间",
+      dataIndex: "submitTime",
+      render: (_, record) => record.submitTime ? formatDateTime(record.submitTime) : "",
+    },
+    {
+      title: "状态",
+      dataIndex: "state",
+    },
+
     {
       title: "操作",
       key: "action",
@@ -63,7 +75,6 @@ export const AppSessionsTable: React.FC<Props> = () => {
                 href={`/api/proxy/${record.address.host}/${record.address.port}/`}
                 target="_blank" rel="noreferrer"
               >
-                 $
                 连接
               </Link>
             ) : undefined

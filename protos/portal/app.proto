@@ -32,13 +32,6 @@ message GetSessionsRequest {
 }
 
 message AppSession {
-
-  enum State {
-    PREPARING = 0;
-    RUNNING = 1;
-    ENDED = 2;
-  }
-
   message Address {
     string host = 1;
     uint32 port = 2;
@@ -48,7 +41,7 @@ message AppSession {
   uint32 job_id = 2;
   google.protobuf.Timestamp submit_time = 3;
   string app_id = 4;
-  State state = 5;
+  string state = 5;
   optional Address address = 6;
 }
 

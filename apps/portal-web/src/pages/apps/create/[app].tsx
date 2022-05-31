@@ -1,9 +1,11 @@
 import { getConfigFromFile } from "@scow/config";
-import { AppServer, AppServerConfigSchema } from "@scow/config/build/appConfig/appServer";
+import { APP_SERVER_CONFIG_BASE_PATH, AppServer, AppServerConfigSchema } from "@scow/config/build/appConfig/appServer";
 import { GetServerSideProps, NextPage } from "next";
+import { join } from "path";
 import { requireAuth } from "src/auth/requireAuth";
 import { SSRProps } from "src/auth/server";
 import { UnifiedErrorPage } from "src/components/errorPages/UnifiedErrorPage";
+import { PageTitle } from "src/components/PageTitle";
 import { LaunchAppForm } from "src/pageComponents/desktop/LaunchAppForm";
 import { Head } from "src/utils/head";
 import { queryToString } from "src/utils/querystring";
@@ -23,6 +25,7 @@ export const AppIndexPage: NextPage<Props> = requireAuth(() => true)((props: Pro
   return (
     <div>
       <Head title={`启动${config.name}`} />
+      <PageTitle titleText={`启动${config.name}`} />
       <LaunchAppForm config={config} />
     </div>
   );
@@ -34,7 +37,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ query }) =
 
   if (!app) { return { props: { error: 400 } }; }
 
-  const config = getConfigFromFile(AppServerConfigSchema, app, true);
+  const config = getConfigFromFile(AppServerConfigSchema, join(APP_SERVER_CONFIG_BASE_PATH, app), true);
 
   if (!config) { return { props: { error: 404 } };}
 
