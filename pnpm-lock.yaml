@@ -69,7 +69,7 @@ importers:
       fastify: 3.29.0
       fastify-graceful-shutdown: 3.1.0
       fastify-plugin: 3.0.1
-      ioredis: 5.0.5
+      ioredis: 5.0.6
       ldapjs: 2.3.2
       nanoid: 3.3.4
     dependencies:
@@ -82,7 +82,7 @@ importers:
       fastify: 3.29.0
       fastify-graceful-shutdown: 3.1.0
       fastify-plugin: 3.0.1
-      ioredis: 5.0.5
+      ioredis: 5.0.6
       ldapjs: 2.3.2
       nanoid: 3.3.4
     devDependencies:
@@ -8468,8 +8468,8 @@ packages:
     dependencies:
       loose-envify: 1.4.0
 
-  /ioredis/5.0.5:
-    resolution: {integrity: sha512-H+u9YB/cBckDO5lt5+S34gGN1EuIBjjaXk31LivQWfX3G1cqZPYCiwF9qCOkqK2NsKVk+saoUN+fLBz5tc2gFw==}
+  /ioredis/5.0.6:
+    resolution: {integrity: sha512-KUm7wPzIet9QrFMoMm09/4bkfVKBUD9KXwBitP3hrNkZ+A6NBndweXGwYIB/7szHcTZgfo7Kvx88SxljJV4D9A==}
     engines: {node: '>=12.22.0'}
     dependencies:
       '@ioredis/commands': 1.1.1
@@ -9620,7 +9620,7 @@ packages:
     dev: false
 
   /lodash.defaults/4.2.0:
-    resolution: {integrity: sha1-0JF4cW/+pN3p5ft7N/bwgCJ0WAw=}
+    resolution: {integrity: sha512-qjxPLHd3r5DnsdGacqOMU6pb/avJzdh9tFX2ymgoZE27BmjXrNy/y4LoaiTeAb+O3gL8AfpJGtqfX/ae2leYYQ==}
     dev: false
 
   /lodash.filter/4.6.0:
@@ -9640,7 +9640,7 @@ packages:
     dev: false
 
   /lodash.isarguments/3.1.0:
-    resolution: {integrity: sha1-L1c9hcaiQon/AGY7SRwdM4/zRYo=}
+    resolution: {integrity: sha512-chi4NHZlZqZD18a0imDHnZPrDeBbTtVN7GXMwuGdRH9qotxAjYs3aVLKc7zNOG9eddR5Ksd8rvFEBc9SsggPpg==}
     dev: false
 
   /lodash.map/4.6.0:
@@ -9979,7 +9979,7 @@ packages:
     engines: {node: '>=10'}
 
   /ms/2.0.0:
-    resolution: {integrity: sha1-VgiurfwAvmwpAd9fmGF4jeDVl8g=}
+    resolution: {integrity: sha512-Tpp60P6IUJDTuOq/5Z8cdskzJujfwqfOTkrwIwj7IRISpnkJnT6SyJ4PCPnGMoFjC9ddhal5KVIYtAt97ix05A==}
 
   /ms/2.1.2:
     resolution: {integrity: sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==}
