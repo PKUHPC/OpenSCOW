@@ -1,6 +1,8 @@
 name: Deploy Docs to GitHub Pages
 
 on:
+  pull_request:
+    branches: [master]
   push:
     branches:
       - master
@@ -29,6 +31,8 @@ jobs:
           CR_URL: ghcr.io/pkuhpc/scow
 
       - name: Deploy to GitHub Pages
+        # only deploy docs on master branches
+        if: github.ref == 'refs/heads/master'
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
