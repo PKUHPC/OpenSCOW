@@ -12,9 +12,12 @@
         "docs/package.json"
       ],
       "matchPackagePatterns": [
-        "@mdx-js/react"
+        "@mdx-js/react",
+        "react",
+        "react-dom",
+        "@types/react"
       ],
-      "allowedVersions": "<2"
+      "enabled": false
     }
   ]
 }
