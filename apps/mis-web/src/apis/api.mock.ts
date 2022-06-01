@@ -8,7 +8,7 @@ import { PlatformRole, TenantRole, UserInfo, UserRole, UserStatus } from "src/mo
 
 export type MockApi<TApi extends Record<
   string,
- (...args: any[]) => JsonFetchResultPromiseLike<any>>
+ (...args : any[]) => JsonFetchResultPromiseLike<any>>
  > = { [key in keyof TApi]:
     (...args) =>
     Promise<

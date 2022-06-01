@@ -5,7 +5,7 @@ import type { UserInfo } from "src/models/User";
 
 export type MockApi<TApi extends Record<
   string,
- (...args: any[]) => JsonFetchResultPromiseLike<any>>
+ (...args : any[]) => JsonFetchResultPromiseLike<any>>
  > = { [key in keyof TApi]:
     (...args) =>
     Promise<

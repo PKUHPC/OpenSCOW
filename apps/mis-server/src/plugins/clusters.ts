@@ -24,7 +24,7 @@ declare type ClientCall<TReq, TReply> = (req: TReq, callback: ClientCallCallback
 declare type TRequest<TFunc> = TFunc extends ClientCall<any, any> ? First<Parameters<TFunc>> : never;
 type TRes<TFunc> =
   TFunc extends ClientCall<any, any>
-    ? Last<Parameters<TFunc>> extends ((...args: any) => any)
+    ? Last<Parameters<TFunc>> extends ((...args : any) => any)
       ? Last<Parameters<Last<Parameters<TFunc>>>>
       : never
     : never
