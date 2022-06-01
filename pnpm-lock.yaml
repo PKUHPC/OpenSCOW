@@ -120,7 +120,7 @@ importers:
       '@fastify/formbody': 7.0.0
       '@fastify/multipart': 6.0.0
       '@fastify/static': 5.0.2
-      '@fastify/swagger': 6.0.1
+      '@fastify/swagger': 6.1.0
       '@grpc/grpc-js': 1.6.7
       '@scow/config': workspace:*
       '@scow/lib-auth': workspace:*
@@ -154,7 +154,7 @@ importers:
       shell-quote: 1.7.3
     devDependencies:
       '@ddadaal/tsgrpc-cli': 0.11.0
-      '@fastify/swagger': 6.0.1
+      '@fastify/swagger': 6.1.0
       '@types/mime-types': 2.1.1
       '@types/shell-quote': 1.7.1
       form-data: 4.0.0
@@ -2955,8 +2955,8 @@ packages:
     transitivePeerDependencies:
       - supports-color
 
-  /@fastify/swagger/6.0.1:
-    resolution: {integrity: sha512-6STMY44AA3Ks7/CYRSh3ocZCVUAHMO/ochtLkP1R7i0XMjpdKFpAEwdGffocjfeD0BRglC36Y22qLHw+YKMCtg==}
+  /@fastify/swagger/6.1.0:
+    resolution: {integrity: sha512-oum6QzV1/8/2eqWOEYzqwhRJQ3ftpxfGnDGmAinLIyeTrsr7xpNev/8iRxAAb7S6S8KRIIybkhvzvkuqnQKTkA==}
     dependencies:
       '@fastify/static': 5.0.2
       fastify-plugin: 3.0.1
