@@ -91,7 +91,7 @@ importers:
 
   apps/clusterops-slurm:
     specifiers:
-      '@ddadaal/tsgrpc-cli': 0.11.0
+      '@ddadaal/tsgrpc-cli': 0.13.0
       '@ddadaal/tsgrpc-server': 0.12.0
       '@grpc/grpc-js': 1.6.7
       '@scow/config': workspace:*
@@ -106,7 +106,7 @@ importers:
       '@scow/config': link:../../libs/config
       node-ssh: 12.0.4
     devDependencies:
-      '@ddadaal/tsgrpc-cli': 0.11.0
+      '@ddadaal/tsgrpc-cli': 0.13.0
       '@types/google-protobuf': 3.15.6
       '@types/node-ssh': 7.0.1
       '@types/rimraf': 3.0.2
@@ -114,7 +114,7 @@ importers:
 
   apps/file-server:
     specifiers:
-      '@ddadaal/tsgrpc-cli': 0.11.0
+      '@ddadaal/tsgrpc-cli': 0.13.0
       '@fastify/cookie': 6.0.0
       '@fastify/error': 3.0.0
       '@fastify/formbody': 7.0.0
@@ -153,7 +153,7 @@ importers:
       nanoid: 3.3.4
       shell-quote: 1.7.3
     devDependencies:
-      '@ddadaal/tsgrpc-cli': 0.11.0
+      '@ddadaal/tsgrpc-cli': 0.13.0
       '@fastify/swagger': 6.1.0
       '@types/mime-types': 2.1.1
       '@types/shell-quote': 1.7.1
@@ -161,7 +161,7 @@ importers:
 
   apps/job-server-slurm:
     specifiers:
-      '@ddadaal/tsgrpc-cli': 0.11.0
+      '@ddadaal/tsgrpc-cli': 0.13.0
       '@ddadaal/tsgrpc-server': 0.12.0
       '@ddadaal/tsgrpc-utils': 0.12.0
       '@grpc/grpc-js': 1.6.7
@@ -177,14 +177,14 @@ importers:
       '@scow/config': link:../../libs/config
       node-ssh: 12.0.4
     devDependencies:
-      '@ddadaal/tsgrpc-cli': 0.11.0
+      '@ddadaal/tsgrpc-cli': 0.13.0
       '@types/google-protobuf': 3.15.6
       '@types/node-cron': 3.0.1
       '@types/ssh2': 0.5.52
 
   apps/mis-server:
     specifiers:
-      '@ddadaal/tsgrpc-cli': 0.11.0
+      '@ddadaal/tsgrpc-cli': 0.13.0
       '@ddadaal/tsgrpc-server': 0.12.0
       '@ddadaal/tsgrpc-utils': 0.12.0
       '@grpc/grpc-js': 1.6.7
@@ -222,7 +222,7 @@ importers:
       undici: 5.4.0
       wait-on: 6.0.1
     devDependencies:
-      '@ddadaal/tsgrpc-cli': 0.11.0
+      '@ddadaal/tsgrpc-cli': 0.13.0
       '@types/google-protobuf': 3.15.6
       '@types/node-cron': 3.0.1
       '@types/wait-on': 5.3.1
@@ -232,7 +232,7 @@ importers:
       '@ant-design/icons': 4.7.0
       '@ddadaal/next-typed-api-routes-cli': 0.4.0
       '@ddadaal/next-typed-api-routes-runtime': 0.3.2
-      '@ddadaal/tsgrpc-cli': 0.11.0
+      '@ddadaal/tsgrpc-cli': 0.13.0
       '@ddadaal/tsgrpc-utils': 0.12.0
       '@grpc/grpc-js': 1.6.7
       '@newhighsco/next-plugin-svgr': 3.0.50
@@ -297,7 +297,7 @@ importers:
       typescript: 4.7.2
     devDependencies:
       '@ddadaal/next-typed-api-routes-cli': 0.4.0
-      '@ddadaal/tsgrpc-cli': 0.11.0
+      '@ddadaal/tsgrpc-cli': 0.13.0
       '@next/bundle-analyzer': 12.1.6
       '@types/google-protobuf': 3.15.6
       '@types/mime-types': 2.1.1
@@ -323,7 +323,7 @@ importers:
       '@codemirror/view': 0.20.7
       '@ddadaal/next-typed-api-routes-cli': 0.4.0
       '@ddadaal/next-typed-api-routes-runtime': 0.3.2
-      '@ddadaal/tsgrpc-cli': 0.11.0
+      '@ddadaal/tsgrpc-cli': 0.13.0
       '@ddadaal/tsgrpc-utils': 0.12.0
       '@grpc/grpc-js': 1.6.7
       '@newhighsco/next-plugin-svgr': 3.0.50
@@ -410,7 +410,7 @@ importers:
       xterm-addon-fit: 0.5.0_xterm@4.18.0
     devDependencies:
       '@ddadaal/next-typed-api-routes-cli': 0.4.0
-      '@ddadaal/tsgrpc-cli': 0.11.0
+      '@ddadaal/tsgrpc-cli': 0.13.0
       '@next/bundle-analyzer': 12.1.6
       '@types/google-protobuf': 3.15.6
       '@types/node': 17.0.35
@@ -2144,8 +2144,8 @@ packages:
       tslib: 2.4.0
     dev: false
 
-  /@ddadaal/tsgrpc-cli/0.11.0:
-    resolution: {integrity: sha512-+n/yDsacEtpOXFUKZWcZKPAfynTYn24X6oqFKa3U7wsIBOybK3F2qSeKsaimBXbHW1zEfL+lTlqxrq75yiY6ow==}
+  /@ddadaal/tsgrpc-cli/0.13.0:
+    resolution: {integrity: sha512-BzdTAnAjTgwW0i87xsLQihftw3BlfTtMKNjUFJeP7Yjr50KEKwFUw2jwLSNzyOeKDxtljtRVMt82wHXqtSra2g==}
     hasBin: true
     dependencies:
       glob: 8.0.3
@@ -14381,7 +14381,7 @@ packages:
   /wide-align/1.1.5:
     resolution: {integrity: sha512-eDMORYaPNZ4sQIuuYPDHdQvf4gyCF9rEEV/yPxGfwPkRodwEgiMUUXTx/dex+Me0wxx53S+NgUHaP7y3MGlDmg==}
     dependencies:
-      string-width: 1.0.2
+      string-width: 4.2.3
     dev: true
 
   /widest-line/3.1.0:
