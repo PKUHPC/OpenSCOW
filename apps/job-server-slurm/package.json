@@ -17,7 +17,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@ddadaal/tsgrpc-server": "0.12.0",
+    "@ddadaal/tsgrpc-server": "0.14.0",
     "@ddadaal/tsgrpc-utils": "0.12.0",
     "@scow/config": "workspace:*",
     "@grpc/grpc-js": "1.6.7",

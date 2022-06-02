@@ -11,7 +11,7 @@
     "protos": "tsgrpc-cli protos"
   },
   "dependencies": {
-    "@ddadaal/tsgrpc-server": "0.12.0",
+    "@ddadaal/tsgrpc-server": "0.14.0",
     "@scow/config": "workspace:*",
     "@grpc/grpc-js": "1.6.7",
     "node-ssh": "12.0.4"
