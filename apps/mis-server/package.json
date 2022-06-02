@@ -36,7 +36,7 @@
   },
   "devDependencies": {
     "@types/node-cron": "3.0.1",
-    "@ddadaal/tsgrpc-cli": "0.11.0",
+    "@ddadaal/tsgrpc-cli": "0.13.0",
     "@types/google-protobuf": "3.15.6",
     "@types/wait-on": "5.3.1"
   },
