@@ -68,7 +68,7 @@
     "@types/url-join": "4.0.1",
     "@types/random-words": "1.1.2",
     "postcss": "8.4.14",
-    "webpack": "5.72.1"
+    "webpack": "5.73.0"
   },
   "browserslist": {
     "production": [

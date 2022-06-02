@@ -52,7 +52,7 @@
     "@types/mime-types": "2.1.1",
     "babel-plugin-import": "1.13.5",
     "postcss": "8.4.14",
-    "webpack": "5.72.1"
+    "webpack": "5.73.0"
   },
   "browserslist": {
     "production": [
