@@ -5,7 +5,7 @@ importers:
   .:
     specifiers:
       '@ddadaal/eslint-config': 1.5.0
-      '@types/jest': 27.5.1
+      '@types/jest': 27.5.2
       '@types/node': 17.0.35
       '@types/rimraf': 3.0.2
       '@typescript-eslint/eslint-plugin': 5.27.0
@@ -31,7 +31,7 @@ importers:
       typescript: 4.7.2
     devDependencies:
       '@ddadaal/eslint-config': 1.5.0_mtjhzqn3riqsjery45gnrqin5u
-      '@types/jest': 27.5.1
+      '@types/jest': 27.5.2
       '@types/node': 17.0.35
       '@types/rimraf': 3.0.2
       '@typescript-eslint/eslint-plugin': 5.27.0_dszb5tb7atwkjjijmmov4qhi7i
@@ -50,7 +50,7 @@ importers:
       pino-pretty: 8.0.0
       pkg: 5.7.0
       rimraf: 3.0.2
-      ts-jest: 28.0.3_7sa2e64agunq5kj4zcolhrnkbm
+      ts-jest: 28.0.3_633spfb6behzietlh4jvmi25ru
       ts-node: 10.8.0_smgpfffxrhk5i4ijhe3532b4hq
       tsc-alias: 1.6.7
       tsconfig-paths: 4.0.0
@@ -4225,8 +4225,8 @@ packages:
       '@types/istanbul-lib-report': 3.0.0
     dev: true
 
-  /@types/jest/27.5.1:
-    resolution: {integrity: sha512-fUy7YRpT+rHXto1YlL+J9rs0uLGyiqVt3ZOTQR+4ROc47yNl8WLdVLgUloBRhOxP1PZvguHl44T3H0wAWxahYQ==}
+  /@types/jest/27.5.2:
+    resolution: {integrity: sha512-mpT8LJJ4CMeeahobofYWIjFo0xonRS/HfxnVEPMPFSQdGUt1uHCnoPT7Zhb+sjDU2wz0oKV0OLUR0WzrHNgfeA==}
     dependencies:
       jest-matcher-utils: 27.5.1
       pretty-format: 27.5.1
@@ -13544,7 +13544,7 @@ packages:
     resolution: {integrity: sha512-rvuRbTarPXmMb79SmzEp8aqXNKcK+y0XaB298IXueQ8I2PsrATcPBCSPyK/dDNa2iWOhKlfNnOjdAOTBU/nkFA==}
     dev: false
 
-  /ts-jest/28.0.3_7sa2e64agunq5kj4zcolhrnkbm:
+  /ts-jest/28.0.3_633spfb6behzietlh4jvmi25ru:
     resolution: {integrity: sha512-HzgbEDQ2KgVtDmpXToqAcKTyGHdHsG23i/iUjfxji92G5eT09S1m9UHZd7csF0Bfgh9txM4JzwHnv7r1waFPlw==}
     engines: {node: ^12.13.0 || ^14.15.0 || ^16.10.0 || >=17.0.0}
     hasBin: true
@@ -13565,7 +13565,7 @@ packages:
       esbuild:
         optional: true
     dependencies:
-      '@types/jest': 27.5.1
+      '@types/jest': 27.5.2
       bs-logger: 0.2.6
       fast-json-stable-stringify: 2.1.0
       jest: 28.1.0_ucs5py5trtrgec2ppulvmog6re
