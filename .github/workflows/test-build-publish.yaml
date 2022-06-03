@@ -55,6 +55,8 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
 
+    if: github.ref == 'refs/heads/master'
+
     steps:
       - uses: actions/checkout@v3
       - uses: pnpm/action-setup@v2.2.2
@@ -77,12 +79,12 @@ jobs:
 
   build-containers:
     needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
 
     permissions:
       contents: read
       packages: write
-
-    runs-on: ubuntu-latest
 
     strategy:
       matrix:
