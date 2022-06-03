@@ -18,7 +18,7 @@
   "license": "ISC",
   "dependencies": {
     "@ddadaal/tsgrpc-server": "0.14.0",
-    "@ddadaal/tsgrpc-utils": "0.12.0",
+    "@ddadaal/tsgrpc-utils": "0.14.0",
     "@grpc/grpc-js": "1.6.7",
     "@mikro-orm/core": "5.1.5",
     "@mikro-orm/cli": "5.1.5",
