@@ -34,6 +34,8 @@ export const appServiceServer = plugin((server) => {
 
       const jobName = randomUUID();
 
+      const workingDirectory = join(config.APP_JOBS_DIR, jobName);
+
       return await server.ext.connect(node, userId, logger, async (ssh) => {
 
         const result = await submitJob({
@@ -47,17 +49,10 @@ export const appServiceServer = plugin((server) => {
             maxTime: maxTime,
             nodeCount: 1,
             partition: partition,
+            workingDirectory,
             qos: qos,
           },
         });
-
-        if (result.code === "ALREADY_EXISTS") {
-        // this is very unlikely to happen, because job name is UUID
-          throw <ServiceError> {
-            code: status.ALREADY_EXISTS,
-            message: `dir ${result.dir} already exists.`,
-          };
-        }
 
         if (result.code === "SBATCH_FAILED") {
           throw <ServiceError> {
@@ -71,13 +66,13 @@ export const appServiceServer = plugin((server) => {
         const metadata: SessionMetadata = {
           jobId: result.jobId,
           sessionId: jobName,
-          submitTime: result.metadata.submitTime,
+          submitTime: result.submitTime.toISOString(),
           appId,
         };
 
         const writeFile = promisify(result.sftp.writeFile.bind(result.sftp));
 
-        await writeFile(join(result.dir, SESSION_METADATA_NAME), JSON.stringify(metadata));
+        await writeFile(join(workingDirectory, SESSION_METADATA_NAME), JSON.stringify(metadata));
 
         return [{ jobId: metadata.jobId, sessionId: metadata.sessionId }];
       });
@@ -91,14 +86,14 @@ export const appServiceServer = plugin((server) => {
       return await server.ext.connect(node, userId, logger, async (ssh) => {
         const sftp = await ssh.requestSFTP();
 
-        if (!await sftpExists(sftp, config.JOBS_DIR)) { return [{ sessions: []}]; }
+        if (!await sftpExists(sftp, config.APP_JOBS_DIR)) { return [{ sessions: []}]; }
 
-        const list = await promisify(sftp.readdir.bind(sftp))(config.JOBS_DIR);
+        const list = await promisify(sftp.readdir.bind(sftp))(config.APP_JOBS_DIR);
 
         const resultMap: Map<number, AppSession> = new Map();
 
         await Promise.all(list.map(async ({ filename }) => {
-          const jobDir = join(config.JOBS_DIR, filename);
+          const jobDir = join(config.APP_JOBS_DIR, filename);
           const metadataPath = join(jobDir, SESSION_METADATA_NAME);
 
           if (!await sftpExists(sftp, metadataPath)) {

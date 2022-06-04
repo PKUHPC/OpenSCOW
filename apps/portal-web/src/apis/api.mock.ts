@@ -55,12 +55,15 @@ export const mockApi: MockApi<typeof api> = {
       nodeCount: 4,
       partition: "low",
       qos: "low",
+      workingDirectory: "/nfs/jobs/123",
     },
   }),
 
   getSavedJobs: async () => ({ results: [{
-    jobName: "123", comment: "1234", submitTime: new Date().toString(),
-    dirPath: "jobs/123",
+    id: "123-sample-apple",
+    comment: "1234",
+    submitTime: new Date().toString(),
+    jobName: "sample-apple",
   }]}),
 
   getIcon: async () => undefined,

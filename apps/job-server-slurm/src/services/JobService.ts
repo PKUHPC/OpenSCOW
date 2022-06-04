@@ -3,7 +3,7 @@ import { ensureNotUndefined } from "@ddadaal/tsgrpc-utils";
 import { ServiceError, status } from "@grpc/grpc-js";
 import { join } from "path";
 import { queryJobInfo } from "src/bl/queryJobInfo";
-import { generateJobScript, JOB_METADATA_NAME, JobMetadata, sftpExists, submitJob } from "src/bl/submitJob";
+import { generateJobScript, JobMetadata, sftpExists, submitJob } from "src/bl/submitJob";
 import { checkClusterExistence, clustersConfig } from "src/config/clusters";
 import { config } from "src/config/env";
 import { JobServiceServer, JobServiceService, SavedJob } from "src/generated/portal/job";
@@ -49,7 +49,7 @@ export const jobServiceServer = plugin((server) => {
     },
 
     submitJob: async ({ request, logger }) => {
-      const { cluster, jobInfo, userId } = ensureNotUndefined(request, ["jobInfo"]);
+      const { cluster, jobInfo, userId, save } = ensureNotUndefined(request, ["jobInfo"]);
 
       const node = clustersConfig[cluster].loginNodes[0];
 
@@ -61,13 +61,6 @@ export const jobServiceServer = plugin((server) => {
           ssh,
         });
 
-        if (reply.code === "ALREADY_EXISTS") {
-          throw <ServiceError> {
-            code: status.ALREADY_EXISTS,
-            message: `dir ${reply.dir} already exists.`,
-          };
-        }
-
         if (reply.code === "SBATCH_FAILED") {
           throw <ServiceError> {
             code: status.UNAVAILABLE,
@@ -76,22 +69,36 @@ export const jobServiceServer = plugin((server) => {
           };
         }
 
+        if (save) {
+          const id = `${jobInfo.jobName}-${reply.jobId}`;
+          logger.info("Save job to %s", id);
+
+          await ssh.mkdir(config.SAVED_JOBS_DIR);
+
+          const filePath = join(config.SAVED_JOBS_DIR, id);
+          await ssh.withSFTP(async (sftp) => {
+            const metadata: JobMetadata = { ...jobInfo, submitTime: reply.submitTime.toISOString() };
+            await promisify(sftp.writeFile.bind(sftp))(filePath, JSON.stringify(metadata));
+          });
+
+          logger.info("Saved job to %s", filePath);
+        }
+
         return [{ jobId: reply.jobId }];
       });
     },
 
     getSavedJob: async ({ request, logger }) => {
-      const { cluster, jobName, userId } = request;
+      const { cluster, id, userId } = request;
 
       const node = clustersConfig[cluster].loginNodes[0];
 
       return await server.ext.connect(node, userId, logger, async (ssh) => {
         const sftp = await ssh.requestSFTP();
 
-        const dir = join(config.JOBS_DIR, jobName);
-        const metadataPath = join(dir, JOB_METADATA_NAME);
+        const file = join(config.SAVED_JOBS_DIR, id);
 
-        const content = await promisify(sftp.readFile.bind(sftp))(metadataPath);
+        const content = await promisify(sftp.readFile.bind(sftp))(file);
 
         const data = JSON.parse(content.toString()) as JobMetadata;
 
@@ -107,26 +114,21 @@ export const jobServiceServer = plugin((server) => {
       return await server.ext.connect(node, userId, logger, async (ssh) => {
         const sftp = await ssh.requestSFTP();
 
-        if (!await sftpExists(sftp, config.JOBS_DIR)) { return [{ results: []}]; }
+        if (!await sftpExists(sftp, config.SAVED_JOBS_DIR)) { return [{ results: []}]; }
 
-        const list = await promisify(sftp.readdir.bind(sftp))(config.JOBS_DIR);
+        const list = await promisify(sftp.readdir.bind(sftp))(config.SAVED_JOBS_DIR);
 
-        const results = (await Promise.all(list.map(async ({ filename }) => {
-          const jobDir = join(config.JOBS_DIR, filename);
-          const metadataPath = join(jobDir, JOB_METADATA_NAME);
-
-          if (!await sftpExists(sftp, config.JOBS_DIR)) {
-            return undefined;
-          }
-          const content = await promisify(sftp.readFile.bind(sftp))(metadataPath);
+        const results = await Promise.all(list.map(async ({ filename }) => {
+          const content = await promisify(sftp.readFile.bind(sftp))(join(config.SAVED_JOBS_DIR, filename));
           const data = JSON.parse(content.toString()) as JobMetadata;
 
-          const absJobDir = await promisify(sftp.realpath.bind(sftp))(jobDir);
-
-          return { jobName: data.jobName, submitTime: new Date(data.submitTime),
-            comment: data.comment,  dirPath: absJobDir,
-          };
-        }))).filter((x) => x) as SavedJob[];
+          return {
+            id: filename,
+            submitTime: new Date(data.submitTime),
+            comment: data.comment,
+            jobName: data.jobName,
+          } as SavedJob;
+        }));
 
         return [{ results }];
       });

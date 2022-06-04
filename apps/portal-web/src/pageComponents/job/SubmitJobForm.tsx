@@ -1,5 +1,6 @@
 import { ReloadOutlined } from "@ant-design/icons";
-import { Button, Col, Form, Input, InputNumber, message, Modal, Row, Select, Tooltip } from "antd";
+import { parsePlaceholder } from "@scow/config/build/parse";
+import { Button, Checkbox, Col, Form, Input, InputNumber, message, Modal, Row, Select, Tooltip } from "antd";
 import { useWatch } from "antd/lib/form/Form";
 import randomWords from "random-words";
 import React, { useEffect, useMemo, useState } from "react";
@@ -23,12 +24,13 @@ interface JobForm {
   maxTime: number;
   account: string;
   comment: string;
+  workingDirectory: string;
+  save: boolean;
 }
 
 function genJobName() {
   return randomWords({ exactly: 2, join: "-" });
 }
-
 
 const initialValues = {
   cluster: defaultCluster,
@@ -38,6 +40,7 @@ const initialValues = {
   coreCount: 1,
   qos: defaultPartitionInfo?.qos?.[0] ?? null,
   maxTime: 30,
+  save: false,
 } as JobForm;
 
 interface Props {
@@ -54,7 +57,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
   };
 
   const submit = async () => {
-    const { cluster, command, jobName, coreCount,
+    const { cluster, command, jobName, coreCount, workingDirectory, save,
       maxTime, nodeCount, partition, qos, account, comment } = await form.validateFields();
 
     setLoading(true);
@@ -62,13 +65,11 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
     await api.submitJob({ body: {
       cluster: cluster.id, command, jobName, account,
       coreCount, maxTime, nodeCount, partition, qos, comment,
+      workingDirectory, save,
     } })
       .httpError(409, (e) => {
         const { code, message: serverMessage  } = e;
-        if (code === "ALREADY_EXISTS") {
-          message.error("作业名已经存在。已生成新作业名");
-          reloadJobName();
-        } else if (code === "SBATCH_FAILED") {
+        if (code === "SBATCH_FAILED") {
           Modal.error({
             title: "提交作业失败",
             content: serverMessage,
@@ -96,10 +97,18 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
 
   const currentPartitionInfo = useMemo(() => getPartitionInfo(cluster, partition), [cluster, partition]);
 
+  const initialJobNameAndDir = useMemo(() => {
+    const jobName = genJobName();
+    return { jobName, workingDirectory: parsePlaceholder(publicConfig.SUBMIT_JOB_WORKING_DIR, { name: jobName }) };
+  }, []);
+
   return (
     <Form<JobForm>
       form={form}
-      initialValues={initial}
+      initialValues={{
+        ...initial,
+        ...initialJobNameAndDir,
+      }}
       onFinish={submit}
       onValuesChange={(changed) => {
         if (changed.cluster) {
@@ -161,7 +170,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
             />
           </Form.Item>
         </Col>
-        <Col span={24} sm={6} >
+        <Col span={12} sm={6} >
           <Form.Item<JobForm> label="节点数" name="nodeCount"
             dependencies={["cluster", "partition"]}
             rules={[
@@ -171,7 +180,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
             <InputNumber min={1} />
           </Form.Item>
         </Col>
-        <Col span={24} sm={6}>
+        <Col span={12} sm={6}>
           <Form.Item<JobForm> label="CPU核心数" name="coreCount"
             dependencies={["cluster", "partition"]}
             rules={[
@@ -186,15 +195,21 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
             <InputNumber min={1} step={1} addonAfter={"分钟"} />
           </Form.Item>
         </Col>
+        <Col span={24} sm={24}>
+          <Form.Item<JobForm> label="工作目录" name="workingDirectory" rules={[{ required: true }]}>
+            <Input addonBefore="~/" />
+          </Form.Item>
+        </Col>
       </Row>
       <Form.Item label="备注" name="comment">
         <Input.TextArea />
       </Form.Item>
-      <Form.Item<JobForm>>
-        <Button type="primary" htmlType="submit" loading={loading}>
-          提交
-        </Button>
+      <Form.Item name="save" valuePropName="checked">
+        <Checkbox>保存为模板</Checkbox>
       </Form.Item>
+      <Button type="primary" htmlType="submit" loading={loading}>
+          提交
+      </Button>
     </Form>
   );
 };

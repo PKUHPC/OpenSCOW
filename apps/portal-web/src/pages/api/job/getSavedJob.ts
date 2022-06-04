@@ -13,7 +13,7 @@ export interface GetSavedJobSchema {
 
   query: {
     cluster: string;
-    jobName: string;
+    id: string;
   };
 
   responses: {
@@ -38,7 +38,7 @@ export default route<GetSavedJobSchema>("GetSavedJobSchema", async (req, res) =>
 
   if (!info) { return; }
 
-  const { cluster, jobName } = req.query;
+  const { cluster, id } = req.query;
 
   // validate the parameters
   if (!(cluster in publicConfig.CLUSTERS_CONFIG)) {
@@ -50,7 +50,7 @@ export default route<GetSavedJobSchema>("GetSavedJobSchema", async (req, res) =>
   return await asyncClientCall(client, "getSavedJob", {
     cluster,
     userId: info.identityId,
-    jobName,
+    id,
   })
     .then((reply) => {
       const { jobInfo } = ensureNotUndefined(reply, ["jobInfo"]);

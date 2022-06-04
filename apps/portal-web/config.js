@@ -51,6 +51,8 @@ const specs = {
 
   ENABLE_SHELL: bool({ desc: "是否启用Shell功能", default: false }),
   SSH_PRIVATE_KEY_PATH: str({ desc: "SSH私钥路径", default: path.join(homedir(), ".ssh", "id_rsa") }),
+
+  SUBMIT_JOB_DEFAULT_PWD: str({ desc: "提交作业的默认工作目录。使用{name}代替作业名称。相对于用户的家目录", default: "scow/jobs/{name}" }),
 };
 
 const config = envConfig(specs, process.env);
@@ -134,6 +136,9 @@ const publicRuntimeConfig = {
   CLUSTERS_CONFIG: clusters,
 
   APPS: getApps(),
+
+  SUBMIT_JOB_WORKING_DIR: config.SUBMIT_JOB_DEFAULT_PWD,
+
 }
 
 if (!building) {

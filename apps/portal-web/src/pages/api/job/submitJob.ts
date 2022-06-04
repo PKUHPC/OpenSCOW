@@ -16,7 +16,9 @@ export interface SubmitJobInfo {
   qos: string | undefined;
   maxTime: number;
   account: string;
+  workingDirectory: string;
   comment?: string;
+  save: boolean;
 }
 
 export interface SubmitJobSchema {
@@ -49,7 +51,8 @@ export default route<SubmitJobSchema>("SubmitJobSchema", async (req, res) => {
 
   if (!info) { return; }
 
-  const { cluster, command, jobName, coreCount, maxTime, nodeCount, partition, qos, account, comment } = req.body;
+  const { cluster, command, jobName, coreCount, maxTime, save,
+    nodeCount, partition, qos, account, comment, workingDirectory } = req.body;
 
   // validate the parameters
   if (!(cluster in publicConfig.CLUSTERS_CONFIG)) {
@@ -68,6 +71,7 @@ export default route<SubmitJobSchema>("SubmitJobSchema", async (req, res) => {
     account,
     command,
     comment,
+    workingDirectory,
   };
 
   const { script } = await asyncClientCall(client, "generateJobScript", {
@@ -79,13 +83,12 @@ export default route<SubmitJobSchema>("SubmitJobSchema", async (req, res) => {
     userId: info.identityId,
     jobInfo,
     script,
+    save,
   })
     .then(({ jobId }) => ({ 201: { jobId } }))
     .catch((e) => {
       if (e.code === status.UNAVAILABLE) {
         return { 409: { code: "SBATCH_FAILED", message: e.details } } as const;
-      } else if (e.code === status.ALREADY_EXISTS) {
-        return { 409: { code: "ALREADY_EXISTS", message: e.message } } as const;
       } else {
         throw e;
       }

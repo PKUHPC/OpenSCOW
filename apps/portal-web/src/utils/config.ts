@@ -48,6 +48,8 @@ export interface PublicRuntimeConfig {
   CLUSTERS_CONFIG: Clusters;
 
   APPS: { id: string; name: string }[];
+
+  SUBMIT_JOB_WORKING_DIR: string;
 }
 
 export const runtimeConfig: ServerRuntimeConfig = getConfig().serverRuntimeConfig;

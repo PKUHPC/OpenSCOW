@@ -16,14 +16,14 @@ export const SubmitJobPage: NextPage = requireAuth(() => true)(
     const query = useQuerystring();
 
     const cluster = queryToString(query.cluster);
-    const jobName = queryToString(query.jobName);
+    const savedJobId = queryToString(query.savedJobId);
 
     const { data, isLoading } = useAsync({
       promiseFn: useCallback(async () => {
-        if (cluster && jobName) {
+        if (cluster && savedJobId) {
           const clusterObj = CLUSTERS.find((x) => x.id === cluster);
           if (!clusterObj) { return undefined; }
-          return api.getSavedJob({ query: { cluster, jobName } })
+          return api.getSavedJob({ query: { cluster, id: savedJobId } })
             .then(({ jobInfo }) => ({
               cluster: clusterObj,
               command: jobInfo.command,
@@ -35,12 +35,14 @@ export const SubmitJobPage: NextPage = requireAuth(() => true)(
               maxTime: jobInfo.maxTime,
               account: jobInfo.account,
               comment: jobInfo.comment || "",
+              workingDirectory: jobInfo.workingDirectory,
+              save: false,
             }));
         } else {
           return undefined;
         }
       },
-      [cluster, jobName]),
+      [cluster, savedJobId]),
     });
 
     return (

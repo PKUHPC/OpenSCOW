@@ -14,7 +14,8 @@ export const config = envConfig({
 
   SSH_PRIVATE_KEY_PATH: str({ desc: "SSH私钥目录", default: path.join(homedir(), ".ssh", "id_rsa") }),
 
-  JOBS_DIR: str({ desc: "存放作业脚本以及相关内容的父目录，相对于用户的家目录", default: "jobs" }),
+  SAVED_JOBS_DIR: str({ desc: "将保存的作业保存到什么位置。相对于用户的家目录", default: "scow/savedJobs" }),
+  APP_JOBS_DIR: str({ desc: "将交互式任务的信息保存到什么位置。相对于用户的家目录", default: "scow/appData" }),
 
   MAX_DISPLAY: num({ desc:"最大连接桌面数量", default: 3 }),
 

@@ -85,13 +85,7 @@ const InfoTable: React.FC<InfoTableProps> = ({
       rowKey={(x) => x.jobName}
       scroll={{ x: true }}
     >
-      <Table.Column<SavedJob> dataIndex="jobName" title="作业名"
-        render={(_, r) => (
-          <Link href={`/files/${cluster.id}/${r.dirPath}`}>
-            {r.jobName}
-          </Link>
-        )}
-      />
+      <Table.Column<SavedJob> dataIndex="jobName" title="作业名"/>
       <Table.Column<SavedJob> dataIndex="submitTime" title="提交时间"
         render={(v) => formatDateTime(v)}
       />
@@ -103,7 +97,7 @@ const InfoTable: React.FC<InfoTableProps> = ({
               pathname: "/jobs/submit",
               query: {
                 cluster: cluster.id,
-                jobName: r.jobName,
+                savedJobId: r.id,
               },
             }}
             >
