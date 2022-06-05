@@ -8,7 +8,7 @@
     "serve": "next start",
     "build": "pnpm prepareDev && npm run build:nogen",
     "build:nogen": "cross-env BUILDING=1 next build",
-    "prepareDev": "pnpm protos && ntar schema && pnpm cloneNoVnc",
+    "prepareDev": "pnpm protos && ntar schema",
     "protos": "tsgrpc-cli protos",
     "cloneNoVnc": "git -C ./public/vnc pull || git clone -c advice.detachedHead=false --depth=1 --branch v1.3.0 https://github.com/novnc/noVNC ./public/vnc"
   },

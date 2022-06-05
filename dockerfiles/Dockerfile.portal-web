@@ -17,6 +17,8 @@ RUN pnpm i --frozen-lockfile
 
 RUN apk add git
 
+RUN pnpm run --filter portal-web cloneNoVnc
+
 COPY tsconfig.json .eslintrc.json ./
 
 COPY protos ./protos
