@@ -5,7 +5,7 @@ importers:
   .:
     specifiers:
       '@ddadaal/eslint-config': 1.5.0
-      '@types/jest': 28.1.0
+      '@types/jest': 28.1.1
       '@types/node': 17.0.35
       '@types/rimraf': 3.0.2
       '@typescript-eslint/eslint-plugin': 5.27.0
@@ -31,7 +31,7 @@ importers:
       typescript: 4.7.3
     devDependencies:
       '@ddadaal/eslint-config': 1.5.0_tyzj345i4ckhnteid5jx5bplcu
-      '@types/jest': 28.1.0
+      '@types/jest': 28.1.1
       '@types/node': 17.0.35
       '@types/rimraf': 3.0.2
       '@typescript-eslint/eslint-plugin': 5.27.0_kor2e3kwnnzugzo3aovmfcq2la
@@ -4225,8 +4225,8 @@ packages:
       '@types/istanbul-lib-report': 3.0.0
     dev: true
 
-  /@types/jest/28.1.0:
-    resolution: {integrity: sha512-ITfF6JJIl9zbEi2k6NmhNE/BiDqfsI/ceqfvdaWaPbcrCpYyyRq4KtDQIWh6vQUru6SqwppODiom/Zhid+np6A==}
+  /@types/jest/28.1.1:
+    resolution: {integrity: sha512-C2p7yqleUKtCkVjlOur9BWVA4HgUQmEj/HWCt5WzZ5mLXrWnyIfl0wGuArc+kBXsy0ZZfLp+7dywB4HtSVYGVA==}
     dependencies:
       jest-matcher-utils: 27.5.1
       pretty-format: 27.5.1
