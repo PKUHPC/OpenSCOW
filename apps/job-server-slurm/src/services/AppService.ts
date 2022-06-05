@@ -74,7 +74,7 @@ export const appServiceServer = plugin((server) => {
         // submit entry.sh
         const { code, stderr, stdout } = await loggedExec(ssh, logger, false,
           "sbatch", [remoteEntryPath],
-          { stream: "both", execOptions: { env: { SESSION_INFO } } },
+          { stream: "both" },
         );
 
         if (code !== 0) {

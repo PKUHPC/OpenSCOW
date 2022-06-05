@@ -10,6 +10,7 @@ import { queryToArray, queryToIntOrDefault, queryToString } from "src/utils/quer
 
 export const config = {
   api: {
+    bodyParser: false,
     externalResolver: true,
   },
 };
@@ -26,8 +27,6 @@ const STATUS_TEXT = {
 export default async (req: NextApiRequest, res: NextApiResponseServerIO) => {
   if (!res.socket.server.proxy) {
     const proxy = res.socket.server.proxy = createProxyServer({
-      changeOrigin: true,
-      autoRewrite: true,
       ignorePath: true,
     });
 
