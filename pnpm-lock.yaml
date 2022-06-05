@@ -127,7 +127,7 @@ importers:
       '@sinclair/typebox': 0.23.5
       '@types/mime-types': 2.1.1
       '@types/shell-quote': 1.7.1
-      fast-json-stringify: 3.2.0
+      fast-json-stringify: 4.0.0
       fastify: 3.29.0
       fastify-graceful-shutdown: 3.1.0
       fastify-plugin: 3.0.1
@@ -145,7 +145,7 @@ importers:
       '@scow/config': link:../../libs/config
       '@scow/lib-auth': link:../../libs/auth
       '@sinclair/typebox': 0.23.5
-      fast-json-stringify: 3.2.0
+      fast-json-stringify: 4.0.0
       fastify: 3.29.0
       fastify-graceful-shutdown: 3.1.0
       fastify-plugin: 3.0.1
@@ -7295,14 +7295,14 @@ packages:
       string-similarity: 4.0.4
     dev: false
 
-  /fast-json-stringify/3.2.0:
-    resolution: {integrity: sha512-rz24ul6KhuhHO8pLrMPSQFKtv1leLnhPHJuLBiAIKG6UHA/XdUrojieKkOmjpCQ3XfaBA/PEBZuDv3U9tQm3MQ==}
+  /fast-json-stringify/4.0.0:
+    resolution: {integrity: sha512-zv2rRNdLXWr3ZZfpQuE3/QDVeyCOufFOaMTqTGO1r5WB2AJ+ISmbLY2id4W4KG3pcng+MsnBO3ROzh/mlx3uFA==}
     engines: {node: '>= 10.0.0'}
     dependencies:
       ajv: 8.11.0
       ajv-formats: 2.1.1
       deepmerge: 4.2.2
-      fast-uri: 1.0.1
+      fast-uri: 2.0.0
       rfdc: 1.3.0
       string-similarity: 4.0.4
     dev: false
@@ -7318,8 +7318,8 @@ packages:
   /fast-safe-stringify/2.1.1:
     resolution: {integrity: sha512-W+KJc2dmILlPplD/H4K9l9LcAHAfPtP6BY84uVLXQ6Evcz9Lcg33Y2z1IVblT6xdY54PXYVHEv+0Wpq8Io6zkA==}
 
-  /fast-uri/1.0.1:
-    resolution: {integrity: sha512-dbO/+ny6lX4tt7pvfPMTiHfQVR5igYKFa5BJ2a21TWuOgd2ySp5DYswsEGuMcJZLL3/eJ/MQJ5KNcXyNUvDt8w==}
+  /fast-uri/2.0.0:
+    resolution: {integrity: sha512-Mt/lDpFwcPcLv3G0Qd3WlIjP5AeCQo/X91TZ9G8Px/3GzkTADX5smwginXYz+iX8mSa5pBN98EObj05X39/JoA==}
     dev: false
 
   /fast-url-parser/1.1.3:
