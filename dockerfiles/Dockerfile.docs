@@ -18,14 +18,12 @@ COPY tsconfig.json .eslintrc.json ./
 COPY protos ./protos
 
 COPY libs/config ./libs/config
-COPY apps/docs ./apps/docs
+COPY docs ./docs
 
 ARG BASE_PATH="/"
 ENV BASE_PATH=${BASE_PATH}
 
 RUN pnpm run build
-
-RUN rm -rf node_modules && pnpm i --prod --frozen-lockfile --offline
 
 FROM nginx:stable-alpine as runner
 
