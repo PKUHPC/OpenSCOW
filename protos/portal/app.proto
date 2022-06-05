@@ -27,9 +27,10 @@ message GetSessionsRequest {
 }
 
 message AppSession {
-  message Address {
+  message RunInfo {
     string host = 1;
     uint32 port = 2;
+    string password = 3;
   }
 
   string session_id = 1;
@@ -37,7 +38,7 @@ message AppSession {
   google.protobuf.Timestamp submit_time = 3;
   string app_id = 4;
   string state = 5;
-  optional Address address = 6;
+  optional RunInfo run_info = 6;
 }
 
 message GetSessionsReply { repeated AppSession sessions = 1; }

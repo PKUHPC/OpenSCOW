@@ -34,6 +34,7 @@ COPY --from=builder /app/libs/config/node_modules/ ./node_modules
 COPY --from=builder /app/libs/config/build/ ./build
 
 WORKDIR /app/apps/job-server-slurm
+COPY --from=builder /app/apps/job-server-slurm/assets ./assets
 COPY --from=builder /app/apps/job-server-slurm/package.json .
 COPY --from=builder /app/apps/job-server-slurm/node_modules/ ./node_modules
 COPY --from=builder /app/apps/job-server-slurm/build ./src

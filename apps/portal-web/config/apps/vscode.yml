@@ -2,5 +2,14 @@ id: vscode
 name: VSCode
 nodes:
   - t001
+  - t002
+beforeScript: |
+  export PORT=$(get_port)
+  export PASSWORD=$(get_password 12)
 script: |
-  echo find
+  PASSWORD=$PASSWORD code-server -vvv --bind-addr 0.0.0.0:$PORT --auth password
+connect:
+  method: POST
+  path: /login
+  formData:
+    password: "{PASSWORD}"

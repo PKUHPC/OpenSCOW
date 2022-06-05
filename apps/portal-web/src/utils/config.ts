@@ -1,3 +1,4 @@
+import { AppServer } from "@scow/config/build/appConfig/appServer";
 import { Clusters } from "@scow/config/build/appConfig/clusters";
 import { CONFIG_BASE_PATH } from "@scow/config/build/constants";
 import getConfig from "next/config";
@@ -17,6 +18,8 @@ export interface ServerRuntimeConfig {
   SSH_PRIVATE_KEY_PATH: string;
 
   CLUSTERS_CONFIG: Clusters;
+
+  APPS: AppServer[];
 }
 
 
