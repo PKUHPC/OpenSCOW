@@ -26,7 +26,7 @@ importers:
       rimraf: 3.0.2
       ts-jest: 28.0.4
       ts-node: 10.8.1
-      tsc-alias: 1.6.8
+      tsc-alias: 1.6.9
       tsconfig-paths: 4.0.0
       typescript: 4.7.3
     devDependencies:
@@ -52,7 +52,7 @@ importers:
       rimraf: 3.0.2
       ts-jest: 28.0.4_dobhpzuee57u35mlukeats7vq4
       ts-node: 10.8.1_lr5yv43hchipyudzleywqpgwuy
-      tsc-alias: 1.6.8
+      tsc-alias: 1.6.9
       tsconfig-paths: 4.0.0
       typescript: 4.7.3
 
@@ -13678,8 +13678,8 @@ packages:
       ts-proto-descriptors: 1.6.0
     dev: true
 
-  /tsc-alias/1.6.8:
-    resolution: {integrity: sha512-dEhFc4uNDxqU8n2l+KtaC4FRrDmC6jWX4G1UjOGiRayS0RAj7ABDqnSkwQQiRIrhZZAaTwpNlap60fHsQaS1aQ==}
+  /tsc-alias/1.6.9:
+    resolution: {integrity: sha512-5lv5uAHn0cgxY1XfpXIdquUSz2xXq3ryQyNtxC6DYH7YT5rt/W+9Gsft2uyLFTh+ozk4qU8iCSP3VemjT69xlQ==}
     hasBin: true
     dependencies:
       chokidar: 3.5.3
