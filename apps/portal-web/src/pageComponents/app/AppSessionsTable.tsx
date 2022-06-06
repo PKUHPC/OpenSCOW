@@ -1,16 +1,17 @@
+import { AppServer } from "@scow/config/build/appConfig/appServer";
 import { Button, Form, message, Popconfirm, Space, Table, TableColumnsType } from "antd";
-import Link from "next/link";
 import React, { useCallback, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { AppSession } from "src/generated/portal/app";
+import { ConnectTopAppLink } from "src/pageComponents/app/ConnectToAppLink";
 import { Cluster, CLUSTERS, publicConfig } from "src/utils/config";
 import { formatDateTime } from "src/utils/datetime";
 
 interface Props {
-
+  connectProps: Record<string, AppServer["connect"]>;
 }
 
 interface FilterForm {
@@ -18,7 +19,7 @@ interface FilterForm {
 }
 
 
-export const AppSessionsTable: React.FC<Props> = () => {
+export const AppSessionsTable: React.FC<Props> = ({ connectProps }) => {
 
   const [form] = Form.useForm<FilterForm>();
 
@@ -69,16 +70,13 @@ export const AppSessionsTable: React.FC<Props> = () => {
       render: (_, record) => (
         <Space>
           {
-            (record.state === "RUNNING" && record.address) ? (
+            (record.state === "RUNNING" && record.runInfo) ? (
               <>
-                <Link
-                  href={`/api/proxy/${record.address.host}/${record.address.port}/`}
-                  passHref
-                >
-                  <a target="_blank">
-                  连接
-                  </a>
-                </Link>
+                <ConnectTopAppLink
+                  sessionId={record.sessionId}
+                  runInfo={record.runInfo}
+                  connectProps={connectProps[record.appId]}
+                />
                 <Popconfirm
                   title="确定结束这个任务吗？"
                   onConfirm={async () =>

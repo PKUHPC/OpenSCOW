@@ -31,6 +31,8 @@ title: "portal-web"
 |`MIS_PATH`|字符串|管理系统的链接。如果不设置，则不显示到管理系统的链接|不设置|
 |`ENABLE_SHELL`|布尔值|是否启用Shell功能|false|
 |`SSH_PRIVATE_KEY_PATH`|字符串|SSH私钥路径|~/.ssh/id_rsa|
+|`SUBMIT_JOB_DEFAULT_PWD`|字符串|提交作业的默认工作目录。使用{name}代替作业名称。相对于用户的家目录|scow/jobs/{name}|
+|`PROXY_BASE_PATH`|字符串|代理地址的根路径|/proxy|
 
 <!-- ENV TABLE END -->
 

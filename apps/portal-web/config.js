@@ -53,6 +53,8 @@ const specs = {
   SSH_PRIVATE_KEY_PATH: str({ desc: "SSH私钥路径", default: path.join(homedir(), ".ssh", "id_rsa") }),
 
   SUBMIT_JOB_DEFAULT_PWD: str({ desc: "提交作业的默认工作目录。使用{name}代替作业名称。相对于用户的家目录", default: "scow/jobs/{name}" }),
+
+  PROXY_BASE_PATH: str({ desc: "代理地址的根路径", default: "/proxy" }),
 };
 
 const config = envConfig(specs, process.env);
@@ -68,24 +70,8 @@ const configPath = production ? undefined : path.join(__dirname, "config");
  */
 const clusters = getConfigFromFile(ClustersConfigSchema, ClustersConfigName, false, configPath);
 
-/**
- * @type {import("./src/utils/config").ServerRuntimeConfig}
- */
-const serverRuntimeConfig = {
-  AUTH_EXTERNAL_URL: config.AUTH_EXTERNAL_URL,
-  AUTH_INTERNAL_URL: config.AUTH_INTERNAL_URL,
-  DEFAULT_FOOTER_TEXT: config.DEFAULT_FOOTER_TEXT,
-  DEFAULT_PRIMARY_COLOR: config.DEFAULT_PRIMARY_COLOR,
-  FOOTER_TEXTS: parseKeyValue(config.FOOTER_TEXTS),
-  PRIMARY_COLORS: parseKeyValue(config.PRIMARY_COLORS),
-  JOB_SERVER: config.JOB_SERVER,
-  SSH_PRIVATE_KEY_PATH: config.SSH_PRIVATE_KEY_PATH,
-  CLUSTERS_CONFIG: clusters,
-};
-
-
+// get available apps
 function getApps() {
-  // get available apps
   const fs = require("fs");
   const { APP_SERVER_CONFIG_BASE_PATH, AppServerConfigSchema } = require("@scow/config/build/appConfig/appServer");
 
@@ -99,11 +85,28 @@ function getApps() {
   const apps = fs.readdirSync(appsPath);
 
   return apps.map((filename) => {
-    const info = getConfigFromFile(AppServerConfigSchema,
+    return getConfigFromFile(AppServerConfigSchema,
       path.join(APP_SERVER_CONFIG_BASE_PATH, path.basename(filename, path.extname(filename))), false, configPath);
-    return { id: info.id, name: info.name };
   });
 }
+
+const apps = getApps();
+
+/**
+ * @type {import("./src/utils/config").ServerRuntimeConfig}
+ */
+const serverRuntimeConfig = {
+  AUTH_EXTERNAL_URL: config.AUTH_EXTERNAL_URL,
+  AUTH_INTERNAL_URL: config.AUTH_INTERNAL_URL,
+  DEFAULT_FOOTER_TEXT: config.DEFAULT_FOOTER_TEXT,
+  DEFAULT_PRIMARY_COLOR: config.DEFAULT_PRIMARY_COLOR,
+  FOOTER_TEXTS: parseKeyValue(config.FOOTER_TEXTS),
+  PRIMARY_COLORS: parseKeyValue(config.PRIMARY_COLORS),
+  JOB_SERVER: config.JOB_SERVER,
+  SSH_PRIVATE_KEY_PATH: config.SSH_PRIVATE_KEY_PATH,
+  CLUSTERS_CONFIG: clusters,
+  APPS: apps,
+};
 
 /**
  * @type {import("./src/utils/config").PublicRuntimeConfig}
@@ -135,10 +138,11 @@ const publicRuntimeConfig = {
 
   CLUSTERS_CONFIG: clusters,
 
-  APPS: getApps(),
+  APPS: apps.map(({ id, name }) => ({ id, name })),
 
   SUBMIT_JOB_WORKING_DIR: config.SUBMIT_JOB_DEFAULT_PWD,
 
+  PROXY_BASE_PATH: config.PROXY_BASE_PATH,
 }
 
 if (!building) {

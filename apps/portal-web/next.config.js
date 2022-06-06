@@ -13,7 +13,6 @@ const config = {
   serverRuntimeConfig,
   publicRuntimeConfig,
   basePath: process.env.NEXT_PUBLIC_BASE_PATH,
-  trailingSlash: true,
   compiler: {
     styledComponents: true,
   }
