@@ -200,7 +200,7 @@ importers:
       '@types/node-cron': 3.0.1
       '@types/wait-on': 5.3.1
       dotenv: 16.0.1
-      node-cron: 3.0.0
+      node-cron: 3.0.1
       node-ssh: 12.0.4
       undici: 5.4.0
       wait-on: 6.0.1
@@ -217,7 +217,7 @@ importers:
       '@scow/lib-decimal': link:../../libs/decimal
       '@sinclair/typebox': 0.23.5
       dotenv: 16.0.1
-      node-cron: 3.0.0
+      node-cron: 3.0.1
       node-ssh: 12.0.4
       undici: 5.4.0
       wait-on: 6.0.1
@@ -10094,11 +10094,9 @@ packages:
       semver: 5.7.1
     dev: true
 
-  /node-cron/3.0.0:
-    resolution: {integrity: sha512-DDwIvvuCwrNiaU7HEivFDULcaQualDv7KoNlB/UU1wPW0n1tDEmBJKhEIE6DlF2FuoOHcNbLJ8ITL2Iv/3AWmA==}
+  /node-cron/3.0.1:
+    resolution: {integrity: sha512-RAWZTNn2M5KDIUV/389UX0EXsqvdFAwc9QwHQceh0Ga56dygqSRthqIjwpgZsoDspHGt2rkHdk9Z4RgfPMdALw==}
     engines: {node: '>=6.0.0'}
-    dependencies:
-      moment-timezone: 0.5.34
     dev: false
 
   /node-emoji/1.11.0:
