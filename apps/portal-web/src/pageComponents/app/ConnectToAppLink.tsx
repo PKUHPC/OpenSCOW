@@ -1,8 +1,10 @@
 import { AppServer } from "@scow/config/build/appConfig/appServer";
 import { parsePlaceholder } from "@scow/config/build/parse";
 import Link from "next/link";
+import { join } from "path";
 import { useMemo } from "react";
 import { AppSession_RunInfo } from "src/generated/portal/app";
+import { publicConfig } from "src/utils/config";
 
 export interface Props {
   connectProps: AppServer["connect"] | undefined;
@@ -40,7 +42,7 @@ export const ConnectTopAppLink: React.FC<Props> = ({
     return { path, query, formData };
   }, [host, password, port]);
 
-  const pathname = `/api/proxy/${host}/${port}${path}`;
+  const pathname = join(publicConfig.PROXY_BASE_PATH, host, String(port), path);
 
   if (connectProps.method === "GET") {
     return (

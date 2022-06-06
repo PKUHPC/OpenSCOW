@@ -3,6 +3,7 @@ import { join } from "path";
 import React, { useState } from "react";
 import { api } from "src/apis";
 import type { DesktopItem } from "src/pageComponents/desktop/DesktopTable";
+import { publicConfig } from "src/utils/config";
 
 interface Props {
   reload: () => void;
@@ -12,7 +13,7 @@ interface Props {
 export const openDesktop = (node: string, port: number, password: string) => {
 
   const params = new URLSearchParams({
-    path: join(process.env.NEXT_PUBLIC_BASE_PATH ?? "", `api/proxy/${node}/${port}`),
+    path: join(publicConfig.PROXY_BASE_PATH, node, String(port)),
     password: password,
     autoconnect: "true",
     reconnect: "true",

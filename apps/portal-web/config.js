@@ -53,6 +53,8 @@ const specs = {
   SSH_PRIVATE_KEY_PATH: str({ desc: "SSH私钥路径", default: path.join(homedir(), ".ssh", "id_rsa") }),
 
   SUBMIT_JOB_DEFAULT_PWD: str({ desc: "提交作业的默认工作目录。使用{name}代替作业名称。相对于用户的家目录", default: "scow/jobs/{name}" }),
+
+  PROXY_BASE_PATH: str({ desc: "代理地址的根路径", default: "/proxy" }),
 };
 
 const config = envConfig(specs, process.env);
@@ -139,6 +141,8 @@ const publicRuntimeConfig = {
   APPS: apps.map(({ id, name }) => ({ id, name })),
 
   SUBMIT_JOB_WORKING_DIR: config.SUBMIT_JOB_DEFAULT_PWD,
+
+  PROXY_BASE_PATH: config.PROXY_BASE_PATH,
 }
 
 if (!building) {

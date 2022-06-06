@@ -4,6 +4,7 @@ import { authenticate } from "src/auth/server";
 import { VncServiceClient } from "src/generated/portal/vnc";
 import { getJobServerClient } from "src/utils/client";
 import { publicConfig } from "src/utils/config";
+import { dnsResolve } from "src/utils/dns";
 
 export interface LaunchDesktopSchema {
   method: "POST";
@@ -43,7 +44,8 @@ export default /* #__PURE__*/route<LaunchDesktopSchema>("LaunchDesktopSchema", a
     username: info.identityId,
     displayId: req.body.displayId,
   })
-    .then(({ node, password, port }) => {
-      return { 200: { node, password, port } };
+    .then(async ({ node, password, port }) => {
+      // nginx doesn't use /etc/hosts. The host must be resolved before passing to nginx
+      return { 200: { node: await dnsResolve(node), password, port } };
     });
 });

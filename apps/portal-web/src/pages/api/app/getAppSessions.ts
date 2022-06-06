@@ -3,6 +3,7 @@ import { asyncClientCall } from "@ddadaal/tsgrpc-utils";
 import { authenticate } from "src/auth/server";
 import { AppServiceClient, AppSession } from "src/generated/portal/app";
 import { getJobServerClient } from "src/utils/client";
+import { dnsResolve } from "src/utils/dns";
 
 export interface GetAppSessionsSchema {
   method: "GET";
@@ -34,7 +35,14 @@ export default /* #__PURE__*/route<GetAppSessionsSchema>("GetAppSessionsSchema",
     cluster,
     userId: info.identityId,
   })
-    .then(({ sessions }) => {
+    .then(async ({ sessions }) => {
+      // Resolve hosts
+      await Promise.all(sessions.map(async (x) => {
+        if (x.runInfo) {
+          x.runInfo.host = await dnsResolve(x.runInfo.host);
+        }
+      }));
+
       return { 200: { sessions } };
     });
 });

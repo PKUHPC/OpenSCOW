@@ -53,6 +53,8 @@ export interface PublicRuntimeConfig {
   APPS: { id: string; name: string }[];
 
   SUBMIT_JOB_WORKING_DIR: string;
+
+  PROXY_BASE_PATH: string;
 }
 
 export const runtimeConfig: ServerRuntimeConfig = getConfig().serverRuntimeConfig;
