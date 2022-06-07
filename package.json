@@ -33,7 +33,7 @@
     "rimraf": "3.0.2",
     "ts-jest": "28.0.4",
     "ts-node": "10.8.1",
-    "tsc-alias": "1.6.8",
+    "tsc-alias": "1.6.9",
     "tsconfig-paths": "4.0.0",
     "typescript": "4.7.3",
     "pkg": "5.7.0",
