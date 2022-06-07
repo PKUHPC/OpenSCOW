@@ -231,7 +231,7 @@ importers:
     specifiers:
       '@ant-design/icons': 4.7.0
       '@ddadaal/next-typed-api-routes-cli': 0.5.0
-      '@ddadaal/next-typed-api-routes-runtime': 0.4.0
+      '@ddadaal/next-typed-api-routes-runtime': 0.5.1
       '@ddadaal/tsgrpc-cli': 0.13.0
       '@ddadaal/tsgrpc-utils': 0.14.0
       '@grpc/grpc-js': 1.6.7
@@ -270,7 +270,7 @@ importers:
       webpack: 5.73.0
     dependencies:
       '@ant-design/icons': 4.7.0_ef5jwxihqo6n7gxfmzogljlgcm
-      '@ddadaal/next-typed-api-routes-runtime': 0.4.0_next@12.1.6
+      '@ddadaal/next-typed-api-routes-runtime': 0.5.1_next@12.1.6
       '@ddadaal/tsgrpc-utils': 0.14.0_@grpc+grpc-js@1.6.7
       '@grpc/grpc-js': 1.6.7
       '@newhighsco/next-plugin-svgr': 3.0.50_next@12.1.6+webpack@5.73.0
@@ -322,7 +322,7 @@ importers:
       '@codemirror/theme-one-dark': 0.20.0
       '@codemirror/view': 0.20.7
       '@ddadaal/next-typed-api-routes-cli': 0.5.0
-      '@ddadaal/next-typed-api-routes-runtime': 0.4.0
+      '@ddadaal/next-typed-api-routes-runtime': 0.5.1
       '@ddadaal/tsgrpc-cli': 0.13.0
       '@ddadaal/tsgrpc-utils': 0.14.0
       '@grpc/grpc-js': 1.6.7
@@ -376,7 +376,7 @@ importers:
       '@codemirror/state': 0.20.0
       '@codemirror/theme-one-dark': 0.20.0
       '@codemirror/view': 0.20.7
-      '@ddadaal/next-typed-api-routes-runtime': 0.4.0_next@12.1.6
+      '@ddadaal/next-typed-api-routes-runtime': 0.5.1_next@12.1.6
       '@ddadaal/tsgrpc-utils': 0.14.0_@grpc+grpc-js@1.6.7
       '@grpc/grpc-js': 1.6.7
       '@newhighsco/next-plugin-svgr': 3.0.50_next@12.1.6+webpack@5.73.0
@@ -2130,8 +2130,8 @@ packages:
       yargs: 17.5.1
     dev: true
 
-  /@ddadaal/next-typed-api-routes-runtime/0.4.0_next@12.1.6:
-    resolution: {integrity: sha512-QSNSxD8s1pCU2jKKAexUwSFLkgUWkuMYY8cqV0BNIVqOHVHeGW43dLZH5Dya8HF/47NxrfKOHfJ31NmhKUcP1A==}
+  /@ddadaal/next-typed-api-routes-runtime/0.5.1_next@12.1.6:
+    resolution: {integrity: sha512-+6cYTrz7WH3QhlYiQSf/WZBid2DAVEv5pzN6r5s3mNYrfdROxHdeohbtDFZmYCv+qL9Pf91NBvJaWuR+vfKzsw==}
     peerDependencies:
       next: '>=11.x'
     dependencies:
@@ -2139,7 +2139,6 @@ packages:
       ajv-formats: 2.1.1
       ajv-formats-draft2019: 1.6.1_ajv@8.11.0
       fast-json-stringify: 4.0.0
-      long: 5.2.0
       next: 12.1.6_ef5jwxihqo6n7gxfmzogljlgcm
       tslib: 2.4.0
     dev: false
