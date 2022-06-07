@@ -42,7 +42,7 @@ export const CustomizableLogoAndText: React.FC<Props> = ({ hostname }) => {
       <Logo >
         <Image
           alt="logo"
-          src="/api/logo/"
+          src="/api/logo"
           layout="fill"
           objectFit="contain"
         />
