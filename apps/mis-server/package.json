@@ -32,7 +32,8 @@
     "node-cron": "3.0.1",
     "undici": "5.4.0",
     "dotenv": "16.0.1",
-    "node-ssh": "12.0.4"
+    "node-ssh": "12.0.4",
+    "uuid": "8.3.2"
   },
   "devDependencies": {
     "@types/node-cron": "3.0.1",
