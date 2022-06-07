@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@ant-design/icons": "4.7.0",
-    "@ddadaal/next-typed-api-routes-runtime": "0.5.1",
+    "@ddadaal/next-typed-api-routes-runtime": "0.3.2",
     "@ddadaal/tsgrpc-utils": "0.14.0",
     "@scow/lib-decimal": "workspace:*",
     "@scow/config": "workspace:*",
@@ -40,7 +40,7 @@
     "moment": "2.29.3"
   },
   "devDependencies": {
-    "@ddadaal/next-typed-api-routes-cli": "0.5.0",
+    "@ddadaal/next-typed-api-routes-cli": "0.4.0",
     "@ddadaal/tsgrpc-cli": "0.13.0",
     "@next/bundle-analyzer": "12.1.6",
     "@types/google-protobuf": "3.15.6",
