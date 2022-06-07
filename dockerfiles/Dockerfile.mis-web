@@ -22,6 +22,9 @@ COPY libs/config ./libs/config
 COPY libs/decimal ./libs/decimal
 COPY apps/mis-web apps/mis-web
 
+ARG BASE_PATH=""
+ENV NEXT_PUBLIC_BASE_PATH=$BASE_PATH
+
 RUN pnpm run build
 
 RUN rm -rf node_modules && pnpm i --prod --frozen-lockfile --offline
