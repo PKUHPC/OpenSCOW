@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@ant-design/icons": "4.7.0",
-    "@ddadaal/next-typed-api-routes-runtime": "0.3.2",
+    "@ddadaal/next-typed-api-routes-runtime": "0.5.1",
     "@ddadaal/tsgrpc-utils": "0.14.0",
     "@scow/lib-decimal": "workspace:*",
     "@scow/config": "workspace:*",
