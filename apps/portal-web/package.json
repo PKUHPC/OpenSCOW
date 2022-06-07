@@ -56,7 +56,7 @@
     "random-words": "1.1.2"
   },
   "devDependencies": {
-    "@ddadaal/next-typed-api-routes-cli": "0.4.0",
+    "@ddadaal/next-typed-api-routes-cli": "0.5.0",
     "@ddadaal/tsgrpc-cli": "0.13.0",
     "@next/bundle-analyzer": "12.1.6",
     "@types/google-protobuf": "3.15.6",
