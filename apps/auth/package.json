@@ -20,7 +20,7 @@
     "ioredis": "5.0.6",
     "fastify-graceful-shutdown": "3.1.0",
     "fastify-plugin": "3.0.1",
-    "nanoid": "3.3.4",
+    "nanoid": "4.0.0",
     "ldapjs": "2.3.3",
     "@fastify/formbody": "6.0.1",
     "@fastify/static": "5.0.2",

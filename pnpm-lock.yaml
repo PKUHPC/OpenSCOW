@@ -71,7 +71,7 @@ importers:
       fastify-plugin: 3.0.1
       ioredis: 5.0.6
       ldapjs: 2.3.3
-      nanoid: 3.3.4
+      nanoid: 4.0.0
     dependencies:
       '@fastify/error': 3.0.0
       '@fastify/formbody': 6.0.1
@@ -84,7 +84,7 @@ importers:
       fastify-plugin: 3.0.1
       ioredis: 5.0.6
       ldapjs: 2.3.3
-      nanoid: 3.3.4
+      nanoid: 4.0.0
     devDependencies:
       '@types/asn1': 0.2.0
       '@types/ldapjs': 2.2.2
@@ -133,7 +133,7 @@ importers:
       fastify-plugin: 3.0.1
       form-data: 4.0.0
       mime-types: 2.1.35
-      nanoid: 3.3.4
+      nanoid: 4.0.0
       shell-quote: 1.7.3
     dependencies:
       '@fastify/cookie': 6.0.0
@@ -150,7 +150,7 @@ importers:
       fastify-graceful-shutdown: 3.1.0
       fastify-plugin: 3.0.1
       mime-types: 2.1.35
-      nanoid: 3.3.4
+      nanoid: 4.0.0
       shell-quote: 1.7.3
     devDependencies:
       '@ddadaal/tsgrpc-cli': 0.13.0
@@ -10042,6 +10042,12 @@ packages:
     resolution: {integrity: sha512-MqBkQh/OHTS2egovRtLk45wEyNXwF+cokD+1YPf9u5VfJiRdAiRwB2froX5Co9Rh20xs4siNPm8naNotSD6RBw==}
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
+
+  /nanoid/4.0.0:
+    resolution: {integrity: sha512-IgBP8piMxe/gf73RTQx7hmnhwz0aaEXYakvqZyE302IXW3HyVNhdNGC+O2MwMAVhLEnvXlvKtGbtJf6wvHihCg==}
+    engines: {node: ^14 || ^16 || >=18}
+    hasBin: true
+    dev: false
 
   /napi-build-utils/1.0.2:
     resolution: {integrity: sha512-ONmRUqK7zj7DWX0D9ADe03wbwOBZxNAfF20PlGfCWQcD3+/MakShIHrMqx9YwPTfxDdF1zLeL+RGZiR9kGMLdg==}
