@@ -21,7 +21,7 @@
     "fastify-graceful-shutdown": "3.1.0",
     "fastify-plugin": "3.0.1",
     "nanoid": "3.3.4",
-    "ldapjs": "2.3.2",
+    "ldapjs": "2.3.3",
     "@fastify/formbody": "6.0.1",
     "@fastify/static": "5.0.2",
     "asn1": "0.2.6"

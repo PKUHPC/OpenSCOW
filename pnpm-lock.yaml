@@ -70,7 +70,7 @@ importers:
       fastify-graceful-shutdown: 3.1.0
       fastify-plugin: 3.0.1
       ioredis: 5.0.6
-      ldapjs: 2.3.2
+      ldapjs: 2.3.3
       nanoid: 3.3.4
     dependencies:
       '@fastify/error': 3.0.0
@@ -83,7 +83,7 @@ importers:
       fastify-graceful-shutdown: 3.1.0
       fastify-plugin: 3.0.1
       ioredis: 5.0.6
-      ldapjs: 2.3.2
+      ldapjs: 2.3.3
       nanoid: 3.3.4
     devDependencies:
       '@types/asn1': 0.2.0
@@ -9485,8 +9485,8 @@ packages:
       assert-plus: 1.0.0
     dev: false
 
-  /ldapjs/2.3.2:
-    resolution: {integrity: sha512-FU+GR/qbQ96WUZ2DUb7FzaEybYvv3240wTVPcbsdELB3o4cK92zGVjntsh68siVkLeCmlCcsd/cIQzyGXSS7LA==}
+  /ldapjs/2.3.3:
+    resolution: {integrity: sha512-75QiiLJV/PQqtpH+HGls44dXweviFwQ6SiIK27EqzKQ5jU/7UFrl2E5nLdQ3IYRBzJ/AVFJI66u0MZ0uofKYwg==}
     engines: {node: '>=10.13.0'}
     dependencies:
       abstract-logging: 2.0.1
@@ -11252,7 +11252,7 @@ packages:
     dev: true
 
   /precond/0.2.3:
-    resolution: {integrity: sha1-qpWRvKokkj8eD0hJ0kD0fvwQdaw=}
+    resolution: {integrity: sha512-QCYG84SgGyGzqJ/vlMsxeXd/pgL/I94ixdNFyh1PusWmTCyVfPJjZ1K1jvHtsbfnXQs2TSkEP2fR7QiMZAnKFQ==}
     engines: {node: '>= 0.6'}
     dev: false
 
