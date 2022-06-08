@@ -27,7 +27,7 @@
     "nanoid": "3.3.4",
     "@fastify/formbody": "7.0.0",
     "@fastify/static": "5.0.2",
-    "@fastify/cookie": "6.0.0",
+    "@fastify/cookie": "7.0.0",
     "@fastify/multipart": "6.0.0",
     "shell-quote": "1.7.3",
     "mime-types": "2.1.35"

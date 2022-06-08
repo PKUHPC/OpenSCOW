@@ -115,7 +115,7 @@ importers:
   apps/file-server:
     specifiers:
       '@ddadaal/tsgrpc-cli': 0.13.0
-      '@fastify/cookie': 6.0.0
+      '@fastify/cookie': 7.0.0
       '@fastify/error': 3.0.0
       '@fastify/formbody': 7.0.0
       '@fastify/multipart': 6.0.0
@@ -136,7 +136,7 @@ importers:
       nanoid: 3.3.4
       shell-quote: 1.7.3
     dependencies:
-      '@fastify/cookie': 6.0.0
+      '@fastify/cookie': 7.0.0
       '@fastify/error': 3.0.0
       '@fastify/formbody': 7.0.0
       '@fastify/multipart': 6.0.0
@@ -2898,8 +2898,8 @@ packages:
       text-decoding: 1.0.0
     dev: false
 
-  /@fastify/cookie/6.0.0:
-    resolution: {integrity: sha512-Luy3Po3dOJmqAuPCiPcWsX0tV5+C3AOnULSdlsGjNGOvyE7jqzysp8kT9ICfsUvove+TeUMgTWl1y9XS3ZPPMg==}
+  /@fastify/cookie/7.0.0:
+    resolution: {integrity: sha512-/JQcHR4bsFGRo39esT1GTxB0MsMd3loJxNfHYV0MRduXvdiDJd94okiCBlPOesRxwA5dJCqFNo80J7muHG+T+w==}
     dependencies:
       cookie-signature: 1.2.0
       fastify-plugin: 3.0.1
