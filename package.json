@@ -11,7 +11,8 @@
     "test": "pnpm run -r test",
     "test:ci": "pnpm run -r test:ci",
     "prepare": "node -e \"try { require('husky').install() } catch (e) {if (e.code !== 'MODULE_NOT_FOUND') throw e}\"",
-    "lint": "eslint --cache '**/*.ts' '**/*.tsx'"
+    "lint": "eslint --cache '**/*.ts' '**/*.tsx'",
+    "cm": "cz"
   },
   "dependencies": {
     "@milahu/patch-package": "6.4.14"
@@ -41,7 +42,11 @@
     "typescript": "4.7.3",
     "pkg": "5.7.0",
     "nodemon": "2.0.16",
-    "husky": "8.0.1"
+    "husky": "8.0.1",
+    "@commitlint/config-conventional": "17.0.2",
+    "@commitlint/cli": "17.0.2",
+    "commitizen": "4.2.4",
+    "cz-conventional-changelog": "3.3.0"
   },
   "volta": {
     "node": "16.15.1"
