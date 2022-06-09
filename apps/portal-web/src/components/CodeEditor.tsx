@@ -18,7 +18,7 @@ const Container = styled.div`
   border-radius: 2px;
 `;
 
-export const Editor: React.FC<Props> = ({ value, onChange, height = "" }) => {
+export const CodeEditor: React.FC<Props> = ({ value, onChange, height = "" }) => {
 
   const view = useRef<EditorView>();
   const editor = useRef<HTMLDivElement>(null);

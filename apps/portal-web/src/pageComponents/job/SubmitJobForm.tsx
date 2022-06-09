@@ -6,7 +6,7 @@ import randomWords from "random-words";
 import React, { useEffect, useMemo, useState } from "react";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
-import { Editor } from "src/components/Editor";
+import { CodeEditor } from "src/components/CodeEditor";
 import { InputGroupFormItem } from "src/components/InputGroupFormItem";
 import { AccountSelector } from "src/pageComponents/job/AccountSelector";
 import { Cluster, publicConfig } from "src/utils/config";
@@ -137,7 +137,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
         </Col>
       </Row>
       <Form.Item<JobForm> label="命令" name="command" rules={[{ required: true }]}>
-        <Editor height="50vh" />
+        <CodeEditor height="50vh" />
       </Form.Item>
       <Row gutter={4}>
         <Col span={24} sm={12}>
