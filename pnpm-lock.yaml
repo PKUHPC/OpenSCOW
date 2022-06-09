@@ -60,7 +60,7 @@ importers:
     specifiers:
       '@fastify/error': 3.0.0
       '@fastify/formbody': 6.0.1
-      '@fastify/static': 5.0.2
+      '@fastify/static': 6.4.0
       '@scow/config': workspace:*
       '@sinclair/typebox': 0.23.5
       '@types/asn1': 0.2.0
@@ -75,7 +75,7 @@ importers:
     dependencies:
       '@fastify/error': 3.0.0
       '@fastify/formbody': 6.0.1
-      '@fastify/static': 5.0.2
+      '@fastify/static': 6.4.0
       '@scow/config': link:../../libs/config
       '@sinclair/typebox': 0.23.5
       asn1: 0.2.6
@@ -119,7 +119,7 @@ importers:
       '@fastify/error': 3.0.0
       '@fastify/formbody': 7.0.0
       '@fastify/multipart': 6.0.0
-      '@fastify/static': 5.0.2
+      '@fastify/static': 6.4.0
       '@fastify/swagger': 6.1.0
       '@grpc/grpc-js': 1.6.7
       '@scow/config': workspace:*
@@ -140,7 +140,7 @@ importers:
       '@fastify/error': 3.0.0
       '@fastify/formbody': 7.0.0
       '@fastify/multipart': 6.0.0
-      '@fastify/static': 5.0.2
+      '@fastify/static': 6.4.0
       '@grpc/grpc-js': 1.6.7
       '@scow/config': link:../../libs/config
       '@scow/lib-auth': link:../../libs/auth
@@ -2950,6 +2950,21 @@ packages:
       send: 0.17.2
     transitivePeerDependencies:
       - supports-color
+    dev: true
+
+  /@fastify/static/6.4.0:
+    resolution: {integrity: sha512-1GFNBKh4ArUpHMCwPUILurpfV3+mTvn+6r6aOQUwP8KKqWJtEAQ1blIwjE16JetmgpIYYamcBUUmojjHDfhgKA==}
+    dependencies:
+      content-disposition: 0.5.4
+      encoding-negotiator: 2.0.1
+      fastify-plugin: 3.0.1
+      glob: 8.0.3
+      p-limit: 3.1.0
+      readable-stream: 3.6.0
+      send: 0.18.0
+    transitivePeerDependencies:
+      - supports-color
+    dev: false
 
   /@fastify/swagger/6.1.0:
     resolution: {integrity: sha512-oum6QzV1/8/2eqWOEYzqwhRJQ3ftpxfGnDGmAinLIyeTrsr7xpNev/8iRxAAb7S6S8KRIIybkhvzvkuqnQKTkA==}
@@ -5426,7 +5441,6 @@ packages:
     resolution: {integrity: sha512-XnAIvQ8eM+kC6aULx6wuQiwVsnzsi9d3WxzV3FpWTGA19F621kwdbsAcFKXgKUHZWsy+mY6iL1sHTxWEFCytDA==}
     dependencies:
       balanced-match: 1.0.2
-    dev: true
 
   /braces/3.0.2:
     resolution: {integrity: sha512-b8um+L1RzM3WDSzvhm6gIz1yfTbBt6YTlcEKAvsmqCZZFw46z626lVj9j1yEPW33H5H+lBQpZMP1k8l+78Ha0A==}
@@ -6449,6 +6463,7 @@ packages:
 
   /destroy/1.0.4:
     resolution: {integrity: sha512-3NdhDuEXnfun/z7x9GOElY49LoqVHoGScmOKwmxhsS8N5Y+Z8KyPPDnaSzqWgYt/ji4mqwfTS34Htrk0zPIXVg==}
+    dev: true
 
   /destroy/1.2.0:
     resolution: {integrity: sha512-2sJGJTaXIIaR1w4iJSNoN0hnMY7Gpc/n8D4qSCJw8QqFWXf7cuAgnEHxBpweaVcPevC2l3KpjYCx3NypQQgaJg==}
@@ -6695,7 +6710,7 @@ packages:
     dev: false
 
   /ee-first/1.1.1:
-    resolution: {integrity: sha1-WQxhFWsK4vTwJVcyoViyZrxWsh0=}
+    resolution: {integrity: sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==}
 
   /electron-to-chromium/1.4.143:
     resolution: {integrity: sha512-2hIgvu0+pDfXIqmVmV5X6iwMjQ2KxDsWKwM+oI1fABEOy/Dqmll0QJRmIQ3rm+XaoUa/qKrmy5h7LSTFQ6Ldzg==}
@@ -7616,7 +7631,7 @@ packages:
     dev: false
 
   /fresh/0.5.2:
-    resolution: {integrity: sha1-PYyt2Q2XZWn6g1qx+OSyOhBWBac=}
+    resolution: {integrity: sha512-zJ2mQYM18rEFOudeV4GShTGIQ7RbzA7ozbU9I/XBpm7kqgMywgmylMwXHxZJmkVoYkna9d2pVXVXPdYTP9ej8Q==}
     engines: {node: '>= 0.6'}
 
   /from2/2.3.0:
@@ -7824,7 +7839,6 @@ packages:
       inherits: 2.0.4
       minimatch: 5.1.0
       once: 1.4.0
-    dev: true
 
   /global-dirs/3.0.0:
     resolution: {integrity: sha512-v8ho2DS5RiCjftj1nD9NmnfaOzTdud7RRnVd9kFNOjqZbISlx5DQ+OrTkywgd0dIt7oFCvKetZSHoHcP3sDdiA==}
@@ -8213,6 +8227,7 @@ packages:
       setprototypeof: 1.2.0
       statuses: 1.5.0
       toidentifier: 1.0.1
+    dev: true
 
   /http-errors/2.0.0:
     resolution: {integrity: sha512-FtwrG/euBzaEjYeRqOgly7G0qviiXoJWnvEH2Z1plBdXgbyjv34pHTSb9zoeHMyDy33+DWy5Wt9Wo+TURtOYSQ==}
@@ -9931,7 +9946,6 @@ packages:
     engines: {node: '>=10'}
     dependencies:
       brace-expansion: 2.0.1
-    dev: true
 
   /minimist/1.2.6:
     resolution: {integrity: sha512-Jsjnk4bw3YJqYzbdyBiNsPWHPfO++UGG749Cxs6peCu5Xg4nrena6OVxOYxrQTqww0Jmwt+Ref8rggumkTLz9Q==}
@@ -10383,6 +10397,7 @@ packages:
     engines: {node: '>= 0.8'}
     dependencies:
       ee-first: 1.1.1
+    dev: true
 
   /on-finished/2.4.1:
     resolution: {integrity: sha512-oVlzkg3ENAhCk2zdv7IJwd/QUD4z2RxRwpkcGY8psCVcCYZNq4wYnVWALHM+brtuJjePWiYF/ClmuDr8Ch5+kg==}
@@ -12758,6 +12773,7 @@ packages:
       statuses: 1.5.0
     transitivePeerDependencies:
       - supports-color
+    dev: true
 
   /send/0.18.0:
     resolution: {integrity: sha512-qqWzuOjSFOuqPjFe4NOsMLafToQQwBSOEpS+FwEt3A2V3vKubTquT3vmLTQpFgMXp8AlFWFuP1qKaJZOtPpVXg==}

@@ -23,7 +23,7 @@
     "nanoid": "3.3.4",
     "ldapjs": "2.3.3",
     "@fastify/formbody": "6.0.1",
-    "@fastify/static": "5.0.2",
+    "@fastify/static": "6.4.0",
     "asn1": "0.2.6"
   },
   "devDependencies": {
