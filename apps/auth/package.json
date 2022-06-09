@@ -7,7 +7,8 @@
     "build": "rimraf build && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
     "dev": "nodemon --watch src -e ts --exec \"npx dotenv -e env/.env.dev -- npx ts-node -r tsconfig-paths/register src/index.ts\"",
     "test": "jest",
-    "test:ci": "jest --ci --coverage"
+    "test:ci": "jest --ci --coverage",
+    "postinstall": "patch-package"
   },
   "keywords": [],
   "author": "",
@@ -15,15 +16,15 @@
   "dependencies": {
     "@scow/config": "workspace:*",
     "@sinclair/typebox": "0.23.5",
-    "fastify": "3.29.0",
+    "fastify": "4.0.0",
     "@fastify/error": "3.0.0",
     "ioredis": "5.0.6",
     "fastify-graceful-shutdown": "3.1.0",
     "fastify-plugin": "3.0.1",
     "nanoid": "4.0.0",
     "ldapjs": "2.3.3",
-    "@fastify/formbody": "6.0.1",
-    "@fastify/static": "5.0.2",
+    "@fastify/formbody": "7.0.1",
+    "@fastify/static": "6.4.0",
     "asn1": "0.2.6"
   },
   "devDependencies": {

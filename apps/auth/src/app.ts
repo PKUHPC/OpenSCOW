@@ -3,9 +3,8 @@ import { omitConfigSpec } from "@scow/config";
 import fastify, { FastifyInstance, FastifyPluginAsync, FastifyPluginCallback } from "fastify";
 import gracefulShutdown from "fastify-graceful-shutdown";
 import { config } from "src/config/env";
-
-import { plugins } from "./plugins";
-import { routes }  from "./routes";
+import { plugins } from "src/plugins";
+import { routes }  from "src/routes";
 
 type Plugin = FastifyPluginAsync | FastifyPluginCallback;
 type PluginOverrides = Map<Plugin, Plugin>;
@@ -28,6 +27,10 @@ export function buildApp(pluginOverrides?: PluginOverrides) {
       customOptions: {
         coerceTypes: "array",
       },
+      plugins: [(ajv) => {
+        ajv.addKeyword({ keyword: "kind" });
+        ajv.addKeyword({ keyword: "modifier" });
+      }],
     },
     schemaErrorFormatter: (errors, dataVar) => {
       return new ValidationError(dataVar, errors);
@@ -46,7 +49,7 @@ export function buildApp(pluginOverrides?: PluginOverrides) {
 }
 
 export async function startServer(server: FastifyInstance) {
-  await server.listen(config.PORT, config.HOST).catch((err) => {
+  await server.listen({ port: config.PORT, host: config.HOST }).catch((err) => {
     server.log.error(err);
     throw err;
   });

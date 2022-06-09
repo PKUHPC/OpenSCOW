@@ -27,6 +27,10 @@ export function buildApp(pluginOverrides?: PluginOverrides) {
       customOptions: {
         coerceTypes: "array",
       },
+      plugins: [(ajv) => {
+        ajv.addKeyword({ keyword: "kind" });
+        ajv.addKeyword({ keyword: "modifier" });
+      }],
     },
     schemaErrorFormatter: (errors, dataVar) => {
       return new ValidationError(dataVar, errors);
@@ -45,7 +49,7 @@ export function buildApp(pluginOverrides?: PluginOverrides) {
 }
 
 export async function startServer(server: FastifyInstance) {
-  await server.listen(config.PORT, config.HOST).catch((err) => {
+  await server.listen({ port: config.PORT, host: config.HOST }).catch((err) => {
     server.log.error(err);
     throw err;
   });

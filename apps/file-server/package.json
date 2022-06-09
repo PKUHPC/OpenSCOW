@@ -9,7 +9,8 @@
     "dev": "nodemon --watch src -e ts --exec \"npx dotenv -e env/.env.dev -- npx ts-node -r tsconfig-paths/register src/index.ts\"",
     "test": "jest",
     "test:ci": "jest --ci --coverage",
-    "genApi": "dotenv -e env/.env.dev -- ts-node -r tsconfig-paths/register src/genSchema.ts"
+    "genApi": "dotenv -e env/.env.dev -- ts-node -r tsconfig-paths/register src/genSchema.ts",
+    "postinstall": "patch-package"
   },
   "keywords": [],
   "author": "",
@@ -20,15 +21,15 @@
     "@grpc/grpc-js": "1.6.7",
     "@sinclair/typebox": "0.23.5",
     "fast-json-stringify": "4.0.0",
-    "fastify": "3.29.0",
+    "fastify": "4.0.0",
     "@fastify/error": "3.0.0",
     "fastify-graceful-shutdown": "3.1.0",
     "fastify-plugin": "3.0.1",
     "nanoid": "4.0.0",
-    "@fastify/formbody": "7.0.0",
-    "@fastify/static": "5.0.2",
-    "@fastify/cookie": "6.0.0",
-    "@fastify/multipart": "6.0.0",
+    "@fastify/formbody": "7.0.1",
+    "@fastify/static": "6.4.0",
+    "@fastify/cookie": "7.0.0",
+    "@fastify/multipart": "7.0.0",
     "shell-quote": "1.7.3",
     "mime-types": "2.1.35"
   },
@@ -37,7 +38,7 @@
     "form-data": "4.0.0",
     "@types/shell-quote": "1.7.1",
     "@types/mime-types": "2.1.1",
-    "@fastify/swagger": "6.1.0"
+    "@fastify/swagger": "7.2.0"
   },
   "volta": {
     "extends": "../../package.json"

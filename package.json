@@ -13,6 +13,9 @@
     "prepare": "node -e \"try { require('husky').install() } catch (e) {if (e.code !== 'MODULE_NOT_FOUND') throw e}\"",
     "lint": "eslint --cache '**/*.ts' '**/*.tsx'"
   },
+  "dependencies": {
+    "@milahu/patch-package": "6.4.14"
+  },
   "devDependencies": {
     "@ddadaal/eslint-config": "1.5.0",
     "eslint-import-resolver-typescript": "2.7.1",
