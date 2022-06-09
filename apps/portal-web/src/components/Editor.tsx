@@ -1,9 +1,9 @@
 import { autocompletion } from "@codemirror/autocomplete";
-import { basicSetup } from "@codemirror/basic-setup";
 import { StreamLanguage } from "@codemirror/language";
 import { shell } from "@codemirror/legacy-modes/mode/shell";
 import { EditorState } from "@codemirror/state";
 import { EditorView } from "@codemirror/view";
+import { basicSetup } from "codemirror";
 import { useEffect, useRef } from "react";
 import styled from "styled-components";
 
