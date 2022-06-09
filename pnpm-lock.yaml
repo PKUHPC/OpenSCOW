@@ -59,7 +59,7 @@ importers:
   apps/auth:
     specifiers:
       '@fastify/error': 3.0.0
-      '@fastify/formbody': 6.0.1
+      '@fastify/formbody': 7.0.1
       '@fastify/static': 5.0.2
       '@scow/config': workspace:*
       '@sinclair/typebox': 0.23.5
@@ -74,7 +74,7 @@ importers:
       nanoid: 4.0.0
     dependencies:
       '@fastify/error': 3.0.0
-      '@fastify/formbody': 6.0.1
+      '@fastify/formbody': 7.0.1
       '@fastify/static': 5.0.2
       '@scow/config': link:../../libs/config
       '@sinclair/typebox': 0.23.5
@@ -117,7 +117,7 @@ importers:
       '@ddadaal/tsgrpc-cli': 0.13.0
       '@fastify/cookie': 6.0.0
       '@fastify/error': 3.0.0
-      '@fastify/formbody': 7.0.0
+      '@fastify/formbody': 7.0.1
       '@fastify/multipart': 6.0.0
       '@fastify/static': 5.0.2
       '@fastify/swagger': 6.1.0
@@ -138,7 +138,7 @@ importers:
     dependencies:
       '@fastify/cookie': 6.0.0
       '@fastify/error': 3.0.0
-      '@fastify/formbody': 7.0.0
+      '@fastify/formbody': 7.0.1
       '@fastify/multipart': 6.0.0
       '@fastify/static': 5.0.2
       '@grpc/grpc-js': 1.6.7
@@ -2913,14 +2913,8 @@ packages:
     resolution: {integrity: sha512-dPRyT40GiHRzSCll3/Jn2nPe25+E1VXc9tDwRAIKwFCxd5Np5wzgz1tmooWG3sV0qKgrBibihVoCna2ru4SEFg==}
     dev: false
 
-  /@fastify/formbody/6.0.1:
-    resolution: {integrity: sha512-yIwCitoES4Sh0tPc6v+uHBqZEKw3CooSZ4kUvO9NC8Y7oRBCW+aC+pTgUZ8M3r2DOzRkNO+Pq0jMQkyL2k8jZQ==}
-    dependencies:
-      fastify-plugin: 3.0.1
-    dev: false
-
-  /@fastify/formbody/7.0.0:
-    resolution: {integrity: sha512-PrOrwR4fxzxkdE65Ex1c0bhl7UvUc47GTfhkHQhnROXc2p485ANR/A4Sl3uYhNvuFVAQtLQYNwjRZL8d6HOAOA==}
+  /@fastify/formbody/7.0.1:
+    resolution: {integrity: sha512-CY6IfzdtidHbZezyyXv7u9dzmb2Lv92HyOZDqANuFb++5ojsqoqIb8bJz11bSgPK0MDoqww/dH6DxZDMM8N4ng==}
     dependencies:
       fastify-plugin: 3.0.1
     dev: false
