@@ -4,10 +4,11 @@
   "scripts": {
     "build": "pnpm run -r build",
     "build:libs": "pnpm --filter './libs/**' run build",
+    "build:containers": "docker compose --env-file dev/.env -f dev/docker-compose.build.yml build",
     "prepareDev": "pnpm build:libs && pnpm run -r prepareDev",
     "prune": "pnpm clean --yes && pnpm bootstrap --ci -- --production",
-    "devenv": "docker compose -f docker-compose.dev.yml up -d",
-    "devenv:stop": "docker compose -f docker-compose.dev.yml down",
+    "devenv": "docker compose --env-file dev/.env -f dev/docker-compose.dev.yml up -d",
+    "devenv:stop": "docker compose --env-file dev/.env -f dev/docker-compose.dev.yml down",
     "test": "pnpm run -r test",
     "test:ci": "pnpm run -r test --ci --coverage --runInBand",
     "prepare": "node -e \"try { require('husky').install() } catch (e) {if (e.code !== 'MODULE_NOT_FOUND') throw e}\"",
