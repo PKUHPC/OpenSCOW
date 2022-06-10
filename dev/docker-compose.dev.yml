@@ -27,7 +27,8 @@ services:
   ldap:
     image: ldaptest
     build:
-      dockerfile: scripts/ldap/Dockerfile
+      context: ..
+      dockerfile: dev/ldap/Dockerfile
     ports:
       - 389:389
     volumes:
@@ -41,4 +42,3 @@ volumes:
   db:
   ldap:
   jobtabledb:
-    name: jobtabledb

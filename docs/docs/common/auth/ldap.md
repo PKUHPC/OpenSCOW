@@ -119,7 +119,7 @@ LDAP认证系统将认证信息存放在redis中，所以在部署认证系统�
 
 ```bash
 # 在整个项目的根目录构建镜像 
-docker build -f scripts/ldap/Dockerfile -t ldap .
+docker build -f dev/ldap/Dockerfile -t ldap .
 
 # 启动镜像。服务在389端口监听。
 # 管理员用户为cn=Manager,ou=hpc,o=pku，密码为admin

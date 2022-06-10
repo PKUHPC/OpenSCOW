@@ -1,7 +1,7 @@
 FROM centos:7
 
 WORKDIR /ldap
-COPY scripts/ldap/provider.sh .
+COPY dev/ldap/provider.sh .
 
 RUN ./provider.sh docker
 
