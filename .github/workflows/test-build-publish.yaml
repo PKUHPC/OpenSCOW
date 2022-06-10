@@ -46,6 +46,8 @@ jobs:
       - name: Wait for ports
         uses: ifaxity/wait-on-action@master
         with:
+          log: true
+          verbose: true
           resource: "localhost:3306 localhost:6379 localhost:3307 localhost:389"
 
       - name: Run tests
