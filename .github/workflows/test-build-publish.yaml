@@ -44,7 +44,7 @@ jobs:
         run: ssh-keygen -t rsa -q -f "$HOME/.ssh/id_rsa" -N ""
 
       - name: Wait for ports
-        uses: ifaxity/wait-on-action
+        uses: ifaxity/wait-on-action@master
         with:
           resource: "localhost:3306 localhost:6379 localhost:3307 localhost:389"
 
