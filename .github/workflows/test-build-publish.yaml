@@ -28,20 +28,25 @@ jobs:
           node-version: 16.x
           cache: pnpm
 
-      - name: Install dependencies
-        run: pnpm i --frozen-lockfile
-
-      - name: Prepare dev libs and code
-        run: pnpm prepareDev
-
       - name: Start dev env for db testing
         run: pnpm devenv
 
       - name: Check running containers
         run: docker ps
 
+      - name: Install dependencies
+        run: pnpm i --frozen-lockfile
+
+      - name: Prepare dev libs and code
+        run: pnpm prepareDev
+
       - name: Generate SSH key pairs for test
         run: ssh-keygen -t rsa -q -f "$HOME/.ssh/id_rsa" -N ""
+
+      - name: Wait for ports
+        uses: ifaxity/wait-on-action
+        with:
+          resource: "localhost:3306 localhost:6379 localhost:3307 localhost:389"
 
       - name: Run tests
         run: pnpm test:ci
