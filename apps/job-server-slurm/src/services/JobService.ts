@@ -3,15 +3,12 @@ import { ensureNotUndefined } from "@ddadaal/tsgrpc-utils";
 import { ServiceError, status } from "@grpc/grpc-js";
 import { join } from "path";
 import { queryJobInfo } from "src/bl/queryJobInfo";
-import { generateJobScript, JobMetadata, sftpExists, submitJob } from "src/bl/submitJob";
+import { generateJobScript, JobMetadata, submitJob } from "src/bl/submitJob";
 import { checkClusterExistence, clustersConfig } from "src/config/clusters";
 import { config } from "src/config/env";
 import { JobServiceServer, JobServiceService, SavedJob } from "src/generated/portal/job";
 import { loggedExec } from "src/plugins/ssh";
-import { promisify } from "util";
-
-
-
+import { sftpExists, sftpReaddir, sftpReadFile, sftpWriteFile } from "src/utils/sftp";
 
 export const jobServiceServer = plugin((server) => {
 
@@ -78,7 +75,7 @@ export const jobServiceServer = plugin((server) => {
           const filePath = join(config.SAVED_JOBS_DIR, id);
           await ssh.withSFTP(async (sftp) => {
             const metadata: JobMetadata = { ...jobInfo, submitTime: reply.submitTime.toISOString() };
-            await promisify(sftp.writeFile.bind(sftp))(filePath, JSON.stringify(metadata));
+            await sftpWriteFile(sftp)(filePath, JSON.stringify(metadata));
           });
 
           logger.info("Saved job to %s", filePath);
@@ -98,7 +95,7 @@ export const jobServiceServer = plugin((server) => {
 
         const file = join(config.SAVED_JOBS_DIR, id);
 
-        const content = await promisify(sftp.readFile.bind(sftp))(file);
+        const content = await sftpReadFile(sftp)(file);
 
         const data = JSON.parse(content.toString()) as JobMetadata;
 
@@ -116,10 +113,10 @@ export const jobServiceServer = plugin((server) => {
 
         if (!await sftpExists(sftp, config.SAVED_JOBS_DIR)) { return [{ results: []}]; }
 
-        const list = await promisify(sftp.readdir.bind(sftp))(config.SAVED_JOBS_DIR);
+        const list = await sftpReaddir(sftp)(config.SAVED_JOBS_DIR);
 
         const results = await Promise.all(list.map(async ({ filename }) => {
-          const content = await promisify(sftp.readFile.bind(sftp))(join(config.SAVED_JOBS_DIR, filename));
+          const content = await sftpReadFile(sftp)(join(config.SAVED_JOBS_DIR, filename));
           const data = JSON.parse(content.toString()) as JobMetadata;
 
           return {

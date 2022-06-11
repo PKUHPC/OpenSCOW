@@ -73,9 +73,9 @@ const clusters = getConfigFromFile(ClustersConfigSchema, ClustersConfigName, fal
 // get available apps
 function getApps() {
   const fs = require("fs");
-  const { APP_SERVER_CONFIG_BASE_PATH, AppServerConfigSchema } = require("@scow/config/build/appConfig/appServer");
+  const { APP_CONFIG_BASE_PATH, AppConfigSchema } = require("@scow/config/build/appConfig/appServer");
 
-  const appsPath = path.join(configPath || CONFIG_BASE_PATH, APP_SERVER_CONFIG_BASE_PATH);
+  const appsPath = path.join(configPath || CONFIG_BASE_PATH, APP_CONFIG_BASE_PATH);
   console.log(appsPath);
 
   if (!fs.existsSync(appsPath)) {
@@ -85,8 +85,8 @@ function getApps() {
   const apps = fs.readdirSync(appsPath);
 
   return apps.map((filename) => {
-    return getConfigFromFile(AppServerConfigSchema,
-      path.join(APP_SERVER_CONFIG_BASE_PATH, path.basename(filename, path.extname(filename))), false, configPath);
+    return getConfigFromFile(AppConfigSchema,
+      path.join(APP_CONFIG_BASE_PATH, path.basename(filename, path.extname(filename))), false, configPath);
   });
 }
 

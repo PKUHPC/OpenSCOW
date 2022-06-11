@@ -24,8 +24,9 @@ export interface JobMetadata {
   workingDirectory: string;
 }
 
-export function generateJobScript(jobInfo: JobInfo) {
-  const { jobName, account, coreCount, maxTime, nodeCount, partition, qos, command, workingDirectory } = jobInfo;
+export function generateJobScript(jobInfo: JobInfo & { output?: string }) {
+  const { jobName, account, coreCount, maxTime, nodeCount, partition, qos, command, workingDirectory,
+    output } = jobInfo;
 
   let script = "#!/bin/bash\n";
 
@@ -41,16 +42,16 @@ export function generateJobScript(jobInfo: JobInfo) {
   append("-c " + coreCount);
   append("--time=" + maxTime);
   append("--chdir=" + workingDirectory);
+  if (output) {
+    append("--output=" + output);
+  }
+
 
   script += "\n";
   script += command;
 
   return script;
 }
-
-export const sftpExists = (sftp: SFTPWrapper, path: string) => new Promise<boolean>((res) => {
-  sftp.stat(path, (err) => res(err === undefined));
-});
 
 interface SubmitJobParams {
   jobInfo: JobInfo;
