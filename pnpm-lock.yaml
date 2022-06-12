@@ -245,8 +245,8 @@ importers:
   apps/mis-web:
     specifiers:
       '@ant-design/icons': 4.7.0
-      '@ddadaal/next-typed-api-routes-cli': 0.4.0
-      '@ddadaal/next-typed-api-routes-runtime': 0.3.2
+      '@ddadaal/next-typed-api-routes-cli': 0.5.1
+      '@ddadaal/next-typed-api-routes-runtime': 0.5.2
       '@ddadaal/tsgrpc-cli': 0.13.0
       '@ddadaal/tsgrpc-utils': 0.14.0
       '@grpc/grpc-js': 1.6.7
@@ -285,7 +285,7 @@ importers:
       webpack: 5.73.0
     dependencies:
       '@ant-design/icons': 4.7.0_ef5jwxihqo6n7gxfmzogljlgcm
-      '@ddadaal/next-typed-api-routes-runtime': 0.3.2_next@12.1.6
+      '@ddadaal/next-typed-api-routes-runtime': 0.5.2_next@12.1.6
       '@ddadaal/tsgrpc-utils': 0.14.0_@grpc+grpc-js@1.6.7
       '@grpc/grpc-js': 1.6.7
       '@newhighsco/next-plugin-svgr': 3.0.50_next@12.1.6+webpack@5.73.0
@@ -311,7 +311,7 @@ importers:
       tslib: 2.4.0
       typescript: 4.7.3
     devDependencies:
-      '@ddadaal/next-typed-api-routes-cli': 0.4.0
+      '@ddadaal/next-typed-api-routes-cli': 0.5.1
       '@ddadaal/tsgrpc-cli': 0.13.0
       '@next/bundle-analyzer': 12.1.6
       '@types/google-protobuf': 3.15.6
@@ -336,8 +336,8 @@ importers:
       '@codemirror/state': 6.0.0
       '@codemirror/theme-one-dark': 6.0.0
       '@codemirror/view': 6.0.0
-      '@ddadaal/next-typed-api-routes-cli': 0.4.0
-      '@ddadaal/next-typed-api-routes-runtime': 0.3.2
+      '@ddadaal/next-typed-api-routes-cli': 0.5.1
+      '@ddadaal/next-typed-api-routes-runtime': 0.5.2
       '@ddadaal/tsgrpc-cli': 0.13.0
       '@ddadaal/tsgrpc-utils': 0.14.0
       '@grpc/grpc-js': 1.6.7
@@ -392,7 +392,7 @@ importers:
       '@codemirror/state': 6.0.0
       '@codemirror/theme-one-dark': 6.0.0
       '@codemirror/view': 6.0.0
-      '@ddadaal/next-typed-api-routes-runtime': 0.3.2_next@12.1.6
+      '@ddadaal/next-typed-api-routes-runtime': 0.5.2_next@12.1.6
       '@ddadaal/tsgrpc-utils': 0.14.0_@grpc+grpc-js@1.6.7
       '@grpc/grpc-js': 1.6.7
       '@newhighsco/next-plugin-svgr': 3.0.50_next@12.1.6+webpack@5.73.0
@@ -426,7 +426,7 @@ importers:
       xterm: 4.18.0
       xterm-addon-fit: 0.5.0_xterm@4.18.0
     devDependencies:
-      '@ddadaal/next-typed-api-routes-cli': 0.4.0
+      '@ddadaal/next-typed-api-routes-cli': 0.5.1
       '@ddadaal/tsgrpc-cli': 0.13.0
       '@next/bundle-analyzer': 12.1.6
       '@types/google-protobuf': 3.15.6
@@ -2354,26 +2354,25 @@ packages:
       - supports-color
     dev: true
 
-  /@ddadaal/next-typed-api-routes-cli/0.4.0:
-    resolution: {integrity: sha512-HmSxIrcWLNLmeAFNvEd+8eOXfm4r4hL4TRhGIdditcDJbiwigQRuqZrVu0Kj62rto4ylOMAsd4+WbRc45zgsLg==}
+  /@ddadaal/next-typed-api-routes-cli/0.5.1:
+    resolution: {integrity: sha512-PlCGfnIKRDHVWE/2J6x8TvXtqdJh6mwHji+Aet6LzHlIduF1Hchv7WZRqjBedi/wH/Wn42XhJRPgCPs6T9pq9A==}
     hasBin: true
     dependencies:
-      ts-json-schema-generator: 0.97.0
+      ts-json-schema-generator: 1.0.0
       tslib: 2.4.0
-      typescript: 4.4.4
+      typescript: 4.6.4
       yargs: 17.5.1
     dev: true
 
-  /@ddadaal/next-typed-api-routes-runtime/0.3.2_next@12.1.6:
-    resolution: {integrity: sha512-COUUPCSJQicJe/q9kcWK8b9TU3zB0poql09V0zSWk1RbQR1jwnm3pLFPYs1SgNqZuzDmarS57SUf/rcmN+Ud5w==}
+  /@ddadaal/next-typed-api-routes-runtime/0.5.2_next@12.1.6:
+    resolution: {integrity: sha512-2CTsf3v7PZI9nVkexopNRSTbH9DZv8deq8BpbWC4nb02pdkgaCZ3Vov5LrEJsqr3v9lSCoW4QgBRtBjy0d4V/A==}
     peerDependencies:
       next: '>=11.x'
     dependencies:
       ajv: 8.11.0
       ajv-formats: 2.1.1
       ajv-formats-draft2019: 1.6.1_ajv@8.11.0
-      fast-json-stringify: 2.7.13
-      long: 5.2.0
+      fast-json-stringify: 4.1.0
       next: 12.1.6_ef5jwxihqo6n7gxfmzogljlgcm
       tslib: 2.4.0
     dev: false
@@ -6201,6 +6200,7 @@ packages:
   /commander/8.3.0:
     resolution: {integrity: sha512-OkTL9umf+He2DZkUq8f8J9of7yL6RJKI24dVITBmNfZBmri9zYZQrKkuXiKhyfPSu8tUhnVBB1iKXevvnlR4Ww==}
     engines: {node: '>= 12'}
+    dev: false
 
   /commander/9.3.0:
     resolution: {integrity: sha512-hv95iU5uXPbK83mjrJKuZyFM/LBAoCV/XhVGkS5Je6tl7sxr6A0ITMw5WoRV46/UaJ46Nllm3Xt7IaJhXTIkzw==}
@@ -7800,18 +7800,20 @@ packages:
   /fast-json-stable-stringify/2.1.0:
     resolution: {integrity: sha512-lhd/wF+Lk98HZoTCtlVraHtfh5XYijIjalXck7saUtuanSDyLMxnHhSXEDJqHxD7msR8D0uCmqlkwjCV8xvwHw==}
 
-  /fast-json-stringify/2.7.13:
-    resolution: {integrity: sha512-ar+hQ4+OIurUGjSJD1anvYSDcUflywhKjfxnsW4TBTD7+u0tJufv6DKRWoQk3vI6YBOWMoz0TQtfbe7dxbQmvA==}
+  /fast-json-stringify/4.0.0:
+    resolution: {integrity: sha512-zv2rRNdLXWr3ZZfpQuE3/QDVeyCOufFOaMTqTGO1r5WB2AJ+ISmbLY2id4W4KG3pcng+MsnBO3ROzh/mlx3uFA==}
     engines: {node: '>= 10.0.0'}
     dependencies:
-      ajv: 6.12.6
+      ajv: 8.11.0
+      ajv-formats: 2.1.1
       deepmerge: 4.2.2
+      fast-uri: 2.0.0
       rfdc: 1.3.0
       string-similarity: 4.0.4
     dev: false
 
-  /fast-json-stringify/4.0.0:
-    resolution: {integrity: sha512-zv2rRNdLXWr3ZZfpQuE3/QDVeyCOufFOaMTqTGO1r5WB2AJ+ISmbLY2id4W4KG3pcng+MsnBO3ROzh/mlx3uFA==}
+  /fast-json-stringify/4.1.0:
+    resolution: {integrity: sha512-yy/5SUALH1LxcVFg/tqaA2a3cfXhpZl5MqdyhSJeAmOZg1nQgU0meg0KuRrFaG3iSrrDMWxTittWb12oIBXOcQ==}
     engines: {node: '>= 10.0.0'}
     dependencies:
       ajv: 8.11.0
@@ -14562,17 +14564,17 @@ packages:
       yargs-parser: 20.2.9
     dev: true
 
-  /ts-json-schema-generator/0.97.0:
-    resolution: {integrity: sha512-kPDq4ut8Mu1ZgSN7OeTXz+ueb1juFt2eyGd23lMr3WoN5sq4Xa9m22kDI46OlwapE0aF8e1pUesOFgDcATHcuA==}
+  /ts-json-schema-generator/1.0.0:
+    resolution: {integrity: sha512-F5VofsyMhNSXKII32NDS8/Ur8o2K3Sh5i/U2ke3UgCKf26ybgm2cZeT2x7VJPl1trML/9QLzz/82l0mvzmb3Vw==}
     engines: {node: '>=10.0.0'}
     hasBin: true
     dependencies:
       '@types/json-schema': 7.0.11
-      commander: 8.3.0
+      commander: 9.3.0
       glob: 7.2.3
       json5: 2.2.1
       safe-stable-stringify: 2.3.1
-      typescript: 4.4.4
+      typescript: 4.6.4
     dev: true
 
   /ts-node/10.8.1_lr5yv43hchipyudzleywqpgwuy:
@@ -14787,8 +14789,8 @@ packages:
     dependencies:
       is-typedarray: 1.0.0
 
-  /typescript/4.4.4:
-    resolution: {integrity: sha512-DqGhF5IKoBl8WNf8C1gu8q0xZSInh9j1kJJMqT3a94w1JzVaBU4EXOSMrz9yDqMT0xt3selp83fuFMQ0uzv6qA==}
+  /typescript/4.6.4:
+    resolution: {integrity: sha512-9ia/jWHIEbo49HfjrLGfKbZSuWo9iTMwXO+Ca3pRsSpbsMbc7/IU8NKdCZVRRBafVPGnoJeFL76ZOAA84I9fEg==}
     engines: {node: '>=4.2.0'}
     hasBin: true
     dev: true

@@ -13,8 +13,8 @@ import { handlegRPCError } from "src/utils/server";
 export type ServerConnectProps = {
   method: string;
   path: string;
-  query?: Record<string, string>;
-  formData?: Record<string, string>;
+  query?: { [key: string]: string };
+  formData?: { [key: string]: string };
 }
 
 export interface ConnectToAppSchema {
