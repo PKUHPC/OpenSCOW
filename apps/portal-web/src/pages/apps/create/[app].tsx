@@ -1,4 +1,4 @@
-import { AppServer } from "@scow/config/build/appConfig/appServer";
+import { App } from "@scow/config/build/appConfig/app";
 import { GetServerSideProps, NextPage } from "next";
 import { requireAuth } from "src/auth/requireAuth";
 import { SSRProps } from "src/auth/server";
@@ -10,7 +10,7 @@ import { Head } from "src/utils/head";
 import { queryToString } from "src/utils/querystring";
 
 type Props = SSRProps<{
-  config: AppServer;
+  config: App;
 }, 400 | 404>;
 
 export const AppIndexPage: NextPage<Props> = requireAuth(() => true)((props: Props) => {
@@ -33,7 +33,7 @@ export const AppIndexPage: NextPage<Props> = requireAuth(() => true)((props: Pro
 const appsMap = runtimeConfig.APPS.reduce((prev, curr) => {
   prev[curr.id] = curr;
   return prev;
-}, {} as Record<string, AppServer>);
+}, {} as Record<string, App>);
 
 export const getServerSideProps: GetServerSideProps<Props> = async ({ query }) => {
 

@@ -1,26 +1,13 @@
 import { Popconfirm, Space } from "antd";
-import { join } from "path";
 import React, { useState } from "react";
 import { api } from "src/apis";
 import type { DesktopItem } from "src/pageComponents/desktop/DesktopTable";
-import { publicConfig } from "src/utils/config";
+import { openDesktop } from "src/utils/vnc";
 
 interface Props {
   reload: () => void;
   record: DesktopItem;
 }
-
-export const openDesktop = (node: string, port: number, password: string) => {
-
-  const params = new URLSearchParams({
-    path: join(publicConfig.PROXY_BASE_PATH, node, String(port)),
-    password: password,
-    autoconnect: "true",
-    reconnect: "true",
-  });
-
-  window.open("/vnc/vnc.html?" + params.toString(), "_blank");
-};
 
 export const DesktopTableActions: React.FC<Props> = ({ reload, record }) => {
 

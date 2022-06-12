@@ -1,16 +1,14 @@
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError, status } from "@grpc/grpc-js";
-import path from "path";
 import { checkClusterExistence, clustersConfig  } from "src/config/clusters";
 import { config } from "src/config/env";
 import { ListDesktopsReply_Connection, VncServiceServer, VncServiceService } from "src/generated/portal/vnc";
-import { loggedExec } from "src/plugins/ssh";
 import { displayIdToPort } from "src/utils/port";
-import { parseDisplayId, parseListOutput, parseOtp, refreshPassword } from "src/utils/turbovnc";
+import { loggedExec, sshConnect } from "src/utils/ssh";
+import { parseDisplayId, parseListOutput, parseOtp, refreshPassword, VNCSERVER_BIN_PATH } from "src/utils/turbovnc";
 
 
 
-const vncServerPath = path.join(config.TURBOVNC_PATH, "bin", "vncserver");
 
 export const vncServiceServer = plugin((server) => {
 
@@ -27,7 +25,7 @@ export const vncServiceServer = plugin((server) => {
       checkClusterExistence(cluster);
       const node = clustersConfig[cluster].loginNodes[0];
 
-      return await server.ext.connect(node, username, logger, async (ssh, nodeAddr) => {
+      return await sshConnect(node, username, logger, async (ssh, nodeAddr) => {
 
         // refresh the otp
         const password = await refreshPassword(ssh, logger, displayId);
@@ -47,11 +45,11 @@ export const vncServiceServer = plugin((server) => {
 
         const node = clustersConfig[clusterId].loginNodes[0];
 
-        await server.ext.connect(node, username, logger, async (ssh, nodeAddr) => {
+        await sshConnect(node, username, logger, async (ssh, nodeAddr) => {
 
           // list all running session
           const resp = await loggedExec(ssh, logger, true,
-            vncServerPath, ["-list"],
+            VNCSERVER_BIN_PATH, ["-list"],
           );
 
           const ids = parseListOutput(resp.stdout);
@@ -72,11 +70,11 @@ export const vncServiceServer = plugin((server) => {
       checkClusterExistence(cluster);
       const node = clustersConfig[cluster].loginNodes[0];
 
-      return await server.ext.connect(node, username, logger, async (ssh, nodeAddr) => {
+      return await sshConnect(node, username, logger, async (ssh, nodeAddr) => {
 
         // find if the user has running session
         let resp = await loggedExec(ssh, logger, true,
-          vncServerPath, ["-list"],
+          VNCSERVER_BIN_PATH, ["-list"],
         );
 
         const ids = parseListOutput(resp.stdout);
@@ -85,7 +83,7 @@ export const vncServiceServer = plugin((server) => {
           resp = await loggedExec(ssh, logger, true,
             // explicitly set securitytypes to avoid requiring setting vnc passwd
             // TODO adds more desktop supprt other than xfce
-            vncServerPath, ["-securitytypes", "OTP", "-otp", "-wm", "xfce"]);
+            VNCSERVER_BIN_PATH, ["-securitytypes", "OTP", "-otp", "-wm", "xfce"]);
 
           // parse the OTP from output. the output was in stderr
           const password = parseOtp(resp.stderr, logger);
@@ -111,11 +109,11 @@ export const vncServiceServer = plugin((server) => {
       checkClusterExistence(cluster);
       const node = clustersConfig[cluster].loginNodes[0];
 
-      return await server.ext.connect(node, username, logger, async (ssh) => {
+      return await sshConnect(node, username, logger, async (ssh) => {
 
         // kill specific desktop
         await loggedExec(ssh, logger, true,
-          vncServerPath, ["-kill", ":" + displayId]);
+          VNCSERVER_BIN_PATH, ["-kill", ":" + displayId]);
 
         return [ {} ];
       });
@@ -125,7 +123,7 @@ export const vncServiceServer = plugin((server) => {
     refreshOTPPassword: async ({ request, logger }) => {
       const { displayId, node, username } = request;
 
-      return await server.ext.connect(node, username, logger, async (ssh) => {
+      return await sshConnect(node, username, logger, async (ssh) => {
         const password = await refreshPassword(ssh, logger, displayId);
 
         return [{ password }];

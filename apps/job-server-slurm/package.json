@@ -20,7 +20,8 @@
     "@ddadaal/tsgrpc-utils": "0.14.0",
     "@scow/config": "workspace:*",
     "@grpc/grpc-js": "1.6.7",
-    "node-ssh": "12.0.4"
+    "node-ssh": "12.0.4",
+    "shell-quote": "1.7.3"
   },
   "devDependencies": {
     "@types/node-cron": "3.0.1",

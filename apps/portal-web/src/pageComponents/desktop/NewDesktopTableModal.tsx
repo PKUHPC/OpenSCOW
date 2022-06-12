@@ -2,8 +2,8 @@ import { Form, Modal } from "antd";
 import React, { useState } from "react";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
-import { openDesktop } from "src/pageComponents/desktop/DesktopTableActions";
 import { Cluster, CLUSTERS } from "src/utils/config";
+import { openDesktop } from "src/utils/vnc";
 
 export interface Props {
   visible: boolean;

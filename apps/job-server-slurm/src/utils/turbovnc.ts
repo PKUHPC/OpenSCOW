@@ -2,8 +2,9 @@ import { Logger } from "@ddadaal/tsgrpc-server";
 import { NodeSSH } from "node-ssh";
 import { join } from "path";
 import { config } from "src/config/env";
-import { loggedExec } from "src/plugins/ssh";
+import { loggedExec } from "src/utils/ssh";
 
+export const VNCSERVER_BIN_PATH = join(config.TURBOVNC_PATH, "bin", "vncserver");
 
 export function parseListOutput(output: string): number[] {
   const ids = [] as number[];
@@ -31,15 +32,20 @@ export function parseOtp(stderr: string, logger: Logger): string {
 
 export function parseDisplayId(stdout: string, logger: Logger): number {
 
-  const firstNonEmptyLine = stdout.split("\n").find((x) => x);
-  if (!firstNonEmptyLine) {
-    logger.error("Error parsing display id from output %s", stdout);
-    throw new Error("Error parsing display id");
+  // Desktop 'TurboVNC: t001:2 (2001213077)' started on display t001:2
+  const regex = /^Desktop '.*' started on display .*:(\d+)$/;
+
+  const lines = stdout.split("\n");
+
+  for (const line of lines) {
+    const matches = line.match(regex);
+    if (!matches) { continue; }
+
+    return +matches[1][0];
   }
 
-  const contents = firstNonEmptyLine.split(":");
-  return +contents[contents.length - 1];
-
+  logger.error("Error parsing display id from %s", stdout);
+  throw new Error("Error parsing display id");
 }
 
 const vncPasswdPath = join(config.TURBOVNC_PATH, "bin", "vncpasswd");

@@ -1,81 +1,75 @@
-import { AppServer } from "@scow/config/build/appConfig/appServer";
 import { parsePlaceholder } from "@scow/config/build/parse";
-import Link from "next/link";
+import { message } from "antd";
 import { join } from "path";
-import { useMemo } from "react";
-import { AppSession_RunInfo } from "src/generated/portal/app";
-import { publicConfig } from "src/utils/config";
+import { api } from "src/apis";
+import { ClickableA } from "src/components/ClickableA";
+import { AppSession } from "src/generated/portal/app";
+import { Cluster, publicConfig } from "src/utils/config";
+import { openDesktop } from "src/utils/vnc";
 
 export interface Props {
-  connectProps: AppServer["connect"] | undefined;
-  runInfo: AppSession_RunInfo;
-  sessionId: string;
+  cluster: Cluster;
+  session: AppSession;
 }
 
 export const ConnectTopAppLink: React.FC<Props> = ({
-  connectProps,
-  sessionId,
-  runInfo: { host, password, port },
+  session, cluster,
 }) => {
 
-  if (!connectProps) {
-    return (
-      <span>
-        不支持连接到此应用
-      </span>
-    );
-  }
+  const onClick = async () => {
+    const reply = await api.connectToApp({ body: { cluster: cluster.id, sessionId: session.sessionId } })
+      .httpError(404, () => { message.error("此应用会话不存在"); })
+      .httpError(409, () => { message.error("此应用目前无法连接"); });
 
+    if (reply.type === "server") {
+      const { connect, host, password, port } = reply;
+      const interpolatedValues = { HOST: host, PASSWORD: password, PORT: port };
+      const path = parsePlaceholder(connect.path, interpolatedValues);
 
-  const { path, query, formData } = useMemo(() => {
-    const interpolatedValues = { HOST: host, PASSWORD: password, PORT: port };
-    const path = parsePlaceholder(connectProps.path, interpolatedValues);
-    function interpolateValues(obj: Record<string, string>) {
-      return Object.keys(obj).reduce((prev, curr) => {
-        prev[curr] = parsePlaceholder(obj[curr], interpolatedValues);
-        return prev;
-      }, {});
-    }
-    const query = interpolateValues(connectProps.query);
-    const formData =  connectProps.formData ? interpolateValues(connectProps.formData) : undefined;
+      const interpolateValues = (obj: Record<string, string>) => {
+        return Object.keys(obj).reduce((prev, curr) => {
+          prev[curr] = parsePlaceholder(obj[curr], interpolatedValues);
+          return prev;
+        }, {});
+      };
 
-    return { path, query, formData };
-  }, [host, password, port]);
+      const query = connect.query ? interpolateValues(connect.query) : {};
+      const formData =  connect.formData ? interpolateValues(connect.formData) : undefined;
 
-  const pathname = join(publicConfig.PROXY_BASE_PATH, host, String(port), path);
+      const pathname = join(publicConfig.PROXY_BASE_PATH, host, String(port), path);
 
-  if (connectProps.method === "GET") {
-    return (
-      <Link
-        href={{ pathname, query }}
-        passHref
-      >
-        <a target="_blank">
-          连接
-        </a>
-      </Link>
-    );
-  } else {
-    const id = `connect-${sessionId}`;
-    return (
-      <form
-        id={id}
-        action={pathname + "?" + new URLSearchParams(query).toString()}
-        method="POST" target="_blank"
-      >
-        {
-          formData
-            ? Object.keys(formData).map((k) => (
-              <input key={k} type="hidden" name={k} value={formData[k]} />
-            )) : undefined
+      const url = pathname + "?" + new URLSearchParams(query).toString();
+
+      if (connect.method === "GET") {
+        window.open(url, "_blank");
+      } else {
+        const form = document.createElement("form");
+        form.style.display = "none";
+        form.action = url;
+        form.method = "POST";
+        form.target = "_blank";
+        if (formData) {
+          Object.keys(formData).forEach((k) => {
+            const input = document.createElement("input");
+            input.type = "hidden";
+            input.name = k;
+            input.value = formData[k];
+          });
         }
-        <a type="submit" onClick={() => {
-          (document.getElementById(id) as HTMLFormElement)?.submit();
-        }}
-        >
-          连接
-        </a>
-      </form>
-    );
-  }
+        document.body.appendChild(form);
+        form.submit();
+      }
+
+    } else {
+      const { host, port, password } = reply;
+      openDesktop(host, port, password);
+    }
+
+  };
+
+  return (
+    <ClickableA onClick={onClick}>连接</ClickableA>
+  );
+
+
 };

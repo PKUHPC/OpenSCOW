@@ -1,4 +1,4 @@
-import { AppServer } from "@scow/config/build/appConfig/appServer";
+import { App } from "@scow/config/build/appConfig/app";
 import { Clusters } from "@scow/config/build/appConfig/clusters";
 import { CONFIG_BASE_PATH } from "@scow/config/build/constants";
 import getConfig from "next/config";
@@ -19,7 +19,7 @@ export interface ServerRuntimeConfig {
 
   CLUSTERS_CONFIG: Clusters;
 
-  APPS: AppServer[];
+  APPS: App[];
 }
 
 

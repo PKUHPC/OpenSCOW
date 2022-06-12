@@ -1,7 +1,7 @@
 import { Logger } from "@ddadaal/tsgrpc-server";
 import { NodeSSH } from "node-ssh";
 import { RunningJob } from "src/generated/common/job";
-import { loggedExec } from "src/plugins/ssh";
+import { loggedExec } from "src/utils/ssh";
 
 const SEPARATOR = "__x__x__";
 

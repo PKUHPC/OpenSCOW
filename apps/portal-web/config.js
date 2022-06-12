@@ -70,10 +70,11 @@ const configPath = production ? undefined : path.join(__dirname, "config");
  */
 const clusters = getConfigFromFile(ClustersConfigSchema, ClustersConfigName, false, configPath);
 
+const fs = require("fs");
+
 // get available apps
 function getApps() {
-  const fs = require("fs");
-  const { APP_CONFIG_BASE_PATH, AppConfigSchema } = require("@scow/config/build/appConfig/appServer");
+  const { APP_CONFIG_BASE_PATH, AppConfigSchema } = require("@scow/config/build/appConfig/app");
 
   const appsPath = path.join(configPath || CONFIG_BASE_PATH, APP_CONFIG_BASE_PATH);
   console.log(appsPath);

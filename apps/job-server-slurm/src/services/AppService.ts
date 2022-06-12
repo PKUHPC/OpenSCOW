@@ -10,10 +10,10 @@ import { generateJobScript, parseSbatchOutput } from "src/bl/submitJob";
 import { clustersConfig } from "src/config/clusters";
 import { config } from "src/config/env";
 import { AppServiceServer, AppServiceService, AppSession } from "src/generated/portal/app";
-import { loggedExec } from "src/plugins/ssh";
 import { displayIdToPort } from "src/utils/port";
 import { sftpChmod, sftpExists, sftpReaddir, sftpReadFile, sftpWriteFile } from "src/utils/sftp";
-import { parseDisplayId, refreshPassword } from "src/utils/turbovnc";
+import { loggedExec, sshConnect } from "src/utils/ssh";
+import { parseDisplayId, refreshPassword, VNCSERVER_BIN_PATH } from "src/utils/turbovnc";
 
 interface SessionMetadata {
   sessionId: string;
@@ -29,7 +29,7 @@ const VNC_OUTPUT_FILE = "output";
 
 const SESSION_METADATA_NAME = "session.json";
 
-const SESSION_INFO = "SESSION_INFO";
+const SERVER_SESSION_INFO = "SERVER_SESSION_INFO";
 const VNC_SESSION_INFO = "VNC_SESSION_INFO";
 
 const getAppConfig = (appId: string) =>
@@ -49,22 +49,21 @@ export const appServiceServer = plugin((server) => {
 
       const workingDirectory = join(config.APP_JOBS_DIR, jobName);
 
-      return await server.ext.connect(node, userId, logger, async (ssh) => {
+      return await sshConnect(node, userId, logger, async (ssh) => {
 
         // make sure workingDirectory exists.
         await ssh.mkdir(workingDirectory);
 
         const sftp = await ssh.requestSFTP();
 
-        const submitAndWriteMetadata = async (script: string) => {
+        const submitAndWriteMetadata = async (script: string, env?: NodeJS.ProcessEnv) => {
           const remoteEntryPath = join(workingDirectory, "entry.sh");
 
           await sftpWriteFile(sftp)(remoteEntryPath, script);
 
           // submit entry.sh
           const { code, stderr, stdout } = await loggedExec(ssh, logger, false,
-            "sbatch", [remoteEntryPath],
-            { stream: "both" },
+            "sbatch", [remoteEntryPath], { execOptions: { env } },
           );
 
           if (code !== 0) {
@@ -106,7 +105,7 @@ export const appServiceServer = plugin((server) => {
             qos: qos,
           });
 
-          const metadata = await submitAndWriteMetadata(script);
+          const metadata = await submitAndWriteMetadata(script, { SERVER_SESSION_INFO });
 
           return [{ jobId: metadata.jobId, sessionId: metadata.sessionId }];
 
@@ -128,7 +127,7 @@ export const appServiceServer = plugin((server) => {
             output: VNC_OUTPUT_FILE,
           });
 
-          const metadata = await submitAndWriteMetadata(script);
+          const metadata = await submitAndWriteMetadata(script, { VNC_SESSION_INFO, VNCSERVER_BIN_PATH });
           return [{ jobId: metadata.jobId, sessionId: metadata.sessionId }];
         }
 
@@ -140,7 +139,7 @@ export const appServiceServer = plugin((server) => {
 
       const node = clustersConfig[cluster].loginNodes[0];
 
-      return await server.ext.connect(node, userId, logger, async (ssh) => {
+      return await sshConnect(node, userId, logger, async (ssh) => {
         const sftp = await ssh.requestSFTP();
 
         if (!await sftpExists(sftp, config.APP_JOBS_DIR)) { return [{ sessions: []}]; }
@@ -162,42 +161,40 @@ export const appServiceServer = plugin((server) => {
 
           const app = getAppConfig(sessionMetadata.appId);
 
+          let ready = false;
+
+          // judge whether the app is ready
           if (app.type === "server") {
             // for server apps,
             // try to read the SESSION_INFO file to get port and password
-            const infoFilePath = join(jobDir, SESSION_INFO);
+            const infoFilePath = join(jobDir, SERVER_SESSION_INFO);
+            ready = await sftpExists(sftp, infoFilePath);
 
-            resultMap.set(sessionMetadata.jobId, {
-              jobId: sessionMetadata.jobId,
-              appId: sessionMetadata.appId,
-              sessionId: sessionMetadata.sessionId,
-              submitTime: new Date(sessionMetadata.submitTime),
-              state: "ENDED",
-              ready: await sftpExists(sftp, infoFilePath),
-            });
           } else {
             // for vnc apps,
             // try to find the output file and try to parse the display number
             const outputFilePath = join(jobDir, VNC_OUTPUT_FILE);
 
-            let ready = false;
             if (await sftpExists(sftp, outputFilePath)) {
               const content = (await sftpReadFile(sftp)(outputFilePath)).toString();
-              if (parseDisplayId(content, logger)) {
+              try {
+                parseDisplayId(content, logger);
                 ready = true;
+              } catch {
+                // ignored if displayId cannot be parsed
               }
             }
 
-            resultMap.set(sessionMetadata.jobId, {
-              jobId: sessionMetadata.jobId,
-              appId: sessionMetadata.appId,
-              sessionId: sessionMetadata.sessionId,
-              submitTime: new Date(sessionMetadata.submitTime),
-              state: "ENDED",
-              ready,
-            });
-
           }
+
+          resultMap.set(sessionMetadata.jobId, {
+            jobId: sessionMetadata.jobId,
+            appId: sessionMetadata.appId,
+            sessionId: sessionMetadata.sessionId,
+            submitTime: new Date(sessionMetadata.submitTime),
+            state: "ENDED",
+            ready,
+          });
 
         }));
 
@@ -211,7 +208,7 @@ export const appServiceServer = plugin((server) => {
           const job = resultMap.get(+x.jobId);
           if (job) {
             job.state = x.state;
-            job.ready &&= x.state === "RUNNING";
+            job.ready &&= (x.state === "RUNNING");
           }
         });
 
@@ -224,12 +221,12 @@ export const appServiceServer = plugin((server) => {
 
       const node = clustersConfig[cluster].loginNodes[0];
 
-      return await server.ext.connect(node, userId, logger, async (ssh) => {
+      return await sshConnect(node, userId, logger, async (ssh) => {
         const sftp = await ssh.requestSFTP();
 
         const jobDir = join(config.APP_JOBS_DIR, sessionId);
 
-        if (!await sftpExists(sftp, sessionId)) {
+        if (!await sftpExists(sftp, jobDir)) {
           throw <ServiceError>{
             code: status.NOT_FOUND,
             message: `dir ${jobDir} does not exist`,
@@ -243,7 +240,7 @@ export const appServiceServer = plugin((server) => {
         const app = getAppConfig(sessionMetadata.appId);
 
         if (app.type === "server") {
-          const infoFilePath = join(jobDir, SESSION_INFO);
+          const infoFilePath = join(jobDir, SERVER_SESSION_INFO);
           if (await sftpExists(sftp, infoFilePath)) {
             const content = (await sftpReadFile(sftp)(infoFilePath)).toString();
 
@@ -251,31 +248,44 @@ export const appServiceServer = plugin((server) => {
 
             const [host, port, password] = content.split("\n");
 
-            return [{ type: app.type, host, port: +port, password }];
-          } else {
-            // for vnc apps,
-            // try to find the output file and try to parse the display number
-            const vncSessionInfoPath = join(jobDir, VNC_SESSION_INFO);
+            return [{ appId: app.id, host, port: +port, password }];
+          }
+        } else {
+          // for vnc apps,
+          // try to find the output file and try to parse the display number
+          const vncSessionInfoPath = join(jobDir, VNC_SESSION_INFO);
 
-            // try to read the host info
-            if (await sftpExists(sftp, vncSessionInfoPath)) {
+          // try to read the host info
+          if (await sftpExists(sftp, vncSessionInfoPath)) {
 
-              const host = (await sftpReadFile(sftp)(vncSessionInfoPath)).toString();
+            const host = (await sftpReadFile(sftp)(vncSessionInfoPath)).toString().trim();
 
-              const outputFilePath = join(jobDir, VNC_OUTPUT_FILE);
-              if (await sftpExists(sftp, outputFilePath)) {
+            const outputFilePath = join(jobDir, VNC_OUTPUT_FILE);
+            if (await sftpExists(sftp, outputFilePath)) {
 
-                const content = (await sftpReadFile(sftp)(outputFilePath)).toString();
+              const content = (await sftpReadFile(sftp)(outputFilePath)).toString();
 
-                const displayId = parseDisplayId(content, logger);
+              let displayId: number | undefined = undefined;
+              try {
+                displayId = parseDisplayId(content, logger);
+              } catch {
+                // ignored if displayId cannot be parsed
+              }
+              if (displayId) {
 
-                if (displayId !== undefined) {
-                // reload the otp password
-                  const password = await refreshPassword(ssh, logger, displayId);
+                // the server is run at the compute node
+                // login to the compute node and refresh the password
 
-                  return [{ type: app.type, host, port: displayIdToPort(displayId), password }];
+                if (displayId) {
+                  return await sshConnect(host, userId, logger, async (computeNodeSsh) => {
+                    if (displayId) {
+                      const password = await refreshPassword(computeNodeSsh, logger, displayId);
+                      return [{ appId: app.id, host, port: displayIdToPort(displayId), password }];
+                    }
+                  });
                 }
               }
+
             }
           }
         }
