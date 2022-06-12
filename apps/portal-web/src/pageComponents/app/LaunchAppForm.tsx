@@ -1,4 +1,4 @@
-import { AppServer } from "@scow/config/build/appConfig/appServer";
+import { App } from "@scow/config/build/appConfig/app";
 import { Button, Form, InputNumber, message, Select } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import { api } from "src/apis";
@@ -9,7 +9,7 @@ import { defaultCluster, defaultPartitionInfo,
   defaultPartitionName, firstPartition, getPartitionInfo } from "src/utils/jobForm";
 
 interface Props {
-  config: AppServer;
+  config: App;
 }
 
 interface FormFields {

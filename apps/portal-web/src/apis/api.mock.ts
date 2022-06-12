@@ -7,7 +7,7 @@ export type MockApi<TApi extends Record<
   string,
  (...args : any[]) => JsonFetchResultPromiseLike<any>>
  > = { [key in keyof TApi]:
-    (...args) =>
+    (...args: Parameters<TApi[key]>) =>
     Promise<
       ReturnType<TApi[key]> extends PromiseLike<infer TSuc>
       ? TSuc
@@ -40,12 +40,27 @@ export const mockApi: MockApi<typeof api> = {
 
   getAppSessions: async () => ({ sessions: [
     { jobId: 100, sessionId: "123", appId: "vscode", state: "PENDING",
-      submitTime: new Date().toISOString() },
+      submitTime: new Date().toISOString(), ready: false },
     { jobId: 101, sessionId: "124", appId: "vscode", state: "RUNNING",
-      submitTime: new Date().toISOString(),
-      runInfo: { host: "127.0.0.1", port: 3000, password: "123" },
-    },
+      submitTime: new Date().toISOString(), ready: true },
+    { jobId: 102, sessionId: "125", appId: "vscode", state: "RUNNING",
+      submitTime: new Date().toISOString(), ready: true },
   ]}),
+
+  connectToApp: async ({ body: { sessionId } }) => sessionId === "124"
+    ? {
+      host: "127.0.0.1", port: 3000, password: "123", type: "server",
+      connect: {
+        method: "POST",
+        path: "/test",
+        query: { test: "!23" },
+        formData: {  test: "123" },
+      },
+    }
+    : {
+      host: "127.0.0.1", port: 3000, password: "123", type: "vnc",
+    }
+  ,
 
   getSavedJob: async () => ({
     jobInfo: {

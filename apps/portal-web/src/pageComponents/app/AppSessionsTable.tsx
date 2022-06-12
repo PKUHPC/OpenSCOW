@@ -1,4 +1,3 @@
-import { AppServer } from "@scow/config/build/appConfig/appServer";
 import { Button, Form, message, Popconfirm, Space, Table, TableColumnsType } from "antd";
 import React, { useCallback, useState } from "react";
 import { useAsync } from "react-async";
@@ -11,7 +10,6 @@ import { Cluster, CLUSTERS, publicConfig } from "src/utils/config";
 import { formatDateTime } from "src/utils/datetime";
 
 interface Props {
-  connectProps: Record<string, AppServer["connect"]>;
 }
 
 interface FilterForm {
@@ -19,7 +17,7 @@ interface FilterForm {
 }
 
 
-export const AppSessionsTable: React.FC<Props> = ({ connectProps }) => {
+export const AppSessionsTable: React.FC<Props> = () => {
 
   const [form] = Form.useForm<FilterForm>();
 
@@ -70,12 +68,11 @@ export const AppSessionsTable: React.FC<Props> = ({ connectProps }) => {
       render: (_, record) => (
         <Space>
           {
-            (record.state === "RUNNING" && record.runInfo) ? (
+            (record.ready) ? (
               <>
                 <ConnectTopAppLink
-                  sessionId={record.sessionId}
-                  runInfo={record.runInfo}
-                  connectProps={connectProps[record.appId]}
+                  session={record}
+                  cluster={query.cluster}
                 />
                 <Popconfirm
                   title="确定结束这个任务吗？"

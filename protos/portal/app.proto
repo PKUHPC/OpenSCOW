@@ -27,23 +27,33 @@ message GetSessionsRequest {
 }
 
 message AppSession {
-  message RunInfo {
-    string host = 1;
-    uint32 port = 2;
-    string password = 3;
-  }
-
   string session_id = 1;
   uint32 job_id = 2;
   google.protobuf.Timestamp submit_time = 3;
   string app_id = 4;
   string state = 5;
-  optional RunInfo run_info = 6;
+  bool ready = 6;
 }
 
 message GetSessionsReply { repeated AppSession sessions = 1; }
 
+message ConnectToAppRequest {
+  string cluster = 1;
+  string user_id = 2;
+  string session_id = 3;
+}
+
+// NOT_FOUND: the session_id is not found
+// UNAVAILABLE: the app is not ready to be connected
+message ConnectToAppReply {
+  string app_id = 1;
+  string host = 2;
+  uint32 port = 3;
+  string password = 4;
+}
+
 service AppService {
   rpc CreateApp(CreateAppRequest) returns (CreateAppReply);
   rpc GetSessions(GetSessionsRequest) returns (GetSessionsReply);
+  rpc ConnectToApp(ConnectToAppRequest) returns (ConnectToAppReply);
 }

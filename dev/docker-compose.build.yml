@@ -5,13 +5,13 @@ services:
   gateway:
     image: $IMAGE_BASE/gateway:$TAG
     build:
-      context: .
+      context: ..
       dockerfile: dockerfiles/Dockerfile.gateway
 
   mis-web-mis:
     image: $IMAGE_BASE/mis-web-mis:$TAG
     build:
-      context: .
+      context: ..
       dockerfile: dockerfiles/Dockerfile.mis-web
       args:
         - BASE_PATH=/mis
@@ -19,7 +19,7 @@ services:
   mis-web-root:
     image: $IMAGE_BASE/mis-web-root:$TAG
     build:
-      context: .
+      context: ..
       dockerfile: dockerfiles/Dockerfile.mis-web
       args:
         - BASE_PATH=
@@ -27,7 +27,7 @@ services:
   portal-web-portal:
     image: $IMAGE_BASE/portal-web-portal:$TAG
     build:
-      context: .
+      context: ..
       dockerfile: dockerfiles/Dockerfile.portal-web
       args:
         - BASE_PATH=/portal
@@ -35,7 +35,7 @@ services:
   portal-web-root:
     image: $IMAGE_BASE/portal-web-root:$TAG
     build:
-      context: .
+      context: ..
       dockerfile: dockerfiles/Dockerfile.portal-web
       args:
         - BASE_PATH=
@@ -43,24 +43,24 @@ services:
   mis-server:
     image: $IMAGE_BASE/mis-server:$TAG
     build:
-      context: .
+      context: ..
       dockerfile: dockerfiles/Dockerfile.mis-server
 
   job-server-slurm:
     image: $IMAGE_BASE/job-server-slurm:$TAG
     build:
-      context: .
+      context: ..
       dockerfile: dockerfiles/Dockerfile.job-server-slurm
 
   auth:
     image: $IMAGE_BASE/auth:$TAG
     build:
-      context: .
+      context: ..
       dockerfile: dockerfiles/Dockerfile.auth
 
   clusterops-slurm:
     image: $IMAGE_BASE/clusterops-slurm:$TAG
     build:
-      context: .
+      context: ..
       dockerfile: dockerfiles/Dockerfile.clusterops-slurm
 

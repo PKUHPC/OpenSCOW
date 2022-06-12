@@ -1,6 +1,6 @@
 import { Server } from "@ddadaal/tsgrpc-server";
 import { createServer } from "src/app";
-import { parseDisplayId, parseListOutput, parseOtp } from "src/services/VncService";
+import { parseDisplayId, parseListOutput, parseOtp } from "src/utils/turbovnc";
 
 let server: Server;
 

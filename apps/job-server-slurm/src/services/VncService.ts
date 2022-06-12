@@ -1,55 +1,14 @@
-import { Logger, plugin } from "@ddadaal/tsgrpc-server";
+import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError, status } from "@grpc/grpc-js";
-import { NodeSSH } from "node-ssh";
-import path from "path";
 import { checkClusterExistence, clustersConfig  } from "src/config/clusters";
 import { config } from "src/config/env";
 import { ListDesktopsReply_Connection, VncServiceServer, VncServiceService } from "src/generated/portal/vnc";
-import { loggedExec } from "src/plugins/ssh";
 import { displayIdToPort } from "src/utils/port";
+import { loggedExec, sshConnect } from "src/utils/ssh";
+import { parseDisplayId, parseListOutput, parseOtp, refreshPassword, VNCSERVER_BIN_PATH } from "src/utils/turbovnc";
 
 
-export function parseListOutput(output: string): number[] {
-  const ids = [] as number[];
-  for (const line of output.split("\n")) {
-    if (line.startsWith(":")) {
-      const parts = line.split(" ");
-      ids.push(parseInt(parts[0].substring(1)));
-    }
-  }
 
-  return ids;
-}
-
-export function parseOtp(output: string, logger: Logger): string {
-  const indicator = "Full control one-time password: ";
-  for (const line of output.split("\n")) {
-    if (line.startsWith(indicator)) {
-      return line.substring(indicator.length).trim();
-    }
-  }
-
-  logger.error("No otp from output %s", output);
-  throw new Error("No otp from output");
-}
-
-export function parseDisplayId(output: string, logger: Logger): number {
-
-  function fail(): never {
-    logger.error("No display id from output %s", output);
-    throw new Error("No display id from output");
-  }
-
-  const firstNonEmptyLine = output.split("\n").find((x) => x);
-  if (!firstNonEmptyLine) { fail(); }
-
-  const contents = firstNonEmptyLine.split(":");
-  return +contents[contents.length - 1];
-
-}
-
-const vncServerPath = path.join(config.TURBOVNC_PATH, "bin", "vncserver");
-const vncPasswdPath = path.join(config.TURBOVNC_PATH, "bin", "vncpasswd");
 
 export const vncServiceServer = plugin((server) => {
 
@@ -59,13 +18,6 @@ export const vncServiceServer = plugin((server) => {
     }
   }
 
-  const refreshPassword = async (ssh: NodeSSH, logger: Logger, displayId: number) => {
-    const resp = await loggedExec(ssh, logger, true,
-      vncPasswdPath, ["-o", "-display", ":" + displayId]);
-
-    return parseOtp(resp.stderr, server.logger);
-  };
-
   server.addService<VncServiceServer>(VncServiceService, {
     launchDesktop: async ({ request, logger }) => {
       const { cluster, username, displayId } = request;
@@ -73,7 +25,7 @@ export const vncServiceServer = plugin((server) => {
       checkClusterExistence(cluster);
       const node = clustersConfig[cluster].loginNodes[0];
 
-      return await server.ext.connect(node, username, logger, async (ssh, nodeAddr) => {
+      return await sshConnect(node, username, logger, async (ssh, nodeAddr) => {
 
         // refresh the otp
         const password = await refreshPassword(ssh, logger, displayId);
@@ -93,14 +45,15 @@ export const vncServiceServer = plugin((server) => {
 
         const node = clustersConfig[clusterId].loginNodes[0];
 
-        await server.ext.connect(node, username, logger, async (ssh, nodeAddr) => {
+        await sshConnect(node, username, logger, async (ssh, nodeAddr) => {
 
           // list all running session
           const resp = await loggedExec(ssh, logger, true,
-            vncServerPath, ["-list"],
+            VNCSERVER_BIN_PATH, ["-list"],
           );
 
           const ids = parseListOutput(resp.stdout);
+
           connectList.push({
             node: nodeAddr,
             cluster: clusterId,
@@ -117,11 +70,11 @@ export const vncServiceServer = plugin((server) => {
       checkClusterExistence(cluster);
       const node = clustersConfig[cluster].loginNodes[0];
 
-      return await server.ext.connect(node, username, logger, async (ssh, nodeAddr) => {
+      return await sshConnect(node, username, logger, async (ssh, nodeAddr) => {
 
         // find if the user has running session
         let resp = await loggedExec(ssh, logger, true,
-          vncServerPath, ["-list"],
+          VNCSERVER_BIN_PATH, ["-list"],
         );
 
         const ids = parseListOutput(resp.stdout);
@@ -130,13 +83,12 @@ export const vncServiceServer = plugin((server) => {
           resp = await loggedExec(ssh, logger, true,
             // explicitly set securitytypes to avoid requiring setting vnc passwd
             // TODO adds more desktop supprt other than xfce
-            vncServerPath, ["-securitytypes", "OTP", "-otp", "-wm", "xfce"]);
+            VNCSERVER_BIN_PATH, ["-securitytypes", "OTP", "-otp", "-wm", "xfce"]);
 
           // parse the OTP from output. the output was in stderr
-          const password = parseOtp(resp.stderr, server.logger);
-
+          const password = parseOtp(resp.stderr, logger);
           // parse display id from output
-          const displayId = parseDisplayId(resp.stderr, server.logger);
+          const displayId = parseDisplayId(resp.stderr, logger);
 
           const port = displayIdToPort(displayId);
 
@@ -157,11 +109,11 @@ export const vncServiceServer = plugin((server) => {
       checkClusterExistence(cluster);
       const node = clustersConfig[cluster].loginNodes[0];
 
-      return await server.ext.connect(node, username, logger, async (ssh) => {
+      return await sshConnect(node, username, logger, async (ssh) => {
 
         // kill specific desktop
         await loggedExec(ssh, logger, true,
-          vncServerPath, ["-kill", ":" + displayId]);
+          VNCSERVER_BIN_PATH, ["-kill", ":" + displayId]);
 
         return [ {} ];
       });
@@ -171,7 +123,7 @@ export const vncServiceServer = plugin((server) => {
     refreshOTPPassword: async ({ request, logger }) => {
       const { displayId, node, username } = request;
 
-      return await server.ext.connect(node, username, logger, async (ssh) => {
+      return await sshConnect(node, username, logger, async (ssh) => {
         const password = await refreshPassword(ssh, logger, displayId);
 
         return [{ password }];
