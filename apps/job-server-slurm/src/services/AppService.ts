@@ -9,6 +9,7 @@ import { queryJobInfo } from "src/bl/queryJobInfo";
 import { generateJobScript, parseSbatchOutput } from "src/bl/submitJob";
 import { clustersConfig } from "src/config/clusters";
 import { config } from "src/config/env";
+import { RunningJob } from "src/generated/common/job";
 import { AppServiceServer, AppServiceService, AppSession } from "src/generated/portal/app";
 import { displayIdToPort } from "src/utils/port";
 import { sftpChmod, sftpExists, sftpReaddir, sftpReadFile, sftpWriteFile } from "src/utils/sftp";
@@ -146,7 +147,16 @@ export const appServiceServer = plugin((server) => {
 
         const list = await sftpReaddir(sftp)(config.APP_JOBS_DIR);
 
-        const resultMap: Map<number, AppSession> = new Map();
+        // using squeue to get jobs that are running
+        // If a job is not running, it cannot be ready
+        const runningJobsInfo = await queryJobInfo(ssh, logger, ["-u", userId]);
+
+        const runningJobInfoMap = runningJobsInfo.reduce((prev, curr) => {
+          prev[curr.jobId] = curr;
+          return prev;
+        }, {} as Record<number, RunningJob>);
+
+        const sessions = [] as AppSession[];
 
         await Promise.all(list.map(async ({ filename }) => {
           const jobDir = join(config.APP_JOBS_DIR, filename);
@@ -159,60 +169,51 @@ export const appServiceServer = plugin((server) => {
           const content = await sftpReadFile(sftp)(metadataPath);
           const sessionMetadata = JSON.parse(content.toString()) as SessionMetadata;
 
+          const runningJobInfo: RunningJob | undefined = runningJobInfoMap[sessionMetadata.jobId];
+
           const app = getAppConfig(sessionMetadata.appId);
 
           let ready = false;
 
           // judge whether the app is ready
-          if (app.type === "server") {
+          if (runningJobInfo && runningJobInfo.state === "RUNNING") {
+            if (app.type === "server") {
             // for server apps,
             // try to read the SESSION_INFO file to get port and password
-            const infoFilePath = join(jobDir, SERVER_SESSION_INFO);
-            ready = await sftpExists(sftp, infoFilePath);
+              const infoFilePath = join(jobDir, SERVER_SESSION_INFO);
+              ready = await sftpExists(sftp, infoFilePath);
 
-          } else {
+            } else {
             // for vnc apps,
             // try to find the output file and try to parse the display number
-            const outputFilePath = join(jobDir, VNC_OUTPUT_FILE);
+              const outputFilePath = join(jobDir, VNC_OUTPUT_FILE);
 
-            if (await sftpExists(sftp, outputFilePath)) {
-              const content = (await sftpReadFile(sftp)(outputFilePath)).toString();
-              try {
-                parseDisplayId(content, logger);
-                ready = true;
-              } catch {
+              if (await sftpExists(sftp, outputFilePath)) {
+                const content = (await sftpReadFile(sftp)(outputFilePath)).toString();
+                try {
+                  parseDisplayId(content, logger);
+                  ready = true;
+                } catch {
                 // ignored if displayId cannot be parsed
+                }
               }
             }
-
           }
 
-          resultMap.set(sessionMetadata.jobId, {
+          sessions.push({
             jobId: sessionMetadata.jobId,
             appId: sessionMetadata.appId,
             sessionId: sessionMetadata.sessionId,
             submitTime: new Date(sessionMetadata.submitTime),
-            state: "ENDED",
+            state: runningJobInfo?.state ?? "ENDED",
             ready,
           });
 
         }));
 
-        // using squeue to query the running jobs of the user
-        // and update the states of the sessions
 
-        // TODO: better way to judge if a job is ready to connect
-        const jobs = [...resultMap.values()];
-        const states = await queryJobInfo(ssh, logger, ["-u", userId]);
-        states.forEach((x) => {
-          const job = resultMap.get(+x.jobId);
-          if (job) {
-            job.state = x.state;
-            job.ready &&= (x.state === "RUNNING");
-          }
-        });
 
-        return [{ sessions: jobs }];
+        return [{ sessions }];
       });
     },
 
