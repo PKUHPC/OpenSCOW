@@ -54,10 +54,12 @@ export const ConnectTopAppLink: React.FC<Props> = ({
             input.type = "hidden";
             input.name = k;
             input.value = formData[k];
+            form.appendChild(input);
           });
         }
         document.body.appendChild(form);
         form.submit();
+        document.body.removeChild(form);
       }
 
     } else {
