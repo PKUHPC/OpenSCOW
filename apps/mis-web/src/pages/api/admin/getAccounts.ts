@@ -1,11 +1,21 @@
 import { route } from "@ddadaal/next-typed-api-routes-runtime";
-import { asyncClientCall, ensureNotUndefined, RequiredBy } from "@ddadaal/tsgrpc-utils";
+import { asyncClientCall, ensureNotUndefined } from "@ddadaal/tsgrpc-utils";
 import { authenticate } from "src/auth/server";
-import { Account, AccountServiceClient, GetAccountsRequest } from "src/generated/server/account";
+import { Money } from "src/generated/common/money";
+import { AccountServiceClient, GetAccountsRequest } from "src/generated/server/account";
 import { TenantRole } from "src/models/User";
 import { getClient } from "src/utils/client";
 
-export type AdminAccountInfo = RequiredBy<Account, "balance">;
+export type AdminAccountInfo = {
+  tenantName: string;
+  accountName: string;
+  userCount: number;
+  blocked: boolean;
+  ownerId: string;
+  ownerName: string;
+  comment: string;
+  balance: Money;
+}
 
 export interface GetAccountsSchema {
   method: "GET";
