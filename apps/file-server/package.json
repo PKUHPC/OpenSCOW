@@ -20,7 +20,7 @@
     "@grpc/grpc-js": "1.6.7",
     "@sinclair/typebox": "0.23.5",
     "fast-json-stringify": "4.0.0",
-    "fastify": "4.0.0",
+    "fastify": "4.0.2",
     "@fastify/error": "3.0.0",
     "fastify-graceful-shutdown": "3.1.0",
     "fastify-plugin": "3.0.1",
