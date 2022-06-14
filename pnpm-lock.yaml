@@ -325,7 +325,7 @@ importers:
   apps/portal-web:
     specifiers:
       '@ant-design/icons': 4.7.0
-      '@codemirror/autocomplete': 6.0.0
+      '@codemirror/autocomplete': 6.0.1
       '@codemirror/basic-setup': 0.20.0
       '@codemirror/commands': 6.0.0
       '@codemirror/language': 6.0.0
@@ -381,7 +381,7 @@ importers:
       xterm-addon-fit: 0.5.0
     dependencies:
       '@ant-design/icons': 4.7.0_ef5jwxihqo6n7gxfmzogljlgcm
-      '@codemirror/autocomplete': 6.0.0
+      '@codemirror/autocomplete': 6.0.1
       '@codemirror/basic-setup': 0.20.0
       '@codemirror/commands': 6.0.0
       '@codemirror/language': 6.0.0
@@ -2018,8 +2018,8 @@ packages:
       '@lezer/common': 0.16.0
     dev: false
 
-  /@codemirror/autocomplete/6.0.0:
-    resolution: {integrity: sha512-53io5DTxNqRm4TVpCsLJuSLPXXKsGdye5TtkC6Ac59cG1WRcY+4n9IfSn/OlINEWd/hthvu0vdoo/TfWoJd9/g==}
+  /@codemirror/autocomplete/6.0.1:
+    resolution: {integrity: sha512-cD1MxuZq4scpVHecqSnUqQfRYlFDdtu4Y+7G4gF989R4F9nzrcrZ58bVua1/kIh0JminbhwqXeWXI/A5bScXaA==}
     dependencies:
       '@codemirror/language': 6.0.0
       '@codemirror/state': 6.0.0
@@ -6077,7 +6077,7 @@ packages:
   /codemirror/6.0.0:
     resolution: {integrity: sha512-c4XR9QtDn+NhKLM2FBsnRn9SFdRH7G6594DYC/fyKKIsTOcdLF0WNWRd+f6kNyd5j1vgYPucbIeq2XkywYCwhA==}
     dependencies:
-      '@codemirror/autocomplete': 6.0.0
+      '@codemirror/autocomplete': 6.0.1
       '@codemirror/commands': 6.0.0
       '@codemirror/language': 6.0.0
       '@codemirror/lint': 6.0.0
