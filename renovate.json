@@ -4,7 +4,7 @@
   ],
   "ignorePaths": [
     "docker-compose.dev.yml",
-    "scripts/ldap/Dockerfile"
+    "dev/ldap/Dockerfile"
   ],
   "packageRules": [
     {
