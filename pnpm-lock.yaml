@@ -126,7 +126,7 @@ importers:
       '@fastify/cookie': 7.0.0
       '@fastify/error': 3.0.0
       '@fastify/formbody': 7.0.1
-      '@fastify/multipart': 7.0.0
+      '@fastify/multipart': 7.1.0
       '@fastify/static': 6.4.0
       '@fastify/swagger': 7.3.0
       '@grpc/grpc-js': 1.6.7
@@ -147,7 +147,7 @@ importers:
       '@fastify/cookie': 7.0.0
       '@fastify/error': 3.0.0
       '@fastify/formbody': 7.0.1
-      '@fastify/multipart': 7.0.0
+      '@fastify/multipart': 7.1.0
       '@fastify/static': 6.4.0
       '@grpc/grpc-js': 1.6.7
       '@scow/config': link:../../libs/config
@@ -3135,10 +3135,6 @@ packages:
       fastify-plugin: 3.0.1
     dev: false
 
-  /@fastify/error/2.0.0:
-    resolution: {integrity: sha512-wI3fpfDT0t7p8E6dA2eTECzzOd+bZsZCJ2Hcv+Onn2b7ZwK3RwD27uW2QDaMtQhAfWQQP+WNK7nKf0twLsBf9w==}
-    dev: false
-
   /@fastify/error/3.0.0:
     resolution: {integrity: sha512-dPRyT40GiHRzSCll3/Jn2nPe25+E1VXc9tDwRAIKwFCxd5Np5wzgz1tmooWG3sV0qKgrBibihVoCna2ru4SEFg==}
     dev: false
@@ -3155,11 +3151,11 @@ packages:
       fastify-plugin: 3.0.1
     dev: false
 
-  /@fastify/multipart/7.0.0:
-    resolution: {integrity: sha512-Ccb/QPcV10Rm55ehrag4fFAiyAXza/WT7j8Cn2mDAJKsn+bU4qi11iVzKy0uFjQ1zP1JMUkcRCCKq6GGvzgBFg==}
+  /@fastify/multipart/7.1.0:
+    resolution: {integrity: sha512-EemYz5DLA7zWtelnNeN5Nj3b3zpN98kGv4sT+DvB7rWxoOz1XwhTnb2mnbwp08tEadMTevSmGdjJLc6sreMgyg==}
     dependencies:
       '@fastify/busboy': 1.0.0
-      '@fastify/error': 2.0.0
+      '@fastify/error': 3.0.0
       deepmerge: 4.2.2
       end-of-stream: 1.4.4
       fastify-plugin: 3.0.1
