@@ -198,11 +198,11 @@ importers:
       '@ddadaal/tsgrpc-server': 0.14.0
       '@ddadaal/tsgrpc-utils': 0.14.0
       '@grpc/grpc-js': 1.6.7
-      '@mikro-orm/cli': 5.1.5
-      '@mikro-orm/core': 5.1.5
-      '@mikro-orm/mariadb': 5.1.5
-      '@mikro-orm/migrations': 5.1.5
-      '@mikro-orm/mysql': 5.1.5
+      '@mikro-orm/cli': 5.2.0
+      '@mikro-orm/core': 5.2.0
+      '@mikro-orm/mariadb': 5.2.0
+      '@mikro-orm/migrations': 5.2.0
+      '@mikro-orm/mysql': 5.2.0
       '@scow/config': workspace:*
       '@scow/lib-decimal': workspace:*
       '@sinclair/typebox': 0.23.5
@@ -219,11 +219,11 @@ importers:
       '@ddadaal/tsgrpc-server': 0.14.0
       '@ddadaal/tsgrpc-utils': 0.14.0_@grpc+grpc-js@1.6.7
       '@grpc/grpc-js': 1.6.7
-      '@mikro-orm/cli': 5.1.5_koaepduqmtxuxbsxhwvmctjibu
-      '@mikro-orm/core': 5.1.5_koaepduqmtxuxbsxhwvmctjibu
-      '@mikro-orm/mariadb': 5.1.5_3cb6nour5kp4xoownwlco4mi6i
-      '@mikro-orm/migrations': 5.1.5_@mikro-orm+core@5.1.5
-      '@mikro-orm/mysql': 5.1.5_3cb6nour5kp4xoownwlco4mi6i
+      '@mikro-orm/cli': 5.2.0_yxmjyrwyrwpldjy7x2xaf7uvm4
+      '@mikro-orm/core': 5.2.0_yxmjyrwyrwpldjy7x2xaf7uvm4
+      '@mikro-orm/mariadb': 5.2.0_7nbbnsken24slmg4ksfjdww56m
+      '@mikro-orm/migrations': 5.2.0_@mikro-orm+core@5.2.0
+      '@mikro-orm/mysql': 5.2.0_7nbbnsken24slmg4ksfjdww56m
       '@scow/config': link:../../libs/config
       '@scow/lib-decimal': link:../../libs/decimal
       '@sinclair/typebox': 0.23.5
@@ -3608,8 +3608,8 @@ packages:
     resolution: {integrity: sha512-H1rQc1ZOHANWBvPcW+JpGwr+juXSxM8Q8YCkm3GhZd8REu1fHR3z99CErO1p9pkcfcxZnMdIZdIsXkOHY0NilA==}
     dev: false
 
-  /@mikro-orm/cli/5.1.5_koaepduqmtxuxbsxhwvmctjibu:
-    resolution: {integrity: sha512-K085njvTdyVlAUKX/u7BX2BsAgtqz3R4zlao+uWS2zgwtMrZY2nTmcjGMaelAw/DVs7UKdR0y6p0JIs/vZPzxQ==}
+  /@mikro-orm/cli/5.2.0_yxmjyrwyrwpldjy7x2xaf7uvm4:
+    resolution: {integrity: sha512-mYbTAJ4sMDCoa7v447W6YMUP7+BcOK3T7oN9vlJ4TUofHgIBtOBuupPtqj/VOpYT6NriTss8RVSI6U8dHdnFeA==}
     engines: {node: '>= 14.0.0'}
     hasBin: true
     peerDependencies:
@@ -3642,11 +3642,11 @@ packages:
       '@mikro-orm/sqlite':
         optional: true
     dependencies:
-      '@mikro-orm/core': 5.1.5_koaepduqmtxuxbsxhwvmctjibu
-      '@mikro-orm/knex': 5.1.5_3cb6nour5kp4xoownwlco4mi6i
-      '@mikro-orm/mariadb': 5.1.5_3cb6nour5kp4xoownwlco4mi6i
-      '@mikro-orm/migrations': 5.1.5_@mikro-orm+core@5.1.5
-      '@mikro-orm/mysql': 5.1.5_3cb6nour5kp4xoownwlco4mi6i
+      '@mikro-orm/core': 5.2.0_yxmjyrwyrwpldjy7x2xaf7uvm4
+      '@mikro-orm/knex': 5.2.0_7nbbnsken24slmg4ksfjdww56m
+      '@mikro-orm/mariadb': 5.2.0_7nbbnsken24slmg4ksfjdww56m
+      '@mikro-orm/migrations': 5.2.0_@mikro-orm+core@5.2.0
+      '@mikro-orm/mysql': 5.2.0_7nbbnsken24slmg4ksfjdww56m
       fs-extra: 10.1.0
       tsconfig-paths: 4.0.0
       yargonaut: 1.1.4
@@ -3663,8 +3663,8 @@ packages:
       - tedious
     dev: false
 
-  /@mikro-orm/core/5.1.5_koaepduqmtxuxbsxhwvmctjibu:
-    resolution: {integrity: sha512-UU4c6QhdRFO81sF/QlVhJncDEu50nYo+MZzHD3fIP7dNn8cjr86zv2uqK8Bs2TWhPz4HE8mPT6qoZHWlisUNJA==}
+  /@mikro-orm/core/5.2.0_yxmjyrwyrwpldjy7x2xaf7uvm4:
+    resolution: {integrity: sha512-4R2JE7NCRSPgvIAXLQFE+unvRMd8SrCQjs4fs62R5LqhRlbhS+FjY332dmXldq6iGoQ5JkuZhBKiSLV/2X12Mg==}
     engines: {node: '>= 14.0.0'}
     peerDependencies:
       '@mikro-orm/better-sqlite': ^5.0.0
@@ -3696,19 +3696,19 @@ packages:
       '@mikro-orm/sqlite':
         optional: true
     dependencies:
-      '@mikro-orm/mariadb': 5.1.5_3cb6nour5kp4xoownwlco4mi6i
-      '@mikro-orm/migrations': 5.1.5_@mikro-orm+core@5.1.5
-      '@mikro-orm/mysql': 5.1.5_3cb6nour5kp4xoownwlco4mi6i
+      '@mikro-orm/mariadb': 5.2.0_7nbbnsken24slmg4ksfjdww56m
+      '@mikro-orm/migrations': 5.2.0_@mikro-orm+core@5.2.0
+      '@mikro-orm/mysql': 5.2.0_7nbbnsken24slmg4ksfjdww56m
       dotenv: 16.0.1
       escaya: 0.0.61
       fs-extra: 10.1.0
       globby: 11.0.4
-      mikro-orm: 5.1.5
+      mikro-orm: 5.2.0
       reflect-metadata: 0.1.13
     dev: false
 
-  /@mikro-orm/knex/5.1.5_3cb6nour5kp4xoownwlco4mi6i:
-    resolution: {integrity: sha512-u1L5WIBliXYTpuRLpTcTPn8/b6loQ41EMsiZTHs5utBKJK19RDqv8YtMVzu7Wku5E8RTYuF27OjHVVLvUV61PQ==}
+  /@mikro-orm/knex/5.2.0_7nbbnsken24slmg4ksfjdww56m:
+    resolution: {integrity: sha512-2NakQSxUGFjsm3TKwMRgWecKUruALK9TnxKGnah3CgNp+nspwQe6G73HvB0zXUEHBslY68CE/ih3qkFMivAAaQ==}
     engines: {node: '>= 14.0.0'}
     peerDependencies:
       '@mikro-orm/core': ^5.0.0
@@ -3738,8 +3738,8 @@ packages:
       sqlite3:
         optional: true
     dependencies:
-      '@mikro-orm/core': 5.1.5_koaepduqmtxuxbsxhwvmctjibu
-      '@mikro-orm/migrations': 5.1.5_@mikro-orm+core@5.1.5
+      '@mikro-orm/core': 5.2.0_yxmjyrwyrwpldjy7x2xaf7uvm4
+      '@mikro-orm/migrations': 5.2.0_@mikro-orm+core@5.2.0
       fs-extra: 10.1.0
       knex: 2.1.0
       sqlstring: 2.3.3
@@ -3749,8 +3749,8 @@ packages:
       - tedious
     dev: false
 
-  /@mikro-orm/knex/5.1.5_t3hjhxpfjizhczrpucxrgsvllq:
-    resolution: {integrity: sha512-u1L5WIBliXYTpuRLpTcTPn8/b6loQ41EMsiZTHs5utBKJK19RDqv8YtMVzu7Wku5E8RTYuF27OjHVVLvUV61PQ==}
+  /@mikro-orm/knex/5.2.0_r23fifbgiskynxwsaeamutziba:
+    resolution: {integrity: sha512-2NakQSxUGFjsm3TKwMRgWecKUruALK9TnxKGnah3CgNp+nspwQe6G73HvB0zXUEHBslY68CE/ih3qkFMivAAaQ==}
     engines: {node: '>= 14.0.0'}
     peerDependencies:
       '@mikro-orm/core': ^5.0.0
@@ -3780,8 +3780,8 @@ packages:
       sqlite3:
         optional: true
     dependencies:
-      '@mikro-orm/core': 5.1.5_koaepduqmtxuxbsxhwvmctjibu
-      '@mikro-orm/migrations': 5.1.5_@mikro-orm+core@5.1.5
+      '@mikro-orm/core': 5.2.0_yxmjyrwyrwpldjy7x2xaf7uvm4
+      '@mikro-orm/migrations': 5.2.0_@mikro-orm+core@5.2.0
       fs-extra: 10.1.0
       knex: 2.1.0_mysql2@2.3.3
       mysql2: 2.3.3
@@ -3792,8 +3792,8 @@ packages:
       - tedious
     dev: false
 
-  /@mikro-orm/mariadb/5.1.5_3cb6nour5kp4xoownwlco4mi6i:
-    resolution: {integrity: sha512-3/DfnCa3tpu1enw1i5ic7vpX+dk7qL2d7qI0Qxafkp/VRdXBy1Tmmgxg2FOzgZmu7Zvk/xrhX3QROzMAdb/iDA==}
+  /@mikro-orm/mariadb/5.2.0_7nbbnsken24slmg4ksfjdww56m:
+    resolution: {integrity: sha512-bmYqLiJo8yMHtQxzUPeB5QNvRC6lZaaAdXMl7l/RczP9TZDJM/aw8qJpC0qoVRogUv4eyX6MiqeRQGHsua/zxA==}
     engines: {node: '>= 14.0.0'}
     peerDependencies:
       '@mikro-orm/core': ^5.0.0
@@ -3808,9 +3808,9 @@ packages:
       '@mikro-orm/seeder':
         optional: true
     dependencies:
-      '@mikro-orm/core': 5.1.5_koaepduqmtxuxbsxhwvmctjibu
-      '@mikro-orm/knex': 5.1.5_3cb6nour5kp4xoownwlco4mi6i
-      '@mikro-orm/migrations': 5.1.5_@mikro-orm+core@5.1.5
+      '@mikro-orm/core': 5.2.0_yxmjyrwyrwpldjy7x2xaf7uvm4
+      '@mikro-orm/knex': 5.2.0_7nbbnsken24slmg4ksfjdww56m
+      '@mikro-orm/migrations': 5.2.0_@mikro-orm+core@5.2.0
       mariadb: 2.5.6
     transitivePeerDependencies:
       - better-sqlite3
@@ -3824,14 +3824,14 @@ packages:
       - tedious
     dev: false
 
-  /@mikro-orm/migrations/5.1.5_@mikro-orm+core@5.1.5:
-    resolution: {integrity: sha512-noOjJFkzAzvKf+hUp2XFjeA6s8wzNKzR12lSz0XUY6VDbEBERlDSfp6nwXsqTKzYxYvf0Q4nyLDFKbcgeYZIGw==}
+  /@mikro-orm/migrations/5.2.0_@mikro-orm+core@5.2.0:
+    resolution: {integrity: sha512-Ap2HBk3R63koF/TvD3tBmu8Bk0/LIXhi/7zRBozuJ30dx5xxOvuCkckW/qEjvxwNSG0ktr1lKVfePzDPt0KGUA==}
     engines: {node: '>= 14.0.0'}
     peerDependencies:
       '@mikro-orm/core': ^5.0.0
     dependencies:
-      '@mikro-orm/core': 5.1.5_koaepduqmtxuxbsxhwvmctjibu
-      '@mikro-orm/knex': 5.1.5_3cb6nour5kp4xoownwlco4mi6i
+      '@mikro-orm/core': 5.2.0_yxmjyrwyrwpldjy7x2xaf7uvm4
+      '@mikro-orm/knex': 5.2.0_7nbbnsken24slmg4ksfjdww56m
       fs-extra: 10.1.0
       knex: 2.1.0
       umzug: 3.1.1
@@ -3848,8 +3848,8 @@ packages:
       - tedious
     dev: false
 
-  /@mikro-orm/mysql/5.1.5_3cb6nour5kp4xoownwlco4mi6i:
-    resolution: {integrity: sha512-V6x5YOv1LweOovuHA1nDz2i2/5YyRKZjS5MBuW9V5R5z52tHPVIxmAVttuyjBuXQIV1OoHZe45Z8uOp7pqtH2g==}
+  /@mikro-orm/mysql/5.2.0_7nbbnsken24slmg4ksfjdww56m:
+    resolution: {integrity: sha512-7CGGPA2mt+k1loS8gigyFUWpqAlVMVqPXeG0xswiAfQfZYc8kuGqhlapEBge3j4wYbNCpAe5ObRS8Oh4HpwJ+w==}
     engines: {node: '>= 14.0.0'}
     peerDependencies:
       '@mikro-orm/core': ^5.0.0
@@ -3864,9 +3864,9 @@ packages:
       '@mikro-orm/seeder':
         optional: true
     dependencies:
-      '@mikro-orm/core': 5.1.5_koaepduqmtxuxbsxhwvmctjibu
-      '@mikro-orm/knex': 5.1.5_t3hjhxpfjizhczrpucxrgsvllq
-      '@mikro-orm/migrations': 5.1.5_@mikro-orm+core@5.1.5
+      '@mikro-orm/core': 5.2.0_yxmjyrwyrwpldjy7x2xaf7uvm4
+      '@mikro-orm/knex': 5.2.0_r23fifbgiskynxwsaeamutziba
+      '@mikro-orm/migrations': 5.2.0_@mikro-orm+core@5.2.0
       mysql2: 2.3.3
     transitivePeerDependencies:
       - better-sqlite3
@@ -10502,8 +10502,8 @@ packages:
       braces: 3.0.2
       picomatch: 2.3.1
 
-  /mikro-orm/5.1.5:
-    resolution: {integrity: sha512-yGSGat+DllafSlAYX3TO7309WufAa6xU2pSYgHMuAo0C+QSOdOFug9w7Vo8+PDMwLTtx2fO/qDLMHthbU0r7gA==}
+  /mikro-orm/5.2.0:
+    resolution: {integrity: sha512-t6up4g6PHN2Davm9djB3yGzdhgUGiPsX1JM6pFx7U3Qei1pFcmZtmZa65jthQOpTsMIFTXPSn8isp1NNemwm6w==}
     engines: {node: '>= 14.0.0'}
     dev: false
 
@@ -12095,7 +12095,7 @@ packages:
     optional: true
 
   /pseudomap/1.0.2:
-    resolution: {integrity: sha1-8FKijacOYYkX7wqKw0wa5aaChrM=}
+    resolution: {integrity: sha512-b/YwNhb8lk1Zz2+bXXpS/LK9OisiZZ1SNsSLxN1x2OXVEhW2Ckr/7mWE5vrC1ZTiJlD9g19jWszTmJsB+oEpFQ==}
     dev: false
 
   /pstree.remy/1.1.8:
@@ -13478,7 +13478,7 @@ packages:
     dev: false
 
   /semver-compare/1.0.0:
-    resolution: {integrity: sha1-De4hahyUGrN+nvsXiPavxf9VN/w=}
+    resolution: {integrity: sha512-YM3/ITh2MJ5MtzaM429anh+x2jiLVjqILF4m4oyQB18W7Ggea7BfqdH/wGMK7dDiMghv/6WG7znWMwUDzJiXow==}
     dev: false
 
   /semver-diff/3.1.1:
@@ -13528,7 +13528,7 @@ packages:
       - supports-color
 
   /seq-queue/0.0.5:
-    resolution: {integrity: sha1-1WgS4cAXpuTnw+Ojeh2m143TyT4=}
+    resolution: {integrity: sha512-hr3Wtp/GZIc/6DAGPDcV4/9WoZhjrkXsi5B/07QgX8tsdc6ilr7BFM6PM6rbdAX1kFSDYeZGLipIZZKyQP0O5Q==}
     dev: false
 
   /serialize-javascript/6.0.0:
@@ -13577,7 +13577,7 @@ packages:
     dev: false
 
   /set-blocking/2.0.0:
-    resolution: {integrity: sha1-BF+XgtARrppoA93TgrJDkrPYkPc=}
+    resolution: {integrity: sha512-KiKBS8AnWGEyLzofFfmvKwpdPzqiy16LvQfK3yv/fVH7Bj13/wl3JSR1J+rfgRE9q7xUJK4qvgS8raSOeLUehw==}
 
   /set-cookie-parser/2.4.8:
     resolution: {integrity: sha512-edRH8mBKEWNVIVMKejNnuJxleqYE/ZSdcT8/Nem9/mmosx12pctd80s2Oy00KNZzrogMZS5mauK2/ymL1bvlvg==}
@@ -13872,7 +13872,7 @@ packages:
     engines: {node: '>= 10.x'}
 
   /sprintf-js/1.0.3:
-    resolution: {integrity: sha1-BOaSb2YolTVPPdAVIDYzuFcpfiw=}
+    resolution: {integrity: sha512-D9cPgkvLlV3t3IzL0D0YLvGA9Ahk4PcvVwUbN0dSGr1aP0Nrt4AEnTUbuGvquEC0mA64Gqt1fzirlRs5ibXx8g==}
 
   /sqlstring/2.3.3:
     resolution: {integrity: sha512-qC9iz2FlN7DQl3+wjwn3802RTyjCx7sDvfQEXchwa6CWOx07/WVfh91gBmQ9fahw8snwGEWU3xGzOt4tFyHLxg==}
@@ -14042,7 +14042,7 @@ packages:
     dev: false
 
   /strip-ansi/3.0.1:
-    resolution: {integrity: sha1-ajhfuIU9lS1f8F0Oiq+UJ43GPc8=}
+    resolution: {integrity: sha512-VhumSSbBqDTP8p2ZLKj40UjBCV4+v8bUSEpUb4KjRgWk9pbqGF4REFj6KEagidb2f/M6AzC0EmFyDNGaw9OCzg==}
     engines: {node: '>=0.10.0'}
     dependencies:
       ansi-regex: 2.1.1
@@ -14174,7 +14174,7 @@ packages:
     dev: false
 
   /supports-color/2.0.0:
-    resolution: {integrity: sha1-U10EXOa2Nj+kARcIRimZXp3zJMc=}
+    resolution: {integrity: sha512-KKNVtd6pCYgPIKU4cp2733HWYCpplQhddZLBUryaAHou723x+FRzQ5Df824Fj+IyyuiQTRoub4SnIFfIcrp70g==}
     engines: {node: '>=0.8.0'}
     dev: false
 
@@ -15360,7 +15360,7 @@ packages:
     dev: true
 
   /which-module/2.0.0:
-    resolution: {integrity: sha1-2e8H3Od7mQK4o6j6SzHD4/fm6Ho=}
+    resolution: {integrity: sha512-B+enWhmw6cjfVC7kS8Pj9pCrKSc5txArRyaYGe088shv/FGWH+0Rjx/xPgtsWfsUtS27FkP697E4DDhgrgoc0Q==}
     dev: false
 
   /which/1.3.1:
@@ -15528,7 +15528,7 @@ packages:
     engines: {node: '>=10'}
 
   /yallist/2.1.2:
-    resolution: {integrity: sha1-HBH5IY8HYImkfdUS+TxmmaaoHVI=}
+    resolution: {integrity: sha512-ncTzHV7NvsQZkYe1DW7cbDLm0YpzHmZF5r/iyP3ZnQtMiJ+pjzisCiMNI+Sj+xQF5pXhSHxSB3uDbsBTzY/c2A==}
     dev: false
 
   /yallist/4.0.0:
