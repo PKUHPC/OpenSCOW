@@ -6,6 +6,9 @@
     "docker-compose.dev.yml",
     "dev/ldap/Dockerfile"
   ],
+  "schedule": [
+    "every weekend"
+  ],
   "packageRules": [
     {
       "matchFiles": [
