@@ -8,7 +8,7 @@ import { FilterFormContainer } from "src/components/FilterFormContainer";
 import type { SavedJob } from "src/generated/portal/job";
 import type { Cluster } from "src/utils/config";
 import { CLUSTERS } from "src/utils/config";
-import { formatDateTime } from "src/utils/datetime";
+import { compareDateTime, formatDateTime } from "src/utils/datetime";
 
 interface Props {}
 
@@ -85,9 +85,13 @@ const InfoTable: React.FC<InfoTableProps> = ({
       rowKey={(x) => x.jobName}
       scroll={{ x: true }}
     >
-      <Table.Column<SavedJob> dataIndex="jobName" title="作业名"/>
+      <Table.Column<SavedJob> dataIndex="jobName" title="作业名"
+        sorter={(a, b) => a.jobName.localeCompare(b.jobName)}
+      />
       <Table.Column<SavedJob> dataIndex="submitTime" title="提交时间"
         render={(v) => formatDateTime(v)}
+        sorter={(a, b) => (a.submitTime && b.submitTime) ? compareDateTime(a.submitTime, b.submitTime) : 0}
+        defaultSortOrder="descend"
       />
       <Table.Column<SavedJob> dataIndex="comment" title="备注" />
       <Table.Column<SavedJob> title="更多"

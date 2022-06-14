@@ -120,7 +120,9 @@ export const RunningJobInfoTable: React.FC<JobInfoTableProps> = ({
             />
           )
         }
-        <Table.Column<RunningJobInfo> dataIndex="jobId" title="作业ID" />
+        <Table.Column<RunningJobInfo> dataIndex="jobId" title="作业ID"
+          sorter={(a, b) => a.jobId.localeCompare(b.jobId)}
+        />
         {
           showUser && (
             <Table.Column<RunningJobInfo> dataIndex="user" title="用户" />

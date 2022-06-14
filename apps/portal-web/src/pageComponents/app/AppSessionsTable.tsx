@@ -7,7 +7,8 @@ import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { AppSession } from "src/generated/portal/app";
 import { ConnectTopAppLink } from "src/pageComponents/app/ConnectToAppLink";
 import { Cluster, CLUSTERS, publicConfig } from "src/utils/config";
-import { formatDateTime } from "src/utils/datetime";
+import { compareDateTime, formatDateTime } from "src/utils/datetime";
+import { compareNumber } from "src/utils/math";
 
 interface Props {
 }
@@ -45,6 +46,8 @@ export const AppSessionsTable: React.FC<Props> = () => {
     {
       title: "作业ID",
       dataIndex: "jobId",
+      sorter: (a, b) => compareNumber(a.jobId, b.jobId),
+      defaultSortOrder: "descend",
     },
     {
       title: "应用",
@@ -55,6 +58,7 @@ export const AppSessionsTable: React.FC<Props> = () => {
       title: "提交时间",
       dataIndex: "submitTime",
       render: (_, record) => record.submitTime ? formatDateTime(record.submitTime) : "",
+      sorter: (a, b) => (!a.submitTime || !b.submitTime) ? -1 :  compareDateTime(a.submitTime, b.submitTime),
     },
     {
       title: "状态",
@@ -125,7 +129,6 @@ export const AppSessionsTable: React.FC<Props> = () => {
         columns={columns}
         rowKey={(record) => record.sessionId}
         loading={isLoading}
-        pagination={false}
       />
     </div>
   );

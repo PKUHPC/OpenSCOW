@@ -20,7 +20,8 @@ import { PathBar } from "src/pageComponents/filemanager/PathBar";
 import { RenameModal } from "src/pageComponents/filemanager/RenameModal";
 import { UploadModal } from "src/pageComponents/filemanager/UploadModal";
 import { publicConfig } from "src/utils/config";
-import { formatDateTime } from "src/utils/datetime";
+import { compareDateTime, formatDateTime } from "src/utils/datetime";
+import { compareNumber } from "src/utils/math";
 import styled from "styled-components";
 
 interface Props {
@@ -379,10 +380,12 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
 
         <Table.Column<FileInfo> dataIndex="mtime" title="修改日期"
           render={(mtime: string | undefined) => mtime ? formatDateTime(mtime) : ""}
+          sorter={(a, b) => (a.type === "error" || b.type === "error") ? 0 : compareDateTime(a.mtime, b.mtime) }
         />
 
         <Table.Column<FileInfo> dataIndex="size" title="大小"
           render={(size: number | undefined) => size === undefined ? "" : Math.floor(size / 1024) + " KB"}
+          sorter={(a, b) => (a.type === "error" || b.type === "error") ? 0 : compareNumber(a.size, b.size) }
         />
 
         <Table.Column<FileInfo> dataIndex="mode" title="权限"
