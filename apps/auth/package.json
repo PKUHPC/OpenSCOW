@@ -6,8 +6,7 @@
   "scripts": {
     "build": "rimraf build && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
     "dev": "nodemon --watch src -e ts --exec \"npx dotenv -e env/.env.dev -- npx ts-node -r tsconfig-paths/register src/index.ts\"",
-    "test": "jest",
-    "postinstall": "patch-package"
+    "test": "jest"
   },
   "keywords": [],
   "author": "",

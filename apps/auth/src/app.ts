@@ -41,6 +41,7 @@ export function buildApp(pluginOverrides?: PluginOverrides) {
 
   applyPlugins(server, pluginOverrides);
 
+  gracefulShutdown[Symbol.for("plugin-meta")].fastify = ">=3.0.0";
   server.register(gracefulShutdown);
 
   routes.forEach((r) => server.register(r));

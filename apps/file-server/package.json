@@ -8,8 +8,7 @@
     "build": "rimraf build && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.json && pkg .",
     "dev": "nodemon --watch src -e ts --exec \"npx dotenv -e env/.env.dev -- npx ts-node -r tsconfig-paths/register src/index.ts\"",
     "test": "jest",
-    "genApi": "dotenv -e env/.env.dev -- ts-node -r tsconfig-paths/register src/genSchema.ts",
-    "postinstall": "patch-package"
+    "genApi": "dotenv -e env/.env.dev -- ts-node -r tsconfig-paths/register src/genSchema.ts"
   },
   "keywords": [],
   "author": "",
