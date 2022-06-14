@@ -20,10 +20,15 @@ export interface JobMetadata {
   workingDirectory: string;
 }
 
-export function generateJobScript(jobInfo: JobInfo & { output?: string }) {
-  const { jobName, account, coreCount, maxTime, nodeCount, partition, qos, command, workingDirectory,
-    output } = jobInfo;
-
+export function generateJobScript(jobInfo: JobInfo & {
+  output?: string;
+  nodeList?: string;
+}) {
+  const {
+    jobName, account, coreCount, maxTime, nodeCount,
+    partition, qos, command, workingDirectory,
+    output, nodeList,
+  } = jobInfo;
   let script = "#!/bin/bash\n";
 
   function append(param: string) {
@@ -40,6 +45,9 @@ export function generateJobScript(jobInfo: JobInfo & { output?: string }) {
   append("--chdir=" + workingDirectory);
   if (output) {
     append("--output=" + output);
+  }
+  if (nodeList) {
+    append("--nodelist=" + nodeList);
   }
 
 
