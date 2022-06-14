@@ -74,7 +74,7 @@ importers:
       '@types/asn1': 0.2.0
       '@types/ldapjs': 2.2.2
       asn1: 0.2.6
-      fastify: 4.0.0
+      fastify: 4.0.2
       fastify-graceful-shutdown: 3.1.0
       fastify-plugin: 3.0.1
       ioredis: 5.0.6
@@ -87,7 +87,7 @@ importers:
       '@scow/config': link:../../libs/config
       '@sinclair/typebox': 0.23.5
       asn1: 0.2.6
-      fastify: 4.0.0
+      fastify: 4.0.2
       fastify-graceful-shutdown: 3.1.0
       fastify-plugin: 3.0.1
       ioredis: 5.0.6
@@ -136,7 +136,7 @@ importers:
       '@types/mime-types': 2.1.1
       '@types/shell-quote': 1.7.1
       fast-json-stringify: 4.0.0
-      fastify: 4.0.0
+      fastify: 4.0.2
       fastify-graceful-shutdown: 3.1.0
       fastify-plugin: 3.0.1
       form-data: 4.0.0
@@ -154,7 +154,7 @@ importers:
       '@scow/lib-auth': link:../../libs/auth
       '@sinclair/typebox': 0.23.5
       fast-json-stringify: 4.0.0
-      fastify: 4.0.0
+      fastify: 4.0.2
       fastify-graceful-shutdown: 3.1.0
       fastify-plugin: 3.0.1
       mime-types: 2.1.35
@@ -3146,7 +3146,7 @@ packages:
   /@fastify/fast-json-stringify-compiler/3.0.0:
     resolution: {integrity: sha512-Wh0wAtL2O83lrUlSawkF5uXC4pL6UGva3P8j9ztVipjIYFBMnzSaxTaSTi9GATXupl8E/BykI+HVBEIyh9FDIw==}
     dependencies:
-      fast-json-stringify: 4.0.0
+      fast-json-stringify: 4.1.0
     dev: false
 
   /@fastify/formbody/7.0.1:
@@ -7821,14 +7821,15 @@ packages:
   /fastify-plugin/3.0.1:
     resolution: {integrity: sha512-qKcDXmuZadJqdTm6vlCqioEbyewF60b/0LOFCcYN1B6BIZGlYJumWWOYs70SFYLDAH4YqdE1cxH/RKMG7rFxgA==}
 
-  /fastify/4.0.0:
-    resolution: {integrity: sha512-Go6j7omkTMzfnFnYT8w4Usi9qfs/7rX8zPrE6K96bp9pe7tnTUC7EcCgaCPelmbn5uh6o45iVL7a274WSbuY/Q==}
+  /fastify/4.0.2:
+    resolution: {integrity: sha512-1DYyRyIqdPbvu/c5Xtt5MF7wQRLO+GbCibRWq+5JhntQVdod9oCy7rGsSNDMjvRgvJY5EUm2UYnBtAsDr5NdFA==}
     dependencies:
       '@fastify/ajv-compiler': 3.1.0
       '@fastify/error': 3.0.0
       '@fastify/fast-json-stringify-compiler': 3.0.0
       abstract-logging: 2.0.1
       avvio: 8.1.3
+      fast-json-stringify: 4.1.0
       find-my-way: 6.3.0
       light-my-request: 5.0.0
       pino: 8.0.0
