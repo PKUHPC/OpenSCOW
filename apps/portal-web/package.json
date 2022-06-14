@@ -50,7 +50,7 @@
     "@codemirror/theme-one-dark": "6.0.0",
     "@codemirror/language": "6.0.0",
     "@codemirror/commands": "6.0.0",
-    "@codemirror/autocomplete": "6.0.0",
+    "@codemirror/autocomplete": "6.0.1",
     "codemirror": "6.0.0",
     "socket.io": "4.5.1",
     "node-pty": "0.11.0-beta9",
