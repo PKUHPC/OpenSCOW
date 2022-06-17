@@ -19,6 +19,7 @@ title: "portal-web"
 |`ENABLE_JOB_MANAGEMENT`|布尔值|是否启动作业管理功能|false|
 |`JOB_SERVER`|字符串|作业服务器的地址|job-server:5000|
 |`ENABLE_LOGIN_DESKTOP`|布尔值|是否启动登录节点上的桌面功能|false|
+|`LOGIN_DESKTOP_WMS`|字符串|登录节点上可以启动的桌面类型，格式：名字=wm值,名字=wm值<br/>示例：Xfce=xfce,gnome3=|Xfce=xfce|
 |`ENABLE_APPS`|布尔值|是否启动交互式任务功能|false|
 |`DEFAULT_FOOTER_TEXT`|字符串|默认footer文本||
 |`FOOTER_TEXTS`|字符串|根据域名(hostname，不包括port)不同，显示在footer上的文本。格式：域名=文本,域名=文本||
