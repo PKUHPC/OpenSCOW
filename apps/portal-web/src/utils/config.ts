@@ -35,6 +35,7 @@ export interface PublicRuntimeConfig {
   FILE_SERVERS: string[];
 
   ENABLE_LOGIN_DESKTOP: boolean;
+  LOGIN_DESKTOP_WMS: { [name: string]: string };
 
   ENABLE_JOB_MANAGEMENT: boolean;
 

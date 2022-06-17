@@ -65,7 +65,7 @@ export const vncServiceServer = plugin((server) => {
     },
 
     createDesktop: async ({ request, logger }) => {
-      const { cluster, username } = request;
+      const { cluster, username, wm } = request;
 
       checkClusterExistence(cluster);
       const node = clustersConfig[cluster].loginNodes[0];
@@ -80,10 +80,16 @@ export const vncServiceServer = plugin((server) => {
         const ids = parseListOutput(resp.stdout);
         if (ids.length < config.MAX_DISPLAY) {
           // start a session
-          resp = await loggedExec(ssh, logger, true,
-            // explicitly set securitytypes to avoid requiring setting vnc passwd
-            // TODO adds more desktop supprt other than xfce
-            VNCSERVER_BIN_PATH, ["-securitytypes", "OTP", "-otp", "-wm", "xfce"]);
+
+          // explicitly set securitytypes to avoid requiring setting vnc passwd
+          const params = ["-securitytypes", "OTP", "-otp"];
+
+          if (wm) {
+            params.push("-wm");
+            params.push(wm);
+          }
+
+          resp = await loggedExec(ssh, logger, true, VNCSERVER_BIN_PATH, params);
 
           // parse the OTP from output. the output was in stderr
           const password = parseOtp(resp.stderr, logger);

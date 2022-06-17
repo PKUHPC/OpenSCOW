@@ -11,6 +11,9 @@ export interface CreateDesktopSchema {
 
   body: {
     cluster: string;
+
+    // the name of the wm
+    wm: string;
   }
 
   responses: {
@@ -19,6 +22,12 @@ export interface CreateDesktopSchema {
       port: number;
       password: string;
     };
+
+    400: {
+      code: "INVALID_WM";
+      message: string;
+    }
+
     409: {
       code: "RESOURCE_EXHAUSTED";
       message: string;
@@ -36,6 +45,12 @@ export default /* #__PURE__*/route<CreateDesktopSchema>("CreateDesktopSchema", a
     return { 501: null };
   }
 
+  const { cluster, wm } = req.body;
+
+  if (publicConfig.LOGIN_DESKTOP_WMS[wm] === undefined) {
+    return { 400: { code: "INVALID_WM", message: `${wm} is not a acceptable wm.` } };
+  }
+
   const info = await auth(req, res);
 
   if (!info) { return; }
@@ -43,8 +58,9 @@ export default /* #__PURE__*/route<CreateDesktopSchema>("CreateDesktopSchema", a
   const client = getJobServerClient(VncServiceClient);
 
   return await asyncClientCall(client, "createDesktop", {
-    cluster: req.body.cluster,
+    cluster,
     username: info.identityId,
+    wm: publicConfig.LOGIN_DESKTOP_WMS[wm],
   })
     .then(({  node, password, port }) => {
       return { 200: { node, password, port } };

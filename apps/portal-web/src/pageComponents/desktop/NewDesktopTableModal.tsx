@@ -1,8 +1,8 @@
-import { Form, Modal } from "antd";
+import { Form, Modal, Select } from "antd";
 import React, { useState } from "react";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
-import { Cluster, CLUSTERS } from "src/utils/config";
+import { Cluster, CLUSTERS, publicConfig } from "src/utils/config";
 import { openDesktop } from "src/utils/vnc";
 
 export interface Props {
@@ -13,8 +13,10 @@ export interface Props {
 
 interface ClusterInfo {
   cluster: Cluster;
+  wm: string;
 }
 
+const defaultWm = Object.keys(publicConfig.LOGIN_DESKTOP_WMS)[0];
 
 export const NewDesktopTableModal: React.FC<Props> = ({ visible, onClose, reload }) => {
 
@@ -28,7 +30,7 @@ export const NewDesktopTableModal: React.FC<Props> = ({ visible, onClose, reload
     setSubmitting(true);
 
     // Create new desktop
-    await api.createDesktop({ body: { cluster: values.cluster.id } })
+    await api.createDesktop({ body: { cluster: values.cluster.id, wm: values.wm } })
       .httpError(409, (e) => {
         const { code, message:serverMessage } = e;
         if (code === "RESOURCE_EXHAUSTED") {
@@ -57,7 +59,7 @@ export const NewDesktopTableModal: React.FC<Props> = ({ visible, onClose, reload
       confirmLoading={submitting}
       onCancel={onClose}
     >
-      <Form form={form} initialValues={{ cluster: CLUSTERS[0] }}>
+      <Form form={form} initialValues={{ cluster: CLUSTERS[0], wm: defaultWm }}>
         <Form.Item
           label="集群"
           name="cluster"
@@ -68,6 +70,13 @@ export const NewDesktopTableModal: React.FC<Props> = ({ visible, onClose, reload
           ]}
         >
           <SingleClusterSelector />
+        </Form.Item>
+        <Form.Item label="桌面" name="wm" required>
+          <Select
+            options={Object.keys(publicConfig.LOGIN_DESKTOP_WMS).map((name) =>
+              ({ label: name, value: name }))}
+          />
+
         </Form.Item>
       </Form>
     </Modal>

@@ -33,6 +33,7 @@ message ListDesktopsReply {
 message CreateDesktopRequest {
   string cluster = 1;
   string username = 2;
+  string wm = 3;
 }
 
 // RESOURCE_EXHAUSTED: if VNC desktop reaches maximum, the details is the

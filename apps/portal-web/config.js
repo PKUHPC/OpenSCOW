@@ -32,6 +32,7 @@ const specs = {
   JOB_SERVER: str({ desc: "作业服务器的地址", default: "job-server:5000" }),
 
   ENABLE_LOGIN_DESKTOP: bool({ desc: "是否启动登录节点上的桌面功能", default: false }),
+  LOGIN_DESKTOP_WMS: str({ desc: "登录节点上可以启动的桌面类型，格式：名字=wm值,名字=wm值", example: "Xfce=xfce,gnome3=", default: "Xfce=xfce" }),
 
   ENABLE_APPS: bool({ desc: "是否启动交互式任务功能", default: false }),
 
@@ -126,7 +127,9 @@ const publicRuntimeConfig = {
   FILE_SERVERS: parseArray(config.FILE_SERVERS),
 
   ENABLE_JOB_MANAGEMENT: config.ENABLE_JOB_MANAGEMENT,
+
   ENABLE_LOGIN_DESKTOP: config.ENABLE_LOGIN_DESKTOP,
+  LOGIN_DESKTOP_WMS: parseKeyValue(config.LOGIN_DESKTOP_WMS),
 
   ENABLE_APPS: config.ENABLE_APPS,
 
