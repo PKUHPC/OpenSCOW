@@ -8,6 +8,7 @@ export const openDesktop = (node: string, port: number, password: string) => {
     password: password,
     autoconnect: "true",
     reconnect: "true",
+    resize: "remote",
   });
 
   window.open("/vnc/vnc.html?" + params.toString(), "_blank");
