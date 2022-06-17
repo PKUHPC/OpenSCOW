@@ -48,12 +48,13 @@ title: 登录节点桌面
 
 下表为目前已经在CentOS 7上测试的各个桌面与turbovnc的兼容性以及对应的wm值。要想使用对应的桌面，请在对应的桌面节点安装`epel-release`包，再运行安装命令部分的命令安装对应的桌面。
 
-| 桌面    | wm值                    | 安装命令                                   | 兼容性     |
-| ------- | ----------------------- | ------------------------------------------ | ---------- |
-| KDE     | `1-kde-plasma-standard` | `yum groupinstall "KDE Plasma Workspaces"` | 可用       |
-| Xfce    | `xfce`                  | `yum groupinstall "Xfce"`                  | 可用       |
-| MATE    | `mate`                  | `yum groupinstall "MATE Desktop"`          | 可用       |
-| GNOME 2 | `2d`                    | `yum groupinstall "GNOME Desktop"`         | **不可用** |
-| GNOME 3 | ` `（空字符串）         | `yum groupinstall "GNOME Desktop"`         | **不可用** |
+| 桌面     | wm值                    | 安装命令                                   | 兼容性     |
+| -------- | ----------------------- | ------------------------------------------ | ---------- |
+| KDE      | `1-kde-plasma-standard` | `yum groupinstall "KDE Plasma Workspaces"` | 可用       |
+| Xfce     | `xfce`                  | `yum groupinstall "Xfce"`                  | 可用       |
+| MATE     | `mate`                  | `yum groupinstall "MATE Desktop"`          | 可用       |
+| cinnamon | `cinnamon`              | `yum install cinnamon`                     | 可用       |
+| GNOME 2  | `2d`                    | `yum groupinstall "GNOME Desktop"`         | **不可用** |
+| GNOME 3  | ` `（空字符串）         | `yum groupinstall "GNOME Desktop"`         | **不可用** |
 
 根据TurboVNC的文档，如果需要启动其他桌面，您可以将wm值设置为任意`/usr/share/xsessions`下的文件名（不包括`.desktop`后缀）来启动对应的桌面。
