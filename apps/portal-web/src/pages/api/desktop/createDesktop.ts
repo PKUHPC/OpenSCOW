@@ -5,6 +5,7 @@ import { authenticate } from "src/auth/server";
 import { VncServiceClient } from "src/generated/portal/vnc";
 import { getJobServerClient } from "src/utils/client";
 import { publicConfig } from "src/utils/config";
+import { dnsResolve } from "src/utils/dns";
 
 export interface CreateDesktopSchema {
   method: "POST";
@@ -62,8 +63,8 @@ export default /* #__PURE__*/route<CreateDesktopSchema>("CreateDesktopSchema", a
     username: info.identityId,
     wm: publicConfig.LOGIN_DESKTOP_WMS[wm],
   })
-    .then(({  node, password, port }) => {
-      return { 200: { node, password, port } };
+    .then(async ({ node, password, port }) => {
+      return { 200: { node: await dnsResolve(node), password, port } };
     }).catch((e) => {
       if (e.code === status.RESOURCE_EXHAUSTED) {
         return { 409: { code: "RESOURCE_EXHAUSTED", message: e.details } } as const;
