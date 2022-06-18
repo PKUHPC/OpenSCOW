@@ -7,7 +7,9 @@ export const exactMatch: Matcher = (spec, path) => {
 };
 
 export const startsWithMatch: Matcher = (spec, path) => {
-  return path.startsWith(spec);
+  const normalizedPath = path.endsWith("/") ? path.substring(0, path.length - 1) : path;
+  // avoid /test matches /test-test
+  return normalizedPath === spec || normalizedPath.startsWith(spec + "/");
 };
 
 export const match = (item: NavItemProps, path: string) => {
