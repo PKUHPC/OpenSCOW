@@ -28,7 +28,7 @@ importers:
       pino-pretty: 8.0.0
       pkg: 5.7.0
       rimraf: 3.0.2
-      ts-jest: 28.0.4
+      ts-jest: 28.0.5
       ts-node: 10.8.1
       tsc-alias: 1.6.9
       tsconfig-paths: 4.0.0
@@ -58,7 +58,7 @@ importers:
       pino-pretty: 8.0.0
       pkg: 5.7.0
       rimraf: 3.0.2
-      ts-jest: 28.0.4_vz6zla63wvofljfl6elifyg77e
+      ts-jest: 28.0.5_vz6zla63wvofljfl6elifyg77e
       ts-node: 10.8.1_lr5yv43hchipyudzleywqpgwuy
       tsc-alias: 1.6.9
       tsconfig-paths: 4.0.0
@@ -9782,18 +9782,6 @@ packages:
       - supports-color
     dev: true
 
-  /jest-util/28.1.0:
-    resolution: {integrity: sha512-qYdCKD77k4Hwkose2YBEqQk7PzUf/NSE+rutzceduFveQREeH6b+89Dc9+wjX9dAwHcgdx4yedGA3FQlU/qCTA==}
-    engines: {node: ^12.13.0 || ^14.15.0 || ^16.10.0 || >=17.0.0}
-    dependencies:
-      '@jest/types': 28.1.1
-      '@types/node': 17.0.38
-      chalk: 4.1.2
-      ci-info: 3.3.1
-      graceful-fs: 4.2.10
-      picomatch: 2.3.1
-    dev: true
-
   /jest-util/28.1.1:
     resolution: {integrity: sha512-FktOu7ca1DZSyhPAxgxB6hfh2+9zMoJ7aEQA759Z6p45NuO8mWcqujH+UdHlCm/V6JTWwDztM2ITCzU1ijJAfw==}
     engines: {node: ^12.13.0 || ^14.15.0 || ^16.10.0 || >=17.0.0}
@@ -14457,8 +14445,8 @@ packages:
     resolution: {integrity: sha512-rvuRbTarPXmMb79SmzEp8aqXNKcK+y0XaB298IXueQ8I2PsrATcPBCSPyK/dDNa2iWOhKlfNnOjdAOTBU/nkFA==}
     dev: false
 
-  /ts-jest/28.0.4_vz6zla63wvofljfl6elifyg77e:
-    resolution: {integrity: sha512-S6uRDDdCJBvnZqyGjB4VCnwbQrbgdL8WPeP4jevVSpYsBaeGRQAIS08o3Svav2Ex+oXwLgJ/m7F24TNq62kA1A==}
+  /ts-jest/28.0.5_vz6zla63wvofljfl6elifyg77e:
+    resolution: {integrity: sha512-Sx9FyP9pCY7pUzQpy4FgRZf2bhHY3za576HMKJFs+OnQ9jS96Du5vNsDKkyedQkik+sEabbKAnCliv9BEsHZgQ==}
     engines: {node: ^12.13.0 || ^14.15.0 || ^16.10.0 || >=17.0.0}
     hasBin: true
     peerDependencies:
@@ -14478,13 +14466,13 @@ packages:
       bs-logger: 0.2.6
       fast-json-stable-stringify: 2.1.0
       jest: 28.1.1_s2su2db7tl6nnkgv7shlaunnoa
-      jest-util: 28.1.0
+      jest-util: 28.1.1
       json5: 2.2.1
       lodash.memoize: 4.1.2
       make-error: 1.3.6
       semver: 7.3.7
       typescript: 4.7.3
-      yargs-parser: 20.2.9
+      yargs-parser: 21.0.1
     dev: true
 
   /ts-json-schema-generator/1.0.0:
