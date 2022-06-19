@@ -18,7 +18,7 @@
     "@scow/lib-auth": "workspace:*",
     "@grpc/grpc-js": "1.6.7",
     "@sinclair/typebox": "0.23.5",
-    "fast-json-stringify": "4.0.0",
+    "fast-json-stringify": "4.2.0",
     "fastify": "4.0.3",
     "@fastify/error": "3.0.0",
     "fastify-graceful-shutdown": "3.1.0",
