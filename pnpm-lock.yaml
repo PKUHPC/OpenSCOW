@@ -365,7 +365,7 @@ importers:
       nookies: 2.5.2
       nprogress: 0.2.0
       postcss: 8.4.14
-      random-words: 1.1.2
+      random-words: 1.2.0
       react: 18.1.0
       react-async: 10.0.1
       react-dom: 18.1.0
@@ -409,7 +409,7 @@ importers:
       node-pty: 0.11.0-beta9
       nookies: 2.5.2
       nprogress: 0.2.0
-      random-words: 1.1.2
+      random-words: 1.2.0
       react: 18.1.0
       react-async: 10.0.1_react@18.1.0
       react-dom: 18.1.0_react@18.1.0
@@ -12175,8 +12175,8 @@ packages:
       ret: 0.1.15
     dev: false
 
-  /random-words/1.1.2:
-    resolution: {integrity: sha512-GwgC+Yu+D5/044grf2QqaYk3ZrQip7yfgvkj/6bJ3H3B3KrE7qoNPbWaYd06hrigqAkrPzNVEpRlnBaNx4bDuA==}
+  /random-words/1.2.0:
+    resolution: {integrity: sha512-YP2bXrT19pxtBh22DK9CLcWsmBjUBAGzw3JWJycTNbXm1+0aS6PrKuAJ9aLT0GGaPlPp9LExfJIMVkzhrDZE6g==}
     dev: false
 
   /randombytes/2.1.0:
