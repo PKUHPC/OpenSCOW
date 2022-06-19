@@ -54,7 +54,7 @@
     "codemirror": "6.0.0",
     "socket.io": "4.5.1",
     "node-pty": "0.11.0-beta9",
-    "random-words": "1.1.2"
+    "random-words": "1.2.0"
   },
   "devDependencies": {
     "@ddadaal/next-typed-api-routes-cli": "0.5.1",
