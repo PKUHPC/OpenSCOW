@@ -74,7 +74,7 @@ importers:
       '@types/asn1': 0.2.0
       '@types/ldapjs': 2.2.2
       asn1: 0.2.6
-      fastify: 4.0.2
+      fastify: 4.0.3
       fastify-graceful-shutdown: 3.1.0
       fastify-plugin: 3.0.1
       ioredis: 5.0.6
@@ -87,7 +87,7 @@ importers:
       '@scow/config': link:../../libs/config
       '@sinclair/typebox': 0.23.5
       asn1: 0.2.6
-      fastify: 4.0.2
+      fastify: 4.0.3
       fastify-graceful-shutdown: 3.1.0
       fastify-plugin: 3.0.1
       ioredis: 5.0.6
@@ -136,7 +136,7 @@ importers:
       '@types/mime-types': 2.1.1
       '@types/shell-quote': 1.7.1
       fast-json-stringify: 4.0.0
-      fastify: 4.0.2
+      fastify: 4.0.3
       fastify-graceful-shutdown: 3.1.0
       fastify-plugin: 3.0.1
       form-data: 4.0.0
@@ -154,7 +154,7 @@ importers:
       '@scow/lib-auth': link:../../libs/auth
       '@sinclair/typebox': 0.23.5
       fast-json-stringify: 4.0.0
-      fastify: 4.0.2
+      fastify: 4.0.3
       fastify-graceful-shutdown: 3.1.0
       fastify-plugin: 3.0.1
       mime-types: 2.1.35
@@ -3139,10 +3139,10 @@ packages:
     resolution: {integrity: sha512-dPRyT40GiHRzSCll3/Jn2nPe25+E1VXc9tDwRAIKwFCxd5Np5wzgz1tmooWG3sV0qKgrBibihVoCna2ru4SEFg==}
     dev: false
 
-  /@fastify/fast-json-stringify-compiler/3.0.0:
-    resolution: {integrity: sha512-Wh0wAtL2O83lrUlSawkF5uXC4pL6UGva3P8j9ztVipjIYFBMnzSaxTaSTi9GATXupl8E/BykI+HVBEIyh9FDIw==}
+  /@fastify/fast-json-stringify-compiler/3.0.1:
+    resolution: {integrity: sha512-X9BL9/N7827M9UTBVsa5G3xOoD3MQ6EqX+D6EyJyF8LdvWTHQJ//BDN4FAEaGZUA2sL+GEMC6+KNjHESnPwQuw==}
     dependencies:
-      fast-json-stringify: 4.1.0
+      fast-json-stringify: 4.2.0
     dev: false
 
   /@fastify/formbody/7.0.1:
@@ -7781,6 +7781,18 @@ packages:
       string-similarity: 4.0.4
     dev: false
 
+  /fast-json-stringify/4.2.0:
+    resolution: {integrity: sha512-9RWBl82H7jwnPlkZ/ghi0VD5OFZVdwgwVui0nYzjnXbPQxJ3ES1+SQcWIoeCJOgrY7JkBkY/69UNZSroFPDRdQ==}
+    engines: {node: '>= 10.0.0'}
+    dependencies:
+      ajv: 8.11.0
+      ajv-formats: 2.1.1
+      deepmerge: 4.2.2
+      fast-uri: 2.0.0
+      rfdc: 1.3.0
+      string-similarity: 4.0.4
+    dev: false
+
   /fast-levenshtein/2.0.6:
     resolution: {integrity: sha512-DCXu6Ifhqcks7TZKY3Hxp3y6qphY5SJZmrWMDrKcERSOXWQdMhU9Ig/PYrzyw/ul9jOIyh0N4M0tbC5hodg8dw==}
     dev: true
@@ -7817,15 +7829,14 @@ packages:
   /fastify-plugin/3.0.1:
     resolution: {integrity: sha512-qKcDXmuZadJqdTm6vlCqioEbyewF60b/0LOFCcYN1B6BIZGlYJumWWOYs70SFYLDAH4YqdE1cxH/RKMG7rFxgA==}
 
-  /fastify/4.0.2:
-    resolution: {integrity: sha512-1DYyRyIqdPbvu/c5Xtt5MF7wQRLO+GbCibRWq+5JhntQVdod9oCy7rGsSNDMjvRgvJY5EUm2UYnBtAsDr5NdFA==}
+  /fastify/4.0.3:
+    resolution: {integrity: sha512-ACb3SXYQaN3zbRRND/51Dk/lmMkEJmGZ1YjSayzefCGX4UeHPw1it9PfJrfiuiG07FO2UxRC7Vxl+GwKfDi1Vw==}
     dependencies:
       '@fastify/ajv-compiler': 3.1.0
       '@fastify/error': 3.0.0
-      '@fastify/fast-json-stringify-compiler': 3.0.0
+      '@fastify/fast-json-stringify-compiler': 3.0.1
       abstract-logging: 2.0.1
       avvio: 8.1.3
-      fast-json-stringify: 4.1.0
       find-my-way: 6.3.0
       light-my-request: 5.0.0
       pino: 8.0.0
