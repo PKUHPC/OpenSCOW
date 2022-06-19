@@ -11,7 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "undici": "5.4.0"
+    "undici": "5.5.1"
   },
   "devDependencies": {
     "pino": "8.0.0"
