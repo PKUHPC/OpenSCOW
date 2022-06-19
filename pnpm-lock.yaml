@@ -7,7 +7,7 @@ importers:
       '@commitlint/cli': 17.0.2
       '@commitlint/config-conventional': 17.0.2
       '@ddadaal/eslint-config': 1.5.0
-      '@types/jest': 28.1.1
+      '@types/jest': 28.1.2
       '@types/node': 17.0.35
       '@types/rimraf': 3.0.2
       '@typescript-eslint/eslint-plugin': 5.28.0
@@ -37,7 +37,7 @@ importers:
       '@commitlint/cli': 17.0.2
       '@commitlint/config-conventional': 17.0.2
       '@ddadaal/eslint-config': 1.5.0_qku3gk5nwktsvnb2uvddzln5da
-      '@types/jest': 28.1.1
+      '@types/jest': 28.1.2
       '@types/node': 17.0.35
       '@types/rimraf': 3.0.2
       '@typescript-eslint/eslint-plugin': 5.28.0_py5roj3ykd3sga4gtxlmfvv4pa
@@ -4474,11 +4474,11 @@ packages:
       '@types/istanbul-lib-report': 3.0.0
     dev: true
 
-  /@types/jest/28.1.1:
-    resolution: {integrity: sha512-C2p7yqleUKtCkVjlOur9BWVA4HgUQmEj/HWCt5WzZ5mLXrWnyIfl0wGuArc+kBXsy0ZZfLp+7dywB4HtSVYGVA==}
+  /@types/jest/28.1.2:
+    resolution: {integrity: sha512-5dNM7mMuIrCtNJsFfvUO/5xCrG8swuT2c7ND+sl3XwlwxJf3k7e7o+PRvcFN/iIm8XhCqHqxLOj9yutDDOJoRg==}
     dependencies:
-      jest-matcher-utils: 27.5.1
-      pretty-format: 27.5.1
+      jest-matcher-utils: 28.1.1
+      pretty-format: 28.1.1
     dev: true
 
   /@types/js-yaml/4.0.5:
@@ -9612,16 +9612,6 @@ packages:
     dependencies:
       jest-get-type: 28.0.2
       pretty-format: 28.1.1
-    dev: true
-
-  /jest-matcher-utils/27.5.1:
-    resolution: {integrity: sha512-z2uTx/T6LBaCoNWNFWwChLBKYxTMcGBRjAt+2SbP929/Fflb9aa5LGma654Rz8z9HLxsrUaYzxE9T/EFIL/PAw==}
-    engines: {node: ^10.13.0 || ^12.13.0 || ^14.15.0 || >=15.0.0}
-    dependencies:
-      chalk: 4.1.2
-      jest-diff: 27.5.1
-      jest-get-type: 27.5.1
-      pretty-format: 27.5.1
     dev: true
 
   /jest-matcher-utils/28.1.1:
