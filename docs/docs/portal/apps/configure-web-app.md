@@ -1,9 +1,9 @@
 ---
 sidebar_position: 2
-title: 配置服务器类应用
+title: 配置Web类应用
 ---
 
-# 配置服务器类应用 
+# 配置Web类应用 
 
 ## 前提条件
 
@@ -22,8 +22,8 @@ id: vscode
 # 这个应用的名字
 name: VSCode
 
-# 指定应用类型为server
-type: server
+# 指定应用类型为web
+type: web
 
 # 可以运行这个应用的节点地址。
 # 如果不设置nodes，则所有节点都可以运行

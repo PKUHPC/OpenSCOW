@@ -49,7 +49,7 @@ export const mockApi: MockApi<typeof api> = {
 
   connectToApp: async ({ body: { sessionId } }) => sessionId === "124"
     ? {
-      host: "127.0.0.1", port: 3000, password: "123", type: "server",
+      host: "127.0.0.1", port: 3000, password: "123", type: "web",
       connect: {
         method: "POST",
         path: "/test",

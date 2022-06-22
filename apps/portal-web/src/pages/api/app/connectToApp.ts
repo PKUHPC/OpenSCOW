@@ -10,7 +10,7 @@ import { dnsResolve } from "src/utils/dns";
 import { handlegRPCError } from "src/utils/server";
 
 // Cannot use ServerConnectPropsConfig from appConfig package
-export type ServerConnectProps = {
+export type AppConnectProps = {
   method: string;
   path: string;
   query?: { [key: string]: string };
@@ -27,7 +27,7 @@ export interface ConnectToAppSchema {
 
   responses: {
     200: { host: string; port: number; password: string } & (
-      | { type: "server"; connect: ServerConnectProps }
+      | { type: "web"; connect: AppConnectProps }
       | { type: "vnc"; }
     );
 
@@ -75,14 +75,14 @@ export default /* #__PURE__*/route<ConnectToAppSchema>("ConnectToAppSchema", asy
 
   const resolvedHost = await dnsResolve(reply.host);
 
-  if (app.type === "server") {
+  if (app.type === "web") {
     return {
       200: {
         host: resolvedHost,
         port: reply.port,
         password: reply.password,
         connect: app.connect,
-        type: "server",
+        type: "web",
       },
     };
   } else {

@@ -3,7 +3,7 @@ name: VSCode
 nodes:
   - t001
   - t002
-type: server
+type: web
 beforeScript: |
   export PORT=$(get_port)
   export PASSWORD=$(get_password 12)

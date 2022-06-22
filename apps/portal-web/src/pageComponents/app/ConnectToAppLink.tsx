@@ -21,7 +21,7 @@ export const ConnectTopAppLink: React.FC<Props> = ({
       .httpError(404, () => { message.error("此应用会话不存在"); })
       .httpError(409, () => { message.error("此应用目前无法连接"); });
 
-    if (reply.type === "server") {
+    if (reply.type === "web") {
       const { connect, host, password, port } = reply;
       const interpolatedValues = { HOST: host, PASSWORD: password, PORT: port };
       const path = parsePlaceholder(connect.path, interpolatedValues);

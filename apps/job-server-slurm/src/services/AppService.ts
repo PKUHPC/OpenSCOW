@@ -90,7 +90,7 @@ export const appServiceServer = plugin((server) => {
           return metadata;
         };
 
-        if (appConfig.type === "server") {
+        if (appConfig.type === "web") {
           await sftpWriteFile(sftp)(join(workingDirectory, "before.sh"), appConfig.beforeScript);
           await sftpWriteFile(sftp)(join(workingDirectory, "script.sh"), appConfig.script);
 
@@ -179,7 +179,7 @@ export const appServiceServer = plugin((server) => {
 
           // judge whether the app is ready
           if (runningJobInfo && runningJobInfo.state === "RUNNING") {
-            if (app.type === "server") {
+            if (app.type === "web") {
             // for server apps,
             // try to read the SESSION_INFO file to get port and password
               const infoFilePath = join(jobDir, SERVER_SESSION_INFO);
@@ -242,7 +242,7 @@ export const appServiceServer = plugin((server) => {
 
         const app = getAppConfig(sessionMetadata.appId);
 
-        if (app.type === "server") {
+        if (app.type === "web") {
           const infoFilePath = join(jobDir, SERVER_SESSION_INFO);
           if (await sftpExists(sftp, infoFilePath)) {
             const content = (await sftpReadFile(sftp)(infoFilePath)).toString();
