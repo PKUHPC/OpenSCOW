@@ -5,7 +5,7 @@ import { UserServiceClient } from "src/generated/server/user";
 import { FullUserInfo, TenantRole } from "src/models/User";
 import { getClient } from "src/utils/client";
 
-export interface GetAllPlatformUsersSchema {
+export interface GetTenantUsersSchema {
   method: "GET";
 
   responses: {
@@ -17,7 +17,7 @@ export interface GetAllPlatformUsersSchema {
 
 const auth = authenticate((info) => info.tenantRoles.includes(TenantRole.TENANT_ADMIN));
 
-export default route<GetAllPlatformUsersSchema>("GetAllPlatformUsersSchema",
+export default route<GetTenantUsersSchema>("GetTenantUsersSchema",
   async (req, res) => {
 
     const info = await auth(req, res);

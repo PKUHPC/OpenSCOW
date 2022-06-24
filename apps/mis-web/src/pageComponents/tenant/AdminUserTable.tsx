@@ -2,11 +2,11 @@ import { Button, Form, Input, Table } from "antd";
 import React, { useMemo, useState } from "react";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { FullUserInfo } from "src/models/User";
-import { GetAllPlatformUsersSchema } from "src/pages/api/admin/getAllPlatformUsersSchema";
+import { GetTenantUsersSchema } from "src/pages/api/admin/getTenantUsers";
 import { formatDateTime } from "src/utils/datetime";
 
 interface Props {
-  data: GetAllPlatformUsersSchema["responses"]["200"] | undefined;
+  data: GetTenantUsersSchema["responses"]["200"] | undefined;
   isLoading: boolean;
   reload: () => void;
 }

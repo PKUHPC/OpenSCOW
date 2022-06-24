@@ -35,7 +35,9 @@ export const PageTitle: React.FC<PageTitleProps> = ({
         </Space>
       </TitleText>
       {children}
-      { reload ? <RefreshLink refresh={reload} /> : undefined}
+      { reload
+        ? <RefreshLink refresh={reload} />
+        : undefined}
     </Container>
   );
 

@@ -8,8 +8,8 @@ import { FilterFormContainer, FilterFormTabs } from "src/components/FilterFormCo
 import { TableTitle } from "src/components/TableTitle";
 import { Money } from "src/generated/common/money";
 import { JobInfo } from "src/generated/server/job";
-import { JobPriceChangeModal } from "src/pageComponents/admin/JobPriceChangeModal";
 import { HistoryJobDrawer } from "src/pageComponents/job/HistoryJobDrawer";
+import { JobPriceChangeModal } from "src/pageComponents/tenant/JobPriceChangeModal";
 import type { GetJobFilter, GetJobInfoSchema } from "src/pages/api/job/jobInfo";
 import type { Cluster } from "src/utils/config";
 import { CLUSTERS } from "src/utils/config";

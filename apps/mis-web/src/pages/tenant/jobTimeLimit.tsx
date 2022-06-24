@@ -8,7 +8,6 @@ import { DisabledA } from "src/components/DisabledA";
 import { PageTitle } from "src/components/PageTitle";
 import { FormLayout } from "src/layouts/FormLayout";
 import { TenantRole } from "src/models/User";
-import type { ChangeStorageMode } from "src/pages/api/admin/changeStorage";
 import { Cluster } from "src/utils/config";
 import { Head } from "src/utils/head";
 
@@ -17,10 +16,12 @@ const changeModeText = {
   DECREASE: "减少",
 };
 
+type ChangeMode = keyof typeof changeModeText;
+
 interface FormProps {
   jobId: number;
   cluster: Cluster;
-  mode: ChangeStorageMode;
+  mode: ChangeMode;
   value: number;
 }
 

@@ -8,9 +8,30 @@ import React from "react";
 import { AccountAffiliation } from "src/generated/server/user";
 import { ReactComponent as Whitelist } from "src/icons/whiteList.svg";
 import { NavItemProps } from "src/layouts/NavItemProps";
-import { TenantRole, UserRole } from "src/models/User";
+import { PlatformRole, TenantRole, UserRole } from "src/models/User";
 import { User } from "src/stores/UserStore";
 import { publicConfig } from "src/utils/config";
+
+export const platformAdminRoutes: NavItemProps[] = [
+  {
+    Icon: UserOutlined,
+    text: "平台管理",
+    path: "/admin",
+    clickable: false,
+    children: [
+      {
+        Icon: ClockCircleOutlined,
+        text: "获取作业",
+        path: "/admin/fetchJobs",
+      },
+      {
+        Icon: UserOutlined,
+        text: "导入用户",
+        path: "/admin/importUsers",
+      },
+    ],
+  },
+];
 
 export const tenantFinanceRoutes: NavItemProps[] = [
   {
@@ -37,72 +58,72 @@ export const tenantAdminRoutes: NavItemProps[] = [
   {
     Icon: CloudServerOutlined,
     text: "租户管理",
-    path: "/admin",
-    clickToPath: "/admin/info",
+    path: "/tenant",
+    clickToPath: "/tenant/info",
     children: [
       {
         Icon: InfoOutlined,
         text: "租户信息",
-        path: "/admin/info",
+        path: "/tenant/info",
       },
       {
         Icon: BookOutlined,
         text: "运行中的作业",
-        path: "/admin/runningJobs",
+        path: "/tenant/runningJobs",
       },
       {
         Icon: BookOutlined,
         text: "已结束的作业",
-        path: "/admin/historyJobs",
+        path: "/tenant/historyJobs",
       },
       {
         Icon: UserOutlined,
         text: "用户管理",
-        path: "/admin/users",
-        clickToPath: "/admin/users/list",
+        path: "/tenant/users",
+        clickToPath: "/tenant/users/list",
         children: [
           {
             Icon: UserOutlined,
             text: "用户列表",
-            path: "/admin/users/list",
+            path: "/tenant/users/list",
           },
           ...publicConfig.ENABLE_CREATE_USER ? [{
             Icon: UserAddOutlined,
             text: "创建用户",
-            path: "/admin/users/create",
+            path: "/tenant/users/create",
           }] : [],
         ],
       },
       {
         Icon: ClockCircleOutlined,
         text: "调整作业时间限制",
-        path: "/admin/jobTimeLimit",
+        path: "/tenant/jobTimeLimit",
       },
       // {
       //   Icon: CloudOutlined,
       //   text: "调整用户存储空间",
-      //   path: "/admin/storage",
+      //   path: "/tenant/storage",
       // },
       {
         Icon: AccountBookOutlined,
         text: "账户管理",
-        path: "/admin/accounts",
-        clickToPath: "/admin/accounts/list",
+        path: "/tenant/accounts",
+        clickToPath: "/tenant/accounts/list",
         children: [
           {
             Icon: AccountBookOutlined,
             text: "账户列表",
-            path: "/admin/accounts/list",
+            path: "/tenant/accounts/list",
           },
           {
             Icon: PlusOutlined,
             text: "创建账户",
-            path: "/admin/accounts/create",
+            path: "/tenant/accounts/create",
           },
           {
             Icon: <AntdIcon component={Whitelist} />,
             text: "账户白名单",
-            path: "/admin/accounts/whitelist",
+            path: "/tenant/accounts/whitelist",
           },
         ],
       },
@@ -212,6 +233,9 @@ export const getAvailableRoutes = (user: User): NavItemProps[] => {
     routes.push(...tenantAdminRoutes);
   }
 
+  if (user.platformRoles.includes(PlatformRole.PLATFORM_ADMIN)) {
+    routes.push(...platformAdminRoutes);
+  }
 
   return routes;
 };

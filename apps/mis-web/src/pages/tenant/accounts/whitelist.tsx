@@ -6,8 +6,8 @@ import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
 import { TenantRole } from "src/models/User";
-import { AccountWhitelistTable } from "src/pageComponents/admin/AccountWhitelistTable";
-import { AddWhitelistedAccountButton } from "src/pageComponents/admin/AddWhitelistedAccountButton";
+import { AccountWhitelistTable } from "src/pageComponents/tenant/AccountWhitelistTable";
+import { AddWhitelistedAccountButton } from "src/pageComponents/tenant/AddWhitelistedAccountButton";
 import { Head } from "src/utils/head";
 import { RefreshLink, useRefreshToken } from "src/utils/refreshToken";
 

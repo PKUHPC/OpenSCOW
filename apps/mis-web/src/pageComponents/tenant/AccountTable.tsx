@@ -4,7 +4,7 @@ import React, { useMemo, useState } from "react";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { Money } from "src/generated/common/money";
 import type { Account } from "src/generated/server/account";
-import type { GetAccountsSchema } from "src/pages/api/admin/getAccounts";
+import type { GetAccountsSchema } from "src/pages/api/tenant/getAccounts";
 import { moneyToString } from "src/utils/money";
 
 interface Props {

@@ -2,13 +2,13 @@ import { Static, Type } from "@sinclair/typebox";
 
 // Redefine to avoid importing non client packages
 export enum TenantRole {
-  TENANT_FINANCE = 0,
-  TENANT_ADMIN = 1,
+  TENANT_ADMIN = 0,
+  TENANT_FINANCE = 1,
 }
 
 export enum PlatformRole {
-  PLATFORM_FINANCE = 0,
-  PLATFORM_ADMIN = 1,
+  PLATFORM_ADMIN = 0,
+  PLATFORM_FINANCE = 1,
 }
 
 export const PlatformRoleTexts = {

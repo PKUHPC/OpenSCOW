@@ -68,12 +68,19 @@ export const mockApi: MockApi<typeof api> = {
 
   getIcon: async () => undefined,
 
+  importUsers: async () => null,
+
+  getFetchJobInfo: async () => ({ fetchStarted: true, schedule: "*", lastFetchTime: new Date().toISOString() }),
+
+  setFetchState: async () => null,
+  fetchJobs: async () => ({ newJobsCount: 200 }),
+
   cancelJobChargeLimit: async () => null,
   setJobChargeLimit: async () => null,
 
   getRunningJobs: async () => ({ results: [runningJob]}),
 
-  getAllPlatformUsers: async () => ({ results: [
+  getTenantUsers: async () => ({ results: [
     {
       createTime: "2020-04-23T23:49:50.000Z",
       email: "test@test.com",

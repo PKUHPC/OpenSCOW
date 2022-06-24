@@ -1,6 +1,6 @@
 import { Logger } from "@ddadaal/tsgrpc-server";
 import { SqlEntityManager } from "@mikro-orm/mysql";
-import { getConfigFromFile } from "@scow/config";
+import { validateObject } from "@scow/config";
 import { Type } from "@sinclair/typebox";
 import { Account } from "src/entities/Account";
 import { AccountWhitelist } from "src/entities/AccountWhitelist";
@@ -24,10 +24,9 @@ const UsersJsonSchema = Type.Object({
   ),
 });
 
-export async function initializeUsers(em: SqlEntityManager, whitelistAll = false, logger: Logger,
-  configBasePath?: string) {
+export async function importUsers(dataStr: string, em: SqlEntityManager, whitelistAll: boolean, logger: Logger) {
 
-  const data = getConfigFromFile(UsersJsonSchema, "users", false, configBasePath);
+  const data = validateObject(UsersJsonSchema, JSON.parse(dataStr));
 
   // create default tenant
   const tenant = new Tenant({ name: DEFAULT_TENANT_NAME });
@@ -89,6 +88,12 @@ export async function initializeUsers(em: SqlEntityManager, whitelistAll = false
     logger.warn(`${idsWithoutName.length} users don't have names.`);
     logger.warn(idsWithoutName.join(", "));
   }
+
+  return {
+    accountCount: accounts.length,
+    userCount: Object.keys(usersMap).length,
+    usersWithoutName: idsWithoutName.length,
+  };
 }
 
 

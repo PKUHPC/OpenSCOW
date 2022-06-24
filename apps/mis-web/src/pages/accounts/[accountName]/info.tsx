@@ -6,7 +6,7 @@ import { ssrAuthenticate, SSRProps } from "src/auth/server";
 import { UnifiedErrorPage } from "src/components/errorPages/UnifiedErrorPage";
 import { PageTitle } from "src/components/PageTitle";
 import { UserRole } from "src/models/User";
-import { getAccounts } from "src/pages/api/admin/getAccounts";
+import { getAccounts } from "src/pages/api/tenant/getAccounts";
 import { Head } from "src/utils/head";
 import { queryToString } from "src/utils/querystring";
 

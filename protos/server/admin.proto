@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package scow.server;
 
+import "google/protobuf/timestamp.proto";
+
 enum ChangeStorageQuotaMode {
   INCREASE = 0;
   DECREASE = 1;
@@ -27,9 +29,39 @@ message QueryStorageQuotaRequest {
 // NOT_FOUND: cluster or userId is not found.
 message QueryStorageQuotaReply { uint64 current_quota = 1; }
 
+message ImportUsersRequest {
+  string data = 1;
+  bool whitelist = 2;
+}
+
+// INVAD_ARGUMENT: the data format is not acceptable
+message ImportUsersReply {
+  uint32 user_count = 1;
+  uint32 account_count = 2;
+  uint32 users_without_name = 3;
+}
+
+message GetFetchInfoRequest {}
+
+message GetFetchInfoReply {
+  bool fetch_started = 1;
+  string schedule = 2;
+  optional google.protobuf.Timestamp last_fetch_time = 3;
+}
+
+message SetFetchStateRequest { bool started = 1; }
+message SetFetchStateReply {}
+
+message FetchJobsRequest {}
+message FetchJobsReply { uint32 new_jobs_count = 1; }
+
 service AdminService {
   rpc ChangeStorageQuota(ChangeStorageQuotaRequest)
       returns (ChangeStorageQuotaReply);
   rpc QueryStorageQuota(QueryStorageQuotaRequest)
       returns (QueryStorageQuotaReply);
+  rpc ImportUsers(ImportUsersRequest) returns (ImportUsersReply);
+  rpc GetFetchInfo(GetFetchInfoRequest) returns (GetFetchInfoReply);
+  rpc SetFetchState(SetFetchStateRequest) returns (SetFetchStateReply);
+  rpc FetchJobs(FetchJobsRequest) returns (FetchJobsReply);
 }

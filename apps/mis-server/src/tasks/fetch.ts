@@ -55,6 +55,8 @@ async function getLatestIndex(em: SqlEntityManager, logger: Logger) {
   return biJobIndex;
 }
 
+export let lastFetched: Date | null = null;
+
 export async function fetchJobs(
   em: SqlEntityManager,
   logger: Logger,
@@ -200,11 +202,14 @@ export async function fetchJobs(
     }
 
     logger.info(`Completed. Saved ${count} new info.`);
+    lastFetched = new Date();
+    return { newJobsCount: count };
   } catch (e) {
     logger.error("Error when fetching jobs. %o", e);
     throw e;
   } finally {
     await sourceOrm.close();
+
 
   }
 }

@@ -1,7 +1,6 @@
 import { createServer } from "src/app";
 import { createPriceItems } from "src/tasks/createBillingItems";
 import { fetchJobs } from "src/tasks/fetch";
-import { initializeUsers } from "src/tasks/initializeUsers";
 import { migrationUp } from "src/tasks/migrationUp";
 
 async function main() {
@@ -12,18 +11,13 @@ async function main() {
 
   // run tasks
   if (args.length > 1) {
-    const [_scriptName, command, ...rest] = args;
+    const [_scriptName, command] = args;
 
     const logger = server.logger.child({ task: command });
 
     const em = server.ext.orm.em.fork();
 
     switch (command) {
-
-    case "initializeUsers":
-      const whitelist = rest.includes("whitelist");
-      await initializeUsers(em, whitelist, logger);
-      break;
 
     case "fetchJobs":
       await fetchJobs(em, logger, server.ext, server.ext);

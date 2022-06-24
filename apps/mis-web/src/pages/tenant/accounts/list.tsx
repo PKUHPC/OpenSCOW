@@ -5,7 +5,7 @@ import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
 import { TenantRole } from "src/models/User";
-import { AccountTable } from "src/pageComponents/admin/AccountTable";
+import { AccountTable } from "src/pageComponents/tenant/AccountTable";
 import { Head } from "src/utils/head";
 import { RefreshLink, useRefreshToken } from "src/utils/refreshToken";
 

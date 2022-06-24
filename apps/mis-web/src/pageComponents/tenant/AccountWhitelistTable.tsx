@@ -4,7 +4,7 @@ import React from "react";
 import { api } from "src/apis";
 import { WhitelistedAccount } from "src/generated/server/account";
 import type {
-  GetWhitelistedAccountsSchema } from "src/pages/api/admin/accountWhitelist/getWhitelistedAccounts";
+  GetWhitelistedAccountsSchema } from "src/pages/api/tenant/accountWhitelist/getWhitelistedAccounts";
 import { formatDateTime } from "src/utils/datetime";
 
 interface Props {

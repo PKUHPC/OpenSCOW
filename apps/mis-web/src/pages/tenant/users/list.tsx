@@ -5,7 +5,7 @@ import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
 import { TenantRole } from "src/models/User";
-import { AdminUserTable } from "src/pageComponents/admin/AdminUserTable";
+import { AdminUserTable } from "src/pageComponents/tenant/AdminUserTable";
 import { Head } from "src/utils/head";
 import { RefreshLink, useRefreshToken } from "src/utils/refreshToken";
 
@@ -13,7 +13,7 @@ export const AdminUsersPage: NextPage = requireAuth((u) => u.tenantRoles.include
   () => {
 
     const promiseFn = useCallback(async () => {
-      return await api.getAllPlatformUsers({ });
+      return await api.getTenantUsers({ });
     }, []);
 
     const [refreshToken, update] = useRefreshToken();
