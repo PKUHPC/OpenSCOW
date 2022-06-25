@@ -39,7 +39,7 @@
     "tsconfig-paths": "4.0.0",
     "typescript": "4.7.4",
     "pkg": "5.7.0",
-    "nodemon": "2.0.16",
+    "nodemon": "2.0.18",
     "husky": "8.0.1",
     "@commitlint/config-conventional": "17.0.2",
     "@commitlint/cli": "17.0.2",
