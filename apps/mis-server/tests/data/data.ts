@@ -3,12 +3,11 @@ import { Account } from "src/entities/Account";
 import { Tenant } from "src/entities/Tenant";
 import { TenantRole, User } from "src/entities/User";
 import { UserAccount, UserRole, UserStatus } from "src/entities/UserAccount";
-
-export const tenantName = "default";
+import { DEFAULT_TENANT_NAME } from "src/utils/constants";
 
 export async function insertInitialData(em: SqlEntityManager) {
 
-  const tenant = new Tenant({ name: tenantName });
+  const tenant = await em.findOneOrFail(Tenant, { name: DEFAULT_TENANT_NAME });
 
   const userA = new User({ name: "AName", userId: "a", email: "a@a.com", tenant,
     tenantRoles: [TenantRole.TENANT_ADMIN]});
