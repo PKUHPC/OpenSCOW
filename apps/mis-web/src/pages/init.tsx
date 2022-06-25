@@ -74,8 +74,6 @@ export const InitSystemPage: NextPage<Props> = (props) => {
         <Tabs.TabPane tab="导入用户" key="2">
           <InitImportUsersForm />
         </Tabs.TabPane>
-        <Tabs.TabPane tab="编辑平台作业价格表" key="3">
-        </Tabs.TabPane>
       </Tabs>
     </div>
   );
