@@ -24,6 +24,7 @@
     "@mikro-orm/mysql": "5.2.0",
     "@mikro-orm/mariadb": "5.2.0",
     "@mikro-orm/migrations": "5.2.0",
+    "@mikro-orm/seeder": "5.2.0",
     "@scow/lib-decimal": "workspace:*",
     "@scow/config": "workspace:*",
     "wait-on": "6.0.1",

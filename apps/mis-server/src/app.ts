@@ -4,6 +4,7 @@ import { plugins } from "src/plugins";
 import { accountServiceServer } from "src/services/account";
 import { adminServiceServer } from "src/services/admin";
 import { chargingServiceServer } from "src/services/charging";
+import { initServiceServer } from "src/services/init";
 import { jobServiceServer } from "src/services/job";
 import { jobChargeLimitServer } from "src/services/jobChargeLimit";
 import { tenantServiceServer } from "src/services/tenant";
@@ -23,6 +24,7 @@ export async function createServer() {
   await server.register(accountServiceServer);
   await server.register(userServiceServer);
   await server.register(adminServiceServer);
+  await server.register(initServiceServer);
   await server.register(jobChargeLimitServer);
   await server.register(jobServiceServer);
   await server.register(chargingServiceServer);

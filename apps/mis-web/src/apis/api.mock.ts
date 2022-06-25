@@ -68,7 +68,11 @@ export const mockApi: MockApi<typeof api> = {
 
   getIcon: async () => undefined,
 
+  createPlatformUser: async () => null,
+
   importUsers: async () => null,
+
+  completeInit: async () => null,
 
   getFetchJobInfo: async () => ({ fetchStarted: true, schedule: "*", lastFetchTime: new Date().toISOString() }),
 

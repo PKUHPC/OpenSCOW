@@ -2,6 +2,7 @@ import { plugin } from "@ddadaal/tsgrpc-server";
 import { MikroORM, Options } from "@mikro-orm/core";
 import { MySqlDriver } from "@mikro-orm/mysql";
 import { config } from "src/config/env";
+import { DatabaseSeeder } from "src/seeders/DatabaseSeeder";
 
 import { entities } from "../entities";
 
@@ -20,6 +21,9 @@ export const ormConfigs = {
   },
   entities,
   debug: config.DB_DEBUG,
+  seeder: {
+    path: "./src/seeders",
+  },
 } as Options<MySqlDriver>;
 
 export const ormPlugin = plugin(async (server) => {
@@ -34,8 +38,9 @@ export const ormPlugin = plugin(async (server) => {
 
   const schemaGenerator = orm.getSchemaGenerator();
   await schemaGenerator.ensureDatabase();
-
   await orm.getMigrator().up();
+
+  await orm.getSeeder().seed(DatabaseSeeder);
 
   server.addExtension("orm", orm);
 

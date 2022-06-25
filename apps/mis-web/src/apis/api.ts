@@ -19,6 +19,8 @@ import type { GetChargesSchema } from "src/pages/api/finance/charges";
 import type { GetUsedPayTypesSchema } from "src/pages/api/finance/getUsedPayTypes";
 import type { FinancePaySchema } from "src/pages/api/finance/pay";
 import type { GetPaymentsSchema } from "src/pages/api/finance/payments";
+import type { CompleteInitSchema } from "src/pages/api/init/completeInit";
+import type { CreatePlatformUserSchema } from "src/pages/api/init/createPlatformAdminUser";
 import type { ChangeJobTimeLimitSchema } from "src/pages/api/job/changeJobTimeLimit";
 import type { GetJobByBiJobIndexSchema } from "src/pages/api/job/getJobByBiJobIndex";
 import type { GetJobInfoSchema } from "src/pages/api/job/jobInfo";
@@ -61,6 +63,8 @@ export const api = {
   financePay: fromApi<FinancePaySchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/finance/pay")),
   getPayments: fromApi<GetPaymentsSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/finance/payments")),
   getIcon: fromApi<GetIconSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api//icon")),
+  completeInit: fromApi<CompleteInitSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/init/completeInit")),
+  createPlatformUser: fromApi<CreatePlatformUserSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/init/createPlatformAdminUser")),
   changeJobTimeLimit: fromApi<ChangeJobTimeLimitSchema>("PATCH", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/job/changeJobTimeLimit")),
   getJobByBiJobIndex: fromApi<GetJobByBiJobIndexSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/job/getJobByBiJobIndex")),
   getJobInfo: fromApi<GetJobInfoSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/job/jobInfo")),

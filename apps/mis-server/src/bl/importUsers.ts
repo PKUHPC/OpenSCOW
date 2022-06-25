@@ -28,9 +28,8 @@ export async function importUsers(dataStr: string, em: SqlEntityManager, whiteli
 
   const data = validateObject(UsersJsonSchema, JSON.parse(dataStr));
 
-  // create default tenant
-  const tenant = new Tenant({ name: DEFAULT_TENANT_NAME });
-  em.persist(tenant);
+  // get default tenant
+  const tenant = await em.findOneOrFail(Tenant, { name: DEFAULT_TENANT_NAME });
 
   // create users from names
   const usersMap: Record<string, User> = {};
@@ -83,7 +82,7 @@ export async function importUsers(dataStr: string, em: SqlEntityManager, whiteli
 
   await em.persistAndFlush([...Object.values(usersMap), ...accounts, ...userAccounts]);
 
-  logger.info(`User initialization success. ${accounts.length} accounts, ${Object.keys(usersMap).length} users.`);
+  logger.info(`Import users complete. ${accounts.length} accounts, ${Object.keys(usersMap).length} users.`);
   if (idsWithoutName.length !== 0) {
     logger.warn(`${idsWithoutName.length} users don't have names.`);
     logger.warn(idsWithoutName.join(", "));

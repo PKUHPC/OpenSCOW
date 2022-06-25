@@ -10,7 +10,11 @@ export interface CreateUserFormFields {
   confirmPassword: string;
 }
 
-export const CreateUserForm: React.FC = () => {
+interface Props {
+  noPassword?: boolean;
+}
+
+export const CreateUserForm: React.FC<Props> = ({ noPassword }) => {
 
   const form = Form.useFormInstance<CreateUserFormFields>();
 
@@ -32,21 +36,27 @@ export const CreateUserForm: React.FC = () => {
       >
         <Input />
       </Form.Item>
-      <Form.Item
-        rules={[{ required: true }, passwordRule]}
-        label="密码"
-        name="password"
-      >
-        <Input.Password placeholder={passwordRule.message} />
-      </Form.Item>
-      <Form.Item
-        name="confirmPassword"
-        label="确认密码"
-        hasFeedback
-        {...confirmPasswordFormItemProps(form, "password")}
-      >
-        <Input.Password />
-      </Form.Item>
+      {
+        noPassword ? undefined : (
+          <>
+            <Form.Item
+              rules={[{ required: true }, passwordRule]}
+              label="密码"
+              name="password"
+            >
+              <Input.Password placeholder={passwordRule.message} />
+            </Form.Item>
+            <Form.Item
+              name="confirmPassword"
+              label="确认密码"
+              hasFeedback
+              {...confirmPasswordFormItemProps(form, "password")}
+            >
+              <Input.Password />
+            </Form.Item>
+          </>
+        )
+      }
     </>
   );
 };

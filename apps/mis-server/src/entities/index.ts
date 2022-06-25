@@ -6,6 +6,7 @@ import { JobPriceChange } from "src/entities/JobPriceChange";
 import { JobPriceItem } from "src/entities/JobPriceItem";
 import { PayRecord } from "src/entities/PayRecord";
 import { StorageQuota } from "src/entities/StorageQuota";
+import { SystemState } from "src/entities/SystemState";
 import { Tenant } from "src/entities/Tenant";
 import { User } from "src/entities/User";
 import { UserAccount } from "src/entities/UserAccount";
@@ -22,4 +23,5 @@ export const entities = [
   JobPriceItem,
   PayRecord,
   ChargeRecord,
+  SystemState,
 ];

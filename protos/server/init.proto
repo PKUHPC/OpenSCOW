@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package scow.server;
+
+message QuerySystemInitializedRequest {}
+message QuerySystemInitializedReply { bool initialized = 1; }
+
+message CreatePlatformAdminRequest {
+  string user_id = 1;
+  string name = 2;
+  string email = 3;
+}
+message CreatePlatformAdminReply {}
+
+message CompleteInitRequest {}
+
+message CompleteInitReply {}
+
+service InitService {
+  rpc QuerySystemInitialized(QuerySystemInitializedRequest)
+      returns (QuerySystemInitializedReply);
+
+  rpc CreatePlatformAdmin(CreatePlatformAdminRequest)
+      returns (CreatePlatformAdminReply);
+
+  // ALREADY_EXISTS: already initialized
+  rpc CompleteInit(CompleteInitRequest) returns (CompleteInitReply);
+}

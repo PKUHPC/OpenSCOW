@@ -3,9 +3,7 @@ import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { importUsers } from "src/bl/importUsers";
 import { StorageQuota } from "src/entities/StorageQuota";
-import {
-  StorageServiceClient,
-} from "src/generated/clusterops/storage";
+import { StorageServiceClient } from "src/generated/clusterops/storage";
 import { AdminServiceServer, AdminServiceService } from "src/generated/server/admin";
 
 export const adminServiceServer = plugin((server) => {
@@ -89,5 +87,6 @@ export const adminServiceServer = plugin((server) => {
 
       return [reply];
     },
+
   });
 });

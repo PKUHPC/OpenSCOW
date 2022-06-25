@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { NotFoundPage } from "src/components/errorPages/NotFoundPage";
+import { Centered } from "src/components/layouts";
 import { PageTitle } from "src/components/PageTitle";
 import { FormLayout } from "src/layouts/FormLayout";
 import { TenantRole } from "src/models/User";
@@ -55,13 +56,13 @@ export const CreateUserPage: NextPage = requireAuth((i) => i.tenantRoles.include
     }
 
     return (
-      <div>
+      <Centered>
         <Head title="创建用户" />
         <PageTitle titleText="创建用户" />
         <FormLayout>
           <CreateUserPageForm />
         </FormLayout>
-      </div>
+      </Centered>
     );
   });
 

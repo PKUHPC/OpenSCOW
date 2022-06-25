@@ -5,6 +5,7 @@ import { authenticate } from "src/auth/server";
 import { AdminServiceClient } from "src/generated/server/admin";
 import { TenantRole } from "src/models/User";
 import { getClient } from "src/utils/client";
+import { queryIfInitialized } from "src/utils/init";
 import { handlegRPCError } from "src/utils/server";
 
 export interface ImportUsersSchema {
@@ -26,8 +27,11 @@ const auth = authenticate((info) => info.tenantRoles.includes(TenantRole.TENANT_
 export default route<ImportUsersSchema>("ImportUsersSchema",
   async (req, res) => {
 
-    const info = await auth(req, res);
-    if (!info) { return; }
+    // if not initialized, every one can import users
+    if (await queryIfInitialized()) {
+      const info = await auth(req, res);
+      if (!info) { return; }
+    }
 
     const { data, whitelist } = req.body;
 
