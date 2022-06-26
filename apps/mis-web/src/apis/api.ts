@@ -35,6 +35,7 @@ import type { GetAccountsSchema } from "src/pages/api/tenant/getAccounts";
 import type { AddUserToAccountSchema } from "src/pages/api/users/addToAccount";
 import type { BlockUserInAccountSchema } from "src/pages/api/users/blockInAccount";
 import type { CreateUserSchema } from "src/pages/api/users/create";
+import type { GetBillingItemsSchema } from "src/pages/api/users/getBillingItems";
 import type { GetAccountUsersSchema } from "src/pages/api/users/index";
 import type { CancelJobChargeLimitSchema } from "src/pages/api/users/jobChargeLimit/cancel";
 import type { SetJobChargeLimitSchema } from "src/pages/api/users/jobChargeLimit/set";
@@ -79,6 +80,7 @@ export const api = {
   addUserToAccount: fromApi<AddUserToAccountSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/users/addToAccount")),
   blockUserInAccount: fromApi<BlockUserInAccountSchema>("PUT", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/users/blockInAccount")),
   createUser: fromApi<CreateUserSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/users/create")),
+  getBillingItems: fromApi<GetBillingItemsSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/users/getBillingItems")),
   getAccountUsers: fromApi<GetAccountUsersSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/users")),
   cancelJobChargeLimit: fromApi<CancelJobChargeLimitSchema>("DELETE", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/users/jobChargeLimit/cancel")),
   setJobChargeLimit: fromApi<SetJobChargeLimitSchema>("PUT", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/users/jobChargeLimit/set")),

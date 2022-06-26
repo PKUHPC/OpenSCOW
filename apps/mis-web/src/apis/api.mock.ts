@@ -66,6 +66,8 @@ export const runningJob: RunningJob = {
 
 export const mockApi: MockApi<typeof api> = {
 
+  getBillingItems: async () => ({ items: []}),
+
   getIcon: async () => undefined,
 
   createPlatformUser: async () => null,

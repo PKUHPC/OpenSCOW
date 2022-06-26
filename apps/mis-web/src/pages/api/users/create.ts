@@ -14,7 +14,7 @@ export interface CreateUserSchema {
   body: {
     /**
      * 用户ID
-     * @pattern ^[a-z0-9_]+$
+     * @pattern ^[a-z1-9_]+$
      */
 
     identityId: string;
@@ -23,7 +23,7 @@ export interface CreateUserSchema {
 
     /**
      * 密码
-     * @pattern ^(?=.*\d)(?=.*[a-zA-Z])(?=.*[`~!@#\$%^&*()_+\-[\];',./{}|:"<>?]).{8,}$
+     * @pattern ^(?=.*\d)(?=.*[a-zA-Z])(?=.*[`~!@#\$%^&*()_+\-[\];',./{}|:"<>?]).{9,}$
      */
     password: string;
   }
