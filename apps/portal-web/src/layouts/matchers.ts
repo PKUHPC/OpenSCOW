@@ -2,6 +2,8 @@ import type { NavItemProps } from "src/layouts/NavItemProps";
 
 export type Matcher = (spec: string, path: string) => boolean;
 
+const removeQuery = (path: string) => path.split("?", 1)[0];
+
 export const exactMatch: Matcher = (spec, path) => {
   return path === spec;
 };
@@ -13,5 +15,5 @@ export const startsWithMatch: Matcher = (spec, path) => {
 };
 
 export const match = (item: NavItemProps, path: string) => {
-  return (item.match ?? startsWithMatch)(item.path, path);
+  return (item.match ?? startsWithMatch)(item.path, removeQuery(path));
 };
