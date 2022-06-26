@@ -7,6 +7,7 @@ export interface JobBillingTableItem {
 
   cluster: string;
   clusterItemIndex: number;
+  itemId: string;
 
   partition: string;
   partitionCount: number;
@@ -21,7 +22,6 @@ export interface JobBillingTableItem {
   gpus: number;
   price: string;
   comment?: string;
-
 }
 
 const columns: ColumnsType<JobBillingTableItem> = [
@@ -62,15 +62,17 @@ const columns: ColumnsType<JobBillingTableItem> = [
 ];
 
 interface Props {
-  items: JobBillingTableItem[];
+  data: JobBillingTableItem[] | undefined;
+  loading?: boolean;
 }
 
-export const JobBillingTable: React.FC<Props> = ({ items }) => {
+export const JobBillingTable: React.FC<Props> = ({ data, loading }) => {
   return (
     <Table
-      dataSource={items} columns={columns}
+      dataSource={data} columns={columns}
       scroll={{ x: 800 }} size="middle"
       bordered pagination={false}
+      loading={loading}
     />
   );
 };

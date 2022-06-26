@@ -10,13 +10,16 @@ import { config } from "src/config/env";
 import { Account } from "src/entities/Account";
 import { JobInfo as JobInfoEntity } from "src/entities/JobInfo";
 import { JobPriceChange } from "src/entities/JobPriceChange";
+import { JobPriceItem } from "src/entities/JobPriceItem";
 import { Tenant } from "src/entities/Tenant";
 import { JobServiceClient } from "src/generated/clusterops/job";
 import {
   GetJobsReply,
+  JobBillingItem,
   JobFilter,
   JobInfo, JobServiceServer, JobServiceService,
 } from "src/generated/server/job";
+import { getActiveBillingItems } from "src/plugins/price";
 import { paginationProps } from "src/utils/orm";
 
 function toGrpc(x: JobInfoEntity) {
@@ -271,22 +274,48 @@ export const jobServiceServer = plugin((server) => {
     },
 
     getBillingItems: async ({ request, em }) => {
-      const { tenantName } = request;
+      const { tenantName, activeOnly } = request;
 
-      const tenant = await em.findOne(Tenant, { name: tenantName });
+      let tenant: Tenant | null = null;
+      if (tenantName) {
+        tenant = await em.findOne(Tenant, { name: tenantName });
 
-      if (!tenant) {
-        throw <ServiceError>{ code: status.NOT_FOUND, message: `Tenant ${tenantName} is not found.` };
+        if (!tenant) {
+          throw <ServiceError>{ code: status.NOT_FOUND, message: `Tenant ${tenantName} is not found.` };
+        }
       }
 
-      const priceMap = await server.ext.price.createPriceMap();
+      const billingItems = await em.find(JobPriceItem, tenant
+        ? { $or: [{ tenant: null }, { tenant }]}
+        : {},
+      {
+        populate: ["tenant"],
+        orderBy: { createTime: "ASC" },
+      });
 
-      return [{ items: Object.entries(priceMap.getPriceMap(tenantName)).reduce((prev, [id, item]) => {
-        prev[id] = decimalToMoney(item.price);
-        return prev;
-      }, {}) }];
+      const priceItemToGrpc = (item: JobPriceItem) => <JobBillingItem>({
+        id: item.itemId,
+        path: item.path.join("."),
+        tenantName: item.tenant?.getProperty("name"),
+        price: decimalToMoney(item.price),
+        createTime: item.createTime,
+      });
+
+      if (activeOnly) {
+        const { defaultPrices, tenantSpecificPrices } = getActiveBillingItems(billingItems);
+
+        const activePrices = tenantName
+          ? Object.values({ ...defaultPrices, ...tenantSpecificPrices[tenantName] })
+          : [
+            ...Object.values(defaultPrices),
+            ...Object.values(tenantSpecificPrices).map((x) => Object.values(x)).flat(),
+          ];
+
+        return [{ items: activePrices.map(priceItemToGrpc) }];
+      } else {
+        return [{ items: billingItems.map(priceItemToGrpc) }];
+      }
+
     },
-
-
   });
 });

@@ -19,3 +19,13 @@ export function defaultRanges(): RangePickerProps["ranges"] {
     "一年": [now.clone().subtract(1, "year").startOf("day"), end],
   };
 }
+
+export function compareDateTime(a: string, b: string): number {
+  const aMoment = moment(a);
+  const bMoment = moment(b);
+
+  if (aMoment.isSame(bMoment)) { return 0; }
+  if (aMoment.isBefore(bMoment)) { return -1; }
+  return 1;
+
+}

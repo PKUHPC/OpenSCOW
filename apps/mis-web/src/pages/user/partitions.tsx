@@ -4,7 +4,7 @@ import { GetServerSideProps, NextPage } from "next";
 import { checkCookie } from "src/auth/server";
 import { JobBillingTable, JobBillingTableItem } from "src/components/JobBillingTable";
 import { PageTitle } from "src/components/PageTitle";
-import { getBillingTableItems } from "src/pages/api/users/getBillingItems";
+import { getBillingTableItems } from "src/pages/api/job/getBillingTable";
 import { runtimeConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
 import styled from "styled-components";
@@ -32,7 +32,7 @@ export const PartitionsPage: NextPage<Props> = ({ items, text }) => {
     <div>
       <Head title="分区信息" />
       <PageTitle titleText="分区信息" />
-      <JobBillingTable items={items} />
+      <JobBillingTable data={items} />
       {
         text?.clusterComment ? (
           <div>

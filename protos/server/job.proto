@@ -104,13 +104,21 @@ message QueryJobTimeLimitRequest {
 }
 
 message GetBillingItemsRequest {
-  // if not specified, return default
+  // if not specified, return every price item
   optional string tenant_name = 1;
+  // returns only active billing items
+  bool active_only = 2;
 }
 
-message GetBillingItemsReply {
-  map<string, common.Money> items = 1;
+message JobBillingItem {
+  string id = 1;
+  string path = 2;
+  optional string tenant_name = 3;
+  common.Money price = 4;
+  google.protobuf.Timestamp create_time = 5;
 }
+
+message GetBillingItemsReply { repeated JobBillingItem items = 1; }
 
 // NOT_FOUND: cluster or job_id is not found.
 message QueryJobTimeLimitReply { uint64 limit = 1; }

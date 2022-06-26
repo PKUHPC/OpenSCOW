@@ -1,16 +1,13 @@
 import { route } from "@ddadaal/next-typed-api-routes-runtime";
-import { asyncClientCall } from "@ddadaal/tsgrpc-utils";
-import { numberToMoney } from "@scow/lib-decimal";
-import { USE_MOCK } from "src/apis/useMock";
 import { authenticate } from "src/auth/server";
 import { JobBillingTableItem } from "src/components/JobBillingTable";
-import { GetBillingItemsReply, JobServiceClient } from "src/generated/server/job";
+import { JobBillingItem } from "src/generated/server/job";
 import { PlatformRole } from "src/models/User";
-import { getClient } from "src/utils/client";
+import { getBillingItems } from "src/pages/api/job/getBillingItems";
 import { publicConfig, runtimeConfig } from "src/utils/config";
 import { moneyToString } from "src/utils/money";
 
-export interface GetBillingItemsSchema {
+export interface GetBillingTableSchema {
   method: "GET";
 
   query: {
@@ -27,26 +24,17 @@ export interface GetBillingItemsSchema {
   }
 }
 
-const mockBillingItems = {
-  "hpc01.compute.low": numberToMoney(0.04),
-  "hpc01.compute.normal": numberToMoney(0.06),
-  "hpc01.compute.high": numberToMoney(0.08),
-  "hpc01.GPU.low": numberToMoney(10.00),
-  "hpc01.GPU.normal": numberToMoney(12.00),
-  "hpc01.GPU.high": numberToMoney(14.00),
-};
 
-async function mockReply(): Promise<GetBillingItemsReply> {
-  return { items: mockBillingItems };
-}
+export async function getBillingTableItems(tenantName: string | undefined) {
+  const items = await getBillingItems(tenantName, true);
 
-
-export async function getBillingTableItems(tenantName?: string) {
-  const client = getClient(JobServiceClient);
-  const reply = USE_MOCK ? await mockReply() : await asyncClientCall(client, "getBillingItems", { tenantName });
+  const pathItemMap = items.reduce((prev, curr) => {
+    prev[curr.path] = curr;
+    return prev;
+  }, {} as Record<string, JobBillingItem>);
 
   let count = 0;
-  const items: JobBillingTableItem[] = [];
+  const tableItems: JobBillingTableItem[] = [];
   const clusters = runtimeConfig.CLUSTERS_CONFIG;
 
   for (const [cluster, { partitions }] of Object.entries(clusters)) {
@@ -59,7 +47,9 @@ export async function getBillingTableItems(tenantName?: string) {
 
         const path = [cluster, partition, qos].filter((x) => x).join(".");
 
-        items.push({
+        const item = pathItemMap[path];
+
+        tableItems.push({
           index: count++,
           clusterItemIndex: clusterItemIndex++,
           partitionItemIndex: partitionItemIndex++,
@@ -72,17 +62,19 @@ export async function getBillingTableItems(tenantName?: string) {
           partitionCount,
           qosCount,
           qos,
-          price: moneyToString(reply.items[path]),
+          itemId: item.id,
+          price: moneyToString(item.price!),
           comment: partitionInfo.comment,
         });
       }
     }
   }
-  return items;
+
+  return tableItems;
 
 }
 
-export default /* #__PURE__*/route<GetBillingItemsSchema>("GetBillingItemsSchema", async (req, res) => {
+export default /* #__PURE__*/route<GetBillingTableSchema>("GetBillingTableSchema", async (req, res) => {
   const { tenant } = req.query;
   if (tenant) {
     const auth = authenticate((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN) || (u.tenant === tenant));

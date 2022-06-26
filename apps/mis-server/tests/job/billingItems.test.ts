@@ -1,17 +1,23 @@
 /* eslint-disable max-len */
 import { Server } from "@ddadaal/tsgrpc-server";
+import { asyncClientCall } from "@ddadaal/tsgrpc-utils";
+import { ChannelCredentials } from "@grpc/grpc-js";
 import { MikroORM } from "@mikro-orm/core";
 import { MySqlDriver } from "@mikro-orm/mysql";
-import { Decimal } from "@scow/lib-decimal";
+import { Decimal, decimalToMoney } from "@scow/lib-decimal";
 import { createServer } from "src/app";
-import { JobPriceItem } from "src/entities/JobPriceItem";
+import { AmountStrategy, JobPriceItem } from "src/entities/JobPriceItem";
 import { Tenant } from "src/entities/Tenant";
+import { JobBillingItem, JobServiceClient } from "src/generated/server/job";
 import { calculateJobPrice, createPriceMap } from "src/plugins/price";
 import { createPriceItems } from "src/tasks/createBillingItems";
+import { DEFAULT_TENANT_NAME } from "src/utils/constants";
 import { dropDatabase } from "tests/data/helpers";
 
 let server: Server;
 let orm: MikroORM<MySqlDriver>;
+let oldPriceItem: JobPriceItem;
+let client: JobServiceClient;
 
 beforeEach(async () => {
   server =  await createServer();
@@ -21,8 +27,24 @@ beforeEach(async () => {
   await orm.getMigrator().up();
 
   // insert tenant
+  const em = orm.em.fork();
   const anotherTenant = new Tenant({ name: "another" });
-  await orm.em.fork().persistAndFlush(anotherTenant);
+  await em.persistAndFlush(anotherTenant);
+
+  await createPriceItems(em, server.logger, "tests/data/config");
+
+  // insert an old price item
+  oldPriceItem = new JobPriceItem({
+    itemId: "HPC102", amount: AmountStrategy.CPUS_ALLOC,
+    price: new Decimal("0.02"), path: ["hpc00", "C032M0128G", "low"],
+  });
+
+  oldPriceItem.createTime = new Date(new Date().getTime() - 100000);
+
+  await em.persistAndFlush(oldPriceItem);
+
+  await server.start();
+  client = new JobServiceClient(server.serverAddress, ChannelCredentials.createInsecure());
 
 });
 
@@ -39,6 +61,7 @@ interface PriceItem {
 }
 
 const expectedPriceItems: PriceItem[] = [
+  { itemId: "HPC102", price: new Decimal("0.02"), path: ["hpc00", "C032M0128G", "low"]},
   { itemId: "HPC01", price: new Decimal("0.04"), path: ["hpc00", "C032M0128G", "low"]},
   { itemId: "HPC02", price: new Decimal("0.06"), path: ["hpc00", "C032M0128G", "normal"]},
   { itemId: "HPC03", price: new Decimal("0.08"), path: ["hpc00", "C032M0128G", "high"]},
@@ -58,7 +81,6 @@ const expectedPriceItems: PriceItem[] = [
 ];
 
 it("creates billing items in db", async () => {
-  await createPriceItems(orm.em.fork(), server.logger, "tests/data/config");
 
   const em = orm.em.fork();
 
@@ -75,8 +97,58 @@ it("creates billing items in db", async () => {
 
 });
 
+const priceItemToJobBillingItem = (x: PriceItem) => <JobBillingItem>({
+  id: x.itemId, path: x.path.join("."), tenantName: x.tenant, price: decimalToMoney(x.price),
+  createTime: expect.any(Date),
+});
+
+it("returns all billing items", async () => {
+  const reply = await asyncClientCall(client, "getBillingItems", { activeOnly: false });
+
+  expect(reply.items).toIncludeSameMembers(expectedPriceItems.map(priceItemToJobBillingItem));
+});
+
+it("returns only active billing items of all tenants", async () => {
+  const reply = await asyncClientCall(client, "getBillingItems", { activeOnly: true });
+
+  expect(reply.items).toIncludeSameMembers(
+    expectedPriceItems.filter((x) => x.itemId !== oldPriceItem.itemId).map(priceItemToJobBillingItem),
+  );
+});
+
+it("returns all billing items applicable to default tenant", async () => {
+  const reply = await asyncClientCall(client, "getBillingItems", { tenantName: DEFAULT_TENANT_NAME, activeOnly: false });
+
+  expect(reply.items).toIncludeSameMembers(
+    expectedPriceItems.filter((x) => x.tenant !== "another").map(priceItemToJobBillingItem),
+  );
+});
+
+it("returns all billing items applicable to another tenant", async () => {
+  const reply = await asyncClientCall(client, "getBillingItems", { tenantName: "another", activeOnly: false });
+
+  expect(reply.items).toIncludeSameMembers(
+    expectedPriceItems.map(priceItemToJobBillingItem),
+  );
+});
+
+it("returns active billing items applicable to default tenant", async () => {
+  const reply = await asyncClientCall(client, "getBillingItems", { tenantName: DEFAULT_TENANT_NAME, activeOnly: true });
+
+  expect(reply.items).toIncludeSameMembers(
+    expectedPriceItems.filter((x) => x.itemId !== oldPriceItem.itemId && !x.tenant).map(priceItemToJobBillingItem),
+  );
+});
+
+it("returns active billing items applicable to another tenant", async () => {
+  const reply = await asyncClientCall(client, "getBillingItems", { tenantName: "another", activeOnly: true });
+
+  expect(reply.items).toIncludeSameMembers(
+    expectedPriceItems.filter((x) => x.itemId !== oldPriceItem.itemId && x.itemId !== "HPC01").map(priceItemToJobBillingItem),
+  );
+});
+
 it("calculates price", async () => {
-  await createPriceItems(orm.em.fork(), server.logger, "tests/data/config");
 
   const priceMap = await createPriceMap(orm.em, server.logger);
 

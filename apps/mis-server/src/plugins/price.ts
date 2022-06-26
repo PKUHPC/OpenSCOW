@@ -45,20 +45,13 @@ export const pricePlugin = plugin(async (s) => {
 
 });
 
-export async function createPriceMap(em: SqlEntityManager<MySqlDriver>, logger: Logger): Promise<PriceMap> {
-  // get all billing items
-  // order by ASC so that items added later overrides items added before.
-  const billingItems = await em.find(JobPriceItem, {}, {
-    populate: ["tenant"],
-    orderBy: { createTime: "ASC" },
-  });
-
+export function getActiveBillingItems(items: JobPriceItem[]) {
   // { [cluster.partition[.qos]]: price }
   const defaultPrices: Record<string, JobPriceItem> = {};
   // { tenantName: { [cluster.partition[.qos] ]: price }}
   const tenantSpecificPrices: Record<string, Record<string, JobPriceItem>> = {};
 
-  billingItems.forEach((item) => {
+  items.forEach((item) => {
     if (!item.tenant) {
       defaultPrices[item.path.join(".")] = item;
     } else {
@@ -69,6 +62,19 @@ export async function createPriceMap(em: SqlEntityManager<MySqlDriver>, logger: 
       tenantSpecificPrices[tenantName][item.path.join(".")] = item;
     }
   });
+
+  return { defaultPrices, tenantSpecificPrices };
+}
+
+export async function createPriceMap(em: SqlEntityManager<MySqlDriver>, logger: Logger): Promise<PriceMap> {
+  // get all billing items
+  // order by ASC so that items added later overrides items added before.
+  const billingItems = await em.find(JobPriceItem, {}, {
+    populate: ["tenant"],
+    orderBy: { createTime: "ASC" },
+  });
+
+  const { defaultPrices, tenantSpecificPrices } = getActiveBillingItems(billingItems);
 
   logger.info("Default Price Map: %o", defaultPrices);
   logger.info("Tenant specific prices %o", tenantSpecificPrices);

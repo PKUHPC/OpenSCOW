@@ -29,8 +29,14 @@ export const tenantServiceServer = plugin((server) => {
         userCount,
         balance: decimalToMoney(tenant.balance),
       }];
-
     },
+
+    getTenants: async ({ em }) => {
+      const tenants = await em.find(Tenant, {}, { fields: ["name"]});
+
+      return [{ names: tenants.map((x) => x.name) }];
+    },
+
   });
 
 });

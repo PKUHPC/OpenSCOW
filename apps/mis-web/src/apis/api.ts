@@ -22,6 +22,8 @@ import type { GetPaymentsSchema } from "src/pages/api/finance/payments";
 import type { CompleteInitSchema } from "src/pages/api/init/completeInit";
 import type { CreatePlatformUserSchema } from "src/pages/api/init/createPlatformAdminUser";
 import type { ChangeJobTimeLimitSchema } from "src/pages/api/job/changeJobTimeLimit";
+import type { GetBillingItemsSchema } from "src/pages/api/job/getBillingItems";
+import type { GetBillingTableSchema } from "src/pages/api/job/getBillingTable";
 import type { GetJobByBiJobIndexSchema } from "src/pages/api/job/getJobByBiJobIndex";
 import type { GetJobInfoSchema } from "src/pages/api/job/jobInfo";
 import type { QueryJobTimeLimitSchema } from "src/pages/api/job/queryJobTimeLimit";
@@ -32,10 +34,10 @@ import type { GetWhitelistedAccountsSchema } from "src/pages/api/tenant/accountW
 import type { WhitelistAccountSchema } from "src/pages/api/tenant/accountWhitelist/whitelistAccount";
 import type { CreateAccountSchema } from "src/pages/api/tenant/createAccount";
 import type { GetAccountsSchema } from "src/pages/api/tenant/getAccounts";
+import type { GetTenantsSchema } from "src/pages/api/tenant/getTenants";
 import type { AddUserToAccountSchema } from "src/pages/api/users/addToAccount";
 import type { BlockUserInAccountSchema } from "src/pages/api/users/blockInAccount";
 import type { CreateUserSchema } from "src/pages/api/users/create";
-import type { GetBillingItemsSchema } from "src/pages/api/users/getBillingItems";
 import type { GetAccountUsersSchema } from "src/pages/api/users/index";
 import type { CancelJobChargeLimitSchema } from "src/pages/api/users/jobChargeLimit/cancel";
 import type { SetJobChargeLimitSchema } from "src/pages/api/users/jobChargeLimit/set";
@@ -67,6 +69,8 @@ export const api = {
   completeInit: fromApi<CompleteInitSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/init/completeInit")),
   createPlatformUser: fromApi<CreatePlatformUserSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/init/createPlatformAdminUser")),
   changeJobTimeLimit: fromApi<ChangeJobTimeLimitSchema>("PATCH", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/job/changeJobTimeLimit")),
+  getBillingItems: fromApi<GetBillingItemsSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/job/getBillingItems")),
+  getBillingTable: fromApi<GetBillingTableSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/job/getBillingTable")),
   getJobByBiJobIndex: fromApi<GetJobByBiJobIndexSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/job/getJobByBiJobIndex")),
   getJobInfo: fromApi<GetJobInfoSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/job/jobInfo")),
   queryJobTimeLimit: fromApi<QueryJobTimeLimitSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/job/queryJobTimeLimit")),
@@ -77,10 +81,10 @@ export const api = {
   whitelistAccount: fromApi<WhitelistAccountSchema>("PUT", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/tenant/accountWhitelist/whitelistAccount")),
   createAccount: fromApi<CreateAccountSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/tenant/createAccount")),
   getAccounts: fromApi<GetAccountsSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/tenant/getAccounts")),
+  getTenants: fromApi<GetTenantsSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/tenant/getTenants")),
   addUserToAccount: fromApi<AddUserToAccountSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/users/addToAccount")),
   blockUserInAccount: fromApi<BlockUserInAccountSchema>("PUT", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/users/blockInAccount")),
   createUser: fromApi<CreateUserSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/users/create")),
-  getBillingItems: fromApi<GetBillingItemsSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/users/getBillingItems")),
   getAccountUsers: fromApi<GetAccountUsersSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/users")),
   cancelJobChargeLimit: fromApi<CancelJobChargeLimitSchema>("DELETE", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/users/jobChargeLimit/cancel")),
   setJobChargeLimit: fromApi<SetJobChargeLimitSchema>("PUT", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/users/jobChargeLimit/set")),

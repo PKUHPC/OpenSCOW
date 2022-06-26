@@ -29,6 +29,16 @@ export const platformAdminRoutes: NavItemProps[] = [
         text: "导入用户",
         path: "/admin/importUsers",
       },
+      {
+        Icon: MoneyCollectOutlined,
+        text: "作业计费项",
+        path: "/admin/jobBillingItems",
+      },
+      {
+        Icon: MoneyCollectOutlined,
+        text: "查询作业价格表",
+        path: "/admin/jobBillingTable",
+      },
     ],
   },
 ];

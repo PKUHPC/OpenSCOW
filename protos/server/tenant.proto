@@ -2,9 +2,7 @@ syntax = "proto3";
 
 package scow.server;
 
-import "google/protobuf/timestamp.proto";
 import "common/money.proto";
-import "common/job.proto";
 
 message GetTenantInfoRequest { string tenant_name = 1; }
 
@@ -22,6 +20,10 @@ message GetTenantInfoReply {
   repeated AdminInfo admins = 4;
 }
 
+message GetTenantsRequest {}
+message GetTenantsReply { repeated string names = 1; }
+
 service TenantService {
   rpc GetTenantInfo(GetTenantInfoRequest) returns (GetTenantInfoReply);
+  rpc GetTenants(GetTenantsRequest) returns (GetTenantsReply);
 }

@@ -39,6 +39,12 @@ it("gets tenant info", async () => {
     balance: decimalToMoney(data.tenant.balance),
     admins: [data.userA].map((x) => ({ userId: x.id + "", userName: x.name })),
   } as GetTenantInfoReply);
+});
 
+it("gets all tenants", async () => {
+  const client = new TenantServiceClient(server.serverAddress, ChannelCredentials.createInsecure());
 
+  const info  = await asyncClientCall(client, "getTenants", {});
+
+  expect(info.names).toIncludeSameMembers([data.tenant.name, data.anotherTenant.name]);
 });
