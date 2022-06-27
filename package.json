@@ -41,8 +41,8 @@
     "pkg": "5.7.0",
     "nodemon": "2.0.18",
     "husky": "8.0.1",
-    "@commitlint/config-conventional": "17.0.2",
-    "@commitlint/cli": "17.0.2",
+    "@commitlint/config-conventional": "17.0.3",
+    "@commitlint/cli": "17.0.3",
     "commitizen": "4.2.4",
     "cz-conventional-changelog": "3.3.0"
   },
