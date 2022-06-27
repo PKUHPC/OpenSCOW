@@ -30,7 +30,7 @@ export const initServiceServer = plugin((server) => {
     },
 
     completeInit: async ({ em }) => {
-      const initializationTime = new SystemState(SystemState.KEYS.INITIALIZATION_TIME, new Date().toString());
+      const initializationTime = new SystemState(SystemState.KEYS.INITIALIZATION_TIME, new Date().toISOString());
 
       try {
         await em.persistAndFlush(initializationTime);
