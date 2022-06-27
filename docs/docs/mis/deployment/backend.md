@@ -78,10 +78,6 @@ volumes:
       CLUSTERS: "hpc01=clusterops-hpc01:5000"
 ```
 
-## 创建初始费用项目
-
-数据库启动以及配置项编写完成后，请根据[快速创建费用规则](../business/billing.mdx#快速创建费用规则)文档创建您的集群的所有QOS的费用项目。
-
 ## 启动服务
 
 运行`docker compose up -d`启动后端服务。

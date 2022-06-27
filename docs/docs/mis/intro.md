@@ -16,3 +16,4 @@ title: 简介
 1. [集群操作层](./deployment/clusterops.md)
 2. [后端](./deployment/backend.md)
 3. [前端](./deployment/web.md)
+4. [初始化](./deployment/init.md)

@@ -43,10 +43,7 @@ MYSQL_PASSWORD={数据库密码} python3 slurm-users.py
 }
 ```
 
-将此`users.json`文件复制到服务节点的`docker-compose.yml`所在目录中，运行以下命令将用户信息导入数据库。
+获取`users.json`之后，在系统初始化时，或者系统初始化后使用平台管理员用户登录后选择**平台管理**->**导入用户**，将`users.json`的内容复制进去。如果需要将新加入的账户都加入白名单中，请勾选`将所有账户加入白名单`。点击确定，即可将所有账户导入默认租户中。
 
-```bash
-docker compose run mis-server initializeUsers
-```
+![导入用户](./import-users.png)
 
-如在后面加上`whitelist`参数，会把所有账户加入白名单。
