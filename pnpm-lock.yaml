@@ -74,7 +74,7 @@ importers:
       '@types/asn1': 0.2.0
       '@types/ldapjs': 2.2.2
       asn1: 0.2.6
-      fastify: 4.0.3
+      fastify: 4.1.0
       fastify-graceful-shutdown: 3.1.0
       fastify-plugin: 3.0.1
       ioredis: 5.0.6
@@ -87,7 +87,7 @@ importers:
       '@scow/config': link:../../libs/config
       '@sinclair/typebox': 0.23.5
       asn1: 0.2.6
-      fastify: 4.0.3
+      fastify: 4.1.0
       fastify-graceful-shutdown: 3.1.0
       fastify-plugin: 3.0.1
       ioredis: 5.0.6
@@ -136,7 +136,7 @@ importers:
       '@types/mime-types': 2.1.1
       '@types/shell-quote': 1.7.1
       fast-json-stringify: 4.2.0
-      fastify: 4.0.3
+      fastify: 4.1.0
       fastify-graceful-shutdown: 3.1.0
       fastify-plugin: 3.0.1
       form-data: 4.0.0
@@ -154,7 +154,7 @@ importers:
       '@scow/lib-auth': link:../../libs/auth
       '@sinclair/typebox': 0.23.5
       fast-json-stringify: 4.2.0
-      fastify: 4.0.3
+      fastify: 4.1.0
       fastify-graceful-shutdown: 3.1.0
       fastify-plugin: 3.0.1
       mime-types: 2.1.35
@@ -7923,8 +7923,8 @@ packages:
   /fastify-plugin/3.0.1:
     resolution: {integrity: sha512-qKcDXmuZadJqdTm6vlCqioEbyewF60b/0LOFCcYN1B6BIZGlYJumWWOYs70SFYLDAH4YqdE1cxH/RKMG7rFxgA==}
 
-  /fastify/4.0.3:
-    resolution: {integrity: sha512-ACb3SXYQaN3zbRRND/51Dk/lmMkEJmGZ1YjSayzefCGX4UeHPw1it9PfJrfiuiG07FO2UxRC7Vxl+GwKfDi1Vw==}
+  /fastify/4.1.0:
+    resolution: {integrity: sha512-nze95u3wpVIsOXMmSi5kgUaEIZq2HJmerk/+ivFBPtYozAydoDg92BcsxDtO4cb8vW4RBkahx8zL5PgH9YulCw==}
     dependencies:
       '@fastify/ajv-compiler': 3.1.0
       '@fastify/error': 3.0.0

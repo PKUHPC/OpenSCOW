@@ -14,7 +14,7 @@
   "dependencies": {
     "@scow/config": "workspace:*",
     "@sinclair/typebox": "0.23.5",
-    "fastify": "4.0.3",
+    "fastify": "4.1.0",
     "@fastify/error": "3.0.0",
     "ioredis": "5.0.6",
     "fastify-graceful-shutdown": "3.1.0",
