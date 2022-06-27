@@ -21,7 +21,10 @@ export interface JobBillingTableItem {
   cores: number;
   gpus: number;
   price: string;
+  path: string;
   comment?: string;
+
+  amount: string;
 }
 
 const columns: ColumnsType<JobBillingTableItem> = [
@@ -54,6 +57,9 @@ const columns: ColumnsType<JobBillingTableItem> = [
   }) },
   { dataIndex: "price", title: "单价（元）", key: "index", render: (_, r) => ({
     children: r.price,
+  }) },
+  { dataIndex: "amount", title: "计量方式", key: "index", render: (_, r) => ({
+    children: r.amount,
   }) },
   { dataIndex: "comment", title: "说明", key: "index", render: (_, r) => ({
     children: r.comment,

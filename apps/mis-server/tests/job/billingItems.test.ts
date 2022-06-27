@@ -4,11 +4,11 @@ import { asyncClientCall } from "@ddadaal/tsgrpc-utils";
 import { ChannelCredentials } from "@grpc/grpc-js";
 import { MikroORM } from "@mikro-orm/core";
 import { MySqlDriver } from "@mikro-orm/mysql";
-import { Decimal, decimalToMoney } from "@scow/lib-decimal";
+import { Decimal, decimalToMoney, numberToMoney } from "@scow/lib-decimal";
 import { createServer } from "src/app";
 import { AmountStrategy, JobPriceItem } from "src/entities/JobPriceItem";
 import { Tenant } from "src/entities/Tenant";
-import { JobBillingItem, JobServiceClient } from "src/generated/server/job";
+import { AddBillingItemRequest, JobBillingItem, JobServiceClient } from "src/generated/server/job";
 import { calculateJobPrice, createPriceMap } from "src/plugins/price";
 import { createPriceItems } from "src/tasks/createBillingItems";
 import { DEFAULT_TENANT_NAME } from "src/utils/constants";
@@ -99,20 +99,22 @@ it("creates billing items in db", async () => {
 
 const priceItemToJobBillingItem = (x: PriceItem) => <JobBillingItem>({
   id: x.itemId, path: x.path.join("."), tenantName: x.tenant, price: decimalToMoney(x.price),
-  createTime: expect.any(Date),
+  createTime: expect.any(Date), amountStrategy: expect.any(String),
 });
 
-it("returns all billing items", async () => {
+it("returns all default billing items", async () => {
   const reply = await asyncClientCall(client, "getBillingItems", { activeOnly: false });
 
-  expect(reply.items).toIncludeSameMembers(expectedPriceItems.map(priceItemToJobBillingItem));
+  expect(reply.items).toIncludeSameMembers(
+    expectedPriceItems.filter((x) => !x.tenant).map(priceItemToJobBillingItem),
+  );
 });
 
-it("returns only active billing items of all tenants", async () => {
+it("returns only active billing items of default ", async () => {
   const reply = await asyncClientCall(client, "getBillingItems", { activeOnly: true });
 
   expect(reply.items).toIncludeSameMembers(
-    expectedPriceItems.filter((x) => x.itemId !== oldPriceItem.itemId).map(priceItemToJobBillingItem),
+    expectedPriceItems.filter((x) => !x.tenant && x.itemId !== oldPriceItem.itemId).map(priceItemToJobBillingItem),
   );
 });
 
@@ -146,6 +148,52 @@ it("returns active billing items applicable to another tenant", async () => {
   expect(reply.items).toIncludeSameMembers(
     expectedPriceItems.filter((x) => x.itemId !== oldPriceItem.itemId && x.itemId !== "HPC01").map(priceItemToJobBillingItem),
   );
+});
+
+it("adds billing item to default", async () => {
+  const request: AddBillingItemRequest = {
+    amountStrategy: AmountStrategy.CPUS_ALLOC, itemId: "HPC203",
+    path: "hpc00.C032M0128G.low", description: "",
+    price: numberToMoney(10),
+  };
+
+  await asyncClientCall(client, "addBillingItem", request);
+
+  const reply = await asyncClientCall(client, "getBillingItems", { activeOnly: true });
+
+  expect(reply.items).toIncludeAllMembers([{
+    amountStrategy: request.amountStrategy,
+    id: request.itemId,
+    path: request.path,
+    createTime: expect.any(Date),
+    price: request.price,
+    tenantName: request.tenantName,
+  } as JobBillingItem]);
+
+  expect(reply.items.find((x) => x.id === "HPC01")).toBeUndefined();
+});
+
+it("adds billing item to another tenant", async () => {
+  const request: AddBillingItemRequest = {
+    amountStrategy: AmountStrategy.CPUS_ALLOC, itemId: "HPC203",
+    path: "hpc00.C032M0128G.low", description: "",
+    price: numberToMoney(10), tenantName: "another",
+  };
+
+  await asyncClientCall(client, "addBillingItem", request);
+
+  const reply = await asyncClientCall(client, "getBillingItems", { tenantName: "another", activeOnly: true });
+
+  expect(reply.items).toIncludeAllMembers([{
+    amountStrategy: request.amountStrategy,
+    id: request.itemId,
+    path: request.path,
+    createTime: expect.any(Date),
+    price: request.price,
+    tenantName: request.tenantName,
+  } as JobBillingItem]);
+
+  expect(reply.items.find((x) => x.id === "HPC01")).toBeUndefined();
 });
 
 it("calculates price", async () => {

@@ -104,7 +104,7 @@ message QueryJobTimeLimitRequest {
 }
 
 message GetBillingItemsRequest {
-  // if not specified, return every price item
+  // if not specified, return default price items
   optional string tenant_name = 1;
   // returns only active billing items
   bool active_only = 2;
@@ -116,12 +116,25 @@ message JobBillingItem {
   optional string tenant_name = 3;
   common.Money price = 4;
   google.protobuf.Timestamp create_time = 5;
+  string amount_strategy = 6;
 }
 
 message GetBillingItemsReply { repeated JobBillingItem items = 1; }
 
 // NOT_FOUND: cluster or job_id is not found.
 message QueryJobTimeLimitReply { uint64 limit = 1; }
+
+message AddBillingItemRequest {
+  // if not set, add as default item
+  optional string tenant_name = 1;
+  string item_id = 2;
+  common.Money price = 3;
+  string amount_strategy = 4;
+  string path = 5;
+  optional string description = 6;
+}
+
+message AddBillingItemReply {}
 
 service JobService {
   rpc GetJobs(GetJobsRequest) returns (GetJobsReply);
@@ -137,4 +150,9 @@ service JobService {
       returns (QueryJobTimeLimitReply);
 
   rpc GetBillingItems(GetBillingItemsRequest) returns (GetBillingItemsReply);
+
+  // ALREADY_EXISTS: item_id already exists
+  // NOT_FOUND: tenant_name is not found
+  // INVALID_ARGUMENT: amount is not valid or path is not valid
+  rpc AddBillingItem(AddBillingItemRequest) returns (AddBillingItemReply);
 }

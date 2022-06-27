@@ -63,8 +63,10 @@ export async function getBillingTableItems(tenantName: string | undefined) {
           qosCount,
           qos,
           itemId: item.id,
+          path,
           price: moneyToString(item.price!),
           comment: partitionInfo.comment,
+          amount: item.amountStrategy,
         });
       }
     }
@@ -76,6 +78,7 @@ export async function getBillingTableItems(tenantName: string | undefined) {
 
 export default /* #__PURE__*/route<GetBillingTableSchema>("GetBillingTableSchema", async (req, res) => {
   const { tenant } = req.query;
+
   if (tenant) {
     const auth = authenticate((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN) || (u.tenant === tenant));
     const info = await auth(req, res);

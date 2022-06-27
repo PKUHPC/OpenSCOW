@@ -5,8 +5,8 @@ import { useCallback } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
-import { JobBillingTable } from "src/components/JobBillingTable";
 import { PageTitle } from "src/components/PageTitle";
+import { EditableJobBillingTable } from "src/pageComponents/job/EditableJobBillingTable";
 import { TenantSelector } from "src/pageComponents/tenant/TenantSelector";
 import { Head } from "src/utils/head";
 import { queryToString, useQuerystring } from "src/utils/querystring";
@@ -40,7 +40,7 @@ const AdminJobBillingTable: React.FC<{ tenant?: string }> = ({ tenant }) => {
           </Form.Item>
         </Form>
       </FilterFormContainer>
-      <JobBillingTable data={data} loading={isLoading} />
+      <EditableJobBillingTable tenant={tenant} reload={reload} data={data} loading={isLoading} />
     </div>
   );
 };
@@ -52,8 +52,8 @@ export const AdminJobBillingTablePage: NextPage = () => {
 
   return (
     <div>
-      <Head title="作业价格表" />
-      <PageTitle titleText={"查询作业价格表"} />
+      <Head title="管理作业价格表" />
+      <PageTitle titleText={"管理作业价格表"} />
       <AdminJobBillingTable tenant={tenant}/>
     </div>
   );

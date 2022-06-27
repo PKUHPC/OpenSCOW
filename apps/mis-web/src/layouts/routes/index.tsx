@@ -31,12 +31,12 @@ export const platformAdminRoutes: NavItemProps[] = [
       },
       {
         Icon: MoneyCollectOutlined,
-        text: "作业计费项",
+        text: "查询作业计费项",
         path: "/admin/jobBillingItems",
       },
       {
         Icon: MoneyCollectOutlined,
-        text: "查询作业价格表",
+        text: "管理作业价格表",
         path: "/admin/jobBillingTable",
       },
     ],
@@ -75,6 +75,11 @@ export const tenantAdminRoutes: NavItemProps[] = [
         Icon: InfoOutlined,
         text: "租户信息",
         path: "/tenant/info",
+      },
+      {
+        Icon: MoneyCollectOutlined,
+        text: "管理作业价格表",
+        path: "/tenant/jobBillingTable",
       },
       {
         Icon: BookOutlined,

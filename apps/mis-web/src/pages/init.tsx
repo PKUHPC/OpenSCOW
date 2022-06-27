@@ -5,6 +5,7 @@ import { api } from "src/apis";
 import { SSRProps } from "src/auth/server";
 import { UnifiedErrorPage } from "src/components/errorPages/UnifiedErrorPage";
 import { Centered } from "src/components/layouts";
+import { EditJobPriceTableForm } from "src/pageComponents/init/EditJobPriceTableForm";
 import { InitImportUsersForm } from "src/pageComponents/init/InitImportUsersForm";
 import { PlatformAdminUserForm } from "src/pageComponents/init/PlatformAdminUserForm";
 import { Head } from "src/utils/head";
@@ -73,6 +74,9 @@ export const InitSystemPage: NextPage<Props> = (props) => {
         </Tabs.TabPane>
         <Tabs.TabPane tab="导入用户" key="2">
           <InitImportUsersForm />
+        </Tabs.TabPane>
+        <Tabs.TabPane tab="编辑作业价格表" key="3">
+          <EditJobPriceTableForm />
         </Tabs.TabPane>
       </Tabs>
     </div>

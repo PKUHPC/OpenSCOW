@@ -30,12 +30,12 @@ export interface GetBillingItemsSchema {
 }
 
 const mockBillingItems = [
-  { id: "HPC01", path: "hpc01.compute.low", price: numberToMoney(0.04) },
-  { id: "HPC02", path: "hpc01.compute.normal", price: numberToMoney(0.06) },
-  { id: "HPC03", path: "hpc01.compute.high", price: numberToMoney(0.08) },
-  { id: "HPC04", path: "hpc01.GPU.low", price: numberToMoney(10.00) },
-  { id: "HPC05", path: "hpc01.GPU.normal", price: numberToMoney(12.00) },
-  { id: "HPC06", path: "hpc01.GPU.high", price: numberToMoney(14.00) },
+  { id: "HPC01", path: "hpc01.compute.low", price: numberToMoney(0.04), amountStrategy: "gpu" },
+  { id: "HPC02", path: "hpc01.compute.normal", price: numberToMoney(0.06), amountStrategy: "gpu" },
+  { id: "HPC03", path: "hpc01.compute.high", price: numberToMoney(0.08), amountStrategy: "gpu" },
+  { id: "HPC04", path: "hpc01.GPU.low", price: numberToMoney(10.00), amountStrategy: "gpu" },
+  { id: "HPC05", path: "hpc01.GPU.normal", price: numberToMoney(12.00), amountStrategy: "gpu" },
+  { id: "HPC06", path: "hpc01.GPU.high", price: numberToMoney(14.00), amountStrategy: "gpu" },
 ];
 
 async function mockReply(): Promise<GetBillingItemsReply> {
@@ -55,6 +55,7 @@ export async function getBillingItems(tenantName: string | undefined, activeOnly
 
 export default /* #__PURE__*/route<GetBillingItemsSchema>("GetBillingItemsSchema", async (req, res) => {
   const { tenant, activeOnly } = req.query;
+
   if (tenant) {
     const auth = authenticate((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN) || (u.tenant === tenant));
     const info = await auth(req, res);

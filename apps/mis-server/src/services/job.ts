@@ -2,7 +2,7 @@ import { plugin } from "@ddadaal/tsgrpc-server";
 import { ensureNotUndefined } from "@ddadaal/tsgrpc-utils";
 import { ServiceError, status } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
-import { FilterQuery, QueryOrder } from "@mikro-orm/core";
+import { FilterQuery, QueryOrder, UniqueConstraintViolationException } from "@mikro-orm/core";
 import { MySqlDriver, SqlEntityManager } from "@mikro-orm/mysql";
 import { Decimal, decimalToMoney, moneyToNumber } from "@scow/lib-decimal";
 import { charge, pay } from "src/bl/charging";
@@ -10,7 +10,7 @@ import { config } from "src/config/env";
 import { Account } from "src/entities/Account";
 import { JobInfo as JobInfoEntity } from "src/entities/JobInfo";
 import { JobPriceChange } from "src/entities/JobPriceChange";
-import { JobPriceItem } from "src/entities/JobPriceItem";
+import { AmountStrategy, JobPriceItem } from "src/entities/JobPriceItem";
 import { Tenant } from "src/entities/Tenant";
 import { JobServiceClient } from "src/generated/clusterops/job";
 import {
@@ -285,13 +285,11 @@ export const jobServiceServer = plugin((server) => {
         }
       }
 
-      const billingItems = await em.find(JobPriceItem, tenant
-        ? { $or: [{ tenant: null }, { tenant }]}
-        : {},
-      {
-        populate: ["tenant"],
-        orderBy: { createTime: "ASC" },
-      });
+      const billingItems = await em.find(JobPriceItem, { $or: [{ tenant: null }, { tenant }]},
+        {
+          populate: ["tenant"],
+          orderBy: { createTime: "ASC" },
+        });
 
       const priceItemToGrpc = (item: JobPriceItem) => <JobBillingItem>({
         id: item.itemId,
@@ -299,6 +297,7 @@ export const jobServiceServer = plugin((server) => {
         tenantName: item.tenant?.getProperty("name"),
         price: decimalToMoney(item.price),
         createTime: item.createTime,
+        amountStrategy: item.amount,
       });
 
       if (activeOnly) {
@@ -314,6 +313,46 @@ export const jobServiceServer = plugin((server) => {
         return [{ items: activePrices.map(priceItemToGrpc) }];
       } else {
         return [{ items: billingItems.map(priceItemToGrpc) }];
+      }
+
+    },
+
+    addBillingItem: async ({ request, em }) => {
+      const { tenantName, itemId, price, amountStrategy, path, description } = ensureNotUndefined(request, ["price"]);
+
+      let tenant: Tenant | undefined = undefined;
+      if (tenantName) {
+        tenant = await em.findOne(Tenant, { name: tenantName }) ?? undefined;
+
+        if (!tenant) {
+          throw <ServiceError>{ code: status.NOT_FOUND, message: `Tenant ${tenantName} is not found.` };
+        }
+      }
+
+      if (!(Object.values(AmountStrategy) as string[]).includes(amountStrategy)) {
+        throw <ServiceError>{
+          code: status.INVALID_ARGUMENT,
+          message: `Amount strategy ${amountStrategy} is not valid.` };
+      }
+
+      const item = new JobPriceItem({
+        amount: amountStrategy as AmountStrategy,
+        itemId,
+        price: new Decimal(moneyToNumber(price)),
+        description: description ?? "",
+        tenant,
+        path: path.split("."),
+      });
+
+      try {
+        await em.persistAndFlush(item);
+        return [{}];
+      } catch (e) {
+        if (e instanceof UniqueConstraintViolationException) {
+          throw <ServiceError>{ code: status.ALREADY_EXISTS, message: `${itemId} already exists.` };
+        } else {
+          throw e;
+        }
       }
 
     },

@@ -4,6 +4,7 @@ import { api } from "src/apis/api";
 import type { RunningJob } from "src/generated/common/job";
 import { JobInfo } from "src/generated/server/job";
 import type { AccountUserInfo } from "src/generated/server/user";
+import { AmountStrategy } from "src/models/job";
 import { PlatformRole, TenantRole, UserInfo, UserRole, UserStatus } from "src/models/User";
 
 export type MockApi<TApi extends Record<
@@ -65,16 +66,17 @@ export const runningJob: RunningJob = {
 };
 
 export const mockApi: MockApi<typeof api> = {
+  addBillingItem: async () => null,
 
   getTenants: async () => ({ names: ["DEFAULT", "another"]}),
 
   getBillingItems: async () => ({ items: [
-    { id: "HPC01", path: "hpc01.compute.low", price: numberToMoney(0.04) },
-    { id: "HPC02", path: "hpc01.compute.normal", price: numberToMoney(0.06) },
-    { id: "HPC03", path: "hpc01.compute.high", price: numberToMoney(0.08) },
-    { id: "HPC04", path: "hpc01.GPU.low", price: numberToMoney(10.00) },
-    { id: "HPC05", path: "hpc01.GPU.normal", price: numberToMoney(12.00) },
-    { id: "HPC06", path: "hpc01.GPU.high", price: numberToMoney(14.00) },
+    { id: "HPC01", path: "hpc01.compute.low", price: numberToMoney(0.04), amountStrategy: "gpu" },
+    { id: "HPC02", path: "hpc01.compute.normal", price: numberToMoney(0.06), amountStrategy: "gpu" },
+    { id: "HPC03", path: "hpc01.compute.high", price: numberToMoney(0.08), amountStrategy: "gpu" },
+    { id: "HPC04", path: "hpc01.GPU.low", price: numberToMoney(10.00), amountStrategy: "gpu" },
+    { id: "HPC05", path: "hpc01.GPU.normal", price: numberToMoney(12.00), amountStrategy: "gpu" },
+    { id: "HPC06", path: "hpc01.GPU.high", price: numberToMoney(14.00), amountStrategy: "gpu" },
   ]}),
 
   getBillingTable: async () => ({ items: [
@@ -93,7 +95,9 @@ export const mockApi: MockApi<typeof api> = {
       qos: "low",
       itemId: "HPC01",
       price: "0.040",
+      path: "hpc01Name.compute.low",
       comment: "说明",
+      amount: AmountStrategy.CPUS_ALLOC,
     },
     {
       index: 1,
@@ -110,7 +114,9 @@ export const mockApi: MockApi<typeof api> = {
       qos: "normal",
       itemId: "HPC02",
       price: "0.060",
+      path: "hpc01Name.compute.normal",
       comment: "说明",
+      amount: AmountStrategy.CPUS_ALLOC,
     },
     {
       index: 2,
@@ -127,7 +133,9 @@ export const mockApi: MockApi<typeof api> = {
       qos: "high",
       itemId: "HPC03",
       price: "0.080",
+      path: "hpc01Name.compute.high",
       comment: "说明",
+      amount: AmountStrategy.CPUS_ALLOC,
     },
     {
       index: 3,
@@ -143,8 +151,10 @@ export const mockApi: MockApi<typeof api> = {
       qosCount: 3,
       qos: "low",
       itemId: "HPC04",
+      path: "hpc01Name.GPU.low",
       price: "10.000",
       comment: "说明",
+      amount: AmountStrategy.CPUS_ALLOC,
     },
     {
       index: 4,
@@ -160,8 +170,10 @@ export const mockApi: MockApi<typeof api> = {
       qosCount: 3,
       qos: "normal",
       itemId: "HPC05",
+      path: "hpc01Name.GPU.normal",
       price: "12.000",
       comment: "说明",
+      amount: AmountStrategy.CPUS_ALLOC,
     },
     {
       index: 5,
@@ -178,7 +190,9 @@ export const mockApi: MockApi<typeof api> = {
       qos: "high",
       itemId: "HPC06",
       price: "14.000",
+      path: "hpc01Name.GPU.high",
       comment: "说明",
+      amount: AmountStrategy.CPUS_ALLOC,
     },
   ]}),
 

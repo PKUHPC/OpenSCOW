@@ -34,7 +34,7 @@ const AdminJobBillingManagementTable: React.FC = () => {
           initialValues={{ activeOnly: true, tenant: undefined }}
         >
           <Form.Item label="租户" name="tenant">
-            <TenantSelector allowUndefined={true} placeholder="不选择返回所有" />
+            <TenantSelector allowUndefined={true} placeholder="不选择返回默认计费项" />
           </Form.Item>
           <Form.Item name="activeOnly" valuePropName="checked">
             <Checkbox>只显示当前生效的计费项</Checkbox>
@@ -57,8 +57,8 @@ const AdminJobBillingManagementTable: React.FC = () => {
 export const JobBillingItemsPage: NextPage = () => {
   return (
     <div>
-      <Head title="作业价格信息" />
-      <PageTitle titleText={"管理作业价格信息"} />
+      <Head title="查询作业价格项" />
+      <PageTitle titleText={"查询作业价格项"} />
       <AdminJobBillingManagementTable />
     </div>
   );

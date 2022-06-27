@@ -46,3 +46,9 @@ export function runningJobId(r: RunningJobInfo) {
   return `${r.cluster.id}:${r.jobId}`;
 }
 
+export enum AmountStrategy {
+  MAX_CPUSALLOC_MEM = "max-cpusAlloc-mem",
+  MAX_GPU_CPUSALLOC = "max-gpu-cpusAlloc",
+  GPU = "gpu",
+  CPUS_ALLOC = "cpusAlloc"
+}
