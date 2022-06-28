@@ -70,7 +70,7 @@ export const userRoutes: NavItemProps[] = [
     children: [
       {
         Icon: Loading3QuartersOutlined,
-        text: "运行中的应用",
+        text: "已创建的应用",
         path: "/apps/sessions",
       },
       {
