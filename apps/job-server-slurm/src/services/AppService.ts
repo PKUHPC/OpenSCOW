@@ -7,6 +7,7 @@ import fs from "fs";
 import { join } from "path";
 import { queryJobInfo } from "src/bl/queryJobInfo";
 import { generateJobScript, parseSbatchOutput } from "src/bl/submitJob";
+import { getAppConfig } from "src/config/apps";
 import { clustersConfig } from "src/config/clusters";
 import { config } from "src/config/env";
 import { RunningJob } from "src/generated/common/job";
@@ -33,8 +34,6 @@ const SESSION_METADATA_NAME = "session.json";
 const SERVER_SESSION_INFO = "SERVER_SESSION_INFO";
 const VNC_SESSION_INFO = "VNC_SESSION_INFO";
 
-const getAppConfig = (appId: string) =>
-  getConfigFromFile(AppConfigSchema, join(APP_CONFIG_BASE_PATH, appId));
 
 export const appServiceServer = plugin((server) => {
   server.addService<AppServiceServer>(AppServiceService, {
