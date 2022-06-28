@@ -40,11 +40,11 @@ export const mockApi: MockApi<typeof api> = {
 
   getAppSessions: async () => ({ sessions: [
     { jobId: 100, sessionId: "123", appId: "vscode", state: "PENDING",
-      submitTime: new Date().toISOString(), ready: false },
+      submitTime: new Date().toISOString(), ready: false, dataPath: "/test" },
     { jobId: 101, sessionId: "124", appId: "vscode", state: "RUNNING",
-      submitTime: new Date().toISOString(), ready: true },
+      submitTime: new Date().toISOString(), ready: true, dataPath: "/test" },
     { jobId: 102, sessionId: "125", appId: "vscode", state: "RUNNING",
-      submitTime: new Date().toISOString(), ready: true },
+      submitTime: new Date().toISOString(), ready: true, dataPath: "/test" },
   ]}),
 
   connectToApp: async ({ body: { sessionId } }) => sessionId === "124"

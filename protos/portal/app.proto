@@ -33,6 +33,7 @@ message AppSession {
   string app_id = 4;
   string state = 5;
   bool ready = 6;
+  string data_path = 7;
 }
 
 message GetSessionsReply { repeated AppSession sessions = 1; }

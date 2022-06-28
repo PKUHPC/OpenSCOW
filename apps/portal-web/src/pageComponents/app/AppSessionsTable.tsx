@@ -1,4 +1,6 @@
 import { Button, Form, message, Popconfirm, Space, Table, TableColumnsType } from "antd";
+import Router from "next/router";
+import { join } from "path";
 import React, { useCallback, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
@@ -96,6 +98,12 @@ export const AppSessionsTable: React.FC<Props> = () => {
               </>
             ) : undefined
           }
+          <a onClick={() => {
+            Router.push(join("/files", query.cluster.id, record.dataPath));
+          }}
+          >
+            进入目录
+          </a>
         </Space>
       ),
     },

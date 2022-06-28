@@ -1,7 +1,5 @@
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError, status } from "@grpc/grpc-js";
-import { getConfigFromFile } from "@scow/config";
-import { APP_CONFIG_BASE_PATH, AppConfigSchema } from "@scow/config/build/appConfig/app";
 import { randomUUID } from "crypto";
 import fs from "fs";
 import { join } from "path";
@@ -13,7 +11,7 @@ import { config } from "src/config/env";
 import { RunningJob } from "src/generated/common/job";
 import { AppServiceServer, AppServiceService, AppSession } from "src/generated/portal/app";
 import { displayIdToPort } from "src/utils/port";
-import { sftpChmod, sftpExists, sftpReaddir, sftpReadFile, sftpWriteFile } from "src/utils/sftp";
+import { sftpChmod, sftpExists, sftpReaddir, sftpReadFile, sftpRealPath, sftpWriteFile } from "src/utils/sftp";
 import { loggedExec, sshConnect } from "src/utils/ssh";
 import { parseDisplayId, refreshPassword, VNCSERVER_BIN_PATH } from "src/utils/turbovnc";
 
@@ -208,6 +206,7 @@ export const appServiceServer = plugin((server) => {
             submitTime: new Date(sessionMetadata.submitTime),
             state: runningJobInfo?.state ?? "ENDED",
             ready,
+            dataPath: await sftpRealPath(sftp)(jobDir),
           });
 
         }));

@@ -13,3 +13,5 @@ export const sftpReadFile = (sftp: SFTPWrapper) => promisify(sftp.readFile.bind(
 export const sftpReaddir = (sftp: SFTPWrapper) => promisify(sftp.readdir.bind(sftp));
 
 export const sftpChmod = (sftp: SFTPWrapper) => promisify(sftp.chmod.bind(sftp));
+
+export const sftpRealPath = (sftp: SFTPWrapper) => promisify(sftp.realpath.bind(sftp));
