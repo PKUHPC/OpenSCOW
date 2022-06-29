@@ -53,7 +53,14 @@ const OperationBar = styled(TableTitle)`
 `;
 
 const nodeModeToString = (mode: number) => {
-  return "0" + (mode & parseInt("777", 8)).toString(8);
+  const numberPermission = (mode & parseInt("777", 8)).toString(8);
+
+  const toStr = (char: string) => {
+    const num = +char;
+    return ((num & 4) !== 0 ? "r" : "-") + ((num & 2) !== 0 ? "w" : "-") + ((num & 1) !== 0 ? "x" : "-");
+  };
+
+  return [0, 1, 2].reduce((prev, curr) => prev + toStr(numberPermission[curr]), "");
 };
 
 type FileInfoKey = React.Key;
