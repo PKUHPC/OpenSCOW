@@ -1,69 +1,69 @@
-<mxfile host="65bd71144e">
+<mxfile host="65bd71144e" scale="2" border="0">
     <diagram id="CCmktOVLaJpoyg_8QXb8" name="Page-1">
-        <mxGraphModel dx="1138" dy="758" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+        <mxGraphModel dx="1194" dy="910" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
-                <mxCell id="7" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=18;" edge="1" parent="1" source="2" target="4">
+                <mxCell id="7" value="" style="edgeStyle=none;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=18;labelBackgroundColor=none;" parent="1" source="2" target="4" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="8" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=18;" edge="1" parent="1" source="2" target="5">
+                <mxCell id="8" value="" style="edgeStyle=none;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=18;labelBackgroundColor=none;" parent="1" source="2" target="5" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="2" value="代码更新&lt;br style=&quot;font-size: 18px;&quot;&gt;(commit, PR)" style="rounded=0;whiteSpace=wrap;html=1;fontSize=18;" parent="1" vertex="1">
+                <mxCell id="2" value="代码更新&#10;(commit, PR)" style="rounded=0;whiteSpace=wrap;fontSize=18;labelBackgroundColor=none;" parent="1" vertex="1">
                     <mxGeometry x="110" y="300" width="120" height="60" as="geometry"/>
                 </mxCell>
-                <mxCell id="12" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=18;" edge="1" parent="1" source="4" target="11">
+                <mxCell id="12" value="" style="edgeStyle=none;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=18;labelBackgroundColor=none;" parent="1" source="4" target="11" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="4" value="构建文档" style="rounded=0;whiteSpace=wrap;html=1;fontSize=18;" vertex="1" parent="1">
+                <mxCell id="4" value="构建文档" style="rounded=0;whiteSpace=wrap;fontSize=18;labelBackgroundColor=none;" parent="1" vertex="1">
                     <mxGeometry x="280" y="210" width="120" height="60" as="geometry"/>
                 </mxCell>
-                <mxCell id="9" style="edgeStyle=none;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;fontSize=18;" edge="1" parent="1" source="5" target="6">
+                <mxCell id="9" value="" style="edgeStyle=none;exitX=0.5;exitY=1;exitDx=0;exitDy=0;fontSize=18;labelBackgroundColor=none;" parent="1" source="5" target="6" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="10" value="测试覆盖率" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=18;" vertex="1" connectable="0" parent="9">
+                <mxCell id="10" value="测试覆盖率" style="edgeLabel;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=18;labelBackgroundColor=none;" parent="9" vertex="1" connectable="0">
                     <mxGeometry x="-0.4035" y="-1" relative="1" as="geometry">
-                        <mxPoint x="1" y="12" as="offset"/>
+                        <mxPoint x="-49" y="12" as="offset"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="14" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=18;" edge="1" parent="1" source="5" target="13">
+                <mxCell id="14" value="" style="edgeStyle=none;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=18;labelBackgroundColor=none;" parent="1" source="5" target="13" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="16" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=18;" edge="1" parent="1" source="5" target="15">
+                <mxCell id="16" value="" style="edgeStyle=none;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=18;labelBackgroundColor=none;" parent="1" source="5" target="15" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="5" value="运行测试" style="rounded=0;whiteSpace=wrap;html=1;fontSize=18;" vertex="1" parent="1">
+                <mxCell id="5" value="运行测试" style="rounded=0;whiteSpace=wrap;fontSize=18;labelBackgroundColor=none;" parent="1" vertex="1">
                     <mxGeometry x="280" y="400" width="120" height="60" as="geometry"/>
                 </mxCell>
-                <mxCell id="6" value="上传到codecov" style="rounded=0;whiteSpace=wrap;html=1;fontSize=18;" vertex="1" parent="1">
+                <mxCell id="6" value="上传到codecov" style="rounded=0;whiteSpace=wrap;fontSize=18;labelBackgroundColor=none;" parent="1" vertex="1">
                     <mxGeometry x="280" y="520" width="120" height="60" as="geometry"/>
                 </mxCell>
-                <mxCell id="11" value="发布到&lt;br&gt;GitHub Pages" style="rounded=0;whiteSpace=wrap;html=1;fontSize=18;" vertex="1" parent="1">
+                <mxCell id="11" value="发布到&#10;GitHub Pages" style="rounded=0;whiteSpace=wrap;fontSize=18;labelBackgroundColor=none;" parent="1" vertex="1">
                     <mxGeometry x="450" y="210" width="120" height="60" as="geometry"/>
                 </mxCell>
-                <mxCell id="20" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=18;" edge="1" parent="1" source="13" target="17">
+                <mxCell id="20" value="" style="edgeStyle=none;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=18;labelBackgroundColor=none;" parent="1" source="13" target="17" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="21" style="edgeStyle=none;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=18;" edge="1" parent="1" source="13" target="18">
+                <mxCell id="21" value="" style="edgeStyle=none;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=18;labelBackgroundColor=none;" parent="1" source="13" target="18" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="13" value="构建镜像" style="rounded=0;whiteSpace=wrap;html=1;fontSize=18;" vertex="1" parent="1">
+                <mxCell id="13" value="构建镜像" style="rounded=0;whiteSpace=wrap;fontSize=18;labelBackgroundColor=none;" parent="1" vertex="1">
                     <mxGeometry x="450" y="340" width="120" height="60" as="geometry"/>
                 </mxCell>
-                <mxCell id="22" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=18;" edge="1" parent="1" source="15" target="19">
+                <mxCell id="22" value="" style="edgeStyle=none;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=18;labelBackgroundColor=none;" parent="1" source="15" target="19" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="15" value="构建二进制文件" style="rounded=0;whiteSpace=wrap;html=1;fontSize=18;" vertex="1" parent="1">
+                <mxCell id="15" value="构建二进制文件" style="rounded=0;whiteSpace=wrap;fontSize=18;labelBackgroundColor=none;" parent="1" vertex="1">
                     <mxGeometry x="450" y="450" width="120" height="60" as="geometry"/>
                 </mxCell>
-                <mxCell id="17" value="上传镜像到GitHub CR" style="rounded=0;whiteSpace=wrap;html=1;fontSize=18;" vertex="1" parent="1">
+                <mxCell id="17" value="上传镜像到GitHub CR" style="rounded=0;whiteSpace=wrap;fontSize=18;labelBackgroundColor=none;" parent="1" vertex="1">
                     <mxGeometry x="600" y="290" width="120" height="60" as="geometry"/>
                 </mxCell>
-                <mxCell id="18" value="上传镜像到&lt;br&gt;阿里云CR" style="rounded=0;whiteSpace=wrap;html=1;fontSize=18;" vertex="1" parent="1">
+                <mxCell id="18" value="上传镜像到&#10;阿里云CR" style="rounded=0;whiteSpace=wrap;fontSize=18;labelBackgroundColor=none;" parent="1" vertex="1">
                     <mxGeometry x="600" y="370" width="120" height="60" as="geometry"/>
                 </mxCell>
-                <mxCell id="19" value="发布为制品" style="rounded=0;whiteSpace=wrap;html=1;fontSize=18;" vertex="1" parent="1">
+                <mxCell id="19" value="发布为制品" style="rounded=0;whiteSpace=wrap;fontSize=18;labelBackgroundColor=none;" parent="1" vertex="1">
                     <mxGeometry x="600" y="450" width="120" height="60" as="geometry"/>
                 </mxCell>
             </root>
