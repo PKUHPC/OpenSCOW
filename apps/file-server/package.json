@@ -36,7 +36,7 @@
     "form-data": "4.0.0",
     "@types/shell-quote": "1.7.1",
     "@types/mime-types": "2.1.1",
-    "@fastify/swagger": "7.4.0"
+    "@fastify/swagger": "7.4.1"
   },
   "volta": {
     "extends": "../../package.json"
