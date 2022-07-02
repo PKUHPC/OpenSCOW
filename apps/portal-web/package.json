@@ -19,7 +19,7 @@
     "@scow/lib-decimal": "workspace:*",
     "@scow/config": "workspace:*",
     "@grpc/grpc-js": "1.6.7",
-    "@newhighsco/next-plugin-svgr": "3.0.50",
+    "@newhighsco/next-plugin-svgr": "3.0.51",
     "@sinclair/typebox": "0.23.5",
     "antd": "4.21.3",
     "google-protobuf": "3.20.1",
