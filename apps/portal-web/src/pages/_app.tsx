@@ -10,9 +10,8 @@ import Head from "next/head";
 import { join } from "path";
 import { useEffect, useRef } from "react";
 import { createStore, StoreProvider, useStore } from "simstate";
-import { MOCK_USER_INFO } from "src/apis/api.mock";
 import { USE_MOCK } from "src/apis/useMock";
-import { getTokenFromCookie, setTokenCookie } from "src/auth/cookie";
+import { getTokenFromCookie } from "src/auth/cookie";
 import { RootLayout } from "src/layouts/RootLayout";
 import { ValidateTokenSchema } from "src/pages/api/auth/validateToken";
 import {
@@ -103,44 +102,32 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
   // so only execute on server
   // Also, validateToken relies on redis, which is not available in client bundle
   if (isServer()) {
+    const token = USE_MOCK ? "123" : getTokenFromCookie(appContext.ctx);
+    if (token) {
+      // Why not directly call validateToken but create an api?
+      // Because this method will (in next.js's perspective) be called both in client and server,
+      // so next.js will import validateToken into the client bundle
+      // validateToken depends on ioredis, which cannot be brought into frontend.
+      // dynamic import also doesn't work.
 
-    if (USE_MOCK) {
-      const token = "123";
-      extra.userInfo = {
-        ...MOCK_USER_INFO,
-        token,
-      };
-      setTokenCookie(appContext.ctx, token);
-    } else {
-      const token = getTokenFromCookie(appContext.ctx);
+      // Why not use api object directly?
+      // fetch in server (node-fetch per se) only supports absolute url
+      // but next-typed-api-routes's object has only pathname
 
+      const result = await fromApi<ValidateTokenSchema>(
+        "GET",
+        join(
+          `http://localhost:${process.env.PORT ?? 3000}`,
+          process.env.NEXT_PUBLIC_BASE_PATH || "/",
+          "/api/auth/validateToken",
+        ),
+      )({ query: { token } }).catch(() => undefined);
 
-      if (token) {
-        // Why not directly call validateToken but create an api?
-        // Because this method will (in next.js's perspective) be called both in client and server,
-        // so next.js will import validateToken into the client bundle
-        // validateToken depends on ioredis, which cannot be brought into frontend.
-        // dynamic import also doesn't work.
-
-        // Why not use api object directly?
-        // fetch in server (node-fetch per se) only supports absolute url
-        // but next-typed-api-routes's object has only pathname
-
-        const result = await fromApi<ValidateTokenSchema>(
-          "GET",
-          join(
-            `http://localhost:${process.env.PORT ?? 3000}`,
-            process.env.NEXT_PUBLIC_BASE_PATH || "/",
-            "/api/auth/validateToken",
-          ),
-        )({ query: { token } }).catch(() => undefined);
-
-        if (result) {
-          extra.userInfo = {
-            ...result,
-            token: token,
-          };
-        }
+      if (result) {
+        extra.userInfo = {
+          ...result,
+          token: token,
+        };
       }
     }
 

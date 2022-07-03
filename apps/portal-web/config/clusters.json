@@ -1,6 +1,9 @@
 {
   "hpc01": {
     "displayName": "hpc01Name",
+    "loginNodes": [
+      "localhost"
+    ],
     "partitions": {
       "compute": {
         "nodes": 3,

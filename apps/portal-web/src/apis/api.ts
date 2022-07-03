@@ -14,6 +14,16 @@ import type { CreateDesktopSchema } from "src/pages/api/desktop/createDesktop";
 import type { KillDesktopSchema } from "src/pages/api/desktop/killDesktop";
 import type { LaunchDesktopSchema } from "src/pages/api/desktop/launchDesktop";
 import type { ListDesktopsSchema } from "src/pages/api/desktop/listDesktops";
+import type { CopyFileItemSchema } from "src/pages/api/file/copy";
+import type { CreateFileSchema } from "src/pages/api/file/createFile";
+import type { DeleteDirSchema } from "src/pages/api/file/deleteDir";
+import type { DeleteFileSchema } from "src/pages/api/file/deleteFile";
+import type { DownloadFileSchema } from "src/pages/api/file/download";
+import type { GetHomeDirectorySchema } from "src/pages/api/file/getHome";
+import type { ListFileSchema } from "src/pages/api/file/list";
+import type { MkdirSchema } from "src/pages/api/file/mkdir";
+import type { MoveFileItemSchema } from "src/pages/api/file/move";
+import type { UploadFileSchema } from "src/pages/api/file/upload";
 import type { CancelJobSchema } from "src/pages/api/job/cancelJob";
 import type { GetAccountsSchema } from "src/pages/api/job/getAccounts";
 import type { GetRunningJobsSchema } from "src/pages/api/job/getRunningJobs";
@@ -34,6 +44,16 @@ export const api = {
   killDesktop: fromApi<KillDesktopSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/desktop/killDesktop")),
   launchDesktop: fromApi<LaunchDesktopSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/desktop/launchDesktop")),
   listDesktops: fromApi<ListDesktopsSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/desktop/listDesktops")),
+  copyFileItem: fromApi<CopyFileItemSchema>("PATCH", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/file/copy")),
+  createFile: fromApi<CreateFileSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/file/createFile")),
+  deleteDir: fromApi<DeleteDirSchema>("DELETE", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/file/deleteDir")),
+  deleteFile: fromApi<DeleteFileSchema>("DELETE", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/file/deleteFile")),
+  downloadFile: fromApi<DownloadFileSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/file/download")),
+  getHomeDirectory: fromApi<GetHomeDirectorySchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/file/getHome")),
+  listFile: fromApi<ListFileSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/file/list")),
+  mkdir: fromApi<MkdirSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/file/mkdir")),
+  moveFileItem: fromApi<MoveFileItemSchema>("PATCH", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/file/move")),
+  uploadFile: fromApi<UploadFileSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/file/upload")),
   getIcon: fromApi<GetIconSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api//icon")),
   cancelJob: fromApi<CancelJobSchema>("DELETE", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/job/cancelJob")),
   getAccounts: fromApi<GetAccountsSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/job/getAccounts")),

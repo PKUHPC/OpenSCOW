@@ -1,18 +1,17 @@
 import { JsonFetchResultPromiseLike } from "@ddadaal/next-typed-api-routes-runtime/lib/client";
 import { api } from "src/apis/api";
 import type { RunningJob } from "src/generated/common/job";
-import type { UserInfo } from "src/models/User";
 
 export type MockApi<TApi extends Record<
   string,
  (...args : any[]) => JsonFetchResultPromiseLike<any>>
- > = { [key in keyof TApi]:
+ > = { [key in keyof TApi]: null | (
     (...args: Parameters<TApi[key]>) =>
     Promise<
       ReturnType<TApi[key]> extends PromiseLike<infer TSuc>
       ? TSuc
       : never
-    >
+    >)
   };
 
 export const runningJob: RunningJob = {
@@ -33,6 +32,19 @@ export const runningJob: RunningJob = {
 };
 
 export const mockApi: MockApi<typeof api> = {
+
+  listFile: null,
+
+  copyFileItem: null,
+  createFile: null,
+  deleteDir: null,
+  deleteFile: null,
+  getHomeDirectory: null,
+  mkdir: null,
+  moveFileItem: null,
+
+  downloadFile: null,
+  uploadFile: null,
 
   createAppSession: async () => ({ jobId: 123, sessionId: "is" }),
 
@@ -117,13 +129,10 @@ export const mockApi: MockApi<typeof api> = {
 
   changePassword: async () => null,
 
-  validateToken: async () => MOCK_USER_INFO,
+  validateToken: null,
 
   getRunningJobs: async () => ({ results: [runningJob]}),
 
   submitJob: async () => ({ jobId: 10 }),
 };
 
-export const MOCK_USER_INFO = {
-  identityId: "123",
-} as UserInfo;

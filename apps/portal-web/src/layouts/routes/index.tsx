@@ -86,14 +86,14 @@ export const userRoutes: NavItemProps[] = [
       },
     ],
   }] : [],
-  ...publicConfig.FILE_SERVERS.length > 0 ? [{
+  ...publicConfig.FILE_SERVERS_ENABLED_CLUSTERS.length > 0 ? [{
     Icon: FolderOutlined,
     text: "文件管理",
     path: "/files",
-    clickToPath: publicConfig.FILE_SERVERS.length === 1
-      ? `/files/${publicConfig.FILE_SERVERS[0]}/~` : undefined,
-    clickable: publicConfig.FILE_SERVERS.length === 1,
-    children: publicConfig.FILE_SERVERS.map((cluster) => ({
+    clickToPath: publicConfig.FILE_SERVERS_ENABLED_CLUSTERS.length === 1
+      ? `/files/${publicConfig.FILE_SERVERS_ENABLED_CLUSTERS[0]}/~` : undefined,
+    clickable: publicConfig.FILE_SERVERS_ENABLED_CLUSTERS.length === 1,
+    children: publicConfig.FILE_SERVERS_ENABLED_CLUSTERS.map((cluster) => ({
       Icon: FolderOutlined,
       text: publicConfig.CLUSTER_NAMES[cluster] ?? cluster,
       path: `/files/${cluster}`,

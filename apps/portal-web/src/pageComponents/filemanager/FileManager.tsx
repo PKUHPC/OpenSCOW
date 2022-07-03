@@ -8,17 +8,18 @@ import Link from "next/link";
 import Router from "next/router";
 import { join } from "path";
 import React, { useEffect, useRef, useState } from "react";
+import { api } from "src/apis/api";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { ModalButton, ModalLink } from "src/components/ModalLink";
 import { TitleText } from "src/components/PageTitle";
 import { TableTitle } from "src/components/TableTitle";
-import { copyItem, deleteItem, FileInfo, FileType, list, moveItem,
-  urlToDownload } from "src/pageComponents/filemanager/api";
+import { urlToDownload } from "src/pageComponents/filemanager/api";
 import { CreateFileModal } from "src/pageComponents/filemanager/CreateFileModal";
 import { MkdirModal } from "src/pageComponents/filemanager/MkdirModal";
 import { PathBar } from "src/pageComponents/filemanager/PathBar";
 import { RenameModal } from "src/pageComponents/filemanager/RenameModal";
 import { UploadModal } from "src/pageComponents/filemanager/UploadModal";
+import { FileInfo, FileType } from "src/pages/api/file/list";
 import { publicConfig } from "src/utils/config";
 import { compareDateTime, formatDateTime } from "src/utils/datetime";
 import { compareNumber } from "src/utils/math";
@@ -92,9 +93,9 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
 
   const reload = async (signal?: AbortSignal) => {
     setLoading(true);
-    await list({ cluster, path }, signal)
+    await api.listFile({ query: { cluster, path } }, signal)
       .then((d) => {
-        setFiles(d.items.filter((x) => x.type !== "error"));
+        setFiles(d.items);
       })
       .finally(() => {
         setLoading(false);
@@ -148,6 +149,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
     setOperation((o) => {
       if (!o || o.started) { return o; }
       const stillExisting = o.selected.filter((x) => allFilesKey.includes(fileInfoKey(x, path)));
+      console.log(stillExisting);
       if (stillExisting.length === 0) {
         return undefined;
       } else {
@@ -163,10 +165,12 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
     setOperation({ ...operation, started: true });
 
     await Promise.allSettled(operation.selected.map(async (x) => {
-      return await (operation.op === "copy" ? copyItem : moveItem)({
-        cluster,
-        fromPath: join(operation.originalPath, x.name),
-        toPath: join(path, x.name),
+      return await (operation.op === "copy" ? api.copyFileItem : api.moveFileItem)({
+        body: {
+          cluster,
+          fromPath: join(operation.originalPath, x.name),
+          toPath: join(path, x.name),
+        },
       }).then(() => {
         setOperation((o) => o ? { ...operation, completed: o.completed.concat(x) } : undefined);
         return x;
@@ -201,9 +205,11 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
       content: `确认要删除选中的${files.length}项？`,
       onOk: async () => {
         await Promise.allSettled(files.map(async (x) => {
-          return deleteItem({
-            cluster,
-            path: join(path, x.name),
+          return (x.type === "file" ? api.deleteFile : api.deleteDir)({
+            body: {
+              cluster,
+              path: join(path, x.name),
+            },
           }).then(() => x).catch(() => undefined);
         }))
           .then((successfulInfo) => {
@@ -387,12 +393,12 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
 
         <Table.Column<FileInfo> dataIndex="mtime" title="修改日期"
           render={(mtime: string | undefined) => mtime ? formatDateTime(mtime) : ""}
-          sorter={(a, b) => (a.type === "error" || b.type === "error") ? 0 : compareDateTime(a.mtime, b.mtime) }
+          sorter={(a, b) => compareDateTime(a.mtime, b.mtime) }
         />
 
         <Table.Column<FileInfo> dataIndex="size" title="大小"
           render={(size: number | undefined) => size === undefined ? "" : Math.floor(size / 1024) + " KB"}
-          sorter={(a, b) => (a.type === "error" || b.type === "error") ? 0 : compareNumber(a.size, b.size) }
+          sorter={(a, b) => compareNumber(a.size, b.size) }
         />
 
         <Table.Column<FileInfo> dataIndex="mode" title="权限"
@@ -423,9 +429,11 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
                   // icon: < />,
                   content: `确认删除${fullPath}？`,
                   onOk: async () => {
-                    await deleteItem({
-                      cluster,
-                      path: fullPath,
+                    await (i.type === "file" ? api.deleteFile : api.deleteDir)({
+                      body: {
+                        cluster,
+                        path: fullPath,
+                      },
                     })
                       .then(() => {
                         message.success("删除成功！");

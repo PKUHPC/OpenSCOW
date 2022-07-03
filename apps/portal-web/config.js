@@ -7,7 +7,6 @@ const building = process.env.BUILDING;
 const dev = process.env.NODE_ENV === "development"
 const production = !building && process.env.NODE_ENV === "production";
 
-
 // load .env.build if in build
 if (building) {
   require("dotenv").config({ path: "env/.env.build" });
@@ -17,16 +16,12 @@ if (dev) {
   require("dotenv").config({ path: "env/.env.dev" });
 }
 
-
 const specs = {
 
   AUTH_EXTERNAL_URL: str({ desc: "认证服务外网地址", default: "/auth" }),
   AUTH_INTERNAL_URL: str({ desc: "认证服务内网地址", default: "http://auth:5000" }),
 
   ENABLE_CHANGE_PASSWORD: bool({ desc: "是否支持用户更改自己的密码", default: false }),
-
-
-  FILE_SERVERS: str({ desc: "启用文件管理功能的集群。格式：集群名,集群名。如果为空，则关闭文件管理的功能", default: "" }),
 
   ENABLE_JOB_MANAGEMENT: bool({ desc: "是否启动作业管理功能", default: false }),
   JOB_SERVER: str({ desc: "作业服务器的地址", default: "job-server:5000" }),
@@ -117,14 +112,14 @@ const publicRuntimeConfig = {
 
   ENABLE_CHANGE_PASSWORD: config.ENABLE_CHANGE_PASSWORD,
 
+  FILE_SERVERS_ENABLED_CLUSTERS: Object.keys(clusters).filter((x) => clusters[x].loginNodes.length > 0),
+
   CLUSTER_NAMES: Object.keys(clusters).reduce((prev, curr) => {
     prev[curr] = clusters[curr].displayName;
     return prev;
   }, {}),
 
   ENABLE_SHELL: config.ENABLE_SHELL,
-
-  FILE_SERVERS: parseArray(config.FILE_SERVERS),
 
   ENABLE_JOB_MANAGEMENT: config.ENABLE_JOB_MANAGEMENT,
 

@@ -27,12 +27,11 @@ export interface PublicRuntimeConfig {
   /** Cluster id and name */
   CLUSTER_NAMES: { [clusterId: string]: string };
 
+  FILE_SERVERS_ENABLED_CLUSTERS: string[];
+
   ENABLE_CHANGE_PASSWORD: boolean;
 
   ENABLE_SHELL: boolean;
-
-  /** cluster id */
-  FILE_SERVERS: string[];
 
   ENABLE_LOGIN_DESKTOP: boolean;
   LOGIN_DESKTOP_WMS: { [name: string]: string };

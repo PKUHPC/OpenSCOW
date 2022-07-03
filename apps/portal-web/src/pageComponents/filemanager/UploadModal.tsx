@@ -26,7 +26,7 @@ export const UploadModal: React.FC<Props> = ({ visible, onClose, path, reload, c
       ]}
     >
       <p>
-        文件将会上传到：{path}
+        文件将会上传到：<strong>{path}</strong>。同名文件将会被覆盖。
       </p>
       <Upload.Dragger
         name="file"
