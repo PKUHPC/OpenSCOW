@@ -10,7 +10,8 @@
     "build:nogen": "cross-env BUILDING=1 next build",
     "prepareDev": "pnpm protos && ntar schema",
     "protos": "tsgrpc-cli protos",
-    "cloneNoVnc": "git -C ./public/vnc pull || git clone -c advice.detachedHead=false --depth=1 --branch v1.3.0 https://hub.fastgit.xyz/novnc/noVNC ./public/vnc"
+    "cloneNoVnc": "git -C ./public/vnc pull || git clone -c advice.detachedHead=false --depth=1 --branch v1.3.0 https://hub.fastgit.xyz/novnc/noVNC ./public/vnc",
+    "test": "jest"
   },
   "dependencies": {
     "@ant-design/icons": "4.7.0",
@@ -73,7 +74,11 @@
     "@types/random-words": "1.1.2",
     "postcss": "8.4.14",
     "webpack": "5.73.0",
-    "@types/busboy": "1.5.0"
+    "@types/busboy": "1.5.0",
+    "jest-environment-jsdom": "28.1.2",
+    "@testing-library/react": "13.3.0",
+    "@testing-library/jest-dom": "5.16.4",
+    "node-mocks-http": "1.11.0"
   },
   "browserslist": {
     "production": [

@@ -6,6 +6,7 @@ const { homedir } = require("os");
 const building = process.env.BUILDING;
 const dev = process.env.NODE_ENV === "development"
 const production = !building && process.env.NODE_ENV === "production";
+const test = process.env.NODE_ENV === "test";
 
 // load .env.build if in build
 if (building) {
@@ -51,6 +52,10 @@ const specs = {
   SUBMIT_JOB_DEFAULT_PWD: str({ desc: "提交作业的默认工作目录。使用{name}代替作业名称。相对于用户的家目录", default: "scow/jobs/{name}" }),
 
   PROXY_BASE_PATH: str({ desc: "代理地址的根路径", default: "/proxy" }),
+
+  FILE_SERVERS: str({ desc: "覆盖集群的文件管理服务器地址。如果一个集群不设置，将会使用集群配置文件中的loginNode", example: "集群ID=IP,集群ID=IP", default: "" }),
+
+  MOCK_USER_ID: str({ desc: "覆盖已登录用户的用户ID", default: undefined }),
 };
 
 const config = envConfig(specs, process.env);
@@ -102,7 +107,9 @@ const serverRuntimeConfig = {
   JOB_SERVER: config.JOB_SERVER,
   SSH_PRIVATE_KEY_PATH: config.SSH_PRIVATE_KEY_PATH,
   CLUSTERS_CONFIG: clusters,
+  FILE_SERVERS: parseKeyValue(config.FILE_SERVERS),
   APPS: apps,
+  MOCK_USER_ID: config.MOCK_USER_ID,
 };
 
 /**

@@ -35,7 +35,7 @@ export default route<CopyFileItemSchema>("CopyFileItemSchema", async (req, res) 
   return await sshConnect(host, info.identityId, async (ssh) => {
     // the SFTPWrapper doesn't supprt copy
     // Use command to do it
-    await ssh.exec("cp", [fromPath, toPath]);
+    await ssh.exec("cp", ["-r", fromPath, toPath]);
 
     return { 204: null };
   });

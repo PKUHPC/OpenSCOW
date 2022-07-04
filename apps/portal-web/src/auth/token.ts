@@ -13,11 +13,13 @@ interface AuthValidateTokenSchema {
   }
 }
 
-export async function validateToken(token: string): Promise<UserInfo | undefined> {
+export async function validateToken(token: string | undefined): Promise<UserInfo | undefined> {
 
-  if (USE_MOCK) {
-    return { identityId: os.userInfo().username };
+  if (process.env.NODE_ENV === "test" || USE_MOCK) {
+    return { identityId: runtimeConfig.MOCK_USER_ID || os.userInfo().username };
   }
+
+  if (!token) { return undefined;}
 
   const resp = await jsonFetch<AuthValidateTokenSchema>({
     method: "GET",

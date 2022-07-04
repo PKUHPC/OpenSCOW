@@ -39,29 +39,39 @@ export default route<UploadFileSchema>("UploadFileSchema", async (req, res) => {
 
   const sftp = await ssh.requestSFTP();
 
+
   const ws = sftp.createWriteStream(path);
 
-  const disconnect = () => {
-    ws.destroy();
-    sftp.end();
-    ssh.dispose();
-  };
+  await new Promise<void>((resolve) => {
+    const disconnect = () => {
+      ws.destroy();
+      sftp.end();
+      ssh.dispose();
+      resolve();
+    };
 
-  bb.on("file", (name, file) => {
-    file.pipe(ws);
+    ws.on("error", (error) => {
+      disconnect();
+      res.status(500).send(new Error("Error opening writeStream", { cause: error }) as any);
+    });
+
+    bb.on("file", (name, file) => {
+      file.pipe(ws);
+    });
+
+    bb.on("close", () => {
+      disconnect();
+      res.status(204).send(null);
+    });
+
+    bb.on("error", (error: Error) => {
+      disconnect();
+      res.status(500).send(new Error("Error reading request", { cause: error }) as any);
+    });
+
+    req.pipe(bb);
   });
 
-  bb.on("close", () => {
-    disconnect();
-    res.status(204).send(null);
-  });
-
-  bb.on("error", (error: Error) => {
-    disconnect();
-    res.status(500).send(new Error("Error reading file", { cause: error }) as any);
-  });
-
-  req.pipe(bb);
 });
 
 export const config = {

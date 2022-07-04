@@ -77,23 +77,23 @@ export default route<DownloadFileSchema>("DownloadFileSchema", async (req, res) 
 
   const stream = sftp.createReadStream(path);
 
-  const end = () => {
-    stream.destroy();
-    ssh.dispose();
-    res.end();
-  };
+  await new Promise<void>((resolve) => {
+    const end = () => {
+      stream.destroy();
+      ssh.dispose();
+      res.end();
+      resolve();
+    };
 
-  stream.on("error", (error) => {
-    res.status(500).send(new Error("Error reading file", { cause: error }));
-    end();
-  });
+    stream.on("error", (error) => {
+      res.status(500).send(new Error("Error reading file", { cause: error }));
+      end();
+    });
+    stream.on("end", end);
 
-  await new Promise(function(resolve) {
     stream.pipe(res);
-    stream.on("end", resolve);
-  });
 
-  end();
+  });
 });
 
 export const config = {

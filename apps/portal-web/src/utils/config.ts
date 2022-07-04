@@ -19,7 +19,11 @@ export interface ServerRuntimeConfig {
 
   CLUSTERS_CONFIG: Clusters;
 
+  FILE_SERVERS: {[cluster: string]: string };
+
   APPS: App[];
+
+  MOCK_USER_ID: string | undefined;
 }
 
 

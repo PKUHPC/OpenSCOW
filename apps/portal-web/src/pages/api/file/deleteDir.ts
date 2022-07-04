@@ -1,7 +1,6 @@
 import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import { authenticate } from "src/auth/server";
-import { sftpRmdir } from "src/utils/sftp";
-import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
+import { getClusterLoginNode, sshConnect, sshRmrf } from "src/utils/ssh";
 
 export interface DeleteDirSchema {
   method: "DELETE";
@@ -33,9 +32,7 @@ export default route<DeleteDirSchema>("DeleteDirSchema", async (req, res) => {
   }
 
   return await sshConnect(host, info.identityId, async (ssh) => {
-    const sftp = await ssh.requestSFTP();
-
-    await sftpRmdir(sftp)(path);
+    await sshRmrf(ssh, path);
 
     return { 204: null };
   });
