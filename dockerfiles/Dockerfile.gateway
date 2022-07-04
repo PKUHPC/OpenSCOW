@@ -4,7 +4,6 @@ FROM nginx:alpine@sha256:8e38930f0390cbd79b2d1528405fb17edcda5f4a30875ecf338ebaa
 RUN sed -i "1 i\load_module /etc/nginx/modules/ngx_http_js_module.so;\n" /etc/nginx/nginx.conf
 
 COPY apps/gateway/includes /etc/nginx/includes
-COPY apps/gateway/js /etc/nginx/js
 COPY apps/gateway/nginx.conf /etc/nginx/templates/default.conf.template
 
 
