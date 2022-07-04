@@ -44,24 +44,27 @@ export default route<UploadFileSchema>("UploadFileSchema", async (req, res) => {
 
   await new Promise<void>((resolve) => {
     const disconnect = () => {
-      ws.destroy();
       sftp.end();
       ssh.dispose();
       resolve();
     };
 
+    ws.on("close", () => {
+      disconnect();
+      res.status(204).send(null);
+    });
+
     ws.on("error", (error) => {
       disconnect();
-      res.status(500).send(new Error("Error opening writeStream", { cause: error }) as any);
+      res.status(500).send(new Error("Error at write stream", { cause: error }) as any);
     });
 
     bb.on("file", (name, file) => {
-      file.pipe(ws);
-    });
+      file.on("end", () => {
+        ws.end();
+      });
 
-    bb.on("close", () => {
-      disconnect();
-      res.status(204).send(null);
+      file.pipe(ws);
     });
 
     bb.on("error", (error: Error) => {

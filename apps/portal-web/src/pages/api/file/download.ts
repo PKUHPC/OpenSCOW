@@ -79,7 +79,6 @@ export default route<DownloadFileSchema>("DownloadFileSchema", async (req, res) 
 
   await new Promise<void>((resolve) => {
     const end = () => {
-      stream.destroy();
       ssh.dispose();
       res.end();
       resolve();
