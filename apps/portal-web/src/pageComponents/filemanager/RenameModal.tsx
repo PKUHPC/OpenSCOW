@@ -19,6 +19,20 @@ export const RenameModal: React.FC<Props> = ({ visible, onClose, path, reload, c
   const [form] = Form.useForm<FormProps>();
   const [loading, setLoading] = useState(false);
 
+  const onSubmit = async () => {
+    const { newFileName } = await form.validateFields();
+    setLoading(true);
+    await api.moveFileItem({ body: { cluster, fromPath: path, toPath: join(dirname(path), newFileName)  } })
+      .then(() => {
+        message.success("修改成功");
+        reload();
+        onClose();
+        form.resetFields();
+      })
+      .finally(() => setLoading(false));
+
+  };
+
   return (
     <Modal
       visible={visible}
@@ -28,21 +42,9 @@ export const RenameModal: React.FC<Props> = ({ visible, onClose, path, reload, c
       onCancel={onClose}
       confirmLoading={loading}
       destroyOnClose
-      onOk={async () => {
-        const { newFileName } = await form.validateFields();
-        setLoading(true);
-        await api.moveFileItem({ body: { cluster, fromPath: path, toPath: join(dirname(path), newFileName)  } })
-          .then(() => {
-            message.success("修改成功");
-            reload();
-            onClose();
-            form.resetFields();
-          })
-          .finally(() => setLoading(false));
-
-      }}
+      onOk={form.submit}
     >
-      <Form form={form}>
+      <Form form={form} onFinish={onSubmit}>
         <Form.Item label="要重命名的文件">
           <strong>{path}</strong>
         </Form.Item>

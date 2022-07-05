@@ -55,11 +55,11 @@ export const NewDesktopTableModal: React.FC<Props> = ({ visible, onClose, reload
     <Modal
       title="新建桌面"
       visible={visible}
-      onOk={onOk}
+      onOk={form.submit}
       confirmLoading={submitting}
       onCancel={onClose}
     >
-      <Form form={form} initialValues={{ cluster: CLUSTERS[0], wm: defaultWm }}>
+      <Form form={form} initialValues={{ cluster: CLUSTERS[0], wm: defaultWm }} onFinish={onOk}>
         <Form.Item
           label="集群"
           name="cluster"

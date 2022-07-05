@@ -19,6 +19,20 @@ export const CreateFileModal: React.FC<Props> = ({ visible, onClose, path, reloa
   const [form] = Form.useForm<FormProps>();
   const [loading, setLoading] = useState(false);
 
+  const onSubmit = async () => {
+    const { newFileName } = await form.validateFields();
+    setLoading(true);
+    await api.createFile({ body: { cluster, path: join(path, newFileName)  } })
+      .httpError(409, () => { message.error("同名文件或者目录已经存在！");})
+      .then(() => {
+        message.success("创建成功");
+        reload();
+        onClose();
+        form.resetFields();
+      })
+      .finally(() => setLoading(false));
+  };
+
   return (
     <Modal
       visible={visible}
@@ -28,21 +42,9 @@ export const CreateFileModal: React.FC<Props> = ({ visible, onClose, path, reloa
       onCancel={onClose}
       confirmLoading={loading}
       destroyOnClose
-      onOk={async () => {
-        const { newFileName } = await form.validateFields();
-        setLoading(true);
-        await api.createFile({ body: { cluster, path: join(path, newFileName)  } })
-          .httpError(409, () => { message.error("同名文件或者目录已经存在！");})
-          .then(() => {
-            message.success("创建成功");
-            reload();
-            onClose();
-            form.resetFields();
-          })
-          .finally(() => setLoading(false));
-      }}
+      onOk={form.submit}
     >
-      <Form form={form}>
+      <Form form={form} onFinish={onSubmit}>
         <Form.Item label="要创建的文件的目录">
           <strong>{path}</strong>
         </Form.Item>
