@@ -142,22 +142,11 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
       });
   }, [path]);
 
-  const allFilesKey = files.map((x) => fileInfoKey(x, path));
+  const resetSelectedAndOperation = () => {
+    setSelectedKeys([]);
+    setOperation(undefined);
+  };
 
-  useEffect(() => {
-    // update operation selected keys
-    setOperation((o) => {
-      if (!o || o.started) { return o; }
-      const stillExisting = o.selected.filter((x) => allFilesKey.includes(fileInfoKey(x, path)));
-      console.log(stillExisting);
-      if (stillExisting.length === 0) {
-        return undefined;
-      } else {
-        return { ...o, selected: stillExisting };
-      }
-    });
-    setSelectedKeys((keys) => keys.filter((x) => allFilesKey.includes(x)));
-  }, [allFilesKey.join(",")]);
 
   const paste = async () => {
     if (!operation) { return; }
@@ -183,7 +172,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
         const allCount = operation.selected.length;
         if (successfulCount === allCount) {
           message.success(`${operationTexts[operation.op]}${allCount}项成功！`);
-          setOperation(undefined);
+          resetSelectedAndOperation();
         } else {
           message.error(`${operationTexts[operation.op]}成功${successfulCount}项，失败${allCount - successfulCount}项`);
           setOperation((o) => o && ({ ...o, started: false }));
@@ -217,7 +206,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
             const allCount = files.length;
             if (failedCount === 0) {
               message.success(`删除${allCount}项成功！`);
-              setOperation(undefined);
+              resetSelectedAndOperation();
             } else {
               message.error(`删除成功${allCount - failedCount}项，失败${failedCount}项`);
               setOperation((o) => o && ({ ...o, started: false }));
@@ -226,6 +215,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
             console.log(e);
             message.error("执行删除操作时遇到错误");
             setOperation((o) => o && ({ ...o, started: false }));
+            setSelectedKeys([]);
           }).finally(() => {
             setOperation(undefined);
             reload();
@@ -437,6 +427,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
                     })
                       .then(() => {
                         message.success("删除成功！");
+                        resetSelectedAndOperation();
                         reload();
                       });
                   },
