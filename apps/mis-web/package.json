@@ -47,7 +47,7 @@
     "@codemirror/commands": "6.0.0",
     "@codemirror/lang-json": "6.0.0",
     "@codemirror/autocomplete": "6.0.2",
-    "codemirror": "6.0.0"
+    "codemirror": "6.0.1"
   },
   "devDependencies": {
     "@ddadaal/next-typed-api-routes-cli": "0.5.1",
