@@ -18,16 +18,16 @@
   "dependencies": {
     "@ddadaal/tsgrpc-server": "0.14.0",
     "@ddadaal/tsgrpc-utils": "0.14.0",
-    "@scow/config": "workspace:*",
     "@grpc/grpc-js": "1.6.7",
+    "@scow/config": "workspace:*",
     "node-ssh": "12.0.4",
     "shell-quote": "1.7.3"
   },
   "devDependencies": {
-    "@types/node-cron": "3.0.1",
     "@ddadaal/tsgrpc-cli": "0.13.0",
     "@types/google-protobuf": "3.15.6",
-    "@types/ssh2": "0.5.52"
+    "@types/node-cron": "3.0.2",
+    "@types/ssh2": "1.11.2"
   },
   "mikro-orm": {
     "useTsNode": true,
