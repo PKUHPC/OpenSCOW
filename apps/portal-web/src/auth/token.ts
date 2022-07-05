@@ -1,6 +1,6 @@
 import { jsonFetch } from "@ddadaal/next-typed-api-routes-runtime/lib/client";
+import os from "os";
 import path from "path";
-import { MOCK_USER_INFO } from "src/apis/api.mock";
 import { USE_MOCK } from "src/apis/useMock";
 import { UserInfo } from "src/models/User";
 import { runtimeConfig } from "src/utils/config";
@@ -13,11 +13,13 @@ interface AuthValidateTokenSchema {
   }
 }
 
-export async function validateToken(token: string): Promise<UserInfo | undefined> {
+export async function validateToken(token: string | undefined): Promise<UserInfo | undefined> {
 
-  if (USE_MOCK) {
-    return MOCK_USER_INFO;
+  if (process.env.NODE_ENV === "test" || USE_MOCK) {
+    return { identityId: runtimeConfig.MOCK_USER_ID || os.userInfo().username };
   }
+
+  if (!token) { return undefined;}
 
   const resp = await jsonFetch<AuthValidateTokenSchema>({
     method: "GET",

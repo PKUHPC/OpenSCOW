@@ -28,6 +28,9 @@ jobs:
           node-version: 16.x
           cache: pnpm
 
+      - name: Generate SSH key pairs for test
+        run: ssh-keygen -t rsa -q -f "$HOME/.ssh/id_rsa" -N ""
+
       - name: Start dev env for db testing
         run: pnpm devenv
 
@@ -39,9 +42,6 @@ jobs:
 
       - name: Prepare dev libs and code
         run: pnpm prepareDev
-
-      - name: Generate SSH key pairs for test
-        run: ssh-keygen -t rsa -q -f "$HOME/.ssh/id_rsa" -N ""
 
       - name: Wait for ports
         uses: ifaxity/wait-on-action@master
@@ -56,33 +56,7 @@ jobs:
       - name: Upload test converage
         uses: codecov/codecov-action@v3
         with:
-          files: ./libs/auth/coverage/lcov.info,./libs/config/coverage/lcov.info,./libs/decimal/coverage/lcov.info,./apps/file-server/coverage/lcov.info,./apps/auth/coverage/lcov.info,./apps/job-server-slurm/coverage/lcov.info,./apps/mis-server/coverage/lcov.info
-
-  build-file-server:
-    needs: test
-    runs-on: ubuntu-latest
-
-    if: github.ref == 'refs/heads/master'
-
-    steps:
-      - uses: actions/checkout@v3
-      - uses: pnpm/action-setup@v2.2.2
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 16.x
-          cache: pnpm
-
-      - name: Install dependencies
-        run: pnpm i --frozen-lockfile
-
-      - name: Build file-server
-        run: pnpm run --filter file-server... build
-
-      - name: Archive file-server
-        uses: actions/upload-artifact@v3
-        with:
-          name: file-server
-          path: apps/file-server/build/file-server
+          files: ./libs/auth/coverage/lcov.info,./libs/config/coverage/lcov.info,./libs/decimal/coverage/lcov.info,./apps/portal-web/coverage/lcov.info,./apps/auth/coverage/lcov.info,./apps/job-server-slurm/coverage/lcov.info,./apps/mis-server/coverage/lcov.info
 
   build-containers:
     needs: test

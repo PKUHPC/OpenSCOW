@@ -1,7 +1,7 @@
 import { Form, Input, message, Modal } from "antd";
 import { dirname, join } from "path";
 import { useState } from "react";
-import { moveItem } from "src/pageComponents/filemanager/api";
+import { api } from "src/apis";
 
 interface Props {
   visible: boolean;
@@ -31,7 +31,7 @@ export const RenameModal: React.FC<Props> = ({ visible, onClose, path, reload, c
       onOk={async () => {
         const { newFileName } = await form.validateFields();
         setLoading(true);
-        await moveItem({ cluster, fromPath: path, toPath: join(dirname(path), newFileName)  })
+        await api.moveFileItem({ body: { cluster, fromPath: path, toPath: join(dirname(path), newFileName)  } })
           .then(() => {
             message.success("修改成功");
             reload();

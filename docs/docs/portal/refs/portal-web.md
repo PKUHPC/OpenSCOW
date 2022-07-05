@@ -15,7 +15,6 @@ title: "portal-web"
 |`AUTH_EXTERNAL_URL`|字符串|认证服务外网地址|/auth|
 |`AUTH_INTERNAL_URL`|字符串|认证服务内网地址|http://auth:5000|
 |`ENABLE_CHANGE_PASSWORD`|布尔值|是否支持用户更改自己的密码|false|
-|`FILE_SERVERS`|字符串|启用文件管理功能的集群。格式：集群名,集群名。如果为空，则关闭文件管理的功能||
 |`ENABLE_JOB_MANAGEMENT`|布尔值|是否启动作业管理功能|false|
 |`JOB_SERVER`|字符串|作业服务器的地址|job-server:5000|
 |`ENABLE_LOGIN_DESKTOP`|布尔值|是否启动登录节点上的桌面功能|false|

@@ -1,7 +1,7 @@
 import { Form, Input, message, Modal } from "antd";
 import { join } from "path";
 import { useState } from "react";
-import { createFile } from "src/pageComponents/filemanager/api";
+import { api } from "src/apis";
 
 interface Props {
   visible: boolean;
@@ -31,7 +31,8 @@ export const CreateFileModal: React.FC<Props> = ({ visible, onClose, path, reloa
       onOk={async () => {
         const { newFileName } = await form.validateFields();
         setLoading(true);
-        await createFile({ cluster, path: join(path, newFileName)  })
+        await api.createFile({ body: { cluster, path: join(path, newFileName)  } })
+          .httpError(409, () => { message.error("同名文件或者目录已经存在！");})
           .then(() => {
             message.success("创建成功");
             reload();

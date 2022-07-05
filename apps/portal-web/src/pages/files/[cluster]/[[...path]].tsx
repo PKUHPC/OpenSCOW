@@ -1,18 +1,13 @@
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useEffect, useRef } from "react";
+import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
-import { NotFoundPage } from "src/components/errorPages/NotFoundPage";
-import { getHome } from "src/pageComponents/filemanager/api";
 import { FileManager } from "src/pageComponents/filemanager/FileManager";
 import { publicConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
 
 export const FileManagerPage: NextPage = requireAuth(() => true)(() => {
-
-  if (publicConfig.FILE_SERVERS.length === 0) {
-    return <NotFoundPage />;
-  }
 
   const router = useRouter();
   const pathParts = router.query.path as (string[] | undefined);
@@ -26,7 +21,7 @@ export const FileManagerPage: NextPage = requireAuth(() => true)(() => {
 
   const getHomePath = async () => {
     return homePathMemo.current
-    ?? (homePathMemo.current = await getHome({ cluster }).then((x) => x.path));
+    ?? (homePathMemo.current = await api.getHomeDirectory({ query: { cluster } }).then((x) => x.path));
   };
 
 

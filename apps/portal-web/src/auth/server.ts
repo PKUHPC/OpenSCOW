@@ -12,10 +12,6 @@ export type AuthResultError = 401 | 403;
 export async function checkCookie(check: Check, req: RequestType): Promise<AuthResultError | UserInfo> {
   const token = getTokenFromCookie({ req });
 
-  if (!token) {
-    return 401;
-  }
-
   const result = await validateToken(token);
 
   if (!result) {

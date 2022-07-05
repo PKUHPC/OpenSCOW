@@ -2,7 +2,7 @@ import { destroyCookie, parseCookies, setCookie } from "nookies";
 
 // Cookie is of format
 
-const TOKEN_KEY = "SCOW_USER";
+export const TOKEN_KEY = "SCOW_USER";
 const COOKIE_PATH = "/";
 
 export type ParseCookieContext = Parameters<typeof parseCookies>[0];

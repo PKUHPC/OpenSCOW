@@ -1,7 +1,7 @@
 import { Form, Input, message, Modal } from "antd";
 import { join } from "path";
 import { useState } from "react";
-import { mkdir } from "src/pageComponents/filemanager/api";
+import { api } from "src/apis";
 
 interface Props {
   visible: boolean;
@@ -31,7 +31,8 @@ export const MkdirModal: React.FC<Props> = ({ visible, onClose, path, reload, cl
       onOk={async () => {
         const { newFileName } = await form.validateFields();
         setLoading(true);
-        await mkdir({ cluster, path: join(path, newFileName)  })
+        await api.mkdir({ body: { cluster, path: join(path, newFileName) } })
+          .httpError(409, () => { message.error("同名文件或目录已经存在！");})
           .then(() => {
             message.success("创建成功");
             reload();

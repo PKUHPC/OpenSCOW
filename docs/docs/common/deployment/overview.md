@@ -7,19 +7,17 @@ title: 简介
 
 在部署之前，您需要有一套或者多套已经部署好的超算集群。目前，我们仅支持使用slurm调度器的超算集群。
 
-为了简化部署，系统大部分组件以docker镜像的形式分发，少数组件分发可直接运行的单个可执行文件。
+为了简化部署，系统组件以docker镜像的形式分发。
 
 系统主要采用**环境变量**的形式进行配置，对于一些复杂的或者多个组件共用的配置（如集群信息）使用**配置文件**配置。配置文件均应映射到容器的`/etc/scow`目录下。配置文件支持yaml和json格式。系统在运行前将会对配置进行检查，如果配置不合法将会中止运行。
 
 ## 从源码构建
 
-目前系统处于alpha阶段，暂不提供构建好的镜像和二进制下载。本部分介绍如何从源码构建项目的镜像和可执行文件。
+目前系统处于alpha阶段，暂不提供构建好的镜像下载。本部分介绍如何从源码构建项目的镜像。
 
 1. 确保系统中安装了以下软件
     - [docker](https://docs.docker.com/engine/install/)
     - [docker compose](https://docs.docker.com/compose/install/)
-    - [volta](https://volta.sh/)：管理node环境
-    - [pnpm](https://pnpm.io/pnpm-cli)
 
 2. 从仓库clone项目
 
@@ -30,7 +28,7 @@ git clone %REPO_URL% --depth=1
 3. 构建镜像
 
 ```bash
-docker compose build
+docker compose -f dev/docker-compose.build.yml build 
 ```
 
 如果您需要修改构建的镜像的tag，那么您可以修改`.env`目录中的`IMAGE_BASE`和`TAG`变量，构建好的镜像的tag为`$IMAGE_BASE/组件名:$TAG`。在后面的部署中，将docker-compose.yml中image修改为对应的值。
@@ -39,20 +37,11 @@ docker compose build
 
 仓库中的`.env`文件中设置的`IMAGE_BASE`和`TAG`变量的值与文档中所使用的镜像tag相同，所以如果您没有修改`.env`中的值，那么您在按文档部署时不需要修改`image`的值。
 
-4. 如果要部署需要二进制文件的服务（如文件管理），那么您需要在本地构建项目。安装依赖并构建项目：
+如果您需要推送镜像，运行 
 
 ```bash
-# 如果是通过官网的安装脚本安装的pnpm，那么运行以下命令安装node-gyp；否则不需要单独运行以下命令
-pnpm i -g node-gyp
-pnpm i
-pnpm run build
+docker compose -f dev/docker-compose.build.yml push
 ```
-
-二进制文件所在的位置如下表。部署对应的项目时将会有相应的如何使用已有二进制文件的提示。
-
-| 项目          | 目录                                 |
-| ------------- | ------------------------------------ |
-| `file-server` | `apps/file-server/build/file-server` |
 
 
 ## 部署顺序

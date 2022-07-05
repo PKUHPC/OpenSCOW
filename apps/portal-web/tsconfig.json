@@ -19,7 +19,12 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "baseUrl": ".",
-    "incremental": true
+    "incremental": true,
+    "paths": {
+      "src/*": [
+        "src/*"
+      ]
+    }
   },
   "exclude": [
     "node_modules"
@@ -28,7 +33,6 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    "scripts/generateSchemas.ts",
-    "scripts/generateClients.ts"
+    "jest.config.js"
   ]
 }
