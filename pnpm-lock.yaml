@@ -128,7 +128,7 @@ importers:
       '@grpc/grpc-js': 1.6.7
       '@scow/config': workspace:*
       '@types/google-protobuf': 3.15.6
-      '@types/node-cron': 3.0.1
+      '@types/node-cron': 3.0.2
       '@types/ssh2': 0.5.52
       node-ssh: 12.0.4
       shell-quote: 1.7.3
@@ -142,7 +142,7 @@ importers:
     devDependencies:
       '@ddadaal/tsgrpc-cli': 0.13.0
       '@types/google-protobuf': 3.15.6
-      '@types/node-cron': 3.0.1
+      '@types/node-cron': 3.0.2
       '@types/ssh2': 0.5.52
 
   apps/mis-server:
@@ -161,7 +161,7 @@ importers:
       '@scow/lib-decimal': workspace:*
       '@sinclair/typebox': 0.23.5
       '@types/google-protobuf': 3.15.6
-      '@types/node-cron': 3.0.1
+      '@types/node-cron': 3.0.2
       '@types/wait-on': 5.3.1
       dotenv: 16.0.1
       node-cron: 3.0.1
@@ -191,7 +191,7 @@ importers:
     devDependencies:
       '@ddadaal/tsgrpc-cli': 0.13.0
       '@types/google-protobuf': 3.15.6
-      '@types/node-cron': 3.0.1
+      '@types/node-cron': 3.0.2
       '@types/wait-on': 5.3.1
 
   apps/mis-web:
@@ -4588,8 +4588,8 @@ packages:
     resolution: {integrity: sha512-jhuKLIRrhvCPLqwPcx6INqmKeiA5EWrsCOPhrlFSrbrmU4ZMPjj5Ul/oLCMDO98XRUIwVm78xICz4EPCektzeQ==}
     dev: true
 
-  /@types/node-cron/3.0.1:
-    resolution: {integrity: sha512-BkMHHonDT8NJUE/pQ3kr5v2GLDKm5or9btLBoBx4F2MB2cuqYC748LYMDC55VlrLI5qZZv+Qgc3m4P3dBPcmeg==}
+  /@types/node-cron/3.0.2:
+    resolution: {integrity: sha512-SK/4GYWiWvGLPl/yv+Tm5oLYbzMx1V3y7CsNTvOb3vF8O9oXH11U6/zckISHnBl4YH8MvXHFIUXbYoBONSdmzw==}
     dev: true
 
   /@types/node-ssh/7.0.1:
