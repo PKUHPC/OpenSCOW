@@ -52,7 +52,6 @@ jobs:
 
       - name: Run tests
         run: pnpm test:ci
-        with:
 
       - name: Upload test converage
         uses: codecov/codecov-action@v3
