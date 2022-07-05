@@ -8,29 +8,27 @@ export const AppConnectPropsSchema = Type.Object({
     Type.Record(Type.String(), Type.String(), { description: "设置为POST时，需要以form data形式提交的数据" })),
 }, { description: "如何连接应用" });
 
+const BasicInfoSchema = Type.Object({
+  id: Type.String({ description: "App ID" }),
+  name: Type.String({ description: "App名" }),
+  nodes: Type.Optional(
+    Type.Array(
+      Type.String({ description: "节点地址" }),
+      { description: "支持启动这个App的节点名。如果不设置，则所有节点都可以运行" },
+    )),
+});
 
-export const AppConfigSchema = Type.Intersect([
-  Type.Object({
-    id: Type.String({ description: "App ID" }),
-    name: Type.String({ description: "App名" }),
-    nodes: Type.Optional(
-      Type.Array(
-        Type.String({ description: "节点地址" }),
-        { description: "支持启动这个App的节点名。如果不设置，则所有节点都可以运行" },
-      )),
-  }),
-  Type.Union([
-    Type.Object({
-      type: Type.Literal("web", { description: "表示为一个Web类应用" }),
-      beforeScript: Type.String({ description: "启动应用之前的准备命令。具体参考文档" }),
-      script: Type.String({ description: "启动应用的命令。可以使用beforeScript中定义的变量" }),
-      connect: AppConnectPropsSchema,
-    }),
-    Type.Object({
-      type: Type.Literal("vnc", { description: "表示为一个VNC类应用" }),
-      xstartup: Type.String({ description: "启动此app的xstartup脚本" }),
-    }),
-  ]),
+export const AppConfigSchema = Type.Union([
+  Type.Intersect([BasicInfoSchema, Type.Object({
+    type: Type.Literal("web", { description: "表示为一个Web类应用" }),
+    beforeScript: Type.String({ description: "启动应用之前的准备命令。具体参考文档" }),
+    script: Type.String({ description: "启动应用的命令。可以使用beforeScript中定义的变量" }),
+    connect: AppConnectPropsSchema,
+  })]),
+  Type.Intersect([BasicInfoSchema, Type.Object({
+    type: Type.Literal("vnc", { description: "表示为一个VNC类应用" }),
+    xstartup: Type.String({ description: "启动此app的xstartup脚本" }),
+  })]),
 ]);
 
 export type App = Static<typeof AppConfigSchema>;

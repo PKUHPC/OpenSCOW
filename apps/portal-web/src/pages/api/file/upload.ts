@@ -44,7 +44,6 @@ export default route<UploadFileSchema>("UploadFileSchema", async (req, res) => {
 
   await new Promise<void>((resolve) => {
     const disconnect = () => {
-      sftp.end();
       ssh.dispose();
       resolve();
     };
