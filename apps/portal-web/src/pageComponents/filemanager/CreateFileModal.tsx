@@ -37,6 +37,7 @@ export const CreateFileModal: React.FC<Props> = ({ visible, onClose, path, reloa
             message.success("创建成功");
             reload();
             onClose();
+            form.resetFields();
           })
           .finally(() => setLoading(false));
       }}

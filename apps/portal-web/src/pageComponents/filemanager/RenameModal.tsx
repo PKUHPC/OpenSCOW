@@ -36,6 +36,7 @@ export const RenameModal: React.FC<Props> = ({ visible, onClose, path, reload, c
             message.success("修改成功");
             reload();
             onClose();
+            form.resetFields();
           })
           .finally(() => setLoading(false));
 

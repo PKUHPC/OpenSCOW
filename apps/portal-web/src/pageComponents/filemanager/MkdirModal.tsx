@@ -37,6 +37,7 @@ export const MkdirModal: React.FC<Props> = ({ visible, onClose, path, reload, cl
             message.success("创建成功");
             reload();
             onClose();
+            form.resetFields();
           })
           .finally(() => setLoading(false));
       }}
