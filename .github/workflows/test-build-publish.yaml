@@ -28,6 +28,9 @@ jobs:
           node-version: 16.x
           cache: pnpm
 
+      - name: Generate SSH key pairs for test
+        run: ssh-keygen -t rsa -q -f "$HOME/.ssh/id_rsa" -N ""
+
       - name: Start dev env for db testing
         run: pnpm devenv
 
@@ -36,9 +39,6 @@ jobs:
 
       - name: Install dependencies
         run: pnpm i --frozen-lockfile
-
-      - name: Generate SSH key pairs for test
-        run: ssh-keygen -t rsa -q -f "$HOME/.ssh/id_rsa" -N ""
 
       - name: Prepare dev libs and code
         run: pnpm prepareDev
