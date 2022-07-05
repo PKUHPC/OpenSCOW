@@ -40,8 +40,8 @@ jobs:
       - name: Prepare dev libs and code
         run: pnpm prepareDev
 
-      - name: Generate SSH key pairs for test
-        run: ssh-keygen -t rsa -q -f "$HOME/.ssh/id_rsa" -N ""
+      # - name: Generate SSH key pairs for test
+      #   run: ssh-keygen -t rsa -q -f "$HOME/.ssh/id_rsa" -N ""
 
       - name: Wait for ports
         uses: ifaxity/wait-on-action@master
