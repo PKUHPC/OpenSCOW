@@ -37,11 +37,11 @@ jobs:
       - name: Install dependencies
         run: pnpm i --frozen-lockfile
 
+      - name: Generate SSH key pairs for test
+        run: ssh-keygen -t rsa -q -f "$HOME/.ssh/id_rsa" -N ""
+
       - name: Prepare dev libs and code
         run: pnpm prepareDev
-
-      # - name: Generate SSH key pairs for test
-      #   run: ssh-keygen -t rsa -q -f "$HOME/.ssh/id_rsa" -N ""
 
       - name: Wait for ports
         uses: ifaxity/wait-on-action@master
@@ -52,6 +52,7 @@ jobs:
 
       - name: Run tests
         run: pnpm test:ci
+        with:
 
       - name: Upload test converage
         uses: codecov/codecov-action@v3
