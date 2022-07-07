@@ -1,4 +1,6 @@
 import { Button, Form, InputNumber, message, Popconfirm, Space, Table } from "antd";
+import Router from "next/router";
+import { join } from "path";
 import React, { useCallback, useMemo, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
@@ -149,6 +151,9 @@ export const RunningJobInfoTable: React.FC<JobInfoTableProps> = ({
         <Table.Column<RunningJobInfo> title="更多"
           render={(_, r) => (
             <Space>
+              <a onClick={() => Router.push(join("/files", r.cluster.id, r.workingDir))}>
+                进入目录
+              </a>
               <a onClick={() => setPreviewItem(r)}>详情</a>
               <Popconfirm
                 title="确定结束这个任务吗？"

@@ -23,4 +23,6 @@ message RunningJob {
   limit.  (Valid for jobs and job steps)
    */
   string time_limit = 14;
+
+  string working_dir = 15;
 }

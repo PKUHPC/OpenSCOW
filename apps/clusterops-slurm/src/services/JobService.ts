@@ -16,7 +16,7 @@ export const jobServiceServer = plugin((server) => {
         "squeue",
         [
           "-o",
-          ["%A", "%P", "%j", "%u", "%T", "%M", "%D", "%R", "%a", "%C", "%q", "%V", "%Y", "%l"].join(separator),
+          ["%A", "%P", "%j", "%u", "%T", "%M", "%D", "%R", "%a", "%C", "%q", "%V", "%Y", "%l", "%Z"].join(separator),
           "--noheader",
           ...userId ? ["-u", userId] : [],
           ...accountNames.length > 0 ? ["-A", accountNames.join(",")] : [],
@@ -28,7 +28,7 @@ export const jobServiceServer = plugin((server) => {
           jobId,
           partition, name, user, state, runningTime,
           nodes, nodesOrReason, account, cores,
-          qos, submissionTime, nodesToBeUsed, timeLimit,
+          qos, submissionTime, nodesToBeUsed, timeLimit, workingDir,
         ] = x.split(separator);
 
         return {
@@ -36,6 +36,7 @@ export const jobServiceServer = plugin((server) => {
           partition, name, user, state, runningTime,
           nodes, nodesOrReason, account, cores,
           qos, submissionTime, nodesToBeUsed, timeLimit,
+          workingDir,
         } as RunningJob;
       });
 

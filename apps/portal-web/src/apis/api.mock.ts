@@ -29,6 +29,7 @@ export const runningJob: RunningJob = {
   submissionTime: "2021-12-22T16:16:02",
   user: "!23",
   timeLimit: "NOT_SET",
+  workingDir: "/home/ddadaal/Code",
 };
 
 export const mockApi: MockApi<typeof api> = {

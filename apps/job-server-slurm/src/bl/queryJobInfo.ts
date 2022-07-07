@@ -10,7 +10,7 @@ export async function queryJobInfo(ssh: NodeSSH, logger: Logger, params: string[
     "squeue",
     [
       "-o",
-      ["%A", "%P", "%j", "%u", "%T", "%M", "%D", "%R", "%a", "%C", "%q", "%V", "%Y", "%l"].join(SEPARATOR),
+      ["%A", "%P", "%j", "%u", "%T", "%M", "%D", "%R", "%a", "%C", "%q", "%V", "%Y", "%l", "%Z"].join(SEPARATOR),
       "--noheader",
       ...params,
     ],
@@ -21,7 +21,7 @@ export async function queryJobInfo(ssh: NodeSSH, logger: Logger, params: string[
       jobId,
       partition, name, user, state, runningTime,
       nodes, nodesOrReason, account, cores,
-      qos, submissionTime, nodesToBeUsed, timeLimit,
+      qos, submissionTime, nodesToBeUsed, timeLimit, workingDir,
     ] = x.split(SEPARATOR);
 
     return {
@@ -29,6 +29,7 @@ export async function queryJobInfo(ssh: NodeSSH, logger: Logger, params: string[
       partition, name, user, state, runningTime,
       nodes, nodesOrReason, account, cores,
       qos, submissionTime, nodesToBeUsed, timeLimit,
+      workingDir,
     } as RunningJob;
   });
 
