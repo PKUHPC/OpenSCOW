@@ -15,7 +15,7 @@ message GetRunningJobsReply { repeated common.job.RunningJob jobs = 1; }
 message SubmitJobRequest {
   string cluster = 1;
   string user_id = 2;
-  JobInfo job_info = 3;
+  NewJobInfo job_info = 3;
   string script = 4;
   bool save = 5;
 }
@@ -23,7 +23,7 @@ message SubmitJobRequest {
 // UNAVAILABLE: if sbatch fails, the details is the stderr
 message SubmitJobReply { uint64 job_id = 1; }
 
-message JobInfo {
+message NewJobInfo {
   string job_name = 1;
   string account = 2;
   optional string partition = 3;
@@ -37,7 +37,7 @@ message JobInfo {
   optional string comment = 10;
 }
 
-message GenerateJobScriptRequest { JobInfo job_info = 1; }
+message GenerateJobScriptRequest { NewJobInfo job_info = 1; }
 
 message GenerateJobScriptReply { string script = 1; }
 
@@ -68,7 +68,7 @@ message GetSavedJobRequest {
   string id = 3;
 }
 
-message GetSavedJobReply { JobInfo job_info = 1; }
+message GetSavedJobReply { NewJobInfo job_info = 1; }
 
 message CancelJobRequest {
   string cluster = 1;
@@ -77,6 +77,29 @@ message CancelJobRequest {
 }
 
 message CancelJobReply {}
+
+message GetAllJobsInfoRequest {
+  string cluster = 1;
+  string user_id = 2;
+  google.protobuf.Timestamp start_time = 3;
+  google.protobuf.Timestamp end_time = 4;
+}
+
+message JobInfo {
+  string job_id = 1;
+  string name = 2;
+  string account = 3;
+  string partition = 4;
+  string qos = 5;
+  string state = 6;
+  string working_dir = 7;
+  string reason = 8;
+  string elapsed = 9;
+  string time_limit = 10;
+  string submit_time = 11;
+}
+
+message GetAllJobsInfoReply { repeated JobInfo jobs = 1; }
 
 service JobService {
   rpc GetRunningJobs(GetRunningJobsRequest) returns (GetRunningJobsReply);
@@ -87,4 +110,5 @@ service JobService {
   rpc GetSavedJobs(GetSavedJobsRequest) returns (GetSavedJobsReply);
   rpc GetSavedJob(GetSavedJobRequest) returns (GetSavedJobReply);
   rpc CancelJob(CancelJobRequest) returns (CancelJobReply);
+  rpc GetAllJobsInfo(GetAllJobsInfoRequest) returns (GetAllJobsInfoReply);
 }

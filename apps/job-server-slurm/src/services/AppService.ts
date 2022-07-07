@@ -3,7 +3,7 @@ import { ServiceError, status } from "@grpc/grpc-js";
 import { randomUUID } from "crypto";
 import fs from "fs";
 import { join } from "path";
-import { queryJobInfo } from "src/bl/queryJobInfo";
+import { querySqueue } from "src/bl/queryJobInfo";
 import { generateJobScript, parseSbatchOutput } from "src/bl/submitJob";
 import { getAppConfig } from "src/config/apps";
 import { clustersConfig } from "src/config/clusters";
@@ -148,7 +148,7 @@ export const appServiceServer = plugin((server) => {
 
         // using squeue to get jobs that are running
         // If a job is not running, it cannot be ready
-        const runningJobsInfo = await queryJobInfo(ssh, logger, ["-u", userId]);
+        const runningJobsInfo = await querySqueue(ssh, logger, ["-u", userId]);
 
         const runningJobInfoMap = runningJobsInfo.reduce((prev, curr) => {
           prev[curr.jobId] = curr;

@@ -1,11 +1,13 @@
 import { Logger } from "@ddadaal/tsgrpc-server";
+import { DateTime } from "luxon";
 import { NodeSSH } from "node-ssh";
 import { RunningJob } from "src/generated/common/job";
+import { JobInfo } from "src/generated/portal/job";
 import { loggedExec } from "src/utils/ssh";
 
 const SEPARATOR = "__x__x__";
 
-export async function queryJobInfo(ssh: NodeSSH, logger: Logger, params: string[]) {
+export async function querySqueue(ssh: NodeSSH, logger: Logger, params: string[]) {
   const result = await loggedExec(ssh, logger, true,
     "squeue",
     [
@@ -31,6 +33,43 @@ export async function queryJobInfo(ssh: NodeSSH, logger: Logger, params: string[
       qos, submissionTime, nodesToBeUsed, timeLimit,
       workingDir,
     } as RunningJob;
+  });
+
+  return jobs;
+}
+
+function formatTime(time: Date, tz: string) {
+  return DateTime.fromJSDate(time).setZone(tz).toFormat("yyyy-MM-dd'T'HH:mm:ss");
+}
+
+export async function querySacct(ssh: NodeSSH, logger: Logger, startTime: Date, endTime: Date) {
+
+  // get target timezone
+  const { stdout } = await loggedExec(ssh, logger, true, "date", ["+%:z"]);
+  const tz = "UTC" + stdout;
+
+  const result = await loggedExec(ssh, logger, true,
+    "sacct",
+    [
+      "-X",
+      "--noheader",
+      "--format", "JobID,JobName,Account,Partition,QOS,State,WorkDir,Reason,Elapsed,TimeLimit,Submit",
+      "--starttime", formatTime(startTime, tz),
+      "--endtime", formatTime(endTime, tz),
+      "--parsable2",
+    ],
+  );
+
+  const jobs = result.stdout.split("\n").map((x) => {
+    const [
+      jobId, name, account, partition, qos, state,
+      workingDir, reason, elapsed, timeLimit, submitTime,
+    ] = x.split("|");
+
+    return {
+      jobId, name, account, partition, qos, state,
+      workingDir, reason, elapsed, timeLimit, submitTime,
+    } as JobInfo;
   });
 
   return jobs;

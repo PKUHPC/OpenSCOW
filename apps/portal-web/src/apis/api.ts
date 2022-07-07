@@ -26,6 +26,7 @@ import type { MoveFileItemSchema } from "src/pages/api/file/move";
 import type { UploadFileSchema } from "src/pages/api/file/upload";
 import type { CancelJobSchema } from "src/pages/api/job/cancelJob";
 import type { GetAccountsSchema } from "src/pages/api/job/getAccounts";
+import type { GetAllJobsSchema } from "src/pages/api/job/getAllJobs";
 import type { GetRunningJobsSchema } from "src/pages/api/job/getRunningJobs";
 import type { GetSavedJobSchema } from "src/pages/api/job/getSavedJob";
 import type { GetSavedJobsSchema } from "src/pages/api/job/getSavedJobs";
@@ -57,6 +58,7 @@ export const api = {
   getIcon: fromApi<GetIconSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api//icon")),
   cancelJob: fromApi<CancelJobSchema>("DELETE", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/job/cancelJob")),
   getAccounts: fromApi<GetAccountsSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/job/getAccounts")),
+  getAllJobs: fromApi<GetAllJobsSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/job/getAllJobs")),
   getRunningJobs: fromApi<GetRunningJobsSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/job/getRunningJobs")),
   getSavedJob: fromApi<GetSavedJobSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/job/getSavedJob")),
   getSavedJobs: fromApi<GetSavedJobsSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/job/getSavedJobs")),

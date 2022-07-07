@@ -2,7 +2,7 @@ import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-utils";
 import { status } from "@grpc/grpc-js";
 import { authenticate } from "src/auth/server";
-import { JobInfo, JobServiceClient } from "src/generated/portal/job";
+import { JobServiceClient, NewJobInfo  } from "src/generated/portal/job";
 import { ensureNotUndefined } from "src/utils/checkNull";
 import { getJobServerClient } from "src/utils/client";
 import { publicConfig } from "src/utils/config";
@@ -18,7 +18,7 @@ export interface GetSavedJobSchema {
 
   responses: {
     200: {
-      jobInfo: JobInfo;
+      jobInfo: NewJobInfo;
     }
 
     400: {

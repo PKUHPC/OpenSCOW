@@ -32,6 +32,11 @@ export const userRoutes: NavItemProps[] = [
         path: "/jobs/runningJobs",
       },
       {
+        Icon: BookOutlined,
+        text: "所有作业",
+        path: "/jobs/allJobs",
+      },
+      {
         Icon: PlusCircleOutlined,
         text: "提交作业",
         path: "/jobs/submit",

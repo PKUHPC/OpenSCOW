@@ -1,4 +1,4 @@
-import { JobInfo } from "src/generated/portal/job";
+import { NewJobInfo } from "src/generated/portal/job";
 
 export function parseSbatchOutput(output: string): number {
   // Submitted batch job 34987
@@ -20,7 +20,7 @@ export interface JobMetadata {
   workingDirectory: string;
 }
 
-export function generateJobScript(jobInfo: JobInfo & {
+export function generateJobScript(jobInfo: NewJobInfo & {
   output?: string;
   nodeList?: string;
 }) {

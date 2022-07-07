@@ -2,7 +2,7 @@ import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-utils";
 import { status } from "@grpc/grpc-js";
 import { authenticate } from "src/auth/server";
-import { JobInfo, JobServiceClient } from "src/generated/portal/job";
+import { JobServiceClient, NewJobInfo } from "src/generated/portal/job";
 import { getJobServerClient } from "src/utils/client";
 import { publicConfig } from "src/utils/config";
 
@@ -61,7 +61,7 @@ export default route<SubmitJobSchema>("SubmitJobSchema", async (req, res) => {
 
   const client = getJobServerClient(JobServiceClient);
 
-  const jobInfo: JobInfo = {
+  const jobInfo: NewJobInfo = {
     jobName,
     coreCount,
     maxTime,

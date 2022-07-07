@@ -2,6 +2,7 @@ import { ReloadOutlined } from "@ant-design/icons";
 import { parsePlaceholder } from "@scow/config/build/parse";
 import { Button, Checkbox, Col, Form, Input, InputNumber, message, Modal, Row, Select, Tooltip } from "antd";
 import { useWatch } from "antd/lib/form/Form";
+import Router from "next/router";
 import randomWords from "random-words";
 import React, { useEffect, useMemo, useState } from "react";
 import { api } from "src/apis";

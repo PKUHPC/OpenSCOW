@@ -2,7 +2,7 @@ import { plugin } from "@ddadaal/tsgrpc-server";
 import { ensureNotUndefined } from "@ddadaal/tsgrpc-utils";
 import { ServiceError, status } from "@grpc/grpc-js";
 import { join } from "path";
-import { queryJobInfo } from "src/bl/queryJobInfo";
+import { querySacct, querySqueue } from "src/bl/queryJobInfo";
 import { generateJobScript, JobMetadata, parseSbatchOutput } from "src/bl/submitJob";
 import { checkClusterExistence, clustersConfig } from "src/config/clusters";
 import { config } from "src/config/env";
@@ -149,7 +149,7 @@ export const jobServiceServer = plugin((server) => {
 
       return await sshConnect(node, userId, logger, async (ssh) => {
 
-        const jobs = await queryJobInfo(ssh, logger, ["-u", userId]);
+        const jobs = await querySqueue(ssh, logger, ["-u", userId]);
 
         return [{ jobs }];
       });
@@ -166,6 +166,19 @@ export const jobServiceServer = plugin((server) => {
         return [{}];
       });
     },
+
+    getAllJobsInfo: async ({ request, logger }) => {
+      const { cluster, userId, startTime, endTime } = ensureNotUndefined(request, ["endTime", "startTime"]);
+
+      const node = clustersConfig[cluster].loginNodes[0];
+
+      return await sshConnect(node, userId, logger, async (ssh) => {
+        const jobs = await querySacct(ssh, logger, startTime, endTime);
+
+        return [{ jobs }];
+      });
+    },
+
 
   });
 });

@@ -128,8 +128,10 @@ importers:
       '@grpc/grpc-js': 1.6.7
       '@scow/config': workspace:*
       '@types/google-protobuf': 3.15.6
+      '@types/luxon': 2.3.2
       '@types/node-cron': 3.0.2
       '@types/ssh2': 1.11.2
+      luxon: 2.4.0
       node-ssh: 12.0.4
       shell-quote: 1.7.3
     dependencies:
@@ -137,11 +139,13 @@ importers:
       '@ddadaal/tsgrpc-utils': 0.14.0_@grpc+grpc-js@1.6.7
       '@grpc/grpc-js': 1.6.7
       '@scow/config': link:../../libs/config
+      luxon: 2.4.0
       node-ssh: 12.0.4
       shell-quote: 1.7.3
     devDependencies:
       '@ddadaal/tsgrpc-cli': 0.13.0
       '@types/google-protobuf': 3.15.6
+      '@types/luxon': 2.3.2
       '@types/node-cron': 3.0.2
       '@types/ssh2': 1.11.2
 
@@ -4612,6 +4616,10 @@ packages:
 
   /@types/long/4.0.2:
     resolution: {integrity: sha512-MqTGEo5bj5t157U6fA/BiDynNkn0YknVdh48CMPkTSpFTVmvao5UQmm7uEF6xBEo7qIMAlY/JSleYaE6VOdpaA==}
+
+  /@types/luxon/2.3.2:
+    resolution: {integrity: sha512-WOehptuhKIXukSUUkRgGbj2c997Uv/iUgYgII8U7XLJqq9W2oF0kQ6frEznRQbdurioz+L/cdaIm4GutTQfgmA==}
+    dev: true
 
   /@types/mdast/3.0.10:
     resolution: {integrity: sha512-W864tg/Osz1+9f4lrGTZpCSO5/z4608eUp19tbozkq2HJK6i3z1kT0H9tlADXuYIb1YYOBByU4Jsqkk75q48qA==}
@@ -10455,6 +10463,11 @@ packages:
     engines: {node: '>=10'}
     dependencies:
       yallist: 4.0.0
+
+  /luxon/2.4.0:
+    resolution: {integrity: sha512-w+NAwWOUL5hO0SgwOHsMBAmZ15SoknmQXhSO0hIbJCAmPKSsGeK8MlmhYh2w6Iib38IxN2M+/ooXWLbeis7GuA==}
+    engines: {node: '>=12'}
+    dev: false
 
   /lz-string/1.4.4:
     resolution: {integrity: sha512-0ckx7ZHRPqb0oUm8zNr+90mtf9DQB60H1wMCjBtfi62Kl3a7JbHob6gA2bC+xRvZoOL+1hzUK8jeuEIQE8svEQ==}
