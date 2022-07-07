@@ -81,6 +81,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
       })
       .then(({ jobId }) => {
         message.success("提交成功！您的新作业ID为：" + jobId);
+        Router.push("/jobs/runningJobs");
       })
       .finally(() => setLoading(false));
   };
