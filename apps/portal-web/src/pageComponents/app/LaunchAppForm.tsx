@@ -1,5 +1,6 @@
 import { App } from "@scow/config/build/appConfig/app";
 import { Button, Form, InputNumber, message, Select } from "antd";
+import Router from "next/router";
 import { useEffect, useMemo, useState } from "react";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
@@ -52,6 +53,7 @@ export const LaunchAppForm: React.FC<Props> = ({ config }) => {
     } })
       .then(() => {
         message.success("创建成功！");
+        Router.push("/apps/sessions");
       }).finally(() => {
         setLoading(false);
       });
