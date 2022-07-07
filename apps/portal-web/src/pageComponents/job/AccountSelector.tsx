@@ -23,7 +23,7 @@ export const AccountSelector: React.FC<Props> = ({ cluster, onChange, value }) =
     promiseFn,
     watch: userStore.user,
     onResolve: ({ accounts }) => {
-      if (value && !accounts.includes(value)) {
+      if (!value || !accounts.includes(value)) {
         onChange?.(accounts[0]);
       }
     },
