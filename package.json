@@ -35,7 +35,7 @@
     "eslint-plugin-simple-import-sort": "7.0.0",
     "husky": "8.0.1",
     "jest": "28.1.2",
-    "jest-extended": "2.0.0",
+    "jest-extended": "3.0.0",
     "nodemon": "2.0.19",
     "pino-pretty": "8.1.0",
     "pkg": "5.8.0",
