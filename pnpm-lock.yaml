@@ -131,7 +131,7 @@ importers:
       '@types/luxon': 2.3.2
       '@types/node-cron': 3.0.2
       '@types/ssh2': 1.11.4
-      luxon: 2.5.0
+      luxon: 3.0.1
       node-ssh: 12.0.4
       shell-quote: 1.7.3
     dependencies:
@@ -139,7 +139,7 @@ importers:
       '@ddadaal/tsgrpc-utils': 0.14.0_@grpc+grpc-js@1.6.7
       '@grpc/grpc-js': 1.6.7
       '@scow/config': link:../../libs/config
-      luxon: 2.5.0
+      luxon: 3.0.1
       node-ssh: 12.0.4
       shell-quote: 1.7.3
     devDependencies:
@@ -10705,8 +10705,8 @@ packages:
     dependencies:
       yallist: 4.0.0
 
-  /luxon/2.5.0:
-    resolution: {integrity: sha512-IDkEPB80Rb6gCAU+FEib0t4FeJ4uVOuX1CQ9GsvU3O+JAGIgu0J7sf1OarXKaKDygTZIoJyU6YdZzTFRu+YR0A==}
+  /luxon/3.0.1:
+    resolution: {integrity: sha512-hF3kv0e5gwHQZKz4wtm4c+inDtyc7elkanAsBq+fundaCdUBNJB1dHEGUZIM6SfSBUlbVFduPwEtNjFK8wLtcw==}
     engines: {node: '>=12'}
     dev: false
 
