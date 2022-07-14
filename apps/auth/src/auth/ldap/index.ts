@@ -7,11 +7,17 @@ import { serveLoginHtml } from "src/auth/ldap/loginHtml";
 import { modifyPassword, modifyPasswordAsSelf } from "src/auth/ldap/password";
 import { registerPostHandler } from "src/auth/ldap/postHandler";
 import { config } from "src/config/env";
+import { ensureNotUndefined } from "src/utils/validations";
 import { promisify } from "util";
 
 const addAttributes = parseKeyValue(config.LDAP_ADD_ATTRS);
 
 export const createLdapAuthProvider = (f: FastifyInstance) => {
+
+  ensureNotUndefined(config, [
+    "LDAP_URL", "LDAP_SEARCH_BASE", "LDAP_FILTER", "LDAP_ADD_USER_BASE", "LDAP_ADD_GROUP_BASE",
+    "LDAP_ATTR_GROUP_USER_ID", "LDAP_ATTR_UID", "LDAP_ATTR_NAME",
+  ]);
 
   registerPostHandler(f);
 
