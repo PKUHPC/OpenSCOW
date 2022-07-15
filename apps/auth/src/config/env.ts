@@ -16,7 +16,7 @@ export const config = envConfig({
 
   TOKEN_TIMEOUT_SECONDS: num({ desc: "token未使用的失效时间，单位秒", default: 3600 }),
 
-  AUTH_TYPE: str({ desc: "认证类型", choices: ["ldap"], default: "ssh" }),
+  AUTH_TYPE: str({ desc: "认证类型", choices: ["ldap", "ssh"], default: "ssh" }),
 
   LDAP_URL: str({ desc: "LDAP地址。认证类型为ldap必填", default: undefined }),
   LDAP_SEARCH_BASE: str({ desc: "LDAP用户搜索base。认证类型为ldap必填", default: "" }),
@@ -49,7 +49,7 @@ export const config = envConfig({
   default: "",
   }),
 
-  SSH_BASE_CLUSTER: str({ desc: "以哪个集群为认证用户的基础。如果不设置则为第一个集群", default: undefined }),
+  SSH_BASE_NODE: str({ desc: "SSH认证中，以哪个节点为认证用户的基础。如果不设置则为第一个集群的第一个登录节点", default: undefined }),
 
   TEST_USERS: str({ desc: "测试用户，如果这些用户登录，将其ID改为另一个ID。格式：原用户ID=新用户ID,原用户ID=新用户ID。", default: "" }),
 

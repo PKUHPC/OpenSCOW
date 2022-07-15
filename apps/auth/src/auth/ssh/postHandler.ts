@@ -9,29 +9,21 @@ import { serveLoginHtml } from "src/auth/loginHtml";
 import { config } from "src/config/env";
 import { redirectToWeb } from "src/routes/callback";
 
-type ValueOf<T> = T[keyof T];
-
 export function registerPostHandler(f: FastifyInstance) {
 
-  const clusters = getConfigFromFile(ClustersConfigSchema, ClustersConfigName);
 
-  let clusterConfig: ValueOf<typeof clusters>;
-  if (config.SSH_BASE_CLUSTER) {
-    clusterConfig = clusters[config.SSH_BASE_CLUSTER];
-    if (!clusterConfig) {
-      throw new Error("Unknown cluster " + config.SSH_BASE_CLUSTER + " set by SSH_BASE_CLUSTER");
-    }
-  } else {
+  let loginNode = config.SSH_BASE_NODE;
+  if (!loginNode) {
+    const clusters = getConfigFromFile(ClustersConfigSchema, ClustersConfigName);
     if (Object.keys(clusters).length === 0) {
       throw new Error("No cluster has been set in clusters config");
     }
-    clusterConfig = Object.values(clusters)[0];
-  }
+    const clusterConfig = Object.values(clusters)[0];
+    loginNode = clusterConfig.loginNodes[0];
 
-  const loginNode = clusterConfig.loginNodes[0];
-
-  if (!loginNode) {
-    throw new Error(`Cluster ${clusterConfig.displayName} has no login node.`);
+    if (!loginNode) {
+      throw new Error(`Cluster ${clusterConfig.displayName} has no login node.`);
+    }
   }
 
   const [host, port] = loginNode.split(":");

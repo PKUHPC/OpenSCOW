@@ -69,5 +69,5 @@ export async function serveLoginHtml(err: boolean, callbackUrl: string, req: Fas
 
 </html>
 `;
-  rep.status(200).type("text/html;charset=UTF-8").send(html);
+  rep.status(err ? 403 : 200).type("text/html;charset=UTF-8").send(html);
 }
