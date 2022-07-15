@@ -1,6 +1,7 @@
 import fp from "fastify-plugin";
 import { AuthProvider } from "src/auth/AuthProvider";
 import { createLdapAuthProvider } from "src/auth/ldap";
+import { createSshAuthProvider } from "src/auth/ssh";
 import { config } from "src/config/env";
 
 declare module "fastify" {
@@ -11,6 +12,7 @@ declare module "fastify" {
 
 const providers = {
   "ldap": createLdapAuthProvider,
+  "ssh": createSshAuthProvider,
 } as const;
 
 export const authPlugin = fp(async (f) => {

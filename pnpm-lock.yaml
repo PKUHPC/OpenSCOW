@@ -80,6 +80,7 @@ importers:
       ioredis: 5.2.0
       ldapjs: 2.3.3
       nanoid: 4.0.0
+      node-ssh: 12.0.4
     dependencies:
       '@fastify/error': 3.0.0
       '@fastify/formbody': 7.0.1
@@ -93,6 +94,7 @@ importers:
       ioredis: 5.2.0
       ldapjs: 2.3.3
       nanoid: 4.0.0
+      node-ssh: 12.0.4
     devDependencies:
       '@types/asn1': 0.2.0
       '@types/ldapjs': 2.2.3
