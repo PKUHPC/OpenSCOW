@@ -8,7 +8,7 @@ WORKDIR /app
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
 
-
+COPY libs/auth/package.json ./libs/auth/
 COPY libs/config/package.json ./libs/config/
 COPY libs/decimal/package.json ./libs/decimal/
 COPY apps/portal-web/package.json ./apps/portal-web/
