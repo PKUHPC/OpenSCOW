@@ -72,7 +72,6 @@ const config = [
   { app: "clusterops-slurm", md: "mis/refs/clusterops-slurm.md" },
   { app: "mis-server", md: "mis/refs/mis-server.md" },
   { app: "mis-web", configFile: "config", md: "mis/refs/mis-web.md" },
-  { app: "file-server", md: "portal/refs/file-server.md" },
   { app: "portal-web", configFile: "config", md: "portal/refs/portal-web.md" },
   { app: "job-server-slurm", md: "portal/refs/job-server-slurm.md" },
 ] as EnvConfig[];
