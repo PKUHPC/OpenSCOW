@@ -1,4 +1,5 @@
-import { publicRuntimeConfig, serverRuntimeConfig } from "../../config";
+
+import { buildRuntimeConfig } from "../../config";
 
 export default () => ({
   serverRuntimeConfig,

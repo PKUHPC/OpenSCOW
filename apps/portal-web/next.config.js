@@ -4,27 +4,28 @@ const withSvgr = require('@newhighsco/next-plugin-svgr')
 
 const analyze = process.env.ANALYZE === 'true';
 
-const { publicRuntimeConfig, serverRuntimeConfig } = require("./config");
+const { buildRuntimeConfig } = require("./config.js");
 
-/**
- * @type {import("next").NextConfig}
- */
-const config = {
-  serverRuntimeConfig,
-  publicRuntimeConfig,
-  basePath: process.env.NEXT_PUBLIC_BASE_PATH,
-  compiler: {
-    styledComponents: true,
-  }
-};
+module.exports = async (phase, { defaultConfig }) => {
 
-module.exports = withPlugins([
-  [withSvgr, {
-    svgrOptions: {
-      // babel: false,
-      icon: true,
+  /**
+   * @type {import("next").NextConfig}
+   */
+  const config = {
+    ...await buildRuntimeConfig(phase),
+    basePath: process.env.NEXT_PUBLIC_BASE_PATH,
+    compiler: {
+      styledComponents: true,
     }
-  }],
-  analyze ? [require("@next/bundle-analyzer")()] : undefined,
-].filter((x) => x), config);
+  };
 
+  return withPlugins([
+    [withSvgr, {
+      svgrOptions: {
+        // babel: false,
+        icon: true,
+      }
+    }],
+    analyze ? [require("@next/bundle-analyzer")()] : undefined,
+  ].filter((x) => x), config)(phase, { defaultConfig });
+};

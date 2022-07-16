@@ -1,28 +1,32 @@
 // @ts-check
 
-const { envConfig, str, bool, parseKeyValue, parseArray } = require("@scow/config");
-const path = require("path");
+const { envConfig, str, bool, parseKeyValue } = require("@scow/config");
+const { join, basename, extname } = require("path");
 const { homedir } = require("os");
-const building = process.env.BUILDING;
-const dev = process.env.NODE_ENV === "development"
-const production = !building && process.env.NODE_ENV === "production";
-const test = process.env.NODE_ENV === "test";
+const fs = require("fs");
+const { PHASE_DEVELOPMENT_SERVER, PHASE_PRODUCTION_BUILD, PHASE_PRODUCTION_SERVER } = require("next/constants");
 
-// load .env.build if in build
-if (building) {
-  require("dotenv").config({ path: "env/.env.build" });
-}
+const { getCapabilities } = require("@scow/lib-auth");
 
-if (dev) {
-  require("dotenv").config({ path: "env/.env.dev" });
+/**
+ * Get auth capabilities
+ * @param {string} authUrl the url for auth service
+ * @param {string} phase the build phase
+ */
+async function queryCapabilities(authUrl, phase) {
+
+  if (phase === PHASE_PRODUCTION_SERVER) {
+    // @ts-ignore
+    return await getCapabilities(authUrl);
+  } else {
+    return { changePassword: true, createUser: true, validateName: true };
+  }
 }
 
 const specs = {
 
   AUTH_EXTERNAL_URL: str({ desc: "认证服务外网地址", default: "/auth" }),
   AUTH_INTERNAL_URL: str({ desc: "认证服务内网地址", default: "http://auth:5000" }),
-
-  ENABLE_CHANGE_PASSWORD: bool({ desc: "是否支持用户更改自己的密码", default: false }),
 
   ENABLE_JOB_MANAGEMENT: bool({ desc: "是否启动作业管理功能", default: false }),
   JOB_SERVER: str({ desc: "作业服务器的地址", default: "job-server:5000" }),
@@ -47,7 +51,7 @@ const specs = {
   MIS_PATH: str({ desc: "管理系统的链接。如果不设置，则不显示到管理系统的链接", default: undefined }),
 
   ENABLE_SHELL: bool({ desc: "是否启用Shell功能", default: false }),
-  SSH_PRIVATE_KEY_PATH: str({ desc: "SSH私钥路径", default: path.join(homedir(), ".ssh", "id_rsa") }),
+  SSH_PRIVATE_KEY_PATH: str({ desc: "SSH私钥路径", default: join(homedir(), ".ssh", "id_rsa") }),
 
   SUBMIT_JOB_DEFAULT_PWD: str({ desc: "提交作业的默认工作目录。使用{name}代替作业名称。相对于用户的家目录", default: "scow/jobs/{name}" }),
 
@@ -60,104 +64,125 @@ const specs = {
 
 const config = envConfig(specs, process.env);
 
-// load clusters.json
-const { getConfigFromFile, CONFIG_BASE_PATH } = require("@scow/config");
-const { ClustersConfigName, ClustersConfigSchema } = require("@scow/config/build/appConfig/clusters");
+const buildRuntimeConfig = async (phase) => {
+  const building = phase === PHASE_PRODUCTION_BUILD;
+  const dev = phase === PHASE_DEVELOPMENT_SERVER;
+  const production = phase === PHASE_PRODUCTION_SERVER;
 
-const configPath = production ? undefined : path.join(__dirname, "config");
-
-/**
- * @type {import("@scow/config/build/appConfig/clusters").Clusters}
- */
-const clusters = getConfigFromFile(ClustersConfigSchema, ClustersConfigName, false, configPath);
-
-const fs = require("fs");
-
-// get available apps
-function getApps() {
-  const { APP_CONFIG_BASE_PATH, AppConfigSchema } = require("@scow/config/build/appConfig/app");
-
-  const appsPath = path.join(configPath || CONFIG_BASE_PATH, APP_CONFIG_BASE_PATH);
-  console.log(appsPath);
-
-  if (!fs.existsSync(appsPath)) {
-    return [];
+  // load .env.build if in build
+  if (building) {
+    require("dotenv").config({ path: "env/.env.build" });
   }
 
-  const apps = fs.readdirSync(appsPath);
+  if (dev) {
+    require("dotenv").config({ path: "env/.env.dev" });
+  }
 
-  return apps.map((filename) => {
-    return getConfigFromFile(AppConfigSchema,
-      path.join(APP_CONFIG_BASE_PATH, path.basename(filename, path.extname(filename))), false, configPath);
-  });
-}
+  // load clusters.json
+  const { getConfigFromFile, CONFIG_BASE_PATH } = require("@scow/config");
+  const { ClustersConfigName, ClustersConfigSchema } = require("@scow/config/build/appConfig/clusters");
 
-const apps = getApps();
+  const configPath = production ? undefined : join(__dirname, "config");
 
-/**
- * @type {import("./src/utils/config").ServerRuntimeConfig}
- */
-const serverRuntimeConfig = {
-  AUTH_EXTERNAL_URL: config.AUTH_EXTERNAL_URL,
-  AUTH_INTERNAL_URL: config.AUTH_INTERNAL_URL,
-  DEFAULT_FOOTER_TEXT: config.DEFAULT_FOOTER_TEXT,
-  DEFAULT_PRIMARY_COLOR: config.DEFAULT_PRIMARY_COLOR,
-  FOOTER_TEXTS: parseKeyValue(config.FOOTER_TEXTS),
-  PRIMARY_COLORS: parseKeyValue(config.PRIMARY_COLORS),
-  JOB_SERVER: config.JOB_SERVER,
-  SSH_PRIVATE_KEY_PATH: config.SSH_PRIVATE_KEY_PATH,
-  CLUSTERS_CONFIG: clusters,
-  FILE_SERVERS: parseKeyValue(config.FILE_SERVERS),
-  APPS: apps,
-  MOCK_USER_ID: config.MOCK_USER_ID,
-};
+  /**
+   * @type {import("@scow/config/build/appConfig/clusters").Clusters}
+   */
+  const clusters = getConfigFromFile(ClustersConfigSchema, ClustersConfigName, false, configPath);
 
-/**
- * @type {import("./src/utils/config").PublicRuntimeConfig}
- */
-const publicRuntimeConfig = {
 
-  ENABLE_CHANGE_PASSWORD: config.ENABLE_CHANGE_PASSWORD,
+  // get available apps
+  function getApps() {
+    const { APP_CONFIG_BASE_PATH, AppConfigSchema } = require("@scow/config/build/appConfig/app");
 
-  FILE_SERVERS_ENABLED_CLUSTERS: Object.keys(clusters).filter((x) => clusters[x].loginNodes.length > 0),
+    const appsPath = join(configPath || CONFIG_BASE_PATH, APP_CONFIG_BASE_PATH);
+    console.log(appsPath);
 
-  CLUSTER_NAMES: Object.keys(clusters).reduce((prev, curr) => {
-    prev[curr] = clusters[curr].displayName;
-    return prev;
-  }, {}),
+    if (!fs.existsSync(appsPath)) {
+      return [];
+    }
 
-  ENABLE_SHELL: config.ENABLE_SHELL,
+    const apps = fs.readdirSync(appsPath);
 
-  ENABLE_JOB_MANAGEMENT: config.ENABLE_JOB_MANAGEMENT,
+    return apps.map((filename) => {
+      return getConfigFromFile(AppConfigSchema,
+        join(APP_CONFIG_BASE_PATH, basename(filename, extname(filename))), false, configPath);
+    });
+  }
 
-  ENABLE_LOGIN_DESKTOP: config.ENABLE_LOGIN_DESKTOP,
-  LOGIN_DESKTOP_WMS: parseKeyValue(config.LOGIN_DESKTOP_WMS),
+  const apps = getApps();
 
-  ENABLE_APPS: config.ENABLE_APPS,
+  /**
+   * @type {import("./src/utils/config").ServerRuntimeConfig}
+   */
+  const serverRuntimeConfig = {
+    AUTH_EXTERNAL_URL: config.AUTH_EXTERNAL_URL,
+    AUTH_INTERNAL_URL: config.AUTH_INTERNAL_URL,
+    DEFAULT_FOOTER_TEXT: config.DEFAULT_FOOTER_TEXT,
+    DEFAULT_PRIMARY_COLOR: config.DEFAULT_PRIMARY_COLOR,
+    FOOTER_TEXTS: parseKeyValue(config.FOOTER_TEXTS),
+    PRIMARY_COLORS: parseKeyValue(config.PRIMARY_COLORS),
+    JOB_SERVER: config.JOB_SERVER,
+    SSH_PRIVATE_KEY_PATH: config.SSH_PRIVATE_KEY_PATH,
+    CLUSTERS_CONFIG: clusters,
+    FILE_SERVERS: parseKeyValue(config.FILE_SERVERS),
+    APPS: apps,
+    MOCK_USER_ID: config.MOCK_USER_ID,
+  };
 
-  MIS_PATH: config.MIS_PATH,
+  // query auth capabilities to set optional auth features
+  const capabilities = await queryCapabilities(config.AUTH_INTERNAL_URL, phase);
 
-  DEFAULT_HOME_TEXT: config.DEFAULT_HOME_TEXT,
-  HOME_TEXTS: parseKeyValue(config.HOME_TEXTS),
-  DEFAULT_HOME_TITLE: config.DEFAULT_HOME_TITLE,
-  HOME_TITLES: parseKeyValue(config.HOME_TITLES),
+  /**
+   * @type {import("./src/utils/config").PublicRuntimeConfig}
+   */
+  const publicRuntimeConfig = {
 
-  CLUSTERS_CONFIG: clusters,
+    ENABLE_CHANGE_PASSWORD: capabilities.changePassword,
 
-  APPS: apps.map(({ id, name }) => ({ id, name })),
+    FILE_SERVERS_ENABLED_CLUSTERS: Object.keys(clusters).filter((x) => clusters[x].loginNodes.length > 0),
 
-  SUBMIT_JOB_WORKING_DIR: config.SUBMIT_JOB_DEFAULT_PWD,
+    CLUSTER_NAMES: Object.keys(clusters).reduce((prev, curr) => {
+      prev[curr] = clusters[curr].displayName;
+      return prev;
+    }, {}),
 
-  PROXY_BASE_PATH: config.PROXY_BASE_PATH,
-}
+    ENABLE_SHELL: config.ENABLE_SHELL,
 
-if (!building) {
-  console.log("Server Runtime Config", serverRuntimeConfig);
-  console.log("Public Runtime Config", publicRuntimeConfig);
+    ENABLE_JOB_MANAGEMENT: config.ENABLE_JOB_MANAGEMENT,
+
+    ENABLE_LOGIN_DESKTOP: config.ENABLE_LOGIN_DESKTOP,
+    LOGIN_DESKTOP_WMS: parseKeyValue(config.LOGIN_DESKTOP_WMS),
+
+    ENABLE_APPS: config.ENABLE_APPS,
+
+    MIS_PATH: config.MIS_PATH,
+
+    DEFAULT_HOME_TEXT: config.DEFAULT_HOME_TEXT,
+    HOME_TEXTS: parseKeyValue(config.HOME_TEXTS),
+    DEFAULT_HOME_TITLE: config.DEFAULT_HOME_TITLE,
+    HOME_TITLES: parseKeyValue(config.HOME_TITLES),
+
+    CLUSTERS_CONFIG: clusters,
+
+    APPS: apps.map(({ id, name }) => ({ id, name })),
+
+    SUBMIT_JOB_WORKING_DIR: config.SUBMIT_JOB_DEFAULT_PWD,
+
+    PROXY_BASE_PATH: config.PROXY_BASE_PATH,
+  }
+
+  if (!building) {
+    console.log("Server Runtime Config", serverRuntimeConfig);
+    console.log("Public Runtime Config", publicRuntimeConfig);
+  }
+
+  return {
+    serverRuntimeConfig,
+    publicRuntimeConfig,
+  }
 }
 
 module.exports = {
-  serverRuntimeConfig,
-  publicRuntimeConfig,
+  buildRuntimeConfig,
   config,
 };

@@ -1,27 +1,31 @@
 /* esslint-disable @typescript-eslint/no-var-requires */
+const withSvgr = require("@newhighsco/next-plugin-svgr");
 const withPlugins = require("next-compose-plugins");
-const withSvgr = require('@newhighsco/next-plugin-svgr')
 
-const analyze = process.env.ANALYZE === 'true';
+const analyze = process.env.ANALYZE === "true";
 
-const { publicRuntimeConfig, serverRuntimeConfig } = require("./config");
+const { buildRuntimeConfig } = require("./config.js");
 
-/**
- * @type {import("next").NextConfig}
- */
-const config = {
-  serverRuntimeConfig,
-  publicRuntimeConfig,
-  basePath: process.env.NEXT_PUBLIC_BASE_PATH,
-};
+module.exports = async (phase, { defaultConfig }) => {
 
-module.exports = withPlugins([
-  [withSvgr, {
-    svgrOptions: {
-      // babel: false,
-      icon: true,
-    }
-  }],
-  analyze ? [require("@next/bundle-analyzer")()] : undefined,
-].filter((x) => x), config);
+  const runtimeConfig = await buildRuntimeConfig(phase);
+
+  /**
+   * @type {import("next").NextConfig}
+   */
+  const config = {
+    ...runtimeConfig,
+    basePath: process.env.NEXT_PUBLIC_BASE_PATH,
+  };
+
+  return withPlugins([
+    [withSvgr, {
+      svgrOptions: {
+        // babel: false,
+        icon: true,
+      },
+    }],
+    analyze ? [require("@next/bundle-analyzer")()] : undefined,
+  ].filter((x) => x), config)(phase, { defaultConfig });
+}
 

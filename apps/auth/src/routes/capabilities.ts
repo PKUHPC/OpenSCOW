@@ -7,9 +7,12 @@ const CapabilitiesSchema = Type.Object({
   validateName: Type.Boolean({ description: "是否可以验证用户名的密码" }),
 });
 
+export type Capabilities = Static<typeof CapabilitiesSchema>;
+
 const ResponsesSchema = Type.Object({
   200: CapabilitiesSchema,
 });
+
 
 export const getCapabilitiesRoute = fp(async (f) => {
   f.get<{

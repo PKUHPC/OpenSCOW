@@ -7,7 +7,7 @@
     "devapi": "cross-env NEXT_PUBLIC_USE_MOCK=0 next dev",
     "serve": "next start",
     "build": "pnpm prepareDev && npm run build:nogen",
-    "build:nogen": "cross-env BUILDING=1 next build",
+    "build:nogen": "next build",
     "prepareDev": "tsgrpc-cli protos && ntar schema",
     "protos": "tsgrpc-cli protos"
   },
@@ -47,7 +47,8 @@
     "simstate": "3.0.1",
     "styled-components": "5.3.5",
     "tslib": "2.4.0",
-    "typescript": "4.7.4"
+    "typescript": "4.7.4",
+    "@scow/lib-auth": "workspace:*"
   },
   "devDependencies": {
     "@ddadaal/next-typed-api-routes-cli": "0.5.1",

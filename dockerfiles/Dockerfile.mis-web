@@ -19,6 +19,7 @@ COPY tsconfig.json .eslintrc.json ./
 COPY protos ./protos
 
 COPY libs/config ./libs/config
+COPY libs/auth ./libs/auth
 COPY libs/decimal ./libs/decimal
 COPY apps/mis-web apps/mis-web
 
@@ -33,6 +34,11 @@ FROM node:gallium-alpine@sha256:554142f9a6367f1fbd776a1b2048fab3a2cc7aa477d7fe9c
 
 WORKDIR /app
 COPY --from=builder /app/node_modules ./node_modules
+
+WORKDIR /app/libs/auth
+COPY --from=builder /app/libs/auth/package.json .
+COPY --from=builder /app/libs/auth/node_modules/ ./node_modules
+COPY --from=builder /app/libs/auth/build/ ./build
 
 WORKDIR /app/libs/config
 COPY --from=builder /app/libs/config/package.json .

@@ -18,8 +18,6 @@ title: "mis-web"
 |`AUTH_EXTERNAL_URL`|字符串|认证服务外网地址|/auth|
 |`AUTH_INTERNAL_URL`|字符串|认证服务内网地址|http://auth:5000|
 |`PREDEFINED_CHARGING_TYPES`|字符串|预定义的充值类型，格式：类型,类型,类型||
-|`ENABLE_CREATE_USER`|布尔值|是否支持用户不存在的时候创建用户|false|
-|`ENABLE_CHANGE_PASSWORD`|布尔值|是否支持用户更改自己的密码|false|
 |`ACCOUNT_NAME_PATTERN`|正则表达式|账户名的正则规则|不设置|
 |`ACCOUNT_NAME_PATTERN_MESSAGE`|字符串|创建账户名时如果账户名不符合规则显示什么。如果ACCOUNT_NAME_PATTERN没有设置，这个不生效|不设置|
 |`DEFAULT_FOOTER_TEXT`|字符串|默认footer文本||
