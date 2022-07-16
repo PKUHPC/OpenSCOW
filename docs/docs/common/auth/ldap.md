@@ -1,5 +1,5 @@
 ---
-sidebar_position: 1
+sidebar_position: 2
 title: LDAP 
 ---
 
@@ -7,7 +7,16 @@ title: LDAP
 
 本节介绍采用LDAP进行用户认证的认证系统。如果您的系统采用其他认证方式，您可以参考文档中的其他认证方式，或者查看[自定义认证](./custom.md)文档以自己实现符合自己需求的认证方式。
 
-## LDAP各个操作流程
+LDAP认证系统支持的功能如下表：
+
+| 功能             | 是否支持 |
+| ---------------- | -------- |
+| 用户登录         | 是       |
+| 用户创建         | 是       |
+| 用户名和姓名验证 | 是       |
+| 修改密码         | 是       |
+
+## LDAP认证流程
 
 为了更好的理解并配置LDAP认证系统，本节将介绍各个操作时，LDAP认证系统所进行的操作。下文中，全大写的代码块（如`LDAP_BIND_DN`为可配置的环境变量。请确认您的LDAP配置兼容这里所称的流程。
 
@@ -83,7 +92,8 @@ LDAP认证系统将认证信息存放在redis中，所以在部署认证系统�
     image: %CR_URL%/auth
     restart: unless-stopped
     environment:
-      # TODO 增加配置
+      AUTH_TYPE: ssh
+      # TODO 增加其他配置
 ```
 
 增加好配置后，运行`docker compose up -d`启动认证系统。
@@ -100,6 +110,7 @@ LDAP认证系统将认证信息存放在redis中，所以在部署认证系统�
 如果您使用provider.sh脚本配置您的服务器，您的LDAP相关配置为如下。其中`{变量}`替换为provider.sh中的对应变量值。
 
 ```yaml
+      AUTH_TYPE: ldap
       LDAP_URL: ldap://LDAP服务器地址
       LDAP_BIND_DN: cn=Manager,ou={ou},o={dn}
       LDAP_BIND_PASSWORD: {adminPasswd}
