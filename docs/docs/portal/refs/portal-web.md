@@ -14,7 +14,6 @@ title: "portal-web"
 | -- | -- | -- | -- |
 |`AUTH_EXTERNAL_URL`|字符串|认证服务外网地址|/auth|
 |`AUTH_INTERNAL_URL`|字符串|认证服务内网地址|http://auth:5000|
-|`ENABLE_CHANGE_PASSWORD`|布尔值|是否支持用户更改自己的密码|false|
 |`ENABLE_JOB_MANAGEMENT`|布尔值|是否启动作业管理功能|false|
 |`JOB_SERVER`|字符串|作业服务器的地址|job-server:5000|
 |`ENABLE_LOGIN_DESKTOP`|布尔值|是否启动登录节点上的桌面功能|false|
@@ -33,6 +32,8 @@ title: "portal-web"
 |`SSH_PRIVATE_KEY_PATH`|字符串|SSH私钥路径|~/.ssh/id_rsa|
 |`SUBMIT_JOB_DEFAULT_PWD`|字符串|提交作业的默认工作目录。使用{name}代替作业名称。相对于用户的家目录|scow/jobs/{name}|
 |`PROXY_BASE_PATH`|字符串|代理地址的根路径|/proxy|
+|`FILE_SERVERS`|字符串|覆盖集群的文件管理服务器地址。如果一个集群不设置，将会使用集群配置文件中的loginNode<br/>示例：集群ID=IP,集群ID=IP||
+|`MOCK_USER_ID`|字符串|覆盖已登录用户的用户ID|不设置|
 
 <!-- ENV TABLE END -->
 
