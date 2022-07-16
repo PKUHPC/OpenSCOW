@@ -58,7 +58,7 @@ importers:
       pino-pretty: 8.1.0
       pkg: 5.8.0
       rimraf: 3.0.2
-      ts-jest: 28.0.5_lt5llx2ti6zt4eclhanfli5ynu
+      ts-jest: 28.0.5_d7p7jfykgzko2wul3x4xic5voa
       ts-node: 10.8.2_qqrtuuv3y2pz7xoxv47yka6pmi
       tsc-alias: 1.6.11
       tsconfig-paths: 4.0.0
@@ -80,6 +80,7 @@ importers:
       ioredis: 5.2.0
       ldapjs: 2.3.3
       nanoid: 4.0.0
+      node-ssh: 12.0.4
     dependencies:
       '@fastify/error': 3.0.0
       '@fastify/formbody': 7.0.1
@@ -93,6 +94,7 @@ importers:
       ioredis: 5.2.0
       ldapjs: 2.3.3
       nanoid: 4.0.0
+      node-ssh: 12.0.4
     devDependencies:
       '@types/asn1': 0.2.0
       '@types/ldapjs': 2.2.3
@@ -218,6 +220,7 @@ importers:
       '@newhighsco/next-plugin-svgr': 3.0.53
       '@next/bundle-analyzer': 12.2.2
       '@scow/config': workspace:*
+      '@scow/lib-auth': workspace:*
       '@scow/lib-decimal': workspace:*
       '@sinclair/typebox': 0.24.19
       '@types/google-protobuf': 3.15.6
@@ -265,6 +268,7 @@ importers:
       '@grpc/grpc-js': 1.6.7
       '@newhighsco/next-plugin-svgr': 3.0.53_next@12.2.2+webpack@5.73.0
       '@scow/config': link:../../libs/config
+      '@scow/lib-auth': link:../../libs/auth
       '@scow/lib-decimal': link:../../libs/decimal
       '@sinclair/typebox': 0.24.19
       antd: 4.21.6_biqbaboplfbrettd7655fr4n2y
@@ -273,7 +277,7 @@ importers:
       less: 4.1.3
       mime-types: 2.1.35
       moment: 2.29.4
-      next: 12.2.2_biqbaboplfbrettd7655fr4n2y
+      next: 12.2.2_beenoklgwfttvph5dgxj7na7aq
       next-compose-plugins: 2.2.1
       next-transpile-modules: 9.0.0
       nookies: 2.5.2
@@ -320,6 +324,7 @@ importers:
       '@newhighsco/next-plugin-svgr': 3.0.53
       '@next/bundle-analyzer': 12.2.2
       '@scow/config': workspace:*
+      '@scow/lib-auth': workspace:*
       '@scow/lib-decimal': workspace:*
       '@sinclair/typebox': 0.24.19
       '@testing-library/jest-dom': 5.16.4
@@ -381,6 +386,7 @@ importers:
       '@grpc/grpc-js': 1.6.7
       '@newhighsco/next-plugin-svgr': 3.0.53_next@12.2.2+webpack@5.73.0
       '@scow/config': link:../../libs/config
+      '@scow/lib-auth': link:../../libs/auth
       '@scow/lib-decimal': link:../../libs/decimal
       '@sinclair/typebox': 0.24.19
       antd: 4.21.6_biqbaboplfbrettd7655fr4n2y
@@ -391,7 +397,7 @@ importers:
       less: 4.1.3
       mime-types: 2.1.35
       moment: 2.29.4
-      next: 12.2.2_biqbaboplfbrettd7655fr4n2y
+      next: 12.2.2_beenoklgwfttvph5dgxj7na7aq
       next-compose-plugins: 2.2.1
       next-transpile-modules: 9.0.0
       node-pty: 0.10.1
@@ -448,7 +454,7 @@ importers:
       react-dom: 17.0.2
       typescript: 4.7.4
     dependencies:
-      '@docusaurus/core': 2.0.0-beta.22_3tgeifm2vmwrlpqlopppsnjtcu
+      '@docusaurus/core': 2.0.0-beta.22_2sf4ol7rvvmc2c63y5qapplkim
       '@docusaurus/preset-classic': 2.0.0-beta.22_7h2hkkgrkeo7pw3ddidwsqad4y
       '@mdx-js/react': 1.6.22_react@17.0.2
       clsx: 1.2.1
@@ -2398,7 +2404,7 @@ packages:
       ajv-formats: 2.1.1
       ajv-formats-draft2019: 1.6.1_ajv@8.11.0
       fast-json-stringify: 4.1.0
-      next: 12.2.2_biqbaboplfbrettd7655fr4n2y
+      next: 12.2.2_beenoklgwfttvph5dgxj7na7aq
       tslib: 2.4.0
     dev: false
 
@@ -2555,104 +2561,6 @@ packages:
       - webpack-cli
     dev: false
 
-  /@docusaurus/core/2.0.0-beta.22_3tgeifm2vmwrlpqlopppsnjtcu:
-    resolution: {integrity: sha512-8KU56anfNo6V6crZG+K/zPKvyAAosZcWfkeNYWu14BzigRbBirJf7ZLRkkLa1NgDdJt3EEBgg+Iv8olPMC1uog==}
-    engines: {node: '>=16.14'}
-    hasBin: true
-    peerDependencies:
-      react: ^16.8.4 || ^17.0.0
-      react-dom: ^16.8.4 || ^17.0.0
-    dependencies:
-      '@babel/core': 7.18.6
-      '@babel/generator': 7.18.7
-      '@babel/plugin-syntax-dynamic-import': 7.8.3_@babel+core@7.18.6
-      '@babel/plugin-transform-runtime': 7.18.6_@babel+core@7.18.6
-      '@babel/preset-env': 7.18.6_@babel+core@7.18.6
-      '@babel/preset-react': 7.18.6_@babel+core@7.18.6
-      '@babel/preset-typescript': 7.18.6_@babel+core@7.18.6
-      '@babel/runtime': 7.18.6
-      '@babel/runtime-corejs3': 7.18.6
-      '@babel/traverse': 7.18.6
-      '@docusaurus/cssnano-preset': 2.0.0-beta.22
-      '@docusaurus/logger': 2.0.0-beta.22
-      '@docusaurus/mdx-loader': 2.0.0-beta.22_sfoxds7t5ydpegc3knd667wn6m
-      '@docusaurus/react-loadable': 5.5.2_react@17.0.2
-      '@docusaurus/utils': 2.0.0-beta.22
-      '@docusaurus/utils-common': 2.0.0-beta.22
-      '@docusaurus/utils-validation': 2.0.0-beta.22
-      '@slorber/static-site-generator-webpack-plugin': 4.0.7
-      '@svgr/webpack': 6.2.1
-      autoprefixer: 10.4.7_postcss@8.4.14
-      babel-loader: 8.2.5_fswvdo7jykdwhfxrdcvghfn6pa
-      babel-plugin-dynamic-import-node: 2.3.3
-      boxen: 6.2.1
-      chalk: 4.1.2
-      chokidar: 3.5.3
-      clean-css: 5.3.0
-      cli-table3: 0.6.2
-      combine-promises: 1.1.0
-      commander: 5.1.0
-      copy-webpack-plugin: 11.0.0_webpack@5.73.0
-      core-js: 3.23.3
-      css-loader: 6.7.1_webpack@5.73.0
-      css-minimizer-webpack-plugin: 4.0.0_ym7haxui4mhsv4z74sxfalk3f4
-      cssnano: 5.1.12_postcss@8.4.14
-      del: 6.1.1
-      detect-port: 1.3.0
-      escape-html: 1.0.3
-      eta: 1.12.3
-      file-loader: 6.2.0_webpack@5.73.0
-      fs-extra: 10.1.0
-      html-minifier-terser: 6.1.0
-      html-tags: 3.2.0
-      html-webpack-plugin: 5.5.0_webpack@5.73.0
-      import-fresh: 3.3.0
-      leven: 3.1.0
-      lodash: 4.17.21
-      mini-css-extract-plugin: 2.6.1_webpack@5.73.0
-      postcss: 8.4.14
-      postcss-loader: 7.0.0_mepnsno3xmng6eyses4tepu7bu
-      prompts: 2.4.2
-      react: 17.0.2
-      react-dev-utils: 12.0.1_3o2jfq6vfqxns3sz6wn2nnc3ei
-      react-dom: 17.0.2_react@17.0.2
-      react-helmet-async: 1.3.0_sfoxds7t5ydpegc3knd667wn6m
-      react-loadable: /@docusaurus/react-loadable/5.5.2_react@17.0.2
-      react-loadable-ssr-addon-v5-slorber: 1.0.1_pobh4rnr4unizsdzh3gmmsgqtu
-      react-router: 5.3.3_react@17.0.2
-      react-router-config: 5.1.1_oyuskl3t7voyrff2xstzuy4hqu
-      react-router-dom: 5.3.3_react@17.0.2
-      rtl-detect: 1.0.4
-      semver: 7.3.7
-      serve-handler: 6.1.3
-      shelljs: 0.8.5
-      terser-webpack-plugin: 5.3.3_webpack@5.73.0
-      tslib: 2.4.0
-      update-notifier: 5.1.0
-      url-loader: 4.1.1_ljnyroaqobwke7fusd7ro2cgzm
-      wait-on: 6.0.1
-      webpack: 5.73.0
-      webpack-bundle-analyzer: 4.5.0
-      webpack-dev-server: 4.9.3_webpack@5.73.0
-      webpack-merge: 5.8.0
-      webpackbar: 5.0.2_webpack@5.73.0
-    transitivePeerDependencies:
-      - '@docusaurus/types'
-      - '@parcel/css'
-      - '@swc/core'
-      - bufferutil
-      - csso
-      - debug
-      - esbuild
-      - eslint
-      - supports-color
-      - typescript
-      - uglify-js
-      - utf-8-validate
-      - vue-template-compiler
-      - webpack-cli
-    dev: false
-
   /@docusaurus/cssnano-preset/2.0.0-beta.22:
     resolution: {integrity: sha512-ewImLASzPD2dRQLhNdBA5AyckkPDqZPMMrQiuDpe4BgfbjROJWLjVzjMbQRdrB2UQPwm9HyE6/+gP55KNISKvQ==}
     engines: {node: '>=16.14'}
@@ -2682,41 +2590,6 @@ packages:
       '@babel/traverse': 7.18.6
       '@docusaurus/logger': 2.0.0-beta.22
       '@docusaurus/utils': 2.0.0-beta.22_gtcehwitjgo6gytchlcqrr4fme
-      '@mdx-js/mdx': 1.6.22
-      escape-html: 1.0.3
-      file-loader: 6.2.0_webpack@5.73.0
-      fs-extra: 10.1.0
-      image-size: 1.0.1
-      mdast-util-to-string: 2.0.0
-      react: 17.0.2
-      react-dom: 17.0.2_react@17.0.2
-      remark-emoji: 2.2.0
-      stringify-object: 3.3.0
-      tslib: 2.4.0
-      unified: 9.2.2
-      unist-util-visit: 2.0.3
-      url-loader: 4.1.1_ljnyroaqobwke7fusd7ro2cgzm
-      webpack: 5.73.0
-    transitivePeerDependencies:
-      - '@docusaurus/types'
-      - '@swc/core'
-      - esbuild
-      - supports-color
-      - uglify-js
-      - webpack-cli
-    dev: false
-
-  /@docusaurus/mdx-loader/2.0.0-beta.22_sfoxds7t5ydpegc3knd667wn6m:
-    resolution: {integrity: sha512-kJT3zsHQTfMFSHlNohw0C4VJjKC2cox6navbMRJM4mZUm+wj0YDE2/WAcwYB8abM1AZkgJvAMZnxynq6vUZxhw==}
-    engines: {node: '>=16.14'}
-    peerDependencies:
-      react: ^16.8.4 || ^17.0.0
-      react-dom: ^16.8.4 || ^17.0.0
-    dependencies:
-      '@babel/parser': 7.18.6
-      '@babel/traverse': 7.18.6
-      '@docusaurus/logger': 2.0.0-beta.22
-      '@docusaurus/utils': 2.0.0-beta.22
       '@mdx-js/mdx': 1.6.22
       escape-html: 1.0.3
       file-loader: 6.2.0_webpack@5.73.0
@@ -3216,18 +3089,6 @@ packages:
       - uglify-js
       - webpack-cli
 
-  /@docusaurus/utils-common/2.0.0-beta.22:
-    resolution: {integrity: sha512-yQM1wPUUqoDCJy0cOFWtUsqxY3utL0E14T4NDtCcdc2Einsl1mamKIaBVpt9SMZugMVXbc/z4IQK8YC81CuXEw==}
-    engines: {node: '>=16.14'}
-    peerDependencies:
-      '@docusaurus/types': '*'
-    peerDependenciesMeta:
-      '@docusaurus/types':
-        optional: true
-    dependencies:
-      tslib: 2.4.0
-    dev: false
-
   /@docusaurus/utils-common/2.0.0-beta.22_gtcehwitjgo6gytchlcqrr4fme:
     resolution: {integrity: sha512-yQM1wPUUqoDCJy0cOFWtUsqxY3utL0E14T4NDtCcdc2Einsl1mamKIaBVpt9SMZugMVXbc/z4IQK8YC81CuXEw==}
     engines: {node: '>=16.14'}
@@ -3241,24 +3102,6 @@ packages:
       tslib: 2.4.0
     dev: false
 
-  /@docusaurus/utils-validation/2.0.0-beta.22:
-    resolution: {integrity: sha512-sW2jrYvhvkh8PjjZzWFyqGs7tlls3F2FgOOj79T9rGj8y+b4a6sRjl8+QgXITjypcQWssCg0wqf6xSXD+LSD/Q==}
-    engines: {node: '>=16.14'}
-    dependencies:
-      '@docusaurus/logger': 2.0.0-beta.22
-      '@docusaurus/utils': 2.0.0-beta.22
-      joi: 17.6.0
-      js-yaml: 4.1.0
-      tslib: 2.4.0
-    transitivePeerDependencies:
-      - '@docusaurus/types'
-      - '@swc/core'
-      - esbuild
-      - supports-color
-      - uglify-js
-      - webpack-cli
-    dev: false
-
   /@docusaurus/utils-validation/2.0.0-beta.22_gtcehwitjgo6gytchlcqrr4fme:
     resolution: {integrity: sha512-sW2jrYvhvkh8PjjZzWFyqGs7tlls3F2FgOOj79T9rGj8y+b4a6sRjl8+QgXITjypcQWssCg0wqf6xSXD+LSD/Q==}
     engines: {node: '>=16.14'}
@@ -3270,38 +3113,6 @@ packages:
       tslib: 2.4.0
     transitivePeerDependencies:
       - '@docusaurus/types'
-      - '@swc/core'
-      - esbuild
-      - supports-color
-      - uglify-js
-      - webpack-cli
-    dev: false
-
-  /@docusaurus/utils/2.0.0-beta.22:
-    resolution: {integrity: sha512-ZwtfJl9n+dMBrdIl1DX9DyO9odMV6+1yqbJkdPrfNSLd17fYZK7HGcwQOem7QIEcJjnroUGrsQoKW8Svg3dQJg==}
-    engines: {node: '>=16.14'}
-    peerDependencies:
-      '@docusaurus/types': '*'
-    peerDependenciesMeta:
-      '@docusaurus/types':
-        optional: true
-    dependencies:
-      '@docusaurus/logger': 2.0.0-beta.22
-      '@svgr/webpack': 6.2.1
-      file-loader: 6.2.0_webpack@5.73.0
-      fs-extra: 10.1.0
-      github-slugger: 1.4.0
-      globby: 11.1.0
-      gray-matter: 4.0.3
-      js-yaml: 4.1.0
-      lodash: 4.17.21
-      micromatch: 4.0.5
-      resolve-pathname: 3.0.0
-      shelljs: 0.8.5
-      tslib: 2.4.0
-      url-loader: 4.1.1_ljnyroaqobwke7fusd7ro2cgzm
-      webpack: 5.73.0
-    transitivePeerDependencies:
       - '@swc/core'
       - esbuild
       - supports-color
@@ -4135,7 +3946,7 @@ packages:
     dependencies:
       '@svgr/webpack': 6.2.1
       file-loader: 6.2.0_webpack@5.73.0
-      next: 12.2.2_biqbaboplfbrettd7655fr4n2y
+      next: 12.2.2_beenoklgwfttvph5dgxj7na7aq
       url-loader: 4.1.1_ljnyroaqobwke7fusd7ro2cgzm
     transitivePeerDependencies:
       - supports-color
@@ -11143,7 +10954,7 @@ packages:
       escalade: 3.1.1
     dev: false
 
-  /next/12.2.2_biqbaboplfbrettd7655fr4n2y:
+  /next/12.2.2_beenoklgwfttvph5dgxj7na7aq:
     resolution: {integrity: sha512-zAYFY45aBry/PlKONqtlloRFqU/We3zWYdn2NoGvDZkoYUYQSJC8WMcalS5C19MxbCZLUVCX7D7a6gTGgl2yLg==}
     engines: {node: '>=12.22.0'}
     hasBin: true
@@ -11167,7 +10978,7 @@ packages:
       postcss: 8.4.5
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
-      styled-jsx: 5.0.2_react@18.2.0
+      styled-jsx: 5.0.2_2sb3a56iojvze2npkgcccbebf4
       use-sync-external-store: 1.1.0_react@18.2.0
     optionalDependencies:
       '@next/swc-android-arm-eabi': 12.2.2
@@ -14562,7 +14373,7 @@ packages:
       supports-color: 5.5.0
     dev: false
 
-  /styled-jsx/5.0.2_react@18.2.0:
+  /styled-jsx/5.0.2_2sb3a56iojvze2npkgcccbebf4:
     resolution: {integrity: sha512-LqPQrbBh3egD57NBcHET4qcgshPks+yblyhPlH2GY8oaDgKs8SK4C3dBh3oSJjgzJ3G5t1SYEZGHkP+QEpX9EQ==}
     engines: {node: '>= 12.0.0'}
     peerDependencies:
@@ -14575,6 +14386,7 @@ packages:
       babel-plugin-macros:
         optional: true
     dependencies:
+      '@babel/core': 7.18.6
       react: 18.2.0
     dev: false
 
@@ -14888,7 +14700,7 @@ packages:
     resolution: {integrity: sha512-rvuRbTarPXmMb79SmzEp8aqXNKcK+y0XaB298IXueQ8I2PsrATcPBCSPyK/dDNa2iWOhKlfNnOjdAOTBU/nkFA==}
     dev: false
 
-  /ts-jest/28.0.5_lt5llx2ti6zt4eclhanfli5ynu:
+  /ts-jest/28.0.5_d7p7jfykgzko2wul3x4xic5voa:
     resolution: {integrity: sha512-Sx9FyP9pCY7pUzQpy4FgRZf2bhHY3za576HMKJFs+OnQ9jS96Du5vNsDKkyedQkik+sEabbKAnCliv9BEsHZgQ==}
     engines: {node: ^12.13.0 || ^14.15.0 || ^16.10.0 || >=17.0.0}
     hasBin: true
@@ -14906,6 +14718,7 @@ packages:
       esbuild:
         optional: true
     dependencies:
+      '@babel/core': 7.18.6
       bs-logger: 0.2.6
       fast-json-stable-stringify: 2.1.0
       jest: 28.1.2_hxaxlvfys2pc3hefxwkmyo5cpq

@@ -3,50 +3,57 @@ import { FastifyInstance } from "fastify";
 import ldapjs from "ldapjs";
 import { AuthProvider } from "src/auth/AuthProvider";
 import { extractUserInfoFromEntry, findUser, searchOne, useLdap } from "src/auth/ldap/helpers";
-import { serveLoginHtml } from "src/auth/ldap/loginHtml";
 import { modifyPassword, modifyPasswordAsSelf } from "src/auth/ldap/password";
 import { registerPostHandler } from "src/auth/ldap/postHandler";
+import { serveLoginHtml } from "src/auth/loginHtml";
 import { config } from "src/config/env";
+import { ensureNotUndefined } from "src/utils/validations";
 import { promisify } from "util";
 
 const addAttributes = parseKeyValue(config.LDAP_ADD_ATTRS);
 
 export const createLdapAuthProvider = (f: FastifyInstance) => {
 
+  ensureNotUndefined(config, [
+    "LDAP_URL", "LDAP_SEARCH_BASE", "LDAP_FILTER", "LDAP_ADD_USER_BASE", "LDAP_ADD_GROUP_BASE",
+    "LDAP_ATTR_GROUP_USER_ID", "LDAP_ATTR_UID",
+  ]);
+
   registerPostHandler(f);
 
   return <AuthProvider>{
     serveLoginHtml: (callbackUrl, req, rep) => serveLoginHtml(false, callbackUrl, req, rep),
     fetchAuthTokenInfo: async () => undefined,
-    validateName: async (identityId, name, req) => {
+    validateName: config.LDAP_ATTR_NAME
+      ? async (identityId, name, req) => {
       // Use LDAP to query a user with identityId and name
-      return useLdap(req.log)(async (client) => {
-        const user = await searchOne(req.log, client, config.LDAP_SEARCH_BASE,
-          {
-            scope: "sub",
-            filter: new ldapjs.AndFilter({
-              filters: [
-                ldapjs.parseFilter(config.LDAP_FILTER),
-                new ldapjs.EqualityFilter({
-                  attribute: config.LDAP_ATTR_UID,
-                  value: identityId,
-                }),
-              ],
-            }),
-          }, extractUserInfoFromEntry,
-        );
+        return useLdap(req.log)(async (client) => {
+          const user = await searchOne(req.log, client, config.LDAP_SEARCH_BASE,
+            {
+              scope: "sub",
+              filter: new ldapjs.AndFilter({
+                filters: [
+                  ldapjs.parseFilter(config.LDAP_FILTER),
+                  new ldapjs.EqualityFilter({
+                    attribute: config.LDAP_ATTR_UID,
+                    value: identityId,
+                  }),
+                ],
+              }),
+            }, extractUserInfoFromEntry,
+          );
 
-        if (!user) {
-          return "NotFound";
-        }
+          if (!user) {
+            return "NotFound";
+          }
 
-        if (user.name !== name) {
-          return "NotMatch";
-        }
+          if (user.name !== name) {
+            return "NotMatch";
+          }
 
-        return "Match";
-      });
-    },
+          return "Match";
+        });
+      } : undefined,
     createUser: async (info, req) => {
       const id = info.id + config.LDAP_ADD_UID_START;
 
@@ -54,7 +61,6 @@ export const createLdapAuthProvider = (f: FastifyInstance) => {
         const peopleDn = `${config.LDAP_ATTR_UID}=${info.identityId},${config.LDAP_ADD_USER_BASE}`;
         const peopleEntry: Record<string, string | string[] | number> = {
           [config.LDAP_ATTR_UID]: info.identityId,
-          [config.LDAP_ATTR_NAME]: info.name,
           sn: info.identityId,
           loginShell: "/bin/bash",
           objectClass: ["inetOrgPerson", "posixAccount", "shadowAccount"],
@@ -62,6 +68,10 @@ export const createLdapAuthProvider = (f: FastifyInstance) => {
           uidNumber: id,
           gidNumber: id,
         };
+
+        if (config.LDAP_ATTR_NAME) {
+          peopleEntry[config.LDAP_ATTR_NAME] = info.name;
+        }
 
         if (config.LDAP_ATTR_MAIL) {
           peopleEntry[config.LDAP_ATTR_MAIL] = info.mail;

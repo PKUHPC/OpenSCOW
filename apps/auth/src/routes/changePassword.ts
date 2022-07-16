@@ -17,7 +17,6 @@ const ResponsesSchema = Type.Object({
 
 const codes: Record<ChangePasswordResult, number> = {
   NotFound: 404,
-  NotImplemented: 501,
   OK: 204,
   WrongOldPassword: 412,
 };
@@ -38,6 +37,10 @@ export const changePasswordRoute = fp(async (f) => {
       },
     },
     async (req, rep) => {
+
+      if (!f.auth.changePassword) {
+        return await rep.code(501).send(null);
+      }
 
       const { identityId, newPassword, oldPassword } =  req.body;
 

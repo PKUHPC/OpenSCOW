@@ -1,6 +1,8 @@
 import fp from "fastify-plugin";
 import { AuthProvider } from "src/auth/AuthProvider";
 import { createLdapAuthProvider } from "src/auth/ldap";
+import { createSshAuthProvider } from "src/auth/ssh";
+import { config } from "src/config/env";
 
 declare module "fastify" {
   interface FastifyInstance {
@@ -8,8 +10,16 @@ declare module "fastify" {
   }
 }
 
+const providers = {
+  "ldap": createLdapAuthProvider,
+  "ssh": createSshAuthProvider,
+} as const;
 
 export const authPlugin = fp(async (f) => {
 
-  f.decorate("auth", createLdapAuthProvider(f));
+  const provider = providers[config.AUTH_TYPE];
+
+  if (!provider) { throw new Error("Unknown auth type " + config.AUTH_TYPE);}
+
+  f.decorate("auth", provider(f));
 });

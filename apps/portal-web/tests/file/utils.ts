@@ -8,7 +8,7 @@ import { sftpWriteFile } from "src/utils/sftp";
 import { sshRawConnect, sshRmrf } from "src/utils/ssh";
 import { SFTPWrapper } from "ssh2";
 
-const target = "localhost:2222";
+const target = "localhost:22222";
 const user = "test";
 export const CLUSTER = "hpc01";
 export const TEST_COOKIE = { [TOKEN_KEY]: "123" };

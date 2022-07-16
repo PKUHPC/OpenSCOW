@@ -22,7 +22,6 @@ const ResponsesSchema = Type.Object({
 });
 
 const codes: Record<CreateUserResult, number> = {
-  NotImplemented: 501,
   AlreadyExists: 409,
   OK: 204,
 };
@@ -43,6 +42,9 @@ export const createUserRoute = fp(async (f) => {
       },
     },
     async (req, rep) => {
+      if (!f.auth.createUser) {
+        return await rep.code(501).send(null);
+      }
 
       const { ...rest } =  req.body;
 

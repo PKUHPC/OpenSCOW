@@ -1,7 +1,6 @@
 import createError from "@fastify/error";
 import { omitConfigSpec } from "@scow/config";
 import fastify, { FastifyInstance, FastifyPluginAsync, FastifyPluginCallback } from "fastify";
-import gracefulShutdown from "fastify-graceful-shutdown";
 import { config } from "src/config/env";
 import { plugins } from "src/plugins";
 import { routes }  from "src/routes";
@@ -40,9 +39,6 @@ export function buildApp(pluginOverrides?: PluginOverrides) {
   server.log.info({ config: omitConfigSpec(config) }, "Loaded config");
 
   applyPlugins(server, pluginOverrides);
-
-  gracefulShutdown[Symbol.for("plugin-meta")].fastify = ">=3.0.0";
-  server.register(gracefulShutdown);
 
   routes.forEach((r) => server.register(r));
 
