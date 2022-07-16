@@ -1,7 +1,3 @@
+declare let __NEXT_RUNTIME_CONFIG__;
 
-import { buildRuntimeConfig } from "../../config";
-
-export default () => ({
-  serverRuntimeConfig,
-  publicRuntimeConfig,
-});
+export default () => __NEXT_RUNTIME_CONFIG__;

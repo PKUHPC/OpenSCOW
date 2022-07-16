@@ -4,7 +4,7 @@ const { envConfig, str, bool, parseKeyValue } = require("@scow/config");
 const { join, basename, extname } = require("path");
 const { homedir } = require("os");
 const fs = require("fs");
-const { PHASE_DEVELOPMENT_SERVER, PHASE_PRODUCTION_BUILD, PHASE_PRODUCTION_SERVER } = require("next/constants");
+const { PHASE_DEVELOPMENT_SERVER, PHASE_PRODUCTION_BUILD, PHASE_PRODUCTION_SERVER, PHASE_TEST } = require("next/constants");
 
 const { getCapabilities } = require("@scow/lib-auth");
 
@@ -68,6 +68,7 @@ const buildRuntimeConfig = async (phase) => {
   const building = phase === PHASE_PRODUCTION_BUILD;
   const dev = phase === PHASE_DEVELOPMENT_SERVER;
   const production = phase === PHASE_PRODUCTION_SERVER;
+  const test = phase === PHASE_TEST;
 
   // load .env.build if in build
   if (building) {
