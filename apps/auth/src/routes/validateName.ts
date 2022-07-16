@@ -29,6 +29,9 @@ export const validateNameRoute = fp(async (f) => {
       },
     },
     async (req, rep) => {
+      if (!f.auth.validateName) {
+        return await rep.code(501).send(null);
+      }
 
       const { identityId, name } = req.query;
 

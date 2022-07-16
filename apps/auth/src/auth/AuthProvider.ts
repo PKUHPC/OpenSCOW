@@ -11,14 +11,14 @@ export interface CreateUserInfo {
 }
 
 export type ValidateNameResult = "NotFound" | "Match" | "NotMatch";
-export type CreateUserResult = "NotImplemented" | "AlreadyExists" | "OK";
-export type ChangePasswordResult = "NotImplemented" | "NotFound" | "WrongOldPassword" | "OK";
+export type CreateUserResult = "AlreadyExists" | "OK";
+export type ChangePasswordResult = "NotFound" | "WrongOldPassword" | "OK";
 
 export interface AuthProvider {
   serveLoginHtml: (callbackUrl: string, req: FastifyRequest, rep: FastifyReply) => Promise<void>;
   fetchAuthTokenInfo: (token: string, req: FastifyRequest) => Promise<string | undefined>;
-  validateName: (identityId: string, name: string, req: FastifyRequest) => Promise<ValidateNameResult>;
-  createUser: (info: CreateUserInfo, req: FastifyRequest) => Promise<CreateUserResult>;
-  changePassword: (id: string, oldPassword: string, newPassword: string,
-    req: FastifyRequest) => Promise<ChangePasswordResult>;
+  validateName: undefined | ((identityId: string, name: string, req: FastifyRequest) => Promise<ValidateNameResult>);
+  createUser: undefined | ((info: CreateUserInfo, req: FastifyRequest) => Promise<CreateUserResult>);
+  changePassword: undefined | ((id: string, oldPassword: string, newPassword: string,
+    req: FastifyRequest) => Promise<ChangePasswordResult>);
 }

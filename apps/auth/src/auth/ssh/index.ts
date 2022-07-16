@@ -10,9 +10,9 @@ export const createSshAuthProvider = (f: FastifyInstance) => {
   return <AuthProvider>{
     serveLoginHtml: (callbackUrl, req, rep) => serveLoginHtml(false, callbackUrl, req, rep),
     fetchAuthTokenInfo: async () => undefined,
-    validateName: async () => "Match",
-    createUser: async () => "NotImplemented",
-    changePassword: async () => "NotImplemented",
+    validateName: undefined,
+    createUser: undefined,
+    changePassword: undefined,
   };
 
 };
