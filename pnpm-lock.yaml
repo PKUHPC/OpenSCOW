@@ -76,7 +76,7 @@ importers:
       asn1: 0.2.6
       fastify: 4.2.1
       fastify-graceful-shutdown: 3.2.0
-      fastify-plugin: 3.0.1
+      fastify-plugin: 4.0.0
       ioredis: 5.2.0
       ldapjs: 2.3.3
       nanoid: 4.0.0
@@ -89,7 +89,7 @@ importers:
       asn1: 0.2.6
       fastify: 4.2.1
       fastify-graceful-shutdown: 3.2.0
-      fastify-plugin: 3.0.1
+      fastify-plugin: 4.0.0
       ioredis: 5.2.0
       ldapjs: 2.3.3
       nanoid: 4.0.0
@@ -8231,6 +8231,10 @@ packages:
 
   /fastify-plugin/3.0.1:
     resolution: {integrity: sha512-qKcDXmuZadJqdTm6vlCqioEbyewF60b/0LOFCcYN1B6BIZGlYJumWWOYs70SFYLDAH4YqdE1cxH/RKMG7rFxgA==}
+    dev: false
+
+  /fastify-plugin/4.0.0:
+    resolution: {integrity: sha512-ZJcXPPcqkj7HFDYqbsCuOIAgIZ/sd2b+OnBxNGyxAcUDUJfIpxp4t23CwxO2E7LZpqUrIliA4TnjxTXG8mLoqw==}
     dev: false
 
   /fastify/4.2.1:
