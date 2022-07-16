@@ -11,6 +11,7 @@ const ResponsesSchema = Type.Object({
     result: Type.Boolean({ description: "验证结果，ID和名字是否匹配" }),
   }),
   404: Type.Null({ description: "用户ID不存在" }),
+  501: Type.Null({ description: "此功能在当前服务器配置下不可用" }),
 });
 
 /**

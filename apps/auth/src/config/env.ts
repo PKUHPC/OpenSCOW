@@ -34,9 +34,9 @@ export const config = envConfig({
   LDAP_ATTR_GROUP_USER_ID: str({ desc: "LDAP中用户对应的组的实体表示用户ID的属性名。认证类型为LDAP必填", default: undefined }),
   LDAP_ATTR_UID: str({ desc: "LDAP中对应用户的id的属性名。认证类型为ldap必填", default: undefined }),
   LDAP_ATTR_NAME: str({ desc: `
-    LDAP中对应用户的姓名的属性名。认证类型为LDAP必填
+    LDAP中对应用户的姓名的属性名。认证类型为LDAP可选填。
     此字段用于在创建用户的时候把姓名信息填入LDAP，以及验证ID和姓名是否匹配。
-    本系统返回的姓名总是以用户账户系统中保存的信息为准。
+    如果不填写，则系统将不会验证ID和姓名是否匹配，且不会再创建用户的时候把姓名信息填入LDAP。
   `, default: undefined }),
   LDAP_ATTR_MAIL: str({ desc: "LDAP中对应用户的邮箱的属性名。可不填。此字段只用于在创建用户的时候把邮件信息填入LDAP。", default: undefined }),
   LDAP_ADD_ATTRS: str({ desc: `
