@@ -28,7 +28,7 @@
     "@newhighsco/next-plugin-svgr": "3.0.53",
     "@scow/config": "workspace:*",
     "@scow/lib-decimal": "workspace:*",
-    "@sinclair/typebox": "0.24.19",
+    "@sinclair/typebox": "0.24.20",
     "antd": "4.21.6",
     "codemirror": "6.0.1",
     "google-protobuf": "3.20.1",
