@@ -1,20 +1,21 @@
 import { route } from "@ddadaal/next-typed-api-routes-runtime";
-import { asyncClientCall } from "@ddadaal/tsgrpc-utils";
 import { authenticate } from "src/auth/server";
-import { ListDesktopsReply, VncServiceClient  } from "src/generated/portal/vnc";
-import { getJobServerClient } from "src/utils/client";
 import { publicConfig } from "src/utils/config";
+import { dnsResolve } from "src/utils/dns";
+import { getClusterLoginNode, loggedExec, sshConnect } from "src/utils/ssh";
+import { parseListOutput, VNCSERVER_BIN_PATH } from "src/utils/turbovnc";
 
 export interface ListDesktopsSchema {
-  method: "POST";
+  method: "GET";
 
-  body: {
-    clusters: string[];
+  query: {
+    cluster: string;
   }
 
   responses: {
     200: {
-        result : ListDesktopsReply;
+      node: string;
+      displayId: number[];
     };
     // 功能没有启用
     501: null;
@@ -33,13 +34,26 @@ export default /* #__PURE__*/route<ListDesktopsSchema>("ListDesktopsSchema", asy
 
   if (!info) { return; }
 
-  const client = getJobServerClient(VncServiceClient);
+  const { cluster } = req.query;
 
-  return await asyncClientCall(client, "listDesktops", {
-    clusters: req.body.clusters,
-    username: info.identityId,
-  })
-    .then((result) => {
-      return { 200: { result } };
-    });
+  const host = getClusterLoginNode(cluster);
+  if (!host) { return { 400: { code: "INVALID_CLUSTER" } }; }
+
+  return await sshConnect(host, info.identityId, req.log, async (ssh) => {
+
+    // list all running session
+    const resp = await loggedExec(ssh, req.log, true,
+      VNCSERVER_BIN_PATH, ["-list"],
+    );
+
+    const ids = parseListOutput(resp.stdout);
+
+    return {
+      200: {
+        node: await dnsResolve(host),
+        displayId: ids,
+      },
+    };
+  });
+
 });

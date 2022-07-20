@@ -32,11 +32,11 @@ export const NewDesktopTableModal: React.FC<Props> = ({ visible, onClose, reload
     // Create new desktop
     await api.createDesktop({ body: { cluster: values.cluster.id, wm: values.wm } })
       .httpError(409, (e) => {
-        const { code, message:serverMessage } = e;
-        if (code === "RESOURCE_EXHAUSTED") {
+        const { code } = e;
+        if (code === "TOO_MANY_DESKTOPS") {
           Modal.error({
             title: "新建桌面失败",
-            content: `该集群桌面数目达到最大限制。已经创建了${serverMessage}个桌面，最多可创建${serverMessage}个桌面。`,
+            content: "该集群桌面数目达到最大限制",
           });
         } else {
           throw e;

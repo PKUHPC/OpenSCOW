@@ -1,9 +1,8 @@
 import { route } from "@ddadaal/next-typed-api-routes-runtime";
-import { asyncClientCall } from "@ddadaal/tsgrpc-utils";
 import { authenticate } from "src/auth/server";
-import { VncServiceClient } from "src/generated/portal/vnc";
-import { getJobServerClient } from "src/utils/client";
 import { publicConfig } from "src/utils/config";
+import { getClusterLoginNode, loggedExec, sshConnect } from "src/utils/ssh";
+import { VNCSERVER_BIN_PATH } from "src/utils/turbovnc";
 
 export interface KillDesktopSchema {
   method: "POST";
@@ -14,9 +13,7 @@ export interface KillDesktopSchema {
   }
 
   responses: {
-    200: {
-      message: string;
-    };
+    204: null;
     // 功能没有启用
     501: null;
   }
@@ -34,14 +31,18 @@ export default /* #__PURE__*/route<KillDesktopSchema>("KillDesktopSchema", async
 
   if (!info) { return; }
 
-  const client = getJobServerClient(VncServiceClient);
+  const { cluster, displayId } = req.body;
 
-  return await asyncClientCall(client, "killDesktop", {
-    cluster: req.body.cluster,
-    username: info.identityId,
-    displayId: req.body.displayId,
-  })
-    .then(() => {
-      return { 200: { message:"success" } };
-    });
+  const host = getClusterLoginNode(cluster);
+
+  if (!host) { return { 400: { code: "INVALID_CLUSTER" } }; }
+
+  return await sshConnect(host, info.identityId, req.log, async (ssh) => {
+
+    // kill specific desktop
+    await loggedExec(ssh, req.log, true, VNCSERVER_BIN_PATH, ["-kill", ":" + displayId]);
+
+    return { 204: null };
+  });
+
 });

@@ -1,6 +1,6 @@
 // @ts-check
 
-const { envConfig, str, bool, parseKeyValue } = require("@scow/config");
+const { envConfig, str, bool, parseKeyValue, num } = require("@scow/config");
 const { join, basename, extname } = require("path");
 const { homedir } = require("os");
 const fs = require("fs");
@@ -60,6 +60,13 @@ const specs = {
   FILE_SERVERS: str({ desc: "覆盖集群的文件管理服务器地址。如果一个集群不设置，将会使用集群配置文件中的loginNode", example: "集群ID=IP,集群ID=IP", default: "" }),
 
   MOCK_USER_ID: str({ desc: "覆盖已登录用户的用户ID", default: undefined }),
+
+  TURBOVNC_PATH: str({ desc: "TurboVNC的安装路径", default: "/opt/TurboVNC" }),
+
+  SAVED_JOBS_DIR: str({ desc: "将保存的作业保存到什么位置。相对于用户的家目录", default: "scow/savedJobs" }),
+  APP_JOBS_DIR: str({ desc: "将交互式任务的信息保存到什么位置。相对于用户的家目录", default: "scow/appData" }),
+
+  MAX_LOGIN_DESKTOPS: num({ desc: "最大登录节点桌面数量", default: 3 }),
 };
 
 const config = envConfig(specs, process.env);
@@ -128,6 +135,10 @@ const buildRuntimeConfig = async (phase) => {
     FILE_SERVERS: parseKeyValue(config.FILE_SERVERS),
     APPS: apps,
     MOCK_USER_ID: config.MOCK_USER_ID,
+    TURBOVNC_PATH: config.TURBOVNC_PATH,
+    MAX_LOGIN_DESKTOPS: config.MAX_LOGIN_DESKTOPS,
+    APP_JOBS_DIR: config.APP_JOBS_DIR,
+    SAVED_JOBS_DIR: config.SAVED_JOBS_DIR,
   };
 
   // query auth capabilities to set optional auth features

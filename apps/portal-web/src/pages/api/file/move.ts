@@ -33,7 +33,7 @@ export default route<MoveFileItemSchema>("MoveFileItemSchema", async (req, res) 
     return { 400: { code: "INVALID_CLUSTER" } };
   }
 
-  return await sshConnect(host, info.identityId, async (ssh) => {
+  return await sshConnect(host, info.identityId, req.log, async (ssh) => {
     const sftp = await ssh.requestSFTP();
 
     await sftpRename(sftp)(fromPath, toPath);

@@ -24,6 +24,13 @@ export interface ServerRuntimeConfig {
   APPS: App[];
 
   MOCK_USER_ID: string | undefined;
+
+  TURBOVNC_PATH: string;
+
+  MAX_LOGIN_DESKTOPS: number;
+  
+  SAVED_JOBS_DIR: string;
+  APP_JOBS_DIR: string;
 }
 
 
