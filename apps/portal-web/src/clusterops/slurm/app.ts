@@ -1,4 +1,3 @@
-import { ServiceError, status } from "@grpc/grpc-js";
 import { randomUUID } from "crypto";
 import fs from "fs";
 import { join } from "path";
@@ -66,11 +65,7 @@ export const slurmAppOps = (cluster: string): AppOps => {
           );
 
           if (code !== 0) {
-            throw <ServiceError> {
-              code: status.UNAVAILABLE,
-              message: "slurm job submission failed.",
-              details: stderr,
-            };
+            return { code: "SBATCH_FAILED", message: stderr } as const;
           }
 
           // parse stdout output to get the job id
@@ -85,7 +80,7 @@ export const slurmAppOps = (cluster: string): AppOps => {
           };
 
           await sftpWriteFile(sftp)(join(workingDirectory, SESSION_METADATA_NAME), JSON.stringify(metadata));
-          return metadata;
+          return { code: "OK", jobId, sessionId: metadata.sessionId } as const;
         };
 
         if (appConfig.type === "web") {
@@ -105,10 +100,7 @@ export const slurmAppOps = (cluster: string): AppOps => {
             nodeList: appConfig.nodes?.join(","),
           });
 
-          const metadata = await submitAndWriteMetadata(script, { SERVER_SESSION_INFO });
-
-          return { jobId: metadata.jobId, sessionId: metadata.sessionId };
-
+          return await submitAndWriteMetadata(script, { SERVER_SESSION_INFO });
         } else {
           const xstartupPath = join(workingDirectory, "xstartup");
           await sftpWriteFile(sftp)(xstartupPath, appConfig.xstartup);
@@ -128,8 +120,7 @@ export const slurmAppOps = (cluster: string): AppOps => {
             nodeList: appConfig.nodes?.join(","),
           });
 
-          const metadata = await submitAndWriteMetadata(script, { VNC_SESSION_INFO, VNCSERVER_BIN_PATH });
-          return { jobId: metadata.jobId, sessionId: metadata.sessionId };
+          return await submitAndWriteMetadata(script, { VNC_SESSION_INFO, VNCSERVER_BIN_PATH });
         }
 
       });
@@ -202,7 +193,7 @@ export const slurmAppOps = (cluster: string): AppOps => {
             jobId: sessionMetadata.jobId,
             appId: sessionMetadata.appId,
             sessionId: sessionMetadata.sessionId,
-            submitTime: new Date(sessionMetadata.submitTime),
+            submitTime: sessionMetadata.submitTime,
             state: runningJobInfo?.state ?? "ENDED",
             ready,
             dataPath: await sftpRealPath(sftp)(jobDir),

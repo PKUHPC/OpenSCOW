@@ -1,4 +1,3 @@
-import { ServiceError, status } from "@grpc/grpc-js";
 import { join } from "path";
 import { JobOps, SavedJob } from "src/clusterops/api/job";
 import { querySacct, querySqueue } from "src/clusterops/slurm/bl/queryJobInfo";
@@ -63,11 +62,7 @@ export const slurmJobOps = (cluster: string): JobOps => {
         );
 
         if (code !== 0) {
-          throw <ServiceError> {
-            code: status.UNAVAILABLE,
-            message: "slurm job submission failed.",
-            details: stderr,
-          };
+          return { code: "SBATCH_FAILED", message: stderr };
         }
 
         // parse stdout output to get the job id
@@ -86,7 +81,7 @@ export const slurmJobOps = (cluster: string): JobOps => {
           logger.info("Saved job to %s", filePath);
         }
 
-        return { jobId };
+        return { code: "OK", jobId };
       });
     },
 
@@ -97,12 +92,14 @@ export const slurmJobOps = (cluster: string): JobOps => {
         const sftp = await ssh.requestSFTP();
 
         const file = join(runtimeConfig.SAVED_JOBS_DIR, id);
+        
+        if (!await sftpExists(sftp, file)) { return { code: "NOT_FOUND" };}
 
         const content = await sftpReadFile(sftp)(file);
 
         const data = JSON.parse(content.toString()) as JobMetadata;
 
-        return { jobInfo: data };
+        return { code: "OK", jobInfo: data };
       });
     },
 
@@ -122,7 +119,7 @@ export const slurmJobOps = (cluster: string): JobOps => {
 
           return {
             id: filename,
-            submitTime: new Date(data.submitTime),
+            submitTime: data.submitTime,
             comment: data.comment,
             jobName: data.jobName,
           } as SavedJob;
@@ -149,7 +146,7 @@ export const slurmJobOps = (cluster: string): JobOps => {
 
       return await sshConnect(host, userId, logger, async (ssh) => {
         await loggedExec(ssh, logger, true, "scancel", [jobId + ""]);
-        return {};
+        return { code: "OK" };
       });
     },
 

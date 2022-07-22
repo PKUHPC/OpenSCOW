@@ -1,9 +1,6 @@
 import { route } from "@ddadaal/next-typed-api-routes-runtime";
-import { asyncClientCall } from "@ddadaal/tsgrpc-utils";
-import { status } from "@grpc/grpc-js";
 import { authenticate } from "src/auth/server";
-import { AppServiceClient } from "src/generated/portal/app";
-import { getJobServerClient } from "src/utils/client";
+import { getClusterOps } from "src/clusterops";
 
 export interface CreateAppSessionSchema {
   method: "POST";
@@ -44,12 +41,11 @@ export default /* #__PURE__*/route<CreateAppSessionSchema>("CreateAppSessionSche
 
   if (!info) { return; }
 
-  const client = getJobServerClient(AppServiceClient);
-
   const { appId, cluster, coreCount, partition, qos, account, maxTime } = req.body;
 
-  return await asyncClientCall(client, "createApp", {
-    cluster,
+  const clusterops = getClusterOps(cluster);
+
+  const reply = await clusterops.app.createApp({
     appId,
     userId: info.identityId,
     coreCount,
@@ -57,14 +53,11 @@ export default /* #__PURE__*/route<CreateAppSessionSchema>("CreateAppSessionSche
     maxTime,
     partition,
     qos,
-  })
-    .then(({ jobId, sessionId }) => {
-      return { 200: { jobId, sessionId } };
-    }).catch((e) => {
-      if (e.code === status.UNAVAILABLE) {
-        return { 409: { code: "SBATCH_FAILED", message: e.details } } as const;
-      } else {
-        throw e;
-      }
-    });
+  }, req.log);
+
+  if (reply.code === "SBATCH_FAILED") {
+    return { 409: { code: "SBATCH_FAILED", message: reply.message } };
+  }
+
+  return { 200: { jobId: reply.jobId, sessionId: reply.sessionId } };
 });

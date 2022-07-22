@@ -1,8 +1,6 @@
 import { route } from "@ddadaal/next-typed-api-routes-runtime";
-import { asyncClientCall } from "@ddadaal/tsgrpc-utils";
 import { authenticate } from "src/auth/server";
-import { JobServiceClient } from "src/generated/portal/job";
-import { getJobServerClient } from "src/utils/client";
+import { getClusterOps } from "src/clusterops";
 
 export interface GetAccountsSchema {
 
@@ -29,13 +27,12 @@ export default route<GetAccountsSchema>("GetAccountsSchema", async (req, res) =>
 
   const { cluster } = req.query;
 
-  const client = getJobServerClient(JobServiceClient);
+  const clusterops = getClusterOps(cluster);
 
-  const resp = await asyncClientCall(client, "getAccounts", {
-    cluster,
+  const reply = await clusterops.job.getAccounts({ 
     userId: info.identityId,
-  });
+  }, req.log);
 
-  return { 200: { accounts: resp.accounts  } };
+  return { 200: { accounts: reply.accounts  } };
 
 });

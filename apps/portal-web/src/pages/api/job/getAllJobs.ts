@@ -1,8 +1,7 @@
 import { route } from "@ddadaal/next-typed-api-routes-runtime";
-import { asyncClientCall } from "@ddadaal/tsgrpc-utils";
 import { authenticate } from "src/auth/server";
-import { JobInfo, JobServiceClient } from "src/generated/portal/job";
-import { getJobServerClient } from "src/utils/client";
+import { getClusterOps } from "src/clusterops";
+import { JobInfo } from "src/generated/portal/job";
 
 export interface GetAllJobsSchema {
 
@@ -30,17 +29,17 @@ export default route<GetAllJobsSchema>("GetAllJobsSchema", async (req, res) => {
   const info = await auth(req, res);
 
   if (!info) { return; }
-
+  
   const { cluster, startTime, endTime } = req.query;
 
-  const client = getJobServerClient(JobServiceClient);
+  const clusterops = getClusterOps(cluster);
 
-  const resp = await asyncClientCall(client, "getAllJobsInfo", {
-    cluster, userId: info.identityId,
-    endTime,
-    startTime,
-  });
+  const reply = await clusterops.job.getAllJobsInfo({ 
+    userId: info.identityId,
+    endTime: new Date(endTime),
+    startTime: new Date(startTime),
+  }, req.log);
 
-  return { 200: { results: resp.jobs  } };
+  return { 200: { results: reply.jobs  } };
 
 });

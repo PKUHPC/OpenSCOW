@@ -16,10 +16,9 @@ export interface SubmitJobRequest {
   save: boolean;
 }
 
-/** UNAVAILABLE: if sbatch fails, the details is the stderr */
-export interface SubmitJobReply {
-  jobId: number;
-}
+export type SubmitJobReply = 
+  | { code: "OK", jobId: number; }
+  | { code: "SBATCH_FAILED", message: string };
 
 export interface NewJobInfo {
   jobName: string;
@@ -58,7 +57,7 @@ export interface GetSavedJobsRequest {
 export interface SavedJob {
   id: string;
   jobName: string;
-  submitTime: Date;
+  submitTime: string;
   comment: string | undefined;
 }
 
@@ -71,8 +70,11 @@ export interface GetSavedJobRequest {
   id: string;
 }
 
-export interface GetSavedJobReply {
-  jobInfo?: NewJobInfo;
+export type GetSavedJobReply = {
+  code: "OK"
+  jobInfo: NewJobInfo;
+} | { 
+  code: "NOT_FOUND"
 }
 
 export interface CancelJobRequest {
@@ -80,7 +82,7 @@ export interface CancelJobRequest {
   jobId: number;
 }
 
-export interface CancelJobReply {}
+export type CancelJobReply = { code: "OK" } | { code: "NOT_FOUND" };
 
 export interface GetAllJobsInfoRequest {
   userId: string;

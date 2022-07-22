@@ -1,8 +1,7 @@
 import { route } from "@ddadaal/next-typed-api-routes-runtime";
-import { asyncClientCall } from "@ddadaal/tsgrpc-utils";
 import { authenticate } from "src/auth/server";
-import { AppServiceClient, AppSession } from "src/generated/portal/app";
-import { getJobServerClient } from "src/utils/client";
+import { getClusterOps } from "src/clusterops";
+import { AppSession } from "src/clusterops/api/app";
 
 export interface GetAppSessionsSchema {
   method: "GET";
@@ -26,15 +25,11 @@ export default /* #__PURE__*/route<GetAppSessionsSchema>("GetAppSessionsSchema",
 
   if (!info) { return; }
 
-  const client = getJobServerClient(AppServiceClient);
-
   const { cluster } = req.query;
 
-  return await asyncClientCall(client, "getSessions", {
-    cluster,
-    userId: info.identityId,
-  })
-    .then(async ({ sessions }) => {
-      return { 200: { sessions } };
-    });
+  const clusterops = getClusterOps(cluster);
+
+  const reply = await clusterops.app.getAppSessions({ userId: info.identityId }, req.log);
+
+  return { 200: { sessions: reply.sessions } };
 });

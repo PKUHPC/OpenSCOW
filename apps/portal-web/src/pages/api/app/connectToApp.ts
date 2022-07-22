@@ -1,13 +1,9 @@
 import { route } from "@ddadaal/next-typed-api-routes-runtime";
-import { asyncClientCall } from "@ddadaal/tsgrpc-utils";
-import { status } from "@grpc/grpc-js";
 import { App } from "@scow/config/build/appConfig/app";
 import { authenticate } from "src/auth/server";
-import { AppServiceClient } from "src/generated/portal/app";
-import { getJobServerClient } from "src/utils/client";
+import { getClusterOps } from "src/clusterops";
 import { runtimeConfig } from "src/utils/config";
 import { dnsResolve } from "src/utils/dns";
-import { handlegRPCError } from "src/utils/server";
 
 // Cannot use ServerConnectPropsConfig from appConfig package
 export type AppConnectProps = {
@@ -54,20 +50,17 @@ export default /* #__PURE__*/route<ConnectToAppSchema>("ConnectToAppSchema", asy
 
   if (!info) { return; }
 
-  const client = getJobServerClient(AppServiceClient);
 
   const { cluster, sessionId } = req.body;
 
-  const reply = await asyncClientCall(client, "connectToApp", {
-    cluster,
-    userId: info.identityId,
-    sessionId,
-  }).catch(handlegRPCError({
-    [status.UNAVAILABLE]: () => [({ 409: null })],
-    [status.NOT_FOUND]: () => [({ 404: null })],
-  }));
+  const clusterops = getClusterOps(cluster);
 
-  if (Array.isArray(reply)) { return reply[0]; }
+  const reply = await clusterops.app.connectToApp({
+    sessionId, userId: info.identityId,
+  }, req.log);
+
+  if (reply.code === "NOT_FOUND") { return { 404: null };}
+  if (reply.code === "UNAVAILABLE") { return { 409: null };}
 
   const app = appProps[reply.appId];
 

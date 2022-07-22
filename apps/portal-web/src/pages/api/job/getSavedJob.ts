@@ -1,11 +1,7 @@
 import { route } from "@ddadaal/next-typed-api-routes-runtime";
-import { asyncClientCall } from "@ddadaal/tsgrpc-utils";
-import { status } from "@grpc/grpc-js";
 import { authenticate } from "src/auth/server";
-import { JobServiceClient, NewJobInfo  } from "src/generated/portal/job";
-import { ensureNotUndefined } from "src/utils/checkNull";
-import { getJobServerClient } from "src/utils/client";
-import { publicConfig } from "src/utils/config";
+import { getClusterOps } from "src/clusterops";
+import { NewJobInfo  } from "src/generated/portal/job";
 
 export interface GetSavedJobSchema {
 
@@ -40,28 +36,13 @@ export default route<GetSavedJobSchema>("GetSavedJobSchema", async (req, res) =>
 
   const { cluster, id } = req.query;
 
-  // validate the parameters
-  if (!(cluster in publicConfig.CLUSTERS_CONFIG)) {
-    return { 400: { message: `Cluster ${cluster} not exists.` } };
-  }
+  const clusterops = getClusterOps(cluster);
 
-  const client = getJobServerClient(JobServiceClient);
+  const reply = await clusterops.job.getSavedJob({ 
+    id, userId: info.identityId,
+  }, req.log);
 
-  return await asyncClientCall(client, "getSavedJob", {
-    cluster,
-    userId: info.identityId,
-    id,
-  })
-    .then((reply) => {
-      const { jobInfo } = ensureNotUndefined(reply, ["jobInfo"]);
+  if (reply.code === "NOT_FOUND") { return { 404: null };}
 
-      return { 200: { jobInfo } } as const;
-    })
-    .catch((e) => {
-      if (e.code === status.NOT_FOUND) {
-        return { 404: null } as const;
-      } else {
-        throw e;
-      }
-    });
+  return { 200: { jobInfo: reply.jobInfo } };
 });

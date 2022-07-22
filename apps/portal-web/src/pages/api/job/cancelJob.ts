@@ -1,9 +1,6 @@
 import { route } from "@ddadaal/next-typed-api-routes-runtime";
-import { asyncClientCall } from "@ddadaal/tsgrpc-utils";
-import { status } from "@grpc/grpc-js";
 import { authenticate } from "src/auth/server";
-import { JobServiceClient } from "src/generated/portal/job";
-import { getJobServerClient } from "src/utils/client";
+import { getClusterOps } from "src/clusterops";
 
 export interface CancelJobSchema {
   method: "DELETE";
@@ -27,22 +24,16 @@ export default /* #__PURE__*/route<CancelJobSchema>("CancelJobSchema", async (re
 
   if (!info) { return; }
 
-  const client = getJobServerClient(JobServiceClient);
-
   const { cluster, jobId } = req.body;
 
-  return await asyncClientCall(client, "cancelJob", {
-    cluster,
+  const clusterops = getClusterOps(cluster);
+
+  const reply = await clusterops.job.cancelJob({ 
     jobId,
     userId: info.identityId,
-  })
-    .then(() => {
-      return { 204: null };
-    }).catch((e) => {
-      if (e.code === status.NOT_FOUND) {
-        return { 404: null } as const;
-      } else {
-        throw e;
-      }
-    });
+  }, req.log);
+
+
+  if (reply.code === "NOT_FOUND") { return { 404: null };}
+  return { 204: null };
 });

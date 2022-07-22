@@ -1,9 +1,7 @@
 import { route } from "@ddadaal/next-typed-api-routes-runtime";
-import { asyncClientCall } from "@ddadaal/tsgrpc-utils";
 import { authenticate } from "src/auth/server";
-import { JobServiceClient, SavedJob } from "src/generated/portal/job";
-import { getJobServerClient } from "src/utils/client";
-import { publicConfig } from "src/utils/config";
+import { getClusterOps } from "src/clusterops";
+import { SavedJob } from "src/clusterops/api/job";
 
 export interface GetSavedJobsSchema {
 
@@ -36,17 +34,12 @@ export default route<GetSavedJobsSchema>("GetSavedJobsSchema", async (req, res) 
 
   const { cluster } = req.query;
 
-  // validate the parameters
-  if (!(cluster in publicConfig.CLUSTERS_CONFIG)) {
-    return { 400: { message: `Cluster ${cluster} not exists.` } };
-  }
+  const clusterops = getClusterOps(cluster);
 
-  const client = getJobServerClient(JobServiceClient);
-
-  return await asyncClientCall(client, "getSavedJobs", {
-    cluster,
+  const reply = await clusterops.job.getSavedJobs({ 
     userId: info.identityId,
-  })
-    .then(({ results }) => ({ 200: { results } }));
+  }, req.log);
+
+  return { 200: { results: reply.results } };
 
 });

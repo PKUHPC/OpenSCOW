@@ -11,9 +11,13 @@ export interface CreateAppRequest {
   maxTime: number;
 }
 
-export interface CreateAppReply {
+export type CreateAppReply = {
+  code: "OK";
   sessionId: string;
   jobId: number;
+} | {
+  code: "SBATCH_FAILED",
+  message: string;
 }
 
 export interface GetAppSessionsRequest {
@@ -23,7 +27,7 @@ export interface GetAppSessionsRequest {
 export interface AppSession {
   sessionId: string;
   jobId: number;
-  submitTime: Date;
+  submitTime: string;
   appId: string;
   state: string;
   ready: boolean;
