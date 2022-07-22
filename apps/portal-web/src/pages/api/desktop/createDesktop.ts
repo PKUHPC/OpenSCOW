@@ -3,6 +3,7 @@ import { authenticate } from "src/auth/server";
 import { displayIdToPort } from "src/clusterops/slurm/bl/port";
 import { publicConfig, runtimeConfig } from "src/utils/config";
 import { dnsResolve } from "src/utils/dns";
+import { createLogger } from "src/utils/log";
 import { getClusterLoginNode, loggedExec, sshConnect } from "src/utils/ssh";
 import { parseDisplayId, parseListOutput, parseOtp, VNCSERVER_BIN_PATH } from "src/utils/turbovnc";
 
@@ -40,6 +41,8 @@ const auth = authenticate(() => true);
 
 export default /* #__PURE__*/route<CreateDesktopSchema>("CreateDesktopSchema", async (req, res) => {
 
+  const logger = createLogger();
+
   if (!publicConfig.ENABLE_LOGIN_DESKTOP) {
     return { 501: null };
   }
@@ -58,10 +61,10 @@ export default /* #__PURE__*/route<CreateDesktopSchema>("CreateDesktopSchema", a
 
   if (!host) { return { 400: { code: "INVALID_CLUSTER" } }; }
 
-  return await sshConnect(host, info.identityId, req.log, async (ssh) => {
+  return await sshConnect(host, info.identityId, logger, async (ssh) => {
 
     // find if the user has running session
-    let resp = await loggedExec(ssh, req.log, true,
+    let resp = await loggedExec(ssh, logger, true,
       VNCSERVER_BIN_PATH, ["-list"],
     );
 
@@ -81,7 +84,7 @@ export default /* #__PURE__*/route<CreateDesktopSchema>("CreateDesktopSchema", a
       params.push(wm);
     }
 
-    resp = await loggedExec(ssh, req.log, true, VNCSERVER_BIN_PATH, params);
+    resp = await loggedExec(ssh, logger, true, VNCSERVER_BIN_PATH, params);
 
     // parse the OTP from output. the output was in stderr
     const password = parseOtp(resp.stderr);

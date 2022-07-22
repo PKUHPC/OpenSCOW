@@ -1,7 +1,8 @@
 import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import { authenticate } from "src/auth/server";
 import { getClusterOps } from "src/clusterops";
-import { NewJobInfo  } from "src/generated/portal/job";
+import { NewJobInfo } from "src/generated/portal/job";
+import { createLogger } from "src/utils/log";
 
 export interface GetSavedJobSchema {
 
@@ -29,6 +30,7 @@ export interface GetSavedJobSchema {
 const auth = authenticate(() => true);
 
 export default route<GetSavedJobSchema>("GetSavedJobSchema", async (req, res) => {
+  const logger = createLogger();
 
   const info = await auth(req, res);
 
@@ -40,7 +42,7 @@ export default route<GetSavedJobSchema>("GetSavedJobSchema", async (req, res) =>
 
   const reply = await clusterops.job.getSavedJob({ 
     id, userId: info.identityId,
-  }, req.log);
+  }, logger);
 
   if (reply.code === "NOT_FOUND") { return { 404: null };}
 

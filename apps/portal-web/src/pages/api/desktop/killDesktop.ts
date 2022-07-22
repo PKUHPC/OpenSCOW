@@ -1,6 +1,7 @@
 import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import { authenticate } from "src/auth/server";
 import { publicConfig } from "src/utils/config";
+import { createLogger } from "src/utils/log";
 import { getClusterLoginNode, loggedExec, sshConnect } from "src/utils/ssh";
 import { VNCSERVER_BIN_PATH } from "src/utils/turbovnc";
 
@@ -23,6 +24,8 @@ const auth = authenticate(() => true);
 
 export default /* #__PURE__*/route<KillDesktopSchema>("KillDesktopSchema", async (req, res) => {
 
+  const logger = createLogger();
+
   if (!publicConfig.ENABLE_LOGIN_DESKTOP) {
     return { 501: null };
   }
@@ -37,10 +40,10 @@ export default /* #__PURE__*/route<KillDesktopSchema>("KillDesktopSchema", async
 
   if (!host) { return { 400: { code: "INVALID_CLUSTER" } }; }
 
-  return await sshConnect(host, info.identityId, req.log, async (ssh) => {
+  return await sshConnect(host, info.identityId, logger, async (ssh) => {
 
     // kill specific desktop
-    await loggedExec(ssh, req.log, true, VNCSERVER_BIN_PATH, ["-kill", ":" + displayId]);
+    await loggedExec(ssh, logger, true, VNCSERVER_BIN_PATH, ["-kill", ":" + displayId]);
 
     return { 204: null };
   });

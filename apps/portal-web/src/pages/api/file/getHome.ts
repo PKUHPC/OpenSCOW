@@ -2,6 +2,7 @@ import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import os from "os";
 import { USE_MOCK } from "src/apis/useMock";
 import { authenticate } from "src/auth/server";
+import { createLogger } from "src/utils/log";
 import { sftpRealPath } from "src/utils/sftp";
 import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
 
@@ -21,6 +22,7 @@ export interface GetHomeDirectorySchema {
 const auth = authenticate(() => true);
 
 export default route<GetHomeDirectorySchema>("GetHomeDirectorySchema", async (req, res) => {
+  const logger = createLogger();
 
   if (USE_MOCK) {
     return { 200: { path: os.homedir() } };
@@ -38,7 +40,7 @@ export default route<GetHomeDirectorySchema>("GetHomeDirectorySchema", async (re
     return { 400: { code: "INVALID_CLUSTER" } };
   }
 
-  return await sshConnect(host, info.identityId, req.log, async (ssh) => {
+  return await sshConnect(host, info.identityId, logger, async (ssh) => {
     const sftp = await ssh.requestSFTP();
 
     const path = await sftpRealPath(sftp)(".");

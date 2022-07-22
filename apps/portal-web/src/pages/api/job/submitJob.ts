@@ -2,6 +2,7 @@ import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import { authenticate } from "src/auth/server";
 import { getClusterOps } from "src/clusterops";
 import { NewJobInfo } from "src/generated/portal/job";
+import { createLogger } from "src/utils/log";
 
 export interface SubmitJobInfo {
   cluster: string;
@@ -44,6 +45,8 @@ const auth = authenticate(() => true);
 
 export default route<SubmitJobSchema>("SubmitJobSchema", async (req, res) => {
 
+  const logger = createLogger();
+
   const info = await auth(req, res);
 
   if (!info) { return; }
@@ -68,14 +71,14 @@ export default route<SubmitJobSchema>("SubmitJobSchema", async (req, res) => {
 
   const scriptReply = await clusterops.job.generateJobScript({ 
     jobInfo,
-  }, req.log);
+  }, logger);
 
   const reply = await clusterops.job.submitJob({
     userId: info.identityId,
     jobInfo,
     script: scriptReply.script,
     save,
-  }, req.log);
+  }, logger);
 
   if (reply.code === "SBATCH_FAILED") {
     return { 409: { code: "SBATCH_FAILED", message: reply.message } };

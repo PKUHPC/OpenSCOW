@@ -2,6 +2,7 @@ import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import { authenticate } from "src/auth/server";
 import { getClusterOps } from "src/clusterops";
 import { RunningJob } from "src/generated/common/job";
+import { createLogger } from "src/utils/log";
 
 export interface GetRunningJobsSchema {
 
@@ -26,6 +27,7 @@ export interface GetRunningJobsSchema {
 const auth = authenticate(() => true);
 
 export default route<GetRunningJobsSchema>("GetRunningJobsSchema", async (req, res) => {
+  const logger = createLogger();
 
   const info = await auth(req, res);
 
@@ -37,7 +39,7 @@ export default route<GetRunningJobsSchema>("GetRunningJobsSchema", async (req, r
 
   const reply = await clusterops.job.getRunningJobs({ 
     userId,
-  }, req.log);
+  }, logger);
 
   return { 200: { results: reply.jobs  } };
 

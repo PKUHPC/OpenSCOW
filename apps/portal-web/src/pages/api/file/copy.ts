@@ -1,5 +1,6 @@
 import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import { authenticate } from "src/auth/server";
+import { createLogger } from "src/utils/log";
 import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
 
 export interface CopyFileItemSchema {
@@ -20,6 +21,9 @@ export interface CopyFileItemSchema {
 const auth = authenticate(() => true);
 
 export default route<CopyFileItemSchema>("CopyFileItemSchema", async (req, res) => {
+
+  const logger = createLogger();
+
   const info = await auth(req, res);
 
   if (!info) { return; }
@@ -32,7 +36,7 @@ export default route<CopyFileItemSchema>("CopyFileItemSchema", async (req, res) 
     return { 400: { code: "INVALID_CLUSTER" } };
   }
 
-  return await sshConnect(host, info.identityId, req.log, async (ssh) => {
+  return await sshConnect(host, info.identityId, logger, async (ssh) => {
     // the SFTPWrapper doesn't supprt copy
     // Use command to do it
     await ssh.exec("cp", ["-r", fromPath, toPath]);

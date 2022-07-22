@@ -4,6 +4,7 @@ import { authenticate } from "src/auth/server";
 import { getClusterOps } from "src/clusterops";
 import { runtimeConfig } from "src/utils/config";
 import { dnsResolve } from "src/utils/dns";
+import { createLogger } from "src/utils/log";
 
 // Cannot use ServerConnectPropsConfig from appConfig package
 export type AppConnectProps = {
@@ -46,10 +47,11 @@ const auth = authenticate(() => true);
 
 export default /* #__PURE__*/route<ConnectToAppSchema>("ConnectToAppSchema", async (req, res) => {
 
+  const logger = createLogger();
+
   const info = await auth(req, res);
 
   if (!info) { return; }
-
 
   const { cluster, sessionId } = req.body;
 
@@ -57,7 +59,7 @@ export default /* #__PURE__*/route<ConnectToAppSchema>("ConnectToAppSchema", asy
 
   const reply = await clusterops.app.connectToApp({
     sessionId, userId: info.identityId,
-  }, req.log);
+  }, logger);
 
   if (reply.code === "NOT_FOUND") { return { 404: null };}
   if (reply.code === "UNAVAILABLE") { return { 409: null };}

@@ -1,6 +1,7 @@
 import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import { authenticate } from "src/auth/server";
 import { getClusterOps } from "src/clusterops";
+import { createLogger } from "src/utils/log";
 
 export interface CancelJobSchema {
   method: "DELETE";
@@ -20,6 +21,8 @@ const auth = authenticate(() => true);
 
 export default /* #__PURE__*/route<CancelJobSchema>("CancelJobSchema", async (req, res) => {
 
+  const logger = createLogger();
+
   const info = await auth(req, res);
 
   if (!info) { return; }
@@ -31,7 +34,7 @@ export default /* #__PURE__*/route<CancelJobSchema>("CancelJobSchema", async (re
   const reply = await clusterops.job.cancelJob({ 
     jobId,
     userId: info.identityId,
-  }, req.log);
+  }, logger);
 
 
   if (reply.code === "NOT_FOUND") { return { 404: null };}

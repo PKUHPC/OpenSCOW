@@ -3,6 +3,7 @@ import { authenticate } from "src/auth/server";
 import { displayIdToPort } from "src/clusterops/slurm/bl/port";
 import { publicConfig } from "src/utils/config";
 import { dnsResolve } from "src/utils/dns";
+import { createLogger } from "src/utils/log";
 import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
 import { refreshPassword } from "src/utils/turbovnc";
 
@@ -29,6 +30,8 @@ const auth = authenticate(() => true);
 
 export default /* #__PURE__*/route<LaunchDesktopSchema>("LaunchDesktopSchema", async (req, res) => {
 
+  const logger = createLogger();
+
   if (!publicConfig.ENABLE_LOGIN_DESKTOP) {
     return { 501: null };
   }
@@ -43,10 +46,10 @@ export default /* #__PURE__*/route<LaunchDesktopSchema>("LaunchDesktopSchema", a
 
   if (!host) { return { 400: { code: "INVALID_CLUSTER" } }; }
 
-  return await sshConnect(host, info.identityId, req.log, async (ssh) => {
+  return await sshConnect(host, info.identityId, logger, async (ssh) => {
 
     // refresh the otp
-    const password = await refreshPassword(ssh, req.log, displayId);
+    const password = await refreshPassword(ssh, logger, displayId);
 
     return { 200: { node: await dnsResolve(host), port: displayIdToPort(displayId), password } };
   });

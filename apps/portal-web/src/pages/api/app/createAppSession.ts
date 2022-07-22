@@ -1,6 +1,7 @@
 import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import { authenticate } from "src/auth/server";
 import { getClusterOps } from "src/clusterops";
+import { createLogger } from "src/utils/log";
 
 export interface CreateAppSessionSchema {
   method: "POST";
@@ -37,6 +38,8 @@ const auth = authenticate(() => true);
 
 export default /* #__PURE__*/route<CreateAppSessionSchema>("CreateAppSessionSchema", async (req, res) => {
 
+  const logger = createLogger();
+
   const info = await auth(req, res);
 
   if (!info) { return; }
@@ -53,7 +56,7 @@ export default /* #__PURE__*/route<CreateAppSessionSchema>("CreateAppSessionSche
     maxTime,
     partition,
     qos,
-  }, req.log);
+  }, logger);
 
   if (reply.code === "SBATCH_FAILED") {
     return { 409: { code: "SBATCH_FAILED", message: reply.message } };
