@@ -1,5 +1,5 @@
-import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import { validateToken } from "src/auth/token";
+import { route } from "src/utils/route";
 
 // ts-json-schema-generator fails to generate from Static<typeof UserInfoSchema>
 // Write another plain UserInfo;

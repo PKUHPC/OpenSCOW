@@ -1,7 +1,6 @@
-import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import { authenticate } from "src/auth/server";
 import { getClusterOps } from "src/clusterops";
-import { createLogger } from "src/utils/log";
+import { route } from "src/utils/route";
 
 export interface GetAccountsSchema {
 
@@ -21,7 +20,7 @@ export interface GetAccountsSchema {
 const auth = authenticate(() => true);
 
 export default route<GetAccountsSchema>("GetAccountsSchema", async (req, res) => {
-  const logger = createLogger();
+
 
   const info = await auth(req, res);
 
@@ -31,9 +30,9 @@ export default route<GetAccountsSchema>("GetAccountsSchema", async (req, res) =>
 
   const clusterops = getClusterOps(cluster);
 
-  const reply = await clusterops.job.getAccounts({ 
+  const reply = await clusterops.job.getAccounts({
     userId: info.identityId,
-  }, logger);
+  }, req.log);
 
   return { 200: { accounts: reply.accounts  } };
 

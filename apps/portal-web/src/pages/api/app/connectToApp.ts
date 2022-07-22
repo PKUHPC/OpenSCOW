@@ -1,10 +1,9 @@
-import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import { App } from "@scow/config/build/appConfig/app";
 import { authenticate } from "src/auth/server";
 import { getClusterOps } from "src/clusterops";
 import { runtimeConfig } from "src/utils/config";
 import { dnsResolve } from "src/utils/dns";
-import { createLogger } from "src/utils/log";
+import { route } from "src/utils/route";
 
 // Cannot use ServerConnectPropsConfig from appConfig package
 export type AppConnectProps = {
@@ -47,7 +46,7 @@ const auth = authenticate(() => true);
 
 export default /* #__PURE__*/route<ConnectToAppSchema>("ConnectToAppSchema", async (req, res) => {
 
-  const logger = createLogger();
+
 
   const info = await auth(req, res);
 
@@ -59,7 +58,7 @@ export default /* #__PURE__*/route<ConnectToAppSchema>("ConnectToAppSchema", asy
 
   const reply = await clusterops.app.connectToApp({
     sessionId, userId: info.identityId,
-  }, logger);
+  }, req.log);
 
   if (reply.code === "NOT_FOUND") { return { 404: null };}
   if (reply.code === "UNAVAILABLE") { return { 409: null };}

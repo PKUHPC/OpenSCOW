@@ -1,9 +1,9 @@
-import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import fs from "fs";
 import { contentType } from "mime-types";
 import path from "path";
 import { CONFIG_PATH } from "src/utils/config";
 import { getHostname } from "src/utils/host";
+import { route } from "src/utils/route";
 
 export interface GetIconSchema {
 

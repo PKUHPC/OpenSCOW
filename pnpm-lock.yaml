@@ -360,6 +360,7 @@ importers:
       nookies: 2.5.2
       nprogress: 0.2.0
       pino: 8.2.0
+      pino-http: 8.1.1
       postcss: 8.4.14
       random-words: 1.2.0
       react: 18.2.0
@@ -411,6 +412,7 @@ importers:
       nookies: 2.5.2
       nprogress: 0.2.0
       pino: 8.2.0
+      pino-http: 8.1.1
       random-words: 1.2.0
       react: 18.2.0
       react-async: 10.0.1_react@18.2.0
@@ -11857,6 +11859,16 @@ packages:
     dependencies:
       readable-stream: 4.0.0
       split2: 4.1.0
+
+  /pino-http/8.1.1:
+    resolution: {integrity: sha512-9eXwQ48z1WU9nLTNh923/6bzLQF9aT3q8jbB3WY5HP80YMutl2yHtOAvjz+WVpWiSimcN9qeM64oOABa/VMbdQ==}
+    dependencies:
+      fast-url-parser: 1.1.3
+      get-caller-file: 2.0.5
+      pino: 8.2.0
+      pino-std-serializers: 6.0.0
+      process-warning: 2.0.0
+    dev: false
 
   /pino-pretty/8.1.0:
     resolution: {integrity: sha512-oKfI8qKXR2a3haHs/X8iB6QSnWLqoOGAjwxIAXem4+XOGIGNw7IKpozId1uE7j89Rj46HIfWnGbAgmQmr8+yRw==}

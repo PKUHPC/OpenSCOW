@@ -61,7 +61,8 @@
     "@scow/lib-auth": "workspace:*",
     "shell-quote": "1.7.3",
     "pino": "8.2.0",
-    "moment-timezone": "0.5.34"
+    "moment-timezone": "0.5.34",
+    "pino-http": "8.1.1"
   },
   "devDependencies": {
     "@ddadaal/next-typed-api-routes-cli": "0.5.1",

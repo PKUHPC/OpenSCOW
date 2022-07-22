@@ -1,8 +1,7 @@
-import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import { authenticate } from "src/auth/server";
 import { publicConfig } from "src/utils/config";
 import { dnsResolve } from "src/utils/dns";
-import { createLogger } from "src/utils/log";
+import { route } from "src/utils/route";
 import { getClusterLoginNode, loggedExec, sshConnect } from "src/utils/ssh";
 import { parseListOutput, VNCSERVER_BIN_PATH } from "src/utils/turbovnc";
 
@@ -28,7 +27,7 @@ const auth = authenticate(() => true);
 
 export default /* #__PURE__*/route<ListDesktopsSchema>("ListDesktopsSchema", async (req, res) => {
 
-  const logger = createLogger();
+
 
   if (!publicConfig.ENABLE_LOGIN_DESKTOP) {
     return { 501: null };
@@ -43,10 +42,10 @@ export default /* #__PURE__*/route<ListDesktopsSchema>("ListDesktopsSchema", asy
   const host = getClusterLoginNode(cluster);
   if (!host) { return { 400: { code: "INVALID_CLUSTER" } }; }
 
-  return await sshConnect(host, info.identityId, logger, async (ssh) => {
+  return await sshConnect(host, info.identityId, req.log, async (ssh) => {
 
     // list all running session
-    const resp = await loggedExec(ssh, logger, true,
+    const resp = await loggedExec(ssh, req.log, true,
       VNCSERVER_BIN_PATH, ["-list"],
     );
 

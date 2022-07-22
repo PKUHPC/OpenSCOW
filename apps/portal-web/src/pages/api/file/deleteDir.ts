@@ -1,6 +1,5 @@
-import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import { authenticate } from "src/auth/server";
-import { createLogger } from "src/utils/log";
+import { route } from "src/utils/route";
 import { getClusterLoginNode, sshConnect, sshRmrf } from "src/utils/ssh";
 
 export interface DeleteDirSchema {
@@ -21,7 +20,7 @@ const auth = authenticate(() => true);
 
 export default route<DeleteDirSchema>("DeleteDirSchema", async (req, res) => {
 
-  const logger = createLogger();
+
 
   const info = await auth(req, res);
 
@@ -35,7 +34,7 @@ export default route<DeleteDirSchema>("DeleteDirSchema", async (req, res) => {
     return { 400: { code: "INVALID_CLUSTER" } };
   }
 
-  return await sshConnect(host, info.identityId, logger, async (ssh) => {
+  return await sshConnect(host, info.identityId, req.log, async (ssh) => {
     await sshRmrf(ssh, path);
 
     return { 204: null };
