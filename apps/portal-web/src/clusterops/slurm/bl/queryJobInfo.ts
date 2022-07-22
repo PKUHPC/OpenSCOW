@@ -2,12 +2,12 @@ import { DateTime } from "luxon";
 import { NodeSSH } from "node-ssh";
 import { RunningJob } from "src/generated/common/job";
 import { JobInfo } from "src/generated/portal/job";
-import { ServerLogger } from "src/utils/log.server";
+import { Logger } from "src/utils/log";
 import { loggedExec } from "src/utils/ssh";
 
 const SEPARATOR = "__x__x__";
 
-export async function querySqueue(ssh: NodeSSH, logger: ServerLogger, params: string[]) {
+export async function querySqueue(ssh: NodeSSH, logger: Logger, params: string[]) {
   const result = await loggedExec(ssh, logger, true,
     "squeue",
     [
@@ -42,7 +42,7 @@ function formatTime(time: Date, tz: string) {
   return DateTime.fromJSDate(time).setZone(tz).toFormat("yyyy-MM-dd'T'HH:mm:ss");
 }
 
-export async function querySacct(ssh: NodeSSH, logger: ServerLogger, startTime: Date, endTime: Date) {
+export async function querySacct(ssh: NodeSSH, logger: Logger, startTime: Date, endTime: Date) {
 
   // get target timezone
   const { stdout } = await loggedExec(ssh, logger, true, "date", ["+%:z"]);

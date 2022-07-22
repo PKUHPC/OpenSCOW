@@ -1,7 +1,7 @@
 import { NodeSSH } from "node-ssh";
 import { join } from "path";
 import { runtimeConfig } from "src/utils/config";
-import { ServerLogger } from "src/utils/log.server";
+import { Logger } from "src/utils/log";
 import { loggedExec } from "src/utils/ssh";
 
 export const VNCSERVER_BIN_PATH = join(runtimeConfig.TURBOVNC_PATH, "bin", "vncserver");
@@ -49,7 +49,7 @@ export function parseDisplayId(stdout: string): number {
 
 const vncPasswdPath = join(runtimeConfig.TURBOVNC_PATH, "bin", "vncpasswd");
 
-export const refreshPassword = async (ssh: NodeSSH, logger: ServerLogger, displayId: number) => {
+export const refreshPassword = async (ssh: NodeSSH, logger: Logger, displayId: number) => {
   const resp = await loggedExec(ssh, logger, true,
     vncPasswdPath, ["-o", "-display", ":" + displayId]);
 

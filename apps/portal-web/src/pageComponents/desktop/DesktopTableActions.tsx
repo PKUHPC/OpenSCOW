@@ -2,14 +2,16 @@ import { Popconfirm, Space } from "antd";
 import React, { useState } from "react";
 import { api } from "src/apis";
 import type { DesktopItem } from "src/pageComponents/desktop/DesktopTable";
+import { Cluster } from "src/utils/config";
 import { openDesktop } from "src/utils/vnc";
 
 interface Props {
   reload: () => void;
+  cluster: Cluster;
   record: DesktopItem;
 }
 
-export const DesktopTableActions: React.FC<Props> = ({ reload, record }) => {
+export const DesktopTableActions: React.FC<Props> = ({ cluster, reload, record }) => {
 
   // Is the popconfirm visible
   const [isPopconfirmVisible, setIsPopconfirmVisible] = useState(false);
@@ -22,7 +24,7 @@ export const DesktopTableActions: React.FC<Props> = ({ reload, record }) => {
             // launch desktop
             const resp = await api.launchDesktop({
               body: {
-                cluster: record.cluster.id,
+                cluster: cluster.id,
                 displayId: record.desktopId,
               },
             });
@@ -42,7 +44,7 @@ export const DesktopTableActions: React.FC<Props> = ({ reload, record }) => {
             // kill desktop
             await api.killDesktop({
               body: {
-                cluster: record.cluster.id,
+                cluster: cluster.id,
                 displayId: record.desktopId,
               },
             });

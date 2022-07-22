@@ -1,7 +1,7 @@
 import { NodeSSH, SSHExecCommandOptions } from "node-ssh";
 import { quote } from "shell-quote";
 import { runtimeConfig }  from "src/utils/config";
-import { ServerLogger } from "src/utils/log.server";
+import { Logger } from "src/utils/log";
 
 export function getClusterLoginNode(cluster: string): string | undefined {
 
@@ -34,7 +34,7 @@ export async function sshRawConnect(
 }
 
 export async function sshConnect<T>(
-  addr: string, username: string, logger: ServerLogger, run: (ssh: NodeSSH) => Promise<T>,
+  addr: string, username: string, logger: Logger, run: (ssh: NodeSSH) => Promise<T>,
 ) {
   const ssh = await sshRawConnect(addr, username);
 
@@ -54,7 +54,7 @@ export function constructCommand(cmd: string, parameters: readonly string[], env
   return envPrefix + command;
 }
 
-export async function loggedExec(ssh: NodeSSH, logger: ServerLogger, throwIfFailed: boolean,
+export async function loggedExec(ssh: NodeSSH, logger: Logger, throwIfFailed: boolean,
   cmd: string, parameters: string[], options?: SSHExecCommandOptions) {
 
   const env = options?.execOptions?.env;

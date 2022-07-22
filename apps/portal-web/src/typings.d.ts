@@ -1,3 +1,5 @@
+import { Logger } from "pino";
+
 declare module "*.less" {
   const module: any;
   export = module;
@@ -22,5 +24,18 @@ declare namespace React {
   interface FC<P = {}> {
     (props: P, context?: any): ReactElement<any, any> | null;
     children: JSX.Element;
+  }
+}
+
+declare module "next/server" {
+  interface NextRequest {
+    log: Logger;
+  }
+
+}
+
+declare module "next" {
+  interface NextApiRequest {
+    log: Logger;
   }
 }

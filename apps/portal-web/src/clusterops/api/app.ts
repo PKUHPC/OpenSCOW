@@ -1,4 +1,4 @@
-import { ServerLogger } from "src/utils/log.server";
+import { Logger } from "src/utils/log";
 
 export interface CreateAppRequest {
   appId: string;
@@ -39,18 +39,18 @@ export interface ConnectToAppRequest {
   sessionId: string;
 }
 
-export type ConnectToAppReply = 
+export type ConnectToAppReply =
   | { code: "NOT_FOUND" } // sessionId is not found
   | { code: "UNAVAILABLE" } // the app is not available to connect yet
-  | { code: "OK", 
-  appId: string;
-  host: string;
-  port: number;
-  password: string;
+  | { code: "OK",
+      appId: string;
+      host: string;
+      port: number;
+      password: string;
 };
 
 export interface AppOps {
-  createApp(req: CreateAppRequest, logger: ServerLogger): Promise<CreateAppReply>;
-  getAppSessions(req: GetAppSessionsRequest, logger: ServerLogger): Promise<GetAppSessionsReply>;
-  connectToApp(req: ConnectToAppRequest, logger: ServerLogger): Promise<ConnectToAppReply>;
+  createApp(req: CreateAppRequest, logger: Logger): Promise<CreateAppReply>;
+  getAppSessions(req: GetAppSessionsRequest, logger: Logger): Promise<GetAppSessionsReply>;
+  connectToApp(req: ConnectToAppRequest, logger: Logger): Promise<ConnectToAppReply>;
 }

@@ -17,6 +17,7 @@ export interface ListDesktopsSchema {
       node: string;
       displayId: number[];
     };
+
     // 功能没有启用
     501: null;
   }

@@ -1,5 +1,5 @@
 import { RunningJob } from "src/generated/common/job";
-import { ServerLogger } from "src/utils/log.server";
+import { Logger } from "src/utils/log";
 
 export interface GetRunningJobsRequest {
   userId: string;
@@ -106,13 +106,13 @@ export interface GetAllJobsInfoReply {
   jobs: JobInfo[];
 }
 
-export interface JobOps { 
-  getRunningJobs(req: GetRunningJobsRequest, logger: ServerLogger): Promise<GetRunningJobsReply>;
-  getAccounts(req: GetAccountsRequest, logger: ServerLogger): Promise<GetAccountsReply>;
-  generateJobScript(req: GenerateJobScriptRequest, logger: ServerLogger): Promise<GenerateJobScriptReply>;
-  submitJob(req: SubmitJobRequest, logger: ServerLogger): Promise<SubmitJobReply>;
-  getSavedJobs(req: GetSavedJobsRequest, logger: ServerLogger): Promise<GetSavedJobsReply>;
-  getSavedJob(req: GetSavedJobRequest, logger: ServerLogger): Promise<GetSavedJobReply>;
-  cancelJob(req: CancelJobRequest, logger: ServerLogger): Promise<CancelJobReply>;
-  getAllJobsInfo(req: GetAllJobsInfoRequest, logger: ServerLogger): Promise<GetAllJobsInfoReply>;
+export interface JobOps {
+  getRunningJobs(req: GetRunningJobsRequest, logger: Logger): Promise<GetRunningJobsReply>;
+  getAccounts(req: GetAccountsRequest, logger: Logger): Promise<GetAccountsReply>;
+  generateJobScript(req: GenerateJobScriptRequest, logger: Logger): Promise<GenerateJobScriptReply>;
+  submitJob(req: SubmitJobRequest, logger: Logger): Promise<SubmitJobReply>;
+  getSavedJobs(req: GetSavedJobsRequest, logger: Logger): Promise<GetSavedJobsReply>;
+  getSavedJob(req: GetSavedJobRequest, logger: Logger): Promise<GetSavedJobReply>;
+  cancelJob(req: CancelJobRequest, logger: Logger): Promise<CancelJobReply>;
+  getAllJobsInfo(req: GetAllJobsInfoRequest, logger: Logger): Promise<GetAllJobsInfoReply>;
 }

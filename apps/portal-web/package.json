@@ -60,8 +60,7 @@
     "xterm-addon-fit": "0.5.0",
     "@scow/lib-auth": "workspace:*",
     "shell-quote": "1.7.3",
-    "pino": "8.2.0",
-    "pino-http": "8.1.1"
+    "pino": "8.2.0"
   },
   "devDependencies": {
     "@ddadaal/next-typed-api-routes-cli": "0.5.1",
@@ -84,8 +83,7 @@
     "postcss": "8.4.14",
     "webpack": "5.73.0",
     "@types/shell-quote": "1.7.1",
-    "@types/pino": "7.0.5",
-    "@types/pino-http": "5.8.1"
+    "@types/pino": "7.0.5"
   },
   "browserslist": {
     "production": [

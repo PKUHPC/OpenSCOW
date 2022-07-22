@@ -4,6 +4,7 @@ import fs from "fs";
 import { join } from "path";
 import { AppOps, AppSession } from "src/clusterops/api/app";
 import { displayIdToPort } from "src/clusterops/slurm/bl/port";
+import { getAppConfig } from "src/config/apps";
 import { RunningJob } from "src/generated/common/job";
 import { runtimeConfig } from "src/utils/config";
 import { sftpChmod, sftpExists, sftpReaddir, sftpReadFile, sftpRealPath, sftpWriteFile } from "src/utils/sftp";
@@ -54,14 +55,14 @@ export const slurmAppOps = (cluster: string): AppOps => {
 
         const sftp = await ssh.requestSFTP();
 
-        const submitAndWriteMetadata = async (script: string, env?: NodeJS.ProcessEnv) => {
+        const submitAndWriteMetadata = async (script: string, env?: Record<string, string>) => {
           const remoteEntryPath = join(workingDirectory, "entry.sh");
 
           await sftpWriteFile(sftp)(remoteEntryPath, script);
 
           // submit entry.sh
           const { code, stderr, stdout } = await loggedExec(ssh, logger, false,
-            "sbatch", [remoteEntryPath], { execOptions: { env } },
+            "sbatch", [remoteEntryPath], { execOptions: { env: env as NodeJS.ProcessEnv } },
           );
 
           if (code !== 0) {
@@ -222,10 +223,7 @@ export const slurmAppOps = (cluster: string): AppOps => {
         const jobDir = join(runtimeConfig.APP_JOBS_DIR, sessionId);
 
         if (!await sftpExists(sftp, jobDir)) {
-          throw <ServiceError>{
-            code: status.NOT_FOUND,
-            message: `dir ${jobDir} does not exist`,
-          };
+          return { code: "NOT_FOUND" };
         }
 
         const metadataPath = join(jobDir, SESSION_METADATA_NAME);
@@ -243,7 +241,7 @@ export const slurmAppOps = (cluster: string): AppOps => {
 
             const [host, port, password] = content.split("\n");
 
-            return { appId: app.id, host, port: +port, password };
+            return { code: "OK", appId: app.id, host, port: +port, password };
           }
         } else {
           // for vnc apps,
@@ -266,28 +264,20 @@ export const slurmAppOps = (cluster: string): AppOps => {
               } catch {
                 // ignored if displayId cannot be parsed
               }
-              if (displayId) {
 
+              if (displayId) {
                 // the server is run at the compute node
                 // login to the compute node and refresh the password
-
-                if (displayId) {
-                  return await sshConnect(host, userId, logger, async (computeNodeSsh) => {
-                    if (displayId) {
-                      const password = await refreshPassword(computeNodeSsh, logger, displayId);
-                      return { appId: app.id, host, port: displayIdToPort(displayId), password };
-                    }
-                  });
-                }
+                return await sshConnect(host, userId, logger, async (computeNodeSsh) => {
+                  const password = await refreshPassword(computeNodeSsh, logger, displayId!);
+                  return { code: "OK", appId: app.id, host, port: displayIdToPort(displayId!), password };
+                });
               }
-
             }
           }
         }
+        return { code: "UNAVAILABLE" };
 
-        throw <ServiceError> {
-          code: status.UNAVAILABLE,
-        };
       });
     },
   };
