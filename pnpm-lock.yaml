@@ -334,7 +334,6 @@ importers:
       '@types/mime-types': 2.1.1
       '@types/node': 18.0.1
       '@types/nprogress': 0.2.0
-      '@types/pino': 7.0.5
       '@types/random-words': 1.1.2
       '@types/react': 18.0.15
       '@types/react-dom': 18.0.6
@@ -438,7 +437,6 @@ importers:
       '@types/mime-types': 2.1.1
       '@types/node': 18.0.1
       '@types/nprogress': 0.2.0
-      '@types/pino': 7.0.5
       '@types/random-words': 1.1.2
       '@types/react': 18.0.15
       '@types/react-dom': 18.0.6
@@ -4973,13 +4971,6 @@ packages:
 
   /@types/parse5/6.0.3:
     resolution: {integrity: sha512-SuT16Q1K51EAVPz1K29DJ/sXjhSQ0zjvsypYJ6tlwVsRV9jwW5Adq2ch8Dq8kDBCkYnELS7N7VNCSB5nC56t/g==}
-    dev: true
-
-  /@types/pino/7.0.5:
-    resolution: {integrity: sha512-wKoab31pknvILkxAF8ss+v9iNyhw5Iu/0jLtRkUD74cNfOOLJNnqfFKAv0r7wVaTQxRZtWrMpGfShwwBjOcgcg==}
-    deprecated: This is a stub types definition. pino provides its own type definitions, so you do not need this installed.
-    dependencies:
-      pino: 8.2.0
     dev: true
 
   /@types/prettier/2.6.3:
@@ -11895,6 +11886,7 @@ packages:
 
   /pino-std-serializers/6.0.0:
     resolution: {integrity: sha512-mMMOwSKrmyl+Y12Ri2xhH1lbzQxwwpuru9VjyJpgFIH4asSj88F2csdMwN6+M5g1Ll4rmsYghHLQJw81tgZ7LQ==}
+    dev: false
 
   /pino/8.0.0:
     resolution: {integrity: sha512-EvZh9ZUoLGkrhqhoF9UBxw2/ZiAhXHUKlGrI4WUT/wLu0sfu8Wr3NJaZ6lxcy/S51W0PMSon5KE7ujPAhc/G6g==}
@@ -11944,6 +11936,7 @@ packages:
       safe-stable-stringify: 2.3.1
       sonic-boom: 3.0.0
       thread-stream: 2.0.0
+    dev: false
 
   /pirates/4.0.5:
     resolution: {integrity: sha512-8V9+HQPupnaXMA23c5hvl69zXvTwTzyAYasnkb0Tts4XvO4CliqONMOnvlq26rkhLC3nWDFBJf73LU1e1VZLaQ==}
@@ -14893,6 +14886,7 @@ packages:
     resolution: {integrity: sha512-tnbzCbIrA4Khq5SJt/Fyz5DlE8pUnPR3//nWv+cqdRktvAl2NuC9O08HHq2Ifa10bhkvHLuzcesNjaH15EgTXA==}
     dependencies:
       real-require: 0.1.0
+    dev: false
 
   /through/2.3.8:
     resolution: {integrity: sha512-w89qg7PI8wAdvX60bMDP+bFoD5Dvhm9oLheFp5O4a2QF0cSBGsBX4qZmadPMvVqlLJBBci+WqGGOAPvcDeNSVg==}
