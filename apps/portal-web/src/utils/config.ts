@@ -7,8 +7,6 @@ export interface ServerRuntimeConfig {
   AUTH_EXTERNAL_URL: string;
   AUTH_INTERNAL_URL: string;
 
-  JOB_SERVER: string;
-
   DEFAULT_FOOTER_TEXT: string;
   FOOTER_TEXTS: {[hostname: string]: string };
 

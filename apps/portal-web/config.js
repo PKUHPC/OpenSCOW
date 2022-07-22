@@ -29,7 +29,6 @@ const specs = {
   AUTH_INTERNAL_URL: str({ desc: "认证服务内网地址", default: "http://auth:5000" }),
 
   ENABLE_JOB_MANAGEMENT: bool({ desc: "是否启动作业管理功能", default: false }),
-  JOB_SERVER: str({ desc: "作业服务器的地址", default: "job-server:5000" }),
 
   ENABLE_LOGIN_DESKTOP: bool({ desc: "是否启动登录节点上的桌面功能", default: false }),
   LOGIN_DESKTOP_WMS: str({ desc: "登录节点上可以启动的桌面类型，格式：名字=wm值,名字=wm值", example: "Xfce=xfce,gnome3=", default: "Xfce=xfce" }),
@@ -129,7 +128,6 @@ const buildRuntimeConfig = async (phase) => {
     DEFAULT_PRIMARY_COLOR: config.DEFAULT_PRIMARY_COLOR,
     FOOTER_TEXTS: parseKeyValue(config.FOOTER_TEXTS),
     PRIMARY_COLORS: parseKeyValue(config.PRIMARY_COLORS),
-    JOB_SERVER: config.JOB_SERVER,
     SSH_PRIVATE_KEY_PATH: config.SSH_PRIVATE_KEY_PATH,
     CLUSTERS_CONFIG: clusters,
     FILE_SERVERS: parseKeyValue(config.FILE_SERVERS),
