@@ -68,13 +68,13 @@ const specs = {
   MAX_LOGIN_DESKTOPS: num({ desc: "最大登录节点桌面数量", default: 3 }),
 };
 
-const config = envConfig(specs, process.env);
+// This config is used to provide env doc auto gen
+const config = { _specs: specs };
 
 const buildRuntimeConfig = async (phase) => {
   const building = phase === PHASE_PRODUCTION_BUILD;
   const dev = phase === PHASE_DEVELOPMENT_SERVER;
   const production = phase === PHASE_PRODUCTION_SERVER;
-  const test = phase === PHASE_TEST;
 
   // load .env.build if in build
   if (building) {
@@ -84,6 +84,9 @@ const buildRuntimeConfig = async (phase) => {
   if (dev) {
     require("dotenv").config({ path: "env/.env.dev" });
   }
+
+  // reload config after envs are applied
+  const config = envConfig(specs, process.env);
 
   // load clusters.json
   const { getConfigFromFile, CONFIG_BASE_PATH } = require("@scow/config");
