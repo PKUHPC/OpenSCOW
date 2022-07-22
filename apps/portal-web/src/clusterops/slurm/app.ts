@@ -20,8 +20,8 @@ interface SessionMetadata {
   submitTime: string;
 }
 
-const SERVER_ENTRY_COMMAND = fs.readFileSync("assets/server_entry.sh", { encoding: "utf-8" });
-const VNC_ENTRY_COMMAND = fs.readFileSync("assets/vnc_entry.sh", { encoding: "utf-8" });
+const SERVER_ENTRY_COMMAND = fs.readFileSync("assets/slurm/server_entry.sh", { encoding: "utf-8" });
+const VNC_ENTRY_COMMAND = fs.readFileSync("assets/slurm/vnc_entry.sh", { encoding: "utf-8" });
 
 const VNC_OUTPUT_FILE = "output";
 
