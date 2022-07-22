@@ -45,7 +45,7 @@ export async function sshRmrf(ssh: NodeSSH, path: string) {
   await ssh.exec("rm", ["-rf", path]);
 }
 
-export function constructCommand(cmd: string, parameters: readonly string[], env?: NodeJS.ProcessEnv) {
+export function constructCommand(cmd: string, parameters: readonly string[], env?: Record<string, string>) {
 
   const command = cmd + (parameters.length > 0 ? (" " + quote(parameters)) : "");
 
@@ -57,7 +57,7 @@ export function constructCommand(cmd: string, parameters: readonly string[], env
 export async function loggedExec(ssh: NodeSSH, logger: Logger, throwIfFailed: boolean,
   cmd: string, parameters: string[], options?: SSHExecCommandOptions) {
 
-  const env = options?.execOptions?.env;
+  const env = options?.execOptions?.env as Record<string, string>;
 
   const command = constructCommand(cmd, parameters, env);
 
