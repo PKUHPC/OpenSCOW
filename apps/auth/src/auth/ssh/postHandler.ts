@@ -6,13 +6,13 @@ import { FastifyInstance } from "fastify";
 import { NodeSSH } from "node-ssh";
 import { cacheInfo } from "src/auth/cacheInfo";
 import { serveLoginHtml } from "src/auth/loginHtml";
-import { config } from "src/config/env";
+import { SshConfigSchema } from "src/config/auth";
 import { redirectToWeb } from "src/routes/callback";
 
-export function registerPostHandler(f: FastifyInstance) {
+export function registerPostHandler(f: FastifyInstance, sshConfig: SshConfigSchema) {
 
+  let loginNode = sshConfig.baseNode;
 
-  let loginNode = config.SSH_BASE_NODE;
   if (!loginNode) {
     const clusters = getConfigFromFile(ClustersConfigSchema, ClustersConfigName);
     if (Object.keys(clusters).length === 0) {

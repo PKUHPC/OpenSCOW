@@ -1,5 +1,6 @@
 import { randomUUID } from "crypto";
 import { FastifyRequest } from "fastify";
+import { authConfig } from "src/config/auth";
 import { config } from "src/config/env";
 
 const testUsers: Record<string, string> = config.TEST_USERS.split(",").reduce((prev, curr) => {
@@ -22,7 +23,7 @@ export async function cacheInfo(identityId: string, req: FastifyRequest): Promis
   const token = randomUUID();
 
   await req.server.redis.set(token,
-    identityId, "EX", config.TOKEN_TIMEOUT_SECONDS,
+    identityId, "EX", authConfig.tokenTimeoutSeconds,
   );
 
   return token;

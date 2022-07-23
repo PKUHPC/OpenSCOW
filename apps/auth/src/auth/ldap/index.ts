@@ -1,4 +1,4 @@
-import { parseKeyValue, parsePlaceholder } from "@scow/config";
+import { parsePlaceholder } from "@scow/config";
 import { FastifyInstance } from "fastify";
 import ldapjs from "ldapjs";
 import { AuthProvider } from "src/auth/AuthProvider";
@@ -6,41 +6,36 @@ import { extractUserInfoFromEntry, findUser, searchOne, useLdap } from "src/auth
 import { modifyPassword, modifyPasswordAsSelf } from "src/auth/ldap/password";
 import { registerPostHandler } from "src/auth/ldap/postHandler";
 import { serveLoginHtml } from "src/auth/loginHtml";
-import { config } from "src/config/env";
+import { authConfig } from "src/config/auth";
 import { ensureNotUndefined } from "src/utils/validations";
 import { promisify } from "util";
 
-const addAttributes = parseKeyValue(config.LDAP_ADD_ATTRS);
-
 export const createLdapAuthProvider = (f: FastifyInstance) => {
 
-  ensureNotUndefined(config, [
-    "LDAP_URL", "LDAP_SEARCH_BASE", "LDAP_FILTER", "LDAP_ADD_USER_BASE", "LDAP_ADD_GROUP_BASE",
-    "LDAP_ATTR_GROUP_USER_ID", "LDAP_ATTR_UID",
-  ]);
+  const { ldap } = ensureNotUndefined(authConfig, ["ldap"]);
 
-  registerPostHandler(f);
+  registerPostHandler(f, ldap);
 
   return <AuthProvider>{
     serveLoginHtml: (callbackUrl, req, rep) => serveLoginHtml(false, callbackUrl, req, rep),
     fetchAuthTokenInfo: async () => undefined,
-    validateName: config.LDAP_ATTR_NAME
+    validateName: ldap.attrs.name
       ? async (identityId, name, req) => {
       // Use LDAP to query a user with identityId and name
-        return useLdap(req.log)(async (client) => {
-          const user = await searchOne(req.log, client, config.LDAP_SEARCH_BASE,
+        return useLdap(req.log, ldap)(async (client) => {
+          const user = await searchOne(req.log, client, ldap.searchBase,
             {
               scope: "sub",
               filter: new ldapjs.AndFilter({
                 filters: [
-                  ldapjs.parseFilter(config.LDAP_FILTER),
+                  ldapjs.parseFilter(ldap.userFilter),
                   new ldapjs.EqualityFilter({
-                    attribute: config.LDAP_ATTR_UID,
+                    attribute: ldap.attrs.uid,
                     value: identityId,
                   }),
                 ],
               }),
-            }, extractUserInfoFromEntry,
+            }, (e) => extractUserInfoFromEntry(ldap, e),
           );
 
           if (!user) {
@@ -55,39 +50,41 @@ export const createLdapAuthProvider = (f: FastifyInstance) => {
         });
       } : undefined,
     createUser: async (info, req) => {
-      const id = info.id + config.LDAP_ADD_UID_START;
+      const id = info.id + ldap.addUser.uidStart;
 
-      await useLdap(req.log)(async (client) => {
-        const peopleDn = `${config.LDAP_ATTR_UID}=${info.identityId},${config.LDAP_ADD_USER_BASE}`;
+      await useLdap(req.log, ldap)(async (client) => {
+        const peopleDn = `${ldap.attrs.uid}=${info.identityId},${ldap.addUser.userBase}`;
         const peopleEntry: Record<string, string | string[] | number> = {
-          [config.LDAP_ATTR_UID]: info.identityId,
+          [ldap.attrs.uid]: info.identityId,
           sn: info.identityId,
           loginShell: "/bin/bash",
           objectClass: ["inetOrgPerson", "posixAccount", "shadowAccount"],
-          homeDirectory: parsePlaceholder(config.LDAP_ADD_HOME_DIR, { userId: info.identityId }),
+          homeDirectory: parsePlaceholder(ldap.addUser.homeDir, { userId: info.identityId }),
           uidNumber: id,
           gidNumber: id,
         };
 
-        if (config.LDAP_ATTR_NAME) {
-          peopleEntry[config.LDAP_ATTR_NAME] = info.name;
+        if (ldap.attrs.name) {
+          peopleEntry[ldap.attrs.name] = info.name;
         }
 
-        if (config.LDAP_ATTR_MAIL) {
-          peopleEntry[config.LDAP_ATTR_MAIL] = info.mail;
+        if (ldap.attrs.mail) {
+          peopleEntry[ldap.attrs.mail] = info.mail;
         }
 
         // parse attributes
-        for (const key in addAttributes) {
-          const value = addAttributes[key];
-          if (value.includes(":")) {
-            peopleEntry[key] = value.split(":").map((x) => parsePlaceholder(x, peopleEntry));
-          } else {
-            peopleEntry[key] = parsePlaceholder(addAttributes[key], peopleEntry);
+        if (ldap.addUser.extraProps) {
+          for (const key in ldap.addUser.extraProps) {
+            const value = ldap.addUser.extraProps[key];
+            if (Array.isArray(value)) {
+              peopleEntry[key] = value.map((x) => parsePlaceholder(x, peopleEntry));
+            } else {
+              peopleEntry[key] = parsePlaceholder(value, peopleEntry);
+            } 
           }
         }
 
-        const groupDn = `${config.LDAP_ATTR_GROUP_USER_ID}=${info.identityId},${config.LDAP_ADD_GROUP_BASE}`;
+        const groupDn = `${ldap.attrs.groupUserId}=${info.identityId},${ldap.addUser.groupBase}`;
         const groupEntry = {
           objectClass: ["posixGroup"],
           memberUid: info.identityId,
@@ -105,11 +102,12 @@ export const createLdapAuthProvider = (f: FastifyInstance) => {
         // set password as admin user
         await modifyPassword(peopleDn, undefined, info.password, client);
 
-        if (config.LDAP_ADD_USER_TO_GROUP) {
+        const addUserToGroup = ldap.addUser.userToGroup;
+        if (addUserToGroup) {
           // get existing members
-          req.log.info("Adding %s to group %s", peopleDn, config.LDAP_ADD_USER_TO_GROUP);
+          req.log.info("Adding %s to group %s", peopleDn, addUserToGroup);
 
-          const members = await searchOne(req.log, client, config.LDAP_ADD_USER_TO_GROUP, {
+          const members = await searchOne(req.log, client, addUserToGroup, {
             attributes: ["member"],
           }, (entry) => {
             const member = entry.attributes.find((x) => x.json.type === "member");
@@ -121,13 +119,13 @@ export const createLdapAuthProvider = (f: FastifyInstance) => {
           });
 
           if (!members) {
-            req.log.error("Didn't find group %s", config.LDAP_ADD_USER_TO_GROUP);
+            req.log.error("Didn't find group %s", addUserToGroup);
             throw { code: "INTERNAL_ERROR" };
           }
 
           // add the dn of the new user to the value
           const modify = promisify(client.modify.bind(client));
-          await modify(config.LDAP_ADD_USER_TO_GROUP, new ldapjs.Change({
+          await modify(addUserToGroup, new ldapjs.Change({
             operation: "add",
             modification: {
               "member": members.members.concat(peopleDn),
@@ -141,13 +139,13 @@ export const createLdapAuthProvider = (f: FastifyInstance) => {
       return "OK";
     },
     changePassword: async (id, oldPassword, newPassword, req) => {
-      return useLdap(req.log)(async (client) => {
-        const user = await findUser(req.log, client, id);
+      return useLdap(req.log, ldap)(async (client) => {
+        const user = await findUser(req.log, ldap, client, id);
         if (!user) {
           return "NotFound";
         }
 
-        const result = await modifyPasswordAsSelf(req.log, user.dn, oldPassword, newPassword);
+        const result = await modifyPasswordAsSelf(req.log, ldap, user.dn, oldPassword, newPassword);
         return result ? "OK" : "WrongOldPassword";
       });
     },

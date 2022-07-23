@@ -1,5 +1,4 @@
 process.env.AUTH_TYPE = "ssh";
-process.env.SSH_BASE_NODE = "localhost:22222";
 
 import { FastifyInstance } from "fastify";
 import { buildApp } from "src/app";

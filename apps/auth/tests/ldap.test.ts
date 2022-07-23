@@ -2,9 +2,12 @@ import { FastifyInstance } from "fastify";
 import { NoSuchObjectError } from "ldapjs";
 import { buildApp } from "src/app";
 import { findUser, useLdap } from "src/auth/ldap/helpers";
-import { config } from "src/config/env";
+import { authConfig } from "src/config/auth";
+import { ensureNotUndefined } from "src/utils/validations";
 
 let server: FastifyInstance;
+
+const { ldap } = ensureNotUndefined(authConfig, ["ldap"]);
 
 beforeEach(async () => {
   server = await buildApp();
@@ -26,10 +29,10 @@ it("creates user and group", async () => {
     password: "12#",
   };
 
-  const userDn = `${config.LDAP_ATTR_UID}=${user.identityId},${config.LDAP_ADD_USER_BASE}`;
-  const groupDn = `${config.LDAP_ATTR_GROUP_USER_ID}=${user.identityId},${config.LDAP_ADD_GROUP_BASE}`;
+  const userDn = `${ldap.attrs.uid}=${user.identityId},${ldap.addUser.userBase}`;
+  const groupDn = `${ldap.attrs.groupUserId}=${user.identityId},${ldap.addUser.groupBase}`;
 
-  await useLdap(server.log)(async (client) => {
+  await useLdap(server.log, ldap)(async (client) => {
 
     function removeEvenNotExist(dn: string) {
       return new Promise<void>((res, rej) => {
@@ -64,7 +67,7 @@ it("creates user and group", async () => {
 
       expect(resp.statusCode).toBe(204);
 
-      const ldapUser = await findUser(server.log, client, user.identityId);
+      const ldapUser = await findUser(server.log, ldap, client, user.identityId);
       expect(ldapUser).toBeDefined();
 
       expect(ldapUser).toEqual({

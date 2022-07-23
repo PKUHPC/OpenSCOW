@@ -5,10 +5,10 @@ import ldapjs from "ldapjs";
 import { cacheInfo } from "src/auth/cacheInfo";
 import { findUser, useLdap } from "src/auth/ldap/helpers";
 import { serveLoginHtml } from "src/auth/loginHtml";
-import { config } from "src/config/env";
+import { LdapConfigSchema } from "src/config/auth";
 import { redirectToWeb } from "src/routes/callback";
 
-export function registerPostHandler(f: FastifyInstance) {
+export function registerPostHandler(f: FastifyInstance, ldapConfig: LdapConfigSchema) {
 
   f.register(formBody);
 
@@ -33,18 +33,18 @@ export function registerPostHandler(f: FastifyInstance) {
     // 6. redirect to /public/callback
     const logger = req.log.child({ plugin: "ldap" });
 
-    await useLdap(logger)(async (client) => {
+    await useLdap(logger, ldapConfig)(async (client) => {
 
-      const user = await findUser(logger, client, username);
+      const user = await findUser(logger, ldapConfig, client, username);
 
       if (!user) {
-        logger.info("Didn't find user with %s=%s", config.LDAP_ATTR_UID, username);
+        logger.info("Didn't find user with %s=%s", ldapConfig.attrs.uid, username);
         await serveLoginHtml(true, callbackUrl, req, res);
         return;
       }
 
       logger.info("Trying binding as %s with credentials", user.dn);
-      const anotherClient = ldapjs.createClient({ url: config.LDAP_URL, log: logger });
+      const anotherClient = ldapjs.createClient({ url: ldapConfig.url, log: logger });
 
       const err = await new Promise<null | ldapjs.Error>((res) => {
         anotherClient.bind(user.dn, password, (err) => {

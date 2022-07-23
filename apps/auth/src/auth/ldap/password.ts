@@ -8,6 +8,7 @@ import { BerWriter } from "asn1";
 import { FastifyLoggerInstance } from "fastify";
 import ldapjs from "ldapjs";
 import { useLdap } from "src/auth/ldap/helpers";
+import { LdapConfigSchema } from "src/config/auth";
 import { promisify } from "util";
 
 function handleIfInvalidCredentials(e: any) {
@@ -43,10 +44,11 @@ export async function modifyPassword(
 
 export async function modifyPasswordAsSelf(
   log: FastifyLoggerInstance,
+  ldap: LdapConfigSchema,
   userDn: string, oldPassword: string, newPassword: string,
 ) : Promise<boolean> {
   try {
-    return await useLdap(log, { dn: userDn, password: oldPassword })(async (client) => {
+    return await useLdap(log, ldap, { dn: userDn, password: oldPassword })(async (client) => {
       await modifyPassword(userDn, oldPassword, newPassword, client);
       return true;
     });

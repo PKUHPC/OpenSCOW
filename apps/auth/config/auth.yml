@@ -1,0 +1,20 @@
+redisUrl: localhost:6379
+authType: ldap
+
+ldap:
+  url: ldap://localhost:389
+  bindDN: cn=Manager,ou=hpc,o=pku
+  bindPassword: admin
+  searchBase: ou=hpc,o=pku
+  userFilter: (uid=*)
+  addUser:
+    userBase: "ou=People,ou=hpc,o=pku"
+    groupBase: "ou=Group,ou=hpc,o=pku"
+  attrs:
+    uid: uid
+    groupUserId: cn
+    name: cn
+    mail: mail
+
+ssh:
+  baseNode: localhost:22222

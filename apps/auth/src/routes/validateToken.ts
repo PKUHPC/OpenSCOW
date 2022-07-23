@@ -1,6 +1,6 @@
 import { Static, Type } from "@sinclair/typebox";
 import fp from "fastify-plugin";
-import { config } from "src/config/env";
+import { authConfig } from "src/config/auth";
 
 const QuerystringSchema = Type.Object({
   token: Type.String(),
@@ -45,13 +45,13 @@ export const validateTokenRoute = fp(async (f) => {
       const cached = await f.redis.get(token);
 
       if (cached) {
-        await f.redis.expire(token, config.TOKEN_TIMEOUT_SECONDS);
+        await f.redis.expire(token, authConfig.tokenTimeoutSeconds);
         return await rep.status(200).send({ identityId: cached });
       } else {
         if (!cached) {
-          await f.redis.set(token, "", "EX", config.TOKEN_TIMEOUT_SECONDS);
+          await f.redis.set(token, "", "EX", authConfig.tokenTimeoutSeconds);
         } else {
-          await f.redis.expire(token, config.TOKEN_TIMEOUT_SECONDS);
+          await f.redis.expire(token, authConfig.tokenTimeoutSeconds);
         }
         return await rep.code(400).send({ code: ErrorCode.INVALID_TOKEN });
       }
