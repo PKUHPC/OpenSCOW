@@ -16,9 +16,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@ddadaal/tsgrpc-server": "0.14.0",
-    "@ddadaal/tsgrpc-utils": "0.14.0",
-    "@grpc/grpc-js": "1.6.7",
+    "@ddadaal/tsgrpc-server": "0.14.1",
+    "@ddadaal/tsgrpc-utils": "0.14.1",
+    "@grpc/grpc-js": "1.6.8",
     "@mikro-orm/cli": "5.2.3",
     "@mikro-orm/core": "5.2.3",
     "@mikro-orm/mariadb": "5.2.3",
@@ -30,13 +30,13 @@
     "@sinclair/typebox": "0.24.20",
     "dotenv": "16.0.1",
     "node-cron": "3.0.1",
-    "node-ssh": "12.0.4",
-    "undici": "5.7.0",
+    "node-ssh": "12.0.5",
+    "undici": "5.8.0",
     "uuid": "8.3.2",
     "wait-on": "6.0.1"
   },
   "devDependencies": {
-    "@ddadaal/tsgrpc-cli": "0.13.0",
+    "@ddadaal/tsgrpc-cli": "0.13.1",
     "@types/google-protobuf": "3.15.6",
     "@types/node-cron": "3.0.2",
     "@types/wait-on": "5.3.1"
