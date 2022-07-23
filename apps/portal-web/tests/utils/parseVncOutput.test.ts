@@ -1,12 +1,4 @@
-import { Server } from "@ddadaal/tsgrpc-server";
-import { createServer } from "src/app";
 import { parseDisplayId, parseListOutput, parseOtp } from "src/utils/turbovnc";
-
-let server: Server;
-
-beforeEach(async () => {
-  server = await createServer();
-});
 
 const startOutput = `
 Desktop 'TurboVNC: login01:1 (2001213077)' started on display login01:1
@@ -23,14 +15,14 @@ Log file is /nfs/2001213077/.vnc/login01:1.log
 it.each([
   [startOutput, 1],
 ])("parses display id from output", async (output, expected) => {
-  expect(parseDisplayId(output, server.logger)).toBe(expected);
+  expect(parseDisplayId(output)).toBe(expected);
 });
 
 it.each([
   ["Full control one-time password: 32582749", "32582749"],
   [startOutput, "67159149"],
 ])("parses OTP from output", async (output, expected) => {
-  expect(parseOtp(output, server.logger)).toBe(expected);
+  expect(parseOtp(output)).toBe(expected);
 });
 
 const listOutput = `

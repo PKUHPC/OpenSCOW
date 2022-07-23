@@ -1,6 +1,6 @@
 // @ts-check
 
-const { envConfig, str, bool, parseKeyValue } = require("@scow/config");
+const { envConfig, str, bool, parseKeyValue, num } = require("@scow/config");
 const { join, basename, extname } = require("path");
 const { homedir } = require("os");
 const fs = require("fs");
@@ -29,7 +29,6 @@ const specs = {
   AUTH_INTERNAL_URL: str({ desc: "认证服务内网地址", default: "http://auth:5000" }),
 
   ENABLE_JOB_MANAGEMENT: bool({ desc: "是否启动作业管理功能", default: false }),
-  JOB_SERVER: str({ desc: "作业服务器的地址", default: "job-server:5000" }),
 
   ENABLE_LOGIN_DESKTOP: bool({ desc: "是否启动登录节点上的桌面功能", default: false }),
   LOGIN_DESKTOP_WMS: str({ desc: "登录节点上可以启动的桌面类型，格式：名字=wm值,名字=wm值", example: "Xfce=xfce,gnome3=", default: "Xfce=xfce" }),
@@ -60,15 +59,22 @@ const specs = {
   FILE_SERVERS: str({ desc: "覆盖集群的文件管理服务器地址。如果一个集群不设置，将会使用集群配置文件中的loginNode", example: "集群ID=IP,集群ID=IP", default: "" }),
 
   MOCK_USER_ID: str({ desc: "覆盖已登录用户的用户ID", default: undefined }),
+
+  TURBOVNC_PATH: str({ desc: "TurboVNC的安装路径", default: "/opt/TurboVNC" }),
+
+  SAVED_JOBS_DIR: str({ desc: "将保存的作业保存到什么位置。相对于用户的家目录", default: "scow/savedJobs" }),
+  APP_JOBS_DIR: str({ desc: "将交互式任务的信息保存到什么位置。相对于用户的家目录", default: "scow/appData" }),
+
+  MAX_LOGIN_DESKTOPS: num({ desc: "最大登录节点桌面数量", default: 3 }),
 };
 
-const config = envConfig(specs, process.env);
+// This config is used to provide env doc auto gen
+const config = { _specs: specs };
 
 const buildRuntimeConfig = async (phase) => {
   const building = phase === PHASE_PRODUCTION_BUILD;
   const dev = phase === PHASE_DEVELOPMENT_SERVER;
   const production = phase === PHASE_PRODUCTION_SERVER;
-  const test = phase === PHASE_TEST;
 
   // load .env.build if in build
   if (building) {
@@ -78,6 +84,9 @@ const buildRuntimeConfig = async (phase) => {
   if (dev) {
     require("dotenv").config({ path: "env/.env.dev" });
   }
+
+  // reload config after envs are applied
+  const config = envConfig(specs, process.env);
 
   // load clusters.json
   const { getConfigFromFile, CONFIG_BASE_PATH } = require("@scow/config");
@@ -122,12 +131,15 @@ const buildRuntimeConfig = async (phase) => {
     DEFAULT_PRIMARY_COLOR: config.DEFAULT_PRIMARY_COLOR,
     FOOTER_TEXTS: parseKeyValue(config.FOOTER_TEXTS),
     PRIMARY_COLORS: parseKeyValue(config.PRIMARY_COLORS),
-    JOB_SERVER: config.JOB_SERVER,
     SSH_PRIVATE_KEY_PATH: config.SSH_PRIVATE_KEY_PATH,
     CLUSTERS_CONFIG: clusters,
     FILE_SERVERS: parseKeyValue(config.FILE_SERVERS),
     APPS: apps,
     MOCK_USER_ID: config.MOCK_USER_ID,
+    TURBOVNC_PATH: config.TURBOVNC_PATH,
+    MAX_LOGIN_DESKTOPS: config.MAX_LOGIN_DESKTOPS,
+    APP_JOBS_DIR: config.APP_JOBS_DIR,
+    SAVED_JOBS_DIR: config.SAVED_JOBS_DIR,
   };
 
   // query auth capabilities to set optional auth features

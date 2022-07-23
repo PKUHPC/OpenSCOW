@@ -15,7 +15,6 @@ title: "portal-web"
 |`AUTH_EXTERNAL_URL`|字符串|认证服务外网地址|/auth|
 |`AUTH_INTERNAL_URL`|字符串|认证服务内网地址|http://auth:5000|
 |`ENABLE_JOB_MANAGEMENT`|布尔值|是否启动作业管理功能|false|
-|`JOB_SERVER`|字符串|作业服务器的地址|job-server:5000|
 |`ENABLE_LOGIN_DESKTOP`|布尔值|是否启动登录节点上的桌面功能|false|
 |`LOGIN_DESKTOP_WMS`|字符串|登录节点上可以启动的桌面类型，格式：名字=wm值,名字=wm值<br/>示例：Xfce=xfce,gnome3=|Xfce=xfce|
 |`ENABLE_APPS`|布尔值|是否启动交互式任务功能|false|
@@ -34,6 +33,10 @@ title: "portal-web"
 |`PROXY_BASE_PATH`|字符串|代理地址的根路径|/proxy|
 |`FILE_SERVERS`|字符串|覆盖集群的文件管理服务器地址。如果一个集群不设置，将会使用集群配置文件中的loginNode<br/>示例：集群ID=IP,集群ID=IP||
 |`MOCK_USER_ID`|字符串|覆盖已登录用户的用户ID|不设置|
+|`TURBOVNC_PATH`|字符串|TurboVNC的安装路径|/opt/TurboVNC|
+|`SAVED_JOBS_DIR`|字符串|将保存的作业保存到什么位置。相对于用户的家目录|scow/savedJobs|
+|`APP_JOBS_DIR`|字符串|将交互式任务的信息保存到什么位置。相对于用户的家目录|scow/appData|
+|`MAX_LOGIN_DESKTOPS`|数字|最大登录节点桌面数量|3|
 
 <!-- ENV TABLE END -->
 

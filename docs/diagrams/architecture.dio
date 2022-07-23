@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e" scale="2" border="0">
     <diagram id="aekzRgjksSTJDkMgN9YQ" name="Page-1">
-        <mxGraphModel dx="1197" dy="392" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+        <mxGraphModel dx="1322" dy="910" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -36,14 +36,11 @@
                 <mxCell id="56" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;fillColor=#0050ef;strokeColor=#001DBC;labelBackgroundColor=none;" parent="1" source="5" target="9" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="77" style="edgeStyle=none;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontSize=18;fillColor=#0050ef;strokeColor=#001DBC;labelBackgroundColor=none;" parent="1" source="5" target="74" edge="1">
-                    <mxGeometry relative="1" as="geometry"/>
-                </mxCell>
                 <mxCell id="81" style="edgeStyle=none;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontSize=18;fillColor=#0050ef;strokeColor=#001DBC;labelBackgroundColor=none;" parent="1" source="5" target="80" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
                 <mxCell id="5" value="portal-web" style="whiteSpace=wrap;html=1;fontSize=18;fillColor=#0050ef;fontColor=#ffffff;strokeColor=#001DBC;labelBackgroundColor=none;" parent="1" vertex="1">
-                    <mxGeometry x="180" y="190" width="120" height="60" as="geometry"/>
+                    <mxGeometry x="170" y="230" width="120" height="60" as="geometry"/>
                 </mxCell>
                 <mxCell id="28" style="edgeStyle=none;html=1;fontSize=18;fillColor=#a20025;strokeColor=#6F0000;labelBackgroundColor=none;" parent="1" source="8" target="27" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
@@ -55,7 +52,7 @@
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
                 <mxCell id="8" value="&lt;span style=&quot;font-size: 18px&quot;&gt;mis-server&lt;br&gt;&lt;/span&gt;" style="whiteSpace=wrap;html=1;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;labelBackgroundColor=none;" parent="1" vertex="1">
-                    <mxGeometry x="314.5" y="300" width="120" height="60" as="geometry"/>
+                    <mxGeometry x="320" y="310" width="120" height="60" as="geometry"/>
                 </mxCell>
                 <mxCell id="45" style="edgeStyle=none;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=18;exitX=1;exitY=0.5;exitDx=0;exitDy=0;labelBackgroundColor=none;" parent="1" source="9" target="44" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
@@ -70,7 +67,7 @@
                     <mxGeometry x="610" y="545" width="90" height="80" as="geometry"/>
                 </mxCell>
                 <mxCell id="34" value="clusterops" style="whiteSpace=wrap;html=1;fontSize=18;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;labelBackgroundColor=none;" parent="1" vertex="1">
-                    <mxGeometry x="379.5" y="410" width="120" height="60" as="geometry"/>
+                    <mxGeometry x="390" y="420" width="120" height="60" as="geometry"/>
                 </mxCell>
                 <mxCell id="43" value="LDAP" style="whiteSpace=wrap;html=1;fontSize=18;labelBackgroundColor=none;" parent="1" vertex="1">
                     <mxGeometry x="707" y="370" width="120" height="60" as="geometry"/>
@@ -88,7 +85,7 @@
                     <mxGeometry x="400" y="190" width="120" height="60" as="geometry"/>
                 </mxCell>
                 <mxCell id="27" value="" style="shape=datastore;whiteSpace=wrap;html=1;fontSize=18;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;labelBackgroundColor=none;" parent="1" vertex="1">
-                    <mxGeometry x="320" y="420" width="40" height="40" as="geometry"/>
+                    <mxGeometry x="320" y="430" width="40" height="40" as="geometry"/>
                 </mxCell>
                 <mxCell id="60" value="slurm" style="rounded=0;whiteSpace=wrap;html=1;fontSize=18;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;labelBackgroundColor=none;" parent="1" vertex="1">
                     <mxGeometry x="400" y="570" width="110" height="50" as="geometry"/>
@@ -98,14 +95,8 @@
                         <mxPoint x="309.2816237490513" y="531.7838943606987" as="targetPoint"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="79" style="edgeStyle=none;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fillColor=#0050ef;strokeColor=#001DBC;labelBackgroundColor=none;" parent="1" source="74" target="80" edge="1">
-                    <mxGeometry relative="1" as="geometry"/>
-                </mxCell>
-                <mxCell id="74" value="job-server" style="rounded=0;whiteSpace=wrap;html=1;fontSize=18;fillColor=#0050ef;fontColor=#ffffff;strokeColor=#001DBC;labelBackgroundColor=none;" parent="1" vertex="1">
-                    <mxGeometry x="140" y="410" width="110" height="60" as="geometry"/>
-                </mxCell>
                 <mxCell id="80" value="login-node" style="rounded=0;whiteSpace=wrap;html=1;fontSize=18;labelBackgroundColor=none;" parent="1" vertex="1">
-                    <mxGeometry x="230" y="570" width="113" height="50" as="geometry"/>
+                    <mxGeometry x="177" y="570" width="113" height="50" as="geometry"/>
                 </mxCell>
             </root>
         </mxGraphModel>

@@ -1,19 +1,17 @@
-import { plugin } from "@ddadaal/tsgrpc-server";
-import { ServiceError, status } from "@grpc/grpc-js";
 import { randomUUID } from "crypto";
 import fs from "fs";
 import { join } from "path";
-import { querySqueue } from "src/bl/queryJobInfo";
-import { generateJobScript, parseSbatchOutput } from "src/bl/submitJob";
+import { AppOps, AppSession } from "src/clusterops/api/app";
+import { displayIdToPort } from "src/clusterops/slurm/bl/port";
 import { getAppConfig } from "src/config/apps";
-import { clustersConfig } from "src/config/clusters";
-import { config } from "src/config/env";
 import { RunningJob } from "src/generated/common/job";
-import { AppServiceServer, AppServiceService, AppSession } from "src/generated/portal/app";
-import { displayIdToPort } from "src/utils/port";
+import { runtimeConfig } from "src/utils/config";
 import { sftpChmod, sftpExists, sftpReaddir, sftpReadFile, sftpRealPath, sftpWriteFile } from "src/utils/sftp";
-import { loggedExec, sshConnect } from "src/utils/ssh";
+import { getClusterLoginNode, loggedExec, sshConnect } from "src/utils/ssh";
 import { parseDisplayId, refreshPassword, VNCSERVER_BIN_PATH } from "src/utils/turbovnc";
+
+import { querySqueue } from "./bl/queryJobInfo";
+import { generateJobScript, parseSbatchOutput } from "./bl/submitJob";
 
 interface SessionMetadata {
   sessionId: string;
@@ -22,8 +20,8 @@ interface SessionMetadata {
   submitTime: string;
 }
 
-const SERVER_ENTRY_COMMAND = fs.readFileSync("assets/server_entry.sh", { encoding: "utf-8" });
-const VNC_ENTRY_COMMAND = fs.readFileSync("assets/vnc_entry.sh", { encoding: "utf-8" });
+const SERVER_ENTRY_COMMAND = fs.readFileSync("assets/slurm/server_entry.sh", { encoding: "utf-8" });
+const VNC_ENTRY_COMMAND = fs.readFileSync("assets/slurm/vnc_entry.sh", { encoding: "utf-8" });
 
 const VNC_OUTPUT_FILE = "output";
 
@@ -32,44 +30,42 @@ const SESSION_METADATA_NAME = "session.json";
 const SERVER_SESSION_INFO = "SERVER_SESSION_INFO";
 const VNC_SESSION_INFO = "VNC_SESSION_INFO";
 
+export const slurmAppOps = (cluster: string): AppOps => {
 
-export const appServiceServer = plugin((server) => {
-  server.addService<AppServiceServer>(AppServiceService, {
-    createApp: async ({ request, logger }) => {
-      const { appId, cluster, userId, account, coreCount, maxTime, partition, qos } = request;
+  const host = getClusterLoginNode(cluster);
+
+  if (!host) { throw new Error(`Cluster ${cluster} has no login node`); }
+
+  return {
+    createApp: async (request, logger) => {
+      const { appId, userId, account, coreCount, maxTime, partition, qos } = request;
 
       // prepare script file
       const appConfig = getAppConfig(appId);
 
-      const node = clustersConfig[cluster].loginNodes[0];
-
       const jobName = randomUUID();
 
-      const workingDirectory = join(config.APP_JOBS_DIR, jobName);
+      const workingDirectory = join(runtimeConfig.APP_JOBS_DIR, jobName);
 
-      return await sshConnect(node, userId, logger, async (ssh) => {
+      return await sshConnect(host, userId, logger, async (ssh) => {
 
         // make sure workingDirectory exists.
         await ssh.mkdir(workingDirectory);
 
         const sftp = await ssh.requestSFTP();
 
-        const submitAndWriteMetadata = async (script: string, env?: NodeJS.ProcessEnv) => {
+        const submitAndWriteMetadata = async (script: string, env?: Record<string, string>) => {
           const remoteEntryPath = join(workingDirectory, "entry.sh");
 
           await sftpWriteFile(sftp)(remoteEntryPath, script);
 
           // submit entry.sh
           const { code, stderr, stdout } = await loggedExec(ssh, logger, false,
-            "sbatch", [remoteEntryPath], { execOptions: { env } },
+            "sbatch", [remoteEntryPath], { execOptions: { env: env as NodeJS.ProcessEnv } },
           );
 
           if (code !== 0) {
-            throw <ServiceError> {
-              code: status.UNAVAILABLE,
-              message: "slurm job submission failed.",
-              details: stderr,
-            };
+            return { code: "SBATCH_FAILED", message: stderr } as const;
           }
 
           // parse stdout output to get the job id
@@ -84,7 +80,7 @@ export const appServiceServer = plugin((server) => {
           };
 
           await sftpWriteFile(sftp)(join(workingDirectory, SESSION_METADATA_NAME), JSON.stringify(metadata));
-          return metadata;
+          return { code: "OK", jobId, sessionId: metadata.sessionId } as const;
         };
 
         if (appConfig.type === "web") {
@@ -104,10 +100,7 @@ export const appServiceServer = plugin((server) => {
             nodeList: appConfig.nodes?.join(","),
           });
 
-          const metadata = await submitAndWriteMetadata(script, { SERVER_SESSION_INFO });
-
-          return [{ jobId: metadata.jobId, sessionId: metadata.sessionId }];
-
+          return await submitAndWriteMetadata(script, { SERVER_SESSION_INFO });
         } else {
           const xstartupPath = join(workingDirectory, "xstartup");
           await sftpWriteFile(sftp)(xstartupPath, appConfig.xstartup);
@@ -127,24 +120,21 @@ export const appServiceServer = plugin((server) => {
             nodeList: appConfig.nodes?.join(","),
           });
 
-          const metadata = await submitAndWriteMetadata(script, { VNC_SESSION_INFO, VNCSERVER_BIN_PATH });
-          return [{ jobId: metadata.jobId, sessionId: metadata.sessionId }];
+          return await submitAndWriteMetadata(script, { VNC_SESSION_INFO, VNCSERVER_BIN_PATH });
         }
 
       });
     },
 
-    getSessions: async ({ request, logger }) => {
-      const { cluster, userId } = request;
+    getAppSessions: async (request, logger) => {
+      const { userId } = request;
 
-      const node = clustersConfig[cluster].loginNodes[0];
-
-      return await sshConnect(node, userId, logger, async (ssh) => {
+      return await sshConnect(host, userId, logger, async (ssh) => {
         const sftp = await ssh.requestSFTP();
 
-        if (!await sftpExists(sftp, config.APP_JOBS_DIR)) { return [{ sessions: []}]; }
+        if (!await sftpExists(sftp, runtimeConfig.APP_JOBS_DIR)) { return { sessions: []}; }
 
-        const list = await sftpReaddir(sftp)(config.APP_JOBS_DIR);
+        const list = await sftpReaddir(sftp)(runtimeConfig.APP_JOBS_DIR);
 
         // using squeue to get jobs that are running
         // If a job is not running, it cannot be ready
@@ -158,7 +148,7 @@ export const appServiceServer = plugin((server) => {
         const sessions = [] as AppSession[];
 
         await Promise.all(list.map(async ({ filename }) => {
-          const jobDir = join(config.APP_JOBS_DIR, filename);
+          const jobDir = join(runtimeConfig.APP_JOBS_DIR, filename);
           const metadataPath = join(jobDir, SESSION_METADATA_NAME);
 
           if (!await sftpExists(sftp, metadataPath)) {
@@ -190,7 +180,7 @@ export const appServiceServer = plugin((server) => {
               if (await sftpExists(sftp, outputFilePath)) {
                 const content = (await sftpReadFile(sftp)(outputFilePath)).toString();
                 try {
-                  parseDisplayId(content, logger);
+                  parseDisplayId(content);
                   ready = true;
                 } catch {
                 // ignored if displayId cannot be parsed
@@ -203,7 +193,7 @@ export const appServiceServer = plugin((server) => {
             jobId: sessionMetadata.jobId,
             appId: sessionMetadata.appId,
             sessionId: sessionMetadata.sessionId,
-            submitTime: new Date(sessionMetadata.submitTime),
+            submitTime: sessionMetadata.submitTime,
             state: runningJobInfo?.state ?? "ENDED",
             ready,
             dataPath: await sftpRealPath(sftp)(jobDir),
@@ -211,27 +201,20 @@ export const appServiceServer = plugin((server) => {
 
         }));
 
-
-
-        return [{ sessions }];
+        return { sessions };
       });
     },
 
-    connectToApp: async ({ request, logger }) => {
-      const { cluster, sessionId, userId } = request;
+    connectToApp: async (request, logger) => {
+      const { sessionId, userId } = request;
 
-      const node = clustersConfig[cluster].loginNodes[0];
-
-      return await sshConnect(node, userId, logger, async (ssh) => {
+      return await sshConnect(host, userId, logger, async (ssh) => {
         const sftp = await ssh.requestSFTP();
 
-        const jobDir = join(config.APP_JOBS_DIR, sessionId);
+        const jobDir = join(runtimeConfig.APP_JOBS_DIR, sessionId);
 
         if (!await sftpExists(sftp, jobDir)) {
-          throw <ServiceError>{
-            code: status.NOT_FOUND,
-            message: `dir ${jobDir} does not exist`,
-          };
+          return { code: "NOT_FOUND" };
         }
 
         const metadataPath = join(jobDir, SESSION_METADATA_NAME);
@@ -249,7 +232,7 @@ export const appServiceServer = plugin((server) => {
 
             const [host, port, password] = content.split("\n");
 
-            return [{ appId: app.id, host, port: +port, password }];
+            return { code: "OK", appId: app.id, host, port: +port, password };
           }
         } else {
           // for vnc apps,
@@ -268,34 +251,26 @@ export const appServiceServer = plugin((server) => {
 
               let displayId: number | undefined = undefined;
               try {
-                displayId = parseDisplayId(content, logger);
+                displayId = parseDisplayId(content);
               } catch {
                 // ignored if displayId cannot be parsed
               }
-              if (displayId) {
 
+              if (displayId) {
                 // the server is run at the compute node
                 // login to the compute node and refresh the password
-
-                if (displayId) {
-                  return await sshConnect(host, userId, logger, async (computeNodeSsh) => {
-                    if (displayId) {
-                      const password = await refreshPassword(computeNodeSsh, logger, displayId);
-                      return [{ appId: app.id, host, port: displayIdToPort(displayId), password }];
-                    }
-                  });
-                }
+                return await sshConnect(host, userId, logger, async (computeNodeSsh) => {
+                  const password = await refreshPassword(computeNodeSsh, logger, displayId!);
+                  return { code: "OK", appId: app.id, host, port: displayIdToPort(displayId!), password };
+                });
               }
-
             }
           }
         }
+        return { code: "UNAVAILABLE" };
 
-        throw <ServiceError> {
-          code: status.UNAVAILABLE,
-        };
       });
     },
-  });
-});
+  };
+};
 

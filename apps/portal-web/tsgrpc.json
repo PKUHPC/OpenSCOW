@@ -3,7 +3,7 @@
   "protos": [
     {
       "path": "../../protos",
-      "files": "../../protos/{portal/**/*.proto,common/job.proto}",
+      "files": "../../protos/common/job.proto",
       "name": "."
     }
   ],

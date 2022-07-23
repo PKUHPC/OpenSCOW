@@ -1,8 +1,8 @@
-import { Logger } from "@ddadaal/tsgrpc-server";
-import { DateTime } from "luxon";
+import moment from "moment-timezone";
 import { NodeSSH } from "node-ssh";
+import { JobInfo } from "src/clusterops/api/job";
 import { RunningJob } from "src/generated/common/job";
-import { JobInfo } from "src/generated/portal/job";
+import { Logger } from "src/utils/log";
 import { loggedExec } from "src/utils/ssh";
 
 const SEPARATOR = "__x__x__";
@@ -39,7 +39,7 @@ export async function querySqueue(ssh: NodeSSH, logger: Logger, params: string[]
 }
 
 function formatTime(time: Date, tz: string) {
-  return DateTime.fromJSDate(time).setZone(tz).toFormat("yyyy-MM-dd'T'HH:mm:ss");
+  return moment(time).tz(tz).format("YYYY-MM-DD[T]HH:mm:ss");
 }
 
 export async function querySacct(ssh: NodeSSH, logger: Logger, startTime: Date, endTime: Date) {

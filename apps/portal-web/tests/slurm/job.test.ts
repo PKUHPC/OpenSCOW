@@ -1,4 +1,4 @@
-import { parseSbatchOutput } from "src/bl/submitJob";
+import { parseSbatchOutput } from "src/clusterops/slurm/bl/submitJob";
 
 it.each([
   ["Submitted batch job 34987", 34987],

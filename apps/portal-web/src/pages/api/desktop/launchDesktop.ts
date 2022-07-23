@@ -1,10 +1,10 @@
-import { route } from "@ddadaal/next-typed-api-routes-runtime";
-import { asyncClientCall } from "@ddadaal/tsgrpc-utils";
 import { authenticate } from "src/auth/server";
-import { VncServiceClient } from "src/generated/portal/vnc";
-import { getJobServerClient } from "src/utils/client";
+import { displayIdToPort } from "src/clusterops/slurm/bl/port";
 import { publicConfig } from "src/utils/config";
 import { dnsResolve } from "src/utils/dns";
+import { route } from "src/utils/route";
+import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
+import { refreshPassword } from "src/utils/turbovnc";
 
 export interface LaunchDesktopSchema {
   method: "POST";
@@ -29,6 +29,8 @@ const auth = authenticate(() => true);
 
 export default /* #__PURE__*/route<LaunchDesktopSchema>("LaunchDesktopSchema", async (req, res) => {
 
+
+
   if (!publicConfig.ENABLE_LOGIN_DESKTOP) {
     return { 501: null };
   }
@@ -37,15 +39,17 @@ export default /* #__PURE__*/route<LaunchDesktopSchema>("LaunchDesktopSchema", a
 
   if (!info) { return; }
 
-  const client = getJobServerClient(VncServiceClient);
+  const { cluster, displayId } = req.body;
 
-  return await asyncClientCall(client, "launchDesktop", {
-    cluster: req.body.cluster,
-    username: info.identityId,
-    displayId: req.body.displayId,
-  })
-    .then(async ({ node, password, port }) => {
-      // nginx doesn't use /etc/hosts. The host must be resolved before passing to nginx
-      return { 200: { node: await dnsResolve(node), password, port } };
-    });
+  const host = getClusterLoginNode(cluster);
+
+  if (!host) { return { 400: { code: "INVALID_CLUSTER" } }; }
+
+  return await sshConnect(host, info.identityId, req.log, async (ssh) => {
+
+    // refresh the otp
+    const password = await refreshPassword(ssh, req.log, displayId);
+
+    return { 200: { node: await dnsResolve(host), port: displayIdToPort(displayId), password } };
+  });
 });

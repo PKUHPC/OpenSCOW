@@ -1,5 +1,7 @@
-import { NodeSSH } from "node-ssh";
+import { NodeSSH, SSHExecCommandOptions } from "node-ssh";
+import { quote } from "shell-quote";
 import { runtimeConfig }  from "src/utils/config";
+import { Logger } from "src/utils/log";
 
 export function getClusterLoginNode(cluster: string): string | undefined {
 
@@ -32,7 +34,7 @@ export async function sshRawConnect(
 }
 
 export async function sshConnect<T>(
-  addr: string, username: string, run: (ssh: NodeSSH) => Promise<T>,
+  addr: string, username: string, logger: Logger, run: (ssh: NodeSSH) => Promise<T>,
 ) {
   const ssh = await sshRawConnect(addr, username);
 
@@ -41,4 +43,33 @@ export async function sshConnect<T>(
 
 export async function sshRmrf(ssh: NodeSSH, path: string) {
   await ssh.exec("rm", ["-rf", path]);
+}
+
+export function constructCommand(cmd: string, parameters: readonly string[], env?: Record<string, string>) {
+
+  const command = cmd + (parameters.length > 0 ? (" " + quote(parameters)) : "");
+
+  const envPrefix = env ? Object.keys(env).map((x) => `${x}=${quote([env[x] ?? ""])} `).join("") : "";
+
+  return envPrefix + command;
+}
+
+export async function loggedExec(ssh: NodeSSH, logger: Logger, throwIfFailed: boolean,
+  cmd: string, parameters: string[], options?: SSHExecCommandOptions) {
+
+  const env = options?.execOptions?.env as Record<string, string>;
+
+  const command = constructCommand(cmd, parameters, env);
+
+  const resp = await ssh.execCommand(command, options);
+
+  if (resp.code !== 0) {
+    // logger.error("Command %o failed. stdout %s, stderr %s", command, resp.stdout, resp.stderr);
+    if (throwIfFailed) {
+      throw new Error("");
+    }
+  } else {
+    // logger.debug("Command %o completed. stdout %s, stderr %s", command, resp.stdout, resp.stderr);
+  }
+  return resp;
 }

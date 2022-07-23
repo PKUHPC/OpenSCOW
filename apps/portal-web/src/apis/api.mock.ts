@@ -1,7 +1,7 @@
 import { JsonFetchResultPromiseLike } from "@ddadaal/next-typed-api-routes-runtime/lib/client";
 import { api } from "src/apis/api";
+import { JobInfo } from "src/clusterops/api/job";
 import type { RunningJob } from "src/generated/common/job";
-import { JobInfo } from "src/generated/portal/job";
 
 export type MockApi<TApi extends Record<
   string,
@@ -122,13 +122,8 @@ export const mockApi: MockApi<typeof api> = {
   launchDesktop: async () => ({ node: "login01", password: "123", port: 1234 }),
 
   listDesktops: async () => ({
-    result: {
-      connections: [{
-        node: "login01",
-        cluster: "hpc01",
-        displayId: [1, 2, 3],
-      }],
-    },
+    node: "login01",
+    displayId: [1, 2, 3],
   }),
 
   createDesktop: async () => (
@@ -138,8 +133,7 @@ export const mockApi: MockApi<typeof api> = {
       port: 1234,
     }),
 
-  killDesktop: async () => ({ message: "success!" }),
-
+  killDesktop: async () => null,
 
   logout: async () => null,
 

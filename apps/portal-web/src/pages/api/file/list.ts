@@ -1,5 +1,5 @@
-import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import { authenticate } from "src/auth/server";
+import { route } from "src/utils/route";
 import { sftpReaddir, sftpStat } from "src/utils/sftp";
 import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
 
@@ -33,6 +33,8 @@ const auth = authenticate(() => true);
 
 export default route<ListFileSchema>("ListFileSchema", async (req, res) => {
 
+
+
   const info = await auth(req, res);
 
   if (!info) { return; }
@@ -45,7 +47,7 @@ export default route<ListFileSchema>("ListFileSchema", async (req, res) => {
     return { 400: { code: "INVALID_CLUSTER" } };
   }
 
-  return await sshConnect(host, info.identityId, async (ssh) => {
+  return await sshConnect(host, info.identityId, req.log, async (ssh) => {
     const sftp = await ssh.requestSFTP();
 
     try {

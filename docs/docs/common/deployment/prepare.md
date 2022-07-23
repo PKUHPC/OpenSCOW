@@ -3,16 +3,24 @@ sidebar_position: 2
 title: 准备环境
 ---
 
+# 集群要求
+
+要在您的集群上使用SCOW，请保证您的集群满足以下条件：
+
+- 集群中的各个节点可相互通过网络连接
+- 使用slurm调度器，并且
+  - 版本为21.08.4及以上
+  - 已经部署slurm的[Accounting](https://slurm.schedmd.com/accounting.html#database-configuration)功能
+
 # 准备环境
 
-我们推荐将系统主要部署在一个**单独**的节点上。下文称部署这些组件的节点为**服务节点**。
+我们推荐将SCOW部署在一个**单独**的节点上。下文称部署这些组件的节点为**服务节点**。
 
 服务节点应该安装好`docker`（[安装docker的官方文档](https://docs.docker.com/engine/install/)）以及`docker compose`（[安装docker compose的官方文档](https://docs.docker.com/compose/install/)）。
 
-
 在部署的过程中，可能有的组件需要其他配置，请参考对应的文档。
 
-## 准备相关文件结构
+# 部署文件目录结构
 
 我们推荐将`docker-compose.yml`文件以及所有配置文件存放到一个目录中，并将存放配置文件的目录映射到容器的`/etc/scow`目录中。
 

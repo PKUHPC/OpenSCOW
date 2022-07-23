@@ -1,11 +1,10 @@
-import { route } from "@ddadaal/next-typed-api-routes-runtime";
-import { asyncClientCall } from "@ddadaal/tsgrpc-utils";
-import { status } from "@grpc/grpc-js";
 import { authenticate } from "src/auth/server";
-import { VncServiceClient } from "src/generated/portal/vnc";
-import { getJobServerClient } from "src/utils/client";
-import { publicConfig } from "src/utils/config";
+import { displayIdToPort } from "src/clusterops/slurm/bl/port";
+import { publicConfig, runtimeConfig } from "src/utils/config";
 import { dnsResolve } from "src/utils/dns";
+import { route } from "src/utils/route";
+import { getClusterLoginNode, loggedExec, sshConnect } from "src/utils/ssh";
+import { parseDisplayId, parseListOutput, parseOtp, VNCSERVER_BIN_PATH } from "src/utils/turbovnc";
 
 export interface CreateDesktopSchema {
   method: "POST";
@@ -25,14 +24,13 @@ export interface CreateDesktopSchema {
     };
 
     400: {
-      code: "INVALID_WM";
-      message: string;
+      code: "INVALID_WM" | "INVALID_CLUSTER";
     }
 
     409: {
-      code: "RESOURCE_EXHAUSTED";
-      message: string;
+      code: "TOO_MANY_DESKTOPS";
     }
+
     // 功能没有启用
     501: null;
   }
@@ -42,9 +40,15 @@ const auth = authenticate(() => true);
 
 export default /* #__PURE__*/route<CreateDesktopSchema>("CreateDesktopSchema", async (req, res) => {
 
+
+
   if (!publicConfig.ENABLE_LOGIN_DESKTOP) {
     return { 501: null };
   }
+
+  const info = await auth(req, res);
+
+  if (!info) { return; }
 
   const { cluster, wm } = req.body;
 
@@ -52,24 +56,42 @@ export default /* #__PURE__*/route<CreateDesktopSchema>("CreateDesktopSchema", a
     return { 400: { code: "INVALID_WM", message: `${wm} is not a acceptable wm.` } };
   }
 
-  const info = await auth(req, res);
+  const host = getClusterLoginNode(cluster);
 
-  if (!info) { return; }
+  if (!host) { return { 400: { code: "INVALID_CLUSTER" } }; }
 
-  const client = getJobServerClient(VncServiceClient);
+  return await sshConnect(host, info.identityId, req.log, async (ssh) => {
 
-  return await asyncClientCall(client, "createDesktop", {
-    cluster,
-    username: info.identityId,
-    wm: publicConfig.LOGIN_DESKTOP_WMS[wm],
-  })
-    .then(async ({ node, password, port }) => {
-      return { 200: { node: await dnsResolve(node), password, port } };
-    }).catch((e) => {
-      if (e.code === status.RESOURCE_EXHAUSTED) {
-        return { 409: { code: "RESOURCE_EXHAUSTED", message: e.details } } as const;
-      } else {
-        throw e;
-      }
-    });
+    // find if the user has running session
+    let resp = await loggedExec(ssh, req.log, true,
+      VNCSERVER_BIN_PATH, ["-list"],
+    );
+
+    const ids = parseListOutput(resp.stdout);
+
+    if (ids.length >= runtimeConfig.MAX_LOGIN_DESKTOPS) {
+      return { 409: { code: "TOO_MANY_DESKTOPS" } as const };
+    }
+
+    // start a session
+
+    // explicitly set securitytypes to avoid requiring setting vnc passwd
+    const params = ["-securitytypes", "OTP", "-otp"];
+
+    if (wm) {
+      params.push("-wm");
+      params.push(wm);
+    }
+
+    resp = await loggedExec(ssh, req.log, true, VNCSERVER_BIN_PATH, params);
+
+    // parse the OTP from output. the output was in stderr
+    const password = parseOtp(resp.stderr);
+    // parse display id from output
+    const displayId = parseDisplayId(resp.stderr);
+
+    const port = displayIdToPort(displayId);
+
+    return { 200: { node: await dnsResolve(host), password, port } };
+  });
 });

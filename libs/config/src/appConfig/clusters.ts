@@ -4,6 +4,7 @@ export const ClustersConfigSchema = Type.Record(
   Type.String({ description: "集群ID" }),
   Type.Object({
     displayName: Type.String({ description: "集群的显示名称" }),
+    scheduler: Type.Enum({ slurm: "slurm" }, { description: "集群所使用的调度器，目前只支持slurm", default: "slurm" }),
     loginNodes: Type.Array(Type.String(), {  description: "集群的登录节点地址", default: []}),
     computeNodes: Type.Array(Type.String(), { description: "集群的计算节点地址", default: []}),
     partitions: Type.Record(

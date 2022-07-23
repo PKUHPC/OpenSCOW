@@ -1,6 +1,6 @@
-import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import busboy from "busboy";
 import { authenticate } from "src/auth/server";
+import { route } from "src/utils/route";
 import { getClusterLoginNode, sshRawConnect } from "src/utils/ssh";
 
 export interface UploadFileSchema {

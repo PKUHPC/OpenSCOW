@@ -7,8 +7,6 @@ export interface ServerRuntimeConfig {
   AUTH_EXTERNAL_URL: string;
   AUTH_INTERNAL_URL: string;
 
-  JOB_SERVER: string;
-
   DEFAULT_FOOTER_TEXT: string;
   FOOTER_TEXTS: {[hostname: string]: string };
 
@@ -24,6 +22,13 @@ export interface ServerRuntimeConfig {
   APPS: App[];
 
   MOCK_USER_ID: string | undefined;
+
+  TURBOVNC_PATH: string;
+
+  MAX_LOGIN_DESKTOPS: number;
+  
+  SAVED_JOBS_DIR: string;
+  APP_JOBS_DIR: string;
 }
 
 

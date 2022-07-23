@@ -1,6 +1,6 @@
-import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import { setTokenCookie } from "src/auth/cookie";
 import { validateToken } from "src/auth/token";
+import { route } from "src/utils/route";
 
 export interface AuthCallbackSchema {
   method: "GET";
