@@ -1,5 +1,6 @@
 import { FastifyReply, FastifyRequest } from "fastify";
-import { AUTH_EXTERNAL_URL, FAVICON_URL, FOOTER_TEXTS } from "src/config/env";
+import { AUTH_EXTERNAL_URL, FAVICON_URL } from "src/config/env";
+import { uiConfig } from "src/config/ui";
 
 function parseHostname(req: FastifyRequest): string | undefined {
 
@@ -63,7 +64,7 @@ export async function serveLoginHtml(err: boolean, callbackUrl: string, req: Fas
         </form>
       </div>
     <p class="absolute bottom-0 w-full text-center my-4 text-gray-500 text-sm">
-      ${(hostname && FOOTER_TEXTS[hostname]) ?? ""}
+      ${(hostname && uiConfig?.footer?.hostnameTextMap?.[hostname]) ?? uiConfig?.footer?.defaultText ?? ""}
     </p>
 </body>
 

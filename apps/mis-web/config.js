@@ -3,6 +3,7 @@
 const { envConfig, getConfigFromFile, parseKeyValue, regex, str } = require("@scow/config");
 const { ClustersConfigName, ClustersConfigSchema } = require("@scow/config/build/appConfig/clusters");
 const { ClusterTextsConfigName, ClusterTextsConfigSchema } = require("@scow/config/build/appConfig/clusterTexts");
+const { DEFAULT_PRIMARY_COLOR, UI_CONFIG_NAME, UiConfigSchema } = require("@scow/config/build/appConfig/ui");
 const { PHASE_DEVELOPMENT_SERVER, PHASE_PRODUCTION_BUILD, PHASE_PRODUCTION_SERVER } = require("next/constants");
 const { join } = require("path");
 const { fetch } = require("undici");
@@ -37,12 +38,6 @@ const specs = {
     desc: "创建账户名时如果账户名不符合规则显示什么。如果ACCOUNT_NAME_PATTERN没有设置，这个不生效",
     default: undefined,
   }),
-
-  DEFAULT_FOOTER_TEXT: str({ desc: "默认footer文本", default: "" }),
-  FOOTER_TEXTS: str({ desc: "根据域名(hostname，不包括port)不同，显示在footer上的文本。格式：域名=文本,域名=文本", default: "" }),
-
-  DEFAULT_PRIMARY_COLOR: str({ desc: "默认主题色", default: "#9B0000" }),
-  PRIMARY_COLORS: str({ desc: "根据域名(hostname，不包括port)不同，应用的primary color。格式：域名=颜色,域名=颜色", default: "" }),
 
   PORTAL_PATH: str({ desc: "门户系统链接。如果不设置，则不显示到门户的链接", default: undefined }),
 };
@@ -81,6 +76,8 @@ const buildRuntimeConfig = async (phase) => {
   const clusterTexts = getConfigFromFile(ClusterTextsConfigSchema, ClusterTextsConfigName, false,
     production ? undefined : join(__dirname, "config"));
 
+  const uiConfig = getConfigFromFile(UiConfigSchema, UI_CONFIG_NAME, true);
+
   /**
    * @type {import ("./src/utils/config").ServerRuntimeConfig}
    */
@@ -89,10 +86,8 @@ const buildRuntimeConfig = async (phase) => {
     AUTH_INTERNAL_URL: config.AUTH_INTERNAL_URL,
     CLUSTERS_CONFIG: clusters,
     CLUSTER_TEXTS_CONFIG: clusterTexts,
-    DEFAULT_FOOTER_TEXT: config.DEFAULT_FOOTER_TEXT,
-    DEFAULT_PRIMARY_COLOR: config.DEFAULT_PRIMARY_COLOR,
-    FOOTER_TEXTS: parseKeyValue(config.FOOTER_TEXTS),
-    PRIMARY_COLORS: parseKeyValue(config.PRIMARY_COLORS),
+    UI_CONFIG: uiConfig,
+    DEFAULT_PRIMARY_COLOR,
     SERVER_URL: config.SERVER_URL,
   };
 

@@ -144,8 +144,11 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
     }
 
     const hostname = getHostname(appContext.ctx.req);
-    extra.primaryColor = (hostname && runtimeConfig.PRIMARY_COLORS[hostname]) ?? runtimeConfig.DEFAULT_PRIMARY_COLOR;
-    extra.footerText = (hostname && runtimeConfig.FOOTER_TEXTS[hostname]) ?? runtimeConfig.DEFAULT_FOOTER_TEXT;
+
+    extra.primaryColor = (hostname && runtimeConfig.UI_CONFIG?.primaryColor?.hostnameMap?.[hostname]) 
+    ?? runtimeConfig.UI_CONFIG?.primaryColor?.defaultColor ?? runtimeConfig.DEFAULT_PRIMARY_COLOR;
+    extra.footerText = (hostname && runtimeConfig.UI_CONFIG?.footer?.hostnameTextMap?.[hostname]) 
+    ?? runtimeConfig.UI_CONFIG?.footer?.defaultText ?? "";
   }
 
   const appProps = await App.getInitialProps(appContext);

@@ -7,6 +7,7 @@ const fs = require("fs");
 const { PHASE_DEVELOPMENT_SERVER, PHASE_PRODUCTION_BUILD, PHASE_PRODUCTION_SERVER, PHASE_TEST } = require("next/constants");
 
 const { getCapabilities } = require("@scow/lib-auth");
+const { UI_CONFIG_NAME, UiConfigSchema, DEFAULT_PRIMARY_COLOR } = require("@scow/config/build/appConfig/ui");
 
 /**
  * Get auth capabilities
@@ -35,17 +36,11 @@ const specs = {
 
   ENABLE_APPS: bool({ desc: "是否启动交互式任务功能", default: false }),
 
-  DEFAULT_FOOTER_TEXT: str({ desc: "默认footer文本", default: "" }),
-  FOOTER_TEXTS: str({ desc: "根据域名(hostname，不包括port)不同，显示在footer上的文本。格式：域名=文本,域名=文本", default: "" }),
-
   DEFAULT_HOME_TEXT: str({ desc: "默认主页文本", default: "北京大学计算中心成立于1963年，是集计算中心管理信息中心和网络中心于一体的实体单位，是独立建制的全校大型综合实验室，负责学校信息化基础设施的建设、开发与运行服务工作。" }),
   HOME_TEXTS: str({ desc: "根据域名(hostname，不包括port)不同，显示在主页上的文本。格式：域名=文本,域名=文本", default: "" }),
 
   DEFAULT_HOME_TITLE: str({ desc: "默认主页标题", default: "北京大学计算中心高性能计算平台交互式工具" }),
   HOME_TITLES: str({ desc: "根据域名(hostname，不包括port)不同，显示在主页上的标题。格式：域名=标题,域名=标题", default: "" }),
-
-  DEFAULT_PRIMARY_COLOR: str({ desc: "默认主题色", default: "#9B0000" }),
-  PRIMARY_COLORS: str({ desc: "根据域名(hostname，不包括port)不同，应用的主题色。格式：域名=颜色,域名=颜色", default: "" }),
 
   MIS_PATH: str({ desc: "管理系统的链接。如果不设置，则不显示到管理系统的链接", default: undefined }),
 
@@ -105,7 +100,6 @@ const buildRuntimeConfig = async (phase) => {
     const { APP_CONFIG_BASE_PATH, AppConfigSchema } = require("@scow/config/build/appConfig/app");
 
     const appsPath = join(configPath || CONFIG_BASE_PATH, APP_CONFIG_BASE_PATH);
-    console.log(appsPath);
 
     if (!fs.existsSync(appsPath)) {
       return [];
@@ -121,19 +115,19 @@ const buildRuntimeConfig = async (phase) => {
 
   const apps = getApps();
 
+  const uiConfig = getConfigFromFile(UiConfigSchema, UI_CONFIG_NAME, true);
+
   /**
    * @type {import("./src/utils/config").ServerRuntimeConfig}
    */
   const serverRuntimeConfig = {
     AUTH_EXTERNAL_URL: config.AUTH_EXTERNAL_URL,
     AUTH_INTERNAL_URL: config.AUTH_INTERNAL_URL,
-    DEFAULT_FOOTER_TEXT: config.DEFAULT_FOOTER_TEXT,
-    DEFAULT_PRIMARY_COLOR: config.DEFAULT_PRIMARY_COLOR,
-    FOOTER_TEXTS: parseKeyValue(config.FOOTER_TEXTS),
-    PRIMARY_COLORS: parseKeyValue(config.PRIMARY_COLORS),
     SSH_PRIVATE_KEY_PATH: config.SSH_PRIVATE_KEY_PATH,
     CLUSTERS_CONFIG: clusters,
     FILE_SERVERS: parseKeyValue(config.FILE_SERVERS),
+    UI_CONFIG: uiConfig,
+    DEFAULT_PRIMARY_COLOR,
     APPS: apps,
     MOCK_USER_ID: config.MOCK_USER_ID,
     TURBOVNC_PATH: config.TURBOVNC_PATH,

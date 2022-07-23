@@ -1,5 +1,6 @@
 import { App } from "@scow/config/build/appConfig/app";
-import { Clusters } from "@scow/config/build/appConfig/clusters";
+import type { Clusters } from "@scow/config/build/appConfig/clusters";
+import type { UiConfigSchema } from "@scow/config/build/appConfig/ui";
 import { CONFIG_BASE_PATH } from "@scow/config/build/constants";
 import getConfig from "next/config";
 
@@ -7,15 +8,12 @@ export interface ServerRuntimeConfig {
   AUTH_EXTERNAL_URL: string;
   AUTH_INTERNAL_URL: string;
 
-  DEFAULT_FOOTER_TEXT: string;
-  FOOTER_TEXTS: {[hostname: string]: string };
-
-  DEFAULT_PRIMARY_COLOR: string;
-  PRIMARY_COLORS: {[hostname: string]: string };
-
   SSH_PRIVATE_KEY_PATH: string;
 
   CLUSTERS_CONFIG: Clusters;
+
+  UI_CONFIG?: UiConfigSchema;
+  DEFAULT_PRIMARY_COLOR: string;
 
   FILE_SERVERS: {[cluster: string]: string };
 
