@@ -56,7 +56,7 @@ jobs:
       - name: Upload test converage
         uses: codecov/codecov-action@v3
         with:
-          files: ./libs/auth/coverage/lcov.info,./libs/config/coverage/lcov.info,./libs/decimal/coverage/lcov.info,./apps/portal-web/coverage/lcov.info,./apps/auth/coverage/lcov.info,./apps/job-server-slurm/coverage/lcov.info,./apps/mis-server/coverage/lcov.info
+          files: ./libs/auth/coverage/lcov.info,./libs/config/coverage/lcov.info,./libs/decimal/coverage/lcov.info,./apps/portal-web/coverage/lcov.info,./apps/auth/coverage/lcov.info,./apps/mis-server/coverage/lcov.info
 
   build-containers:
     needs: test
