@@ -1,4 +1,4 @@
-FROM nginx:alpine@sha256:8e38930f0390cbd79b2d1528405fb17edcda5f4a30875ecf338ebaa598dc994e
+FROM nginx:alpine@sha256:87fb6f4040ffd52dd616f360b8520ed4482930ea75417182ad3f76c4aaadf24f
 
 # load njs
 RUN sed -i "1 i\load_module /etc/nginx/modules/ngx_http_js_module.so;\n" /etc/nginx/nginx.conf
