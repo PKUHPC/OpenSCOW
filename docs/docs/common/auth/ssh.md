@@ -5,11 +5,9 @@ title: SSH
 
 # SSH认证系统
 
-本节介绍采用SSH进行用户认证的认证系统。如果您的系统采用其他认证方式，您可以参考文档中的其他认证方式，或者查看[自定义认证](./custom.md)文档以自己实现符合自己需求的认证方式。
+本节介绍内置认证系统并采用SSH进行用户认证的认证系统。如果您的系统采用其他认证方式，您可以参考文档中的其他认证方式，或者查看[自定义认证](./custom.md)文档以自己实现符合自己需求的认证方式。
 
 SSH认证是非常简单的认证方式。用户可以直接使用和SSH登录集群相同的用户名和密码来登录系统。
-
-SSH认证方式要求编写好[集群配置文件](../deployment/clusters.mdx)，并确保其中第一个集群有至少一个登录节点。
 
 SSH认证方式所支持的功能如下表：
 
@@ -21,6 +19,17 @@ SSH认证方式所支持的功能如下表：
 | 修改密码         | 否       |
 
 ## 安装并配置SSH认证服务
+
+### 编写配置文件
+
+SSH认证方式要求编写好[集群配置文件](../deployment/clusters.mdx)，并且确保其中第一个集群有至少一个登录节点。
+
+在配置文件目录中创建文件`config/auth.yml`，并输入以下内容：
+
+```yaml title="config/auth.yml"
+# 指定使用认证类型为SSH
+authType: ssh
+```
 
 ### 部署redis
 
@@ -46,9 +55,8 @@ LDAP认证系统将认证信息存放在redis中，所以在部署认证系统�
   auth:
     image: %CR_URL%/auth
     restart: unless-stopped
-    environment:
-      # 默认即为ssh，可以不设置
-      AUTH_TYPE: ssh
+    volumes:
+      - ./config:/etc/scow
       
 ```
 

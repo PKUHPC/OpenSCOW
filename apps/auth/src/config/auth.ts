@@ -1,10 +1,7 @@
 import { getConfigFromFile } from "@scow/config";
 import { Static, Type } from "@sinclair/typebox";
 
-export enum AuthType {
-  ldap = "ldap",
-  ssh = "ssh",
-}
+import { AuthType } from "./AuthType";
 
 export const LdapConfigSchema = Type.Object({
   url: Type.String({ description: "LDAP地址" }),

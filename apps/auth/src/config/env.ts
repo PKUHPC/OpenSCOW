@@ -1,5 +1,6 @@
 import { envConfig, host, parseKeyValue, port, str } from "@scow/config";
-import { AuthType } from "src/config/auth";
+
+import { AuthType } from "./AuthType";
 
 export const AUTH_EXTERNAL_URL = "/auth";
 export const AUTH_REDIRECT_URL = "/api/auth/callback";
