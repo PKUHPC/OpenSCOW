@@ -78,10 +78,6 @@ jobs:
             file: mis-server
             build_args: ""
 
-          - name: job-server-slurm
-            file: job-server-slurm
-            build_args: ""
-
           - name: auth
             file: auth
             build_args: ""
