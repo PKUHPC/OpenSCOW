@@ -1,4 +1,4 @@
-import { NewJobInfo } from "src/generated/portal/job";
+import { NewJobInfo } from "src/clusterops/api/job";
 
 export function parseSbatchOutput(output: string): number {
   // Submitted batch job 34987

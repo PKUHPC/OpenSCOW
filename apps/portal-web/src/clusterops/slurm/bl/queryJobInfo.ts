@@ -1,7 +1,7 @@
 import moment from "moment-timezone";
 import { NodeSSH } from "node-ssh";
+import { JobInfo } from "src/clusterops/api/job";
 import { RunningJob } from "src/generated/common/job";
-import { JobInfo } from "src/generated/portal/job";
 import { Logger } from "src/utils/log";
 import { loggedExec } from "src/utils/ssh";
 

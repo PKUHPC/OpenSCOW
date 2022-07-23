@@ -1,7 +1,7 @@
 import { JsonFetchResultPromiseLike } from "@ddadaal/next-typed-api-routes-runtime/lib/client";
 import { api } from "src/apis/api";
+import { JobInfo } from "src/clusterops/api/job";
 import type { RunningJob } from "src/generated/common/job";
-import { JobInfo } from "src/generated/portal/job";
 
 export type MockApi<TApi extends Record<
   string,

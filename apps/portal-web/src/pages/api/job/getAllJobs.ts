@@ -1,6 +1,6 @@
 import { authenticate } from "src/auth/server";
 import { getClusterOps } from "src/clusterops";
-import { JobInfo } from "src/generated/portal/job";
+import { JobInfo } from "src/clusterops/api/job";
 import { route } from "src/utils/route";
 
 export interface GetAllJobsSchema {

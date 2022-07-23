@@ -1,6 +1,6 @@
 import { authenticate } from "src/auth/server";
 import { getClusterOps } from "src/clusterops";
-import { NewJobInfo } from "src/generated/portal/job";
+import { NewJobInfo } from "src/clusterops/api/job";
 import { route } from "src/utils/route";
 
 export interface GetSavedJobSchema {
