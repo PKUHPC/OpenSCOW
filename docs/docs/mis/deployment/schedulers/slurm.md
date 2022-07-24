@@ -7,7 +7,7 @@ title: slurm
 
 ## 部署slurm.sh
 
-将[slurm.sh](%REPO_FILE_URL%/apps/clusterops-slurm/slurm.sh)复制进每个集群的**slurm节点**，并给予可执行权限。
+将[slurm.sh](%REPO_FILE_URL%/apps/mis-server/scripts/slurm.sh)复制进每个集群的**slurm节点**，并给予可执行权限。
 
 ## 部署clusterops-slurm
 

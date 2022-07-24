@@ -17,7 +17,7 @@ title: 用户模型
 
 如果您已有一个slurm集群，可以使用本功能将slurm中的用户信息导入本系统。
 
-把[slurm-users.py](%REPO_URL%/apps/mis-server/scripts/slurm-users.py)复制到[slurm.sh](../deployment/clusterops.md#部署slurmsh)的目录下，运行以下命令，获得一个`users.json`文件。
+把[slurm-users.py](%REPO_URL%/apps/mis-server/scripts/slurm-users.py)复制到[slurm.sh](../deployment/schedulers/slurm.md#部署slurmsh)的目录下，运行以下命令，获得一个`users.json`文件。
 
 ```bash
 MYSQL_PASSWORD={数据库密码} python3 slurm-users.py
