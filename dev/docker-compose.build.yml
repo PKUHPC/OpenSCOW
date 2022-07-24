@@ -51,10 +51,3 @@ services:
     build:
       context: ..
       dockerfile: dockerfiles/Dockerfile.auth
-
-  clusterops-slurm:
-    image: $IMAGE_BASE/clusterops-slurm:$TAG
-    build:
-      context: ..
-      dockerfile: dockerfiles/Dockerfile.clusterops-slurm
-

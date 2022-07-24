@@ -99,29 +99,6 @@ importers:
       '@types/asn1': 0.2.0
       '@types/ldapjs': 2.2.3
 
-  apps/clusterops-slurm:
-    specifiers:
-      '@ddadaal/tsgrpc-cli': 0.13.1
-      '@ddadaal/tsgrpc-server': 0.14.1
-      '@grpc/grpc-js': 1.6.8
-      '@scow/config': workspace:*
-      '@types/google-protobuf': 3.15.6
-      '@types/node-ssh': 7.0.1
-      '@types/rimraf': 3.0.2
-      '@types/wait-on': 5.3.1
-      node-ssh: 12.0.5
-    dependencies:
-      '@ddadaal/tsgrpc-server': 0.14.1
-      '@grpc/grpc-js': 1.6.8
-      '@scow/config': link:../../libs/config
-      node-ssh: 12.0.5
-    devDependencies:
-      '@ddadaal/tsgrpc-cli': 0.13.1
-      '@types/google-protobuf': 3.15.6
-      '@types/node-ssh': 7.0.1
-      '@types/rimraf': 3.0.2
-      '@types/wait-on': 5.3.1
-
   apps/mis-server:
     specifiers:
       '@ddadaal/tsgrpc-cli': 0.13.1
@@ -5088,14 +5065,6 @@ packages:
     resolution: {integrity: sha512-SK/4GYWiWvGLPl/yv+Tm5oLYbzMx1V3y7CsNTvOb3vF8O9oXH11U6/zckISHnBl4YH8MvXHFIUXbYoBONSdmzw==}
     dev: true
 
-  /@types/node-ssh/7.0.1:
-    resolution: {integrity: sha512-98EuH7UQl/WWwwDxpbANQ76HwBdzcSnC9zLSdrtVW7jjYeOTQ6TxBygbGwzZR4ho1agbd941UnHCdrXz2sS8JQ==}
-    dependencies:
-      '@types/node': 18.0.1
-      '@types/ssh2': 1.11.2
-      '@types/ssh2-streams': 0.1.9
-    dev: true
-
   /@types/node/17.0.45:
     resolution: {integrity: sha512-w+tIMs3rq2afQdsPJlODhoUEKzFP1ayaoyl1CcnwtIlsVe7K7bA1NGm4s3PraqTLlXnbIN84zuBlxBWo1u9BLw==}
     dev: false
@@ -5233,18 +5202,6 @@ packages:
     dependencies:
       '@types/node': 18.0.1
     dev: false
-
-  /@types/ssh2-streams/0.1.9:
-    resolution: {integrity: sha512-I2J9jKqfmvXLR5GomDiCoHrEJ58hAOmFrekfFqmCFd+A6gaEStvWnPykoWUwld1PNg4G5ag1LwdA+Lz1doRJqg==}
-    dependencies:
-      '@types/node': 18.0.1
-    dev: true
-
-  /@types/ssh2/1.11.2:
-    resolution: {integrity: sha512-BFkgcZSKC2Dz5MuHiZDuEDrNegP1L98kX/VdYB0HAq8RkiXrcY9yCki71IMux7QlK2VOe0UrQv7fsvWJU4STFQ==}
-    dependencies:
-      '@types/node': 18.0.1
-    dev: true
 
   /@types/stack-utils/2.0.1:
     resolution: {integrity: sha512-Hl219/BT5fLAaz6NDkSuhzasy49dwQS/DSdu4MdggFB8zcXv7vflBI3xp7FEmkmdDkBUI2bPUNeMttp2knYdxw==}

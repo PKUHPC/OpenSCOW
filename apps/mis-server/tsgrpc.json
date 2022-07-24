@@ -3,7 +3,7 @@
   "protos": [
     {
       "path": "../../protos",
-      "files": "../../protos/{server,clusterops}/*.proto",
+      "files": "../../protos/server/*.proto",
       "name": "."
     }
   ],

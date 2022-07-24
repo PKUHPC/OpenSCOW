@@ -82,10 +82,6 @@ jobs:
             file: auth
             build_args: ""
 
-          - name: clusterops-slurm
-            file: clusterops-slurm
-            build_args: ""
-
           - name: mis-web-root
             file: mis-web
             build_args: BASE_PATH=

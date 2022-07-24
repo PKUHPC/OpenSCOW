@@ -69,7 +69,6 @@ interface EnvConfig {
 
 const config = [
   { app: "auth", md: "common/refs/auth.md" },
-  { app: "clusterops-slurm", md: "mis/refs/clusterops-slurm.md" },
   { app: "mis-server", md: "mis/refs/mis-server.md" },
   { app: "mis-web", configFile: "config", md: "mis/refs/mis-web.md" },
   { app: "portal-web", configFile: "config", md: "portal/refs/portal-web.md" },
