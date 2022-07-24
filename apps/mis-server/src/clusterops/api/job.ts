@@ -18,8 +18,8 @@ export interface ChangeJobTimeLimitRequest {
 }
 
 /** NOT_FOUND: if job_id is not found. */
-export type ChangeJobTimeLimitReply = 
-  | { code: "NOT_FOUND"} 
+export type ChangeJobTimeLimitReply =
+  | { code: "NOT_FOUND"}
   | { code: "OK" };
 
 export interface QueryJobTimeLimitRequest {
@@ -27,12 +27,12 @@ export interface QueryJobTimeLimitRequest {
 }
 
 /** NOT_FOUND: if job_id is not found */
-export type QueryJobTimeLimitReply = 
-  | { code: "NOT_FOUND"} 
-  | { 
-    code: "OK", 
+export type QueryJobTimeLimitReply =
+  | { code: "NOT_FOUND"}
+  | {
+    code: "OK",
     // 单位秒
-    limit: number; 
+    limit: number;
 };
 
 export interface JobOps {

@@ -1,6 +1,5 @@
-import { StorageOps } from "src/clusterops/api/storage";
+import { ChangeStorageQuotaMode, StorageOps } from "src/clusterops/api/storage";
 import { SlurmClusterInfo } from "src/clusterops/slurm";
-import { ChangeStorageQuotaMode } from "src/generated/clusterops/storage";
 
 export const slurmStorageOps = ({ executeSlurmScript }: SlurmClusterInfo): StorageOps => {
   return {
