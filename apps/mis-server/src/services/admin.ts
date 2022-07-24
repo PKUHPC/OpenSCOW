@@ -3,13 +3,12 @@ import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { importUsers } from "src/bl/importUsers";
 import { StorageQuota } from "src/entities/StorageQuota";
-import { StorageServiceClient } from "src/generated/clusterops/storage";
 import { AdminServiceServer, AdminServiceService } from "src/generated/server/admin";
 
 export const adminServiceServer = plugin((server) => {
 
   server.addService<AdminServiceServer>(AdminServiceService, {
-    changeStorageQuota: async ({ request, em }) => {
+    changeStorageQuota: async ({ request, em, logger }) => {
       const { cluster, mode, userId, value } = request;
 
       const quota = await em.findOne(StorageQuota, {
@@ -24,10 +23,17 @@ export const adminServiceServer = plugin((server) => {
 
       const reply = await server.ext.clusters.callOnOne(
         cluster,
-        StorageServiceClient,
-        "changeStorageQuota",
-        { mode, userId, value },
+        logger,
+        async (ops) => ops.storage.changeStorageQuota({ request: { mode, userId, value }, logger }),
       );
+
+      if (reply.code === "NOT_FOUND") {
+        throw <ServiceError> { code: Status.NOT_FOUND };
+      }
+
+      if (reply.code === "INVALID_VALUE") {
+        throw <ServiceError> { code: Status.INVALID_ARGUMENT };
+      }
 
       quota.storageQuota = reply.currentQuota;
 

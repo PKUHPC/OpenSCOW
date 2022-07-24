@@ -2,16 +2,17 @@ import { plugin } from "@ddadaal/tsgrpc-server";
 import { MikroORM, Options } from "@mikro-orm/core";
 import { MySqlDriver } from "@mikro-orm/mysql";
 import { config } from "src/config/env";
+import { misConfig } from "src/config/mis";
 import { DatabaseSeeder } from "src/seeders/DatabaseSeeder";
 
 import { entities } from "../entities";
 
 export const ormConfigs = {
-  host: config.DB_HOST,
-  port: config.DB_PORT,
-  user: config.DB_USER,
-  dbName: config.DB_DBNAME,
-  password: config.DB_PASSWORD,
+  host: misConfig.db.host,
+  port: misConfig.db.port,
+  user: misConfig.db.user,
+  dbName: config.DBNAME ?? misConfig.db.dbName,
+  password: misConfig.db.password,
   type: "mysql",
   forceUndefined: true,
   runMigrations: true,
@@ -20,7 +21,7 @@ export const ormConfigs = {
     pattern: /^[\w-]+\d+\.(j|t)s$/,
   },
   entities,
-  debug: config.DB_DEBUG,
+  debug: misConfig.db.debug,
   seeder: {
     path: "./src/seeders",
   },

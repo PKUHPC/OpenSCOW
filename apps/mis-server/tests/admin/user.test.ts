@@ -3,7 +3,7 @@ import { asyncClientCall } from "@ddadaal/tsgrpc-utils";
 import { ChannelCredentials } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { createServer } from "src/app";
-import { config } from "src/config/env";
+import { misConfig } from "src/config/mis";
 import { Tenant } from "src/entities/Tenant";
 import { User } from "src/entities/User";
 import { UserAccount, UserRole, UserStatus } from "src/entities/UserAccount";
@@ -58,7 +58,7 @@ it("creates user", async () => {
 
   expect(fetch).toHaveBeenNthCalledWith(
     1,
-    config.AUTH_URL + "/user",
+    misConfig.authUrl + "/user",
     {
       method: "POST",
       body: JSON.stringify({

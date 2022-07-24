@@ -5,7 +5,7 @@ import { ChannelCredentials } from "@grpc/grpc-js";
 import { MikroORM } from "@mikro-orm/core";
 import { MySqlDriver } from "@mikro-orm/mysql";
 import { createServer } from "src/app";
-import { config } from "src/config/env";
+import { misConfig } from "src/config/mis";
 import { AdminServiceClient } from "src/generated/server/admin";
 import { createSourceDbOrm } from "src/tasks/fetch";
 import { clearAndClose, dropDatabase } from "tests/data/helpers";
@@ -33,8 +33,8 @@ it("gets current fetch info", async () => {
   const info = await asyncClientCall(client, "getFetchInfo", {});
 
   expect(info).toEqual({
-    fetchStarted: config.FETCH_JOBS_PERIODIC_FETCH_ENABLED,
-    schedule: config.FETCH_JOBS_PERIODIC_FETCH_CRON,
+    fetchStarted: misConfig.fetchJobs.periodicFetch.enabled,
+    schedule: misConfig.fetchJobs.periodicFetch.cron,
     lastFetchTime: undefined,
   } as typeof info);
 

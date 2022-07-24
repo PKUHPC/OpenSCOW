@@ -31,7 +31,7 @@ beforeEach(async () => {
   const anotherTenant = new Tenant({ name: "another" });
   await em.persistAndFlush(anotherTenant);
 
-  await createPriceItems(em, server.logger, "tests/data/config");
+  await createPriceItems(em, server.logger);
 
   // insert an old price item
   oldPriceItem = new JobPriceItem({

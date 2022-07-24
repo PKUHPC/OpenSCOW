@@ -3,14 +3,13 @@ import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { UniqueConstraintViolationException } from "@mikro-orm/core";
 import { decimalToMoney } from "@scow/lib-decimal";
-import { config } from "src/config/env";
+import { clusters } from "src/config/clusters";
+import { misConfig } from "src/config/mis";
 import { Account } from "src/entities/Account";
 import { StorageQuota } from "src/entities/StorageQuota";
 import { Tenant } from "src/entities/Tenant";
 import { User } from "src/entities/User";
 import { UserAccount, UserRole, UserStatus } from "src/entities/UserAccount";
-import { StorageServiceClient } from "src/generated/clusterops/storage";
-import { UserServiceClient } from "src/generated/clusterops/user";
 import {
   AccountStatus,
   GetAccountUsersReply,
@@ -94,22 +93,29 @@ export const userServiceServer = plugin((server) => {
       }];
     },
 
-    queryUsedStorageQuota: async ({ request }) => {
+    queryUsedStorageQuota: async ({ request, logger }) => {
       const { cluster, userId } = request;
 
       const reply = await server.ext.clusters.callOnOne(
         cluster,
-        StorageServiceClient,
-        "queryUsedStorageQuota",
-        { userId },
+        logger,
+        async (ops) => ops.storage.queryUsedStorageQuota({
+          request: { userId }, logger,
+        }),
       );
+
+      if (reply.code === "NOT_FOUND") {
+        throw <ServiceError>{
+          code: Status.NOT_FOUND,
+        };
+      }
 
       return [{
         used: reply.used,
       }];
     },
 
-    addUserToAccount: async ({ request, em }) => {
+    addUserToAccount: async ({ request, em, logger }) => {
       const { accountName, userId, tenantName } = request;
 
       const account = await em.findOne(Account, {
@@ -132,9 +138,8 @@ export const userServiceServer = plugin((server) => {
         };
       }
 
-      await server.ext.clusters.callOnAll(UserServiceClient,
-        { method: "addUser", req: { accountName, userId } },
-        { method: "removeUser", req: { accountName, userId } },
+      await server.ext.clusters.callOnAll(logger,
+        async (ops) => ops.user.addUser({ request: { accountName, userId }, logger }),
       );
 
       const newUserAccount = new UserAccount({
@@ -151,7 +156,7 @@ export const userServiceServer = plugin((server) => {
       return [{}];
     },
 
-    removeUserFromAccount: async ({ request, em }) => {
+    removeUserFromAccount: async ({ request, em, logger }) => {
       const { accountName, userId, tenantName } = request;
 
       const userAccount = await em.findOne(UserAccount, {
@@ -171,9 +176,8 @@ export const userServiceServer = plugin((server) => {
         };
       }
 
-      await server.ext.clusters.callOnAll(UserServiceClient,
-        { method: "removeUser", req: { accountName, userId } },
-        { method: "addUser", req: { accountName, userId } },
+      await server.ext.clusters.callOnAll(logger,
+        async (ops) => ops.user.removeUser({ request: { accountName, userId }, logger }),
       );
 
       await em.removeAndFlush(userAccount);
@@ -182,7 +186,7 @@ export const userServiceServer = plugin((server) => {
 
     },
 
-    blockUserInAccount: async ({ request, em }) => {
+    blockUserInAccount: async ({ request, em, logger }) => {
       const { accountName, userId, tenantName } = request;
 
       const user = await em.findOne(UserAccount, {
@@ -202,7 +206,7 @@ export const userServiceServer = plugin((server) => {
         };
       }
 
-      await user.block(server.ext);
+      await user.block(server.ext, logger);
 
       user.status = UserStatus.BLOCKED;
 
@@ -211,7 +215,7 @@ export const userServiceServer = plugin((server) => {
       return [{}];
     },
 
-    unblockUserInAccount: async ({ request, em }) => {
+    unblockUserInAccount: async ({ request, em, logger }) => {
       const { accountName, userId, tenantName } = request;
 
       const user = await em.findOne(UserAccount, {
@@ -231,7 +235,7 @@ export const userServiceServer = plugin((server) => {
         };
       }
 
-      await user.unblock(server.ext);
+      await user.unblock(server.ext, logger);
 
       user.status = UserStatus.UNBLOCKED;
 
@@ -302,7 +306,7 @@ export const userServiceServer = plugin((server) => {
 
       const user = new User({ name, userId: identityId, tenant, email });
 
-      user.storageQuotas.add(...server.ext.clusters.clusters.map((x) => new StorageQuota({
+      user.storageQuotas.add(...Object.keys(clusters).map((x) => new StorageQuota({
         cluster: x,
         storageQuota: 0,
         user: user!,
@@ -319,7 +323,7 @@ export const userServiceServer = plugin((server) => {
       }
 
       // call auth
-      const rep = await fetch(config.AUTH_URL + "/user", {
+      const rep = await fetch(misConfig.authUrl + "/user", {
         method: "POST",
         body: JSON.stringify({
           identityId,
@@ -347,7 +351,7 @@ export const userServiceServer = plugin((server) => {
         throw <ServiceError> { code: Status.INTERNAL, message: "Error creating user in auth" };
       }
 
-      if (config.INSERT_SSH_KEY_WHEN_CREATING_USER) {
+      if (misConfig.insertSshKeyForNewUser) {
         logger.info("Inserting SSH public key to login nodes");
 
         await insertKey(identityId, logger);

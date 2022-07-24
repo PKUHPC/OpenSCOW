@@ -42,7 +42,7 @@ export async function pay(
 
   if (target instanceof Account && prevBalance.lte(0) && target.balance.gt(0)) {
     logger.info("Unblock account %s", target.accountName);
-    await target.unblock(clusterPlugin.clusters);
+    await target.unblock(clusterPlugin.clusters, logger);
   }
 
   return {
@@ -79,7 +79,7 @@ export async function charge(
 
   if (target instanceof Account && prevBalance.gt(0) && target.balance.lte(0)) {
     logger.info("Block account %s due to out of balance.", target.accountName);
-    await target.block(clusterPlugin.clusters);
+    await target.block(clusterPlugin.clusters, logger);
   }
 
   return {

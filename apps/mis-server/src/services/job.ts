@@ -6,13 +6,12 @@ import { FilterQuery, QueryOrder, UniqueConstraintViolationException } from "@mi
 import { MySqlDriver, SqlEntityManager } from "@mikro-orm/mysql";
 import { Decimal, decimalToMoney, moneyToNumber } from "@scow/lib-decimal";
 import { charge, pay } from "src/bl/charging";
-import { config } from "src/config/env";
+import { misConfig } from "src/config/mis";
 import { Account } from "src/entities/Account";
 import { JobInfo as JobInfoEntity } from "src/entities/JobInfo";
 import { JobPriceChange } from "src/entities/JobPriceChange";
 import { AmountStrategy, JobPriceItem } from "src/entities/JobPriceItem";
 import { Tenant } from "src/entities/Tenant";
-import { JobServiceClient } from "src/generated/clusterops/job";
 import {
   GetJobsReply,
   JobBillingItem,
@@ -114,7 +113,7 @@ export const jobServiceServer = plugin((server) => {
       const { filter, accountPrice, tenantPrice, reason, operatorId, ipAddress } =
         ensureNotUndefined(request, ["filter"]);
 
-      const type = config.JOB_PRICE_CHANGE_CHARGING_TYPE;
+      const type = misConfig.changeJobPriceType;
       const newAccountPrice = accountPrice ? new Decimal(moneyToNumber(accountPrice)) : undefined;
       const newTenantPrice = tenantPrice ? new Decimal(moneyToNumber(tenantPrice)) : undefined;
 
@@ -225,7 +224,7 @@ export const jobServiceServer = plugin((server) => {
       return [{ info: toGrpc(job) }];
     },
 
-    getRunningJobs: async ({ request, em }) => {
+    getRunningJobs: async ({ request, em, logger }) => {
       const { cluster, userId, accountName, tenantName, jobIdList } = request;
 
       const accountNames = accountName !== undefined
@@ -237,38 +236,55 @@ export const jobServiceServer = plugin((server) => {
 
       const reply = await server.ext.clusters.callOnOne(
         cluster,
-        JobServiceClient,
-        "getRunningJobs",
-        { userId, accountNames, jobIdList },
+        logger,
+        async (ops) => ops.job.getRunningJobs({
+          request: { userId, accountNames, jobIdList },
+          logger,
+        }),
       );
 
       return [{ jobs: reply.jobs }];
 
     },
 
-    changeJobTimeLimit: async ({ request }) => {
+    changeJobTimeLimit: async ({ request, logger }) => {
       const { cluster, delta, jobId } = request;
 
-      await server.ext.clusters.callOnOne(
+      const reply = await server.ext.clusters.callOnOne(
         cluster,
-        JobServiceClient,
-        "changeJobTimeLimit",
-        { delta, jobId },
+        logger,
+        async (ops) => ops.job.changeJobTimeLimit({
+          request: { delta, jobId }, logger,
+        }),
       );
+
+      if (reply.code === "NOT_FOUND") {
+        throw <ServiceError>{
+          code: Status.NOT_FOUND,
+        };
+      }
 
       return [{}];
     },
 
-    queryJobTimeLimit: async ({ request }) => {
+    queryJobTimeLimit: async ({ request, logger }) => {
 
       const { cluster, jobId } = request;
 
       const reply = await server.ext.clusters.callOnOne(
         cluster,
-        JobServiceClient,
-        "queryJobTimeLimit",
-        { jobId },
+        logger,
+        async (ops) => ops.job.queryJobTimeLimit({
+          request: { jobId },
+          logger,
+        }),
       );
+
+      if (reply.code === "NOT_FOUND") {
+        throw <ServiceError>{
+          code: Status.NOT_FOUND,
+        };
+      }
 
       return [{ limit: reply.limit }];
     },

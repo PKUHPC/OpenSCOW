@@ -104,7 +104,7 @@ it("adds job charge", async () => {
 
   const charge = new Decimal(20.4);
 
-  await ua.addJobCharge(charge, server.ext);
+  await ua.addJobCharge(charge, server.ext, server.logger);
 
   expectDecimalEqual(ua.usedJobCharge, charge);
   expectDecimalEqual(ua.jobChargeLimit, limit);
@@ -120,7 +120,7 @@ it("blocks user if used > limit", async () => {
   expectDecimalEqual(ua.jobChargeLimit, limit);
 
   const charge = new Decimal(120.4);
-  await ua.addJobCharge(charge, server.ext);
+  await ua.addJobCharge(charge, server.ext, server.logger);
 
   expectDecimalEqual(ua.usedJobCharge, charge);
   expectDecimalEqual(ua.jobChargeLimit, limit);
@@ -152,7 +152,7 @@ it("unblocks user if limit >= used is positive", async () => {
 
   const charge = new Decimal(-20.4);
 
-  await ua.addJobCharge(charge, server.ext);
+  await ua.addJobCharge(charge, server.ext, server.logger);
 
   expectDecimalEqual(ua.jobChargeLimit, limit);
   expectDecimalEqual(ua.usedJobCharge, new Decimal(99.6));
@@ -160,7 +160,7 @@ it("unblocks user if limit >= used is positive", async () => {
 });
 
 it("does nothing if no limit", async () => { const charge = new Decimal(120.4);
-  await ua.addJobCharge(charge, server.ext);
+  await ua.addJobCharge(charge, server.ext, server.logger);
 
   expect(ua.jobChargeLimit).toBeUndefined();
   expect(ua.usedJobCharge).toBeUndefined();

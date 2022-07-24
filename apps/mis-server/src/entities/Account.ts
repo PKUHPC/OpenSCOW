@@ -1,3 +1,4 @@
+import { Logger } from "@ddadaal/tsgrpc-server";
 import { Collection, Entity,
   IdentifiedReference, ManyToOne, OneToMany, OneToOne, PrimaryKey, Property,
 } from "@mikro-orm/core";
@@ -5,7 +6,6 @@ import { Decimal } from "@scow/lib-decimal";
 import { AccountWhitelist } from "src/entities/AccountWhitelist";
 import { Tenant } from "src/entities/Tenant";
 import { UserAccount } from "src/entities/UserAccount";
-import { AccountServiceClient } from "src/generated/clusterops/account";
 import { ClusterPlugin } from "src/plugins/clusters";
 import { DECIMAL_DEFAULT_RAW, DecimalType } from "src/utils/decimal";
 import { EntityOrRef, toRef } from "src/utils/orm";
@@ -45,7 +45,8 @@ export class Account {
    *
    * @returns Operation result
   **/
-  async block(clusterPlugin: ClusterPlugin["clusters"]): Promise<"AlreadyBlocked" | "Whitelisted" | "OK"> {
+  async block(clusterPlugin: ClusterPlugin["clusters"], logger: Logger):
+   Promise<"AlreadyBlocked" | "Whitelisted" | "OK"> {
 
     if (this.blocked) { return "AlreadyBlocked"; }
 
@@ -53,12 +54,11 @@ export class Account {
       return "Whitelisted";
     }
 
-    await clusterPlugin.callOnAll(
-      AccountServiceClient,
-      { method: "blockAccount", req: {
-        accountName: this.accountName,
-      } },
-    );
+    await clusterPlugin.callOnAll(logger, async (ops) => ops.account.blockAccount({
+      request: { accountName: this.accountName },
+      logger,
+    }));
+
 
     this.blocked = true;
     return "OK";
@@ -67,16 +67,19 @@ export class Account {
   /**
      * Call flush after this.
      * */
-  async unblock(clusterPlugin: ClusterPlugin["clusters"]) {
+  async unblock(clusterPlugin: ClusterPlugin["clusters"], logger: Logger) {
 
     if (!this.blocked) { return; }
 
-    await clusterPlugin.callOnAll(
-      AccountServiceClient,
-      { method: "unblockAccount", req: {
-        accountName: this.accountName,
-      } },
-    );
+    await clusterPlugin.callOnAll(logger, async (ops) => ops.account.blockAccount({
+      request: { accountName: this.accountName },
+      logger,
+    }));
+
+    await clusterPlugin.callOnAll(logger, async (ops) => ops.account.unblockAccount({
+      request: { accountName: this.accountName },
+      logger,
+    }));
 
     this.blocked = false;
   }

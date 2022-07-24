@@ -66,7 +66,7 @@ export const jobChargeLimitServer = plugin((server) => {
           };
         }
 
-        await userAccount.setJobCharge(new Decimal(moneyToNumber(limit)), server.ext);
+        await userAccount.setJobCharge(new Decimal(moneyToNumber(limit)), server.ext, logger);
 
         logger.info("Set %s job charge limit to user %s account %s. Current used %s",
           userAccount.jobChargeLimit!.toFixed(2),

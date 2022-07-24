@@ -1,9 +1,9 @@
+import { Logger } from "@ddadaal/tsgrpc-server";
 import { Entity, IdentifiedReference,
   ManyToOne, PrimaryKey, Property } from "@mikro-orm/core";
 import { Decimal } from "@scow/lib-decimal";
 import { Account } from "src/entities/Account";
 import { User } from "src/entities/User";
-import { UserServiceClient } from "src/generated/clusterops/user";
 import { ClusterPlugin } from "src/plugins/clusters";
 import { DecimalType } from "src/utils/decimal";
 import { EntityOrRef, toRef } from "src/utils/orm";
@@ -33,26 +33,26 @@ export class UserAccount {
   @Property({ columnType: "varchar(10)", comment: Object.values(UserStatus).join(", ") })
     status: UserStatus;
 
-  async addJobCharge(charge: Decimal, clusterPlugin: ClusterPlugin) {
+  async addJobCharge(charge: Decimal, clusterPlugin: ClusterPlugin, logger: Logger) {
     if (this.usedJobCharge && this.jobChargeLimit) {
       this.usedJobCharge = this.usedJobCharge.plus(charge);
       if (this.usedJobCharge.gt(this.jobChargeLimit)) {
-        await this.block(clusterPlugin);
+        await this.block(clusterPlugin, logger);
       } else {
-        await this.unblock(clusterPlugin);
+        await this.unblock(clusterPlugin, logger);
       }
     }
   }
 
-  async setJobCharge(charge: Decimal, clusterPlugin: ClusterPlugin) {
+  async setJobCharge(charge: Decimal, clusterPlugin: ClusterPlugin, logger: Logger) {
     this.jobChargeLimit = charge;
     if (!this.usedJobCharge) {
       this.usedJobCharge = new Decimal(0);
     } else {
       if (this.jobChargeLimit.lt(this.usedJobCharge)) {
-        await this.block(clusterPlugin);
+        await this.block(clusterPlugin, logger);
       } else {
-        await this.unblock(clusterPlugin);
+        await this.unblock(clusterPlugin, logger);
       }
     }
   }
@@ -61,18 +61,18 @@ export class UserAccount {
    * User and account must be loaded.
    * Call flush after this.
    * */
-  async block(clusterPlugin: ClusterPlugin) {
+  async block(clusterPlugin: ClusterPlugin, logger: Logger) {
     if (this.status === UserStatus.BLOCKED) {
       return;
     }
 
-    await clusterPlugin.clusters.callOnAll(
-      UserServiceClient,
-      { method: "blockUserInAccount", req: {
+    await clusterPlugin.clusters.callOnAll(logger, async (ops) => ops.user.blockUserInAccount({
+      request: {
         accountName: this.account.getProperty("accountName"),
         userId: this.user.getProperty("userId"),
-      } },
-    );
+      },
+      logger,
+    }));
 
     this.status = UserStatus.BLOCKED;
   }
@@ -81,18 +81,19 @@ export class UserAccount {
    * User and account must be loaded.
    * Call flush after this.
    * */
-  async unblock(clusterPlugin: ClusterPlugin) {
+  async unblock(clusterPlugin: ClusterPlugin, logger: Logger) {
     if (this.status === UserStatus.UNBLOCKED) {
       return;
+
     }
 
-    await clusterPlugin.clusters.callOnAll(
-      UserServiceClient,
-      { method: "unblockUserInAccount", req: {
+    await clusterPlugin.clusters.callOnAll(logger, async (ops) => ops.user.unblockUserInAccount({
+      request: {
         accountName: this.account.getProperty("accountName"),
         userId: this.user.getProperty("userId"),
-      } },
-    );
+      },
+      logger,
+    }));
 
     this.status = UserStatus.UNBLOCKED;
   }

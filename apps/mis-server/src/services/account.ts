@@ -8,15 +8,13 @@ import { AccountWhitelist } from "src/entities/AccountWhitelist";
 import { Tenant } from "src/entities/Tenant";
 import { User } from "src/entities/User";
 import { UserAccount, UserRole as EntityUserRole, UserStatus } from "src/entities/UserAccount";
-import { AccountServiceClient } from "src/generated/clusterops/account";
-import { AccountServiceServer, AccountServiceService,
-  BlockAccountReply_Result } from "src/generated/server/account";
+import { AccountServiceServer, AccountServiceService, BlockAccountReply_Result } from "src/generated/server/account";
 import { toRef } from "src/utils/orm";
 
 export const accountServiceServer = plugin((server) => {
 
   server.addService<AccountServiceServer>(AccountServiceService, {
-    blockAccount: async ({ request, em }) => {
+    blockAccount: async ({ request, em, logger }) => {
       const { accountName } = request;
 
       await em.transactional(async (em) => {
@@ -33,13 +31,13 @@ export const accountServiceServer = plugin((server) => {
         }
 
 
-        await account.block(server.ext.clusters);
+        await account.block(server.ext.clusters, logger);
       });
 
       return [{ result: BlockAccountReply_Result.OK }];
     },
 
-    unblockAccount: async ({ request, em }) => {
+    unblockAccount: async ({ request, em, logger }) => {
       const { accountName } = request;
 
       await em.transactional(async (em) => {
@@ -55,7 +53,7 @@ export const accountServiceServer = plugin((server) => {
           return [{ executed: false }];
         }
 
-        await account.unblock(server.ext.clusters);
+        await account.unblock(server.ext.clusters, logger);
       });
 
       return [{ executed: true }];
@@ -135,9 +133,11 @@ export const accountServiceServer = plugin((server) => {
 
       logger.info("Creating account in cluster.");
       await server.ext.clusters.callOnAll(
-        AccountServiceClient,
-        { method: "createAccount", req: { accountName, ownerId } },
-        { method: "deleteAccount", req: { accountName } },
+        logger,
+        async (ops) => ops.account.createAccount({
+          request: { accountName, ownerId },
+          logger,
+        }),
       ).catch(async (e) => {
         await rollback(e);
       });
@@ -199,7 +199,7 @@ export const accountServiceServer = plugin((server) => {
       });
       account.whitelist = toRef(whitelist);
 
-      await account.unblock(server.ext.clusters);
+      await account.unblock(server.ext.clusters, logger);
       await em.persistAndFlush(whitelist);
 
       logger.info("Add account %s to whitelist by %s with comment %s",
@@ -233,7 +233,7 @@ export const accountServiceServer = plugin((server) => {
 
       if (account.balance.isNegative()) {
         logger.info("Account %s is out of balance and not whitelisted. Block the account.", account.accountName);
-        await account.block(server.ext.clusters);
+        await account.block(server.ext.clusters, logger);
       }
 
       await em.flush();

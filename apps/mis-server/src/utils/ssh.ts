@@ -1,21 +1,30 @@
 import { Logger } from "@ddadaal/tsgrpc-server";
 import fs from "fs";
 import { NodeSSH } from "node-ssh";
-import { config, INSERT_SSH_KEY_LOGIN_NODES } from "src/config/env";
+import { clusters } from "src/config/clusters";
+import { privateKeyPath, publicKeyPath } from "src/config/mis";
 
-const connectAsRoot = async <T>(ip: string, run: (ssh: NodeSSH) => Promise<T>) => {
+const publicKey = fs.readFileSync(publicKeyPath, "utf-8").trim();
+
+const clusterLoginNodes = Object.keys(clusters).reduce((prev, curr) => {
+  prev[curr] = clusters[curr].loginNodes[0];
+  return prev;
+}, {} as Record<string, string>);
+
+
+export const sshConnect = async <T>(
+  host: string, username: string, privateKeyPath: string,
+  run: (ssh: NodeSSH) => Promise<T>,
+) => {
 
   const ssh = new NodeSSH();
+  await ssh.connect({ host, username, privateKey: privateKeyPath });
 
-  return await ssh.connect({
-    username: "root", host: ip, privateKey: config.INSERT_SSH_KEY_PRIVATE_KEY_PATH,
-  })
-    .then(run)
-    .finally(() => ssh.dispose());
+  const value = await run(ssh).finally(() => ssh.dispose());
 
+  return value;
 };
 
-const publicKey = fs.readFileSync(config.INSERT_SSH_KEY_PUBLIC_KEY_PATH, "utf-8").trim();
 
 export async function insertKey(user: string, logger: Logger) {
   // https://superuser.com/a/484280
@@ -42,11 +51,11 @@ export async function insertKey(user: string, logger: Logger) {
     `;
 
 
-  await Promise.allSettled(Object.entries(INSERT_SSH_KEY_LOGIN_NODES).map(async ([name, ip]) => {
+  await Promise.allSettled(Object.entries(clusterLoginNodes).map(async ([name, ip]) => {
 
     logger.info("Adding key to user %s on cluster %s", user, name);
 
-    await connectAsRoot(ip, async (ssh) => {
+    await sshConnect(ip, "root", privateKeyPath, async (ssh) => {
       const homeDir = await ssh.execCommand(`eval echo ~${user}`);
 
       await ssh.execCommand(script(homeDir.stdout.trim()));

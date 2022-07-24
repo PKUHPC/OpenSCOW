@@ -1,6 +1,10 @@
 {
   "hpc00": {
     "displayName": "hpc00",
+    "mis": {
+      "slurm": {
+      }
+    },
     "partitions": {
       "C032M0128G": {
         "mem": 131072,

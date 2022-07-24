@@ -27,9 +27,9 @@ const PriceItemsJsonSchema = Type.Record(
   TenantSpecificSchema);
 
 
-export async function createPriceItems(em: SqlEntityManager, logger: Logger, configBasePath?: string) {
+export async function createPriceItems(em: SqlEntityManager, logger: Logger) {
 
-  const priceItems = getConfigFromFile(PriceItemsJsonSchema, "priceItems", false, configBasePath);
+  const priceItems = getConfigFromFile(PriceItemsJsonSchema, "priceItems", false);
 
   logger.info("priceItems.json content: %o", priceItems);
 

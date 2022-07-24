@@ -5,7 +5,7 @@ import { MikroORM, QueryOrder } from "@mikro-orm/core";
 import { MariaDbDriver } from "@mikro-orm/mariadb";
 import { SqlEntityManager } from "@mikro-orm/mysql";
 import { charge } from "src/bl/charging";
-import { config } from "src/config/env";
+import { misConfig } from "src/config/mis";
 import { Account } from "src/entities/Account";
 import { JobInfo } from "src/entities/JobInfo";
 import { OriginalJob } from "src/entities/OriginalJob";
@@ -18,11 +18,11 @@ export const createSourceDbOrm = async (logger: Logger) => {
   logger.info("Connecting to source db.");
 
   const dbConnection = await MikroORM.init<MariaDbDriver>({
-    host: config.FETCH_JOBS_DB_HOST,
-    port: config.FETCH_JOBS_DB_PORT,
-    user: config.FETCH_JOBS_DB_USER,
-    dbName: config.FETCH_JOBS_DB_DBNAME,
-    password: config.FETCH_JOBS_DB_PASSWORD,
+    host: misConfig.fetchJobs.db.host,
+    port: misConfig.fetchJobs.db.port,
+    user: misConfig.fetchJobs.db.user,
+    dbName: misConfig.fetchJobs.db.dbName,
+    password: misConfig.fetchJobs.db.password,
     type: "mariadb",
     forceUndefined: true,
     logger: (msg) => logger.info(msg),
@@ -79,7 +79,7 @@ export async function fetchJobs(
 
     const latestIndex = await getLatestIndex(em, logger);
 
-    const startIndex = Math.max(latestIndex + 1, config.FETCH_JOBS_START_INDEX);
+    const startIndex = Math.max(latestIndex + 1, misConfig.fetchJobs.startIndex);
     logger.info(`Fetching new info from ${startIndex}`);
 
     // Fetch new info
@@ -90,7 +90,7 @@ export async function fetchJobs(
     const count = await sourceEm.count(OriginalJob, { biJobIndex: { $gte: startIndex } });
     logger.info(`${count} new records to fetch.`);
 
-    const batchSize = config.FETCH_JOBS_BATCH_SIZE;
+    const batchSize = misConfig.fetchJobs.batchSize;
     const loopCount = Math.ceil(count / batchSize);
 
     logger.info(`Batch size is ${batchSize}. ${loopCount} rounds to complete.`);
@@ -173,12 +173,12 @@ export async function fetchJobs(
             };
           }
 
-          const comment = parseCommentPlaceholder(config.JOB_CHARGE_COMMENT, x);
+          const comment = parseCommentPlaceholder(misConfig.jobChargeComment, x);
 
           // charge account
           await charge({
             amount: x.accountPrice,
-            type: config.JOB_PRICE_CHARGING_TYPE,
+            type: misConfig.jobChargeType,
             comment,
             target: ua.account.$,
           }, em, logger, clusterPlugin);
@@ -186,12 +186,12 @@ export async function fetchJobs(
           // charge tenant
           await charge({
             amount: x.tenantPrice,
-            type: config.JOB_PRICE_CHARGING_TYPE,
+            type: misConfig.jobChargeType,
             comment,
             target: ua.account.$.tenant.getEntity(),
           }, em, logger, clusterPlugin);
 
-          await ua.addJobCharge(x.tenantPrice, clusterPlugin);
+          await ua.addJobCharge(x.tenantPrice, clusterPlugin, logger);
 
         }));
 

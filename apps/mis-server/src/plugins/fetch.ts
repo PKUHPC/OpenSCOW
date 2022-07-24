@@ -1,6 +1,6 @@
 import { plugin } from "@ddadaal/tsgrpc-server";
 import cron from "node-cron";
-import { config } from "src/config/env";
+import { misConfig } from "src/config/mis";
 import { fetchJobs, lastFetched } from "src/tasks/fetch";
 
 export interface FetchPlugin {
@@ -16,18 +16,18 @@ export interface FetchPlugin {
 
 export const fetchPlugin = plugin(async (f) => {
 
-  let fetchStarted = config.FETCH_JOBS_PERIODIC_FETCH_ENABLED;
+  let fetchStarted = !!misConfig.fetchJobs.periodicFetch;
 
   const logger = f.logger.child({ plugin: "fetch" });
 
   const trigger = () => fetchJobs(f.ext.orm.em.fork(), logger, f.ext, f.ext);
 
   const task = cron.schedule(
-    config.FETCH_JOBS_PERIODIC_FETCH_CRON,
+    misConfig.fetchJobs.periodicFetch.cron,
     trigger,
     {
       timezone: "Asia/Shanghai",
-      scheduled: config.FETCH_JOBS_PERIODIC_FETCH_ENABLED,
+      scheduled: misConfig.fetchJobs.periodicFetch.enabled,
     },
   );
 
@@ -58,7 +58,7 @@ export const fetchPlugin = plugin(async (f) => {
         logger.info("Fetch stopped");
       }
     },
-    schedule: config.FETCH_JOBS_PERIODIC_FETCH_CRON,
+    schedule: misConfig.fetchJobs.periodicFetch.cron,
     lastFetched: () => lastFetched,
     fetch: trigger,
   });

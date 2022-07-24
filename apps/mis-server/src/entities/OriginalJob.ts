@@ -1,7 +1,7 @@
 import { Entity, Index, PrimaryKey, Property } from "@mikro-orm/core";
-import { config } from "src/config/env";
+import { misConfig } from "src/config/mis";
 
-@Entity({ tableName: config.FETCH_JOBS_DB_TABLE_NAME })
+@Entity({ tableName: misConfig.fetchJobs.db.tableName })
 export class OriginalJob {
 
   @PrimaryKey()

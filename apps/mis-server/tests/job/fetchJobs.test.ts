@@ -26,7 +26,7 @@ beforeEach(async () => {
 
   initialEm = server.ext.orm.em.fork();
 
-  await createPriceItems(initialEm, server.logger, "tests/data/config");
+  await createPriceItems(initialEm, server.logger);
 
   data = await insertInitialData(initialEm);
 
@@ -54,7 +54,7 @@ it("fetches the data", async () => {
 
   // set job charge limit of user b in account b
 
-  await data.uaBB.setJobCharge(new Decimal(0.01), server.ext);
+  await data.uaBB.setJobCharge(new Decimal(0.01), server.ext, server.logger);
   await initialEm.flush();
 
   await fetchJobs(server.ext.orm.em.fork(), server.logger, server.ext, server.ext);
