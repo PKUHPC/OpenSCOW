@@ -18,14 +18,10 @@ title: "portal-web"
 |`ENABLE_LOGIN_DESKTOP`|布尔值|是否启动登录节点上的桌面功能|false|
 |`LOGIN_DESKTOP_WMS`|字符串|登录节点上可以启动的桌面类型，格式：名字=wm值,名字=wm值<br/>示例：Xfce=xfce,gnome3=|Xfce=xfce|
 |`ENABLE_APPS`|布尔值|是否启动交互式任务功能|false|
-|`DEFAULT_FOOTER_TEXT`|字符串|默认footer文本||
-|`FOOTER_TEXTS`|字符串|根据域名(hostname，不包括port)不同，显示在footer上的文本。格式：域名=文本,域名=文本||
 |`DEFAULT_HOME_TEXT`|字符串|默认主页文本|北京大学计算中心成立于1963年，是集计算中心管理信息中心和网络中心于一体的实体单位，是独立建制的全校大型综合实验室，负责学校信息化基础设施的建设、开发与运行服务工作。|
 |`HOME_TEXTS`|字符串|根据域名(hostname，不包括port)不同，显示在主页上的文本。格式：域名=文本,域名=文本||
 |`DEFAULT_HOME_TITLE`|字符串|默认主页标题|北京大学计算中心高性能计算平台交互式工具|
 |`HOME_TITLES`|字符串|根据域名(hostname，不包括port)不同，显示在主页上的标题。格式：域名=标题,域名=标题||
-|`DEFAULT_PRIMARY_COLOR`|字符串|默认主题色|#9B0000|
-|`PRIMARY_COLORS`|字符串|根据域名(hostname，不包括port)不同，应用的主题色。格式：域名=颜色,域名=颜色||
 |`MIS_PATH`|字符串|管理系统的链接。如果不设置，则不显示到管理系统的链接|不设置|
 |`ENABLE_SHELL`|布尔值|是否启用Shell功能|false|
 |`SSH_PRIVATE_KEY_PATH`|字符串|SSH私钥路径|~/.ssh/id_rsa|
