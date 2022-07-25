@@ -10,9 +10,8 @@ import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { CodeEditor } from "src/components/CodeEditor";
 import { InputGroupFormItem } from "src/components/InputGroupFormItem";
 import { AccountSelector } from "src/pageComponents/job/AccountSelector";
-import { Cluster, publicConfig } from "src/utils/config";
-import { defaultCluster, defaultPartitionInfo,
-  defaultPartitionName, firstPartition, getPartitionInfo } from "src/utils/jobForm";
+import { Cluster, CLUSTERS, publicConfig } from "src/utils/config";
+import { firstPartition, getPartitionInfo } from "src/utils/jobForm";
 
 interface JobForm {
   cluster: Cluster;
@@ -34,12 +33,9 @@ function genJobName() {
 }
 
 const initialValues = {
-  cluster: defaultCluster,
   command: "",
-  partition: defaultPartitionName,
   nodeCount: 1,
   coreCount: 1,
-  qos: defaultPartitionInfo?.qos?.[0] ?? null,
   maxTime: 30,
   save: false,
 } as JobForm;
@@ -90,11 +86,27 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
 
   const partition = useWatch("partition", form) ?? initial.partition;
 
+  // set default
+  useEffect(() => {
+    const defaultCluster = CLUSTERS[0];
+
+    if (defaultCluster) {
+      const [partition, info] = firstPartition(defaultCluster);
+      form.setFieldsValue({
+        cluster: defaultCluster,
+        partition,
+        qos: info?.qos?.[0],
+      });
+    }
+  }, []);
+
   // if partition is no longer available, use the first partition of the cluster
   useEffect(() => {
+
     if (!getPartitionInfo(cluster, partition)) {
       form.setFieldsValue({ partition: firstPartition(cluster)[0] });
     }
+
   }, [partition]);
 
   const currentPartitionInfo = useMemo(() => getPartitionInfo(cluster, partition), [cluster, partition]);

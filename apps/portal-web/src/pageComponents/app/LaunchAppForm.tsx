@@ -4,9 +4,8 @@ import { useEffect, useMemo, useState } from "react";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { AccountSelector } from "src/pageComponents/job/AccountSelector";
-import { Cluster, publicConfig } from "src/utils/config";
-import { defaultCluster, defaultPartitionInfo,
-  defaultPartitionName, firstPartition, getPartitionInfo } from "src/utils/jobForm";
+import { Cluster, CLUSTERS, publicConfig } from "src/utils/config";
+import { firstPartition, getPartitionInfo } from "src/utils/jobForm";
 
 interface Props {
   appId: string;
@@ -23,13 +22,10 @@ interface FormFields {
 
 
 const initialValues = {
-  cluster: defaultCluster,
-  partition: defaultPartitionName,
   nodeCount: 1,
   coreCount: 1,
-  qos: defaultPartitionInfo?.qos?.[0],
   maxTime: 60,
-} as Omit<FormFields, "account">;
+} as Partial<FormFields>;
 
 
 export const LaunchAppForm: React.FC<Props> = ({ appId }) => {
@@ -61,6 +57,20 @@ export const LaunchAppForm: React.FC<Props> = ({ appId }) => {
   const cluster = Form.useWatch("cluster", form) ?? initialValues.cluster;
 
   const partition = Form.useWatch("partition", form) ?? initialValues.partition;
+
+  // set default
+  useEffect(() => {
+    const defaultCluster = CLUSTERS[0];
+
+    if (defaultCluster) {
+      const [partition, info] = firstPartition(defaultCluster);
+      form.setFieldsValue({
+        cluster: defaultCluster,
+        partition,
+        qos: info?.qos?.[0],
+      });
+    }
+  }, []);
 
   // if partition is no longer available, use the first partition of the cluster
   useEffect(() => {
