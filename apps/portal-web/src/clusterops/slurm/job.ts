@@ -72,9 +72,9 @@ export const slurmJobOps = (cluster: string): JobOps => {
           const id = `${jobInfo.jobName}-${jobId}`;
           logger.info("Save job to %s", id);
 
-          await ssh.mkdir(runtimeConfig.SAVED_JOBS_DIR);
+          await ssh.mkdir(runtimeConfig.PORTAL_CONFIG.savedJobsDir);
 
-          const filePath = join(runtimeConfig.SAVED_JOBS_DIR, id);
+          const filePath = join(runtimeConfig.PORTAL_CONFIG.savedJobsDir, id);
           const metadata: JobMetadata = { ...jobInfo, submitTime: new Date().toISOString() };
           await sftpWriteFile(sftp)(filePath, JSON.stringify(metadata));
 
@@ -91,8 +91,8 @@ export const slurmJobOps = (cluster: string): JobOps => {
       return await sshConnect(host, userId, logger, async (ssh) => {
         const sftp = await ssh.requestSFTP();
 
-        const file = join(runtimeConfig.SAVED_JOBS_DIR, id);
-        
+        const file = join(runtimeConfig.PORTAL_CONFIG.savedJobsDir, id);
+
         if (!await sftpExists(sftp, file)) { return { code: "NOT_FOUND" };}
 
         const content = await sftpReadFile(sftp)(file);
@@ -109,12 +109,12 @@ export const slurmJobOps = (cluster: string): JobOps => {
       return await sshConnect(host, userId, logger, async (ssh) => {
         const sftp = await ssh.requestSFTP();
 
-        if (!await sftpExists(sftp, runtimeConfig.SAVED_JOBS_DIR)) { return { results: []}; }
+        if (!await sftpExists(sftp, runtimeConfig.PORTAL_CONFIG.savedJobsDir)) { return { results: []}; }
 
-        const list = await sftpReaddir(sftp)(runtimeConfig.SAVED_JOBS_DIR);
+        const list = await sftpReaddir(sftp)(runtimeConfig.PORTAL_CONFIG.savedJobsDir);
 
         const results = await Promise.all(list.map(async ({ filename }) => {
-          const content = await sftpReadFile(sftp)(join(runtimeConfig.SAVED_JOBS_DIR, filename));
+          const content = await sftpReadFile(sftp)(join(runtimeConfig.PORTAL_CONFIG.savedJobsDir, filename));
           const data = JSON.parse(content.toString()) as JobMetadata;
 
           return {

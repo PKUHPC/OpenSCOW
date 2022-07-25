@@ -1,5 +1,6 @@
 import { AppConfigSchema } from "@scow/config/build/appConfig/app";
-import { ClusterConfigSchema } from "@scow/config/build/appConfig/cluster";
+import type { ClusterConfigSchema } from "@scow/config/build/appConfig/cluster";
+import type { PortalConfigSchema } from "@scow/config/build/appConfig/portal";
 import type { UiConfigSchema } from "@scow/config/build/appConfig/ui";
 import { CONFIG_BASE_PATH } from "@scow/config/build/constants";
 import getConfig from "next/config";
@@ -13,20 +14,16 @@ export interface ServerRuntimeConfig {
   CLUSTERS_CONFIG: {[cluster: string]: ClusterConfigSchema};
 
   UI_CONFIG?: UiConfigSchema;
-  DEFAULT_PRIMARY_COLOR: string;
 
-  FILE_SERVERS: {[cluster: string]: string };
+  PORTAL_CONFIG: PortalConfigSchema;
+
+  DEFAULT_PRIMARY_COLOR: string;
 
   APPS: Record<string, AppConfigSchema>;
 
   MOCK_USER_ID: string | undefined;
 
-  TURBOVNC_PATH: string;
-
-  MAX_LOGIN_DESKTOPS: number;
-
-  SAVED_JOBS_DIR: string;
-  APP_JOBS_DIR: string;
+  LOGIN_NODES: Record<string, string>;
 }
 
 
@@ -34,20 +31,18 @@ export interface PublicRuntimeConfig {
   /** Cluster id and name */
   CLUSTER_NAMES: { [clusterId: string]: string };
 
-  FILE_SERVERS_ENABLED_CLUSTERS: string[];
-
   ENABLE_CHANGE_PASSWORD: boolean;
 
   ENABLE_SHELL: boolean;
 
   ENABLE_LOGIN_DESKTOP: boolean;
-  LOGIN_DESKTOP_WMS: { [name: string]: string };
+  LOGIN_DESKTOP_WMS: { name: string; wm: string }[];
 
   ENABLE_JOB_MANAGEMENT: boolean;
 
   ENABLE_APPS: boolean;
 
-  MIS_PATH: string;
+  MIS_PATH: string | undefined;
 
   DEFAULT_HOME_TEXT: string;
   HOME_TEXTS: {[hostname: string]: string };

@@ -46,7 +46,7 @@ export const slurmAppOps = (cluster: string): AppOps => {
 
       const jobName = randomUUID();
 
-      const workingDirectory = join(runtimeConfig.APP_JOBS_DIR, jobName);
+      const workingDirectory = join(runtimeConfig.PORTAL_CONFIG.appJobsDir, jobName);
 
       return await sshConnect(host, userId, logger, async (ssh) => {
 
@@ -133,9 +133,9 @@ export const slurmAppOps = (cluster: string): AppOps => {
       return await sshConnect(host, userId, logger, async (ssh) => {
         const sftp = await ssh.requestSFTP();
 
-        if (!await sftpExists(sftp, runtimeConfig.APP_JOBS_DIR)) { return { sessions: []}; }
+        if (!await sftpExists(sftp, runtimeConfig.PORTAL_CONFIG.appJobsDir)) { return { sessions: []}; }
 
-        const list = await sftpReaddir(sftp)(runtimeConfig.APP_JOBS_DIR);
+        const list = await sftpReaddir(sftp)(runtimeConfig.PORTAL_CONFIG.appJobsDir);
 
         // using squeue to get jobs that are running
         // If a job is not running, it cannot be ready
@@ -149,7 +149,7 @@ export const slurmAppOps = (cluster: string): AppOps => {
         const sessions = [] as AppSession[];
 
         await Promise.all(list.map(async ({ filename }) => {
-          const jobDir = join(runtimeConfig.APP_JOBS_DIR, filename);
+          const jobDir = join(runtimeConfig.PORTAL_CONFIG.appJobsDir, filename);
           const metadataPath = join(jobDir, SESSION_METADATA_NAME);
 
           if (!await sftpExists(sftp, metadataPath)) {
@@ -212,7 +212,7 @@ export const slurmAppOps = (cluster: string): AppOps => {
       return await sshConnect(host, userId, logger, async (ssh) => {
         const sftp = await ssh.requestSFTP();
 
-        const jobDir = join(runtimeConfig.APP_JOBS_DIR, sessionId);
+        const jobDir = join(runtimeConfig.PORTAL_CONFIG.appJobsDir, sessionId);
 
         if (!await sftpExists(sftp, jobDir)) {
           return { code: "NOT_FOUND" };

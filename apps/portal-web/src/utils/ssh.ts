@@ -5,7 +5,7 @@ import { Logger } from "src/utils/log";
 
 export function getClusterLoginNode(cluster: string): string | undefined {
 
-  if (runtimeConfig.FILE_SERVERS[cluster]) { return runtimeConfig.FILE_SERVERS[cluster]; }
+  if (runtimeConfig.LOGIN_NODES[cluster]) { return runtimeConfig.LOGIN_NODES[cluster]; }
 
   const config = runtimeConfig.CLUSTERS_CONFIG[cluster];
 

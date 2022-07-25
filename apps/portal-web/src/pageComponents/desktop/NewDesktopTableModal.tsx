@@ -16,7 +16,7 @@ interface ClusterInfo {
   wm: string;
 }
 
-const defaultWm = Object.keys(publicConfig.LOGIN_DESKTOP_WMS)[0];
+const defaultWm = publicConfig.LOGIN_DESKTOP_WMS[0];
 
 export const NewDesktopTableModal: React.FC<Props> = ({ visible, onClose, reload }) => {
 
@@ -59,7 +59,7 @@ export const NewDesktopTableModal: React.FC<Props> = ({ visible, onClose, reload
       confirmLoading={submitting}
       onCancel={onClose}
     >
-      <Form form={form} initialValues={{ cluster: CLUSTERS[0], wm: defaultWm }} onFinish={onOk}>
+      <Form form={form} initialValues={{ cluster: CLUSTERS[0], wm: defaultWm.wm }} onFinish={onOk}>
         <Form.Item
           label="集群"
           name="cluster"
@@ -73,8 +73,8 @@ export const NewDesktopTableModal: React.FC<Props> = ({ visible, onClose, reload
         </Form.Item>
         <Form.Item label="桌面" name="wm" required>
           <Select
-            options={Object.keys(publicConfig.LOGIN_DESKTOP_WMS).map((name) =>
-              ({ label: name, value: name }))}
+            options={publicConfig.LOGIN_DESKTOP_WMS.map(({ name, wm }) =>
+              ({ label: name, value: wm }))}
           />
 
         </Form.Item>

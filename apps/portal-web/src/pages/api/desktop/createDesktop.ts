@@ -52,7 +52,7 @@ export default /* #__PURE__*/route<CreateDesktopSchema>("CreateDesktopSchema", a
 
   const { cluster, wm } = req.body;
 
-  if (publicConfig.LOGIN_DESKTOP_WMS[wm] === undefined) {
+  if (publicConfig.LOGIN_DESKTOP_WMS.find((x) => x.wm === wm) === undefined) {
     return { 400: { code: "INVALID_WM", message: `${wm} is not a acceptable wm.` } };
   }
 
@@ -69,7 +69,7 @@ export default /* #__PURE__*/route<CreateDesktopSchema>("CreateDesktopSchema", a
 
     const ids = parseListOutput(resp.stdout);
 
-    if (ids.length >= runtimeConfig.MAX_LOGIN_DESKTOPS) {
+    if (ids.length >= runtimeConfig.PORTAL_CONFIG.loginDesktop.maxDesktops) {
       return { 409: { code: "TOO_MANY_DESKTOPS" } as const };
     }
 
