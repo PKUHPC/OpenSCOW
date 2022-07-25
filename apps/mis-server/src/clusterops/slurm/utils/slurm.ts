@@ -1,7 +1,8 @@
 import { Logger } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
-import { privateKeyPath, SlurmMisConfigSchema } from "src/config/mis";
+import { SlurmMisConfigSchema } from "@scow/config/build/appConfig/mis";
+import { privateKeyPath } from "src/config/mis";
 import { sshConnect } from "src/utils/ssh";
 
 export const executeScript = async (

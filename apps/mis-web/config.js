@@ -2,6 +2,7 @@
 
 const { envConfig, getConfigFromFile, parseKeyValue, regex, str } = require("@scow/config");
 const { ClusterConfigSchema, getClusterConfigs } = require("@scow/config/build/appConfig/cluster");
+const { SlurmMisConfigSchema, MisConfigSchema, MIS_CONFIG_NAME } = require("@scow/config/build/appConfig/mis");
 const { ClusterTextsConfigName, ClusterTextsConfigSchema } = require("@scow/config/build/appConfig/clusterTexts");
 const { DEFAULT_PRIMARY_COLOR, UI_CONFIG_NAME, UiConfigSchema } = require("@scow/config/build/appConfig/ui");
 const { PHASE_DEVELOPMENT_SERVER, PHASE_PRODUCTION_BUILD, PHASE_PRODUCTION_SERVER } = require("next/constants");
@@ -30,16 +31,6 @@ const specs = {
 
   AUTH_EXTERNAL_URL: str({ desc: "认证服务外网地址", default: "/auth" }),
   AUTH_INTERNAL_URL: str({ desc: "认证服务内网地址", default: "http://auth:5000" }),
-
-  PREDEFINED_CHARGING_TYPES: str({ desc: "预定义的充值类型，格式：类型,类型,类型", default: "" }),
-
-  ACCOUNT_NAME_PATTERN: regex({ desc: "账户名的正则规则", default: undefined }),
-  ACCOUNT_NAME_PATTERN_MESSAGE: str({
-    desc: "创建账户名时如果账户名不符合规则显示什么。如果ACCOUNT_NAME_PATTERN没有设置，这个不生效",
-    default: undefined,
-  }),
-
-  PORTAL_PATH: str({ desc: "门户系统链接。如果不设置，则不显示到门户的链接", default: undefined }),
 };
 
 const config = envConfig(specs, process.env);
@@ -64,15 +55,13 @@ const buildRuntimeConfig = async (phase) => {
 
   // load clusters.json
 
-  const clusters = getClusterConfigs(production ? undefined : join(__dirname, "config"));
 
-  /**
-   * @type {import("@scow/config/build/appConfig/clusterTexts").ClusterTexts}
-   */
-  const clusterTexts = getConfigFromFile(ClusterTextsConfigSchema, ClusterTextsConfigName, false,
-    production ? undefined : join(__dirname, "config"));
+  const basePath = production ? undefined : join(__dirname, "config");
 
-  const uiConfig = getConfigFromFile(UiConfigSchema, UI_CONFIG_NAME, true);
+  const clusters = getClusterConfigs(basePath);
+  const clusterTexts = getConfigFromFile(ClusterTextsConfigSchema, ClusterTextsConfigName, false, basePath);
+  const uiConfig = getConfigFromFile(UiConfigSchema, UI_CONFIG_NAME, true, basePath);
+  const misConfig = getConfigFromFile(MisConfigSchema, MIS_CONFIG_NAME, false, basePath);
 
   /**
    * @type {import ("./src/utils/config").ServerRuntimeConfig}
@@ -93,19 +82,17 @@ const buildRuntimeConfig = async (phase) => {
   const publicRuntimeConfig = {
     ENABLE_CREATE_USER: capabilities.createUser,
     ENABLE_CHANGE_PASSWORD: capabilities.changePassword,
-    PREDEFINED_CHARGING_TYPES: config.PREDEFINED_CHARGING_TYPES.split(",")
-      .filter((x) => x)
-      .map((x) => x.trim()),
+    PREDEFINED_CHARGING_TYPES: misConfig.predefinedChargingTypes,
 
     CLUSTERS: Object.keys(clusters).reduce((prev, curr) => {
       prev[curr] = clusters[curr].displayName;
       return prev;
     }, {}),
 
-    ACCOUNT_NAME_PATTERN: config.ACCOUNT_NAME_PATTERN,
-    ACCOUNT_NAME_PATTERN_MESSAGE: config.ACCOUNT_NAME_PATTERN_MESSAGE,
+    ACCOUNT_NAME_PATTERN: misConfig.accountNamePattern?.regex,
+    ACCOUNT_NAME_PATTERN_MESSAGE: misConfig.accountNamePattern?.errorMessage,
 
-    PORTAL_PATH: config.PORTAL_PATH,
+    PORTAL_PATH: misConfig.portalPath,
   };
 
   if (!building) {

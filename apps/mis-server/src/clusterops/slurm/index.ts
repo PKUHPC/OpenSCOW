@@ -1,4 +1,5 @@
 import { Logger } from "@ddadaal/tsgrpc-server";
+import { SlurmMisConfigSchema } from "@scow/config/build/appConfig/mis";
 import { ClusterOps } from "src/clusterops/api";
 import { slurmAccountOps } from "src/clusterops/slurm/account";
 import { slurmJobOps } from "src/clusterops/slurm/job";
@@ -6,7 +7,6 @@ import { slurmStorageOps } from "src/clusterops/slurm/storage";
 import { slurmUserOps } from "src/clusterops/slurm/user";
 import { executeSlurmScript } from "src/clusterops/slurm/utils/slurm";
 import { clusters } from "src/config/clusters";
-import { SlurmMisConfigSchema } from "src/config/mis";
 
 export interface SlurmClusterInfo {
   slurmConfig: SlurmMisConfigSchema;
