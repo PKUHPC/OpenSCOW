@@ -1,4 +1,3 @@
-import { App } from "@scow/config/build/appConfig/app";
 import { authenticate } from "src/auth/server";
 import { getClusterOps } from "src/clusterops";
 import { runtimeConfig } from "src/utils/config";
@@ -37,16 +36,9 @@ export interface ConnectToAppSchema {
   }
 }
 
-const appProps = runtimeConfig.APPS.reduce((prev, curr) => {
-  prev[curr.id] = curr;
-  return prev;
-}, {} as Record<string, App>);
-
 const auth = authenticate(() => true);
 
 export default /* #__PURE__*/route<ConnectToAppSchema>("ConnectToAppSchema", async (req, res) => {
-
-
 
   const info = await auth(req, res);
 
@@ -63,7 +55,7 @@ export default /* #__PURE__*/route<ConnectToAppSchema>("ConnectToAppSchema", asy
   if (reply.code === "NOT_FOUND") { return { 404: null };}
   if (reply.code === "UNAVAILABLE") { return { 409: null };}
 
-  const app = appProps[reply.appId];
+  const app = runtimeConfig.APPS[reply.appId];
 
   if (!app) { throw new Error(`Unknown app ${reply.appId}`);}
 
@@ -75,7 +67,7 @@ export default /* #__PURE__*/route<ConnectToAppSchema>("ConnectToAppSchema", asy
         host: resolvedHost,
         port: reply.port,
         password: reply.password,
-        connect: app.connect,
+        connect: app.web!.connect,
         type: "web",
       },
     };

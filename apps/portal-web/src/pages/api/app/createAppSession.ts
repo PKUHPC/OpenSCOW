@@ -25,6 +25,10 @@ export interface CreateAppSessionSchema {
       message: string;
     }
 
+    404: {
+      code: "APP_NOT_FOUND";
+    }
+
     409: {
       code: "SBATCH_FAILED";
       message: string;
@@ -59,6 +63,10 @@ export default /* #__PURE__*/route<CreateAppSessionSchema>("CreateAppSessionSche
 
   if (reply.code === "SBATCH_FAILED") {
     return { 409: { code: "SBATCH_FAILED", message: reply.message } };
+  }
+
+  if (reply.code === "APP_NOT_FOUND") {
+    return { 404: { code: "APP_NOT_FOUND" } };
   }
 
   return { 200: { jobId: reply.jobId, sessionId: reply.sessionId } };

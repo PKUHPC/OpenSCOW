@@ -18,6 +18,8 @@ export type CreateAppReply = {
 } | {
   code: "SBATCH_FAILED",
   message: string;
+} | {
+  code: "APP_NOT_FOUND";
 }
 
 export interface GetAppSessionsRequest {

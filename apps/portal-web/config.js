@@ -1,13 +1,13 @@
 // @ts-check
 
 const { envConfig, str, bool, parseKeyValue, num } = require("@scow/config");
-const { join, basename, extname } = require("path");
+const { join } = require("path");
 const { homedir } = require("os");
-const fs = require("fs");
 const { PHASE_DEVELOPMENT_SERVER, PHASE_PRODUCTION_BUILD, PHASE_PRODUCTION_SERVER, PHASE_TEST } = require("next/constants");
 
 const { getCapabilities } = require("@scow/lib-auth");
 const { UI_CONFIG_NAME, UiConfigSchema, DEFAULT_PRIMARY_COLOR } = require("@scow/config/build/appConfig/ui");
+const { getAppConfigs } = require("@scow/config/build/appConfig/app");
 
 /**
  * Get auth capabilities
@@ -94,26 +94,7 @@ const buildRuntimeConfig = async (phase) => {
    */
   const clusters = getConfigFromFile(ClustersConfigSchema, ClustersConfigName, false, configPath);
 
-
-  // get available apps
-  function getApps() {
-    const { APP_CONFIG_BASE_PATH, AppConfigSchema } = require("@scow/config/build/appConfig/app");
-
-    const appsPath = join(configPath || CONFIG_BASE_PATH, APP_CONFIG_BASE_PATH);
-
-    if (!fs.existsSync(appsPath)) {
-      return [];
-    }
-
-    const apps = fs.readdirSync(appsPath);
-
-    return apps.map((filename) => {
-      return getConfigFromFile(AppConfigSchema,
-        join(APP_CONFIG_BASE_PATH, basename(filename, extname(filename))), false, configPath);
-    });
-  }
-
-  const apps = getApps();
+  const apps = getAppConfigs(configPath);
 
   const uiConfig = getConfigFromFile(UiConfigSchema, UI_CONFIG_NAME, true);
 
@@ -171,7 +152,7 @@ const buildRuntimeConfig = async (phase) => {
 
     CLUSTERS_CONFIG: clusters,
 
-    APPS: apps.map(({ id, name }) => ({ id, name })),
+    APPS: Object.entries(apps).map(([id, { name }]) => ({ id, name })),
 
     SUBMIT_JOB_WORKING_DIR: config.SUBMIT_JOB_DEFAULT_PWD,
 

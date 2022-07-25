@@ -1,4 +1,4 @@
-import { App } from "@scow/config/build/appConfig/app";
+import { AppConfigSchema } from "@scow/config/build/appConfig/app";
 import type { Clusters } from "@scow/config/build/appConfig/clusters";
 import type { UiConfigSchema } from "@scow/config/build/appConfig/ui";
 import { CONFIG_BASE_PATH } from "@scow/config/build/constants";
@@ -17,14 +17,14 @@ export interface ServerRuntimeConfig {
 
   FILE_SERVERS: {[cluster: string]: string };
 
-  APPS: App[];
+  APPS: Record<string, AppConfigSchema>;
 
   MOCK_USER_ID: string | undefined;
 
   TURBOVNC_PATH: string;
 
   MAX_LOGIN_DESKTOPS: number;
-  
+
   SAVED_JOBS_DIR: string;
   APP_JOBS_DIR: string;
 }

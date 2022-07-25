@@ -20,7 +20,7 @@ import { PathBar } from "src/pageComponents/filemanager/PathBar";
 import { RenameModal } from "src/pageComponents/filemanager/RenameModal";
 import { UploadModal } from "src/pageComponents/filemanager/UploadModal";
 import { FileInfo, FileType } from "src/pages/api/file/list";
-import { publicConfig } from "src/utils/config";
+import { CLUSTERS, publicConfig } from "src/utils/config";
 import { compareDateTime, formatDateTime } from "src/utils/datetime";
 import { compareNumber } from "src/utils/math";
 import styled from "styled-components";
@@ -232,7 +232,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
   return (
     <div>
       <TitleText>
-        集群{publicConfig.CLUSTER_NAMES[cluster] ?? cluster}文件管理
+        集群{CLUSTERS[cluster] ?? cluster}文件管理
       </TitleText>
       <TopBar>
         <Button onClick={back} icon={<LeftOutlined />} shape="circle" />

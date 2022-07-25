@@ -1,4 +1,3 @@
-import { App } from "@scow/config/build/appConfig/app";
 import { Button, Form, InputNumber, message, Select } from "antd";
 import Router from "next/router";
 import { useEffect, useMemo, useState } from "react";
@@ -10,7 +9,7 @@ import { defaultCluster, defaultPartitionInfo,
   defaultPartitionName, firstPartition, getPartitionInfo } from "src/utils/jobForm";
 
 interface Props {
-  config: App;
+  appId: string;
 }
 
 interface FormFields {
@@ -33,7 +32,7 @@ const initialValues = {
 } as Omit<FormFields, "account">;
 
 
-export const LaunchAppForm: React.FC<Props> = ({ config }) => {
+export const LaunchAppForm: React.FC<Props> = ({ appId }) => {
 
   const [form] = Form.useForm<FormFields>();
   const [loading, setLoading] = useState(false);
@@ -44,7 +43,7 @@ export const LaunchAppForm: React.FC<Props> = ({ config }) => {
     setLoading(true);
     await api.createAppSession({ body: {
       cluster: cluster.id,
-      appId: config.id,
+      appId,
       coreCount,
       partition,
       qos,

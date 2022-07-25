@@ -25,27 +25,29 @@ name: VSCode
 # 指定应用类型为web
 type: web
 
-# 可以运行这个应用的节点地址。
-# 如果不设置nodes，则所有节点都可以运行
-nodes:
-  - t001
-  - t002
+# Web应用的配置
+web:
+  # 可以运行这个应用的节点地址。
+  # 如果不设置nodes，则所有节点都可以运行
+  nodes:
+    - t001
+    - t002
 
-# 准备脚本
-beforeScript: |
-  export PORT=$(get_port)
-  export PASSWORD=$(get_password 12)
+  # 准备脚本
+  beforeScript: |
+    export PORT=$(get_port)
+    export PASSWORD=$(get_password 12)
 
-# 运行任务的脚本。可以使用准备脚本定义的
-script: |
-  PASSWORD=$PASSWORD code-server -vvv --bind-addr 0.0.0.0:$PORT --auth password
+  # 运行任务的脚本。可以使用准备脚本定义的
+  script: |
+    PASSWORD=$PASSWORD code-server -vvv --bind-addr 0.0.0.0:$PORT --auth password
 
-# 如何连接应用
-connect:
-  method: POST
-  path: /login
-  formData:
-    password: "{PASSWORD}"
+  # 如何连接应用
+  connect:
+    method: POST
+    path: /login
+    formData:
+      password: "{PASSWORD}"
 ```
 
 增加了此文件后，运行以下命令重启job-server和portal-web即可

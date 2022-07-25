@@ -3,7 +3,6 @@ import fs from "fs";
 import { join } from "path";
 import { AppOps, AppSession } from "src/clusterops/api/app";
 import { displayIdToPort } from "src/clusterops/slurm/bl/port";
-import { getAppConfig } from "src/config/apps";
 import { RunningJob } from "src/generated/common/job";
 import { runtimeConfig } from "src/utils/config";
 import { sftpChmod, sftpExists, sftpReaddir, sftpReadFile, sftpRealPath, sftpWriteFile } from "src/utils/sftp";
@@ -41,7 +40,9 @@ export const slurmAppOps = (cluster: string): AppOps => {
       const { appId, userId, account, coreCount, maxTime, partition, qos } = request;
 
       // prepare script file
-      const appConfig = getAppConfig(appId);
+      const appConfig = runtimeConfig.APPS[appId];
+
+      if (!appConfig) { return { code: "APP_NOT_FOUND" };}
 
       const jobName = randomUUID();
 
@@ -84,8 +85,8 @@ export const slurmAppOps = (cluster: string): AppOps => {
         };
 
         if (appConfig.type === "web") {
-          await sftpWriteFile(sftp)(join(workingDirectory, "before.sh"), appConfig.beforeScript);
-          await sftpWriteFile(sftp)(join(workingDirectory, "script.sh"), appConfig.script);
+          await sftpWriteFile(sftp)(join(workingDirectory, "before.sh"), appConfig.web!.beforeScript);
+          await sftpWriteFile(sftp)(join(workingDirectory, "script.sh"), appConfig.web!.script);
 
           const script = generateJobScript({
             jobName,
@@ -103,7 +104,7 @@ export const slurmAppOps = (cluster: string): AppOps => {
           return await submitAndWriteMetadata(script, { SERVER_SESSION_INFO });
         } else {
           const xstartupPath = join(workingDirectory, "xstartup");
-          await sftpWriteFile(sftp)(xstartupPath, appConfig.xstartup);
+          await sftpWriteFile(sftp)(xstartupPath, appConfig.vnc!.xstartup);
           await sftpChmod(sftp)(xstartupPath, "755");
 
           const script = generateJobScript({
@@ -160,7 +161,7 @@ export const slurmAppOps = (cluster: string): AppOps => {
 
           const runningJobInfo: RunningJob | undefined = runningJobInfoMap[sessionMetadata.jobId];
 
-          const app = getAppConfig(sessionMetadata.appId);
+          const app = runtimeConfig.APPS[sessionMetadata.appId];
 
           let ready = false;
 
@@ -221,7 +222,7 @@ export const slurmAppOps = (cluster: string): AppOps => {
         const content = await sftpReadFile(sftp)(metadataPath);
         const sessionMetadata = JSON.parse(content.toString()) as SessionMetadata;
 
-        const app = getAppConfig(sessionMetadata.appId);
+        const app = runtimeConfig.APPS[sessionMetadata.appId];
 
         if (app.type === "web") {
           const infoFilePath = join(jobDir, SERVER_SESSION_INFO);
@@ -232,7 +233,7 @@ export const slurmAppOps = (cluster: string): AppOps => {
 
             const [host, port, password] = content.split("\n");
 
-            return { code: "OK", appId: app.id, host, port: +port, password };
+            return { code: "OK", appId: sessionMetadata.appId, host, port: +port, password };
           }
         } else {
           // for vnc apps,
@@ -261,7 +262,13 @@ export const slurmAppOps = (cluster: string): AppOps => {
                 // login to the compute node and refresh the password
                 return await sshConnect(host, userId, logger, async (computeNodeSsh) => {
                   const password = await refreshPassword(computeNodeSsh, logger, displayId!);
-                  return { code: "OK", appId: app.id, host, port: displayIdToPort(displayId!), password };
+                  return {
+                    code: "OK",
+                    appId: sessionMetadata.appId,
+                    host,
+                    port: displayIdToPort(displayId!),
+                    password,
+                  };
                 });
               }
             }

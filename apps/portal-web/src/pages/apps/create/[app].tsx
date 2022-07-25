@@ -1,4 +1,4 @@
-import { App } from "@scow/config/build/appConfig/app";
+import { AppConfigSchema } from "@scow/config/build/appConfig/app";
 import { GetServerSideProps, NextPage } from "next";
 import { requireAuth } from "src/auth/requireAuth";
 import { SSRProps } from "src/auth/server";
@@ -10,7 +10,8 @@ import { Head } from "src/utils/head";
 import { queryToString } from "src/utils/querystring";
 
 type Props = SSRProps<{
-  config: App;
+  appId: string;
+  config: AppConfigSchema;
 }, 400 | 404>;
 
 export const AppIndexPage: NextPage<Props> = requireAuth(() => true)((props: Props) => {
@@ -19,21 +20,16 @@ export const AppIndexPage: NextPage<Props> = requireAuth(() => true)((props: Pro
     return <UnifiedErrorPage code={props.error} />;
   }
 
-  const { config } = props;
+  const { config, appId } = props;
 
   return (
     <div>
       <Head title={`启动${config.name}`} />
       <PageTitle titleText={`启动${config.name}`} />
-      <LaunchAppForm config={config} />
+      <LaunchAppForm appId={appId} />
     </div>
   );
 });
-
-const appsMap = runtimeConfig.APPS.reduce((prev, curr) => {
-  prev[curr.id] = curr;
-  return prev;
-}, {} as Record<string, App>);
 
 export const getServerSideProps: GetServerSideProps<Props> = async ({ query }) => {
 
@@ -41,12 +37,13 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ query }) =
 
   if (!appId) { return { props: { error: 400 } }; }
 
-  const config = appsMap[appId];
+  const config = runtimeConfig.APPS[appId];
 
   if (!config) { return { props: { error: 404 } };}
 
   return {
     props: {
+      appId,
       config,
     },
   };
