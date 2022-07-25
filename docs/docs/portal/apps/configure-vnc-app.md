@@ -28,13 +28,14 @@ name: emacs
 # 指定应用类型为vnc
 type: vnc
 
+# 可以运行这个应用的节点地址。
+# 如果不设置nodes，则所有节点都可以运行
+nodes:
+  - t001
+  - t002
+
 # VNC应用的配置
 vnc: 
-  # 可以运行这个应用的节点地址。
-  # 如果不设置nodes，则所有节点都可以运行
-  nodes:
-    - t001
-    - t002
 
   # 此X Session的xstartup脚本
   xstartup: |

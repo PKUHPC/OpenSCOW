@@ -25,13 +25,14 @@ name: VSCode
 # 指定应用类型为web
 type: web
 
+# 可以运行这个应用的节点地址。
+# 如果不设置nodes，则所有节点都可以运行
+nodes:
+  - t001
+  - t002
+
 # Web应用的配置
 web:
-  # 可以运行这个应用的节点地址。
-  # 如果不设置nodes，则所有节点都可以运行
-  nodes:
-    - t001
-    - t002
 
   # 准备脚本
   beforeScript: |
