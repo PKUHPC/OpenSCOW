@@ -6,7 +6,7 @@ import { slurmStorageOps } from "src/clusterops/slurm/storage";
 import { slurmUserOps } from "src/clusterops/slurm/user";
 import { executeSlurmScript } from "src/clusterops/slurm/utils/slurm";
 import { clusters } from "src/config/clusters";
-import { misConfig, SlurmMisConfigSchema } from "src/config/mis";
+import { SlurmMisConfigSchema } from "src/config/mis";
 
 export interface SlurmClusterInfo {
   slurmConfig: SlurmMisConfigSchema;
@@ -15,23 +15,26 @@ export interface SlurmClusterInfo {
   executeSlurmScript: (params: string[], logger: Logger) => ReturnType<typeof executeSlurmScript>;
 }
 
-
 export const createSlurmOps = (cluster: string): ClusterOps => {
 
-  const clusterConfig = clusters[cluster];
-
-  const slurmConfig = misConfig.clusters[cluster]?.slurm;
+  const slurmConfig = clusters[cluster].slurm;
 
   if (!slurmConfig) {
-    throw new Error(`the slurm property of cluster ${cluster} in mis.yaml.clusters is not set.`);
+    throw new Error(`the slurm property of cluster ${cluster} in clusters/${cluster}.yaml is not set.`);
   }
 
-  const partitions = Object.keys(clusterConfig.partitions);
+  const slurmMisConfig = slurmConfig.mis;
+
+  if (!slurmMisConfig) {
+    throw new Error(`the slurm.mis property of cluster ${cluster} in clusters/${cluster}.yaml is not set.`);
+  }
+
+  const partitions = Object.keys(slurmConfig.partitions);
 
   const clusterInfo: SlurmClusterInfo = {
     partitions,
-    slurmConfig,
-    executeSlurmScript: (params, logger) => executeSlurmScript(slurmConfig, partitions, params, logger),
+    slurmConfig: slurmMisConfig,
+    executeSlurmScript: (params, logger) => executeSlurmScript(slurmMisConfig, partitions, params, logger),
   };
 
   return {

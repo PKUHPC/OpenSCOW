@@ -59,11 +59,6 @@ export const MisConfigSchema = Type.Object({
     description: "给作业扣费时，扣费项的备注。可以使用{price}使用作业信息中的字段。字段参考src/entities/JobInfo",
     default: "集群: {cluster}，作业ID：{idJob}",
   }),
-
-  clusters: Type.Record(Type.String(), Type.Object({
-    ignore: Type.Boolean({ description: "调用集群时忽略本集群", default: false }),
-    slurm: Type.Optional(SlurmMisConfigSchema),
-  }), { description: "每个集群的配置", default: {} }),
 });
 
 const MIS_CONFIG_NAME = "mis";

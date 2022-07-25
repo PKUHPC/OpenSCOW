@@ -1,6 +1,4 @@
-import { getConfigFromFile } from "@scow/config";
-import { Clusters, ClustersConfigName, ClustersConfigSchema } from "@scow/config/build/appConfig/clusters";
+import { getClusterConfigs } from "@scow/config/build/appConfig/cluster";
 
-export type { Clusters };
-export const clusters = getConfigFromFile(ClustersConfigSchema, ClustersConfigName);
+export const clusters = getClusterConfigs();
 

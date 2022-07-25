@@ -8,6 +8,7 @@ const { PHASE_DEVELOPMENT_SERVER, PHASE_PRODUCTION_BUILD, PHASE_PRODUCTION_SERVE
 const { getCapabilities } = require("@scow/lib-auth");
 const { UI_CONFIG_NAME, UiConfigSchema, DEFAULT_PRIMARY_COLOR } = require("@scow/config/build/appConfig/ui");
 const { getAppConfigs } = require("@scow/config/build/appConfig/app");
+const { getClusterConfigs } = require("@scow/config/build/appConfig/cluster");
 
 /**
  * Get auth capabilities
@@ -84,15 +85,11 @@ const buildRuntimeConfig = async (phase) => {
   const config = envConfig(specs, process.env);
 
   // load clusters.json
-  const { getConfigFromFile, CONFIG_BASE_PATH } = require("@scow/config");
-  const { ClustersConfigName, ClustersConfigSchema } = require("@scow/config/build/appConfig/clusters");
+  const { getConfigFromFile } = require("@scow/config");
 
   const configPath = production ? undefined : join(__dirname, "config");
 
-  /**
-   * @type {import("@scow/config/build/appConfig/clusters").Clusters}
-   */
-  const clusters = getConfigFromFile(ClustersConfigSchema, ClustersConfigName, false, configPath);
+  const clusters = getClusterConfigs(configPath);
 
   const apps = getAppConfigs(configPath);
 
@@ -127,7 +124,7 @@ const buildRuntimeConfig = async (phase) => {
 
     ENABLE_CHANGE_PASSWORD: capabilities.changePassword,
 
-    FILE_SERVERS_ENABLED_CLUSTERS: Object.keys(clusters).filter((x) => clusters[x].loginNodes.length > 0),
+    FILE_SERVERS_ENABLED_CLUSTERS: Object.keys(clusters).filter((x) => clusters[x].slurm.loginNodes.length > 0),
 
     CLUSTER_NAMES: Object.keys(clusters).reduce((prev, curr) => {
       prev[curr] = clusters[curr].displayName;

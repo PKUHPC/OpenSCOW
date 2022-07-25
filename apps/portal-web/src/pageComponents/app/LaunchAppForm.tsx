@@ -90,7 +90,7 @@ export const LaunchAppForm: React.FC<Props> = ({ appId }) => {
       >
         <Select
           disabled={!currentPartitionInfo}
-          options={Object.keys(publicConfig.CLUSTERS_CONFIG[cluster.id].partitions)
+          options={Object.keys(publicConfig.CLUSTERS_CONFIG[cluster.id].slurm.partitions)
             .map((x) => ({ label: x, value: x }))}
         />
       </Form.Item>

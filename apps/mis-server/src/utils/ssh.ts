@@ -7,7 +7,7 @@ import { privateKeyPath, publicKeyPath } from "src/config/mis";
 const publicKey = fs.readFileSync(publicKeyPath, "utf-8").trim();
 
 const clusterLoginNodes = Object.keys(clusters).reduce((prev, curr) => {
-  prev[curr] = clusters[curr].loginNodes[0];
+  prev[curr] = clusters[curr].slurm.loginNodes[0];
   return prev;
 }, {} as Record<string, string>);
 

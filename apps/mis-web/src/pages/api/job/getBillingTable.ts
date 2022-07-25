@@ -37,7 +37,7 @@ export async function getBillingTableItems(tenantName: string | undefined) {
   const tableItems: JobBillingTableItem[] = [];
   const clusters = runtimeConfig.CLUSTERS_CONFIG;
 
-  for (const [cluster, { partitions }] of Object.entries(clusters)) {
+  for (const [cluster, { slurm: { partitions } }] of Object.entries(clusters)) {
     const partitionCount = Object.keys(partitions).length;
     let clusterItemIndex = 0;
     for (const [partition, partitionInfo] of Object.entries(partitions)) {

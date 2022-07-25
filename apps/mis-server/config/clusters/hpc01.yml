@@ -1,0 +1,21 @@
+displayName: hpc01
+slurm:
+  partitions:
+    compute:
+      nodes: 198
+      mem: 63000
+      cores: 28
+      gpus: 0
+      qos:
+        - low
+        - normal
+        - high
+    gpu:
+      nodes: 1
+      mem: 386000
+      cores: 48
+      gpus: 8
+      qos:
+        - low
+        - normal
+        - high

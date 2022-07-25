@@ -47,7 +47,7 @@ export default async (req: NextApiRequest, res: NextApiResponseServerIO) => {
 
       // create a pty and connect to ssh
       // if path is empty, it will be home page
-      const host = `${user.identityId}@${runtimeConfig.CLUSTERS_CONFIG[cluster].loginNodes[0]}`;
+      const host = `${user.identityId}@${runtimeConfig.CLUSTERS_CONFIG[cluster].slurm.loginNodes[0]}`;
 
       const args = [host, "-i", runtimeConfig.SSH_PRIVATE_KEY_PATH.replace("\"", "'")];
       if (path) {

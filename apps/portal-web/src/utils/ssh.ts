@@ -11,7 +11,7 @@ export function getClusterLoginNode(cluster: string): string | undefined {
 
   if (!config) { return undefined; }
 
-  return config.loginNodes[0];
+  return config.slurm.loginNodes[0];
 }
 
 /**

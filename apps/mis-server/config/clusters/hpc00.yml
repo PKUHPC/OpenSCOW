@@ -1,0 +1,34 @@
+displayName: hpc00
+misIgnore: true
+slurm:
+  mis:
+    managerUrl: haha
+    dbPassword: password
+    associationTableName: user_association
+    scriptPath: /test/slurm.sh
+  partitions:
+    C032M0128G:
+      mem: 131072
+      cores: 32
+      nodes: 32
+      gpus: 0
+      qos:
+        - low
+        - normal
+        - high
+        - cryoem
+    GPU:
+      mem: 262144
+      cores: 28
+      nodes: 32
+      gpus: 4
+      qos:
+        - low
+        - normal
+        - high
+        - cryoem
+    life:
+      mem: 262144
+      cores: 28
+      gpus: 4
+      nodes: 32

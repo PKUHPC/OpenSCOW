@@ -165,7 +165,7 @@ export function calculateJobPrice(
     };
   }
 
-  const partitionInfo = clusterInfo.partitions[info.partition];
+  const partitionInfo = clusterInfo.slurm.partitions[info.partition];
   if (!partitionInfo) {
     logger.warn(`Unknown partition ${info.partition} of cluster ${info.cluster}`);
     return {

@@ -1,7 +1,7 @@
 // @ts-check
 
 const { envConfig, getConfigFromFile, parseKeyValue, regex, str } = require("@scow/config");
-const { ClustersConfigName, ClustersConfigSchema } = require("@scow/config/build/appConfig/clusters");
+const { ClusterConfigSchema, getClusterConfigs } = require("@scow/config/build/appConfig/cluster");
 const { ClusterTextsConfigName, ClusterTextsConfigSchema } = require("@scow/config/build/appConfig/clusterTexts");
 const { DEFAULT_PRIMARY_COLOR, UI_CONFIG_NAME, UiConfigSchema } = require("@scow/config/build/appConfig/ui");
 const { PHASE_DEVELOPMENT_SERVER, PHASE_PRODUCTION_BUILD, PHASE_PRODUCTION_SERVER } = require("next/constants");
@@ -64,11 +64,7 @@ const buildRuntimeConfig = async (phase) => {
 
   // load clusters.json
 
-  /**
-   * @type {import("@scow/config/build/appConfig/clusters").Clusters}
-   */
-  const clusters = getConfigFromFile(ClustersConfigSchema, ClustersConfigName, false,
-    production ? undefined : join(__dirname, "config"));
+  const clusters = getClusterConfigs(production ? undefined : join(__dirname, "config"));
 
   /**
    * @type {import("@scow/config/build/appConfig/clusterTexts").ClusterTexts}
