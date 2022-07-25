@@ -1,12 +1,11 @@
 import formBody from "@fastify/formbody";
-import { getConfigFromFile } from "@scow/config";
-import { ClustersConfigName, ClustersConfigSchema } from "@scow/config/build/appConfig/clusters";
 import { Static, Type } from "@sinclair/typebox";
 import { FastifyInstance } from "fastify";
 import { NodeSSH } from "node-ssh";
 import { cacheInfo } from "src/auth/cacheInfo";
 import { serveLoginHtml } from "src/auth/loginHtml";
 import { SshConfigSchema } from "src/config/auth";
+import { clusters } from "src/config/clusters";
 import { redirectToWeb } from "src/routes/callback";
 
 export function registerPostHandler(f: FastifyInstance, sshConfig: SshConfigSchema) {
@@ -14,12 +13,11 @@ export function registerPostHandler(f: FastifyInstance, sshConfig: SshConfigSche
   let loginNode = sshConfig.baseNode;
 
   if (!loginNode) {
-    const clusters = getConfigFromFile(ClustersConfigSchema, ClustersConfigName);
     if (Object.keys(clusters).length === 0) {
       throw new Error("No cluster has been set in clusters config");
     }
     const clusterConfig = Object.values(clusters)[0];
-    loginNode = clusterConfig.loginNodes[0];
+    loginNode = clusterConfig.slurm.loginNodes[0];
 
     if (!loginNode) {
       throw new Error(`Cluster ${clusterConfig.displayName} has no login node.`);
