@@ -12,7 +12,7 @@ export const ormConfigs = {
   port: misConfig.db.port,
   user: misConfig.db.user,
   dbName: config.DBNAME ?? misConfig.db.dbName,
-  password: misConfig.db.password,
+  password: config.DB_PASSWORD ?? misConfig.db.password,
   type: "mysql",
   forceUndefined: true,
   runMigrations: true,

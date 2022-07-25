@@ -19,6 +19,7 @@ title: "mis-server"
 |`PORT`|端口号|监听端口|5000|
 |`LOG_LEVEL`|字符串|日志等级|info|
 |`DBNAME`|字符串|存放系统数据的数据库名，将会覆写配置文件。用于测试|不设置|
+|`DB_PASSWORD`|字符串|管理系统数据库密码，将会覆写配置文件|不设置|
 
 <!-- ENV TABLE END -->
 
