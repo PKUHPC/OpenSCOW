@@ -54,9 +54,8 @@ export const LaunchAppForm: React.FC<Props> = ({ appId }) => {
       });
   };
 
-  const cluster = Form.useWatch("cluster", form) ?? initialValues.cluster;
-
-  const partition = Form.useWatch("partition", form) ?? initialValues.partition;
+  const cluster = Form.useWatch("cluster", form) as Cluster | undefined;
+  const partition = Form.useWatch("partition", form) as string | undefined;
 
   // set default
   useEffect(() => {
@@ -74,12 +73,19 @@ export const LaunchAppForm: React.FC<Props> = ({ appId }) => {
 
   // if partition is no longer available, use the first partition of the cluster
   useEffect(() => {
+    if (!cluster) {
+      form.setFieldsValue({ partition: undefined });
+      return;
+    }
     if (!getPartitionInfo(cluster, partition)) {
       form.setFieldsValue({ partition: firstPartition(cluster)[0] });
     }
-  }, [partition]);
+  }, [cluster, partition]);
 
-  const currentPartitionInfo = useMemo(() => getPartitionInfo(cluster, partition), [cluster, partition]);
+  const currentPartitionInfo = useMemo(
+    () => cluster ? getPartitionInfo(cluster, partition) : undefined,
+    [cluster, partition],
+  );
 
   return (
     <Form form={form} onFinish={onSubmit} initialValues={initialValues}>
@@ -91,17 +97,21 @@ export const LaunchAppForm: React.FC<Props> = ({ appId }) => {
       <Form.Item label="账户" name="account"
         rules={[{ required: true }]} dependencies={["cluster"]}
       >
-        <AccountSelector cluster={cluster.id} />
+        <AccountSelector cluster={cluster?.id} />
       </Form.Item>
 
       <Form.Item<FormFields> label="分区" name="partition"
+        shouldUpdate={(prev, curr) => prev.cluster.id !== curr.cluster.id}
         dependencies={["cluster"]}
         rules={[{ required: true }]}
       >
         <Select
           disabled={!currentPartitionInfo}
-          options={Object.keys(publicConfig.CLUSTERS_CONFIG[cluster.id].slurm.partitions)
-            .map((x) => ({ label: x, value: x }))}
+          options={cluster
+            ? Object.keys(publicConfig.CLUSTERS_CONFIG[cluster.id].slurm.partitions)
+              .map((x) => ({ label: x, value: x }))
+            : []
+          }
         />
       </Form.Item>
 

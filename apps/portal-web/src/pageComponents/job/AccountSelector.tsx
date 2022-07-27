@@ -7,7 +7,7 @@ import { api } from "src/apis";
 import { UserStore } from "src/stores/UserStore";
 
 interface Props {
-  cluster: string;
+  cluster?: string;
   value?: string;
   onChange?: (value: string) => void;
 }
@@ -16,7 +16,7 @@ export const AccountSelector: React.FC<Props> = ({ cluster, onChange, value }) =
   const userStore = useStore(UserStore);
 
   const promiseFn = useCallback(async () => {
-    return api.getAccounts({ query: { cluster } });
+    return cluster ? api.getAccounts({ query: { cluster } }) : { accounts: [] as string[] };
   }, [cluster, userStore.user]);
 
   const { data, isLoading, reload } = useAsync({
