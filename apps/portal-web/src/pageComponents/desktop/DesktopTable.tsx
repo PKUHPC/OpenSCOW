@@ -1,5 +1,5 @@
 import { PlusOutlined } from "@ant-design/icons";
-import { Table } from "antd";
+import { Form, Table } from "antd";
 import { ColumnsType } from "antd/lib/table";
 import Router from "next/router";
 import React, { useCallback } from "react";
@@ -72,10 +72,14 @@ export const DesktopTable: React.FC<Props> = () => {
         </NewDesktopTableModalButton>
       </PageTitle>
       <FilterFormContainer>
-        <SingleClusterSelector value={cluster} onChange={(x) => {
-          Router.push({ query: { cluster: x.id } });
-        }}
-        />
+        <Form layout="inline">
+          <Form.Item label="集群">
+            <SingleClusterSelector value={cluster} onChange={(x) => {
+              Router.push({ query: { cluster: x.id } });
+            }}
+            />
+          </Form.Item>
+        </Form>
       </FilterFormContainer>
       <Table
         dataSource={data}
