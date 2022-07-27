@@ -78,17 +78,18 @@ export const userRoutes: NavItemProps[] = [
         text: "已创建的应用",
         path: "/apps/sessions",
       },
-      {
-        Icon: PlusOutlined,
-        text: "创建应用",
-        clickable: false,
-        path: "/apps/create",
-        children: publicConfig.APPS.map(({ id, name }) => ({
-          Icon: DesktopOutlined,
-          text: name,
-          path: `/apps/create/${id}`,
-        })),
-      },
+      ...publicConfig.APPS.length > 0 ? [
+        {
+          Icon: PlusOutlined,
+          text: "创建应用",
+          clickable: false,
+          path: "/apps/create",
+          children: publicConfig.APPS.map(({ id, name }) => ({
+            Icon: DesktopOutlined,
+            text: name,
+            path: `/apps/create/${id}`,
+          })),
+        }] : [],
     ],
   }] : [],
   ...CLUSTERS.length > 0 ? [{
