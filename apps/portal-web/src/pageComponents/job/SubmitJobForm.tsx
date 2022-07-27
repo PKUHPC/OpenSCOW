@@ -82,9 +82,9 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
       .finally(() => setLoading(false));
   };
 
-  const cluster = useWatch("cluster", form) ?? initial.cluster;
+  const cluster = useWatch("cluster", form) as Cluster | undefined;
 
-  const partition = useWatch("partition", form) ?? initial.partition;
+  const partition = useWatch("partition", form) as string | undefined;
 
   // set default
   useEffect(() => {
@@ -103,13 +103,21 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
   // if partition is no longer available, use the first partition of the cluster
   useEffect(() => {
 
+    if (!cluster) {
+      form.setFieldsValue({ partition: undefined });
+      return;
+    }
+
     if (!getPartitionInfo(cluster, partition)) {
       form.setFieldsValue({ partition: firstPartition(cluster)[0] });
     }
 
-  }, [partition]);
+  }, [cluster, partition]);
 
-  const currentPartitionInfo = useMemo(() => getPartitionInfo(cluster, partition), [cluster, partition]);
+  const currentPartitionInfo = useMemo(
+    () => cluster ? getPartitionInfo(cluster, partition) : undefined,
+    [cluster, partition],
+  );
 
   const initialJobNameAndDir = useMemo(() => {
     const jobName = genJobName();
@@ -128,7 +136,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
         if (changed.cluster) {
           const [name, info] = firstPartition(changed.cluster);
           form.setFieldsValue({ cluster: changed.cluster, partition: name, qos: info?.qos?.[0] });
-        } else if (changed.partition) {
+        } else if (cluster && changed.partition) {
           const partitionInfo = getPartitionInfo(cluster, changed.partition);
           form.setFieldsValue({ qos: partitionInfo?.qos?.[0] });
         }
@@ -158,7 +166,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
           <Form.Item<JobForm> label="账户" name="account"
             rules={[{ required: true }]} dependencies={["cluster"]}
           >
-            <AccountSelector cluster={cluster.id} />
+            <AccountSelector cluster={cluster?.id} />
           </Form.Item>
         </Col>
         <Col span={24} sm={6}>
@@ -168,8 +176,11 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
           >
             <Select
               disabled={!currentPartitionInfo}
-              options={Object.keys(publicConfig.CLUSTERS_CONFIG[cluster.id].slurm.partitions)
-                .map((x) => ({ label: x, value: x }))}
+              options={cluster
+                ? Object.keys(publicConfig.CLUSTERS_CONFIG[cluster.id].slurm.partitions)
+                  .map((x) => ({ label: x, value: x }))
+                : []
+              }
             />
           </Form.Item>
         </Col>

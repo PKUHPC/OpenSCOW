@@ -101,7 +101,6 @@ export const LaunchAppForm: React.FC<Props> = ({ appId }) => {
       </Form.Item>
 
       <Form.Item<FormFields> label="分区" name="partition"
-        shouldUpdate={(prev, curr) => prev.cluster.id !== curr.cluster.id}
         dependencies={["cluster"]}
         rules={[{ required: true }]}
       >
