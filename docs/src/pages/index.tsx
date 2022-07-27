@@ -18,7 +18,7 @@ function HomepageHeader() {
         <div className={styles.buttons}>
           <Link
             className="button button--secondary button--lg"
-            to={useBaseUrl("docs/common/intro")}>
+            to={useBaseUrl("docs/common")}>
               简介
           </Link>
         </div>

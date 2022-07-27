@@ -18,6 +18,7 @@ title: "portal-web"
 |`SSH_PRIVATE_KEY_PATH`|字符串|SSH私钥路径|~/.ssh/id_rsa|
 |`MOCK_USER_ID`|字符串|覆盖已登录用户的用户ID|不设置|
 |`PROXY_BASE_PATH`|字符串|网关的代理路径|/proxy|
+|`MIS_URL`|字符串|如果部署了管理系统，设置URL或者路径。将会覆盖配置文件。空字符串等价于未设置||
 
 <!-- ENV TABLE END -->
 

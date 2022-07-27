@@ -53,24 +53,31 @@ const config = {
         items: [
           {
             type: 'doc',
-            docId: 'common/intro',
+            docId: 'common/index',
             position: 'left',
             sidebarId: "common",
             label: '文档',
           },
           {
             type: 'doc',
-            docId: 'portal/intro',
+            docId: 'portal/index',
             position: 'left',
             sidebarId: "portal",
             label: '门户系统',
           },
           {
             type: 'doc',
-            docId: 'mis/intro',
+            docId: 'mis/index',
             position: 'left',
             sidebarId: "mis",
             label: '运营系统',
+          },
+          {
+            type: 'doc',
+            docId: 'refs/index',
+            position: 'left',
+            sidebarId: "refs",
+            label: '配置参考',
           },
           { to: join(variables.BASE_PATH, "blog"), label: '博客', position: 'left' },
           {
@@ -88,7 +95,7 @@ const config = {
             items: [
               {
                 label: 'Intro',
-                to: join(variables.BASE_PATH, `docs/common/intro`),
+                to: join(variables.BASE_PATH, `docs/common`),
               },
             ],
           },

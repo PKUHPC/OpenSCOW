@@ -68,10 +68,10 @@ interface EnvConfig {
 }
 
 const config = [
-  { app: "auth", md: "common/refs/auth.md" },
-  { app: "mis-server", md: "mis/refs/mis-server.md" },
-  { app: "mis-web", configFile: "config", md: "mis/refs/mis-web.md" },
-  { app: "portal-web", configFile: "config", md: "portal/refs/portal-web.md" },
+  { app: "auth", md: "refs/env/auth.md" },
+  { app: "mis-server", md: "refs/env/mis-server.md" },
+  { app: "mis-web", configFile: "config", md: "refs/env/mis-web.md" },
+  { app: "portal-web", configFile: "config", md: "refs/env/portal-web.md" },
 ] as EnvConfig[];
 
 const TABLE_START = "<!-- ENV TABLE START -->";

@@ -20,8 +20,6 @@ title: 运维
 
 对于使用镜像部署的部分，可以使用常用的docker日志管理命令或者工具管理日志。如果使用的`docker compose`，可以使用`docker compose logs -f`后面跟对应服务名称的方式查看服务的日志。
 
-对于使用可执行文件部署的部分，我们提供的相应脚本也内置了查看日志的功能。或者，您也可以选择在运行时使用重定向、管道等功能将stdout重定向到文件等地方以便查看。
-
 ```bash
 # 如果docker compose中服务名为auth，使用此命令可以查看auth服务的日志
 docker compose logs -f auth

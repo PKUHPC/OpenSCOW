@@ -15,4 +15,24 @@ title: 自定义仪表盘
 
 ## 自定义文本
 
-系统支持根据不同的域名显示不同的标题文本和描述信息。请参考[配置介绍](../refs/portal-web.md)配置`HOME_TEXTS`, `DEFAULT_HOME_TEXT`, `HOME_TITLES`和`DEFAULT_HOME_TITLE`环境变量。
+系统支持根据不同的域名显示不同的标题文本和描述信息。
+
+在`config/portal.yaml`中可以配置自定义文档：
+
+```yaml title="config/portal.yaml"
+# 主页标题
+homeTitle: 
+  # 默认文本
+  defaultText: "Super Computing on Web"
+  # 从不同域名访问，显示的不同的文本
+  hostnameMap: 
+    a.com: "a.com's SCOW Deployment"
+
+# 主页文本
+homeText: 
+  # 默认文本
+  defaultText: "SCOW"
+  # 从不同域名访问，显示的不同的文本
+  hostnameMap: 
+    a.com: "a.com's SCOW"
+```
