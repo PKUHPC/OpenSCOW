@@ -71,7 +71,7 @@ export function getDirConfig<T extends TSchema>(
     const config = validateObject(schema, parsers[ext](content));
 
     if (config) {
-      m[basename(filename, ext)] = config;
+      m[basename(filename, "." + ext)] = config;
     }
 
     return m;
