@@ -92,12 +92,12 @@ export const Header: React.FC<Props> = ({
         <MenuPartPlaceholder />
       </MenuPart>
       {
-        publicConfig.PORTAL_PATH ? (
+        publicConfig.PORTAL_URL ? (
           <HeaderItem>
             <a href={
               userStore.user
-                ? join(publicConfig.PORTAL_PATH, "/api/auth/callback?token=" + userStore.user?.token)
-                : publicConfig.PORTAL_PATH
+                ? join(publicConfig.PORTAL_URL, "/api/auth/callback?token=" + userStore.user?.token)
+                : publicConfig.PORTAL_URL
             }
             >
 

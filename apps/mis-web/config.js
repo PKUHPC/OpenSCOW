@@ -31,6 +31,8 @@ const specs = {
 
   AUTH_EXTERNAL_URL: str({ desc: "认证服务外网地址", default: "/auth" }),
   AUTH_INTERNAL_URL: str({ desc: "认证服务内网地址", default: "http://auth:5000" }),
+
+  PORTAL_URL: str({ desc: "如果部署了门户系统，设置URL或者路径。将会覆盖配置文件。空字符串等价于未设置", default: "" }),
 };
 
 const config = envConfig(specs, process.env);
@@ -92,7 +94,7 @@ const buildRuntimeConfig = async (phase) => {
     ACCOUNT_NAME_PATTERN: misConfig.accountNamePattern?.regex,
     ACCOUNT_NAME_PATTERN_MESSAGE: misConfig.accountNamePattern?.errorMessage,
 
-    PORTAL_PATH: misConfig.portalPath,
+    PORTAL_URL: config.PORTAL_URL || misConfig.portalUrl,
   };
 
   if (!building) {

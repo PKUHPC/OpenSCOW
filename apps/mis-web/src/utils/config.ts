@@ -26,7 +26,7 @@ export interface PublicRuntimeConfig {
   ACCOUNT_NAME_PATTERN: string | undefined;
   ACCOUNT_NAME_PATTERN_MESSAGE: string | undefined;
 
-  PORTAL_PATH: string | undefined;
+  PORTAL_URL: string | undefined;
 }
 
 export const runtimeConfig: ServerRuntimeConfig = getConfig().serverRuntimeConfig;

@@ -93,12 +93,12 @@ export const Header: React.FC<Props> = ({
       </MenuPart>
       {
 
-        publicConfig.MIS_PATH ? (
+        publicConfig.MIS_URL ? (
           <HeaderItem>
             <a href={
               userStore.user
-                ? join(publicConfig.MIS_PATH, "/api/auth/callback?token=" + userStore.user?.token)
-                : publicConfig.MIS_PATH
+                ? join(publicConfig.MIS_URL, "/api/auth/callback?token=" + userStore.user?.token)
+                : publicConfig.MIS_URL
             }
             >
               <ArrowRightOutlined /> 管理系统

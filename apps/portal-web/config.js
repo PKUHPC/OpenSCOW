@@ -39,6 +39,8 @@ const specs = {
   MOCK_USER_ID: str({ desc: "覆盖已登录用户的用户ID", default: undefined }),
 
   PROXY_BASE_PATH: str({ desc: "网关的代理路径", default: "/proxy" }),
+
+  MIS_URL: str({ desc: "如果部署了管理系统，设置URL或者路径。将会覆盖配置文件。空字符串等价于未设置", default: "" }),
 };
 
 // This config is used to provide env doc auto gen
@@ -112,7 +114,7 @@ const buildRuntimeConfig = async (phase) => {
 
     ENABLE_APPS: portalConfig.apps,
 
-    MIS_PATH: portalConfig.misPath,
+    MIS_URL: config.MIS_URL || portalConfig.misUrl,
 
     DEFAULT_HOME_TEXT: portalConfig.homeText.defaultText,
     HOME_TEXTS: portalConfig.homeText.hostnameMap,

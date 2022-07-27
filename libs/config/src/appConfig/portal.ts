@@ -29,7 +29,7 @@ export const PortalConfigSchema = Type.Object({
     ),
   }),
 
-  misPath: Type.Optional(Type.String({ description: "管理系统的部署地址，如果不设置，则不显示到管理系统的连接" })),
+  misUrl: Type.Optional(Type.String({ description: "管理系统的部署URL或者路径" })),
 
   shell: Type.Boolean({ description: "是否启用终端功能", default: true }),
 

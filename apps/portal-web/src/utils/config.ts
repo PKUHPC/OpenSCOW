@@ -42,7 +42,7 @@ export interface PublicRuntimeConfig {
 
   ENABLE_APPS: boolean;
 
-  MIS_PATH: string | undefined;
+  MIS_URL: string | undefined;
 
   DEFAULT_HOME_TEXT: string;
   HOME_TEXTS: {[hostname: string]: string };

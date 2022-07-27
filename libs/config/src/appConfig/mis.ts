@@ -21,7 +21,7 @@ export const MisConfigSchema = Type.Object({
 
   authUrl: Type.String({ description: "认证服务的地址。一定要加协议(http://)", default: "http://auth:5000" }),
 
-  portalPath: Type.Optional(Type.String({ description: "如果部署了门户系统，设置门户系统的部署路径" })),
+  portalUrl: Type.Optional(Type.String({ description: "如果部署了门户系统，设置门户系统的部署URL或者pathname" })),
 
   predefinedChargingTypes: Type.Array(Type.String(), { description: "预定义的充值类型", default: []}),
 
