@@ -1,8 +1,9 @@
 import { Logger, plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
-import { getClusterOps, opsForClusters } from "src/clusterops";
 import { ClusterOps } from "src/clusterops/api";
+import { createSlurmOps } from "src/clusterops/slurm";
+import { clusters } from "src/config/clusters";
 
 // Throw ServiceError if failed.
 type CallOnAll = <T>(
@@ -23,7 +24,25 @@ export type ClusterPlugin = {
   }
 }
 
+const clusterOpsMaps = {
+  "slurm": createSlurmOps,
+} as const;
+
 export const clustersPlugin = plugin(async (f) => {
+
+  const opsForClusters = Object.entries(clusters).reduce((prev, [cluster, c]) => {
+    const ops = clusterOpsMaps[(c.scheduler as keyof typeof clusterOpsMaps)](cluster, f.logger);
+
+    if (ops) {
+      prev[cluster] = { ops, ignore: c.misIgnore };
+    }
+
+    return prev;
+  }, {} as Record<string, { ops: ClusterOps, ignore: boolean } >);
+
+  const getClusterOps = (cluster: string) => {
+    return opsForClusters[cluster];
+  };
 
   const clustersPlugin = {
 

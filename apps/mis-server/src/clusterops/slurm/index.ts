@@ -15,7 +15,7 @@ export interface SlurmClusterInfo {
   executeSlurmScript: (params: string[], logger: Logger) => ReturnType<typeof executeSlurmScript>;
 }
 
-export const createSlurmOps = (cluster: string): ClusterOps => {
+export const createSlurmOps = (cluster: string, logger: Logger): ClusterOps | undefined => {
 
   const slurmConfig = clusters[cluster].slurm;
 
@@ -26,7 +26,8 @@ export const createSlurmOps = (cluster: string): ClusterOps => {
   const slurmMisConfig = slurmConfig.mis;
 
   if (!slurmMisConfig) {
-    throw new Error(`the slurm.mis property of cluster ${cluster} in clusters/${cluster}.yaml is not set.`);
+    logger.warn("the slurm.mis property of cluster %s is not set. Ignore the cluster.", cluster);
+    return undefined;
   }
 
   const partitions = Object.keys(slurmConfig.partitions);
