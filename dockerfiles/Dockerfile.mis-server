@@ -23,7 +23,7 @@ COPY protos ./protos
 COPY libs/config ./libs/config
 COPY libs/auth ./libs/auth
 COPY libs/decimal ./libs/decimal
-COPY libs/ssh/package.json ./libs/ssh/
+COPY libs/ssh ./libs/ssh
 COPY apps/mis-server ./apps/mis-server
 
 RUN pnpm run build
