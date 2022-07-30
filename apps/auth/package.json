@@ -24,7 +24,7 @@
     "ioredis": "5.2.2",
     "ldapjs": "2.3.3",
     "nanoid": "4.0.0",
-    "node-ssh": "12.0.5"
+    "node-ssh": "13.0.0"
   },
   "devDependencies": {
     "@types/asn1": "0.2.0",

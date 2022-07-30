@@ -80,7 +80,7 @@ importers:
       ioredis: 5.2.2
       ldapjs: 2.3.3
       nanoid: 4.0.0
-      node-ssh: 12.0.5
+      node-ssh: 13.0.0
     dependencies:
       '@fastify/error': 3.0.0
       '@fastify/formbody': 7.0.1
@@ -94,7 +94,7 @@ importers:
       ioredis: 5.2.2
       ldapjs: 2.3.3
       nanoid: 4.0.0
-      node-ssh: 12.0.5
+      node-ssh: 13.0.0
     devDependencies:
       '@types/asn1': 0.2.0
       '@types/ldapjs': 2.2.3
@@ -11419,18 +11419,6 @@ packages:
 
   /node-releases/2.0.5:
     resolution: {integrity: sha512-U9h1NLROZTq9uE1SNffn6WuPDg8icmi3ns4rEl/oTfIle4iLjTliCzgTsbaIFMq/Xn078/lfY/BL0GWZ+psK4Q==}
-
-  /node-ssh/12.0.5:
-    resolution: {integrity: sha512-uN2GTGdBRUUKkZmcNBr9OM+xKL6zq74emnkSyb1TshBdVWegj3boue6QallQeqZzo7YGVheP5gAovUL+8hZSig==}
-    engines: {node: '>= 10'}
-    dependencies:
-      is-stream: 2.0.1
-      make-dir: 3.1.0
-      sb-promise-queue: 2.1.0
-      sb-scandir: 3.1.0
-      shell-escape: 0.2.0
-      ssh2: 1.11.0
-    dev: false
 
   /node-ssh/13.0.0:
     resolution: {integrity: sha512-8yfPvuB8z1M5rXFR8Z1Tl0a0M43N64VjZfjXRwOGCcImFphuXhMPniPksf1FkVj9djKbpHvLUMIVS399H9yCSQ==}
