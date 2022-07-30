@@ -1,6 +1,6 @@
 displayName: "hpc01Name"
 slurm:
-  loginNodes: ["localhost"]
+  loginNodes: ["localhost:22222"]
   partitions:
     compute:
       nodes: 3
