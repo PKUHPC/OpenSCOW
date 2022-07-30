@@ -1,0 +1,23 @@
+{
+  "name": "@scow/ssh",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "node-ssh": "13.0.0",
+    "shell-quote": "1.7.3"
+  },
+  "devDependencies": {
+    "pino": "8.3.1",
+    "@types/ssh2": "1.11.5"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "volta": {
+    "extends": "../../package.json"
+  }
+}
