@@ -1,3 +1,4 @@
+import { sftpChmod, sftpExists, sftpReaddir, sftpReadFile, sftpRealPath, sftpWriteFile } from "@scow/lib-ssh";
 import { randomUUID } from "crypto";
 import fs from "fs";
 import { join } from "path";
@@ -5,7 +6,6 @@ import { AppOps, AppSession } from "src/clusterops/api/app";
 import { displayIdToPort } from "src/clusterops/slurm/bl/port";
 import { RunningJob } from "src/generated/common/job";
 import { runtimeConfig } from "src/utils/config";
-import { sftpChmod, sftpExists, sftpReaddir, sftpReadFile, sftpRealPath, sftpWriteFile } from "src/utils/sftp";
 import { getClusterLoginNode, loggedExec, sshConnect } from "src/utils/ssh";
 import { parseDisplayId, refreshPassword, VNCSERVER_BIN_PATH } from "src/utils/turbovnc";
 
@@ -48,7 +48,7 @@ export const slurmAppOps = (cluster: string): AppOps => {
 
       const workingDirectory = join(runtimeConfig.PORTAL_CONFIG.appJobsDir, jobName);
 
-      return await sshConnect(host, userId, logger, async (ssh) => {
+      return await sshConnect(host, userId, async (ssh) => {
 
         // make sure workingDirectory exists.
         await ssh.mkdir(workingDirectory);
@@ -130,7 +130,7 @@ export const slurmAppOps = (cluster: string): AppOps => {
     getAppSessions: async (request, logger) => {
       const { userId } = request;
 
-      return await sshConnect(host, userId, logger, async (ssh) => {
+      return await sshConnect(host, userId, async (ssh) => {
         const sftp = await ssh.requestSFTP();
 
         if (!await sftpExists(sftp, runtimeConfig.PORTAL_CONFIG.appJobsDir)) { return { sessions: []}; }
@@ -209,7 +209,7 @@ export const slurmAppOps = (cluster: string): AppOps => {
     connectToApp: async (request, logger) => {
       const { sessionId, userId } = request;
 
-      return await sshConnect(host, userId, logger, async (ssh) => {
+      return await sshConnect(host, userId, async (ssh) => {
         const sftp = await ssh.requestSFTP();
 
         const jobDir = join(runtimeConfig.PORTAL_CONFIG.appJobsDir, sessionId);
@@ -260,7 +260,7 @@ export const slurmAppOps = (cluster: string): AppOps => {
               if (displayId) {
                 // the server is run at the compute node
                 // login to the compute node and refresh the password
-                return await sshConnect(host, userId, logger, async (computeNodeSsh) => {
+                return await sshConnect(host, userId, async (computeNodeSsh) => {
                   const password = await refreshPassword(computeNodeSsh, logger, displayId!);
                   return {
                     code: "OK",

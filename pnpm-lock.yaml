@@ -113,13 +113,13 @@ importers:
       '@mikro-orm/seeder': 5.2.3
       '@scow/config': workspace:*
       '@scow/lib-decimal': workspace:*
+      '@scow/lib-ssh': workspace:*
       '@sinclair/typebox': 0.24.20
       '@types/google-protobuf': 3.15.6
       '@types/node-cron': 3.0.2
       '@types/wait-on': 5.3.1
       dotenv: 16.0.1
       node-cron: 3.0.1
-      node-ssh: 12.0.5
       undici: 5.8.0
       uuid: 8.3.2
       wait-on: 6.0.1
@@ -135,10 +135,10 @@ importers:
       '@mikro-orm/seeder': 5.2.3_@mikro-orm+core@5.2.3
       '@scow/config': link:../../libs/config
       '@scow/lib-decimal': link:../../libs/decimal
+      '@scow/lib-ssh': link:../../libs/ssh
       '@sinclair/typebox': 0.24.20
       dotenv: 16.0.1
       node-cron: 3.0.1
-      node-ssh: 12.0.5
       undici: 5.8.0
       uuid: 8.3.2
       wait-on: 6.0.1
@@ -274,6 +274,7 @@ importers:
       '@scow/config': workspace:*
       '@scow/lib-auth': workspace:*
       '@scow/lib-decimal': workspace:*
+      '@scow/lib-ssh': workspace:*
       '@sinclair/typebox': 0.24.20
       '@testing-library/jest-dom': 5.16.4
       '@testing-library/react': 13.3.0
@@ -285,7 +286,6 @@ importers:
       '@types/random-words': 1.1.2
       '@types/react': 18.0.15
       '@types/react-dom': 18.0.6
-      '@types/shell-quote': 1.7.1
       '@types/styled-components': 5.1.25
       '@types/url-join': 4.0.1
       antd: 4.21.7
@@ -303,7 +303,6 @@ importers:
       next-transpile-modules: 9.0.0
       node-mocks-http: 1.11.0
       node-pty: 0.10.1
-      node-ssh: 12.0.5
       nookies: 2.5.2
       nprogress: 0.2.0
       pino: 8.3.0
@@ -314,7 +313,6 @@ importers:
       react-async: 10.0.1
       react-dom: 18.2.0
       react-is: 18.2.0
-      shell-quote: 1.7.3
       simstate: 3.0.1
       socket.io: 4.5.1
       socket.io-client: 4.5.1
@@ -341,6 +339,7 @@ importers:
       '@scow/config': link:../../libs/config
       '@scow/lib-auth': link:../../libs/auth
       '@scow/lib-decimal': link:../../libs/decimal
+      '@scow/lib-ssh': link:../../libs/ssh
       '@sinclair/typebox': 0.24.20
       antd: 4.21.7_biqbaboplfbrettd7655fr4n2y
       busboy: 1.6.0
@@ -355,7 +354,6 @@ importers:
       next-compose-plugins: 2.2.1
       next-transpile-modules: 9.0.0
       node-pty: 0.10.1
-      node-ssh: 12.0.5
       nookies: 2.5.2
       nprogress: 0.2.0
       pino: 8.3.0
@@ -365,7 +363,6 @@ importers:
       react-async: 10.0.1_react@18.2.0
       react-dom: 18.2.0_react@18.2.0
       react-is: 18.2.0
-      shell-quote: 1.7.3
       simstate: 3.0.1_react@18.2.0
       socket.io: 4.5.1
       socket.io-client: 4.5.1
@@ -388,7 +385,6 @@ importers:
       '@types/random-words': 1.1.2
       '@types/react': 18.0.15
       '@types/react-dom': 18.0.6
-      '@types/shell-quote': 1.7.1
       '@types/styled-components': 5.1.25
       '@types/url-join': 4.0.1
       jest-environment-jsdom: 28.1.3
@@ -458,6 +454,21 @@ importers:
       bignumber.js: 9.0.2
     dependencies:
       bignumber.js: 9.0.2
+
+  libs/ssh:
+    specifiers:
+      '@types/shell-quote': 1.7.1
+      '@types/ssh2': 1.11.5
+      node-ssh: 13.0.0
+      pino: 8.3.1
+      shell-quote: 1.7.3
+    dependencies:
+      node-ssh: 13.0.0
+      shell-quote: 1.7.3
+    devDependencies:
+      '@types/shell-quote': 1.7.1
+      '@types/ssh2': 1.11.5
+      pino: 8.3.1
 
 packages:
 
@@ -5202,6 +5213,12 @@ packages:
     dependencies:
       '@types/node': 18.0.1
     dev: false
+
+  /@types/ssh2/1.11.5:
+    resolution: {integrity: sha512-RaBsPKr+YP/slH8iR7XfC7chyomU+V57F/gJ5cMSP2n6/YWKVmeRLx7lrkgw4YYLpEW5lXLAdfZJqGo0PXboSA==}
+    dependencies:
+      '@types/node': 18.0.1
+    dev: true
 
   /@types/stack-utils/2.0.1:
     resolution: {integrity: sha512-Hl219/BT5fLAaz6NDkSuhzasy49dwQS/DSdu4MdggFB8zcXv7vflBI3xp7FEmkmdDkBUI2bPUNeMttp2knYdxw==}
@@ -11403,6 +11420,18 @@ packages:
       ssh2: 1.11.0
     dev: false
 
+  /node-ssh/13.0.0:
+    resolution: {integrity: sha512-8yfPvuB8z1M5rXFR8Z1Tl0a0M43N64VjZfjXRwOGCcImFphuXhMPniPksf1FkVj9djKbpHvLUMIVS399H9yCSQ==}
+    engines: {node: '>= 10'}
+    dependencies:
+      is-stream: 2.0.1
+      make-dir: 3.1.0
+      sb-promise-queue: 2.1.0
+      sb-scandir: 3.1.0
+      shell-escape: 0.2.0
+      ssh2: 1.11.0
+    dev: false
+
   /nodemon/2.0.19:
     resolution: {integrity: sha512-4pv1f2bMDj0Eeg/MhGqxrtveeQ5/G/UVe9iO6uTZzjnRluSA4PVWf8CW99LUPwGB3eNIA7zUFoP77YuI7hOc0A==}
     engines: {node: '>=8.10.0'}
@@ -11956,6 +11985,23 @@ packages:
       safe-stable-stringify: 2.3.1
       sonic-boom: 3.1.0
       thread-stream: 2.0.0
+
+  /pino/8.3.1:
+    resolution: {integrity: sha512-G5KDVXr8viwc/n7iKfDyqqRZflY7OpJn0SDq1wagUhXkcPodZuSymLFziSuD/gCEcVG65IN5MPDY4ZMT9OJWfg==}
+    hasBin: true
+    dependencies:
+      atomic-sleep: 1.0.0
+      fast-redact: 3.1.1
+      on-exit-leak-free: 2.1.0
+      pino-abstract-transport: 1.0.0
+      pino-std-serializers: 6.0.0
+      process-warning: 2.0.0
+      quick-format-unescaped: 4.0.4
+      real-require: 0.2.0
+      safe-stable-stringify: 2.3.1
+      sonic-boom: 3.1.0
+      thread-stream: 2.0.0
+    dev: true
 
   /pirates/4.0.5:
     resolution: {integrity: sha512-8V9+HQPupnaXMA23c5hvl69zXvTwTzyAYasnkb0Tts4XvO4CliqONMOnvlq26rkhLC3nWDFBJf73LU1e1VZLaQ==}
@@ -13553,6 +13599,11 @@ packages:
   /real-require/0.1.0:
     resolution: {integrity: sha512-r/H9MzAWtrv8aSVjPCMFpDMl5q66GqtmmRkRjpHTsp4zBAa+snZyiQNlMONiUmEJcsnaw0wCauJ2GWODr/aFkg==}
     engines: {node: '>= 12.13.0'}
+
+  /real-require/0.2.0:
+    resolution: {integrity: sha512-57frrGM/OCTLqLOAh0mhVA9VBMHd+9U7Zb2THMGdBUoZVOtGbJzjxsYGDJ3A9AYYCP4hn6y1TVbaOfzWtm5GFg==}
+    engines: {node: '>= 12.13.0'}
+    dev: true
 
   /rechoir/0.6.2:
     resolution: {integrity: sha512-HFM8rkZ+i3zrV+4LQjwQ0W+ez98pApMGM3HUrN04j3CqzPOzl9nmP15Y8YXNm8QHGv/eacOVEjqhmWpkRV0NAw==}

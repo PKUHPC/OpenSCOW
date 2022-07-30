@@ -1,10 +1,10 @@
+import { loggedExec, sftpExists, sftpReaddir, sftpReadFile, sftpWriteFile, sshConnect } from "@scow/lib-ssh";
 import { join } from "path";
 import { JobOps, SavedJob } from "src/clusterops/api/job";
 import { querySacct, querySqueue } from "src/clusterops/slurm/bl/queryJobInfo";
 import { generateJobScript, JobMetadata, parseSbatchOutput } from "src/clusterops/slurm/bl/submitJob";
 import { runtimeConfig } from "src/utils/config";
-import { sftpExists, sftpReaddir, sftpReadFile, sftpWriteFile } from "src/utils/sftp";
-import { getClusterLoginNode, loggedExec, sshConnect } from "src/utils/ssh";
+import { getClusterLoginNode } from "src/utils/ssh";
 
 export const slurmJobOps = (cluster: string): JobOps => {
 
@@ -16,7 +16,7 @@ export const slurmJobOps = (cluster: string): JobOps => {
     getAccounts: async (request, logger) => {
       const { userId }  = request;
 
-      const accounts = await sshConnect(host, userId, logger, async (ssh) => {
+      const accounts = await sshConnect(host, userId, runtimeConfig.SSH_PRIVATE_KEY_PATH, async (ssh) => {
         const { stdout } = await loggedExec(ssh, logger, true,
           "sacctmgr", ["show", "ass", `user=${userId}`, "format=account%20"]);
 
@@ -44,7 +44,7 @@ export const slurmJobOps = (cluster: string): JobOps => {
     submitJob: async (request, logger) => {
       const { jobInfo, userId, save } = request;
 
-      return await sshConnect(host, userId, logger, async (ssh) => {
+      return await sshConnect(host, userId, runtimeConfig.SSH_PRIVATE_KEY_PATH, async (ssh) => {
 
         const dir = jobInfo.workingDirectory;
 
@@ -85,10 +85,10 @@ export const slurmJobOps = (cluster: string): JobOps => {
       });
     },
 
-    getSavedJob: async (request, logger) => {
+    getSavedJob: async (request) => {
       const { id, userId } = request;
 
-      return await sshConnect(host, userId, logger, async (ssh) => {
+      return await sshConnect(host, userId, runtimeConfig.SSH_PRIVATE_KEY_PATH, async (ssh) => {
         const sftp = await ssh.requestSFTP();
 
         const file = join(runtimeConfig.PORTAL_CONFIG.savedJobsDir, id);
@@ -103,10 +103,10 @@ export const slurmJobOps = (cluster: string): JobOps => {
       });
     },
 
-    getSavedJobs: async (request, logger) => {
+    getSavedJobs: async (request) => {
       const { userId } = request;
 
-      return await sshConnect(host, userId, logger, async (ssh) => {
+      return await sshConnect(host, userId, runtimeConfig.SSH_PRIVATE_KEY_PATH, async (ssh) => {
         const sftp = await ssh.requestSFTP();
 
         if (!await sftpExists(sftp, runtimeConfig.PORTAL_CONFIG.savedJobsDir)) { return { results: []}; }
@@ -132,7 +132,7 @@ export const slurmJobOps = (cluster: string): JobOps => {
     getRunningJobs: async (request, logger) => {
       const { userId } = request;
 
-      return await sshConnect(host, userId, logger, async (ssh) => {
+      return await sshConnect(host, userId, runtimeConfig.SSH_PRIVATE_KEY_PATH, async (ssh) => {
 
         const jobs = await querySqueue(ssh, logger, ["-u", userId]);
 
@@ -144,7 +144,7 @@ export const slurmJobOps = (cluster: string): JobOps => {
     cancelJob: async (request, logger) => {
       const { jobId, userId } = request;
 
-      return await sshConnect(host, userId, logger, async (ssh) => {
+      return await sshConnect(host, userId, runtimeConfig.SSH_PRIVATE_KEY_PATH, async (ssh) => {
         await loggedExec(ssh, logger, true, "scancel", [jobId + ""]);
         return { code: "OK" };
       });
@@ -153,7 +153,7 @@ export const slurmJobOps = (cluster: string): JobOps => {
     getAllJobsInfo: async (request, logger) => {
       const { userId, startTime, endTime } = request;
 
-      return await sshConnect(host, userId, logger, async (ssh) => {
+      return await sshConnect(host, userId, runtimeConfig.SSH_PRIVATE_KEY_PATH, async (ssh) => {
         const jobs = await querySacct(ssh, logger, startTime, endTime);
 
         return { jobs };

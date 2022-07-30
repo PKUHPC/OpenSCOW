@@ -1,5 +1,5 @@
+import { sftpReadFile } from "@scow/lib-ssh";
 import getFileRoute from "src/pages/api/file/download";
-import { sftpReadFile } from "src/utils/sftp";
 import { actualPath, call, CLUSTER, connectToTestServer, createFile,
   createTestItems, resetTestServer, TestServer } from "tests/file/utils";
 

@@ -1,4 +1,4 @@
-import { constructCommand } from "src/utils/ssh";
+import { constructCommand } from "@scow/lib-ssh";
 
 it.each([
   [["test", [], {}], "test"],

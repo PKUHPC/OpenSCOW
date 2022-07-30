@@ -1,6 +1,7 @@
+import { sshRmrf } from "@scow/lib-ssh";
 import { authenticate } from "src/auth/server";
 import { route } from "src/utils/route";
-import { getClusterLoginNode, sshConnect, sshRmrf } from "src/utils/ssh";
+import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
 
 export interface DeleteDirSchema {
   method: "DELETE";
@@ -34,7 +35,7 @@ export default route<DeleteDirSchema>("DeleteDirSchema", async (req, res) => {
     return { 400: { code: "INVALID_CLUSTER" } };
   }
 
-  return await sshConnect(host, info.identityId, req.log, async (ssh) => {
+  return await sshConnect(host, info.identityId,  async (ssh) => {
     await sshRmrf(ssh, path);
 
     return { 204: null };

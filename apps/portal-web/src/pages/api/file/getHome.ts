@@ -1,8 +1,8 @@
+import { sftpRealPath } from "@scow/lib-ssh";
 import os from "os";
 import { USE_MOCK } from "src/apis/useMock";
 import { authenticate } from "src/auth/server";
 import { route } from "src/utils/route";
-import { sftpRealPath } from "src/utils/sftp";
 import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
 
 export interface GetHomeDirectorySchema {
@@ -39,7 +39,7 @@ export default route<GetHomeDirectorySchema>("GetHomeDirectorySchema", async (re
     return { 400: { code: "INVALID_CLUSTER" } };
   }
 
-  return await sshConnect(host, info.identityId, req.log, async (ssh) => {
+  return await sshConnect(host, info.identityId,  async (ssh) => {
     const sftp = await ssh.requestSFTP();
 
     const path = await sftpRealPath(sftp)(".");

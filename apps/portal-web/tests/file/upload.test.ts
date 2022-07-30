@@ -1,5 +1,5 @@
+import { sftpStat } from "@scow/lib-ssh";
 import uploadRoute from "src/pages/api/file/upload";
-import { sftpStat } from "src/utils/sftp";
 import { actualPath, call, CLUSTER, connectToTestServer, createTestItems,
   mockFileForm, resetTestServer, TestServer } from "tests/file/utils";
 
