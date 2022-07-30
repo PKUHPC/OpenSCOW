@@ -1,8 +1,10 @@
+import { sshRawConnect } from "@scow/lib-ssh";
 import { contentType } from "mime-types";
 import { basename } from "path";
 import { authenticate } from "src/auth/server";
+import { runtimeConfig } from "src/utils/config";
 import { route } from "src/utils/route";
-import { getClusterLoginNode, sshRawConnect } from "src/utils/ssh";
+import { getClusterLoginNode } from "src/utils/ssh";
 
 export interface DownloadFileSchema {
   method: "GET";
@@ -60,7 +62,7 @@ export default route<DownloadFileSchema>("DownloadFileSchema", async (req, res) 
     return { 400: { code: "INVALID_CLUSTER" } };
   }
 
-  const ssh = await sshRawConnect(host, info.identityId);
+  const ssh = await sshRawConnect(host, info.identityId, runtimeConfig.SSH_PRIVATE_KEY_PATH);
 
   const sftp = await ssh.requestSFTP();
 

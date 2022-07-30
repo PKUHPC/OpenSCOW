@@ -1,11 +1,11 @@
+import { sftpWriteFile, sshRawConnect, sshRmrf } from "@scow/lib-ssh";
 import { randomBytes } from "crypto";
 import FormData from "form-data";
 import { createMocks, RequestOptions } from "node-mocks-http";
 import { NodeSSH } from "node-ssh";
 import path from "path";
 import { TOKEN_KEY } from "src/auth/cookie";
-import { sftpWriteFile } from "src/utils/sftp";
-import { sshRawConnect, sshRmrf } from "src/utils/ssh";
+import { runtimeConfig } from "src/utils/config";
 import { SFTPWrapper } from "ssh2";
 
 const target = "localhost:22222";
@@ -20,7 +20,7 @@ export interface TestServer {
 
 export const connectToTestServer = async () => {
 
-  const ssh = await sshRawConnect(target, user);
+  const ssh = await sshRawConnect(target, user, runtimeConfig.SSH_PRIVATE_KEY_PATH);
 
   return { ssh, sftp: await ssh.requestSFTP() } as TestServer;
 };

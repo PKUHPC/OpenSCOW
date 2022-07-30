@@ -11,6 +11,7 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
 COPY libs/auth/package.json ./libs/auth/
 COPY libs/config/package.json ./libs/config/
 COPY libs/decimal/package.json ./libs/decimal/
+COPY libs/ssh/package.json ./libs/ssh/
 COPY apps/portal-web/package.json ./apps/portal-web/
 
 RUN pnpm i --frozen-lockfile
@@ -26,6 +27,7 @@ COPY protos ./protos
 COPY libs/config ./libs/config
 COPY libs/auth ./libs/auth
 COPY libs/decimal ./libs/decimal
+COPY libs/ssh ./libs/ssh
 COPY apps/portal-web ./apps/portal-web
 
 ARG BASE_PATH=""
@@ -51,6 +53,11 @@ WORKDIR /app/libs/config
 COPY --from=builder /app/libs/config/package.json .
 COPY --from=builder /app/libs/config/node_modules/ ./node_modules
 COPY --from=builder /app/libs/config/build/ ./build
+
+WORKDIR /app/libs/ssh
+COPY --from=builder /app/libs/ssh/package.json .
+COPY --from=builder /app/libs/ssh/node_modules/ ./node_modules
+COPY --from=builder /app/libs/ssh/build/ ./build
 
 WORKDIR /app/apps/portal-web
 COPY --from=builder /app/apps/portal-web/package.json ./package.json

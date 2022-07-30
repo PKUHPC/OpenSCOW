@@ -27,10 +27,10 @@
     "@mikro-orm/seeder": "5.2.3",
     "@scow/config": "workspace:*",
     "@scow/lib-decimal": "workspace:*",
+    "@scow/lib-ssh": "workspace:*",
     "@sinclair/typebox": "0.24.20",
     "dotenv": "16.0.1",
     "node-cron": "3.0.1",
-    "node-ssh": "12.0.5",
     "undici": "5.8.0",
     "uuid": "8.3.2",
     "wait-on": "6.0.1"

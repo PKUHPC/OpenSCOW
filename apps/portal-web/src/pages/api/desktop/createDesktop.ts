@@ -1,9 +1,10 @@
+import { loggedExec } from "@scow/lib-ssh";
 import { authenticate } from "src/auth/server";
 import { displayIdToPort } from "src/clusterops/slurm/bl/port";
 import { publicConfig, runtimeConfig } from "src/utils/config";
 import { dnsResolve } from "src/utils/dns";
 import { route } from "src/utils/route";
-import { getClusterLoginNode, loggedExec, sshConnect } from "src/utils/ssh";
+import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
 import { parseDisplayId, parseListOutput, parseOtp, VNCSERVER_BIN_PATH } from "src/utils/turbovnc";
 
 export interface CreateDesktopSchema {
@@ -60,7 +61,7 @@ export default /* #__PURE__*/route<CreateDesktopSchema>("CreateDesktopSchema", a
 
   if (!host) { return { 400: { code: "INVALID_CLUSTER" } }; }
 
-  return await sshConnect(host, info.identityId, req.log, async (ssh) => {
+  return await sshConnect(host, info.identityId, async (ssh) => {
 
     // find if the user has running session
     let resp = await loggedExec(ssh, req.log, true,

@@ -1,6 +1,6 @@
+import { sftpExists, sftpMkdir } from "@scow/lib-ssh";
 import { join } from "path";
 import copyFileRoute from "src/pages/api/file/copy";
-import { sftpExists, sftpMkdir } from "src/utils/sftp";
 
 import { actualPath, call, CLUSTER, connectToTestServer, createFile, createTestItems,
   resetTestServer, TestServer } from "./utils";

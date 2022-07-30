@@ -1,5 +1,5 @@
+import { sftpMkdir, sftpStat } from "@scow/lib-ssh";
 import mkdirRoute from "src/pages/api/file/mkdir";
-import { sftpMkdir, sftpStat } from "src/utils/sftp";
 import { actualPath, call, CLUSTER,
   connectToTestServer, createTestItems, resetTestServer, TestServer } from "tests/file/utils";
 

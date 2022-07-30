@@ -1,10 +1,10 @@
 {
-  "name": "@scow/ssh",
+  "name": "@scow/lib-ssh",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "build/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "rimraf build && tsc -p tsconfig.build.json"
   },
   "dependencies": {
     "node-ssh": "13.0.0",
@@ -12,7 +12,8 @@
   },
   "devDependencies": {
     "pino": "8.3.1",
-    "@types/ssh2": "1.11.5"
+    "@types/ssh2": "1.11.5",
+    "@types/shell-quote": "1.7.1"
   },
   "keywords": [],
   "author": "",

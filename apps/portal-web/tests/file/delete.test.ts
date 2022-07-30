@@ -1,7 +1,7 @@
+import { sftpExists, sftpMkdir } from "@scow/lib-ssh";
 import path from "path";
 import deleteDirRoute from "src/pages/api/file/deleteDir";
 import deleteFileRoute from "src/pages/api/file/deleteFile";
-import { sftpExists, sftpMkdir } from "src/utils/sftp";
 import { actualPath, call, CLUSTER, connectToTestServer, createFile,
   createTestItems, resetTestServer, TestServer } from "tests/file/utils";
 

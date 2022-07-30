@@ -1,7 +1,9 @@
+import { sshRawConnect } from "@scow/lib-ssh";
 import busboy from "busboy";
 import { authenticate } from "src/auth/server";
+import { runtimeConfig } from "src/utils/config";
 import { route } from "src/utils/route";
-import { getClusterLoginNode, sshRawConnect } from "src/utils/ssh";
+import { getClusterLoginNode } from "src/utils/ssh";
 
 export interface UploadFileSchema {
   method: "POST";
@@ -35,7 +37,7 @@ export default route<UploadFileSchema>("UploadFileSchema", async (req, res) => {
 
   const bb = busboy({ headers: req.headers });
 
-  const ssh = await sshRawConnect(host, info.identityId);
+  const ssh = await sshRawConnect(host, info.identityId, runtimeConfig.SSH_PRIVATE_KEY_PATH);
 
   const sftp = await ssh.requestSFTP();
 

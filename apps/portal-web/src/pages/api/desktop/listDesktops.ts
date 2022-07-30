@@ -42,7 +42,7 @@ export default /* #__PURE__*/route<ListDesktopsSchema>("ListDesktopsSchema", asy
   const host = getClusterLoginNode(cluster);
   if (!host) { return { 400: { code: "INVALID_CLUSTER" } }; }
 
-  return await sshConnect(host, info.identityId, req.log, async (ssh) => {
+  return await sshConnect(host, info.identityId, async (ssh) => {
 
     // list all running session
     const resp = await loggedExec(ssh, req.log, true,

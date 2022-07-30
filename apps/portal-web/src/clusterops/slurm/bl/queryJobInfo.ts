@@ -1,9 +1,9 @@
+import { loggedExec } from "@scow/lib-ssh";
 import moment from "moment-timezone";
 import { NodeSSH } from "node-ssh";
 import { JobInfo } from "src/clusterops/api/job";
 import { RunningJob } from "src/generated/common/job";
 import { Logger } from "src/utils/log";
-import { loggedExec } from "src/utils/ssh";
 
 const SEPARATOR = "__x__x__";
 

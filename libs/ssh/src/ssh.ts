@@ -1,13 +1,6 @@
 import { NodeSSH, SSHExecCommandOptions } from "node-ssh";
 import type { Logger } from "pino";
 import { quote } from "shell-quote";
-
-export interface ConnectOptions {
-  address: string;
-  username: string;
-  privateKeyPath: string;
-}
-
 /**
  * Connect to SSH and returns the SSH Object
  * Must dispose of the object after use
@@ -15,21 +8,20 @@ export interface ConnectOptions {
  * @param username  username
  * @returns SSH Object
  */
-export async function sshRawConnect({ address, privateKeyPath, username }: ConnectOptions) {
+export async function sshRawConnect(address: string, username: string, privateKeyPath: string) {
   const [host, port] = address.split(":");
-
   const ssh = new NodeSSH();
 
-  await ssh.connect({ host, port: port ? +port : undefined, username, privateKey: privateKeyPath });
+  await ssh.connect({ host, port: port ? +port : undefined, username, privateKeyPath: privateKeyPath });
 
   return ssh;
 }
 
 export async function sshConnect<T>(
-  options: ConnectOptions,
+  address: string, username: string, privateKeyPath: string,
   run: (ssh: NodeSSH) => Promise<T>,
 ) {
-  const ssh = await sshRawConnect(options);
+  const ssh = await sshRawConnect(address, username, privateKeyPath);
 
   return run(ssh).finally(() => { ssh.dispose();});
 }
