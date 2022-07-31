@@ -12,7 +12,7 @@ import { HistoryJobDrawer } from "src/pageComponents/job/HistoryJobDrawer";
 import { JobPriceChangeModal } from "src/pageComponents/tenant/JobPriceChangeModal";
 import type { GetJobFilter, GetJobInfoSchema } from "src/pages/api/job/jobInfo";
 import type { Cluster } from "src/utils/config";
-import { CLUSTERS } from "src/utils/config";
+import { publicConfig } from "src/utils/config";
 import { defaultRanges, formatDateTime } from "src/utils/datetime";
 import { moneyToString, nullableMoneyToString } from "src/utils/money";
 
@@ -55,7 +55,7 @@ export const AdminJobTable: React.FC<Props> = () => {
       userId: "",
       accountName: "",
       jobEndTime: [now.clone().subtract(1, "week"), now],
-      clusters: CLUSTERS,
+      clusters: Object.values(publicConfig.CLUSTERS),
     };
   });
   const [form] = Form.useForm<FilterForm>();

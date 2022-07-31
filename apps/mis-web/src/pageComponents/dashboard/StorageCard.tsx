@@ -46,7 +46,7 @@ export const StorageCard: React.FC<Props> = ({
 
   return (
     <StatCard
-      title={`${publicConfig.CLUSTERS[cluster] ?? cluster} 存储${data ? "已使用/" : ""}总限额`}
+      title={`${publicConfig.CLUSTERS[cluster]?.name ?? cluster} 存储${data ? "已使用/" : ""}总限额`}
     >
       <Container>
         <span style={{ fontSize: "24px" }}>

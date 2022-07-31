@@ -53,7 +53,7 @@ export async function getBillingTableItems(tenantName: string | undefined) {
           index: count++,
           clusterItemIndex: clusterItemIndex++,
           partitionItemIndex: partitionItemIndex++,
-          cluster: publicConfig.CLUSTERS[cluster] ?? cluster,
+          cluster: publicConfig.CLUSTERS[cluster]?.name ?? cluster,
           cores: partitionInfo.cores,
           gpus: partitionInfo.gpus,
           mem: partitionInfo.mem,

@@ -43,9 +43,8 @@ const buildRuntimeConfig = async (phase) => {
   const dev = phase === PHASE_DEVELOPMENT_SERVER;
   const production = phase === PHASE_PRODUCTION_SERVER;
 
-  // load .env.build if in build
   if (building) {
-    require("dotenv").config({ path: "env/.env.build" });
+    return { serverRuntimeConfig: {}, publicRuntimeConfig: {} };
   }
 
   if (dev) {
@@ -87,7 +86,7 @@ const buildRuntimeConfig = async (phase) => {
     PREDEFINED_CHARGING_TYPES: misConfig.predefinedChargingTypes,
 
     CLUSTERS: Object.keys(clusters).reduce((prev, curr) => {
-      prev[curr] = clusters[curr].displayName;
+      prev[curr] = { id: curr, name: clusters[curr].displayName };
       return prev;
     }, {}),
 
