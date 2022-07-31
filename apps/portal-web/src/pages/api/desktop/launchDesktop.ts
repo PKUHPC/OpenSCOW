@@ -45,7 +45,7 @@ export default /* #__PURE__*/route<LaunchDesktopSchema>("LaunchDesktopSchema", a
 
   if (!host) { return { 400: { code: "INVALID_CLUSTER" } }; }
 
-  return await sshConnect(host, info.identityId, async (ssh) => {
+  return await sshConnect(host, info.identityId, req.log, async (ssh) => {
 
     // refresh the otp
     const password = await refreshPassword(ssh, req.log, displayId);

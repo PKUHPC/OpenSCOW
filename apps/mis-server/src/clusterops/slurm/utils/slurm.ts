@@ -3,7 +3,7 @@ import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { SlurmMisConfigSchema } from "@scow/config/build/appConfig/mis";
 import { sshConnect } from "@scow/lib-ssh";
-import { privateKeyPath } from "src/config/mis";
+import { rootKeyPair } from "src/config/env";
 
 export const executeScript = async (
   slurmMisConfig: SlurmMisConfigSchema,  cmd: string, parameters: string[], env: NodeJS.ProcessEnv, logger: Logger,
@@ -11,7 +11,7 @@ export const executeScript = async (
 
   const host = slurmMisConfig.managerUrl;
 
-  return await sshConnect(host, "root", privateKeyPath, async (ssh) => {
+  return await sshConnect(host, "root", rootKeyPair, logger, async (ssh) => {
     const resp = await ssh.exec(cmd, parameters, { stream: "both", execOptions: { env } });
 
     logger.trace({ cmd: {

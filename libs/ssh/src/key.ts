@@ -1,23 +1,31 @@
+import fs from "fs";
 import type { Logger } from "pino";
 
 import { sshConnect } from "./ssh";
+export interface KeyPair {
+  publicKey: string;
+  privateKey: string;
+}
 
-interface Node {
-  host: string;
-  name: string;
+export function getKeyPair(privateKeyPath: string, publicKeyPath: string): KeyPair {
+  return {
+    privateKey: fs.readFileSync(privateKeyPath, "utf-8"),
+    publicKey: fs.readFileSync(publicKeyPath, "utf-8"),
+  };
 }
 
 /**
  * Insert the host's public key to the user's authorized_keys to enable public key login
  *
  * @param user the user
- * @param hosts all the nodes that need to be inserted
- * @param privateKeyPath the path for private key
+ * @param host the host of machine
+ * @param rootKeyPair the key pair of root
  * @param logger the logger
  */
 export async function insertKey(
-  user: string, hosts: Node[], privateKeyPath: string, publicKeyContent: string, logger: Logger,
+  user: string, host: string, rootKeyPair: KeyPair, logger: Logger,
 ) {
+
   // https://superuser.com/a/484280
   const script = (homeDir: string) => `
 
@@ -36,21 +44,18 @@ export async function insertKey(
       chown "${user}:${user}" "${homeDir}/.ssh/authorized_keys"
     fi
 
-    if ! grep -q "${publicKeyContent}" "${homeDir}/.ssh/authorized_keys"; then
-      echo "${publicKeyContent}" >> "${homeDir}/.ssh/authorized_keys"
+    if ! grep -q "${rootKeyPair.publicKey}" "${homeDir}/.ssh/authorized_keys"; then
+      echo "${rootKeyPair.publicKey}" >> "${homeDir}/.ssh/authorized_keys"
     fi
     `;
 
 
-  await Promise.all(hosts.map(async ({ name, host }) => {
+  logger.info("Adding key to user %s to %s", host);
 
-    logger.info("Adding key to user %s on cluster %s", user, name);
+  await sshConnect(host, "root", rootKeyPair, logger, async (ssh) => {
+    const homeDir = await ssh.execCommand(`eval echo ~${user}`);
 
-    await sshConnect(host, "root", privateKeyPath, async (ssh) => {
-      const homeDir = await ssh.execCommand(`eval echo ~${user}`);
-
-      await ssh.execCommand(script(homeDir.stdout.trim()));
-    });
-  }));
+    await ssh.execCommand(script(homeDir.stdout.trim()));
+  });
 }
 

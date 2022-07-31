@@ -30,11 +30,6 @@ export const MisConfigSchema = Type.Object({
     errorMessage: Type.Optional(Type.String({ description: "如果账户名不符合规则显示什么" })),
   })),
 
-  publicKeyPath: Type.Optional(Type.String({ description: "系统公钥的路径。默认为~/.ssh/id_rsa.pub" })),
-  privateKeyPath: Type.Optional(Type.String({ description: "系统私钥的路径。默认为~/.ssh/id_rsa" })),
-
-  insertSshKeyForNewUser: Type.Boolean({ description: "是否在创建用户后给用户插入登录所需要的SSH公钥",  default: true }),
-
   fetchJobs: Type.Object({
     db: Type.Object({
       host: Type.String({ description: "job_table数据库地址" }),

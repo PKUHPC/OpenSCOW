@@ -1,27 +1,51 @@
 import { NodeSSH, SSHExecCommandOptions } from "node-ssh";
 import type { Logger } from "pino";
 import { quote } from "shell-quote";
+
+import { insertKey, KeyPair } from "./key";
+
 /**
  * Connect to SSH and returns the SSH Object
  * Must dispose of the object after use
+ *
+ * If the username is not root and first login attempt failed,
+ * it inserts the public key into the user's authorized_key and logs in again
+ *
  * @param addr address
  * @param username  username
+ * @param rootKeyPair the ssh key pair of root user
+ * @param logger logger
  * @returns SSH Object
  */
-export async function sshRawConnect(address: string, username: string, privateKeyPath: string) {
+export async function sshRawConnect(address: string, username: string, rootKeyPair: KeyPair, logger: Logger) {
   const [host, port] = address.split(":");
   const ssh = new NodeSSH();
 
-  await ssh.connect({ host, port: port ? +port : undefined, username, privateKeyPath: privateKeyPath });
+  async function connect() {
+    await ssh.connect({ host, port: port ? +port : undefined, username, privateKey: rootKeyPair.privateKey });
+  }
+
+  try {
+    await connect();
+  } catch (e) {
+    if (username === "root") {
+      logger.info("Login to %s as %s failed.");
+      throw e;
+    }
+
+    logger.info("Login to %s as %s failed. Try inserting public key", username);
+    await insertKey(username, address, rootKeyPair, logger);
+    await connect();
+  }
 
   return ssh;
 }
 
 export async function sshConnect<T>(
-  address: string, username: string, privateKeyPath: string,
+  address: string, username: string, rootKeyPair: KeyPair, logger: Logger,
   run: (ssh: NodeSSH) => Promise<T>,
 ) {
-  const ssh = await sshRawConnect(address, username, privateKeyPath);
+  const ssh = await sshRawConnect(address, username, rootKeyPair, logger);
 
   return run(ssh).finally(() => { ssh.dispose();});
 }
@@ -62,4 +86,18 @@ export async function loggedExec(ssh: NodeSSH, logger: Logger, throwIfFailed: bo
     logger.debug("Command %o completed. stdout %s, stderr %s", command, resp.stdout, resp.stderr);
   }
   return resp;
+}
+
+/**
+ * Check if the root user can log in to the host
+ * If fails, return the error
+ *
+ * @param host the host
+ * @param keyPair key pair
+ * @param logger logger
+ * @returns the error if login failed
+ */
+export async function testRootUserSshLogin(host: string, keyPair: KeyPair, logger: Logger) {
+  return await sshConnect(host, "root", keyPair, logger, async () => undefined).catch((e) => e);
+
 }

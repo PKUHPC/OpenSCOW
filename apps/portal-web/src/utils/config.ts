@@ -3,6 +3,7 @@ import type { ClusterConfigSchema } from "@scow/config/build/appConfig/cluster";
 import type { PortalConfigSchema } from "@scow/config/build/appConfig/portal";
 import type { UiConfigSchema } from "@scow/config/build/appConfig/ui";
 import { CONFIG_BASE_PATH } from "@scow/config/build/constants";
+import { KeyPair } from "@scow/lib-ssh";
 import getConfig from "next/config";
 
 export interface ServerRuntimeConfig {
@@ -10,6 +11,7 @@ export interface ServerRuntimeConfig {
   AUTH_INTERNAL_URL: string;
 
   SSH_PRIVATE_KEY_PATH: string;
+  ROOT_KEY_PAIR: KeyPair;
 
   CLUSTERS_CONFIG: {[cluster: string]: ClusterConfigSchema};
 

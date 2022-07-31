@@ -62,7 +62,7 @@ export default route<DownloadFileSchema>("DownloadFileSchema", async (req, res) 
     return { 400: { code: "INVALID_CLUSTER" } };
   }
 
-  const ssh = await sshRawConnect(host, info.identityId, runtimeConfig.SSH_PRIVATE_KEY_PATH);
+  const ssh = await sshRawConnect(host, info.identityId, runtimeConfig.ROOT_KEY_PAIR, req.log);
 
   const sftp = await ssh.requestSFTP();
 

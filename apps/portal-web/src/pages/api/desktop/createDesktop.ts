@@ -61,7 +61,7 @@ export default /* #__PURE__*/route<CreateDesktopSchema>("CreateDesktopSchema", a
 
   if (!host) { return { 400: { code: "INVALID_CLUSTER" } }; }
 
-  return await sshConnect(host, info.identityId, async (ssh) => {
+  return await sshConnect(host, info.identityId, req.log, async (ssh) => {
 
     // find if the user has running session
     let resp = await loggedExec(ssh, req.log, true,

@@ -19,7 +19,6 @@ import {
   UserRole as PFUserRole,  UserServiceServer,
   UserServiceService,
   UserStatus as PFUserStatus } from "src/generated/server/user";
-import { insertKey } from "src/utils/ssh";
 import { fetch } from "undici";
 
 export const userServiceServer = plugin((server) => {
@@ -349,13 +348,6 @@ export const userServiceServer = plugin((server) => {
         logger.info("Error creating user in auth. code: %d, body: %o", rep.status, await rep.text());
 
         throw <ServiceError> { code: Status.INTERNAL, message: "Error creating user in auth" };
-      }
-
-      if (misConfig.insertSshKeyForNewUser) {
-        logger.info("Inserting SSH public key to login nodes");
-
-        await insertKey(identityId, logger);
-        logger.info("Setup login for %s success", identityId);
       }
 
       return [{ id: user.id }];

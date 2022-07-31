@@ -4,6 +4,7 @@ import FormData from "form-data";
 import { createMocks, RequestOptions } from "node-mocks-http";
 import { NodeSSH } from "node-ssh";
 import path from "path";
+import pino from "pino";
 import { TOKEN_KEY } from "src/auth/cookie";
 import { runtimeConfig } from "src/utils/config";
 import { SFTPWrapper } from "ssh2";
@@ -20,7 +21,7 @@ export interface TestServer {
 
 export const connectToTestServer = async () => {
 
-  const ssh = await sshRawConnect(target, user, runtimeConfig.SSH_PRIVATE_KEY_PATH);
+  const ssh = await sshRawConnect(target, user, runtimeConfig.ROOT_KEY_PAIR, pino());
 
   return { ssh, sftp: await ssh.requestSFTP() } as TestServer;
 };

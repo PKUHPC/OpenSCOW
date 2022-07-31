@@ -37,7 +37,7 @@ export default route<UploadFileSchema>("UploadFileSchema", async (req, res) => {
 
   const bb = busboy({ headers: req.headers });
 
-  const ssh = await sshRawConnect(host, info.identityId, runtimeConfig.SSH_PRIVATE_KEY_PATH);
+  const ssh = await sshRawConnect(host, info.identityId, runtimeConfig.ROOT_KEY_PAIR, req.log);
 
   const sftp = await ssh.requestSFTP();
 

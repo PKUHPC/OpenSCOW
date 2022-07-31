@@ -11,6 +11,8 @@ const { UI_CONFIG_NAME, UiConfigSchema, DEFAULT_PRIMARY_COLOR } = require("@scow
 const { PORTAL_CONFIG_NAME, PortalConfigSchema } = require("@scow/config/build/appConfig/portal");
 const { getAppConfigs } = require("@scow/config/build/appConfig/app");
 const { getClusterConfigs } = require("@scow/config/build/appConfig/cluster");
+const { getKeyPair, testRootUserSshLogin } = require("@scow/lib-ssh");
+const pino = require("pino");
 
 /**
  * Get auth capabilities
@@ -35,6 +37,7 @@ const specs = {
   LOGIN_NODES: str({ desc: "集群的登录节点。将会覆写配置文件。格式：集群ID=登录节点,集群ID=登录节点", default: "" }),
 
   SSH_PRIVATE_KEY_PATH: str({ desc: "SSH私钥路径", default: join(homedir(), ".ssh", "id_rsa") }),
+  SSH_PUBLIC_KEY_PATH: str({ desc: "SSH公钥路径", default: join(homedir(), ".ssh", "id_rsa.pub") }),
 
   MOCK_USER_ID: str({ desc: "覆盖已登录用户的用户ID", default: undefined }),
 
@@ -47,6 +50,9 @@ const specs = {
 const config = { _specs: specs };
 
 const buildRuntimeConfig = async (phase) => {
+
+  const logger = pino.default();
+
   const building = phase === PHASE_PRODUCTION_BUILD;
   const dev = phase === PHASE_DEVELOPMENT_SERVER;
   const production = phase === PHASE_PRODUCTION_SERVER;
@@ -60,8 +66,10 @@ const buildRuntimeConfig = async (phase) => {
     require("dotenv").config({ path: "env/.env.dev" });
   }
 
+
   // reload config after envs are applied
   const config = envConfig(specs, process.env);
+
 
   // load clusters.json
 
@@ -74,6 +82,21 @@ const buildRuntimeConfig = async (phase) => {
   const uiConfig = getConfigFromFile(UiConfigSchema, UI_CONFIG_NAME, true, configPath);
   const portalConfig = getConfigFromFile(PortalConfigSchema, PORTAL_CONFIG_NAME, false, configPath);
 
+  // test if the root user can ssh to login nodes
+  const keyPair = getKeyPair(config.SSH_PRIVATE_KEY_PATH, config.SSH_PUBLIC_KEY_PATH);
+
+  await Promise.all(Object.values(clusters).map(async ({ displayName, slurm: { loginNodes } }) => {
+    const node = loginNodes[0];
+    logger.info("Checking if root can login to %s by login node %s", displayName, node)
+    const error = await testRootUserSshLogin(node, keyPair, logger);
+    if (error) {
+      logger.info("Root cannot login to %s by login node %s. err: %o", displayName, node, error)
+      throw error;
+    } else {
+      logger.info("Root can login to %s by login node %s", displayName, node)
+    }
+  }));
+
   /**
    * @type {import("./src/utils/config").ServerRuntimeConfig}
    */
@@ -81,6 +104,7 @@ const buildRuntimeConfig = async (phase) => {
     AUTH_EXTERNAL_URL: config.AUTH_EXTERNAL_URL,
     AUTH_INTERNAL_URL: config.AUTH_INTERNAL_URL,
     SSH_PRIVATE_KEY_PATH: config.SSH_PRIVATE_KEY_PATH,
+    ROOT_KEY_PAIR: keyPair,
     CLUSTERS_CONFIG: clusters,
     PORTAL_CONFIG: portalConfig,
     DEFAULT_PRIMARY_COLOR,

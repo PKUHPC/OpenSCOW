@@ -1,9 +1,11 @@
 import { Logger, plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
+import { testRootUserSshLogin } from "@scow/lib-ssh";
 import { ClusterOps } from "src/clusterops/api";
 import { createSlurmOps } from "src/clusterops/slurm";
 import { clusters } from "src/config/clusters";
+import { rootKeyPair } from "src/config/env";
 
 // Throw ServiceError if failed.
 type CallOnAll = <T>(
@@ -29,6 +31,18 @@ const clusterOpsMaps = {
 } as const;
 
 export const clustersPlugin = plugin(async (f) => {
+
+  await Promise.all(Object.values(clusters).map(async ({ displayName, slurm: { loginNodes } }) => {
+    const node = loginNodes[0];
+    f.logger.info("Checking if root can login to %s by login node %s", displayName, node);
+    const error = await testRootUserSshLogin(node, rootKeyPair, f.logger);
+    if (error) {
+      f.logger.info("Root cannot login to %s by login node %s. err: %o", displayName, node, error);
+      throw error;
+    } else {
+      f.logger.info("Root can login to %s by login node %s", displayName, node);
+    }
+  }));
 
   const opsForClusters = Object.entries(clusters).reduce((prev, [cluster, c]) => {
     const ops = clusterOpsMaps[(c.scheduler as keyof typeof clusterOpsMaps)](cluster, f.logger);
