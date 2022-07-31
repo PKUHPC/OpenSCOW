@@ -11,7 +11,7 @@ import { ModalButton } from "src/components/ModalLink";
 import { PageTitle } from "src/components/PageTitle";
 import { DesktopTableActions } from "src/pageComponents/desktop/DesktopTableActions";
 import { NewDesktopTableModal } from "src/pageComponents/desktop/NewDesktopTableModal";
-import { CLUSTERS, CLUSTERS_ID_MAP } from "src/utils/config";
+import { publicConfig } from "src/utils/config";
 import { queryToString, useQuerystring } from "src/utils/querystring";
 
 const NewDesktopTableModalButton = ModalButton(NewDesktopTableModal, { type: "primary", icon: <PlusOutlined /> });
@@ -30,7 +30,10 @@ export const DesktopTable: React.FC<Props> = () => {
   const qs = useQuerystring();
 
   const clusterParam = queryToString(qs.cluster);
-  const cluster = CLUSTERS_ID_MAP[clusterParam] ?? CLUSTERS[0];
+  const cluster = publicConfig.CLUSTERS_CONFIG[clusterParam]
+    ? { id: clusterParam, name: publicConfig.CLUSTERS_CONFIG[clusterParam].displayName }
+    : publicConfig.CLUSTERS[0];
+
 
   const { data, isLoading, reload } = useAsync({
     promiseFn: useCallback(async () => {

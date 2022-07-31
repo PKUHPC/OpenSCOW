@@ -8,7 +8,7 @@ import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { runningJobId, RunningJobInfo } from "src/models/job";
 import { RunningJobDrawer } from "src/pageComponents/job/RunningJobDrawer";
-import { Cluster, CLUSTERS, CLUSTERS_ID_MAP  } from "src/utils/config";
+import { Cluster, clusterConfigToCluster, publicConfig } from "src/utils/config";
 
 interface FilterForm {
   jobId: number | undefined;
@@ -29,7 +29,7 @@ export const RunningJobQueryTable: React.FC<Props> = ({
   const [query, setQuery] = useState<FilterForm>(() => {
     return {
       jobId: undefined,
-      cluster: CLUSTERS[0],
+      cluster: publicConfig.CLUSTERS[0],
     };
   });
 
@@ -52,7 +52,7 @@ export const RunningJobQueryTable: React.FC<Props> = ({
       filtered = filtered.filter((x) => x.jobId === query.jobId + "");
     }
 
-    return filtered.map((x) => RunningJobInfo.fromGrpc(x, CLUSTERS_ID_MAP[query.cluster.id]));
+    return filtered.map((x) => RunningJobInfo.fromGrpc(x, clusterConfigToCluster(query.cluster.id)!));
   }, [data, query.jobId]);
 
   return (

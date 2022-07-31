@@ -6,7 +6,7 @@ import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
 import { SubmitJobForm } from "src/pageComponents/job/SubmitJobForm";
-import { CLUSTERS } from "src/utils/config";
+import { publicConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
 import { queryToString, useQuerystring } from "src/utils/querystring";
 
@@ -21,7 +21,7 @@ export const SubmitJobPage: NextPage = requireAuth(() => true)(
     const { data, isLoading } = useAsync({
       promiseFn: useCallback(async () => {
         if (cluster && savedJobId) {
-          const clusterObj = CLUSTERS.find((x) => x.id === cluster);
+          const clusterObj = publicConfig.CLUSTERS.find((x) => x.id === cluster);
           if (!clusterObj) { return undefined; }
           return api.getSavedJob({ query: { cluster, id: savedJobId } })
             .then(({ jobInfo }) => ({

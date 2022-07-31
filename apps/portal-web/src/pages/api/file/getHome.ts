@@ -39,7 +39,7 @@ export default route<GetHomeDirectorySchema>("GetHomeDirectorySchema", async (re
     return { 400: { code: "INVALID_CLUSTER" } };
   }
 
-  return await sshConnect(host, info.identityId,  async (ssh) => {
+  return await sshConnect(host, info.identityId,  req.log, async (ssh) => {
     const sftp = await ssh.requestSFTP();
 
     const path = await sftpRealPath(sftp)(".");

@@ -3,6 +3,7 @@ import type { ClusterConfigSchema } from "@scow/config/build/appConfig/cluster";
 import type { PortalConfigSchema } from "@scow/config/build/appConfig/portal";
 import type { UiConfigSchema } from "@scow/config/build/appConfig/ui";
 import { CONFIG_BASE_PATH } from "@scow/config/build/constants";
+import { KeyPair } from "@scow/lib-ssh";
 import getConfig from "next/config";
 
 export interface ServerRuntimeConfig {
@@ -10,6 +11,7 @@ export interface ServerRuntimeConfig {
   AUTH_INTERNAL_URL: string;
 
   SSH_PRIVATE_KEY_PATH: string;
+  ROOT_KEY_PAIR: KeyPair;
 
   CLUSTERS_CONFIG: {[cluster: string]: ClusterConfigSchema};
 
@@ -28,9 +30,6 @@ export interface ServerRuntimeConfig {
 
 
 export interface PublicRuntimeConfig {
-  /** Cluster id and name */
-  CLUSTER_NAMES: { [clusterId: string]: string };
-
   ENABLE_CHANGE_PASSWORD: boolean;
 
   ENABLE_SHELL: boolean;
@@ -52,6 +51,9 @@ export interface PublicRuntimeConfig {
 
   CLUSTERS_CONFIG: {[cluster: string]: ClusterConfigSchema};
 
+  CLUSTERS: Cluster[];
+
+
   APPS: { id: string; name: string }[];
 
   SUBMIT_JOB_WORKING_DIR: string;
@@ -64,11 +66,10 @@ export const publicConfig: PublicRuntimeConfig = getConfig().publicRuntimeConfig
 
 export type Cluster = { id: string; name: string; }
 
-export const CLUSTERS: Cluster[] = Object.entries(publicConfig.CLUSTER_NAMES).map(([id, name]) => ({ id, name }));
-
-export const CLUSTERS_ID_MAP = CLUSTERS.reduce((prev, curr) => {
-  prev[curr.id] = curr;
-  return prev;
-}, {} as Record<string, Cluster>);
-
 export const CONFIG_PATH = process.env.NODE_ENV === "production" ? CONFIG_BASE_PATH : "config";
+
+export function clusterConfigToCluster(id: string): Cluster | undefined {
+  const config = publicConfig.CLUSTERS_CONFIG[id];
+
+  return config ? { id, name: config.displayName } : undefined;
+}

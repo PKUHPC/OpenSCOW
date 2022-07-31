@@ -1,7 +1,7 @@
 import { Layout } from "antd";
 import useBreakpoint from "antd/lib/grid/hooks/useBreakpoint";
 import { useRouter } from "next/router";
-import React, { PropsWithChildren, useState } from "react";
+import React, { PropsWithChildren, useMemo, useState } from "react";
 import { Footer } from "src/layouts/Footer";
 import { Header } from "src/layouts/header";
 import { match } from "src/layouts/matchers";
@@ -42,7 +42,7 @@ const StyledLayout = styled(Layout)`
 
 export const RootLayout: React.FC<Props> = ({ footerText, children }) => {
 
-  const allRoutes = userRoutes;
+  const allRoutes = useMemo(userRoutes, []);
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
 

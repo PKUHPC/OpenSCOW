@@ -16,14 +16,17 @@ export interface AuthCallbackSchema {
   }
 }
 
-
 export default route<AuthCallbackSchema>("AuthCallbackSchema", async (req, res) => {
 
   const { token } = req.query;
 
-  if (await validateToken(token)) {
+  // query the token and get the username
+  const info = await validateToken(token);
+
+  if (info) {
     // set token cache
     setTokenCookie({ res }, token);
+
     res.redirect(process.env.NEXT_PUBLIC_BASE_PATH || "/");
   } else {
     return { 403: null };

@@ -39,7 +39,7 @@ export default /* #__PURE__*/route<KillDesktopSchema>("KillDesktopSchema", async
 
   if (!host) { return { 400: { code: "INVALID_CLUSTER" } }; }
 
-  return await sshConnect(host, info.identityId, async (ssh) => {
+  return await sshConnect(host, info.identityId, req.log, async (ssh) => {
 
     // kill specific desktop
     await loggedExec(ssh, req.log, true, VNCSERVER_BIN_PATH, ["-kill", ":" + displayId]);
