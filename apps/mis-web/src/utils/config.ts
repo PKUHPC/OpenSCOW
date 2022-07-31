@@ -17,8 +17,7 @@ export interface ServerRuntimeConfig {
 }
 
 export interface PublicRuntimeConfig {
-  /** Cluster id and name */
-  CLUSTERS: { [clusterId: string]: string };
+  CLUSTERS: { [clusterId: string]: Cluster };
   PREDEFINED_CHARGING_TYPES: string[];
   ENABLE_CREATE_USER: boolean;
   ENABLE_CHANGE_PASSWORD: boolean;
@@ -33,7 +32,5 @@ export const runtimeConfig: ServerRuntimeConfig = getConfig().serverRuntimeConfi
 export const publicConfig: PublicRuntimeConfig = getConfig().publicRuntimeConfig;
 
 export type Cluster = { id: string; name: string; }
-
-export const CLUSTERS: Cluster[] = Object.entries(publicConfig.CLUSTERS).map(([id, name]) => ({ id, name }));
 
 export const CONFIG_PATH = process.env.NODE_ENV === "production" ? CONFIG_BASE_PATH : "config";

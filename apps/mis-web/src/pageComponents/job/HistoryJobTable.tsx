@@ -12,7 +12,7 @@ import { JobInfo } from "src/generated/server/job";
 import { HistoryJobDrawer } from "src/pageComponents/job/HistoryJobDrawer";
 import type { GetJobInfoSchema } from "src/pages/api/job/jobInfo";
 import type { Cluster } from "src/utils/config";
-import { CLUSTERS } from "src/utils/config";
+import { publicConfig } from "src/utils/config";
 import { defaultRanges, formatDateTime } from "src/utils/datetime";
 import { useDidUpdateEffect } from "src/utils/hooks";
 import { moneyToString, nullableMoneyToString } from "src/utils/money";
@@ -48,7 +48,7 @@ export const JobTable: React.FC<Props> = ({
     return {
       jobEndTime: [now.clone().subtract(1, "week"), now],
       jobId: undefined,
-      clusters: CLUSTERS,
+      clusters: Object.values(publicConfig.CLUSTERS),
       accountName: typeof accountNames === "string" ? accountNames : undefined,
     };
   });

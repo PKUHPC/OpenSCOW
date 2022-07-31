@@ -10,8 +10,7 @@ import { runningJobId, RunningJobInfo } from "src/models/job";
 import { BatchChangeJobTimeLimitButton } from "src/pageComponents/job/BatchChangeJobTimeLimitButton";
 import { ChangeJobTimeLimitModal } from "src/pageComponents/job/ChangeJobTimeLimitModal";
 import { RunningJobDrawer } from "src/pageComponents/job/RunningJobDrawer";
-import type { Cluster } from "src/utils/config";
-import { CLUSTERS } from "src/utils/config";
+import { Cluster, publicConfig } from "src/utils/config";
 import { useDidUpdateEffect } from "src/utils/hooks";
 
 interface FilterForm {
@@ -28,12 +27,6 @@ interface Props {
   showUser: boolean;
 }
 
-const clustersIdMap = CLUSTERS.reduce((prev, curr) => {
-  prev[curr.id] = curr;
-  return prev;
-}, {} as Record<string, Cluster>);
-
-
 export const RunningJobQueryTable: React.FC<Props> = ({
   userId, accountNames, showUser, showAccount, filterAccountName = true,
 }) => {
@@ -46,7 +39,7 @@ export const RunningJobQueryTable: React.FC<Props> = ({
     return {
       accountName: typeof accountNames === "string" ? accountNames : undefined,
       jobId: undefined,
-      cluster: CLUSTERS[0],
+      cluster: Object.values(publicConfig.CLUSTERS)[0],
     };
   });
 
@@ -76,7 +69,7 @@ export const RunningJobQueryTable: React.FC<Props> = ({
       // add local range filters here
     }
 
-    return filtered.map((x) => RunningJobInfo.fromGrpc(x, clustersIdMap[query.cluster.id]));
+    return filtered.map((x) => RunningJobInfo.fromGrpc(x, publicConfig.CLUSTERS[query.cluster.id]));
   }, [data, query.jobId]);
 
   return (

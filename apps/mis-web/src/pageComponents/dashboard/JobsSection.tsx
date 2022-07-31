@@ -6,7 +6,7 @@ import { Section } from "src/components/Section";
 import { RunningJobInfo } from "src/models/job";
 import { RunningJobInfoTable } from "src/pageComponents/job/RunningJobTable";
 import { User } from "src/stores/UserStore";
-import { CLUSTERS } from "src/utils/config";
+import { publicConfig } from "src/utils/config";
 
 interface Props {
   user: User;
@@ -15,7 +15,7 @@ interface Props {
 export const JobsSection: React.FC<Props> = ({ user }) => {
 
   const promiseFn = useCallback(() => {
-    return Promise.all(CLUSTERS.map(async ({ id, name }) => {
+    return Promise.all(Object.values(publicConfig.CLUSTERS).map(async ({ id, name }) => {
       return api.getRunningJobs({
         query: {
           cluster: id,

@@ -11,7 +11,7 @@ import { publicConfig } from "src/utils/config";
 
 const columns: ColumnsType<JobBillingTableItem> = [
   { dataIndex: "cluster", title: "集群", key: "index", render: (_, r) => ({
-    children: publicConfig.CLUSTERS[r.cluster] ?? r.cluster,
+    children: publicConfig.CLUSTERS[r.cluster]?.name ?? r.cluster,
     props: { rowSpan: r.clusterItemIndex === 0 ? r.partitionCount * r.qosCount : 0  },
   }) },
   { dataIndex: "partition", title: "分区全名", key: "index", render: (_, r) => ({

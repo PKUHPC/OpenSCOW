@@ -1,5 +1,5 @@
 import { Select } from "antd";
-import { Cluster, CLUSTERS } from "src/utils/config";
+import { Cluster, publicConfig } from "src/utils/config";
 
 
 interface Props {
@@ -15,7 +15,7 @@ export const ClusterSelector: React.FC<Props> = ({ value, onChange }) => {
       placeholder="请选择集群"
       value={value ? value.map((v) => ({ value: v.id, label: v.name })) : undefined}
       onChange={(values) => onChange?.(values.map((x) => ({ id: x.value, name: x.label })))}
-      options={CLUSTERS.map((x) => ({ value: x.id, label: x.name }))}
+      options={Object.values(publicConfig.CLUSTERS).map((x) => ({ value: x.id, label: x.name }))}
     />
   );
 };
@@ -32,7 +32,7 @@ export const SingleClusterSelector: React.FC<SingleSelectionProps> = ({ value, o
       placeholder="请选择集群"
       value={value ? ({ value: value.id, label: value.name }) : undefined}
       onChange={({ value, label }) => onChange?.({ id: value, name: label })}
-      options={CLUSTERS.map((x) => ({ value: x.id, label: x.name }))}
+      options={Object.values(publicConfig.CLUSTERS).map((x) => ({ value: x.id, label: x.name }))}
     />
   );
 };
