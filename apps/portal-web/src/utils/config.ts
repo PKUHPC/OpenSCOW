@@ -30,9 +30,6 @@ export interface ServerRuntimeConfig {
 
 
 export interface PublicRuntimeConfig {
-  /** Cluster id and name */
-  CLUSTER_NAMES: { [clusterId: string]: string };
-
   ENABLE_CHANGE_PASSWORD: boolean;
 
   ENABLE_SHELL: boolean;
@@ -54,6 +51,9 @@ export interface PublicRuntimeConfig {
 
   CLUSTERS_CONFIG: {[cluster: string]: ClusterConfigSchema};
 
+  CLUSTERS: Cluster[];
+
+
   APPS: { id: string; name: string }[];
 
   SUBMIT_JOB_WORKING_DIR: string;
@@ -66,11 +66,10 @@ export const publicConfig: PublicRuntimeConfig = getConfig().publicRuntimeConfig
 
 export type Cluster = { id: string; name: string; }
 
-export const CLUSTERS: Cluster[] = Object.entries(publicConfig.CLUSTER_NAMES).map(([id, name]) => ({ id, name }));
-
-export const CLUSTERS_ID_MAP = CLUSTERS.reduce((prev, curr) => {
-  prev[curr.id] = curr;
-  return prev;
-}, {} as Record<string, Cluster>);
-
 export const CONFIG_PATH = process.env.NODE_ENV === "production" ? CONFIG_BASE_PATH : "config";
+
+export function clusterConfigToCluster(id: string): Cluster | undefined {
+  const config = publicConfig.CLUSTERS_CONFIG[id];
+
+  return config ? { id, name: config.displayName } : undefined;
+}

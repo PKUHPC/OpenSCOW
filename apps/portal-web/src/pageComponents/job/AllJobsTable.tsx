@@ -8,7 +8,7 @@ import { api } from "src/apis";
 import { JobInfo } from "src/clusterops/api/job";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
-import { Cluster, CLUSTERS } from "src/utils/config";
+import { Cluster, publicConfig } from "src/utils/config";
 import { defaultRanges, formatDateTime } from "src/utils/datetime";
 import { compareNumber } from "src/utils/math";
 
@@ -31,7 +31,7 @@ export const AllJobQueryTable: React.FC<Props> = ({
     return {
       time: [now.clone().subtract(1, "week"), now],
       jobId: undefined,
-      cluster: CLUSTERS[0],
+      cluster: publicConfig.CLUSTERS[0],
     };
   });
 

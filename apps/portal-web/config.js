@@ -59,7 +59,7 @@ const buildRuntimeConfig = async (phase) => {
 
   // load .env.build if in build
   if (building) {
-    require("dotenv").config({ path: "env/.env.build" });
+    return { serverRuntimeConfig: {}, publicRuntimeConfig: {} };
   }
 
   if (dev) {
@@ -82,20 +82,22 @@ const buildRuntimeConfig = async (phase) => {
   const uiConfig = getConfigFromFile(UiConfigSchema, UI_CONFIG_NAME, true, configPath);
   const portalConfig = getConfigFromFile(PortalConfigSchema, PORTAL_CONFIG_NAME, false, configPath);
 
-  // test if the root user can ssh to login nodes
   const keyPair = getKeyPair(config.SSH_PRIVATE_KEY_PATH, config.SSH_PUBLIC_KEY_PATH);
 
-  await Promise.all(Object.values(clusters).map(async ({ displayName, slurm: { loginNodes } }) => {
-    const node = loginNodes[0];
-    logger.info("Checking if root can login to %s by login node %s", displayName, node)
-    const error = await testRootUserSshLogin(node, keyPair, logger);
-    if (error) {
-      logger.info("Root cannot login to %s by login node %s. err: %o", displayName, node, error)
-      throw error;
-    } else {
-      logger.info("Root can login to %s by login node %s", displayName, node)
-    }
-  }));
+  // test if the root user can ssh to login nodes
+  if (production) {
+    await Promise.all(Object.values(clusters).map(async ({ displayName, slurm: { loginNodes } }) => {
+      const node = loginNodes[0];
+      logger.info("Checking if root can login to %s by login node %s", displayName, node)
+      const error = await testRootUserSshLogin(node, keyPair, logger);
+      if (error) {
+        logger.info("Root cannot login to %s by login node %s. err: %o", displayName, node, error)
+        throw error;
+      } else {
+        logger.info("Root can login to %s by login node %s", displayName, node)
+      }
+    }));
+  }
 
   /**
    * @type {import("./src/utils/config").ServerRuntimeConfig}
@@ -124,11 +126,6 @@ const buildRuntimeConfig = async (phase) => {
 
     ENABLE_CHANGE_PASSWORD: capabilities.changePassword,
 
-    CLUSTER_NAMES: Object.keys(clusters).reduce((prev, curr) => {
-      prev[curr] = clusters[curr].displayName;
-      return prev;
-    }, {}),
-
     ENABLE_SHELL: portalConfig.shell,
 
     ENABLE_JOB_MANAGEMENT: portalConfig.jobManagement,
@@ -146,6 +143,7 @@ const buildRuntimeConfig = async (phase) => {
     HOME_TITLES: portalConfig.homeTitle.hostnameMap,
 
     CLUSTERS_CONFIG: clusters,
+    CLUSTERS: Object.entries(clusters).map(([id, { displayName }]) => ({ id, name: displayName })),
 
     APPS: Object.entries(apps).map(([id, { name }]) => ({ id, name })),
 

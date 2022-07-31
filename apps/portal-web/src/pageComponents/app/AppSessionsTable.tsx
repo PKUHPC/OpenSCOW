@@ -8,7 +8,7 @@ import { AppSession } from "src/clusterops/api/app";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { ConnectTopAppLink } from "src/pageComponents/app/ConnectToAppLink";
-import { Cluster, CLUSTERS, publicConfig } from "src/utils/config";
+import { Cluster, publicConfig } from "src/utils/config";
 import { compareDateTime, formatDateTime } from "src/utils/datetime";
 import { compareNumber } from "src/utils/math";
 
@@ -26,7 +26,7 @@ export const AppSessionsTable: React.FC<Props> = () => {
 
   const [query, setQuery] = useState<FilterForm>(() => {
     return {
-      cluster: CLUSTERS[0],
+      cluster: publicConfig.CLUSTERS[0],
     };
   });
 

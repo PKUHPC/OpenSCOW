@@ -2,7 +2,7 @@ import { Form, Modal, Select } from "antd";
 import React, { useState } from "react";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
-import { Cluster, CLUSTERS, publicConfig } from "src/utils/config";
+import { Cluster, publicConfig } from "src/utils/config";
 import { openDesktop } from "src/utils/vnc";
 
 export interface Props {
@@ -16,9 +16,9 @@ interface ClusterInfo {
   wm: string;
 }
 
-const defaultWm = publicConfig.LOGIN_DESKTOP_WMS[0];
 
 export const NewDesktopTableModal: React.FC<Props> = ({ visible, onClose, reload }) => {
+  const defaultWm = publicConfig.LOGIN_DESKTOP_WMS[0];
 
   const [form] = Form.useForm<ClusterInfo>();
   const [submitting, setSubmitting] = useState(false);
@@ -59,7 +59,7 @@ export const NewDesktopTableModal: React.FC<Props> = ({ visible, onClose, reload
       confirmLoading={submitting}
       onCancel={onClose}
     >
-      <Form form={form} initialValues={{ cluster: CLUSTERS[0], wm: defaultWm.wm }} onFinish={onOk}>
+      <Form form={form} initialValues={{ cluster: publicConfig.CLUSTERS[0], wm: defaultWm.wm }} onFinish={onOk}>
         <Form.Item
           label="集群"
           name="cluster"

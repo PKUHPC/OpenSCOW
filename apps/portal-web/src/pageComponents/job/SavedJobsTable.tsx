@@ -7,7 +7,7 @@ import type { SavedJob } from "src/clusterops/api/job";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import type { Cluster } from "src/utils/config";
-import { CLUSTERS } from "src/utils/config";
+import { publicConfig } from "src/utils/config";
 import { compareDateTime, formatDateTime } from "src/utils/datetime";
 
 interface Props {}
@@ -20,7 +20,7 @@ export const SavedJobsTable: React.FC<Props> = () => {
 
   const [query, setQuery] = useState<FilterForm>(() => {
     return {
-      cluster: CLUSTERS[0],
+      cluster: publicConfig.CLUSTERS[0],
     };
   });
 

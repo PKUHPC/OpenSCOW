@@ -1,7 +1,7 @@
 import { Button } from "antd";
 import { NextPage } from "next";
 import { requireAuth } from "src/auth/requireAuth";
-import { CLUSTERS } from "src/utils/config";
+import { publicConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
 
 export const ShellIndexPage: NextPage = requireAuth(() => true)(() => {
@@ -11,7 +11,7 @@ export const ShellIndexPage: NextPage = requireAuth(() => true)(() => {
       <h1>
         启动以下集群的终端：
       </h1>
-      {CLUSTERS.map(({ id, name }) => (
+      {publicConfig.CLUSTERS.map(({ id, name }) => (
         <a key={id} href={`/shell/${id}`} target="__blank">
           <Button>
             {name}

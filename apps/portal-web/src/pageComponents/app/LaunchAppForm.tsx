@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { AccountSelector } from "src/pageComponents/job/AccountSelector";
-import { Cluster, CLUSTERS, publicConfig } from "src/utils/config";
+import { Cluster, publicConfig } from "src/utils/config";
 import { firstPartition, getPartitionInfo } from "src/utils/jobForm";
 
 interface Props {
@@ -59,7 +59,7 @@ export const LaunchAppForm: React.FC<Props> = ({ appId }) => {
 
   // set default
   useEffect(() => {
-    const defaultCluster = CLUSTERS[0];
+    const defaultCluster = publicConfig.CLUSTERS[0];
 
     if (defaultCluster) {
       const [partition, info] = firstPartition(defaultCluster);
