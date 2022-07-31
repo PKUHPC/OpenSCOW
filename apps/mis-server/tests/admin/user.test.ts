@@ -9,7 +9,6 @@ import { User } from "src/entities/User";
 import { UserAccount, UserRole, UserStatus } from "src/entities/UserAccount";
 import { UserServiceClient } from "src/generated/server/user";
 import { reloadEntity } from "src/utils/orm";
-jest.mock("src/utils/ssh");
 import { insertInitialData } from "tests/data/data";
 import { dropDatabase } from "tests/data/helpers";
 import { fetch } from "undici";
