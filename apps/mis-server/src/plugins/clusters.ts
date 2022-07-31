@@ -32,17 +32,19 @@ const clusterOpsMaps = {
 
 export const clustersPlugin = plugin(async (f) => {
 
-  await Promise.all(Object.values(clusters).map(async ({ displayName, slurm: { loginNodes } }) => {
-    const node = loginNodes[0];
-    f.logger.info("Checking if root can login to %s by login node %s", displayName, node);
-    const error = await testRootUserSshLogin(node, rootKeyPair, f.logger);
-    if (error) {
-      f.logger.info("Root cannot login to %s by login node %s. err: %o", displayName, node, error);
-      throw error;
-    } else {
-      f.logger.info("Root can login to %s by login node %s", displayName, node);
-    }
-  }));
+  if (process.env.NODE_ENV === "production") {
+    await Promise.all(Object.values(clusters).map(async ({ displayName, slurm: { loginNodes } }) => {
+      const node = loginNodes[0];
+      f.logger.info("Checking if root can login to %s by login node %s", displayName, node);
+      const error = await testRootUserSshLogin(node, rootKeyPair, f.logger);
+      if (error) {
+        f.logger.info("Root cannot login to %s by login node %s. err: %o", displayName, node, error);
+        throw error;
+      } else {
+        f.logger.info("Root can login to %s by login node %s", displayName, node);
+      }
+    }));
+  }
 
   const opsForClusters = Object.entries(clusters).reduce((prev, [cluster, c]) => {
     const ops = clusterOpsMaps[(c.scheduler as keyof typeof clusterOpsMaps)](cluster, f.logger);
