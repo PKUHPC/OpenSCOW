@@ -1,5 +1,5 @@
 import { loggedExec } from "@scow/lib-ssh";
-import moment from "moment-timezone";
+import moment from "moment";
 import { NodeSSH } from "node-ssh";
 import { JobInfo } from "src/clusterops/api/job";
 import { RunningJob } from "src/generated/common/job";
@@ -38,15 +38,28 @@ export async function querySqueue(ssh: NodeSSH, logger: Logger, params: string[]
   return jobs;
 }
 
+function applyOffset(time: moment.Moment, tz: string): moment.Moment {
+  // tz is of format +08:00
+
+  const [h, m] = tz.substring(1).split(":");
+
+  const sign = tz[0];
+  if (sign === "+") {
+    return time.add(+h, "hours").add(+m, "minutes");
+  } else {
+    return time.subtract(+h, "hours").subtract(+m, "minutes");
+  }
+
+}
+
 function formatTime(time: Date, tz: string) {
-  return moment(time).tz(tz).format("YYYY-MM-DD[T]HH:mm:ss");
+  return applyOffset(moment(time), tz).format("YYYY-MM-DD[T]HH:mm:ss");
 }
 
 export async function querySacct(ssh: NodeSSH, logger: Logger, startTime: Date, endTime: Date) {
 
   // get target timezone
-  const { stdout } = await loggedExec(ssh, logger, true, "date", ["+%:z"]);
-  const tz = "UTC" + stdout;
+  const { stdout: tz } = await loggedExec(ssh, logger, true, "date", ["+%:z"]);
 
   const result = await loggedExec(ssh, logger, true,
     "sacct",

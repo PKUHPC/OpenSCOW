@@ -1,5 +1,6 @@
 FROM node:gallium-alpine@sha256:1908564153449b1c46b329e6ce2307e226bc566294f822f11c5a8bcef4eeaad7 AS builder
 
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.tuna.tsinghua.edu.cn/g' /etc/apk/repositories
 RUN apk update && apk add libc6-compat python3 make gcc g++
 
 RUN corepack enable
@@ -39,6 +40,7 @@ RUN rm -rf node_modules && pnpm i --prod --frozen-lockfile --offline
 
 FROM node:gallium-alpine@sha256:1908564153449b1c46b329e6ce2307e226bc566294f822f11c5a8bcef4eeaad7 AS runner
 
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.tuna.tsinghua.edu.cn/g' /etc/apk/repositories
 RUN apk add --no-cache openssh-client
 
 WORKDIR /app
