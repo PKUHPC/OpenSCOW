@@ -63,12 +63,18 @@ git clone --depth=1 https://%GIT_PLATFORM%.com/%ORGANIZATION_NAME%/scow-deployme
 cd scow-deployment
 ```
 
-## 修改.env文件
+## 准备配置文件
 
-在根目录下根据模板`.env.example`创建`.env`文件，并打开它，根据内部备注提示修改配置。
+运行以下命令从示例生成配置文件
 
 ```bash
+cp -r config-example config
 cp .env.example .env
+```
+
+打开`.env`，根据内部备注提示修改基础配置。
+
+```bash
 vim .env
 ```
 
