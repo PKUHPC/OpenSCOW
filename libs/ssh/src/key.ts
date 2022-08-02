@@ -50,7 +50,7 @@ export async function insertKey(
     `;
 
 
-  logger.info("Adding key to user %s to %s", host);
+  logger.info("Adding key to user %s to %s", user, host);
 
   await sshConnect(host, "root", rootKeyPair, logger, async (ssh) => {
     const homeDir = await ssh.execCommand(`eval echo ~${user}`);

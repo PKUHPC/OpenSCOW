@@ -29,11 +29,11 @@ export async function sshRawConnect(address: string, username: string, rootKeyPa
     await connect();
   } catch (e) {
     if (username === "root") {
-      logger.info("Login to %s as %s failed.");
+      logger.info("Login to %s as %s failed.", host, username);
       throw e;
     }
 
-    logger.info("Login to %s as %s failed. Try inserting public key", username);
+    logger.info("Login to %s as %s failed. Try inserting public key", host, username);
     await insertKey(username, address, rootKeyPair, logger);
     await connect();
   }
