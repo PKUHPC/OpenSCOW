@@ -73,6 +73,10 @@ export async function querySacct(ssh: NodeSSH, logger: Logger, startTime: Date, 
     ],
   );
 
+  if (result.stdout.length === 0) {
+    return [];
+  }
+
   const jobs = result.stdout.split("\n").map((x) => {
     const [
       jobId, name, account, partition, qos, state,
