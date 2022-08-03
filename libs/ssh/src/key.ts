@@ -9,8 +9,8 @@ export interface KeyPair {
 
 export function getKeyPair(privateKeyPath: string, publicKeyPath: string): KeyPair {
   return {
-    privateKey: fs.readFileSync(privateKeyPath, "utf-8"),
-    publicKey: fs.readFileSync(publicKeyPath, "utf-8"),
+    privateKey: fs.readFileSync(privateKeyPath, "utf-8").trim(),
+    publicKey: fs.readFileSync(publicKeyPath, "utf-8").trim(),
   };
 }
 
@@ -45,7 +45,7 @@ export async function insertKey(
     fi
 
     if ! grep -q "${rootKeyPair.publicKey}" "${homeDir}/.ssh/authorized_keys"; then
-      echo "${rootKeyPair.publicKey}" >> "${homeDir}/.ssh/authorized_keys"
+      echo -e "${rootKeyPair.publicKey}\n" >> "${homeDir}/.ssh/authorized_keys"
     fi
     `;
 
