@@ -48,7 +48,7 @@ web:
     method: POST
     path: /login
     formData:
-      password: "{PASSWORD}"
+      password: "{{ PASSWORD }}"
 ```
 
 增加了此文件后，运行以下命令重启job-server和portal-web即可
@@ -81,5 +81,5 @@ docker compose restart portal-web job-server
 
 ### `connect`
 
-`connect`部分定义如何连接到应用。我们推荐将应用使用密码方式进行加密，所以一般在连接时需要将密码输入给应用。具体如何连接应用和应用本身有关。`connect`的`path`, `query`和`formData`部分可以使用`{PASSWORD}`代替应用在创建时生成的密码。
+`connect`部分定义如何连接到应用。我们推荐将应用使用密码方式进行加密，所以一般在连接时需要将密码输入给应用。具体如何连接应用和应用本身有关。`connect`的`path`, `query`和`formData`部分可以使用`{{ PASSWORD }}`代替应用在创建时生成的密码。
 

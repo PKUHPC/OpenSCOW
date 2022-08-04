@@ -34,7 +34,7 @@ export const PortalConfigSchema = Type.Object({
   shell: Type.Boolean({ description: "是否启用终端功能", default: true }),
 
   submitJobDefaultPwd: Type.String({
-    description: "提交作业的默认工作目录。使用{name}代替作业名称。相对于用户的家目录", default: "scow/jobs/{name}" }),
+    description: "提交作业的默认工作目录。使用{{ name }}代替作业名称。相对于用户的家目录", default: "scow/jobs/{{ name }}" }),
 
   savedJobsDir: Type.String({ description: "将保存的作业保存到什么位置。相对于用户家目录", default: "scow/savedJobs" }),
 

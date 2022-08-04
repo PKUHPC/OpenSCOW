@@ -49,7 +49,7 @@ LDAP认证系统支持的功能如下表：
 | sn                              | 用户名                                                 |
 | loginShell                      | /bin/bash                                              |
 | objectClass                     | ["inetOrgPerson", "posixAccount", "shadowAccount"]     |
-| homeDirectory                   | `ldap.addUser.homeDir`，其中的`{username}`替换为用户名 |
+| homeDirectory                   | `ldap.addUser.homeDir`，其中的`{{ username }}`替换为用户名 |
 | uidNumber                       | 数据库中的用户项的id + `ldap.addUsaer.uidStart`        |
 | gidNumber                       | 数据库中的用户项的id + `ldap.addUser.uidStart`         |
 | `ldap.attrs.mail`（如果设置了） | 用户的邮箱                                             |

@@ -57,8 +57,8 @@ export const MisConfigSchema = Type.Object({
   changeJobPriceType: Type.String({ description: "修改作业费用时所使用的付款/充值类型", default: "作业费用更改" }),
 
   jobChargeComment: Type.String({
-    description: "给作业扣费时，扣费项的备注。可以使用{price}使用作业信息中的字段。字段参考src/entities/JobInfo",
-    default: "集群: {cluster}，作业ID：{idJob}",
+    description: "给作业扣费时，扣费项的备注。可以使用{{ 属性名 }}使用作业信息中的属性。字段参考src/entities/JobInfo",
+    default: "集群: {{ cluster }}，作业ID：{{ idJob }}",
   }),
 });
 
