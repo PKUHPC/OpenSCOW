@@ -2,9 +2,13 @@ import { parseArray, parseKeyValue, parsePlaceholder } from "src/parse";
 
 it.each([
   ["123", {}, "123"],
-  ["123{a}123", {}, "123123"],
-  ["123{a}123", { a: "4" }, "1234123"],
-  ["123{a123_4}", { a123_4: "haha " }, "123haha "],
+  ["123{{ a }}123", {}, "123123"],
+  ["123{{ a }}123", { a: "4" }, "1234123"],
+  ["1{23{{ a123_4 }}", { a123_4: "haha " }, "1{23haha "],
+  ["123{a}", { a: "haha" }, "123{a}"],
+  ["123{{a}}", { a: "haha" }, "123{{a}}"],
+  ["123{{a }}", { a: "haha" }, "123{{a }}"],
+  ["123{{ a }}123{{ b }}{{ a }}", { a: "aaa", b: "bbb" }, "123aaa123bbbaaa"],
 ])("parses placeholder %p with %p to %p", (str: string, obj: object, expected: string) => {
   expect(parsePlaceholder(str, obj)).toBe(expected);
 });
