@@ -69,8 +69,8 @@ homeText:
 # 是否启用终端功能
 shell: true
 
-# 提交作业的默认工作目录。使用{name}代替作业名称。相对于用户的家目录
-# submitJobDefaultPwd: scow/jobs/{name}
+# 提交作业的默认工作目录。使用{{ name }}代替作业名称。相对于用户的家目录
+# submitJobDefaultPwd: scow/jobs/{{ name }}
 
 # 将保存的作业保存到什么位置。相对于用户家目录
 # savedJobsDir: scow/savedJobs
