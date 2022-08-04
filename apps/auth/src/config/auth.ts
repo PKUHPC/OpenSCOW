@@ -12,7 +12,10 @@ export const LdapConfigSchema = Type.Object({
   addUser: Type.Object({
     userBase: Type.String({ description: "LDAP增加用户节点时，把用户增加到哪个节点下" }),
     groupBase: Type.String({ description: "LDAP增加用户对应的组时，把组节点增加到哪个节点下" }),
-    homeDir: Type.String({ description: "LDAP增加用户时，用户的homeDirectory值。使用{userId}代替新用户的用户名", default: "/nfs/{userId}" }),
+    homeDir: Type.String({
+      description: "LDAP增加用户时，用户的homeDirectory值。使用{{ userId }}代替新用户的用户名",
+      default: "/nfs/{{ userId }}",
+    }),
     userToGroup: Type.Optional(Type.String({ description: "LDAP增加用户时，应该把用户增加到哪个Group下。如果不填，创建用户后不会增加用户到Group" })),
     uidStart: Type.Integer({
       description: "LDAP创建用户时，uid从多少开始。生成的用户的uid等于此值加上用户账户中创建的用户ID。创建的Group的gid和uid和此相同。",
@@ -20,13 +23,13 @@ export const LdapConfigSchema = Type.Object({
     }),
     extraProps: Type.Optional(
       Type.Record(
-        Type.String(), 
-        Type.Union([Type.String(), Type.Array(Type.String())]), 
+        Type.String(),
+        Type.Union([Type.String(), Type.Array(Type.String())]),
         { description: `
           LDAP增加用户时，用户项除了id、name和mail，还应该添加哪些属性
           如果这里出现了uid, name或email同名的属性，这里的值将替代用户输入的值。
-          属性值支持使用 {LDAP属性值key} 格式来使用用户填入的值。
-          例如：LDAP_ATTR_NAME=cn, LDAP_ADD_ATTRS=sn={cn}，那么添加时将会增加一个sn项，其值为cn项，即为用户输入的姓名
+          属性值支持使用 {{ LDAP属性值key }} 格式来使用用户填入的值。
+          例如：{ sn: "{{ cn }}" }，那么添加时将会增加一个sn属性，其值为cn的属性，即为用户输入的姓名
         `,
         })),
   }, { description: "添加用户的配置" }),
