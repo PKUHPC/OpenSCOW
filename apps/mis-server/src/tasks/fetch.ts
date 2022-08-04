@@ -4,6 +4,7 @@ import { Status } from "@grpc/grpc-js/build/src/constants";
 import { MikroORM, QueryOrder } from "@mikro-orm/core";
 import { MariaDbDriver } from "@mikro-orm/mariadb";
 import { SqlEntityManager } from "@mikro-orm/mysql";
+import { parsePlaceholder } from "@scow/config";
 import { charge } from "src/bl/charging";
 import { misConfig } from "src/config/mis";
 import { Account } from "src/entities/Account";
@@ -12,7 +13,6 @@ import { OriginalJob } from "src/entities/OriginalJob";
 import { UserAccount } from "src/entities/UserAccount";
 import { ClusterPlugin } from "src/plugins/clusters";
 import { PricePlugin } from "src/plugins/price";
-import { parseCommentPlaceholder } from "src/utils/parse";
 
 export const createSourceDbOrm = async (logger: Logger) => {
   logger.info("Connecting to source db.");
@@ -173,7 +173,7 @@ export async function fetchJobs(
             };
           }
 
-          const comment = parseCommentPlaceholder(misConfig.jobChargeComment, x);
+          const comment = parsePlaceholder(misConfig.jobChargeComment, x);
 
           // charge account
           await charge({
