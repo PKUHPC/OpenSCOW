@@ -51,10 +51,10 @@ web:
       password: "{{ PASSWORD }}"
 ```
 
-增加了此文件后，运行以下命令重启job-server和portal-web即可
+增加了此文件后，运行以下命令重启job-server即可。
 
 ```bash
-docker compose restart portal-web job-server
+docker compose restart portal-web
 ```
 
 ## 配置解释
@@ -81,5 +81,18 @@ docker compose restart portal-web job-server
 
 ### `connect`
 
-`connect`部分定义如何连接到应用。我们推荐将应用使用密码方式进行加密，所以一般在连接时需要将密码输入给应用。具体如何连接应用和应用本身有关。`connect`的`path`, `query`和`formData`部分可以使用`{{ PASSWORD }}`代替应用在创建时生成的密码。
+`connect`部分定义如何连接到应用。系统将会给可以连接的应用创建一个用于连接应用的a标签。点击a标签之后，系统将会打开一个新标签页，打开新标签页时实际进行的动作将可以在这里自定义。
+
+配置如下：
+
+| 属性       | 类型                 | 是否必填 | 解释                                          |
+| ---------- | -------------------- | -------- | --------------------------------------------- |
+| `path`     | 字符串               | 是       | 新标签页所访问的相对路径                      |
+| `method`   | "GET" 或者 "POST"    | 是       | 发起一个什么的HTTP请求                        |
+| `query`    | 字符串到字符串的字典 | 否       | 连接时附带的query                             |
+| `formData` | 字符串到字符串的字典 | 否       | 如果`method`是POST，这个请求将会带的form data |
+
+
+我们推荐将应用使用密码方式进行加密，所以一般在连接时需要将密码输入给应用。`path`, `query`的值和`formData`的值部分可以使用`{{ PASSWORD }}`代替应用在创建时生成的密码。
+
 

@@ -96,5 +96,5 @@ docker compose up -d
 当修改了配置文件后，运行以下命令重启系统
 
 ```bash
-docker compose restart -d
+docker compose restart
 ```

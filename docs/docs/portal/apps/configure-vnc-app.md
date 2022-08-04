@@ -43,10 +43,10 @@ vnc:
 
 ```
 
-增加了此文件后，运行以下命令重启job-server和portal-web即可
+增加了此文件后，运行以下命令重启job-server即可。
 
 ```bash
-docker compose restart portal-web job-server
+docker compose restart portal-web
 ```
 
 ## 配置解释
