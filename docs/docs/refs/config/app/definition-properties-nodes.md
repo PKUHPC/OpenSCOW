@@ -1,0 +1,3 @@
+## nodes Type
+
+`string[]`

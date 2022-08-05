@@ -1,0 +1,3 @@
+## patternProperties Type
+
+unknown

@@ -1,0 +1,3 @@
+## dbPassword Type
+
+`string`

@@ -1,0 +1,3 @@
+## beforeScript Type
+
+`string`

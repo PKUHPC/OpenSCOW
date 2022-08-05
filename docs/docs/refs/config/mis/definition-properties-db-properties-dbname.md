@@ -1,0 +1,3 @@
+## dbName Type
+
+`string`

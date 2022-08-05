@@ -1,0 +1,3 @@
+## managerUrl Type
+
+`string`

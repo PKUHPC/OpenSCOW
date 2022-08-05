@@ -1,0 +1,3 @@
+## defaultText Type
+
+`string`

@@ -1,0 +1,3 @@
+## misUrl Type
+
+`string`

@@ -1,0 +1,3 @@
+## debug Type
+
+`boolean`

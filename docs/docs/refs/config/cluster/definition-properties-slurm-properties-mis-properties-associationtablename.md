@@ -1,0 +1,3 @@
+## associationTableName Type
+
+`string`

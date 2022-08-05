@@ -1,0 +1,3 @@
+## wm Type
+
+`string`

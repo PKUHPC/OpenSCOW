@@ -1,0 +1,3 @@
+## xstartup Type
+
+`string`

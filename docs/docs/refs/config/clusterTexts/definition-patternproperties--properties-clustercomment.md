@@ -1,0 +1,3 @@
+## clusterComment Type
+
+`string`

@@ -1,0 +1,3 @@
+## startIndex Type
+
+`integer`
