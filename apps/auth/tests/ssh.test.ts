@@ -19,7 +19,7 @@ afterEach(async () => {
   await server.close();
 });
 
-it("logs in to the ssh login", async () => {
+it.only("logs in to the ssh login", async () => {
 
   const callbackUrl = "/callback";
 
@@ -37,7 +37,7 @@ it("logs in to the ssh login", async () => {
   });
 
   expect(resp.statusCode).toBe(302);
-  expect(resp.headers.location).toBe(callbackUrl);
+  expect(resp.headers.location).toStartWith(callbackUrl + "?");
 });
 
 it("fails to login with wrong credentials", async () => {

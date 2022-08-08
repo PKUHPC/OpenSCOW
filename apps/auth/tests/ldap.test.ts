@@ -113,6 +113,7 @@ it("should login with correct username and password", async () => {
     });
 
     expect(resp.statusCode).toBe(302);
+    expect(resp.headers.location).toStartWith(callbackUrl + "?");
   }
 });
 
