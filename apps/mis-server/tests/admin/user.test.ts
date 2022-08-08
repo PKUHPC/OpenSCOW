@@ -79,7 +79,7 @@ it("cannot create user if userId exists", async () => {
   const email = "test@test.com";
 
   const user = new User({ name, userId, email, tenant });
-  await server.ext.orm.em.persistAndFlush(user);
+  await server.ext.orm.em.fork().persistAndFlush(user);
 
   const reply = await asyncClientCall(client, "createUser", {
     name, identityId: userId, email, tenantName: tenant.name, password,
@@ -89,7 +89,7 @@ it("cannot create user if userId exists", async () => {
 });
 
 it("cannot remove owner from account", async () => {
-  const data = await insertInitialData(server.ext.orm.em);
+  const data = await insertInitialData(server.ext.orm.em.fork());
 
   const reply = await asyncClientCall(client, "removeUserFromAccount", {
     tenantName: data.tenant.name,
@@ -101,7 +101,8 @@ it("cannot remove owner from account", async () => {
 });
 
 it("deletes user", async () => {
-  const data = await insertInitialData(server.ext.orm.em);
+  const em = server.ext.orm.em.fork();
+  const data = await insertInitialData(em);
 
   const user = new User({
     name: "test", userId: "test", email: "test@test.com",
@@ -111,9 +112,9 @@ it("deletes user", async () => {
     user, account: data.accountA, role: UserRole.USER, status: UserStatus.BLOCKED,
   }));
 
-  await server.ext.orm.em.persistAndFlush([user]);
+  await em.persistAndFlush([user]);
 
-  const em = server.ext.orm.em.fork();
+  em.clear();
 
   expect(await em.count(UserAccount, { account: data.accountA })).toBe(3);
   expect(await em.count(User, { tenant: data.tenant })).toBe(3);
@@ -130,7 +131,7 @@ it("deletes user", async () => {
 });
 
 it("cannot delete owner", async () => {
-  const data = await insertInitialData(server.ext.orm.em);
+  const data = await insertInitialData(server.ext.orm.em.fork());
 
   const reply = await asyncClientCall(client, "deleteUser", {
     tenantName: data.tenant.name,

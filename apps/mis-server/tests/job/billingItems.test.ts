@@ -198,7 +198,7 @@ it("adds billing item to another tenant", async () => {
 
 it("calculates price", async () => {
 
-  const priceMap = await createPriceMap(orm.em, server.logger);
+  const priceMap = await createPriceMap(orm.em.fork(), server.logger);
 
 
   // obtain test data by running the following data in db
