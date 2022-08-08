@@ -28,10 +28,10 @@
     "@scow/config": "workspace:*",
     "@scow/lib-decimal": "workspace:*",
     "@scow/lib-ssh": "workspace:*",
-    "@sinclair/typebox": "0.24.22",
+    "@sinclair/typebox": "0.24.27",
     "dotenv": "16.0.1",
     "node-cron": "3.0.1",
-    "undici": "5.8.0",
+    "undici": "5.8.1",
     "uuid": "8.3.2",
     "wait-on": "6.0.1"
   },
