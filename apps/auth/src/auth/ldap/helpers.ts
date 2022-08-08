@@ -16,6 +16,7 @@ export const useLdap = (
 
     return await consume(client).finally(() => {
       client.destroy();
+      logger.info("Disconnected LDAP connection.");
     });
   };
 };
@@ -72,7 +73,7 @@ export const searchOne = async <T>(
   });
 };
 
-export const findUser = async (logger: FastifyLoggerInstance, 
+export const findUser = async (logger: FastifyLoggerInstance,
   config: LdapConfigSchema, client: ldapjs.Client, id: string) => {
   return await searchOne(logger, client, config.searchBase,
     {
@@ -82,7 +83,7 @@ export const findUser = async (logger: FastifyLoggerInstance,
           ldapjs.parseFilter(config.userFilter),
           new ldapjs.EqualityFilter({
             attribute: config.attrs.uid,
-            value: id, 
+            value: id,
           })],
       }),
     }, (e) => extractUserInfoFromEntry(config, e),

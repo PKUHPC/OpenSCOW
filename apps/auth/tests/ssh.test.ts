@@ -2,6 +2,7 @@ process.env.AUTH_TYPE = "ssh";
 
 import { FastifyInstance } from "fastify";
 import { buildApp } from "src/app";
+import { createFormData } from "tests/utils";
 
 const username = "test";
 const password = "test";
@@ -22,35 +23,39 @@ it("logs in to the ssh login", async () => {
 
   const callbackUrl = "/callback";
 
-  const formData = new URLSearchParams();
-  formData.append("username", username);
-  formData.append("password", password);
-  formData.append("callbackUrl", callbackUrl);
+  const { payload, headers } = createFormData({
+    username: username,
+    password: password,
+    callbackUrl: callbackUrl,
+  });
 
   const resp = await server.inject({
     method: "POST",
     path: "/public/auth",
-    payload: formData.toString(),
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    payload,
+    headers,
   });
 
   expect(resp.statusCode).toBe(302);
+  expect(resp.headers.location).toBe(callbackUrl);
 });
 
 it("fails to login with wrong credentials", async () => {
 
   const callbackUrl = "/callback";
 
-  const formData = new URLSearchParams();
-  formData.append("username", username);
-  formData.append("password", password.repeat(2));
-  formData.append("callbackUrl", callbackUrl);
+
+  const { payload, headers } = createFormData({
+    username: username,
+    password: password + "a",
+    callbackUrl: callbackUrl,
+  });
 
   const resp = await server.inject({
     method: "POST",
     path: "/public/auth",
-    payload: formData.toString(),
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    payload,
+    headers,
   });
 
   expect(resp.statusCode).toBe(403);
