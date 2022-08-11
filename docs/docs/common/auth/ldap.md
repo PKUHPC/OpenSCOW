@@ -65,11 +65,9 @@ LDAP认证系统支持的功能如下表：
 
 4. 设置新用户的密码为用户输入的密码
 
-## 安装并配置LDAP认证服务
+## 配置LDAP认证服务
 
-### 编写配置文件
-
-在配置文件目录中创建文件`config/auth.yml`，并输入以下内容：
+在`config/auth.yml`中输入以下内容，并根据情况配置。
 
 ```yaml title="config/auth.yml"
 # 指定使用认证类型为LDAP
@@ -77,38 +75,58 @@ authType: ldap
 
 # 在此部分输入LDAP的配置
 ldap:
+  # LDAP服务器地址。必填
+  url: ldap://LDAP服务器地址
 
+  # 进行LDAP操作的用户DN。默认为空
+  # bindDN: ""
+  # 进行LDAP操作的用户密码。默认为空
+  # bindPassword: ""
+
+  # 在哪个节点下搜索要登录的用户。默认为空
+  # searchBase: ""
+  # 搜索登录用户时的筛选器。必填
+  userFilter: "(uid=*)"
+
+  # 添加用户的相关配置。必填
+  addUser:
+    # 增加用户节点时，把用户增加到哪个节点下
+    userBase: "ou=People,ou={ou},o={dn}"
+    # 增加用户节点时，把用户对应的组增加到哪个节点下
+    groupBase: "ou=Group,ou={ou},o={dn}"
+
+    # 用户的homeDirectory值。使用{{ userId }}代替新用户的用户名。默认如下
+    homeDir: /nfs/{{ userId }}
+
+    # 是否应该把新用户加到哪个LDAP组下。如果不填，则不加
+    # userToGroup: group
+
+    # uid从多少开始。生成的用户的uid等于此值加上用户账户中创建的用户ID。创建的Group的gid和uid和此相同。
+    # 默认如下
+    # uidStart: 66000
+
+    # 用户项除了id、name和mail，还应该添加哪些属性。类型是个dict
+    # 如果这里出现了名为uid, name或email的属性，这里的值将替代用户输入的值。
+    # 属性值支持使用 {{ LDAP属性值key }} 格式来使用用户填入的值。
+    # 例如：{ sn: "{{ cn }}" }，那么添加时将会增加一个sn属性，其值为cn的属性，即为用户输入的姓名
+    # extraProps: 
+    #   key: value
+
+  # 属性映射
+  attrs:
+    # LDAP中对应用户ID的属性名
+    uid: uid
+    # LDAP中用户对应的组的实体表示用户ID的属性名
+    groupUserId: cn
+    # 此字段用于在创建用户的时候把姓名信息填入LDAP，以及验证ID和姓名是否匹配。
+    # 如果不填写，则系统将不会验证ID和姓名是否匹配，且不会再创建用户的时候把姓名信息填入LDAP。
+    # name: cn
+
+    # LDAP中对应用户的邮箱的属性名。可不填。此字段只用于在创建用户的时候把邮件信息填入LDAP。
+    # mail: mail
 ```
 
-接下来的的配置将需要写入到此文件的`ldap`部分中。
-
-### 部署redis
-
-LDAP认证系统将认证信息存放在redis中，所以在部署认证系统之前需要先部署redis。
-
-在`docker-compose.yml`的`services`块中添加以下条目:
-
-```yaml title=docker-compose.yml
-  redis:
-    image: redis:alpine
-    restart: unless-stopped
-```
-
-运行`docker compose up -d`启动redis。
-
-### 部署认证服务
-
-在`docker-compose.yml`的`services`块中添加以下条目:
-
-```yaml title=docker-compose.yml
-  auth:
-    image: %CR_URL%/auth
-    restart: unless-stopped
-    volumes:
-      - ./config:/etc/scow
-```
-
-增加好配置后，运行`docker compose up -d`启动认证系统。
+增加好配置后，运行`docker compose restart`重启系统即可。
 
 ## LDAP快速配置脚本
 
@@ -121,19 +139,25 @@ LDAP认证系统将认证信息存放在redis中，所以在部署认证系统�
 
 如果您使用provider.sh脚本配置您的服务器，您的LDAP相关配置为如下。其中`{变量}`替换为provider.sh中的对应变量值。
 
-```yaml
-      AUTH_TYPE: ldap
-      LDAP_URL: ldap://LDAP服务器地址
-      LDAP_BIND_DN: cn=Manager,ou={ou},o={dn}
-      LDAP_BIND_PASSWORD: {adminPasswd}
-      LDAP_SEARCH_BASE: "ou={ou},o={dn}"
-      LDAP_FILTER: "(uid=*)"
-      LDAP_ADD_USER_BASE: "ou=People,ou={ou},o={dn}"
-      LDAP_ADD_GROUP_BASE: "ou=Group,ou={ou},o={dn}"
-      LDAP_ATTR_UID: uid
-      LDAP_ATTR_GROUP_USER_ID: cn
-      LDAP_ATTR_NAME: cn
-      LDAP_ATTR_MAIL: mail
+```yaml title="config/auth.yml"
+
+# ...其他配置
+
+authType: ldap
+ldap:
+  url: ldap://LDAP服务器地址
+  bindDN: cn=Manager,ou={ou},o={dn}
+  bindPassword: {adminPasswd}
+  searchBase: "ou={ou},o={dn}"
+  userFilter: "(uid=*)"
+  addUser:
+    userBase: "ou=People,ou={ou},o={dn}"
+    groupBase: "ou=Group,ou={ou},o={dn}"
+  attrs:
+    uid: uid
+    groupUserId: cn
+    name: cn
+    mail: mail
 ```
 
 ## LDAP镜像

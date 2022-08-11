@@ -18,46 +18,15 @@ SSH认证方式所支持的功能如下表：
 | 用户名和姓名验证 | 否       |
 | 修改密码         | 否       |
 
-## 安装并配置SSH认证服务
-
-### 编写配置文件
+## 配置SSH认证服务
 
 SSH认证方式要求编写好[集群配置文件](../clusterConfig.md)，并且确保其中第一个集群有至少一个登录节点。
 
-在配置文件目录中创建文件`config/auth.yml`，并输入以下内容：
+在`config/auth.yml`中输入以下内容：
 
 ```yaml title="config/auth.yml"
 # 指定使用认证类型为SSH
 authType: ssh
 ```
 
-### 部署redis
-
-LDAP认证系统将认证信息存放在redis中，所以在部署认证系统之前需要先部署redis。
-
-在`docker-compose.yml`的`services`块中添加以下条目:
-
-```yaml title=docker-compose.yml
-  redis:
-    image: redis:alpine
-    restart: unless-stopped
-    ports:
-      - 6379:6379
-```
-
-运行`docker compose up -d`启动redis。
-
-### 部署并配置SSH认证服务
-
-在`docker-compose.yml`的`services`块中添加以下条目:
-
-```yaml title=docker-compose.yml
-  auth:
-    image: %CR_URL%/auth
-    restart: unless-stopped
-    volumes:
-      - ./config:/etc/scow
-      
-```
-
-增加好配置后，运行`docker compose up -d`启动认证系统即可。
+增加好配置后，运行`docker compose restart`重启系统即可。
