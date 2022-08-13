@@ -50,6 +50,7 @@ pnpm i
 pnpm prepareDev
 ```
 
+
 ### 为什么不采用其他monorepo管理方案？
 
 - npm workspace：
@@ -58,6 +59,18 @@ pnpm prepareDev
 - yarn workspace：新版本berry和volta的兼容性不好([issue](https://github.com/volta-cli/volta/issues/651))，yarn的workspaces的foreach命令需要单独装插件，而且foreach命令不会交互式地输出结果
 - nx: 尝试迁移过去好几次了，但是感觉概念有点太复杂了……
 - lerna: 很久没更新了，删除依赖需要删掉包的node_modules然后重新bootstrap，麻烦
+
+## 测试开发环境
+
+我们使用docker搭建了一套简单的开发环境，可以用来跑一些项目的测试。具体开发环境请参考[docker-compose.dev.yml](../../../dev/docker-compose.dev.yml)。
+
+```bash
+# 构建并启动开发环境
+pnpm prepareDev
+
+# 运行测试
+pnpm test
+```
 
 ## 容器构建说明
 
