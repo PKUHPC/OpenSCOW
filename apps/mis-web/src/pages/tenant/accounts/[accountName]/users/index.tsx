@@ -45,7 +45,7 @@ export const AccountUsersPage: NextPage = requireAuth(
         <Head title={title} />
         <PageTitle
           beforeTitle={(
-            <BackButton href={"/admin/accounts/list"} />
+            <BackButton href={"/tenant/accounts/list"} />
           )}
           titleText={title}
         >
@@ -60,7 +60,7 @@ export const AccountUsersPage: NextPage = requireAuth(
           accountName={accountName}
           data={data}
           isLoading={isLoading}
-          getJobsPageUrl={(userId) => `/admin/accounts/${accountName}/users/${userId}/jobs`}
+          getJobsPageUrl={(userId) => `/tenant/accounts/${accountName}/users/${userId}/jobs`}
         />
       </div>
     );

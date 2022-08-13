@@ -86,7 +86,7 @@ export const AccountTable: React.FC<Props> = ({
         <Table.Column<Account> title="操作"
           render={(_, r) => (
             <Space split={<Divider type="vertical" />}>
-              <Link href={{ pathname: `/admin/accounts/${r.accountName}/users` }}>
+              <Link href={{ pathname: `/tenant/accounts/${r.accountName}/users` }}>
               管理成员
               </Link>
             </Space>
