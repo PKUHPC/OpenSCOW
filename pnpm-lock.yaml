@@ -25,7 +25,7 @@ importers:
       jest: 28.1.3
       jest-extended: 3.0.2
       nodemon: 2.0.19
-      pino-pretty: 8.1.0
+      pino-pretty: 9.0.0
       pkg: 5.8.0
       rimraf: 3.0.2
       ts-jest: 28.0.7
@@ -55,7 +55,7 @@ importers:
       jest: 28.1.3_vgaowovp4vif3h5newwzgtopqa
       jest-extended: 3.0.2_jest@28.1.3
       nodemon: 2.0.19
-      pino-pretty: 8.1.0
+      pino-pretty: 9.0.0
       pkg: 5.8.0
       rimraf: 3.0.2
       ts-jest: 28.0.7_bi2kohzqnxavgozw3csgny5hju
@@ -11958,10 +11958,6 @@ packages:
     resolution: {integrity: sha512-PX1wu0AmAdPqOL1mWhqmlOd8kOIZQwGZw6rh7uby9fTc5lhaOWFLX3I6R1hrF9k3zUY40e6igsLGkDXK92LJNg==}
     dev: false
 
-  /on-exit-leak-free/1.0.0:
-    resolution: {integrity: sha512-Ve8ubhrXRdnuCJ5bQSQpP3uaV43K1PMcOfSRC1pqHgRZommXCgsXwh08jVC5NpjwScE23BPDwDvVg4cov3mwjw==}
-    dev: true
-
   /on-exit-leak-free/2.1.0:
     resolution: {integrity: sha512-VuCaZZAjReZ3vUwgOB8LxAosIurDiAW0s13rI1YwmaP++jvcxP77AWoQvenZebpCA2m8WC1/EosPYPMjnRAp/w==}
 
@@ -12293,8 +12289,8 @@ packages:
       process-warning: 2.0.0
     dev: false
 
-  /pino-pretty/8.1.0:
-    resolution: {integrity: sha512-oKfI8qKXR2a3haHs/X8iB6QSnWLqoOGAjwxIAXem4+XOGIGNw7IKpozId1uE7j89Rj46HIfWnGbAgmQmr8+yRw==}
+  /pino-pretty/9.0.0:
+    resolution: {integrity: sha512-WcojVUw8aJQz0in90xj7nQo5g14d9bLkBnE80P/Sk8JxNilbtyXp9mNjRcF07uOBEoNMrdkBniv8Tu1Lale7Kw==}
     hasBin: true
     dependencies:
       colorette: 2.0.19
@@ -12304,12 +12300,12 @@ packages:
       help-me: 4.0.1
       joycon: 3.1.1
       minimist: 1.2.6
-      on-exit-leak-free: 1.0.0
+      on-exit-leak-free: 2.1.0
       pino-abstract-transport: 1.0.0
       pump: 3.0.0
       readable-stream: 4.0.0
       secure-json-parse: 2.4.0
-      sonic-boom: 3.0.0
+      sonic-boom: 3.1.0
       strip-json-comments: 3.1.1
     dev: true
 
@@ -14782,12 +14778,6 @@ packages:
       uuid: 8.3.2
       websocket-driver: 0.7.4
     dev: false
-
-  /sonic-boom/3.0.0:
-    resolution: {integrity: sha512-p5DiZOZHbJ2ZO5MADczp5qrfOd3W5Vr2vHxfCpe7G4AzPwVOweIjbfgku8wSQUuk+Y5Yuo8W7JqRe6XKmKistg==}
-    dependencies:
-      atomic-sleep: 1.0.0
-    dev: true
 
   /sonic-boom/3.1.0:
     resolution: {integrity: sha512-qVr246G5307nz5JmhtsvHudxNMrRTWTCmTg+tA4gHQJnVyx/SsyQnky/5peC23B8etvlKli9P6sNXWQGDxoskQ==}
