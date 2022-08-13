@@ -71,11 +71,6 @@ export class Account {
 
     if (!this.blocked) { return; }
 
-    await clusterPlugin.callOnAll(logger, async (ops) => ops.account.blockAccount({
-      request: { accountName: this.accountName },
-      logger,
-    }));
-
     await clusterPlugin.callOnAll(logger, async (ops) => ops.account.unblockAccount({
       request: { accountName: this.accountName },
       logger,
