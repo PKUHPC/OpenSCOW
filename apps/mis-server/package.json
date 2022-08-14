@@ -31,7 +31,7 @@
     "@sinclair/typebox": "0.24.27",
     "dotenv": "16.0.1",
     "node-cron": "3.0.1",
-    "undici": "5.8.1",
+    "undici": "5.8.2",
     "uuid": "8.3.2",
     "wait-on": "6.0.1"
   },
