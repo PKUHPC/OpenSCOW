@@ -1,4 +1,4 @@
-FROM node:gallium-alpine@sha256:1c8769a8c9ed57817ef07162744a3722421333a438185c560aa42a9a1fc6ea23 AS builder
+FROM node:gallium-alpine@sha256:2c405ed42fc0fd6aacbe5730042640450e5ec030bada7617beac88f742b6997b AS builder
 
 RUN apk update && apk add libc6-compat python3 make gcc g++
 
@@ -30,7 +30,7 @@ RUN pnpm run build
 
 RUN rm -rf node_modules && pnpm i --prod --frozen-lockfile --offline
 
-FROM node:gallium-alpine@sha256:1c8769a8c9ed57817ef07162744a3722421333a438185c560aa42a9a1fc6ea23 AS runner
+FROM node:gallium-alpine@sha256:2c405ed42fc0fd6aacbe5730042640450e5ec030bada7617beac88f742b6997b AS runner
 
 WORKDIR /app
 COPY --from=builder /app/node_modules ./node_modules
