@@ -11,10 +11,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "undici": "5.8.1"
+    "undici": "5.9.1"
   },
   "devDependencies": {
-    "pino": "8.4.0"
+    "pino": "8.4.2"
   },
   "volta": {
     "extends": "../../package.json"
