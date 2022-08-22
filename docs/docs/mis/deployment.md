@@ -87,3 +87,7 @@ accountNamePattern:
 ## 启动服务
 
 运行`docker compose up -d`启动管理系统。
+
+## 系统初始化
+
+查看[系统初始化](./init/index.md)文档初始化系统信息。
