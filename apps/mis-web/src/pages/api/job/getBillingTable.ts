@@ -62,11 +62,13 @@ export async function getBillingTableItems(tenantName: string | undefined) {
           partitionCount,
           qosCount,
           qos,
-          itemId: item.id,
+          priceItem: item ? {
+            amount: item.amountStrategy,
+            itemId: item.id,
+            price: moneyToString(item.price!),
+          } : undefined,
           path,
-          price: moneyToString(item.price!),
           comment: partitionInfo.comment,
-          amount: item.amountStrategy,
         });
       }
     }

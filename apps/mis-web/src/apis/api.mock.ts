@@ -3,21 +3,21 @@ import { numberToMoney } from "@scow/lib-decimal";
 import { api } from "src/apis/api";
 import type { RunningJob } from "src/generated/common/job";
 import { JobInfo } from "src/generated/server/job";
-import type { AccountUserInfo } from "src/generated/server/user";
-import { AmountStrategy } from "src/models/job";
+import type { AccountUserInfo, GetUserStatusReply } from "src/generated/server/user";
 import { PlatformRole, TenantRole, UserInfo, UserRole, UserStatus } from "src/models/User";
 
 export type MockApi<TApi extends Record<
   string,
  (...args : any[]) => JsonFetchResultPromiseLike<any>>
- > = { [key in keyof TApi]:
-    (...args) =>
+ > = { [key in keyof TApi]: null | (
+    (...args: Parameters<TApi[key]>) =>
     Promise<
       ReturnType<TApi[key]> extends PromiseLike<infer TSuc>
       ? TSuc
       : never
-    >
+    >)
   };
+
 
 
 const mockJobInfo: JobInfo = {
@@ -80,122 +80,7 @@ export const mockApi: MockApi<typeof api> = {
     { id: "HPC06", path: "hpc01.GPU.high", price: numberToMoney(14.00), amountStrategy: "gpu" },
   ]}),
 
-  getBillingTable: async () => ({ items: [
-    {
-      index: 0,
-      clusterItemIndex: 0,
-      partitionItemIndex: 0,
-      cluster: "hpc01Name",
-      cores: 32,
-      gpus: 0,
-      mem: 262144,
-      nodes: 3,
-      partition: "compute",
-      partitionCount: 2,
-      qosCount: 3,
-      qos: "low",
-      itemId: "HPC01",
-      price: "0.040",
-      path: "hpc01Name.compute.low",
-      comment: "说明",
-      amount: AmountStrategy.CPUS_ALLOC,
-    },
-    {
-      index: 1,
-      clusterItemIndex: 1,
-      partitionItemIndex: 1,
-      cluster: "hpc01Name",
-      cores: 32,
-      gpus: 0,
-      mem: 262144,
-      nodes: 3,
-      partition: "compute",
-      partitionCount: 2,
-      qosCount: 3,
-      qos: "normal",
-      itemId: "HPC02",
-      price: "0.060",
-      path: "hpc01Name.compute.normal",
-      comment: "说明",
-      amount: AmountStrategy.CPUS_ALLOC,
-    },
-    {
-      index: 2,
-      clusterItemIndex: 2,
-      partitionItemIndex: 2,
-      cluster: "hpc01Name",
-      cores: 32,
-      gpus: 0,
-      mem: 262144,
-      nodes: 3,
-      partition: "compute",
-      partitionCount: 2,
-      qosCount: 3,
-      qos: "high",
-      itemId: "HPC03",
-      price: "0.080",
-      path: "hpc01Name.compute.high",
-      comment: "说明",
-      amount: AmountStrategy.CPUS_ALLOC,
-    },
-    {
-      index: 3,
-      clusterItemIndex: 3,
-      partitionItemIndex: 0,
-      cluster: "hpc01Name",
-      cores: 48,
-      gpus: 8,
-      mem: 262144,
-      nodes: 1,
-      partition: "GPU",
-      partitionCount: 2,
-      qosCount: 3,
-      qos: "low",
-      itemId: "HPC04",
-      path: "hpc01Name.GPU.low",
-      price: "10.000",
-      comment: "说明",
-      amount: AmountStrategy.CPUS_ALLOC,
-    },
-    {
-      index: 4,
-      clusterItemIndex: 4,
-      partitionItemIndex: 1,
-      cluster: "hpc01Name",
-      cores: 48,
-      gpus: 8,
-      mem: 262144,
-      nodes: 1,
-      partition: "GPU",
-      partitionCount: 2,
-      qosCount: 3,
-      qos: "normal",
-      itemId: "HPC05",
-      path: "hpc01Name.GPU.normal",
-      price: "12.000",
-      comment: "说明",
-      amount: AmountStrategy.CPUS_ALLOC,
-    },
-    {
-      index: 5,
-      clusterItemIndex: 5,
-      partitionItemIndex: 2,
-      cluster: "hpc01Name",
-      cores: 48,
-      gpus: 8,
-      mem: 262144,
-      nodes: 1,
-      partition: "GPU",
-      partitionCount: 2,
-      qosCount: 3,
-      qos: "high",
-      itemId: "HPC06",
-      price: "14.000",
-      path: "hpc01Name.GPU.high",
-      comment: "说明",
-      amount: AmountStrategy.CPUS_ALLOC,
-    },
-  ]}),
+  getBillingTable: null,
 
   getIcon: async () => undefined,
 
@@ -262,19 +147,7 @@ export const mockApi: MockApi<typeof api> = {
   getJobInfo: async () => ({ jobs: [mockJobInfo], totalCount: 1, totalPrice: numberToMoney(100) }),
   financePay: async () => ({ balance: 123 }),
   authCallback: async () => undefined as never,
-  getUserStatus: async () => ({
-    storageQuotas: {
-      "WM2": 100,
-      "WM1": 200,
-    },
-    accountStatuses: {
-      "hpc1": { userStatus: UserStatus.BLOCKED, accountBlocked: false },
-      "hpc2": { userStatus: UserStatus.BLOCKED, accountBlocked: true,
-        jobChargeLimit: numberToMoney(10),
-        usedJobCharge: numberToMoney(2),
-      },
-    },
-  }),
+  getUserStatus: async () => MOCK_USER_STATUS,
   getAccountUsers: async () => ({
     totalCount: 2,
     results: [
@@ -349,3 +222,17 @@ export const MOCK_USER_INFO = {
     { accountName: "hpc2001213075", role: UserRole.USER },
   ],
 } as UserInfo;
+
+export const MOCK_USER_STATUS: GetUserStatusReply = {
+  storageQuotas: {
+    "WM2": 100,
+    "WM1": 200,
+  },
+  accountStatuses: {
+    "hpc1": { userStatus: UserStatus.BLOCKED, accountBlocked: false },
+    "hpc2": { userStatus: UserStatus.BLOCKED, accountBlocked: true,
+      jobChargeLimit: numberToMoney(10),
+      usedJobCharge: numberToMoney(2),
+    },
+  },
+};

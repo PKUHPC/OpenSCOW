@@ -2,7 +2,7 @@
 import { numberToMoney } from "@scow/lib-decimal";
 import { Form, Input, InputNumber, message, Modal, Select, Space, Table } from "antd";
 import { ColumnsType } from "antd/lib/table";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { api } from "src/apis";
 import { JobBillingTableItem } from "src/components/JobBillingTable";
 import { CommonModalProps, ModalLink } from "src/components/ModalLink";
@@ -37,13 +37,17 @@ const columns: ColumnsType<JobBillingTableItem> = [
   { dataIndex: "qos", title: "QOS", key: "index", render: (_, r) => ({
     children: r.qos,
   }) },
-  { dataIndex: "amount", title: "计量方式", key: "index", render: (_, r) => ({
-    children: r.amount,
+  { dataIndex: "priceItem", title: "当前计费项", key: "index", render: (_, r) => ({
+    children: r.priceItem
+      ? `${r.priceItem.itemId} (${r.priceItem.price}, ${r.priceItem.amount})`
+      : "未设置",
   }) },
 ];
 
-const EditPriceModal: React.FC<CommonModalProps & { path: string; tenant?: string; reload: () => void }> = ({
-  onClose, path, visible, tenant, reload,
+const EditPriceModal: React.FC<CommonModalProps & {
+  current: JobBillingTableItem["priceItem"]; path: string; tenant?: string; reload: () => void
+}> = ({
+  current, onClose, path, visible, tenant, reload,
 }) => {
 
   const [form] = Form.useForm<{ price: number; itemId: string; amount: string; description: string }>();
@@ -68,7 +72,13 @@ const EditPriceModal: React.FC<CommonModalProps & { path: string; tenant?: strin
 
   return (
     <Modal title="编辑作业价格项" visible={visible} onCancel={onClose} onOk={onOk} destroyOnClose confirmLoading={loading}>
-      <Form form={form} initialValues={{ amount: AmountStrategy.CPUS_ALLOC, price: 0, description: "" }}>
+      <Form form={form} initialValues={{
+        itemId: current?.itemId,
+        amount: current?.amount ?? AmountStrategy.CPUS_ALLOC,
+        price: current?.price ?? 0,
+        description: "",
+      }}
+      >
         <Form.Item label="租户">
           <strong>{tenant ?? "默认价格项"}</strong>
         </Form.Item>
@@ -102,30 +112,21 @@ interface Props {
 }
 
 export const EditableJobBillingTable: React.FC<Props> = ({ data, loading, tenant, reload }) => {
-
-  const pathMap = useMemo(() => data?.reduce((prev, curr) => {
-    prev[curr.path] = curr;
-    return prev;
-  }, {} as Record<string, JobBillingTableItem>), [data]);
-
   return (
     <Table
       dataSource={data} columns={[
         ...columns,
-        { dataIndex: "price", title: "计费项和单价（元）", key: "index", render: (_, r) => ({
-          children: (
-            <Space>
-              {pathMap
-                ? (pathMap[r.path]
-                  ? `${pathMap[r.path].price} (${pathMap[r.path].itemId})`
-                  : undefined)
-                : undefined}
-              <EditPriceModalLink path={r.path} reload={reload} tenant={tenant}>
+        { dataIndex: "price", title: "设置", key: "index", render: (_, r) => {
+          return {
+            children: (
+              <Space>
+                <EditPriceModalLink current={r.priceItem} path={r.path} reload={reload} tenant={tenant}>
                 设置
-              </EditPriceModalLink>
-            </Space>
-          ),
-        }) },
+                </EditPriceModalLink>
+              </Space>
+            ),
+          };
+        } },
       ]}
       scroll={{ x: 800 }} size="middle"
       bordered pagination={false}

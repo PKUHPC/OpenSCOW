@@ -7,7 +7,12 @@ export interface JobBillingTableItem {
 
   cluster: string;
   clusterItemIndex: number;
-  itemId: string;
+
+  priceItem?: {
+    itemId: string;
+    price: string;
+    amount: string;
+  }
 
   partition: string;
   partitionCount: number;
@@ -20,11 +25,9 @@ export interface JobBillingTableItem {
   mem: number;
   cores: number;
   gpus: number;
-  price: string;
   path: string;
   comment?: string;
 
-  amount: string;
 }
 
 const columns: ColumnsType<JobBillingTableItem> = [
@@ -56,10 +59,10 @@ const columns: ColumnsType<JobBillingTableItem> = [
     children: r.qos,
   }) },
   { dataIndex: "price", title: "单价（元）", key: "index", render: (_, r) => ({
-    children: r.price,
+    children: r.priceItem?.price ?? "未定义",
   }) },
   { dataIndex: "amount", title: "计量方式", key: "index", render: (_, r) => ({
-    children: r.amount,
+    children: r.priceItem?.amount ?? "未定义",
   }) },
   { dataIndex: "comment", title: "说明", key: "index", render: (_, r) => ({
     children: r.comment,
