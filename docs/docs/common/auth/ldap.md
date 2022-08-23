@@ -16,17 +16,28 @@ LDAP认证系统支持的功能如下表：
 | 用户名和姓名验证 | 是       |
 | 修改密码         | 是       |
 
+## LDAP认证要求和流程
 
-## LDAP认证流程
+为了更好的理解并配置LDAP认证系统，本节将介绍各个操作时，LDAP认证系统所进行的操作。请确认您的LDAP配置兼容这里所称的流程
 
-为了更好的理解并配置LDAP认证系统，本节将介绍各个操作时，LDAP认证系统所进行的操作。下文中，代码块（如`ldap.bindDn`）为配置文件`config/auth.yml`中的对应值。请确认您的LDAP配置兼容这里所称的流程。
+下文中，代码块（如`ldap.bindDn`）为配置文件`config/auth.yml`中的对应值。
+
+### 使用LDAP登录集群
+
+要使用LDAP进行SCOW系统的用户认证，您必须配置LDAP服务器和集群中的每个节点，使得集群中的任何节点都可以使用LDAP用户节点的`ldap.attrs.uid`对应的属性的值和密码作为用户名和密码登录。请参考[client.sh](%REPO_FILE_URL%/dev/ldap/client.sh)配置使用LDAP服务器登录Linux节点。
+
+另外，我们还要求
+
+- 每个需要登录集群的用户节点都对应一个用户组(group)的节点，所对应的Linux用户属于用户组节点所对应的Linux用户组
+- 用户节点的`ldap.attrs.uid`属性的值 == 组节点的`ldap.attrs.groupUserId`属性的值
+- 用户节点的uidNumber, gidNumber和组节点的gidNumber的值相同
 
 ### 登录
 
-当用户登录时，认证系统获得用户的用户名和密码，进行以下操作：
+当用户登录时，认证系统获得用户输入的用户名和密码，进行以下操作：
 
-1. 使用`ldap.bindDn`和`ldap.bindPassword`作为用户名和密码与向LDAP服务器所在的`ldap.url`发起bind请求
-2. bind成功后，以`ldap.searchBase`为搜索根，以sub模式，以`ldap.filter` 和 (`ldap.attrs.uid`等于输入的用户名) 为筛选条件搜索节点
+1. 使用`ldap.bindDn`和`ldap.bindPassword`作为用户名和密码，向LDAP服务器所在的`ldap.url`发起bind请求
+2. bind成功后，以`ldap.searchBase`为搜索根，以sub模式，以`ldap.filter` && (`ldap.attrs.uid`等于输入的用户名) 为筛选条件搜索节点
    1. 如果搜索结果为空，则登录失败
    2. 如果搜索节点有多个，取第一个结果
 3. 以**上一个结果的DN**以及**输入的密码**作为用户名和密码，与LDAP服务器发起bind请求
@@ -50,11 +61,11 @@ LDAP认证系统支持的功能如下表：
 | loginShell                      | /bin/bash                                              |
 | objectClass                     | ["inetOrgPerson", "posixAccount", "shadowAccount"]     |
 | homeDirectory                   | `ldap.addUser.homeDir`，其中的`{{ username }}`替换为用户名 |
-| uidNumber                       | 数据库中的用户项的id + `ldap.addUsaer.uidStart`        |
+| uidNumber                       | 数据库中的用户项的id + `ldap.addUser.uidStart`        |
 | gidNumber                       | 数据库中的用户项的id + `ldap.addUser.uidStart`         |
 | `ldap.attrs.mail`（如果设置了） | 用户的邮箱                                             |
 
-3. 创建一个新的entry作为group，其DN以及属性值如下表所示。
+3. 创建一个新的entry作为新用户的group，其DN以及属性值如下表所示。
 
 | 属性名      | 值                                                         |
 | ----------- | ---------------------------------------------------------- |
@@ -64,6 +75,7 @@ LDAP认证系统支持的功能如下表：
 | gidNumber   | 同用户的uidNumber                                          |
 
 4. 设置新用户的密码为用户输入的密码
+
 
 ## 配置LDAP认证服务
 
