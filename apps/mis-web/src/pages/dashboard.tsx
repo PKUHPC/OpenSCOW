@@ -5,7 +5,7 @@ import { GetServerSideProps, NextPage } from "next";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 import { useStore } from "simstate";
-import { mockApi } from "src/apis/api.mock";
+import { MOCK_USER_STATUS } from "src/apis/api.mock";
 import { USE_MOCK } from "src/apis/useMock";
 import { requireAuth } from "src/auth/requireAuth";
 import { AuthResultError, ssrAuthenticate } from "src/auth/server";
@@ -63,7 +63,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ req }) => 
   // manually call mock
   if (USE_MOCK) {
 
-    const status = await mockApi.getUserStatus();
+    const status = MOCK_USER_STATUS;
 
     const accountInfo = Object.keys(status.accountStatuses).reduce((prev, curr) => {
       prev[curr] = { ...status.accountStatuses[curr], balance: 10.00 };
