@@ -5,8 +5,6 @@ on:
   pull_request:
     branches: [master]
   push:
-    tags:
-      - "build-*"
     branches:
       - master
 
@@ -63,7 +61,6 @@ jobs:
   build-images:
     needs: test
     runs-on: ubuntu-latest
-    if: ${{ github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/build-') }}
 
     permissions:
       contents: read
