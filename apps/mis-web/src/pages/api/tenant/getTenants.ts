@@ -2,7 +2,7 @@ import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-utils";
 import { authenticate } from "src/auth/server";
 import { TenantServiceClient } from "src/generated/server/tenant";
-import { TenantRole } from "src/models/User";
+import { PlatformRole } from "src/models/User";
 import { getClient } from "src/utils/client";
 
 export interface GetTenantsSchema {
@@ -15,7 +15,7 @@ export interface GetTenantsSchema {
   }
 }
 
-const auth = authenticate((info) => info.tenantRoles.includes(TenantRole.TENANT_ADMIN));
+const auth = authenticate((info) => info.platformRoles.includes(PlatformRole.PLATFORM_ADMIN));
 
 export default route<GetTenantsSchema>("GetTenantsSchema",
   async (req, res) => {
