@@ -156,7 +156,7 @@ export const userRoutes: (accounts: AccountAffiliation[]) => NavItemProps[] = (a
     Icon: BookOutlined,
     text: "用户空间",
     path: "/user",
-    clickToPath: "/user/runningJobs",
+    clickToPath: accounts.length > 0 ? "/user/runningJobs" : "/user/partitions",
     children: [
       ...accounts.length > 0 ? [
         {
