@@ -20,7 +20,7 @@ import type { GetUsedPayTypesSchema } from "src/pages/api/finance/getUsedPayType
 import type { FinancePaySchema } from "src/pages/api/finance/pay";
 import type { GetPaymentsSchema } from "src/pages/api/finance/payments";
 import type { CompleteInitSchema } from "src/pages/api/init/completeInit";
-import type { CreatePlatformUserSchema } from "src/pages/api/init/createPlatformAdminUser";
+import type { CreateInitAdminSchema } from "src/pages/api/init/createInitAdmin";
 import type { AddBillingItemSchema } from "src/pages/api/job/addBillingItem";
 import type { ChangeJobTimeLimitSchema } from "src/pages/api/job/changeJobTimeLimit";
 import type { GetBillingItemsSchema } from "src/pages/api/job/getBillingItems";
@@ -68,7 +68,7 @@ export const api = {
   getPayments: fromApi<GetPaymentsSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/finance/payments")),
   getIcon: fromApi<GetIconSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api//icon")),
   completeInit: fromApi<CompleteInitSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/init/completeInit")),
-  createPlatformUser: fromApi<CreatePlatformUserSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/init/createPlatformAdminUser")),
+  createInitAdmin: fromApi<CreateInitAdminSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/init/createInitAdmin")),
   addBillingItem: fromApi<AddBillingItemSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/job/addBillingItem")),
   changeJobTimeLimit: fromApi<ChangeJobTimeLimitSchema>("PATCH", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/job/changeJobTimeLimit")),
   getBillingItems: fromApi<GetBillingItemsSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/job/getBillingItems")),

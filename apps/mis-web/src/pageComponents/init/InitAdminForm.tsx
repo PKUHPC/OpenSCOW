@@ -12,7 +12,7 @@ const AlertContainer = styled.div`
   margin-bottom: 16px;
 `;
 
-export const PlatformAdminUserForm: React.FC = () => {
+export const InitAdminForm: React.FC = () => {
   const [form] = Form.useForm<FormFields>();
 
   const [loading, setLoading] = useState(false);
@@ -20,7 +20,7 @@ export const PlatformAdminUserForm: React.FC = () => {
     const { email, identityId, name } = await form.validateFields();
     setLoading(true);
 
-    api.createPlatformUser({ body: { email, identityId, name } })
+    api.createInitAdmin({ body: { email, identityId, name } })
       .then(() => {
         message.success("添加完成！");
         form.resetFields();
@@ -32,7 +32,7 @@ export const PlatformAdminUserForm: React.FC = () => {
   return (
     <Centered>
       <FormLayout maxWidth={800}>
-        <p>您可以在此创建初始平台管理员用户。</p>
+        <p>您可以在此创建初始管理员用户。这里添加的用户将会自动拥有<strong>平台管理员</strong>和<strong>默认租户的租户管理员权限</strong>。</p>
         <AlertContainer>
           <Alert type="warning" showIcon
             message="请确认平台管理员用户必须已经存在于认证系统，且用户的ID必须和认证系统中的用户ID保持一致。"

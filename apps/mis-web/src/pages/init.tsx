@@ -6,8 +6,8 @@ import { SSRProps } from "src/auth/server";
 import { UnifiedErrorPage } from "src/components/errorPages/UnifiedErrorPage";
 import { Centered } from "src/components/layouts";
 import { EditJobPriceTableForm } from "src/pageComponents/init/EditJobPriceTableForm";
+import { InitAdminForm } from "src/pageComponents/init/InitAdminForm";
 import { InitImportUsersForm } from "src/pageComponents/init/InitImportUsersForm";
-import { PlatformAdminUserForm } from "src/pageComponents/init/PlatformAdminUserForm";
 import { Head } from "src/utils/head";
 import { queryIfInitialized } from "src/utils/init";
 import styled from "styled-components";
@@ -69,8 +69,8 @@ export const InitSystemPage: NextPage<Props> = (props) => {
         </CompleteButtonContainer>
       </Title>
       <Tabs centered defaultActiveKey="1">
-        <Tabs.TabPane tab="创建平台管理员用户" key="1">
-          <PlatformAdminUserForm />
+        <Tabs.TabPane tab="创建初始管理员用户" key="1">
+          <InitAdminForm />
         </Tabs.TabPane>
         <Tabs.TabPane tab="导入用户" key="2">
           <InitImportUsersForm />

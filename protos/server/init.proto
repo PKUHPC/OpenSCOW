@@ -5,12 +5,12 @@ package scow.server;
 message QuerySystemInitializedRequest {}
 message QuerySystemInitializedReply { bool initialized = 1; }
 
-message CreatePlatformAdminRequest {
+message CreateInitAdminRequest {
   string user_id = 1;
   string name = 2;
   string email = 3;
 }
-message CreatePlatformAdminReply {}
+message CreateInitAdminReply {}
 
 message CompleteInitRequest {}
 
@@ -20,8 +20,8 @@ service InitService {
   rpc QuerySystemInitialized(QuerySystemInitializedRequest)
       returns (QuerySystemInitializedReply);
 
-  rpc CreatePlatformAdmin(CreatePlatformAdminRequest)
-      returns (CreatePlatformAdminReply);
+  rpc CreateInitAdmin(CreateInitAdminRequest)
+      returns (CreateInitAdminReply);
 
   // ALREADY_EXISTS: already initialized
   rpc CompleteInit(CompleteInitRequest) returns (CompleteInitReply);

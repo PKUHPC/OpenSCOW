@@ -4,7 +4,7 @@ import { InitServiceClient } from "src/generated/server/init";
 import { getClient } from "src/utils/client";
 import { queryIfInitialized } from "src/utils/init";
 
-export interface CreatePlatformUserSchema {
+export interface CreateInitAdminSchema {
   method: "POST";
 
   body: {
@@ -26,7 +26,7 @@ export interface CreatePlatformUserSchema {
   }
 }
 
-export default route<CreatePlatformUserSchema>("CreatePlatformUserSchema", async (req) => {
+export default route<CreateInitAdminSchema>("CreateInitAdminSchema", async (req) => {
   const result = await queryIfInitialized();
 
   if (result) { return { 409: { code: "ALREADY_INITIALIZED" } }; }
@@ -35,7 +35,7 @@ export default route<CreatePlatformUserSchema>("CreatePlatformUserSchema", async
 
   const client = getClient(InitServiceClient);
 
-  await asyncClientCall(client, "createPlatformAdmin", {
+  await asyncClientCall(client, "createInitAdmin", {
     email, name, userId: identityId,
   });
 
