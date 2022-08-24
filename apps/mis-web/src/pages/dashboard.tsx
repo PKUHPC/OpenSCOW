@@ -57,7 +57,7 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)((props: Pr
 
 
 export const getServerSideProps: GetServerSideProps<Props> = async ({ req }) => {
-  const auth = ssrAuthenticate((i) => i.accountAffiliations.length > 0);
+  const auth = ssrAuthenticate(() => true);
 
   // Cannot directly call api routes here, so mock is not available directly.
   // manually call mock
