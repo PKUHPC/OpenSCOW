@@ -82,6 +82,12 @@ shell: true
 # turboVNCPath: /opt/TurboVNC
 ```
 
+## 更多配置
+
+一些功能可能需要进一步的配置，请根据对应的文档完成。
+
+- [登录节点桌面](./desktop.md)
+
 ## 启动服务
 
 运行`docker compose up -d`启动门户系统。
