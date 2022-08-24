@@ -84,7 +84,7 @@ export const mockApi: MockApi<typeof api> = {
 
   getIcon: async () => undefined,
 
-  createPlatformUser: async () => null,
+  createInitAdmin: async () => null,
 
   importUsers: async () => null,
 

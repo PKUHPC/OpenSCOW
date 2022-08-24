@@ -2,8 +2,8 @@ import { Server } from "@ddadaal/tsgrpc-server";
 import { asyncClientCall } from "@ddadaal/tsgrpc-utils";
 import { ChannelCredentials, status } from "@grpc/grpc-js";
 import { createServer } from "src/app";
-import { PlatformRole, User } from "src/entities/User";
-import { CreatePlatformAdminRequest, InitServiceClient } from "src/generated/server/init";
+import { PlatformRole, TenantRole, User } from "src/entities/User";
+import { CreateInitAdminRequest, InitServiceClient } from "src/generated/server/init";
 import { dropDatabase } from "tests/data/helpers";
 
 let server: Server;
@@ -46,14 +46,14 @@ it("fails to complete if already init", async () => {
 
 });
 
-it("creates platform user", async () => {
-  const userInfo: CreatePlatformAdminRequest = {
+it("creates an init admin user", async () => {
+  const userInfo: CreateInitAdminRequest = {
     email: "test@test.com",
     name: "123",
     userId: "123",
   };
 
-  await asyncClientCall(client, "createPlatformAdmin", userInfo);
+  await asyncClientCall(client, "createInitAdmin", userInfo);
 
   const em = server.ext.orm.em.fork();
 
@@ -61,5 +61,6 @@ it("creates platform user", async () => {
 
   expect(user).toMatchObject(userInfo);
   expect(user.platformRoles).toIncludeSameMembers([PlatformRole.PLATFORM_ADMIN]);
+  expect(user.tenantRoles).toIncludeSameMembers([TenantRole.TENANT_ADMIN]);
 });
 
