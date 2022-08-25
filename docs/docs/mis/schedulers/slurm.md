@@ -30,12 +30,12 @@ slurm:
 
 ## 导入已有用户信息
 
-如果您已有一个slurm集群，在管理系统部署完成吼，可以使用本功能将slurm中的用户信息导入本系统。
+如果您已有一个slurm集群，在管理系统部署完成后，可以使用本功能将slurm中的用户信息导入本系统。
 
-把[slurm-users.py](%REPO_URL%/apps/mis-server/scripts/slurm-users.py)复制到`slurm.sh`的目录下，运行以下命令，获得一个`users.json`文件。
+把[slurm-users.py](%REPO_FILE_URL%/apps/mis-server/scripts/slurm-users.py)复制到`slurm.sh`的目录下，运行以下命令，获得一个`users.json`文件。
 
 ```bash
-MYSQL_PASSWORD={数据库密码} python3 slurm-users.py
+MYSQL_PASSWORD={slurmdbd的数据库密码} python3 slurm-users.py
 ```
 
 `users.json`的文件初始数据格式如下。不存在名字的用户的初始名字为自己的ID。

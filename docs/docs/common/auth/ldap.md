@@ -144,8 +144,8 @@ ldap:
 
 我们提供以下两个脚本可以用来在**CentOS 7**环境快速安装和配置LDAP服务器
 
-- [provider.sh](%REPO_FILE_URL%/scripts/ldap/provider.sh): 用于配置LDAP服务器
-- [client.sh](%REPO_FILE_URL%/scripts/ldap/client.sh): 用于配置LDAP客户端
+- [provider.sh](%REPO_FILE_URL%/dev/ldap/provider.sh): 用于配置LDAP服务器
+- [client.sh](%REPO_FILE_URL%/dev/ldap/client.sh): 用于配置LDAP客户端
 
 请下载这两个文件，修改两个文件开头部分的相关配置（`Start Configuratin Part`和`End Configuration Part`之间的变量），运行即可。
 
