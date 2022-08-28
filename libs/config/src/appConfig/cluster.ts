@@ -1,13 +1,7 @@
 import { Static, Type } from "@sinclair/typebox";
+import { SlurmMisConfigSchema } from "src/appConfig/mis";
 
 import { getDirConfig } from "../fileConfig";
-
-export const SlurmMisConfigSchema = Type.Object({
-  managerUrl: Type.String({ description: "slurm manager节点的URL" }),
-  dbPassword: Type.String({ description: "slurmdbd的数据库密码" }),
-  associationTableName: Type.String({ description: "user_association表名" }),
-  scriptPath: Type.String({ description: "slurm.sh绝对路径" }),
-}, { description: "slurm的MIS配置" });
 
 export const ClusterConfigSchema = Type.Object({
   displayName: Type.String({ description: "集群的显示名称" }),
@@ -32,7 +26,6 @@ export const ClusterConfigSchema = Type.Object({
 });
 
 export type ClusterConfigSchema = Static<typeof ClusterConfigSchema>;
-export type SlurmMisConfigSchema = Static<typeof SlurmMisConfigSchema>;
 
 const CLUSTER_CONFIG_BASE_PATH = "clusters";
 
