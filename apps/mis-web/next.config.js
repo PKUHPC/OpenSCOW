@@ -6,7 +6,7 @@ const analyze = process.env.ANALYZE === "true";
 
 const { buildRuntimeConfig } = require("./config.js");
 
-module.exports = async (phase, { defaultConfig }) => {
+module.exports = async (phase) => {
 
   const runtimeConfig = await buildRuntimeConfig(phase);
 
@@ -26,6 +26,6 @@ module.exports = async (phase, { defaultConfig }) => {
       },
     }],
     analyze ? [require("@next/bundle-analyzer")()] : undefined,
-  ].filter((x) => x), config)(phase, { defaultConfig });
+  ].filter((x) => x), config)(phase, { defaultConfig: {} });
 }
 
