@@ -14,11 +14,3 @@ fetchJobs:
     dbName: jobs
     tableName: jobs
 
-clusters:
-  hpc01:
-    ignore: true
-    slurm:
-      managerUrl: haha
-      dbPassword: password
-      clusterName: pkuhpc
-      scriptPath: /test/slurm.sh
