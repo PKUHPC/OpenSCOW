@@ -24,8 +24,8 @@ slurm:
     scriptPath: /test/slurm.sh
     # slurmdbd的数据库密码
     dbPassword: password
-    # slurm accounting功能中，保存user_association信息的数据库的表名
-    associationTableName: user_association
+    # slurm中这个集群的集群名
+    clusterName: hpc01
 ```
 
 ## 导入已有用户信息
@@ -35,7 +35,7 @@ slurm:
 把[slurm-users.py](%REPO_FILE_URL%/apps/mis-server/scripts/slurm-users.py)复制到`slurm.sh`的目录下，运行以下命令，获得一个`users.json`文件。
 
 ```bash
-MYSQL_PASSWORD={slurmdbd的数据库密码} python3 slurm-users.py
+MYSQL_PASSWORD={slurmdbd的数据库密码} CLUSTER_NAME={slurm中这个集群的集群名} python3 slurm-users.py
 ```
 
 `users.json`的文件初始数据格式如下。不存在名字的用户的初始名字为自己的ID。

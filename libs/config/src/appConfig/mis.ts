@@ -3,7 +3,7 @@ import { Static, Type } from "@sinclair/typebox";
 export const SlurmMisConfigSchema = Type.Object({
   managerUrl: Type.String({ description: "slurm manager节点的URL" }),
   dbPassword: Type.String({ description: "slurmdbd的数据库密码" }),
-  associationTableName: Type.String({ description: "user_association表名" }),
+  clusterName: Type.String({ description: "这个集群在slurm中的集群名字" }),
   scriptPath: Type.String({ description: "slurm.sh绝对路径" }),
 }, { description: "slurm的MIS配置" });
 

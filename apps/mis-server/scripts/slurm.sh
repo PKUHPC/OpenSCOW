@@ -201,7 +201,7 @@ basePartition=($BASE_PARTITIONS)
 allPartition=("compute")
 declare -A exclPartition
 exclPartition=([compute]="20" )
-assoc_table=$ASSOC_TABLE
+assoc_table=${CLUSTER_NAME}_assoc_table
 
 addUser() #abandon !!!!!2017-09-24
 {

@@ -44,7 +44,7 @@ export const executeSlurmScript = async (
   const result = await executeScript(slurmMisConfig, slurmMisConfig.scriptPath, params, {
     MYSQL_PASSWORD: slurmMisConfig.dbPassword,
     BASE_PARTITIONS: partitionsParam,
-    ASSOC_TABLE: slurmMisConfig.associationTableName,
+    CLUSTER_NAME: slurmMisConfig.clusterName,
   }, logger);
 
   return result;
