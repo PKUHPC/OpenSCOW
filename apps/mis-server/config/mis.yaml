@@ -20,5 +20,5 @@ clusters:
     slurm:
       managerUrl: haha
       dbPassword: password
-      associationTableName: user_association
+      clusterName: pkuhpc
       scriptPath: /test/slurm.sh
