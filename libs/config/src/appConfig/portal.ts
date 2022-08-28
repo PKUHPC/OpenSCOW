@@ -1,4 +1,5 @@
 import { Static, Type } from "@sinclair/typebox";
+import { GetConfigFn, getConfigFromFile } from "src/fileConfig";
 
 export const PortalConfigSchema = Type.Object({
   jobManagement: Type.Boolean({ description: "是否启动作业管理功能", default: true }),
@@ -44,6 +45,9 @@ export const PortalConfigSchema = Type.Object({
 
 });
 
-export const PORTAL_CONFIG_NAME = "portal";
+const PORTAL_CONFIG_NAME = "portal";
 
 export type PortalConfigSchema = Static<typeof PortalConfigSchema>;
+
+export const getPortalConfig: GetConfigFn<PortalConfigSchema> = (baseConfigPath) =>
+  getConfigFromFile(PortalConfigSchema, PORTAL_CONFIG_NAME, baseConfigPath);

@@ -5,10 +5,9 @@ const { join } = require("path");
 const { homedir } = require("os");
 const { PHASE_DEVELOPMENT_SERVER, PHASE_PRODUCTION_BUILD, PHASE_PRODUCTION_SERVER, PHASE_TEST } = require("next/constants");
 
-const { getConfigFromFile } = require("@scow/config");
 const { getCapabilities } = require("@scow/lib-auth");
-const { UI_CONFIG_NAME, UiConfigSchema, DEFAULT_PRIMARY_COLOR } = require("@scow/config/build/appConfig/ui");
-const { PORTAL_CONFIG_NAME, PortalConfigSchema } = require("@scow/config/build/appConfig/portal");
+const { DEFAULT_PRIMARY_COLOR, getUiConfig } = require("@scow/config/build/appConfig/ui");
+const { getPortalConfig } = require("@scow/config/build/appConfig/portal");
 const { getAppConfigs } = require("@scow/config/build/appConfig/app");
 const { getClusterConfigs } = require("@scow/config/build/appConfig/cluster");
 const { getKeyPair, testRootUserSshLogin } = require("@scow/lib-ssh");
@@ -79,8 +78,8 @@ const buildRuntimeConfig = async (phase) => {
 
   const apps = getAppConfigs(configPath);
 
-  const uiConfig = getConfigFromFile(UiConfigSchema, UI_CONFIG_NAME, true, configPath);
-  const portalConfig = getConfigFromFile(PortalConfigSchema, PORTAL_CONFIG_NAME, false, configPath);
+  const uiConfig = getUiConfig(configPath);
+  const portalConfig = getPortalConfig(configPath);
 
   const keyPair = getKeyPair(config.SSH_PRIVATE_KEY_PATH, config.SSH_PUBLIC_KEY_PATH);
 

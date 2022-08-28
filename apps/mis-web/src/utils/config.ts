@@ -1,6 +1,6 @@
 import type { ClusterConfigSchema } from "@scow/config/build/appConfig/cluster";
 import { CONFIG_BASE_PATH } from "@scow/config/build/constants";
-import type { ClusterTexts } from "@scow/config/src/appConfig/clusterTexts";
+import type { ClusterTextsConfigSchema } from "@scow/config/src/appConfig/clusterTexts";
 import type { UiConfigSchema } from "@scow/config/src/appConfig/ui";
 import getConfig from "next/config";
 
@@ -13,7 +13,7 @@ export interface ServerRuntimeConfig {
   DEFAULT_PRIMARY_COLOR: string;
 
   CLUSTERS_CONFIG: {[clusterId: string]: ClusterConfigSchema};
-  CLUSTER_TEXTS_CONFIG: ClusterTexts;
+  CLUSTER_TEXTS_CONFIG: ClusterTextsConfigSchema;
 }
 
 export interface PublicRuntimeConfig {

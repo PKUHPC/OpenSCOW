@@ -20,16 +20,12 @@ const candidates = Object.entries(parsers);
  *
  * @param schema JSON Schema对象
  * @param filename 文件名，不要带扩展名
- * @param allowNotExistent 是否允许配置文件不存在
  * @param basePath 配置文件路径。当NODE_ENV === production时，默认为/etc/scow, 否则为$PWD/config
  * @returns 配置对象
+ * @throws 如果配置文件不存在，抛出异常
  */
 export function getConfigFromFile<T extends TSchema>(
-  schema: T, filename: string, allowNotExistent: true, basePath?: string): Static<T> | undefined
-export function getConfigFromFile<T extends TSchema>(
-  schema: T, filename: string, allowNotExistent?: false, basePath?: string): Static<T>
-export function getConfigFromFile<T extends TSchema>(
-  schema: T, filename: string, allowNotExistent = false,
+  schema: T, filename: string,
   basePath = process.env.NODE_ENV === "production" ? CONFIG_BASE_PATH : "config") {
 
   for (const [ext, loader] of candidates) {
@@ -40,11 +36,7 @@ export function getConfigFromFile<T extends TSchema>(
     }
   }
 
-  if (!allowNotExistent) {
-    throw new Error(`No config named ${filename} exists.`);
-  } else {
-    return undefined;
-  }
+  throw new Error(`config ${filename} doesn't exist in ${basePath}`);
 }
 
 export function getDirConfig<T extends TSchema>(
@@ -77,3 +69,6 @@ export function getDirConfig<T extends TSchema>(
     return m;
   }, {});
 }
+
+export type GetConfigFn<T> = (baseConfigPath?: string) => T;
+
