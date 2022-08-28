@@ -1,4 +1,4 @@
-import { ClusterTexts } from "@scow/config/build/appConfig/clusterTexts";
+import type { ClusterTextsConfigSchema } from "@scow/config/build/appConfig/clusterTexts";
 import { Divider } from "antd";
 import { GetServerSideProps, NextPage } from "next";
 import { checkCookie } from "src/auth/server";
@@ -13,7 +13,7 @@ type ValueOf<T> = T[keyof T];
 
 interface Props {
   items: JobBillingTableItem[];
-  text: ValueOf<ClusterTexts> | undefined;
+  text: ValueOf<ClusterTextsConfigSchema> | undefined;
 }
 
 const ClusterCommentTitle = styled.h2`
