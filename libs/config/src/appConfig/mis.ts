@@ -1,5 +1,7 @@
 import { Static, Type } from "@sinclair/typebox";
 
+import { GetConfigFn, getConfigFromFile } from "../fileConfig";
+
 export const SlurmMisConfigSchema = Type.Object({
   managerUrl: Type.String({ description: "slurm manager节点的URL" }),
   dbPassword: Type.String({ description: "slurmdbd的数据库密码" }),
@@ -62,6 +64,9 @@ export const MisConfigSchema = Type.Object({
   }),
 });
 
-export const MIS_CONFIG_NAME = "mis";
+const MIS_CONFIG_NAME = "mis";
 
+export type MisConfigSchema = Static<typeof MisConfigSchema>;
 
+export const getMisConfig: GetConfigFn<MisConfigSchema> = (baseConfigPath) =>
+  getConfigFromFile(MisConfigSchema, MIS_CONFIG_NAME, baseConfigPath);

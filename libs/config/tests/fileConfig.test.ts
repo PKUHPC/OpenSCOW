@@ -36,16 +36,12 @@ afterEach(() => {
   fs.rmSync(folderPath, { recursive: true });
 });
 
-function runTest(createdFiles: readonly Ext[], expectedLoaded: Ext | undefined) {
+function runTest(createdFiles: readonly Ext[], expectedLoaded: Ext) {
   createdFiles.forEach(createConfig);
 
-  const mustExists = expectedLoaded !== undefined;
-  // @ts-ignore
-  const obj = getConfigFromFile(Schema, configName, !mustExists, folderPath);
+  const obj = getConfigFromFile(Schema, configName, folderPath);
 
-  if (mustExists) {
-    expect(obj?.loaded).toBe(expectedLoaded);
-  }
+  expect(obj.loaded).toBe(expectedLoaded);
 }
 
 it.each([
@@ -63,6 +59,3 @@ it("reports error if config not exist", async () => {
   expect(() => runTest([], "yml")).toThrow();
 });
 
-it("allows non exist", async () => {
-  runTest([], undefined);
-});

@@ -29,7 +29,7 @@ const PriceItemsJsonSchema = Type.Record(
 
 export async function createPriceItems(em: SqlEntityManager, logger: Logger) {
 
-  const priceItems = getConfigFromFile(PriceItemsJsonSchema, "priceItems", false);
+  const priceItems = getConfigFromFile(PriceItemsJsonSchema, "priceItems");
 
   logger.info("priceItems.json content: %o", priceItems);
 

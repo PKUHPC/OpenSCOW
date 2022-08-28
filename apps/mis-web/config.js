@@ -1,10 +1,10 @@
 // @ts-check
 
 const { envConfig, getConfigFromFile, parseKeyValue, regex, str } = require("@scow/config");
-const { ClusterConfigSchema, getClusterConfigs } = require("@scow/config/build/appConfig/cluster");
-const { SlurmMisConfigSchema, MisConfigSchema, MIS_CONFIG_NAME } = require("@scow/config/build/appConfig/mis");
-const { ClusterTextsConfigName, ClusterTextsConfigSchema } = require("@scow/config/build/appConfig/clusterTexts");
-const { DEFAULT_PRIMARY_COLOR, UI_CONFIG_NAME, UiConfigSchema } = require("@scow/config/build/appConfig/ui");
+const { getClusterConfigs } = require("@scow/config/build/appConfig/cluster");
+const { getMisConfig } = require("@scow/config/build/appConfig/mis");
+const { getClusterTextsConfig } = require("@scow/config/build/appConfig/clusterTexts");
+const { DEFAULT_PRIMARY_COLOR, getUiConfig } = require("@scow/config/build/appConfig/ui");
 const { PHASE_DEVELOPMENT_SERVER, PHASE_PRODUCTION_BUILD, PHASE_PRODUCTION_SERVER } = require("next/constants");
 const { join } = require("path");
 const { fetch } = require("undici");
@@ -60,9 +60,9 @@ const buildRuntimeConfig = async (phase) => {
   const basePath = production ? undefined : join(__dirname, "config");
 
   const clusters = getClusterConfigs(basePath);
-  const clusterTexts = getConfigFromFile(ClusterTextsConfigSchema, ClusterTextsConfigName, false, basePath);
-  const uiConfig = getConfigFromFile(UiConfigSchema, UI_CONFIG_NAME, true, basePath);
-  const misConfig = getConfigFromFile(MisConfigSchema, MIS_CONFIG_NAME, false, basePath);
+  const clusterTexts = getClusterTextsConfig(basePath);
+  const uiConfig = getUiConfig(basePath);
+  const misConfig = getMisConfig(basePath);
 
   /**
    * @type {import ("./src/utils/config").ServerRuntimeConfig}
