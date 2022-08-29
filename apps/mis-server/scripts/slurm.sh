@@ -673,7 +673,8 @@ blockUserfromAcct(){
             echo "User $3 is not exist in account $2"
             exit 4
         else
-            sacctmgr -i modify user where name=$3 account=$2 set MaxSubmitJobs=0  MaxJobs=0
+            #sacctmgr -i modify user where name=$3 account=$2 set MaxSubmitJobs=0  MaxJobs=0
+            sacctmgr -i modify user where name=$3 account=$2 set qos=block DefaultQOS=block
             echo "User $3 is blocked in account $2!"
             exit 0
         fi
@@ -734,7 +735,8 @@ allowUserfromAcct(){
             echo "User $3 is not exist in account $2"
             exit 4
         else
-            sacctmgr -i modify user where name=$3 account=$2 set MaxSubmitJobs=-1 MaxJobs=-1
+            #sacctmgr -i modify user where name=$3 account=$2 set MaxSubmitJobs=-1 MaxJobs=-1
+            sacctmgr -i -Q modify user where name=$3 account=$2 set qos=high,low,normal DefaultQOS=low
             echo "User $3 is allowed in account $2!"
             exit 0
         fi
@@ -794,12 +796,13 @@ queryUserInAcct(){
             echo "User $3 is not exist in account $2"
             exit 4
         else
-            MaxSubmitJobs=`$mysql --skip-column-names slurm_acct_db -e " select distinct max_submit_jobs from $assoc_table where acct='$2' and user='$3'"`
-            if [ "$MaxSubmitJobs" == "NULL" ] ; then
-                echo "User $3 is allowed in account $2!"
+            #MaxSubmitJobs=`$mysql --skip-column-names slurm_acct_db -e " select distinct max_submit_jobs from $assoc_table where acct='$2' and user='$3'"`
+            qos=`sacctmgr show assoc format=user,acct%20,qos | grep -E "$3.*$2"  | uniq | awk '{print $3}'`
+            if [ "$qos" == "block" ] ; then
+                echo "User $3 is blocked in account $2!"
                 exit 0
             else
-                echo "User $3 is blocked in account $2!"
+                echo "User $3 is allowed in account $2!"
                 exit 0
             fi
         fi
