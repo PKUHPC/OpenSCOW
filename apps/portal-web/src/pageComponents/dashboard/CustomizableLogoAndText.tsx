@@ -1,9 +1,9 @@
 import { Divider } from "antd";
 import Image from "next/image";
+import { join } from "path";
 import React from "react";
 import { publicConfig } from "src/utils/config";
 import styled from "styled-components";
-
 
 interface Props {
   hostname: string | undefined;
@@ -42,7 +42,7 @@ export const CustomizableLogoAndText: React.FC<Props> = ({ hostname }) => {
       <Logo >
         <Image
           alt="logo"
-          src="/api/logo"
+          src={join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/logo")}
           layout="fill"
           objectFit="contain"
         />
