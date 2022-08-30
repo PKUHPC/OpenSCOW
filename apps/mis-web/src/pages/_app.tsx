@@ -75,7 +75,9 @@ function MyApp({ Component, pageProps, extra }: Props) {
       <Head>
         <meta name="format-detection" content="telephone=no"/>
         <link href="/manifest.json" rel="manifest" id="manifest" />
-        <link rel="icon" type="image/x-icon" href="/api/icon?type=favicon"></link>
+        <link rel="icon" type="image/x-icon"
+          href={join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/icon?type=favicon")}
+        ></link>
       </Head>
       <GlobalStyle />
       <StoreProvider stores={[userStore]}>
@@ -145,9 +147,9 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
 
     const hostname = getHostname(appContext.ctx.req);
 
-    extra.primaryColor = (hostname && runtimeConfig.UI_CONFIG?.primaryColor?.hostnameMap?.[hostname]) 
+    extra.primaryColor = (hostname && runtimeConfig.UI_CONFIG?.primaryColor?.hostnameMap?.[hostname])
     ?? runtimeConfig.UI_CONFIG?.primaryColor?.defaultColor ?? runtimeConfig.DEFAULT_PRIMARY_COLOR;
-    extra.footerText = (hostname && runtimeConfig.UI_CONFIG?.footer?.hostnameTextMap?.[hostname]) 
+    extra.footerText = (hostname && runtimeConfig.UI_CONFIG?.footer?.hostnameTextMap?.[hostname])
     ?? runtimeConfig.UI_CONFIG?.footer?.defaultText ?? "";
   }
 
