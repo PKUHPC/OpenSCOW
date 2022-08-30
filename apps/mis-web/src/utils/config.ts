@@ -6,7 +6,7 @@ import getConfig from "next/config";
 
 export interface ServerRuntimeConfig {
   SERVER_URL: string;
-  AUTH_EXTERNAL_URL: string;
+  BASE_PATH: string;
   AUTH_INTERNAL_URL: string;
 
   UI_CONFIG: UiConfigSchema | undefined;

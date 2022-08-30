@@ -12,7 +12,7 @@ title: "portal-web"
 
 | 名字 | 类型 | 描述 | 默认值 |
 | -- | -- | -- | -- |
-|`AUTH_EXTERNAL_URL`|字符串|认证服务外网地址|/auth|
+|`BASE_PATH`|字符串|整个系统的base path|/|
 |`AUTH_INTERNAL_URL`|字符串|认证服务内网地址|http://auth:5000|
 |`LOGIN_NODES`|字符串|集群的登录节点。将会覆写配置文件。格式：集群ID=登录节点,集群ID=登录节点||
 |`SSH_PRIVATE_KEY_PATH`|字符串|SSH私钥路径|~/.ssh/id_rsa|

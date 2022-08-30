@@ -7,7 +7,7 @@ import { KeyPair } from "@scow/lib-ssh";
 import getConfig from "next/config";
 
 export interface ServerRuntimeConfig {
-  AUTH_EXTERNAL_URL: string;
+  BASE_PATH: string;
   AUTH_INTERNAL_URL: string;
 
   SSH_PRIVATE_KEY_PATH: string;

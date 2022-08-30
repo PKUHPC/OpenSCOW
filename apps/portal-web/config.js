@@ -30,7 +30,8 @@ async function queryCapabilities(authUrl, phase) {
 
 const specs = {
 
-  AUTH_EXTERNAL_URL: str({ desc: "认证服务外网地址", default: "/auth" }),
+  BASE_PATH: str({ desc: "整个系统的base path", default: "/" }),
+
   AUTH_INTERNAL_URL: str({ desc: "认证服务内网地址", default: "http://auth:5000" }),
 
   LOGIN_NODES: str({ desc: "集群的登录节点。将会覆写配置文件。格式：集群ID=登录节点,集群ID=登录节点", default: "" }),
@@ -102,7 +103,7 @@ const buildRuntimeConfig = async (phase) => {
    * @type {import("./src/utils/config").ServerRuntimeConfig}
    */
   const serverRuntimeConfig = {
-    AUTH_EXTERNAL_URL: config.AUTH_EXTERNAL_URL,
+    BASE_PATH: config.BASE_PATH,
     AUTH_INTERNAL_URL: config.AUTH_INTERNAL_URL,
     SSH_PRIVATE_KEY_PATH: config.SSH_PRIVATE_KEY_PATH,
     ROOT_KEY_PAIR: keyPair,
