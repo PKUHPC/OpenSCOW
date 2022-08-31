@@ -52,7 +52,9 @@ export const userRoutes: () => NavItemProps[] = () => [
     Icon: MacCommandOutlined,
     text: "Shell",
     path: "/shell",
-    clickToPath: publicConfig.CLUSTERS.length === 1 ? `/shell/${publicConfig.CLUSTERS[0].id}` : undefined,
+    clickToPath: publicConfig.CLUSTERS.length === 1
+      ? `${process.env.NEXT_PUBLIC_BASE_PATH || ""}/shell/${publicConfig.CLUSTERS[0].id}`
+      : undefined,
     openInNewPage: true,
     clickable: publicConfig.CLUSTERS.length === 1,
     children: publicConfig.CLUSTERS.map(({ name, id }) => ({
