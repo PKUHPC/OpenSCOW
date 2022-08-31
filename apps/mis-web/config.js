@@ -1,6 +1,6 @@
 // @ts-check
 
-const { envConfig, getConfigFromFile, parseKeyValue, regex, str } = require("@scow/config");
+const { envConfig, getConfigFromFile, parseKeyValue, regex, str, bool } = require("@scow/config");
 const { getClusterConfigs } = require("@scow/config/build/appConfig/cluster");
 const { getMisConfig } = require("@scow/config/build/appConfig/mis");
 const { getClusterTextsConfig } = require("@scow/config/build/appConfig/clusterTexts");
@@ -32,7 +32,8 @@ const specs = {
 
   AUTH_INTERNAL_URL: str({ desc: "认证服务内网地址", default: "http://auth:5000" }),
 
-  PORTAL_URL: str({ desc: "如果部署了门户系统，设置URL或者路径。将会覆盖配置文件。空字符串等价于未设置", default: "" }),
+  PORTAL_DEPLOYED: bool({ desc: "是否部署了门户系统", default: false }),
+  PORTAL_URL: str({ desc: "如果部署了门户系统，设置URL或者路径。将会覆盖配置文件。空字符串等价于未部署门户系统", default: "" }),
 };
 
 const config = envConfig(specs, process.env);
@@ -77,6 +78,8 @@ const buildRuntimeConfig = async (phase) => {
     SERVER_URL: config.SERVER_URL,
   };
 
+  const portalUrlSetting = config.PORTAL_URL || misConfig.portalUrl;
+
   /**
    * @type {import("./src/utils/config").PublicRuntimeConfig}
    */
@@ -93,7 +96,7 @@ const buildRuntimeConfig = async (phase) => {
     ACCOUNT_NAME_PATTERN: misConfig.accountNamePattern?.regex,
     ACCOUNT_NAME_PATTERN_MESSAGE: misConfig.accountNamePattern?.errorMessage,
 
-    PORTAL_URL: config.PORTAL_URL || misConfig.portalUrl,
+    PORTAL_URL: config.PORTAL_URL ? (config.PORTAL_URL || misConfig.portalUrl) : undefined,
   };
 
   if (!building) {

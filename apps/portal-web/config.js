@@ -43,7 +43,8 @@ const specs = {
 
   PROXY_BASE_PATH: str({ desc: "网关的代理路径", default: "/proxy" }),
 
-  MIS_URL: str({ desc: "如果部署了管理系统，设置URL或者路径。将会覆盖配置文件。空字符串等价于未设置", default: "" }),
+  MIS_DEPLOYED: bool({ desc: "是否部署了管理系统", default: false }),
+  MIS_URL: str({ desc: "如果部署了管理系统，设置URL或者路径。将会覆盖配置文件。空字符串等价于未部署管理系统", default: "" }),
 };
 
 // This config is used to provide env doc auto gen
@@ -119,6 +120,8 @@ const buildRuntimeConfig = async (phase) => {
   // query auth capabilities to set optional auth features
   const capabilities = await queryCapabilities(config.AUTH_INTERNAL_URL, phase);
 
+  const misUrlSetting = config.MIS_URL || portalConfig.misUrl;
+
   /**
    * @type {import("./src/utils/config").PublicRuntimeConfig}
    */
@@ -135,7 +138,7 @@ const buildRuntimeConfig = async (phase) => {
 
     ENABLE_APPS: portalConfig.apps,
 
-    MIS_URL: config.MIS_URL || portalConfig.misUrl,
+    MIS_URL: config.MIS_DEPLOYED ? (config.MIS_URL || portalConfig.misUrl) : undefined,
 
     DEFAULT_HOME_TEXT: portalConfig.homeText.defaultText,
     HOME_TEXTS: portalConfig.homeText.hostnameMap,
