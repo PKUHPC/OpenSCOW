@@ -7,7 +7,7 @@ title: 自定义前端相对路径
 
 对于门户系统和管理系统，根据部署的URL不同，我们提供部署在根路径(`/`)和一个子路径（`/mis`和`/portal`）的镜像。如果想把前端部署在其他相对路径，需要重新编译项目。
 
-我们假设整个系统部署在`/demo1`之下，门户在`/demo1`根目录下，管理系统在`/demo1/mis`下，.env中的`IMAGE_BASE`为`%CR_URL%`。
+我们假设整个系统部署在`/demo1`之下，门户在`/demo1`根目录下，管理系统在`/demo1/mis`下，.env中的`IMAGE_BASE`为`%CR_URL%`，`IMAGE_TAG`为`master`。
 
 这种情况操作如下：
 
@@ -26,10 +26,10 @@ git clone --depth=1 %REPO_URL%
 # BASE_PATH设置为部署时的相对路径，以/开头，不要以/结尾
 
 # 管理系统
-docker build -f dockerfiles/Dockerfile.mis-web --build-arg BASE_PATH="/demo1/mis" -t "%CR_URL%/mis-web-mis1" .
+docker build -f dockerfiles/Dockerfile.mis-web --build-arg BASE_PATH="/demo1/mis" -t "%CR_URL%/mis-web-mis1:master" .
 
 # 门户系统
-docker build -f dockerfiles/Dockerfile.portal-web --build-arg BASE_PATH="/demo1" -t "%CR_URL%/portal-web-portal1" .
+docker build -f dockerfiles/Dockerfile.portal-web --build-arg BASE_PATH="/demo1" -t "%CR_URL%/portal-web-portal1:master" .
 ```
 
 4. 构建完成后，修改`.env`
