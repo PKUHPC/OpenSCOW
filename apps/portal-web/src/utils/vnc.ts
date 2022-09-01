@@ -11,6 +11,6 @@ export const openDesktop = (node: string, port: number, password: string) => {
     resize: "remote",
   });
 
-  window.open("/vnc/vnc.html?" + params.toString(), "_blank");
+  window.open(join(publicConfig.PROXY_BASE_PATH, "/vnc/vnc.html") + "?" + params.toString(), "_blank");
 };
 

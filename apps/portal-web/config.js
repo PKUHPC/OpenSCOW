@@ -41,10 +41,10 @@ const specs = {
 
   MOCK_USER_ID: str({ desc: "覆盖已登录用户的用户ID", default: undefined }),
 
-  PROXY_BASE_PATH: str({ desc: "网关的代理路径", default: "/proxy" }),
+  PROXY_BASE_PATH: str({ desc: "网关的代理路径。相对于整个系统的base path。", default: "/proxy" }),
 
   MIS_DEPLOYED: bool({ desc: "是否部署了管理系统", default: false }),
-  MIS_URL: str({ desc: "如果部署了管理系统，设置URL或者路径。将会覆盖配置文件。空字符串等价于未部署管理系统", default: "" }),
+  MIS_URL: str({ desc: "如果部署了管理系统，设置URL或者路径。相对于整个系统的base path。将会覆盖配置文件。空字符串等价于未部署管理系统", default: "" }),
 };
 
 // This config is used to provide env doc auto gen
@@ -138,7 +138,7 @@ const buildRuntimeConfig = async (phase) => {
 
     ENABLE_APPS: portalConfig.apps,
 
-    MIS_URL: config.MIS_DEPLOYED ? (config.MIS_URL || portalConfig.misUrl) : undefined,
+    MIS_URL: config.MIS_DEPLOYED ? join(config.BASE_PATH, config.MIS_URL || portalConfig.misUrl || "") : undefined,
 
     DEFAULT_HOME_TEXT: portalConfig.homeText.defaultText,
     HOME_TEXTS: portalConfig.homeText.hostnameMap,
@@ -152,7 +152,7 @@ const buildRuntimeConfig = async (phase) => {
 
     SUBMIT_JOB_WORKING_DIR: portalConfig.submitJobDefaultPwd,
 
-    PROXY_BASE_PATH: config.PROXY_BASE_PATH,
+    PROXY_BASE_PATH: join(config.BASE_PATH, config.PROXY_BASE_PATH),
   }
 
   if (!building) {

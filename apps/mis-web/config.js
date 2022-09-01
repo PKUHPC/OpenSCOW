@@ -33,7 +33,7 @@ const specs = {
   AUTH_INTERNAL_URL: str({ desc: "认证服务内网地址", default: "http://auth:5000" }),
 
   PORTAL_DEPLOYED: bool({ desc: "是否部署了门户系统", default: false }),
-  PORTAL_URL: str({ desc: "如果部署了门户系统，设置URL或者路径。将会覆盖配置文件。空字符串等价于未部署门户系统", default: "" }),
+  PORTAL_URL: str({ desc: "如果部署了门户系统，设置URL或者路径。相对于整个系统的base path。将会覆盖配置文件。空字符串等价于未部署门户系统", default: "" }),
 };
 
 const config = envConfig(specs, process.env);
@@ -96,7 +96,7 @@ const buildRuntimeConfig = async (phase) => {
     ACCOUNT_NAME_PATTERN: misConfig.accountNamePattern?.regex,
     ACCOUNT_NAME_PATTERN_MESSAGE: misConfig.accountNamePattern?.errorMessage,
 
-    PORTAL_URL: config.PORTAL_URL ? (config.PORTAL_URL || misConfig.portalUrl) : undefined,
+    PORTAL_URL: config.PORTAL_URL ? join(config.BASE_PATH, config.PORTAL_URL || misConfig.portalUrl || "") : undefined,
   };
 
   if (!building) {
