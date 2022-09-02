@@ -10,8 +10,8 @@ slurm:
         cores: 32,
         gpus: 0,
         qos:
-          - "low"
-          - "normal"
+          - "low",
+          - "normal",
           - "high",
         comment: 说明
       },
