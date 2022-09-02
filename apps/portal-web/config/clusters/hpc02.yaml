@@ -9,11 +9,13 @@ slurm:
         cores: 29,
         gpus: 8,
         qos:
-          - normal,
-          - high,
-          - highest,
+          [
+            normal,
+            high,
+            highest          
+          ],
         comment: "说明"
-      }
+      },
       {
         name: another,
         nodes: 2,
