@@ -1,19 +1,25 @@
 displayName: "hpc02Name"
 slurm:
   partitions:
-    GPU:
-      nodes: 2
-      mem: 262144
-      cores: 29
-      gpus: 8
-      qos:
-        - normal
-        - high
-        - highest
-      comment: "说明"
-    another:
-      nodes: 2
-      mem: 262144
-      cores: 29
-      gpus: 8
-      comment: "说明"
+    [
+      {
+        name: GPU,
+        nodes: 2,
+        mem: 262144,
+        cores: 29,
+        gpus: 8,
+        qos:
+          - normal
+          - high
+          - highest,
+        comment: "说明"
+      }
+      {
+        name: another,
+        nodes: 2,
+        mem: 262144,
+        cores: 29,
+        gpus: 8,
+        comment: "说明"
+      }
+    ]
