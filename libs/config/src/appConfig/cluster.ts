@@ -50,7 +50,7 @@ export const ClusterListConfigSchema = Type.Object({
         }
       ),
       {
-        describe: "分区信息，分区名、内存、核心数、GPU卡数、节点数、QOS、计费项说明",
+        description: "分区信息，分区名、内存、核心数、GPU卡数、节点数、QOS、计费项说明",
         default: []
       }
     ),
