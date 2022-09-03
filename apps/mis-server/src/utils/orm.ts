@@ -7,7 +7,7 @@ export const paginationProps = (page?: number, pageSize: number = 10) => ({
 
 export type EntityOrRef<T> = T | IdentifiedReference<T>;
 
-export function toRef<T>(t: EntityOrRef<T>): IdentifiedReference<T> {
+export function toRef<T extends {}>(t: EntityOrRef<T>): IdentifiedReference<T> {
   if (t instanceof Reference) {
     return t;
   } else {

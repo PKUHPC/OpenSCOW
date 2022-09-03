@@ -58,7 +58,7 @@ export const envConfig = <T extends object>(
   };
 };
 
-export function omitConfigSpec<T>(spec: T) {
+export function omitConfigSpec<T extends {}>(spec: T) {
   return Object.keys(spec).reduce((prev, key) => {
     if (key !== "_specs") {
       prev[key] = spec[key];
