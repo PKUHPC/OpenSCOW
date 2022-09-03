@@ -104,7 +104,7 @@ importers:
       '@ddadaal/tsgrpc-cli': 0.13.2
       '@ddadaal/tsgrpc-server': 0.14.2
       '@ddadaal/tsgrpc-utils': 0.14.2
-      '@grpc/grpc-js': 1.6.12
+      '@grpc/grpc-js': 1.6.10
       '@mikro-orm/cli': 5.4.0
       '@mikro-orm/core': 5.4.0
       '@mikro-orm/mariadb': 5.4.0
@@ -125,8 +125,8 @@ importers:
       wait-on: 6.0.1
     dependencies:
       '@ddadaal/tsgrpc-server': 0.14.2
-      '@ddadaal/tsgrpc-utils': 0.14.2_@grpc+grpc-js@1.6.12
-      '@grpc/grpc-js': 1.6.12
+      '@ddadaal/tsgrpc-utils': 0.14.2_@grpc+grpc-js@1.6.10
+      '@grpc/grpc-js': 1.6.10
       '@mikro-orm/cli': 5.4.0_y3awib7uiq4xqqraxzv5lojdt4
       '@mikro-orm/core': 5.4.0_y3awib7uiq4xqqraxzv5lojdt4
       '@mikro-orm/mariadb': 5.4.0_auwkb7hdpalfjah2wrbjz5rnve
@@ -397,7 +397,7 @@ importers:
       '@docusaurus/core': 2.1.0
       '@docusaurus/module-type-aliases': 2.1.0
       '@docusaurus/preset-classic': 2.1.0
-      '@mdx-js/react': 2.1.3
+      '@mdx-js/react': 1.6.22
       '@scow/config': workspace:*
       '@sinclair/typebox': 0.24.34
       '@tsconfig/docusaurus': 1.0.6
@@ -410,7 +410,7 @@ importers:
     dependencies:
       '@docusaurus/core': 2.1.0_rw34wyrummvuuuhgiylphbvpae
       '@docusaurus/preset-classic': 2.1.0_lnvet2r4gmqrpn2pc4ksnywn7q
-      '@mdx-js/react': 2.1.3_react@17.0.2
+      '@mdx-js/react': 1.6.22_react@17.0.2
       clsx: 1.2.1
       prism-react-renderer: 1.3.5_react@17.0.2
       react: 17.0.2
@@ -2454,6 +2454,15 @@ packages:
       tslib: 2.4.0
     dev: false
 
+  /@ddadaal/tsgrpc-utils/0.14.2_@grpc+grpc-js@1.6.10:
+    resolution: {integrity: sha512-YCclHT3Fo/22U9TfvPoBQM0i6bEmPCKY5HAUMiEYvLI/9tWh8Z5Br5z9Xw5ty/HVwsJb/k/Gw6j/Fcf9m9QHeA==}
+    peerDependencies:
+      '@grpc/grpc-js': '>=1.4.0'
+    dependencies:
+      '@grpc/grpc-js': 1.6.10
+      tslib: 2.4.0
+    dev: false
+
   /@ddadaal/tsgrpc-utils/0.14.2_@grpc+grpc-js@1.6.12:
     resolution: {integrity: sha512-YCclHT3Fo/22U9TfvPoBQM0i6bEmPCKY5HAUMiEYvLI/9tWh8Z5Br5z9Xw5ty/HVwsJb/k/Gw6j/Fcf9m9QHeA==}
     peerDependencies:
@@ -3946,16 +3955,6 @@ packages:
       react: 17.0.2
     dev: false
 
-  /@mdx-js/react/2.1.3_react@17.0.2:
-    resolution: {integrity: sha512-11n4lTvvRyxq3OYbWJwEYM+7q6PE0GxKbk0AwYIIQmrRkxDeljIsjDQkKOgdr/orgRRbYy5zi+iERdnwe01CHQ==}
-    peerDependencies:
-      react: '>=16'
-    dependencies:
-      '@types/mdx': 2.0.2
-      '@types/react': 18.0.18
-      react: 17.0.2
-    dev: false
-
   /@mdx-js/util/1.6.22:
     resolution: {integrity: sha512-H1rQc1ZOHANWBvPcW+JpGwr+juXSxM8Q8YCkm3GhZd8REu1fHR3z99CErO1p9pkcfcxZnMdIZdIsXkOHY0NilA==}
     dev: false
@@ -4987,10 +4986,6 @@ packages:
     resolution: {integrity: sha512-W864tg/Osz1+9f4lrGTZpCSO5/z4608eUp19tbozkq2HJK6i3z1kT0H9tlADXuYIb1YYOBByU4Jsqkk75q48qA==}
     dependencies:
       '@types/unist': 2.0.6
-
-  /@types/mdx/2.0.2:
-    resolution: {integrity: sha512-mJGfgj4aWpiKb8C0nnJJchs1sHBHn0HugkVfqqyQi7Wn6mBRksLeQsPOFvih/Pu8L1vlDzfe/LidhVHBeUk3aQ==}
-    dev: false
 
   /@types/mime-types/2.1.1:
     resolution: {integrity: sha512-vXOTGVSLR2jMw440moWTC7H19iUyLtP3Z1YTj7cSsubOICinjMxFeb/V57v9QdyyPGbbWolUFSSmSiRSn94tFw==}
