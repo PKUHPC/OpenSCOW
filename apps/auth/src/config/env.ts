@@ -14,6 +14,8 @@ export const config = envConfig({
     desc: "日志等级",
   }),
 
+  BASE_PATH: str({ desc: "认证系统部署地址的base path", default: "/" }),
+
   AUTH_TYPE: str({ desc: "认证类型。将会覆写配置文件", choices: Object.values(AuthType), default: undefined }),
 
   TEST_USERS: str({ desc: "测试用户，如果这些用户登录，将其ID改为另一个ID。格式：原用户ID=新用户ID,原用户ID=新用户ID。", default: "" }),

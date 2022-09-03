@@ -1,6 +1,6 @@
 // @ts-check
 
-const { envConfig, getConfigFromFile, parseKeyValue, regex, str } = require("@scow/config");
+const { envConfig, getConfigFromFile, parseKeyValue, regex, str, bool } = require("@scow/config");
 const { getClusterConfigs } = require("@scow/config/build/appConfig/cluster");
 const { getMisConfig } = require("@scow/config/build/appConfig/mis");
 const { getClusterTextsConfig } = require("@scow/config/build/appConfig/clusterTexts");
@@ -27,12 +27,13 @@ async function queryCapabilities(authUrl, phase) {
 
 const specs = {
 
+  BASE_PATH: str({ desc: "整个系统的base path", default: "/" }),
   SERVER_URL: str({ desc: "后端服务地址", default: "mis-server:5000" }),
 
-  AUTH_EXTERNAL_URL: str({ desc: "认证服务外网地址", default: "/auth" }),
   AUTH_INTERNAL_URL: str({ desc: "认证服务内网地址", default: "http://auth:5000" }),
 
-  PORTAL_URL: str({ desc: "如果部署了门户系统，设置URL或者路径。将会覆盖配置文件。空字符串等价于未设置", default: "" }),
+  PORTAL_DEPLOYED: bool({ desc: "是否部署了门户系统", default: false }),
+  PORTAL_URL: str({ desc: "如果部署了门户系统，设置URL或者路径。相对于整个系统的base path。将会覆盖配置文件。空字符串等价于未部署门户系统", default: "" }),
 };
 
 const config = envConfig(specs, process.env);
@@ -68,7 +69,7 @@ const buildRuntimeConfig = async (phase) => {
    * @type {import ("./src/utils/config").ServerRuntimeConfig}
    */
   const serverRuntimeConfig = {
-    AUTH_EXTERNAL_URL: config.AUTH_EXTERNAL_URL,
+    BASE_PATH: config.BASE_PATH,
     AUTH_INTERNAL_URL: config.AUTH_INTERNAL_URL,
     CLUSTERS_CONFIG: clusters,
     CLUSTER_TEXTS_CONFIG: clusterTexts,
@@ -76,6 +77,8 @@ const buildRuntimeConfig = async (phase) => {
     DEFAULT_PRIMARY_COLOR,
     SERVER_URL: config.SERVER_URL,
   };
+
+  const portalUrlSetting = config.PORTAL_URL || misConfig.portalUrl;
 
   /**
    * @type {import("./src/utils/config").PublicRuntimeConfig}
@@ -93,7 +96,7 @@ const buildRuntimeConfig = async (phase) => {
     ACCOUNT_NAME_PATTERN: misConfig.accountNamePattern?.regex,
     ACCOUNT_NAME_PATTERN_MESSAGE: misConfig.accountNamePattern?.errorMessage,
 
-    PORTAL_URL: config.PORTAL_URL || misConfig.portalUrl,
+    PORTAL_URL: config.PORTAL_DEPLOYED ? join(config.BASE_PATH, config.PORTAL_URL || misConfig.portalUrl || "") : undefined,
   };
 
   if (!building) {

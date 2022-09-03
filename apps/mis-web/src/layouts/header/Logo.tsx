@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { join } from "path";
 import styled from "styled-components";
 
 const LogoContainer = styled.h1`
@@ -16,7 +17,7 @@ export const Logo = () => {
     <LogoContainer>
       <Link href="/">
         <a>
-          <img height="40px" src="/api/icon?type=favicon" />
+          <img height="40px" src={join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/icon?type=favicon")}/>
         </a>
       </Link>
     </LogoContainer>

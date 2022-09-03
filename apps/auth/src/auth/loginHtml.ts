@@ -1,5 +1,6 @@
 import { FastifyReply, FastifyRequest } from "fastify";
-import { AUTH_EXTERNAL_URL, FAVICON_URL } from "src/config/env";
+import { join } from "path";
+import { AUTH_EXTERNAL_URL, config, FAVICON_URL } from "src/config/env";
 import { uiConfig } from "src/config/ui";
 
 function parseHostname(req: FastifyRequest): string | undefined {
@@ -27,7 +28,7 @@ export async function serveLoginHtml(err: boolean, callbackUrl: string, req: Fas
 
 <head>
     <title>登录</title>
-    <link href="${AUTH_EXTERNAL_URL}/public/assets/tailwind.min.css" rel="stylesheet">
+    <link href="${join(config.BASE_PATH, AUTH_EXTERNAL_URL, "/public/assets/tailwind.min.css")}" rel="stylesheet">
     <link rel="icon" type="image/x-icon" href="${FAVICON_URL}"></link>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
