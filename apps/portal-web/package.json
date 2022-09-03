@@ -16,7 +16,6 @@
   "dependencies": {
     "@ant-design/icons": "4.7.0",
     "@codemirror/autocomplete": "6.1.0",
-    "@codemirror/basic-setup": "0.20.0",
     "@codemirror/commands": "6.1.0",
     "@codemirror/language": "6.2.1",
     "@codemirror/legacy-modes": "6.1.0",
