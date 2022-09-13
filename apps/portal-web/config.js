@@ -30,7 +30,8 @@ async function queryCapabilities(authUrl, phase) {
 
 const specs = {
 
-  AUTH_EXTERNAL_URL: str({ desc: "认证服务外网地址", default: "/auth" }),
+  BASE_PATH: str({ desc: "整个系统的base path", default: "/" }),
+
   AUTH_INTERNAL_URL: str({ desc: "认证服务内网地址", default: "http://auth:5000" }),
 
   LOGIN_NODES: str({ desc: "集群的登录节点。将会覆写配置文件。格式：集群ID=登录节点,集群ID=登录节点", default: "" }),
@@ -40,9 +41,10 @@ const specs = {
 
   MOCK_USER_ID: str({ desc: "覆盖已登录用户的用户ID", default: undefined }),
 
-  PROXY_BASE_PATH: str({ desc: "网关的代理路径", default: "/proxy" }),
+  PROXY_BASE_PATH: str({ desc: "网关的代理路径。相对于整个系统的base path。", default: "/proxy" }),
 
-  MIS_URL: str({ desc: "如果部署了管理系统，设置URL或者路径。将会覆盖配置文件。空字符串等价于未设置", default: "" }),
+  MIS_DEPLOYED: bool({ desc: "是否部署了管理系统", default: false }),
+  MIS_URL: str({ desc: "如果部署了管理系统，设置URL或者路径。相对于整个系统的base path。将会覆盖配置文件。空字符串等价于未部署管理系统", default: "" }),
 };
 
 // This config is used to provide env doc auto gen
@@ -102,7 +104,7 @@ const buildRuntimeConfig = async (phase) => {
    * @type {import("./src/utils/config").ServerRuntimeConfig}
    */
   const serverRuntimeConfig = {
-    AUTH_EXTERNAL_URL: config.AUTH_EXTERNAL_URL,
+    BASE_PATH: config.BASE_PATH,
     AUTH_INTERNAL_URL: config.AUTH_INTERNAL_URL,
     SSH_PRIVATE_KEY_PATH: config.SSH_PRIVATE_KEY_PATH,
     ROOT_KEY_PAIR: keyPair,
@@ -117,6 +119,8 @@ const buildRuntimeConfig = async (phase) => {
 
   // query auth capabilities to set optional auth features
   const capabilities = await queryCapabilities(config.AUTH_INTERNAL_URL, phase);
+
+  const misUrlSetting = config.MIS_URL || portalConfig.misUrl;
 
   /**
    * @type {import("./src/utils/config").PublicRuntimeConfig}
@@ -134,7 +138,7 @@ const buildRuntimeConfig = async (phase) => {
 
     ENABLE_APPS: portalConfig.apps,
 
-    MIS_URL: config.MIS_URL || portalConfig.misUrl,
+    MIS_URL: config.MIS_DEPLOYED ? join(config.BASE_PATH, config.MIS_URL || portalConfig.misUrl || "") : undefined,
 
     DEFAULT_HOME_TEXT: portalConfig.homeText.defaultText,
     HOME_TEXTS: portalConfig.homeText.hostnameMap,
@@ -148,7 +152,7 @@ const buildRuntimeConfig = async (phase) => {
 
     SUBMIT_JOB_WORKING_DIR: portalConfig.submitJobDefaultPwd,
 
-    PROXY_BASE_PATH: config.PROXY_BASE_PATH,
+    PROXY_BASE_PATH: join(config.BASE_PATH, config.PROXY_BASE_PATH),
   }
 
   if (!building) {

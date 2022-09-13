@@ -5,9 +5,16 @@ title: slurm
 
 # 配置使用slurm的集群
 
-## 部署slurm.sh
+## 选定slurm节点和部署slurm.sh
 
-将[slurm.sh](%REPO_FILE_URL%/apps/mis-server/scripts/slurm.sh)复制进每个集群的**slurm节点**，并给予可执行权限。
+在集群中选定一个节点作为**slurm节点**。此节点需要满足以下条件：
+
+- **服务节点**可以以root用户SSH免密登录到此节点
+- 此节点上安装并配置好了slurm的客户端程序，如`sacctmgr`、`squeue`等。
+
+我们建议在slurm集群的manager节点上同时配置客户端程序，并使用此节点为**slurm节点**。
+
+之后，将[slurm.sh](%REPO_FILE_URL%/apps/mis-server/scripts/slurm.sh)复制进每个集群的**slurm节点**，并给予可执行权限。
 
 ## 修改集群配置
 

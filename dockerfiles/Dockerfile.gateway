@@ -1,8 +1,5 @@
 FROM nginx:alpine@sha256:082f8c10bd47b6acc8ef15ae61ae45dd8fde0e9f389a8b5cb23c37408642bf5d
 
-# load njs
-RUN sed -i "1 i\load_module /etc/nginx/modules/ngx_http_js_module.so;\n" /etc/nginx/nginx.conf
-
 COPY apps/gateway/includes /etc/nginx/includes
 COPY apps/gateway/nginx.conf /etc/nginx/templates/default.conf.template
 
@@ -11,10 +8,10 @@ ENV CLIENT_MAX_BODY_SIZE=1g
 ENV ACCESS_LOG=/var/log/nginx/access.log
 ENV ERROR_LOG=/var/log/nginx/error.log
 ENV EXTRA=
-ENV FILE_SERVERS=
-ENV ROOT_PATH_INTERNAL_URL=http://portal-web:3000
-ENV SUB_PATH_INTERNAL_URL=http://mis-web:3000
-ENV SUB_PATH=/mis
+ENV PORTAL_PATH=/
+ENV PORTAL_PATH_INTERNAL_URL=http://portal-web:3000
+ENV MIS_PATH=/mis
+ENV MIS_PATH_INTERNAL_URL=http://mis-web:3000
 ENV SHELL_SERVER_INTERNAL_URL=http://shell-server:5000
 ENV AUTH_INTERNAL_URL=http://auth:5000
 ENV RESOLVER=127.0.0.11

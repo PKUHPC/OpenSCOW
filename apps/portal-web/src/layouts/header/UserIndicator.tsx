@@ -47,9 +47,9 @@ export const UserIndicator: React.FC<Props> = ({
             </a>
           </Dropdown>
         ) : (
-          <a href="/api/auth">
+          <Link href="/api/auth">
             登录
-          </a>
+          </Link>
         )
       }
     </Container>

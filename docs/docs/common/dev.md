@@ -15,8 +15,7 @@ title: 开发
 
 - `protos`：包含了整个系统所有的proto文件
 - `dockerfiles`：包含整个系统所有的dockerfile文件
-- `docker-compose.yml`：用来快速build每个子系统，不应该用来运行子系统
-- `docker-compose.dev.yml`：用于快速启动开发和测试本系统所需要的本地环境
+- `dev`：开发相关文件
 - `apps`：所有子系统
 - `libs`：公共库
 - `docs`：文档项目
@@ -48,17 +47,41 @@ pnpm i
 
 # 准备开发需要的库和代码：构建依赖库，生成各种代码
 pnpm prepareDev
+
 ```
 
+apps下的所有项目均可以使用`dev`脚本以开发环境运行。
 
-### 为什么不采用其他monorepo管理方案？
+```bash
+# 以开发环境运行门户前端
+cd apps/portal-web
+pnpm dev
+```
 
-- npm workspace：
-  - ~~这个会把所有依赖装在根目录，但是tsgrpc-cli会假设依赖装在项目目录，这样tsgrpc-cli就不能运行了~~（解决了）
-  - npm workspace运行命令时不按依赖拓扑排序顺序运行（wtf!!!!），也不能手动在根package.json里指定所有包，因为每个子系统构建时，不存在其他子系统
-- yarn workspace：新版本berry和volta的兼容性不好([issue](https://github.com/volta-cli/volta/issues/651))，yarn的workspaces的foreach命令需要单独装插件，而且foreach命令不会交互式地输出结果
-- nx: 尝试迁移过去好几次了，但是感觉概念有点太复杂了……
-- lerna: 很久没更新了，删除依赖需要删掉包的node_modules然后重新bootstrap，麻烦
+以开发环境运行文档项目
+
+```bash
+cd docs
+pnpm start
+```
+
+其他常用命令：
+
+```bash
+# 编译libs目录下的库
+pnpm build:libs
+
+# 在某一个具体项目下运行特定的脚本
+# {项目名}请替换为项目package.json中name字段的@scow/后面的内容
+# 项目可以运行什么脚本请查看项目package.json中的scripts
+pnpm --filter {项目名} build
+
+# 如运行@scow/config项目的build命令（编译），则运行
+# 要想使用任何libs项目下的修改，必须先运行对应的build命令编译好
+pnpm --filter config build
+
+```
+
 
 ## 测试开发环境
 
@@ -69,7 +92,11 @@ pnpm prepareDev
 pnpm prepareDev
 
 # 运行测试
+# 测试环境必须在prepareDev运行后才能运行
 pnpm test
+
+# 对某一项目运行测试（此为对@scow/portal-web项目运行测试）
+pnpm --filter portal-web test
 ```
 
 ## 容器构建说明
@@ -87,6 +114,19 @@ pnpm test
 
 项目要求所有commit遵守[Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/)标准。项目使用[commitlint](https://github.com/conventional-changelog/commitlint)进行commit检查，如果commit格式不正确将会拒绝commit。如果您不熟悉Conventional Commits标准，可以运行`pnpm cm`打开一个可交互式程序，根据程序的提示填写对应信息。
 
+## 为什么不采用其他monorepo管理方案？
+
+- npm workspace：
+  - ~~这个会把所有依赖装在根目录，但是tsgrpc-cli会假设依赖装在项目目录，这样tsgrpc-cli就不能运行了~~（解决了）
+  - npm workspace运行命令时不按依赖拓扑排序顺序运行（wtf!!!!），也不能手动在根package.json里指定所有包，因为每个子系统构建时，不存在其他子系统
+- yarn workspace：新版本berry和volta的兼容性不好([issue](https://github.com/volta-cli/volta/issues/651))，yarn的workspaces的foreach命令需要单独装插件，而且foreach命令不会交互式地输出结果
+- nx: 尝试迁移过去好几次了，但是感觉概念有点太复杂了……
+- lerna: 很久没更新了，删除依赖需要删掉包的node_modules然后重新bootstrap，麻烦
+
 ## CI
 
-所有往master分支的commit都会触发CI。CI会构建所有组件，把组件push到registry中，然后触发测试集群的部署。
+项目CI配置如下：
+
+![CI流程](./ci.jpg)
+
+

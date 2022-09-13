@@ -305,11 +305,11 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
         <Space wrap>
           {
             publicConfig.ENABLE_SHELL ? (
-              <a href={`/shell/${cluster}${path}`} target="_blank" rel="noreferrer">
+              <Link href={`/shell/${cluster}${path}`} target="_blank">
                 <Button icon={<MacCommandOutlined />}>
                   在终端中打开
                 </Button>
-              </a>
+              </Link>
             ) : null
           }
           <CreateFileButton
