@@ -1,7 +1,7 @@
 displayName: hpc01
 slurm:
   partitions:
-    compute:
+    - name: compute
       nodes: 198
       mem: 63000
       cores: 28
@@ -10,7 +10,7 @@ slurm:
         - low
         - normal
         - high
-    gpu:
+    - name: gpu
       nodes: 1
       mem: 386000
       cores: 48

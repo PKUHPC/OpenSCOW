@@ -7,7 +7,7 @@ slurm:
     clusterName: pkuhpc
     scriptPath: /test/slurm.sh
   partitions:
-    C032M0128G:
+    - name: C032M0128G
       mem: 131072
       cores: 32
       nodes: 32
@@ -17,7 +17,7 @@ slurm:
         - normal
         - high
         - cryoem
-    GPU:
+    - name: GPU
       mem: 262144
       cores: 28
       nodes: 32
@@ -27,7 +27,7 @@ slurm:
         - normal
         - high
         - cryoem
-    life:
+    - name: life
       mem: 262144
       cores: 28
       gpus: 4

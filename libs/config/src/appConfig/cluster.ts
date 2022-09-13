@@ -61,14 +61,14 @@ export const ClusterListConfigSchema = Type.Object({
 
 export type ClusterListConfigSchema = Static<typeof ClusterListConfigSchema>;
 
-const List2Map = (src: Record<string, ClusterListConfigSchema>): Record<string, ClusterConfigSchema> => {
-  let result: Record<string, ClusterConfigSchema> = {};
+const convertToOldConfigSchema = (src: Record<string, ClusterListConfigSchema>): Record<string, ClusterConfigSchema> => {
+  const result: Record<string, ClusterConfigSchema> = {};
   for (const key in src) {
-    let dir  = key;
-    let temp = src[key];
-    let partitionstemp: ClusterConfigSchema["slurm"]["partitions"] = {};
-    for(const partition of temp.slurm.partitions) {
-      partitionstemp[partition.name] = {
+    const name  = key;
+    const clusterConfig = src[key];
+    const partitions: ClusterConfigSchema["slurm"]["partitions"] = {};
+    for (const partition of clusterConfig.slurm.partitions) {
+      partitions[partition.name] = {
         mem: partition.mem,
         cores: partition.cores,
         gpus: partition.gpus,
@@ -77,14 +77,14 @@ const List2Map = (src: Record<string, ClusterListConfigSchema>): Record<string, 
         comment: partition.comment,
       };
     }
-    result[dir] = {
-      displayName: temp.displayName,
-      scheduler: temp.scheduler,
-      misIgnore: temp.misIgnore,
+    result[name] = {
+      displayName: clusterConfig.displayName,
+      scheduler: clusterConfig.scheduler,
+      misIgnore: clusterConfig.misIgnore,
       slurm: {
-        loginNodes: temp.slurm.loginNodes,
-        computeNodes: temp.slurm.computeNodes,
-        partitions: partitionstemp   
+        loginNodes: clusterConfig.slurm.loginNodes,
+        computeNodes: clusterConfig.slurm.computeNodes,
+        partitions: partitions
       }
     }
   }
@@ -94,9 +94,8 @@ const List2Map = (src: Record<string, ClusterListConfigSchema>): Record<string, 
 export const getClusterConfigs = (baseConfigPath?: string): Record<string, ClusterConfigSchema> => {
 
   // const appsConfig = getDirConfig(ClusterConfigSchema, CLUSTER_CONFIG_BASE_PATH, baseConfigPath);
-  let appsListConfig = getDirConfig(ClusterListConfigSchema, CLUSTER_CONFIG_BASE_PATH, baseConfigPath);
-  let appsConfig  =  List2Map(appsListConfig)
-
+  const appsListConfig = getDirConfig(ClusterListConfigSchema, CLUSTER_CONFIG_BASE_PATH, baseConfigPath);
+  const appsConfig = convertToOldConfigSchema(appsListConfig)
   Object.entries(appsConfig).forEach(([id, config]) => {
     if (!config[config.scheduler]) {
       throw new Error(`App ${id} is of scheduler ${config.scheduler} but config.${config.scheduler} is not set`);
