@@ -27,10 +27,10 @@ slurm:
     - cn01
     - cn02
 
-  # 集群的分区信息
+  # 集群的分区信息，结构为一个列表
   partitions:
     # 分区1的名字
-    compute:
+    - name: compute
       # 分区内节点数
       nodes: 28
       # 单节点内存数量，单位M
@@ -47,7 +47,7 @@ slurm:
       # 这个分区的备注信息
       comment: ""
 
-    GPU:
+    - name: GPU
       nodes: 1
       mem: 262144
       cores: 48
