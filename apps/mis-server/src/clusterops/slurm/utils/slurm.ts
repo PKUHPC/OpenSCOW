@@ -1,8 +1,6 @@
 import { Logger } from "@ddadaal/tsgrpc-server";
-import { ServiceError } from "@grpc/grpc-js";
-import { Status } from "@grpc/grpc-js/build/src/constants";
 import { SlurmMisConfigSchema } from "@scow/config/build/appConfig/mis";
-import { sshConnect } from "@scow/lib-ssh";
+import { loggedExec, sshConnect } from "@scow/lib-ssh";
 import { rootKeyPair } from "src/config/env";
 
 export const executeScript = async (
@@ -12,25 +10,7 @@ export const executeScript = async (
   const host = slurmMisConfig.managerUrl;
 
   return await sshConnect(host, "root", rootKeyPair, logger, async (ssh) => {
-    const resp = await ssh.exec(cmd, parameters, { stream: "both", execOptions: { env } });
-
-    logger.trace({ cmd: {
-      cmd: [cmd, ...parameters].join(" "),
-      code: resp.code,
-      stdout: resp.stdout,
-      stderr: resp.stderr,
-    } }, "Command completed.");
-
-    if (resp.code !== 0) {
-      logger.error("Command %o failed. stdout %s, stderr %s",
-        [cmd, ...parameters].join(" "), resp.stdout, resp.stderr);
-      throw <ServiceError> {
-        code: Status.INTERNAL,
-        message: "Command execution failed.",
-      };
-    }
-
-    return resp;
+    return await loggedExec(ssh, logger, true, cmd, parameters, { execOptions: { env } });
   });
 };
 
