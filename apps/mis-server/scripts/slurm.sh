@@ -639,7 +639,7 @@ blockUser(){
             echo "User $2 is already blocked!"
             exit 8
         else
-            sacctmgr -i -Q modify user $2 set qos=block DefaultQOS=block
+            sacctmgr -i -Q modify user $2 set MaxSubmitJobs=0  MaxJobs=0 MaxWall=00:00:00  GrpJobs=0 GrpSubmit=0 GrpSubmitJobs=0 MaxSubmitJobs=0 GrpWall=00:00:00
             echo "User $2 is blocked!"
             exit 0
         fi
@@ -673,8 +673,7 @@ blockUserfromAcct(){
             echo "User $3 is not exist in account $2"
             exit 4
         else
-            #sacctmgr -i modify user where name=$3 account=$2 set MaxSubmitJobs=0  MaxJobs=0
-            sacctmgr -i modify user where name=$3 account=$2 set qos=block DefaultQOS=block
+            sacctmgr -i -Q modify user where name=$3 account=$2 set MaxSubmitJobs=0  MaxJobs=0 MaxWall=00:00:00  GrpJobs=0 GrpSubmit=0 GrpSubmitJobs=0 MaxSubmitJobs=0 GrpWall=00:00:00
             echo "User $3 is blocked in account $2!"
             exit 0
         fi
@@ -697,15 +696,9 @@ allowUser(){
             echo "User $2 is not exist!"
             exit 7
         fi
-        qos=`sacctmgr show assoc format=user,qos | grep $2 | uniq | awk '{print $2}'`
-        if [ "$qos" == "high,low,normal" ] ; then
-            echo "User $2 is already allowed!"
-            exit 8
-        else
-            sacctmgr -i -Q modify user $2 set qos=high,low,normal DefaultQOS=low
-            echo "User $2 is allowed!"
-            exit 0
-        fi
+        sacctmgr -i -Q modify user $2 set MaxSubmitJobs=-1 MaxJobs=-1 MaxWall=-1  GrpJobs=-1 GrpSubmit=-1 GrpSubmitJobs=-1 MaxSubmitJobs=-1 GrpWall=-1
+        echo "User $2 is allowed!"
+        exit 0
     else
         echo -e "$allowUser\n"
         echo $nocommand
@@ -735,8 +728,7 @@ allowUserfromAcct(){
             echo "User $3 is not exist in account $2"
             exit 4
         else
-            #sacctmgr -i modify user where name=$3 account=$2 set MaxSubmitJobs=-1 MaxJobs=-1
-            sacctmgr -i -Q modify user where name=$3 account=$2 set qos=high,low,normal DefaultQOS=low
+            sacctmgr -i -Q modify user where name=$3 account=$2 set MaxSubmitJobs=-1 MaxJobs=-1 MaxWall=-1  GrpJobs=-1 GrpSubmit=-1 GrpSubmitJobs=-1 MaxSubmitJobs=-1 GrpWall=-1
             echo "User $3 is allowed in account $2!"
             exit 0
         fi
