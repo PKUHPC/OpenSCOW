@@ -57,8 +57,9 @@ export const ClusterListConfigSchema = Type.Object({
 export type ClusterListConfigSchema = Static<typeof ClusterListConfigSchema>;
 
 
-// eslint-disable-next-line max-len
-const convertToOldConfigSchema = (src: Record<string, ClusterListConfigSchema>): Record<string, ClusterConfigSchema> => {
+const convertToOldConfigSchema = (
+  src: Record<string, ClusterListConfigSchema>,
+): Record<string, ClusterConfigSchema> => {
   const result: Record<string, ClusterConfigSchema> = {};
   for (const key in src) {
     const name  = key;
