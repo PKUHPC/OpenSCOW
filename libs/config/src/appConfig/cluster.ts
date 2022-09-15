@@ -17,7 +17,7 @@ export type ClusterConfigSchema = {
       qos?: string[];
       comment?: string;
     }>;
-    mis?: SlurmMisConfigSchema;
+    mis: SlurmMisConfigSchema | undefined;
   };
   misIgnore: boolean;
 }
@@ -82,6 +82,7 @@ const convertToOldConfigSchema = (src: Record<string, ClusterListConfigSchema>):
         loginNodes: clusterConfig.slurm.loginNodes,
         computeNodes: clusterConfig.slurm.computeNodes,
         partitions: partitions,
+        mis: clusterConfig.slurm.mis,
       },
     };
   }
