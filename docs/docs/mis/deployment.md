@@ -22,17 +22,30 @@ title: 部署
 # COMPOSE_PROFILES=mis
 COMPOSE_PROFILES=mis,portal
 
-# 如果本项目将会部署在域名的根目录下，按如下设置这两个变量
-MIS_ROOT_URL=/
-MIS_IMAGE_POSTFIX=root
+# 确认管理系统会部署
+MIS_DEPLOYED=true
 
 # 如果将会部署在`/mis`路径下，按如下设置这两个变量
-MIS_ROOT_URL=/mis
+MIS_BASE_PATH=/mis
 MIS_IMAGE_POSTFIX=mis
 
+# 如果本项目将会部署在域名的根目录下，按如下设置这两个变量
+MIS_BASE_PATH=/
+MIS_IMAGE_POSTFIX=root
+
 # 设置管理系统数据库密码
+# 在系统第一次启动前可自由设置，使用此密码可以以root身份登录数据库
+# 一旦数据库启动后即不可修改
+# 必须长于8个字符，并同时包括字母、数字和符号
 MIS_DB_PASSWORD=must!chang3this
 ```
+
+:::tip
+
+如果想自定义系统部署的相对路径，或者了解`MIS_BASE_PATH`的含义，请参考[自定义相对路径](../common/customization/basepath.md)。
+
+:::
+
 
 ## 更新集群配置文件
 

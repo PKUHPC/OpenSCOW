@@ -16,14 +16,22 @@ title: 部署
 # COMPOSE_PROFILES=portal
 COMPOSE_PROFILES=mis,portal
 
+PORTAL_DEPLOYED=true
+
 # 如果本项目将会部署在域名的根目录下，按如下设置这两个变量
-PORTAL_ROOT_URL=/
+PORTAL_BASE_PATH=/
 PORTAL_IMAGE_POSTFIX=root
 
 # 如果将会部署在`/portal`路径下，按如下设置这两个变量
-PORTAL_ROOT_URL=/portal
+PORTAL_BASE_PATH=/portal
 PORTAL_IMAGE_POSTFIX=root
 ```
+
+:::tip
+
+如果想自定义系统部署的相对路径，或者了解`PORTAL_BASE_PATH`的含义，请参考[自定义相对路径](../common/customization/basepath.md)。
+
+:::
 
 ## 编写门户服务配置
 
