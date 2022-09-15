@@ -64,6 +64,11 @@ export const clustersPlugin = plugin(async (f) => {
 
     callOnOne: <CallOnOne>(async (cluster, logger, call) => {
       const ops = getClusterOps(cluster);
+
+      if (!ops) {
+        throw new Error("Calling actions on non-existing cluster " + cluster);
+      }
+
       if (ops.ignore) {
         throw new Error("Call specific actions on ignored cluster " + cluster);
       }
