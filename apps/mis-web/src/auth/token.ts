@@ -1,5 +1,5 @@
 import { jsonFetch } from "@ddadaal/next-typed-api-routes-runtime/lib/client";
-import { asyncClientCall } from "@ddadaal/tsgrpc-utils";
+import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import path from "path";
 import { MOCK_USER_INFO } from "src/apis/api.mock";
 import { USE_MOCK } from "src/apis/useMock";

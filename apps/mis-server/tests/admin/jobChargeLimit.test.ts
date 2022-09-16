@@ -1,5 +1,5 @@
+import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Server } from "@ddadaal/tsgrpc-server";
-import { asyncClientCall } from "@ddadaal/tsgrpc-utils";
 import { ChannelCredentials } from "@grpc/grpc-js";
 import { SqlEntityManager } from "@mikro-orm/mysql";
 import { Decimal, decimalToMoney } from "@scow/lib-decimal";

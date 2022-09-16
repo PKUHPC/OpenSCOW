@@ -1,9 +1,10 @@
 import { route } from "@ddadaal/next-typed-api-routes-runtime";
-import { asyncClientCall, ensureNotUndefined } from "@ddadaal/tsgrpc-utils";
+import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { authenticate } from "src/auth/server";
 import { Money } from "src/generated/common/money";
 import { AccountServiceClient, GetAccountsRequest } from "src/generated/server/account";
 import { TenantRole } from "src/models/User";
+import { ensureNotUndefined } from "src/utils/checkNull";
 import { getClient } from "src/utils/client";
 
 export type AdminAccountInfo = {

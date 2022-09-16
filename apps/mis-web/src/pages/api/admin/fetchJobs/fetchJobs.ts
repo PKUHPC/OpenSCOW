@@ -1,5 +1,5 @@
 import { route } from "@ddadaal/next-typed-api-routes-runtime";
-import { asyncClientCall } from "@ddadaal/tsgrpc-utils";
+import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { authenticate } from "src/auth/server";
 import { AdminServiceClient } from "src/generated/server/admin";
 import { PlatformRole } from "src/models/User";

@@ -1,5 +1,5 @@
 import { route } from "@ddadaal/next-typed-api-routes-runtime";
-import { asyncClientCall } from "@ddadaal/tsgrpc-utils";
+import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { InitServiceClient } from "src/generated/server/init";
 import { getClient } from "src/utils/client";
 import { queryIfInitialized } from "src/utils/init";

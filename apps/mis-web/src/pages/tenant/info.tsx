@@ -1,4 +1,4 @@
-import { asyncClientCall } from "@ddadaal/tsgrpc-utils";
+import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { status } from "@grpc/grpc-js";
 import { moneyToNumber, numberToMoney } from "@scow/lib-decimal";
 import { Descriptions, Tag } from "antd";

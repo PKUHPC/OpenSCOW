@@ -1,4 +1,3 @@
-import { ensureNotUndefined } from "@ddadaal/tsgrpc-utils";
 import { moneyToNumber } from "@scow/lib-decimal";
 import { Divider } from "antd";
 import { GetServerSideProps, NextPage } from "next";
@@ -15,6 +14,7 @@ import { AccountInfoSection } from "src/pageComponents/dashboard/AccountInfoSect
 import { JobsSection } from "src/pageComponents/dashboard/JobsSection";
 import { getUserStatus, GetUserStatusSchema } from "src/pages/api/dashboard/status";
 import { UserStore } from "src/stores/UserStore";
+import { ensureNotUndefined } from "src/utils/checkNull";
 import { Head } from "src/utils/head";
 
 export type AccountInfo = Omit<AccountStatus, "balance"> & {

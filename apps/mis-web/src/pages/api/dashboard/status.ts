@@ -1,5 +1,5 @@
 import { route } from "@ddadaal/next-typed-api-routes-runtime";
-import { asyncClientCall } from "@ddadaal/tsgrpc-utils";
+import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { authenticate } from "src/auth/server";
 import type { GetUserStatusReply } from "src/generated/server/user";
 import { UserServiceClient } from "src/generated/server/user";

@@ -1,5 +1,4 @@
-import { plugin } from "@ddadaal/tsgrpc-server";
-import { ensureNotUndefined } from "@ddadaal/tsgrpc-utils";
+import { ensureNotUndefined, plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { LockMode } from "@mikro-orm/core";

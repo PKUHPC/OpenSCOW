@@ -23,7 +23,7 @@
     "@codemirror/theme-one-dark": "6.1.0",
     "@codemirror/view": "6.2.3",
     "@ddadaal/next-typed-api-routes-runtime": "0.5.2",
-    "@ddadaal/tsgrpc-utils": "0.14.2",
+    "@ddadaal/tsgrpc-client": "0.15.0",
     "@grpc/grpc-js": "1.7.0",
     "@newhighsco/next-plugin-svgr": "3.0.59",
     "@scow/config": "workspace:*",

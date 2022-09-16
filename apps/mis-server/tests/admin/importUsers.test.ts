@@ -1,6 +1,6 @@
 /* eslint-disable max-len */
+import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Server } from "@ddadaal/tsgrpc-server";
-import { asyncClientCall } from "@ddadaal/tsgrpc-utils";
 import { ChannelCredentials } from "@grpc/grpc-js";
 import { MikroORM } from "@mikro-orm/core";
 import { MySqlDriver } from "@mikro-orm/mysql";

@@ -103,7 +103,6 @@ importers:
     specifiers:
       '@ddadaal/tsgrpc-cli': 0.13.3
       '@ddadaal/tsgrpc-server': 0.15.0
-      '@ddadaal/tsgrpc-utils': 0.14.2
       '@grpc/grpc-js': 1.7.0
       '@mikro-orm/cli': 5.4.2
       '@mikro-orm/core': 5.4.2
@@ -125,7 +124,6 @@ importers:
       wait-on: 6.0.1
     dependencies:
       '@ddadaal/tsgrpc-server': 0.15.0_@grpc+grpc-js@1.7.0
-      '@ddadaal/tsgrpc-utils': 0.14.2_@grpc+grpc-js@1.7.0
       '@grpc/grpc-js': 1.7.0
       '@mikro-orm/cli': 5.4.2_adwgwmyi2u7au24xytkk7s66fy
       '@mikro-orm/core': 5.4.2_adwgwmyi2u7au24xytkk7s66fy
@@ -162,7 +160,7 @@ importers:
       '@ddadaal/next-typed-api-routes-cli': 0.5.1
       '@ddadaal/next-typed-api-routes-runtime': 0.5.2
       '@ddadaal/tsgrpc-cli': 0.13.3
-      '@ddadaal/tsgrpc-utils': 0.14.2
+      '@ddadaal/tsgrpc-client': 0.15.0
       '@grpc/grpc-js': 1.7.0
       '@newhighsco/next-plugin-svgr': 3.0.59
       '@next/bundle-analyzer': 12.3.0
@@ -210,7 +208,7 @@ importers:
       '@codemirror/theme-one-dark': 6.1.0
       '@codemirror/view': 6.2.3
       '@ddadaal/next-typed-api-routes-runtime': 0.5.2_next@12.3.0
-      '@ddadaal/tsgrpc-utils': 0.14.2_@grpc+grpc-js@1.7.0
+      '@ddadaal/tsgrpc-client': 0.15.0_@grpc+grpc-js@1.7.0
       '@grpc/grpc-js': 1.7.0
       '@newhighsco/next-plugin-svgr': 3.0.59_next@12.3.0+webpack@5.74.0
       '@scow/config': link:../../libs/config
@@ -264,7 +262,7 @@ importers:
       '@ddadaal/next-typed-api-routes-cli': 0.5.1
       '@ddadaal/next-typed-api-routes-runtime': 0.5.2
       '@ddadaal/tsgrpc-cli': 0.13.3
-      '@ddadaal/tsgrpc-utils': 0.14.2
+      '@ddadaal/tsgrpc-client': 0.15.0
       '@grpc/grpc-js': 1.7.0
       '@newhighsco/next-plugin-svgr': 3.0.59
       '@next/bundle-analyzer': 12.3.0
@@ -328,7 +326,7 @@ importers:
       '@codemirror/theme-one-dark': 6.1.0
       '@codemirror/view': 6.2.3
       '@ddadaal/next-typed-api-routes-runtime': 0.5.2_next@12.3.0
-      '@ddadaal/tsgrpc-utils': 0.14.2_@grpc+grpc-js@1.7.0
+      '@ddadaal/tsgrpc-client': 0.15.0_@grpc+grpc-js@1.7.0
       '@grpc/grpc-js': 1.7.0
       '@newhighsco/next-plugin-svgr': 3.0.59_next@12.3.0+webpack@5.74.0
       '@scow/config': link:../../libs/config
@@ -2372,6 +2370,15 @@ packages:
       - supports-color
     dev: true
 
+  /@ddadaal/tsgrpc-client/0.15.0_@grpc+grpc-js@1.7.0:
+    resolution: {integrity: sha512-H0pfK+7r/uXJnY8ZFfpY8b3dzxZqO1NsUctYHS9BAoqiGHNlM4uk7HWcRr1cyBqyCCIIZWDDHlkmL+VN5kASkg==}
+    peerDependencies:
+      '@grpc/grpc-js': '>=1.7.0'
+    dependencies:
+      '@grpc/grpc-js': 1.7.0
+      tslib: 2.4.0
+    dev: false
+
   /@ddadaal/tsgrpc-server/0.15.0_@grpc+grpc-js@1.7.0:
     resolution: {integrity: sha512-PFqaGV62kvy0+jZ2xvR5AlFe5eyWnKSVqHG+7FLVMytXwejiN5SgGRzFvIKDCY48S3BA2MiUFaTC9sJt6jo9FA==}
     peerDependencies:
@@ -2379,15 +2386,6 @@ packages:
     dependencies:
       '@grpc/grpc-js': 1.7.0
       pino: 8.5.0
-      tslib: 2.4.0
-    dev: false
-
-  /@ddadaal/tsgrpc-utils/0.14.2_@grpc+grpc-js@1.7.0:
-    resolution: {integrity: sha512-YCclHT3Fo/22U9TfvPoBQM0i6bEmPCKY5HAUMiEYvLI/9tWh8Z5Br5z9Xw5ty/HVwsJb/k/Gw6j/Fcf9m9QHeA==}
-    peerDependencies:
-      '@grpc/grpc-js': '>=1.4.0'
-    dependencies:
-      '@grpc/grpc-js': 1.7.0
       tslib: 2.4.0
     dev: false
 

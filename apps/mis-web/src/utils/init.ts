@@ -1,4 +1,4 @@
-import { asyncClientCall } from "@ddadaal/tsgrpc-utils";
+import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { USE_MOCK } from "src/apis/useMock";
 import { InitServiceClient } from "src/generated/server/init";
 import { getClient } from "src/utils/client";
