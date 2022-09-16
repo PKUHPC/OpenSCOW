@@ -12,7 +12,7 @@
     "test": "pnpm run -r test",
     "test:ci": "pnpm run -r test --ci --coverage --runInBand",
     "prepare": "node -e \"try { require('husky').install() } catch (e) {if (e.code !== 'MODULE_NOT_FOUND') throw e}\"",
-    "lint": "eslint --cache '**/*.ts' '**/*.tsx'",
+    "lint": "eslint --cache --ext .tsx,.ts .",
     "cm": "cz"
   },
   "devDependencies": {
