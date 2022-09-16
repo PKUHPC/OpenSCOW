@@ -101,7 +101,7 @@ importers:
 
   apps/mis-server:
     specifiers:
-      '@ddadaal/tsgrpc-cli': 0.13.3
+      '@ddadaal/tsgrpc-cli': 0.13.4
       '@ddadaal/tsgrpc-server': 0.15.0
       '@grpc/grpc-js': 1.7.0
       '@mikro-orm/cli': 5.4.2
@@ -141,7 +141,7 @@ importers:
       uuid: 9.0.0
       wait-on: 6.0.1
     devDependencies:
-      '@ddadaal/tsgrpc-cli': 0.13.3
+      '@ddadaal/tsgrpc-cli': 0.13.4
       '@types/google-protobuf': 3.15.6
       '@types/node-cron': 3.0.4
       '@types/wait-on': 5.3.1
@@ -159,7 +159,7 @@ importers:
       '@codemirror/view': 6.2.3
       '@ddadaal/next-typed-api-routes-cli': 0.5.1
       '@ddadaal/next-typed-api-routes-runtime': 0.5.2
-      '@ddadaal/tsgrpc-cli': 0.13.3
+      '@ddadaal/tsgrpc-cli': 0.13.4
       '@ddadaal/tsgrpc-client': 0.15.0
       '@grpc/grpc-js': 1.7.0
       '@newhighsco/next-plugin-svgr': 3.0.59
@@ -236,7 +236,7 @@ importers:
       typescript: 4.8.3
     devDependencies:
       '@ddadaal/next-typed-api-routes-cli': 0.5.1
-      '@ddadaal/tsgrpc-cli': 0.13.3
+      '@ddadaal/tsgrpc-cli': 0.13.4
       '@next/bundle-analyzer': 12.3.0
       '@types/google-protobuf': 3.15.6
       '@types/mime-types': 2.1.1
@@ -261,7 +261,7 @@ importers:
       '@codemirror/view': 6.2.3
       '@ddadaal/next-typed-api-routes-cli': 0.5.1
       '@ddadaal/next-typed-api-routes-runtime': 0.5.2
-      '@ddadaal/tsgrpc-cli': 0.13.3
+      '@ddadaal/tsgrpc-cli': 0.13.4
       '@ddadaal/tsgrpc-client': 0.15.0
       '@grpc/grpc-js': 1.7.0
       '@newhighsco/next-plugin-svgr': 3.0.59
@@ -365,7 +365,7 @@ importers:
       xterm-addon-fit: 0.6.0_xterm@5.0.0
     devDependencies:
       '@ddadaal/next-typed-api-routes-cli': 0.5.1
-      '@ddadaal/tsgrpc-cli': 0.13.3
+      '@ddadaal/tsgrpc-cli': 0.13.4
       '@next/bundle-analyzer': 12.3.0
       '@testing-library/jest-dom': 5.16.5
       '@testing-library/react': 13.4.0_biqbaboplfbrettd7655fr4n2y
@@ -2354,8 +2354,8 @@ packages:
       tslib: 2.4.0
     dev: false
 
-  /@ddadaal/tsgrpc-cli/0.13.3:
-    resolution: {integrity: sha512-ms++Bl4dhvPZvTzKQKIeCiKMQC6AoSn2x0w0VKLm/bJhLqEvIrxd/KZOMfqK7RUq5t1ylxTKq9UXolx32dAh+A==}
+  /@ddadaal/tsgrpc-cli/0.13.4:
+    resolution: {integrity: sha512-Ha5GadU1Nr5n7CQUxyg4oMQCo98RwUvH2elVS4sO2oUYYSK6WQuB/8yHOQ0vzbsAtcPusm+iqP/gNYEkHMnI1w==}
     hasBin: true
     dependencies:
       glob: 8.0.3
@@ -16229,7 +16229,7 @@ packages:
   /wide-align/1.1.5:
     resolution: {integrity: sha512-eDMORYaPNZ4sQIuuYPDHdQvf4gyCF9rEEV/yPxGfwPkRodwEgiMUUXTx/dex+Me0wxx53S+NgUHaP7y3MGlDmg==}
     dependencies:
-      string-width: 1.0.2
+      string-width: 4.2.3
     dev: true
 
   /widest-line/3.1.0:

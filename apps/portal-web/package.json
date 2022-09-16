@@ -63,7 +63,7 @@
   },
   "devDependencies": {
     "@ddadaal/next-typed-api-routes-cli": "0.5.1",
-    "@ddadaal/tsgrpc-cli": "0.13.3",
+    "@ddadaal/tsgrpc-cli": "0.13.4",
     "@next/bundle-analyzer": "12.3.0",
     "@testing-library/jest-dom": "5.16.5",
     "@testing-library/react": "13.4.0",
