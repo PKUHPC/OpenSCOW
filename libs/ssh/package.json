@@ -11,9 +11,9 @@
     "shell-quote": "1.7.3"
   },
   "devDependencies": {
-    "pino": "8.4.2",
+    "@types/shell-quote": "1.7.1",
     "@types/ssh2": "1.11.5",
-    "@types/shell-quote": "1.7.1"
+    "pino": "8.5.0"
   },
   "keywords": [],
   "author": "",
