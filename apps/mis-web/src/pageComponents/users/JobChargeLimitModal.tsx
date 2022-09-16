@@ -30,7 +30,7 @@ export const JobChargeLimitModal: React.FC<Props> = ({
   const onOk = async () => {
     const { limit } = await form.validateFields();
     setLoading(true);
-    await api.setJobChargeLimit({ body: { userId, accountName, limit  } })
+    await api.setJobChargeLimit({ body: { userId, accountName, limit } })
       .then(() => {
         message.success("设置成功");
         reload();

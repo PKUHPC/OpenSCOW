@@ -65,7 +65,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
       workingDirectory, save,
     } })
       .httpError(409, (e) => {
-        const { code, message: serverMessage  } = e;
+        const { code, message: serverMessage } = e;
         if (code === "SBATCH_FAILED") {
           Modal.error({
             title: "提交作业失败",
@@ -199,7 +199,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
           <Form.Item<JobForm> label="节点数" name="nodeCount"
             dependencies={["cluster", "partition"]}
             rules={[
-              { required: true, type: "integer", max: currentPartitionInfo?.nodes  },
+              { required: true, type: "integer", max: currentPartitionInfo?.nodes },
             ]}
           >
             <InputNumber min={1} />

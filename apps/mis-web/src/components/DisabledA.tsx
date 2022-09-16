@@ -7,7 +7,7 @@ type Props = React.PropsWithChildren<{
   message?: React.ReactNode;
 }>;
 
-export const DisabledA: React.FC<Props> = React.forwardRef(({  onClick, disabled, message, children }, ref) => {
+export const DisabledA: React.FC<Props> = React.forwardRef(({ onClick, disabled, message, children }, ref) => {
 
   if (!disabled) {
     return <a onClick={onClick}>{children}</a>;

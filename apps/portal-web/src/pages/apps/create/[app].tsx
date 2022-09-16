@@ -39,7 +39,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ query }) =
 
   const config = runtimeConfig.APPS[appId];
 
-  if (!config) { return { props: { error: 404 } };}
+  if (!config) { return { props: { error: 404 } }; }
 
   return {
     props: {

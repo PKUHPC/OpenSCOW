@@ -47,7 +47,7 @@ export async function sshConnect<T>(
 ) {
   const ssh = await sshRawConnect(address, username, rootKeyPair, logger);
 
-  return run(ssh).finally(() => { ssh.dispose();});
+  return run(ssh).finally(() => { ssh.dispose(); });
 }
 
 /**

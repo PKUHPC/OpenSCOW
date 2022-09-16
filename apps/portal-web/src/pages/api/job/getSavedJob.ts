@@ -43,7 +43,7 @@ export default route<GetSavedJobSchema>("GetSavedJobSchema", async (req, res) =>
     id, userId: info.identityId,
   }, req.log);
 
-  if (reply.code === "NOT_FOUND") { return { 404: null };}
+  if (reply.code === "NOT_FOUND") { return { 404: null }; }
 
   return { 200: { jobInfo: reply.jobInfo } };
 });

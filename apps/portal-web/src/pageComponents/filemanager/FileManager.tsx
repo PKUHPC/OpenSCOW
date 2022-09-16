@@ -1,7 +1,7 @@
 import { CloseOutlined,
   CopyOutlined,
   DeleteOutlined, FileAddOutlined, FileOutlined, FolderAddOutlined,
-  FolderOutlined,   HomeOutlined, LeftOutlined, MacCommandOutlined, RightOutlined,
+  FolderOutlined, HomeOutlined, LeftOutlined, MacCommandOutlined, RightOutlined,
   ScissorOutlined, SnippetsOutlined, UploadOutlined, UpOutlined } from "@ant-design/icons";
 import { Button, Divider, message, Modal, Space, Table } from "antd";
 import Link from "next/link";

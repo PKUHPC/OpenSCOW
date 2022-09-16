@@ -19,7 +19,7 @@ export async function validateToken(token: string | undefined): Promise<UserInfo
     return { identityId: runtimeConfig.MOCK_USER_ID || os.userInfo().username };
   }
 
-  if (!token) { return undefined;}
+  if (!token) { return undefined; }
 
   const resp = await jsonFetch<AuthValidateTokenSchema>({
     method: "GET",

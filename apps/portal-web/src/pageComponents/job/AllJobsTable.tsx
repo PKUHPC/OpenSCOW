@@ -48,7 +48,7 @@ export const AllJobQueryTable: React.FC<Props> = ({
   const { data, isLoading, reload } = useAsync({ promiseFn });
 
   const filteredData = useMemo(() => {
-    if (!data) { return undefined;}
+    if (!data) { return undefined; }
 
     let filtered = data.results;
     if (query.jobId) {

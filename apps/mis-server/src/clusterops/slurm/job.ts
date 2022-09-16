@@ -45,7 +45,7 @@ export const slurmJobOps = ({ slurmConfig, executeSlurmScript }: SlurmClusterInf
       const { jobId } = request;
       const result = await executeSlurmScript(["-t", jobId], logger);
 
-      if (result.code === 7)  {
+      if (result.code === 7) {
         return { code: "NOT_FOUND" };
       }
 
@@ -66,7 +66,7 @@ export const slurmJobOps = ({ slurmConfig, executeSlurmScript }: SlurmClusterInf
 
       const result = await executeSlurmScript(["-n", jobId, delta + ""], logger);
 
-      if (result.code === 7)  {
+      if (result.code === 7) {
         return { code: "NOT_FOUND" };
       }
 

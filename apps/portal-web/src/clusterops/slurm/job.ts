@@ -14,7 +14,7 @@ export const slurmJobOps = (cluster: string): JobOps => {
 
   return {
     getAccounts: async (request, logger) => {
-      const { userId }  = request;
+      const { userId } = request;
 
       const accounts = await sshConnect(host, userId, logger, async (ssh) => {
         const { stdout } = await loggedExec(ssh, logger, true,
@@ -93,7 +93,7 @@ export const slurmJobOps = (cluster: string): JobOps => {
 
         const file = join(runtimeConfig.PORTAL_CONFIG.savedJobsDir, id);
 
-        if (!await sftpExists(sftp, file)) { return { code: "NOT_FOUND" };}
+        if (!await sftpExists(sftp, file)) { return { code: "NOT_FOUND" }; }
 
         const content = await sftpReadFile(sftp)(file);
 

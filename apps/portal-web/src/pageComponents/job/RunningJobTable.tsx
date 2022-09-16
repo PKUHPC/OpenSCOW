@@ -45,7 +45,7 @@ export const RunningJobQueryTable: React.FC<Props> = ({
   const { data, isLoading, reload } = useAsync({ promiseFn });
 
   const filteredData = useMemo(() => {
-    if (!data) { return undefined;}
+    if (!data) { return undefined; }
 
     let filtered = data.results;
     if (query.jobId) {
@@ -101,7 +101,7 @@ type JobInfoTableProps = {
 };
 
 export const RunningJobInfoTable: React.FC<JobInfoTableProps> = ({
-  data,  isLoading,  showAccount, showCluster, showUser, reload,
+  data, isLoading, showAccount, showCluster, showUser, reload,
 }) => {
 
   const [previewItem, setPreviewItem] = useState<RunningJobInfo | undefined>(undefined);

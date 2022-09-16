@@ -55,7 +55,7 @@ export const RootLayout: React.FC<Props> = ({ footerText, children }) => {
 
   const sidebarRoutes = md ? firstLevelRoute?.children : allRoutes;
 
-  const hasSidebar =  arrayContainsElement(sidebarRoutes);
+  const hasSidebar = arrayContainsElement(sidebarRoutes);
 
   return (
     <Root>

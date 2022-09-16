@@ -44,7 +44,7 @@ export default route<ChangeJobTimeLimitSchema>("ChangeJobTimeLimitSchema",
     const info = await auth(req, res);
     if (!info) { return; }
 
-    const { cluster, delta, jobId }  = req.body;
+    const { cluster, delta, jobId } = req.body;
 
     const client = getClient(JobServiceClient);
 

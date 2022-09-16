@@ -20,7 +20,7 @@ let oldPriceItem: JobPriceItem;
 let client: JobServiceClient;
 
 beforeEach(async () => {
-  server =  await createServer();
+  server = await createServer();
   orm = server.ext.orm;
 
   await orm.getSchemaGenerator().ensureDatabase();

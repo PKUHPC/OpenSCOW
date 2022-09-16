@@ -47,7 +47,7 @@ export const NewDesktopTableModal: React.FC<Props> = ({ visible, onClose, reload
         onClose();
         reload();
       })
-      .finally(() => { setSubmitting(false);});
+      .finally(() => { setSubmitting(false); });
   };
 
 

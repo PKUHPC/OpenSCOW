@@ -29,7 +29,7 @@ export function getConfigFromFile<T extends TSchema>(
   basePath = process.env.NODE_ENV === "production" ? CONFIG_BASE_PATH : "config") {
 
   for (const [ext, loader] of candidates) {
-    const path  = join(basePath, filename + "." + ext);
+    const path = join(basePath, filename + "." + ext);
     if (fs.existsSync(path)) {
       const content = fs.readFileSync(path, { encoding: "utf8" });
       return validateObject(schema, loader(content));

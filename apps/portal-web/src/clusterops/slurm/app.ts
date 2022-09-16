@@ -42,7 +42,7 @@ export const slurmAppOps = (cluster: string): AppOps => {
       // prepare script file
       const appConfig = runtimeConfig.APPS[appId];
 
-      if (!appConfig) { return { code: "APP_NOT_FOUND" };}
+      if (!appConfig) { return { code: "APP_NOT_FOUND" }; }
 
       const jobName = randomUUID();
 

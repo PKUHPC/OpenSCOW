@@ -4,7 +4,7 @@ import { InitServiceClient } from "src/generated/server/init";
 import { getClient } from "src/utils/client";
 
 export async function queryIfInitialized() {
-  if (USE_MOCK) { return false;}
+  if (USE_MOCK) { return false; }
 
   const client = getClient(InitServiceClient);
 

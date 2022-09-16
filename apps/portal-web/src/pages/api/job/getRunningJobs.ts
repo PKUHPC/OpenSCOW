@@ -40,6 +40,6 @@ export default route<GetRunningJobsSchema>("GetRunningJobsSchema", async (req, r
     userId,
   }, req.log);
 
-  return { 200: { results: reply.jobs  } };
+  return { 200: { results: reply.jobs } };
 
 });

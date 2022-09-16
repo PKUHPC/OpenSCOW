@@ -52,12 +52,12 @@ export default /* #__PURE__*/route<ConnectToAppSchema>("ConnectToAppSchema", asy
     sessionId, userId: info.identityId,
   }, req.log);
 
-  if (reply.code === "NOT_FOUND") { return { 404: null };}
-  if (reply.code === "UNAVAILABLE") { return { 409: null };}
+  if (reply.code === "NOT_FOUND") { return { 404: null }; }
+  if (reply.code === "UNAVAILABLE") { return { 409: null }; }
 
   const app = runtimeConfig.APPS[reply.appId];
 
-  if (!app) { throw new Error(`Unknown app ${reply.appId}`);}
+  if (!app) { throw new Error(`Unknown app ${reply.appId}`); }
 
   const resolvedHost = await dnsResolve(reply.host);
 

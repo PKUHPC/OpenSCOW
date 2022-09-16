@@ -1,6 +1,6 @@
 import { loggedExec, sshConnect as libConnect } from "@scow/lib-ssh";
 import type { NodeSSH } from "node-ssh";
-import { runtimeConfig }  from "src/utils/config";
+import { runtimeConfig } from "src/utils/config";
 import { Logger } from "src/utils/log";
 
 export { loggedExec };

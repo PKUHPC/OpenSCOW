@@ -1,4 +1,4 @@
-import { envConfig, host, port, str  } from "@scow/config";
+import { envConfig, host, port, str } from "@scow/config";
 import { getKeyPair } from "@scow/lib-ssh";
 import { homedir } from "os";
 import { join } from "path";

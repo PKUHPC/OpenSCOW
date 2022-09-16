@@ -39,8 +39,8 @@ const StorageForm: React.FC = () => {
     setLoading(true);
 
     await api.changeStorageQuota({ body: { value, userId, cluster: cluster.id, mode } })
-      .httpError(404, () => { message.error("用户未找到");})
-      .httpError(400, () => { message.error("余额变化不合法。");})
+      .httpError(404, () => { message.error("用户未找到"); })
+      .httpError(400, () => { message.error("余额变化不合法。"); })
       .then(({ currentQuota }) => {
         message.success("修改成功！");
         setCurent(currentQuota);

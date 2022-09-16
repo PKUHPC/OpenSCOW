@@ -84,7 +84,7 @@ export const mockApi: MockApi<typeof api> = {
         method: "POST",
         path: "/test",
         query: { test: "!23" },
-        formData: {  test: "123" },
+        formData: { test: "123" },
       },
     }
     : {

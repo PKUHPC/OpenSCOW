@@ -40,7 +40,7 @@ export const validateTokenRoute = fp(async (f) => {
     },
     async (req, rep) => {
 
-      const { token } =  req.query;
+      const { token } = req.query;
 
       const cached = await f.redis.get(token);
 

@@ -25,9 +25,9 @@ export const ImportUsersForm: React.FC = () => {
     setLoading(true);
 
     await api.importUsers({ body: { data, whitelist } })
-      .httpError(400, () => { message.error("数据格式不正确");})
-      .then(() => { message.success("导入成功！");})
-      .finally(() => { setLoading(false);});
+      .httpError(400, () => { message.error("数据格式不正确"); })
+      .then(() => { message.success("导入成功！"); })
+      .finally(() => { setLoading(false); });
   };
 
   return (

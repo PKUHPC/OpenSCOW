@@ -20,7 +20,7 @@ if (USE_MOCK) {
         delay(500).then(() => res(fn(...args)));
       });
       // @ts-ignore
-      promise.httpError = () => { return promise;};
+      promise.httpError = () => { return promise; };
       return promise;
     };
 

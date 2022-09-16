@@ -12,7 +12,7 @@ import { publicConfig } from "src/utils/config";
 const columns: ColumnsType<JobBillingTableItem> = [
   { dataIndex: "cluster", title: "集群", key: "index", render: (_, r) => ({
     children: publicConfig.CLUSTERS[r.cluster]?.name ?? r.cluster,
-    props: { rowSpan: r.clusterItemIndex === 0 ? r.partitionCount * r.qosCount : 0  },
+    props: { rowSpan: r.clusterItemIndex === 0 ? r.partitionCount * r.qosCount : 0 },
   }) },
   { dataIndex: "partition", title: "分区全名", key: "index", render: (_, r) => ({
     children: r.partition,
@@ -61,7 +61,7 @@ const EditPriceModal: React.FC<CommonModalProps & {
     await api.addBillingItem({ body: {
       amount, itemId, path, price: numberToMoney(price), description, tenant,
     } })
-      .httpError(409, () => { message.error("此ID已经被使用！");})
+      .httpError(409, () => { message.error("此ID已经被使用！"); })
       .then(() => {
         message.success("添加成功！");
         reload();

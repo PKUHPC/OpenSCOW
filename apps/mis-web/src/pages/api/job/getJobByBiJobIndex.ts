@@ -31,7 +31,7 @@ export default route<GetJobByBiJobIndexSchema>("GetJobByBiJobIndexSchema",
       return;
     }
 
-    const { biJobIndex }  = req.query;
+    const { biJobIndex } = req.query;
 
     const client = getClient(JobServiceClient);
 

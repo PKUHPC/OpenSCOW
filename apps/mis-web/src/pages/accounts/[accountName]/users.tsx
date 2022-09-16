@@ -15,7 +15,7 @@ import { RefreshLink, useRefreshToken } from "src/utils/refreshToken";
 export const UsersPage: NextPage = requireAuth(
   (i) => i.accountAffiliations.some((x) => x.role !== UserRole.USER),
 )(
-  ({ userStore }) =>  {
+  ({ userStore }) => {
 
     const accountName = useAccountPagesAccountName();
 

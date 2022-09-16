@@ -31,7 +31,7 @@ export default route<ValidateTokenSchema>("ValidateTokenSchema", async (req) => 
 
   const info = await validateToken(token);
 
-  if (!info) { return { 403: null };}
+  if (!info) { return { 403: null }; }
 
   return { 200: info };
 

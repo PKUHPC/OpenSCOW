@@ -25,7 +25,7 @@ export const logoutRoute = fp(async (f) => {
     },
     async (req, rep) => {
 
-      const { token } =  req.query;
+      const { token } = req.query;
 
       await f.redis.del(token);
 

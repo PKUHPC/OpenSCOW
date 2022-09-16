@@ -81,7 +81,7 @@ export default route<GetPaymentsSchema>("GetPaymentsSchema", async (req, res) =>
       accountName: obj.accountName,
       comment: obj.comment,
       index: obj.index,
-      ipAddress: returnAuditInfo ?  obj.ipAddress : "",
+      ipAddress: returnAuditInfo ? obj.ipAddress : "",
       operatorId: returnAuditInfo ? obj.operatorId : "",
       time: obj.time,
       type: obj.type,

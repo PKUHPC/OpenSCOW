@@ -74,7 +74,7 @@ interface InfoTableProps {
 }
 
 const InfoTable: React.FC<InfoTableProps> = ({
-  data,  isLoading, cluster,
+  data, isLoading, cluster,
 }) => {
 
   return (

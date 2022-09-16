@@ -60,7 +60,7 @@ export const RunningJobQueryTable: React.FC<Props> = ({
   const { data, isLoading, reload } = useAsync({ promiseFn });
 
   const filteredData = useMemo(() => {
-    if (!data) { return undefined;}
+    if (!data) { return undefined; }
 
     let filtered = data.results;
     if (searchType.current === "precision") {
@@ -175,7 +175,7 @@ type JobInfoTableProps = {
 const ChangeJobTimeLimitModalLink = ModalLink(ChangeJobTimeLimitModal);
 
 export const RunningJobInfoTable: React.FC<JobInfoTableProps> = ({
-  data,  isLoading, reload, showAccount, showCluster, showUser, selection,
+  data, isLoading, reload, showAccount, showCluster, showUser, selection,
 }) => {
 
   const [previewItem, setPreviewItem] = useState<RunningJobInfo | undefined>(undefined);

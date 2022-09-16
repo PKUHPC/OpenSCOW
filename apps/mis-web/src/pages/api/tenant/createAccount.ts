@@ -46,7 +46,7 @@ export default route<CreateAccountSchema>("CreateAccountSchema",
       return;
     }
 
-    const { accountName, ownerId, ownerName, comment }  = req.body;
+    const { accountName, ownerId, ownerName, comment } = req.body;
 
     if (accountNameRegex && !accountNameRegex.test(accountName)) {
       return { 400: {

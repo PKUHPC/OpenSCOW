@@ -35,7 +35,7 @@ export default route<DeleteDirSchema>("DeleteDirSchema", async (req, res) => {
     return { 400: { code: "INVALID_CLUSTER" } };
   }
 
-  return await sshConnect(host, info.identityId,  req.log, async (ssh) => {
+  return await sshConnect(host, info.identityId, req.log, async (ssh) => {
     await sshRmrf(ssh, path);
 
     return { 204: null };

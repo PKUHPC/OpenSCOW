@@ -8,7 +8,7 @@ type Result = "OK" | "NotFound" | "NotAllowed";
 
 export async function checkJobAccessible(jobId: string, cluster: string, info: UserInfo): Promise<Result> {
 
-  const client =  getClient(JobServiceClient);
+  const client = getClient(JobServiceClient);
 
   if (info.platformRoles.includes(PlatformRole.PLATFORM_ADMIN)) {
     return "OK";

@@ -22,7 +22,7 @@ export const chargingServiceServer = plugin((server) => {
         ? await em.findOne(Tenant, { name: tenantName })
         : await em.findOne(Account, { tenant: { name: tenantName }, accountName });
 
-      if (!entity) { throw <ServiceError>{ code: status.NOT_FOUND };}
+      if (!entity) { throw <ServiceError>{ code: status.NOT_FOUND }; }
 
       return [{ balance: decimalToMoney(entity.balance) }];
     },

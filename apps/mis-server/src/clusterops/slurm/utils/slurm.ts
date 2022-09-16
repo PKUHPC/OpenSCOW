@@ -4,7 +4,7 @@ import { loggedExec, sshConnect } from "@scow/lib-ssh";
 import { rootKeyPair } from "src/config/env";
 
 export const executeScript = async (
-  slurmMisConfig: SlurmMisConfigSchema,  cmd: string, parameters: string[], env: NodeJS.ProcessEnv, logger: Logger,
+  slurmMisConfig: SlurmMisConfigSchema, cmd: string, parameters: string[], env: NodeJS.ProcessEnv, logger: Logger,
 ) => {
 
   const host = slurmMisConfig.managerUrl;

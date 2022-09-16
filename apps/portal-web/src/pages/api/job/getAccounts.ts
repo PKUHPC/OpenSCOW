@@ -34,6 +34,6 @@ export default route<GetAccountsSchema>("GetAccountsSchema", async (req, res) =>
     userId: info.identityId,
   }, req.log);
 
-  return { 200: { accounts: reply.accounts  } };
+  return { 200: { accounts: reply.accounts } };
 
 });

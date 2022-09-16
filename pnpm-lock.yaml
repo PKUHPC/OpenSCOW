@@ -6,7 +6,7 @@ importers:
     specifiers:
       '@commitlint/cli': 17.1.2
       '@commitlint/config-conventional': 17.1.0
-      '@ddadaal/eslint-config': 1.5.1
+      '@ddadaal/eslint-config': 1.6.0
       '@types/jest': 29.0.3
       '@types/node': 18.7.18
       '@types/rimraf': 3.0.2
@@ -20,7 +20,7 @@ importers:
       eslint: 8.23.1
       eslint-import-resolver-typescript: 3.5.1
       eslint-plugin-import: 2.26.0
-      eslint-plugin-simple-import-sort: 7.0.0
+      eslint-plugin-simple-import-sort: 8.0.0
       husky: 8.0.1
       jest: 29.0.3
       jest-extended: 3.1.0
@@ -36,7 +36,7 @@ importers:
     devDependencies:
       '@commitlint/cli': 17.1.2
       '@commitlint/config-conventional': 17.1.0
-      '@ddadaal/eslint-config': 1.5.1_sye5u47tf3kp2vsqykgqqa2pkq
+      '@ddadaal/eslint-config': 1.6.0_x4xuq6rvouk2tybpg4puasyezm
       '@types/jest': 29.0.3
       '@types/node': 18.7.18
       '@types/rimraf': 3.0.2
@@ -50,7 +50,7 @@ importers:
       eslint: 8.23.1
       eslint-import-resolver-typescript: 3.5.1_hdzsmr7kawaomymueo2tso6fjq
       eslint-plugin-import: 2.26.0_dnpzw43gx7nu2gqo7farhnkjku
-      eslint-plugin-simple-import-sort: 7.0.0_eslint@8.23.1
+      eslint-plugin-simple-import-sort: 8.0.0_eslint@8.23.1
       husky: 8.0.1
       jest: 29.0.3_sgupjgtkb76w4hsvieap2xky7i
       jest-extended: 3.1.0_jest@29.0.3
@@ -2311,26 +2311,26 @@ packages:
     engines: {node: '>=10'}
     dev: false
 
-  /@ddadaal/eslint-config/1.5.1_sye5u47tf3kp2vsqykgqqa2pkq:
-    resolution: {integrity: sha512-nwR+VN3eCSB5Tz6CC8mrszgxKLvNmzbtG+8hpv+dFl4XP/qHKgmuSUmGVijESvZTNJisV7oveF4Yqvb8aIXtYg==}
+  /@ddadaal/eslint-config/1.6.0_x4xuq6rvouk2tybpg4puasyezm:
+    resolution: {integrity: sha512-srzHjyvd9igwCJk+BlTTCPdkHOsU4SDHNlodY8CUo7k+M8HnkPV4rI7aAIkJ/lukEHy23BPMayy+P6VmN6qqAQ==}
     peerDependencies:
-      '@typescript-eslint/eslint-plugin': ^5.30.5
-      eslint: ^8.19.0
-      eslint-import-resolver-typescript: ^3.2.1
-      eslint-plugin-import: ^2.26.0
-      eslint-plugin-simple-import-sort: ^7.0.0
+      '@typescript-eslint/eslint-plugin': '>=5.37.0'
+      eslint: '>=8.23.1'
+      eslint-import-resolver-typescript: '>=3.5.1'
+      eslint-plugin-import: '>=2.26.0'
+      eslint-plugin-simple-import-sort: '>=8.0.0'
     dependencies:
       '@typescript-eslint/eslint-plugin': 5.37.0_22c5fnooleyfkzrkkgdmel5kmi
       '@typescript-eslint/parser': 5.37.0_irgkl5vooow2ydyo6aokmferha
       eslint: 8.23.1
       eslint-import-resolver-typescript: 3.5.1_hdzsmr7kawaomymueo2tso6fjq
       eslint-plugin-import: 2.26.0_dnpzw43gx7nu2gqo7farhnkjku
-      eslint-plugin-simple-import-sort: 7.0.0_eslint@8.23.1
-      typescript: 4.8.3
+      eslint-plugin-simple-import-sort: 8.0.0_eslint@8.23.1
     optionalDependencies:
       eslint-plugin-react: 7.31.8_eslint@8.23.1
     transitivePeerDependencies:
       - supports-color
+      - typescript
     dev: true
 
   /@ddadaal/next-typed-api-routes-cli/0.5.1:
@@ -7854,8 +7854,8 @@ packages:
     dev: true
     optional: true
 
-  /eslint-plugin-simple-import-sort/7.0.0_eslint@8.23.1:
-    resolution: {integrity: sha512-U3vEDB5zhYPNfxT5TYR7u01dboFZp+HNpnGhkDB2g/2E4wZ/g1Q9Ton8UwCLfRV9yAKyYqDh62oHOamvkFxsvw==}
+  /eslint-plugin-simple-import-sort/8.0.0_eslint@8.23.1:
+    resolution: {integrity: sha512-bXgJQ+lqhtQBCuWY/FUWdB27j4+lqcvXv5rUARkzbeWLwea+S5eBZEQrhnO+WgX3ZoJHVj0cn943iyXwByHHQw==}
     peerDependencies:
       eslint: '>=5.0.0'
     dependencies:

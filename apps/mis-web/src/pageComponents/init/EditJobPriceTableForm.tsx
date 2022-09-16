@@ -14,7 +14,7 @@ export const EditJobPriceTableForm: React.FC = () => {
     <Centered>
       <div>
         <p>您可以在这里设置默认作业价格表。未设置的将会以0元计费。</p>
-        <EditableJobBillingTable reload={reload} data={data} loading={isLoading}  />
+        <EditableJobBillingTable reload={reload} data={data} loading={isLoading} />
       </div>
     </Centered>
   );

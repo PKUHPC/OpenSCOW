@@ -11,14 +11,14 @@ import { queryToString } from "src/utils/querystring";
 export const UserJobsPage: NextPage = requireAuth(
   (i) => i.accountAffiliations.some((x) => x.role !== UserRole.USER),
 )(
-  () =>  {
+  () => {
 
     const router = useRouter();
 
     const userId = queryToString(router.query.userId) || undefined;
     const accountName = queryToString(router.query.accountName) || "";
 
-    const title =  `用户${userId}在账户${accountName}下运行的作业`;
+    const title = `用户${userId}在账户${accountName}下运行的作业`;
 
     return (
       <div>

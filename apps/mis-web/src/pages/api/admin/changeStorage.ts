@@ -53,7 +53,7 @@ export default route<ChangeStorageQuotaSchema>("ChangeStorageQuotaSchema",
       return;
     }
 
-    const { mode, value, userId, cluster }  = req.body;
+    const { mode, value, userId, cluster } = req.body;
 
     const client = getClient(AdminServiceClient);
 

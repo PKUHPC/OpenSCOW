@@ -16,21 +16,21 @@ export const slurmUserOps = ({ executeSlurmScript }: SlurmClusterInfo): UserOps 
     removeUser: async ({ request, logger }) => {
       const { accountName, userId } = request;
       const result = await executeSlurmScript(["-k", accountName, userId], logger);
-      if (result.code === 4) { return { code: "NOT_FOUND" };}
+      if (result.code === 4) { return { code: "NOT_FOUND" }; }
       return { code: "OK" };
     },
 
     blockUserInAccount: async ({ request, logger }) => {
       const { accountName, userId } = request;
       const result = await executeSlurmScript(["-o", accountName, userId], logger);
-      if (result.code === 4) { return { code: "NOT_FOUND" };}
+      if (result.code === 4) { return { code: "NOT_FOUND" }; }
       return { code: "OK" };
     },
 
     unblockUserInAccount: async ({ request, logger }) => {
       const { accountName, userId } = request;
       const result = await executeSlurmScript(["-r", accountName, userId], logger);
-      if (result.code === 4) { return { code: "NOT_FOUND" };}
+      if (result.code === 4) { return { code: "NOT_FOUND" }; }
       return { code: "OK" };
     },
 

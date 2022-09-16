@@ -21,7 +21,7 @@ export default route<GetTenantsSchema>("GetTenantsSchema",
   async (req, res) => {
 
     const info = await auth(req, res);
-    if (!info) { return;  }
+    if (!info) { return; }
 
     const client = getClient(TenantServiceClient);
 

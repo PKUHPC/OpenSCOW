@@ -39,7 +39,7 @@ export default route<QueryJobTimeLimitSchema>("QueryJobTimeLimitSchema",
       return;
     }
 
-    const { cluster, jobId }  = req.query;
+    const { cluster, jobId } = req.query;
 
     const jobAccessible = await checkJobAccessible(jobId, cluster, info);
 

@@ -3,7 +3,7 @@ import { omitConfigSpec } from "@scow/config";
 import fastify, { FastifyInstance, FastifyPluginAsync, FastifyPluginCallback } from "fastify";
 import { config } from "src/config/env";
 import { plugins } from "src/plugins";
-import { routes }  from "src/routes";
+import { routes } from "src/routes";
 
 type Plugin = FastifyPluginAsync | FastifyPluginCallback;
 type PluginOverrides = Map<Plugin, Plugin>;

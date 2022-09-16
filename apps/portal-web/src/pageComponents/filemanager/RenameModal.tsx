@@ -22,7 +22,7 @@ export const RenameModal: React.FC<Props> = ({ visible, onClose, path, reload, c
   const onSubmit = async () => {
     const { newFileName } = await form.validateFields();
     setLoading(true);
-    await api.moveFileItem({ body: { cluster, fromPath: path, toPath: join(dirname(path), newFileName)  } })
+    await api.moveFileItem({ body: { cluster, fromPath: path, toPath: join(dirname(path), newFileName) } })
       .then(() => {
         message.success("修改成功");
         reload();

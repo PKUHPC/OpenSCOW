@@ -47,7 +47,7 @@ export const authCallbackRoute = fp(async (f) => {
     },
     async (req, rep) => {
 
-      const { token } =  req.query;
+      const { token } = req.query;
 
       // validate the token
       const info = await f.auth.fetchAuthTokenInfo(token, req);

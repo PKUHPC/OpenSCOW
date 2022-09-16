@@ -42,6 +42,6 @@ export default route<GetAllJobsSchema>("GetAllJobsSchema", async (req, res) => {
     startTime: new Date(startTime),
   }, req.log);
 
-  return { 200: { results: reply.jobs  } };
+  return { 200: { results: reply.jobs } };
 
 });

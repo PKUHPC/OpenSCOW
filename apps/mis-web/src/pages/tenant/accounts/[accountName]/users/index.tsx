@@ -17,7 +17,7 @@ import { RefreshLink, useRefreshToken } from "src/utils/refreshToken";
 export const AccountUsersPage: NextPage = requireAuth(
   (i) => i.tenantRoles.includes(TenantRole.TENANT_ADMIN),
 )(
-  ({ userStore }) =>  {
+  ({ userStore }) => {
 
     const router = useRouter();
 

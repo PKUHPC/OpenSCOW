@@ -60,7 +60,7 @@ export const AppSessionsTable: React.FC<Props> = () => {
       title: "提交时间",
       dataIndex: "submitTime",
       render: (_, record) => record.submitTime ? formatDateTime(record.submitTime) : "",
-      sorter: (a, b) => (!a.submitTime || !b.submitTime) ? -1 :  compareDateTime(a.submitTime, b.submitTime),
+      sorter: (a, b) => (!a.submitTime || !b.submitTime) ? -1 : compareDateTime(a.submitTime, b.submitTime),
     },
     {
       title: "状态",

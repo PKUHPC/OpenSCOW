@@ -34,7 +34,7 @@ export const ConnectTopAppLink: React.FC<Props> = ({
       };
 
       const query = connect.query ? interpolateValues(connect.query) : {};
-      const formData =  connect.formData ? interpolateValues(connect.formData) : undefined;
+      const formData = connect.formData ? interpolateValues(connect.formData) : undefined;
 
       const pathname = join(publicConfig.PROXY_BASE_PATH, host, String(port), path);
 

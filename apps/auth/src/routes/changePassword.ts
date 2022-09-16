@@ -42,7 +42,7 @@ export const changePasswordRoute = fp(async (f) => {
         return await rep.code(501).send(null);
       }
 
-      const { identityId, newPassword, oldPassword } =  req.body;
+      const { identityId, newPassword, oldPassword } = req.body;
 
       const result = await f.auth.changePassword(identityId, oldPassword, newPassword, req);
 

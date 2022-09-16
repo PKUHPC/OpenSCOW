@@ -38,7 +38,7 @@ export const ChargeTable: React.FC<Props> = ({ accountName, showAccountName }) =
   });
 
   useDidUpdateEffect(() => {
-    setQuery((q) => ({ ...q, accountName  }));
+    setQuery((q) => ({ ...q, accountName }));
   }, [accountName]);
 
   return (

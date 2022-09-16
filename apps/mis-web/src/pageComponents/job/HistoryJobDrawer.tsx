@@ -43,7 +43,7 @@ interface Props {
 }
 
 export const HistoryJobDrawer: React.FC<Props> = (props) => {
-  const {  item, onClose, show } = props;
+  const { item, onClose, show } = props;
   return (
     <Drawer
       width={500}

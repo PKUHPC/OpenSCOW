@@ -22,7 +22,7 @@ const CreateUserPageForm: React.FC = () => {
     setLoading(true);
 
     await api.createUser({ body: { email, identityId, name, password } })
-      .httpError(409, () => { message.error("此用户ID已经存在！");})
+      .httpError(409, () => { message.error("此用户ID已经存在！"); })
       .then(() => {
         message.success("用户创建完成");
       }).finally(() => {

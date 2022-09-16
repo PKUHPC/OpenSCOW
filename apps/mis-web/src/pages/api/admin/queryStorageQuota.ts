@@ -32,7 +32,7 @@ export default route<QueryStorageQuotaSchema>("QueryStorageQuotaSchema",
     const info = await auth(req, res);
     if (!info) { return; }
 
-    const { userId, cluster }  = req.query;
+    const { userId, cluster } = req.query;
 
     const client = getClient(AdminServiceClient);
 

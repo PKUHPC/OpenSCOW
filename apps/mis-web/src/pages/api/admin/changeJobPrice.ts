@@ -45,7 +45,7 @@ export default route<ChangeJobPriceSchema>("ChangeJobPriceSchema",
     const info = await auth(req, res);
     if (!info) { return; }
 
-    const { price, reason, accountName, clusters, jobEndTimeEnd, jobEndTimeStart, jobId, userId, target }  = req.body;
+    const { price, reason, accountName, clusters, jobEndTimeEnd, jobEndTimeStart, jobId, userId, target } = req.body;
 
     if (
       (target === "account" && !info.tenantRoles.includes(TenantRole.TENANT_ADMIN)) ||

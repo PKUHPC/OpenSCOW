@@ -23,7 +23,7 @@ export const MkdirModal: React.FC<Props> = ({ visible, onClose, path, reload, cl
     const { newFileName } = await form.validateFields();
     setLoading(true);
     await api.mkdir({ body: { cluster, path: join(path, newFileName) } })
-      .httpError(409, () => { message.error("同名文件或目录已经存在！");})
+      .httpError(409, () => { message.error("同名文件或目录已经存在！"); })
       .then(() => {
         message.success("创建成功");
         reload();

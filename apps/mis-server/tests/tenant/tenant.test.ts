@@ -31,7 +31,7 @@ afterEach(async () => {
 it("gets tenant info", async () => {
   const client = new TenantServiceClient(server.serverAddress, ChannelCredentials.createInsecure());
 
-  const info  = await asyncClientCall(client, "getTenantInfo", { tenantName: data.tenant.name });
+  const info = await asyncClientCall(client, "getTenantInfo", { tenantName: data.tenant.name });
 
   expect(info).toEqual({
     accountCount: 2,
@@ -44,7 +44,7 @@ it("gets tenant info", async () => {
 it("gets all tenants", async () => {
   const client = new TenantServiceClient(server.serverAddress, ChannelCredentials.createInsecure());
 
-  const info  = await asyncClientCall(client, "getTenants", {});
+  const info = await asyncClientCall(client, "getTenants", {});
 
   expect(info.names).toIncludeSameMembers([data.tenant.name, data.anotherTenant.name]);
 });

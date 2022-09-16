@@ -31,7 +31,7 @@ const roleTags = {
 };
 
 export const UserTable: React.FC<Props> = ({
-  data, isLoading,  reload, accountName, canSetAdmin,
+  data, isLoading, reload, accountName, canSetAdmin,
 }) => {
 
   return (

@@ -16,7 +16,7 @@ import {
   platformRoleFromJSON,
   QueryIsUserInAccountReply,
   tenantRoleFromJSON,
-  UserRole as PFUserRole,  UserServiceServer,
+  UserRole as PFUserRole, UserServiceServer,
   UserServiceService,
   UserStatus as PFUserStatus } from "src/generated/server/user";
 import { fetch } from "undici";

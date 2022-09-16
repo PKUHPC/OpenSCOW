@@ -12,7 +12,7 @@ export const AppConnectPropsSchema = Type.Object({
 
 export type AppConnectPropsSchema = Static<typeof AppConnectPropsSchema>;
 
-export enum AppType  {
+export enum AppType {
   web = "web",
   vnc = "vnc"
 }

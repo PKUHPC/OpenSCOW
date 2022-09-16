@@ -36,6 +36,6 @@ export default /* #__PURE__*/route<CancelJobSchema>("CancelJobSchema", async (re
   }, req.log);
 
 
-  if (reply.code === "NOT_FOUND") { return { 404: null };}
+  if (reply.code === "NOT_FOUND") { return { 404: null }; }
   return { 204: null };
 });

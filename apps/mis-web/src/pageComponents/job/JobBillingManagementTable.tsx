@@ -21,7 +21,7 @@ export const JobBillingManagementTable: React.FC<Props> = ({ data, loading }) =>
         render={(t) => formatDateTime(t)}
       />
       <Table.Column<JobBillingItem> title="价格" dataIndex={"price"}
-        render={(_, r) => r.price ?  moneyToString(r.price) : ""}
+        render={(_, r) => r.price ? moneyToString(r.price) : ""}
       />
     </Table>
   );
