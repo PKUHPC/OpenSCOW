@@ -6,7 +6,7 @@ importers:
     specifiers:
       '@commitlint/cli': 17.1.2
       '@commitlint/config-conventional': 17.1.0
-      '@ddadaal/eslint-config': 1.6.0
+      '@ddadaal/eslint-config': 1.7.1
       '@types/jest': 29.0.3
       '@types/node': 18.7.18
       '@types/rimraf': 3.0.2
@@ -36,7 +36,7 @@ importers:
     devDependencies:
       '@commitlint/cli': 17.1.2
       '@commitlint/config-conventional': 17.1.0
-      '@ddadaal/eslint-config': 1.6.0_x4xuq6rvouk2tybpg4puasyezm
+      '@ddadaal/eslint-config': 1.7.1_x4xuq6rvouk2tybpg4puasyezm
       '@types/jest': 29.0.3
       '@types/node': 18.7.18
       '@types/rimraf': 3.0.2
@@ -199,7 +199,7 @@ importers:
       webpack: 5.74.0
     dependencies:
       '@ant-design/icons': 4.7.0_biqbaboplfbrettd7655fr4n2y
-      '@codemirror/autocomplete': 6.2.0
+      '@codemirror/autocomplete': 6.2.0_wnvejgzqjpkjrm4uqn22pasz3i
       '@codemirror/commands': 6.1.0
       '@codemirror/lang-json': 6.0.0
       '@codemirror/language': 6.2.1
@@ -318,7 +318,7 @@ importers:
       xterm-addon-fit: 0.6.0
     dependencies:
       '@ant-design/icons': 4.7.0_biqbaboplfbrettd7655fr4n2y
-      '@codemirror/autocomplete': 6.2.0
+      '@codemirror/autocomplete': 6.2.0_wnvejgzqjpkjrm4uqn22pasz3i
       '@codemirror/commands': 6.1.0
       '@codemirror/language': 6.2.1
       '@codemirror/legacy-modes': 6.1.0
@@ -2058,6 +2058,19 @@ packages:
       '@lezer/common': 1.0.1
     dev: false
 
+  /@codemirror/autocomplete/6.2.0_wnvejgzqjpkjrm4uqn22pasz3i:
+    resolution: {integrity: sha512-yNCm2CEE4kE4L2Sf7WeyCej1Q3951ccaCWfomrlBkoERKCss+TzuEeqGe5VnAJTEybLy1yzf1BdMUY/988bfpg==}
+    peerDependencies:
+      '@codemirror/language': ^6.0.0
+      '@codemirror/state': ^6.0.0
+      '@codemirror/view': ^6.0.0
+    dependencies:
+      '@codemirror/language': 6.2.1
+      '@codemirror/state': 6.1.1
+      '@codemirror/view': 6.2.3
+      '@lezer/common': 1.0.1
+    dev: false
+
   /@codemirror/commands/6.1.0:
     resolution: {integrity: sha512-qCj2YqmbBjj0P1iumnlL5lBqZvJPzT+t2UvgjcaXErp5ZvMqFRVgQyrEfdXX6SX5UcvcHKBjXqno+MkUp0aYvQ==}
     dependencies:
@@ -2309,8 +2322,8 @@ packages:
     engines: {node: '>=10'}
     dev: false
 
-  /@ddadaal/eslint-config/1.6.0_x4xuq6rvouk2tybpg4puasyezm:
-    resolution: {integrity: sha512-srzHjyvd9igwCJk+BlTTCPdkHOsU4SDHNlodY8CUo7k+M8HnkPV4rI7aAIkJ/lukEHy23BPMayy+P6VmN6qqAQ==}
+  /@ddadaal/eslint-config/1.7.1_x4xuq6rvouk2tybpg4puasyezm:
+    resolution: {integrity: sha512-TvF+h15ID81fSc3HeZT8XIUFy4bkcpfKdxPoKfEWFjjelJt/TkhL2sXsiyuDOynztCwKTQOXahMTDdjoIYAQsQ==}
     peerDependencies:
       '@typescript-eslint/eslint-plugin': '>=5.37.0'
       eslint: '>=8.23.1'
@@ -13506,6 +13519,12 @@ packages:
   /react-dev-utils/12.0.1_kb3egcnme7w23lfa5xodfjfhge:
     resolution: {integrity: sha512-84Ivxmr17KjUupyqzFode6xKhjwuEJDROWKJy/BthkL7Wn6NJ8h4WE6k/exAv6ImS+0oZLRRW5j/aINMHyeGeQ==}
     engines: {node: '>=14'}
+    peerDependencies:
+      typescript: '>=2.7'
+      webpack: '>=4'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
     dependencies:
       '@babel/code-frame': 7.18.6
       address: 1.2.1
@@ -13531,12 +13550,12 @@ packages:
       shell-quote: 1.7.3
       strip-ansi: 6.0.1
       text-table: 0.2.0
+      typescript: 4.8.3
+      webpack: 5.74.0
     transitivePeerDependencies:
       - eslint
       - supports-color
-      - typescript
       - vue-template-compiler
-      - webpack
     dev: false
 
   /react-dom/17.0.2_react@17.0.2:

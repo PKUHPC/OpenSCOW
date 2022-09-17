@@ -84,7 +84,7 @@ export const clustersPlugin = plugin(async (f) => {
           return call(ops.ops).then(() => {
             logger.info("Executing on %s success", cluster);
             return;
-          }).catch((e) =>{
+          }).catch((e) => {
             logger.info("Executing on %s failed for %o", cluster, e);
             return cluster;
           });
