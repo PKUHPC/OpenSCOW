@@ -81,7 +81,7 @@ const mockUsers = [
     userId: "test",
     createTime: "2020-04-23T23:49:50.000Z",
     email: "test@test.com",
-    name: "陈俊达",
+    name: "testuser",
     id: "123",
     tenantRoles: [TenantRole.TENANT_ADMIN, TenantRole.TENANT_FINANCE],
     platformRoles: [PlatformRole.PLATFORM_FINANCE, PlatformRole.PLATFORM_ADMIN],
@@ -226,7 +226,7 @@ export const mockApi: MockApi<typeof api> = {
 
 export const MOCK_USER_INFO = {
   tenant: "default",
-  name: "陈俊达",
+  name: "testuser",
   identityId: "123",
   token: "123",
   // accountAffiliations: [],
