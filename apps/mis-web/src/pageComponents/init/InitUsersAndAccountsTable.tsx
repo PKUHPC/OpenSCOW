@@ -68,7 +68,7 @@ const UserTable: React.FC<DataTableProps<User>> = ({ data, loading, reload }) =>
                 <Popconfirm
                   title="确定要取消此用户的平台管理员和租户管理员角色吗？"
                   onConfirm={async () => {
-                    await api.setAsInitAdmin({ body: { userId: r.userId } }).then(() => {
+                    await api.unsetInitAdmin({ body: { userId: r.userId } }).then(() => {
                       message.success("取消设置成功！");
                       reload();
                     });
