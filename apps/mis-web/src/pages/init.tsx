@@ -8,6 +8,7 @@ import { Centered } from "src/components/layouts";
 import { EditJobPriceTableForm } from "src/pageComponents/init/EditJobPriceTableForm";
 import { InitAdminForm } from "src/pageComponents/init/InitAdminForm";
 import { InitImportUsersForm } from "src/pageComponents/init/InitImportUsersForm";
+import { InitUsersAndAccountsTable } from "src/pageComponents/init/InitUsersAndAccountsTable";
 import { Head } from "src/utils/head";
 import { queryIfInitialized } from "src/utils/init";
 import styled from "styled-components";
@@ -69,13 +70,16 @@ export const InitSystemPage: NextPage<Props> = (props) => {
         </CompleteButtonContainer>
       </Title>
       <Tabs centered defaultActiveKey="1">
-        <Tabs.TabPane tab="创建初始管理员用户" key="1">
-          <InitAdminForm />
-        </Tabs.TabPane>
-        <Tabs.TabPane tab="导入用户" key="2">
+        <Tabs.TabPane tab="导入用户" key="1">
           <InitImportUsersForm />
         </Tabs.TabPane>
-        <Tabs.TabPane tab="编辑作业价格表" key="3">
+        <Tabs.TabPane tab="用户账户管理" key="2">
+          <InitUsersAndAccountsTable />
+        </Tabs.TabPane>
+        <Tabs.TabPane tab="创建初始管理员用户" key="3">
+          <InitAdminForm />
+        </Tabs.TabPane>
+        <Tabs.TabPane tab="编辑作业价格表" key="4">
           <EditJobPriceTableForm />
         </Tabs.TabPane>
       </Tabs>

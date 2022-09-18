@@ -27,6 +27,12 @@ export enum UserRole {
   OWNER = 2,
 }
 
+export const UserRoleTexts = {
+  [UserRole.USER]: "用户",
+  [UserRole.OWNER]: "拥有者",
+  [UserRole.ADMIN]: "管理员",
+};
+
 export enum UserStatus {
   UNBLOCKED = 0,
   BLOCKED = 1,

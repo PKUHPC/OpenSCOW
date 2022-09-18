@@ -166,6 +166,7 @@ message User {
   google.protobuf.Timestamp create_time = 5;
   repeated AccountAffiliation account_affiliations = 6;
   repeated PlatformRole platform_roles = 7;
+  repeated TenantRole tenant_roles = 8;
 }
 
 message GetUserInfoRequest { string user_id = 1; }
