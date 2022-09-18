@@ -21,6 +21,10 @@ import type { FinancePaySchema } from "src/pages/api/finance/pay";
 import type { GetPaymentsSchema } from "src/pages/api/finance/payments";
 import type { CompleteInitSchema } from "src/pages/api/init/completeInit";
 import type { CreateInitAdminSchema } from "src/pages/api/init/createInitAdmin";
+import type { InitGetAccountsSchema } from "src/pages/api/init/getAccounts";
+import type { InitGetUsersSchema } from "src/pages/api/init/getUsers";
+import type { UnsetInitAdminSchema } from "src/pages/api/init/setAsInitAdmin";
+import type { SetAsInitAdminSchema } from "src/pages/api/init/setAsInitAdmin copy";
 import type { AddBillingItemSchema } from "src/pages/api/job/addBillingItem";
 import type { ChangeJobTimeLimitSchema } from "src/pages/api/job/changeJobTimeLimit";
 import type { GetBillingItemsSchema } from "src/pages/api/job/getBillingItems";
@@ -69,6 +73,10 @@ export const api = {
   getIcon: fromApi<GetIconSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api//icon")),
   completeInit: fromApi<CompleteInitSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/init/completeInit")),
   createInitAdmin: fromApi<CreateInitAdminSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/init/createInitAdmin")),
+  initGetAccounts: fromApi<InitGetAccountsSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/init/getAccounts")),
+  initGetUsers: fromApi<InitGetUsersSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/init/getUsers")),
+  setAsInitAdmin: fromApi<SetAsInitAdminSchema>("PATCH", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/init/setAsInitAdmin copy")),
+  unsetInitAdmin: fromApi<UnsetInitAdminSchema>("DELETE", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/init/setAsInitAdmin")),
   addBillingItem: fromApi<AddBillingItemSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/job/addBillingItem")),
   changeJobTimeLimit: fromApi<ChangeJobTimeLimitSchema>("PATCH", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/job/changeJobTimeLimit")),
   getBillingItems: fromApi<GetBillingItemsSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/job/getBillingItems")),
