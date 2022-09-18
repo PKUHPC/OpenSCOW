@@ -39,12 +39,10 @@ const UserTable: React.FC<DataTableProps<User>> = ({ data, loading, reload }) =>
       />
       <Table.Column<User> dataIndex="accountAffiliations" title="所属账户"
         render={(accounts: AccountAffiliation[]) => accounts
-          .map((x) => (
-            <span key={x.accountName}>
-              {x.accountName}
-              {x.role !== UserRole.USER ? <Tag>{UserRoleTexts[x.role]}</Tag> : ""}
-            </span>
-          ))}
+          .map((x) =>
+            x.accountName +
+              (x.role !== UserRole.USER ? `(${UserRoleTexts[x.role]})` : ""),
+          ).join(", ")}
       />
       <Table.Column<User> title="初始管理员" render={(_, r) => (
         <Space>
