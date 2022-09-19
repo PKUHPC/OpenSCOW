@@ -16,6 +16,17 @@ message CompleteInitRequest {}
 
 message CompleteInitReply {}
 
+message SetAsInitAdminRequest {
+  string user_id = 1;
+}
+
+message SetAsInitAdminReply {}
+
+message UnsetInitAdminRequest {
+  string user_id = 1;
+}
+message UnsetInitAdminReply {}
+
 service InitService {
   rpc QuerySystemInitialized(QuerySystemInitializedRequest)
       returns (QuerySystemInitializedReply);
@@ -25,4 +36,13 @@ service InitService {
 
   // ALREADY_EXISTS: already initialized
   rpc CompleteInit(CompleteInitRequest) returns (CompleteInitReply);
+
+  // Set a user as PLATFORM_ADMIN and default tenant's TENANT_ADMIN
+  // NOT_FOUND: the user is not found in default tenant
+  rpc SetAsInitAdmin(SetAsInitAdminRequest) returns (SetAsInitAdminReply);
+
+  // Unset a user's PLATFORM_ADMIN and default tenant's TENANT_ADMIN role
+  // NOT_FOUND: the user is not found in default tenant
+  rpc UnsetInitAdmin(UnsetInitAdminRequest) returns (UnsetInitAdminReply);
+
 }

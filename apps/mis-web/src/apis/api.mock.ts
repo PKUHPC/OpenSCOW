@@ -2,9 +2,11 @@ import { JsonFetchResultPromiseLike } from "@ddadaal/next-typed-api-routes-runti
 import { numberToMoney } from "@scow/lib-decimal";
 import { api } from "src/apis/api";
 import type { RunningJob } from "src/generated/common/job";
+import type { Account } from "src/generated/server/account";
 import { JobInfo } from "src/generated/server/job";
 import type { AccountUserInfo, GetUserStatusReply } from "src/generated/server/user";
 import { PlatformRole, TenantRole, UserInfo, UserRole, UserStatus } from "src/models/User";
+import { DEFAULT_TENANT_NAME } from "src/utils/constants";
 
 export type MockApi<TApi extends Record<
   string,
@@ -66,6 +68,30 @@ export const runningJob: RunningJob = {
   workingDir: "/home/ddadaal/Code",
 };
 
+const mockAccounts: Required<Account>[] = [
+  { accountName: "hpc123456", userCount: 3, blocked: true, tenantName: "default",
+    ownerId: "123", ownerName: "哈哈", comment: "123", balance: numberToMoney(20) },
+  { accountName: "hpc1234567", userCount: 10, blocked: false, tenantName: "default",
+    ownerId: "123", ownerName: "哈哈哈哈", comment: "123", balance: numberToMoney(30) },
+];
+
+const mockUsers = [
+  {
+    tenantName: DEFAULT_TENANT_NAME,
+    userId: "test",
+    createTime: "2020-04-23T23:49:50.000Z",
+    email: "test@test.com",
+    name: "testuser",
+    id: "123",
+    tenantRoles: [TenantRole.TENANT_ADMIN, TenantRole.TENANT_FINANCE],
+    platformRoles: [PlatformRole.PLATFORM_FINANCE, PlatformRole.PLATFORM_ADMIN],
+    accountAffiliations: [
+      { accountName: "hpc2001213077", role: UserRole.ADMIN },
+      { accountName: "hpc2001213075", role: UserRole.USER },
+    ],
+  },
+];
+
 export const mockApi: MockApi<typeof api> = {
   addBillingItem: async () => null,
 
@@ -79,6 +105,13 @@ export const mockApi: MockApi<typeof api> = {
     { id: "HPC05", path: "hpc01.GPU.normal", price: numberToMoney(12.00), amountStrategy: "gpu" },
     { id: "HPC06", path: "hpc01.GPU.high", price: numberToMoney(14.00), amountStrategy: "gpu" },
   ]}),
+
+  setAsInitAdmin: async () => null,
+  unsetInitAdmin: async () => null,
+
+  initGetAccounts: async () => ({ accounts: mockAccounts }),
+
+  initGetUsers: async () => ({ users: mockUsers }),
 
   getBillingTable: null,
 
@@ -100,19 +133,7 @@ export const mockApi: MockApi<typeof api> = {
 
   getRunningJobs: async () => ({ results: [runningJob]}),
 
-  getTenantUsers: async () => ({ results: [
-    {
-      createTime: "2020-04-23T23:49:50.000Z",
-      email: "test@test.com",
-      name: "陈俊达",
-      id: "123",
-      platformRoles: [PlatformRole.PLATFORM_FINANCE, PlatformRole.PLATFORM_ADMIN],
-      accountAffiliations: [
-        { accountName: "hpc2001213077", role: UserRole.ADMIN },
-        { accountName: "hpc2001213075", role: UserRole.USER },
-      ],
-    },
-  ]}),
+  getTenantUsers: async () => ({ results: mockUsers }),
 
   logout: async () => null,
 
@@ -182,12 +203,7 @@ export const mockApi: MockApi<typeof api> = {
   queryStorageUsage: async () => ({ result: 10 }),
   changeStorageQuota: async () => ({ currentQuota: 10 }),
   queryStorageQuota: async () => ({ currentQuota: 10 }),
-  getAccounts: async () => ({ totalCount: 2, results: [
-    { accountName: "hpc123456", userCount: 3, blocked: true, tenantName: "default",
-      ownerId: "123", ownerName: "哈哈", comment: "123", balance: numberToMoney(20) },
-    { accountName: "hpc1234567", userCount: 10, blocked: false, tenantName: "default",
-      ownerId: "123", ownerName: "哈哈哈哈", comment: "123", balance: numberToMoney(30) },
-  ]}),
+  getAccounts: async () => ({ totalCount: mockAccounts.length, results: mockAccounts }),
   changeJobTimeLimit: async () => null,
   queryJobTimeLimit: async () => ({ result: 10 }),
   createAccount: async () => null,
@@ -210,7 +226,7 @@ export const mockApi: MockApi<typeof api> = {
 
 export const MOCK_USER_INFO = {
   tenant: "default",
-  name: "陈俊达",
+  name: "testuser",
   identityId: "123",
   token: "123",
   // accountAffiliations: [],
