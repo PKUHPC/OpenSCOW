@@ -22,12 +22,11 @@ export interface JobMetadata {
 
 export function generateJobScript(jobInfo: NewJobInfo & {
   output?: string;
-  nodeList?: string;
 }) {
   const {
     jobName, account, coreCount, maxTime, nodeCount,
     partition, qos, command, workingDirectory,
-    output, nodeList,
+    output, 
   } = jobInfo;
   let script = "#!/bin/bash\n";
 
@@ -45,9 +44,6 @@ export function generateJobScript(jobInfo: NewJobInfo & {
   append("--chdir=" + workingDirectory);
   if (output) {
     append("--output=" + output);
-  }
-  if (nodeList) {
-    append("--nodelist=" + nodeList);
   }
 
 
