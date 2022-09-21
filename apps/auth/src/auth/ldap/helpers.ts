@@ -38,12 +38,19 @@ export const searchOne = async <T>(
       let found = false;
 
       res.on("searchEntry", (entry) => {
-        if (found) { return; }
+        if (found) {
+          logger.info("An entry has already be found. Ignoring more entities.");
+          return;
+        }
+
         logger.info("Get an entry. %o", entry);
 
         const val = furtherCheck(entry);
 
-        if (!val) { return; }
+        if (!val) {
+          logger.info("Entity %o failed to pass further check");
+          return;
+        }
 
         found = true;
         logger.info("Get an entry with valid info. dn: %s.", entry.dn);
