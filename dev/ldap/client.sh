@@ -101,4 +101,11 @@ EOF
 chown root:root /etc/sssd/sssd.conf
 chmod 600 /etc/sssd/sssd.conf
 systemctl restart sssd
-authconfig --enableldaptls --update
+
+authconfig --enableldaptls --enablemkhomedir --update
+
+systemctl enable systemd-logind
+systemctl start systemd-logind
+
+systemctl enable oddjobd
+systemctl start oddjobd
