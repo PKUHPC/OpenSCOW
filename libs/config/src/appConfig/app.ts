@@ -33,11 +33,6 @@ export type VncAppConfigSchema = Static<typeof VncAppConfigSchema>;
 
 export const AppConfigSchema = Type.Object({
   name: Type.String({ description: "App名" }),
-  nodes: Type.Optional(
-    Type.Array(
-      Type.String({ description: "节点地址" }),
-      { description: "支持启动这个App的节点名。如果不设置，则所有节点都可以运行" },
-    )),
   type: Type.Enum(AppType, { description: "应用类型" }),
   web: Type.Optional(WebAppConfigSchema),
   vnc: Type.Optional(VncAppConfigSchema),
