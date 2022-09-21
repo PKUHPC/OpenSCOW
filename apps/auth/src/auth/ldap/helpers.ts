@@ -1,10 +1,10 @@
-import { FastifyLoggerInstance } from "fastify";
+import { FastifyBaseLogger } from "fastify";
 import ldapjs from "ldapjs";
 import { LdapConfigSchema } from "src/config/auth";
 import { promisify } from "util";
 
 export const useLdap = (
-  logger: FastifyLoggerInstance,
+  logger: FastifyBaseLogger,
   config: LdapConfigSchema,
   user: { dn: string, password: string } = { dn: config.bindDN, password: config.bindPassword },
 ) => {
@@ -22,7 +22,7 @@ export const useLdap = (
 };
 
 export const searchOne = async <T>(
-  logger: FastifyLoggerInstance,
+  logger: FastifyBaseLogger,
   client: ldapjs.Client,
   searchBase: string,
   searchOptions: ldapjs.SearchOptions,
@@ -80,7 +80,7 @@ export const searchOne = async <T>(
   });
 };
 
-export const findUser = async (logger: FastifyLoggerInstance,
+export const findUser = async (logger: FastifyBaseLogger,
   config: LdapConfigSchema, client: ldapjs.Client, id: string) => {
   return await searchOne(logger, client, config.searchBase,
     {

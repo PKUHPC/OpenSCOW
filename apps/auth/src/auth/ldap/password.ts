@@ -5,7 +5,7 @@
  */
 
 import { BerWriter } from "asn1";
-import { FastifyLoggerInstance } from "fastify";
+import { FastifyBaseLogger } from "fastify";
 import ldapjs from "ldapjs";
 import { useLdap } from "src/auth/ldap/helpers";
 import { LdapConfigSchema } from "src/config/auth";
@@ -43,7 +43,7 @@ export async function modifyPassword(
 }
 
 export async function modifyPasswordAsSelf(
-  log: FastifyLoggerInstance,
+  log: FastifyBaseLogger,
   ldap: LdapConfigSchema,
   userDn: string, oldPassword: string, newPassword: string,
 ) : Promise<boolean> {
