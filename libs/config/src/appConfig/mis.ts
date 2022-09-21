@@ -16,7 +16,7 @@ export const MisConfigSchema = Type.Object({
     host: Type.String({ description: "数据库地址" }),
     port: Type.Integer({ description: "数据库端口" }),
     user: Type.String({ description: "数据库用户名" }),
-    password: Type.String({ description: "数据库密码", default: "" }),
+    password: Type.Optional(Type.String({ description: "数据库密码" })),
     dbName: Type.String({ description: "数据库数据库名" }),
     debug: Type.Boolean({ description: "打开ORM的debug模式", default: false }),
   }),
