@@ -52,18 +52,18 @@ LDAP认证系统支持的功能如下表：
 1. 使用`ldap.bindDn`和`ldap.bindPassword`作为用户名和密码与向LDAP服务器所在的`ldap.url`发起bind请求
 2. 创建一个新的entry作为用户，其DN以及属性值如下表所示。如果想修改这些值，请参考配置项中的`ldap.addUser.extraProps`属性
 
-| 属性名                          | 值                                                     |
-| ------------------------------- | ------------------------------------------------------ |
-| DN                              | `{ldap.attrs.uid}=用户名,{ldap.addUser.userBase}`      |
-| `ldap.attrs.uid`                | 用户名                                                 |
-| `ldap.attrs.name`               | 用户姓名                                               |
-| sn                              | 用户名                                                 |
-| loginShell                      | /bin/bash                                              |
-| objectClass                     | ["inetOrgPerson", "posixAccount", "shadowAccount"]     |
+| 属性名                          | 值                                                         |
+| ------------------------------- | ---------------------------------------------------------- |
+| DN                              | `{ldap.attrs.uid}=用户名,{ldap.addUser.userBase}`          |
+| `ldap.attrs.uid`                | 用户名                                                     |
+| `ldap.attrs.name`               | 用户姓名                                                   |
+| sn                              | 用户名                                                     |
+| loginShell                      | /bin/bash                                                  |
+| objectClass                     | ["inetOrgPerson", "posixAccount", "shadowAccount"]         |
 | homeDirectory                   | `ldap.addUser.homeDir`，其中的`{{ username }}`替换为用户名 |
-| uidNumber                       | 数据库中的用户项的id + `ldap.addUser.uidStart`        |
-| gidNumber                       | 数据库中的用户项的id + `ldap.addUser.uidStart`         |
-| `ldap.attrs.mail`（如果设置了） | 用户的邮箱                                             |
+| uidNumber                       | 数据库中的用户项的id + `ldap.addUser.uidStart`             |
+| gidNumber                       | 数据库中的用户项的id + `ldap.addUser.uidStart`             |
+| `ldap.attrs.mail`（如果设置了） | 用户的邮箱                                                 |
 
 3. 创建一个新的entry作为新用户的group，其DN以及属性值如下表所示。
 
@@ -100,6 +100,23 @@ ldap:
   # 搜索登录用户时的筛选器。必填
   userFilter: "(uid=*)"
 
+  # 属性映射
+  attrs:
+    # LDAP中对应用户ID的属性名
+    uid: uid
+    # LDAP中用户对应的组的实体表示用户ID的属性名
+    groupUserId: cn
+
+    # LDAP对应用户姓名的属性名
+    # 此字段用于
+    # 1. 登录时显示为用户的姓名
+    # 2. 创建用户的时候把姓名信息填入LDAP
+    # 3. 管理系统添加用户时，验证ID和姓名是否匹配
+    name: cn
+
+    # LDAP中对应用户的邮箱的属性名。可不填。此字段只用于在创建用户的时候把邮件信息填入LDAP。
+    # mail: mail
+
   # 添加用户的相关配置。必填
   addUser:
     # 增加用户节点时，把用户增加到哪个节点下
@@ -123,19 +140,6 @@ ldap:
     # 例如：{ sn: "{{ cn }}" }，那么添加时将会增加一个sn属性，其值为cn的属性，即为用户输入的姓名
     # extraProps: 
     #   key: value
-
-  # 属性映射
-  attrs:
-    # LDAP中对应用户ID的属性名
-    uid: uid
-    # LDAP中用户对应的组的实体表示用户ID的属性名
-    groupUserId: cn
-    # 此字段用于在创建用户的时候把姓名信息填入LDAP，以及验证ID和姓名是否匹配。
-    # 如果不填写，则系统将不会验证ID和姓名是否匹配，且不会再创建用户的时候把姓名信息填入LDAP。
-    # name: cn
-
-    # LDAP中对应用户的邮箱的属性名。可不填。此字段只用于在创建用户的时候把邮件信息填入LDAP。
-    # mail: mail
 ```
 
 增加好配置后，运行`docker compose restart`重启系统即可。
