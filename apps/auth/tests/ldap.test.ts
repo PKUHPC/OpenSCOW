@@ -20,9 +20,9 @@ const user = {
   password: "12#",
 };
 
-const userDn = `${ldap.attrs.uid}=${user.identityId},${ldap.addUser.userBase}`;
+const userDn = `${ldap.addUser.userIdDnKey}=${user.identityId},${ldap.addUser.userBase}`;
 const groupDn =
-  `${ldap.addUser.newGroupPerUser!.userIdAttr}=${user.identityId},`
+  `${ldap.addUser.newGroupPerUser!.groupIdDnKey}=${user.identityId},`
   + `${ldap.addUser.newGroupPerUser!.groupBase}`;
 
 beforeEach(async () => {

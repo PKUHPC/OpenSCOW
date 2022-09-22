@@ -9,12 +9,15 @@ ldap:
   userFilter: (uid=*)
   addUser:
     userBase: "ou=People,ou=hpc,o=pku"
+    userIdDnKey: cn
+
     groupStrategy: "new-group-per-user"
     newGroupPerUser:
       groupBase: "ou=Group,ou=hpc,o=pku"
-      userIdAttr: cn
+      groupIdDnKey: cn
     oneGroupForAllUsers:
       gidNumber: 1000
+
     extraProps:
       # test overriding existing property
       mail: mail is {{ mail }}

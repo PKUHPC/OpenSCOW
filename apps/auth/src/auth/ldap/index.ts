@@ -72,7 +72,9 @@ export const createLdapAuthProvider = (f: FastifyInstance) => {
       const id = info.id + ldap.addUser.uidStart;
 
       await useLdap(req.log, ldap)(async (client) => {
-        const userDn = `${ldap.attrs.uid}=${info.identityId},${ldap.addUser.userBase}`;
+        const userDn =
+          `${ldap.addUser.userIdDnKey ?? ldap.attrs.uid}=${info.identityId},` +
+          `${ldap.addUser.userBase}`;
         const userEntry: Record<string, string | string[] | number> = {
           [ldap.attrs.uid]: info.identityId,
           sn: info.identityId,
@@ -105,7 +107,7 @@ export const createLdapAuthProvider = (f: FastifyInstance) => {
 
           const config = ldap.addUser.newGroupPerUser!;
 
-          const groupDn = `${config.userIdAttr}=${info.identityId},${config.groupBase}`;
+          const groupDn = `${config.groupIdDnKey ?? ldap.attrs.uid}=${info.identityId},${config.groupBase}`;
           const groupEntry = {
             objectClass: ["posixGroup"],
             memberUid: info.identityId,

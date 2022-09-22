@@ -21,6 +21,14 @@ export const LdapConfigSchema = Type.Object({
       default: "/nfs/{{ userId }}",
     }),
 
+    userIdDnKey: Type.Optional(Type.String({
+      description: `
+      LDAP增加用户时，新用户节点的DN中，第一个路径的属性的key。
+      新用户节点的DN为{userIdDnKey}={用户ID},{userBase}
+      如果不填写，则使用ldap.attrs.uid的值
+      `,
+    })),
+
     groupStrategy: Type.Enum(NewUserGroupStrategy, { description: `
       如何确定新用户的组。
       ${NewUserGroupStrategy["new-group-per-user"]}: 给每个用户创建一个新的组
@@ -29,7 +37,11 @@ export const LdapConfigSchema = Type.Object({
 
     newGroupPerUser: Type.Optional(Type.Object({
       groupBase: Type.String({ description: "LDAP增加用户对应的组时，把组节点增加到哪个节点下" }),
-      userIdAttr: Type.String({ description: "LDAP中用户对应的组的实体表示用户ID的属性名。组节点的此属性的值将会被设置为用户名" }),
+      groupIdDnKey: Type.Optional(Type.String({ description: `
+      新的组节点的DN中，第一个路径的属性的key。
+      新的组节点的DN为{groupIdDnKey}={用户ID},{groupBase}
+      如果不填写，则使用ldap.attrs.uid的值
+      ` })),
       extraProps: Type.Optional(Type.Record(Type.String(), Type.Union([Type.String(), Type.Array(Type.String())], {
         description: "组的节点应该额外拥有的属性值。可以使用 {{ 用户节点的属性key }}来使用用户节点的属性值",
       }))),
