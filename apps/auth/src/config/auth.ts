@@ -76,12 +76,17 @@ export const LdapConfigSchema = Type.Object({
   }, { description: "添加用户的配置" }),
   attrs: Type.Object({
     uid: Type.String({ description: "LDAP中对应用户的id的属性名。" }),
-    name: Type.String({ description: `
+    name: Type.Optional(Type.String({ description: `
         LDAP对应用户姓名的属性名。此字段用于
         1. 登录时显示为用户的姓名
         2. 创建用户的时候把姓名信息填入LDAP
         3. 管理系统添加用户时，验证ID和姓名是否匹配
-    ` }),
+
+        如果不设置此字段，那么
+        1. 用户姓名为用户的ID
+        2. 创建用户时姓名信息填入LDAP
+        3. 管理系统添加用户时，不验证ID与姓名是否匹配
+    ` })),
     mail: Type.Optional(Type.String({ description: "LDAP中对应用户的邮箱的属性名。可不填。此字段只用于在创建用户的时候把邮件信息填入LDAP。" })),
   }, { description: "属性映射" }),
 }, { description: "LDAP配置" });

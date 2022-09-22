@@ -54,7 +54,7 @@ export const createLdapAuthProvider = (f: FastifyInstance) => {
                   }),
                 ],
               }),
-            }, (e) => extractUserInfoFromEntry(ldap, e),
+            }, (e) => extractUserInfoFromEntry(ldap, e, req.log),
           );
 
           if (!user) {
