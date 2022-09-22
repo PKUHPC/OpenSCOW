@@ -4,8 +4,8 @@ import { Static, Type } from "@sinclair/typebox";
 import { AuthType } from "./AuthType";
 
 export enum NewUserGroupStrategy {
-  "new-group-per-user" = "new-group-per-user",
-  "one-group-for-all-users" = "one-group-for-all-users"
+  "newGroupPerUser" = "newGroupPerUser",
+  "oneGroupForAllUsers" = "oneGroupForAllUsers"
 }
 
 export const LdapConfigSchema = Type.Object({
@@ -31,8 +31,8 @@ export const LdapConfigSchema = Type.Object({
 
     groupStrategy: Type.Enum(NewUserGroupStrategy, { description: `
       如何确定新用户的组。
-      ${NewUserGroupStrategy["new-group-per-user"]}: 给每个用户创建一个新的组
-      ${NewUserGroupStrategy["one-group-for-all-users"]}: 将所有用户加入某个已有的组
+      ${NewUserGroupStrategy.newGroupPerUser}: 给每个用户创建一个新的组
+      ${NewUserGroupStrategy.oneGroupForAllUsers}: 将所有用户加入某个已有的组
     ` }),
 
     newGroupPerUser: Type.Optional(Type.Object({
@@ -45,11 +45,11 @@ export const LdapConfigSchema = Type.Object({
       extraProps: Type.Optional(Type.Record(Type.String(), Type.Union([Type.String(), Type.Array(Type.String())], {
         description: "组的节点应该额外拥有的属性值。可以使用 {{ 用户节点的属性key }}来使用用户节点的属性值",
       }))),
-    }, { description: "如果groupStrategy采用new-group-per-user，填写新的组节点的配置信息" })),
+    }, { description: "如果groupStrategy采用newGroupPerUser，填写新的组节点的配置信息" })),
 
     oneGroupForAllUsers: Type.Optional(Type.Object({
       gidNumber: Type.Integer({ description: "新用户将会加入的组的gidNumber属性值" }),
-    }, { description: "如果groupStrategy采用one-group-for-all-users，填写原有组的信息" })),
+    }, { description: "如果groupStrategy采用oneGroupForAllUsers，填写原有组的信息" })),
 
     addUserToLdapGroup: Type.Optional(
       Type.String({ description: "LDAP增加用户时，应该把用户增加到哪个LDAP Group下。如果不填，创建用户后不会增加用户到Group" }),
@@ -58,7 +58,7 @@ export const LdapConfigSchema = Type.Object({
     uidStart: Type.Integer({
       description: `
       LDAP创建用户时，uid从多少开始。生成的用户的uid等于此值加上用户账户中创建的用户ID。
-      如果采用new-group-per-user的用户组策略，创建的组的gid和uid和此相同。`,
+      如果采用newGroupPerUser的用户组策略，创建的组的gid和uid和此相同。`,
       default: 66000,
     }),
 
@@ -120,18 +120,18 @@ function validateConfig(config: AuthConfigSchema) {
       throw new Error("authType is set to ldap, but ldap config is not set");
     }
 
-    if (config.ldap.addUser.groupStrategy === NewUserGroupStrategy["new-group-per-user"]
+    if (config.ldap.addUser.groupStrategy === NewUserGroupStrategy.newGroupPerUser
     && !config.ldap.addUser.newGroupPerUser) {
       throw new Error(`
-      ldap.addUser.groupStrategy is set to ${NewUserGroupStrategy["new-group-per-user"]} is set to ldap,
+      ldap.addUser.groupStrategy is set to ${NewUserGroupStrategy.newGroupPerUser} is set to ldap,
       but ldap.addUser.groupStrategy.newGroupPerUser config is not set`,
       );
     }
 
-    if (config.ldap.addUser.groupStrategy === NewUserGroupStrategy["one-group-for-all-users"]
+    if (config.ldap.addUser.groupStrategy === NewUserGroupStrategy.oneGroupForAllUsers
     && !config.ldap.addUser.oneGroupForAllUsers) {
       throw new Error(`
-      ldap.addUser.groupStrategy is set to ${NewUserGroupStrategy["one-group-for-all-users"]} is set to ldap,
+      ldap.addUser.groupStrategy is set to ${NewUserGroupStrategy.oneGroupForAllUsers} is set to ldap,
       but ldap.addUser.groupStrategy.oneGroupFroAllUsers config is not set`,
       );
     }

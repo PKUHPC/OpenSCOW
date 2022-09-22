@@ -68,9 +68,9 @@ async function searchByDn(client: Client, dn: string) {
   return searchOne(server.log, client, dn, { scope: "base" }, (e) => e);
 }
 
-it("creates user and group if groupStrategy is new-group-per-user", async () => {
+it("creates user and group if groupStrategy is newGroupPerUser", async () => {
 
-  ldap.addUser.groupStrategy = NewUserGroupStrategy["new-group-per-user"];
+  ldap.addUser.groupStrategy = NewUserGroupStrategy.newGroupPerUser;
 
   const resp = await server.inject({
     method: "POST",
@@ -108,8 +108,8 @@ it("creates user and group if groupStrategy is new-group-per-user", async () => 
 
 });
 
-it("creates only user if groupStrategy is one-group-for-all-users", async () => {
-  ldap.addUser.groupStrategy = NewUserGroupStrategy["one-group-for-all-users"];
+it("creates only user if groupStrategy is oneGroupForAllUsers", async () => {
+  ldap.addUser.groupStrategy = NewUserGroupStrategy.oneGroupForAllUsers;
 
   const resp = await server.inject({
     method: "POST",

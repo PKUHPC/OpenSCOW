@@ -101,9 +101,9 @@ export const createLdapAuthProvider = (f: FastifyInstance) => {
         const add = promisify(client.add.bind(client));
 
 
-        if (ldap.addUser.groupStrategy === NewUserGroupStrategy["new-group-per-user"]) {
+        if (ldap.addUser.groupStrategy === NewUserGroupStrategy.newGroupPerUser) {
 
-          req.log.info("ldap.addUser.groupStrategy is new-group-per-user. Creating new group for the user.");
+          req.log.info("ldap.addUser.groupStrategy is newGroupPerUser. Creating new group for the user.");
 
           const config = ldap.addUser.newGroupPerUser!;
 
@@ -125,7 +125,7 @@ export const createLdapAuthProvider = (f: FastifyInstance) => {
 
         }
 
-        if (ldap.addUser.groupStrategy === NewUserGroupStrategy["one-group-for-all-users"]) {
+        if (ldap.addUser.groupStrategy === NewUserGroupStrategy.oneGroupForAllUsers) {
           const config = ldap.addUser.oneGroupForAllUsers!;
 
           req.log.info("ldap.addUser.groupStrategy is one-group-for-all-users.");

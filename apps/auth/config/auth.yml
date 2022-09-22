@@ -11,7 +11,7 @@ ldap:
     userBase: "ou=People,ou=hpc,o=pku"
     userIdDnKey: cn
 
-    groupStrategy: "new-group-per-user"
+    groupStrategy: "newGroupPerUser"
     newGroupPerUser:
       groupBase: "ou=Group,ou=hpc,o=pku"
       groupIdDnKey: cn
