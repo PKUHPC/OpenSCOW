@@ -97,9 +97,13 @@ export const findUser = async (logger: FastifyBaseLogger,
   );
 };
 
+export const extractAttr = (entry: ldapjs.SearchEntry, attr: string): string[] | undefined => {
+  return entry.attributes.find((x) => x.json.type === attr)?.vals as string[] | undefined;
+};
+
 export const extractUserInfoFromEntry = (config: LdapConfigSchema, entry: ldapjs.SearchEntry) => {
-  const identityId = takeOne(entry.attributes.find((x) => x.json.type === config.attrs.uid)?.vals);
-  const name = takeOne(entry.attributes.find((x) => x.json.type === config.attrs.name)?.vals);
+  const identityId = takeOne(extractAttr(entry, config.attrs.uid));
+  const name = takeOne(extractAttr(entry, config.attrs.name));
 
   if (!identityId || !name) {
     return undefined;
@@ -108,7 +112,7 @@ export const extractUserInfoFromEntry = (config: LdapConfigSchema, entry: ldapjs
   }
 };
 
-function takeOne(val: string | string[] | undefined) {
+export function takeOne(val: string | string[] | undefined) {
   if (typeof val === "string") {
     return val;
   }
