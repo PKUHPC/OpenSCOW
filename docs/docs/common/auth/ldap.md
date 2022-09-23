@@ -26,12 +26,6 @@ LDAP认证系统支持的功能如下表：
 
 要使用LDAP进行SCOW系统的用户认证，您必须配置LDAP服务器和集群中的每个节点，使得集群中的任何节点都可以使用LDAP用户节点的`ldap.attrs.uid`对应的属性的值和密码作为用户名和密码登录。请参考[client.sh](%REPO_FILE_URL%/dev/ldap/client.sh)配置使用LDAP服务器登录Linux节点。
 
-另外，我们还要求
-
-- 每个需要登录集群的用户节点都对应一个用户组(group)的节点，所对应的Linux用户属于用户组节点所对应的Linux用户组
-- 用户节点的`ldap.attrs.uid`属性的值 == 组节点的`ldap.attrs.groupUserId`属性的值
-- 用户节点的uidNumber, gidNumber和组节点的gidNumber的值相同
-
 ### 登录
 
 当用户登录时，认证系统获得用户输入的用户名和密码，进行以下操作：
@@ -47,32 +41,46 @@ LDAP认证系统支持的功能如下表：
 
 ### 创建用户
 
+系统会对每个新用户创建一个新的LDAP节点表示用户，并支持同时创建一个LDAP节点表示用户的组。
+
 当用户在运营系统中创建后，认证系统获得新用户的用户名、用户姓名、密码和邮箱，进行以下操作
 
 1. 使用`ldap.bindDn`和`ldap.bindPassword`作为用户名和密码与向LDAP服务器所在的`ldap.url`发起bind请求
-2. 创建一个新的entry作为用户，其DN以及属性值如下表所示。如果想修改这些值，请参考配置项中的`ldap.addUser.extraProps`属性
+2. 创建一个新的entry作为用户，其DN以及属性值如下表所示
 
-| 属性名                          | 值                                                         |
-| ------------------------------- | ---------------------------------------------------------- |
-| DN                              | `{ldap.attrs.uid}=用户名,{ldap.addUser.userBase}`          |
-| `ldap.attrs.uid`                | 用户名                                                     |
-| `ldap.attrs.name`               | 用户姓名                                                   |
-| sn                              | 用户名                                                     |
-| loginShell                      | /bin/bash                                                  |
-| objectClass                     | ["inetOrgPerson", "posixAccount", "shadowAccount"]         |
-| homeDirectory                   | `ldap.addUser.homeDir`，其中的`{{ username }}`替换为用户名 |
-| uidNumber                       | 数据库中的用户项的id + `ldap.addUser.uidStart`             |
-| gidNumber                       | 数据库中的用户项的id + `ldap.addUser.uidStart`             |
-| `ldap.attrs.mail`（如果设置了） | 用户的邮箱                                                 |
+表中`??`表示如果前面的配置值设置了，就采用前面的值，如果没有设置，则采用后面的值。
 
-3. 创建一个新的entry作为新用户的group，其DN以及属性值如下表所示。
+| 属性名                               | 值                                                                            |
+| ------------------------------------ | ----------------------------------------------------------------------------- |
+| DN                                   | `{ldap.addUser.userIdDnKey ?? ldap.attrs.uid}=用户名,{ldap.addUser.userBase}` |
+| `ldap.attrs.uid`                     | 用户名                                                                        |
+| sn                                   | 用户名                                                                        |
+| loginShell                           | /bin/bash                                                                     |
+| objectClass                          | ["inetOrgPerson", "posixAccount", "shadowAccount"]                            |
+| homeDirectory                        | `ldap.addUser.homeDir`，其中的`{{ username }}`替换为用户名                    |
+| uidNumber                            | 数据库中的用户项的id + `ldap.addUser.uidStart`                                |
+| gidNumber                            | 取决于`ldap.groupStrategy`，见下文                                            |
+| `ldap.attrs.name`（如果设置了）      | 用户姓名                                                                      |
+| `ldap.attrs.mail`（如果设置了）      | 用户的邮箱                                                                    |
+| `ldap.addUser.extraProps`中的每个key | key对应的值，其中`{{ key }}`替换为`key`本节点的对应的属性的值                 |
 
-| 属性名      | 值                                                         |
-| ----------- | ---------------------------------------------------------- |
-| DN          | `{ldap.attrs.groupUserId}=用户名,{ldap.addUser.groupBase}` |
-| objectClass | ["posixGroup"]                                             |
-| memberUid   | 用户名                                                     |
-| gidNumber   | 同用户的uidNumber                                          |
+如果`ldap.addUser.extraProps`中包括已经存在的key，则会替换对应的属性。
+
+3. 配置新用户所属的组。
+
+如果`ldap.addUser.groupStrategy`设置为`oneGroupForAllUsers`，则新用户的`gidNumber`为`ldap.addUser.oneGroupForAllUsers.gidNumber`的值，且不会新建新的表示组的LDAP节点。
+
+如果`ldap.addUser.groupStrategy`设置为`newGroupPerUser`，则新用户的`gidNumber`的值等于用户的uidNumber，并且会创建一个新的LDAP节点作为新用户的group，其DN以及属性值如下表所示。
+
+| 属性名                                               | 值                                                                                                         |
+| ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| DN                                                   | `{ldap.newGroupPerUser.groupIdDnKey ?? ldap.attrs.userId}=用户名,{ldap.addUser.newGroupPerUser.groupBase}` |
+| objectClass                                          | ["posixGroup"]                                                                                             |
+| memberUid                                            | 用户名                                                                                                     |
+| gidNumber                                            | 同用户的uidNumber                                                                                          |
+| `ldap.addUser.newGroupPerUser.extraProps`中的每个key | key对应的值，其中`{{ key }}`替换为本节点的`key`对应的属性的值                                              |
+
+如果`ldap.addUser.newGroupPerUser.extraProps`中包括已经存在的key，则会替换对应的属性。
 
 4. 设置新用户的密码为用户输入的密码
 
@@ -104,15 +112,18 @@ ldap:
   attrs:
     # LDAP中对应用户ID的属性名
     uid: uid
-    # LDAP中用户对应的组的实体表示用户ID的属性名
-    groupUserId: cn
 
     # LDAP对应用户姓名的属性名
     # 此字段用于
     # 1. 登录时显示为用户的姓名
     # 2. 创建用户的时候把姓名信息填入LDAP
     # 3. 管理系统添加用户时，验证ID和姓名是否匹配
-    name: cn
+    #
+    # 如果不设置此字段，那么
+    # 1. 用户姓名为用户的ID
+    # 2. 创建用户时姓名信息填入LDAP
+    # 3. 管理系统添加用户时，不验证ID与姓名是否匹配
+    # name: cn
 
     # LDAP中对应用户的邮箱的属性名。可不填。此字段只用于在创建用户的时候把邮件信息填入LDAP。
     # mail: mail
@@ -121,23 +132,49 @@ ldap:
   addUser:
     # 增加用户节点时，把用户增加到哪个节点下
     userBase: "ou=People,ou={ou},o={dn}"
-    # 增加用户节点时，把用户对应的组增加到哪个节点下
-    groupBase: "ou=Group,ou={ou},o={dn}"
 
     # 用户的homeDirectory值。使用{{ userId }}代替新用户的用户名。默认如下
     homeDir: /nfs/{{ userId }}
 
-    # 是否应该把新用户加到哪个LDAP组下。如果不填，则不加
-    # userToGroup: group
+    # LDAP增加用户时，新用户节点的DN中，第一个路径的属性的key。
+    # 新用户节点的DN为{userIdDnKey}={用户ID},{userBase}
+    # 如果不填写，则使用ldap.attrs.uid的值
+    # userIdDnKey: uid
 
-    # uid从多少开始。生成的用户的uid等于此值加上用户账户中创建的用户ID。创建的Group的gid和uid和此相同。
+    # 如何确定新用户的组。可取的值包括：
+    # newGroupPerUser: 给每个用户创建新的组
+    # oneGroupForAllUsers: 不创建新的组，给所有用户设定一个固定的组
+    groupStrategy: newGroupPerUser
+
+    newGroupPerUser:
+      # 用户对应的新组应该加在哪个节点下
+      groupBase: "ou=Group,ou={ou},o={dn}"
+
+      # 新的组节点的DN中，第一个路径的属性的key。
+      # 新的组节点的DN为{groupIdDnKey}={用户ID},{groupBase}
+      # 如果不填写，则使用ldap.attrs.uid的值
+      # groupIdDnKey: uid
+
+      # 组的节点应该额外拥有的属性值。可以使用 {{ 用户节点的属性key }}来使用用户节点的属性值
+      # extraProps:
+      #   greetings: hello this is group {{ userId }}
+
+    # 如果groupStrategy设置为oneGroupForAllUsers，那么必须设置此属性
+    oneGroupForAllUsers:
+      # 用户的gidNumber属性的值
+      gidNumber: 5000
+
+    # 是否应该把新用户加到哪个LDAP组下。如果不填，则不加
+    # addUserToLdapGroup: group
+
+    # uid从多少开始。生成的用户的uid等于此值加上用户账户中创建的用户ID
     # 默认如下
     # uidStart: 66000
 
     # 用户项除了id、name和mail，还应该添加哪些属性。类型是个dict
     # 如果这里出现了名为uid, name或email的属性，这里的值将替代用户输入的值。
     # 属性值支持使用 {{ LDAP属性值key }} 格式来使用用户填入的值。
-    # 例如：{ sn: "{{ cn }}" }，那么添加时将会增加一个sn属性，其值为cn的属性，即为用户输入的姓名
+    # 例如：sn: "{{ cn }}"，那么添加时将会增加一个sn属性，其值为cn的属性，即为用户输入的姓名
     # extraProps: 
     #   key: value
 ```
@@ -168,10 +205,16 @@ ldap:
   userFilter: "(uid=*)"
   addUser:
     userBase: "ou=People,ou={ou},o={dn}"
-    groupBase: "ou=Group,ou={ou},o={dn}"
+    userIdDnKey: uid
+    # 把homeDir设置为共享存储上的用户的家路径
+    homeDir: /nfs/{{ userId }} 
+
+    groupStrategy: newGroupPerUser
+    newGroupPerUser:
+      groupBase: "ou=Group,ou={ou},o={dn}"
+      groupIdDnKey: cn
   attrs:
     uid: uid
-    groupUserId: cn
     name: cn
     mail: mail
 ```

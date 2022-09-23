@@ -1,8 +1,8 @@
 import { FastifyInstance } from "fastify";
-import { Client, createClient, NoSuchObjectError } from "ldapjs";
+import { Client, createClient, NoSuchObjectError, SearchEntry } from "ldapjs";
 import { buildApp } from "src/app";
-import { findUser } from "src/auth/ldap/helpers";
-import { authConfig } from "src/config/auth";
+import { extractAttr, findUser, searchOne, takeOne } from "src/auth/ldap/helpers";
+import { authConfig, NewUserGroupStrategy } from "src/config/auth";
 import { ensureNotUndefined } from "src/utils/validations";
 import { createFormData } from "tests/utils";
 import { promisify } from "util";
@@ -20,8 +20,10 @@ const user = {
   password: "12#",
 };
 
-const userDn = `${ldap.attrs.uid}=${user.identityId},${ldap.addUser.userBase}`;
-const groupDn = `${ldap.attrs.groupUserId}=${user.identityId},${ldap.addUser.groupBase}`;
+const userDn = `${ldap.addUser.userIdDnKey}=${user.identityId},${ldap.addUser.userBase}`;
+const groupDn =
+  `${ldap.addUser.newGroupPerUser!.groupIdDnKey}=${user.identityId},`
+  + `${ldap.addUser.newGroupPerUser!.groupBase}`;
 
 beforeEach(async () => {
   server = await buildApp();
@@ -32,30 +34,29 @@ beforeEach(async () => {
   await promisify(client.bind.bind(client))(ldap.bindDN, ldap.bindPassword);
 });
 
+function extractOne(entry: SearchEntry, property: string) {
+  return takeOne(extractAttr(entry, property));
+}
 
-async function removeUser(client: Client) {
-  function removeEvenNotExist(dn: string) {
-    return new Promise<void>((res, rej) => {
-      client.del(dn, (err) => {
-        if (err) {
-          if (err instanceof NoSuchObjectError) {
-            console.log("No entity with dn " + dn);
-          } else {
-            rej(err);
-          }
+async function removeEvenNotExist(client: Client, dn: string) {
+  return new Promise<void>((res, rej) => {
+    client.del(dn, (err) => {
+      if (err) {
+        if (err instanceof NoSuchObjectError) {
+          console.log("No entity with dn " + dn);
+        } else {
+          rej(err);
         }
-        res();
-      });
+      }
+      res();
     });
-  }
-
-  await removeEvenNotExist(userDn);
-  await removeEvenNotExist(groupDn);
+  });
 }
 
 
 afterEach(async () => {
-  await removeUser(client);
+  await removeEvenNotExist(client, userDn);
+  await removeEvenNotExist(client, groupDn);
   client.destroy();
 
   await server.close();
@@ -63,7 +64,13 @@ afterEach(async () => {
 
 });
 
-it("creates user and group", async () => {
+async function searchByDn(client: Client, dn: string) {
+  return searchOne(server.log, client, dn, { scope: "base" }, (e) => e);
+}
+
+it("creates user and group if groupStrategy is newGroupPerUser", async () => {
+
+  ldap.addUser.groupStrategy = NewUserGroupStrategy.newGroupPerUser;
 
   const resp = await server.inject({
     method: "POST",
@@ -73,14 +80,52 @@ it("creates user and group", async () => {
 
   expect(resp.statusCode).toBe(204);
 
-  const ldapUser = await findUser(server.log, ldap, client, user.identityId);
-  expect(ldapUser).toBeDefined();
+  const responseUser = await findUser(server.log, ldap, client, user.identityId);
 
-  expect(ldapUser).toEqual({
+  expect(responseUser).toEqual({
     dn: userDn,
     identityId: user.identityId,
     name: user.name,
   });
+
+  const ldapUser = await searchByDn(client, userDn);
+  if (!ldapUser) { fail("response user is not defined"); }
+
+
+  const uid = ldap.addUser.uidStart + user.id + "";
+
+  expect(extractOne(ldapUser, "uidNumber")).toBe(uid);
+  expect(extractOne(ldapUser, "gidNumber")).toBe(uid);
+  expect(extractOne(ldapUser, "uid")).toBe(user.identityId);
+  expect(extractOne(ldapUser, "cn")).toBe(user.name);
+  expect(extractOne(ldapUser, "mail")).toBe(`mail is ${user.mail}`);
+
+  const ldapGroup = await searchByDn(client, groupDn);
+  if (!ldapGroup) { fail("response group is not defined"); }
+
+  expect(ldapGroup.dn).toBe(groupDn);
+  expect(extractOne(ldapGroup, "memberUid")).toBe(user.identityId);
+
+});
+
+it("creates only user if groupStrategy is oneGroupForAllUsers", async () => {
+  ldap.addUser.groupStrategy = NewUserGroupStrategy.oneGroupForAllUsers;
+
+  const resp = await server.inject({
+    method: "POST",
+    url: "/user",
+    payload: user,
+  });
+
+  expect(resp.statusCode).toBe(204);
+
+  const ldapUser = await searchByDn(client, userDn);
+  if (!ldapUser) { fail("response user is not defined"); }
+
+  const uid = ldap.addUser.uidStart + user.id + "";
+
+  expect(extractOne(ldapUser, "uidNumber")).toBe(uid);
+  expect(extractOne(ldapUser, "gidNumber")).toBe(1000 + "");
 
 });
 

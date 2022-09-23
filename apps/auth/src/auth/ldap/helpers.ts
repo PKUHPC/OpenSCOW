@@ -93,22 +93,30 @@ export const findUser = async (logger: FastifyBaseLogger,
             value: id,
           })],
       }),
-    }, (e) => extractUserInfoFromEntry(config, e),
+    }, (e) => extractUserInfoFromEntry(config, e, logger),
   );
 };
 
-export const extractUserInfoFromEntry = (config: LdapConfigSchema, entry: ldapjs.SearchEntry) => {
-  const identityId = takeOne(entry.attributes.find((x) => x.json.type === config.attrs.uid)?.vals);
-  const name = takeOne(entry.attributes.find((x) => x.json.type === config.attrs.name)?.vals);
-
-  if (!identityId || !name) {
-    return undefined;
-  } else {
-    return { identityId, name };
-  }
+export const extractAttr = (entry: ldapjs.SearchEntry, attr: string): string[] | undefined => {
+  return entry.attributes.find((x) => x.json.type === attr)?.vals as string[] | undefined;
 };
 
-function takeOne(val: string | string[] | undefined) {
+export const extractUserInfoFromEntry = (
+  config: LdapConfigSchema, entry: ldapjs.SearchEntry, log: FastifyBaseLogger,
+) => {
+  const identityId = takeOne(extractAttr(entry, config.attrs.uid));
+
+  if (!identityId) {
+    log.info("Candidate user (dn %s) doesn't has property key %s (set by ldap.attrs.uid). Ignored.");
+    return undefined;
+  }
+
+  const name = config.attrs.name ? takeOne(extractAttr(entry, config.attrs.name)) : identityId;
+
+  return { identityId, name };
+};
+
+export function takeOne(val: string | string[] | undefined) {
   if (typeof val === "string") {
     return val;
   }
