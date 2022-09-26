@@ -1,8 +1,5 @@
 id: vscode
 name: VSCode
-nodes:
-  - t001
-  - t002
 type: web
 
 web:

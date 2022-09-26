@@ -98,7 +98,6 @@ export const slurmAppOps = (cluster: string): AppOps => {
             partition: partition,
             workingDirectory,
             qos: qos,
-            nodeList: appConfig.nodes?.join(","),
           });
 
           return await submitAndWriteMetadata(script, { SERVER_SESSION_INFO });
@@ -118,7 +117,6 @@ export const slurmAppOps = (cluster: string): AppOps => {
             workingDirectory,
             qos: qos,
             output: VNC_OUTPUT_FILE,
-            nodeList: appConfig.nodes?.join(","),
           });
 
           return await submitAndWriteMetadata(script, { VNC_SESSION_INFO, VNCSERVER_BIN_PATH });
