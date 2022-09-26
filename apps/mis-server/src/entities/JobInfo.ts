@@ -1,8 +1,14 @@
 import { Entity, Index, PrimaryKey, Property } from "@mikro-orm/core";
 import { Decimal } from "@scow/lib-decimal";
 import type { OriginalJob } from "src/entities/OriginalJob";
-import { UNKNOWN_PRICE_ITEM } from "src/utils/constants";
 import { DECIMAL_DEFAULT_RAW, DecimalType } from "src/utils/decimal";
+
+const UNKNOWN_PRICE_ITEM = "UNKNOWN";
+
+export interface JobPriceInfo {
+  tenant: { billingItemId: string; price: Decimal; } | undefined;
+  account: { billingItemId: string; price: Decimal; } | undefined;
+}
 
 @Entity()
 export class JobInfo {
@@ -99,17 +105,14 @@ export class JobInfo {
 
   constructor(
     job: OriginalJob,
-    tenant: string,
-    tenantPrice: Decimal,
-    tenantBillingItemId: string,
-    accountPrice: Decimal,
-    accountBillingItemId: string,
+    tenant: string | undefined,
+    jobPriceInfo: JobPriceInfo,
   ) {
     this.biJobIndex = job.biJobIndex;
     this.idJob = job.idJob;
 
     this.account = job.account;
-    this.tenant = tenant;
+    this.tenant = tenant ?? "";
 
     this.user = job.user;
     this.partition = job.partition;
@@ -128,10 +131,10 @@ export class JobInfo {
     this.timeWait = job.timeWait;
     this.qos = job.qos;
 
-    this.tenantPrice = tenantPrice;
-    this.tenantBillingItemId = tenantBillingItemId;
-    this.accountPrice = accountPrice;
-    this.accountBillingItemId = accountBillingItemId;
+    this.tenantPrice = jobPriceInfo.tenant?.price ?? new Decimal(0);
+    this.tenantBillingItemId = jobPriceInfo.tenant?.billingItemId ?? UNKNOWN_PRICE_ITEM;
+    this.accountPrice = jobPriceInfo.account?.price ?? new Decimal(0);
+    this.accountBillingItemId = jobPriceInfo.tenant?.billingItemId ?? UNKNOWN_PRICE_ITEM;
 
     this.recordTime = job.recordTime;
     this.timeSubmit = job.timeSubmit;

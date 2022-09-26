@@ -2,8 +2,9 @@ import { Logger, plugin } from "@ddadaal/tsgrpc-server";
 import { MySqlDriver, SqlEntityManager } from "@mikro-orm/mysql";
 import { Decimal } from "@scow/lib-decimal";
 import { clusters } from "src/config/clusters";
+import { JobPriceInfo } from "src/entities/JobInfo";
 import { AmountStrategy, JobPriceItem } from "src/entities/JobPriceItem";
-import { DEFAULT_TENANT_NAME, UNKNOWN_PRICE_ITEM } from "src/utils/constants";
+import { DEFAULT_TENANT_NAME } from "src/utils/constants";
 
 export interface JobInfo {
   biJobIndex: number;
@@ -142,12 +143,9 @@ export async function createPriceMap(em: SqlEntityManager<MySqlDriver>, logger: 
   };
 }
 
-interface JobPriceInfo {
-  tenant: { billingItemId: string; price: Decimal; }
-  account: { billingItemId: string; price: Decimal; }
-}
 
 
+export const emptyJobPriceInfo = (): JobPriceInfo => ({ tenant: undefined, account: undefined });
 
 export function calculateJobPrice(
   info: JobInfo, getPriceItem: PriceMap["getPriceItem"],
@@ -159,19 +157,13 @@ export function calculateJobPrice(
 
   if (!clusterInfo) {
     logger.warn(`Unknown cluster ${info.cluster}`);
-    return {
-      tenant: { billingItemId: UNKNOWN_PRICE_ITEM, price: new Decimal(0) },
-      account: { billingItemId: UNKNOWN_PRICE_ITEM, price: new Decimal(0) },
-    };
+    return emptyJobPriceInfo();
   }
 
   const partitionInfo = clusterInfo.slurm.partitions[info.partition];
   if (!partitionInfo) {
     logger.warn(`Unknown partition ${info.partition} of cluster ${info.cluster}`);
-    return {
-      tenant: { billingItemId: UNKNOWN_PRICE_ITEM, price: new Decimal(0) },
-      account: { billingItemId: UNKNOWN_PRICE_ITEM, price: new Decimal(0) },
-    };
+    return emptyJobPriceInfo();
   }
 
   const { mem, gpus, cores } = partitionInfo;

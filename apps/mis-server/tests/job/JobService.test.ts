@@ -9,7 +9,6 @@ import { JobPriceChange } from "src/entities/JobPriceChange";
 import { UserAccount } from "src/entities/UserAccount";
 import { JobServiceClient } from "src/generated/server/job";
 import { range } from "src/utils/array";
-import { UNKNOWN_PRICE_ITEM } from "src/utils/constants";
 import { reloadEntities } from "src/utils/orm";
 import { InitialData, insertInitialData } from "tests/data/data";
 import { dropDatabase } from "tests/data/helpers";
@@ -61,7 +60,10 @@ const mockOriginalJobData = (
   "timeWait": 132,
   "qos": "normal",
   "recordTime": new Date("2020-04-23T23:49:50.000Z"),
-}, data.tenant.name, tenantPrice, UNKNOWN_PRICE_ITEM, accountPrice, UNKNOWN_PRICE_ITEM);
+}, data.tenant.name, {
+  tenant: { billingItemId: "", price: tenantPrice },
+  account: { billingItemId: "", price: accountPrice },
+});
 
 function createClient() {
   return new JobServiceClient(server.serverAddress, ChannelCredentials.createInsecure());

@@ -943,5 +943,32 @@
     "accountPrice": 0,
     "tenantPrice": 0,
     "nodelist": ""
+  },
+  {
+    "gpu": 0,
+    "qos": "normal",
+    "memReq": 2250,
+    "cluster": "hpc01",
+    "memAlloc": 2250,
+    "timeUsed": 0,
+    "cpusAlloc": 1,
+    "partition": "compute",
+    "biJobIndex": 6623,
+    "account": "hpca",
+    "user": "not-exist-user",
+    "timeEnd": "2022-01-13T03:19:50.715Z",
+    "timeSubmit": "2022-01-13T03:19:50.715Z",
+    "timeStart": "2022-01-13T03:19:50.715Z",
+    "idJob": 0,
+    "timeWait": 0,
+    "timelimit": 0,
+    "nodesAlloc": 0,
+    "nodesReq": 0,
+    "cpusReq": 0,
+    "jobName": "test",
+    "tenant": "default",
+    "accountPrice": 0,
+    "tenantPrice": 0,
+    "nodelist": ""
   }
 ]
