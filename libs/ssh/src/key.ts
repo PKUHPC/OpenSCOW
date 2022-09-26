@@ -31,7 +31,7 @@ export async function insertKey(
 
     if ! [ -f "${homeDir}" ]; then
       mkdir -p "${homeDir}"
-      chown "${user}:${user}" "${homeDir}"
+      chown "${user}:" "${homeDir}"
     fi
 
     if ! [ -f "${homeDir}/.ssh/authorized_keys" ]; then
@@ -40,8 +40,8 @@ export async function insertKey(
 
       chmod 700 "${homeDir}/.ssh"
       chmod 644 "${homeDir}/.ssh/authorized_keys"
-      chown "${user}:${user}" "${homeDir}/.ssh"
-      chown "${user}:${user}" "${homeDir}/.ssh/authorized_keys"
+      chown "${user}:" "${homeDir}/.ssh"
+      chown "${user}:" "${homeDir}/.ssh/authorized_keys"
     fi
 
     if ! grep -q "${rootKeyPair.publicKey}" "${homeDir}/.ssh/authorized_keys"; then
