@@ -1,6 +1,4 @@
 import { Logger } from "@ddadaal/tsgrpc-server";
-import { ServiceError } from "@grpc/grpc-js";
-import { Status } from "@grpc/grpc-js/build/src/constants";
 import { MikroORM, QueryOrder } from "@mikro-orm/core";
 import { MariaDbDriver } from "@mikro-orm/mariadb";
 import { SqlEntityManager } from "@mikro-orm/mysql";
@@ -12,7 +10,7 @@ import { JobInfo } from "src/entities/JobInfo";
 import { OriginalJob } from "src/entities/OriginalJob";
 import { UserAccount } from "src/entities/UserAccount";
 import { ClusterPlugin } from "src/plugins/clusters";
-import { PricePlugin } from "src/plugins/price";
+import { emptyJobPriceInfo, PricePlugin } from "src/plugins/price";
 
 export const createSourceDbOrm = async (logger: Logger) => {
   logger.info("Connecting to source db.");
@@ -115,10 +113,10 @@ export async function fetchJobs(
           const tenant = accountTenantMap.get(i.account);
 
           if (!tenant) {
-            throw new Error(`Account ${i.account} doesn't exist.`);
+            logger.warn("Account %s doesn't exist. Doesn't charge the job.", i.account);
           }
 
-          const price = priceMap.calculatePrice({
+          const price = tenant ? priceMap.calculatePrice({
             biJobIndex: i.biJobIndex,
             cluster: i.cluster,
             cpusAlloc: i.cpusAlloc,
@@ -130,7 +128,7 @@ export async function fetchJobs(
             timeUsed: i.timeUsed,
             account: i.account,
             tenant,
-          });
+          }) : emptyJobPriceInfo();
 
           // 从job_table读出来的数据实际上是+8时区，但是读出来的时间字符串中不包含时区信息
           // 由于容器本身是+0时区，所以程序将会以为读出来的是+0时区的时间
@@ -145,10 +143,7 @@ export async function fetchJobs(
               i[k] = convertToUTC(i[k]);
             });
 
-          const pricedJob = new JobInfo(i, tenant,
-            price.tenant.price, price.tenant.billingItemId,
-            price.account.price, price.account.billingItemId,
-          );
+          const pricedJob = new JobInfo(i, tenant, price);
 
           em.persist(pricedJob);
 
@@ -157,43 +152,43 @@ export async function fetchJobs(
 
         // add job charge for user account
 
-        await Promise.all(pricedJobs.map(async (x) => {
-          // add job charge for the user
-          const ua = await em.findOne(UserAccount, {
-            account: { accountName: x.account },
-            user: { userId: x.user },
-          }, {
-            populate: ["user", "account", "account.tenant"],
-          });
+        await Promise.all(pricedJobs
+          .map(async (x) => {
+            // add job charge for the user
+            const ua = await em.findOne(UserAccount, {
+              account: { accountName: x.account },
+              user: { userId: x.user },
+            }, {
+              populate: ["user", "account", "account.tenant"],
+            });
 
-          if (!ua) {
-            throw <ServiceError>{
-              code: Status.NOT_FOUND,
-              message: `User ${x.user} in account ${x.account} is not found.`,
-            };
-          }
+            if (!ua) {
+              logger.warn({ biJobIndex: x.biJobIndex },
+                "User %s in account %s is not found. Don't charge the job.", x.user, x.account);
+            }
 
-          const comment = parsePlaceholder(misConfig.jobChargeComment, x);
+            const comment = parsePlaceholder(misConfig.jobChargeComment, x);
 
-          // charge account
-          await charge({
-            amount: x.accountPrice,
-            type: misConfig.jobChargeType,
-            comment,
-            target: ua.account.$,
-          }, em, logger, clusterPlugin);
+            if (ua) {
+              // charge account
+              await charge({
+                amount: x.accountPrice,
+                type: misConfig.jobChargeType,
+                comment,
+                target: ua.account.$,
+              }, em, logger, clusterPlugin);
 
-          // charge tenant
-          await charge({
-            amount: x.tenantPrice,
-            type: misConfig.jobChargeType,
-            comment,
-            target: ua.account.$.tenant.getEntity(),
-          }, em, logger, clusterPlugin);
+              // charge tenant
+              await charge({
+                amount: x.tenantPrice,
+                type: misConfig.jobChargeType,
+                comment,
+                target: ua.account.$.tenant.getEntity(),
+              }, em, logger, clusterPlugin);
 
-          await ua.addJobCharge(x.tenantPrice, clusterPlugin, logger);
-
-        }));
+              await ua.addJobCharge(x.tenantPrice, clusterPlugin, logger);
+            }
+          }));
 
         logger.info(`Round ${i + 1}/${loopCount} completed and persisted. Wait 2 seconds for next round.`);
       });

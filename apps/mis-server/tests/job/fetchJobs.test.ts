@@ -32,7 +32,7 @@ beforeEach(async () => {
 
   // insert raw job table info data
   jobTableOrm = await createSourceDbOrm(server.logger);
-  const jobsData = testData.map(({ tenantPrice, accountPrice, ...rest }) => {
+  const jobsData = testData.map(({ tenantPrice, accountPrice, tenant, ...rest }) => {
     const job = new OriginalJob();
     Object.assign(job, rest);
     return job;
