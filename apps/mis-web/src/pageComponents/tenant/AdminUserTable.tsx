@@ -1,9 +1,9 @@
-import { Button, Form, Input, Table } from "antd";
+import { Button, Form, Input, Table, Tag } from "antd";
 import React, { useMemo, useState } from "react";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
-import { FullUserInfo } from "src/models/User";
+import { FullUserInfo, TenantRoleTexts } from "src/models/User";
 import { GetTenantUsersSchema } from "src/pages/api/admin/getTenantUsers";
-import { formatDateTime } from "src/utils/datetime";
+import { compareDateTime, formatDateTime } from "src/utils/datetime";
 
 interface Props {
   data: GetTenantUsersSchema["responses"]["200"] | undefined;
@@ -68,18 +68,17 @@ export const AdminUserTable: React.FC<Props> = ({
           sorter={(a, b) => a.email.localeCompare(b.email)}
           sortDirections={["ascend", "descend"]}
         />
+        <Table.Column<FullUserInfo> dataIndex="tenantRoles" title="租户角色"
+          render={(_, r) => r.tenantRoles.map((x) => <Tag key={x}>{TenantRoleTexts[x]}</Tag>)}
+        />
         <Table.Column<FullUserInfo> dataIndex="createTime" title="创建时间"
-          // TODO compare time string
-          sorter={(a, b) => a.createTime.localeCompare(b.createTime)}
+          sorter={(a, b) => compareDateTime(a.createTime, b.createTime)}
           sortDirections={["ascend", "descend"]}
           render={(d) => formatDateTime(d)}
         />
         <Table.Column<FullUserInfo> dataIndex="affiliatedAccountNames" title="可用账户"
           render={(_, r) => r.accountAffiliations.map((x) => x.accountName).join(", ")}
         />
-        {/* <Table.Column<FullUserInfo> dataIndex="platformRoles" title="平台角色"
-          render={(_, r) => r.platformRoles.map((x) => PlatformRoleTexts[x]).join(", ")}
-        /> */}
       </Table>
     </div>
   );

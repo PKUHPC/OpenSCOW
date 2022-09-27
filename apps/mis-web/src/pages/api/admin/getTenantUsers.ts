@@ -37,7 +37,7 @@ export default route<GetTenantUsersSchema>("GetTenantUsersSchema",
       email: x.email,
       id: x.userId,
       name: x.name,
-      platformRoles: x.platformRoles,
+      tenantRoles: x.tenantRoles,
     }));
 
 

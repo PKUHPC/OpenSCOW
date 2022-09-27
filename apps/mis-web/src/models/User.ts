@@ -63,6 +63,6 @@ export interface FullUserInfo {
   email: string;
   createTime: string;
   accountAffiliations: { accountName: string; role: UserRole }[];
-  platformRoles: PlatformRole[];
+  tenantRoles: TenantRole[];
 }
 
