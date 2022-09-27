@@ -14,7 +14,7 @@
     "undici": "5.10.0"
   },
   "devDependencies": {
-    "pino": "8.5.0"
+    "pino": "8.6.0"
   },
   "volta": {
     "extends": "../../package.json"
