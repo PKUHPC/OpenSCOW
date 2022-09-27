@@ -14,12 +14,10 @@ export const IndexPage: NextPage = () => {
       if (userStore.user.accountAffiliations.length > 0) {
         return <Redirect url="/dashboard" />;
       } else {
-        const platformRole = userStore.user.platformRoles[0];
-
-        if (platformRole === PlatformRole.PLATFORM_FINANCE) {
+        if (userStore.user.platformRoles.includes(PlatformRole.PLATFORM_FINANCE)) {
           return <Redirect url="/finance/pay" />;
         } else {
-          return <Redirect url="/admin"/>;
+          return <Redirect url="/dashboard"/>;
         }
       }
     }
