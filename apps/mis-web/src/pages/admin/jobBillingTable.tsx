@@ -14,11 +14,7 @@ import { queryToString, useQuerystring } from "src/utils/querystring";
 const AdminJobBillingTable: React.FC<{ tenant?: string }> = ({ tenant }) => {
 
   const { data, isLoading, reload } = useAsync({ promiseFn: useCallback(async () => {
-    if (tenant) {
-      return await api.getBillingTable({ query: { tenant } }).then((x) => x.items);
-    } else {
-      return [];
-    }
+    return await api.getBillingTable({ query: { tenant } }).then((x) => x.items);
   }, [tenant]) });
 
   return (
@@ -27,8 +23,8 @@ const AdminJobBillingTable: React.FC<{ tenant?: string }> = ({ tenant }) => {
         <Form layout="inline">
           <Form.Item label="租户">
             <TenantSelector
-              placeholder="请选择租户"
-              allowUndefined={false}
+              placeholder="不选择来管理平台计算项"
+              allowUndefined={true}
               value={tenant}
               onChange={(tenant) => Router.push({ pathname: "/admin/jobBillingTable", query: { tenant } })}
             />

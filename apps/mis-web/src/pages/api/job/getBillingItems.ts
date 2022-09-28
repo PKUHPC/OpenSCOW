@@ -13,8 +13,8 @@ export interface GetBillingItemsSchema {
   query: {
     /**
      * Platform admin can query any tenant
-     * Not login user can only query default (by not setting the tenant field)
-     * Login user can only query the default and tenant the user belongs to
+     * Not login user can only query platform default (by not setting the tenant field)
+     * Login user can only query the platform default and tenant the user belongs to
      */
     tenant?: string;
 

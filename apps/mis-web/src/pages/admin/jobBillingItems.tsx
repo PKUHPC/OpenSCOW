@@ -34,7 +34,7 @@ const AdminJobBillingManagementTable: React.FC = () => {
           initialValues={{ activeOnly: true, tenant: undefined }}
         >
           <Form.Item label="租户" name="tenant">
-            <TenantSelector allowUndefined={true} placeholder="不选择返回默认计费项" />
+            <TenantSelector allowUndefined={true} placeholder="不选择返回平台计费项" />
           </Form.Item>
           <Form.Item name="activeOnly" valuePropName="checked">
             <Checkbox>只显示当前生效的计费项</Checkbox>
@@ -42,7 +42,7 @@ const AdminJobBillingManagementTable: React.FC = () => {
           <Form.Item>
             <Space>
               <Link href={{ pathname: "/admin/jobBillingTable", query: { tenant } }} >
-                <Button disabled={!tenant}>查看此租户价格表</Button>
+                <Button>查看{tenant ? "租户" : "平台"}价格表</Button>
               </Link>
               <Button loading={isLoading} onClick={reload}>刷新</Button>
             </Space>
