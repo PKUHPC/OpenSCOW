@@ -28,7 +28,7 @@ type: web
 # slurm配置
 slurm:
   options:
-     - "-X node[1-2]"
+     - "-x node[1-2]"
 
 # Web应用的配置
 web:
