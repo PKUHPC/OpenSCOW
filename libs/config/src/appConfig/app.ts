@@ -32,7 +32,10 @@ export const VncAppConfigSchema = Type.Object({
 export type VncAppConfigSchema = Static<typeof VncAppConfigSchema>;
 
 export const SlurmConfigSchema = Type.Object({
-  options: Type.Array(Type.String(), { description:"运行slurm脚本时可添加的选项" }),
+  options: Type.Array(
+    Type.String({ description: "sbatch选项" }), 
+    { description:"运行slurm脚本时可添加的选项" },
+  ),
 });
 
 export type SlurmConfigSchema = Static<typeof SlurmConfigSchema>;
