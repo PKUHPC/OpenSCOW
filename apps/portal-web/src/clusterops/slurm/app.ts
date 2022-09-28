@@ -98,6 +98,7 @@ export const slurmAppOps = (cluster: string): AppOps => {
             partition: partition,
             workingDirectory,
             qos: qos,
+            otherOptions: appConfig.slurm?.options,
           });
 
           return await submitAndWriteMetadata(script, { SERVER_SESSION_INFO });
@@ -117,6 +118,7 @@ export const slurmAppOps = (cluster: string): AppOps => {
             workingDirectory,
             qos: qos,
             output: VNC_OUTPUT_FILE,
+            otherOptions: appConfig.slurm?.options,
           });
 
           return await submitAndWriteMetadata(script, { VNC_SESSION_INFO, VNCSERVER_BIN_PATH });
