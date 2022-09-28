@@ -25,6 +25,11 @@ name: VSCode
 # 指定应用类型为web
 type: web
 
+# slurm配置
+slurm:
+  options:
+     - "-X node[1-2]"
+
 # Web应用的配置
 web:
 
