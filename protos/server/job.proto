@@ -125,7 +125,7 @@ message GetBillingItemsReply { repeated JobBillingItem items = 1; }
 message QueryJobTimeLimitReply { uint64 limit = 1; }
 
 message AddBillingItemRequest {
-  // if not set, add as default item
+  // if not set, add as platform default item
   optional string tenant_name = 1;
   string item_id = 2;
   common.Money price = 3;

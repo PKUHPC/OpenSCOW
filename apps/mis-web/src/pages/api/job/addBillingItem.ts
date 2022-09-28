@@ -14,8 +14,9 @@ export interface AddBillingItemSchema {
   method: "POST";
 
   body: {
-    // if not set, add to default
+    // if not set, add to platform default
     tenant?: string;
+
     itemId: string;
     price: Money;
     amount: string;
