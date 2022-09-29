@@ -88,7 +88,9 @@ export const initServiceServer = plugin((server) => {
         await em.persistAndFlush(initializationTime);
       } catch (e) {
         if (e instanceof UniqueConstraintViolationException) {
-          throw <ServiceError> { code: status.ALREADY_EXISTS };
+          throw <ServiceError> {
+            code: status.ALREADY_EXISTS, message: "already initialized",
+          };
         } else {
           throw e;
         }

@@ -21,7 +21,17 @@ export const chargingServiceServer = plugin((server) => {
         ? await em.findOne(Tenant, { name: tenantName })
         : await em.findOne(Account, { tenant: { name: tenantName }, accountName });
 
-      if (!entity) { throw <ServiceError>{ code: status.NOT_FOUND }; }
+      if (!entity) {
+        if (accountName === undefined) {
+          throw <ServiceError>{
+            code: status.NOT_FOUND, message: `Tenant ${tenantName} is not found`,
+          };
+        } else {
+          throw <ServiceError>{
+            code: status.NOT_FOUND, message: `Tenant ${tenantName} or account  ${accountName} is not found`,
+          };
+        }
+      }
 
       return [{ balance: decimalToMoney(entity.balance) }];
     },
@@ -43,7 +53,16 @@ export const chargingServiceServer = plugin((server) => {
           });
 
         if (!target) {
-          throw <ServiceError> { code: status.NOT_FOUND };
+          if (accountName === undefined) {
+            throw <ServiceError>{
+              code: status.NOT_FOUND, message: `Tenant  ${tenantName} is not found`,
+            };
+          } else {
+            throw <ServiceError>{
+              code: status.NOT_FOUND, message: `Account ${accountName} or tenant ${tenantName} is not found`,
+            };
+          }
+
         }
 
         return await pay({
@@ -78,7 +97,15 @@ export const chargingServiceServer = plugin((server) => {
           });
 
         if (!target) {
-          throw <ServiceError> { code: status.NOT_FOUND };
+          if (accountName === undefined) {
+            throw <ServiceError>{
+              code: status.NOT_FOUND, message: `Tenant  ${tenantName} is not found`,
+            };
+          } else {
+            throw <ServiceError>{
+              code: status.NOT_FOUND, message: `Account  ${accountName} or tenant  ${tenantName} is not found`,
+            };
+          }
         }
 
         return await charge({

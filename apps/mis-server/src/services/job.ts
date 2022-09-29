@@ -216,7 +216,7 @@ export const jobServiceServer = plugin((server) => {
 
       if (!job) {
         throw <ServiceError>{
-          code: Status.NOT_FOUND,
+          code: Status.NOT_FOUND, message: `Job ${biJobIndex} is not found`,
         };
       }
 
@@ -256,10 +256,9 @@ export const jobServiceServer = plugin((server) => {
           request: { delta, jobId }, logger,
         }),
       );
-
       if (reply.code === "NOT_FOUND") {
         throw <ServiceError>{
-          code: Status.NOT_FOUND,
+          code: Status.NOT_FOUND, message: `Cluster ${cluster} or  job ${jobId} is not found.`,
         };
       }
 
@@ -281,7 +280,7 @@ export const jobServiceServer = plugin((server) => {
 
       if (reply.code === "NOT_FOUND") {
         throw <ServiceError>{
-          code: Status.NOT_FOUND,
+          code: Status.NOT_FOUND, message: `Cluster ${cluster} or  job ${jobId} is not found.`,
         };
       }
 
@@ -347,7 +346,8 @@ export const jobServiceServer = plugin((server) => {
       if (!(Object.values(AmountStrategy) as string[]).includes(amountStrategy)) {
         throw <ServiceError>{
           code: status.INVALID_ARGUMENT,
-          message: `Amount strategy ${amountStrategy} is not valid.` };
+          message: `Amount strategy ${amountStrategy} is not valid.`,
+        };
       }
 
       const item = new JobPriceItem({

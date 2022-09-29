@@ -23,7 +23,9 @@ export const accountServiceServer = plugin((server) => {
         }, { lockMode: LockMode.PESSIMISTIC_WRITE });
 
         if (!account) {
-          throw <ServiceError>{ code: Status.NOT_FOUND };
+          throw <ServiceError>{
+            code: Status.NOT_FOUND, message: `Account ${accountName} is not found`,
+          };
         }
 
         if (account.blocked) {
@@ -46,7 +48,9 @@ export const accountServiceServer = plugin((server) => {
         }, { lockMode: LockMode.PESSIMISTIC_WRITE });
 
         if (!account) {
-          throw <ServiceError>{ code: Status.NOT_FOUND };
+          throw <ServiceError>{
+            code: Status.NOT_FOUND, message: `Account ${accountName} is not found`,
+          };
         }
 
         if (!account.blocked) {
@@ -100,12 +104,16 @@ export const accountServiceServer = plugin((server) => {
       const user = await em.findOne(User, { userId: ownerId });
 
       if (!user) {
-        throw <ServiceError> { code: Status.NOT_FOUND };
+        throw <ServiceError> {
+          code: Status.NOT_FOUND, message: `User ${ownerId} is not found`,
+        };
       }
 
       const tenant = await em.findOne(Tenant, { name: tenantName });
       if (!tenant) {
-        throw <ServiceError> { code: Status.NOT_FOUND };
+        throw <ServiceError> {
+          code: Status.NOT_FOUND, message: `Tenant ${tenantName} is not found`,
+        };
       }
 
       // insert the account now to avoid future conflict
@@ -120,7 +128,7 @@ export const accountServiceServer = plugin((server) => {
       } catch (e) {
         if (e instanceof UniqueConstraintViolationException) {
           throw <ServiceError>{
-            code: Status.ALREADY_EXISTS,
+            code: Status.ALREADY_EXISTS, message: `Account ${accountName} already exists.`,
           };
         }
       }
@@ -184,7 +192,9 @@ export const accountServiceServer = plugin((server) => {
       const account = await em.findOne(Account, { accountName, tenant: { name: tenantName } });
 
       if (!account) {
-        throw <ServiceError>{ code: Status.NOT_FOUND };
+        throw <ServiceError>{
+          code: Status.NOT_FOUND, message: `Account ${accountName} is not found`,
+        };
       }
 
       if (account.whitelist) {
@@ -217,7 +227,9 @@ export const accountServiceServer = plugin((server) => {
       const account = await em.findOne(Account, { accountName, tenant: { name: tenantName } });
 
       if (!account) {
-        throw <ServiceError>{ code: Status.NOT_FOUND };
+        throw <ServiceError>{
+          code: Status.NOT_FOUND, message: `Account ${accountName} is not found`,
+        };
       }
 
       if (!account.whitelist) {

@@ -21,14 +21,14 @@ export const jobChargeLimitServer = plugin((server) => {
         if (!userAccount) {
           throw <ServiceError>{
             code: Status.NOT_FOUND,
-            details: "User is not found in account.",
+            details: `User ${userId} is not found in account`,
           };
         }
 
         if (!userAccount.jobChargeLimit) {
           throw <ServiceError> {
             code: Status.NOT_FOUND,
-            details: "The user in account has no limit",
+            details: `The user ${userId} in account ${accountName} has no limit`,
           };
         }
 
@@ -61,7 +61,7 @@ export const jobChargeLimitServer = plugin((server) => {
         if (!userAccount) {
           throw <ServiceError>{
             code: Status.NOT_FOUND,
-            details: "User is not found in account.",
+            details: `User ${userId} is not found in account.`,
           };
         }
 
