@@ -17,7 +17,7 @@ export const adminServiceServer = plugin((server) => {
 
       if (!quota) {
         throw <ServiceError>{
-          code: Status.NOT_FOUND,
+          code: Status.NOT_FOUND, message: `User ${userId} or cluster ${cluster} is not found`,
         };
       }
 
@@ -28,11 +28,15 @@ export const adminServiceServer = plugin((server) => {
       );
 
       if (reply.code === "NOT_FOUND") {
-        throw <ServiceError> { code: Status.NOT_FOUND };
+        throw <ServiceError> {
+          code: Status.NOT_FOUND, message: `User ${userId} or cluster ${cluster} is not found`,
+        };
       }
 
       if (reply.code === "INVALID_VALUE") {
-        throw <ServiceError> { code: Status.INVALID_ARGUMENT };
+        throw <ServiceError> {
+          code: Status.INVALID_ARGUMENT, message: `The changed storage quota value ${value} is not valid`,
+        };
       }
 
       quota.storageQuota = reply.currentQuota;
@@ -52,7 +56,7 @@ export const adminServiceServer = plugin((server) => {
 
       if (!quota) {
         throw <ServiceError>{
-          code: Status.NOT_FOUND,
+          code: Status.NOT_FOUND, message:  `User ${userId} or cluster ${cluster} is not found`,
         };
       }
 
