@@ -788,13 +788,14 @@ queryUserInAcct(){
             echo "User $3 is not exist in account $2"
             exit 4
         else
-            #MaxSubmitJobs=`$mysql --skip-column-names slurm_acct_db -e " select distinct max_submit_jobs from $assoc_table where acct='$2' and user='$3'"`
-            qos=`sacctmgr show assoc format=user,acct%20,qos | grep -E "$3.*$2"  | uniq | awk '{print $3}'`
-            if [ "$qos" == "block" ] ; then
-                echo "User $3 is blocked in account $2!"
+            MaxSubmitJobs=`$mysql --skip-column-names slurm_acct_db -e " select distinct max_submit_jobs from pkuhpc_assoc_table where acct='$2' and user='$3'"`
+            #qos=`sacctmgr show assoc format=user,acct%20,qos | grep -E "$3.*$2"  | uniq | awk '{print $3}'`
+            #if [ "$MaxSubmitJobs" == "0" ] ; then
+            if [ "$MaxSubmitJobs" == "NULL" ] ; then
+                echo "User $3 is allowed in account $2!"
                 exit 0
             else
-                echo "User $3 is allowed in account $2!"
+                echo "User $3 is blocked in account $2!"
                 exit 0
             fi
         fi
