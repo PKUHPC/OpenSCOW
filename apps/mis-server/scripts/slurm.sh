@@ -752,12 +752,12 @@ queryUser(){
             echo "User $2 is not exist!"
             exit 7
         fi
-        qos=`sacctmgr show assoc format=user,qos | grep $2 | uniq | awk '{print $2}'`
-        if [ "$qos" == "block" ] ; then
-            echo "User $2 is blocked!"
+        MaxSubmitJobs=`$mysql --skip-column-names slurm_acct_db -e " select distinct max_submit_jobs from $assoc_table where user='$2'"`
+        if [ "$MaxSubmitJobs" == "NULL" ] ; then
+            echo "User $2 is allowed!"
             exit 0
         else
-            echo "User $2 is allowed!"
+            echo "User $2 is blocked!"
             exit 0
         fi
     else
@@ -788,15 +788,15 @@ queryUserInAcct(){
             echo "User $3 is not exist in account $2"
             exit 4
         else
-            #MaxSubmitJobs=`$mysql --skip-column-names slurm_acct_db -e " select distinct max_submit_jobs from $assoc_table where acct='$2' and user='$3'"`
-            qos=`sacctmgr show assoc format=user,acct%20,qos | grep -E "$3.*$2"  | uniq | awk '{print $3}'`
-            if [ "$qos" == "block" ] ; then
-                echo "User $3 is blocked in account $2!"
-                exit 0
-            else
+             MaxSubmitJobs=`$mysql --skip-column-names slurm_acct_db -e " select distinct max_submit_jobs from $assoc_table where acct='$2' and user='$3'"`
+            if [ "$MaxSubmitJobs" == "NULL" ] ; then
                 echo "User $3 is allowed in account $2!"
                 exit 0
+            else
+                echo "User $3 is blocked in account $2!"
+                exit 0
             fi
+
         fi
     else
         echo -e "$queryUserInAcct\n"
