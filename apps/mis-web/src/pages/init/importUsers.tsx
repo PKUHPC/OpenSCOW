@@ -1,14 +1,11 @@
-import { Result, Tabs } from "antd";
+import { Result } from "antd";
 import { GetServerSideProps, NextPage } from "next";
-import Link from "next/link";
 import { SSRProps } from "src/auth/server";
 import { UnifiedErrorPage } from "src/components/errorPages/UnifiedErrorPage";
-import { EditJobPriceTableForm } from "src/pageComponents/init/EditJobPriceTableForm";
-import { InitAdminForm } from "src/pageComponents/init/InitAdminForm";
 import { InitImportUsersForm } from "src/pageComponents/init/InitImportUsersForm";
 import { InitDrawer } from "src/pageComponents/init/InitLayout";
-// import { InitUsersAndAccountsTable } from "src/pageComponents/init/InitUsersAndAccountsTable";
 import { queryIfInitialized } from "src/utils/init";
+
 type Props = SSRProps<{}>;
 
 export const ImportUsersPage: NextPage<Props> = (props) => {
@@ -29,21 +26,9 @@ export const ImportUsersPage: NextPage<Props> = (props) => {
   }
   return (
     <div>
-      <InitDrawer/>
-      <Tabs centered defaultActiveKey="1">
-        <Tabs.TabPane tab="导入用户" key="1">
-          <InitImportUsersForm />
-        </Tabs.TabPane>
-        <Tabs.TabPane tab="用户账户管理" key="2">
-          <Link href="/users"/>
-        </Tabs.TabPane>
-        <Tabs.TabPane tab="创建初始管理员用户" key="3">
-          <InitAdminForm />
-        </Tabs.TabPane>
-        <Tabs.TabPane tab="编辑作业价格表" key="4">
-          <EditJobPriceTableForm />
-        </Tabs.TabPane>
-      </Tabs>
+      <InitDrawer>
+        <InitImportUsersForm/>
+      </InitDrawer>
     </div>
   );
 
