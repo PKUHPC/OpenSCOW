@@ -1,5 +1,6 @@
 import { Result } from "antd";
 import { GetServerSideProps, NextPage } from "next";
+import { useRouter } from "next/router";
 import { SSRProps } from "src/auth/server";
 import { UnifiedErrorPage } from "src/components/errorPages/UnifiedErrorPage";
 import { InitDrawer } from "src/pageComponents/init/InitLayout";
@@ -26,7 +27,7 @@ export const UsersPage: NextPage<Props> = (props) => {
   }
   return (
     <div>
-      <InitDrawer>
+      <InitDrawer url={useRouter().asPath}>
         <InitUsersAndAccountsTable/>
       </InitDrawer>
     </div>
@@ -43,5 +44,6 @@ export const getServerSideProps: GetServerSideProps<Props> = async () => {
   return { props: {} };
 
 };
+
 
 export default UsersPage;
