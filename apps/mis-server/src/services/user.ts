@@ -1,4 +1,4 @@
-import { ensureNotUndefined, plugin } from "@ddadaal/tsgrpc-server";
+import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { UniqueConstraintViolationException } from "@mikro-orm/core";
