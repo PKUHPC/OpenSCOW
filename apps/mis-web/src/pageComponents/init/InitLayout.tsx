@@ -1,16 +1,13 @@
 import { Button, Modal, Tabs } from "antd";
 import Link from "next/link";
-import Router, { useRouter } from "next/router";
-import React from "react";
+import Router from "next/router";
 import { api } from "src/apis";
 import { Centered } from "src/components/layouts";
 import { Head } from "src/utils/head";
 import styled from "styled-components";
 
-type DrawerProps = {
-  url: string;
-  children: React.ReactNode;
-}
+
+type Props = React.PropsWithChildren;
 
 const Title = styled(Centered)`
   position: relative;
@@ -21,23 +18,9 @@ const CompleteButtonContainer = styled.div`
   right: 0;
 `;
 
-export const InitTab: React.FC = () => {
-  const TabItems = [
-    { label: (<Link href="/init/importUsers">导入用户</Link>), key: "/init/importUsers" },
-    { label: (<Link href="/init/users">用户账户管理</Link>), key: "/init/users" },
-    { label: (<Link href="/init/createInitAdmin">创建初始管理员用户</Link>), key: "/init/createInitAdmin" },
-    { label: (<Link href="/init/jobPriceTable">编辑作业价格表</Link>), key: "/init/jobPriceTable" },
-  ];
-  return (
-    <div>
-      <Tabs centered items={TabItems} activeKey={useRouter().asPath}/>
-    </div>
-  );
-};
-
-export const InitDrawer: React.FC<DrawerProps> = (props) => {
-  const { url, children } = props;
-  console.log(url);
+export const InitDrawer: React.FC<Props> = ({
+  children,
+}) => {
   return (
     <div>
       <Head title="系统初始化"/>
@@ -65,9 +48,21 @@ export const InitDrawer: React.FC<DrawerProps> = (props) => {
           </Button>
         </CompleteButtonContainer>
       </Title>
-      <InitTab/>
+      <Tabs centered>
+        <Tabs.TabPane tab="导入用户" key="1">
+          {/* <Link href="/pages/init/importUsers"/> */}
+        </Tabs.TabPane>
+        <Tabs.TabPane tab="用户账户管理" key="2">
+          {/* <Link href="/pages/init/users"/> */}
+        </Tabs.TabPane>
+        <Tabs.TabPane tab="创建初始管理员用户" key="3">
+          {/* <Link href="/pages/init/createInitAdmin"/> */}
+        </Tabs.TabPane>
+        <Tabs.TabPane tab="编辑作业价格表" key="4">
+          {/* <Link href="/pages/init/jobPriceTable"/> */}
+        </Tabs.TabPane>
+      </Tabs>
       <div>{children}</div>
     </div>
   );
 };
-
