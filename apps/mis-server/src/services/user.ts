@@ -1,4 +1,4 @@
-import { plugin } from "@ddadaal/tsgrpc-server";
+import { ensureNotUndefined, plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { UniqueConstraintViolationException } from "@mikro-orm/core";
@@ -19,6 +19,7 @@ import {
   UserRole as PFUserRole, UserServiceServer,
   UserServiceService,
   UserStatus as PFUserStatus } from "src/generated/server/user";
+import { paginationProps } from "src/utils/orm";
 import { fetch } from "undici";
 
 export const userServiceServer = plugin((server) => {
@@ -441,6 +442,22 @@ export const userServiceServer = plugin((server) => {
         tenantRoles: user.tenantRoles.map(tenantRoleFromJSON),
         platformRoles: user.platformRoles.map(platformRoleFromJSON),
       }];
+    },
+
+    getAllUsers: async ({ request, em }) => {
+
+      const { page, pageSize } = request;
+
+      const users = await em.find(User, {}, {
+        ...paginationProps(page, pageSize || 10),
+      });
+
+      return [{ platformUsers: users.map((x) => ({
+        userId: x.userId,
+        name: x.name,
+        createTime: x.createTime,
+        platformRoles: x.platformRoles.map(platformRoleFromJSON),
+      })) }];
     },
 
   });
