@@ -8,7 +8,6 @@ import { Head } from "src/utils/head";
 import styled from "styled-components";
 
 type DrawerProps = {
-  url: string;
   children: React.ReactNode;
 }
 
@@ -36,8 +35,7 @@ export const InitTab: React.FC = () => {
 };
 
 export const InitDrawer: React.FC<DrawerProps> = (props) => {
-  const { url, children } = props;
-  console.log(url);
+  const { children } = props;
   return (
     <div>
       <Head title="系统初始化"/>
