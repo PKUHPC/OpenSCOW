@@ -202,11 +202,25 @@ message GetUserInfoReply {
 
 message GetUsersReply { repeated User users = 1; }
 
+message GetAllUsersRequest {
+  uint32 page = 1;
+  optional uint64 page_size = 2;
+}
+
+message GetAllUsersReply { 
+  string user_id = 1;
+  string name = 2;
+  google.protobuf.Timestamp create_time = 3;
+  repeated PlatformRole platform_roles = 4;
+}
+
 service UserService {
 
   rpc GetUsers(GetUsersRequest) returns (GetUsersReply);
 
   rpc GetUserInfo(GetUserInfoRequest) returns (GetUserInfoReply);
+
+  rpc GetAllUsers(GetAllUsersRequest) returns (GetAllUsersReply);
 
   rpc GetAccountUsers(GetAccountUsersRequest) returns (GetAccountUsersReply);
   rpc QueryIsUserInAccount(QueryIsUserInAccountRequest)
