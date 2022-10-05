@@ -1,6 +1,5 @@
 import { Result } from "antd";
 import { GetServerSideProps, NextPage } from "next";
-import { useRouter } from "next/router";
 import { SSRProps } from "src/auth/server";
 import { UnifiedErrorPage } from "src/components/errorPages/UnifiedErrorPage";
 import { InitImportUsersForm } from "src/pageComponents/init/InitImportUsersForm";
@@ -27,7 +26,7 @@ export const ImportUsersPage: NextPage<Props> = (props) => {
   }
   return (
     <div>
-      <InitDrawer url={useRouter().asPath}>
+      <InitDrawer>
         <InitImportUsersForm/>
       </InitDrawer>
     </div>
