@@ -93,6 +93,21 @@ const mockUsers = [
 ];
 
 export const mockApi: MockApi<typeof api> = {
+  getAllUsers: async () => ({ platformUsers: [
+    { 
+      userId: "test01", 
+      name: "test01", 
+      createTime: "2022-10-05T23:49:50.000Z", 
+      platformRoles: [PlatformRole.PLATFORM_FINANCE, PlatformRole.PLATFORM_ADMIN],
+    },
+    {
+      userId: "test02", 
+      name: "test02", 
+      createTime: "2022-10-05T23:49:50.000Z", 
+      platformRoles: [PlatformRole.PLATFORM_FINANCE],
+    },
+  ]}),
+
   addBillingItem: async () => null,
 
   getTenants: async () => ({ names: ["DEFAULT", "another"]}),
