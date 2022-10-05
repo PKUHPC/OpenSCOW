@@ -106,6 +106,12 @@ export const mockApi: MockApi<typeof api> = {
       createTime: "2022-10-05T23:49:50.000Z", 
       platformRoles: [PlatformRole.PLATFORM_FINANCE],
     },
+    {
+      userId: "test03", 
+      name: "test03", 
+      createTime: "2022-10-05T23:49:50.000Z", 
+      platformRoles: [],
+    },
   ]}),
 
   addBillingItem: async () => null,
