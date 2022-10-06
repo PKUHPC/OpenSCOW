@@ -30,6 +30,11 @@ export const platformAdminRoutes: NavItemProps[] = [
         path: "/admin/importUsers",
       },
       {
+        Icon: UserOutlined,
+        text: "全部用户",
+        path: "/admin/users",
+      },
+      {
         Icon: MoneyCollectOutlined,
         text: "查询作业计费项",
         path: "/admin/jobBillingItems",
