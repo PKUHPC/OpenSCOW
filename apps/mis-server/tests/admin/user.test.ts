@@ -143,3 +143,33 @@ it("cannot delete owner", async () => {
   expect(await server.ext.orm.em.count(UserAccount, { account: data.accountA })).toBe(2);
   expect(await server.ext.orm.em.count(User, { tenant: data.tenant })).toBe(2);
 });
+
+it("get all users", async () => {
+  const data = await insertInitialData(server.ext.orm.em.fork());
+
+  const users = await asyncClientCall(client, "getAllUsers", {
+    page: 1,
+    pageSize: 10,
+  });
+
+  expect(users.totalCount).toBe(2);
+  expect(users.platformUsers.map((x) => ({ 
+    userId: x.userId, 
+    name: x.name, 
+    createTime: x.createTime, 
+    platformRoles: x.platformRoles,
+  }))).toIncludeSameMembers([
+    {
+      userId: data.userA.userId,
+      name: data.userA.name,
+      createTime: data.userA.createTime,
+      platformRoles: data.userA.platformRoles,
+    },
+    {
+      userId: data.userB.userId,
+      name: data.userB.name,
+      createTime: data.userB.createTime,
+      platformRoles: data.userB.platformRoles,
+    },
+  ]);
+});
