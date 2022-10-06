@@ -1,6 +1,8 @@
 import { NodeSSH, SSHExecCommandOptions } from "node-ssh";
 import type { Logger } from "pino";
 import { quote } from "shell-quote";
+import { SFTPWrapper } from "ssh2";
+import { promisify } from "util";
 
 import { insertKey, KeyPair } from "./key";
 
@@ -11,7 +13,7 @@ import { insertKey, KeyPair } from "./key";
  * If the username is not root and first login attempt failed,
  * it inserts the public key into the user's authorized_key and logs in again
  *
- * @param addr address
+ * @param address address
  * @param username  username
  * @param rootKeyPair the ssh key pair of root user
  * @param logger logger
@@ -101,3 +103,10 @@ export async function testRootUserSshLogin(host: string, keyPair: KeyPair, logge
   return await sshConnect(host, "root", keyPair, logger, async () => undefined).catch((e) => e);
 
 }
+
+export const sftpWriteFile = (sftp: SFTPWrapper) =>
+  promisify(sftp.writeFile.bind(sftp) as typeof sftp["writeFile"]);
+export const sftpChown = (sftp: SFTPWrapper) =>
+  promisify(sftp.chown.bind(sftp) as typeof sftp["chown"]);
+export const sftpChmod = (sftp: SFTPWrapper) =>
+  promisify(sftp.writeFile.bind(sftp) as typeof sftp["chmod"]);

@@ -1,7 +1,8 @@
 import fs from "fs";
+import { join } from "path";
 import type { Logger } from "pino";
 
-import { sshConnect } from "./ssh";
+import { sftpChmod,sftpWriteFile, sshConnect } from "./ssh";
 export interface KeyPair {
   publicKey: string;
   privateKey: string;
@@ -25,37 +26,26 @@ export function getKeyPair(privateKeyPath: string, publicKeyPath: string): KeyPa
 export async function insertKey(
   user: string, host: string, rootKeyPair: KeyPair, logger: Logger,
 ) {
-
   // https://superuser.com/a/484280
-  const script = (homeDir: string) => `
-
-    if ! [ -f "${homeDir}" ]; then
-      mkdir -p "${homeDir}"
-      chown "${user}:" "${homeDir}"
-    fi
-
-    if ! [ -f "${homeDir}/.ssh/authorized_keys" ]; then
-      mkdir -p "${homeDir}/.ssh"
-      touch "${homeDir}/.ssh/authorized_keys"
-
-      chmod 700 "${homeDir}/.ssh"
-      chmod 644 "${homeDir}/.ssh/authorized_keys"
-      chown "${user}:" "${homeDir}/.ssh"
-      chown "${user}:" "${homeDir}/.ssh/authorized_keys"
-    fi
-
-    if ! grep -q "${rootKeyPair.publicKey}" "${homeDir}/.ssh/authorized_keys"; then
-      echo -e "${rootKeyPair.publicKey}\n" >> "${homeDir}/.ssh/authorized_keys"
-    fi
-    `;
-
-
   logger.info("Adding key to user %s to %s", user, host);
 
   await sshConnect(host, "root", rootKeyPair, logger, async (ssh) => {
     const homeDir = await ssh.execCommand(`eval echo ~${user}`);
+    const userHomeDir = homeDir.stdout.trim();
 
-    await ssh.execCommand(script(homeDir.stdout.trim()));
+    const sftp = await ssh.requestSFTP();
+    // make sure user home directory exists.
+    await ssh.mkdir(userHomeDir, undefined, sftp);
+
+    const sshDir = join(userHomeDir, ".ssh");
+
+    await ssh.mkdir(sshDir, undefined, sftp);
+
+    const keyFilePath = join(sshDir, "authorized_keys");
+    await sftpChmod(sftp)(sshDir, 700);
+    await sftpWriteFile(sftp)(keyFilePath, rootKeyPair.publicKey);
+    
+    await sftpChmod(sftp)(keyFilePath, 644);
   });
 }
 
