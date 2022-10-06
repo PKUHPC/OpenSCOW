@@ -448,16 +448,19 @@ export const userServiceServer = plugin((server) => {
 
       const { page, pageSize } = request;
 
-      const users = await em.find(User, {}, {
+      const [users, count] = await em.findAndCount(User, {}, {
         ...paginationProps(page, pageSize || 10),
       });
 
-      return [{ platformUsers: users.map((x) => ({
-        userId: x.userId,
-        name: x.name,
-        createTime: x.createTime,
-        platformRoles: x.platformRoles.map(platformRoleFromJSON),
-      })) }];
+      return [{ 
+        totalCount: count,
+        platformUsers: users.map((x) => ({
+          userId: x.userId,
+          name: x.name,
+          createTime: x.createTime,
+          platformRoles: x.platformRoles.map(platformRoleFromJSON),
+        })),
+      }];
     },
 
   });

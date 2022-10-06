@@ -215,7 +215,8 @@ message GetAllUsersRequest {
 }
 
 message GetAllUsersReply { 
-  repeated PlatformUserInfo platform_users = 1;
+  uint64 total_count = 1;
+  repeated PlatformUserInfo platform_users = 2;
 }
 
 service UserService {

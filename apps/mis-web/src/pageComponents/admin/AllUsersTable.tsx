@@ -61,6 +61,7 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
           defaultPageSize: 10,
           pageSize: pageInfo.pageSize,
           showSizeChanger: true,
+          total: data?.totalCount,
           onChange: (page, pageSize) => setPageInfo({ page, pageSize }),
         } : false}
         scroll={{ x: true }}
