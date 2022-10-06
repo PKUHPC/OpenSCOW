@@ -1,5 +1,7 @@
 import { NodeSSH, SSHExecCommandOptions } from "node-ssh";
 import { quote } from "shell-quote";
+import { SFTPWrapper } from "ssh2";
+import { promisify } from "util";
 import type { Logger } from "ts-log";
 
 import { insertKey, KeyPair } from "./key";
@@ -101,3 +103,10 @@ export async function testRootUserSshLogin(host: string, keyPair: KeyPair, logge
   return await sshConnect(host, "root", keyPair, logger, async () => undefined).catch((e) => e);
 
 }
+
+export const sftpWriteFile = (sftp: SFTPWrapper) =>
+  promisify(sftp.writeFile.bind(sftp) as typeof sftp["writeFile"]);
+export const sftpChown = (sftp: SFTPWrapper) =>
+  promisify(sftp.chown.bind(sftp) as typeof sftp["chown"]);
+export const sftpChmod = (sftp: SFTPWrapper) =>
+  promisify(sftp.writeFile.bind(sftp) as typeof sftp["chmod"]);
