@@ -19,6 +19,7 @@ import {
   UserRole as PFUserRole, UserServiceServer,
   UserServiceService,
   UserStatus as PFUserStatus } from "src/generated/server/user";
+import { paginationProps } from "src/utils/orm";
 import { fetch } from "undici";
 
 export const userServiceServer = plugin((server) => {
@@ -440,6 +441,25 @@ export const userServiceServer = plugin((server) => {
         name: user.name,
         tenantRoles: user.tenantRoles.map(tenantRoleFromJSON),
         platformRoles: user.platformRoles.map(platformRoleFromJSON),
+      }];
+    },
+
+    getAllUsers: async ({ request, em }) => {
+
+      const { page, pageSize } = request;
+
+      const [users, count] = await em.findAndCount(User, {}, {
+        ...paginationProps(page, pageSize || 10),
+      });
+
+      return [{ 
+        totalCount: count,
+        platformUsers: users.map((x) => ({
+          userId: x.userId,
+          name: x.name,
+          createTime: x.createTime,
+          platformRoles: x.platformRoles.map(platformRoleFromJSON),
+        })),
       }];
     },
 

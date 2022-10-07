@@ -8,6 +8,7 @@ import type { ChangeStorageQuotaSchema } from "src/pages/api/admin/changeStorage
 import type { FetchJobsSchema } from "src/pages/api/admin/fetchJobs/fetchJobs";
 import type { GetFetchJobInfoSchema } from "src/pages/api/admin/fetchJobs/getFetchInfo";
 import type { SetFetchStateSchema } from "src/pages/api/admin/fetchJobs/setFetchState";
+import type { GetAllUsersSchema } from "src/pages/api/admin/getAllUsers";
 import type { GetTenantUsersSchema } from "src/pages/api/admin/getTenantUsers";
 import type { ImportUsersSchema } from "src/pages/api/admin/importUsers";
 import type { QueryStorageQuotaSchema } from "src/pages/api/admin/queryStorageQuota";
@@ -59,6 +60,7 @@ export const api = {
   fetchJobs: fromApi<FetchJobsSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin/fetchJobs/fetchJobs")),
   getFetchJobInfo: fromApi<GetFetchJobInfoSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin/fetchJobs/getFetchInfo")),
   setFetchState: fromApi<SetFetchStateSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin/fetchJobs/setFetchState")),
+  getAllUsers: fromApi<GetAllUsersSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin/getAllUsers")),
   getTenantUsers: fromApi<GetTenantUsersSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin/getTenantUsers")),
   importUsers: fromApi<ImportUsersSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin/importUsers")),
   queryStorageQuota: fromApi<QueryStorageQuotaSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin/queryStorageQuota")),
@@ -104,3 +106,4 @@ export const api = {
   unblockUserInAccount: fromApi<UnblockUserInAccountSchema>("PUT", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/users/unblockInAccount")),
   unsetAdmin: fromApi<UnsetAdminSchema>("PUT", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/users/unsetAdmin")),
 };
+  
