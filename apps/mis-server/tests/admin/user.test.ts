@@ -152,7 +152,7 @@ it("get all users", async () => {
     pageSize: 10,
   });
 
-  expect(users.totalCount).toBe(2);
+  expect(users.totalCount).toBe(3);
   expect(users.platformUsers.map((x) => ({ 
     userId: x.userId, 
     name: x.name, 
@@ -170,6 +170,12 @@ it("get all users", async () => {
       name: data.userB.name,
       createTime: data.userB.createTime,
       platformRoles: data.userB.platformRoles,
+    },
+    {
+      userId: data.userC.userId,
+      name: data.userC.name,
+      createTime: data.userC.createTime,
+      platformRoles: data.userC.platformRoles,
     },
   ]);
 });

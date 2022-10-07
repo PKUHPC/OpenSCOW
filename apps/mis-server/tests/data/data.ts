@@ -44,7 +44,7 @@ export async function insertInitialData(em: SqlEntityManager) {
 
   await em.persistAndFlush([anotherTenant, userC, accountC, uaCC]);
 
-  return { tenant, userA, userB, accountA, accountB, uaAA, uaAB, uaBB, anotherTenant };
+  return { tenant, userA, userB, userC, accountA, accountB, accountC, uaAA, uaAB, uaBB, uaCC, anotherTenant };
 
 }
 
