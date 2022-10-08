@@ -27,18 +27,12 @@ export const FileManagerPage: NextPage = requireAuth(() => true)(() => {
     router.push(`/files/${cluster}/${homePathMemo.current[cluster]}`);
   };
 
-  // if cluster changes, go to home dir
-  useEffect(() => {
-    toHomeDir();
-  }, [cluster]);
-
-
-  // if accessing homedir, find the homedir and go to it
+  // if cluster changes and accesses homedir, find the homedir and go to it
   useEffect(() => {
     if (pathParts && pathParts.length === 1 && pathParts[0] === "~") {
       toHomeDir();
     }
-  }, [fullPath]);
+  }, [cluster, fullPath]);
 
   return (
     <>
