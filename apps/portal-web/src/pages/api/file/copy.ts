@@ -13,6 +13,11 @@ export interface CopyFileItemSchema {
 
   responses: {
     204: null;
+    415: {
+      code: "CP_CMD_FAILED";
+      // stderr of the cp command
+      error: string;
+    }
     400: { code: "INVALID_CLUSTER" };
   }
 }
@@ -38,7 +43,11 @@ export default route<CopyFileItemSchema>("CopyFileItemSchema", async (req, res) 
   return await sshConnect(host, info.identityId, req.log, async (ssh) => {
     // the SFTPWrapper doesn't supprt copy
     // Use command to do it
-    await ssh.exec("cp", ["-r", fromPath, toPath]);
+    const resp = await ssh.exec("cp", ["-r", fromPath, toPath], { stream: "both" });
+
+    if (resp.code !== 0) {
+      return { 415: { code: "CP_CMD_FAILED", error: resp.stderr } };
+    }
 
     return { 204: null };
   });

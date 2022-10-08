@@ -14,6 +14,7 @@ export interface MoveFileItemSchema {
 
   responses: {
     204: null;
+    415: { code: "RENAME_FAILED", error: string };
     400: { code: "INVALID_CLUSTER" };
   }
 }
@@ -21,8 +22,6 @@ export interface MoveFileItemSchema {
 const auth = authenticate(() => true);
 
 export default route<MoveFileItemSchema>("MoveFileItemSchema", async (req, res) => {
-
-
 
   const info = await auth(req, res);
 
@@ -39,7 +38,10 @@ export default route<MoveFileItemSchema>("MoveFileItemSchema", async (req, res) 
   return await sshConnect(host, info.identityId, req.log, async (ssh) => {
     const sftp = await ssh.requestSFTP();
 
-    await sftpRename(sftp)(fromPath, toPath);
+    const error = await sftpRename(sftp)(fromPath, toPath).catch((e) => e);
+    if (error) {
+      return { 415: { code: "RENAME_FAILED", error } };
+    }
 
     return { 204: null };
   });
