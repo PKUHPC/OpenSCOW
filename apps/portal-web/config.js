@@ -12,6 +12,7 @@ const { getAppConfigs } = require("@scow/config/build/appConfig/app");
 const { getClusterConfigs } = require("@scow/config/build/appConfig/cluster");
 const { getKeyPair, testRootUserSshLogin } = require("@scow/lib-ssh");
 const pino = require("pino");
+const os = require("os");
 
 /**
  * Get auth capabilities
@@ -39,8 +40,6 @@ const specs = {
   SSH_PRIVATE_KEY_PATH: str({ desc: "SSH私钥路径", default: join(homedir(), ".ssh", "id_rsa") }),
   SSH_PUBLIC_KEY_PATH: str({ desc: "SSH公钥路径", default: join(homedir(), ".ssh", "id_rsa.pub") }),
 
-  MOCK_USER_ID: str({ desc: "覆盖已登录用户的用户ID", default: undefined }),
-
   PROXY_BASE_PATH: str({ desc: "网关的代理路径。相对于整个系统的base path。", default: "/proxy" }),
 
   MIS_DEPLOYED: bool({ desc: "是否部署了管理系统", default: false }),
@@ -66,7 +65,6 @@ const buildRuntimeConfig = async (phase) => {
   if (dev) {
     require("dotenv").config({ path: "env/.env.dev" });
   }
-
 
   // reload config after envs are applied
   const config = envConfig(specs, process.env);
@@ -112,7 +110,8 @@ const buildRuntimeConfig = async (phase) => {
     PORTAL_CONFIG: portalConfig,
     DEFAULT_PRIMARY_COLOR,
     APPS: apps,
-    MOCK_USER_ID: config.MOCK_USER_ID,
+    // use os username in test
+    MOCK_USER_ID: process.env.NODE_ENV === "test" ? os.userInfo().username : undefined,
     UI_CONFIG: uiConfig,
     LOGIN_NODES: parseKeyValue(config.LOGIN_NODES),
   };
