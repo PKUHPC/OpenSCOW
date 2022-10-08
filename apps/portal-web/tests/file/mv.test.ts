@@ -40,6 +40,7 @@ it("returns error if target dir contains a dir with the same name as the origina
 
   await sftpMkdir(server.sftp)(actualPath(sourceFolder));
   await createFile(server.sftp, actualPath(join(sourceFolder, containingFile)));
+  await sftpMkdir(server.sftp)(actualPath(targetFolder));
   await sftpMkdir(server.sftp)(actualPath(join(targetFolder, containingFile)));
 
   const { res } = await call(moveFileRoute, { body: {
