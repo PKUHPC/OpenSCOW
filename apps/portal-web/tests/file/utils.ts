@@ -3,6 +3,7 @@ import { randomBytes } from "crypto";
 import FormData from "form-data";
 import { createMocks, RequestOptions } from "node-mocks-http";
 import { NodeSSH } from "node-ssh";
+import os from "os";
 import path from "path";
 import pino from "pino";
 import { TOKEN_KEY } from "src/auth/cookie";
@@ -10,7 +11,7 @@ import { runtimeConfig } from "src/utils/config";
 import { SFTPWrapper } from "ssh2";
 
 const target = "localhost:22222";
-const user = "test";
+const user = os.userInfo().username;
 export const CLUSTER = "hpc01";
 export const TEST_COOKIE = { [TOKEN_KEY]: "123" };
 
