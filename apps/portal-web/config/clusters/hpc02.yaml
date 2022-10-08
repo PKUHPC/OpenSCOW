@@ -1,5 +1,7 @@
 displayName: hpc02Name
 slurm:
+  loginNodes:
+    - localhost:22
   partitions:
       - name: GPU
         nodes: 2
@@ -9,7 +11,7 @@ slurm:
         qos:
           - normal
           - high
-          - highest         
+          - highest
         comment: 说明
 
       - name: another
