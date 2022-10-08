@@ -19,7 +19,7 @@ afterEach(async () => {
   await resetTestServer(server);
 });
 
-it.only("copies file", async () => {
+it("copies file", async () => {
 
   const newFileName = "newFile";
 
