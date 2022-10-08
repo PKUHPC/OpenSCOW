@@ -151,7 +151,31 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
   const paste = async () => {
     if (!operation) { return; }
 
+    const operationText = operationTexts[operation.op];
+
     setOperation({ ...operation, started: true });
+
+    const operationApi = operation.op === "copy" ? api.copyFileItem : api.moveFileItem;
+
+    // if only one file is selected, show detailed error information
+    if (operation.selected.length === 1) {
+      const filename = operation.selected[0].name;
+      const fromPath = join(operation.originalPath, filename);
+      await operationApi({ body: { cluster, fromPath, toPath: join(path, filename) } })
+        .httpError(415, ({ error }) => {
+          Modal.error({
+            title: `${operationText}出错`,
+            content: operation.op === "copy" ? error : "可能是因为目标目录中有同名的文件或者目录。",
+          });
+        })
+        .then(() => {
+          message.error(`${operationText}成功！`);
+        }).finally(() => {
+          resetSelectedAndOperation();
+          reload();
+        });
+      return;
+    }
 
     await Promise.allSettled(operation.selected.map(async (x) => {
       return await (operation.op === "copy" ? api.copyFileItem : api.moveFileItem)({
@@ -171,17 +195,16 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
         const successfulCount = successfulInfo.filter((x) => x).length;
         const allCount = operation.selected.length;
         if (successfulCount === allCount) {
-          message.success(`${operationTexts[operation.op]}${allCount}项成功！`);
+          message.success(`${operationText}${allCount}项成功！`);
           resetSelectedAndOperation();
         } else {
-          message.error(`${operationTexts[operation.op]}成功${successfulCount}项，失败${allCount - successfulCount}项`);
-          setOperation((o) => o && ({ ...o, started: false }));
+          message.error(`${operationText}成功${successfulCount}项，失败${allCount - successfulCount}项`);
         }
       }).catch((e) => {
         console.log(e);
-        message.error(`执行${operationTexts[operation.op]}操作时遇到错误`);
-        setOperation((o) => o && ({ ...o, started: false }));
+        message.error(`执行${operationText}操作时遇到错误`);
       }).finally(() => {
+        resetSelectedAndOperation();
         reload();
       });
 

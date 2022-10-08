@@ -19,7 +19,7 @@ afterEach(async () => {
   await resetTestServer(server);
 });
 
-it("copies file", async () => {
+it.only("copies file", async () => {
 
   const newFileName = "newFile";
 
@@ -54,4 +54,22 @@ it("copies directory", async () => {
   expect(await sftpExists(server.sftp, actualPath(sourceFolder))).toBeTrue();
   expect(await sftpExists(server.sftp, actualPath(targetFolder))).toBeTrue();
   expect(await sftpExists(server.sftp, actualPath(join(targetFolder, containingFile)))).toBeTrue();
+});
+
+it("returns error if target dir contains a dir with the same name as the original file", async () => {
+  const sourceFolder = "newFolder";
+  const containingFile = "testfile";
+  const targetFolder = "targetFolder";
+
+  await sftpMkdir(server.sftp)(actualPath(sourceFolder));
+  await createFile(server.sftp, actualPath(join(sourceFolder, containingFile)));
+  await sftpMkdir(server.sftp)(actualPath(join(targetFolder, containingFile)));
+
+  const { res } = await call(copyFileRoute, { body: {
+    cluster: CLUSTER,
+    fromPath: actualPath(actualPath(join(sourceFolder, containingFile))),
+    toPath: actualPath(targetFolder),
+  } });
+
+  expect(res.statusCode).toBe(415);
 });
