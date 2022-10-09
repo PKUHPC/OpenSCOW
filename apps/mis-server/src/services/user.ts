@@ -463,6 +463,52 @@ export const userServiceServer = plugin((server) => {
       }];
     },
 
+    setPlatformRole: async ({ request, em }) => {
+      const { userId, roleType } = request;
+
+      const user = await em.findOne(User, { userId: userId });
+
+      if (!user) {
+        throw <ServiceError>{
+          code: Status.NOT_FOUND, message: `User ${userId} is not found.`,
+        };
+      }
+
+      if (user.platformRoles.includes(roleType)) {
+        throw <ServiceError> {
+          code: Status.FAILED_PRECONDITION, message: `User ${userId} is already this role.`,
+        };
+      }
+
+      user.platformRoles.push(roleType);
+      await em.flush();
+
+      return [{}];
+    },
+    
+    unsetPlatformRole: async ({ request, em }) => {
+      const { userId, roleType } = request;
+  
+      const user = await em.findOne(User, { userId: userId });
+  
+      if (!user) {
+        throw <ServiceError>{
+          code: Status.NOT_FOUND, message: `User ${userId} is not found.`,
+        };
+      }
+  
+      if (!user.platformRoles.includes(roleType)) {
+        throw <ServiceError> {
+          code: Status.FAILED_PRECONDITION, message: `User ${userId} is already not this role.`,
+        };
+      }
+  
+      user.platformRoles = user.platformRoles.filter((item) => item !== roleType);
+      await em.flush();
+  
+      return [{}];      
+    },
+
   });
 
 });
