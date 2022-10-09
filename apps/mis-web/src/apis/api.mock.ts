@@ -123,6 +123,10 @@ export const mockApi: MockApi<typeof api> = {
     ],
   }),
 
+  setPlatformRole: async () => ({ executed: true }),
+
+  unsetPlatformRole: async () => ({ executed: false }),
+  
   addBillingItem: async () => null,
 
   getTenants: async () => ({ names: ["DEFAULT", "another"]}),

@@ -12,6 +12,8 @@ import type { GetAllUsersSchema } from "src/pages/api/admin/getAllUsers";
 import type { GetTenantUsersSchema } from "src/pages/api/admin/getTenantUsers";
 import type { ImportUsersSchema } from "src/pages/api/admin/importUsers";
 import type { QueryStorageQuotaSchema } from "src/pages/api/admin/queryStorageQuota";
+import type { SetPlatformRoleSchema } from "src/pages/api/admin/setPlatformRole";
+import type { UnsetPlatformRoleSchema } from "src/pages/api/admin/unsetPlatformRole";
 import type { AuthCallbackSchema } from "src/pages/api/auth/callback";
 import type { LogoutSchema } from "src/pages/api/auth/logout";
 import type { ValidateTokenSchema } from "src/pages/api/auth/validateToken";
@@ -64,6 +66,8 @@ export const api = {
   getTenantUsers: fromApi<GetTenantUsersSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin/getTenantUsers")),
   importUsers: fromApi<ImportUsersSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin/importUsers")),
   queryStorageQuota: fromApi<QueryStorageQuotaSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin/queryStorageQuota")),
+  setPlatformRole: fromApi<SetPlatformRoleSchema>("PUT", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin/setPlatformRole")),
+  unsetPlatformRole: fromApi<UnsetPlatformRoleSchema>("PUT", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin/unsetPlatformRole")),
   authCallback: fromApi<AuthCallbackSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/auth/callback")),
   logout: fromApi<LogoutSchema>("DELETE", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/auth/logout")),
   validateToken: fromApi<ValidateTokenSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/auth/validateToken")),

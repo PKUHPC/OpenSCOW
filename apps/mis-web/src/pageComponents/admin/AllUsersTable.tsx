@@ -94,9 +94,10 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
                         icon: <ExclamationCircleOutlined />,
                         content: `确认要移除用户${r.name}（ID：${r.userId}）的平台管理员权限？`,
                         onOk: async () => {
-                          await api.unsetPlatformRole({
-                            // pass
-                          })
+                          await api.unsetPlatformRole({ body: {
+                            userId: r.userId,
+                            roleType: PlatformRole.PLATFORM_ADMIN,
+                          } })
                             .then(() => {
                               message.success("操作成功！");
                               reload();
@@ -118,9 +119,10 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
                         icon: <ExclamationCircleOutlined />,
                         content: `确认要设置用户${r.name}（ID：${r.userId}）为平台管理员？`,
                         onOk: async () => {
-                          await api.setPlatformRole({
-                            // pass
-                          })
+                          await api.setPlatformRole({ body: {
+                            userId: r.userId,
+                            roleType: PlatformRole.PLATFORM_ADMIN,
+                          } })
                             .then(() => {
                               message.success("操作成功！");
                               reload();
@@ -149,9 +151,10 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
                         icon: <ExclamationCircleOutlined />,
                         content: `确认要取消用户${r.name}（ID：${r.userId}）的财务人员权限？`,
                         onOk: async () => {
-                          await api.unsetPlatformRole({
-                            // pass
-                          })
+                          await api.unsetPlatformRole({ body: {
+                            userId: r.userId,
+                            roleType: PlatformRole.PLATFORM_FINANCE,
+                          } })
                             .then(() => {
                               message.success("操作成功！");
                               reload();
@@ -173,9 +176,10 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
                         icon: <ExclamationCircleOutlined />,
                         content: `确认要设置用户${r.name}（ID：${r.userId}）为平台财务人员？`,
                         onOk: async () => {
-                          await api.setPlatformRole({
-                            // pass
-                          })
+                          await api.setPlatformRole({ body: {
+                            userId: r.userId,
+                            roleType: PlatformRole.PLATFORM_FINANCE,
+                          } })
                             .then(() => {
                               message.success("操作成功！");
                               reload();
