@@ -27,6 +27,26 @@ const HandleTenantChange = (value: string[]) => {
   console.log(`selected ${value}`);
 };
 
+const PlatFormRolesChildren : React.ReactNode[] = [];
+Object.entries(PlatformRole).forEach(([, value]) => {
+  if (typeof value === "number") {
+    PlatFormRolesChildren.push(
+      <Select.Option key={value} >
+        {PlatformRoleTexts[value]}
+      </Select.Option>);
+  }
+});
+
+const TenantRolesChildren : React.ReactNode[] = [];
+Object.entries(TenantRole).forEach(([, value]) => {
+  if (typeof value === "number") {
+    TenantRolesChildren.push(
+      <Select.Option key={value} >
+        {TenantRoleTexts[value]}
+      </Select.Option>);
+  }
+});
+
 const UserTable: React.FC<DataTableProps<User>> = ({ data, loading, reload }) => {
   return (
     <Table
@@ -44,12 +64,7 @@ const UserTable: React.FC<DataTableProps<User>> = ({ data, loading, reload }) =>
           <Select style={{ width: "100%" }} onChange={HandlePlatFormChange} 
             mode="multiple" allowClear placeholder="Please select"
           >
-            <Select.Option key={PlatformRoleTexts[PlatformRole.PLATFORM_FINANCE]}>
-              {PlatformRoleTexts[PlatformRole.PLATFORM_FINANCE]}
-            </Select.Option>
-            <Select.Option key={PlatformRoleTexts[PlatformRole.PLATFORM_ADMIN]}>
-              {PlatformRoleTexts[PlatformRole.PLATFORM_ADMIN]}
-            </Select.Option>
+            {PlatFormRolesChildren}
           </Select>
         }
       />
@@ -58,12 +73,7 @@ const UserTable: React.FC<DataTableProps<User>> = ({ data, loading, reload }) =>
           <Select style={{ width: "100%" }} onChange={HandleTenantChange} 
             mode="multiple" allowClear placeholder="Please select"
           >
-            <Select.Option key={TenantRoleTexts[TenantRole.TENANT_FINANCE]}>
-              {TenantRoleTexts[TenantRole.TENANT_FINANCE]}
-            </Select.Option>
-            <Select.Option key={TenantRoleTexts[TenantRole.TENANT_ADMIN]}>
-              {TenantRoleTexts[TenantRole.TENANT_ADMIN]}
-            </Select.Option>
+            {TenantRolesChildren}
           </Select>
         }
       />
