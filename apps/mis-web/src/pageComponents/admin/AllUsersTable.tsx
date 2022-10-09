@@ -5,6 +5,7 @@ import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { DisabledA } from "src/components/DisabledA";
 import { PlatformRole, PlatformUserInfo } from "src/generated/server/user";
+import { PlatformRole as pRole } from "src/models/User";
 import { GetAllUsersSchema } from "src/pages/api/admin/getAllUsers";
 import { User } from "src/stores/UserStore";
 import { formatDateTime } from "src/utils/datetime";
@@ -80,7 +81,7 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
         />
         <Table.Column<PlatformUserInfo> dataIndex="platformRoles" title="平台管理员"
           render={(_, r) => (
-            r.platformRoles.includes(PlatformRole.PLATFORM_ADMIN)
+            r.platformRoles.includes(pRole.PLATFORM_ADMIN)
               ? (
                 <Space size="middle">
                   是
@@ -139,7 +140,7 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
         />
         <Table.Column<PlatformUserInfo> dataIndex="platformRoles" title="平台财务人员"
           render={(_, r) => (
-            r.platformRoles.includes(PlatformRole.PLATFORM_FINANCE)
+            r.platformRoles.includes(pRole.PLATFORM_FINANCE)
               ? (
                 <Space size="middle">
                   是
