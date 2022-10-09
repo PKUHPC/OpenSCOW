@@ -1,11 +1,12 @@
 process.env.AUTH_TYPE = "ssh";
 
 import { FastifyInstance } from "fastify";
+import os from "os";
 import { buildApp } from "src/app";
 import { createFormData } from "tests/utils";
 
-const username = "test";
-const password = "test";
+const username = os.userInfo().username;
+const password = username;
 
 let server: FastifyInstance;
 
@@ -19,7 +20,7 @@ afterEach(async () => {
   await server.close();
 });
 
-it.only("logs in to the ssh login", async () => {
+it("logs in to the ssh login", async () => {
 
   const callbackUrl = "/callback";
 

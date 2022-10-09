@@ -17,21 +17,22 @@ export const FileManagerPage: NextPage = requireAuth(() => true)(() => {
     ? "~"
     : "/" + (pathParts?.join("/") ?? "");
 
-  const homePathMemo = useRef<string | undefined>(undefined);
+  const homePathMemo = useRef({} as Record<string, string>);
 
-  const getHomePath = async () => {
-    return homePathMemo.current
-    ?? (homePathMemo.current = await api.getHomeDirectory({ query: { cluster } }).then((x) => x.path));
+  const toHomeDir = async () => {
+    if (!homePathMemo.current[cluster]) {
+      homePathMemo.current[cluster] = await api.getHomeDirectory({ query: { cluster } }).then((x) => x.path);
+    }
+
+    router.push(`/files/${cluster}/${homePathMemo.current[cluster]}`);
   };
 
-
+  // if cluster changes and accesses homedir, find the homedir and go to it
   useEffect(() => {
     if (pathParts && pathParts.length === 1 && pathParts[0] === "~") {
-      getHomePath().then((path) => {
-        router.push(`/files/${cluster}/${path}`);
-      });
+      toHomeDir();
     }
-  }, [fullPath]);
+  }, [cluster, fullPath]);
 
   return (
     <>

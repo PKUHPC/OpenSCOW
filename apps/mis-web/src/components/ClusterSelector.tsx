@@ -16,6 +16,7 @@ export const ClusterSelector: React.FC<Props> = ({ value, onChange }) => {
       value={value ? value.map((v) => ({ value: v.id, label: v.name })) : undefined}
       onChange={(values) => onChange?.(values.map((x) => ({ id: x.value, name: x.label })))}
       options={Object.values(publicConfig.CLUSTERS).map((x) => ({ value: x.id, label: x.name }))}
+      style={{ minWidth: "96px" }}
     />
   );
 };
