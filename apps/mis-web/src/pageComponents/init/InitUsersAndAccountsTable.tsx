@@ -1,4 +1,4 @@
-import { message, Popconfirm, Space, Table, Tag } from "antd";
+import { message, Popconfirm, Select, Space, Table, Tag } from "antd";
 import { useEffect } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
@@ -19,6 +19,14 @@ const Title = styled.div`
   justify-content: space-between;
 `;
 
+const HandlePlatFormChange = (value: string[]) => {
+  console.log(`selected ${value}`);
+};
+
+const HandleTenantChange = (value: string[]) => {
+  console.log(`selected ${value}`);
+};
+
 const UserTable: React.FC<DataTableProps<User>> = ({ data, loading, reload }) => {
   return (
     <Table
@@ -31,11 +39,33 @@ const UserTable: React.FC<DataTableProps<User>> = ({ data, loading, reload }) =>
     >
       <Table.Column<User> dataIndex="userId" title="用户ID" />
       <Table.Column<User> dataIndex="name" title="姓名" />
-      <Table.Column<User> dataIndex="platformRoles" title="平台角色"
-        render={(r: PlatformRole[]) => r.map((x) => <Tag key={x}>{PlatformRoleTexts[x]}</Tag>)}
+      <Table.Column<User> dataIndex="platformRoles" title="平台角色" width={200} 
+        render={() => 
+          <Select style={{ width: "100%" }} onChange={HandlePlatFormChange} 
+            mode="multiple" allowClear placeholder="Please select"
+          >
+            <Select.Option key={PlatformRoleTexts[PlatformRole.PLATFORM_FINANCE]}>
+              {PlatformRoleTexts[PlatformRole.PLATFORM_FINANCE]}
+            </Select.Option>
+            <Select.Option key={PlatformRoleTexts[PlatformRole.PLATFORM_ADMIN]}>
+              {PlatformRoleTexts[PlatformRole.PLATFORM_ADMIN]}
+            </Select.Option>
+          </Select>
+        }
       />
-      <Table.Column<User> dataIndex="tenantRoles" title="租户角色"
-        render={(r: TenantRole[]) => r.map(((x) => <Tag key={x}>{TenantRoleTexts[x]}</Tag>))}
+      <Table.Column<User> dataIndex="tenantRoles" title="租户角色" width={200}
+        render={() => 
+          <Select style={{ width: "100%" }} onChange={HandleTenantChange} 
+            mode="multiple" allowClear placeholder="Please select"
+          >
+            <Select.Option key={TenantRoleTexts[TenantRole.TENANT_FINANCE]}>
+              {TenantRoleTexts[TenantRole.TENANT_FINANCE]}
+            </Select.Option>
+            <Select.Option key={TenantRoleTexts[TenantRole.TENANT_ADMIN]}>
+              {TenantRoleTexts[TenantRole.TENANT_ADMIN]}
+            </Select.Option>
+          </Select>
+        }
       />
       <Table.Column<User> dataIndex="accountAffiliations" title="所属账户"
         render={(accounts: AccountAffiliation[]) => accounts
