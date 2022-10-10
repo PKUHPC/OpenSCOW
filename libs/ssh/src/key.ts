@@ -2,7 +2,8 @@ import fs from "fs";
 import { join } from "path";
 import type { Logger } from "ts-log";
 
-import { sftpChmod, sftpChown, sftpWriteFile, sshConnect } from "./ssh";
+import { sftpChmod, sftpChown, sftpWriteFile } from "./sftp";
+import { sshConnect } from "./ssh";
 export interface KeyPair {
   publicKey: string;
   privateKey: string;
@@ -49,7 +50,7 @@ export async function insertKey(
 
     const userID = await ssh.execCommand(`id -u ${user}`);
     const userGID = await ssh.execCommand(`id -g ${user}`);
-    
+
     await sftpChown(sftp)(sshDir, Number(userID.stdout.trim()), Number(userGID.stdout.trim()));
 
     await sftpChown(sftp)(keyFilePath, Number(userID.stdout.trim()), Number(userGID.stdout.trim()));
