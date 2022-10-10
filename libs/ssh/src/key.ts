@@ -2,7 +2,8 @@ import fs from "fs";
 import { join } from "path";
 import type { Logger } from "pino";
 
-import { sftpChmod, sftpChown, sftpWriteFile, sshConnect } from "./ssh";
+import { sftpChmod, sftpChown, sftpWriteFile } from "./sftp";
+import { sshConnect } from "./ssh";
 export interface KeyPair {
   publicKey: string;
   privateKey: string;
@@ -44,12 +45,12 @@ export async function insertKey(
     const keyFilePath = join(sshDir, "authorized_keys");
     await sftpChmod(sftp)(sshDir, 700);
     await sftpWriteFile(sftp)(keyFilePath, rootKeyPair.publicKey);
-    
+
     await sftpChmod(sftp)(keyFilePath, 644);
 
     const userID = await ssh.execCommand(`id -u ${user}`);
     const userGID = await ssh.execCommand(`id -g ${user}`);
-    
+
     await sftpChown(sftp)(sshDir, Number(userID.stdout.trim()), Number(userGID.stdout.trim()));
 
     await sftpChown(sftp)(keyFilePath, Number(userID.stdout.trim()), Number(userGID.stdout.trim()));
