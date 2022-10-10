@@ -1,4 +1,4 @@
-import { message, Popconfirm, Select, Space, Table, Tag } from "antd";
+import { message, Popconfirm, Select, Space, Table } from "antd";
 import { useEffect } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
@@ -19,14 +19,7 @@ const Title = styled.div`
   justify-content: space-between;
 `;
 
-const HandlePlatFormChange = (value: string[]) => {
-  console.log(`selected ${value}`);
-};
-
-const HandleTenantChange = (value: string[]) => {
-  console.log(`selected ${value}`);
-};
-
+// PlatFormRolesSelect的children
 const PlatFormRolesChildren : React.ReactNode[] = [];
 Object.entries(PlatformRole).forEach(([, value]) => {
   if (typeof value === "number") {
@@ -37,6 +30,7 @@ Object.entries(PlatformRole).forEach(([, value]) => {
   }
 });
 
+// TenantRolesSelect的children
 const TenantRolesChildren : React.ReactNode[] = [];
 Object.entries(TenantRole).forEach(([, value]) => {
   if (typeof value === "number") {
@@ -46,6 +40,20 @@ Object.entries(TenantRole).forEach(([, value]) => {
       </Select.Option>);
   }
 });
+
+// Select的回调方法
+const HandlePlatFormChange = (value: string[]) => {
+  console.log(`selected ${value}`);
+};
+const HandlePlatFormDeselect = (value: string) => {
+  console.log(`deselected ${value}`);
+};
+const HandleTenantChange = (value: string[]) => {
+  console.log(`selected ${value}`);
+};
+const HandleTenantDeselect = (value: string) => {
+  console.log(`selected ${value}`);
+};
 
 const UserTable: React.FC<DataTableProps<User>> = ({ data, loading, reload }) => {
   return (
@@ -61,7 +69,7 @@ const UserTable: React.FC<DataTableProps<User>> = ({ data, loading, reload }) =>
       <Table.Column<User> dataIndex="name" title="姓名" />
       <Table.Column<User> dataIndex="platformRoles" title="平台角色" width={200} 
         render={() => 
-          <Select style={{ width: "100%" }} onChange={HandlePlatFormChange} 
+          <Select style={{ width: "100%" }} onChange={HandlePlatFormChange} onDeselect={HandlePlatFormDeselect} 
             mode="multiple" allowClear placeholder="Please select"
           >
             {PlatFormRolesChildren}
@@ -70,7 +78,7 @@ const UserTable: React.FC<DataTableProps<User>> = ({ data, loading, reload }) =>
       />
       <Table.Column<User> dataIndex="tenantRoles" title="租户角色" width={200}
         render={() => 
-          <Select style={{ width: "100%" }} onChange={HandleTenantChange} 
+          <Select style={{ width: "100%" }} onChange={HandleTenantChange} onDeselect={HandleTenantDeselect}
             mode="multiple" allowClear placeholder="Please select"
           >
             {TenantRolesChildren}
