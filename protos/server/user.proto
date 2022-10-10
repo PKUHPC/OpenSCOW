@@ -219,6 +219,24 @@ message GetAllUsersReply {
   repeated PlatformUserInfo platform_users = 2;
 }
 
+message SetPlatformRoleRequest {
+  string user_id = 1;
+  PlatformRole role_type = 2;
+}
+
+// FAILED_PRECONDITION: the user is already this role(role_type)
+// NOT_FOUND: user is not found.
+message SetPlatformRoleReply {}
+
+message UnsetPlatformRoleRequest {
+  string user_id = 1;
+  PlatformRole role_type = 2;
+}
+
+// FAILED_PRECONDITION: the user is already not this role(role_type)
+// NOT_FOUND: user is not found.
+message UnsetPlatformRoleReply {}
+
 service UserService {
 
   rpc GetUsers(GetUsersRequest) returns (GetUsersReply);
@@ -245,4 +263,6 @@ service UserService {
   rpc SetAsAdmin(SetAsAdminRequest) returns (SetAsAdminReply);
   rpc UnsetAdmin(UnsetAdminRequest) returns (UnsetAdminReply);
   rpc GetName(GetNameRequest) returns (GetNameReply);
+  rpc SetPlatformRole(SetPlatformRoleRequest) returns (SetPlatformRoleReply);
+  rpc UnsetPlatformRole(UnsetPlatformRoleRequest) returns (UnsetPlatformRoleReply);
 }

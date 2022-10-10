@@ -96,6 +96,12 @@ export const mockApi: MockApi<typeof api> = {
   getAllUsers: async () => ({ 
     totalCount: 3,
     platformUsers: [
+      {
+        userId: "123", 
+        name: "testuser", 
+        createTime: "2022-10-05T23:49:50.000Z", 
+        platformRoles: [PlatformRole.PLATFORM_FINANCE, PlatformRole.PLATFORM_ADMIN],
+      },
       { 
         userId: "test01", 
         name: "test01", 
@@ -117,6 +123,10 @@ export const mockApi: MockApi<typeof api> = {
     ],
   }),
 
+  setPlatformRole: async () => ({ executed: true }),
+
+  unsetPlatformRole: async () => ({ executed: false }),
+  
   addBillingItem: async () => null,
 
   getTenants: async () => ({ names: ["DEFAULT", "another"]}),
