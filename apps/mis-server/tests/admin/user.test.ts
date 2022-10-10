@@ -190,7 +190,7 @@ it("manage platform role", async () => {
   });
 
   const setUser = await em.findOne(User, { userId: data.userA.userId });
-  expect(setUser?.platformRoles.includes(pRole.PLATFORM_ADMIN)).toBe(true);
+  expect(setUser?.platformRoles.includes(pRole["PLATFORM_ADMIN"])).toBe(true);
 
   await asyncClientCall(client, "unsetPlatformRole", {
     userId: data.userA.userId,
@@ -198,5 +198,5 @@ it("manage platform role", async () => {
   });
 
   const unsetUser = await em.findOne(User, { userId: data.userA.userId });
-  expect(unsetUser?.platformRoles.includes(pRole.PLATFORM_ADMIN)).toBe(false);
+  expect(unsetUser?.platformRoles.includes(pRole["PLATFORM_ADMIN"])).toBe(false);
 });
