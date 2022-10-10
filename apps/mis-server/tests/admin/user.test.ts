@@ -5,9 +5,9 @@ import { Status } from "@grpc/grpc-js/build/src/constants";
 import { createServer } from "src/app";
 import { misConfig } from "src/config/mis";
 import { Tenant } from "src/entities/Tenant";
-import { User } from "src/entities/User";
+import { PlatformRole as pRole, User } from "src/entities/User";
 import { UserAccount, UserRole, UserStatus } from "src/entities/UserAccount";
-import { UserServiceClient } from "src/generated/server/user";
+import { PlatformRole, UserServiceClient } from "src/generated/server/user";
 import { reloadEntity } from "src/utils/orm";
 import { insertInitialData } from "tests/data/data";
 import { dropDatabase } from "tests/data/helpers";
@@ -178,4 +178,25 @@ it("get all users", async () => {
       platformRoles: data.userC.platformRoles,
     },
   ]);
+});
+
+it("manage platform role", async () => {
+  const em = server.ext.orm.em.fork();
+  const data = await insertInitialData(em);
+
+  await asyncClientCall(client, "setPlatformRole", {
+    userId: data.userA.userId,
+    roleType: PlatformRole.PLATFORM_ADMIN,
+  });
+
+  const setUser = await em.findOne(User, { userId: data.userA.userId });
+  expect(setUser?.platformRoles.includes(pRole["PLATFORM_ADMIN"])).toBe(true);
+
+  await asyncClientCall(client, "unsetPlatformRole", {
+    userId: data.userA.userId,
+    roleType: PlatformRole.PLATFORM_ADMIN,
+  });
+
+  const unsetUser = await em.findOne(User, { userId: data.userA.userId });
+  expect(unsetUser?.platformRoles.includes(pRole["PLATFORM_ADMIN"])).toBe(false);
 });

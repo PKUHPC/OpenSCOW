@@ -8,12 +8,13 @@ import { misConfig } from "src/config/mis";
 import { Account } from "src/entities/Account";
 import { StorageQuota } from "src/entities/StorageQuota";
 import { Tenant } from "src/entities/Tenant";
-import { User } from "src/entities/User";
+import { PlatformRole, User } from "src/entities/User";
 import { UserAccount, UserRole, UserStatus } from "src/entities/UserAccount";
 import {
   AccountStatus,
   GetAccountUsersReply,
   platformRoleFromJSON,
+  platformRoleToJSON,
   QueryIsUserInAccountReply,
   tenantRoleFromJSON,
   UserRole as PFUserRole, UserServiceServer,
@@ -461,6 +462,55 @@ export const userServiceServer = plugin((server) => {
           platformRoles: x.platformRoles.map(platformRoleFromJSON),
         })),
       }];
+    },
+
+    setPlatformRole: async ({ request, em }) => {
+      const { userId, roleType } = request;
+      const dbRoleType: PlatformRole = PlatformRole[platformRoleToJSON(roleType)];
+      
+      const user = await em.findOne(User, { userId: userId });
+      
+      if (!user) {
+        throw <ServiceError>{
+          code: Status.NOT_FOUND, message: `User ${userId} is not found.`,
+        };
+      }
+
+      if (user.platformRoles.includes(dbRoleType)) {
+        throw <ServiceError> {
+          code: Status.FAILED_PRECONDITION, message: `User ${userId} is already this role.`,
+        };
+      }
+
+      user.platformRoles.push(dbRoleType);
+      await em.flush();
+
+      return [{}];
+    },
+    
+    unsetPlatformRole: async ({ request, em }) => {
+      const { userId, roleType } = request;
+      const dbRoleType: PlatformRole = PlatformRole[platformRoleToJSON(roleType)];
+
+      const user = await em.findOne(User, { userId: userId });
+  
+      if (!user) {
+        throw <ServiceError>{
+          code: Status.NOT_FOUND, message: `User ${userId} is not found.`,
+        };
+      }
+  
+      if (!user.platformRoles.includes(dbRoleType)) {
+        throw <ServiceError> {
+          code: Status.FAILED_PRECONDITION, message: `User ${userId} is already not this role.`,
+        };
+      }
+  
+      user.platformRoles = user.platformRoles.filter((item) => 
+        item !== dbRoleType);
+      await em.flush();
+  
+      return [{}];      
     },
 
   });
