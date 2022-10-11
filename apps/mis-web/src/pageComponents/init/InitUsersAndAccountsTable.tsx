@@ -19,12 +19,12 @@ const Title = styled.div`
   justify-content: space-between;
 `;
 
-// PlatFormRolesSelect的children
-const PlatFormRolesChildren : React.ReactNode[] = [];
+// PlatformRolesSelect的children
+const PlatformRolesChildren : React.ReactNode[] = [];
 Object.entries(PlatformRole).forEach(([, value]) => {
   if (typeof value === "number") {
-    PlatFormRolesChildren.push(
-      <Select.Option key={value} >
+    PlatformRolesChildren.push(
+      <Select.Option value = {value} >
         {PlatformRoleTexts[value]}
       </Select.Option>);
   }
@@ -35,27 +35,14 @@ const TenantRolesChildren : React.ReactNode[] = [];
 Object.entries(TenantRole).forEach(([, value]) => {
   if (typeof value === "number") {
     TenantRolesChildren.push(
-      <Select.Option key={value} >
+      <Select.Option value = {value}>
         {TenantRoleTexts[value]}
       </Select.Option>);
   }
 });
 
-// Select的回调方法
-const HandlePlatFormChange = (value: string[]) => {
-  console.log(`selected ${value}`);
-};
-const HandlePlatFormDeselect = (value: string) => {
-  console.log(`deselected ${value}`);
-};
-const HandleTenantChange = (value: string[]) => {
-  console.log(`selected ${value}`);
-};
-const HandleTenantDeselect = (value: string) => {
-  console.log(`selected ${value}`);
-};
-
 const UserTable: React.FC<DataTableProps<User>> = ({ data, loading, reload }) => {
+
   return (
     <Table
       loading={loading}
@@ -68,18 +55,72 @@ const UserTable: React.FC<DataTableProps<User>> = ({ data, loading, reload }) =>
       <Table.Column<User> dataIndex="userId" title="用户ID" />
       <Table.Column<User> dataIndex="name" title="姓名" />
       <Table.Column<User> dataIndex="platformRoles" title="平台角色" width={200} 
-        render={() => 
-          <Select style={{ width: "100%" }} onChange={HandlePlatFormChange} onDeselect={HandlePlatFormDeselect} 
-            mode="multiple" allowClear placeholder="Please select"
+        render={(_, r) => 
+          <Select 
+            defaultValue={r.platformRoles}
+            style={{ width: "100%" }} 
+            onSelect={
+              async (value: number) => {
+                await api.setPlatformRole({ body: {
+                  userId: r.userId,
+                  roleType: value,
+                } })
+                  .then(() => {
+                    message.success("设置成功");
+                    reload();
+                  });
+              }
+            }
+            onDeselect={
+              async (value: number) => {
+                await api.unsetPlatformRole({ body: {
+                  userId: r.userId,
+                  roleType: value,
+                } })
+                  .then(() => {
+                    message.success("取消成功");
+                    reload();
+                  });
+              }
+            }
+            mode="multiple" 
+            placeholder="Please select"
           >
-            {PlatFormRolesChildren}
+            {PlatformRolesChildren}
           </Select>
         }
       />
       <Table.Column<User> dataIndex="tenantRoles" title="租户角色" width={200}
-        render={() => 
-          <Select style={{ width: "100%" }} onChange={HandleTenantChange} onDeselect={HandleTenantDeselect}
-            mode="multiple" allowClear placeholder="Please select"
+        render={(_, r) => 
+          <Select 
+            defaultValue={r.tenantRoles}
+            style={{ width: "100%" }} 
+            onSelect={
+              async (value: number) => {
+                await api.setTenantRole({ body: {
+                  userId: r.userId,
+                  roleType: value,
+                } })
+                  .then(() => {
+                    message.success("设置成功");
+                    reload();
+                  });
+              }
+            }
+            onDeselect={
+              async (value: number) => {
+                await api.unsetTenantRole({ body: {
+                  userId: r.userId,
+                  roleType: value,
+                } })
+                  .then(() => {
+                    message.success("取消成功");
+                    reload();
+                  });
+              }
+            }
+            mode="multiple" 
+            placeholder="Please select" 
           >
             {TenantRolesChildren}
           </Select>
@@ -91,43 +132,6 @@ const UserTable: React.FC<DataTableProps<User>> = ({ data, loading, reload }) =>
             x.accountName +
               (x.role !== UserRole.USER ? `(${UserRoleTexts[x.role]})` : ""),
           ).join(", ")}
-      />
-      <Table.Column<User> title="初始管理员" render={(_, r) => (
-        <Space>
-          {
-            !(r.platformRoles.includes(PlatformRole.PLATFORM_ADMIN) && r.tenantRoles.includes(TenantRole.TENANT_ADMIN))
-              ? (
-                <Popconfirm
-                  title="确定要赋予此用户的平台管理员和租户管理员角色吗？"
-                  onConfirm={async () => {
-                    await api.setAsInitAdmin({ body: { userId: r.userId } }).then(() => {
-                      message.success("设置成功！");
-                      reload();
-                    });
-                  }}
-                >
-                  <a>设置</a>
-                </Popconfirm>
-              ) : undefined
-          }
-          {
-            (r.platformRoles.includes(PlatformRole.PLATFORM_ADMIN) || r.tenantRoles.includes(TenantRole.TENANT_ADMIN))
-              ? (
-                <Popconfirm
-                  title="确定要取消此用户的平台管理员和租户管理员角色吗？"
-                  onConfirm={async () => {
-                    await api.unsetInitAdmin({ body: { userId: r.userId } }).then(() => {
-                      message.success("取消设置成功！");
-                      reload();
-                    });
-                  }}
-                >
-                  <a>取消</a>
-                </Popconfirm>
-              ) : undefined
-          }
-        </Space>
-      )}
       />
     </Table>
   );
