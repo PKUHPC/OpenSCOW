@@ -12,7 +12,7 @@
   },
   "devDependencies": {
     "@types/shell-quote": "1.7.1",
-    "@types/ssh2": "1.11.5",
+    "@types/ssh2": "1.11.6",
     "ts-log": "2.2.5"
   },
   "keywords": [],
