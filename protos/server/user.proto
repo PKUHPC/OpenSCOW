@@ -237,6 +237,24 @@ message UnsetPlatformRoleRequest {
 // NOT_FOUND: user is not found.
 message UnsetPlatformRoleReply {}
 
+message SetTenantRoleRequest {
+  string user_id = 1;
+  TenantRole role_type = 2;
+}
+
+// FAILED_PRECONDITION: the user is already this role(role_type)
+// NOT_FOUND: user is not found.
+message SetTenantRoleReply {}
+
+message UnsetTenantRoleRequest {
+  string user_id = 1;
+  TenantRole role_type = 2;
+}
+
+// FAILED_PRECONDITION: the user is already not this role(role_type)
+// NOT_FOUND: user is not found.
+message UnsetTenantRoleReply {}
+
 service UserService {
 
   rpc GetUsers(GetUsersRequest) returns (GetUsersReply);
