@@ -14,7 +14,7 @@
     "undici": "5.10.0"
   },
   "devDependencies": {
-    "pino": "8.6.0"
+    "ts-log": "2.2.5"
   },
   "volta": {
     "extends": "../../package.json"

@@ -1,5 +1,5 @@
 import fs from "fs";
-import type { Logger } from "pino";
+import type { Logger } from "ts-log";
 
 import { sshConnect } from "./ssh";
 export interface KeyPair {

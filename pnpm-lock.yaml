@@ -311,6 +311,7 @@ importers:
       socket.io: 4.5.2
       socket.io-client: 4.5.2
       styled-components: 5.3.5
+      ts-log: 2.2.5
       tslib: 2.4.0
       typescript: 4.8.3
       webpack: 5.74.0
@@ -382,6 +383,7 @@ importers:
       jest-environment-jsdom: 29.0.3
       node-mocks-http: 1.11.0
       postcss: 8.4.16
+      ts-log: 2.2.5
       webpack: 5.74.0
 
   docs:
@@ -421,12 +423,12 @@ importers:
 
   libs/auth:
     specifiers:
-      pino: 8.6.0
+      ts-log: 2.2.5
       undici: 5.10.0
     dependencies:
       undici: 5.10.0
     devDependencies:
-      pino: 8.6.0
+      ts-log: 2.2.5
 
   libs/config:
     specifiers:
@@ -456,15 +458,15 @@ importers:
       '@types/shell-quote': 1.7.1
       '@types/ssh2': 1.11.5
       node-ssh: 13.0.0
-      pino: 8.6.0
       shell-quote: 1.7.3
+      ts-log: 2.2.5
     dependencies:
       node-ssh: 13.0.0
       shell-quote: 1.7.3
     devDependencies:
       '@types/shell-quote': 1.7.1
       '@types/ssh2': 1.11.5
-      pino: 8.6.0
+      ts-log: 2.2.5
 
 packages:
 
@@ -8188,6 +8190,7 @@ packages:
   /fast-redact/3.1.2:
     resolution: {integrity: sha512-+0em+Iya9fKGfEQGcd62Yv6onjBmmhV1uh86XVfOU8VwAe6kaFdQCWI9s0/Nnugx5Vd9tdbZ7e6gE2tR9dzXdw==}
     engines: {node: '>=6'}
+    dev: false
 
   /fast-safe-stringify/2.1.1:
     resolution: {integrity: sha512-W+KJc2dmILlPplD/H4K9l9LcAHAfPtP6BY84uVLXQ6Evcz9Lcg33Y2z1IVblT6xdY54PXYVHEv+0Wpq8Io6zkA==}
@@ -12147,6 +12150,7 @@ packages:
 
   /pino-std-serializers/6.0.0:
     resolution: {integrity: sha512-mMMOwSKrmyl+Y12Ri2xhH1lbzQxwwpuru9VjyJpgFIH4asSj88F2csdMwN6+M5g1Ll4rmsYghHLQJw81tgZ7LQ==}
+    dev: false
 
   /pino/8.6.0:
     resolution: {integrity: sha512-gCEOs6XpgiM8mSFjiLXQejDJ1PZww8AUmHowQ16QpqpXQDIm3mFwn/29+Y6CJxd6i+x3uXduuerjq+IqWoABbA==}
@@ -12163,6 +12167,7 @@ packages:
       safe-stable-stringify: 2.3.1
       sonic-boom: 3.2.0
       thread-stream: 2.2.0
+    dev: false
 
   /pirates/4.0.5:
     resolution: {integrity: sha512-8V9+HQPupnaXMA23c5hvl69zXvTwTzyAYasnkb0Tts4XvO4CliqONMOnvlq26rkhLC3nWDFBJf73LU1e1VZLaQ==}
@@ -12755,6 +12760,7 @@ packages:
 
   /process-warning/2.0.0:
     resolution: {integrity: sha512-+MmoAXoUX+VTHAlwns0h+kFUWFs/3FZy+ZuchkgjyOu3oioLAo2LB5aCfKPh2+P9O18i3m43tUEv3YqttSy0Ww==}
+    dev: false
 
   /progress/2.0.3:
     resolution: {integrity: sha512-7PiHtLll5LdnKIMw100I+8xJXR5gW2QwWYkT6iJva0bXitZKa/XMrSbdmg3r2Xnaidz9Qumd0VPaMrZlF9V9sA==}
@@ -12907,6 +12913,7 @@ packages:
 
   /quick-format-unescaped/4.0.4:
     resolution: {integrity: sha512-tYC1Q1hgyRuHgloV/YXs2w15unPVh8qfu/qCTfhTYamaw7fyhumKa2yGpdSo87vY32rIclj+4fWYQXUMs9EHvg==}
+    dev: false
 
   /quick-lru/4.0.1:
     resolution: {integrity: sha512-ARhCpm70fzdcvNQfPoy49IaanKkTlRWF2JMzqhcJbhSFRZv7nPTvZJdcY7301IPmvW+/p0RgIWnQDLJxifsQ7g==}
@@ -13757,6 +13764,7 @@ packages:
   /real-require/0.2.0:
     resolution: {integrity: sha512-57frrGM/OCTLqLOAh0mhVA9VBMHd+9U7Zb2THMGdBUoZVOtGbJzjxsYGDJ3A9AYYCP4hn6y1TVbaOfzWtm5GFg==}
     engines: {node: '>= 12.13.0'}
+    dev: false
 
   /rechoir/0.6.2:
     resolution: {integrity: sha512-HFM8rkZ+i3zrV+4LQjwQ0W+ez98pApMGM3HUrN04j3CqzPOzl9nmP15Y8YXNm8QHGv/eacOVEjqhmWpkRV0NAw==}
@@ -15095,6 +15103,7 @@ packages:
     resolution: {integrity: sha512-rUkv4/fnb4rqy/gGy7VuqK6wE1+1DOCOWy4RMeaV69ZHMP11tQKZvZSip1yTgrKCMZzEMcCL/bKfHvSfDHx+iQ==}
     dependencies:
       real-require: 0.2.0
+    dev: false
 
   /through/2.3.8:
     resolution: {integrity: sha512-w89qg7PI8wAdvX60bMDP+bFoD5Dvhm9oLheFp5O4a2QF0cSBGsBX4qZmadPMvVqlLJBBci+WqGGOAPvcDeNSVg==}
@@ -15273,6 +15282,10 @@ packages:
       json5: 2.2.1
       safe-stable-stringify: 2.3.1
       typescript: 4.6.4
+    dev: true
+
+  /ts-log/2.2.5:
+    resolution: {integrity: sha512-PGcnJoTBnVGy6yYNFxWVNkdcAuAMstvutN9MgDJIV6L0oG8fB+ZNNy1T+wJzah8RPGor1mZuPQkVfXNDpy9eHA==}
     dev: true
 
   /ts-node/10.9.1_bidgzm5cq2du6gnjtweqqjrrn4:
