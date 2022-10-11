@@ -80,7 +80,8 @@
     "jest-environment-jsdom": "29.0.3",
     "node-mocks-http": "1.11.0",
     "postcss": "8.4.16",
-    "webpack": "5.74.0"
+    "webpack": "5.74.0",
+    "ts-log": "2.2.5"
   },
   "browserslist": {
     "production": [

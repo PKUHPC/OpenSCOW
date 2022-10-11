@@ -13,7 +13,7 @@
   "devDependencies": {
     "@types/shell-quote": "1.7.1",
     "@types/ssh2": "1.11.5",
-    "pino": "8.6.0"
+    "ts-log": "2.2.5"
   },
   "keywords": [],
   "author": "",
