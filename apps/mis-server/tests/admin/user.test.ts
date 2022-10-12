@@ -207,7 +207,7 @@ it("manage tenant role", async () => {
 
   await asyncClientCall(client, "setTenantRole", {
     userId: data.userA.userId,
-    roleType: TenantRole.TENANT_ADMIN,
+    roleType: TenantRole.TENANT_FINANCE,
   });
 
   const setUser = await em.findOne(User, { userId: data.userA.userId });
