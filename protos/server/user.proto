@@ -283,4 +283,6 @@ service UserService {
   rpc GetName(GetNameRequest) returns (GetNameReply);
   rpc SetPlatformRole(SetPlatformRoleRequest) returns (SetPlatformRoleReply);
   rpc UnsetPlatformRole(UnsetPlatformRoleRequest) returns (UnsetPlatformRoleReply);
+  rpc SetTenantRole(SetTenantRoleRequest) returns (SetTenantRoleReply);
+  rpc UnsetTenantRole(UnsetTenantRoleRequest) returns (UnsetTenantRoleReply);
 }
