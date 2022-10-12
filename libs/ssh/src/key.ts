@@ -43,10 +43,10 @@ export async function insertKey(
     await ssh.mkdir(sshDir, undefined, sftp);
 
     const keyFilePath = join(sshDir, "authorized_keys");
-    await sftpChmod(sftp)(sshDir, 700);
+    await sftpChmod(sftp)(sshDir, "700");
     await sftpWriteFile(sftp)(keyFilePath, rootKeyPair.publicKey);
 
-    await sftpChmod(sftp)(keyFilePath, 644);
+    await sftpChmod(sftp)(keyFilePath, "644");
 
     const userID = await ssh.execCommand(`id -u ${user}`);
     const userGID = await ssh.execCommand(`id -g ${user}`);
