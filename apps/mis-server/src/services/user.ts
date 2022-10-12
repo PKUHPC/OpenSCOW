@@ -8,7 +8,7 @@ import { misConfig } from "src/config/mis";
 import { Account } from "src/entities/Account";
 import { StorageQuota } from "src/entities/StorageQuota";
 import { Tenant } from "src/entities/Tenant";
-import { PlatformRole, User } from "src/entities/User";
+import { PlatformRole, TenantRole, User } from "src/entities/User";
 import { UserAccount, UserRole, UserStatus } from "src/entities/UserAccount";
 import {
   AccountStatus,
@@ -17,6 +17,7 @@ import {
   platformRoleToJSON,
   QueryIsUserInAccountReply,
   tenantRoleFromJSON,
+  tenantRoleToJSON,
   UserRole as PFUserRole, UserServiceServer,
   UserServiceService,
   UserStatus as PFUserStatus } from "src/generated/server/user";
@@ -513,6 +514,53 @@ export const userServiceServer = plugin((server) => {
       return [{}];      
     },
 
-  });
+    setTenantRole: async ({ request, em }) => {
+      const { userId, roleType } = request;
+      const dbRoleType: TenantRole = TenantRole[tenantRoleToJSON(roleType)];
+      
+      const user = await em.findOne(User, { userId: userId });
+      
+      if (!user) {
+        throw <ServiceError>{
+          code: Status.NOT_FOUND, message: `User ${userId} is not found.`,
+        };
+      }
 
+      if (user.tenantRoles.includes(dbRoleType)) {
+        throw <ServiceError> {
+          code: Status.FAILED_PRECONDITION, message: `User ${userId} is already this role.`,
+        };
+      }
+
+      user.tenantRoles.push(dbRoleType);
+      await em.flush();
+
+      return [{}];
+    },
+
+    unsetTenantRole: async ({ request, em }) => {
+      const { userId, roleType } = request;
+      const dbRoleType: TenantRole = TenantRole[tenantRoleToJSON(roleType)];
+
+      const user = await em.findOne(User, { userId: userId });
+  
+      if (!user) {
+        throw <ServiceError>{
+          code: Status.NOT_FOUND, message: `User ${userId} is not found.`,
+        };
+      }
+  
+      if (!user.tenantRoles.includes(dbRoleType)) {
+        throw <ServiceError> {
+          code: Status.FAILED_PRECONDITION, message: `User ${userId} is already not this role.`,
+        };
+      }
+  
+      user.tenantRoles = user.tenantRoles.filter((item) => 
+        item !== dbRoleType);
+      await em.flush();
+  
+      return [{}]; 
+    },
+  });
 });
