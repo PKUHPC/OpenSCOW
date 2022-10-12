@@ -33,6 +33,7 @@ services:
       - PGID=1000
       - USER_NAME=$USER
       - PASSWORD_ACCESS=true
+      - SUDO_ACCESS=true
       - USER_PASSWORD=$USER
       - PUBLIC_KEY_FILE=/id_rsa.pub
     volumes:
