@@ -211,7 +211,7 @@ it("manage tenant role", async () => {
   });
 
   const setUser = await em.findOne(User, { userId: data.userA.userId });
-  expect(setUser?.tenantRoles.includes(tRole["TENANT_ADMIN"])).toBe(true);
+  expect(setUser?.tenantRoles.includes(tRole["TENANT_FINANCE"])).toBe(true);
 
   await asyncClientCall(client, "unsetTenantRole", {
     userId: data.userA.userId,
