@@ -111,7 +111,7 @@ const buildRuntimeConfig = async (phase) => {
     DEFAULT_PRIMARY_COLOR,
     APPS: apps,
     // use os username in test
-    MOCK_USER_ID: process.env.NODE_ENV === "test" ? os.userInfo().username : undefined,
+    MOCK_USER_ID: process.env.NODE_ENV === "test" ? "test" : undefined,
     UI_CONFIG: uiConfig,
     LOGIN_NODES: parseKeyValue(config.LOGIN_NODES),
   };

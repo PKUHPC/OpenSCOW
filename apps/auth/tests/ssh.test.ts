@@ -1,11 +1,10 @@
 process.env.AUTH_TYPE = "ssh";
 
 import { FastifyInstance } from "fastify";
-import os from "os";
 import { buildApp } from "src/app";
 import { createFormData } from "tests/utils";
 
-const username = os.userInfo().username;
+const username = "test";
 const password = username;
 
 let server: FastifyInstance;

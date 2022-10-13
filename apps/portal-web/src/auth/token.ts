@@ -1,5 +1,4 @@
 import { jsonFetch } from "@ddadaal/next-typed-api-routes-runtime/lib/client";
-import os from "os";
 import path from "path";
 import { USE_MOCK } from "src/apis/useMock";
 import { UserInfo } from "src/models/User";
@@ -16,7 +15,10 @@ interface AuthValidateTokenSchema {
 export async function validateToken(token: string | undefined): Promise<UserInfo | undefined> {
 
   if (process.env.NODE_ENV === "test" || USE_MOCK) {
-    return { identityId: runtimeConfig.MOCK_USER_ID || os.userInfo().username };
+    if (!runtimeConfig.MOCK_USER_ID) {
+      throw new Error("Using mock user id but runtimeConfig.MOCK_USER_ID is not set");
+    }
+    return { identityId: runtimeConfig.MOCK_USER_ID };
   }
 
   if (!token) { return undefined; }
