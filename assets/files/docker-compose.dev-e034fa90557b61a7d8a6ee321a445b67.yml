@@ -31,10 +31,10 @@ services:
     environment:
       - PUID=1000
       - PGID=1000
-      - USER_NAME=$USER
+      - USER_NAME=test
       - PASSWORD_ACCESS=true
       - SUDO_ACCESS=true
-      - USER_PASSWORD=$USER
+      - USER_PASSWORD=test
       - PUBLIC_KEY_FILE=/id_rsa.pub
     volumes:
       - ./ssh-server/custom-cont-init.d:/config/custom-cont-init.d
