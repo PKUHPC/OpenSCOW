@@ -23,7 +23,7 @@
     "@codemirror/theme-one-dark": "6.1.0",
     "@codemirror/view": "6.3.1",
     "@ddadaal/next-typed-api-routes-runtime": "0.5.2",
-    "@ddadaal/tsgrpc-client": "0.15.1",
+    "@ddadaal/tsgrpc-client": "0.15.2",
     "@grpc/grpc-js": "1.7.1",
     "@newhighsco/next-plugin-svgr": "3.0.61",
     "@scow/config": "workspace:*",
@@ -63,7 +63,7 @@
   },
   "devDependencies": {
     "@ddadaal/next-typed-api-routes-cli": "0.5.1",
-    "@ddadaal/tsgrpc-cli": "0.13.6",
+    "@ddadaal/tsgrpc-cli": "0.14.0",
     "@next/bundle-analyzer": "12.3.1",
     "@testing-library/jest-dom": "5.16.5",
     "@testing-library/react": "13.4.0",
