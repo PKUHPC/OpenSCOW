@@ -23,7 +23,7 @@ interface Props {
 export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
 
   const [pageInfo, setPageInfo] = useState<PageInfo>({ page: 1, pageSize: 10 });
-  
+
   const promiseFn = useCallback(async () => {
     return await api.getAllUsers({ query: {
       page: pageInfo.page,
@@ -35,7 +35,7 @@ export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
 
   return (
     <div>
-      <UserInfoTable 
+      <UserInfoTable
         data={data}
         pageInfo={pageInfo}
         setPageInfo={setPageInfo}
@@ -76,10 +76,14 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
       >
         <Table.Column<PlatformUserInfo> dataIndex="userId" title="用户ID" />
         <Table.Column<PlatformUserInfo> dataIndex="name" title="姓名" />
-        <Table.Column<PlatformUserInfo> dataIndex="createTime" title="创建时间" 
+        <Table.Column<PlatformUserInfo>
+          dataIndex="createTime"
+          title="创建时间"
           render={(time: string) => formatDateTime(time)}
         />
-        <Table.Column<PlatformUserInfo> dataIndex="platformRoles" title="平台管理员"
+        <Table.Column<PlatformUserInfo>
+          dataIndex="platformRoles"
+          title="平台管理员"
           render={(_, r) => (
             r.platformRoles.includes(PlatformRole.PLATFORM_ADMIN)
               ? (
@@ -102,14 +106,14 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
                               message.success("操作成功！");
                               reload();
                             });
-                        },              
+                        },
                       });
                     }}
                   >
                     取消
                   </DisabledA>
-                </Space> 
-              ) : ( 
+                </Space>
+              ) : (
                 <Space size="middle">
                   否
                   <a
@@ -127,7 +131,7 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
                               message.success("操作成功！");
                               reload();
                             });
-                        },              
+                        },
                       });
                     }}
                   >
@@ -135,10 +139,12 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
                   </a>
                 </Space>
               )
-              
+
           )}
         />
-        <Table.Column<PlatformUserInfo> dataIndex="platformRoles" title="平台财务人员"
+        <Table.Column<PlatformUserInfo>
+          dataIndex="platformRoles"
+          title="平台财务人员"
           render={(_, r) => (
             r.platformRoles.includes(PlatformRole.PLATFORM_FINANCE)
               ? (
@@ -159,14 +165,14 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
                               message.success("操作成功！");
                               reload();
                             });
-                        },              
+                        },
                       });
                     }}
                   >
                     取消
                   </a>
-                </Space> 
-              ) : ( 
+                </Space>
+              ) : (
                 <Space size="middle">
                   否
                   <a
@@ -184,7 +190,7 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
                               message.success("操作成功！");
                               reload();
                             });
-                        },              
+                        },
                       });
                     }}
                   >
@@ -192,7 +198,7 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
                   </a>
                 </Space>
               )
-              
+
           )}
         />
       </Table>

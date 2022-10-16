@@ -50,7 +50,7 @@ export const AdminJobBillingTablePage: NextPage = () => {
     <div>
       <Head title="管理作业价格表" />
       <PageTitle titleText={"管理作业价格表"} />
-      <AdminJobBillingTable tenant={tenant}/>
+      <AdminJobBillingTable tenant={tenant} />
     </div>
   );
 };

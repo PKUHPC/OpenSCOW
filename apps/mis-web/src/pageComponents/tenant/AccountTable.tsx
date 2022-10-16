@@ -3,8 +3,7 @@ import Link from "next/link";
 import React, { useMemo, useState } from "react";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { Money } from "src/generated/common/money";
-import type { Account } from "src/generated/server/account";
-import type { GetAccountsSchema } from "src/pages/api/tenant/getAccounts";
+import type { AdminAccountInfo, GetAccountsSchema } from "src/pages/api/tenant/getAccounts";
 import { moneyToString } from "src/utils/money";
 
 interface Props {
@@ -69,21 +68,33 @@ export const AccountTable: React.FC<Props> = ({
         rowKey="userId"
         scroll={{ x: true }}
       >
-        <Table.Column<Account> dataIndex="accountName" title="账户名"
+        <Table.Column<AdminAccountInfo>
+          dataIndex="accountName"
+          title="账户名"
           sorter={(a, b) => a.accountName.localeCompare(b.accountName)}
           sortDirections={["ascend", "descend"]}
         />
-        <Table.Column<Account> dataIndex="ownerName" title="拥有者"
+        <Table.Column<AdminAccountInfo>
+          dataIndex="ownerName"
+          title="拥有者"
           render={(_, r) => `${r.ownerName}（${r.ownerId}）`}
         />
-        <Table.Column<Account> dataIndex="comment" title="备注" />
-        <Table.Column<Account> dataIndex="balance" title="余额"
+        <Table.Column<AdminAccountInfo>
+          dataIndex="comment"
+          title="备注"
+        />
+        <Table.Column<AdminAccountInfo>
+          dataIndex="balance"
+          title="余额"
           render={(b: Money) => moneyToString(b) + " 元" }
         />
-        <Table.Column<Account> dataIndex="blocked" title="状态"
+        <Table.Column<AdminAccountInfo>
+          dataIndex="blocked"
+          title="状态"
           render={(blocked) => blocked ? <Tag color="red">封锁</Tag> : <Tag color="green">正常</Tag>}
         />
-        <Table.Column<Account> title="操作"
+        <Table.Column<AdminAccountInfo>
+          title="操作"
           render={(_, r) => (
             <Space split={<Divider type="vertical" />}>
               <Link href={{ pathname: `/tenant/accounts/${r.accountName}/users` }}>

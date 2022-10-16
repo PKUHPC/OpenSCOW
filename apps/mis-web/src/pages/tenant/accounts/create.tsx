@@ -39,13 +39,16 @@ const CreateAccountForm: React.FC = () => {
   };
 
   return (
-    <Form<FormProps> form={form}
+    <Form
+      form={form}
       wrapperCol={{ span: 20 }}
       labelCol={{ span: 4 }}
       labelAlign="right"
       onFinish={submit}
     >
-      <Form.Item<FormProps> name="accountName" label="账户名"
+      <Form.Item
+        name="accountName"
+        label="账户名"
         rules={[
           { required: true },
           { pattern: /^[a-z0-9_]+$/, message: "只能由小写英文字符、数字和下划线组成" },
@@ -58,12 +61,16 @@ const CreateAccountForm: React.FC = () => {
       >
         <Input />
       </Form.Item>
-      <Form.Item<FormProps> name="ownerId" label="拥有者用户ID"
+      <Form.Item
+        name="ownerId"
+        label="拥有者用户ID"
         rules={[{ required: true }]}
       >
         <Input />
       </Form.Item>
-      <Form.Item<FormProps> name="ownerName" label="拥有者姓名"
+      <Form.Item
+        name="ownerName"
+        label="拥有者姓名"
         rules={[{ required: true }]}
       >
         <Input />

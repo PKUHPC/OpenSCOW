@@ -72,12 +72,14 @@ const EditPriceModal: React.FC<CommonModalProps & {
 
   return (
     <Modal title="编辑作业价格项" visible={visible} onCancel={onClose} onOk={onOk} destroyOnClose confirmLoading={loading}>
-      <Form form={form} initialValues={{
-        itemId: current?.itemId,
-        amount: current?.amount ?? AmountStrategy.CPUS_ALLOC,
-        price: current?.price ?? 0,
-        description: "",
-      }}
+      <Form
+        form={form}
+        initialValues={{
+          itemId: current?.itemId,
+          amount: current?.amount ?? AmountStrategy.CPUS_ALLOC,
+          price: current?.price ?? 0,
+          description: "",
+        }}
       >
         <Form.Item label="租户">
           <strong>{tenant ?? "默认价格项"}</strong>
@@ -114,7 +116,8 @@ interface Props {
 export const EditableJobBillingTable: React.FC<Props> = ({ data, loading, tenant, reload }) => {
   return (
     <Table
-      dataSource={data} columns={[
+      dataSource={data}
+      columns={[
         ...columns,
         { dataIndex: "price", title: "设置", key: "index", render: (_, r) => {
           return {
@@ -128,8 +131,10 @@ export const EditableJobBillingTable: React.FC<Props> = ({ data, loading, tenant
           };
         } },
       ]}
-      scroll={{ x: 800 }} size="middle"
-      bordered pagination={false}
+      scroll={{ x: 800 }}
+      size="middle"
+      bordered
+      pagination={false}
       loading={loading}
     />
   );

@@ -6,7 +6,7 @@ importers:
     specifiers:
       '@commitlint/cli': 17.1.2
       '@commitlint/config-conventional': 17.1.0
-      '@ddadaal/eslint-config': 1.7.1
+      '@ddadaal/eslint-config': 1.8.0
       '@types/jest': 29.1.2
       '@types/node': 18.7.18
       '@types/rimraf': 3.0.2
@@ -36,7 +36,7 @@ importers:
     devDependencies:
       '@commitlint/cli': 17.1.2
       '@commitlint/config-conventional': 17.1.0
-      '@ddadaal/eslint-config': 1.7.1_yv3yh56z4secljaiiyjik2w4qa
+      '@ddadaal/eslint-config': 1.8.0_yv3yh56z4secljaiiyjik2w4qa
       '@types/jest': 29.1.2
       '@types/node': 18.7.18
       '@types/rimraf': 3.0.2
@@ -2315,8 +2315,8 @@ packages:
     engines: {node: '>=10'}
     dev: false
 
-  /@ddadaal/eslint-config/1.7.1_yv3yh56z4secljaiiyjik2w4qa:
-    resolution: {integrity: sha512-TvF+h15ID81fSc3HeZT8XIUFy4bkcpfKdxPoKfEWFjjelJt/TkhL2sXsiyuDOynztCwKTQOXahMTDdjoIYAQsQ==}
+  /@ddadaal/eslint-config/1.8.0_yv3yh56z4secljaiiyjik2w4qa:
+    resolution: {integrity: sha512-l2kndnPQpk4qTwe5Qq8Xll+h3aFjNgORv0olwHib/SzNHymT/e2irc2+OXxR6C35VNltKYVKrek4FB7uRV9RCg==}
     peerDependencies:
       '@typescript-eslint/eslint-plugin': '>=5.37.0'
       eslint: '>=8.23.1'
@@ -6645,7 +6645,7 @@ packages:
     dev: false
 
   /concat-map/0.0.1:
-    resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==}
+    resolution: {integrity: sha1-2Klr13/Wjfd5OnMDajug1UBdR3s=}
 
   /configstore/5.0.1:
     resolution: {integrity: sha512-aMKprgk5YhBNyH25hj8wGt2+D52Sw1DRRIzqBwLp2Ya9mFmY8KPvvtvmna8SxVR9JMZ4kzMD68N22vlaRpkeFA==}

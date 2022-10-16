@@ -78,9 +78,12 @@ interface Props {
 export const JobBillingTable: React.FC<Props> = ({ data, loading }) => {
   return (
     <Table
-      dataSource={data} columns={columns}
-      scroll={{ x: 800 }} size="middle"
-      bordered pagination={false}
+      dataSource={data}
+      columns={columns}
+      scroll={{ x: 800 }}
+      size="middle"
+      bordered
+      pagination={false}
       loading={loading}
     />
   );

@@ -83,7 +83,7 @@ export const ChargeTable: React.FC<Props> = ({ accountName, showAccountName }) =
           )
         }
         <Table.Column dataIndex="time" title="扣费日期" render={(v) => formatDateTime(v)} />
-        <Table.Column dataIndex="amount" title="扣费金额" render={(v) => v.toFixed(3)}/>
+        <Table.Column dataIndex="amount" title="扣费金额" render={(v) => v.toFixed(3)} />
         <Table.Column dataIndex="type" title="类型" />
         <Table.Column dataIndex="comment" title="备注" />
       </Table>

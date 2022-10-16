@@ -26,15 +26,20 @@ export const AccountWhitelistTable: React.FC<Props> = ({
       pagination={{ showSizeChanger: true }}
     >
       <Table.Column<WhitelistedAccount> dataIndex="accountName" title="账户名" />
-      <Table.Column<WhitelistedAccount> dataIndex="ownerId" title="拥有者"
+      <Table.Column<WhitelistedAccount>
+        dataIndex="ownerId"
+        title="拥有者"
         render={(_, r) => `${r.ownerName} (id: ${r.ownerId})`}
       />
-      <Table.Column<WhitelistedAccount> dataIndex="addTime" title="加入时间"
+      <Table.Column
+        dataIndex="addTime"
+        title="加入时间"
         render={(time: string) => formatDateTime(time) }
       />
       <Table.Column<WhitelistedAccount> dataIndex="comment" title="备注" />
       <Table.Column<WhitelistedAccount> dataIndex="operatorId" title="操作人" />
-      <Table.Column<WhitelistedAccount> title="操作"
+      <Table.Column<WhitelistedAccount>
+        title="操作"
         render={(_, r) => (
           <Space split={<Divider type="vertical" />}>
             <a onClick={() => {

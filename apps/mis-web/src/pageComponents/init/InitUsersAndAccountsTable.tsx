@@ -24,7 +24,7 @@ const PlatformRolesChildren : React.ReactNode[] = [];
 Object.entries(PlatformRole).forEach(([, value]) => {
   if (typeof value === "number") {
     PlatformRolesChildren.push(
-      <Select.Option value = {value} >
+      <Select.Option value={value}>
         {PlatformRoleTexts[value]}
       </Select.Option>);
   }
@@ -35,7 +35,7 @@ const TenantRolesChildren : React.ReactNode[] = [];
 Object.entries(TenantRole).forEach(([, value]) => {
   if (typeof value === "number") {
     TenantRolesChildren.push(
-      <Select.Option value = {value}>
+      <Select.Option value={value}>
         {TenantRoleTexts[value]}
       </Select.Option>);
   }
@@ -54,11 +54,14 @@ const UserTable: React.FC<DataTableProps<User>> = ({ data, loading, reload }) =>
     >
       <Table.Column<User> dataIndex="userId" title="用户ID" />
       <Table.Column<User> dataIndex="name" title="姓名" />
-      <Table.Column<User> dataIndex="platformRoles" title="平台角色" width={200} 
-        render={(_, r) => 
-          <Select 
+      <Table.Column<User>
+        dataIndex="platformRoles"
+        title="平台角色"
+        width={200}
+        render={(_, r) => (
+          <Select
             defaultValue={r.platformRoles}
-            style={{ width: "100%" }} 
+            style={{ width: "100%" }}
             onSelect={
               async (value: number) => {
                 await api.setPlatformRole({ body: {
@@ -83,18 +86,21 @@ const UserTable: React.FC<DataTableProps<User>> = ({ data, loading, reload }) =>
                   });
               }
             }
-            mode="multiple" 
+            mode="multiple"
             placeholder="Please select"
           >
             {PlatformRolesChildren}
           </Select>
-        }
+        )}
       />
-      <Table.Column<User> dataIndex="tenantRoles" title="租户角色" width={200}
-        render={(_, r) => 
-          <Select 
+      <Table.Column<User>
+        dataIndex="tenantRoles"
+        title="租户角色"
+        width={200}
+        render={(_, r) => (
+          <Select
             defaultValue={r.tenantRoles}
-            style={{ width: "100%" }} 
+            style={{ width: "100%" }}
             onSelect={
               async (value: number) => {
                 await api.setTenantRole({ body: {
@@ -119,14 +125,16 @@ const UserTable: React.FC<DataTableProps<User>> = ({ data, loading, reload }) =>
                   });
               }
             }
-            mode="multiple" 
-            placeholder="Please select" 
+            mode="multiple"
+            placeholder="Please select"
           >
             {TenantRolesChildren}
           </Select>
-        }
+        )}
       />
-      <Table.Column<User> dataIndex="accountAffiliations" title="所属账户"
+      <Table.Column
+        dataIndex="accountAffiliations"
+        title="所属账户"
         render={(accounts: AccountAffiliation[]) => accounts
           .map((x) =>
             x.accountName +
@@ -149,7 +157,9 @@ const AccountTable: React.FC<DataTableProps<Account>> = ({ data, loading, reload
       title={() => <Title><span>账户</span><a onClick={reload}>刷新</a></Title>}
     >
       <Table.Column<Account> dataIndex="accountName" title="账户名" />
-      <Table.Column<Account> dataIndex="ownerName" title="拥有者"
+      <Table.Column<Account>
+        dataIndex="ownerName"
+        title="拥有者"
         render={(_, r) => `${r.ownerName} (id: ${r.ownerId})`}
       />
     </Table>

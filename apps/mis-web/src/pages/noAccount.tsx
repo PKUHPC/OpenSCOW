@@ -7,11 +7,11 @@ export const NoAccountPage: NextPage = () => {
       status="warning"
       title="没有可以管理的账户"
       subTitle=""
-      extra={
+      extra={(
         <p>
           请访问 http://hpc.pku.edu.cn/guide.html 查看如何开户。
         </p>
-      }
+      )}
     />
   );
 };

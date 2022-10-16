@@ -11,7 +11,8 @@ type Props = SSRProps<{}>;
 export const JobPriceTablePage: NextPage<Props> = (props) => {
   if ("error" in props) {
     return (
-      <UnifiedErrorPage code={props.error}
+      <UnifiedErrorPage
+        code={props.error}
         customComponents={{
           409: (
             <Result
@@ -27,7 +28,7 @@ export const JobPriceTablePage: NextPage<Props> = (props) => {
   return (
     <div>
       <InitDrawer>
-        <EditJobPriceTableForm/>
+        <EditJobPriceTableForm />
       </InitDrawer>
     </div>
   );

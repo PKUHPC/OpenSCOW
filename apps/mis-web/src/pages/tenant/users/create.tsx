@@ -31,7 +31,8 @@ const CreateUserPageForm: React.FC = () => {
   };
 
   return (
-    <Form form={form}
+    <Form
+      form={form}
       wrapperCol={{ span: 20 }}
       labelCol={{ span: 4 }}
       labelAlign="right"

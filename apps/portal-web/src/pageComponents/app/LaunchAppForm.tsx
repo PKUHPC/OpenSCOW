@@ -94,13 +94,18 @@ export const LaunchAppForm: React.FC<Props> = ({ appId }) => {
         <SingleClusterSelector />
       </Form.Item>
 
-      <Form.Item label="账户" name="account"
-        rules={[{ required: true }]} dependencies={["cluster"]}
+      <Form.Item
+        label="账户"
+        name="account"
+        rules={[{ required: true }]}
+        dependencies={["cluster"]}
       >
         <AccountSelector cluster={cluster?.id} />
       </Form.Item>
 
-      <Form.Item<FormFields> label="分区" name="partition"
+      <Form.Item
+        label="分区"
+        name="partition"
         dependencies={["cluster"]}
         rules={[{ required: true }]}
       >
@@ -114,7 +119,9 @@ export const LaunchAppForm: React.FC<Props> = ({ appId }) => {
         />
       </Form.Item>
 
-      <Form.Item<FormFields> label="QOS" name="qos"
+      <Form.Item
+        label="QOS"
+        name="qos"
         dependencies={["cluster", "partition"]}
         rules={[{ required: true }]}
       >
@@ -124,7 +131,9 @@ export const LaunchAppForm: React.FC<Props> = ({ appId }) => {
         />
       </Form.Item>
 
-      <Form.Item<FormFields> label="CPU核心数" name="coreCount"
+      <Form.Item
+        label="CPU核心数"
+        name="coreCount"
         dependencies={["cluster", "partition"]}
         rules={[
           { required: true, type: "integer", max: currentPartitionInfo?.cores },

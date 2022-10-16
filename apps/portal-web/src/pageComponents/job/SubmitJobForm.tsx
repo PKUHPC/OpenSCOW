@@ -163,14 +163,19 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
       </Form.Item>
       <Row gutter={4}>
         <Col span={24} sm={12}>
-          <Form.Item<JobForm> label="账户" name="account"
-            rules={[{ required: true }]} dependencies={["cluster"]}
+          <Form.Item
+            label="账户"
+            name="account"
+            rules={[{ required: true }]}
+            dependencies={["cluster"]}
           >
             <AccountSelector cluster={cluster?.id} />
           </Form.Item>
         </Col>
         <Col span={24} sm={6}>
-          <Form.Item<JobForm> label="分区" name="partition"
+          <Form.Item
+            label="分区"
+            name="partition"
             dependencies={["cluster"]}
             rules={[{ required: true }]}
           >
@@ -185,7 +190,9 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
           </Form.Item>
         </Col>
         <Col span={24} sm={6}>
-          <Form.Item<JobForm> label="QOS" name="qos"
+          <Form.Item
+            label="QOS"
+            name="qos"
             dependencies={["cluster", "partition"]}
             rules={[{ required: true }]}
           >
@@ -195,8 +202,10 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
             />
           </Form.Item>
         </Col>
-        <Col span={12} sm={6} >
-          <Form.Item<JobForm> label="节点数" name="nodeCount"
+        <Col span={12} sm={6}>
+          <Form.Item
+            label="节点数"
+            name="nodeCount"
             dependencies={["cluster", "partition"]}
             rules={[
               { required: true, type: "integer", max: currentPartitionInfo?.nodes },
@@ -206,7 +215,9 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
           </Form.Item>
         </Col>
         <Col span={12} sm={6}>
-          <Form.Item<JobForm> label="CPU核心数" name="coreCount"
+          <Form.Item
+            label="CPU核心数"
+            name="coreCount"
             dependencies={["cluster", "partition"]}
             rules={[
               { required: true, type: "integer", max: currentPartitionInfo?.cores },

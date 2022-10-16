@@ -118,7 +118,9 @@ export const JobInfoTable: React.FC<JobInfoTableProps> = ({
       rowKey={(x) => x.jobId}
       scroll={{ x: true }}
     >
-      <Table.Column<JobInfo> dataIndex="jobId" title="作业ID"
+      <Table.Column<JobInfo>
+        dataIndex="jobId"
+        title="作业ID"
         sorter={(a, b) => compareNumber(+a.jobId, +b.jobId)}
         defaultSortOrder="descend"
       />
@@ -127,18 +129,23 @@ export const JobInfoTable: React.FC<JobInfoTableProps> = ({
       <Table.Column<JobInfo> dataIndex="partition" title="分区" />
       <Table.Column<JobInfo> dataIndex="qos" title="QOS" />
       <Table.Column<JobInfo> dataIndex="state" title="状态" />
-      <Table.Column<JobInfo> dataIndex="submitTime"
+      <Table.Column<JobInfo>
+        dataIndex="submitTime"
         title="提交时间"
         render={(t) => formatDateTime(t)}
       />
-      <Table.Column<JobInfo> dataIndex="elapsed"
+      <Table.Column<JobInfo>
+        dataIndex="elapsed"
         title="运行时间"
       />
       <Table.Column<JobInfo> dataIndex="timeLimit" title="作业时间限制" />
-      <Table.Column<JobInfo> dataIndex="reason" title="说明"
+      <Table.Column<JobInfo>
+        dataIndex="reason"
+        title="说明"
         render={(d: string) => d.startsWith("(") && d.endsWith(")") ? d.substring(1, d.length - 1) : d}
       />
-      <Table.Column<JobInfo> title="更多"
+      <Table.Column<JobInfo>
+        title="更多"
         render={(_, r) => (
           <Space>
             <a onClick={() => Router.push(join("/files", cluster.id, r.workingDir))}>
