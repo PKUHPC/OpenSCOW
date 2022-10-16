@@ -36,7 +36,7 @@ export const FileManagerPage: NextPage = requireAuth(() => true)(() => {
 
   return (
     <>
-      <Head title={`${publicConfig.CLUSTERS_CONFIG[cluster]?.displayName ?? cluster}文件管理`}/>
+      <Head title={`${publicConfig.CLUSTERS_CONFIG[cluster]?.displayName ?? cluster}文件管理`} />
       <FileManager
         cluster={cluster}
         path={fullPath}

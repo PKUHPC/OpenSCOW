@@ -73,7 +73,8 @@ export const ShellPage: NextPage = requireAuth(() => true)(({ userStore }) => {
       <TerminalContainer>
         <DynamicShellComponent
           path={paths ? ("/" + paths.join("/")) : ""}
-          user={userStore.user} cluster={cluster}
+          user={userStore.user}
+          cluster={cluster}
         />
       </TerminalContainer>
     </Container>

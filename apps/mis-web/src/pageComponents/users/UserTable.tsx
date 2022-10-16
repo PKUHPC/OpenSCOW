@@ -44,10 +44,14 @@ export const UserTable: React.FC<Props> = ({
     >
       <Table.Column<AccountUserInfo> dataIndex="userId" title="用户ID" />
       <Table.Column<AccountUserInfo> dataIndex="name" title="姓名" />
-      <Table.Column<AccountUserInfo> dataIndex="role" title="角色"
+      <Table.Column<AccountUserInfo>
+        dataIndex="role"
+        title="角色"
         render={(r: UserRole) => roleTags[r]}
       />
-      <Table.Column<AccountUserInfo> dataIndex="status" title="状态"
+      <Table.Column<AccountUserInfo>
+        dataIndex="status"
+        title="状态"
         render={(s) => statusTexts[s]}
       />
       {/* {
@@ -57,7 +61,9 @@ export const UserTable: React.FC<Props> = ({
           />
         )))
       } */}
-      <Table.Column<AccountUserInfo> dataIndex="jobChargeLimit" title="已用额度/用户限额"
+      <Table.Column<AccountUserInfo>
+        dataIndex="jobChargeLimit"
+        title="已用额度/用户限额"
         render={(_, r) => r.jobChargeLimit && r.usedJobChargeLimit
           ? `${moneyToString(r.usedJobChargeLimit)} / ${moneyToString(r.jobChargeLimit)} 元`
           : "无"}
@@ -69,7 +75,8 @@ export const UserTable: React.FC<Props> = ({
           </Link>
         )}
       /> */}
-      <Table.Column<AccountUserInfo> title="操作"
+      <Table.Column<AccountUserInfo>
+        title="操作"
         render={(_, r) => (
           <Space split={<Divider type="vertical" />}>
             <SetJobChargeLimitLink

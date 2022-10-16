@@ -23,8 +23,8 @@ export const AdminAccountsPage: NextPage = requireAuth((u) => u.tenantRoles.incl
     return (
       <div>
         <Head title="账户列表" />
-        <PageTitle titleText={"账户列表"} >
-          <RefreshLink refresh={update}/>
+        <PageTitle titleText={"账户列表"}>
+          <RefreshLink refresh={update} />
         </PageTitle>
         <AccountTable
           data={data}

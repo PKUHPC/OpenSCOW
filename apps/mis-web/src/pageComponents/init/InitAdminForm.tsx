@@ -35,14 +35,16 @@ export const InitAdminForm: React.FC = () => {
         <p>您可以在此创建初始管理员用户。</p>
         <p>这里添加的用户为初始管理员，位于默认租户中，将会自动拥有<strong>平台管理员</strong>和<strong>默认租户的租户管理员</strong>角色。</p>
         <AlertContainer>
-          <Alert type="warning" showIcon
+          <Alert
+            type="warning"
+            showIcon
             message="请确认初始管理员用户必须已经存在于认证系统，且用户的ID必须和认证系统中的用户ID保持一致。"
           />
         </AlertContainer>
         <Form form={form} onFinish={onFinish}>
           <CreateUserForm noPassword />
           <Centered>
-            <Form.Item >
+            <Form.Item>
               <Button type="primary" htmlType="submit" loading={loading}>
               添加
               </Button>

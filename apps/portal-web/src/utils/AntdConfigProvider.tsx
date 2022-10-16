@@ -20,7 +20,7 @@ export const AntdConfigProvider: React.FC<Props> = ({ children, color }) => {
   }, []);
 
   return (
-    <ConfigProvider locale={zhCN} >
+    <ConfigProvider locale={zhCN}>
       {children}
     </ConfigProvider>
   );

@@ -73,9 +73,11 @@ function MyApp({ Component, pageProps, extra }: Props) {
   return (
     <>
       <Head>
-        <meta name="format-detection" content="telephone=no"/>
+        <meta name="format-detection" content="telephone=no" />
         <link href="/manifest.json" rel="manifest" id="manifest" />
-        <link rel="icon" type="image/x-icon"
+        <link
+          rel="icon"
+          type="image/x-icon"
           href={join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/icon?type=favicon")}
         ></link>
       </Head>

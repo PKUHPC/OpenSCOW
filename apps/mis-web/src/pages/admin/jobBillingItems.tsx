@@ -29,7 +29,8 @@ const AdminJobBillingManagementTable: React.FC = () => {
   return (
     <div>
       <FilterFormContainer>
-        <Form<FilterForm> layout="inline"
+        <Form
+          layout="inline"
           form={form}
           initialValues={{ activeOnly: true, tenant: undefined }}
         >
@@ -41,7 +42,7 @@ const AdminJobBillingManagementTable: React.FC = () => {
           </Form.Item>
           <Form.Item>
             <Space>
-              <Link href={{ pathname: "/admin/jobBillingTable", query: { tenant } }} >
+              <Link href={{ pathname: "/admin/jobBillingTable", query: { tenant } }}>
                 <Button>查看{tenant ? "租户" : "平台"}价格表</Button>
               </Link>
               <Button loading={isLoading} onClick={reload}>刷新</Button>

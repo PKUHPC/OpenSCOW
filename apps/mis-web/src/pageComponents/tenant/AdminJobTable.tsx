@@ -76,49 +76,51 @@ export const AdminJobTable: React.FC<Props> = () => {
     <div>
       <FilterFormContainer>
         <Form<FilterForm>
-          form={form} initialValues={query}
+          form={form}
+          initialValues={query}
           onFinish={async () => {
             setQuery(await form.validateFields());
           }}
         >
-          <FilterFormTabs button={(
-            <Form.Item>
-              <Button type="primary" htmlType="submit">搜索</Button>
-            </Form.Item>
-          )}
-          onChange={(a) => rangeSearch.current = a === "range"}
-          tabs={[
-            {
-              title: "批量搜索", key: "range", node: (
-                <>
-                  <Form.Item label="集群" name="clusters">
-                    <ClusterSelector />
-                  </Form.Item>
-                  <Form.Item label="用户ID" name="userId">
-                    <Input />
-                  </Form.Item>
-                  <Form.Item label="账户" name="accountName">
-                    <Input />
-                  </Form.Item>
-                  <Form.Item label="作业结束时间" name="jobEndTime">
-                    <DatePicker.RangePicker showTime allowClear={false} ranges={defaultRanges()}/>
-                  </Form.Item>
-                </>
-              ),
-            },
-            {
-              title: "精确搜索", key: "precision", node: (
-                <>
-                  <Form.Item label="集群" name="clusters">
-                    <ClusterSelector />
-                  </Form.Item>
-                  <Form.Item label="集群作业ID" name="jobId">
-                    <InputNumber min={1} style={{ minWidth: "160px" }} />
-                  </Form.Item>
-                </>
-              ),
-            },
-          ]}
+          <FilterFormTabs
+            button={(
+              <Form.Item>
+                <Button type="primary" htmlType="submit">搜索</Button>
+              </Form.Item>
+            )}
+            onChange={(a) => rangeSearch.current = a === "range"}
+            tabs={[
+              {
+                title: "批量搜索", key: "range", node: (
+                  <>
+                    <Form.Item label="集群" name="clusters">
+                      <ClusterSelector />
+                    </Form.Item>
+                    <Form.Item label="用户ID" name="userId">
+                      <Input />
+                    </Form.Item>
+                    <Form.Item label="账户" name="accountName">
+                      <Input />
+                    </Form.Item>
+                    <Form.Item label="作业结束时间" name="jobEndTime">
+                      <DatePicker.RangePicker showTime allowClear={false} ranges={defaultRanges()} />
+                    </Form.Item>
+                  </>
+                ),
+              },
+              {
+                title: "精确搜索", key: "precision", node: (
+                  <>
+                    <Form.Item label="集群" name="clusters">
+                      <ClusterSelector />
+                    </Form.Item>
+                    <Form.Item label="集群作业ID" name="jobId">
+                      <InputNumber min={1} style={{ minWidth: "160px" }} />
+                    </Form.Item>
+                  </>
+                ),
+              },
+            ]}
           />
         </Form>
       </FilterFormContainer>
@@ -236,25 +238,35 @@ const JobInfoTable: React.FC<JobInfoTableProps> = ({
         <Table.Column<JobInfo> dataIndex="partition" title="分区" />
         <Table.Column<JobInfo> dataIndex="qos" title="QOS" />
         <Table.Column<JobInfo> dataIndex="jobName" title="作业名" />
-        <Table.Column<JobInfo> dataIndex="timeSubmit" title="提交时间"
+        <Table.Column<JobInfo>
+          dataIndex="timeSubmit"
+          title="提交时间"
           render={(time: string) => formatDateTime(time)}
         />
-        <Table.Column<JobInfo> dataIndex="timeEnd" title="结束时间"
+        <Table.Column<JobInfo>
+          dataIndex="timeEnd"
+          title="结束时间"
           render={(time: string) => formatDateTime(time)}
         />
-        <Table.Column<JobInfo> dataIndex="accountPrice" title="租户计费"
+        <Table.Column<JobInfo>
+          dataIndex="accountPrice"
+          title="租户计费"
           render={(price: Money) => moneyToString(price)}
         />
-        <Table.Column<JobInfo> dataIndex="tenantPrice" title="平台计费"
+        <Table.Column<JobInfo>
+          dataIndex="tenantPrice"
+          title="平台计费"
           render={(price: Money) => moneyToString(price)}
         />
-        <Table.Column<JobInfo> title="更多"
+        <Table.Column<JobInfo>
+          title="更多"
           render={(_, r) => <a onClick={() => setPreviewItem(r)}>详情</a>}
         />
       </Table>
       <HistoryJobDrawer
         show={previewItem !== undefined}
-        item={previewItem} onClose={() => setPreviewItem(undefined)}
+        item={previewItem}
+        onClose={() => setPreviewItem(undefined)}
         showedPrices={["account", "tenant"]}
       />
     </>

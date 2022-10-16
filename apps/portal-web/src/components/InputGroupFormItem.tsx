@@ -7,7 +7,7 @@ type Props = React.PropsWithChildren<{
 }>;
 
 export const InputGroupFormItem: React.FC<Props> = ({ children, deltaWidth, value, onChange }) => (
-  <Input.Group compact >
+  <Input.Group compact>
     <Input
       value={value}
       onChange={(e) => onChange?.(e.target.value)}

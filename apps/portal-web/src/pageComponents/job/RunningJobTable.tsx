@@ -117,12 +117,16 @@ export const RunningJobInfoTable: React.FC<JobInfoTableProps> = ({
       >
         {
           showCluster && (
-            <Table.Column<RunningJobInfo> dataIndex="cluster" title="集群"
+            <Table.Column<RunningJobInfo>
+              dataIndex="cluster"
+              title="集群"
               render={(_, r) => r.cluster.name}
             />
           )
         }
-        <Table.Column<RunningJobInfo> dataIndex="jobId" title="作业ID"
+        <Table.Column<RunningJobInfo>
+          dataIndex="jobId"
+          title="作业ID"
           sorter={(a, b) => a.jobId.localeCompare(b.jobId)}
         />
         {
@@ -141,14 +145,18 @@ export const RunningJobInfoTable: React.FC<JobInfoTableProps> = ({
         <Table.Column<RunningJobInfo> dataIndex="nodes" title="节点数" />
         <Table.Column<RunningJobInfo> dataIndex="cores" title="核心数" />
         <Table.Column<RunningJobInfo> dataIndex="state" title="状态" />
-        <Table.Column<RunningJobInfo> dataIndex="runningOrQueueTime"
+        <Table.Column
+          dataIndex="runningOrQueueTime"
           title="运行/排队时间"
         />
-        <Table.Column<RunningJobInfo> dataIndex="nodesOrReason" title="说明"
+        <Table.Column<RunningJobInfo>
+          dataIndex="nodesOrReason"
+          title="说明"
           render={(d: string) => d.startsWith("(") && d.endsWith(")") ? d.substring(1, d.length - 1) : d}
         />
         <Table.Column<RunningJobInfo> dataIndex="timeLimit" title="作业时间限制" />
-        <Table.Column<RunningJobInfo> title="更多"
+        <Table.Column<RunningJobInfo>
+          title="更多"
           render={(_, r) => (
             <Space>
               <a onClick={() => Router.push(join("/files", r.cluster.id, r.workingDir))}>
@@ -174,8 +182,10 @@ export const RunningJobInfoTable: React.FC<JobInfoTableProps> = ({
           )}
         />
       </Table>
-      <RunningJobDrawer show={previewItem !== undefined}
-        item={previewItem} onClose={() => setPreviewItem(undefined)}
+      <RunningJobDrawer
+        show={previewItem !== undefined}
+        item={previewItem}
+        onClose={() => setPreviewItem(undefined)}
       />
     </>
   );

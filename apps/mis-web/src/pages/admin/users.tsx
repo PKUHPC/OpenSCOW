@@ -13,7 +13,7 @@ export const ShowUsersPage: NextPage = requireAuth(() => true)(({ userStore: { u
   return (
     <div>
       <Head title="平台用户列表" />
-      <PageTitle titleText={"平台用户列表"} >
+      <PageTitle titleText={"平台用户列表"}>
         <RefreshLink refresh={update} />
       </PageTitle>
       <AllUsersTable 

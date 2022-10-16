@@ -77,9 +77,11 @@ export const DesktopTable: React.FC<Props> = () => {
       <FilterFormContainer>
         <Form layout="inline">
           <Form.Item label="集群">
-            <SingleClusterSelector value={cluster} onChange={(x) => {
-              Router.push({ query: { cluster: x.id } });
-            }}
+            <SingleClusterSelector
+              value={cluster}
+              onChange={(x) => {
+                Router.push({ query: { cluster: x.id } });
+              }}
             />
           </Form.Item>
         </Form>

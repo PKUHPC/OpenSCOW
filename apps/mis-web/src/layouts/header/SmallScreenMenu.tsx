@@ -53,10 +53,12 @@ export const SmallScreenMenu: React.FC<Props> = ({
         placement="bottomRight"
         overlay={<Menu items={items} />}
       >
-        <Button type="link" style={{
-          height: "100%",
-          color: pathname === "/" ? "white" : "black",
-        }}
+        <Button
+          type="link"
+          style={{
+            height: "100%",
+            color: pathname === "/" ? "white" : "black",
+          }}
         >
           <MenuOutlined />
         </Button>

@@ -56,27 +56,39 @@ export const AdminUserTable: React.FC<Props> = ({
         rowKey="id"
         scroll={{ x: true }}
       >
-        <Table.Column<FullUserInfo> dataIndex="id" title="用户ID"
+        <Table.Column<FullUserInfo>
+          dataIndex="id"
+          title="用户ID"
           sorter={(a, b) => a.id.localeCompare(b.id)}
           sortDirections={["ascend", "descend"]}
         />
-        <Table.Column<FullUserInfo> dataIndex="name" title="姓名"
+        <Table.Column<FullUserInfo>
+          dataIndex="name"
+          title="姓名"
           sorter={(a, b) => a.name.localeCompare(b.name)}
           sortDirections={["ascend", "descend"]}
         />
-        <Table.Column<FullUserInfo> dataIndex="email" title="邮箱"
+        <Table.Column<FullUserInfo>
+          dataIndex="email"
+          title="邮箱"
           sorter={(a, b) => a.email.localeCompare(b.email)}
           sortDirections={["ascend", "descend"]}
         />
-        <Table.Column<FullUserInfo> dataIndex="tenantRoles" title="租户角色"
+        <Table.Column<FullUserInfo>
+          dataIndex="tenantRoles"
+          title="租户角色"
           render={(_, r) => r.tenantRoles.map((x) => <Tag key={x}>{TenantRoleTexts[x]}</Tag>)}
         />
-        <Table.Column<FullUserInfo> dataIndex="createTime" title="创建时间"
+        <Table.Column<FullUserInfo>
+          dataIndex="createTime"
+          title="创建时间"
           sorter={(a, b) => compareDateTime(a.createTime, b.createTime)}
           sortDirections={["ascend", "descend"]}
           render={(d) => formatDateTime(d)}
         />
-        <Table.Column<FullUserInfo> dataIndex="affiliatedAccountNames" title="可用账户"
+        <Table.Column<FullUserInfo>
+          dataIndex="affiliatedAccountNames"
+          title="可用账户"
           render={(_, r) => r.accountAffiliations.map((x) => x.accountName).join(", ")}
         />
       </Table>

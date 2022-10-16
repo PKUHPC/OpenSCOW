@@ -25,10 +25,10 @@ export const AccountWhitelistPage: NextPage = requireAuth((u) => u.tenantRoles.i
     return (
       <div>
         <Head title="白名单账户" />
-        <PageTitle titleText={"白名单账户列表"} >
+        <PageTitle titleText={"白名单账户列表"}>
           <Space split={<Divider type="vertical" />}>
             <AddWhitelistedAccountButton refresh={reload} />
-            <RefreshLink refresh={update}/>
+            <RefreshLink refresh={update} />
           </Space>
         </PageTitle>
         <AccountWhitelistTable

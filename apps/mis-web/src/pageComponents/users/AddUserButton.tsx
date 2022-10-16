@@ -89,7 +89,10 @@ export const AddUserButton: React.FC<Props> = ({ refresh, accountName }) => {
   return (
     <>
       <NewUserModal
-        close={() => setModalShow(false)} visible={modalShow} refresh={refresh} accountName={accountName}
+        close={() => setModalShow(false)}
+        visible={modalShow}
+        refresh={refresh}
+        accountName={accountName}
         onUserNotFound={() => {
           if (publicConfig.ENABLE_CREATE_USER) {
             setModalShow(false);
@@ -99,10 +102,12 @@ export const AddUserButton: React.FC<Props> = ({ refresh, accountName }) => {
           }
         }}
       />
-      <CreateUserModal onClose={() => {
-        setCreateUserShown(false);
-        setModalShow(true);
-      }} visible={createUserShow}
+      <CreateUserModal
+        onClose={() => {
+          setCreateUserShown(false);
+          setModalShow(true);
+        }}
+        visible={createUserShow}
       />
       <Button type="primary" icon={<PlusOutlined />} onClick={() => setModalShow(true)}>
       添加用户
