@@ -31,7 +31,7 @@
     "@algolia/client-search": "4.14.2",
     "@docusaurus/module-type-aliases": "2.1.0",
     "@scow/config": "workspace:*",
-    "@sinclair/typebox": "0.24.44",
+    "@sinclair/typebox": "0.24.46",
     "@tsconfig/docusaurus": "1.0.6",
     "@types/react": "18.0.18",
     "typescript": "4.8.4"
