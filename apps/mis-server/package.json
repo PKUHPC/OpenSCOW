@@ -17,7 +17,7 @@
   "license": "ISC",
   "dependencies": {
     "@ddadaal/tsgrpc-server": "0.17.0",
-    "@grpc/grpc-js": "1.7.1",
+    "@grpc/grpc-js": "1.7.2",
     "@mikro-orm/cli": "5.4.2",
     "@mikro-orm/core": "5.4.2",
     "@mikro-orm/mariadb": "5.4.2",
@@ -27,7 +27,7 @@
     "@scow/config": "workspace:*",
     "@scow/lib-decimal": "workspace:*",
     "@scow/lib-ssh": "workspace:*",
-    "@sinclair/typebox": "0.24.44",
+    "@sinclair/typebox": "0.24.46",
     "dotenv": "16.0.3",
     "node-cron": "3.0.2",
     "undici": "5.11.0",
