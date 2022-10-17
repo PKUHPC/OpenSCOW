@@ -205,6 +205,7 @@ export const mockApi: MockApi<typeof api> = {
 
   getJobInfo: async () => ({ jobs: [mockJobInfo], totalCount: 1, totalPrice: numberToMoney(100) }),
   financePay: async () => ({ balance: 123 }),
+  tenantFinancePay: async () => ({ balance: 123 }),
   authCallback: async () => undefined as never,
   getUserStatus: async () => MOCK_USER_STATUS,
   getAccountUsers: async () => ({
