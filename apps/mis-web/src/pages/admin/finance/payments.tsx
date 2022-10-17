@@ -5,7 +5,7 @@ import { PlatformRole } from "src/models/User";
 import { Head } from "src/utils/head";
 
 export const TenantPaymentsPage: NextPage = requireAuth((i) => 
-  i.platformRoles.includes(PlatformRole.PLATFORM_ADMIN),
+  i.platformRoles.includes(PlatformRole.PLATFORM_FINANCE),
 )(() => {
   return (
     <div>

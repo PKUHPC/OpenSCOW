@@ -5,7 +5,8 @@ import { FormLayout } from "src/layouts/FormLayout";
 import { PlatformRole } from "src/models/User";
 import { Head } from "src/utils/head";
 
-export const TenantFinancePayPage: NextPage = requireAuth((i) => i.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))(
+export const TenantFinancePayPage: NextPage = requireAuth(
+  (i) => i.platformRoles.includes(PlatformRole.PLATFORM_FINANCE))(
   () => {
     return (
       <div>
