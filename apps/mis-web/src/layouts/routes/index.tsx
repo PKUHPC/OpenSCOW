@@ -44,6 +44,24 @@ export const platformAdminRoutes: NavItemProps[] = [
         text: "管理作业价格表",
         path: "/admin/jobBillingTable",
       },
+      {
+        Icon: MoneyCollectOutlined,
+        text: "财务管理",
+        path: "/admin/finance",
+        clickable: false,
+        children: [
+          {
+            Icon: PlusSquareOutlined,
+            text: "账户充值",
+            path: "/admin/finance/pay",
+          },
+          {
+            Icon: BookOutlined,
+            text: "充值记录",
+            path: "/admin/finance/payments",
+          },
+        ],
+      },
     ],
   },
 ];
