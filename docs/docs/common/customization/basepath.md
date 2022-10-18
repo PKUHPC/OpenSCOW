@@ -16,7 +16,7 @@ title: 相对路径
 
 当前由于技术限制，将系统部署不同的相对路径下需要重新编译前端项目的镜像以及进行一些配置。对于门户系统和管理系统，我们提供部署在根路径(`/`)和一个子路径（`/mis`和`/portal`）的镜像。
 
-我们假设整个系统部署在`/demo1`之下，门户在`/demo1`根目录下，管理系统在`/demo1/mis`下，.env中的`IMAGE_BASE`为`%CR_URL%`，`IMAGE_TAG`为`master`。
+我们假设整个系统部署在`/demo1`之下，门户在`/demo1`根目录下，管理系统在`/demo1/mis`下，`config.py`中的`COMMON.IMAGE_BASE`为`%CR_URL%`，`COMMON.IMAGE_TAG`为`master`。
 
 这种情况操作如下：
 
@@ -41,43 +41,54 @@ docker build -f dockerfiles/Dockerfile.mis-web --build-arg BASE_PATH="/demo1/mis
 docker build -f dockerfiles/Dockerfile.portal-web --build-arg BASE_PATH="/demo1" -t "%CR_URL%/portal-web-portal1:master" .
 ```
 
-4. 构建完成后，修改`.env`
+4. 构建完成后，修改`config.py`
 
-```bash
-# 具体注释请参考.env中的备注
+```python
+# 具体注释请参考config.py中的备注
 
 # 整个系统的根路径
-BASE_PATH=/demo1
+COMMON = {
+  "BASE_PATH": "/demo1",
+  # ...
+}
 
 # 已经部署的门户系统
-PORTAL_DEPLOYED=true
-# 门户系统的就是在/demo1下，相对于BASE_PATH是根路径，所以设置为/ 
-PORTAL_BASE_PATH=/
-# 门户系统的镜像的是portal-web-{portal1}，所以取portal1
-PORTAL_IMAGE_POSTFIX=portal1
+# 门户系统部署在/demo1下，相对于COMMON.BASE_PATH是根路径，所以设置PORTAL.BASE_PATH为/
+# PORTAL.BASE_PATH若不设置，默认值为/
+# 门户系统的镜像是portal-web-{portal1}，所以PORTAL.IMAGE_POSTFIX取portal1
+PORTAL = {
+  "BASE_PATH": "/",
+  "IMAGE_POSTFIX": "portal1"
+}
 
-# 已经部署的门户系统
-MIS_DEPLOYED=true
-# 管理系统是再/demo1/mis下，相对于整个系统的路径为/mis
-MIS_BASE_PATH=/mis
-# 门户系统的镜像的是portal-web-{mis1}，所以取mis1
-MIS_IMAGE_POSTFIX=mis1
+
+# 已经部署的管理系统
+# 管理系统若部署在/demo1/mis下，相对于COMMON.BASE_PATH为/mis，所以设置MIS.BASE_PATH为/mis
+# 管理系统的镜像的是mis-web-{mis1}，所以MIS.IMAGE_POSTFIX取mis1
+MIS = {
+  "BASE_PATH": "/mis",
+  "IMAGE_POSTFIX": "mis1",
+  # ...
+}
+
 ```
 
 ## `BASE_PATH`填写规则
 
-`.env`中，`BASE_PATH`、`PORTAL_BASE_PATH`和`MIS_BASE_PATH`均不以`/`结尾。`BASE_PATH`填写整个系统的根路径，`PORTAL_BASE_PATH`和`MIS_BASE_PATH`分别表示门户系统和管理系统相对于系统的相对路径，遵循以下的编写原则：
+`config.py`中，`COMMON.BASE_PATH`、`PORTAL.BASE_PATH`和`MIS.BASE_PATH`均不以`/`结尾。`COMMON.BASE_PATH`填写整个系统的根路径，`PORTAL.BASE_PATH`和`MIS.BASE_PATH`分别表示门户系统和管理系统相对于系统的相对路径，遵循以下的编写原则：
 
-> 如果BASE_PATH为空（即根目录），那么
->   如果对应的系统部署在根目录下，填写`/`；否则填写相对路径，以`/`开头，不以`/`结尾
-> 否则，即如果BASE_PATH不为空，那么
->   如果对应的系统部署在根目录下，不填写；否则填写相对路径，以`/`开头，不以`/`结尾
+> 如果`COMMON.BASE_PATH`为根目录，那么
+> 如果对应的系统部署在根目录下，填写`/`；否则填写相对路径，以`/`开头，不以`/`结尾
+>
+> 否则，即如果`COMMON.BASE_PATH`不为根目录，那么
+> 如果对应的系统部署在根目录下，填写`/`；否则填写相对路径，以`/`开头，不以`/`结尾
 
 示例：
 
-| 整个系统的访问路径 | 门户系统的访问路径 | 管理系统的访问路径 | `BASE_PATH` | `PORTAL_BASE_PATH` | `MIS_BASE_PATH` |
-| ------------------ | ------------------ | ------------------ | ----------- | ------------------ | --------------- |
-| /                  | /                  | /mis               |             | /                  | /mis            |
-| /                  | /portal            | /                  |             | /portal            | /               |
-| /scow              | /scow              | /scow/mis          | /scow       |                    | /mis            |
-| /scow              | /scow/portal       | /scow              | /scow       | /portal            |                 |
+| 整个系统的访问路径 | 门户系统的访问路径 | 管理系统的访问路径 | `COMMON.BASE_PATH` | `PORTAL.BASE_PATH` | `MIS.BASE_PATH` |
+| ------------------ | ------------------ | ------------------ | ------------------ | ------------------ | --------------- |
+| /                  | /                  | /mis               | /                  | /                  | /mis            |
+| /                  | /portal            | /                  | /                  | /portal            | /               |
+| /scow              | /scow              | /scow/mis          | /scow              | /                  | /mis            |
+| /scow              | /scow/portal       | /scow              | /scow              | /portal            | /               |
+
