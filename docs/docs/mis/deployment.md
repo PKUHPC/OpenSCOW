@@ -23,26 +23,30 @@ title: 部署
 MIS = {
   "BASE_PATH": "/mis",
   "IMAGE_POSTFIX": "mis",
-  "DB_PASSWORD": "must!chang3this"
+  # ...
 }
 
 # 如果将会部署在域名的根目录下，设置"MIS.BASE_PATH"为 "/"，"MIS.IMAGE_POSTFIX"为 "root"
 MIS = {
   "BASE_PATH": "/",
   "IMAGE_POSTFIX": "root",
-  "DB_PASSWORD": "must!chang3this"
+  # ...
 }
 
 # MIS.BASE_PATH若不设置，将会取其默认值"/mis"
 MIS = {
   "IMAGE_POSTFIX": "mis",
-  "DB_PASSWORD": "must!chang3this"
+  # ...
 }
 
 # MIS.DB_PASSWORD为管理系统数据库密码
 # 在系统第一次启动前可自由设置，使用此密码可以以root身份登录数据库
 # 一旦数据库启动后即不可修改
 # 必须长于8个字符，并同时包括字母、数字和符号
+MIS = {
+  # ...
+  "DB_PASSWORD": "must!chang3this"
+}
 ```
 
 :::tip
