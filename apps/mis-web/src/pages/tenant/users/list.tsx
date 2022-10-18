@@ -10,7 +10,7 @@ import { Head } from "src/utils/head";
 import { RefreshLink, useRefreshToken } from "src/utils/refreshToken";
 
 export const AdminUsersPage: NextPage = requireAuth((u) => u.tenantRoles.includes(TenantRole.TENANT_ADMIN))(
-  () => {
+  ({ userStore: { user } }) => {
 
     const promiseFn = useCallback(async () => {
       return await api.getTenantUsers({ });
@@ -30,6 +30,7 @@ export const AdminUsersPage: NextPage = requireAuth((u) => u.tenantRoles.include
           data={data}
           isLoading={isLoading}
           reload={reload}
+          user={user}
         />
       </div>
     );
