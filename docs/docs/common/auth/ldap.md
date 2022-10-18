@@ -1,13 +1,13 @@
 ---
 sidebar_position: 3
-title: LDAP 
+title: LDAP
 ---
 
-# LDAP认证系统
+# LDAP 认证系统
 
-本节介绍使用内置认证系统并使用LDAP进行用户认证。
+本节介绍使用内置认证系统并使用 LDAP 进行用户认证。
 
-LDAP认证系统支持的功能如下表：
+LDAP 认证系统支持的功能如下表：
 
 | 功能             | 是否支持 |
 | ---------------- | -------- |
@@ -16,76 +16,75 @@ LDAP认证系统支持的功能如下表：
 | 用户名和姓名验证 | 是       |
 | 修改密码         | 是       |
 
-## LDAP认证要求和流程
+## LDAP 认证要求和流程
 
-为了更好的理解并配置LDAP认证系统，本节将介绍各个操作时，LDAP认证系统所进行的操作。请确认您的LDAP配置兼容这里所称的流程
+为了更好的理解并配置 LDAP 认证系统，本节将介绍各个操作时，LDAP 认证系统所进行的操作。请确认您的 LDAP 配置兼容这里所称的流程
 
 下文中，代码块（如`ldap.bindDn`）为配置文件`config/auth.yml`中的对应值。
 
-### 使用LDAP登录集群
+### 使用 LDAP 登录集群
 
-要使用LDAP进行SCOW系统的用户认证，您必须配置LDAP服务器和集群中的每个节点，使得集群中的任何节点都可以使用LDAP用户节点的`ldap.attrs.uid`对应的属性的值和密码作为用户名和密码登录。请参考[client.sh](%REPO_FILE_URL%/dev/ldap/client.sh)配置使用LDAP服务器登录Linux节点。
+要使用 LDAP 进行 SCOW 系统的用户认证，您必须配置 LDAP 服务器和集群中的每个节点，使得集群中的任何节点都可以使用 LDAP 用户节点的`ldap.attrs.uid`对应的属性的值和密码作为用户名和密码登录。请参考[client.sh](%REPO_FILE_URL%/dev/ldap/client.sh)配置使用 LDAP 服务器登录 Linux 节点。
 
 ### 登录
 
 当用户登录时，认证系统获得用户输入的用户名和密码，进行以下操作：
 
-1. 使用`ldap.bindDn`和`ldap.bindPassword`作为用户名和密码，向LDAP服务器所在的`ldap.url`发起bind请求
-2. bind成功后，以`ldap.searchBase`为搜索根，以sub模式，以`ldap.filter` && (`ldap.attrs.uid`等于输入的用户名) 为筛选条件搜索节点
+1. 使用`ldap.bindDn`和`ldap.bindPassword`作为用户名和密码，向 LDAP 服务器所在的`ldap.url`发起 bind 请求
+2. bind 成功后，以`ldap.searchBase`为搜索根，以 sub 模式，以`ldap.filter` && (`ldap.attrs.uid`等于输入的用户名) 为筛选条件搜索节点
    1. 如果搜索结果为空，则登录失败
    2. 如果搜索节点有多个，取第一个结果
-3. 以**上一个结果的DN**以及**输入的密码**作为用户名和密码，与LDAP服务器发起bind请求
-   1. 如果bind失败，则登录失败
-4. 登录成功。生成一个UUID作为token，将token与**输入的用户名**存入redis
-5. 重定向到用户在登录时，通过querystring指定的callback URL，并传入`token={token}`作为querystring参数
+3. 以**上一个结果的 DN**以及**输入的密码**作为用户名和密码，与 LDAP 服务器发起 bind 请求
+   1. 如果 bind 失败，则登录失败
+4. 登录成功。生成一个 UUID 作为 token，将 token 与**输入的用户名**存入 redis
+5. 重定向到用户在登录时，通过 querystring 指定的 callback URL，并传入`token={token}`作为 querystring 参数
 
 ### 创建用户
 
-系统会对每个新用户创建一个新的LDAP节点表示用户，并支持同时创建一个LDAP节点表示用户的组。
+系统会对每个新用户创建一个新的 LDAP 节点表示用户，并支持同时创建一个 LDAP 节点表示用户的组。
 
 当用户在运营系统中创建后，认证系统获得新用户的用户名、用户姓名、密码和邮箱，进行以下操作
 
-1. 使用`ldap.bindDn`和`ldap.bindPassword`作为用户名和密码与向LDAP服务器所在的`ldap.url`发起bind请求
-2. 创建一个新的entry作为用户，其DN以及属性值如下表所示
+1. 使用`ldap.bindDn`和`ldap.bindPassword`作为用户名和密码与向 LDAP 服务器所在的`ldap.url`发起 bind 请求
+2. 创建一个新的 entry 作为用户，其 DN 以及属性值如下表所示
 
 表中`??`表示如果前面的配置值设置了，就采用前面的值，如果没有设置，则采用后面的值。
 
-| 属性名                               | 值                                                                            |
-| ------------------------------------ | ----------------------------------------------------------------------------- |
-| DN                                   | `{ldap.addUser.userIdDnKey ?? ldap.attrs.uid}=用户名,{ldap.addUser.userBase}` |
-| `ldap.attrs.uid`                     | 用户名                                                                        |
-| sn                                   | 用户名                                                                        |
-| loginShell                           | /bin/bash                                                                     |
-| objectClass                          | ["inetOrgPerson", "posixAccount", "shadowAccount"]                            |
-| homeDirectory                        | `ldap.addUser.homeDir`，其中的`{{ username }}`替换为用户名                    |
-| uidNumber                            | 数据库中的用户项的id + `ldap.addUser.uidStart`                                |
-| gidNumber                            | 取决于`ldap.groupStrategy`，见下文                                            |
-| `ldap.attrs.name`（如果设置了）      | 用户姓名                                                                      |
-| `ldap.attrs.mail`（如果设置了）      | 用户的邮箱                                                                    |
-| `ldap.addUser.extraProps`中的每个key | key对应的值，其中`{{ key }}`替换为`key`本节点的对应的属性的值                 |
+| 属性名                                | 值                                                                            |
+| ------------------------------------- | ----------------------------------------------------------------------------- |
+| DN                                    | `{ldap.addUser.userIdDnKey ?? ldap.attrs.uid}=用户名,{ldap.addUser.userBase}` |
+| `ldap.attrs.uid`                      | 用户名                                                                        |
+| sn                                    | 用户名                                                                        |
+| loginShell                            | /bin/bash                                                                     |
+| objectClass                           | ["inetOrgPerson", "posixAccount", "shadowAccount"]                            |
+| homeDirectory                         | `ldap.addUser.homeDir`，其中的`{{ username }}`替换为用户名                    |
+| uidNumber                             | 数据库中的用户项的 id + `ldap.addUser.uidStart`                               |
+| gidNumber                             | 取决于`ldap.groupStrategy`，见下文                                            |
+| `ldap.attrs.name`（如果设置了）       | 用户姓名                                                                      |
+| `ldap.attrs.mail`（如果设置了）       | 用户的邮箱                                                                    |
+| `ldap.addUser.extraProps`中的每个 key | key 对应的值，其中`{{ key }}`替换为`key`本节点的对应的属性的值                |
 
-如果`ldap.addUser.extraProps`中包括已经存在的key，则会替换对应的属性。
+如果`ldap.addUser.extraProps`中包括已经存在的 key，则会替换对应的属性。
 
 3. 配置新用户所属的组。
 
-如果`ldap.addUser.groupStrategy`设置为`oneGroupForAllUsers`，则新用户的`gidNumber`为`ldap.addUser.oneGroupForAllUsers.gidNumber`的值，且不会新建新的表示组的LDAP节点。
+如果`ldap.addUser.groupStrategy`设置为`oneGroupForAllUsers`，则新用户的`gidNumber`为`ldap.addUser.oneGroupForAllUsers.gidNumber`的值，且不会新建新的表示组的 LDAP 节点。
 
-如果`ldap.addUser.groupStrategy`设置为`newGroupPerUser`，则新用户的`gidNumber`的值等于用户的uidNumber，并且会创建一个新的LDAP节点作为新用户的group，其DN以及属性值如下表所示。
+如果`ldap.addUser.groupStrategy`设置为`newGroupPerUser`，则新用户的`gidNumber`的值等于用户的 uidNumber，并且会创建一个新的 LDAP 节点作为新用户的 group，其 DN 以及属性值如下表所示。
 
-| 属性名                                               | 值                                                                                                         |
-| ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| DN                                                   | `{ldap.newGroupPerUser.groupIdDnKey ?? ldap.attrs.userId}=用户名,{ldap.addUser.newGroupPerUser.groupBase}` |
-| objectClass                                          | ["posixGroup"]                                                                                             |
-| memberUid                                            | 用户名                                                                                                     |
-| gidNumber                                            | 同用户的uidNumber                                                                                          |
-| `ldap.addUser.newGroupPerUser.extraProps`中的每个key | key对应的值，其中`{{ key }}`替换为本节点的`key`对应的属性的值                                              |
+| 属性名                                                | 值                                                                                                         |
+| ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| DN                                                    | `{ldap.newGroupPerUser.groupIdDnKey ?? ldap.attrs.userId}=用户名,{ldap.addUser.newGroupPerUser.groupBase}` |
+| objectClass                                           | ["posixGroup"]                                                                                             |
+| memberUid                                             | 用户名                                                                                                     |
+| gidNumber                                             | 同用户的 uidNumber                                                                                         |
+| `ldap.addUser.newGroupPerUser.extraProps`中的每个 key | key 对应的值，其中`{{ key }}`替换为本节点的`key`对应的属性的值                                             |
 
-如果`ldap.addUser.newGroupPerUser.extraProps`中包括已经存在的key，则会替换对应的属性。
+如果`ldap.addUser.newGroupPerUser.extraProps`中包括已经存在的 key，则会替换对应的属性。
 
 4. 设置新用户的密码为用户输入的密码
 
-
-## 配置LDAP认证服务
+## 配置 LDAP 认证服务
 
 在`config/auth.yml`中输入以下内容，并根据情况配置。
 
@@ -175,39 +174,38 @@ ldap:
     # 如果这里出现了名为uid, name或email的属性，这里的值将替代用户输入的值。
     # 属性值支持使用 {{ LDAP属性值key }} 格式来使用用户填入的值。
     # 例如：sn: "{{ cn }}"，那么添加时将会增加一个sn属性，其值为cn的属性，即为用户输入的姓名
-    # extraProps: 
+    # extraProps:
     #   key: value
 ```
 
-增加好配置后，运行`docker compose restart`重启系统即可。
+增加好配置后，运行`./compose.sh restart`重启系统即可。
 
-## LDAP快速配置脚本
+## LDAP 快速配置脚本
 
-我们提供以下两个脚本可以用来在**CentOS 7**环境快速安装和配置LDAP服务器
+我们提供以下两个脚本可以用来在**CentOS 7**环境快速安装和配置 LDAP 服务器
 
-- [provider.sh](%REPO_FILE_URL%/dev/ldap/provider.sh): 用于配置LDAP服务器
-- [client.sh](%REPO_FILE_URL%/dev/ldap/client.sh): 用于配置LDAP客户端
+- [provider.sh](%REPO_FILE_URL%/dev/ldap/provider.sh): 用于配置 LDAP 服务器
+- [client.sh](%REPO_FILE_URL%/dev/ldap/client.sh): 用于配置 LDAP 客户端
 
 请下载这两个文件，修改两个文件开头部分的相关配置（`Start Configuratin Part`和`End Configuration Part`之间的变量），运行即可。
 
-如果您使用provider.sh脚本配置您的服务器，您的LDAP相关配置为如下。其中`{变量}`替换为provider.sh中的对应变量值。
+如果您使用 provider.sh 脚本配置您的服务器，您的 LDAP 相关配置为如下。其中`{变量}`替换为 provider.sh 中的对应变量值。
 
 ```yaml title="config/auth.yml"
-
 # ...其他配置
 
 authType: ldap
 ldap:
   url: ldap://LDAP服务器地址
   bindDN: cn=Manager,ou={ou},o={dn}
-  bindPassword: {adminPasswd}
+  bindPassword: { adminPasswd }
   searchBase: "ou={ou},o={dn}"
   userFilter: "(uid=*)"
   addUser:
     userBase: "ou=People,ou={ou},o={dn}"
     userIdDnKey: uid
     # 把homeDir设置为共享存储上的用户的家路径
-    homeDir: /nfs/{{ userId }} 
+    homeDir: /nfs/{{ userId }}
 
     groupStrategy: newGroupPerUser
     newGroupPerUser:
@@ -219,12 +217,12 @@ ldap:
     mail: mail
 ```
 
-## LDAP镜像
+## LDAP 镜像
 
-您还可以使用我们提供的已经配置好的LDAP docker镜像进行体验。注意，此镜像仅用于测试和功能体验，请勿用于生产环境！
+您还可以使用我们提供的已经配置好的 LDAP docker 镜像进行体验。注意，此镜像仅用于测试和功能体验，请勿用于生产环境！
 
 ```bash
-# 在整个项目的根目录构建镜像 
+# 在整个项目的根目录构建镜像
 docker build -f dev/ldap/Dockerfile -t ldap .
 
 # 启动镜像。服务在389端口监听。
