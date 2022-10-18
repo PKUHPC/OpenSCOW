@@ -101,3 +101,33 @@ export async function testRootUserSshLogin(host: string, keyPair: KeyPair, logge
   return await sshConnect(host, "root", keyPair, logger, async () => undefined).catch((e) => e);
 
 }
+
+/**
+ * Check if the root user can log in to the host
+ * If fails, return the error
+ *
+ * @param address the address
+ * @param username the username
+ * @param pwd password
+ * @param rootKeyPair key pair
+ * @param logger logger
+ */
+export async function sshUserPasswordConnect(address: string, username: string, pwd: string,  rootKeyPair: KeyPair, logger: Logger) {
+  const [host, port] = address.split(":");
+  const ssh = new NodeSSH();
+
+  async function connect() {
+    await ssh.connect({ host, port: port ? +port : undefined, username, password: pwd });
+  }
+
+  try {
+    await connect();
+    await insertKey("root", address, rootKeyPair, logger);
+  } catch (e) {
+    logger.info("Login to %s as %s failed.", host, username);
+    throw e;
+  } finally {
+    ssh.dispose();
+  }
+}
+

@@ -21,6 +21,9 @@ import {
   UserStatus as PFUserStatus } from "src/generated/server/user";
 import { fetch } from "undici";
 
+import {sshUserPasswordConnect} from "@scow/lib-ssh";
+import { rootKeyPair } from "src/config/env";
+
 export const userServiceServer = plugin((server) => {
 
   server.addService<UserServiceServer>(UserServiceService, {
@@ -324,7 +327,6 @@ export const userServiceServer = plugin((server) => {
       }
 
       // call auth
-      // 调用认证系统的创建用户接口，在底层认证系统中创建用户
       const rep = await fetch(misConfig.authUrl + "/user", {
         method: "POST",
         body: JSON.stringify({
@@ -341,8 +343,7 @@ export const userServiceServer = plugin((server) => {
 
       logger.info("Calling auth completed. %o", rep);
 
-      // 如果调用认证系统的创建用户接口失败，删除第一步在数据库中创建的用户
-
+      // If the call of creating user of auth fails,  delete the user created in the database.
       if (!rep.ok) {
         await em.removeAndFlush(user);
 
@@ -356,6 +357,20 @@ export const userServiceServer = plugin((server) => {
 
         throw <ServiceError> { code: Status.INTERNAL, message: `Error creating user ${user.id} in auth.` };
       }
+
+      // Making an ssh Request to the login node as the user created.
+      await Promise.all(Object.values(clusters).map(async ({ displayName, slurm: { loginNodes } }) => {
+        const node = loginNodes[0];
+        logger.info("Checking if user can login to %s by login node %s", displayName, node);
+
+        const error = await sshUserPasswordConnect(node, name, password,  rootKeyPair, logger).catch((e) => e);
+        if (error) {
+          logger.info("user %s cannot login to %s by login node %s. err: %o", name, displayName, node, error);
+          throw error;
+        } else {
+          logger.info("user %s login to %s by login node %s", name, displayName, node);
+        }
+      }));
 
       return [{ id: user.id }];
     },
