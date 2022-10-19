@@ -1,8 +1,10 @@
 import { NodeSSH, SSHExecCommandOptions } from "node-ssh";
+import { join } from "path";
 import type { Logger } from "pino";
 import { quote } from "shell-quote";
 
 import { insertKey, KeyPair } from "./key";
+import { sftpChmod, sftpStat, sftpWriteFile } from "./sftp";
 
 /**
  * Connect to SSH and returns the SSH Object
@@ -112,17 +114,35 @@ export async function testRootUserSshLogin(host: string, keyPair: KeyPair, logge
  * @param rootKeyPair key pair
  * @param logger logger
  */
-export async function sshUserPasswordConnect(address: string, username: string, pwd: string,  rootKeyPair: KeyPair, logger: Logger) {
+export async function userSshFirstLogin(
+  address: string, username: string, pwd: string,
+  rootKeyPair: KeyPair, logger: Logger,
+) {
   const [host, port] = address.split(":");
   const ssh = new NodeSSH();
 
-  async function connect() {
-    await ssh.connect({ host, port: port ? +port : undefined, username, password: pwd });
-  }
-
   try {
-    await connect();
-    await insertKey("root", address, rootKeyPair, logger);
+    await ssh.connect({ host, port: port ? +port : undefined, username, password: pwd });
+
+    const homeDir = await ssh.execCommand(`eval echo ~${username}`);
+    const userHomeDir = homeDir.stdout.trim();
+
+    const sftp = await ssh.requestSFTP();
+    const stat = await sftpStat(sftp)(userHomeDir);
+    // make sure user home dir is exist !
+    if (!stat.isDirectory()) {
+      logger.error("User %s home directory %s is not exits", username, userHomeDir);
+    }
+    else {
+      // creat ~/.ssh/authorized_keys and write keys
+      const sshDir = join(userHomeDir, ".ssh");
+      await ssh.mkdir(sshDir, undefined, sftp);
+      const keyFilePath = join(sshDir, "authorized_keys");
+      await sftpChmod(sftp)(sshDir, "700");
+      await sftpWriteFile(sftp)(keyFilePath, rootKeyPair.publicKey);
+      logger.info("Writing key for user %s to %s in file %s", username, host, keyFilePath);
+      await sftpChmod(sftp)(keyFilePath, "644");
+    }
   } catch (e) {
     logger.info("Login to %s as %s failed.", host, username);
     throw e;

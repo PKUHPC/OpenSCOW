@@ -45,7 +45,7 @@ export async function insertKey(
 
     await ssh.mkdir(sshDir, undefined, sftp);
     // root create the directory, so we need to change the owner
-    await sftpChown(sftp)(userHomeDir,  Number(userID.stdout.trim()), Number(userGID.stdout.trim()))
+    await sftpChown(sftp)(userHomeDir, Number(userID.stdout.trim()), Number(userGID.stdout.trim()));
 
     const keyFilePath = join(sshDir, "authorized_keys");
     await sftpChmod(sftp)(sshDir, "700");

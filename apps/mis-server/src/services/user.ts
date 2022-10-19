@@ -3,7 +3,9 @@ import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { UniqueConstraintViolationException } from "@mikro-orm/core";
 import { decimalToMoney } from "@scow/lib-decimal";
+import { userSshFirstLogin } from "@scow/lib-ssh";
 import { clusters } from "src/config/clusters";
+import { rootKeyPair } from "src/config/env";
 import { misConfig } from "src/config/mis";
 import { Account } from "src/entities/Account";
 import { StorageQuota } from "src/entities/StorageQuota";
@@ -20,9 +22,6 @@ import {
   UserServiceService,
   UserStatus as PFUserStatus } from "src/generated/server/user";
 import { fetch } from "undici";
-
-import {sshUserPasswordConnect} from "@scow/lib-ssh";
-import { rootKeyPair } from "src/config/env";
 
 export const userServiceServer = plugin((server) => {
 
@@ -363,7 +362,7 @@ export const userServiceServer = plugin((server) => {
         const node = loginNodes[0];
         logger.info("Checking if user can login to %s by login node %s", displayName, node);
 
-        const error = await sshUserPasswordConnect(node, name, password,  rootKeyPair, logger).catch((e) => e);
+        const error = await userSshFirstLogin(node, name, password, rootKeyPair, logger).catch((e) => e);
         if (error) {
           logger.info("user %s cannot login to %s by login node %s. err: %o", name, displayName, node, error);
           throw error;
