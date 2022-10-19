@@ -8,10 +8,17 @@
         "files": "../../protos/common/job.proto"
       },
       "target": "."
+    },
+    {
+      "source": "local",
+      "local": {
+        "protoPaths": "../../protos",
+        "files": "../../protos/portal/*.proto"
+      },
+      "target": "."
     }
   ],
   "params": [
-    "--ts_proto_opt=unrecognizedEnum=false",
-    "--ts_proto_opt=useDate=string"
+    "--ts_proto_opt=unrecognizedEnum=false,useDate=string,oneof=unions"
   ]
 }

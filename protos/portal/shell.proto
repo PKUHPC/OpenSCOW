@@ -29,9 +29,21 @@ message ShellRequest {
   }
 }
 
-message ShellResponse { bytes data = 1; }
+message ShellResponse {
+
+  message Data { bytes data = 1; }
+
+  message Exit {
+    optional uint32 code = 1;
+    optional string signal = 2;
+  }
+
+  oneof message {
+    Data data = 1;
+    Exit exit = 2;
+  }
+}
 
 service ShellService {
-  rpc Shell(stream ShellRequest)
-      returns (stream ShellResponse);
+  rpc Shell(stream ShellRequest) returns (stream ShellResponse);
 }

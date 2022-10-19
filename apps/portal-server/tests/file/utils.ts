@@ -12,6 +12,17 @@ const target = "localhost:22222";
 export const userId = "test";
 export const cluster = "hpc01";
 
+export async function collectInfo<T>(stream: AsyncIterable<T>) {
+
+  const buffer = [] as T[];
+
+  for await (const res of stream) {
+    buffer.push(res);
+  }
+
+  return buffer;
+}
+
 export interface TestSshServer {
   ssh: NodeSSH;
   sftp: SFTPWrapper;

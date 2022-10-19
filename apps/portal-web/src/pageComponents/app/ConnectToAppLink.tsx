@@ -2,8 +2,8 @@ import { parsePlaceholder } from "@scow/config/build/parse";
 import { message } from "antd";
 import { join } from "path";
 import { api } from "src/apis";
-import { AppSession } from "src/clusterops/api/app";
 import { ClickableA } from "src/components/ClickableA";
+import type { AppSession } from "src/generated/portal/app";
 import { Cluster, publicConfig } from "src/utils/config";
 import { openDesktop } from "src/utils/vnc";
 

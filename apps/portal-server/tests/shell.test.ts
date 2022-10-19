@@ -1,9 +1,10 @@
 import { asyncDuplexStreamCall } from "@ddadaal/tsgrpc-client";
 import { Server } from "@ddadaal/tsgrpc-server";
 import { credentials } from "@grpc/grpc-js";
+import { once } from "events";
 import { createServer } from "src/app";
-import { ShellServiceClient } from "src/generated/portal/shell";
-import { cluster, connectToTestServer,
+import { ShellResponse, ShellServiceClient } from "src/generated/portal/shell";
+import { cluster, collectInfo, connectToTestServer,
   createTestItems, resetTestServer, TestSshServer, userId } from "tests/file/utils";
 
 let ssh: TestSshServer;
@@ -30,21 +31,33 @@ it("tests shell interaction", async () => {
 
   await stream.writeAsync({ message: { $case: "connect", connect: { cluster, userId } } });
 
-  // get rid of greeting
-  await stream.readAsync();
-  await stream.readAsync();
-
-  // the shell echoes back input
-  const type = "123";
+  // types commands
+  const type = "echo 123\nexit\n";
   await stream.writeAsync({ message: { $case: "data", data: { data: Buffer.from(type) } } });
 
-  const data = await stream.readAsync();
+  // collect output
+  const data = await collectInfo<ShellResponse>(stream);
 
-  try {
-    expect(data?.data.toString()).toBe(type);
-  } finally {
-    stream.end();
-  }
+  // expect the output
+  const actual = data.reduce((prev, curr) => {
+    if (curr.message?.$case === "data") {
+      prev.push(curr.message.data.data);
+    }
+    return prev;
+  }, [] as Uint8Array[]);
+
+  const expected = [] as Uint8Array[];
+
+  // expectation
+  await ssh.ssh.withShell(async (channel) => {
+    channel.on("data", (chunk: Buffer) => {
+      expected.push(chunk);
+    });
+    channel.write(type);
+    await once(channel, "end");
+  });
+
+  expect(Buffer.concat(actual)).toEqual(Buffer.concat(expected));
 
 
 

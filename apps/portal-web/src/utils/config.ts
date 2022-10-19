@@ -26,6 +26,8 @@ export interface ServerRuntimeConfig {
   MOCK_USER_ID: string | undefined;
 
   LOGIN_NODES: Record<string, string>;
+
+  SERVER_URL: string;
 }
 
 

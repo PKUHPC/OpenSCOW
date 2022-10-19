@@ -36,14 +36,14 @@ message CreateAppSessionRequest {
   string cluster = 2;
   string app_id = 3;
   string account = 4;
-  string partition = 5;
-  string qos = 6;
+  optional string partition = 5;
+  optional string qos = 6;
   uint32 core_count = 7;
   uint32 max_time = 8;
 }
 
 // NOT_FOUND: app is not found
-// INTERNAL: SBATCH failed, message has output
+// INTERNAL: SBATCH failed, details has output
 message CreateAppSessionResponse {
   uint32 job_id = 1;
   string session_id = 2;

@@ -47,9 +47,13 @@ export const shellServiceServer = plugin((server) => {
 
           const abortController = new AbortController();
 
-          channel.on("exit", (...args) => {
+          channel.on("exit", (...args: [code: string] | [code: null, signal: string]) => {
             logger.info("Shell exited with %o", ...args);
             abortController.abort();
+            call.write({ message: { $case: "exit", exit: {
+              code: args[0] ? +args[0] : undefined,
+              signal: args[0] ? undefined : args[1],
+            } } });
           });
 
           // if either pipeline ends, ends the request
@@ -57,11 +61,10 @@ export const shellServiceServer = plugin((server) => {
             // shell -> client
             pipeline(
               channel,
-              async function(chunk) {
-                return { data: chunk };
+              async function(chunk: Uint8Array) {
+                return { message: { $case: "data" as const, data: { data: chunk } } };
               },
               call,
-              { signal: abortController.signal },
             ),
 
             // client -> shell
@@ -101,9 +104,8 @@ export const shellServiceServer = plugin((server) => {
               channel,
               { signal: abortController.signal },
             ),
-          ]);
+          ]).finally(() => { call.end(); channel.end(); });
         }, { cols, rows });
-
       });
 
 
