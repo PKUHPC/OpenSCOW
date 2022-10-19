@@ -12,38 +12,60 @@ import { PlatformRole, TenantRole, UserRole } from "src/models/User";
 import { User } from "src/stores/UserStore";
 import { publicConfig } from "src/utils/config";
 
-export const platformAdminRoutes: NavItemProps[] = [
+export const platformAdminRoutes: (platformRoles: PlatformRole[]) => NavItemProps[] = (platformRoles) => [
   {
     Icon: UserOutlined,
     text: "平台管理",
     path: "/admin",
     clickable: false,
     children: [
-      {
-        Icon: ClockCircleOutlined,
-        text: "获取作业",
-        path: "/admin/fetchJobs",
-      },
-      {
-        Icon: UserOutlined,
-        text: "导入用户",
-        path: "/admin/importUsers",
-      },
-      {
-        Icon: UserOutlined,
-        text: "全部用户",
-        path: "/admin/users",
-      },
-      {
-        Icon: MoneyCollectOutlined,
-        text: "查询作业计费项",
-        path: "/admin/jobBillingItems",
-      },
-      {
-        Icon: MoneyCollectOutlined,
-        text: "管理作业价格表",
-        path: "/admin/jobBillingTable",
-      },
+      ...platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ? [
+        {
+          Icon: ClockCircleOutlined,
+          text: "获取作业",
+          path: "/admin/fetchJobs",
+        },
+        {
+          Icon: UserOutlined,
+          text: "导入用户",
+          path: "/admin/importUsers",
+        },
+        {
+          Icon: UserOutlined,
+          text: "全部用户",
+          path: "/admin/users",
+        },
+        {
+          Icon: MoneyCollectOutlined,
+          text: "查询作业计费项",
+          path: "/admin/jobBillingItems",
+        },
+        {
+          Icon: MoneyCollectOutlined,
+          text: "管理作业价格表",
+          path: "/admin/jobBillingTable",
+        },
+      ] : [],
+      ...platformRoles.includes(PlatformRole.PLATFORM_FINANCE) ? [
+        {
+          Icon: MoneyCollectOutlined,
+          text: "财务管理",
+          path: "/admin/finance",
+          clickable: false,
+          children: [
+            {
+              Icon: PlusSquareOutlined,
+              text: "账户充值",
+              path: "/admin/finance/pay",
+            },
+            {
+              Icon: BookOutlined,
+              text: "充值记录",
+              path: "/admin/finance/payments",
+            },
+          ],
+        },
+      ] : [],
     ],
   },
 ];
@@ -251,7 +273,7 @@ export const getAvailableRoutes = (user: User): NavItemProps[] => {
   }
 
   if (user.platformRoles.includes(PlatformRole.PLATFORM_ADMIN)) {
-    routes.push(...platformAdminRoutes);
+    routes.push(...platformAdminRoutes(user.platformRoles));
   }
 
   return routes;
