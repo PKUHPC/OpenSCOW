@@ -1,0 +1,23 @@
+displayName: hpc02Name
+slurm:
+  loginNodes:
+    - localhost:22
+  partitions:
+      - name: GPU
+        nodes: 2
+        mem: 262144
+        cores: 29
+        gpus: 8
+        qos:
+          - normal
+          - high
+          - highest
+        comment: 说明
+
+      - name: another
+        nodes: 2
+        mem: 262144
+        cores: 29
+        gpus: 8
+        comment: 说明
+

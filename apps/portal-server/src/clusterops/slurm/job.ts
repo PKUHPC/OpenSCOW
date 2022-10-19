@@ -1,9 +1,9 @@
 import { loggedExec, sftpExists, sftpReaddir, sftpReadFile, sftpWriteFile } from "@scow/lib-ssh";
 import { join } from "path";
-import { JobOps, SavedJob } from "src/clusterops/api/job";
+import { JobOps, JobTemplate } from "src/clusterops/api/job";
 import { querySacct, querySqueue } from "src/clusterops/slurm/bl/queryJobInfo";
 import { generateJobScript, JobMetadata, parseSbatchOutput } from "src/clusterops/slurm/bl/submitJob";
-import { runtimeConfig } from "src/utils/config";
+import { portalConfig } from "src/config/portal";
 import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
 
 export const slurmJobOps = (cluster: string): JobOps => {
@@ -13,7 +13,7 @@ export const slurmJobOps = (cluster: string): JobOps => {
   if (!host) { throw new Error(`Cluster ${cluster} has no login node`); }
 
   return {
-    getAccounts: async (request, logger) => {
+    listAccounts: async (request, logger) => {
       const { userId } = request;
 
       const accounts = await sshConnect(host, userId, logger, async (ssh) => {
@@ -42,7 +42,7 @@ export const slurmJobOps = (cluster: string): JobOps => {
     },
 
     submitJob: async (request, logger) => {
-      const { jobInfo, userId, save } = request;
+      const { jobInfo, userId, saveAsTemplate } = request;
 
       return await sshConnect(host, userId, logger, async (ssh) => {
 
@@ -68,30 +68,30 @@ export const slurmJobOps = (cluster: string): JobOps => {
         // parse stdout output to get the job id
         const jobId = parseSbatchOutput(stdout);
 
-        if (save) {
+        if (saveAsTemplate) {
           const id = `${jobInfo.jobName}-${jobId}`;
           logger.info("Save job to %s", id);
 
-          await ssh.mkdir(runtimeConfig.PORTAL_CONFIG.savedJobsDir);
+          await ssh.mkdir(portalConfig.savedJobsDir);
 
-          const filePath = join(runtimeConfig.PORTAL_CONFIG.savedJobsDir, id);
+          const filePath = join(portalConfig.savedJobsDir, id);
           const metadata: JobMetadata = { ...jobInfo, submitTime: new Date().toISOString() };
           await sftpWriteFile(sftp)(filePath, JSON.stringify(metadata));
 
-          logger.info("Saved job to %s", filePath);
+          logger.info("Saved job as template to %s", filePath);
         }
 
         return { code: "OK", jobId };
       });
     },
 
-    getSavedJob: async (request, logger) => {
+    getJobTamplate: async (request, logger) => {
       const { id, userId } = request;
 
       return await sshConnect(host, userId, logger, async (ssh) => {
         const sftp = await ssh.requestSFTP();
 
-        const file = join(runtimeConfig.PORTAL_CONFIG.savedJobsDir, id);
+        const file = join(portalConfig.savedJobsDir, id);
 
         if (!await sftpExists(sftp, file)) { return { code: "NOT_FOUND" }; }
 
@@ -103,40 +103,40 @@ export const slurmJobOps = (cluster: string): JobOps => {
       });
     },
 
-    getSavedJobs: async (request, logger) => {
+    listJobTemplates: async (request, logger) => {
       const { userId } = request;
 
       return await sshConnect(host, userId, logger, async (ssh) => {
         const sftp = await ssh.requestSFTP();
 
-        if (!await sftpExists(sftp, runtimeConfig.PORTAL_CONFIG.savedJobsDir)) { return { results: []}; }
+        if (!await sftpExists(sftp, portalConfig.savedJobsDir)) { return { results: []}; }
 
-        const list = await sftpReaddir(sftp)(runtimeConfig.PORTAL_CONFIG.savedJobsDir);
+        const list = await sftpReaddir(sftp)(portalConfig.savedJobsDir);
 
         const results = await Promise.all(list.map(async ({ filename }) => {
-          const content = await sftpReadFile(sftp)(join(runtimeConfig.PORTAL_CONFIG.savedJobsDir, filename));
+          const content = await sftpReadFile(sftp)(join(portalConfig.savedJobsDir, filename));
           const data = JSON.parse(content.toString()) as JobMetadata;
 
           return {
             id: filename,
-            submitTime: data.submitTime,
+            submitTime: new Date(data.submitTime),
             comment: data.comment,
             jobName: data.jobName,
-          } as SavedJob;
+          } as JobTemplate;
         }));
 
         return { results };
       });
     },
 
-    getRunningJobs: async (request, logger) => {
+    listRunningJobs: async (request, logger) => {
       const { userId } = request;
 
       return await sshConnect(host, userId, logger, async (ssh) => {
 
-        const jobs = await querySqueue(ssh, logger, ["-u", userId]);
+        const results = await querySqueue(ssh, logger, ["-u", userId]);
 
-        return { jobs };
+        return { results };
       });
 
     },
@@ -150,13 +150,13 @@ export const slurmJobOps = (cluster: string): JobOps => {
       });
     },
 
-    getAllJobsInfo: async (request, logger) => {
+    listAllJobsInfo: async (request, logger) => {
       const { userId, startTime, endTime } = request;
 
       return await sshConnect(host, userId, logger, async (ssh) => {
-        const jobs = await querySacct(ssh, logger, startTime, endTime);
+        const results = await querySacct(ssh, logger, startTime, endTime);
 
-        return { jobs };
+        return { results };
       });
     },
 

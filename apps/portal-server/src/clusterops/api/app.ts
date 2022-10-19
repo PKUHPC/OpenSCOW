@@ -1,4 +1,4 @@
-import { Logger } from "src/utils/log";
+import { Logger } from "ts-log";
 
 export interface CreateAppRequest {
   appId: string;
@@ -29,7 +29,7 @@ export interface GetAppSessionsRequest {
 export interface AppSession {
   sessionId: string;
   jobId: number;
-  submitTime: string;
+  submitTime: Date;
   appId: string;
   state: string;
   ready: boolean;
@@ -57,6 +57,6 @@ export type ConnectToAppReply =
 
 export interface AppOps {
   createApp(req: CreateAppRequest, logger: Logger): Promise<CreateAppReply>;
-  getAppSessions(req: GetAppSessionsRequest, logger: Logger): Promise<GetAppSessionsReply>;
+  listAppSessions(req: GetAppSessionsRequest, logger: Logger): Promise<GetAppSessionsReply>;
   connectToApp(req: ConnectToAppRequest, logger: Logger): Promise<ConnectToAppReply>;
 }

@@ -1,0 +1,76 @@
+syntax = "proto3";
+
+package scow.portal;
+
+import "google/protobuf/timestamp.proto";
+
+message ConnectToAppRequest {
+  string user_id = 1;
+  string cluster = 2;
+  string sessionId = 3;
+}
+
+message WebAppProps {
+  string method = 1;
+  string path = 2;
+  map<string, string> query = 3;
+  map<string, string> form_data = 4;
+}
+
+message VncAppProps {}
+
+// NOT_FOUND: session id not found
+// UNAVAILABLE: the session cannot be connected
+message ConnectToAppResponse {
+  string host = 1;
+  uint32 port = 2;
+  string password = 3;
+  oneof app_props {
+    WebAppProps web = 4;
+    VncAppProps vnc = 5;
+  }
+}
+
+message CreateAppSessionRequest {
+  string user_id = 1;
+  string cluster = 2;
+  string app_id = 3;
+  string account = 4;
+  string partition = 5;
+  string qos = 6;
+  uint32 core_count = 7;
+  uint32 max_time = 8;
+}
+
+// NOT_FOUND: app is not found
+// INTERNAL: SBATCH failed, message has output
+message CreateAppSessionResponse {
+  uint32 job_id = 1;
+  string session_id = 2;
+}
+
+message ListAppSessionsRequest {
+  string user_id = 1;
+  string cluster = 2;
+}
+
+message AppSession {
+  string session_id = 1;
+  uint32 jobId = 2;
+  google.protobuf.Timestamp submit_time = 3;
+  string app_id = 4;
+  string state = 5;
+  bool ready = 6;
+  string data_path = 7;
+}
+
+message ListAppSessionsResponse { repeated AppSession sessions = 1; }
+
+service AppService {
+  rpc ConnectToApp(ConnectToAppRequest) returns (ConnectToAppResponse);
+
+  rpc CreateAppSession(CreateAppSessionRequest)
+      returns (CreateAppSessionResponse);
+
+  rpc ListAppSessions(ListAppSessionsRequest) returns (ListAppSessionsResponse);
+}

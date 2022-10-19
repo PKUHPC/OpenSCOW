@@ -4,8 +4,9 @@ import fs from "fs";
 import { join } from "path";
 import { AppOps, AppSession } from "src/clusterops/api/app";
 import { displayIdToPort } from "src/clusterops/slurm/bl/port";
+import { apps } from "src/config/apps";
+import { portalConfig } from "src/config/portal";
 import { RunningJob } from "src/generated/common/job";
-import { runtimeConfig } from "src/utils/config";
 import { getClusterLoginNode, loggedExec, sshConnect } from "src/utils/ssh";
 import { parseDisplayId, refreshPassword, VNCSERVER_BIN_PATH } from "src/utils/turbovnc";
 
@@ -40,13 +41,13 @@ export const slurmAppOps = (cluster: string): AppOps => {
       const { appId, userId, account, coreCount, maxTime, partition, qos } = request;
 
       // prepare script file
-      const appConfig = runtimeConfig.APPS[appId];
+      const appConfig = apps[appId];
 
       if (!appConfig) { return { code: "APP_NOT_FOUND" }; }
 
       const jobName = randomUUID();
 
-      const workingDirectory = join(runtimeConfig.PORTAL_CONFIG.appJobsDir, jobName);
+      const workingDirectory = join(portalConfig.appJobsDir, jobName);
 
       return await sshConnect(host, userId, logger, async (ssh) => {
 
@@ -127,15 +128,15 @@ export const slurmAppOps = (cluster: string): AppOps => {
       });
     },
 
-    getAppSessions: async (request, logger) => {
+    listAppSessions: async (request, logger) => {
       const { userId } = request;
 
       return await sshConnect(host, userId, logger, async (ssh) => {
         const sftp = await ssh.requestSFTP();
 
-        if (!await sftpExists(sftp, runtimeConfig.PORTAL_CONFIG.appJobsDir)) { return { sessions: []}; }
+        if (!await sftpExists(sftp, portalConfig.appJobsDir)) { return { sessions: []}; }
 
-        const list = await sftpReaddir(sftp)(runtimeConfig.PORTAL_CONFIG.appJobsDir);
+        const list = await sftpReaddir(sftp)(portalConfig.appJobsDir);
 
         // using squeue to get jobs that are running
         // If a job is not running, it cannot be ready
@@ -149,7 +150,7 @@ export const slurmAppOps = (cluster: string): AppOps => {
         const sessions = [] as AppSession[];
 
         await Promise.all(list.map(async ({ filename }) => {
-          const jobDir = join(runtimeConfig.PORTAL_CONFIG.appJobsDir, filename);
+          const jobDir = join(portalConfig.appJobsDir, filename);
           const metadataPath = join(jobDir, SESSION_METADATA_NAME);
 
           if (!await sftpExists(sftp, metadataPath)) {
@@ -161,7 +162,7 @@ export const slurmAppOps = (cluster: string): AppOps => {
 
           const runningJobInfo: RunningJob | undefined = runningJobInfoMap[sessionMetadata.jobId];
 
-          const app = runtimeConfig.APPS[sessionMetadata.appId];
+          const app = apps[sessionMetadata.appId];
 
           let ready = false;
 
@@ -194,7 +195,7 @@ export const slurmAppOps = (cluster: string): AppOps => {
             jobId: sessionMetadata.jobId,
             appId: sessionMetadata.appId,
             sessionId: sessionMetadata.sessionId,
-            submitTime: sessionMetadata.submitTime,
+            submitTime: new Date(sessionMetadata.submitTime),
             state: runningJobInfo?.state ?? "ENDED",
             ready,
             dataPath: await sftpRealPath(sftp)(jobDir),
@@ -212,7 +213,7 @@ export const slurmAppOps = (cluster: string): AppOps => {
       return await sshConnect(host, userId, logger, async (ssh) => {
         const sftp = await ssh.requestSFTP();
 
-        const jobDir = join(runtimeConfig.PORTAL_CONFIG.appJobsDir, sessionId);
+        const jobDir = join(portalConfig.appJobsDir, sessionId);
 
         if (!await sftpExists(sftp, jobDir)) {
           return { code: "NOT_FOUND" };
@@ -222,7 +223,7 @@ export const slurmAppOps = (cluster: string): AppOps => {
         const content = await sftpReadFile(sftp)(metadataPath);
         const sessionMetadata = JSON.parse(content.toString()) as SessionMetadata;
 
-        const app = runtimeConfig.APPS[sessionMetadata.appId];
+        const app = apps[sessionMetadata.appId];
 
         if (app.type === "web") {
           const infoFilePath = join(jobDir, SERVER_SESSION_INFO);

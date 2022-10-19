@@ -1,22 +1,22 @@
 import { RunningJob } from "src/generated/common/job";
-import { Logger } from "src/utils/log";
+import { Logger } from "ts-log";
 
-export interface GetRunningJobsRequest {
+export interface ListRunningJobsRequest {
   userId: string;
 }
 
-export interface GetRunningJobsReply {
-  jobs: RunningJob[];
+export interface ListRunningJobsReply {
+  results: RunningJob[];
 }
 
 export interface SubmitJobRequest {
   userId: string;
   jobInfo: NewJobInfo;
   script: string;
-  save: boolean;
+  saveAsTemplate: boolean;
 }
 
-export type SubmitJobReply = 
+export type SubmitJobReply =
   | { code: "OK", jobId: number; }
   | { code: "SBATCH_FAILED", message: string };
 
@@ -42,27 +42,27 @@ export interface GenerateJobScriptReply {
   script: string;
 }
 
-export interface GetAccountsRequest {
+export interface ListAccountsRequest {
   userId: string;
 }
 
-export interface GetAccountsReply {
+export interface ListAccountsReply {
   accounts: string[];
 }
 
-export interface GetSavedJobsRequest {
+export interface ListSavedJobsRequest {
   userId: string;
 }
 
-export interface SavedJob {
+export interface JobTemplate {
   id: string;
   jobName: string;
-  submitTime: string;
+  submitTime: Date;
   comment: string | undefined;
 }
 
-export interface GetSavedJobsReply {
-  results: SavedJob[];
+export interface ListSavedJobsReply {
+  results: JobTemplate[];
 }
 
 export interface GetSavedJobRequest {
@@ -73,7 +73,7 @@ export interface GetSavedJobRequest {
 export type GetSavedJobReply = {
   code: "OK"
   jobInfo: NewJobInfo;
-} | { 
+} | {
   code: "NOT_FOUND"
 }
 
@@ -84,37 +84,37 @@ export interface CancelJobRequest {
 
 export type CancelJobReply = { code: "OK" } | { code: "NOT_FOUND" };
 
-export interface GetAllJobsInfoRequest {
+export interface ListAllJobsInfoRequest {
   userId: string;
-  startTime: Date;
-  endTime: Date;
+  startTime?: Date;
+  endTime?: Date;
 }
 
 export interface JobInfo {
-  jobId: string;
+  jobId: number;
   name: string;
   account: string;
   partition: string;
   qos: string;
   state: string;
-  workingDir: string;
+  workingDirectory: string;
   reason: string;
   elapsed: string;
   timeLimit: string;
   submitTime: string;
 }
 
-export interface GetAllJobsInfoReply {
-  jobs: JobInfo[];
+export interface ListAllJobsInfoReply {
+  results: JobInfo[];
 }
 
 export interface JobOps {
-  getRunningJobs(req: GetRunningJobsRequest, logger: Logger): Promise<GetRunningJobsReply>;
-  getAccounts(req: GetAccountsRequest, logger: Logger): Promise<GetAccountsReply>;
+  listRunningJobs(req: ListRunningJobsRequest, logger: Logger): Promise<ListRunningJobsReply>;
+  listAccounts(req: ListAccountsRequest, logger: Logger): Promise<ListAccountsReply>;
   generateJobScript(req: GenerateJobScriptRequest, logger: Logger): Promise<GenerateJobScriptReply>;
   submitJob(req: SubmitJobRequest, logger: Logger): Promise<SubmitJobReply>;
-  getSavedJobs(req: GetSavedJobsRequest, logger: Logger): Promise<GetSavedJobsReply>;
-  getSavedJob(req: GetSavedJobRequest, logger: Logger): Promise<GetSavedJobReply>;
+  listJobTemplates(req: ListSavedJobsRequest, logger: Logger): Promise<ListSavedJobsReply>;
+  getJobTamplate(req: GetSavedJobRequest, logger: Logger): Promise<GetSavedJobReply>;
   cancelJob(req: CancelJobRequest, logger: Logger): Promise<CancelJobReply>;
-  getAllJobsInfo(req: GetAllJobsInfoRequest, logger: Logger): Promise<GetAllJobsInfoReply>;
+  listAllJobsInfo(req: ListAllJobsInfoRequest, logger: Logger): Promise<ListAllJobsInfoReply>;
 }

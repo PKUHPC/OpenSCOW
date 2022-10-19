@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+package scow.portal;
+
+message CreateDesktopRequest {
+  string user_id = 1;
+  string cluster = 2;
+  string wm = 3;
+}
+
+// NOT_FOUND: cluster is not found
+// INVALID_ARGUMENT: wm is not valid
+// RESOURCE_EXHAUSTED: too many desktops
+message CreateDesktopResponse {
+  string node = 1;
+  uint32 port = 2;
+  string password = 3;
+}
+
+message KillDesktopRequest {
+  string user_id = 1;
+  string cluster = 2;
+  uint32 display_id = 3;
+}
+
+message KillDesktopResponse {}
+
+message ConnectToDesktopRequest {
+  string user_id = 1;
+  string cluster = 2;
+  uint32 display_id = 3;
+}
+
+// NOT_FOUND: cluster is not found
+message ConnectToDesktopResponse {
+  string node = 1;
+  uint32 port = 2;
+  string password = 3;
+}
+
+message ListDesktopsRequest {
+  string user_id = 1;
+  string cluster = 2;
+}
+
+// NOT_FOUND: cluster is not found
+message ListDesktopsResponse {
+  string node = 1;
+  repeated uint32 display_ids = 2;
+}
+
+service DesktopService {
+  rpc CreateDesktop(CreateDesktopRequest) returns (CreateDesktopResponse);
+  rpc KillDesktop(KillDesktopRequest) returns (KillDesktopResponse);
+  rpc ConnectToDesktop(ConnectToDesktopRequest)
+      returns (ConnectToDesktopResponse);
+  rpc ListDesktops(ListDesktopsRequest) returns (ListDesktopsResponse);
+}

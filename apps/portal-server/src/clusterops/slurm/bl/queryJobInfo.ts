@@ -3,7 +3,7 @@ import moment from "moment";
 import { NodeSSH } from "node-ssh";
 import { JobInfo } from "src/clusterops/api/job";
 import { RunningJob } from "src/generated/common/job";
-import { Logger } from "src/utils/log";
+import { Logger } from "ts-log";
 
 const SEPARATOR = "__x__x__";
 
@@ -56,7 +56,7 @@ function formatTime(time: Date, tz: string) {
   return applyOffset(moment(time), tz).format("YYYY-MM-DD[T]HH:mm:ss");
 }
 
-export async function querySacct(ssh: NodeSSH, logger: Logger, startTime: Date, endTime: Date) {
+export async function querySacct(ssh: NodeSSH, logger: Logger, startTime?: Date, endTime?: Date) {
 
   // get target timezone
   const { stdout: tz } = await loggedExec(ssh, logger, true, "date", ["+%:z"]);
@@ -67,8 +67,8 @@ export async function querySacct(ssh: NodeSSH, logger: Logger, startTime: Date, 
       "-X",
       "--noheader",
       "--format", "JobID,JobName,Account,Partition,QOS,State,WorkDir,Reason,Elapsed,TimeLimit,Submit",
-      "--starttime", formatTime(startTime, tz),
-      "--endtime", formatTime(endTime, tz),
+      ...startTime ? ["--starttime", formatTime(startTime, tz)] : [],
+      ...endTime ? ["--endtime", formatTime(endTime, tz)] : [],
       "--parsable2",
     ],
   );
@@ -80,12 +80,12 @@ export async function querySacct(ssh: NodeSSH, logger: Logger, startTime: Date, 
   const jobs = result.stdout.split("\n").map((x) => {
     const [
       jobId, name, account, partition, qos, state,
-      workingDir, reason, elapsed, timeLimit, submitTime,
+      workingDirectory, reason, elapsed, timeLimit, submitTime,
     ] = x.split("|");
 
     return {
-      jobId, name, account, partition, qos, state,
-      workingDir, reason, elapsed, timeLimit, submitTime,
+      jobId: +jobId, name, account, partition, qos, state,
+      workingDirectory, reason, elapsed, timeLimit, submitTime,
     } as JobInfo;
   });
 

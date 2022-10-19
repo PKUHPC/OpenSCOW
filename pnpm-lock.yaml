@@ -249,6 +249,47 @@ importers:
       postcss: 8.4.18
       webpack: 5.74.0
 
+  apps/portal-server:
+    specifiers:
+      '@ddadaal/tsgrpc-cli': 0.14.1
+      '@ddadaal/tsgrpc-client': 0.17.0
+      '@ddadaal/tsgrpc-common': 0.1.0
+      '@ddadaal/tsgrpc-server': 0.18.0
+      '@grpc/grpc-js': 1.7.2
+      '@scow/config': workspace:*
+      '@scow/lib-ssh': workspace:*
+      '@sinclair/typebox': 0.24.46
+      '@types/node-cron': 3.0.4
+      '@types/shell-quote': 1.7.1
+      '@types/wait-on': 5.3.1
+      dotenv: 16.0.3
+      node-cron: 3.0.2
+      shell-quote: 1.7.4
+      ts-log: 2.2.5
+      undici: 5.11.0
+      uuid: 9.0.0
+      wait-on: 6.0.1
+    dependencies:
+      '@ddadaal/tsgrpc-common': 0.1.0
+      '@ddadaal/tsgrpc-server': 0.18.0_@grpc+grpc-js@1.7.2
+      '@grpc/grpc-js': 1.7.2
+      '@scow/config': link:../../libs/config
+      '@scow/lib-ssh': link:../../libs/ssh
+      '@sinclair/typebox': 0.24.46
+      dotenv: 16.0.3
+      node-cron: 3.0.2
+      shell-quote: 1.7.4
+      ts-log: 2.2.5
+      undici: 5.11.0
+      uuid: 9.0.0
+      wait-on: 6.0.1
+    devDependencies:
+      '@ddadaal/tsgrpc-cli': 0.14.1
+      '@ddadaal/tsgrpc-client': 0.17.0_@grpc+grpc-js@1.7.2
+      '@types/node-cron': 3.0.4
+      '@types/shell-quote': 1.7.1
+      '@types/wait-on': 5.3.1
+
   apps/portal-web:
     specifiers:
       '@ant-design/icons': 4.7.0
@@ -2377,6 +2418,23 @@ packages:
       - supports-color
     dev: true
 
+  /@ddadaal/tsgrpc-cli/0.14.1:
+    resolution: {integrity: sha512-KzBVYMb/RyJnnoIn+nGPb3Nx0AYq4mW821nF26nW7DMLmA9naJrl0U3FUv+rTnT/VDsB6kln6cq4ttgZ4VHEfw==}
+    hasBin: true
+    dependencies:
+      glob: 8.0.3
+      grpc-tools: 1.11.3
+      rimraf: 3.0.2
+      shell-quote: 1.7.4
+      ts-proto: 1.129.0
+      tslib: 2.4.0
+      yargs: 17.6.0
+      zod: 3.19.1
+    transitivePeerDependencies:
+      - encoding
+      - supports-color
+    dev: true
+
   /@ddadaal/tsgrpc-client/0.16.0_@grpc+grpc-js@1.7.2:
     resolution: {integrity: sha512-arcrQ88mHIOdDOHkYenzrgcwM39ANXjqUM6Zv/v8H2hc2A1HrslR4tZJfzsPq9p5VihPkTCOtZ2e8noanRPs0A==}
     peerDependencies:
@@ -2386,11 +2444,37 @@ packages:
       tslib: 2.4.0
     dev: false
 
+  /@ddadaal/tsgrpc-client/0.17.0_@grpc+grpc-js@1.7.2:
+    resolution: {integrity: sha512-N03wGlFI8heG+96IagIhtVVZ79oOGgx8l45y7VpInS/Qzn3f1779fIvy1O6nyrCwC+aMmGZnzyaQ/XkRW6ALaQ==}
+    peerDependencies:
+      '@grpc/grpc-js': '>=1.7.0'
+    dependencies:
+      '@ddadaal/tsgrpc-common': 0.1.0
+      '@grpc/grpc-js': 1.7.2
+      tslib: 2.4.0
+    dev: true
+
+  /@ddadaal/tsgrpc-common/0.1.0:
+    resolution: {integrity: sha512-Cm7UbwvREDm7JwGtrHEMrLb8ZCk9rY3/ligQrdK0GJUP0aJJhe26qYcpAnaF0V4U7E8Nlg9qshecNlsb9M67Lg==}
+    dependencies:
+      tslib: 2.4.0
+
   /@ddadaal/tsgrpc-server/0.17.0_@grpc+grpc-js@1.7.2:
     resolution: {integrity: sha512-ApuFaEHL0e8YZ/nkD1qzuNpgbhHEDVQq8DbOqfmNeDPs8Hjp1VSAmo24lW3xm/OAuEpBnWyO747TYf3jk/G/Hg==}
     peerDependencies:
       '@grpc/grpc-js': '>=1.7.0'
     dependencies:
+      '@grpc/grpc-js': 1.7.2
+      pino: 8.6.1
+      tslib: 2.4.0
+    dev: false
+
+  /@ddadaal/tsgrpc-server/0.18.0_@grpc+grpc-js@1.7.2:
+    resolution: {integrity: sha512-17bi6AGp0ddWs/ZEyYr3uthPd4r3ayVNwuHbKCqo2LRF9sFvzB33NDiNM4I5YglMdUV/mwzmovtqKlTSd92ljw==}
+    peerDependencies:
+      '@grpc/grpc-js': '>=1.7.0'
+    dependencies:
+      '@ddadaal/tsgrpc-common': 0.1.0
       '@grpc/grpc-js': 1.7.2
       pino: 8.6.1
       tslib: 2.4.0
@@ -3417,7 +3501,6 @@ packages:
     dependencies:
       '@grpc/proto-loader': 0.7.2
       '@types/node': 18.7.18
-    dev: false
 
   /@grpc/proto-loader/0.7.2:
     resolution: {integrity: sha512-jCdyLIT/tdQ1zhrbTQnJNK5nbDf0GoBpy5jVNywBzzMDF+Vs6uEaHnfz46dMtDxkvwrF2hzk5Z67goliceH0sA==}
@@ -3429,7 +3512,6 @@ packages:
       long: 4.0.0
       protobufjs: 7.1.1
       yargs: 16.2.0
-    dev: false
 
   /@hapi/hoek/9.3.0:
     resolution: {integrity: sha512-/c6rf4UJlmHlC9b5BaNvzAcFv7HZ2QHaV0D4/HNlBdvFnvQq8RI4kYdhyPCl7Xj+oWvTWQ8ujhqS53LIgAe6KQ==}
@@ -10740,7 +10822,6 @@ packages:
 
   /lodash.camelcase/4.3.0:
     resolution: {integrity: sha512-TwuEnCnxbc3rAvhf/LbG7tJUDzhqXyFnv3dtzLOPgCG/hODL7WFnsbwktkD7yUV0RrreP/l1PALq/YSg6VvjlA==}
-    dev: false
 
   /lodash.curry/4.1.1:
     resolution: {integrity: sha512-/u14pXGviLaweY5JI0IUzgzF2J6Ne8INyzAZjImcryjgkZ+ebruBxy2/JaOOkTqScddcYtakjhSaeemV8lR0tA==}
@@ -10797,7 +10878,6 @@ packages:
 
   /long/5.2.0:
     resolution: {integrity: sha512-9RTUNjK60eJbx3uz+TEGF7fUr29ZDxR5QzXcyDpeSfeH28S9ycINflOgOlppit5U+4kNTe83KQnMEerw7GmE8w==}
-    dev: false
 
   /longest-streak/3.0.1:
     resolution: {integrity: sha512-cHlYSUpL2s7Fb3394mYxwTYj8niTaNHUCLr0qdiCXQfSjfuA7CKofpX2uSwEfFDQ0EB7JcnMnm+GjbqqoinYYg==}
@@ -12981,7 +13061,6 @@ packages:
       '@protobufjs/utf8': 1.1.0
       '@types/node': 18.7.18
       long: 5.2.0
-    dev: false
 
   /proxy-addr/2.0.7:
     resolution: {integrity: sha512-llQsMLSUDUPT44jdrU/O37qlnifitDP+ZwrmmZcoSKyLKvtZxpyV0n2/bD/N4tBAAZ/gJEdZU7KMraoK1+XYAg==}
@@ -15420,7 +15499,6 @@ packages:
 
   /ts-log/2.2.5:
     resolution: {integrity: sha512-PGcnJoTBnVGy6yYNFxWVNkdcAuAMstvutN9MgDJIV6L0oG8fB+ZNNy1T+wJzah8RPGor1mZuPQkVfXNDpy9eHA==}
-    dev: true
 
   /ts-node/10.9.1_2cnt46lw4tdywdelgueo3bh3pq:
     resolution: {integrity: sha512-NtVysVPkxxrwFGUUxGYhfux8k78pQB3JqYBXlLRZgdGUqTO5wU/UyHop5p70iEbGhB7q5KmiZiU0Y3KlJrScEw==}
@@ -15499,6 +15577,18 @@ packages:
 
   /ts-proto/1.128.0:
     resolution: {integrity: sha512-1rn9+FHCnJc+C6V4o3ckublXttzTWIP8HOHfiMV4NtmRv0M5zKrMERfkubbxwPbAXNEzi1srOCimoQZpsxG/CQ==}
+    hasBin: true
+    dependencies:
+      '@types/object-hash': 1.3.4
+      dataloader: 1.4.0
+      object-hash: 1.3.1
+      protobufjs: 6.11.3
+      ts-poet: 6.1.0
+      ts-proto-descriptors: 1.7.1
+    dev: true
+
+  /ts-proto/1.129.0:
+    resolution: {integrity: sha512-BpEaceKO1dblM4TpaeIUcmHcm0F78zTXO3Ys1qtIr4Jcsk5KPZJAUo14arDYzwI6FiLWJ6K4vsy/KpxU5+OvAg==}
     hasBin: true
     dependencies:
       '@types/object-hash': 1.3.4
