@@ -5,7 +5,7 @@ import { buildApp } from "src/app";
 import { createFormData } from "tests/utils";
 
 const username = "test";
-const password = username;
+const password = "1234";
 
 let server: FastifyInstance;
 

@@ -25,20 +25,15 @@ services:
       - 3307:3306
 
   ssh-server:
-    image: lscr.io/linuxserver/openssh-server:latest
+    image: alpine-ssh
+    build:
+      context: ..
+      dockerfile: dev/ssh-server/Dockerfile
     ports:
-      - 22222:2222
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - USER_NAME=test
-      - PASSWORD_ACCESS=true
-      - SUDO_ACCESS=true
-      - USER_PASSWORD=test
-      - PUBLIC_KEY_FILE=/id_rsa.pub
+      - 22222:22
     volumes:
-      - ./ssh-server/custom-cont-init.d:/config/custom-cont-init.d
-      - $HOME/.ssh/id_rsa.pub:/id_rsa.pub
+      - $HOME/.ssh/id_rsa.pub:/root/.ssh/authorized_keys
+      - $HOME/.ssh/id_rsa.pub:/home/test/.ssh/authorized_keys
 
   ldap:
     image: ldaptest
