@@ -27,13 +27,11 @@ services:
   ssh-server:
     image: alpine-ssh
     build:
-      context: ..
-      dockerfile: dev/ssh-server/Dockerfile
+      context: dev/ssh-server
     ports:
       - 22222:22
     volumes:
-      - $HOME/.ssh/id_rsa.pub:/root/.ssh/authorized_keys
-      - $HOME/.ssh/id_rsa.pub:/home/test/.ssh/authorized_keys
+      - $HOME/.ssh/id_rsa.pub:/id_rsa.pub
 
   ldap:
     image: ldaptest
