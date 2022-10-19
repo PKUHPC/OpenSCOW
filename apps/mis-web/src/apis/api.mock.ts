@@ -197,6 +197,17 @@ export const mockApi: MockApi<typeof api> = {
     type: "Task",
   }], totalCount: 1, total: 10 }),
 
+  getTenantPayments: async () => ({ results: [{
+    amount: 10,
+    comment: "123",
+    index: 1,
+    time: "123",
+    tenantName: "default",
+    ipAddress: "127.0.0.1",
+    operatorId: "123",
+    type: "Task",
+  }], totalCount: 1, total: 10 }),
+
   getUsedPayTypes: async () => ({ types: ["Pay", "JobPriceChange"]}),
 
   changeJobPrice: async () => ({ count: 10 }),
