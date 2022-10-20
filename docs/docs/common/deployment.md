@@ -33,8 +33,8 @@ title: 部署
 目前系统处于alpha阶段，暂不提供构建好的镜像下载。本部分介绍如何从源码构建项目的镜像。
 
 1. 在服务节点中安装以下软件：
-    - [docker](https://docs.docker.com/engine/install/)
-    - [docker compose](https://docs.docker.com/compose/install/)
+   - [docker](https://docs.docker.com/engine/install/)
+   - [docker compose](https://docs.docker.com/compose/install/)
 
 2. 从仓库clone项目
 
@@ -69,14 +69,20 @@ cd scow-deployment
 
 ```bash
 cp -r config-example config
-cp .env.example .env
+cp config-example.py config.py
 ```
 
-打开`.env`，根据内部备注提示修改基础配置。
+打开`config.py`，根据内部备注提示修改基础配置。
 
 ```bash
-vim .env
+vim config.py
 ```
+
+## 生成配置文件
+
+​```bash
+python generate.py
+​```
 
 ## 配置
 
@@ -90,11 +96,11 @@ vim .env
 部署完成后，运行以下命令启动系统。
 
 ```bash
-docker compose up -d
+./compose.sh up -d
 ```
 
 当修改了配置文件后，运行以下命令重启系统
 
 ```bash
-docker compose restart
+./compose.sh./ restart
 ```
