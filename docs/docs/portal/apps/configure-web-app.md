@@ -53,7 +53,7 @@ web:
 增加了此文件后，运行以下命令重启job-server即可。
 
 ```bash
-./compose.sh restart portal-web
+docker compose restart portal-web
 ```
 
 ## 配置解释

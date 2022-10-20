@@ -69,19 +69,13 @@ cd scow-deployment
 
 ```bash
 cp -r config-example config
-cp config-example.py config.py
+cp .env.example .env
 ```
 
-打开`config.py`，根据内部备注提示修改基础配置。
+打开`.env`，根据内部备注提示修改基础配置。
 
 ```bash
-vim config.py
-```
-
-## 生成配置文件
-
-```bash
-python generate.py
+vim .env
 ```
 
 ## 配置
@@ -96,11 +90,11 @@ python generate.py
 部署完成后，运行以下命令启动系统。
 
 ```bash
-./compose.sh up -d
+docker compose up -d
 ```
 
 当修改了配置文件后，运行以下命令重启系统
 
 ```bash
-./compose.sh./ restart
+docker compose restart
 ```
