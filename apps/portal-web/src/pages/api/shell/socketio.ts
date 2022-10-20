@@ -70,7 +70,8 @@ export default async (req: NextApiRequest, res: NextApiResponseServerIO) => {
           socket.emit("data", chunk.message.data.data);
           break;
         case "exit":
-          socket.emit("exit", chunk.message.exit);
+          console.log("received exit");
+          socket.emit("exit", { exitCode: chunk.message.exit.code, signal: chunk.message.exit.signal });
           break;
         }
       });
@@ -79,8 +80,8 @@ export default async (req: NextApiRequest, res: NextApiResponseServerIO) => {
         stream.write({ message: { $case: "resize", resize: { cols: data.cols, rows: data.rows } } });
       });
 
-      socket.on("data", (data) => {
-        stream.write({ message:  { $case :"data", data: { data } } });
+      socket.on("data", ([data]: [string]) => {
+        stream.write({ message:  { $case :"data", data: { data: Buffer.from(data) } } });
       });
 
       socket.on("disconnect", () => {
