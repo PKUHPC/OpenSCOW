@@ -75,7 +75,7 @@ MIS = {
 
 ## `BASE_PATH`填写规则
 
-`config.py`中，`COMMON.BASE_PATH`、`PORTAL.BASE_PATH`和`MIS.BASE_PATH`均不以`/`结尾。`COMMON.BASE_PATH`填写整个系统的根路径，`PORTAL.BASE_PATH`和`MIS.BASE_PATH`分别表示门户系统和管理系统相对于系统的相对路径，遵循以下的编写原 123 则：
+`config.py`中，`COMMON.BASE_PATH`、`PORTAL.BASE_PATH`和`MIS.BASE_PATH`均不以`/`结尾。`COMMON.BASE_PATH`填写整个系统的根路径，`PORTAL.BASE_PATH`和`MIS.BASE_PATH`分别表示门户系统和管理系统相对于系统的相对路径，遵循以下的编写原则：
 
 | 整个系统的访问路径 | 门户系统的访问路径 | 管理系统的访问路径 | `COMMON.BASE_PATH` | `PORTAL.BASE_PATH` | `MIS.BASE_PATH` |
 | ------------------ | ------------------ | ------------------ | ------------------ | ------------------ | --------------- |
