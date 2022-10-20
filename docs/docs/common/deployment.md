@@ -102,5 +102,5 @@ python generate.py
 当修改了配置文件后，运行以下命令重启系统
 
 ```bash
-./compose.sh./ restart
+./compose.sh restart
 ```
