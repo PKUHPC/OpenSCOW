@@ -23,6 +23,7 @@ message KillDesktopRequest {
   uint32 display_id = 3;
 }
 
+// NOT_FOUND: cluster is not found
 message KillDesktopResponse {}
 
 message ConnectToDesktopRequest {

@@ -1,5 +1,5 @@
+import { createWriterExtensions } from "@ddadaal/tsgrpc-common";
 import { plugin } from "@ddadaal/tsgrpc-server";
-import { augmentedWriter } from "@ddadaal/tsgrpc-server/lib/utils";
 import { ServiceError, status } from "@grpc/grpc-js";
 import { quote } from "shell-quote";
 import { ShellServiceServer, ShellServiceService } from "src/generated/portal/shell";
@@ -38,7 +38,7 @@ export const shellServiceServer = plugin((server) => {
         await ssh.withShell(async (channel) => {
           logger.info("Shell requested");
 
-          const { writeAsync } = augmentedWriter(channel);
+          const { writeAsync } = createWriterExtensions(channel);
 
           if (path) {
             logger.info("cd to path %s", path);

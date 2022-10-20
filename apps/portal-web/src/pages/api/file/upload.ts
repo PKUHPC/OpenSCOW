@@ -1,9 +1,11 @@
-import { sshRawConnect } from "@scow/lib-ssh";
-import busboy from "busboy";
+import { asyncRequestStreamCall } from "@ddadaal/tsgrpc-client";
+import busboy, { BusboyEvents } from "busboy";
+import { once } from "events";
 import { authenticate } from "src/auth/server";
-import { runtimeConfig } from "src/utils/config";
+import { FileServiceClient } from "src/generated/portal/file";
+import { getClient } from "src/utils/client";
+import { pipeline } from "src/utils/pipeline";
 import { route } from "src/utils/route";
-import { getClusterLoginNode } from "src/utils/ssh";
 
 export interface UploadFileSchema {
   method: "POST";
@@ -29,53 +31,26 @@ export default route<UploadFileSchema>("UploadFileSchema", async (req, res) => {
 
   if (!info) { return; }
 
-  const host = getClusterLoginNode(cluster);
-
-  if (!host) {
-    return { 400: { code: "INVALID_CLUSTER" } };
-  }
-
   const bb = busboy({ headers: req.headers });
 
-  const ssh = await sshRawConnect(host, info.identityId, runtimeConfig.ROOT_KEY_PAIR, req.log);
+  const client = getClient(FileServiceClient);
 
-  const sftp = await ssh.requestSFTP();
+  return await asyncRequestStreamCall(client, "upload", async ({ writeAsync }, stream) => {
+    await writeAsync({ message: { $case: "info", info: { cluster, path, userId: info.identityId } } });
 
+    const [_name, file] = (await once(bb, "file")) as Parameters<BusboyEvents["file"]>;
 
-  const ws = sftp.createWriteStream(path);
+    await pipeline(
+      file,
+      (chunk) => ({ message: { $case: "chunk" as const, chunk } }),
+      stream,
+    );
 
-  await new Promise<void>((resolve) => {
-    const disconnect = () => {
-      ssh.dispose();
-      resolve();
-    };
-
-    ws.on("close", () => {
-      disconnect();
-      res.status(204).send(null);
-    });
-
-    ws.on("error", (error) => {
-      disconnect();
-      res.status(500).send(new Error("Error at write stream", { cause: error }) as any);
-    });
-
-    bb.on("file", (name, file) => {
-      file.on("end", () => {
-        ws.end();
-      });
-
-      file.pipe(ws);
-    });
-
-    bb.on("error", (error: Error) => {
-      disconnect();
-      res.status(500).send(new Error("Error reading request", { cause: error }) as any);
-    });
-
-    req.pipe(bb);
+  }).then(() => ({ 204: null }), (e) => {
+    throw new Error("Error when writing stream", { cause: e });
+  }).finally(() => {
+    bb.end();
   });
-
 });
 
 export const config = {

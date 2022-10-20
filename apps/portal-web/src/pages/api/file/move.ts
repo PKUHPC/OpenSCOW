@@ -1,7 +1,10 @@
-import { sftpRename } from "@scow/lib-ssh";
+import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
+import { status } from "@grpc/grpc-js";
 import { authenticate } from "src/auth/server";
+import { FileServiceClient } from "src/generated/portal/file";
+import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
-import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
+import { handlegRPCError } from "src/utils/server";
 
 export interface MoveFileItemSchema {
   method: "PATCH";
@@ -29,22 +32,13 @@ export default route<MoveFileItemSchema>("MoveFileItemSchema", async (req, res) 
 
   const { cluster, fromPath, toPath } = req.body;
 
-  const host = getClusterLoginNode(cluster);
+  const client = getClient(FileServiceClient);
 
-  if (!host) {
-    return { 400: { code: "INVALID_CLUSTER" } };
-  }
-
-  return await sshConnect(host, info.identityId, req.log, async (ssh) => {
-    const sftp = await ssh.requestSFTP();
-
-    const error = await sftpRename(sftp)(fromPath, toPath).catch((e) => e);
-    if (error) {
-      return { 415: { code: "RENAME_FAILED", error } };
-    }
-
-    return { 204: null };
-  });
-
+  return asyncUnaryCall(client, "move", {
+    cluster, fromPath, toPath, userId: info.identityId,
+  }).then(() => ({ 204: null }), handlegRPCError({
+    [status.INTERNAL]: (e) => ({ 415: { code: "RENAME_FAILED" as const, error: e.details } }),
+    [status.NOT_FOUND]: () => ({ 400: { code: "INVALID_CLUSTER" as const } }),
+  }));
 
 });

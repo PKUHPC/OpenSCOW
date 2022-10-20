@@ -3,7 +3,7 @@ import { ObjectWritable } from "@grpc/grpc-js/build/src/object-stream";
 
 export async function pipeline<TSource, TTarget>(
   source: AsyncIterable<TSource>,
-  transform: (source: TSource) => Promise<TTarget | undefined>,
+  transform: (source: TSource) => TTarget | undefined | Promise<TTarget | undefined>,
   target: ObjectWritable<TTarget>,
   options?: { signal: AbortSignal },
 ) {

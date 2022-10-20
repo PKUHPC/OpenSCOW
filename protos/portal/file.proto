@@ -9,6 +9,7 @@ message CopyRequest {
   string to_path = 4;
 }
 
+// NOT_FOUND: cluster is not found
 // INTERNAL: cp command failed. message has stdout
 message CopyResponse {}
 
@@ -18,6 +19,7 @@ message CreateFileRequest {
   string path = 3;
 }
 
+// NOT_FOUND: cluster is not found
 // ALREADY_EXISTS: file also exists
 message CreateFileResponse {}
 
@@ -27,6 +29,7 @@ message DeleteDirectoryRequest {
   string path = 3;
 }
 
+// NOT_FOUND: cluster is not found
 message DeleteDirectoryResponse {}
 
 message DeleteFileRequest {
@@ -35,6 +38,7 @@ message DeleteFileRequest {
   string path = 3;
 }
 
+// NOT_FOUND: cluster is not found
 message DeleteFileResponse {}
 
 message DownloadRequest {
@@ -50,10 +54,9 @@ message GetHomeDirectoryRequest {
   string cluster = 2;
 }
 
+// NOT_FOUND: cluster is not found
 message GetHomeDirectoryResponse { string path = 1; }
 
-// PERMISSION_DENIED: directory is not accessible
-// CONFLICT: path is not directory or not exists
 message ReadDirectoryRequest {
   string user_id = 1;
   string cluster = 2;
@@ -74,6 +77,8 @@ message FileInfo {
   uint32 size = 5;
 }
 
+// PERMISSION_DENIED: directory is not accessible
+// NOT_FOUND: path is not directory or not exists
 message ReadDirectoryResponse { repeated FileInfo results = 1; }
 
 message MoveRequest {
@@ -83,7 +88,7 @@ message MoveRequest {
   string to_path = 4;
 }
 
-// INTERNAL: rename failed. message has error
+// INTERNAL: rename failed. details has error
 message MoveResponse {}
 
 message MakeDirectoryRequest {
@@ -92,7 +97,8 @@ message MakeDirectoryRequest {
   string path = 3;
 }
 
-// ALREADY_EXISTS
+// NOT_FOUND: cluster not found
+// ALREADY_EXISTS: directory already found
 message MakeDirectoryResponse {}
 
 message UploadRequest {

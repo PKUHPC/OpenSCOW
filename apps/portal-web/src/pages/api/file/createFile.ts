@@ -1,7 +1,10 @@
-import { sftpExists, sftpWriteFile } from "@scow/lib-ssh";
+import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
+import { status } from "@grpc/grpc-js";
 import { authenticate } from "src/auth/server";
+import { FileServiceClient } from "src/generated/portal/file";
+import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
-import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
+import { handlegRPCError } from "src/utils/server";
 
 export interface CreateFileSchema {
   method: "POST";
@@ -30,23 +33,13 @@ export default route<CreateFileSchema>("CreateFileSchema", async (req, res) => {
 
   const { cluster, path } = req.body;
 
-  const host = getClusterLoginNode(cluster);
+  const client = getClient(FileServiceClient);
 
-  if (!host) {
-    return { 400: { code: "INVALID_CLUSTER" } };
-  }
-
-  return await sshConnect(host, info.identityId, req.log, async (ssh) => {
-    const sftp = await ssh.requestSFTP();
-
-    if (await sftpExists(sftp, path)) {
-      return { 409: { code: "ALREADY_EXISTS" } };
-    }
-
-    await sftpWriteFile(sftp)(path, Buffer.alloc(0));
-
-    return { 204: null };
-  });
-
+  return asyncUnaryCall(client, "createFile", {
+    cluster, path, userId: info.identityId,
+  }).then(() => ({ 204: null }), handlegRPCError({
+    [status.NOT_FOUND]: () => ({ 400: { code: "INVALID_CLUSTER" as const } }),
+    [status.ALREADY_EXISTS]: () => ({ 409: { code: "ALREADY_EXISTS" as const } }),
+  }));
 
 });
