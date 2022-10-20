@@ -13,36 +13,45 @@ title: 部署
 
 请参考[export-jobs](https://%GIT_PLATFORM%.com/%ORGANIZATION_NAME%/export-jobs)项目配置源作业信息数据库。
 
-## 修改.env文件
+## 修改config.py文件
 
-修改部署路径下的.env文件
+修改部署路径下的`config.py`文件
 
-```env
-# 确保COMPOSE_PROFILES中包括mis
-# COMPOSE_PROFILES=mis
-COMPOSE_PROFILES=mis,portal
+```python
+# 确保管理系统会部署，即MIS不能配置为False
+# 如果将会部署在`/mis`路径下，设置"MIS.BASE_PATH"为 "/mis"，"MIS.IMAGE_POSTFIX"为 "mis"
+MIS = {
+  "BASE_PATH": "/mis",
+  "IMAGE_POSTFIX": "mis",
+  # ...
+}
 
-# 确认管理系统会部署
-MIS_DEPLOYED=true
+# 如果将会部署在域名的根目录下，设置"MIS.BASE_PATH"为 "/"，"MIS.IMAGE_POSTFIX"为 "root"
+MIS = {
+  "BASE_PATH": "/",
+  "IMAGE_POSTFIX": "root",
+  # ...
+}
 
-# 如果将会部署在`/mis`路径下，按如下设置这两个变量
-MIS_BASE_PATH=/mis
-MIS_IMAGE_POSTFIX=mis
+# MIS.BASE_PATH若不设置，将会取其默认值"/mis"
+MIS = {
+  "IMAGE_POSTFIX": "mis",
+  # ...
+}
 
-# 如果本项目将会部署在域名的根目录下，按如下设置这两个变量
-MIS_BASE_PATH=/
-MIS_IMAGE_POSTFIX=root
-
-# 设置管理系统数据库密码
+# MIS.DB_PASSWORD为管理系统数据库密码
 # 在系统第一次启动前可自由设置，使用此密码可以以root身份登录数据库
 # 一旦数据库启动后即不可修改
 # 必须长于8个字符，并同时包括字母、数字和符号
-MIS_DB_PASSWORD=must!chang3this
+MIS = {
+  # ...
+  "DB_PASSWORD": "must!chang3this"
+}
 ```
 
 :::tip
 
-如果想自定义系统部署的相对路径，或者了解`MIS_BASE_PATH`的含义，请参考[自定义相对路径](../common/customization/basepath.md)。
+如果想自定义系统部署的相对路径，或者了解`MIS.BASE_PATH`的含义，请参考[自定义相对路径](../common/customization/basepath.md)。
 
 :::
 
@@ -99,7 +108,7 @@ accountNamePattern:
 
 ## 启动服务
 
-运行`docker compose up -d`启动管理系统。
+运行`./compose.sh up -d`启动管理系统。
 
 ## 系统初始化
 

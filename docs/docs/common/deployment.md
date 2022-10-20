@@ -80,9 +80,9 @@ vim config.py
 
 ## 生成配置文件
 
-​```bash
+```bash
 python generate.py
-​```
+```
 
 ## 配置
 
