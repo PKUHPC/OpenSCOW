@@ -53,6 +53,8 @@ export const appServiceServer = plugin((server) => {
 
       const clusterops = getClusterOps(cluster);
 
+      if (!clusterops) { throw clusterNotFound(cluster); }
+
       const reply = await clusterops.app.createApp({
         appId,
         userId,
@@ -64,7 +66,7 @@ export const appServiceServer = plugin((server) => {
       }, logger);
 
       if (reply.code === "SBATCH_FAILED") {
-        throw <ServiceError> { code: Status.UNAVAILABLE, message: reply.message };
+        throw <ServiceError> { code: Status.INTERNAL, message: "sbatch failed", details: reply.message };
       }
 
       if (reply.code === "APP_NOT_FOUND") {
@@ -79,6 +81,8 @@ export const appServiceServer = plugin((server) => {
       const { cluster, userId } = request;
 
       const clusterops = getClusterOps(cluster);
+
+      if (!clusterops) { throw clusterNotFound(cluster); }
 
       const reply = await clusterops.app.listAppSessions({ userId }, logger);
 

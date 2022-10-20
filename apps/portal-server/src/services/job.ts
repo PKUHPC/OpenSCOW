@@ -141,7 +141,9 @@ export const jobServiceServer = plugin((server) => {
       }, logger);
 
       if (reply.code === "SBATCH_FAILED") {
-        throw <ServiceError>{ code: Status.INTERNAL, message: reply.message };
+        throw <ServiceError>{
+          code: Status.INTERNAL, message: "sbatch failed", details: reply.message,
+        };
       }
 
       return [{ jobId: reply.jobId }];

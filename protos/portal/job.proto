@@ -103,7 +103,7 @@ message SubmitJobRequest {
 }
 
 // NOT_FOUND: cluster is not found
-// INTERNAL: sbatch failed. message has output
+// INTERNAL: sbatch failed. details has output
 message SubmitJobResponse { uint32 job_id = 1; }
 
 service JobService {

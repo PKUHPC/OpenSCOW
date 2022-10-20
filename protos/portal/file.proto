@@ -10,7 +10,7 @@ message CopyRequest {
 }
 
 // NOT_FOUND: cluster is not found
-// INTERNAL: cp command failed. message has stdout
+// INTERNAL: cp command failed. details has stderr
 message CopyResponse {}
 
 message CreateFileRequest {
@@ -78,7 +78,7 @@ message FileInfo {
 }
 
 // PERMISSION_DENIED: directory is not accessible
-// NOT_FOUND: path is not directory or not exists
+// INVALID_ARGUMENT: path is not directory or not exists
 message ReadDirectoryResponse { repeated FileInfo results = 1; }
 
 message MoveRequest {

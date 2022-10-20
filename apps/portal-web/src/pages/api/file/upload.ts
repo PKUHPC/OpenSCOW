@@ -38,17 +38,19 @@ export default route<UploadFileSchema>("UploadFileSchema", async (req, res) => {
   return await asyncRequestStreamCall(client, "upload", async ({ writeAsync }, stream) => {
     await writeAsync({ message: { $case: "info", info: { cluster, path, userId: info.identityId } } });
 
-    const [_name, file] = (await once(bb, "file")) as Parameters<BusboyEvents["file"]>;
+    const [_name, file] = (await once(bb, "file").catch((e) => {
+      throw new Error("Error when waiting for file upload", { cause: e });
+    })) as Parameters<BusboyEvents["file"]>;
 
     await pipeline(
       file,
       (chunk) => ({ message: { $case: "chunk" as const, chunk } }),
       stream,
-    );
+    ).catch((e) => {
+      throw new Error("Error when writing stream", { cause: e });
+    });
 
-  }).then(() => ({ 204: null }), (e) => {
-    throw new Error("Error when writing stream", { cause: e });
-  }).finally(() => {
+  }).then(() => ({ 204: null })).finally(() => {
     bb.end();
   });
 });

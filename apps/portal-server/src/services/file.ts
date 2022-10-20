@@ -26,7 +26,7 @@ export const fileServiceServer = plugin((server) => {
         const resp = await ssh.exec("cp", ["-r", fromPath, toPath], { stream: "both" });
 
         if (resp.code !== 0) {
-          throw <ServiceError> { code: status.INTERNAL, message: resp.stderr };
+          throw <ServiceError> { code: status.INTERNAL, message: "cp command failed", details: resp.stderr };
         }
 
         return [{}];
@@ -116,7 +116,7 @@ export const fileServiceServer = plugin((server) => {
         const sftp = await ssh.requestSFTP();
 
         if (await sftpExists(sftp, path)) {
-          throw <ServiceError>{ code: status.ALREADY_EXISTS, message: `${path} already exists` };
+          throw <ServiceError>{ code: status.ALREADY_EXISTS, details: `${path} already exists` };
         }
 
         await sftpMkdir(sftp)(path);
@@ -137,7 +137,7 @@ export const fileServiceServer = plugin((server) => {
         const sftp = await ssh.requestSFTP();
         const error = await sftpRename(sftp)(fromPath, toPath).catch((e) => e);
         if (error) {
-          throw <ServiceError>{ code: status.INTERNAL, message: error };
+          throw <ServiceError>{ code: status.INTERNAL, message: "rename failed", details: error };
         }
 
         return [{}];
@@ -156,12 +156,15 @@ export const fileServiceServer = plugin((server) => {
 
         const stat = await sftpStat(sftp)(path).catch((e) => {
           logger.error(e, "stat %s as %s failed", path, userId);
-          throw <ServiceError> { code: status.PERMISSION_DENIED, message: `${path} is not accessible` };
+          throw <ServiceError> {
+            code: status.PERMISSION_DENIED, message: `${path} is not accessible`,
+          };
         });
 
         if (!stat.isDirectory()) {
           throw <ServiceError> {
-            code: status.FAILED_PRECONDITION, message: `${path} is not directory or not exists` };
+            code: status.INVALID_ARGUMENT,
+            message: `${path} is not directory or not exists` };
         }
 
         const files = await sftpReaddir(sftp)(path);
@@ -210,7 +213,8 @@ export const fileServiceServer = plugin((server) => {
         ).catch((e) => {
           throw <ServiceError> {
             code: status.INTERNAL,
-            details: "Error when reading file. Message: " + e?.message,
+            message: "Error when reading file",
+            details: e?.message,
           };
         });
 
@@ -244,11 +248,12 @@ export const fileServiceServer = plugin((server) => {
         class RequestError {
           constructor(
             public code: ServiceError["code"],
-            public details: ServiceError["details"],
+            public message: ServiceError["message"],
+            public details?: ServiceError["details"],
           ) {}
 
           toServiceError(): ServiceError {
-            return <ServiceError> { code: this.code, details: this.details };
+            return <ServiceError> { code: this.code, message: this.message, details: this.details };
           }
         }
 
@@ -290,10 +295,11 @@ export const fileServiceServer = plugin((server) => {
           if (e instanceof RequestError) {
             throw e.toServiceError();
           } else {
-            throw <ServiceError> {
-              code: status.INTERNAL,
-              details: "Error when writing file. Message: " + e?.message,
-            };
+            throw new RequestError(
+              status.INTERNAL,
+              "Error when writing file",
+              e.message,
+            ).toServiceError();
           }
 
         }
