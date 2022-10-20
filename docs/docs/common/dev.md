@@ -108,6 +108,9 @@ pnpm test
 
 # 对某一项目运行测试（此为对@scow/portal-web项目运行测试）
 pnpm --filter portal-web test
+
+# 停止开发环境
+pnpm devenv:stop
 ```
 
 ## 容器构建说明
