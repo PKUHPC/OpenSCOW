@@ -78,12 +78,6 @@ cp config-example.py config.py
 vim config.py
 ```
 
-## 生成配置文件
-
-```bash
-python generate.py
-```
-
 ## 配置
 
 根据以下顺序配置系统其他组件：
