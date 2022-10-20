@@ -106,8 +106,6 @@ const buildRuntimeConfig = async (phase) => {
   const serverRuntimeConfig = {
     BASE_PATH: config.BASE_PATH,
     AUTH_INTERNAL_URL: config.AUTH_INTERNAL_URL,
-    SSH_PRIVATE_KEY_PATH: config.SSH_PRIVATE_KEY_PATH,
-    ROOT_KEY_PAIR: keyPair,
     CLUSTERS_CONFIG: clusters,
     PORTAL_CONFIG: portalConfig,
     DEFAULT_PRIMARY_COLOR,
@@ -147,7 +145,11 @@ const buildRuntimeConfig = async (phase) => {
     DEFAULT_HOME_TITLE: portalConfig.homeTitle.defaultText,
     HOME_TITLES: portalConfig.homeTitle.hostnameMap,
 
-    CLUSTERS_CONFIG: clusters,
+    CLUSTERS_CONFIG: Object.entries(clusters).reduce((prev, [name, config]) => {
+      prev[name] = { displayName: config.displayName, slurm: { partitions: config.slurm.partitions } }
+      return prev;
+    }, {}),
+
     CLUSTERS: Object.entries(clusters).map(([id, { displayName }]) => ({ id, name: displayName })),
 
     APPS: Object.entries(apps).map(([id, { name }]) => ({ id, name })),
