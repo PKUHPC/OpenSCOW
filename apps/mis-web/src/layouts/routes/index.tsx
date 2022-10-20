@@ -12,136 +12,164 @@ import { PlatformRole, TenantRole, UserRole } from "src/models/User";
 import { User } from "src/stores/UserStore";
 import { publicConfig } from "src/utils/config";
 
-export const platformAdminRoutes: NavItemProps[] = [
+export const platformAdminRoutes: (platformRoles: PlatformRole[]) => NavItemProps[] = (platformRoles) => [
   {
     Icon: UserOutlined,
     text: "平台管理",
     path: "/admin",
     clickable: false,
     children: [
-      {
-        Icon: ClockCircleOutlined,
-        text: "获取作业",
-        path: "/admin/fetchJobs",
-      },
-      {
-        Icon: UserOutlined,
-        text: "导入用户",
-        path: "/admin/importUsers",
-      },
-      {
-        Icon: MoneyCollectOutlined,
-        text: "查询作业计费项",
-        path: "/admin/jobBillingItems",
-      },
-      {
-        Icon: MoneyCollectOutlined,
-        text: "管理作业价格表",
-        path: "/admin/jobBillingTable",
-      },
+      ...platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ? [
+        {
+          Icon: ClockCircleOutlined,
+          text: "获取作业",
+          path: "/admin/fetchJobs",
+        },
+        {
+          Icon: UserOutlined,
+          text: "导入用户",
+          path: "/admin/importUsers",
+        },
+        {
+          Icon: UserOutlined,
+          text: "全部用户",
+          path: "/admin/users",
+        },
+        {
+          Icon: MoneyCollectOutlined,
+          text: "查询作业计费项",
+          path: "/admin/jobBillingItems",
+        },
+        {
+          Icon: MoneyCollectOutlined,
+          text: "管理作业价格表",
+          path: "/admin/jobBillingTable",
+        },
+      ] : [],
+      ...platformRoles.includes(PlatformRole.PLATFORM_FINANCE) ? [
+        {
+          Icon: MoneyCollectOutlined,
+          text: "财务管理",
+          path: "/admin/finance",
+          clickable: false,
+          children: [
+            {
+              Icon: PlusSquareOutlined,
+              text: "账户充值",
+              path: "/admin/finance/pay",
+            },
+            {
+              Icon: BookOutlined,
+              text: "充值记录",
+              path: "/admin/finance/payments",
+            },
+          ],
+        },
+      ] : [],
     ],
   },
 ];
 
-export const tenantFinanceRoutes: NavItemProps[] = [
-  {
-    Icon: MoneyCollectOutlined,
-    text: "财务管理",
-    path: "/finance",
-    clickable: false,
-    children: [
-      {
-        Icon: PlusSquareOutlined,
-        text: "账户充值",
-        path: "/finance/payAccount",
-      },
-      {
-        Icon: BookOutlined,
-        text: "充值记录",
-        path: "/finance/payments",
-      },
-    ],
-  },
-];
-
-export const tenantAdminRoutes: NavItemProps[] = [
+export const tenantRoutes: (tenantRoles: TenantRole[]) => NavItemProps[] = (tenantRoles) => [
   {
     Icon: CloudServerOutlined,
     text: "租户管理",
     path: "/tenant",
     clickToPath: "/tenant/info",
     children: [
-      {
-        Icon: InfoOutlined,
-        text: "租户信息",
-        path: "/tenant/info",
-      },
-      {
-        Icon: MoneyCollectOutlined,
-        text: "管理作业价格表",
-        path: "/tenant/jobBillingTable",
-      },
-      {
-        Icon: BookOutlined,
-        text: "运行中的作业",
-        path: "/tenant/runningJobs",
-      },
-      {
-        Icon: BookOutlined,
-        text: "已结束的作业",
-        path: "/tenant/historyJobs",
-      },
-      {
-        Icon: UserOutlined,
-        text: "用户管理",
-        path: "/tenant/users",
-        clickToPath: "/tenant/users/list",
-        children: [
-          {
-            Icon: UserOutlined,
-            text: "用户列表",
-            path: "/tenant/users/list",
-          },
-          ...publicConfig.ENABLE_CREATE_USER ? [{
-            Icon: UserAddOutlined,
-            text: "创建用户",
-            path: "/tenant/users/create",
-          }] : [],
-        ],
-      },
-      {
-        Icon: ClockCircleOutlined,
-        text: "调整作业时间限制",
-        path: "/tenant/jobTimeLimit",
-      },
-      // {
-      //   Icon: CloudOutlined,
-      //   text: "调整用户存储空间",
-      //   path: "/tenant/storage",
-      // },
-      {
-        Icon: AccountBookOutlined,
-        text: "账户管理",
-        path: "/tenant/accounts",
-        clickToPath: "/tenant/accounts/list",
-        children: [
-          {
-            Icon: AccountBookOutlined,
-            text: "账户列表",
-            path: "/tenant/accounts/list",
-          },
-          {
-            Icon: PlusOutlined,
-            text: "创建账户",
-            path: "/tenant/accounts/create",
-          },
-          {
-            Icon: <AntdIcon component={Whitelist} />,
-            text: "账户白名单",
-            path: "/tenant/accounts/whitelist",
-          },
-        ],
-      },
+      ...tenantRoles.includes(TenantRole.TENANT_ADMIN) ? [
+        {
+          Icon: InfoOutlined,
+          text: "租户信息",
+          path: "/tenant/info",
+        },
+        {
+          Icon: MoneyCollectOutlined,
+          text: "管理作业价格表",
+          path: "/tenant/jobBillingTable",
+        },
+        {
+          Icon: BookOutlined,
+          text: "运行中的作业",
+          path: "/tenant/runningJobs",
+        },
+        {
+          Icon: BookOutlined,
+          text: "已结束的作业",
+          path: "/tenant/historyJobs",
+        },
+        {
+          Icon: UserOutlined,
+          text: "用户管理",
+          path: "/tenant/users",
+          clickToPath: "/tenant/users/list",
+          children: [
+            {
+              Icon: UserOutlined,
+              text: "用户列表",
+              path: "/tenant/users/list",
+            },
+            ...publicConfig.ENABLE_CREATE_USER ? [{
+              Icon: UserAddOutlined,
+              text: "创建用户",
+              path: "/tenant/users/create",
+            }] : [],
+          ],
+        },
+        {
+          Icon: ClockCircleOutlined,
+          text: "调整作业时间限制",
+          path: "/tenant/jobTimeLimit",
+        },
+        // {
+        //   Icon: CloudOutlined,
+        //   text: "调整用户存储空间",
+        //   path: "/tenant/storage",
+        // },
+        {
+          Icon: AccountBookOutlined,
+          text: "账户管理",
+          path: "/tenant/accounts",
+          clickToPath: "/tenant/accounts/list",
+          children: [
+            {
+              Icon: AccountBookOutlined,
+              text: "账户列表",
+              path: "/tenant/accounts/list",
+            },
+            {
+              Icon: PlusOutlined,
+              text: "创建账户",
+              path: "/tenant/accounts/create",
+            },
+            {
+              Icon: <AntdIcon component={Whitelist} />,
+              text: "账户白名单",
+              path: "/tenant/accounts/whitelist",
+            },
+          ],
+        },
+      ] : [],
+      ...tenantRoles.includes(TenantRole.TENANT_FINANCE) ? [
+        {
+          Icon: MoneyCollectOutlined,
+          text: "财务管理",
+          path: "/tenant/finance",
+          clickable: false,
+          children: [
+            {
+              Icon: PlusSquareOutlined,
+              text: "账户充值",
+              path: "/tenant/finance/payAccount",
+            },
+            {
+              Icon: BookOutlined,
+              text: "充值记录",
+              path: "/tenant/finance/payments",
+            },
+          ],
+        },
+      ] : [],
     ],
   },
 ];
@@ -240,16 +268,12 @@ export const getAvailableRoutes = (user: User): NavItemProps[] => {
     routes.push(...accountAdminRoutes(adminAccounts));
   }
 
-  if (user.tenantRoles.includes(TenantRole.TENANT_FINANCE)) {
-    routes.push(...tenantFinanceRoutes);
-  }
-
-  if (user.tenantRoles.includes(TenantRole.TENANT_ADMIN)) {
-    routes.push(...tenantAdminRoutes);
+  if (user.tenantRoles.length !== 0) {
+    routes.push(...tenantRoutes(user.tenantRoles));
   }
 
   if (user.platformRoles.includes(PlatformRole.PLATFORM_ADMIN)) {
-    routes.push(...platformAdminRoutes);
+    routes.push(...platformAdminRoutes(user.platformRoles));
   }
 
   return routes;

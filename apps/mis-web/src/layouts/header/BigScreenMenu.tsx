@@ -36,7 +36,8 @@ export const BigScreenMenu: React.FC<Props> = ({
         arrayContainsElement(routes)
           ? (
             <Menu
-              theme="light" mode="horizontal"
+              theme="light"
+              mode="horizontal"
               selectedKeys={selectedKeys}
               style={{ border: 0 }}
               forceSubMenuRender

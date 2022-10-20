@@ -25,7 +25,7 @@ export const UserJobsPage: NextPage = requireAuth(
         <Head title={title} />
         <PageTitle
           beforeTitle={(
-            <BackButton href={`/accounts/${accountName}/users`}/>
+            <BackButton href={`/accounts/${accountName}/users`} />
           )}
           titleText={title}
         />

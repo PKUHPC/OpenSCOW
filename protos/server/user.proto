@@ -202,11 +202,66 @@ message GetUserInfoReply {
 
 message GetUsersReply { repeated User users = 1; }
 
+message PlatformUserInfo {
+  string user_id = 1;
+  string name = 2;
+  google.protobuf.Timestamp create_time = 3;
+  repeated PlatformRole platform_roles = 4;
+}
+
+message GetAllUsersRequest {
+  uint32 page = 1;
+  optional uint64 page_size = 2;
+}
+
+message GetAllUsersReply { 
+  uint64 total_count = 1;
+  repeated PlatformUserInfo platform_users = 2;
+}
+
+message SetPlatformRoleRequest {
+  string user_id = 1;
+  PlatformRole role_type = 2;
+}
+
+// FAILED_PRECONDITION: the user is already this role(role_type)
+// NOT_FOUND: user is not found.
+message SetPlatformRoleReply {}
+
+message UnsetPlatformRoleRequest {
+  string user_id = 1;
+  PlatformRole role_type = 2;
+}
+
+// FAILED_PRECONDITION: the user is already not this role(role_type)
+// NOT_FOUND: user is not found.
+message UnsetPlatformRoleReply {}
+
+message SetTenantRoleRequest {
+  string user_id = 1;
+  TenantRole role_type = 2;
+}
+
+// FAILED_PRECONDITION: the user is already this role(role_type)
+// NOT_FOUND: user is not found.
+message SetTenantRoleReply {}
+
+message UnsetTenantRoleRequest {
+  string user_id = 1;
+  TenantRole role_type = 2;
+}
+
+// FAILED_PRECONDITION: the user is already not this role(role_type)
+// NOT_FOUND: user is not found.
+message UnsetTenantRoleReply {}
+
 service UserService {
 
   rpc GetUsers(GetUsersRequest) returns (GetUsersReply);
 
   rpc GetUserInfo(GetUserInfoRequest) returns (GetUserInfoReply);
+
+  rpc GetAllUsers(GetAllUsersRequest) returns (GetAllUsersReply);
 
   rpc GetAccountUsers(GetAccountUsersRequest) returns (GetAccountUsersReply);
   rpc QueryIsUserInAccount(QueryIsUserInAccountRequest)
@@ -226,4 +281,8 @@ service UserService {
   rpc SetAsAdmin(SetAsAdminRequest) returns (SetAsAdminReply);
   rpc UnsetAdmin(UnsetAdminRequest) returns (UnsetAdminReply);
   rpc GetName(GetNameRequest) returns (GetNameReply);
+  rpc SetPlatformRole(SetPlatformRoleRequest) returns (SetPlatformRoleReply);
+  rpc UnsetPlatformRole(UnsetPlatformRoleRequest) returns (UnsetPlatformRoleReply);
+  rpc SetTenantRole(SetTenantRoleRequest) returns (SetTenantRoleReply);
+  rpc UnsetTenantRole(UnsetTenantRoleRequest) returns (UnsetTenantRoleReply);
 }

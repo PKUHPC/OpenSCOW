@@ -13,7 +13,7 @@ export const InitImportUsersForm: React.FC = () => {
           </a>
           了解系统用户模型以及如何导入用户信息。
         </p>
-        <ImportUsersForm/>
+        <ImportUsersForm />
       </FormLayout>
     </Centered>
   );

@@ -1,14 +1,19 @@
-import { Button, Form, Input, Table, Tag } from "antd";
+import { ExclamationCircleOutlined } from "@ant-design/icons";
+import { Button, Form, Input, message, Modal, Space, Table, Tag } from "antd";
 import React, { useMemo, useState } from "react";
+import { api } from "src/apis";
+import { DisabledA } from "src/components/DisabledA";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
-import { FullUserInfo, TenantRoleTexts } from "src/models/User";
+import { FullUserInfo, TenantRole } from "src/models/User";
 import { GetTenantUsersSchema } from "src/pages/api/admin/getTenantUsers";
+import { User } from "src/stores/UserStore";
 import { compareDateTime, formatDateTime } from "src/utils/datetime";
 
 interface Props {
   data: GetTenantUsersSchema["responses"]["200"] | undefined;
   isLoading: boolean;
   reload: () => void;
+  user: User;
 }
 
 interface FilterForm {
@@ -16,7 +21,7 @@ interface FilterForm {
 }
 
 export const AdminUserTable: React.FC<Props> = ({
-  data, isLoading,
+  data, isLoading, reload, user,
 }) => {
 
   const [form] = Form.useForm<FilterForm>();
@@ -56,27 +61,150 @@ export const AdminUserTable: React.FC<Props> = ({
         rowKey="id"
         scroll={{ x: true }}
       >
-        <Table.Column<FullUserInfo> dataIndex="id" title="用户ID"
+        <Table.Column<FullUserInfo>
+          dataIndex="id"
+          title="用户ID"
           sorter={(a, b) => a.id.localeCompare(b.id)}
           sortDirections={["ascend", "descend"]}
         />
-        <Table.Column<FullUserInfo> dataIndex="name" title="姓名"
+        <Table.Column<FullUserInfo>
+          dataIndex="name"
+          title="姓名"
           sorter={(a, b) => a.name.localeCompare(b.name)}
           sortDirections={["ascend", "descend"]}
         />
-        <Table.Column<FullUserInfo> dataIndex="email" title="邮箱"
+        <Table.Column<FullUserInfo>
+          dataIndex="email"
+          title="邮箱"
           sorter={(a, b) => a.email.localeCompare(b.email)}
           sortDirections={["ascend", "descend"]}
         />
-        <Table.Column<FullUserInfo> dataIndex="tenantRoles" title="租户角色"
-          render={(_, r) => r.tenantRoles.map((x) => <Tag key={x}>{TenantRoleTexts[x]}</Tag>)}
+        <Table.Column<FullUserInfo> 
+          dataIndex="tenantRoles"
+          title="租户管理员"
+          render={(_, r) => (
+            r.tenantRoles.includes(TenantRole.TENANT_ADMIN) ? (
+              <Space size="middle">
+                是
+                <DisabledA
+                  disabled={r.id === user.identityId}
+                  message="不能取消自己的租户管理员权限"
+                  onClick={async () => {
+                    Modal.confirm({
+                      title: "确定取消租户管理员权限",
+                      icon: <ExclamationCircleOutlined />,
+                      content: `确定要移除用户${r.name}（ID: ${r.id}）的租户管理员权限？`,
+                      onOk: async () => {
+                        await api.unsetTenantRole({ body: {
+                          userId : r.id,
+                          roleType: TenantRole.TENANT_ADMIN,
+                        } })
+                          .then(() => {
+                            message.success("操作成功！");
+                            reload();
+                          });
+                      },
+                    });
+                  }}
+                >
+                  取消
+                </DisabledA>
+              </Space>
+            ) : (
+              <Space size="middle">
+                否
+                <a
+                  onClick={() => {
+                    Modal.confirm({
+                      title: "确定设置为租户管理员",
+                      icon: <ExclamationCircleOutlined />,
+                      content: `确定要设置用户${r.name}（ID: ${r.id}）为租户管理员？`,
+                      onOk: async () => {
+                        await api.setTenantRole({ body: {
+                          userId : r.id,
+                          roleType: TenantRole.TENANT_ADMIN,
+                        } })
+                          .then(() => {
+                            message.success("操作成功！");
+                            reload();
+                          });
+                      },
+                    });
+                  }}
+                >
+                  设置
+                </a>
+              </Space>
+            )
+          )}
         />
-        <Table.Column<FullUserInfo> dataIndex="createTime" title="创建时间"
+        <Table.Column<FullUserInfo> 
+          dataIndex="tenantRoles"
+          title="租户财务人员"
+          render={(_, r) => (
+            r.tenantRoles.includes(TenantRole.TENANT_FINANCE) ? (
+              <Space size="middle">
+                是
+                <a
+                  onClick={async () => {
+                    Modal.confirm({
+                      title: "确定取消租户财务人员权限",
+                      icon: <ExclamationCircleOutlined />,
+                      content: `确定要移除用户${r.name}（ID: ${r.id}）的财务人员权限？`,
+                      onOk: async () => {
+                        await api.unsetTenantRole({ body: {
+                          userId : r.id,
+                          roleType: TenantRole.TENANT_FINANCE,
+                        } })
+                          .then(() => {
+                            message.success("操作成功！");
+                            reload();
+                          });
+                      },
+                    });
+                  }}
+                >
+                  取消
+                </a>
+              </Space>
+            ) : (
+              <Space size="middle">
+                否
+                <a
+                  onClick={() => {
+                    Modal.confirm({
+                      title: "确定设置为租户财务人员",
+                      icon: <ExclamationCircleOutlined />,
+                      content: `确定要设置用户${r.name}（ID: ${r.id}）为租户财务人员？`,
+                      onOk: async () => {
+                        await api.setTenantRole({ body: {
+                          userId : r.id,
+                          roleType: TenantRole.TENANT_FINANCE,
+                        } })
+                          .then(() => {
+                            message.success("操作成功！");
+                            reload();
+                          });
+                      },
+                    });
+                  }}
+                >
+                  设置
+                </a>
+              </Space>
+            )
+          )}
+        />
+        <Table.Column<FullUserInfo>
+          dataIndex="createTime"
+          title="创建时间"
           sorter={(a, b) => compareDateTime(a.createTime, b.createTime)}
           sortDirections={["ascend", "descend"]}
           render={(d) => formatDateTime(d)}
         />
-        <Table.Column<FullUserInfo> dataIndex="affiliatedAccountNames" title="可用账户"
+        <Table.Column<FullUserInfo>
+          dataIndex="affiliatedAccountNames"
+          title="可用账户"
           render={(_, r) => r.accountAffiliations.map((x) => x.accountName).join(", ")}
         />
       </Table>

@@ -5,9 +5,9 @@ import { Status } from "@grpc/grpc-js/build/src/constants";
 import { createServer } from "src/app";
 import { misConfig } from "src/config/mis";
 import { Tenant } from "src/entities/Tenant";
-import { User } from "src/entities/User";
+import { PlatformRole as pRole, TenantRole as tRole, User } from "src/entities/User";
 import { UserAccount, UserRole, UserStatus } from "src/entities/UserAccount";
-import { UserServiceClient } from "src/generated/server/user";
+import { PlatformRole, TenantRole, UserServiceClient } from "src/generated/server/user";
 import { reloadEntity } from "src/utils/orm";
 import { insertInitialData } from "tests/data/data";
 import { dropDatabase } from "tests/data/helpers";
@@ -142,4 +142,82 @@ it("cannot delete owner", async () => {
 
   expect(await server.ext.orm.em.count(UserAccount, { account: data.accountA })).toBe(2);
   expect(await server.ext.orm.em.count(User, { tenant: data.tenant })).toBe(2);
+});
+
+it("get all users", async () => {
+  const data = await insertInitialData(server.ext.orm.em.fork());
+
+  const users = await asyncClientCall(client, "getAllUsers", {
+    page: 1,
+    pageSize: 10,
+  });
+
+  expect(users.totalCount).toBe(3);
+  expect(users.platformUsers.map((x) => ({ 
+    userId: x.userId, 
+    name: x.name, 
+    createTime: x.createTime, 
+    platformRoles: x.platformRoles,
+  }))).toIncludeSameMembers([
+    {
+      userId: data.userA.userId,
+      name: data.userA.name,
+      createTime: data.userA.createTime,
+      platformRoles: data.userA.platformRoles,
+    },
+    {
+      userId: data.userB.userId,
+      name: data.userB.name,
+      createTime: data.userB.createTime,
+      platformRoles: data.userB.platformRoles,
+    },
+    {
+      userId: data.userC.userId,
+      name: data.userC.name,
+      createTime: data.userC.createTime,
+      platformRoles: data.userC.platformRoles,
+    },
+  ]);
+});
+
+it("manage platform role", async () => {
+  const em = server.ext.orm.em.fork();
+  const data = await insertInitialData(em);
+
+  await asyncClientCall(client, "setPlatformRole", {
+    userId: data.userA.userId,
+    roleType: PlatformRole.PLATFORM_ADMIN,
+  });
+
+  const setUser = await em.findOne(User, { userId: data.userA.userId });
+  expect(setUser?.platformRoles.includes(pRole["PLATFORM_ADMIN"])).toBe(true);
+
+  await asyncClientCall(client, "unsetPlatformRole", {
+    userId: data.userA.userId,
+    roleType: PlatformRole.PLATFORM_ADMIN,
+  });
+
+  const unsetUser = await em.findOne(User, { userId: data.userA.userId });
+  expect(unsetUser?.platformRoles.includes(pRole["PLATFORM_ADMIN"])).toBe(false);
+});
+
+it("manage tenant role", async () => {
+  const em = server.ext.orm.em.fork();
+  const data = await insertInitialData(em);
+
+  await asyncClientCall(client, "setTenantRole", {
+    userId: data.userA.userId,
+    roleType: TenantRole.TENANT_FINANCE,
+  });
+
+  const setUser = await em.findOne(User, { userId: data.userA.userId });
+  expect(setUser?.tenantRoles.includes(tRole["TENANT_FINANCE"])).toBe(true);
+
+  await asyncClientCall(client, "unsetTenantRole", {
+    userId: data.userA.userId,
+    roleType: TenantRole.TENANT_ADMIN,
+  });
+
+  const unsetUser = await em.findOne(User, { userId: data.userA.userId });
+  expect(unsetUser?.tenantRoles.includes(tRole["TENANT_ADMIN"])).toBe(false);
 });

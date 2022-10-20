@@ -1,7 +1,5 @@
-import { Logger as PinoLogger } from "pino";
+import { Logger } from "ts-log";
 import { fetch } from "undici";
-
-export type Logger = Pick<PinoLogger, "warn" | "trace">
 
 export interface UserInfo {
   identityId: string;

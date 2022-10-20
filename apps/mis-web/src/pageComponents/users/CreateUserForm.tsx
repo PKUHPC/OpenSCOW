@@ -20,7 +20,9 @@ export const CreateUserForm: React.FC<Props> = ({ noPassword }) => {
 
   return (
     <>
-      <Form.Item label="用户ID" name="identityId"
+      <Form.Item
+        label="用户ID"
+        name="identityId"
         rules={[
           { pattern: /^[a-z0-9_]+$/, message: "只能由小写英文字符、数字和下划线组成" },
           { required: true },
@@ -31,7 +33,9 @@ export const CreateUserForm: React.FC<Props> = ({ noPassword }) => {
       <Form.Item label="用户姓名" name="name" rules={[{ required: true }]}>
         <Input />
       </Form.Item>
-      <Form.Item label="用户邮箱" name="email"
+      <Form.Item
+        label="用户邮箱"
+        name="email"
         rules={[{ required: true }, emailRule]}
       >
         <Input />

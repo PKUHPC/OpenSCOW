@@ -2,7 +2,7 @@ import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { authenticate } from "src/auth/server";
 import { ChargingServiceClient } from "src/generated/server/charging";
-import { TenantRole } from "src/models/User";
+import { PlatformRole, TenantRole } from "src/models/User";
 import { getClient } from "src/utils/client";
 
 export interface GetUsedPayTypesSchema {
@@ -16,7 +16,8 @@ export interface GetUsedPayTypesSchema {
 }
 
 const auth = authenticate((u) =>
-  u.tenantRoles.includes(TenantRole.TENANT_FINANCE),
+  u.tenantRoles.includes(TenantRole.TENANT_FINANCE) ||
+  u.platformRoles.includes(PlatformRole.PLATFORM_FINANCE),
 );
 
 export default route<GetUsedPayTypesSchema>("GetUsedPayTypesSchema",

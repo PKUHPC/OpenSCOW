@@ -88,10 +88,12 @@ export const PathBar: React.FC<Props> = ({ path, loading, reload, go, fullUrl })
                 ))}
               </Space>
             </BarStateBar>
-            <Button onClick={(e) => {
-              e.stopPropagation();
-              goOrReload();
-            }} icon={icon}
+            <Button
+              onClick={(e) => {
+                e.stopPropagation();
+                goOrReload();
+              }}
+              icon={icon}
             />
           </>
         )

@@ -1,6 +1,6 @@
 import fs from "fs";
 import { join } from "path";
-import type { Logger } from "pino";
+import type { Logger } from "ts-log";
 
 import { sftpChmod, sftpChown, sftpWriteFile } from "./sftp";
 import { sshConnect } from "./ssh";

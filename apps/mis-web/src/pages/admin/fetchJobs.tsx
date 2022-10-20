@@ -35,12 +35,14 @@ export const FetchJobsInfoPage: NextPage = () => {
                     ? <Badge status="success" text="已开启" />
                     : <Badge status="error" text="已暂停" />
                   }
-                  <DisabledA onClick={() => {
-                    setChangingState(true);
-                    api.setFetchState({ query: { started: !data.fetchStarted } })
-                      .then(() => reload())
-                      .finally(() => setChangingState(false));
-                  }} disabled={changingState}
+                  <DisabledA
+                    onClick={() => {
+                      setChangingState(true);
+                      api.setFetchState({ query: { started: !data.fetchStarted } })
+                        .then(() => reload())
+                        .finally(() => setChangingState(false));
+                    }}
+                    disabled={changingState}
                   >
                     {data.fetchStarted ? "停止获取" : "开始获取"}
                   </DisabledA>
@@ -54,15 +56,17 @@ export const FetchJobsInfoPage: NextPage = () => {
                   <span>
                     {data.lastFetchTime ? formatDateTime(data.lastFetchTime) : "未获取过"}
                   </span>
-                  <DisabledA onClick={() => {
-                    setFetching(true);
-                    api.fetchJobs({})
-                      .then(({ newJobsCount }) => {
-                        message.success(`作业获取完成，获取到${newJobsCount}条新纪录。`);
-                        reload();
-                      })
-                      .finally(() => setFetching(false));
-                  }} disabled={fetching}
+                  <DisabledA
+                    onClick={() => {
+                      setFetching(true);
+                      api.fetchJobs({})
+                        .then(({ newJobsCount }) => {
+                          message.success(`作业获取完成，获取到${newJobsCount}条新纪录。`);
+                          reload();
+                        })
+                        .finally(() => setFetching(false));
+                    }}
+                    disabled={fetching}
                   >
                     立刻获取作业
                   </DisabledA>

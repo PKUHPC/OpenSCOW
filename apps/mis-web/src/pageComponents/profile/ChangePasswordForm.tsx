@@ -32,8 +32,11 @@ export const ChangePasswordForm: React.FC = () => {
 
   return (
     <Spin spinning={loading}>
-      <Form initialValues={undefined}
-        layout="vertical" form={form} onFinish={onFinish}
+      <Form
+        initialValues={undefined}
+        layout="vertical"
+        form={form}
+        onFinish={onFinish}
       >
         <Form.Item
           rules={[{ required: true }]}
@@ -58,7 +61,7 @@ export const ChangePasswordForm: React.FC = () => {
           <Input.Password />
         </Form.Item>
         <Form.Item>
-          <Button type="primary" htmlType="submit" >
+          <Button type="primary" htmlType="submit">
             提交
           </Button>
         </Form.Item>

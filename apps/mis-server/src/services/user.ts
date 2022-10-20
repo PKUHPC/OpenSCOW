@@ -10,17 +10,20 @@ import { misConfig } from "src/config/mis";
 import { Account } from "src/entities/Account";
 import { StorageQuota } from "src/entities/StorageQuota";
 import { Tenant } from "src/entities/Tenant";
-import { User } from "src/entities/User";
+import { PlatformRole, TenantRole, User } from "src/entities/User";
 import { UserAccount, UserRole, UserStatus } from "src/entities/UserAccount";
 import {
   AccountStatus,
   GetAccountUsersReply,
   platformRoleFromJSON,
+  platformRoleToJSON,
   QueryIsUserInAccountReply,
   tenantRoleFromJSON,
+  tenantRoleToJSON,
   UserRole as PFUserRole, UserServiceServer,
   UserServiceService,
   UserStatus as PFUserStatus } from "src/generated/server/user";
+import { paginationProps } from "src/utils/orm";
 import { fetch } from "undici";
 
 export const userServiceServer = plugin((server) => {
@@ -457,6 +460,121 @@ export const userServiceServer = plugin((server) => {
       }];
     },
 
-  });
+    getAllUsers: async ({ request, em }) => {
 
+      const { page, pageSize } = request;
+
+      const [users, count] = await em.findAndCount(User, {}, {
+        ...paginationProps(page, pageSize || 10),
+      });
+
+      return [{ 
+        totalCount: count,
+        platformUsers: users.map((x) => ({
+          userId: x.userId,
+          name: x.name,
+          createTime: x.createTime,
+          platformRoles: x.platformRoles.map(platformRoleFromJSON),
+        })),
+      }];
+    },
+
+    setPlatformRole: async ({ request, em }) => {
+      const { userId, roleType } = request;
+      const dbRoleType: PlatformRole = PlatformRole[platformRoleToJSON(roleType)];
+      
+      const user = await em.findOne(User, { userId: userId });
+      
+      if (!user) {
+        throw <ServiceError>{
+          code: Status.NOT_FOUND, message: `User ${userId} is not found.`,
+        };
+      }
+
+      if (user.platformRoles.includes(dbRoleType)) {
+        throw <ServiceError> {
+          code: Status.FAILED_PRECONDITION, message: `User ${userId} is already this role.`,
+        };
+      }
+
+      user.platformRoles.push(dbRoleType);
+      await em.flush();
+
+      return [{}];
+    },
+    
+    unsetPlatformRole: async ({ request, em }) => {
+      const { userId, roleType } = request;
+      const dbRoleType: PlatformRole = PlatformRole[platformRoleToJSON(roleType)];
+
+      const user = await em.findOne(User, { userId: userId });
+  
+      if (!user) {
+        throw <ServiceError>{
+          code: Status.NOT_FOUND, message: `User ${userId} is not found.`,
+        };
+      }
+  
+      if (!user.platformRoles.includes(dbRoleType)) {
+        throw <ServiceError> {
+          code: Status.FAILED_PRECONDITION, message: `User ${userId} is already not this role.`,
+        };
+      }
+  
+      user.platformRoles = user.platformRoles.filter((item) => 
+        item !== dbRoleType);
+      await em.flush();
+  
+      return [{}];      
+    },
+
+    setTenantRole: async ({ request, em }) => {
+      const { userId, roleType } = request;
+      const dbRoleType: TenantRole = TenantRole[tenantRoleToJSON(roleType)];
+      
+      const user = await em.findOne(User, { userId: userId });
+      
+      if (!user) {
+        throw <ServiceError>{
+          code: Status.NOT_FOUND, message: `User ${userId} is not found.`,
+        };
+      }
+
+      if (user.tenantRoles.includes(dbRoleType)) {
+        throw <ServiceError> {
+          code: Status.FAILED_PRECONDITION, message: `User ${userId} is already this role.`,
+        };
+      }
+
+      user.tenantRoles.push(dbRoleType);
+      await em.flush();
+
+      return [{}];
+    },
+
+    unsetTenantRole: async ({ request, em }) => {
+      const { userId, roleType } = request;
+      const dbRoleType: TenantRole = TenantRole[tenantRoleToJSON(roleType)];
+
+      const user = await em.findOne(User, { userId: userId });
+  
+      if (!user) {
+        throw <ServiceError>{
+          code: Status.NOT_FOUND, message: `User ${userId} is not found.`,
+        };
+      }
+  
+      if (!user.tenantRoles.includes(dbRoleType)) {
+        throw <ServiceError> {
+          code: Status.FAILED_PRECONDITION, message: `User ${userId} is already not this role.`,
+        };
+      }
+  
+      user.tenantRoles = user.tenantRoles.filter((item) => 
+        item !== dbRoleType);
+      await em.flush();
+  
+      return [{}]; 
+    },
+  });
 });

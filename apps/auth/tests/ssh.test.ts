@@ -5,7 +5,7 @@ import { buildApp } from "src/app";
 import { createFormData } from "tests/utils";
 
 const username = "test";
-const password = "test";
+const password = "1234";
 
 let server: FastifyInstance;
 
@@ -19,7 +19,7 @@ afterEach(async () => {
   await server.close();
 });
 
-it.only("logs in to the ssh login", async () => {
+it("logs in to the ssh login", async () => {
 
   const callbackUrl = "/callback";
 

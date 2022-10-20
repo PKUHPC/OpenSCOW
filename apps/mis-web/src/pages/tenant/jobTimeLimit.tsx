@@ -68,22 +68,27 @@ const StorageForm: React.FC = () => {
   };
 
   return (
-    <Form form={form}
+    <Form
+      form={form}
       wrapperCol={{ span: 18 }}
       labelCol={{ span: 6 }}
       labelAlign="right"
       onFinish={submit}
       initialValues={{ mode: "INCREASE", value: 1 }}
     >
-      <Form.Item<FormProps> name="cluster" label="集群"
+      <Form.Item
+        name="cluster"
+        label="集群"
         rules={[{ required: true }]}
       >
         <SingleClusterSelector />
       </Form.Item>
-      <Form.Item<FormProps> name="jobId" label="作业ID"
+      <Form.Item
+        name="jobId"
+        label="作业ID"
         rules={[{ required: true }]}
       >
-        <InputNumber style={{ minWidth: "160px" }} min={1}/>
+        <InputNumber style={{ minWidth: "160px" }} min={1} />
       </Form.Item>
       <Form.Item label="当前作业时间限制">
         <DisabledA onClick={queryCurrent} disabled={currentLoading}>

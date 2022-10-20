@@ -2,9 +2,12 @@
   "binPath": "../../node_modules/.bin",
   "protos": [
     {
-      "path": "../../protos",
-      "files": "../../protos/common/job.proto",
-      "name": "."
+      "source": "local",
+      "local": {
+        "protoPaths": "../../protos",
+        "files": "../../protos/common/job.proto"
+      },
+      "target": "."
     }
   ],
   "params": [

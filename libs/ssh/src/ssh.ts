@@ -1,6 +1,6 @@
 import { NodeSSH, SSHExecCommandOptions } from "node-ssh";
 import { join } from "path";
-import type { Logger } from "pino";
+import type { Logger } from "ts-log";
 import { quote } from "shell-quote";
 
 import { insertKey, KeyPair } from "./key";

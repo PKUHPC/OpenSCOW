@@ -24,7 +24,7 @@ export const UserIndicator: React.FC<Props> = ({
         userStore.user ? (
           <Dropdown
             trigger={["click"]}
-            overlay={
+            overlay={(
               <Menu>
                 <Menu.Item disabled>
                     用户ID：{userStore.user.identityId}
@@ -38,10 +38,10 @@ export const UserIndicator: React.FC<Props> = ({
                   登出
                 </Menu.Item>
               </Menu>
-            }
+            )}
           >
             <a>
-              <UserOutlined/>
+              <UserOutlined />
               {userStore.user.name}
               <DownOutlined />
             </a>

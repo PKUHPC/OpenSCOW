@@ -1,6 +1,5 @@
 import { Result } from "antd";
 import { GetServerSideProps, NextPage } from "next";
-import { useRouter } from "next/router";
 import { SSRProps } from "src/auth/server";
 import { UnifiedErrorPage } from "src/components/errorPages/UnifiedErrorPage";
 import { EditJobPriceTableForm } from "src/pageComponents/init/EditJobPriceTableForm";
@@ -12,7 +11,8 @@ type Props = SSRProps<{}>;
 export const JobPriceTablePage: NextPage<Props> = (props) => {
   if ("error" in props) {
     return (
-      <UnifiedErrorPage code={props.error}
+      <UnifiedErrorPage
+        code={props.error}
         customComponents={{
           409: (
             <Result
@@ -27,8 +27,8 @@ export const JobPriceTablePage: NextPage<Props> = (props) => {
   }
   return (
     <div>
-      <InitDrawer url={useRouter().asPath}>
-        <EditJobPriceTableForm/>
+      <InitDrawer>
+        <EditJobPriceTableForm />
       </InitDrawer>
     </div>
   );

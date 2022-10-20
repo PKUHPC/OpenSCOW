@@ -5,5 +5,6 @@ package scow.common;
 message Money {
   bool positive = 1;
   uint64 yuan = 2;
-  uint32 mills = 3;
+  // 4 decimal places
+  uint32 decimal_place = 3;
 }

@@ -30,7 +30,8 @@ export const FilterFormTabs: React.FC<TabbedFilterFormProps> = ({
   return (
     <Tabs
       defaultActiveKey={tabs.length > 0 ? tabs[0].title : ""}
-      size="small" tabBarExtraContent={button}
+      size="small"
+      tabBarExtraContent={button}
       onChange={onChange}
     >
       {

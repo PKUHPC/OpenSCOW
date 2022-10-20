@@ -8,12 +8,12 @@
   },
   "dependencies": {
     "node-ssh": "13.0.0",
-    "shell-quote": "1.7.3"
+    "shell-quote": "1.7.4"
   },
   "devDependencies": {
     "@types/shell-quote": "1.7.1",
-    "@types/ssh2": "1.11.5",
-    "pino": "8.6.0"
+    "@types/ssh2": "1.11.6",
+    "ts-log": "2.2.5"
   },
   "keywords": [],
   "author": "",

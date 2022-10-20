@@ -30,11 +30,13 @@ export const JobsSection: React.FC<Props> = ({ user }) => {
   const { data, isLoading, reload } = useAsync({ promiseFn });
 
   return (
-    <Section title="未结束作业列表" extra={
-      <Link href="/user/runningJobs">
+    <Section
+      title="未结束作业列表"
+      extra={(
+        <Link href="/user/runningJobs">
         查看所有未结束作业
-      </Link>
-    }
+        </Link>
+      )}
     >
       <RunningJobInfoTable
         data={data}

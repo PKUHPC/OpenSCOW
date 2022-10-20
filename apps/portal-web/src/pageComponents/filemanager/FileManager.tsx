@@ -151,7 +151,31 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
   const paste = async () => {
     if (!operation) { return; }
 
+    const operationText = operationTexts[operation.op];
+
     setOperation({ ...operation, started: true });
+
+    const operationApi = operation.op === "copy" ? api.copyFileItem : api.moveFileItem;
+
+    // if only one file is selected, show detailed error information
+    if (operation.selected.length === 1) {
+      const filename = operation.selected[0].name;
+      const fromPath = join(operation.originalPath, filename);
+      await operationApi({ body: { cluster, fromPath, toPath: join(path, filename) } })
+        .httpError(415, ({ error }) => {
+          Modal.error({
+            title: `${operationText}出错`,
+            content: operation.op === "copy" ? error : "可能是因为目标目录中有同名的文件或者目录。",
+          });
+        })
+        .then(() => {
+          message.error(`${operationText}成功！`);
+        }).finally(() => {
+          resetSelectedAndOperation();
+          reload();
+        });
+      return;
+    }
 
     await Promise.allSettled(operation.selected.map(async (x) => {
       return await (operation.op === "copy" ? api.copyFileItem : api.moveFileItem)({
@@ -171,17 +195,16 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
         const successfulCount = successfulInfo.filter((x) => x).length;
         const allCount = operation.selected.length;
         if (successfulCount === allCount) {
-          message.success(`${operationTexts[operation.op]}${allCount}项成功！`);
+          message.success(`${operationText}${allCount}项成功！`);
           resetSelectedAndOperation();
         } else {
-          message.error(`${operationTexts[operation.op]}成功${successfulCount}项，失败${allCount - successfulCount}项`);
-          setOperation((o) => o && ({ ...o, started: false }));
+          message.error(`${operationText}成功${successfulCount}项，失败${allCount - successfulCount}项`);
         }
       }).catch((e) => {
         console.log(e);
-        message.error(`执行${operationTexts[operation.op]}操作时遇到错误`);
-        setOperation((o) => o && ({ ...o, started: false }));
+        message.error(`执行${operationText}操作时遇到错误`);
       }).finally(() => {
+        resetSelectedAndOperation();
         reload();
       });
 
@@ -259,13 +282,17 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
             上传文件
           </UploadButton>
           <Divider type="vertical" />
-          <Button icon={<DeleteOutlined />} danger onClick={onDeleteClick}
+          <Button
+            icon={<DeleteOutlined />}
+            danger
+            onClick={onDeleteClick}
             disabled={selectedKeys.length === 0 || operation?.started}
           >
             删除选中
           </Button>
           <Button
-            icon={<CopyOutlined />} onClick={() =>
+            icon={<CopyOutlined />}
+            onClick={() =>
               setOperation({ op: "copy",
                 selected: keysToFiles(selectedKeys), originalPath: path, started: false, completed: [],
               })}
@@ -273,14 +300,18 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
           >
             复制选中
           </Button>
-          <Button icon={<ScissorOutlined />} onClick={() =>
-            setOperation({ op:"move",
-              selected: keysToFiles(selectedKeys), originalPath: path, started: false, completed: []})}
-          disabled={selectedKeys.length === 0 || operation?.started}
+          <Button
+            icon={<ScissorOutlined />}
+            onClick={() =>
+              setOperation({ op:"move",
+                selected: keysToFiles(selectedKeys), originalPath: path, started: false, completed: []})}
+            disabled={selectedKeys.length === 0 || operation?.started}
           >
             移动选中
           </Button>
-          <Button icon={<SnippetsOutlined />} onClick={paste}
+          <Button
+            icon={<SnippetsOutlined />}
+            onClick={paste}
             disabled={!operation || operation.started || operation.originalPath === path}
           >
             粘贴到此处
@@ -353,7 +384,9 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
           },
         })}
       >
-        <Table.Column<FileInfo> dataIndex="type" title=""
+        <Table.Column<FileInfo>
+          dataIndex="type"
+          title=""
           width="32px"
           defaultSortOrder={"ascend"}
           sorter={(a, b) => a.type.localeCompare(b.type)}
@@ -363,7 +396,9 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
           )}
         />
 
-        <Table.Column<FileInfo> dataIndex="name" title="文件名"
+        <Table.Column<FileInfo>
+          dataIndex="name"
+          title="文件名"
           sorter={(a, b) => a.name.localeCompare(b.name)}
           sortDirections={["ascend", "descend"]}
           render={(_, r) => (
@@ -383,21 +418,29 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
           )}
         />
 
-        <Table.Column<FileInfo> dataIndex="mtime" title="修改日期"
+        <Table.Column<FileInfo>
+          dataIndex="mtime"
+          title="修改日期"
           render={(mtime: string | undefined) => mtime ? formatDateTime(mtime) : ""}
           sorter={(a, b) => compareDateTime(a.mtime, b.mtime) }
         />
 
-        <Table.Column<FileInfo> dataIndex="size" title="大小"
+        <Table.Column<FileInfo>
+          dataIndex="size"
+          title="大小"
           render={(size: number | undefined) => size === undefined ? "" : Math.floor(size / 1024) + " KB"}
           sorter={(a, b) => compareNumber(a.size, b.size) }
         />
 
-        <Table.Column<FileInfo> dataIndex="mode" title="权限"
+        <Table.Column<FileInfo>
+          dataIndex="mode"
+          title="权限"
           render={(mode: number | undefined) => mode === undefined ? "" : nodeModeToString(mode)}
         />
 
-        <Table.Column<FileInfo> dataIndex="action" title="操作"
+        <Table.Column<FileInfo>
+          dataIndex="action"
+          title="操作"
           render={(_, i: FileInfo) => (
             <Space>
               {

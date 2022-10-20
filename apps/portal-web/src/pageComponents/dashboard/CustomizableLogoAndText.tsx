@@ -39,7 +39,7 @@ export const CustomizableLogoAndText: React.FC<Props> = ({ hostname }) => {
 
   return (
     <Container>
-      <Logo >
+      <Logo>
         <Image
           alt="logo"
           src={join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/logo")}

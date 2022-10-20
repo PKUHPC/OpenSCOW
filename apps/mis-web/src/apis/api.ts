@@ -8,9 +8,16 @@ import type { ChangeStorageQuotaSchema } from "src/pages/api/admin/changeStorage
 import type { FetchJobsSchema } from "src/pages/api/admin/fetchJobs/fetchJobs";
 import type { GetFetchJobInfoSchema } from "src/pages/api/admin/fetchJobs/getFetchInfo";
 import type { SetFetchStateSchema } from "src/pages/api/admin/fetchJobs/setFetchState";
+import type { TenantFinancePaySchema } from "src/pages/api/admin/finance/pay";
+import type { GetTenantPaymentsSchema } from "src/pages/api/admin/finance/payments";
+import type { GetAllUsersSchema } from "src/pages/api/admin/getAllUsers";
 import type { GetTenantUsersSchema } from "src/pages/api/admin/getTenantUsers";
 import type { ImportUsersSchema } from "src/pages/api/admin/importUsers";
 import type { QueryStorageQuotaSchema } from "src/pages/api/admin/queryStorageQuota";
+import type { SetPlatformRoleSchema } from "src/pages/api/admin/setPlatformRole";
+import type { SetTenantRoleSchema } from "src/pages/api/admin/setTenantRole";
+import type { UnsetPlatformRoleSchema } from "src/pages/api/admin/unsetPlatformRole";
+import type { UnsetTenantRoleSchema } from "src/pages/api/admin/unsetTenantRole";
 import type { AuthCallbackSchema } from "src/pages/api/auth/callback";
 import type { LogoutSchema } from "src/pages/api/auth/logout";
 import type { ValidateTokenSchema } from "src/pages/api/auth/validateToken";
@@ -59,9 +66,16 @@ export const api = {
   fetchJobs: fromApi<FetchJobsSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin/fetchJobs/fetchJobs")),
   getFetchJobInfo: fromApi<GetFetchJobInfoSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin/fetchJobs/getFetchInfo")),
   setFetchState: fromApi<SetFetchStateSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin/fetchJobs/setFetchState")),
+  tenantFinancePay: fromApi<TenantFinancePaySchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin/finance/pay")),
+  getTenantPayments: fromApi<GetTenantPaymentsSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin/finance/payments")),
+  getAllUsers: fromApi<GetAllUsersSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin/getAllUsers")),
   getTenantUsers: fromApi<GetTenantUsersSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin/getTenantUsers")),
   importUsers: fromApi<ImportUsersSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin/importUsers")),
   queryStorageQuota: fromApi<QueryStorageQuotaSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin/queryStorageQuota")),
+  setPlatformRole: fromApi<SetPlatformRoleSchema>("PUT", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin/setPlatformRole")),
+  setTenantRole: fromApi<SetTenantRoleSchema>("PUT", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin/setTenantRole")),
+  unsetPlatformRole: fromApi<UnsetPlatformRoleSchema>("PUT", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin/unsetPlatformRole")),
+  unsetTenantRole: fromApi<UnsetTenantRoleSchema>("PUT", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin/unsetTenantRole")),
   authCallback: fromApi<AuthCallbackSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/auth/callback")),
   logout: fromApi<LogoutSchema>("DELETE", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/auth/logout")),
   validateToken: fromApi<ValidateTokenSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/auth/validateToken")),
@@ -104,3 +118,4 @@ export const api = {
   unblockUserInAccount: fromApi<UnblockUserInAccountSchema>("PUT", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/users/unblockInAccount")),
   unsetAdmin: fromApi<UnsetAdminSchema>("PUT", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/users/unsetAdmin")),
 };
+  
