@@ -361,8 +361,9 @@ export const userServiceServer = plugin((server) => {
       }
 
       // Making an ssh Request to the login node as the user created.
-      await Promise.all(Object.values(clusters).map(async ({ displayName, slurm: { loginNodes } }) => {
-        const node = loginNodes[0];
+      await Promise.all(Object.values(clusters).map(async ({ displayName, slurm, misIgnore }) => {
+        if (misIgnore) { return; }
+        const node = slurm.loginNodes[0];
         logger.info("Checking if user can login to %s by login node %s", displayName, node);
 
         const error = await userSshFirstLogin(node, name, password, rootKeyPair, logger).catch((e) => e);
@@ -468,7 +469,7 @@ export const userServiceServer = plugin((server) => {
         ...paginationProps(page, pageSize || 10),
       });
 
-      return [{ 
+      return [{
         totalCount: count,
         platformUsers: users.map((x) => ({
           userId: x.userId,
@@ -482,9 +483,9 @@ export const userServiceServer = plugin((server) => {
     setPlatformRole: async ({ request, em }) => {
       const { userId, roleType } = request;
       const dbRoleType: PlatformRole = PlatformRole[platformRoleToJSON(roleType)];
-      
+
       const user = await em.findOne(User, { userId: userId });
-      
+
       if (!user) {
         throw <ServiceError>{
           code: Status.NOT_FOUND, message: `User ${userId} is not found.`,
@@ -502,38 +503,38 @@ export const userServiceServer = plugin((server) => {
 
       return [{}];
     },
-    
+
     unsetPlatformRole: async ({ request, em }) => {
       const { userId, roleType } = request;
       const dbRoleType: PlatformRole = PlatformRole[platformRoleToJSON(roleType)];
 
       const user = await em.findOne(User, { userId: userId });
-  
+
       if (!user) {
         throw <ServiceError>{
           code: Status.NOT_FOUND, message: `User ${userId} is not found.`,
         };
       }
-  
+
       if (!user.platformRoles.includes(dbRoleType)) {
         throw <ServiceError> {
           code: Status.FAILED_PRECONDITION, message: `User ${userId} is already not this role.`,
         };
       }
-  
-      user.platformRoles = user.platformRoles.filter((item) => 
+
+      user.platformRoles = user.platformRoles.filter((item) =>
         item !== dbRoleType);
       await em.flush();
-  
-      return [{}];      
+
+      return [{}];
     },
 
     setTenantRole: async ({ request, em }) => {
       const { userId, roleType } = request;
       const dbRoleType: TenantRole = TenantRole[tenantRoleToJSON(roleType)];
-      
+
       const user = await em.findOne(User, { userId: userId });
-      
+
       if (!user) {
         throw <ServiceError>{
           code: Status.NOT_FOUND, message: `User ${userId} is not found.`,
@@ -557,24 +558,24 @@ export const userServiceServer = plugin((server) => {
       const dbRoleType: TenantRole = TenantRole[tenantRoleToJSON(roleType)];
 
       const user = await em.findOne(User, { userId: userId });
-  
+
       if (!user) {
         throw <ServiceError>{
           code: Status.NOT_FOUND, message: `User ${userId} is not found.`,
         };
       }
-  
+
       if (!user.tenantRoles.includes(dbRoleType)) {
         throw <ServiceError> {
           code: Status.FAILED_PRECONDITION, message: `User ${userId} is already not this role.`,
         };
       }
-  
-      user.tenantRoles = user.tenantRoles.filter((item) => 
+
+      user.tenantRoles = user.tenantRoles.filter((item) =>
         item !== dbRoleType);
       await em.flush();
-  
-      return [{}]; 
+
+      return [{}];
     },
   });
 });

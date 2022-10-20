@@ -1,7 +1,7 @@
 import { NodeSSH, SSHExecCommandOptions } from "node-ssh";
 import { join } from "path";
-import type { Logger } from "ts-log";
 import { quote } from "shell-quote";
+import type { Logger } from "ts-log";
 
 import { insertKey, KeyPair } from "./key";
 import { sftpChmod, sftpStat, sftpWriteFile } from "./sftp";
@@ -129,7 +129,7 @@ export async function userSshFirstLogin(
 
     const sftp = await ssh.requestSFTP();
     const stat = await sftpStat(sftp)(userHomeDir);
-    // make sure user home dir is exist !
+    // make sure user home dir is exists !
     if (!stat.isDirectory()) {
       logger.error("User %s home directory %s is not exits", username, userHomeDir);
     }
