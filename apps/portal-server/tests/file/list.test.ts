@@ -45,7 +45,7 @@ it("returns error if list a file", async () => {
   await expectGrpcThrow(asyncUnaryCall(client, "readDirectory", {
     cluster, userId, path: actualPath("test1"),
   }), (e) => {
-    expect(e.code).toBe(status.FAILED_PRECONDITION);
+    expect(e.code).toBe(status.INVALID_ARGUMENT);
   });
 });
 

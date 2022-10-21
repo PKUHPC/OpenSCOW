@@ -57,7 +57,10 @@ it("tests shell interaction", async () => {
     await once(channel, "end");
   });
 
-  expect(Buffer.concat(actual)).toEqual(Buffer.concat(expected));
+  const actualString = Buffer.concat(actual).toString();
+  const expectedString = Buffer.concat(expected).toString();
+
+  expect(actualString).toEqual(expectedString);
 
 
 
