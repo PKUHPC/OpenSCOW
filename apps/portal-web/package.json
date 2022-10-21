@@ -11,7 +11,7 @@
     "prepareDev": "pnpm protos && ntar schema",
     "protos": "tsgrpc-cli protos",
     "cloneNoVnc": "git -C ./public/vnc pull || git clone -c advice.detachedHead=false --depth=1 --branch v1.3.0 https://github.com/novnc/noVNC ./public/vnc",
-    "test": "jest"
+    "test": "jest --passWithNoTests"
   },
   "dependencies": {
     "@ant-design/icons": "4.7.0",
