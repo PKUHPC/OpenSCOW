@@ -26,7 +26,9 @@ export async function createServer() {
   await server.register(fileServiceServer);
   await server.register(shellServiceServer);
 
-  await checkClustersRootUserLogin(server.logger);
+  if (process.env.NODE_ENV === "production") {
+    await checkClustersRootUserLogin(server.logger);
+  }
 
   return server;
 }
