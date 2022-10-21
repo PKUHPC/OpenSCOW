@@ -77,6 +77,10 @@ jobs:
             file: mis-server
             build_args: ""
 
+          - name: portal-server
+            file: portal-server
+            build_args: ""
+
           - name: auth
             file: auth
             build_args: ""
