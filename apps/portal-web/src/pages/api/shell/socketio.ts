@@ -1,9 +1,11 @@
+import { asyncDuplexStreamCall } from "@ddadaal/tsgrpc-client";
 import { NextApiRequest } from "next";
-import * as pty from "node-pty";
 import { join } from "path";
 import { Server as ServerIO } from "socket.io";
 import { checkCookie } from "src/auth/server";
+import { ShellResponse, ShellServiceClient } from "src/generated/portal/shell";
 import { NextApiResponseServerIO } from "src/types/socket";
+import { getClient } from "src/utils/client";
 import { runtimeConfig } from "src/utils/config";
 import { queryToIntOrDefault, queryToString } from "src/utils/querystring";
 
@@ -23,6 +25,7 @@ export default async (req: NextApiRequest, res: NextApiResponseServerIO) => {
 
     io.on("connection", async (socket) => {
 
+
       const user = await checkCookie(() => true, socket.request);
 
       if (typeof user === "number") {
@@ -31,6 +34,7 @@ export default async (req: NextApiRequest, res: NextApiResponseServerIO) => {
         socket.disconnect();
         return;
       }
+
 
       const log = (message: string, ...optionalParams: any[]) => console.log(
         `[io] [${user.identityId}] ${message}`, optionalParams);
@@ -45,45 +49,43 @@ export default async (req: NextApiRequest, res: NextApiResponseServerIO) => {
 
       const path = queryToString(socket.handshake.query.path);
 
-      // create a pty and connect to ssh
-      // if path is empty, it will be home page
-      const host = `${user.identityId}@${runtimeConfig.CLUSTERS_CONFIG[cluster].slurm.loginNodes[0]}`;
-
-      const args = [host, "-i", runtimeConfig.SSH_PRIVATE_KEY_PATH.replace("\"", "'")];
-      if (path) {
-        args.push("-t", "cd '" + path.replace(/\'/g, "'\\''") + "' ; exec ${SHELL} -l");
-      }
-
       const { cols, rows } = socket.handshake.query;
 
-      const ptyProcess = pty.spawn("ssh", args, {
-        name: "xterm-color",
+      const client = getClient(ShellServiceClient);
+
+      const stream = asyncDuplexStreamCall(client, "shell");
+
+      await stream.writeAsync({ message: { $case: "connect", connect: {
+        cluster, userId: user.identityId,
         cols: queryToIntOrDefault(cols, 80),
         rows: queryToIntOrDefault(rows, 30),
-        cwd: process.env.HOME,
-      });
+        path,
+      } } });
 
-      log("SSH Process started");
+      log("Connected to shell");
 
-      ptyProcess.onData(function(data) {
-        socket.emit("data", data);
-      });
-
-      ptyProcess.onExit((e) => {
-        log("Process exited. ", e);
-        socket.emit("exit", e);
+      stream.on("data", (chunk: ShellResponse) => {
+        switch (chunk.message?.$case) {
+        case "data":
+          socket.emit("data", chunk.message.data.data);
+          break;
+        case "exit":
+          socket.emit("exit", { exitCode: chunk.message.exit.code, signal: chunk.message.exit.signal });
+          break;
+        }
       });
 
       socket.on("resize", (data: { cols: number, rows: number }) => {
-        ptyProcess.resize(data.cols, data.rows);
+        stream.write({ message: { $case: "resize", resize: { cols: data.cols, rows: data.rows } } });
       });
 
-      socket.on("data", (data) => {
-        ptyProcess.write(data);
+      socket.on("data", ([data]: [string]) => {
+        stream.write({ message:  { $case :"data", data: { data: Buffer.from(data) } } });
       });
 
       socket.on("disconnect", () => {
-        ptyProcess.kill("SIGKILL");
+        stream.write({ message: { $case: "disconnect", disconnect: {} } });
+        stream.end();
       });
 
     });

@@ -1,7 +1,10 @@
+import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
+import { status } from "@grpc/grpc-js";
 import { authenticate } from "src/auth/server";
-import { getClusterOps } from "src/clusterops";
-import { NewJobInfo } from "src/clusterops/api/job";
+import { JobServiceClient } from "src/generated/portal/job";
+import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
+import { handlegRPCError } from "src/utils/server";
 
 export interface SubmitJobInfo {
   cluster: string;
@@ -53,7 +56,10 @@ export default route<SubmitJobSchema>("SubmitJobSchema", async (req, res) => {
   const { cluster, command, jobName, coreCount, maxTime, save,
     nodeCount, partition, qos, account, comment, workingDirectory } = req.body;
 
-  const jobInfo: NewJobInfo = {
+  const client = getClient(JobServiceClient);
+
+  return await asyncUnaryCall(client, "submitJob", {
+    cluster, userId: info.identityId,
     jobName,
     coreCount,
     maxTime,
@@ -64,24 +70,8 @@ export default route<SubmitJobSchema>("SubmitJobSchema", async (req, res) => {
     command,
     comment,
     workingDirectory,
-  };
-
-  const clusterops = getClusterOps(cluster);
-
-  const scriptReply = await clusterops.job.generateJobScript({
-    jobInfo,
-  }, req.log);
-
-  const reply = await clusterops.job.submitJob({
-    userId: info.identityId,
-    jobInfo,
-    script: scriptReply.script,
-    save,
-  }, req.log);
-
-  if (reply.code === "SBATCH_FAILED") {
-    return { 409: { code: "SBATCH_FAILED", message: reply.message } };
-  }
-
-  return { 201: { jobId: reply.jobId } };
+    saveAsTemplate: save,
+  }).then(({ jobId }) => ({ 201: { jobId } }), handlegRPCError({
+    [status.INTERNAL]: (e) => ({ 409: { code: "SBATCH_FAILED" as const, message: e.details } }),
+  }));
 });

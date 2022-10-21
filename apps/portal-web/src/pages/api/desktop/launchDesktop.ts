@@ -1,10 +1,11 @@
+import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { authenticate } from "src/auth/server";
-import { displayIdToPort } from "src/clusterops/slurm/bl/port";
+import { DesktopServiceClient } from "src/generated/portal/desktop";
+import { getClient } from "src/utils/client";
 import { publicConfig } from "src/utils/config";
 import { dnsResolve } from "src/utils/dns";
 import { route } from "src/utils/route";
-import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
-import { refreshPassword } from "src/utils/turbovnc";
+import { handlegRPCError } from "src/utils/server";
 
 export interface LaunchDesktopSchema {
   method: "POST";
@@ -28,9 +29,6 @@ export interface LaunchDesktopSchema {
 const auth = authenticate(() => true);
 
 export default /* #__PURE__*/route<LaunchDesktopSchema>("LaunchDesktopSchema", async (req, res) => {
-
-
-
   if (!publicConfig.ENABLE_LOGIN_DESKTOP) {
     return { 501: null };
   }
@@ -41,15 +39,15 @@ export default /* #__PURE__*/route<LaunchDesktopSchema>("LaunchDesktopSchema", a
 
   const { cluster, displayId } = req.body;
 
-  const host = getClusterLoginNode(cluster);
+  const client = getClient(DesktopServiceClient);
 
-  if (!host) { return { 400: { code: "INVALID_CLUSTER" } }; }
+  return await asyncUnaryCall(client, "connectToDesktop", {
+    cluster, displayId, userId: info.identityId,
+  }).then(async ({ node, password, port }) => ({ 200: {
+    node: await dnsResolve(node),
+    password,
+    port,
+  } }), handlegRPCError({
 
-  return await sshConnect(host, info.identityId, req.log, async (ssh) => {
-
-    // refresh the otp
-    const password = await refreshPassword(ssh, req.log, displayId);
-
-    return { 200: { node: await dnsResolve(host), port: displayIdToPort(displayId), password } };
-  });
+  }));
 });

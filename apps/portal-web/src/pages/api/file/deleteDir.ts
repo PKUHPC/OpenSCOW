@@ -1,7 +1,10 @@
-import { sshRmrf } from "@scow/lib-ssh";
+import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
+import { status } from "@grpc/grpc-js";
 import { authenticate } from "src/auth/server";
+import { FileServiceClient } from "src/generated/portal/file";
+import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
-import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
+import { handlegRPCError } from "src/utils/server";
 
 export interface DeleteDirSchema {
   method: "DELETE";
@@ -29,17 +32,14 @@ export default route<DeleteDirSchema>("DeleteDirSchema", async (req, res) => {
 
   const { cluster, path } = req.body;
 
-  const host = getClusterLoginNode(cluster);
+  const client = getClient(FileServiceClient);
 
-  if (!host) {
-    return { 400: { code: "INVALID_CLUSTER" } };
-  }
+  return asyncUnaryCall(client, "deleteDirectory", {
+    cluster, path, userId: info.identityId,
+  }).then(() => ({ 204: null }), handlegRPCError({
+    [status.NOT_FOUND]: () => ({ 400: { code: "INVALID_CLUSTER" as const } }),
+  }));
 
-  return await sshConnect(host, info.identityId, req.log, async (ssh) => {
-    await sshRmrf(ssh, path);
-
-    return { 204: null };
-  });
 
 
 });

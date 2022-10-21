@@ -5,9 +5,9 @@ import { join } from "path";
 import React, { useCallback, useMemo, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
-import { JobInfo } from "src/clusterops/api/job";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
+import { JobInfo } from "src/generated/portal/job";
 import { Cluster, publicConfig } from "src/utils/config";
 import { defaultRanges, formatDateTime } from "src/utils/datetime";
 import { compareNumber } from "src/utils/math";
@@ -52,7 +52,7 @@ export const AllJobQueryTable: React.FC<Props> = ({
 
     let filtered = data.results;
     if (query.jobId) {
-      filtered = filtered.filter((x) => x.jobId === query.jobId + "");
+      filtered = filtered.filter((x) => x.jobId === query.jobId);
     }
 
     return filtered;
@@ -148,7 +148,7 @@ export const JobInfoTable: React.FC<JobInfoTableProps> = ({
         title="更多"
         render={(_, r) => (
           <Space>
-            <a onClick={() => Router.push(join("/files", cluster.id, r.workingDir))}>
+            <a onClick={() => Router.push(join("/files", cluster.id, r.workingDirectory))}>
                 进入目录
             </a>
           </Space>

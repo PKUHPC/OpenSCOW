@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+package scow.portal;
+
+message ShellRequest {
+
+  message Connect {
+    string cluster = 1;
+    string user_id = 2;
+    optional uint32 cols = 3;
+    optional uint32 rows = 4;
+    optional string path = 5;
+  }
+
+  message Resize {
+    uint32 cols = 1;
+    uint32 rows = 2;
+  }
+
+  message Data { bytes data = 1; }
+
+  message Disconnect {}
+
+  oneof message {
+    Connect connect = 1;
+    Resize resize = 2;
+    Data data = 3;
+    Disconnect disconnect = 4;
+  }
+}
+
+message ShellResponse {
+
+  message Data { bytes data = 1; }
+
+  message Exit {
+    optional uint32 code = 1;
+    optional string signal = 2;
+  }
+
+  oneof message {
+    Data data = 1;
+    Exit exit = 2;
+  }
+}
+
+service ShellService {
+  rpc Shell(stream ShellRequest) returns (stream ShellResponse);
+}

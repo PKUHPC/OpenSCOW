@@ -1,0 +1,136 @@
+syntax = "proto3";
+
+package scow.portal;
+
+message CopyRequest {
+  string user_id = 1;
+  string cluster = 2;
+  string from_path = 3;
+  string to_path = 4;
+}
+
+// NOT_FOUND: cluster is not found
+// INTERNAL: cp command failed. details has stderr
+message CopyResponse {}
+
+message CreateFileRequest {
+  string user_id = 1;
+  string cluster = 2;
+  string path = 3;
+}
+
+// NOT_FOUND: cluster is not found
+// ALREADY_EXISTS: file also exists
+message CreateFileResponse {}
+
+message DeleteDirectoryRequest {
+  string user_id = 1;
+  string cluster = 2;
+  string path = 3;
+}
+
+// NOT_FOUND: cluster is not found
+message DeleteDirectoryResponse {}
+
+message DeleteFileRequest {
+  string user_id = 1;
+  string cluster = 2;
+  string path = 3;
+}
+
+// NOT_FOUND: cluster is not found
+message DeleteFileResponse {}
+
+message DownloadRequest {
+  string user_id = 1;
+  string cluster = 2;
+  string path = 3;
+}
+
+message DownloadResponse { bytes chunk = 1; }
+
+message GetHomeDirectoryRequest {
+  string user_id = 1;
+  string cluster = 2;
+}
+
+// NOT_FOUND: cluster is not found
+message GetHomeDirectoryResponse { string path = 1; }
+
+message ReadDirectoryRequest {
+  string user_id = 1;
+  string cluster = 2;
+  string path = 3;
+}
+
+message FileInfo {
+
+  enum FileType {
+    File = 0;
+    Dir = 1;
+  }
+
+  string name = 1;
+  FileType type = 2;
+  string mtime = 3;
+  uint32 mode = 4;
+  uint32 size = 5;
+}
+
+// PERMISSION_DENIED: directory is not accessible
+// INVALID_ARGUMENT: path is not directory or not exists
+message ReadDirectoryResponse { repeated FileInfo results = 1; }
+
+message MoveRequest {
+  string user_id = 1;
+  string cluster = 2;
+  string from_path = 3;
+  string to_path = 4;
+}
+
+// INTERNAL: rename failed. details has error
+message MoveResponse {}
+
+message MakeDirectoryRequest {
+  string user_id = 1;
+  string cluster = 2;
+  string path = 3;
+}
+
+// NOT_FOUND: cluster not found
+// ALREADY_EXISTS: directory already found
+message MakeDirectoryResponse {}
+
+message UploadRequest {
+
+  message Info {
+    string user_id = 1;
+    string cluster = 2;
+    string path = 3;
+  }
+
+  oneof message {
+    // only the first message has info
+    Info info = 1;
+    bytes chunk = 2;
+  };
+}
+
+message UploadResponse { uint64 written_bytes = 1; }
+
+service FileService {
+  rpc Copy(CopyRequest) returns (CopyResponse);
+  rpc CreateFile(CreateFileRequest) returns (CreateFileResponse);
+  rpc DeleteDirectory(DeleteDirectoryRequest) returns (DeleteDirectoryResponse);
+  rpc DeleteFile(DeleteFileRequest) returns (DeleteFileResponse);
+  rpc Download(DownloadRequest) returns (stream DownloadResponse);
+  rpc GetHomeDirectory(GetHomeDirectoryRequest)
+      returns (GetHomeDirectoryResponse);
+  rpc ReadDirectory(ReadDirectoryRequest) returns (ReadDirectoryResponse);
+
+  rpc Move(MoveRequest) returns (MoveResponse);
+
+  rpc MakeDirectory(MakeDirectoryRequest) returns (MakeDirectoryResponse);
+
+  rpc Upload(stream UploadRequest) returns (UploadResponse);
+}

@@ -3,15 +3,13 @@ import type { ClusterConfigSchema } from "@scow/config/build/appConfig/cluster";
 import type { PortalConfigSchema } from "@scow/config/build/appConfig/portal";
 import type { UiConfigSchema } from "@scow/config/build/appConfig/ui";
 import { CONFIG_BASE_PATH } from "@scow/config/build/constants";
-import { KeyPair } from "@scow/lib-ssh";
 import getConfig from "next/config";
 
 export interface ServerRuntimeConfig {
   BASE_PATH: string;
   AUTH_INTERNAL_URL: string;
 
-  SSH_PRIVATE_KEY_PATH: string;
-  ROOT_KEY_PAIR: KeyPair;
+  APPS: { [id: string]: AppConfigSchema };
 
   CLUSTERS_CONFIG: {[cluster: string]: ClusterConfigSchema};
 
@@ -21,11 +19,16 @@ export interface ServerRuntimeConfig {
 
   DEFAULT_PRIMARY_COLOR: string;
 
-  APPS: Record<string, AppConfigSchema>;
-
   MOCK_USER_ID: string | undefined;
 
   LOGIN_NODES: Record<string, string>;
+
+  SERVER_URL: string;
+}
+
+export interface PublicClusterConfig {
+  displayName: string;
+  slurm: { partitions: string[] }
 }
 
 
@@ -49,10 +52,9 @@ export interface PublicRuntimeConfig {
   DEFAULT_HOME_TITLE: string;
   HOME_TITLES: {[hostname: string]: string };
 
-  CLUSTERS_CONFIG: {[cluster: string]: ClusterConfigSchema};
+  CLUSTERS_CONFIG: {[cluster: string]: PublicClusterConfig };
 
   CLUSTERS: Cluster[];
-
 
   APPS: { id: string; name: string }[];
 

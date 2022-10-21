@@ -1,9 +1,10 @@
+import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { authenticate } from "src/auth/server";
+import { DesktopServiceClient } from "src/generated/portal/desktop";
+import { getClient } from "src/utils/client";
 import { publicConfig } from "src/utils/config";
 import { dnsResolve } from "src/utils/dns";
 import { route } from "src/utils/route";
-import { getClusterLoginNode, loggedExec, sshConnect } from "src/utils/ssh";
-import { parseListOutput, VNCSERVER_BIN_PATH } from "src/utils/turbovnc";
 
 export interface ListDesktopsSchema {
   method: "GET";
@@ -39,24 +40,12 @@ export default /* #__PURE__*/route<ListDesktopsSchema>("ListDesktopsSchema", asy
 
   const { cluster } = req.query;
 
-  const host = getClusterLoginNode(cluster);
-  if (!host) { return { 400: { code: "INVALID_CLUSTER" } }; }
+  const client = getClient(DesktopServiceClient);
 
-  return await sshConnect(host, info.identityId, req.log, async (ssh) => {
+  return await asyncUnaryCall(client, "listDesktops", {
+    cluster, userId: info.identityId,
+  }).then(async ({ node, displayIds }) => ({ 200: { node: await dnsResolve(node), displayId: displayIds } }));
 
-    // list all running session
-    const resp = await loggedExec(ssh, req.log, true,
-      VNCSERVER_BIN_PATH, ["-list"],
-    );
 
-    const ids = parseListOutput(resp.stdout);
-
-    return {
-      200: {
-        node: await dnsResolve(host),
-        displayId: ids,
-      },
-    };
-  });
 
 });

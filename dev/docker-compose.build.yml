@@ -46,6 +46,12 @@ services:
       context: ..
       dockerfile: dockerfiles/Dockerfile.mis-server
 
+  portal-server:
+    image: $IMAGE_BASE/portal-server:$TAG
+    build:
+      context: ..
+      dockerfile: dockerfiles/Dockerfile.portal-server
+
   auth:
     image: $IMAGE_BASE/auth:$TAG
     build:

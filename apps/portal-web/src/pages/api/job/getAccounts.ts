@@ -1,5 +1,7 @@
+import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { authenticate } from "src/auth/server";
-import { getClusterOps } from "src/clusterops";
+import { JobServiceClient } from "src/generated/portal/job";
+import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
 
 export interface GetAccountsSchema {
@@ -28,12 +30,10 @@ export default route<GetAccountsSchema>("GetAccountsSchema", async (req, res) =>
 
   const { cluster } = req.query;
 
-  const clusterops = getClusterOps(cluster);
+  const client = getClient(JobServiceClient);
 
-  const reply = await clusterops.job.getAccounts({
-    userId: info.identityId,
-  }, req.log);
-
-  return { 200: { accounts: reply.accounts } };
+  return asyncUnaryCall(client, "listAccounts", {
+    cluster, userId: info.identityId,
+  }).then(({ accounts }) => ({ 200: { accounts } }));
 
 });
