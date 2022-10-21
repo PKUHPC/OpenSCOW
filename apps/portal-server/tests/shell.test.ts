@@ -1,7 +1,6 @@
 import { asyncDuplexStreamCall } from "@ddadaal/tsgrpc-client";
 import { Server } from "@ddadaal/tsgrpc-server";
 import { credentials } from "@grpc/grpc-js";
-import { once } from "events";
 import { createServer } from "src/app";
 import { ShellResponse, ShellServiceClient } from "src/generated/portal/shell";
 import { cluster, collectInfo, connectToTestServer,
@@ -50,11 +49,11 @@ it("tests shell interaction", async () => {
 
   // expectation
   await ssh.ssh.withShell(async (channel) => {
-    channel.on("data", (chunk: Buffer) => {
-      expected.push(chunk);
-    });
     channel.write(type);
-    await once(channel, "end");
+
+    for await (const chunk of channel) {
+      expected.push(chunk);
+    }
   });
 
   const actualString = Buffer.concat(actual).toString();

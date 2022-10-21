@@ -50,12 +50,10 @@ export const shellServiceServer = plugin((server) => {
 
             const hasCode = args[0] !== null;
 
-            call.writeAsync({ message: { $case: "exit", exit: {
+            call.write({ message: { $case: "exit", exit: {
               code: hasCode ? +args[0] : undefined,
               signal: hasCode ? undefined : args[1],
-            } } }).then(() => {
-              call.end();
-            });
+            } } });
           });
 
           // if either pipeline ends, ends the request
