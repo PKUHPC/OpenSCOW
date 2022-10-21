@@ -11,7 +11,6 @@ const { getPortalConfig } = require("@scow/config/build/appConfig/portal");
 const { getAppConfigs } = require("@scow/config/build/appConfig/app");
 const { getClusterConfigs } = require("@scow/config/build/appConfig/cluster");
 const { getKeyPair, testRootUserSshLogin } = require("@scow/lib-ssh");
-const pino = require("pino");
 const os = require("os");
 
 /**
@@ -55,8 +54,6 @@ const config = { _specs: specs };
 
 const buildRuntimeConfig = async (phase) => {
 
-  const logger = pino.default();
-
   const building = phase === PHASE_PRODUCTION_BUILD;
   const dev = phase === PHASE_DEVELOPMENT_SERVER;
   const production = phase === PHASE_PRODUCTION_SERVER;
@@ -91,13 +88,13 @@ const buildRuntimeConfig = async (phase) => {
   if (production) {
     await Promise.all(Object.values(clusters).map(async ({ displayName, slurm: { loginNodes } }) => {
       const node = loginNodes[0];
-      logger.info("Checking if root can login to %s by login node %s", displayName, node)
-      const error = await testRootUserSshLogin(node, keyPair, logger);
+      console.log("Checking if root can login to %s by login node %s", displayName, node)
+      const error = await testRootUserSshLogin(node, keyPair, console);
       if (error) {
-        logger.info("Root cannot login to %s by login node %s. err: %o", displayName, node, error)
+        console.log("Root cannot login to %s by login node %s. err: %o", displayName, node, error)
         throw error;
       } else {
-        logger.info("Root can login to %s by login node %s", displayName, node)
+        console.log("Root can login to %s by login node %s", displayName, node)
       }
     }));
   }
