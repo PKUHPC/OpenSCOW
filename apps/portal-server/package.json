@@ -31,7 +31,7 @@
     "dayjs": "1.11.6"
   },
   "devDependencies": {
-    "@ddadaal/tsgrpc-cli": "0.14.1",
+    "@ddadaal/tsgrpc-cli": "0.14.2",
     "@ddadaal/tsgrpc-client": "0.17.0",
     "@types/node-cron": "3.0.4",
     "@types/wait-on": "5.3.1",

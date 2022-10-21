@@ -101,7 +101,7 @@ importers:
 
   apps/mis-server:
     specifiers:
-      '@ddadaal/tsgrpc-cli': 0.14.0
+      '@ddadaal/tsgrpc-cli': 0.14.2
       '@ddadaal/tsgrpc-server': 0.17.0
       '@grpc/grpc-js': 1.7.2
       '@mikro-orm/cli': 5.4.2
@@ -141,7 +141,7 @@ importers:
       uuid: 9.0.0
       wait-on: 6.0.1
     devDependencies:
-      '@ddadaal/tsgrpc-cli': 0.14.0
+      '@ddadaal/tsgrpc-cli': 0.14.2
       '@types/google-protobuf': 3.15.6
       '@types/node-cron': 3.0.4
       '@types/wait-on': 5.3.1
@@ -159,7 +159,7 @@ importers:
       '@codemirror/view': 6.3.1
       '@ddadaal/next-typed-api-routes-cli': 0.5.1
       '@ddadaal/next-typed-api-routes-runtime': 0.5.2
-      '@ddadaal/tsgrpc-cli': 0.14.0
+      '@ddadaal/tsgrpc-cli': 0.14.2
       '@ddadaal/tsgrpc-client': 0.16.0
       '@grpc/grpc-js': 1.7.2
       '@newhighsco/next-plugin-svgr': 3.0.63
@@ -236,7 +236,7 @@ importers:
       typescript: 4.8.4
     devDependencies:
       '@ddadaal/next-typed-api-routes-cli': 0.5.1
-      '@ddadaal/tsgrpc-cli': 0.14.0
+      '@ddadaal/tsgrpc-cli': 0.14.2
       '@next/bundle-analyzer': 12.3.1
       '@types/google-protobuf': 3.15.6
       '@types/mime-types': 2.1.1
@@ -251,7 +251,7 @@ importers:
 
   apps/portal-server:
     specifiers:
-      '@ddadaal/tsgrpc-cli': 0.14.1
+      '@ddadaal/tsgrpc-cli': 0.14.2
       '@ddadaal/tsgrpc-client': 0.17.0
       '@ddadaal/tsgrpc-common': 0.1.0
       '@ddadaal/tsgrpc-server': 0.18.0
@@ -286,7 +286,7 @@ importers:
       uuid: 9.0.0
       wait-on: 6.0.1
     devDependencies:
-      '@ddadaal/tsgrpc-cli': 0.14.1
+      '@ddadaal/tsgrpc-cli': 0.14.2
       '@ddadaal/tsgrpc-client': 0.17.0_@grpc+grpc-js@1.7.2
       '@types/node-cron': 3.0.4
       '@types/shell-quote': 1.7.1
@@ -304,7 +304,7 @@ importers:
       '@codemirror/view': 6.3.1
       '@ddadaal/next-typed-api-routes-cli': 0.5.1
       '@ddadaal/next-typed-api-routes-runtime': 0.5.2
-      '@ddadaal/tsgrpc-cli': 0.14.0
+      '@ddadaal/tsgrpc-cli': 0.14.2
       '@ddadaal/tsgrpc-client': 0.17.1
       '@grpc/grpc-js': 1.7.2
       '@newhighsco/next-plugin-svgr': 3.0.63
@@ -401,7 +401,7 @@ importers:
       xterm-addon-fit: 0.6.0_xterm@5.0.0
     devDependencies:
       '@ddadaal/next-typed-api-routes-cli': 0.5.1
-      '@ddadaal/tsgrpc-cli': 0.14.0
+      '@ddadaal/tsgrpc-cli': 0.14.2
       '@next/bundle-analyzer': 12.3.1
       '@testing-library/jest-dom': 5.16.5
       '@testing-library/react': 13.4.0_biqbaboplfbrettd7655fr4n2y
@@ -2395,31 +2395,13 @@ packages:
       tslib: 2.4.0
     dev: false
 
-  /@ddadaal/tsgrpc-cli/0.14.0:
-    resolution: {integrity: sha512-Uu3+12nuezby5zhpBWLQO7nU/WlrW0UPX1rn3A2RBHb3i9azkrjroNBgnxO6DH1QAwBMGegyieOvQDvgqGTuxA==}
+  /@ddadaal/tsgrpc-cli/0.14.2:
+    resolution: {integrity: sha512-GiN4fnLwxwTdHpgYpK54S/UtVm8MmM4U9tEvJKJVsQ13lER3HcyDnDKEkmi5OmaBCo4sRMfUBfxd/NFRHODJqg==}
     hasBin: true
     dependencies:
       glob: 8.0.3
       grpc-tools: 1.11.3
       rimraf: 3.0.2
-      shell-quote: 1.7.4
-      ts-proto: 1.128.0
-      tslib: 2.4.0
-      yargs: 17.6.0
-      zod: 3.19.1
-    transitivePeerDependencies:
-      - encoding
-      - supports-color
-    dev: true
-
-  /@ddadaal/tsgrpc-cli/0.14.1:
-    resolution: {integrity: sha512-KzBVYMb/RyJnnoIn+nGPb3Nx0AYq4mW821nF26nW7DMLmA9naJrl0U3FUv+rTnT/VDsB6kln6cq4ttgZ4VHEfw==}
-    hasBin: true
-    dependencies:
-      glob: 8.0.3
-      grpc-tools: 1.11.3
-      rimraf: 3.0.2
-      shell-quote: 1.7.4
       ts-proto: 1.129.0
       tslib: 2.4.0
       yargs: 17.6.0
@@ -14637,6 +14619,7 @@ packages:
 
   /shell-quote/1.7.4:
     resolution: {integrity: sha512-8o/QEhSSRb1a5i7TFR0iM4G16Z0vYB2OQVs4G3aAFXjn3T6yEx8AZxy1PgDF7I00LZHYA3WxaSYIf5e5sAX8Rw==}
+    dev: false
 
   /shelljs/0.8.5:
     resolution: {integrity: sha512-TiwcRcrkhHvbrZbnRcFYMLl30Dfov3HKqzp5tO5b4pt6G/SezKcYhmDg15zXVBswHmctSAQKznqNW2LO5tTDow==}
@@ -15561,18 +15544,6 @@ packages:
     dependencies:
       long: 4.0.0
       protobufjs: 6.11.3
-    dev: true
-
-  /ts-proto/1.128.0:
-    resolution: {integrity: sha512-1rn9+FHCnJc+C6V4o3ckublXttzTWIP8HOHfiMV4NtmRv0M5zKrMERfkubbxwPbAXNEzi1srOCimoQZpsxG/CQ==}
-    hasBin: true
-    dependencies:
-      '@types/object-hash': 1.3.4
-      dataloader: 1.4.0
-      object-hash: 1.3.1
-      protobufjs: 6.11.3
-      ts-poet: 6.1.0
-      ts-proto-descriptors: 1.7.1
     dev: true
 
   /ts-proto/1.129.0:

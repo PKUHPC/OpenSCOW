@@ -51,7 +51,7 @@
   },
   "devDependencies": {
     "@ddadaal/next-typed-api-routes-cli": "0.5.1",
-    "@ddadaal/tsgrpc-cli": "0.14.0",
+    "@ddadaal/tsgrpc-cli": "0.14.2",
     "@next/bundle-analyzer": "12.3.1",
     "@types/google-protobuf": "3.15.6",
     "@types/mime-types": "2.1.1",
