@@ -273,7 +273,6 @@ export const fileServiceServer = plugin((server) => {
               }
 
               if (req.message.$case === "chunk") {
-                logger.info("Chunk of size %d is received", req.message.chunk.length);
                 writtenBytes += req.message.chunk.length;
                 return req.message.chunk;
               }
@@ -289,6 +288,8 @@ export const fileServiceServer = plugin((server) => {
           // ensure the data is written
           writeStream.end();
           await finished(writeStream);
+
+          logger.info("Upload complete. Received %d bytes", writtenBytes);
 
           return [{ writtenBytes }];
         } catch (e: any) {

@@ -6,6 +6,7 @@ import { FileServiceClient } from "src/generated/portal/file";
 import { getClient } from "src/utils/client";
 import { pipeline } from "src/utils/pipeline";
 import { route } from "src/utils/route";
+import { pipeline as pipelineStream } from "stream/promises";
 
 export interface UploadFileSchema {
   method: "POST";
@@ -35,12 +36,16 @@ export default route<UploadFileSchema>("UploadFileSchema", async (req, res) => {
 
   const client = getClient(FileServiceClient);
 
+  pipelineStream(req, bb);
+
+  const [_name, file] = (await once(bb, "file").catch((e) => {
+    throw new Error("Error when waiting for file upload", { cause: e });
+  })) as Parameters<BusboyEvents["file"]>;
+
+  console.log("received file", _name);
+
   return await asyncRequestStreamCall(client, "upload", async ({ writeAsync }, stream) => {
     await writeAsync({ message: { $case: "info", info: { cluster, path, userId: info.identityId } } });
-
-    const [_name, file] = (await once(bb, "file").catch((e) => {
-      throw new Error("Error when waiting for file upload", { cause: e });
-    })) as Parameters<BusboyEvents["file"]>;
 
     await pipeline(
       file,

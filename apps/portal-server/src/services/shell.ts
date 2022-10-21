@@ -45,15 +45,17 @@ export const shellServiceServer = plugin((server) => {
             await writeAsync(quote(["cd", path]) + "\n");
           }
 
-          const abortController = new AbortController();
-
           channel.on("exit", (...args: [code: string] | [code: null, signal: string]) => {
             logger.info("Shell exited with %o", ...args);
-            abortController.abort();
-            call.write({ message: { $case: "exit", exit: {
-              code: args[0] ? +args[0] : undefined,
-              signal: args[0] ? undefined : args[1],
-            } } });
+
+            const hasCode = args[0] !== null;
+
+            call.writeAsync({ message: { $case: "exit", exit: {
+              code: hasCode ? +args[0] : undefined,
+              signal: hasCode ? undefined : args[1],
+            } } }).then(() => {
+              call.end();
+            });
           });
 
           // if either pipeline ends, ends the request
@@ -86,7 +88,7 @@ export const shellServiceServer = plugin((server) => {
 
                 if (req.message.$case === "disconnect") {
                   logger.info("Disconnect received from client");
-                  abortController.abort();
+                  call.end();
                   return;
                 }
 
@@ -99,10 +101,8 @@ export const shellServiceServer = plugin((server) => {
                   code: status.INVALID_ARGUMENT,
                   message: `Received unexpected message type ${req.message.$case}`,
                 };
-
               },
               channel,
-              { signal: abortController.signal },
             ),
           ]).finally(() => { call.end(); channel.end(); });
         }, { cols, rows });

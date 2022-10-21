@@ -70,7 +70,6 @@ export default async (req: NextApiRequest, res: NextApiResponseServerIO) => {
           socket.emit("data", chunk.message.data.data);
           break;
         case "exit":
-          console.log("received exit");
           socket.emit("exit", { exitCode: chunk.message.exit.code, signal: chunk.message.exit.signal });
           break;
         }
