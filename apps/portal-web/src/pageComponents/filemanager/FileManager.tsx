@@ -169,7 +169,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
           });
         })
         .then(() => {
-          message.error(`${operationText}成功！`);
+          message.success(`${operationText}成功！`);
         }).finally(() => {
           resetSelectedAndOperation();
           reload();
