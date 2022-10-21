@@ -6,6 +6,7 @@ import { desktopServiceServer } from "src/services/desktop";
 import { fileServiceServer } from "src/services/file";
 import { jobServiceServer } from "src/services/job";
 import { shellServiceServer } from "src/services/shell";
+import { checkClustersRootUserLogin } from "src/utils/ssh";
 
 export async function createServer() {
 
@@ -24,6 +25,8 @@ export async function createServer() {
   await server.register(jobServiceServer);
   await server.register(fileServiceServer);
   await server.register(shellServiceServer);
+
+  await checkClustersRootUserLogin(server.logger);
 
   return server;
 }

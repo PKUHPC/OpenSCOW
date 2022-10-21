@@ -10,8 +10,6 @@ const { DEFAULT_PRIMARY_COLOR, getUiConfig } = require("@scow/config/build/appCo
 const { getPortalConfig } = require("@scow/config/build/appConfig/portal");
 const { getAppConfigs } = require("@scow/config/build/appConfig/app");
 const { getClusterConfigs } = require("@scow/config/build/appConfig/cluster");
-const { getKeyPair, testRootUserSshLogin } = require("@scow/lib-ssh");
-const os = require("os");
 
 /**
  * Get auth capabilities
@@ -81,23 +79,6 @@ const buildRuntimeConfig = async (phase) => {
 
   const uiConfig = getUiConfig(configPath);
   const portalConfig = getPortalConfig(configPath);
-
-  const keyPair = getKeyPair(config.SSH_PRIVATE_KEY_PATH, config.SSH_PUBLIC_KEY_PATH);
-
-  // test if the root user can ssh to login nodes
-  if (production) {
-    await Promise.all(Object.values(clusters).map(async ({ displayName, slurm: { loginNodes } }) => {
-      const node = loginNodes[0];
-      console.log("Checking if root can login to %s by login node %s", displayName, node)
-      const error = await testRootUserSshLogin(node, keyPair, console);
-      if (error) {
-        console.log("Root cannot login to %s by login node %s. err: %o", displayName, node, error)
-        throw error;
-      } else {
-        console.log("Root can login to %s by login node %s", displayName, node)
-      }
-    }));
-  }
 
   /**
    * @type {import("./src/utils/config").ServerRuntimeConfig}
