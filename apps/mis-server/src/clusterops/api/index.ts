@@ -14,4 +14,5 @@ export interface ClusterOps {
   job: JobOps;
   storage: StorageOps;
   user: UserOps;
+  onStartup: () => Promise<void>;
 }

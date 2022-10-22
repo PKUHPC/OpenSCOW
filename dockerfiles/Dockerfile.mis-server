@@ -58,6 +58,7 @@ COPY --from=builder /app/libs/ssh/build/ ./build
 WORKDIR /app/apps/mis-server
 COPY --from=builder /app/apps/mis-server/package.json .
 COPY --from=builder /app/apps/mis-server/node_modules/ ./node_modules
+COPY --from=builder /app/apps/mis-server/scripts/ ./scripts
 COPY --from=builder /app/apps/mis-server/build/ ./src
 
 ENV NODE_ENV production
