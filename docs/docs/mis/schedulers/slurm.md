@@ -14,7 +14,7 @@ title: slurm
 
 我们建议在slurm集群的manager节点上同时配置客户端程序，并使用此节点为**slurm节点**。
 
-之后，将[slurm.sh](%REPO_FILE_URL%/apps/mis-server/scripts/slurm.sh)复制进每个集群的**slurm节点**，并给予可执行权限。
+之后，将[slurm.sh](%REPO_FILE_URL%/apps/mis-server/scripts/slurm.sh)复制进每个集群的**slurm节点**，并给予可执行权限。(现在无需进行这一步，不用手动复制，系统会根据下面集群配置中的managerUrl和scriptPath所给地址自动复制)
 
 ## 修改集群配置
 
