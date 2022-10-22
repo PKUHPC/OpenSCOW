@@ -3,6 +3,7 @@ import { Server } from "@ddadaal/tsgrpc-server";
 import { ChannelCredentials, status } from "@grpc/grpc-js";
 import { sftpExists, sftpStat, sshConnect } from "@scow/lib-ssh";
 import { createServer } from "src/app";
+import { createSlurmOps } from "src/clusterops/slurm";
 import { clusters } from "src/config/clusters";
 import { rootKeyPair } from "src/config/env";
 import { Tenant } from "src/entities/Tenant";
@@ -29,6 +30,10 @@ afterEach(async () => {
 });
 
 it("To test whether the slurm.sh is automatically copied successfully", async () => {
+  const ops = createSlurmOps("hpc00", server.logger);
+  if (ops) {
+    await ops.onStartup();
+  }
   const testSlurmMisConfig00 = clusters["hpc00"].slurm.mis;
   if (!testSlurmMisConfig00) {
     fail(new Error("The cluster configuration file does not exist"));

@@ -14,7 +14,6 @@ title: slurm
 
 我们建议在slurm集群的manager节点上同时配置客户端程序，并使用此节点为**slurm节点**。
 
-之后，系统会自动将[slurm.sh](%REPO_FILE_URL%/apps/mis-server/scripts/slurm.sh)复制进每个集群的**slurm节点**，并给予可执行权限。
 
 ## 修改集群配置
 
@@ -27,7 +26,7 @@ slurm:
   mis:
     # 部署slurm.sh的机器的地址
     managerUrl: haha
-    # slurm.sh在机器中的绝对地址
+    # slurm.sh在机器中的绝对地址,每次系统启动时，会自动将slurm.sh文件复制到scriptPath指定路径上
     scriptPath: /test/slurm.sh
     # slurmdbd的数据库密码
     dbPassword: password

@@ -1,5 +1,5 @@
 displayName: hpc00
-misIgnore: false
+misIgnore: true
 slurm:
   mis:
     managerUrl: localhost:22222
