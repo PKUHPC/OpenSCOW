@@ -31,12 +31,13 @@ afterEach(async () => {
 
 it("To test whether the slurm.sh is automatically copied successfully", async () => {
   const ops = createSlurmOps("hpc00", server.logger);
-  if (ops) {
-    await ops.onStartup();
+  if (!ops) {
+    throw new Error("The cluster configuration file does not exist");
   }
+  await ops.onStartup();
   const testSlurmMisConfig00 = clusters["hpc00"].slurm.mis;
   if (!testSlurmMisConfig00) {
-    fail(new Error("The cluster configuration file does not exist"));
+    throw new Error("The cluster configuration file does not exist");
   }
   await sshConnect(testSlurmMisConfig00.managerUrl, "test", rootKeyPair, server.logger, async (ssh) => {
     const sftp = await ssh.requestSFTP();

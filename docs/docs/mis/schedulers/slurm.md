@@ -13,7 +13,7 @@ title: slurm
 - 此节点上安装并配置好了slurm的客户端程序，如`sacctmgr`、`squeue`等。
 
 我们建议在slurm集群的manager节点上同时配置客户端程序，并使用此节点为**slurm节点**。
-
+-在项目启动后，系统将自动给slurm节点上传一个slurm.sh脚本，用于进行一些slurm操作。具体上传的位置将可以在集群配置中进行配置。
 
 ## 修改集群配置
 
