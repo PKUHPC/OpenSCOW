@@ -1,7 +1,10 @@
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Server } from "@ddadaal/tsgrpc-server";
 import { ChannelCredentials, status } from "@grpc/grpc-js";
+import { sftpExists, sftpStat, sshConnect } from "@scow/lib-ssh";
 import { createServer } from "src/app";
+import { clusters } from "src/config/clusters";
+import { rootKeyPair } from "src/config/env";
 import { Tenant } from "src/entities/Tenant";
 import { PlatformRole, TenantRole, User } from "src/entities/User";
 import { CreateInitAdminRequest, InitServiceClient,
@@ -23,6 +26,23 @@ beforeEach(async () => {
 afterEach(async () => {
   await dropDatabase(server.ext.orm);
   await server.close();
+});
+
+it("To test whether the slurm.sh is automatically copied successfully", async () => {
+  const testSlurmMisConfig00 = clusters["hpc00"].slurm.mis;
+  if (!testSlurmMisConfig00) {
+    fail(new Error("The cluster configuration file does not exist"));
+  }
+  await sshConnect(testSlurmMisConfig00.managerUrl, "test", rootKeyPair, server.logger, async (ssh) => {
+    const sftp = await ssh.requestSFTP();
+    // 测试指定路径是否存在slurm.sh文件
+    const result = await sftpExists(sftp, testSlurmMisConfig00.scriptPath);
+    expect(result).toEqual(true);
+    // 解析出文件mode低9位权限字段并测试是否为555
+    const stats = await sftpStat(sftp)(testSlurmMisConfig00.scriptPath);
+    const testNumberPermission = (stats.mode & parseInt("777", 8)).toString(8);
+    expect(testNumberPermission).toEqual("555");
+  });
 });
 
 it("querys init state and updates if complete", async () => {
