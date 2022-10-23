@@ -72,6 +72,20 @@ export const adminServiceServer = plugin((server) => {
 
     },
 
+    getClusterUsers: async ({ request, logger }) => {
+      const { cluster } = request;
+
+      const reply = await server.ext.clusters.callOnOne(
+        cluster,
+        logger,
+        async (ops) => ops.user.getUsersInAccounts({
+          request: {}, logger,
+        }),
+      );
+
+      return [{ result: reply.result }];
+    },
+
     getFetchInfo: async () => {
       return [{
         fetchStarted: server.ext.fetch.started(),

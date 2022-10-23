@@ -41,6 +41,14 @@ message ImportUsersReply {
   uint32 users_without_name = 3;
 }
 
+message GetClusterUsersRequest {
+  string cluster = 1;
+}
+
+message GetClusterUsersReply {
+  string result = 1;
+}
+
 message GetFetchInfoRequest {}
 
 message GetFetchInfoReply {
@@ -61,6 +69,7 @@ service AdminService {
   rpc QueryStorageQuota(QueryStorageQuotaRequest)
       returns (QueryStorageQuotaReply);
   rpc ImportUsers(ImportUsersRequest) returns (ImportUsersReply);
+  rpc GetClusterUsers(GetClusterUsersRequest) returns (GetClusterUsersReply);
   rpc GetFetchInfo(GetFetchInfoRequest) returns (GetFetchInfoReply);
   rpc SetFetchState(SetFetchStateRequest) returns (SetFetchStateReply);
   rpc FetchJobs(FetchJobsRequest) returns (FetchJobsReply);
