@@ -1,8 +1,8 @@
 ---
-slug: update-deployment
-title: socw-deployment平滑升级指导
+slug: update-to-python-deployment
+title: scow-deployment平滑升级指导
 authors: [huangjun]
-tags: [scow, socw-deployment]
+tags: [scow, scow-deployment]
 
 ---
 
@@ -24,47 +24,15 @@ docker-compose down
 
 ## 2. 备份配置文件
 
-为避免不确定性因素或操作失误造成升级失败丢失数据，建议备份如下数据：
+主要备份`.env`配置文件：
 
 ```shell
 # 1. 创建备份目录
 mkdir /path/to/backup
 
-# 2. 备份scow业务配置
-cp -r ./config /path/to/backup
-# 3. 备份部署的环境变量
+# 2. 备份部署的环境变量
 cp .env /path/to/backup
 
-# 4. 备份数据库文件
-# 查看备份目录：根据docker-compose文件，一般默认目录为：/var/lib/docker/volumes/scow-deployment_db_data/_data，也可根据如下命令查看
-docker inspect scow-deployment-db-1 | grep Mounts -A 10
-#...
-            "Mounts": [
-                {
-                    "Type": "volume",
-                    "Source": "scow-deployment_db_data",
-                    "Target": "/var/lib/mysql",
-                    "VolumeOptions": {}
-                }
-            ],
-            "MaskedPaths": [
-                "/proc/acpi",
-                "/proc/config.gz",
---
-        "Mounts": [
-            {
-                "Type": "volume",
-                "Name": "scow-deployment-db_data",
-                "Source": "/var/lib/docker/volumes/scow-deployment_db_data/_data",
-                "Destination": "/var/lib/mysql",
-                "Driver": "local",
-                "Mode": "z",
-                "RW": true,
-                "Propagation": ""
-            }
-#...
-# 可以看出备份目录为：/var/lib/docker/volumes/scow-deployment_db_data/_data，备份该目录
-cp -r /var/lib/docker/volumes/scow-deployment_db_data/_data /path/to/backup
 ```
 
 ## 3.  升级
@@ -72,8 +40,9 @@ cp -r /var/lib/docker/volumes/scow-deployment_db_data/_data /path/to/backup
 拉取master分支最新代码：
 
 ```shell
-# 为避免原目录中存在一些自定义文件影响，建议克隆一份最新代码
-git clone https://github.com/PKUHPC/scow-deployment.git
+cd /path/to/scow-deployment
+# 同步最新代码
+git pull
 ```
 
 目录结构如下：
@@ -91,13 +60,10 @@ tree -L 1
 编写配置文件:
 
 ```shell
-# 1. 从备份处拷贝scow业务配置模板文件目录
-cp -r /path/to/backup/config ./
-
-# 2. 复制配置文件
+# 1. 复制配置文件
 cp config-example.py config.py
 
-# 3. 配置参数
+# 2. 配置参数
 # 根据和备份的.env文件和config.py中的参数说明，修改config.py文件中的参数
 
 ```
@@ -111,6 +77,8 @@ cp config-example.py config.py
 # 停止服务
 ./compose.sh down
 ```
+
+> `./compose.sh`支持所有基于`Docker Compose`文件的`docker-compose`命令，如：up、down、ps、restart等。
 
 详细说明可参考`PKUHPC/scow-deployment`项目的[README.md](https://github.com/PKUHPC/scow-deployment/blob/master/README.md)。
 
