@@ -23,7 +23,22 @@ message GetTenantInfoReply {
 message GetTenantsRequest {}
 message GetTenantsReply { repeated string names = 1; }
 
+
+message PlatformTenantInfo {
+    uint32 tenantId = 1;
+    string tenantName = 2;
+    common.Money balance = 3;
+}
+message GetAllTenantsRequest {}
+message GetAllTenantsReply {
+    uint32 totalCount = 1;
+    // uint32 userCount = 2;
+    // uint32 accountCount = 3;
+    repeated PlatformTenantInfo platform_tenants = 2;
+}
+
 service TenantService {
   rpc GetTenantInfo(GetTenantInfoRequest) returns (GetTenantInfoReply);
   rpc GetTenants(GetTenantsRequest) returns (GetTenantsReply);
+  rpc GetAllTenants(GetAllTenantsRequest) returns (GetAllTenantsReply);
 }

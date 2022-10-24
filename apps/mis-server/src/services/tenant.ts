@@ -37,6 +37,25 @@ export const tenantServiceServer = plugin((server) => {
       return [{ names: tenants.map((x) => x.name) }];
     },
 
+    getAllTenants: async ({ em }) => {
+      const [tenants, tenantCount] = await em.findAndCount(Tenant, {});
+      // 
+      // const userCount = await em.count(User);
+      // const userCount= await em.count(Account);
+      return [
+        {
+
+          totalCount:tenantCount,
+          // userCount:userCount,
+          // accountCount:userCount,
+          platformTenants:tenants.map((x) => ({
+            tenantId:x.id,
+            tenantName:x.name,
+            balabce:x.balance,
+          })),
+        }];
+    },
+
   });
 
 });

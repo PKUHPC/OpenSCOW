@@ -32,6 +32,11 @@ export const platformAdminRoutes: (platformRoles: PlatformRole[]) => NavItemProp
         },
         {
           Icon: UserOutlined,
+          text: "全部租户",
+          path: "/admin/tenants",
+        },
+        {
+          Icon: UserOutlined,
           text: "全部用户",
           path: "/admin/users",
         },
