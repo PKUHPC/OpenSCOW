@@ -31,4 +31,4 @@ SSH认证方式要求编写好[集群配置文件](../clusterConfig.md)，并且
 authType: ssh
 ```
 
-增加好配置后，运行`docker compose restart`重启系统即可。
+增加好配置后，运行`./compose.sh restart`重启系统即可。
