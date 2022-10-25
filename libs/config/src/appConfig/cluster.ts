@@ -40,7 +40,7 @@ export const ClusterListConfigSchema = Type.Object({
           cores: Type.Integer({ description: "核心数" }),
           gpus: Type.Integer({ description: "GPU卡数" }),
           nodes: Type.Integer({ description: "节点数" }),
-          qos: Type.Array(Type.String({ description: "QOS" }), { description: "QOS列表", default: []}),
+          qos: Type.Array(Type.String({ description: "QOS" }), { description: "QOS列表" }),
           comment: Type.Optional(Type.String({ description: "计费项说明" })),
         },
       ),
