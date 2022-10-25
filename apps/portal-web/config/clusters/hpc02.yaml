@@ -19,5 +19,9 @@ slurm:
         mem: 262144
         cores: 29
         gpus: 8
+        qos:
+          - low
+          - normal
+          - high
         comment: 说明
 
