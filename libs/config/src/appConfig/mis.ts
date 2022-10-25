@@ -11,6 +11,11 @@ export const SlurmMisConfigSchema = Type.Object({
 
 export type SlurmMisConfigSchema = Static<typeof SlurmMisConfigSchema>;
 
+export enum JobTableType {
+  mariadb = "mariadb",
+  mysql = "mysql",
+}
+
 export const MisConfigSchema = Type.Object({
   db: Type.Object({
     host: Type.String({ description: "数据库地址" }),
@@ -40,6 +45,7 @@ export const MisConfigSchema = Type.Object({
       password: Type.String({ description: "job_table数据库密码" }),
       dbName: Type.String({ description: "job_table数据库名" }),
       tableName: Type.String({ description: "job_table中源数据所在的表名" }),
+      type: Type.Enum(JobTableType, { description: "job_table数据库类型", default: JobTableType.mariadb }),
     }),
 
     startIndex: Type.Integer({ description: "从哪个biJobIndex开始获取数据", default: 0 }),
