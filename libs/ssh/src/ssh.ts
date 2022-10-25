@@ -1,7 +1,5 @@
 import { NodeSSH, SSHExecCommandOptions } from "node-ssh";
 import { quote } from "shell-quote";
-import { SFTPWrapper } from "ssh2";
-import { promisify } from "util";
 import type { Logger } from "ts-log";
 
 import { insertKey, KeyPair } from "./key";
