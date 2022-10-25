@@ -34,7 +34,7 @@ export const CreateUserForm: React.FC<Props> = ({ noPassword }) => {
         ]}
 
       >
-        <Input placeholder="只能由小写英文字符、数字和下划线组成" />
+        <Input placeholder={publicConfig.USERID_PATTERN_MESSAGE} />
       </Form.Item>
       <Form.Item label="用户姓名" name="name" rules={[{ required: true }]}>
         <Input />
