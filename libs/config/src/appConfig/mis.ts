@@ -32,6 +32,11 @@ export const MisConfigSchema = Type.Object({
     errorMessage: Type.Optional(Type.String({ description: "如果账户名不符合规则显示什么" })),
   })),
 
+  userIdPattern: Type.Optional(Type.Object({
+    regex: Type.String({ description: "用户ID的正则规则" }),
+    errorMessage: Type.Optional(Type.String({ description: "如果用户ID不符合规则显示什么" })),
+  })),
+
   fetchJobs: Type.Object({
     db: Type.Object({
       host: Type.String({ description: "job_table数据库地址" }),

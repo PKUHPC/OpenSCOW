@@ -14,9 +14,7 @@ export interface CreateUserSchema {
   body: {
     /**
      * 用户ID
-     * @pattern ^[a-z1-9_]+$
      */
-
     identityId: string;
     name: string;
     email: string;

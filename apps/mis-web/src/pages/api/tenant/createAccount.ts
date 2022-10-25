@@ -15,7 +15,6 @@ export interface CreateAccountSchema {
   body: {
     /**
      * 账户名
-     * @pattern ^[a-z0-9_]+$
      */
     accountName: string;
     ownerId: string;

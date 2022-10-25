@@ -96,6 +96,9 @@ const buildRuntimeConfig = async (phase) => {
     ACCOUNT_NAME_PATTERN: misConfig.accountNamePattern?.regex,
     ACCOUNT_NAME_PATTERN_MESSAGE: misConfig.accountNamePattern?.errorMessage,
 
+    USERID_PATTERN: misConfig.userIdPattern?.regex,
+    USERID_PATTERN_MESSAGE: misConfig.userIdPattern?.errorMessage,
+
     PORTAL_URL: config.PORTAL_DEPLOYED ? join(config.BASE_PATH, config.PORTAL_URL || misConfig.portalUrl || "") : undefined,
   };
 
