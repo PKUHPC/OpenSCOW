@@ -4,6 +4,7 @@ import { Status } from "@grpc/grpc-js/build/src/constants";
 import { importUsers } from "src/bl/importUsers";
 import { StorageQuota } from "src/entities/StorageQuota";
 import { AdminServiceServer, AdminServiceService } from "src/generated/server/admin";
+import { parseClusterUsers } from "src/utils/slurm";
 
 export const adminServiceServer = plugin((server) => {
 
@@ -82,8 +83,8 @@ export const adminServiceServer = plugin((server) => {
           request: {}, logger,
         }),
       );
-
-      return [{ result: reply.result }];
+      
+      return [parseClusterUsers(reply.result)];
     },
 
     getFetchInfo: async () => {

@@ -159,6 +159,27 @@ export const mockApi: MockApi<typeof api> = {
 
   importUsers: async () => null,
 
+  getClusterUsers: async () => {
+    return ({
+      accounts: [
+        {
+          accountName: "a_user1",
+          users: [{ userId: "user1", state: "allowed!" }, { userId: "user2", state: "allowed!" }],
+          owner: "user1",
+        },
+        {
+          accountName: "account2",
+          users: [{ userId: "user2", state: "allowed!" }, { userId: "user3", state: "allowed!" }],
+        },
+      ],
+      users: [ 
+        { userId: "user1", userName: "user1", accounts: [ "a_user1" ]}, 
+        { userId: "user2", userName: "user2", accounts: [ "a_user1", "account2" ]}, 
+        { userId: "user3", userName: "user3", accounts: [ "account2" ]},
+      ],
+    });
+  },
+
   completeInit: async () => null,
 
   getFetchJobInfo: async () => ({ fetchStarted: true, schedule: "*", lastFetchTime: new Date().toISOString() }),

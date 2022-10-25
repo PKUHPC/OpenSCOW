@@ -1,7 +1,7 @@
 import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { authenticate } from "src/auth/server";
-import { AdminServiceClient } from "src/generated/server/admin";
+import { AdminServiceClient, GetClusterUsersReply } from "src/generated/server/admin";
 import { PlatformRole } from "src/models/User";
 import { getClient } from "src/utils/client";
 
@@ -14,9 +14,7 @@ export interface GetClusterUsersSchema {
   }
 
   responses: {
-    200: {
-      dataString: string;
-    }
+    200: GetClusterUsersReply;
   }
 }
 
@@ -31,8 +29,11 @@ export default route<GetClusterUsersSchema>("GetClusterUsersSchema",
 
     const client = getClient(AdminServiceClient);
 
-    return await asyncClientCall(client, "getClusterUsers", {
+    const result = await asyncClientCall(client, "getClusterUsers", {
       cluster,
-    })
-      .then(({ result }) => ({ 200: { dataString: result } }));
+    });
+
+    return {
+      200: result,
+    };
   });
