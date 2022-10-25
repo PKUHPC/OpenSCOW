@@ -41,9 +41,10 @@ export async function getBillingTableItems(tenantName: string | undefined) {
     const partitionCount = Object.keys(partitions).length;
     let clusterItemIndex = 0;
     for (const [partition, partitionInfo] of Object.entries(partitions)) {
-      const qosCount = partitionInfo.qos?.length ?? 1;
+      const qosCount = partitionInfo.qos.length;
+
       let partitionItemIndex = 0;
-      for (const qos of partitionInfo.qos ?? [""]) {
+      for (const qos of partitionInfo.qos) {
 
         const path = [cluster, partition, qos].filter((x) => x).join(".");
 

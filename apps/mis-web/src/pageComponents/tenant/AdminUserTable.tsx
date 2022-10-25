@@ -1,5 +1,5 @@
 import { ExclamationCircleOutlined } from "@ant-design/icons";
-import { Button, Form, Input, message, Modal, Space, Table, Tag } from "antd";
+import { Button, Form, Input, message, Modal, Space, Table } from "antd";
 import React, { useMemo, useState } from "react";
 import { api } from "src/apis";
 import { DisabledA } from "src/components/DisabledA";
@@ -79,7 +79,7 @@ export const AdminUserTable: React.FC<Props> = ({
           sorter={(a, b) => a.email.localeCompare(b.email)}
           sortDirections={["ascend", "descend"]}
         />
-        <Table.Column<FullUserInfo> 
+        <Table.Column<FullUserInfo>
           dataIndex="tenantRoles"
           title="租户管理员"
           render={(_, r) => (
@@ -138,7 +138,7 @@ export const AdminUserTable: React.FC<Props> = ({
             )
           )}
         />
-        <Table.Column<FullUserInfo> 
+        <Table.Column<FullUserInfo>
           dataIndex="tenantRoles"
           title="租户财务人员"
           render={(_, r) => (

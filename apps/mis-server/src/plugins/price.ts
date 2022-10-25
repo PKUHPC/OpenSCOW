@@ -33,7 +33,6 @@ export interface PriceMap {
 
   calculatePrice(info: JobInfo): JobPriceInfo;
 
-  checkDefaultBillingItemsCompleteness(): void;
 }
 
 export const pricePlugin = plugin(async (s) => {
@@ -47,9 +46,9 @@ export const pricePlugin = plugin(async (s) => {
 });
 
 export function getActiveBillingItems(items: JobPriceItem[]) {
-  // { [cluster.partition[.qos]]: price }
+  // { [cluster.partition.qos]: price }
   const defaultPrices: Record<string, JobPriceItem> = {};
-  // { tenantName: { [cluster.partition[.qos] ]: price }}
+  // { tenantName: { [cluster.partition.qos ]: price }}
   const tenantSpecificPrices: Record<string, Record<string, JobPriceItem>> = {};
 
   items.forEach((item) => {
@@ -84,15 +83,15 @@ export async function createPriceMap(em: SqlEntityManager<MySqlDriver>, logger: 
 
     const [cluster, partition, qos] = path;
 
+    const pathStr = [cluster, partition, qos].join(".");
+
     if (tenantName && tenantName !== DEFAULT_TENANT_NAME && tenantName in tenantSpecificPrices) {
-      const specific = tenantSpecificPrices[tenantName][[cluster, partition, qos].join(".")] ||
-        tenantSpecificPrices[tenantName][[cluster, partition].join(".")];
+      const specific = tenantSpecificPrices[tenantName][pathStr];
 
       if (specific) { return specific; }
     }
 
-    const price = defaultPrices[[cluster, partition, qos].join(".")] ||
-        defaultPrices[[cluster, partition].join(".")];
+    const price = defaultPrices[pathStr];
 
     if (!price) {
       throw new Error(`Unknown cluster ${cluster} partition ${partition} qos ${qos}`);
@@ -104,33 +103,6 @@ export async function createPriceMap(em: SqlEntityManager<MySqlDriver>, logger: 
   return {
 
     calculatePrice: (info) => calculateJobPrice(info, getPriceItem, logger),
-
-    checkDefaultBillingItemsCompleteness: () => {
-      for (const cluster in clusters.clusters) {
-        for (const partition in clusters.clusters[cluster]) {
-          const path = [cluster, partition];
-
-          const { qos } = clusters.clusters[cluster][partition];
-
-          if (path.join(".") in defaultPrices) {
-            continue;
-          }
-
-          if (Array.isArray(qos)) {
-            qos.forEach((q) => {
-              const newPath = [...path, q].join(".");
-              if (!(newPath in defaultPrices)) {
-                throw new Error(`${newPath} not defined in JobBillingItem table.`);
-              }
-            });
-          } else {
-            throw new Error(`${path.join(".")} not defined in JobBillingItem table.`);
-          }
-        }
-      }
-
-      logger.info("Billing Items defined in db covers all items in clustersSpecs.json");
-    },
 
     getPriceMap: (tenantName) => {
       return {

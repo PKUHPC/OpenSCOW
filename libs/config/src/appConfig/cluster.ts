@@ -14,7 +14,7 @@ export type ClusterConfigSchema = {
       cores: number;
       gpus: number;
       nodes: number;
-      qos?: string[];
+      qos: string[];
       comment?: string;
     }>;
     mis: SlurmMisConfigSchema | undefined;
@@ -40,7 +40,7 @@ export const ClusterListConfigSchema = Type.Object({
           cores: Type.Integer({ description: "核心数" }),
           gpus: Type.Integer({ description: "GPU卡数" }),
           nodes: Type.Integer({ description: "节点数" }),
-          qos: Type.Optional(Type.Array(Type.String({ description: "QOS" }))),
+          qos: Type.Array(Type.String({ description: "QOS" }), { description: "QOS列表", default: []}),
           comment: Type.Optional(Type.String({ description: "计费项说明" })),
         },
       ),
