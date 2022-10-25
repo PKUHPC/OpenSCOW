@@ -32,6 +32,9 @@ export async function insertKey(
 
   await sshConnect(host, "root", rootKeyPair, logger, async (ssh) => {
     const homeDir = await ssh.execCommand(`eval echo ~${user}`);
+    const userID = await ssh.execCommand(`id -u ${user}`);
+    const userGID = await ssh.execCommand(`id -g ${user}`);
+
     const userHomeDir = homeDir.stdout.trim();
 
     const sftp = await ssh.requestSFTP();
@@ -41,15 +44,15 @@ export async function insertKey(
     const sshDir = join(userHomeDir, ".ssh");
 
     await ssh.mkdir(sshDir, undefined, sftp);
+    // root create the directory, so we need to change the owner
+    await sftpChown(sftp)(userHomeDir, Number(userID.stdout.trim()), Number(userGID.stdout.trim()));
 
     const keyFilePath = join(sshDir, "authorized_keys");
     await sftpChmod(sftp)(sshDir, "700");
     await sftpWriteFile(sftp)(keyFilePath, rootKeyPair.publicKey);
+    logger.info("Writing key to user %s, userID %s to %s in file %s", user, userID, host, keyFilePath);
 
     await sftpChmod(sftp)(keyFilePath, "644");
-
-    const userID = await ssh.execCommand(`id -u ${user}`);
-    const userGID = await ssh.execCommand(`id -g ${user}`);
 
     await sftpChown(sftp)(sshDir, Number(userID.stdout.trim()), Number(userGID.stdout.trim()));
 
