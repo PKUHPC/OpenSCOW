@@ -20,7 +20,7 @@ export async function importUsers(data: GetClusterUsersReply, em: SqlEntityManag
   
   const idsWithoutName = [] as string[];
   data.users.forEach(({ userId, userName }) => {
-    usersMap[userId] = new User({ name: userName, userId, email: "", tenant });
+    usersMap[userId] = new User({ name: userName === "" ? userId : userName, userId, email: "", tenant });
     if (userName === "") { idsWithoutName.push(userId); }
   });
 

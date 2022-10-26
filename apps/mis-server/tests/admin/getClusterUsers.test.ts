@@ -6,7 +6,7 @@ const dataStr = "a_user1\nuser1 : allowed!\nuser2 : blocked!\n\naccount2\nuser2:
 it("test whether the string from 'slurm.sh -l all' can be parsed successfully", async () => {
   const result = parseClusterUsers(dataStr);
 
-  expect(result).toBe({ accounts: [
+  expect(result).toStrictEqual({ accounts: [
     {
       accountName: "a_user1",
       users: [{ userId: "user1", state: "allowed!" }, { userId: "user2", state: "blocked!" }],
