@@ -33,7 +33,7 @@ export type VncAppConfigSchema = Static<typeof VncAppConfigSchema>;
 
 export const SlurmConfigSchema = Type.Object({
   options: Type.Array(
-    Type.String({ description: "sbatch选项" }), 
+    Type.String({ description: "sbatch选项" }),
     { description:"运行slurm脚本时可添加的选项" },
   ),
 });
@@ -43,9 +43,10 @@ export type SlurmConfigSchema = Static<typeof SlurmConfigSchema>;
 export const AppConfigSchema = Type.Object({
   name: Type.String({ description: "App名" }),
   type: Type.Enum(AppType, { description: "应用类型" }),
-  slurm: Type.Optional(SlurmConfigSchema), 
+  slurm: Type.Optional(SlurmConfigSchema),
   web: Type.Optional(WebAppConfigSchema),
   vnc: Type.Optional(VncAppConfigSchema),
+  proxy_type: Type.String({ description: "proxy 类型" }),
 });
 
 export type AppConfigSchema = Static<typeof AppConfigSchema>;

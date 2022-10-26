@@ -24,7 +24,7 @@ export interface ConnectToAppSchema {
   }
 
   responses: {
-    200: { host: string; port: number; password: string } & (
+    200: { host: string; port: number; password: string; proxyType: string } & (
       | { type: "web"; connect: AppConnectProps }
       | { type: "vnc"; }
     );
@@ -64,6 +64,7 @@ export default /* #__PURE__*/route<ConnectToAppSchema>("ConnectToAppSchema", asy
           password: x.password,
           type: "web" as const,
           connect: x.appProps.web,
+          proxyType: x.proxyType,
         },
       };
     } else {
@@ -73,6 +74,7 @@ export default /* #__PURE__*/route<ConnectToAppSchema>("ConnectToAppSchema", asy
           port: x.port,
           password: x.password,
           type: "vnc" as const,
+          proxyType: x.proxyType,
         },
       };
     }

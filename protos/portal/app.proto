@@ -29,6 +29,7 @@ message ConnectToAppResponse {
     WebAppProps web = 4;
     VncAppProps vnc = 5;
   }
+  string proxyType = 6;
 }
 
 message CreateAppSessionRequest {

@@ -61,6 +61,9 @@ export interface PublicRuntimeConfig {
   SUBMIT_JOB_WORKING_DIR: string;
 
   PROXY_BASE_PATH: string;
+  RPROXY_BASE_PATH: string;
+  WSPROXY_BASE_PATH: string;
+
 }
 
 export const runtimeConfig: ServerRuntimeConfig = getConfig().serverRuntimeConfig;

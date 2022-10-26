@@ -38,6 +38,8 @@ const specs = {
   SSH_PUBLIC_KEY_PATH: str({ desc: "SSH公钥路径", default: join(homedir(), ".ssh", "id_rsa.pub") }),
 
   PROXY_BASE_PATH: str({ desc: "网关的代理路径。相对于整个系统的base path。", default: "/proxy" }),
+  RPROXY_BASE_PATH: str({ desc: "网关的代理路径。相对于整个系统的base path。", default: "/rproxy" }),
+  WSPROXY_BASE_PATH: str({ desc: "网关的代理路径。相对于整个系统的base path。", default: "/wsproxy" }),
 
   SERVER_URL: str({ desc: "门户后端的路径", default: "portal-server:5000" }),
 
@@ -136,6 +138,8 @@ const buildRuntimeConfig = async (phase) => {
     SUBMIT_JOB_WORKING_DIR: portalConfig.submitJobDefaultPwd,
 
     PROXY_BASE_PATH: join(config.BASE_PATH, config.PROXY_BASE_PATH),
+    RPROXY_BASE_PATH: join(config.BASE_PATH, config.RPROXY_BASE_PATH),
+    WSPROXY_BASE_PATH: join(config.BASE_PATH, config.WSPROXY_BASE_PATH),
   }
 
   if (!building) {

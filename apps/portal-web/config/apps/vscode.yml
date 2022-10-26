@@ -1,6 +1,7 @@
 id: vscode
 name: VSCode
 type: web
+proxy_type: rproxy
 
 slurm:
   options:

@@ -58,12 +58,14 @@ export const appServiceServer = plugin((server) => {
       default:
         throw new Error(`Unknown app type ${app.type} of app id ${reply.appId}`);
       }
+      const proxyType = app.proxy_type;
 
       return [{
         host: reply.host,
         port: reply.port,
         password: reply.password,
         appProps,
+        proxyType,
       }];
     },
 
