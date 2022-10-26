@@ -1,9 +1,9 @@
-import { Button, Form, Input, message, Select, Table } from "antd";
-import { useCallback, useState } from "react";
+import { Button, Checkbox, Form, Input, message, Select, Table } from "antd";
+import { useCallback, useEffect, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
-import { AccountInfo, UserInfo } from "src/generated/server/admin";
+import { AccountInfo, GetClusterUsersReply, UserInfo } from "src/generated/server/admin";
 import { Cluster, publicConfig } from "src/utils/config";
 import styled from "styled-components";
 
@@ -18,9 +18,9 @@ export const ImportUsersTable: React.FC = () => {
     return Object.values(publicConfig.CLUSTERS)[0]; 
   });
 
-  // const [form] = Form.useForm<Cluster>();
+  const [form] = Form.useForm<{data:GetClusterUsersReply, whitelist:boolean}>();
 
-  // const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const promiseFn = useCallback(async () => {
     return await api.getClusterUsers({ query: {
@@ -30,115 +30,99 @@ export const ImportUsersTable: React.FC = () => {
 
   const { data, isLoading, reload } = useAsync({ promiseFn });
 
+  useEffect(() => {
+    form.setFieldsValue({
+      data: data,
+      whitelist: true,
+    });
+  }, [data]);
+
   return (
     <div>
       <SingleClusterSelector 
-        // value={Object.values(publicConfig.CLUSTERS)[0]} 
         onChange={async (value) => { setQuery(value); }} 
       />
-      {/* <Form
-        layout="inline"
+      <Form
         form={form}
         onFinish={async () => {
-          // setLoading(true);
-          setQuery(await form.validateFields());
-          // setLoading(false);
+          if (!data) return;
+
+          setLoading(true);
+
+          const { data: changedData, whitelist } = await form.validateFields();
+          changedData.users.forEach((x, i) => data.users[i].userName = x.userName);
+          changedData.accounts.forEach((x, i) => data.accounts[i].owner = x.owner);
+          
+          await api.importUsers({ body: {
+            data: data,
+            whitelist: whitelist,
+          } })
+            .httpError(400, () => { message.error("数据格式不正确"); })
+            .then(() => { message.success("导入成功"); })
+            .finally(() => { setLoading(true); });
         }}
       >
-        <Form.Item name="clusterName" label="集群" rules={[{ required: true }]}>
-          <SingleClusterSelector />
-        </Form.Item>
-        <Form.Item>
-          <Button type="primary" htmlType="submit" loading={isLoading}>
-            获取用户信息
-          </Button>
-        </Form.Item>
-      </Form> */}
-      <UserTable data={data?.users} loading={isLoading} reload={reload} />
-      <AccountTable data={data?.accounts} loading={isLoading} reload={reload} />
-      <Button onClick={async () => {
-        if (data?.accounts.find((x) => x.owner === undefined) !== undefined) {
-          message.error("每个账户必须有一个拥有者");
-        }
-        else {
-          await api.importUsers({ body: {
-            data: data || { accounts:[], users:[]},
-            whitelist: true,
-          } })
-            .then(() => { message.success("导入成功"); });
-        }
-      }}
-      >
-        导入
-      </Button>
-    </div>
-  );
-};
-
-interface DataTableProps<T> {
-  data: T[] | undefined;
-  loading: boolean;
-  reload: () => void;
-}
-
-const UserTable: React.FC<DataTableProps<UserInfo>> = ({ data, loading, reload }) => {
-  return (
-    <Table
-      loading={loading}
-      dataSource={data}
-      scroll={{ x:true }}
-      bordered
-      rowKey="userId"
-      title={() => <Title><span>用户</span><a onClick={reload}>刷新</a></Title>}
-    >
-      <Table.Column<UserInfo> dataIndex="userId" title="用户ID" width={200} />
-      <Table.Column<UserInfo> 
-        dataIndex="name" 
-        title="姓名" 
-        width={200}
-        render={(_, r) => (
-          <Input 
-            placeholder="输入用户姓名（默认为用户ID）" 
-            allowClear
-            defaultValue={r.userName}
-            onChange={(e) => { r.userName = e.target.value; }}
+        <Table
+          loading={isLoading}
+          dataSource={data?.users}
+          scroll={{ x:true }}
+          bordered
+          rowKey="userId"
+          title={() => <Title><span>用户</span><a onClick={reload}>刷新</a></Title>}
+        >
+          <Table.Column<UserInfo> dataIndex="userId" title="用户ID" key="userId" width={200} />
+          <Table.Column<UserInfo> 
+            dataIndex="name" 
+            title="姓名" 
+            width={200}
+            render={(_, record:any, index:number) => (
+              <Form.Item name={["data", "users", index, "userName"]} rules={[{ required: true, message: "请输入姓名" }]}>
+                <Input 
+                  placeholder="输入用户姓名" 
+                  allowClear
+                />
+              </Form.Item>
+            )}
           />
-        )}
-      />
-      <Table.Column<UserInfo> 
-        dataIndex="accounts" 
-        title="所属账户" 
-        render={(_, r) => r.accounts.join(", ")}
-      />
-    </Table>
-  );
-};
-
-const AccountTable: React.FC<DataTableProps<AccountInfo>> = ({ data, loading, reload }) => {
-  return (
-    <Table
-      loading={loading}
-      dataSource={data}
-      scroll={{ x:true }}
-      pagination={{ showSizeChanger: true }}
-      rowKey="accountName"
-      bordered
-      title={() => <Title><span>账户</span><a onClick={reload}>刷新</a></Title>}
-    >
-      <Table.Column<AccountInfo> dataIndex="accountName" title="账户名" width={400} />
-      <Table.Column<AccountInfo> 
-        dataIndex="owner"
-        title="拥有者"
-        render={(_, r) => (
-          <Select
-            defaultValue={r.owner}
-            onChange={(value) => { r.owner = value; }}
-            options={r.users.map((user) => ({ value: user.userId, label: user.userId }))}
-            style={{ width: "100%" }}
-            placeholder={"请选择一个拥有者"}
-          />         
-        )}
-      />
-    </Table>
+          <Table.Column<UserInfo> 
+            dataIndex="accounts" 
+            key="accounts"
+            title="所属账户" 
+            render={(_, r) => r.accounts.join(", ")}
+          />
+        </Table>
+        <Table
+          loading={isLoading}
+          dataSource={data?.accounts}
+          scroll={{ x:true }}
+          pagination={{ showSizeChanger: true }}
+          rowKey="accountName"
+          bordered
+          title={() => <Title><span>账户</span><a onClick={reload}>刷新</a></Title>}
+        >
+          <Table.Column<AccountInfo> dataIndex="accountName" title="账户名" width={400} />
+          <Table.Column<AccountInfo> 
+            dataIndex="owner"
+            title="拥有者"
+            render={(_, r, i) => (
+              <Form.Item name={["data", "accounts", i, "owner"]} rules={[{ required: true, message: "请选择一个拥有者" }]}>
+                <Select
+                  defaultValue={r.owner}
+                  options={r.users.map((user) => ({ value: user.userId, label: user.userId }))}
+                  style={{ width: "100%" }}
+                  placeholder={"请选择一个拥有者"}
+                />         
+              </Form.Item>
+            )}
+          />
+        </Table>
+        <Form.Item name="whitelist" valuePropName="checked">
+          <Checkbox>将所有账户加入白名单</Checkbox>
+        </Form.Item>
+        <Button type="primary" htmlType="submit" loading={loading}>
+          提交
+        </Button>
+      </Form>
+    </div>
   );
 };
