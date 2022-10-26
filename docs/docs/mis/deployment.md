@@ -85,6 +85,9 @@ fetchJobs:
     password: jobtablepassword
     dbName: jobs
     tableName: jobs
+    # 源作业信息库使用的mariadb或者mysql
+    # 默认为mariadb
+    # type: mariadb
 
   # 周期性获取数据
   periodicFetch:
