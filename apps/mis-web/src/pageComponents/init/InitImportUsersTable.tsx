@@ -1,8 +1,10 @@
 import { Centered } from "src/components/layouts";
 import { FormLayout } from "src/layouts/FormLayout";
-import { ImportUsersForm } from "src/pageComponents/admin/ImportUsersForm";
 
-export const InitImportUsersForm: React.FC = () => {
+import { ImportUsersTable } from "../admin/ImportUsersTable";
+
+
+export const InitImportUsersTable: React.FC = () => {
 
   return (
     <Centered>
@@ -13,7 +15,7 @@ export const InitImportUsersForm: React.FC = () => {
           </a>
           了解系统用户模型以及如何导入用户信息。
         </p>
-        <ImportUsersForm />
+        <ImportUsersTable />
       </FormLayout>
     </Centered>
   );
