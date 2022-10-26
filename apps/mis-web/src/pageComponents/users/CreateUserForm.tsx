@@ -1,5 +1,6 @@
 import { Form, Input } from "antd";
 import React from "react";
+import { publicConfig } from "src/utils/config";
 import { confirmPasswordFormItemProps, emailRule, passwordRule } from "src/utils/form";
 
 export interface CreateUserFormFields {
@@ -24,11 +25,16 @@ export const CreateUserForm: React.FC<Props> = ({ noPassword }) => {
         label="用户ID"
         name="identityId"
         rules={[
-          { pattern: /^[a-z0-9_]+$/, message: "只能由小写英文字符、数字和下划线组成" },
           { required: true },
+          ...publicConfig.USERID_PATTERN
+            ? [{
+              pattern: new RegExp(publicConfig.USERID_PATTERN),
+              message: publicConfig.USERID_PATTERN_MESSAGE }]
+            : [],
         ]}
+
       >
-        <Input placeholder="只能由小写英文字符、数字和下划线组成" />
+        <Input placeholder={publicConfig.USERID_PATTERN_MESSAGE} />
       </Form.Item>
       <Form.Item label="用户姓名" name="name" rules={[{ required: true }]}>
         <Input />

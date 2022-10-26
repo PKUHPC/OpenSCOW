@@ -101,7 +101,15 @@ predefinedChargingTypes:
   - 测试
 
 # 账户名的规则
-accountNamePattern:
+# accountNamePattern:
+  # 正则表达式
+  # regex: ""
+
+  # 出错时的消息
+  # errorMessage: ""
+
+# 用户ID的规则
+# userIdPattern:
   # 正则表达式
   # regex: ""
 
