@@ -67,6 +67,14 @@ export const adminServiceServer = plugin((server) => {
     importUsers: async ({ request, em, logger }) => {
       const { data, whitelist } = request;
 
+      if (!data || 
+          data.accounts.find((x) => x.owner === undefined || !x.users.find((user) => user.userId === x.owner))
+      ) {
+        throw <ServiceError> {
+          code: Status.INVALID_ARGUMENT, message: "Submitted data is not valid",
+        };
+      }
+
       const reply = await importUsers(data, em, whitelist, logger);
 
       return [reply];

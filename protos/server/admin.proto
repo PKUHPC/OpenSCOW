@@ -30,7 +30,7 @@ message QueryStorageQuotaRequest {
 message QueryStorageQuotaReply { uint64 current_quota = 1; }
 
 message ImportUsersRequest {
-  string data = 1;
+  GetClusterUsersReply data = 1;
   bool whitelist = 2;
 }
 
