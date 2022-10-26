@@ -59,7 +59,7 @@ export const ImportUsersTable: React.FC = () => {
           } })
             .httpError(400, () => { message.error("数据格式不正确"); })
             .then(() => { message.success("导入成功"); })
-            .finally(() => { setLoading(true); });
+            .finally(() => { setLoading(false); });
         }}
       >
         <Table
