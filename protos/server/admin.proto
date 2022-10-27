@@ -29,8 +29,13 @@ message QueryStorageQuotaRequest {
 // NOT_FOUND: cluster or userId is not found.
 message QueryStorageQuotaReply { uint64 current_quota = 1; }
 
+message ImportUsersData {
+  repeated AccountInfo accounts = 1;
+  repeated UserInfo users = 2;
+}
+
 message ImportUsersRequest {
-  GetClusterUsersReply data = 1;
+  ImportUsersData data = 1;
   bool whitelist = 2;
 }
 

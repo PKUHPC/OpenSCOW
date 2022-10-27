@@ -4,6 +4,7 @@ import { authenticate } from "src/auth/server";
 import { AdminServiceClient, GetClusterUsersReply } from "src/generated/server/admin";
 import { PlatformRole } from "src/models/User";
 import { getClient } from "src/utils/client";
+import { queryIfInitialized } from "src/utils/init";
 
 
 export interface GetClusterUsersSchema {
@@ -22,9 +23,12 @@ const auth = authenticate((info) => info.platformRoles.includes(PlatformRole.PLA
 
 export default route<GetClusterUsersSchema>("GetClusterUsersSchema",
   async (req, res) => {
-    const info = await auth(req, res);
-    if (!info) { return; }
 
+    // if not initialized, every one can import users
+    if (await queryIfInitialized()) {
+      const info = await auth(req, res);
+      if (!info) { return; }
+    }
     const { cluster } = req.query;
 
     const client = getClient(AdminServiceClient);

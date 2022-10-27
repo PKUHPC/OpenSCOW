@@ -7,11 +7,23 @@ import { AccountWhitelist } from "src/entities/AccountWhitelist";
 import { Tenant } from "src/entities/Tenant";
 import { User } from "src/entities/User";
 import { UserAccount, UserRole, UserStatus } from "src/entities/UserAccount";
-import { GetClusterUsersReply } from "src/generated/server/admin";
 import { DEFAULT_TENANT_NAME } from "src/utils/constants";
 import { toRef } from "src/utils/orm";
 
-export async function importUsers(data: GetClusterUsersReply, em: SqlEntityManager, 
+export interface ImportUsersData {
+  accounts: {
+    accountName: string;
+    users: {userId: string; state: string}[];
+    owner: string;
+  }[];
+  users: {
+    userId: string;
+    userName: string;
+    accounts: string[];
+  }[];
+}
+
+export async function importUsers(data: ImportUsersData, em: SqlEntityManager, 
   whitelistAll: boolean, logger: Logger) 
 {
   const tenant = await em.findOneOrFail(Tenant, { name: DEFAULT_TENANT_NAME });
@@ -27,7 +39,7 @@ export async function importUsers(data: GetClusterUsersReply, em: SqlEntityManag
 
   const accounts: Account[] = [];
   const userAccounts: UserAccount[] = [];
-  data.accounts.forEach(async (a) => {
+  data.accounts.forEach((a) => {
     const account = new Account({
       accountName: a.accountName, comment: "", blocked: false,
       tenant,

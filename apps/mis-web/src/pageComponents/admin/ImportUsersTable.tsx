@@ -1,10 +1,11 @@
 import { Button, Checkbox, Form, Input, message, Select, Table } from "antd";
+import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { AccountInfo, GetClusterUsersReply, UserInfo } from "src/generated/server/admin";
-import { Cluster, publicConfig } from "src/utils/config";
+import { queryToString } from "src/utils/querystring";
 import styled from "styled-components";
 
 const Title = styled.div`
@@ -14,19 +15,19 @@ const Title = styled.div`
 
 
 export const ImportUsersTable: React.FC = () => {
-  const [query, setQuery] = useState<Cluster>(() => {
-    return Object.values(publicConfig.CLUSTERS)[0]; 
-  });
 
+  const router = useRouter();
+  const cluster = queryToString(router.query.cluster);
+  
   const [form] = Form.useForm<{data:GetClusterUsersReply, whitelist:boolean}>();
 
   const [loading, setLoading] = useState(false);
 
   const promiseFn = useCallback(async () => {
     return await api.getClusterUsers({ query: {
-      cluster: query.id,
+      cluster,
     } });
-  }, [query]);
+  }, []);
 
   const { data, isLoading, reload } = useAsync({ promiseFn });
 
@@ -40,7 +41,7 @@ export const ImportUsersTable: React.FC = () => {
   return (
     <div>
       <SingleClusterSelector 
-        onChange={async (value) => { setQuery(value); }} 
+        onChange={async (value) => { router.push(`/admin/importUsers?cluster=${value.id}`); }} 
       />
       <Form
         form={form}

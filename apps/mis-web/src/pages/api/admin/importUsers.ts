@@ -3,7 +3,7 @@ import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { authenticate } from "src/auth/server";
 import { AdminServiceClient, GetClusterUsersReply } from "src/generated/server/admin";
-import { TenantRole } from "src/models/User";
+import { PlatformRole } from "src/models/User";
 import { getClient } from "src/utils/client";
 import { queryIfInitialized } from "src/utils/init";
 import { handlegRPCError } from "src/utils/server";
@@ -22,7 +22,7 @@ export interface ImportUsersSchema {
   }
 }
 
-const auth = authenticate((info) => info.tenantRoles.includes(TenantRole.TENANT_ADMIN));
+const auth = authenticate((info) => info.platformRoles.includes(PlatformRole.PLATFORM_ADMIN));
 
 export default route<ImportUsersSchema>("ImportUsersSchema",
   async (req, res) => {
