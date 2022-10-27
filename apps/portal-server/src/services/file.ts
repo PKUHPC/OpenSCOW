@@ -1,3 +1,4 @@
+import { createWriterExtensions } from "@ddadaal/tsgrpc-common";
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError, status } from "@grpc/grpc-js";
 import { sftpExists,
@@ -8,6 +9,8 @@ import { FileInfo, FileInfo_FileType,
 import { clusterNotFound } from "src/utils/errors";
 import { pipeline } from "src/utils/pipeline";
 import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
+import { once } from "stream";
+import { finished } from "stream/promises";
 
 export const fileServiceServer = plugin((server) => {
 
@@ -259,33 +262,34 @@ export const fileServiceServer = plugin((server) => {
         try {
           const writeStream = sftp.createWriteStream(path);
 
+          const { writeAsync } = createWriterExtensions(writeStream);
+
           let writtenBytes = 0;
 
-          await pipeline(
-            call.iter(),
-            async (req) => {
-              if (!req.message) {
-                throw new RequestError(
-                  status.INVALID_ARGUMENT,
-                  "Request is received but message is undefined",
-                );
-              }
+          for await (const req of call.iter()) {
+            if (!req.message) {
+              throw new RequestError(
+                status.INVALID_ARGUMENT,
+                "Request is received but message is undefined",
+              );
+            }
 
-              if (req.message.$case === "chunk") {
-                writtenBytes += req.message.chunk.length;
-                return req.message.chunk;
-              }
-
+            if (req.message.$case !== "chunk") {
               throw new RequestError(
                 status.INVALID_ARGUMENT,
                 `Expect receive chunk but received message of type ${req.message.$case}`,
               );
-            },
-            writeStream,
-          );
+            }
+            await writeAsync(req.message.chunk);
+            writtenBytes += req.message.chunk.length;
+          }
 
           // ensure the data is written
-          await new Promise<void>((res) => writeStream.end(() => res()));
+          // if (!writeStream.destroyed) {
+          //   await new Promise<void>((res, rej) => writeStream.end((e) => e ? rej(e) : res()));
+          // }
+          writeStream.end();
+          await once(writeStream, "close");
 
           logger.info("Upload complete. Received %d bytes", writtenBytes);
 
