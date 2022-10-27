@@ -7,7 +7,6 @@ const { getClusterTextsConfig } = require("@scow/config/build/appConfig/clusterT
 const { DEFAULT_PRIMARY_COLOR, getUiConfig } = require("@scow/config/build/appConfig/ui");
 const { PHASE_DEVELOPMENT_SERVER, PHASE_PRODUCTION_BUILD, PHASE_PRODUCTION_SERVER } = require("next/constants");
 const { join } = require("path");
-const { fetch } = require("undici");
 const { getCapabilities } = require("@scow/lib-auth");
 
 /**
