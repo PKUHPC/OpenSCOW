@@ -1,6 +1,5 @@
 import { NodeSSH } from "node-ssh";
 import { join } from "path";
-import pino from "pino";
 import { insertKey } from "src/key";
 import { sftpExists, sftpReadFile, sftpStat, sshRmrf } from "src/sftp";
 
@@ -20,9 +19,6 @@ beforeEach(async () => {
   // creat user
   await serverSsh.ssh.execCommand(`adduser -D -h ${home} ${testUser}`);
   await serverSsh.ssh.execCommand(`echo ${testUser}:12345678|chpasswd`);
-
-  await insertKey(testUser, target, rootKeyPair, pino());
-
 });
 
 afterEach(async () => {
@@ -34,15 +30,14 @@ afterEach(async () => {
 });
 
 it("insert key", async () => {
+  await insertKey(testUser, target, rootKeyPair, console);
 
   expect(await sftpExists(serverSsh.sftp, home)).toBeTrue();
 
   expect(await sftpExists(serverSsh.sftp, sshDir)).toBeTrue();
   expect(await sftpExists(serverSsh.sftp, keyFile)).toBeTrue();
 
-});
-
-it("user ssh login", async () => {
+  // user ssh login
   const [host, port] = target.split(":");
   const ssh = new NodeSSH();
 
@@ -51,28 +46,24 @@ it("user ssh login", async () => {
   } finally {
     ssh.dispose();
   }
-});
 
-it("check ssh key info", async () => {
+  // check ssh key info
   const keyContent = (await sftpReadFile(serverSsh.sftp)(keyFile)).toString();
   expect(keyContent).toMatch(rootKeyPair.publicKey);
-});
 
-it("check ssh key permission and owner", async () => {
+  // check ssh key permission and owner
   const userID = await serverSsh.ssh.execCommand(`id -u ${testUser}`);
   const userGID = await serverSsh.ssh.execCommand(`id -g ${testUser}`);
 
   const keyStats = await sftpStat(serverSsh.sftp)(keyFile);
   const keyPermission = (keyStats.mode & parseInt("777", 8)).toString(8);
   expect(keyPermission).toEqual("644");
+  expect(keyStats.uid).toBe(Number(userID.stdout.trim()));
+  expect(keyStats.gid).toBe(Number(userGID.stdout.trim()));
 
   const sshStats = await sftpStat(serverSsh.sftp)(sshDir);
   const sshPermission = (sshStats.mode & parseInt("777", 8)).toString(8);
   expect(sshPermission).toEqual("700");
-
   expect(sshStats.uid).toBe(Number(userID.stdout.trim()));
   expect(sshStats.gid).toBe(Number(userGID.stdout.trim()));
-
-  expect(keyStats.uid).toBe(Number(userID.stdout.trim()));
-  expect(keyStats.gid).toBe(Number(userGID.stdout.trim()));
 });

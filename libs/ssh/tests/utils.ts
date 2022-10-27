@@ -3,7 +3,6 @@ import { NodeSSH } from "node-ssh";
 import { homedir } from "os";
 import path from "path";
 import { join } from "path";
-import pino from "pino";
 import { getKeyPair } from "src/key";
 import { sftpWriteFile, sshRmrf } from "src/sftp";
 import { sshRawConnect } from "src/ssh";
@@ -26,7 +25,7 @@ export const rootKeyPair = getKeyPair(SSH_PRIVATE_KEY_PATH, SSH_PUBLIC_KEY_PATH)
 
 export const connectToTestServerAsRoot = async () => {
 
-  const ssh = await sshRawConnect(target, rootUserId, rootKeyPair, pino());
+  const ssh = await sshRawConnect(target, rootUserId, rootKeyPair, console);
 
   return { ssh, sftp: await ssh.requestSFTP() } as TestSshServer;
 };
