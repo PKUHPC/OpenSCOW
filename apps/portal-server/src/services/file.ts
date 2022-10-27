@@ -8,7 +8,6 @@ import { FileInfo, FileInfo_FileType,
 import { clusterNotFound } from "src/utils/errors";
 import { pipeline } from "src/utils/pipeline";
 import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
-import { finished } from "stream/promises";
 
 export const fileServiceServer = plugin((server) => {
 
@@ -286,8 +285,7 @@ export const fileServiceServer = plugin((server) => {
           );
 
           // ensure the data is written
-          writeStream.end();
-          await finished(writeStream);
+          await new Promise<void>((res) => writeStream.end(() => res()));
 
           logger.info("Upload complete. Received %d bytes", writtenBytes);
 
