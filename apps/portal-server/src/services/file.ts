@@ -10,7 +10,6 @@ import { clusterNotFound } from "src/utils/errors";
 import { pipeline } from "src/utils/pipeline";
 import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
 import { once } from "stream";
-import { finished } from "stream/promises";
 
 export const fileServiceServer = plugin((server) => {
 
@@ -218,6 +217,10 @@ export const fileServiceServer = plugin((server) => {
             message: "Error when reading file",
             details: e?.message,
           };
+        }).finally(async () => {
+          readStream.close(() => {});
+          await once(readStream, "close");
+          // await promisify(readStream.close.bind(readStream))();
         });
 
       });
