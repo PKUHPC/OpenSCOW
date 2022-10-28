@@ -1,10 +1,18 @@
-jest.mock("undici");
 import { validateToken } from "src/validateToken";
-import { fetch } from "undici";
-
-import { validToken } from "../__mocks__/undici";
 
 const authUrl = "auth:5000";
+
+const validToken = "123";
+
+// @ts-ignore
+globalThis.fetch = jest.fn((url: string) => {
+  if (new URL(url).searchParams.get("token") === validToken) {
+    return { status: 200, json: () => ({ identityId: validToken }) };
+  } else {
+    return { status: 403, json: () => ({}) };
+  }
+});
+
 
 it("raises correct request", async () => {
   await validateToken(authUrl, validToken);

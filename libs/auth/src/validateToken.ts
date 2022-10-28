@@ -1,5 +1,4 @@
 import { Logger } from "ts-log";
-import { fetch } from "undici";
 
 export interface UserInfo {
   identityId: string;
