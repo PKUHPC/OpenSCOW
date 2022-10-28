@@ -1,9 +1,9 @@
-import { AccountInfo, GetClusterUsersReply, UserInAccount, UserInfo } from "src/generated/server/admin";
+import { ClusterAccountInfo, ClusterUserInfo, GetClusterUsersReply, UserInAccount } from "src/generated/server/admin";
 
 export function parseClusterUsers(dataStr: string): GetClusterUsersReply {
   const obj: GetClusterUsersReply = {
-    accounts:[] as AccountInfo[],
-    users:[] as UserInfo[],
+    accounts:[] as ClusterAccountInfo[],
+    users:[] as ClusterUserInfo[],
   };
 
   if (dataStr.trim() === "") { return obj; }

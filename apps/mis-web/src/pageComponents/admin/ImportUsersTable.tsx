@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
-import { AccountInfo, GetClusterUsersReply, UserInfo } from "src/generated/server/admin";
+import { ClusterAccountInfo, ClusterUserInfo, GetClusterUsersReply } from "src/generated/server/admin";
 import { queryToString } from "src/utils/querystring";
 import styled from "styled-components";
 
@@ -71,8 +71,8 @@ export const ImportUsersTable: React.FC = () => {
           rowKey="userId"
           title={() => <Title><span>用户</span><a onClick={reload}>刷新</a></Title>}
         >
-          <Table.Column<UserInfo> dataIndex="userId" title="用户ID" key="userId" width={200} />
-          <Table.Column<UserInfo> 
+          <Table.Column<ClusterUserInfo> dataIndex="userId" title="用户ID" key="userId" width={200} />
+          <Table.Column<ClusterUserInfo> 
             dataIndex="name" 
             title="姓名" 
             width={200}
@@ -85,7 +85,7 @@ export const ImportUsersTable: React.FC = () => {
               </Form.Item>
             )}
           />
-          <Table.Column<UserInfo> 
+          <Table.Column<ClusterUserInfo> 
             dataIndex="accounts" 
             key="accounts"
             title="所属账户" 
@@ -101,8 +101,8 @@ export const ImportUsersTable: React.FC = () => {
           bordered
           title={() => <Title><span>账户</span><a onClick={reload}>刷新</a></Title>}
         >
-          <Table.Column<AccountInfo> dataIndex="accountName" title="账户名" width={400} />
-          <Table.Column<AccountInfo> 
+          <Table.Column<ClusterAccountInfo> dataIndex="accountName" title="账户名" width={400} />
+          <Table.Column<ClusterAccountInfo> 
             dataIndex="owner"
             title="拥有者"
             render={(_, r, i) => (
