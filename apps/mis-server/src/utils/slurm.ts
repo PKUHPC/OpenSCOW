@@ -8,7 +8,8 @@ export function parseClusterUsers(dataStr: string): GetClusterUsersReply {
 
   if (dataStr.trim() === "") { return obj; }
 
-  const lines = dataStr.split("\n");
+  const lines = dataStr.trim().split("\n");
+  lines.push("");
 
   let i = 0;
   while (i < lines.length) {
