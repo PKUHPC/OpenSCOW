@@ -19,6 +19,9 @@ export const sftpReaddir = (sftp: SFTPWrapper) =>
 export const sftpChmod = (sftp: SFTPWrapper) =>
   promisify(sftp.chmod.bind(sftp) as typeof sftp["chmod"]);
 
+export const sftpChown = (sftp: SFTPWrapper) =>
+  promisify(sftp.chown.bind(sftp) as typeof sftp["chown"]);
+
 export const sftpRealPath = (sftp: SFTPWrapper) =>
   promisify(sftp.realpath.bind(sftp) as typeof sftp["realpath"]);
 
