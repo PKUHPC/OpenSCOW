@@ -67,7 +67,7 @@ export const AllJobQueryTable: React.FC<Props> = ({
           initialValues={query}
           onFinish={async () => {
             setQuery({
-              ...await form.validateFields(),
+              ...(await form.validateFields()),
             });
           }}
         >

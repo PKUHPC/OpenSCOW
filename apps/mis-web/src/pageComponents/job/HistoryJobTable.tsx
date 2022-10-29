@@ -92,7 +92,7 @@ export const JobTable: React.FC<Props> = ({
           onFinish={async () => {
             setQuery({
               accountName: query.accountName,
-              ...await form.validateFields(),
+              ...(await form.validateFields()),
             });
           }}
         >

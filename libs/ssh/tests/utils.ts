@@ -1,7 +1,6 @@
 import { randomBytes } from "crypto";
 import { NodeSSH } from "node-ssh";
 import { homedir } from "os";
-import path from "path";
 import { join } from "path";
 import { getKeyPair } from "src/key";
 import { sftpWriteFile, sshRmrf } from "src/sftp";

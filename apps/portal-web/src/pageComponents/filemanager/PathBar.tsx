@@ -69,17 +69,22 @@ export const PathBar: React.FC<Props> = ({ path, loading, reload, go, fullUrl })
           <>
             <BarStateBar onClick={() => setState("input")}>
               <Space>
-                <Link href={fullUrl("/")} passHref>
-                  <a onClick={(e) => e.stopPropagation()}>
+                <Link href={fullUrl("/")} passHref onClick={(e) => e.stopPropagation()}>
+
                     /
-                  </a>
+
                 </Link>
                 {pathSegments.map((x, i) => (
                   <Fragment key={x}>
-                    <Link href={fullUrl(pathSegments.slice(0, i + 1).join("/"))} key={i} passHref>
-                      <a onClick={(e) => e.stopPropagation()}>
-                        {x}
-                      </a>
+                    <Link
+                      href={fullUrl(pathSegments.slice(0, i + 1).join("/"))}
+                      key={i}
+                      passHref
+                      onClick={(e) => e.stopPropagation()}
+                    >
+
+                      {x}
+
                     </Link>
                     <span>
                     /

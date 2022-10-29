@@ -35,6 +35,6 @@ export default /* #__PURE__*/route<CancelJobSchema>("CancelJobSchema", async (re
   return asyncUnaryCall(client, "cancelJob", {
     jobId, userId: info.identityId, cluster,
   }).then(() => ({ 204: null }), handlegRPCError({
-    [status.NOT_FOUND]: () => ({ 404: { code: "JOB_NOT_FOUND" } }) as const,
+    [status.NOT_FOUND]: () => ({ 404: { code: "JOB_NOT_FOUND" } } as const),
   }));
 });
