@@ -1,7 +1,7 @@
 import { randomBytes } from "crypto";
 import { NodeSSH } from "node-ssh";
 import { homedir } from "os";
-import { join } from "path";
+import { dirname, join } from "path";
 import { getKeyPair } from "src/key";
 import { sftpWriteFile, sshRmrf } from "src/sftp";
 import { sshRawConnect } from "src/ssh";
@@ -32,7 +32,7 @@ export const connectToTestServerAsRoot = async () => {
 export const resetTestServerAsRoot = async (server: TestSshServer) => {
   const base = baseFolder();
 
-  await sshRmrf(server.ssh, path.dirname(base));
+  await sshRmrf(server.ssh, dirname(base));
   server.ssh.dispose();
 };
 
@@ -45,8 +45,8 @@ const baseFolder = () => `tests/testFolder${process.env.JEST_WORKER_ID}/${rootUs
 // returns base folder
 export async function createTestItems({ sftp, ssh }: TestSshServer): Promise<string> {
   const base = baseFolder();
-  await ssh.mkdir(path.join(base, "dir1"), undefined, sftp);
-  const test1 = path.join(base, "test1");
+  await ssh.mkdir(join(base, "dir1"), undefined, sftp);
+  const test1 = join(base, "test1");
   await createFile(sftp, test1);
 
   return base;
