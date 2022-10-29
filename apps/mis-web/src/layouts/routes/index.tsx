@@ -1,4 +1,4 @@
-import AntdIcon, {
+import {
   AccountBookOutlined, BookOutlined, ClockCircleOutlined, CloudServerOutlined,
   DashboardOutlined,
   InfoOutlined, MoneyCollectOutlined, PartitionOutlined,
@@ -7,6 +7,7 @@ import AntdIcon, {
 import React from "react";
 import { AccountAffiliation } from "src/generated/server/user";
 import Whitelist from "src/icons/whiteList.svg";
+import { NavIcon } from "src/layouts/icon";
 import { NavItemProps } from "src/layouts/NavItemProps";
 import { PlatformRole, TenantRole, UserRole } from "src/models/User";
 import { User } from "src/stores/UserStore";
@@ -143,7 +144,7 @@ export const tenantRoutes: (tenantRoles: TenantRole[]) => NavItemProps[] = (tena
               path: "/tenant/accounts/create",
             },
             {
-              Icon: <AntdIcon component={Whitelist} />,
+              Icon: <NavIcon src={Whitelist} alt="Whitelist" />,
               text: "账户白名单",
               path: "/tenant/accounts/whitelist",
             },
