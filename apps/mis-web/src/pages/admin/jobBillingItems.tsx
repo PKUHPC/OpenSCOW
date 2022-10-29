@@ -42,7 +42,10 @@ const AdminJobBillingManagementTable: React.FC = () => {
           </Form.Item>
           <Form.Item>
             <Space>
-              <Link href={{ pathname: "/admin/jobBillingTable", query: { tenant } }}>
+              <Link
+                href={{ pathname: "/admin/jobBillingTable", query: { tenant } }}
+                legacyBehavior
+              >
                 <Button>查看{tenant ? "租户" : "平台"}价格表</Button>
               </Link>
               <Button loading={isLoading} onClick={reload}>刷新</Button>

@@ -16,9 +16,9 @@ export const Logo = () => {
   return (
     <LogoContainer>
       <Link href="/">
-        <a>
-          <img height="40px" src={join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/icon?type=favicon")} />
-        </a>
+
+        <img height="40px" src={join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/icon?type=favicon")} />
+
       </Link>
     </LogoContainer>
   );

@@ -50,11 +50,9 @@ const CreateAccountForm: React.FC = () => {
         label="账户名"
         rules={[
           { required: true },
-          ...publicConfig.ACCOUNT_NAME_PATTERN
-            ? [{
-              pattern: new RegExp(publicConfig.ACCOUNT_NAME_PATTERN),
-              message: publicConfig.ACCOUNT_NAME_PATTERN_MESSAGE }]
-            : [],
+          ...(publicConfig.ACCOUNT_NAME_PATTERN ? [{
+            pattern: new RegExp(publicConfig.ACCOUNT_NAME_PATTERN),
+            message: publicConfig.ACCOUNT_NAME_PATTERN_MESSAGE }] : []),
         ]}
       >
         <Input />
@@ -64,11 +62,9 @@ const CreateAccountForm: React.FC = () => {
         label="拥有者用户ID"
         rules={[
           { required: true },
-          ...publicConfig.USERID_PATTERN
-            ? [{
-              pattern: new RegExp(publicConfig.USERID_PATTERN),
-              message: publicConfig.USERID_PATTERN_MESSAGE }]
-            : [],
+          ...(publicConfig.USERID_PATTERN ? [{
+            pattern: new RegExp(publicConfig.USERID_PATTERN),
+            message: publicConfig.USERID_PATTERN_MESSAGE }] : []),
         ]}
 
       >
