@@ -6,7 +6,7 @@ import AntdIcon, {
   UserOutlined } from "@ant-design/icons";
 import React from "react";
 import { AccountAffiliation } from "src/generated/server/user";
-import { ReactComponent as Whitelist } from "src/icons/whiteList.svg";
+import Whitelist from "src/icons/whiteList.svg";
 import { NavItemProps } from "src/layouts/NavItemProps";
 import { PlatformRole, TenantRole, UserRole } from "src/models/User";
 import { User } from "src/stores/UserStore";
