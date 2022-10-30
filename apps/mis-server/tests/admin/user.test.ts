@@ -144,6 +144,7 @@ it("cannot delete owner", async () => {
   expect(await server.ext.orm.em.count(User, { tenant: data.tenant })).toBe(2);
 });
 
+
 it("get all users", async () => {
   const data = await insertInitialData(server.ext.orm.em.fork());
 

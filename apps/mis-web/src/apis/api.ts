@@ -45,6 +45,7 @@ import type { ChangePasswordSchema } from "src/pages/api/profile/changePassword"
 import type { DewhitelistAccountSchema } from "src/pages/api/tenant/accountWhitelist/dewhitelistAccount";
 import type { GetWhitelistedAccountsSchema } from "src/pages/api/tenant/accountWhitelist/getWhitelistedAccounts";
 import type { WhitelistAccountSchema } from "src/pages/api/tenant/accountWhitelist/whitelistAccount";
+import type { CreateTenantSchema } from "src/pages/api/tenant/create";
 import type { CreateAccountSchema } from "src/pages/api/tenant/createAccount";
 import type { GetAccountsSchema } from "src/pages/api/tenant/getAccounts";
 import type { GetTenantsSchema } from "src/pages/api/tenant/getTenants";
@@ -64,11 +65,11 @@ import type { UnsetAdminSchema } from "src/pages/api/users/unsetAdmin";
 export const api = {
   changeJobPrice: fromApi<ChangeJobPriceSchema>("PATCH", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin/changeJobPrice")),
   changeStorageQuota: fromApi<ChangeStorageQuotaSchema>("PUT", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin/changeStorage")),
-  fetchJobs: fromApi<FetchJobsSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin\fetchJobs/fetchJobs")),
-  getFetchJobInfo: fromApi<GetFetchJobInfoSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin\fetchJobs/getFetchInfo")),
-  setFetchState: fromApi<SetFetchStateSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin\fetchJobs/setFetchState")),
-  tenantFinancePay: fromApi<TenantFinancePaySchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin\finance/pay")),
-  getTenantPayments: fromApi<GetTenantPaymentsSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin\finance/payments")),
+  fetchJobs: fromApi<FetchJobsSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin/fetchJobs/fetchJobs")),
+  getFetchJobInfo: fromApi<GetFetchJobInfoSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin/fetchJobs/getFetchInfo")),
+  setFetchState: fromApi<SetFetchStateSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin/fetchJobs/setFetchState")),
+  tenantFinancePay: fromApi<TenantFinancePaySchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin/finance/pay")),
+  getTenantPayments: fromApi<GetTenantPaymentsSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin/finance/payments")),
   getAllTenants: fromApi<GetAllTenantsSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin/getAllTenants")),
   getAllUsers: fromApi<GetAllUsersSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin/getAllUsers")),
   getTenantUsers: fromApi<GetTenantUsersSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin/getTenantUsers")),
@@ -102,9 +103,10 @@ export const api = {
   queryJobTimeLimit: fromApi<QueryJobTimeLimitSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/job/queryJobTimeLimit")),
   getRunningJobs: fromApi<GetRunningJobsSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/job/runningJobs")),
   changePassword: fromApi<ChangePasswordSchema>("PATCH", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/profile/changePassword")),
-  dewhitelistAccount: fromApi<DewhitelistAccountSchema>("DELETE", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/tenant\accountWhitelist/dewhitelistAccount")),
-  getWhitelistedAccounts: fromApi<GetWhitelistedAccountsSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/tenant\accountWhitelist/getWhitelistedAccounts")),
-  whitelistAccount: fromApi<WhitelistAccountSchema>("PUT", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/tenant\accountWhitelist/whitelistAccount")),
+  dewhitelistAccount: fromApi<DewhitelistAccountSchema>("DELETE", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/tenant/accountWhitelist/dewhitelistAccount")),
+  getWhitelistedAccounts: fromApi<GetWhitelistedAccountsSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/tenant/accountWhitelist/getWhitelistedAccounts")),
+  whitelistAccount: fromApi<WhitelistAccountSchema>("PUT", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/tenant/accountWhitelist/whitelistAccount")),
+  createTenant: fromApi<CreateTenantSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/tenant/create")),
   createAccount: fromApi<CreateAccountSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/tenant/createAccount")),
   getAccounts: fromApi<GetAccountsSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/tenant/getAccounts")),
   getTenants: fromApi<GetTenantsSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/tenant/getTenants")),
@@ -112,8 +114,8 @@ export const api = {
   blockUserInAccount: fromApi<BlockUserInAccountSchema>("PUT", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/users/blockInAccount")),
   createUser: fromApi<CreateUserSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/users/create")),
   getAccountUsers: fromApi<GetAccountUsersSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/users")),
-  cancelJobChargeLimit: fromApi<CancelJobChargeLimitSchema>("DELETE", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/users\jobChargeLimit/cancel")),
-  setJobChargeLimit: fromApi<SetJobChargeLimitSchema>("PUT", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/users\jobChargeLimit/set")),
+  cancelJobChargeLimit: fromApi<CancelJobChargeLimitSchema>("DELETE", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/users/jobChargeLimit/cancel")),
+  setJobChargeLimit: fromApi<SetJobChargeLimitSchema>("PUT", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/users/jobChargeLimit/set")),
   removeUserFromAccount: fromApi<RemoveUserFromAccountSchema>("DELETE", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/users/removeFromAccount")),
   setAdmin: fromApi<SetAdminSchema>("PUT", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/users/setAsAdmin")),
   queryStorageUsage: fromApi<QueryStorageUsageSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/users/storageUsage")),

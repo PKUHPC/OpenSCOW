@@ -85,6 +85,7 @@ const buildRuntimeConfig = async (phase) => {
    */
   const publicRuntimeConfig = {
     ENABLE_CREATE_USER: capabilities.createUser,
+    ENABLE_CREATE_USER: capabilities.createTenant,
     ENABLE_CHANGE_PASSWORD: capabilities.changePassword,
     PREDEFINED_CHARGING_TYPES: misConfig.predefinedChargingTypes,
 

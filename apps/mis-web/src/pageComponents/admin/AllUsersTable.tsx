@@ -30,7 +30,6 @@ export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
       pageSize: pageInfo.pageSize,
     } });
   }, [pageInfo]);
-  // 为什么这里依赖变化时生成新函数？
   const { data, isLoading, reload } = useAsync({ promiseFn, watch: refreshToken });
 
   return (

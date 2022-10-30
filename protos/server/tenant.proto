@@ -24,21 +24,27 @@ message GetTenantsRequest {}
 message GetTenantsReply { repeated string names = 1; }
 
 
-message PlatformTenantInfo {
+message PlatformTenantsInfo {
     uint32 tenantId = 1;
     string tenantName = 2;
-    common.Money balance = 3;
+    uint32 userCount = 3;
+    uint32 accountCount = 4;
+    common.Money balance = 5;
 }
 message GetAllTenantsRequest {}
 message GetAllTenantsReply {
     uint32 totalCount = 1;
-    // uint32 userCount = 2;
-    // uint32 accountCount = 3;
-    repeated PlatformTenantInfo platform_tenants = 2;
+    repeated PlatformTenantsInfo platform_tenants = 2;
 }
+
+message CreateTenantRequest {
+  string name=1;
+}
+message CreateTeneanteReply {}
 
 service TenantService {
   rpc GetTenantInfo(GetTenantInfoRequest) returns (GetTenantInfoReply);
   rpc GetTenants(GetTenantsRequest) returns (GetTenantsReply);
   rpc GetAllTenants(GetAllTenantsRequest) returns (GetAllTenantsReply);
+  rpc CreateTenant(CreateTenantRequest) returns (CreateTeneanteReply);
 }
