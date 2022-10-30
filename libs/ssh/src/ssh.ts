@@ -11,7 +11,7 @@ import { insertKey, KeyPair } from "./key";
  * If the username is not root and first login attempt failed,
  * it inserts the public key into the user's authorized_key and logs in again
  *
- * @param addr address
+ * @param address address
  * @param username  username
  * @param rootKeyPair the ssh key pair of root user
  * @param logger logger

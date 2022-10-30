@@ -68,9 +68,7 @@ export default route<ChangeJobPriceSchema>("ChangeJobPriceSchema",
         jobId,
         userId,
       },
-      ...target === "account"
-        ? { accountPrice: money }
-        : { tenantPrice: money },
+      ...(target === "account" ? { accountPrice: money } : { tenantPrice: money }),
       ipAddress: parseIp(req) ?? "",
       operatorId: info.identityId,
       reason,

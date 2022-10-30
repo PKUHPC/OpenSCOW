@@ -11,6 +11,11 @@ export const SlurmMisConfigSchema = Type.Object({
 
 export type SlurmMisConfigSchema = Static<typeof SlurmMisConfigSchema>;
 
+export enum JobTableType {
+  mariadb = "mariadb",
+  mysql = "mysql",
+}
+
 export const MisConfigSchema = Type.Object({
   db: Type.Object({
     host: Type.String({ description: "数据库地址" }),
@@ -32,6 +37,11 @@ export const MisConfigSchema = Type.Object({
     errorMessage: Type.Optional(Type.String({ description: "如果账户名不符合规则显示什么" })),
   })),
 
+  userIdPattern: Type.Optional(Type.Object({
+    regex: Type.String({ description: "用户ID的正则规则" }),
+    errorMessage: Type.Optional(Type.String({ description: "如果用户ID不符合规则显示什么" })),
+  })),
+
   fetchJobs: Type.Object({
     db: Type.Object({
       host: Type.String({ description: "job_table数据库地址" }),
@@ -40,6 +50,7 @@ export const MisConfigSchema = Type.Object({
       password: Type.String({ description: "job_table数据库密码" }),
       dbName: Type.String({ description: "job_table数据库名" }),
       tableName: Type.String({ description: "job_table中源数据所在的表名" }),
+      type: Type.Enum(JobTableType, { description: "job_table数据库类型", default: JobTableType.mariadb }),
     }),
 
     startIndex: Type.Integer({ description: "从哪个biJobIndex开始获取数据", default: 0 }),

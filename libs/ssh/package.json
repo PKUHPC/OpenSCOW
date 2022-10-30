@@ -4,7 +4,8 @@
   "description": "",
   "main": "build/index.js",
   "scripts": {
-    "build": "rimraf build && tsc -p tsconfig.build.json"
+    "build": "rimraf build && tsc -p tsconfig.build.json",
+    "test": "jest"
   },
   "dependencies": {
     "node-ssh": "13.0.0",

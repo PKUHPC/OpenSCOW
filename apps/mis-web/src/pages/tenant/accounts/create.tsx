@@ -16,7 +16,6 @@ interface FormProps {
   comment: string;
 }
 
-const accountNameRegex = publicConfig.ACCOUNT_NAME_PATTERN ? new RegExp(publicConfig.ACCOUNT_NAME_PATTERN) : undefined;
 
 const CreateAccountForm: React.FC = () => {
 
@@ -51,12 +50,9 @@ const CreateAccountForm: React.FC = () => {
         label="账户名"
         rules={[
           { required: true },
-          { pattern: /^[a-z0-9_]+$/, message: "只能由小写英文字符、数字和下划线组成" },
-          ...accountNameRegex
-            ? [{
-              pattern: accountNameRegex,
-              message: publicConfig.ACCOUNT_NAME_PATTERN_MESSAGE }]
-            : [],
+          ...(publicConfig.ACCOUNT_NAME_PATTERN ? [{
+            pattern: new RegExp(publicConfig.ACCOUNT_NAME_PATTERN),
+            message: publicConfig.ACCOUNT_NAME_PATTERN_MESSAGE }] : []),
         ]}
       >
         <Input />
@@ -64,7 +60,13 @@ const CreateAccountForm: React.FC = () => {
       <Form.Item
         name="ownerId"
         label="拥有者用户ID"
-        rules={[{ required: true }]}
+        rules={[
+          { required: true },
+          ...(publicConfig.USERID_PATTERN ? [{
+            pattern: new RegExp(publicConfig.USERID_PATTERN),
+            message: publicConfig.USERID_PATTERN_MESSAGE }] : []),
+        ]}
+
       >
         <Input />
       </Form.Item>

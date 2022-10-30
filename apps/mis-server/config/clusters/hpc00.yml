@@ -2,10 +2,10 @@ displayName: hpc00
 misIgnore: true
 slurm:
   mis:
-    managerUrl: haha
+    managerUrl: localhost:22222
     dbPassword: password
     clusterName: pkuhpc
-    scriptPath: /test/slurm.sh
+    scriptPath: /slurmshTest/slurm.sh
   partitions:
     - name: C032M0128G
       mem: 131072

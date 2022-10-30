@@ -8,7 +8,7 @@ interface Props {
 
 export const BackButton: React.FC<Props> = ({ href }) => {
   return (
-    <Link href={href}>
+    <Link href={href} legacyBehavior>
       <Button>
         <StepBackwardOutlined />
       </Button>

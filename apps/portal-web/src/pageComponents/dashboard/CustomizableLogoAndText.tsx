@@ -1,5 +1,4 @@
 import { Divider } from "antd";
-import Image from "next/image";
 import { join } from "path";
 import React from "react";
 import { publicConfig } from "src/utils/config";
@@ -15,7 +14,8 @@ const Container = styled.div`
 const Logo = styled.div`
   position: relative;
   width: 100%;
-  padding-bottom: 8%;
+  display: flex;
+  justify-content: center;
 `;
 
 const TitleAndText = styled.div`
@@ -40,11 +40,12 @@ export const CustomizableLogoAndText: React.FC<Props> = ({ hostname }) => {
   return (
     <Container>
       <Logo>
-        <Image
+        <img
           alt="logo"
           src={join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/logo")}
-          layout="fill"
-          objectFit="contain"
+          style={{
+            objectFit: "contain",
+          }}
         />
       </Logo>
       <TitleAndText>

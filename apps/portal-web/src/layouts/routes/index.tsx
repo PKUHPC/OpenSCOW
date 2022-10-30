@@ -20,7 +20,7 @@ export const userRoutes: () => NavItemProps[] = () => [
     text: "仪表盘",
     path: "/dashboard",
   },
-  ...publicConfig.ENABLE_JOB_MANAGEMENT ? [{
+  ...(publicConfig.ENABLE_JOB_MANAGEMENT ? [{
     Icon: BookOutlined,
     text: "作业",
     path: "/jobs",
@@ -47,8 +47,8 @@ export const userRoutes: () => NavItemProps[] = () => [
         path: "/jobs/savedJobs",
       },
     ],
-  }] : [],
-  ...publicConfig.ENABLE_SHELL ? [{
+  }] : []),
+  ...(publicConfig.ENABLE_SHELL ? [{
     Icon: MacCommandOutlined,
     text: "Shell",
     path: "/shell",
@@ -62,14 +62,14 @@ export const userRoutes: () => NavItemProps[] = () => [
       Icon: CloudServerOutlined,
       text: name,
       path: `/shell/${id}`,
-    }) as NavItemProps),
-  } as NavItemProps] : [],
-  ...publicConfig.ENABLE_LOGIN_DESKTOP ? [{
+    } as NavItemProps)),
+  } as NavItemProps] : []),
+  ...(publicConfig.ENABLE_LOGIN_DESKTOP ? [{
     Icon: DesktopOutlined,
     text: "桌面",
     path: "/desktop",
-  }] : [],
-  ...publicConfig.ENABLE_APPS ? [{
+  }] : []),
+  ...(publicConfig.ENABLE_APPS ? [{
     Icon: EyeOutlined,
     text: "交互式应用",
     path: "/apps",
@@ -80,7 +80,7 @@ export const userRoutes: () => NavItemProps[] = () => [
         text: "已创建的应用",
         path: "/apps/sessions",
       },
-      ...publicConfig.APPS.length > 0 ? [
+      ...(publicConfig.APPS.length > 0 ? [
         {
           Icon: PlusOutlined,
           text: "创建应用",
@@ -91,10 +91,10 @@ export const userRoutes: () => NavItemProps[] = () => [
             text: name,
             path: `/apps/create/${id}`,
           })),
-        }] : [],
+        }] : []),
     ],
-  }] : [],
-  ...publicConfig.CLUSTERS.length > 0 ? [{
+  }] : []),
+  ...(publicConfig.CLUSTERS.length > 0 ? [{
     Icon: FolderOutlined,
     text: "文件管理",
     path: "/files",
@@ -106,8 +106,8 @@ export const userRoutes: () => NavItemProps[] = () => [
       text: cluster.name,
       path: `/files/${cluster.id}`,
       clickToPath: `/files/${cluster.id}/~`,
-    }) as NavItemProps),
-  }] : [],
+    } as NavItemProps)),
+  }] : []),
 ];
 
 export const iconToNode = (Icon: any) => {

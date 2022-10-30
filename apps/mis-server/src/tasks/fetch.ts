@@ -21,7 +21,7 @@ export const createSourceDbOrm = async (logger: Logger) => {
     user: misConfig.fetchJobs.db.user,
     dbName: misConfig.fetchJobs.db.dbName,
     password: misConfig.fetchJobs.db.password,
-    type: "mariadb",
+    type: misConfig.fetchJobs.db.type,
     forceUndefined: true,
     logger: (msg) => logger.info(msg),
     entities: [OriginalJob],

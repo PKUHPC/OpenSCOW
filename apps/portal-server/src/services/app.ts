@@ -1,9 +1,10 @@
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
+import { AppType } from "@scow/config/build/appConfig/app";
 import { getClusterOps } from "src/clusterops";
 import { apps } from "src/config/apps";
-import { AppServiceServer, AppServiceService } from "src/generated/portal/app";
+import { AppServiceServer, AppServiceService, ConnectToAppResponse } from "src/generated/portal/app";
 import { clusterNotFound } from "src/utils/errors";
 
 export const appServiceServer = plugin((server) => {
@@ -34,17 +35,35 @@ export const appServiceServer = plugin((server) => {
         throw <ServiceError> { code: Status.NOT_FOUND, message: `app id ${reply.appId} is not found` };
       }
 
+      let appProps: ConnectToAppResponse["appProps"];
+
+      switch (app.type) {
+      case AppType.vnc:
+        appProps = {
+          $case: "vnc",
+          vnc: {},
+        };
+        break;
+      case AppType.web:
+        appProps = {
+          $case: "web",
+          web: {
+            formData: app.web!.connect.formData ?? {},
+            query: app.web!.connect.query ?? {},
+            method: app.web!.connect.method,
+            path: app.web!.connect.path,
+          },
+        };
+        break;
+      default:
+        throw new Error(`Unknown app type ${app.type} of app id ${reply.appId}`);
+      }
+
       return [{
         host: reply.host,
         port: reply.port,
         password: reply.password,
-        web: app.web ? {
-          formData: app.web.connect.formData ?? {},
-          query: app.web.connect.query ?? {},
-          method: app.web.connect.method,
-          path: app.web.connect.path,
-        } : undefined,
-        vnc: app.vnc ? {} : undefined,
+        appProps,
       }];
     },
 
