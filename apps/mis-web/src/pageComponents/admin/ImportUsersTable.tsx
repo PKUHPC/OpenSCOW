@@ -14,6 +14,17 @@ const Title = styled.div`
   justify-content: space-between;
 `;
 
+const ClusterContainer = styled.div`
+padding: 8px 16px 16px 16px;
+margin: 8px 0;
+background: #fbfbfb;
+border: 1px solid #d9d9d9;
+border-radius: 2px;
+
+.ant-form-item {
+  margin: 4px;
+}
+`;
 
 export const ImportUsersTable: React.FC = () => {
 
@@ -45,12 +56,18 @@ export const ImportUsersTable: React.FC = () => {
 
   return (
     <div>
-      <SingleClusterSelector
-        value={cluster} 
-        onChange={(value) => { 
-          Router.push({ query: { cluster: value.id } }); 
-        }} 
-      />
+      <ClusterContainer>
+        <Form layout="inline">
+          <Form.Item label="集群">
+            <SingleClusterSelector
+              value={cluster} 
+              onChange={(value) => { 
+                Router.push({ query: { cluster: value.id } }); 
+              }} 
+            />
+          </Form.Item>
+        </Form>
+      </ClusterContainer>
       <Form
         form={form}
         onFinish={async () => {
