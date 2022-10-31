@@ -16,16 +16,16 @@ export function parseClusterUsers(dataStr: string): GetClusterUsersReply {
     const account = lines[i].trim();
     const accountIndex = obj.accounts.push({ accountName: account, users: [] as UserInAccount[] });
     i++;
-    while (lines[i].trim() != "") {
+    while (lines[i].trim() !== "") {
       const [user, status] = lines[i].split(":").map((x) => x.trim());
       const userIndex = obj.users.findIndex((x) => x.userId === user);
-      if (userIndex == -1) {
+      if (userIndex === -1) {
         obj.users.push({ userId: user, userName: user, accounts: [account]});
       }
       else {
         obj.users[userIndex].accounts.push(account);
       }
-      if (account == "a_" + user) {
+      if (account === "a_" + user) {
         if (obj.accounts[accountIndex - 1].owner === undefined) {
           obj.accounts[accountIndex - 1].owner = user;
         } 
