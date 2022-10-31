@@ -2,7 +2,6 @@ import { PlusOutlined } from "@ant-design/icons";
 import { Button, Form, Input, message, Modal } from "antd";
 import React, { useState } from "react";
 import { api } from "src/apis";
-import { CreateTenantModal } from "src/pageComponents/tenant/CreateTenantModal";
 
 
 interface FormProps {
@@ -64,21 +63,12 @@ export const AddTenantButton: React.FC<Props> = ({ refresh }) => {
 
   const [modalShow, setModalShow] = useState(false);
 
-  const [createTenantShow, setCreateTenantShown] = useState(false);
-
   return (
     <>
       <NewTenantModal
         close={() => setModalShow(false)}
         visible={modalShow}
         refresh={refresh}
-      />
-      <CreateTenantModal
-        onClose={() => {
-          setCreateTenantShown(false);
-          setModalShow(true);
-        }}
-        visible={createTenantShow}
       />
       <Button type="primary" icon={<PlusOutlined />} onClick={() => setModalShow(true)}>
       添加租户

@@ -41,7 +41,7 @@ export const tenantServiceServer = plugin((server) => {
     },
 
     getAllTenants: async ({ em }) => {
-      const [tenants, tenantCount] = await em.findAndCount(Tenant, {});
+      const tenants = await em.find(Tenant, {});
       const userCount
         = await em.createQueryBuilder("User").select("tenant_id")
           .count().groupBy("tenant_id").orderBy({ tenant_id:"asc" }).execute("all");
@@ -51,31 +51,31 @@ export const tenantServiceServer = plugin((server) => {
       
       return [
         {
-          totalCount: tenantCount,
-          platformTenants: await Promise.all(tenants.map(async (x) => ({
+          totalCount: tenants.length,
+          platformTenants: tenants.map((x) => ({
             tenantId:x.id,
             tenantName: x.name,
             userCount: userCount[x.id - 1].count,
             accountCount: accountCount[x.id - 1].count,
             balance:decimalToMoney(x.balance),
-          }))),
+          })),
         }];
     },
 
     createTenant: async ({ request, em }) => {
       const { name } = request;
 
-      const tenantName = await em.findOne(Tenant, { name: name });
-      if (tenantName) {
+      const tenant = await em.findOne(Tenant, { name: name });
+      if (tenant) {
         throw <ServiceError> { code: Status.ALREADY_EXISTS, details: "The tenant already exists" };
       }
       // create tenant in database
-      const tenant = new Tenant({ name });
+      const newTenant = new Tenant({ name });
       try {
-        await em.persistAndFlush(tenant);
+        await em.persistAndFlush(newTenant);
       } catch (e) {
         if (e instanceof UniqueConstraintViolationException) {
-          throw <ServiceError> { code: Status.ALREADY_EXISTS, message:`Tenant ${tenant} already exists.` };
+          throw <ServiceError> { code: Status.ALREADY_EXISTS, message:`Tenant ${newTenant.name} already exists.` };
         } else {
           throw e;
         }

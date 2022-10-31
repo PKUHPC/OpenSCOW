@@ -10,17 +10,13 @@ export interface CreateTenantSchema {
   method: "POST";
 
   body: {
-    /**
-     * 用户ID
-     * @pattern ^[a-z1-9_]+$
-     */
     name: string;
   }
 
     responses: {
       204: null;
         
-    /** 用户已经存在 */
+    /** 租户已经存在 */
       409: null;
   }
 }

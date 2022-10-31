@@ -8,7 +8,7 @@ export const CreateTenantForm: React.FC = () => {
 
   return (
     <>
-      <Form.Item label="姓名" name="name" rules={[{ required: true }]}>
+      <Form.Item label="租户名" name="name" rules={[{ required: true }]}>
         <Input />
       </Form.Item>
     </>
