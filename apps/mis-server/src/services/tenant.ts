@@ -75,7 +75,7 @@ export const tenantServiceServer = plugin((server) => {
         await em.persistAndFlush(newTenant);
       } catch (e) {
         if (e instanceof UniqueConstraintViolationException) {
-          throw <ServiceError> { code: Status.ALREADY_EXISTS, message:`Tenant ${newTenant.name} already exists.` };
+          throw <ServiceError> { code: Status.ALREADY_EXISTS, message:`Tenant with ${newTenant.name} already exists.` };
         } else {
           throw e;
         }
