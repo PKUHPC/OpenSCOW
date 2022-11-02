@@ -1,6 +1,6 @@
 ---
 sidebar_position: 2
-title: 样例：Jupyter配置
+title: Jupyter
 ---
 
 # 样例：Jupyter配置

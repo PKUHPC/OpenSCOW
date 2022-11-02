@@ -1,6 +1,6 @@
 ---
 sidebar_position: 2
-title: 样例：VSCode配置
+title: VSCode
 ---
 
 # 样例：VSCode配置
