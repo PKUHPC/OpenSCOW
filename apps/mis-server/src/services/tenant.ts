@@ -52,8 +52,7 @@ export const tenantServiceServer = plugin((server) => {
       const accountCount
         = await em.createQueryBuilder("User").select("tenant_id")
           .count().groupBy("tenant_id").orderBy({ tenant_id: "asc" }).execute("all");
-      server.logger.info("${${userCount}[0]}");
-      console.log("hhh");
+      server.logger.info("hhh");
       return [
         {
           totalCount: tenants.length,

@@ -1,0 +1,4088 @@
+[33mcommit 793cac9f6eae96d130dccbb46f47de275fa10382[m[33m ([m[1;36mHEAD -> [m[1;32mshowAllTenant[m[33m, [m[1;31morigin/showAllTenant[m[33m)[m
+Author: yhy <useremail@163.com>
+Date:   Wed Nov 2 17:15:14 2022 +0800
+
+    fix: just to test some mistakes
+
+[33mcommit 86cfeac65315058e8af1958ab10661e0dd3a396b[m
+Author: yhy <useremail@163.com>
+Date:   Tue Nov 1 20:10:46 2022 +0800
+
+    fix: modify
+
+[33mcommit 1e93bf65d1da69708f31b4657587998e6c64ebab[m
+Author: yhy <useremail@163.com>
+Date:   Mon Oct 31 10:43:41 2022 +0800
+
+    fix: modify some mistakes
+
+[33mcommit 6603d1531cfcc6e6e293e2c9f93d1417bbda4f1d[m
+Merge: 4ca64b5c 0c4a4cfb
+Author: yhy <useremail@163.com>
+Date:   Mon Oct 31 00:52:55 2022 +0800
+
+    Merge branch 'master' into showAllTenant
+
+[33mcommit 4ca64b5c59dcda7181afd25a1f19fab47b4de379[m
+Author: yhy <useremail@163.com>
+Date:   Mon Oct 31 00:51:35 2022 +0800
+
+    fix: test passes firstly
+
+[33mcommit 0c4a4cfb021a5d5d01ccda4d197d7ea8002c356a[m[33m ([m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmaster[m[33m)[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sat Oct 29 12:21:44 2022 +0800
+
+    feat(web): update to next 13 (#244)
+    
+    * fix(web): update to next 13 and remove svg plugin
+    
+    * fix(web): run new-link codemod
+    
+    * fix(mis-web): fix svg icon
+    
+    * fix(portal-web): use native img for dashboard logo
+    
+    * fix(ssh): fix build
+
+[33mcommit e6450f025eda4954114c0efd7cd1b8406ddad5b4[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Sat Oct 29 10:41:13 2022 +0800
+
+    chore(deps): update nginx:alpine docker digest to 2452715 (#242)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit 0f6559720f72ec14298448a1c4be87329b2570b6[m
+Author: WZD09 <102740885+WZD09@users.noreply.github.com>
+Date:   Fri Oct 28 11:15:04 2022 +0800
+
+    refactor(ssh): reimplement auto public key auth setup in SFTP (#212)
+    
+    * chore(ssh): add public key using SFTP
+    
+    * chore(ssh): change owner of ssh key files
+    
+    * fix(ssh): fix sftp re-exporting error
+    
+    * fix(ssh): fix ssh file permission bug.
+    
+    * fix(ssh): fix user home directory permission error
+    
+    * fix(ssh): add ssh key for new user
+    
+    * chore(ssh): sort tests
+
+[33mcommit 349f243cabe185b22bc01e661321746eb33bb2f8[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Fri Oct 28 11:14:28 2022 +0800
+
+    feat: update to node 18 (#240)
+    
+    * feat: update node to v18
+    
+    * feat: remove undici for native fetch
+    
+    * feat: update images to node 18
+    
+    * chore: clean tsconfig
+    
+    * ci: update to node 18
+    
+    * fix(portal-server): upload not finished
+    
+    * fix(portal-server): fix upload error in node 18
+    
+    * fix(mis-server): mock global fetch
+    
+    * fix(portal-server): fix download tests
+
+[33mcommit 5b184617ddc762b8b11c7e007e5425374a80bd20[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Wed Oct 26 10:36:51 2022 +0800
+
+    feat(mis): allow to customize user id pattern (#236)
+    
+    * feat(mis): allow to customize user id pattern
+    
+    * fix(mis-web): fix create user form user id placeholder
+
+[33mcommit 121b9f5508da4932a4bd0dec4e0adb198a581e18[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Wed Oct 26 10:24:12 2022 +0800
+
+    feat(mis): job table supports mysql (#235)
+
+[33mcommit 321be7155111c6fd455b0888a47f9656bd6ced00[m
+Author: huangjun0210 <huangjun0210-17@126.com>
+Date:   Tue Oct 25 09:24:23 2022 +0800
+
+    Update deployment doc (#224)
+    
+    * update deployment doc
+    
+    * update mis deployment doc
+    
+    * update basepath doc
+    
+    * update portal deployment doc
+    
+    * update docker compose cmd use in doc
+    
+    * update basepath doc
+    
+    * undo
+    
+    * update common deployment doc
+    
+    * update mis deployment doc
+    
+    * update basepath doc
+    
+    * update portal deployment doc
+    
+    * update docker compose cmd use in doc
+    
+    * update docker compose cmd use in doc
+    
+    * update basepath doc
+    
+    * update common deployment doc
+    
+    * add scow-deployment update blog
+    
+    * optimize blog
+
+[33mcommit d572b5109a77286b10fccc0bffe1fec9fbf98961[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Mon Oct 24 15:38:48 2022 +0800
+
+    docs: fix architecture diagram
+
+[33mcommit 3d1e1693899c37f2b1e1c1c4568139d85fcbd6a9[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Mon Oct 24 14:54:21 2022 +0800
+
+    docs: update architecture
+
+[33mcommit c4faf46d0360a73d7a3f4027ad44a1ac5a4f66c9[m
+Author: yhy <useremail@163.com>
+Date:   Mon Oct 24 14:03:10 2022 +0800
+
+    fix: this is only a draft with many mistakes
+
+[33mcommit 90ab58f0b31d81c5d3f82ed5fe08886688e4f0be[m
+Author: yhy <useremail@163.com>
+Date:   Mon Oct 24 13:58:54 2022 +0800
+
+    fix: this only is a draft with many mistakes
+
+[33mcommit 9fedd557ebd438a537b2031c3c565c862e1a2ef0[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sun Oct 23 10:07:02 2022 +0800
+
+    fix(portal-server): return app props properly (#234)
+
+[33mcommit 3219e98f7ac27db96d2af9ffdc5022178b3388a0[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sun Oct 23 09:59:52 2022 +0800
+
+    fix(portal-server): password not generated
+
+[33mcommit 24079b7453e31073ab49aa991d6d6983e9a2936f[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Sat Oct 22 17:06:28 2022 +0800
+
+    chore(deps): update nginx:alpine docker digest to bffb433 (#231)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit 0aafdf79a17da66f1c21de1322564ca95f34a2ef[m
+Author: yhy <96867690+coovy@users.noreply.github.com>
+Date:   Sat Oct 22 17:06:12 2022 +0800
+
+    feat(mis-server): copy slurm.sh to slurm node automatically when mis-server starts (#233)
+    
+    * fix: slurmshCopy test pass
+    
+    * docs: modify
+    
+    * docs: docs modify
+    
+    * fix: modify test case
+    
+    * fix: modify test case and docs
+    
+    * docs: modify docs
+    
+    * docs: modify docs
+    
+    Co-authored-by: yhy <useremail@163.com>
+
+[33mcommit 3ee78196466c828f7859825262fe8f97adee7958[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Fri Oct 21 20:26:24 2022 +0800
+
+    fix: update tsgrpc-cli to latest
+
+[33mcommit 1eaf4aa52a600dd57cb9a40f31e28b5575c44da8[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Fri Oct 21 17:11:06 2022 +0800
+
+    refactor(portal): separate backend from portal (#230)
+    
+    * feat(portal-server): add portal-server
+    
+    * feat: update portal-web
+    
+    * feat(portal-web): rewrite api
+    
+    * feat(portal-web): clean up frontend config
+    
+    * fix(portal): review error code design
+    
+    * fix(portal-server): add entry
+    
+    * fix(portal-web): fix portal dev env
+    
+    * fix(portal): shell partially works
+    
+    * fix(portal): fix upload, download and shell
+    
+    * fix(portal-web): fix message type when copy success
+    
+    * fix(portal-web): pass tests with no tests
+    
+    * fix(portal-server): fix tests
+    
+    * fix(portal-server): try fixing shell test error
+    
+    * fix(portal-server): skips shell test for now
+    
+    * fix(portal-web): remove unnecessary packages
+    
+    * ci: add portal-server to coverages
+    
+    * fix(portal-web): remove pino from portal-web
+    
+    * fix(portal-web): remove web logging
+    
+    * build: remove openssh-client from portal-web
+    
+    * ci: remove portal-web coverage
+    
+    * ci: build portal-server
+    
+    * fix(portal-server): use dayjs to replace moment
+    
+    * fix(portal): portal-server checks root user login
+    
+    * fix(portal-server): only check ssh availability in production
+
+[33mcommit 2caaa0779b371ff9621a29516b5d0e60f605e6f1[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Thu Oct 20 10:13:00 2022 +0800
+
+    docs: devenv (#229)
+    
+    * docs: add docs about dev env
+    
+    * docs: add devenv:stop
+
+[33mcommit 00307a7f6554012d68025f29eced0ab2b8e3593e[m
+Merge: e06945fb 337cffe7
+Author: vanstriker <liruomiao@gmail.com>
+Date:   Wed Oct 19 23:40:31 2022 +0800
+
+    Merge pull request #228 from PKUHPC/login_test-ssh-server_as_root
+    
+    fix: login test-ssh-server as root
+
+[33mcommit 337cffe7fac3e152c13f6637bd5e7ed6a5b78fa0[m[33m ([m[1;31morigin/login_test-ssh-server_as_root[m[33m)[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Wed Oct 19 23:11:11 2022 +0800
+
+    fix(dev): fix test ssh server base image tag
+
+[33mcommit 81665c908c1cf2a94e1d18bea1b1644bfe71dce7[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Wed Oct 19 23:10:40 2022 +0800
+
+    fix(dev): fix test ssh server file permissions
+
+[33mcommit e06945fb25c88c941ea0a41e1832c59f640b3924[m
+Author: Zhenxin Fu <fuzhenxin95@gmail.com>
+Date:   Wed Oct 19 18:55:57 2022 +0800
+
+    fix bug: get_password function returns "password" (#227)
+    
+    bug: get_password function returns "password" instead of a random string.
+
+[33mcommit d25baccdc2eb74b85fa06043f64c747d42ed1ca7[m
+Author: qhqhqhq <98016770+qhqhqhq@users.noreply.github.com>
+Date:   Wed Oct 19 15:17:20 2022 +0800
+
+    add finance under platform admin (#225)
+    
+    * feat(mis-web): add page in /admin/finance
+    
+    * feat(mis-web): add sidebar in platform management
+    
+    * fix(mis-web): change auth to platform_finance
+    
+    * feat(mis): platform_finance can get usedPayType
+    
+    * feat(mis-web): add api to submit form
+    
+    * feat(mis-web): add tenant charge form
+    
+    * feat(mis-web): add api named getTenantPayments
+    
+    * feat(mis-web): add PaymentsTable to payments page
+
+[33mcommit c5964a10f4c47cf3f8a6304bc7c8bbb655560498[m
+Author: Li Ruomiao <liruomiao@gmail.com>
+Date:   Wed Oct 19 12:04:01 2022 +0800
+
+    fix: login test-ssh-server as root
+    
+    fix #62
+
+[33mcommit 2d06d8963621771b9d691097933382441fa7af7e[m
+Author: Junzhe Li <78996942+tulvgengenr@users.noreply.github.com>
+Date:   Tue Oct 18 18:14:21 2022 +0800
+
+    feat(mis-web): set up/remove tenant roles on the front-end of tenant/list (#223)
+
+[33mcommit fb007383f7a02440808ddc3379b4a9cd61e4d520[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Mon Oct 17 09:34:38 2022 +0800
+
+    fix(deps): update all non-major dependencies (#218)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit 3ea3b813479ce58c8ea5137d114768b3b6a56a93[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sun Oct 16 22:47:14 2022 +0800
+
+    style: update to latest eslint-config (#222)
+
+[33mcommit becbfb8e7c75dc85a1a972f161c6c2219372f99c[m
+Author: qhqhqhq <98016770+qhqhqhq@users.noreply.github.com>
+Date:   Sun Oct 16 22:15:41 2022 +0800
+
+    chore(mis-web): move_finance_to_tenant_management (#221)
+
+[33mcommit a3fabcfe3eaa439fd3d1e4f847d359e7e25906b1[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sun Oct 16 22:15:19 2022 +0800
+
+    fix: update tsgrpc to latest (#220)
+
+[33mcommit d6547d2b95379bb5a30342def45e3d48f116d1a3[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sat Oct 15 16:27:34 2022 +0800
+
+    chore: update tsgrpc to latest and update tsgrpc.json (#219)
+
+[33mcommit 22603cf2597379a0517fb658c4c869669fa77e97[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Sat Oct 15 15:16:59 2022 +0800
+
+    chore(deps): update node.js to 2175727 (#217)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit 61c4c027b572ffc1c5fcf4bba2344405295fff2e[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Thu Oct 13 14:50:28 2022 +0800
+
+    fix: Use fixed username 'test' for localhost ssh server (#216)
+    
+    * fix: use fixed username for local ssh server
+    
+    * fix(portal-web): file manager in dev no longer supports localhost sshd
+
+[33mcommit d43a08d3bf561ad735b034a12262a96ef0af778b[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Wed Oct 12 23:02:08 2022 +0800
+
+    feat: money keeps 4 decimal places (#215)
+
+[33mcommit f7631f6f9c2ee813dcb93ef8bb1379041ae11694[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Wed Oct 12 17:01:13 2022 +0800
+
+    chore: enable sudo access for ssh server user
+
+[33mcommit 3680c174fba711a8ae5885c3e662b8570d34ee6a[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Wed Oct 12 16:59:27 2022 +0800
+
+    fix(mis-server): update .env.dev to be able to use mikro-orm cli
+
+[33mcommit d796654ab871b0043c71e5afe074c41e1ff155fa[m
+Author: Junzhe Li <78996942+tulvgengenr@users.noreply.github.com>
+Date:   Wed Oct 12 14:53:56 2022 +0800
+
+    feat(mis): allow setting platform roles and tenant roles in init of mis-web (#214)
+    
+    * feat(mis): change the settings of PlatFormRole and TenantRole in init from Tags to Select in mis-web
+    
+    * feat(mis): modify Selection's Options to Role's traversal
+    
+    * feat(mis): add temporary storage of api files
+    
+    * feat(mis-server): grpc calls about tenant roles
+    
+    * feat(mis-web): add API for managing tenant roles
+    
+    * fix(mis-web): fix a bug about TenantRole from generated/server or models
+    
+    * feat(mis-web): add front-end web implementation and called the corresponding api
+    
+    * fix(mis-web): fix the bug for build
+    
+    * test(mis-server): add test for grpc call about managing tenant roles
+    
+    * fix(mis-server): add rpc define in protos for set/unsetTenantRole
+    
+    * fix(docs): update the docs of init in mis
+    
+    * fix(mis-server): fix a bug of test file about tenant role in admin
+    
+    * fix(mis-server): fix a bug of test file about tenant role in admin
+
+[33mcommit 1061502f7748b7558cee4127ce34d684067774cd[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Tue Oct 11 16:06:06 2022 +0800
+
+    chore(deps): update all non-major dependencies (#202)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit 8f21cacc288a536dedf725fb13cb7e2bb18fc3c1[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Tue Oct 11 15:47:42 2022 +0800
+
+    feat: remove pino dependency if only log interface is required (#213)
+
+[33mcommit 4575439fda536444da4d927946e6ac173dfedea1[m
+Author: qhqhqhq <98016770+qhqhqhq@users.noreply.github.com>
+Date:   Mon Oct 10 16:17:46 2022 +0800
+
+    feat(mis): manage user platform roles (#210)
+    
+    * feat(mis-web): write front-end page(without API)
+    
+    * feat(mis-server): grpc calls about platform roles
+    
+    * test(mis-web): add more test cases for getAllUsers API
+    
+    * feat(mis-web): add API for managing platform roles
+    
+    * fix(mis-web): fix a bug about PlatformRole
+    
+    * fix(mis-web): try to fix build error
+    
+    * test(mis-server): add test for grpc call
+    
+    * fix(mis): fix bug about PlatformRole in grpc call
+
+[33mcommit 83d327c2e8902ac46cab79c37f8ed4722b319bb5[m
+Author: Ashlee1994 <mayinping@pku.edu.cn>
+Date:   Mon Oct 10 10:08:13 2022 +0800
+
+    Update slurm.sh (#200)
+
+[33mcommit 787bc1c7a11425e89028394bd96557c24fd41369[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sun Oct 9 12:31:37 2022 +0800
+
+    fix(repo): set sh files eol to lf
+
+[33mcommit 98ed7a706824f6b765eb8e546935d1f088d582c5[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sat Oct 8 17:03:53 2022 +0800
+
+    feat(portal): add error messages when copy or move fails (#209)
+    
+    * feat(portal): add error message when copy or move fails
+    
+    * fix(portal): removing it.only
+    
+    * fix(portal-web): fix new tests
+
+[33mcommit 33038296daf49adfe637da3c30481547db9d798c[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sat Oct 8 16:39:49 2022 +0800
+
+    fix(portal): allow different homedir paths for the same user on different clusters (#208)
+    
+    * feat(mis-web): allow to manage local and test ssh server using portal file manager
+    
+    * feat(portal): allow different home path for the same user on different clusters
+    
+    * fix(portal): accessing path directly redirects to homedir
+    
+    * fix(auth): ssh test using host os username
+    
+    * fix(portal): fix tests
+
+[33mcommit 486d82d065532558950923309ad151188af670d8[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Sat Oct 8 16:07:54 2022 +0800
+
+    chore(deps): update node.js to 4d68856 (#201)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit dac38ec6565c077c1ec89a75447ca2e9d76488b6[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Sat Oct 8 16:07:44 2022 +0800
+
+    chore(deps): update docker/login-action digest to f4ef78c (#206)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit c754aa858267ece7142666809502c1a595118961[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Sat Oct 8 16:07:34 2022 +0800
+
+    chore(deps): update nginx:alpine docker digest to b87c350 (#207)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit 9e7f5d75dd7a87fa50e24706d40be81d6e531f7a[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sat Oct 8 15:00:29 2022 +0800
+
+    fix(mis-web): add min-width to multi cluster selector
+
+[33mcommit 31c38b5950a3ff3f8a23912a8673864b89ed4b5e[m
+Author: qhqhqhq <98016770+qhqhqhq@users.noreply.github.com>
+Date:   Fri Oct 7 09:21:09 2022 +0800
+
+    feat(mis): show all users (#205)
+    
+    * feat(mis-server): add getAllUsers in user.proto
+    
+    * fix(mis-server): add data struct of getAllUsers in user.proto
+    
+    * feat(mis-server): add new method named getAllUsers in grpc
+    
+    * fix(mis-server): remove unused import(ensureNotUndefined)
+    
+    * feat(mis-web): create API route named getAllUsers
+    
+    * feat(mis-web): regenerate src/apis/api.ts
+    
+    * feat(mis-web): add mock data of API getAllUsers
+    
+    * feat(mis-web): add /admin/users page in frontend
+    
+    * fix(mis): fix a bug in the paging mechanism
+    
+    * feat(mis-web): add option in sidebar
+    
+    * test(mis-server): add test for getAllUsers
+    
+    * test(mis-server): fix bug about test data
+
+[33mcommit cd7badcd8ff2e708e298639c6d55d6e339ff5456[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Thu Oct 6 10:47:04 2022 +0800
+
+    feat(mis-web): update style for init tabs
+
+[33mcommit 4d30cce0f44f0b1d7a237921719c96550b972b7a[m
+Author: Junzhe Li <78996942+tulvgengenr@users.noreply.github.com>
+Date:   Thu Oct 6 09:05:51 2022 +0800
+
+    fix(mis): delete the excess code of /src/pages/init in mis-web (#204)
+
+[33mcommit 04842cf9cfe858148a6784f46231743a6934a1c0[m
+Merge: 9299b06e 637e9362
+Author: Junzhe Li <78996942+tulvgengenr@users.noreply.github.com>
+Date:   Wed Oct 5 22:58:27 2022 +0800
+
+    Merge pull request #203 from PKUHPC/enhance_init_move_to_different_path
+    
+    feat(mis):  move 4 sub-functions of mis-web to a different path
+
+[33mcommit 637e93627385642f4c410b2cea27726b39485e6b[m
+Author: ljz <871005218@qq.com>
+Date:   Wed Oct 5 22:19:02 2022 +0800
+
+    fix(mis): delete the code of debug
+
+[33mcommit 4c9098d8e8e0ea27f5cb37381c0c57eebb7595fd[m
+Author: ljz <871005218@qq.com>
+Date:   Wed Oct 5 22:09:57 2022 +0800
+
+    Revert "Revert "feat(mis): allow jumping from one to another in the four pages of init""
+    
+    This reverts commit 6575f9f853b11cb750945357eb8d88b1e4e6611e.
+
+[33mcommit 6575f9f853b11cb750945357eb8d88b1e4e6611e[m
+Author: ljz <871005218@qq.com>
+Date:   Wed Oct 5 22:09:22 2022 +0800
+
+    Revert "feat(mis): allow jumping from one to another in the four pages of init"
+    
+    This reverts commit a70c706d427d051eec974e753dd676bae8e258ad.
+
+[33mcommit a70c706d427d051eec974e753dd676bae8e258ad[m
+Author: ljz <871005218@qq.com>
+Date:   Wed Oct 5 22:08:11 2022 +0800
+
+    feat(mis): allow jumping from one to another in the four pages of init
+
+[33mcommit 562abfc099b6d8c463c26453678417dfad5d1c83[m
+Author: ljz <871005218@qq.com>
+Date:   Tue Oct 4 20:14:42 2022 +0800
+
+    feat: implemented pages which are createInitAdmin, JobPriceTable, Users in init
+
+[33mcommit 273ac97117b797266adea32a0d2fab680c64d7ed[m
+Author: ljz <871005218@qq.com>
+Date:   Tue Oct 4 20:05:37 2022 +0800
+
+    feat: add the public react component from init as layout
+
+[33mcommit 52dc1be088bfc3c7b7391ba62cc6aa2be2bfb746[m
+Author: ljz <871005218@qq.com>
+Date:   Tue Oct 4 19:20:59 2022 +0800
+
+    feat: add abstracting the public React component from init
+
+[33mcommit 375cf3079bc260e524de4a475b10cdad323eab7a[m
+Author: ljz <871005218@qq.com>
+Date:   Tue Oct 4 18:38:15 2022 +0800
+
+    feat: add jump from init to inportusers in mis-web
+
+[33mcommit 9299b06e8f9d3e4fcf979d3917d7ae63e089e120[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Tue Oct 4 10:08:41 2022 +0800
+
+    docs: update diagrams
+
+[33mcommit 4c96d877afe134b557c4e851e4786752007ff415[m
+Author: Ashlee1994 <mayinping@pku.edu.cn>
+Date:   Fri Sep 30 15:15:37 2022 +0800
+
+    Update slurm.sh (#199)
+    
+    modify queryUserInAcct  and queryUser
+
+[33mcommit bbe1525ec4ace12049aab59bb5b652c4d76e0eae[m
+Author: WZD09 <102740885+WZD09@users.noreply.github.com>
+Date:   Thu Sep 29 23:00:04 2022 +0800
+
+    chore(mis-server): add detailed error information (#198)
+
+[33mcommit 420628b1458f3872eb90e2a6386d7499f6f3697f[m
+Author: qhqhqhq <98016770+qhqhqhq@users.noreply.github.com>
+Date:   Wed Sep 28 23:47:58 2022 +0800
+
+    docs(portal): fix bug in interactive app doc (#197)
+
+[33mcommit c5ade4dad891143bd3d48a9629adebcb40d1c4d6[m
+Author: qhqhqhq <98016770+qhqhqhq@users.noreply.github.com>
+Date:   Wed Sep 28 17:32:38 2022 +0800
+
+    add extra slurm params when running interactive apps (#193)
+    
+    * feat: add slurm options to AppConfigSchema
+    
+    * feat: add slurm options from config in entry.sh
+    
+    * feat: add config instruction in config file and doc
+
+[33mcommit 0a6a92c5d653e7bd6103c7dd07a57af624ec7d56[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Wed Sep 28 16:42:31 2022 +0800
+
+    feat(mis): allow viewing and setting platform price items (#194)
+
+[33mcommit 578c3106b09bb1e35f60d15def4859eec46bee75[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Tue Sep 27 18:20:09 2022 +0800
+
+    fix(deps): update all non-major dependencies (#176)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit a0b7f6a914b17ef72db9e7489befc3403008b2b2[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Tue Sep 27 16:05:32 2022 +0800
+
+    fix(mis): redirect to dashboard by default
+
+[33mcommit 9351f840e59e54d3eb8ec9d046bdbdf7433c5894[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Tue Sep 27 14:57:56 2022 +0800
+
+    fix(mis): fix index redirect
+
+[33mcommit e7ce911caaa24fb53d816f7cdf826714067992ec[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Tue Sep 27 14:28:46 2022 +0800
+
+    feat(mis): show tenant roles in tenant users
+
+[33mcommit 9ca0e89595a097025f90ba432682a8d6805d31cc[m
+Author: qhqhqhq <98016770+qhqhqhq@users.noreply.github.com>
+Date:   Mon Sep 26 15:07:04 2022 +0800
+
+    fix(portal): remove 'nodes' config in interactive apps (#190)
+    
+    * remove nodes config when generate job script
+    
+    * feat(mis): init page allows to set existing users as init admins (#186)
+    
+    * feat(mis-web): add manage users and accouonts page
+    
+    * feat(mis-server): implements new apis for init users
+    
+    * fix(mis-web): update text descriptions in create init admin user
+    
+    * fix(mis-web): remove real name from code
+    
+    * fix(mis-web): update the text of user's role in an account
+    
+    * docs: update docs about new init pages
+    
+    * fix(mis-web): use correct api to unset init admins
+    
+    * remove nodes config in AppConfigSchema, config file and doc
+    
+    Co-authored-by: Chen Junda <ddadaal@outlook.com>
+
+[33mcommit 752ee9efc1b6d857ffb71ac5569deaa6f81ee0cf[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Mon Sep 26 14:57:16 2022 +0800
+
+    feat(mis): don't throw when user or account is not found in source jobs (#192)
+
+[33mcommit 05b8a4811e43353160b00fb71a8adc7267fa83b7[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Mon Sep 26 11:10:25 2022 +0800
+
+    fix(ssh): chown doesn't explicitly set group name when inserting key
+
+[33mcommit e0095db3cf2594b35031659b94da64e2cc2ac556[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Fri Sep 23 09:08:47 2022 +0800
+
+    feat(auth)!: improve ldap configurability (#191)
+    
+    * feat(auth): ldap add new users' groupStrategy
+    
+    * feat(auth): ldap allow customization of dn key of new user and group
+    
+    * feat(auth): ldap allow not setting user's name
+    
+    * fix(auth): rename ldap groupStrategy
+    
+    * docs: update docs about ldap
+    
+    * docs: fix typo
+
+[33mcommit ee553acd3b926ead92df6b554bc6aead567511f8[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Thu Sep 22 21:37:23 2022 +0800
+
+    fix: build:libs not finding projects under windows
+
+[33mcommit c0d78ace04f5678637356fccd89cb87de3b22b7b[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Wed Sep 21 11:06:15 2022 +0800
+
+    fix(mis): use optional for mis db.password config
+
+[33mcommit 3720b6636a98044dcd4dc093126345fdd77a96c3[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Wed Sep 21 11:02:45 2022 +0800
+
+    fix(config): make mis.db.password optional
+
+[33mcommit b8b47b31cd49444f79506a913feaa21f111680c0[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Wed Sep 21 11:00:41 2022 +0800
+
+    fix(auth)!: make ldap.attrs.name required
+
+[33mcommit 956bd08802deb431547d99ef6e05a6dea90289ff[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Wed Sep 21 10:53:33 2022 +0800
+
+    fix(auth): replace deprecated imports
+
+[33mcommit 5bbfe7bb326f832d40d394cd4ce9a8925de33e38[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Wed Sep 21 10:51:08 2022 +0800
+
+    fix(auth): add logs in ldap login
+
+[33mcommit 86a220ddddc6b8f6f424b0ae85d6178f00e5ec07[m
+Author: huangjun0210 <huangjun0210-17@126.com>
+Date:   Mon Sep 19 14:46:20 2022 +0800
+
+    update ldap client, update systemd-logind and oddjobd services (#188)
+
+[33mcommit b0bf91c1ff4e01776d75d4fa2959936ff40f93ba[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sun Sep 18 21:13:18 2022 +0800
+
+    feat(mis): init page allows to set existing users as init admins (#186)
+    
+    * feat(mis-web): add manage users and accouonts page
+    
+    * feat(mis-server): implements new apis for init users
+    
+    * fix(mis-web): update text descriptions in create init admin user
+    
+    * fix(mis-web): remove real name from code
+    
+    * fix(mis-web): update the text of user's role in an account
+    
+    * docs: update docs about new init pages
+    
+    * fix(mis-web): use correct api to unset init admins
+
+[33mcommit e73e63fdca47095d39419d3738df9dc43e78f92a[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sat Sep 17 16:18:53 2022 +0800
+
+    style: update lint rules and fix
+
+[33mcommit a8cc9cd6282b0af8c65129564b55feb28fb6add6[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Fri Sep 16 21:13:17 2022 +0800
+
+    fix: try to fix eslint on windows
+
+[33mcommit 430cc8b7e5406e8c4476a8cb4a0e962fc706b58a[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Fri Sep 16 21:08:14 2022 +0800
+
+    chore: update pnpm version
+
+[33mcommit 2bf4d01307ff9d10f71a7b91ca36ac105388da81[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Fri Sep 16 21:07:02 2022 +0800
+
+    fix: update tsgrpc cli
+
+[33mcommit 66bdabb4456ebf66ac812e75c1080794fc79502c[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Fri Sep 16 19:37:39 2022 +0800
+
+    feat: update to newest tsgrpc packages
+
+[33mcommit 1c8e64372d2faa7ca8436c1f5617c5ea097dfa71[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Fri Sep 16 19:29:23 2022 +0800
+
+    fix: update eslint rules and fix errors
+
+[33mcommit 795e83790d60b37b6b4d3403e0ee0766ffe220c4[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Fri Sep 16 19:28:09 2022 +0800
+
+    chore: update deps
+
+[33mcommit 106caf806ff83d7b15304d54ad4ffc22e25158eb[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Thu Sep 15 20:14:31 2022 +0800
+
+    docs: update base path config for deployment doc
+
+[33mcommit ab2e447fa66410e74110f489dd1f1ddffff18921[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Thu Sep 15 20:06:59 2022 +0800
+
+    docs: update basepath docs
+
+[33mcommit c6844155b5ecd7865fb684aa674a3068bc446c79[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Thu Sep 15 17:07:58 2022 +0800
+
+    fix(mis): remove a eslint ignore
+
+[33mcommit 3f94b3fc2d88af193da73e0c29fcd93adffb2873[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Thu Sep 15 09:58:18 2022 +0800
+
+    fix(config): add missing mis config
+
+[33mcommit b1cdf6fd64d6e20a633a18ff2144ce42faa1f930[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Thu Sep 15 09:42:21 2022 +0800
+
+    chore(mis-server): add log on callOnOne
+
+[33mcommit 80dc197438097f500341085c6bedbe187c289e75[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Wed Sep 14 19:19:01 2022 +0800
+
+    chore(deps): update jest monorepo to v29 (#177)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit 970f323301894b75c32bcc13e01b4af5d9198cc0[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Wed Sep 14 19:18:34 2022 +0800
+
+    fix(deps): update dependency uuid to v9 (#185)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit cabc1a4aebc4f655fa5aa84f1f2f320dd62f55c9[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Wed Sep 14 19:18:25 2022 +0800
+
+    chore(deps): update docker/login-action digest to 21f251a (#184)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit ce839da7de8dc7987200341e743c1358a3bf638a[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Wed Sep 14 09:36:24 2022 +0000
+
+    fix(mis-server): update slurm script to fix block
+
+[33mcommit 50eb6b6f53f0d64eab9424eb57e85f6f891630a0[m
+Author: Junzhe Li <78996942+tulvgengenr@users.noreply.github.com>
+Date:   Wed Sep 14 16:56:16 2022 +0800
+
+    refactor(config): Change the slurm partition information in the cluster configuration to a list (#183)
+    
+    * Convert the original schema to ListSchema
+    
+    * modify describe to description
+    
+    * modify the schema of hpc01, hpc02
+    
+    * add comma between flow collection entries of hpc01, hpc02
+    
+    * add comma again of hpc01
+    
+    * modify the schema of hpc01 and hpc02
+    
+    * modify the conf files of mis-server
+    
+    * update docs/common/culsterConfig
+    
+    * update conf file of mis-web
+    
+    * Implemented a custom ClusterConfigSchema type
+
+[33mcommit 887a8ae7a831deb3c4818d400f2519c41ed2fb8b[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Wed Sep 14 07:44:17 2022 +0000
+
+    fix(mis-web): header login link not added with base path
+
+[33mcommit a6ccd188dfc1cbe700ea368a9e75a50afba8210f[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Wed Sep 14 07:41:32 2022 +0000
+
+    fix(mis-server): not passing env when calling slurm when env is not allowed in the ssh server
+
+[33mcommit 5aa3b73560356d69e34b96979f65a7092e8d6ef8[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Tue Sep 6 21:18:44 2022 +0800
+
+    docs: update dev docs
+
+[33mcommit 8edc23db9edffaaf92d610ce8273b4600680c0e9[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Tue Sep 6 21:06:55 2022 +0800
+
+    docs: add requirements for slurm node
+
+[33mcommit 377d2103801c47f8e6ca7b509cc91da5ab77ec25[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Tue Sep 6 21:02:33 2022 +0800
+
+    fix(portal): file manager's open in terminal not include base path
+
+[33mcommit 82d15bf65d5f3e58998045429f450ed84f27077a[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Mon Sep 5 07:45:56 2022 +0800
+
+    chore: update deps (#181)
+    
+    * chore: update deps
+    
+    * fix: revert unnecessary package upgrades
+    
+    * fix: type param constraints for ts 4.8
+    
+    * fix: remove @codemirror/basic-setup
+
+[33mcommit 28d473f3afbd08d4a6081b151d639766077a5dc1[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sat Sep 3 10:51:39 2022 +0800
+
+    fix base path configuration (#180)
+    
+    * fix(portal): dashboard logo with basepath
+    
+    * fix(web): navbar logo with basepath
+    
+    * fix(web): icon url with basepath
+    
+    * fix(auth): allow set base path for auth
+    
+    * fix(web): navbar login link use base path
+    
+    * chore(web): clean up env files
+    
+    * fix(web): remove AUTH_EXTERNAL_URL and add BASE_PATH env
+    
+    * fix(gateway): try supporting base path
+    
+    * docs: update base path customization
+    
+    * fix(gateway): use better matching for path
+    
+    * fix(gatewya): add base path to gateway
+    
+    * fix(gatewya): add base path to gateway
+    
+    * fix(gateway): fix base path
+    
+    * fix(gateway): remove / for portal and mis
+    
+    * fix(portal): base path for header shell link
+    
+    * fix(web): fix mis and portal link
+    
+    * docs: update about base path
+    
+    * docs: update about base path
+    
+    * fix(web): handle proxy base path and add docs
+    
+    * fix(portal-web): fix vnc base url
+    
+    * fix(mis-web): use PORTAL_DEPLOYED to judge portal link
+
+[33mcommit bd6770f9ea18ca1485a44f933dd5931fb777c4ea[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Mon Aug 29 20:23:20 2022 +0800
+
+    fix(mis): fix slurm script
+
+[33mcommit 02efeff410184d9e1525ad844daae5f7a3f74b32[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sun Aug 28 18:16:49 2022 +0800
+
+    feat: simplify config design (#179)
+    
+    * feat: simplify config design
+    
+    * fix(mis-web): fix build error
+
+[33mcommit 94d6ec137fd9d5121988b3123bcb1440087e1944[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Sun Aug 28 12:13:44 2022 +0800
+
+    chore(deps): update docker/login-action digest to be010b4 (#175)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit b6689e6c668a00700db7745f49f54d3f086bd383[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sun Aug 28 12:12:41 2022 +0800
+
+    feat(mis)!: replace assoc table name with slurm cluster name config (#178)
+    
+    * feat(mis)!: replace assoc table name with slurm cluster name config
+    
+    * fix(mis): test config file
+    
+    * fix(mis): test config file
+
+[33mcommit 839ae50649aa088272402f8c877e275257450982[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sun Aug 28 09:24:13 2022 +0800
+
+    fix(web): partially remove nextjs warnings
+
+[33mcommit 3d48dd11a44a8d0fe7d5e1f5ad54d9703f089d66[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Thu Aug 25 02:17:24 2022 +0000
+
+    docs: fix broken file links and update docs
+
+[33mcommit 93ccf6d74b254963a1709d4f7fa052ae6d31d66d[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Wed Aug 24 22:53:57 2022 +0800
+
+    fix(mis-web): allow user with no accounts to access dashboard
+
+[33mcommit 603905d7f508bc2203384dfcc4f3b03bf2459fe4[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Wed Aug 24 22:41:56 2022 +0800
+
+    fix(mis-web): click user space when no accounts leads to /user/partitions
+
+[33mcommit 1e95e5d893bf05fe2fa014610ef8c37a9291714f[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Wed Aug 24 22:40:39 2022 +0800
+
+    fix(mis-web): only platform_admin can get tenants
+
+[33mcommit 04cedbfc434aabe0ae449ed96829578118465655[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Wed Aug 24 22:39:27 2022 +0800
+
+    fix(mis): assign initial user with tenant_admin role (#173)
+    
+    * fix(mis-web): assign initial user with tenant_admin role
+    
+    * fix(mis-web): update texts
+
+[33mcommit b42106bda972583286a1879540ce6e99fe4ff730[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Wed Aug 24 22:14:41 2022 +0800
+
+    docs: add hints for further config
+
+[33mcommit 0a9959de1ece81c572b9539bfed6fe1e87aaf6d7[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Tue Aug 23 07:21:31 2022 +0000
+
+    ci: build and push images for PRs. remove tag build
+
+[33mcommit fe4161b4bb61ea7ec69c795418e8b3a25cf7e285[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Tue Aug 23 07:19:56 2022 +0000
+
+    docs: update ldap docs
+
+[33mcommit 5eeac1107afd70d76fa5f68a11e6342c45ccd7f6[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Tue Aug 23 14:14:42 2022 +0800
+
+    fix(mis-web): fix error when no item exists for a price item (#172)
+
+[33mcommit b9f01751fcf2ccffc8dc3008df741810b57a8d9c[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Mon Aug 22 19:47:27 2022 +0800
+
+    ci: build images if commit has a tag starting with build-
+
+[33mcommit ca0f4e6cbfdaffccb84e2698ce844cceaf1dc04f[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Mon Aug 22 05:46:19 2022 +0000
+
+    docs: update docs
+
+[33mcommit a3d34c5493084d2cafc599196995ecfa0ddf1d96[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Mon Aug 22 09:38:18 2022 +0800
+
+    chore(deps): update node.js to 2c405ed (#171)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit 374d2a6c63a177ea21688be3b95b2b67c99f70e6[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Mon Aug 22 09:38:08 2022 +0800
+
+    fix(deps): update all non-major dependencies (#167)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit 82f476d7e98e19ac1e5f2007e96b2afc6ed42575[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sun Aug 14 15:06:13 2022 +0800
+
+    fix(portal-web): use github to clone novnc
+
+[33mcommit a65179eb9c47ec9b14d048c05d45e4b5776af941[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sun Aug 14 10:47:42 2022 +0800
+
+    fix(build): don't use tsinghua mirror
+
+[33mcommit 36ed9610fe0345a68efa387aad37afc7b865771e[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sun Aug 14 00:08:40 2022 +0800
+
+    docs: add docs about devenv
+
+[33mcommit 691e8b331db7e4178059ecfa6bc43118969b4454[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sat Aug 13 21:04:41 2022 +0800
+
+    fix(mis-web): wrong page paths
+
+[33mcommit 7c066c3e4f4304b391f235ac0c0ec7f359ade435[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sat Aug 13 18:14:46 2022 +0800
+
+    fix(mis-server): remove blockAccount call at unblock method
+
+[33mcommit 4522706078f38fb3b87fb7bf7872c0506c95fbc5[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Sat Aug 13 15:19:22 2022 +0800
+
+    chore(deps): update dependency pino-pretty to v9 (#168)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit 3019067afcbaf7bcac51a1007da8032da6f126c5[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Sat Aug 13 15:19:11 2022 +0800
+
+    chore(deps): update node.js to 1c8769a (#166)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit 42c722a50f76e227ad24a5a027bf46897022fa0d[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Sat Aug 13 15:18:59 2022 +0800
+
+    chore(deps): update nginx:alpine docker digest to 082f8c1 (#165)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit 44813a9fc6933079545cffe258f1d1a6892aab2c[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Thu Aug 11 08:14:30 2022 +0000
+
+    docs: update auth providers docs
+
+[33mcommit 28517d543f35ef5df781c945f34ac2605e9d6eaf[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Mon Aug 8 11:11:21 2022 +0000
+
+    fix(auth): add tests for callback url
+
+[33mcommit c545117ffcf76a93bbd0d1dca6602273f5524446[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Mon Aug 8 10:59:00 2022 +0000
+
+    fix(auth): ldap client is not released after login
+
+[33mcommit fcd77042b3f289d687987798484e8ddf845c55b6[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Mon Aug 8 12:21:37 2022 +0800
+
+    fix(deps): update all non-major dependencies (#159)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit 624fdab350f313d8b77b2204afe445572dd3ec2e[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Mon Aug 8 03:16:24 2022 +0000
+
+    fix: upgrade mikro-orm and fix illegal use of global entity manager
+
+[33mcommit 9a4e026a1737406525158dec1504204104f99833[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Sat Aug 6 17:18:04 2022 +0800
+
+    chore(deps): update nginx digest to 044441a (#163)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit 920f8d120f52ae6f8192c81c1e6c023c9c6bb565[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Fri Aug 5 07:53:51 2022 +0000
+
+    docs: add auto generate config file docs
+
+[33mcommit 135ec05b625d567d91abc8d4141080de0dcaeccc[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Thu Aug 4 08:33:22 2022 +0000
+
+    docs: update docs
+
+[33mcommit b17f1951f9026c0b877404d09694077dc21d1736[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Thu Aug 4 15:26:48 2022 +0800
+
+    refactor: Changing template format from {a} to {{ a }} (#162)
+    
+    * refactor(mis-server): use unified parsePlaceholder
+    
+    * refactor!: change placeholder format to {{ key }}
+    
+    * refactor: change configs to use new template format
+    
+    * docs: update docs about new template format
+
+[33mcommit b7669db91db404835a67b1cbc189799dcd0f67fe[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Wed Aug 3 02:51:27 2022 +0000
+
+    fix(portal-web): handle sacct returning ""
+
+[33mcommit eb5d9fe28e85e13cee36c6dc235a05258e373bce[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Wed Aug 3 02:32:36 2022 +0000
+
+    fix(ssh): trim keys when getKeyPair
+
+[33mcommit 346ffb7dbe0961fce3ef2f78c5ac56fbab86284d[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Tue Aug 2 08:36:43 2022 +0000
+
+    fix: logging in ssh
+
+[33mcommit a23659eecc8cc3aa24a549dfc8eb405954676ceb[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Mon Aug 1 22:45:24 2022 +0800
+
+    fix(portal): custom parser to handle query timezone
+
+[33mcommit e4e83964ba7495b2a13ed281f639026e64f210a3[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Mon Aug 1 21:26:21 2022 +0800
+
+    docs: align with deployment repo
+
+[33mcommit dcf1da5b4b3773e4fabf2f9dcfdb1ed1a3dd1c3f[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Mon Aug 1 19:24:52 2022 +0800
+
+    fix(mis-web): create user page layout
+
+[33mcommit e414bc84b216af287819c03d1cdd6512dca3e731[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sun Jul 31 16:14:59 2022 +0800
+
+    refactor(mis-web): no longer need configs to build (#161)
+    
+    * docs: fix broken links on README
+    
+    * refactor(mis-web): no longer need configs to build
+
+[33mcommit 347948d67ba37523a65a0d013b29fc1dda44ffc8[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sun Jul 31 15:36:25 2022 +0800
+
+    feat: Automatically setup public key on the user's authorized_keys (#160)
+    
+    * feat: auto insert ssh key if cannot login
+    
+    * fix(portal-web): build no longer needs local configs
+    
+    * docs: update doc
+    
+    * fix(mis-erver): only test root user ssh login at production
+    
+    * fix(mis-server): mock not existent module
+
+[33mcommit a6e5fc4d2baabfbceafbcb71be3d6d106148adeb[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Sat Jul 30 20:36:53 2022 +0800
+
+    chore(deps): update node.js to 1908564 (#158)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit 149f7bbde5942d6b3f730bf39514fb8e932cc70b[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Sat Jul 30 19:04:19 2022 +0800
+
+    chore(deps): update nginx digest to 9c2030e (#153)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit 029dd621353d2e2077bde7d9a1b7d1f627f71751[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Sat Jul 30 19:04:11 2022 +0800
+
+    chore(deps): update pnpm to v7.7.1 (#157)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit 9fc29e38accf23bbca894f5bfc9afd9fb371ccba[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Sat Jul 30 18:58:20 2022 +0800
+
+    chore(deps): update node.js to aadb411 (#154)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit 288724d6049ec7738a947ac1e4fd6ff612502676[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Sat Jul 30 17:45:10 2022 +0800
+
+    fix(deps): update dependency node-ssh to v13 (#155)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit 17d53f2aeb408f4a1b42dd99e6d79725309138bf[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Sat Jul 30 17:44:48 2022 +0800
+
+    chore(deps): update all non-major dependencies (#150)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit fd9cbe41d077218b149eb2f15d570be4c4b6a55a[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sat Jul 30 16:42:14 2022 +0800
+
+    fix: mis-server build
+
+[33mcommit cabfe52f5e2f73a25c6e4118af5e0a6c4f7eaf10[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sat Jul 30 16:31:37 2022 +0800
+
+    refactor: extract ssh code into a lib (#156)
+    
+    * refactor: add ssh lib
+    
+    * refactor: extract ssh logic into a lib
+
+[33mcommit 9a93f36488b6e99ead706cfa82450f2da0a2ddb6[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sat Jul 30 09:57:11 2022 +0800
+
+    fix(mis-server): properly ignore not mis enabled clusters
+
+[33mcommit fee833488a35bac9e09cb39b94313060ebee7698[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sat Jul 30 09:11:07 2022 +0800
+
+    fix(ci): wrong login node port
+
+[33mcommit fd6e2eaf7dce4518272992c3e0f7309add903f08[m[33m ([m[1;31morigin/update-app-config[m[33m)[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Wed Jul 27 20:14:36 2022 +0800
+
+    fix(portal): submit job form
+
+[33mcommit b6b5b944cc9f6e4616bea3eb3adacd7ef2de4502[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Wed Jul 27 20:13:52 2022 +0800
+
+    fix(portal): no header at desktops
+
+[33mcommit 2296ee7a7070fb9ecb168673334df25bd35cc1b7[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Wed Jul 27 19:49:11 2022 +0800
+
+    fix(portal): fix create app form
+
+[33mcommit 2a305c51dbff2151fa045cc9cd5022f6321ce0a6[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Wed Jul 27 19:25:44 2022 +0800
+
+    feat(portal): don't show create app if no app is configured
+
+[33mcommit ab83a8cb31f73b7fc934b1e202ad0b22816124f8[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Wed Jul 27 19:19:59 2022 +0800
+
+    fix: not removing ext from dir config
+
+[33mcommit 11d1f83d16ba1301cd1b901c33a9a27d1ea4ce79[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Wed Jul 27 19:03:44 2022 +0800
+
+    fix: portal not build
+
+[33mcommit dfc94b28505e223d08d98390e7a62db646eb979f[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Wed Jul 27 07:23:52 2022 +0000
+
+    docs: overhaul
+
+[33mcommit 733e51227cf9acd436ad768c4bd8c95a293b9a13[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Wed Jul 27 05:50:28 2022 +0000
+
+    feat(web): allow reset mis/portal url using env
+
+[33mcommit d4dd5932ede4a1dfd4b29dde3c0190d55b0b1582[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Tue Jul 26 00:03:55 2022 +0800
+
+    fix: remove ext when assigning key to dir configs
+
+[33mcommit cc30bb19c22421ac687d0d1477d0a336ec0b62f2[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Mon Jul 25 23:55:12 2022 +0800
+
+    docs: update env
+
+[33mcommit f6de71efce63da972713a9ad7047b0de5453cbc6[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Mon Jul 25 23:54:32 2022 +0800
+
+    refactor(mis): move config to libs/config
+
+[33mcommit 3fccb89646e28ecdc8724f03f4721ad6259ea595[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Mon Jul 25 22:53:23 2022 +0800
+
+    fix(config): bad getDirConfig impl
+
+[33mcommit 2036c9b7c7f306f6a7405e01ecf48c58bed07920[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Mon Jul 25 22:10:13 2022 +0800
+
+    docs: update mis-server
+
+[33mcommit 06fd3ca7ff15a3271fdf13bd6ff41ffc0a1a4036[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Mon Jul 25 22:08:53 2022 +0800
+
+    feat(portal): use config file
+
+[33mcommit 3afcfe6a4dc2878a79ec6fb086bbbe40992879d8[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Mon Jul 25 20:09:07 2022 +0800
+
+    fix(portal-web): don't use default cluster in build
+
+[33mcommit 85c0dd2d670ce3769c7c1649ac5850ae49cf1469[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Mon Jul 25 19:06:01 2022 +0800
+
+    fix(auth): read legacy config
+
+[33mcommit 18aab116a81713efeebc92b2bafa7b47eba3012a[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Mon Jul 25 18:45:51 2022 +0800
+
+    chore: remove clusterops-slurm
+
+[33mcommit a229cddc3b76dc75eefa224a4355e7c29faf8f82[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Mon Jul 25 07:34:58 2022 +0000
+
+    docs: update
+
+[33mcommit c8314ac5bbca379c0183eff7f0a4baec20b021d9[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Mon Jul 25 07:24:51 2022 +0000
+
+    refactor: update cluster config format
+
+[33mcommit b463bb7afda0acd170aa0bed14d98bd1ac764228[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Mon Jul 25 06:33:06 2022 +0000
+
+    refactor: update app config format
+
+[33mcommit c5bd2edff8db2d0dbb62a3286815c77825016f07[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Mon Jul 25 03:06:12 2022 +0000
+
+    fix(mis-server): rename DBNAME to DB_NAME
+
+[33mcommit 5b86c20c696522b75d1a384e2dccd5d76a3d97c8[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Mon Jul 25 03:05:18 2022 +0000
+
+    feat(mis-server): add DB_PASSWORD to override db password
+
+[33mcommit 3bbcdf9a2f502c2cabb99bcff7fa1de51037dc3b[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sun Jul 24 23:07:15 2022 +0800
+
+    refactor: rename clusterops slurm impls
+
+[33mcommit cf6aed9882793ba3642a873042c3d9a4a81787b6[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sun Jul 24 23:05:57 2022 +0800
+
+    fix: wrong import
+
+[33mcommit 8e391272c7f4d22e87a3e772499ba951e1a9bd3b[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sun Jul 24 22:54:40 2022 +0800
+
+    fix: broken links
+
+[33mcommit 7835cc2a6c32798b81278b44ecd1e31bdf635755[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sun Jul 24 22:48:40 2022 +0800
+
+    docs: update env docs
+
+[33mcommit 4f193f01aedad913caa711c017f3da3751251e31[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sun Jul 24 22:48:20 2022 +0800
+
+    refactor: remove clusterops
+
+[33mcommit 65267b87be9c412930ede474ef520a561a7c5a3d[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sun Jul 24 22:40:44 2022 +0800
+
+    docs: update architecture
+
+[33mcommit b52bcfcddca7502834b77e51620f223a4e6d4ece[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sun Jul 24 22:39:49 2022 +0800
+
+    docs: update
+
+[33mcommit b87e9c59a1d40caec4e1f33b35bd5f6346aaa42d[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sun Jul 24 22:23:30 2022 +0800
+
+    refactor(mis-server): use config file for most config
+
+[33mcommit 2faa4a82ac6bf335fa39ce1c2cd992e46ec573f1[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sat Jul 23 22:25:49 2022 +0800
+
+    ci: remove job-server-slurm
+
+[33mcommit 92cada488d9cc53ea691fe8add47dcbf7bfbbe47[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sat Jul 23 22:18:25 2022 +0800
+
+    chore: remove job-server-slurm from build
+
+[33mcommit 53a3f1de9a017dcc98589bdaf373f4d70d3eddd5[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sat Jul 23 21:54:08 2022 +0800
+
+    refactor: use specific conf file for ui customization
+
+[33mcommit b23f01d160bbdfd487d193687e7911a6f5b9060e[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sat Jul 23 21:47:06 2022 +0800
+
+    docs: update auth docs
+
+[33mcommit 4f42982c74df8440fad4e63b7c391fac21b5aec5[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sat Jul 23 11:25:19 2022 +0800
+
+    refactor: auth use config
+
+[33mcommit af144dc0116769d6b795e8057fe7ed4630bc971d[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Sat Jul 23 10:13:59 2022 +0800
+
+    chore(deps): update all non-major dependencies (#146)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit 36577c1a36336a15d0b76e0c0192fd789559b09c[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Sat Jul 23 09:51:20 2022 +0800
+
+    chore(deps): update node.js to da32af0 (#148)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit c2642dea5f50ef23a140660cfc9923eafa1a8cb7[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Sat Jul 23 09:51:11 2022 +0800
+
+    chore(deps): update nginx digest to 87fb6f4 (#147)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit 4af2c29689aecb6f180743bfb7d090f8946cfb7d[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sat Jul 23 09:39:54 2022 +0800
+
+    refactor: merge job-server-slurm to portal-web (#149)
+    
+    * feat: merging job server
+    
+    * feat: merge job-server-slurm to portal-web
+    
+    * feat: migrate tests from job-server to portal
+    
+    * refactor: rewrite api routes without grpc call
+    
+    * refactor: remove job-server config
+    
+    * refactor: workaround schema generator not reading global typings
+    
+    * fix: use moment-timezone for now for tz
+    
+    * feat: use pino-http for api route logging
+    
+    * fix: remove unnecessary package
+    
+    * fix: not reading correct slurm template script
+    
+    * fix: portal-web dev env not applied
+    
+    * fix: cluster ops wrong type
+    
+    * refactor: remove job-server-slurm
+    
+    * docs: simplify docs
+    
+    * fix(docs): fix broken link
+    
+    * docs: fix broken title
+    
+    * refactor: remove portal proto file
+    
+    * fix: remove refs to src/generated/portal
+
+[33mcommit 4985628fd83d27ded32bbb5bccbf0b154913d1ae[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Sun Jul 17 08:45:22 2022 +0800
+
+    fix(deps): update all non-major dependencies (#143)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit 9cb416a8f5a2af7496675b3d7fa1c15a41d2e71e[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Sat Jul 16 22:47:36 2022 +0800
+
+    fix(deps): update dependency fastify-plugin to v4 (#144)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit 6e51a0e64a49a981ba96c19575613461d80bcca3[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sat Jul 16 22:40:12 2022 +0800
+
+    feat(auth): SSH and Capabilities APIs (#145)
+    
+    * refactor: enable auth to support more auth type
+    
+    * feat: implement ssh auth
+    
+    * feat: add tests for ssh login
+    
+    * feat(auth): add capabilities api
+    
+    * feat(auth): allow LDAP_ATTR_NAME to be optional
+    
+    * fix(docs): remove file-server from doc autogen
+    
+    * feat(web): using auth capabilities
+    
+    * chore: ignore internal in docker ignore
+    
+    * fix: fix web build
+    
+    * refactor(portal-web): use auth capabilities
+    
+    * docs: update auto gen env doc
+    
+    * docs: add ssh auth type
+
+[33mcommit 48e889fc280167f5be41ef77fe8ef7b366bf573c[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Wed Jul 13 20:24:43 2022 +0800
+
+    fix(deps): update dependency luxon to v3 (#142)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit 00d9655cd58f182e610aeb428c3952e507d55043[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Wed Jul 13 20:24:29 2022 +0800
+
+    chore(deps): update dependency jest-extended to v3 (#141)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit f699078dbc4a8542f7aea7251e28b8801fab08c4[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Wed Jul 13 20:11:03 2022 +0800
+
+    chore(deps): update node.js to 554142f (#139)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit cc4efacdd5f8ea4eb9ecf56086a47c148e15249a[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Wed Jul 13 20:10:52 2022 +0800
+
+    fix(deps): update all non-major dependencies (#140)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit 24eda88fd69c7a7687ab7d70f5c0a215e68c11bb[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Thu Jul 7 16:46:02 2022 +0800
+
+    feat(portal): account selector auto selects the first
+
+[33mcommit 5a5bf92e5f5baaadada53f63d50c29ad46af98c9[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Thu Jul 7 16:41:43 2022 +0800
+
+    feat(portal): jump to running jobs when submitting job
+
+[33mcommit a8dd70d88253213b9e9130904ff3fe91472216a9[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Thu Jul 7 16:41:09 2022 +0800
+
+    feat: portal get all jobs
+
+[33mcommit d1ed781af31e2ed39eef871639aa4cd3ace44daa[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Thu Jul 7 10:05:36 2022 +0800
+
+    feat(portal): click to working dir from running jobs
+
+[33mcommit ac13544e46c435024cdf81663f108cf73524ff0e[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Thu Jul 7 09:31:47 2022 +0800
+
+    feat(portal): jump to sessions after creating app
+
+[33mcommit 4392c1b2c314a7d0aef8733f583a8d08a9453e5c[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Tue Jul 5 11:07:20 2022 +0800
+
+    feat(portal): enter to submit a modal form
+
+[33mcommit 107d90da566547288a32c14637b19b3c82a7c337[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Tue Jul 5 11:00:58 2022 +0800
+
+    fix(file-manager): reset form fields when completed
+
+[33mcommit c34963fb036eb430774b000e43357e9c2cc71664[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Tue Jul 5 10:59:22 2022 +0800
+
+    fix(file-manager): fix copy and move
+
+[33mcommit 39ba7472caadfcb63fcd96c836254a3d7cd5709c[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Tue Jul 5 16:03:01 2022 +0800
+
+    chore: group all non-major dep updates to one pr
+
+[33mcommit 318372abc65ffbd5c39e37b2840f49c27f1cb728[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Tue Jul 5 15:53:14 2022 +0800
+
+    fix: build
+
+[33mcommit 54eb51d89c441f653b8afe0ba14fa3b5fc022bd2[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Tue Jul 5 15:27:02 2022 +0800
+
+    fix: update deps
+
+[33mcommit 8dfe3aa64ce52407f6e88be04ddf9eedec274033[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Tue Jul 5 14:46:34 2022 +0800
+
+    fix(deps): update dependency codemirror to v6.0.1 (#134)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit 77705b96d7471e88149f1c7bff7bb47e3eb8e97b[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Tue Jul 5 14:46:12 2022 +0800
+
+    chore(deps): update jest monorepo (#130)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit 8dd95532ca785bd78d2880d3e12e50c643b75766[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Tue Jul 5 11:12:23 2022 +0800
+
+    fix(deps): update dependency antd to v4.21.5 (#133)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit 56477c85068af3b97398aec01359cddc835a74a2[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Tue Jul 5 11:12:05 2022 +0800
+
+    chore(deps): update dependency eslint to v8.19.0 (#135)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit f16c4a2e51e7f6aa79eba13049f602bf1e8ab586[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Tue Jul 5 10:44:22 2022 +0800
+
+    refactor: Use SFTP in portal-web to implement file management (#138)
+    
+    * feat: sftp based file management
+    
+    * refactor(gateway): remove file server proxy
+    
+    * docs: remove file-server
+    
+    * ci: remove file-server
+    
+    * test: add file operation test for portal-web file manager
+    
+    * refactor: remove file-server
+    
+    * ci: coverage remove file-server and add portal-web
+    
+    * fix: remove file-server in the lock file
+    
+    * fix(gateway): remove file server related rules
+    
+    * fix: upload and download close logic
+    
+    * ci: comment out ssh key generation
+    
+    * ci: create ssh keys before starting dev env
+    
+    * ci: fix test build
+    
+    * ci: create ssh keys before starting dev containers
+
+[33mcommit 09561f0914ee268986793b032c5692edf809bcfc[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Thu Jun 30 16:14:38 2022 +0800
+
+    docs: update diagrams
+
+[33mcommit 49fe064b20074c8e1e9c87136861abb88ea71d09[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Wed Jun 29 11:41:39 2022 +0800
+
+    feat(portal): show file permissions as rwx
+
+[33mcommit 9ad1546aa5c47d6ed995d73a4319512791b85945[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Tue Jun 28 19:28:25 2022 +0800
+
+    feat(portal): add link to interactive app's dir
+
+[33mcommit 72519146a7470502e6133127efe88cd06ae99de7[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Tue Jun 28 19:13:59 2022 +0800
+
+    fix(portal-web): rename app session's layout label
+
+[33mcommit 0f8ffd7074402607bba960ce7fd8e1e0f5fab427[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Tue Jun 28 18:45:11 2022 +0800
+
+    fix(job-server-slurm): cache app configs
+
+[33mcommit 4e89cdffc58a5c9fe3d1dd30edaabc7be0c1e086[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Mon Jun 27 19:30:38 2022 +0800
+
+    chore(deps): update dependency pino-pretty to v8.1.0 (#123)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit 1771fa8f0bca91be37ba8efa9300e45ca46c0255[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Mon Jun 27 19:23:30 2022 +0800
+
+    fix(deps): update codemirror (#125)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit 50dc4525c4b8449ce155b41fb728344cc6d2a73d[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Mon Jun 27 19:23:11 2022 +0800
+
+    chore(deps): update typescript-eslint monorepo to v5.29.0 (#124)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit 6e4775c304d60e2c82979c6d11c43b55033ed5f6[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Mon Jun 27 19:11:21 2022 +0800
+
+    fix(deps): update mikro-orm monorepo to v5.2.1 (#120)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit f74cc8ca73ff90407c6f63cb69df34c220a71162[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Mon Jun 27 18:38:27 2022 +0800
+
+    chore(deps): update dependency pino to v8.1.0 (#122)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit 882f7aad1f47166670db37dd54744cbe0109cabe[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Mon Jun 27 18:38:18 2022 +0800
+
+    fix(deps): update dependency fastify to v4.1.0 (#126)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit 445589f64ac53872ca2570a6fa24ccb4745a8768[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Mon Jun 27 18:38:06 2022 +0800
+
+    chore(deps): update commitlint monorepo to v17.0.3 (#121)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit 44dca80f4ab7549b3b590ecae0b331e6475d51e0[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Mon Jun 27 18:37:36 2022 +0800
+
+    chore(deps): update dependency nodemon to v2.0.18 (#119)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit f67606245a6fd89b5287567c84340a1441e58f74[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Mon Jun 27 18:37:25 2022 +0800
+
+    chore(deps): update dependency @types/jest to v28.1.3 (#118)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit 6751fc8289f17ca47a88d75dcc93a3becda56420[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Mon Jun 27 18:37:14 2022 +0800
+
+    chore(deps): update nginx digest to 8e38930 (#117)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit 84edd5f7735bdb09c2380f33dd265603a633b173[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Mon Jun 27 15:56:53 2022 +0800
+
+    docs: add docs about portal management actions and init page
+
+[33mcommit 0ccd9c66b5423e79faefbc1bcde2bbe9abdd7598[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Mon Jun 27 15:32:27 2022 +0800
+
+    fix(mis-server): save iso time string when completing init
+
+[33mcommit b69a4c4e0bb332af20be53ecf0a8de8b51036fd5[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Mon Jun 27 15:26:46 2022 +0800
+
+    feat(mis): implemented change price table on web
+
+[33mcommit c900fec34bf216fe4087d2135d4c96bf2ecb5b36[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Mon Jun 27 00:11:13 2022 +0800
+
+    feat(mis): view job billing items and table
+
+[33mcommit 53f7532356e859514fa3970db14ecac22e357709[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Mon Jun 27 00:05:44 2022 +0800
+
+    fix(web): remove query before matching path
+
+[33mcommit 255a66535bdbc07ecc11c64531a22f778398983d[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sun Jun 26 17:25:16 2022 +0800
+
+    feat(mis-web): componentize JobBillingTable
+
+[33mcommit 9bf7c4fc17cbc45f0f0c041a6cf0298372fa3c5b[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sat Jun 25 19:08:53 2022 +0800
+
+    fix(mis-server): fix tests
+
+[33mcommit c97391c763b4ef657d83d3eddb21307d5ad3f557[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sat Jun 25 18:45:14 2022 +0800
+
+    fix: remove change price table for now
+
+[33mcommit 381babe4a73c37b9bc02899de65087b8e896cae7[m[33m ([m[1;31morigin/init-pages[m[33m)[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sat Jun 25 16:20:28 2022 +0800
+
+    feat: init page
+
+[33mcommit 0c76a5ac193776b2f939de3ec08b9e1f07e9a704[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Fri Jun 24 22:13:43 2022 +0800
+
+    feat(mis): add import users and manage job info in web
+
+[33mcommit 7fd5a3a332e46f1672efbb32064460108140e574[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Thu Jun 23 09:39:59 2022 +0800
+
+    chore(deps): update dependency @fastify/swagger to v7.4.0 (#116)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit 14f4bc17ecce6a7c34787d26d1330b8dbc650f55[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Wed Jun 22 10:57:11 2022 +0800
+
+    fix: rename server app to web app
+
+[33mcommit e2e2c0076b105aca168aad163b57376417967e02[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Wed Jun 22 10:48:39 2022 +0800
+
+    docs: update diagrams
+
+[33mcommit 9c0813d2f9b54373abdd6257b13d578ee3259f6c[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Mon Jun 20 20:40:15 2022 +0800
+
+    docs: update diagrams
+
+[33mcommit 17e8c3a6dba31b0eb04c0139f6d93e71a990bc5a[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Sun Jun 19 14:43:30 2022 +0800
+
+    chore(deps): update dependency @types/jest to v28.1.2 (#102)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit f65da98bd00ed68504c43baa0e75375ceabbd8b4[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Sun Jun 19 14:43:23 2022 +0800
+
+    chore(deps): update dependency typescript to v4.7.4 (#106)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit 987fb84b46a26cea9570b8045f86253fbc20300c[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Sun Jun 19 14:43:15 2022 +0800
+
+    fix(deps): update react monorepo to v18.2.0 (#115)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit 778252161efaa9dda9c485a314cb05864d80049b[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Sun Jun 19 14:19:34 2022 +0800
+
+    fix(deps): update dependency fast-json-stringify to v4.2.0 (#97)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit dce77656ced5b8d0e64ea3b21f1f1c8da758cff6[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Sun Jun 19 14:19:15 2022 +0800
+
+    chore(deps): update pnpm to v7.3.0 (#111)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit dd8de60366850c524b768f2bb7e90125a46e4a2f[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Sun Jun 19 14:18:54 2022 +0800
+
+    chore(deps): update typescript-eslint monorepo to v5.28.0 (#112)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit d82675e7765e26312af9d22ce44ffac6e6bdd267[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Sun Jun 19 14:18:38 2022 +0800
+
+    fix(deps): update dependency random-words to v1.2.0 (#113)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit 6efab716260c140bb3a71b7a310b99b31adf1b68[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Sun Jun 19 14:18:27 2022 +0800
+
+    fix(deps): update dependency undici to v5.5.1 (#114)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit 56c1bc741823c2c9a7e3a143d522b1698866798e[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Sun Jun 19 10:57:09 2022 +0800
+
+    chore(deps): update dependency @types/react to v18.0.14 (#103)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit 67b24dda55b0e978ba45e8558bd44a8988968baa[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Sun Jun 19 10:57:00 2022 +0800
+
+    chore(deps): update dependency ts-jest to v28.0.5 (#104)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit 3ec43eec01fec46ecf96cbcc609a16cfcd851252[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Sun Jun 19 10:56:43 2022 +0800
+
+    chore(deps): update dependency tsc-alias to v1.6.11 (#105)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit 7c27245f5a1499fdf174258885a7d2ae4d5eed0f[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Sun Jun 19 10:56:32 2022 +0800
+
+    fix(deps): update codemirror (#107)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit 365728f83277e5dee2a2b4ad490e17ced74ee32f[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Sun Jun 19 10:56:23 2022 +0800
+
+    fix(deps): update dependency antd to v4.21.3 (#108)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit b02d21a66f401758a54b5fa916878446ba6acc5b[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Sun Jun 19 10:56:14 2022 +0800
+
+    fix(deps): update dependency fastify to v4.0.3 (#109)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit ada02e0b0133b33da4bf14ea5fbc262543efca4d[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Sun Jun 19 10:55:51 2022 +0800
+
+    chore(deps): update dependency eslint to v8.18.0 (#110)
+    
+    Co-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+
+[33mcommit 7e9f95d54fdfe01da59b7d6f0e17c4c2d4768a52[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sat Jun 18 21:17:16 2022 +0800
+
+    fix(web): better default route path matcher
+
+[33mcommit fb93fe7fdde56eb950ec635fef93f36b99cad870[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sat Jun 18 16:57:55 2022 +0800
+
+    fix(portal): fix createDesktop not resolve node addr
+
+[33mcommit 5ecc7964aa97cc7d5ea44faf12d03ca1a109cbb2[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Fri Jun 17 16:19:11 2022 +0800
+
+    docs(portal): add test result for cinnamon desktop
+
+[33mcommit 7283cde9479148e7fead2c6a7822d5997f468a0c[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Fri Jun 17 16:09:12 2022 +0800
+
+    feat: set resize to remote for novnc
+
+[33mcommit 1a5f057c9370bafce15443c768e7cefe2379779a[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Fri Jun 17 15:47:54 2022 +0800
+
+    docs: update custom login node desktop
+
+[33mcommit 6889cb0c682359bbe5dc9d0ea381ea9037669f3f[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Fri Jun 17 15:25:28 2022 +0800
+
+    feat: launch other wm in login desktop
+
+[33mcommit 3d2589fd524357f14dce7e83683917bdcb61aff6[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Wed Jun 15 14:46:29 2022 +0800
+
+    fix(clusterops-slurm): running jobs wrong format
+
+[33mcommit ea2aaf2e87c848faddcb4952edb840394d706ecd[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Tue Jun 14 21:35:01 2022 +0800
+
+    fix(deps): update dependency @codemirror/autocomplete to v6.0.1 (#92)
+    
+    Co-authored-by: Renovate Bot <bot@renovateapp.com>
+
+[33mcommit 08b8c1ea761cb75697baa4837861fe2231f1a59f[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Tue Jun 14 21:16:19 2022 +0800
+
+    fix(deps): update dependency @fastify/multipart to v7.1.0 (#90)
+    
+    Co-authored-by: Renovate Bot <bot@renovateapp.com>
+
+[33mcommit f944faed4ad357799797a473e2bd93c69d023ba6[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Tue Jun 14 21:15:51 2022 +0800
+
+    fix(deps): update dependency fastify to v4.0.2 (#96)
+    
+    Co-authored-by: Renovate Bot <bot@renovateapp.com>
+
+[33mcommit 5b7f657cbde1ab72c6598509b3f965a54a9f60e3[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Tue Jun 14 21:15:40 2022 +0800
+
+    chore(deps): update pnpm to v7.2.1 (#93)
+    
+    Co-authored-by: Renovate Bot <bot@renovateapp.com>
+
+[33mcommit 89d6e986bb3ec786623a644041248b86c359948c[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Tue Jun 14 21:15:26 2022 +0800
+
+    chore(deps): update dependency @fastify/swagger to v7.3.0 (#86)
+    
+    Co-authored-by: Renovate Bot <bot@renovateapp.com>
+
+[33mcommit aeb7d14a60cd6b16f9a03b6980b7121dd526f1d7[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Tue Jun 14 21:15:16 2022 +0800
+
+    fix(deps): update mikro-orm monorepo to v5.2.0 (#94)
+    
+    Co-authored-by: Renovate Bot <bot@renovateapp.com>
+
+[33mcommit cf324ad4580863c2cd596dc7a3d3bd77552b8d56[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Tue Jun 14 21:14:51 2022 +0800
+
+    chore(deps): update dependency @tsconfig/docusaurus to v1.0.6 (#98)
+    
+    Co-authored-by: Renovate Bot <bot@renovateapp.com>
+
+[33mcommit f77c43da8f8bcbe563e0774d094220963e86fad1[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Tue Jun 14 21:14:41 2022 +0800
+
+    fix(deps): update dependency antd to v4.21.1 (#101)
+    
+    Co-authored-by: Renovate Bot <bot@renovateapp.com>
+
+[33mcommit ddf1d5c346ce01a1853c25badb28b899c235cc4a[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Tue Jun 14 21:04:28 2022 +0800
+
+    ci(renovate): change schedule to weekend
+
+[33mcommit 22098676494b007ee88e34e5bfa58006b249b2e5[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Tue Jun 14 21:03:50 2022 +0800
+
+    ci(renovate): fix ignorePath not pointing to new ldap dockerfile
+
+[33mcommit 7509a8358bb1eadfc01d588d64be8a80eda05f4b[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Tue Jun 14 21:01:29 2022 +0800
+
+    chore: remove patch-package
+
+[33mcommit 1d0733fd2643303502214f8f98803af4e4d336d1[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Tue Jun 14 20:40:56 2022 +0800
+
+    feat: add sorters to some tables
+
+[33mcommit 59ee1fb806e629bdeee164e8aeb390c56add7904[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Tue Jun 14 20:09:30 2022 +0800
+
+    fix: apps' nodes config not working
+
+[33mcommit 558e13302e0a5e4ecee3b948fe9fb299c4f123ca[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Mon Jun 13 16:41:37 2022 +0800
+
+    fix(mis-web): get accounts not working
+
+[33mcommit c7f0b256e851aec80331ed7541e8091c5ed6e2f0[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sun Jun 12 16:59:52 2022 +0800
+
+    feat: try to upgrade ntar
+
+[33mcommit dbf443118984dd44eb3779adf677696825a68c25[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sun Jun 12 14:28:30 2022 +0800
+
+    feat: vnc apps (#99)
+    
+    * feat: implementing vnc apps
+    
+    * build: use .env.build and .env.dev to separate env files
+    
+    * feat: implemented vnc app
+    
+    * fix: update how to judge if a app  can be connected
+    
+    * fix: server formData not passed in
+    
+    * docs: add vnc app
+
+[33mcommit 66caef23094da4176e02f60f49df7e540653e02a[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Fri Jun 10 16:23:50 2022 +0000
+
+    build: fix dev related files
+
+[33mcommit dab522cdb1a00f9d9e3e040d3501e5664eda75b4[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Fri Jun 10 15:44:00 2022 +0000
+
+    build: reorg dev related files
+
+[33mcommit 6f16200141d5d006e734e34c23a7481d58436b28[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Fri Jun 10 20:28:17 2022 +0800
+
+    ci: enable wait-for-action logging
+
+[33mcommit 619b0208f957d5ec82b76abfa04d88ef75db7946[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Fri Jun 10 20:16:10 2022 +0800
+
+    ci: fix waited resources
+
+[33mcommit 2170fed5ef962dd758f26af6d3f00dd66e12da30[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Fri Jun 10 20:08:13 2022 +0800
+
+    ci: enable wait for logging
+
+[33mcommit 43aab4db3d6a1b2211a09dccae873a9aeb3f17f2[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Fri Jun 10 19:18:28 2022 +0800
+
+    ci: fix wait-on-action
+
+[33mcommit aaba61728485b5c9b0680653fbb067da5c514a35[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Fri Jun 10 19:15:55 2022 +0800
+
+    ci: test waits for ports to be available
+
+[33mcommit a959b1258ddf5fd1a6fe489956a62d0b97f12bd8[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Thu Jun 9 19:23:43 2022 +0800
+
+    ci: centralize test:ci and add --runInBand
+
+[33mcommit fac0fc279063e16538047a45116b0900b6610972[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Thu Jun 9 19:03:56 2022 +0800
+
+    docs: update commit lint
+
+[33mcommit 58a0e130b4548030cef498da99a4fedff6ff08db[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Thu Jun 9 18:52:00 2022 +0800
+
+    chore: introduce commit lint
+
+[33mcommit 14c08f17abf5f0ee79332ff0eec7c5c4ac48767a[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Thu Jun 9 13:19:47 2022 +0800
+
+    fix(portal-web): update editor naming
+
+[33mcommit bb2b64da7ea3d6538bea153c65c2a79750730b4b[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Thu Jun 9 13:18:56 2022 +0800
+
+    feat(deps): update codemirror to 6
+
+[33mcommit 4da60292645beec9e068db0d6c34c73bab58967f[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Thu Jun 9 11:30:41 2022 +0800
+
+    feat(deps): update fastify and ecosystem to v4
+
+[33mcommit 12b2fab756a043a8b0ce3fd3e2e629c13127bccb[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Thu Jun 9 09:51:04 2022 +0800
+
+    fix(deps): update dependency less to v4.1.3 (#88)
+    
+    Co-authored-by: Renovate Bot <bot@renovateapp.com>
+
+[33mcommit b154ed892b9686ac9d9f23eb212b189606f19a1d[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Thu Jun 9 09:50:56 2022 +0800
+
+    fix(deps): update dependency nanoid to v4 (#85)
+    
+    Co-authored-by: Renovate Bot <bot@renovateapp.com>
+
+[33mcommit 3a613837394e03ddba5a10961495270bc2cd1778[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Wed Jun 8 10:46:33 2022 +0800
+
+    fix(deps): update dependency ldapjs to v2.3.3 (#83)
+    
+    Co-authored-by: Renovate Bot <bot@renovateapp.com>
+
+[33mcommit bdb919f556b9a522b2a26e60ca76d02cfbb16e71[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Wed Jun 8 10:45:07 2022 +0800
+
+    chore(deps): update node.js to c785e61 (#82)
+    
+    Co-authored-by: Renovate Bot <bot@renovateapp.com>
+
+[33mcommit 8ade217ffaada288dfde80ca4191f1caefa7ac6e[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Wed Jun 8 10:37:04 2022 +0800
+
+    chore(deps): update dependency jest to v28.1.1 (#79)
+    
+    Co-authored-by: Renovate Bot <bot@renovateapp.com>
+
+[33mcommit 0a7c079c6fec4c7cd3db16c96ba4d470a0c191cb[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Wed Jun 8 10:36:55 2022 +0800
+
+    chore(deps): update node.js to f074f27 (#81)
+    
+    Co-authored-by: Renovate Bot <bot@renovateapp.com>
+
+[33mcommit 4fecae0f73d978f7dce50ad6519d8c1d39403db5[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Tue Jun 7 11:22:39 2022 +0000
+
+    fix: lock file
+
+[33mcommit 3d61ce06766a2ae22b043bf4fb4feb563792f23a[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Tue Jun 7 19:19:54 2022 +0800
+
+    fix(portal-web,mis-web): rollback api routes update
+
+[33mcommit 1f09cb85f485d83e41219237036e58f21c020a65[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Tue Jun 7 08:50:02 2022 +0000
+
+    fix(portal-web,mis-web): BASE_PATH not set during build
+
+[33mcommit 6743d7a6e9cb3a260c8bbb34c638b3b969b4fe1c[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Tue Jun 7 08:11:48 2022 +0000
+
+    fix(mis-server): workkaround missing dependency
+
+[33mcommit 7b980c724e35d62fd3e9c5181ebcc30ffbd4f3cd[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Tue Jun 7 08:06:07 2022 +0000
+
+    fix(portal-web): dashboard icon not working
+
+[33mcommit 002447a262027be20ba04259c489d631d4c5118f[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Tue Jun 7 07:22:48 2022 +0000
+
+    fix: update ntar-runtime to latest and try build
+
+[33mcommit caa5506e8c5f35fe593593fc15c50cd87048f356[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Tue Jun 7 10:29:54 2022 +0800
+
+    fix(deps): update dependency @ddadaal/next-typed-api-routes-runtime to v0.4.0 (#78)
+    
+    Co-authored-by: Renovate Bot <bot@renovateapp.com>
+
+[33mcommit 0314eb51044e71641df986d34a97fc978e159a4e[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Tue Jun 7 10:15:53 2022 +0800
+
+    chore(deps): update dependency @ddadaal/next-typed-api-routes-cli to v0.5.0 (#77)
+    
+    Co-authored-by: Renovate Bot <bot@renovateapp.com>
+
+[33mcommit c2a7037dcdbfac183be879e3dde5d4c8cda55895[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Tue Jun 7 10:06:52 2022 +0800
+
+    fix(deps): update dependency fast-json-stringify to v4 (#68)
+    
+    Co-authored-by: Renovate Bot <bot@renovateapp.com>
+
+[33mcommit cfca2e356301ffe91cbd829c087e74bf878c8886[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Tue Jun 7 10:06:34 2022 +0800
+
+    chore(deps): update pnpm to v7.1.9 (#70)
+    
+    Co-authored-by: Renovate Bot <bot@renovateapp.com>
+
+[33mcommit 5c61e23a919cb0138c02697eb24ccf5a80c42fbe[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Tue Jun 7 10:06:15 2022 +0800
+
+    chore(deps): update dependency tsc-alias to v1.6.9 (#71)
+    
+    Co-authored-by: Renovate Bot <bot@renovateapp.com>
+
+[33mcommit 6bac9b7efd77c684156bd8bd3997ea553b284411[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Tue Jun 7 10:06:05 2022 +0800
+
+    fix(deps): update dependency antd to v4.21.0 (#72)
+    
+    Co-authored-by: Renovate Bot <bot@renovateapp.com>
+
+[33mcommit c49b990af9236264b8568d707709ae3f1dac75ad[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Tue Jun 7 10:05:55 2022 +0800
+
+    fix(deps): update dependency node-cron to v3.0.1 (#74)
+    
+    Co-authored-by: Renovate Bot <bot@renovateapp.com>
+
+[33mcommit e025843703dac71e61ebd04f914e43aa5d9b2638[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Tue Jun 7 10:05:44 2022 +0800
+
+    chore(deps): update typescript-eslint monorepo to v5.27.1 (#75)
+    
+    Co-authored-by: Renovate Bot <bot@renovateapp.com>
+
+[33mcommit da5e88bf8fe6de658827c1c3b593615c179947e8[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Tue Jun 7 10:05:35 2022 +0800
+
+    chore(deps): update node.js to 1fafca8 (#76)
+    
+    Co-authored-by: Renovate Bot <bot@renovateapp.com>
+
+[33mcommit 0607f3eff96f5da53735d2ec06d54fea20359c43[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Mon Jun 6 22:12:07 2022 +0800
+
+    feat: Support password protected app (#73)
+    
+    * feat: support password auth for apps
+    
+    * fix
+    
+    * feat: only use gateway to proxy
+    
+    * fix(gateway): proxy not working
+    
+    * docs: update app doc
+
+[33mcommit 8c2af36e9beee2aa19a46e64040705eabb033e77[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Mon Jun 6 08:03:58 2022 +0800
+
+    chore(deps): update dependency @types/react to v18.0.12 (#69)
+    
+    Co-authored-by: Renovate Bot <bot@renovateapp.com>
+
+[33mcommit 012cf52881cfde3bfc7f233e8013707f53d9eaa6[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sun Jun 5 16:36:42 2022 +0800
+
+    Improve dockerfile (#67)
+    
+    * improve dockerfiles
+    
+    * fix: docs dockerfile
+    
+    * chore(portal-web): docker build caches no vnc repo
+
+[33mcommit 1712269c940962aabdad912f93773ba5efc17427[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Sun Jun 5 10:03:16 2022 +0800
+
+    chore(deps): update pnpm to v7.1.8 (#65)
+    
+    Co-authored-by: Renovate Bot <bot@renovateapp.com>
+
+[33mcommit 1c0dc79e7f0b92a45bf8139f596fe4374480398c[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Sun Jun 5 10:03:08 2022 +0800
+
+    chore(deps): update dependency @types/jest to v28.1.1 (#66)
+    
+    Co-authored-by: Renovate Bot <bot@renovateapp.com>
+
+[33mcommit 624e208bc938b2acdf8f27c3bf75ff45de5a7d35[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sat Jun 4 20:40:45 2022 +0800
+
+    fix(job-server-slurm): set chdir parameters in job submission
+
+[33mcommit 04ca0018e898c3b09af15900244cab1be9b97a3f[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sat Jun 4 20:09:36 2022 +0800
+
+    feat: update job file organization and support job work dir
+
+[33mcommit 576221dc593c8b6fd531306b552ba7d2016a0726[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Sat Jun 4 14:08:30 2022 +0800
+
+    chore(deps): update dependency @types/react to v18.0.11 (#64)
+    
+    Co-authored-by: Renovate Bot <bot@renovateapp.com>
+
+[33mcommit 1d89ac09c54166e5ced41873c83fee28403ceed6[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Sat Jun 4 08:52:47 2022 +0800
+
+    chore(deps): update dependency eslint to v8.17.0 (#63)
+    
+    Co-authored-by: Renovate Bot <bot@renovateapp.com>
+
+[33mcommit 6581dd9d96fff71f9d8d0ae770cb2d3714b705e9[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Sat Jun 4 08:41:39 2022 +0800
+
+    chore(deps): update dependency typescript to v4.7.3 (#62)
+    
+    Co-authored-by: Renovate Bot <bot@renovateapp.com>
+
+[33mcommit f593a79c7d9a1bc74ae05e867bfc02d035b17bbe[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Sat Jun 4 08:30:42 2022 +0800
+
+    chore(deps): update dependency ts-node to v10.8.1 (#61)
+    
+    Co-authored-by: Renovate Bot <bot@renovateapp.com>
+
+[33mcommit 3f945b0d195662d62b355e47f79aa9814e5cfebe[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Fri Jun 3 17:04:21 2022 +0800
+
+    chore(deps): update dependency tsc-alias to v1.6.8 (#60)
+    
+    Co-authored-by: Renovate Bot <bot@renovateapp.com>
+
+[33mcommit 1365c60ccf8d0fea83309be138c9c493756bbf17[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Fri Jun 3 08:17:55 2022 +0000
+
+    ci: only build at master commits
+
+[33mcommit 95e133031595f5c46e27d69ae79836007f1ed0c7[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Fri Jun 3 16:14:30 2022 +0800
+
+    chore(deps): update dependency @types/jest to v28 (#54)
+    
+    Co-authored-by: Renovate Bot <bot@renovateapp.com>
+
+[33mcommit c325536d30725c605911ecfc82dd79983a64709b[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Fri Jun 3 14:49:26 2022 +0800
+
+    chore(deps): update dependency webpack to v5.73.0 (#57)
+    
+    Co-authored-by: Renovate Bot <bot@renovateapp.com>
+
+[33mcommit 388302b6fe0749f30393fdbc50ab3d7dd5e925d7[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Fri Jun 3 14:49:06 2022 +0800
+
+    chore(deps): update dependency ts-jest to v28.0.4 (#59)
+    
+    Co-authored-by: Renovate Bot <bot@renovateapp.com>
+
+[33mcommit 9c7e6a873f4b4bc174a84df9327fdd710de82138[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Fri Jun 3 08:34:23 2022 +0800
+
+    fix(deps): update dependency @ddadaal/tsgrpc-utils to v0.14.0 (#58)
+    
+    Co-authored-by: Renovate Bot <bot@renovateapp.com>
+
+[33mcommit fc69678c6cdb1361116993661006e6073deb8143[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Fri Jun 3 08:34:12 2022 +0800
+
+    chore(deps): update dependency @types/jest to v27.5.2 (#52)
+    
+    Co-authored-by: Renovate Bot <bot@renovateapp.com>
+
+[33mcommit 48260a262bf4f39760fd7dfec738ed27ca10239d[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Thu Jun 2 19:25:57 2022 +0800
+
+    fix(deps): update dependency @ddadaal/tsgrpc-server to v0.14.0 (#56)
+    
+    Co-authored-by: Renovate Bot <bot@renovateapp.com>
+
+[33mcommit 845c8ccd51f1c47095d2780c26969c7bb4a90dc0[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Thu Jun 2 19:18:59 2022 +0800
+
+    chore(deps): update dependency @ddadaal/tsgrpc-cli to v0.13.0 (#55)
+    
+    Co-authored-by: Renovate Bot <bot@renovateapp.com>
+
+[33mcommit c3d56256b2050ef09ba2a4bc66ac60bf91a2a6a1[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Thu Jun 2 19:00:43 2022 +0800
+
+    fix(deps): update codemirror (#45)
+    
+    Co-authored-by: Renovate Bot <bot@renovateapp.com>
+
+[33mcommit c25ef398ba9468e2ddfe6165a24bafc8fdd41ac8[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Thu Jun 2 19:00:20 2022 +0800
+
+    chore(deps): update node.js to v16.15.1 (#53)
+    
+    Co-authored-by: Renovate Bot <bot@renovateapp.com>
+
+[33mcommit 52933fccd6522c0fa69c8229f93477766b873c2f[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Thu Jun 2 18:59:49 2022 +0800
+
+    chore(deps): update dependency pino-pretty to v8 (#51)
+    
+    Co-authored-by: Renovate Bot <bot@renovateapp.com>
+
+[33mcommit 0328a9f777f81ad6991ee659842d54be6b3210ce[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Thu Jun 2 18:59:38 2022 +0800
+
+    chore(deps): update dependency pino to v8 (#50)
+    
+    Co-authored-by: Renovate Bot <bot@renovateapp.com>
+
+[33mcommit 1f998c175aab6ee79b99982697c16b6f72534a71[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Wed Jun 1 15:05:44 2022 +0800
+
+    ci: run actions in pr
+
+[33mcommit f2645702ac9b01c980f8c6a758d801b472366fe5[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Wed Jun 1 14:59:25 2022 +0800
+
+    ci: synchronize pnpm version
+
+[33mcommit 1733a911c788ba3a0234816ca5220743c8cd0cb4[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Wed Jun 1 06:19:07 2022 +0000
+
+    fix: avoid pnpm buggy auto peer install
+
+[33mcommit a7c96bbacd4e9d8d0f7aad139869de58da90e970[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Wed Jun 1 10:42:11 2022 +0800
+
+    chore(deps): update dependency @types/react to v18.0.10 (#49)
+    
+    Co-authored-by: Renovate Bot <bot@renovateapp.com>
+
+[33mcommit b4347817f0d942c5b7833398aeff5792caf1cf3d[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Wed Jun 1 01:57:51 2022 +0000
+
+    renovate: ignore unnecessary packages
+
+[33mcommit aafad714cbdc410fcb1d30b26b61bee2b60c6f01[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Wed Jun 1 01:53:32 2022 +0000
+
+    docker: use gallium tag for node
+
+[33mcommit 9d9a901f3e55ac31c65fd4432620b6669046debe[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Wed Jun 1 01:51:07 2022 +0000
+
+    fix: lockfile
+
+[33mcommit c472ceb8513f1174adcaefcb51c363b7c56cc595[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Wed Jun 1 08:48:55 2022 +0800
+
+    chore(deps): update dependency @fastify/swagger to v6.1.0 (#48)
+    
+    Co-authored-by: Renovate Bot <bot@renovateapp.com>
+
+[33mcommit dd17109e127bee2f2e6059fbaaeb7b64cfd1997c[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Wed Jun 1 08:48:41 2022 +0800
+
+    fix(deps): update dependency ioredis to v5.0.6 (#47)
+    
+    Co-authored-by: Renovate Bot <bot@renovateapp.com>
+
+[33mcommit abce273fe78514ade15300526315d4d89af5c044[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Tue May 31 22:38:52 2022 +0800
+
+    fix(deps): update dependency undici to v5.4.0 (#46)
+    
+    Co-authored-by: Renovate Bot <bot@renovateapp.com>
+
+[33mcommit a44aa15b23b7b58bf06c6c17916417bdd8e7e5e0[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Tue May 31 17:11:31 2022 +0800
+
+    fix(deps): update codemirror (#41)
+    
+    Co-authored-by: Renovate Bot <bot@renovateapp.com>
+
+[33mcommit 23d935b902ffc0fb9d805404bcdbea4608db92b7[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Tue May 31 17:11:19 2022 +0800
+
+    chore(deps): update typescript-eslint monorepo to v5.27.0 (#43)
+    
+    Co-authored-by: Renovate Bot <bot@renovateapp.com>
+
+[33mcommit 3f5242dc68060af672a1fd1789c1e61ebf9081b1[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Tue May 31 17:11:10 2022 +0800
+
+    fix(deps): update dependency antd to v4.20.7 (#42)
+    
+    Co-authored-by: Renovate Bot <bot@renovateapp.com>
+
+[33mcommit a71956077e5a5e967c07383e733e0e11b9ec9abd[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Tue May 31 17:10:32 2022 +0800
+
+    Implement initial version of interactive apps (#44)
+    
+    * implementing interactive apps
+    
+    * implementing interactive apps
+    
+    * implement extra params for app submission
+    
+    * implemented interactive apps
+    
+    * implemented cancel job
+    
+    * portal-web: organize pages
+    
+    * job-server-slurm: don't use tmp file for script
+    
+    * job-server-slurm: fix error  querying completed sessions
+    
+    * job-server-slurm: remove unnecessary config
+    
+    * docs: update docs
+
+[33mcommit b0f3b2da6fd1bbb3ac4d20a7ebf37d3437832a64[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Mon May 30 11:12:31 2022 +0800
+
+    portal-web: use random-words for new job name
+
+[33mcommit 2ddec941dcb66bc9f7e38c0ac50277d24c3cd189[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Mon May 30 10:35:43 2022 +0800
+
+    auth: downgrade @fastify/formbody to use with fastify v3
+
+[33mcommit 7b80eb4303f0edeb963fff7540e460680d65eb20[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Mon May 30 09:53:42 2022 +0800
+
+    mis-server: update mikro-orm
+
+[33mcommit e8354d00889b5c1274c6f822c2b3e60eec8e91dd[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sun May 29 09:30:30 2022 +0000
+
+    fix: mis-server temporarily use ts 4.6.3 and wait for mikro-orm's new release
+
+[33mcommit 28e6011f22ab8d05e7d2bfb90ebeabb349088d5d[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sun May 29 15:01:38 2022 +0800
+
+    chore: use newer lint rules
+
+[33mcommit 2ce5c19da109e2da6093d96138de105937225bff[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sun May 29 14:57:33 2022 +0800
+
+    web: fix web codes
+
+[33mcommit f3fe956b8e648e14940f967ee488ceb71d689ee2[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Sun May 29 09:51:40 2022 +0800
+
+    chore(deps): update pnpm/action-setup action to v2.2.2 (#36)
+    
+    Co-authored-by: Renovate Bot <bot@renovateapp.com>
+
+[33mcommit a4c18a60a0c489a9e7f51c93988383963de92f1b[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sun May 29 09:46:35 2022 +0800
+
+    fix: docs
+
+[33mcommit 2e1021c06ab52477cefe1b9c80beb48f824547b3[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Sat May 28 15:24:52 2022 +0800
+
+    chore(deps): update nginx digest to a74534e (#34)
+    
+    Co-authored-by: Renovate Bot <bot@renovateapp.com>
+
+[33mcommit 536b0794a2c01262518a2f2770cb310519085b9c[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Sat May 28 15:24:43 2022 +0800
+
+    chore(deps): update node.js to 1a9a71e (#35)
+    
+    Co-authored-by: Renovate Bot <bot@renovateapp.com>
+
+[33mcommit de06b1578cfc4d941587fc6d8de09a2a11411881[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sat May 28 07:21:36 2022 +0000
+
+    fix: outdated lock file
+
+[33mcommit f65640a337fd3ac4fd63c59e4c4e49d6767beec8[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sat May 28 07:19:53 2022 +0000
+
+    chore: remove fresnel and update to react 18
+
+[33mcommit bab71c0f1a9a5f04d83c527807bd018618ecf404[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sat May 28 07:08:48 2022 +0000
+
+    fix: seslint ignore next files
+
+[33mcommit 7161ac562730b31c8bc03fbe2ab53c25e6d7212f[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sat May 28 07:05:19 2022 +0000
+
+    fix: some ts error
+
+[33mcommit d4715c1e71b75d66cc269621de64c3d806177de8[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sat May 28 06:53:18 2022 +0000
+
+    fix: lock file
+
+[33mcommit d1c0f0c7c93aa5ce68263a2c4224875a636dd82d[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sat May 28 06:47:24 2022 +0000
+
+    chore: pindocker image
+
+[33mcommit 672001a80115c0db18ac6a3551a941fe527bffc6[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sat May 28 02:18:25 2022 +0000
+
+    chore: remove stale scripts
+
+[33mcommit 1cc72fba851bea43c02a8e5b951e852257b462e7[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Sat May 28 08:16:26 2022 +0800
+
+    fix(deps): update docusaurus monorepo to v2.0.0-beta.21 (#33)
+    
+    Co-authored-by: Renovate Bot <bot@renovateapp.com>
+
+[33mcommit 4b1f520949ab0f874e790618880e4e1037d29faf[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Fri May 27 13:20:48 2022 +0000
+
+    fix: update renovate config
+
+[33mcommit dee5238e1b6f029e45ae18886cb32a37e17f6251[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Fri May 27 21:19:11 2022 +0800
+
+    fix(deps): update dependency ioredis to v5.0.5 (#30)
+    
+    Co-authored-by: Renovate Bot <bot@renovateapp.com>
+
+[33mcommit 25a89d1a4519bd6b3c4b2c45551e2c2afb29e21c[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Fri May 27 13:09:53 2022 +0000
+
+    fix renovate config
+
+[33mcommit ce3de6046709087e71764a3d221205a74d89dd81[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Fri May 27 13:08:48 2022 +0000
+
+    chore: update renovate config
+
+[33mcommit 0e286975e2924f38cd2c80ef878a32065aa506da[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Fri May 27 13:08:09 2022 +0000
+
+    chore: pin dependency versions and update jest
+
+[33mcommit 1e179eafe639891eaa62dfc78b3787bfc5f8e50d[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Fri May 27 11:52:15 2022 +0000
+
+    chore: fix vscode ts config
+
+[33mcommit 14dc1aa060cfb60cffed262015000a640d80e2ee[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Fri May 27 15:01:08 2022 +0800
+
+    fix(deps): update dependency @fastify/formbody to v7 (#24)
+    
+    Co-authored-by: Renovate Bot <bot@renovateapp.com>
+
+[33mcommit b63b1446c2637e05f716a6e8f6018ba17653adcc[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Fri May 27 14:56:39 2022 +0800
+
+    chore(deps): update pnpm/action-setup action to v2.2.1 (#19)
+    
+    Co-authored-by: Renovate Bot <bot@renovateapp.com>
+
+[33mcommit 17e260f17953218fdb0f25acf479b6455ad1a646[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Fri May 27 14:50:23 2022 +0800
+
+    fix(deps): update dependency @fastify/error to v3 (#23)
+    
+    Co-authored-by: Renovate Bot <bot@renovateapp.com>
+
+[33mcommit e5cfda98896591c38182ca048f238ff38ee972d6[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Fri May 27 14:48:25 2022 +0800
+
+    chore(deps): update dependency tsconfig-paths to v4 (#22)
+    
+    Co-authored-by: Renovate Bot <bot@renovateapp.com>
+
+[33mcommit 0638650d501b6ba5962f408b7be9be6469428aea[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Fri May 27 14:45:32 2022 +0800
+
+    chore(deps): update actions/checkout action to v3 (#20)
+    
+    Co-authored-by: Renovate Bot <bot@renovateapp.com>
+
+[33mcommit 2aec92ce915825ce781289c8d3b3f7af69ac46c4[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Fri May 27 14:45:19 2022 +0800
+
+    chore(deps): update codecov/codecov-action action to v3 (#21)
+    
+    Co-authored-by: Renovate Bot <bot@renovateapp.com>
+
+[33mcommit 571fed9ed389c200f743fa53184fce5cebbb1024[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Fri May 27 14:41:52 2022 +0800
+
+    fix(deps): pin dependencies (#17)
+    
+    Co-authored-by: Renovate Bot <bot@renovateapp.com>
+
+[33mcommit f1040c0bd97e2df555adfa5402e46ac0bd6f8a9c[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Fri May 27 14:41:43 2022 +0800
+
+    chore(deps): update docker/login-action digest to d398f07 (#18)
+    
+    Co-authored-by: Renovate Bot <bot@renovateapp.com>
+
+[33mcommit 57fdde9e3027845d92f316b8f21f9fc1e18917f7[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Fri May 27 13:09:01 2022 +0800
+
+    fix(deps): pin dependencies (#15)
+    
+    Co-authored-by: Renovate Bot <bot@renovateapp.com>
+    Co-authored-by: Chen Junda <ddadaal@outlook.com>
+
+[33mcommit 3987fa44042c2679705065777c9a918f92858687[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Fri May 27 13:04:44 2022 +0800
+
+    chore(deps): pin dependencies (#14)
+    
+    Co-authored-by: Renovate Bot <bot@renovateapp.com>
+
+[33mcommit 4a31a5f90fb77381b77377be4fc04cd5ba8c2b1e[m
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Fri May 27 12:55:57 2022 +0800
+
+    chore(deps): add renovate.json (#13)
+    
+    Co-authored-by: Renovate Bot <bot@renovateapp.com>
+
+[33mcommit 337b4044ccb82461cdd9364e566cf7c3ae85f511[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Fri May 27 09:51:32 2022 +0800
+
+    portal-web: fix homepage src
+
+[33mcommit c49857de1fe64de49e58836faae99f04847aca0b[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Fri May 27 09:13:52 2022 +0800
+
+    portal-web: fix proxy
+
+[33mcommit 6319690e7fbad670bf8fa7d2f213f17bd621a031[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Wed May 25 16:56:17 2022 +0800
+
+    lint: update lint rules
+
+[33mcommit 7cbf5df42b5f3067d6fc783da7150a17889528a8[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Wed May 25 16:16:46 2022 +0800
+
+    chore: use react preset in web projects
+
+[33mcommit 9ce069b5225a76597659773ee52fe4741e4ba6d6[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Wed May 25 15:29:54 2022 +0800
+
+    portal-web: separate desktop table code
+
+[33mcommit fb53f653bb8d7194e411607befdad18e2f81a6ee[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Wed May 25 15:13:14 2022 +0800
+
+    portal-web: fix desktop table property not matching
+
+[33mcommit 835b6a9b5df82bf46d6990c76975b932462e0397[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Wed May 25 14:50:30 2022 +0800
+
+    update desktop code
+
+[33mcommit 8e3b7e2ffc4086ab7de29900ddc3a921177a687e[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Wed May 25 14:22:25 2022 +0800
+
+    portal-web: initial implementation of authenticated proxy
+
+[33mcommit 21b7e12751ed94f73b87b8cf02afa72329cea0d1[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Wed May 25 10:28:44 2022 +0800
+
+    web: make validateToken work in validateToken
+
+[33mcommit cbda465c3af8271d91038557a15998a11781360a[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Tue May 24 23:23:03 2022 +0800
+
+    portal: open terminal in new page
+
+[33mcommit a2bb6d1d12fe9cdf156d072e99cd5768457a156b[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Tue May 24 23:01:50 2022 +0800
+
+    config: rename config name and schema to avoid importing wrong lib
+
+[33mcommit 0245c652a966c076df499c747c9beef2db828021[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Tue May 24 22:55:06 2022 +0800
+
+    job-server: fix wrong clusterConfig import
+
+[33mcommit a160e28102de373ae245c20e76ed36c0c284a7cb[m
+Author: Jason <33650151+JasonChen9@users.noreply.github.com>
+Date:   Tue May 24 03:57:24 2022 -0700
+
+    portal: allow multiple desktop sessions (#10)
+
+[33mcommit 97f5cbc8ffa65c3ad571d522d3128deda60404d7[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sun May 22 20:34:19 2022 +0800
+
+    file-server: fix contentType handling
+
+[33mcommit cfee673851c68730cb8bafbf69971c8f9bdc5e41[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sun May 22 20:06:21 2022 +0800
+
+    web: ignore api-routes-schemas.json file
+
+[33mcommit 70f1156586d06720a271c9e48f0fb27eac05e21d[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sun May 22 20:04:47 2022 +0800
+
+    portal: add saved jobs
+
+[33mcommit f8094fadeb8b307b8650050cc677e08b7f67aa88[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sun May 22 14:49:45 2022 +0800
+
+    web: use antd's new menu item
+
+[33mcommit 267c64ed278d1edd28dc568c265562c945754ab4[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sun May 22 14:35:06 2022 +0800
+
+    web: nav link support open in new link
+
+[33mcommit 16d4b8adda65ba40bc8de4b10974eeb65f73555f[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sun May 22 14:21:40 2022 +0800
+
+    chore: align default image base to docs
+
+[33mcommit 22d8ba2190b266b63dfc1844cfddc6df2491e141[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sun May 22 14:21:25 2022 +0800
+
+    docs: update build from source
+
+[33mcommit 3c2346512e0757cc35b985b1449ea0e3cd53a9ad[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sat May 21 17:22:14 2022 +0800
+
+    ci: change coverage result folder
+
+[33mcommit 2446dbec77342b1363a60deef951da801cb4ecd4[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sat May 21 17:20:19 2022 +0800
+
+    chore: run tests for libs
+
+[33mcommit 6965b973f07e5a734c3f3cd271f9b8b3849e1528[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sat May 21 17:13:11 2022 +0800
+
+    config: fix tests
+
+[33mcommit d5dc9fc9f1eff8262bec8ff9f2a34bcc8ed74346[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sat May 21 16:54:54 2022 +0800
+
+    file-server: fix test code not updating config path
+
+[33mcommit 7ac1f550fe72208b5eb0e03b14e3582251919ed6[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sat May 21 16:49:21 2022 +0800
+
+    refactor: move config code to src/config/
+
+[33mcommit 26965909314c968b0a49b4fc7e024223186be6ee[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sat May 21 16:00:12 2022 +0800
+
+    job-server-slurm: add customization of jobs folder
+
+[33mcommit fa289974e9822b15e44900003b5c3d788c2c1e6a[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sat May 21 14:28:42 2022 +0800
+
+    docs: update graphs
+
+[33mcommit 0aecd7da560b8e85d7713ab4b076f3c0931661bd[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Thu May 19 16:57:29 2022 +0800
+
+    Complete #7
+
+[33mcommit cfad40cb14e7af7e899d4fbec7fbeeb94d8a0a41[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Wed May 18 15:45:15 2022 +0800
+
+    job-server-slurm: remove tmp file afterwards and adds tests
+
+[33mcommit 77d8ce3300c4138386ce0f214a7b7f59fbaf9165[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Tue May 17 17:00:14 2022 +0800
+
+    portal: reject if job name conflicts
+
+[33mcommit 87685219395034ec483be852a5b69e634661beb3[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Mon May 16 17:06:51 2022 +0800
+
+    web: fix table x overflow
+
+[33mcommit 8b212557cfb1c6500e42785c306b3000f2fa09fc[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Mon May 16 16:50:28 2022 +0800
+
+    portal-web: fix process.env dev issue
+
+[33mcommit 908bc804b698ca5be16b7f9a08370bb0167321b4[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Mon May 16 16:21:08 2022 +0800
+
+    docs: add dashboard customization
+
+[33mcommit f69dd0f3c978bc660a7cf5ef815c7be19d5b97de[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Mon May 16 15:58:49 2022 +0800
+
+    docs: add operations
+
+[33mcommit 91746804050666aa43996c99293cebe18a43a994[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Mon May 16 15:48:12 2022 +0800
+
+    docs: fix broken link
+
+[33mcommit faf5033dd5e3dd4b6e8df5324f3e4c1f12112931[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Mon May 16 15:45:36 2022 +0800
+
+    docs: update
+
+[33mcommit d7e091ee3643195868a1204c05a616a88d99f171[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Mon May 16 13:17:15 2022 +0800
+
+    chore: update lock file
+
+[33mcommit 34ca32a8c86657e4ca48a977591256d2075f9454[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Mon May 16 13:17:08 2022 +0800
+
+    chore: update dockerfile
+
+[33mcommit 84e5b42f30dfd28859892650a0702c34562eb01e[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Mon May 16 12:14:36 2022 +0800
+
+    portal-web: fix shell initial resize
+
+[33mcommit 0225261965309d455699ca48446208a7b481cb22[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Mon May 16 10:43:29 2022 +0800
+
+    refactor: merge shell-server to portal-web
+
+[33mcommit 997a3e9cef6f654251a0385c4ec4af50650d4168[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Mon May 16 00:05:57 2022 +0800
+
+    portal-web: use codemirror for job submission
+
+[33mcommit da4d24cfa0c1c562af36d48554a92b7b53671519[m
+Merge: 59d21bd0 4e87866e
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sun May 15 21:02:16 2022 +0800
+
+    Merge pull request #5 from PKUHPC/portal-homepage
+    
+    portal-web: customizable logo and text
+
+[33mcommit 4e87866e5bc6b64bac08899f653ffb82ad29f934[m
+Author: xgy <995975102@qq.com>
+Date:   Sun May 15 01:17:28 2022 -0700
+
+    portal-web : use styled-components
+
+[33mcommit 59d21bd018ba2d6fff6a23f579725b430ad44046[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sun May 15 15:05:34 2022 +0800
+
+    dockerfiles: set NODE_ENV to production for all containers
+
+[33mcommit a611ebfae25c9ad9a8a9d7e1f7501e585b8a5eb0[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sun May 15 15:04:43 2022 +0800
+
+    config: fix reverse logic of config loading
+
+[33mcommit 8e0f7226510b35181f086e864b99b48a751ad4a1[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sun May 15 14:37:03 2022 +0800
+
+    web: fix web build
+
+[33mcommit 6f20a7f6303085dace1d5b718ee1e15f97e77c39[m
+Author: xgy <995975102@qq.com>
+Date:   Sat May 14 23:30:53 2022 -0700
+
+    portal-web: customizable logo and text
+
+[33mcommit 8ca4bcc9a2171ae7593d15f98543b6eec9597a3a[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sun May 15 12:56:49 2022 +0800
+
+    web: fix config dir
+
+[33mcommit faffcab7c64d987e7faf22c44febdb944b2b10c4[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sun May 15 12:29:45 2022 +0800
+
+    config: use defaults value and default path
+
+[33mcommit 9c19d493e73dcd06ec6d8dc677bf21a478c3abdd[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sun May 15 11:30:16 2022 +0800
+
+    docs: fix broken link
+
+[33mcommit 6797cc9d015e02d693d2095139f90f93a0259f8e[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sun May 15 11:23:08 2022 +0800
+
+    refactor: merge login and compute nodes config to clusters config
+
+[33mcommit 1d3dbbeef30f642efb153ef3f8407b62e6b98028[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sat May 14 15:06:16 2022 +0800
+
+    chore: ignore internal folder
+
+[33mcommit da4101501fce2a86bae1e349a6766d0ef0370f2a[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sat May 14 15:04:48 2022 +0800
+
+    config: omit _specs when logging config
+
+[33mcommit 82d5d0acfb8a4c6c3cf84bea377215082103123b[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sat May 14 14:47:35 2022 +0800
+
+    docs: update config and docs generation
+
+[33mcommit fc877b97ef73544c921c27c8e612e108f567c943[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sat May 14 13:57:20 2022 +0800
+
+    docs: replace default homedir to ~
+
+[33mcommit 716ac5e46a77e13ab40ff06f479d326ac9591320[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sat May 14 13:44:55 2022 +0800
+
+    docs: update docs
+
+[33mcommit 113557ac4091c6a499ed2532d840899cd8d151ae[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sat May 14 10:59:31 2022 +0800
+
+    portal-web: add regeneration of job name in job submit
+
+[33mcommit 96543940154ad9fe929287e24e6e208a1e12ea2a[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sat May 14 10:45:51 2022 +0800
+
+    portal-web: update submit job form layout
+
+[33mcommit 5f53d9bef00634e8c0d87cde7c06212fc3bf5d56[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sat May 14 10:24:25 2022 +0800
+
+    portal-web: use monaco-editor for job submission
+
+[33mcommit 51a6a2270128fb97c6d97f22b98e886c094b5ebd[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Fri May 13 21:46:49 2022 +0800
+
+    ci: generate ssh keys for test
+
+[33mcommit 683cc538af770f416630682950443da6a13c8387[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Fri May 13 21:35:31 2022 +0800
+
+    refactor: mis-server instead of shell-server inserts key for new user
+
+[33mcommit 99a3171d6d9f4d582e21a4e156d2b593d4c82a4e[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Fri May 13 17:25:13 2022 +0800
+
+    portal: fix simple job submission
+
+[33mcommit bb2514ac91cbec5bd68ae7ae0b72460192c8284f[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Fri May 13 13:53:05 2022 +0800
+
+    job-server-slurm: fix tmp dependency
+
+[33mcommit 8cca90e2c3deda6fdda7a8504012e26ed4120b3a[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Fri May 13 13:22:24 2022 +0800
+
+    portal: working on job submission
+
+[33mcommit 2b7c9250f1e0b3a8400e9efbc76270522f50cfa1[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Fri May 13 12:26:53 2022 +0800
+
+    docs: update
+
+[33mcommit 3c98f70897c756f2c131f01180a9a285892e0a7b[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Fri May 13 12:25:09 2022 +0800
+
+    portal-web:  file manager to home path when clicking header
+
+[33mcommit 7c325abbcc85aee42ca7558f62a284a4b84f3561[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Fri May 13 10:53:39 2022 +0800
+
+    job-server-slurm: no header when squeue
+
+[33mcommit f55b66d03c1c14ca0f00ace29c97e1317db8f8e3[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Fri May 13 10:15:19 2022 +0800
+
+    ci: fix bad links
+
+[33mcommit 07b6aa028b17553377b4265556e0bb662094648b[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Fri May 13 10:15:13 2022 +0800
+
+    docs: fix broken link
+
+[33mcommit d661a10662bf88733d0daebedf46a980e0f8ed48[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Fri May 13 10:06:08 2022 +0800
+
+    portal: vnc-server to job-server
+
+[33mcommit 55a17f97f4a2db98134d5dde04c145f91ea273c3[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Thu May 12 23:24:18 2022 +0800
+
+    file-server: add openapi generation
+
+[33mcommit d658a9f4d837bbf76214f32b21222fd0eb0a4fed[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Thu May 12 21:34:33 2022 +0800
+
+    portal-web: add page for submit job
+
+[33mcommit 8456588fcc2ecb46f61e90eb3926467445d0ca32[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Thu May 12 20:54:41 2022 +0800
+
+    portal-web: clean code
+
+[33mcommit c3a23fe2439e6fd6e029d2b6e73a8763140718fe[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Thu May 12 20:19:45 2022 +0800
+
+    ci: disable husky during ci
+
+[33mcommit 67f70b88d8253cc68279bb5e31bff46b94dee884[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Thu May 12 20:06:03 2022 +0800
+
+    chore: move dev packages to root
+
+[33mcommit 683f6b0d2900df3dc8cc15a08cc52d4f30fcbfa9[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Thu May 12 17:36:24 2022 +0800
+
+    chore: fix pre-commit and enable cache for eslint
+
+[33mcommit 68423d467a39199733b2b903be15a1a7031008c6[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Thu May 12 17:32:01 2022 +0800
+
+    docs: update about code lint
+
+[33mcommit 1a6f3dca78a4e68a299b0a1890d9b18b58ffd35c[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Thu May 12 17:27:22 2022 +0800
+
+    chore: add husky for eslint check
+
+[33mcommit 03055ae304f9294f306a95877113046caa21a859[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Thu May 12 17:16:53 2022 +0800
+
+    portal-web: move jobs to the left of shell
+
+[33mcommit 063f3789ad195e86e3840e48ab4340838c47721c[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Thu May 12 16:47:02 2022 +0800
+
+    chore: use better logging for config
+
+[33mcommit 70c5ed6844abfe55ff2fc587cd04e77b91b33f2a[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Thu May 12 16:35:12 2022 +0800
+
+    ci: publish to aliyun cr
+
+[33mcommit a91f20ca25ca5051f974c993d64bd2670915ae13[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Thu May 12 15:36:42 2022 +0800
+
+    web: try to fix icon resolution
+
+[33mcommit 937b2e830fcf0aa70eac19a68e4b9dbe5d255061[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Thu May 12 13:32:18 2022 +0800
+
+    mis-server: fix whitelist not working when fetch charges
+
+[33mcommit 81b5c7180aa56a383e40108a33da07a216129ff7[m
+Author: Fan Chun <fanchun@pku.edu.cn>
+Date:   Thu May 12 12:00:01 2022 +0800
+
+    Update README.md
+
+[33mcommit b35fc2ae7b64e8652e7f338559ee52bdd632209c[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Thu May 12 11:59:45 2022 +0800
+
+    web: try to fix icons
+
+[33mcommit e43b70920b0a25db2418419b96520fef6a736f36[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Thu May 12 10:59:57 2022 +0800
+
+    chore: clean package json files
+
+[33mcommit 14ba171017fa199134da92bf8001312834588972[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Thu May 12 10:58:26 2022 +0800
+
+    chore: add env vars for test
+
+[33mcommit 5d46e7da676d01f980e826900174c44a32722b2d[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Thu May 12 10:51:37 2022 +0800
+
+    chore: update compose file for build
+
+[33mcommit 0ee4b700cea2736e959a3b4bf035ad65258ba022[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Thu May 12 10:17:30 2022 +0800
+
+    docs: fix broken link
+
+[33mcommit 9fbbdf7f8f191134cf064df9049bf838048167ac[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Thu May 12 10:11:43 2022 +0800
+
+    web: fix bad config path in dev
+
+[33mcommit 0c629219e36b4f92c9d22c2aaa316382551753ed[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Thu May 12 10:05:49 2022 +0800
+
+    docs: add config for job management
+
+[33mcommit 5a6f4c7cbe5db22e3fca328dd91c475fe3c2520a[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Thu May 12 10:04:38 2022 +0800
+
+    portal-web: remove unnecessary env
+
+[33mcommit 0010825a7488bf8de212509b350f925aeaee61da[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Thu May 12 09:59:07 2022 +0800
+
+    portal: add running jobs
+
+[33mcommit e6250660f26b22911f48bda2aeca430abb382ddd[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Thu May 12 00:02:55 2022 +0800
+
+    mis-server: rewrite tests to pass detectOpenHandles
+
+[33mcommit 2ae0b837a81b351a4d1725a47493dab95b40dc71[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Wed May 11 22:18:06 2022 +0800
+
+    ci: rename a ci job's name
+
+[33mcommit 6ddb47f6545b27ef5077fdcd081c8b0ca6e75bac[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Wed May 11 22:17:38 2022 +0800
+
+    web: update icon resolution
+
+[33mcommit 887f2c1b62615f08763ed72b2846bb21bcfda81e[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Wed May 11 20:47:22 2022 +0800
+
+    docs: update badges in readme
+
+[33mcommit bc3427acac635def1c79c71ed5a7152bb36b2c98[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Wed May 11 19:39:17 2022 +0800
+
+    ci: prepare dev before test
+
+[33mcommit 5a2d68ac99192f7d1b455a34d5477e79314fcedf[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Wed May 11 19:39:07 2022 +0800
+
+    chore: add prepareDev script
+
+[33mcommit 347a49edfd57cc5bf52daf7780463fa6c583f8a9[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Wed May 11 19:21:49 2022 +0800
+
+    ci: build libs before test
+
+[33mcommit ffbcf90492af27e982a31e283bcc64b3bbc516a9[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Wed May 11 19:14:40 2022 +0800
+
+    ci: run tests before publish
+
+[33mcommit 018f18e108ac223cb5fc3d3e79be316ceb59dd10[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Wed May 11 18:48:49 2022 +0800
+
+    test: passes tests
+
+[33mcommit 3425d248b10a144bd6a4e39bd6855bc1c01ae42d[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Wed May 11 15:12:27 2022 +0800
+
+    docs: update intro and readme
+
+[33mcommit f38d760426e542affee10d17de0b8f9820b21126[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Wed May 11 14:23:22 2022 +0800
+
+    docs: move dev docs to docs site
+
+[33mcommit bd6249971f1b0c78aad01140b1866d7a9f6466aa[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Wed May 11 14:01:31 2022 +0800
+
+    ldap: set volume for ldap container
+
+[33mcommit 153f301f1d40ee58f46bf9e623344db977a710d6[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Wed May 11 11:09:47 2022 +0800
+
+    docs: add install node-gyp notice
+
+[33mcommit 274410a63b0d76a346a71997ecf4f760f9088741[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Wed May 11 10:43:20 2022 +0800
+
+    docs: update build  from source
+
+[33mcommit e0d2ba26d1aa4420d86b203c8d80124c60eae2d4[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Wed May 11 10:39:04 2022 +0800
+
+    docs: interpolate vars in inlineCode
+
+[33mcommit 59d1ac207cad447c99adabb0d6eb1dee931e14f8[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Wed May 11 10:32:01 2022 +0800
+
+    chore: specify node version specifically
+
+[33mcommit df894a2bd7f0308daf34976c8d187f98a7fe9c4f[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Wed May 11 10:17:06 2022 +0800
+
+    docs: add how to deploy file when building from source
+
+[33mcommit 8fa7b188bbcd2c58a8f9b5fc4b11ca9077ca45a4[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Wed May 11 10:07:29 2022 +0800
+
+    docs: add build from source
+
+[33mcommit 87f11fd95652bce3028644b48fb4b929e6365ec4[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Tue May 10 20:38:37 2022 +0800
+
+    auth: add LDAP_ATTR_GROUP_USER_ID config
+
+[33mcommit 2e0fd92a5ab66a3fd4fdde8868aecb89c5ff2880[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Tue May 10 20:36:19 2022 +0800
+
+    auth: add test
+
+[33mcommit 2d0e406f94c796c80c2fc39bb2fe770020b2278f[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Tue May 10 14:43:39 2022 +0800
+
+    docs: add LDAP image
+
+[33mcommit d0ef4f455b5756a3e58d2876f990e6c5b4b58a2d[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Tue May 10 14:40:16 2022 +0800
+
+    ldap: add a docker based ldap setup
+
+[33mcommit f8cffb593909dbb684030762bc7cc08bd5ecc11b[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Tue May 10 10:51:59 2022 +0800
+
+    scripts: clean ldap provider script
+
+[33mcommit d3aa90bceea6a11a2e41e71267a07df6fb56d969[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Mon May 9 17:15:03 2022 +0800
+
+    docs: update CR_URL
+
+[33mcommit 7e4ec86846ddac3a2eaeec55f120ca7e2a2207cc[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Mon May 9 16:28:14 2022 +0800
+
+    ci: fix doc site build
+
+[33mcommit 1dc455348ea246773ee3f4fc1df499194cd701d0[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Mon May 9 16:26:44 2022 +0800
+
+    ci: set correct urls for doc site
+
+[33mcommit 21952b50d8926facb52c7baf39b698f48e684384[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Mon May 9 16:21:10 2022 +0800
+
+    ci: build dependencies before test
+
+[33mcommit 37bd91aa68dd837b04c70c21c950f4f7f797d345[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Mon May 9 16:17:51 2022 +0800
+
+    ci: file-server run ci test
+
+[33mcommit ba4f11d8631baa5da965c862355d62f241ef21ed[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Mon May 9 16:14:52 2022 +0800
+
+    ci: test before build
+
+[33mcommit 1fee49bd2d9d4913a35f7a5930ecb7464e6d3376[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Mon May 9 16:13:01 2022 +0800
+
+    ci: file-server runs test and uploads to codecov
+
+[33mcommit a1b584e43bf68ed4715d7546ecb1d1a55c674d69[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Mon May 9 16:03:53 2022 +0800
+
+    portal-web: clone novnc from github
+
+[33mcommit e6692570845a82ee14f2bef7471eac3050d9847a[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Mon May 9 15:56:09 2022 +0800
+
+    ci: fix web build
+
+[33mcommit 61a1dd12458996a8cb3ca1f92ed3f94dea1ef513[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Mon May 9 15:52:45 2022 +0800
+
+    ci: fix web container build
+
+[33mcommit 8a6ad23c4469b4993aff4e02860782f3431e65a9[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Mon May 9 15:49:32 2022 +0800
+
+    ci: update pnpm version
+
+[33mcommit d4bf11f87cf41550348c13fe3d1c8931e72de041[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Mon May 9 15:48:11 2022 +0800
+
+    ci: add web containers
+
+[33mcommit ada4f88637ca82cfd74f7662ec5ea7b2f749c206[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Mon May 9 15:25:28 2022 +0800
+
+    ci: use v3 version of build-push-action
+
+[33mcommit dbc61592d26174b512bfdf958d5e0ba23e07289b[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Mon May 9 15:24:44 2022 +0800
+
+    ci: remove docs container
+
+[33mcommit 7bb6fbd975709fe324ad2029b1eae2707c1bc5a2[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Mon May 9 13:06:31 2022 +0800
+
+    build: specify versions in dockerfiles
+
+[33mcommit 817adbe18ca0c20ef4273820112fedb026ef18a0[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Mon May 9 13:06:18 2022 +0800
+
+    build: update lockfile
+
+[33mcommit 549b6eab9fd3ad1cb2f34a542f3c6c8b5314dc8b[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Mon May 9 11:51:21 2022 +0800
+
+    ci: try to build and push containers
+
+[33mcommit e920721bc1063bcc1f2bd6e6819e6f7f9dac1a0b[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Mon May 9 11:09:34 2022 +0800
+
+    chore: update build docker-compose.yaml
+
+[33mcommit 390775d87bd9518f97f6faf612794e002a3f83f9[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sat May 7 10:24:45 2022 +0800
+
+    docs: change sample project
+
+[33mcommit 075926c1cc80fdac56ef5af35c7f43c5127a8adb[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sat May 7 10:23:11 2022 +0800
+
+    docs: add job_table docs
+
+[33mcommit fed1e9648aa2661b5ad35df8b50c420520f9c858[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Sat May 7 00:54:17 2022 +0800
+
+    file-server: fix bad module mock
+
+[33mcommit 633ebc4e12dc72db1dde699234e09b72c10ca8f7[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Fri May 6 23:18:17 2022 +0800
+
+    clusterops-slurm: make assoc_table configurable
+
+[33mcommit 859a4df3229a12992cc543aa8ec50363fd1f1f9d[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Fri May 6 22:29:23 2022 +0800
+
+    ci: add build file-server
+
+[33mcommit 1533defc7bf7e4d2d7cdd58caf1a3aec2f1eba93[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Fri May 6 22:14:10 2022 +0800
+
+    ci: update docs ci
+
+[33mcommit 7eb6f4f14b0ce4472c1aa9591f251e672d341551[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Fri May 6 22:08:01 2022 +0800
+
+    ci: add docs workflow
+
+[33mcommit 8b479662799a2921707075443ce201c25ca81ebe[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Fri May 6 22:00:45 2022 +0800
+
+    docs: update config
+
+[33mcommit 6a7f43953fd107ec707736faa11f344b5d6dfac4[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Fri May 6 21:58:57 2022 +0800
+
+    clean compose file
+
+[33mcommit 2f040b2af132daba4d5242292e106fd22bdf47aa[m
+Author: Chen Junda <ddadaal@outlook.com>
+Date:   Fri May 6 21:46:28 2022 +0800
+
+    init
