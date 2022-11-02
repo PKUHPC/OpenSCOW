@@ -3,6 +3,7 @@ import { ServiceError, status } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { UniqueConstraintViolationException } from "@mikro-orm/core";
 import { decimalToMoney } from "@scow/lib-decimal";
+import { createServer } from "src/app";
 import { Account } from "src/entities/Account";
 import { Tenant } from "src/entities/Tenant";
 import { TenantRole, User } from "src/entities/User";
@@ -41,14 +42,18 @@ export const tenantServiceServer = plugin((server) => {
     },
 
     getAllTenants: async ({ em }) => {
+      const server = await createServer();
+      server.logger.info("开始调用getAllTenants");
       const tenants = await em.find(Tenant, {});
+      server.logger.info("执行完毕:const tenants = await em.find(Tenant, {});");
       const userCount
         = await em.createQueryBuilder("User").select("tenant_id")
           .count().groupBy("tenant_id").orderBy({ tenant_id:"asc" }).execute("all");
       const accountCount
         = await em.createQueryBuilder("User").select("tenant_id")
           .count().groupBy("tenant_id").orderBy({ tenant_id: "asc" }).execute("all");
-      
+      server.logger.info("${${userCount}[0]}");
+      console.log("hhh");
       return [
         {
           totalCount: tenants.length,
