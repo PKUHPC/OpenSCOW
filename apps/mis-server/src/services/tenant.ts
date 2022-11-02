@@ -68,11 +68,6 @@ export const tenantServiceServer = plugin((server) => {
 
     createTenant: async ({ request, em }) => {
       const { name } = request;
-
-      const tenant = await em.findOne(Tenant, { name: name });
-      if (tenant) {
-        throw <ServiceError> { code: Status.ALREADY_EXISTS, details: "The tenant already exists" };
-      }
       // create tenant in database
       const newTenant = new Tenant({ name });
       try {
