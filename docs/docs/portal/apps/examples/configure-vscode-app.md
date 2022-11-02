@@ -1,17 +1,17 @@
 ---
 sidebar_position: 2
-title: 配置Web类应用
+title: 样例：VSCode配置
 ---
 
-# 配置Web类应用
+# 样例：VSCode配置
 
 ## 前提条件
 
 请确保在需要运行应用的计算节点上安装有需要的软件包。
 
-## 配置示例
+下面讲解使用[coder/code-server](https://github.com/coder/code-server)启动VSCode的配置。
 
-下面以使用[coder/code-server](https://github.com/coder/code-server)启动VSCode的配置为例来讲解如何配置一个服务器类应用。
+## 配置文件
 
 创建`config/apps`目录，在里面创建`vscode.yml`文件，其内容如下：
 
@@ -27,11 +27,6 @@ type: web
 
 # 指定反向代理类型
 proxyType: relative
-
-# slurm配置
-slurm:
-  options:
-     - "-x node[1-2]"
 
 # Web应用的配置
 web:
@@ -96,5 +91,3 @@ web:
 
 
 我们推荐将应用使用密码方式进行加密，所以一般在连接时需要将密码输入给应用。`path`, `query`的值和`formData`的值部分可以使用`{{ PASSWORD }}`代替应用在创建时生成的密码。
-
-
