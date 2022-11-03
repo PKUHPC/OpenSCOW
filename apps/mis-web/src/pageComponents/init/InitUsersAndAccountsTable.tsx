@@ -64,10 +64,13 @@ const UserTable: React.FC<DataTableProps<User>> = ({ data, loading, reload }) =>
             style={{ width: "100%" }}
             onSelect={
               async (value: number) => {
+                console.log(value);
                 await api.setPlatformRole({ body: {
                   userId: r.userId,
                   roleType: value,
                 } })
+                  .httpError(200, () => { message.error("用户已经是该角色"); })
+                  .httpError(404, () => { message.error("用户不存在"); })
                   .then(() => {
                     message.success("设置成功");
                     reload();
@@ -80,6 +83,8 @@ const UserTable: React.FC<DataTableProps<User>> = ({ data, loading, reload }) =>
                   userId: r.userId,
                   roleType: value,
                 } })
+                  .httpError(200, () => { message.error("用户已经不是该角色"); })
+                  .httpError(404, () => { message.error("用户不存在"); })
                   .then(() => {
                     message.success("取消成功");
                     reload();
@@ -107,6 +112,8 @@ const UserTable: React.FC<DataTableProps<User>> = ({ data, loading, reload }) =>
                   userId: r.userId,
                   roleType: value,
                 } })
+                  .httpError(200, () => { message.error("用户已经是该角色"); })
+                  .httpError(404, () => { message.error("用户不存在"); })
                   .then(() => {
                     message.success("设置成功");
                     reload();
@@ -119,6 +126,8 @@ const UserTable: React.FC<DataTableProps<User>> = ({ data, loading, reload }) =>
                   userId: r.userId,
                   roleType: value,
                 } })
+                  .httpError(200, () => { message.error("用户已经不是该角色"); })
+                  .httpError(404, () => { message.error("用户不存在"); })
                   .then(() => {
                     message.success("取消成功");
                     reload();
