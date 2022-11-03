@@ -1,10 +1,11 @@
-import { sshRawConnect } from "@scow/lib-ssh";
+import { asyncReplyStreamCall } from "@ddadaal/tsgrpc-client";
 import { contentType } from "mime-types";
 import { basename } from "path";
 import { authenticate } from "src/auth/server";
-import { runtimeConfig } from "src/utils/config";
+import { FileServiceClient } from "src/generated/portal/file";
+import { getClient } from "src/utils/client";
+import { pipeline } from "src/utils/pipeline";
 import { route } from "src/utils/route";
-import { getClusterLoginNode } from "src/utils/ssh";
 
 export interface DownloadFileSchema {
   method: "GET";
@@ -56,15 +57,7 @@ export default route<DownloadFileSchema>("DownloadFileSchema", async (req, res) 
 
   const { cluster, path, download } = req.query;
 
-  const host = getClusterLoginNode(cluster);
-
-  if (!host) {
-    return { 400: { code: "INVALID_CLUSTER" } };
-  }
-
-  const ssh = await sshRawConnect(host, info.identityId, runtimeConfig.ROOT_KEY_PAIR, req.log);
-
-  const sftp = await ssh.requestSFTP();
+  const client = getClient(FileServiceClient);
 
   const filename = basename(path).replace("\"", "\\\"");
   const dispositionParm = "filename* = UTF-8''" + encodeURIComponent(filename);
@@ -77,23 +70,18 @@ export default route<DownloadFileSchema>("DownloadFileSchema", async (req, res) 
     "Content-Disposition": `inline; ${dispositionParm}`,
   });
 
-  const stream = sftp.createReadStream(path);
+  const stream = asyncReplyStreamCall(client, "download", {
+    cluster, path, userId: info.identityId,
+  });
 
-  await new Promise<void>((resolve) => {
-    const end = () => {
-      ssh.dispose();
-      res.end();
-      resolve();
-    };
-
-    stream.on("error", (error) => {
-      res.status(500).send(new Error("Error reading file", { cause: error }));
-      end();
-    });
-    stream.on("end", end);
-
-    stream.pipe(res);
-
+  await pipeline(
+    stream.iter(),
+    async (x) => {
+      return x.chunk;
+    },
+    res,
+  ).finally(() => {
+    res.end();
   });
 });
 

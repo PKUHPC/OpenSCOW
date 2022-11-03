@@ -1,7 +1,10 @@
-import { sftpReaddir, sftpStat } from "@scow/lib-ssh";
+import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
+import { status } from "@grpc/grpc-js";
 import { authenticate } from "src/auth/server";
+import { FileInfo_FileType, FileServiceClient } from "src/generated/portal/file";
+import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
-import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
+import { handlegRPCError } from "src/utils/server";
 
 export type FileType = "file" | "dir";
 
@@ -31,8 +34,12 @@ export interface ListFileSchema {
 
 const auth = authenticate(() => true);
 
-export default route<ListFileSchema>("ListFileSchema", async (req, res) => {
+const mapType = {
+  [FileInfo_FileType.Dir]: "dir",
+  [FileInfo_FileType.File]: "file",
+} as const;
 
+export default route<ListFileSchema>("ListFileSchema", async (req, res) => {
 
 
   const info = await auth(req, res);
@@ -41,42 +48,17 @@ export default route<ListFileSchema>("ListFileSchema", async (req, res) => {
 
   const { cluster, path } = req.query;
 
-  const host = getClusterLoginNode(cluster);
+  const client = getClient(FileServiceClient);
 
-  if (!host) {
-    return { 400: { code: "INVALID_CLUSTER" } };
-  }
+  return asyncUnaryCall(client, "readDirectory", {
+    cluster, userId: info.identityId, path,
+  }).then(({ results }) => ({ 200: {
+    items: results.map(({ mode, mtime, name, size, type }) => ({
+      mode, mtime, name, size, type: mapType[type],
+    })) } }), handlegRPCError({
+    [status.NOT_FOUND]: () => ({ 400: { code: "INVALID_CLUSTER" as const } }),
+    [status.PERMISSION_DENIED]: () => ({ 403: { code: "NOT_ACCESSIBLE" as const } }),
+    [status.INVALID_ARGUMENT]: () => ({ 412: { code: "DIRECTORY_NOT_FOUND" as const } }),
+  }));
 
-  return await sshConnect(host, info.identityId, req.log, async (ssh) => {
-    const sftp = await ssh.requestSFTP();
-
-    try {
-      const stat = await sftpStat(sftp)(path);
-
-      if (!stat.isDirectory()) {
-        return { 412: { code: "DIRECTORY_NOT_FOUND" } } as const;
-      }
-
-      const files = await sftpReaddir(sftp)(path);
-
-      const list: FileInfo[] = [];
-
-      for (const file of files) {
-
-        const isDir = file.longname.startsWith("d");
-
-        list.push({
-          type: isDir ? "dir" : "file",
-          name: file.filename,
-          mtime: new Date(file.attrs.mtime * 1000).toISOString(),
-          size: file.attrs.size,
-          mode: file.attrs.mode,
-        });
-      }
-      return { 200: { items: list } };
-    } catch {
-      return { 403: { code: "NOT_ACCESSIBLE" } } as const;
-
-    }
-  });
 });

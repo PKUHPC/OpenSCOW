@@ -169,7 +169,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
           });
         })
         .then(() => {
-          message.error(`${operationText}成功！`);
+          message.success(`${operationText}成功！`);
         }).finally(() => {
           resetSelectedAndOperation();
           reload();
@@ -336,7 +336,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
         <Space wrap>
           {
             publicConfig.ENABLE_SHELL ? (
-              <Link href={`/shell/${cluster}${path}`} target="_blank">
+              <Link href={`/shell/${cluster}${path}`} target="_blank" legacyBehavior>
                 <Button icon={<MacCommandOutlined />}>
                   在终端中打开
                 </Button>
@@ -404,7 +404,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
           render={(_, r) => (
             r.type === "dir" ? (
               <Link href={join(urlPrefix, cluster, path, r.name)} passHref>
-                <a>{r.name}</a>
+                {r.name}
               </Link>
             ) : (
               <a onClick={() => {

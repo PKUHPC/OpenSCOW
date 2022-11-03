@@ -1,4 +1,3 @@
-import { AppConfigSchema } from "@scow/config/build/appConfig/app";
 import { GetServerSideProps, NextPage } from "next";
 import { requireAuth } from "src/auth/requireAuth";
 import { SSRProps } from "src/auth/server";
@@ -11,7 +10,7 @@ import { queryToString } from "src/utils/querystring";
 
 type Props = SSRProps<{
   appId: string;
-  config: AppConfigSchema;
+  appName: string;
 }, 400 | 404>;
 
 export const AppIndexPage: NextPage<Props> = requireAuth(() => true)((props: Props) => {
@@ -20,12 +19,12 @@ export const AppIndexPage: NextPage<Props> = requireAuth(() => true)((props: Pro
     return <UnifiedErrorPage code={props.error} />;
   }
 
-  const { config, appId } = props;
+  const { appName, appId } = props;
 
   return (
     <div>
-      <Head title={`启动${config.name}`} />
-      <PageTitle titleText={`启动${config.name}`} />
+      <Head title={`启动${appName}`} />
+      <PageTitle titleText={`启动${appName}`} />
       <LaunchAppForm appId={appId} />
     </div>
   );
@@ -44,7 +43,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ query }) =
   return {
     props: {
       appId,
-      config,
+      appName: config.name,
     },
   };
 };

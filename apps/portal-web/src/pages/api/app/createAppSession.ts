@@ -1,6 +1,10 @@
+import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
+import { status } from "@grpc/grpc-js";
 import { authenticate } from "src/auth/server";
-import { getClusterOps } from "src/clusterops";
+import { AppServiceClient } from "src/generated/portal/app";
+import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
+import { handlegRPCError } from "src/utils/server";
 
 export interface CreateAppSessionSchema {
   method: "POST";
@@ -42,32 +46,28 @@ const auth = authenticate(() => true);
 export default /* #__PURE__*/route<CreateAppSessionSchema>("CreateAppSessionSchema", async (req, res) => {
 
 
-
   const info = await auth(req, res);
 
   if (!info) { return; }
 
   const { appId, cluster, coreCount, partition, qos, account, maxTime } = req.body;
 
-  const clusterops = getClusterOps(cluster);
+  const client = getClient(AppServiceClient);
 
-  const reply = await clusterops.app.createApp({
+  return await asyncUnaryCall(client, "createAppSession", {
     appId,
+    cluster,
     userId: info.identityId,
     coreCount,
     account,
     maxTime,
     partition,
     qos,
-  }, req.log);
+  }).then((reply) => {
+    return { 200: { jobId: reply.jobId, sessionId: reply.sessionId } };
+  }, handlegRPCError({
+    [status.INTERNAL]: (e) => ({ 409: { code: "SBATCH_FAILED" as const, message: e.details } }),
+    [status.NOT_FOUND]: (e) => ({ 404: { code: "APP_NOT_FOUND" as const, message: e.details } }),
+  }));
 
-  if (reply.code === "SBATCH_FAILED") {
-    return { 409: { code: "SBATCH_FAILED", message: reply.message } };
-  }
-
-  if (reply.code === "APP_NOT_FOUND") {
-    return { 404: { code: "APP_NOT_FOUND" } };
-  }
-
-  return { 200: { jobId: reply.jobId, sessionId: reply.sessionId } };
 });

@@ -1,5 +1,4 @@
 import { join } from "path";
-import { fetch } from "undici";
 
 export interface Capabilities {
   createUser: boolean;

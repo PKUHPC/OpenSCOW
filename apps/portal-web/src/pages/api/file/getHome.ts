@@ -1,7 +1,10 @@
-import { sftpRealPath } from "@scow/lib-ssh";
+import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
+import { status } from "@grpc/grpc-js";
 import { authenticate } from "src/auth/server";
+import { FileServiceClient } from "src/generated/portal/file";
+import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
-import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
+import { handlegRPCError } from "src/utils/server";
 
 export interface GetHomeDirectorySchema {
   method: "GET";
@@ -26,19 +29,13 @@ export default route<GetHomeDirectorySchema>("GetHomeDirectorySchema", async (re
 
   const { cluster } = req.query;
 
-  const host = getClusterLoginNode(cluster);
+  const client = getClient(FileServiceClient);
 
-  if (!host) {
-    return { 400: { code: "INVALID_CLUSTER" } };
-  }
-
-  return await sshConnect(host, info.identityId, req.log, async (ssh) => {
-    const sftp = await ssh.requestSFTP();
-
-    const path = await sftpRealPath(sftp)(".");
-
-    return { 200: { path } };
-  });
+  return asyncUnaryCall(client, "getHomeDirectory", {
+    cluster, userId: info.identityId,
+  }).then(({ path }) => ({ 200: { path } }), handlegRPCError({
+    [status.NOT_FOUND]: () => ({ 400: { code: "INVALID_CLUSTER" as const } }),
+  }));
 
 
 });

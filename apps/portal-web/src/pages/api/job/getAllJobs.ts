@@ -1,6 +1,7 @@
+import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { authenticate } from "src/auth/server";
-import { getClusterOps } from "src/clusterops";
-import { JobInfo } from "src/clusterops/api/job";
+import { JobInfo, JobServiceClient } from "src/generated/portal/job";
+import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
 
 export interface GetAllJobsSchema {
@@ -34,14 +35,11 @@ export default route<GetAllJobsSchema>("GetAllJobsSchema", async (req, res) => {
 
   const { cluster, startTime, endTime } = req.query;
 
-  const clusterops = getClusterOps(cluster);
+  const client = getClient(JobServiceClient);
 
-  const reply = await clusterops.job.getAllJobsInfo({
-    userId: info.identityId,
-    endTime: new Date(endTime),
-    startTime: new Date(startTime),
-  }, req.log);
-
-  return { 200: { results: reply.jobs } };
+  return asyncUnaryCall(client, "listAllJobs", {
+    userId: info.identityId, cluster,
+    startTime, endTime,
+  }).then(({ results }) => ({ 200: { results } }));
 
 });

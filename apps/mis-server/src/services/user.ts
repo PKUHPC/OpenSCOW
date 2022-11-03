@@ -24,7 +24,6 @@ import {
   UserServiceService,
   UserStatus as PFUserStatus } from "src/generated/server/user";
 import { paginationProps } from "src/utils/orm";
-import { fetch } from "undici";
 
 export const userServiceServer = plugin((server) => {
 

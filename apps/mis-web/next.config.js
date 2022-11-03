@@ -1,5 +1,4 @@
 /* esslint-disable @typescript-eslint/no-var-requires */
-const withSvgr = require("@newhighsco/next-plugin-svgr");
 const withPlugins = require("next-compose-plugins");
 
 const analyze = process.env.ANALYZE === "true";
@@ -19,12 +18,6 @@ module.exports = async (phase) => {
   };
 
   return withPlugins([
-    [withSvgr, {
-      svgrOptions: {
-        // babel: false,
-        icon: true,
-      },
-    }],
     analyze ? [require("@next/bundle-analyzer")()] : undefined,
   ].filter((x) => x), config)(phase, { defaultConfig: {} });
 }

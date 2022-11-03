@@ -1,6 +1,7 @@
+import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { authenticate } from "src/auth/server";
-import { getClusterOps } from "src/clusterops";
-import { SavedJob } from "src/clusterops/api/job";
+import { JobServiceClient, JobTemplate } from "src/generated/portal/job";
+import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
 
 export interface GetSavedJobsSchema {
@@ -13,7 +14,7 @@ export interface GetSavedJobsSchema {
 
   responses: {
     200: {
-      results: SavedJob[];
+      results: JobTemplate[];
     }
 
     400: {
@@ -28,19 +29,16 @@ const auth = authenticate(() => true);
 
 export default route<GetSavedJobsSchema>("GetSavedJobsSchema", async (req, res) => {
 
-
   const info = await auth(req, res);
 
   if (!info) { return; }
 
   const { cluster } = req.query;
 
-  const clusterops = getClusterOps(cluster);
+  const client = getClient(JobServiceClient);
 
-  const reply = await clusterops.job.getSavedJobs({
-    userId: info.identityId,
-  }, req.log);
-
-  return { 200: { results: reply.results } };
+  return asyncUnaryCall(client, "listJobTemplates", {
+    userId: info.identityId, cluster,
+  }).then(({ results }) => ({ 200: { results } }));
 
 });

@@ -4,9 +4,9 @@ import { join } from "path";
 import React, { useCallback, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
-import { AppSession } from "src/clusterops/api/app";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
+import type { AppSession } from "src/generated/portal/app";
 import { ConnectTopAppLink } from "src/pageComponents/app/ConnectToAppLink";
 import { Cluster, publicConfig } from "src/utils/config";
 import { compareDateTime, formatDateTime } from "src/utils/datetime";
@@ -117,7 +117,7 @@ export const AppSessionsTable: React.FC<Props> = () => {
           initialValues={query}
           onFinish={async () => {
             setQuery({
-              ...await form.validateFields(),
+              ...(await form.validateFields()),
             });
           }}
         >

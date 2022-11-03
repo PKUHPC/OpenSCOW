@@ -7,7 +7,6 @@ const { getClusterTextsConfig } = require("@scow/config/build/appConfig/clusterT
 const { DEFAULT_PRIMARY_COLOR, getUiConfig } = require("@scow/config/build/appConfig/ui");
 const { PHASE_DEVELOPMENT_SERVER, PHASE_PRODUCTION_BUILD, PHASE_PRODUCTION_SERVER } = require("next/constants");
 const { join } = require("path");
-const { fetch } = require("undici");
 const { getCapabilities } = require("@scow/lib-auth");
 
 /**
@@ -95,6 +94,9 @@ const buildRuntimeConfig = async (phase) => {
 
     ACCOUNT_NAME_PATTERN: misConfig.accountNamePattern?.regex,
     ACCOUNT_NAME_PATTERN_MESSAGE: misConfig.accountNamePattern?.errorMessage,
+
+    USERID_PATTERN: misConfig.userIdPattern?.regex,
+    USERID_PATTERN_MESSAGE: misConfig.userIdPattern?.errorMessage,
 
     PORTAL_URL: config.PORTAL_DEPLOYED ? join(config.BASE_PATH, config.PORTAL_URL || misConfig.portalUrl || "") : undefined,
   };

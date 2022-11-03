@@ -3,9 +3,9 @@ import Link from "next/link";
 import React, { useCallback, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
-import type { SavedJob } from "src/clusterops/api/job";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
+import { JobTemplate } from "src/generated/portal/job";
 import type { Cluster } from "src/utils/config";
 import { publicConfig } from "src/utils/config";
 import { compareDateTime, formatDateTime } from "src/utils/datetime";
@@ -43,7 +43,7 @@ export const SavedJobsTable: React.FC<Props> = () => {
           initialValues={query}
           onFinish={async () => {
             setQuery({
-              ...await form.validateFields(),
+              ...(await form.validateFields()),
             });
           }}
         >
@@ -68,7 +68,7 @@ export const SavedJobsTable: React.FC<Props> = () => {
 };
 
 interface InfoTableProps {
-  data?: SavedJob[];
+  data?: JobTemplate[];
   isLoading: boolean;
   cluster: Cluster;
 }
@@ -85,20 +85,20 @@ const InfoTable: React.FC<InfoTableProps> = ({
       rowKey={(x) => x.jobName}
       scroll={{ x: true }}
     >
-      <Table.Column<SavedJob>
+      <Table.Column<JobTemplate>
         dataIndex="jobName"
         title="作业名"
         sorter={(a, b) => a.jobName.localeCompare(b.jobName)}
       />
-      <Table.Column<SavedJob>
+      <Table.Column<JobTemplate>
         dataIndex="submitTime"
         title="提交时间"
         render={(v) => formatDateTime(v)}
         sorter={(a, b) => (a.submitTime && b.submitTime) ? compareDateTime(a.submitTime, b.submitTime) : 0}
         defaultSortOrder="descend"
       />
-      <Table.Column<SavedJob> dataIndex="comment" title="备注" />
-      <Table.Column<SavedJob>
+      <Table.Column<JobTemplate> dataIndex="comment" title="备注" />
+      <Table.Column<JobTemplate>
         title="更多"
         render={(_, r) => (
           <Space>

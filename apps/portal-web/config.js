@@ -10,9 +10,6 @@ const { DEFAULT_PRIMARY_COLOR, getUiConfig } = require("@scow/config/build/appCo
 const { getPortalConfig } = require("@scow/config/build/appConfig/portal");
 const { getAppConfigs } = require("@scow/config/build/appConfig/app");
 const { getClusterConfigs } = require("@scow/config/build/appConfig/cluster");
-const { getKeyPair, testRootUserSshLogin } = require("@scow/lib-ssh");
-const pino = require("pino");
-const os = require("os");
 
 /**
  * Get auth capabilities
@@ -42,6 +39,10 @@ const specs = {
 
   PROXY_BASE_PATH: str({ desc: "网关的代理路径。相对于整个系统的base path。", default: "/proxy" }),
 
+  SERVER_URL: str({ desc: "门户后端的路径", default: "portal-server:5000" }),
+
+  MOCK_USER_ID: str({ desc: "开发和测试的时候所使用的user id", default: undefined }),
+
   MIS_DEPLOYED: bool({ desc: "是否部署了管理系统", default: false }),
   MIS_URL: str({ desc: "如果部署了管理系统，设置URL或者路径。相对于整个系统的base path。将会覆盖配置文件。空字符串等价于未部署管理系统", default: "" }),
 };
@@ -50,8 +51,6 @@ const specs = {
 const config = { _specs: specs };
 
 const buildRuntimeConfig = async (phase) => {
-
-  const logger = pino.default();
 
   const building = phase === PHASE_PRODUCTION_BUILD;
   const dev = phase === PHASE_DEVELOPMENT_SERVER;
@@ -81,39 +80,20 @@ const buildRuntimeConfig = async (phase) => {
   const uiConfig = getUiConfig(configPath);
   const portalConfig = getPortalConfig(configPath);
 
-  const keyPair = getKeyPair(config.SSH_PRIVATE_KEY_PATH, config.SSH_PUBLIC_KEY_PATH);
-
-  // test if the root user can ssh to login nodes
-  if (production) {
-    await Promise.all(Object.values(clusters).map(async ({ displayName, slurm: { loginNodes } }) => {
-      const node = loginNodes[0];
-      logger.info("Checking if root can login to %s by login node %s", displayName, node)
-      const error = await testRootUserSshLogin(node, keyPair, logger);
-      if (error) {
-        logger.info("Root cannot login to %s by login node %s. err: %o", displayName, node, error)
-        throw error;
-      } else {
-        logger.info("Root can login to %s by login node %s", displayName, node)
-      }
-    }));
-  }
-
   /**
    * @type {import("./src/utils/config").ServerRuntimeConfig}
    */
   const serverRuntimeConfig = {
     BASE_PATH: config.BASE_PATH,
     AUTH_INTERNAL_URL: config.AUTH_INTERNAL_URL,
-    SSH_PRIVATE_KEY_PATH: config.SSH_PRIVATE_KEY_PATH,
-    ROOT_KEY_PAIR: keyPair,
     CLUSTERS_CONFIG: clusters,
     PORTAL_CONFIG: portalConfig,
     DEFAULT_PRIMARY_COLOR,
     APPS: apps,
-    // use os username in test
-    MOCK_USER_ID: process.env.NODE_ENV === "test" ? "test" : undefined,
+    MOCK_USER_ID: config.MOCK_USER_ID,
     UI_CONFIG: uiConfig,
     LOGIN_NODES: parseKeyValue(config.LOGIN_NODES),
+    SERVER_URL: config.SERVER_URL,
   };
 
   // query auth capabilities to set optional auth features
@@ -144,7 +124,11 @@ const buildRuntimeConfig = async (phase) => {
     DEFAULT_HOME_TITLE: portalConfig.homeTitle.defaultText,
     HOME_TITLES: portalConfig.homeTitle.hostnameMap,
 
-    CLUSTERS_CONFIG: clusters,
+    CLUSTERS_CONFIG: Object.entries(clusters).reduce((prev, [name, config]) => {
+      prev[name] = { displayName: config.displayName, slurm: { partitions: config.slurm.partitions } }
+      return prev;
+    }, {}),
+
     CLUSTERS: Object.entries(clusters).map(([id, { displayName }]) => ({ id, name: displayName })),
 
     APPS: Object.entries(apps).map(([id, { name }]) => ({ id, name })),

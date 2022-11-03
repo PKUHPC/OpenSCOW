@@ -179,7 +179,7 @@ ldap:
     #   key: value
 ```
 
-增加好配置后，运行`docker compose restart`重启系统即可。
+增加好配置后，运行`./compose.sh restart`重启系统即可。
 
 ## LDAP快速配置脚本
 

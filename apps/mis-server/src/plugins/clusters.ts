@@ -56,6 +56,10 @@ export const clustersPlugin = plugin(async (f) => {
     return prev;
   }, {} as Record<string, { ops: ClusterOps, ignore: boolean } >);
 
+  for (const ops of Object.values(opsForClusters).filter((x) => !x.ignore).map((x) => x.ops)) {
+    await ops.onStartup();
+  }
+
   const getClusterOps = (cluster: string) => {
     return opsForClusters[cluster];
   };

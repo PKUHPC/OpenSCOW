@@ -1,6 +1,7 @@
+import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { authenticate } from "src/auth/server";
-import { getClusterOps } from "src/clusterops";
-import { AppSession } from "src/clusterops/api/app";
+import { AppServiceClient, AppSession } from "src/generated/portal/app";
+import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
 
 export interface GetAppSessionsSchema {
@@ -22,16 +23,18 @@ const auth = authenticate(() => true);
 export default /* #__PURE__*/route<GetAppSessionsSchema>("GetAppSessionsSchema", async (req, res) => {
 
 
-
   const info = await auth(req, res);
 
   if (!info) { return; }
 
   const { cluster } = req.query;
 
-  const clusterops = getClusterOps(cluster);
+  const client = getClient(AppServiceClient);
 
-  const reply = await clusterops.app.getAppSessions({ userId: info.identityId }, req.log);
+  return asyncUnaryCall(client, "listAppSessions", {
+    cluster, userId: info.identityId,
+  }).then((reply) => {
+    return { 200: { sessions: reply.sessions } };
+  });
 
-  return { 200: { sessions: reply.sessions } };
 });

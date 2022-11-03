@@ -1,6 +1,10 @@
+import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
+import { status } from "@grpc/grpc-js";
 import { authenticate } from "src/auth/server";
+import { FileServiceClient } from "src/generated/portal/file";
+import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
-import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
+import { handlegRPCError } from "src/utils/server";
 
 export interface CopyFileItemSchema {
   method: "PATCH";
@@ -26,31 +30,18 @@ const auth = authenticate(() => true);
 
 export default route<CopyFileItemSchema>("CopyFileItemSchema", async (req, res) => {
 
-
-
   const info = await auth(req, res);
 
   if (!info) { return; }
 
   const { cluster, fromPath, toPath } = req.body;
 
-  const host = getClusterLoginNode(cluster);
+  const client = getClient(FileServiceClient);
 
-  if (!host) {
-    return { 400: { code: "INVALID_CLUSTER" } };
-  }
-
-  return await sshConnect(host, info.identityId, req.log, async (ssh) => {
-    // the SFTPWrapper doesn't supprt copy
-    // Use command to do it
-    const resp = await ssh.exec("cp", ["-r", fromPath, toPath], { stream: "both" });
-
-    if (resp.code !== 0) {
-      return { 415: { code: "CP_CMD_FAILED", error: resp.stderr } };
-    }
-
-    return { 204: null };
-  });
-
-
+  return asyncUnaryCall(client, "copy", {
+    cluster, fromPath, toPath, userId: info.identityId,
+  }).then(() => ({ 204: null }), handlegRPCError({
+    [status.INTERNAL]: (e) => ({ 415: { code: "CP_CMD_FAILED" as const, error: e.details } }),
+    [status.NOT_FOUND]: () => ({ 400: { code: "INVALID_CLUSTER" as const } }),
+  }));
 });

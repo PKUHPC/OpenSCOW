@@ -1,0 +1,124 @@
+syntax = "proto3";
+
+package scow.portal;
+
+import "google/protobuf/timestamp.proto";
+import "common/job.proto";
+
+message CancelJobRequest {
+  string user_id = 1;
+  string cluster = 2;
+  uint32 job_id = 3;
+}
+
+// NOT_FOUND: cluster is not found
+message CancelJobResponse {}
+
+message ListAccountsRequest {
+  string user_id = 1;
+  string cluster = 2;
+}
+
+message ListAccountsResponse { repeated string accounts = 1; }
+
+message ListAllJobsRequest {
+  string user_id = 1;
+  string cluster = 2;
+
+  google.protobuf.Timestamp start_time = 3;
+  google.protobuf.Timestamp end_time = 4;
+}
+
+message JobInfo {
+  uint32 job_id = 1;
+  string name = 2;
+  string account = 3;
+  string partition = 4;
+  string qos = 5;
+  string state = 6;
+  string working_directory = 7;
+  string reason = 8;
+  string elapsed = 9;
+  string time_limit = 10;
+  string submit_time = 11;
+}
+
+message NewJobInfo {
+  string job_name = 1;
+  string account = 2;
+  optional string partition = 3;
+  optional string qos = 4;
+  uint32 node_count = 5;
+  uint32 core_count = 6;
+  uint32 max_time = 7; // in minutes
+  string command = 8;
+  string working_directory = 9;
+  optional string comment = 10;
+}
+
+message ListAllJobsResponse { repeated JobInfo results = 1; }
+
+message ListRunningJobsRequest {
+  string user_id = 1;
+  string cluster = 2;
+}
+
+message ListRunningJobsResponse { repeated common.job.RunningJob results = 1; }
+
+message ListJobTemplatesRequest {
+  string user_id = 1;
+  string cluster = 2;
+}
+
+message JobTemplate {
+  string id = 1;
+  string job_name = 2;
+  google.protobuf.Timestamp submit_time = 3;
+  optional string comment = 4;
+}
+
+message ListJobTemplatesResponse { repeated JobTemplate results = 1; }
+
+message GetJobTemplateRequest {
+  string user_id = 1;
+  string cluster = 2;
+  string template_id = 3;
+}
+
+message GetJobTemplateResponse { NewJobInfo job_info = 1; }
+message SubmitJobRequest {
+  string user_id = 1;
+  string cluster = 2;
+  optional string partition = 3;
+  uint32 node_count = 4;
+  uint32 core_count = 5;
+  string command = 6;
+  string job_name = 7;
+  optional string qos = 8;
+  uint32 max_time = 9; // in minutes
+  string account = 10;
+  string working_directory = 11;
+  optional string comment = 12;
+  bool save_as_template = 13;
+}
+
+// NOT_FOUND: cluster is not found
+// INTERNAL: sbatch failed. details has output
+message SubmitJobResponse { uint32 job_id = 1; }
+
+service JobService {
+  rpc CancelJob(CancelJobRequest) returns (CancelJobResponse);
+
+  rpc ListAccounts(ListAccountsRequest) returns (ListAccountsResponse);
+
+  rpc ListAllJobs(ListAllJobsRequest) returns (ListAllJobsResponse);
+
+  rpc ListRunningJobs(ListRunningJobsRequest) returns (ListRunningJobsResponse);
+
+  rpc ListJobTemplates(ListJobTemplatesRequest)
+      returns (ListJobTemplatesResponse);
+
+  rpc GetJobTemplate(GetJobTemplateRequest) returns (GetJobTemplateResponse);
+
+  rpc SubmitJob(SubmitJobRequest) returns (SubmitJobResponse);
+}

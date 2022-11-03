@@ -1,7 +1,7 @@
 import { JsonFetchResultPromiseLike } from "@ddadaal/next-typed-api-routes-runtime/lib/client";
 import { api } from "src/apis/api";
-import { JobInfo } from "src/clusterops/api/job";
 import type { RunningJob } from "src/generated/common/job";
+import { JobInfo } from "src/generated/portal/job";
 
 export type MockApi<TApi extends Record<
   string,
@@ -34,14 +34,14 @@ export const runningJob: RunningJob = {
 };
 
 export const job: JobInfo = {
-  jobId: "123",
+  jobId: 123,
   account: "123",
   name: "123",
   partition: "123",
   qos: "123",
   state: "PENDING",
   timeLimit: "NOT_SET",
-  workingDir: "/home/ddadaal/Code",
+  workingDirectory: "/home/ddadaal/Code",
   elapsed: "00:00:00",
   reason: "None",
   submitTime: "2022-07-07T09:21:42",

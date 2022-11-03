@@ -1,6 +1,10 @@
+import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
+import { status } from "@grpc/grpc-js";
 import { authenticate } from "src/auth/server";
-import { getClusterOps } from "src/clusterops";
+import { JobServiceClient } from "src/generated/portal/job";
+import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
+import { handlegRPCError } from "src/utils/server";
 
 export interface CancelJobSchema {
   method: "DELETE";
@@ -12,7 +16,7 @@ export interface CancelJobSchema {
 
   responses: {
     204: null;
-    404: null;
+    404: { code: "JOB_NOT_FOUND" };
   }
 }
 
@@ -20,22 +24,17 @@ const auth = authenticate(() => true);
 
 export default /* #__PURE__*/route<CancelJobSchema>("CancelJobSchema", async (req, res) => {
 
-
-
   const info = await auth(req, res);
 
   if (!info) { return; }
 
   const { cluster, jobId } = req.body;
 
-  const clusterops = getClusterOps(cluster);
+  const client = getClient(JobServiceClient);
 
-  const reply = await clusterops.job.cancelJob({
-    jobId,
-    userId: info.identityId,
-  }, req.log);
-
-
-  if (reply.code === "NOT_FOUND") { return { 404: null }; }
-  return { 204: null };
+  return asyncUnaryCall(client, "cancelJob", {
+    jobId, userId: info.identityId, cluster,
+  }).then(() => ({ 204: null }), handlegRPCError({
+    [status.NOT_FOUND]: () => ({ 404: { code: "JOB_NOT_FOUND" } } as const),
+  }));
 });

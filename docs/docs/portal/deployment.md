@@ -7,29 +7,35 @@ title: 部署
 
 本节介绍如何部署门户系统。
 
-## 修改.env文件
+## 修改config.py文件
 
-修改部署路径下的.env文件
+修改部署路径下的config.py文件
 
-```env
-# 确保COMPOSE_PROFILES中包括portal
-# COMPOSE_PROFILES=portal
-COMPOSE_PROFILES=mis,portal
-
-PORTAL_DEPLOYED=true
+```python
+#确保门户系统会部署，即PORTAL不能配置为False
 
 # 如果本项目将会部署在域名的根目录下，按如下设置这两个变量
-PORTAL_BASE_PATH=/
-PORTAL_IMAGE_POSTFIX=root
+PORTAL = {
+  "BASE_PATH": "/",
+  "IMAGE_POSTFIX": "root"
+}
 
 # 如果将会部署在`/portal`路径下，按如下设置这两个变量
-PORTAL_BASE_PATH=/portal
-PORTAL_IMAGE_POSTFIX=root
+PORTAL = {
+  "BASE_PATH": "/portal",
+  "IMAGE_POSTFIX": "root"
+}
+
+# PORTAL.BASE_PATH若不设置，将会取其默认值"/"
+PORTAL = {
+  "IMAGE_POSTFIX": "root",
+  # ...
+}
 ```
 
 :::tip
 
-如果想自定义系统部署的相对路径，或者了解`PORTAL_BASE_PATH`的含义，请参考[自定义相对路径](../common/customization/basepath.md)。
+如果想自定义系统部署的相对路径，或者了解`PORTAL.BASE_PATH`的含义，请参考[自定义相对路径](../common/customization/basepath.md)。
 
 :::
 
@@ -98,4 +104,4 @@ shell: true
 
 ## 启动服务
 
-运行`docker compose up -d`启动门户系统。
+运行`./compose.sh up -d`启动门户系统。

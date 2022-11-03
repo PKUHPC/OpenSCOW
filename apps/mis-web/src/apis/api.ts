@@ -11,6 +11,7 @@ import type { SetFetchStateSchema } from "src/pages/api/admin/fetchJobs/setFetch
 import type { TenantFinancePaySchema } from "src/pages/api/admin/finance/pay";
 import type { GetTenantPaymentsSchema } from "src/pages/api/admin/finance/payments";
 import type { GetAllUsersSchema } from "src/pages/api/admin/getAllUsers";
+import type { GetClusterUsersSchema } from "src/pages/api/admin/getClusterUsers";
 import type { GetTenantUsersSchema } from "src/pages/api/admin/getTenantUsers";
 import type { ImportUsersSchema } from "src/pages/api/admin/importUsers";
 import type { QueryStorageQuotaSchema } from "src/pages/api/admin/queryStorageQuota";
@@ -69,6 +70,7 @@ export const api = {
   tenantFinancePay: fromApi<TenantFinancePaySchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin/finance/pay")),
   getTenantPayments: fromApi<GetTenantPaymentsSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin/finance/payments")),
   getAllUsers: fromApi<GetAllUsersSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin/getAllUsers")),
+  getClusterUsers: fromApi<GetClusterUsersSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin/getClusterUsers")),
   getTenantUsers: fromApi<GetTenantUsersSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin/getTenantUsers")),
   importUsers: fromApi<ImportUsersSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin/importUsers")),
   queryStorageQuota: fromApi<QueryStorageQuotaSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin/queryStorageQuota")),

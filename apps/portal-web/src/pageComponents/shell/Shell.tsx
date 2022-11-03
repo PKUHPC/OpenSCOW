@@ -72,11 +72,13 @@ export const Shell: React.FC<Props> = ({ user, cluster, path }) => {
           socket.emit("resize", { cols, rows });
         });
 
-        socket.on("data", (data) => {
-          term.write(data);
+        socket.on("data", (data: ArrayBuffer) => {
+          console.log("received data", typeof data, data, data.toString());
+          term.write(Buffer.from(data));
         });
 
         socket.on("exit", (e: { exitCode: number, signal?: number }) => {
+          socket.disconnect();
           term.write(`Process exited with code ${e.exitCode}.`);
         });
 

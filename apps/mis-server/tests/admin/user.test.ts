@@ -1,3 +1,5 @@
+import "tests/data/fetch";
+
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Server } from "@ddadaal/tsgrpc-server";
 import { ChannelCredentials } from "@grpc/grpc-js";
@@ -11,8 +13,6 @@ import { PlatformRole, TenantRole, UserServiceClient } from "src/generated/serve
 import { reloadEntity } from "src/utils/orm";
 import { insertInitialData } from "tests/data/data";
 import { dropDatabase } from "tests/data/helpers";
-import { fetch } from "undici";
-
 
 const anotherTenant = "anotherTenant";
 
@@ -153,10 +153,10 @@ it("get all users", async () => {
   });
 
   expect(users.totalCount).toBe(3);
-  expect(users.platformUsers.map((x) => ({ 
-    userId: x.userId, 
-    name: x.name, 
-    createTime: x.createTime, 
+  expect(users.platformUsers.map((x) => ({
+    userId: x.userId,
+    name: x.name,
+    createTime: x.createTime,
     platformRoles: x.platformRoles,
   }))).toIncludeSameMembers([
     {

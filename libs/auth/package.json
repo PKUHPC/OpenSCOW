@@ -10,9 +10,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "undici": "5.11.0"
-  },
+  "dependencies": {},
   "devDependencies": {
     "ts-log": "2.2.5"
   },
