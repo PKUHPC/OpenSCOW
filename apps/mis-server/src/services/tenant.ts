@@ -41,25 +41,21 @@ export const tenantServiceServer = plugin((server) => {
     },
 
     getAllTenants: async ({ em }) => {
-      // const server = await createServer();
-      // server.logger.info("开始调用getAllTenants");
       const tenants = await em.find(Tenant, {});
-      // server.logger.info("执行完毕:const tenants = await em.find(Tenant, {});");
-      const userCount
-        = await em.createQueryBuilder("User").select("tenant_id")
-          .count().groupBy("tenant_id").orderBy({ tenant_id:"asc" }).execute("all");
-      const accountCount
-        = await em.createQueryBuilder("User").select("tenant_id")
-          .count().groupBy("tenant_id").orderBy({ tenant_id: "asc" }).execute("all");
-      // server.logger.info("hhh");
+      const userCount :{ tenantId: string; count: number }[]
+        = await em.createQueryBuilder(User).select("tenant_id")
+          .count().groupBy("tenant_id").execute("all");
+      const accountCount:{ tenantId: string; count: number }[]
+        = await em.createQueryBuilder(Account).select("tenant_id")
+          .count().groupBy("tenant_id").execute("all");
       return [
         {
           totalCount: tenants.length,
           platformTenants: tenants.map((x) => ({
             tenantId:x.id,
             tenantName: x.name,
-            userCount: userCount[x.id - 1].count,
-            accountCount: accountCount[x.id - 1].count,
+            userCount: userCount.find((t) => t.tenantId === x.name)!.count,
+            accountCount: accountCount.find((A) => A.tenantId === x.name)!.count,
             balance:decimalToMoney(x.balance),
           })),
         }];
