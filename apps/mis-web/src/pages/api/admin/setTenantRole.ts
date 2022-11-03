@@ -5,6 +5,7 @@ import { authenticate } from "src/auth/server";
 import { UserServiceClient } from "src/generated/server/user";
 import { TenantRole } from "src/models/User";
 import { getClient } from "src/utils/client";
+import { queryIfInitialized } from "src/utils/init";
 import { handlegRPCError } from "src/utils/server";
 
 
@@ -26,13 +27,14 @@ export interface SetTenantRoleSchema {
 
 export default route<SetTenantRoleSchema>("SetTenantRoleSchema", async (req, res) => {
   const { userId, roleType } = req.body;
-
-  const auth = authenticate((u) => 
-    u.tenantRoles.includes(TenantRole.TENANT_ADMIN));
   
-  const info = await auth(req, res);
+  if (await queryIfInitialized()) {
+    const auth = authenticate((u) => 
+      u.tenantRoles.includes(TenantRole.TENANT_ADMIN));
+    const info = await auth(req, res);
+    if (!info) { return; }
+  }
 
-  if (!info) { return; }
 
   const client = getClient(UserServiceClient);
 
