@@ -169,12 +169,12 @@ example:
 query timelimit of job 4300: ./slurm -t 4300
 "
 
+
 mysql="mysql -uroot -p$MYSQL_PASSWORD"
 basePartition=($BASE_PARTITIONS)
 base_qos=`sacctmgr -n show qos format=Name | tr '\n' ',' | sed s/[[:space:]]//g`
 base_qos=${base_qos%?}
 default_qos="normal"
-allPartition=("compute")
 assoc_table=${CLUSTER_NAME}_assoc_table
 
 addUser() #abandon !!!!!2017-09-24
@@ -307,7 +307,10 @@ delAcct(){ ## attention: ensure this account is not any user's default account
             do
                 user_acct=`$mysql --skip-column-names slurm_acct_db -e "select acct from $assoc_table where user='$line' and deleted=0" | sort -u | sed "s/^$2$//g"`
                 if [ "$user_acct" == "" ] ; then  ## users that only have an account, we should delete these users before delete account
-                    /root/HPCSH/slurm -v $line
+                    # delete user
+                    sacctmgr -i delete user name=$line
+                    ## delete ralated null account
+                    acct=`$mysql --skip-column-names slurm_acct_db -e "select DISTINCT acct from $assoc_table where user='$line' and deleted=0"`
                 else
                     choose=`echo $user_acct | awk {'print $1'}`
              #       echo "choose="$choose
@@ -348,7 +351,10 @@ delFromAcct(){   #####2017-08-31   not rewrite it
                 user_acct=`$mysql --skip-column-names slurm_acct_db -e "select acct from $assoc_table where user='$1' and deleted=0" | sort -u | sed "s/^$acct$//g"`
                 if [ "$user_acct" = "" ] ; then ## user only has one account, that's $2=acct
                     echo "here only one account!"
-                    /root/HPCSH/slurm -v $1
+                    # delete user
+                    sacctmgr -i delete user name=$1
+                    ## delete ralated null account
+                    acct=`$mysql --skip-column-names slurm_acct_db -e "select DISTINCT acct from $assoc_table where user='$1' and deleted=0"`
                 else
                     choose=`echo $user_acct | awk {'print $1'}`
                     #wrong if the default account is not $2 , user's default account shouldn't change
