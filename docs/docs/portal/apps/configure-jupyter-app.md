@@ -1,5 +1,5 @@
 ---
-sidebar_position: 2
+sidebar_position: 3
 title: Jupyter
 ---
 
@@ -7,16 +7,15 @@ title: Jupyter
 
 ## 前提条件
 
-请确保在需要运行应用的计算节点上安装有需要的软件包。
+请确保在需要运行应用的计算节点上安装有Jupyter Notebook。
 
-下面讲解如何配置Jupyter交互式应用。
+下面讲解如何配置使用Jupyter。
 
 ## 配置文件
 
 创建`config/apps`目录，在里面创建`jupyter.yml`文件，其内容如下：
 
 ```yaml title="config/apps/jupyter.yml"
-```jsx
 # 这个应用的ID
 id: jupyter
 
