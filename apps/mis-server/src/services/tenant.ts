@@ -1,7 +1,7 @@
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError, status } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
-import { t, UniqueConstraintViolationException } from "@mikro-orm/core";
+import { UniqueConstraintViolationException } from "@mikro-orm/core";
 import { decimalToMoney } from "@scow/lib-decimal";
 import { Account } from "src/entities/Account";
 import { Tenant } from "src/entities/Tenant";
@@ -46,25 +46,6 @@ export const tenantServiceServer = plugin((server) => {
         .execute("select tenant_id, count(*) as count from user group by tenant_id");
       const accountCount = await em.getConnection()
         .execute("select tenant_id, count(*) as count from user group by tenant_id");
-      // console.log(userCount);
-      // userCount.find((x) => {
-      //   console.log(x);
-      //   x.tenant_id === 1;
-      // });
-      server.logger.info("test userCount");
-      userCount.map((x) => {
-        server.logger.info(x);
-        server.logger.info(x.tenant_id, x.count);
-      });
-
-      server.logger.info("test tenants");
-      tenants.map((x) => {
-        server.logger.info(x);
-        server.logger.info(x.id);
-        const g = userCount.find((t) => t.tenant_id === x.id);
-        console.log(g);
-      });
-
       return [
         {
           totalCount: tenants.length,
@@ -72,11 +53,8 @@ export const tenantServiceServer = plugin((server) => {
             tenantId:x.id,
             tenantName: x.name,
             // 初始创建租户时，其中无账户和用户
-
             userCount: userCount.find((t) => t.tenant_id === x.id)?.count ?? 0,
             accountCount: accountCount.find((t) => t.tenant_id === x.id)?.count ?? 0,
-            // userCount: 0,
-            // accountCount: 0,
             balance:decimalToMoney(x.balance),
           })),
         }];
@@ -84,6 +62,7 @@ export const tenantServiceServer = plugin((server) => {
 
     createTenant: async ({ request, em }) => {
       const { name } = request;
+      server.logger.info(`start to create tenant: ${name} `);
       // create tenant in database
       const newTenant = new Tenant({ name });
       try {
@@ -95,9 +74,8 @@ export const tenantServiceServer = plugin((server) => {
           throw e;
         }
       }
-      return;
+      return [{}];
     },
-
   });
 
 });

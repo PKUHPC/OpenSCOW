@@ -3,7 +3,6 @@ import { Server } from "@ddadaal/tsgrpc-server";
 import { ChannelCredentials } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { decimalToMoney } from "@scow/lib-decimal";
-import { exit } from "process";
 import { createServer } from "src/app";
 import { Tenant } from "src/entities/Tenant";
 import { TenantServiceClient } from "src/generated/server/tenant";
@@ -60,15 +59,18 @@ it("get all tenants", async () => {
     
 });
 
-// it("cannot create a tenant if the name exists", async () => {
-//   const reply = await asyncClientCall(client, "createTenant", { name: "teanant" }).catch((e) => e);
-//   expect(reply.code).tobe(Status.ALREADY_EXISTS);
-// });
+it("cannot create a tenant if the name exists", async () => {
+  const tenant = new Tenant({ name: "tenant" });
+  await server.ext.orm.em.fork().persistAndFlush(tenant);
 
-// it("create a new tenant", async () => {
-//   const reply = await asyncClientCall(client, "createTenant", { name: "teanantTest" });
-//   expect(reply).toBe(null);
-//   const em = server.ext.orm.em.fork();
-//   const tenant = await em.findOneOrFail(Tenant, { name: "tenantTest" });
-//   expect(tenant.name).tobe("tenantTest");
-// });
+  const reply = await asyncClientCall(client, "createTenant", { name: "tenant" }).catch((e) => e);
+  console.log(reply);
+  expect(reply.code).toBe(Status.ALREADY_EXISTS);
+});
+
+it("create a new tenant", async () => {
+  await asyncClientCall(client, "createTenant", { name: "tenantTest" });
+  const em = server.ext.orm.em.fork();
+  const tenant = await em.findOneOrFail(Tenant, { name: "tenantTest" });
+  expect(tenant.name).toBe("tenantTest");
+});
