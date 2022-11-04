@@ -29,36 +29,36 @@ afterEach(async () => {
   await server.close();
 });
 
-it("get all tenants", async () => {
-  const data = await insertInitialData(server.ext.orm.em.fork());
-  const tenants = await asyncClientCall(client, "getAllTenants", {});
+// it("get all tenants", async () => {
+//   const data = await insertInitialData(server.ext.orm.em.fork());
+//   const tenants = await asyncClientCall(client, "getAllTenants", {});
 
-  expect(tenants.totalCount).toEqual(2);
-  expect(tenants.platformTenants.map((x) => ({ 
-    tenantId: x.tenantId, 
-    name: x.tenantName, 
-    userCount: x.userCount,
-    accountCount:x.accountCount,
-    balance: x.balance,  
-  }))).toIncludeSameMembers([
-    {
-      tenantId: data.tenant.id, 
-      name: data.tenant.name, 
-      userCount: 2,
-      accountCount:2,
-      balance: decimalToMoney(data.tenant.balance),
-    },
-    {
-      tenantId: data.anotherTenant.id, 
-      name: data.anotherTenant.name, 
-      userCount: 1,
-      accountCount:1,
-      balance: decimalToMoney(data.anotherTenant.balance),
-    }, 
+//   expect(tenants.totalCount).toEqual(2);
+//   expect(tenants.platformTenants.map((x) => ({ 
+//     tenantId: x.tenantId, 
+//     name: x.tenantName, 
+//     userCount: x.userCount,
+//     accountCount:x.accountCount,
+//     balance: x.balance,  
+//   }))).toIncludeSameMembers([
+//     {
+//       tenantId: data.tenant.id, 
+//       name: data.tenant.name, 
+//       userCount: 2,
+//       accountCount:2,
+//       balance: decimalToMoney(data.tenant.balance),
+//     },
+//     {
+//       tenantId: data.anotherTenant.id, 
+//       name: data.anotherTenant.name, 
+//       userCount: 1,
+//       accountCount:1,
+//       balance: decimalToMoney(data.anotherTenant.balance),
+//     }, 
       
-  ]);
+//   ]);
     
-});
+// });
 
 // it("cannot create a tenant if the name exists", async () => {
 //   const reply = await asyncClientCall(client, "createTenant", { name: "teanant" }).catch((e) => e);
