@@ -42,20 +42,21 @@ export const tenantServiceServer = plugin((server) => {
 
     getAllTenants: async ({ em }) => {
       const tenants = await em.find(Tenant, {});
-
-      console.log("aaa");
       const userCount = await em.getConnection()
         .execute("select tenant_id, count(*) as count from user group by tenant_id");
       const accountCount = await em.getConnection()
         .execute("select tenant_id, count(*) as count from user group by tenant_id");
+      console.log(userCount);
+      const a = await em.createQueryBuilder(User).count();
+      a;
       return [
         {
           totalCount: tenants.length,
           platformTenants: tenants.map((x) => ({
             tenantId:x.id,
             tenantName: x.name,
-            userCount: userCount.find((t) => t.tenant_id === x.id)!.count,
-            accountCount: accountCount.find((t) => t.tenant_id === x.id)!.count,
+            userCount: userCount.find((t) => t.tenant_id === x.id)!.count || 0,
+            accountCount: accountCount.find((t) => t.tenant_id === x.id)!.count || 0,
             balance:decimalToMoney(x.balance),
           })),
         }];
