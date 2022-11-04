@@ -51,6 +51,20 @@ export const tenantServiceServer = plugin((server) => {
       //   console.log(x);
       //   x.tenant_id === 1;
       // });
+      server.logger.info("test userCount");
+      userCount.map((x) => {
+        server.logger.info(x);
+        server.logger.info(x.tenant_id, x.count);
+      });
+
+      server.logger.info("test tenants");
+      tenants.map((x) => {
+        server.logger.info(x);
+        server.logger.info(x.id);
+        const g = userCount.find((t) => t.tenant_id === x.id);
+        console.log(g);
+      });
+
       return [
         {
           totalCount: tenants.length,
@@ -59,10 +73,10 @@ export const tenantServiceServer = plugin((server) => {
             tenantName: x.name,
             // 初始创建租户时，其中无账户和用户
 
-            // userCount: userCount.find((t) => t.tenant_id === x.id)?.count ?? 0,
-            // accountCount: accountCount.find((t) => t.tenant_id === x.id)?.count ?? 0,
-            userCount: 0,
-            accountCount: 0,
+            userCount: userCount.find((t) => t.tenant_id === x.id)?.count ?? 0,
+            accountCount: accountCount.find((t) => t.tenant_id === x.id)?.count ?? 0,
+            // userCount: 0,
+            // accountCount: 0,
             balance:decimalToMoney(x.balance),
           })),
         }];
