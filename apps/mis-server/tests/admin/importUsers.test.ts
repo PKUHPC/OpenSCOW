@@ -29,43 +29,50 @@ afterEach(async () => {
   await server.close();
 });
 
-const usersJson = {
-  "accounts": {
-    "a_abc": {
-      "abc": "allowed!,owner",
-      "yhh": "blocked!",
+const data = {
+  accounts: [
+    {
+      accountName: "a_user1",
+      users: [{ userId: "user1", state: "allowed!" }, { userId: "user2", state: "blocked!" }],
+      owner: "user1",
     },
-    "a_b": {
-      "yhh": "allowed!,owner",
+    {
+      accountName: "account2",
+      users: [{ userId: "user2", state: "allowed!" }, { userId: "user3", state: "blocked!" }],
+      owner: "user2",
     },
-  },
-  "names": {
-    "abc": "abcName",
-  },
+  ],
+  users: [ 
+    { userId: "user1", userName: "user1Name", accounts: [ "a_user1" ]}, 
+    { userId: "user2", userName: "user2", accounts: [ "a_user1", "account2" ]}, 
+    { userId: "user3", userName: "", accounts: [ "account2" ]},
+  ],
 };
 
 it("imports users and accounts from users.json", async () => {
-  await asyncClientCall(client, "importUsers", { data: JSON.stringify(usersJson), whitelist: true });
+  await asyncClientCall(client, "importUsers", { data: data, whitelist: true });
 
   const em = orm.em.fork();
 
   const accounts = await em.find(Account, {});
-  expect(accounts.map((x) => x.accountName)).toIncludeSameMembers(Object.keys(usersJson.accounts));
+  expect(accounts.map((x) => x.accountName)).toIncludeSameMembers(data.accounts.map((x) => x.accountName));
 
   const ua = await em.find(UserAccount, { }, {
     populate: ["account", "user"],
   });
   expect(ua.map((x) => ({ accountName: x.account.$.accountName, userId: x.user.$.userId, role: x.role, blocked: x.status === UserStatus.BLOCKED })))
     .toIncludeSameMembers([
-      { accountName: "a_abc", userId: "abc", role: UserRole.OWNER, blocked: false },
-      { accountName: "a_abc", userId: "yhh", role: UserRole.USER, blocked: true },
-      { accountName: "a_b", userId: "yhh", role: UserRole.OWNER, blocked: false },
+      { accountName: "a_user1", userId: "user1", role: UserRole.OWNER, blocked: false },
+      { accountName: "a_user1", userId: "user2", role: UserRole.USER, blocked: true },
+      { accountName: "account2", userId: "user2", role: UserRole.OWNER, blocked: false },
+      { accountName: "account2", userId: "user3", role: UserRole.USER, blocked: true },
     ]);
 
   const users = await em.find(User, { });
   expect(users.map((x) => ({ userId: x.userId, name: x.name })))
     .toIncludeSameMembers([
-      { userId: "abc", name: "abcName" },
-      { userId: "yhh", name: "yhh" },
+      { userId: "user1", name: "user1Name" },
+      { userId: "user2", name: "user2" },
+      { userId: "user3", name: "user3" },
     ]);
 });

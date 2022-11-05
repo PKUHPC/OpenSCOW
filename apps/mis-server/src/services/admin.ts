@@ -1,9 +1,10 @@
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
-import { importUsers } from "src/bl/importUsers";
+import { importUsers, ImportUsersData } from "src/bl/importUsers";
 import { StorageQuota } from "src/entities/StorageQuota";
 import { AdminServiceServer, AdminServiceService } from "src/generated/server/admin";
+import { parseClusterUsers } from "src/utils/slurm";
 
 export const adminServiceServer = plugin((server) => {
 
@@ -66,10 +67,45 @@ export const adminServiceServer = plugin((server) => {
     importUsers: async ({ request, em, logger }) => {
       const { data, whitelist } = request;
 
-      const reply = await importUsers(data, em, whitelist, logger);
+      if (!data) {
+        throw <ServiceError> {
+          code: Status.INVALID_ARGUMENT, message: "Submitted data is empty",
+        };
+      }
+
+      const accountWithoutOwner = data.accounts.find((x) => x.owner === undefined);
+      if (accountWithoutOwner) {
+        throw <ServiceError> {
+          code: Status.INVALID_ARGUMENT, message: `Account ${accountWithoutOwner.accountName} doesn't have owner`,
+        };
+      }
+
+      const ownerNotInAccount = data.accounts.find((x) => !x.users.find((user) => user.userId === x.owner));
+      if (ownerNotInAccount) {
+        throw <ServiceError> {
+          code: Status.INVALID_ARGUMENT,
+          message: `Owner ${ownerNotInAccount.owner} is not in ${ownerNotInAccount.accountName}`,
+        };
+      }
+
+      const reply = await importUsers(data as ImportUsersData, em, whitelist, logger);
 
       return [reply];
 
+    },
+
+    getClusterUsers: async ({ request, logger }) => {
+      const { cluster } = request;
+
+      const reply = await server.ext.clusters.callOnOne(
+        cluster,
+        logger,
+        async (ops) => ops.user.getAllUsersInAccounts({
+          request: {}, logger,
+        }),
+      );
+      
+      return [parseClusterUsers(reply.result)];
     },
 
     getFetchInfo: async () => {
