@@ -43,15 +43,24 @@ export const tenantServiceServer = plugin((server) => {
 
     getAllTenants: async ({ em }) => {
       const tenants = await em.find(Tenant, {});
-      const userCount: { tCount: number, tId: number }[]
+      const userCountObjectArray: { tCount: number, tId: number }[]
         = await em.createQueryBuilder(User, "u")
           .select("count(u.user_id) as tCount, u.tenant_id as tId").orderBy({ tenant_id: QueryOrder.ASC })
           .groupBy("u.tenant_id").execute("all");
-      const accountCount: { tCount: number, tId: number }[]
+      // 将获查询得的对象数组userCountObjectArray转换为{"tenant_id":"userCountOfTenant"}形式
+      const userCount = {};
+      userCountObjectArray.map((x) => {
+        userCount[x.tId] = x.tCount;
+      });
+      const accountCountObjectArray: { tCount: number, tId: number }[]
         = await em.createQueryBuilder(Account, "a")
           .orderBy({ tenant_id: QueryOrder.ASC }).select("count(a.id) as tCount, a.tenant_id as tId")
           .groupBy("a.tenant_id").execute("all");
-      let i = 0;
+      // 将获查询得的对象数组accountCountObjectArray转换为{"tenant_id":"accountCountOfTenant"}形式
+      const accountCount = {};
+      accountCountObjectArray.map((x) => {
+        accountCount[x.tId] = x.tCount;
+      });
       return [
         {
           totalCount: tenants.length,
@@ -59,8 +68,8 @@ export const tenantServiceServer = plugin((server) => {
             tenantId:x.id,
             tenantName: x.name,
             // 初始创建租户时，其中无账户和用户,
-            userCount: userCount[i]?.tCount ?? 0,
-            accountCount: accountCount[i++]?.tCount ?? 0,
+            userCount: userCount[`${x.id}`] ?? 0,
+            accountCount: accountCount[`${x.id}`] ?? 0,
             balance:decimalToMoney(x.balance),
           })),
         }];
