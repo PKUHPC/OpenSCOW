@@ -1,5 +1,6 @@
 import { InboxOutlined } from "@ant-design/icons";
 import { Button, message, Modal, Upload } from "antd";
+import axios from "axios";
 import { join } from "path";
 import { urlToUpload } from "src/pageComponents/filemanager/api";
 
@@ -12,6 +13,29 @@ interface Props {
 }
 
 export const UploadModal: React.FC<Props> = ({ visible, onClose, path, reload, cluster }) => {
+
+  const uploadRequest = async (options) => {
+    const { onSuccess, onError, file, onProgress, action } = options;
+
+    const fmData = new FormData();
+    const config = {
+      headers: { "content-type": "multipart/form-data" },
+      onUploadProgress: (event) => {
+        console.log(event.loaded / event.total);
+        onProgress({ percent: (event.loaded / event.total) * 100 });
+      },
+    };
+    fmData.append("file", file);
+    try {
+      const res = await axios.post(action, fmData, config);
+      onSuccess("Ok");
+      console.log("server res: ", res);
+    } catch (err) {
+      console.log("error: ", err);
+      // const error = new Error('some error');
+      onError({ err });
+    }
+  };
 
   return (
     <Modal
@@ -32,7 +56,12 @@ export const UploadModal: React.FC<Props> = ({ visible, onClose, path, reload, c
         name="file"
         multiple
         action={async (file) => urlToUpload(cluster, join(path, file.name))}
+        customRequest={uploadRequest}
         withCredentials
+        progress={{
+          strokeWidth: 3,
+          format: (percent) => percent && `${parseFloat(percent.toFixed(2))}%`,
+        }}
         onChange={({ file }) => {
           if (file.status === "done") {
             message.success(`${file.name}上传成功`);
