@@ -1,9 +1,8 @@
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError, status } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
-import { QueryOrder, UniqueConstraintViolationException } from "@mikro-orm/core";
+import { UniqueConstraintViolationException } from "@mikro-orm/core";
 import { decimalToMoney } from "@scow/lib-decimal";
-import { count } from "console";
 import { Account } from "src/entities/Account";
 import { Tenant } from "src/entities/Tenant";
 import { TenantRole, User } from "src/entities/User";
@@ -45,7 +44,7 @@ export const tenantServiceServer = plugin((server) => {
       const tenants = await em.find(Tenant, {});
       const userCountObjectArray: { tCount: number, tId: number }[]
         = await em.createQueryBuilder(User, "u")
-          .select("count(u.user_id) as tCount, u.tenant_id as tId").orderBy({ tenant_id: QueryOrder.ASC })
+          .select("count(u.user_id) as tCount, u.tenant_id as tId")
           .groupBy("u.tenant_id").execute("all");
       // 将获查询得的对象数组userCountObjectArray转换为{"tenant_id":"userCountOfTenant"}形式
       const userCount = {};
@@ -54,7 +53,7 @@ export const tenantServiceServer = plugin((server) => {
       });
       const accountCountObjectArray: { tCount: number, tId: number }[]
         = await em.createQueryBuilder(Account, "a")
-          .orderBy({ tenant_id: QueryOrder.ASC }).select("count(a.id) as tCount, a.tenant_id as tId")
+          .select("count(a.id) as tCount, a.tenant_id as tId")
           .groupBy("a.tenant_id").execute("all");
       // 将获查询得的对象数组accountCountObjectArray转换为{"tenant_id":"accountCountOfTenant"}形式
       const accountCount = {};
@@ -77,6 +76,10 @@ export const tenantServiceServer = plugin((server) => {
 
     createTenant: async ({ request, em }) => {
       const { name } = request;
+      const tenant = await em.findOne(Tenant, { name: name });
+      if (tenant) {
+        throw <ServiceError> { code: Status.ALREADY_EXISTS, details: "The tenant already exists" };
+      }
       server.logger.info(`start to create tenant: ${name} `);
       // create tenant in database
       const newTenant = new Tenant({ name });
