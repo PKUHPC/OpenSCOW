@@ -24,7 +24,7 @@ export function getKeyPair(privateKeyPath: string, publicKeyPath: string): KeyPa
  * @param rootKeyPair the key pair of root
  * @param logger the logger
  */
-export async function insertKey(
+export async function insertKeyAsRoot(
   user: string, host: string, rootKeyPair: KeyPair, logger: Logger,
 ) {
   // https://superuser.com/a/484280
