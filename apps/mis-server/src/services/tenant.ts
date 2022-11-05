@@ -1,8 +1,9 @@
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError, status } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
-import { UniqueConstraintViolationException } from "@mikro-orm/core";
+import { QueryOrder, UniqueConstraintViolationException } from "@mikro-orm/core";
 import { decimalToMoney } from "@scow/lib-decimal";
+import { count } from "console";
 import { Account } from "src/entities/Account";
 import { Tenant } from "src/entities/Tenant";
 import { TenantRole, User } from "src/entities/User";
@@ -42,19 +43,24 @@ export const tenantServiceServer = plugin((server) => {
 
     getAllTenants: async ({ em }) => {
       const tenants = await em.find(Tenant, {});
-      const userCount = await em.getConnection()
-        .execute("select tenant_id, count(*) as count from user group by tenant_id");
-      const accountCount = await em.getConnection()
-        .execute("select tenant_id, count(*) as count from user group by tenant_id");
+      const userCount: { tCount: number, tId: number }[]
+        = await em.createQueryBuilder(User, "u")
+          .select("count(u.user_id) as tCount, u.tenant_id as tId").orderBy({ tenant_id: QueryOrder.ASC })
+          .groupBy("u.tenant_id").execute("all");
+      const accountCount: { tCount: number, tId: number }[]
+        = await em.createQueryBuilder(Account, "a")
+          .orderBy({ tenant_id: QueryOrder.ASC }).select("count(a.id) as tCount, a.tenant_id as tId")
+          .groupBy("a.tenant_id").execute("all");
+      let i = 0;
       return [
         {
           totalCount: tenants.length,
           platformTenants: tenants.map((x) => ({
             tenantId:x.id,
             tenantName: x.name,
-            // 初始创建租户时，其中无账户和用户
-            userCount: userCount.find((t) => t.tenant_id === x.id)?.count ?? 0,
-            accountCount: accountCount.find((t) => t.tenant_id === x.id)?.count ?? 0,
+            // 初始创建租户时，其中无账户和用户,
+            userCount: userCount[i]?.tCount ?? 0,
+            accountCount: accountCount[i++]?.tCount ?? 0,
             balance:decimalToMoney(x.balance),
           })),
         }];
