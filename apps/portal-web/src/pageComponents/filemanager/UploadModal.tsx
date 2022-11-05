@@ -1,6 +1,5 @@
 import { InboxOutlined } from "@ant-design/icons";
 import { Button, message, Modal, Upload } from "antd";
-import axios from "axios";
 import { join } from "path";
 import { urlToUpload } from "src/pageComponents/filemanager/api";
 
@@ -15,26 +14,35 @@ interface Props {
 export const UploadModal: React.FC<Props> = ({ visible, onClose, path, reload, cluster }) => {
 
   const uploadRequest = async (options) => {
-    const { onSuccess, onError, file, onProgress, action } = options;
+    const { onSuccess, file, onProgress, action } = options;
 
-    const fmData = new FormData();
-    const config = {
-      headers: { "content-type": "multipart/form-data" },
-      onUploadProgress: (event) => {
-        console.log(event.loaded / event.total);
-        onProgress({ percent: (event.loaded / event.total) * 100 });
+    const totalBytes = file.size;
+    let bytesUploaded = 0;
+
+    const fileReader = file.stream().getReader();
+    const progressTrackingStream = new ReadableStream({
+      async pull(controller) {
+        const result = await fileReader.read();
+        if (result.done) {
+          console.log("completed stream");
+          controller.close();
+          return;
+        }
+        controller.enqueue(result.value);
+        bytesUploaded += result.value.byteLength;
+        onProgress({ percent: bytesUploaded / totalBytes });
       },
-    };
-    fmData.append("file", file);
-    try {
-      const res = await axios.post(action, fmData, config);
-      onSuccess("Ok");
-      console.log("server res: ", res);
-    } catch (err) {
-      console.log("error: ", err);
-      // const error = new Error('some error');
-      onError({ err });
-    }
+    });
+    await fetch(action, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/octet-stream",
+      },
+      body: progressTrackingStream,
+      credentials: "include",
+      // duplex: "half",
+    });
+    onSuccess("Ok");
   };
 
   return (
