@@ -3,7 +3,7 @@ import { join } from "path";
 import { quote } from "shell-quote";
 import type { Logger } from "ts-log";
 
-import { insertKey, KeyPair } from "./key";
+import { insertKeyAsRoot, KeyPair } from "./key";
 import { sftpChmod, sftpStat, sftpWriteFile } from "./sftp";
 
 /**
@@ -36,18 +36,56 @@ export async function sshRawConnect(address: string, username: string, rootKeyPa
     }
 
     logger.info("Login to %s as %s failed. Try inserting public key", host, username);
-    await insertKey(username, address, rootKeyPair, logger);
+    await insertKeyAsRoot(username, address, rootKeyPair, logger);
     await connect();
   }
 
   return ssh;
 }
 
+/**
+ * Connect to SSH by password and returns the SSH Object
+ * Must dispose of the object after use
+ *
+ * @param address address
+ * @param username  username
+ * @param password password of the user
+ * @param logger logger
+ * @returns SSH Object
+ */
+export async function sshRawConnectByPassword(address: string, username: string, password: string, logger: Logger) {
+  const [host, port] = address.split(":");
+  const ssh = new NodeSSH();
+
+  async function connect() {
+    await ssh.connect({ host, port: port ? +port : undefined, username, password: password });
+  }
+
+  try {
+    await connect();
+  } catch (e) {
+    logger.info("Login to %s as %s by password failed.", host, username);
+    throw e;
+  }
+
+  return ssh;
+}
+
+
 export async function sshConnect<T>(
   address: string, username: string, rootKeyPair: KeyPair, logger: Logger,
   run: (ssh: NodeSSH) => Promise<T>,
 ) {
   const ssh = await sshRawConnect(address, username, rootKeyPair, logger);
+
+  return run(ssh).finally(() => { ssh.dispose(); });
+}
+
+export async function sshConnectByPassword<T>(
+  address: string, username: string, password: string, logger: Logger,
+  run: (ssh: NodeSSH) => Promise<T>,
+) {
+  const ssh = await sshRawConnectByPassword(address, username, password, logger);
 
   return run(ssh).finally(() => { ssh.dispose(); });
 }
@@ -105,8 +143,7 @@ export async function testRootUserSshLogin(host: string, keyPair: KeyPair, logge
 }
 
 /**
- * Check if the root user can log in to the host
- * If fails, return the error
+ * Login as user by password and insert the host's public key to the user's authorized_keys to enable public key login
  *
  * @param address the address
  * @param username the username
@@ -114,24 +151,21 @@ export async function testRootUserSshLogin(host: string, keyPair: KeyPair, logge
  * @param rootKeyPair key pair
  * @param logger logger
  */
-export async function userSshFirstLogin(
+export async function insertKeyAsUser(
   address: string, username: string, pwd: string,
   rootKeyPair: KeyPair, logger: Logger,
 ) {
-  const [host, port] = address.split(":");
-  const ssh = new NodeSSH();
 
-  try {
-    await ssh.connect({ host, port: port ? +port : undefined, username, password: pwd });
-
+  await sshConnectByPassword(address, username, pwd, logger, async (ssh) => {
     const homeDir = await ssh.execCommand(`eval echo ~${username}`);
     const userHomeDir = homeDir.stdout.trim();
 
     const sftp = await ssh.requestSFTP();
     const stat = await sftpStat(sftp)(userHomeDir);
-    // make sure user home dir is exists !
+    // make sure user home dir is exists
     if (!stat.isDirectory()) {
-      logger.error("User %s home directory %s is not exits", username, userHomeDir);
+      logger.error("Home directory %s of user %s does not exist", userHomeDir, username);
+      throw new Error(`Home directory ${userHomeDir} of user ${username} does not exist`);
     }
     else {
       // creat ~/.ssh/authorized_keys and write keys
@@ -140,14 +174,9 @@ export async function userSshFirstLogin(
       const keyFilePath = join(sshDir, "authorized_keys");
       await sftpChmod(sftp)(sshDir, "700");
       await sftpWriteFile(sftp)(keyFilePath, rootKeyPair.publicKey);
-      logger.info("Writing key for user %s to %s in file %s", username, host, keyFilePath);
+      logger.info("Writing key for user %s to %s in file %s", username, address, keyFilePath);
       await sftpChmod(sftp)(keyFilePath, "644");
     }
-  } catch (e) {
-    logger.info("Login to %s as %s failed.", host, username);
-    throw e;
-  } finally {
-    ssh.dispose();
-  }
+  });
 }
 

@@ -1,6 +1,6 @@
 import { NodeSSH } from "node-ssh";
 import { join } from "path";
-import { insertKey } from "src/key";
+import { insertKeyAsRoot } from "src/key";
 import { sftpExists, sftpReadFile, sftpStat, sshRmrf } from "src/sftp";
 
 import { connectToTestServerAsRoot, createTestItems, resetTestServerAsRoot, rootKeyPair, TestSshServer } from "./utils";
@@ -30,7 +30,7 @@ afterEach(async () => {
 });
 
 it("insert key", async () => {
-  await insertKey(testUser, target, rootKeyPair, console);
+  await insertKeyAsRoot(testUser, target, rootKeyPair, console);
 
   expect(await sftpExists(serverSsh.sftp, home)).toBeTrue();
 
