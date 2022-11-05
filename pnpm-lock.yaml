@@ -181,7 +181,7 @@ importers:
       moment: 2.29.4
       next: 13.0.0
       next-compose-plugins: 2.2.1
-      next-transpile-modules: 9.1.0
+      next-transpile-modules: 10.0.0
       nookies: 2.5.2
       nprogress: 0.2.0
       postcss: 8.4.18
@@ -219,7 +219,7 @@ importers:
       moment: 2.29.4
       next: 13.0.0_biqbaboplfbrettd7655fr4n2y
       next-compose-plugins: 2.2.1
-      next-transpile-modules: 9.1.0
+      next-transpile-modules: 10.0.0
       nookies: 2.5.2
       nprogress: 0.2.0
       react: 18.2.0
@@ -329,7 +329,7 @@ importers:
       moment: 2.29.4
       next: 13.0.0
       next-compose-plugins: 2.2.1
-      next-transpile-modules: 9.1.0
+      next-transpile-modules: 10.0.0
       node-mocks-http: 1.11.0
       nookies: 2.5.2
       nprogress: 0.2.0
@@ -375,7 +375,7 @@ importers:
       moment: 2.29.4
       next: 13.0.0_biqbaboplfbrettd7655fr4n2y
       next-compose-plugins: 2.2.1
-      next-transpile-modules: 9.1.0
+      next-transpile-modules: 10.0.0
       nookies: 2.5.2
       nprogress: 0.2.0
       random-words: 1.2.0
@@ -11672,11 +11672,10 @@ packages:
     resolution: {integrity: sha512-OjJ+fV15FXO2uQXQagLD4C0abYErBjyjE0I0FHpOEIB8upw0hg1ldFP6cqHTJBH1cZqy96OeR3u1dJ+Ez2D4Bg==}
     dev: false
 
-  /next-transpile-modules/9.1.0:
-    resolution: {integrity: sha512-yzJji65xDqcIqjvx5vPJcs1M+MYQTzLM1pXH/qf8Q88ohx+bwVGDc1AeV+HKr1NwvMCNTpwVPSFI7cA5WdyeWA==}
+  /next-transpile-modules/10.0.0:
+    resolution: {integrity: sha512-FyeJ++Lm2Fq31gbThiRCrJlYpIY9QaI7A3TjuhQLzOix8ChQrvn5ny4MhfIthS5cy6+uK1AhDRvxVdW17y3Xdw==}
     dependencies:
       enhanced-resolve: 5.10.0
-      escalade: 3.1.1
     dev: false
 
   /next/13.0.0_biqbaboplfbrettd7655fr4n2y:

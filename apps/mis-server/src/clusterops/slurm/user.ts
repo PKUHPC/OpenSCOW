@@ -34,5 +34,10 @@ export const slurmUserOps = ({ executeSlurmScript }: SlurmClusterInfo): UserOps 
       return { code: "OK" };
     },
 
+    getAllUsersInAccounts: async ({ logger }) => {
+      const result = await executeSlurmScript(["-l", "all"], logger);
+      return { result: result.stdout };
+    },
+
   };
 };

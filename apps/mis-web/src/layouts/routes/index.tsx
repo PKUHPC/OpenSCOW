@@ -122,11 +122,11 @@ export const tenantRoutes: (tenantRoles: TenantRole[]) => NavItemProps[] = (tena
             }] : []),
           ],
         },
-        {
-          Icon: ClockCircleOutlined,
-          text: "调整作业时间限制",
-          path: "/tenant/jobTimeLimit",
-        },
+        // {
+        //   Icon: ClockCircleOutlined,
+        //   text: "调整作业时间限制",
+        //   path: "/tenant/jobTimeLimit",
+        // },
         // {
         //   Icon: CloudOutlined,
         //   text: "调整用户存储空间",
