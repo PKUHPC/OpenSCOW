@@ -39,7 +39,7 @@
     "moment": "2.29.4",
     "next": "13.0.0",
     "next-compose-plugins": "2.2.1",
-    "next-transpile-modules": "9.1.0",
+    "next-transpile-modules": "10.0.0",
     "nookies": "2.5.2",
     "nprogress": "0.2.0",
     "random-words": "1.2.0",
