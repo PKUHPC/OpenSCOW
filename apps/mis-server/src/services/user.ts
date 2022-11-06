@@ -311,7 +311,7 @@ export const userServiceServer = plugin((server) => {
       // creat user in database
       const user = new User({ name, userId: identityId, tenant, email });
 
-      user.storageQuotas.add(...Object.keys(clusters).map((x) => new StorageQuota({
+      user.storageQuotas.add(Object.keys(clusters).map((x) => new StorageQuota({
         cluster: x,
         storageQuota: 0,
         user: user!,

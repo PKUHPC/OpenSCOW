@@ -48,29 +48,37 @@ it("unblocks account when added to whitelist", async () => {
     operatorId: "123",
   });
 
-  await reloadEntity(a);
+  await reloadEntity(em, a);
 
   expect(a.blocked).toBeFalse();
 });
 
 it("blocks account when it is dewhitelisted and balance is < 0", async () => {
-  a.balance = new Decimal(-1);
 
-  a.blocked = false;
-  a.whitelist = toRef(new AccountWhitelist({
+  const whitelist = new AccountWhitelist({
     account: a,
     comment: "",
     operatorId: "123",
-  }));
+  });
+
+  await em.persistAndFlush(whitelist);
+
+  a.balance = new Decimal(-1);
+
+  a.blocked = false;
+  a.whitelist = toRef(whitelist);
 
   await em.flush();
 
-  await asyncClientCall(client, "dewhitelistAccount", {
+  const resp = await asyncClientCall(client, "dewhitelistAccount", {
     tenantName: a.tenant.getProperty("name"),
     accountName: a.accountName,
   });
 
-  await reloadEntity(a);
+  expect(resp.executed).toBeTrue();
+
+  await em.refresh(a);
+  await reloadEntity(em, a);
 
   expect(a.blocked).toBeTrue();
 });
@@ -94,7 +102,7 @@ it("charges user but don't block account if account is whitelist", async () => {
     type: "haha",
   }, em.fork(), server.logger, server.ext);
 
-  await reloadEntity(a);
+  await reloadEntity(em, a);
 
   expect(currentBalance.toNumber()).toBe(-1);
   expect(previousBalance.toNumber()).toBe(1);

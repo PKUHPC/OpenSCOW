@@ -53,7 +53,7 @@ it("sets job charge limit", async () => {
     ...params(ua), limit: decimalToMoney(limit),
   });
 
-  await reloadEntity(ua);
+  await reloadEntity(em, ua);
 
   expectDecimalEqual(ua.jobChargeLimit, limit);
   expectDecimalEqual(ua.usedJobCharge, new Decimal(0));
@@ -73,7 +73,7 @@ it("changes job charge limit", async () => {
 
   await asyncClientCall(client, "setJobChargeLimit", { ...params(ua), limit: decimalToMoney(newLimit) });
 
-  await reloadEntity(ua);
+  await reloadEntity(em, ua);
 
   expectDecimalEqual(ua.jobChargeLimit, newLimit);
 });
@@ -88,10 +88,13 @@ it("cancels job charge limit", async () => {
 
   await asyncClientCall(client, "cancelJobChargeLimit", { ...params(ua) });
 
-  await reloadEntity(ua);
+  const ua1 = await em.fork().findOneOrFail(UserAccount, {
+    account: ua.account,
+    user: ua.user,
+  });
 
-  expect(ua.jobChargeLimit).toBeUndefined();
-  expect(ua.usedJobCharge).toBeUndefined();
+  expect(ua1.jobChargeLimit).toBeUndefined();
+  expect(ua1.usedJobCharge).toBeUndefined();
 });
 
 it("adds job charge", async () => {
@@ -137,7 +140,7 @@ it("unblocked user if limit is changed to >= used", async () => {
   const newLimit = new Decimal(140);
   await asyncClientCall(client, "setJobChargeLimit", { ...params(ua), limit: decimalToMoney(newLimit) });
 
-  await reloadEntity(ua);
+  await reloadEntity(em, ua);
   expectDecimalEqual(ua.jobChargeLimit, newLimit);
   expect(ua.status).toBe(UserStatus.UNBLOCKED);
 
