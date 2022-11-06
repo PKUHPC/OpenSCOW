@@ -30,7 +30,6 @@ export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
       pageSize: pageInfo.pageSize,
     } });
   }, [pageInfo]);
-
   const { data, isLoading, reload } = useAsync({ promiseFn, watch: refreshToken });
 
   return (
