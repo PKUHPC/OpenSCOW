@@ -106,7 +106,7 @@ it("changes job prices", async () => {
     tenantPrice: jobs[x].tenantPrice.toFixed(4),
   }));
 
-  await reloadEntities(jobs);
+  await reloadEntities(em, jobs);
 
   expect(jobs.map((x) => x.tenantPrice.toNumber())).toStrictEqual([1.7, 1.7, 4]);
   expect(jobs.map((x) => x.accountPrice.toNumber())).toStrictEqual([1.6, 1.6, 8]);
@@ -119,7 +119,7 @@ it("changes job prices", async () => {
   expect(record.newAccountPrice?.toNumber()).toBe(1.6);
   expect(record.newTenantPrice?.toNumber()).toBe(1.7);
 
-  await reloadEntities([data.tenant, data.accountA, data.accountB]);
+  await reloadEntities(em, [data.tenant, data.accountA, data.accountB]);
 
   // check balances
   expect(data.tenant.balance.toNumber()).toBe(prevTenantBalance.minus(0.4).toNumber()); // 1-1.7+2-1.7

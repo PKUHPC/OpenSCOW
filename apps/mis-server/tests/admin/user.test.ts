@@ -124,7 +124,7 @@ it("deletes user", async () => {
     userId: user.userId,
   });
 
-  await reloadEntity(data.accountA);
+  await reloadEntity(em, data.accountA);
 
   expect(await em.count(UserAccount, { account: data.accountA })).toBe(2);
   expect(await em.count(User, { tenant: data.tenant })).toBe(2);
