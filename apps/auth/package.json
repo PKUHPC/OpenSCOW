@@ -16,19 +16,19 @@
     "@fastify/formbody": "7.3.0",
     "@fastify/static": "6.5.0",
     "@scow/config": "workspace:*",
-    "@sinclair/typebox": "0.24.46",
+    "@sinclair/typebox": "0.25.2",
     "asn1": "0.2.6",
-    "fastify": "4.8.1",
+    "fastify": "4.9.2",
     "fastify-graceful-shutdown": "3.4.0",
     "fastify-plugin": "4.3.0",
-    "ioredis": "5.2.3",
+    "ioredis": "5.2.4",
     "ldapjs": "2.3.3",
     "nanoid": "4.0.0",
     "node-ssh": "13.0.0"
   },
   "devDependencies": {
     "@types/asn1": "0.2.0",
-    "@types/ldapjs": "2.2.4"
+    "@types/ldapjs": "2.2.5"
   },
   "volta": {
     "extends": "../../package.json"

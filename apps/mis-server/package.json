@@ -16,8 +16,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@ddadaal/tsgrpc-server": "0.17.0",
-    "@grpc/grpc-js": "1.7.2",
+    "@ddadaal/tsgrpc-server": "0.18.0",
+    "@grpc/grpc-js": "1.7.3",
     "@mikro-orm/cli": "5.5.1",
     "@mikro-orm/core": "5.5.1",
     "@mikro-orm/mariadb": "5.5.1",
@@ -27,7 +27,7 @@
     "@scow/config": "workspace:*",
     "@scow/lib-decimal": "workspace:*",
     "@scow/lib-ssh": "workspace:*",
-    "@sinclair/typebox": "0.24.46",
+    "@sinclair/typebox": "0.25.2",
     "dotenv": "16.0.3",
     "node-cron": "3.0.2",
     "uuid": "9.0.0",
@@ -36,7 +36,7 @@
   "devDependencies": {
     "@ddadaal/tsgrpc-cli": "0.14.2",
     "@types/google-protobuf": "3.15.6",
-    "@types/node-cron": "3.0.4",
+    "@types/node-cron": "3.0.5",
     "@types/wait-on": "5.3.1"
   },
   "mikro-orm": {

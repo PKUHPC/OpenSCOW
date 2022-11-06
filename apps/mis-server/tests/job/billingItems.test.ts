@@ -97,9 +97,11 @@ it("creates billing items in db", async () => {
 
 });
 
+const anyDate = () => expect.any(Date) as unknown as Date;
+
 const priceItemToJobBillingItem = (x: PriceItem) => <JobBillingItem>({
   id: x.itemId, path: x.path.join("."), tenantName: x.tenant, price: decimalToMoney(x.price),
-  createTime: expect.any(Date), amountStrategy: expect.any(String),
+  createTime: anyDate(), amountStrategy: expect.any(String),
 });
 
 it("returns all default billing items", async () => {
@@ -165,7 +167,7 @@ it("adds billing item to default", async () => {
     amountStrategy: request.amountStrategy,
     id: request.itemId,
     path: request.path,
-    createTime: expect.any(Date),
+    createTime: anyDate(),
     price: request.price,
     tenantName: request.tenantName,
   } as JobBillingItem]);
@@ -188,7 +190,7 @@ it("adds billing item to another tenant", async () => {
     amountStrategy: request.amountStrategy,
     id: request.itemId,
     path: request.path,
-    createTime: expect.any(Date),
+    createTime: anyDate(),
     price: request.price,
     tenantName: request.tenantName,
   } as JobBillingItem]);
