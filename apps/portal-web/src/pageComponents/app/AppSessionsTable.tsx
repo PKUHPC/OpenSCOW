@@ -1,43 +1,37 @@
-import { Button, Form, message, Popconfirm, Space, Table, TableColumnsType } from "antd";
-import Router from "next/router";
+import { Form, message, Popconfirm, Space, Table, TableColumnsType } from "antd";
+import Router, { useRouter } from "next/router";
 import { join } from "path";
-import React, { useCallback, useState } from "react";
+import React, { useCallback } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import type { AppSession } from "src/generated/portal/app";
 import { ConnectTopAppLink } from "src/pageComponents/app/ConnectToAppLink";
-import { Cluster, publicConfig } from "src/utils/config";
+import { publicConfig } from "src/utils/config";
 import { compareDateTime, formatDateTime } from "src/utils/datetime";
 import { compareNumber } from "src/utils/math";
+import { queryToString } from "src/utils/querystring";
 
 interface Props {
 }
 
-interface FilterForm {
-  cluster: Cluster;
-}
-
-
 export const AppSessionsTable: React.FC<Props> = () => {
 
-  const [form] = Form.useForm<FilterForm>();
+  const router = useRouter();
 
-  const [query, setQuery] = useState<FilterForm>(() => {
-    return {
-      cluster: publicConfig.CLUSTERS[0],
-    };
-  });
+  const clusterQuery = queryToString(router.query.cluster);
+
+  const cluster = publicConfig.CLUSTERS.find((x) => x.id === clusterQuery) ?? publicConfig.CLUSTERS[0];
 
   const { data, isLoading, reload } = useAsync({
     promiseFn: useCallback(async () => {
       // List all desktop
-      const { sessions } = await api.getAppSessions({ query: { cluster: query.cluster.id } });
+      const { sessions } = await api.getAppSessions({ query: { cluster: cluster.id } });
 
       return sessions;
 
-    }, []),
+    }, [cluster]),
   });
 
   const columns: TableColumnsType<AppSession> = [
@@ -78,13 +72,13 @@ export const AppSessionsTable: React.FC<Props> = () => {
               <>
                 <ConnectTopAppLink
                   session={record}
-                  cluster={query.cluster}
+                  cluster={cluster}
                 />
                 <Popconfirm
                   title="确定结束这个任务吗？"
                   onConfirm={async () =>
                     api.cancelJob({ body: {
-                      cluster: query.cluster.id,
+                      cluster: cluster.id,
                       jobId: record.jobId,
                     } })
                       .then(() => {
@@ -99,7 +93,7 @@ export const AppSessionsTable: React.FC<Props> = () => {
             ) : undefined
           }
           <a onClick={() => {
-            Router.push(join("/files", query.cluster.id, record.dataPath));
+            Router.push(join("/files", cluster.id, record.dataPath));
           }}
           >
             进入目录
@@ -111,24 +105,14 @@ export const AppSessionsTable: React.FC<Props> = () => {
   return (
     <div>
       <FilterFormContainer>
-        <Form<FilterForm>
-          layout="inline"
-          form={form}
-          initialValues={query}
-          onFinish={async () => {
-            setQuery({
-              ...(await form.validateFields()),
-            });
-          }}
-        >
-          <Form.Item label="集群" name="cluster">
-            <SingleClusterSelector />
-          </Form.Item>
-          <Form.Item>
-            <Space>
-              <Button type="primary" htmlType="submit">搜索</Button>
-              <Button loading={isLoading} onClick={reload}>刷新</Button>
-            </Space>
+        <Form layout="inline">
+          <Form.Item label="集群">
+            <SingleClusterSelector
+              value={cluster}
+              onChange={(cluster) => {
+                router.push({ pathname: router.pathname, query: { cluster: cluster.id } });
+              }}
+            />
           </Form.Item>
         </Form>
       </FilterFormContainer>
