@@ -29,16 +29,13 @@ export const DesktopTable: React.FC<Props> = () => {
 
   const qs = useQuerystring();
 
-  const clusterParam = queryToString(qs.cluster);
-  const cluster = publicConfig.CLUSTERS_CONFIG[clusterParam]
-    ? { id: clusterParam, name: publicConfig.CLUSTERS_CONFIG[clusterParam].displayName }
-    : publicConfig.CLUSTERS[0];
-
+  const clusterQuery = queryToString(qs.cluster);
+  const cluster = publicConfig.CLUSTERS.find((x) => x.id === clusterQuery) ?? publicConfig.CLUSTERS[0];
 
   const { data, isLoading, reload } = useAsync({
     promiseFn: useCallback(async () => {
       // List all desktop
-      const result = await api.listDesktops({ query: { cluster: cluster.id } });
+      const result = await api.listDesktops({ query: { cluster: cluster.name } });
 
       return result.displayId.map((x) => ({ desktopId: x, addr: result.node }));
 
