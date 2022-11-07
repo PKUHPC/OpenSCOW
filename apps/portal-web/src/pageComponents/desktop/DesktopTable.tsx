@@ -1,7 +1,7 @@
 import { PlusOutlined } from "@ant-design/icons";
 import { Form, Table } from "antd";
 import { ColumnsType } from "antd/lib/table";
-import Router from "next/router";
+import { useRouter } from "next/router";
 import React, { useCallback } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
@@ -12,7 +12,7 @@ import { PageTitle } from "src/components/PageTitle";
 import { DesktopTableActions } from "src/pageComponents/desktop/DesktopTableActions";
 import { NewDesktopTableModal } from "src/pageComponents/desktop/NewDesktopTableModal";
 import { publicConfig } from "src/utils/config";
-import { queryToString, useQuerystring } from "src/utils/querystring";
+import { queryToString } from "src/utils/querystring";
 
 const NewDesktopTableModalButton = ModalButton(NewDesktopTableModal, { type: "primary", icon: <PlusOutlined /> });
 
@@ -27,13 +27,10 @@ export type DesktopItem = {
 
 export const DesktopTable: React.FC<Props> = () => {
 
-  const qs = useQuerystring();
+  const router = useRouter();
 
-  const clusterParam = queryToString(qs.cluster);
-  const cluster = publicConfig.CLUSTERS_CONFIG[clusterParam]
-    ? { id: clusterParam, name: publicConfig.CLUSTERS_CONFIG[clusterParam].displayName }
-    : publicConfig.CLUSTERS[0];
-
+  const clusterQuery = queryToString(router.query.cluster);
+  const cluster = publicConfig.CLUSTERS.find((x) => x.id === clusterQuery) ?? publicConfig.CLUSTERS[0];
 
   const { data, isLoading, reload } = useAsync({
     promiseFn: useCallback(async () => {
@@ -80,7 +77,7 @@ export const DesktopTable: React.FC<Props> = () => {
             <SingleClusterSelector
               value={cluster}
               onChange={(x) => {
-                Router.push({ query: { cluster: x.id } });
+                router.push({ query: { cluster: x.id } });
               }}
             />
           </Form.Item>
