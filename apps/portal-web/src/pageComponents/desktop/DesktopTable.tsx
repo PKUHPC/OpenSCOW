@@ -35,7 +35,7 @@ export const DesktopTable: React.FC<Props> = () => {
   const { data, isLoading, reload } = useAsync({
     promiseFn: useCallback(async () => {
       // List all desktop
-      const result = await api.listDesktops({ query: { cluster: cluster.name } });
+      const result = await api.listDesktops({ query: { cluster: cluster.id } });
 
       return result.displayId.map((x) => ({ desktopId: x, addr: result.node }));
 
