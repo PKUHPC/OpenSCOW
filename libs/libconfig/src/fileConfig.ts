@@ -3,7 +3,6 @@ import fs from "fs";
 import { load } from "js-yaml";
 import { basename, extname, join } from "path";
 
-import { CONFIG_BASE_PATH } from "./constants";
 import { validateObject } from "./validation";
 
 const parsers = {
@@ -25,8 +24,8 @@ const candidates = Object.entries(parsers);
  * @throws 如果配置文件不存在，抛出异常
  */
 export function getConfigFromFile<T extends TSchema>(
-  schema: T, filename: string,
-  basePath = process.env.NODE_ENV === "production" ? CONFIG_BASE_PATH : "config") {
+  schema: T, filename: string, basePath: string,
+) {
 
   for (const [ext, loader] of candidates) {
     const path = join(basePath, filename + "." + ext);
@@ -40,9 +39,7 @@ export function getConfigFromFile<T extends TSchema>(
 }
 
 export function getDirConfig<T extends TSchema>(
-  schema: T,
-  dir: string,
-  basePath = process.env.NODE_ENV === "production" ? CONFIG_BASE_PATH : "config",
+  schema: T, dir: string, basePath: string,
 ): Record<string, Static<T>> {
   const configDir = join(basePath, dir);
 

@@ -1,6 +1,6 @@
+import { GetConfigFn, getConfigFromFile } from "@scow/lib-config";
 import { Static, Type } from "@sinclair/typebox";
-
-import { GetConfigFn, getConfigFromFile } from "../fileConfig";
+import { defaultBasePathConfig } from "src/constants";
 
 export const ClusterTextsConfigSchema = Type.Record(
   Type.String({ description: "租户，如果为default则是对所有租户" }),
@@ -18,4 +18,4 @@ const CLUSTER_TEXTS_CONFIG_SCHEMA = "clusterTexts";
 export type ClusterTextsConfigSchema = Static<typeof ClusterTextsConfigSchema>;
 
 export const getClusterTextsConfig: GetConfigFn<ClusterTextsConfigSchema> = (baseConfigPath) =>
-  getConfigFromFile(ClusterTextsConfigSchema, CLUSTER_TEXTS_CONFIG_SCHEMA, baseConfigPath);
+  getConfigFromFile(ClusterTextsConfigSchema, CLUSTER_TEXTS_CONFIG_SCHEMA, baseConfigPath ?? defaultBasePathConfig);

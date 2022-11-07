@@ -456,6 +456,20 @@ importers:
 
   libs/config:
     specifiers:
+      '@scow/lib-config': workspace:*
+      '@sinclair/typebox': 0.25.2
+    dependencies:
+      '@scow/lib-config': link:../libconfig
+      '@sinclair/typebox': 0.25.2
+
+  libs/decimal:
+    specifiers:
+      bignumber.js: 9.1.0
+    dependencies:
+      bignumber.js: 9.1.0
+
+  libs/libconfig:
+    specifiers:
       '@sinclair/typebox': 0.25.2
       '@types/js-yaml': 4.0.5
       ajv: 8.11.0
@@ -470,12 +484,6 @@ importers:
       js-yaml: 4.1.0
     devDependencies:
       '@types/js-yaml': 4.0.5
-
-  libs/decimal:
-    specifiers:
-      bignumber.js: 9.1.0
-    dependencies:
-      bignumber.js: 9.1.0
 
   libs/ssh:
     specifiers:
