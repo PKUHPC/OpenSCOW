@@ -1,6 +1,6 @@
+import { GetConfigFn, getConfigFromFile } from "@scow/lib-config";
 import { Static, Type } from "@sinclair/typebox";
-
-import { GetConfigFn, getConfigFromFile } from "../fileConfig";
+import { DEFAULT_CONFIG_BASE_PATH } from "src/constants";
 
 export const DEFAULT_PRIMARY_COLOR = "#9B0000";
 
@@ -23,4 +23,4 @@ const UI_CONFIG_NAME = "ui";
 export type UiConfigSchema = Static<typeof UiConfigSchema>;
 
 export const getUiConfig: GetConfigFn<UiConfigSchema> = (baseConfigPath) =>
-  getConfigFromFile(UiConfigSchema, UI_CONFIG_NAME, baseConfigPath);
+  getConfigFromFile(UiConfigSchema, UI_CONFIG_NAME, baseConfigPath ?? DEFAULT_CONFIG_BASE_PATH);

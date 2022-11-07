@@ -1,15 +1,15 @@
 // @ts-check
 
-const { envConfig, str, bool, parseKeyValue, num } = require("@scow/config");
+const { envConfig, str, bool, parseKeyValue, num } = require("@scow/lib-config");
 const { join } = require("path");
 const { homedir } = require("os");
 const { PHASE_DEVELOPMENT_SERVER, PHASE_PRODUCTION_BUILD, PHASE_PRODUCTION_SERVER, PHASE_TEST } = require("next/constants");
 
 const { getCapabilities } = require("@scow/lib-auth");
-const { DEFAULT_PRIMARY_COLOR, getUiConfig } = require("@scow/config/build/appConfig/ui");
-const { getPortalConfig } = require("@scow/config/build/appConfig/portal");
-const { getAppConfigs } = require("@scow/config/build/appConfig/app");
-const { getClusterConfigs } = require("@scow/config/build/appConfig/cluster");
+const { DEFAULT_PRIMARY_COLOR, getUiConfig } = require("@scow/config/build/ui");
+const { getPortalConfig } = require("@scow/config/build/portal");
+const { getAppConfigs } = require("@scow/config/build/app");
+const { getClusterConfigs } = require("@scow/config/build/cluster");
 
 /**
  * Get auth capabilities

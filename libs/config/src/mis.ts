@@ -1,6 +1,6 @@
+import { GetConfigFn, getConfigFromFile } from "@scow/lib-config";
 import { Static, Type } from "@sinclair/typebox";
-
-import { GetConfigFn, getConfigFromFile } from "../fileConfig";
+import { DEFAULT_CONFIG_BASE_PATH } from "src/constants";
 
 export const SlurmMisConfigSchema = Type.Object({
   managerUrl: Type.String({ description: "slurm manager节点的URL" }),
@@ -80,4 +80,4 @@ const MIS_CONFIG_NAME = "mis";
 export type MisConfigSchema = Static<typeof MisConfigSchema>;
 
 export const getMisConfig: GetConfigFn<MisConfigSchema> = (baseConfigPath) =>
-  getConfigFromFile(MisConfigSchema, MIS_CONFIG_NAME, baseConfigPath);
+  getConfigFromFile(MisConfigSchema, MIS_CONFIG_NAME, baseConfigPath ?? DEFAULT_CONFIG_BASE_PATH);

@@ -1,4 +1,4 @@
-import { parsePlaceholder } from "@scow/config";
+import { parsePlaceholder } from "@scow/lib-config";
 import { FastifyInstance } from "fastify";
 import ldapjs from "ldapjs";
 import { AuthProvider } from "src/auth/AuthProvider";

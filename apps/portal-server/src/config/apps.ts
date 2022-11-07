@@ -1,4 +1,4 @@
-import { getAppConfigs } from "@scow/config/build/appConfig/app";
+import { getAppConfigs } from "@scow/config/build/app";
 
 export const apps = getAppConfigs();
 

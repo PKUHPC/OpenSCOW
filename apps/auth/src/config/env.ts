@@ -1,4 +1,4 @@
-import { envConfig, host, port, str } from "@scow/config";
+import { envConfig, host, port, str } from "@scow/lib-config";
 
 import { AuthType } from "./AuthType";
 

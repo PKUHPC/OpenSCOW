@@ -1,7 +1,7 @@
+import { DEFAULT_CONFIG_BASE_PATH } from "@scow/config/build/constants";
 import fs from "fs";
 import { contentType } from "mime-types";
 import path from "path";
-import { CONFIG_PATH } from "src/utils/config";
 import { getHostname } from "src/utils/host";
 import { route } from "src/utils/route";
 
@@ -19,7 +19,7 @@ export interface GetIconSchema {
 }
 
 
-const CUSTOM_ICONS_DIR = path.join(CONFIG_PATH, "icons");
+const CUSTOM_ICONS_DIR = path.join(DEFAULT_CONFIG_BASE_PATH, "icons");
 
 const CUSTOM_DEFAULT_DIR = path.join(CUSTOM_ICONS_DIR, "default");
 const BUILTIN_DEFAULT_DIR = "assets/icons";

@@ -2,23 +2,15 @@
   "name": "@scow/config",
   "version": "1.0.0",
   "description": "",
-  "main": "build/index.js",
   "scripts": {
-    "build": "rimraf build && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
-    "test": "jest"
+    "build": "rimraf build && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@sinclair/typebox": "0.25.2",
-    "ajv": "8.11.0",
-    "ajv-formats": "2.1.1",
-    "envalid": "7.3.1",
-    "js-yaml": "4.1.0"
-  },
-  "devDependencies": {
-    "@types/js-yaml": "4.0.5"
+    "@scow/lib-config": "workspace:*",
+    "@sinclair/typebox": "0.25.2"
   },
   "volta": {
     "extends": "../../package.json"

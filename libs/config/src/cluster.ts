@@ -1,7 +1,7 @@
+import { GetConfigFn, getDirConfig } from "@scow/lib-config";
 import { Static, Type } from "@sinclair/typebox";
-import { SlurmMisConfigSchema } from "src/appConfig/mis";
-
-import { getDirConfig } from "../fileConfig";
+import { DEFAULT_CONFIG_BASE_PATH } from "src/constants";
+import { SlurmMisConfigSchema } from "src/mis";
 
 export type ClusterConfigSchema = {
   displayName: string;
@@ -90,10 +90,10 @@ const convertToOldConfigSchema = (
   return result;
 };
 
-export const getClusterConfigs = (baseConfigPath?: string): Record<string, ClusterConfigSchema> => {
+export const getClusterConfigs: GetConfigFn<Record<string, ClusterConfigSchema>> = (baseConfigPath) => {
 
-  // const appsConfig = getDirConfig(ClusterConfigSchema, CLUSTER_CONFIG_BASE_PATH, baseConfigPath);
-  const appsListConfig = getDirConfig(ClusterListConfigSchema, CLUSTER_CONFIG_BASE_PATH, baseConfigPath);
+  const appsListConfig = getDirConfig(ClusterListConfigSchema,
+    CLUSTER_CONFIG_BASE_PATH, baseConfigPath ?? DEFAULT_CONFIG_BASE_PATH);
   const appsConfig = convertToOldConfigSchema(appsListConfig);
   Object.entries(appsConfig).forEach(([id, config]) => {
     if (!config[config.scheduler]) {

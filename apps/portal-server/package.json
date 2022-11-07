@@ -19,6 +19,7 @@
     "@ddadaal/tsgrpc-common": "0.1.0",
     "@grpc/grpc-js": "1.7.3",
     "@scow/config": "workspace:*",
+    "@scow/lib-config": "workspace:*",
     "@scow/lib-ssh": "workspace:*",
     "@sinclair/typebox": "0.25.2",
     "dotenv": "16.0.3",

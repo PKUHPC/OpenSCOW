@@ -8,6 +8,7 @@ WORKDIR /app
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
 
+COPY libs/libconfig/package.json ./libs/libconfig/
 COPY libs/config/package.json ./libs/config/
 COPY libs/auth/package.json ./libs/auth/
 COPY libs/decimal/package.json ./libs/decimal/
@@ -20,6 +21,7 @@ COPY tsconfig.json .eslintrc.json ./
 
 COPY protos ./protos
 
+COPY libs/libconfig ./libs/libconfig
 COPY libs/config ./libs/config
 COPY libs/auth ./libs/auth
 COPY libs/decimal ./libs/decimal
@@ -44,6 +46,11 @@ WORKDIR /app/libs/decimal
 COPY --from=builder /app/libs/decimal/package.json .
 COPY --from=builder /app/libs/decimal/node_modules/ ./node_modules
 COPY --from=builder /app/libs/decimal/build/ ./build
+
+WORKDIR /app/libs/libconfig
+COPY --from=builder /app/libs/libconfig/package.json .
+COPY --from=builder /app/libs/libconfig/node_modules/ ./node_modules
+COPY --from=builder /app/libs/libconfig/build/ ./build
 
 WORKDIR /app/libs/config
 COPY --from=builder /app/libs/config/package.json .

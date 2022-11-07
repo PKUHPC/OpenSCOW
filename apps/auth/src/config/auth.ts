@@ -1,4 +1,5 @@
-import { getConfigFromFile } from "@scow/config";
+import { DEFAULT_CONFIG_BASE_PATH } from "@scow/config/build/constants";
+import { getConfigFromFile } from "@scow/lib-config";
 import { Static, Type } from "@sinclair/typebox";
 
 import { AuthType } from "./AuthType";
@@ -111,7 +112,7 @@ export type AuthConfigSchema = Static<typeof AuthConfigSchema>;
 
 export const AUTH_CONFIG_FILE = "auth";
 
-export const authConfig = getConfigFromFile(AuthConfigSchema, AUTH_CONFIG_FILE);
+export const authConfig = getConfigFromFile(AuthConfigSchema, AUTH_CONFIG_FILE, DEFAULT_CONFIG_BASE_PATH);
 
 // validate the config
 function validateConfig(config: AuthConfigSchema) {

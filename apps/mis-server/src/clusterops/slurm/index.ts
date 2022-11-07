@@ -1,5 +1,5 @@
 import { Logger } from "@ddadaal/tsgrpc-server";
-import { SlurmMisConfigSchema } from "@scow/config/build/appConfig/mis";
+import { SlurmMisConfigSchema } from "@scow/config/build/mis";
 import { sftpChmod, sshConnect } from "@scow/lib-ssh";
 import { ClusterOps } from "src/clusterops/api";
 import { slurmAccountOps } from "src/clusterops/slurm/account";
@@ -45,7 +45,7 @@ export const createSlurmOps = (cluster: string, logger: Logger): ClusterOps | un
     storage: slurmStorageOps(clusterInfo),
     job:  slurmJobOps(clusterInfo),
     user: slurmUserOps(clusterInfo),
-    onStartup: async () => {   
+    onStartup: async () => {
       return await sshConnect(slurmMisConfig.managerUrl, "root", rootKeyPair, logger, async (ssh) => {
         logger.info("start to copy slurm.sh");
         // 请求sftp对象
