@@ -17,6 +17,7 @@ COPY tsconfig.json .eslintrc.json ./
 
 COPY protos ./protos
 
+COPY libs/libconfig ./libs/libconfig
 COPY libs/config ./libs/config
 COPY apps/auth ./apps/auth
 
