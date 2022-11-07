@@ -1,4 +1,4 @@
-import type { ClusterTextsConfigSchema } from "@scow/config/build/appConfig/clusterTexts";
+import type { ClusterTextsConfigSchema } from "@scow/config/build/clusterTexts";
 import { Divider } from "antd";
 import { GetServerSideProps, NextPage } from "next";
 import { checkCookie } from "src/auth/server";

@@ -2,7 +2,7 @@ import { Logger } from "@ddadaal/tsgrpc-server";
 import { MikroORM, QueryOrder } from "@mikro-orm/core";
 import { MariaDbDriver } from "@mikro-orm/mariadb";
 import { SqlEntityManager } from "@mikro-orm/mysql";
-import { parsePlaceholder } from "@scow/config";
+import { parsePlaceholder } from "@scow/lib-config";
 import { charge } from "src/bl/charging";
 import { misConfig } from "src/config/mis";
 import { Account } from "src/entities/Account";

@@ -7,6 +7,7 @@ RUN corepack enable
 WORKDIR /app
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
+COPY libs/libconfig/package.json ./libs/libconfig/
 COPY libs/config/package.json ./libs/config/
 COPY apps/auth/package.json ./apps/auth/
 
@@ -27,6 +28,11 @@ FROM node:hydrogen-alpine@sha256:1f09c210a17508d34277971b19541a47a26dc5a641dedc0
 
 WORKDIR /app
 COPY --from=builder /app/node_modules ./node_modules
+
+WORKDIR /app/libs/libconfig
+COPY --from=builder /app/libs/libconfig/package.json .
+COPY --from=builder /app/libs/libconfig/node_modules/ ./node_modules
+COPY --from=builder /app/libs/libconfig/build/ ./build
 
 WORKDIR /app/libs/config
 COPY --from=builder /app/libs/config/package.json .

@@ -70,6 +70,7 @@ importers:
       '@fastify/formbody': 7.3.0
       '@fastify/static': 6.5.0
       '@scow/config': workspace:*
+      '@scow/lib-config': workspace:*
       '@sinclair/typebox': 0.25.2
       '@types/asn1': 0.2.0
       '@types/ldapjs': 2.2.5
@@ -86,6 +87,7 @@ importers:
       '@fastify/formbody': 7.3.0
       '@fastify/static': 6.5.0
       '@scow/config': link:../../libs/config
+      '@scow/lib-config': link:../../libs/libconfig
       '@sinclair/typebox': 0.25.2
       asn1: 0.2.6
       fastify: 4.9.2
@@ -111,6 +113,7 @@ importers:
       '@mikro-orm/mysql': 5.5.1
       '@mikro-orm/seeder': 5.5.1
       '@scow/config': workspace:*
+      '@scow/lib-config': workspace:*
       '@scow/lib-decimal': workspace:*
       '@scow/lib-ssh': workspace:*
       '@sinclair/typebox': 0.25.2
@@ -131,6 +134,7 @@ importers:
       '@mikro-orm/mysql': 5.5.1_vsv5myw3ixte33egugtpcapmtu
       '@mikro-orm/seeder': 5.5.1_@mikro-orm+core@5.5.1
       '@scow/config': link:../../libs/config
+      '@scow/lib-config': link:../../libs/libconfig
       '@scow/lib-decimal': link:../../libs/decimal
       '@scow/lib-ssh': link:../../libs/ssh
       '@sinclair/typebox': 0.25.2
@@ -163,6 +167,7 @@ importers:
       '@next/bundle-analyzer': 13.0.2
       '@scow/config': workspace:*
       '@scow/lib-auth': workspace:*
+      '@scow/lib-config': workspace:*
       '@scow/lib-decimal': workspace:*
       '@sinclair/typebox': 0.25.2
       '@types/google-protobuf': 3.15.6
@@ -209,6 +214,7 @@ importers:
       '@grpc/grpc-js': 1.7.3
       '@scow/config': link:../../libs/config
       '@scow/lib-auth': link:../../libs/auth
+      '@scow/lib-config': link:../../libs/libconfig
       '@scow/lib-decimal': link:../../libs/decimal
       '@sinclair/typebox': 0.25.2
       antd: 4.24.1_biqbaboplfbrettd7655fr4n2y
@@ -253,6 +259,7 @@ importers:
       '@ddadaal/tsgrpc-server': 0.18.0
       '@grpc/grpc-js': 1.7.3
       '@scow/config': workspace:*
+      '@scow/lib-config': workspace:*
       '@scow/lib-ssh': workspace:*
       '@sinclair/typebox': 0.25.2
       '@types/node-cron': 3.0.5
@@ -270,6 +277,7 @@ importers:
       '@ddadaal/tsgrpc-server': 0.18.0_@grpc+grpc-js@1.7.3
       '@grpc/grpc-js': 1.7.3
       '@scow/config': link:../../libs/config
+      '@scow/lib-config': link:../../libs/libconfig
       '@scow/lib-ssh': link:../../libs/ssh
       '@sinclair/typebox': 0.25.2
       dayjs: 1.11.6
@@ -304,6 +312,7 @@ importers:
       '@next/bundle-analyzer': 13.0.2
       '@scow/config': workspace:*
       '@scow/lib-auth': workspace:*
+      '@scow/lib-config': workspace:*
       '@scow/lib-decimal': workspace:*
       '@scow/lib-ssh': workspace:*
       '@sinclair/typebox': 0.25.2
@@ -363,6 +372,7 @@ importers:
       '@grpc/grpc-js': 1.7.3
       '@scow/config': link:../../libs/config
       '@scow/lib-auth': link:../../libs/auth
+      '@scow/lib-config': link:../../libs/libconfig
       '@scow/lib-decimal': link:../../libs/decimal
       '@scow/lib-ssh': link:../../libs/ssh
       '@sinclair/typebox': 0.25.2

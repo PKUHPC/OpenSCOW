@@ -1,5 +1,5 @@
 import createError from "@fastify/error";
-import { omitConfigSpec } from "@scow/config";
+import { omitConfigSpec } from "@scow/lib-config";
 import fastify, { FastifyInstance, FastifyPluginAsync, FastifyPluginCallback } from "fastify";
 import { config } from "src/config/env";
 import { plugins } from "src/plugins";

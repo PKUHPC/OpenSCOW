@@ -1,7 +1,7 @@
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
-import { AppType } from "@scow/config/build/appConfig/app";
+import { AppType } from "@scow/config/build/app";
 import { getClusterOps } from "src/clusterops";
 import { apps } from "src/config/apps";
 import { AppServiceServer, AppServiceService, ConnectToAppResponse } from "src/generated/portal/app";

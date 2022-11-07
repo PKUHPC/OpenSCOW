@@ -16,6 +16,7 @@
     "@fastify/formbody": "7.3.0",
     "@fastify/static": "6.5.0",
     "@scow/config": "workspace:*",
+    "@scow/lib-config": "workspace:*",
     "@sinclair/typebox": "0.25.2",
     "asn1": "0.2.6",
     "fastify": "4.9.2",

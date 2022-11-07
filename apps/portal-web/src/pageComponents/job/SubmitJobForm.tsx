@@ -1,5 +1,5 @@
 import { ReloadOutlined } from "@ant-design/icons";
-import { parsePlaceholder } from "@scow/config/build/parse";
+import { parsePlaceholder } from "@scow/lib-config";
 import { Button, Checkbox, Col, Form, Input, InputNumber, message, Modal, Row, Select, Tooltip } from "antd";
 import { useWatch } from "antd/lib/form/Form";
 import Router from "next/router";

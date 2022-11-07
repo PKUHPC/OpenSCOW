@@ -26,6 +26,7 @@
     "@ddadaal/tsgrpc-client": "0.17.1",
     "@grpc/grpc-js": "1.7.3",
     "@scow/config": "workspace:*",
+    "@scow/lib-config": "workspace:*",
     "@scow/lib-auth": "workspace:*",
     "@scow/lib-decimal": "workspace:*",
     "@scow/lib-ssh": "workspace:*",
