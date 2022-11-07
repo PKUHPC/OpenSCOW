@@ -141,6 +141,6 @@ pnpm devenv:stop
 
 项目CI配置如下：
 
-![CI流程](./ci.jpg)
+![CI流程](../../diagrams/ci.png)
 
 

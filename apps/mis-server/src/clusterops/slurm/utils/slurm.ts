@@ -1,5 +1,5 @@
 import { Logger } from "@ddadaal/tsgrpc-server";
-import { SlurmMisConfigSchema } from "@scow/config/build/appConfig/mis";
+import { SlurmMisConfigSchema } from "@scow/config/build/mis";
 import { loggedExec, sshConnect } from "@scow/lib-ssh";
 import { rootKeyPair } from "src/config/env";
 

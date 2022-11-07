@@ -39,10 +39,10 @@ export const SmallScreenMenu: React.FC<Props> = ({
   if (userStore.user) {
     items.push({ disabled: true, key: "user-info", label: `欢迎，${userStore.user.identityId}` });
     items.push({ key: "logout", label: (
-      <Link href="/">
-        <a onClick={userStore.logout}>
+      <Link href="/" onClick={userStore.logout}>
+        
         退出登录
-        </a>
+        
       </Link>
     ) });
   }

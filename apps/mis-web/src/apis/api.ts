@@ -10,7 +10,9 @@ import type { GetFetchJobInfoSchema } from "src/pages/api/admin/fetchJobs/getFet
 import type { SetFetchStateSchema } from "src/pages/api/admin/fetchJobs/setFetchState";
 import type { TenantFinancePaySchema } from "src/pages/api/admin/finance/pay";
 import type { GetTenantPaymentsSchema } from "src/pages/api/admin/finance/payments";
+import type { GetAllTenantsSchema } from "src/pages/api/admin/getAllTenants";
 import type { GetAllUsersSchema } from "src/pages/api/admin/getAllUsers";
+import type { GetClusterUsersSchema } from "src/pages/api/admin/getClusterUsers";
 import type { GetTenantUsersSchema } from "src/pages/api/admin/getTenantUsers";
 import type { ImportUsersSchema } from "src/pages/api/admin/importUsers";
 import type { QueryStorageQuotaSchema } from "src/pages/api/admin/queryStorageQuota";
@@ -44,6 +46,7 @@ import type { ChangePasswordSchema } from "src/pages/api/profile/changePassword"
 import type { DewhitelistAccountSchema } from "src/pages/api/tenant/accountWhitelist/dewhitelistAccount";
 import type { GetWhitelistedAccountsSchema } from "src/pages/api/tenant/accountWhitelist/getWhitelistedAccounts";
 import type { WhitelistAccountSchema } from "src/pages/api/tenant/accountWhitelist/whitelistAccount";
+import type { CreateTenantSchema } from "src/pages/api/tenant/create";
 import type { CreateAccountSchema } from "src/pages/api/tenant/createAccount";
 import type { GetAccountsSchema } from "src/pages/api/tenant/getAccounts";
 import type { GetTenantsSchema } from "src/pages/api/tenant/getTenants";
@@ -68,7 +71,9 @@ export const api = {
   setFetchState: fromApi<SetFetchStateSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin/fetchJobs/setFetchState")),
   tenantFinancePay: fromApi<TenantFinancePaySchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin/finance/pay")),
   getTenantPayments: fromApi<GetTenantPaymentsSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin/finance/payments")),
+  getAllTenants: fromApi<GetAllTenantsSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin/getAllTenants")),
   getAllUsers: fromApi<GetAllUsersSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin/getAllUsers")),
+  getClusterUsers: fromApi<GetClusterUsersSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin/getClusterUsers")),
   getTenantUsers: fromApi<GetTenantUsersSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin/getTenantUsers")),
   importUsers: fromApi<ImportUsersSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin/importUsers")),
   queryStorageQuota: fromApi<QueryStorageQuotaSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin/queryStorageQuota")),
@@ -103,6 +108,7 @@ export const api = {
   dewhitelistAccount: fromApi<DewhitelistAccountSchema>("DELETE", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/tenant/accountWhitelist/dewhitelistAccount")),
   getWhitelistedAccounts: fromApi<GetWhitelistedAccountsSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/tenant/accountWhitelist/getWhitelistedAccounts")),
   whitelistAccount: fromApi<WhitelistAccountSchema>("PUT", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/tenant/accountWhitelist/whitelistAccount")),
+  createTenant: fromApi<CreateTenantSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/tenant/create")),
   createAccount: fromApi<CreateAccountSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/tenant/createAccount")),
   getAccounts: fromApi<GetAccountsSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/tenant/getAccounts")),
   getTenants: fromApi<GetTenantsSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/tenant/getTenants")),

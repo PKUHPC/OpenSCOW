@@ -1,6 +1,6 @@
+import { GetConfigFn, getDirConfig } from "@scow/lib-config";
 import { Static, Type } from "@sinclair/typebox";
-
-import { getDirConfig } from "../fileConfig";
+import { DEFAULT_CONFIG_BASE_PATH } from "src/constants";
 
 export const AppConnectPropsSchema = Type.Object({
   method: Type.Enum({ GET: "GET", POST: "POST" }, { description: "连接所使用的HTTP方法" }),
@@ -59,9 +59,9 @@ export type AppConfigSchema = Static<typeof AppConfigSchema>;
 
 export const APP_CONFIG_BASE_PATH = "apps";
 
-export const getAppConfigs = (baseConfigPath?: string): Record<string, AppConfigSchema> => {
+export const getAppConfigs: GetConfigFn<Record<string, AppConfigSchema>> = (baseConfigPath) => {
 
-  const appsConfig = getDirConfig(AppConfigSchema, APP_CONFIG_BASE_PATH, baseConfigPath);
+  const appsConfig = getDirConfig(AppConfigSchema, APP_CONFIG_BASE_PATH, baseConfigPath ?? DEFAULT_CONFIG_BASE_PATH);
 
   Object.entries(appsConfig).forEach(([id, config]) => {
     if (!config[config.type]) {

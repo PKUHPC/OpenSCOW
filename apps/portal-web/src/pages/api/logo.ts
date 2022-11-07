@@ -1,7 +1,7 @@
+import { DEFAULT_CONFIG_BASE_PATH } from "@scow/config/build/constants";
 import fs from "fs";
 import { contentType } from "mime-types";
 import path from "path";
-import { CONFIG_PATH } from "src/utils/config";
 import { getHostname } from "src/utils/host";
 import { route } from "src/utils/route";
 
@@ -15,7 +15,7 @@ export interface GetLogoSchema {
 }
 
 
-const CUSTOM_LOGO_DIR = path.join(CONFIG_PATH, "logo");
+const CUSTOM_LOGO_DIR = path.join(DEFAULT_CONFIG_BASE_PATH, "logo");
 
 const CUSTOM_DEFAULT_DIR = path.join(CUSTOM_LOGO_DIR, "default");
 const BUILTIN_DEFAULT_DIR = "assets/logo";

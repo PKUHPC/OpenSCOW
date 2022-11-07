@@ -1,6 +1,7 @@
 import { Logger } from "@ddadaal/tsgrpc-server";
 import { SqlEntityManager } from "@mikro-orm/mysql";
-import { getConfigFromFile } from "@scow/config";
+import { DEFAULT_CONFIG_BASE_PATH } from "@scow/config/build/constants";
+import { getConfigFromFile } from "@scow/lib-config";
 import { Decimal } from "@scow/lib-decimal";
 import { Static, Type } from "@sinclair/typebox";
 import { AmountStrategy, JobPriceItem } from "src/entities/JobPriceItem";
@@ -29,7 +30,7 @@ const PriceItemsJsonSchema = Type.Record(
 
 export async function createPriceItems(em: SqlEntityManager, logger: Logger) {
 
-  const priceItems = getConfigFromFile(PriceItemsJsonSchema, "priceItems");
+  const priceItems = getConfigFromFile(PriceItemsJsonSchema, "priceItems", DEFAULT_CONFIG_BASE_PATH);
 
   logger.info("priceItems.json content: %o", priceItems);
 

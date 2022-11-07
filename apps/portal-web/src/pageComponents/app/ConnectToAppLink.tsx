@@ -1,4 +1,4 @@
-import { parsePlaceholder } from "@scow/config/build/parse";
+import { parsePlaceholder } from "@scow/lib-config/build/parse";
 import { message } from "antd";
 import { join } from "path";
 import { api } from "src/apis";

@@ -3,7 +3,9 @@ import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { UniqueConstraintViolationException } from "@mikro-orm/core";
 import { decimalToMoney } from "@scow/lib-decimal";
+import { insertKeyAsUser } from "@scow/lib-ssh";
 import { clusters } from "src/config/clusters";
+import { rootKeyPair } from "src/config/env";
 import { misConfig } from "src/config/mis";
 import { Account } from "src/entities/Account";
 import { StorageQuota } from "src/entities/StorageQuota";
@@ -309,7 +311,7 @@ export const userServiceServer = plugin((server) => {
       // creat user in database
       const user = new User({ name, userId: identityId, tenant, email });
 
-      user.storageQuotas.add(...Object.keys(clusters).map((x) => new StorageQuota({
+      user.storageQuotas.add(Object.keys(clusters).map((x) => new StorageQuota({
         cluster: x,
         storageQuota: 0,
         user: user!,
@@ -326,7 +328,6 @@ export const userServiceServer = plugin((server) => {
       }
 
       // call auth
-      // 调用认证系统的创建用户接口，在底层认证系统中创建用户
       const rep = await fetch(misConfig.authUrl + "/user", {
         method: "POST",
         body: JSON.stringify({
@@ -343,8 +344,7 @@ export const userServiceServer = plugin((server) => {
 
       logger.info("Calling auth completed. %o", rep);
 
-      // 如果调用认证系统的创建用户接口失败，删除第一步在数据库中创建的用户
-
+      // If the call of creating user of auth fails,  delete the user created in the database.
       if (!rep.ok) {
         await em.removeAndFlush(user);
 
@@ -357,6 +357,23 @@ export const userServiceServer = plugin((server) => {
         logger.info("Error creating user in auth. code: %d, body: %o", rep.status, await rep.text());
 
         throw <ServiceError> { code: Status.INTERNAL, message: `Error creating user ${user.id} in auth.` };
+      }
+
+      // Making an ssh Request to the login node as the user created.
+      if (process.env.NODE_ENV === "production") {
+        await Promise.all(Object.values(clusters).map(async ({ displayName, slurm, misIgnore }) => {
+          if (misIgnore) { return; }
+          const node = slurm.loginNodes[0];
+          logger.info("Checking if user can login to %s by login node %s", displayName, node);
+
+          const error = await insertKeyAsUser(node, name, password, rootKeyPair, logger).catch((e) => e);
+          if (error) {
+            logger.info("user %s cannot login to %s by login node %s. err: %o", name, displayName, node, error);
+            throw error;
+          } else {
+            logger.info("user %s login to %s by login node %s", name, displayName, node);
+          }
+        }));
       }
 
       return [{ id: user.id }];

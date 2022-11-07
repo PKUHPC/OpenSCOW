@@ -26,11 +26,9 @@ export const CreateUserForm: React.FC<Props> = ({ noPassword }) => {
         name="identityId"
         rules={[
           { required: true },
-          ...publicConfig.USERID_PATTERN
-            ? [{
-              pattern: new RegExp(publicConfig.USERID_PATTERN),
-              message: publicConfig.USERID_PATTERN_MESSAGE }]
-            : [],
+          ...(publicConfig.USERID_PATTERN ? [{
+            pattern: new RegExp(publicConfig.USERID_PATTERN),
+            message: publicConfig.USERID_PATTERN_MESSAGE }] : []),
         ]}
 
       >

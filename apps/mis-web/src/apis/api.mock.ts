@@ -92,7 +92,36 @@ const mockUsers = [
   },
 ];
 
+
 export const mockApi: MockApi<typeof api> = {
+
+  getAllTenants: async () => (
+    {
+      totalCount: 3,
+      platformTenants: [{
+        tenantId: 1,
+        tenantName: "test1",
+        balance: numberToMoney(0.0000),
+        userCount: 1,
+        accountCount:1,
+      },
+      {
+        tenantId: 2,
+        tenantName: "test2",
+        balance: numberToMoney(10.0000),
+        userCount: 4,
+        accountCount:2,
+      },
+      {
+        tenantId: 3,
+        tenantName: "test3",
+        balance: numberToMoney(10.5),
+        userCount: 5,
+        accountCount:3,
+      },
+      ],
+    }),
+
   getAllUsers: async () => ({ 
     totalCount: 3,
     platformUsers: [
@@ -158,6 +187,27 @@ export const mockApi: MockApi<typeof api> = {
   createInitAdmin: async () => null,
 
   importUsers: async () => null,
+
+  getClusterUsers: async () => {
+    return ({
+      accounts: [
+        {
+          accountName: "a_user1",
+          users: [{ userId: "user1", state: "allowed!" }, { userId: "user2", state: "allowed!" }],
+          owner: "user1",
+        },
+        {
+          accountName: "account2",
+          users: [{ userId: "user2", state: "allowed!" }, { userId: "user3", state: "allowed!" }],
+        },
+      ],
+      users: [ 
+        { userId: "user1", userName: "user1", accounts: [ "a_user1" ]}, 
+        { userId: "user2", userName: "user2", accounts: [ "a_user1", "account2" ]}, 
+        { userId: "user3", userName: "user3", accounts: [ "account2" ]},
+      ],
+    });
+  },
 
   completeInit: async () => null,
 
@@ -270,7 +320,7 @@ export const mockApi: MockApi<typeof api> = {
 
   changePassword: async () => null,
   createUser: async () => null,
-
+  createTenant: async () => null,
   validateToken: async () => MOCK_USER_INFO,
 };
 
@@ -302,3 +352,4 @@ export const MOCK_USER_STATUS: GetUserStatusReply = {
     },
   },
 };
+

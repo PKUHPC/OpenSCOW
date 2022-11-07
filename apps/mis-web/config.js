@@ -1,10 +1,10 @@
 // @ts-check
 
-const { envConfig, getConfigFromFile, parseKeyValue, regex, str, bool } = require("@scow/config");
-const { getClusterConfigs } = require("@scow/config/build/appConfig/cluster");
-const { getMisConfig } = require("@scow/config/build/appConfig/mis");
-const { getClusterTextsConfig } = require("@scow/config/build/appConfig/clusterTexts");
-const { DEFAULT_PRIMARY_COLOR, getUiConfig } = require("@scow/config/build/appConfig/ui");
+const { envConfig, getConfigFromFile, parseKeyValue, regex, str, bool } = require("@scow/lib-config");
+const { getClusterConfigs } = require("@scow/config/build/cluster");
+const { getMisConfig } = require("@scow/config/build/mis");
+const { getClusterTextsConfig } = require("@scow/config/build/clusterTexts");
+const { DEFAULT_PRIMARY_COLOR, getUiConfig } = require("@scow/config/build/ui");
 const { PHASE_DEVELOPMENT_SERVER, PHASE_PRODUCTION_BUILD, PHASE_PRODUCTION_SERVER } = require("next/constants");
 const { join } = require("path");
 const { getCapabilities } = require("@scow/lib-auth");

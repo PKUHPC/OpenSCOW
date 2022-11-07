@@ -1,4 +1,4 @@
-import { getMisConfig } from "@scow/config/build/appConfig/mis";
+import { getMisConfig } from "@scow/config/build/mis";
 
 export const misConfig = getMisConfig();
 

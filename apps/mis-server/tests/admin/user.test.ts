@@ -124,7 +124,7 @@ it("deletes user", async () => {
     userId: user.userId,
   });
 
-  await reloadEntity(data.accountA);
+  await reloadEntity(em, data.accountA);
 
   expect(await em.count(UserAccount, { account: data.accountA })).toBe(2);
   expect(await em.count(User, { tenant: data.tenant })).toBe(2);
@@ -143,6 +143,7 @@ it("cannot delete owner", async () => {
   expect(await server.ext.orm.em.count(UserAccount, { account: data.accountA })).toBe(2);
   expect(await server.ext.orm.em.count(User, { tenant: data.tenant })).toBe(2);
 });
+
 
 it("get all users", async () => {
   const data = await insertInitialData(server.ext.orm.em.fork());

@@ -110,7 +110,7 @@ it("sets an user as platforn admin and tenant admin", async () => {
 
   await asyncClientCall(client, "setAsInitAdmin", request);
 
-  await reloadEntities([user]);
+  await reloadEntities(em, [user]);
 
   expect(user.platformRoles).toIncludeSameMembers([PlatformRole.PLATFORM_ADMIN]);
   expect(user.tenantRoles).toIncludeSameMembers([TenantRole.TENANT_ADMIN]);
@@ -136,7 +136,7 @@ it("unsets an user as platforn admin and tenant admin", async () => {
 
   await asyncClientCall(client, "unsetInitAdmin", request);
 
-  await reloadEntities([user]);
+  await reloadEntities(em, [user]);
 
   expect(user.platformRoles).not.toInclude(PlatformRole.PLATFORM_ADMIN);
   expect(user.tenantRoles).not.toInclude(TenantRole.TENANT_ADMIN);

@@ -10,8 +10,8 @@ on:
 
 env:
   GITHUB_CR: ghcr.io
-  ALIYUN_CR: registry.cn-hangzhou.aliyuncs.com
-  ALIYUN_PROJECT_NAME: scow
+  # ALIYUN_CR: registry.cn-hangzhou.aliyuncs.com
+  # ALIYUN_PROJECT_NAME: scow
 
 jobs:
   test:
@@ -56,7 +56,7 @@ jobs:
       - name: Upload test converage
         uses: codecov/codecov-action@v3
         with:
-          files: ./libs/auth/coverage/lcov.info,./libs/config/coverage/lcov.info,./libs/decimal/coverage/lcov.info,./apps/auth/coverage/lcov.info,./apps/mis-server/coverage/lcov.info,./apps/portal-server/coverage/lcov.info
+          files: ./libs/auth/coverage/lcov.info,./libs/libconfig/coverage/lcov.info,./libs/decimal/coverage/lcov.info,./apps/auth/coverage/lcov.info,./apps/mis-server/coverage/lcov.info,./apps/portal-server/coverage/lcov.info
 
   build-images:
     needs: test
@@ -111,20 +111,12 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Log in to the Aliyun CR
-        uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
-        with:
-          registry: ${{ env.ALIYUN_CR }}
-          username: ${{ secrets.ALIYUN_CR_USERNAME }}
-          password: ${{ secrets.ALIYUN_CR_PASSWORD }}
-
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v4
         with:
           images: |
             ${{ env.GITHUB_CR }}/${{ github.repository }}/${{ matrix.name }}
-            ${{ env.ALIYUN_CR }}/${{ env.ALIYUN_PROJECT_NAME }}/${{ matrix.name }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v3

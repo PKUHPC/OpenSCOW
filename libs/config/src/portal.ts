@@ -1,5 +1,6 @@
+import { GetConfigFn, getConfigFromFile } from "@scow/lib-config";
 import { Static, Type } from "@sinclair/typebox";
-import { GetConfigFn, getConfigFromFile } from "src/fileConfig";
+import { DEFAULT_CONFIG_BASE_PATH } from "src/constants";
 
 export const PortalConfigSchema = Type.Object({
   jobManagement: Type.Boolean({ description: "是否启动作业管理功能", default: true }),
@@ -50,4 +51,4 @@ const PORTAL_CONFIG_NAME = "portal";
 export type PortalConfigSchema = Static<typeof PortalConfigSchema>;
 
 export const getPortalConfig: GetConfigFn<PortalConfigSchema> = (baseConfigPath) =>
-  getConfigFromFile(PortalConfigSchema, PORTAL_CONFIG_NAME, baseConfigPath);
+  getConfigFromFile(PortalConfigSchema, PORTAL_CONFIG_NAME, baseConfigPath ?? DEFAULT_CONFIG_BASE_PATH);

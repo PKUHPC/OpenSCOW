@@ -59,7 +59,7 @@ it("pays account", async () => {
   expect(moneyToNumber(reply.previousBalance!)).toBe(0);
   expect(moneyToNumber(reply.currentBalance!)).toBe(10);
 
-  await reloadEntity(account);
+  await reloadEntity(em, account);
 
   expect(account.balance.toNumber()).toBe(10);
 });
@@ -86,13 +86,13 @@ it("concurrently pays", async () => {
 
   expect(responses.every((x) => x.status === "fulfilled")).toBeTrue();
 
-  await reloadEntity(account);
+  await reloadEntity(em, account);
 
   expect(account.balance.toNumber()).toBe(100);
 
-  const em = server.ext.orm.em.fork();
+  const em1 = server.ext.orm.em.fork();
 
-  expect(await em.count(PayRecord)).toBe(10);
+  expect(await em1.count(PayRecord)).toBe(10);
 });
 
 it("returns NOT_FOUND if account is not found", async () => {
@@ -141,7 +141,7 @@ it("charges account", async () => {
   expect(moneyToNumber(reply.previousBalance!)).toBe(0);
   expect(moneyToNumber(reply.currentBalance!)).toBe(-10);
 
-  await reloadEntity(account);
+  await reloadEntity(em, account);
 
   expect(account.balance.toNumber()).toBe(-10);
 });
@@ -166,13 +166,13 @@ it("concurrently charges", async () => {
 
   expect(responses.every((x) => x.status === "fulfilled")).toBeTrue();
 
-  await reloadEntity(account);
+  await reloadEntity(em, account);
 
   expect(account.balance.toNumber()).toBe(-100);
 
-  const em = server.ext.orm.em.fork();
+  const em1 = server.ext.orm.em.fork();
 
-  expect(await em.count(ChargeRecord)).toBe(10);
+  expect(await em1.count(ChargeRecord)).toBe(10);
 });
 
 
@@ -195,7 +195,7 @@ it("returns payment records", async () => {
 
   await asyncClientCall(client, "pay", request);
 
-  await reloadEntity(account);
+  await reloadEntity(em, account);
   expect(account.balance.toNumber()).toBe(10);
 
   const reply = await asyncClientCall(client, "getPaymentRecords", {

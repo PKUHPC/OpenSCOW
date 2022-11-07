@@ -98,7 +98,7 @@ it("fetches the data", async () => {
     }
   });
 
-  await reloadEntities([data.tenant, data.anotherTenant, data.accountA, data.accountB, data.uaAA, data.uaBB]);
+  await reloadEntities(em, [data.tenant, data.anotherTenant, data.accountA, data.accountB, data.uaAA, data.uaBB]);
   expect(data.accountA.balance.toNumber()).toBe(accountACharges.negated().toNumber());
   expect(data.accountB.balance.toNumber()).toBe(accountBCharges.negated().toNumber());
   expect(data.tenant.balance.toNumber()).toBe(defaultTenantCharges.negated().toNumber());

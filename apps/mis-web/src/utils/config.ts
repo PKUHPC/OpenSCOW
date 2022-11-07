@@ -1,7 +1,6 @@
-import type { ClusterConfigSchema } from "@scow/config/build/appConfig/cluster";
-import { CONFIG_BASE_PATH } from "@scow/config/build/constants";
-import type { ClusterTextsConfigSchema } from "@scow/config/src/appConfig/clusterTexts";
-import type { UiConfigSchema } from "@scow/config/src/appConfig/ui";
+import type { ClusterConfigSchema } from "@scow/config/build/cluster";
+import type { ClusterTextsConfigSchema } from "@scow/config/build/clusterTexts";
+import type { UiConfigSchema } from "@scow/config/build/ui";
 import getConfig from "next/config";
 
 export interface ServerRuntimeConfig {
@@ -36,4 +35,3 @@ export const publicConfig: PublicRuntimeConfig = getConfig().publicRuntimeConfig
 
 export type Cluster = { id: string; name: string; }
 
-export const CONFIG_PATH = process.env.NODE_ENV === "production" ? CONFIG_BASE_PATH : "config";

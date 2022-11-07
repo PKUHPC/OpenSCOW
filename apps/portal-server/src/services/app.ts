@@ -1,13 +1,13 @@
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
-import { AppType, ProxyType } from "@scow/config/build/appConfig/app";
+import { AppType, ProxyType } from "@scow/config/build/app";
 import { getClusterOps } from "src/clusterops";
 import { apps } from "src/config/apps";
-import { 
+import {
   AppServiceServer,
   AppServiceService,
-  ConnectToAppResponse, 
+  ConnectToAppResponse,
   ConnectToAppResponse_ProxyType,
 } from "src/generated/portal/app";
 import { clusterNotFound } from "src/utils/errors";
