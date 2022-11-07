@@ -8,6 +8,11 @@ function get_password {
   echo $password
 }
 
+function get_ip {
+  local ip=$(getent ahostsv4 $(hostname) |grep $(hostname)|awk -F ' ' '{ print $1 }')
+  echo $ip
+}
+
 export HOST=$(hostname)
 
 source before.sh

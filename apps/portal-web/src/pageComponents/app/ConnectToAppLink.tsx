@@ -22,7 +22,7 @@ export const ConnectTopAppLink: React.FC<Props> = ({
       .httpError(409, () => { message.error("此应用目前无法连接"); });
 
     if (reply.type === "web") {
-      const { connect, host, password, port } = reply;
+      const { connect, host, password, port, proxyType } = reply;
       const interpolatedValues = { HOST: host, PASSWORD: password, PORT: port };
       const path = parsePlaceholder(connect.path, interpolatedValues);
 
@@ -36,7 +36,9 @@ export const ConnectTopAppLink: React.FC<Props> = ({
       const query = connect.query ? interpolateValues(connect.query) : {};
       const formData = connect.formData ? interpolateValues(connect.formData) : undefined;
 
-      const pathname = join(publicConfig.PROXY_BASE_PATH, host, String(port), path);
+      const proxyBasePath = proxyType === "relative" ? publicConfig.RPROXY_BASE_PATH : publicConfig.PROXY_BASE_PATH;
+
+      const pathname = join(proxyBasePath, host, String(port), path);
 
       const url = pathname + "?" + new URLSearchParams(query).toString();
 

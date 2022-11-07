@@ -18,6 +18,9 @@ title: "portal-web"
 |`SSH_PRIVATE_KEY_PATH`|字符串|SSH私钥路径|~/.ssh/id_rsa|
 |`SSH_PUBLIC_KEY_PATH`|字符串|SSH公钥路径|~/.ssh/id_rsa.pub|
 |`PROXY_BASE_PATH`|字符串|网关的代理路径。相对于整个系统的base path。|/proxy|
+|`RPROXY_BASE_PATH`|字符串|网关的代理路径。相对于整个系统的base path。|/rproxy|
+|`WSPROXY_BASE_PATH`|字符串|网关的代理路径。相对于整个系统的base path。|/wsproxy|
+|`SERVER_URL`|字符串|门户后端的路径|portal-server:5000|
 |`MIS_DEPLOYED`|布尔值|是否部署了管理系统|false|
 |`MIS_URL`|字符串|如果部署了管理系统，设置URL或者路径。相对于整个系统的base path。将会覆盖配置文件。空字符串等价于未部署管理系统||
 

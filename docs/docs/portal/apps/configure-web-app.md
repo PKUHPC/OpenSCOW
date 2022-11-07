@@ -3,7 +3,7 @@ sidebar_position: 2
 title: 配置Web类应用
 ---
 
-# 配置Web类应用 
+# 配置Web类应用
 
 ## 前提条件
 
@@ -24,6 +24,9 @@ name: VSCode
 
 # 指定应用类型为web
 type: web
+
+# 指定反向代理类型
+proxyType: relative
 
 # slurm配置
 slurm:
