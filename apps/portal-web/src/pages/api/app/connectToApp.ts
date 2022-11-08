@@ -1,7 +1,7 @@
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { status } from "@grpc/grpc-js";
 import { authenticate } from "src/auth/server";
-import { AppServiceClient, ConnectToAppResponse_ProxyType } from "src/generated/portal/app";
+import { AppServiceClient, WebAppProps_ProxyType } from "src/generated/portal/app";
 import { getClient } from "src/utils/client";
 import { dnsResolve } from "src/utils/dns";
 import { route } from "src/utils/route";
@@ -24,8 +24,9 @@ export interface ConnectToAppSchema {
   }
 
   responses: {
-    200: { host: string; port: number; password: string; proxyType: "relative" | "absolute" | "websocket" } & (
-      | { type: "web"; connect: AppConnectProps }
+    200: { host: string; port: number; password: string} & (
+      | { type: "web"; connect: AppConnectProps; proxyType: "relative" | "absolute";
+    }
       | { type: "vnc"; }
     );
 
@@ -65,9 +66,9 @@ export default /* #__PURE__*/route<ConnectToAppSchema>("ConnectToAppSchema", asy
           password: x.password,
           type: "web" as const,
           connect: x.appProps.web,
-          proxyType: x.proxyType === ConnectToAppResponse_ProxyType.absolute
-            ? "absolute" : x.proxyType === ConnectToAppResponse_ProxyType.websocket
-              ? "websocket" : "relative",
+          proxyType: x.appProps.web.proxyType === WebAppProps_ProxyType.relative
+            ? "relative"
+            : "absolute",
         },
       };
     } else {
@@ -77,9 +78,6 @@ export default /* #__PURE__*/route<ConnectToAppSchema>("ConnectToAppSchema", asy
           port: x.port,
           password: x.password,
           type: "vnc" as const,
-          proxyType: x.proxyType === ConnectToAppResponse_ProxyType.absolute
-            ? "absolute" : x.proxyType === ConnectToAppResponse_ProxyType.websocket
-              ? "websocket" : "relative",
         },
       };
     }

@@ -25,12 +25,12 @@ name: VSCode
 # 指定应用类型为web
 type: web
 
-# 指定反向代理类型
-proxyType: relative
-
 # Web应用的配置
 web:
 
+  # 指定反向代理类型
+  proxyType: relative
+  
   # 准备脚本
   beforeScript: |
     export PORT=$(get_port)

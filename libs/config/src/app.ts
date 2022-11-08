@@ -17,13 +17,8 @@ export enum AppType {
   vnc = "vnc"
 }
 
-export enum ProxyType {
-  relative = "relative",
-  absolute = "absolute",
-  websocket = "websocket"
-}
-
 export const WebAppConfigSchema = Type.Object({
+  proxyType: Type.Enum({ relative: "relative", absolute: "absolute" }, { description: "proxy 类型" }),
   beforeScript: Type.String({ description: "启动应用之前的准备命令。具体参考文档" }),
   script: Type.String({ description: "启动应用的命令。可以使用beforeScript中定义的变量" }),
   connect: AppConnectPropsSchema,
@@ -52,7 +47,6 @@ export const AppConfigSchema = Type.Object({
   slurm: Type.Optional(SlurmConfigSchema),
   web: Type.Optional(WebAppConfigSchema),
   vnc: Type.Optional(VncAppConfigSchema),
-  proxyType: Type.Enum(ProxyType, { description: "proxy 类型" }),
 });
 
 export type AppConfigSchema = Static<typeof AppConfigSchema>;

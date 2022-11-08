@@ -25,8 +25,6 @@ name: VSCode
 # 指定应用类型为web
 type: web
 
-# 指定反向代理类型
-proxyType: relative
 
 # slurm配置
 slurm:
@@ -35,6 +33,9 @@ slurm:
 
 # Web应用的配置
 web:
+
+  # 指定反向代理类型
+  proxyType: relative
 
   # 准备脚本
   beforeScript: |
@@ -60,6 +61,29 @@ web:
 ```
 
 ## 配置解释
+
+### `proxyType`
+
+对于web类型的应用，需要配置`proxyType`。不同的交互式应用使用了不同的nginx proxy方式，通过配置`proxyType`，可以允许应用携带不同类型的uri到后端计算节点。
+
+`proxyType`可以配置为`relative`或者`absolute`。
+
+- 如果设置成`absolute`，会把完整URL请求路径反向代理到给定的主机和端口。比如访问以下地址：
+  
+  > https://hpc.pku.edu/proxy/192.168.220.133/7383/index.html
+
+  以下URL请求将会被发送给计算节点`192.168.220.133`的`7383`端口。
+
+  > /proxy/192.168.220.133/7383/index.html
+  
+- 如果设置成`relative`，只使用URL请求路径的路径部分将请求反向代理到给定的主机和端口。比如访问以下地址：
+
+  > https://hpc.pku.edu/rproxy/192.168.220.133/4253/index.html
+
+  以下URL请求将会被发送给计算节点`192.168.220.133`的`4253`端口。
+
+  > /index.html
+
 
 ### `beforeScript`和`script`
 

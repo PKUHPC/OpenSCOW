@@ -1,14 +1,14 @@
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
-import { AppType, ProxyType } from "@scow/config/build/app";
+import { AppType } from "@scow/config/build/app";
 import { getClusterOps } from "src/clusterops";
 import { apps } from "src/config/apps";
 import {
   AppServiceServer,
   AppServiceService,
   ConnectToAppResponse,
-  ConnectToAppResponse_ProxyType,
+  WebAppProps_ProxyType,
 } from "src/generated/portal/app";
 import { clusterNotFound } from "src/utils/errors";
 
@@ -57,6 +57,9 @@ export const appServiceServer = plugin((server) => {
             query: app.web!.connect.query ?? {},
             method: app.web!.connect.method,
             path: app.web!.connect.path,
+            proxyType: app.web!.proxyType === "absolute"
+              ? WebAppProps_ProxyType.absolute
+              : WebAppProps_ProxyType.relative,
           },
         };
         break;
@@ -64,28 +67,11 @@ export const appServiceServer = plugin((server) => {
         throw new Error(`Unknown app type ${app.type} of app id ${reply.appId}`);
       }
 
-      let proxyType: ConnectToAppResponse["proxyType"];
-
-      switch (app.proxyType) {
-      case ProxyType.relative:
-        proxyType = ConnectToAppResponse_ProxyType.relative;
-        break;
-      case ProxyType.absolute:
-        proxyType = ConnectToAppResponse_ProxyType.absolute;
-        break;
-      case ProxyType.websocket:
-        proxyType = ConnectToAppResponse_ProxyType.websocket;
-        break;
-      default:
-        throw new Error(`Unknown proxy type ${app.proxyType} of app id ${reply.appId}`);
-      }
-
       return [{
         host: reply.host,
         port: reply.port,
         password: reply.password,
         appProps,
-        proxyType: proxyType,
       }];
     },
 
