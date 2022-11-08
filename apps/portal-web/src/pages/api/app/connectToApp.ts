@@ -1,7 +1,7 @@
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { status } from "@grpc/grpc-js";
 import { authenticate } from "src/auth/server";
-import { AppServiceClient } from "src/generated/portal/app";
+import { AppServiceClient, WebAppProps_ProxyType } from "src/generated/portal/app";
 import { getClient } from "src/utils/client";
 import { dnsResolve } from "src/utils/dns";
 import { route } from "src/utils/route";
@@ -9,7 +9,7 @@ import { handlegRPCError } from "src/utils/server";
 
 // Cannot use ServerConnectPropsConfig from appConfig package
 export type AppConnectProps = {
-  proxyType: string;
+  proxyType: WebAppProps_ProxyType;
   method: string;
   path: string;
   query?: { [key: string]: string };

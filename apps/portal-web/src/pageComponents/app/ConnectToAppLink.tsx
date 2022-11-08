@@ -4,6 +4,7 @@ import { join } from "path";
 import { api } from "src/apis";
 import { ClickableA } from "src/components/ClickableA";
 import type { AppSession } from "src/generated/portal/app";
+import { WebAppProps_ProxyType } from "src/generated/portal/app";
 import { Cluster, publicConfig } from "src/utils/config";
 import { openDesktop } from "src/utils/vnc";
 
@@ -37,7 +38,9 @@ export const ConnectTopAppLink: React.FC<Props> = ({
       const formData = connect.formData ? interpolateValues(connect.formData) : undefined;
 
       const proxyType = connect.proxyType;
-      const proxyBasePath = proxyType === "relative" ? publicConfig.RPROXY_BASE_PATH : publicConfig.PROXY_BASE_PATH;
+      const proxyBasePath = proxyType === WebAppProps_ProxyType.relative
+        ? publicConfig.RPROXY_BASE_PATH
+        : publicConfig.PROXY_BASE_PATH;
 
       const pathname = join(proxyBasePath, host, String(port), path);
 
