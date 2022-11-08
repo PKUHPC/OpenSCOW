@@ -56,6 +56,7 @@ export const appServiceServer = plugin((server) => {
             query: app.web!.connect.query ?? {},
             method: app.web!.connect.method,
             path: app.web!.connect.path,
+            proxyType: app.web!.proxyType,
           },
         };
         break;
@@ -84,7 +85,6 @@ export const appServiceServer = plugin((server) => {
         port: reply.port,
         password: reply.password,
         appProps,
-        proxyType: app.type === "web" ? app.web!.proxyType : "websocket",
       }];
     },
 

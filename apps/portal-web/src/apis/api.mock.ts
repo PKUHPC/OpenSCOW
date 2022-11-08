@@ -85,11 +85,11 @@ export const mockApi: MockApi<typeof api> = {
         path: "/test",
         query: { test: "!23" },
         formData: { test: "123" },
+        proxyType: "relative",
       },
-      proxyType: "relative",
     }
     : {
-      host: "127.0.0.1", port: 3000, password: "123", type: "vnc", proxyType: "websocket",
+      host: "127.0.0.1", port: 3000, password: "123", type: "vnc",
     }
   ,
 
