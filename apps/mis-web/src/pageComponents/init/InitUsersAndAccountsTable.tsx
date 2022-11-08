@@ -27,16 +27,6 @@ interface PlatformRoleSelectorProps {
 
 const PlatformRoleSelector: React.FC<PlatformRoleSelectorProps> = ({ role, userId, reload }) => {
 
-  const PlatformRolesChildren: React.ReactNode[] = [];
-  Object.entries(PlatformRole).forEach(([, value]) => {
-    if (typeof value === "number") {
-      PlatformRolesChildren.push(
-        <Select.Option value={value}>
-          {PlatformRoleTexts[value]}
-        </Select.Option>);
-    }
-  });
-
   const [loading, setLoading] = useState(false);
 
   return (
@@ -81,7 +71,11 @@ const PlatformRoleSelector: React.FC<PlatformRoleSelectorProps> = ({ role, userI
       mode="multiple"
       placeholder="Please select"
     >
-      {PlatformRolesChildren}
+      {
+        Object.entries(PlatformRoleTexts).map(([key, value]) => {
+          return <Select.Option key={key} value={key}>{value}</Select.Option>;
+        })
+      }
     </Select>
   );
 };
@@ -93,16 +87,6 @@ interface TenantRoleSelectorProps {
 }
 
 const TenantRoleSelector: React.FC<TenantRoleSelectorProps> = ({ role, userId, reload }) => {
-
-  const TenantRolesChildren: React.ReactNode[] = [];
-  Object.entries(TenantRole).forEach(([, value]) => {
-    if (typeof value === "number") {
-      TenantRolesChildren.push(
-        <Select.Option value={value}>
-          {TenantRoleTexts[value]}
-        </Select.Option>);
-    }
-  });
 
   const [loading, setLoading] = useState(false);
 
@@ -148,7 +132,11 @@ const TenantRoleSelector: React.FC<TenantRoleSelectorProps> = ({ role, userId, r
       mode="multiple"
       placeholder="Please select"
     >
-      {TenantRolesChildren}
+      {
+        Object.entries(TenantRoleTexts).map(([key, value]) => {
+          return <Select.Option key={key} value={key}>{value}</Select.Option>;
+        })
+      }
     </Select>
   );
 };
