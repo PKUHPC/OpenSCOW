@@ -84,7 +84,7 @@ export const appServiceServer = plugin((server) => {
         port: reply.port,
         password: reply.password,
         appProps,
-        proxyType: app.web!.proxyType,
+        proxyType: app.type === "web" ? app.web!.proxyType : "websocket",
       }];
     },
 

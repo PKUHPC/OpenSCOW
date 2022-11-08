@@ -25,11 +25,10 @@ name: jupyter
 # 指定应用类型为web
 type: web
 
-# 指定反向代理类型
-proxyType: absolute
-
 # Web应用的配置
 web:
+  # 指定反向代理类型
+  proxyType: absolute
   # 准备脚本
   beforeScript: |
     export PORT=$(get_port)
