@@ -19,131 +19,140 @@ const Title = styled.div`
   justify-content: space-between;
 `;
 
-// PlatformRolesSelect的children
-const PlatformRolesChildren : React.ReactNode[] = [];
-Object.entries(PlatformRole).forEach(([, value]) => {
-  if (typeof value === "number") {
-    PlatformRolesChildren.push(
-      <Select.Option value={value}>
-        {PlatformRoleTexts[value]}
-      </Select.Option>);
-  }
-});
-
-// TenantRolesSelect的children
-const TenantRolesChildren : React.ReactNode[] = [];
-Object.entries(TenantRole).forEach(([, value]) => {
-  if (typeof value === "number") {
-    TenantRolesChildren.push(
-      <Select.Option value={value}>
-        {TenantRoleTexts[value]}
-      </Select.Option>);
-  }
-});
-
-interface SelectProps {
-  roletype: "platform" | "tenant";
-  role: PlatformRole[] | TenantRole[];
-  userid: string;
-  reloadfunction: () => void;
+interface PlatformRoleSelectorProps {
+  role: PlatformRole[];
+  userId: string;
+  reload: () => void;
 }
 
+const PlatformRoleSelector: React.FC<PlatformRoleSelectorProps> = ({ role, userId, reload }) => {
 
-const SelectWithLoading: React.FC<SelectProps> = ({ roletype, role, userid, reloadfunction }) => {
-  const [loading, setLoading] = useState(true);
+  const PlatformRolesChildren: React.ReactNode[] = [];
+  Object.entries(PlatformRole).forEach(([, value]) => {
+    if (typeof value === "number") {
+      PlatformRolesChildren.push(
+        <Select.Option value={value}>
+          {PlatformRoleTexts[value]}
+        </Select.Option>);
+    }
+  });
+
+  const [loading, setLoading] = useState(false);
+
   return (
-    roletype === "platform" ? 
-      (
-        <Select
-          disabled={loading}
-          defaultValue={role}
-          style={{ width: "100%" }}
-          onSelect={
-            async (value: number) => {
-              setLoading(true);
-              await api.setPlatformRole({ body:{
-                userId: userid,
-                roleType: value,
-              } })
-                .httpError(200, () => { message.error("用户已经是该角色"); })
-                .httpError(400, () => { message.error("用户不存在"); })
-                .httpError(401, () => { message.error("用户没有权限"); })
-                .then(() => {
-                  message.success("设置成功");
-                  setLoading(false);
-                  reloadfunction();
-                });
-            }
-          }
-          onDeselect={
-            async (value: number) => {
-              setLoading(true);
-              await api.unsetPlatformRole({ body:{
-                userId: userid,
-                roleType: value,
-              } })
-                .httpError(200, () => { message.error("用户已经不是该角色"); })
-                .httpError(400, () => { message.error("用户不存在"); })
-                .httpError(401, () => { message.error("用户没有权限"); })
-                .then(() => {
-                  message.success("设置成功");
-                  setLoading(false);
-                  reloadfunction();
-                });
-            }
-          }
-          mode="multiple"
-          placeholder="Please select"
-        >
-          {PlatformRolesChildren}
-        </Select>
-      ) : (
-        <Select
-          disabled={loading}
-          defaultValue={role}
-          style={{ width: "100%" }}
-          onSelect={
-            async (value: number) => {
-              setLoading(true);
-              await api.setTenantRole({ body:{
-                userId: userid,
-                roleType: value,
-              } })
-                .httpError(200, () => { message.error("用户已经是该角色"); })
-                .httpError(400, () => { message.error("用户不存在"); })
-                .httpError(401, () => { message.error("用户没有权限"); })
-                .then(() => {
-                  message.success("设置成功");
-                  setLoading(false);
-                  reloadfunction();
-                });
-            }
-          }
-          onDeselect={
-            async (value: number) => {
-              setLoading(true);
-              await api.unsetTenantRole({ body:{
-                userId: userid,
-                roleType: value,
-              } })
-                .httpError(200, () => { message.error("用户已经不是该角色"); })
-                .httpError(400, () => { message.error("用户不存在"); })
-                .httpError(401, () => { message.error("用户没有权限"); })
-                .then(() => {
-                  message.success("设置成功");
-                  setLoading(false);
-                  reloadfunction();
-                });
-            }
-          }
-          mode="multiple"
-          placeholder="Please select"
-        >
-          {PlatformRolesChildren}
-        </Select>
-      )
+    <Select
+      disabled={loading}
+      defaultValue={role}
+      style={{ width: "100%" }}
+      onSelect={
+        async (value: number) => {
+          setLoading(true);
+          await api.setPlatformRole({ body:{
+            userId: userId,
+            roleType: value,
+          } })
+            .httpError(200, () => { message.error("用户已经是该角色"); })
+            .httpError(400, () => { message.error("用户不存在"); })
+            .httpError(401, () => { message.error("用户没有权限"); })
+            .then(() => {
+              message.success("设置成功");
+              setLoading(false);
+              reload();
+            });
+        }
+      }
+      onDeselect={
+        async (value: number) => {
+          setLoading(true);
+          await api.unsetPlatformRole({ body:{
+            userId: userId,
+            roleType: value,
+          } })
+            .httpError(200, () => { message.error("用户已经不是该角色"); })
+            .httpError(400, () => { message.error("用户不存在"); })
+            .httpError(401, () => { message.error("用户没有权限"); })
+            .then(() => {
+              message.success("设置成功");
+              setLoading(false);
+              reload();
+            });
+        }
+      }
+      mode="multiple"
+      placeholder="Please select"
+    >
+      {PlatformRolesChildren}
+    </Select>
   );
 };
+
+interface TenantRoleSelectorProps {
+  role: TenantRole[];
+  userId: string;
+  reload: () => void;
+}
+
+const TenantRoleSelector: React.FC<TenantRoleSelectorProps> = ({ role, userId, reload }) => {
+
+  const TenantRolesChildren: React.ReactNode[] = [];
+  Object.entries(TenantRole).forEach(([, value]) => {
+    if (typeof value === "number") {
+      TenantRolesChildren.push(
+        <Select.Option value={value}>
+          {TenantRoleTexts[value]}
+        </Select.Option>);
+    }
+  });
+
+  const [loading, setLoading] = useState(false);
+
+  return (
+    <Select
+      disabled={loading}
+      defaultValue={role}
+      style={{ width: "100%" }}
+      onSelect={
+        async (value: number) => {
+          setLoading(true);
+          await api.setTenantRole({ body:{
+            userId: userId,
+            roleType: value,
+          } })
+            .httpError(200, () => { message.error("用户已经是该角色"); })
+            .httpError(400, () => { message.error("用户不存在"); })
+            .httpError(401, () => { message.error("用户没有权限"); })
+            .then(() => {
+              message.success("设置成功");
+              setLoading(false);
+              reload();
+            });
+        }
+      }
+      onDeselect={
+        async (value: number) => {
+          setLoading(true);
+          await api.unsetTenantRole({ body:{
+            userId: userId,
+            roleType: value,
+          } })
+            .httpError(200, () => { message.error("用户已经不是该角色"); })
+            .httpError(400, () => { message.error("用户不存在"); })
+            .httpError(401, () => { message.error("用户没有权限"); })
+            .then(() => {
+              message.success("设置成功");
+              setLoading(false);
+              reload();
+            });
+        }
+      }
+      mode="multiple"
+      placeholder="Please select"
+    >
+      {TenantRolesChildren}
+    </Select>
+  );
+};
+
 
 const UserTable: React.FC<DataTableProps<User>> = ({ data, loading, reload }) => {
   return (
@@ -162,7 +171,7 @@ const UserTable: React.FC<DataTableProps<User>> = ({ data, loading, reload }) =>
         title="平台角色"
         width={200}
         render={(_, r) => (
-          <SelectWithLoading roletype="platform" role={r.platformRoles} userid={r.userId} reloadfunction={reload} />
+          <PlatformRoleSelector role={r.platformRoles} userId={r.userId} reload={reload} />
         )}
       />
       <Table.Column<User>
@@ -170,7 +179,7 @@ const UserTable: React.FC<DataTableProps<User>> = ({ data, loading, reload }) =>
         title="租户角色"
         width={200}
         render={(_, r) => (
-          <SelectWithLoading roletype="tenant" role={r.tenantRoles} userid={r.userId} reloadfunction={reload} />
+          <TenantRoleSelector role={r.tenantRoles} userId={r.userId} reload={reload} />
         )}
       />
       <Table.Column
