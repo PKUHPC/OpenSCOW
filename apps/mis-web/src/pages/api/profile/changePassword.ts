@@ -1,5 +1,5 @@
 import { route } from "@ddadaal/next-typed-api-routes-runtime";
-import { changePassword as changePa } from "@scow/lib-auth"; 
+import { changePassword as changePass } from "@scow/lib-auth"; 
 import { authenticate } from "src/auth/server";
 import { publicConfig, runtimeConfig } from "src/utils/config";
 
@@ -19,9 +19,12 @@ export interface ChangePasswordSchema {
     /** 更改成功 */
     204: null;
 
+    /** 用户未找到 */
+    404: null;
+
     /** 密码不正确 */
     412: null;
-
+    
     /** 本功能在当前配置下不可用。 */
     501: null;
   }
@@ -42,7 +45,7 @@ export default /* #__PURE__*/route<ChangePasswordSchema>("ChangePasswordSchema",
 
   const { newPassword, oldPassword } = req.body;
 
-  return await changePa(runtimeConfig.AUTH_INTERNAL_URL, info.identityId, oldPassword, newPassword)
+  return await changePass(runtimeConfig.AUTH_INTERNAL_URL, info.identityId, oldPassword, newPassword)
     .then(() => ({ 204: null }))
     .catch((e) => ({ [e.status]: null }));
 
