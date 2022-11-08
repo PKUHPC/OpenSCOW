@@ -1,4 +1,5 @@
-import { jsonFetch, route } from "@ddadaal/next-typed-api-routes-runtime";
+import { route } from "@ddadaal/next-typed-api-routes-runtime";
+import { changePassword as changePa } from "@scow/lib-auth"; 
 import { authenticate } from "src/auth/server";
 import { publicConfig, runtimeConfig } from "src/utils/config";
 
@@ -41,15 +42,7 @@ export default /* #__PURE__*/route<ChangePasswordSchema>("ChangePasswordSchema",
 
   const { newPassword, oldPassword } = req.body;
 
-  return await jsonFetch({
-    method: "PATCH",
-    path: `${runtimeConfig.AUTH_INTERNAL_URL}/password`,
-    body: {
-      identityId: info.identityId,
-      newPassword,
-      oldPassword,
-    },
-  })
+  return await changePa(runtimeConfig.AUTH_INTERNAL_URL, info.identityId, oldPassword, newPassword)
     .then(() => ({ 204: null }))
     .catch((e) => ({ [e.status]: null }));
 
