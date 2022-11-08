@@ -59,13 +59,20 @@ export default /* #__PURE__*/route<ConnectToAppSchema>("ConnectToAppSchema", asy
 
 
     if (x.appProps?.$case === "web") {
+      const connect: AppConnectProps = {
+        method: x.appProps.web.method,
+        path: x.appProps.web.path,
+        query: x.appProps.web.query ?? {},
+        formData: x.appProps.web.formData ?? {},
+      };
+
       return {
         200: {
           host: resolvedHost,
           port: x.port,
           password: x.password,
           type: "web" as const,
-          connect: x.appProps.web,
+          connect: connect,
           proxyType: x.appProps.web.proxyType === WebAppProps_ProxyType.relative
             ? "relative"
             : "absolute",
