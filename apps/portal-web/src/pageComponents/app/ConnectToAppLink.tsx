@@ -4,7 +4,6 @@ import { join } from "path";
 import { api } from "src/apis";
 import { ClickableA } from "src/components/ClickableA";
 import type { AppSession } from "src/generated/portal/app";
-import { WebAppProps_ProxyType } from "src/generated/portal/app";
 import { Cluster, publicConfig } from "src/utils/config";
 import { openDesktop } from "src/utils/vnc";
 
@@ -23,7 +22,7 @@ export const ConnectTopAppLink: React.FC<Props> = ({
       .httpError(409, () => { message.error("此应用目前无法连接"); });
 
     if (reply.type === "web") {
-      const { connect, host, password, port } = reply;
+      const { connect, host, password, port, proxyType } = reply;
       const interpolatedValues = { HOST: host, PASSWORD: password, PORT: port };
       const path = parsePlaceholder(connect.path, interpolatedValues);
 
@@ -37,8 +36,7 @@ export const ConnectTopAppLink: React.FC<Props> = ({
       const query = connect.query ? interpolateValues(connect.query) : {};
       const formData = connect.formData ? interpolateValues(connect.formData) : undefined;
 
-      const proxyType = connect.proxyType;
-      const proxyBasePath = proxyType === WebAppProps_ProxyType.relative
+      const proxyBasePath = proxyType === "relative"
         ? publicConfig.RPROXY_BASE_PATH
         : publicConfig.PROXY_BASE_PATH;
 

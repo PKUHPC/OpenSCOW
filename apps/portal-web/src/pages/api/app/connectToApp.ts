@@ -9,7 +9,6 @@ import { handlegRPCError } from "src/utils/server";
 
 // Cannot use ServerConnectPropsConfig from appConfig package
 export type AppConnectProps = {
-  proxyType: WebAppProps_ProxyType;
   method: string;
   path: string;
   query?: { [key: string]: string };
@@ -26,7 +25,8 @@ export interface ConnectToAppSchema {
 
   responses: {
     200: { host: string; port: number; password: string} & (
-      | { type: "web"; connect: AppConnectProps}
+      | { type: "web"; connect: AppConnectProps; proxyType: "relative" | "absolute";
+    }
       | { type: "vnc"; }
     );
 
@@ -66,6 +66,9 @@ export default /* #__PURE__*/route<ConnectToAppSchema>("ConnectToAppSchema", asy
           password: x.password,
           type: "web" as const,
           connect: x.appProps.web,
+          proxyType: x.appProps.web.proxyType === WebAppProps_ProxyType.relative
+            ? "relative"
+            : "absolute",
         },
       };
     } else {
