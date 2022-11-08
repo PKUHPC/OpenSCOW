@@ -72,7 +72,9 @@ export default /* #__PURE__*/route<ConnectToAppSchema>("ConnectToAppSchema", asy
           port: x.port,
           password: x.password,
           type: "web" as const,
+
           connect: connect,
+
           proxyType: x.appProps.web.proxyType === WebAppProps_ProxyType.relative
             ? "relative"
             : "absolute",
