@@ -1,6 +1,7 @@
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { Server } from "@ddadaal/tsgrpc-server";
 import { credentials, status } from "@grpc/grpc-js";
+import { sftpStat } from "@scow/lib-ssh";
 import { createServer } from "src/app";
 import { FileServiceClient } from "src/generated/portal/file";
 
@@ -32,7 +33,9 @@ it("gets file metadata", async () => {
     cluster, userId, path: actualPath("test1"),
   });
 
-  expect(reply.size).toEqual(expect.any(Number));
+  const stat = await sftpStat(ssh.sftp)(actualPath("test1"));
+
+  expect(reply.size).toBe(stat.size);
 });
 
 it("returns error if file is not accessible", async () => {
