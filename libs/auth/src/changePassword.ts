@@ -11,8 +11,8 @@ export async function changePassword(
     method: "PATCH",
     body: JSON.stringify({
       identityId,
-      newPassword,
       oldPassword,
+      newPassword,
     }),
   });
 
