@@ -315,5 +315,26 @@ export const fileServiceServer = plugin((server) => {
 
     },
 
+    getFileMetadata: async ({ request, logger }) => {
+      const { userId, cluster, path } = request;
+
+      const host = getClusterLoginNode(cluster);
+
+      if (!host) { throw clusterNotFound(cluster); }
+
+      return await sshConnect(host, userId, logger, async (ssh) => {
+        const sftp = await ssh.requestSFTP();
+
+        const stat = await sftpStat(sftp)(path).catch((e) => {
+          logger.error(e, "stat %s as %s failed", path, userId);
+          throw <ServiceError> {
+            code: status.PERMISSION_DENIED, message: `${path} is not accessible`,
+          };
+        });
+
+        return [{ size: stat.size }];
+      });
+    },
+
   });
 });
