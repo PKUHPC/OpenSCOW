@@ -4,7 +4,7 @@ import { quote } from "shell-quote";
 import type { Logger } from "ts-log";
 
 import { insertKeyAsRoot, KeyPair } from "./key";
-import { sftpChmod, sftpStat, sftpWriteFile } from "./sftp";
+import { sftpChmod, sftpMkdir, sftpStat, sftpWriteFile } from "./sftp";
 
 /**
  * Connect to SSH and returns the SSH Object
@@ -161,22 +161,30 @@ export async function insertKeyAsUser(
     const userHomeDir = homeDir.stdout.trim();
 
     const sftp = await ssh.requestSFTP();
-    const stat = await sftpStat(sftp)(userHomeDir);
-    // make sure user home dir is exists
+    const stat = await sftpStat(sftp)(userHomeDir).catch(() => undefined);
+
+    if (!stat) {
+      logger.warn("Home directory %s of user %s doesn't exist even after login as the user. Insert key as root.",
+        userHomeDir, username);
+
+      await insertKeyAsRoot(username, address, rootKeyPair, logger);
+      return;
+    }
+
+    // make sure user home dir is a directory
     if (!stat.isDirectory()) {
-      logger.error("Home directory %s of user %s does not exist", userHomeDir, username);
-      throw new Error(`Home directory ${userHomeDir} of user ${username} does not exist`);
+      throw new Error(`${userHomeDir} of user ${username} exists but is not a directory`);
     }
-    else {
-      // creat ~/.ssh/authorized_keys and write keys
-      const sshDir = join(userHomeDir, ".ssh");
-      await ssh.mkdir(sshDir, undefined, sftp);
-      const keyFilePath = join(sshDir, "authorized_keys");
-      await sftpChmod(sftp)(sshDir, "700");
-      await sftpWriteFile(sftp)(keyFilePath, rootKeyPair.publicKey);
-      logger.info("Writing key for user %s to %s in file %s", username, address, keyFilePath);
-      await sftpChmod(sftp)(keyFilePath, "644");
-    }
+
+    // creat ~/.ssh/authorized_keys and write keys
+    const sshDir = join(userHomeDir, ".ssh");
+    await sftpMkdir(sftp)(sshDir);
+    await sftpChmod(sftp)(sshDir, "700");
+
+    const keyFilePath = join(sshDir, "authorized_keys");
+    await sftpWriteFile(sftp)(keyFilePath, rootKeyPair.publicKey);
+    logger.info("Writing key for user %s to %s in file %s", username, address, keyFilePath);
+    await sftpChmod(sftp)(keyFilePath, "644");
   });
 }
 

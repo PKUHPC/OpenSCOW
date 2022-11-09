@@ -1,7 +1,7 @@
-import { NodeSSH } from "node-ssh";
 import { join } from "path";
 import { insertKeyAsRoot } from "src/key";
 import { sftpExists, sftpReadFile, sftpStat, sshRmrf } from "src/sftp";
+import { insertKeyAsUser, sshConnect } from "src/ssh";
 
 import { connectToTestServerAsRoot, createTestItems, resetTestServerAsRoot, rootKeyPair, TestSshServer } from "./utils";
 
@@ -12,13 +12,14 @@ const testUser = "testNewUser" + randomPostfix;
 const home = join("/testNewUserHome", testUser);
 const sshDir = join(home, ".ssh");
 const keyFile = join(sshDir, "authorized_keys");
+const password = "12345678";
 
 beforeEach(async () => {
   serverSsh = await connectToTestServerAsRoot();
   await createTestItems(serverSsh);
   // creat user
   await serverSsh.ssh.execCommand(`adduser -D -h ${home} ${testUser}`);
-  await serverSsh.ssh.execCommand(`echo ${testUser}:12345678|chpasswd`);
+  await serverSsh.ssh.execCommand(`echo ${testUser}:${password}|chpasswd`);
 });
 
 afterEach(async () => {
@@ -29,7 +30,11 @@ afterEach(async () => {
   await resetTestServerAsRoot(serverSsh);
 });
 
-it("insert key", async () => {
+function tryLoginAsUser() {
+  return sshConnect(target, testUser, rootKeyPair, console, async () => undefined);
+}
+
+it("insert key as root", async () => {
   await insertKeyAsRoot(testUser, target, rootKeyPair, console);
 
   expect(await sftpExists(serverSsh.sftp, home)).toBeTrue();
@@ -37,15 +42,7 @@ it("insert key", async () => {
   expect(await sftpExists(serverSsh.sftp, sshDir)).toBeTrue();
   expect(await sftpExists(serverSsh.sftp, keyFile)).toBeTrue();
 
-  // user ssh login
-  const [host, port] = target.split(":");
-  const ssh = new NodeSSH();
-
-  try {
-    await ssh.connect({ host, port: +port, username: testUser, privateKey: rootKeyPair.privateKey });
-  } finally {
-    ssh.dispose();
-  }
+  await tryLoginAsUser();
 
   // check ssh key info
   const keyContent = (await sftpReadFile(serverSsh.sftp)(keyFile)).toString();
@@ -66,4 +63,15 @@ it("insert key", async () => {
   expect(sshPermission).toEqual("700");
   expect(sshStats.uid).toBe(Number(userID.stdout.trim()));
   expect(sshStats.gid).toBe(Number(userGID.stdout.trim()));
+});
+
+it("insert keys as user", async () => {
+  await insertKeyAsUser(target, testUser, password, rootKeyPair, console);
+
+  expect(await sftpExists(serverSsh.sftp, home)).toBeTrue();
+
+  expect(await sftpExists(serverSsh.sftp, sshDir)).toBeTrue();
+  expect(await sftpExists(serverSsh.sftp, keyFile)).toBeTrue();
+
+  await tryLoginAsUser();
 });
