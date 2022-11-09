@@ -1,4 +1,4 @@
-import { asyncReplyStreamCall } from "@ddadaal/tsgrpc-client";
+import { asyncReplyStreamCall, asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { contentType } from "mime-types";
 import { basename } from "path";
 import { authenticate } from "src/auth/server";
@@ -62,12 +62,18 @@ export default route<DownloadFileSchema>("DownloadFileSchema", async (req, res) 
   const filename = basename(path).replace("\"", "\\\"");
   const dispositionParm = "filename* = UTF-8''" + encodeURIComponent(filename);
 
+  const reply = await asyncUnaryCall(client, "getFileMetadata", {
+    userId: info.identityId, cluster, path,
+  });
+
   res.writeHead(200, download ? {
     "Content-Type": getContentType(filename, "application/octet-stream"),
     "Content-Disposition": `attachment; ${dispositionParm}`,
+    "Content-Length": reply.size,
   } : {
     "Content-Type": getContentType(filename, "text/plain; charset=utf-8"),
     "Content-Disposition": `inline; ${dispositionParm}`,
+    "Content-Length": reply.size,
   });
 
   const stream = asyncReplyStreamCall(client, "download", {
