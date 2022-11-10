@@ -8,8 +8,8 @@ export const SavedJobsPage: NextPage = requireAuth(() => true)(
   () => {
     return (
       <div>
-        <Head title="已保存的作业" />
-        <PageTitle titleText={"已保存的作业"} />
+        <Head title="作业模板" />
+        <PageTitle titleText={"作业模板列表"} />
         <SavedJobsTable />
       </div>
     );
