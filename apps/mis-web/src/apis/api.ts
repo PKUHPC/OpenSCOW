@@ -4,7 +4,7 @@ import { fromApi } from "@ddadaal/next-typed-api-routes-runtime/lib/client";
 import { join } from "path";
 import type { GetIconSchema } from "src/pages/api//icon";
 import type { ChangeJobPriceSchema } from "src/pages/api/admin/changeJobPrice";
-import type { ChangePasswordForPlatformAdminSchema } from "src/pages/api/admin/changePassword";
+import type { changePasswordAsPlatformAdminSchema } from "src/pages/api/admin/changePassword";
 import type { ChangeStorageQuotaSchema } from "src/pages/api/admin/changeStorage";
 import type { FetchJobsSchema } from "src/pages/api/admin/fetchJobs/fetchJobs";
 import type { GetFetchJobInfoSchema } from "src/pages/api/admin/fetchJobs/getFetchInfo";
@@ -47,7 +47,7 @@ import type { ChangePasswordSchema } from "src/pages/api/profile/changePassword"
 import type { DewhitelistAccountSchema } from "src/pages/api/tenant/accountWhitelist/dewhitelistAccount";
 import type { GetWhitelistedAccountsSchema } from "src/pages/api/tenant/accountWhitelist/getWhitelistedAccounts";
 import type { WhitelistAccountSchema } from "src/pages/api/tenant/accountWhitelist/whitelistAccount";
-import type { ChangePasswordForTenantAdminSchema } from "src/pages/api/tenant/changePassword";
+import type { changePasswordAsTenantAdminSchema } from "src/pages/api/tenant/changePassword";
 import type { CreateTenantSchema } from "src/pages/api/tenant/create";
 import type { CreateAccountSchema } from "src/pages/api/tenant/createAccount";
 import type { GetAccountsSchema } from "src/pages/api/tenant/getAccounts";
@@ -106,8 +106,8 @@ export const api = {
   queryJobTimeLimit: fromApi<QueryJobTimeLimitSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/job/queryJobTimeLimit")),
   getRunningJobs: fromApi<GetRunningJobsSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/job/runningJobs")),
   changePassword: fromApi<ChangePasswordSchema>("PATCH", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/profile/changePassword")),
-  changePasswordForPlatformAdmin: fromApi<ChangePasswordForPlatformAdminSchema>("PATCH", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin/changePassword")),
-  changePasswordForTenantAdmin: fromApi<ChangePasswordForTenantAdminSchema>("PATCH", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/tenant/changePassword")),
+  changePasswordAsPlatformAdmin: fromApi<changePasswordAsPlatformAdminSchema>("PATCH", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin/changePassword")),
+  changePasswordAsTenantAdmin: fromApi<changePasswordAsTenantAdminSchema>("PATCH", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/tenant/changePassword")),
   dewhitelistAccount: fromApi<DewhitelistAccountSchema>("DELETE", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/tenant/accountWhitelist/dewhitelistAccount")),
   getWhitelistedAccounts: fromApi<GetWhitelistedAccountsSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/tenant/accountWhitelist/getWhitelistedAccounts")),
   whitelistAccount: fromApi<WhitelistAccountSchema>("PUT", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/tenant/accountWhitelist/whitelistAccount")),
