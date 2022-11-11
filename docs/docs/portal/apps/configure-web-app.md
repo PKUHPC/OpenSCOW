@@ -66,7 +66,7 @@ web:
 
 对于web类型的应用，需要配置`proxyType`。不同的交互式应用使用了不同的nginx proxy方式，通过配置`proxyType`，可以允许应用携带不同类型的uri到后端计算节点。
 
-`proxyType`可以配置为`relative`或者`absolute`。
+`proxyType`可以配置为`relative`或者`absolute`，如果不配置默认是`relative`。
 
 - 如果设置成`absolute`，会把完整URL请求路径反向代理到给定的主机和端口。比如访问以下地址：
   

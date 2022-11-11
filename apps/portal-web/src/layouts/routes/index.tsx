@@ -43,7 +43,7 @@ export const userRoutes: () => NavItemProps[] = () => [
       },
       {
         Icon: SaveOutlined,
-        text: "已保存的作业",
+        text: "作业模板",
         path: "/jobs/savedJobs",
       },
     ],
