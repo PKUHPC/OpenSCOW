@@ -4,10 +4,12 @@ import React, { useMemo, useState } from "react";
 import { api } from "src/apis";
 import { DisabledA } from "src/components/DisabledA";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
+import { PlatformUserInfo } from "src/generated/server/user";
 import { FullUserInfo, TenantRole } from "src/models/User";
 import { GetTenantUsersSchema } from "src/pages/api/admin/getTenantUsers";
 import { User } from "src/stores/UserStore";
 import { compareDateTime, formatDateTime } from "src/utils/datetime";
+import { confirmPasswordFormItemProps, passwordRule } from "src/utils/form";
 
 interface Props {
   data: GetTenantUsersSchema["responses"]["200"] | undefined;
@@ -20,11 +22,19 @@ interface FilterForm {
   idOrName: string | undefined;
 }
 
+interface FormProps {
+  oldPassword: string;
+  newPassword: string;
+  confirm: string;
+}
+
 export const AdminUserTable: React.FC<Props> = ({
   data, isLoading, reload, user,
 }) => {
 
   const [form] = Form.useForm<FilterForm>();
+
+  const [passwordForm] = Form.useForm<FormProps>();
 
   const [query, setQuery] = useState<FilterForm>({
     idOrName: undefined,
@@ -206,6 +216,73 @@ export const AdminUserTable: React.FC<Props> = ({
           dataIndex="affiliatedAccountNames"
           title="可用账户"
           render={(_, r) => r.accountAffiliations.map((x) => x.accountName).join(", ")}
+        />
+        <Table.Column<PlatformUserInfo>
+          dataIndex="changePassword"
+          title="操作"
+          render={(_, r) => (
+            <DisabledA
+              disabled={!user.tenantRoles.includes(TenantRole.TENANT_ADMIN)}
+              message="只有租户管理员才能修改密码"
+              onClick={() => {
+                Modal.confirm({
+                  title: `确认要修改用户${r.name}（ID：${r.userId}）的密码？`,
+                  icon: <ExclamationCircleOutlined />,
+                  width: "70%",
+                  content:(
+                    <Form
+                      initialValues={undefined}
+                      layout="vertical"
+                      form={form}
+                      preserve={false}
+                    >
+                      <Form.Item
+                        rules={[{ required: true, message: "请输入原密码" }]}
+                        label="原密码"
+                        name="oldPassword"
+                      >
+                        <Input.Password />
+                      </Form.Item>
+                      <Form.Item
+                        rules={[{ required: true, message: "请输入新密码" }, passwordRule]}
+                        label="新密码"
+                        name="newPassword"
+                      >
+                        <Input.Password placeholder={passwordRule.message} />
+                      </Form.Item>
+                      <Form.Item
+                        name="confirm"
+                        label="确认密码"
+                        hasFeedback
+                        {...confirmPasswordFormItemProps(passwordForm, "newPassword")}
+                      >
+                        <Input.Password />
+                      </Form.Item>
+                    </Form> 
+                  ),
+                  onOk: async () => {
+                    const { oldPassword, newPassword } = await passwordForm.validateFields();
+                    const changePasswordResponses = await api.changePasswordForTenantAdmin({ body: {
+                      identityId: r.userId,
+                      oldPassword,
+                      newPassword,
+                    } })
+                      .httpError(404, () => { message.error("用户不存在"); })
+                      .httpError(412, () => { message.error("原密码错误"); })
+                      .httpError(501, () => { message.error("本功能在当前配置下不可用"); });
+                    if (!changePasswordResponses) {
+                      message.error("修改密码失败，您不是该用户所在的租户");
+                    } else {
+                      message.success("修改密码成功");
+                    }
+                  },
+                },                
+                );
+              }}
+            >
+              修改密码
+            </DisabledA>
+          )}
         />
       </Table>
     </div>

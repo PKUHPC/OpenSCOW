@@ -1,5 +1,5 @@
 import { ExclamationCircleOutlined } from "@ant-design/icons";
-import { message, Modal, Space, Table } from "antd";
+import { Form, Input, message, Modal, Space, Table } from "antd";
 import React, { useCallback, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
@@ -9,6 +9,7 @@ import { PlatformRole } from "src/models/User";
 import { GetAllUsersSchema } from "src/pages/api/admin/getAllUsers";
 import { User } from "src/stores/UserStore";
 import { formatDateTime } from "src/utils/datetime";
+import { confirmPasswordFormItemProps, passwordRule } from "src/utils/form";
 
 interface PageInfo {
     page: number;
@@ -18,6 +19,12 @@ interface PageInfo {
 interface Props {
   refreshToken: boolean;
   user: User;
+}
+
+interface FormProps {
+  oldPassword: string;
+  newPassword: string;
+  confirm: string;
 }
 
 export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
@@ -58,6 +65,7 @@ interface UserInfoTableProps {
 const UserInfoTable: React.FC<UserInfoTableProps> = ({
   data, pageInfo, setPageInfo, isLoading, reload, user,
 }) => {
+  const [form] = Form.useForm<FormProps>();
   return (
     <>
       <Table
@@ -198,6 +206,73 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
                 </Space>
               )
 
+          )}
+        />
+        <Table.Column<PlatformUserInfo>
+          dataIndex="changePassword"
+          title="操作"
+          render={(_, r) => (
+            <DisabledA
+              disabled={!user.platformRoles.includes(PlatformRole.PLATFORM_ADMIN)}
+              message="只有平台管理员才能修改密码"
+              onClick={() => {
+                Modal.confirm({
+                  title: `确认要修改用户${r.name}（ID：${r.userId}）的密码？`,
+                  icon: <ExclamationCircleOutlined />,
+                  width: "70%",
+                  content:(
+                    <Form
+                      initialValues={undefined}
+                      layout="vertical"
+                      form={form}
+                      preserve={false}
+                    >
+                      <Form.Item
+                        rules={[{ required: true, message: "请输入原密码" }]}
+                        label="原密码"
+                        name="oldPassword"
+                      >
+                        <Input.Password />
+                      </Form.Item>
+                      <Form.Item
+                        rules={[{ required: true, message: "请输入新密码" }, passwordRule]}
+                        label="新密码"
+                        name="newPassword"
+                      >
+                        <Input.Password placeholder={passwordRule.message} />
+                      </Form.Item>
+                      <Form.Item
+                        name="confirm"
+                        label="确认密码"
+                        hasFeedback
+                        {...confirmPasswordFormItemProps(form, "newPassword")}
+                      >
+                        <Input.Password />
+                      </Form.Item>
+                    </Form> 
+                  ),
+                  onOk: async () => {
+                    const { oldPassword, newPassword } = await form.validateFields();
+                    await api.changePasswordForPlatformAdmin({ body: {
+                      identityId: r.userId,
+                      oldPassword,
+                      newPassword,
+                    } })
+                      .httpError(404, () => { message.error("用户不存在"); })
+                      .httpError(412, () => { message.error("原密码错误"); })
+                      .httpError(501, () => { message.error("本功能在当前配置下不可用"); })
+                      .then(() => {
+                        form.setFieldsValue({ oldPassword: "", newPassword: "", confirm: "" });
+                        message.success("密码更改成功！");
+                        reload();
+                      });
+                  },
+                });
+              }
+              }
+            >
+              修改密码
+            </DisabledA>
           )}
         />
       </Table>
