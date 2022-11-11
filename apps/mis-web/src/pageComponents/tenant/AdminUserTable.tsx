@@ -221,9 +221,7 @@ export const AdminUserTable: React.FC<Props> = ({
           dataIndex="changePassword"
           title="操作"
           render={(_, r) => (
-            <DisabledA
-              disabled={!user.tenantRoles.includes(TenantRole.TENANT_ADMIN)}
-              message="只有租户管理员才能修改密码"
+            <a
               onClick={() => {
                 Modal.confirm({
                   title: `确认要修改用户${r.name}（ID：${r.userId}）的密码？`,
@@ -262,7 +260,7 @@ export const AdminUserTable: React.FC<Props> = ({
                   ),
                   onOk: async () => {
                     const { oldPassword, newPassword } = await passwordForm.validateFields();
-                    const changePasswordResponses = await api.changePasswordForTenantAdmin({ body: {
+                    const changePasswordResponses = await api.changePasswordAsTenantAdmin({ body: {
                       identityId: r.userId,
                       oldPassword,
                       newPassword,
@@ -281,7 +279,7 @@ export const AdminUserTable: React.FC<Props> = ({
               }}
             >
               修改密码
-            </DisabledA>
+            </a>
           )}
         />
       </Table>

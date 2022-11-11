@@ -212,9 +212,7 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
           dataIndex="changePassword"
           title="操作"
           render={(_, r) => (
-            <DisabledA
-              disabled={!user.platformRoles.includes(PlatformRole.PLATFORM_ADMIN)}
-              message="只有平台管理员才能修改密码"
+            <a
               onClick={() => {
                 Modal.confirm({
                   title: `确认要修改用户${r.name}（ID：${r.userId}）的密码？`,
@@ -253,7 +251,7 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
                   ),
                   onOk: async () => {
                     const { oldPassword, newPassword } = await form.validateFields();
-                    await api.changePasswordForPlatformAdmin({ body: {
+                    await api.changePasswordAsPlatformAdmin({ body: {
                       identityId: r.userId,
                       oldPassword,
                       newPassword,
@@ -272,7 +270,7 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
               }
             >
               修改密码
-            </DisabledA>
+            </a>
           )}
         />
       </Table>
