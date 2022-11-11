@@ -319,6 +319,8 @@ export const mockApi: MockApi<typeof api> = {
   }], totalCount: 1 }),
 
   changePassword: async () => null,
+  changePasswordForPlatformAdmin: async () => null,
+  changePasswordForTenantAdmin: async () => null,
   createUser: async () => null,
   createTenant: async () => null,
   validateToken: async () => MOCK_USER_INFO,
