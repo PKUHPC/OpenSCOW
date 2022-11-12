@@ -1,4 +1,4 @@
-FROM node:hydrogen-alpine@sha256:1f09c210a17508d34277971b19541a47a26dc5a641dedc03bd28cff095052996 AS builder
+FROM node:hydrogen-alpine@sha256:9eff44230b2fdcca57a73b8f908c8029e72d24dd05cac5339c79d3dedf6b208b AS builder
 
 RUN apk update && apk add libc6-compat python3 make gcc g++
 
