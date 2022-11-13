@@ -1,4 +1,4 @@
-import { ArrayType, Collection, Entity, Enum, IdentifiedReference,
+import { Collection, Entity, Enum, IdentifiedReference,
   ManyToOne, OneToMany, PrimaryKey, Property } from "@mikro-orm/core";
 import { StorageQuota } from "src/entities/StorageQuota";
 import { Tenant } from "src/entities/Tenant";
