@@ -1,4 +1,4 @@
-import { ArrayType, Collection, Entity, IdentifiedReference,
+import { Collection, Entity, Enum, IdentifiedReference,
   ManyToOne, OneToMany, PrimaryKey, Property } from "@mikro-orm/core";
 import { StorageQuota } from "src/entities/StorageQuota";
 import { Tenant } from "src/entities/Tenant";
@@ -41,10 +41,10 @@ export class User {
   @OneToMany(() => UserAccount, (u) => u.user)
     accounts = new Collection<UserAccount>(this);
 
-  @Property({ type: ArrayType, comment: Object.values(TenantRole).join(", ") })
+  @Enum({ items: () => TenantRole, array: true, comment: Object.values(TenantRole).join(", ") })
     tenantRoles: TenantRole[];
 
-  @Property({ type: ArrayType, comment: Object.values(PlatformRole).join(", ") })
+  @Enum({ items: () => PlatformRole, array: true, comment: Object.values(PlatformRole).join(", ") })
     platformRoles: PlatformRole[];
 
   constructor(init: {
