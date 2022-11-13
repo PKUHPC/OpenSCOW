@@ -1,8 +1,15 @@
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
+import { UniqueConstraintViolationException } from "@mikro-orm/core";
 import { decimalToMoney } from "@scow/lib-decimal";
+import { insertKeyAsUser } from "@scow/lib-ssh";
+import { clusters } from "src/config/clusters";
+import { rootKeyPair } from "src/config/env";
+import { misConfig } from "src/config/mis";
 import { Account } from "src/entities/Account";
+import { StorageQuota } from "src/entities/StorageQuota";
+import { Tenant } from "src/entities/Tenant";
 import { PlatformRole, TenantRole, User } from "src/entities/User";
 import { UserAccount, UserRole, UserStatus } from "src/entities/UserAccount";
 import {
@@ -16,7 +23,6 @@ import {
   UserRole as PFUserRole, UserServiceServer,
   UserServiceService,
   UserStatus as PFUserStatus } from "src/generated/server/user";
-import { newUserInDataAndAuth } from "src/utils/newUserInDataAndAuth";
 import { paginationProps } from "src/utils/orm";
 
 export const userServiceServer = plugin((server) => {
@@ -297,8 +303,80 @@ export const userServiceServer = plugin((server) => {
 
     createUser: async ({ request, em, logger }) => {
       const { name, tenantName, email, identityId, password } = request;
-      const userId = await newUserInDataAndAuth(identityId, email, name, password, tenantName, logger, em);
-      return [{ id: userId }];
+
+      const tenant = await em.findOne(Tenant, { name: tenantName });
+      if (!tenant) {
+        throw <ServiceError> { code: Status.NOT_FOUND, details: "Tenant is not found." };
+      }
+      // creat user in database
+      const user = new User({ name, userId: identityId, tenant, email });
+
+      user.storageQuotas.add(Object.keys(clusters).map((x) => new StorageQuota({
+        cluster: x,
+        storageQuota: 0,
+        user: user!,
+      })));
+
+      try {
+        await em.persistAndFlush(user);
+      } catch (e) {
+        if (e instanceof UniqueConstraintViolationException) {
+          throw <ServiceError> { code: Status.ALREADY_EXISTS, message:`User with id ${identityId} already exists.` };
+        } else {
+          throw e;
+        }
+      }
+
+      // call auth
+      const rep = await fetch(misConfig.authUrl + "/user", {
+        method: "POST",
+        body: JSON.stringify({
+          identityId,
+          id: user.id,
+          mail: email,
+          name: name,
+          password,
+        }),
+        headers: {
+          "content-type": "application/json",
+        },
+      });
+
+      logger.info("Calling auth completed. %o", rep);
+
+      // If the call of creating user of auth fails,  delete the user created in the database.
+      if (!rep.ok) {
+        await em.removeAndFlush(user);
+
+        if (rep.status === 409) {
+          throw <ServiceError> {
+            code: Status.ALREADY_EXISTS, message:`User with id ${user.id} already exists.`,
+          };
+        }
+
+        logger.info("Error creating user in auth. code: %d, body: %o", rep.status, await rep.text());
+
+        throw <ServiceError> { code: Status.INTERNAL, message: `Error creating user ${user.id} in auth.` };
+      }
+
+      // Making an ssh Request to the login node as the user created.
+      if (process.env.NODE_ENV === "production") {
+        await Promise.all(Object.values(clusters).map(async ({ displayName, slurm, misIgnore }) => {
+          if (misIgnore) { return; }
+          const node = slurm.loginNodes[0];
+          logger.info("Checking if user can login to %s by login node %s", displayName, node);
+
+          const error = await insertKeyAsUser(node, name, password, rootKeyPair, logger).catch((e) => e);
+          if (error) {
+            logger.info("user %s cannot login to %s by login node %s. err: %o", name, displayName, node, error);
+            throw error;
+          } else {
+            logger.info("user %s login to %s by login node %s", name, displayName, node);
+          }
+        }));
+      }
+
+      return [{ id: user.id }];
     },
 
     deleteUser: async ({ request, em }) => {

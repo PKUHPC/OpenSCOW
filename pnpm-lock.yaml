@@ -113,7 +113,6 @@ importers:
       '@mikro-orm/mysql': 5.5.1
       '@mikro-orm/seeder': 5.5.1
       '@scow/config': workspace:*
-      '@scow/lib-auth': workspace:*
       '@scow/lib-config': workspace:*
       '@scow/lib-decimal': workspace:*
       '@scow/lib-ssh': workspace:*
@@ -135,7 +134,6 @@ importers:
       '@mikro-orm/mysql': 5.5.1_vsv5myw3ixte33egugtpcapmtu
       '@mikro-orm/seeder': 5.5.1_@mikro-orm+core@5.5.1
       '@scow/config': link:../../libs/config
-      '@scow/lib-auth': link:../../libs/auth
       '@scow/lib-config': link:../../libs/libconfig
       '@scow/lib-decimal': link:../../libs/decimal
       '@scow/lib-ssh': link:../../libs/ssh
