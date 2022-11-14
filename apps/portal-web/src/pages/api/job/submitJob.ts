@@ -1,10 +1,9 @@
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
-import { status } from "@grpc/grpc-js";
 import { authenticate } from "src/auth/server";
 import { JobServiceClient } from "src/generated/portal/job";
+import { ensureNotUndefined } from "src/utils/checkNull";
 import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
-import { handlegRPCError } from "src/utils/server";
 
 export interface SubmitJobInfo {
   cluster: string;
@@ -58,7 +57,7 @@ export default route<SubmitJobSchema>("SubmitJobSchema", async (req, res) => {
 
   const client = getClient(JobServiceClient);
 
-  return await asyncUnaryCall(client, "submitJob", {
+  const resp = await asyncUnaryCall(client, "submitJob", {
     cluster, userId: info.identityId,
     jobName,
     coreCount,
@@ -71,7 +70,13 @@ export default route<SubmitJobSchema>("SubmitJobSchema", async (req, res) => {
     comment,
     workingDirectory,
     saveAsTemplate: save,
-  }).then(({ jobId }) => ({ 201: { jobId } }), handlegRPCError({
-    [status.INTERNAL]: (e) => ({ 409: { code: "SBATCH_FAILED" as const, message: e.details } }),
-  }));
+  });
+
+  const { result } = ensureNotUndefined(resp, ["result"]);
+
+  if (result.$case === "error") {
+    return { 409: { code: "SBATCH_FAILED", message: result.error.error } };
+  }
+
+  return { 201: { jobId: result.ok.jobId } };
 });
