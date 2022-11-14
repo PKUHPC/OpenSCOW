@@ -2,6 +2,7 @@ import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { UniqueConstraintViolationException } from "@mikro-orm/core";
+import { createUserInAuth } from "@scow/lib-auth";
 import { decimalToMoney } from "@scow/lib-decimal";
 import { insertKeyAsUser } from "@scow/lib-ssh";
 import { clusters } from "src/config/clusters";
@@ -316,7 +317,6 @@ export const userServiceServer = plugin((server) => {
         storageQuota: 0,
         user: user!,
       })));
-
       try {
         await em.persistAndFlush(user);
       } catch (e) {
@@ -328,21 +328,7 @@ export const userServiceServer = plugin((server) => {
       }
 
       // call auth
-      const rep = await fetch(misConfig.authUrl + "/user", {
-        method: "POST",
-        body: JSON.stringify({
-          identityId,
-          id: user.id,
-          mail: email,
-          name: name,
-          password,
-        }),
-        headers: {
-          "content-type": "application/json",
-        },
-      });
-
-      logger.info("Calling auth completed. %o", rep);
+      const rep = await createUserInAuth(identityId, user.id, email, name, password, misConfig.authUrl, logger);
 
       // If the call of creating user of auth fails,  delete the user created in the database.
       if (!rep.ok) {
