@@ -23,11 +23,6 @@ interface Props {
   user: User;
 }
 
-interface FormProps {
-  oldPassword: string;
-  newPassword: string;
-  confirm: string;
-}
 
 export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
 
