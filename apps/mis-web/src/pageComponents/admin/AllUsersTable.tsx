@@ -1,5 +1,5 @@
 import { ExclamationCircleOutlined } from "@ant-design/icons";
-import { Form, Input, message, Modal, Space, Table } from "antd";
+import { Divider, message, Modal, Space, Table } from "antd";
 import React, { useCallback, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
@@ -9,7 +9,9 @@ import { PlatformRole } from "src/models/User";
 import { GetAllUsersSchema } from "src/pages/api/admin/getAllUsers";
 import { User } from "src/stores/UserStore";
 import { formatDateTime } from "src/utils/datetime";
-import { confirmPasswordFormItemProps, passwordRule } from "src/utils/form";
+
+import { ChangePasswordModalLink } from "./changePasswordModal";
+
 
 interface PageInfo {
     page: number;
@@ -65,7 +67,7 @@ interface UserInfoTableProps {
 const UserInfoTable: React.FC<UserInfoTableProps> = ({
   data, pageInfo, setPageInfo, isLoading, reload, user,
 }) => {
-  const [form] = Form.useForm<FormProps>();
+
   return (
     <>
       <Table
@@ -208,69 +210,20 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
 
           )}
         />
+
         <Table.Column<PlatformUserInfo>
           dataIndex="changePassword"
           title="操作"
           render={(_, r) => (
-            <a
-              onClick={() => {
-                Modal.confirm({
-                  title: `确认要修改用户${r.name}（ID：${r.userId}）的密码？`,
-                  icon: <ExclamationCircleOutlined />,
-                  width: "70%",
-                  content:(
-                    <Form
-                      initialValues={undefined}
-                      layout="vertical"
-                      form={form}
-                      preserve={false}
-                    >
-                      <Form.Item
-                        rules={[{ required: true, message: "请输入原密码" }]}
-                        label="原密码"
-                        name="oldPassword"
-                      >
-                        <Input.Password />
-                      </Form.Item>
-                      <Form.Item
-                        rules={[{ required: true, message: "请输入新密码" }, passwordRule]}
-                        label="新密码"
-                        name="newPassword"
-                      >
-                        <Input.Password placeholder={passwordRule.message} />
-                      </Form.Item>
-                      <Form.Item
-                        name="confirm"
-                        label="确认密码"
-                        hasFeedback
-                        {...confirmPasswordFormItemProps(form, "newPassword")}
-                      >
-                        <Input.Password />
-                      </Form.Item>
-                    </Form> 
-                  ),
-                  onOk: async () => {
-                    const { oldPassword, newPassword } = await form.validateFields();
-                    await api.changePasswordAsPlatformAdmin({ body: {
-                      identityId: r.userId,
-                      oldPassword,
-                      newPassword,
-                    } })
-                      .httpError(404, () => { message.error("用户不存在"); })
-                      .httpError(412, () => { message.error("原密码错误"); })
-                      .httpError(501, () => { message.error("本功能在当前配置下不可用"); })
-                      .then(() => {
-                        form.setFieldsValue({ oldPassword: "", newPassword: "", confirm: "" });
-                        message.success("密码更改成功！");
-                        reload();
-                      });
-                  },
-                });
-              }
-              }
-            >
-              修改密码
-            </a>
+            <Space split={<Divider type="vertical" />}>
+              <ChangePasswordModalLink
+                userId={r.userId}
+                name={r.name}
+                reload={reload}
+              >
+                修改密码
+              </ChangePasswordModalLink>
+            </Space>
           )}
         />
       </Table>
