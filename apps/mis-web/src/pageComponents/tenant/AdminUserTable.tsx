@@ -2,6 +2,7 @@ import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { Button, Divider, Form, Input, message, Modal, Space, Table } from "antd";
 import React, { useMemo, useState } from "react";
 import { api } from "src/apis";
+import { ChangePasswordModalLink } from "src/components/ChangePasswordModal";
 import { DisabledA } from "src/components/DisabledA";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { PlatformUserInfo } from "src/generated/server/user";
@@ -9,8 +10,6 @@ import { FullUserInfo, TenantRole } from "src/models/User";
 import { GetTenantUsersSchema } from "src/pages/api/admin/getTenantUsers";
 import { User } from "src/stores/UserStore";
 import { compareDateTime, formatDateTime } from "src/utils/datetime";
-
-import { ChangePasswordModalLink } from "./changePasswordModal";
 
 interface Props {
   data: GetTenantUsersSchema["responses"]["200"] | undefined;
@@ -219,7 +218,20 @@ export const AdminUserTable: React.FC<Props> = ({
               <ChangePasswordModalLink
                 userId={r.userId}
                 name={r.name}
-                reload={reload}
+                reload={reload} 
+                onComplete={async (oldPassword: string, newPassword: string): Promise<Boolean> => {
+                  let resultReturn = false;
+                  await api.changePasswordAsTenantAdmin({ body:{
+                    identityId: r.userId,
+                    oldPassword: oldPassword,
+                    newPassword: newPassword,
+                  } })
+                    .httpError(404, () => { message.error("用户不存在"); })
+                    .httpError(412, () => { message.error("原密码错误"); })
+                    .httpError(501, () => { message.error("本功能在当前配置下不可用"); })
+                    .then(() => { message.success("修改成功"); resultReturn = true; });
+                  return resultReturn;
+                }}      
               >
               修改密码
               </ChangePasswordModalLink>

@@ -1,42 +1,37 @@
-import { Form, Input, message, Modal } from "antd";
+import { Form, Input, Modal } from "antd";
 import { useState } from "react";
-import { api } from "src/apis";
 import { ModalLink } from "src/components/ModalLink";
 import { confirmPasswordFormItemProps, passwordRule } from "src/utils/form";
+
 interface Props {
     name: string;
     userId: string;
     reload: () => void;
     onClose: () => void;
+    onComplete: (oldPassword:string, newPassword:string) => Promise<Boolean>;
     visible: boolean;
 }
+
 interface FormProps {
     oldPassword: string;
     newPassword: string;
     confirm: string;
-  }
-const changePasswordModal: React.FC<Props> = ({ name, userId, reload, onClose, visible }) => {
+}
+
+const ChangePasswordModal: React.FC<Props> = ({ name, userId, reload, onClose, onComplete, visible }) => {
   const [form] = Form.useForm<FormProps>();
   const [loading, setLoading] = useState(false);
 
-  const onOk = async () => {
+  const onOK = async () => {
     const { oldPassword, newPassword } = await form.validateFields();
     setLoading(true);
-    await api.changePasswordAsPlatformAdmin({ body:{
-      identityId: userId,
-      oldPassword,
-      newPassword,
-    } })
-      .httpError(404, () => { message.error("用户不存在"); })
-      .httpError(412, () => { message.error("原密码错误"); })
-      .httpError(501, () => { message.error("本功能在当前配置下不可用"); })
-      .then(() => {
-        form.setFieldsValue({ oldPassword: "", newPassword: "", confirm: "" });
-        message.success("修改成功");
-        reload();
-        onClose();
-      })
-      .finally(() => setLoading(false));
+    const resultOnComplete = await onComplete(oldPassword, newPassword);
+    if (resultOnComplete) {
+      form.setFieldsValue({ oldPassword: "", newPassword: "", confirm: "" });
+      reload();
+      onClose();
+    }
+    setLoading(false);
   };
 
   return (
@@ -44,7 +39,7 @@ const changePasswordModal: React.FC<Props> = ({ name, userId, reload, onClose, v
       title={`确认要修改用户${name}（ID：${userId}）的密码？`}
       visible={visible}
       width={"70%"}
-      onOk={onOk}
+      onOk={onOK}
       confirmLoading={loading}
       onCancel={onClose}
     >
@@ -80,4 +75,4 @@ const changePasswordModal: React.FC<Props> = ({ name, userId, reload, onClose, v
     </Modal>
   );
 };
-export const ChangePasswordModalLink = ModalLink(changePasswordModal);
+export const ChangePasswordModalLink = ModalLink(ChangePasswordModal);

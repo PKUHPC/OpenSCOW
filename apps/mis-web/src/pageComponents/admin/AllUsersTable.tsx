@@ -3,14 +3,13 @@ import { Divider, message, Modal, Space, Table } from "antd";
 import React, { useCallback, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
+import { ChangePasswordModalLink } from "src/components/ChangePasswordModal";
 import { DisabledA } from "src/components/DisabledA";
 import { PlatformUserInfo } from "src/generated/server/user";
 import { PlatformRole } from "src/models/User";
 import { GetAllUsersSchema } from "src/pages/api/admin/getAllUsers";
 import { User } from "src/stores/UserStore";
 import { formatDateTime } from "src/utils/datetime";
-
-import { ChangePasswordModalLink } from "./changePasswordModal";
 
 
 interface PageInfo {
@@ -215,6 +214,19 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
                 userId={r.userId}
                 name={r.name}
                 reload={reload}
+                onComplete={async (oldPassword: string, newPassword: string): Promise<Boolean> => {
+                  let resultReturn = false;
+                  await api.changePasswordAsPlatformAdmin({ body:{
+                    identityId: r.userId,
+                    oldPassword: oldPassword,
+                    newPassword: newPassword,
+                  } })
+                    .httpError(404, () => { message.error("用户不存在"); })
+                    .httpError(412, () => { message.error("原密码错误"); })
+                    .httpError(501, () => { message.error("本功能在当前配置下不可用"); })
+                    .then(() => { message.success("修改成功"); resultReturn = true; });
+                  return resultReturn;
+                }}
               >
                 修改密码
               </ChangePasswordModalLink>
