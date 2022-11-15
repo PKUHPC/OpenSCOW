@@ -4,8 +4,10 @@ import Router from "next/router";
 import { useCallback } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
+import { requireAuth } from "src/auth/requireAuth";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { PageTitle } from "src/components/PageTitle";
+import { PlatformRole } from "src/models/User";
 import { EditableJobBillingTable } from "src/pageComponents/job/EditableJobBillingTable";
 import { TenantSelector } from "src/pageComponents/tenant/TenantSelector";
 import { Head } from "src/utils/head";
@@ -41,18 +43,20 @@ const AdminJobBillingTable: React.FC<{ tenant?: string }> = ({ tenant }) => {
   );
 };
 
-export const AdminJobBillingTablePage: NextPage = () => {
-  const query = useQuerystring();
+export const AdminJobBillingTablePage: NextPage = 
+  requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))(
+    () => {
+      const query = useQuerystring();
 
-  const tenant = queryToString(query.tenant) || undefined;
+      const tenant = queryToString(query.tenant) || undefined;
 
-  return (
-    <div>
-      <Head title="管理作业价格表" />
-      <PageTitle titleText={"管理作业价格表"} />
-      <AdminJobBillingTable tenant={tenant} />
-    </div>
-  );
-};
+      return (
+        <div>
+          <Head title="管理作业价格表" />
+          <PageTitle titleText={"管理作业价格表"} />
+          <AdminJobBillingTable tenant={tenant} />
+        </div>
+      );
+    });
 
 export default AdminJobBillingTablePage;

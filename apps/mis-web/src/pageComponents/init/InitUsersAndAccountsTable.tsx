@@ -6,6 +6,7 @@ import { Centered } from "src/components/layouts";
 import { Account } from "src/generated/server/account";
 import { AccountAffiliation, User } from "src/generated/server/user";
 import { PlatformRole, PlatformRoleTexts, TenantRole, TenantRoleTexts, UserRole, UserRoleTexts } from "src/models/User";
+import { confirmPasswordFormItemProps } from "src/utils/form";
 import styled from "styled-components";
 
 interface DataTableProps<T> {
@@ -28,11 +29,11 @@ interface PlatformRoleSelectorProps {
 const PlatformRoleSelector: React.FC<PlatformRoleSelectorProps> = ({ role, userId, reload }) => {
 
   const [loading, setLoading] = useState(false);
-
+  const roleTexts: string[] = role.map((r) => PlatformRoleTexts[r]);
   return (
     <Select
       disabled={loading}
-      defaultValue={role}
+      defaultValue={roleTexts}
       style={{ width: "100%" }}
       onSelect={
         async (value: number) => {
@@ -73,12 +74,13 @@ const PlatformRoleSelector: React.FC<PlatformRoleSelectorProps> = ({ role, userI
     >
       {
         Object.entries(PlatformRoleTexts).map(([key, value]) => {
-          return <Select.Option key={key} value={key}>{value}</Select.Option>;
+          return <Select.Option key={key} value={value}>{value}</Select.Option>;
         })
       }
     </Select>
   );
 };
+
 
 interface TenantRoleSelectorProps {
   role: TenantRole[];
@@ -89,11 +91,11 @@ interface TenantRoleSelectorProps {
 const TenantRoleSelector: React.FC<TenantRoleSelectorProps> = ({ role, userId, reload }) => {
 
   const [loading, setLoading] = useState(false);
-
+  const roleTexts: string[] = role.map((r) => TenantRoleTexts[r]);
   return (
     <Select
       disabled={loading}
-      defaultValue={role}
+      defaultValue={roleTexts}
       style={{ width: "100%" }}
       onSelect={
         async (value: number) => {
@@ -134,7 +136,7 @@ const TenantRoleSelector: React.FC<TenantRoleSelectorProps> = ({ role, userId, r
     >
       {
         Object.entries(TenantRoleTexts).map(([key, value]) => {
-          return <Select.Option key={key} value={key}>{value}</Select.Option>;
+          return <Select.Option key={key} value={value}>{value}</Select.Option>;
         })
       }
     </Select>

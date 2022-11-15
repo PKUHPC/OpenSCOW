@@ -103,8 +103,17 @@ message SubmitJobRequest {
 }
 
 // NOT_FOUND: cluster is not found
-// INTERNAL: sbatch failed. details has output
-message SubmitJobResponse { uint32 job_id = 1; }
+message SubmitJobResponse {
+
+  message OK { uint32 job_id = 1; }
+
+  message SchedulerError { string error = 1; }
+
+  oneof result {
+    OK ok = 1;
+    SchedulerError error = 2;
+  }
+}
 
 service JobService {
   rpc CancelJob(CancelJobRequest) returns (CancelJobResponse);

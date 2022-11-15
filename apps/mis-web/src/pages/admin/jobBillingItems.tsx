@@ -5,8 +5,10 @@ import Link from "next/link";
 import { useCallback } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
+import { requireAuth } from "src/auth/requireAuth";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { PageTitle } from "src/components/PageTitle";
+import { PlatformRole } from "src/models/User";
 import { JobBillingManagementTable } from "src/pageComponents/job/JobBillingManagementTable";
 import { TenantSelector } from "src/pageComponents/tenant/TenantSelector";
 import { Head } from "src/utils/head";
@@ -58,14 +60,15 @@ const AdminJobBillingManagementTable: React.FC = () => {
   );
 };
 
-export const JobBillingItemsPage: NextPage = () => {
-  return (
-    <div>
-      <Head title="查询作业价格项" />
-      <PageTitle titleText={"查询作业价格项"} />
-      <AdminJobBillingManagementTable />
-    </div>
-  );
-};
+export const JobBillingItemsPage: NextPage = requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))(
+  () => {
+    return (
+      <div>
+        <Head title="查询作业价格项" />
+        <PageTitle titleText={"查询作业价格项"} />
+        <AdminJobBillingManagementTable />
+      </div>
+    );
+  });
 
 export default JobBillingItemsPage;
