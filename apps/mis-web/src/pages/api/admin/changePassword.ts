@@ -36,7 +36,7 @@ export interface ChangePasswordAsPlatformAdminSchema {
 
 
 export default /* #__PURE__*/route<ChangePasswordAsPlatformAdminSchema>(
-  "changePasswordAsPlatformAdminSchema", async (req, res) => {
+  "ChangePasswordAsPlatformAdminSchema", async (req, res) => {
 
     if (!publicConfig.ENABLE_CHANGE_PASSWORD) {
       return { 501: null };

@@ -39,7 +39,7 @@ export interface ChangePasswordAsTenantAdminSchema {
 
 
 export default /* #__PURE__*/route<ChangePasswordAsTenantAdminSchema>(
-  "changePasswordAsTenantAdminSchema", async (req, res) => {
+  "ChangePasswordAsTenantAdminSchema", async (req, res) => {
 
     if (!publicConfig.ENABLE_CHANGE_PASSWORD) {
       return { 501: null };
