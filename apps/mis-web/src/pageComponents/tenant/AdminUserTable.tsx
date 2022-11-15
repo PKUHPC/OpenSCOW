@@ -228,7 +228,8 @@ export const AdminUserTable: React.FC<Props> = ({
                     .httpError(404, () => { message.error("用户不存在"); })
                     .httpError(412, () => { message.error("原密码错误"); })
                     .httpError(501, () => { message.error("本功能在当前配置下不可用"); })
-                    .then(() => { message.success("修改成功"); });
+                    .then(() => { message.success("修改成功"); })
+                    .catch(() => { message.error("修改失败"); });
                 }}      
               >
               修改密码
