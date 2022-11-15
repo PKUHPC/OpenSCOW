@@ -9,7 +9,7 @@ import { publicConfig, runtimeConfig } from "src/utils/config";
 
 // 此API用于租户管理员修改自己租户的用户密码
 // 没有权限返回undefined
-export interface changePasswordAsTenantAdminSchema {
+export interface ChangePasswordAsTenantAdminSchema {
 
   method: "PATCH";
 
@@ -38,7 +38,7 @@ export interface changePasswordAsTenantAdminSchema {
 }
 
 
-export default /* #__PURE__*/route<changePasswordAsTenantAdminSchema>(
+export default /* #__PURE__*/route<ChangePasswordAsTenantAdminSchema>(
   "changePasswordAsTenantAdminSchema", async (req, res) => {
 
     if (!publicConfig.ENABLE_CHANGE_PASSWORD) {

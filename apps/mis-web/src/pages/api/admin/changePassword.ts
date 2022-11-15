@@ -6,7 +6,7 @@ import { publicConfig, runtimeConfig } from "src/utils/config";
 
 // 此API用于账户管理员修改其他任意用户的密码。
 // 没有权限返回undefined
-export interface changePasswordAsPlatformAdminSchema {
+export interface ChangePasswordAsPlatformAdminSchema {
 
   method: "PATCH";
 
@@ -35,7 +35,7 @@ export interface changePasswordAsPlatformAdminSchema {
 }
 
 
-export default /* #__PURE__*/route<changePasswordAsPlatformAdminSchema>(
+export default /* #__PURE__*/route<ChangePasswordAsPlatformAdminSchema>(
   "changePasswordAsPlatformAdminSchema", async (req, res) => {
 
     if (!publicConfig.ENABLE_CHANGE_PASSWORD) {
