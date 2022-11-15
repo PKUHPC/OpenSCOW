@@ -219,8 +219,7 @@ export const AdminUserTable: React.FC<Props> = ({
                 userId={r.userId}
                 name={r.name}
                 reload={reload} 
-                onComplete={async (oldPassword: string, newPassword: string): Promise<Boolean> => {
-                  let resultReturn = false;
+                onComplete={async (oldPassword: string, newPassword: string) => {
                   await api.changePasswordAsTenantAdmin({ body:{
                     identityId: r.userId,
                     oldPassword: oldPassword,
@@ -229,8 +228,7 @@ export const AdminUserTable: React.FC<Props> = ({
                     .httpError(404, () => { message.error("用户不存在"); })
                     .httpError(412, () => { message.error("原密码错误"); })
                     .httpError(501, () => { message.error("本功能在当前配置下不可用"); })
-                    .then(() => { message.success("修改成功"); resultReturn = true; });
-                  return resultReturn;
+                    .then(() => { message.success("修改成功"); });
                 }}      
               >
               修改密码

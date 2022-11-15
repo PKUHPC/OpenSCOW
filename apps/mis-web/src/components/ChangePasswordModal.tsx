@@ -8,7 +8,7 @@ interface Props {
     userId: string;
     reload: () => void;
     onClose: () => void;
-    onComplete: (oldPassword:string, newPassword:string) => Promise<Boolean>;
+    onComplete: (oldPassword:string, newPassword:string) => Promise<void>;
     visible: boolean;
 }
 
@@ -25,13 +25,13 @@ const ChangePasswordModal: React.FC<Props> = ({ name, userId, reload, onClose, o
   const onOK = async () => {
     const { oldPassword, newPassword } = await form.validateFields();
     setLoading(true);
-    const resultOnComplete = await onComplete(oldPassword, newPassword);
-    if (resultOnComplete) {
-      form.setFieldsValue({ oldPassword: "", newPassword: "", confirm: "" });
-      reload();
-      onClose();
-    }
-    setLoading(false);
+    await onComplete(oldPassword, newPassword)
+      .then(() => { 
+        form.setFieldsValue({ oldPassword: "", newPassword: "", confirm: "" });
+        reload();
+        onClose();
+      })
+      .finally(() => setLoading(false));
   };
 
   return (
