@@ -6,7 +6,10 @@ RUN corepack enable
 
 WORKDIR /app
 
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
+COPY pnpm-lock.yaml ./
+RUN pnpm fetch
+
+COPY package.json pnpm-workspace.yaml .npmrc ./
 
 COPY libs/auth/package.json ./libs/auth/
 COPY libs/libconfig/package.json ./libs/libconfig/
@@ -15,7 +18,7 @@ COPY libs/decimal/package.json ./libs/decimal/
 COPY libs/ssh/package.json ./libs/ssh/
 COPY apps/portal-web/package.json ./apps/portal-web/
 
-RUN pnpm i --frozen-lockfile
+RUN pnpm i --offline --frozen-lockfile
 
 RUN apk add git
 

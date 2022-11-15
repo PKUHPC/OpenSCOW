@@ -6,7 +6,11 @@ RUN corepack enable
 
 WORKDIR /app
 
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
+
+COPY pnpm-lock.yaml ./
+RUN pnpm fetch
+
+COPY package.json pnpm-workspace.yaml .npmrc ./
 
 COPY libs/libconfig/package.json ./libs/libconfig/
 COPY libs/config/package.json ./libs/config/
@@ -14,7 +18,7 @@ COPY libs/decimal/package.json ./libs/decimal/
 COPY libs/ssh/package.json ./libs/ssh/
 COPY apps/portal-server/package.json ./apps/portal-server/
 
-RUN pnpm i --frozen-lockfile
+RUN pnpm i --offline --frozen-lockfile
 
 COPY tsconfig.json .eslintrc.json ./
 
