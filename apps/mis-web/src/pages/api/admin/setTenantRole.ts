@@ -20,6 +20,8 @@ export interface SetTenantRoleSchema {
   responses: {
     // 如果用户已经是这个角色，那么executed为false
     200: { executed: boolean };
+    // 用户没有权限
+    401: null;
     // 用户不存在
     404: null;
   }
@@ -32,7 +34,7 @@ export default route<SetTenantRoleSchema>("SetTenantRoleSchema", async (req, res
     const auth = authenticate((u) => 
       u.tenantRoles.includes(TenantRole.TENANT_ADMIN));
     const info = await auth(req, res);
-    if (!info) { return; }
+    if (!info) { return { 401: null }; }
   }
 
 

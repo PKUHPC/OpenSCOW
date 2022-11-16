@@ -1,7 +1,6 @@
 import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Status } from "@grpc/grpc-js/build/src/constants";
-import { NextApiRequest, NextApiResponse } from "next";
 import { authenticate } from "src/auth/server";
 import { UserServiceClient } from "src/generated/server/user";
 import { PlatformRole } from "src/models/User";
@@ -21,6 +20,8 @@ export interface SetPlatformRoleSchema {
   responses: {
     // 如果用户已经是这个角色，那么executed为false
     200: { executed: boolean };
+    // 用户没有权限
+    401: null;
     // 用户不存在
     404: null;
   }
@@ -33,7 +34,7 @@ export default route<SetPlatformRoleSchema>("SetPlatformRoleSchema", async (req,
     const auth = authenticate((u) => 
       u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN));
     const info = await auth(req, res);
-    if (!info) { return; }
+    if (!info) { return { 401: null }; }
   }
 
   const client = getClient(UserServiceClient);

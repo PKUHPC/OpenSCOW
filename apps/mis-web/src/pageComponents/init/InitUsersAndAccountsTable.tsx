@@ -6,7 +6,6 @@ import { Centered } from "src/components/layouts";
 import { Account } from "src/generated/server/account";
 import { AccountAffiliation, User } from "src/generated/server/user";
 import { PlatformRole, PlatformRoleTexts, TenantRole, TenantRoleTexts, UserRole, UserRoleTexts } from "src/models/User";
-import { confirmPasswordFormItemProps } from "src/utils/form";
 import styled from "styled-components";
 
 interface DataTableProps<T> {
@@ -43,7 +42,7 @@ const PlatformRoleSelector: React.FC<PlatformRoleSelectorProps> = ({ role, userI
             roleType: value,
           } })
             .httpError(200, () => { message.error("用户已经是该角色"); })
-            .httpError(400, () => { message.error("用户不存在"); })
+            .httpError(404, () => { message.error("用户不存在"); })
             .httpError(401, () => { message.error("用户没有权限"); })
             .then(() => {
               message.success("设置成功");
@@ -60,7 +59,7 @@ const PlatformRoleSelector: React.FC<PlatformRoleSelectorProps> = ({ role, userI
             roleType: value,
           } })
             .httpError(200, () => { message.error("用户已经不是该角色"); })
-            .httpError(400, () => { message.error("用户不存在"); })
+            .httpError(404, () => { message.error("用户不存在"); })
             .httpError(401, () => { message.error("用户没有权限"); })
             .then(() => {
               message.success("设置成功");
@@ -105,7 +104,7 @@ const TenantRoleSelector: React.FC<TenantRoleSelectorProps> = ({ role, userId, r
             roleType: value,
           } })
             .httpError(200, () => { message.error("用户已经是该角色"); })
-            .httpError(400, () => { message.error("用户不存在"); })
+            .httpError(404, () => { message.error("用户不存在"); })
             .httpError(401, () => { message.error("用户没有权限"); })
             .then(() => {
               message.success("设置成功");
@@ -122,7 +121,7 @@ const TenantRoleSelector: React.FC<TenantRoleSelectorProps> = ({ role, userId, r
             roleType: value,
           } })
             .httpError(200, () => { message.error("用户已经不是该角色"); })
-            .httpError(400, () => { message.error("用户不存在"); })
+            .httpError(404, () => { message.error("用户不存在"); })
             .httpError(401, () => { message.error("用户没有权限"); })
             .then(() => {
               message.success("设置成功");
