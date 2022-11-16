@@ -43,7 +43,8 @@ const PlatformRoleSelector: React.FC<PlatformRoleSelectorProps> = ({ role, userI
           } })
             .httpError(200, () => { message.error("用户已经是该角色"); })
             .httpError(404, () => { message.error("用户不存在"); })
-            .httpError(401, () => { message.error("用户没有权限"); })
+            .httpError(401, () => { message.error("用户未登录"); })
+            .httpError(403, () => { message.error("用户没有权限"); })
             .then(() => {
               message.success("设置成功");
               setLoading(false);
@@ -60,7 +61,8 @@ const PlatformRoleSelector: React.FC<PlatformRoleSelectorProps> = ({ role, userI
           } })
             .httpError(200, () => { message.error("用户已经不是该角色"); })
             .httpError(404, () => { message.error("用户不存在"); })
-            .httpError(401, () => { message.error("用户没有权限"); })
+            .httpError(401, () => { message.error("用户未登录"); })
+            .httpError(403, () => { message.error("用户没有权限"); })
             .then(() => {
               message.success("设置成功");
               setLoading(false);
@@ -105,7 +107,8 @@ const TenantRoleSelector: React.FC<TenantRoleSelectorProps> = ({ role, userId, r
           } })
             .httpError(200, () => { message.error("用户已经是该角色"); })
             .httpError(404, () => { message.error("用户不存在"); })
-            .httpError(401, () => { message.error("用户没有权限"); })
+            .httpError(401, () => { message.error("用户未登录"); })
+            .httpError(403, () => { message.error("用户没有权限"); })
             .then(() => {
               message.success("设置成功");
               setLoading(false);
@@ -122,7 +125,8 @@ const TenantRoleSelector: React.FC<TenantRoleSelectorProps> = ({ role, userId, r
           } })
             .httpError(200, () => { message.error("用户已经不是该角色"); })
             .httpError(404, () => { message.error("用户不存在"); })
-            .httpError(401, () => { message.error("用户没有权限"); })
+            .httpError(401, () => { message.error("用户未登录"); })
+            .httpError(403, () => { message.error("用户没有权限"); })
             .then(() => {
               message.success("设置成功");
               setLoading(false);

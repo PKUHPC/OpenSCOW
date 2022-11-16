@@ -20,8 +20,6 @@ export interface SetPlatformRoleSchema {
   responses: {
     // 如果用户已经是这个角色，那么executed为false
     200: { executed: boolean };
-    // 用户没有权限
-    401: null;
     // 用户不存在
     404: null;
   }
@@ -34,7 +32,7 @@ export default route<SetPlatformRoleSchema>("SetPlatformRoleSchema", async (req,
     const auth = authenticate((u) => 
       u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN));
     const info = await auth(req, res);
-    if (!info) { return { 401: null }; }
+    if (!info) { return; }
   }
 
   const client = getClient(UserServiceClient);
