@@ -12,7 +12,7 @@ export async function changePassword(
     headers: applicationJsonHeaders,
   });
 
-  if (!resp.ok) {
-    throw logHttpErrorAndThrow(resp, logger);
+  if (resp.status !== 204) {
+    await logHttpErrorAndThrow(resp, logger);
   }
 }

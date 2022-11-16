@@ -1,3 +1,5 @@
+import { applicationJsonHeaders } from "src/utils";
+
 import { changePassword } from "../src/changePassword";
 
 const authUrl = "auth:5000";
@@ -21,13 +23,13 @@ globalThis.fetch = jest.fn((url:string, req:RequstSchema) => {
   const testOldPassword = testBody.oldPassword;
 
   if (testIdentityId !== identityId) {
-    return { status: 404, json: () => ({}) };
+    return { status: 404, text: () => "" };
   }
   else if (testOldPassword !== oldPassword) {
-    return { status: 412, json: () => ({}) };
+    return { status: 412, text: () => "" };
   }
   else {
-    return { status: 204, json: () => ({}) };
+    return { status: 204, text: () => "" };
   }
 });
 
@@ -39,20 +41,28 @@ it("raises correct request for changing password", async () => {
     {
       method: "PATCH",
       body: JSON.stringify({ identityId, oldPassword, newPassword }),
+      headers: applicationJsonHeaders,
     },
   );
 });
 
 it("fails test for changing password with wrong oldpassword", async () => {
-  await changePassword(authUrl, { identityId, oldPassword: oldPassword + "123", newPassword })
-    .then(() => { expect("").fail("Change password success"); })
-    .catch((e) => { expect(e.status).toBe(412); });
+
+  try {
+    await changePassword(authUrl, { identityId, oldPassword: oldPassword + "123", newPassword });
+    expect("").fail("Change password success");
+  } catch (e: any) {
+    expect(e.status).toBe(412);
+  }
 });
 
 it("fails test for changing password with the user who cannot be found", async () => {
-  await changePassword(authUrl, { identityId: identityId + "123", oldPassword, newPassword })
-    .then(() => { expect("").fail("Change password success"); })
-    .catch((e) => { expect(e.status).toBe(404); });
+  try {
+    await changePassword(authUrl, { identityId: identityId + "123", oldPassword, newPassword });
+    expect("").fail("Change password success");
+  } catch (e: any) {
+    expect(e.status).toBe(404);
+  }
 });
 
 it("succeeds when changing password", async () => {

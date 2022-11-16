@@ -12,8 +12,8 @@ export async function createUser(
     headers: applicationJsonHeaders,
   });
 
-  if (!resp.ok) {
-    throw logHttpErrorAndThrow(resp, logger);
+  if (resp.status !== 201) {
+    await logHttpErrorAndThrow(resp, logger);
   }
 
 }
