@@ -1,4 +1,4 @@
-import { Button, Form, Input, InputNumber, message, Tag } from "antd";
+import { Button, Form, Input, InputNumber, message, notification, Tag } from "antd";
 import React, { useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
@@ -62,6 +62,13 @@ export const ChargeForm: React.FC = () => {
     })
       .httpError(404, () => {
         message.error("账户未找到");
+      })
+      .httpError(500, (e) => {
+        notification["error"]({
+          message: "操作失败",
+          description: `多集群操作出现错误, 部分集群未同步修改(${e}), 请联系管理员!`,
+          duration: 0,
+        });
       })
       .then(() => {
         messageApi.success("充值完成！");

@@ -20,6 +20,7 @@ export interface UnblockUserInAccountSchema {
     200: { executed: boolean };
     // 用户不存在
     404: null;
+    500: string;
   }
 }
 
@@ -42,6 +43,7 @@ export default /* #__PURE__*/route<UnblockUserInAccountSchema>("UnblockUserInAcc
   })
     .then(() => ({ 200: { executed: true } }))
     .catch(handlegRPCError({
+      [Status.INTERNAL]: (e) => ({ 500: e.details }),
       [Status.NOT_FOUND]: () => ({ 404: null }),
       [Status.FAILED_PRECONDITION]: () => ({ 200: { executed: false } }),
     }));

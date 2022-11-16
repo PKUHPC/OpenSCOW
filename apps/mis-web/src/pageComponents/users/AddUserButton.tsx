@@ -1,5 +1,5 @@
 import { PlusOutlined } from "@ant-design/icons";
-import { Button, Form, Input, message, Modal } from "antd";
+import { Button, Form, Input, message, Modal, notification } from "antd";
 import React, { useState } from "react";
 import { api } from "src/apis";
 import { CreateUserModal } from "src/pageComponents/users/CreateUserModal";
@@ -44,6 +44,13 @@ const NewUserModal: React.FC<ModalProps> = ({
       })
       .httpError(409, () => {
         message.error("用户已经存在于此账户中！");
+      })
+      .httpError(500, (e) => {
+        notification["error"]({
+          message: "操作失败",
+          description: `多集群操作出现错误, 部分集群未同步修改(${e}), 请联系管理员!`,
+          duration: 0,
+        });
       })
       .then(() => {
         message.success("添加成功！");

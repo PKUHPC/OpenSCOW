@@ -25,6 +25,8 @@ export interface FinancePaySchema {
     }
     // account is not found in current tenant.
     404: null;
+
+    500: string;
   }
 }
 
@@ -51,6 +53,7 @@ export default route<FinancePaySchema>("FinancePaySchema",
 
       return { 200: { balance: moneyToNumber(replyObj.currentBalance) } };
     }).catch(handlegRPCError({
+      [Status.INTERNAL]: (e) => ({ 500: e.details }),
       [Status.NOT_FOUND]: () => ({ 404: null }),
     }));
 

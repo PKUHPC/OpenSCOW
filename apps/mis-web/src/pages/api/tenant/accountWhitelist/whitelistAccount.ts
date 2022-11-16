@@ -18,6 +18,7 @@ export interface WhitelistAccountSchema {
   responses: {
     204: null;
     404: null;
+    500: string;
   }
 }
 
@@ -43,6 +44,7 @@ export default route<WhitelistAccountSchema>("WhitelistAccountSchema",
     })
       .then(() => ({ 204: null }))
       .catch(handlegRPCError({
+        [Status.INTERNAL]: (e) => ({ 500: e.details }),
         [Status.NOT_FOUND]: () => ({ 404: null }),
       }));
   });

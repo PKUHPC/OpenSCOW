@@ -30,6 +30,8 @@ export interface AddUserToAccountSchema {
 
     /** 用户已经存在 */
     409: null;
+
+    500: string;
   }
 }
 
@@ -63,6 +65,7 @@ export default /* #__PURE__*/route<AddUserToAccountSchema>("AddUserToAccountSche
     userId: identityId,
   }).then(() => ({ 204: null }))
     .catch(handlegRPCError({
+      [Status.INTERNAL]: (e) => ({ 500: e.details }),
       [Status.ALREADY_EXISTS]: () => ({ 409: null }),
       [Status.NOT_FOUND]: () => ({ 404: { code: "ACCOUNT_NOT_FOUND" as const } }),
     }));

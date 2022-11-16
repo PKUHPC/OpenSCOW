@@ -26,6 +26,8 @@ export interface TenantFinancePaySchema {
     }
     // tenant is not found in platform.
     404: null;
+
+    500: string;
   }
 }
 
@@ -50,6 +52,7 @@ export default route<TenantFinancePaySchema>("TenantFinancePaySchema",
 
       return { 200: { balance: moneyToNumber(replyObj.currentBalance) } };
     }).catch(handlegRPCError({
+      [Status.INTERNAL]: (e) => ({ 500: e.details }),
       [Status.NOT_FOUND]: () => ({ 404: null }),
     }));
   },

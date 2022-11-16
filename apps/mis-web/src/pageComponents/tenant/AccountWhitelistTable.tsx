@@ -1,5 +1,5 @@
 import { ExclamationCircleOutlined } from "@ant-design/icons";
-import { Divider, message, Modal, Space, Table } from "antd";
+import { Divider, message, Modal, notification, Space, Table } from "antd";
 import React from "react";
 import { api } from "src/apis";
 import { WhitelistedAccount } from "src/generated/server/account";
@@ -51,6 +51,13 @@ export const AccountWhitelistTable: React.FC<Props> = ({
                   await api.dewhitelistAccount({ body: {
                     accountName: r.accountName,
                   } })
+                    .httpError(500, (e) => {
+                      notification["error"]({
+                        message: "操作失败",
+                        description: `多集群操作出现错误, 部分集群未同步修改(${e}), 请联系管理员!`,
+                        duration: 0,
+                      });
+                    })
                     .then(() => {
                       message.success("移出白名单成功！");
                       reload();
