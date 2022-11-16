@@ -55,12 +55,10 @@ export default /* #__PURE__*/route<ChangePasswordSchema>("ChangePasswordSchema",
       switch (e.status) {
       case "NOT_FOUND":
         return { 404: null };
-      case "OK":
-        return { 205: null };
       case "WRONG_PASSWORD":
-        return { 413: null };
+        return { 412: null };
       case "NOT_SUPPORTED":
-        return { 502: null };
+        return { 501: null };
       default:
         throw e;
       }
