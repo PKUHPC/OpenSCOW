@@ -34,6 +34,7 @@ export const AdminUserTable: React.FC<Props> = ({
     (!query.idOrName || x.id.includes(query.idOrName) || x.name.includes(query.idOrName))
   )) : undefined, [data, query]);
 
+  console.log("filteredData", filteredData);
   return (
     <div>
       <FilterFormContainer>
