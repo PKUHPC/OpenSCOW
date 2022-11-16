@@ -1,7 +1,6 @@
 import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Status } from "@grpc/grpc-js/build/src/constants";
-import { NextApiRequest, NextApiResponse } from "next";
 import { authenticate } from "src/auth/server";
 import { UserServiceClient } from "src/generated/server/user";
 import { PlatformRole } from "src/models/User";
