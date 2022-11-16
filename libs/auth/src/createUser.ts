@@ -13,7 +13,7 @@ export async function createUser(
   });
 
   if (resp.status !== 201) {
-    await logHttpErrorAndThrow(resp, logger);
+    logHttpErrorAndThrow(resp, logger);
   }
 
 }

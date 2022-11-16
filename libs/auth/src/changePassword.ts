@@ -13,6 +13,6 @@ export async function changePassword(
   });
 
   if (resp.status !== 204) {
-    await logHttpErrorAndThrow(resp, logger);
+    logHttpErrorAndThrow(resp, logger);
   }
 }
