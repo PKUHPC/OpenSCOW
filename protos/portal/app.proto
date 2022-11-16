@@ -71,6 +71,19 @@ message AppSession {
 
 message ListAppSessionsResponse { repeated AppSession sessions = 1; }
 
+message GetAppAttributesRequest {
+  string app_id = 1;
+}
+
+message AppCustomAttribute {
+  string widget = 1;
+  string label = 2;
+}
+
+message GetAppAttributesResponse {
+  repeated AppCustomAttribute attributes = 1;
+}
+
 service AppService {
   rpc ConnectToApp(ConnectToAppRequest) returns (ConnectToAppResponse);
 
@@ -78,4 +91,6 @@ service AppService {
       returns (CreateAppSessionResponse);
 
   rpc ListAppSessions(ListAppSessionsRequest) returns (ListAppSessionsResponse);
+
+  rpc GetAppAttributes(GetAppAttributesRequest) returns (GetAppAttributesResponse);
 }

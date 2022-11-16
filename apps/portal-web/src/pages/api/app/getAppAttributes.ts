@@ -1,4 +1,4 @@
-// import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
+import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { authenticate } from "src/auth/server";
 import { AppServiceClient } from "src/generated/portal/app";
 import { getClient } from "src/utils/client";
@@ -32,20 +32,19 @@ export default /* #__PURE__*/route<GetAppAttributesSchema>("GetAppAttributesSche
 
   if (!info) { return; }
 
-  const { cluster } = req.query;
+  const { appId } = req.query;
 
   const client = getClient(AppServiceClient);
 
-  // return asyncUnaryCall(client, "listAppSessions", {
-  //   cluster, userId: info.identityId,
-  // }).then((reply) => {
-  //   return { 200: { sessions: reply.sessions } };
-  // });
-  const tmp_data: AppCustomFormAttribute[] = [
-    { widget: "111", label: "222" },
-    { widget: "333", label: "444" },
-  ];
+  // const tmp_data: AppCustomFormAttribute[] = [
+  //   { widget: "111", label: "222" },
+  //   { widget: "333", label: "444" },
+  // ];
 
-  return { 200: { appCustomFormAttributes:  tmp_data } };
+  return asyncUnaryCall(client, "getAppAttributes", {
+    appId,
+  }).then((reply) => {
+    return { 200: { appCustomFormAttributes: reply.attributes } };
+  });
 
 });

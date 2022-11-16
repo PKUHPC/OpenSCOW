@@ -18,3 +18,9 @@ web:
     path: /login
     formData:
       password: "{PASSWORD}"
+
+attributes:
+  - widget: number_field
+    label: Custom_label
+  - widget: number_field
+    label: Custom_label

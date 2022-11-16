@@ -5,6 +5,7 @@ import { AppType } from "@scow/config/build/app";
 import { getClusterOps } from "src/clusterops";
 import { apps } from "src/config/apps";
 import {
+  AppCustomAttribute,
   AppServiceServer,
   AppServiceService,
   ConnectToAppResponse,
@@ -116,6 +117,12 @@ export const appServiceServer = plugin((server) => {
       return [{ sessions: reply.sessions }];
     },
 
+    getAppAttributes: async ({ request }) => {
+      const { appId } = request;
+      const app = apps[appId];
+      const attributes:AppCustomAttribute[] = app.attributes ? app.attributes : [];
+      return [{ attributes: attributes }];
+    },
   });
 
 });

@@ -51,6 +51,9 @@ export const AppConfigSchema = Type.Object({
   slurm: Type.Optional(SlurmConfigSchema),
   web: Type.Optional(WebAppConfigSchema),
   vnc: Type.Optional(VncAppConfigSchema),
+  attributes: Type.Optional(Type.Array(
+    Type.Object({ widget: Type.String({ description: "表单类型" }), label: Type.String({ description: "表单标签" }) }),
+  )),
 });
 
 export type AppConfigSchema = Static<typeof AppConfigSchema>;
