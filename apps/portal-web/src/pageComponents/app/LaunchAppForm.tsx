@@ -1,6 +1,7 @@
-import { Button, Form, InputNumber, message, Select } from "antd";
+import { Button, Form, Input, InputNumber, message, Select } from "antd";
 import Router from "next/router";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { AccountSelector } from "src/pageComponents/job/AccountSelector";
@@ -54,6 +55,15 @@ export const LaunchAppForm: React.FC<Props> = ({ appId }) => {
       });
   };
 
+
+  const { data } = useAsync({
+    promiseFn: useCallback(async () => {
+      const { appCustomFormAttributes } = await api.getAppAttributes({ query: { appId } });
+      return appCustomFormAttributes;
+    },
+    [appId]),
+  });
+
   const cluster = Form.useWatch("cluster", form) as Cluster | undefined;
   const partition = Form.useWatch("partition", form) as string | undefined;
 
@@ -86,6 +96,51 @@ export const LaunchAppForm: React.FC<Props> = ({ appId }) => {
     () => cluster ? getPartitionInfo(cluster, partition) : undefined,
     [cluster, partition],
   );
+
+  const items = data?.map((item) => {
+    if (item.widget === "number_field") {
+      return (
+        <Form.Item
+          key={item.label}
+          label={item.label}
+          name="testNumberInput"
+          rules={[
+            { required: true, type: "integer" },
+          ]}
+        >
+          <InputNumber />
+        </Form.Item>
+      );
+    } else if (item.widget === "text_field") {
+      return (
+        <Form.Item
+          key={item.label}
+          label={item.label}
+          name="testParameter"
+          rules={[{ required: true }]}
+        >
+          <Input />
+        </Form.Item>
+      );
+    } else {
+      const { Option } = Select;
+      return (
+        <Form.Item
+          key={item.label}
+          label="选项"
+          name="testSelect"
+          rules={[{ required: true }]}
+        >
+          <Select>
+            <Option value="opt1">male</Option>
+            <Option value="opt2">female</Option>
+            <Option value="opt3">other</Option>
+          </Select>
+
+        </Form.Item>
+      );
+    }
+  });
 
   return (
     <Form form={form} onFinish={onSubmit} initialValues={initialValues}>
@@ -146,7 +201,7 @@ export const LaunchAppForm: React.FC<Props> = ({ appId }) => {
         <InputNumber min={1} step={1} addonAfter={"分钟"} />
       </Form.Item>
 
-
+      {items}
 
       <Form.Item>
         <Button type="primary" htmlType="submit" loading={loading}>
