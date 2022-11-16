@@ -75,7 +75,7 @@ const PlatformRoleSelector: React.FC<PlatformRoleSelectorProps> = ({ role, userI
     >
       {
         Object.entries(PlatformRoleTexts).map(([key, value]) => {
-          return <Select.Option key={key} value={value}>{value}</Select.Option>;
+          return <Select.Option key={key} value={key}>{value}</Select.Option>;
         })
       }
     </Select>
