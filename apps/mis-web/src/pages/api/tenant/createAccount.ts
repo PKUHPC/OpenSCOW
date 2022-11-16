@@ -30,6 +30,7 @@ export interface CreateAccountSchema {
     /** ownerId不存在 */
     404: null;
     409: null;
+    500: string;
   }
 }
 
@@ -72,6 +73,7 @@ export default route<CreateAccountSchema>("CreateAccountSchema",
     })
       .then(() => ({ 200: null }))
       .catch(handlegRPCError({
+        [Status.INTERNAL]: (e) => ({ 500: e.details }),
         [Status.ALREADY_EXISTS]: () => ({ 409: null }),
         [Status.NOT_FOUND]: () => ({ 404: null }),
       }));

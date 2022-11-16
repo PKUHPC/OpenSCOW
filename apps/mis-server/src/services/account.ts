@@ -148,6 +148,7 @@ export const accountServiceServer = plugin((server) => {
         }),
       ).catch(async (e) => {
         await rollback(e);
+        throw e;
       });
 
       logger.info("Account has been created in cluster.");
