@@ -139,7 +139,7 @@ const TenantRoleSelector: React.FC<TenantRoleSelectorProps> = ({ role, userId, r
     >
       {
         Object.entries(TenantRoleTexts).map(([key, value]) => {
-          return <Select.Option key={key} value={value}>{value}</Select.Option>;
+          return <Select.Option key={key} value={key}>{value}</Select.Option>;
         })
       }
     </Select>
