@@ -330,16 +330,16 @@ export const userServiceServer = plugin((server) => {
       // call auth
       await createUser(misConfig.authUrl, { identityId, id: user.id, mail: email, name, password }, logger)
         // If the call of creating user of auth fails,  delete the user created in the database.
-        .catch(async (rep) => {
+        .catch(async (e) => {
           await em.removeAndFlush(user);
 
-          if (rep.status === 409) {
+          if (e.status === 409) {
             throw <ServiceError> {
               code: Status.ALREADY_EXISTS, message:`User with id ${user.id} already exists.`,
             };
           }
 
-          logger.info("Error creating user in auth. code: %d, body: %o", rep.status, await rep.text());
+          logger.error("Error creating user in auth.", e);
 
           throw <ServiceError> { code: Status.INTERNAL, message: `Error creating user ${user.id} in auth.` };
         });
