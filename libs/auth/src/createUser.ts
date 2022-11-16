@@ -12,7 +12,7 @@ export async function createUser(
     headers: applicationJsonHeaders,
   });
 
-  if (resp.status !== 201) {
+  if (resp.status !== 204) {
     logHttpErrorAndThrow(resp, logger);
   }
 
