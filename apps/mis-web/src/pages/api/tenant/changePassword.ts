@@ -1,6 +1,6 @@
 import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
-import { changePassword as changePass } from "@scow/lib-auth"; 
+import { changePassword as libChangePassword } from "@scow/lib-auth"; 
 import { authenticate } from "src/auth/server";
 import { GetUserInfoReply, UserServiceClient } from "src/generated/server/user";
 import { TenantRole } from "src/models/User";
@@ -63,7 +63,7 @@ export default /* #__PURE__*/route<ChangePasswordAsTenantAdminSchema>(
       return;
     }
 
-    return await changePass(runtimeConfig.AUTH_INTERNAL_URL, identityId, oldPassword, newPassword)
+    return await libChangePassword(runtimeConfig.AUTH_INTERNAL_URL, { identityId, newPassword, oldPassword }, console)
       .then(() => ({ 204: null }))
       .catch((e) => ({ [e.status]: null }));
   });

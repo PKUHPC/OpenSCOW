@@ -1,5 +1,5 @@
 import { route } from "@ddadaal/next-typed-api-routes-runtime";
-import { changePassword as changePass } from "@scow/lib-auth"; 
+import { changePassword as libChangePassword } from "@scow/lib-auth"; 
 import { authenticate } from "src/auth/server";
 import { PlatformRole } from "src/models/User";
 import { publicConfig, runtimeConfig } from "src/utils/config";
@@ -50,7 +50,7 @@ export default /* #__PURE__*/route<ChangePasswordAsPlatformAdminSchema>(
 
     const { identityId, newPassword, oldPassword } = req.body;
 
-    return await changePass(runtimeConfig.AUTH_INTERNAL_URL, identityId, oldPassword, newPassword)
+    return await libChangePassword(runtimeConfig.AUTH_INTERNAL_URL, { identityId, newPassword, oldPassword }, console)
       .then(() => ({ 204: null }))
       .catch((e) => ({ [e.status]: null }));
 
