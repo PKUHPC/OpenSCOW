@@ -32,8 +32,8 @@ globalThis.fetch = jest.fn((url:string, req:RequstSchema) => {
 });
 
 it("raises correct request for changing password", async () => {
-  await changePassword(authUrl, identityId, oldPassword, newPassword);
-    
+  await changePassword(authUrl, { identityId, oldPassword, newPassword });
+
   expect(fetch).toHaveBeenCalledWith(
     authUrl + "/password",
     {
@@ -44,20 +44,17 @@ it("raises correct request for changing password", async () => {
 });
 
 it("fails test for changing password with wrong oldpassword", async () => {
-  const result = await changePassword(authUrl, identityId + "123", oldPassword, newPassword);
-    
-  expect(result).toEqual({ status: 404 });
+  await changePassword(authUrl, { identityId, oldPassword: oldPassword + "123", newPassword })
+    .then(() => { expect("").fail("Change password success"); })
+    .catch((e) => { expect(e.status).toBe(412); });
 });
 
 it("fails test for changing password with the user who cannot be found", async () => {
-  const result = await changePassword(authUrl, identityId, oldPassword + "123", newPassword);
-      
-  expect(result).toEqual({ status: 412 });
+  await changePassword(authUrl, { identityId: identityId + "123", oldPassword, newPassword })
+    .then(() => { expect("").fail("Change password success"); })
+    .catch((e) => { expect(e.status).toBe(404); });
 });
 
-it("returns true for changing password", async () => {
-  const result = await changePassword(authUrl, identityId, oldPassword, newPassword);
-        
-  expect(result).toEqual({ status: 204 });
+it("succeeds when changing password", async () => {
+  await changePassword(authUrl, { identityId, oldPassword, newPassword });
 });
-  
