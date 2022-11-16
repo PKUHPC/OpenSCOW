@@ -2,7 +2,7 @@ import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { UniqueConstraintViolationException } from "@mikro-orm/core";
-import { createUserInAuth } from "@scow/lib-auth";
+import { createUser } from "@scow/lib-auth";
 import { decimalToMoney } from "@scow/lib-decimal";
 import { insertKeyAsUser } from "@scow/lib-ssh";
 import { clusters } from "src/config/clusters";
@@ -328,22 +328,21 @@ export const userServiceServer = plugin((server) => {
       }
 
       // call auth
-      const rep = await createUserInAuth(identityId, user.id, email, name, password, misConfig.authUrl, logger);
+      await createUser(misConfig.authUrl, { identityId, id: user.id, mail: email, name, password }, logger)
+        // If the call of creating user of auth fails,  delete the user created in the database.
+        .catch(async (e) => {
+          await em.removeAndFlush(user);
 
-      // If the call of creating user of auth fails,  delete the user created in the database.
-      if (!rep.ok) {
-        await em.removeAndFlush(user);
+          if (e.status === 409) {
+            throw <ServiceError> {
+              code: Status.ALREADY_EXISTS, message:`User with id ${user.id} already exists.`,
+            };
+          }
 
-        if (rep.status === 409) {
-          throw <ServiceError> {
-            code: Status.ALREADY_EXISTS, message:`User with id ${user.id} already exists.`,
-          };
-        }
+          logger.error("Error creating user in auth.", e);
 
-        logger.info("Error creating user in auth. code: %d, body: %o", rep.status, await rep.text());
-
-        throw <ServiceError> { code: Status.INTERNAL, message: `Error creating user ${user.id} in auth.` };
-      }
+          throw <ServiceError> { code: Status.INTERNAL, message: `Error creating user ${user.id} in auth.` };
+        });
 
       // Making an ssh Request to the login node as the user created.
       if (process.env.NODE_ENV === "production") {
