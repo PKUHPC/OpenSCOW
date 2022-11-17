@@ -5,6 +5,7 @@ import { authenticate } from "src/auth/server";
 import { AccountServiceClient } from "src/generated/server/account";
 import { TenantRole } from "src/models/User";
 import { getClient } from "src/utils/client";
+import { handlegRPCInternalError, internalErrorInfo } from "src/utils/internalError";
 import { handlegRPCError } from "src/utils/server";
 
 export interface DewhitelistAccountSchema {
@@ -17,7 +18,7 @@ export interface DewhitelistAccountSchema {
   responses: {
     204: null;
     404: null;
-    500: string;
+    500: internalErrorInfo;
   }
 }
 
@@ -39,7 +40,7 @@ export default route<DewhitelistAccountSchema>("DewhitelistAccountSchema",
     })
       .then(() => ({ 204: null }))
       .catch(handlegRPCError({
-        [Status.INTERNAL]: (e) => ({ 500: e.details }),
+        [Status.INTERNAL]: handlegRPCInternalError,
         [Status.NOT_FOUND]: () => ({ 404: null }),
       }));
   });

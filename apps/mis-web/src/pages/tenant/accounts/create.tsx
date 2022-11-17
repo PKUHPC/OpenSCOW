@@ -1,4 +1,4 @@
-import { Button, Form, Input, message, Modal } from "antd";
+import { Button, Form, Input, message } from "antd";
 import { NextPage } from "next";
 import React, { useState } from "react";
 import { api } from "src/apis";
@@ -8,6 +8,7 @@ import { FormLayout } from "src/layouts/FormLayout";
 import { TenantRole } from "src/models/User";
 import { publicConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
+import { handleInternalError } from "src/utils/internalError";
 
 interface FormProps {
   ownerId: string;
@@ -31,12 +32,7 @@ const CreateAccountForm: React.FC = () => {
       .httpError(404, () => { message.error(`用户${ownerId}不存在。`); })
       .httpError(409, () => { message.error("账户名已经被占用"); })
       .httpError(400, () => { message.error("用户ID和名字不匹配。"); })
-      .httpError(500, (e) => {
-        Modal.error({
-          title: "操作失败",
-          content: `多集群操作出现错误, 部分集群未同步修改(${e}), 请联系管理员!`,
-        });
-      })
+      .httpError(500, handleInternalError)
       .then(() => {
         message.success("创建成功！");
       })

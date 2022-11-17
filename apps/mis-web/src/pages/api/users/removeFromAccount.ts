@@ -5,6 +5,7 @@ import { authenticate } from "src/auth/server";
 import { UserServiceClient } from "src/generated/server/user";
 import { PlatformRole, UserRole } from "src/models/User";
 import { getClient } from "src/utils/client";
+import { handlegRPCInternalError, internalErrorInfo } from "src/utils/internalError";
 import { handlegRPCError } from "src/utils/server";
 
 export interface RemoveUserFromAccountSchema {
@@ -23,7 +24,7 @@ export interface RemoveUserFromAccountSchema {
     // 不能移出账户拥有者
     406: null;
 
-    500: string;
+    500: internalErrorInfo;
   }
 }
 
@@ -48,7 +49,7 @@ export default /* #__PURE__*/route<RemoveUserFromAccountSchema>("RemoveUserFromA
   })
     .then(() => ({ 204: null }))
     .catch(handlegRPCError({
-      [Status.INTERNAL]: (e) => ({ 500: e.details }),
+      [Status.INTERNAL]: handlegRPCInternalError,
       [Status.NOT_FOUND]: () => ({ 404: null }),
       [Status.OUT_OF_RANGE]: () => ({ 406: null }),
     }));

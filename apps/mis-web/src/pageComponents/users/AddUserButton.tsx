@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { api } from "src/apis";
 import { CreateUserModal } from "src/pageComponents/users/CreateUserModal";
 import { publicConfig } from "src/utils/config";
+import { handleInternalError } from "src/utils/internalError";
 
 
 interface FormProps {
@@ -45,12 +46,7 @@ const NewUserModal: React.FC<ModalProps> = ({
       .httpError(409, () => {
         message.error("用户已经存在于此账户中！");
       })
-      .httpError(500, (e) => {
-        Modal.error({
-          title: "操作失败",
-          content: `多集群操作出现错误, 部分集群未同步修改(${e}), 请联系管理员!`,
-        });
-      })
+      .httpError(500, handleInternalError)
       .then(() => {
         message.success("添加成功！");
         refresh();

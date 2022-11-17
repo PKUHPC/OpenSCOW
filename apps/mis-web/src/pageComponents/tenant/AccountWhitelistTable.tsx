@@ -6,6 +6,7 @@ import { WhitelistedAccount } from "src/generated/server/account";
 import type {
   GetWhitelistedAccountsSchema } from "src/pages/api/tenant/accountWhitelist/getWhitelistedAccounts";
 import { formatDateTime } from "src/utils/datetime";
+import { handleInternalError } from "src/utils/internalError";
 
 interface Props {
   data: GetWhitelistedAccountsSchema["responses"]["200"] | undefined;
@@ -51,12 +52,7 @@ export const AccountWhitelistTable: React.FC<Props> = ({
                   await api.dewhitelistAccount({ body: {
                     accountName: r.accountName,
                   } })
-                    .httpError(500, (e) => {
-                      Modal.error({
-                        title: "操作失败",
-                        content: `多集群操作出现错误, 部分集群未同步修改(${e}), 请联系管理员!`,
-                      });
-                    })
+                    .httpError(500, handleInternalError)
                     .then(() => {
                       message.success("移出白名单成功！");
                       reload();

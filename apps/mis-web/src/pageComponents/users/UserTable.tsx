@@ -8,6 +8,7 @@ import type { AccountUserInfo } from "src/generated/server/user";
 import { UserRole, UserStatus } from "src/models/User";
 import { SetJobChargeLimitLink } from "src/pageComponents/users/JobChargeLimitModal";
 import { GetAccountUsersSchema } from "src/pages/api/users";
+import { handleInternalError } from "src/utils/internalError";
 import { moneyToString } from "src/utils/money";
 
 interface Props {
@@ -102,12 +103,7 @@ export const UserTable: React.FC<Props> = ({
                           identityId: r.userId,
                           accountName: accountName,
                         } })
-                          .httpError(500, (e) => {
-                            Modal.error({
-                              title: "操作失败",
-                              content: `多集群操作出现错误, 部分集群未同步修改(${e}), 请联系管理员!`,
-                            });
-                          })
+                          .httpError(500, handleInternalError)
                           .then(() => {
                             message.success("解封用户成功！");
                             reload();
@@ -129,12 +125,7 @@ export const UserTable: React.FC<Props> = ({
                           identityId: r.userId,
                           accountName: accountName,
                         } })
-                          .httpError(500, (e) => {
-                            Modal.error({
-                              title: "操作失败",
-                              content: `多集群操作出现错误, 部分集群未同步修改(${e}), 请联系管理员!`,
-                            });
-                          })
+                          .httpError(500, handleInternalError)
                           .then(() => {
                             message.success("封锁用户成功！");
                             reload();
@@ -208,12 +199,7 @@ export const UserTable: React.FC<Props> = ({
                       identityId: r.userId,
                       accountName: accountName,
                     } })
-                      .httpError(500, (e) => {
-                        Modal.error({
-                          title: "操作失败",
-                          content: `多集群操作出现错误, 部分集群未同步修改(${e}), 请联系管理员!`,
-                        });
-                      })
+                      .httpError(500, handleInternalError)
                       .then(() => {
                         message.success("移出用户成功！");
                         reload();

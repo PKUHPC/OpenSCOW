@@ -1,9 +1,10 @@
-import { Button, Form, Input, InputNumber, message, Modal, Tag } from "antd";
+import { Button, Form, Input, InputNumber, message, Tag } from "antd";
 import React, { useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { ClickableA } from "src/components/ClickableA";
 import { publicConfig } from "src/utils/config";
+import { handleInternalError } from "src/utils/internalError";
 
 interface ChargeFields {
   accountName: string;
@@ -63,12 +64,7 @@ export const ChargeForm: React.FC = () => {
       .httpError(404, () => {
         message.error("账户未找到");
       })
-      .httpError(500, (e) => {
-        Modal.error({
-          title: "操作失败",
-          content: `多集群操作出现错误, 部分集群未同步修改(${e}), 请联系管理员!`,
-        });
-      })
+      .httpError(500, handleInternalError)
       .then(() => {
         messageApi.success("充值完成！");
       })
