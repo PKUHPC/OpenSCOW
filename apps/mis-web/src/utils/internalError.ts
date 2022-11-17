@@ -9,7 +9,7 @@ export interface internalErrorInfo {
 }
 
 export const handlegRPCInternalError = (e: ServiceError) => {
-  if (e.message === "Execution on clusters failed.") {
+  if (e.details) {
     return { 500: { code: "CLUSTEROPS_FAILED", info: e.details } };
   }
 };
