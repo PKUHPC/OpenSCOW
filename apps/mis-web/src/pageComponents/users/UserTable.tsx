@@ -1,5 +1,5 @@
 import { ExclamationCircleOutlined } from "@ant-design/icons";
-import { Divider, message, Modal, notification, Space, Table, Tag } from "antd";
+import { Divider, message, Modal, Space, Table, Tag } from "antd";
 import { LinkProps } from "next/link";
 import React from "react";
 import { api } from "src/apis";
@@ -103,10 +103,9 @@ export const UserTable: React.FC<Props> = ({
                           accountName: accountName,
                         } })
                           .httpError(500, (e) => {
-                            notification["error"]({
-                              message: "操作失败",
-                              description: `多集群操作出现错误, 部分集群未同步修改(${e}), 请联系管理员!`,
-                              duration: 0,
+                            Modal.error({
+                              title: "操作失败",
+                              content: `多集群操作出现错误, 部分集群未同步修改(${e}), 请联系管理员!`,
                             });
                           })
                           .then(() => {
@@ -131,10 +130,9 @@ export const UserTable: React.FC<Props> = ({
                           accountName: accountName,
                         } })
                           .httpError(500, (e) => {
-                            notification["error"]({
-                              message: "操作失败",
-                              description: `多集群操作出现错误, 部分集群未同步修改(${e}), 请联系管理员!`,
-                              duration: 0,
+                            Modal.error({
+                              title: "操作失败",
+                              content: `多集群操作出现错误, 部分集群未同步修改(${e}), 请联系管理员!`,
                             });
                           })
                           .then(() => {
@@ -211,10 +209,9 @@ export const UserTable: React.FC<Props> = ({
                       accountName: accountName,
                     } })
                       .httpError(500, (e) => {
-                        notification["error"]({
-                          message: "操作失败",
-                          description: `多集群操作出现错误, 部分集群未同步修改(${e}), 请联系管理员!`,
-                          duration: 0,
+                        Modal.error({
+                          title: "操作失败",
+                          content: `多集群操作出现错误, 部分集群未同步修改(${e}), 请联系管理员!`,
                         });
                       })
                       .then(() => {

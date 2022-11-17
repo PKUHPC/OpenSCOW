@@ -1,5 +1,5 @@
 import { PlusOutlined } from "@ant-design/icons";
-import { Button, Form, Input, message, Modal, notification } from "antd";
+import { Button, Form, Input, message, Modal } from "antd";
 import React, { useState } from "react";
 import { api } from "src/apis";
 
@@ -29,10 +29,9 @@ const NewAccountModal: React.FC<ModalProps> = ({
         message.error("账户不存在！");
       })
       .httpError(500, (e) => {
-        notification["error"]({
-          message: "操作失败",
-          description: `多集群操作出现错误, 部分集群未同步修改(${e}), 请联系管理员!`,
-          duration: 0,
+        Modal.error({
+          title: "操作失败",
+          content: `多集群操作出现错误, 部分集群未同步修改(${e}), 请联系管理员!`,
         });
       })
       .then(() => {
