@@ -2,7 +2,7 @@ import { Form, Input, InputNumber, message, Modal } from "antd";
 import { useState } from "react";
 import { api } from "src/apis";
 import type { GetJobFilter } from "src/pages/api/job/jobInfo";
-import { handleInternalError } from "src/utils/internalError";
+import { handleClusteropsErrorInUi } from "src/utils/internalError";
 
 interface Props {
   visible: boolean;
@@ -40,7 +40,7 @@ export const JobPriceChangeModal: React.FC<Props> = ({ visible, onClose, jobCoun
 
         setLoading(true);
         await api.changeJobPrice({ body: { ...filter, price, reason, target } })
-          .httpError(500, handleInternalError)
+          .httpError(500, handleClusteropsErrorInUi)
           .then(() => {
             message.success("修改成功");
             reload();

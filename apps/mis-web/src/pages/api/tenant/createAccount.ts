@@ -7,7 +7,7 @@ import { TenantRole } from "src/models/User";
 import { checkNameMatch } from "src/server/checkIdNameMatch";
 import { getClient } from "src/utils/client";
 import { publicConfig } from "src/utils/config";
-import { handlegRPCInternalError, internalErrorInfo } from "src/utils/internalError";
+import { handleGrpcClusteropsError, InternalErrorInfo } from "src/utils/internalError";
 import { handlegRPCError } from "src/utils/server";
 
 export interface CreateAccountSchema {
@@ -31,7 +31,7 @@ export interface CreateAccountSchema {
     /** ownerId不存在 */
     404: null;
     409: null;
-    500: internalErrorInfo;
+    500: InternalErrorInfo;
   }
 }
 
@@ -74,7 +74,7 @@ export default route<CreateAccountSchema>("CreateAccountSchema",
     })
       .then(() => ({ 200: null }))
       .catch(handlegRPCError({
-        [Status.INTERNAL]: handlegRPCInternalError,
+        [Status.INTERNAL]: handleGrpcClusteropsError,
         [Status.ALREADY_EXISTS]: () => ({ 409: null }),
         [Status.NOT_FOUND]: () => ({ 404: null }),
       }));

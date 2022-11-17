@@ -7,7 +7,7 @@ import { ChargingServiceClient } from "src/generated/server/charging";
 import { TenantRole } from "src/models/User";
 import { ensureNotUndefined } from "src/utils/checkNull";
 import { getClient } from "src/utils/client";
-import { handlegRPCInternalError, internalErrorInfo } from "src/utils/internalError";
+import { handleGrpcClusteropsError, InternalErrorInfo } from "src/utils/internalError";
 import { handlegRPCError, parseIp } from "src/utils/server";
 
 export interface FinancePaySchema {
@@ -27,7 +27,7 @@ export interface FinancePaySchema {
     // account is not found in current tenant.
     404: null;
 
-    500: internalErrorInfo;
+    500: InternalErrorInfo;
   }
 }
 
@@ -54,7 +54,7 @@ export default route<FinancePaySchema>("FinancePaySchema",
 
       return { 200: { balance: moneyToNumber(replyObj.currentBalance) } };
     }).catch(handlegRPCError({
-      [Status.INTERNAL]: handlegRPCInternalError,
+      [Status.INTERNAL]: handleGrpcClusteropsError,
       [Status.NOT_FOUND]: () => ({ 404: null }),
     }));
 

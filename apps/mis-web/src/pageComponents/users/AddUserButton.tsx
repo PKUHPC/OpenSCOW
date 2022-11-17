@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { api } from "src/apis";
 import { CreateUserModal } from "src/pageComponents/users/CreateUserModal";
 import { publicConfig } from "src/utils/config";
-import { handleInternalError } from "src/utils/internalError";
+import { handleClusteropsErrorInUi } from "src/utils/internalError";
 
 
 interface FormProps {
@@ -46,7 +46,7 @@ const NewUserModal: React.FC<ModalProps> = ({
       .httpError(409, () => {
         message.error("用户已经存在于此账户中！");
       })
-      .httpError(500, handleInternalError)
+      .httpError(500, handleClusteropsErrorInUi)
       .then(() => {
         message.success("添加成功！");
         refresh();

@@ -5,7 +5,7 @@ import { authenticate } from "src/auth/server";
 import { AccountServiceClient } from "src/generated/server/account";
 import { TenantRole } from "src/models/User";
 import { getClient } from "src/utils/client";
-import { handlegRPCInternalError, internalErrorInfo } from "src/utils/internalError";
+import { handleGrpcClusteropsError, InternalErrorInfo } from "src/utils/internalError";
 import { handlegRPCError } from "src/utils/server";
 
 export interface WhitelistAccountSchema {
@@ -19,7 +19,7 @@ export interface WhitelistAccountSchema {
   responses: {
     204: null;
     404: null;
-    500: internalErrorInfo;
+    500: InternalErrorInfo;
   }
 }
 
@@ -45,7 +45,7 @@ export default route<WhitelistAccountSchema>("WhitelistAccountSchema",
     })
       .then(() => ({ 204: null }))
       .catch(handlegRPCError({
-        [Status.INTERNAL]: handlegRPCInternalError,
+        [Status.INTERNAL]: handleGrpcClusteropsError,
         [Status.NOT_FOUND]: () => ({ 404: null }),
       }));
   });

@@ -6,7 +6,7 @@ import { UserServiceClient } from "src/generated/server/user";
 import { PlatformRole, UserRole } from "src/models/User";
 import { checkNameMatch } from "src/server/checkIdNameMatch";
 import { getClient } from "src/utils/client";
-import { handlegRPCInternalError, internalErrorInfo } from "src/utils/internalError";
+import { handleGrpcClusteropsError, InternalErrorInfo } from "src/utils/internalError";
 import { handlegRPCError } from "src/utils/server";
 
 export interface AddUserToAccountSchema {
@@ -32,7 +32,7 @@ export interface AddUserToAccountSchema {
     /** 用户已经存在 */
     409: null;
 
-    500: internalErrorInfo;
+    500: InternalErrorInfo;
   }
 }
 
@@ -66,7 +66,7 @@ export default /* #__PURE__*/route<AddUserToAccountSchema>("AddUserToAccountSche
     userId: identityId,
   }).then(() => ({ 204: null }))
     .catch(handlegRPCError({
-      [Status.INTERNAL]: handlegRPCInternalError,
+      [Status.INTERNAL]: handleGrpcClusteropsError,
       [Status.ALREADY_EXISTS]: () => ({ 409: null }),
       [Status.NOT_FOUND]: () => ({ 404: { code: "ACCOUNT_NOT_FOUND" as const } }),
     }));

@@ -2,7 +2,7 @@ import { PlusOutlined } from "@ant-design/icons";
 import { Button, Form, Input, message, Modal } from "antd";
 import React, { useState } from "react";
 import { api } from "src/apis";
-import { handleInternalError } from "src/utils/internalError";
+import { handleClusteropsErrorInUi } from "src/utils/internalError";
 
 interface FormProps {
   accountName: string;
@@ -29,7 +29,7 @@ const NewAccountModal: React.FC<ModalProps> = ({
       .httpError(404, () => {
         message.error("账户不存在！");
       })
-      .httpError(500, handleInternalError)
+      .httpError(500, handleClusteropsErrorInUi)
       .then(() => {
         message.success("添加成功！");
         refresh();
