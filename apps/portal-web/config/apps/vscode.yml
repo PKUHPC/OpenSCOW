@@ -20,7 +20,16 @@ web:
       password: "{PASSWORD}"
 
 attributes:
-  - widget: number_field
-    label: Custom_label
-  - widget: number_field
-    label: Custom_label
+	- type: text
+	  key: version
+	  label: 版本
+	- type: number
+	  key: size
+	  label: 数量
+	- type: select
+	  key: option
+	  label: 选项
+		options:
+		  - "optionA"
+		  - "optionB"
+		  - "optionC"

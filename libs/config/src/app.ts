@@ -52,7 +52,12 @@ export const AppConfigSchema = Type.Object({
   web: Type.Optional(WebAppConfigSchema),
   vnc: Type.Optional(VncAppConfigSchema),
   attributes: Type.Optional(Type.Array(
-    Type.Object({ widget: Type.String({ description: "表单类型" }), label: Type.String({ description: "表单标签" }) }),
+    Type.Object({ 
+      type: Type.String({ description: "表单类型" }), 
+      label: Type.String({ description: "表单标签" }),
+      key: Type.String({ description: "表单key" }),
+      option: Type.Optional(Type.Array(Type.String({ description: "表单选项" }))),
+    }),
   )),
 });
 
