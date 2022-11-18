@@ -3,6 +3,7 @@ import { changePassword as libChangePassword } from "@scow/lib-auth";
 import { authenticate } from "src/auth/server";
 import { publicConfig, runtimeConfig } from "src/utils/config";
 
+// 此API用于用户修改自己的密码。
 export interface ChangePasswordSchema {
 
   method: "PATCH";

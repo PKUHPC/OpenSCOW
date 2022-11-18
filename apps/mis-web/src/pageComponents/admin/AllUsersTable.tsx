@@ -1,14 +1,16 @@
 import { ExclamationCircleOutlined } from "@ant-design/icons";
-import { message, Modal, Space, Table } from "antd";
+import { Divider, message, Modal, Space, Table } from "antd";
 import React, { useCallback, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
+import { ChangePasswordModalLink } from "src/components/ChangePasswordModal";
 import { DisabledA } from "src/components/DisabledA";
 import { PlatformUserInfo } from "src/generated/server/user";
 import { PlatformRole } from "src/models/User";
 import { GetAllUsersSchema } from "src/pages/api/admin/getAllUsers";
 import { User } from "src/stores/UserStore";
 import { formatDateTime } from "src/utils/datetime";
+
 
 interface PageInfo {
     page: number;
@@ -19,6 +21,7 @@ interface Props {
   refreshToken: boolean;
   user: User;
 }
+
 
 export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
 
@@ -58,6 +61,7 @@ interface UserInfoTableProps {
 const UserInfoTable: React.FC<UserInfoTableProps> = ({
   data, pageInfo, setPageInfo, isLoading, reload, user,
 }) => {
+
   return (
     <>
       <Table
@@ -198,6 +202,33 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
                 </Space>
               )
 
+          )}
+        />
+
+        <Table.Column<PlatformUserInfo>
+          dataIndex="changePassword"
+          title="操作"
+          render={(_, r) => (
+            <Space split={<Divider type="vertical" />}>
+              <ChangePasswordModalLink
+                userId={r.userId}
+                name={r.name}
+                onComplete={async (oldPassword, newPassword) => {
+                  await api.changePasswordAsPlatformAdmin({ body:{
+                    identityId: r.userId,
+                    oldPassword: oldPassword,
+                    newPassword: newPassword,
+                  } })
+                    .httpError(404, () => { message.error("用户不存在"); })
+                    .httpError(412, () => { message.error("原密码错误"); })
+                    .httpError(501, () => { message.error("本功能在当前配置下不可用"); })
+                    .then(() => { message.success("修改成功"); })
+                    .catch(() => { message.error("修改失败"); });
+                }}
+              >
+                修改密码
+              </ChangePasswordModalLink>
+            </Space>
           )}
         />
       </Table>
