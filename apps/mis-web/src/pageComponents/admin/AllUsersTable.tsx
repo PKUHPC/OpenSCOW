@@ -213,7 +213,6 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
               <ChangePasswordModalLink
                 userId={r.userId}
                 name={r.name}
-                reload={reload}
                 onComplete={async (oldPassword, newPassword) => {
                   await api.changePasswordAsPlatformAdmin({ body:{
                     identityId: r.userId,

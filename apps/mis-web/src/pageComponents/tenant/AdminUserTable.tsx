@@ -218,7 +218,6 @@ export const AdminUserTable: React.FC<Props> = ({
               <ChangePasswordModalLink
                 userId={r.id}
                 name={r.name}
-                reload={reload} 
                 onComplete={async (oldPassword, newPassword) => {
                   await api.changePasswordAsTenantAdmin({ body:{
                     identityId: r.id,

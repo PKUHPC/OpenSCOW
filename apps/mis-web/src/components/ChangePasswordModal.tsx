@@ -6,7 +6,6 @@ import { confirmPasswordFormItemProps, passwordRule } from "src/utils/form";
 interface Props {
     name: string;
     userId: string;
-    reload: () => void;
     onClose: () => void;
     onComplete: (oldPassword:string, newPassword:string) => Promise<void>;
     visible: boolean;
@@ -18,7 +17,7 @@ interface FormProps {
     confirm: string;
 }
 
-const ChangePasswordModal: React.FC<Props> = ({ name, userId, reload, onClose, onComplete, visible }) => {
+const ChangePasswordModal: React.FC<Props> = ({ name, userId, onClose, onComplete, visible }) => {
   const [form] = Form.useForm<FormProps>();
   const [loading, setLoading] = useState(false);
 
@@ -28,7 +27,6 @@ const ChangePasswordModal: React.FC<Props> = ({ name, userId, reload, onClose, o
     await onComplete(oldPassword, newPassword)
       .then(() => { 
         form.resetFields();
-        reload();
         onClose();
       })
       .finally(() => setLoading(false));
