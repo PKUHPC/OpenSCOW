@@ -27,7 +27,7 @@ const ChangePasswordModal: React.FC<Props> = ({ name, userId, reload, onClose, o
     setLoading(true);
     await onComplete(oldPassword, newPassword)
       .then(() => { 
-        form.setFieldsValue({ oldPassword: "", newPassword: "", confirm: "" });
+        form.resetFields();
         reload();
         onClose();
       })

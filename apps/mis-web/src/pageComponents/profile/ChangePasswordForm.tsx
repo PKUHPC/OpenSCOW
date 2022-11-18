@@ -21,7 +21,7 @@ export const ChangePasswordForm: React.FC = () => {
     await api.changePassword({ body: { newPassword, oldPassword } })
       .httpError(412, () => { message.error("原密码不正确"); })
       .then(() => {
-        form.setFieldsValue({ oldPassword: "", newPassword: "", confirm: "" });
+        form.resetFields();
         message.success("密码更改成功！");
       })
       .finally(() => {
