@@ -19,6 +19,9 @@ interface FormFields {
   coreCount: number;
   account: string;
   maxTime: number;
+  // version: string;
+  // text: string;
+  // option: string;
 }
 
 
@@ -29,15 +32,52 @@ const initialValues = {
 } as Partial<FormFields>;
 
 
+// export interface SelectOption {
+//   key: string;
+//   value: string;
+// }
+
+// export interface AppCustomAttribute {
+//   type: string;
+//   label: string;
+//   key: string;
+//   select: SelectOption[];
+// }
+
+
+
 export const LaunchAppForm: React.FC<Props> = ({ appId }) => {
+
+  const { data } = useAsync({
+    promiseFn: useCallback(async () => {
+      const { appCustomFormAttributes } = await api.getAppAttributes({ query: { appId } })
+        .httpError(404, () => { message.error("此应用不存在"); });
+      return appCustomFormAttributes;
+    },
+    [appId]),
+  });
+
+  // // Get the custom form keys
+  // interface IMyTable extends AppCustomAttribute { }
+  // type MyTablePropsArray = Array<keyof IMyTable>;
+  // const propsArray: MyTablePropsArray = Object.keys(data ? data[0] : []) as MyTablePropsArray;
+  // // console.log(propsArray);
+  // // todo 这里应该放在api里面
+
+
 
   const [form] = Form.useForm<FormFields>();
   const [loading, setLoading] = useState(false);
 
   const onSubmit = async () => {
     const { cluster, coreCount, partition, qos, account, maxTime } = await form.validateFields();
-    const all = await form.validateFields();
-    console.log(all);
+    
+    // eslint-disable-next-line max-len
+    // const { cluster, coreCount, partition, qos, account, maxTime, version, text, option } = await form.validateFields();
+    // console.log(version);
+    // console.log(text);
+    // console.log(option);
+
 
     setLoading(true);
     await api.createAppSession({ body: {
@@ -58,14 +98,6 @@ export const LaunchAppForm: React.FC<Props> = ({ appId }) => {
   };
 
 
-  const { data } = useAsync({
-    promiseFn: useCallback(async () => {
-      const { appCustomFormAttributes } = await api.getAppAttributes({ query: { appId } })
-        .httpError(404, () => { message.error("此应用不存在"); });
-      return appCustomFormAttributes;
-    },
-    [appId]),
-  });
 
   const cluster = Form.useWatch("cluster", form) as Cluster | undefined;
   const partition = Form.useWatch("partition", form) as string | undefined;
@@ -109,7 +141,7 @@ export const LaunchAppForm: React.FC<Props> = ({ appId }) => {
     if (item.type === "number") {
       return (
         <Form.Item
-          key={item.label}
+          key={item.key}
           label={item.label}
           name={item.key}
           rules={[
@@ -122,7 +154,7 @@ export const LaunchAppForm: React.FC<Props> = ({ appId }) => {
     } else if (item.type === "text") {
       return (
         <Form.Item
-          key={item.label}
+          key={item.key}
           label={item.label}
           name={item.key}
           rules={[{ required: true }]}
@@ -133,7 +165,7 @@ export const LaunchAppForm: React.FC<Props> = ({ appId }) => {
     } else {
       return (
         <Form.Item
-          key={item.label}
+          key={item.key}
           label={item.label}
           name={item.key}
           rules={[{ required: true }]}
