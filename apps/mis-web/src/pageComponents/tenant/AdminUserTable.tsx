@@ -175,7 +175,7 @@ export const AdminUserTable: React.FC<Props> = ({
                     Modal.confirm({
                       title: "确定设置为租户财务人员",
                       icon: <ExclamationCircleOutlined />,
-                      content: `确定要设置用户${r.name}（ID： ${r.id}）为租户财务人员？`,
+                      content: `确定要设置用户${r.name}（ID: ${r.id}）为租户财务人员？`,
                       onOk: async () => {
                         await api.setTenantRole({ body: {
                           userId : r.id,
