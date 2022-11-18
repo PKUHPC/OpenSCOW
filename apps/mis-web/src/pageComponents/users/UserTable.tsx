@@ -8,6 +8,7 @@ import type { AccountUserInfo } from "src/generated/server/user";
 import { UserRole, UserStatus } from "src/models/User";
 import { SetJobChargeLimitLink } from "src/pageComponents/users/JobChargeLimitModal";
 import { GetAccountUsersSchema } from "src/pages/api/users";
+import { handleClusteropsErrorInUi } from "src/utils/internalError";
 import { moneyToString } from "src/utils/money";
 
 interface Props {
@@ -102,6 +103,7 @@ export const UserTable: React.FC<Props> = ({
                           identityId: r.userId,
                           accountName: accountName,
                         } })
+                          .httpError(500, handleClusteropsErrorInUi)
                           .then(() => {
                             message.success("解封用户成功！");
                             reload();
@@ -123,6 +125,7 @@ export const UserTable: React.FC<Props> = ({
                           identityId: r.userId,
                           accountName: accountName,
                         } })
+                          .httpError(500, handleClusteropsErrorInUi)
                           .then(() => {
                             message.success("封锁用户成功！");
                             reload();
@@ -196,6 +199,7 @@ export const UserTable: React.FC<Props> = ({
                       identityId: r.userId,
                       accountName: accountName,
                     } })
+                      .httpError(500, handleClusteropsErrorInUi)
                       .then(() => {
                         message.success("移出用户成功！");
                         reload();

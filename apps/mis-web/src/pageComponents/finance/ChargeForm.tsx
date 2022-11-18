@@ -4,6 +4,7 @@ import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { ClickableA } from "src/components/ClickableA";
 import { publicConfig } from "src/utils/config";
+import { handleClusteropsErrorInUi } from "src/utils/internalError";
 
 interface ChargeFields {
   accountName: string;
@@ -63,6 +64,7 @@ export const ChargeForm: React.FC = () => {
       .httpError(404, () => {
         message.error("账户未找到");
       })
+      .httpError(500, handleClusteropsErrorInUi)
       .then(() => {
         messageApi.success("充值完成！");
       })

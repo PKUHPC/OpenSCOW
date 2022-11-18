@@ -7,6 +7,7 @@ import { ChargingServiceClient } from "src/generated/server/charging";
 import { PlatformRole } from "src/models/User";
 import { ensureNotUndefined } from "src/utils/checkNull";
 import { getClient } from "src/utils/client";
+import { handleGrpcClusteropsError, InternalErrorInfo } from "src/utils/internalError";
 import { handlegRPCError, parseIp } from "src/utils/server";
 
 
@@ -26,6 +27,8 @@ export interface TenantFinancePaySchema {
     }
     // tenant is not found in platform.
     404: null;
+
+    500: InternalErrorInfo;
   }
 }
 
@@ -50,6 +53,7 @@ export default route<TenantFinancePaySchema>("TenantFinancePaySchema",
 
       return { 200: { balance: moneyToNumber(replyObj.currentBalance) } };
     }).catch(handlegRPCError({
+      [Status.INTERNAL]: handleGrpcClusteropsError,
       [Status.NOT_FOUND]: () => ({ 404: null }),
     }));
   },
