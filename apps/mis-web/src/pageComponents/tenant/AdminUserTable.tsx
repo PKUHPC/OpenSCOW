@@ -146,7 +146,7 @@ export const AdminUserTable: React.FC<Props> = ({
               <Space size="middle">
                 是
                 <a
-                  onClick={async () => {
+                  onClick={() => {
                     Modal.confirm({
                       title: "确定取消租户财务人员权限",
                       icon: <ExclamationCircleOutlined />,

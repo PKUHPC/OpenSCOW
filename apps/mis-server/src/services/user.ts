@@ -414,7 +414,7 @@ export const userServiceServer = plugin((server) => {
         name: x.name,
         userId: x.userId,
         createTime: x.createTime,
-        tenantRoles: x.tenantRoles,
+        tenantRoles: x.tenantRoles.map(tenantRoleFromJSON),
         accountAffiliations: x.accounts.getItems().map((x) => ({
           accountName: x.account.getEntity().accountName,
           role: PFUserRole[x.role],
