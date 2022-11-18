@@ -42,6 +42,10 @@ services:
       - 389:389
     volumes:
       - ldap:/var/lib/ldap
+    ulimits:
+      nofile:
+        soft: 10240
+        hard: 10240
 
 networks:
   default:
