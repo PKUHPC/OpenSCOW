@@ -36,7 +36,6 @@ const ChangePasswordModal: React.FC<Props> = ({ name, userId, onClose, onComplet
     <Modal
       title={`修改用户${name}（ID：${userId}）的密码`}
       visible={visible}
-      width={"70%"}
       onOk={onOK}
       confirmLoading={loading}
       onCancel={onClose}
