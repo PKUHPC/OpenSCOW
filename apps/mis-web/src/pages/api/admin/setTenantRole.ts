@@ -38,7 +38,6 @@ export default route<SetTenantRoleSchema>("SetTenantRoleSchema", async (req, res
 
   const client = getClient(UserServiceClient);
 
-  console.log("roleType", roleType);
   return await asyncClientCall(client, "setTenantRole", {
     userId,
     roleType,
