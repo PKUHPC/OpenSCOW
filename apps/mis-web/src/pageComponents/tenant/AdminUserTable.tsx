@@ -210,18 +210,18 @@ export const AdminUserTable: React.FC<Props> = ({
           title="可用账户"
           render={(_, r) => r.accountAffiliations.map((x) => x.accountName).join(", ")}
         />
-        <Table.Column<PlatformUserInfo>
+        <Table.Column<FullUserInfo>
           dataIndex="changePassword"
           title="操作"
           render={(_, r) => (
             <Space split={<Divider type="vertical" />}>
               <ChangePasswordModalLink
-                userId={r.userId}
+                userId={r.id}
                 name={r.name}
                 reload={reload} 
                 onComplete={async (oldPassword, newPassword) => {
                   await api.changePasswordAsTenantAdmin({ body:{
-                    identityId: r.userId,
+                    identityId: r.id,
                     oldPassword: oldPassword,
                     newPassword: newPassword,
                   } })
