@@ -77,13 +77,14 @@ export const mockApi: MockApi<typeof api> = {
       submitTime: new Date().toISOString(), ready: true, dataPath: "/test" },
   ]}),
 
-  getAppAttributes: async () => ({
-    appCustomFormAttributes: [
-      { widget: "number_field", label: "输入数字" },
-      { widget: "text_field", label: "输入文字" },
-      { widget: "select", label: "选项" },
-    ],
-  }),
+  getAppAttributes: async () => ({ appCustomFormAttributes: [
+    { type: "number", label: "版本", key: "version", select: []},
+    { type: "text", label: "文字 ", key: "text", select: []},
+    { type: "select", label: "选项", key: "select", select: [
+      { key: "v1", value: "version1" },
+      { key: "v2", value: "version2" },
+    ]},
+  ]}),
 
   connectToApp: async ({ body: { sessionId } }) => sessionId === "124"
     ? {

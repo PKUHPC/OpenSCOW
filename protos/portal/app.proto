@@ -75,9 +75,16 @@ message GetAppAttributesRequest {
   string app_id = 1;
 }
 
+message SelectOption {
+  string key = 1;
+  string value = 2;
+}
+
 message AppCustomAttribute {
-  string widget = 1;
+  string type = 1;
   string label = 2;
+  string key = 3;
+  repeated SelectOption select = 4;
 }
 
 message GetAppAttributesResponse {

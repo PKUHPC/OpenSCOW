@@ -120,7 +120,12 @@ export const appServiceServer = plugin((server) => {
     getAppAttributes: async ({ request }) => {
       const { appId } = request;
       const app = apps[appId];
-      const attributes:AppCustomAttribute[] = app.attributes ? app.attributes : [];
+
+      if (!app) {
+        throw <ServiceError> { code: Status.NOT_FOUND, message: `app id ${appId} is not found` };
+      }
+      
+      const attributes:AppCustomAttribute[] = app.attributes ?? [];
       return [{ attributes: attributes }];
     },
   });

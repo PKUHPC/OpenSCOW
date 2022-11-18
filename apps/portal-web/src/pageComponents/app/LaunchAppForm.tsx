@@ -36,6 +36,8 @@ export const LaunchAppForm: React.FC<Props> = ({ appId }) => {
 
   const onSubmit = async () => {
     const { cluster, coreCount, partition, qos, account, maxTime } = await form.validateFields();
+    const all = await form.validateFields();
+    console.log(all);
 
     setLoading(true);
     await api.createAppSession({ body: {
@@ -58,7 +60,8 @@ export const LaunchAppForm: React.FC<Props> = ({ appId }) => {
 
   const { data } = useAsync({
     promiseFn: useCallback(async () => {
-      const { appCustomFormAttributes } = await api.getAppAttributes({ query: { appId } });
+      const { appCustomFormAttributes } = await api.getAppAttributes({ query: { appId } })
+        .httpError(404, () => { message.error("此应用不存在"); });
       return appCustomFormAttributes;
     },
     [appId]),
@@ -97,13 +100,18 @@ export const LaunchAppForm: React.FC<Props> = ({ appId }) => {
     [cluster, partition],
   );
 
-  const items = data?.map((item) => {
-    if (item.widget === "number_field") {
+
+
+
+  const customFormItems = data?.map((item) => {
+
+
+    if (item.type === "number") {
       return (
         <Form.Item
           key={item.label}
           label={item.label}
-          name="testNumberInput"
+          name={item.key}
           rules={[
             { required: true, type: "integer" },
           ]}
@@ -111,32 +119,28 @@ export const LaunchAppForm: React.FC<Props> = ({ appId }) => {
           <InputNumber />
         </Form.Item>
       );
-    } else if (item.widget === "text_field") {
+    } else if (item.type === "text") {
       return (
         <Form.Item
           key={item.label}
           label={item.label}
-          name="testParameter"
+          name={item.key}
           rules={[{ required: true }]}
         >
           <Input />
         </Form.Item>
       );
     } else {
-      const { Option } = Select;
       return (
         <Form.Item
           key={item.label}
-          label="选项"
-          name="testSelect"
+          label={item.label}
+          name={item.key}
           rules={[{ required: true }]}
         >
-          <Select>
-            <Option value="opt1">male</Option>
-            <Option value="opt2">female</Option>
-            <Option value="opt3">other</Option>
-          </Select>
-
+          <Select
+            options={item.select.map((x) => ({ label: x.key, value: x.value }))}
+          />
         </Form.Item>
       );
     }
@@ -201,7 +205,7 @@ export const LaunchAppForm: React.FC<Props> = ({ appId }) => {
         <InputNumber min={1} step={1} addonAfter={"分钟"} />
       </Form.Item>
 
-      {items}
+      {customFormItems}
 
       <Form.Item>
         <Button type="primary" htmlType="submit" loading={loading}>

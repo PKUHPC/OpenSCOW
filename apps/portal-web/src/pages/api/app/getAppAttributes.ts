@@ -1,13 +1,10 @@
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
+import { status } from "@grpc/grpc-js";
 import { authenticate } from "src/auth/server";
-import { AppServiceClient } from "src/generated/portal/app";
+import { AppCustomAttribute, AppServiceClient } from "src/generated/portal/app";
 import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
-
-export type AppCustomFormAttribute = {
-  widget: string;
-  label: string;
-}
+import { handlegRPCError } from "src/utils/server";
 
 export interface GetAppAttributesSchema {
   method: "GET";
@@ -18,8 +15,11 @@ export interface GetAppAttributesSchema {
 
   responses: {
     200: {
-      appCustomFormAttributes: AppCustomFormAttribute[];
+      appCustomFormAttributes: AppCustomAttribute[];
     };
+
+    // appId not exists
+    404: { code: "APP_NOT_FOUND" };
   }
 }
 
@@ -36,15 +36,13 @@ export default /* #__PURE__*/route<GetAppAttributesSchema>("GetAppAttributesSche
 
   const client = getClient(AppServiceClient);
 
-  // const tmp_data: AppCustomFormAttribute[] = [
-  //   { widget: "111", label: "222" },
-  //   { widget: "333", label: "444" },
-  // ];
 
   return asyncUnaryCall(client, "getAppAttributes", {
     appId,
   }).then((reply) => {
     return { 200: { appCustomFormAttributes: reply.attributes } };
-  });
+  }, handlegRPCError({
+    [status.NOT_FOUND]: () => ({ 404: { code: "APP_NOT_FOUND" } } as const),
+  }));
 
 });
