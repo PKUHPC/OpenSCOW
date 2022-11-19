@@ -45,7 +45,7 @@ export const LaunchAppForm: React.FC<Props> = ({ appId }) => {
     const allFormFields = await form.validateFields();
     const { cluster, coreCount, partition, qos, account, maxTime } = allFormFields;
 
-    const customFormKeyValue:Map<string, string> = new Map();
+    const customFormKeyValue = new Map<string, string>();
     if (data) {
       data.forEach((customFormAttribute) => {
         const customFormKey = customFormAttribute.key;
