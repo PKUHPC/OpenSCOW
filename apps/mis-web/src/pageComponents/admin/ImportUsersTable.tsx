@@ -97,7 +97,7 @@ export const ImportUsersTable: React.FC = () => {
                 dataIndex="name" 
                 title="姓名" 
                 width={200}
-                render={(_, record:any, index:number) => (
+                render={(_text, _record, index) => (
                   <Form.Item name={["data", "users", index, "userName"]} rules={[{ required: true, message: "请输入姓名" }]}>
                     <Input 
                       placeholder="输入用户姓名" 
