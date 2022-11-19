@@ -45,6 +45,7 @@ message CreateAppSessionRequest {
   optional string qos = 6;
   uint32 core_count = 7;
   uint32 max_time = 8;
+  map<string, string> customAttributes = 9;
 }
 
 // NOT_FOUND: app is not found

@@ -45,11 +45,11 @@ export const LaunchAppForm: React.FC<Props> = ({ appId }) => {
     const allFormFields = await form.validateFields();
     const { cluster, coreCount, partition, qos, account, maxTime } = allFormFields;
 
-    const customFormKeyValue = new Map<string, string>();
+    const customFormKeyValue:{[key: string]: string} = {};
     if (data) {
       data.forEach((customFormAttribute) => {
         const customFormKey = customFormAttribute.key;
-        customFormKeyValue.set(customFormKey, allFormFields[customFormKey]);
+        customFormKeyValue[customFormKey] = allFormFields[customFormKey];
       });
     }
 
@@ -62,6 +62,7 @@ export const LaunchAppForm: React.FC<Props> = ({ appId }) => {
       qos,
       account,
       maxTime,
+      customAttributes: customFormKeyValue,
     } })
       .then(() => {
         message.success("创建成功！");

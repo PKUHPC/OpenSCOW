@@ -77,7 +77,9 @@ export const appServiceServer = plugin((server) => {
     },
 
     createAppSession: async ({ request, logger }) => {
-      const { account, appId, cluster, coreCount, maxTime, partition, qos, userId } = request;
+      const { account, appId, cluster, coreCount, maxTime, partition, qos, userId, customAttributes } = request;
+      logger.info("Get custom form fields %s.", customAttributes.toString());
+      // todo
 
       const clusterops = getClusterOps(cluster);
 
@@ -124,7 +126,7 @@ export const appServiceServer = plugin((server) => {
       if (!app) {
         throw <ServiceError> { code: Status.NOT_FOUND, message: `app id ${appId} is not found` };
       }
-      
+
       const attributes:AppCustomAttribute[] = app.attributes ?? [];
       return [{ attributes: attributes }];
     },
