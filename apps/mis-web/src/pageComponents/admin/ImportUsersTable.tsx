@@ -1,4 +1,4 @@
-import { Button, Checkbox, Form, Input, message, Select, Table } from "antd";
+import { Button, Checkbox, Form, Input, message, Select, Table, Tabs } from "antd";
 import Router from "next/router";
 import { useCallback, useEffect, useState } from "react";
 import { useAsync } from "react-async";
@@ -8,11 +8,6 @@ import { ClusterAccountInfo, ClusterUserInfo, GetClusterUsersReply } from "src/g
 import { publicConfig } from "src/utils/config";
 import { queryToString, useQuerystring } from "src/utils/querystring";
 import styled from "styled-components";
-
-const Title = styled.div`
-  display: flex;
-  justify-content: space-between;
-`;
 
 const ClusterContainer = styled.div`
 padding: 8px 16px 16px 16px;
@@ -88,66 +83,70 @@ export const ImportUsersTable: React.FC = () => {
             .finally(() => { setLoading(false); });
         }}
       >
-        <Table
-          loading={isLoading}
-          dataSource={data?.users}
-          scroll={{ x:true }}
-          bordered
-          rowKey="userId"
-          title={() => <Title><span>用户</span><a onClick={reload}>刷新</a></Title>}
-        >
-          <Table.Column<ClusterUserInfo> dataIndex="userId" title="用户ID" key="userId" width={200} />
-          <Table.Column<ClusterUserInfo> 
-            dataIndex="name" 
-            title="姓名" 
-            width={200}
-            render={(_, record:any, index:number) => (
-              <Form.Item name={["data", "users", index, "userName"]} rules={[{ required: true, message: "请输入姓名" }]}>
-                <Input 
-                  placeholder="输入用户姓名" 
-                  allowClear
-                />
-              </Form.Item>
-            )}
-          />
-          <Table.Column<ClusterUserInfo> 
-            dataIndex="accounts" 
-            key="accounts"
-            title="所属账户" 
-            render={(_, r) => r.accounts.join(", ")}
-          />
-        </Table>
-        <Table
-          loading={isLoading}
-          dataSource={data?.accounts}
-          scroll={{ x:true }}
-          pagination={{ showSizeChanger: true }}
-          rowKey="accountName"
-          bordered
-          title={() => <Title><span>账户</span><a onClick={reload}>刷新</a></Title>}
-        >
-          <Table.Column<ClusterAccountInfo> dataIndex="accountName" title="账户名" width={400} />
-          <Table.Column<ClusterAccountInfo> 
-            dataIndex="owner"
-            title="拥有者"
-            render={(_, r, i) => (
-              <Form.Item name={["data", "accounts", i, "owner"]} rules={[{ required: true, message: "请选择一个拥有者" }]}>
-                <Select
-                  defaultValue={r.owner}
-                  options={r.users.map((user) => ({ value: user.userId, label: user.userId }))}
-                  style={{ width: "100%" }}
-                  placeholder={"请选择一个拥有者"}
-                />         
-              </Form.Item>
-            )}
-          />
-        </Table>
-        <Form.Item name="whitelist" valuePropName="checked">
-          <Checkbox>将所有账户加入白名单</Checkbox>
-        </Form.Item>
-        <Button type="primary" htmlType="submit" loading={loading}>
-          提交
-        </Button>
+        <Tabs defaultActiveKey="user" tabBarExtraContent={<a onClick={reload}>刷新</a>}>
+          <Tabs.TabPane tab="用户" key="user">
+            <Table
+              loading={isLoading}
+              dataSource={data?.users}
+              scroll={{ x:true }}
+              bordered
+              rowKey="userId"
+            >
+              <Table.Column<ClusterUserInfo> dataIndex="userId" title="用户ID" key="userId" width={200} />
+              <Table.Column<ClusterUserInfo> 
+                dataIndex="name" 
+                title="姓名" 
+                width={200}
+                render={(_text, _record, index) => (
+                  <Form.Item name={["data", "users", index, "userName"]} rules={[{ required: true, message: "请输入姓名" }]}>
+                    <Input 
+                      placeholder="输入用户姓名" 
+                      allowClear
+                    />
+                  </Form.Item>
+                )}
+              />
+              <Table.Column<ClusterUserInfo> 
+                dataIndex="accounts" 
+                key="accounts"
+                title="所属账户" 
+                render={(_, r) => r.accounts.join(", ")}
+              />
+            </Table>
+          </Tabs.TabPane>
+          <Tabs.TabPane tab="账户" key="account">
+            <Table
+              loading={isLoading}
+              dataSource={data?.accounts}
+              scroll={{ x:true }}
+              pagination={{ showSizeChanger: true }}
+              rowKey="accountName"
+              bordered
+            >
+              <Table.Column<ClusterAccountInfo> dataIndex="accountName" title="账户名" width={400} />
+              <Table.Column<ClusterAccountInfo> 
+                dataIndex="owner"
+                title="拥有者"
+                render={(_, r, i) => (
+                  <Form.Item name={["data", "accounts", i, "owner"]} rules={[{ required: true, message: "请选择一个拥有者" }]}>
+                    <Select
+                      defaultValue={r.owner}
+                      options={r.users.map((user) => ({ value: user.userId, label: user.userId }))}
+                      style={{ width: "100%" }}
+                      placeholder={"请选择一个拥有者"}
+                    />
+                  </Form.Item>
+                )}
+              />
+            </Table>
+            <Form.Item name="whitelist" valuePropName="checked">
+              <Checkbox>将所有账户加入白名单</Checkbox>
+            </Form.Item>
+            <Button type="primary" htmlType="submit" loading={loading}>
+              提交
+            </Button>
+          </Tabs.TabPane>
+        </Tabs>
       </Form>
     </div>
   );
