@@ -9,11 +9,6 @@ import { publicConfig } from "src/utils/config";
 import { queryToString, useQuerystring } from "src/utils/querystring";
 import styled from "styled-components";
 
-const Title = styled.div`
-  display: flex;
-  justify-content: space-between;
-`;
-
 const ClusterContainer = styled.div`
 padding: 8px 16px 16px 16px;
 margin: 8px 0;
@@ -96,7 +91,6 @@ export const ImportUsersTable: React.FC = () => {
               scroll={{ x:true }}
               bordered
               rowKey="userId"
-              // title={() => <Title><span>用户</span><a onClick={reload}>刷新</a></Title>}
             >
               <Table.Column<ClusterUserInfo> dataIndex="userId" title="用户ID" key="userId" width={200} />
               <Table.Column<ClusterUserInfo> 
@@ -128,7 +122,6 @@ export const ImportUsersTable: React.FC = () => {
               pagination={{ showSizeChanger: true }}
               rowKey="accountName"
               bordered
-              // title={() => <Title><span>账户</span><a onClick={reload}>刷新</a></Title>}
             >
               <Table.Column<ClusterAccountInfo> dataIndex="accountName" title="账户名" width={400} />
               <Table.Column<ClusterAccountInfo> 
