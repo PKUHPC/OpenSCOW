@@ -110,21 +110,21 @@ export const adminServiceServer = plugin((server) => {
       const result = parseClusterUsers(reply.result);
 
       const includedAccounts = await em.find(Account, { 
-        accountName: { $in: result.accounts.map((x) => (x.accountName)) },
+        accountName: { $in: result.accounts.map((x) => x.accountName) },
       });
-      includedAccounts.map((account) => {
-        const a = result.accounts.find((x) => (x.accountName === account.accountName));
-        a!.included = true;
-        a!.owner = "该账户已导入";
+      includedAccounts.forEach((account) => {
+        const a = result.accounts.find((x) => x.accountName === account.accountName)!;
+        a.included = true;
+        a.owner = "该账户已导入";
       });
 
       const includedUsers = await em.find(User, {
-        userId: { $in: result.users.map((x) => (x.userId)) },
+        userId: { $in: result.users.map((x) => x.userId) },
       });
-      includedUsers.map((user) => {
-        const u = result.users.find((x) => (x.userId === user.userId));
-        u!.included = true;
-        u!.userName = user.name;
+      includedUsers.forEach((user) => {
+        const u = result.users.find((x) => x.userId === user.userId)!;
+        u.included = true;
+        u.userName = user.name;
       });
       
       return [result];
