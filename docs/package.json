@@ -27,14 +27,14 @@
     "react-dom": "17.0.2"
   },
   "devDependencies": {
-    "@adobe/jsonschema2md": "7.1.2",
+    "@adobe/jsonschema2md": "7.1.3",
     "@algolia/client-search": "4.14.2",
     "@docusaurus/module-type-aliases": "2.2.0",
     "@scow/config": "workspace:*",
     "@sinclair/typebox": "0.25.8",
     "@tsconfig/docusaurus": "1.0.6",
     "@types/react": "18.0.18",
-    "typescript": "4.8.4"
+    "typescript": "4.9.3"
   },
   "browserslist": {
     "production": [
