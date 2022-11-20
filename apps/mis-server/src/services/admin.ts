@@ -2,7 +2,9 @@ import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { importUsers, ImportUsersData } from "src/bl/importUsers";
+import { Account } from "src/entities/Account";
 import { StorageQuota } from "src/entities/StorageQuota";
+import { User } from "src/entities/User";
 import { AdminServiceServer, AdminServiceService } from "src/generated/server/admin";
 import { parseClusterUsers } from "src/utils/slurm";
 
@@ -94,7 +96,7 @@ export const adminServiceServer = plugin((server) => {
 
     },
 
-    getClusterUsers: async ({ request, logger }) => {
+    getClusterUsers: async ({ request, em, logger }) => {
       const { cluster } = request;
 
       const reply = await server.ext.clusters.callOnOne(
@@ -104,8 +106,22 @@ export const adminServiceServer = plugin((server) => {
           request: {}, logger,
         }),
       );
+
+      const result = parseClusterUsers(reply.result);
+
+      await Promise.all(result.accounts.map(async (account) => {
+        if (await em.findOne(Account, { accountName: account.accountName })) {
+          account.included = true;
+        }
+      }));
       
-      return [parseClusterUsers(reply.result)];
+      await Promise.all(result.users.map(async (user) => {
+        if (await em.findOne(User, { userId: user.userId })) {
+          user.included = true;
+        }
+      }));
+
+      return [result];
     },
 
     getFetchInfo: async () => {
