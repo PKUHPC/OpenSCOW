@@ -205,7 +205,7 @@ export const mockApi: MockApi<typeof api> = {
         {
           accountName: "a_user4",
           users: [{ userId: "user4", state: "allowed!" }],
-          owner: "user4",
+          owner: "该账户已导入",
           included: true,
         },
       ],

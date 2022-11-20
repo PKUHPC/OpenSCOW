@@ -1,6 +1,6 @@
 import { Button, Checkbox, Form, Input, message, Select, Table, Tabs, Tooltip } from "antd";
 import Router from "next/router";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
@@ -34,42 +34,27 @@ export const ImportUsersTable: React.FC = () => {
 
   const [loading, setLoading] = useState(false);
 
-  const [selectedUsers, setSelectedUsers] = useState<React.Key[]>([0, 1]);
-  const [selectedAccounts, setSelectedAccounts] = useState<React.Key[]>([]);
-
-  const promiseFn = useCallback(async () => {
-    const result = await api.getClusterUsers({ query: {
+  const promiseFn = useCallback(async () => {    
+    return await api.getClusterUsers({ query: {
       cluster: cluster.id,
     } });
-
-    const users: React.Key[] = [];
-    const accounts: React.Key[] = [];
-
-    result.users.forEach((user) => {
-      if (!user.included) {
-        users.push(user.userId);
-      }
-    });
-    result.accounts.forEach((account) => {
-      if (!account.included) {
-        accounts.push(account.accountName);
-      }
-    });
-
-    setSelectedUsers(users);
-    setSelectedAccounts(accounts);
-
-    return result;
   }, [cluster]);
-
+  
   const { data, isLoading, reload } = useAsync({ promiseFn });
-
+  
   useEffect(() => {
     form.setFieldsValue({
       data: data,
       whitelist: true,
     });
   }, [data]);
+  
+  const selectedUsers = useMemo(() => data?.users.filter(
+    (x) => (!x.included)).map((x) => (x.userId)), [data],
+  );
+  const selectedAccounts = useMemo(() => data?.accounts.filter(
+    (x) => (!x.included)).map((x) => (x.accountName)), [data],
+  );
 
   return (
     <div>

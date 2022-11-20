@@ -109,18 +109,24 @@ export const adminServiceServer = plugin((server) => {
 
       const result = parseClusterUsers(reply.result);
 
-      await Promise.all(result.accounts.map(async (account) => {
-        if (await em.findOne(Account, { accountName: account.accountName })) {
-          account.included = true;
-        }
-      }));
-      
-      await Promise.all(result.users.map(async (user) => {
-        if (await em.findOne(User, { userId: user.userId })) {
-          user.included = true;
-        }
-      }));
+      const includedAccounts = await em.find(Account, { 
+        accountName: { $in: result.accounts.map((x) => (x.accountName)) },
+      });
+      includedAccounts.map((account) => {
+        const a = result.accounts.find((x) => (x.accountName === account.accountName));
+        a!.included = true;
+        a!.owner = "该账户已导入";
+      });
 
+      const includedUsers = await em.find(User, {
+        userId: { $in: result.users.map((x) => (x.userId)) },
+      });
+      includedUsers.map((user) => {
+        const u = result.users.find((x) => (x.userId === user.userId));
+        u!.included = true;
+        u!.userName = user.name;
+      });
+      
       return [result];
     },
 
