@@ -10,6 +10,9 @@ export const sftpExists = (sftp: SFTPWrapper, path: string) =>
 export const sftpWriteFile = (sftp: SFTPWrapper) =>
   promisify(sftp.writeFile.bind(sftp) as typeof sftp["writeFile"]);
 
+export const sftpAppendFile = (sftp: SFTPWrapper) =>
+  promisify(sftp.writeFile.bind(sftp) as typeof sftp["appendFile"]);
+
 export const sftpReadFile = (sftp: SFTPWrapper) =>
   promisify(sftp.readFile.bind(sftp) as typeof sftp["readFile"]);
 

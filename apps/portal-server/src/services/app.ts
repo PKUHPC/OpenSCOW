@@ -93,6 +93,7 @@ export const appServiceServer = plugin((server) => {
         maxTime,
         partition,
         qos,
+        customAttributes,
       }, logger);
 
       if (reply.code === "SBATCH_FAILED") {

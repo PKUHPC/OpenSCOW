@@ -1,4 +1,4 @@
-import { sftpChmod, sftpExists, sftpReaddir, sftpReadFile, sftpRealPath, sftpWriteFile } from "@scow/lib-ssh";
+import { sftpChmod, sftpExists, sftpReaddir, sftpReadFile, sftpRealPath, sftpWriteFile, sftpAppendFile } from "@scow/lib-ssh";
 import { randomUUID } from "crypto";
 import fs from "fs";
 import { join } from "path";
@@ -38,7 +38,7 @@ export const slurmAppOps = (cluster: string): AppOps => {
 
   return {
     createApp: async (request, logger) => {
-      const { appId, userId, account, coreCount, maxTime, partition, qos } = request;
+      const { appId, userId, account, coreCount, maxTime, partition, qos, customAttributes } = request;
 
       // prepare script file
       const appConfig = apps[appId];
@@ -87,6 +87,8 @@ export const slurmAppOps = (cluster: string): AppOps => {
 
         if (appConfig.type === "web") {
           await sftpWriteFile(sftp)(join(workingDirectory, "before.sh"), appConfig.web!.beforeScript);
+          await sftpAppendFile(sftp)(join(workingDirectory, "before.sh"), customAttributes.toString());  // todo
+
           await sftpWriteFile(sftp)(join(workingDirectory, "script.sh"), appConfig.web!.script);
 
           const script = generateJobScript({
