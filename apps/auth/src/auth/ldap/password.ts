@@ -46,7 +46,7 @@ export async function modifyPasswordAsSelf(
   log: FastifyBaseLogger,
   ldap: LdapConfigSchema,
   userDn: string, oldPassword: string, newPassword: string,
-) : Promise<boolean> {
+): Promise<boolean> {
   try {
     return await useLdap(log, ldap, { dn: userDn, password: oldPassword })(async (client) => {
       await modifyPassword(userDn, oldPassword, newPassword, client);

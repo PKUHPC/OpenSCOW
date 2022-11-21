@@ -30,7 +30,7 @@ export const ImportUsersTable: React.FC = () => {
     ? publicConfig.CLUSTERS[clusterParam]
     : Object.values(publicConfig.CLUSTERS)[0]);
 
-  const [form] = Form.useForm<{data:GetClusterUsersReply, whitelist:boolean}>();
+  const [form] = Form.useForm<{data: GetClusterUsersReply, whitelist: boolean}>();
 
   const [loading, setLoading] = useState(false);
 
