@@ -128,6 +128,16 @@ message GetFileMetadataResponse {
   uint32 size = 1;
 }
 
+message IsExistsRequest {
+  string user_id = 1;
+  string cluster = 2;
+  string path = 3;
+}
+
+message IsExistsResponse {
+   bool exists = 1; 
+}
+
 service FileService {
   rpc Copy(CopyRequest) returns (CopyResponse);
   rpc CreateFile(CreateFileRequest) returns (CreateFileResponse);
@@ -145,4 +155,6 @@ service FileService {
   rpc Upload(stream UploadRequest) returns (UploadResponse);
 
   rpc GetFileMetadata(GetFileMetadataRequest) returns (GetFileMetadataResponse);
+
+  rpc IsExists(IsExistsRequest) returns (IsExistsResponse);
 }

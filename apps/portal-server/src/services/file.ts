@@ -336,5 +336,23 @@ export const fileServiceServer = plugin((server) => {
       });
     },
 
+    isExists: async ({ request, logger }) => {
+      const { userId, cluster, path } = request;
+
+      const host = getClusterLoginNode(cluster);
+
+      if (!host) { throw clusterNotFound(cluster); }
+
+      return await sshConnect(host, userId, logger, async (ssh) => {
+        const sftp = await ssh.requestSFTP();
+        if (await sftpExists(sftp, path)) {
+          return [{ exists: true }];
+        }
+        else {
+          return [{ exists: false }];
+        }
+      });
+    },
+
   });
 });
