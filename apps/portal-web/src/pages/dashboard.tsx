@@ -9,7 +9,7 @@ import { Head } from "src/utils/head";
 import { getHostname } from "src/utils/host";
 
 interface Props { 
-  hostname : string | undefined
+  hostname: string | undefined
 }
 
 export const DashboardPage: NextPage<Props> = requireAuth(() => true)((props: Props) => {

@@ -9,7 +9,7 @@ import { Head } from "src/utils/head";
 import { RefreshLink, useRefreshToken } from "src/utils/refreshToken";
 
 
-export const showAllTenants :NextPage = 
+export const showAllTenants: NextPage = 
   requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))(() => {
     
     const [refreshToken, update] = useRefreshToken();

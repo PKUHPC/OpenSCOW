@@ -10,7 +10,7 @@ import { DEFAULT_TENANT_NAME } from "src/utils/constants";
 
 export type MockApi<TApi extends Record<
   string,
- (...args : any[]) => JsonFetchResultPromiseLike<any>>
+ (...args: any[]) => JsonFetchResultPromiseLike<any>>
  > = { [key in keyof TApi]: null | (
     (...args: Parameters<TApi[key]>) =>
     Promise<

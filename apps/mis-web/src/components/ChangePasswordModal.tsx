@@ -7,7 +7,7 @@ interface Props {
     name: string;
     userId: string;
     onClose: () => void;
-    onComplete: (oldPassword:string, newPassword:string) => Promise<void>;
+    onComplete: (oldPassword: string, newPassword: string) => Promise<void>;
     visible: boolean;
 }
 

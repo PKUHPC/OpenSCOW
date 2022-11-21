@@ -17,7 +17,7 @@ interface RequstSchema {
 }
 
 // @ts-ignore
-globalThis.fetch = jest.fn((url:string, req:RequstSchema) => {
+globalThis.fetch = jest.fn((url: string, req: RequstSchema) => {
   const testBody = JSON.parse(req.body);
   const testIdentityId = testBody.identityId;
   const testOldPassword = testBody.oldPassword;
