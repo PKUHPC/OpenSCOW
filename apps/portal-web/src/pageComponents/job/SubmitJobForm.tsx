@@ -5,11 +5,13 @@ import { useWatch } from "antd/lib/form/Form";
 import Router from "next/router";
 import randomWords from "random-words";
 import React, { useEffect, useMemo, useState } from "react";
+import { useStore } from "simstate";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { CodeEditor } from "src/components/CodeEditor";
 import { InputGroupFormItem } from "src/components/InputGroupFormItem";
 import { AccountSelector } from "src/pageComponents/job/AccountSelector";
+import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { Cluster, publicConfig } from "src/utils/config";
 import { firstPartition, getPartitionInfo } from "src/utils/jobForm";
 
@@ -86,9 +88,11 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
 
   const partition = useWatch("partition", form) as string | undefined;
 
+  const defaultClusterStore = useStore(DefaultClusterStore);
+
   // set default
   useEffect(() => {
-    const defaultCluster = publicConfig.CLUSTERS[0];
+    const defaultCluster = defaultClusterStore.cluster;
 
     if (defaultCluster) {
       const [partition, info] = firstPartition(defaultCluster);

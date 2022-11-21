@@ -2,11 +2,13 @@ import { Layout } from "antd";
 import useBreakpoint from "antd/lib/grid/hooks/useBreakpoint";
 import { useRouter } from "next/router";
 import React, { PropsWithChildren, useMemo, useState } from "react";
+import { useStore } from "simstate";
 import { Footer } from "src/layouts/Footer";
 import { Header } from "src/layouts/header";
 import { match } from "src/layouts/matchers";
 import { userRoutes } from "src/layouts/routes";
 import { SideNav } from "src/layouts/SideNav";
+import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { arrayContainsElement } from "src/utils/array";
 import styled from "styled-components";
 // import logo from "src/assets/logo-no-text.svg";
@@ -41,8 +43,9 @@ const StyledLayout = styled(Layout)`
 
 
 export const RootLayout: React.FC<Props> = ({ footerText, children }) => {
+  const defaultClusterStore = useStore(DefaultClusterStore);
 
-  const allRoutes = useMemo(userRoutes, []);
+  const allRoutes = useMemo(userRoutes, [defaultClusterStore.cluster]);
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
 

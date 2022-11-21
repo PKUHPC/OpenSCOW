@@ -3,9 +3,11 @@ import { Space } from "antd";
 import { join } from "path";
 import React from "react";
 import { useStore } from "simstate";
+import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { BigScreenMenu } from "src/layouts/header/BigScreenMenu";
 import { Logo } from "src/layouts/header/Logo";
 import { NavItemProps } from "src/layouts/NavItemProps";
+import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { UserStore } from "src/stores/UserStore";
 import { antdBreakpoints } from "src/styles/constants";
 import { publicConfig } from "src/utils/config";
@@ -69,6 +71,8 @@ export const Header: React.FC<Props> = ({
 
   const userStore = useStore(UserStore);
 
+  const defaultClusterStore = useStore(DefaultClusterStore);
+
   return (
     <Container>
       <HeaderItem>
@@ -91,6 +95,12 @@ export const Header: React.FC<Props> = ({
         />
         <MenuPartPlaceholder />
       </MenuPart>
+      <SingleClusterSelector 
+        value={defaultClusterStore.cluster} 
+        onChange={(cluster) => {
+          defaultClusterStore.setCluster(cluster);
+        }} 
+      />
       {
 
         publicConfig.MIS_URL ? (

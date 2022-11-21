@@ -14,12 +14,13 @@ import { USE_MOCK } from "src/apis/useMock";
 import { getTokenFromCookie } from "src/auth/cookie";
 import { RootLayout } from "src/layouts/RootLayout";
 import { ValidateTokenSchema } from "src/pages/api/auth/validateToken";
+import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import {
   User, UserStore,
 } from "src/stores/UserStore";
 import { GlobalStyle } from "src/styles/globalStyle";
 import { AntdConfigProvider } from "src/utils/AntdConfigProvider";
-import { runtimeConfig } from "src/utils/config";
+import { publicConfig, runtimeConfig } from "src/utils/config";
 import { getHostname } from "src/utils/host";
 import { isServer } from "src/utils/isServer";
 import useConstant from "src/utils/useConstant";
@@ -69,6 +70,11 @@ function MyApp({ Component, pageProps, extra }: Props) {
     return store;
   });
 
+  const defaultClusterStore = useConstant(() => {
+    const store = createStore(DefaultClusterStore, Object.values(publicConfig.CLUSTERS)[0]);
+    return store;
+  });
+
   // Use the layout defined at the page level, if available
   return (
     <>
@@ -82,7 +88,7 @@ function MyApp({ Component, pageProps, extra }: Props) {
         ></link>
       </Head>
       <GlobalStyle />
-      <StoreProvider stores={[userStore]}>
+      <StoreProvider stores={[userStore, defaultClusterStore]}>
         <AntdConfigProvider color={primaryColor}>
           <FailEventHandler />
           <TopProgressBar />
