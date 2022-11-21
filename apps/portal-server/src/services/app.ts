@@ -126,7 +126,7 @@ export const appServiceServer = plugin((server) => {
         throw <ServiceError> { code: Status.NOT_FOUND, message: `app id ${appId} is not found` };
       }
 
-      const attributes:AppCustomAttribute[] = app.attributes ?? [];
+      const attributes: AppCustomAttribute[] = app.attributes ?? [];
       return [{ attributes: attributes }];
     },
   });

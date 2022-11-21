@@ -21,11 +21,13 @@ interface FormFields {
   maxTime: number;
 }
 
+
 const initialValues = {
   nodeCount: 1,
   coreCount: 1,
   maxTime: 60,
 } as Partial<FormFields>;
+
 
 export const LaunchAppForm: React.FC<Props> = ({ appId }) => {
 
@@ -45,7 +47,7 @@ export const LaunchAppForm: React.FC<Props> = ({ appId }) => {
     const allFormFields = await form.validateFields();
     const { cluster, coreCount, partition, qos, account, maxTime } = allFormFields;
 
-    const customFormKeyValue:{[key: string]: string} = {};
+    const customFormKeyValue: {[key: string]: string} = {};
     if (data) {
       data.forEach((customFormAttribute) => {
         const customFormKey = customFormAttribute.key;

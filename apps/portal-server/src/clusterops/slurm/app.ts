@@ -86,7 +86,7 @@ export const slurmAppOps = (cluster: string): AppOps => {
         };
 
         if (appConfig.type === "web") {
-          let beforeScript:string = appConfig.web!.beforeScript ?? "";
+          let beforeScript: string = appConfig.web!.beforeScript ?? "";
           for (const key in customAttributes) {
             beforeScript = beforeScript + "\n" + "export " + key + "=" + customAttributes[key];
           }
