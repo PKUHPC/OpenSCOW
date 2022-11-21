@@ -2,9 +2,11 @@ import { Button, Checkbox, Form, Input, message, Select, Table, Tabs, Tooltip } 
 import Router from "next/router";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useAsync } from "react-async";
+import { useStore } from "simstate";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { ClusterAccountInfo, ClusterUserInfo, GetClusterUsersReply, ImportUsersData } from "src/generated/server/admin";
+import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { publicConfig } from "src/utils/config";
 import { queryToString, useQuerystring } from "src/utils/querystring";
 import styled from "styled-components";
@@ -25,10 +27,12 @@ export const ImportUsersTable: React.FC = () => {
 
   const qs = useQuerystring();
 
+  const defaultClusterStore = useStore(DefaultClusterStore);
+
   const clusterParam = queryToString(qs.cluster);
   const cluster = (publicConfig.CLUSTERS[clusterParam]
     ? publicConfig.CLUSTERS[clusterParam]
-    : Object.values(publicConfig.CLUSTERS)[0]);
+    : defaultClusterStore.cluster);
 
   const [form] = Form.useForm<{data: GetClusterUsersReply, whitelist: boolean}>();
 

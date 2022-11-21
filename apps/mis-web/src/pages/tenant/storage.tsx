@@ -1,6 +1,7 @@
 import { Button, Form, Input, InputNumber, message, Select } from "antd";
 import { NextPage } from "next";
 import React, { useState } from "react";
+import { useStore } from "simstate";
 import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
@@ -9,6 +10,7 @@ import { PageTitle } from "src/components/PageTitle";
 import { FormLayout } from "src/layouts/FormLayout";
 import { TenantRole } from "src/models/User";
 import type { ChangeStorageMode } from "src/pages/api/admin/changeStorage";
+import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { Cluster } from "src/utils/config";
 import { Head } from "src/utils/head";
 
@@ -33,6 +35,8 @@ const StorageForm: React.FC = () => {
 
   const [current, setCurent] = useState<number | undefined>(undefined);
   const [currentLoading, setCurrentLoading] = useState(false);
+
+  const defaultClusterStore = useStore(DefaultClusterStore);
 
   const submit = async () => {
     const { value, userId, cluster, mode } = await form.validateFields();
@@ -84,6 +88,7 @@ const StorageForm: React.FC = () => {
         name="cluster"
         label="集群"
         rules={[{ required: true }]}
+        initialValue={defaultClusterStore.cluster}
       >
         <SingleClusterSelector />
       </Form.Item>
