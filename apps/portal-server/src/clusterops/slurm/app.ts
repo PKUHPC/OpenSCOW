@@ -1,4 +1,4 @@
-import { sftpChmod, sftpExists, sftpReaddir, sftpReadFile, sftpRealPath, sftpWriteFile, sftpAppendFile } from "@scow/lib-ssh";
+import { sftpChmod, sftpExists, sftpReaddir, sftpReadFile, sftpRealPath, sftpWriteFile } from "@scow/lib-ssh";
 import { randomUUID } from "crypto";
 import fs from "fs";
 import { join } from "path";
@@ -86,8 +86,12 @@ export const slurmAppOps = (cluster: string): AppOps => {
         };
 
         if (appConfig.type === "web") {
-          await sftpWriteFile(sftp)(join(workingDirectory, "before.sh"), appConfig.web!.beforeScript);
-          await sftpAppendFile(sftp)(join(workingDirectory, "before.sh"), customAttributes.toString());  // todo
+          let beforeScript:string = appConfig.web!.beforeScript ?? "";
+          for (const key in customAttributes) {
+            beforeScript = beforeScript + "\n" + "export " + key + "=" + customAttributes[key];
+          }
+          await sftpWriteFile(sftp)(join(workingDirectory, "before.sh"), beforeScript);
+
 
           await sftpWriteFile(sftp)(join(workingDirectory, "script.sh"), appConfig.web!.script);
 

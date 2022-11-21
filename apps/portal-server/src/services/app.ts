@@ -78,8 +78,6 @@ export const appServiceServer = plugin((server) => {
 
     createAppSession: async ({ request, logger }) => {
       const { account, appId, cluster, coreCount, maxTime, partition, qos, userId, customAttributes } = request;
-      logger.info("Get custom form fields %s.", customAttributes.toString());
-      // todo
 
       const clusterops = getClusterOps(cluster);
 
