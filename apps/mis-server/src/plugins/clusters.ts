@@ -102,6 +102,7 @@ export const clustersPlugin = plugin(async (f) => {
         throw <ServiceError>{
           code: Status.INTERNAL,
           message: "Execution on clusters failed.",
+          details: failed.join(","),
         };
       }
 

@@ -19,7 +19,7 @@
     "@scow/lib-config": "workspace:*",
     "@sinclair/typebox": "0.25.8",
     "asn1": "0.2.6",
-    "fastify": "4.9.2",
+    "fastify": "4.10.0",
     "fastify-graceful-shutdown": "3.4.0",
     "fastify-plugin": "4.3.0",
     "ioredis": "5.2.4",

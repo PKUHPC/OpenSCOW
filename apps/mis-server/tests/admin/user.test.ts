@@ -1,9 +1,8 @@
-import "tests/data/fetch";
-
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Server } from "@ddadaal/tsgrpc-server";
 import { ChannelCredentials } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
+import { createUser } from "@scow/lib-auth";
 import { createServer } from "src/app";
 import { misConfig } from "src/config/mis";
 import { Tenant } from "src/entities/Tenant";
@@ -13,6 +12,10 @@ import { PlatformRole, TenantRole, UserServiceClient } from "src/generated/serve
 import { reloadEntity } from "src/utils/orm";
 import { insertInitialData } from "tests/data/data";
 import { dropDatabase } from "tests/data/helpers";
+
+jest.mock("@scow/lib-auth", () => ({
+  createUser: jest.fn(async () => ({ status: 204, ok: true, text: () => "" })),
+}));
 
 const anotherTenant = "anotherTenant";
 
@@ -54,22 +57,17 @@ it("creates user", async () => {
 
   expect(user.name).toBe(name);
 
-  expect(fetch).toHaveBeenNthCalledWith(
+  expect(createUser).toHaveBeenNthCalledWith(
     1,
-    misConfig.authUrl + "/user",
+    misConfig.authUrl,
     {
-      method: "POST",
-      body: JSON.stringify({
-        identityId: userId,
-        id: user.id,
-        mail: email,
-        name: name,
-        password,
-      }),
-      headers: {
-        "content-type": "application/json",
-      },
+      identityId: userId,
+      id: user.id,
+      mail: email,
+      name: name,
+      password,
     },
+    expect.anything(),
   );
 });
 

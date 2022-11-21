@@ -1,24 +1,18 @@
-import { message, Select, Table } from "antd";
+import { message, Select, Table, Tabs } from "antd";
 import { useEffect, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { Centered } from "src/components/layouts";
 import { Account } from "src/generated/server/account";
 import { AccountAffiliation, User } from "src/generated/server/user";
+import { FormLayout } from "src/layouts/FormLayout";
 import { PlatformRole, PlatformRoleTexts, TenantRole, TenantRoleTexts, UserRole, UserRoleTexts } from "src/models/User";
-import { confirmPasswordFormItemProps } from "src/utils/form";
-import styled from "styled-components";
 
 interface DataTableProps<T> {
   data: T[] | undefined;
   loading: boolean;
   reload: () => void;
 }
-
-const Title = styled.div`
-  display: flex;
-  justify-content: space-between;
-`;
 
 interface PlatformRoleSelectorProps {
   role: PlatformRole[];
@@ -43,8 +37,8 @@ const PlatformRoleSelector: React.FC<PlatformRoleSelectorProps> = ({ role, userI
             roleType: value,
           } })
             .httpError(200, () => { message.error("用户已经是该角色"); })
-            .httpError(400, () => { message.error("用户不存在"); })
-            .httpError(401, () => { message.error("用户没有权限"); })
+            .httpError(404, () => { message.error("用户不存在"); })
+            .httpError(403, () => { message.error("用户没有权限"); })
             .then(() => {
               message.success("设置成功");
               setLoading(false);
@@ -60,8 +54,8 @@ const PlatformRoleSelector: React.FC<PlatformRoleSelectorProps> = ({ role, userI
             roleType: value,
           } })
             .httpError(200, () => { message.error("用户已经不是该角色"); })
-            .httpError(400, () => { message.error("用户不存在"); })
-            .httpError(401, () => { message.error("用户没有权限"); })
+            .httpError(404, () => { message.error("用户不存在"); })
+            .httpError(403, () => { message.error("用户没有权限"); })
             .then(() => {
               message.success("设置成功");
               setLoading(false);
@@ -74,7 +68,7 @@ const PlatformRoleSelector: React.FC<PlatformRoleSelectorProps> = ({ role, userI
     >
       {
         Object.entries(PlatformRoleTexts).map(([key, value]) => {
-          return <Select.Option key={key} value={value}>{value}</Select.Option>;
+          return <Select.Option key={key} value={key}>{value}</Select.Option>;
         })
       }
     </Select>
@@ -105,8 +99,8 @@ const TenantRoleSelector: React.FC<TenantRoleSelectorProps> = ({ role, userId, r
             roleType: value,
           } })
             .httpError(200, () => { message.error("用户已经是该角色"); })
-            .httpError(400, () => { message.error("用户不存在"); })
-            .httpError(401, () => { message.error("用户没有权限"); })
+            .httpError(404, () => { message.error("用户不存在"); })
+            .httpError(403, () => { message.error("用户没有权限"); })
             .then(() => {
               message.success("设置成功");
               setLoading(false);
@@ -122,8 +116,8 @@ const TenantRoleSelector: React.FC<TenantRoleSelectorProps> = ({ role, userId, r
             roleType: value,
           } })
             .httpError(200, () => { message.error("用户已经不是该角色"); })
-            .httpError(400, () => { message.error("用户不存在"); })
-            .httpError(401, () => { message.error("用户没有权限"); })
+            .httpError(404, () => { message.error("用户不存在"); })
+            .httpError(403, () => { message.error("用户没有权限"); })
             .then(() => {
               message.success("设置成功");
               setLoading(false);
@@ -136,7 +130,7 @@ const TenantRoleSelector: React.FC<TenantRoleSelectorProps> = ({ role, userId, r
     >
       {
         Object.entries(TenantRoleTexts).map(([key, value]) => {
-          return <Select.Option key={key} value={value}>{value}</Select.Option>;
+          return <Select.Option key={key} value={key}>{value}</Select.Option>;
         })
       }
     </Select>
@@ -152,7 +146,6 @@ const UserTable: React.FC<DataTableProps<User>> = ({ data, loading, reload }) =>
       scroll={{ x: true }}
       bordered
       rowKey="userId"
-      title={() => <Title><span>用户</span><a onClick={reload}>刷新</a></Title>}
     >
       <Table.Column<User> dataIndex="userId" title="用户ID" />
       <Table.Column<User> dataIndex="name" title="姓名" />
@@ -185,7 +178,7 @@ const UserTable: React.FC<DataTableProps<User>> = ({ data, loading, reload }) =>
   );
 };
 
-const AccountTable: React.FC<DataTableProps<Account>> = ({ data, loading, reload }) => {
+const AccountTable: React.FC<DataTableProps<Account>> = ({ data, loading }) => {
   return (
     <Table
       loading={loading}
@@ -194,7 +187,6 @@ const AccountTable: React.FC<DataTableProps<Account>> = ({ data, loading, reload
       pagination={{ showSizeChanger: true }}
       rowKey="accountName"
       bordered
-      title={() => <Title><span>账户</span><a onClick={reload}>刷新</a></Title>}
     >
       <Table.Column<Account> dataIndex="accountName" title="账户名" />
       <Table.Column<Account>
@@ -227,16 +219,22 @@ export const InitUsersAndAccountsTable: React.FC = () => {
 
   return (
     <Centered>
-      <div>
+      <FormLayout maxWidth={800}>
         <p>
           您可以在这里管理当前系统中默认租户下的用户和账户，以及设置某个用户为<strong>初始管理员</strong>。
         </p>
         <p>
           <strong>初始管理员</strong>指同时为租户管理员和平台管理员的用户。
         </p>
-        <UserTable data={usersData} loading={usersLoading} reload={usersReload} />
-        <AccountTable data={accountsData} loading={accountsLoading} reload={accountsReload} />
-      </div>
+        <Tabs defaultActiveKey="user" tabBarExtraContent={<a onClick={reload}>刷新</a>}>
+          <Tabs.TabPane tab="用户" key="user">
+            <UserTable data={usersData} loading={usersLoading} reload={usersReload} />
+          </Tabs.TabPane>
+          <Tabs.TabPane tab="账户" key="account">
+            <AccountTable data={accountsData} loading={accountsLoading} reload={accountsReload} />
+          </Tabs.TabPane>
+        </Tabs>
+      </FormLayout>
     </Centered>
   );
 

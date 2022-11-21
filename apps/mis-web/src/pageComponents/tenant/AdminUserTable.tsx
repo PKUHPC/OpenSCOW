@@ -1,9 +1,11 @@
 import { ExclamationCircleOutlined } from "@ant-design/icons";
-import { Button, Form, Input, message, Modal, Space, Table } from "antd";
+import { Button, Divider, Form, Input, message, Modal, Space, Table } from "antd";
 import React, { useMemo, useState } from "react";
 import { api } from "src/apis";
+import { ChangePasswordModalLink } from "src/components/ChangePasswordModal";
 import { DisabledA } from "src/components/DisabledA";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
+import { PlatformUserInfo } from "src/generated/server/user";
 import { FullUserInfo, TenantRole } from "src/models/User";
 import { GetTenantUsersSchema } from "src/pages/api/admin/getTenantUsers";
 import { User } from "src/stores/UserStore";
@@ -19,6 +21,7 @@ interface Props {
 interface FilterForm {
   idOrName: string | undefined;
 }
+
 
 export const AdminUserTable: React.FC<Props> = ({
   data, isLoading, reload, user,
@@ -146,7 +149,7 @@ export const AdminUserTable: React.FC<Props> = ({
               <Space size="middle">
                 是
                 <a
-                  onClick={async () => {
+                  onClick={() => {
                     Modal.confirm({
                       title: "确定取消租户财务人员权限",
                       icon: <ExclamationCircleOutlined />,
@@ -206,6 +209,32 @@ export const AdminUserTable: React.FC<Props> = ({
           dataIndex="affiliatedAccountNames"
           title="可用账户"
           render={(_, r) => r.accountAffiliations.map((x) => x.accountName).join(", ")}
+        />
+        <Table.Column<FullUserInfo>
+          dataIndex="changePassword"
+          title="操作"
+          render={(_, r) => (
+            <Space split={<Divider type="vertical" />}>
+              <ChangePasswordModalLink
+                userId={r.id}
+                name={r.name}
+                onComplete={async (oldPassword, newPassword) => {
+                  await api.changePasswordAsTenantAdmin({ body:{
+                    identityId: r.id,
+                    oldPassword: oldPassword,
+                    newPassword: newPassword,
+                  } })
+                    .httpError(404, () => { message.error("用户不存在"); })
+                    .httpError(412, () => { message.error("原密码错误"); })
+                    .httpError(501, () => { message.error("本功能在当前配置下不可用"); })
+                    .then(() => { message.success("修改成功"); })
+                    .catch(() => { message.error("修改失败"); });
+                }}      
+              >
+              修改密码
+              </ChangePasswordModalLink>
+            </Space>
+          )}
         />
       </Table>
     </div>

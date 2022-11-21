@@ -3,7 +3,7 @@ FROM centos:7
 WORKDIR /ldap
 COPY dev/ldap/provider.sh .
 
-RUN ./provider.sh docker
+RUN ulimit -n 10240;./provider.sh docker
 
 VOLUME [ "/var/lib/ldap" ]
 
