@@ -29,7 +29,7 @@
     "@scow/lib-auth": "workspace:*",
     "@scow/lib-decimal": "workspace:*",
     "@sinclair/typebox": "0.25.8",
-    "antd": "4.24.3",
+    "antd": "5.0.0",
     "codemirror": "6.0.1",
     "google-protobuf": "3.21.2",
     "less": "4.1.3",
