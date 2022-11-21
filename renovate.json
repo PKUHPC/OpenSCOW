@@ -22,6 +22,12 @@
       "groupSlug": "all-minor-patch"
     },
     {
+      "matchPackagePatterns": [
+        "next"
+      ],
+      "enabled": false
+    },
+    {
       "matchFiles": [
         "docs/package.json"
       ],
