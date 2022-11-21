@@ -30,8 +30,20 @@ message QueryStorageQuotaRequest {
 message QueryStorageQuotaReply { uint64 current_quota = 1; }
 
 message ImportUsersData {
-  repeated ClusterAccountInfo accounts = 1;
-  repeated ClusterUserInfo users = 2;
+  message AccountInfo {
+    string account_name = 1;
+    repeated UserInAccount users = 2;
+    string owner = 3;
+  }
+
+  message UserInfo {
+    string user_id = 1;
+    string user_name = 2;
+    repeated string accounts = 3;
+  }
+
+  repeated AccountInfo accounts = 1;
+  repeated UserInfo users = 2;
 }
 
 message ImportUsersRequest {
@@ -55,12 +67,14 @@ message ClusterAccountInfo {
   string account_name = 1;
   repeated UserInAccount users = 2;
   optional string owner = 3;
+  bool included = 4;
 }
 
 message ClusterUserInfo {
   string user_id = 1;
   string user_name = 2;
   repeated string accounts = 3;
+  bool included = 4;
 }
 
 message GetClusterUsersRequest {

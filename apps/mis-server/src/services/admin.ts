@@ -2,7 +2,9 @@ import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { importUsers, ImportUsersData } from "src/bl/importUsers";
+import { Account } from "src/entities/Account";
 import { StorageQuota } from "src/entities/StorageQuota";
+import { User } from "src/entities/User";
 import { AdminServiceServer, AdminServiceService } from "src/generated/server/admin";
 import { parseClusterUsers } from "src/utils/slurm";
 
@@ -94,7 +96,7 @@ export const adminServiceServer = plugin((server) => {
 
     },
 
-    getClusterUsers: async ({ request, logger }) => {
+    getClusterUsers: async ({ request, em, logger }) => {
       const { cluster } = request;
 
       const reply = await server.ext.clusters.callOnOne(
@@ -104,8 +106,28 @@ export const adminServiceServer = plugin((server) => {
           request: {}, logger,
         }),
       );
+
+      const result = parseClusterUsers(reply.result);
+
+      const includedAccounts = await em.find(Account, { 
+        accountName: { $in: result.accounts.map((x) => x.accountName) },
+      });
+      includedAccounts.forEach((account) => {
+        const a = result.accounts.find((x) => x.accountName === account.accountName)!;
+        a.included = true;
+        a.owner = "该账户已导入";
+      });
+
+      const includedUsers = await em.find(User, {
+        userId: { $in: result.users.map((x) => x.userId) },
+      });
+      includedUsers.forEach((user) => {
+        const u = result.users.find((x) => x.userId === user.userId)!;
+        u.included = true;
+        u.userName = user.name;
+      });
       
-      return [parseClusterUsers(reply.result)];
+      return [result];
     },
 
     getFetchInfo: async () => {

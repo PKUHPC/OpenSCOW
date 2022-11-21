@@ -14,13 +14,13 @@ export function parseClusterUsers(dataStr: string): GetClusterUsersReply {
   let i = 0;
   while (i < lines.length) {
     const account = lines[i].trim();
-    const accountIndex = obj.accounts.push({ accountName: account, users: [] as UserInAccount[] });
+    const accountIndex = obj.accounts.push({ accountName: account, users: [] as UserInAccount[], included: false });
     i++;
     while (lines[i].trim() !== "") {
       const [user, status] = lines[i].split(":").map((x) => x.trim());
       const userIndex = obj.users.findIndex((x) => x.userId === user);
       if (userIndex === -1) {
-        obj.users.push({ userId: user, userName: user, accounts: [account]});
+        obj.users.push({ userId: user, userName: user, accounts: [account], included: false });
       }
       else {
         obj.users[userIndex].accounts.push(account);
