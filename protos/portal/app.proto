@@ -82,10 +82,15 @@ message SelectOption {
 }
 
 message AppCustomAttribute {
-  string type = 1;
+  enum AttributeType {
+    number = 0;
+    text = 1;
+    select = 2;
+  }
+  AttributeType type = 1;
   string label = 2;
   string key = 3;
-  repeated SelectOption select = 4;
+  repeated SelectOption options = 4;
 }
 
 message GetAppAttributesResponse {

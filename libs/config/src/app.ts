@@ -53,7 +53,7 @@ export const AppConfigSchema = Type.Object({
   vnc: Type.Optional(VncAppConfigSchema),
   attributes: Type.Optional(Type.Array(
     Type.Object({
-      type: Type.String({ description: "表单类型" }),
+      type:  Type.Enum({ number: "number", text: "text", select: "select" }, { description: "表单类型" }),
       label: Type.String({ description: "表单标签" }),
       key: Type.String({ description: "表单key" }),
       select: Type.Array(

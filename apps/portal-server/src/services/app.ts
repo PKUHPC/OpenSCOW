@@ -6,6 +6,7 @@ import { getClusterOps } from "src/clusterops";
 import { apps } from "src/config/apps";
 import {
   AppCustomAttribute,
+  AppCustomAttribute_AttributeType,
   AppServiceServer,
   AppServiceService,
   ConnectToAppResponse,
@@ -125,8 +126,20 @@ export const appServiceServer = plugin((server) => {
       if (!app) {
         throw <ServiceError> { code: Status.NOT_FOUND, message: `app id ${appId} is not found` };
       }
+      const attributes: AppCustomAttribute[] = [];
+      if (app.attributes) {
+        app.attributes.forEach((item) => {
+          attributes.push({
+            type: item.type === "number"
+              ? AppCustomAttribute_AttributeType.number : item.type === "select"
+                ? AppCustomAttribute_AttributeType.select : AppCustomAttribute_AttributeType.text,
+            label: item.label,
+            key: item.key,
+            options: item.select,
+          });
+        });
+      }
 
-      const attributes: AppCustomAttribute[] = app.attributes ?? [];
       return [{ attributes: attributes }];
     },
   });
