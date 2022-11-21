@@ -2,7 +2,7 @@ FROM alpine:3.17
 
 ENV TZ Asia/Shanghai
 
-RUN apk add --no-cache openssh=9.0_p1-r2
+RUN apk add --no-cache openssh=9.1_p1-r1
 
 COPY ./entry.sh /entry.sh
 
