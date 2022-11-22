@@ -1,4 +1,4 @@
-import { Space } from "antd";
+import { Typography } from "antd";
 import React from "react";
 import { RefreshLink } from "src/utils/refreshToken";
 import styled from "styled-components";
@@ -10,11 +10,6 @@ const Container = styled.div`
   justify-content: space-between;
 `;
 
-export const TitleText = styled.h1`
-  font-weight: 700;
-  font-size: 16px;
-`;
-
 type PageTitleProps = React.PropsWithChildren<{
   beforeTitle?: React.ReactNode;
   titleText: React.ReactNode;
@@ -22,6 +17,11 @@ type PageTitleProps = React.PropsWithChildren<{
   reload?: () => void;
 }>;
 
+export const TitleText = styled(Typography.Title)`
+  && {
+    font-size: 28px;
+  }
+`;
 
 export const PageTitle: React.FC<PageTitleProps> = ({
   beforeTitle, titleText, reload, children,
@@ -29,15 +29,11 @@ export const PageTitle: React.FC<PageTitleProps> = ({
   return (
     <Container>
       <TitleText>
-        <Space>
-          {beforeTitle}
-          {titleText}
-        </Space>
+        {beforeTitle}
+        {titleText}
       </TitleText>
       {children}
-      { reload
-        ? <RefreshLink refresh={reload} />
-        : undefined}
+      { reload ? <RefreshLink refresh={reload} /> : undefined}
     </Container>
   );
 

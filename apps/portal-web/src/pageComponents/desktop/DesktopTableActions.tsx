@@ -37,7 +37,7 @@ export const DesktopTableActions: React.FC<Props> = ({ cluster, reload, record }
 
         <Popconfirm
           title="删除后不可恢复，你确定要删除吗?"
-          visible={isPopconfirmVisible}
+          open={isPopconfirmVisible}
           onConfirm={async () => {
             setIsPopconfirmVisible(false);
 

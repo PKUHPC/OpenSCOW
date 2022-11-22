@@ -1,4 +1,4 @@
-import { Divider } from "antd";
+import { Divider, Typography } from "antd";
 import { join } from "path";
 import React from "react";
 import { publicConfig } from "src/utils/config";
@@ -27,11 +27,11 @@ const TitleAndText = styled.div`
   flex-direction: column;
 `;
 
-const Title = styled.h1`
+const Title = styled(Typography.Title)`
   align-self: center;
 `;
 
-const Text = styled.p`
+const Text = styled(Typography.Paragraph)`
   text-indent: 2rem ;
 `;
 

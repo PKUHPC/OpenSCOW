@@ -2,26 +2,26 @@ import { Button, ButtonProps } from "antd";
 import React, { useState } from "react";
 
 export interface CommonModalProps {
- visible: boolean;
+ open: boolean;
  onClose: () => void;
 }
 
 export const ModalLink = <T,>(
   ModalComponent: React.ComponentType<CommonModalProps & T>,
 ) => (props: React.PropsWithChildren<Omit<T, keyof CommonModalProps>>) => {
-    const [visible, setVisible] = useState(false);
+    const [open, setOpen] = useState(false);
     const { children, ...rest } = props;
 
     return (
       <>
-        <a onClick={() => setVisible(true)}>
+        <a onClick={() => setOpen(true)}>
           {children}
         </a>
         {/** @ts-ignore */}
         <ModalComponent
-          visible={visible}
+          open={open}
           onClose={() => {
-            setVisible(false);
+            setOpen(false);
           }}
           {...rest}
         />
@@ -35,19 +35,19 @@ export const ModalButton = <T,>(
   ModalComponent: React.ComponentType<CommonModalProps & T>,
   buttonProps?: ButtonProps,
 ) => (props: React.PropsWithChildren<Omit<T, keyof CommonModalProps>>) => {
-    const [visible, setVisible] = useState(false);
+    const [open, setOpen] = useState(false);
     const { children, ...rest } = props;
 
     return (
       <>
-        <Button onClick={() => setVisible(true)} {...buttonProps}>
+        <Button onClick={() => setOpen(true)} {...buttonProps}>
           {children}
         </Button>
         {/** @ts-ignore */}
         <ModalComponent
-          visible={visible}
+          open={open}
           onClose={() => {
-            setVisible(false);
+            setOpen(false);
           }}
           {...rest}
         />

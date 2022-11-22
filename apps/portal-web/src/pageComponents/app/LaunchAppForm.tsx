@@ -1,9 +1,10 @@
-import { Button, Form, Input, InputNumber, message, Select } from "antd";
+import { Button, Form, Input, InputNumber, Select } from "antd";
 import Router from "next/router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
+import { useMessage } from "src/layouts/prompts";
 import { AccountSelector } from "src/pageComponents/job/AccountSelector";
 import { Cluster, publicConfig } from "src/utils/config";
 import { firstPartition, getPartitionInfo } from "src/utils/jobForm";
@@ -30,6 +31,8 @@ const initialValues = {
 
 
 export const LaunchAppForm: React.FC<Props> = ({ appId }) => {
+
+  const message = useMessage();
 
   const { data } = useAsync({
     promiseFn: useCallback(async () => {

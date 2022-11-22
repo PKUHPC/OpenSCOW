@@ -5,7 +5,8 @@ import { EditorState } from "@codemirror/state";
 import { EditorView } from "@codemirror/view";
 import { basicSetup } from "codemirror";
 import { useEffect, useRef } from "react";
-import styled from "styled-components";
+import { useDarkMode } from "src/layouts/darkMode";
+import styled, { useTheme } from "styled-components";
 
 interface Props {
   value?: string;
@@ -14,8 +15,8 @@ interface Props {
 }
 
 const Container = styled.div`
-  border: 1px solid #d9d9d9;
-  border-radius: 2px;
+  border: 1px solid ${({ theme }) => theme.token.colorBorder};
+  border-radius: ${({ theme }) => theme.token.borderRadius};
 `;
 
 export const CodeEditor: React.FC<Props> = ({ value, onChange, height = "" }) => {
@@ -30,6 +31,9 @@ export const CodeEditor: React.FC<Props> = ({ value, onChange, height = "" }) =>
       onChange(value);
     }
   });
+
+  const { token } = useTheme();
+  const { dark } = useDarkMode();
 
   useEffect(() => {
     const state = EditorState.create({
@@ -46,13 +50,12 @@ export const CodeEditor: React.FC<Props> = ({ value, onChange, height = "" }) =>
             fontFamily: "SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace",
           },
           "&.cm-focused": {
-            borderColor: "var(--ant-primary-color-hover)",
-            boxShadow: "0 0 0 2px var(--ant-primary-color-outline)",
+            borderColor: token.colorBorder,
+            boxShadow: token.boxShadow,
             outline: "none !important",
             zIndex: "1",
           },
-        }),
-        // oneDark,
+        }, { dark }),
       ],
 
     });
@@ -63,7 +66,7 @@ export const CodeEditor: React.FC<Props> = ({ value, onChange, height = "" }) =>
     return () => {
       view.current?.destroy();
     };
-  }, []);
+  }, [token, dark]);
 
   useEffect(() => {
     const currentView = view.current;
@@ -75,7 +78,7 @@ export const CodeEditor: React.FC<Props> = ({ value, onChange, height = "" }) =>
         });
       }
     }
-  }, [value, view.current]);
+  }, [value, view.current, token]);
 
   return (
     <Container>

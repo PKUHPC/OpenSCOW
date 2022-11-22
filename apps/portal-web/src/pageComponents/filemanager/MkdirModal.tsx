@@ -1,10 +1,11 @@
-import { Form, Input, message, Modal } from "antd";
+import { Form, Input, Modal } from "antd";
 import { join } from "path";
 import { useState } from "react";
 import { api } from "src/apis";
+import { useMessage } from "src/layouts/prompts";
 
 interface Props {
-  visible: boolean;
+  open: boolean;
   onClose: () => void;
   reload: () => void;
   cluster: string;
@@ -15,7 +16,10 @@ interface FormProps {
   newFileName: string;
 }
 
-export const MkdirModal: React.FC<Props> = ({ visible, onClose, path, reload, cluster }) => {
+export const MkdirModal: React.FC<Props> = ({ open, onClose, path, reload, cluster }) => {
+
+  const message = useMessage();
+
   const [form] = Form.useForm<FormProps>();
   const [loading, setLoading] = useState(false);
 
@@ -35,7 +39,7 @@ export const MkdirModal: React.FC<Props> = ({ visible, onClose, path, reload, cl
 
   return (
     <Modal
-      visible={visible}
+      open={open}
       title="创建目录"
       okText={"确认"}
       cancelText="取消"

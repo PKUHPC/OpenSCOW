@@ -19,9 +19,10 @@ const Bar = styled.div`
 `;
 
 const BarStateBar = styled(Bar)`
-  border: 1px solid #d9d9d9;
-  border-radius: 2px;
-  padding-left: 8px;
+  border: 1px solid ${({ theme }) => theme.token.colorBorder};
+  border-radius: ${({ theme }) => theme.token.borderRadius}px;
+  padding: 0 8px;
+  margin: 0 4px;
 `;
 
 export const PathBar: React.FC<Props> = ({ path, loading, reload, go, fullUrl }) => {
