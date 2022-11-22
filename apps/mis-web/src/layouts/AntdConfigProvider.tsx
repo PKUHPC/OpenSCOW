@@ -30,7 +30,7 @@ export const AntdConfigProvider: React.FC<Props> = ({ children, color }) => {
   return (
     <ConfigProvider
       locale={zhCNlocale}
-      theme={{ token: { colorPrimary: color }, algorithm: dark ? theme.darkAlgorithm : undefined }}
+      theme={{ token: { colorPrimary: color, colorInfo: color }, algorithm: dark ? theme.darkAlgorithm : undefined }}
     >
       <StyledComponentsThemeProvider color={color}>
         <MessageProvider>
