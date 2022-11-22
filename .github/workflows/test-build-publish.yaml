@@ -95,7 +95,7 @@ jobs:
 
           - name: mis-web-demo
             file: mis-web
-            build_args: BASE_PATH=/demo/scow
+            build_args: BASE_PATH=/demo/scow/mis
 
           - name: portal-web-root
             file: portal-web
