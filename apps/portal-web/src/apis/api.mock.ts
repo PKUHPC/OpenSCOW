@@ -78,9 +78,9 @@ export const mockApi: MockApi<typeof api> = {
   ]}),
 
   getAppAttributes: async () => ({ appCustomFormAttributes: [
-    { type: "number", label: "版本", key: "version", select: []},
-    { type: "text", label: "文字 ", key: "text", select: []},
-    { type: "select", label: "选项", key: "option", select: [
+    { type: "number", label: "版本", name: "version", select: []},
+    { type: "text", label: "文字 ", name: "text", select: []},
+    { type: "select", label: "选项", name: "option", select: [
       { key: "v1", value: "version1" },
       { key: "v2", value: "version2" },
     ]},
