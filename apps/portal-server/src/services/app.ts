@@ -134,7 +134,7 @@ export const appServiceServer = plugin((server) => {
               ? AppCustomAttribute_AttributeType.number : item.type === "select"
                 ? AppCustomAttribute_AttributeType.select : AppCustomAttribute_AttributeType.text,
             label: item.label,
-            key: item.key,
+            name: item.name,
             options: item.select,
           });
         });

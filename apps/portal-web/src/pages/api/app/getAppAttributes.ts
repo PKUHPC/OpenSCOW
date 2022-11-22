@@ -14,7 +14,7 @@ export interface SelectOption {
 export interface AppCustomAttribute {
   type: "text" | "number" | "select";
   label: string;
-  key: string;
+  name: string;
   select: SelectOption[];
 }
 
@@ -59,7 +59,7 @@ export default /* #__PURE__*/route<GetAppAttributesSchema>("GetAppAttributesSche
           ? "number" : item.type === AppCustomAttribute_AttributeType.select
             ? "select" : "text",
         label: item.label,
-        key: item.key,
+        name: item.name,
         select: item.options,
       });
     });

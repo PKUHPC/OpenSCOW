@@ -89,7 +89,7 @@ message AppCustomAttribute {
   }
   AttributeType type = 1;
   string label = 2;
-  string key = 3;
+  string name = 3;
   repeated SelectOption options = 4;
 }
 

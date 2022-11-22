@@ -55,7 +55,7 @@ export const AppConfigSchema = Type.Object({
     Type.Object({
       type:  Type.Enum({ number: "number", text: "text", select: "select" }, { description: "表单类型" }),
       label: Type.String({ description: "表单标签" }),
-      key: Type.String({ description: "表单key" }),
+      name: Type.String({ description: "表单name" }),
       select: Type.Array(
         Type.Object({
           key: Type.String({ description: "表单选项key" }),

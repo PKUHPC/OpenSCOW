@@ -86,12 +86,12 @@ export const slurmAppOps = (cluster: string): AppOps => {
         };
 
         if (appConfig.type === "web") {
-          let beforeScript: string = appConfig.web!.beforeScript ?? "";
+          let beforeScript: string = "";
           for (const key in customAttributes) {
-            beforeScript = beforeScript + "\n" + "export " + key + "=" + customAttributes[key];
+            beforeScript = beforeScript + "export " + key + "=" + customAttributes[key] + "\n";
           }
+          beforeScript = beforeScript + appConfig.web!.beforeScript;
           await sftpWriteFile(sftp)(join(workingDirectory, "before.sh"), beforeScript);
-
 
           await sftpWriteFile(sftp)(join(workingDirectory, "script.sh"), appConfig.web!.script);
 

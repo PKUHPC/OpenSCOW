@@ -19,20 +19,18 @@ web:
     formData:
       password: "{PASSWORD}"
 
-
-
 attributes:
   - type: text
-    key: version
+    name: version
     label: 版本
   - type: number
-    key: size
+    name: size
     label: 数量
   - type: select
-    key: selectVersion
+    name: selectVersion
     label: 选择版本
     select:
-      - key: v10
+      - key: 10
         value: v10
-      - key: v11
+      - key: 11
         value: v11

@@ -50,7 +50,7 @@ export const LaunchAppForm: React.FC<Props> = ({ appId }) => {
     const customFormKeyValue: {[key: string]: string} = {};
     if (data) {
       data.forEach((customFormAttribute) => {
-        const customFormKey = customFormAttribute.key;
+        const customFormKey = customFormAttribute.name;
         customFormKeyValue[customFormKey] = allFormFields[customFormKey];
       });
     }
@@ -111,9 +111,9 @@ export const LaunchAppForm: React.FC<Props> = ({ appId }) => {
     if (item.type === "number") {
       return (
         <Form.Item
-          key={`${item.key}+${index}`}
+          key={`${item.name}+${index}`}
           label={item.label}
-          name={item.key}
+          name={item.name}
           rules={[
             { required: true, type: "integer" },
           ]}
@@ -124,9 +124,9 @@ export const LaunchAppForm: React.FC<Props> = ({ appId }) => {
     } else if (item.type === "text") {
       return (
         <Form.Item
-          key={`${item.key}+${index}`}
+          key={`${item.name}+${index}`}
           label={item.label}
-          name={item.key}
+          name={item.name}
           rules={[{ required: true }]}
         >
           <Input />
@@ -135,9 +135,9 @@ export const LaunchAppForm: React.FC<Props> = ({ appId }) => {
     } else {
       return (
         <Form.Item
-          key={`${item.key}+${index}`}
+          key={`${item.name}+${index}`}
           label={item.label}
-          name={item.key}
+          name={item.name}
           rules={[{ required: true }]}
         >
           <Select
