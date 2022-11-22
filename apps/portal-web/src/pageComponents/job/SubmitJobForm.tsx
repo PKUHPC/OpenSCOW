@@ -1,6 +1,6 @@
 import { ReloadOutlined } from "@ant-design/icons";
 import { parsePlaceholder } from "@scow/lib-config/build/parse";
-import { Button, Checkbox, Col, Form, Input, InputNumber, message, Modal, Row, Select, Tooltip } from "antd";
+import { Button, Checkbox, Col, Form, Input, InputNumber, Modal, Row, Select, Tooltip } from "antd";
 import Router from "next/router";
 import randomWords from "random-words";
 import React, { useEffect, useMemo, useState } from "react";
@@ -8,6 +8,7 @@ import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { CodeEditor } from "src/components/CodeEditor";
 import { InputGroupFormItem } from "src/components/InputGroupFormItem";
+import { useMessage } from "src/layouts/prompts";
 import { AccountSelector } from "src/pageComponents/job/AccountSelector";
 import { Cluster, publicConfig } from "src/utils/config";
 import { firstPartition, getPartitionInfo } from "src/utils/jobForm";
@@ -44,6 +45,7 @@ interface Props {
 }
 
 export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
+  const message = useMessage();
 
   const [form] = Form.useForm<JobForm>();
   const [loading, setLoading] = useState(false);

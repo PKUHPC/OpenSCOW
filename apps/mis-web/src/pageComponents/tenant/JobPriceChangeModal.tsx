@@ -1,6 +1,7 @@
-import { Form, Input, InputNumber, message, Modal } from "antd";
+import { Form, Input, InputNumber, Modal } from "antd";
 import { useState } from "react";
 import { api } from "src/apis";
+import { useMessage } from "src/layouts/prompts";
 import type { GetJobFilter } from "src/pages/api/job/jobInfo";
 import { handleClusteropsErrorInUi } from "src/utils/internalError";
 
@@ -26,6 +27,8 @@ const text = {
 export const JobPriceChangeModal: React.FC<Props> = ({ visible, onClose, jobCount, filter, target, reload }) => {
   const [form] = Form.useForm<FormProps>();
   const [loading, setLoading] = useState(false);
+
+  const message = useMessage();
 
   return (
     <Modal

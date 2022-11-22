@@ -1,4 +1,4 @@
-import { Badge, Descriptions, message, Space, Spin } from "antd";
+import { Badge, Descriptions, Space, Spin } from "antd";
 import { NextPage } from "next";
 import { useState } from "react";
 import { useAsync } from "react-async";
@@ -6,6 +6,7 @@ import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { DisabledA } from "src/components/DisabledA";
 import { PageTitle } from "src/components/PageTitle";
+import { useMessage } from "src/layouts/prompts";
 import { PlatformRole } from "src/models/User";
 import { formatDateTime } from "src/utils/datetime";
 import { Head } from "src/utils/head";
@@ -19,6 +20,8 @@ export const FetchJobsInfoPage: NextPage = requireAuth((u) => u.platformRoles.in
     const { isLoading, data, reload } = useAsync({
       promiseFn,
     });
+
+    const message = useMessage();
 
     const [fetching, setFetching] = useState(false);
     const [changingState, setChangingState] = useState(false);

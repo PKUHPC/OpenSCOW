@@ -1,11 +1,11 @@
 import { ExclamationCircleOutlined } from "@ant-design/icons";
-import { Button, Divider, Form, Input, message, Space, Table } from "antd";
+import { Button, Divider, Form, Input, Space, Table } from "antd";
 import React, { useMemo, useState } from "react";
 import { api } from "src/apis";
 import { ChangePasswordModalLink } from "src/components/ChangePasswordModal";
 import { DisabledA } from "src/components/DisabledA";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
-import { useModal } from "src/layouts/prompts";
+import { useMessage, useModal } from "src/layouts/prompts";
 import { FullUserInfo, TenantRole } from "src/models/User";
 import { GetTenantUsersSchema } from "src/pages/api/admin/getTenantUsers";
 import { User } from "src/stores/UserStore";
@@ -28,6 +28,7 @@ export const AdminUserTable: React.FC<Props> = ({
 }) => {
 
   const modal = useModal();
+  const message = useMessage();
 
   const [form] = Form.useForm<FilterForm>();
 

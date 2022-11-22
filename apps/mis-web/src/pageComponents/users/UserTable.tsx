@@ -1,11 +1,11 @@
 import { ExclamationCircleOutlined } from "@ant-design/icons";
-import { Divider, message, Space, Table, Tag } from "antd";
+import { Divider, Space, Table, Tag } from "antd";
 import { LinkProps } from "next/link";
 import React from "react";
 import { api } from "src/apis";
 import { DisabledA } from "src/components/DisabledA";
 import type { AccountUserInfo } from "src/generated/server/user";
-import { useModal } from "src/layouts/prompts";
+import { useMessage, useModal } from "src/layouts/prompts";
 import { UserRole, UserStatus } from "src/models/User";
 import { SetJobChargeLimitLink } from "src/pageComponents/users/JobChargeLimitModal";
 import { GetAccountUsersSchema } from "src/pages/api/users";
@@ -37,6 +37,7 @@ export const UserTable: React.FC<Props> = ({
 }) => {
 
   const modal = useModal();
+  const message = useMessage();
 
   return (
     <Table

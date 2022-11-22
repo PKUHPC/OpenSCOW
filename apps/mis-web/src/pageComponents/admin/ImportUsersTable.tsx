@@ -1,4 +1,4 @@
-import { Button, Checkbox, Form, Input, message, Select, Table, Tabs, Tooltip } from "antd";
+import { Button, Checkbox, Form, Input, Select, Table, Tabs, Tooltip } from "antd";
 import Router from "next/router";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useAsync } from "react-async";
@@ -6,13 +6,14 @@ import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { ClusterAccountInfo, ClusterUserInfo, GetClusterUsersReply, ImportUsersData } from "src/generated/server/admin";
+import { useMessage } from "src/layouts/prompts";
 import { publicConfig } from "src/utils/config";
 import { queryToString, useQuerystring } from "src/utils/querystring";
 
 export const ImportUsersTable: React.FC = () => {
+  const message = useMessage();
 
   const qs = useQuerystring();
-
   const clusterParam = queryToString(qs.cluster);
   const cluster = (publicConfig.CLUSTERS[clusterParam]
     ? publicConfig.CLUSTERS[clusterParam]

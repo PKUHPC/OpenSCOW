@@ -6,6 +6,7 @@ import { Centered } from "src/components/layouts";
 import { Account } from "src/generated/server/account";
 import { AccountAffiliation, User } from "src/generated/server/user";
 import { FormLayout } from "src/layouts/FormLayout";
+import { useMessage } from "src/layouts/prompts";
 import { PlatformRole, PlatformRoleTexts, TenantRole, TenantRoleTexts, UserRole, UserRoleTexts } from "src/models/User";
 
 interface DataTableProps<T> {
@@ -21,6 +22,7 @@ interface PlatformRoleSelectorProps {
 }
 
 const PlatformRoleSelector: React.FC<PlatformRoleSelectorProps> = ({ role, userId, reload }) => {
+  const message = useMessage();
 
   const [loading, setLoading] = useState(false);
   const roleTexts: string[] = role.map((r) => PlatformRoleTexts[r]);

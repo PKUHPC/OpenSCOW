@@ -1,6 +1,7 @@
-import { Form, message, Modal } from "antd";
+import { Form, Modal } from "antd";
 import React, { useState } from "react";
 import { api } from "src/apis";
+import { useMessage } from "src/layouts/prompts";
 import { CreateUserForm, CreateUserFormFields } from "src/pageComponents/users/CreateUserForm";
 
 interface Props {
@@ -13,6 +14,8 @@ export const CreateUserModal: React.FC<Props> = ({
 }) => {
   const [form] = Form.useForm<CreateUserFormFields>();
   const [loading, setLoading] = useState(false);
+
+  const message = useMessage();
 
   const onOk = async () => {
     const { password, email, identityId, name } = await form.validateFields();

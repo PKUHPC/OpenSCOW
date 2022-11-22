@@ -1,7 +1,8 @@
 import { PlusOutlined } from "@ant-design/icons";
-import { Button, Form, Input, message, Modal } from "antd";
+import { Button, Form, Input, Modal } from "antd";
 import React, { useState } from "react";
 import { api } from "src/apis";
+import { useMessage } from "src/layouts/prompts";
 import { handleClusteropsErrorInUi } from "src/utils/internalError";
 
 interface FormProps {
@@ -18,6 +19,8 @@ interface ModalProps {
 const NewAccountModal: React.FC<ModalProps> = ({
   visible, close, refresh,
 }) => {
+
+  const message = useMessage();
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm<FormProps>();
 

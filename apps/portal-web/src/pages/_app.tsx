@@ -2,7 +2,6 @@ import "nprogress/nprogress.css";
 import "antd/dist/reset.css";
 
 import { failEvent, fromApi } from "@ddadaal/next-typed-api-routes-runtime/lib/client";
-import { message } from "antd";
 import type { AppContext, AppProps } from "next/app";
 import App from "next/app";
 import dynamic from "next/dynamic";
@@ -15,6 +14,7 @@ import { getTokenFromCookie } from "src/auth/cookie";
 import { AntdConfigProvider } from "src/layouts/AntdConfigProvider";
 import { BaseLayout } from "src/layouts/base/BaseLayout";
 import { DarkModeProvider } from "src/layouts/darkMode";
+import { useMessage } from "src/layouts/prompts";
 import { ValidateTokenSchema } from "src/pages/api/auth/validateToken";
 import {
   User, UserStore,
@@ -27,6 +27,7 @@ import useConstant from "src/utils/useConstant";
 
 
 const FailEventHandler: React.FC = () => {
+  const message = useMessage();
   const userStore = useStore(UserStore);
 
   // 登出过程需要调用的几个方法（logout, useState等）都是immutable的

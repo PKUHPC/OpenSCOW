@@ -1,8 +1,9 @@
-import { Alert, Button, Form, message, Typography } from "antd";
+import { Alert, Button, Form, Typography } from "antd";
 import { useState } from "react";
 import { api } from "src/apis";
 import { Centered } from "src/components/layouts";
 import { FormLayout } from "src/layouts/FormLayout";
+import { useMessage } from "src/layouts/prompts";
 import { CreateUserForm, CreateUserFormFields } from "src/pageComponents/users/CreateUserForm";
 import styled from "styled-components";
 
@@ -14,6 +15,8 @@ const AlertContainer = styled.div`
 
 export const InitAdminForm: React.FC = () => {
   const [form] = Form.useForm<FormFields>();
+
+  const message = useMessage();
 
   const [loading, setLoading] = useState(false);
   const onFinish = async () => {

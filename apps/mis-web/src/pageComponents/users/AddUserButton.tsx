@@ -2,6 +2,7 @@ import { PlusOutlined } from "@ant-design/icons";
 import { Button, Form, Input, message, Modal } from "antd";
 import React, { useState } from "react";
 import { api } from "src/apis";
+import { useMessage } from "src/layouts/prompts";
 import { CreateUserModal } from "src/pageComponents/users/CreateUserModal";
 import { publicConfig } from "src/utils/config";
 import { handleClusteropsErrorInUi } from "src/utils/internalError";
@@ -25,6 +26,8 @@ const NewUserModal: React.FC<ModalProps> = ({
 }) => {
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm<FormProps>();
+
+  const message = useMessage();
 
   const onOk = async () => {
     setLoading(true);

@@ -1,5 +1,5 @@
 import { HttpError } from "@ddadaal/next-typed-api-routes-runtime";
-import { Button, DatePicker, Divider, Form, Input, InputNumber, message, Select, Table } from "antd";
+import { Button, DatePicker, Divider, Form, Input, InputNumber, Select, Table } from "antd";
 import dayjs from "dayjs";
 import React, { useCallback, useRef, useState } from "react";
 import { useAsync } from "react-async";
@@ -9,6 +9,7 @@ import { FilterFormContainer, FilterFormTabs } from "src/components/FilterFormCo
 import { TableTitle } from "src/components/TableTitle";
 import { Money } from "src/generated/common/money";
 import { JobInfo } from "src/generated/server/job";
+import { useMessage } from "src/layouts/prompts";
 import { HistoryJobDrawer } from "src/pageComponents/job/HistoryJobDrawer";
 import type { GetJobInfoSchema } from "src/pages/api/job/jobInfo";
 import type { Cluster } from "src/utils/config";
@@ -40,6 +41,8 @@ export const JobTable: React.FC<Props> = ({
   userId, accountNames, filterAccountName = true, filterUser = true,
   showAccount, showUser, showedPrices, priceTexts,
 }) => {
+
+  const message = useMessage();
 
   const rangeSearch = useRef(true);
 

@@ -1,9 +1,9 @@
 import { ExclamationCircleOutlined } from "@ant-design/icons";
-import { Divider, message, Space, Table } from "antd";
+import { Divider, Space, Table } from "antd";
 import React from "react";
 import { api } from "src/apis";
 import { WhitelistedAccount } from "src/generated/server/account";
-import { useModal } from "src/layouts/prompts";
+import { useMessage, useModal } from "src/layouts/prompts";
 import type {
   GetWhitelistedAccountsSchema } from "src/pages/api/tenant/accountWhitelist/getWhitelistedAccounts";
 import { formatDateTime } from "src/utils/datetime";
@@ -20,6 +20,7 @@ export const AccountWhitelistTable: React.FC<Props> = ({
 }) => {
 
   const modal = useModal();
+  const message = useMessage();
 
   return (
     <Table

@@ -1,10 +1,10 @@
 import { ExclamationCircleOutlined } from "@ant-design/icons";
-import { Form, InputNumber, message, Modal, Space } from "antd";
+import { Form, InputNumber, Modal, Space } from "antd";
 import { useState } from "react";
 import { api } from "src/apis";
 import { ModalLink } from "src/components/ModalLink";
 import type { Money } from "src/generated/common/money";
-import { useModal } from "src/layouts/prompts";
+import { useMessage, useModal } from "src/layouts/prompts";
 import { moneyToString } from "src/utils/money";
 
 interface Props {
@@ -29,6 +29,7 @@ export const JobChargeLimitModal: React.FC<Props> = ({
   const [loading, setLoading] = useState(false);
 
   const modal = useModal();
+  const message = useMessage();
 
   const onOk = async () => {
     const { limit } = await form.validateFields();
