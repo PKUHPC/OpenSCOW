@@ -93,6 +93,10 @@ jobs:
             file: mis-web
             build_args: BASE_PATH=/mis
 
+          - name: mis-web-demo
+            file: mis-web
+            build_args: BASE_PATH=/demo/scow/mis
+
           - name: portal-web-root
             file: portal-web
             build_args: BASE_PATH=
@@ -100,6 +104,10 @@ jobs:
           - name: portal-web-portal
             file: portal-web
             build_args: BASE_PATH=/portal
+
+          - name: portal-web-demo
+            file: portal-web
+            build_args: BASE_PATH=/demo/scow
 
     steps:
       - uses: actions/checkout@v3
