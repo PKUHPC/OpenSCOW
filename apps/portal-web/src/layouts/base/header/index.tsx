@@ -87,9 +87,6 @@ export const Header: React.FC<Props> = ({
         />
         <MenuPartPlaceholder />
       </MenuPart>
-      <MenuPart>
-        <MenuPartPlaceholder />
-      </MenuPart>
       {
         publicConfig.MIS_URL ? (
           <HeaderItem>
