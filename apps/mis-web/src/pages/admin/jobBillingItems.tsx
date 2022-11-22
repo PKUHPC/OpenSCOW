@@ -1,5 +1,4 @@
 import { Button, Checkbox, Form, Space } from "antd";
-import { useWatch } from "antd/lib/form/Form";
 import { NextPage } from "next";
 import Link from "next/link";
 import { useCallback } from "react";
@@ -21,8 +20,8 @@ interface FilterForm {
 const AdminJobBillingManagementTable: React.FC = () => {
   const [form] = Form.useForm<FilterForm>();
 
-  const tenant = useWatch("tenant", form);
-  const activeOnly = useWatch("activeOnly", form) ?? true;
+  const tenant = Form.useWatch("tenant", form);
+  const activeOnly = Form.useWatch("activeOnly", form) ?? true;
 
   const { data, isLoading, reload } = useAsync({ promiseFn: useCallback(async () => {
     return await api.getBillingItems({ query: { tenant, activeOnly } });

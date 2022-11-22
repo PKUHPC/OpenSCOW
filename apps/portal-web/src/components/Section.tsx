@@ -1,3 +1,4 @@
+import { Typography } from "antd";
 import React from "react";
 import styled from "styled-components";
 
@@ -16,9 +17,11 @@ const Title = styled.div`
   justify-content: space-between;
 `;
 
-const TitleText = styled.h3`
+const TitleText = styled(Typography.Title)`
+&& {
   font-weight: 700;
-  font-size: 16px;
+  font-size: 24px;
+}
 `;
 
 export const Section: React.FC<Props> = ({ title, extra, children, className }) => {

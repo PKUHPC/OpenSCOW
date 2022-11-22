@@ -1,11 +1,12 @@
-import { Form, Input, InputNumber, message, Modal } from "antd";
+import { Form, Input, InputNumber, Modal } from "antd";
 import { useState } from "react";
 import { api } from "src/apis";
+import { useMessage } from "src/layouts/prompts";
 import type { GetJobFilter } from "src/pages/api/job/jobInfo";
 import { handleClusteropsErrorInUi } from "src/utils/internalError";
 
 interface Props {
-  visible: boolean;
+  open: boolean;
   onClose: () => void;
   jobCount: number;
   filter: GetJobFilter;
@@ -23,13 +24,15 @@ const text = {
   "tenant": "平台计费",
 };
 
-export const JobPriceChangeModal: React.FC<Props> = ({ visible, onClose, jobCount, filter, target, reload }) => {
+export const JobPriceChangeModal: React.FC<Props> = ({ open, onClose, jobCount, filter, target, reload }) => {
   const [form] = Form.useForm<FormProps>();
   const [loading, setLoading] = useState(false);
 
+  const message = useMessage();
+
   return (
     <Modal
-      visible={visible}
+      open={open}
       title={`修改作业${text[target]}`}
       okText={`修改${text[target]}`}
       cancelText="取消"

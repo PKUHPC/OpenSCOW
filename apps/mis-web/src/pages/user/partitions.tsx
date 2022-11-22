@@ -1,5 +1,5 @@
 import type { ClusterTextsConfigSchema } from "@scow/config/build/clusterTexts";
-import { Divider } from "antd";
+import { Divider, Typography } from "antd";
 import { GetServerSideProps, NextPage } from "next";
 import { checkCookie } from "src/auth/server";
 import { JobBillingTable, JobBillingTableItem } from "src/components/JobBillingTable";
@@ -16,13 +16,13 @@ interface Props {
   text: ValueOf<ClusterTextsConfigSchema> | undefined;
 }
 
-const ClusterCommentTitle = styled.h2`
+const ClusterCommentTitle = styled(Typography.Title)`
   padding-top: 8px;
   font-weight: 600;
   font-size: 16px;
 `;
 
-const ContentContainer = styled.p`
+const ContentContainer = styled(Typography.Paragraph)`
   white-space: pre-line;
 `;
 
@@ -36,7 +36,7 @@ export const PartitionsPage: NextPage<Props> = ({ items, text }) => {
       {
         text?.clusterComment ? (
           <div>
-            <ClusterCommentTitle>说明</ClusterCommentTitle>
+            <ClusterCommentTitle level={2}>说明</ClusterCommentTitle>
             <ContentContainer>{text.clusterComment}</ContentContainer>
           </div>
         ) : undefined

@@ -51,6 +51,8 @@ const buildRuntimeConfig = async (phase) => {
     require("dotenv").config({ path: "env/.env.dev" });
   }
 
+  const config = envConfig(specs, process.env);
+
   // query auth capabilities to set optional auth features
   const capabilities = await queryCapabilities(config.AUTH_INTERNAL_URL, phase);
 
@@ -76,6 +78,7 @@ const buildRuntimeConfig = async (phase) => {
     DEFAULT_PRIMARY_COLOR,
     SERVER_URL: config.SERVER_URL,
   };
+
 
   const portalUrlSetting = config.PORTAL_URL || misConfig.portalUrl;
 

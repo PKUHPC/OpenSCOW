@@ -1,8 +1,9 @@
-import { Button, Form, InputNumber, message, Select } from "antd";
+import { Button, Form, InputNumber, Select } from "antd";
 import Router from "next/router";
 import { useEffect, useMemo, useState } from "react";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
+import { useMessage } from "src/layouts/prompts";
 import { AccountSelector } from "src/pageComponents/job/AccountSelector";
 import { Cluster, publicConfig } from "src/utils/config";
 import { firstPartition, getPartitionInfo } from "src/utils/jobForm";
@@ -29,6 +30,8 @@ const initialValues = {
 
 
 export const LaunchAppForm: React.FC<Props> = ({ appId }) => {
+
+  const message = useMessage();
 
   const [form] = Form.useForm<FormFields>();
   const [loading, setLoading] = useState(false);

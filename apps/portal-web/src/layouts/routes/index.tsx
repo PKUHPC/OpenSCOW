@@ -11,7 +11,7 @@ import {
   PlusOutlined,
   SaveOutlined } from "@ant-design/icons";
 import React from "react";
-import { NavItemProps } from "src/layouts/NavItemProps";
+import { NavItemProps } from "src/layouts/base/NavItemProps";
 import { publicConfig } from "src/utils/config";
 
 export const userRoutes: () => NavItemProps[] = () => [

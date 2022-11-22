@@ -1,4 +1,4 @@
-import { Divider, message, Space } from "antd";
+import { Divider, Space } from "antd";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useCallback } from "react";
@@ -7,6 +7,7 @@ import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { BackButton } from "src/components/BackButton";
 import { PageTitle } from "src/components/PageTitle";
+import { useMessage } from "src/layouts/prompts";
 import { TenantRole } from "src/models/User";
 import { AddUserButton } from "src/pageComponents/users/AddUserButton";
 import { UserTable } from "src/pageComponents/users/UserTable";
@@ -18,6 +19,8 @@ export const AccountUsersPage: NextPage = requireAuth(
   (i) => i.tenantRoles.includes(TenantRole.TENANT_ADMIN),
 )(
   ({ userStore }) => {
+
+    const message = useMessage();
 
     const router = useRouter();
 

@@ -1,3 +1,4 @@
+import { Typography } from "antd";
 import { useCallback } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
@@ -13,7 +14,7 @@ export const EditJobPriceTableForm: React.FC = () => {
   return (
     <Centered>
       <div>
-        <p>您可以在这里设置默认作业价格表。未设置的将会以0元计费。</p>
+        <Typography.Paragraph>您可以在这里设置默认作业价格表。未设置的将会以0元计费。</Typography.Paragraph>
         <EditableJobBillingTable reload={reload} data={data} loading={isLoading} />
       </div>
     </Centered>
