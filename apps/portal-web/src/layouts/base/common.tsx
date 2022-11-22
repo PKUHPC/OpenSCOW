@@ -1,8 +1,8 @@
-import { ItemType } from "antd/lib/menu/hooks/useItems";
+import { ItemType } from "antd/es/menu/hooks/useItems";
 import Link from "next/link";
 import Router from "next/router";
-import { match } from "src/layouts/matchers";
-import { NavItemProps } from "src/layouts/NavItemProps";
+import { match } from "src/layouts/base/matchers";
+import { NavItemProps } from "src/layouts/base/NavItemProps";
 import { iconToNode } from "src/layouts/routes";
 import { arrayContainsElement } from "src/utils/array";
 
@@ -11,7 +11,7 @@ export function createMenuItems(
   parentClickable: boolean,
 ) {
 
-  function createMenuItem(route: NavItemProps) {
+  function createMenuItem(route: NavItemProps): ItemType {
     if (arrayContainsElement(route.children)) {
       return {
         icon: iconToNode(route.Icon),
@@ -36,13 +36,8 @@ export function createMenuItems(
       icon: iconToNode(route.Icon),
       key: route.path,
       label: (
-        <Link
-          href={route.clickToPath ?? route.path}
-          {...route.openInNewPage ? { target: "_blank" } : {}}
-        >
-
+        <Link href={route.clickToPath ?? route.path} {...route.openInNewPage ? { target: "_blank" } : {}}>
           {route.text}
-
         </Link>
       ),
     } as ItemType;

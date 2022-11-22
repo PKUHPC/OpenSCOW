@@ -1,20 +1,19 @@
-import { Layout } from "antd";
-import useBreakpoint from "antd/lib/grid/hooks/useBreakpoint";
+"use client";
+
+import { Grid, Layout } from "antd";
 import { useRouter } from "next/router";
 import React, { PropsWithChildren, useMemo, useState } from "react";
-import { Footer } from "src/layouts/Footer";
-import { Header } from "src/layouts/header";
-import { match } from "src/layouts/matchers";
+import { useStore } from "simstate";
+import { Footer } from "src/layouts/base/Footer";
+import { Header } from "src/layouts/base/header";
+import { match } from "src/layouts/base/matchers";
+import { SideNav } from "src/layouts/base/SideNav";
 import { userRoutes } from "src/layouts/routes";
-import { SideNav } from "src/layouts/SideNav";
+import { UserStore } from "src/stores/UserStore";
 import { arrayContainsElement } from "src/utils/array";
 import styled from "styled-components";
 // import logo from "src/assets/logo-no-text.svg";
-
-
-type Props = PropsWithChildren<{
-  footerText: string;
-}>;
+const { useBreakpoint } = Grid;
 
 const Root = styled.div`
   min-height: 100vh;
@@ -26,6 +25,7 @@ const ContentPart = styled.div`
   display: flex;
   flex: 1;
   flex-direction: column;
+  width: 100%;
   overflow-x: scroll;
 `;
 
@@ -33,23 +33,33 @@ const Content = styled(Layout.Content)`
   margin: 8px;
   padding: 16px;
   flex: 1;
-  background: white;
+  background: ${({ theme }) => theme.token.colorBgLayout};
 `;
 
 const StyledLayout = styled(Layout)`
+  position: relative;
 `;
 
+type Props = PropsWithChildren<{
+  footerText: string;
+}>;
 
-export const RootLayout: React.FC<Props> = ({ footerText, children }) => {
+export const BaseLayout: React.FC<PropsWithChildren<Props>> = ({ children, footerText }) => {
 
-  const allRoutes = useMemo(userRoutes, []);
+  const userStore = useStore(UserStore);
+
+  const allRoutes = useMemo(() => userRoutes(), []);
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
 
   const router = useRouter();
 
+  const logout = () => {
+    userStore.logout();
+  };
+
   // get the first level route
-  const firstLevelRoute = allRoutes.find((x) => match(x, router.pathname));
+  const firstLevelRoute = allRoutes.find((x) => match(x, router.asPath));
 
   const { md } = useBreakpoint();
 
@@ -60,19 +70,19 @@ export const RootLayout: React.FC<Props> = ({ footerText, children }) => {
   return (
     <Root>
       <Header
-        pathname={router.asPath}
-        navigate={router.push}
         setSidebarCollapsed={setSidebarCollapsed}
+        pathname={router.asPath}
         sidebarCollapsed={sidebarCollapsed}
         hasSidebar={hasSidebar}
         routes={allRoutes}
+        user={userStore.user}
+        logout={logout}
       />
       <StyledLayout>
         {
           hasSidebar ? (
             <SideNav
               pathname={router.asPath}
-              navigate={router.push}
               collapsed={sidebarCollapsed}
               routes={sidebarRoutes}
               setCollapsed={setSidebarCollapsed}
@@ -89,3 +99,4 @@ export const RootLayout: React.FC<Props> = ({ footerText, children }) => {
     </Root>
   );
 };
+

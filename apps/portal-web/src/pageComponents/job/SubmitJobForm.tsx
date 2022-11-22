@@ -1,7 +1,6 @@
 import { ReloadOutlined } from "@ant-design/icons";
 import { parsePlaceholder } from "@scow/lib-config/build/parse";
 import { Button, Checkbox, Col, Form, Input, InputNumber, message, Modal, Row, Select, Tooltip } from "antd";
-import { useWatch } from "antd/lib/form/Form";
 import Router from "next/router";
 import randomWords from "random-words";
 import React, { useEffect, useMemo, useState } from "react";
@@ -82,9 +81,9 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
       .finally(() => setLoading(false));
   };
 
-  const cluster = useWatch("cluster", form) as Cluster | undefined;
+  const cluster = Form.useWatch("cluster", form) as Cluster | undefined;
 
-  const partition = useWatch("partition", form) as string | undefined;
+  const partition = Form.useWatch("partition", form) as string | undefined;
 
   // set default
   useEffect(() => {

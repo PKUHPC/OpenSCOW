@@ -1,14 +1,11 @@
-import { ArrowRightOutlined, MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
+import { MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
 import { Space } from "antd";
-import { join } from "path";
 import React from "react";
-import { useStore } from "simstate";
-import { BigScreenMenu } from "src/layouts/header/BigScreenMenu";
-import { Logo } from "src/layouts/header/Logo";
-import { NavItemProps } from "src/layouts/NavItemProps";
-import { UserStore } from "src/stores/UserStore";
-import { antdBreakpoints } from "src/styles/constants";
-import { publicConfig } from "src/utils/config";
+import { antdBreakpoints } from "src/layouts/base/constants";
+import { BigScreenMenu } from "src/layouts/base/header/BigScreenMenu";
+import { Logo } from "src/layouts/base/header/Logo";
+import { NavItemProps } from "src/layouts/base/NavItemProps";
+import { User } from "src/stores/UserStore";
 import styled from "styled-components";
 
 import { UserIndicator } from "./UserIndicator";
@@ -20,9 +17,10 @@ interface ComponentProps {
 const Container = styled.header<ComponentProps>`
   display: flex;
   padding: 0 4px;
-  box-shadow: 0 2px 8px #f0f1f2;
+  box-shadow: ${({ theme }) => theme.token.boxShadow };
   z-index: 50;
   align-items: center;
+  background-color: ${({ theme }) => theme.token.colorBgContainer};
 `;
 
 const HeaderItem = styled.div`
@@ -33,13 +31,7 @@ const HeaderItem = styled.div`
 
 const MenuPart = styled(HeaderItem)`
   flex: 1;
-  width: 100%;
-`;
-
-const ResponsiveBigScreenMenu = styled(BigScreenMenu)`
-  @media (max-width: ${antdBreakpoints.md}px) {
-    display: none;
-  }
+  min-width: 0;
 `;
 
 const MenuPartPlaceholder = styled.div`
@@ -50,24 +42,25 @@ const MenuPartPlaceholder = styled.div`
 `;
 
 const IndicatorPart = styled(HeaderItem)`
+  justify-self: flex-end;
   flex-wrap: nowrap;
 `;
 
 interface Props {
-  navigate: (path: string) => void;
   hasSidebar: boolean;
   setSidebarCollapsed: (collapsed: boolean) => void;
   sidebarCollapsed: boolean;
   routes?: NavItemProps[];
+  user?: User;
+  logout: (() => void) | undefined;
   pathname: string;
 }
 
 export const Header: React.FC<Props> = ({
-  hasSidebar, routes, pathname,
+  hasSidebar, routes,
   setSidebarCollapsed, sidebarCollapsed,
+  user, pathname, logout,
 }) => {
-
-  const userStore = useStore(UserStore);
 
   return (
     <Container>
@@ -85,29 +78,17 @@ export const Header: React.FC<Props> = ({
         </Space>
       </HeaderItem>
       <MenuPart>
-        <ResponsiveBigScreenMenu
+        <BigScreenMenu
           pathname={pathname}
           routes={routes}
         />
         <MenuPartPlaceholder />
       </MenuPart>
-      {
-
-        publicConfig.MIS_URL ? (
-          <HeaderItem>
-            <a href={
-              userStore.user
-                ? join(publicConfig.MIS_URL, "/api/auth/callback?token=" + userStore.user?.token)
-                : publicConfig.MIS_URL
-            }
-            >
-              <ArrowRightOutlined /> 管理系统
-            </a>
-          </HeaderItem>
-        ) : undefined
-      }
+      <MenuPart>
+        <MenuPartPlaceholder />
+      </MenuPart>
       <IndicatorPart>
-        <UserIndicator />
+        <UserIndicator user={user} logout={logout} />
       </IndicatorPart>
     </Container>
   );
