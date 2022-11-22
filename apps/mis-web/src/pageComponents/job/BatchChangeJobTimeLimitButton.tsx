@@ -12,17 +12,17 @@ interface ChangeJobTimeLimitButtonProps {
 export const BatchChangeJobTimeLimitButton: React.FC<ChangeJobTimeLimitButtonProps> = ({
   data, disabled, reload,
 }) => {
-  const [visible, setVisible] = useState(false);
+  const [open, setOpen] = useState(false);
 
   return (
     <>
-      <Button disabled={disabled} onClick={() => setVisible(true)}>
+      <Button disabled={disabled} onClick={() => setOpen(true)}>
         延长所选作业时间限制
       </Button>
       <ChangeJobTimeLimitModal
         reload={reload}
-        onClose={() => setVisible(false)}
-        visible={visible}
+        onClose={() => setOpen(false)}
+        open={open}
         data={data}
       />
     </>

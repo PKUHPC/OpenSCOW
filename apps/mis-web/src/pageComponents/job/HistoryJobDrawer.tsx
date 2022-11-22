@@ -36,20 +36,20 @@ const drawerItems = [
 )[];
 
 interface Props {
-  show: boolean;
+  open: boolean;
   item: JobInfo | undefined;
   onClose: () => void;
   showedPrices: ("tenant" | "account")[];
 }
 
 export const HistoryJobDrawer: React.FC<Props> = (props) => {
-  const { item, onClose, show } = props;
+  const { item, onClose, open } = props;
   return (
     <Drawer
       width={500}
       placement="right"
       onClose={onClose}
-      visible={show}
+      open={open}
       title="作业详细信息"
     >
       {

@@ -148,18 +148,18 @@ const ChangePriceButton: React.FC<{
   reload: () => void;
 }> = ({ filter, count, target, reload }) => {
 
-  const [visible, setVisible] = useState(false);
+  const [open, setOpen] = useState(false);
 
   return (
     <>
-      <Button onClick={() => setVisible(true)}>
+      <Button onClick={() => setOpen(true)}>
         调整搜索结果所有作业{target === "account" ? "租户计费" : "平台计费"}
       </Button>
       <JobPriceChangeModal
         target={target}
         reload={reload}
-        onClose={() => setVisible(false)}
-        visible={visible}
+        onClose={() => setOpen(false)}
+        open={open}
         filter={filter}
         jobCount={count}
       />
@@ -264,7 +264,7 @@ const JobInfoTable: React.FC<JobInfoTableProps> = ({
         />
       </Table>
       <HistoryJobDrawer
-        show={previewItem !== undefined}
+        open={previewItem !== undefined}
         item={previewItem}
         onClose={() => setPreviewItem(undefined)}
         showedPrices={["account", "tenant"]}

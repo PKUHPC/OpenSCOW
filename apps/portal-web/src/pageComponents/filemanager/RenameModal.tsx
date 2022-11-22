@@ -5,7 +5,7 @@ import { api } from "src/apis";
 import { useMessage } from "src/layouts/prompts";
 
 interface Props {
-  visible: boolean;
+  open: boolean;
   onClose: () => void;
   reload: () => void;
   cluster: string;
@@ -16,7 +16,7 @@ interface FormProps {
   newFileName: string;
 }
 
-export const RenameModal: React.FC<Props> = ({ visible, onClose, path, reload, cluster }) => {
+export const RenameModal: React.FC<Props> = ({ open, onClose, path, reload, cluster }) => {
 
   const message = useMessage();
 
@@ -39,7 +39,7 @@ export const RenameModal: React.FC<Props> = ({ visible, onClose, path, reload, c
 
   return (
     <Modal
-      visible={visible}
+      open={open}
       title="重命名文件"
       okText={"确认"}
       cancelText="取消"

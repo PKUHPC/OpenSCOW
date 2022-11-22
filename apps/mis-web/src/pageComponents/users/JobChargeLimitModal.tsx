@@ -13,7 +13,7 @@ interface Props {
   accountName: string;
   currentLimit?: Money;
   currentUsed?: Money;
-  visible: boolean;
+  open: boolean;
   onClose: () => void;
   reload: () => void;
 }
@@ -23,7 +23,7 @@ interface FormFields {
 }
 
 export const JobChargeLimitModal: React.FC<Props> = ({
-  accountName, onClose, reload, userId, visible, username, currentLimit, currentUsed,
+  accountName, onClose, reload, userId, open, username, currentLimit, currentUsed,
 }) => {
   const [form] = Form.useForm<FormFields>();
   const [loading, setLoading] = useState(false);
@@ -46,7 +46,7 @@ export const JobChargeLimitModal: React.FC<Props> = ({
   return (
     <Modal
       title={`${currentLimit === undefined ? "设置" : "修改"}用户作业费用限额`}
-      open={visible}
+      open={open}
       onCancel={onClose}
       confirmLoading={loading}
       onOk={onOk}

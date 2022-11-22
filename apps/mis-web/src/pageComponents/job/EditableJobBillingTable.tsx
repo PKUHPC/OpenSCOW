@@ -48,7 +48,7 @@ const columns: ColumnsType<JobBillingTableItem> = [
 const EditPriceModal: React.FC<CommonModalProps & {
   current: JobBillingTableItem["priceItem"]; path: string; tenant?: string; reload: () => void
 }> = ({
-  current, onClose, path, visible, tenant, reload,
+  current, onClose, path, open, tenant, reload,
 }) => {
 
 
@@ -75,7 +75,7 @@ const EditPriceModal: React.FC<CommonModalProps & {
   };
 
   return (
-    <Modal title="编辑作业价格项" visible={visible} onCancel={onClose} onOk={onOk} destroyOnClose confirmLoading={loading}>
+    <Modal title="编辑作业价格项" open={open} onCancel={onClose} onOk={onOk} destroyOnClose confirmLoading={loading}>
       <Form
         form={form}
         initialValues={{

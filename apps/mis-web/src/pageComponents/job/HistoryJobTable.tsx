@@ -288,7 +288,7 @@ export const JobInfoTable: React.FC<JobInfoTableProps> = ({
         />
       </Table>
       <HistoryJobDrawer
-        show={previewItem !== undefined}
+        open={previewItem !== undefined}
         item={previewItem}
         onClose={() => setPreviewItem(undefined)}
         showedPrices={showedPrices}

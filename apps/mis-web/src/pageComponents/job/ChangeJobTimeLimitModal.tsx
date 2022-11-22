@@ -8,7 +8,7 @@ import { arrayContainsElement } from "src/utils/array";
 import type { Cluster } from "src/utils/config";
 
 interface Props {
-  visible: boolean;
+  open: boolean;
   onClose: () => void;
   reload: () => void;
 
@@ -31,7 +31,7 @@ interface CompletionStatus {
   failed: RunningJobInfo[];
 }
 
-export const ChangeJobTimeLimitModal: React.FC<Props> = ({ visible, onClose, data, reload }) => {
+export const ChangeJobTimeLimitModal: React.FC<Props> = ({ open, onClose, data, reload }) => {
 
   const message = useMessage();
 
@@ -55,7 +55,7 @@ export const ChangeJobTimeLimitModal: React.FC<Props> = ({ visible, onClose, dat
 
   return (
     <Modal
-      visible={visible}
+      open={open}
       title="修改作业时限"
       okText="修改"
       cancelText="取消"

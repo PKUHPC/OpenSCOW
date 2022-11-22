@@ -10,13 +10,13 @@ interface FormProps {
 }
 
 interface ModalProps {
-  visible: boolean;
+  open: boolean;
   close: () => void;
   refresh: () => void;
 }
 
 const NewTenantModal: React.FC<ModalProps> = ({
-  visible, close, refresh,
+  open, close, refresh,
 }) => {
 
 
@@ -47,7 +47,7 @@ const NewTenantModal: React.FC<ModalProps> = ({
   return (
     <Modal
       title="添加租户"
-      open={visible}
+      open={open}
       onCancel={close}
       onOk={onOk}
       confirmLoading={loading}
@@ -73,7 +73,7 @@ export const AddTenantButton: React.FC<Props> = ({ refresh }) => {
     <>
       <NewTenantModal
         close={() => setModalShow(false)}
-        visible={modalShow}
+        open={modalShow}
         refresh={refresh}
       />
       <Button type="primary" icon={<PlusOutlined />} onClick={() => setModalShow(true)}>

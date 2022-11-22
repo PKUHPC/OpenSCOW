@@ -11,13 +11,13 @@ interface FormProps {
 }
 
 interface ModalProps {
-  visible: boolean;
+  open: boolean;
   close: () => void;
   refresh: () => void;
 }
 
 const NewAccountModal: React.FC<ModalProps> = ({
-  visible, close, refresh,
+  open, close, refresh,
 }) => {
 
   const message = useMessage();
@@ -46,7 +46,7 @@ const NewAccountModal: React.FC<ModalProps> = ({
   return (
     <Modal
       title="添加白名单账户"
-      visible={visible}
+      open={open}
       onCancel={close}
       onOk={onOk}
       confirmLoading={loading}
@@ -73,7 +73,7 @@ export const AddWhitelistedAccountButton: React.FC<Props> = ({ refresh }) => {
 
   return (
     <>
-      <NewAccountModal close={() => setModalShow(false)} visible={modalShow} refresh={refresh} />
+      <NewAccountModal close={() => setModalShow(false)} open={modalShow} refresh={refresh} />
       <Button type="primary" icon={<PlusOutlined />} onClick={() => setModalShow(true)}>
       添加白名单账户
       </Button>

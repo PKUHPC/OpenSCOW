@@ -5,20 +5,20 @@ import { useMessage } from "src/layouts/prompts";
 import { urlToUpload } from "src/pageComponents/filemanager/api";
 
 interface Props {
-  visible: boolean;
+  open: boolean;
   onClose: () => void;
   reload: () => void;
   cluster: string;
   path: string;
 }
 
-export const UploadModal: React.FC<Props> = ({ visible, onClose, path, reload, cluster }) => {
+export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, cluster }) => {
 
   const message = useMessage();
 
   return (
     <Modal
-      visible={visible}
+      open={open}
       title="上传文件"
       onCancel={onClose}
       destroyOnClose
