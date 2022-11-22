@@ -43,6 +43,13 @@ const StyledSider = styled(Sider)`
   .ant-menu-item:first-child {
     margin-top: 0px;
   }
+
+  .ant-menu {
+    min-height: 100%;
+    border-right: 0;
+  }
+
+
 `;
 
 function getAllParentKeys(routes: NavItemProps[]): string[] {
@@ -108,7 +115,6 @@ export const SideNav: React.FC<Props> = ({
           }
           onOpenChange={setOpenKeys}
           // defaultOpenKeys={parentKeys}
-          style={{ height: "100%", borderRight: 0 }}
           items={createMenuItems(routes, false)}
         >
         </Menu>
