@@ -52,6 +52,17 @@ web:
     path: /login
     formData:
       password: "{{ PASSWORD }}"
+
+# 配置HTML表单，用户可以指定code-server版本      
+attributes:
+  - type: select
+    name: selectVersion
+    label: 选择版本
+    select:
+      - key: 10
+        value: v4.8.3
+      - key: 11
+        value: v4.9.0
 ```
 
 增加了此文件后，运行以下命令重启job-server即可。
@@ -121,4 +132,71 @@ web:
 
 我们推荐将应用使用密码方式进行加密，所以一般在连接时需要将密码输入给应用。`path`, `query`的值和`formData`的值部分可以使用`{{ PASSWORD }}`代替应用在创建时生成的密码。
 
+### `attributes`
 
+通过`attributes`配置项，可以修改创建应用的HTML表单，允许管理员定义用户创建交互式应用时的表单选项，让用户能够指定应用的版本等。
+
+用户提交的内容会作为运行应用的计算节点的环境变量生效。
+
+配置`attributes`可以加载多个HTML表单，每一条可用配置项如下：
+
+| 属性       | 类型                           | 是否必填 | 解释                             |
+|----------|------------------------------|------|--------------------------------|
+| `type`   | "number", "text" 或者 "select" | 是    | 在HTML表单元素中输入的内容的类型             |
+| `name`   | 字符串                          | 是    | HTML表单的name属性，会作为计算节点环境变量名     |
+| `label`  | 字符串                          | 是    | HTML表单的label属性，输入框左侧显示的标签      |
+| `select` | 选项的列表                        | 否    | 如果`type`是select，需要配置此项，指明具体的选项 |
+
+配置一个输入内容是文本类型的表单，需要指定`type`为"text", 示例如下：
+
+```yaml
+attributes:
+  - type: text
+    name: version
+    label: 版本
+```
+
+配置一个输入内容是数字类型的表单，需要指定`type`为"number", 示例如下：
+
+```yaml
+attributes:
+  - type: number
+    name: size
+    label: 数量
+```
+
+配置一个输入内容是文本类型的表单，需要指定`type`为"select",并且配置`select`项, 示例如下：
+
+```yaml
+attributes:
+  - type: select
+    name: selectVersion
+    label: 选择版本
+    select:
+      - key: 10
+        value: v10
+      - key: 11
+        value: v11
+```
+
+如果用户选择v11选项，环境变量 `selectVersion=11` 可以在应用启动时被读取。
+
+可以配置多个HTML表单：
+
+```yaml
+attributes:
+  - type: text
+    name: version
+    label: 版本
+  - type: number
+    name: size
+    label: 数量
+  - type: select
+    name: selectVersion
+    label: 选择版本
+    select:
+      - key: 10
+        value: v10
+      - key: 11
+        value: v11
+```
