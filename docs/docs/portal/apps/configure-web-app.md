@@ -173,13 +173,13 @@ attributes:
     name: selectVersion
     label: 选择版本
     select:
-      - key: 10
+      - key: version10
         value: v10
-      - key: 11
+      - key: version11
         value: v11
 ```
 
-如果用户选择v11选项，环境变量 `selectVersion=11` 可以在应用启动时被读取。
+如果用户选择v11选项，环境变量 `selectVersion=version11` 可以在应用启动时被读取。
 
 可以配置多个HTML表单：
 
@@ -195,8 +195,8 @@ attributes:
     name: selectVersion
     label: 选择版本
     select:
-      - key: 10
+      - key: version10
         value: v10
-      - key: 11
+      - key: version11
         value: v11
 ```
