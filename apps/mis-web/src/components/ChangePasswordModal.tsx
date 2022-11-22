@@ -25,7 +25,7 @@ const ChangePasswordModal: React.FC<Props> = ({ name, userId, onClose, onComplet
     const { oldPassword, newPassword } = await form.validateFields();
     setLoading(true);
     await onComplete(oldPassword, newPassword)
-      .then(() => { 
+      .then(() => {
         form.resetFields();
         onClose();
       })
@@ -35,7 +35,7 @@ const ChangePasswordModal: React.FC<Props> = ({ name, userId, onClose, onComplet
   return (
     <Modal
       title={`修改用户${name}（ID：${userId}）的密码`}
-      visible={visible}
+      open={visible}
       onOk={onOK}
       confirmLoading={loading}
       onCancel={onClose}

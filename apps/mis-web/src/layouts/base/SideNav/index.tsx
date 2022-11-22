@@ -1,7 +1,9 @@
+"use client";
+
 import { Layout, Menu } from "antd";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { calcSelectedKeys, createMenuItems } from "src/layouts/common";
-import { antdBreakpoints } from "src/styles/constants";
+import { calcSelectedKeys, createMenuItems } from "src/layouts/base/common";
+import { antdBreakpoints } from "src/layouts/base/constants";
 import { arrayContainsElement } from "src/utils/array";
 import { useDidUpdateEffect } from "src/utils/hooks";
 import styled from "styled-components";
@@ -17,25 +19,24 @@ interface Props {
   collapsed: boolean;
   setCollapsed: (collapsed: boolean) => void;
 
-  pathname: string;
-  navigate: (path: string) => void;
-
   routes: NavItemProps[];
+  pathname: string;
+
 }
 
 const StyledSider = styled(Sider)`
 
   @media (max-width: ${antdBreakpoints[breakpoint]}px ) {
-    position:absolute;
+    position: absolute !important;
     height: 100%;
-    z-index:5;
+    z-index: 1000;
 
     body, html {
       overflow-x: hidden;
       overflow-y: auto;
     }
-    overflow: scroll;
 
+    overflow: auto;
   }
 
 
@@ -55,7 +56,7 @@ function getAllParentKeys(routes: NavItemProps[]): string[] {
 }
 
 export const SideNav: React.FC<Props> = ({
-  collapsed, pathname, routes, setCollapsed,
+  collapsed, routes, setCollapsed, pathname,
 }) => {
 
   const parentKeys = useMemo(() => getAllParentKeys(routes), [routes]);
@@ -91,7 +92,6 @@ export const SideNav: React.FC<Props> = ({
         breakpoint={antdBreakpoints[breakpoint]}
       />
       <StyledSider
-        className="site-layout-background"
         onBreakpoint={onBreakpoint}
         collapsed={collapsed}
         collapsedWidth={0}

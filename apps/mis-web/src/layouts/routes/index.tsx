@@ -7,8 +7,8 @@ import {
 import React from "react";
 import { AccountAffiliation } from "src/generated/server/user";
 import Whitelist from "src/icons/whiteList.svg";
+import { NavItemProps } from "src/layouts/base/NavItemProps";
 import { NavIcon } from "src/layouts/icon";
-import { NavItemProps } from "src/layouts/NavItemProps";
 import { PlatformRole, TenantRole, UserRole } from "src/models/User";
 import { User } from "src/stores/UserStore";
 import { publicConfig } from "src/utils/config";
@@ -262,7 +262,9 @@ export const accountAdminRoutes: (adminAccounts: AccountAffiliation[]) => NavIte
 
 ];
 
-export const getAvailableRoutes = (user: User): NavItemProps[] => {
+export const getAvailableRoutes = (user: User | undefined): NavItemProps[] => {
+
+  if (!user) { return []; }
 
 
   const routes = [] as NavItemProps[];

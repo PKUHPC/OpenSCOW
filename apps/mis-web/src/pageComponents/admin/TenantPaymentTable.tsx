@@ -1,11 +1,10 @@
 import { Button, DatePicker, Form, Input, Select, Table } from "antd";
-import { useForm } from "antd/lib/form/Form";
-import moment from "moment";
+import dayjs from "dayjs";
 import { useCallback, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
-import { defaultRanges, formatDateTime } from "src/utils/datetime";
+import { defaultPresets, formatDateTime } from "src/utils/datetime";
 import { useDidUpdateEffect } from "src/utils/hooks";
 
 interface Props {
@@ -17,16 +16,16 @@ interface Props {
 
 interface FilterForm {
   tenantName?: string;
-  time: [moment.Moment, moment.Moment],
+  time: [dayjs.Dayjs, dayjs.Dayjs],
 }
 
-const today = moment().endOf("day");
+const today = dayjs().endOf("day");
 
 export const TenantPaymentTable: React.FC<Props> = ({
   tenantNames, showTenantName, showAuditInfo,
 }) => {
 
-  const [form] = useForm<FilterForm>();
+  const [form] = Form.useForm<FilterForm>();
 
   const [query, setQuery] = useState({
     tenantName: tenantNames?.[0],
@@ -77,7 +76,7 @@ export const TenantPaymentTable: React.FC<Props> = ({
               )
           }
           <Form.Item label="时间" name="time">
-            <DatePicker.RangePicker allowClear={false} ranges={defaultRanges()} />
+            <DatePicker.RangePicker allowClear={false} presets={defaultPresets} />
           </Form.Item>
           <Form.Item label="总数">
             <strong>

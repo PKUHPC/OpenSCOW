@@ -1,4 +1,4 @@
-import { Alert, Button, Form, message } from "antd";
+import { Alert, Button, Form, message, Typography } from "antd";
 import { useState } from "react";
 import { api } from "src/apis";
 import { Centered } from "src/components/layouts";
@@ -32,8 +32,10 @@ export const InitAdminForm: React.FC = () => {
   return (
     <Centered>
       <FormLayout maxWidth={800}>
-        <p>您可以在此创建初始管理员用户。</p>
-        <p>这里添加的用户为初始管理员，位于默认租户中，将会自动拥有<strong>平台管理员</strong>和<strong>默认租户的租户管理员</strong>角色。</p>
+        <Typography.Paragraph>您可以在此创建初始管理员用户。</Typography.Paragraph>
+        <Typography.Paragraph>
+          这里添加的用户为初始管理员，位于默认租户中，将会自动拥有<strong>平台管理员</strong>和<strong>默认租户的租户管理员</strong>角色。
+        </Typography.Paragraph>
         <AlertContainer>
           <Alert
             type="warning"

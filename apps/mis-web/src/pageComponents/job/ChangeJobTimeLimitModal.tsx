@@ -1,6 +1,7 @@
-import { Divider, Form, Input, InputNumber, message, Modal, Progress, Select } from "antd";
+import { Divider, Form, Input, InputNumber, Modal, Progress, Select } from "antd";
 import { useRef, useState } from "react";
 import { api } from "src/apis";
+import { useMessage } from "src/layouts/prompts";
 import { RunningJobInfo } from "src/models/job";
 import { ChangeStorageMode } from "src/pages/api/admin/changeStorage";
 import { arrayContainsElement } from "src/utils/array";
@@ -31,6 +32,9 @@ interface CompletionStatus {
 }
 
 export const ChangeJobTimeLimitModal: React.FC<Props> = ({ visible, onClose, data, reload }) => {
+
+  const message = useMessage();
+
   const [form] = Form.useForm<FormProps>();
   const [loading, setLoading] = useState(false);
 
@@ -85,7 +89,7 @@ export const ChangeJobTimeLimitModal: React.FC<Props> = ({ visible, onClose, dat
                 reload();
                 close();
               } else {
-                message.warn("部分作业修改时限失败。");
+                message.error("部分作业修改时限失败。");
                 reload();
               }
             }

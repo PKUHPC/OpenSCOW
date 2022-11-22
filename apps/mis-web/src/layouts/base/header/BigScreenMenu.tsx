@@ -1,12 +1,19 @@
+"use client";
+
 import { Menu } from "antd";
 import React, { useMemo } from "react";
-import { calcSelectedKeys, createMenuItems } from "src/layouts/common";
-import { NavItemProps } from "src/layouts/NavItemProps";
+import { calcSelectedKeys, createMenuItems } from "src/layouts/base/common";
+import { antdBreakpoints } from "src/layouts/base/constants";
+import { NavItemProps } from "src/layouts/base/NavItemProps";
 import { arrayContainsElement } from "src/utils/array";
 import styled from "styled-components";
 
-// get the select
 const Container = styled.div`
+
+  @media (max-width: ${antdBreakpoints.md}px) {
+    display: none;
+  }
+
   width: 100%;
 
   .ant-menu-item {
@@ -16,12 +23,11 @@ const Container = styled.div`
 
 interface Props {
   routes?: NavItemProps[];
-  pathname: string;
   className?: string;
+  pathname: string;
 }
-
 export const BigScreenMenu: React.FC<Props> = ({
-  routes, pathname, className,
+  routes, className, pathname,
 }) => {
 
   const selectedKeys = useMemo(() =>
@@ -36,11 +42,11 @@ export const BigScreenMenu: React.FC<Props> = ({
         arrayContainsElement(routes)
           ? (
             <Menu
+              style={{ minWidth: 0, flex: "auto", border: 0 }}
               theme="light"
               mode="horizontal"
               selectedKeys={selectedKeys}
-              style={{ border: 0 }}
-              forceSubMenuRender
+              // forceSubMenuRender
               items={createMenuItems(routes, true)}
             />
           ) : undefined

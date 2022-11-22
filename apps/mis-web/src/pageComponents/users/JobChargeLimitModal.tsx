@@ -4,6 +4,7 @@ import { useState } from "react";
 import { api } from "src/apis";
 import { ModalLink } from "src/components/ModalLink";
 import type { Money } from "src/generated/common/money";
+import { useModal } from "src/layouts/prompts";
 import { moneyToString } from "src/utils/money";
 
 interface Props {
@@ -27,6 +28,8 @@ export const JobChargeLimitModal: React.FC<Props> = ({
   const [form] = Form.useForm<FormFields>();
   const [loading, setLoading] = useState(false);
 
+  const modal = useModal();
+
   const onOk = async () => {
     const { limit } = await form.validateFields();
     setLoading(true);
@@ -42,7 +45,7 @@ export const JobChargeLimitModal: React.FC<Props> = ({
   return (
     <Modal
       title={`${currentLimit === undefined ? "设置" : "修改"}用户作业费用限额`}
-      visible={visible}
+      open={visible}
       onCancel={onClose}
       confirmLoading={loading}
       onOk={onOk}
@@ -67,7 +70,7 @@ export const JobChargeLimitModal: React.FC<Props> = ({
                   </strong>
                 </span>
                 <a onClick={() => {
-                  Modal.confirm({
+                  modal.confirm({
                     title: "取消作业费用限额",
                     icon: <ExclamationCircleOutlined />,
                     content: "确认要取消此用户在此账户中的限额吗？",

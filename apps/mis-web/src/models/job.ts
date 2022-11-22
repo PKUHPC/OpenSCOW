@@ -1,4 +1,4 @@
-import moment from "moment";
+import dayjs from "dayjs";
 import type { RunningJob } from "src/generated/common/job";
 import type { Cluster } from "src/utils/config";
 
@@ -23,7 +23,7 @@ function calculateRunningOrQueueTime(r: RunningJob) {
   }
 
   // calculate to format [{days}-][{Hours}:]{MM}:{SS}
-  const diffMs = moment().diff(r.submissionTime);
+  const diffMs = dayjs().diff(r.submissionTime);
   const seconds = diffMs / 1000;
   const minutes = seconds / 60;
   const hours = minutes / 60;

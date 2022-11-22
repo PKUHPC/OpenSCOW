@@ -1,5 +1,5 @@
 import "nprogress/nprogress.css";
-import "antd/dist/antd.variable.min.css";
+import "antd/dist/reset.css";
 
 import { failEvent, fromApi } from "@ddadaal/next-typed-api-routes-runtime/lib/client";
 import { message } from "antd";
@@ -13,13 +13,14 @@ import { createStore, StoreProvider, useStore } from "simstate";
 import { MOCK_USER_INFO } from "src/apis/api.mock";
 import { USE_MOCK } from "src/apis/useMock";
 import { getTokenFromCookie, setTokenCookie } from "src/auth/cookie";
-import { RootLayout } from "src/layouts/RootLayout";
+import { AntdConfigProvider } from "src/layouts/AntdConfigProvider";
+import { BaseLayout } from "src/layouts/base/BaseLayout";
+import { DarkModeProvider } from "src/layouts/darkMode";
 import { ValidateTokenSchema } from "src/pages/api/auth/validateToken";
 import {
   User, UserStore,
 } from "src/stores/UserStore";
 import { GlobalStyle } from "src/styles/globalStyle";
-import { AntdConfigProvider } from "src/utils/AntdConfigProvider";
 import { runtimeConfig } from "src/utils/config";
 import { getHostname } from "src/utils/host";
 import { isServer } from "src/utils/isServer";
@@ -81,15 +82,18 @@ function MyApp({ Component, pageProps, extra }: Props) {
           href={join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/icon?type=favicon")}
         ></link>
       </Head>
-      <GlobalStyle />
       <StoreProvider stores={[userStore]}>
-        <AntdConfigProvider color={primaryColor}>
-          <FailEventHandler />
-          <TopProgressBar />
-          <RootLayout footerText={footerText}>
-            <Component {...pageProps} />
-          </RootLayout>
-        </AntdConfigProvider>
+        <DarkModeProvider>
+
+          <AntdConfigProvider color={primaryColor}>
+            <GlobalStyle />
+            <FailEventHandler />
+            <TopProgressBar />
+            <BaseLayout footerText={footerText}>
+              <Component {...pageProps} />
+            </BaseLayout>
+          </AntdConfigProvider>
+        </DarkModeProvider>
       </StoreProvider>
     </>
   );

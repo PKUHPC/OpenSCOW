@@ -5,6 +5,7 @@ import React from "react";
 import { api } from "src/apis";
 import { DisabledA } from "src/components/DisabledA";
 import type { AccountUserInfo } from "src/generated/server/user";
+import { useModal } from "src/layouts/prompts";
 import { UserRole, UserStatus } from "src/models/User";
 import { SetJobChargeLimitLink } from "src/pageComponents/users/JobChargeLimitModal";
 import { GetAccountUsersSchema } from "src/pages/api/users";
@@ -34,6 +35,8 @@ const roleTags = {
 export const UserTable: React.FC<Props> = ({
   data, isLoading, reload, accountName, canSetAdmin,
 }) => {
+
+  const modal = useModal();
 
   return (
     <Table
@@ -94,7 +97,7 @@ export const UserTable: React.FC<Props> = ({
               r.status === UserStatus.BLOCKED
                 ? (
                   <a onClick={() => {
-                    Modal.confirm({
+                    modal.confirm({
                       title: "确认解除用户封锁？",
                       icon: <ExclamationCircleOutlined />,
                       content: `确认要从账户${accountName}解除用户${r.name}（ID：${r.userId}）的封锁？`,
@@ -116,7 +119,7 @@ export const UserTable: React.FC<Props> = ({
                   </a>
                 ) : (
                   <a onClick={() => {
-                    Modal.confirm({
+                    modal.confirm({
                       title: "确认封锁用户？",
                       icon: <ExclamationCircleOutlined />,
                       content: `确认要从账户${accountName}封锁用户${r.name}（ID：${r.userId}）？`,
@@ -143,7 +146,7 @@ export const UserTable: React.FC<Props> = ({
                 r.role === UserRole.ADMIN
                   ? (
                     <a onClick={() => {
-                      Modal.confirm({
+                      modal.confirm({
                         title: "确认取消管理员权限",
                         icon: <ExclamationCircleOutlined />,
                         content: `确认取消用户${r.name} （ID：${r.userId}）在账户${accountName}的管理员权限吗？`,
@@ -164,7 +167,7 @@ export const UserTable: React.FC<Props> = ({
                     </a>
                   ) : r.role === UserRole.USER ? (
                     <a onClick={() => {
-                      Modal.confirm({
+                      modal.confirm({
                         title: "给予管理员权限",
                         icon: <ExclamationCircleOutlined />,
                         content: `确认给予用户${r.name} （ID：${r.userId}）在账户${accountName}的管理员权限吗？`,
@@ -190,7 +193,7 @@ export const UserTable: React.FC<Props> = ({
               disabled={r.role === UserRole.OWNER}
               message="不能移出账户拥有者"
               onClick={() => {
-                Modal.confirm({
+                modal.confirm({
                   title: "确认移出用户",
                   icon: <ExclamationCircleOutlined />,
                   content: `确认要从账户${accountName}移出用户${r.name}（ID：${r.userId}）？`,

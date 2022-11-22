@@ -1,4 +1,4 @@
-import type { NavItemProps } from "src/layouts/NavItemProps";
+import type { NavItemProps } from "src/layouts/base/NavItemProps";
 
 export type Matcher = (spec: string, path: string) => boolean;
 

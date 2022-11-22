@@ -1,4 +1,4 @@
-import { message, Select, Table, Tabs } from "antd";
+import { message, Select, Table, Tabs, Typography } from "antd";
 import { useEffect, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
@@ -220,12 +220,12 @@ export const InitUsersAndAccountsTable: React.FC = () => {
   return (
     <Centered>
       <FormLayout maxWidth={800}>
-        <p>
+        <Typography.Paragraph>
           您可以在这里管理当前系统中默认租户下的用户和账户，以及设置某个用户为<strong>初始管理员</strong>。
-        </p>
-        <p>
+        </Typography.Paragraph>
+        <Typography.Paragraph>
           <strong>初始管理员</strong>指同时为租户管理员和平台管理员的用户。
-        </p>
+        </Typography.Paragraph>
         <Tabs defaultActiveKey="user" tabBarExtraContent={<a onClick={reload}>刷新</a>}>
           <Tabs.TabPane tab="用户" key="user">
             <UserTable data={usersData} loading={usersLoading} reload={usersReload} />

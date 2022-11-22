@@ -1,5 +1,5 @@
 import { Button, DatePicker, Divider, Form, Input, InputNumber, Space, Table } from "antd";
-import moment from "moment";
+import dayjs from "dayjs";
 import React, { useCallback, useMemo, useRef, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
@@ -13,7 +13,7 @@ import { JobPriceChangeModal } from "src/pageComponents/tenant/JobPriceChangeMod
 import type { GetJobFilter, GetJobInfoSchema } from "src/pages/api/job/jobInfo";
 import type { Cluster } from "src/utils/config";
 import { publicConfig } from "src/utils/config";
-import { defaultRanges, formatDateTime } from "src/utils/datetime";
+import { defaultPresets, formatDateTime } from "src/utils/datetime";
 import { moneyToString, nullableMoneyToString } from "src/utils/money";
 
 interface PageInfo {
@@ -22,7 +22,7 @@ interface PageInfo {
 }
 
 interface FilterForm {
-  jobEndTime: [moment.Moment, moment.Moment];
+  jobEndTime: [dayjs.Dayjs, dayjs.Dayjs];
   jobId: number | undefined;
   accountName: string;
   userId: string;
@@ -49,7 +49,7 @@ export const AdminJobTable: React.FC<Props> = () => {
   const rangeSearch = useRef(true);
 
   const [query, setQuery] = useState<FilterForm>(() => {
-    const now = moment();
+    const now = dayjs();
     return {
       jobId: undefined,
       userId: "",
@@ -103,7 +103,7 @@ export const AdminJobTable: React.FC<Props> = () => {
                       <Input />
                     </Form.Item>
                     <Form.Item label="作业结束时间" name="jobEndTime">
-                      <DatePicker.RangePicker showTime allowClear={false} ranges={defaultRanges()} />
+                      <DatePicker.RangePicker showTime allowClear={false} presets={defaultPresets} />
                     </Form.Item>
                   </>
                 ),
