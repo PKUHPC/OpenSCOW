@@ -5,7 +5,7 @@ import { JobInfo } from "src/generated/portal/job";
 
 export type MockApi<TApi extends Record<
   string,
- (...args : any[]) => JsonFetchResultPromiseLike<any>>
+ (...args: any[]) => JsonFetchResultPromiseLike<any>>
  > = { [key in keyof TApi]: null | (
     (...args: Parameters<TApi[key]>) =>
     Promise<

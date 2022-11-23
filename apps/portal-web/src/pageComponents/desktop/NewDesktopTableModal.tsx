@@ -6,7 +6,7 @@ import { Cluster, publicConfig } from "src/utils/config";
 import { openDesktop } from "src/utils/vnc";
 
 export interface Props {
-  visible: boolean;
+  open: boolean;
   onClose: () => void;
   reload: () => void;
 }
@@ -17,7 +17,7 @@ interface ClusterInfo {
 }
 
 
-export const NewDesktopTableModal: React.FC<Props> = ({ visible, onClose, reload }) => {
+export const NewDesktopTableModal: React.FC<Props> = ({ open, onClose, reload }) => {
   const defaultWm = publicConfig.LOGIN_DESKTOP_WMS[0];
 
   const [form] = Form.useForm<ClusterInfo>();
@@ -54,7 +54,7 @@ export const NewDesktopTableModal: React.FC<Props> = ({ visible, onClose, reload
   return (
     <Modal
       title="新建桌面"
-      visible={visible}
+      open={open}
       onOk={form.submit}
       confirmLoading={submitting}
       onCancel={onClose}

@@ -1,4 +1,4 @@
-import { Button, Form, message } from "antd";
+import { Button, Form } from "antd";
 import { NextPage } from "next";
 import React, { useState } from "react";
 import { api } from "src/apis";
@@ -6,6 +6,7 @@ import { requireAuth } from "src/auth/requireAuth";
 import { NotFoundPage } from "src/components/errorPages/NotFoundPage";
 import { PageTitle } from "src/components/PageTitle";
 import { FormLayout } from "src/layouts/FormLayout";
+import { useMessage } from "src/layouts/prompts";
 import { TenantRole } from "src/models/User";
 import { CreateUserForm, CreateUserFormFields } from "src/pageComponents/users/CreateUserForm";
 import { publicConfig } from "src/utils/config";
@@ -14,6 +15,7 @@ import { Head } from "src/utils/head";
 const CreateUserPageForm: React.FC = () => {
 
   const [form] = Form.useForm<CreateUserFormFields>();
+  const message = useMessage();
 
   const [loading, setLoading] = useState(false);
 

@@ -7,7 +7,7 @@ import { GetTenantInfoReply } from "src/generated/server/tenant";
 import { GetAllTenantsSchema } from "src/pages/api/admin/getAllTenants";
 
 interface Props {
-  refreshToken:boolean;
+  refreshToken: boolean;
 }
 export const AllTenantsTable: React.FC<Props> = ({ refreshToken }) => {
   const promiseFn = useCallback(async () => {

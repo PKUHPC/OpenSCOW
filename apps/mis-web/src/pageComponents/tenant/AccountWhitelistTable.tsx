@@ -1,8 +1,9 @@
 import { ExclamationCircleOutlined } from "@ant-design/icons";
-import { Divider, message, Modal, Space, Table } from "antd";
+import { Divider, Space, Table } from "antd";
 import React from "react";
 import { api } from "src/apis";
 import { WhitelistedAccount } from "src/generated/server/account";
+import { useMessage, useModal } from "src/layouts/prompts";
 import type {
   GetWhitelistedAccountsSchema } from "src/pages/api/tenant/accountWhitelist/getWhitelistedAccounts";
 import { formatDateTime } from "src/utils/datetime";
@@ -17,6 +18,9 @@ interface Props {
 export const AccountWhitelistTable: React.FC<Props> = ({
   data, isLoading, reload,
 }) => {
+
+  const modal = useModal();
+  const message = useMessage();
 
   return (
     <Table
@@ -44,7 +48,7 @@ export const AccountWhitelistTable: React.FC<Props> = ({
         render={(_, r) => (
           <Space split={<Divider type="vertical" />}>
             <a onClick={() => {
-              Modal.confirm({
+              modal.confirm({
                 title: "确认将账户移除白名单？",
                 icon: <ExclamationCircleOutlined />,
                 content: `确认要将账户${r.accountName}从白名单移除？`,

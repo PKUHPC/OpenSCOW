@@ -1,11 +1,10 @@
 import { Button, DatePicker, Form, Input, Select, Table } from "antd";
-import { useForm } from "antd/lib/form/Form";
-import moment from "moment";
+import dayjs from "dayjs";
 import { useCallback, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
-import { defaultRanges, formatDateTime } from "src/utils/datetime";
+import { defaultPresets, formatDateTime } from "src/utils/datetime";
 import { useDidUpdateEffect } from "src/utils/hooks";
 
 interface Props {
@@ -17,28 +16,28 @@ interface Props {
 
 interface FilterForm {
   accountName?: string;
-  time: [moment.Moment, moment.Moment],
+  time: [dayjs.Dayjs, dayjs.Dayjs],
 }
 
-const today = moment().endOf("day");
+const today = dayjs().endOf("day");
 
 export const PaymentTable: React.FC<Props> = ({
   accountNames, showAccountName, showAuditInfo,
 }) => {
 
-  const [form] = useForm<FilterForm>();
+  const [form] = Form.useForm<FilterForm>();
 
-  const [query, setQuery] = useState({
+  const [query, setQuery] = useState(() => ({
     accountName: accountNames?.[0],
-    time: [today.clone().subtract(1, "year"), today],
-  });
+    time: [today.subtract(1, "year"), today],
+  }));
 
   const { data, isLoading } = useAsync({
     promiseFn: useCallback(async () => {
       return api.getPayments({ query: {
         accountName: query.accountName,
-        startTime: query.time[0].clone().startOf("day").toISOString(),
-        endTime: query.time[1].clone().endOf("day").toISOString(),
+        startTime: query.time[0].startOf("day").toISOString(),
+        endTime: query.time[1].endOf("day").toISOString(),
       } });
     }, [query]),
   });
@@ -77,7 +76,7 @@ export const PaymentTable: React.FC<Props> = ({
               )
           }
           <Form.Item label="时间" name="time">
-            <DatePicker.RangePicker allowClear={false} ranges={defaultRanges()} />
+            <DatePicker.RangePicker allowClear={false} presets={defaultPresets} />
           </Form.Item>
           <Form.Item label="总数">
             <strong>

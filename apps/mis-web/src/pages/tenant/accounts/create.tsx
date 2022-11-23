@@ -1,10 +1,11 @@
-import { Button, Form, Input, message } from "antd";
+import { Button, Form, Input } from "antd";
 import { NextPage } from "next";
 import React, { useState } from "react";
 import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
 import { FormLayout } from "src/layouts/FormLayout";
+import { useMessage } from "src/layouts/prompts";
 import { TenantRole } from "src/models/User";
 import { publicConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
@@ -23,6 +24,8 @@ const CreateAccountForm: React.FC = () => {
   const [form] = Form.useForm<FormProps>();
 
   const [loading, setLoading] = useState(false);
+
+  const message = useMessage();
 
   const submit = async () => {
     const { accountName, ownerId, ownerName, comment } = await form.validateFields();

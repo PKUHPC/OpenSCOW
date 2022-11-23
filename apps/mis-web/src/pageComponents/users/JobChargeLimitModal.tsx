@@ -1,9 +1,10 @@
 import { ExclamationCircleOutlined } from "@ant-design/icons";
-import { Form, InputNumber, message, Modal, Space } from "antd";
+import { Form, InputNumber, Modal, Space } from "antd";
 import { useState } from "react";
 import { api } from "src/apis";
 import { ModalLink } from "src/components/ModalLink";
 import type { Money } from "src/generated/common/money";
+import { useMessage, useModal } from "src/layouts/prompts";
 import { moneyToString } from "src/utils/money";
 
 interface Props {
@@ -12,7 +13,7 @@ interface Props {
   accountName: string;
   currentLimit?: Money;
   currentUsed?: Money;
-  visible: boolean;
+  open: boolean;
   onClose: () => void;
   reload: () => void;
 }
@@ -22,10 +23,13 @@ interface FormFields {
 }
 
 export const JobChargeLimitModal: React.FC<Props> = ({
-  accountName, onClose, reload, userId, visible, username, currentLimit, currentUsed,
+  accountName, onClose, reload, userId, open, username, currentLimit, currentUsed,
 }) => {
   const [form] = Form.useForm<FormFields>();
   const [loading, setLoading] = useState(false);
+
+  const modal = useModal();
+  const message = useMessage();
 
   const onOk = async () => {
     const { limit } = await form.validateFields();
@@ -42,7 +46,7 @@ export const JobChargeLimitModal: React.FC<Props> = ({
   return (
     <Modal
       title={`${currentLimit === undefined ? "设置" : "修改"}用户作业费用限额`}
-      visible={visible}
+      open={open}
       onCancel={onClose}
       confirmLoading={loading}
       onOk={onOk}
@@ -67,7 +71,7 @@ export const JobChargeLimitModal: React.FC<Props> = ({
                   </strong>
                 </span>
                 <a onClick={() => {
-                  Modal.confirm({
+                  modal.confirm({
                     title: "取消作业费用限额",
                     icon: <ExclamationCircleOutlined />,
                     content: "确认要取消此用户在此账户中的限额吗？",

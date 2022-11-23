@@ -1,28 +1,28 @@
-import type { RangePickerProps } from "antd/lib/date-picker";
-import moment from "moment";
+import { TimeRangePickerProps } from "antd";
+import dayjs from "dayjs";
 
 export function formatDateTime(str: string): string {
-  return moment(str)
+  return dayjs(str)
     .format("YYYY-MM-DD HH:mm:ss");
 }
 
-export function defaultRanges(): RangePickerProps["ranges"] {
-  const now = moment();
-  const end = now.clone().endOf("day");
+export const defaultPresets: TimeRangePickerProps["presets"] = (() => {
+  const now = dayjs();
+  const end = now.endOf("day");
 
-  return {
-    "今天": [now.clone().startOf("day"), end],
-    "本月": [now.clone().startOf("month"), end],
-    "今年": [now.clone().startOf("year"), end],
-    "3个月": [now.clone().subtract(3, "month").startOf("day"), end],
-    "6个月": [now.clone().subtract(6, "month").startOf("day"), end],
-    "一年": [now.clone().subtract(1, "year").startOf("day"), end],
-  };
-}
+  return [
+    { label: "今天", value: [now.startOf("day"), end]},
+    { label: "本月", value: [now.startOf("month"), end]},
+    { label: "今年", value: [now.startOf("year"), end]},
+    { label: "3个月", value: [now.subtract(3, "month").startOf("day"), end]},
+    { label: "6个月", value: [now.subtract(6, "month").startOf("day"), end]},
+    { label: "一年", value: [now.subtract(1, "year").startOf("day"), end]},
+  ];
+})();
 
 export function compareDateTime(a: string, b: string): number {
-  const aMoment = moment(a);
-  const bMoment = moment(b);
+  const aMoment = dayjs(a);
+  const bMoment = dayjs(b);
 
   if (aMoment.isSame(bMoment)) { return 0; }
   if (aMoment.isBefore(bMoment)) { return -1; }

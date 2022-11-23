@@ -10,7 +10,7 @@ import { DEFAULT_TENANT_NAME } from "src/utils/constants";
 
 export type MockApi<TApi extends Record<
   string,
- (...args : any[]) => JsonFetchResultPromiseLike<any>>
+ (...args: any[]) => JsonFetchResultPromiseLike<any>>
  > = { [key in keyof TApi]: null | (
     (...args: Parameters<TApi[key]>) =>
     Promise<
@@ -195,16 +195,25 @@ export const mockApi: MockApi<typeof api> = {
           accountName: "a_user1",
           users: [{ userId: "user1", state: "allowed!" }, { userId: "user2", state: "allowed!" }],
           owner: "user1",
+          included: false,
         },
         {
           accountName: "account2",
           users: [{ userId: "user2", state: "allowed!" }, { userId: "user3", state: "allowed!" }],
+          included: false,
+        },
+        {
+          accountName: "a_user4",
+          users: [{ userId: "user4", state: "allowed!" }],
+          owner: "该账户已导入",
+          included: true,
         },
       ],
       users: [ 
-        { userId: "user1", userName: "user1", accounts: [ "a_user1" ]}, 
-        { userId: "user2", userName: "user2", accounts: [ "a_user1", "account2" ]}, 
-        { userId: "user3", userName: "user3", accounts: [ "account2" ]},
+        { userId: "user1", userName: "user1", accounts: [ "a_user1" ], included: false }, 
+        { userId: "user2", userName: "user2", accounts: [ "a_user1", "account2" ], included: false }, 
+        { userId: "user3", userName: "user3", accounts: [ "account2" ], included: false },
+        { userId: "user4", userName: "user4", accounts: [ "a_user4" ], included: true },
       ],
     });
   },
