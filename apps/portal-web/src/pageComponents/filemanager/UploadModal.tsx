@@ -48,7 +48,7 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
         beforeUpload={async (file) => {
           await api.exists({ query:{ cluster: cluster, path: join(path, file.name) } })
             .then((d) => {
-              if (d) {
+              if (d.result) {
                 Modal.confirm({
                   title: "文件已存在",
                   content: `文件${file.name}已存在，是否覆盖？`,
