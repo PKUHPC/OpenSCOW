@@ -61,7 +61,7 @@ export const AppConfigSchema = Type.Object({
           Type.Object({
             key: Type.String({ description: "表单选项key" }),
             value: Type.String({ description: "表单选项的文本" }),
-          }), { description:"表单选项"},
+          }), { description:"表单选项" },
         )),
     }),
   )),
@@ -82,9 +82,10 @@ export const getAppConfigs: GetConfigFn<Record<string, AppConfigSchema>> = (base
     if (config.attributes) {
       config.attributes.forEach((item) => {
         if (item.type === "select" && !item.select) {
-          throw new Error(`App ${id}'s form attributes of name ${item.name} is of type select but select options is not set`);
+          throw new Error(`
+          App ${id}'s form attributes of name ${item.name} is of type select but select options is not set`);
         }
-      })
+      });
     }
   });
 

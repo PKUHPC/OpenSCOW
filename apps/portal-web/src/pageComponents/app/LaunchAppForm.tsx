@@ -113,8 +113,8 @@ export const LaunchAppForm: React.FC<Props> = ({ appId }) => {
   const customFormItems = data?.map((item, index) => {
 
     const config = item.type === "number"
-      ? { rules: [ { type: "integer", required: true }] }
-      : { rules: [ { required: true }] };
+      ? { rules: [ { type: "integer", required: true }]}
+      : { rules: [ { required: true }]};
 
     const inputItem = item.type === "number" ? (<InputNumber />)
       : item.type === "text" ? (<Input />)
