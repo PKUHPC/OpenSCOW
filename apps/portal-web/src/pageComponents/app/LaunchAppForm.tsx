@@ -111,44 +111,29 @@ export const LaunchAppForm: React.FC<Props> = ({ appId }) => {
   );
 
   const customFormItems = data?.map((item, index) => {
-    if (item.type === "number") {
-      return (
-        <Form.Item
-          key={`${item.name}+${index}`}
-          label={item.label}
-          name={item.name}
-          rules={[
-            { required: true, type: "integer" },
-          ]}
-        >
-          <InputNumber />
-        </Form.Item>
-      );
-    } else if (item.type === "text") {
-      return (
-        <Form.Item
-          key={`${item.name}+${index}`}
-          label={item.label}
-          name={item.name}
-          rules={[{ required: true }]}
-        >
-          <Input />
-        </Form.Item>
-      );
-    } else {
-      return (
-        <Form.Item
-          key={`${item.name}+${index}`}
-          label={item.label}
-          name={item.name}
-          rules={[{ required: true }]}
-        >
+
+    const config = item.type === "number"
+      ? { rules: [ { type: "integer", required: true }] }
+      : { rules: [ { required: true }] };
+
+    const inputItem = item.type === "number" ? (<InputNumber />)
+      : item.type === "text" ? (<Input />)
+        : (
           <Select
             options={item.select.map((x) => ({ label: x.value, value: x.key }))}
           />
-        </Form.Item>
-      );
-    }
+        );
+
+    return (
+      <Form.Item
+        key={`${item.name}+${index}`}
+        label={item.label}
+        name={item.name}
+        {...config}
+      >
+        {inputItem}
+      </Form.Item>
+    );
   });
 
   return (

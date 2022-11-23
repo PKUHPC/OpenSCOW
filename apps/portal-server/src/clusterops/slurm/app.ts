@@ -88,7 +88,16 @@ export const slurmAppOps = (cluster: string): AppOps => {
         if (appConfig.type === "web") {
           let beforeScript: string = "";
           for (const key in customAttributes) {
-            beforeScript = beforeScript + "export " + key + "=" + customAttributes[key] + "\n";
+            if (customAttributes[key].toString().trim() === "") {
+              throw new Error(`The value entered by the user of custom form whose name is ${key} is all Spaces`);
+            }
+            if (customAttributes[key].toString().indexOf("\"") >= 0) {
+              throw new Error(`
+              The custom form attributes value ${customAttributes[key]} of key ${key} contains double quotes "`);
+            }
+
+            const envItem = `export ${key}="${customAttributes[key]}"`;
+            beforeScript = beforeScript + envItem + "\n";
           }
           beforeScript = beforeScript + appConfig.web!.beforeScript;
           await sftpWriteFile(sftp)(join(workingDirectory, "before.sh"), beforeScript);

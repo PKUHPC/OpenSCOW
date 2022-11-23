@@ -1,7 +1,7 @@
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { status } from "@grpc/grpc-js";
 import { authenticate } from "src/auth/server";
-import { AppCustomAttribute_AttributeType, AppServiceClient } from "src/generated/portal/app";
+import { appCustomAttribute_AttributeTypeToJSON, AppServiceClient } from "src/generated/portal/app";
 import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
 import { handlegRPCError } from "src/utils/server";
@@ -12,7 +12,7 @@ export interface SelectOption {
 }
 
 export interface AppCustomAttribute {
-  type: "text" | "number" | "select";
+  type: string;
   label: string;
   name: string;
   select: SelectOption[];
@@ -55,9 +55,7 @@ export default /* #__PURE__*/route<GetAppAttributesSchema>("GetAppAttributesSche
     const attributes: AppCustomAttribute[] = [];
     reply.attributes.forEach((item) => {
       attributes.push({
-        type: item.type === AppCustomAttribute_AttributeType.number
-          ? "number" : item.type === AppCustomAttribute_AttributeType.select
-            ? "select" : "text",
+        type: appCustomAttribute_AttributeTypeToJSON(item.type),
         label: item.label,
         name: item.name,
         select: item.options,

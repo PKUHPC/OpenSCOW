@@ -6,7 +6,7 @@ import { getClusterOps } from "src/clusterops";
 import { apps } from "src/config/apps";
 import {
   AppCustomAttribute,
-  AppCustomAttribute_AttributeType,
+  appCustomAttribute_AttributeTypeFromJSON,
   AppServiceServer,
   AppServiceService,
   ConnectToAppResponse,
@@ -130,12 +130,10 @@ export const appServiceServer = plugin((server) => {
       if (app.attributes) {
         app.attributes.forEach((item) => {
           attributes.push({
-            type: item.type === "number"
-              ? AppCustomAttribute_AttributeType.number : item.type === "select"
-                ? AppCustomAttribute_AttributeType.select : AppCustomAttribute_AttributeType.text,
+            type: appCustomAttribute_AttributeTypeFromJSON(item.type),
             label: item.label,
             name: item.name,
-            options: item.select,
+            options: item.select ?? [],
           });
         });
       }

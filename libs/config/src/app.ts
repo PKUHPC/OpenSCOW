@@ -55,13 +55,14 @@ export const AppConfigSchema = Type.Object({
     Type.Object({
       type:  Type.Enum({ number: "number", text: "text", select: "select" }, { description: "表单类型" }),
       label: Type.String({ description: "表单标签" }),
-      name: Type.String({ description: "表单name" }),
-      select: Type.Array(
-        Type.Object({
-          key: Type.String({ description: "表单选项key" }),
-          value: Type.String({ description: "表单选项value" }),
-        }), { description:"表单选项", default: []},
-      ),
+      name: Type.String({ description: "表单字段名" }),
+      select: Type.Optional(
+        Type.Array(
+          Type.Object({
+            key: Type.String({ description: "表单选项key" }),
+            value: Type.String({ description: "表单选项的文本" }),
+          }), { description:"表单选项"},
+        )),
     }),
   )),
 });
@@ -77,6 +78,13 @@ export const getAppConfigs: GetConfigFn<Record<string, AppConfigSchema>> = (base
   Object.entries(appsConfig).forEach(([id, config]) => {
     if (!config[config.type]) {
       throw new Error(`App ${id} is of type ${config.type} but config.${config.type} is not set`);
+    }
+    if (config.attributes) {
+      config.attributes.forEach((item) => {
+        if (item.type === "select" && !item.select) {
+          throw new Error(`App ${id}'s form attributes of name ${item.name} is of type select but select options is not set`);
+        }
+      })
     }
   });
 
