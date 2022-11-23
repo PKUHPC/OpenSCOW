@@ -9,7 +9,7 @@ import { handlegRPCError } from "src/utils/server";
 export interface ExistsSchema {
 	method: "GET";
 	
-	body: {
+	query: {
 		cluster: string;
 		path: string;
 	}
@@ -27,7 +27,7 @@ export default route<ExistsSchema>("ExistsSchema", async (req, res) => {
   const info = await auth(req, res);
   if (!info) { return; }
 
-  const { cluster, path } = req.body;
+  const { cluster, path } = req.query;
 
   const client = getClient(FileServiceClient);
 
