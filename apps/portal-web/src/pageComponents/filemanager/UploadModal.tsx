@@ -46,7 +46,7 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
           }
         }}
         beforeUpload={async (file) => {
-          await api.exists({ body:{ cluster: cluster, path: join(path, file.name) } })
+          await api.exists({ query:{ cluster: cluster, path: join(path, file.name) } })
             .then((d) => {
               if (d) {
                 Modal.confirm({
