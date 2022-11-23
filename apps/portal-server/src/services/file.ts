@@ -336,7 +336,7 @@ export const fileServiceServer = plugin((server) => {
       });
     },
 
-    isExists: async ({ request, logger }) => {
+    exists: async ({ request, logger }) => {
       const { userId, cluster, path } = request;
 
       const host = getClusterLoginNode(cluster);

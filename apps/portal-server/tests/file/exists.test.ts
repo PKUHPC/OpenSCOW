@@ -2,7 +2,7 @@ import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { Server } from "@ddadaal/tsgrpc-server";
 import { credentials } from "@grpc/grpc-js";
 import { createServer } from "src/app";
-import { FileServiceClient, IsExistsRequest } from "src/generated/portal/file";
+import { ExistsRequest, FileServiceClient } from "src/generated/portal/file";
 
 import { actualPath, cluster, connectToTestServer, 
   createFile, createTestItems, resetTestServer, TestSshServer, userId } from "./utils";
@@ -32,9 +32,9 @@ it("return true if exists", async () => {
 
   await createFile(ssh.sftp, filePath);
   
-  const result = await asyncUnaryCall(client, "isExists", {
+  const result = await asyncUnaryCall(client, "exists", {
     cluster, userId, path: filePath,
-  } as IsExistsRequest);
+  } as ExistsRequest);
 
   expect(result.exists).toBeTrue();
 
@@ -44,9 +44,9 @@ it("return false if not exists", async () => {
   const fileName = "file2";
   const filePath = actualPath(fileName);
 
-  const result = await asyncUnaryCall(client, "isExists", {
+  const result = await asyncUnaryCall(client, "exists", {
     cluster, userId, path: filePath,
-  } as IsExistsRequest);
+  } as ExistsRequest);
 
   expect(result.exists).toBeFalse();
 

@@ -128,13 +128,13 @@ message GetFileMetadataResponse {
   uint32 size = 1;
 }
 
-message IsExistsRequest {
+message ExistsRequest {
   string user_id = 1;
   string cluster = 2;
   string path = 3;
 }
 
-message IsExistsResponse {
+message ExistsResponse {
    bool exists = 1; 
 }
 
@@ -156,5 +156,5 @@ service FileService {
 
   rpc GetFileMetadata(GetFileMetadataRequest) returns (GetFileMetadataResponse);
 
-  rpc IsExists(IsExistsRequest) returns (IsExistsResponse);
+  rpc Exists(ExistsRequest) returns (ExistsResponse);
 }
