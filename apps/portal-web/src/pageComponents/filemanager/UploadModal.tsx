@@ -1,6 +1,7 @@
 import { InboxOutlined } from "@ant-design/icons";
 import { Button, Modal, Upload } from "antd";
 import { join } from "path";
+import { api } from "src/apis";
 import { useMessage } from "src/layouts/prompts";
 import { urlToUpload } from "src/pageComponents/filemanager/api";
 
@@ -43,6 +44,22 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
           } else if (file.status === "error") {
             message.error(`${file.name}上传失败`);
           }
+        }}
+        beforeUpload={async (file) => {
+          await api.exists({ body:{ cluster: cluster, path: join(path, file.name) } })
+            .then((d) => {
+              if (d) {
+                Modal.confirm({
+                  title: "文件已存在",
+                  content: `文件${file.name}已存在，是否覆盖？`,
+                  onOk: () => Promise.resolve(),
+                  onCancel: () => Promise.reject(),
+                });
+              }
+              else {
+                Promise.resolve();
+              }
+            });
         }}
       >
         <p className="ant-upload-drag-icon">

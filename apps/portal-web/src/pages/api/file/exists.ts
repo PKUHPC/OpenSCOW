@@ -15,7 +15,7 @@ export interface ExistsSchema {
 	}
 
 	responses: {
-		200: boolean;
+		200: { result: boolean };
 		400: { code: "INVALID_CLUSTER" };
 	}
 }
@@ -33,7 +33,7 @@ export default route<ExistsSchema>("ExistsSchema", async (req, res) => {
 
   return asyncUnaryCall(client, "exists", {
     userId: info.identityId, cluster, path,  
-  }).then((results) => ({ 200: results.exists }), handlegRPCError({
+  }).then((results) => ({ 200: { result: results.exists } }), handlegRPCError({
     [status.NOT_FOUND]: () => ({ 400: { code: "INVALID_CLUSTER" as const } }),
   }));
 });
