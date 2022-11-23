@@ -1,5 +1,5 @@
 import { PlusOutlined } from "@ant-design/icons";
-import { Form, Table } from "antd";
+import { Button, Form, Table } from "antd";
 import { ColumnsType } from "antd/es/table";
 import { useRouter } from "next/router";
 import React, { useCallback } from "react";
@@ -8,7 +8,6 @@ import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { ModalButton } from "src/components/ModalLink";
-import { PageTitle } from "src/components/PageTitle";
 import { DesktopTableActions } from "src/pageComponents/desktop/DesktopTableActions";
 import { NewDesktopTableModal } from "src/pageComponents/desktop/NewDesktopTableModal";
 import { publicConfig } from "src/utils/config";
@@ -17,7 +16,6 @@ import { queryToString } from "src/utils/querystring";
 const NewDesktopTableModalButton = ModalButton(NewDesktopTableModal, { type: "primary", icon: <PlusOutlined /> });
 
 interface Props {
-
 }
 
 export type DesktopItem = {
@@ -66,11 +64,6 @@ export const DesktopTable: React.FC<Props> = () => {
   ];
   return (
     <div>
-      <PageTitle titleText="登录节点上的桌面">
-        <NewDesktopTableModalButton reload={reload}>
-        新建桌面
-        </NewDesktopTableModalButton>
-      </PageTitle>
       <FilterFormContainer>
         <Form layout="inline">
           <Form.Item label="集群">
@@ -80,6 +73,16 @@ export const DesktopTable: React.FC<Props> = () => {
                 router.push({ query: { cluster: x.id } });
               }}
             />
+          </Form.Item>
+          <Form.Item>
+            <Button onClick={reload} loading={isLoading}>
+              刷新
+            </Button>
+          </Form.Item>
+          <Form.Item>
+            <NewDesktopTableModalButton reload={reload} cluster={cluster}>
+              新建桌面
+            </NewDesktopTableModalButton>
           </Form.Item>
         </Form>
       </FilterFormContainer>
