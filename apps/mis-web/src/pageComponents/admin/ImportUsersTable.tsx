@@ -1,12 +1,14 @@
-import { Button, Checkbox, Form, Input, Select, Table, Tabs, Tooltip } from "antd";
+import { Button, Checkbox, Form, Input, Select, Space, Table, Tabs, Tooltip } from "antd";
 import Router from "next/router";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useAsync } from "react-async";
+import { useStore } from "simstate";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { ClusterAccountInfo, ClusterUserInfo, GetClusterUsersReply, ImportUsersData } from "src/generated/server/admin";
 import { useMessage } from "src/layouts/prompts";
+import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { publicConfig } from "src/utils/config";
 import { queryToString, useQuerystring } from "src/utils/querystring";
 
@@ -14,10 +16,13 @@ export const ImportUsersTable: React.FC = () => {
   const message = useMessage();
 
   const qs = useQuerystring();
+
+  const defaultClusterStore = useStore(DefaultClusterStore);
+
   const clusterParam = queryToString(qs.cluster);
   const cluster = (publicConfig.CLUSTERS[clusterParam]
     ? publicConfig.CLUSTERS[clusterParam]
-    : Object.values(publicConfig.CLUSTERS)[0]);
+    : defaultClusterStore.cluster);
 
   const [form] = Form.useForm<{data: GetClusterUsersReply, whitelist: boolean}>();
 
@@ -99,8 +104,20 @@ export const ImportUsersTable: React.FC = () => {
             .finally(() => { setLoading(false); });
         }}
       >
-        <Tabs defaultActiveKey="user" tabBarExtraContent={<a onClick={reload}>刷新</a>}>
-          <Tabs.TabPane tab="用户" key="user">
+        <Tabs 
+          defaultActiveKey="user" 
+          tabBarExtraContent={(
+            <Space size="large">
+              <a onClick={reload}>
+                刷新
+              </a>
+              <Button type="primary" htmlType="submit" loading={loading}>
+                提交
+              </Button>
+            </Space>
+          )}
+        >
+          <Tabs.TabPane tab="用户" key="user" forceRender={true}>
             <Table
               rowSelection={{
                 selectedRowKeys: selectedUsers,
@@ -145,7 +162,7 @@ export const ImportUsersTable: React.FC = () => {
               />
             </Table>
           </Tabs.TabPane>
-          <Tabs.TabPane tab="账户" key="account">
+          <Tabs.TabPane tab="账户" key="account" forceRender={true}>
             <Table
               rowSelection={{
                 selectedRowKeys: selectedAccounts,
@@ -188,9 +205,6 @@ export const ImportUsersTable: React.FC = () => {
             <Form.Item name="whitelist" valuePropName="checked">
               <Checkbox>将所有账户加入白名单</Checkbox>
             </Form.Item>
-            <Button type="primary" htmlType="submit" loading={loading}>
-              提交
-            </Button>
           </Tabs.TabPane>
         </Tabs>
       </Form>

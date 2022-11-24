@@ -3,12 +3,14 @@ import Router, { useRouter } from "next/router";
 import { join } from "path";
 import React, { useCallback } from "react";
 import { useAsync } from "react-async";
+import { useStore } from "simstate";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import type { AppSession } from "src/generated/portal/app";
 import { useMessage } from "src/layouts/prompts";
 import { ConnectTopAppLink } from "src/pageComponents/app/ConnectToAppLink";
+import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { publicConfig } from "src/utils/config";
 import { compareDateTime, formatDateTime } from "src/utils/datetime";
 import { compareNumber } from "src/utils/math";
@@ -25,7 +27,9 @@ export const AppSessionsTable: React.FC<Props> = () => {
 
   const clusterQuery = queryToString(router.query.cluster);
 
-  const cluster = publicConfig.CLUSTERS.find((x) => x.id === clusterQuery) ?? publicConfig.CLUSTERS[0];
+  const defaultClusterStore = useStore(DefaultClusterStore);
+
+  const cluster = publicConfig.CLUSTERS.find((x) => x.id === clusterQuery) ?? defaultClusterStore.cluster;
 
   const { data, isLoading, reload } = useAsync({
     promiseFn: useCallback(async () => {

@@ -2,12 +2,13 @@ import { Button, Form, Space, Table } from "antd";
 import Link from "next/link";
 import React, { useCallback, useState } from "react";
 import { useAsync } from "react-async";
+import { useStore } from "simstate";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { JobTemplate } from "src/generated/portal/job";
+import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import type { Cluster } from "src/utils/config";
-import { publicConfig } from "src/utils/config";
 
 interface Props {}
 
@@ -17,9 +18,11 @@ interface FilterForm {
 
 export const SavedJobsTable: React.FC<Props> = () => {
 
+  const defaultClusterStore = useStore(DefaultClusterStore);
+
   const [query, setQuery] = useState<FilterForm>(() => {
     return {
-      cluster: publicConfig.CLUSTERS[0],
+      cluster: defaultClusterStore.cluster,
     };
   });
 

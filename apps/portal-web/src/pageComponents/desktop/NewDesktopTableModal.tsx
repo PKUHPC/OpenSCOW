@@ -49,7 +49,6 @@ export const NewDesktopTableModal: React.FC<Props> = ({ open, onClose, reload, c
       .finally(() => { setSubmitting(false); });
   };
 
-
   return (
     <Modal
       title="新建桌面"

@@ -12,9 +12,9 @@ import {
   SaveOutlined } from "@ant-design/icons";
 import React from "react";
 import { NavItemProps } from "src/layouts/base/NavItemProps";
-import { publicConfig } from "src/utils/config";
+import { Cluster, publicConfig } from "src/utils/config";
 
-export const userRoutes: () => NavItemProps[] = () => [
+export const userRoutes: (defaultCluster: Cluster) => NavItemProps[] = (defaultCluster: Cluster) => [
   {
     Icon: DashboardOutlined,
     text: "仪表盘",
@@ -52,11 +52,9 @@ export const userRoutes: () => NavItemProps[] = () => [
     Icon: MacCommandOutlined,
     text: "Shell",
     path: "/shell",
-    clickToPath: publicConfig.CLUSTERS.length === 1
-      ? `${process.env.NEXT_PUBLIC_BASE_PATH || ""}/shell/${publicConfig.CLUSTERS[0].id}`
-      : undefined,
+    clickToPath: `${process.env.NEXT_PUBLIC_BASE_PATH || ""}/shell/${defaultCluster.id}`,
     openInNewPage: true,
-    clickable: publicConfig.CLUSTERS.length === 1,
+    clickable: true,
     children: publicConfig.CLUSTERS.map(({ name, id }) => ({
       openInNewPage: true,
       Icon: CloudServerOutlined,
@@ -98,9 +96,8 @@ export const userRoutes: () => NavItemProps[] = () => [
     Icon: FolderOutlined,
     text: "文件管理",
     path: "/files",
-    clickToPath: publicConfig.CLUSTERS.length === 1
-      ? `/files/${publicConfig.CLUSTERS[0].id}/~` : undefined,
-    clickable: publicConfig.CLUSTERS.length === 1,
+    clickToPath: `/files/${defaultCluster.id}/~`,
+    clickable: true,
     children: publicConfig.CLUSTERS.map((cluster) => ({
       Icon: FolderOutlined,
       text: cluster.name,

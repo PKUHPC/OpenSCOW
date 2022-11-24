@@ -5,6 +5,7 @@ import { join } from "path";
 import React from "react";
 import { antdBreakpoints } from "src/layouts/base/constants";
 import { BigScreenMenu } from "src/layouts/base/header/BigScreenMenu";
+import { DefaultClusterSelector } from "src/layouts/base/header/DefaultClusterSelector";
 import { Logo } from "src/layouts/base/header/Logo";
 import { NavItemProps } from "src/layouts/base/NavItemProps";
 import { User } from "src/stores/UserStore";
@@ -64,7 +65,6 @@ export const Header: React.FC<Props> = ({
   setSidebarCollapsed, sidebarCollapsed,
   user, pathname, logout,
 }) => {
-
   return (
     <Container>
       <HeaderItem>
@@ -87,6 +87,7 @@ export const Header: React.FC<Props> = ({
         />
         <MenuPartPlaceholder />
       </MenuPart>
+      <DefaultClusterSelector />
       {
         publicConfig.PORTAL_URL ? (
           <HeaderItem>

@@ -4,12 +4,14 @@ import { ColumnsType } from "antd/es/table";
 import { useRouter } from "next/router";
 import React, { useCallback } from "react";
 import { useAsync } from "react-async";
+import { useStore } from "simstate";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { ModalButton } from "src/components/ModalLink";
 import { DesktopTableActions } from "src/pageComponents/desktop/DesktopTableActions";
 import { NewDesktopTableModal } from "src/pageComponents/desktop/NewDesktopTableModal";
+import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { publicConfig } from "src/utils/config";
 import { queryToString } from "src/utils/querystring";
 
@@ -27,8 +29,10 @@ export const DesktopTable: React.FC<Props> = () => {
 
   const router = useRouter();
 
+  const defaultClusterStore = useStore(DefaultClusterStore);
+
   const clusterQuery = queryToString(router.query.cluster);
-  const cluster = publicConfig.CLUSTERS.find((x) => x.id === clusterQuery) ?? publicConfig.CLUSTERS[0];
+  const cluster = publicConfig.CLUSTERS.find((x) => x.id === clusterQuery) ?? defaultClusterStore.cluster;
 
   const { data, isLoading, reload } = useAsync({
     promiseFn: useCallback(async () => {
