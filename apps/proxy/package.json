@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "dotenv -e env/.env.dev -- npx nodemon --watch src -e ts,tsx --exec npx ts-node -r tsconfig-paths/register src/index.ts",
-    "build": "pnpm prepareDev && rimraf build && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
+    "build": "rimraf build && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
     "serve": "node build/index.js"
   },
   "dependencies": {
