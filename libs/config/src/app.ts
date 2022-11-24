@@ -59,8 +59,8 @@ export const AppConfigSchema = Type.Object({
       select: Type.Optional(
         Type.Array(
           Type.Object({
-            key: Type.String({ description: "表单选项key" }),
-            value: Type.String({ description: "表单选项的文本" }),
+            value: Type.String({ description: "表单选项key，编程中使用" }),
+            label: Type.String({ description: "表单选项展示给用户的文本" }),
           }), { description:"表单选项" },
         )),
     }),

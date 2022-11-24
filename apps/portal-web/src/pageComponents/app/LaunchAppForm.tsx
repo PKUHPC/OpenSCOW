@@ -122,7 +122,7 @@ export const LaunchAppForm: React.FC<Props> = ({ appId }) => {
       : item.type === "text" ? (<Input />)
         : (
           <Select
-            options={item.select.map((x) => ({ label: x.value, value: x.key }))}
+            options={item.select.map((x) => ({ label: x.label, value: x.value }))}
           />
         );
 

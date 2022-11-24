@@ -30,7 +30,7 @@ attributes:
     name: selectVersion
     label: 选择版本
     select:
-      - key: version10
-        value: v10
-      - key: version11
-        value: v11
+      - value: version10
+        label: v10
+      - value: version11
+        label: v11

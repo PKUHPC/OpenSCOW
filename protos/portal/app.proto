@@ -77,8 +77,8 @@ message GetAppAttributesRequest {
 }
 
 message SelectOption {
-  string key = 1;
-  string value = 2;
+  string value = 1;
+  string label = 2;
 }
 
 message AppCustomAttribute {

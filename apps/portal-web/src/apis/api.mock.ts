@@ -81,8 +81,8 @@ export const mockApi: MockApi<typeof api> = {
     { type: "number", label: "版本", name: "version", select: []},
     { type: "text", label: "文字 ", name: "text", select: []},
     { type: "select", label: "选项", name: "option", select: [
-      { key: "v1", value: "version1" },
-      { key: "v2", value: "version2" },
+      { label: "版本1", value: "version1" },
+      { label: "版本2", value: "version2" },
     ]},
   ]}),
 

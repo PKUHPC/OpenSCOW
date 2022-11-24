@@ -143,9 +143,11 @@ attributes:
 | 属性       | 类型                           | 是否必填 | 解释                             |
 |----------|------------------------------|------|--------------------------------|
 | `type`   | `number`, `text` 或者 `select` | 是    | 在HTML表单元素中输入的内容的类型             |
-| `name`   | 字符串                          | 是    | HTML表单的name属性，会作为计算节点环境变量名     |
+| `name`   | 字符串                          | 是    | HTML表单的name属性，在编程中使用，并且会作为计算节点环境变量名     |
 | `label`  | 字符串                          | 是    | HTML表单的label属性，输入框左侧显示的标签      |
-| `select` | 选项的列表                        | 否    | 如果`type`是`select`，需要配置此项，指明具体的选项 |
+| `select` | 选项的列表                        | 否    | 如果`type`是`select`，必须配置此项，指明具体的选项，具体配置办法见`select`示例 |
+
+#### 配置输入类型为文本的HTML表单
 
 配置一个输入内容是文本类型的表单，需要指定`type`为`text`, 示例如下：
 
@@ -156,7 +158,11 @@ attributes:
     label: 版本
 ```
 
-配置一个输入内容是数字类型的表单，需要指定`type`为`number`, 示例如下：
+如果用户输入了`v3.4.5`，计算节点的环境变量`version=v3.4.5`可以在应用启动时被读取。
+
+#### 配置输入类型为数字的HTML表单
+
+配置一个输入内容是数字类型的表单，需要指定`type`为`number`, 此时用户仅能输入数字，示例如下：
 
 ```yaml
 attributes:
@@ -165,7 +171,18 @@ attributes:
     label: 数量
 ```
 
-配置一个输入内容是文本类型的表单，需要指定`type`为`select`,并且配置`select`项, 示例如下：
+如果用户输入了345，计算节点的环境变量`size=345`可以在应用启动时被读取。
+
+#### 配置输入为下拉选择器的HTML表单
+
+配置一个输入内容是下拉选择器的表单，需要指定`type`为`select`,并且配置`select`项。`select`项需要配置`value`和`label`，作为用户可以选择的选项。
+
+| 属性       | 类型                           | 是否必填 | 解释                             |
+|----------|------------------------------|------|--------------------------------|
+| `value`   | 字符串 | 是    | HTML表单选项的value属性，在编程中使用，并且会作为计算节点环境变量的值             |
+| `label`   | 字符串                          | 是    | HTML表单的label属性，选项中展示给用户的文本     |
+
+示例如下：
 
 ```yaml
 attributes:
@@ -173,13 +190,13 @@ attributes:
     name: selectVersion
     label: 选择版本
     select:
-      - key: version10
-        value: v10
-      - key: version11
-        value: v11
+      - value: version10
+        label: v10
+      - value: version11
+        label: v11
 ```
 
-如果用户选择v11选项，环境变量 `selectVersion=version11` 可以在应用启动时被读取。
+如果用户选择v11选项，计算节点的环境变量 `selectVersion=version11` 可以在应用启动时被读取。
 
 可以配置多个HTML表单：
 
@@ -195,8 +212,8 @@ attributes:
     name: selectVersion
     label: 选择版本
     select:
-      - key: version10
-        value: v10
-      - key: version11
-        value: v11
+      - value: version10
+        label: v10
+      - value: version11
+        label: v11
 ```

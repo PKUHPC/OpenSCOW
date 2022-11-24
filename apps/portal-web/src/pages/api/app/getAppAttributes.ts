@@ -7,8 +7,8 @@ import { route } from "src/utils/route";
 import { handlegRPCError } from "src/utils/server";
 
 export interface SelectOption {
-  key: string;
   value: string;
+  label: string;
 }
 
 export interface AppCustomAttribute {
