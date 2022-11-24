@@ -1,5 +1,5 @@
 {
-  "name": "@scow/proxy",
+  "name": "@scow/node-gateway",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",

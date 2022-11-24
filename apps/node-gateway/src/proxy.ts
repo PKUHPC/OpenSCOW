@@ -3,7 +3,7 @@ import cookie from "cookie";
 import http, { IncomingMessage } from "http";
 import httpProxy, { ProxyTarget } from "http-proxy";
 import pino, { Logger } from "pino";
-import { config } from "src/config/env";
+import { basePaths, config } from "src/config/env";
 import { createReqIdGen } from "src/reqId";
 
 const rootLogger = pino({ level: config.LOG_LEVEL });
@@ -19,7 +19,7 @@ function parseToken(req: IncomingMessage) {
 async function authenticate(req: IncomingMessage, logger: Logger) {
   const token = parseToken(req);
 
-  const user = token && await validateToken(config.AUTH_URL, token, logger);
+  const user = token && await validateToken(config.AUTH_INTERNAL_URL, token, logger);
 
   return user ? user : undefined;
 }
@@ -48,7 +48,7 @@ function parseTarget(req: IncomingMessage): ProxyTarget | Error {
 
 }
 
-export function createProxyServer() {
+export function createGateway() {
   const proxy = httpProxy.createServer();
 
   const reqIdGen = createReqIdGen();
@@ -57,6 +57,40 @@ export function createProxyServer() {
 
     const logger = rootLogger.child({ req: reqIdGen() });
 
+    function doProxy(target: ProxyTarget, type: string) {
+      logger.info("proxy %s requests", type);
+      proxy.web(req, res, { target }, (err) => {
+        if (err) { logger.error(err, "Error when proxing %s requests", type); }
+      });
+    }
+
+    if (!req.url) {
+      res.writeHead(400, { "Content-Type": "text/plain" });
+      res.end("No url is specified");
+      return;
+    }
+
+    // proxy auth requests
+    if (req.url.startsWith(basePaths.authPublic)) {
+      doProxy(config.AUTH_INTERNAL_URL, "auth");
+      return;
+    }
+
+    // proxy PORTAL_BASE_PATH
+    if (basePaths.portal && req.url.startsWith(basePaths.portal)) {
+      logger.info("proxy portal requests");
+      doProxy(config.PORTAL_INTERNAL_URL, "portal");
+      return;
+    }
+
+    // proxy MIS_BASE_PATH
+    if (basePaths.mis && req.url.startsWith(basePaths.mis)) {
+      logger.info("proxy MIS requests");
+      doProxy(config.PORTAL_INTERNAL_URL, "mis");
+      return;
+    }
+
+    // the rest is proxy
     const target = parseTarget(req);
 
     if (target instanceof Error) {
@@ -68,9 +102,8 @@ export function createProxyServer() {
 
     authenticate(req, logger).then((user) => {
       if (user) {
-        logger.info("Authenticated as {}. Continue HTTP proxy to {}", user.identityId, target);
-        proxy.web(req, res, { target });
-
+        logger.info("Authenticated as %s", user.identityId);
+        doProxy(target, "proxy");
       } else {
         logger.info("Request not authenticated");
         res.writeHead(401, { "Content-Type": "text/plain" });
@@ -84,23 +117,55 @@ export function createProxyServer() {
 
     const logger = rootLogger.child({ req: reqIdGen() });
 
+    const writeError = (statusLine: string, msg: string) => {
+      socket.end(`HTTP/1.1 ${statusLine}\r\n${msg}`);
+    };
+
+    const doProxy = (target: ProxyTarget) => {
+      logger.info("proxy ws requests");
+      proxy.ws(req, socket, head, { target }, (err) => {
+        if (err) {
+          logger.error(err, "Error when proxing ws requests");
+          writeError("500 Internal Server Error", "Error when proxing ws requests. " + err.message);
+        }
+      });
+    };
+
+    if (!req.url) {
+      writeError("400 Bad Request", "No url is specified");
+      return;
+    }
+
+    // proxy PORTAL_BASE_PATH
+    if (basePaths.portal && req.url.startsWith(basePaths.portal)) {
+      logger.info("proxy portal requests");
+      doProxy(config.PORTAL_INTERNAL_URL);
+      return;
+    }
+
+    // proxy MIS_BASE_PATH
+    if (basePaths.mis && req.url.startsWith(basePaths.mis)) {
+      logger.info("proxy MIS requests");
+      doProxy(config.PORTAL_INTERNAL_URL);
+      return;
+    }
+
+    // proxy
     const target = parseTarget(req);
 
     if (target instanceof Error) {
       logger.error(target, "req.url is not parsable");
-      socket.write("HTTP/1.1 400 Bad Request\r\n");
-      socket.end("req.url is not parsable. " + target.message);
+      writeError("400 Bad Request", "req.url is not parsable. " + target.message);
       return;
     }
 
     authenticate(req, logger).then((user) => {
       if (user) {
         logger.info("Authenticated as {}. Continue WebSocket proxy to {}", user.identityId, target);
-        proxy.ws(req, socket, head, { target });
+        doProxy(target);
       } else {
         logger.info("Request not authenticated");
-        socket.write("HTTP/1.1 401 Unauthorized\r\n");
-        socket.end("Token is not valid.");
+        writeError("401 Unauthorized", "Token is not valid");
       }
     });
   });

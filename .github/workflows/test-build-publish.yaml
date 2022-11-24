@@ -73,8 +73,8 @@ jobs:
             file: gateway
             build_args: ""
 
-          - name: proxy
-            file: proxy
+          - name: node-gateway
+            file: node-gateway
             build_args: ""
 
           - name: mis-server

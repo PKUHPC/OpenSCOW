@@ -58,10 +58,10 @@ services:
       context: ..
       dockerfile: dockerfiles/Dockerfile.auth
 
-  proxy:
-    image: $IMAGE_BASE/proxy:$TAG
+  node-gateway:
+    image: $IMAGE_BASE/node-gateway:$TAG
     build:
       context: ..
-      dockerfile: dockerfiles/Dockerfile.proxy
+      dockerfile: dockerfiles/Dockerfile.node-gateway
 
 
