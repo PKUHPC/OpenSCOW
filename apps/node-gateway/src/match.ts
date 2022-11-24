@@ -19,5 +19,5 @@ export function longestMatch<T extends Rule>(url: string, rules: T[]): T | undef
 }
 
 export function stripPrefix(url: string, prefix: string) {
-  return url.slice(prefix.length);
+  return prefix === "/" ? url : url.slice(prefix.length);
 }

@@ -146,7 +146,7 @@ export function createGateway() {
 
       const proxyWs = () => {
         proxy.ws(req, socket, head, {
-          target, prependPath: false, xfwd: true,
+          target, ignorePath: true, xfwd: true,
         }, (err) => {
           if (err) { logger.error(err, "Error when proxing %s requests", type); }
         });
