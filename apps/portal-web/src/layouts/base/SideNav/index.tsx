@@ -28,7 +28,7 @@ const StyledSider = styled(Sider)`
 
   @media (max-width: ${antdBreakpoints[breakpoint]}px ) {
     position: absolute !important;
-    height: 100%;
+    min-height: 100%;
     z-index: 1000;
 
     body, html {
@@ -38,6 +38,8 @@ const StyledSider = styled(Sider)`
 
     overflow: auto;
   }
+
+  height: 100%;
 
   .ant-menu-item:first-child {
     margin-top: 0px;
