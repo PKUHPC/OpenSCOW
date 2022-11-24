@@ -1,4 +1,6 @@
 import { Select } from "antd";
+import { useStore } from "simstate";
+import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { Cluster, publicConfig } from "src/utils/config";
 
 
@@ -24,16 +26,34 @@ export const ClusterSelector: React.FC<Props> = ({ value, onChange }) => {
 interface SingleSelectionProps {
   value?: Cluster;
   onChange?: (cluster: Cluster) => void;
+  label?: string;
 }
 
-export const SingleClusterSelector: React.FC<SingleSelectionProps> = ({ value, onChange }) => {
+export const SingleClusterSelector: React.FC<SingleSelectionProps> = ({ value, onChange, label }) => {
   return (
     <Select
       labelInValue
       placeholder="请选择集群"
       value={value ? ({ value: value.id, label: value.name }) : undefined}
       onChange={({ value, label }) => onChange?.({ id: value, name: label })}
-      options={Object.values(publicConfig.CLUSTERS).map((x) => ({ value: x.id, label: x.name }))}
+      options={
+        (label ? [{ value: label, label, disabled: true }] : [])
+          .concat(Object.values(publicConfig.CLUSTERS).map((x) => ({ value: x.id, label: x.name, disabled: false })))
+      }
+    />
+  );
+};
+
+export const DefaultClusterSelector: React.FC = () => {
+  const defaultClusterStore = useStore(DefaultClusterStore);
+
+  return (
+    <SingleClusterSelector 
+      value={defaultClusterStore.cluster} 
+      onChange={(cluster) => {
+        defaultClusterStore.setCluster(cluster);
+      }} 
+      label="选择默认集群"
     />
   );
 };

@@ -3,14 +3,12 @@ import { Space, Typography } from "antd";
 import Link from "next/link";
 import { join } from "path";
 import React from "react";
-import { useStore } from "simstate";
-import { SingleClusterSelector } from "src/components/ClusterSelector";
+import { DefaultClusterSelector } from "src/components/ClusterSelector";
 import { antdBreakpoints } from "src/layouts/base/constants";
 import { BigScreenMenu } from "src/layouts/base/header/BigScreenMenu";
 import { Logo } from "src/layouts/base/header/Logo";
 import { NavItemProps } from "src/layouts/base/NavItemProps";
-import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
-import { User, UserStore } from "src/stores/UserStore";
+import { User } from "src/stores/UserStore";
 import { publicConfig } from "src/utils/config";
 import styled from "styled-components";
 
@@ -67,11 +65,6 @@ export const Header: React.FC<Props> = ({
   setSidebarCollapsed, sidebarCollapsed,
   user, pathname, logout,
 }) => {
-
-  const userStore = useStore(UserStore);
-
-  const defaultClusterStore = useStore(DefaultClusterStore);
-
   return (
     <Container>
       <HeaderItem>
@@ -94,12 +87,7 @@ export const Header: React.FC<Props> = ({
         />
         <MenuPartPlaceholder />
       </MenuPart>
-      <SingleClusterSelector
-        value={defaultClusterStore.cluster}
-        onChange={(cluster) => {
-          defaultClusterStore.setCluster(cluster);
-        }}
-      />
+      <DefaultClusterSelector />
       {
         publicConfig.PORTAL_URL ? (
           <HeaderItem>
