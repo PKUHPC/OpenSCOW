@@ -45,8 +45,32 @@ function parseTarget(req: IncomingMessage): ProxyTarget | Error {
   } else {
     return new Error("type is not absolute or relative");
   }
-
 }
+
+interface Rule {
+  prefix: string;
+  doProxy: () => void;
+}
+
+function matchLongest(path: string, rules: Rule[]) {
+  // TODO prefix tree :)
+  let longest: Rule | undefined = undefined;
+  for (const rule of rules) {
+    if (path.startsWith(rule.prefix) && (!longest || rule.prefix.length > longest.prefix.length)) {
+      longest = rule;
+    }
+  }
+  return longest;
+}
+
+
+const prefixProxy = (rules: Rule[], url: string) => {
+  const rule = matchLongest(url, rules);
+  if (!rule) { return false; }
+  rule.doProxy();
+  return true;
+};
+
 
 export function createGateway() {
   const proxy = httpProxy.createServer();
@@ -70,25 +94,19 @@ export function createGateway() {
       return;
     }
 
-    // proxy auth requests
-    if (req.url.startsWith(basePaths.authPublic)) {
-      doProxy(config.AUTH_INTERNAL_URL, "auth");
-      return;
+    const rules: Rule[] = [
+      { prefix: basePaths.authPublic, doProxy: () => doProxy(config.AUTH_INTERNAL_URL, "auth") },
+    ];
+
+    if (basePaths.portal) {
+      rules.push({ prefix: basePaths.portal, doProxy: () => doProxy(config.PORTAL_INTERNAL_URL, "portal") });
     }
 
-    // proxy PORTAL_BASE_PATH
-    if (basePaths.portal && req.url.startsWith(basePaths.portal)) {
-      logger.info("proxy portal requests");
-      doProxy(config.PORTAL_INTERNAL_URL, "portal");
-      return;
+    if (basePaths.mis) {
+      rules.push({ prefix: basePaths.mis, doProxy: () => doProxy(config.MIS_INTERNAL_URL, "mis") });
     }
 
-    // proxy MIS_BASE_PATH
-    if (basePaths.mis && req.url.startsWith(basePaths.mis)) {
-      logger.info("proxy MIS requests");
-      doProxy(config.PORTAL_INTERNAL_URL, "mis");
-      return;
-    }
+    if (prefixProxy(rules, req.url)) { return; }
 
     // the rest is proxy
     const target = parseTarget(req);
@@ -121,8 +139,8 @@ export function createGateway() {
       socket.end(`HTTP/1.1 ${statusLine}\r\n${msg}`);
     };
 
-    const doProxy = (target: ProxyTarget) => {
-      logger.info("proxy ws requests");
+    const doProxy = (target: ProxyTarget, type: string) => {
+      logger.info("proxy %s WebSocket requests", type);
       proxy.ws(req, socket, head, { target }, (err) => {
         if (err) {
           logger.error(err, "Error when proxing ws requests");
@@ -136,19 +154,17 @@ export function createGateway() {
       return;
     }
 
-    // proxy PORTAL_BASE_PATH
-    if (basePaths.portal && req.url.startsWith(basePaths.portal)) {
-      logger.info("proxy portal requests");
-      doProxy(config.PORTAL_INTERNAL_URL);
-      return;
+    const rules: Rule[] = [];
+
+    if (basePaths.portal) {
+      rules.push({ prefix: basePaths.portal, doProxy: () => doProxy(config.PORTAL_INTERNAL_URL, "portal") });
     }
 
-    // proxy MIS_BASE_PATH
-    if (basePaths.mis && req.url.startsWith(basePaths.mis)) {
-      logger.info("proxy MIS requests");
-      doProxy(config.PORTAL_INTERNAL_URL);
-      return;
+    if (basePaths.mis) {
+      rules.push({ prefix: basePaths.mis, doProxy: () => doProxy(config.MIS_INTERNAL_URL, "mis") });
     }
+
+    if (prefixProxy(rules, req.url)) { return; }
 
     // proxy
     const target = parseTarget(req);
@@ -161,8 +177,8 @@ export function createGateway() {
 
     authenticate(req, logger).then((user) => {
       if (user) {
-        logger.info("Authenticated as {}. Continue WebSocket proxy to {}", user.identityId, target);
-        doProxy(target);
+        logger.info("Authenticated as {}", user.identityId);
+        doProxy(target, "proxy");
       } else {
         logger.info("Request not authenticated");
         writeError("401 Unauthorized", "Token is not valid");
@@ -173,9 +189,30 @@ export function createGateway() {
   return server;
 }
 
+
 export async function startListening(server: http.Server) {
+
+
+  // start
   return new Promise<void>((res) => {
     server.listen(config.PORT, config.HOST, () => {
+
+      // graceful shutdown
+      const signals = {
+        "SIGHUP": 1,
+        "SIGINT": 2,
+        "SIGTERM": 15,
+      };
+
+      Object.entries(signals).forEach(([signal, value]) => {
+        process.on(signal, () => {
+          server.close(() => {
+            console.log(`server stopped by ${signal} with value ${value}`);
+            process.exit(128 + value);
+          });
+        });
+      });
+
       res();
     });
   });

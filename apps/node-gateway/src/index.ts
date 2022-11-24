@@ -1,9 +1,5 @@
-import { createGateway, startListening } from "src/proxy";
+import { createGateway, startListening } from "src/server";
 
 const server = createGateway();
 
 startListening(server);
-
-
-
-

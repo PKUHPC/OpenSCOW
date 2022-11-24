@@ -14,10 +14,10 @@ export const config = envConfig({
   BASE_PATH: str({ desc: "整个系统部署的base path", default: "/" }),
 
   PORTAL_PATH: str({ desc: "门户系统的部署路径，设置为空为不部署", default: "" }),
-  PORTAL_INTERNAL_URL: str({ desc: "门户系统在内网中的路径", default: "http://portal-web:5000" }),
+  PORTAL_INTERNAL_URL: str({ desc: "门户系统在内网中的路径", default: "http://portal-web:3000" }),
 
   MIS_PATH: str({ desc: "管理系统的部署路径，设置为空为不部署", default: "" }),
-  MIS_INTERNAL_URL: str({ desc: "管理系统在内网中的路径", default: "http://mis-web:5000" }),
+  MIS_INTERNAL_URL: str({ desc: "管理系统在内网中的路径", default: "http://mis-web:3000" }),
 
 });
 
