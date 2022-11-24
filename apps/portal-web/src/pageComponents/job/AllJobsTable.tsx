@@ -10,7 +10,7 @@ import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { JobInfo } from "src/generated/portal/job";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
-import { Cluster, publicConfig } from "src/utils/config";
+import { Cluster } from "src/utils/config";
 import { defaultPresets, formatDateTime } from "src/utils/datetime";
 import { compareNumber } from "src/utils/math";
 
