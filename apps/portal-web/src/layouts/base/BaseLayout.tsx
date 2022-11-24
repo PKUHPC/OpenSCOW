@@ -9,6 +9,7 @@ import { Header } from "src/layouts/base/header";
 import { match } from "src/layouts/base/matchers";
 import { SideNav } from "src/layouts/base/SideNav";
 import { userRoutes } from "src/layouts/routes";
+import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { UserStore } from "src/stores/UserStore";
 import { arrayContainsElement } from "src/utils/array";
 import styled from "styled-components";
@@ -45,9 +46,11 @@ type Props = PropsWithChildren<{
 
 export const BaseLayout: React.FC<PropsWithChildren<Props>> = ({ children, footerText }) => {
 
+  const defaultClusterStore = useStore(DefaultClusterStore);
+
   const userStore = useStore(UserStore);
 
-  const allRoutes = useMemo(() => userRoutes(), []);
+  const allRoutes = useMemo(() => userRoutes(defaultClusterStore.cluster), [defaultClusterStore.cluster]);
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
 

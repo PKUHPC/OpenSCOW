@@ -4,11 +4,13 @@ import Router from "next/router";
 import { join } from "path";
 import React, { useCallback, useMemo, useState } from "react";
 import { useAsync } from "react-async";
+import { useStore } from "simstate";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { JobInfo } from "src/generated/portal/job";
-import { Cluster, publicConfig } from "src/utils/config";
+import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
+import { Cluster } from "src/utils/config";
 import { defaultPresets, formatDateTime } from "src/utils/datetime";
 import { compareNumber } from "src/utils/math";
 
@@ -26,12 +28,14 @@ export const AllJobQueryTable: React.FC<Props> = ({
   userId,
 }) => {
 
+  const defaultClusterStore = useStore(DefaultClusterStore);
+
   const [query, setQuery] = useState<FilterForm>(() => {
     const now = dayjs();
     return {
       time: [now.subtract(1, "week"), now],
       jobId: undefined,
-      cluster: publicConfig.CLUSTERS[0],
+      cluster: defaultClusterStore.cluster,
     };
   });
 
