@@ -13,6 +13,7 @@ const TerminalContainer = styled.div`
   // https://github.com/xtermjs/xterm.js/issues/3564#issuecomment-1034107272
   .xterm-viewport {
     width: initial !important;
+    overflow-y: hidden;
   }
 `;
 
@@ -30,7 +31,10 @@ export const Shell: React.FC<Props> = ({ user, cluster, path }) => {
   useEffect(() => {
     if (container.current) {
 
-      const term = new Terminal({ cursorBlink: true });
+      const term = new Terminal({
+        cursorBlink: true,
+        scrollback: 0,
+      });
 
       const payload = {
         cluster,
