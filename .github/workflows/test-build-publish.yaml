@@ -73,6 +73,10 @@ jobs:
             file: gateway
             build_args: ""
 
+          - name: proxy
+            file: proxy
+            build_args: ""
+
           - name: mis-server
             file: mis-server
             build_args: ""

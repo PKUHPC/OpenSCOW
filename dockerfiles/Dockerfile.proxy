@@ -1,0 +1,65 @@
+FROM node:hydrogen-alpine@sha256:9eff44230b2fdcca57a73b8f908c8029e72d24dd05cac5339c79d3dedf6b208b AS builder
+
+RUN apk update && apk add libc6-compat python3 make gcc g++
+
+RUN corepack enable
+
+WORKDIR /app
+
+COPY pnpm-lock.yaml ./
+RUN pnpm fetch
+
+COPY package.json pnpm-workspace.yaml .npmrc ./
+
+COPY libs/libconfig/package.json ./libs/libconfig/
+COPY libs/config/package.json ./libs/config/
+COPY libs/auth/package.json ./libs/auth/
+COPY apps/proxy/package.json ./apps/proxy/
+
+RUN pnpm i --offline --frozen-lockfile
+
+COPY tsconfig.json .eslintrc.json ./
+
+COPY protos ./protos
+
+COPY libs/libconfig ./libs/libconfig
+COPY libs/config ./libs/config
+COPY libs/auth ./libs/auth
+COPY apps/proxy ./apps/proxy
+
+RUN pnpm run build
+
+RUN rm -rf node_modules && pnpm i --prod --frozen-lockfile --offline
+
+FROM node:hydrogen-alpine@sha256:9eff44230b2fdcca57a73b8f908c8029e72d24dd05cac5339c79d3dedf6b208b AS runner
+
+WORKDIR /app
+COPY --from=builder /app/node_modules ./node_modules
+
+WORKDIR /app/libs/auth
+COPY --from=builder /app/libs/auth/package.json .
+COPY --from=builder /app/libs/auth/node_modules/ ./node_modules
+COPY --from=builder /app/libs/auth/build/ ./build
+
+WORKDIR /app/libs/libconfig
+COPY --from=builder /app/libs/libconfig/package.json .
+COPY --from=builder /app/libs/libconfig/node_modules/ ./node_modules
+COPY --from=builder /app/libs/libconfig/build/ ./build
+
+WORKDIR /app/libs/config
+COPY --from=builder /app/libs/config/package.json .
+COPY --from=builder /app/libs/config/node_modules/ ./node_modules
+COPY --from=builder /app/libs/config/build/ ./build
+
+WORKDIR /app/apps/proxy
+COPY --from=builder /app/apps/proxy/package.json .
+COPY --from=builder /app/apps/proxy/node_modules/ ./node_modules
+COPY --from=builder /app/apps/proxy/scripts/ ./scripts
+COPY --from=builder /app/apps/proxy/build/ ./src
+
+ENV NODE_ENV production
+
+ENTRYPOINT [ "node", "src/index.js" ]
+
+
+
