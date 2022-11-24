@@ -4,6 +4,8 @@ import http, { IncomingMessage } from "http";
 import httpProxy, { ProxyTarget } from "http-proxy";
 import pino, { Logger } from "pino";
 import { basePaths, config } from "src/config/env";
+import { setupGracefulShutdown } from "src/gracefulShutdown";
+import { longestMatch } from "src/match";
 import { createReqIdGen } from "src/reqId";
 
 const rootLogger = pino({ level: config.LOG_LEVEL });
@@ -52,26 +54,6 @@ interface Rule {
   doProxy: () => void;
 }
 
-function matchLongest(path: string, rules: Rule[]) {
-  // TODO prefix tree :)
-  let longest: Rule | undefined = undefined;
-  for (const rule of rules) {
-    if (path.startsWith(rule.prefix) && (!longest || rule.prefix.length > longest.prefix.length)) {
-      longest = rule;
-    }
-  }
-  return longest;
-}
-
-
-const prefixProxy = (rules: Rule[], url: string) => {
-  const rule = matchLongest(url, rules);
-  if (!rule) { return false; }
-  rule.doProxy();
-  return true;
-};
-
-
 export function createGateway() {
   const proxy = httpProxy.createServer();
 
@@ -106,7 +88,12 @@ export function createGateway() {
       rules.push({ prefix: basePaths.mis, doProxy: () => doProxy(config.MIS_INTERNAL_URL, "mis") });
     }
 
-    if (prefixProxy(rules, req.url)) { return; }
+    const match = longestMatch(req.url, rules);
+
+    if (match) {
+      match.doProxy();
+      return;
+    }
 
     // the rest is proxy
     const target = parseTarget(req);
@@ -164,7 +151,12 @@ export function createGateway() {
       rules.push({ prefix: basePaths.mis, doProxy: () => doProxy(config.MIS_INTERNAL_URL, "mis") });
     }
 
-    if (prefixProxy(rules, req.url)) { return; }
+    const match = longestMatch(req.url, rules);
+
+    if (match) {
+      match.doProxy();
+      return;
+    }
 
     // proxy
     const target = parseTarget(req);
@@ -196,23 +188,7 @@ export async function startListening(server: http.Server) {
   // start
   return new Promise<void>((res) => {
     server.listen(config.PORT, config.HOST, () => {
-
-      // graceful shutdown
-      const signals = {
-        "SIGHUP": 1,
-        "SIGINT": 2,
-        "SIGTERM": 15,
-      };
-
-      Object.entries(signals).forEach(([signal, value]) => {
-        process.on(signal, () => {
-          server.close(() => {
-            console.log(`server stopped by ${signal} with value ${value}`);
-            process.exit(128 + value);
-          });
-        });
-      });
-
+      setupGracefulShutdown(server, rootLogger);
       res();
     });
   });
