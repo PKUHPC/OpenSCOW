@@ -57,3 +57,11 @@ services:
     build:
       context: ..
       dockerfile: dockerfiles/Dockerfile.auth
+
+  proxy:
+    image: $IMAGE_BASE/proxy:$TAG
+    build:
+      context: ..
+      dockerfile: dockerfiles/Dockerfile.proxy
+
+
