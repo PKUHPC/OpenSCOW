@@ -12,10 +12,6 @@ const TerminalContainer = styled.div`
   flex: 1;
 
   width: 100%;
-
-  .xterm-viewport {
-    overflow-y: hidden;
-  }
 `;
 
 interface Props {
@@ -34,7 +30,6 @@ export const Shell: React.FC<Props> = ({ user, cluster, path }) => {
 
       const term = new Terminal({
         cursorBlink: true,
-        scrollback: 0,
       });
 
       const payload = {
