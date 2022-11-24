@@ -54,7 +54,6 @@ COPY --from=builder /app/libs/config/build/ ./build
 WORKDIR /app/apps/proxy
 COPY --from=builder /app/apps/proxy/package.json .
 COPY --from=builder /app/apps/proxy/node_modules/ ./node_modules
-COPY --from=builder /app/apps/proxy/scripts/ ./scripts
 COPY --from=builder /app/apps/proxy/build/ ./src
 
 ENV NODE_ENV production
