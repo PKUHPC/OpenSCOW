@@ -6,7 +6,7 @@ interface Rule {
  * Longest match
  * @param url the url to match
  * @param rules rules
- * @returns the matched rule, or undefined if no match
+ * @returns the matched rule, or undefined if no
  */
 export function longestMatch<T extends Rule>(url: string, rules: T[]): T | undefined {
   let longest: T | undefined = undefined;
@@ -18,3 +18,6 @@ export function longestMatch<T extends Rule>(url: string, rules: T[]): T | undef
   return longest;
 }
 
+export function stripPrefix(url: string, prefix: string) {
+  return url.slice(prefix.length);
+}

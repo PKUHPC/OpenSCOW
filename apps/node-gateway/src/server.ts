@@ -1,33 +1,16 @@
-import { validateToken } from "@scow/lib-auth";
-import cookie from "cookie";
 import http, { IncomingMessage } from "http";
-import httpProxy, { ProxyTarget } from "http-proxy";
-import pino, { Logger } from "pino";
+import httpProxy from "http-proxy";
+import pino from "pino";
+import { authenticateRequest } from "src/auth";
 import { basePaths, config } from "src/config/env";
 import { setupGracefulShutdown } from "src/gracefulShutdown";
-import { longestMatch } from "src/match";
+import { longestMatch, stripPrefix } from "src/match";
 import { createReqIdGen } from "src/reqId";
 
 const rootLogger = pino({ level: config.LOG_LEVEL });
 
-const TOKEN_COOKIE_KEY = "SCOW_USER";
 
-function parseToken(req: IncomingMessage) {
-  const token: string | undefined = cookie.parse(req.headers.cookie || "")[TOKEN_COOKIE_KEY];
-
-  return token;
-}
-
-async function authenticate(req: IncomingMessage, logger: Logger) {
-  const token = parseToken(req);
-
-  const user = token && await validateToken(config.AUTH_INTERNAL_URL, token, logger);
-
-  return user ? user : undefined;
-}
-
-function parseTarget(req: IncomingMessage): ProxyTarget | Error {
-  // /base_path/proxy/{absolute,relative}/{node}/{port}/{path}
+function parseProxyTarget(req: IncomingMessage): string | Error {
   if (!req.url) { return new Error("req.url is undefined"); }
 
   const parts = req.url.split("/");
@@ -51,7 +34,7 @@ function parseTarget(req: IncomingMessage): ProxyTarget | Error {
 
 interface Rule {
   prefix: string;
-  doProxy: () => void;
+  proxy: (rest: string) => void;
 }
 
 export function createGateway() {
@@ -63,10 +46,35 @@ export function createGateway() {
 
     const logger = rootLogger.child({ req: reqIdGen() });
 
-    function doProxy(target: ProxyTarget, type: string) {
-      logger.info("proxy %s requests", type);
-      proxy.web(req, res, { target }, (err) => {
-        if (err) { logger.error(err, "Error when proxing %s requests", type); }
+    function doProxy(target: string, type: string, auth: boolean) {
+
+      const proxyWeb = () => {
+        proxy.web(req, res, {
+          target,
+          prependPath: false, xfwd: true,
+        }, (err) => {
+          if (err) { logger.error(err, "Error when proxing %s requests", type); }
+        });
+      };
+
+      logger.info("proxy %s request", type);
+
+      if (!auth) {
+        proxyWeb();
+        return;
+      }
+
+      authenticateRequest(req, logger).then((user) => {
+        if (user) {
+          proxyWeb();
+        } else {
+          res.writeHead(401, { "Content-Type": "text/plain" });
+          res.end("Unauthorized");
+        }
+      }, (e) => {
+        logger.error(e, "Error when authenticating request");
+        res.writeHead(500, { "Content-Type": "text/plain" });
+        res.end("Error during authentication");
       });
     }
 
@@ -77,44 +85,52 @@ export function createGateway() {
     }
 
     const rules: Rule[] = [
-      { prefix: basePaths.authPublic, doProxy: () => doProxy(config.AUTH_INTERNAL_URL, "auth") },
+      {
+        prefix: basePaths.authPublic,
+        proxy: (rest) => doProxy(config.AUTH_INTERNAL_URL + "/public" + rest, "auth", false),
+      },
     ];
 
     if (basePaths.portal) {
-      rules.push({ prefix: basePaths.portal, doProxy: () => doProxy(config.PORTAL_INTERNAL_URL, "portal") });
+      rules.push({
+        prefix: basePaths.portal,
+        proxy: (rest) => doProxy(config.PORTAL_INTERNAL_URL + rest, "portal", false),
+      });
     }
 
     if (basePaths.mis) {
-      rules.push({ prefix: basePaths.mis, doProxy: () => doProxy(config.MIS_INTERNAL_URL, "mis") });
+      rules.push({
+        prefix: basePaths.mis,
+        proxy: (rest) => doProxy(config.MIS_INTERNAL_URL + rest, "mis", false),
+      });
     }
+
+
+    rules.push({
+      prefix: basePaths.proxy,
+      proxy: () => {
+
+        const target = parseProxyTarget(req);
+
+        if (target instanceof Error) {
+          logger.error(target, "req.url is not parsable");
+          res.writeHead(400, { "Content-Type": "text/plain" });
+          res.end("req.url is not parsable. " + target.message);
+          return;
+        }
+
+        doProxy(target, "proxy", true);
+      },
+    });
 
     const match = longestMatch(req.url, rules);
 
     if (match) {
-      match.doProxy();
-      return;
+      match.proxy(stripPrefix(req.url, match.prefix));
+    } else {
+      res.writeHead(404, { "Content-Type": "text/plain" });
+      res.end("Not found");
     }
-
-    // the rest is proxy
-    const target = parseTarget(req);
-
-    if (target instanceof Error) {
-      logger.error(target, "req.url is not parsable");
-      res.writeHead(400, { "Content-Type": "text/plain" });
-      res.end("req.url is not parsable. " + target.message);
-      return;
-    }
-
-    authenticate(req, logger).then((user) => {
-      if (user) {
-        logger.info("Authenticated as %s", user.identityId);
-        doProxy(target, "proxy");
-      } else {
-        logger.info("Request not authenticated");
-        res.writeHead(401, { "Content-Type": "text/plain" });
-        res.end("Unauthorized");
-      }
-    });
 
   });
 
@@ -126,15 +142,34 @@ export function createGateway() {
       socket.end(`HTTP/1.1 ${statusLine}\r\n${msg}`);
     };
 
-    const doProxy = (target: ProxyTarget, type: string) => {
+    function doProxy(target: string, type: string, auth: boolean) {
+
+      const proxyWs = () => {
+        proxy.ws(req, socket, head, {
+          target, prependPath: false, xfwd: true,
+        }, (err) => {
+          if (err) { logger.error(err, "Error when proxing %s requests", type); }
+        });
+      };
+
       logger.info("proxy %s WebSocket requests", type);
-      proxy.ws(req, socket, head, { target }, (err) => {
-        if (err) {
-          logger.error(err, "Error when proxing ws requests");
-          writeError("500 Internal Server Error", "Error when proxing ws requests. " + err.message);
+
+      if (!auth) {
+        proxyWs();
+        return;
+      }
+
+      authenticateRequest(req, logger).then((user) => {
+        if (user) {
+          proxyWs();
+        } else {
+          writeError("401 Unauthorized", "Unauthorized");
         }
+      }, (e) => {
+        logger.error(e, "Error when authenticating request");
+        writeError("500 Internal Server Error", "Error when authenticating request");
       });
-    };
+    }
 
     if (!req.url) {
       writeError("400 Bad Request", "No url is specified");
@@ -144,38 +179,43 @@ export function createGateway() {
     const rules: Rule[] = [];
 
     if (basePaths.portal) {
-      rules.push({ prefix: basePaths.portal, doProxy: () => doProxy(config.PORTAL_INTERNAL_URL, "portal") });
+      rules.push({
+        prefix: basePaths.portal,
+        proxy: (rest) => doProxy(config.PORTAL_INTERNAL_URL + rest, "portal", false),
+      });
     }
 
     if (basePaths.mis) {
-      rules.push({ prefix: basePaths.mis, doProxy: () => doProxy(config.MIS_INTERNAL_URL, "mis") });
+      rules.push({
+        prefix: basePaths.mis,
+        proxy: (rest) => doProxy(config.MIS_INTERNAL_URL + rest, "mis", false),
+      });
     }
+
+    rules.push({
+      prefix: basePaths.proxy,
+      proxy: () => {
+        // proxy
+        const target = parseProxyTarget(req);
+
+        if (target instanceof Error) {
+          logger.error(target, "req.url is not parsable");
+          writeError("400 Bad Request", "req.url is not parsable. " + target.message);
+          return;
+        }
+
+        doProxy(target, "proxy", true);
+      },
+    });
 
     const match = longestMatch(req.url, rules);
 
     if (match) {
-      match.doProxy();
+      match.proxy(stripPrefix(req.url, match.prefix));
       return;
+    } else {
+      writeError("404 Not Found", "Not found");
     }
-
-    // proxy
-    const target = parseTarget(req);
-
-    if (target instanceof Error) {
-      logger.error(target, "req.url is not parsable");
-      writeError("400 Bad Request", "req.url is not parsable. " + target.message);
-      return;
-    }
-
-    authenticate(req, logger).then((user) => {
-      if (user) {
-        logger.info("Authenticated as {}", user.identityId);
-        doProxy(target, "proxy");
-      } else {
-        logger.info("Request not authenticated");
-        writeError("401 Unauthorized", "Token is not valid");
-      }
-    });
   });
 
   return server;
@@ -184,11 +224,11 @@ export function createGateway() {
 
 export async function startListening(server: http.Server) {
 
+  setupGracefulShutdown(server, rootLogger);
 
   // start
   return new Promise<void>((res) => {
     server.listen(config.PORT, config.HOST, () => {
-      setupGracefulShutdown(server, rootLogger);
       res();
     });
   });

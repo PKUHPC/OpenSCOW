@@ -25,5 +25,6 @@ export const basePaths = {
   authPublic: join(config.BASE_PATH, "/auth/public"),
   portal: config.PORTAL_PATH ? join(config.BASE_PATH, config.PORTAL_PATH) : undefined,
   mis: config.MIS_PATH ? join(config.BASE_PATH, config.MIS_PATH) : undefined,
+  proxy: join(config.BASE_PATH, "/proxy"),
 };
 
