@@ -1,4 +1,4 @@
-import { Button, Checkbox, Form, Input, Select, Table, Tabs, Tooltip } from "antd";
+import { Button, Checkbox, Form, Input, Select, Space, Steps, Table, Tooltip } from "antd";
 import Router from "next/router";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useAsync } from "react-async";
@@ -22,6 +22,8 @@ export const ImportUsersTable: React.FC = () => {
   const [form] = Form.useForm<{data: GetClusterUsersReply, whitelist: boolean}>();
 
   const [loading, setLoading] = useState(false);
+
+  const [current, setCurrent] = useState(0);
 
   const promiseFn = useCallback(async () => {
     return await api.getClusterUsers({ query: {
@@ -99,53 +101,65 @@ export const ImportUsersTable: React.FC = () => {
             .finally(() => { setLoading(false); });
         }}
       >
-        <Tabs defaultActiveKey="user" tabBarExtraContent={<a onClick={reload}>刷新</a>}>
-          <Tabs.TabPane tab="用户" key="user">
-            <Table
-              rowSelection={{
-                selectedRowKeys: selectedUsers,
-                type: "checkbox",
-                renderCell(_checked, record, _index, node) {
-                  if (record.included) {
-                    return <Tooltip title="用户已经存在于SCOW中">{node}</Tooltip>;
-                  }
-                  else {
-                    return <Tooltip title="用户不存在于SCOW中，将会导入SCOW">{node}</Tooltip>;
-                  }
-                },
-                getCheckboxProps: () => ({
-                  disabled: true,
-                }),
-              }}
-              loading={isLoading}
-              dataSource={data?.users}
-              scroll={{ x:true }}
-              bordered
-              rowKey="userId"
-            >
-              <Table.Column<ClusterUserInfo> dataIndex="userId" title="用户ID" key="userId" width={200} />
-              <Table.Column<ClusterUserInfo>
-                dataIndex="name"
-                title="姓名"
-                width={200}
-                render={(_text, record, index) => record.included ? record.userName : (
-                  <Form.Item name={["data", "users", index, "userName"]} rules={[{ required: true, message: "请输入姓名" }]}>
-                    <Input
-                      placeholder="输入用户姓名"
-                      allowClear
-                    />
-                  </Form.Item>
-                )}
-              />
-              <Table.Column<ClusterUserInfo>
-                dataIndex="accounts"
-                key="accounts"
-                title="所属账户"
-                render={(_, r) => r.accounts.join(", ")}
-              />
-            </Table>
-          </Tabs.TabPane>
-          <Tabs.TabPane tab="账户" key="account">
+        <Space>
+          <Steps
+            current={current} 
+            items={[{ title: "用户" }, { title: "账户" }]} 
+            onChange={(value) => { setCurrent(value); }}
+            size="small"
+            type="navigation"
+            style={{ width: 200 }}
+            responsive={false}
+          />
+          <a onClick={reload}>刷新</a>
+        </Space>
+        <div className="steps-content">
+          <Table
+            style={{ display: current === 0 ? "inline" : "none" }}
+            rowSelection={{
+              selectedRowKeys: selectedUsers,
+              type: "checkbox",
+              renderCell(_checked, record, _index, node) {
+                if (record.included) {
+                  return <Tooltip title="用户已经存在于SCOW中">{node}</Tooltip>;
+                }
+                else {
+                  return <Tooltip title="用户不存在于SCOW中，将会导入SCOW">{node}</Tooltip>;
+                }
+              },
+              getCheckboxProps: () => ({
+                disabled: true,
+              }),
+            }}
+            loading={isLoading}
+            dataSource={data?.users}
+            scroll={{ x:true }}
+            bordered
+            rowKey="userId"
+          >
+            <Table.Column<ClusterUserInfo> dataIndex="userId" title="用户ID" key="userId" width={200} />
+            <Table.Column<ClusterUserInfo>
+              dataIndex="name"
+              title="姓名"
+              width={200}
+              render={(_text, record, index) => record.included ? record.userName : (
+                <Form.Item name={["data", "users", index, "userName"]} rules={[{ required: true, message: "请输入姓名" }]}>
+                  <Input
+                    placeholder="输入用户姓名"
+                    allowClear
+                  />
+                </Form.Item>
+              )}
+            />
+            <Table.Column<ClusterUserInfo>
+              dataIndex="accounts"
+              key="accounts"
+              title="所属账户"
+              render={(_, r) => r.accounts.join(", ")}
+            />
+          </Table>
+          
+          <div style={{ display: current === 1 ? "inline" : "none" }}>
             <Table
               rowSelection={{
                 selectedRowKeys: selectedAccounts,
@@ -191,8 +205,8 @@ export const ImportUsersTable: React.FC = () => {
             <Button type="primary" htmlType="submit" loading={loading}>
               提交
             </Button>
-          </Tabs.TabPane>
-        </Tabs>
+          </div>
+        </div>
       </Form>
     </div>
   );
