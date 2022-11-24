@@ -1,6 +1,4 @@
 import { Select } from "antd";
-import { useStore } from "simstate";
-import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { Cluster, publicConfig } from "src/utils/config";
 
 
@@ -44,16 +42,3 @@ export const SingleClusterSelector: React.FC<SingleSelectionProps> = ({ value, o
   );
 };
 
-export const DefaultClusterSelector: React.FC = () => {
-  const defaultClusterStore = useStore(DefaultClusterStore);
-
-  return (
-    <SingleClusterSelector 
-      value={defaultClusterStore.cluster} 
-      onChange={(cluster) => {
-        defaultClusterStore.setCluster(cluster);
-      }} 
-      label="选择默认集群"
-    />
-  );
-};

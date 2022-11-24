@@ -1,6 +1,4 @@
 import { Select } from "antd";
-import { useStore } from "simstate";
-import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { Cluster, publicConfig } from "src/utils/config";
 
 
@@ -39,20 +37,6 @@ export const SingleClusterSelector: React.FC<SingleSelectionProps> = ({ value, o
         (label ? [{ value: label, label, disabled: true }] : [])
           .concat(publicConfig.CLUSTERS.map((x) => ({ value: x.id, label: x.name, disabled: false })))
       }
-    />
-  );
-};
-
-export const DefaultClusterSelector: React.FC = () => {
-  const defaultClusterStore = useStore(DefaultClusterStore);
-
-  return (
-    <SingleClusterSelector 
-      value={defaultClusterStore.cluster} 
-      onChange={(cluster) => {
-        defaultClusterStore.setCluster(cluster);
-      }} 
-      label="选择默认集群"
     />
   );
 };
