@@ -1,11 +1,12 @@
 import { ExclamationCircleOutlined } from "@ant-design/icons";
-import { Divider, message, Modal, Space, Table } from "antd";
+import { Divider, Space, Table } from "antd";
 import React, { useCallback, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { ChangePasswordModalLink } from "src/components/ChangePasswordModal";
 import { DisabledA } from "src/components/DisabledA";
 import { PlatformUserInfo } from "src/generated/server/user";
+import { useMessage, useModal } from "src/layouts/prompts";
 import { PlatformRole } from "src/models/User";
 import { GetAllUsersSchema } from "src/pages/api/admin/getAllUsers";
 import { User } from "src/stores/UserStore";
@@ -62,6 +63,9 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
   data, pageInfo, setPageInfo, isLoading, reload, user,
 }) => {
 
+  const modal = useModal();
+  const message = useMessage();
+
   return (
     <>
       <Table
@@ -96,7 +100,7 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
                     disabled={r.userId === user.identityId}
                     message="不能取消自己的平台管理员权限"
                     onClick={() => {
-                      Modal.confirm({
+                      modal.confirm({
                         title: "确认取消管理员权限",
                         icon: <ExclamationCircleOutlined />,
                         content: `确认要移除用户${r.name}（ID: ${r.userId}）的平台管理员权限？`,
@@ -121,7 +125,7 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
                   否
                   <a
                     onClick={() => {
-                      Modal.confirm({
+                      modal.confirm({
                         title: "确认设置为平台管理员",
                         icon: <ExclamationCircleOutlined />,
                         content: `确认要设置用户${r.name}（ID: ${r.userId}）为平台管理员？`,
@@ -155,7 +159,7 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
                   是
                   <a
                     onClick={() => {
-                      Modal.confirm({
+                      modal.confirm({
                         title: "确认取消财务人员权限",
                         icon: <ExclamationCircleOutlined />,
                         content: `确认要取消用户${r.name}（ID: ${r.userId}）的财务人员权限？`,
@@ -180,7 +184,7 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
                   否
                   <a
                     onClick={() => {
-                      Modal.confirm({
+                      modal.confirm({
                         title: "确认设置为平台财务人员",
                         icon: <ExclamationCircleOutlined />,
                         content: `确认要设置用户${r.name}（ID: ${r.userId}）为平台财务人员？`,

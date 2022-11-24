@@ -1,8 +1,7 @@
 import "nprogress/nprogress.css";
-import "antd/dist/antd.variable.min.css";
+import "antd/dist/reset.css";
 
 import { failEvent, fromApi } from "@ddadaal/next-typed-api-routes-runtime/lib/client";
-import { message } from "antd";
 import type { AppContext, AppProps } from "next/app";
 import App from "next/app";
 import dynamic from "next/dynamic";
@@ -12,14 +11,16 @@ import { useEffect, useRef } from "react";
 import { createStore, StoreProvider, useStore } from "simstate";
 import { USE_MOCK } from "src/apis/useMock";
 import { getTokenFromCookie } from "src/auth/cookie";
-import { RootLayout } from "src/layouts/RootLayout";
+import { AntdConfigProvider } from "src/layouts/AntdConfigProvider";
+import { BaseLayout } from "src/layouts/base/BaseLayout";
+import { DarkModeProvider } from "src/layouts/darkMode";
+import { useMessage } from "src/layouts/prompts";
 import { ValidateTokenSchema } from "src/pages/api/auth/validateToken";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import {
   User, UserStore,
 } from "src/stores/UserStore";
 import { GlobalStyle } from "src/styles/globalStyle";
-import { AntdConfigProvider } from "src/utils/AntdConfigProvider";
 import { publicConfig, runtimeConfig } from "src/utils/config";
 import { getHostname } from "src/utils/host";
 import { isServer } from "src/utils/isServer";
@@ -27,6 +28,7 @@ import useConstant from "src/utils/useConstant";
 
 
 const FailEventHandler: React.FC = () => {
+  const message = useMessage();
   const userStore = useStore(UserStore);
 
   // 登出过程需要调用的几个方法（logout, useState等）都是immutable的
@@ -87,16 +89,19 @@ function MyApp({ Component, pageProps, extra }: Props) {
           href={join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/icon?type=favicon")}
         ></link>
       </Head>
-      <GlobalStyle />
       <StoreProvider stores={[userStore, defaultClusterStore]}>
-        <AntdConfigProvider color={primaryColor}>
-          <FailEventHandler />
-          <TopProgressBar />
-          <RootLayout footerText={footerText}>
-            <Component {...pageProps} />
-          </RootLayout>
-        </AntdConfigProvider>
+        <DarkModeProvider>
+          <AntdConfigProvider color={primaryColor}>
+            <GlobalStyle />
+            <FailEventHandler />
+            <TopProgressBar />
+            <BaseLayout footerText={footerText}>
+              <Component {...pageProps} />
+            </BaseLayout>
+          </AntdConfigProvider>
+        </DarkModeProvider>
       </StoreProvider>
+
     </>
   );
 }

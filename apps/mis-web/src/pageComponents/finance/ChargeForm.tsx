@@ -1,8 +1,9 @@
-import { Button, Form, Input, InputNumber, message, Tag } from "antd";
+import { Button, Form, Input, InputNumber, Tag } from "antd";
 import React, { useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { ClickableA } from "src/components/ClickableA";
+import { useMessage } from "src/layouts/prompts";
 import { publicConfig } from "src/utils/config";
 import { handleClusteropsErrorInUi } from "src/utils/internalError";
 
@@ -40,7 +41,7 @@ const UsedType: React.FC<{ onClick: (type: string) => void }> = ({ onClick }) =>
 };
 
 export const ChargeForm: React.FC = () => {
-  const [messageApi, contextHolder] = message.useMessage();
+  const message = useMessage();
   const [form] = Form.useForm<ChargeFields>();
 
   const [loading, setLoading] = useState(false);
@@ -50,7 +51,7 @@ export const ChargeForm: React.FC = () => {
 
     setLoading(true);
 
-    const hide = messageApi.loading("充值中……", 0);
+    const hide = message.loading("充值中……", 0);
 
     // 2. upload the rest
     await api.financePay({
@@ -66,7 +67,7 @@ export const ChargeForm: React.FC = () => {
       })
       .httpError(500, handleClusteropsErrorInUi)
       .then(() => {
-        messageApi.success("充值完成！");
+        message.success("充值完成！");
       })
       .finally(() => {
         setLoading(false);
@@ -83,7 +84,6 @@ export const ChargeForm: React.FC = () => {
       labelAlign="right"
       onFinish={submit}
     >
-      {contextHolder}
       <Form.Item
         name="accountName"
         label="账户"

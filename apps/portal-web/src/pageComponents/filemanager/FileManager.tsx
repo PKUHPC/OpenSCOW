@@ -3,7 +3,7 @@ import { CloseOutlined,
   DeleteOutlined, FileAddOutlined, FileOutlined, FolderAddOutlined,
   FolderOutlined, HomeOutlined, LeftOutlined, MacCommandOutlined, RightOutlined,
   ScissorOutlined, SnippetsOutlined, UploadOutlined, UpOutlined } from "@ant-design/icons";
-import { Button, Divider, message, Modal, Space, Table } from "antd";
+import { Button, Divider, Modal, Space, Table } from "antd";
 import Link from "next/link";
 import Router from "next/router";
 import { join } from "path";
@@ -13,6 +13,7 @@ import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { ModalButton, ModalLink } from "src/components/ModalLink";
 import { TitleText } from "src/components/PageTitle";
 import { TableTitle } from "src/components/TableTitle";
+import { useMessage } from "src/layouts/prompts";
 import { urlToDownload } from "src/pageComponents/filemanager/api";
 import { CreateFileModal } from "src/pageComponents/filemanager/CreateFileModal";
 import { MkdirModal } from "src/pageComponents/filemanager/MkdirModal";
@@ -82,6 +83,8 @@ const operationTexts = {
 };
 
 export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
+
+  const message = useMessage();
 
   const prevPathRef = useRef<string>(path);
 

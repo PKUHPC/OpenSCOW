@@ -1,7 +1,8 @@
 import { PlusOutlined } from "@ant-design/icons";
-import { Button, Form, Input, message, Modal } from "antd";
+import { Button, Form, Input, Modal } from "antd";
 import React, { useState } from "react";
 import { api } from "src/apis";
+import { useMessage } from "src/layouts/prompts";
 
 
 interface FormProps {
@@ -9,14 +10,19 @@ interface FormProps {
 }
 
 interface ModalProps {
-  visible: boolean;
+  open: boolean;
   close: () => void;
   refresh: () => void;
 }
 
 const NewTenantModal: React.FC<ModalProps> = ({
-  visible, close, refresh,
+  open, close, refresh,
 }) => {
+
+
+  const message = useMessage();
+
+
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm<FormProps>();
 
@@ -41,7 +47,7 @@ const NewTenantModal: React.FC<ModalProps> = ({
   return (
     <Modal
       title="添加租户"
-      open={visible}
+      open={open}
       onCancel={close}
       onOk={onOk}
       confirmLoading={loading}
@@ -67,7 +73,7 @@ export const AddTenantButton: React.FC<Props> = ({ refresh }) => {
     <>
       <NewTenantModal
         close={() => setModalShow(false)}
-        visible={modalShow}
+        open={modalShow}
         refresh={refresh}
       />
       <Button type="primary" icon={<PlusOutlined />} onClick={() => setModalShow(true)}>

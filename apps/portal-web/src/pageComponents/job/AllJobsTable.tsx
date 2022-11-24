@@ -1,5 +1,5 @@
 import { Button, DatePicker, Form, InputNumber, Space, Table } from "antd";
-import moment from "moment";
+import dayjs from "dayjs";
 import Router from "next/router";
 import { join } from "path";
 import React, { useCallback, useMemo, useState } from "react";
@@ -10,12 +10,12 @@ import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { JobInfo } from "src/generated/portal/job";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
-import { Cluster } from "src/utils/config";
-import { defaultRanges, formatDateTime } from "src/utils/datetime";
+import { Cluster, publicConfig } from "src/utils/config";
+import { defaultPresets, formatDateTime } from "src/utils/datetime";
 import { compareNumber } from "src/utils/math";
 
 interface FilterForm {
-  time: [moment.Moment, moment.Moment];
+  time: [dayjs.Dayjs, dayjs.Dayjs];
   jobId: number | undefined;
   cluster: Cluster;
 }
@@ -31,9 +31,9 @@ export const AllJobQueryTable: React.FC<Props> = ({
   const defaultClusterStore = useStore(DefaultClusterStore);
 
   const [query, setQuery] = useState<FilterForm>(() => {
-    const now = moment();
+    const now = dayjs();
     return {
-      time: [now.clone().subtract(1, "week"), now],
+      time: [now.subtract(1, "week"), now],
       jobId: undefined,
       cluster: defaultClusterStore.cluster,
     };
@@ -81,7 +81,7 @@ export const AllJobQueryTable: React.FC<Props> = ({
           <Form.Item label="时间" name="time">
             <DatePicker.RangePicker
               showTime
-              ranges={defaultRanges()}
+              presets={defaultPresets}
               allowClear={false}
             />
           </Form.Item>

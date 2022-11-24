@@ -1,18 +1,21 @@
-import { Form, message, Modal } from "antd";
+import { Form, Modal } from "antd";
 import React, { useState } from "react";
 import { api } from "src/apis";
+import { useMessage } from "src/layouts/prompts";
 import { CreateUserForm, CreateUserFormFields } from "src/pageComponents/users/CreateUserForm";
 
 interface Props {
-  visible: boolean;
+  open: boolean;
   onClose: () => void;
 }
 
 export const CreateUserModal: React.FC<Props> = ({
-  onClose, visible,
+  onClose, open,
 }) => {
   const [form] = Form.useForm<CreateUserFormFields>();
   const [loading, setLoading] = useState(false);
+
+  const message = useMessage();
 
   const onOk = async () => {
     const { password, email, identityId, name } = await form.validateFields();
@@ -30,7 +33,7 @@ export const CreateUserModal: React.FC<Props> = ({
   return (
     <Modal
       title="创建用户"
-      visible={visible}
+      open={open}
       onCancel={onClose}
       confirmLoading={loading}
       onOk={onOk}

@@ -2,6 +2,7 @@ import { PlusOutlined } from "@ant-design/icons";
 import { Button, Form, Input, message, Modal } from "antd";
 import React, { useState } from "react";
 import { api } from "src/apis";
+import { useMessage } from "src/layouts/prompts";
 import { CreateUserModal } from "src/pageComponents/users/CreateUserModal";
 import { publicConfig } from "src/utils/config";
 import { handleClusteropsErrorInUi } from "src/utils/internalError";
@@ -14,17 +15,19 @@ interface FormProps {
 
 interface ModalProps {
   accountName: string;
-  visible: boolean;
+  open: boolean;
   close: () => void;
   refresh: () => void;
   onUserNotFound: () => void;
 }
 
 const NewUserModal: React.FC<ModalProps> = ({
-  visible, close, refresh, accountName, onUserNotFound,
+  open, close, refresh, accountName, onUserNotFound,
 }) => {
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm<FormProps>();
+
+  const message = useMessage();
 
   const onOk = async () => {
     setLoading(true);
@@ -60,7 +63,7 @@ const NewUserModal: React.FC<ModalProps> = ({
   return (
     <Modal
       title="添加用户"
-      visible={visible}
+      open={open}
       onCancel={close}
       onOk={onOk}
       confirmLoading={loading}
@@ -92,7 +95,7 @@ export const AddUserButton: React.FC<Props> = ({ refresh, accountName }) => {
     <>
       <NewUserModal
         close={() => setModalShow(false)}
-        visible={modalShow}
+        open={modalShow}
         refresh={refresh}
         accountName={accountName}
         onUserNotFound={() => {
@@ -109,7 +112,7 @@ export const AddUserButton: React.FC<Props> = ({ refresh, accountName }) => {
           setCreateUserShown(false);
           setModalShow(true);
         }}
-        visible={createUserShow}
+        open={createUserShow}
       />
       <Button type="primary" icon={<PlusOutlined />} onClick={() => setModalShow(true)}>
       添加用户

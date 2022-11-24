@@ -1,4 +1,4 @@
-import { Form, message, Popconfirm, Space, Table, TableColumnsType } from "antd";
+import { Form, Popconfirm, Space, Table, TableColumnsType } from "antd";
 import Router, { useRouter } from "next/router";
 import { join } from "path";
 import React, { useCallback } from "react";
@@ -8,6 +8,7 @@ import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import type { AppSession } from "src/generated/portal/app";
+import { useMessage } from "src/layouts/prompts";
 import { ConnectTopAppLink } from "src/pageComponents/app/ConnectToAppLink";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { publicConfig } from "src/utils/config";
@@ -19,6 +20,8 @@ interface Props {
 }
 
 export const AppSessionsTable: React.FC<Props> = () => {
+
+  const message = useMessage();
 
   const router = useRouter();
 

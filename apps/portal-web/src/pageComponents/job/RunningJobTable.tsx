@@ -1,4 +1,4 @@
-import { Button, Form, InputNumber, message, Popconfirm, Space, Table } from "antd";
+import { Button, Form, InputNumber, Popconfirm, Space, Table } from "antd";
 import Router from "next/router";
 import { join } from "path";
 import React, { useCallback, useMemo, useState } from "react";
@@ -7,6 +7,7 @@ import { useStore } from "simstate";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
+import { useMessage } from "src/layouts/prompts";
 import { runningJobId, RunningJobInfo } from "src/models/job";
 import { RunningJobDrawer } from "src/pageComponents/job/RunningJobDrawer";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
@@ -108,6 +109,9 @@ export const RunningJobInfoTable: React.FC<JobInfoTableProps> = ({
   data, isLoading, showAccount, showCluster, showUser, reload,
 }) => {
 
+  const message = useMessage();
+
+
   const [previewItem, setPreviewItem] = useState<RunningJobInfo | undefined>(undefined);
 
   return (
@@ -187,7 +191,7 @@ export const RunningJobInfoTable: React.FC<JobInfoTableProps> = ({
         />
       </Table>
       <RunningJobDrawer
-        show={previewItem !== undefined}
+        open={previewItem !== undefined}
         item={previewItem}
         onClose={() => setPreviewItem(undefined)}
       />

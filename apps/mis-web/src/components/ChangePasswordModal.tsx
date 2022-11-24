@@ -8,7 +8,7 @@ interface Props {
     userId: string;
     onClose: () => void;
     onComplete: (oldPassword: string, newPassword: string) => Promise<void>;
-    visible: boolean;
+    open: boolean;
 }
 
 interface FormProps {
@@ -17,7 +17,7 @@ interface FormProps {
     confirm: string;
 }
 
-const ChangePasswordModal: React.FC<Props> = ({ name, userId, onClose, onComplete, visible }) => {
+const ChangePasswordModal: React.FC<Props> = ({ name, userId, onClose, onComplete, open }) => {
   const [form] = Form.useForm<FormProps>();
   const [loading, setLoading] = useState(false);
 
@@ -25,7 +25,7 @@ const ChangePasswordModal: React.FC<Props> = ({ name, userId, onClose, onComplet
     const { oldPassword, newPassword } = await form.validateFields();
     setLoading(true);
     await onComplete(oldPassword, newPassword)
-      .then(() => { 
+      .then(() => {
         form.resetFields();
         onClose();
       })
@@ -35,7 +35,7 @@ const ChangePasswordModal: React.FC<Props> = ({ name, userId, onClose, onComplet
   return (
     <Modal
       title={`修改用户${name}（ID：${userId}）的密码`}
-      visible={visible}
+      open={open}
       onOk={onOK}
       confirmLoading={loading}
       onCancel={onClose}

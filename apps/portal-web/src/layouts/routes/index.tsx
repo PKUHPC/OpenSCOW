@@ -12,7 +12,7 @@ import {
   SaveOutlined } from "@ant-design/icons";
 import React from "react";
 import { useStore } from "simstate";
-import { NavItemProps } from "src/layouts/NavItemProps";
+import { NavItemProps } from "src/layouts/base/NavItemProps";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { publicConfig } from "src/utils/config";
 

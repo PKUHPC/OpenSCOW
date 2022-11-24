@@ -1,4 +1,4 @@
-import { Button, Form, Input, InputNumber, message, Select } from "antd";
+import { Button, Form, Input, InputNumber, Select } from "antd";
 import { NextPage } from "next";
 import React, { useState } from "react";
 import { useStore } from "simstate";
@@ -8,6 +8,7 @@ import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { DisabledA } from "src/components/DisabledA";
 import { PageTitle } from "src/components/PageTitle";
 import { FormLayout } from "src/layouts/FormLayout";
+import { useMessage } from "src/layouts/prompts";
 import { TenantRole } from "src/models/User";
 import type { ChangeStorageMode } from "src/pages/api/admin/changeStorage";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
@@ -37,6 +38,8 @@ const StorageForm: React.FC = () => {
   const [currentLoading, setCurrentLoading] = useState(false);
 
   const defaultClusterStore = useStore(DefaultClusterStore);
+  
+  const message = useMessage();
 
   const submit = async () => {
     const { value, userId, cluster, mode } = await form.validateFields();

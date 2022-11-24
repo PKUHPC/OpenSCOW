@@ -1,7 +1,7 @@
-import { ReloadOutlined, RightOutlined } from "@ant-design/icons";
-import { Button, Input, Space } from "antd";
+import { DatabaseOutlined, ReloadOutlined, RightOutlined } from "@ant-design/icons";
+import { Breadcrumb, Button, Input } from "antd";
 import Link from "next/link";
-import { Fragment, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
 
 interface Props {
@@ -15,13 +15,17 @@ interface Props {
 const Bar = styled.div`
   display: flex;
   width: 100%;
-
 `;
 
 const BarStateBar = styled(Bar)`
-  border: 1px solid #d9d9d9;
-  border-radius: 2px;
-  padding-left: 8px;
+  border: 1px solid ${({ theme }) => theme.token.colorBorder};
+  border-radius: ${({ theme }) => theme.token.borderRadius}px;
+  padding: 0 8px;
+  margin: 0 4px;
+
+  .ant-breadcrumb {
+    align-self: center;
+  }
 `;
 
 export const PathBar: React.FC<Props> = ({ path, loading, reload, go, fullUrl }) => {
@@ -68,30 +72,24 @@ export const PathBar: React.FC<Props> = ({ path, loading, reload, go, fullUrl })
         ) : (
           <>
             <BarStateBar onClick={() => setState("input")}>
-              <Space>
-                <Link href={fullUrl("/")} passHref onClick={(e) => e.stopPropagation()}>
-
-                    /
-
-                </Link>
+              <Breadcrumb style={{ alignSelf: "center" }}>
+                <Breadcrumb.Item>
+                  <Link href={fullUrl("/")} title="/" onClick={(e) => e.stopPropagation()}>
+                    <DatabaseOutlined />
+                  </Link>
+                </Breadcrumb.Item>
                 {pathSegments.map((x, i) => (
-                  <Fragment key={x}>
+                  <Breadcrumb.Item key={i}>
                     <Link
                       href={fullUrl(pathSegments.slice(0, i + 1).join("/"))}
                       key={i}
-                      passHref
                       onClick={(e) => e.stopPropagation()}
                     >
-
                       {x}
-
                     </Link>
-                    <span>
-                    /
-                    </span>
-                  </Fragment>
+                  </Breadcrumb.Item>
                 ))}
-              </Space>
+              </Breadcrumb>
             </BarStateBar>
             <Button
               onClick={(e) => {

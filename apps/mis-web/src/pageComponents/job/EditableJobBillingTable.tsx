@@ -1,11 +1,12 @@
 
 import { numberToMoney } from "@scow/lib-decimal";
-import { Form, Input, InputNumber, message, Modal, Select, Space, Table } from "antd";
-import { ColumnsType } from "antd/lib/table";
+import { Form, Input, InputNumber, Modal, Select, Space, Table } from "antd";
+import { ColumnsType } from "antd/es/table";
 import { useState } from "react";
 import { api } from "src/apis";
 import { JobBillingTableItem } from "src/components/JobBillingTable";
 import { CommonModalProps, ModalLink } from "src/components/ModalLink";
+import { useMessage } from "src/layouts/prompts";
 import { AmountStrategy } from "src/models/job";
 import { publicConfig } from "src/utils/config";
 
@@ -47,8 +48,11 @@ const columns: ColumnsType<JobBillingTableItem> = [
 const EditPriceModal: React.FC<CommonModalProps & {
   current: JobBillingTableItem["priceItem"]; path: string; tenant?: string; reload: () => void
 }> = ({
-  current, onClose, path, visible, tenant, reload,
+  current, onClose, path, open, tenant, reload,
 }) => {
+
+
+  const message = useMessage();
 
   const [form] = Form.useForm<{ price: number; itemId: string; amount: string; description: string }>();
   const [loading, setLoading] = useState(false);
@@ -71,7 +75,7 @@ const EditPriceModal: React.FC<CommonModalProps & {
   };
 
   return (
-    <Modal title="编辑作业价格项" visible={visible} onCancel={onClose} onOk={onOk} destroyOnClose confirmLoading={loading}>
+    <Modal title="编辑作业价格项" open={open} onCancel={onClose} onOk={onOk} destroyOnClose confirmLoading={loading}>
       <Form
         form={form}
         initialValues={{

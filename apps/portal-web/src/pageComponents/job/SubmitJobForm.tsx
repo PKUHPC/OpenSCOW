@@ -1,7 +1,6 @@
 import { ReloadOutlined } from "@ant-design/icons";
 import { parsePlaceholder } from "@scow/lib-config/build/parse";
-import { Button, Checkbox, Col, Form, Input, InputNumber, message, Modal, Row, Select, Tooltip } from "antd";
-import { useWatch } from "antd/lib/form/Form";
+import { Button, Checkbox, Col, Form, Input, InputNumber, Modal, Row, Select, Tooltip } from "antd";
 import Router from "next/router";
 import randomWords from "random-words";
 import React, { useEffect, useMemo, useState } from "react";
@@ -10,6 +9,7 @@ import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { CodeEditor } from "src/components/CodeEditor";
 import { InputGroupFormItem } from "src/components/InputGroupFormItem";
+import { useMessage } from "src/layouts/prompts";
 import { AccountSelector } from "src/pageComponents/job/AccountSelector";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { Cluster, publicConfig } from "src/utils/config";
@@ -47,6 +47,7 @@ interface Props {
 }
 
 export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
+  const message = useMessage();
 
   const [form] = Form.useForm<JobForm>();
   const [loading, setLoading] = useState(false);
@@ -84,9 +85,9 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
       .finally(() => setLoading(false));
   };
 
-  const cluster = useWatch("cluster", form) as Cluster | undefined;
+  const cluster = Form.useWatch("cluster", form) as Cluster | undefined;
 
-  const partition = useWatch("partition", form) as string | undefined;
+  const partition = Form.useWatch("partition", form) as string | undefined;
 
   const defaultClusterStore = useStore(DefaultClusterStore);
 

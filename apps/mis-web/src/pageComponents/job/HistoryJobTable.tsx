@@ -1,6 +1,6 @@
 import { HttpError } from "@ddadaal/next-typed-api-routes-runtime";
-import { Button, DatePicker, Divider, Form, Input, InputNumber, message, Select, Table } from "antd";
-import moment from "moment";
+import { Button, DatePicker, Divider, Form, Input, InputNumber, Select, Table } from "antd";
+import dayjs from "dayjs";
 import React, { useCallback, useRef, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
@@ -9,16 +9,17 @@ import { FilterFormContainer, FilterFormTabs } from "src/components/FilterFormCo
 import { TableTitle } from "src/components/TableTitle";
 import { Money } from "src/generated/common/money";
 import { JobInfo } from "src/generated/server/job";
+import { useMessage } from "src/layouts/prompts";
 import { HistoryJobDrawer } from "src/pageComponents/job/HistoryJobDrawer";
 import type { GetJobInfoSchema } from "src/pages/api/job/jobInfo";
 import type { Cluster } from "src/utils/config";
 import { publicConfig } from "src/utils/config";
-import { defaultRanges, formatDateTime } from "src/utils/datetime";
+import { defaultPresets, formatDateTime } from "src/utils/datetime";
 import { useDidUpdateEffect } from "src/utils/hooks";
 import { moneyToString, nullableMoneyToString } from "src/utils/money";
 
 interface FilterForm {
-  jobEndTime: [moment.Moment, moment.Moment];
+  jobEndTime: [dayjs.Dayjs, dayjs.Dayjs];
   jobId: number | undefined;
   accountName?: string;
   userId?: string;
@@ -41,12 +42,14 @@ export const JobTable: React.FC<Props> = ({
   showAccount, showUser, showedPrices, priceTexts,
 }) => {
 
+  const message = useMessage();
+
   const rangeSearch = useRef(true);
 
   const [query, setQuery] = useState<FilterForm>(() => {
-    const now = moment();
+    const now = dayjs();
     return {
-      jobEndTime: [now.clone().subtract(1, "week"), now],
+      jobEndTime: [now.subtract(1, "week"), now],
       jobId: undefined,
       clusters: Object.values(publicConfig.CLUSTERS),
       accountName: typeof accountNames === "string" ? accountNames : undefined,
@@ -130,7 +133,7 @@ export const JobTable: React.FC<Props> = ({
                   <Form.Item label="作业结束时间" name="jobEndTime">
                     <DatePicker.RangePicker
                       showTime
-                      ranges={defaultRanges()}
+                      presets={defaultPresets}
                       allowClear={false}
                     />
                   </Form.Item>
@@ -285,7 +288,7 @@ export const JobInfoTable: React.FC<JobInfoTableProps> = ({
         />
       </Table>
       <HistoryJobDrawer
-        show={previewItem !== undefined}
+        open={previewItem !== undefined}
         item={previewItem}
         onClose={() => setPreviewItem(undefined)}
         showedPrices={showedPrices}

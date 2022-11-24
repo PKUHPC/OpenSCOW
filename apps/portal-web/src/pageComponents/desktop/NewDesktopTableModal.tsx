@@ -1,28 +1,25 @@
 import { Form, Modal, Select } from "antd";
 import React, { useState } from "react";
-import { useStore } from "simstate";
 import { api } from "src/apis";
-import { SingleClusterSelector } from "src/components/ClusterSelector";
-import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { Cluster, publicConfig } from "src/utils/config";
 import { openDesktop } from "src/utils/vnc";
 
 export interface Props {
-  visible: boolean;
+  open: boolean;
   onClose: () => void;
   reload: () => void;
+  cluster: Cluster;
 }
 
-interface ClusterInfo {
-  cluster: Cluster;
+interface FormInfo {
   wm: string;
 }
 
 
-export const NewDesktopTableModal: React.FC<Props> = ({ visible, onClose, reload }) => {
+export const NewDesktopTableModal: React.FC<Props> = ({ open, onClose, reload, cluster }) => {
   const defaultWm = publicConfig.LOGIN_DESKTOP_WMS[0];
 
-  const [form] = Form.useForm<ClusterInfo>();
+  const [form] = Form.useForm<FormInfo>();
   const [submitting, setSubmitting] = useState(false);
 
   const onOk = async () => {
@@ -32,7 +29,7 @@ export const NewDesktopTableModal: React.FC<Props> = ({ visible, onClose, reload
     setSubmitting(true);
 
     // Create new desktop
-    await api.createDesktop({ body: { cluster: values.cluster.id, wm: values.wm } })
+    await api.createDesktop({ body: { cluster: cluster.id, wm: values.wm } })
       .httpError(409, (e) => {
         const { code } = e;
         if (code === "TOO_MANY_DESKTOPS") {
@@ -52,34 +49,20 @@ export const NewDesktopTableModal: React.FC<Props> = ({ visible, onClose, reload
       .finally(() => { setSubmitting(false); });
   };
 
-  const defaultClusterStore = useStore(DefaultClusterStore);
-
   return (
     <Modal
       title="新建桌面"
-      visible={visible}
+      open={open}
       onOk={form.submit}
       confirmLoading={submitting}
       onCancel={onClose}
     >
-      <Form form={form} initialValues={{ cluster: defaultClusterStore.cluster, wm: defaultWm.wm }} onFinish={onOk}>
-        <Form.Item
-          label="集群"
-          name="cluster"
-          rules={[
-            {
-              required: true,
-            },
-          ]}
-        >
-          <SingleClusterSelector />
-        </Form.Item>
+      <Form form={form} initialValues={{ wm: defaultWm.wm }} onFinish={onOk}>
         <Form.Item label="桌面" name="wm" required>
           <Select
             options={publicConfig.LOGIN_DESKTOP_WMS.map(({ name, wm }) =>
               ({ label: name, value: wm }))}
           />
-
         </Form.Item>
       </Form>
     </Modal>

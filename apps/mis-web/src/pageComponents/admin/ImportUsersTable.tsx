@@ -1,29 +1,19 @@
-import { Button, Checkbox, Form, Input, message, Select, Table, Tabs, Tooltip } from "antd";
+import { Button, Checkbox, Form, Input, Select, Table, Tabs, Tooltip } from "antd";
 import Router from "next/router";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useAsync } from "react-async";
 import { useStore } from "simstate";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
+import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { ClusterAccountInfo, ClusterUserInfo, GetClusterUsersReply, ImportUsersData } from "src/generated/server/admin";
+import { useMessage } from "src/layouts/prompts";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { publicConfig } from "src/utils/config";
 import { queryToString, useQuerystring } from "src/utils/querystring";
-import styled from "styled-components";
-
-const ClusterContainer = styled.div`
-padding: 8px 16px 16px 16px;
-margin: 8px 0;
-background: #fbfbfb;
-border: 1px solid #d9d9d9;
-border-radius: 2px;
-
-.ant-form-item {
-  margin: 4px;
-}
-`;
 
 export const ImportUsersTable: React.FC = () => {
+  const message = useMessage();
 
   const qs = useQuerystring();
 
@@ -38,21 +28,21 @@ export const ImportUsersTable: React.FC = () => {
 
   const [loading, setLoading] = useState(false);
 
-  const promiseFn = useCallback(async () => {    
+  const promiseFn = useCallback(async () => {
     return await api.getClusterUsers({ query: {
       cluster: cluster.id,
     } });
   }, [cluster]);
-  
+
   const { data, isLoading, reload } = useAsync({ promiseFn });
-  
+
   useEffect(() => {
     form.setFieldsValue({
       data: data,
       whitelist: true,
     });
   }, [data]);
-  
+
   const selectedUsers = useMemo(() => data?.users.filter(
     (x) => (!x.included)).map((x) => (x.userId)), [data],
   );
@@ -62,18 +52,18 @@ export const ImportUsersTable: React.FC = () => {
 
   return (
     <div>
-      <ClusterContainer>
+      <FilterFormContainer>
         <Form layout="inline">
           <Form.Item label="集群">
             <SingleClusterSelector
-              value={cluster} 
-              onChange={(value) => { 
-                Router.push({ query: { cluster: value.id } }); 
-              }} 
+              value={cluster}
+              onChange={(value) => {
+                Router.push({ query: { cluster: value.id } });
+              }}
             />
           </Form.Item>
         </Form>
-      </ClusterContainer>
+      </FilterFormContainer>
       <Form
         form={form}
         onFinish={async () => {
@@ -88,8 +78,8 @@ export const ImportUsersTable: React.FC = () => {
             if (!data.users[i].included) {
               data.users[i].userName = x.userName;
               importData.users.push({
-                userId: data.users[i].userId, 
-                userName: data.users[i].userName, 
+                userId: data.users[i].userId,
+                userName: data.users[i].userName,
                 accounts: data.users[i].accounts,
               });
             }
@@ -97,14 +87,14 @@ export const ImportUsersTable: React.FC = () => {
           changedData.accounts.forEach((x, i) => {
             if (!data.accounts[i].included) {
               data.accounts[i].owner = x.owner;
-              importData.accounts.push({ 
-                accountName: data.accounts[i].accountName, 
-                users: data.accounts[i].users, 
+              importData.accounts.push({
+                accountName: data.accounts[i].accountName,
+                users: data.accounts[i].users,
                 owner: data.accounts[i].owner!,
               });
             }
           });
-          
+
           await api.importUsers({ body: {
             data: importData,
             whitelist: whitelist,
@@ -139,23 +129,23 @@ export const ImportUsersTable: React.FC = () => {
               rowKey="userId"
             >
               <Table.Column<ClusterUserInfo> dataIndex="userId" title="用户ID" key="userId" width={200} />
-              <Table.Column<ClusterUserInfo> 
-                dataIndex="name" 
-                title="姓名" 
+              <Table.Column<ClusterUserInfo>
+                dataIndex="name"
+                title="姓名"
                 width={200}
                 render={(_text, record, index) => record.included ? record.userName : (
                   <Form.Item name={["data", "users", index, "userName"]} rules={[{ required: true, message: "请输入姓名" }]}>
-                    <Input 
-                      placeholder="输入用户姓名" 
+                    <Input
+                      placeholder="输入用户姓名"
                       allowClear
                     />
                   </Form.Item>
                 )}
               />
-              <Table.Column<ClusterUserInfo> 
-                dataIndex="accounts" 
+              <Table.Column<ClusterUserInfo>
+                dataIndex="accounts"
                 key="accounts"
-                title="所属账户" 
+                title="所属账户"
                 render={(_, r) => r.accounts.join(", ")}
               />
             </Table>
@@ -185,7 +175,7 @@ export const ImportUsersTable: React.FC = () => {
               bordered
             >
               <Table.Column<ClusterAccountInfo> dataIndex="accountName" title="账户名" width={400} />
-              <Table.Column<ClusterAccountInfo> 
+              <Table.Column<ClusterAccountInfo>
                 dataIndex="owner"
                 title="拥有者"
                 render={(_, r, i) => r.included ? r.owner : (

@@ -1,13 +1,14 @@
-import { Divider, Form, Input, InputNumber, message, Modal, Progress, Select } from "antd";
+import { Divider, Form, Input, InputNumber, Modal, Progress, Select } from "antd";
 import { useRef, useState } from "react";
 import { api } from "src/apis";
+import { useMessage } from "src/layouts/prompts";
 import { RunningJobInfo } from "src/models/job";
 import { ChangeStorageMode } from "src/pages/api/admin/changeStorage";
 import { arrayContainsElement } from "src/utils/array";
 import type { Cluster } from "src/utils/config";
 
 interface Props {
-  visible: boolean;
+  open: boolean;
   onClose: () => void;
   reload: () => void;
 
@@ -30,7 +31,10 @@ interface CompletionStatus {
   failed: RunningJobInfo[];
 }
 
-export const ChangeJobTimeLimitModal: React.FC<Props> = ({ visible, onClose, data, reload }) => {
+export const ChangeJobTimeLimitModal: React.FC<Props> = ({ open, onClose, data, reload }) => {
+
+  const message = useMessage();
+
   const [form] = Form.useForm<FormProps>();
   const [loading, setLoading] = useState(false);
 
@@ -51,7 +55,7 @@ export const ChangeJobTimeLimitModal: React.FC<Props> = ({ visible, onClose, dat
 
   return (
     <Modal
-      visible={visible}
+      open={open}
       title="修改作业时限"
       okText="修改"
       cancelText="取消"
@@ -85,7 +89,7 @@ export const ChangeJobTimeLimitModal: React.FC<Props> = ({ visible, onClose, dat
                 reload();
                 close();
               } else {
-                message.warn("部分作业修改时限失败。");
+                message.error("部分作业修改时限失败。");
                 reload();
               }
             }

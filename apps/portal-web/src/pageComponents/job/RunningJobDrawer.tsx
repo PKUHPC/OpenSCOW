@@ -4,7 +4,7 @@ import { Cluster } from "src/utils/config";
 import { formatDateTime } from "src/utils/datetime";
 
 interface Props {
-  show: boolean;
+  open: boolean;
   item: RunningJobInfo | undefined;
   onClose: () => void;
 }
@@ -27,14 +27,14 @@ const drawerItems = [
 ] as ([string, keyof RunningJobInfo] | [string, keyof RunningJobInfo, (v: any, r: RunningJobInfo) => string])[];
 
 export const RunningJobDrawer: React.FC<Props> = ({
-  item, onClose, show,
+  item, onClose, open,
 }) => {
   return (
     <Drawer
       width={500}
       placement="right"
       onClose={onClose}
-      visible={show}
+      open={open}
       title="未结束的作业详细信息"
     >
       {

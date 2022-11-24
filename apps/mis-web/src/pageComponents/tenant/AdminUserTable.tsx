@@ -1,11 +1,11 @@
 import { ExclamationCircleOutlined } from "@ant-design/icons";
-import { Button, Divider, Form, Input, message, Modal, Space, Table } from "antd";
+import { Button, Divider, Form, Input, Space, Table } from "antd";
 import React, { useMemo, useState } from "react";
 import { api } from "src/apis";
 import { ChangePasswordModalLink } from "src/components/ChangePasswordModal";
 import { DisabledA } from "src/components/DisabledA";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
-import { PlatformUserInfo } from "src/generated/server/user";
+import { useMessage, useModal } from "src/layouts/prompts";
 import { FullUserInfo, TenantRole } from "src/models/User";
 import { GetTenantUsersSchema } from "src/pages/api/admin/getTenantUsers";
 import { User } from "src/stores/UserStore";
@@ -26,6 +26,9 @@ interface FilterForm {
 export const AdminUserTable: React.FC<Props> = ({
   data, isLoading, reload, user,
 }) => {
+
+  const modal = useModal();
+  const message = useMessage();
 
   const [form] = Form.useForm<FilterForm>();
 
@@ -93,7 +96,7 @@ export const AdminUserTable: React.FC<Props> = ({
                   disabled={r.id === user.identityId}
                   message="不能取消自己的租户管理员权限"
                   onClick={async () => {
-                    Modal.confirm({
+                    modal.confirm({
                       title: "确定取消租户管理员权限",
                       icon: <ExclamationCircleOutlined />,
                       content: `确定要移除用户${r.name}（ID: ${r.id}）的租户管理员权限？`,
@@ -118,7 +121,7 @@ export const AdminUserTable: React.FC<Props> = ({
                 否
                 <a
                   onClick={() => {
-                    Modal.confirm({
+                    modal.confirm({
                       title: "确定设置为租户管理员",
                       icon: <ExclamationCircleOutlined />,
                       content: `确定要设置用户${r.name}（ID: ${r.id}）为租户管理员？`,
@@ -150,7 +153,7 @@ export const AdminUserTable: React.FC<Props> = ({
                 是
                 <a
                   onClick={() => {
-                    Modal.confirm({
+                    modal.confirm({
                       title: "确定取消租户财务人员权限",
                       icon: <ExclamationCircleOutlined />,
                       content: `确定要移除用户${r.name}（ID: ${r.id}）的财务人员权限？`,
@@ -175,7 +178,7 @@ export const AdminUserTable: React.FC<Props> = ({
                 否
                 <a
                   onClick={() => {
-                    Modal.confirm({
+                    modal.confirm({
                       title: "确定设置为租户财务人员",
                       icon: <ExclamationCircleOutlined />,
                       content: `确定要设置用户${r.name}（ID: ${r.id}）为租户财务人员？`,
@@ -229,7 +232,7 @@ export const AdminUserTable: React.FC<Props> = ({
                     .httpError(501, () => { message.error("本功能在当前配置下不可用"); })
                     .then(() => { message.success("修改成功"); })
                     .catch(() => { message.error("修改失败"); });
-                }}      
+                }}
               >
               修改密码
               </ChangePasswordModalLink>
