@@ -28,7 +28,6 @@ const StyledSider = styled(Sider)`
 
   @media (max-width: ${antdBreakpoints[breakpoint]}px ) {
     position: absolute !important;
-    height: 100%;
     z-index: 1000;
 
     body, html {
@@ -39,6 +38,7 @@ const StyledSider = styled(Sider)`
     overflow: auto;
   }
 
+  height: 100%;
 
   .ant-menu-item:first-child {
     margin-top: 0px;
@@ -47,6 +47,12 @@ const StyledSider = styled(Sider)`
   .ant-menu {
     min-height: 100%;
     border-right: 0;
+  }
+`;
+
+const Container = styled.div`
+  .ant-layout-sider {
+    background: initial;
   }
 `;
 
@@ -90,7 +96,7 @@ export const SideNav: React.FC<Props> = ({
     return null;
   }
   return (
-    <>
+    <Container>
       <BodyMask
         onClick={() => setCollapsed(true)}
         sidebarShown={!collapsed}
@@ -117,7 +123,7 @@ export const SideNav: React.FC<Props> = ({
         >
         </Menu>
       </StyledSider>
-    </>
+    </Container>
   );
 };
 

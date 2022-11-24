@@ -2,6 +2,7 @@ import { join } from "path";
 import { useEffect, useRef } from "react";
 import { io } from "socket.io-client";
 import { User } from "src/stores/UserStore";
+import { debounce } from "src/utils/debounce";
 import styled from "styled-components";
 import { Terminal } from "xterm";
 import { FitAddon } from "xterm-addon-fit";
@@ -10,10 +11,7 @@ const TerminalContainer = styled.div`
   background-color: black;
   flex: 1;
 
-  // https://github.com/xtermjs/xterm.js/issues/3564#issuecomment-1034107272
-  .xterm-viewport {
-    width: initial !important;
-  }
+  width: 100%;
 `;
 
 interface Props {
@@ -30,7 +28,9 @@ export const Shell: React.FC<Props> = ({ user, cluster, path }) => {
   useEffect(() => {
     if (container.current) {
 
-      const term = new Terminal({ cursorBlink: true });
+      const term = new Terminal({
+        cursorBlink: true,
+      });
 
       const payload = {
         cluster,
@@ -48,10 +48,10 @@ export const Shell: React.FC<Props> = ({ user, cluster, path }) => {
         `${path ? "path " + path : "home path"} ***\r\n`,
       );
 
-      const resizeObserver = new ResizeObserver(() => {
+      const resizeObserver = new ResizeObserver(debounce(() => {
         fitAddon.fit();
         socket.emit("resize", { cols: term.cols, rows: term.rows });
-      });
+      }));
 
       resizeObserver.observe(container.current);
 
