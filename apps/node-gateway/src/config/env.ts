@@ -3,7 +3,7 @@ import { join } from "path";
 
 export const config = envConfig({
   HOST: host({ default: "0.0.0.0", desc: "监听地址" }),
-  PORT: port({ default: 5000, desc: "监听端口" }),
+  PORT: port({ default: 80, desc: "监听端口" }),
   LOG_LEVEL: str({
     default: "info",
     desc: "日志等级",
