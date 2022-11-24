@@ -1,4 +1,5 @@
 import { Button, Form, Input, InputNumber, Select } from "antd";
+import { Rule } from "antd/es/form";
 import Router from "next/router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAsync } from "react-async";
@@ -112,9 +113,10 @@ export const LaunchAppForm: React.FC<Props> = ({ appId }) => {
 
   const customFormItems = data?.map((item, index) => {
 
-    const config = item.type === "number"
-      ? { rules: [ { type: "integer", required: true }]}
-      : { rules: [ { required: true }]};
+    const rules: Rule[] = item.type === "number"
+      ? [{ type: "integer" }, { required: true }]
+      : [{ required: true }];
+  
 
     const inputItem = item.type === "number" ? (<InputNumber />)
       : item.type === "text" ? (<Input />)
@@ -129,7 +131,7 @@ export const LaunchAppForm: React.FC<Props> = ({ appId }) => {
         key={`${item.name}+${index}`}
         label={item.label}
         name={item.name}
-        {...config}
+        rules={rules}
       >
         {inputItem}
       </Form.Item>

@@ -142,12 +142,12 @@ attributes:
 
 | 属性       | 类型                           | 是否必填 | 解释                             |
 |----------|------------------------------|------|--------------------------------|
-| `type`   | "number", "text" 或者 "select" | 是    | 在HTML表单元素中输入的内容的类型             |
+| `type`   | `number`, `text` 或者 `select` | 是    | 在HTML表单元素中输入的内容的类型             |
 | `name`   | 字符串                          | 是    | HTML表单的name属性，会作为计算节点环境变量名     |
 | `label`  | 字符串                          | 是    | HTML表单的label属性，输入框左侧显示的标签      |
-| `select` | 选项的列表                        | 否    | 如果`type`是select，需要配置此项，指明具体的选项 |
+| `select` | 选项的列表                        | 否    | 如果`type`是`select`，需要配置此项，指明具体的选项 |
 
-配置一个输入内容是文本类型的表单，需要指定`type`为"text", 示例如下：
+配置一个输入内容是文本类型的表单，需要指定`type`为`text`, 示例如下：
 
 ```yaml
 attributes:
@@ -156,7 +156,7 @@ attributes:
     label: 版本
 ```
 
-配置一个输入内容是数字类型的表单，需要指定`type`为"number", 示例如下：
+配置一个输入内容是数字类型的表单，需要指定`type`为`number`, 示例如下：
 
 ```yaml
 attributes:
@@ -165,7 +165,7 @@ attributes:
     label: 数量
 ```
 
-配置一个输入内容是文本类型的表单，需要指定`type`为"select",并且配置`select`项, 示例如下：
+配置一个输入内容是文本类型的表单，需要指定`type`为`select`,并且配置`select`项, 示例如下：
 
 ```yaml
 attributes:

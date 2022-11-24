@@ -2,6 +2,7 @@ import { sftpChmod, sftpExists, sftpReaddir, sftpReadFile, sftpRealPath, sftpWri
 import { randomUUID } from "crypto";
 import fs from "fs";
 import { join } from "path";
+import { quote } from "shell-quote";
 import { AppOps, AppSession } from "src/clusterops/api/app";
 import { displayIdToPort } from "src/clusterops/slurm/bl/port";
 import { apps } from "src/config/apps";
@@ -88,15 +89,8 @@ export const slurmAppOps = (cluster: string): AppOps => {
         if (appConfig.type === "web") {
           let beforeScript: string = "";
           for (const key in customAttributes) {
-            if (customAttributes[key].toString().trim() === "") {
-              throw new Error(`The value entered by the user of custom form whose name is ${key} is all Spaces`);
-            }
-            if (customAttributes[key].toString().indexOf("\"") >= 0) {
-              throw new Error(`
-              The custom form attributes value ${customAttributes[key]} of key ${key} contains double quotes "`);
-            }
-
-            const envItem = `export ${key}="${customAttributes[key]}"`;
+            const quotedAttribute = quote([customAttributes[key] ?? ""]);
+            const envItem = `export ${key}=${quotedAttribute}`;
             beforeScript = beforeScript + envItem + "\n";
           }
           beforeScript = beforeScript + appConfig.web!.beforeScript;
