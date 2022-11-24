@@ -11,12 +11,10 @@ import {
   PlusOutlined,
   SaveOutlined } from "@ant-design/icons";
 import React from "react";
-import { useStore } from "simstate";
 import { NavItemProps } from "src/layouts/base/NavItemProps";
-import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
-import { publicConfig } from "src/utils/config";
+import { Cluster, publicConfig } from "src/utils/config";
 
-export const userRoutes: () => NavItemProps[] = () => [
+export const userRoutes: (defaultCluster: Cluster) => NavItemProps[] = (defaultCluster: Cluster) => [
   {
     Icon: DashboardOutlined,
     text: "仪表盘",
@@ -54,7 +52,7 @@ export const userRoutes: () => NavItemProps[] = () => [
     Icon: MacCommandOutlined,
     text: "Shell",
     path: "/shell",
-    clickToPath: `${process.env.NEXT_PUBLIC_BASE_PATH || ""}/shell/${useStore(DefaultClusterStore).cluster.id}`,
+    clickToPath: `${process.env.NEXT_PUBLIC_BASE_PATH || ""}/shell/${defaultCluster.id}`,
     openInNewPage: true,
     clickable: true,
     children: publicConfig.CLUSTERS.map(({ name, id }) => ({
@@ -98,7 +96,7 @@ export const userRoutes: () => NavItemProps[] = () => [
     Icon: FolderOutlined,
     text: "文件管理",
     path: "/files",
-    clickToPath: `/files/${useStore(DefaultClusterStore).cluster.id}/~`,
+    clickToPath: `/files/${defaultCluster.id}/~`,
     clickable: true,
     children: publicConfig.CLUSTERS.map((cluster) => ({
       Icon: FolderOutlined,
