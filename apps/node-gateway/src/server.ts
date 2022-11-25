@@ -1,19 +1,18 @@
-import http, { IncomingMessage } from "http";
+import http from "http";
 import httpProxy from "http-proxy";
 import pino from "pino";
 import { authenticateRequest } from "src/auth";
 import { basePaths, config } from "src/config/env";
 import { setupGracefulShutdown } from "src/gracefulShutdown";
 import { longestMatch, stripPrefix } from "src/match";
+import { normalizeUrl } from "src/path";
 import { createReqIdGen } from "src/reqId";
 
 const rootLogger = pino({ level: config.LOG_LEVEL });
 
 
-function parseProxyTarget(req: IncomingMessage): string | Error {
-  if (!req.url) { return new Error("req.url is undefined"); }
-
-  const parts = req.url.split("/");
+function parseProxyTarget(url: string): string | Error {
+  const parts = url.split("/");
 
   // find the end of base_path
   const proxyIndex = parts.indexOf("proxy");
@@ -84,25 +83,27 @@ export function createGateway() {
       return;
     }
 
+    const url = normalizeUrl(req.url);
+
     const rules: Rule[] = [
       {
         prefix: basePaths.authPublic,
         proxy: () =>
-          doProxy(config.AUTH_INTERNAL_URL + "/public" + stripPrefix(req.url!, basePaths.authPublic), "auth", false),
+          doProxy(config.AUTH_INTERNAL_URL + "/public" + stripPrefix(url, basePaths.authPublic), "auth", false),
       },
     ];
 
     if (basePaths.portal) {
       rules.push({
         prefix: basePaths.portal,
-        proxy: () => doProxy(config.PORTAL_INTERNAL_URL + req.url, "portal", false),
+        proxy: () => doProxy(config.PORTAL_INTERNAL_URL + url, "portal", false),
       });
     }
 
     if (basePaths.mis) {
       rules.push({
         prefix: basePaths.mis,
-        proxy: () => doProxy(config.MIS_INTERNAL_URL + req.url, "mis", false),
+        proxy: () => doProxy(config.MIS_INTERNAL_URL + url, "mis", false),
       });
     }
 
@@ -111,7 +112,7 @@ export function createGateway() {
       prefix: basePaths.proxy,
       proxy: () => {
 
-        const target = parseProxyTarget(req);
+        const target = parseProxyTarget(url);
 
         if (target instanceof Error) {
           logger.error(target, "req.url is not parsable");
@@ -124,7 +125,7 @@ export function createGateway() {
       },
     });
 
-    const match = longestMatch(req.url, rules);
+    const match = longestMatch(url, rules);
 
     if (match) {
       match.proxy();
@@ -177,19 +178,21 @@ export function createGateway() {
       return;
     }
 
+    const url = normalizeUrl(req.url);
+
     const rules: Rule[] = [];
 
     if (basePaths.portal) {
       rules.push({
         prefix: basePaths.portal,
-        proxy: () => doProxy(config.PORTAL_INTERNAL_URL + req.url, "portal", false),
+        proxy: () => doProxy(config.PORTAL_INTERNAL_URL + url, "portal", false),
       });
     }
 
     if (basePaths.mis) {
       rules.push({
         prefix: basePaths.mis,
-        proxy: () => doProxy(config.MIS_INTERNAL_URL + req.url, "mis", false),
+        proxy: () => doProxy(config.MIS_INTERNAL_URL + url, "mis", false),
       });
     }
 
@@ -197,7 +200,7 @@ export function createGateway() {
       prefix: basePaths.proxy,
       proxy: () => {
         // proxy
-        const target = parseProxyTarget(req);
+        const target = parseProxyTarget(url);
 
         if (target instanceof Error) {
           logger.error(target, "req.url is not parsable");
@@ -209,7 +212,7 @@ export function createGateway() {
       },
     });
 
-    const match = longestMatch(req.url, rules);
+    const match = longestMatch(url, rules);
 
     if (match) {
       match.proxy();
