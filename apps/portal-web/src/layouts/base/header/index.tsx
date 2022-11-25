@@ -1,6 +1,5 @@
 import { ArrowRightOutlined, MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
 import { Space, Typography } from "antd";
-import Link from "next/link";
 import { join } from "path";
 import React from "react";
 import { antdBreakpoints } from "src/layouts/base/constants";
@@ -91,18 +90,13 @@ export const Header: React.FC<Props> = ({
       {
         publicConfig.MIS_URL ? (
           <HeaderItem>
-            <Link
-              href={
-                user
-                  ? join(publicConfig.MIS_URL, "/api/auth/callback?token=" + user.token)
-                  : publicConfig.MIS_URL
-              }
-              legacyBehavior
+            {/* Cannot use Link because links adds BASE_PATH, but MIS_URL already contains it */}
+            <Typography.Link href={user
+              ? join(publicConfig.MIS_URL, "/api/auth/callback?token=" + user.token)
+              : publicConfig.MIS_URL}
             >
-              <Typography.Link>
-                <ArrowRightOutlined /> 管理系统
-              </Typography.Link>
-            </Link>
+              <ArrowRightOutlined /> 管理系统
+            </Typography.Link>
           </HeaderItem>
         ) : undefined
       }
