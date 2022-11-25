@@ -52,10 +52,6 @@ export const initServiceServer = plugin((server) => {
     },
 
     createInitAdmin: async ({ request, em }) => {
-
-      if (!server.ext.capabilities.createUser) {
-      }
-
       // get default tenant
       const tenant = await em.findOneOrFail(Tenant, { name: DEFAULT_TENANT_NAME });
 
