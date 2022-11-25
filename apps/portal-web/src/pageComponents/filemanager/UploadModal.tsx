@@ -53,12 +53,12 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
                 modal.confirm({
                   title: "文件已存在",
                   content: `文件${file.name}已存在，是否覆盖？`,
-                  onOk: () => Promise.resolve(),
-                  onCancel: () => Promise.reject(),
+                  onOk: () => { return true; },
+                  onCancel: () => { return false; },
                 });
               }
               else {
-                Promise.resolve();
+                return true;
               }
             });
         }}
