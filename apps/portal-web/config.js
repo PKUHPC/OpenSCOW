@@ -147,6 +147,20 @@ const buildRuntimeConfig = async (phase) => {
     console.log("Public Runtime Config", publicRuntimeConfig);
   }
 
+  if (production) {
+
+    // HACK
+    // call /api/proxy/<node>/<port>/ after 3 seconds to init the proxy ws server
+    setTimeout(() => {
+      const url = join(publicRuntimeConfig.PROXY_BASE_PATH, "127.0.0.1", "3001");
+      console.log("Calling proxy url to initialize ws proxy server", url);
+      fetch(url).then((r) => { }).catch((e) => {
+        console.error("Error when calling proxy url to initialize ws proxy server", e);
+      });
+    }, 3000);
+
+  }
+
   return {
     serverRuntimeConfig,
     publicRuntimeConfig,
