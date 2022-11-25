@@ -1,8 +1,50 @@
 import http from "http";
+import httpProxy from "http-proxy";
 import { NextApiRequest } from "next";
+import { normalize } from "path";
 import { checkCookie } from "src/auth/server";
-import { parseProxyTarget, proxy } from "src/server/proxy";
 import { AugmentedNextApiResponse } from "src/types/next";
+import { runtimeConfig } from "src/utils/config";
+
+/**
+ * Normalize url's pathname part
+ * @param url url
+ * @returns normalized url
+ */
+function normalizeUrl(url: string) {
+  // strip querystring
+  const qsIndex = url.indexOf("?");
+
+  const pathname = url.slice(0, qsIndex === -1 ? undefined : qsIndex);
+  const qs = qsIndex === -1 ? "" : url.slice(qsIndex);
+
+  return normalize(pathname) + qs;
+}
+
+
+function parseProxyTarget(url: string, includeBasePath: boolean): string | Error {
+
+  const normalizedUrl = normalizeUrl(url);
+
+  // skip base path
+  const relativePath = includeBasePath
+    ? runtimeConfig.BASE_PATH === "/"
+      ? normalizedUrl
+      : normalizedUrl.slice(runtimeConfig.BASE_PATH.length)
+    : normalizedUrl;
+
+  const [_empty, _api, _proxy, type, node, port, ...path] = relativePath.split("/");
+
+  if (type === "relative") {
+    return `http://${node}:${port}/${path.join("/")}`;
+  } else if (type === "absolute") {
+    return `http://${node}:${port}${url}`;
+  } else {
+    return new Error("type is not absolute or relative");
+  }
+}
+
+const proxy = httpProxy.createServer();
 
 export const config = {
   api: {
@@ -39,7 +81,7 @@ export default async (req: NextApiRequest, res: AugmentedNextApiResponse) => {
         return;
       }
 
-      const target = parseProxyTarget(req.url!);
+      const target = parseProxyTarget(req.url!, true);
 
       if (target instanceof Error) {
         writeError("400 Bad Request", target.message);
@@ -68,7 +110,7 @@ export default async (req: NextApiRequest, res: AugmentedNextApiResponse) => {
     return;
   }
 
-  const target = parseProxyTarget(req.url!);
+  const target = parseProxyTarget(req.url!, false);
 
   if (target instanceof Error) {
     res.status(400).send(target.message);
