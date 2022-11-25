@@ -73,10 +73,6 @@ jobs:
             file: gateway
             build_args: ""
 
-          - name: node-gateway
-            file: node-gateway
-            build_args: ""
-
           - name: mis-server
             file: mis-server
             build_args: ""
