@@ -154,8 +154,8 @@ const buildRuntimeConfig = async (phase) => {
     setTimeout(() => {
       const url = "http://localhost:3000" + join(publicRuntimeConfig.PROXY_BASE_PATH, "127.0.0.1", "3001");
       console.log("Calling proxy url to initialize ws proxy server", url);
-      fetch(url).then((r) => r.json()).then((r) => {
-        console.log("Calling proxy url result: ", r.text());
+      fetch(url).then(() => {
+        console.log("Call completed.");
       }).catch((e) => {
         console.error("Error when calling proxy url to initialize ws proxy server", e);
       });
