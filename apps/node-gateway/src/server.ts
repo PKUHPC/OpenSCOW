@@ -56,7 +56,17 @@ export function createGateway() {
 
   const server = http.createServer({}, (req, res) => {
 
-    const logger = rootLogger.child({ req: reqIdGen() });
+    if (!req.url) {
+      res.writeHead(400, { "Content-Type": "text/plain" });
+      res.end("No url is specified");
+      return;
+    }
+
+    const url = normalizeUrl(req.url);
+
+    const logger = rootLogger.child({ req: reqIdGen(), url });
+
+    logger.trace("Received HTTP request");
 
     function doProxy(target: string, type: string, auth: boolean) {
 
@@ -90,13 +100,6 @@ export function createGateway() {
       });
     }
 
-    if (!req.url) {
-      res.writeHead(400, { "Content-Type": "text/plain" });
-      res.end("No url is specified");
-      return;
-    }
-
-    const url = normalizeUrl(req.url);
 
     const rules: Rule[] = [
       {
@@ -141,8 +144,10 @@ export function createGateway() {
     const match = longestMatch(url, rules);
 
     if (match) {
+      logger.trace("Matched rule with prefix %s", match.prefix);
       match.proxy();
     } else {
+      logger.trace("No match");
       res.writeHead(404, { "Content-Type": "text/plain" });
       res.end("Not found");
     }
@@ -151,11 +156,20 @@ export function createGateway() {
 
   server.on("upgrade", (req, socket, head) => {
 
-    const logger = rootLogger.child({ req: reqIdGen() });
-
     const writeError = (statusLine: string, msg: string) => {
       socket.end(`HTTP/1.1 ${statusLine}\r\n${msg}`);
     };
+
+    if (!req.url) {
+      writeError("400 Bad Request", "No url is specified");
+      return;
+    }
+
+    const url = normalizeUrl(req.url);
+
+    const logger = rootLogger.child({ req: reqIdGen(), url });
+
+    logger.trace("Received WebSocket request");
 
     function doProxy(target: string, type: string, auth: boolean) {
 
@@ -186,12 +200,6 @@ export function createGateway() {
       });
     }
 
-    if (!req.url) {
-      writeError("400 Bad Request", "No url is specified");
-      return;
-    }
-
-    const url = normalizeUrl(req.url);
 
     const rules: Rule[] = [];
 
@@ -228,9 +236,11 @@ export function createGateway() {
     const match = longestMatch(url, rules);
 
     if (match) {
+      logger.trace("Matched rule with prefix %s", match.prefix);
       match.proxy();
       return;
     } else {
+      logger.trace("No match");
       writeError("404 Not Found", "Not found");
     }
   });
