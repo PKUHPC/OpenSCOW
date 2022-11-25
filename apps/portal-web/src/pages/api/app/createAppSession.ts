@@ -27,6 +27,7 @@ export interface CreateAppSessionSchema {
     };
 
     400: {
+      code: "INVALID_INPUT";
       message: string;
     }
 
@@ -70,6 +71,7 @@ export default /* #__PURE__*/route<CreateAppSessionSchema>("CreateAppSessionSche
   }, handlegRPCError({
     [status.INTERNAL]: (e) => ({ 409: { code: "SBATCH_FAILED" as const, message: e.details } }),
     [status.NOT_FOUND]: (e) => ({ 404: { code: "APP_NOT_FOUND" as const, message: e.details } }),
+    [status.INVALID_ARGUMENT]: (e) => ({ 400: { code: "INVALID_INPUT" as const, message: e.details } }),
   }));
 
 });

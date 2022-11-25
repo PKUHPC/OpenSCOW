@@ -50,6 +50,7 @@ message CreateAppSessionRequest {
 
 // NOT_FOUND: app is not found
 // INTERNAL: SBATCH failed, details has output
+// INVALID_ARGUMENT: the custom form atrributes is invalid
 message CreateAppSessionResponse {
   uint32 job_id = 1;
   string session_id = 2;
