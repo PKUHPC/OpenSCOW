@@ -1,5 +1,4 @@
 import { envConfig, host, port, str } from "@scow/lib-config";
-import { join } from "path";
 
 export const config = envConfig({
   HOST: host({ default: "0.0.0.0", desc: "监听地址" }),
@@ -21,10 +20,17 @@ export const config = envConfig({
 
 });
 
-export const basePaths = {
-  authPublic: join(config.BASE_PATH, "/auth/public"),
-  portal: config.PORTAL_PATH ? join(config.BASE_PATH, config.PORTAL_PATH) : undefined,
-  mis: config.MIS_PATH ? join(config.BASE_PATH, config.MIS_PATH) : undefined,
-  proxy: join(config.BASE_PATH, "/proxy"),
-};
+type KeysMatchingString<T> = {
+  [K in keyof T]-?: T[K] extends string ? K : never;
+}[keyof T];
 
+function throwIfTrailingSlash(key: KeysMatchingString<typeof config>) {
+  const path = config[key];
+  if (path.length > 1 && path.endsWith("/")) {
+    throw new Error("non-root path should not end with /");
+  }
+}
+
+throwIfTrailingSlash("BASE_PATH");
+throwIfTrailingSlash("PORTAL_PATH");
+throwIfTrailingSlash("MIS_PATH");

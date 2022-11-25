@@ -1,12 +1,25 @@
 import http from "http";
 import httpProxy from "http-proxy";
+import { join } from "path";
 import pino from "pino";
 import { authenticateRequest } from "src/auth";
-import { basePaths, config } from "src/config/env";
+import { config } from "src/config/env";
 import { setupGracefulShutdown } from "src/gracefulShutdown";
 import { longestMatch, stripPrefix } from "src/match";
 import { createReqIdGen } from "src/reqId";
 import { normalizeUrl } from "src/utils";
+
+function emptyIfRoot(path: string) {
+  return path === "/" ? "" : path;
+}
+
+const basePaths = {
+  authPublic: join(config.BASE_PATH, "/auth/public"),
+  portal: config.PORTAL_PATH ? join(config.BASE_PATH, emptyIfRoot(config.PORTAL_PATH)) : undefined,
+  mis: config.MIS_PATH ? join(config.BASE_PATH, emptyIfRoot(config.MIS_PATH)) : undefined,
+  proxy: join(config.BASE_PATH, "/proxy"),
+};
+
 
 const rootLogger = pino({ level: config.LOG_LEVEL });
 

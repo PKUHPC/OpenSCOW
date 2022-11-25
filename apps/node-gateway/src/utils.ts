@@ -14,3 +14,4 @@ export function normalizeUrl(url: string) {
 
   return normalize(pathname) + qs;
 }
+
