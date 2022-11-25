@@ -33,6 +33,7 @@ import type { CompleteInitSchema } from "src/pages/api/init/completeInit";
 import type { CreateInitAdminSchema } from "src/pages/api/init/createInitAdmin";
 import type { InitGetAccountsSchema } from "src/pages/api/init/getAccounts";
 import type { InitGetUsersSchema } from "src/pages/api/init/getUsers";
+import type { IsUserExistSchema } from "src/pages/api/init/isUserExist";
 import type { UnsetInitAdminSchema } from "src/pages/api/init/setAsInitAdmin";
 import type { SetAsInitAdminSchema } from "src/pages/api/init/setAsInitAdmin copy";
 import type { AddBillingItemSchema } from "src/pages/api/job/addBillingItem";
@@ -64,8 +65,10 @@ import type { QueryStorageUsageSchema } from "src/pages/api/users/storageUsage";
 import type { UnblockUserInAccountSchema } from "src/pages/api/users/unblockInAccount";
 import type { UnsetAdminSchema } from "src/pages/api/users/unsetAdmin";
 
+
 export const api = {
   changeJobPrice: fromApi<ChangeJobPriceSchema>("PATCH", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin/changeJobPrice")),
+  changePasswordAsPlatformAdmin: fromApi<ChangePasswordAsPlatformAdminSchema>("PATCH", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin/changePassword")),
   changeStorageQuota: fromApi<ChangeStorageQuotaSchema>("PUT", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin/changeStorage")),
   fetchJobs: fromApi<FetchJobsSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin/fetchJobs/fetchJobs")),
   getFetchJobInfo: fromApi<GetFetchJobInfoSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin/fetchJobs/getFetchInfo")),
@@ -95,6 +98,7 @@ export const api = {
   createInitAdmin: fromApi<CreateInitAdminSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/init/createInitAdmin")),
   initGetAccounts: fromApi<InitGetAccountsSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/init/getAccounts")),
   initGetUsers: fromApi<InitGetUsersSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/init/getUsers")),
+  isUserExist: fromApi<IsUserExistSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/init/isUserExist")),
   setAsInitAdmin: fromApi<SetAsInitAdminSchema>("PATCH", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/init/setAsInitAdmin copy")),
   unsetInitAdmin: fromApi<UnsetInitAdminSchema>("DELETE", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/init/setAsInitAdmin")),
   addBillingItem: fromApi<AddBillingItemSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/job/addBillingItem")),
@@ -106,11 +110,10 @@ export const api = {
   queryJobTimeLimit: fromApi<QueryJobTimeLimitSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/job/queryJobTimeLimit")),
   getRunningJobs: fromApi<GetRunningJobsSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/job/runningJobs")),
   changePassword: fromApi<ChangePasswordSchema>("PATCH", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/profile/changePassword")),
-  changePasswordAsPlatformAdmin: fromApi<ChangePasswordAsPlatformAdminSchema>("PATCH", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin/changePassword")),
-  changePasswordAsTenantAdmin: fromApi<ChangePasswordAsTenantAdminSchema>("PATCH", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/tenant/changePassword")),
   dewhitelistAccount: fromApi<DewhitelistAccountSchema>("DELETE", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/tenant/accountWhitelist/dewhitelistAccount")),
   getWhitelistedAccounts: fromApi<GetWhitelistedAccountsSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/tenant/accountWhitelist/getWhitelistedAccounts")),
   whitelistAccount: fromApi<WhitelistAccountSchema>("PUT", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/tenant/accountWhitelist/whitelistAccount")),
+  changePasswordAsTenantAdmin: fromApi<ChangePasswordAsTenantAdminSchema>("PATCH", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/tenant/changePassword")),
   createTenant: fromApi<CreateTenantSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/tenant/create")),
   createAccount: fromApi<CreateAccountSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/tenant/createAccount")),
   getAccounts: fromApi<GetAccountsSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/tenant/getAccounts")),

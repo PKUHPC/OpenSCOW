@@ -24,6 +24,7 @@ import {
   UserRole as PFUserRole, UserServiceServer,
   UserServiceService,
   UserStatus as PFUserStatus } from "src/generated/server/user";
+import { newUserInDataAndAuth } from "src/utils/newUserInDatabaseAndAuth";
 import { paginationProps } from "src/utils/orm";
 
 export const userServiceServer = plugin((server) => {
@@ -304,64 +305,15 @@ export const userServiceServer = plugin((server) => {
 
     createUser: async ({ request, em, logger }) => {
       const { name, tenantName, email, identityId, password } = request;
-
       const tenant = await em.findOne(Tenant, { name: tenantName });
       if (!tenant) {
         throw <ServiceError> { code: Status.NOT_FOUND, details: "Tenant is not found." };
       }
       // creat user in database
       const user = new User({ name, userId: identityId, tenant, email });
+      const id = await newUserInDataAndAuth(user, password, logger, em);
 
-      user.storageQuotas.add(Object.keys(clusters).map((x) => new StorageQuota({
-        cluster: x,
-        storageQuota: 0,
-        user: user!,
-      })));
-      try {
-        await em.persistAndFlush(user);
-      } catch (e) {
-        if (e instanceof UniqueConstraintViolationException) {
-          throw <ServiceError> { code: Status.ALREADY_EXISTS, message:`User with id ${identityId} already exists.` };
-        } else {
-          throw e;
-        }
-      }
-
-      // call auth
-      await createUser(misConfig.authUrl, { identityId, id: user.id, mail: email, name, password }, logger)
-        // If the call of creating user of auth fails,  delete the user created in the database.
-        .catch(async (e) => {
-          await em.removeAndFlush(user);
-
-          if (e.status === 409) {
-            throw <ServiceError> {
-              code: Status.ALREADY_EXISTS, message:`User with id ${user.id} already exists.`,
-            };
-          }
-
-          logger.error("Error creating user in auth.", e);
-
-          throw <ServiceError> { code: Status.INTERNAL, message: `Error creating user ${user.id} in auth.` };
-        });
-
-      // Making an ssh Request to the login node as the user created.
-      if (process.env.NODE_ENV === "production") {
-        await Promise.all(Object.values(clusters).map(async ({ displayName, slurm, misIgnore }) => {
-          if (misIgnore) { return; }
-          const node = slurm.loginNodes[0];
-          logger.info("Checking if user can login to %s by login node %s", displayName, node);
-
-          const error = await insertKeyAsUser(node, name, password, rootKeyPair, logger).catch((e) => e);
-          if (error) {
-            logger.info("user %s cannot login to %s by login node %s. err: %o", name, displayName, node, error);
-            throw error;
-          } else {
-            logger.info("user %s login to %s by login node %s", name, displayName, node);
-          }
-        }));
-      }
-
-      return [{ id: user.id }];
+      return [{ id: id }];
     },
 
     deleteUser: async ({ request, em }) => {

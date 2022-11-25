@@ -3,37 +3,35 @@ import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { InitServiceClient } from "src/generated/server/init";
 import { getClient } from "src/utils/client";
 import { publicConfig } from "src/utils/config";
-import { queryIfInitialized } from "src/utils/init";
 
-export interface CreateInitAdminSchema {
+export interface IsUserExistSchema {
   method: "POST";
 
   body: {
     identityId: string;
     name: string;
     email: string;
-    password: string;
-    isExist: boolean;
+    password: string
   };
 
   responses: {
-    204: null;
+    200: { 
+      isExistInScow: boolean,
+      isExistInLdap: boolean,
+    };
+      
+    // 204: null;
 
     400: { code: "USER_ID_NOT_VALID" };
-
-    409: { code: "ALREADY_INITIALIZED"; }
 
   }
 }
 
 const userIdRegex = publicConfig.USERID_PATTERN ? new RegExp(publicConfig.USERID_PATTERN) : undefined;
 
-export default route<CreateInitAdminSchema>("CreateInitAdminSchema", async (req) => {
-  const result = await queryIfInitialized();
+export default route<IsUserExistSchema>("IsUserExistSchema", async (req) => {
 
-  if (result) { return { 409: { code: "ALREADY_INITIALIZED" } }; }
-
-  const { email, identityId, name, password, isExist } = req.body;
+  const { email, identityId, name, password } = req.body;
 
   if (userIdRegex && !userIdRegex.test(identityId)) {
     return { 400: {
@@ -43,11 +41,15 @@ export default route<CreateInitAdminSchema>("CreateInitAdminSchema", async (req)
   }
 
   const client = getClient(InitServiceClient);
-  await asyncClientCall(client, "createInitAdmin", {
-    email, name, userId: identityId, password, isExist,
+  const isExist = await asyncClientCall(client, "isUserExist", {
+    email, name, userId: identityId, password,
   });
 
-  return { 204: null };
-
+  return {
+    200:
+    { 
+      isExistInScow: isExist["isExistInScow"],
+      isExistInLdap: isExist["isExistInLdap"],
+    },
+  };
 });
-

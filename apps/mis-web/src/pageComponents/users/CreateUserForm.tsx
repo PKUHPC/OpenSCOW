@@ -2,7 +2,6 @@ import { Form, Input } from "antd";
 import React from "react";
 import { publicConfig } from "src/utils/config";
 import { confirmPasswordFormItemProps, emailRule, passwordRule } from "src/utils/form";
-
 export interface CreateUserFormFields {
   identityId: string;
   name: string;
@@ -11,11 +10,9 @@ export interface CreateUserFormFields {
   confirmPassword: string;
 }
 
-interface Props {
-  noPassword?: boolean;
-}
 
-export const CreateUserForm: React.FC<Props> = ({ noPassword }) => {
+
+export const CreateUserForm: React.FC = () => {
 
   const form = Form.useFormInstance<CreateUserFormFields>();
 
@@ -44,26 +41,27 @@ export const CreateUserForm: React.FC<Props> = ({ noPassword }) => {
       >
         <Input />
       </Form.Item>
+      <Form.Item
+        label="用户密码"
+        name="password"
+        rules={[{ required:true }, passwordRule]}
+      >
+        <Input.Password placeholder={passwordRule.message} />
+      </Form.Item>
       {
-        noPassword ? undefined : (
+        publicConfig.ENABLE_CREATE_USER ? (
           <>
             <Form.Item
-              rules={[{ required: true }, passwordRule]}
-              label="密码"
-              name="password"
-            >
-              <Input.Password placeholder={passwordRule.message} />
-            </Form.Item>
-            <Form.Item
-              name="confirmPassword"
               label="确认密码"
+              name="confirmPassword"
               hasFeedback
               {...confirmPasswordFormItemProps(form, "password")}
             >
-              <Input.Password />
+              <Input.Password placeholder={passwordRule.message} />
             </Form.Item>
           </>
-        )
+        ) : undefined
+        
       }
     </>
   );

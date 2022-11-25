@@ -13,6 +13,7 @@ import { reloadEntity } from "src/utils/orm";
 import { insertInitialData } from "tests/data/data";
 import { dropDatabase } from "tests/data/helpers";
 
+
 jest.mock("@scow/lib-auth", () => ({
   createUser: jest.fn(async () => ({ status: 204, ok: true, text: () => "" })),
 }));

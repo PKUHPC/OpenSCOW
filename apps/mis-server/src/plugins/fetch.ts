@@ -1,4 +1,5 @@
 import { plugin } from "@ddadaal/tsgrpc-server";
+import { getCapabilities } from "@scow/lib-auth";
 import cron from "node-cron";
 import { misConfig } from "src/config/mis";
 import { fetchJobs, lastFetched } from "src/tasks/fetch";
@@ -38,6 +39,9 @@ export const fetchPlugin = plugin(async (f) => {
     logger.info("Fetch info stopped.");
   });
 
+  const capabilities = await getCapabilities(misConfig.authUrl);
+  f.addExtension("capabilities", capabilities);
+
   f.addExtension("fetch", <FetchPlugin["fetch"]>{
     started: () => fetchStarted,
     start: () => {
@@ -62,4 +66,6 @@ export const fetchPlugin = plugin(async (f) => {
     lastFetched: () => lastFetched,
     fetch: trigger,
   });
+
+  // f.ext.fetch
 });

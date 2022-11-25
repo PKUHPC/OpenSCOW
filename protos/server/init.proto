@@ -9,6 +9,8 @@ message CreateInitAdminRequest {
   string user_id = 1;
   string name = 2;
   string email = 3;
+  string password = 4;
+  bool isExist = 5;
 }
 message CreateInitAdminReply {}
 
@@ -26,6 +28,17 @@ message UnsetInitAdminRequest {
   string user_id = 1;
 }
 message UnsetInitAdminReply {}
+message IsUserExistRequest {
+  string user_id = 1;
+  string name = 2;
+  string email = 3;
+  string password = 4;
+}
+message IsUserExistReply {
+  bool isExistInScow= 1;
+  bool isExistInLdap = 2;
+}
+
 
 service InitService {
   rpc QuerySystemInitialized(QuerySystemInitializedRequest)
@@ -44,5 +57,6 @@ service InitService {
   // Unset a user's PLATFORM_ADMIN and default tenant's TENANT_ADMIN role
   // NOT_FOUND: the user is not found in default tenant
   rpc UnsetInitAdmin(UnsetInitAdminRequest) returns (UnsetInitAdminReply);
+  rpc IsUserExist(IsUserExistRequest) returns (IsUserExistReply);
 
 }

@@ -11,8 +11,17 @@ import { PlatformRole, TenantRole, User } from "src/entities/User";
 import { CreateInitAdminRequest, InitServiceClient,
   SetAsInitAdminRequest, UnsetInitAdminRequest } from "src/generated/server/init";
 import { DEFAULT_TENANT_NAME } from "src/utils/constants";
+import { newUserInDataAndAuth } from "src/utils/newUserInDatabaseAndAuth";
 import { reloadEntities, toRef } from "src/utils/orm";
 import { dropDatabase } from "tests/data/helpers";
+
+jest.mock("@scow/lib-auth", () => ({
+  getCapabilities: jest.fn(async () => ({
+    createUser: true,
+    changePassword: true,
+    validateName: true,
+  })),
+}));
 
 let server: Server;
 let client: InitServiceClient;
@@ -27,6 +36,27 @@ beforeEach(async () => {
 afterEach(async () => {
   await dropDatabase(server.ext.orm);
   await server.close();
+});
+
+it("Test a user exists scow", async () => {
+  const identityId = "test01";
+  const name = "test01";
+  const email = "test01@test01.com";
+  const password = "pwd...123";
+  const em = server.ext.orm.em.fork();
+  const tenant = await em.findOneOrFail(Tenant, { name: DEFAULT_TENANT_NAME });
+  const user = new User({
+    email, name, tenant, userId: identityId,
+    platformRoles: [PlatformRole.PLATFORM_ADMIN], tenantRoles: [TenantRole.TENANT_ADMIN],
+  });
+  await newUserInDataAndAuth(user, password, server.logger, em);
+  const isExistResult = await asyncClientCall(client, "isUserExist", {
+    userId: identityId,
+    name: name,
+    email: email,
+    password: password,
+  });
+  expect(isExistResult.isExistInScow).toBe(true);
 });
 
 it("To test whether the slurm.sh is automatically copied successfully", async () => {
@@ -81,15 +111,20 @@ it("creates an init admin user", async () => {
     email: "test@test.com",
     name: "123",
     userId: "123",
+    password: "pwd...123",
+    isExist: false,
   };
-
   await asyncClientCall(client, "createInitAdmin", userInfo);
 
   const em = server.ext.orm.em.fork();
 
   const user = await em.findOneOrFail(User, { userId: userInfo.userId });
 
-  expect(user).toMatchObject(userInfo);
+  expect(user).toMatchObject({
+    email: userInfo.email,
+    name: userInfo.name,
+    userId: userInfo.userId,
+  });
   expect(user.platformRoles).toIncludeSameMembers([PlatformRole.PLATFORM_ADMIN]);
   expect(user.tenantRoles).toIncludeSameMembers([TenantRole.TENANT_ADMIN]);
 });
