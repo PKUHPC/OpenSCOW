@@ -253,23 +253,6 @@ importers:
       postcss: 8.4.19
       webpack: 5.75.0
 
-  apps/node-gateway:
-    specifiers:
-      '@scow/lib-auth': workspace:*
-      '@scow/lib-config': workspace:*
-      '@types/cookie': 0.5.1
-      cookie: 0.5.0
-      http-proxy: 1.18.1
-      pino: 8.7.0
-    dependencies:
-      '@scow/lib-auth': link:../../libs/auth
-      '@scow/lib-config': link:../../libs/libconfig
-      cookie: 0.5.0
-      http-proxy: 1.18.1
-      pino: 8.7.0
-    devDependencies:
-      '@types/cookie': 0.5.1
-
   apps/portal-server:
     specifiers:
       '@ddadaal/tsgrpc-cli': 0.14.3
@@ -4812,10 +4795,6 @@ packages:
   /@types/cookie/0.4.1:
     resolution: {integrity: sha512-XW/Aa8APYr6jSVVA1y/DEIZX0/GMKLEVekNG727R8cs56ahETkRAy/3DR7+fJyh7oUgGwNQaRfXCun0+KbWY7Q==}
     dev: false
-
-  /@types/cookie/0.5.1:
-    resolution: {integrity: sha512-COUnqfB2+ckwXXSFInsFdOAWQzCCx+a5hq2ruyj+Vjund94RJQd4LG2u9hnvJrTgunKAaax7ancBYlDrNYxA0g==}
-    dev: true
 
   /@types/cors/2.8.12:
     resolution: {integrity: sha512-vt+kDhq/M2ayberEtJcIN/hxXy1Pk+59g2FV/ZQceeaTyCtCucjL2Q7FXlFjtWn4n15KCr1NE2lNNFhp0lEThw==}

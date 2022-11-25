@@ -58,10 +58,4 @@ services:
       context: ..
       dockerfile: dockerfiles/Dockerfile.auth
 
-  node-gateway:
-    image: $IMAGE_BASE/node-gateway:$TAG
-    build:
-      context: ..
-      dockerfile: dockerfiles/Dockerfile.node-gateway
-
 
