@@ -48,7 +48,7 @@ web:
     c.NotebookApp.port_retries = 0
     c.NotebookApp.password = u'sha1:${SALT}:${PASSWORD_SHA1}'
     c.NotebookApp.open_browser = False
-    c.NotebookApp.base_url = "/proxy/${SLURM_COMPUTE_NODE_IP}/${PORT}/"
+    c.NotebookApp.base_url = "/api/proxy/absolute/${SLURM_COMPUTE_NODE_IP}/${PORT}/"
     c.NotebookApp.allow_origin = '*'
     c.NotebookApp.disable_check_xsrf = True
     EOL
