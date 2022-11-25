@@ -63,12 +63,12 @@ COPY --from=builder /app/libs/config/build/ ./build
 WORKDIR /app/apps/portal-server
 COPY --from=builder /app/apps/portal-server/package.json .
 COPY --from=builder /app/apps/portal-server/node_modules/ ./node_modules
-COPY --from=builder /app/apps/portal-server/build/ ./src
 COPY --from=builder /app/apps/portal-server/assets ./assets
+COPY --from=builder /app/apps/portal-server/build/ ./build
 
 ENV NODE_ENV production
 
-ENTRYPOINT [ "node", "src/index.js" ]
+CMD ["npm", "run", "serve"]
 
 
 

@@ -4,7 +4,7 @@
   "scripts": {
     "build": "pnpm run -r build",
     "build:libs": "pnpm --filter \"./libs/**\" run build",
-    "build:containers": "docker compose --env-file dev/.env.build -f dev/docker-compose.build.yml build",
+    "build:images": "docker compose --env-file dev/.env.build -f dev/docker-compose.build.yml build",
     "prepareDev": "pnpm build:libs && pnpm run -r prepareDev",
     "prune": "pnpm clean --yes && pnpm bootstrap --ci -- --production",
     "devenv": "docker compose --env-file dev/.env.dev -f dev/docker-compose.dev.yml up -d",
