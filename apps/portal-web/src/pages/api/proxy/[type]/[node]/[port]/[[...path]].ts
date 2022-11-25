@@ -12,9 +12,16 @@ export const config = {
 
 export default async (req: NextApiRequest, res: AugmentedNextApiResponse) => {
 
+  /**
+   * Node的原生http服务器（http.Server）在收到WebSocket连接的时候将会触发一个`upgrade`事件，而且并不走正常的HTTP请求响应流程
+   * 所以整个系统第一次启动后，在以HTTP形式访问此代理地址之前，到本地址的WebSocket将会失败
+   * 因为此时并没有注册upgrade事件的监听器，无法处理WebSocket连接。
+   *
+   * 所以系统启动后，需要手动触发一次到本地址的HTTP请求，以便注册upgrade事件的监听器
+   */
   if (!res.socket.server.upgrade) {
     // @ts-ignore
-    const server: http.Server = req.socket.server;
+    const server: http.Server = res.socket.server;
 
     server.on("upgrade", async (req, socket, head) => {
 
