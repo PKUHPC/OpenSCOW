@@ -15,7 +15,8 @@ module.exports = async (phase) => {
     basePath: process.env.NEXT_PUBLIC_BASE_PATH,
     compiler: {
       styledComponents: true,
-    }
+    },
+    trailingSlash: true,
   };
 
   return withPlugins([
