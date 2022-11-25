@@ -2,7 +2,7 @@ import { InboxOutlined } from "@ant-design/icons";
 import { Button, Modal, Upload } from "antd";
 import { join } from "path";
 import { api } from "src/apis";
-import { useMessage } from "src/layouts/prompts";
+import { useMessage, useModal } from "src/layouts/prompts";
 import { urlToUpload } from "src/pageComponents/filemanager/api";
 
 interface Props {
@@ -15,8 +15,9 @@ interface Props {
 
 export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, cluster }) => {
 
+  const modal = useModal();
   const message = useMessage();
-
+  
   return (
     <Modal
       open={open}
@@ -49,7 +50,7 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
           await api.exists({ query:{ cluster: cluster, path: join(path, file.name) } })
             .then((d) => {
               if (d.result) {
-                Modal.confirm({
+                modal.confirm({
                   title: "文件已存在",
                   content: `文件${file.name}已存在，是否覆盖？`,
                   onOk: () => Promise.resolve(),
