@@ -37,9 +37,9 @@ const specs = {
   SSH_PRIVATE_KEY_PATH: str({ desc: "SSH私钥路径", default: join(homedir(), ".ssh", "id_rsa") }),
   SSH_PUBLIC_KEY_PATH: str({ desc: "SSH公钥路径", default: join(homedir(), ".ssh", "id_rsa.pub") }),
 
-  PROXY_BASE_PATH: str({ desc: "网关的代理路径。相对于整个系统的base path。", default: "/proxy/absolute" }),
-  RPROXY_BASE_PATH: str({ desc: "网关的代理路径。相对于整个系统的base path。", default: "/proxy/relative" }),
-  WSPROXY_BASE_PATH: str({ desc: "网关的代理路径。相对于整个系统的base path。", default: "/proxy/absolute" }),
+  PROXY_BASE_PATH: str({ desc: "网关的代理路径。相对于整个系统的base path。", default: "/api/proxy/absolute" }),
+  RPROXY_BASE_PATH: str({ desc: "网关的代理路径。相对于整个系统的base path。", default: "/api/proxy/relative" }),
+  WSPROXY_BASE_PATH: str({ desc: "网关的代理路径。相对于整个系统的base path。", default: "/api/proxy/absolute" }),
 
   SERVER_URL: str({ desc: "门户后端的路径", default: "portal-server:5000" }),
 

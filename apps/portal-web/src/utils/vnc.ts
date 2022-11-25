@@ -4,7 +4,7 @@ import { publicConfig } from "src/utils/config";
 export const openDesktop = (node: string, port: number, password: string) => {
 
   const params = new URLSearchParams({
-    path: join(publicConfig.WSPROXY_BASE_PATH, node, String(port)),
+    path: join(process.env.NEXT_PUBLIC_BASE_PATH || "", publicConfig.WSPROXY_BASE_PATH, node, String(port)),
     password: password,
     autoconnect: "true",
     reconnect: "true",
