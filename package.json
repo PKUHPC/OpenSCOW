@@ -10,7 +10,7 @@
     "devenv": "docker compose --env-file dev/.env.dev -f dev/docker-compose.dev.yml up -d",
     "devenv:stop": "docker compose --env-file dev/.env.dev -f dev/docker-compose.dev.yml down",
     "test": "pnpm run -r test",
-    "test:ci": "pnpm run -r test --ci --coverage",
+    "test:ci": "pnpm run -r test --ci --coverage --runInBand",
     "prepare": "node -e \"try { require('husky').install() } catch (e) {if (e.code !== 'MODULE_NOT_FOUND') throw e}\"",
     "lint": "eslint --cache --ext .tsx,.ts .",
     "cm": "cz"
