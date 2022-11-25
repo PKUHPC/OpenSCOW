@@ -34,7 +34,7 @@ function parseProxyTarget(req: IncomingMessage): string | Error {
 
 interface Rule {
   prefix: string;
-  proxy: (rest: string) => void;
+  proxy: () => void;
 }
 
 export function createGateway() {
@@ -51,7 +51,7 @@ export function createGateway() {
       const proxyWeb = () => {
         proxy.web(req, res, {
           target,
-          prependPath: false, xfwd: true,
+          ignorePath: true, xfwd: true,
         }, (err) => {
           if (err) { logger.error(err, "Error when proxing %s requests", type); }
         });
@@ -87,21 +87,22 @@ export function createGateway() {
     const rules: Rule[] = [
       {
         prefix: basePaths.authPublic,
-        proxy: (rest) => doProxy(config.AUTH_INTERNAL_URL + "/public" + rest, "auth", false),
+        proxy: () =>
+          doProxy(config.AUTH_INTERNAL_URL + "/public" + stripPrefix(req.url!, basePaths.authPublic), "auth", false),
       },
     ];
 
     if (basePaths.portal) {
       rules.push({
         prefix: basePaths.portal,
-        proxy: (rest) => doProxy(config.PORTAL_INTERNAL_URL + rest, "portal", false),
+        proxy: () => doProxy(config.PORTAL_INTERNAL_URL + req.url, "portal", false),
       });
     }
 
     if (basePaths.mis) {
       rules.push({
         prefix: basePaths.mis,
-        proxy: (rest) => doProxy(config.MIS_INTERNAL_URL + rest, "mis", false),
+        proxy: () => doProxy(config.MIS_INTERNAL_URL + req.url, "mis", false),
       });
     }
 
@@ -126,7 +127,7 @@ export function createGateway() {
     const match = longestMatch(req.url, rules);
 
     if (match) {
-      match.proxy(stripPrefix(req.url, match.prefix));
+      match.proxy();
     } else {
       res.writeHead(404, { "Content-Type": "text/plain" });
       res.end("Not found");
@@ -181,14 +182,14 @@ export function createGateway() {
     if (basePaths.portal) {
       rules.push({
         prefix: basePaths.portal,
-        proxy: (rest) => doProxy(config.PORTAL_INTERNAL_URL + rest, "portal", false),
+        proxy: () => doProxy(config.PORTAL_INTERNAL_URL + req.url, "portal", false),
       });
     }
 
     if (basePaths.mis) {
       rules.push({
         prefix: basePaths.mis,
-        proxy: (rest) => doProxy(config.MIS_INTERNAL_URL + rest, "mis", false),
+        proxy: () => doProxy(config.MIS_INTERNAL_URL + req.url, "mis", false),
       });
     }
 
@@ -211,7 +212,7 @@ export function createGateway() {
     const match = longestMatch(req.url, rules);
 
     if (match) {
-      match.proxy(stripPrefix(req.url, match.prefix));
+      match.proxy();
       return;
     } else {
       writeError("404 Not Found", "Not found");
