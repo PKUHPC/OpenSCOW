@@ -5,8 +5,8 @@ import { authenticateRequest } from "src/auth";
 import { basePaths, config } from "src/config/env";
 import { setupGracefulShutdown } from "src/gracefulShutdown";
 import { longestMatch, stripPrefix } from "src/match";
-import { normalizeUrl } from "src/path";
 import { createReqIdGen } from "src/reqId";
+import { normalizeUrl } from "src/utils";
 
 const rootLogger = pino({ level: config.LOG_LEVEL });
 
