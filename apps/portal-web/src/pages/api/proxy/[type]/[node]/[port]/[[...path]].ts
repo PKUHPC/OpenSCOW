@@ -39,9 +39,7 @@ export default async (req: NextApiRequest, res: AugmentedNextApiResponse) => {
         return;
       }
 
-      const url = req.url!;
-
-      const target = parseProxyTarget(url);
+      const target = parseProxyTarget(req.url!);
 
       if (target instanceof Error) {
         writeError("400 Bad Request", target.message);
