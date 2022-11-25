@@ -95,7 +95,7 @@ export const appServiceServer = plugin((server) => {
 
         switch (attribute.type) {
         case "number":
-          if (!(typeof customAttributes[attribute.name] === "number")) {
+          if (!Number(customAttributes[attribute.name]) && Number(customAttributes[attribute.name]) !== 0) {
             throw <ServiceError> { 
               code: Status.INVALID_ARGUMENT, 
               message: `
