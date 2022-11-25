@@ -77,8 +77,6 @@ export default async (req: NextApiRequest, res: AugmentedNextApiResponse) => {
     return;
   }
 
-  console.log("proxy to %s", target);
-
   proxy.web(req, res, {
     target,
     ignorePath: true, xfwd: true,
