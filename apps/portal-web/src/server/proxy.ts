@@ -9,7 +9,7 @@ export function parseProxyTarget(url: string): string | Error {
     ? url
     : url.slice(runtimeConfig.BASE_PATH.length);
 
-  const [_empty, _proxy, type, node, port, ...path] = relativePath.split("/");
+  const [_empty, _api, _proxy, type, node, port, ...path] = relativePath.split("/");
 
   if (type === "relative") {
     return `http://${node}:${port}/${path.join("/")}`;
