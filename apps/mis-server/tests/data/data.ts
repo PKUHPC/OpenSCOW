@@ -5,6 +5,14 @@ import { TenantRole, User } from "src/entities/User";
 import { UserAccount, UserRole, UserStatus } from "src/entities/UserAccount";
 import { DEFAULT_TENANT_NAME } from "src/utils/constants";
 
+jest.mock("@scow/lib-auth", () => ({
+  getCapabilities: jest.fn(async () => ({
+    createUser: true,
+    changePassword: true,
+    validateName: true,
+  })),
+}));
+
 export async function insertInitialData(em: SqlEntityManager) {
 
   const tenant = await em.findOneOrFail(Tenant, { name: DEFAULT_TENANT_NAME });

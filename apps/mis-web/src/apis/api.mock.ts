@@ -152,9 +152,9 @@ export const mockApi: MockApi<typeof api> = {
     ],
   }),
   
-  isUserExist: async () => ({
-    isExistInScow: false,
-    isExistInLdap: false,
+  userExists: async () => ({
+    existsInScow: false,
+    existsInAuth: false,
   }),
   
   setPlatformRole: async () => ({ executed: true }),

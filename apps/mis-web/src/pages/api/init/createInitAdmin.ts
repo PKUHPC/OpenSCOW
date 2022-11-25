@@ -13,7 +13,7 @@ export interface CreateInitAdminSchema {
     name: string;
     email: string;
     password: string;
-    isExist: boolean;
+    existsInAuth: boolean;
   };
 
   responses: {
@@ -33,7 +33,7 @@ export default route<CreateInitAdminSchema>("CreateInitAdminSchema", async (req)
 
   if (result) { return { 409: { code: "ALREADY_INITIALIZED" } }; }
 
-  const { email, identityId, name, password, isExist } = req.body;
+  const { email, identityId, name, password, existsInAuth } = req.body;
 
   if (userIdRegex && !userIdRegex.test(identityId)) {
     return { 400: {
@@ -44,7 +44,7 @@ export default route<CreateInitAdminSchema>("CreateInitAdminSchema", async (req)
 
   const client = getClient(InitServiceClient);
   await asyncClientCall(client, "createInitAdmin", {
-    email, name, userId: identityId, password, isExist,
+    email, name, userId: identityId, password, existsInAuth,
   });
 
   return { 204: null };

@@ -1,4 +1,3 @@
-import { ReloadOutlined } from "@ant-design/icons";
 import { Alert, Button, Form, Typography } from "antd";
 import { useState } from "react";
 import { api } from "src/apis";
@@ -28,8 +27,8 @@ export const InitAdminForm: React.FC = () => {
     const { email, identityId, name, password } = await form.validateFields();
     publicConfig.ENABLE_CREATE_USER ?
       // 当前认证系统支持创建用户
-      await api.isUserExist({ body: { email, identityId, name, password } }).then((isExist) => {
-        isExist.isExistInScow ?
+      await api.userExists({ body: { email, identityId, name, password } }).then((isExist) => {
+        isExist.existsInScow ?
           (
             Modal.error({
               title: "",
@@ -41,13 +40,13 @@ export const InitAdminForm: React.FC = () => {
           
           Modal.confirm({
             title: "请确认",
-            content: isExist.isExistInLdap ? "此用户存在于已经认证系统，确认添加为初始管理员？" : "用户不存在，是否确认创建此用户并添加为初始管理员？",
+            content: isExist.existsInAuth ? "此用户存在于已经认证系统，确认添加为初始管理员？" : "用户不存在，是否确认创建此用户并添加为初始管理员？",
             onCancel: () => {
               setLoading(false);
             },
             onOk: async () => {
               await api.createInitAdmin(
-                { body: { email, identityId, name, password, isExist: isExist.isExistInLdap } })
+                { body: { email, identityId, name, password, existsInAuth: isExist.existsInAuth } })
                 .then(() => {
                   message.success("添加完成！");
                   form.resetFields();
@@ -58,9 +57,9 @@ export const InitAdminForm: React.FC = () => {
           });
       })
       // 当前认证系统不支持创建用户
-      : await api.isUserExist({ body: { email, identityId, name, password } })
+      : await api.userExists({ body: { email, identityId, name, password } })
         .then((isExist) => {
-          isExist.isExistInScow ?
+          isExist.existsInScow ?
             Modal.error({
               title: "",
               content: "用户已存在于SCOW数据库",
@@ -73,10 +72,10 @@ export const InitAdminForm: React.FC = () => {
               title: "请确认",
               // icon: <ExclamationCircleOutlined />,
               // 用户不存在，调用
-              content: isExist.isExistInLdap ? "用户存在，确定要将此用户设置为初始管理员？" : "用户不存在，确认表示新建此用户？",
+              content: isExist.existsInAuth ? "用户存在，确定要将此用户设置为初始管理员？" : "用户不存在，确认表示新建此用户？",
               onOk: async () => {
                 await api.createInitAdmin(
-                  { body: { email, identityId, name, password, isExist: isExist.isExistInLdap } })
+                  { body: { email, identityId, name, password, existsInAuth: isExist.existsInAuth } })
                   .then(() => {
                     message.success("添加完成！");
                     form.resetFields();

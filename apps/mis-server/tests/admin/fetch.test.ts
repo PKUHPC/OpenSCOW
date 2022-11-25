@@ -10,6 +10,14 @@ import { AdminServiceClient } from "src/generated/server/admin";
 import { createSourceDbOrm } from "src/tasks/fetch";
 import { clearAndClose, dropDatabase } from "tests/data/helpers";
 
+jest.mock("@scow/lib-auth", () => ({
+  getCapabilities: jest.fn(async () => ({
+    createUser: true,
+    changePassword: true,
+    validateName: true,
+  })),
+}));
+
 let server: Server;
 let orm: MikroORM<MySqlDriver>;
 let client: AdminServiceClient;

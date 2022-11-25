@@ -4,7 +4,7 @@ import { InitServiceClient } from "src/generated/server/init";
 import { getClient } from "src/utils/client";
 import { publicConfig } from "src/utils/config";
 
-export interface IsUserExistSchema {
+export interface userExistsSchema {
   method: "POST";
 
   body: {
@@ -16,8 +16,8 @@ export interface IsUserExistSchema {
 
   responses: {
     200: { 
-      isExistInScow: boolean,
-      isExistInLdap: boolean,
+      existsInScow: boolean,
+      existsInAuth: boolean,
     };
       
     // 204: null;
@@ -29,7 +29,7 @@ export interface IsUserExistSchema {
 
 const userIdRegex = publicConfig.USERID_PATTERN ? new RegExp(publicConfig.USERID_PATTERN) : undefined;
 
-export default route<IsUserExistSchema>("IsUserExistSchema", async (req) => {
+export default route<userExistsSchema>("userExistsSchema", async (req) => {
 
   const { email, identityId, name, password } = req.body;
 
@@ -41,15 +41,15 @@ export default route<IsUserExistSchema>("IsUserExistSchema", async (req) => {
   }
 
   const client = getClient(InitServiceClient);
-  const isExist = await asyncClientCall(client, "isUserExist", {
+  const isExist = await asyncClientCall(client, "userExists", {
     email, name, userId: identityId, password,
   });
 
   return {
     200:
     { 
-      isExistInScow: isExist["isExistInScow"],
-      isExistInLdap: isExist["isExistInLdap"],
+      existsInScow: isExist.existsInScow,
+      existsInAuth: isExist.existsInAuth,
     },
   };
 });

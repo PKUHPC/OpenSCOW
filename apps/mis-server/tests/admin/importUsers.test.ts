@@ -11,6 +11,14 @@ import { UserAccount, UserRole, UserStatus } from "src/entities/UserAccount";
 import { AdminServiceClient } from "src/generated/server/admin";
 import { dropDatabase } from "tests/data/helpers";
 
+jest.mock("@scow/lib-auth", () => ({
+  getCapabilities: jest.fn(async () => ({
+    createUser: true,
+    changePassword: true,
+    validateName: true,
+  })),
+}));
+
 let server: Server;
 let orm: MikroORM<MySqlDriver>;
 let client: AdminServiceClient;
