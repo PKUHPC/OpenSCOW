@@ -1,15 +1,15 @@
 import httpProxy from "http-proxy";
+import { runtimeConfig } from "src/utils/config";
 
 export const proxy = httpProxy.createServer();
 
 export function parseProxyTarget(url: string): string | Error {
-  const parts = url.split("/");
+  // skip base path
+  const relativePath = runtimeConfig.BASE_PATH === "/"
+    ? url
+    : url.slice(runtimeConfig.BASE_PATH.length);
 
-  // find the end of base_path
-  const proxyIndex = parts.indexOf("proxy");
-  if (proxyIndex === -1) { return new Error("URL is malformed."); }
-
-  const [_proxy, type, node, port, ...path] = parts.slice(proxyIndex);
+  const [_empty, _proxy, type, node, port, ...path] = relativePath.split("/");
 
   if (type === "relative") {
     return `http://${node}:${port}/${path.join("/")}`;
