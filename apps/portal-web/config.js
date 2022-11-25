@@ -1,6 +1,6 @@
 // @ts-check
 
-const { envConfig, str, bool, parseKeyValue, num } = require("@scow/lib-config");
+const { envConfig, str, bool, parseKeyValue, num, port } = require("@scow/lib-config");
 const { join } = require("path");
 const { homedir } = require("os");
 const { PHASE_DEVELOPMENT_SERVER, PHASE_PRODUCTION_BUILD, PHASE_PRODUCTION_SERVER, PHASE_TEST } = require("next/constants");
@@ -152,7 +152,7 @@ const buildRuntimeConfig = async (phase) => {
     // HACK
     // call /api/proxy/<node>/<port>/ after 3 seconds to init the proxy ws server
     setTimeout(() => {
-      const url = join(publicRuntimeConfig.PROXY_BASE_PATH, "127.0.0.1", "3001");
+      const url = "http://localhost:3000" + join(publicRuntimeConfig.PROXY_BASE_PATH, "127.0.0.1", "3001");
       console.log("Calling proxy url to initialize ws proxy server", url);
       fetch(url).then((r) => r.json()).then((r) => {
         console.log("Calling proxy url result: ", r.text());
