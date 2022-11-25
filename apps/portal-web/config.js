@@ -60,12 +60,15 @@ const buildRuntimeConfig = async (phase) => {
 
   // load .env.build if in build
   if (building) {
+
+
     return { serverRuntimeConfig: {}, publicRuntimeConfig: {} };
   }
 
   if (dev) {
     require("dotenv").config({ path: "env/.env.dev" });
   }
+
 
   // reload config after envs are applied
   const config = envConfig(specs, process.env);
@@ -145,6 +148,19 @@ const buildRuntimeConfig = async (phase) => {
   if (!building) {
     console.log("Server Runtime Config", serverRuntimeConfig);
     console.log("Public Runtime Config", publicRuntimeConfig);
+  }
+
+  if (production) {
+
+    // HACK
+    // call /api/init after 3 seconds to init the server
+    setTimeout(() => {
+      console.log("call /api/init");
+      fetch(join(config.BASE_PATH, "/api/init")).then((res) => res.json()).then((v) => {
+        console.log("init result", v);
+      });
+    }, 3000);
+
   }
 
   return {
