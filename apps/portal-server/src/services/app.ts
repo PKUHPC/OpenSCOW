@@ -95,7 +95,7 @@ export const appServiceServer = plugin((server) => {
 
         switch (attribute.type) {
         case "number":
-          if (!Number(customAttributes[attribute.name]) && Number(customAttributes[attribute.name]) !== 0) {
+          if (Number.isNaN(Number(customAttributes[attribute.name]))) {
             throw <ServiceError> { 
               code: Status.INVALID_ARGUMENT, 
               message: `
@@ -106,25 +106,9 @@ export const appServiceServer = plugin((server) => {
           break;
 
         case "text":
-          if (!(typeof customAttributes[attribute.name] === "string")) {
-            throw <ServiceError> { 
-              code: Status.INVALID_ARGUMENT, 
-              message: `
-              custom form attribute ${attribute.name} should be of type string,
-              but of type ${typeof customAttributes[attribute.name]}`,
-            };
-          }
           break;
 
         case "select":
-          if (!(typeof customAttributes[attribute.name] === "string")) {
-            throw <ServiceError> { 
-              code: Status.INVALID_ARGUMENT, 
-              message: `
-              custom form attribute ${attribute.name} should be of type string,
-              but of type ${typeof customAttributes[attribute.name]}`,
-            };
-          }
           // check the option selected by user is in select attributes as the config defined 
           if (!(attribute.select!.some((optionItem) => optionItem.value === customAttributes[attribute.name]))) {
             throw <ServiceError> { 

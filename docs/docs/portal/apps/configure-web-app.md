@@ -59,10 +59,10 @@ attributes:
     name: selectVersion
     label: 选择版本
     select:
-      - key: 10
-        value: v4.8.3
-      - key: 11
-        value: v4.9.0
+      - value: version10
+        label: v10
+      - value: version11
+        label: v11
 ```
 
 增加了此文件后，运行以下命令重启job-server即可。
