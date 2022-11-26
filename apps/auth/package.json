@@ -18,6 +18,7 @@
     "@fastify/static": "6.5.0",
     "@scow/config": "workspace:*",
     "@scow/lib-config": "workspace:*",
+    "@scow/lib-ssh": "workspace:*",
     "@sinclair/typebox": "0.25.8",
     "asn1": "0.2.6",
     "fastify": "4.10.0",
@@ -25,8 +26,7 @@
     "fastify-plugin": "4.3.0",
     "ioredis": "5.2.4",
     "ldapjs": "2.3.3",
-    "nanoid": "4.0.0",
-    "node-ssh": "13.0.0"
+    "nanoid": "4.0.0"
   },
   "devDependencies": {
     "@types/asn1": "0.2.0",

@@ -1,30 +1,12 @@
 import formBody from "@fastify/formbody";
+import { sshConnectByPassword } from "@scow/lib-ssh";
 import { Static, Type } from "@sinclair/typebox";
 import { FastifyInstance } from "fastify";
-import { NodeSSH } from "node-ssh";
 import { cacheInfo } from "src/auth/cacheInfo";
 import { serveLoginHtml } from "src/auth/loginHtml";
-import { SshConfigSchema } from "src/config/auth";
-import { clusters } from "src/config/clusters";
 import { redirectToWeb } from "src/routes/callback";
 
-export function registerPostHandler(f: FastifyInstance, sshConfig: SshConfigSchema) {
-
-  let loginNode = sshConfig.baseNode;
-
-  if (!loginNode) {
-    if (Object.keys(clusters).length === 0) {
-      throw new Error("No cluster has been set in clusters config");
-    }
-    const clusterConfig = Object.values(clusters)[0];
-    loginNode = clusterConfig.slurm.loginNodes[0];
-
-    if (!loginNode) {
-      throw new Error(`Cluster ${clusterConfig.displayName} has no login node.`);
-    }
-  }
-
-  const [host, port] = loginNode.split(":");
+export function registerPostHandler(f: FastifyInstance, loginNode: string) {
 
   f.register(formBody);
 
@@ -40,23 +22,20 @@ export function registerPostHandler(f: FastifyInstance, sshConfig: SshConfigSche
   }, async (req, res) => {
     const { username, password, callbackUrl } = req.body;
 
-    const logger = req.log.child({ plugin: "ldap" });
+    const logger = req.log.child({ plugin: "ssh" });
 
     // login to the a login node
 
-    const ssh = new NodeSSH();
-
-    try {
-      await ssh.connect({ username, password, host, port: +port });
-      const info = await cacheInfo(username, req);
-      await redirectToWeb(callbackUrl, info, res);
-    } catch (e) {
-      logger.info("Log in as %s failed. Erro: %o", username, e);
-      await serveLoginHtml(true, callbackUrl, req, res);
-    } finally {
-      ssh.dispose();
-
-    }
+    await sshConnectByPassword(loginNode, username, password, req.log, async () => {})
+      .then(async () => {
+        logger.info("Log in as %s succeeded.");
+        const info = await cacheInfo(username, req);
+        await redirectToWeb(callbackUrl, info, res);
+      })
+      .catch(async (e) => {
+        logger.error(e, "Log in as %s failed.", username);
+        await serveLoginHtml(true, callbackUrl, req, res);
+      });
 
   });
 }
