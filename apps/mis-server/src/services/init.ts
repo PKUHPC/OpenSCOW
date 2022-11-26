@@ -58,7 +58,7 @@ export const initServiceServer = plugin((server) => {
 
       if (existsInAuth) {
         // If the user exists, write it directly to the database
-        await em.persistAndFlush([tenant, user]);
+        await createUserInDatabase(user, server.logger, em);
       }
       else if (server.ext.capabilities.createUser) {
 
