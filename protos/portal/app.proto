@@ -45,10 +45,12 @@ message CreateAppSessionRequest {
   optional string qos = 6;
   uint32 core_count = 7;
   uint32 max_time = 8;
+  map<string, string> customAttributes = 9;
 }
 
 // NOT_FOUND: app is not found
 // INTERNAL: SBATCH failed, details has output
+// INVALID_ARGUMENT: the custom form atrributes is invalid
 message CreateAppSessionResponse {
   uint32 job_id = 1;
   string session_id = 2;
@@ -71,6 +73,31 @@ message AppSession {
 
 message ListAppSessionsResponse { repeated AppSession sessions = 1; }
 
+message GetAppAttributesRequest {
+  string app_id = 1;
+}
+
+message SelectOption {
+  string value = 1;
+  string label = 2;
+}
+
+message AppCustomAttribute {
+  enum AttributeType {
+    number = 0;
+    text = 1;
+    select = 2;
+  }
+  AttributeType type = 1;
+  string label = 2;
+  string name = 3;
+  repeated SelectOption options = 4;
+}
+
+message GetAppAttributesResponse {
+  repeated AppCustomAttribute attributes = 1;
+}
+
 service AppService {
   rpc ConnectToApp(ConnectToAppRequest) returns (ConnectToAppResponse);
 
@@ -78,4 +105,6 @@ service AppService {
       returns (CreateAppSessionResponse);
 
   rpc ListAppSessions(ListAppSessionsRequest) returns (ListAppSessionsResponse);
+
+  rpc GetAppAttributes(GetAppAttributesRequest) returns (GetAppAttributesResponse);
 }

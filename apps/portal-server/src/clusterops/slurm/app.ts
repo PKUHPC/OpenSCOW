@@ -2,6 +2,7 @@ import { sftpChmod, sftpExists, sftpReaddir, sftpReadFile, sftpRealPath, sftpWri
 import { randomUUID } from "crypto";
 import fs from "fs";
 import { join } from "path";
+import { quote } from "shell-quote";
 import { AppOps, AppSession } from "src/clusterops/api/app";
 import { displayIdToPort } from "src/clusterops/slurm/bl/port";
 import { apps } from "src/config/apps";
@@ -38,7 +39,7 @@ export const slurmAppOps = (cluster: string): AppOps => {
 
   return {
     createApp: async (request, logger) => {
-      const { appId, userId, account, coreCount, maxTime, partition, qos } = request;
+      const { appId, userId, account, coreCount, maxTime, partition, qos, customAttributes } = request;
 
       // prepare script file
       const appConfig = apps[appId];
@@ -86,7 +87,15 @@ export const slurmAppOps = (cluster: string): AppOps => {
         };
 
         if (appConfig.type === "web") {
-          await sftpWriteFile(sftp)(join(workingDirectory, "before.sh"), appConfig.web!.beforeScript);
+          let beforeScript: string = "";
+          for (const key in customAttributes) {
+            const quotedAttribute = quote([customAttributes[key] ?? ""]);
+            const envItem = `export ${key}=${quotedAttribute}`;
+            beforeScript = beforeScript + envItem + "\n";
+          }
+          beforeScript = beforeScript + appConfig.web!.beforeScript;
+          await sftpWriteFile(sftp)(join(workingDirectory, "before.sh"), beforeScript);
+
           await sftpWriteFile(sftp)(join(workingDirectory, "script.sh"), appConfig.web!.script);
 
           const script = generateJobScript({

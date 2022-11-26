@@ -6,6 +6,7 @@ import type { GetIconSchema } from "src/pages/api//icon";
 import type { GetLogoSchema } from "src/pages/api//logo";
 import type { ConnectToAppSchema } from "src/pages/api/app/connectToApp";
 import type { CreateAppSessionSchema } from "src/pages/api/app/createAppSession";
+import type { GetAppAttributesSchema } from "src/pages/api/app/getAppAttributes";
 import type { GetAppSessionsSchema } from "src/pages/api/app/getAppSessions";
 import type { AuthCallbackSchema } from "src/pages/api/auth/callback";
 import type { LogoutSchema } from "src/pages/api/auth/logout";
@@ -37,6 +38,7 @@ import type { ChangePasswordSchema } from "src/pages/api/profile/changePassword"
 export const api = {
   connectToApp: fromApi<ConnectToAppSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/app/connectToApp")),
   createAppSession: fromApi<CreateAppSessionSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/app/createAppSession")),
+  getAppAttributes: fromApi<GetAppAttributesSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/app/getAppAttributes")),
   getAppSessions: fromApi<GetAppSessionsSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/app/getAppSessions")),
   authCallback: fromApi<AuthCallbackSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/auth/callback")),
   logout: fromApi<LogoutSchema>("DELETE", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/auth/logout")),

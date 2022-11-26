@@ -77,6 +77,15 @@ export const mockApi: MockApi<typeof api> = {
       submitTime: new Date().toISOString(), ready: true, dataPath: "/test" },
   ]}),
 
+  getAppAttributes: async () => ({ appCustomFormAttributes: [
+    { type: "number", label: "版本", name: "version", select: []},
+    { type: "text", label: "文字 ", name: "text", select: []},
+    { type: "select", label: "选项", name: "option", select: [
+      { label: "版本1", value: "version1" },
+      { label: "版本2", value: "version2" },
+    ]},
+  ]}),
+
   connectToApp: async ({ body: { sessionId } }) => sessionId === "124"
     ? {
       host: "127.0.0.1", port: 3000, password: "123", type: "web",

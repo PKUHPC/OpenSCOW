@@ -9,6 +9,7 @@ export interface CreateAppRequest {
   coreCount: number;
   /** in minutes */
   maxTime: number;
+  customAttributes: { [key: string]: string };
 }
 
 export type CreateAppReply = {
