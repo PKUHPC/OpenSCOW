@@ -1,4 +1,5 @@
 import { applicationJsonHeaders } from "src/utils";
+import { mockFetch } from "tests/utils";
 
 import { changePassword } from "../src/changePassword";
 
@@ -10,27 +11,21 @@ const oldPassword = "123456";
 
 const newPassword = "654321";
 
-
-interface RequstSchema {
-  method: string,
-  body: string,
-}
-
-// @ts-ignore
-globalThis.fetch = jest.fn((url: string, req: RequstSchema) => {
-  const testBody = JSON.parse(req.body);
+mockFetch((input, init) => {
+  const testBody = JSON.parse(init!.body as string);
   const testIdentityId = testBody.identityId;
   const testOldPassword = testBody.oldPassword;
 
   if (testIdentityId !== identityId) {
-    return { status: 404, text: () => "" };
+    return { status: 404 };
   }
   else if (testOldPassword !== oldPassword) {
-    return { status: 412, text: () => "" };
+    return { status: 412 };
   }
   else {
-    return { status: 204, text: () => "" };
+    return { status: 204 };
   }
+
 });
 
 it("raises correct request for changing password", async () => {
