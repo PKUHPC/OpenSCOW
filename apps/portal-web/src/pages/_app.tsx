@@ -157,7 +157,7 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
           : await fromApi<ListAvailableAppsSchema>(
             "GET",
             join(basePrefix, "/api/app/listAvailableApps"),
-          )({ query: { } }).then((x) => x.apps);
+          )({ query: { token } }).then((x) => x.apps);
 
         extra.apps = apps;
       }
