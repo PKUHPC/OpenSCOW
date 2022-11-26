@@ -1,9 +1,8 @@
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
-import { AppType } from "@scow/config/build/app";
+import { AppType, getAppConfigs } from "@scow/config/build/app";
 import { getClusterOps } from "src/clusterops";
-import { apps } from "src/config/apps";
 import {
   AppCustomAttribute,
   appCustomAttribute_AttributeTypeFromJSON,
@@ -18,6 +17,9 @@ export const appServiceServer = plugin((server) => {
 
   server.addService<AppServiceServer>(AppServiceService, {
     connectToApp: async ({ request, logger }) => {
+      const apps = getAppConfigs();
+
+
       const { cluster, sessionId, userId } = request;
 
       const clusterOps = getClusterOps(cluster);
@@ -78,6 +80,8 @@ export const appServiceServer = plugin((server) => {
     },
 
     createAppSession: async ({ request, logger }) => {
+      const apps = getAppConfigs();
+
       const { account, appId, cluster, coreCount, maxTime, partition, qos, userId, customAttributes } = request;
 
       const app = apps[appId];
@@ -168,6 +172,8 @@ export const appServiceServer = plugin((server) => {
     },
 
     getAppAttributes: async ({ request }) => {
+      const apps = getAppConfigs();
+
       const { appId } = request;
       const app = apps[appId];
 
