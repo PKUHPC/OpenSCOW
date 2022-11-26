@@ -9,7 +9,6 @@ import Head from "next/head";
 import { join } from "path";
 import { useEffect, useRef } from "react";
 import { createStore, StoreProvider, useStore } from "simstate";
-import { mockApi } from "src/apis/api.mock";
 import { USE_MOCK } from "src/apis/useMock";
 import { getTokenFromCookie } from "src/auth/cookie";
 import { App } from "src/generated/portal/app";
@@ -152,16 +151,16 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
           ...userInfo,
           token: token,
         };
+
+        const apps = USE_MOCK
+          ? [{ id: "vscode", name: "VSCode" }, { id: "emacs", name: "Emacs" }]
+          : await fromApi<ListAvailableAppsSchema>(
+            "GET",
+            join(basePrefix, "/api/app/listAvailableApps"),
+          )({ query: { } }).then((x) => x.apps);
+
+        extra.apps = apps;
       }
-
-      const apps = USE_MOCK
-        ? (await mockApi.listAvailableApps!({ query: {} })).apps
-        : await fromApi<ListAvailableAppsSchema>(
-          "GET",
-          join(basePrefix, "/api/app/listAvailableApps"),
-        )({ query: { } }).then((x) => x.apps);
-
-      extra.apps = apps;
     }
 
     const hostname = getHostname(appContext.ctx.req);
