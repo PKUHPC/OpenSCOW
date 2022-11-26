@@ -8,6 +8,7 @@ import type { ConnectToAppSchema } from "src/pages/api/app/connectToApp";
 import type { CreateAppSessionSchema } from "src/pages/api/app/createAppSession";
 import type { GetAppAttributesSchema } from "src/pages/api/app/getAppAttributes";
 import type { GetAppSessionsSchema } from "src/pages/api/app/getAppSessions";
+import type { ListAvailableAppsSchema } from "src/pages/api/app/listAvailableApps";
 import type { AuthCallbackSchema } from "src/pages/api/auth/callback";
 import type { LogoutSchema } from "src/pages/api/auth/logout";
 import type { ValidateTokenSchema } from "src/pages/api/auth/validateToken";
@@ -40,13 +41,14 @@ export const api = {
   createAppSession: fromApi<CreateAppSessionSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/app/createAppSession")),
   getAppAttributes: fromApi<GetAppAttributesSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/app/getAppAttributes")),
   getAppSessions: fromApi<GetAppSessionsSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/app/getAppSessions")),
+  listAvailableApps: fromApi<ListAvailableAppsSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/app/listAvailableApps")),
   authCallback: fromApi<AuthCallbackSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/auth/callback")),
   logout: fromApi<LogoutSchema>("DELETE", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/auth/logout")),
   validateToken: fromApi<ValidateTokenSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/auth/validateToken")),
   createDesktop: fromApi<CreateDesktopSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/desktop/createDesktop")),
   killDesktop: fromApi<KillDesktopSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/desktop/killDesktop")),
   launchDesktop: fromApi<LaunchDesktopSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/desktop/launchDesktop")),
-  listDesktops: fromApi<ListDesktopsSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/desktop/listDesktops")),
+  listDesktops: fromApi<ListDesktopsSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/desktop/listDesktops")),
   copyFileItem: fromApi<CopyFileItemSchema>("PATCH", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/file/copy")),
   createFile: fromApi<CreateFileSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/file/createFile")),
   deleteDir: fromApi<DeleteDirSchema>("DELETE", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/file/deleteDir")),

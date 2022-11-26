@@ -11,10 +11,13 @@ import {
   PlusOutlined,
   SaveOutlined } from "@ant-design/icons";
 import React from "react";
+import { App } from "src/generated/portal/app";
 import { NavItemProps } from "src/layouts/base/NavItemProps";
 import { Cluster, publicConfig } from "src/utils/config";
 
-export const userRoutes: (defaultCluster: Cluster) => NavItemProps[] = (defaultCluster: Cluster) => [
+export const userRoutes: (
+  defaultCluster: Cluster, apps: App[],
+) => NavItemProps[] = (defaultCluster, apps) => [
   {
     Icon: DashboardOutlined,
     text: "仪表盘",
@@ -78,13 +81,13 @@ export const userRoutes: (defaultCluster: Cluster) => NavItemProps[] = (defaultC
         text: "已创建的应用",
         path: "/apps/sessions",
       },
-      ...(publicConfig.APPS.length > 0 ? [
+      ...(apps.length > 0 ? [
         {
           Icon: PlusOutlined,
           text: "创建应用",
           clickable: false,
           path: "/apps/create",
-          children: publicConfig.APPS.map(({ id, name }) => ({
+          children: apps.map(({ id, name }) => ({
             Icon: DesktopOutlined,
             text: name,
             path: `/apps/create/${id}`,

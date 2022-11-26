@@ -51,6 +51,11 @@ export const mockApi: MockApi<typeof api> = {
 
   getAllJobs: async () => ({ results: [job]}),
 
+  listAvailableApps: async () => ({ apps: [
+    { id: "vscode", name: "VSCode" },
+    { id: "emacs", name: "Emacs" },
+  ]}),
+
   listFile: null,
 
   copyFileItem: null,

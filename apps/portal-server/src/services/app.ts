@@ -91,17 +91,17 @@ export const appServiceServer = plugin((server) => {
       const attributesConfig = app.attributes;
       attributesConfig?.forEach((attribute) => {
         if (!(attribute.name in customAttributes)) {
-          throw <ServiceError> { 
-            code: Status.INVALID_ARGUMENT, 
+          throw <ServiceError> {
+            code: Status.INVALID_ARGUMENT,
             message: `custom form attribute ${attribute.name} is not found`,
           };
-        } 
+        }
 
         switch (attribute.type) {
         case "number":
           if (Number.isNaN(Number(customAttributes[attribute.name]))) {
-            throw <ServiceError> { 
-              code: Status.INVALID_ARGUMENT, 
+            throw <ServiceError> {
+              code: Status.INVALID_ARGUMENT,
               message: `
               custom form attribute ${attribute.name} should be of type number,
               but of type ${typeof customAttributes[attribute.name]}`,
@@ -113,10 +113,10 @@ export const appServiceServer = plugin((server) => {
           break;
 
         case "select":
-          // check the option selected by user is in select attributes as the config defined 
+          // check the option selected by user is in select attributes as the config defined
           if (!(attribute.select!.some((optionItem) => optionItem.value === customAttributes[attribute.name]))) {
-            throw <ServiceError> { 
-              code: Status.INVALID_ARGUMENT, 
+            throw <ServiceError> {
+              code: Status.INVALID_ARGUMENT,
               message: `
               the option value of ${attribute.name} selected by user should be
               one of select attributes as the ${appId} config defined,
@@ -194,6 +194,13 @@ export const appServiceServer = plugin((server) => {
 
       return [{ attributes: attributes }];
     },
+
+    listAvailableApps: async ({}) => {
+      const apps = getAppConfigs();
+
+      return [{ apps: Object.keys(apps).map((x) => ({ id: x, name: apps[x].name })) }];
+    },
+
   });
 
 });

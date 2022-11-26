@@ -77,8 +77,6 @@ const buildRuntimeConfig = async (phase) => {
 
   const clusters = getClusterConfigs(configPath);
 
-  const apps = getAppConfigs(configPath);
-
   const uiConfig = getUiConfig(configPath);
   const portalConfig = getPortalConfig(configPath);
 
@@ -91,7 +89,6 @@ const buildRuntimeConfig = async (phase) => {
     CLUSTERS_CONFIG: clusters,
     PORTAL_CONFIG: portalConfig,
     DEFAULT_PRIMARY_COLOR,
-    APPS: apps,
     MOCK_USER_ID: config.MOCK_USER_ID,
     UI_CONFIG: uiConfig,
     LOGIN_NODES: parseKeyValue(config.LOGIN_NODES),
@@ -132,8 +129,6 @@ const buildRuntimeConfig = async (phase) => {
     }, {}),
 
     CLUSTERS: Object.entries(clusters).map(([id, { displayName }]) => ({ id, name: displayName })),
-
-    APPS: Object.entries(apps).map(([id, { name }]) => ({ id, name })),
 
     SUBMIT_JOB_WORKING_DIR: portalConfig.submitJobDefaultPwd,
 

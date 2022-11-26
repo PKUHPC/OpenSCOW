@@ -1,4 +1,3 @@
-import { AppConfigSchema } from "@scow/config/build/app";
 import type { ClusterConfigSchema } from "@scow/config/build/cluster";
 import type { PortalConfigSchema } from "@scow/config/build/portal";
 import type { UiConfigSchema } from "@scow/config/build/ui";
@@ -7,8 +6,6 @@ import getConfig from "next/config";
 export interface ServerRuntimeConfig {
   BASE_PATH: string;
   AUTH_INTERNAL_URL: string;
-
-  APPS: { [id: string]: AppConfigSchema };
 
   CLUSTERS_CONFIG: {[cluster: string]: ClusterConfigSchema};
 
@@ -54,8 +51,6 @@ export interface PublicRuntimeConfig {
   CLUSTERS_CONFIG: {[cluster: string]: PublicClusterConfig };
 
   CLUSTERS: Cluster[];
-
-  APPS: { id: string; name: string }[];
 
   SUBMIT_JOB_WORKING_DIR: string;
 
