@@ -10,6 +10,8 @@ jobs:
   main:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
+
       - uses: dreampulse/action-lint-pull-request-title@master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
