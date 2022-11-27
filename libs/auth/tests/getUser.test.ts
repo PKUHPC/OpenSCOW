@@ -1,4 +1,4 @@
-import { getUser } from "src/getUser";
+import { getUser } from "src/createUser";
 import { applicationJsonHeaders } from "src/utils";
 import { mockFetch } from "tests/utils";
 

@@ -1,11 +1,9 @@
-import { loggedExec, sshConnect } from "@scow/lib-ssh";
 import { FastifyInstance } from "fastify";
 import { AuthProvider } from "src/auth/AuthProvider";
 import { serveLoginHtml } from "src/auth/loginHtml";
 import { registerPostHandler } from "src/auth/ssh/postHandler";
 import { authConfig, SshConfigSchema } from "src/config/auth";
 import { clusters } from "src/config/clusters";
-import { rootKeyPair } from "src/config/env";
 import { ensureNotUndefined } from "src/utils/validations";
 
 function checkLoginNode(sshConfig: SshConfigSchema) {
@@ -40,13 +38,6 @@ export const createSshAuthProvider = (f: FastifyInstance) => {
   return <AuthProvider>{
     serveLoginHtml: (callbackUrl, req, rep) => serveLoginHtml(false, callbackUrl, req, rep),
     fetchAuthTokenInfo: async () => undefined,
-    getUser: async (identityId, req) => {
-      return await sshConnect(loginNode, "root", rootKeyPair, req.log, async (ssh) => {
-        return loggedExec(ssh, req.log, true, "id", [identityId])
-          .then(() => ({ identityId }))
-          .catch(() => undefined);
-      });
-    },
     validateName: undefined,
     createUser: undefined,
     changePassword: undefined,

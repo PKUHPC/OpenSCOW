@@ -60,25 +60,3 @@ it("fails to login with wrong credentials", async () => {
 
   expect(resp.statusCode).toBe(403);
 });
-
-it("gets user info", async () => {
-  const resp = await server.inject({
-    method: "GET",
-    url: "/user",
-    query: { identityId: username },
-  });
-
-  expect(resp.statusCode).toBe(200);
-  expect(resp.json()).toEqual({ user: { identityId: username } });
-});
-
-it("returns 404 if user doesn't exist", async () => {
-  const resp = await server.inject({
-    method: "GET",
-    url: "/user",
-    query: { identityId: username + "wrong" },
-  });
-
-  expect(resp.statusCode).toBe(404);
-  expect(resp.json()).toEqual({ code: "USER_NOT_FOUND" });
-});
