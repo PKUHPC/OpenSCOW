@@ -73,9 +73,7 @@ message AppSession {
 
 message ListAppSessionsResponse { repeated AppSession sessions = 1; }
 
-message GetAppAttributesRequest {
-  string app_id = 1;
-}
+message GetAppAttributesRequest { string app_id = 1; }
 
 message SelectOption {
   string value = 1;
@@ -94,9 +92,16 @@ message AppCustomAttribute {
   repeated SelectOption options = 4;
 }
 
-message GetAppAttributesResponse {
-  repeated AppCustomAttribute attributes = 1;
+message GetAppAttributesResponse { repeated AppCustomAttribute attributes = 1; }
+
+message ListAvailableAppsRequest {}
+
+message App {
+  string id = 1;
+  string name = 2;
 }
+
+message ListAvailableAppsResponse { repeated App apps = 1; }
 
 service AppService {
   rpc ConnectToApp(ConnectToAppRequest) returns (ConnectToAppResponse);
@@ -106,5 +111,9 @@ service AppService {
 
   rpc ListAppSessions(ListAppSessionsRequest) returns (ListAppSessionsResponse);
 
-  rpc GetAppAttributes(GetAppAttributesRequest) returns (GetAppAttributesResponse);
+  rpc GetAppAttributes(GetAppAttributesRequest)
+      returns (GetAppAttributesResponse);
+
+  rpc ListAvailableApps(ListAvailableAppsRequest)
+      returns (ListAvailableAppsResponse);
 }

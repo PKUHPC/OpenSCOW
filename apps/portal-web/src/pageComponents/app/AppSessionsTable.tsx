@@ -10,6 +10,7 @@ import { FilterFormContainer } from "src/components/FilterFormContainer";
 import type { AppSession } from "src/generated/portal/app";
 import { useMessage } from "src/layouts/prompts";
 import { ConnectTopAppLink } from "src/pageComponents/app/ConnectToAppLink";
+import { AppsStore } from "src/stores/AppsStore";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { publicConfig } from "src/utils/config";
 import { compareDateTime, formatDateTime } from "src/utils/datetime";
@@ -20,6 +21,8 @@ interface Props {
 }
 
 export const AppSessionsTable: React.FC<Props> = () => {
+
+  const apps = useStore(AppsStore);
 
   const message = useMessage();
 
@@ -55,7 +58,7 @@ export const AppSessionsTable: React.FC<Props> = () => {
     {
       title: "应用",
       dataIndex: "appId",
-      render: (appId: string) => publicConfig.APPS.find((x) => x.id === appId)?.name ?? appId,
+      render: (appId: string) => apps.find((x) => x.id === appId)?.name ?? appId,
     },
     {
       title: "提交时间",
