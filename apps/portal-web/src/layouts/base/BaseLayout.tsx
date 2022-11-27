@@ -53,8 +53,8 @@ export const BaseLayout: React.FC<PropsWithChildren<Props>> = ({ children, foote
 
   const apps = useStore(AppsStore);
 
-  const allRoutes = useMemo(() => userRoutes(defaultClusterStore.cluster, apps),
-    [defaultClusterStore.cluster, apps],
+  const allRoutes = useMemo(() => userRoutes(userStore.user, defaultClusterStore.cluster, apps),
+    [userStore.user, defaultClusterStore.cluster, apps],
   );
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
