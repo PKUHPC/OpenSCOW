@@ -27,13 +27,13 @@ export const getUserRoute = fp(async (f) => {
       },
     },
     async (req, rep) => {
-      if (!f.auth.createUser) {
+      if (!f.auth.getUser) {
         return await rep.code(501).send(null);
       }
 
       const { identityId } = req.query;
 
-      const result = await f.auth.createUser.getUser(identityId, req);
+      const result = await f.auth.getUser(identityId, req);
 
       if (result) {
         return rep.code(200).send({ user: { identityId: result.identityId } });
