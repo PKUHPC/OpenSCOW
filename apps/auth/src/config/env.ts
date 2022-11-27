@@ -1,4 +1,7 @@
 import { envConfig, host, port, str } from "@scow/lib-config";
+import { getKeyPair } from "@scow/lib-ssh";
+import { homedir } from "os";
+import { join } from "path";
 
 import { AuthType } from "./AuthType";
 
@@ -19,6 +22,9 @@ export const config = envConfig({
   AUTH_TYPE: str({ desc: "认证类型。将会覆写配置文件", choices: Object.values(AuthType), default: undefined }),
 
   TEST_USERS: str({ desc: "测试用户，如果这些用户登录，将其ID改为另一个ID。格式：原用户ID=新用户ID,原用户ID=新用户ID。", default: "" }),
+  SSH_PRIVATE_KEY_PATH: str({ desc: "SSH私钥路径", default: join(homedir(), ".ssh", "id_rsa") }),
+  SSH_PUBLIC_KEY_PATH: str({ desc: "SSH公钥路径", default: join(homedir(), ".ssh", "id_rsa.pub") }),
 
 });
 
+export const rootKeyPair = getKeyPair(config.SSH_PRIVATE_KEY_PATH, config.SSH_PUBLIC_KEY_PATH);

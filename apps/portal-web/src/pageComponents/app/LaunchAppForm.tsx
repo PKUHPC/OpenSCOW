@@ -1,6 +1,8 @@
-import { Button, Form, InputNumber, Select } from "antd";
+import { Button, Form, Input, InputNumber, Select } from "antd";
+import { Rule } from "antd/es/form";
 import Router from "next/router";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useAsync } from "react-async";
 import { useStore } from "simstate";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
@@ -35,11 +37,29 @@ export const LaunchAppForm: React.FC<Props> = ({ appId }) => {
 
   const message = useMessage();
 
+  const { data } = useAsync({
+    promiseFn: useCallback(async () => {
+      const { appCustomFormAttributes } = await api.getAppAttributes({ query: { appId } })
+        .httpError(404, () => { message.error("此应用不存在"); });
+      return appCustomFormAttributes;
+    },
+    [appId]),
+  });
+
   const [form] = Form.useForm<FormFields>();
   const [loading, setLoading] = useState(false);
 
   const onSubmit = async () => {
-    const { cluster, coreCount, partition, qos, account, maxTime } = await form.validateFields();
+    const allFormFields = await form.validateFields();
+    const { cluster, coreCount, partition, qos, account, maxTime } = allFormFields;
+
+    const customFormKeyValue: {[key: string]: string} = {};
+    if (data) {
+      data.forEach((customFormAttribute) => {
+        const customFormKey = customFormAttribute.name;
+        customFormKeyValue[customFormKey] = allFormFields[customFormKey];
+      });
+    }
 
     setLoading(true);
     await api.createAppSession({ body: {
@@ -50,6 +70,7 @@ export const LaunchAppForm: React.FC<Props> = ({ appId }) => {
       qos,
       account,
       maxTime,
+      customAttributes: customFormKeyValue,
     } })
       .then(() => {
         message.success("创建成功！");
@@ -93,6 +114,33 @@ export const LaunchAppForm: React.FC<Props> = ({ appId }) => {
     () => cluster ? getPartitionInfo(cluster, partition) : undefined,
     [cluster, partition],
   );
+
+  const customFormItems = data?.map((item, index) => {
+
+    const rules: Rule[] = item.type === "number"
+      ? [{ type: "integer" }, { required: true }]
+      : [{ required: true }];
+  
+
+    const inputItem = item.type === "number" ? (<InputNumber />)
+      : item.type === "text" ? (<Input />)
+        : (
+          <Select
+            options={item.select.map((x) => ({ label: x.label, value: x.value }))}
+          />
+        );
+
+    return (
+      <Form.Item
+        key={`${item.name}+${index}`}
+        label={item.label}
+        name={item.name}
+        rules={rules}
+      >
+        {inputItem}
+      </Form.Item>
+    );
+  });
 
   return (
     <Form form={form} onFinish={onSubmit} initialValues={initialValues}>
@@ -153,7 +201,7 @@ export const LaunchAppForm: React.FC<Props> = ({ appId }) => {
         <InputNumber min={1} step={1} addonAfter={"分钟"} />
       </Form.Item>
 
-
+      {customFormItems}
 
       <Form.Item>
         <Button type="primary" htmlType="submit" loading={loading}>

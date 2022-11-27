@@ -68,10 +68,7 @@ async function searchByDn(client: Client, dn: string) {
   return searchOne(server.log, client, dn, { scope: "base" }, (e) => e);
 }
 
-it("creates user and group if groupStrategy is newGroupPerUser", async () => {
-
-  ldap.addUser.groupStrategy = NewUserGroupStrategy.newGroupPerUser;
-
+const createUser = async () => {
   const resp = await server.inject({
     method: "POST",
     url: "/user",
@@ -79,6 +76,14 @@ it("creates user and group if groupStrategy is newGroupPerUser", async () => {
   });
 
   expect(resp.statusCode).toBe(204);
+
+};
+
+it("creates user and group if groupStrategy is newGroupPerUser", async () => {
+
+  ldap.addUser.groupStrategy = NewUserGroupStrategy.newGroupPerUser;
+
+  await createUser();
 
   const responseUser = await findUser(server.log, ldap, client, user.identityId);
 
@@ -108,16 +113,11 @@ it("creates user and group if groupStrategy is newGroupPerUser", async () => {
 
 });
 
+
 it("creates only user if groupStrategy is oneGroupForAllUsers", async () => {
   ldap.addUser.groupStrategy = NewUserGroupStrategy.oneGroupForAllUsers;
 
-  const resp = await server.inject({
-    method: "POST",
-    url: "/user",
-    payload: user,
-  });
-
-  expect(resp.statusCode).toBe(204);
+  await createUser();
 
   const ldapUser = await searchByDn(client, userDn);
   if (!ldapUser) { fail("response user is not defined"); }
@@ -130,66 +130,72 @@ it("creates only user if groupStrategy is oneGroupForAllUsers", async () => {
 });
 
 it("should login with correct username and password", async () => {
-  {
-    const resp = await server.inject({
-      method: "POST",
-      url: "/user",
-      payload: user,
-    });
 
-    expect(resp.statusCode).toBe(204);
-  }
+  await createUser();
 
   const callbackUrl = "/callback";
 
   // login
-  {
-    const { payload, headers } = createFormData({
-      username: user.identityId,
-      password: user.password,
-      callbackUrl,
-    });
+  const { payload, headers } = createFormData({
+    username: user.identityId,
+    password: user.password,
+    callbackUrl,
+  });
 
-    const resp = await server.inject({
-      method: "POST",
-      url: "/public/auth",
-      payload,
-      headers,
-    });
+  const resp = await server.inject({
+    method: "POST",
+    url: "/public/auth",
+    payload,
+    headers,
+  });
 
-    expect(resp.statusCode).toBe(302);
-    expect(resp.headers.location).toStartWith(callbackUrl + "?");
-  }
+  expect(resp.statusCode).toBe(302);
+  expect(resp.headers.location).toStartWith(callbackUrl + "?");
 });
 
 it("should not login with wrong password", async () => {
-  {
-    const resp = await server.inject({
-      method: "POST",
-      url: "/user",
-      payload: user,
-    });
 
-    expect(resp.statusCode).toBe(204);
-  }
+  await createUser();
 
   const callbackUrl = "/callback";
 
   // login
-  {
-    const { payload, headers } = createFormData({
-      username: user.identityId,
-      password: user.password + "0",
-      callbackUrl,
-    });
+  const { payload, headers } = createFormData({
+    username: user.identityId,
+    password: user.password + "0",
+    callbackUrl,
+  });
 
-    const resp = await server.inject({
-      method: "POST",
-      url: "/public/auth",
-      payload,
-      headers,
-    });
+  const resp = await server.inject({
+    method: "POST",
+    url: "/public/auth",
+    payload,
+    headers,
+  });
 
-    expect(resp.statusCode).toBe(403);
-  }
+  expect(resp.statusCode).toBe(403);
+});
+
+it("gets user info", async () => {
+  await createUser();
+
+  const resp = await server.inject({
+    method: "GET",
+    url: "/user",
+    query: { identityId: user.identityId },
+  });
+
+  expect(resp.statusCode).toBe(200);
+  expect(resp.json()).toEqual({ user: { identityId: user.identityId } });
+});
+
+it("returns 404 if user doesn't exist", async () => {
+  const resp = await server.inject({
+    method: "GET",
+    url: "/user",
+    query: { identityId: user.identityId },
+  });
+
+  expect(resp.statusCode).toBe(404);
+  expect(resp.json()).toEqual({ code: "USER_NOT_FOUND" });
 });

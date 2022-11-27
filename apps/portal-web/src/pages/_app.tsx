@@ -3,7 +3,7 @@ import "antd/dist/reset.css";
 
 import { failEvent, fromApi } from "@ddadaal/next-typed-api-routes-runtime/lib/client";
 import type { AppContext, AppProps } from "next/app";
-import App from "next/app";
+import NextApp from "next/app";
 import dynamic from "next/dynamic";
 import Head from "next/head";
 import { join } from "path";
@@ -11,11 +11,14 @@ import { useEffect, useRef } from "react";
 import { createStore, StoreProvider, useStore } from "simstate";
 import { USE_MOCK } from "src/apis/useMock";
 import { getTokenFromCookie } from "src/auth/cookie";
+import { App } from "src/generated/portal/app";
 import { AntdConfigProvider } from "src/layouts/AntdConfigProvider";
 import { BaseLayout } from "src/layouts/base/BaseLayout";
 import { DarkModeProvider } from "src/layouts/darkMode";
 import { useMessage } from "src/layouts/prompts";
+import { ListAvailableAppsSchema } from "src/pages/api/app/listAvailableApps";
 import { ValidateTokenSchema } from "src/pages/api/auth/validateToken";
+import { AppsStore } from "src/stores/AppsStore";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import {
   User, UserStore,
@@ -58,6 +61,7 @@ interface ExtraProps {
   userInfo: User | undefined;
   primaryColor: string;
   footerText: string;
+  apps: App[];
 }
 
 type Props = AppProps & { extra: ExtraProps };
@@ -73,9 +77,10 @@ function MyApp({ Component, pageProps, extra }: Props) {
   });
 
   const defaultClusterStore = useConstant(() => {
-    const store = createStore(DefaultClusterStore, Object.values(publicConfig.CLUSTERS)[0]);
-    return store;
+    return createStore(DefaultClusterStore, publicConfig.CLUSTERS[0]);
   });
+
+  const appsStore = useConstant(() => createStore(AppsStore, extra.apps));
 
   // Use the layout defined at the page level, if available
   return (
@@ -89,7 +94,7 @@ function MyApp({ Component, pageProps, extra }: Props) {
           href={join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/icon?type=favicon")}
         ></link>
       </Head>
-      <StoreProvider stores={[userStore, defaultClusterStore]}>
+      <StoreProvider stores={[userStore, defaultClusterStore, appsStore]}>
         <DarkModeProvider>
           <AntdConfigProvider color={primaryColor}>
             <GlobalStyle />
@@ -111,6 +116,7 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
     userInfo: undefined,
     footerText: "",
     primaryColor: "",
+    apps: [],
   };
 
   // This is called on server on first load, and on client on every page transition
@@ -130,20 +136,30 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
       // fetch in server (node-fetch per se) only supports absolute url
       // but next-typed-api-routes's object has only pathname
 
-      const result = await fromApi<ValidateTokenSchema>(
+      const basePrefix = join(
+        `http://localhost:${process.env.PORT ?? 3000}`,
+        process.env.NEXT_PUBLIC_BASE_PATH || "/",
+      );
+
+      const userInfo = await fromApi<ValidateTokenSchema>(
         "GET",
-        join(
-          `http://localhost:${process.env.PORT ?? 3000}`,
-          process.env.NEXT_PUBLIC_BASE_PATH || "/",
-          "/api/auth/validateToken",
-        ),
+        join(basePrefix, "/api/auth/validateToken"),
       )({ query: { token } }).catch(() => undefined);
 
-      if (result) {
+      if (userInfo) {
         extra.userInfo = {
-          ...result,
+          ...userInfo,
           token: token,
         };
+
+        const apps = USE_MOCK
+          ? [{ id: "vscode", name: "VSCode" }, { id: "emacs", name: "Emacs" }]
+          : await fromApi<ListAvailableAppsSchema>(
+            "GET",
+            join(basePrefix, "/api/app/listAvailableApps"),
+          )({ query: { token } }).then((x) => x.apps);
+
+        extra.apps = apps;
       }
     }
 
@@ -155,8 +171,9 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
       ?? runtimeConfig.UI_CONFIG?.footer?.defaultText ?? "";
   }
 
-  const appProps = await App.getInitialProps(appContext);
+  const appProps = await NextApp.getInitialProps(appContext);
 
+  // getAvailable
 
   return { ...appProps, extra } as Props;
 };

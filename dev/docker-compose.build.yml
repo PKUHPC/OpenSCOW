@@ -57,3 +57,5 @@ services:
     build:
       context: ..
       dockerfile: dockerfiles/Dockerfile.auth
+
+

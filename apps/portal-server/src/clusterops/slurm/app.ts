@@ -1,10 +1,11 @@
+import { getAppConfigs } from "@scow/config/build/app";
 import { sftpChmod, sftpExists, sftpReaddir, sftpReadFile, sftpRealPath, sftpWriteFile } from "@scow/lib-ssh";
 import { randomUUID } from "crypto";
 import fs from "fs";
 import { join } from "path";
+import { quote } from "shell-quote";
 import { AppOps, AppSession } from "src/clusterops/api/app";
 import { displayIdToPort } from "src/clusterops/slurm/bl/port";
-import { apps } from "src/config/apps";
 import { portalConfig } from "src/config/portal";
 import { RunningJob } from "src/generated/common/job";
 import { getClusterLoginNode, loggedExec, sshConnect } from "src/utils/ssh";
@@ -38,7 +39,9 @@ export const slurmAppOps = (cluster: string): AppOps => {
 
   return {
     createApp: async (request, logger) => {
-      const { appId, userId, account, coreCount, maxTime, partition, qos } = request;
+      const apps = getAppConfigs();
+
+      const { appId, userId, account, coreCount, maxTime, partition, qos, customAttributes } = request;
 
       // prepare script file
       const appConfig = apps[appId];
@@ -86,7 +89,15 @@ export const slurmAppOps = (cluster: string): AppOps => {
         };
 
         if (appConfig.type === "web") {
-          await sftpWriteFile(sftp)(join(workingDirectory, "before.sh"), appConfig.web!.beforeScript);
+          let beforeScript: string = "";
+          for (const key in customAttributes) {
+            const quotedAttribute = quote([customAttributes[key] ?? ""]);
+            const envItem = `export ${key}=${quotedAttribute}`;
+            beforeScript = beforeScript + envItem + "\n";
+          }
+          beforeScript = beforeScript + appConfig.web!.beforeScript;
+          await sftpWriteFile(sftp)(join(workingDirectory, "before.sh"), beforeScript);
+
           await sftpWriteFile(sftp)(join(workingDirectory, "script.sh"), appConfig.web!.script);
 
           const script = generateJobScript({
@@ -129,6 +140,8 @@ export const slurmAppOps = (cluster: string): AppOps => {
     },
 
     listAppSessions: async (request, logger) => {
+      const apps = getAppConfigs();
+
       const { userId } = request;
 
       return await sshConnect(host, userId, logger, async (ssh) => {
@@ -208,6 +221,8 @@ export const slurmAppOps = (cluster: string): AppOps => {
     },
 
     connectToApp: async (request, logger) => {
+      const apps = getAppConfigs();
+
       const { sessionId, userId } = request;
 
       return await sshConnect(host, userId, logger, async (ssh) => {

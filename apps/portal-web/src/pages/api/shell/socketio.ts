@@ -4,7 +4,7 @@ import { join } from "path";
 import { Server as ServerIO } from "socket.io";
 import { checkCookie } from "src/auth/server";
 import { ShellResponse, ShellServiceClient } from "src/generated/portal/shell";
-import { NextApiResponseServerIO } from "src/types/socket";
+import { AugmentedNextApiResponse } from "src/types/next";
 import { getClient } from "src/utils/client";
 import { runtimeConfig } from "src/utils/config";
 import { queryToIntOrDefault, queryToString } from "src/utils/querystring";
@@ -15,7 +15,7 @@ export const config = {
   },
 };
 
-export default async (req: NextApiRequest, res: NextApiResponseServerIO) => {
+export default async (req: NextApiRequest, res: AugmentedNextApiResponse) => {
 
   if (!res.socket.server.io) {
     // @ts-ignore

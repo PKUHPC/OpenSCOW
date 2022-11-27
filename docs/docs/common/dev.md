@@ -124,10 +124,6 @@ pnpm devenv:stop
 
 项目使用[eslint](https://eslint.org)进行代码风格规范和检查。eslint的配置采用[`@ddadaal/eslint-config`](https://github.com/ddadaal/eslint-config)。项目使用[husky](https://github.com/typicode/husky)设置了一个`pre-commit`的git hook，在提交前运行`eslint`进行代码风格检查，如果代码风格检查没有通过则无法commit。
 
-## commit风格检查
-
-项目要求所有commit遵守[Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/)标准。项目使用[commitlint](https://github.com/conventional-changelog/commitlint)进行commit检查，如果commit格式不正确将会拒绝commit。如果您不熟悉Conventional Commits标准，可以运行`pnpm cm`打开一个可交互式程序，根据程序的提示填写对应信息。
-
 ## 为什么不采用其他monorepo管理方案？
 
 - npm workspace：
