@@ -17,9 +17,11 @@ export type ChangePasswordResult = "NotFound" | "WrongOldPassword" | "OK";
 export interface AuthProvider {
   serveLoginHtml: (callbackUrl: string, req: FastifyRequest, rep: FastifyReply) => Promise<void>;
   fetchAuthTokenInfo: (token: string, req: FastifyRequest) => Promise<string | undefined>;
-  getUser: (identityId: string, req: FastifyRequest) => Promise<{ identityId: string } | undefined>;
+  createUser: {
+    createUser: ((info: CreateUserInfo, req: FastifyRequest) => Promise<CreateUserResult>);
+    getUser: (identityId: string, req: FastifyRequest) => Promise<{ identityId: string } | undefined>;
+  } | undefined,
   validateName: undefined | ((identityId: string, name: string, req: FastifyRequest) => Promise<ValidateNameResult>);
-  createUser: undefined | ((info: CreateUserInfo, req: FastifyRequest) => Promise<CreateUserResult>);
   changePassword: undefined | ((id: string, oldPassword: string, newPassword: string,
     req: FastifyRequest) => Promise<ChangePasswordResult>);
 }

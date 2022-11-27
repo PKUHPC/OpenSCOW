@@ -48,7 +48,7 @@ export const createUserRoute = fp(async (f) => {
 
       const { ...rest } = req.body;
 
-      const result = await f.auth.createUser(rest, req);
+      const result = await f.auth.createUser.createUser(rest, req);
 
       return await rep.status(codes[result]).send();
     },

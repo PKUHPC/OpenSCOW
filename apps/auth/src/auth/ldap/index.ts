@@ -36,9 +36,6 @@ export const createLdapAuthProvider = (f: FastifyInstance) => {
   registerPostHandler(f, ldap);
 
   return <AuthProvider>{
-    getUser: async (identityId, req) => useLdap(req.log, ldap)(async (client) => (
-      findUser(req.log, ldap, client, identityId)
-    )),
     serveLoginHtml: (callbackUrl, req, rep) => serveLoginHtml(false, callbackUrl, req, rep),
     fetchAuthTokenInfo: async () => undefined,
     validateName: ldap.attrs.name
@@ -71,115 +68,120 @@ export const createLdapAuthProvider = (f: FastifyInstance) => {
           return "Match";
         });
       } : undefined,
-    createUser: async (info, req) => {
-      const id = info.id + ldap.addUser.uidStart;
+    createUser: {
+      getUser: async (identityId, req) => useLdap(req.log, ldap)(async (client) => (
+        findUser(req.log, ldap, client, identityId)
+      )),
+      createUser: async (info, req) => {
+        const id = info.id + ldap.addUser.uidStart;
 
-      await useLdap(req.log, ldap)(async (client) => {
-        const userDn =
+        await useLdap(req.log, ldap)(async (client) => {
+          const userDn =
           `${ldap.addUser.userIdDnKey ?? ldap.attrs.uid}=${info.identityId},` +
           `${ldap.addUser.userBase}`;
-        const userEntry: Record<string, string | string[] | number> = {
-          [ldap.attrs.uid]: info.identityId,
-          sn: info.identityId,
-          loginShell: "/bin/bash",
-          objectClass: ["inetOrgPerson", "posixAccount", "shadowAccount"],
-          homeDirectory: parsePlaceholder(ldap.addUser.homeDir, { userId: info.identityId }),
-          uidNumber: id,
-          gidNumber: id,
-        };
-
-        if (ldap.attrs.name) {
-          userEntry[ldap.attrs.name] = info.name;
-        }
-
-        if (ldap.attrs.mail) {
-          userEntry[ldap.attrs.mail] = info.mail;
-        }
-
-        // parse attributes
-        if (ldap.addUser.extraProps) {
-          applyExtraProps(userEntry, ldap.addUser.extraProps, userEntry);
-        }
-
-        const add = promisify(client.add.bind(client));
-
-
-        if (ldap.addUser.groupStrategy === NewUserGroupStrategy.newGroupPerUser) {
-
-          req.log.info("ldap.addUser.groupStrategy is newGroupPerUser. Creating new group for the user.");
-
-          const config = ldap.addUser.newGroupPerUser!;
-
-          const groupDn = `${config.groupIdDnKey ?? ldap.attrs.uid}=${info.identityId},${config.groupBase}`;
-          const groupEntry = {
-            objectClass: ["posixGroup"],
-            memberUid: info.identityId,
+          const userEntry: Record<string, string | string[] | number> = {
+            [ldap.attrs.uid]: info.identityId,
+            sn: info.identityId,
+            loginShell: "/bin/bash",
+            objectClass: ["inetOrgPerson", "posixAccount", "shadowAccount"],
+            homeDirectory: parsePlaceholder(ldap.addUser.homeDir, { userId: info.identityId }),
+            uidNumber: id,
             gidNumber: id,
           };
 
-          userEntry["gidNumber"] = id;
-
-          if (config.extraProps) {
-            applyExtraProps(groupEntry, config.extraProps, userEntry);
+          if (ldap.attrs.name) {
+            userEntry[ldap.attrs.name] = info.name;
           }
 
-          req.log.info("Adding group %s with entry info %o", groupDn, groupEntry);
-          await add(groupDn, groupEntry);
+          if (ldap.attrs.mail) {
+            userEntry[ldap.attrs.mail] = info.mail;
+          }
 
-        }
+          // parse attributes
+          if (ldap.addUser.extraProps) {
+            applyExtraProps(userEntry, ldap.addUser.extraProps, userEntry);
+          }
 
-        if (ldap.addUser.groupStrategy === NewUserGroupStrategy.oneGroupForAllUsers) {
-          const config = ldap.addUser.oneGroupForAllUsers!;
+          const add = promisify(client.add.bind(client));
 
-          req.log.info("ldap.addUser.groupStrategy is one-group-for-all-users.");
-          req.log.info("Using existing group %s for the user", config.gidNumber);
 
-          userEntry["gidNumber"] = config.gidNumber;
-        }
+          if (ldap.addUser.groupStrategy === NewUserGroupStrategy.newGroupPerUser) {
 
-        req.log.info("Adding people %s with entry info %o", userDn, userEntry);
-        await add(userDn, userEntry);
+            req.log.info("ldap.addUser.groupStrategy is newGroupPerUser. Creating new group for the user.");
 
-        // set password as admin user
-        await modifyPassword(userDn, undefined, info.password, client);
+            const config = ldap.addUser.newGroupPerUser!;
 
-        // Add user to ldap group
-        const addUserToLdapGroup = ldap.addUser.addUserToLdapGroup;
+            const groupDn = `${config.groupIdDnKey ?? ldap.attrs.uid}=${info.identityId},${config.groupBase}`;
+            const groupEntry = {
+              objectClass: ["posixGroup"],
+              memberUid: info.identityId,
+              gidNumber: id,
+            };
 
-        if (addUserToLdapGroup) {
-          // get existing members
-          req.log.info("Adding %s to group %s", userDn, addUserToLdapGroup);
+            userEntry["gidNumber"] = id;
 
-          const members = await searchOne(req.log, client, addUserToLdapGroup, {
-            attributes: ["member"],
-          }, (entry) => {
-            const member = entry.attributes.find((x) => x.json.type === "member");
-            if (!member) {
-              return undefined;
+            if (config.extraProps) {
+              applyExtraProps(groupEntry, config.extraProps, userEntry);
             }
 
-            return { members: member.json.vals };
-          });
+            req.log.info("Adding group %s with entry info %o", groupDn, groupEntry);
+            await add(groupDn, groupEntry);
 
-          if (!members) {
-            req.log.error("Didn't find LDAP group %s", addUserToLdapGroup);
-            throw { code: "INTERNAL_ERROR" };
           }
 
-          // add the dn of the new user to the value
-          const modify = promisify(client.modify.bind(client));
-          await modify(addUserToLdapGroup, new ldapjs.Change({
-            operation: "add",
-            modification: {
-              "member": members.members.concat(userDn),
-            },
-          }));
-        }
+          if (ldap.addUser.groupStrategy === NewUserGroupStrategy.oneGroupForAllUsers) {
+            const config = ldap.addUser.oneGroupForAllUsers!;
+
+            req.log.info("ldap.addUser.groupStrategy is one-group-for-all-users.");
+            req.log.info("Using existing group %s for the user", config.gidNumber);
+
+            userEntry["gidNumber"] = config.gidNumber;
+          }
+
+          req.log.info("Adding people %s with entry info %o", userDn, userEntry);
+          await add(userDn, userEntry);
+
+          // set password as admin user
+          await modifyPassword(userDn, undefined, info.password, client);
+
+          // Add user to ldap group
+          const addUserToLdapGroup = ldap.addUser.addUserToLdapGroup;
+
+          if (addUserToLdapGroup) {
+          // get existing members
+            req.log.info("Adding %s to group %s", userDn, addUserToLdapGroup);
+
+            const members = await searchOne(req.log, client, addUserToLdapGroup, {
+              attributes: ["member"],
+            }, (entry) => {
+              const member = entry.attributes.find((x) => x.json.type === "member");
+              if (!member) {
+                return undefined;
+              }
+
+              return { members: member.json.vals };
+            });
+
+            if (!members) {
+              req.log.error("Didn't find LDAP group %s", addUserToLdapGroup);
+              throw { code: "INTERNAL_ERROR" };
+            }
+
+            // add the dn of the new user to the value
+            const modify = promisify(client.modify.bind(client));
+            await modify(addUserToLdapGroup, new ldapjs.Change({
+              operation: "add",
+              modification: {
+                "member": members.members.concat(userDn),
+              },
+            }));
+          }
 
 
-      });
+        });
 
-      return "OK";
+        return "OK";
+      },
     },
     changePassword: async (id, oldPassword, newPassword, req) => {
       return useLdap(req.log, ldap)(async (client) => {

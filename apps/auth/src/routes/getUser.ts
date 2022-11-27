@@ -8,6 +8,7 @@ const QuerystringSchema = Type.Object({
 const ResponsesSchema = Type.Object({
   200: Type.Object({ user: Type.Object({ identityId: Type.String() }) }),
   404: Type.Object({ code: Type.Literal("USER_NOT_FOUND") }),
+  501: Type.Null({ description: "此功能在当前服务器配置下不可用" }),
 });
 
 /**
@@ -26,10 +27,13 @@ export const getUserRoute = fp(async (f) => {
       },
     },
     async (req, rep) => {
+      if (!f.auth.createUser) {
+        return await rep.code(501).send(null);
+      }
 
       const { identityId } = req.query;
 
-      const result = await f.auth.getUser(identityId, req);
+      const result = await f.auth.createUser.getUser(identityId, req);
 
       if (result) {
         return rep.code(200).send({ user: { identityId: result.identityId } });
