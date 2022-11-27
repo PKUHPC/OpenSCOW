@@ -11,6 +11,14 @@
     "prepareDev": "tsgrpc-cli protos && ntar schema",
     "protos": "tsgrpc-cli protos"
   },
+  "files": [
+    ".next",
+    "public",
+    "assets",
+    "next.config.js",
+    "config.js",
+    "api-routes-schemas.json"
+  ],
   "dependencies": {
     "@ant-design/icons": "4.8.0",
     "@codemirror/autocomplete": "6.3.4",

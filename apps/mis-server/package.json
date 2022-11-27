@@ -12,6 +12,10 @@
     "protos": "tsgrpc-cli protos",
     "orm": "dotenv -e env/.env.dev -- npx mikro-orm"
   },
+  "files": [
+    "scripts",
+    "build"
+  ],
   "keywords": [],
   "author": "",
   "license": "ISC",

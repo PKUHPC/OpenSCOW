@@ -9,6 +9,10 @@
     "serve": "node build/index.js",
     "test": "jest"
   },
+  "files": [
+    "build",
+    "public"
+  ],
   "keywords": [],
   "author": "",
   "license": "ISC",
