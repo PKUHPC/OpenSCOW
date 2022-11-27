@@ -12,6 +12,14 @@
     "protos": "tsgrpc-cli protos",
     "test": "jest --passWithNoTests"
   },
+  "files": [
+    ".next",
+    "public",
+    "next.config.js",
+    "config.js",
+    "assets",
+    "api-routes-schemas.json"
+  ],
   "dependencies": {
     "@ant-design/icons": "4.8.0",
     "@codemirror/autocomplete": "6.3.4",

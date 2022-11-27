@@ -7,6 +7,9 @@
     "build": "rimraf build && tsc -p tsconfig.build.json",
     "test": "jest"
   },
+  "files": [
+    "build"
+  ],
   "dependencies": {
     "node-ssh": "13.0.0",
     "shell-quote": "1.7.4"
