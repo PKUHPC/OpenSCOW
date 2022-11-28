@@ -198,13 +198,12 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
           title: "文件已存在",
           content: `文件${filename}已存在，是否覆盖？`,
           okText: "确认",
-          onOk: () => {
-            if (operation.selected[0].type === "dir") {
-              api.deleteDir({ body: { cluster, path: join(path, filename) } });
-            } else {
-              api.deleteFile({ body: { cluster, path: join(path, filename) } });
-            }
-            pasteOneFile(fromPath, toPath);
+          onOk: async () => {
+            const deleteOperation = operation.selected[0].type === "dir" ? api.deleteDir : api.deleteFile;
+            await deleteOperation({ body: { cluster: cluster, path: toPath } })
+              .then(() => {
+                pasteOneFile(fromPath, toPath);
+              });
           },
           onCancel: () => {
             resetSelectedAndOperation();
@@ -224,13 +223,12 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
           title: "文件已存在",
           content: `文件${x.name}已存在，是否覆盖？`,
           okText: "确认",
-          onOk: () => {
-            if (x.type === "dir") {
-              api.deleteDir({ body: { cluster, path: join(path, x.name) } });
-            } else {
-              api.deleteFile({ body: { cluster, path: join(path, x.name) } });
-            }
-            pasteFiles(x, join(operation.originalPath, x.name), join(path, x.name));
+          onOk: async () => {
+            const deleteOperation = x.type === "dir" ? api.deleteDir : api.deleteFile;
+            await deleteOperation({ body: { cluster: cluster, path: join(path, x.name) } })
+              .then(() => {
+                return pasteFiles(x, join(operation.originalPath, x.name), join(path, x.name));
+              });
           },
         });
       } else {
