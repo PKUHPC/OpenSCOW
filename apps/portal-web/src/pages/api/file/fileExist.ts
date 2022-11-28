@@ -6,7 +6,7 @@ import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
 import { handlegRPCError } from "src/utils/server";
 
-export interface ExistsSchema {
+export interface FileExistSchema {
 	method: "GET";
 	
 	query: {
@@ -22,7 +22,7 @@ export interface ExistsSchema {
 
 const auth = authenticate(() => true);
 
-export default route<ExistsSchema>("ExistsSchema", async (req, res) => {
+export default route<FileExistSchema>("FileExistSchema", async (req, res) => {
 
   const info = await auth(req, res);
   if (!info) { return; }

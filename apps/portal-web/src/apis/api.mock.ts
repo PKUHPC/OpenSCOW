@@ -68,7 +68,7 @@ export const mockApi: MockApi<typeof api> = {
 
   downloadFile: null,
   uploadFile: null,
-  exists: null,
+  fileExist: null,
 
   createAppSession: async () => ({ jobId: 123, sessionId: "is" }),
 

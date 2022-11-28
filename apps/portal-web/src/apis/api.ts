@@ -21,7 +21,7 @@ import type { CreateFileSchema } from "src/pages/api/file/createFile";
 import type { DeleteDirSchema } from "src/pages/api/file/deleteDir";
 import type { DeleteFileSchema } from "src/pages/api/file/deleteFile";
 import type { DownloadFileSchema } from "src/pages/api/file/download";
-import type { ExistsSchema } from "src/pages/api/file/exists";
+import type { FileExistSchema } from "src/pages/api/file/fileExist";
 import type { GetHomeDirectorySchema } from "src/pages/api/file/getHome";
 import type { ListFileSchema } from "src/pages/api/file/list";
 import type { MkdirSchema } from "src/pages/api/file/mkdir";
@@ -69,5 +69,5 @@ export const api = {
   submitJob: fromApi<SubmitJobSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/job/submitJob")),
   getLogo: fromApi<GetLogoSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api//logo")),
   changePassword: fromApi<ChangePasswordSchema>("PATCH", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/profile/changePassword")),
-  exists: fromApi<ExistsSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/file/exists")),
+  fileExist: fromApi<FileExistSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/file/fileExist")),
 };

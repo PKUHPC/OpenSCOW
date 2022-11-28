@@ -192,7 +192,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
       const filename = operation.selected[0].name;
       const fromPath = join(operation.originalPath, filename);
       const toPath = join(path, filename);
-      const isExist = await api.exists({ query: { cluster, path: toPath } });
+      const isExist = await api.fileExist({ query: { cluster, path: toPath } });
       if (isExist.result) {
         modal.confirm({
           title: "文件已存在",
@@ -217,7 +217,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
     }
 
     await Promise.allSettled(operation.selected.map(async (x) => {
-      const isExist = await api.exists({ query: { cluster, path: join(path, x.name) } });
+      const isExist = await api.fileExist({ query: { cluster, path: join(path, x.name) } });
       if (isExist) {
         modal.confirm({
           title: "文件已存在",
