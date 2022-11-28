@@ -56,3 +56,7 @@ ll
 ## 连接至管理系统数据库
 
 当部署好了管理系统后，可以在仓库下运行`./db.sh`连接并进入数据库。
+
+# 注意
+
+此仓库的内容由[PKUHPC/SCOW](https://github.com/PKUHPC/SCOW)通过GitHub Actions自动生成。查看本仓库commit记录以获取当前版本对应的SCOW版本。
