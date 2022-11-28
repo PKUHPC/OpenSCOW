@@ -202,7 +202,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
             const deleteOperation = operation.selected[0].type === "dir" ? api.deleteDir : api.deleteFile;
             await deleteOperation({ body: { cluster: cluster, path: toPath } })
               .then(() => {
-                pasteOneFile(fromPath, toPath);
+                return pasteOneFile(fromPath, toPath);
               });
           },
           onCancel: () => {
