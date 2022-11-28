@@ -17,11 +17,12 @@ import { BaseLayout } from "src/layouts/base/BaseLayout";
 import { DarkModeProvider } from "src/layouts/darkMode";
 import { useMessage } from "src/layouts/prompts";
 import { ValidateTokenSchema } from "src/pages/api/auth/validateToken";
+import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import {
   User, UserStore,
 } from "src/stores/UserStore";
 import { GlobalStyle } from "src/styles/globalStyle";
-import { runtimeConfig } from "src/utils/config";
+import { publicConfig, runtimeConfig } from "src/utils/config";
 import { getHostname } from "src/utils/host";
 import { isServer } from "src/utils/isServer";
 import useConstant from "src/utils/useConstant";
@@ -71,6 +72,11 @@ function MyApp({ Component, pageProps, extra }: Props) {
     return store;
   });
 
+  const defaultClusterStore = useConstant(() => {
+    const store = createStore(DefaultClusterStore, Object.values(publicConfig.CLUSTERS)[0]);
+    return store;
+  });
+
   // Use the layout defined at the page level, if available
   return (
     <>
@@ -83,7 +89,7 @@ function MyApp({ Component, pageProps, extra }: Props) {
           href={join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/icon?type=favicon")}
         ></link>
       </Head>
-      <StoreProvider stores={[userStore]}>
+      <StoreProvider stores={[userStore, defaultClusterStore]}>
         <DarkModeProvider>
 
           <AntdConfigProvider color={primaryColor}>

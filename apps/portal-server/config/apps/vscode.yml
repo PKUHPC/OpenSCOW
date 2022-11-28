@@ -18,3 +18,19 @@ web:
     path: /login
     formData:
       password: "{PASSWORD}"
+
+attributes:
+  - type: text
+    name: version
+    label: 版本
+  - type: number
+    name: size
+    label: 数量
+  - type: select
+    name: selectVersion
+    label: 选择版本
+    select:
+      - value: version10
+        label: v10
+      - value: version11
+        label: v11

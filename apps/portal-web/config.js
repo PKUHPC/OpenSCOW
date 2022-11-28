@@ -1,6 +1,6 @@
 // @ts-check
 
-const { envConfig, str, bool, parseKeyValue, num } = require("@scow/lib-config");
+const { envConfig, str, bool, parseKeyValue, num, port } = require("@scow/lib-config");
 const { join } = require("path");
 const { homedir } = require("os");
 const { PHASE_DEVELOPMENT_SERVER, PHASE_PRODUCTION_BUILD, PHASE_PRODUCTION_SERVER, PHASE_TEST } = require("next/constants");
@@ -37,9 +37,9 @@ const specs = {
   SSH_PRIVATE_KEY_PATH: str({ desc: "SSH私钥路径", default: join(homedir(), ".ssh", "id_rsa") }),
   SSH_PUBLIC_KEY_PATH: str({ desc: "SSH公钥路径", default: join(homedir(), ".ssh", "id_rsa.pub") }),
 
-  PROXY_BASE_PATH: str({ desc: "网关的代理路径。相对于整个系统的base path。", default: "/proxy" }),
-  RPROXY_BASE_PATH: str({ desc: "网关的代理路径。相对于整个系统的base path。", default: "/rproxy" }),
-  WSPROXY_BASE_PATH: str({ desc: "网关的代理路径。相对于整个系统的base path。", default: "/wsproxy" }),
+  PROXY_BASE_PATH: str({ desc: "网关的代理路径。相对于整个系统的base path。", default: "/api/proxy/absolute" }),
+  RPROXY_BASE_PATH: str({ desc: "网关的代理路径。相对于整个系统的base path。", default: "/api/proxy/relative" }),
+  WSPROXY_BASE_PATH: str({ desc: "网关的代理路径。相对于整个系统的base path。", default: "/api/proxy/absolute" }),
 
   SERVER_URL: str({ desc: "门户后端的路径", default: "portal-server:5000" }),
 
@@ -77,8 +77,6 @@ const buildRuntimeConfig = async (phase) => {
 
   const clusters = getClusterConfigs(configPath);
 
-  const apps = getAppConfigs(configPath);
-
   const uiConfig = getUiConfig(configPath);
   const portalConfig = getPortalConfig(configPath);
 
@@ -91,7 +89,6 @@ const buildRuntimeConfig = async (phase) => {
     CLUSTERS_CONFIG: clusters,
     PORTAL_CONFIG: portalConfig,
     DEFAULT_PRIMARY_COLOR,
-    APPS: apps,
     MOCK_USER_ID: config.MOCK_USER_ID,
     UI_CONFIG: uiConfig,
     LOGIN_NODES: parseKeyValue(config.LOGIN_NODES),
@@ -133,8 +130,6 @@ const buildRuntimeConfig = async (phase) => {
 
     CLUSTERS: Object.entries(clusters).map(([id, { displayName }]) => ({ id, name: displayName })),
 
-    APPS: Object.entries(apps).map(([id, { name }]) => ({ id, name })),
-
     SUBMIT_JOB_WORKING_DIR: portalConfig.submitJobDefaultPwd,
 
     PROXY_BASE_PATH: join(config.BASE_PATH, config.PROXY_BASE_PATH),
@@ -145,6 +140,22 @@ const buildRuntimeConfig = async (phase) => {
   if (!building) {
     console.log("Server Runtime Config", serverRuntimeConfig);
     console.log("Public Runtime Config", publicRuntimeConfig);
+  }
+
+  if (production) {
+
+    // HACK
+    // call /api/proxy/<node>/<port>/ after 3 seconds to init the proxy ws server
+    setTimeout(() => {
+      const url = "http://localhost:3000" + join(publicRuntimeConfig.PROXY_BASE_PATH, "127.0.0.1", "3001");
+      console.log("Calling proxy url to initialize ws proxy server", url);
+      fetch(url).then(() => {
+        console.log("Call completed.");
+      }).catch((e) => {
+        console.error("Error when calling proxy url to initialize ws proxy server", e);
+      });
+    }, 3000);
+
   }
 
   return {

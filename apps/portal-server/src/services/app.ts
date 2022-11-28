@@ -1,10 +1,11 @@
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
-import { AppType } from "@scow/config/build/app";
+import { AppType, getAppConfigs } from "@scow/config/build/app";
 import { getClusterOps } from "src/clusterops";
-import { apps } from "src/config/apps";
 import {
+  AppCustomAttribute,
+  appCustomAttribute_AttributeTypeFromJSON,
   AppServiceServer,
   AppServiceService,
   ConnectToAppResponse,
@@ -16,6 +17,9 @@ export const appServiceServer = plugin((server) => {
 
   server.addService<AppServiceServer>(AppServiceService, {
     connectToApp: async ({ request, logger }) => {
+      const apps = getAppConfigs();
+
+
       const { cluster, sessionId, userId } = request;
 
       const clusterOps = getClusterOps(cluster);
@@ -76,7 +80,57 @@ export const appServiceServer = plugin((server) => {
     },
 
     createAppSession: async ({ request, logger }) => {
-      const { account, appId, cluster, coreCount, maxTime, partition, qos, userId } = request;
+      const apps = getAppConfigs();
+
+      const { account, appId, cluster, coreCount, maxTime, partition, qos, userId, customAttributes } = request;
+
+      const app = apps[appId];
+      if (!app) {
+        throw <ServiceError> { code: Status.NOT_FOUND, message: `app id ${appId} is not found` };
+      }
+      const attributesConfig = app.attributes;
+      attributesConfig?.forEach((attribute) => {
+        if (!(attribute.name in customAttributes)) {
+          throw <ServiceError> {
+            code: Status.INVALID_ARGUMENT,
+            message: `custom form attribute ${attribute.name} is not found`,
+          };
+        }
+
+        switch (attribute.type) {
+        case "number":
+          if (Number.isNaN(Number(customAttributes[attribute.name]))) {
+            throw <ServiceError> {
+              code: Status.INVALID_ARGUMENT,
+              message: `
+              custom form attribute ${attribute.name} should be of type number,
+              but of type ${typeof customAttributes[attribute.name]}`,
+            };
+          }
+          break;
+
+        case "text":
+          break;
+
+        case "select":
+          // check the option selected by user is in select attributes as the config defined
+          if (!(attribute.select!.some((optionItem) => optionItem.value === customAttributes[attribute.name]))) {
+            throw <ServiceError> {
+              code: Status.INVALID_ARGUMENT,
+              message: `
+              the option value of ${attribute.name} selected by user should be
+              one of select attributes as the ${appId} config defined,
+              but is ${customAttributes[attribute.name]}`,
+            };
+          }
+          break;
+
+        default:
+          throw new Error(`
+          the custom form attributes type in ${appId} config should be one of number, text or select,
+          but the type of ${attribute.name} is ${attribute.type}`);
+        }
+      });
 
       const clusterops = getClusterOps(cluster);
 
@@ -90,6 +144,7 @@ export const appServiceServer = plugin((server) => {
         maxTime,
         partition,
         qos,
+        customAttributes,
       }, logger);
 
       if (reply.code === "SBATCH_FAILED") {
@@ -114,6 +169,36 @@ export const appServiceServer = plugin((server) => {
       const reply = await clusterops.app.listAppSessions({ userId }, logger);
 
       return [{ sessions: reply.sessions }];
+    },
+
+    getAppAttributes: async ({ request }) => {
+      const apps = getAppConfigs();
+
+      const { appId } = request;
+      const app = apps[appId];
+
+      if (!app) {
+        throw <ServiceError> { code: Status.NOT_FOUND, message: `app id ${appId} is not found` };
+      }
+      const attributes: AppCustomAttribute[] = [];
+      if (app.attributes) {
+        app.attributes.forEach((item) => {
+          attributes.push({
+            type: appCustomAttribute_AttributeTypeFromJSON(item.type),
+            label: item.label,
+            name: item.name,
+            options: item.select ?? [],
+          });
+        });
+      }
+
+      return [{ attributes: attributes }];
+    },
+
+    listAvailableApps: async ({}) => {
+      const apps = getAppConfigs();
+
+      return [{ apps: Object.keys(apps).map((x) => ({ id: x, name: apps[x].name })) }];
     },
 
   });

@@ -1,10 +1,10 @@
 import { ArrowRightOutlined, MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
 import { Space, Typography } from "antd";
-import Link from "next/link";
 import { join } from "path";
 import React from "react";
 import { antdBreakpoints } from "src/layouts/base/constants";
 import { BigScreenMenu } from "src/layouts/base/header/BigScreenMenu";
+import { DefaultClusterSelector } from "src/layouts/base/header/DefaultClusterSelector";
 import { Logo } from "src/layouts/base/header/Logo";
 import { NavItemProps } from "src/layouts/base/NavItemProps";
 import { User } from "src/stores/UserStore";
@@ -64,7 +64,6 @@ export const Header: React.FC<Props> = ({
   setSidebarCollapsed, sidebarCollapsed,
   user, pathname, logout,
 }) => {
-
   return (
     <Container>
       <HeaderItem>
@@ -87,21 +86,17 @@ export const Header: React.FC<Props> = ({
         />
         <MenuPartPlaceholder />
       </MenuPart>
+      <DefaultClusterSelector />
       {
         publicConfig.PORTAL_URL ? (
           <HeaderItem>
-            <Link
-              href={
-                user
-                  ? join(publicConfig.PORTAL_URL, "/api/auth/callback?token=" + user.token)
-                  : publicConfig.PORTAL_URL
-              }
-              legacyBehavior
+            {/* Cannot use Link because links adds BASE_PATH, but MIS_URL already contains it */}
+            <Typography.Link href={user
+              ? join(publicConfig.PORTAL_URL, "/api/auth/callback?token=" + user.token)
+              : publicConfig.PORTAL_URL}
             >
-              <Typography.Link>
-                <ArrowRightOutlined /> 门户
-              </Typography.Link>
-            </Link>
+              <ArrowRightOutlined /> 门户
+            </Typography.Link>
           </HeaderItem>
         ) : undefined
       }

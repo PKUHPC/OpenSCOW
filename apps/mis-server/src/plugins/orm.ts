@@ -1,11 +1,14 @@
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { MikroORM, Options } from "@mikro-orm/core";
 import { MySqlDriver } from "@mikro-orm/mysql";
+import { join } from "path";
 import { config } from "src/config/env";
 import { misConfig } from "src/config/mis";
 import { DatabaseSeeder } from "src/seeders/DatabaseSeeder";
 
 import { entities } from "../entities";
+
+const distPath = process.env.NODE_ENV === "production" ? "build" : "src";
 
 export const ormConfigs = {
   host: misConfig.db.host,
@@ -17,13 +20,13 @@ export const ormConfigs = {
   forceUndefined: true,
   runMigrations: true,
   migrations: {
-    path: "./src/migrations",
+    path: join(distPath, "migrations"),
     pattern: /^[\w-]+\d+\.(j|t)s$/,
   },
   entities,
   debug: misConfig.db.debug,
   seeder: {
-    path: "./src/seeders",
+    path: join(distPath, "seenders"),
   },
 } as Options<MySqlDriver>;
 

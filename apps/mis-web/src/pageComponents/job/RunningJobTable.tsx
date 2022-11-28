@@ -1,6 +1,7 @@
 import { Button, Form, Input, InputNumber, Select, Space, Table } from "antd";
 import React, { useCallback, useMemo, useRef, useState } from "react";
 import { useAsync } from "react-async";
+import { useStore } from "simstate";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer, FilterFormTabs } from "src/components/FilterFormContainer";
@@ -10,6 +11,7 @@ import { runningJobId, RunningJobInfo } from "src/models/job";
 import { BatchChangeJobTimeLimitButton } from "src/pageComponents/job/BatchChangeJobTimeLimitButton";
 import { ChangeJobTimeLimitModal } from "src/pageComponents/job/ChangeJobTimeLimitModal";
 import { RunningJobDrawer } from "src/pageComponents/job/RunningJobDrawer";
+import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { Cluster, publicConfig } from "src/utils/config";
 import { useDidUpdateEffect } from "src/utils/hooks";
 
@@ -35,11 +37,13 @@ export const RunningJobQueryTable: React.FC<Props> = ({
 
   const [selected, setSelected] = useState<RunningJobInfo[]>([]);
 
+  const defaultClusterStore = useStore(DefaultClusterStore);
+
   const [query, setQuery] = useState<FilterForm>(() => {
     return {
       accountName: typeof accountNames === "string" ? accountNames : undefined,
       jobId: undefined,
-      cluster: Object.values(publicConfig.CLUSTERS)[0],
+      cluster: defaultClusterStore.cluster,
     };
   });
 

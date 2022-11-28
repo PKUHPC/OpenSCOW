@@ -51,6 +51,11 @@ export const mockApi: MockApi<typeof api> = {
 
   getAllJobs: async () => ({ results: [job]}),
 
+  listAvailableApps: async () => ({ apps: [
+    { id: "vscode", name: "VSCode" },
+    { id: "emacs", name: "Emacs" },
+  ]}),
+
   listFile: null,
 
   copyFileItem: null,
@@ -76,6 +81,15 @@ export const mockApi: MockApi<typeof api> = {
       submitTime: new Date().toISOString(), ready: true, dataPath: "/test" },
     { jobId: 102, sessionId: "125", appId: "vscode", state: "RUNNING",
       submitTime: new Date().toISOString(), ready: true, dataPath: "/test" },
+  ]}),
+
+  getAppAttributes: async () => ({ appCustomFormAttributes: [
+    { type: "number", label: "版本", name: "version", select: []},
+    { type: "text", label: "文字 ", name: "text", select: []},
+    { type: "select", label: "选项", name: "option", select: [
+      { label: "版本1", value: "version1" },
+      { label: "版本2", value: "version2" },
+    ]},
   ]}),
 
   connectToApp: async ({ body: { sessionId } }) => sessionId === "124"

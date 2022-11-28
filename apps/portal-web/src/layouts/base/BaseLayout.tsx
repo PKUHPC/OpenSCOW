@@ -9,6 +9,8 @@ import { Header } from "src/layouts/base/header";
 import { match } from "src/layouts/base/matchers";
 import { SideNav } from "src/layouts/base/SideNav";
 import { userRoutes } from "src/layouts/routes";
+import { AppsStore } from "src/stores/AppsStore";
+import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { UserStore } from "src/stores/UserStore";
 import { arrayContainsElement } from "src/utils/array";
 import styled from "styled-components";
@@ -26,7 +28,6 @@ const ContentPart = styled.div`
   flex: 1;
   flex-direction: column;
   width: 100%;
-  overflow-x: scroll;
 `;
 
 const Content = styled(Layout.Content)`
@@ -46,9 +47,15 @@ type Props = PropsWithChildren<{
 
 export const BaseLayout: React.FC<PropsWithChildren<Props>> = ({ children, footerText }) => {
 
+  const defaultClusterStore = useStore(DefaultClusterStore);
+
   const userStore = useStore(UserStore);
 
-  const allRoutes = useMemo(() => userRoutes(), []);
+  const apps = useStore(AppsStore);
+
+  const allRoutes = useMemo(() => userRoutes(userStore.user, defaultClusterStore.cluster, apps),
+    [userStore.user, defaultClusterStore.cluster, apps],
+  );
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
 
