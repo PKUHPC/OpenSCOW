@@ -13,13 +13,14 @@ import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { ModalButton, ModalLink } from "src/components/ModalLink";
 import { TitleText } from "src/components/PageTitle";
 import { TableTitle } from "src/components/TableTitle";
-import { useMessage } from "src/layouts/prompts";
+import { useMessage, useModal } from "src/layouts/prompts";
 import { urlToDownload } from "src/pageComponents/filemanager/api";
 import { CreateFileModal } from "src/pageComponents/filemanager/CreateFileModal";
 import { MkdirModal } from "src/pageComponents/filemanager/MkdirModal";
 import { PathBar } from "src/pageComponents/filemanager/PathBar";
 import { RenameModal } from "src/pageComponents/filemanager/RenameModal";
 import { UploadModal } from "src/pageComponents/filemanager/UploadModal";
+import exists from "src/pages/api/file/exists";
 import { FileInfo, FileType } from "src/pages/api/file/list";
 import { publicConfig } from "src/utils/config";
 import { compareDateTime, formatDateTime } from "src/utils/datetime";
@@ -84,6 +85,7 @@ const operationTexts = {
 
 export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
 
+  const modal = useModal();
   const message = useMessage();
 
   const prevPathRef = useRef<string>(path);
@@ -164,35 +166,59 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
     if (operation.selected.length === 1) {
       const filename = operation.selected[0].name;
       const fromPath = join(operation.originalPath, filename);
-      await operationApi({ body: { cluster, fromPath, toPath: join(path, filename) } })
-        .httpError(415, ({ error }) => {
-          Modal.error({
-            title: `${operationText}出错`,
-            content: operation.op === "copy" ? error : "可能是因为目标目录中有同名的文件或者目录。",
+      const onOk = async () => {
+        await operationApi({ body: { cluster, fromPath, toPath: join(path, filename) } })
+          .httpError(415, ({ error }) => {
+            Modal.error({
+              title: `${operationText}出错`,
+              content: operation.op === "copy" ? error : "可能是因为目标目录中有同名的文件或者目录。",
+            });
+          })
+          .then(() => {
+            message.success(`${operationText}成功！`);
+          }).finally(() => {
+            resetSelectedAndOperation();
+            reload();
           });
-        })
-        .then(() => {
-          message.success(`${operationText}成功！`);
-        }).finally(() => {
-          resetSelectedAndOperation();
-          reload();
+      };
+      const isExist = await api.exists({ query: { cluster, path: join(path, filename) } });
+      if (isExist.result) {
+        modal.confirm({
+          title: "文件已存在",
+          content: `文件${filename}已存在，是否覆盖？`,
+          onOk: () => onOk(),
         });
+      } else {
+        onOk();
+      }
       return;
     }
 
     await Promise.allSettled(operation.selected.map(async (x) => {
-      return await (operation.op === "copy" ? api.copyFileItem : api.moveFileItem)({
-        body: {
-          cluster,
-          fromPath: join(operation.originalPath, x.name),
-          toPath: join(path, x.name),
-        },
-      }).then(() => {
-        setOperation((o) => o ? { ...operation, completed: o.completed.concat(x) } : undefined);
-        return x;
-      }).catch(() => {
-        return undefined;
-      });
+      const isExist = await api.exists({ query: { cluster, path: join(path, x.name) } });
+      const onOk = async () => {
+        await (operation.op === "copy" ? api.copyFileItem : api.moveFileItem)({
+          body: {
+            cluster,
+            fromPath: join(operation.originalPath, x.name),
+            toPath: join(path, x.name),
+          },
+        }).then(() => {
+          setOperation((o) => o ? { ...operation, completed: o.completed.concat(x) } : undefined);
+          return x;
+        }).catch(() => {
+          return undefined;
+        });
+      };
+      if (isExist) {
+        modal.confirm({
+          title: "文件已存在",
+          content: `文件${x.name}已存在，是否覆盖？`,
+          onOk: () => onOk(),
+        });
+      } else {
+        onOk();
+      }
     }))
       .then((successfulInfo) => {
         const successfulCount = successfulInfo.filter((x) => x).length;
@@ -203,10 +229,12 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
         } else {
           message.error(`${operationText}成功${successfulCount}项，失败${allCount - successfulCount}项`);
         }
-      }).catch((e) => {
+      })
+      .catch((e) => {
         console.log(e);
         message.error(`执行${operationText}操作时遇到错误`);
-      }).finally(() => {
+      })
+      .finally(() => {
         resetSelectedAndOperation();
         reload();
       });
