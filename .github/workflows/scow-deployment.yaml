@@ -1,0 +1,30 @@
+name: Update scow-deployment
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: pandoc/latex
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Pushes to scow-deployment repo
+        id: push_directory
+        uses: cpina/github-action-push-to-another-repository@main
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          source-directory: deploy/
+          destination-github-username: PKUHPC
+          destination-repository-name: scow-deployment
+          user-email: scow-bot@scow.com
+          commit-message: See ORIGIN_COMMIT from $GITHUB_REF
+          target-branch: ${{ github.ref_name }}
+
+      - name: Test get variable exported by push-to-another-repository
+        run: echo $DESTINATION_CLONED_DIRECTORY
