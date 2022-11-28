@@ -138,8 +138,7 @@ export const fileServiceServer = plugin((server) => {
         const sftp = await ssh.requestSFTP();
         const error = await sftpRename(sftp)(fromPath, toPath).catch((e) => e);
         if (error) {
-          // 无需throw，因为已经对重名文件做了检查
-          // throw <ServiceError>{ code: status.INTERNAL, message: "rename failed", details: error };
+          throw <ServiceError>{ code: status.INTERNAL, message: "rename failed", details: error };
         }
 
         return [{}];

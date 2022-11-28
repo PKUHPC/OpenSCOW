@@ -20,7 +20,6 @@ import { MkdirModal } from "src/pageComponents/filemanager/MkdirModal";
 import { PathBar } from "src/pageComponents/filemanager/PathBar";
 import { RenameModal } from "src/pageComponents/filemanager/RenameModal";
 import { UploadModal } from "src/pageComponents/filemanager/UploadModal";
-import exists from "src/pages/api/file/exists";
 import { FileInfo, FileType } from "src/pages/api/file/list";
 import { publicConfig } from "src/utils/config";
 import { compareDateTime, formatDateTime } from "src/utils/datetime";
@@ -167,6 +166,11 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
       const filename = operation.selected[0].name;
       const fromPath = join(operation.originalPath, filename);
       const onOk = async () => {
+        if (operation.selected[0].type === "dir") {
+          api.deleteDir({ body: { cluster, path: join(path, filename) } });
+        } else {
+          api.deleteFile({ body: { cluster, path: join(path, filename) } });
+        }
         await operationApi({ body: { cluster, fromPath, toPath: join(path, filename) } })
           .httpError(415, ({ error }) => {
             Modal.error({
@@ -197,6 +201,11 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
     await Promise.allSettled(operation.selected.map(async (x) => {
       const isExist = await api.exists({ query: { cluster, path: join(path, x.name) } });
       const onOk = async () => {
+        if (x.type === "dir") {
+          api.deleteDir({ body: { cluster, path: join(path, x.name) } });
+        } else {
+          api.deleteFile({ body: { cluster, path: join(path, x.name) } });
+        }
         await (operation.op === "copy" ? api.copyFileItem : api.moveFileItem)({
           body: {
             cluster,
