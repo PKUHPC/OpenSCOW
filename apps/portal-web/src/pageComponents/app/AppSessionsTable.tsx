@@ -9,10 +9,10 @@ import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import type { AppSession } from "src/generated/portal/app";
 import { useMessage } from "src/layouts/prompts";
+import { compareState } from "src/models/job";
 import { ConnectTopAppLink } from "src/pageComponents/app/ConnectToAppLink";
 import { AppsStore } from "src/stores/AppsStore";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
-import { compareState } from "src/utils/appState";
 import { publicConfig } from "src/utils/config";
 import { compareDateTime, formatDateTime } from "src/utils/datetime";
 import { compareNumber } from "src/utils/math";
@@ -59,6 +59,7 @@ export const AppSessionsTable: React.FC<Props> = () => {
       title: "应用",
       dataIndex: "appId",
       render: (appId: string) => apps.find((x) => x.id === appId)?.name ?? appId,
+      sorter: (a, b) => (!a.submitTime || !b.submitTime) ? -1 : compareDateTime(a.submitTime, b.submitTime),
     },
     {
       title: "提交时间",
