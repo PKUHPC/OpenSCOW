@@ -199,7 +199,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
           content: `文件${filename}已存在，是否覆盖？`,
           okText: "确认",
           onOk: async () => {
-            const fileType = await api.getFileType({ query: { cluster, path: fromPath } });
+            const fileType = await api.getFileType({ query: { cluster, path: toPath } });
             const deleteOperation = fileType.type === "dir" ? api.deleteDir : api.deleteFile;
             await deleteOperation({ body: { cluster: cluster, path: toPath } })
               .then(() => {
