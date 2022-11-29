@@ -64,11 +64,19 @@ export const AppSessionsTable: React.FC<Props> = () => {
       title: "提交时间",
       dataIndex: "submitTime",
       render: (_, record) => record.submitTime ? formatDateTime(record.submitTime) : "",
-      sorter: (a, b) => (!a.submitTime || !b.submitTime) ? -1 : compareDateTime(a.submitTime, b.submitTime),
     },
     {
       title: "状态",
       dataIndex: "state",
+      sorter: (a, b) => {
+        if (a.state !== b.state && (a.state === "RUNNING" || b.state === "RUNNING")) {
+          return a.state === "RUNNING" ? 1 : -1;
+        } else if (a.state !== b.state && (a.state === "PENDING" || b.state === "PENDING")) {
+          return a.state === "PENDING" ? 1 : -1;
+        } else {
+          return (!a.submitTime || !b.submitTime) ? -1 : compareDateTime(a.submitTime, b.submitTime);
+        }
+      },
     },
 
     {
