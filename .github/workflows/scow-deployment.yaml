@@ -7,7 +7,7 @@ on:
     branches: [master]
 
 jobs:
-  build:
+  push-branch:
     name: Push deploy/ to scow-deployment
     runs-on: ubuntu-latest
     steps:
