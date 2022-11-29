@@ -58,6 +58,8 @@ export interface PublicRuntimeConfig {
   RPROXY_BASE_PATH: string;
   WSPROXY_BASE_PATH: string;
 
+  NOVNC_CLIENT_PATH: string;
+
 }
 
 export const runtimeConfig: ServerRuntimeConfig = getConfig().serverRuntimeConfig;

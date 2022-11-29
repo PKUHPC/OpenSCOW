@@ -20,10 +20,6 @@ COPY apps/portal-web/package.json ./apps/portal-web/
 
 RUN pnpm i --offline --frozen-lockfile
 
-RUN apk add git
-
-RUN pnpm run --filter portal-web cloneNoVnc
-
 COPY tsconfig.json .eslintrc.json ./
 
 COPY protos ./protos

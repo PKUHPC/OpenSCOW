@@ -28,7 +28,7 @@
     "@scow/lib-decimal": "workspace:*",
     "@scow/lib-ssh": "workspace:*",
     "@scow/lib-config": "workspace:*",
-    "@sinclair/typebox": "0.25.8",
+    "@sinclair/typebox": "0.25.10",
     "@scow/lib-auth": "workspace:*",
     "dotenv": "16.0.3",
     "node-cron": "3.0.2",
