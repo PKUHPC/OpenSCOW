@@ -1,0 +1,7 @@
+# 创建用户、修改密码时，密码的规则。不设置就没有限制
+# userIdPattern:
+  # 正则表达式
+  # regex: ""
+
+  # 出错时的消息
+  # errorMessage: ""
