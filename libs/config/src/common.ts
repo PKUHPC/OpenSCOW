@@ -15,10 +15,16 @@ import { Static, Type } from "@sinclair/typebox";
 import { DEFAULT_CONFIG_BASE_PATH } from "src/constants";
 
 export const CommonConfigSchema = Type.Object({
-  passwordPattern: Type.Optional(Type.Object({
-    regex: Type.String({ description: "用户密码的正则规则" }),
-    errorMessage: Type.Optional(Type.String({ description: "如果密码不符合规则显示什么" })),
-  }, { description: "创建用户、修改密码时的密码的规则" })),
+  passwordPattern: Type.Object({
+    regex: Type.String({
+      description: "用户密码的正则规则",
+      default: "^(?=.*\d)(?=.*[a-zA-Z])(?=.*[`~!@#\$%^&*()_+\-[\];',./{}|:\"<>?]).{8,}$",
+    }),
+    errorMessage: Type.String({
+      description: "如果密码不符合规则显示什么",
+      default: "必须包含字母、数字和符号，长度大于等于8位",
+    }),
+  }, { description: "创建用户、修改密码时的密码的规则" }),
 });
 
 const COMMON_CONFIG_NAME = "common";
