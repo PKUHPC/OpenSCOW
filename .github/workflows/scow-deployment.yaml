@@ -35,7 +35,7 @@ jobs:
     steps:
       - name: Delete PR branch
         uses: dawidd6/action-delete-branch@v3
-        if: ${{ github.event_name == "pull_request" && github.event.action == "closed" }}
+        if: ${{ github.event_name == "pull_request" }} && ${{ github.event.action == "closed" }}
         with:
           github_token: ${{ secrets.SCOW_DEPLOYMENT_PAT }}
           owner: PKUHPC
