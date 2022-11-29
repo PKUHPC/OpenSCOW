@@ -14,15 +14,6 @@ import { insertInitialData } from "tests/data/data";
 import { dropDatabase } from "tests/data/helpers";
 
 
-jest.mock("@scow/lib-auth", () => ({
-  createUser: jest.fn(async () => ({ status: 204, ok: true, text: () => "" })),
-  getCapabilities: jest.fn(async () => ({
-    createUser: true,
-    changePassword: true,
-    validateName: true,
-  })),
-}));
-
 const anotherTenant = "anotherTenant";
 
 let server: Server;

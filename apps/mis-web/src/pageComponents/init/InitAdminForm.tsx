@@ -31,7 +31,7 @@ export const InitAdminForm: React.FC = () => {
         // 如果在scow中已经存在这个用户，则不用创建操作
         Modal.error({
           title: "用户已存在",
-          content: "用户已存在于SCOW数据库",
+          content: "用户已存在于SCOW数据库，无法再添加此用户",
           onOk: async () => {
             setLoading(false);
           },
@@ -41,7 +41,7 @@ export const InitAdminForm: React.FC = () => {
         // 用户不存在于scow: 且认证系统支持查询，且查询结果不存在于认证系统，且当前系统不支持创建用户
         Modal.confirm({
           title: "当前系统不支持创建用户",
-          content: "用户不存在，请确认用户名和密码是否正确",
+          content: "用户不存在，请确认用户id是否正确",
           onOk: async () => {
             setLoading(false);
           },
@@ -61,10 +61,10 @@ export const InitAdminForm: React.FC = () => {
           title: "提示",
           content: result.getUserCapability ?
           // 认证系统支持查询
-            result.existsInAuth ? "此用户存在于已经认证系统，确认添加为初始管理员？" : "用户不存在，是否确认创建此用户并添加为初始管理员？"
+            result.existsInAuth ? "此用户存在于已经认证系统，确认添加为初始管理员？" : "用户不存在于认证系统，是否确认创建此用户并添加为初始管理员？"
             : // 认证系统不支持查询
             publicConfig.ENABLE_CREATE_USER ?
-              "无法确认用户是否在认证系统中存在， 将会尝试在认证系统中创建" : "无法确认用户是否在认证系统中存在且无法在认证系统中创建，请确认用户已经在认证系统中存在",
+              "无法确认用户是否在认证系统中存在， 将会尝试在认证系统中创建" : "无法确认用户是否在认证系统中存在且无法在认证系统中创建，请您确认此用户已经在认证系统中存在，确认将会直接加入到数据库中",
           
           onCancel: () => {
             setLoading(false);
@@ -75,8 +75,8 @@ export const InitAdminForm: React.FC = () => {
               .then((createdResult) => {
                 createdResult ? message.success("添加完成！")
                   : Modal.confirm({
-                    title: "创建失败",
-                    content: "请确认用户已存在于认证系统",
+                    title: "添加失败",
+                    content: "创建用户失败",
                     onOk: async () => {},
                     onCancel: async () => {},
                   });
@@ -101,7 +101,6 @@ export const InitAdminForm: React.FC = () => {
             type={publicConfig.ENABLE_CREATE_USER ? "success" : "warning"} 
             message={publicConfig.ENABLE_CREATE_USER ? "当前认证系统支持创建用户，您可以选择加入一个已存在于认证系统的用户，或者创建一个全新的用户。系统将会在认证系统中创建此用户"
               : "当前认证系统不支持创建用户，请确认要添加的用户必须已经存在于认证系统，且用户的ID必须和认证系统中的用户ID保持一致"}
-            // message="请确认初始管理员用户必须已经存在于认证系统，且用户的ID必须和认证系统中的用户ID保持一致。"
           />
         </AlertContainer>
         <Form form={form} onFinish={onFinish}>

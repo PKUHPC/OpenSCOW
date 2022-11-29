@@ -45,11 +45,6 @@ export const initServiceServer = plugin((server) => {
         existsInAuth: undefined,
         getUserCapability: false,
       }];
-      // return [{
-      //   existsInScow: true,
-      //   existsInAuth: false,
-      //   getUserCapability: false,
-      // }];
     },
 
     createInitAdmin: async ({ request, em }) => {
@@ -80,7 +75,9 @@ export const initServiceServer = plugin((server) => {
           result = true;
         }
         else {
-          // 认证系统不存在 && 认证系统支持创建 -> 则尝试创建
+          // 认证系统中不存在 && 认证系统支持创建
+          // 认证系统不支持查询
+          // -> 都要尝试创建
           // call auth
           await createUser(misConfig.authUrl,
             { identityId: user.userId, id: user.id, mail: user.email, name: user.name, password }, server.logger)
