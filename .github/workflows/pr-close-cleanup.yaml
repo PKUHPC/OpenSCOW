@@ -16,4 +16,4 @@ jobs:
           github_token: ${{ secrets.SCOW_DEPLOYMENT_PAT }}
           owner: PKUHPC
           repository: scow-deployment
-          branches: ${{ github.ref_name }}
+          branches: ${{ github.event.number }}/merge
