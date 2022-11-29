@@ -10,10 +10,10 @@ message CreateInitAdminRequest {
   string name = 2;
   string email = 3;
   string password = 4;
-  optional bool existsInAuth = 5;
+  optional bool exists_in_auth = 5;
 }
 message CreateInitAdminReply {
-  bool createdResult = 1;
+  bool created = 1;
 }
 
 message CompleteInitRequest {}
@@ -34,9 +34,8 @@ message userExistsRequest {
   string user_id = 1;
 }
 message userExistsReply {
-  bool existsInScow= 1;
-  optional bool existsInAuth = 2;
-  bool getUserCapability = 3;
+  bool exists_in_scow= 1;
+  optional bool exists_in_auth = 2;
 }
 
 

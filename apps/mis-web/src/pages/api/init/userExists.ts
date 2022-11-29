@@ -15,7 +15,6 @@ export interface userExistsSchema {
     200: { 
       existsInScow: boolean,
       existsInAuth: boolean | undefined,
-      getUserCapability: boolean,
     };
       
     // 204: null;
@@ -49,7 +48,6 @@ export default route<userExistsSchema>("userExistsSchema", async (req) => {
     { 
       existsInScow: result.existsInScow,
       existsInAuth: result.existsInAuth,
-      getUserCapability: result.getUserCapability,
     },
   };
 });

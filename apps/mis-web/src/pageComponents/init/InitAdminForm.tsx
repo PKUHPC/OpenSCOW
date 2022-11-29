@@ -40,11 +40,12 @@ export const InitAdminForm: React.FC = () => {
           setLoading(false);
         },
       });
-    } else if (!result.existsInAuth && result.getUserCapability && !publicConfig.ENABLE_CREATE_USER) {
+    } else if (!result.existsInAuth && result.existsInAuth !== undefined && !publicConfig.ENABLE_CREATE_USER) {
       // 用户不存在于scow: 且认证系统支持查询，且查询结果不存在于认证系统，且当前系统不支持创建用户
       Modal.confirm({
-        title: "当前系统不支持创建用户",
-        content: "用户不存在，请确认用户id是否正确",
+        title: "当前认证系统不支持创建用户",
+        content: "用户不存在，请确认用户ID是否正确",
+        okText: "确认",
         onOk: async () => {
           setLoading(false);
         },
@@ -61,28 +62,31 @@ export const InitAdminForm: React.FC = () => {
       // result.existsInAuth ? "此用户存在于已经认证系统，确认添加为初始管理员？" : "用户不存在，是否确认创建此用户并添加为初始管理员？",
       Modal.confirm({
         title: "提示",
-        content: result.getUserCapability ?
+        content: result.existsInAuth !== undefined ?
           // 认证系统支持查询
           result.existsInAuth ? "此用户存在于已经认证系统，确认添加为初始管理员？" : "用户不存在于认证系统，是否确认创建此用户并添加为初始管理员？"
           : // 认证系统不支持查询
           publicConfig.ENABLE_CREATE_USER ?
-            "无法确认用户是否在认证系统中存在， 将会尝试在认证系统中创建" : "无法确认用户是否在认证系统中存在且无法在认证系统中创建，请您确认此用户已经在认证系统中存在，确认将会直接加入到数据库中",
-          
+            "无法确认用户是否在认证系统中存在， 将会尝试在认证系统中创建" : "无法确认用户是否在认证系统中存在，并且当前认证系统不支持创建用户，请您确认此用户已经在认证系统中存在，确认将会直接加入到数据库中。",
+        okText: "确认",
         onCancel: () => {
           setLoading(false);
         },
         onOk: async () => {
           await api.createInitAdmin(
             { body: { email, identityId, name, password, existsInAuth: result.existsInAuth } })
-            .then((createdResult) => {
-              createdResult ? message.success("添加完成！")
-                : Modal.confirm({
+            .then((created) => {
+              if (created.created) {
+                message.success("添加完成！");
+                form.resetFields();
+              } else { 
+                Modal.confirm({
                   title: "添加失败",
                   content: "创建用户失败",
+                  okText: "确认",
                   onOk: async () => {},
                   onCancel: async () => {},
-                });
-              form.resetFields();
+                }); }
             }).finally(() => {
               setLoading(false);
             });

@@ -18,7 +18,7 @@ export interface CreateInitAdminSchema {
 
   responses: {
     200: {
-      createdResult: boolean,
+      created: boolean,
     }
     204: null;
 
@@ -46,12 +46,12 @@ export default route<CreateInitAdminSchema>("CreateInitAdminSchema", async (req)
   }
 
   const client = getClient(InitServiceClient);
-  const createdResult = await asyncClientCall(client, "createInitAdmin", {
+  const created = await asyncClientCall(client, "createInitAdmin", {
     email, name, userId: identityId, password, existsInAuth,
   });
 
   return { 
-    createdResult: createdResult,
+    created: created,
   };
 
 });

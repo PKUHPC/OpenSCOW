@@ -35,7 +35,6 @@ export const initServiceServer = plugin((server) => {
         return [{
           existsInScow: !!user,
           existsInAuth: !!userInfo,
-          getUserCapability: true,
         }];
       }
 
@@ -43,7 +42,6 @@ export const initServiceServer = plugin((server) => {
       return [{
         existsInScow: !!user,
         existsInAuth: undefined,
-        getUserCapability: false,
       }];
     },
 
@@ -52,51 +50,49 @@ export const initServiceServer = plugin((server) => {
 
       if (server.ext.capabilities.getUser && !existsInAuth && !server.ext.capabilities.createUser) {
         // 认证系统支持查询用户,且不存在于认证系统，且认证系统不支持创建用户
-        return [{ createdResult: false }];
-      } else {
-        // get default tenant
-        const tenant = await em.findOneOrFail(Tenant, { name: DEFAULT_TENANT_NAME });
+        return [{ created: false }];
+      } 
+      // get default tenant
+      const tenant = await em.findOneOrFail(Tenant, { name: DEFAULT_TENANT_NAME });
 
-        // new the user
-        const user = new User({
-          email, name, tenant, userId,
-          platformRoles: [PlatformRole.PLATFORM_ADMIN], tenantRoles: [TenantRole.TENANT_ADMIN],
+      // new the user
+      const user = new User({
+        email, name, tenant, userId,
+        platformRoles: [PlatformRole.PLATFORM_ADMIN], tenantRoles: [TenantRole.TENANT_ADMIN],
+      });
+
+      // 认证系统支持查询 && 存在于认证系统
+      // 认证系统支持查询 && 不存在于认证系统 && 认证系统支持创建用户
+      // 认证系统不支持查询 
+      // -> 都要在数据库进行创建
+      await createUserInDatabase(user, password, server.logger, em);
+      if (existsInAuth) {
+        // 认证系统存在则无需下一步
+        return [{ created: true }];
+      } 
+      let result = true;
+      // 认证系统中不存在 && 认证系统支持创建
+      // 认证系统不支持查询
+      // -> 都要尝试创建
+      // call auth
+      await createUser(misConfig.authUrl,
+        { identityId: user.userId, id: user.id, mail: user.email, name: user.name, password }, server.logger)
+      // If the call of creating user of auth fails,  delete the user created in the database.
+        .catch(async (e) => {
+          result = false;
+          await em.removeAndFlush(user);
+          if (e.status === 409) {
+            throw <ServiceError>{
+              code: Status.ALREADY_EXISTS, message:`User with id ${user.name} already exists.`,
+            };
+          }
+
+          server.logger.error("Error creating user in auth.", e);
+
+          throw <ServiceError> { code: Status.INTERNAL, message: `Error creating user ${user.id} in auth.` };
         });
-
-        // 认证系统支持查询 && 存在于认证系统
-        // 认证系统支持查询 && 不存在于认证系统 && 认证系统支持创建用户
-        // 认证系统不支持查询 
-        // -> 都要在数据库进行创建
-        await createUserInDatabase(user, password, server.logger, em);
-        if (existsInAuth) {
-          // 认证系统存在则无需下一步
-          return [{ createdResult: true }];
-        } else {
-          let result = true;
-          // 认证系统中不存在 && 认证系统支持创建
-          // 认证系统不支持查询
-          // -> 都要尝试创建
-          // call auth
-          await createUser(misConfig.authUrl,
-            { identityId: user.userId, id: user.id, mail: user.email, name: user.name, password }, server.logger)
-          // If the call of creating user of auth fails,  delete the user created in the database.
-            .catch(async (e) => {
-              result = false;
-              await em.removeAndFlush(user);
-              if (e.status === 409) {
-                throw <ServiceError>{
-                  code: Status.ALREADY_EXISTS, message:`User with id ${user.name} already exists.`,
-                };
-              }
-
-              server.logger.error("Error creating user in auth.", e);
-
-              throw <ServiceError> { code: Status.INTERNAL, message: `Error creating user ${user.id} in auth.` };
-            });
           
-          return [{ createdResult: result }];
-        }
-      }
+      return [{ created: result }];
     },
 
     setAsInitAdmin: async ({ request, em }) => {
