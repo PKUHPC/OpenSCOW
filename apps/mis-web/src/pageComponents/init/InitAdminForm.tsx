@@ -29,10 +29,13 @@ export const InitAdminForm: React.FC = () => {
     await api.userExists({ body: { identityId } }).then((result) => {
       if (result.existsInScow) {
         // 如果在scow中已经存在这个用户，则不用创建操作
-        Modal.error({
+        Modal.confirm({
           title: "用户已存在",
           content: "用户已存在于SCOW数据库，无法再添加此用户",
           onOk: async () => {
+            setLoading(false);
+          },
+          onCancel: async () => {
             setLoading(false);
           },
         });
