@@ -2,6 +2,10 @@
 
 https://pkuhpc.github.io/SCOW/docs/common/deployment
 
+## 要求
+
+系统中已安装python3，并能够使用`python3`命令调用。
+
 ## 编写配置文件
 
 ```shell
@@ -60,3 +64,7 @@ ll
 # 注意
 
 此仓库的内容由[PKUHPC/SCOW](https://github.com/PKUHPC/SCOW)通过GitHub Actions自动生成。查看本仓库commit记录以获取当前版本对应的SCOW版本。
+
+# 授权协议
+
+SCOW 使用 [木兰宽松许可证, 第2版](http://license.coscl.org.cn/MulanPSL2) 开源协议。

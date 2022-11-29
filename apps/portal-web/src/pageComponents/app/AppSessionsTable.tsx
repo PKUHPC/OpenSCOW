@@ -1,3 +1,15 @@
+/**
+ * Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
+ * SCOW is licensed under Mulan PSL v2.
+ * You can use this software according to the terms and conditions of the Mulan PSL v2.
+ * You may obtain a copy of Mulan PSL v2 at:
+ *          http://license.coscl.org.cn/MulanPSL2
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+ * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+ * See the Mulan PSL v2 for more details.
+ */
+
 import { Form, Popconfirm, Space, Table, TableColumnsType } from "antd";
 import Router, { useRouter } from "next/router";
 import { join } from "path";
@@ -9,6 +21,7 @@ import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import type { AppSession } from "src/generated/portal/app";
 import { useMessage } from "src/layouts/prompts";
+import { compareState } from "src/models/job";
 import { ConnectTopAppLink } from "src/pageComponents/app/ConnectToAppLink";
 import { AppsStore } from "src/stores/AppsStore";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
@@ -53,22 +66,26 @@ export const AppSessionsTable: React.FC<Props> = () => {
       title: "作业ID",
       dataIndex: "jobId",
       sorter: (a, b) => compareNumber(a.jobId, b.jobId),
-      defaultSortOrder: "descend",
     },
     {
       title: "应用",
       dataIndex: "appId",
       render: (appId: string) => apps.find((x) => x.id === appId)?.name ?? appId,
+      sorter: (a, b) => (!a.submitTime || !b.submitTime) ? -1 : compareDateTime(a.submitTime, b.submitTime),
     },
     {
       title: "提交时间",
       dataIndex: "submitTime",
       render: (_, record) => record.submitTime ? formatDateTime(record.submitTime) : "",
-      sorter: (a, b) => (!a.submitTime || !b.submitTime) ? -1 : compareDateTime(a.submitTime, b.submitTime),
     },
     {
       title: "状态",
       dataIndex: "state",
+      sorter: (a, b) => compareState (a.state, b.state) 
+        ? compareState (a.state, b.state) : 
+        compareNumber(a.jobId, b.jobId),
+      defaultSortOrder: "descend",
+
     },
 
     {

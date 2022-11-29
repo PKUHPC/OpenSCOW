@@ -18,6 +18,7 @@ importers:
       eslint: 8.28.0
       eslint-import-resolver-typescript: 3.5.2
       eslint-plugin-import: 2.26.0
+      eslint-plugin-license-header: 0.6.0
       eslint-plugin-simple-import-sort: 8.0.0
       husky: 8.0.2
       jest: 29.3.1
@@ -46,6 +47,7 @@ importers:
       eslint: 8.28.0
       eslint-import-resolver-typescript: 3.5.2_ktrec6dplf4now6nlbc6d67jee
       eslint-plugin-import: 2.26.0_vc54pluhgv7booofyyjouvuf74
+      eslint-plugin-license-header: 0.6.0
       eslint-plugin-simple-import-sort: 8.0.0_eslint@8.28.0
       husky: 8.0.2
       jest: 29.3.1_odkjkoia5xunhxkdrka32ib6vi
@@ -7413,6 +7415,37 @@ packages:
       - supports-color
     dev: true
 
+  /eslint-plugin-license-header/0.6.0:
+    resolution: {integrity: sha512-IEywStBWaDBDMkogYoKUAdaOuomZ+YaQmdoSD2vHmXobekM+XuP6SWLlvwUUhIbdocn3MTlb5CUJ8E4VHz1c/w==}
+    dependencies:
+      requireindex: 1.2.0
+    dev: true
+
+  /eslint-plugin-react/7.31.10_eslint@8.28.0:
+    resolution: {integrity: sha512-e4N/nc6AAlg4UKW/mXeYWd3R++qUano5/o+t+wnWxIf+bLsOaH3a4q74kX3nDjYym3VBN4HyO9nEn1GcAqgQOA==}
+    engines: {node: '>=4'}
+    requiresBuild: true
+    peerDependencies:
+      eslint: ^3 || ^4 || ^5 || ^6 || ^7 || ^8
+    dependencies:
+      array-includes: 3.1.6
+      array.prototype.flatmap: 1.3.1
+      doctrine: 2.1.0
+      eslint: 8.28.0
+      estraverse: 5.3.0
+      jsx-ast-utils: 3.3.3
+      minimatch: 3.1.2
+      object.entries: 1.1.6
+      object.fromentries: 2.0.6
+      object.hasown: 1.1.2
+      object.values: 1.1.6
+      prop-types: 15.8.1
+      resolve: 2.0.0-next.4
+      semver: 6.3.0
+      string.prototype.matchall: 4.0.8
+    dev: true
+    optional: true
+
   /eslint-plugin-simple-import-sort/8.0.0_eslint@8.28.0:
     resolution: {integrity: sha512-bXgJQ+lqhtQBCuWY/FUWdB27j4+lqcvXv5rUARkzbeWLwea+S5eBZEQrhnO+WgX3ZoJHVj0cn943iyXwByHHQw==}
     peerDependencies:
@@ -12864,6 +12897,11 @@ packages:
   /require-main-filename/2.0.0:
     resolution: {integrity: sha512-NKN5kMDylKuldxYLSUfrbo5Tuzh4hd+2E8NPPX02mZtn1VuREQToYe/ZdlJy+J3uCpfaiGF05e7B8W0iXbQHmg==}
     dev: false
+
+  /requireindex/1.2.0:
+    resolution: {integrity: sha512-L9jEkOi3ASd9PYit2cwRfyppc9NoABujTP8/5gFcbERmo5jUoAKovIC3fsF17pkTnGsrByysqX+Kxd2OTNI1ww==}
+    engines: {node: '>=0.10.5'}
+    dev: true
 
   /requires-port/1.0.0:
     resolution: {integrity: sha512-KigOCHcocU3XODJxsu8i/j8T9tzT4adHiecwORRQ0ZZFcp7ahwXuRU1m+yuO90C5ZUyGeGfocHDI14M3L3yDAQ==}

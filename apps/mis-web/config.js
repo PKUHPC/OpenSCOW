@@ -3,6 +3,7 @@
 const { envConfig, getConfigFromFile, parseKeyValue, regex, str, bool } = require("@scow/lib-config");
 const { getClusterConfigs } = require("@scow/config/build/cluster");
 const { getMisConfig } = require("@scow/config/build/mis");
+const { getCommonConfig } = require("@scow/config/build/common");
 const { getClusterTextsConfig } = require("@scow/config/build/clusterTexts");
 const { DEFAULT_PRIMARY_COLOR, getUiConfig } = require("@scow/config/build/ui");
 const { PHASE_DEVELOPMENT_SERVER, PHASE_PRODUCTION_BUILD, PHASE_PRODUCTION_SERVER } = require("next/constants");
@@ -66,6 +67,8 @@ const buildRuntimeConfig = async (phase) => {
   const uiConfig = getUiConfig(basePath);
   const misConfig = getMisConfig(basePath);
 
+  const commonConfig = getCommonConfig(basePath);
+
   /**
    * @type {import ("./src/utils/config").ServerRuntimeConfig}
    */
@@ -102,6 +105,9 @@ const buildRuntimeConfig = async (phase) => {
     USERID_PATTERN_MESSAGE: misConfig.userIdPattern?.errorMessage,
 
     PORTAL_URL: config.PORTAL_DEPLOYED ? join(config.BASE_PATH, config.PORTAL_URL || misConfig.portalUrl || "") : undefined,
+
+    PASSWORD_PATTERN: commonConfig.passwordPattern?.regex,
+    PASSWORD_PATTERN_MESSAGE: commonConfig.passwordPattern?.errorMessage,
   };
 
   if (!building) {

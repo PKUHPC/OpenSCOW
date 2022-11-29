@@ -1,3 +1,15 @@
+/**
+ * Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
+ * SCOW is licensed under Mulan PSL v2.
+ * You can use this software according to the terms and conditions of the Mulan PSL v2.
+ * You may obtain a copy of Mulan PSL v2 at:
+ *          http://license.coscl.org.cn/MulanPSL2
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+ * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+ * See the Mulan PSL v2 for more details.
+ */
+
 import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { status } from "@grpc/grpc-js";
@@ -21,13 +33,17 @@ export interface CreateUserSchema {
 
     /**
      * 密码
-     * @pattern ^(?=.*\d)(?=.*[a-zA-Z])(?=.*[`~!@#\$%^&*()_+\-[\];',./{}|:"<>?]).{9,}$
      */
     password: string;
   }
 
   responses: {
     204: null;
+
+    400: {
+      code: "PASSWORD_NOT_VALID";
+      message: string | undefined;
+    }
 
     /** 用户已经存在 */
     409: null;
@@ -36,6 +52,8 @@ export interface CreateUserSchema {
     501: null;
   }
 }
+
+const passwordPattern = publicConfig.PASSWORD_PATTERN && new RegExp(publicConfig.PASSWORD_PATTERN);
 
 export default /* #__PURE__*/route<CreateUserSchema>("CreateUserSchema", async (req, res) => {
 
@@ -53,6 +71,10 @@ export default /* #__PURE__*/route<CreateUserSchema>("CreateUserSchema", async (
   const info = await auth(req, res);
 
   if (!info) { return; }
+
+  if (passwordPattern && !passwordPattern.test(password)) {
+    return { 400: { code: "PASSWORD_NOT_VALID", message: publicConfig.PASSWORD_PATTERN_MESSAGE } };
+  }
 
   // create user on server
   const client = getClient(UserServiceClient);

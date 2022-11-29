@@ -1,3 +1,15 @@
+/**
+ * Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
+ * SCOW is licensed under Mulan PSL v2.
+ * You can use this software according to the terms and conditions of the Mulan PSL v2.
+ * You may obtain a copy of Mulan PSL v2 at:
+ *          http://license.coscl.org.cn/MulanPSL2
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+ * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+ * See the Mulan PSL v2 for more details.
+ */
+
 import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import { changePassword as libChangePassword } from "@scow/lib-auth";
 import { authenticate } from "src/auth/server";
@@ -10,15 +22,17 @@ export interface ChangePasswordSchema {
 
   body: {
     oldPassword: string;
-    /**
-     * @pattern ^(?=.*\d)(?=.*[a-zA-Z])(?=.*[`~!@#\$%^&*()_+\-[\];',./{}|:"<>?]).{8,}$
-     */
     newPassword: string;
   };
 
   responses: {
     /** 更改成功 */
     204: null;
+
+    400: {
+      code: "PASSWORD_NOT_VALID";
+      message: string | undefined;
+    }
 
     /** 用户未找到 */
     404: null;
@@ -31,6 +45,7 @@ export interface ChangePasswordSchema {
   }
 }
 
+const passwordPattern = publicConfig.PASSWORD_PATTERN && new RegExp(publicConfig.PASSWORD_PATTERN);
 
 export default /* #__PURE__*/route<ChangePasswordSchema>("ChangePasswordSchema", async (req, res) => {
 
@@ -45,6 +60,10 @@ export default /* #__PURE__*/route<ChangePasswordSchema>("ChangePasswordSchema",
   if (!info) { return; }
 
   const { newPassword, oldPassword } = req.body;
+
+  if (passwordPattern && !passwordPattern.test(newPassword)) {
+    return { 400: { code: "PASSWORD_NOT_VALID", message: publicConfig.PASSWORD_PATTERN_MESSAGE } };
+  }
 
   return await libChangePassword(runtimeConfig.AUTH_INTERNAL_URL, {
     identityId: info.identityId,
