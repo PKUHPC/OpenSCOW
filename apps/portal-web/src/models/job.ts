@@ -59,7 +59,7 @@ export function runningJobId(r: RunningJobInfo) {
 }
 
 export function compareState(a: string, b: string): -1 | 0 | 1 {
-  const endState = "ENDING";
+  const endState = "ENDED";
   if (a === b || (a !== endState && b !== endState)) { return 0; }
   if (a === endState) { return -1; }
   return 1;
