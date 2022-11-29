@@ -48,23 +48,21 @@ export const initServiceServer = plugin((server) => {
     },
 
     createInitAdmin: async ({ request, em }) => {
-
-      let result = false;
-
-      // get default tenant
-      const tenant = await em.findOneOrFail(Tenant, { name: DEFAULT_TENANT_NAME });
-
-      // new the user
       const { userId, email, name, password, existsInAuth } = request;
-      const user = new User({
-        email, name, tenant, userId,
-        platformRoles: [PlatformRole.PLATFORM_ADMIN], tenantRoles: [TenantRole.TENANT_ADMIN],
-      });
+
       if (server.ext.capabilities.getUser && !existsInAuth && !server.ext.capabilities.createUser) {
         // 认证系统支持查询用户,且不存在于认证系统，且认证系统不支持创建用户
-        result = false;
-      }
-      else {
+        return [{ createdResult: false }];
+      } else {
+        // get default tenant
+        const tenant = await em.findOneOrFail(Tenant, { name: DEFAULT_TENANT_NAME });
+
+        // new the user
+        const user = new User({
+          email, name, tenant, userId,
+          platformRoles: [PlatformRole.PLATFORM_ADMIN], tenantRoles: [TenantRole.TENANT_ADMIN],
+        });
+
         // 认证系统支持查询 && 存在于认证系统
         // 认证系统支持查询 && 不存在于认证系统 && 认证系统支持创建用户
         // 认证系统不支持查询 
@@ -72,9 +70,9 @@ export const initServiceServer = plugin((server) => {
         await createUserInDatabase(user, password, server.logger, em);
         if (existsInAuth) {
           // 认证系统存在则无需下一步
-          result = true;
-        }
-        else {
+          return [{ createdResult: true }];
+        } else {
+          let result = true;
           // 认证系统中不存在 && 认证系统支持创建
           // 认证系统不支持查询
           // -> 都要尝试创建
@@ -95,11 +93,10 @@ export const initServiceServer = plugin((server) => {
 
               throw <ServiceError> { code: Status.INTERNAL, message: `Error creating user ${user.id} in auth.` };
             });
+          
+          return [{ createdResult: result }];
         }
       }
-      return [{
-        createdResult: result,
-      }];
     },
 
     setAsInitAdmin: async ({ request, em }) => {

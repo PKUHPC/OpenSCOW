@@ -30,7 +30,7 @@ afterEach(async () => {
   await server.close();
 });
 
-it("Test a user exists scow", async () => {
+it("Test function userExist", async () => {
   const identityId = "test01";
   const name = "test01";
   const email = "test01@test01.com";
