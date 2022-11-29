@@ -7,7 +7,7 @@ on:
     branches: [master]
 
 jobs:
-  build:
+  push-branch:
     name: Push deploy/ to scow-deployment
     runs-on: ubuntu-latest
     steps:
@@ -28,3 +28,16 @@ jobs:
           user_email: 41898282+github-actions[bot]@users.noreply.github.com
           external_repository: PKUHPC/scow-deployment
           publish_branch: ${{ github.ref_name }}
+
+  clean-branch:
+    name: Delete PR branch when PR is merged
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name }} == "pull_request" && ${{ github.event.action }} == "closed"
+    steps:
+      - name: Delete scow-deployment PR branch
+        uses: dawidd6/action-delete-branch@v3
+        with:
+          github_token: ${{ secrets.SCOW_DEPLOYMENT_PAT }}
+          owner: PKUHPC
+          repository: scow-deployment
+          branches: ${{ github.ref_name }}
