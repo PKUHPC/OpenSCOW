@@ -1,5 +1,6 @@
 import { parseClusterUsers } from "src/utils/slurm";
 
+
 const dataStr = "a_user1\nuser1 : allowed!\nuser2 : blocked!\n\naccount2\nuser2:allowed!\nuser3:blocked!\n";
 
 it("test whether the string from 'slurm.sh -l all' can be parsed successfully", async () => {

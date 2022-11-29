@@ -66,6 +66,4 @@ export const fetchPlugin = plugin(async (f) => {
     lastFetched: () => lastFetched,
     fetch: trigger,
   });
-
-  // f.ext.fetch
 });

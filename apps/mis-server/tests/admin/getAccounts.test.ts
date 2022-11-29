@@ -7,6 +7,7 @@ import { AccountServiceClient } from "src/generated/server/account";
 import { InitialData, insertInitialData } from "tests/data/data";
 import { dropDatabase } from "tests/data/helpers";
 
+
 let server: Server;
 let data: InitialData;
 
