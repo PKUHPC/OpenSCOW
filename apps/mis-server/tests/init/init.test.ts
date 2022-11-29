@@ -42,10 +42,10 @@ it("Test a user exists scow", async () => {
     platformRoles: [PlatformRole.PLATFORM_ADMIN], tenantRoles: [TenantRole.TENANT_ADMIN],
   });
   await createUserInDatabase(user, password, server.logger, em);
-  const isExistResult = await asyncClientCall(client, "userExists", {
+  const result = await asyncClientCall(client, "userExists", {
     userId: identityId,
   });
-  expect(isExistResult.existsInScow).toBe(true);
+  expect(result.existsInScow).toBe(true);
 });
 
 it("To test whether the slurm.sh is automatically copied successfully", async () => {
