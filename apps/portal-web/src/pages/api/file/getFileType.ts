@@ -15,7 +15,7 @@ export interface GetFileTypeSchema {
     };
 
     responses: {
-      200: { type: "dir" | "file" };
+      200: { type: string };
       400: { code: "INVALID_CLUSTER" | "INVALID_PATH" };
     };
 }
