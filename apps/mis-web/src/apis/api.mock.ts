@@ -191,7 +191,7 @@ export const mockApi: MockApi<typeof api> = {
   getIcon: async () => undefined,
 
   createInitAdmin: async () => ({
-    createdResult: true,
+    createdResult: false,
   }),
 
   importUsers: async () => null,
