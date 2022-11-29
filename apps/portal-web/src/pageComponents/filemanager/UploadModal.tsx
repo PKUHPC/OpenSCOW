@@ -53,7 +53,13 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
               modal.confirm({
                 title: "文件已存在",
                 content: `文件${file.name}已存在，是否覆盖？`,
-                onOk: () => { resolve(file); },
+                okText: "确认",
+                onOk: async () => {
+                  const fileType = await api.getFileType({ query:{ cluster: cluster, path: join(path, file.name) } });
+                  const deleteOperation = fileType.type === "dir" ? api.deleteDir : api.deleteFile;
+                  await deleteOperation({ body: { cluster: cluster, path: join(path, file.name) } })
+                    .then(() => resolve(file));
+                },
                 onCancel: () => { reject(file); },
               });
             } else {

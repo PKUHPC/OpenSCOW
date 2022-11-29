@@ -199,7 +199,8 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
           content: `文件${filename}已存在，是否覆盖？`,
           okText: "确认",
           onOk: async () => {
-            const deleteOperation = operation.selected[0].type === "dir" ? api.deleteDir : api.deleteFile;
+            const fileType = await api.getFileType({ query: { cluster, path: fromPath } });
+            const deleteOperation = fileType.type === "dir" ? api.deleteDir : api.deleteFile;
             await deleteOperation({ body: { cluster: cluster, path: toPath } })
               .then(() => {
                 return pasteOneFile(fromPath, toPath);
@@ -224,7 +225,8 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
           content: `文件${x.name}已存在，是否覆盖？`,
           okText: "确认",
           onOk: async () => {
-            const deleteOperation = x.type === "dir" ? api.deleteDir : api.deleteFile;
+            const fileType = await api.getFileType({ query: { cluster, path: join(path, x.name) } });
+            const deleteOperation = fileType.type === "dir" ? api.deleteDir : api.deleteFile;
             await deleteOperation({ body: { cluster: cluster, path: join(path, x.name) } })
               .then(() => {
                 return pasteFiles(x, join(operation.originalPath, x.name), join(path, x.name));
