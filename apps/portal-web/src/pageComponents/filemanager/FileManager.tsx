@@ -207,8 +207,8 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
       const isExist = await api.fileExist({ query: { cluster, path: toPath } });
       if (isExist.result) {
         modal.confirm({
-          title: "文件已存在",
-          content: `文件${filename}已存在，是否覆盖？`,
+          title: "文件/目录已存在",
+          content: `文件/目录${filename}已存在，是否覆盖？`,
           okText: "确认",
           onOk: async () => {
             const fileType = await api.getFileType({ query: { cluster, path: toPath } });
@@ -233,8 +233,8 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
       const isExist = await api.fileExist({ query: { cluster, path: join(path, x.name) } });
       if (isExist) {
         modal.confirm({
-          title: "文件已存在",
-          content: `文件${x.name}已存在，是否覆盖？`,
+          title: "文件/目录已存在",
+          content: `文件/目录${x.name}已存在，是否覆盖？`,
           okText: "确认",
           onOk: async () => {
             const fileType = await api.getFileType({ query: { cluster, path: join(path, x.name) } });
@@ -274,6 +274,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
     const files = keysToFiles(selectedKeys);
     modal.confirm({
       title: "确认删除",
+      okText: "确认",
       content: `确认要删除选中的${files.length}项？`,
       onOk: async () => {
         await Promise.allSettled(files.map(async (x) => {
@@ -523,6 +524,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
                   title: "确认删除",
                   // icon: < />,
                   content: `确认删除${fullPath}？`,
+                  okText: "确认",
                   onOk: async () => {
                     await (i.type === "file" ? api.deleteFile : api.deleteDir)({
                       body: {

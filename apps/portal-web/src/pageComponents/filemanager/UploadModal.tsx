@@ -63,8 +63,8 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
             const isExist = await api.fileExist({ query:{ cluster: cluster, path: join(path, file.name) } });
             if (isExist.result) {
               modal.confirm({
-                title: "文件已存在",
-                content: `文件${file.name}已存在，是否覆盖？`,
+                title: "文件/目录已存在",
+                content: `文件/目录${file.name}已存在，是否覆盖？`,
                 okText: "确认",
                 onOk: async () => {
                   const fileType = await api.getFileType({ query:{ cluster: cluster, path: join(path, file.name) } });
