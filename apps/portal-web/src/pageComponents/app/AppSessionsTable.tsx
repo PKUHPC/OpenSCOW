@@ -62,6 +62,11 @@ export const AppSessionsTable: React.FC<Props> = () => {
     }, [cluster]),
   });
 
+  setTimeout(() => {
+    message.success("刷新应用列表成功");
+    reload(); 
+  }, 10000); 
+
   const columns: TableColumnsType<AppSession> = [
     {
       title: "会话ID",
