@@ -12,6 +12,7 @@ import { useMessage } from "src/layouts/prompts";
 import { ConnectTopAppLink } from "src/pageComponents/app/ConnectToAppLink";
 import { AppsStore } from "src/stores/AppsStore";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
+import { compareState } from "src/utils/appState";
 import { publicConfig } from "src/utils/config";
 import { compareDateTime, formatDateTime } from "src/utils/datetime";
 import { compareNumber } from "src/utils/math";
@@ -53,7 +54,6 @@ export const AppSessionsTable: React.FC<Props> = () => {
       title: "作业ID",
       dataIndex: "jobId",
       sorter: (a, b) => compareNumber(a.jobId, b.jobId),
-      defaultSortOrder: "descend",
     },
     {
       title: "应用",
@@ -68,15 +68,11 @@ export const AppSessionsTable: React.FC<Props> = () => {
     {
       title: "状态",
       dataIndex: "state",
-      sorter: (a, b) => {
-        if (a.state !== b.state && (a.state === "RUNNING" || b.state === "RUNNING")) {
-          return a.state === "RUNNING" ? 1 : -1;
-        } else if (a.state !== b.state && (a.state === "PENDING" || b.state === "PENDING")) {
-          return a.state === "PENDING" ? 1 : -1;
-        } else {
-          return (!a.submitTime || !b.submitTime) ? -1 : compareDateTime(a.submitTime, b.submitTime);
-        }
-      },
+      sorter: (a, b) => compareState (a.state, b.state) 
+        ? compareState (a.state, b.state) : 
+        compareNumber(a.jobId, b.jobId),
+      defaultSortOrder: "descend",
+
     },
 
     {
