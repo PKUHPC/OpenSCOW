@@ -126,6 +126,7 @@ message GetFileMetadataRequest {
 
 message GetFileMetadataResponse {
   uint32 size = 1;
+  string type = 2;
 }
 
 message ExistsRequest {

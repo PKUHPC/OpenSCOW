@@ -2,6 +2,7 @@ import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { Server } from "@ddadaal/tsgrpc-server";
 import { credentials, status } from "@grpc/grpc-js";
 import { sftpStat } from "@scow/lib-ssh";
+import { utc } from "dayjs";
 import { createServer } from "src/app";
 import { FileServiceClient } from "src/generated/portal/file";
 
@@ -27,7 +28,7 @@ afterEach(async () => {
   await server.close();
 });
 
-it("gets file metadata", async () => {
+it("gets file size", async () => {
 
   const reply = await asyncUnaryCall(client, "getFileMetadata", {
     cluster, userId, path: actualPath("test1"),
@@ -44,4 +45,12 @@ it("returns error if file is not accessible", async () => {
   }), (e) => {
     expect(e.code).toBe(status.PERMISSION_DENIED);
   });
+});
+
+it("gets file type", async () => {
+  const reply = await asyncUnaryCall(client, "getFileMetadata", {
+    cluster, userId, path: actualPath("test1"),
+  });
+
+  expect(reply.type).toBe("file");
 });

@@ -332,7 +332,7 @@ export const fileServiceServer = plugin((server) => {
           };
         });
 
-        return [{ size: stat.size }];
+        return [{ size: stat.size, type: stat.isDirectory() ? "dir" : "file" }];
       });
     },
 
