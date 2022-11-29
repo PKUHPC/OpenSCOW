@@ -19,6 +19,7 @@ export interface CreateInitAdminSchema {
   responses: {
     200: {
       created: boolean,
+      errorType: string | undefined,
     }
     204: null;
 
@@ -51,7 +52,8 @@ export default route<CreateInitAdminSchema>("CreateInitAdminSchema", async (req)
   });
 
   return { 
-    created: created,
+    created: created.created,
+    errorType: created.errorType,
   };
 
 });

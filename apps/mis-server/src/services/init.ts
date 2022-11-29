@@ -71,6 +71,7 @@ export const initServiceServer = plugin((server) => {
         return [{ created: true }];
       } 
       let result = true;
+      let errorType: string | undefined;
       // 认证系统中不存在 && 认证系统支持创建
       // 认证系统不支持查询
       // -> 都要尝试创建
@@ -79,20 +80,24 @@ export const initServiceServer = plugin((server) => {
         { identityId: user.userId, id: user.id, mail: user.email, name: user.name, password }, server.logger)
       // If the call of creating user of auth fails,  delete the user created in the database.
         .catch(async (e) => {
-          result = false;
-          await em.removeAndFlush(user);
-          if (e.status === 409) {
+
+          if (e.status !== 409) {
+            result = false;
+            await em.removeAndFlush(user);
+          } else {
+            errorType = "409";
             throw <ServiceError>{
               code: Status.ALREADY_EXISTS, message:`User with id ${user.name} already exists.`,
-            };
+            }; 
           }
-
           server.logger.error("Error creating user in auth.", e);
-
           throw <ServiceError> { code: Status.INTERNAL, message: `Error creating user ${user.id} in auth.` };
         });
           
-      return [{ created: result }];
+      return [{ 
+        created: result,
+        errorType: errorType,
+      }];
     },
 
     setAsInitAdmin: async ({ request, em }) => {

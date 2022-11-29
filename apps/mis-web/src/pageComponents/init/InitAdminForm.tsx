@@ -75,9 +75,16 @@ export const InitAdminForm: React.FC = () => {
         onOk: async () => {
           await api.createInitAdmin(
             { body: { email, identityId, name, password, existsInAuth: result.existsInAuth } })
-            .then((created) => {
-              if (created.created) {
-                message.success("添加完成！");
+            .then((createdResult) => {
+              if (createdResult.created) {
+                createdResult.errorType === undefined ? message.success("添加完成！")
+                  : Modal.confirm({
+                    title: "添加成功",
+                    content: "此用户存在于认证系统中，已成功添加到SCOW数据库",
+                    okText: "确认",
+                    onOk: async () => {},
+                    onCancel: async () => {},
+                  });
                 form.resetFields();
               } else { 
                 Modal.confirm({
