@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Form, Popconfirm, Space, Table, TableColumnsType } from "antd";
+import { Button, Form, Popconfirm, Space, Table, TableColumnsType } from "antd";
 import Router, { useRouter } from "next/router";
 import { join } from "path";
 import React, { useCallback } from "react";
@@ -135,6 +135,11 @@ export const AppSessionsTable: React.FC<Props> = () => {
                 router.push({ pathname: router.pathname, query: { cluster: cluster.id } });
               }}
             />
+          </Form.Item>
+          <Form.Item>
+            <Space>
+              <Button loading={isLoading} onClick={reload}>刷新</Button>
+            </Space>
           </Form.Item>
         </Form>
       </FilterFormContainer>
