@@ -312,7 +312,7 @@ export const userServiceServer = plugin((server) => {
       }
       // creat user in database
       const user = new User({ name, userId: identityId, tenant, email });
-      await createUserInDatabase(user, logger, em);
+      await createUserInDatabase(user, password, logger, em);
 
       // call auth
       await createUser(misConfig.authUrl, { identityId, id: user.id, mail: email, name, password }, logger)

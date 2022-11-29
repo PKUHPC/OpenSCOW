@@ -9,14 +9,6 @@ import { TenantServiceClient } from "src/generated/server/tenant";
 import { insertInitialData } from "tests/data/data";
 import { dropDatabase } from "tests/data/helpers";
 
-jest.mock("@scow/lib-auth", () => ({
-  getCapabilities: jest.fn(async () => ({
-    createUser: true,
-    changePassword: true,
-    validateName: true,
-  })),
-}));
-
 let server: Server;
 let client: TenantServiceClient;
 

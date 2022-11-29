@@ -14,14 +14,6 @@ import { clearAndClose, dropDatabase } from "tests/data/helpers";
 
 import testData from "./testData.json";
 
-jest.mock("@scow/lib-auth", () => ({
-  getCapabilities: jest.fn(async () => ({
-    createUser: true,
-    changePassword: true,
-    validateName: true,
-  })),
-}));
-
 let data: InitialData;
 let server: Server;
 let jobTableOrm: Awaited<ReturnType<typeof createSourceDbOrm>>;

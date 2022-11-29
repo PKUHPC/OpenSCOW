@@ -13,10 +13,13 @@ export interface CreateInitAdminSchema {
     name: string;
     email: string;
     password: string;
-    existsInAuth: boolean;
+    existsInAuth: boolean | undefined;
   };
 
   responses: {
+    200: {
+      createdResult: boolean,
+    }
     204: null;
 
     400: { code: "USER_ID_NOT_VALID" };
@@ -43,11 +46,13 @@ export default route<CreateInitAdminSchema>("CreateInitAdminSchema", async (req)
   }
 
   const client = getClient(InitServiceClient);
-  await asyncClientCall(client, "createInitAdmin", {
+  const createdResult = await asyncClientCall(client, "createInitAdmin", {
     email, name, userId: identityId, password, existsInAuth,
   });
 
-  return { 204: null };
+  return { 
+    createdResult: createdResult,
+  };
 
 });
 

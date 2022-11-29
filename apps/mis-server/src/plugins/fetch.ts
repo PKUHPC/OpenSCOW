@@ -1,4 +1,5 @@
 import { plugin } from "@ddadaal/tsgrpc-server";
+import { Server } from "@grpc/grpc-js";
 import { getCapabilities } from "@scow/lib-auth";
 import cron from "node-cron";
 import { misConfig } from "src/config/mis";

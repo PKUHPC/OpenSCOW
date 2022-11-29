@@ -2,10 +2,8 @@ import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError, status } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { UniqueConstraintViolationException } from "@mikro-orm/core";
-import { createUser } from "@scow/lib-auth";
-import { insertKeyAsUser, sshRawConnectByPassword } from "@scow/lib-ssh";
+import { createUser, getUser } from "@scow/lib-auth";
 import { clusters } from "src/config/clusters";
-import { rootKeyPair } from "src/config/env";
 import { misConfig } from "src/config/mis";
 import { SystemState } from "src/entities/SystemState";
 import { Tenant } from "src/entities/Tenant";
@@ -25,27 +23,39 @@ export const initServiceServer = plugin((server) => {
     },
 
     userExists: async ({ request, em }) => {
-      const { name, password, userId } = request;
-      let existsInAuth = true;
+      const { userId } = request;
 
       // Check whether the user already exists in scow
       const user = await em.findOne(User, { userId, tenant: { name: DEFAULT_TENANT_NAME } });
 
-      const cluster = Object.values(clusters).find((c) => c.misIgnore === false);
-      const node = cluster!.slurm.loginNodes[0];
-      try {
-        await sshRawConnectByPassword(node, name, password, server.logger);
-      } catch (e) {
-        existsInAuth = false;
+      if (server.ext.capabilities.getUser) {
+        const cluster = Object.values(clusters).find((c) => c.misIgnore === false);
+        const node = cluster!.slurm.loginNodes[0];
+        const userInfo = await getUser(node, { identityId: userId }, server.logger);
+        return [{
+          existsInScow: !!user,
+          existsInAuth: !!userInfo,
+          getUserCapability: true,
+        }];
       }
 
+      // 如果不支持查询，则直接返回existsInAuth: undefined
       return [{
         existsInScow: !!user,
-        existsInAuth: existsInAuth,
+        existsInAuth: undefined,
+        getUserCapability: false,
       }];
+      // return [{
+      //   existsInScow: true,
+      //   existsInAuth: false,
+      //   getUserCapability: false,
+      // }];
     },
 
     createInitAdmin: async ({ request, em }) => {
+
+      let result = false;
+
       // get default tenant
       const tenant = await em.findOneOrFail(Tenant, { name: DEFAULT_TENANT_NAME });
 
@@ -55,53 +65,44 @@ export const initServiceServer = plugin((server) => {
         email, name, tenant, userId,
         platformRoles: [PlatformRole.PLATFORM_ADMIN], tenantRoles: [TenantRole.TENANT_ADMIN],
       });
-
-      if (existsInAuth) {
-        // If the user exists, write it directly to the database
-        await createUserInDatabase(user, server.logger, em);
+      if (server.ext.capabilities.getUser && !existsInAuth && !server.ext.capabilities.createUser) {
+        // 认证系统支持查询用户,且不存在于认证系统，且认证系统不支持创建用户
+        result = false;
       }
-      else if (server.ext.capabilities.createUser) {
-
-        // If the user does not exist in Auth, create the user in database firstly
-        await createUserInDatabase(user, server.logger, em);
-
-        // call auth
-        await createUser(misConfig.authUrl,
-          { identityId: user.userId, id: user.id, mail: user.email, name: user.name, password }, server.logger)
-        // If the call of creating user of auth fails,  delete the user created in the database.
-          .catch(async (e) => {
-            await em.removeAndFlush(user);
-            if (e.status === 409) {
-              throw <ServiceError>{
-                code: Status.ALREADY_EXISTS, message:`User with id ${user.name} already exists.`,
-              };
-            }
-
-            server.logger.error("Error creating user in auth.", e);
-
-            throw <ServiceError> { code: Status.INTERNAL, message: `Error creating user ${user.id} in auth.` };
-          });
-        
-        // Making an ssh Request to the login node as the user created.
-        if (process.env.NODE_ENV === "production") {
-          await Promise.all(Object.values(clusters).map(async ({ displayName, slurm, misIgnore }) => {
-            if (misIgnore) { return; }
-            const node = slurm.loginNodes[0];
-            server.logger.info("Checking if user can login to %s by login node %s", displayName, node);
-
-            const error = await insertKeyAsUser(node, user.name, password, rootKeyPair, server.logger).catch((e) => e);
-            if (error) {
-              server.logger
-                .info("user %s cannot login to %s by login node %s. err: %o", name, displayName, node, error);
-              throw error;
-            } else {
-              server.logger.info("user %s login to %s by login node %s", name, displayName, node);
-            }
-          }));
+      else {
+        // 认证系统支持查询 && 存在于认证系统
+        // 认证系统支持查询 && 不存在于认证系统 && 认证系统支持创建用户
+        // 认证系统不支持查询 
+        // -> 都要在数据库进行创建
+        await createUserInDatabase(user, password, server.logger, em);
+        if (existsInAuth) {
+          // 认证系统存在则无需下一步
+          result = true;
         }
+        else {
+          // 认证系统不存在 && 认证系统支持创建 -> 则尝试创建
+          // call auth
+          await createUser(misConfig.authUrl,
+            { identityId: user.userId, id: user.id, mail: user.email, name: user.name, password }, server.logger)
+          // If the call of creating user of auth fails,  delete the user created in the database.
+            .catch(async (e) => {
+              result = false;
+              await em.removeAndFlush(user);
+              if (e.status === 409) {
+                throw <ServiceError>{
+                  code: Status.ALREADY_EXISTS, message:`User with id ${user.name} already exists.`,
+                };
+              }
 
+              server.logger.error("Error creating user in auth.", e);
+
+              throw <ServiceError> { code: Status.INTERNAL, message: `Error creating user ${user.id} in auth.` };
+            });
+        }
       }
-      return [{}];
+      return [{
+        createdResult: result,
+      }];
     },
 
     setAsInitAdmin: async ({ request, em }) => {

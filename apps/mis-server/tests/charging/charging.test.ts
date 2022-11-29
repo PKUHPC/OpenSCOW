@@ -14,14 +14,6 @@ import { range } from "src/utils/array";
 import { reloadEntity } from "src/utils/orm";
 import { dropDatabase } from "tests/data/helpers";
 
-jest.mock("@scow/lib-auth", () => ({
-  getCapabilities: jest.fn(async () => ({
-    createUser: true,
-    changePassword: true,
-    validateName: true,
-  })),
-}));
-
 let server: Server;
 let em: SqlEntityManager;
 let account: Account;

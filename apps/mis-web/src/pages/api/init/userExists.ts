@@ -9,15 +9,13 @@ export interface userExistsSchema {
 
   body: {
     identityId: string;
-    name: string;
-    email: string;
-    password: string
   };
 
   responses: {
     200: { 
       existsInScow: boolean,
-      existsInAuth: boolean,
+      existsInAuth: boolean | undefined,
+      getUserCapability: boolean,
     };
       
     // 204: null;
@@ -31,7 +29,7 @@ const userIdRegex = publicConfig.USERID_PATTERN ? new RegExp(publicConfig.USERID
 
 export default route<userExistsSchema>("userExistsSchema", async (req) => {
 
-  const { email, identityId, name, password } = req.body;
+  const { identityId } = req.body;
 
   if (userIdRegex && !userIdRegex.test(identityId)) {
     return { 400: {
@@ -40,16 +38,18 @@ export default route<userExistsSchema>("userExistsSchema", async (req) => {
     } };
   }
 
+
   const client = getClient(InitServiceClient);
-  const isExist = await asyncClientCall(client, "userExists", {
-    email, name, userId: identityId, password,
+  const result = await asyncClientCall(client, "userExists", {
+    userId: identityId,
   });
 
   return {
     200:
     { 
-      existsInScow: isExist.existsInScow,
-      existsInAuth: isExist.existsInAuth,
+      existsInScow: result.existsInScow,
+      existsInAuth: result.existsInAuth,
+      getUserCapability: result.getUserCapability,
     },
   };
 });

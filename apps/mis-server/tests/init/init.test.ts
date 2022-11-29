@@ -15,15 +15,6 @@ import { createUserInDatabase } from "src/utils/createUser";
 import { reloadEntities, toRef } from "src/utils/orm";
 import { dropDatabase } from "tests/data/helpers";
 
-jest.mock("@scow/lib-auth", () => ({
-  createUser: jest.fn(async () => ({ status: 204, ok: true, text: () => "" })),
-  getCapabilities: jest.fn(async () => ({
-    createUser: true,
-    changePassword: true,
-    validateName: true,
-  })),
-}));
-
 let server: Server;
 let client: InitServiceClient;
 
@@ -50,12 +41,9 @@ it("Test a user exists scow", async () => {
     email, name, tenant, userId: identityId,
     platformRoles: [PlatformRole.PLATFORM_ADMIN], tenantRoles: [TenantRole.TENANT_ADMIN],
   });
-  await createUserInDatabase(user, server.logger, em);
+  await createUserInDatabase(user, password, server.logger, em);
   const isExistResult = await asyncClientCall(client, "userExists", {
     userId: identityId,
-    name: name,
-    email: email,
-    password: password,
   });
   expect(isExistResult.existsInScow).toBe(true);
 });
