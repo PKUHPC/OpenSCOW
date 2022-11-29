@@ -204,8 +204,8 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
       const filename = operation.selected[0].name;
       const fromPath = join(operation.originalPath, filename);
       const toPath = join(path, filename);
-      const isExist = await api.fileExist({ query: { cluster, path: toPath } });
-      if (isExist.result) {
+      const exists = await api.fileExist({ query: { cluster, path: toPath } });
+      if (exists.result) {
         modal.confirm({
           title: "文件/目录已存在",
           content: `文件/目录${filename}已存在，是否覆盖？`,
@@ -213,10 +213,8 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
           onOk: async () => {
             const fileType = await api.getFileType({ query: { cluster, path: toPath } });
             const deleteOperation = fileType.type === "dir" ? api.deleteDir : api.deleteFile;
-            await deleteOperation({ body: { cluster: cluster, path: toPath } })
-              .then(() => {
-                return pasteOneFile(fromPath, toPath);
-              });
+            await deleteOperation({ body: { cluster: cluster, path: toPath } });
+            await pasteOneFile(fromPath, toPath);
           },
           onCancel: () => {
             resetSelectedAndOperation();
@@ -230,8 +228,8 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
     }
 
     await Promise.allSettled(operation.selected.map(async (x) => {
-      const isExist = await api.fileExist({ query: { cluster, path: join(path, x.name) } });
-      if (isExist) {
+      const exists = await api.fileExist({ query: { cluster, path: join(path, x.name) } });
+      if (exists.result) {
         modal.confirm({
           title: "文件/目录已存在",
           content: `文件/目录${x.name}已存在，是否覆盖？`,
@@ -239,10 +237,8 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
           onOk: async () => {
             const fileType = await api.getFileType({ query: { cluster, path: join(path, x.name) } });
             const deleteOperation = fileType.type === "dir" ? api.deleteDir : api.deleteFile;
-            await deleteOperation({ body: { cluster: cluster, path: join(path, x.name) } })
-              .then(() => {
-                return pasteFiles(x, join(operation.originalPath, x.name), join(path, x.name));
-              });
+            await deleteOperation({ body: { cluster: cluster, path: join(path, x.name) } });
+            await pasteFiles(x, join(operation.originalPath, x.name), join(path, x.name));
           },
         });
       } else {
