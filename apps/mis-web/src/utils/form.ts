@@ -11,10 +11,11 @@
  */
 
 import { FormInstance } from "antd";
+import { publicConfig } from "src/utils/config";
 
 export const passwordRule = {
-  pattern: /^(?=.*\d)(?=.*[a-zA-Z])(?=.*[`~!@#\$%^&*()_+\-[\];',./{}|:"<>?]).{8,}$/,
-  message: "必须包含字母、数字和符号，八位及以上",
+  pattern: publicConfig.PASSWORD_PATTERN ? new RegExp(publicConfig.PASSWORD_PATTERN) : undefined,
+  message: publicConfig.PASSWORD_PATTERN_MESSAGE,
 };
 
 

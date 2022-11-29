@@ -10,6 +10,7 @@ const { DEFAULT_PRIMARY_COLOR, getUiConfig } = require("@scow/config/build/ui");
 const { getPortalConfig } = require("@scow/config/build/portal");
 const { getAppConfigs } = require("@scow/config/build/app");
 const { getClusterConfigs } = require("@scow/config/build/cluster");
+const { getCommonConfig } = require("@scow/config/build/common");
 
 /**
  * Get auth capabilities
@@ -81,6 +82,7 @@ const buildRuntimeConfig = async (phase) => {
 
   const uiConfig = getUiConfig(configPath);
   const portalConfig = getPortalConfig(configPath);
+  const commonConfig = getCommonConfig(configPath);
 
   /**
    * @type {import("./src/utils/config").ServerRuntimeConfig}
@@ -101,6 +103,7 @@ const buildRuntimeConfig = async (phase) => {
   const capabilities = await queryCapabilities(config.AUTH_INTERNAL_URL, phase);
 
   const misUrlSetting = config.MIS_URL || portalConfig.misUrl;
+
 
   /**
    * @type {import("./src/utils/config").PublicRuntimeConfig}
@@ -139,6 +142,9 @@ const buildRuntimeConfig = async (phase) => {
     WSPROXY_BASE_PATH: join(config.BASE_PATH, config.WSPROXY_BASE_PATH),
 
     NOVNC_CLIENT_PATH: join(config.BASE_PATH, config.NOVNC_CLIENT_PATH),
+
+    PASSWORD_PATTERN: commonConfig.passwordPattern?.regex,
+    PASSWORD_PATTERN_MESSAGE: commonConfig.passwordPattern?.errorMessage,
   }
 
   if (!building) {

@@ -33,13 +33,17 @@ export interface CreateUserSchema {
 
     /**
      * 密码
-     * @pattern ^(?=.*\d)(?=.*[a-zA-Z])(?=.*[`~!@#\$%^&*()_+\-[\];',./{}|:"<>?]).{9,}$
      */
     password: string;
   }
 
   responses: {
     204: null;
+
+    400: {
+      code: "PASSWORD_NOT_VALID";
+      message: string | undefined;
+    }
 
     /** 用户已经存在 */
     409: null;
@@ -48,6 +52,8 @@ export interface CreateUserSchema {
     501: null;
   }
 }
+
+const passwordPattern = publicConfig.PASSWORD_PATTERN && new RegExp(publicConfig.PASSWORD_PATTERN);
 
 export default /* #__PURE__*/route<CreateUserSchema>("CreateUserSchema", async (req, res) => {
 
@@ -65,6 +71,10 @@ export default /* #__PURE__*/route<CreateUserSchema>("CreateUserSchema", async (
   const info = await auth(req, res);
 
   if (!info) { return; }
+
+  if (passwordPattern && !passwordPattern.test(password)) {
+    return { 400: { code: "PASSWORD_NOT_VALID", message: publicConfig.PASSWORD_PATTERN_MESSAGE } };
+  }
 
   // create user on server
   const client = getClient(UserServiceClient);
