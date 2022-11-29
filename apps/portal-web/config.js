@@ -47,6 +47,8 @@ const specs = {
 
   MIS_DEPLOYED: bool({ desc: "是否部署了管理系统", default: false }),
   MIS_URL: str({ desc: "如果部署了管理系统，设置URL或者路径。相对于整个系统的base path。将会覆盖配置文件。空字符串等价于未部署管理系统", default: "" }),
+
+  NOVNC_CLIENT_PATH: str({ desc: "novnc客户端的URL。相对于整个系统的base path", default: "/vnc" }),
 };
 
 // This config is used to provide env doc auto gen
@@ -135,6 +137,8 @@ const buildRuntimeConfig = async (phase) => {
     PROXY_BASE_PATH: join(config.BASE_PATH, config.PROXY_BASE_PATH),
     RPROXY_BASE_PATH: join(config.BASE_PATH, config.RPROXY_BASE_PATH),
     WSPROXY_BASE_PATH: join(config.BASE_PATH, config.WSPROXY_BASE_PATH),
+
+    NOVNC_CLIENT_PATH: join(config.BASE_PATH, config.NOVNC_CLIENT_PATH),
   }
 
   if (!building) {
