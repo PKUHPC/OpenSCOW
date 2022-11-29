@@ -14,6 +14,7 @@ message CreateInitAdminRequest {
 }
 message CreateInitAdminReply {
   bool created = 1;
+  optional string  error_type = 2;
 }
 
 message CompleteInitRequest {}
