@@ -226,8 +226,9 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
       }
       return;
     }
-
-    await Promise.allSettled(operation.selected.map(async (x) => {
+    
+    let successfulCount:number = 0;
+    for(const x of operation.selected) {
       const exists = await api.fileExist({ query: { cluster, path: join(path, x.name) } });
       if (exists.result) {
         modal.confirm({
@@ -238,32 +239,25 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
             const fileType = await api.getFileType({ query: { cluster, path: join(path, x.name) } });
             const deleteOperation = fileType.type === "dir" ? api.deleteDir : api.deleteFile;
             await deleteOperation({ body: { cluster: cluster, path: join(path, x.name) } });
-            await pasteFiles(x, join(operation.originalPath, x.name), join(path, x.name));
+            await pasteFiles(x, join(operation.originalPath, x.name), join(path, x.name))
+              .then(() => { successfulCount++; })
+              .catch((e) => { message.error(`对文件/目录${x.name}执行${operationText}操作时遇到错误`); });
           },
         });
       } else {
-        pasteFiles(x, join(operation.originalPath, x.name), join(path, x.name));
+        pasteFiles(x, join(operation.originalPath, x.name), join(path, x.name))
+          .then(() => { successfulCount++; })
+          .catch((e) => { message.error(`对文件/目录${x.name}执行${operationText}操作时遇到错误`); });
       }
-    }))
-      .then((successfulInfo) => {
-        const successfulCount = successfulInfo.filter((x) => x).length;
-        const allCount = operation.selected.length;
-        if (successfulCount === allCount) {
-          message.success(`${operationText}${allCount}项成功！`);
-          resetSelectedAndOperation();
-        } else {
-          message.error(`${operationText}成功${successfulCount}项，失败${allCount - successfulCount}项`);
-        }
-      })
-      .catch((e) => {
-        console.log(e);
-        message.error(`执行${operationText}操作时遇到错误`);
-      })
-      .finally(() => {
-        resetSelectedAndOperation();
-        reload();
-      });
-
+    }
+    const allCount = operation.selected.length;
+    if (successfulCount === allCount) {
+      message.success(`${operationText}${allCount}项成功！`);
+    } else {
+      message.error(`${operationText}成功${successfulCount}项，失败${allCount - successfulCount}项`);
+    }
+    resetSelectedAndOperation();
+    reload();
   };
 
   const onDeleteClick = () => {
