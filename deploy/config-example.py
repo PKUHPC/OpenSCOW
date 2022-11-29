@@ -1,3 +1,13 @@
+# Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
+# SCOW is licensed under Mulan PSL v2.
+# You can use this software according to the terms and conditions of the Mulan PSL v2.
+# You may obtain a copy of Mulan PSL v2 at:
+#          http://license.coscl.org.cn/MulanPSL2
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+# EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+# MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+# See the Mulan PSL v2 for more details.
+
 # encoding: utf-8
 
 # ------- 全局通用配置 -------
@@ -17,7 +27,7 @@ COMMON = {
 # ------- 门户系统 -------
 #
 # PORTAL.BASE_PATH: 非必须，默认值为"/"
-#                   若设置则/开头，不要以/结尾. 
+#                   若设置则/开头，不要以/结尾.
 #                   如果BASE_PATH为/root1，PORTAL.BASE_PATH为/root2，那么最终访问门户系统的路径是/root1/root2
 # PORTAL.IMAGE_POSTFIX: 门户系统镜像后缀
 # PORTAL.NOVNC_IMAGE: novnc客户端的镜像地址。一般无需修改
@@ -33,7 +43,7 @@ PORTAL = {
 # ------- 管理系统 -------
 #
 # MIS.BASE_PATH: 非必须，默认值为"/mis"
-#                若设置则以/开头，不要以/结尾. 
+#                若设置则以/开头，不要以/结尾.
 #                如果BASE_PATH为/root1，MIS.BASE_PATH为/root2，那么最终访问管理系统的路径是/root1/root2
 # MIS.IMAGE_POSTFIX: 管理系统镜像后缀
 # MIS.DB_PASSWORD：管理系统数据库的密码. 第一次启动管理系统时会使用此密码初始化管理系统数据库，之后如需修改需要手动在数据库中修改
@@ -63,15 +73,15 @@ FLUENTD = {
 # AUTH = {
 #   # 镜像地址。必填，只要是能访问的镜像地址即可。
 #   "IMAGE": "ghcr.io/pkuhpc/scow-auth:master",
- 
+
 #   # 端口映射（可选）
 #   # "PORTS": ["80:80", "3302:3302"],
- 
+
 #   # 环境变量（可选）
 #   # "ENV": {
 #   #   "KEY": "123"
 #   # },
- 
+
 #   # 卷映射（可选）
 #   # 默认添加/etc/hosts:/etc/hosts和./config:/etc/scow
 #   # 可选添加其他映射

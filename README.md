@@ -41,5 +41,5 @@ Follow [the documentation](https://pkuhpc.github.io/SCOW/docs/common/dev) to lea
 
 ## License
 
-Currently, you are only authorized to download and build the system to your clusters for evaluation purposes. A proper open source license will be used in the future. 
+SCOW is distributed under [Mulan Permissive Software License, Version 2](http://license.coscl.org.cn/MulanPSL2).
 
