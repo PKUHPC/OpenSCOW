@@ -357,12 +357,8 @@ export const fileServiceServer = plugin((server) => {
 
       return await sshConnect(host, userId, logger, async (ssh) => {
         const sftp = await ssh.requestSFTP();
-        if (await sftpExists(sftp, path)) {
-          return [{ exists: true }];
-        }
-        else {
-          return [{ exists: false }];
-        }
+        const exists = await sftpExists(sftp, path);
+        return [{ exists }];
       });
     },
 
