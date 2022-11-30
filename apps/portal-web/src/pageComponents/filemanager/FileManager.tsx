@@ -227,43 +227,47 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
       return;
     }
 
-    await Promise.allSettled(operation.selected.map(async (x) => {
-      const exists = await api.fileExist({ query: { cluster, path: join(path, x.name) } });
-      if (exists.result) {
-        modal.confirm({
-          title: "文件/目录已存在",
-          content: `文件/目录${x.name}已存在，是否覆盖？`,
-          okText: "确认",
-          onOk: async () => {
-            const fileType = await api.getFileType({ query: { cluster, path: join(path, x.name) } });
-            const deleteOperation = fileType.type === "dir" ? api.deleteDir : api.deleteFile;
-            await deleteOperation({ body: { cluster: cluster, path: join(path, x.name) } });
-            await pasteFiles(x, join(operation.originalPath, x.name), join(path, x.name));
-          },
-        });
-      } else {
-        await pasteFiles(x, join(operation.originalPath, x.name), join(path, x.name));
-      }
-    }))
-      .then((successfulInfo) => {
-        const successfulCount = successfulInfo.filter((x) => x).length;
-        const allCount = operation.selected.length;
-        if (successfulCount === allCount) {
-          message.success(`${operationText}${allCount}项成功！`);
-          resetSelectedAndOperation();
+    let successfulCount:number = 0;
+    let abandonCount:number = 0;
+    const allCount = operation.selected.length;
+    try {
+      for (const x of operation.selected) {
+        const exists = await api.fileExist({ query: { cluster, path: join(path, x.name) } });
+        if (exists.result) {
+          await new Promise<void>(async (res) =>{
+            modal.confirm({
+              title: "文件/目录已存在",
+              content: `文件/目录${x.name}已存在，是否覆盖？`,
+              okText: "确认",
+              onOk: async () => {
+                const fileType = await api.getFileType({ query: { cluster, path: join(path, x.name) } });
+                const deleteOperation = fileType.type === "dir" ? api.deleteDir : api.deleteFile;
+                await deleteOperation({ body: { cluster: cluster, path: join(path, x.name) } });
+                await pasteFiles(x, join(operation.originalPath, x.name), join(path, x.name));
+                successfulCount++;
+                res();
+              },
+              onCancel: async () => { abandonCount++; res(); },
+            });
+          })
         } else {
-          message.error(`${operationText}成功${successfulCount}项，失败${allCount - successfulCount}项`);
+          await pasteFiles(x, join(operation.originalPath, x.name), join(path, x.name));
+          successfulCount++;
         }
-      })
-      .catch((e) => {
-        console.log(e);
-        message.error(`执行${operationText}操作时遇到错误`);
-      })
-      .finally(() => {
-        resetSelectedAndOperation();
-        reload();
-      });
-
+      }
+      message.success(
+        `${operationText}成功！总计${allCount}项文件/目录，其中成功${successfulCount}项，放弃${abandonCount}项`
+      );
+    } catch (e) {
+      console.error(e);
+      message.error(
+        `${operationText}错误！总计${allCount}项文件/目录，其中成功${successfulCount}项，放弃${abandonCount}项`+
+        `失败${allCount - successfulCount - abandonCount}项`
+      );
+    } finally {
+      resetSelectedAndOperation();
+      reload();
+    }
   };
 
   const onDeleteClick = () => {
