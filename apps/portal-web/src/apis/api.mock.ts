@@ -80,6 +80,8 @@ export const mockApi: MockApi<typeof api> = {
 
   downloadFile: null,
   uploadFile: null,
+  fileExist: null,
+  getFileType: null,
 
   createAppSession: async () => ({ jobId: 123, sessionId: "is" }),
 
@@ -173,5 +175,6 @@ export const mockApi: MockApi<typeof api> = {
   getRunningJobs: async () => ({ results: [runningJob]}),
 
   submitJob: async () => ({ jobId: 10 }),
+
 };
 

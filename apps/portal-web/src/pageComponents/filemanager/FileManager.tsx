@@ -15,7 +15,7 @@ import { CloseOutlined,
   DeleteOutlined, FileAddOutlined, FileOutlined, FolderAddOutlined,
   FolderOutlined, HomeOutlined, LeftOutlined, MacCommandOutlined, RightOutlined,
   ScissorOutlined, SnippetsOutlined, UploadOutlined, UpOutlined } from "@ant-design/icons";
-import { Button, Divider, Modal, Space, Table } from "antd";
+import { Button, Divider, Space, Table } from "antd";
 import Link from "next/link";
 import Router from "next/router";
 import { join } from "path";
@@ -25,7 +25,7 @@ import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { ModalButton, ModalLink } from "src/components/ModalLink";
 import { TitleText } from "src/components/PageTitle";
 import { TableTitle } from "src/components/TableTitle";
-import { useMessage } from "src/layouts/prompts";
+import { useMessage, useModal } from "src/layouts/prompts";
 import { urlToDownload } from "src/pageComponents/filemanager/api";
 import { CreateFileModal } from "src/pageComponents/filemanager/CreateFileModal";
 import { MkdirModal } from "src/pageComponents/filemanager/MkdirModal";
@@ -96,6 +96,7 @@ const operationTexts = {
 
 export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
 
+  const modal = useModal();
   const message = useMessage();
 
   const prevPathRef = useRef<string>(path);
@@ -172,63 +173,70 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
 
     const operationApi = operation.op === "copy" ? api.copyFileItem : api.moveFileItem;
 
-    // if only one file is selected, show detailed error information
-    if (operation.selected.length === 1) {
-      const filename = operation.selected[0].name;
-      const fromPath = join(operation.originalPath, filename);
-      await operationApi({ body: { cluster, fromPath, toPath: join(path, filename) } })
+    const pasteFile = async (file: FileInfo, fromPath: string, toPath: string) => {
+      await operationApi({ body: { cluster, fromPath, toPath } })
         .httpError(415, ({ error }) => {
-          Modal.error({
-            title: `${operationText}出错`,
-            content: operation.op === "copy" ? error : "可能是因为目标目录中有同名的文件或者目录。",
-          });
+          modal.error({
+            title: `文件${file.name}${operationText}出错`,
+            content: error,
+          })
         })
         .then(() => {
-          message.success(`${operationText}成功！`);
-        }).finally(() => {
-          resetSelectedAndOperation();
-          reload();
+          setOperation((o) => o ? { ...operation, completed: o.completed.concat(file) } : undefined);
+          return file;
+        }).catch(() => {
+          return undefined;
         });
-      return;
-    }
-
-    await Promise.allSettled(operation.selected.map(async (x) => {
-      return await (operation.op === "copy" ? api.copyFileItem : api.moveFileItem)({
-        body: {
-          cluster,
-          fromPath: join(operation.originalPath, x.name),
-          toPath: join(path, x.name),
-        },
-      }).then(() => {
-        setOperation((o) => o ? { ...operation, completed: o.completed.concat(x) } : undefined);
-        return x;
-      }).catch(() => {
-        return undefined;
-      });
-    }))
-      .then((successfulInfo) => {
-        const successfulCount = successfulInfo.filter((x) => x).length;
-        const allCount = operation.selected.length;
-        if (successfulCount === allCount) {
-          message.success(`${operationText}${allCount}项成功！`);
-          resetSelectedAndOperation();
+    };
+    
+    let successfulCount:number = 0;
+    let abandonCount:number = 0;
+    const allCount = operation.selected.length;
+    try {
+      for (const x of operation.selected) {
+        const exists = await api.fileExist({ query: { cluster, path: join(path, x.name) } });
+        if (exists.result) {
+          await new Promise<void>(async (res) =>{
+            modal.confirm({
+              title: "文件/目录已存在",
+              content: `文件/目录${x.name}已存在，是否覆盖？`,
+              okText: "确认",
+              onOk: async () => {
+                const fileType = await api.getFileType({ query: { cluster, path: join(path, x.name) } });
+                const deleteOperation = fileType.type === "dir" ? api.deleteDir : api.deleteFile;
+                await deleteOperation({ body: { cluster: cluster, path: join(path, x.name) } });
+                await pasteFile(x, join(operation.originalPath, x.name), join(path, x.name));
+                successfulCount++;
+                res();
+              },
+              onCancel: async () => { abandonCount++; res(); },
+            });
+          })
         } else {
-          message.error(`${operationText}成功${successfulCount}项，失败${allCount - successfulCount}项`);
+          await pasteFile(x, join(operation.originalPath, x.name), join(path, x.name));
+          successfulCount++;
         }
-      }).catch((e) => {
-        console.log(e);
-        message.error(`执行${operationText}操作时遇到错误`);
-      }).finally(() => {
-        resetSelectedAndOperation();
-        reload();
-      });
-
+      }
+      message.success(
+        `${operationText}成功！总计${allCount}项文件/目录，其中成功${successfulCount}项，放弃${abandonCount}项`
+      );
+    } catch (e) {
+      console.error(e);
+      message.error(
+        `${operationText}错误！总计${allCount}项文件/目录，其中成功${successfulCount}项，放弃${abandonCount}项`+
+        `失败${allCount - successfulCount - abandonCount}项`
+      );
+    } finally {
+      resetSelectedAndOperation();
+      reload();
+    }
   };
 
   const onDeleteClick = () => {
     const files = keysToFiles(selectedKeys);
-    Modal.confirm({
+    modal.confirm({
       title: "确认删除",
+      okText: "确认",
       content: `确认要删除选中的${files.length}项？`,
       onOk: async () => {
         await Promise.allSettled(files.map(async (x) => {
@@ -474,10 +482,11 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
               </RenameLink>
               <a onClick={() => {
                 const fullPath = join(path, i.name);
-                Modal.confirm({
+                modal.confirm({
                   title: "确认删除",
                   // icon: < />,
                   content: `确认删除${fullPath}？`,
+                  okText: "确认",
                   onOk: async () => {
                     await (i.type === "file" ? api.deleteFile : api.deleteDir)({
                       body: {

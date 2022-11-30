@@ -344,7 +344,21 @@ export const fileServiceServer = plugin((server) => {
           };
         });
 
-        return [{ size: stat.size }];
+        return [{ size: stat.size, type: stat.isDirectory() ? "dir" : "file" }];
+      });
+    },
+
+    exists: async ({ request, logger }) => {
+      const { userId, cluster, path } = request;
+
+      const host = getClusterLoginNode(cluster);
+
+      if (!host) { throw clusterNotFound(cluster); }
+
+      return await sshConnect(host, userId, logger, async (ssh) => {
+        const sftp = await ssh.requestSFTP();
+        const exists = await sftpExists(sftp, path);
+        return [{ exists }];
       });
     },
 
