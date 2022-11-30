@@ -173,25 +173,14 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
 
     const operationApi = operation.op === "copy" ? api.copyFileItem : api.moveFileItem;
 
-    // if only one file is selected, show detailed error information
-    const pasteOneFile = async (fromPath: string, toPath: string) => {
+    const pasteFile = async (file: FileInfo, fromPath: string, toPath: string) => {
       await operationApi({ body: { cluster, fromPath, toPath } })
         .httpError(415, ({ error }) => {
           modal.error({
-            title: `${operationText}出错`,
+            title: `文件${file.name}${operationText}出错`,
             content: error,
-          });
+          })
         })
-        .then(() => {
-          message.success(`${operationText}成功！`);
-        }).finally(() => {
-          resetSelectedAndOperation();
-          reload();
-        });
-    };
-    // if multiple files are selected, don't show error for each file
-    const pasteFiles = async (file: FileInfo, fromPath: string, toPath: string) => {
-      await operationApi({ body: { cluster, fromPath, toPath } })
         .then(() => {
           setOperation((o) => o ? { ...operation, completed: o.completed.concat(file) } : undefined);
           return file;
@@ -199,34 +188,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
           return undefined;
         });
     };
-
-    if (operation.selected.length === 1) {
-      const filename = operation.selected[0].name;
-      const fromPath = join(operation.originalPath, filename);
-      const toPath = join(path, filename);
-      const exists = await api.fileExist({ query: { cluster, path: toPath } });
-      if (exists.result) {
-        modal.confirm({
-          title: "文件/目录已存在",
-          content: `文件/目录${filename}已存在，是否覆盖？`,
-          okText: "确认",
-          onOk: async () => {
-            const fileType = await api.getFileType({ query: { cluster, path: toPath } });
-            const deleteOperation = fileType.type === "dir" ? api.deleteDir : api.deleteFile;
-            await deleteOperation({ body: { cluster: cluster, path: toPath } });
-            await pasteOneFile(fromPath, toPath);
-          },
-          onCancel: () => {
-            resetSelectedAndOperation();
-            reload();
-          },
-        });
-      } else {
-        await pasteOneFile(fromPath, toPath);
-      }
-      return;
-    }
-
+    
     let successfulCount:number = 0;
     let abandonCount:number = 0;
     const allCount = operation.selected.length;
@@ -243,7 +205,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
                 const fileType = await api.getFileType({ query: { cluster, path: join(path, x.name) } });
                 const deleteOperation = fileType.type === "dir" ? api.deleteDir : api.deleteFile;
                 await deleteOperation({ body: { cluster: cluster, path: join(path, x.name) } });
-                await pasteFiles(x, join(operation.originalPath, x.name), join(path, x.name));
+                await pasteFile(x, join(operation.originalPath, x.name), join(path, x.name));
                 successfulCount++;
                 res();
               },
@@ -251,7 +213,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
             });
           })
         } else {
-          await pasteFiles(x, join(operation.originalPath, x.name), join(path, x.name));
+          await pasteFile(x, join(operation.originalPath, x.name), join(path, x.name));
           successfulCount++;
         }
       }
