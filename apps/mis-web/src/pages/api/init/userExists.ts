@@ -16,7 +16,7 @@ import { InitServiceClient } from "src/generated/server/init";
 import { getClient } from "src/utils/client";
 import { publicConfig } from "src/utils/config";
 
-export interface userExistsSchema {
+export interface UserExistsSchema {
   method: "POST";
 
   body: {
@@ -38,7 +38,7 @@ export interface userExistsSchema {
 
 const userIdRegex = publicConfig.USERID_PATTERN ? new RegExp(publicConfig.USERID_PATTERN) : undefined;
 
-export default route<userExistsSchema>("userExistsSchema", async (req) => {
+export default route<UserExistsSchema>("UserExistsSchema", async (req) => {
 
   const { identityId } = req.body;
 

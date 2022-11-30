@@ -39,30 +39,30 @@ export const initServiceServer = plugin((server) => {
 
       // Check whether the user already exists in scow
       const user = await em.findOne(User, { userId, tenant: { name: DEFAULT_TENANT_NAME } });
-
-      if (server.ext.capabilities.getUser) {
-        const cluster = Object.values(clusters).find((c) => c.misIgnore === false);
-        const node = cluster!.slurm.loginNodes[0];
-        const userInfo = await getUser(node, { identityId: userId }, server.logger);
+      if (!server.ext.capabilities.getUser) {
+        // 如果不支持查询，则直接返回existsInAuth: undefined
         return [{
           existsInScow: !!user,
-          existsInAuth: !!userInfo,
+          existsInAuth: undefined,
         }];
       }
-
-      // 如果不支持查询，则直接返回existsInAuth: undefined
+      const cluster = Object.values(clusters).find((c) => c.misIgnore === false);
+      const node = cluster!.slurm.loginNodes[0];
+      const userInfo = await getUser(node, { identityId: userId }, server.logger);
       return [{
         existsInScow: !!user,
-        existsInAuth: undefined,
+        existsInAuth: !!userInfo,
       }];
     },
 
     createInitAdmin: async ({ request, em }) => {
       const { userId, email, name, password, existsInAuth } = request;
-
       if (server.ext.capabilities.getUser && !existsInAuth && !server.ext.capabilities.createUser) {
         // 认证系统支持查询用户,且不存在于认证系统，且认证系统不支持创建用户
-        return [{ created: false }];
+        throw <ServiceError>{
+          code: Status.PERMISSION_DENIED, 
+          message:`The auth does not support creating users and the user ${name} doesn't exist in auth.`,
+        };
       } 
       // get default tenant
       const tenant = await em.findOneOrFail(Tenant, { name: DEFAULT_TENANT_NAME });
@@ -80,10 +80,8 @@ export const initServiceServer = plugin((server) => {
       await createUserInDatabase(user, password, server.logger, em);
       if (existsInAuth) {
         // 认证系统存在则无需下一步
-        return [{ created: true }];
+        return [{}];
       } 
-      let result = true;
-      let errorType: string | undefined;
       // 认证系统中不存在 && 认证系统支持创建
       // 认证系统不支持查询
       // -> 都要尝试创建
@@ -92,24 +90,16 @@ export const initServiceServer = plugin((server) => {
         { identityId: user.userId, id: user.id, mail: user.email, name: user.name, password }, server.logger)
       // If the call of creating user of auth fails,  delete the user created in the database.
         .catch(async (e) => {
-
-          if (e.status !== 409) {
-            result = false;
-            await em.removeAndFlush(user);
-          } else {
-            errorType = "409";
+          if (e.status === 409) {
             throw <ServiceError>{
-              code: Status.ALREADY_EXISTS, message:`User with id ${user.name} already exists.`,
+              code: Status.ALREADY_EXISTS, message:`User with id ${user.name} already exists in auth.`,
             }; 
           }
+          await em.removeAndFlush(user);
           server.logger.error("Error creating user in auth.", e);
-          throw <ServiceError> { code: Status.INTERNAL, message: `Error creating user ${user.id} in auth.` };
+          throw <ServiceError> { code: Status.INTERNAL, message: `Error creating user ${user.id} in auth.` }; 
         });
-          
-      return [{ 
-        created: result,
-        errorType: errorType,
-      }];
+      return [{}];
     },
 
     setAsInitAdmin: async ({ request, em }) => {

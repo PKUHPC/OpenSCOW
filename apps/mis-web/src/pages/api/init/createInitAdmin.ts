@@ -12,10 +12,13 @@
 
 import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
+import { Status } from "@grpc/grpc-js/build/src/constants";
 import { InitServiceClient } from "src/generated/server/init";
 import { getClient } from "src/utils/client";
 import { publicConfig } from "src/utils/config";
 import { queryIfInitialized } from "src/utils/init";
+import { handleGrpcClusteropsError } from "src/utils/internalError";
+import { handlegRPCError } from "src/utils/server";
 
 export interface CreateInitAdminSchema {
   method: "POST";
@@ -25,19 +28,15 @@ export interface CreateInitAdminSchema {
     name: string;
     email: string;
     password: string;
-    existsInAuth: boolean | undefined;
   };
 
   responses: {
-    200: {
-      created: boolean,
-      errorType: string | undefined,
-    }
     204: null;
-
     400: { code: "USER_ID_NOT_VALID" };
 
-    409: { code: "ALREADY_INITIALIZED"; }
+    409: { code: "ALREADY_EXISTS_IN_AUTH" | "ALREADY_EXISTS_IN_AUTH" | "ALREADY_INITIALIZED" };
+
+    500: { code: "UNKNOWN_ERROR" };
 
   }
 }
@@ -49,7 +48,7 @@ export default route<CreateInitAdminSchema>("CreateInitAdminSchema", async (req)
 
   if (result) { return { 409: { code: "ALREADY_INITIALIZED" } }; }
 
-  const { email, identityId, name, password, existsInAuth } = req.body;
+  const { email, identityId, name, password } = req.body;
 
   if (userIdRegex && !userIdRegex.test(identityId)) {
     return { 400: {
@@ -59,14 +58,21 @@ export default route<CreateInitAdminSchema>("CreateInitAdminSchema", async (req)
   }
 
   const client = getClient(InitServiceClient);
-  const created = await asyncClientCall(client, "createInitAdmin", {
-    email, name, userId: identityId, password, existsInAuth,
+  const exist = await asyncClientCall(client, "userExists", {
+    userId: identityId,
   });
-
-  return { 
-    created: created.created,
-    errorType: created.errorType,
-  };
-
+  if (exist.existsInScow) {
+    return {
+      409: { code: "ALREADY_EXISTS_IN_AUTH" } };
+  }
+  await asyncClientCall(client, "createInitAdmin", {
+    email, name, userId: identityId, password, existsInAuth: exist.existsInAuth,
+  })
+    .catch(handlegRPCError({
+      [Status.ALREADY_EXISTS]: () => ({ 409: "ALREADY_EXISTS_IN_AUTH" }),
+      [Status.INTERNAL]: () => ({ 500: { code: "UNKNOWN_ERROR" } }),
+      [Status.PERMISSION_DENIED]: handleGrpcClusteropsError,
+    }));
+  return { 204: null };
 });
 

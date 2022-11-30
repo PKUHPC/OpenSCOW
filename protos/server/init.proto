@@ -24,10 +24,7 @@ message CreateInitAdminRequest {
   string password = 4;
   optional bool exists_in_auth = 5;
 }
-message CreateInitAdminReply {
-  bool created = 1;
-  optional string  error_type = 2;
-}
+message CreateInitAdminReply {}
 
 message CompleteInitRequest {}
 
