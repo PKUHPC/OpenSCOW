@@ -34,7 +34,7 @@ export interface CreateInitAdminSchema {
     204: null;
     400: { code: "USER_ID_NOT_VALID" };
 
-    409: { code: "ALREADY_EXISTS_IN_AUTH" | "ALREADY_EXISTS_IN_AUTH" | "ALREADY_INITIALIZED" };
+    409: { code: "ALREADY_EXISTS_IN_AUTH" | "ALREADY_EXISTS_IN_SCOW" | "ALREADY_INITIALIZED" };
 
     500: { code: "UNKNOWN_ERROR" };
 
@@ -63,7 +63,7 @@ export default route<CreateInitAdminSchema>("CreateInitAdminSchema", async (req)
   });
   if (exist.existsInScow) {
     return {
-      409: { code: "ALREADY_EXISTS_IN_AUTH" } };
+      409: { code: "ALREADY_EXISTS_IN_SCOW" } };
   }
   await asyncClientCall(client, "createInitAdmin", {
     email, name, userId: identityId, password, existsInAuth: exist.existsInAuth,
