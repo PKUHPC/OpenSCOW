@@ -179,7 +179,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
           modal.error({
             title: `文件${file.name}${operationText}出错`,
             content: error,
-          })
+          });
         })
         .then(() => {
           setOperation((o) => o ? { ...operation, completed: o.completed.concat(file) } : undefined);
@@ -189,14 +189,14 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
         });
     };
     
-    let successfulCount:number = 0;
-    let abandonCount:number = 0;
+    let successfulCount: number = 0;
+    let abandonCount: number = 0;
     const allCount = operation.selected.length;
     try {
       for (const x of operation.selected) {
         const exists = await api.fileExist({ query: { cluster, path: join(path, x.name) } });
         if (exists.result) {
-          await new Promise<void>(async (res) =>{
+          await new Promise<void>(async (res) => {
             modal.confirm({
               title: "文件/目录已存在",
               content: `文件/目录${x.name}已存在，是否覆盖？`,
@@ -211,20 +211,20 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
               },
               onCancel: async () => { abandonCount++; res(); },
             });
-          })
+          });
         } else {
           await pasteFile(x, join(operation.originalPath, x.name), join(path, x.name));
           successfulCount++;
         }
       }
       message.success(
-        `${operationText}成功！总计${allCount}项文件/目录，其中成功${successfulCount}项，放弃${abandonCount}项`
+        `${operationText}成功！总计${allCount}项文件/目录，其中成功${successfulCount}项，放弃${abandonCount}项`,
       );
     } catch (e) {
       console.error(e);
       message.error(
-        `${operationText}错误！总计${allCount}项文件/目录，其中成功${successfulCount}项，放弃${abandonCount}项`+
-        `失败${allCount - successfulCount - abandonCount}项`
+        `${operationText}错误！总计${allCount}项文件/目录，其中成功${successfulCount}项，放弃${abandonCount}项` +
+        `失败${allCount - successfulCount - abandonCount}项`,
       );
     } finally {
       resetSelectedAndOperation();
