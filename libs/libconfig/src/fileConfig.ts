@@ -37,13 +37,17 @@ const candidates = Object.entries(parsers);
  */
 export function getConfigFromFile<T extends TSchema>(
   schema: T, filename: string, basePath: string,
-) {
+): Static<T> {
 
   for (const [ext, loader] of candidates) {
     const path = join(basePath, filename + "." + ext);
     if (fs.existsSync(path)) {
       const content = fs.readFileSync(path, { encoding: "utf8" });
-      return validateObject(schema, loader(content));
+      const obj = validateObject(schema, loader(content));
+      if (obj instanceof Error) {
+        throw new Error(`Error reading config file ${path}: ${obj.message}`);
+      }
+      return obj;
     }
   }
 
@@ -67,9 +71,15 @@ export function getDirConfig<T extends TSchema>(
 
     if (!(ext in parsers)) { return m; }
 
-    const content = fs.readFileSync(join(configDir, filename), { encoding: "utf8" });
+    const configFilePath = join(configDir, filename);
+
+    const content = fs.readFileSync(configFilePath, { encoding: "utf8" });
 
     const config = validateObject(schema, parsers[ext](content));
+
+    if (config instanceof Error) {
+      throw new Error(`Error reading config file ${configFilePath}: ${config.message}`);
+    }
 
     if (config) {
       m[basename(filename, "." + ext)] = config;
