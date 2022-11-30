@@ -8,7 +8,7 @@
 # MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 # See the Mulan PSL v2 for more details.
 
-python generate.py
+python3 generate.py
 
 if docker compose &> /dev/null; then compose="docker compose";
 elif docker-compose &> /dev/null; then compose="docker-compose";

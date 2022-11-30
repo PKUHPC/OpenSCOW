@@ -2,6 +2,10 @@
 
 https://pkuhpc.github.io/SCOW/docs/common/deployment
 
+## 要求
+
+系统中已安装python3，并能够使用`python3`命令调用。
+
 ## 编写配置文件
 
 ```shell

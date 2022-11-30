@@ -39,6 +39,9 @@ export interface PublicRuntimeConfig {
   USERID_PATTERN: string | undefined;
   USERID_PATTERN_MESSAGE: string | undefined;
 
+  PASSWORD_PATTERN: string | undefined;
+  PASSWORD_PATTERN_MESSAGE: string | undefined;
+
   PORTAL_URL: string | undefined;
 }
 

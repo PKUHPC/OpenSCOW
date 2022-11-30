@@ -60,7 +60,10 @@ export const ChangePasswordForm: React.FC = () => {
           <Input.Password />
         </Form.Item>
         <Form.Item
-          rules={[{ required: true }, passwordRule]}
+          rules={[
+            { required: true },
+            passwordRule,
+          ]}
           label="新密码"
           name="newPassword"
         >
