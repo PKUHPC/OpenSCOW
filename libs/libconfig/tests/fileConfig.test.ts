@@ -71,3 +71,13 @@ it("reports error if config not exist", async () => {
   expect(() => runTest([], "yml")).toThrow();
 });
 
+it("reports file path", async () => {
+
+  fs.writeFileSync(path.join(folderPath, configName + ".yaml"), exts.yaml({ loaded: false }));
+  try {
+    getConfigFromFile(Schema, configName, folderPath);
+    expect("").fail("should throw");
+  } catch (e: any) {
+    expect(e.message).toContain(path.join(folderPath, configName + ".yaml"));
+  }
+});
