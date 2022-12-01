@@ -13,6 +13,8 @@
 import { join } from "path";
 import { Logger } from "ts-log";
 
+import { applicationJsonHeaders } from "./utils";
+
 export async function checkPassword(
   authUrl: string,
   identityId: string,
@@ -23,6 +25,7 @@ export async function checkPassword(
   const url = join(authUrl, "/checkPassword") + "?" + query.toString();
   const resp = await fetch(url, {
     method: "GET",
+    headers: applicationJsonHeaders,
   });
 
   const body = await resp.json() as { success: boolean }; 
