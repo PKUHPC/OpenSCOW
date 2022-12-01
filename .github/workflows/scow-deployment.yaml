@@ -8,7 +8,7 @@ on:
 
 jobs:
   push-branch:
-    name: Push deploy/ to scow-deployment
+    name: Push deploy/local to scow-deployment
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
