@@ -32,7 +32,7 @@ function handleIfInvalidCredentials(e: any) {
 }
 
 export async function modifyPassword(
-  userId: string, oldPassword: string | undefined, newPassword: string, client: ldapjs.Client,
+  userId: string, newPassword: string, client: ldapjs.Client,
 ): Promise<boolean> {
   /** Must bind as the user whose password is to be changed and then password can be changed */
   try {
@@ -40,10 +40,7 @@ export async function modifyPassword(
     const writer = new BerWriter();
     writer.startSequence();
     writer.writeString(userId, CTX_SPECIFIC_CLASS | 0); // sequence item number 0
-    if (oldPassword) {
-      writer.writeString(oldPassword, CTX_SPECIFIC_CLASS | 1); // sequence item number 1
-    }
-    writer.writeString(newPassword, CTX_SPECIFIC_CLASS | 2); // sequence item number 2
+    writer.writeString(newPassword, CTX_SPECIFIC_CLASS | 1); // sequence item number 2
     writer.endSequence();
 
     await promisify(client.exop.bind(client))("1.3.6.1.4.1.4203.1.11.1", writer.buffer);
@@ -57,11 +54,11 @@ export async function modifyPassword(
 export async function modifyPasswordAsSelf(
   log: FastifyBaseLogger,
   ldap: LdapConfigSchema,
-  userDn: string, oldPassword: string, newPassword: string,
+  userDn: string, newPassword: string,
 ): Promise<boolean> {
   try {
-    return await useLdap(log, ldap, { dn: userDn, password: oldPassword })(async (client) => {
-      await modifyPassword(userDn, oldPassword, newPassword, client);
+    return await useLdap(log, ldap)(async (client) => {
+      await modifyPassword(userDn, newPassword, client);
       return true;
     });
   } catch (e: any) {

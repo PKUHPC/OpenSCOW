@@ -66,14 +66,14 @@ export const createLdapAuthProvider = (f: FastifyInstance) => {
     createUser: async (info, req) => {
       return createUser(info, req, ldap);
     },
-    changePassword: async (id, oldPassword, newPassword, req) => {
+    changePassword: async (id, newPassword, req) => {
       return useLdap(req.log, ldap)(async (client) => {
         const user = await findUser(req.log, ldap, client, id);
         if (!user) {
           return "NotFound";
         }
 
-        const result = await modifyPasswordAsSelf(req.log, ldap, user.dn, oldPassword, newPassword);
+        const result = await modifyPasswordAsSelf(req.log, ldap, user.dn, newPassword);
         return result ? "OK" : "WrongOldPassword";
       });
     },
