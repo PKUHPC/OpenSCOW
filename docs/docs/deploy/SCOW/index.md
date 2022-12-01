@@ -1,9 +1,9 @@
 ---
 sidebar_position: 1
-title: SCOW部署
+title: SCOW部署简介
 ---
 
-# SCOW部署
+# SCOW部署简介
 
 本节介绍如何部署系统。
 
