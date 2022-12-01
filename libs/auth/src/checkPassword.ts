@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { join } from "path";
 import { Logger } from "ts-log";
 
 export async function checkPassword(
@@ -18,7 +19,9 @@ export async function checkPassword(
   password: string,
   logger?: Logger,
 ) {
-  const resp = await fetch(authUrl + "/checkPassword?identityId=" + identityId + "&password=" + password, {
+  const query = new URLSearchParams([["identityId", identityId], ["password", password]]);
+  const url = join(authUrl, "/checkPassword") + "?" + query.toString();
+  const resp = await fetch(url, {
     method: "GET",
   });
 
