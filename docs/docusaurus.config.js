@@ -1,41 +1,40 @@
 // @ts-check
 // Note: type annotations allow type checking and IDEs autocompletion
 
-const lightCodeTheme = require('prism-react-renderer/themes/github');
-const darkCodeTheme = require('prism-react-renderer/themes/dracula');
+const lightCodeTheme = require("prism-react-renderer/themes/github");
+const darkCodeTheme = require("prism-react-renderer/themes/dracula");
 const { join } = require("path");
 const { plugin, variables } = require("./plugins/var");
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: 'SCOW',
-  tagline: 'Super Computing On Web',
+  title: "SCOW",
+  tagline: "Super Computing On Web",
   url: variables.DOCS_URL,
   baseUrl: variables.BASE_PATH,
-  onBrokenLinks: 'throw',
-  onBrokenMarkdownLinks: 'warn',
-  favicon: 'img/favicon.ico',
+  onBrokenLinks: "throw",
+  onBrokenMarkdownLinks: "warn",
+  favicon: "img/favicon.ico",
   organizationName: variables.ORGANIZATION_NAME,
   projectName: variables.PROJECT_NAME,
   trailingSlash: false,
 
   presets: [
     [
-      '@docusaurus/preset-classic',
+      "@docusaurus/preset-classic",
       /** @type {import('@docusaurus/preset-classic').Options} */
       ({
         docs: {
-          sidebarPath: require.resolve('./sidebars.js'),
+          sidebarPath: require.resolve("./sidebars.js"),
           editUrl: join(variables.REPO_URL, "/edit/main/website/"),
           beforeDefaultRemarkPlugins: [plugin],
         },
         blog: {
           showReadingTime: true,
-          editUrl:
-            join(variables.REPO_URL, "/edit/main/website/blog/"),
+          editUrl: join(variables.REPO_URL, "/edit/main/website/blog/"),
         },
         theme: {
-          customCss: require.resolve('./src/css/custom.css'),
+          customCss: require.resolve("./src/css/custom.css"),
         },
       }),
     ],
@@ -45,74 +44,77 @@ const config = {
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
       navbar: {
-        title: 'SCOW',
+        title: "SCOW",
         logo: {
-          alt: 'My Site Logo',
-          src: 'img/logo.svg',
+          alt: "My Site Logo",
+          src: "img/logo.svg",
         },
         items: [
           {
-            type: 'doc',
-            docId: 'common/index',
-            position: 'left',
-            sidebarId: "common",
-            label: '文档',
+            type: "doc",
+            docId: "info/index",
+            position: "left",
+            sidebarId: "info",
+            label: "平台信息",
           },
           {
-            type: 'doc',
-            docId: 'portal/index',
-            position: 'left',
-            sidebarId: "portal",
-            label: '门户系统',
+            type: "doc",
+            docId: "deploy/index",
+            position: "left",
+            sidebarId: "deploy",
+            label: "部署文档",
           },
           {
-            type: 'doc',
-            docId: 'mis/index',
-            position: 'left',
-            sidebarId: "mis",
-            label: '运营系统',
+            type: "doc",
+            docId: "guide/index",
+            position: "left",
+            sidebarId: "guide",
+            label: "使用文档",
           },
           {
-            type: 'doc',
-            docId: 'refs/index',
-            position: 'left',
+            type: "doc",
+            docId: "refs/index",
+            position: "left",
             sidebarId: "refs",
-            label: '配置参考',
+            label: "配置参考",
           },
-          { to: join(variables.BASE_PATH, "blog"), label: '博客', position: 'left' },
+          {
+            to: join(variables.BASE_PATH, "blog"),
+            label: "博客",
+            position: "left",
+          },
           {
             href: variables.REPO_URL,
-            label: 'Repo',
-            position: 'right',
+            label: "Repo",
+            position: "right",
           },
         ],
       },
       footer: {
-        style: 'dark',
+        style: "dark",
         links: [
           {
-            title: 'Docs',
+            title: "Docs",
             items: [
               {
-                label: 'Intro',
-                to: join(variables.BASE_PATH, `docs/common`),
+                label: "Intro",
+                to: join(variables.BASE_PATH, `docs/info`),
               },
             ],
           },
           {
-            title: 'Community',
-            items: [
-            ],
+            title: "Community",
+            items: [],
           },
           {
-            title: 'More',
+            title: "More",
             items: [
               {
-                label: 'Blog',
+                label: "Blog",
                 to: join(variables.BASE_PATH, `blog`),
               },
               {
-                label: 'Repo',
+                label: "Repo",
                 href: variables.REPO_URL,
               },
             ],
