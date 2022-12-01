@@ -10,10 +10,13 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { ServiceError } from "@ddadaal/tsgrpc-common";
+import { status } from "@grpc/grpc-js";
 import { loggedExec, sshConnect as libConnect, testRootUserSshLogin } from "@scow/lib-ssh";
 import type { NodeSSH } from "node-ssh";
 import { clusters } from "src/config/clusters";
 import { rootKeyPair } from "src/config/env";
+import { scowErrorMetadata } from "src/utils/error";
 import { Logger } from "ts-log";
 
 export { loggedExec };
@@ -23,10 +26,18 @@ export function getClusterLoginNode(cluster: string): string | undefined {
   return clusters[cluster]?.slurm?.loginNodes?.[0];
 }
 
+export const SSH_ERROR_CODE = "SSH_ERROR";
+
 export async function sshConnect<T>(
   address: string, username: string, logger: Logger, run: (ssh: NodeSSH) => Promise<T>,
 ): Promise<T> {
-  return libConnect(address, username, rootKeyPair, logger, run);
+  return libConnect(address, username, rootKeyPair, logger, run).catch((e) => {
+    logger.error(e, "Error during ssh connection");
+    throw new ServiceError({
+      code: status.INTERNAL,
+      metadata: scowErrorMetadata(SSH_ERROR_CODE),
+    });
+  });
 }
 
 /**
