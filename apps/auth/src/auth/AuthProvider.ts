@@ -25,6 +25,7 @@ export interface CreateUserInfo {
 export type ValidateNameResult = "NotFound" | "Match" | "NotMatch";
 export type CreateUserResult = "AlreadyExists" | "OK";
 export type ChangePasswordResult = "NotFound" | "WrongOldPassword" | "OK";
+export type CheckPasswordResult = "NotFound" | "Match" | "NotMatch";
 
 export interface AuthProvider {
   serveLoginHtml: (callbackUrl: string, req: FastifyRequest, rep: FastifyReply) => Promise<void>;
@@ -34,4 +35,6 @@ export interface AuthProvider {
   validateName: undefined | ((identityId: string, name: string, req: FastifyRequest) => Promise<ValidateNameResult>);
   changePassword: undefined | ((id: string, oldPassword: string, newPassword: string,
     req: FastifyRequest) => Promise<ChangePasswordResult>);
+  checkPassword: undefined | ((identityId: string, password: string, 
+    req: FastifyRequest) => Promise<CheckPasswordResult>);
 }

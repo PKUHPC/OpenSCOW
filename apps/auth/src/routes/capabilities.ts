@@ -47,6 +47,7 @@ export const getCapabilitiesRoute = fp(async (f) => {
         validateName: provider.validateName !== undefined,
         changePassword: provider.changePassword !== undefined,
         getUser: provider.getUser !== undefined,
+        checkPassword: provider.checkPassword !== undefined,
       };
     },
   );

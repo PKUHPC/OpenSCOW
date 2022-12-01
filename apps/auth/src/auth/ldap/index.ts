@@ -15,7 +15,7 @@ import ldapjs from "ldapjs";
 import { AuthProvider } from "src/auth/AuthProvider";
 import { createUser } from "src/auth/ldap/createUser";
 import { extractUserInfoFromEntry, findUser, searchOne, useLdap } from "src/auth/ldap/helpers";
-import { modifyPasswordAsSelf } from "src/auth/ldap/password";
+import { checkPassword, modifyPasswordAsSelf } from "src/auth/ldap/password";
 import { registerPostHandler } from "src/auth/ldap/postHandler";
 import { serveLoginHtml } from "src/auth/loginHtml";
 import { authConfig } from "src/config/auth";
@@ -77,6 +77,16 @@ export const createLdapAuthProvider = (f: FastifyInstance) => {
         return result ? "OK" : "WrongOldPassword";
       });
     },
-  };
+    checkPassword: async (identityId, password, req) => {
+      return useLdap(req.log, ldap)(async (client) => {
+        const user = await findUser(req.log, ldap, client, identityId);
+        if (!user) {
+          return "NotFound";
+        }
 
+        const result = await checkPassword(req.log, ldap, user.dn, password);
+        return result ? "Match" : "NotMatch";
+      });
+    },
+  };
 };

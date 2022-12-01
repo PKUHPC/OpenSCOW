@@ -68,3 +68,17 @@ export async function modifyPasswordAsSelf(
     return handleIfInvalidCredentials(e);
   }
 }
+
+export async function checkPassword(
+  log: FastifyBaseLogger,
+  ldapConfig: LdapConfigSchema,
+  userDn: string, password: string,
+): Promise<boolean> {
+  try {
+    return await useLdap(log, ldapConfig, { dn: userDn, password })(async () => {
+      return true;
+    });
+  } catch (e: any) {
+    return handleIfInvalidCredentials(e);
+  }
+}
