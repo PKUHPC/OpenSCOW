@@ -98,7 +98,7 @@ const config = {
             items: [
               {
                 label: "Intro",
-                to: join(variables.BASE_PATH, `docs/info`),
+                to: join(variables.BASE_PATH, `docs/info/index`),
               },
             ],
           },
