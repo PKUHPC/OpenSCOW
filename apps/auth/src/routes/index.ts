@@ -10,9 +10,9 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { checkPassword } from "src/auth/ldap/password";
 import { getCapabilitiesRoute } from "src/routes/capabilities";
 import { changePasswordRoute } from "src/routes/changePassword";
+import { checkPasswordRoute } from "src/routes/checkPassword";
 import { createUserRoute } from "src/routes/createUser";
 import { getUserRoute } from "src/routes/getUser";
 import { logoutRoute } from "src/routes/logout";
@@ -32,5 +32,5 @@ export const routes = [
   logoutRoute,
   getCapabilitiesRoute,
   getUserRoute,
-  checkPassword,
+  checkPasswordRoute,
 ];
