@@ -40,7 +40,7 @@ export async function modifyPassword(
     const writer = new BerWriter();
     writer.startSequence();
     writer.writeString(userId, CTX_SPECIFIC_CLASS | 0); // sequence item number 0
-    writer.writeString(newPassword, CTX_SPECIFIC_CLASS | 1); // sequence item number 2
+    writer.writeString(newPassword, CTX_SPECIFIC_CLASS | 2); // sequence item number 2
     writer.endSequence();
 
     await promisify(client.exop.bind(client))("1.3.6.1.4.1.4203.1.11.1", writer.buffer);
