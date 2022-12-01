@@ -85,15 +85,15 @@ pnpm --filter config build
 
 ## 测试开发环境
 
-我们使用docker搭建了一套简单的开发环境，可以用来跑一些项目的测试。具体开发环境请参考[docker-compose.dev.yml](../../../dev/docker-compose.dev.yml)。
+我们使用docker搭建了一套简单的开发环境，可以用来跑一些项目的测试。具体开发环境请参考[docker-compose.dev.yml](../../../../dev/docker-compose.dev.yml)。
 
 开发环境包括
 
 - 可以通过`3306`端口连接的的MySQL8数据库
-    - root密码为[dev/.env.dev](../../dev/.env.dev)中的`MYSQL_ROOT_PASSWORD`
+    - root密码为[dev/.env.dev](../../../../dev/.env.dev)中的`MYSQL_ROOT_PASSWORD`
 - 可以通过`6379`端口连接的redis:alpine
 - 可以通过`3307`端口连接的mariadb:5.5作为job table
-    - root密码为[dev/.env.dev](../../dev/.env.dev)中的`JOB_TABLE_PASSWORD`
+    - root密码为[dev/.env.dev](../../../../dev/.env.dev)中的`JOB_TABLE_PASSWORD`
 - 可以通过`22222`端口连接的SSH服务器
     - 可以直接使用本地的`~/.ssh/id_rsa.pub`登录`root`和`test`用户，也可以通过用户名`test`、密码`test`登录`test`用户
 - 可以通过`389`端口连接的LDAP服务器，详情参考[LDAP文档](./auth/ldap.md#LDAP镜像)
