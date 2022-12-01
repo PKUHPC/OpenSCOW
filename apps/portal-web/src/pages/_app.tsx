@@ -53,6 +53,7 @@ const FailEventHandler: React.FC = () => {
       if (e.status === 401) {
         userStore.logout();
       } else {
+        console.log(e);
         message.error(`服务器出错啦！(${e.status}, ${e.data?.code}))`);
       }
     });
