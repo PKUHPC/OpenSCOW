@@ -11,10 +11,9 @@
  */
 
 import { Button, Form, Popconfirm, Space, Table, TableColumnsType } from "antd";
-import { Alert } from "antd";
 import Router, { useRouter } from "next/router";
 import { join } from "path";
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect } from "react";
 import { useAsync } from "react-async";
 import { useStore } from "simstate";
 import { api } from "src/apis";
@@ -29,11 +28,6 @@ import { publicConfig } from "src/utils/config";
 import { compareDateTime, formatDateTime } from "src/utils/datetime";
 import { compareNumber } from "src/utils/math";
 import { queryToString } from "src/utils/querystring";
-import styled from "styled-components";
-
-const AlertContainer = styled.div`
-  margin-bottom: 16px;
-`;
 
 interface Props {
 }
@@ -61,11 +55,6 @@ export const AppSessionsTable: React.FC<Props> = () => {
 
     }, [cluster]),
   });
-
-  setTimeout(() => {
-    message.success("刷新应用列表成功");
-    reload(); 
-  }, 10000); 
 
   const columns: TableColumnsType<AppSession> = [
     {
@@ -135,15 +124,16 @@ export const AppSessionsTable: React.FC<Props> = () => {
       ),
     },
   ];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      reload();
+    }, 10000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div>
-      <AlertContainer>
-        <Alert
-          type="warning"
-          showIcon
-          message="创建交互式应用后，请点击刷新按钮"
-        />
-      </AlertContainer>
       <FilterFormContainer>
         <Form layout="inline">
           <Form.Item label="集群">
