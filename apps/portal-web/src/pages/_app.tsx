@@ -52,10 +52,15 @@ const FailEventHandler: React.FC = () => {
     failEvent.register((e) => {
       if (e.status === 401) {
         userStore.logout();
-      } else {
-        console.log(e);
-        message.error(`服务器出错啦！(${e.status}, ${e.data?.code}))`);
+        return;
       }
+
+      if (e.data?.code === "SSH_ERROR") {
+        message.error("以用户身份连接到集群失败");
+        return;
+      }
+
+      message.error(`服务器出错啦！(${e.status}, ${e.data?.code}))`);
     });
   }, []);
 

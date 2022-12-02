@@ -6,7 +6,7 @@ on:
     branches: [master]
 
 jobs:
-  clean-deployment-branch:
+  clean-scow-deployment:
     name: Delete scow-deployment PR branch
     runs-on: ubuntu-latest
     steps:
