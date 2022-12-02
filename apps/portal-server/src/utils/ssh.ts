@@ -12,7 +12,7 @@
 
 import { ServiceError } from "@ddadaal/tsgrpc-common";
 import { status } from "@grpc/grpc-js";
-import { loggedExec, sshConnect as libConnect, testRootUserSshLogin } from "@scow/lib-ssh";
+import { loggedExec, sshConnect as libConnect, SshConnectError, testRootUserSshLogin } from "@scow/lib-ssh";
 import type { NodeSSH } from "node-ssh";
 import { clusters } from "src/config/clusters";
 import { rootKeyPair } from "src/config/env";
@@ -32,8 +32,8 @@ export async function sshConnect<T>(
   address: string, username: string, logger: Logger, run: (ssh: NodeSSH) => Promise<T>,
 ): Promise<T> {
   return libConnect(address, username, rootKeyPair, logger, run).catch((e) => {
-    if (e === "SSH_CONNECT_ERROR") {
-      throw new ServiceError({
+    if (e instanceof SshConnectError) {
+      throw new ServiceError({ 
         code: status.INTERNAL,
         metadata: scowErrorMetadata(SSH_ERROR_CODE),
       });

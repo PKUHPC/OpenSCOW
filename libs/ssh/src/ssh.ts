@@ -18,6 +18,8 @@ import type { Logger } from "ts-log";
 import { insertKeyAsRoot, KeyPair } from "./key";
 import { sftpChmod, sftpMkdir, sftpStat, sftpWriteFile } from "./sftp";
 
+export class SshConnectError extends Error {}
+
 /**
  * Connect to SSH and returns the SSH Object
  * Must dispose of the object after use
@@ -51,7 +53,7 @@ export async function sshRawConnect(address: string, username: string, rootKeyPa
     await insertKeyAsRoot(username, address, rootKeyPair, logger);
     await connect().catch((e) => {
       logger.error(e, "Error during ssh connection");
-      throw "SSH_CONNECT_ERROR";
+      throw new SshConnectError();
     });
   }
 
