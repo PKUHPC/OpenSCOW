@@ -51,7 +51,7 @@ export const InitAdminForm: React.FC = () => {
     } else if (!result.existsInAuth && result.existsInAuth !== undefined && !publicConfig.ENABLE_CREATE_USER) {
       // 用户不存在于scow: 且认证系统支持查询，且查询结果不存在于认证系统，且当前系统不支持创建用户
       modal.confirm({
-        title: "当前认证系统不支持创建用户",
+        title: "用户不存在于认证系统",
         content: "用户不存在，请确认用户ID是否正确",
         okText: "确认",
         onOk: async () => {
@@ -84,14 +84,21 @@ export const InitAdminForm: React.FC = () => {
           await api.createInitAdmin(
             { body: { email, identityId, name, password } })
             .httpError(409, (e) => { 
-              if (e.code === "ALREADY_EXISTS_IN_AUTH")
+              if (e.code === "ALREADY_EXISTS_IN_SCOW")
+                modal.error({
+                  title: "添加失败",
+                  content: "此用户存在于scow数据库",
+                  okText: "确认",
+                });
+            })
+            .then((createdInAuth) => { 
+              createdInAuth.createdInAuth ? 
                 modal.info({
                   title: "添加成功",
                   content: "此用户存在于认证系统中，已成功添加到SCOW数据库",
                   okText: "确认",
-                });
-            })
-            .then(() => { message.success("添加完成！"); })
+                })
+                : message.success("添加完成！"); })
             .catch(() => {               
               modal.error({
                 title: "添加失败",

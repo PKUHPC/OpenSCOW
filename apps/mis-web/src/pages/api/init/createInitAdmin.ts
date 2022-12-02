@@ -30,10 +30,12 @@ export interface CreateInitAdminSchema {
   };
 
   responses: {
-    204: null;
+    200: {
+      createdInAuth: boolean;
+    };
     400: { code: "USER_ID_NOT_VALID" };
 
-    409: { code: "ALREADY_INITIALIZED" | "ALREADY_EXISTS_IN_SCOW" | "ALREADY_EXISTS_IN_AUTH" };
+    409: { code: "ALREADY_INITIALIZED" | "ALREADY_EXISTS_IN_SCOW" };
     500: null;
   }
 }
@@ -57,12 +59,9 @@ export default route<CreateInitAdminSchema>("CreateInitAdminSchema", async (req)
   const client = getClient(InitServiceClient);
   return await asyncClientCall(client, "createInitAdmin", {
     email, name, userId: identityId, password,
-  }).then(() => ({ 204: null }))
+  }).then((res) => ({ 200: { createdInAuth: res.createdInAuth } }))
     .catch(handlegRPCError({
-      [Status.ALREADY_EXISTS]: (e) => ({ 
-        409: 
-        { code: e.details === "EXISTS_IN_SCOW" ? "ALREADY_EXISTS_IN_SCOW" as const 
-          : "ALREADY_EXISTS_IN_AUTH" as const } }),
+      [Status.ALREADY_EXISTS]: () => ({ 409: { code: "ALREADY_EXISTS_IN_SCOW" as const } }),
       [Status.INTERNAL]: () => ({ 500: null }),
     }));
 });

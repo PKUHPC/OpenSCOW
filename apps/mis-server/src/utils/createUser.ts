@@ -15,11 +15,9 @@ import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { UniqueConstraintViolationException } from "@mikro-orm/core";
 import { MySqlDriver, SqlEntityManager } from "@mikro-orm/mysql";
-import { createUser } from "@scow/lib-auth";
 import { insertKeyAsUser } from "@scow/lib-ssh";
 import { clusters } from "src/config/clusters";
 import { rootKeyPair } from "src/config/env";
-import { misConfig } from "src/config/mis";
 import { StorageQuota } from "src/entities/StorageQuota";
 import { Tenant } from "src/entities/Tenant";
 import { User } from "src/entities/User";
@@ -57,24 +55,7 @@ export async function createUserInDatabase(
   return user;
 }
 
-export async function createUserInAuth(
-  user: User, password: string, logger: Logger) {
-  await createUser(misConfig.authUrl,
-    { identityId: user.userId, id: user.id, mail: user.email, name: user.name, password },
-    logger)
-    // If the call of creating user of auth fails,  delete the user created in the database.
-    .catch(async (e) => {
-      if (e.status === 409) {
-        throw <ServiceError>{
-          code: Status.ALREADY_EXISTS, 
-          message:`User with id ${user.name} already exists in auth.`,
-          details: "EXISTS_IN_AUTH",
-        }; 
-      }
-      logger.error("Error creating user in auth.", e);
-      throw <ServiceError> { code: Status.INTERNAL, message: `Error creating user ${user.id} in auth.` }; 
-    });
-
+export async function insertKeyToNewUser(name: string, password: string, logger: Logger) {
   // Making an ssh Request to the login node as the user created.
   if (process.env.NODE_ENV === "production") {
     await Promise.all(Object.values(clusters).map(async ({ displayName, slurm, misIgnore }) => {
@@ -82,7 +63,7 @@ export async function createUserInAuth(
       const node = slurm.loginNodes[0];
       logger.info("Checking if user can login to %s by login node %s", displayName, node);
     
-      const error = await insertKeyAsUser(node, user.name, password, rootKeyPair, logger).catch((e) => e);
+      const error = await insertKeyAsUser(node, name, password, rootKeyPair, logger).catch((e) => e);
       if (error) {
         logger
           .info("user %s cannot login to %s by login node %s. err: %o", name, displayName, node, error);
@@ -93,23 +74,3 @@ export async function createUserInAuth(
     }));
   }
 }
-
-
-// 需要注意认证系统已存在与scow中已存在返回code相同，但是details不同
-export async function createUserInDatabaseAndAuth(
-  userId: string, name: string, email: string, password: string, tenantName: string, 
-  logger: Logger, em: SqlEntityManager<MySqlDriver>) {
-  const user = await createUserInDatabase(userId, name, email, tenantName, logger, em);
-  await createUserInAuth(user!, password, logger)
-    .catch(async (e) => {
-      if (e.code === Status.INTERNAL) {
-        await em.removeAndFlush(user);
-        throw <ServiceError> { 
-          code: Status.INTERNAL, 
-          message: `Error creating user ${user.id} in auth.` };
-      }
-      throw e;
-    });
-  return user;
-}
-

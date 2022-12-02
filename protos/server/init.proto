@@ -23,7 +23,9 @@ message CreateInitAdminRequest {
   string email = 3;
   string password = 4;
 }
-message CreateInitAdminReply {}
+message CreateInitAdminReply {
+  bool created_in_auth = 1;
+}
 
 message CompleteInitRequest {}
 
@@ -43,7 +45,7 @@ message UserExistsRequest {
   string user_id = 1;
 }
 message UserExistsReply {
-  bool exists_in_scow= 1;
+  bool exists_in_scow = 1;
   optional bool exists_in_auth = 2;
 }
 
