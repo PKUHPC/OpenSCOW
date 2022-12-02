@@ -63,7 +63,7 @@ export default route<CreateInitAdminSchema>("CreateInitAdminSchema", async (req)
         409: 
         { code: e.details === "EXISTS_IN_SCOW" ? "ALREADY_EXISTS_IN_SCOW" as const 
           : "ALREADY_EXISTS_IN_AUTH" as const } }),
-      [Status.INTERNAL]: () => null,
+      [Status.INTERNAL]: () => ({ 500: null }),
     }));
 });
 
