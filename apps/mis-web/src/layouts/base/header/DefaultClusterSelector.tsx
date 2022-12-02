@@ -10,22 +10,19 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { ClusterOutlined } from "@ant-design/icons";
 import { Space, Tooltip } from "antd";
 import { useStore } from "simstate";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
+import { ThemeClusterOutlined } from "src/components/ThemeClusterOutlined";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
-import { useTheme } from "styled-components";
 
 export const DefaultClusterSelector: React.FC = () => {
   const defaultClusterStore = useStore(DefaultClusterStore);
 
-  const { token } = useTheme();
-
   return (
     <Space>
       <Tooltip title="需要选择集群的功能将会默认选择默认集群">
-        <ClusterOutlined style={{ color: token.colorPrimary }} />
+        <ThemeClusterOutlined />
       </Tooltip>
       <SingleClusterSelector
         value={defaultClusterStore.cluster}
