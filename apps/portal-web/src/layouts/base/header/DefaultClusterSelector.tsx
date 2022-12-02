@@ -21,11 +21,11 @@ export const DefaultClusterSelector: React.FC = () => {
   const defaultClusterStore = useStore(DefaultClusterStore);
 
   const { token } = useTheme();
-  
+
   return (
     <Space>
       <Tooltip title="需要选择集群的功能将会默认选择默认集群">
-        <ClusterOutlined style={{ color: token.colorPrimary }}/>
+        <ClusterOutlined style={{ color: token.colorPrimary }} />
       </Tooltip>
       <SingleClusterSelector
         value={defaultClusterStore.cluster}
