@@ -49,6 +49,7 @@ export const SingleClusterSelector: React.FC<SingleSelectionProps> = ({ value, o
         (label ? [{ value: label, label, disabled: true }] : [])
           .concat(publicConfig.CLUSTERS.map((x) => ({ value: x.id, label: x.name, disabled: false })))
       }
+      dropdownMatchSelectWidth={false}
     />
   );
 };

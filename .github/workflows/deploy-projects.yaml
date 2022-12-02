@@ -1,0 +1,24 @@
+name: Update deploy projects
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  scow-deployment:
+    name: Update scow-deployment
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Pushes to scow-deployment repo
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          personal_token: ${{ secrets.SCOW_DEPLOYMENT_PAT }}
+          publish_dir: ./deploy/local
+          user_name: github-actions[bot]
+          user_email: 41898282+github-actions[bot]@users.noreply.github.com
+          external_repository: PKUHPC/scow-deployment
+          publish_branch: ${{ github.ref_name }}

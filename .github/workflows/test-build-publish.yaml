@@ -28,6 +28,12 @@ jobs:
           node-version: 18.x
           cache: pnpm
 
+      - name: Install dependencies
+        run: pnpm i --frozen-lockfile
+
+      - name: Lint code
+        run: pnpm lint
+
       - name: Generate SSH key pairs for test
         run: ssh-keygen -t rsa -q -f "$HOME/.ssh/id_rsa" -N ""
 
@@ -36,9 +42,6 @@ jobs:
 
       - name: Check running containers
         run: docker ps
-
-      - name: Install dependencies
-        run: pnpm i --frozen-lockfile
 
       - name: Prepare dev libs and code
         run: pnpm prepareDev

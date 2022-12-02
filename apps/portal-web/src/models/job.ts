@@ -58,3 +58,10 @@ export function runningJobId(r: RunningJobInfo) {
   return `${r.cluster.id}:${r.jobId}`;
 }
 
+export function compareState(a: string, b: string): -1 | 0 | 1 {
+  const endState = "ENDED";
+  if (a === b || (a !== endState && b !== endState)) { return 0; }
+  if (a === endState) { return -1; }
+  return 1;
+}
+  

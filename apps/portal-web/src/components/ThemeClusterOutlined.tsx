@@ -10,27 +10,15 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Type } from "@sinclair/typebox";
-import { validateObject } from "src/validation";
+import { ClusterOutlined } from "@ant-design/icons";
+import React from "react";
+import { useTheme } from "styled-components";
 
-const Schema = Type.Object({
-  propertyA: Type.Number(),
-});
 
-it.each([
-  [{ propertyA: 1 }, true],
-  [{ propertyA: 1, propertyB: 2 }, true],
-  [{ propertyA: "1" }, false],
-  [{ propertyB: 2 }, false],
-
-])("returns correct validation result", (data, expected) => {
-
-  const result = validateObject(Schema, data);
-
-  if (expected) {
-    expect(result).toEqual(data);
-  } else {
-    expect(result).toBeInstanceOf(Error);
-  }
-});
-
+export const ThemeClusterOutlined: React.FC = () => {
+  const { token } = useTheme();
+  
+  return (
+    <ClusterOutlined style={{ color: token.colorPrimary }} />
+  );
+};

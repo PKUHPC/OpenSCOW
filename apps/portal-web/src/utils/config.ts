@@ -72,6 +72,9 @@ export interface PublicRuntimeConfig {
 
   NOVNC_CLIENT_PATH: string;
 
+  PASSWORD_PATTERN: string | undefined;
+  PASSWORD_PATTERN_MESSAGE: string | undefined;
+
 }
 
 export const runtimeConfig: ServerRuntimeConfig = getConfig().serverRuntimeConfig;
