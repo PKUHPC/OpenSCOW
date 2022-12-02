@@ -13,7 +13,8 @@
 import { InboxOutlined } from "@ant-design/icons";
 import { Button, Modal, Upload } from "antd";
 import { join } from "path";
-import { useMessage } from "src/layouts/prompts";
+import { api } from "src/apis";
+import { useMessage, useModal } from "src/layouts/prompts";
 import { urlToUpload } from "src/pageComponents/filemanager/api";
 
 interface Props {
@@ -26,8 +27,9 @@ interface Props {
 
 export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, cluster }) => {
 
+  const modal = useModal();
   const message = useMessage();
-
+  
   return (
     <Modal
       open={open}
@@ -55,6 +57,27 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
           } else if (file.status === "error") {
             message.error(`${file.name}上传失败`);
           }
+        }}
+        beforeUpload={(file) => {
+          return new Promise(async (resolve, reject) => {
+            const exists = await api.fileExist({ query:{ cluster: cluster, path: join(path, file.name) } });
+            if (exists.result) {
+              modal.confirm({
+                title: "文件/目录已存在",
+                content: `文件/目录${file.name}已存在，是否覆盖？`,
+                okText: "确认",
+                onOk: async () => {
+                  const fileType = await api.getFileType({ query:{ cluster: cluster, path: join(path, file.name) } });
+                  const deleteOperation = fileType.type === "dir" ? api.deleteDir : api.deleteFile;
+                  await deleteOperation({ body: { cluster: cluster, path: join(path, file.name) } })
+                    .then(() => resolve(file));
+                },
+                onCancel: () => { reject(file); },
+              });
+            } else {
+              resolve(file);
+            }
+          });
         }}
       >
         <p className="ant-upload-drag-icon">

@@ -138,6 +138,17 @@ message GetFileMetadataRequest {
 
 message GetFileMetadataResponse {
   uint32 size = 1;
+  string type = 2;
+}
+
+message ExistsRequest {
+  string user_id = 1;
+  string cluster = 2;
+  string path = 3;
+}
+
+message ExistsResponse {
+   bool exists = 1; 
 }
 
 service FileService {
@@ -157,4 +168,6 @@ service FileService {
   rpc Upload(stream UploadRequest) returns (UploadResponse);
 
   rpc GetFileMetadata(GetFileMetadataRequest) returns (GetFileMetadataResponse);
+
+  rpc Exists(ExistsRequest) returns (ExistsResponse);
 }
