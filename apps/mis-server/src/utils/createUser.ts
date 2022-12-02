@@ -27,7 +27,10 @@ import { User } from "src/entities/User";
 export async function createUserInDatabase(
   userId: string, name: string, email: string, tenantName: string, logger: Logger, em: SqlEntityManager<MySqlDriver>) {
   // get default tenant
-  const tenant = await em.findOneOrFail(Tenant, { name: tenantName });
+  const tenant = await em.findOne(Tenant, { name: tenantName });
+  if (!tenant) {
+    throw <ServiceError> { code: Status.NOT_FOUND, message: `Tenant ${tenantName} is not found.` };
+  }
   // new the user
   const user = new User({
     email, name, tenant, userId,
@@ -42,7 +45,11 @@ export async function createUserInDatabase(
     await em.persistAndFlush(user);
   } catch (e) {
     if (e instanceof UniqueConstraintViolationException) {
-      throw <ServiceError> { code: Status.ALREADY_EXISTS, message:`User with id ${user.id} already exists.` };
+      throw <ServiceError> { 
+        code: Status.ALREADY_EXISTS, 
+        message:`User with id ${user.id} already exists.`,
+        details: "EXISTS_IN_SCOW",
+      };
     } else {
       throw e;
     }
@@ -61,6 +68,7 @@ export async function createUserInAuth(
         throw <ServiceError>{
           code: Status.ALREADY_EXISTS, 
           message:`User with id ${user.name} already exists in auth.`,
+          details: "EXISTS_IN_AUTH",
         }; 
       }
       await em.removeAndFlush(user);
@@ -87,28 +95,39 @@ export async function createUserInAuth(
   }
 }
 
-export async function createUserInDatabaseAndAuth(
-  userId: string, email: string, name: string, password: string, tenantName: string, 
-  logger: Logger, em: SqlEntityManager<MySqlDriver>) {
 
+// 需要注意认证系统已存在与scow中已存在返回code相同，但是details不同
+export async function createUserInDatabaseAndAuth(
+  userId: string, name: string, email: string, password: string, tenantName: string, 
+  logger: Logger, em: SqlEntityManager<MySqlDriver>) {
   const user = await createUserInDatabase(userId, name, email, tenantName, logger, em)
     .catch((e) => {
-      if (e.code === 6) {
-        throw <ServiceError>{
-          code: Status.ALREADY_EXISTS, 
-          message:`User with id ${name} already exists in scow.`,
-          details: "EXISTS_IN_SCOW",
-        }; 
+      if (e.code === 5) {
+        throw <ServiceError> {
+          code: Status.NOT_FOUND,
+          message: "Tenant is not found.",
+        };
       }
+      if (e.code === 6) {
+        throw <ServiceError> {
+          code: Status.ALREADY_EXISTS, 
+          message:`User with id ${user.id} already exists.`,
+          details: "EXISTS_IN_SCOW",
+        };        
+      } 
+      throw <ServiceError> { code: Status.INTERNAL, message: `Error creating user ${user.id} in database.` };
     });
   await createUserInAuth(user!, password, logger, em)
     .catch((e) => {
       if (e.code === 6) {
-        throw <ServiceError>{
+        throw <ServiceError> {
           code: Status.ALREADY_EXISTS, 
-          message:`User with id ${name} already exists in scow.`,
-          details: "EXISTS_IN_AUTH",
-        }; 
+          message:`User with id ${user.id} already exists.`,
+          details: "EXISTS_IN_SCOW",
+        };        
+      } 
+      if (e.code === 13) {
+        throw <ServiceError> { code: Status.INTERNAL, message: `Error creating user ${user.id} in auth.` };
       }
     });
   return user;

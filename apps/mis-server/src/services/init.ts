@@ -43,27 +43,38 @@ export const initServiceServer = plugin((server) => {
 
     createInitAdmin: async ({ request, em }) => {
       const { userId, email, name, password } = request;
+      // 需要注意，如果扔出异常，前端会根据异常结果显示不同提示
+      // 显示两种情况，认证系统中创建失败的原因ALREADY_EXISTS_IN_AUTH=>成功
+      // 显示两种情况，其他错误=>失败
       const user = await createUserInDatabase(userId, name, email, DEFAULT_TENANT_NAME, server.logger, em)
         .catch((e) => {
           if (e.code === 6) {
-            throw <ServiceError>{
+            throw <ServiceError> {
               code: Status.ALREADY_EXISTS, 
-              message:`User with id ${name} already exists in scow.`,
-              cause: "EXISTS_IN_SCOW",
-            }; 
+              message:`User with id ${user.id} already exists.`,
+              details: "EXISTS_IN_SCOW",
+            };        
           }
+          throw <ServiceError> { code: Status.INTERNAL, message: `Error creating user ${user.id} in database.` };
         });
-      await createUserInAuth(user!, password, server.logger, em)
+
+      await setAsInitAdmin(userId, em);
+
+      await createUserInAuth(user, password, server.logger, em)
         .catch((e) => {
           if (e.code === 6) {
-            throw <ServiceError>{
+            throw <ServiceError> {
               code: Status.ALREADY_EXISTS, 
-              message:`User with id ${name} already exists in scow.`,
-              cause: "EXISTS_IN_AUTH",
-            }; 
+              message:`User with id ${user.id} already exists.`,
+              details: "EXISTS_IN_SCOW",
+            };        
+          }       
+          if (e.code === 13) {
+            throw <ServiceError> { 
+              code: Status.INTERNAL, 
+              message: `Error creating user ${user.id} in auth.` };
           }
         });
-      await setAsInitAdmin(userId, em);
       return [{}];
     },
 
