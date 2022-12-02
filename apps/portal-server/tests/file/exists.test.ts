@@ -12,14 +12,12 @@
 
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { Server } from "@ddadaal/tsgrpc-server";
-import { credentials, status } from "@grpc/grpc-js";
-import { sftpStat } from "@scow/lib-ssh";
-import { utc } from "dayjs";
+import { credentials } from "@grpc/grpc-js";
 import { createServer } from "src/app";
-import { FileServiceClient } from "src/generated/portal/file";
+import { ExistsRequest, FileServiceClient } from "src/generated/portal/file";
 
 import { actualPath, cluster, connectToTestServer, 
-  createTestItems, expectGrpcThrow, resetTestServer, TestSshServer, userId } from "./utils";
+  createFile, createTestItems, resetTestServer, TestSshServer, userId } from "./utils";
 
 let ssh: TestSshServer;
 let server: Server;
@@ -40,29 +38,28 @@ afterEach(async () => {
   await server.close();
 });
 
-it("gets file size", async () => {
+it("return true if exists", async () => {
+  const fileName = "file1";
+  const filePath = actualPath(fileName);
 
-  const reply = await asyncUnaryCall(client, "getFileMetadata", {
-    cluster, userId, path: actualPath("test1"),
-  });
+  await createFile(ssh.sftp, filePath);
+  
+  const result = await asyncUnaryCall(client, "exists", {
+    cluster, userId, path: filePath,
+  } as ExistsRequest);
 
-  const stat = await sftpStat(ssh.sftp)(actualPath("test1"));
+  expect(result.exists).toBeTrue();
 
-  expect(reply.size).toBe(stat.size);
 });
 
-it("returns error if file is not accessible", async () => {
-  await expectGrpcThrow(asyncUnaryCall(client, "getFileMetadata", {
-    cluster, userId, path: actualPath("test2"),
-  }), (e) => {
-    expect(e.code).toBe(status.PERMISSION_DENIED);
-  });
-});
+it("return false if not exists", async () => {
+  const fileName = "file2";
+  const filePath = actualPath(fileName);
 
-it("gets file type", async () => {
-  const reply = await asyncUnaryCall(client, "getFileMetadata", {
-    cluster, userId, path: actualPath("test1"),
-  });
+  const result = await asyncUnaryCall(client, "exists", {
+    cluster, userId, path: filePath,
+  } as ExistsRequest);
 
-  expect(reply.type).toBe("file");
+  expect(result.exists).toBeFalse();
+
 });
