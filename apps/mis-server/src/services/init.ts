@@ -14,15 +14,13 @@ import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError, status } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { UniqueConstraintViolationException } from "@mikro-orm/core";
-import { createUser, getUser } from "@scow/lib-auth";
-import { clusters } from "src/config/clusters";
-import { misConfig } from "src/config/mis";
 import { SystemState } from "src/entities/SystemState";
-import { Tenant } from "src/entities/Tenant";
 import { PlatformRole, TenantRole, User } from "src/entities/User";
 import { InitServiceServer, InitServiceService } from "src/generated/server/init";
 import { DEFAULT_TENANT_NAME } from "src/utils/constants";
-import { createUserInDatabase } from "src/utils/createUser";
+import { createUserInAuth, createUserInDatabase } from "src/utils/createUser";
+import { setAsInitAdmin } from "src/utils/setAsAdmin";
+import { userExists } from "src/utils/userExists";
 
 export const initServiceServer = plugin((server) => {
 
@@ -36,69 +34,36 @@ export const initServiceServer = plugin((server) => {
 
     userExists: async ({ request, em }) => {
       const { userId } = request;
-
-      // Check whether the user already exists in scow
-      const user = await em.findOne(User, { userId, tenant: { name: DEFAULT_TENANT_NAME } });
-      if (!server.ext.capabilities.getUser) {
-        // 如果不支持查询，则直接返回existsInAuth: undefined
-        return [{
-          existsInScow: !!user,
-          existsInAuth: undefined,
-        }];
-      }
-      const cluster = Object.values(clusters).find((c) => c.misIgnore === false);
-      const node = cluster!.slurm.loginNodes[0];
-      const userInfo = await getUser(node, { identityId: userId }, server.logger);
+      const result = await userExists(userId, server.logger, em);
       return [{
-        existsInScow: !!user,
-        existsInAuth: !!userInfo,
+        existsInScow: result.existsInScow,
+        existsInAuth: result.existsInAuth,
       }];
     },
 
     createInitAdmin: async ({ request, em }) => {
-      const { userId, email, name, password, existsInAuth } = request;
-      if (server.ext.capabilities.getUser && !existsInAuth && !server.ext.capabilities.createUser) {
-        // 认证系统支持查询用户,且不存在于认证系统，且认证系统不支持创建用户
-        throw <ServiceError>{
-          code: Status.PERMISSION_DENIED, 
-          message:`The auth does not support creating users and the user ${name} doesn't exist in auth.`,
-        };
-      } 
-      // get default tenant
-      const tenant = await em.findOneOrFail(Tenant, { name: DEFAULT_TENANT_NAME });
-
-      // new the user
-      const user = new User({
-        email, name, tenant, userId,
-        platformRoles: [PlatformRole.PLATFORM_ADMIN], tenantRoles: [TenantRole.TENANT_ADMIN],
-      });
-
-      // 认证系统支持查询 && 存在于认证系统
-      // 认证系统支持查询 && 不存在于认证系统 && 认证系统支持创建用户
-      // 认证系统不支持查询 
-      // -> 都要在数据库进行创建
-      await createUserInDatabase(user, password, server.logger, em);
-      if (existsInAuth) {
-        // 认证系统存在则无需下一步
-        return [{}];
-      } 
-      // 认证系统中不存在 && 认证系统支持创建
-      // 认证系统不支持查询
-      // -> 都要尝试创建
-      // call auth
-      await createUser(misConfig.authUrl,
-        { identityId: user.userId, id: user.id, mail: user.email, name: user.name, password }, server.logger)
-      // If the call of creating user of auth fails,  delete the user created in the database.
-        .catch(async (e) => {
-          if (e.status === 409) {
+      const { userId, email, name, password } = request;
+      const user = await createUserInDatabase(userId, name, email, DEFAULT_TENANT_NAME, server.logger, em)
+        .catch((e) => {
+          if (e.code === 6) {
             throw <ServiceError>{
-              code: Status.ALREADY_EXISTS, message:`User with id ${user.name} already exists in auth.`,
+              code: Status.ALREADY_EXISTS, 
+              message:`User with id ${name} already exists in scow.`,
+              cause: "EXISTS_IN_SCOW",
             }; 
           }
-          await em.removeAndFlush(user);
-          server.logger.error("Error creating user in auth.", e);
-          throw <ServiceError> { code: Status.INTERNAL, message: `Error creating user ${user.id} in auth.` }; 
         });
+      await createUserInAuth(user!, password, server.logger, em)
+        .catch((e) => {
+          if (e.code === 6) {
+            throw <ServiceError>{
+              code: Status.ALREADY_EXISTS, 
+              message:`User with id ${name} already exists in scow.`,
+              cause: "EXISTS_IN_AUTH",
+            }; 
+          }
+        });
+      await setAsInitAdmin(userId, em);
       return [{}];
     },
 

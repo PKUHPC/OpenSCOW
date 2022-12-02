@@ -17,7 +17,6 @@ import { InitServiceClient } from "src/generated/server/init";
 import { getClient } from "src/utils/client";
 import { publicConfig } from "src/utils/config";
 import { queryIfInitialized } from "src/utils/init";
-import { handleGrpcClusteropsError } from "src/utils/internalError";
 import { handlegRPCError } from "src/utils/server";
 
 export interface CreateInitAdminSchema {
@@ -34,9 +33,7 @@ export interface CreateInitAdminSchema {
     204: null;
     400: { code: "USER_ID_NOT_VALID" };
 
-    409: { code: "ALREADY_EXISTS_IN_AUTH" | "ALREADY_EXISTS_IN_SCOW" | "ALREADY_INITIALIZED" };
-
-    500: { code: "UNKNOWN_ERROR" };
+    409: { code: "ALREADY_INITIALIZED" | "ALREADY_EXISTS_IN_SCOW" | "ALREADY_EXISTS_IN_AUTH" };
 
   }
 }
@@ -46,7 +43,7 @@ const userIdRegex = publicConfig.USERID_PATTERN ? new RegExp(publicConfig.USERID
 export default route<CreateInitAdminSchema>("CreateInitAdminSchema", async (req) => {
   const result = await queryIfInitialized();
 
-  if (result) { return { 409: { code: "ALREADY_INITIALIZED" } }; }
+  if (result) { return { 409: { code: "ALREADY_INITIALIZED" as const } }; }
 
   const { email, identityId, name, password } = req.body;
 
@@ -58,21 +55,14 @@ export default route<CreateInitAdminSchema>("CreateInitAdminSchema", async (req)
   }
 
   const client = getClient(InitServiceClient);
-  const exist = await asyncClientCall(client, "userExists", {
-    userId: identityId,
-  });
-  if (exist.existsInScow) {
-    return {
-      409: { code: "ALREADY_EXISTS_IN_SCOW" } };
-  }
-  await asyncClientCall(client, "createInitAdmin", {
-    email, name, userId: identityId, password, existsInAuth: exist.existsInAuth,
-  })
+  return await asyncClientCall(client, "createInitAdmin", {
+    email, name, userId: identityId, password,
+  }).then(() => ({ 204: null }))
     .catch(handlegRPCError({
-      [Status.ALREADY_EXISTS]: () => ({ 409: "ALREADY_EXISTS_IN_AUTH" }),
-      [Status.INTERNAL]: () => ({ 500: { code: "UNKNOWN_ERROR" } }),
-      [Status.PERMISSION_DENIED]: handleGrpcClusteropsError,
+      [Status.ALREADY_EXISTS]: (e) => ({ 
+        409: 
+        { code: e.details === "EXISTS_IN_SCOW" ? "ALREADY_EXISTS_IN_SCOW" as const 
+          : "ALREADY_EXISTS_IN_AUTH" as const } }),
     }));
-  return { 204: null };
 });
 

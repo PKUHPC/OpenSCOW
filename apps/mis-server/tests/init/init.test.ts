@@ -46,14 +46,9 @@ it("Test function userExist", async () => {
   const identityId = "test01";
   const name = "test01";
   const email = "test01@test01.com";
-  const password = "pwd...123";
   const em = server.ext.orm.em.fork();
   const tenant = await em.findOneOrFail(Tenant, { name: DEFAULT_TENANT_NAME });
-  const user = new User({
-    email, name, tenant, userId: identityId,
-    platformRoles: [PlatformRole.PLATFORM_ADMIN], tenantRoles: [TenantRole.TENANT_ADMIN],
-  });
-  await createUserInDatabase(user, password, server.logger, em);
+  await createUserInDatabase(identityId, name, email, tenant.name, server.logger, em);
   const result = await asyncClientCall(client, "userExists", {
     userId: identityId,
   });
@@ -113,7 +108,6 @@ it("creates an init admin user", async () => {
     name: "123",
     userId: "123",
     password: "pwd...123",
-    existsInAuth: false,
   };
   await asyncClientCall(client, "createInitAdmin", userInfo);
 

@@ -13,15 +13,8 @@
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
-import { UniqueConstraintViolationException } from "@mikro-orm/core";
-import { createUser } from "@scow/lib-auth";
 import { decimalToMoney } from "@scow/lib-decimal";
-import { insertKeyAsUser } from "@scow/lib-ssh";
-import { clusters } from "src/config/clusters";
-import { rootKeyPair } from "src/config/env";
-import { misConfig } from "src/config/mis";
 import { Account } from "src/entities/Account";
-import { StorageQuota } from "src/entities/StorageQuota";
 import { Tenant } from "src/entities/Tenant";
 import { PlatformRole, TenantRole, User } from "src/entities/User";
 import { UserAccount, UserRole, UserStatus } from "src/entities/UserAccount";
@@ -36,7 +29,7 @@ import {
   UserRole as PFUserRole, UserServiceServer,
   UserServiceService,
   UserStatus as PFUserStatus } from "src/generated/server/user";
-import { createUserInDatabase } from "src/utils/createUser";
+import { createUserInDatabaseAndAuth } from "src/utils/createUser";
 import { paginationProps } from "src/utils/orm";
 
 export const userServiceServer = plugin((server) => {
@@ -322,45 +315,10 @@ export const userServiceServer = plugin((server) => {
       if (!tenant) {
         throw <ServiceError> { code: Status.NOT_FOUND, details: "Tenant is not found." };
       }
-      // creat user in database
-      const user = new User({ name, userId: identityId, tenant, email });
-      await createUserInDatabase(user, password, logger, em);
+      console.log("teaName", tenantName);
+      const user = await createUserInDatabaseAndAuth(identityId, email, name, password, tenantName, logger, em);
 
-      // call auth
-      await createUser(misConfig.authUrl, { identityId, id: user.id, mail: email, name, password }, logger)
-        // If the call of creating user of auth fails,  delete the user created in the database.
-        .catch(async (e) => {
-          await em.removeAndFlush(user);
-
-          if (e.status === 409) {
-            throw <ServiceError> {
-              code: Status.ALREADY_EXISTS, message:`User with id ${user.id} already exists.`,
-            };
-          }
-
-          logger.error("Error creating user in auth.", e);
-
-          throw <ServiceError> { code: Status.INTERNAL, message: `Error creating user ${user.id} in auth.` };
-        });
-
-      // Making an ssh Request to the login node as the user created.
-      if (process.env.NODE_ENV === "production") {
-        await Promise.all(Object.values(clusters).map(async ({ displayName, slurm, misIgnore }) => {
-          if (misIgnore) { return; }
-          const node = slurm.loginNodes[0];
-          logger.info("Checking if user can login to %s by login node %s", displayName, node);
-
-          const error = await insertKeyAsUser(node, name, password, rootKeyPair, logger).catch((e) => e);
-          if (error) {
-            logger.info("user %s cannot login to %s by login node %s. err: %o", name, displayName, node, error);
-            throw error;
-          } else {
-            logger.info("user %s login to %s by login node %s", name, displayName, node);
-          }
-        }));
-      }
-
-      return [{ id: user.id }];
+      return [{ id: user!.id }];
     },
 
     deleteUser: async ({ request, em }) => {
