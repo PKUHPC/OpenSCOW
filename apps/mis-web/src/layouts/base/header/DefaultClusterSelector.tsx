@@ -15,14 +15,17 @@ import { Space, Tooltip } from "antd";
 import { useStore } from "simstate";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
+import { useTheme } from "styled-components";
 
 export const DefaultClusterSelector: React.FC = () => {
   const defaultClusterStore = useStore(DefaultClusterStore);
 
+  const { token } = useTheme();
+
   return (
     <Space>
       <Tooltip title="需要选择集群的功能将会默认选择默认集群">
-        <ClusterOutlined />
+        <ClusterOutlined style={{ color: token.colorPrimary }}/>
       </Tooltip>
       <SingleClusterSelector
         value={defaultClusterStore.cluster}
