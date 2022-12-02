@@ -88,6 +88,11 @@ Export list for 192.168.29.106:
 ```PowerShell
 # 创建目录
 mkdir /data
+#将共享存储/data 挂载至192.168.29.106服务器的/data目录下
+mount 192.168.29.106:/data /data -o proto=tcp -o nolock
+
+# 设置开机自动挂载
+vim /etc/fstab
 # 在文档末尾添加
 192.168.29.106:/data /data nfs rw,auto,nofail,noatime,nolock,intr,tcp,actimeo=1800 0 0
 ```
