@@ -39,10 +39,10 @@ message UnsetInitAdminRequest {
   string user_id = 1;
 }
 message UnsetInitAdminReply {}
-message userExistsRequest {
+message UserExistsRequest {
   string user_id = 1;
 }
-message userExistsReply {
+message UserExistsReply {
   bool exists_in_scow= 1;
   optional bool exists_in_auth = 2;
 }
@@ -65,6 +65,6 @@ service InitService {
   // Unset a user's PLATFORM_ADMIN and default tenant's TENANT_ADMIN role
   // NOT_FOUND: the user is not found in default tenant
   rpc UnsetInitAdmin(UnsetInitAdminRequest) returns (UnsetInitAdminReply);
-  rpc userExists(userExistsRequest) returns (userExistsReply);
+  rpc UserExists(UserExistsRequest) returns (UserExistsReply);
 
 }

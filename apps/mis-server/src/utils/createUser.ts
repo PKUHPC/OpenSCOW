@@ -58,7 +58,7 @@ export async function createUserInDatabase(
 }
 
 export async function createUserInAuth(
-  user: User, password: string, logger: Logger, em: SqlEntityManager<MySqlDriver>) {
+  user: User, password: string, logger: Logger) {
   await createUser(misConfig.authUrl,
     { identityId: user.userId, id: user.id, mail: user.email, name: user.name, password },
     logger)
@@ -71,7 +71,6 @@ export async function createUserInAuth(
           details: "EXISTS_IN_AUTH",
         }; 
       }
-      await em.removeAndFlush(user);
       logger.error("Error creating user in auth.", e);
       throw <ServiceError> { code: Status.INTERNAL, message: `Error creating user ${user.id} in auth.` }; 
     });
@@ -100,35 +99,16 @@ export async function createUserInAuth(
 export async function createUserInDatabaseAndAuth(
   userId: string, name: string, email: string, password: string, tenantName: string, 
   logger: Logger, em: SqlEntityManager<MySqlDriver>) {
-  const user = await createUserInDatabase(userId, name, email, tenantName, logger, em)
-    .catch((e) => {
-      if (e.code === 5) {
-        throw <ServiceError> {
-          code: Status.NOT_FOUND,
-          message: "Tenant is not found.",
-        };
+  const user = await createUserInDatabase(userId, name, email, tenantName, logger, em);
+  await createUserInAuth(user!, password, logger)
+    .catch(async (e) => {
+      if (e.code === Status.INTERNAL) {
+        await em.removeAndFlush(user);
+        throw <ServiceError> { 
+          code: Status.INTERNAL, 
+          message: `Error creating user ${user.id} in auth.` };
       }
-      if (e.code === 6) {
-        throw <ServiceError> {
-          code: Status.ALREADY_EXISTS, 
-          message:`User with id ${user.id} already exists.`,
-          details: "EXISTS_IN_SCOW",
-        };        
-      } 
-      throw <ServiceError> { code: Status.INTERNAL, message: `Error creating user ${user.id} in database.` };
-    });
-  await createUserInAuth(user!, password, logger, em)
-    .catch((e) => {
-      if (e.code === 6) {
-        throw <ServiceError> {
-          code: Status.ALREADY_EXISTS, 
-          message:`User with id ${user.id} already exists.`,
-          details: "EXISTS_IN_SCOW",
-        };        
-      } 
-      if (e.code === 13) {
-        throw <ServiceError> { code: Status.INTERNAL, message: `Error creating user ${user.id} in auth.` };
-      }
+      throw e;
     });
   return user;
 }

@@ -44,7 +44,6 @@ export const InitAdminForm: React.FC = () => {
         title: "用户已存在",
         content: "用户已存在于SCOW数据库，无法再添加此用户",
         okText: "确认",
-        cancelText: "",
         onOk: async () => {
           setLoading(false);
         },

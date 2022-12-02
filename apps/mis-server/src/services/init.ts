@@ -48,7 +48,7 @@ export const initServiceServer = plugin((server) => {
       // 显示两种情况，其他错误=>失败
       const user = await createUserInDatabase(userId, name, email, DEFAULT_TENANT_NAME, server.logger, em)
         .catch((e) => {
-          if (e.code === 6) {
+          if (e.code !== Status.ALREADY_EXISTS) {
             throw <ServiceError> {
               code: Status.ALREADY_EXISTS, 
               message:`User with id ${user.id} already exists.`,
@@ -60,16 +60,17 @@ export const initServiceServer = plugin((server) => {
 
       await setAsInitAdmin(userId, em);
 
-      await createUserInAuth(user, password, server.logger, em)
-        .catch((e) => {
-          if (e.code === 6) {
+      await createUserInAuth(user, password, server.logger)
+        .catch(async (e) => {
+          if (e.code === Status.ALREADY_EXISTS) {
             throw <ServiceError> {
               code: Status.ALREADY_EXISTS, 
               message:`User with id ${user.id} already exists.`,
-              details: "EXISTS_IN_SCOW",
+              details: "EXISTS_IN_AUTH",
             };        
           }       
-          if (e.code === 13) {
+          if (e.code === Status.INTERNAL) {
+            await em.removeAndFlush(user);
             throw <ServiceError> { 
               code: Status.INTERNAL, 
               message: `Error creating user ${user.id} in auth.` };
