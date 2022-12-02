@@ -2,7 +2,7 @@
 sidebar_label: '多集群管理'
 title: 多集群管理
 slug: /multi_cluster
-sidebar_position: 6
+sidebar_position: 7
 ---
 
 SCOW多集群部署架构如下图所示：
