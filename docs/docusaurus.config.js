@@ -120,7 +120,7 @@ const config = {
             ],
           },
         ],
-        copyright: `Copyright © ${new Date().getFullYear()} SCOW, PKUHPC. Built with Docusaurus.`,
+        copyright: `Copyright © ${new Date().getFullYear()} 北京大学计算与数字经济研究院. Built with Docusaurus.`,
       },
       prism: {
         theme: lightCodeTheme,
