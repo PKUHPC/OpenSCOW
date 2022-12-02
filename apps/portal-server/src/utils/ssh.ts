@@ -32,11 +32,13 @@ export async function sshConnect<T>(
   address: string, username: string, logger: Logger, run: (ssh: NodeSSH) => Promise<T>,
 ): Promise<T> {
   return libConnect(address, username, rootKeyPair, logger, run).catch((e) => {
-    logger.error(e, "Error during ssh connection");
-    throw new ServiceError({
-      code: status.INTERNAL,
-      metadata: scowErrorMetadata(SSH_ERROR_CODE),
-    });
+    if (e === "SSH_CONNECT_ERROR") {
+      throw new ServiceError({
+        code: status.INTERNAL,
+        metadata: scowErrorMetadata(SSH_ERROR_CODE),
+      });
+    }
+    throw e;    
   });
 }
 

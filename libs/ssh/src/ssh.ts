@@ -49,12 +49,9 @@ export async function sshRawConnect(address: string, username: string, rootKeyPa
 
     logger.info("Login to %s as %s failed. Try inserting public key", host, username);
     await insertKeyAsRoot(username, address, rootKeyPair, logger);
-    await connect().catch(() => {
-      console.log("throw ssh connect error");
-      throw <Error> {
-        // code: Status.INTERNAL,
-        message: "Login with public key failed.",
-      };
+    await connect().catch((e) => {
+      logger.error(e, "Error during ssh connection");
+      throw "SSH_CONNECT_ERROR";
     });
   }
 
