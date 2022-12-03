@@ -7,13 +7,26 @@
 /* You can override the default Infima variables here. */
 :root {
   --ifm-color-primary: #94070A;
-  --ifm-color-primary-dark: rgb(33, 175, 144);
-  --ifm-color-primary-darker: rgb(31, 165, 136);
-  --ifm-color-primary-darkest: rgb(26, 136, 112);
-  --ifm-color-primary-light: rgb(70, 203, 174);
-  --ifm-color-primary-lighter: rgb(102, 212, 189);
-  --ifm-color-primary-lightest: rgb(146, 224, 208);
+
+  --ifm-color-primary-dark: rgb(241, 168, 63);
+  --ifm-color-primary-darker: rgb(58, 49, 44);
+  --ifm-color-primary-darkest: rgb(94, 74, 68);
+  --ifm-color-primary-light: rgb(241, 168, 63);
+  --ifm-color-primary-lighter: rgb(252, 209, 108);
+  --ifm-color-primary-lightest: rgb(249, 231, 212);
+
+  --ifm-color-success-dark: rgb(241, 168, 63);
+
+  --ifm-color-success-contrast-background: rgb(249, 231, 212);
+  --ifm-color-success-contrast-foreground: rgb(148, 7, 10);
+  --ifm-alert-background-color-highlight: rgb(252, 209, 108);
+
+
   --ifm-code-font-size: 95%;
+}
+
+.alert--success {
+  --ifm-alert-background-color-highlight: rgb(252, 209, 180);
 }
 
 .docusaurus-highlight-code-line {
@@ -25,4 +38,10 @@
 
 html[data-theme='dark'] .docusaurus-highlight-code-line {
   background-color: rgba(0, 0, 0, 0.3);
+}
+
+html[data-theme='dark']  .alert--success {
+  --ifm-alert-background-color: rgb(58, 49, 44);
+  --ifm-color-success-contrast-foreground: rgb(255, 239, 225);
+  --ifm-alert-background-color-highlight: rgb(94, 74, 68);
 }
