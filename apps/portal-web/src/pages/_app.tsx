@@ -56,7 +56,7 @@ const FailEventHandler: React.FC = () => {
       }
 
       if (e.data?.code === "SSH_ERROR") {
-        message.error("以用户身份连接到集群失败");
+        message.error("无法以用户身份连接到登录节点。请确认您的家目录的权限为700、750或者755");
         return;
       }
 
