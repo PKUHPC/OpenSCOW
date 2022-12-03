@@ -33,6 +33,16 @@ interface SessionMetadata {
   submitTime: string;
 }
 
+interface ServerSessionInfoData {
+  host: string;
+  port: number;
+  password: string;
+}
+
+interface VncSessionInfoData {
+  host: string;
+}
+
 const SERVER_ENTRY_COMMAND = fs.readFileSync("assets/slurm/server_entry.sh", { encoding: "utf-8" });
 const VNC_ENTRY_COMMAND = fs.readFileSync("assets/slurm/vnc_entry.sh", { encoding: "utf-8" });
 
@@ -255,11 +265,8 @@ export const slurmAppOps = (cluster: string): AppOps => {
         if (app.type === "web") {
           const infoFilePath = join(jobDir, SERVER_SESSION_INFO);
           if (await sftpExists(sftp, infoFilePath)) {
-            const content = (await sftpReadFile(sftp)(infoFilePath)).toString();
-
-            // FORMAT: HOST\nPORT\nPASSWORD
-
-            const [host, port, password] = content.split("\n");
+            const content = await sftpReadFile(sftp)(infoFilePath);
+            const { host, port, password } = JSON.parse(content.toString()) as ServerSessionInfoData;
 
             return { code: "OK", appId: sessionMetadata.appId, host, port: +port, password };
           }
@@ -270,8 +277,8 @@ export const slurmAppOps = (cluster: string): AppOps => {
 
           // try to read the host info
           if (await sftpExists(sftp, vncSessionInfoPath)) {
-
-            const host = (await sftpReadFile(sftp)(vncSessionInfoPath)).toString().trim();
+            const content = await sftpReadFile(sftp)(vncSessionInfoPath);
+            const { host } = JSON.parse(content.toString().trim()) as VncSessionInfoData;
 
             const outputFilePath = join(jobDir, VNC_OUTPUT_FILE);
             if (await sftpExists(sftp, outputFilePath)) {
