@@ -50,8 +50,8 @@ const VNC_OUTPUT_FILE = "output";
 
 const SESSION_METADATA_NAME = "session.json";
 
-const SERVER_SESSION_INFO = "SERVER_SESSION_INFO";
-const VNC_SESSION_INFO = "VNC_SESSION_INFO";
+const SERVER_SESSION_INFO = "server_session_info.json";
+const VNC_SESSION_INFO = "vnc_session_info.json";
 
 export const slurmAppOps = (cluster: string): AppOps => {
 
