@@ -17,7 +17,7 @@ import { LockMode } from "@mikro-orm/core";
 import { Decimal } from "@scow/lib-decimal";
 import { moneyToNumber } from "@scow/lib-decimal/build/convertion";
 import { UserAccount } from "src/entities/UserAccount";
-import { JobChargeLimitServiceServer, JobChargeLimitServiceService } from "src/generated/server/jobChargeLimit";
+import { JobChargeLimitServiceServer, JobChargeLimitServiceService } from "src/generated/server/job_charge_limit";
 
 export const jobChargeLimitServer = plugin((server) => {
   server.addService<JobChargeLimitServiceServer>(JobChargeLimitServiceService, {

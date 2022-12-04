@@ -17,7 +17,7 @@ import { SqlEntityManager } from "@mikro-orm/mysql";
 import { Decimal, decimalToMoney } from "@scow/lib-decimal";
 import { createServer } from "src/app";
 import { UserAccount, UserStatus } from "src/entities/UserAccount";
-import { JobChargeLimitServiceClient } from "src/generated/server/jobChargeLimit";
+import { JobChargeLimitServiceClient } from "src/generated/server/job_charge_limit";
 import { reloadEntity } from "src/utils/orm";
 import { InitialData, insertInitialData } from "tests/data/data";
 import { dropDatabase } from "tests/data/helpers";

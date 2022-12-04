@@ -38,7 +38,9 @@ message GetBalanceRequest {
   optional string account_name = 2;
 }
 
-message GetBalanceReply { common.Money balance = 1; }
+message GetBalanceReply {
+  common.Money balance = 1;
+}
 
 message ChargeRequest {
   string tenant_name = 1;
@@ -106,9 +108,12 @@ message GetPaymentRecordsReply {
   optional common.Money total = 2;
 }
 
-message GetAllPayTypesRequest {}
+message GetAllPayTypesRequest {
+}
 
-message GetAllPayTypesReply { repeated string types = 1; }
+message GetAllPayTypesReply {
+  repeated string types = 1;
+}
 
 service ChargingService {
   // NotFound: account is not found.

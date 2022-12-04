@@ -29,9 +29,12 @@ message ShellRequest {
     uint32 rows = 2;
   }
 
-  message Data { bytes data = 1; }
+  message Data {
+    bytes data = 1;
+  }
 
-  message Disconnect {}
+  message Disconnect {
+  }
 
   oneof message {
     Connect connect = 1;
@@ -43,7 +46,9 @@ message ShellRequest {
 
 message ShellResponse {
 
-  message Data { bytes data = 1; }
+  message Data {
+    bytes data = 1;
+  }
 
   message Exit {
     optional uint32 code = 1;
