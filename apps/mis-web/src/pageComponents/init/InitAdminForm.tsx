@@ -92,7 +92,7 @@ export const InitAdminForm: React.FC = () => {
                 });
             })
             .then((createdInAuth) => { 
-              createdInAuth.createdInAuth ? 
+              !createdInAuth.createdInAuth ? 
                 modal.info({
                   title: "添加成功",
                   content: "此用户存在于认证系统中，已成功添加到SCOW数据库",

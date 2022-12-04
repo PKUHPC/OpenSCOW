@@ -52,27 +52,29 @@ export const initServiceServer = plugin((server) => {
           if (e.code === Status.ALREADY_EXISTS) {
             throw <ServiceError> {
               code: Status.ALREADY_EXISTS, 
-              message:`User with id ${user.id} already exists in scow.`,
+              message:`User with userId ${userId} already exists in scow.`,
               details: "EXISTS_IN_SCOW",
             };        
           }
-          throw <ServiceError> { code: Status.INTERNAL, message: `Error creating user ${user.id} in database.` };
+          throw <ServiceError> { 
+            code: Status.INTERNAL, 
+            message: `Error creating user with userId ${userId} in database.` };
         });
 
       user.platformRoles.push(PlatformRole.PLATFORM_ADMIN);
       user.tenantRoles.push(TenantRole.TENANT_ADMIN);
       await em.flush();
-
-      // createdInAuth代表用户是否在创建之前已经存在于认证系统
-      let createdInAuth: boolean = false;
       // call auth
-      await createUser(misConfig.authUrl,
+      // createdInAuth反映用户在本次创建之前用户否存在于认证系统，否->true, 是->false
+      const createdInAuth = await createUser(misConfig.authUrl,
         { identityId: user.userId, id: user.id, mail: user.email, name: user.name, password },
         server.logger)
+        .then(() => true)
         // If the call of creating user of auth fails,  delete the user created in the database.
         .catch(async (e) => {
           if (e.status === 409) {
-            createdInAuth = true; 
+            server.logger.warn(`User with userId ${ userId }  exists in auth.`);
+            return false; 
           }
           server.logger.error("Error creating user in auth.", e);
           throw <ServiceError> { code: Status.INTERNAL, message: `Error creating user ${user.id} in auth.` }; 

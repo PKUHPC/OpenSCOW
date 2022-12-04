@@ -53,6 +53,7 @@ it("Test function userExist", async () => {
     userId: identityId,
   });
   expect(result.existsInScow).toBe(true);
+  expect(result.existsInAuth).toBe(true);
 });
 
 it("To test whether the slurm.sh is automatically copied successfully", async () => {

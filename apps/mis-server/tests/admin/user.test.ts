@@ -91,7 +91,6 @@ it("cannot create user if userId exists", async () => {
   const reply = await asyncClientCall(client, "createUser", {
     name, identityId: userId, email, tenantName: tenant.name, password,
   }).catch((e) => e);
-
   expect(reply.code).toBe(Status.ALREADY_EXISTS);
 });
 
