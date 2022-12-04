@@ -14,8 +14,8 @@ syntax = "proto3";
 
 package scow.portal;
 
-import "google/protobuf/timestamp.proto";
 import "common/job.proto";
+import "google/protobuf/timestamp.proto";
 
 message CancelJobRequest {
   string user_id = 1;
@@ -24,14 +24,17 @@ message CancelJobRequest {
 }
 
 // NOT_FOUND: cluster is not found
-message CancelJobResponse {}
+message CancelJobResponse {
+}
 
 message ListAccountsRequest {
   string user_id = 1;
   string cluster = 2;
 }
 
-message ListAccountsResponse { repeated string accounts = 1; }
+message ListAccountsResponse {
+  repeated string accounts = 1;
+}
 
 message ListAllJobsRequest {
   string user_id = 1;
@@ -68,14 +71,18 @@ message NewJobInfo {
   optional string comment = 10;
 }
 
-message ListAllJobsResponse { repeated JobInfo results = 1; }
+message ListAllJobsResponse {
+  repeated JobInfo results = 1;
+}
 
 message ListRunningJobsRequest {
   string user_id = 1;
   string cluster = 2;
 }
 
-message ListRunningJobsResponse { repeated common.job.RunningJob results = 1; }
+message ListRunningJobsResponse {
+  repeated common.job.RunningJob results = 1;
+}
 
 message ListJobTemplatesRequest {
   string user_id = 1;
@@ -89,7 +96,9 @@ message JobTemplate {
   optional string comment = 4;
 }
 
-message ListJobTemplatesResponse { repeated JobTemplate results = 1; }
+message ListJobTemplatesResponse {
+  repeated JobTemplate results = 1;
+}
 
 message GetJobTemplateRequest {
   string user_id = 1;
@@ -97,7 +106,9 @@ message GetJobTemplateRequest {
   string template_id = 3;
 }
 
-message GetJobTemplateResponse { NewJobInfo job_info = 1; }
+message GetJobTemplateResponse {
+  NewJobInfo job_info = 1;
+}
 message SubmitJobRequest {
   string user_id = 1;
   string cluster = 2;
@@ -117,9 +128,13 @@ message SubmitJobRequest {
 // NOT_FOUND: cluster is not found
 message SubmitJobResponse {
 
-  message OK { uint32 job_id = 1; }
+  message OK {
+    uint32 job_id = 1;
+  }
 
-  message SchedulerError { string error = 1; }
+  message SchedulerError {
+    string error = 1;
+  }
 
   oneof result {
     OK ok = 1;

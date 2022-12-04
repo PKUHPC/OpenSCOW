@@ -38,9 +38,13 @@ message UnblockAccountRequest {
 }
 
 // NOT_FOUND: account is not found.
-message UnblockAccountReply { bool executed = 1; }
+message UnblockAccountReply {
+  bool executed = 1;
+}
 
-message GetWhitelistedAccountsRequest { string tenant_name = 1; }
+message GetWhitelistedAccountsRequest {
+  string tenant_name = 1;
+}
 
 message WhitelistedAccount {
   string account_name = 1;
@@ -63,7 +67,9 @@ message WhitelistAccountRequest {
 }
 
 // NOT_FOUND: account is not found.
-message WhitelistAccountReply { bool executed = 1; }
+message WhitelistAccountReply {
+  bool executed = 1;
+}
 
 message DewhitelistAccountRequest {
   string tenant_name = 1;
@@ -71,7 +77,9 @@ message DewhitelistAccountRequest {
 }
 
 // NOT_FOUND: account is not found.
-message DewhitelistAccountReply { bool executed = 1; }
+message DewhitelistAccountReply {
+  bool executed = 1;
+}
 
 message CreateAccountRequest {
   string tenant_name = 1;
@@ -82,7 +90,8 @@ message CreateAccountRequest {
 
 // ALREADY_EXISTS: Account already exists.
 // NOT_FOUND: owner user doesn't exist
-message CreateAccountReply {}
+message CreateAccountReply {
+}
 
 message GetAccountsRequest {
   string tenant_name = 1;
@@ -101,7 +110,9 @@ message Account {
   common.Money balance = 8;
 }
 
-message GetAccountsReply { repeated Account results = 1; }
+message GetAccountsReply {
+  repeated Account results = 1;
+}
 
 service AccountService {
 

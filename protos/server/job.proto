@@ -14,9 +14,9 @@ syntax = "proto3";
 
 package scow.server;
 
-import "google/protobuf/timestamp.proto";
-import "common/money.proto";
 import "common/job.proto";
+import "common/money.proto";
+import "google/protobuf/timestamp.proto";
 
 message JobInfo {
   uint64 bi_job_index = 1;
@@ -82,12 +82,18 @@ message ChangeJobPriceRequest {
 }
 
 // NOT_FOUND: job is not found
-message ChangeJobPriceReply { uint64 count = 1; }
+message ChangeJobPriceReply {
+  uint64 count = 1;
+}
 
-message GetJobByBiJobIndexRequest { string bi_job_index = 1; }
+message GetJobByBiJobIndexRequest {
+  string bi_job_index = 1;
+}
 
 // NOT_FOUND: job is not found
-message GetJobByBiJobIndexReply { JobInfo info = 1; }
+message GetJobByBiJobIndexReply {
+  JobInfo info = 1;
+}
 
 message GetRunningJobsRequest {
   string cluster = 1;
@@ -99,7 +105,9 @@ message GetRunningJobsRequest {
   repeated string job_id_list = 5;
 }
 
-message GetRunningJobsReply { repeated common.job.RunningJob jobs = 1; }
+message GetRunningJobsReply {
+  repeated common.job.RunningJob jobs = 1;
+}
 
 message ChangeJobTimeLimitRequest {
   string cluster = 1;
@@ -108,7 +116,8 @@ message ChangeJobTimeLimitRequest {
 }
 
 // NOT_FOUND: cluster or job_id is not found.
-message ChangeJobTimeLimitReply {}
+message ChangeJobTimeLimitReply {
+}
 
 message QueryJobTimeLimitRequest {
   string cluster = 1;
@@ -131,10 +140,14 @@ message JobBillingItem {
   string amount_strategy = 6;
 }
 
-message GetBillingItemsReply { repeated JobBillingItem items = 1; }
+message GetBillingItemsReply {
+  repeated JobBillingItem items = 1;
+}
 
 // NOT_FOUND: cluster or job_id is not found.
-message QueryJobTimeLimitReply { uint64 limit = 1; }
+message QueryJobTimeLimitReply {
+  uint64 limit = 1;
+}
 
 message AddBillingItemRequest {
   // if not set, add as platform default item
@@ -146,7 +159,8 @@ message AddBillingItemRequest {
   optional string description = 6;
 }
 
-message AddBillingItemReply {}
+message AddBillingItemReply {
+}
 
 service JobService {
   rpc GetJobs(GetJobsRequest) returns (GetJobsReply);

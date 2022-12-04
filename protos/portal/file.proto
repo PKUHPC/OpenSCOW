@@ -23,7 +23,8 @@ message CopyRequest {
 
 // NOT_FOUND: cluster is not found
 // INTERNAL: cp command failed. details has stderr
-message CopyResponse {}
+message CopyResponse {
+}
 
 message CreateFileRequest {
   string user_id = 1;
@@ -33,7 +34,8 @@ message CreateFileRequest {
 
 // NOT_FOUND: cluster is not found
 // ALREADY_EXISTS: file also exists
-message CreateFileResponse {}
+message CreateFileResponse {
+}
 
 message DeleteDirectoryRequest {
   string user_id = 1;
@@ -42,7 +44,8 @@ message DeleteDirectoryRequest {
 }
 
 // NOT_FOUND: cluster is not found
-message DeleteDirectoryResponse {}
+message DeleteDirectoryResponse {
+}
 
 message DeleteFileRequest {
   string user_id = 1;
@@ -51,7 +54,8 @@ message DeleteFileRequest {
 }
 
 // NOT_FOUND: cluster is not found
-message DeleteFileResponse {}
+message DeleteFileResponse {
+}
 
 message DownloadRequest {
   string user_id = 1;
@@ -59,7 +63,9 @@ message DownloadRequest {
   string path = 3;
 }
 
-message DownloadResponse { bytes chunk = 1; }
+message DownloadResponse {
+  bytes chunk = 1;
+}
 
 message GetHomeDirectoryRequest {
   string user_id = 1;
@@ -67,7 +73,9 @@ message GetHomeDirectoryRequest {
 }
 
 // NOT_FOUND: cluster is not found
-message GetHomeDirectoryResponse { string path = 1; }
+message GetHomeDirectoryResponse {
+  string path = 1;
+}
 
 message ReadDirectoryRequest {
   string user_id = 1;
@@ -78,8 +86,8 @@ message ReadDirectoryRequest {
 message FileInfo {
 
   enum FileType {
-    File = 0;
-    Dir = 1;
+    FILE = 0;
+    DIR = 1;
   }
 
   string name = 1;
@@ -91,7 +99,9 @@ message FileInfo {
 
 // PERMISSION_DENIED: directory is not accessible
 // INVALID_ARGUMENT: path is not directory or not exists
-message ReadDirectoryResponse { repeated FileInfo results = 1; }
+message ReadDirectoryResponse {
+  repeated FileInfo results = 1;
+}
 
 message MoveRequest {
   string user_id = 1;
@@ -101,7 +111,8 @@ message MoveRequest {
 }
 
 // INTERNAL: rename failed. details has error
-message MoveResponse {}
+message MoveResponse {
+}
 
 message MakeDirectoryRequest {
   string user_id = 1;
@@ -111,7 +122,8 @@ message MakeDirectoryRequest {
 
 // NOT_FOUND: cluster not found
 // ALREADY_EXISTS: directory already found
-message MakeDirectoryResponse {}
+message MakeDirectoryResponse {
+}
 
 message UploadRequest {
 
@@ -128,7 +140,9 @@ message UploadRequest {
   };
 }
 
-message UploadResponse { uint64 written_bytes = 1; }
+message UploadResponse {
+  uint64 written_bytes = 1;
+}
 
 message GetFileMetadataRequest {
   string user_id = 1;
@@ -148,7 +162,7 @@ message ExistsRequest {
 }
 
 message ExistsResponse {
-   bool exists = 1; 
+  bool exists = 1; 
 }
 
 service FileService {

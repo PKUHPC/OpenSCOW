@@ -14,30 +14,38 @@ syntax = "proto3";
 
 package scow.server;
 
-message QuerySystemInitializedRequest {}
-message QuerySystemInitializedReply { bool initialized = 1; }
+message QuerySystemInitializedRequest {
+}
+message QuerySystemInitializedReply {
+  bool initialized = 1;
+}
 
 message CreateInitAdminRequest {
   string user_id = 1;
   string name = 2;
   string email = 3;
 }
-message CreateInitAdminReply {}
+message CreateInitAdminReply {
+}
 
-message CompleteInitRequest {}
+message CompleteInitRequest {
+}
 
-message CompleteInitReply {}
+message CompleteInitReply {
+}
 
 message SetAsInitAdminRequest {
   string user_id = 1;
 }
 
-message SetAsInitAdminReply {}
+message SetAsInitAdminReply {
+}
 
 message UnsetInitAdminRequest {
   string user_id = 1;
 }
-message UnsetInitAdminReply {}
+message UnsetInitAdminReply {
+}
 
 service InitService {
   rpc QuerySystemInitialized(QuerySystemInitializedRequest)
