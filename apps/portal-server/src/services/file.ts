@@ -189,7 +189,7 @@ export const fileServiceServer = plugin((server) => {
           const isDir = file.longname.startsWith("d");
 
           list.push({
-            type: isDir ? FileInfo_FileType.Dir : FileInfo_FileType.File,
+            type: isDir ? FileInfo_FileType.DIR : FileInfo_FileType.FILE,
             name: file.filename,
             mtime: new Date(file.attrs.mtime * 1000).toISOString(),
             size: file.attrs.size,
