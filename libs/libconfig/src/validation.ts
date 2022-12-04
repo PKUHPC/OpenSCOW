@@ -36,12 +36,14 @@ export const createAjv = () => addFormats(new Ajv({
 
 export function validateObject<TObj extends TSchema>(
   schema: TObj, object: any,
-): Static<TObj> {
+): Static<TObj> | Error {
 
   const ajv = createAjv();
   const ok = ajv.validate(schema, object);
 
-  if (!ok) { throw new Error("Invalid json. " + ajv.errorsText()); }
+  if (!ok) {
+    return new Error(ajv.errorsText());
+  }
 
   return object;
 }

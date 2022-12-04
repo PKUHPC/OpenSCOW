@@ -1,4 +1,4 @@
-name: Lint PR
+name: Lint PR Title and Content
 on:
   pull_request_target:
     types:
@@ -8,6 +8,7 @@ on:
       - synchronize
 
 jobs:
+
   lint-title:
     runs-on: ubuntu-latest
     steps:

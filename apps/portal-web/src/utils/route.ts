@@ -11,9 +11,20 @@
  */
 
 import { route as rawRoute } from "@ddadaal/next-typed-api-routes-runtime";
+import { Metadata } from "@grpc/grpc-js";
 
 export const route: typeof rawRoute = (schemaName, handler) => {
   return rawRoute(schemaName, async (req, res) => {
-    return handler(req, res);
+    const response = handler(req, res);
+    if (response instanceof Promise) {
+      return response.catch((e) => {
+        if (!(e.metadata instanceof Metadata)) { throw e; }
+
+        const SCOW_ERROR = e.metadata.get("IS_SCOW_ERROR");
+        if (!SCOW_ERROR) { throw e; }
+        const code = e.metadata.get("SCOW_ERROR_CODE")[0].toString();
+        return { 500: { code } };
+      });
+    }
   });
 };

@@ -52,9 +52,15 @@ const FailEventHandler: React.FC = () => {
     failEvent.register((e) => {
       if (e.status === 401) {
         userStore.logout();
-      } else {
-        message.error(`服务器出错啦！(${e.status}, ${e.data?.code}))`);
+        return;
       }
+
+      if (e.data?.code === "SSH_ERROR") {
+        message.error("无法以用户身份连接到登录节点。请确认您的家目录的权限为700、750或者755");
+        return;
+      }
+
+      message.error(`服务器出错啦！(${e.status}, ${e.data?.code}))`);
     });
   }, []);
 

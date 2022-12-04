@@ -33,6 +33,8 @@ import type { CreateFileSchema } from "src/pages/api/file/createFile";
 import type { DeleteDirSchema } from "src/pages/api/file/deleteDir";
 import type { DeleteFileSchema } from "src/pages/api/file/deleteFile";
 import type { DownloadFileSchema } from "src/pages/api/file/download";
+import type { FileExistSchema } from "src/pages/api/file/fileExist";
+import type { GetFileTypeSchema } from "src/pages/api/file/getFileType";
 import type { GetHomeDirectorySchema } from "src/pages/api/file/getHome";
 import type { ListFileSchema } from "src/pages/api/file/list";
 import type { MkdirSchema } from "src/pages/api/file/mkdir";
@@ -46,7 +48,6 @@ import type { GetSavedJobSchema } from "src/pages/api/job/getSavedJob";
 import type { GetSavedJobsSchema } from "src/pages/api/job/getSavedJobs";
 import type { SubmitJobSchema } from "src/pages/api/job/submitJob";
 import type { ChangePasswordSchema } from "src/pages/api/profile/changePassword";
-
 
 export const api = {
   connectToApp: fromApi<ConnectToAppSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/app/connectToApp")),
@@ -81,4 +82,6 @@ export const api = {
   submitJob: fromApi<SubmitJobSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/job/submitJob")),
   getLogo: fromApi<GetLogoSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api//logo")),
   changePassword: fromApi<ChangePasswordSchema>("PATCH", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/profile/changePassword")),
+  fileExist: fromApi<FileExistSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/file/fileExist")),
+  getFileType: fromApi<GetFileTypeSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/file/getFileType")),
 };
