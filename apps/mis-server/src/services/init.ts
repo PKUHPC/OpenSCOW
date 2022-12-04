@@ -81,7 +81,7 @@ export const initServiceServer = plugin((server) => {
         });
       
       // 插入公钥失败也认为是创建用户成功
-      await insertKeyToNewUser(name, password, server.logger)
+      await insertKeyToNewUser(userId, password, server.logger)
         .catch(() => null);
 
       return [{ createdInAuth: createdInAuth }];

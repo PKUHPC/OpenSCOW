@@ -335,11 +335,13 @@ export const userServiceServer = plugin((server) => {
             server.logger.warn("User exists in auth.");
           } else {
             server.logger.error("Error creating user in auth.", e);
-            throw <ServiceError> { code: Status.INTERNAL, message: `Error creating user ${user.id} in auth.` }; 
+            throw <ServiceError> { 
+              code: Status.INTERNAL, 
+              message: `Error creating user with userId ${identityId} in auth.` }; 
           }
         });
       // insert public key
-      await insertKeyToNewUser(name, password, server.logger);
+      await insertKeyToNewUser(identityId, password, server.logger);
 
       return [{ id: user.id }];
     },
