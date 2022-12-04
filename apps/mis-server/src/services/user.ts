@@ -311,7 +311,6 @@ export const userServiceServer = plugin((server) => {
 
     createUser: async ({ request, em }) => {
       const { name, tenantName, email, identityId, password } = request;
-      console.log("aaa");
       const user = await createUserInDatabase(identityId, name, email, tenantName, server.logger, em)
         .catch((e) => {
           if (e.code === Status.ALREADY_EXISTS) {
