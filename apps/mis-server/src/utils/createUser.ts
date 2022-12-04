@@ -45,7 +45,7 @@ export async function createUserInDatabase(
     if (e instanceof UniqueConstraintViolationException) {
       throw <ServiceError> { 
         code: Status.ALREADY_EXISTS, 
-        message:`User with id ${user.id} already exists.`,
+        message:`User with userId ${userId} already exists.`,
         details: "EXISTS_IN_SCOW",
       };
     } else {
