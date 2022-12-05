@@ -12,11 +12,12 @@
     "test": "pnpm run -r test",
     "test:ci": "pnpm run -r test --ci --coverage --runInBand",
     "prepare": "node -e \"try { require('husky').install() } catch (e) {if (e.code !== 'MODULE_NOT_FOUND') throw e}\"",
-    "lint": "pnpm lint:ts && pnpm lint:protos",
+    "lint": "concurrently \"npm:lint:*\"",
     "lint:ts": "eslint --cache --ext .tsx,.ts .",
     "lint:protos": "docker run --volume \"$(pwd):/workspace\" --workdir /workspace yoheimuta/protolint -fix protos"
   },
   "devDependencies": {
+    "concurrently": "7.6.0",
     "@ddadaal/eslint-config": "1.9.0",
     "@commitlint/config-conventional": "17.3.0",
     "@types/jest": "29.2.3",
