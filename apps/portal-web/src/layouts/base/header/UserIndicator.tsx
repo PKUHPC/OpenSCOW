@@ -16,6 +16,7 @@ import Link from "next/link";
 import React from "react";
 import { ClickableA } from "src/components/ClickableA";
 import { UserInfo } from "src/models/User";
+import { antdBreakpoints } from "src/styles/constants";
 import styled from "styled-components";
 
 interface Props {
@@ -25,6 +26,13 @@ interface Props {
 
 const Container = styled.div`
   white-space: nowrap;
+`;
+
+const HiddenOnSmallScreen = styled.span`
+  @media (max-width: ${antdBreakpoints.md}px) {
+    display: none;
+  }
+
 `;
 
 export const UserIndicator: React.FC<Props> = ({
@@ -47,7 +55,9 @@ export const UserIndicator: React.FC<Props> = ({
           >
             <ClickableA>
               <UserOutlined />
-              {user.identityId}
+              <HiddenOnSmallScreen>
+                {user.identityId}
+              </HiddenOnSmallScreen>
               <DownOutlined />
             </ClickableA>
           </Dropdown>

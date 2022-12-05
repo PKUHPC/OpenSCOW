@@ -15,7 +15,7 @@ import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { numberToMoney } from "@scow/lib-decimal";
 import { authenticate } from "src/auth/server";
-import { JobChargeLimitServiceClient } from "src/generated/server/jobChargeLimit";
+import { JobChargeLimitServiceClient } from "src/generated/server/job_charge_limit";
 import { UserRole } from "src/models/User";
 import { getClient } from "src/utils/client";
 import { handlegRPCError } from "src/utils/server";

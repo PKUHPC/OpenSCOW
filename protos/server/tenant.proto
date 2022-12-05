@@ -16,7 +16,9 @@ package scow.server;
 
 import "common/money.proto";
 
-message GetTenantInfoRequest { string tenant_name = 1; }
+message GetTenantInfoRequest {
+  string tenant_name = 1;
+}
 
 // NOT_FOUND: tenant is not found
 message GetTenantInfoReply {
@@ -32,27 +34,32 @@ message GetTenantInfoReply {
   repeated AdminInfo admins = 4;
 }
 
-message GetTenantsRequest {}
-message GetTenantsReply { repeated string names = 1; }
+message GetTenantsRequest {
+}
+message GetTenantsReply {
+  repeated string names = 1;
+}
 
 
 message PlatformTenantsInfo {
-    uint32 tenantId = 1;
-    string tenantName = 2;
-    uint32 userCount = 3;
-    uint32 accountCount = 4;
-    common.Money balance = 5;
+  uint32 tenant_id = 1;
+  string tenant_name = 2;
+  uint32 user_count = 3;
+  uint32 account_count = 4;
+  common.Money balance = 5;
 }
-message GetAllTenantsRequest {}
+message GetAllTenantsRequest {
+}
 message GetAllTenantsReply {
-    uint32 totalCount = 1;
-    repeated PlatformTenantsInfo platform_tenants = 2;
+  uint32 total_count = 1;
+  repeated PlatformTenantsInfo platform_tenants = 2;
 }
 
 message CreateTenantRequest {
   string name=1;
 }
-message CreateTeneanteReply {}
+message CreateTeneanteReply {
+}
 
 service TenantService {
   rpc GetTenantInfo(GetTenantInfoRequest) returns (GetTenantInfoReply);

@@ -36,7 +36,8 @@ message KillDesktopRequest {
 }
 
 // NOT_FOUND: cluster is not found
-message KillDesktopResponse {}
+message KillDesktopResponse {
+}
 
 message ConnectToDesktopRequest {
   string user_id = 1;

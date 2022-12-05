@@ -12,9 +12,9 @@
 
 syntax = "proto3";
 
-import "common/money.proto";
-
 package scow.server;
+
+import "common/money.proto";
 
 // NOT_FOUND: the user is not in the account
 message SetJobChargeLimitRequest {
@@ -24,7 +24,8 @@ message SetJobChargeLimitRequest {
   common.Money limit = 4;
 }
 
-message SetJobChargeLimitReply {}
+message SetJobChargeLimitReply {
+}
 
 // NOT_FOUND: the user is not in the account || the user doesn't have a charge
 // limit
@@ -34,7 +35,8 @@ message CancelJobChargeLimitRequest {
   string user_id = 3;
 }
 
-message CancelJobChargeLimitReply {}
+message CancelJobChargeLimitReply {
+}
 
 service JobChargeLimitService {
 

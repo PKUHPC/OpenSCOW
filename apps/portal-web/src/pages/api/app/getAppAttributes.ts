@@ -24,7 +24,7 @@ export interface SelectOption {
 }
 
 export interface AppCustomAttribute {
-  type: string;
+  type: "NUMBER" | "SELECT" | "TEXT";
   label: string;
   name: string;
   select: SelectOption[];
@@ -67,7 +67,7 @@ export default /* #__PURE__*/route<GetAppAttributesSchema>("GetAppAttributesSche
     const attributes: AppCustomAttribute[] = [];
     reply.attributes.forEach((item) => {
       attributes.push({
-        type: appCustomAttribute_AttributeTypeToJSON(item.type),
+        type: appCustomAttribute_AttributeTypeToJSON(item.type) as AppCustomAttribute["type"],
         label: item.label,
         name: item.name,
         select: item.options,
