@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { ArrowRightOutlined, MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
+import { DatabaseOutlined, MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
 import { Space, Typography } from "antd";
 import { join } from "path";
 import React from "react";
@@ -42,6 +42,11 @@ const HeaderItem = styled.div`
   padding: 0 16px;
   /* justify-content: center; */
   height: 100%;
+
+  @media (max-width: ${antdBreakpoints.md}px) {
+    padding-right: 4px;
+  }
+
 `;
 
 const MenuPart = styled(HeaderItem)`
@@ -54,6 +59,13 @@ const MenuPartPlaceholder = styled.div`
   @media (min-width: ${antdBreakpoints.md}px) {
     display: none;
   }
+`;
+
+const HiddenOnSmallScreen = styled.span`
+  @media (max-width: ${antdBreakpoints.md}px) {
+    display: none;
+  }
+
 `;
 
 const IndicatorPart = styled(HeaderItem)`
@@ -107,7 +119,10 @@ export const Header: React.FC<Props> = ({
               ? join(publicConfig.MIS_URL, "/api/auth/callback?token=" + user.token)
               : publicConfig.MIS_URL}
             >
-              <ArrowRightOutlined /> 管理系统
+              <DatabaseOutlined />
+              <HiddenOnSmallScreen>
+                管理系统
+              </HiddenOnSmallScreen>
             </Typography.Link>
           </HeaderItem>
         ) : undefined
