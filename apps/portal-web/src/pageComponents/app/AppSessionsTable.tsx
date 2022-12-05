@@ -170,7 +170,7 @@ export const AppSessionsTable: React.FC<Props> = () => {
             onChange={onChange} 
             style={{ lineHeight: "40px", marginLeft: "10px" }}
           >
-            自动刷新
+            10s自动刷新
           </Checkbox>
         </Form>
       </FilterFormContainer>
