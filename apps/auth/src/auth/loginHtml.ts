@@ -45,7 +45,7 @@ export async function serveLoginHtml(err: boolean, callbackUrl: string, req: Fas
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
         .bg-pku-red {
-            background-color: #9B0000;
+            background-color: #94070A;
         }
     </style>
 </head>
