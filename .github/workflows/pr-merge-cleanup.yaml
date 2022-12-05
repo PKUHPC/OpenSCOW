@@ -17,3 +17,15 @@ jobs:
           owner: PKUHPC
           repository: scow-deployment
           branches: ${{ github.event.number }}/merge
+
+  clean-scow-vagrant:
+    name: Delete scow-vagrant PR branch
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete scow-vagrant PR branch
+        uses: dawidd6/action-delete-branch@v3
+        with:
+          github_token: ${{ secrets.SCOW_DEPLOYMENT_PAT }}
+          owner: PKUHPC
+          repository: scow-vagrant
+          branches: ${{ github.event.number }}/merge
