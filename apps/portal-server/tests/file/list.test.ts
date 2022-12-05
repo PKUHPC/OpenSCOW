@@ -44,9 +44,9 @@ it("gets file list", async () => {
   });
 
   expect(reply.results).toIncludeSameMembers([
-    { name: "dir1", type: FileInfo_FileType.Dir,
+    { name: "dir1", type: FileInfo_FileType.DIR,
       mode: expect.any(Number), mtime: expect.any(String), size: expect.any(Number) },
-    { name: "test1", type: FileInfo_FileType.File,
+    { name: "test1", type: FileInfo_FileType.FILE,
       mode: expect.any(Number), mtime: expect.any(String), size: expect.any(Number) },
   ] as FileInfo[]);
 

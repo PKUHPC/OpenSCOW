@@ -87,7 +87,7 @@ export default /* #__PURE__*/route<ConnectToAppSchema>("ConnectToAppSchema", asy
 
           connect: connect,
 
-          proxyType: x.appProps.web.proxyType === WebAppProps_ProxyType.relative
+          proxyType: x.appProps.web.proxyType === WebAppProps_ProxyType.RELATIVE
             ? "relative"
             : "absolute",
         },

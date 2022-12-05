@@ -10,11 +10,12 @@
  * See the Mulan PSL v2 for more details.
  */
 
-syntax = "proto3";
+import { MetadataValue } from "@grpc/grpc-js";
 
-import "google/protobuf/descriptor.proto";
-package scow.mq;
-
-extend google.protobuf.MessageOptions {
-  optional string mq_queue = 51234;
-}
+export const scowErrorMetadata = (code: string, extra?: Record<string, MetadataValue>) => {
+  return {
+    IS_SCOW_ERROR: "1",
+    SCOW_ERROR_CODE: code,
+    ...extra,
+  };
+};

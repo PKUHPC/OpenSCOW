@@ -45,9 +45,9 @@ interface Props {
 }
 
 const fileTypeIcons = {
-  "file": FileOutlined,
-  "dir": FolderOutlined,
-  "error": CloseOutlined,
+  "FILE": FileOutlined,
+  "DIR": FolderOutlined,
+  "ERROR": CloseOutlined,
 } as Record<FileType, React.ComponentType>;
 
 const TopBar = styled(FilterFormContainer)`
@@ -188,7 +188,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
           return undefined;
         });
     };
-    
+
     let successfulCount: number = 0;
     let abandonCount: number = 0;
     const allCount = operation.selected.length;
@@ -240,7 +240,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
       content: `确认要删除选中的${files.length}项？`,
       onOk: async () => {
         await Promise.allSettled(files.map(async (x) => {
-          return (x.type === "file" ? api.deleteFile : api.deleteDir)({
+          return (x.type === "FILE" ? api.deleteFile : api.deleteDir)({
             body: {
               cluster,
               path: join(path, x.name),
@@ -398,9 +398,9 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
             setSelectedKeys([fileInfoKey(r, path)]);
           },
           onDoubleClick: () => {
-            if (r.type === "dir") {
+            if (r.type === "DIR") {
               Router.push(fullUrl(join(path, r.name)));
-            } else if (r.type === "file") {
+            } else if (r.type === "FILE") {
               const href = urlToDownload(cluster, join(path, r.name), false);
               openPreviewLink(href);
             }
@@ -425,7 +425,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
           sorter={(a, b) => a.name.localeCompare(b.name)}
           sortDirections={["ascend", "descend"]}
           render={(_, r) => (
-            r.type === "dir" ? (
+            r.type === "DIR" ? (
               <Link href={join(urlPrefix, cluster, path, r.name)} passHref>
                 {r.name}
               </Link>
@@ -467,7 +467,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
           render={(_, i: FileInfo) => (
             <Space>
               {
-                i.type === "file" ? (
+                i.type === "FILE" ? (
                   <a href={urlToDownload(cluster, join(path, i.name), true)}>
                 下载
                   </a>
@@ -488,7 +488,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
                   content: `确认删除${fullPath}？`,
                   okText: "确认",
                   onOk: async () => {
-                    await (i.type === "file" ? api.deleteFile : api.deleteDir)({
+                    await (i.type === "FILE" ? api.deleteFile : api.deleteDir)({
                       body: {
                         cluster,
                         path: fullPath,
