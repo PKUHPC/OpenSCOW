@@ -10,14 +10,15 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { ServiceError } from "@ddadaal/tsgrpc-common";
 import { Logger, plugin } from "@ddadaal/tsgrpc-server";
-import { ServiceError } from "@grpc/grpc-js";
-import { Status } from "@grpc/grpc-js/build/src/constants";
+import { status } from "@grpc/grpc-js";
 import { testRootUserSshLogin } from "@scow/lib-ssh";
 import { ClusterOps } from "src/clusterops/api";
 import { createSlurmOps } from "src/clusterops/slurm";
 import { clusters } from "src/config/clusters";
 import { rootKeyPair } from "src/config/env";
+import { scowErrorMetadata } from "src/utils/error";
 
 // Throw ServiceError if failed.
 type CallOnAll = <T>(
@@ -41,6 +42,8 @@ export type ClusterPlugin = {
 const clusterOpsMaps = {
   "slurm": createSlurmOps,
 } as const;
+
+export const CLUSTEROPS_ERROR_CODE = "CLUSTEROPS_ERROR";
 
 export const clustersPlugin = plugin(async (f) => {
 
@@ -111,11 +114,11 @@ export const clustersPlugin = plugin(async (f) => {
 
       if (failed.length > 0) {
         logger.error("Cluster ops fails at clusters %o", failed);
-        throw <ServiceError>{
-          code: Status.INTERNAL,
-          message: "Execution on clusters failed.",
+        throw new ServiceError({
+          code: status.INTERNAL,
           details: failed.join(","),
-        };
+          metadata: scowErrorMetadata(CLUSTEROPS_ERROR_CODE),
+        });
       }
 
     }),

@@ -27,7 +27,7 @@ import { getTokenFromCookie, setTokenCookie } from "src/auth/cookie";
 import { AntdConfigProvider } from "src/layouts/AntdConfigProvider";
 import { BaseLayout } from "src/layouts/base/BaseLayout";
 import { DarkModeProvider } from "src/layouts/darkMode";
-import { useMessage } from "src/layouts/prompts";
+import { useMessage, useModal } from "src/layouts/prompts";
 import { ValidateTokenSchema } from "src/pages/api/auth/validateToken";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import {
@@ -41,6 +41,7 @@ import useConstant from "src/utils/useConstant";
 
 const FailEventHandler: React.FC = () => {
   const message = useMessage();
+  const modal = useModal();
   const userStore = useStore(UserStore);
 
   // 登出过程需要调用的几个方法（logout, useState等）都是immutable的
@@ -49,9 +50,20 @@ const FailEventHandler: React.FC = () => {
     failEvent.register((e) => {
       if (e.status === 401) {
         userStore.logout();
-      } else {
-        message.error(`服务器出错啦！(${e.status}, ${e.data?.code}))`);
+        return;
       }
+
+      if (e.data?.code === "CLUSTEROPS_ERROR") {
+        modal.error({
+          title: "操作失败",
+          content: `多集群操作出现错误，部分集群未同步修改(${
+            e.data.details?.split(",").map((x) => publicConfig.CLUSTERS[x].name)
+          }), 请联系管理员!`,
+        });
+      }
+
+      message.error(`服务器出错啦！(${e.status}, ${e.data?.code}))`);
+    
     });
   }, []);
 
