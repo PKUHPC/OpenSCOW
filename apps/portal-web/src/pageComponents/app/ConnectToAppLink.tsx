@@ -36,8 +36,8 @@ export const ConnectTopAppLink: React.FC<Props> = ({
       .httpError(409, () => { message.error("此应用目前无法连接"); });
 
     if (reply.type === "web") {
-      const { connect, host, password, port, proxyType } = reply;
-      const interpolatedValues = { HOST: host, PASSWORD: password, PORT: port };
+      const { connect, host, password, port, proxyType, customFormData } = reply;
+      const interpolatedValues = { HOST: host, PASSWORD: password, PORT: port, ...customFormData };
       const path = parsePlaceholder(connect.path, interpolatedValues);
 
       const interpolateValues = (obj: Record<string, string>) => {

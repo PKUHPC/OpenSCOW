@@ -37,6 +37,7 @@ interface ServerSessionInfoData {
   [key: string]: string | number;
   host: string;
   port: number;
+  password: string;
 }
 
 const SERVER_ENTRY_COMMAND = fs.readFileSync("assets/slurm/server_entry.sh", { encoding: "utf-8" });
@@ -107,8 +108,12 @@ export const slurmAppOps = (cluster: string): AppOps => {
         };
 
         if (appConfig.type === "web") {
-          const sessionInfo = String.raw`
-          echo -e "{\"HOST\":\"$HOST\",\"PORT\":$PORT,\"PASSWORD\":\"$PASSWORD\"}" >$SERVER_SESSION_INFO`;
+          let customForm = String.raw`\"HOST\":\"$HOST\",\"PORT\":$PORT`;
+          for (const key in appConfig.web!.connect.formData) {
+            const upperFormDataKey = key.toUpperCase();
+            customForm += String.raw`,\"${upperFormDataKey}\":\"$${upperFormDataKey}\"`;
+          }
+          const sessionInfo = `echo -e "{${customForm}}" >$SERVER_SESSION_INFO`;
 
           let beforeScript: string = "";
           for (const key in customAttributes) {
@@ -265,9 +270,12 @@ export const slurmAppOps = (cluster: string): AppOps => {
           const infoFilePath = join(jobDir, SERVER_SESSION_INFO);
           if (await sftpExists(sftp, infoFilePath)) {
             const content = await sftpReadFile(sftp)(infoFilePath);
-            const { host, port, password } = JSON.parse(content.toString()) as ServerSessionInfoData;
+            const serverSessionInfo = JSON.parse(content.toString()) as ServerSessionInfoData;
 
-            return { code: "OK", appId: sessionMetadata.appId, host, port: +port, password };
+            const { host, port, password, ...rest } = serverSessionInfo;
+            const customFormData: {[key: string]: string} = rest as {[key: string]: string};
+
+            return { code: "OK", appId: sessionMetadata.appId, host, port: +port, password, customFormData };
           }
         } else {
           // for vnc apps,

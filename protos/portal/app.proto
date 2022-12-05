@@ -32,6 +32,7 @@ message WebAppProps {
     ABSOLUTE = 1;
   }
   ProxyType proxy_type = 5;
+  map<string, string> customFormData = 6;
 }
 
 message VncAppProps {
