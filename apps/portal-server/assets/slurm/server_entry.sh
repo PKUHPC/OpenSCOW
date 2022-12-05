@@ -17,7 +17,4 @@ export HOST=$(hostname)
 
 source before.sh
 
-# Write session info
-echo -e "{\"HOST\":\"$HOST\",\"PORT\":$PORT,\"PASSWORD\":\"$PASSWORD\"}" >$SERVER_SESSION_INFO
-
 source script.sh
