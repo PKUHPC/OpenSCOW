@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { ArrowRightOutlined, MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
+import { DesktopOutlined, MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
 import { Space, Typography } from "antd";
 import { join } from "path";
 import React from "react";
@@ -42,7 +42,13 @@ const HeaderItem = styled.div`
   padding: 0 16px;
   /* justify-content: center; */
   height: 100%;
+
+  @media (max-width: ${antdBreakpoints.md}px) {
+    padding-right: 4px;
+  }
+
 `;
+
 
 const MenuPart = styled(HeaderItem)`
   flex: 1;
@@ -59,6 +65,12 @@ const MenuPartPlaceholder = styled.div`
 const IndicatorPart = styled(HeaderItem)`
   justify-self: flex-end;
   flex-wrap: nowrap;
+`;
+
+const HiddenOnSmallScreen = styled.span`
+  @media (max-width: ${antdBreakpoints.md}px) {
+    display: none;
+  }
 `;
 
 interface Props {
@@ -107,7 +119,10 @@ export const Header: React.FC<Props> = ({
               ? join(publicConfig.PORTAL_URL, "/api/auth/callback?token=" + user.token)
               : publicConfig.PORTAL_URL}
             >
-              <ArrowRightOutlined /> 门户
+              <DesktopOutlined style={{ paddingRight: 2 }} />
+              <HiddenOnSmallScreen>
+                 门户
+              </HiddenOnSmallScreen>
             </Typography.Link>
           </HeaderItem>
         ) : undefined
