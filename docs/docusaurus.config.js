@@ -55,7 +55,7 @@ const config = {
             docId: "info/index",
             position: "left",
             sidebarId: "info",
-            label: "平台信息",
+            label: "功能介绍",
           },
           {
             type: "doc",
