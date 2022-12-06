@@ -10,16 +10,19 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { authPlugin } from "src/plugins/auth";
-import { gracefulShutdownPlugin } from "src/plugins/gracefulShutdown";
-import { redisPlugin } from "src/plugins/redis";
-import { staticPlugin } from "src/plugins/static";
-import { viewPlugin } from "src/plugins/view";
+import view from "@fastify/view";
+import fp from "fastify-plugin";
+import { Liquid } from "liquidjs";
 
-export const plugins = [
-  redisPlugin,
-  authPlugin,
-  staticPlugin,
-  gracefulShutdownPlugin,
-  viewPlugin,
-];
+export const viewPlugin = fp(async (f) => {
+
+  const liquid = new Liquid({
+    root: process.cwd(),
+    extname: ".liquid",
+  });
+
+
+  f.register(view, {
+    engine: { liquid },
+  });
+});

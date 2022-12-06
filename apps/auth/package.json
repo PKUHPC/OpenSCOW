@@ -16,6 +16,8 @@
     "@fastify/error": "3.1.0",
     "@fastify/formbody": "7.4.0",
     "@fastify/static": "6.5.1",
+    "@fastify/view": "7.3.0",
+    "liquidjs": "10.2.0",
     "@scow/config": "workspace:*",
     "@scow/lib-config": "workspace:*",
     "@scow/lib-ssh": "workspace:*",
