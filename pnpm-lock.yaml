@@ -69,6 +69,7 @@ importers:
       '@fastify/error': 3.1.0
       '@fastify/formbody': 7.4.0
       '@fastify/static': 6.5.1
+      '@fastify/view': 7.3.0
       '@scow/config': workspace:*
       '@scow/lib-config': workspace:*
       '@scow/lib-ssh': workspace:*
@@ -81,11 +82,13 @@ importers:
       fastify-plugin: 4.4.0
       ioredis: 5.2.4
       ldapjs: 2.3.3
+      liquidjs: 10.2.0
       nanoid: 4.0.0
     dependencies:
       '@fastify/error': 3.1.0
       '@fastify/formbody': 7.4.0
       '@fastify/static': 6.5.1
+      '@fastify/view': 7.3.0
       '@scow/config': link:../../libs/config
       '@scow/lib-config': link:../../libs/libconfig
       '@scow/lib-ssh': link:../../libs/ssh
@@ -96,6 +99,7 @@ importers:
       fastify-plugin: 4.4.0
       ioredis: 5.2.4
       ldapjs: 2.3.3
+      liquidjs: 10.2.0
       nanoid: 4.0.0
     devDependencies:
       '@types/asn1': 0.2.0
@@ -3395,6 +3399,13 @@ packages:
       send: 0.18.0
     transitivePeerDependencies:
       - supports-color
+    dev: false
+
+  /@fastify/view/7.3.0:
+    resolution: {integrity: sha512-NkT7VemozRmuYyML2oosEwwJk43Ca02CxwMnVmZ3XNF2ULYMI1pgiauIgTn+cCV6JT9wtsqpXRp4SvyH8vZF2A==}
+    dependencies:
+      fastify-plugin: 4.4.0
+      hashlru: 2.3.0
     dev: false
 
   /@grpc/grpc-js/1.7.3:
@@ -8973,6 +8984,10 @@ packages:
     dependencies:
       function-bind: 1.1.1
 
+  /hashlru/2.3.0:
+    resolution: {integrity: sha512-0cMsjjIC8I+D3M44pOQdsy0OHXGLVz6Z0beRuufhKa0KfaD2wGwAev6jILzXsd3/vpnNQJmWyZtIILqM1N+n5A==}
+    dev: false
+
   /hast-to-hyperscript/9.0.1:
     resolution: {integrity: sha512-zQgLKqF+O2F72S1aa4y2ivxzSlko3MAvxkwG8ehGmNiqd98BIN3JM1rAJPmplEyLmGLO2QZYJtIneOSZ2YbJuA==}
     dependencies:
@@ -10610,6 +10625,12 @@ packages:
 
   /lines-and-columns/1.2.4:
     resolution: {integrity: sha512-7ylylesZQ/PV29jhEDl3Ufjo6ZX7gCqJr5F7PKrqc93v7fzSymt1BpwEU8nAUXs8qzzvqhbjhK5QZg6Mt/HkBg==}
+
+  /liquidjs/10.2.0:
+    resolution: {integrity: sha512-wAAMfpHfHsp07DgULzbrTnsKfrQIqsetHa8iMgT1KdG1Lrq7NRYKGsEY3wRP6Al9czPduFWA444IGB4Ikp42wQ==}
+    engines: {node: '>=14'}
+    hasBin: true
+    dev: false
 
   /loader-runner/4.3.0:
     resolution: {integrity: sha512-3R/1M+yS3j5ou80Me59j7F9IMs4PXs3VqRrm0TU3AbKPxlmpoY1TNscJV/oGJXo8qCatFGTfDbY6W6ipGOYXfg==}
