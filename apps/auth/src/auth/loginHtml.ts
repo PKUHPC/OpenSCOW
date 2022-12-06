@@ -35,13 +35,16 @@ export async function serveLoginHtml(err: boolean, callbackUrl: string, req: Fas
 
   const hostname = parseHostname(req);
 
-  return rep.status(err ? 401 : 200).view("src/auth/login.liquid", {
-    cssUrl: join(config.BASE_PATH, config.AUTH_BASE_PATH, "/public/assets/tailwind.min.css"),
-    faviconUrl: join(config.BASE_PATH, FAVICON_URL),
-    backgroundColor: uiConfig.primaryColor?.defaultColor ?? DEFAULT_PRIMARY_COLOR,
-    callbackUrl,
-    footerText: (hostname && uiConfig?.footer?.hostnameTextMap?.[hostname]) ?? uiConfig?.footer?.defaultText ?? "",
-    err,
-  });
+  return rep.status(err ? 401 : 200).view(
+    join(process.env.NODE_ENV === "production" ? "build" : "src", "auth/login.liquid"),
+    {
+      cssUrl: join(config.BASE_PATH, config.AUTH_BASE_PATH, "/public/assets/tailwind.min.css"),
+      faviconUrl: join(config.BASE_PATH, FAVICON_URL),
+      backgroundColor: uiConfig.primaryColor?.defaultColor ?? DEFAULT_PRIMARY_COLOR,
+      callbackUrl,
+      footerText: (hostname && uiConfig?.footer?.hostnameTextMap?.[hostname]) ?? uiConfig?.footer?.defaultText ?? "",
+      err,
+    },
+  );
 
 }
