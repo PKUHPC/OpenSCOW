@@ -17,7 +17,6 @@ import { Liquid } from "liquidjs";
 export const viewPlugin = fp(async (f) => {
 
   const liquid = new Liquid({
-    root: "views",
     extname: ".liquid",
   });
 
