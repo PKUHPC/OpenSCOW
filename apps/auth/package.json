@@ -11,7 +11,8 @@
   },
   "files": [
     "build",
-    "public"
+    "public",
+    "views"
   ],
   "keywords": [],
   "author": "",
