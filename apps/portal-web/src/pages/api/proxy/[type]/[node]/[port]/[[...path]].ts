@@ -50,7 +50,7 @@ function parseProxyTarget(url: string, includeBasePath: boolean): string | Error
   if (type === "relative") {
     return `http://${node}:${port}/${path.join("/")}`;
   } else if (type === "absolute") {
-    return `http://${node}:${port}${url}`;
+    return `http://${node}:${port}${runtimeConfig.BASE_PATH}${url}`;
   } else {
     return new Error("type is not absolute or relative");
   }
