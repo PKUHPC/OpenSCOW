@@ -17,12 +17,13 @@ import { Liquid } from "liquidjs";
 export const viewPlugin = fp(async (f) => {
 
   const liquid = new Liquid({
-    root: process.cwd(),
+    root: "views",
     extname: ".liquid",
   });
 
 
   f.register(view, {
     engine: { liquid },
+    root: "views",
   });
 });

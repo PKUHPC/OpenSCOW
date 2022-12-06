@@ -63,6 +63,7 @@ COPY --from=builder /app/libs/ssh/build/ ./build
 
 WORKDIR /app/apps/auth
 COPY apps/auth/public ./public
+COPY apps/auth/views ./views
 COPY --from=builder /app/apps/auth/package.json .
 COPY --from=builder /app/apps/auth/node_modules/ ./node_modules
 COPY --from=builder /app/apps/auth/build ./build
