@@ -18,7 +18,11 @@ import type { Logger } from "ts-log";
 import { insertKeyAsRoot, KeyPair } from "./key";
 import { sftpChmod, sftpMkdir, sftpStat, sftpWriteFile } from "./sftp";
 
-export class SshConnectError extends Error {}
+export class SshConnectError extends Error {
+  constructor(options?: ErrorOptions) {
+    super("Error when connecting to remote", options);
+  }
+}
 
 /**
  * Connect to SSH and returns the SSH Object
@@ -52,8 +56,8 @@ export async function sshRawConnect(address: string, username: string, rootKeyPa
     logger.info("Login to %s as %s failed. Try inserting public key", host, username);
     await insertKeyAsRoot(username, address, rootKeyPair, logger);
     await connect().catch((e) => {
-      logger.error(e, "Error during ssh connection");
-      throw new SshConnectError();
+      logger.error(e, "Error when ssh connecting to remote");
+      throw new SshConnectError({ cause: e });
     });
   }
 
