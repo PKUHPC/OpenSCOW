@@ -3,16 +3,61 @@ name: Deploy Docs to GitHub Pages
 on:
   pull_request:
     branches: [master]
+    paths:
+      - docs/**
   push:
+    paths:
+      - docs/**
     branches:
       - master
     # Review gh actions docs if you want to further define triggers, paths, etc
     # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#on
 
 jobs:
+  deploy-preview:
+    name: Deploy Docs Preview
+    runs-on: ubuntu-latest
+    concurrency: preview-${{ github.ref }}
+    if: github.event == "pull_request" && contains(['opened', 'reopened', 'synchronize'], github.event.action)
+    steps:
+      - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2.2.4
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm i --frozen-lockfile
+
+      - name: Build website
+        run: pnpm run --filter docs... build
+        env:
+          GIT_PLATFORM: github
+          CR_URL: ghcr.io/pkuhpc/scow
+          BASE_PATH: ${{ github.project_name }}
+
+      - name: Deploy preview
+        uses: rossjrw/pr-preview-action@v1
+        with:
+          source-dir: ./docs/build/
+          action: deploy
+
+  delete-preview:
+    name: Delete Docs Preview
+    runs-on: ubuntu-latest
+    concurrency: preview-${{ github.ref }}
+    if: github.event == "pull_request" && github.event.action == "closed" && !github.event.pull_request.merged
+    steps:
+      - name: Delete Deploy preview
+        uses: rossjrw/pr-preview-action@v1
+        with:
+          source-dir: ./build/
+          action: remove
+
   deploy:
-    concurrency: ci-${{ github.ref }}
     name: Deploy to GitHub Pages
+    concurrency: ci-${{ github.ref }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -38,3 +83,5 @@ jobs:
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           folder: ./docs/build
+          clean-exclude: pr-preview/
+          force: false
