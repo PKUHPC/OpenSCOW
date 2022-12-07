@@ -60,6 +60,7 @@ const FailEventHandler: React.FC = () => {
             e.data.details?.split(",").map((x) => publicConfig.CLUSTERS[x].name)
           }), 请联系管理员!`,
         });
+        return;
       }
 
       message.error(`服务器出错啦！(${e.status}, ${e.data?.code}))`);
