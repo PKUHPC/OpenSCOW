@@ -11,7 +11,7 @@
  */
 
 import { getAppConfigs } from "@scow/config/build/app";
-import { getPlaceholderText } from "@scow/lib-config";
+import { getPlaceholderText } from "@scow/lib-config/build/parse";
 import { sftpChmod, sftpExists, sftpReaddir, sftpReadFile, sftpRealPath, sftpWriteFile } from "@scow/lib-ssh";
 import { randomUUID } from "crypto";
 import fs from "fs";
