@@ -49,3 +49,17 @@ export function parseArray(str: string): string[] {
   }
   return str.split(",");
 }
+
+/**
+ * Get abc in {{ abc }}
+ * @param str the original string with placeholder
+ * @returns text in placeholder
+ */
+export function getPlaceholderText(str: string): string {
+  const matchValues = str.match(/\{\{\ ([a-zA-Z0-9_]+)\ \}\}/g);
+  if (matchValues) {
+    return matchValues[0].slice(3, -3);
+  } else {
+    return "";
+  }
+}

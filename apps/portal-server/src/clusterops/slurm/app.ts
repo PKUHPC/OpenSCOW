@@ -11,6 +11,7 @@
  */
 
 import { getAppConfigs } from "@scow/config/build/app";
+import { getPlaceholderText } from "@scow/lib-config";
 import { sftpChmod, sftpExists, sftpReaddir, sftpReadFile, sftpRealPath, sftpWriteFile } from "@scow/lib-ssh";
 import { randomUUID } from "crypto";
 import fs from "fs";
@@ -110,15 +111,12 @@ export const slurmAppOps = (cluster: string): AppOps => {
         if (appConfig.type === "web") {
           let customForm = String.raw`\"HOST\":\"$HOST\",\"PORT\":$PORT`;
           for (const key in appConfig.web!.connect.formData) {
-            const values = appConfig.web?.connect.formData[key].match(/\{\{\ ([a-zA-Z0-9_]+)\ \}\}/g);
-            if (values) {
-              // get "TEST_USERNAME" from one entry in formData "username: {{ TEST_USERNAME}}"
-              const envName = values[0].slice(3, -3);
-              customForm += String.raw`,\"${envName}\":\"$${envName}\"`;
-            } else {
+            const value = getPlaceholderText(appConfig.web!.connect.formData[key]);
+            if (!value) {
               throw new Error(`
-              FormData ${key} of app ${appId} is not in the correct format in the app configuration file`);
+              FormData ${key} of app ${appId} is not exi`);
             }
+            customForm += String.raw`,\"${value}\":\"$${value}\"`;
           }
           const sessionInfo = `echo -e "{${customForm}}" >$SERVER_SESSION_INFO`;
 
