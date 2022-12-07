@@ -125,7 +125,6 @@ pnpm devenv:stop
 项目使用[eslint](https://eslint.org)进行代码风格规范和检查。eslint的配置采用[`@ddadaal/eslint-config`](https://github.com/ddadaal/eslint-config)。
 
 项目使用[protolint](https://github.com/yoheimuta/protolint)对proto文件进行代码风格规范和检查。eslint的配置请参考protolint的官方文档以及仓库下的`.protolint.yaml`文件。建议安装对应的编辑器插件以在编译时获取proto文件检查结果。
-
 项目使用[husky](https://github.com/typicode/husky)设置了一个`pre-commit`的git hook，在提交前运行以上的代码风格检查，如果代码风格检查没有通过则无法commit。
 
 ## 为什么不采用其他monorepo管理方案？
