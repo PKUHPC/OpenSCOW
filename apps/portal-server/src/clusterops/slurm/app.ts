@@ -110,8 +110,15 @@ export const slurmAppOps = (cluster: string): AppOps => {
         if (appConfig.type === "web") {
           let customForm = String.raw`\"HOST\":\"$HOST\",\"PORT\":$PORT`;
           for (const key in appConfig.web!.connect.formData) {
-            const upperFormDataKey = key.toUpperCase();
-            customForm += String.raw`,\"${upperFormDataKey}\":\"$${upperFormDataKey}\"`;
+            const values = appConfig.web?.connect.formData[key].match(/\{\{\ ([a-zA-Z0-9_]+)\ \}\}/g);
+            if (values) {
+              // get "TEST_USERNAME" from one entry in formData "username: {{ TEST_USERNAME}}"
+              const envName = values[0].slice(3, -3);
+              customForm += String.raw`,\"${envName}\":\"$${envName}\"`;
+            } else {
+              throw new Error(`
+              FormData ${key} of app ${appId} is not in the correct format in the app configuration file`);
+            }
           }
           const sessionInfo = `echo -e "{${customForm}}" >$SERVER_SESSION_INFO`;
 
