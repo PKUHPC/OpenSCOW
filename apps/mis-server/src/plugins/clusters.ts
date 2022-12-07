@@ -118,6 +118,7 @@ export const clustersPlugin = plugin(async (f) => {
           code: status.INTERNAL,
           details: failed.join(","),
           metadata: scowErrorMetadata(CLUSTEROPS_ERROR_CODE),
+          // metadata: scowErrorMetadata(CLUSTEROPS_ERROR_CODE, {failedClusters: failed.join(",")})
         });
       }
 

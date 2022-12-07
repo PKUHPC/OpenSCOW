@@ -10,7 +10,6 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { authenticate } from "src/auth/server";
@@ -19,6 +18,7 @@ import { TenantRole } from "src/models/User";
 import { checkNameMatch } from "src/server/checkIdNameMatch";
 import { getClient } from "src/utils/client";
 import { publicConfig } from "src/utils/config";
+import { route } from "src/utils/route";
 // import { handleGrpcClusteropsError, InternalErrorInfo } from "src/utils/internalError";
 import { handlegRPCError } from "src/utils/server";
 
