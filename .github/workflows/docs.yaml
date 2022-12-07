@@ -3,16 +3,22 @@ name: Deploy Docs to GitHub Pages
 on:
   pull_request:
     branches: [master]
+    paths:
+      - docs/**
   push:
+    paths:
+      - docs/**
     branches:
       - master
     # Review gh actions docs if you want to further define triggers, paths, etc
     # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#on
 
 jobs:
-  deploy:
-    name: Deploy to GitHub Pages
+  deploy-preview:
+    name: Deploy Docs Preview
     runs-on: ubuntu-latest
+    concurrency: preview-${{ github.ref }}
+    if: github.event_name == 'pull_request' && contains(fromJson('["opened", "reopened", "synchronize"]'), github.event.action)
     steps:
       - uses: actions/checkout@v3
       - uses: pnpm/action-setup@v2.2.4
@@ -29,19 +35,52 @@ jobs:
         env:
           GIT_PLATFORM: github
           CR_URL: ghcr.io/pkuhpc/scow
+          BASE_PATH: /${{ github.event.repository.name }}/pr-preview/pr-${{ github.event.number }}/
+
+      - name: Deploy preview
+        uses: rossjrw/pr-preview-action@v1
+        with:
+          source-dir: ./docs/build/
+          action: deploy
+
+  delete-preview:
+    name: Delete Docs Preview
+    runs-on: ubuntu-latest
+    concurrency: preview-${{ github.ref }}
+    if: github.event_name == 'pull_request' && github.event.action == 'closed' && !github.event.pull_request.merged
+    steps:
+      - name: Delete Deploy preview
+        uses: rossjrw/pr-preview-action@v1
+        with:
+          source-dir: ./docs/build/
+          action: remove
+
+  deploy-docs:
+    name: Deploy to GitHub Pages
+    concurrency: ci-${{ github.ref }}
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
+    steps:
+      - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2.2.4
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm i --frozen-lockfile
+
+      - name: Build website
+        run: pnpm run --filter docs... build
+        env:
+          GIT_PLATFORM: github
+          CR_URL: ghcr.io/pkuhpc/scow
+          BASE_PATH: ${{ github.project_name }}
 
       - name: Deploy to GitHub Pages
-        # only deploy docs on master branches
-        if: github.ref == 'refs/heads/master'
-        uses: peaceiris/actions-gh-pages@v3
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          # Build output to publish to the `gh-pages` branch:
-          publish_dir: ./docs/build
-          # The following lines assign commit authorship to the official
-          # GH-Actions bot for deploys to `gh-pages` branch:
-          # https://github.com/actions/checkout/issues/13#issuecomment-724415212
-          # The GH actions bot is used by default if you didn't specify the two fields.
-          # You can swap them out with your own user credentials.
-          user_name: github-actions[bot]
-          user_email: 41898282+github-actions[bot]@users.noreply.github.com
+          folder: ./docs/build
+          clean-exclude: pr-preview/
+          force: false
