@@ -15,33 +15,31 @@ RUN apk update && apk add libc6-compat python3 make gcc g++
 
 RUN corepack enable
 
-FROM base as store
-
 WORKDIR /app
 COPY pnpm-lock.yaml .
 
 RUN pnpm fetch
 
-FROM store as pruner
+FROM base as pruner
 
 WORKDIR /app
 
 COPY . .
 
-RUN pnpm dlx turbo prune --scope=@scow/auth --docker
+RUN pnpm dlx turbo prune --scope="@scow/auth" --docker
 
-FROM store AS builder
+FROM base AS builder
 
 WORKDIR /app
 COPY --from=pruner /app/out/json/ .
-COPY --from=pruner /app/out/pnpm-lock.yaml .
+COPY .npmrc ./
 RUN pnpm i --offline --frozen-lockfile
 
 COPY --from=pruner /app/out/full/ .
 COPY tsconfig.json .eslintrc.json turbo.json ./
 COPY protos ./protos
 
-RUN pnpm turbo build
+RUN pnpm build
 
 RUN pnpm --filter="@scow/auth" --prod deploy dist
 
