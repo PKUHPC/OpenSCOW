@@ -27,7 +27,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Pushes to scow-vagrant repo
+      - name: Pushes to scow-deployment repo
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           token: ${{ secrets.SCOW_DEPLOYMENT_PAT }}
