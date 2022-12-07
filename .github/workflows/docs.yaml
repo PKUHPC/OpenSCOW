@@ -35,7 +35,7 @@ jobs:
         env:
           GIT_PLATFORM: github
           CR_URL: ghcr.io/pkuhpc/scow
-          BASE_PATH: ${{ github.project_name }}
+          BASE_PATH: /${{ github.event.repository.name }}/pr-preview/pr-${{ github.event.number }}/
 
       - name: Deploy preview
         uses: rossjrw/pr-preview-action@v1
