@@ -55,10 +55,11 @@ jobs:
           source-dir: ./build/
           action: remove
 
-  deploy:
+  deploy-docs:
     name: Deploy to GitHub Pages
     concurrency: ci-${{ github.ref }}
     runs-on: ubuntu-latest
+    if: github.ref == "refs/heads/master"
     steps:
       - uses: actions/checkout@v3
       - uses: pnpm/action-setup@v2.2.4
@@ -78,8 +79,6 @@ jobs:
           BASE_PATH: ${{ github.project_name }}
 
       - name: Deploy to GitHub Pages
-        # only deploy docs on master branches
-        if: github.ref == 'refs/heads/master'
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           folder: ./docs/build
