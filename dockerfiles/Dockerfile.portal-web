@@ -30,7 +30,7 @@ COPY apps/portal-web/package.json ./apps/portal-web/
 
 RUN pnpm i --offline --frozen-lockfile
 
-COPY tsconfig.json .eslintrc.json ./
+COPY tsconfig.json .eslintrc.json turbo.json ./
 
 COPY protos ./protos
 
