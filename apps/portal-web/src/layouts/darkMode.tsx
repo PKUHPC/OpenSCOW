@@ -11,11 +11,13 @@
  */
 
 import { FloatButton } from "antd";
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import React, { PropsWithChildren, useEffect, useState } from "react";
 import moon from "src/components/icons/moon.svg";
 import sun from "src/components/icons/sun.svg";
 import sunMoon from "src/components/icons/sun-moon.svg";
+import { useLocalStorage } from "src/utils/hooks";
 
 const modes = ["system", "dark", "light"] as const;
 
@@ -28,14 +30,14 @@ const icons = {
 export type DarkMode = typeof modes[number];
 
 const DarkModeContext = React.createContext<{
-  mode: DarkMode;
-  dark: boolean;
-  setMode: (mode: DarkMode) => void;
-    }>(undefined!);
+    mode: DarkMode;
+    dark: boolean;
+    setMode: (mode: DarkMode) => void;
+      }>(undefined!);
 
 export const useDarkMode = () => React.useContext(DarkModeContext);
 
-export const DarkModeButton = () => {
+const DarkModeButtonInternal = () => {
   const { mode, setMode } = useDarkMode();
 
   const [icon, alt, label] = icons[mode];
@@ -50,9 +52,15 @@ export const DarkModeButton = () => {
   );
 };
 
+const DARK_MODE_KEY = "scow-dark-mode";
+
+// disable ssr for the button
+// for the image rendered in server and client is different
+export const DarkModeButton = dynamic(() => Promise.resolve(DarkModeButtonInternal), { ssr: false });
+
 export const DarkModeProvider = ({ children }: PropsWithChildren<{}>) => {
 
-  const [mode, setMode] = useState<DarkMode>("system");
+  const [mode, setMode] = useLocalStorage<DarkMode>(DARK_MODE_KEY, "system");
 
   const [dark, setDark] = useState(false);
 

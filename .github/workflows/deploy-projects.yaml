@@ -22,3 +22,19 @@ jobs:
           user_email: 41898282+github-actions[bot]@users.noreply.github.com
           external_repository: PKUHPC/scow-deployment
           publish_branch: ${{ github.ref_name }}
+
+  scow-vagrant:
+    name: Update scow-vagrant
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Pushes to scow-vagrant repo
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          personal_token: ${{ secrets.SCOW_DEPLOYMENT_PAT }}
+          publish_dir: ./deploy/vagrant
+          user_name: github-actions[bot]
+          user_email: 41898282+github-actions[bot]@users.noreply.github.com
+          external_repository: PKUHPC/scow-vagrant
+          publish_branch: ${{ github.ref_name }}

@@ -16,6 +16,7 @@ import Link from "next/link";
 import React from "react";
 import { ClickableA } from "src/components/ClickableA";
 import { UserInfo } from "src/models/User";
+import { antdBreakpoints } from "src/styles/constants";
 import styled from "styled-components";
 
 interface Props {
@@ -25,6 +26,12 @@ interface Props {
 
 const Container = styled.div`
   white-space: nowrap;
+`;
+
+const HiddenOnSmallScreen = styled.span`
+  @media (max-width: ${antdBreakpoints.md}px) {
+    display: none;
+  }
 `;
 
 export const UserIndicator: React.FC<Props> = ({
@@ -39,6 +46,7 @@ export const UserIndicator: React.FC<Props> = ({
             trigger={["click"]}
             menu={{
               items: [
+                { key: "username", disabled: true, label: `用户姓名：${user.name}` },
                 { key: "userid", disabled: true, label: `用户ID：${user.identityId}` },
                 { key: "profileLink", label: <Link href="/profile">个人信息</Link> },
                 { key: "logout", onClick: logout, label: "退出登录" },
@@ -47,7 +55,9 @@ export const UserIndicator: React.FC<Props> = ({
           >
             <ClickableA>
               <UserOutlined />
-              {user.name}
+              <HiddenOnSmallScreen>
+                {user.name}
+              </HiddenOnSmallScreen>
               <DownOutlined />
             </ClickableA>
           </Dropdown>
