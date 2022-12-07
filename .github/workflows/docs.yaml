@@ -52,7 +52,7 @@ jobs:
       - name: Delete Deploy preview
         uses: rossjrw/pr-preview-action@v1
         with:
-          source-dir: ./build/
+          source-dir: ./docs/build/
           action: remove
 
   deploy-docs:
