@@ -78,16 +78,11 @@ export async function sshRawConnectByPassword(address: string, username: string,
   const [host, port] = address.split(":");
   const ssh = new NodeSSH();
 
-  async function connect() {
-    await ssh.connect({ host, port: port ? +port : undefined, username, password: password });
-  }
-
-  try {
-    await connect();
-  } catch (e) {
-    logger.info("Login to %s as %s by password failed.", host, username);
-    throw e;
-  }
+  await ssh.connect({ host, port: port ? +port : undefined, username, password: password })
+    .catch((e) => {
+      logger.info("Login to %s as %s by password failed.", host, username);
+      throw new SshConnectError({ cause: e });
+    });
 
   return ssh;
 }
