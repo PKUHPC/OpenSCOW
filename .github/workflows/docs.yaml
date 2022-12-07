@@ -18,7 +18,7 @@ jobs:
     name: Deploy Docs Preview
     runs-on: ubuntu-latest
     concurrency: preview-${{ github.ref }}
-    if: github.event_name == 'pull_request' && contains(['opened', 'reopened', 'synchronize'], github.event.action)
+    if: (github.event_name == 'pull_request') && (contains(['opened', 'reopened', 'synchronize'], github.event.action))
     steps:
       - uses: actions/checkout@v3
       - uses: pnpm/action-setup@v2.2.4
@@ -47,7 +47,7 @@ jobs:
     name: Delete Docs Preview
     runs-on: ubuntu-latest
     concurrency: preview-${{ github.ref }}
-    if: github.event_name == 'pull_request' && github.event.action == "closed" && !github.event.pull_request.merged
+    if: (github.event_name == 'pull_request') && (github.event.action == "closed" && !github.event.pull_request.merged)
     steps:
       - name: Delete Deploy preview
         uses: rossjrw/pr-preview-action@v1
