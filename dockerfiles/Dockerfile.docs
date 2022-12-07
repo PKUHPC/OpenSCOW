@@ -9,35 +9,37 @@
 # See the Mulan PSL v2 for more details.
 
 
-FROM node:hydrogen-alpine@sha256:9eff44230b2fdcca57a73b8f908c8029e72d24dd05cac5339c79d3dedf6b208b AS builder
+FROM node:hydrogen-alpine@sha256:9eff44230b2fdcca57a73b8f908c8029e72d24dd05cac5339c79d3dedf6b208b AS base
 
 RUN apk update && apk add libc6-compat python3 make gcc g++
 
 RUN corepack enable
 
 WORKDIR /app
+COPY pnpm-lock.yaml .
 
-COPY pnpm-lock.yaml ./
 RUN pnpm fetch
 
-COPY package.json pnpm-workspace.yaml .npmrc ./
+FROM base as pruner
 
-COPY libs/config/package.json ./libs/config/
-COPY apps/docs/package.json ./apps/docs/
+WORKDIR /app
 
+COPY . .
+RUN pnpm dlx turbo prune --scope="@scow/docs" --docker
+
+FROM base AS builder
+
+WORKDIR /app
+COPY --from=pruner /app/out/json/ .
+COPY .npmrc ./
 RUN pnpm i --offline --frozen-lockfile
 
-COPY tsconfig.json .eslintrc.json ./
-
+COPY --from=pruner /app/out/full/ .
+COPY tsconfig.json .eslintrc.json turbo.json ./
 COPY protos ./protos
 
-COPY libs/config ./libs/config
-COPY docs ./docs
+RUN pnpm build
 
-ARG BASE_PATH="/"
-ENV BASE_PATH=${BASE_PATH}
-
-RUN pnpm run build
 
 FROM nginx:stable-alpine as runner
 
