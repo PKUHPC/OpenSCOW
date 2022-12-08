@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { getPlaceholderText,parseArray, parseKeyValue, parsePlaceholder } from "src/parse";
+import { getPlaceholderText, parseArray, parseKeyValue, parsePlaceholder } from "src/parse";
 
 it.each([
   ["123", {}, "123"],
