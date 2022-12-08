@@ -114,7 +114,7 @@ export const slurmAppOps = (cluster: string): AppOps => {
             const value = getPlaceholderText(appConfig.web!.connect.formData[key]);
             if (!value) {
               throw new Error(`
-              FormData ${key} of app ${appId} is not exi`);
+              FormData ${key} of app ${appId} doesn't exist`);
             }
             customForm += String.raw`,\"${value}\":\"$${value}\"`;
           }
