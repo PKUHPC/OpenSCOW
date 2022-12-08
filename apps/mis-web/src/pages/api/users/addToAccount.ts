@@ -10,7 +10,6 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { authenticate } from "src/auth/server";
@@ -18,6 +17,7 @@ import { UserServiceClient } from "src/generated/server/user";
 import { PlatformRole, UserRole } from "src/models/User";
 import { checkNameMatch } from "src/server/checkIdNameMatch";
 import { getClient } from "src/utils/client";
+import { route } from "src/utils/route";
 import { handlegRPCError } from "src/utils/server";
 
 export interface AddUserToAccountSchema {
