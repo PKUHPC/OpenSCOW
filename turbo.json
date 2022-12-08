@@ -1,0 +1,43 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "pipeline": {
+    "build": {
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        ".next/**",
+        "build/**"
+      ]
+    },
+    "prepareDev": {
+      "outputs": [
+        "api-routes-schemas.json",
+        "src/generated"
+      ],
+      "inputs": [
+        "../../protos",
+        "src/pages/api/**/*.ts"
+      ]
+    },
+    "test": {
+      "outputs": [],
+      "inputs": [
+        "src/**/*.tsx",
+        "src/**/*.ts",
+        "test/**/*.ts",
+        "test/**/*.tsx"
+      ]
+    },
+    "//#lint:all": {
+      "inputs": [
+        "**/*.tsx",
+        "**/*.ts",
+        "protos"
+      ],
+      "outputs": [
+        ".eslintcache"
+      ]
+    }
+  }
+}
