@@ -21,7 +21,6 @@ import { useMessage } from "src/layouts/prompts";
 import { TenantRole } from "src/models/User";
 import { publicConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
-import { handleClusteropsErrorInUi } from "src/utils/internalError";
 
 interface FormProps {
   ownerId: string;
