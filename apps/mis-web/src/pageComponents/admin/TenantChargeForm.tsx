@@ -17,7 +17,6 @@ import { api } from "src/apis";
 import { ClickableA } from "src/components/ClickableA";
 import { useMessage } from "src/layouts/prompts";
 import { publicConfig } from "src/utils/config";
-import { handleClusteropsErrorInUi } from "src/utils/internalError";
 
 import { TenantSelector } from "../tenant/TenantSelector";
 
@@ -79,7 +78,6 @@ export const TenantChargeForm: React.FC = () => {
       .httpError(404, () => {
         message.error("账户未找到");
       })
-      .httpError(500, handleClusteropsErrorInUi)
       .then(() => {
         message.success("充值完成！");
       })

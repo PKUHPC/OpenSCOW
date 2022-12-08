@@ -110,6 +110,7 @@ importers:
   apps/mis-server:
     specifiers:
       '@ddadaal/tsgrpc-cli': 0.14.3
+      '@ddadaal/tsgrpc-common': 0.2.0
       '@ddadaal/tsgrpc-server': 0.18.1
       '@grpc/grpc-js': 1.7.3
       '@mikro-orm/cli': 5.5.3
@@ -132,6 +133,7 @@ importers:
       uuid: 9.0.0
       wait-on: 6.0.1
     dependencies:
+      '@ddadaal/tsgrpc-common': 0.2.0
       '@ddadaal/tsgrpc-server': 0.18.1_@grpc+grpc-js@1.7.3
       '@grpc/grpc-js': 1.7.3
       '@mikro-orm/cli': 5.5.3_utlaohwup27fels2hqu5kgjghe
