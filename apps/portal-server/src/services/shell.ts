@@ -115,7 +115,7 @@ export const shellServiceServer = plugin((server) => {
               channel,
             ),
           ]).finally(() => { call.end(); channel.end(); });
-        }, { cols, rows });
+        }, { cols, rows, term: "xterm-256color" });
       });
 
 

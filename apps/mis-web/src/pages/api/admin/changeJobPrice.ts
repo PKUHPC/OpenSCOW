@@ -10,7 +10,6 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { numberToMoney } from "@scow/lib-decimal";
@@ -19,7 +18,7 @@ import { JobServiceClient } from "src/generated/server/job";
 import { PlatformRole, TenantRole } from "src/models/User";
 import type { GetJobFilter } from "src/pages/api/job/jobInfo";
 import { getClient } from "src/utils/client";
-import { handleGrpcClusteropsError, InternalErrorInfo } from "src/utils/internalError";
+import { route } from "src/utils/route";
 import { handlegRPCError, parseIp } from "src/utils/server";
 
 export interface ChangeJobPriceSchema {
@@ -44,7 +43,6 @@ export interface ChangeJobPriceSchema {
     404: null;
     /** 非租户管理员不能修改作业的账户价格；非平台管理员不能修改作业的租户价格 */
     403: null;
-    500: InternalErrorInfo;
   }
 }
 
@@ -89,7 +87,6 @@ export default route<ChangeJobPriceSchema>("ChangeJobPriceSchema",
     })
       .then((x) => ({ 200: x }))
       .catch(handlegRPCError({
-        [Status.INTERNAL]: handleGrpcClusteropsError,
         [Status.NOT_FOUND]: () => ({ 404: null }),
       }));
   });

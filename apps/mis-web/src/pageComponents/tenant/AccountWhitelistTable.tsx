@@ -19,7 +19,6 @@ import { useMessage, useModal } from "src/layouts/prompts";
 import type {
   GetWhitelistedAccountsSchema } from "src/pages/api/tenant/accountWhitelist/getWhitelistedAccounts";
 import { formatDateTime } from "src/utils/datetime";
-import { handleClusteropsErrorInUi } from "src/utils/internalError";
 
 interface Props {
   data: GetWhitelistedAccountsSchema["responses"]["200"] | undefined;
@@ -68,7 +67,6 @@ export const AccountWhitelistTable: React.FC<Props> = ({
                   await api.dewhitelistAccount({ body: {
                     accountName: r.accountName,
                   } })
-                    .httpError(500, handleClusteropsErrorInUi)
                     .then(() => {
                       message.success("移出白名单成功！");
                       reload();

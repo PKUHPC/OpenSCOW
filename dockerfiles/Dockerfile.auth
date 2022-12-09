@@ -28,7 +28,7 @@ COPY apps/auth/package.json ./apps/auth/
 
 RUN pnpm i --offline --frozen-lockfile
 
-COPY tsconfig.json .eslintrc.json ./
+COPY tsconfig.json .eslintrc.json turbo.json ./
 
 COPY protos ./protos
 
@@ -63,6 +63,7 @@ COPY --from=builder /app/libs/ssh/build/ ./build
 
 WORKDIR /app/apps/auth
 COPY apps/auth/public ./public
+COPY apps/auth/views ./views
 COPY --from=builder /app/apps/auth/package.json .
 COPY --from=builder /app/apps/auth/node_modules/ ./node_modules
 COPY --from=builder /app/apps/auth/build ./build

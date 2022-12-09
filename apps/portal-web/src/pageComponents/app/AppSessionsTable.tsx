@@ -10,10 +10,11 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Form, Popconfirm, Space, Table, TableColumnsType } from "antd";
+import { Button, Checkbox, Form, Popconfirm, Space, Table, TableColumnsType } from "antd";
+import type { CheckboxChangeEvent } from "antd/es/checkbox";
 import Router, { useRouter } from "next/router";
 import { join } from "path";
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useAsync } from "react-async";
 import { useStore } from "simstate";
 import { api } from "src/apis";
@@ -129,6 +130,23 @@ export const AppSessionsTable: React.FC<Props> = () => {
       ),
     },
   ];
+
+  const [checked, setChecked] = useState(true);
+  const [disabled] = useState(false);
+
+  const onChange = (e: CheckboxChangeEvent) => {
+    setChecked(e.target.checked);
+  };
+
+  useEffect(() => {
+    if (checked) {
+      const interval = setInterval(() => {
+        reload();
+      }, 10000);
+      return () => clearInterval(interval);
+    }
+  }, [checked]);
+
   return (
     <div>
       <FilterFormContainer>
@@ -141,6 +159,19 @@ export const AppSessionsTable: React.FC<Props> = () => {
               }}
             />
           </Form.Item>
+          <Form.Item>
+            <Space>
+              <Button loading={isLoading} onClick={reload}>刷新</Button>
+            </Space>
+          </Form.Item>
+          <Checkbox 
+            checked={checked} 
+            disabled={disabled} 
+            onChange={onChange} 
+            style={{ lineHeight: "40px", marginLeft: "10px" }}
+          >
+            10s自动刷新
+          </Checkbox>
         </Form>
       </FilterFormContainer>
       <Table

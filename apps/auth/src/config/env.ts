@@ -17,7 +17,6 @@ import { join } from "path";
 
 import { AuthType } from "./AuthType";
 
-export const AUTH_EXTERNAL_URL = "/auth";
 export const AUTH_REDIRECT_URL = "/api/auth/callback";
 export const FAVICON_URL = "/api/icon?type=favicon";
 
@@ -29,7 +28,9 @@ export const config = envConfig({
     desc: "日志等级",
   }),
 
-  BASE_PATH: str({ desc: "认证系统部署地址的base path", default: "/" }),
+  BASE_PATH: str({ desc: "整个系统的base path", default: "/" }),
+
+  AUTH_BASE_PATH: str({ desc: "认证系统相对于整个系统的base path", default: "/auth" }),
 
   AUTH_TYPE: str({ desc: "认证类型。将会覆写配置文件", choices: Object.values(AuthType), default: undefined }),
 

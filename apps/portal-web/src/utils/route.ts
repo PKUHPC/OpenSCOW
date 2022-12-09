@@ -20,8 +20,9 @@ export const route: typeof rawRoute = (schemaName, handler) => {
       return response.catch((e) => {
         if (!(e.metadata instanceof Metadata)) { throw e; }
 
-        const SCOW_ERROR = e.metadata.get("IS_SCOW_ERROR");
-        if (!SCOW_ERROR) { throw e; }
+        const SCOW_ERROR = (e.metadata as Metadata).get("IS_SCOW_ERROR");
+        if (SCOW_ERROR.length === 0) { throw e; }
+
         const code = e.metadata.get("SCOW_ERROR_CODE")[0].toString();
         return { 500: { code } };
       });

@@ -21,7 +21,6 @@ import { useMessage } from "src/layouts/prompts";
 import { TenantRole } from "src/models/User";
 import { publicConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
-import { handleClusteropsErrorInUi } from "src/utils/internalError";
 
 interface FormProps {
   ownerId: string;
@@ -47,7 +46,6 @@ const CreateAccountForm: React.FC = () => {
       .httpError(404, () => { message.error(`用户${ownerId}不存在。`); })
       .httpError(409, () => { message.error("账户名已经被占用"); })
       .httpError(400, () => { message.error("用户ID和名字不匹配。"); })
-      .httpError(500, handleClusteropsErrorInUi)
       .then(() => {
         message.success("创建成功！");
       })
