@@ -283,9 +283,9 @@ export const slurmAppOps = (cluster: string): AppOps => {
             return { 
               code: "OK", 
               appId: sessionMetadata.appId, 
-              host: HOST, 
-              port: +PORT, 
-              password: PASSWORD, 
+              host: HOST as string, 
+              port: +PORT as number, 
+              password: PASSWORD as string, 
               customFormData:  customFormData ?? {},
             };
           }
