@@ -277,10 +277,17 @@ export const slurmAppOps = (cluster: string): AppOps => {
             const content = await sftpReadFile(sftp)(infoFilePath);
             const serverSessionInfo = JSON.parse(content.toString()) as ServerSessionInfoData;
 
-            const { host, port, password, ...rest } = serverSessionInfo;
+            const { HOST, PORT, PASSWORD, ...rest } = serverSessionInfo;
             const customFormData: {[key: string]: string} = rest as {[key: string]: string};
 
-            return { code: "OK", appId: sessionMetadata.appId, host, port: +port, password, customFormData };
+            return { 
+              code: "OK", 
+              appId: sessionMetadata.appId, 
+              host: HOST, 
+              port: +PORT, 
+              password: PASSWORD, 
+              customFormData:  customFormData ?? {},
+            };
           }
         } else {
           // for vnc apps,

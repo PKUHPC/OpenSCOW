@@ -115,6 +115,7 @@ export const mockApi: MockApi<typeof api> = {
         formData: { test: "123" },
       },
       proxyType: "relative",
+      customFormData: { USERNAME: "bob" },
     }
     : {
       host: "127.0.0.1", port: 3000, password: "123", type: "vnc",
