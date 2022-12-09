@@ -37,8 +37,12 @@ export interface ConnectToAppSchema {
 
   responses: {
     200: { host: string; port: number; password: string} & (
-      | { type: "web"; connect: AppConnectProps; proxyType: "relative" | "absolute";
-    }
+      | { 
+        type: "web"; 
+        connect: AppConnectProps; 
+        proxyType: "relative" | "absolute"; 
+        customFormData?: {[key: string]: string};
+       }
       | { type: "vnc"; }
     );
 
@@ -90,6 +94,7 @@ export default /* #__PURE__*/route<ConnectToAppSchema>("ConnectToAppSchema", asy
           proxyType: x.appProps.web.proxyType === WebAppProps_ProxyType.RELATIVE
             ? "relative"
             : "absolute",
+          customFormData: x.appProps.web.customFormData,
         },
       };
     } else {

@@ -76,6 +76,7 @@ export const appServiceServer = plugin((server) => {
             proxyType: app.web!.proxyType === "absolute"
               ? WebAppProps_ProxyType.ABSOLUTE
               : WebAppProps_ProxyType.RELATIVE,
+            customFormData: reply.customFormData ?? {},
           },
         };
         break;
