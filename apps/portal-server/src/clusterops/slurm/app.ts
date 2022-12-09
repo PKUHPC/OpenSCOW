@@ -34,6 +34,7 @@ interface SessionMetadata {
   submitTime: string;
 }
 
+// All keys are strings except PORT
 interface ServerSessionInfoData {
   [key: string]: string | number;
   HOST: string;
