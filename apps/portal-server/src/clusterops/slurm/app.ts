@@ -36,9 +36,9 @@ interface SessionMetadata {
 
 interface ServerSessionInfoData {
   [key: string]: string | number;
-  host: string;
-  port: number;
-  password: string;
+  HOST: string;
+  PORT: number;
+  PASSWORD: string;
 }
 
 const SERVER_ENTRY_COMMAND = fs.readFileSync("assets/slurm/server_entry.sh", { encoding: "utf-8" });
@@ -278,14 +278,13 @@ export const slurmAppOps = (cluster: string): AppOps => {
             const serverSessionInfo = JSON.parse(content.toString()) as ServerSessionInfoData;
 
             const { HOST, PORT, PASSWORD, ...rest } = serverSessionInfo;
-            const customFormData: {[key: string]: string} = rest as {[key: string]: string};
-
+            const customFormData = rest as {[key: string]: string};
             return { 
               code: "OK", 
               appId: sessionMetadata.appId, 
-              host: HOST as string, 
-              port: +PORT as number, 
-              password: PASSWORD as string, 
+              host: HOST, 
+              port: +PORT, 
+              password: PASSWORD, 
               customFormData:  customFormData ?? {},
             };
           }
