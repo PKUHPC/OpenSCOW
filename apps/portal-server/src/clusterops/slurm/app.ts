@@ -113,11 +113,9 @@ export const slurmAppOps = (cluster: string): AppOps => {
           let customForm = String.raw`\"HOST\":\"$HOST\",\"PORT\":$PORT`;
           for (const key in appConfig.web!.connect.formData) {
             const value = getPlaceholderText(appConfig.web!.connect.formData[key]);
-            if (!value) {
-              throw new Error(`
-              FormData ${key} of app ${appId} doesn't exist`);
+            if (value) {
+              customForm += String.raw`,\"${value}\":\"$${value}\"`;
             }
-            customForm += String.raw`,\"${value}\":\"$${value}\"`;
           }
           const sessionInfo = `echo -e "{${customForm}}" >$SERVER_SESSION_INFO`;
 
