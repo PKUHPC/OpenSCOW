@@ -79,7 +79,7 @@ const config = {
             label: "配置参考",
           },
           {
-            to: join(variables.BASE_PATH, "blog"),
+            to: "blog",
             label: "博客",
             position: "left",
           },
@@ -98,7 +98,7 @@ const config = {
             items: [
               {
                 label: "Intro",
-                to: join(variables.BASE_PATH, `docs/info/index`),
+                to: `docs/info`,
               },
             ],
           },
@@ -111,7 +111,7 @@ const config = {
             items: [
               {
                 label: "Blog",
-                to: join(variables.BASE_PATH, `blog`),
+                to: `blog`,
               },
               {
                 label: "Repo",
