@@ -66,6 +66,7 @@ export type ConnectToAppReply =
       host: string;
       port: number;
       password: string;
+      customFormData?: {[key: string]: string};
 };
 
 export interface AppOps {

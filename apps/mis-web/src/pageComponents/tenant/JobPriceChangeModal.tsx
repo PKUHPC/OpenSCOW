@@ -15,7 +15,6 @@ import { useState } from "react";
 import { api } from "src/apis";
 import { useMessage } from "src/layouts/prompts";
 import type { GetJobFilter } from "src/pages/api/job/jobInfo";
-import { handleClusteropsErrorInUi } from "src/utils/internalError";
 
 interface Props {
   open: boolean;
@@ -55,7 +54,6 @@ export const JobPriceChangeModal: React.FC<Props> = ({ open, onClose, jobCount, 
 
         setLoading(true);
         await api.changeJobPrice({ body: { ...filter, price, reason, target } })
-          .httpError(500, handleClusteropsErrorInUi)
           .then(() => {
             message.success("修改成功");
             reload();

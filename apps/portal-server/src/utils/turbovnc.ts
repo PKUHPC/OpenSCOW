@@ -44,6 +44,7 @@ export function parseOtp(stderr: string): string {
 export function parseDisplayId(stdout: string): number {
 
   // Desktop 'TurboVNC: t001:2 (2001213077)' started on display t001:2
+  // Desktop 'TurboVNC: cn1:21 (demo_admin)' started on display cn1:21
   const regex = /^Desktop '.*' started on display .*:(\d+)$/;
 
   const lines = stdout.split("\n");
@@ -52,7 +53,7 @@ export function parseDisplayId(stdout: string): number {
     const matches = line.match(regex);
     if (!matches) { continue; }
 
-    return +matches[1][0];
+    return +matches[1];
   }
 
   // logger.error("Error parsing display id from %s", stdout);
