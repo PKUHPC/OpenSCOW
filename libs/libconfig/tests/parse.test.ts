@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { getPlaceholderText, parseArray, parseKeyValue, parsePlaceholder } from "src/parse";
+import { getPlaceholderTexts, parseArray, parseKeyValue, parsePlaceholder } from "src/parse";
 
 it.each([
   ["123", {}, "123"],
@@ -47,14 +47,18 @@ it.each([
 });
 
 it.each([
-  ["", ""],
-  ["{{ abc }}", "abc"],
-  ["123", ""],
-  ["123{{ abc }}456", "abc"],
-  ["123{{abc }}456", ""],
-  ["123{{abc}}456", ""],
-  ["123{ abc }456", ""],
-  ["123{ abc }456", ""],
-])("get text %p from %p", async (input: string, expected: string) => {
-  expect(getPlaceholderText(input)).toEqual(expected);
+  ["", []],
+  ["{{ abc }}", ["abc"]],
+  ["{{ abc }} dd {{ def }}", ["abc", "def"]],
+  ["{{ abc }}dd{{ def }}", ["abc", "def"]],
+  ["{{ abc}} dd {{ def }}", ["def"]],
+  ["{abc }} dd {{def }}", []],
+  ["123", []],
+  ["123{{ abc }}456", ["abc"]],
+  ["123{{abc }}456", []],
+  ["123{{abc}}456", []],
+  ["123{ abc }456", []],
+  ["123{ abc }456", []],
+])("from %p get texts %p", async (input: string, expected: string[]) => {
+  expect(getPlaceholderTexts(input)).toEqual(expected);
 });

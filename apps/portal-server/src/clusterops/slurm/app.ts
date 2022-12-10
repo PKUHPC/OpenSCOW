@@ -11,7 +11,7 @@
  */
 
 import { getAppConfigs } from "@scow/config/build/app";
-import { getPlaceholderText } from "@scow/lib-config/build/parse";
+import { getPlaceholderTexts } from "@scow/lib-config/build/parse";
 import { sftpChmod, sftpExists, sftpReaddir, sftpReadFile, sftpRealPath, sftpWriteFile } from "@scow/lib-ssh";
 import { randomUUID } from "crypto";
 import fs from "fs";
@@ -112,9 +112,11 @@ export const slurmAppOps = (cluster: string): AppOps => {
         if (appConfig.type === "web") {
           let customForm = String.raw`\"HOST\":\"$HOST\",\"PORT\":$PORT`;
           for (const key in appConfig.web!.connect.formData) {
-            const value = getPlaceholderText(appConfig.web!.connect.formData[key]);
-            if (value) {
-              customForm += String.raw`,\"${value}\":\"$${value}\"`;
+            const texts = getPlaceholderTexts(appConfig.web!.connect.formData[key]);
+            if (texts.length !== 0) {
+              for (const text in texts) {
+                customForm += String.raw`,\"${text}\":\"$${text}\"`;
+              }
             }
           }
           const sessionInfo = `echo -e "{${customForm}}" >$SERVER_SESSION_INFO`;
