@@ -14,7 +14,7 @@
     "prepare": "node -e \"try { require('husky').install() } catch (e) {if (e.code !== 'MODULE_NOT_FOUND') throw e}\"",
     "lint": "concurrently \"npm:lint:*\"",
     "lint:ts": "eslint --cache --ext .tsx,.ts .",
-    "lint:protos": "zx scripts/lintProtos.mjs"
+    "lint:protos": "node scripts/lintProtos.mjs"
   },
   "devDependencies": {
     "zx": "7.1.1",
