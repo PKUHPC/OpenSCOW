@@ -12,9 +12,13 @@
 
 import "zx/globals";
 
-await $`docker run --volume ${process.cwd() + ":/workspace"} --workdir /workspace yoheimuta/protolint -fix protos`;
 
+let pwd = process.cwd();
 
+if (os.platform() === "win32") {
+  pwd = `/${pwd.replace(":", "").replaceAll("\\", "/")}`;
+  $.shell = "powershell";
+  $.prefix = "";
+}
 
-
-
+await $`docker run --rm --volume ${pwd + ":/workspace"} --workdir /workspace yoheimuta/protolint -fix protos`;
