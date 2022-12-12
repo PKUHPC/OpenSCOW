@@ -10,15 +10,17 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import "zx/globals";
+import { exec } from "node:child_process";
+import os from "node:os";
 
+const iswin = os.platform() === "win32";
+const cwd = iswin ? "%cd%" : "$(pwd)";
 
-let pwd = process.cwd();
-
-if (os.platform() === "win32") {
-  pwd = `/${pwd.replace(":", "").replaceAll("\\", "/")}`;
-  $.shell = "powershell";
-  $.prefix = "";
-}
-
-await $`docker run --rm --volume ${pwd + ":/workspace"} --workdir /workspace yoheimuta/protolint -fix protos`;
+exec(`docker run --rm --volume "${cwd}:/workspace" --workdir /workspace yoheimuta/protolint -fix protos`, {
+  shell: iswin ? "cmd.exe" : undefined,
+}, (err, _stdout, stderr) => {
+  if (err) {
+    console.error(stderr);
+    process.exit(err.code);
+  }
+});
