@@ -33,13 +33,18 @@ function normalizeUrl(url: string) {
   return normalize(pathname) + qs;
 }
 
-
-function parseProxyTarget(url: string, includeBasePath: boolean): string | Error {
+/**
+ * Parse proxy target
+ * @param url req.url
+ * @param urlIncludesBasePath whether url.req includes base path already
+ * @returns Parsed proxy targe
+ */
+function parseProxyTarget(url: string, urlIncludesBasePath: boolean): string | Error {
 
   const normalizedUrl = normalizeUrl(url);
 
   // skip base path
-  const relativePath = includeBasePath
+  const relativePath = urlIncludesBasePath
     ? runtimeConfig.BASE_PATH === "/"
       ? normalizedUrl
       : normalizedUrl.slice(runtimeConfig.BASE_PATH.length)
@@ -50,7 +55,8 @@ function parseProxyTarget(url: string, includeBasePath: boolean): string | Error
   if (type === "relative") {
     return `http://${node}:${port}/${path.join("/")}`;
   } else if (type === "absolute") {
-    return `http://${node}:${port}${runtimeConfig.BASE_PATH}${url}`;
+    const path = `${(urlIncludesBasePath || runtimeConfig.BASE_PATH === "/") ? "" : runtimeConfig.BASE_PATH}${url}`;
+    return `http://${node}:${port}${path}`;
   } else {
     return new Error("type is not absolute or relative");
   }
@@ -93,6 +99,7 @@ export default async (req: NextApiRequest, res: AugmentedNextApiResponse) => {
         return;
       }
 
+      // req.url of raw node.js request object doesn't remove base path
       const target = parseProxyTarget(req.url!, true);
 
       if (target instanceof Error) {
@@ -122,6 +129,7 @@ export default async (req: NextApiRequest, res: AugmentedNextApiResponse) => {
     return;
   }
 
+  // req.url of next.js removes base path
   const target = parseProxyTarget(req.url!, false);
 
   if (target instanceof Error) {
