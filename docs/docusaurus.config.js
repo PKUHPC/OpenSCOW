@@ -74,6 +74,13 @@ const config = {
           },
           {
             type: "doc",
+            docId: "contribution/index",
+            position: "left",
+            sidebarId: "contribution",
+            label: "贡献指南",
+          },
+          {
+            type: "doc",
             docId: "refs/index",
             position: "left",
             sidebarId: "refs",
