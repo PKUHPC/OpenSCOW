@@ -46,8 +46,9 @@ const config = {
       navbar: {
         title: "",
         logo: {
-          alt: "My Site Logo",
+          alt: "SCOW Logo",
           src: "img/logo.svg",
+          srcDark: "img/logo_dark.svg",
         },
         items: [
           {
