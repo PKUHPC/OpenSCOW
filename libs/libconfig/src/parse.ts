@@ -51,19 +51,19 @@ export function parseArray(str: string): string[] {
 }
 
 /**
- * Get ["abc"] in {{ abc }}
+ * Get all unique placeholder keys in a string
  * @param str the original string with placeholder
  * @returns the array of texts in placeholder
  */
-export function getPlaceholderTexts(str: string): string[] {
+export function getPlaceholderKeys(str: string): string[] {
 
   const matchValues = str.match(/\{\{\ ([a-zA-Z0-9_]+)\ \}\}/g);
 
   if (matchValues) {
     const texts = matchValues.map(function(val) {
       return val.slice(3, -3);
-    }); 
-    return texts;
+    });
+    return [...new Set(texts)];
 
   } else {
     return [];
