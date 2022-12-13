@@ -36,6 +36,7 @@ COPY libs/libconfig ./libs/libconfig
 COPY libs/config ./libs/config
 COPY docs ./docs
 
+# BASE_PATH must end with /
 ARG BASE_PATH="/"
 ENV BASE_PATH=${BASE_PATH}
 
