@@ -36,7 +36,7 @@ function calculateRunningOrQueueTime(r: RunningJob) {
 
   // calculate to format [{days}-][{Hours}:]{MM}:{SS}
   const diffMs = dayjs().diff(r.submissionTime);
-  return formtTime(diffMs);
+  return formatTime(diffMs);
 }
 
 export function runningJobId(r: RunningJobInfo) {
@@ -56,11 +56,11 @@ export function calculateAppRemainingTime(runningTime: string, timeLimit: string
     return timeLimit;
   }
   const diffMs = parseTime(timeLimit) - parseTime(runningTime);
-  return diffMs < 0 ? "00:00" : formtTime(diffMs);
+  return diffMs < 0 ? "00:00" : formatTime(diffMs);
 }
 
 // calculate number of milliseconds to format [{days}-][{Hours}:]{MM}:{SS}
-export function formtTime(milliseconds: number) {
+export function formatTime(milliseconds: number) {
   const seconds = milliseconds / 1000;
   const minutes = seconds / 60;
   const hours = minutes / 60;
