@@ -23,6 +23,7 @@ RUN pnpm fetch
 COPY package.json pnpm-workspace.yaml .npmrc ./
 
 COPY libs/config/package.json ./libs/config/
+COPY libs/libconfig/package.json ./libs/libconfig/
 COPY docs/package.json ./docs/
 
 RUN pnpm i --offline --frozen-lockfile
@@ -31,6 +32,7 @@ COPY tsconfig.json .eslintrc.json turbo.json ./
 
 COPY protos ./protos
 
+COPY libs/libconfig ./libs/libconfig
 COPY libs/config ./libs/config
 COPY docs ./docs
 
