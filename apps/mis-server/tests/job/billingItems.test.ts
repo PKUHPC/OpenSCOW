@@ -18,6 +18,7 @@ import { MikroORM } from "@mikro-orm/core";
 import { MySqlDriver } from "@mikro-orm/mysql";
 import { Decimal, decimalToMoney, numberToMoney } from "@scow/lib-decimal";
 import { createServer } from "src/app";
+import { clusterNameToScowClusterId } from "src/config/clusters";
 import { AmountStrategy, JobPriceItem } from "src/entities/JobPriceItem";
 import { Tenant } from "src/entities/Tenant";
 import { AddBillingItemRequest, JobBillingItem, JobServiceClient } from "src/generated/server/job";
@@ -222,7 +223,10 @@ it("calculates price", async () => {
   const wrongPrices = [] as { biJobIndex: number; tenantPrice: { expected: number; actual: number | undefined }; accountPrice: { expected: number; actual: number | undefined } }[];
 
   testData.forEach((t) => {
-    const price = calculateJobPrice(t, priceMap.getPriceItem, server.logger);
+    const price = calculateJobPrice({
+      ...t,
+      cluster: clusterNameToScowClusterId(t.cluster),
+    }, priceMap.getPriceItem, server.logger);
     if (price.tenant?.price.toNumber() !== t.tenantPrice || price.account?.price.toNumber() !== t.accountPrice) {
       wrongPrices.push({
         biJobIndex: t.biJobIndex,
