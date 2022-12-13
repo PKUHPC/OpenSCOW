@@ -47,6 +47,8 @@ export interface AppSession {
   state: string;
   ready: boolean;
   dataPath: string;
+  runningTime: string;
+  timeLimit: string;
 }
 
 export interface GetAppSessionsReply {

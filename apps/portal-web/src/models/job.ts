@@ -36,7 +36,32 @@ function calculateRunningOrQueueTime(r: RunningJob) {
 
   // calculate to format [{days}-][{Hours}:]{MM}:{SS}
   const diffMs = dayjs().diff(r.submissionTime);
-  const seconds = diffMs / 1000;
+  return formatTime(diffMs);
+}
+
+export function runningJobId(r: RunningJobInfo) {
+  return `${r.cluster.id}:${r.jobId}`;
+}
+
+export function compareState(a: string, b: string): -1 | 0 | 1 {
+  const endState = "ENDED";
+  if (a === b || (a !== endState && b !== endState)) { return 0; }
+  if (a === endState) { return -1; }
+  return 1;
+}
+
+export function calculateAppRemainingTime(runningTime: string, timeLimit: string) {
+  if (runningTime.split(/[:-]/).length < 2 || timeLimit.split(/[:-]/).length < 2) {
+    // if timeLimit or runningTime is INVALID or UNLIMITED, return timeLimit
+    return timeLimit;
+  }
+  const diffMs = parseTime(timeLimit) - parseTime(runningTime);
+  return diffMs < 0 ? "00:00" : formatTime(diffMs);
+}
+
+// calculate number of milliseconds to format [{days}-][{Hours}:]{MM}:{SS}
+export function formatTime(milliseconds: number) {
+  const seconds = milliseconds / 1000;
   const minutes = seconds / 60;
   const hours = minutes / 60;
   const days = hours / 24;
@@ -54,14 +79,18 @@ function calculateRunningOrQueueTime(r: RunningJob) {
   return text;
 }
 
-export function runningJobId(r: RunningJobInfo) {
-  return `${r.cluster.id}:${r.jobId}`;
+// Parse the given string in [{days}-][{Hours}:]{MM}:{SS} format and return number of milliseconds
+export function parseTime(time: string) {
+  const list = time.split(/[:-]/).map((x) => +x);
+
+  const seconds = list.at(-1);
+  const minutes = list.at(-2);
+  const hours = list.at(-3) ?? 0;
+  const days = list.at(-4) ?? 0;
+
+  return seconds! * 1000 + minutes! * 60000 + (hours * 3600000) + days * 86400000;
+
 }
 
-export function compareState(a: string, b: string): -1 | 0 | 1 {
-  const endState = "ENDED";
-  if (a === b || (a !== endState && b !== endState)) { return 0; }
-  if (a === endState) { return -1; }
-  return 1;
-}
+
   
