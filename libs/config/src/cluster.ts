@@ -107,6 +107,19 @@ export const getClusterConfigs: GetConfigFn<Record<string, ClusterConfigSchema>>
   const appsListConfig = getDirConfig(ClusterListConfigSchema,
     CLUSTER_CONFIG_BASE_PATH, baseConfigPath ?? DEFAULT_CONFIG_BASE_PATH);
   const appsConfig = convertToOldConfigSchema(appsListConfig);
+
+  // check duplicate slurm cluster id
+  const slurmClusters = new Set();
+  Object.values(appsConfig).forEach((config) => {
+    if (config.slurm && config.slurm.mis) {
+      if (slurmClusters.has(config.slurm.mis.clusterName)) {
+        throw new Error(`slurm cluster ${config.slurm.mis.clusterName} has already been used.`);
+      } else {
+        slurmClusters.add(config.slurm.mis.clusterName);
+      }
+    }
+  });
+
   Object.entries(appsConfig).forEach(([id, config]) => {
     if (!config[config.scheduler]) {
       throw new Error(`App ${id} is of scheduler ${config.scheduler} but config.${config.scheduler} is not set`);

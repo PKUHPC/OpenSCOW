@@ -14,3 +14,14 @@ import { getClusterConfigs } from "@scow/config/build/cluster";
 
 export const clusters = getClusterConfigs();
 
+// map slurm cluster id to scow cluster id
+const clusterIdMap = Object.entries(clusters).reduce((prev, [key, value]) => {
+  if (value.scheduler === "slurm" && value.slurm && value.slurm.mis) {
+    prev[value.slurm.mis.clusterName] = key;
+  }
+  return prev;
+}, { } as Record<string, string>);
+
+export function clusterNameToScowClusterId(clusterName: string) {
+  return clusterIdMap[clusterName];
+}
