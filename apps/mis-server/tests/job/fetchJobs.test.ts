@@ -15,6 +15,7 @@ import { Server } from "@ddadaal/tsgrpc-server";
 import { MySqlDriver, SqlEntityManager } from "@mikro-orm/mysql";
 import { Decimal } from "@scow/lib-decimal";
 import { createServer } from "src/app";
+import { clusterNameToScowClusterId } from "src/config/clusters";
 import { JobInfo } from "src/entities/JobInfo";
 import { OriginalJob } from "src/entities/OriginalJob";
 import { UserStatus } from "src/entities/UserAccount";
@@ -76,6 +77,16 @@ it("fetches the data", async () => {
   const jobs = await em.find(JobInfo, {});
 
   expect(jobs).toBeArrayOfSize(testData.length);
+
+  // check the cluster is mapped to scow cluster id
+  const testDataJobToCluster = testData.reduce((acc, x) => {
+    acc[x.biJobIndex] = x.cluster;
+    return acc;
+  }, {} as Record<string, string>);
+
+  jobs.forEach((x) => {
+    expect(x.cluster).toBe(clusterNameToScowClusterId(testDataJobToCluster[x.biJobIndex]));
+  });
 
   jobs.sort((a, b) => a.biJobIndex - b.biJobIndex);
 

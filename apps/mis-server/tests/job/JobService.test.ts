@@ -56,7 +56,7 @@ const mockOriginalJobData = (
   "partition": "C032M0128G",
   "nodelist": "a5u15n01",
   "jobName": "CoW",
-  "cluster": "hpc00",
+  "cluster": "pkuhpc",
   "timeSubmit": new Date("2020-04-23T22:23:00.000Z"),
   "timeStart": new Date("2020-04-23T22:25:12.000Z"),
   "timeEnd": new Date("2020-04-23T23:18:02.000Z"),

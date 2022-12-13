@@ -20,6 +20,7 @@ import { DEFAULT_TENANT_NAME } from "src/utils/constants";
 
 export interface JobInfo {
   biJobIndex: number;
+  // scow cluster id
   cluster: string;
   partition: string;
   qos: string;
