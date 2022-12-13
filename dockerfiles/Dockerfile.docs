@@ -23,7 +23,7 @@ RUN pnpm fetch
 COPY package.json pnpm-workspace.yaml .npmrc ./
 
 COPY libs/config/package.json ./libs/config/
-COPY apps/docs/package.json ./apps/docs/
+COPY docs/package.json ./docs/
 
 RUN pnpm i --offline --frozen-lockfile
 
