@@ -74,8 +74,9 @@ export const appServiceServer = plugin((server) => {
             method: app.web!.connect.method,
             path: app.web!.connect.path,
             proxyType: app.web!.proxyType === "absolute"
-              ? WebAppProps_ProxyType.absolute
-              : WebAppProps_ProxyType.relative,
+              ? WebAppProps_ProxyType.ABSOLUTE
+              : WebAppProps_ProxyType.RELATIVE,
+            customFormData: reply.customFormData ?? {},
           },
         };
         break;

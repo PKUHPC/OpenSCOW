@@ -14,11 +14,49 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Pushes to scow-deployment repo
-        uses: peaceiris/actions-gh-pages@v3
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
-          personal_token: ${{ secrets.SCOW_DEPLOYMENT_PAT }}
-          publish_dir: ./deploy/local
-          user_name: github-actions[bot]
-          user_email: 41898282+github-actions[bot]@users.noreply.github.com
-          external_repository: PKUHPC/scow-deployment
-          publish_branch: ${{ github.ref_name }}
+          token: ${{ secrets.SCOW_DEPLOYMENT_PAT }}
+          folder: ./deploy/local
+          repository-name: PKUHPC/scow-deployment
+          branch: ${{ github.ref_name }}
+
+  scow-vagrant:
+    name: Update scow-vagrant
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Pushes to scow-vagrant repo
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          token: ${{ secrets.SCOW_DEPLOYMENT_PAT }}
+          folder: ./deploy/vagrant
+          repository-name: PKUHPC/scow-vagrant
+          branch: ${{ github.ref_name }}
+
+  clean-scow-deployment:
+    name: Delete scow-deployment PR branch
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' && github.event.action == 'closed'
+    steps:
+      - name: Delete scow-deployment PR branch
+        uses: dawidd6/action-delete-branch@v3
+        with:
+          github_token: ${{ secrets.SCOW_DEPLOYMENT_PAT }}
+          owner: PKUHPC
+          repository: scow-deployment
+          branches: ${{ github.event.number }}/merge
+
+  clean-scow-vagrant:
+    name: Delete scow-vagrant PR branch
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' && github.event.action == 'closed'
+    steps:
+      - name: Delete scow-vagrant PR branch
+        uses: dawidd6/action-delete-branch@v3
+        with:
+          github_token: ${{ secrets.SCOW_DEPLOYMENT_PAT }}
+          owner: PKUHPC
+          repository: scow-vagrant
+          branches: ${{ github.event.number }}/merge

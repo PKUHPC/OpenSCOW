@@ -10,14 +10,13 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { authenticate } from "src/auth/server";
 import { AccountServiceClient } from "src/generated/server/account";
 import { TenantRole } from "src/models/User";
 import { getClient } from "src/utils/client";
-import { handleGrpcClusteropsError, InternalErrorInfo } from "src/utils/internalError";
+import { route } from "src/utils/route";
 import { handlegRPCError } from "src/utils/server";
 
 export interface WhitelistAccountSchema {
@@ -31,7 +30,6 @@ export interface WhitelistAccountSchema {
   responses: {
     204: null;
     404: null;
-    500: InternalErrorInfo;
   }
 }
 
@@ -57,7 +55,6 @@ export default route<WhitelistAccountSchema>("WhitelistAccountSchema",
     })
       .then(() => ({ 204: null }))
       .catch(handlegRPCError({
-        [Status.INTERNAL]: handleGrpcClusteropsError,
         [Status.NOT_FOUND]: () => ({ 404: null }),
       }));
   });

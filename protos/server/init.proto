@@ -14,8 +14,11 @@ syntax = "proto3";
 
 package scow.server;
 
-message QuerySystemInitializedRequest {}
-message QuerySystemInitializedReply { bool initialized = 1; }
+message QuerySystemInitializedRequest {
+}
+message QuerySystemInitializedReply {
+  bool initialized = 1;
+}
 
 message CreateInitAdminRequest {
   string user_id = 1;
@@ -27,20 +30,24 @@ message CreateInitAdminReply {
   bool created_in_auth = 1;
 }
 
-message CompleteInitRequest {}
+message CompleteInitRequest {
+}
 
-message CompleteInitReply {}
+message CompleteInitReply {
+}
 
 message SetAsInitAdminRequest {
   string user_id = 1;
 }
 
-message SetAsInitAdminReply {}
+message SetAsInitAdminReply {
+}
 
 message UnsetInitAdminRequest {
   string user_id = 1;
 }
-message UnsetInitAdminReply {}
+message UnsetInitAdminReply {
+}
 message UserExistsRequest {
   string user_id = 1;
 }

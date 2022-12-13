@@ -70,7 +70,7 @@ it("fails to login with wrong credentials", async () => {
     headers,
   });
 
-  expect(resp.statusCode).toBe(403);
+  expect(resp.statusCode).toBe(401);
 });
 
 it("gets user info", async () => {

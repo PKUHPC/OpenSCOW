@@ -19,7 +19,7 @@ import "google/protobuf/timestamp.proto";
 message ConnectToAppRequest {
   string user_id = 1;
   string cluster = 2;
-  string sessionId = 3;
+  string session_id = 3;
 }
 
 message WebAppProps {
@@ -28,13 +28,15 @@ message WebAppProps {
   map<string, string> query = 3;
   map<string, string> form_data = 4;
   enum ProxyType {
-    relative = 0;
-    absolute = 1;
+    RELATIVE = 0;
+    ABSOLUTE = 1;
   }
-  ProxyType proxyType = 5;
+  ProxyType proxy_type = 5;
+  map<string, string> custom_form_data = 6;
 }
 
-message VncAppProps {}
+message VncAppProps {
+}
 
 // NOT_FOUND: session id not found
 // UNAVAILABLE: the session cannot be connected
@@ -57,7 +59,7 @@ message CreateAppSessionRequest {
   optional string qos = 6;
   uint32 core_count = 7;
   uint32 max_time = 8;
-  map<string, string> customAttributes = 9;
+  map<string, string> custom_attributes = 9;
 }
 
 // NOT_FOUND: app is not found
@@ -75,7 +77,7 @@ message ListAppSessionsRequest {
 
 message AppSession {
   string session_id = 1;
-  uint32 jobId = 2;
+  uint32 job_id = 2;
   google.protobuf.Timestamp submit_time = 3;
   string app_id = 4;
   string state = 5;
@@ -83,9 +85,13 @@ message AppSession {
   string data_path = 7;
 }
 
-message ListAppSessionsResponse { repeated AppSession sessions = 1; }
+message ListAppSessionsResponse {
+  repeated AppSession sessions = 1;
+}
 
-message GetAppAttributesRequest { string app_id = 1; }
+message GetAppAttributesRequest {
+  string app_id = 1;
+}
 
 message SelectOption {
   string value = 1;
@@ -94,9 +100,9 @@ message SelectOption {
 
 message AppCustomAttribute {
   enum AttributeType {
-    number = 0;
-    text = 1;
-    select = 2;
+    NUMBER = 0;
+    TEXT = 1;
+    SELECT = 2;
   }
   AttributeType type = 1;
   string label = 2;
@@ -104,16 +110,21 @@ message AppCustomAttribute {
   repeated SelectOption options = 4;
 }
 
-message GetAppAttributesResponse { repeated AppCustomAttribute attributes = 1; }
+message GetAppAttributesResponse {
+  repeated AppCustomAttribute attributes = 1;
+}
 
-message ListAvailableAppsRequest {}
+message ListAvailableAppsRequest {
+}
 
 message App {
   string id = 1;
   string name = 2;
 }
 
-message ListAvailableAppsResponse { repeated App apps = 1; }
+message ListAvailableAppsResponse {
+  repeated App apps = 1;
+}
 
 service AppService {
   rpc ConnectToApp(ConnectToAppRequest) returns (ConnectToAppResponse);

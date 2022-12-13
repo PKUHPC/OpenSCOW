@@ -12,6 +12,7 @@
 
 import { Entity, Index, PrimaryKey, Property } from "@mikro-orm/core";
 import { Decimal } from "@scow/lib-decimal";
+import { clusterNameToScowClusterId } from "src/config/clusters";
 import type { OriginalJob } from "src/entities/OriginalJob";
 import { DECIMAL_DEFAULT_RAW, DecimalType } from "src/utils/decimal";
 
@@ -46,6 +47,7 @@ export class JobInfo {
   @Property({ length: 255, columnType: "tinytext", comment: "作业名" })
     jobName!: string;
 
+  // 这里存的是scow中的集群名
   @Property({ length: 50, comment: "集群名" })
     cluster!: string;
 
@@ -130,7 +132,7 @@ export class JobInfo {
     this.partition = job.partition;
     this.nodelist = job.nodelist;
     this.jobName = job.jobName;
-    this.cluster = job.cluster;
+    this.cluster = clusterNameToScowClusterId(job.cluster);
     this.gpu = job.gpu;
     this.cpusReq = job.cpusReq;
     this.memReq = job.memReq;

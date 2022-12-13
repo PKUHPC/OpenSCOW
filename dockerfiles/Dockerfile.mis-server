@@ -32,7 +32,7 @@ COPY apps/mis-server/package.json ./apps/mis-server/
 
 RUN pnpm i --offline --frozen-lockfile
 
-COPY tsconfig.json .eslintrc.json ./
+COPY tsconfig.json .eslintrc.json turbo.json ./
 
 COPY protos ./protos
 

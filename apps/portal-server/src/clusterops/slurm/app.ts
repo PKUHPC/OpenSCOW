@@ -11,6 +11,7 @@
  */
 
 import { getAppConfigs } from "@scow/config/build/app";
+import { getPlaceholderText } from "@scow/lib-config/build/parse";
 import { sftpChmod, sftpExists, sftpReaddir, sftpReadFile, sftpRealPath, sftpWriteFile } from "@scow/lib-ssh";
 import { randomUUID } from "crypto";
 import fs from "fs";
@@ -33,6 +34,14 @@ interface SessionMetadata {
   submitTime: string;
 }
 
+// All keys are strings except PORT
+interface ServerSessionInfoData {
+  [key: string]: string | number;
+  HOST: string;
+  PORT: number;
+  PASSWORD: string;
+}
+
 const SERVER_ENTRY_COMMAND = fs.readFileSync("assets/slurm/server_entry.sh", { encoding: "utf-8" });
 const VNC_ENTRY_COMMAND = fs.readFileSync("assets/slurm/vnc_entry.sh", { encoding: "utf-8" });
 
@@ -40,7 +49,7 @@ const VNC_OUTPUT_FILE = "output";
 
 const SESSION_METADATA_NAME = "session.json";
 
-const SERVER_SESSION_INFO = "SERVER_SESSION_INFO";
+const SERVER_SESSION_INFO = "server_session_info.json";
 const VNC_SESSION_INFO = "VNC_SESSION_INFO";
 
 export const slurmAppOps = (cluster: string): AppOps => {
@@ -101,13 +110,24 @@ export const slurmAppOps = (cluster: string): AppOps => {
         };
 
         if (appConfig.type === "web") {
+          let customForm = String.raw`\"HOST\":\"$HOST\",\"PORT\":$PORT`;
+          for (const key in appConfig.web!.connect.formData) {
+            const value = getPlaceholderText(appConfig.web!.connect.formData[key]);
+            if (!value) {
+              throw new Error(`
+              FormData ${key} of app ${appId} doesn't exist`);
+            }
+            customForm += String.raw`,\"${value}\":\"$${value}\"`;
+          }
+          const sessionInfo = `echo -e "{${customForm}}" >$SERVER_SESSION_INFO`;
+
           let beforeScript: string = "";
           for (const key in customAttributes) {
             const quotedAttribute = quote([customAttributes[key] ?? ""]);
             const envItem = `export ${key}=${quotedAttribute}`;
             beforeScript = beforeScript + envItem + "\n";
           }
-          beforeScript = beforeScript + appConfig.web!.beforeScript;
+          beforeScript = beforeScript + appConfig.web!.beforeScript + sessionInfo;
           await sftpWriteFile(sftp)(join(workingDirectory, "before.sh"), beforeScript);
 
           await sftpWriteFile(sftp)(join(workingDirectory, "script.sh"), appConfig.web!.script);
@@ -255,13 +275,19 @@ export const slurmAppOps = (cluster: string): AppOps => {
         if (app.type === "web") {
           const infoFilePath = join(jobDir, SERVER_SESSION_INFO);
           if (await sftpExists(sftp, infoFilePath)) {
-            const content = (await sftpReadFile(sftp)(infoFilePath)).toString();
+            const content = await sftpReadFile(sftp)(infoFilePath);
+            const serverSessionInfo = JSON.parse(content.toString()) as ServerSessionInfoData;
 
-            // FORMAT: HOST\nPORT\nPASSWORD
-
-            const [host, port, password] = content.split("\n");
-
-            return { code: "OK", appId: sessionMetadata.appId, host, port: +port, password };
+            const { HOST, PORT, PASSWORD, ...rest } = serverSessionInfo;
+            const customFormData = rest as {[key: string]: string};
+            return { 
+              code: "OK", 
+              appId: sessionMetadata.appId, 
+              host: HOST, 
+              port: +PORT, 
+              password: PASSWORD, 
+              customFormData:  customFormData ?? {},
+            };
           }
         } else {
           // for vnc apps,

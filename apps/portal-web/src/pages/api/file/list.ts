@@ -18,7 +18,7 @@ import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
 import { handlegRPCError } from "src/utils/server";
 
-export type FileType = "file" | "dir";
+export type FileType = "FILE" | "DIR";
 
 export type FileInfo = {
   name: string;
@@ -47,8 +47,8 @@ export interface ListFileSchema {
 const auth = authenticate(() => true);
 
 const mapType = {
-  [FileInfo_FileType.Dir]: "dir",
-  [FileInfo_FileType.File]: "file",
+  [FileInfo_FileType.DIR]: "DIR",
+  [FileInfo_FileType.FILE]: "FILE",
 } as const;
 
 export default route<ListFileSchema>("ListFileSchema", async (req, res) => {

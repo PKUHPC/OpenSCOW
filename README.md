@@ -33,11 +33,11 @@ SCOW is an HPC portal and management information system (MIS) for HPC users and 
 
 ## Deployment
 
-Follow [the documentation](https://pkuhpc.github.io/SCOW/docs/common/deployment) to deploy SCOW onto your clusters.
+Follow [Deployment Guide](https://pkuhpc.github.io/SCOW/docs/deploy) to deploy SCOW onto your clusters.
 
 ## Development & Contribution
 
-Follow [the documentation](https://pkuhpc.github.io/SCOW/docs/common/dev) to learn how to start developing the project.
+Follow [Contribution Guide](https://pkuhpc.github.io/SCOW/docs/contribution) to learn how to contribute to the project.
 
 ## License
 

@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { parseArray, parseKeyValue, parsePlaceholder } from "src/parse";
+import { getPlaceholderText, parseArray, parseKeyValue, parsePlaceholder } from "src/parse";
 
 it.each([
   ["123", {}, "123"],
@@ -44,4 +44,17 @@ it.each([
   ["abs,sd,", ["abs", "sd", ""]],
 ])("parses array %p to %p", (input: string, expected: string[]) => {
   expect(parseArray(input)).toEqual(expected);
+});
+
+it.each([
+  ["", ""],
+  ["{{ abc }}", "abc"],
+  ["123", ""],
+  ["123{{ abc }}456", "abc"],
+  ["123{{abc }}456", ""],
+  ["123{{abc}}456", ""],
+  ["123{ abc }456", ""],
+  ["123{ abc }456", ""],
+])("get text %p from %p", async (input: string, expected: string) => {
+  expect(getPlaceholderText(input)).toEqual(expected);
 });

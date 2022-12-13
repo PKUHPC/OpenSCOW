@@ -16,6 +16,7 @@ import { MariaDbDriver } from "@mikro-orm/mariadb";
 import { SqlEntityManager } from "@mikro-orm/mysql";
 import { parsePlaceholder } from "@scow/lib-config";
 import { charge } from "src/bl/charging";
+import { clusterNameToScowClusterId } from "src/config/clusters";
 import { misConfig } from "src/config/mis";
 import { Account } from "src/entities/Account";
 import { JobInfo } from "src/entities/JobInfo";
@@ -130,7 +131,7 @@ export async function fetchJobs(
 
           const price = tenant ? priceMap.calculatePrice({
             biJobIndex: i.biJobIndex,
-            cluster: i.cluster,
+            cluster: clusterNameToScowClusterId(i.cluster),
             cpusAlloc: i.cpusAlloc,
             gpu: i.gpu,
             memAlloc: i.memAlloc,

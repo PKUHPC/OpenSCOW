@@ -13,9 +13,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@fastify/error": "3.0.0",
-    "@fastify/formbody": "7.3.0",
+    "@fastify/error": "3.1.0",
+    "@fastify/formbody": "7.4.0",
     "@fastify/static": "6.5.1",
+    "@fastify/view": "7.3.0",
+    "liquidjs": "10.2.0",
     "@scow/config": "workspace:*",
     "@scow/lib-config": "workspace:*",
     "@scow/lib-ssh": "workspace:*",
@@ -23,7 +25,7 @@
     "asn1": "0.2.6",
     "fastify": "4.10.2",
     "fastify-graceful-shutdown": "3.4.0",
-    "fastify-plugin": "4.3.0",
+    "fastify-plugin": "4.4.0",
     "ioredis": "5.2.4",
     "ldapjs": "2.3.3",
     "nanoid": "4.0.0"

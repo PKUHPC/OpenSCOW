@@ -1,5 +1,11 @@
 displayName: hpc01
+misIgnore: true
 slurm:
+  mis:
+    managerUrl: localhost:22222
+    dbPassword: password
+    clusterName: pkuhpc1
+    scriptPath: /slurmshTest/slurm.sh
   loginNodes:
     - localhost:22222
   partitions:

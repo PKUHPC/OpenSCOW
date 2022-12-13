@@ -48,7 +48,9 @@ message QueryUsedStorageQuotaRequest {
   string cluster = 3;
 }
 
-message QueryUsedStorageQuotaReply { uint64 used = 1; }
+message QueryUsedStorageQuotaReply {
+  uint64 used = 1;
+}
 
 message GetAccountUsersRequest {
   string tenant_name = 1;
@@ -66,7 +68,9 @@ message AccountUserInfo {
   optional common.Money used_job_charge_limit = 7;
 }
 
-message GetAccountUsersReply { repeated AccountUserInfo results = 1; }
+message GetAccountUsersReply {
+  repeated AccountUserInfo results = 1;
+}
 
 message QueryIsUserInAccountRequest {
   string tenant_name = 1;
@@ -74,7 +78,9 @@ message QueryIsUserInAccountRequest {
   string account_name = 3;
 }
 
-message QueryIsUserInAccountReply { bool result = 1; }
+message QueryIsUserInAccountReply {
+  bool result = 1;
+}
 
 message UnblockUserInAccountRequest {
   string tenant_name = 1;
@@ -84,7 +90,8 @@ message UnblockUserInAccountRequest {
 
 // NOT_FOUND: user_id or account_name is not found.
 // FAILED_PRECONDITION: user is already unblocked
-message UnblockUserInAccountReply {}
+message UnblockUserInAccountReply {
+}
 
 message BlockUserInAccountRequest {
   string tenant_name = 1;
@@ -94,7 +101,8 @@ message BlockUserInAccountRequest {
 
 // NOT_FOUND: user_id or account_name is not found.
 // FAILED_PRECONDITION: user is already blocked
-message BlockUserInAccountReply {}
+message BlockUserInAccountReply {
+}
 
 message RemoveUserFromAccountRequest {
   string tenant_name = 1;
@@ -104,7 +112,8 @@ message RemoveUserFromAccountRequest {
 
 // NOT_FOUND: user_id is not found.
 // OUT_OF_RANGE: user is the owner of the account
-message RemoveUserFromAccountReply {}
+message RemoveUserFromAccountReply {
+}
 
 message AddUserToAccountRequest {
   string tenant_name = 1;
@@ -114,7 +123,8 @@ message AddUserToAccountRequest {
 
 // ALREADY_EXISTS: user already in the account
 // NOT_FOUND: account is not found.
-message AddUserToAccountReply {}
+message AddUserToAccountReply {
+}
 
 message SetAsAdminRequest {
   string tenant_name = 1;
@@ -124,7 +134,8 @@ message SetAsAdminRequest {
 
 // FAILED_PRECONDITION: the user is already admin
 // NOT_FOUND: user is not found.
-message SetAsAdminReply {}
+message SetAsAdminReply {
+}
 
 message UnsetAdminRequest {
   string tenant_name = 1;
@@ -134,7 +145,8 @@ message UnsetAdminRequest {
 
 // FAILED_PRECONDITION: the user is already not admin
 // NOT_FOUND: user is not found.
-message UnsetAdminReply {}
+message UnsetAdminReply {
+}
 
 message CreateUserRequest {
   string tenant_name = 1;
@@ -158,7 +170,8 @@ message DeleteUserRequest {
 
 // FAILED_PRECONDITION: the user is an owner of an account.
 // NOT_FOUND: user is not found
-message DeleteUserReply {}
+message DeleteUserReply {
+}
 
 message GetNameRequest {
   string tenant_name = 1;
@@ -166,9 +179,13 @@ message GetNameRequest {
 }
 
 // NOT_FOUND: user is not found
-message GetNameReply { string name = 1; }
+message GetNameReply {
+  string name = 1;
+}
 
-message GetUsersRequest { string tenant_name = 1; }
+message GetUsersRequest {
+  string tenant_name = 1;
+}
 
 message User {
   string tenant_name = 1;
@@ -181,7 +198,9 @@ message User {
   repeated TenantRole tenant_roles = 8;
 }
 
-message GetUserInfoRequest { string user_id = 1; }
+message GetUserInfoRequest {
+  string user_id = 1;
+}
 
 enum UserRole {
   USER = 0;
@@ -212,7 +231,9 @@ message GetUserInfoReply {
   string tenant_name = 5;
 }
 
-message GetUsersReply { repeated User users = 1; }
+message GetUsersReply {
+  repeated User users = 1;
+}
 
 message PlatformUserInfo {
   string user_id = 1;
@@ -238,7 +259,8 @@ message SetPlatformRoleRequest {
 
 // FAILED_PRECONDITION: the user is already this role(role_type)
 // NOT_FOUND: user is not found.
-message SetPlatformRoleReply {}
+message SetPlatformRoleReply {
+}
 
 message UnsetPlatformRoleRequest {
   string user_id = 1;
@@ -247,7 +269,8 @@ message UnsetPlatformRoleRequest {
 
 // FAILED_PRECONDITION: the user is already not this role(role_type)
 // NOT_FOUND: user is not found.
-message UnsetPlatformRoleReply {}
+message UnsetPlatformRoleReply {
+}
 
 message SetTenantRoleRequest {
   string user_id = 1;
@@ -256,7 +279,8 @@ message SetTenantRoleRequest {
 
 // FAILED_PRECONDITION: the user is already this role(role_type)
 // NOT_FOUND: user is not found.
-message SetTenantRoleReply {}
+message SetTenantRoleReply {
+}
 
 message UnsetTenantRoleRequest {
   string user_id = 1;
@@ -265,7 +289,8 @@ message UnsetTenantRoleRequest {
 
 // FAILED_PRECONDITION: the user is already not this role(role_type)
 // NOT_FOUND: user is not found.
-message UnsetTenantRoleReply {}
+message UnsetTenantRoleReply {
+}
 
 service UserService {
 

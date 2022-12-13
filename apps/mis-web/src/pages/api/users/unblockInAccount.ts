@@ -10,14 +10,13 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { authenticate } from "src/auth/server";
 import { UserServiceClient } from "src/generated/server/user";
 import { PlatformRole, UserRole } from "src/models/User";
 import { getClient } from "src/utils/client";
-import { handleGrpcClusteropsError, InternalErrorInfo } from "src/utils/internalError";
+import { route } from "src/utils/route";
 import { handlegRPCError } from "src/utils/server";
 
 export interface UnblockUserInAccountSchema {
@@ -33,7 +32,6 @@ export interface UnblockUserInAccountSchema {
     200: { executed: boolean };
     // 用户不存在
     404: null;
-    500: InternalErrorInfo;
   }
 }
 
@@ -56,7 +54,6 @@ export default /* #__PURE__*/route<UnblockUserInAccountSchema>("UnblockUserInAcc
   })
     .then(() => ({ 200: { executed: true } }))
     .catch(handlegRPCError({
-      [Status.INTERNAL]: handleGrpcClusteropsError,
       [Status.NOT_FOUND]: () => ({ 404: null }),
       [Status.FAILED_PRECONDITION]: () => ({ 200: { executed: false } }),
     }));

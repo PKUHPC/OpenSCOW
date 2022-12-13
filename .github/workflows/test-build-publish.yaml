@@ -112,6 +112,10 @@ jobs:
             file: portal-web
             build_args: BASE_PATH=/demo/scow
 
+          - name: docs
+            file: docs
+            build_args: BASE_PATH=/SCOW/
+
     steps:
       - uses: actions/checkout@v3
 
