@@ -41,9 +41,9 @@ ENV BASE_PATH=${BASE_PATH}
 
 RUN pnpm run build
 
-FROM nginx:stable-alpine as runner
+FROM nginx:alpine@sha256:455c39afebd4d98ef26dd70284aa86e6810b0485af5f4f222b19b89758cabf1e as runner
 
-COPY ./docs/nginx.conf /etc/nginx/conf.d/default.conf
+COPY docs/nginx.conf /etc/nginx/templates/default.conf.template
 COPY --from=builder /app/docs/build /var/www/html
 
 ARG BASE_PATH="/"
