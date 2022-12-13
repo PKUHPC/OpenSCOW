@@ -52,7 +52,7 @@ export function compareState(a: string, b: string): -1 | 0 | 1 {
 
 export function calculateAppRemainingTime(runningTime: string, timeLimit: string) {
   if (runningTime.split(/[:-]/).length < 2 || timeLimit.split(/[:-]/).length < 2) {
-    // if timeLimit or runningTime is INVALID or INFINITE, return timeLimit
+    // if timeLimit or runningTime is INVALID or UNLIMITED, return timeLimit
     return timeLimit;
   }
   const diffMs = parseTime(timeLimit) - parseTime(runningTime);
