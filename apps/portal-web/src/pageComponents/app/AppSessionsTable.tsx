@@ -22,7 +22,7 @@ import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import type { AppSession } from "src/generated/portal/app";
 import { useMessage } from "src/layouts/prompts";
-import { compareState } from "src/models/job";
+import { calculateAppRemainingTime, compareState } from "src/models/job";
 import { ConnectTopAppLink } from "src/pageComponents/app/ConnectToAppLink";
 import { AppsStore } from "src/stores/AppsStore";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
@@ -53,7 +53,10 @@ export const AppSessionsTable: React.FC<Props> = () => {
       // List all desktop
       const { sessions } = await api.getAppSessions({ query: { cluster: cluster.id } });
 
-      return sessions;
+      return sessions.map((x) => ({
+        ...x, 
+        remainingTime: x.ready ? calculateAppRemainingTime(x.runningTime, x.timeLimit) : x.timeLimit,
+      }));
 
     }, [cluster]),
   });
@@ -87,6 +90,10 @@ export const AppSessionsTable: React.FC<Props> = () => {
         compareNumber(a.jobId, b.jobId),
       defaultSortOrder: "descend",
 
+    },
+    {
+      title: "剩余时间",
+      dataIndex: "remainingTime",
     },
 
     {
