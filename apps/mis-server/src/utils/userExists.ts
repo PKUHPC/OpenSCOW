@@ -13,7 +13,6 @@
 import { Logger } from "@ddadaal/tsgrpc-server";
 import { MySqlDriver, SqlEntityManager } from "@mikro-orm/mysql";
 import { getCapabilities, getUser } from "@scow/lib-auth";
-import { clusters } from "src/config/clusters";
 import { misConfig } from "src/config/mis";
 import { User } from "src/entities/User";
 import { DEFAULT_TENANT_NAME } from "src/utils/constants";
@@ -29,9 +28,7 @@ export async function userExists(userId: string, logger: Logger, em: SqlEntityMa
       existsInAuth: undefined,
     };
   }
-  const cluster = Object.values(clusters).find((c) => c.misIgnore === false);
-  const node = cluster!.slurm.loginNodes[0];
-  const userInfo = await getUser(node, { identityId: userId }, logger);
+  const userInfo = await getUser(misConfig.authUrl, { identityId: userId }, logger);
   return {
     existsInScow: !!user,
     existsInAuth: !!userInfo,
