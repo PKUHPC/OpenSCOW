@@ -28,11 +28,6 @@ name: emacs
 # 指定应用类型为vnc
 type: vnc
 
-# slurm配置
-slurm:
-  options:
-     - "-x node[1-2]"
-
 # VNC应用的配置
 vnc: 
 

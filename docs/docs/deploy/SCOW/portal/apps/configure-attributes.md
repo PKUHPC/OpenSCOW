@@ -5,13 +5,15 @@ title: 配置HTML表单
 
 # 配置HTML表单
 
-web和vnc类应用都可以通过`attributes`配置项，修改创建应用的HTML表单，允许管理员定义用户创建交互式应用时的表单选项，让用户能够指定应用的版本等信息。
+Web和VNC类应用都可以通过`attributes`配置项，修改创建应用的HTML表单，允许管理员定义用户创建交互式应用时的表单选项，让用户能够指定应用的版本等信息。
 
-用户提交的内容会作为运行应用的计算节点的环境变量生效。
+用户提交的内容会作为运行应用的计算节点的环境变量生效，web类应用可以在`script`项使用，VNC类应用可以在`xstartup`使用这些变量。
 
 ## 配置示例
 
-以code-server为例，为web类应用自定义HTML表单的配置文件如下：
+### web类应用配置HTML表单示例
+
+以[coder/code-server](https://github.com/coder/code-server)启动VSCode为例，为web类应用自定义HTML表单的配置文件如下：
 
 ```yaml title="config/apps/vscode.yml"
 # 这个应用的ID
@@ -22,12 +24,6 @@ name: VSCode
 
 # 指定应用类型为web
 type: web
-
-
-# slurm配置
-slurm:
-  options:
-     - "-x node[1-2]"
 
 # Web应用的配置
 web:
@@ -40,9 +36,10 @@ web:
     export PORT=$(get_port)
     export PASSWORD=$(get_password 12)
 
-  # 运行任务的脚本。可以使用准备脚本定义的
+  # 运行任务的脚本。使用了用户在自定义表单中选择的选项
   script: |
-    PASSWORD=$PASSWORD code-server${selectVersion} -vvv --bind-addr 0.0.0.0:$PORT --auth password
+    module load ${selectVersion}
+    PASSWORD=$PASSWORD code-server -vvv --bind-addr 0.0.0.0:$PORT --auth password
 
   # 如何连接应用
   connect:
@@ -57,11 +54,15 @@ attributes:
     name: selectVersion
     label: 选择版本
     select:
-      - value: version10
-        label: v10
-      - value: version11
-        label: v11
+      - value: code-server/4.8.0
+        label: version 4.8.0
+      - value: code-server/4.9.0
+        label: version 4.9.0
 ```
+
+如果用户选择的是`version 4.8.0`选项，`xstartup`中`module load ${selectVersion}`实际执行的是`module load code-server/4.8.0`。
+
+### VNC类应用配置HTML表单示例
 
 以Emacs为例，桌面类应用自定义HTML表单的配置文件如下：
 
@@ -75,11 +76,6 @@ name: emacs
 # 指定应用类型为vnc
 type: vnc
 
-# slurm配置
-slurm:
-  options:
-     - "-x node[1-2]"
-
 # VNC应用的配置
 vnc: 
 
@@ -87,9 +83,10 @@ vnc:
   # beforeScript:
   #   export VERSION=1.0
   
-  # 此X Session的xstartup脚本
+  # 此X Session的xstartup脚本。使用了用户在自定义表单中选择的选项
   xstartup: |
-    emacs${selectVersion} -mm
+    module load ${selectVersion}
+    emacs -mm
 
 # 配置HTML表单，用户可以指定Emacs版本      
 attributes:
@@ -97,12 +94,14 @@ attributes:
     name: selectVersion
     label: 选择版本
     select:
-      - value: version27.1
+      - value: emacs/27.1
         label: Emacs 27.1 released
-      - value: version28.1
+      - value: emacs/28.1
         label: Emacs 28.1 released
 
 ```
+
+如果用户选择的是`Emacs 28.1 released`选项，`xstartup`中`module load ${selectVersion}`实际执行的是`module load emacs/28.1`。
 
 ## 配置解释
 
@@ -111,7 +110,7 @@ attributes:
 | 属性       | 类型                           | 是否必填 | 解释                             |
 |----------|------------------------------|------|--------------------------------|
 | `type`   | `number`, `text` 或者 `select` | 是    | 在HTML表单元素中输入的内容的类型             |
-| `name`   | 字符串                          | 是    | HTML表单的name属性，在编程中使用，并且会作为计算节点环境变量名     |
+| `name`   | 字符串                          | 是    | HTML表单的name属性，在编程中使用，并且会作为计算节点环境变量名，可以在Web应用的`script`或者VNC应用的`xstartop`使用     |
 | `label`  | 字符串                          | 是    | HTML表单的label属性，输入框左侧显示的标签      |
 | `select` | 选项的列表                        | 否    | 如果`type`是`select`，必须配置此项，指明具体的选项，具体配置办法见`select`示例 |
 

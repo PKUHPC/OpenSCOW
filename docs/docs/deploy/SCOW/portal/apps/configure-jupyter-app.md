@@ -38,7 +38,7 @@ web:
     export CONFIG_FILE="${PWD}/config.py"
     export SLURM_COMPUTE_NODE_IP=$(get_ip)
 
-  # 运行任务的脚本。可以使用准备脚本定义的
+  # 运行任务的脚本。可以使用准备脚本定义的变量
   script: |
     (
     umask 077

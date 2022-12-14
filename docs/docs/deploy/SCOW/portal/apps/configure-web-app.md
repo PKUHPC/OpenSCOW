@@ -25,12 +25,6 @@ name: VSCode
 # 指定应用类型为web
 type: web
 
-
-# slurm配置
-slurm:
-  options:
-     - "-x node[1-2]"
-
 # Web应用的配置
 web:
 
@@ -42,7 +36,7 @@ web:
     export PORT=$(get_port)
     export PASSWORD=$(get_password 12)
 
-  # 运行任务的脚本。可以使用准备脚本定义的
+  # 运行任务的脚本。可以使用准备脚本定义的变量
   script: |
     PASSWORD=$PASSWORD code-server -vvv --bind-addr 0.0.0.0:$PORT --auth password
 
