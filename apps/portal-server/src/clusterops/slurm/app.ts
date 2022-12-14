@@ -147,6 +147,9 @@ export const slurmAppOps = (cluster: string): AppOps => {
 
           return await submitAndWriteMetadata(script, { SERVER_SESSION_INFO });
         } else {
+          // vnc app
+          await sftpWriteFile(sftp)(join(workingDirectory, "before.sh"), appConfig.vnc!.beforeScript ?? "");
+
           const xstartupPath = join(workingDirectory, "xstartup");
           await sftpWriteFile(sftp)(xstartupPath, appConfig.vnc!.xstartup);
           await sftpChmod(sftp)(xstartupPath, "755");

@@ -36,6 +36,10 @@ slurm:
 # VNC应用的配置
 vnc: 
 
+  # 可以使用准备脚本来准备运行任务的环境
+  # beforeScript:
+  #   export VERSION=1.0
+  
   # 此X Session的xstartup脚本
   xstartup: |
     emacs -mm
@@ -49,6 +53,10 @@ vnc:
 ```
 
 ## 配置解释
+
+### beforeScript
+
+`beforeScript`为准备脚本,可以选择使用这个脚本用来准备运行任务的环境。
 
 ### xstartup
 
