@@ -16,10 +16,9 @@ import styled from "styled-components";
 
 const LogoContainer = styled.h1`
   color: var(--ant-primary-color);
-  margin-bottom: 0;
 
   img {
-    margin-bottom: 4px;
+    padding: 2px 0;
   }
 `;
 

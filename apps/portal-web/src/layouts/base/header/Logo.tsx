@@ -19,7 +19,7 @@ const LogoContainer = styled.h1`
   margin-bottom: 0;
 
   img {
-    margin-bottom: 4px;
+    padding: 2px 0;
   }
 `;
 
