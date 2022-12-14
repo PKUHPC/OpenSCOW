@@ -46,17 +46,13 @@ vnc:
 
 ```
 
-增加了此文件后，运行以下命令重启job-server即可。
-
-```bash
-./compose.sh restart portal-web
-```
+增加了此文件后，刷新即可。
 
 ## 配置解释
 
 ### beforeScript
 
-`beforeScript`为准备脚本,可以选择使用这个脚本用来准备运行任务的环境。
+`beforeScript`为准备脚本,如果有需要使用的变量，可以选择使用这个脚本用来准备运行任务的环境。
 
 ### xstartup
 
@@ -64,3 +60,6 @@ vnc:
 
 所以对于桌面类应用而言，您只需要填写正确的xstartup脚本即可。
 
+### `attributes`
+
+如果需要指定应用版本，可以通过`attributes`配置项添加自定义HTML表单，具体配置示例请参考[attributes配置](./configure-attributes.md)。

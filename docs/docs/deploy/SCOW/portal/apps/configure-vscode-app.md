@@ -48,8 +48,4 @@ web:
       password: "{{ PASSWORD }}"
 ```
 
-增加了此文件后，运行以下命令重启portal-web和portal-server。
-
-```bash
-./compose.sh restart portal-web portal-server
-```
+增加了此文件后，刷新即可。

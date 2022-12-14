@@ -109,6 +109,13 @@ export const slurmAppOps = (cluster: string): AppOps => {
           return { code: "OK", jobId, sessionId: metadata.sessionId } as const;
         };
 
+        let customAttributesExport: string = "";
+        for (const key in customAttributes) {
+          const quotedAttribute = quote([customAttributes[key] ?? ""]);
+          const envItem = `export ${key}=${quotedAttribute}`;
+          customAttributesExport = customAttributesExport + envItem + "\n";
+        }
+
         if (appConfig.type === "web") {
           let customForm = String.raw`\"HOST\":\"$HOST\",\"PORT\":$PORT`;
           for (const key in appConfig.web!.connect.formData) {
@@ -121,13 +128,7 @@ export const slurmAppOps = (cluster: string): AppOps => {
           }
           const sessionInfo = `echo -e "{${customForm}}" >$SERVER_SESSION_INFO`;
 
-          let beforeScript: string = "";
-          for (const key in customAttributes) {
-            const quotedAttribute = quote([customAttributes[key] ?? ""]);
-            const envItem = `export ${key}=${quotedAttribute}`;
-            beforeScript = beforeScript + envItem + "\n";
-          }
-          beforeScript = beforeScript + appConfig.web!.beforeScript + sessionInfo;
+          const beforeScript = customAttributesExport + appConfig.web!.beforeScript + sessionInfo;
           await sftpWriteFile(sftp)(join(workingDirectory, "before.sh"), beforeScript);
 
           await sftpWriteFile(sftp)(join(workingDirectory, "script.sh"), appConfig.web!.script);
@@ -148,7 +149,10 @@ export const slurmAppOps = (cluster: string): AppOps => {
           return await submitAndWriteMetadata(script, { SERVER_SESSION_INFO });
         } else {
           // vnc app
-          await sftpWriteFile(sftp)(join(workingDirectory, "before.sh"), appConfig.vnc!.beforeScript ?? "");
+
+          const beforeScript = customAttributesExport + appConfig.vnc!.beforeScript ?? "";
+
+          await sftpWriteFile(sftp)(join(workingDirectory, "before.sh"), beforeScript);
 
           const xstartupPath = join(workingDirectory, "xstartup");
           await sftpWriteFile(sftp)(xstartupPath, appConfig.vnc!.xstartup);
