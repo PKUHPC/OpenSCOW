@@ -25,9 +25,6 @@ import { reloadEntity } from "src/utils/orm";
 import { insertInitialData } from "tests/data/data";
 import { dropDatabase } from "tests/data/helpers";
 
-jest.mock("@scow/lib-auth", () => ({
-  createUser: jest.fn(async () => ({ status: 204, ok: true, text: () => "" })),
-}));
 
 const anotherTenant = "anotherTenant";
 
@@ -94,7 +91,6 @@ it("cannot create user if userId exists", async () => {
   const reply = await asyncClientCall(client, "createUser", {
     name, identityId: userId, email, tenantName: tenant.name, password,
   }).catch((e) => e);
-
   expect(reply.code).toBe(Status.ALREADY_EXISTS);
 });
 

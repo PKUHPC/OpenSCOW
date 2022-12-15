@@ -19,7 +19,6 @@ import { GetTenantInfoReply, TenantServiceClient } from "src/generated/server/te
 import { InitialData, insertInitialData } from "tests/data/data";
 import { dropDatabase } from "tests/data/helpers";
 
-
 let server: Server;
 let data: InitialData;
 

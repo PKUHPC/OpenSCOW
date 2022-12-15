@@ -12,41 +12,35 @@
 
 import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
-import { Status } from "@grpc/grpc-js/build/src/constants";
 import { InitServiceClient } from "src/generated/server/init";
 import { getClient } from "src/utils/client";
 import { publicConfig } from "src/utils/config";
-import { queryIfInitialized } from "src/utils/init";
-import { handlegRPCError } from "src/utils/server";
 
-export interface CreateInitAdminSchema {
+export interface UserExistsSchema {
   method: "POST";
 
   body: {
     identityId: string;
-    name: string;
-    email: string;
-    password: string;
   };
 
   responses: {
-    200: {
-      createdInAuth: boolean;
+    200: { 
+      existsInScow: boolean,
+      existsInAuth: boolean | undefined,
     };
+      
+    // 204: null;
+
     400: { code: "USER_ID_NOT_VALID" };
 
-    409: { code: "ALREADY_INITIALIZED" | "ALREADY_EXISTS_IN_SCOW" };
   }
 }
 
 const userIdRegex = publicConfig.USERID_PATTERN ? new RegExp(publicConfig.USERID_PATTERN) : undefined;
 
-export default route<CreateInitAdminSchema>("CreateInitAdminSchema", async (req) => {
-  const result = await queryIfInitialized();
+export default route<UserExistsSchema>("UserExistsSchema", async (req) => {
 
-  if (result) { return { 409: { code: "ALREADY_INITIALIZED" as const } }; }
-
-  const { email, identityId, name, password } = req.body;
+  const { identityId } = req.body;
 
   if (userIdRegex && !userIdRegex.test(identityId)) {
     return { 400: {
@@ -55,12 +49,17 @@ export default route<CreateInitAdminSchema>("CreateInitAdminSchema", async (req)
     } };
   }
 
-  const client = getClient(InitServiceClient);
-  return await asyncClientCall(client, "createInitAdmin", {
-    email, name, userId: identityId, password,
-  }).then((res) => ({ 200: { createdInAuth: res.createdInAuth } }))
-    .catch(handlegRPCError({
-      [Status.ALREADY_EXISTS]: () => ({ 409: { code: "ALREADY_EXISTS_IN_SCOW" as const } }),
-    }));
-});
 
+  const client = getClient(InitServiceClient);
+  const result = await asyncClientCall(client, "userExists", {
+    userId: identityId,
+  });
+
+  return {
+    200:
+    { 
+      existsInScow: result.existsInScow,
+      existsInAuth: result.existsInAuth,
+    },
+  };
+});

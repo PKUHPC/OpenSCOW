@@ -24,8 +24,10 @@ message CreateInitAdminRequest {
   string user_id = 1;
   string name = 2;
   string email = 3;
+  string password = 4;
 }
 message CreateInitAdminReply {
+  bool created_in_auth = 1;
 }
 
 message CompleteInitRequest {
@@ -46,6 +48,14 @@ message UnsetInitAdminRequest {
 }
 message UnsetInitAdminReply {
 }
+message UserExistsRequest {
+  string user_id = 1;
+}
+message UserExistsReply {
+  bool exists_in_scow = 1;
+  optional bool exists_in_auth = 2;
+}
+
 
 service InitService {
   rpc QuerySystemInitialized(QuerySystemInitializedRequest)
@@ -64,5 +74,6 @@ service InitService {
   // Unset a user's PLATFORM_ADMIN and default tenant's TENANT_ADMIN role
   // NOT_FOUND: the user is not found in default tenant
   rpc UnsetInitAdmin(UnsetInitAdminRequest) returns (UnsetInitAdminReply);
+  rpc UserExists(UserExistsRequest) returns (UserExistsReply);
 
 }
