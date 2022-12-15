@@ -35,8 +35,8 @@ COPY --from=pruner /app/out/json/ .
 COPY .npmrc ./
 RUN pnpm i --offline --frozen-lockfile
 
-COPY tsconfig.json .eslintrc.json ./
-
+COPY --from=pruner /app/out/full/ .
+COPY tsconfig.json .eslintrc.json turbo.json ./
 COPY protos ./protos
 
 RUN pnpm build
