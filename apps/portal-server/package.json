@@ -17,18 +17,18 @@
   "dependencies": {
     "@ddadaal/tsgrpc-server": "0.18.1",
     "@ddadaal/tsgrpc-common": "0.2.0",
-    "@grpc/grpc-js": "1.7.3",
+    "@grpc/grpc-js": "1.8.0",
     "@scow/config": "workspace:*",
     "@scow/lib-config": "workspace:*",
     "@scow/lib-ssh": "workspace:*",
-    "@sinclair/typebox": "0.25.10",
+    "@sinclair/typebox": "0.25.13",
     "dotenv": "16.0.3",
     "node-cron": "3.0.2",
     "uuid": "9.0.0",
     "wait-on": "6.0.1",
     "ts-log": "2.2.5",
     "shell-quote": "1.7.4",
-    "dayjs": "1.11.6"
+    "dayjs": "1.11.7"
   },
   "devDependencies": {
     "@ddadaal/tsgrpc-cli": "0.14.3",

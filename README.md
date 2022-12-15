@@ -8,6 +8,19 @@ Super Computing On Web.
 
 For details, check out https://PKUHPC.github.io/SCOW.
 
+## Demo
+
+A full feature slurm + SCOW cluster is available at https://hpc.pku.edu.cn/demo/scow.
+
+Credentials:
+
+| User        | username     | password     |
+| ----------- | ------------ | ------------ |
+| Normal User | `demo_user`  | `demo_user`  |
+| Full Admin  | `demo_admin` | `demo_admin` |
+
+Further information about demo cluster can be found [here](https://pkuhpc.github.io/SCOW/docs/info#%E4%BD%93%E9%AA%8C%E7%8E%AF%E5%A2%83).
+
 ## Overview
 
 SCOW is an HPC portal and management information system (MIS) for HPC users and system administrators. 
