@@ -95,9 +95,9 @@ export const getAppConfigs: GetConfigFn<Record<string, AppConfigSchema>> = (base
     }
     if (config.attributes) {
       config.attributes.forEach((item) => {
-        if (item.type === "select" && !item.select) {
+        if (item.type === "SELECT" && !item.select) {
           throw new Error(`
-          App ${id}'s form attributes of name ${item.name} is of type select but select options is not set`);
+          App ${id}'s form attributes of name ${item.name} is of type SELECT but select options is not set`);
         }
       });
     }
