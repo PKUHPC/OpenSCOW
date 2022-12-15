@@ -36,7 +36,6 @@ export interface CreateInitAdminSchema {
     400: { code: "USER_ID_NOT_VALID" };
 
     409: { code: "ALREADY_INITIALIZED" | "ALREADY_EXISTS_IN_SCOW" };
-    500: null;
   }
 }
 
@@ -62,7 +61,6 @@ export default route<CreateInitAdminSchema>("CreateInitAdminSchema", async (req)
   }).then((res) => ({ 200: { createdInAuth: res.createdInAuth } }))
     .catch(handlegRPCError({
       [Status.ALREADY_EXISTS]: () => ({ 409: { code: "ALREADY_EXISTS_IN_SCOW" as const } }),
-      [Status.INTERNAL]: () => ({ 500: null }),
     }));
 });
 
