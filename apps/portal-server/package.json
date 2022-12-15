@@ -13,7 +13,8 @@
   },
   "files": [
     "assets",
-    "build"
+    "build",
+    ".npmrc"
   ],
   "keywords": [],
   "author": "",

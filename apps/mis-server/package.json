@@ -14,7 +14,8 @@
   },
   "files": [
     "scripts",
-    "build"
+    "build",
+    ".npmrc"
   ],
   "keywords": [],
   "author": "",
