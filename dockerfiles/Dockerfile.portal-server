@@ -55,4 +55,6 @@ ENV NODE_ENV production
 
 EXPOSE 5000
 
+WORKDIR /app/apps/portal-server
+
 CMD ["npm", "run", "serve"]

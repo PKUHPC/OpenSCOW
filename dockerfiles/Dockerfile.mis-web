@@ -63,4 +63,6 @@ ENV NEXT_PUBLIC_BASE_PATH=$BASE_PATH
 
 EXPOSE 3000
 
+WORKDIR /app/apps/mis-web
+
 CMD ["npm", "run", "serve"]

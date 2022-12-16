@@ -61,4 +61,6 @@ ENV NEXT_PUBLIC_BASE_PATH=$BASE_PATH
 
 EXPOSE 3000
 
+WORKDIR /app/apps/portal-web
+
 CMD ["npm", "run", "serve"]
