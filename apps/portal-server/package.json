@@ -13,7 +13,8 @@
   },
   "files": [
     "assets",
-    "build"
+    "build",
+    ".npmrc"
   ],
   "keywords": [],
   "author": "",
@@ -32,9 +33,7 @@
     "wait-on": "6.0.1",
     "ts-log": "2.2.5",
     "shell-quote": "1.7.4",
-    "dayjs": "1.11.7",
-    "long": "5.2.1",
-    "protobufjs": "7.1.2"
+    "dayjs": "1.11.7"
   },
   "devDependencies": {
     "@ddadaal/tsgrpc-cli": "0.14.3",

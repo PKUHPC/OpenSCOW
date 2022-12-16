@@ -63,9 +63,7 @@
     "typescript": "4.9.4",
     "xterm": "5.0.0",
     "xterm-addon-fit": "0.6.0",
-    "http-proxy": "1.18.1",
-    "long": "5.2.1",
-    "protobufjs": "7.1.2"
+    "http-proxy": "1.18.1"
   },
   "devDependencies": {
     "@ddadaal/next-typed-api-routes-cli": "0.5.1",
