@@ -14,8 +14,7 @@
   },
   "files": [
     "scripts",
-    "build",
-    ".npmrc"
+    "build"
   ],
   "keywords": [],
   "author": "",
@@ -39,7 +38,9 @@
     "dotenv": "16.0.3",
     "node-cron": "3.0.2",
     "uuid": "9.0.0",
-    "wait-on": "6.0.1"
+    "wait-on": "6.0.1",
+    "long": "5.2.1",
+    "protobufjs": "7.1.2"
   },
   "devDependencies": {
     "@ddadaal/tsgrpc-cli": "0.14.3",

@@ -41,11 +41,7 @@ COPY protos ./protos
 
 RUN pnpm build
 
-COPY scripts scripts
-RUN node scripts/copyDist.mjs
-RUN cd dist && pnpm i --offline --prod --frozen-lockfile
-
-# copy files to dist
+RUN pnpm --filter="@scow/mis-server" --prod deploy dist
 
 FROM node:hydrogen-alpine@sha256:9eff44230b2fdcca57a73b8f908c8029e72d24dd05cac5339c79d3dedf6b208b AS runner
 
@@ -56,7 +52,5 @@ COPY --from=builder /app/dist .
 ENV NODE_ENV production
 
 EXPOSE 5000
-
-WORKDIR /app/apps/mis-server
 
 CMD ["npm", "run", "serve"]

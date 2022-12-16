@@ -133,7 +133,9 @@ importers:
       '@types/node-cron': 3.0.6
       '@types/wait-on': 5.3.1
       dotenv: 16.0.3
+      long: 5.2.1
       node-cron: 3.0.2
+      protobufjs: 7.1.2
       uuid: 9.0.0
       wait-on: 6.0.1
     dependencies:
@@ -153,7 +155,9 @@ importers:
       '@scow/lib-ssh': link:../../libs/ssh
       '@sinclair/typebox': 0.25.13
       dotenv: 16.0.3
+      long: 5.2.1
       node-cron: 3.0.2
+      protobufjs: 7.1.2
       uuid: 9.0.0
       wait-on: 6.0.1
     devDependencies:
@@ -197,6 +201,7 @@ importers:
       dayjs: 1.11.7
       google-protobuf: 3.21.2
       less: 4.1.3
+      long: 5.2.1
       mime-types: 2.1.35
       next: 13.0.2
       next-compose-plugins: 2.2.1
@@ -204,6 +209,7 @@ importers:
       nookies: 2.5.2
       nprogress: 0.2.0
       postcss: 8.4.20
+      protobufjs: 7.1.2
       react: 18.2.0
       react-async: 10.0.1
       react-dom: 18.2.0
@@ -236,12 +242,14 @@ importers:
       dayjs: 1.11.7
       google-protobuf: 3.21.2
       less: 4.1.3
+      long: 5.2.1
       mime-types: 2.1.35
       next: 13.0.2_biqbaboplfbrettd7655fr4n2y
       next-compose-plugins: 2.2.1
       next-transpile-modules: 10.0.0
       nookies: 2.5.2
       nprogress: 0.2.0
+      protobufjs: 7.1.2
       react: 18.2.0
       react-async: 10.0.1_react@18.2.0
       react-dom: 18.2.0_react@18.2.0
@@ -281,7 +289,9 @@ importers:
       '@types/wait-on': 5.3.1
       dayjs: 1.11.7
       dotenv: 16.0.3
+      long: 5.2.1
       node-cron: 3.0.2
+      protobufjs: 7.1.2
       shell-quote: 1.7.4
       ts-log: 2.2.5
       uuid: 9.0.0
@@ -296,7 +306,9 @@ importers:
       '@sinclair/typebox': 0.25.13
       dayjs: 1.11.7
       dotenv: 16.0.3
+      long: 5.2.1
       node-cron: 3.0.2
+      protobufjs: 7.1.2
       shell-quote: 1.7.4
       ts-log: 2.2.5
       uuid: 9.0.0
@@ -350,6 +362,7 @@ importers:
       http-proxy: 1.18.1
       jest-environment-jsdom: 29.3.1
       less: 4.1.3
+      long: 5.2.1
       mime-types: 2.1.35
       next: 13.0.2
       next-compose-plugins: 2.2.1
@@ -358,6 +371,7 @@ importers:
       nookies: 2.5.2
       nprogress: 0.2.0
       postcss: 8.4.20
+      protobufjs: 7.1.2
       random-words: 1.2.0
       react: 18.2.0
       react-async: 10.0.1
@@ -398,12 +412,14 @@ importers:
       google-protobuf: 3.21.2
       http-proxy: 1.18.1
       less: 4.1.3
+      long: 5.2.1
       mime-types: 2.1.35
       next: 13.0.2_biqbaboplfbrettd7655fr4n2y
       next-compose-plugins: 2.2.1
       next-transpile-modules: 10.0.0
       nookies: 2.5.2
       nprogress: 0.2.0
+      protobufjs: 7.1.2
       random-words: 1.2.0
       react: 18.2.0
       react-async: 10.0.1_react@18.2.0
