@@ -10,6 +10,19 @@
  * See the Mulan PSL v2 for more details.
  */
 
+/**
+ * Copy the required files of the app and the dependent libs to dist folder.
+ * The files specified in the `files` fields of package.json of the app and libs will be copied.
+ *
+ * Usage:
+  *  node scripts/copyDist.mjs [appDir]
+  *
+  *  e.g. node scripts/copyDist.mjs apps/mis-server
+ *
+ * If appDir is not specified, the script will use the only app under apps folder.
+ * If there are multiple apps under apps folder, an error will be thrown.
+ */
+
 import fs from "node:fs";
 import { join } from "node:path";
 
