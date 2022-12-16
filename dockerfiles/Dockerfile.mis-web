@@ -45,7 +45,6 @@ ENV NEXT_PUBLIC_BASE_PATH=$BASE_PATH
 
 RUN pnpm build
 
-# Network connection required
 COPY scripts scripts
 RUN node scripts/copyDist.mjs
 RUN cd dist && pnpm i --offline --prod --frozen-lockfile
