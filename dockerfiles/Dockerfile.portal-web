@@ -44,9 +44,9 @@ ENV NEXT_PUBLIC_BASE_PATH=$BASE_PATH
 
 RUN pnpm build
 
-COPY scripts scripts/
-RUN rm -rf node_modules && pnpm i --prod --frozen-lockfile --offline
+COPY scripts scripts
 RUN node scripts/copyDist.mjs
+RUN cd dist && pnpm i --offline --prod --frozen-lockfile
 
 FROM node:hydrogen-alpine@sha256:9eff44230b2fdcca57a73b8f908c8029e72d24dd05cac5339c79d3dedf6b208b AS runner
 
