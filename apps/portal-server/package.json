@@ -11,6 +11,11 @@
     "prepareDev": "pnpm protos",
     "protos": "tsgrpc-cli protos"
   },
+  "files": [
+    "assets",
+    "build",
+    ".npmrc"
+  ],
   "keywords": [],
   "author": "",
   "license": "ISC",
