@@ -135,7 +135,7 @@ importers:
       dotenv: 16.0.3
       node-cron: 3.0.2
       uuid: 9.0.0
-      wait-on: 6.0.1
+      wait-on: 7.0.1
     dependencies:
       '@ddadaal/tsgrpc-common': 0.2.0
       '@ddadaal/tsgrpc-server': 0.18.1_@grpc+grpc-js@1.8.0
@@ -155,7 +155,7 @@ importers:
       dotenv: 16.0.3
       node-cron: 3.0.2
       uuid: 9.0.0
-      wait-on: 6.0.1
+      wait-on: 7.0.1
     devDependencies:
       '@ddadaal/tsgrpc-cli': 0.14.3
       '@types/google-protobuf': 3.15.6
@@ -285,7 +285,7 @@ importers:
       shell-quote: 1.7.4
       ts-log: 2.2.5
       uuid: 9.0.0
-      wait-on: 6.0.1
+      wait-on: 7.0.1
     dependencies:
       '@ddadaal/tsgrpc-common': 0.2.0
       '@ddadaal/tsgrpc-server': 0.18.1_@grpc+grpc-js@1.8.0
@@ -300,7 +300,7 @@ importers:
       shell-quote: 1.7.4
       ts-log: 2.2.5
       uuid: 9.0.0
-      wait-on: 6.0.1
+      wait-on: 7.0.1
     devDependencies:
       '@ddadaal/tsgrpc-cli': 0.14.3
       '@ddadaal/tsgrpc-client': 0.17.2_@grpc+grpc-js@1.8.0
@@ -5852,7 +5852,6 @@ packages:
 
   /asynckit/0.4.0:
     resolution: {integrity: sha512-Oei9OH4tRh0YqU3GxhX79dM/mwVgvbZJaSNaRk+bshkj0S5cfHcgYakreBjrHwatXKbz+IoIdYLxrKim2MjW0Q==}
-    dev: true
 
   /at-least-node/1.0.0:
     resolution: {integrity: sha512-+q/t7Ekv1EDY2l6Gda6LLiX14rU9TV20Wa3ofeQmwPFZbOMo9DXrLbOjFaaclkXKWidIaopwAObQDqwWtGUjqg==}
@@ -5897,6 +5896,15 @@ packages:
     resolution: {integrity: sha512-cD8FOb0tRH3uuEe6+evtAbgJtfxr7ly3fQjYcMcuPlgkwVS9xboaVIpcDV+cYQe+yGykgwZCs1pzjntcGa6l5g==}
     dependencies:
       follow-redirects: 1.15.2
+    transitivePeerDependencies:
+      - debug
+    dev: false
+
+  /axios/0.27.2:
+    resolution: {integrity: sha512-t+yRIyySRTp/wua5xEr+z1q60QmLq8ABsS5O9Me1AsE5dfKqgnCFzwiCZZ/cGNd1lq4/7akDWMxdhVlucjmnOQ==}
+    dependencies:
+      follow-redirects: 1.15.2
+      form-data: 4.0.0
     transitivePeerDependencies:
       - debug
     dev: false
@@ -6661,7 +6669,6 @@ packages:
     engines: {node: '>= 0.8'}
     dependencies:
       delayed-stream: 1.0.0
-    dev: true
 
   /comma-separated-tokens/1.0.8:
     resolution: {integrity: sha512-GHuDRO12Sypu2cV70d1dkA2EUmXHgntrzbpvOB+Qy+49ypNfGgFQIC2fhhXbnyrJRynDCAARsT7Ou0M6hirpfw==}
@@ -7429,7 +7436,6 @@ packages:
   /delayed-stream/1.0.0:
     resolution: {integrity: sha512-ZySD7Nf91aLB0RxL4KGrKHBXl7Eds1DAmEdcoVawXnLD7SDhpNgtuII2aAkg7a7QS41jxPSZ17p4VdGnMHk3MQ==}
     engines: {node: '>=0.4.0'}
-    dev: true
 
   /delegates/1.0.0:
     resolution: {integrity: sha512-bd2L678uiWATM6m5Z1VzNCErI3jiGzt6HGY8OVICs40JQq/HALfbyNJmp0UDakEY4pMMaN0Ly5om/B1VI/+xfQ==}
@@ -8685,7 +8691,6 @@ packages:
       asynckit: 0.4.0
       combined-stream: 1.0.8
       mime-types: 2.1.35
-    dev: true
 
   /forwarded/0.2.0:
     resolution: {integrity: sha512-buRG0fpBtRHSTCOASe6hD258tEubFoRLb4ZNA6NxMVHNw2gOcwHo9wyablzMzOA5z9xA9L1KNjk/Nt6MT9aYow==}
@@ -9531,7 +9536,7 @@ packages:
       mute-stream: 0.0.8
       ora: 5.4.1
       run-async: 2.4.1
-      rxjs: 7.5.7
+      rxjs: 7.8.0
       string-width: 4.2.3
       strip-ansi: 6.0.1
       through: 2.3.8
@@ -14337,6 +14342,12 @@ packages:
     resolution: {integrity: sha512-z9MzKh/UcOqB3i20H6rtrlaE/CgjLOvheWK/9ILrbhROGTweAi1BaFsTT9FbwZi5Trr1qNRs+MXkhmR06awzQA==}
     dependencies:
       tslib: 2.4.1
+    dev: true
+
+  /rxjs/7.8.0:
+    resolution: {integrity: sha512-F2+gxDshqmIub1KdvZkaEfGDwLNpPvk9Fs6LD/MyQxNgMds/WH9OdDDXOmxUZpME+iSK3rQCctkL0DYyytUqMg==}
+    dependencies:
+      tslib: 2.4.1
 
   /sade/1.8.1:
     resolution: {integrity: sha512-xal3CZX1Xlo/k4ApwCFrHVACi9fBqJ7V+mwhBsuf/1IOKbBy098Fex+Wa/5QMubw09pSZ/u8EY8PWgevJsXp1A==}
@@ -16189,7 +16200,21 @@ packages:
       joi: 17.7.0
       lodash: 4.17.21
       minimist: 1.2.7
-      rxjs: 7.5.7
+      rxjs: 7.8.0
+    transitivePeerDependencies:
+      - debug
+    dev: false
+
+  /wait-on/7.0.1:
+    resolution: {integrity: sha512-9AnJE9qTjRQOlTZIldAaf/da2eW0eSRSgcqq85mXQja/DW3MriHxkpODDSUEg+Gri/rKEcXUZHe+cevvYItaog==}
+    engines: {node: '>=12.0.0'}
+    hasBin: true
+    dependencies:
+      axios: 0.27.2
+      joi: 17.7.0
+      lodash: 4.17.21
+      minimist: 1.2.7
+      rxjs: 7.8.0
     transitivePeerDependencies:
       - debug
     dev: false
