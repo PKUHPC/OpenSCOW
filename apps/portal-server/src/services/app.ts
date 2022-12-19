@@ -111,7 +111,7 @@ export const appServiceServer = plugin((server) => {
         }
 
         switch (attribute.type) {
-        case "NUMBER":
+        case "number":
           if (Number.isNaN(Number(customAttributes[attribute.name]))) {
             throw <ServiceError> {
               code: Status.INVALID_ARGUMENT,
@@ -122,10 +122,10 @@ export const appServiceServer = plugin((server) => {
           }
           break;
 
-        case "TEXT":
+        case "text":
           break;
 
-        case "SELECT":
+        case "select":
           // check the option selected by user is in select attributes as the config defined
           if (!(attribute.select!.some((optionItem) => optionItem.value === customAttributes[attribute.name]))) {
             throw <ServiceError> {
@@ -140,7 +140,7 @@ export const appServiceServer = plugin((server) => {
 
         default:
           throw new Error(`
-          the custom form attributes type in ${appId} config should be one of NUMBER, TEXT or SELECT,
+          the custom form attributes type in ${appId} config should be one of number, text or select,
           but the type of ${attribute.name} is ${attribute.type}`);
         }
       });
@@ -197,7 +197,7 @@ export const appServiceServer = plugin((server) => {
       if (app.attributes) {
         app.attributes.forEach((item) => {
           attributes.push({
-            type: appCustomAttribute_AttributeTypeFromJSON(item.type),
+            type: appCustomAttribute_AttributeTypeFromJSON(item.type.toLowerCase()),
             label: item.label,
             name: item.name,
             options: item.select ?? [],

@@ -67,7 +67,7 @@ export const AppConfigSchema = Type.Object({
   vnc: Type.Optional(VncAppConfigSchema),
   attributes: Type.Optional(Type.Array(
     Type.Object({
-      type:  Type.Enum({ NUMBER: "NUMBER", TEXT: "TEXT", SELECT: "SELECT" }, { description: "表单类型" }),
+      type:  Type.Enum({ number: "number", text: "text", select: "select" }, { description: "表单类型" }),
       label: Type.String({ description: "表单标签" }),
       name: Type.String({ description: "表单字段名" }),
       select: Type.Optional(
@@ -95,9 +95,9 @@ export const getAppConfigs: GetConfigFn<Record<string, AppConfigSchema>> = (base
     }
     if (config.attributes) {
       config.attributes.forEach((item) => {
-        if (item.type === "SELECT" && !item.select) {
+        if (item.type === "select" && !item.select) {
           throw new Error(`
-          App ${id}'s form attributes of name ${item.name} is of type SELECT but select options is not set`);
+          App ${id}'s form attributes of name ${item.name} is of type select but select options is not set`);
         }
       });
     }
