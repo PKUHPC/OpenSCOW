@@ -9,77 +9,52 @@
 # See the Mulan PSL v2 for more details.
 
 
-FROM node:hydrogen-alpine@sha256:9eff44230b2fdcca57a73b8f908c8029e72d24dd05cac5339c79d3dedf6b208b AS builder
+FROM node:hydrogen-alpine@sha256:9eff44230b2fdcca57a73b8f908c8029e72d24dd05cac5339c79d3dedf6b208b AS base
 
 RUN apk update && apk add libc6-compat python3 make gcc g++
 
 RUN corepack enable
 
 WORKDIR /app
+COPY pnpm-lock.yaml .
 
-
-COPY pnpm-lock.yaml ./
 RUN pnpm fetch
 
-COPY package.json pnpm-workspace.yaml .npmrc ./
+FROM base as pruner
 
-COPY libs/libconfig/package.json ./libs/libconfig/
-COPY libs/config/package.json ./libs/config/
-COPY libs/decimal/package.json ./libs/decimal/
-COPY libs/ssh/package.json ./libs/ssh/
-COPY apps/portal-server/package.json ./apps/portal-server/
+WORKDIR /app
 
+COPY . .
+
+RUN pnpm dlx turbo prune --scope="@scow/portal-server" --docker
+
+FROM base AS builder
+
+WORKDIR /app
+COPY --from=pruner /app/out/json/ .
+COPY .npmrc ./
 RUN pnpm i --offline --frozen-lockfile
 
+COPY --from=pruner /app/out/full/ .
 COPY tsconfig.json .eslintrc.json turbo.json ./
-
 COPY protos ./protos
 
-COPY libs/libconfig ./libs/libconfig
-COPY libs/config ./libs/config
-COPY libs/auth ./libs/auth
-COPY libs/decimal ./libs/decimal
-COPY libs/ssh ./libs/ssh
-COPY apps/portal-server ./apps/portal-server
+RUN pnpm build
 
-RUN pnpm run build
-
-RUN rm -rf node_modules && pnpm i --prod --frozen-lockfile --offline
+COPY scripts scripts
+RUN node scripts/copyDist.mjs
+RUN cd dist && pnpm i --offline --prod --frozen-lockfile
 
 FROM node:hydrogen-alpine@sha256:9eff44230b2fdcca57a73b8f908c8029e72d24dd05cac5339c79d3dedf6b208b AS runner
 
 WORKDIR /app
-COPY --from=builder /app/node_modules ./node_modules
 
-WORKDIR /app/libs/decimal
-COPY --from=builder /app/libs/decimal/package.json .
-COPY --from=builder /app/libs/decimal/node_modules/ ./node_modules
-COPY --from=builder /app/libs/decimal/build/ ./build
-
-WORKDIR /app/libs/libconfig
-COPY --from=builder /app/libs/libconfig/package.json .
-COPY --from=builder /app/libs/libconfig/node_modules/ ./node_modules
-COPY --from=builder /app/libs/libconfig/build/ ./build
-
-WORKDIR /app/libs/ssh
-COPY --from=builder /app/libs/ssh/package.json .
-COPY --from=builder /app/libs/ssh/node_modules/ ./node_modules
-COPY --from=builder /app/libs/ssh/build/ ./build
-
-WORKDIR /app/libs/config
-COPY --from=builder /app/libs/config/package.json .
-COPY --from=builder /app/libs/config/node_modules/ ./node_modules
-COPY --from=builder /app/libs/config/build/ ./build
-
-WORKDIR /app/apps/portal-server
-COPY --from=builder /app/apps/portal-server/package.json .
-COPY --from=builder /app/apps/portal-server/node_modules/ ./node_modules
-COPY --from=builder /app/apps/portal-server/assets ./assets
-COPY --from=builder /app/apps/portal-server/build/ ./build
+COPY --from=builder /app/dist .
 
 ENV NODE_ENV production
 
+EXPOSE 5000
+
+WORKDIR /app/apps/portal-server
+
 CMD ["npm", "run", "serve"]
-
-
-

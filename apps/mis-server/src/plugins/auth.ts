@@ -10,28 +10,15 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import Link from "next/link";
-import { join } from "path";
-import styled from "styled-components";
+import { plugin } from "@ddadaal/tsgrpc-server";
+import { getCapabilities } from "@scow/lib-auth";
+import { misConfig } from "src/config/mis";
 
-const LogoContainer = styled.h1`
-  color: var(--ant-primary-color);
-  margin-bottom: 0;
 
-  img {
-    padding: 2px 0;
-  }
-`;
+export const authPlugin = plugin(async (f) => {
 
-export const Logo = () => {
+  const capabilities = await getCapabilities(misConfig.authUrl);
 
-  return (
-    <LogoContainer>
-      <Link href="/">
+  f.addExtension("capabilities", capabilities);
 
-        <img height="40px" src={join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/icon?type=favicon")} />
-
-      </Link>
-    </LogoContainer>
-  );
-};
+});

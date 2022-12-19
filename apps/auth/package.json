@@ -9,19 +9,24 @@
     "serve": "node build/index.js",
     "test": "jest"
   },
+  "files": [
+    "build",
+    "public",
+    "views"
+  ],
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@fastify/error": "3.1.0",
+    "@fastify/error": "3.2.0",
     "@fastify/formbody": "7.4.0",
-    "@fastify/static": "6.5.1",
+    "@fastify/static": "6.6.0",
     "@fastify/view": "7.3.0",
-    "liquidjs": "10.2.0",
+    "liquidjs": "10.3.2",
     "@scow/config": "workspace:*",
     "@scow/lib-config": "workspace:*",
     "@scow/lib-ssh": "workspace:*",
-    "@sinclair/typebox": "0.25.10",
+    "@sinclair/typebox": "0.25.13",
     "asn1": "0.2.6",
     "fastify": "4.10.2",
     "fastify-graceful-shutdown": "3.4.0",

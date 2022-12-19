@@ -7,3 +7,5 @@
 .eslintcache
 internal
 .turbo
+out
+dist

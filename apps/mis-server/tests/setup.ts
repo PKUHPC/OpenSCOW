@@ -10,28 +10,16 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import Link from "next/link";
-import { join } from "path";
-import styled from "styled-components";
-
-const LogoContainer = styled.h1`
-  color: var(--ant-primary-color);
-  margin-bottom: 0;
-
-  img {
-    padding: 2px 0;
-  }
-`;
-
-export const Logo = () => {
-
-  return (
-    <LogoContainer>
-      <Link href="/">
-
-        <img height="40px" src={join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/icon?type=favicon")} />
-
-      </Link>
-    </LogoContainer>
-  );
+import "jest-extended";
+module.exports = async () => {
+  jest.mock("@scow/lib-auth", () => ({
+    createUser: jest.fn(async () => ({ status: 204, ok: true, text: () => "" })),
+    getUser: jest.fn(async () => ({ identityId: "test" })),
+    getCapabilities: jest.fn(async () => ({
+      createUser: true,
+      changePassword: true,
+      getUser: true,
+      validateName: true,
+    })),
+  }));
 };
