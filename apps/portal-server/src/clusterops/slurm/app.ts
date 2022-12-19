@@ -242,6 +242,8 @@ export const slurmAppOps = (cluster: string): AppOps => {
             state: runningJobInfo?.state ?? "ENDED",
             ready,
             dataPath: await sftpRealPath(sftp)(jobDir),
+            runningTime: runningJobInfo?.runningTime ?? "",
+            timeLimit: runningJobInfo?.timeLimit ?? "",
           });
 
         }));

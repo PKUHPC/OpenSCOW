@@ -163,7 +163,12 @@ export const mockApi: MockApi<typeof api> = {
       },
     ],
   }),
-
+  
+  userExists: async () => ({
+    existsInScow: false,
+    existsInAuth: false,
+  }),
+  
   setPlatformRole: async () => ({ executed: true }),
 
   unsetPlatformRole: async () => ({ executed: false }),
@@ -196,7 +201,7 @@ export const mockApi: MockApi<typeof api> = {
 
   getIcon: async () => undefined,
 
-  createInitAdmin: async () => null,
+  createInitAdmin: async () => ({ createdInAuth: false }),
 
   importUsers: async () => null,
 

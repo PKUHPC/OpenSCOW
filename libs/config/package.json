@@ -5,12 +5,15 @@
   "scripts": {
     "build": "rimraf build && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json"
   },
+  "files": [
+    "build"
+  ],
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@scow/lib-config": "workspace:*",
-    "@sinclair/typebox": "0.25.10"
+    "@sinclair/typebox": "0.25.13"
   },
   "volta": {
     "extends": "../../package.json"

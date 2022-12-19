@@ -10,18 +10,16 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { getClusterConfigs } from "@scow/config/build/cluster";
-
-export const clusters = getClusterConfigs();
-
-// map slurm cluster id to scow cluster id
-export const clusterIdMap = Object.entries(clusters).reduce((prev, [key, value]) => {
-  if (value.scheduler === "slurm" && value.slurm && value.slurm.mis) {
-    prev[value.slurm.mis.clusterName] = key;
-  }
-  return prev;
-}, { } as Record<string, string>);
-
-export function clusterNameToScowClusterId(clusterName: string) {
-  return clusterIdMap[clusterName];
-}
+import "jest-extended";
+module.exports = async () => {
+  jest.mock("@scow/lib-auth", () => ({
+    createUser: jest.fn(async () => ({ status: 204, ok: true, text: () => "" })),
+    getUser: jest.fn(async () => ({ identityId: "test" })),
+    getCapabilities: jest.fn(async () => ({
+      createUser: true,
+      changePassword: true,
+      getUser: true,
+      validateName: true,
+    })),
+  }));
+};
