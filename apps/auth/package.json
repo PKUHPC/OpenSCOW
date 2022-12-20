@@ -22,7 +22,7 @@
     "@fastify/formbody": "7.4.0",
     "@fastify/static": "6.6.0",
     "@fastify/view": "7.3.0",
-    "liquidjs": "10.3.2",
+    "liquidjs": "10.3.3",
     "@scow/config": "workspace:*",
     "@scow/lib-config": "workspace:*",
     "@scow/lib-ssh": "workspace:*",

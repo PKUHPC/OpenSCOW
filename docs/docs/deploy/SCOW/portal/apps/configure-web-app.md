@@ -83,6 +83,8 @@ web:
 - `PORT`：程序将会运行在的端口
 - `PASSWORD`: 连接程序用的密码
 
+`connect`的`formData`项需要使用的变量也需要在此处export。
+
 准备脚本中的`export`的变量可以在`script`中使用。
 
 `script`部分为如何启动这个应用的脚本。
@@ -111,6 +113,8 @@ web:
 
 
 我们推荐将应用使用密码方式进行加密，所以一般在连接时需要将密码输入给应用。`path`, `query`的值和`formData`的值部分可以使用`{{ PASSWORD }}`代替应用在创建时生成的密码。
+
+此外，如果`formData`需要使用其他变量，可以在准备脚本`beforeScript`中export需要的变量，然后以`{{ 变量名 }}`的形式使用。
 
 ### `attributes`
 

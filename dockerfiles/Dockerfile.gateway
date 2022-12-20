@@ -9,7 +9,7 @@
 # See the Mulan PSL v2 for more details.
 
 
-FROM nginx:alpine@sha256:455c39afebd4d98ef26dd70284aa86e6810b0485af5f4f222b19b89758cabf1e
+FROM nginx:alpine@sha256:dd8a054d7ef030e94a6449783605d6c306c1f69c10c2fa06b66a030e0d1db793
 
 COPY apps/gateway/includes /etc/nginx/includes
 COPY apps/gateway/nginx.conf /etc/nginx/templates/default.conf.template
