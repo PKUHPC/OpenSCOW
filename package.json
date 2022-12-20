@@ -5,6 +5,7 @@
     "build": "turbo run build",
     "build:libs": "turbo run build --filter \"./libs/**\"",
     "build:images": "docker compose --env-file dev/.env.build -f dev/docker-compose.build.yml build",
+    "generate:protos": "turbo run generate --filter protos",
     "prepareDev": "pnpm build:libs && turbo run prepareDev",
     "prune": "pnpm clean --yes && pnpm bootstrap --ci -- --production",
     "devenv": "docker compose --env-file dev/.env.dev -f dev/docker-compose.dev.yml up -d",
@@ -15,7 +16,7 @@
     "lint": "turbo run lint:all",
     "lint:all": "concurrently \"npm:lint:*(!all)\"",
     "lint:ts": "eslint --cache --ext .tsx,.ts .",
-    "lint:protos": "node scripts/lintProtos.mjs"
+    "lint:protos": "buf lint"
   },
   "devDependencies": {
     "turbo": "1.6.3",

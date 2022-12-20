@@ -17,11 +17,11 @@ import { ChannelCredentials } from "@grpc/grpc-js";
 import { MikroORM } from "@mikro-orm/core";
 import { MySqlDriver } from "@mikro-orm/mysql";
 import { Decimal, decimalToMoney, numberToMoney } from "@scow/lib-decimal";
+import { AddBillingItemRequest, JobBillingItem, JobServiceClient } from "@scow/protos/build/server/job";
 import { createServer } from "src/app";
 import { clusterNameToScowClusterId } from "src/config/clusters";
 import { AmountStrategy, JobPriceItem } from "src/entities/JobPriceItem";
 import { Tenant } from "src/entities/Tenant";
-import { AddBillingItemRequest, JobBillingItem, JobServiceClient } from "src/generated/server/job";
 import { calculateJobPrice, createPriceMap } from "src/plugins/price";
 import { createPriceItems } from "src/tasks/createBillingItems";
 import { DEFAULT_TENANT_NAME } from "src/utils/constants";
@@ -110,7 +110,7 @@ it("creates billing items in db", async () => {
 
 });
 
-const anyDate = () => expect.any(Date) as unknown as Date;
+const anyDate = () => expect.any(String);
 
 const priceItemToJobBillingItem = (x: PriceItem) => <JobBillingItem>({
   id: x.itemId, path: x.path.join("."), tenantName: x.tenant, price: decimalToMoney(x.price),

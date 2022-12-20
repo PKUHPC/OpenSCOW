@@ -24,11 +24,11 @@ export interface UserExistsSchema {
   };
 
   responses: {
-    200: { 
+    200: {
       existsInScow: boolean,
       existsInAuth: boolean | undefined,
     };
-      
+
     // 204: null;
 
     400: { code: "USER_ID_NOT_VALID" };
@@ -57,7 +57,7 @@ export default route<UserExistsSchema>("UserExistsSchema", async (req) => {
 
   return {
     200:
-    { 
+    {
       existsInScow: result.existsInScow,
       existsInAuth: result.existsInAuth,
     },

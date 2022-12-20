@@ -11,13 +11,13 @@
  */
 
 import { ExclamationCircleOutlined } from "@ant-design/icons";
+import { PlatformUserInfo } from "@scow/protos/build/server/user";
 import { Divider, Space, Table } from "antd";
 import React, { useCallback, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { ChangePasswordModalLink } from "src/components/ChangePasswordModal";
 import { DisabledA } from "src/components/DisabledA";
-import { PlatformUserInfo } from "src/generated/server/user";
 import { useMessage, useModal } from "src/layouts/prompts";
 import { PlatformRole } from "src/models/User";
 import { GetAllUsersSchema } from "src/pages/api/admin/getAllUsers";

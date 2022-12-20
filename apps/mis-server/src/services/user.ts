@@ -15,21 +15,21 @@ import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { createUser } from "@scow/lib-auth";
 import { decimalToMoney } from "@scow/lib-decimal";
-import { misConfig } from "src/config/mis";
-import { Account } from "src/entities/Account";
-import { PlatformRole, TenantRole, User } from "src/entities/User";
-import { UserAccount, UserRole, UserStatus } from "src/entities/UserAccount";
 import {
   AccountStatus,
-  GetAccountUsersReply,
+  GetAccountUsersResponse,
   platformRoleFromJSON,
   platformRoleToJSON,
-  QueryIsUserInAccountReply,
+  QueryIsUserInAccountResponse,
   tenantRoleFromJSON,
   tenantRoleToJSON,
   UserRole as PFUserRole, UserServiceServer,
   UserServiceService,
-  UserStatus as PFUserStatus } from "src/generated/server/user";
+  UserStatus as PFUserStatus } from "@scow/protos/build/server/user";
+import { misConfig } from "src/config/mis";
+import { Account } from "src/entities/Account";
+import { PlatformRole, TenantRole, User } from "src/entities/User";
+import { UserAccount, UserRole, UserStatus } from "src/entities/UserAccount";
 import { createUserInDatabase, insertKeyToNewUser } from "src/utils/createUser";
 import { paginationProps } from "src/utils/orm";
 
@@ -43,7 +43,7 @@ export const userServiceServer = plugin((server) => {
         account: { accountName, tenant: { name: tenantName } },
       }, { populate: ["user", "user.storageQuotas"]});
 
-      return [GetAccountUsersReply.fromPartial({
+      return [GetAccountUsersResponse.fromPartial({
         results: accountUsers.map((x) => ({
           userId: x.user.$.userId,
           name: x.user.$.name,
@@ -67,7 +67,7 @@ export const userServiceServer = plugin((server) => {
         account: { accountName, tenant: { name: tenantName } },
       });
 
-      return [QueryIsUserInAccountReply.fromPartial({
+      return [QueryIsUserInAccountResponse.fromPartial({
         result: user !== null,
       })];
     },
@@ -315,13 +315,13 @@ export const userServiceServer = plugin((server) => {
         .catch((e) => {
           if (e.code === Status.ALREADY_EXISTS) {
             throw <ServiceError> {
-              code: Status.ALREADY_EXISTS, 
+              code: Status.ALREADY_EXISTS,
               message: `User with userId ${identityId} already exists in scow.`,
               details: "EXISTS_IN_SCOW",
-            };        
+            };
           }
-          throw <ServiceError> { 
-            code: Status.INTERNAL, 
+          throw <ServiceError> {
+            code: Status.INTERNAL,
             message: `Error creating user with userId ${identityId} in database.` };
         });
       // call auth
@@ -334,9 +334,9 @@ export const userServiceServer = plugin((server) => {
             server.logger.warn("User exists in auth.");
           } else {
             server.logger.error("Error creating user in auth.", e);
-            throw <ServiceError> { 
-              code: Status.INTERNAL, 
-              message: `Error creating user with userId ${identityId} in auth.` }; 
+            throw <ServiceError> {
+              code: Status.INTERNAL,
+              message: `Error creating user with userId ${identityId} in auth.` };
           }
         });
       // insert public key
@@ -394,7 +394,7 @@ export const userServiceServer = plugin((server) => {
         email: x.email,
         name: x.name,
         userId: x.userId,
-        createTime: x.createTime,
+        createTime: x.createTime.toISOString(),
         tenantRoles: x.tenantRoles.map(tenantRoleFromJSON),
         accountAffiliations: x.accounts.getItems().map((x) => ({
           accountName: x.account.getEntity().accountName,
@@ -441,7 +441,7 @@ export const userServiceServer = plugin((server) => {
         platformUsers: users.map((x) => ({
           userId: x.userId,
           name: x.name,
-          createTime: x.createTime,
+          createTime: x.createTime.toISOString(),
           platformRoles: x.platformRoles.map(platformRoleFromJSON),
         })),
       }];

@@ -21,7 +21,7 @@ message GetTenantInfoRequest {
 }
 
 // NOT_FOUND: tenant is not found
-message GetTenantInfoReply {
+message GetTenantInfoResponse {
   common.Money balance = 1;
   uint32 account_count = 2;
   uint32 user_count = 3;
@@ -36,7 +36,7 @@ message GetTenantInfoReply {
 
 message GetTenantsRequest {
 }
-message GetTenantsReply {
+message GetTenantsResponse {
   repeated string names = 1;
 }
 
@@ -50,7 +50,7 @@ message PlatformTenantsInfo {
 }
 message GetAllTenantsRequest {
 }
-message GetAllTenantsReply {
+message GetAllTenantsResponse {
   uint32 total_count = 1;
   repeated PlatformTenantsInfo platform_tenants = 2;
 }
@@ -58,12 +58,12 @@ message GetAllTenantsReply {
 message CreateTenantRequest {
   string name=1;
 }
-message CreateTeneanteReply {
+message CreateTenantResponse {
 }
 
 service TenantService {
-  rpc GetTenantInfo(GetTenantInfoRequest) returns (GetTenantInfoReply);
-  rpc GetTenants(GetTenantsRequest) returns (GetTenantsReply);
-  rpc GetAllTenants(GetAllTenantsRequest) returns (GetAllTenantsReply);
-  rpc CreateTenant(CreateTenantRequest) returns (CreateTeneanteReply);
+  rpc GetTenantInfo(GetTenantInfoRequest) returns (GetTenantInfoResponse);
+  rpc GetTenants(GetTenantsRequest) returns (GetTenantsResponse);
+  rpc GetAllTenants(GetAllTenantsRequest) returns (GetAllTenantsResponse);
+  rpc CreateTenant(CreateTenantRequest) returns (CreateTenantResponse);
 }

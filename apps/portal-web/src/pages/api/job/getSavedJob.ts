@@ -12,8 +12,8 @@
 
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { status } from "@grpc/grpc-js";
+import { JobServiceClient, NewJobInfo } from "@scow/protos/build/portal/job";
 import { authenticate } from "src/auth/server";
-import { JobServiceClient, NewJobInfo } from "src/generated/portal/job";
 import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
 import { handlegRPCError } from "src/utils/server";

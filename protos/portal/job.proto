@@ -81,7 +81,7 @@ message ListRunningJobsRequest {
 }
 
 message ListRunningJobsResponse {
-  repeated common.job.RunningJob results = 1;
+  repeated common.RunningJob results = 1;
 }
 
 message ListJobTemplatesRequest {

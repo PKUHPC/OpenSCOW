@@ -14,8 +14,8 @@ import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Server } from "@ddadaal/tsgrpc-server";
 import { ChannelCredentials } from "@grpc/grpc-js";
 import { decimalToMoney } from "@scow/lib-decimal";
+import { AccountServiceClient } from "@scow/protos/build/server/account";
 import { createServer } from "src/app";
-import { AccountServiceClient } from "src/generated/server/account";
 import { InitialData, insertInitialData } from "tests/data/data";
 import { dropDatabase } from "tests/data/helpers";
 

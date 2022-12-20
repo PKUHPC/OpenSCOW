@@ -16,11 +16,11 @@ import { Server } from "@ddadaal/tsgrpc-server";
 import { ChannelCredentials } from "@grpc/grpc-js";
 import { MikroORM } from "@mikro-orm/core";
 import { MySqlDriver } from "@mikro-orm/mysql";
+import { AdminServiceClient } from "@scow/protos/build/server/admin";
 import { createServer } from "src/app";
 import { Account } from "src/entities/Account";
 import { User } from "src/entities/User";
 import { UserAccount, UserRole, UserStatus } from "src/entities/UserAccount";
-import { AdminServiceClient } from "src/generated/server/admin";
 import { dropDatabase } from "tests/data/helpers";
 
 let server: Server;
@@ -54,9 +54,9 @@ const data = {
       owner: "user2",
     },
   ],
-  users: [ 
-    { userId: "user1", userName: "user1Name", accounts: [ "a_user1" ]}, 
-    { userId: "user2", userName: "user2", accounts: [ "a_user1", "account2" ]}, 
+  users: [
+    { userId: "user1", userName: "user1Name", accounts: [ "a_user1" ]},
+    { userId: "user2", userName: "user2", accounts: [ "a_user1", "account2" ]},
     { userId: "user3", userName: "", accounts: [ "account2" ]},
   ],
 };

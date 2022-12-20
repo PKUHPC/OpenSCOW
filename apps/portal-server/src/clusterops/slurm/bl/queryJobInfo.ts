@@ -11,9 +11,9 @@
  */
 
 import { loggedExec } from "@scow/lib-ssh";
+import { RunningJob } from "@scow/protos/build/common/job";
 import { NodeSSH } from "node-ssh";
 import { JobInfo } from "src/clusterops/api/job";
-import { RunningJob } from "src/generated/common/job";
 import dayjs, { Dayjs } from "src/utils/dayjs";
 import { Logger } from "ts-log";
 

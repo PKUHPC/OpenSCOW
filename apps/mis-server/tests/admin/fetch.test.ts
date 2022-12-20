@@ -16,9 +16,9 @@ import { Server } from "@ddadaal/tsgrpc-server";
 import { ChannelCredentials } from "@grpc/grpc-js";
 import { MikroORM } from "@mikro-orm/core";
 import { MySqlDriver } from "@mikro-orm/mysql";
+import { AdminServiceClient } from "@scow/protos/build/server/admin";
 import { createServer } from "src/app";
 import { misConfig } from "src/config/mis";
-import { AdminServiceClient } from "src/generated/server/admin";
 import { createSourceDbOrm } from "src/tasks/fetch";
 import { clearAndClose, dropDatabase } from "tests/data/helpers";
 

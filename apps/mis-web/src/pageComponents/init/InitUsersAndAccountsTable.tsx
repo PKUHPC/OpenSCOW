@@ -10,13 +10,13 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { Account } from "@scow/protos/build/server/account";
+import { AccountAffiliation, User } from "@scow/protos/build/server/user";
 import { message, Select, Table, Tabs, Typography } from "antd";
 import { useEffect, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { Centered } from "src/components/layouts";
-import { Account } from "src/generated/server/account";
-import { AccountAffiliation, User } from "src/generated/server/user";
 import { FormLayout } from "src/layouts/FormLayout";
 import { useMessage } from "src/layouts/prompts";
 import { PlatformRole, PlatformRoleTexts, TenantRole, TenantRoleTexts, UserRole, UserRoleTexts } from "src/models/User";

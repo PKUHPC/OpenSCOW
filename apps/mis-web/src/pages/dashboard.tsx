@@ -11,6 +11,7 @@
  */
 
 import { moneyToNumber } from "@scow/lib-decimal";
+import { AccountStatus } from "@scow/protos/build/server/user";
 import { Divider } from "antd";
 import { GetServerSideProps, NextPage } from "next";
 import { useRouter } from "next/router";
@@ -21,7 +22,6 @@ import { USE_MOCK } from "src/apis/useMock";
 import { requireAuth } from "src/auth/requireAuth";
 import { AuthResultError, ssrAuthenticate } from "src/auth/server";
 import { UnifiedErrorPage } from "src/components/errorPages/UnifiedErrorPage";
-import { AccountStatus } from "src/generated/server/user";
 import { AccountInfoSection } from "src/pageComponents/dashboard/AccountInfoSection";
 import { JobsSection } from "src/pageComponents/dashboard/JobsSection";
 import { getUserStatus, GetUserStatusSchema } from "src/pages/api/dashboard/status";

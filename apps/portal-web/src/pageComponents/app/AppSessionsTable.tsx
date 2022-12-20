@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import type { AppSession } from "@scow/protos/build/portal/app";
 import { Button, Checkbox, Form, Popconfirm, Space, Table, TableColumnsType } from "antd";
 import type { CheckboxChangeEvent } from "antd/es/checkbox";
 import Router, { useRouter } from "next/router";
@@ -20,7 +21,6 @@ import { useStore } from "simstate";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
-import type { AppSession } from "src/generated/portal/app";
 import { useMessage } from "src/layouts/prompts";
 import { calculateAppRemainingTime, compareState } from "src/models/job";
 import { ConnectTopAppLink } from "src/pageComponents/app/ConnectToAppLink";
@@ -54,7 +54,7 @@ export const AppSessionsTable: React.FC<Props> = () => {
       const { sessions } = await api.getAppSessions({ query: { cluster: cluster.id } });
 
       return sessions.map((x) => ({
-        ...x, 
+        ...x,
         remainingTime: x.ready ? calculateAppRemainingTime(x.runningTime, x.timeLimit) : x.timeLimit,
       }));
 
@@ -85,8 +85,8 @@ export const AppSessionsTable: React.FC<Props> = () => {
     {
       title: "状态",
       dataIndex: "state",
-      sorter: (a, b) => compareState (a.state, b.state) 
-        ? compareState (a.state, b.state) : 
+      sorter: (a, b) => compareState (a.state, b.state)
+        ? compareState (a.state, b.state) :
         compareNumber(a.jobId, b.jobId),
       defaultSortOrder: "descend",
 
@@ -171,10 +171,10 @@ export const AppSessionsTable: React.FC<Props> = () => {
               <Button loading={isLoading} onClick={reload}>刷新</Button>
             </Space>
           </Form.Item>
-          <Checkbox 
-            checked={checked} 
-            disabled={disabled} 
-            onChange={onChange} 
+          <Checkbox
+            checked={checked}
+            disabled={disabled}
+            onChange={onChange}
             style={{ lineHeight: "40px", marginLeft: "10px" }}
           >
             10s自动刷新

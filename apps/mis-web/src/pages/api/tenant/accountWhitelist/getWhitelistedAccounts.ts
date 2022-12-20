@@ -12,8 +12,8 @@
 
 import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
+import { AccountServiceClient, WhitelistedAccount } from "@scow/protos/build/server/account";
 import { authenticate } from "src/auth/server";
-import { AccountServiceClient, WhitelistedAccount } from "src/generated/server/account";
 import { TenantRole } from "src/models/User";
 import { getClient } from "src/utils/client";
 

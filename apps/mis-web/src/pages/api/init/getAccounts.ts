@@ -12,7 +12,7 @@
 
 import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
-import { Account, AccountServiceClient } from "src/generated/server/account";
+import { Account, AccountServiceClient } from "@scow/protos/build/server/account";
 import { getClient } from "src/utils/client";
 import { DEFAULT_TENANT_NAME } from "src/utils/constants";
 import { queryIfInitialized } from "src/utils/init";

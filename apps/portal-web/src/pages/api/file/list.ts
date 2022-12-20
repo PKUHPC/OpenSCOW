@@ -12,8 +12,8 @@
 
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { status } from "@grpc/grpc-js";
+import { FileInfo_FileType, FileServiceClient } from "@scow/protos/build/portal/file";
 import { authenticate } from "src/auth/server";
-import { FileInfo_FileType, FileServiceClient } from "src/generated/portal/file";
 import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
 import { handlegRPCError } from "src/utils/server";

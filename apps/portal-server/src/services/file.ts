@@ -15,9 +15,9 @@ import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError, status } from "@grpc/grpc-js";
 import { sftpExists,
   sftpMkdir, sftpReaddir, sftpRealPath, sftpRename, sftpStat, sftpUnlink, sftpWriteFile, sshRmrf } from "@scow/lib-ssh";
-import { config } from "src/config/env";
 import { FileInfo, FileInfo_FileType,
-  FileServiceServer, FileServiceService } from "src/generated/portal/file";
+  FileServiceServer, FileServiceService } from "@scow/protos/build/portal/file";
+import { config } from "src/config/env";
 import { clusterNotFound } from "src/utils/errors";
 import { pipeline } from "src/utils/pipeline";
 import { getClusterLoginNode, sshConnect } from "src/utils/ssh";

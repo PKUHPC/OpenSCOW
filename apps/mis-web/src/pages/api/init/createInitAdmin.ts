@@ -13,7 +13,7 @@
 import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Status } from "@grpc/grpc-js/build/src/constants";
-import { InitServiceClient } from "src/generated/server/init";
+import { InitServiceClient } from "@scow/protos/build/server/init";
 import { getClient } from "src/utils/client";
 import { publicConfig } from "src/utils/config";
 import { queryIfInitialized } from "src/utils/init";

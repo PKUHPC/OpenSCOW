@@ -10,11 +10,11 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { Money } from "@scow/protos/build/common/money";
 import { Button, Divider, Form, Input, Select, Space, Table, Tag } from "antd";
 import Link from "next/link";
 import React, { useMemo, useState } from "react";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
-import { Money } from "src/generated/common/money";
 import type { AdminAccountInfo, GetAccountsSchema } from "src/pages/api/tenant/getAccounts";
 import { moneyToString } from "src/utils/money";
 

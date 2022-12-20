@@ -8,8 +8,7 @@
     "serve": "next start",
     "build": "pnpm prepareDev && npm run build:nogen",
     "build:nogen": "next build",
-    "prepareDev": "pnpm protos && ntar schema",
-    "protos": "tsgrpc-cli protos",
+    "prepareDev": "ntar schema",
     "test": "jest --passWithNoTests"
   },
   "files": [
@@ -38,6 +37,7 @@
     "@scow/lib-decimal": "workspace:*",
     "@scow/lib-ssh": "workspace:*",
     "@sinclair/typebox": "0.25.13",
+    "@scow/protos": "workspace:*",
     "antd": "5.0.7",
     "busboy": "1.6.0",
     "codemirror": "6.0.1",
@@ -67,7 +67,6 @@
   },
   "devDependencies": {
     "@ddadaal/next-typed-api-routes-cli": "0.5.1",
-    "@ddadaal/tsgrpc-cli": "0.14.3",
     "@next/bundle-analyzer": "13.0.2",
     "@testing-library/jest-dom": "5.16.5",
     "@testing-library/react": "13.4.0",

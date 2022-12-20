@@ -12,8 +12,8 @@
 
 import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
-import type { User } from "src/generated/server/user";
-import { UserServiceClient } from "src/generated/server/user";
+import type { User } from "@scow/protos/build/server/user";
+import { UserServiceClient } from "@scow/protos/build/server/user";
 import { getClient } from "src/utils/client";
 import { DEFAULT_TENANT_NAME } from "src/utils/constants";
 import { queryIfInitialized } from "src/utils/init";

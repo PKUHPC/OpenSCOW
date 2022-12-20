@@ -12,8 +12,8 @@
 
 import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
+import { UserServiceClient } from "@scow/protos/build/server/user";
 import { authenticate } from "src/auth/server";
-import { UserServiceClient } from "src/generated/server/user";
 import { getClient } from "src/utils/client";
 
 export interface QueryStorageUsageSchema {

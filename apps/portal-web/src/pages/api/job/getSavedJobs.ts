@@ -11,8 +11,8 @@
  */
 
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
+import { JobServiceClient, JobTemplate } from "@scow/protos/build/portal/job";
 import { authenticate } from "src/auth/server";
-import { JobServiceClient, JobTemplate } from "src/generated/portal/job";
 import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
 

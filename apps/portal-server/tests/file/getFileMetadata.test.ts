@@ -14,11 +14,10 @@ import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { Server } from "@ddadaal/tsgrpc-server";
 import { credentials, status } from "@grpc/grpc-js";
 import { sftpStat } from "@scow/lib-ssh";
-import { utc } from "dayjs";
+import { FileServiceClient } from "@scow/protos/build/portal/file";
 import { createServer } from "src/app";
-import { FileServiceClient } from "src/generated/portal/file";
 
-import { actualPath, cluster, connectToTestServer, 
+import { actualPath, cluster, connectToTestServer,
   createTestItems, expectGrpcThrow, resetTestServer, TestSshServer, userId } from "./utils";
 
 let ssh: TestSshServer;

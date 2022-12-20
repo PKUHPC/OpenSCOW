@@ -11,9 +11,9 @@
  */
 
 import { route } from "@ddadaal/next-typed-api-routes-runtime";
+import { JobBillingItem } from "@scow/protos/build/server/job";
 import { authenticate } from "src/auth/server";
 import { JobBillingTableItem } from "src/components/JobBillingTable";
-import { JobBillingItem } from "src/generated/server/job";
 import { PlatformRole } from "src/models/User";
 import { getBillingItems } from "src/pages/api/job/getBillingItems";
 import { publicConfig, runtimeConfig } from "src/utils/config";

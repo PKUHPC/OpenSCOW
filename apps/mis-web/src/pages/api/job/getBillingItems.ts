@@ -13,9 +13,9 @@
 import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { numberToMoney } from "@scow/lib-decimal";
+import { GetBillingItemsResponse, JobServiceClient } from "@scow/protos/build/server/job";
 import { USE_MOCK } from "src/apis/useMock";
 import { authenticate } from "src/auth/server";
-import { GetBillingItemsReply, JobServiceClient } from "src/generated/server/job";
 import { PlatformRole } from "src/models/User";
 import { getClient } from "src/utils/client";
 
@@ -37,7 +37,7 @@ export interface GetBillingItemsSchema {
   }
 
   responses: {
-    200: GetBillingItemsReply;
+    200: GetBillingItemsResponse;
   }
 }
 
@@ -50,7 +50,7 @@ const mockBillingItems = [
   { id: "HPC06", path: "hpc01.GPU.high", price: numberToMoney(14.00), amountStrategy: "gpu" },
 ];
 
-async function mockReply(): Promise<GetBillingItemsReply> {
+async function mockReply(): Promise<GetBillingItemsResponse> {
   return { items: mockBillingItems };
 }
 

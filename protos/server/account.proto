@@ -23,7 +23,7 @@ message BlockAccountRequest {
 }
 
 // NOT_FOUND: account is not found.
-message BlockAccountReply {
+message BlockAccountResponse {
   enum Result {
     OK = 0;
     ALREADY_BLOCKED = 1;
@@ -38,7 +38,7 @@ message UnblockAccountRequest {
 }
 
 // NOT_FOUND: account is not found.
-message UnblockAccountReply {
+message UnblockAccountResponse {
   bool executed = 1;
 }
 
@@ -55,7 +55,7 @@ message WhitelistedAccount {
   string comment = 6;
 }
 
-message GetWhitelistedAccountsReply {
+message GetWhitelistedAccountsResponse {
   repeated WhitelistedAccount accounts = 1;
 }
 
@@ -67,7 +67,7 @@ message WhitelistAccountRequest {
 }
 
 // NOT_FOUND: account is not found.
-message WhitelistAccountReply {
+message WhitelistAccountResponse {
   bool executed = 1;
 }
 
@@ -77,7 +77,7 @@ message DewhitelistAccountRequest {
 }
 
 // NOT_FOUND: account is not found.
-message DewhitelistAccountReply {
+message DewhitelistAccountResponse {
   bool executed = 1;
 }
 
@@ -90,7 +90,7 @@ message CreateAccountRequest {
 
 // ALREADY_EXISTS: Account already exists.
 // NOT_FOUND: owner user doesn't exist
-message CreateAccountReply {
+message CreateAccountResponse {
 }
 
 message GetAccountsRequest {
@@ -110,21 +110,21 @@ message Account {
   common.Money balance = 8;
 }
 
-message GetAccountsReply {
+message GetAccountsResponse {
   repeated Account results = 1;
 }
 
 service AccountService {
 
-  rpc CreateAccount(CreateAccountRequest) returns (CreateAccountReply);
-  rpc GetAccounts(GetAccountsRequest) returns (GetAccountsReply);
+  rpc CreateAccount(CreateAccountRequest) returns (CreateAccountResponse);
+  rpc GetAccounts(GetAccountsRequest) returns (GetAccountsResponse);
 
-  rpc BlockAccount(BlockAccountRequest) returns (BlockAccountReply);
-  rpc UnblockAccount(UnblockAccountRequest) returns (UnblockAccountReply);
+  rpc BlockAccount(BlockAccountRequest) returns (BlockAccountResponse);
+  rpc UnblockAccount(UnblockAccountRequest) returns (UnblockAccountResponse);
 
   rpc GetWhitelistedAccounts(GetWhitelistedAccountsRequest)
-      returns (GetWhitelistedAccountsReply);
-  rpc WhitelistAccount(WhitelistAccountRequest) returns (WhitelistAccountReply);
+      returns (GetWhitelistedAccountsResponse);
+  rpc WhitelistAccount(WhitelistAccountRequest) returns (WhitelistAccountResponse);
   rpc DewhitelistAccount(DewhitelistAccountRequest)
-      returns (DewhitelistAccountReply);
+      returns (DewhitelistAccountResponse);
 }

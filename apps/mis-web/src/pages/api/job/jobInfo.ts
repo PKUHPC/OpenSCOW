@@ -12,8 +12,8 @@
 
 import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
+import { GetJobsRequest, GetJobsResponse, JobFilter, JobServiceClient } from "@scow/protos/build/server/job";
 import { authenticate } from "src/auth/server";
-import { GetJobsReply, GetJobsRequest, JobFilter, JobServiceClient } from "src/generated/server/job";
 import { TenantRole } from "src/models/User";
 import { getClient } from "src/utils/client";
 
@@ -65,7 +65,7 @@ export interface GetJobInfoSchema {
   };
 
   responses: {
-    200: GetJobsReply;
+    200: GetJobsResponse;
 
     403: null;
   }

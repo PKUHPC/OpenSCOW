@@ -12,9 +12,9 @@
 
 import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
-import { changePassword as libChangePassword } from "@scow/lib-auth"; 
+import { changePassword as libChangePassword } from "@scow/lib-auth";
+import { GetUserInfoResponse, UserServiceClient } from "@scow/protos/build/server/user";
 import { authenticate } from "src/auth/server";
-import { GetUserInfoReply, UserServiceClient } from "src/generated/server/user";
 import { TenantRole } from "src/models/User";
 import { getClient } from "src/utils/client";
 import { publicConfig, runtimeConfig } from "src/utils/config";
@@ -43,7 +43,7 @@ export interface ChangePasswordAsTenantAdminSchema {
 
     /** 密码不正确 */
     412: null;
-    
+
     /** 本功能在当前配置下不可用。 */
     501: null;
   }
@@ -56,18 +56,18 @@ export default /* #__PURE__*/route<ChangePasswordAsTenantAdminSchema>(
     if (!publicConfig.ENABLE_CHANGE_PASSWORD) {
       return { 501: null };
     }
-    
+
     const { identityId, newPassword, oldPassword } = req.body;
 
     const client = getClient(UserServiceClient);
-    const userInfo: GetUserInfoReply = await asyncClientCall(client, "getUserInfo", {
+    const userInfo: GetUserInfoResponse = await asyncClientCall(client, "getUserInfo", {
       userId: identityId,
     });
     if (!userInfo) {
       return { 404: null };
     }
     // 鉴权，要求用户所在的租户应该为当前租户管理员
-    const auth = authenticate((info) => 
+    const auth = authenticate((info) =>
       (info.tenantRoles.includes(TenantRole.TENANT_ADMIN)) && (userInfo.tenantName === info.tenant));
 
     const info = await auth(req, res);

@@ -14,14 +14,14 @@ import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Server } from "@ddadaal/tsgrpc-server";
 import { ChannelCredentials, status } from "@grpc/grpc-js";
 import { sftpExists, sftpStat, sshConnect } from "@scow/lib-ssh";
+import { CreateInitAdminRequest, InitServiceClient,
+  SetAsInitAdminRequest, UnsetInitAdminRequest } from "@scow/protos/build/server/init";
 import { createServer } from "src/app";
 import { createSlurmOps } from "src/clusterops/slurm";
 import { clusters } from "src/config/clusters";
 import { rootKeyPair } from "src/config/env";
 import { Tenant } from "src/entities/Tenant";
 import { PlatformRole, TenantRole, User } from "src/entities/User";
-import { CreateInitAdminRequest, InitServiceClient,
-  SetAsInitAdminRequest, UnsetInitAdminRequest } from "src/generated/server/init";
 import { DEFAULT_TENANT_NAME } from "src/utils/constants";
 import { createUserInDatabase } from "src/utils/createUser";
 import { reloadEntities, toRef } from "src/utils/orm";

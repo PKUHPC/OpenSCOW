@@ -16,7 +16,7 @@ package scow.server;
 
 message QuerySystemInitializedRequest {
 }
-message QuerySystemInitializedReply {
+message QuerySystemInitializedResponse {
   bool initialized = 1;
 }
 
@@ -26,32 +26,32 @@ message CreateInitAdminRequest {
   string email = 3;
   string password = 4;
 }
-message CreateInitAdminReply {
+message CreateInitAdminResponse {
   bool created_in_auth = 1;
 }
 
 message CompleteInitRequest {
 }
 
-message CompleteInitReply {
+message CompleteInitResponse {
 }
 
 message SetAsInitAdminRequest {
   string user_id = 1;
 }
 
-message SetAsInitAdminReply {
+message SetAsInitAdminResponse {
 }
 
 message UnsetInitAdminRequest {
   string user_id = 1;
 }
-message UnsetInitAdminReply {
+message UnsetInitAdminResponse {
 }
 message UserExistsRequest {
   string user_id = 1;
 }
-message UserExistsReply {
+message UserExistsResponse {
   bool exists_in_scow = 1;
   optional bool exists_in_auth = 2;
 }
@@ -59,21 +59,21 @@ message UserExistsReply {
 
 service InitService {
   rpc QuerySystemInitialized(QuerySystemInitializedRequest)
-      returns (QuerySystemInitializedReply);
+      returns (QuerySystemInitializedResponse);
 
   rpc CreateInitAdmin(CreateInitAdminRequest)
-      returns (CreateInitAdminReply);
+      returns (CreateInitAdminResponse);
 
   // ALREADY_EXISTS: already initialized
-  rpc CompleteInit(CompleteInitRequest) returns (CompleteInitReply);
+  rpc CompleteInit(CompleteInitRequest) returns (CompleteInitResponse);
 
   // Set a user as PLATFORM_ADMIN and default tenant's TENANT_ADMIN
   // NOT_FOUND: the user is not found in default tenant
-  rpc SetAsInitAdmin(SetAsInitAdminRequest) returns (SetAsInitAdminReply);
+  rpc SetAsInitAdmin(SetAsInitAdminRequest) returns (SetAsInitAdminResponse);
 
   // Unset a user's PLATFORM_ADMIN and default tenant's TENANT_ADMIN role
   // NOT_FOUND: the user is not found in default tenant
-  rpc UnsetInitAdmin(UnsetInitAdminRequest) returns (UnsetInitAdminReply);
-  rpc UserExists(UserExistsRequest) returns (UserExistsReply);
+  rpc UnsetInitAdmin(UnsetInitAdminRequest) returns (UnsetInitAdminResponse);
+  rpc UserExists(UserExistsRequest) returns (UserExistsResponse);
 
 }

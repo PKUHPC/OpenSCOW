@@ -12,8 +12,8 @@
 
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { status } from "@grpc/grpc-js";
+import { DesktopServiceClient } from "@scow/protos/build/portal/desktop";
 import { authenticate } from "src/auth/server";
-import { DesktopServiceClient } from "src/generated/portal/desktop";
 import { getClient } from "src/utils/client";
 import { publicConfig } from "src/utils/config";
 import { dnsResolve } from "src/utils/dns";

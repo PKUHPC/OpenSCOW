@@ -29,6 +29,15 @@
         "test/**/*.tsx"
       ]
     },
+    "@scow/protos#generate": {
+      "inputs": [
+        "../../protos",
+        "../../buf.gen.yaml"
+      ],
+      "outputs": [
+        "build/**"
+      ]
+    },
     "//#lint:all": {
       "inputs": [
         "**/*.tsx",

@@ -11,10 +11,10 @@
  */
 
 import { parsePlaceholder } from "@scow/lib-config/build/parse";
+import type { AppSession } from "@scow/protos/build/portal/app";
 import { join } from "path";
 import { api } from "src/apis";
 import { ClickableA } from "src/components/ClickableA";
-import type { AppSession } from "src/generated/portal/app";
 import { useMessage } from "src/layouts/prompts";
 import { Cluster, publicConfig } from "src/utils/config";
 import { openDesktop } from "src/utils/vnc";

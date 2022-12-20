@@ -14,12 +14,12 @@ import { ensureNotUndefined, plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError, status } from "@grpc/grpc-js";
 import { LockMode, QueryOrder } from "@mikro-orm/core";
 import { Decimal, decimalToMoney, moneyToNumber } from "@scow/lib-decimal";
+import { ChargingServiceServer, ChargingServiceService } from "@scow/protos/build/server/charging";
 import { charge, pay } from "src/bl/charging";
 import { Account } from "src/entities/Account";
 import { ChargeRecord } from "src/entities/ChargeRecord";
 import { PayRecord } from "src/entities/PayRecord";
 import { Tenant } from "src/entities/Tenant";
-import { ChargingServiceServer, ChargingServiceService } from "src/generated/server/charging";
 
 
 export const chargingServiceServer = plugin((server) => {
@@ -160,7 +160,7 @@ export const chargingServiceServer = plugin((server) => {
           comment: x.comment,
           index: x.id,
           ipAddress: x.ipAddress,
-          time: x.time,
+          time: x.time.toISOString(),
           type: x.type,
           operatorId: x.operatorId,
         })),
@@ -184,7 +184,7 @@ export const chargingServiceServer = plugin((server) => {
           amount: decimalToMoney(x.amount),
           comment: x.comment,
           index: x.id,
-          time: x.time,
+          time: x.time.toISOString(),
           type: x.type,
         })),
         total: decimalToMoney(records.reduce((prev, curr) => prev.plus(curr.amount), new Decimal(0))),

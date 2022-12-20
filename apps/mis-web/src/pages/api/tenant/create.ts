@@ -13,8 +13,8 @@
 import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { status } from "@grpc/grpc-js";
+import { TenantServiceClient } from "@scow/protos/build/server/tenant";
 import { authenticate } from "src/auth/server";
-import { TenantServiceClient } from "src/generated/server/tenant";
 import { PlatformRole } from "src/models/User";
 import { getClient } from "src/utils/client";
 import { handlegRPCError } from "src/utils/server";
@@ -27,7 +27,7 @@ export interface CreateTenantSchema {
 
     responses: {
       204: null;
-        
+
     /** 租户已经存在 */
       409: null;
   }

@@ -15,9 +15,9 @@ import { Server } from "@ddadaal/tsgrpc-server";
 import { ChannelCredentials } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { decimalToMoney } from "@scow/lib-decimal";
+import { TenantServiceClient } from "@scow/protos/build/server/tenant";
 import { createServer } from "src/app";
 import { Tenant } from "src/entities/Tenant";
-import { TenantServiceClient } from "src/generated/server/tenant";
 import { insertInitialData } from "tests/data/data";
 import { dropDatabase } from "tests/data/helpers";
 
@@ -45,30 +45,30 @@ it("get all tenants", async () => {
   const tenants = await asyncClientCall(client, "getAllTenants", {});
 
   expect(tenants.totalCount).toEqual(2);
-  expect(tenants.platformTenants.map((x) => ({ 
-    tenantId: x.tenantId, 
-    name: x.tenantName, 
+  expect(tenants.platformTenants.map((x) => ({
+    tenantId: x.tenantId,
+    name: x.tenantName,
     userCount: x.userCount,
     accountCount:x.accountCount,
-    balance: x.balance,  
+    balance: x.balance,
   }))).toIncludeSameMembers([
     {
-      tenantId: data.tenant.id, 
-      name: data.tenant.name, 
+      tenantId: data.tenant.id,
+      name: data.tenant.name,
       userCount: 2,
       accountCount:2,
       balance: decimalToMoney(data.tenant.balance),
     },
     {
-      tenantId: data.anotherTenant.id, 
-      name: data.anotherTenant.name, 
+      tenantId: data.anotherTenant.id,
+      name: data.anotherTenant.name,
       userCount: 1,
       accountCount:1,
       balance: decimalToMoney(data.anotherTenant.balance),
-    }, 
-      
+    },
+
   ]);
-    
+
 });
 
 it("cannot create a tenant if the name exists", async () => {

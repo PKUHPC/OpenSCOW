@@ -11,6 +11,8 @@
  */
 
 import { HttpError } from "@ddadaal/next-typed-api-routes-runtime";
+import { Money } from "@scow/protos/build/common/money";
+import { JobInfo } from "@scow/protos/build/server/job";
 import { Button, DatePicker, Divider, Form, Input, InputNumber, Select, Table } from "antd";
 import dayjs from "dayjs";
 import React, { useCallback, useRef, useState } from "react";
@@ -19,8 +21,6 @@ import { api } from "src/apis";
 import { ClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer, FilterFormTabs } from "src/components/FilterFormContainer";
 import { TableTitle } from "src/components/TableTitle";
-import { Money } from "src/generated/common/money";
-import { JobInfo } from "src/generated/server/job";
 import { useMessage } from "src/layouts/prompts";
 import { HistoryJobDrawer } from "src/pageComponents/job/HistoryJobDrawer";
 import type { GetJobInfoSchema } from "src/pages/api/job/jobInfo";

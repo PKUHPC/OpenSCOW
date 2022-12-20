@@ -11,8 +11,8 @@
  */
 
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
+import { AppServiceClient, AppSession } from "@scow/protos/build/portal/app";
 import { authenticate } from "src/auth/server";
-import { AppServiceClient, AppSession } from "src/generated/portal/app";
 import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
 

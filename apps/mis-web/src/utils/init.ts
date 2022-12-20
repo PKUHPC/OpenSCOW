@@ -11,8 +11,8 @@
  */
 
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
+import { InitServiceClient } from "@scow/protos/build/server/init";
 import { USE_MOCK } from "src/apis/useMock";
-import { InitServiceClient } from "src/generated/server/init";
 import { getClient } from "src/utils/client";
 
 export async function queryIfInitialized() {

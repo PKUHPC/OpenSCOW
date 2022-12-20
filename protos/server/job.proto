@@ -65,7 +65,7 @@ message GetJobsRequest {
   optional uint64 page_size = 3;
 }
 
-message GetJobsReply {
+message GetJobsResponse {
   uint64 total_count = 1;
   repeated JobInfo jobs = 2;
   common.Money total_account_price = 3;
@@ -82,7 +82,7 @@ message ChangeJobPriceRequest {
 }
 
 // NOT_FOUND: job is not found
-message ChangeJobPriceReply {
+message ChangeJobPriceResponse {
   uint64 count = 1;
 }
 
@@ -91,7 +91,7 @@ message GetJobByBiJobIndexRequest {
 }
 
 // NOT_FOUND: job is not found
-message GetJobByBiJobIndexReply {
+message GetJobByBiJobIndexResponse {
   JobInfo info = 1;
 }
 
@@ -105,8 +105,8 @@ message GetRunningJobsRequest {
   repeated string job_id_list = 5;
 }
 
-message GetRunningJobsReply {
-  repeated common.job.RunningJob jobs = 1;
+message GetRunningJobsResponse {
+  repeated common.RunningJob jobs = 1;
 }
 
 message ChangeJobTimeLimitRequest {
@@ -116,7 +116,7 @@ message ChangeJobTimeLimitRequest {
 }
 
 // NOT_FOUND: cluster or job_id is not found.
-message ChangeJobTimeLimitReply {
+message ChangeJobTimeLimitResponse {
 }
 
 message QueryJobTimeLimitRequest {
@@ -140,12 +140,12 @@ message JobBillingItem {
   string amount_strategy = 6;
 }
 
-message GetBillingItemsReply {
+message GetBillingItemsResponse {
   repeated JobBillingItem items = 1;
 }
 
 // NOT_FOUND: cluster or job_id is not found.
-message QueryJobTimeLimitReply {
+message QueryJobTimeLimitResponse {
   uint64 limit = 1;
 }
 
@@ -159,26 +159,26 @@ message AddBillingItemRequest {
   optional string description = 6;
 }
 
-message AddBillingItemReply {
+message AddBillingItemResponse {
 }
 
 service JobService {
-  rpc GetJobs(GetJobsRequest) returns (GetJobsReply);
+  rpc GetJobs(GetJobsRequest) returns (GetJobsResponse);
   rpc GetJobByBiJobIndex(GetJobByBiJobIndexRequest)
-      returns (GetJobByBiJobIndexReply);
-  rpc ChangeJobPrice(ChangeJobPriceRequest) returns (ChangeJobPriceReply);
+      returns (GetJobByBiJobIndexResponse);
+  rpc ChangeJobPrice(ChangeJobPriceRequest) returns (ChangeJobPriceResponse);
 
-  rpc GetRunningJobs(GetRunningJobsRequest) returns (GetRunningJobsReply);
+  rpc GetRunningJobs(GetRunningJobsRequest) returns (GetRunningJobsResponse);
 
   rpc ChangeJobTimeLimit(ChangeJobTimeLimitRequest)
-      returns (ChangeJobTimeLimitReply);
+      returns (ChangeJobTimeLimitResponse);
   rpc QueryJobTimeLimit(QueryJobTimeLimitRequest)
-      returns (QueryJobTimeLimitReply);
+      returns (QueryJobTimeLimitResponse);
 
-  rpc GetBillingItems(GetBillingItemsRequest) returns (GetBillingItemsReply);
+  rpc GetBillingItems(GetBillingItemsRequest) returns (GetBillingItemsResponse);
 
   // ALREADY_EXISTS: item_id already exists
   // NOT_FOUND: tenant_name is not found
   // INVALID_ARGUMENT: amount is not valid or path is not valid
-  rpc AddBillingItem(AddBillingItemRequest) returns (AddBillingItemReply);
+  rpc AddBillingItem(AddBillingItemRequest) returns (AddBillingItemResponse);
 }

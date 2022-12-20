@@ -13,8 +13,8 @@
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { numberToMoney } from "@scow/lib-decimal";
+import { JobServiceClient } from "@scow/protos/build/server/job";
 import { authenticate } from "src/auth/server";
-import { JobServiceClient } from "src/generated/server/job";
 import { PlatformRole, TenantRole } from "src/models/User";
 import type { GetJobFilter } from "src/pages/api/job/jobInfo";
 import { getClient } from "src/utils/client";

@@ -15,12 +15,13 @@ import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { LockMode, UniqueConstraintViolationException } from "@mikro-orm/core";
 import { decimalToMoney } from "@scow/lib-decimal";
+import { AccountServiceServer, AccountServiceService,
+  BlockAccountResponse_Result } from "@scow/protos/build/server/account";
 import { Account } from "src/entities/Account";
 import { AccountWhitelist } from "src/entities/AccountWhitelist";
 import { Tenant } from "src/entities/Tenant";
 import { User } from "src/entities/User";
 import { UserAccount, UserRole as EntityUserRole, UserStatus } from "src/entities/UserAccount";
-import { AccountServiceServer, AccountServiceService, BlockAccountReply_Result } from "src/generated/server/account";
 import { toRef } from "src/utils/orm";
 
 export const accountServiceServer = plugin((server) => {
@@ -41,14 +42,14 @@ export const accountServiceServer = plugin((server) => {
         }
 
         if (account.blocked) {
-          return [{ result: BlockAccountReply_Result.ALREADY_BLOCKED }];
+          return [{ result: BlockAccountResponse_Result.ALREADY_BLOCKED }];
         }
 
 
         await account.block(server.ext.clusters, logger);
       });
 
-      return [{ result: BlockAccountReply_Result.OK }];
+      return [{ result: BlockAccountResponse_Result.OK }];
     },
 
     unblockAccount: async ({ request, em, logger }) => {
@@ -190,7 +191,7 @@ export const accountServiceServer = plugin((server) => {
             accountName: x.account.$.accountName,
             comment: x.comment,
             operatorId: x.operatorId,
-            addTime: x.time,
+            addTime: x.time.toISOString(),
             ownerId: accountOwner.id + "",
             ownerName: accountOwner.name,
           };

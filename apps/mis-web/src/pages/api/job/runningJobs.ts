@@ -12,9 +12,9 @@
 
 import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
+import { RunningJob } from "@scow/protos/build/common/job";
+import { GetRunningJobsRequest, JobServiceClient } from "@scow/protos/build/server/job";
 import { authenticate } from "src/auth/server";
-import { RunningJob } from "src/generated/common/job";
-import { GetRunningJobsRequest, JobServiceClient } from "src/generated/server/job";
 import { PlatformRole, TenantRole } from "src/models/User";
 import { getClient } from "src/utils/client";
 

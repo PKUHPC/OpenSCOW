@@ -16,12 +16,12 @@ import { ChannelCredentials } from "@grpc/grpc-js";
 import * as grpc from "@grpc/grpc-js";
 import { SqlEntityManager } from "@mikro-orm/mysql";
 import { Decimal, moneyToNumber, numberToMoney } from "@scow/lib-decimal";
+import { ChargeRequest, ChargingServiceClient, PaymentRecord, PayRequest } from "@scow/protos/build/server/charging";
 import { createServer } from "src/app";
 import { Account } from "src/entities/Account";
 import { ChargeRecord } from "src/entities/ChargeRecord";
 import { PayRecord } from "src/entities/PayRecord";
 import { Tenant } from "src/entities/Tenant";
-import { ChargeRequest, ChargingServiceClient, PaymentRecord, PayRequest } from "src/generated/server/charging";
 import { range } from "src/utils/array";
 import { reloadEntity } from "src/utils/orm";
 import { dropDatabase } from "tests/data/helpers";
@@ -212,8 +212,8 @@ it("returns payment records", async () => {
 
   const reply = await asyncClientCall(client, "getPaymentRecords", {
     accountName: account.accountName,
-    startTime,
-    endTime: new Date(),
+    startTime: startTime.toISOString(),
+    endTime: new Date().toISOString(),
   });
 
   expect(reply.results).toHaveLength(1);

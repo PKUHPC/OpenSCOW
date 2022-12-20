@@ -22,8 +22,8 @@ import {
   PlusCircleOutlined,
   PlusOutlined,
   SaveOutlined } from "@ant-design/icons";
+import { App } from "@scow/protos/build/portal/app";
 import React from "react";
-import { App } from "src/generated/portal/app";
 import { NavItemProps } from "src/layouts/base/NavItemProps";
 import { User } from "src/stores/UserStore";
 import { Cluster, publicConfig } from "src/utils/config";

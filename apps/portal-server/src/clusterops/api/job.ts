@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { RunningJob } from "src/generated/common/job";
+import { RunningJob } from "@scow/protos/build/common/job";
 import { Logger } from "ts-log";
 
 export interface ListRunningJobsRequest {

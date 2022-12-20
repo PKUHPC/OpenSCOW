@@ -10,6 +10,8 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { ClusterAccountInfo, ClusterUserInfo,
+  GetClusterUsersResponse, ImportUsersData } from "@scow/protos/build/server/admin";
 import { Button, Checkbox, Form, Input, Select, Space, Table, Tabs, Tooltip } from "antd";
 import Router from "next/router";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
@@ -18,7 +20,6 @@ import { useStore } from "simstate";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
-import { ClusterAccountInfo, ClusterUserInfo, GetClusterUsersReply, ImportUsersData } from "src/generated/server/admin";
 import { useMessage } from "src/layouts/prompts";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { publicConfig } from "src/utils/config";
@@ -36,7 +37,7 @@ export const ImportUsersTable: React.FC = () => {
     ? publicConfig.CLUSTERS[clusterParam]
     : defaultClusterStore.cluster);
 
-  const [form] = Form.useForm<{data: GetClusterUsersReply, whitelist: boolean}>();
+  const [form] = Form.useForm<{data: GetClusterUsersResponse, whitelist: boolean}>();
 
   const [loading, setLoading] = useState(false);
 
@@ -116,8 +117,8 @@ export const ImportUsersTable: React.FC = () => {
             .finally(() => { setLoading(false); });
         }}
       >
-        <Tabs 
-          defaultActiveKey="user" 
+        <Tabs
+          defaultActiveKey="user"
           tabBarExtraContent={(
             <Space size="large">
               <a onClick={reload}>

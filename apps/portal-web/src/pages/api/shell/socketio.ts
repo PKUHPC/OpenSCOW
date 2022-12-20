@@ -11,11 +11,11 @@
  */
 
 import { asyncDuplexStreamCall } from "@ddadaal/tsgrpc-client";
+import { ShellResponse, ShellServiceClient } from "@scow/protos/build/portal/shell";
 import { NextApiRequest } from "next";
 import { join } from "path";
 import { Server as ServerIO } from "socket.io";
 import { checkCookie } from "src/auth/server";
-import { ShellResponse, ShellServiceClient } from "src/generated/portal/shell";
 import { AugmentedNextApiResponse } from "src/types/next";
 import { getClient } from "src/utils/client";
 import { runtimeConfig } from "src/utils/config";

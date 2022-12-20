@@ -12,8 +12,8 @@
 
 import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
+import { GetAllUsersResponse, UserServiceClient } from "@scow/protos/build/server/user";
 import { authenticate } from "src/auth/server";
-import { GetAllUsersReply, UserServiceClient } from "src/generated/server/user";
 import { PlatformRole } from "src/models/User";
 import { getClient } from "src/utils/client";
 
@@ -31,17 +31,17 @@ export interface GetAllUsersSchema {
        * @type integer
        */
       pageSize?: number;
-    
+
     };
-    
+
     responses: {
-        200: GetAllUsersReply;
+        200: GetAllUsersResponse;
     }
 }
 
 const auth = authenticate((info) => info.platformRoles.includes(PlatformRole.PLATFORM_ADMIN));
 
-export default route<GetAllUsersSchema>("GetAllUsersSchema", 
+export default route<GetAllUsersSchema>("GetAllUsersSchema",
   async (req, res) => {
 
     const info = await auth(req, res);

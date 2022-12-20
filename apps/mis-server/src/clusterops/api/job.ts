@@ -10,8 +10,8 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { RunningJob } from "@scow/protos/build/common/job";
 import { Request } from "src/clusterops/api";
-import { RunningJob } from "src/generated/common/job";
 
 export interface GetRunningJobsRequest {
   userId?: string | undefined;
