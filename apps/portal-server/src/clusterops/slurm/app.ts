@@ -120,8 +120,8 @@ export const slurmAppOps = (cluster: string): AppOps => {
           let customForm = String.raw`\"HOST\":\"$HOST\",\"PORT\":$PORT`;
           for (const key in appConfig.web!.connect.formData) {
             const texts = getPlaceholderKeys(appConfig.web!.connect.formData[key]);
-            for (const text in texts) {
-              customForm += `,\"${text}\":\"$${text}\"`;
+            for (const i in texts) {
+              customForm += `,\\\"${texts[i]}\\\":\\\"$${texts[i]}\\\"`;
             }
           }
           const sessionInfo = `echo -e "{${customForm}}" >$SERVER_SESSION_INFO`;
