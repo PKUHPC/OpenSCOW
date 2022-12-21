@@ -197,7 +197,7 @@ export const appServiceServer = plugin((server) => {
       if (app.attributes) {
         app.attributes.forEach((item) => {
           attributes.push({
-            type: appCustomAttribute_AttributeTypeFromJSON(item.type.toLowerCase()),
+            type: appCustomAttribute_AttributeTypeFromJSON(item.type.toUpperCase()),
             label: item.label,
             name: item.name,
             options: item.select ?? [],
