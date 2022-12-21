@@ -119,6 +119,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
       - name: Log in to the GitHub Container registry
         uses: docker/login-action@f75d088332b07a08afadf6ac53c74509b9453f12
         with:
@@ -142,3 +148,4 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           file: dockerfiles/Dockerfile.${{ matrix.file }}
           labels: ${{ steps.meta.outputs.labels }}
+          platforms: linux/amd64,linux/arm64

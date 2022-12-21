@@ -4,8 +4,12 @@
   "description": "",
   "main": "build/index.js",
   "scripts": {
-    "generate": "cd ../.. && buf generate && cd libs/protos && rimraf build && tsc"
+    "generate": "rimraf generated && cd ../.. && buf generate" ,
+    "build": "rimraf build && tsc"
   },
+  "files": [
+    "build"
+  ],
   "dependencies": {
     "long": "5.2.1",
     "protobufjs": "7.1.2"
