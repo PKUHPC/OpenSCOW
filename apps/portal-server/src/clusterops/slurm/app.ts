@@ -11,7 +11,7 @@
  */
 
 import { getAppConfigs } from "@scow/config/build/app";
-import { getPlaceholderText } from "@scow/lib-config/build/parse";
+import { getPlaceholderKeys } from "@scow/lib-config/build/parse";
 import { sftpChmod, sftpExists, sftpReaddir, sftpReadFile, sftpRealPath, sftpWriteFile } from "@scow/lib-ssh";
 import { randomUUID } from "crypto";
 import fs from "fs";
@@ -112,12 +112,10 @@ export const slurmAppOps = (cluster: string): AppOps => {
         if (appConfig.type === "web") {
           let customForm = String.raw`\"HOST\":\"$HOST\",\"PORT\":$PORT`;
           for (const key in appConfig.web!.connect.formData) {
-            const value = getPlaceholderText(appConfig.web!.connect.formData[key]);
-            if (!value) {
-              throw new Error(`
-              FormData ${key} of app ${appId} doesn't exist`);
+            const texts = getPlaceholderKeys(appConfig.web!.connect.formData[key]);
+            for (const text in texts) {
+              customForm += `,\"${text}\":\"$${text}\"`;
             }
-            customForm += String.raw`,\"${value}\":\"$${value}\"`;
           }
           const sessionInfo = `echo -e "{${customForm}}" >$SERVER_SESSION_INFO`;
 
@@ -282,12 +280,12 @@ export const slurmAppOps = (cluster: string): AppOps => {
 
             const { HOST, PORT, PASSWORD, ...rest } = serverSessionInfo;
             const customFormData = rest as {[key: string]: string};
-            return { 
-              code: "OK", 
-              appId: sessionMetadata.appId, 
-              host: HOST, 
-              port: +PORT, 
-              password: PASSWORD, 
+            return {
+              code: "OK",
+              appId: sessionMetadata.appId,
+              host: HOST,
+              port: +PORT,
+              password: PASSWORD,
               customFormData:  customFormData ?? {},
             };
           }

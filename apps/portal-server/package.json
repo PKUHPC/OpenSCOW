@@ -11,6 +11,11 @@
     "prepareDev": "pnpm protos",
     "protos": "tsgrpc-cli protos"
   },
+  "files": [
+    "assets",
+    "build",
+    ".npmrc"
+  ],
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -25,7 +30,7 @@
     "dotenv": "16.0.3",
     "node-cron": "3.0.2",
     "uuid": "9.0.0",
-    "wait-on": "6.0.1",
+    "wait-on": "7.0.1",
     "ts-log": "2.2.5",
     "shell-quote": "1.7.4",
     "dayjs": "1.11.7"

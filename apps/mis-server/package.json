@@ -12,6 +12,11 @@
     "protos": "tsgrpc-cli protos",
     "orm": "dotenv -e env/.env.dev -- npx mikro-orm"
   },
+  "files": [
+    "scripts",
+    "build",
+    ".npmrc"
+  ],
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -34,7 +39,7 @@
     "dotenv": "16.0.3",
     "node-cron": "3.0.2",
     "uuid": "9.0.0",
-    "wait-on": "6.0.1"
+    "wait-on": "7.0.1"
   },
   "devDependencies": {
     "@ddadaal/tsgrpc-cli": "0.14.3",
