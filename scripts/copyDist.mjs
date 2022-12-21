@@ -62,6 +62,9 @@ const getRequiredFiles = async (packageRoot) => {
   );
 
   // get the required files for the app
+  if (!packageJson.files) {
+    throw new Error("No files specified in package.json of " + packageRoot);
+  }
   return DEFAULT_COPY_ITEMS.concat(packageJson.files);
 
 };
