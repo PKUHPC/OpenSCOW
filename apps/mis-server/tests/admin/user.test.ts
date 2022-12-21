@@ -169,19 +169,19 @@ it("get all users", async () => {
     {
       userId: data.userA.userId,
       name: data.userA.name,
-      createTime: data.userA.createTime,
+      createTime: data.userA.createTime.toISOString(),
       platformRoles: data.userA.platformRoles,
     },
     {
       userId: data.userB.userId,
       name: data.userB.name,
-      createTime: data.userB.createTime,
+      createTime: data.userB.createTime.toISOString(),
       platformRoles: data.userB.platformRoles,
     },
     {
       userId: data.userC.userId,
       name: data.userC.name,
-      createTime: data.userC.createTime,
+      createTime: data.userC.createTime.toISOString(),
       platformRoles: data.userC.platformRoles,
     },
   ]);
