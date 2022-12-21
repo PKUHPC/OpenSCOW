@@ -50,7 +50,7 @@ web:
 
 # 配置HTML表单，用户可以指定code-server版本      
 attributes:
-  - type: SELECT
+  - type: select
     name: selectVersion
     label: 选择版本
     select:
@@ -90,7 +90,7 @@ vnc:
 
 # 配置HTML表单，用户可以指定Emacs版本      
 attributes:
-  - type: SELECT
+  - type: select
     name: selectVersion
     label: 选择版本
     select:
@@ -109,18 +109,18 @@ attributes:
 
 | 属性       | 类型                           | 是否必填 | 解释                             |
 |----------|------------------------------|------|--------------------------------|
-| `type`   | `NUMBER`, `TEXT` 或者 `SELECT` | 是    | 在HTML表单元素中输入的内容的类型             |
+| `type`   | `number`, `text` 或者 `select` | 是    | 在HTML表单元素中输入的内容的类型             |
 | `name`   | 字符串                          | 是    | HTML表单的name属性，在编程中使用，并且会作为计算节点环境变量名，可以在Web应用的`script`或者VNC应用的`xstartop`使用     |
 | `label`  | 字符串                          | 是    | HTML表单的label属性，输入框左侧显示的标签      |
-| `select` | 选项的列表                        | 否    | 如果`type`是`SELECT`，必须配置此项，指明具体的选项，具体配置办法见`select`示例 |
+| `select` | 选项的列表                        | 否    | 如果`type`是`select`，必须配置此项，指明具体的选项，具体配置办法见`select`示例 |
 
 ### 配置输入类型为文本的HTML表单
 
-配置一个输入内容是文本类型的表单，需要指定`type`为`TEXT`, 示例如下：
+配置一个输入内容是文本类型的表单，需要指定`type`为`text`, 示例如下：
 
 ```yaml
 attributes:
-  - type: TEXT
+  - type: text
     name: version
     label: 版本
 ```
@@ -129,11 +129,11 @@ attributes:
 
 ### 配置输入类型为数字的HTML表单
 
-配置一个输入内容是数字类型的表单，需要指定`type`为`NUMBER`, 此时用户仅能输入数字，示例如下：
+配置一个输入内容是数字类型的表单，需要指定`type`为`number`, 此时用户仅能输入数字，示例如下：
 
 ```yaml
 attributes:
-  - type: NUMBER
+  - type: number
     name: size
     label: 数量
 ```
@@ -142,7 +142,7 @@ attributes:
 
 ### 配置输入为下拉选择器的HTML表单
 
-配置一个输入内容是下拉选择器的表单，需要指定`type`为`SELECT`,并且配置`select`项。`select`项需要配置`value`和`label`，作为用户可以选择的选项。
+配置一个输入内容是下拉选择器的表单，需要指定`type`为`select`,并且配置`select`项。`select`项需要配置`value`和`label`，作为用户可以选择的选项。
 
 | 属性       | 类型                           | 是否必填 | 解释                             |
 |----------|------------------------------|------|--------------------------------|
@@ -153,7 +153,7 @@ attributes:
 
 ```yaml
 attributes:
-  - type: SELECT
+  - type: select
     name: selectVersion
     label: 选择版本
     select:
@@ -169,13 +169,13 @@ attributes:
 
 ```yaml
 attributes:
-  - type: TEXT
+  - type: text
     name: version
     label: 版本
-  - type: NUMBER
+  - type: number
     name: size
     label: 数量
-  - type: SELECT
+  - type: select
     name: selectVersion
     label: 选择版本
     select:
