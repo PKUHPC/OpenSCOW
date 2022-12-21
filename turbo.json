@@ -35,17 +35,32 @@
         "../../buf.gen.yaml"
       ],
       "outputs": [
+        "generated/**"
+      ]
+    },
+    "@scow/protos#build": {
+      "dependsOn": [
+        "^@scow/protos#generate"
+      ],
+      "inputs": [
+        "generated/**"
+      ],
+      "outputs": [
         "build/**"
       ]
     },
-    "//#lint:all": {
+    "//#lint:ts": {
       "inputs": [
         "**/*.tsx",
-        "**/*.ts",
-        "protos"
+        "**/*.ts"
       ],
       "outputs": [
         ".eslintcache"
+      ]
+    },
+    "//#lint:protos": {
+      "inputs": [
+        "protos/**"
       ]
     }
   }
