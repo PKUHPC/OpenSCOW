@@ -56,7 +56,7 @@ docker compose --env-file dev/.env.build -f dev/docker-compose.build.yml build
 
 :::tip
 
-为了简化构建镜像所需杭燃看，使用此命令时，docker将会自动使用运行此命令时的机器的架构编译镜像。例如如果您在AMD64架构的机器上编译，编译出来的镜像仅支持AMD64架构。
+为了简化构建镜像时所需要的环境和减少所需时间，使用此命令构建镜像时，docker将会自动使用运行此命令时的机器的架构编译镜像。例如如果您在AMD64架构的机器上编译，编译出来的镜像仅支持AMD64架构。
 
 请查看[多架构支持](./multi-platform.md)文档来了解系统对非AMD64架构（如ARM64）的机器的支持。
 
