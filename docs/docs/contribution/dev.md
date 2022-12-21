@@ -74,14 +74,21 @@ pnpm start
 # 编译libs目录下的库
 pnpm build:libs
 
+# 修改proto文件后，重新生成proto对应的ts文件
+pnpm build:protos
+
 # 在某一个具体项目下运行特定的脚本
 # {项目名}请替换为项目package.json中name字段的@scow/后面的内容
 # 项目可以运行什么脚本请查看项目package.json中的scripts
-pnpm --filter {项目名} build
+pnpm --filter {项目名} build 
 
 # 如运行@scow/config项目的build命令（编译），则运行
 # 要想使用任何libs项目下的修改，必须先运行对应的build命令编译好
 pnpm --filter config build
+
+# 在某个项目下运行特定的脚本也可以使用cd进入项目后运行pnpm对应命令
+cd config
+pnpm build
 
 ```
 
