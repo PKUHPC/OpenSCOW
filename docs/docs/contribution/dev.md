@@ -28,11 +28,14 @@ title: 开发
 - [docker compose](https://docs.docker.com/compose/install/)
 - [volta](https://volta.sh/)：管理node环境
 - [pnpm](https://pnpm.io/pnpm-cli)：推荐standalone安装
+- [buf](https://docs.buf.build/installation)：管理protobuf文件
 
 无需手动安装node。volta将会在第一次运行npm或者node命令时自动安装对应工具的对应版本。
 
+我们推荐使用[Visual Studio Code](https://code.visualstudio.com/)作为开发环境。仓库中有.vscode目录用于预先配置部分VSCode的开发环境。
+
 要开始开发：
-ml
+
 ```bash
 # clone仓库
 git clone %REPO_URL%
@@ -123,8 +126,6 @@ pnpm devenv:stop
 ## 代码风格检查
 
 项目使用[eslint](https://eslint.org)进行代码风格规范和检查。eslint的配置采用[`@ddadaal/eslint-config`](https://github.com/ddadaal/eslint-config)。
-
-项目使用[protolint](https://github.com/yoheimuta/protolint)对proto文件进行代码风格规范和检查。eslint的配置请参考protolint的官方文档以及仓库下的`.protolint.yaml`文件。建议安装对应的编辑器插件以在编译时获取proto文件检查结果。
 
 项目使用[husky](https://github.com/typicode/husky)设置了一个`pre-commit`的git hook，在提交前运行以上的代码风格检查，如果代码风格检查没有通过则无法commit。
 
