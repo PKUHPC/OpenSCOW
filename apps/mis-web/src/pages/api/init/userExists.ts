@@ -12,7 +12,7 @@
 
 import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
-import { InitServiceClient } from "src/generated/server/init";
+import { InitServiceClient } from "@scow/protos/build/server/init";
 import { getClient } from "src/utils/client";
 import { publicConfig } from "src/utils/config";
 
