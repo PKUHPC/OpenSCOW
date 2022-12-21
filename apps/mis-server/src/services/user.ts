@@ -340,7 +340,8 @@ export const userServiceServer = plugin((server) => {
           }
         });
       // insert public key
-      await insertKeyToNewUser(identityId, password, server.logger);
+      await insertKeyToNewUser(identityId, password, server.logger)
+      .catch(()=>{});
 
       return [{ id: user.id }];
     },
