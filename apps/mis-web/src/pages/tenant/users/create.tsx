@@ -56,11 +56,11 @@ const CreateUserPageForm: React.FC = () => {
         onOk: async () => {
           await api.createUser({ body: { email, identityId, name, password } })
             .httpError(409, () => {
-                modal.error({
-                  title: "添加失败",
-                  content: "此用户存在于scow数据库",
-                  okText: "确认",
-                });
+              modal.error({
+                title: "添加失败",
+                content: "此用户存在于scow数据库",
+                okText: "确认",
+              });
             })
             .then(() => { 
               message.success("添加完成！"); })
