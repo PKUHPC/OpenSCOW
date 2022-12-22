@@ -43,6 +43,8 @@ export const WebAppConfigSchema = Type.Object({
 export type WebAppConfigSchema = Static<typeof WebAppConfigSchema>;
 
 export const VncAppConfigSchema = Type.Object({
+  beforeScript: Type.Optional(Type.String({ description: "启动应用之前的准备命令。具体参考文档" })),
+
   xstartup: Type.String({ description: "启动此app的xstartup脚本" }),
 });
 
