@@ -38,7 +38,7 @@ web:
     export CONFIG_FILE="${PWD}/config.py"
     export SLURM_COMPUTE_NODE_IP=$(get_ip)
 
-  # 运行任务的脚本。可以使用准备脚本定义的
+  # 运行任务的脚本。可以使用准备脚本定义的变量
   script: |
     (
     umask 077
@@ -63,12 +63,7 @@ web:
       password: "{{ PASSWORD }}"
 ```
 
-增加了此文件后，运行以下命令重启portal-web和portal-server。
-
-```bash
-./compose.sh restart portal-web portal-server
-```
-
+增加了此文件后，刷新即可。
 
 对于Jupyter，export以下变量的含义是：
 
