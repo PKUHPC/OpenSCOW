@@ -349,8 +349,8 @@ export const mockApi: MockApi<typeof api> = {
   changePasswordAsTenantAdmin: async () => null,
   createUser: async () => (
     { id: 1,
-      createdInAuth: false
-   }),
+      createdInAuth: false,
+    }),
   createTenant: async () => null,
   validateToken: async () => MOCK_USER_INFO,
 };

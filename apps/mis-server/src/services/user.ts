@@ -350,7 +350,7 @@ export const userServiceServer = plugin((server) => {
       return [{ 
         createdInAuth: createdInAuth,
         id: user.id,
-       }];
+      }];
     },
 
     deleteUser: async ({ request, em }) => {
