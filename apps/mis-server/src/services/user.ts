@@ -347,7 +347,10 @@ export const userServiceServer = plugin((server) => {
       await insertKeyToNewUser(identityId, password, server.logger)
         .catch(() => {});
 
-      return [{ createdInAuth: createdInAuth }];
+      return [{ 
+        createdInAuth: createdInAuth,
+        id: user.id,
+       }];
     },
 
     deleteUser: async ({ request, em }) => {

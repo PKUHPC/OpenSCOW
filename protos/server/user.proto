@@ -160,7 +160,8 @@ message CreateUserRequest {
 message CreateUserReply {
   // The id of the new user
   // Must be monotonically increasing
-  bool created_in_auth = 1;
+  uint32 id = 1;
+  bool created_in_auth = 2;
 }
 
 message DeleteUserRequest {
