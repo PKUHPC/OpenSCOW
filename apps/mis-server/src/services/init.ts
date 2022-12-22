@@ -76,6 +76,8 @@ export const initServiceServer = plugin((server) => {
             server.logger.warn(`User with userId ${ userId }  exists in auth.`);
             return false; 
           }
+          // 回滚数据库
+          await em.removeAndFlush(user),
           server.logger.error("Error creating user in auth.", e);
           throw <ServiceError> { code: Status.INTERNAL, message: `Error creating user ${user.id} in auth.` }; 
         });
