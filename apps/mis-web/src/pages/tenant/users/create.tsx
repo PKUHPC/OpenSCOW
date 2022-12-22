@@ -62,8 +62,14 @@ const CreateUserPageForm: React.FC = () => {
                 okText: "确认",
               });
             })
-            .then(() => { 
-              message.success("添加完成！"); })
+            .then((createdInAuth) => { 
+              !createdInAuth.createdInAuth ? 
+                modal.info({
+                  title: "添加成功",
+                  content: "此用户存在于认证系统中，已成功添加到SCOW数据库",
+                  okText: "确认",
+                })
+                : message.success("添加完成！"); })
             .catch(() => {               
               modal.error({
                 title: "添加失败",
