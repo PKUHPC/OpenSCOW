@@ -69,7 +69,12 @@ export const initServiceServer = plugin((server) => {
       const createdInAuth = await createUser(misConfig.authUrl,
         { identityId: user.userId, id: user.id, mail: user.email, name: user.name, password },
         server.logger)
-        .then(() => true)
+        .then(async () => {
+          // 插入公钥失败也认为是创建用户成功
+          await insertKeyToNewUser(userId, password, server.logger)
+            .catch(() => null);
+          return true;
+        })
         // If the call of creating user of auth fails,  delete the user created in the database.
         .catch(async (e) => {
           if (e.status === 409) {
@@ -81,10 +86,6 @@ export const initServiceServer = plugin((server) => {
           server.logger.error("Error creating user in auth.", e);
           throw <ServiceError> { code: Status.INTERNAL, message: `Error creating user ${user.id} in auth.` }; 
         });
-      
-      // 插入公钥失败也认为是创建用户成功
-      await insertKeyToNewUser(userId, password, server.logger)
-        .catch(() => null);
 
       return [{ createdInAuth: createdInAuth }];
     },
