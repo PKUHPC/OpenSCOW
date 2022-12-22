@@ -13,6 +13,7 @@
 import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { status } from "@grpc/grpc-js";
+import { traceDeprecation } from "process";
 import { authenticate } from "src/auth/server";
 import { UserServiceClient } from "src/generated/server/user";
 import { PlatformRole, UserRole } from "src/models/User";
@@ -38,7 +39,9 @@ export interface CreateUserSchema {
   }
 
   responses: {
-    204: null;
+    200: {
+      createdInAuth: boolean;
+    };
 
     400: {
       code: "PASSWORD_NOT_VALID";
@@ -86,7 +89,7 @@ export default /* #__PURE__*/route<CreateUserSchema>("CreateUserSchema", async (
     password,
     tenantName: info.tenant,
   })
-    .then(() => ({ 204: null }))
+    .then((res) => ({ 200: { createdInAuth: res.createdInAuth } }))
     .catch(handlegRPCError({
       [status.ALREADY_EXISTS]: () => ({ 409: null }),
     }));

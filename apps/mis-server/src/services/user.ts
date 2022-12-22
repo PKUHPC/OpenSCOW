@@ -325,24 +325,34 @@ export const userServiceServer = plugin((server) => {
             message: `Error creating user with userId ${identityId} in database.` };
         });
       // call auth
-      await createUser(misConfig.authUrl,
+      const createdInAuth = await createUser(misConfig.authUrl,
         { identityId: user.userId, id: user.id, mail: user.email, name: user.name, password },
         server.logger)
+        .then(async () => {
+          // insert public key
+          await insertKeyToNewUser(identityId, password, server.logger)
+            .catch(() => {});
+          return true;
+        })
         // If the call of creating user of auth fails,  delete the user created in the database.
         .catch(async (e) => {
           if (e.status === 409) {
             server.logger.warn("User exists in auth.");
+            return false;
           } else {
+            // 回滚数据库
+            await em.removeAndFlush(user);
             server.logger.error("Error creating user in auth.", e);
             throw <ServiceError> { 
               code: Status.INTERNAL, 
               message: `Error creating user with userId ${identityId} in auth.` }; 
           }
         });
-      // insert public key
-      await insertKeyToNewUser(identityId, password, server.logger);
 
-      return [{ id: user.id }];
+      return [{ 
+        createdInAuth: createdInAuth,
+        id: user.id,
+      }];
     },
 
     deleteUser: async ({ request, em }) => {
