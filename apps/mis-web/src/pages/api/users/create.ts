@@ -38,7 +38,9 @@ export interface CreateUserSchema {
   }
 
   responses: {
-    204: null;
+    200: {
+      createdInAuth: boolean;
+    };
 
     400: {
       code: "PASSWORD_NOT_VALID";
@@ -86,7 +88,7 @@ export default /* #__PURE__*/route<CreateUserSchema>("CreateUserSchema", async (
     password,
     tenantName: info.tenant,
   })
-    .then(() => ({ 204: null }))
+    .then((res) => ({ 200: { createdInAuth: res.createdInAuth } }))
     .catch(handlegRPCError({
       [status.ALREADY_EXISTS]: () => ({ 409: null }),
     }));

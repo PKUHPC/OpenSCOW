@@ -36,7 +36,7 @@ web:
     export PORT=$(get_port)
     export PASSWORD=$(get_password 12)
 
-  # 运行任务的脚本。可以使用准备脚本定义的
+  # 运行任务的脚本。可以使用准备脚本定义的变量
   script: |
     PASSWORD=$PASSWORD code-server -vvv --bind-addr 0.0.0.0:$PORT --auth password
 
@@ -48,8 +48,4 @@ web:
       password: "{{ PASSWORD }}"
 ```
 
-增加了此文件后，运行以下命令重启portal-web和portal-server。
-
-```bash
-./compose.sh restart portal-web portal-server
-```
+增加了此文件后，刷新即可。
