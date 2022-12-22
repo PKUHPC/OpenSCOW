@@ -51,7 +51,9 @@ const CreateUserPageForm: React.FC = () => {
         title: result.existsInAuth !== undefined ? 
           result.existsInAuth ? "用户已存在于认证系统" : "用户未存在于认证系统"
           : "无法确定用户是否存在于认证系统",
-        content: result.existsInAuth ? "点击“确认”将会将此用户直接添加到SCOW数据库" : "点击“确认”将会同时在SCOW数据库和认证系统创建此用户",
+        content: result.existsInAuth ? 
+          "用户已经在认证系统中存在，您此处输入的密码将会不起作用，新用户的密码将是认证系统中的已有用户的当前密码。点击“确认”将会将此用户直接添加到SCOW数据库," 
+          : "点击“确认”将会同时在SCOW数据库和认证系统创建此用户",
         okText: "确认",
         onOk: async () => {
           await api.createUser({ body: { email, identityId, name, password } })
