@@ -153,4 +153,5 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           file: dockerfiles/Dockerfile.${{ matrix.file }}
           labels: ${{ steps.meta.outputs.labels }}
-          platforms: linux/amd64,linux/arm64
+          # only build arm64 in master commits
+          platforms: linux/amd64${{ github.ref == 'refs/heads/master' && ',linux/arm64' || '' }}
