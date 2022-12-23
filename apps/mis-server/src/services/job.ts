@@ -16,6 +16,12 @@ import { Status } from "@grpc/grpc-js/build/src/constants";
 import { FilterQuery, QueryOrder, UniqueConstraintViolationException } from "@mikro-orm/core";
 import { MySqlDriver, SqlEntityManager } from "@mikro-orm/mysql";
 import { Decimal, decimalToMoney, moneyToNumber } from "@scow/lib-decimal";
+import {
+  GetJobsResponse,
+  JobBillingItem,
+  JobFilter,
+  JobInfo, JobServiceServer, JobServiceService,
+} from "@scow/protos/build/server/job";
 import { charge, pay } from "src/bl/charging";
 import { misConfig } from "src/config/mis";
 import { Account } from "src/entities/Account";
@@ -23,12 +29,6 @@ import { JobInfo as JobInfoEntity } from "src/entities/JobInfo";
 import { JobPriceChange } from "src/entities/JobPriceChange";
 import { AmountStrategy, JobPriceItem } from "src/entities/JobPriceItem";
 import { Tenant } from "src/entities/Tenant";
-import {
-  GetJobsReply,
-  JobBillingItem,
-  JobFilter,
-  JobInfo, JobServiceServer, JobServiceService,
-} from "src/generated/server/job";
 import { getActiveBillingItems } from "src/plugins/price";
 import { paginationProps } from "src/utils/orm";
 
@@ -49,10 +49,10 @@ function toGrpc(x: JobInfoEntity) {
     nodesReq: x.nodesReq,
     partition: x.partition,
     qos: x.qos,
-    recordTime: x.recordTime,
-    timeEnd: x.timeEnd,
-    timeStart: x.timeStart,
-    timeSubmit: x.timeSubmit,
+    recordTime: x.recordTime.toISOString(),
+    timeEnd: x.timeEnd.toISOString(),
+    timeStart: x.timeStart.toISOString(),
+    timeSubmit: x.timeSubmit.toISOString(),
     timeUsed: x.timeUsed,
     timeWait: x.timeWait,
     timelimit: x.timelimit,
@@ -115,7 +115,7 @@ export const jobServiceServer = plugin((server) => {
         jobs: jobs.map(toGrpc),
         totalAccountPrice: decimalToMoney(new Decimal(total_account_price)),
         totalTenantPrice: decimalToMoney(new Decimal(total_tenant_price)),
-      } as GetJobsReply;
+      } as GetJobsResponse;
 
       return [reply];
     },
@@ -322,7 +322,7 @@ export const jobServiceServer = plugin((server) => {
         path: item.path.join("."),
         tenantName: item.tenant?.getProperty("name"),
         price: decimalToMoney(item.price),
-        createTime: item.createTime,
+        createTime: item.createTime.toISOString(),
         amountStrategy: item.amount,
       });
 

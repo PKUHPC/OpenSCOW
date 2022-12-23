@@ -10,8 +10,8 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { JobBillingItem } from "@scow/protos/build/server/job";
 import { Table } from "antd";
-import { JobBillingItem } from "src/generated/server/job";
 import { compareDateTime, formatDateTime } from "src/utils/datetime";
 import { moneyToString } from "src/utils/money";
 

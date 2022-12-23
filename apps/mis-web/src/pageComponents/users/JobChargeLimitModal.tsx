@@ -11,11 +11,11 @@
  */
 
 import { ExclamationCircleOutlined } from "@ant-design/icons";
+import type { Money } from "@scow/protos/build/common/money";
 import { Form, InputNumber, Modal, Space } from "antd";
 import { useState } from "react";
 import { api } from "src/apis";
 import { ModalLink } from "src/components/ModalLink";
-import type { Money } from "src/generated/common/money";
 import { useMessage, useModal } from "src/layouts/prompts";
 import { moneyToString } from "src/utils/money";
 

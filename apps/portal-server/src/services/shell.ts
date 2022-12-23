@@ -13,8 +13,8 @@
 import { createWriterExtensions } from "@ddadaal/tsgrpc-common";
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError, status } from "@grpc/grpc-js";
+import { ShellServiceServer, ShellServiceService } from "@scow/protos/build/portal/shell";
 import { quote } from "shell-quote";
-import { ShellServiceServer, ShellServiceService } from "src/generated/portal/shell";
 import { clusterNotFound } from "src/utils/errors";
 import { pipeline } from "src/utils/pipeline";
 import { getClusterLoginNode, sshConnect } from "src/utils/ssh";

@@ -14,8 +14,8 @@ import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Server } from "@ddadaal/tsgrpc-server";
 import { ChannelCredentials } from "@grpc/grpc-js";
 import { decimalToMoney } from "@scow/lib-decimal";
+import { GetTenantInfoResponse, TenantServiceClient } from "@scow/protos/build/server/tenant";
 import { createServer } from "src/app";
-import { GetTenantInfoReply, TenantServiceClient } from "src/generated/server/tenant";
 import { InitialData, insertInitialData } from "tests/data/data";
 import { dropDatabase } from "tests/data/helpers";
 
@@ -49,7 +49,7 @@ it("gets tenant info", async () => {
     userCount: 2,
     balance: decimalToMoney(data.tenant.balance),
     admins: [data.userA].map((x) => ({ userId: x.id + "", userName: x.name })),
-  } as GetTenantInfoReply);
+  } as GetTenantInfoResponse);
 });
 
 it("gets all tenants", async () => {

@@ -10,6 +10,8 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { Money } from "@scow/protos/build/common/money";
+import { JobInfo } from "@scow/protos/build/server/job";
 import { Button, DatePicker, Divider, Form, Input, InputNumber, Space, Table } from "antd";
 import dayjs from "dayjs";
 import React, { useCallback, useMemo, useRef, useState } from "react";
@@ -18,8 +20,6 @@ import { api } from "src/apis";
 import { ClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer, FilterFormTabs } from "src/components/FilterFormContainer";
 import { TableTitle } from "src/components/TableTitle";
-import { Money } from "src/generated/common/money";
-import { JobInfo } from "src/generated/server/job";
 import { HistoryJobDrawer } from "src/pageComponents/job/HistoryJobDrawer";
 import { JobPriceChangeModal } from "src/pageComponents/tenant/JobPriceChangeModal";
 import type { GetJobFilter, GetJobInfoSchema } from "src/pages/api/job/jobInfo";

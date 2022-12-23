@@ -14,8 +14,8 @@ import { asyncReplyStreamCall } from "@ddadaal/tsgrpc-client";
 import { Server } from "@ddadaal/tsgrpc-server";
 import { credentials, status } from "@grpc/grpc-js";
 import { sftpReadFile } from "@scow/lib-ssh";
+import { DownloadResponse, FileServiceClient } from "@scow/protos/build/portal/file";
 import { createServer } from "src/app";
-import { DownloadResponse, FileServiceClient } from "src/generated/portal/file";
 import { actualPath, cluster, connectToTestServer,
   createFile, createTestItems, expectGrpcThrow, resetTestServer, TestSshServer, userId } from "tests/file/utils";
 

@@ -11,7 +11,16 @@
 
 FROM node:hydrogen-alpine@sha256:a136ed7b0df71082cdb171f36d640ea3b392a5c70401c642326acee767b8c540 AS base
 
-RUN apk update && apk add libc6-compat python3 make gcc g++
+RUN apk update && apk add libc6-compat python3 make gcc g++ curl
+
+ARG BUF_VERSION="1.11.0"
+
+RUN BIN="/usr/local/bin" && \
+VERSION="${BUF_VERSION}" && \
+  curl -sSL \
+    "https://github.com/bufbuild/buf/releases/download/v${VERSION}/buf-$(uname -s)-$(uname -m)" \
+    -o "${BIN}/buf" && \
+  chmod +x "${BIN}/buf"
 
 RUN corepack enable
 
@@ -36,7 +45,7 @@ COPY .npmrc ./
 RUN pnpm i --offline --frozen-lockfile
 
 COPY --from=pruner /app/out/full/ .
-COPY tsconfig.json .eslintrc.json turbo.json ./
+COPY tsconfig.json .eslintrc.json turbo.json buf.gen.yaml buf.work.yaml ./
 COPY protos ./protos
 
 ARG BASE_PATH=""

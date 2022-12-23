@@ -12,14 +12,14 @@
 
 import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
+import { GetAllTenantsResponse, TenantServiceClient } from "@scow/protos/build/server/tenant";
 import { authenticate } from "src/auth/server";
-import { GetAllTenantsReply, TenantServiceClient } from "src/generated/server/tenant";
 import { PlatformRole } from "src/models/User";
 import { getClient } from "src/utils/client";
 export interface GetAllTenantsSchema {
     method: "GET";
     responses: {
-        200: GetAllTenantsReply;
+        200: GetAllTenantsResponse;
     }
 }
 const auth = authenticate((info) => info.platformRoles.includes(PlatformRole.PLATFORM_ADMIN));

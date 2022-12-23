@@ -13,8 +13,8 @@
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { Server } from "@ddadaal/tsgrpc-server";
 import { credentials, status } from "@grpc/grpc-js";
+import { FileInfo, FileInfo_FileType, FileServiceClient } from "@scow/protos/build/portal/file";
 import { createServer } from "src/app";
-import { FileInfo, FileInfo_FileType, FileServiceClient } from "src/generated/portal/file";
 import { actualPath, cluster, connectToTestServer,
   createTestItems, expectGrpcThrow, resetTestServer, TestSshServer, userId } from "tests/file/utils";
 

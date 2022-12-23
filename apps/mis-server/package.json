@@ -5,11 +5,9 @@
   "main": "index.js",
   "scripts": {
     "dev": "dotenv -e env/.env.dev -- npx nodemon --watch src -e ts,tsx --exec npx ts-node -r tsconfig-paths/register src/index.ts",
-    "build": "pnpm prepareDev && rimraf build && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
+    "build": "rimraf build && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
     "serve": "node build/index.js",
     "test": "jest",
-    "prepareDev": "pnpm protos",
-    "protos": "tsgrpc-cli protos",
     "orm": "dotenv -e env/.env.dev -- npx mikro-orm"
   },
   "files": [
@@ -36,13 +34,13 @@
     "@scow/lib-config": "workspace:*",
     "@sinclair/typebox": "0.25.13",
     "@scow/lib-auth": "workspace:*",
+    "@scow/protos": "workspace:*",
     "dotenv": "16.0.3",
     "node-cron": "3.0.2",
     "uuid": "9.0.0",
     "wait-on": "7.0.1"
   },
   "devDependencies": {
-    "@ddadaal/tsgrpc-cli": "0.14.3",
     "@types/google-protobuf": "3.15.6",
     "@types/node-cron": "3.0.6",
     "@types/wait-on": "5.3.1"

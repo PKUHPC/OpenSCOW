@@ -13,9 +13,9 @@
 import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { status } from "@grpc/grpc-js";
+import { Money } from "@scow/protos/build/common/money";
+import { JobServiceClient } from "@scow/protos/build/server/job";
 import { authenticate } from "src/auth/server";
-import { Money } from "src/generated/common/money";
-import { JobServiceClient } from "src/generated/server/job";
 import { AmountStrategy } from "src/models/job";
 import { PlatformRole, TenantRole } from "src/models/User";
 import { getClient } from "src/utils/client";

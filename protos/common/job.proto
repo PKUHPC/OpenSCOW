@@ -12,7 +12,7 @@
 
 syntax = "proto3";
 
-package scow.common.job;
+package scow.common;
 
 message RunningJob {
   string job_id = 1;

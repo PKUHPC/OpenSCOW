@@ -11,10 +11,10 @@
  */
 
 import { asyncRequestStreamCall } from "@ddadaal/tsgrpc-client";
+import { FileServiceClient } from "@scow/protos/build/portal/file";
 import busboy, { BusboyEvents } from "busboy";
 import { once } from "events";
 import { authenticate } from "src/auth/server";
-import { FileServiceClient } from "src/generated/portal/file";
 import { getClient } from "src/utils/client";
 import { pipeline } from "src/utils/pipeline";
 import { route } from "src/utils/route";

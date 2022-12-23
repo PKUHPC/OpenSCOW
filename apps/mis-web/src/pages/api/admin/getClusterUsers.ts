@@ -12,8 +12,8 @@
 
 import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
+import { AdminServiceClient, GetClusterUsersResponse } from "@scow/protos/build/server/admin";
 import { authenticate } from "src/auth/server";
-import { AdminServiceClient, GetClusterUsersReply } from "src/generated/server/admin";
 import { PlatformRole } from "src/models/User";
 import { getClient } from "src/utils/client";
 import { queryIfInitialized } from "src/utils/init";
@@ -27,7 +27,7 @@ export interface GetClusterUsersSchema {
   }
 
   responses: {
-    200: GetClusterUsersReply;
+    200: GetClusterUsersResponse;
   }
 }
 

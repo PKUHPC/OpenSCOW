@@ -12,11 +12,11 @@
 
 import { JsonFetchResultPromiseLike } from "@ddadaal/next-typed-api-routes-runtime/lib/client";
 import { numberToMoney } from "@scow/lib-decimal";
+import type { RunningJob } from "@scow/protos/build/common/job";
+import type { Account } from "@scow/protos/build/server/account";
+import { JobInfo } from "@scow/protos/build/server/job";
+import type { AccountUserInfo, GetUserStatusResponse } from "@scow/protos/build/server/user";
 import { api } from "src/apis/api";
-import type { RunningJob } from "src/generated/common/job";
-import type { Account } from "src/generated/server/account";
-import { JobInfo } from "src/generated/server/job";
-import type { AccountUserInfo, GetUserStatusReply } from "src/generated/server/user";
 import { PlatformRole, TenantRole, UserInfo, UserRole, UserStatus } from "src/models/User";
 import { DEFAULT_TENANT_NAME } from "src/utils/constants";
 
@@ -134,45 +134,45 @@ export const mockApi: MockApi<typeof api> = {
       ],
     }),
 
-  getAllUsers: async () => ({ 
+  getAllUsers: async () => ({
     totalCount: 3,
     platformUsers: [
       {
-        userId: "123", 
-        name: "testuser", 
-        createTime: "2022-10-05T23:49:50.000Z", 
-        platformRoles: [PlatformRole.PLATFORM_FINANCE, PlatformRole.PLATFORM_ADMIN],
-      },
-      { 
-        userId: "test01", 
-        name: "test01", 
-        createTime: "2022-10-05T23:49:50.000Z", 
+        userId: "123",
+        name: "testuser",
+        createTime: "2022-10-05T23:49:50.000Z",
         platformRoles: [PlatformRole.PLATFORM_FINANCE, PlatformRole.PLATFORM_ADMIN],
       },
       {
-        userId: "test02", 
-        name: "test02", 
-        createTime: "2022-10-05T23:49:50.000Z", 
+        userId: "test01",
+        name: "test01",
+        createTime: "2022-10-05T23:49:50.000Z",
+        platformRoles: [PlatformRole.PLATFORM_FINANCE, PlatformRole.PLATFORM_ADMIN],
+      },
+      {
+        userId: "test02",
+        name: "test02",
+        createTime: "2022-10-05T23:49:50.000Z",
         platformRoles: [PlatformRole.PLATFORM_FINANCE],
       },
       {
-        userId: "test03", 
-        name: "test03", 
-        createTime: "2022-10-05T23:49:50.000Z", 
+        userId: "test03",
+        name: "test03",
+        createTime: "2022-10-05T23:49:50.000Z",
         platformRoles: [],
       },
     ],
   }),
-  
+
   userExists: async () => ({
     existsInScow: false,
     existsInAuth: false,
   }),
-  
+
   setPlatformRole: async () => ({ executed: true }),
 
   unsetPlatformRole: async () => ({ executed: false }),
-  
+
   setTenantRole: async () => ({ executed: true }),
 
   unsetTenantRole: async () => ({ executed: false }),
@@ -226,9 +226,9 @@ export const mockApi: MockApi<typeof api> = {
           included: true,
         },
       ],
-      users: [ 
-        { userId: "user1", userName: "user1", accounts: [ "a_user1" ], included: false }, 
-        { userId: "user2", userName: "user2", accounts: [ "a_user1", "account2" ], included: false }, 
+      users: [
+        { userId: "user1", userName: "user1", accounts: [ "a_user1" ], included: false },
+        { userId: "user2", userName: "user2", accounts: [ "a_user1", "account2" ], included: false },
         { userId: "user3", userName: "user3", accounts: [ "account2" ], included: false },
         { userId: "user4", userName: "user4", accounts: [ "a_user4" ], included: true },
       ],
@@ -370,7 +370,7 @@ export const MOCK_USER_INFO = {
   ],
 } as UserInfo;
 
-export const MOCK_USER_STATUS: GetUserStatusReply = {
+export const MOCK_USER_STATUS: GetUserStatusResponse = {
   storageQuotas: {
     "WM2": 100,
     "WM1": 200,

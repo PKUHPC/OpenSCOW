@@ -10,8 +10,8 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import type { RunningJob } from "@scow/protos/build/common/job";
 import dayjs from "dayjs";
-import type { RunningJob } from "src/generated/common/job";
 import type { Cluster } from "src/utils/config";
 
 
@@ -93,4 +93,4 @@ export function parseTime(time: string) {
 }
 
 
-  
+

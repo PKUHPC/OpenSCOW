@@ -13,8 +13,8 @@
 import { asyncDuplexStreamCall } from "@ddadaal/tsgrpc-client";
 import { Server } from "@ddadaal/tsgrpc-server";
 import { credentials } from "@grpc/grpc-js";
+import { ShellResponse, ShellServiceClient } from "@scow/protos/build/portal/shell";
 import { createServer } from "src/app";
-import { ShellResponse, ShellServiceClient } from "src/generated/portal/shell";
 import { cluster, collectInfo, connectToTestServer,
   createTestItems, resetTestServer, TestSshServer, userId } from "tests/file/utils";
 

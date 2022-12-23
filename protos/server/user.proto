@@ -35,7 +35,7 @@ message AccountStatus {
   common.Money balance = 5;
 }
 
-message GetUserStatusReply {
+message GetUserStatusResponse {
   // account and its status
   map<string, AccountStatus> account_statuses = 1;
   // cluster and quota
@@ -48,7 +48,7 @@ message QueryUsedStorageQuotaRequest {
   string cluster = 3;
 }
 
-message QueryUsedStorageQuotaReply {
+message QueryUsedStorageQuotaResponse {
   uint64 used = 1;
 }
 
@@ -68,7 +68,7 @@ message AccountUserInfo {
   optional common.Money used_job_charge_limit = 7;
 }
 
-message GetAccountUsersReply {
+message GetAccountUsersResponse {
   repeated AccountUserInfo results = 1;
 }
 
@@ -78,7 +78,7 @@ message QueryIsUserInAccountRequest {
   string account_name = 3;
 }
 
-message QueryIsUserInAccountReply {
+message QueryIsUserInAccountResponse {
   bool result = 1;
 }
 
@@ -90,7 +90,7 @@ message UnblockUserInAccountRequest {
 
 // NOT_FOUND: user_id or account_name is not found.
 // FAILED_PRECONDITION: user is already unblocked
-message UnblockUserInAccountReply {
+message UnblockUserInAccountResponse {
 }
 
 message BlockUserInAccountRequest {
@@ -101,7 +101,7 @@ message BlockUserInAccountRequest {
 
 // NOT_FOUND: user_id or account_name is not found.
 // FAILED_PRECONDITION: user is already blocked
-message BlockUserInAccountReply {
+message BlockUserInAccountResponse {
 }
 
 message RemoveUserFromAccountRequest {
@@ -112,7 +112,7 @@ message RemoveUserFromAccountRequest {
 
 // NOT_FOUND: user_id is not found.
 // OUT_OF_RANGE: user is the owner of the account
-message RemoveUserFromAccountReply {
+message RemoveUserFromAccountResponse {
 }
 
 message AddUserToAccountRequest {
@@ -123,7 +123,7 @@ message AddUserToAccountRequest {
 
 // ALREADY_EXISTS: user already in the account
 // NOT_FOUND: account is not found.
-message AddUserToAccountReply {
+message AddUserToAccountResponse {
 }
 
 message SetAsAdminRequest {
@@ -134,7 +134,7 @@ message SetAsAdminRequest {
 
 // FAILED_PRECONDITION: the user is already admin
 // NOT_FOUND: user is not found.
-message SetAsAdminReply {
+message SetAsAdminResponse {
 }
 
 message UnsetAdminRequest {
@@ -145,7 +145,7 @@ message UnsetAdminRequest {
 
 // FAILED_PRECONDITION: the user is already not admin
 // NOT_FOUND: user is not found.
-message UnsetAdminReply {
+message UnsetAdminResponse {
 }
 
 message CreateUserRequest {
@@ -157,7 +157,7 @@ message CreateUserRequest {
 }
 
 // ALREADY_EXISTS: user with id already exists
-message CreateUserReply {
+message CreateUserResponse {
   // The id of the new user
   // Must be monotonically increasing
   uint32 id = 1;
@@ -171,7 +171,7 @@ message DeleteUserRequest {
 
 // FAILED_PRECONDITION: the user is an owner of an account.
 // NOT_FOUND: user is not found
-message DeleteUserReply {
+message DeleteUserResponse {
 }
 
 message GetNameRequest {
@@ -180,7 +180,7 @@ message GetNameRequest {
 }
 
 // NOT_FOUND: user is not found
-message GetNameReply {
+message GetNameResponse {
   string name = 1;
 }
 
@@ -224,7 +224,7 @@ enum TenantRole {
   TENANT_FINANCE = 1;
 }
 
-message GetUserInfoReply {
+message GetUserInfoResponse {
   repeated AccountAffiliation affiliations = 1;
   repeated PlatformRole platform_roles = 2;
   repeated TenantRole tenant_roles = 3;
@@ -232,7 +232,7 @@ message GetUserInfoReply {
   string tenant_name = 5;
 }
 
-message GetUsersReply {
+message GetUsersResponse {
   repeated User users = 1;
 }
 
@@ -248,7 +248,7 @@ message GetAllUsersRequest {
   optional uint64 page_size = 2;
 }
 
-message GetAllUsersReply {
+message GetAllUsersResponse {
   uint64 total_count = 1;
   repeated PlatformUserInfo platform_users = 2;
 }
@@ -260,7 +260,7 @@ message SetPlatformRoleRequest {
 
 // FAILED_PRECONDITION: the user is already this role(role_type)
 // NOT_FOUND: user is not found.
-message SetPlatformRoleReply {
+message SetPlatformRoleResponse {
 }
 
 message UnsetPlatformRoleRequest {
@@ -270,7 +270,7 @@ message UnsetPlatformRoleRequest {
 
 // FAILED_PRECONDITION: the user is already not this role(role_type)
 // NOT_FOUND: user is not found.
-message UnsetPlatformRoleReply {
+message UnsetPlatformRoleResponse {
 }
 
 message SetTenantRoleRequest {
@@ -280,7 +280,7 @@ message SetTenantRoleRequest {
 
 // FAILED_PRECONDITION: the user is already this role(role_type)
 // NOT_FOUND: user is not found.
-message SetTenantRoleReply {
+message SetTenantRoleResponse {
 }
 
 message UnsetTenantRoleRequest {
@@ -290,37 +290,37 @@ message UnsetTenantRoleRequest {
 
 // FAILED_PRECONDITION: the user is already not this role(role_type)
 // NOT_FOUND: user is not found.
-message UnsetTenantRoleReply {
+message UnsetTenantRoleResponse {
 }
 
 service UserService {
 
-  rpc GetUsers(GetUsersRequest) returns (GetUsersReply);
+  rpc GetUsers(GetUsersRequest) returns (GetUsersResponse);
 
-  rpc GetUserInfo(GetUserInfoRequest) returns (GetUserInfoReply);
+  rpc GetUserInfo(GetUserInfoRequest) returns (GetUserInfoResponse);
 
-  rpc GetAllUsers(GetAllUsersRequest) returns (GetAllUsersReply);
+  rpc GetAllUsers(GetAllUsersRequest) returns (GetAllUsersResponse);
 
-  rpc GetAccountUsers(GetAccountUsersRequest) returns (GetAccountUsersReply);
+  rpc GetAccountUsers(GetAccountUsersRequest) returns (GetAccountUsersResponse);
   rpc QueryIsUserInAccount(QueryIsUserInAccountRequest)
-      returns (QueryIsUserInAccountReply);
-  rpc GetUserStatus(GetUserStatusRequest) returns (GetUserStatusReply);
+      returns (QueryIsUserInAccountResponse);
+  rpc GetUserStatus(GetUserStatusRequest) returns (GetUserStatusResponse);
   rpc QueryUsedStorageQuota(QueryUsedStorageQuotaRequest)
-      returns (QueryUsedStorageQuotaReply);
-  rpc CreateUser(CreateUserRequest) returns (CreateUserReply);
-  rpc DeleteUser(DeleteUserRequest) returns (DeleteUserReply);
-  rpc AddUserToAccount(AddUserToAccountRequest) returns (AddUserToAccountReply);
+      returns (QueryUsedStorageQuotaResponse);
+  rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
+  rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse);
+  rpc AddUserToAccount(AddUserToAccountRequest) returns (AddUserToAccountResponse);
   rpc RemoveUserFromAccount(RemoveUserFromAccountRequest)
-      returns (RemoveUserFromAccountReply);
+      returns (RemoveUserFromAccountResponse);
   rpc BlockUserInAccount(BlockUserInAccountRequest)
-      returns (BlockUserInAccountReply);
+      returns (BlockUserInAccountResponse);
   rpc UnblockUserInAccount(UnblockUserInAccountRequest)
-      returns (UnblockUserInAccountReply);
-  rpc SetAsAdmin(SetAsAdminRequest) returns (SetAsAdminReply);
-  rpc UnsetAdmin(UnsetAdminRequest) returns (UnsetAdminReply);
-  rpc GetName(GetNameRequest) returns (GetNameReply);
-  rpc SetPlatformRole(SetPlatformRoleRequest) returns (SetPlatformRoleReply);
-  rpc UnsetPlatformRole(UnsetPlatformRoleRequest) returns (UnsetPlatformRoleReply);
-  rpc SetTenantRole(SetTenantRoleRequest) returns (SetTenantRoleReply);
-  rpc UnsetTenantRole(UnsetTenantRoleRequest) returns (UnsetTenantRoleReply);
+      returns (UnblockUserInAccountResponse);
+  rpc SetAsAdmin(SetAsAdminRequest) returns (SetAsAdminResponse);
+  rpc UnsetAdmin(UnsetAdminRequest) returns (UnsetAdminResponse);
+  rpc GetName(GetNameRequest) returns (GetNameResponse);
+  rpc SetPlatformRole(SetPlatformRoleRequest) returns (SetPlatformRoleResponse);
+  rpc UnsetPlatformRole(UnsetPlatformRoleRequest) returns (UnsetPlatformRoleResponse);
+  rpc SetTenantRole(SetTenantRoleRequest) returns (SetTenantRoleResponse);
+  rpc UnsetTenantRole(UnsetTenantRoleRequest) returns (UnsetTenantRoleResponse);
 }

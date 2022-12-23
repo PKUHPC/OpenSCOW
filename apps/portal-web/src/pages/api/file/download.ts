@@ -11,10 +11,10 @@
  */
 
 import { asyncReplyStreamCall, asyncUnaryCall } from "@ddadaal/tsgrpc-client";
+import { FileServiceClient } from "@scow/protos/build/portal/file";
 import { contentType } from "mime-types";
 import { basename } from "path";
 import { authenticate } from "src/auth/server";
-import { FileServiceClient } from "src/generated/portal/file";
 import { getClient } from "src/utils/client";
 import { pipeline } from "src/utils/pipeline";
 import { route } from "src/utils/route";

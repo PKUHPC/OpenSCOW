@@ -13,6 +13,7 @@
 import { getAppConfigs } from "@scow/config/build/app";
 import { getPlaceholderKeys } from "@scow/lib-config/build/parse";
 import { sftpChmod, sftpExists, sftpReaddir, sftpReadFile, sftpRealPath, sftpWriteFile } from "@scow/lib-ssh";
+import { RunningJob } from "@scow/protos/build/common/job";
 import { randomUUID } from "crypto";
 import fs from "fs";
 import { join } from "path";
@@ -20,7 +21,6 @@ import { quote } from "shell-quote";
 import { AppOps, AppSession } from "src/clusterops/api/app";
 import { displayIdToPort } from "src/clusterops/slurm/bl/port";
 import { portalConfig } from "src/config/portal";
-import { RunningJob } from "src/generated/common/job";
 import { getClusterLoginNode, loggedExec, sshConnect } from "src/utils/ssh";
 import { parseDisplayId, refreshPassword, VNCSERVER_BIN_PATH } from "src/utils/turbovnc";
 

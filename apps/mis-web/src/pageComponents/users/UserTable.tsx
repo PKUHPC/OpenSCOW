@@ -11,12 +11,12 @@
  */
 
 import { ExclamationCircleOutlined } from "@ant-design/icons";
+import type { AccountUserInfo } from "@scow/protos/build/server/user";
 import { Divider, Space, Table, Tag } from "antd";
 import { LinkProps } from "next/link";
 import React from "react";
 import { api } from "src/apis";
 import { DisabledA } from "src/components/DisabledA";
-import type { AccountUserInfo } from "src/generated/server/user";
 import { useMessage, useModal } from "src/layouts/prompts";
 import { UserRole, UserStatus } from "src/models/User";
 import { SetJobChargeLimitLink } from "src/pageComponents/users/JobChargeLimitModal";

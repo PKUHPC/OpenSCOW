@@ -10,8 +10,8 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { JobInfo } from "@scow/protos/build/server/job";
 import { Descriptions, Drawer } from "antd";
-import { JobInfo } from "src/generated/server/job";
 import { formatDateTime } from "src/utils/datetime";
 import { moneyToString } from "src/utils/money";
 

@@ -12,8 +12,8 @@
 
 import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
+import { ChargingServiceClient } from "@scow/protos/build/server/charging";
 import { authenticate } from "src/auth/server";
-import { ChargingServiceClient } from "src/generated/server/charging";
 import { PlatformRole, TenantRole } from "src/models/User";
 import { getClient } from "src/utils/client";
 

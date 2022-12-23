@@ -28,11 +28,14 @@ title: 开发
 - [docker compose](https://docs.docker.com/compose/install/)
 - [volta](https://volta.sh/)：管理node环境
 - [pnpm](https://pnpm.io/pnpm-cli)：推荐standalone安装
+- [buf](https://docs.buf.build/installation)：管理protobuf文件
 
 无需手动安装node。volta将会在第一次运行npm或者node命令时自动安装对应工具的对应版本。
 
+我们推荐使用[Visual Studio Code](https://code.visualstudio.com/)作为开发环境。仓库中有.vscode目录用于预先配置部分VSCode的开发环境。
+
 要开始开发：
-ml
+
 ```bash
 # clone仓库
 git clone %REPO_URL%
@@ -71,14 +74,21 @@ pnpm start
 # 编译libs目录下的库
 pnpm build:libs
 
+# 修改proto文件后，重新生成proto对应的ts文件
+pnpm build:protos
+
 # 在某一个具体项目下运行特定的脚本
 # {项目名}请替换为项目package.json中name字段的@scow/后面的内容
 # 项目可以运行什么脚本请查看项目package.json中的scripts
-pnpm --filter {项目名} build
+pnpm --filter {项目名} build 
 
 # 如运行@scow/config项目的build命令（编译），则运行
 # 要想使用任何libs项目下的修改，必须先运行对应的build命令编译好
 pnpm --filter config build
+
+# 在某个项目下运行特定的脚本也可以使用cd进入项目后运行pnpm对应命令
+cd config
+pnpm build
 
 ```
 
@@ -123,8 +133,6 @@ pnpm devenv:stop
 ## 代码风格检查
 
 项目使用[eslint](https://eslint.org)进行代码风格规范和检查。eslint的配置采用[`@ddadaal/eslint-config`](https://github.com/ddadaal/eslint-config)。
-
-项目使用[protolint](https://github.com/yoheimuta/protolint)对proto文件进行代码风格规范和检查。eslint的配置请参考protolint的官方文档以及仓库下的`.protolint.yaml`文件。建议安装对应的编辑器插件以在编译时获取proto文件检查结果。
 
 项目使用[husky](https://github.com/typicode/husky)设置了一个`pre-commit`的git hook，在提交前运行以上的代码风格检查，如果代码风格检查没有通过则无法commit。
 

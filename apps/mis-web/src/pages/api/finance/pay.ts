@@ -13,8 +13,8 @@
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { moneyToNumber, numberToMoney } from "@scow/lib-decimal";
+import { ChargingServiceClient } from "@scow/protos/build/server/charging";
 import { authenticate } from "src/auth/server";
-import { ChargingServiceClient } from "src/generated/server/charging";
 import { TenantRole } from "src/models/User";
 import { ensureNotUndefined } from "src/utils/checkNull";
 import { getClient } from "src/utils/client";

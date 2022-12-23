@@ -31,7 +31,7 @@ message ChangeStorageQuotaRequest {
 
 // INVALID_ARGUMENT: change value is not valid.
 // NOT_FOUND: user_id or cluster is not found
-message ChangeStorageQuotaReply {
+message ChangeStorageQuotaResponse {
   uint64 current_quota = 1;
 }
 
@@ -41,7 +41,7 @@ message QueryStorageQuotaRequest {
 }
 
 // NOT_FOUND: cluster or userId is not found.
-message QueryStorageQuotaReply {
+message QueryStorageQuotaResponse {
   uint64 current_quota = 1;
 }
 
@@ -68,7 +68,7 @@ message ImportUsersRequest {
 }
 
 // INVAD_ARGUMENT: the data format is not acceptable
-message ImportUsersReply {
+message ImportUsersResponse {
   uint32 user_count = 1;
   uint32 account_count = 2;
   uint32 users_without_name = 3;
@@ -97,7 +97,7 @@ message GetClusterUsersRequest {
   string cluster = 1;
 }
 
-message GetClusterUsersReply {
+message GetClusterUsersResponse {
   repeated ClusterAccountInfo accounts = 1;
   repeated ClusterUserInfo users = 2;
 }
@@ -105,7 +105,7 @@ message GetClusterUsersReply {
 message GetFetchInfoRequest {
 }
 
-message GetFetchInfoReply {
+message GetFetchInfoResponse {
   bool fetch_started = 1;
   string schedule = 2;
   optional google.protobuf.Timestamp last_fetch_time = 3;
@@ -114,23 +114,23 @@ message GetFetchInfoReply {
 message SetFetchStateRequest {
   bool started = 1;
 }
-message SetFetchStateReply {
+message SetFetchStateResponse {
 }
 
 message FetchJobsRequest {
 }
-message FetchJobsReply {
+message FetchJobsResponse {
   uint32 new_jobs_count = 1;
 }
 
 service AdminService {
   rpc ChangeStorageQuota(ChangeStorageQuotaRequest)
-      returns (ChangeStorageQuotaReply);
+      returns (ChangeStorageQuotaResponse);
   rpc QueryStorageQuota(QueryStorageQuotaRequest)
-      returns (QueryStorageQuotaReply);
-  rpc ImportUsers(ImportUsersRequest) returns (ImportUsersReply);
-  rpc GetClusterUsers(GetClusterUsersRequest) returns (GetClusterUsersReply);
-  rpc GetFetchInfo(GetFetchInfoRequest) returns (GetFetchInfoReply);
-  rpc SetFetchState(SetFetchStateRequest) returns (SetFetchStateReply);
-  rpc FetchJobs(FetchJobsRequest) returns (FetchJobsReply);
+      returns (QueryStorageQuotaResponse);
+  rpc ImportUsers(ImportUsersRequest) returns (ImportUsersResponse);
+  rpc GetClusterUsers(GetClusterUsersRequest) returns (GetClusterUsersResponse);
+  rpc GetFetchInfo(GetFetchInfoRequest) returns (GetFetchInfoResponse);
+  rpc SetFetchState(SetFetchStateRequest) returns (SetFetchStateResponse);
+  rpc FetchJobs(FetchJobsRequest) returns (FetchJobsResponse);
 }

@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { JobTemplate } from "@scow/protos/build/portal/job";
 import { Button, Form, Space, Table } from "antd";
 import Link from "next/link";
 import React, { useCallback, useState } from "react";
@@ -18,7 +19,6 @@ import { useStore } from "simstate";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
-import { JobTemplate } from "src/generated/portal/job";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import type { Cluster } from "src/utils/config";
 

@@ -11,8 +11,8 @@
  */
 
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
-import { AccountServiceClient } from "src/generated/server/account";
-import { JobServiceClient } from "src/generated/server/job";
+import { AccountServiceClient } from "@scow/protos/build/server/account";
+import { JobServiceClient } from "@scow/protos/build/server/job";
 import { PlatformRole, TenantRole, UserInfo, UserRole } from "src/models/User";
 import { getClient } from "src/utils/client";
 

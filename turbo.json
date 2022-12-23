@@ -29,14 +29,38 @@
         "test/**/*.tsx"
       ]
     },
-    "//#lint:all": {
+    "@scow/protos#generate": {
+      "inputs": [
+        "../../protos",
+        "../../buf.gen.yaml"
+      ],
+      "outputs": [
+        "generated/**"
+      ]
+    },
+    "@scow/protos#build": {
+      "dependsOn": [
+        "^@scow/protos#generate"
+      ],
+      "inputs": [
+        "generated/**"
+      ],
+      "outputs": [
+        "build/**"
+      ]
+    },
+    "//#lint:ts": {
       "inputs": [
         "**/*.tsx",
-        "**/*.ts",
-        "protos"
+        "**/*.ts"
       ],
       "outputs": [
         ".eslintcache"
+      ]
+    },
+    "//#lint:protos": {
+      "inputs": [
+        "protos/**"
       ]
     }
   }

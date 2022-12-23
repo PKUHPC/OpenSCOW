@@ -13,8 +13,8 @@
 import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Status } from "@grpc/grpc-js/build/src/constants";
+import { AdminServiceClient } from "@scow/protos/build/server/admin";
 import { authenticate } from "src/auth/server";
-import { AdminServiceClient } from "src/generated/server/admin";
 import { TenantRole } from "src/models/User";
 import { getClient } from "src/utils/client";
 import { handlegRPCError } from "src/utils/server";

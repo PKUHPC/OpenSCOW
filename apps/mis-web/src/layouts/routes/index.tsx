@@ -16,8 +16,8 @@ import {
   InfoOutlined, MoneyCollectOutlined, PartitionOutlined,
   PlusOutlined, PlusSquareOutlined, UserAddOutlined,
   UserOutlined } from "@ant-design/icons";
+import { AccountAffiliation } from "@scow/protos/build/server/user";
 import React from "react";
-import { AccountAffiliation } from "src/generated/server/user";
 import Whitelist from "src/icons/whiteList.svg";
 import { NavItemProps } from "src/layouts/base/NavItemProps";
 import { NavIcon } from "src/layouts/icon";

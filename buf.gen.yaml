@@ -1,0 +1,12 @@
+version: v1
+plugins:
+  - remote: buf.build/stephenh/plugins/ts-proto
+    out: libs/protos/generated
+    opt:
+      - unrecognizedEnum=false
+      - useDate=string
+      - oneof=unions
+      - esModuleInterop=true
+      - useOptionals=messages
+      - outputServices=grpc-js
+

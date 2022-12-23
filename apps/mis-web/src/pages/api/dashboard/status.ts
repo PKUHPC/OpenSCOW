@@ -12,9 +12,9 @@
 
 import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
+import type { GetUserStatusResponse } from "@scow/protos/build/server/user";
+import { UserServiceClient } from "@scow/protos/build/server/user";
 import { authenticate } from "src/auth/server";
-import type { GetUserStatusReply } from "src/generated/server/user";
-import { UserServiceClient } from "src/generated/server/user";
 import { getClient } from "src/utils/client";
 
 export interface GetUserStatusSchema {
@@ -22,7 +22,7 @@ export interface GetUserStatusSchema {
   method: "GET";
 
   responses: {
-    200: GetUserStatusReply;
+    200: GetUserStatusResponse;
   }
 }
 

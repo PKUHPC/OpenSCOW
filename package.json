@@ -5,6 +5,7 @@
     "build": "turbo run build",
     "build:libs": "turbo run build --filter \"./libs/**\"",
     "build:images": "docker compose --env-file dev/.env.build -f dev/docker-compose.build.yml build",
+    "build:protos": "turbo run build --filter protos",
     "prepareDev": "pnpm build:libs && turbo run prepareDev",
     "prune": "pnpm clean --yes && pnpm bootstrap --ci -- --production",
     "devenv": "docker compose --env-file dev/.env.dev -f dev/docker-compose.dev.yml up -d",
@@ -12,14 +13,12 @@
     "test": "turbo run test",
     "test:ci": "pnpm run -r test --ci --coverage --runInBand",
     "prepare": "node -e \"try { require('husky').install() } catch (e) {if (e.code !== 'MODULE_NOT_FOUND') throw e}\"",
-    "lint": "turbo run lint:all",
-    "lint:all": "concurrently \"npm:lint:*(!all)\"",
+    "lint": "turbo run lint:ts lint:protos",
     "lint:ts": "eslint --cache --ext .tsx,.ts .",
-    "lint:protos": "node scripts/lintProtos.mjs"
+    "lint:protos": "buf lint"
   },
   "devDependencies": {
     "turbo": "1.6.3",
-    "concurrently": "7.6.0",
     "@ddadaal/eslint-config": "1.9.0",
     "@commitlint/config-conventional": "17.3.0",
     "@types/jest": "29.2.4",

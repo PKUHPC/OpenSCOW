@@ -13,9 +13,9 @@
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
+import { DesktopServiceServer, DesktopServiceService } from "@scow/protos/build/portal/desktop";
 import { displayIdToPort } from "src/clusterops/slurm/bl/port";
 import { portalConfig } from "src/config/portal";
-import { DesktopServiceServer, DesktopServiceService } from "src/generated/portal/desktop";
 import { clusterNotFound } from "src/utils/errors";
 import { getClusterLoginNode, loggedExec, sshConnect } from "src/utils/ssh";
 import { parseDisplayId, parseListOutput, parseOtp, refreshPassword, VNCSERVER_BIN_PATH } from "src/utils/turbovnc";

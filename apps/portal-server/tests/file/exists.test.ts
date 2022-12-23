@@ -13,10 +13,10 @@
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { Server } from "@ddadaal/tsgrpc-server";
 import { credentials } from "@grpc/grpc-js";
+import { ExistsRequest, FileServiceClient } from "@scow/protos/build/portal/file";
 import { createServer } from "src/app";
-import { ExistsRequest, FileServiceClient } from "src/generated/portal/file";
 
-import { actualPath, cluster, connectToTestServer, 
+import { actualPath, cluster, connectToTestServer,
   createFile, createTestItems, resetTestServer, TestSshServer, userId } from "./utils";
 
 let ssh: TestSshServer;
@@ -43,7 +43,7 @@ it("return true if exists", async () => {
   const filePath = actualPath(fileName);
 
   await createFile(ssh.sftp, filePath);
-  
+
   const result = await asyncUnaryCall(client, "exists", {
     cluster, userId, path: filePath,
   } as ExistsRequest);

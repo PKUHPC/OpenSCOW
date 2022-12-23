@@ -13,9 +13,9 @@
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
+import { JobServiceServer, JobServiceService } from "@scow/protos/build/portal/job";
 import { getClusterOps } from "src/clusterops";
 import { NewJobInfo } from "src/clusterops/api/job";
-import { JobServiceServer, JobServiceService } from "src/generated/portal/job";
 import { clusterNotFound, jobNotFound } from "src/utils/errors";
 
 export const jobServiceServer = plugin((server) => {
@@ -88,7 +88,7 @@ export const jobServiceServer = plugin((server) => {
         userId,
       }, logger);
 
-      return [{ results: reply.results }];
+      return [{ results: reply.results.map((x) => ({ ...x, submitTime: x.submitTime?.toISOString() })) }];
 
     },
 
@@ -115,7 +115,9 @@ export const jobServiceServer = plugin((server) => {
       if (!clusterops) { throw clusterNotFound(cluster); }
 
       const reply = await clusterops.job.listAllJobsInfo({
-        userId, endTime, startTime,
+        userId,
+        endTime: endTime ? new Date(endTime) : undefined,
+        startTime: startTime ? new Date(startTime) : undefined,
       }, logger);
 
       return [{ results: reply.results }];

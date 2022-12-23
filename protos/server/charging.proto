@@ -28,7 +28,7 @@ message PayRequest {
   string ip_address = 7;
 }
 
-message PayReply {
+message PayResponse {
   common.Money previous_balance = 1;
   common.Money current_balance = 2;
 }
@@ -38,7 +38,7 @@ message GetBalanceRequest {
   optional string account_name = 2;
 }
 
-message GetBalanceReply {
+message GetBalanceResponse {
   common.Money balance = 1;
 }
 
@@ -51,7 +51,7 @@ message ChargeRequest {
   string comment = 5;
 }
 
-message ChargeReply {
+message ChargeResponse {
   common.Money previous_balance = 1;
   common.Money current_balance = 2;
 }
@@ -76,7 +76,7 @@ message GetChargeRecordsRequest {
   optional string account_name = 4;
 }
 
-message GetChargeRecordsReply {
+message GetChargeRecordsResponse {
   repeated ChargeRecord results = 1;
   optional common.Money total = 2;
 }
@@ -103,7 +103,7 @@ message GetPaymentRecordsRequest {
   optional string account_name = 4;
 }
 
-message GetPaymentRecordsReply {
+message GetPaymentRecordsResponse {
   repeated PaymentRecord results = 1;
   optional common.Money total = 2;
 }
@@ -111,23 +111,23 @@ message GetPaymentRecordsReply {
 message GetAllPayTypesRequest {
 }
 
-message GetAllPayTypesReply {
+message GetAllPayTypesResponse {
   repeated string types = 1;
 }
 
 service ChargingService {
   // NotFound: account is not found.
-  rpc Pay(PayRequest) returns (PayReply);
+  rpc Pay(PayRequest) returns (PayResponse);
 
-  rpc GetAllPayTypes(GetAllPayTypesRequest) returns (GetAllPayTypesReply);
+  rpc GetAllPayTypes(GetAllPayTypesRequest) returns (GetAllPayTypesResponse);
 
   // NotFound: account is not found.
-  rpc Charge(ChargeRequest) returns (ChargeReply);
+  rpc Charge(ChargeRequest) returns (ChargeResponse);
 
   // NotFound: account or tenant is not found.
-  rpc GetBalance(GetBalanceRequest) returns (GetBalanceReply);
+  rpc GetBalance(GetBalanceRequest) returns (GetBalanceResponse);
 
   rpc GetPaymentRecords(GetPaymentRecordsRequest)
-      returns (GetPaymentRecordsReply);
-  rpc GetChargeRecords(GetChargeRecordsRequest) returns (GetChargeRecordsReply);
+      returns (GetPaymentRecordsResponse);
+  rpc GetChargeRecords(GetChargeRecordsRequest) returns (GetChargeRecordsResponse);
 }

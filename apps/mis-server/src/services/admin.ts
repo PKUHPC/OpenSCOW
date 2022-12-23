@@ -13,11 +13,11 @@
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
+import { AdminServiceServer, AdminServiceService } from "@scow/protos/build/server/admin";
 import { importUsers, ImportUsersData } from "src/bl/importUsers";
 import { Account } from "src/entities/Account";
 import { StorageQuota } from "src/entities/StorageQuota";
 import { User } from "src/entities/User";
-import { AdminServiceServer, AdminServiceService } from "src/generated/server/admin";
 import { parseClusterUsers } from "src/utils/slurm";
 
 export const adminServiceServer = plugin((server) => {
@@ -121,7 +121,7 @@ export const adminServiceServer = plugin((server) => {
 
       const result = parseClusterUsers(reply.result);
 
-      const includedAccounts = await em.find(Account, { 
+      const includedAccounts = await em.find(Account, {
         accountName: { $in: result.accounts.map((x) => x.accountName) },
       });
       includedAccounts.forEach((account) => {
@@ -138,7 +138,7 @@ export const adminServiceServer = plugin((server) => {
         u.included = true;
         u.userName = user.name;
       });
-      
+
       return [result];
     },
 
@@ -146,7 +146,7 @@ export const adminServiceServer = plugin((server) => {
       return [{
         fetchStarted: server.ext.fetch.started(),
         schedule: server.ext.fetch.schedule,
-        lastFetchTime: server.ext.fetch.lastFetched() ?? undefined,
+        lastFetchTime: server.ext.fetch.lastFetched()?.toISOString() ?? undefined,
       }];
     },
 

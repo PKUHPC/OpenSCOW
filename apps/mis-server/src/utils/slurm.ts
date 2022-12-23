@@ -10,10 +10,11 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { ClusterAccountInfo, ClusterUserInfo, GetClusterUsersReply, UserInAccount } from "src/generated/server/admin";
+import { ClusterAccountInfo, ClusterUserInfo,
+  GetClusterUsersResponse, UserInAccount } from "@scow/protos/build/server/admin";
 
-export function parseClusterUsers(dataStr: string): GetClusterUsersReply {
-  const obj: GetClusterUsersReply = {
+export function parseClusterUsers(dataStr: string): GetClusterUsersResponse {
+  const obj: GetClusterUsersResponse = {
     accounts:[] as ClusterAccountInfo[],
     users:[] as ClusterUserInfo[],
   };
@@ -40,7 +41,7 @@ export function parseClusterUsers(dataStr: string): GetClusterUsersReply {
       if (account === "a_" + user) {
         if (obj.accounts[accountIndex - 1].owner === undefined) {
           obj.accounts[accountIndex - 1].owner = user;
-        } 
+        }
       }
       obj.accounts[accountIndex - 1].users.push({ userId:user, state:status });
       i++;

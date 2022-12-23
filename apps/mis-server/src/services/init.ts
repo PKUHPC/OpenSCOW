@@ -15,10 +15,10 @@ import { ServiceError, status } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { UniqueConstraintViolationException } from "@mikro-orm/core";
 import { createUser } from "@scow/lib-auth";
+import { InitServiceServer, InitServiceService } from "@scow/protos/build/server/init";
 import { misConfig } from "src/config/mis";
 import { SystemState } from "src/entities/SystemState";
 import { PlatformRole, TenantRole, User } from "src/entities/User";
-import { InitServiceServer, InitServiceService } from "src/generated/server/init";
 import { DEFAULT_TENANT_NAME } from "src/utils/constants";
 import { createUserInDatabase, insertKeyToNewUser } from "src/utils/createUser";
 import { userExists } from "src/utils/userExists";
@@ -51,13 +51,13 @@ export const initServiceServer = plugin((server) => {
         .catch((e) => {
           if (e.code === Status.ALREADY_EXISTS) {
             throw <ServiceError> {
-              code: Status.ALREADY_EXISTS, 
+              code: Status.ALREADY_EXISTS,
               message:`User with userId ${userId} already exists in scow.`,
               details: "EXISTS_IN_SCOW",
-            };        
+            };
           }
-          throw <ServiceError> { 
-            code: Status.INTERNAL, 
+          throw <ServiceError> {
+            code: Status.INTERNAL,
             message: `Error creating user with userId ${userId} in database.` };
         });
 
@@ -79,12 +79,12 @@ export const initServiceServer = plugin((server) => {
         .catch(async (e) => {
           if (e.status === 409) {
             server.logger.warn(`User with userId ${ userId }  exists in auth.`);
-            return false; 
+            return false;
           }
           // 回滚数据库
           await em.removeAndFlush(user),
           server.logger.error("Error creating user in auth.", e);
-          throw <ServiceError> { code: Status.INTERNAL, message: `Error creating user ${user.id} in auth.` }; 
+          throw <ServiceError> { code: Status.INTERNAL, message: `Error creating user ${user.id} in auth.` };
         });
 
       return [{ createdInAuth: createdInAuth }];

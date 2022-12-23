@@ -1,0 +1,20 @@
+{
+  "name": "@scow/protos",
+  "version": "1.0.0",
+  "description": "",
+  "main": "build/index.js",
+  "scripts": {
+    "generate": "rimraf generated && cd ../.. && buf generate" ,
+    "build": "rimraf build && tsc"
+  },
+  "files": [
+    "build"
+  ],
+  "dependencies": {
+    "long": "5.2.1",
+    "protobufjs": "7.1.2"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

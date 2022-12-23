@@ -28,6 +28,11 @@ jobs:
           node-version: 18.x
           cache: pnpm
 
+      - uses: bufbuild/buf-setup-action@v1
+        with:
+          version: "1.11.0"
+          github_token: ${{ github.token }}
+
       - name: Install dependencies
         run: pnpm i --frozen-lockfile
 
@@ -119,6 +124,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
       - name: Log in to the GitHub Container registry
         uses: docker/login-action@f75d088332b07a08afadf6ac53c74509b9453f12
         with:
@@ -142,3 +153,5 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           file: dockerfiles/Dockerfile.${{ matrix.file }}
           labels: ${{ steps.meta.outputs.labels }}
+          # only build arm64 in master commits
+          platforms: linux/amd64${{ github.ref == 'refs/heads/master' && ',linux/arm64' || '' }}

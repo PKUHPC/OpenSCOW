@@ -12,8 +12,8 @@
 
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { status } from "@grpc/grpc-js";
+import { AppServiceClient, WebAppProps_ProxyType } from "@scow/protos/build/portal/app";
 import { authenticate } from "src/auth/server";
-import { AppServiceClient, WebAppProps_ProxyType } from "src/generated/portal/app";
 import { getClient } from "src/utils/client";
 import { dnsResolve } from "src/utils/dns";
 import { route } from "src/utils/route";
@@ -37,10 +37,10 @@ export interface ConnectToAppSchema {
 
   responses: {
     200: { host: string; port: number; password: string} & (
-      | { 
-        type: "web"; 
-        connect: AppConnectProps; 
-        proxyType: "relative" | "absolute"; 
+      | {
+        type: "web";
+        connect: AppConnectProps;
+        proxyType: "relative" | "absolute";
         customFormData?: {[key: string]: string};
        }
       | { type: "vnc"; }

@@ -10,10 +10,10 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { RunningJob } from "@scow/protos/build/common/job";
 import { JobOps } from "src/clusterops/api/job";
 import { SlurmClusterInfo } from "src/clusterops/slurm";
 import { executeScript } from "src/clusterops/slurm/utils/slurm";
-import { RunningJob } from "src/generated/common/job";
 
 export const slurmJobOps = ({ slurmConfig, executeSlurmScript }: SlurmClusterInfo): JobOps => {
 

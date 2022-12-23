@@ -15,10 +15,10 @@ import { ServiceError, status } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { UniqueConstraintViolationException } from "@mikro-orm/core";
 import { decimalToMoney } from "@scow/lib-decimal";
+import { TenantServiceServer, TenantServiceService } from "@scow/protos/build/server/tenant";
 import { Account } from "src/entities/Account";
 import { Tenant } from "src/entities/Tenant";
 import { TenantRole, User } from "src/entities/User";
-import { TenantServiceServer, TenantServiceService } from "src/generated/server/tenant";
 
 
 export const tenantServiceServer = plugin((server) => {

@@ -13,8 +13,8 @@
 import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Status } from "@grpc/grpc-js/build/src/constants";
+import { UserServiceClient } from "@scow/protos/build/server/user";
 import { authenticate } from "src/auth/server";
-import { UserServiceClient } from "src/generated/server/user";
 import { PlatformRole } from "src/models/User";
 import { getClient } from "src/utils/client";
 import { queryIfInitialized } from "src/utils/init";
@@ -39,10 +39,10 @@ export interface UnsetPlatformRoleSchema {
 
 export default route<UnsetPlatformRoleSchema>("UnsetPlatformRoleSchema", async (req, res) => {
   const { userId, roleType } = req.body;
-  
+
   if (await queryIfInitialized()) {
-    const auth = authenticate((u) => 
-      u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN) && 
+    const auth = authenticate((u) =>
+      u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN) &&
     !(u.identityId === userId && roleType === PlatformRole.PLATFORM_ADMIN));
     const info = await auth(req, res);
     if (!info) { return; }

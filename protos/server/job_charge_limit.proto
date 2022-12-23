@@ -24,7 +24,7 @@ message SetJobChargeLimitRequest {
   common.Money limit = 4;
 }
 
-message SetJobChargeLimitReply {
+message SetJobChargeLimitResponse {
 }
 
 // NOT_FOUND: the user is not in the account || the user doesn't have a charge
@@ -35,14 +35,14 @@ message CancelJobChargeLimitRequest {
   string user_id = 3;
 }
 
-message CancelJobChargeLimitReply {
+message CancelJobChargeLimitResponse {
 }
 
 service JobChargeLimitService {
 
   rpc SetJobChargeLimit(SetJobChargeLimitRequest)
-      returns (SetJobChargeLimitReply);
+      returns (SetJobChargeLimitResponse);
 
   rpc CancelJobChargeLimit(CancelJobChargeLimitRequest)
-      returns (CancelJobChargeLimitReply);
+      returns (CancelJobChargeLimitResponse);
 }

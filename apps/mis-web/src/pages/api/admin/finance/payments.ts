@@ -13,8 +13,8 @@
 import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { moneyToNumber } from "@scow/lib-decimal";
+import { ChargingServiceClient } from "@scow/protos/build/server/charging";
 import { authenticate } from "src/auth/server";
-import { ChargingServiceClient } from "src/generated/server/charging";
 import { PlatformRole } from "src/models/User";
 import { ensureNotUndefined } from "src/utils/checkNull";
 import { getClient } from "src/utils/client";
@@ -28,7 +28,7 @@ export interface TenantPaymentInfo {
     comment: string;
     ipAddress: string;
     operatorId: string;
-} 
+}
 
 export interface GetTenantPaymentsSchema {
   method: "GET";

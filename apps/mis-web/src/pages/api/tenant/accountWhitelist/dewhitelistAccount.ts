@@ -12,8 +12,8 @@
 
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Status } from "@grpc/grpc-js/build/src/constants";
+import { AccountServiceClient } from "@scow/protos/build/server/account";
 import { authenticate } from "src/auth/server";
-import { AccountServiceClient } from "src/generated/server/account";
 import { TenantRole } from "src/models/User";
 import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";

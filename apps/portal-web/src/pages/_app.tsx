@@ -14,6 +14,7 @@ import "nprogress/nprogress.css";
 import "antd/dist/reset.css";
 
 import { failEvent, fromApi } from "@ddadaal/next-typed-api-routes-runtime/lib/client";
+import { App } from "@scow/protos/build/portal/app";
 import type { AppContext, AppProps } from "next/app";
 import NextApp from "next/app";
 import dynamic from "next/dynamic";
@@ -23,7 +24,6 @@ import { useEffect, useRef } from "react";
 import { createStore, StoreProvider, useStore } from "simstate";
 import { USE_MOCK } from "src/apis/useMock";
 import { getTokenFromCookie } from "src/auth/cookie";
-import { App } from "src/generated/portal/app";
 import { AntdConfigProvider } from "src/layouts/AntdConfigProvider";
 import { BaseLayout } from "src/layouts/base/BaseLayout";
 import { DarkModeProvider } from "src/layouts/darkMode";

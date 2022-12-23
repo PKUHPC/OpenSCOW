@@ -11,7 +11,7 @@
  */
 
 import { moneyToNumber } from "@scow/lib-decimal";
-import type { Money } from "src/generated/common/money";
+import type { Money } from "@scow/protos/build/common/money";
 
 export function moneyToString(money: Money) {
   return moneyToNumber(money).toFixed(3);

@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { JobInfo } from "@scow/protos/build/portal/job";
 import { Button, DatePicker, Form, InputNumber, Space, Table } from "antd";
 import dayjs from "dayjs";
 import Router from "next/router";
@@ -20,7 +21,6 @@ import { useStore } from "simstate";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
-import { JobInfo } from "src/generated/portal/job";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { Cluster } from "src/utils/config";
 import { defaultPresets, formatDateTime } from "src/utils/datetime";

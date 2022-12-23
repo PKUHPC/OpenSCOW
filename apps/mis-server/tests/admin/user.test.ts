@@ -15,12 +15,12 @@ import { Server } from "@ddadaal/tsgrpc-server";
 import { ChannelCredentials } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { createUser } from "@scow/lib-auth";
+import { PlatformRole, TenantRole, UserServiceClient } from "@scow/protos/build/server/user";
 import { createServer } from "src/app";
 import { misConfig } from "src/config/mis";
 import { Tenant } from "src/entities/Tenant";
 import { PlatformRole as pRole, TenantRole as tRole, User } from "src/entities/User";
 import { UserAccount, UserRole, UserStatus } from "src/entities/UserAccount";
-import { PlatformRole, TenantRole, UserServiceClient } from "src/generated/server/user";
 import { reloadEntity } from "src/utils/orm";
 import { insertInitialData } from "tests/data/data";
 import { dropDatabase } from "tests/data/helpers";
@@ -169,19 +169,19 @@ it("get all users", async () => {
     {
       userId: data.userA.userId,
       name: data.userA.name,
-      createTime: data.userA.createTime,
+      createTime: data.userA.createTime.toISOString(),
       platformRoles: data.userA.platformRoles,
     },
     {
       userId: data.userB.userId,
       name: data.userB.name,
-      createTime: data.userB.createTime,
+      createTime: data.userB.createTime.toISOString(),
       platformRoles: data.userB.platformRoles,
     },
     {
       userId: data.userC.userId,
       name: data.userC.name,
-      createTime: data.userC.createTime,
+      createTime: data.userC.createTime.toISOString(),
       platformRoles: data.userC.platformRoles,
     },
   ]);

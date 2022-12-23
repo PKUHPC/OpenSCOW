@@ -12,9 +12,9 @@
 
 import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
+import type { AccountUserInfo } from "@scow/protos/build/server/user";
+import { UserServiceClient } from "@scow/protos/build/server/user";
 import { authenticate } from "src/auth/server";
-import type { AccountUserInfo } from "src/generated/server/user";
-import { UserServiceClient } from "src/generated/server/user";
 import { PlatformRole, UserRole } from "src/models/User";
 import { getClient } from "src/utils/client";
 

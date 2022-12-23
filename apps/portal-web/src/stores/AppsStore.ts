@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { App } from "src/generated/portal/app";
+import { App } from "@scow/protos/build/portal/app";
 
 export function AppsStore(apps: App[]) {
   return apps;

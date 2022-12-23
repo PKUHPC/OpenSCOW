@@ -14,9 +14,9 @@ import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { Server } from "@ddadaal/tsgrpc-server";
 import { credentials } from "@grpc/grpc-js";
 import { sftpExists, sftpMkdir } from "@scow/lib-ssh";
+import { FileServiceClient } from "@scow/protos/build/portal/file";
 import path from "path";
 import { createServer } from "src/app";
-import { FileServiceClient } from "src/generated/portal/file";
 import { actualPath, cluster, connectToTestServer,
   createFile, createTestItems, resetTestServer, TestSshServer, userId } from "tests/file/utils";
 
