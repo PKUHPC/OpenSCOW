@@ -37,6 +37,8 @@ export const executeSlurmScript = async (
     MYSQL_PASSWORD: slurmMisConfig.dbPassword,
     BASE_PARTITIONS: partitionsParam,
     CLUSTER_NAME: slurmMisConfig.clusterName,
+    DB_HOST: slurmMisConfig.dbHost,
+    DB_PORT: String(slurmMisConfig.dbPort),
   }, logger);
 
   return result;

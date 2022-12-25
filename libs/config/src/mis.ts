@@ -16,6 +16,8 @@ import { DEFAULT_CONFIG_BASE_PATH } from "src/constants";
 
 export const SlurmMisConfigSchema = Type.Object({
   managerUrl: Type.String({ description: "slurm manager节点的URL" }),
+  dbHost: Type.String({ description: "slurmdbd的数据库地址", default: "localhost" }),
+  dbPort: Type.Integer({ description: "slurmdbd的数据库端口", default: 3306 }),
   dbPassword: Type.String({ description: "slurmdbd的数据库密码" }),
   clusterName: Type.String({ description: "这个集群在slurm中的集群名字" }),
   scriptPath: Type.String({ description: "slurm.sh绝对路径" }),

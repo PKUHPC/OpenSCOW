@@ -51,7 +51,17 @@ slurm:
     managerUrl: haha
     # slurm.sh在机器中的绝对地址
     scriptPath: /test/slurm.sh
-    # slurmdbd的数据库密码
+
+    # 部署slurm.sh的机器通过什么地址访问slurm的数据库
+    # 不填写为下面的默认值
+    # dbHost: localhost
+
+    # 部署slurm.sh的机器通过什么端口访问slurm的数据库
+    # 不填写为下面的默认值
+    # dbPort: 3306
+
+    # slurmdbd的数据库root用户的密码
     dbPassword: password
+
     # 这个集群在slurm中的集群名字
     clusterName: pkuhpc
