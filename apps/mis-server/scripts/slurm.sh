@@ -170,7 +170,7 @@ query timelimit of job 4300: ./slurm -t 4300
 "
 
 
-mysql="mysql -uroot -p$MYSQL_PASSWORD"
+mysql="mysql -h$DB_HOST -P$DB_PORT -uroot -p$MYSQL_PASSWORD"
 basePartition=($BASE_PARTITIONS)
 base_qos=`sacctmgr -n show qos format=Name | tr '\n' ',' | sed s/[[:space:]]//g`
 base_qos=${base_qos%?}

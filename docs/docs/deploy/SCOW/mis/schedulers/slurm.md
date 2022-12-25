@@ -10,7 +10,9 @@ title: slurm
 在集群中选定一个节点作为**slurm节点**。此节点需要满足以下条件：
 
 - **服务节点**可以以root用户SSH免密登录到此节点
-- 此节点上安装并配置好了slurm的客户端程序，如`sacctmgr`、`squeue`等。
+- 此节点上安装并配置好了slurm的客户端程序，如`sacctmgr`、`squeue`等
+- 此节点上安装有`mysql`客户端，可以通过`mysql`直接执行
+- 此节点上运行有slurm的mysql数据库，或者可以连接到其他机器上的数据库
 
 我们建议在slurm集群的manager节点上同时配置客户端程序，并使用此节点为**slurm节点**。
 在项目启动后，系统将自动给slurm节点上传一个slurm.sh脚本，用于进行一些slurm操作。具体上传的位置可以在集群配置中进行配置。
@@ -28,6 +30,15 @@ slurm:
     managerUrl: haha
     # slurm.sh在机器中的绝对地址,每次系统启动时，会自动将slurm.sh文件复制到scriptPath指定路径上
     scriptPath: /test/slurm.sh
+
+    # 部署slurm.sh的机器通过什么地址访问slurm的mysql数据库
+    # 不填写为下面的默认值
+    # dbHost: localhost
+
+    # 部署slurm.sh的机器通过什么端口访问slurm的mysql数据库
+    # 不填写为下面的默认值
+    # dbPort: 3306
+
     # slurmdbd的数据库密码
     dbPassword: password
     # slurm中这个集群的集群名
