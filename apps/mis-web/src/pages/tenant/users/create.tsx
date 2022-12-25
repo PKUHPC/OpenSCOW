@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { FormLayout } from "@scow/lib-web/build/layouts/FormLayout";
 import { Button, Form } from "antd";
 import { NextPage } from "next";
 import React, { useState } from "react";
@@ -17,7 +18,6 @@ import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { NotFoundPage } from "src/components/errorPages/NotFoundPage";
 import { PageTitle } from "src/components/PageTitle";
-import { FormLayout } from "src/layouts/FormLayout";
 import { useMessage, useModal } from "src/layouts/prompts";
 import { TenantRole } from "src/models/User";
 import { CreateUserForm, CreateUserFormFields } from "src/pageComponents/users/CreateUserForm";
@@ -48,11 +48,11 @@ const CreateUserPageForm: React.FC = () => {
       });
     } else {
       modal.confirm({
-        title: result.existsInAuth !== undefined ? 
+        title: result.existsInAuth !== undefined ?
           result.existsInAuth ? "用户已存在于认证系统" : "用户未存在于认证系统"
           : "无法确定用户是否存在于认证系统",
-        content: result.existsInAuth ? 
-          "用户已经在认证系统中存在，您此处输入的密码将会不起作用，新用户的密码将是认证系统中的已有用户的当前密码。点击“确认”将会将此用户直接添加到SCOW数据库," 
+        content: result.existsInAuth ?
+          "用户已经在认证系统中存在，您此处输入的密码将会不起作用，新用户的密码将是认证系统中的已有用户的当前密码。点击“确认”将会将此用户直接添加到SCOW数据库,"
           : "点击“确认”将会同时在SCOW数据库和认证系统创建此用户",
         okText: "确认",
         onOk: async () => {
@@ -64,20 +64,20 @@ const CreateUserPageForm: React.FC = () => {
                 okText: "确认",
               });
             })
-            .then((createdInAuth) => { 
-              !createdInAuth.createdInAuth ? 
+            .then((createdInAuth) => {
+              !createdInAuth.createdInAuth ?
                 modal.info({
                   title: "添加成功",
                   content: "此用户存在于认证系统中，已成功添加到SCOW数据库",
                   okText: "确认",
                 })
                 : message.success("添加完成！"); })
-            .catch(() => {               
+            .catch(() => {
               modal.error({
                 title: "添加失败",
                 content: "创建用户失败",
-              });  
-            }) 
+              });
+            })
             .finally(() => {
               form.resetFields();
               setLoading(false);

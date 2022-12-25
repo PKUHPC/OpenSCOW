@@ -10,10 +10,10 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { FormLayout } from "@scow/lib-web/build/layouts/FormLayout";
 import { NextPage } from "next";
 import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
-import { FormLayout } from "src/layouts/FormLayout";
 import { PlatformRole } from "src/models/User";
 import { TenantChargeForm } from "src/pageComponents/admin/TenantChargeForm";
 import { Head } from "src/utils/head";

@@ -14,6 +14,9 @@ import "nprogress/nprogress.css";
 import "antd/dist/reset.css";
 
 import { failEvent, fromApi } from "@ddadaal/next-typed-api-routes-runtime/lib/client";
+import { AntdConfigProvider } from "@scow/lib-web/build/layouts/AntdConfigProvider";
+import { DarkModeProvider } from "@scow/lib-web/build/layouts/darkMode";
+import { useMessage, useModal } from "@scow/lib-web/build/layouts/prompts";
 import type { AppContext, AppProps } from "next/app";
 import App from "next/app";
 import dynamic from "next/dynamic";
@@ -24,10 +27,8 @@ import { createStore, StoreProvider, useStore } from "simstate";
 import { MOCK_USER_INFO } from "src/apis/api.mock";
 import { USE_MOCK } from "src/apis/useMock";
 import { getTokenFromCookie, setTokenCookie } from "src/auth/cookie";
-import { AntdConfigProvider } from "src/layouts/AntdConfigProvider";
-import { BaseLayout } from "src/layouts/base/BaseLayout";
-import { DarkModeProvider } from "src/layouts/darkMode";
-import { useMessage, useModal } from "src/layouts/prompts";
+import { BaseLayout } from "src/layouts/BaseLayout";
+import { FloatButtons } from "src/layouts/FloatButtons";
 import { ValidateTokenSchema } from "src/pages/api/auth/validateToken";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import {
@@ -64,7 +65,7 @@ const FailEventHandler: React.FC = () => {
       }
 
       message.error(`服务器出错啦！(${e.status}, ${e.data?.code}))`);
-    
+
     });
   }, []);
 
@@ -118,6 +119,7 @@ function MyApp({ Component, pageProps, extra }: Props) {
         <DarkModeProvider>
 
           <AntdConfigProvider color={primaryColor}>
+            <FloatButtons />
             <GlobalStyle />
             <FailEventHandler />
             <TopProgressBar />

@@ -36,6 +36,8 @@
     "@scow/lib-auth": "workspace:*",
     "@scow/lib-decimal": "workspace:*",
     "@scow/lib-ssh": "workspace:*",
+    "@scow/lib-utils": "workspace:*",
+    "@scow/lib-web": "workspace:*",
     "@sinclair/typebox": "0.25.13",
     "@scow/protos": "workspace:*",
     "antd": "5.0.7",

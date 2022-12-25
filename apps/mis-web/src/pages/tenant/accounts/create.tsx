@@ -10,13 +10,13 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { FormLayout } from "@scow/lib-web/build/layouts/FormLayout";
 import { Button, Form, Input } from "antd";
 import { NextPage } from "next";
 import React, { useState } from "react";
 import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
-import { FormLayout } from "src/layouts/FormLayout";
 import { useMessage } from "src/layouts/prompts";
 import { TenantRole } from "src/models/User";
 import { publicConfig } from "src/utils/config";

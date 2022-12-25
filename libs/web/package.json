@@ -1,0 +1,25 @@
+{
+  "name": "@scow/lib-web",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "rimraf build && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
+    "test": "jest"
+  },
+  "files": [
+    "build",
+    "icons"
+  ],
+  "dependencies": {
+    "@scow/lib-utils": "workspace:*"
+  },
+  "peerDependencies": {
+    "antd": "5.0.7",
+    "next": "13.0.2",
+    "styled-components": "5.3.6"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

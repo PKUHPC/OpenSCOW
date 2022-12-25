@@ -6,25 +6,23 @@
       "dom.iterable",
       "esnext"
     ],
+    "outDir": "build",
     "allowJs": true,
     "skipLibCheck": true,
-    "strict": false,
-    "forceConsistentCasingInFileNames": true,
-    "strictNullChecks": true,
-    "noEmit": true,
-    "esModuleInterop": true,
-    "module": "esnext",
-    "moduleResolution": "node",
+    "declaration": true,
     "resolveJsonModule": true,
+    "esModuleInterop": true,
     "isolatedModules": true,
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "baseUrl": ".",
-    "incremental": true,
     "paths": {
       "src/*": [
         "src/*"
+      ],
+      "tests/*": [
+        "tests/*"
       ]
-    }
+    },
   },
   "exclude": [
     "node_modules"
@@ -33,6 +31,5 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    "jest.config.js"
-, "../../libs/web/src/layouts/DefaultClusterSelector.tsx"  ]
+  ]
 }

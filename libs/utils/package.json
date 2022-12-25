@@ -1,0 +1,16 @@
+{
+  "name": "@scow/lib-utils",
+  "version": "1.0.0",
+  "description": "",
+  "main": "build/index.js",
+  "scripts": {
+    "build": "rimraf build && tsc -p tsconfig.build.json",
+    "test": "jest"
+  },
+  "files": [
+    "build"
+  ],
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

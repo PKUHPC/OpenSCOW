@@ -180,6 +180,8 @@ importers:
       '@scow/lib-auth': workspace:*
       '@scow/lib-config': workspace:*
       '@scow/lib-decimal': workspace:*
+      '@scow/lib-utils': workspace:*
+      '@scow/lib-web': workspace:*
       '@scow/protos': workspace:*
       '@sinclair/typebox': 0.25.13
       '@types/google-protobuf': 3.15.6
@@ -228,6 +230,8 @@ importers:
       '@scow/lib-auth': link:../../libs/auth
       '@scow/lib-config': link:../../libs/libconfig
       '@scow/lib-decimal': link:../../libs/decimal
+      '@scow/lib-utils': link:../../libs/utils
+      '@scow/lib-web': link:../../libs/web
       '@scow/protos': link:../../libs/protos
       '@sinclair/typebox': 0.25.13
       antd: 5.0.7_biqbaboplfbrettd7655fr4n2y
@@ -326,6 +330,8 @@ importers:
       '@scow/lib-config': workspace:*
       '@scow/lib-decimal': workspace:*
       '@scow/lib-ssh': workspace:*
+      '@scow/lib-utils': workspace:*
+      '@scow/lib-web': workspace:*
       '@scow/protos': workspace:*
       '@sinclair/typebox': 0.25.13
       '@testing-library/jest-dom': 5.16.5
@@ -388,6 +394,8 @@ importers:
       '@scow/lib-config': link:../../libs/libconfig
       '@scow/lib-decimal': link:../../libs/decimal
       '@scow/lib-ssh': link:../../libs/ssh
+      '@scow/lib-utils': link:../../libs/utils
+      '@scow/lib-web': link:../../libs/web
       '@scow/protos': link:../../libs/protos
       '@sinclair/typebox': 0.25.13
       antd: 5.0.7_biqbaboplfbrettd7655fr4n2y
@@ -531,6 +539,15 @@ importers:
       '@types/shell-quote': 1.7.1
       '@types/ssh2': 1.11.6
       ts-log: 2.2.5
+
+  libs/utils:
+    specifiers: {}
+
+  libs/web:
+    specifiers:
+      '@scow/lib-utils': workspace:*
+    dependencies:
+      '@scow/lib-utils': link:../utils
 
 packages:
 
