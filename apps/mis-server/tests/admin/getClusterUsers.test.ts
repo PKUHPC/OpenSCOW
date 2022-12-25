@@ -13,7 +13,20 @@
 import { parseClusterUsers } from "src/utils/slurm";
 
 
-const dataStr = "a_user1\nuser1 : allowed!\nuser2 : blocked!\n\naccount2\nuser2:allowed!\nuser3:blocked!\n";
+const dataStr = `
+a_user1
+user1 : allowed!
+user2 : blocked!
+
+a_t2
+There is no user in account !
+account2
+user2:allowed!
+user3:blocked!
+
+a_t3
+There is no user in account !
+`;
 
 it("test whether the string from 'slurm.sh -l all' can be parsed successfully", async () => {
   const result = parseClusterUsers(dataStr);
@@ -26,14 +39,24 @@ it("test whether the string from 'slurm.sh -l all' can be parsed successfully", 
       included: false,
     },
     {
+      accountName: "a_t2",
+      users: [],
+      included: false,
+    },
+    {
       accountName: "account2",
       users: [{ userId: "user2", state: "allowed!" }, { userId: "user3", state: "blocked!" }],
       included: false,
     },
+    {
+      accountName: "a_t3",
+      users: [],
+      included: false,
+    },
   ],
-  users: [ 
-    { userId: "user1", userName: "user1", accounts: [ "a_user1" ], included: false }, 
-    { userId: "user2", userName: "user2", accounts: [ "a_user1", "account2" ], included: false }, 
+  users: [
+    { userId: "user1", userName: "user1", accounts: [ "a_user1" ], included: false },
+    { userId: "user2", userName: "user2", accounts: [ "a_user1", "account2" ], included: false },
     { userId: "user3", userName: "user3", accounts: [ "account2" ], included: false },
   ]});
 });

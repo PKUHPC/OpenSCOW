@@ -25,11 +25,14 @@ export function parseClusterUsers(dataStr: string): GetClusterUsersResponse {
   lines.push("");
 
   let i = 0;
-  while (i < lines.length) {
+  while (i < lines.length - 1) {
     const account = lines[i].trim();
     const accountIndex = obj.accounts.push({ accountName: account, users: [] as UserInAccount[], included: false });
     i++;
-    while (lines[i].trim() !== "") {
+    while (i < lines.length && lines[i].trim() !== "") {
+
+      if (lines[i].trim().startsWith("There is no user in account")) { break; }
+
       const [user, status] = lines[i].split(":").map((x) => x.trim());
       const userIndex = obj.users.findIndex((x) => x.userId === user);
       if (userIndex === -1) {
@@ -43,7 +46,7 @@ export function parseClusterUsers(dataStr: string): GetClusterUsersResponse {
           obj.accounts[accountIndex - 1].owner = user;
         }
       }
-      obj.accounts[accountIndex - 1].users.push({ userId:user, state:status });
+      obj.accounts[accountIndex - 1].users.push({ userId: user, state: status });
       i++;
     }
     i++;
