@@ -13,6 +13,8 @@
 import { ClusterAccountInfo, ClusterUserInfo,
   GetClusterUsersResponse, UserInAccount } from "@scow/protos/build/server/admin";
 
+// Parses slurm.sh output to GetClusterUsersResponse
+// Accounts with no user are not included
 export function parseClusterUsers(dataStr: string): GetClusterUsersResponse {
   const obj: GetClusterUsersResponse = {
     accounts:[] as ClusterAccountInfo[],
@@ -30,9 +32,10 @@ export function parseClusterUsers(dataStr: string): GetClusterUsersResponse {
     const accountIndex = obj.accounts.push({ accountName: account, users: [] as UserInAccount[], included: false });
     i++;
     while (i < lines.length && lines[i].trim() !== "") {
-
-      if (lines[i].trim().startsWith("There is no user in account")) { break; }
-
+      if (lines[i].trim().startsWith("There is no user in account")) {
+        obj.accounts.pop();
+        break;
+      }
       const [user, status] = lines[i].split(":").map((x) => x.trim());
       const userIndex = obj.users.findIndex((x) => x.userId === user);
       if (userIndex === -1) {

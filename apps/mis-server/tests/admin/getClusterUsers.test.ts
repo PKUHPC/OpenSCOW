@@ -39,18 +39,8 @@ it("test whether the string from 'slurm.sh -l all' can be parsed successfully", 
       included: false,
     },
     {
-      accountName: "a_t2",
-      users: [],
-      included: false,
-    },
-    {
       accountName: "account2",
       users: [{ userId: "user2", state: "allowed!" }, { userId: "user3", state: "blocked!" }],
-      included: false,
-    },
-    {
-      accountName: "a_t3",
-      users: [],
       included: false,
     },
   ],
