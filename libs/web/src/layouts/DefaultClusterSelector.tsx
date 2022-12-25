@@ -13,8 +13,9 @@
 import { ClusterOutlined } from "@ant-design/icons";
 import { Space, Tooltip } from "antd";
 import React from "react";
-import { Cluster, SingleClusterSelector } from "src/components/ClusterSelector";
 import { useTheme } from "styled-components";
+
+import { Cluster, SingleClusterSelector } from "../components/ClusterSelector";
 
 
 export const ThemeClusterOutlined: React.FC = () => {

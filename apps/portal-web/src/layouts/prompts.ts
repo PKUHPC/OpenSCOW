@@ -10,4 +10,4 @@
  * See the Mulan PSL v2 for more details.
  */
 
-export * from "@scow/lib-web/build/layouts/prompts";
+export { MessageProvider, ModalProvider, useMessage, useModal } from "@scow/lib-web/build/layouts/prompts";
