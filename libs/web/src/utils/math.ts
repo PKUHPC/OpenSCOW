@@ -10,19 +10,16 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import Head from "next/head";
-import React from "react";
-
-interface Props {
-  title?: string;
+export function max(op1: number, op2: number) {
+  return op1 > op2 ? op1 : op2;
+}
+export function min(op1: number, op2: number) {
+  return op1 < op2 ? op1 : op2;
 }
 
-export const PageMetadata: React.FC<Props> = ({ title }) => {
-  const titleStr = `${title ? `${title} | ` : ""}第三届全国高校数据驱动创新研究大赛`;
+export function compareNumber(a: number, b: number): -1 | 0 | 1 {
+  if (a === b) { return 0; }
+  if (a < b) { return -1; }
+  return 1;
+}
 
-  return (
-    <Head>
-      <title>{titleStr}</title>
-    </Head>
-  );
-};

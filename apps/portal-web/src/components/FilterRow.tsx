@@ -10,8 +10,8 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { RefreshLink } from "@scow/lib-web/build/utils/refreshToken";
 import { PropsWithChildren } from "react";
-import { RefreshLink } from "src/utils/refreshToken";
 import styled from "styled-components";
 
 type Props = PropsWithChildren<{

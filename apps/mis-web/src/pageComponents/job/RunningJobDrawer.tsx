@@ -10,10 +10,10 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { formatDateTime } from "@scow/lib-web/build/utils/datetime";
 import { JobInfo } from "@scow/protos/build/server/job";
 import { Descriptions, Drawer } from "antd";
 import { RunningJobInfo } from "src/models/job";
-import { formatDateTime } from "src/utils/datetime";
 
 interface Props {
   open: boolean;

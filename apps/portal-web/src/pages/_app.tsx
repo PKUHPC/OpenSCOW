@@ -16,6 +16,8 @@ import "antd/dist/reset.css";
 import { failEvent, fromApi } from "@ddadaal/next-typed-api-routes-runtime/lib/client";
 import { AntdConfigProvider } from "@scow/lib-web/build/layouts/AntdConfigProvider";
 import { DarkModeProvider } from "@scow/lib-web/build/layouts/darkMode";
+import { useConstant } from "@scow/lib-web/build/utils/hooks";
+import { isServer } from "@scow/lib-web/build/utils/isServer";
 import { App } from "@scow/protos/build/portal/app";
 import type { AppContext, AppProps } from "next/app";
 import NextApp from "next/app";
@@ -39,8 +41,6 @@ import {
 import { GlobalStyle } from "src/styles/globalStyle";
 import { publicConfig, runtimeConfig } from "src/utils/config";
 import { getHostname } from "src/utils/host";
-import { isServer } from "src/utils/isServer";
-import useConstant from "src/utils/useConstant";
 
 
 const FailEventHandler: React.FC = () => {

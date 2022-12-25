@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { defaultPresets, formatDateTime } from "@scow/lib-web/build/utils/datetime";
 import { Money } from "@scow/protos/build/common/money";
 import { JobInfo } from "@scow/protos/build/server/job";
 import { Button, DatePicker, Divider, Form, Input, InputNumber, Space, Table } from "antd";
@@ -25,7 +26,6 @@ import { JobPriceChangeModal } from "src/pageComponents/tenant/JobPriceChangeMod
 import type { GetJobFilter, GetJobInfoSchema } from "src/pages/api/job/jobInfo";
 import type { Cluster } from "src/utils/config";
 import { publicConfig } from "src/utils/config";
-import { defaultPresets, formatDateTime } from "src/utils/datetime";
 import { moneyToString, nullableMoneyToString } from "src/utils/money";
 
 interface PageInfo {

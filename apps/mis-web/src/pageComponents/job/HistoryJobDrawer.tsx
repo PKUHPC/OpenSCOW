@@ -10,9 +10,9 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { formatDateTime } from "@scow/lib-web/build/utils/datetime";
 import { JobInfo } from "@scow/protos/build/server/job";
 import { Descriptions, Drawer } from "antd";
-import { formatDateTime } from "src/utils/datetime";
 import { moneyToString } from "src/utils/money";
 
 const drawerItems = [

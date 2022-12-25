@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { RefreshLink, useRefreshToken } from "@scow/lib-web/build/utils/refreshToken";
 import { NextPage } from "next";
 import { useCallback } from "react";
 import { useAsync } from "react-async";
@@ -19,7 +20,6 @@ import { PageTitle } from "src/components/PageTitle";
 import { TenantRole } from "src/models/User";
 import { AccountTable } from "src/pageComponents/tenant/AccountTable";
 import { Head } from "src/utils/head";
-import { RefreshLink, useRefreshToken } from "src/utils/refreshToken";
 
 export const AdminAccountsPage: NextPage = requireAuth((u) => u.tenantRoles.includes(TenantRole.TENANT_ADMIN))(
   () => {

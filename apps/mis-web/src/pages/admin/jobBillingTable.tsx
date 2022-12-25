@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { queryToString, useQuerystring } from "@scow/lib-web/build/utils/querystring";
 import { Button, Form, Space } from "antd";
 import { NextPage } from "next";
 import Router from "next/router";
@@ -23,7 +24,6 @@ import { PlatformRole } from "src/models/User";
 import { EditableJobBillingTable } from "src/pageComponents/job/EditableJobBillingTable";
 import { TenantSelector } from "src/pageComponents/tenant/TenantSelector";
 import { Head } from "src/utils/head";
-import { queryToString, useQuerystring } from "src/utils/querystring";
 
 const AdminJobBillingTable: React.FC<{ tenant?: string }> = ({ tenant }) => {
 

@@ -17,6 +17,8 @@ import { failEvent, fromApi } from "@ddadaal/next-typed-api-routes-runtime/lib/c
 import { AntdConfigProvider } from "@scow/lib-web/build/layouts/AntdConfigProvider";
 import { DarkModeProvider } from "@scow/lib-web/build/layouts/darkMode";
 import { useMessage, useModal } from "@scow/lib-web/build/layouts/prompts";
+import { useConstant } from "@scow/lib-web/build/utils/hooks";
+import { isServer } from "@scow/lib-web/build/utils/isServer";
 import type { AppContext, AppProps } from "next/app";
 import App from "next/app";
 import dynamic from "next/dynamic";
@@ -37,8 +39,6 @@ import {
 import { GlobalStyle } from "src/styles/globalStyle";
 import { publicConfig, runtimeConfig } from "src/utils/config";
 import { getHostname } from "src/utils/host";
-import { isServer } from "src/utils/isServer";
-import useConstant from "src/utils/useConstant";
 
 const FailEventHandler: React.FC = () => {
   const message = useMessage();

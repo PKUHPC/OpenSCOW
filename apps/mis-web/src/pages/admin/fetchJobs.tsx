@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { formatDateTime } from "@scow/lib-web/build/utils/datetime";
 import { Badge, Descriptions, Space, Spin } from "antd";
 import { NextPage } from "next";
 import { useState } from "react";
@@ -20,7 +21,6 @@ import { DisabledA } from "src/components/DisabledA";
 import { PageTitle } from "src/components/PageTitle";
 import { useMessage } from "src/layouts/prompts";
 import { PlatformRole } from "src/models/User";
-import { formatDateTime } from "src/utils/datetime";
 import { Head } from "src/utils/head";
 
 

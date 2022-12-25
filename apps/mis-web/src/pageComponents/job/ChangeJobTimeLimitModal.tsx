@@ -10,13 +10,13 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { arrayContainsElement } from "@scow/lib-web/build/utils/array";
 import { Divider, Form, Input, InputNumber, Modal, Progress, Select } from "antd";
 import { useRef, useState } from "react";
 import { api } from "src/apis";
 import { useMessage } from "src/layouts/prompts";
 import { RunningJobInfo } from "src/models/job";
 import { ChangeStorageMode } from "src/pages/api/admin/changeStorage";
-import { arrayContainsElement } from "src/utils/array";
 import type { Cluster } from "src/utils/config";
 
 interface Props {

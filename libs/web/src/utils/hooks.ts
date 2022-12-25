@@ -64,3 +64,17 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
   };
   return [storedValue, setValue] as const;
 }
+
+export function useFirstMount() {
+  const isMountRef = useRef(true);
+  useEffect(() => {
+    isMountRef.current = false;
+  }, []);
+  return isMountRef.current;
+}
+
+export function useConstant<T>(func: () => T): T {
+  const [value] = useState(func);
+
+  return value;
+}

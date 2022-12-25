@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { useDidUpdateEffect } from "@scow/lib-web/build/utils/hooks";
 import { Button, Form, Input, InputNumber, Select, Space, Table } from "antd";
 import React, { useCallback, useMemo, useRef, useState } from "react";
 import { useAsync } from "react-async";
@@ -25,7 +26,6 @@ import { ChangeJobTimeLimitModal } from "src/pageComponents/job/ChangeJobTimeLim
 import { RunningJobDrawer } from "src/pageComponents/job/RunningJobDrawer";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { Cluster, publicConfig } from "src/utils/config";
-import { useDidUpdateEffect } from "src/utils/hooks";
 
 interface FilterForm {
   jobId: number | undefined;

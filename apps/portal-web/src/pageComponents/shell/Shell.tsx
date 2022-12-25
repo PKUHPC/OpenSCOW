@@ -10,11 +10,11 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { debounce } from "@scow/lib-web/build/utils/debounce";
 import { join } from "path";
 import { useEffect, useRef } from "react";
 import { io } from "socket.io-client";
 import { User } from "src/stores/UserStore";
-import { debounce } from "src/utils/debounce";
 import styled from "styled-components";
 import { Terminal } from "xterm";
 import { FitAddon } from "xterm-addon-fit";

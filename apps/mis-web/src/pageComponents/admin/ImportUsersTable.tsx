@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { queryToString, useQuerystring } from "@scow/lib-web/build/utils/querystring";
 import { ClusterAccountInfo, ClusterUserInfo,
   GetClusterUsersResponse, ImportUsersData } from "@scow/protos/build/server/admin";
 import { Button, Checkbox, Form, Input, Select, Space, Table, Tabs, Tooltip } from "antd";
@@ -23,7 +24,6 @@ import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { useMessage } from "src/layouts/prompts";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { publicConfig } from "src/utils/config";
-import { queryToString, useQuerystring } from "src/utils/querystring";
 
 export const ImportUsersTable: React.FC = () => {
   const message = useMessage();

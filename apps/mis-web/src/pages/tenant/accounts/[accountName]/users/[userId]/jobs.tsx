@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { queryToString } from "@scow/lib-web/build/utils/querystring";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { requireAuth } from "src/auth/requireAuth";
@@ -18,7 +19,6 @@ import { PageTitle } from "src/components/PageTitle";
 import { TenantRole } from "src/models/User";
 import { JobTable } from "src/pageComponents/job/HistoryJobTable";
 import { Head } from "src/utils/head";
-import { queryToString } from "src/utils/querystring";
 
 export const JobsPage: NextPage = requireAuth((u) => u.tenantRoles.includes(TenantRole.TENANT_ADMIN))(
   () => {

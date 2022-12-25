@@ -10,10 +10,10 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { queryToString, useQuerystring } from "@scow/lib-web/build/utils/querystring";
 import { ForbiddenPage } from "src/components/errorPages/ForbiddenPage";
 import { UserRole } from "src/models/User";
 import type { User } from "src/stores/UserStore";
-import { queryToString, useQuerystring } from "src/utils/querystring";
 
 export const checkQueryAccountNameIsAdmin = (u: User) => {
   const query = useQuerystring();
