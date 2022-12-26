@@ -145,6 +145,26 @@ export async function loggedExec(ssh: NodeSSH, logger: Logger, throwIfFailed: bo
 }
 
 /**
+ * Execute a command as a user
+ *
+ * @param ssh ssh object connected as root
+ * @param user the user the command will execute as
+ * @param logger logger
+ * @param throwIfFailed throw if failed
+ * @param command the command
+ * @param parameters the parameters
+ * @param options exec options
+ */
+export async function executeAsUser(
+  ssh: NodeSSH, user: string, logger: Logger, throwIfFailed: boolean,
+  command: string, parameters: string[], options?: SSHExecCommandOptions,
+) {
+  const cmd = constructCommand(command, parameters);
+
+  return await loggedExec(ssh, logger, throwIfFailed, "su", ["-c", cmd, user], options);
+}
+
+/**
  * Check if the root user can log in to the host
  * If fails, return the error
  *

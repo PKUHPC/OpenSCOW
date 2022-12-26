@@ -15,9 +15,9 @@ import { insertKeyAsRoot } from "src/key";
 import { sftpExists, sftpReadFile, sftpStat, sshRmrf } from "src/sftp";
 import { insertKeyAsUser, sshConnect } from "src/ssh";
 
-import { connectToTestServerAsRoot, createTestItems, resetTestServerAsRoot, rootKeyPair, TestSshServer } from "./utils";
+import { connectToTestServerAsRoot,
+  createTestItems, resetTestServerAsRoot, rootKeyPair, target, TestSshServer } from "./utils";
 
-const target = "localhost:22222";
 let serverSsh: TestSshServer;
 const randomPostfix = String(Math.ceil(Math.random() * 1000 + 1));
 const testUser = "testNewUser" + randomPostfix;

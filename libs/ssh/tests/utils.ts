@@ -19,7 +19,7 @@ import { sftpWriteFile, sshRmrf } from "src/sftp";
 import { sshRawConnect } from "src/ssh";
 import { SFTPWrapper } from "ssh2";
 
-const target = "localhost:22222";
+export const target = "localhost:22222";
 export const rootUserId = "root";
 
 export interface TestSshServer {
