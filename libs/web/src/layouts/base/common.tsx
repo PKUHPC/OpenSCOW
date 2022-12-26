@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { arrayContainsElement } from "@scow/lib-utils";
+import { arrayContainsElement } from "@scow/utils";
 import { ItemType } from "antd/es/menu/hooks/useItems";
 import Link from "next/link";
 import Router from "next/router";

@@ -11,7 +11,7 @@
  */
 
 import { MenuOutlined } from "@ant-design/icons";
-import { arrayContainsElement } from "@scow/lib-utils";
+import { arrayContainsElement } from "@scow/utils";
 import { Button, Dropdown } from "antd";
 import { ItemType } from "antd/es/menu/hooks/useItems";
 import Link from "next/link";

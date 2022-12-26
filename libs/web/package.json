@@ -13,7 +13,7 @@
     "icons"
   ],
   "dependencies": {
-    "@scow/lib-utils": "workspace:*"
+    "@scow/utils": "workspace:*"
   },
   "peerDependencies": {
     "antd": "5.0.7",

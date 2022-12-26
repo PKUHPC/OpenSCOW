@@ -12,7 +12,7 @@
 
 "use client";
 
-import { arrayContainsElement } from "@scow/lib-utils";
+import { arrayContainsElement } from "@scow/utils";
 import { Layout, Menu } from "antd";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { calcSelectedKeys, createMenuItems } from "src/layouts/base/common";

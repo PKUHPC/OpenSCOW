@@ -37,7 +37,7 @@
     "@scow/lib-decimal": "workspace:*",
     "@scow/protos": "workspace:*",
     "@scow/lib-web": "workspace:*",
-    "@scow/lib-utils": "workspace:*",
+    "@scow/utils": "workspace:*",
     "@sinclair/typebox": "0.25.13",
     "antd": "5.0.7",
     "dayjs": "1.11.7",

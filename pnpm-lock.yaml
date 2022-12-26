@@ -180,7 +180,7 @@ importers:
       '@scow/lib-auth': workspace:*
       '@scow/lib-config': workspace:*
       '@scow/lib-decimal': workspace:*
-      '@scow/lib-utils': workspace:*
+      '@scow/utils': workspace:*
       '@scow/lib-web': workspace:*
       '@scow/protos': workspace:*
       '@sinclair/typebox': 0.25.13
@@ -230,7 +230,7 @@ importers:
       '@scow/lib-auth': link:../../libs/auth
       '@scow/lib-config': link:../../libs/libconfig
       '@scow/lib-decimal': link:../../libs/decimal
-      '@scow/lib-utils': link:../../libs/utils
+      '@scow/utils': link:../../libs/utils
       '@scow/lib-web': link:../../libs/web
       '@scow/protos': link:../../libs/protos
       '@sinclair/typebox': 0.25.13
@@ -330,7 +330,7 @@ importers:
       '@scow/lib-config': workspace:*
       '@scow/lib-decimal': workspace:*
       '@scow/lib-ssh': workspace:*
-      '@scow/lib-utils': workspace:*
+      '@scow/utils': workspace:*
       '@scow/lib-web': workspace:*
       '@scow/protos': workspace:*
       '@sinclair/typebox': 0.25.13
@@ -394,7 +394,7 @@ importers:
       '@scow/lib-config': link:../../libs/libconfig
       '@scow/lib-decimal': link:../../libs/decimal
       '@scow/lib-ssh': link:../../libs/ssh
-      '@scow/lib-utils': link:../../libs/utils
+      '@scow/utils': link:../../libs/utils
       '@scow/lib-web': link:../../libs/web
       '@scow/protos': link:../../libs/protos
       '@sinclair/typebox': 0.25.13
@@ -545,9 +545,9 @@ importers:
 
   libs/web:
     specifiers:
-      '@scow/lib-utils': workspace:*
+      '@scow/utils': workspace:*
     dependencies:
-      '@scow/lib-utils': link:../utils
+      '@scow/utils': link:../utils
 
 packages:
 

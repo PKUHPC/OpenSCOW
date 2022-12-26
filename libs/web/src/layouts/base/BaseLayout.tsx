@@ -12,7 +12,7 @@
 
 "use client";
 
-import { arrayContainsElement } from "@scow/lib-utils";
+import { arrayContainsElement } from "@scow/utils";
 import { Grid, Layout } from "antd";
 import { useRouter } from "next/router";
 import React, { PropsWithChildren, useState } from "react";
