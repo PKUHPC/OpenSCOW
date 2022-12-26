@@ -4,8 +4,7 @@
   "description": "",
   "main": "build/index.js",
   "scripts": {
-    "build": "rimraf build && tsc -p tsconfig.build.json",
-    "test": "jest"
+    "build": "rimraf build && tsc -p tsconfig.build.json"
   },
   "files": [
     "build"
