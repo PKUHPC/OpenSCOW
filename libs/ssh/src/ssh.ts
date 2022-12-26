@@ -107,6 +107,17 @@ export async function sshConnectByPassword<T>(
 }
 
 /**
+ * Calculate env prefix. Needed quotes in values are added
+ * e.g. { test: "123"; test1: "4\"56" } => "test=123 test1='4\"56' "
+ *
+ * @param env env objec
+ * @returns string to be added in front of the command
+ */
+export function getEnvPrefix(env: Record<string, string>) {
+  return Object.keys(env).map((x) => `${x}=${quote([env[x] ?? ""])} `).join("");
+}
+
+/**
  * Construct a command with env prefixes.
  * Some OpenSSH servers don't accept envs
  * This is a workaround by combining the envs to the command
@@ -119,7 +130,7 @@ export function constructCommand(cmd: string, parameters: readonly string[], env
 
   const command = cmd + (parameters.length > 0 ? (" " + quote(parameters)) : "");
 
-  const envPrefix = env ? Object.keys(env).map((x) => `${x}=${quote([env[x] ?? ""])} `).join("") : "";
+  const envPrefix = env ? getEnvPrefix(env) : "";
 
   return envPrefix + command;
 }
@@ -157,11 +168,18 @@ export async function loggedExec(ssh: NodeSSH, logger: Logger, throwIfFailed: bo
  */
 export async function executeAsUser(
   ssh: NodeSSH, user: string, logger: Logger, throwIfFailed: boolean,
-  command: string, parameters: string[], options?: SSHExecCommandOptions,
+  command: string, parameters: readonly string[], options?: SSHExecCommandOptions,
 ) {
-  const cmd = constructCommand(command, parameters);
 
-  return await loggedExec(ssh, logger, throwIfFailed, "su", ["-c", cmd, user], options);
+  const env = options?.execOptions?.env;
+  const envOption = env ? `--preserve-env=${Object.keys(env).join(",")}` : "";
+
+  return await loggedExec(ssh, logger, throwIfFailed,
+    "sudo", [
+      envOption,
+      "-u", user,
+      "-s", command, ...parameters,
+    ], options);
 }
 
 /**
