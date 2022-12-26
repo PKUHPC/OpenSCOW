@@ -193,7 +193,7 @@ export async function insertKeyAsUser(
 ) {
 
   await sshConnectByPassword(address, username, pwd, logger, async (ssh) => {
-    const homeDir = await ssh.execCommand(`eval echo ~${username}`);
+    const homeDir = await loggedExec(ssh, logger, true, "eval", ["echo", `~${username}`]);
     const userHomeDir = homeDir.stdout.trim();
 
     const sftp = await ssh.requestSFTP();
