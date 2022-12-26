@@ -28,21 +28,33 @@ slurm:
   mis:
     # 部署slurm.sh的机器的地址
     managerUrl: haha
-    # slurm.sh在机器中的绝对地址,每次系统启动时，会自动将slurm.sh文件复制到scriptPath指定路径上
+    # slurm.sh在机器中的绝对地址
     scriptPath: /test/slurm.sh
 
-    # 部署slurm.sh的机器通过什么地址访问slurm的mysql数据库
+    # 部署slurm.sh的机器通过什么地址访问slurm的数据库
     # 不填写为下面的默认值
     # dbHost: localhost
 
-    # 部署slurm.sh的机器通过什么端口访问slurm的mysql数据库
+    # 部署slurm.sh的机器通过什么端口访问slurm的数据库
     # 不填写为下面的默认值
     # dbPort: 3306
 
-    # slurmdbd的数据库密码
+    # slurm数据库的用户名
+    # 参考slurmdbd.conf的StorageUser配置
+    # 不填写为下面的默认值
+    # dbUser: root
+
+    # slurmdbd的数据库用户的密码
+    # 参考slurmdbd.conf的StoragePass配置
     dbPassword: password
-    # slurm中这个集群的集群名
-    clusterName: hpc01
+
+    # slurm accounting数据库的数据库名
+    # 参考slurmdbd.conf的StorageLoc配置
+    # 不填写为下面的默认值
+    # slurmAcctDbName: "slurm_acct_db"
+
+    # 这个集群在slurm中的集群名字
+    clusterName: pkuhpc
 ```
 
 ## 导入已有用户信息
