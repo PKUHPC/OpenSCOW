@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { RefreshLink, useRefreshToken } from "@scow/lib-web/build/utils/refreshToken";
 import { Divider, Space } from "antd";
 import { NextPage } from "next";
 import { useCallback } from "react";
@@ -22,7 +23,6 @@ import { useAccountPagesAccountName } from "src/pageComponents/accounts/checkQue
 import { AddUserButton } from "src/pageComponents/users/AddUserButton";
 import { UserTable } from "src/pageComponents/users/UserTable";
 import { Head } from "src/utils/head";
-import { RefreshLink, useRefreshToken } from "src/utils/refreshToken";
 
 export const UsersPage: NextPage = requireAuth(
   (i) => i.accountAffiliations.some((x) => x.role !== UserRole.USER),

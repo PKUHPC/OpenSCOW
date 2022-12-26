@@ -15,6 +15,8 @@ import { CloseOutlined,
   DeleteOutlined, FileAddOutlined, FileOutlined, FolderAddOutlined,
   FolderOutlined, HomeOutlined, LeftOutlined, MacCommandOutlined, RightOutlined,
   ScissorOutlined, SnippetsOutlined, UploadOutlined, UpOutlined } from "@ant-design/icons";
+import { compareDateTime, formatDateTime } from "@scow/lib-web/build/utils/datetime";
+import { compareNumber } from "@scow/lib-web/build/utils/math";
 import { Button, Divider, Space, Table } from "antd";
 import Link from "next/link";
 import Router from "next/router";
@@ -34,8 +36,6 @@ import { RenameModal } from "src/pageComponents/filemanager/RenameModal";
 import { UploadModal } from "src/pageComponents/filemanager/UploadModal";
 import { FileInfo, FileType } from "src/pages/api/file/list";
 import { publicConfig } from "src/utils/config";
-import { compareDateTime, formatDateTime } from "src/utils/datetime";
-import { compareNumber } from "src/utils/math";
 import styled from "styled-components";
 
 interface Props {

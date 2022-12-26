@@ -11,6 +11,7 @@
  */
 
 import { PlusOutlined } from "@ant-design/icons";
+import { queryToString } from "@scow/lib-web/build/utils/querystring";
 import { Button, Form, Table } from "antd";
 import { ColumnsType } from "antd/es/table";
 import { useRouter } from "next/router";
@@ -25,7 +26,6 @@ import { DesktopTableActions } from "src/pageComponents/desktop/DesktopTableActi
 import { NewDesktopTableModal } from "src/pageComponents/desktop/NewDesktopTableModal";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { publicConfig } from "src/utils/config";
-import { queryToString } from "src/utils/querystring";
 
 const NewDesktopTableModalButton = ModalButton(NewDesktopTableModal, { type: "primary", icon: <PlusOutlined /> });
 

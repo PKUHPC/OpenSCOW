@@ -11,6 +11,7 @@
  */
 
 import { ExclamationCircleOutlined } from "@ant-design/icons";
+import { formatDateTime } from "@scow/lib-web/build/utils/datetime";
 import { PlatformUserInfo } from "@scow/protos/build/server/user";
 import { Divider, Space, Table } from "antd";
 import React, { useCallback, useState } from "react";
@@ -22,7 +23,6 @@ import { useMessage, useModal } from "src/layouts/prompts";
 import { PlatformRole } from "src/models/User";
 import { GetAllUsersSchema } from "src/pages/api/admin/getAllUsers";
 import { User } from "src/stores/UserStore";
-import { formatDateTime } from "src/utils/datetime";
 
 
 interface PageInfo {

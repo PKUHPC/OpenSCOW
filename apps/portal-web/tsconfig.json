@@ -34,5 +34,5 @@
     "**/*.ts",
     "**/*.tsx",
     "jest.config.js"
-  ]
+, "../../libs/web/src/layouts/DefaultClusterSelector.tsx", "../../libs/web/src/utils/form.ts"  ]
 }

@@ -11,6 +11,7 @@
  */
 
 import { asyncDuplexStreamCall } from "@ddadaal/tsgrpc-client";
+import { queryToIntOrDefault, queryToString } from "@scow/lib-web/build/utils/querystring";
 import { ShellResponse, ShellServiceClient } from "@scow/protos/build/portal/shell";
 import { NextApiRequest } from "next";
 import { join } from "path";
@@ -19,7 +20,6 @@ import { checkCookie } from "src/auth/server";
 import { AugmentedNextApiResponse } from "src/types/next";
 import { getClient } from "src/utils/client";
 import { runtimeConfig } from "src/utils/config";
-import { queryToIntOrDefault, queryToString } from "src/utils/querystring";
 
 export const config = {
   api: {

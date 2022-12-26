@@ -11,9 +11,9 @@
  */
 
 import { finallyEvent, prefetchEvent } from "@ddadaal/next-typed-api-routes-runtime/lib/client";
+import { isServer } from "@scow/lib-web/build/utils/isServer";
 import Router from "next/router";
 import NProgress from "nprogress";
-import { isServer } from "src/utils/isServer";
 
 NProgress.configure({ showSpinner: false });
 

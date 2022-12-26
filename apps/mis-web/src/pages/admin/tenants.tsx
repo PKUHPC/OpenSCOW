@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { RefreshLink, useRefreshToken } from "@scow/lib-web/build/utils/refreshToken";
 import { Divider, Space } from "antd";
 import { NextPage } from "next";
 import { requireAuth } from "src/auth/requireAuth";
@@ -18,7 +19,6 @@ import { PlatformRole } from "src/models/User";
 import { AllTenantsTable } from "src/pageComponents/admin/AllTenantsTable";
 import { AddTenantButton } from "src/pageComponents/tenant/AddTenantButton";
 import { Head } from "src/utils/head";
-import { RefreshLink, useRefreshToken } from "src/utils/refreshToken";
 
 
 export const showAllTenants: NextPage = 

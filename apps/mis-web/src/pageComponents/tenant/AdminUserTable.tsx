@@ -11,6 +11,7 @@
  */
 
 import { ExclamationCircleOutlined } from "@ant-design/icons";
+import { compareDateTime, formatDateTime } from "@scow/lib-web/build/utils/datetime";
 import { Button, Divider, Form, Input, Space, Table } from "antd";
 import React, { useMemo, useState } from "react";
 import { api } from "src/apis";
@@ -21,7 +22,6 @@ import { useMessage, useModal } from "src/layouts/prompts";
 import { FullUserInfo, TenantRole } from "src/models/User";
 import { GetTenantUsersSchema } from "src/pages/api/admin/getTenantUsers";
 import { User } from "src/stores/UserStore";
-import { compareDateTime, formatDateTime } from "src/utils/datetime";
 
 interface Props {
   data: GetTenantUsersSchema["responses"]["200"] | undefined;

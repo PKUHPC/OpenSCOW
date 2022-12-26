@@ -11,6 +11,7 @@
  */
 
 import { ExclamationCircleOutlined } from "@ant-design/icons";
+import { formatDateTime } from "@scow/lib-web/build/utils/datetime";
 import { WhitelistedAccount } from "@scow/protos/build/server/account";
 import { Divider, Space, Table } from "antd";
 import React from "react";
@@ -18,7 +19,6 @@ import { api } from "src/apis";
 import { useMessage, useModal } from "src/layouts/prompts";
 import type {
   GetWhitelistedAccountsSchema } from "src/pages/api/tenant/accountWhitelist/getWhitelistedAccounts";
-import { formatDateTime } from "src/utils/datetime";
 
 interface Props {
   data: GetWhitelistedAccountsSchema["responses"]["200"] | undefined;

@@ -14,6 +14,10 @@ import "nprogress/nprogress.css";
 import "antd/dist/reset.css";
 
 import { failEvent, fromApi } from "@ddadaal/next-typed-api-routes-runtime/lib/client";
+import { AntdConfigProvider } from "@scow/lib-web/build/layouts/AntdConfigProvider";
+import { DarkModeProvider } from "@scow/lib-web/build/layouts/darkMode";
+import { useConstant } from "@scow/lib-web/build/utils/hooks";
+import { isServer } from "@scow/lib-web/build/utils/isServer";
 import { App } from "@scow/protos/build/portal/app";
 import type { AppContext, AppProps } from "next/app";
 import NextApp from "next/app";
@@ -24,9 +28,8 @@ import { useEffect, useRef } from "react";
 import { createStore, StoreProvider, useStore } from "simstate";
 import { USE_MOCK } from "src/apis/useMock";
 import { getTokenFromCookie } from "src/auth/cookie";
-import { AntdConfigProvider } from "src/layouts/AntdConfigProvider";
-import { BaseLayout } from "src/layouts/base/BaseLayout";
-import { DarkModeProvider } from "src/layouts/darkMode";
+import { BaseLayout } from "src/layouts/BaseLayout";
+import { FloatButtons } from "src/layouts/FloatButtons";
 import { useMessage } from "src/layouts/prompts";
 import { ListAvailableAppsSchema } from "src/pages/api/app/listAvailableApps";
 import { ValidateTokenSchema } from "src/pages/api/auth/validateToken";
@@ -38,8 +41,6 @@ import {
 import { GlobalStyle } from "src/styles/globalStyle";
 import { publicConfig, runtimeConfig } from "src/utils/config";
 import { getHostname } from "src/utils/host";
-import { isServer } from "src/utils/isServer";
-import useConstant from "src/utils/useConstant";
 
 
 const FailEventHandler: React.FC = () => {
@@ -115,6 +116,7 @@ function MyApp({ Component, pageProps, extra }: Props) {
       <StoreProvider stores={[userStore, defaultClusterStore, appsStore]}>
         <DarkModeProvider>
           <AntdConfigProvider color={primaryColor}>
+            <FloatButtons />
             <GlobalStyle />
             <FailEventHandler />
             <TopProgressBar />

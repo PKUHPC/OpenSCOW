@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { RefreshLink, useRefreshToken } from "@scow/lib-web/build/utils/refreshToken";
 import { Divider, Space } from "antd";
 import { NextPage } from "next";
 import { useCallback } from "react";
@@ -21,7 +22,6 @@ import { TenantRole } from "src/models/User";
 import { AccountWhitelistTable } from "src/pageComponents/tenant/AccountWhitelistTable";
 import { AddWhitelistedAccountButton } from "src/pageComponents/tenant/AddWhitelistedAccountButton";
 import { Head } from "src/utils/head";
-import { RefreshLink, useRefreshToken } from "src/utils/refreshToken";
 
 export const AccountWhitelistPage: NextPage = requireAuth((u) => u.tenantRoles.includes(TenantRole.TENANT_ADMIN))(
   () => {

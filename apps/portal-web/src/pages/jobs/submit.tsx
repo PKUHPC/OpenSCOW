@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { queryToString, useQuerystring } from "@scow/lib-web/build/utils/querystring";
 import { Spin } from "antd";
 import { NextPage } from "next";
 import { useCallback } from "react";
@@ -20,7 +21,6 @@ import { PageTitle } from "src/components/PageTitle";
 import { SubmitJobForm } from "src/pageComponents/job/SubmitJobForm";
 import { publicConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
-import { queryToString, useQuerystring } from "src/utils/querystring";
 
 export const SubmitJobPage: NextPage = requireAuth(() => true)(
   () => {

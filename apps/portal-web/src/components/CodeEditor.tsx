@@ -15,9 +15,9 @@ import { StreamLanguage } from "@codemirror/language";
 import { shell } from "@codemirror/legacy-modes/mode/shell";
 import { EditorState } from "@codemirror/state";
 import { EditorView } from "@codemirror/view";
+import { useDarkMode } from "@scow/lib-web/build/layouts/darkMode";
 import { basicSetup } from "codemirror";
 import { useEffect, useRef } from "react";
-import { useDarkMode } from "src/layouts/darkMode";
 import styled, { useTheme } from "styled-components";
 
 interface Props {

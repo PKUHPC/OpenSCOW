@@ -10,9 +10,9 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { FormLayout } from "@scow/lib-web/build/layouts/FormLayout";
 import { Alert, Typography } from "antd";
 import { Centered } from "src/components/layouts";
-import { FormLayout } from "src/layouts/FormLayout";
 import styled from "styled-components";
 
 import { ImportUsersTable } from "../admin/ImportUsersTable";

@@ -10,11 +10,11 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { FormLayout } from "@scow/lib-web/build/layouts/FormLayout";
 import { Alert, Button, Form, Typography } from "antd";
 import { useState } from "react";
 import { api } from "src/apis";
 import { Centered } from "src/components/layouts";
-import { FormLayout } from "src/layouts/FormLayout";
 import { useMessage, useModal } from "src/layouts/prompts";
 import { CreateUserForm, CreateUserFormFields } from "src/pageComponents/users/CreateUserForm";
 import { publicConfig } from "src/utils/config";
@@ -72,11 +72,11 @@ export const InitAdminForm: React.FC = () => {
         title: "提示",
         content: result.existsInAuth !== undefined ?
           // 认证系统支持查询
-          result.existsInAuth ? 
+          result.existsInAuth ?
             "用户已经在认证系统中存在，您此处输入的密码将会不起作用，新用户的密码将是认证系统中的已有用户的当前密码。确认添加为初始管理员？" : "用户不存在于认证系统，是否确认创建此用户并添加为初始管理员？"
           : // 认证系统不支持查询
           publicConfig.ENABLE_CREATE_USER ?
-            " 无法确认用户是否在认证系统中存在， 将会尝试在认证系统中创建。如果用户已经在认证系统中存在，您此处输入的密码将会不起作用，新用户的密码将是认证系统中的已有用户的当前密码" 
+            " 无法确认用户是否在认证系统中存在， 将会尝试在认证系统中创建。如果用户已经在认证系统中存在，您此处输入的密码将会不起作用，新用户的密码将是认证系统中的已有用户的当前密码"
             : "无法确认用户是否在认证系统中存在，并且当前认证系统不支持创建用户，请您确认此用户已经在认证系统中存在，确认将会直接加入到数据库中"
             + ", 并且您此处输入的密码将不会起作用，新用户的密码将是认证系统中的已有用户的当前密码。",
         okText: "确认",
@@ -86,7 +86,7 @@ export const InitAdminForm: React.FC = () => {
         onOk: async () => {
           await api.createInitAdmin(
             { body: { email, identityId, name, password } })
-            .httpError(409, (e) => { 
+            .httpError(409, (e) => {
               if (e.code === "ALREADY_EXISTS_IN_SCOW")
                 modal.error({
                   title: "添加失败",
@@ -94,20 +94,20 @@ export const InitAdminForm: React.FC = () => {
                   okText: "确认",
                 });
             })
-            .then((createdInAuth) => { 
-              !createdInAuth.createdInAuth ? 
+            .then((createdInAuth) => {
+              !createdInAuth.createdInAuth ?
                 modal.info({
                   title: "添加成功",
                   content: "此用户存在于认证系统中，已成功添加到SCOW数据库",
                   okText: "确认",
                 })
                 : message.success("添加完成！"); })
-            .catch(() => {               
+            .catch(() => {
               modal.error({
                 title: "添加失败",
                 content: "创建用户失败",
-              });  
-            }) 
+              });
+            })
             .finally(() => {
               form.resetFields();
               setLoading(false);
@@ -126,7 +126,7 @@ export const InitAdminForm: React.FC = () => {
         </Typography.Paragraph>
         <AlertContainer>
           <Alert
-            type={publicConfig.ENABLE_CREATE_USER ? "success" : "warning"} 
+            type={publicConfig.ENABLE_CREATE_USER ? "success" : "warning"}
             message={publicConfig.ENABLE_CREATE_USER ? "当前认证系统支持创建用户，您可以选择加入一个已存在于认证系统的用户，或者创建一个全新的用户。系统将会在认证系统中创建此用户"
               : "当前认证系统不支持创建用户，请确认要添加的用户必须已经存在于认证系统，且用户的ID必须和认证系统中的用户ID保持一致"}
           />

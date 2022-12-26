@@ -11,6 +11,7 @@
  */
 
 import { moneyToNumber } from "@scow/lib-decimal";
+import { queryToString } from "@scow/lib-web/build/utils/querystring";
 import { Descriptions, Tag } from "antd";
 import { GetServerSideProps, NextPage } from "next";
 import { USE_MOCK } from "src/apis/useMock";
@@ -20,7 +21,6 @@ import { PageTitle } from "src/components/PageTitle";
 import { UserRole } from "src/models/User";
 import { getAccounts } from "src/pages/api/tenant/getAccounts";
 import { Head } from "src/utils/head";
-import { queryToString } from "src/utils/querystring";
 
 type Props = SSRProps<{
   accountName: string;

@@ -10,13 +10,13 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { RefreshLink, useRefreshToken } from "@scow/lib-web/build/utils/refreshToken";
 import { NextPage } from "next";
 import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
 import { PlatformRole } from "src/models/User";
 import { AllUsersTable } from "src/pageComponents/admin/AllUsersTable";
 import { Head } from "src/utils/head";
-import { RefreshLink, useRefreshToken } from "src/utils/refreshToken";
 
 
 export const ShowUsersPage: NextPage = 

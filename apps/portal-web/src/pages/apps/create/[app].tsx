@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { queryToString } from "@scow/lib-web/build/utils/querystring";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useStore } from "simstate";
@@ -19,7 +20,6 @@ import { PageTitle } from "src/components/PageTitle";
 import { LaunchAppForm } from "src/pageComponents/app/LaunchAppForm";
 import { AppsStore } from "src/stores/AppsStore";
 import { Head } from "src/utils/head";
-import { queryToString } from "src/utils/querystring";
 
 
 export const AppIndexPage: NextPage = requireAuth(() => true)(() => {

@@ -10,7 +10,6 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { FormInstance } from "antd";
 import { publicConfig } from "src/utils/config";
 
 export const passwordRule = {
@@ -18,30 +17,4 @@ export const passwordRule = {
   message: publicConfig.PASSWORD_PATTERN_MESSAGE,
 };
 
-export const confirmPasswordFormItemProps = <
-  PasswordFieldName extends string,
-  T extends { [key in PasswordFieldName]: string }
->(form: FormInstance<T>, passwordFieldName: PasswordFieldName) => {
-  return {
-    dependencies: [passwordFieldName],
-    validateFirst: true,
-    rules: [
-      {
-        required: true,
-        message: "请确认密码",
-      },
-      {
-        validator: async (_, value) => {
-          if (value && form.getFieldValue(passwordFieldName) !== value) {
-            throw new Error("两次密码输入不一致，请重新输入");
-          }
-        },
-      },
-    ],
-  };
-};
-
-export const emailRule = ({
-  type: "email",
-  message: "邮箱格式不正确，请重新输入",
-}) as const;
+export { confirmPasswordFormItemProps, emailRule } from "@scow/lib-web/build/utils/form";
