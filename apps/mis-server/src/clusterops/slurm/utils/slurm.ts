@@ -34,11 +34,13 @@ export const executeSlurmScript = async (
   const partitionsParam = partitions.map((x) => "\"" + x + "\"").join(" ");
 
   const result = await executeScript(slurmMisConfig, slurmMisConfig.scriptPath, params, {
-    MYSQL_PASSWORD: slurmMisConfig.dbPassword,
     BASE_PARTITIONS: partitionsParam,
     CLUSTER_NAME: slurmMisConfig.clusterName,
     DB_HOST: slurmMisConfig.dbHost,
     DB_PORT: String(slurmMisConfig.dbPort),
+    DB_USER: slurmMisConfig.dbUser,
+    DB_PASSWORD: slurmMisConfig.dbPassword,
+    SLURM_ACCT_DB_NAME: slurmMisConfig.slurmAcctDbName,
   }, logger);
 
   return result;

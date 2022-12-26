@@ -170,12 +170,14 @@ query timelimit of job 4300: ./slurm -t 4300
 "
 
 
-mysql="mysql -h$DB_HOST -P$DB_PORT -uroot -p$MYSQL_PASSWORD"
+mysql="mysql -h$DB_HOST -P$DB_PORT -u$DB_USER -p$DB_PASSWORD"
+slurm_acct_db_name="$SLURM_ACCT_DB_NAME"
 basePartition=($BASE_PARTITIONS)
 base_qos=`sacctmgr -n show qos format=Name | tr '\n' ',' | sed s/[[:space:]]//g`
 base_qos=${base_qos%?}
 default_qos="normal"
 assoc_table=${CLUSTER_NAME}_assoc_table
+
 
 addUser() #abandon !!!!!2017-09-24
 {
@@ -238,7 +240,7 @@ addToAcct(){
         username=$4
         acct=`sacctmgr -n show acct $2`
         user=`sacctmgr -n show user $4`
-        user_acct=`$mysql --skip-column-names slurm_acct_db -e "select * from $assoc_table where user='$4' and acct='$2' and deleted=0"`
+        user_acct=`$mysql --skip-column-names $slurm_acct_db_name -e "select * from $assoc_table where user='$4' and acct='$2' and deleted=0"`
         user2=`ldapsearch -x  uid=$4 | grep homeDirectory`
         if [ "$acct" != "" ] ; then
             if [ "$user" = "" ] || [ "$user2" = "" ]; then # user is not exist
@@ -277,7 +279,7 @@ delUser(){
         else
             sacctmgr -i delete user name=$2
             ## delete ralated null account
-            acct=`$mysql --skip-column-names slurm_acct_db -e "select DISTINCT acct from $assoc_table where user='$2' and deleted=0"`
+            acct=`$mysql --skip-column-names $slurm_acct_db_name -e "select DISTINCT acct from $assoc_table where user='$2' and deleted=0"`
         fi
     else
         echo -e "$delUser\n"
@@ -290,7 +292,7 @@ delAcct(){ ## attention: ensure this account is not any user's default account
 ## example:
 ## delete an account names test:  ./slurm -a test
     if [ $# == 2 ]; then
-        #acct=`$mysql slurm_acct_db -e "select * from acct_table where name='$2' and deleted=0"`
+        #acct=`$mysql $slurm_acct_db_name -e "select * from acct_table where name='$2' and deleted=0"`
         acct=`sacctmgr -n show acct $2`
         if [ "$acct" == "" ] ; then
             echo "Account $2 is not exist!"
@@ -302,20 +304,20 @@ delAcct(){ ## attention: ensure this account is not any user's default account
                 echo "This acct is running some jobs!"
                 exit 8
             fi
-            user=`$mysql --skip-column-names slurm_acct_db -e "select user from $assoc_table where acct='$2' and deleted=0 " | sort -u`
+            user=`$mysql --skip-column-names $slurm_acct_db_name -e "select user from $assoc_table where acct='$2' and deleted=0 " | sort -u`
             for line in $user
             do
-                user_acct=`$mysql --skip-column-names slurm_acct_db -e "select acct from $assoc_table where user='$line' and deleted=0" | sort -u | sed "s/^$2$//g"`
+                user_acct=`$mysql --skip-column-names $slurm_acct_db_name -e "select acct from $assoc_table where user='$line' and deleted=0" | sort -u | sed "s/^$2$//g"`
                 if [ "$user_acct" == "" ] ; then  ## users that only have an account, we should delete these users before delete account
                     # delete user
                     sacctmgr -i delete user name=$line
                     ## delete ralated null account
-                    acct=`$mysql --skip-column-names slurm_acct_db -e "select DISTINCT acct from $assoc_table where user='$line' and deleted=0"`
+                    acct=`$mysql --skip-column-names $slurm_acct_db_name -e "select DISTINCT acct from $assoc_table where user='$line' and deleted=0"`
                 else
                     choose=`echo $user_acct | awk {'print $1'}`
              #       echo "choose="$choose
                     #wrong if the default account is not $2 , user's default account shouldn't change
-                    defAcct=`$mysql --skip-column-names slurm_acct_db -e "select acct from $assoc_table where user="$line" and deleted=0 and is_def=1" | sort | uniq`
+                    defAcct=`$mysql --skip-column-names $slurm_acct_db_name -e "select acct from $assoc_table where user="$line" and deleted=0 and is_def=1" | sort | uniq`
                     if [ "$defAcct" = "$2" ] ; then
                         sacctmgr -i update user set DefaultAccount=$choose where user=$line
                     fi
@@ -337,28 +339,28 @@ delFromAcct(){   #####2017-08-31   not rewrite it
     if [ $# -gt 2 ] ; then
         acct=$2
         deleUser=$3
-        #account=`$mysql slurm_acct_db -e "select * from acct_table where name='$2' and deleted=0"`
+        #account=`$mysql $slurm_acct_db_name -e "select * from acct_table where name='$2' and deleted=0"`
         account=`sacctmgr -n show acct $2`
         if [ "$account" = "" ] ; then
             echo "This account $2 is not exist"
             exit 7
         fi
-        user=`$mysql --skip-column-names slurm_acct_db -e "select user from $assoc_table where acct='$2' and deleted=0 " | sort -u`
+        user=`$mysql --skip-column-names $slurm_acct_db_name -e "select user from $assoc_table where acct='$2' and deleted=0 " | sort -u`
         shift 2
         while [ $1 ]
         do
             if echo "${user[@]}" | grep -w "$1" > /dev/null ; then
-                user_acct=`$mysql --skip-column-names slurm_acct_db -e "select acct from $assoc_table where user='$1' and deleted=0" | sort -u | sed "s/^$acct$//g"`
+                user_acct=`$mysql --skip-column-names $slurm_acct_db_name -e "select acct from $assoc_table where user='$1' and deleted=0" | sort -u | sed "s/^$acct$//g"`
                 if [ "$user_acct" = "" ] ; then ## user only has one account, that's $2=acct
                     echo "here only one account!"
                     # delete user
                     sacctmgr -i delete user name=$1
                     ## delete ralated null account
-                    acct=`$mysql --skip-column-names slurm_acct_db -e "select DISTINCT acct from $assoc_table where user='$1' and deleted=0"`
+                    acct=`$mysql --skip-column-names $slurm_acct_db_name -e "select DISTINCT acct from $assoc_table where user='$1' and deleted=0"`
                 else
                     choose=`echo $user_acct | awk {'print $1'}`
                     #wrong if the default account is not $2 , user's default account shouldn't change
-                    defAcct=`$mysql --skip-column-names slurm_acct_db -e "select acct from $assoc_table where user="$1" and deleted=0 and is_def=1" | sort | uniq`
+                    defAcct=`$mysql --skip-column-names $slurm_acct_db_name -e "select acct from $assoc_table where user="$1" and deleted=0 and is_def=1" | sort | uniq`
                     #echo defAcct=$defAcct
                     if [ "$defAcct" = "$acct" ] ; then
                         sacctmgr -i update user set DefaultAccount=$choose where user=$1
@@ -465,7 +467,7 @@ blockUser(){
             echo "User $2 is not exist!"
             exit 7
         fi
-        MaxSubmitJobs=`$mysql --skip-column-names slurm_acct_db -e " select distinct max_submit_jobs from $assoc_table where user='$2'"`
+        MaxSubmitJobs=`$mysql --skip-column-names $slurm_acct_db_name -e " select distinct max_submit_jobs from $assoc_table where user='$2'"`
         if [ "$MaxSubmitJobs" == 0 ] ; then
             echo "User $2 is already blocked!"
             exit 8
@@ -488,7 +490,7 @@ blockUserfromAcct(){
 #block a user named test from an account named acct
 #./slurm -o acct test
     if [[ $# == 3 ]] ; then
-        #user=`$mysql --skip-column-names slurm_acct_db -e "select user from $assoc_table where acct='$2' and deleted=0 " | sort -u`
+        #user=`$mysql --skip-column-names $slurm_acct_db_name -e "select user from $assoc_table where acct='$2' and deleted=0 " | sort -u`
         acct=`sacctmgr -n show acct $2`
         if [ "$acct" == "" ] ; then
             echo "Account $2 is not exist!"
@@ -583,7 +585,7 @@ queryUser(){
             echo "User $2 is not exist!"
             exit 7
         fi
-        MaxSubmitJobs=`$mysql --skip-column-names slurm_acct_db -e " select distinct max_submit_jobs from $assoc_table where user='$2'"`
+        MaxSubmitJobs=`$mysql --skip-column-names $slurm_acct_db_name -e " select distinct max_submit_jobs from $assoc_table where user='$2'"`
         if [ "$MaxSubmitJobs" == "NULL" ] ; then
             echo "User $2 is allowed!"
             exit 0
@@ -619,7 +621,7 @@ queryUserInAcct(){
             echo "User $3 is not exist in account $2"
             exit 4
         else
-             MaxSubmitJobs=`$mysql --skip-column-names slurm_acct_db -e " select distinct max_submit_jobs from $assoc_table where acct='$2' and user='$3'"`
+             MaxSubmitJobs=`$mysql --skip-column-names $slurm_acct_db_name -e " select distinct max_submit_jobs from $assoc_table where acct='$2' and user='$3'"`
             if [ "$MaxSubmitJobs" == "NULL" ] ; then
                 echo "User $3 is allowed in account $2!"
                 exit 0
@@ -706,7 +708,7 @@ AllUserInAcct(){
             echo "Account $2 is not exist!"
             exit 7
         fi
-        user_acct=`$mysql --skip-column-names slurm_acct_db -e "select distinct user,qos from $assoc_table where acct='$2' and deleted='0'"`
+        user_acct=`$mysql --skip-column-names $slurm_acct_db_name -e "select distinct user,qos from $assoc_table where acct='$2' and deleted='0'"`
         if [ "$user_acct" == "" ] ; then
             echo "There is no user in account $2!"
             exit 0
@@ -721,7 +723,7 @@ AllUserInAcct(){
                 shift 1
                 continue
             fi
-            MaxSubmitJobs=`$mysql --skip-column-names slurm_acct_db -e " select distinct max_submit_jobs from $assoc_table where acct='$acct' and user='$1'"`
+            MaxSubmitJobs=`$mysql --skip-column-names $slurm_acct_db_name -e " select distinct max_submit_jobs from $assoc_table where acct='$acct' and user='$1'"`
             if [ "$MaxSubmitJobs" == "NULL" ] ; then
                 echo "$1 : allowd!"
             else
@@ -746,11 +748,11 @@ AllUserInAllAcct(){
 #./slurm -l test
 
     if [[ $# == 2 && $2 == "all" ]] ; then
-        all_acct=`$mysql --skip-column-names slurm_acct_db -e "select distinct name from acct_table where deleted='0'"`
+        all_acct=`$mysql --skip-column-names $slurm_acct_db_name -e "select distinct name from acct_table where deleted='0'"`
 
         for acct in $all_acct
         do
-            user_acct=`$mysql --skip-column-names slurm_acct_db -e "select distinct user from $assoc_table where acct='$acct' and deleted='0'"`
+            user_acct=`$mysql --skip-column-names $slurm_acct_db_name -e "select distinct user from $assoc_table where acct='$acct' and deleted='0'"`
             if [ "$user_acct" == "" ] ; then
                 echo $acct
                 echo "There is no user in account $2!"
@@ -763,7 +765,7 @@ AllUserInAllAcct(){
             set -- `echo $user_acct`
             while [ $1 ]
             do
-                MaxSubmitJobs=`$mysql --skip-column-names slurm_acct_db -e " select distinct max_submit_jobs from $assoc_table where acct='$acct' and user='$1'"`
+                MaxSubmitJobs=`$mysql --skip-column-names $slurm_acct_db_name -e " select distinct max_submit_jobs from $assoc_table where acct='$acct' and user='$1'"`
                 if [ "$MaxSubmitJobs" == "NULL" ] ; then
                     echo "$1 : allowed!"
                 else
