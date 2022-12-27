@@ -46,6 +46,7 @@ RUN pnpm i --offline --frozen-lockfile
 
 COPY --from=pruner /app/out/full/ .
 COPY tsconfig.json .eslintrc.json turbo.json buf.gen.yaml buf.work.yaml ./
+COPY libs/tsconfig.json ./libs/
 COPY protos ./protos
 
 RUN pnpm build
