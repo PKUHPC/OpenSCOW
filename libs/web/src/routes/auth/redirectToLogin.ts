@@ -10,11 +10,20 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { redirectToAuthLogin } from "@scow/lib-web/build/routes/auth/redirectToLogin";
 import { NextApiRequest, NextApiResponse } from "next";
-import { runtimeConfig } from "src/utils/config";
+import { join } from "path";
 
-export default (req: NextApiRequest, res: NextApiResponse) => {
-  redirectToAuthLogin(req, res, runtimeConfig.AUTH_EXTERNAL_URL);
+export const redirectToAuthLogin = (req: NextApiRequest, res: NextApiResponse, authExternalUrl: string) => {
+  const url = new URL(req.url!, `http://${req.headers.host}`);
+
+  const callbackUrl = url.origin + join(process.env.NEXT_PUBLIC_BASE_PATH || "/", "/api/auth/callback");
+
+  const target = authExternalUrl
+    + (authExternalUrl.endsWith("/") ? "" : "/")
+    + `public/auth?callbackUrl=${encodeURIComponent(callbackUrl)}`;
+
+  console.log(authExternalUrl, target);
+
+  res.redirect(target);
 };
 

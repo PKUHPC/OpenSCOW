@@ -16,9 +16,10 @@ import type { UiConfigSchema } from "@scow/config/build/ui";
 import getConfig from "next/config";
 
 export interface ServerRuntimeConfig {
-  SERVER_URL: string;
-  BASE_PATH: string;
+  AUTH_EXTERNAL_URL: string;
   AUTH_INTERNAL_URL: string;
+
+  SERVER_URL: string;
 
   UI_CONFIG: UiConfigSchema | undefined;
   DEFAULT_PRIMARY_COLOR: string;

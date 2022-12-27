@@ -16,7 +16,6 @@ import { NextApiRequest } from "next";
 import { normalize } from "path";
 import { checkCookie } from "src/auth/server";
 import { AugmentedNextApiResponse } from "src/types/next";
-import { runtimeConfig } from "src/utils/config";
 
 /**
  * Normalize url's pathname part
@@ -43,11 +42,13 @@ function parseProxyTarget(url: string, urlIncludesBasePath: boolean): string | E
 
   const normalizedUrl = normalizeUrl(url);
 
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "/";
+
   // skip base path
   const relativePath = urlIncludesBasePath
-    ? runtimeConfig.BASE_PATH === "/"
+    ? basePath === "/"
       ? normalizedUrl
-      : normalizedUrl.slice(runtimeConfig.BASE_PATH.length)
+      : normalizedUrl.slice(basePath.length)
     : normalizedUrl;
 
   const [_empty, _api, _proxy, type, node, port, ...path] = relativePath.split("/");
@@ -55,7 +56,7 @@ function parseProxyTarget(url: string, urlIncludesBasePath: boolean): string | E
   if (type === "relative") {
     return `http://${node}:${port}/${path.join("/")}`;
   } else if (type === "absolute") {
-    const path = `${(urlIncludesBasePath || runtimeConfig.BASE_PATH === "/") ? "" : runtimeConfig.BASE_PATH}${url}`;
+    const path = `${(urlIncludesBasePath || basePath === "/") ? "" : basePath}${url}`;
     return `http://${node}:${port}${path}`;
   } else {
     return new Error("type is not absolute or relative");

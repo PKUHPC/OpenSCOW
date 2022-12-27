@@ -26,14 +26,15 @@ async function queryCapabilities(authUrl, phase) {
 }
 
 const specs = {
+  AUTH_EXTERNAL_URL: str({ desc: "认证系统的URL。如果部署在和本系统一样的域名下，可以只写完整路径", default: "/auth" }),
 
-  BASE_PATH: str({ desc: "整个系统的base path", default: "/" }),
   SERVER_URL: str({ desc: "后端服务地址", default: "mis-server:5000" }),
 
+  AUTH_ORIGIN: str({ desc: "认证系统的域名。如果认证系统和本系统部署在同一个域名下，不填写", default: undefined }),
   AUTH_INTERNAL_URL: str({ desc: "认证服务内网地址", default: "http://auth:5000" }),
 
   PORTAL_DEPLOYED: bool({ desc: "是否部署了门户系统", default: false }),
-  PORTAL_URL: str({ desc: "如果部署了门户系统，设置URL或者路径。相对于整个系统的base path。将会覆盖配置文件。空字符串等价于未部署门户系统", default: "" }),
+  PORTAL_URL: str({ desc: "如果部署了门户系统，门户系统的URL。如果和本系统域名相同，可以只写完整路径。将会覆盖配置文件。空字符串等价于未部署门户系统", default: "" }),
 };
 
 const config = envConfig(specs, process.env);
@@ -60,20 +61,21 @@ const buildRuntimeConfig = async (phase) => {
   // load clusters.json
 
 
-  const basePath = production ? undefined : join(__dirname, "config");
+  const configBasePath = process.env.SCOW_CONFIG_DIR ??
+    (production ? undefined : join(__dirname, "config"));
 
-  const clusters = getClusterConfigs(basePath);
-  const clusterTexts = getClusterTextsConfig(basePath);
-  const uiConfig = getUiConfig(basePath);
-  const misConfig = getMisConfig(basePath);
+  const clusters = getClusterConfigs(configBasePath);
+  const clusterTexts = getClusterTextsConfig(configBasePath);
+  const uiConfig = getUiConfig(configBasePath);
+  const misConfig = getMisConfig(configBasePath);
 
-  const commonConfig = getCommonConfig(basePath);
+  const commonConfig = getCommonConfig(configBasePath);
 
   /**
    * @type {import ("./src/utils/config").ServerRuntimeConfig}
    */
   const serverRuntimeConfig = {
-    BASE_PATH: config.BASE_PATH,
+    AUTH_EXTERNAL_URL: config.AUTH_EXTERNAL_URL,
     AUTH_INTERNAL_URL: config.AUTH_INTERNAL_URL,
     CLUSTERS_CONFIG: clusters,
     CLUSTER_TEXTS_CONFIG: clusterTexts,
@@ -83,7 +85,7 @@ const buildRuntimeConfig = async (phase) => {
   };
 
 
-  const portalUrlSetting = config.PORTAL_URL || misConfig.portalUrl;
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "/";
 
   /**
    * @type {import("./src/utils/config").PublicRuntimeConfig}
@@ -104,7 +106,7 @@ const buildRuntimeConfig = async (phase) => {
     USERID_PATTERN: misConfig.userIdPattern?.regex,
     USERID_PATTERN_MESSAGE: misConfig.userIdPattern?.errorMessage,
 
-    PORTAL_URL: config.PORTAL_DEPLOYED ? join(config.BASE_PATH, config.PORTAL_URL || misConfig.portalUrl || "") : undefined,
+    PORTAL_URL: config.PORTAL_DEPLOYED ? join(basePath, config.PORTAL_URL || misConfig.portalUrl || "") : undefined,
 
     PASSWORD_PATTERN: commonConfig.passwordPattern?.regex,
     PASSWORD_PATTERN_MESSAGE: commonConfig.passwordPattern?.errorMessage,

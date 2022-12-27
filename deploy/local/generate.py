@@ -204,8 +204,7 @@ def create_portal_server_service():
 
 def create_portal_web_service():
     pw_env = {
-        "BASE_PATH": BASE_PATH,
-        "MIS_URL": MIS_PATH,
+        "MIS_URL": os.path.join(BASE_PATH, MIS_PATH),
         "MIS_DEPLOYED": "true" if cfg.MIS else "false"
     }
     pw_volumes = {
@@ -244,8 +243,7 @@ def create_mis_server_service():
 
 def create_mis_web_service():
     mv_env = {
-        "BASE_PATH": BASE_PATH,
-        "PORTAL_URL": PORTAL_PATH,
+        "PORTAL_URL": os.path.join(BASE_PATH, PORTAL_PATH),
         "PORTAL_DEPLOYED": "true" if cfg.PORTAL else "false"
     }
     mv_volumes = {
