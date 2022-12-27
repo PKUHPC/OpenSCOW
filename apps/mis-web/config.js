@@ -58,11 +58,7 @@ const buildRuntimeConfig = async (phase) => {
   // query auth capabilities to set optional auth features
   const capabilities = await queryCapabilities(config.AUTH_INTERNAL_URL, phase);
 
-  // load clusters.json
-
-
-  const configBasePath = process.env.SCOW_CONFIG_DIR ??
-    (production ? undefined : join(__dirname, "config"));
+  const configBasePath = production ? undefined : join(__dirname, "config");
 
   const clusters = getClusterConfigs(configBasePath);
   const clusterTexts = getClusterTextsConfig(configBasePath);

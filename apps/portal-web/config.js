@@ -75,8 +75,7 @@ const buildRuntimeConfig = async (phase) => {
 
   // load clusters.json
 
-  const configPath = process.env.SCOW_CONFIG_DIR ??
-    (production ? undefined : join(__dirname, "config"));
+  const configPath = production ? undefined : join(__dirname, "config");
 
   const clusters = getClusterConfigs(configPath);
 
