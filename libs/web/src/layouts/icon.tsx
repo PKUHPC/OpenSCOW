@@ -21,7 +21,7 @@ interface Props {
 export function NavIcon({ src, alt }: Props) {
   return (
     <AntdIcon
-      component={({ width, height, style, className, fill }) => (
+      component={({ width, height, style, className, fill }: any) => (
         <Image
           src={src}
           alt={alt}
