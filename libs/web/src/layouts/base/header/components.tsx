@@ -40,8 +40,8 @@ interface JumpToAnotherLinkProps {
   linkText: string;
 }
 
-export const JumpToAnotherLink = ({ user, link, icon, linkText }: JumpToAnotherLinkProps) => {
-  if (!link) { return undefined; }
+export const JumpToAnotherLink: React.FC<JumpToAnotherLinkProps> = ({ user, link, icon, linkText }) => {
+  if (!link) { return null; }
 
   return (
 
