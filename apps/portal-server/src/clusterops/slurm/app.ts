@@ -12,7 +12,8 @@
 
 import { getAppConfigs } from "@scow/config/build/app";
 import { getPlaceholderKeys } from "@scow/lib-config/build/parse";
-import { sftpChmod, sftpExists, sftpReaddir, sftpReadFile, sftpRealPath, sftpWriteFile } from "@scow/lib-ssh";
+import { loggedExec, sftpChmod, sftpExists,
+  sftpReaddir, sftpReadFile, sftpRealPath, sftpWriteFile } from "@scow/lib-ssh";
 import { RunningJob } from "@scow/protos/build/common/job";
 import { randomUUID } from "crypto";
 import fs from "fs";
@@ -21,7 +22,7 @@ import { quote } from "shell-quote";
 import { AppOps, AppSession } from "src/clusterops/api/app";
 import { displayIdToPort } from "src/clusterops/slurm/bl/port";
 import { portalConfig } from "src/config/portal";
-import { getClusterLoginNode, loggedExec, sshConnect } from "src/utils/ssh";
+import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
 import { parseDisplayId, refreshPassword, VNCSERVER_BIN_PATH } from "src/utils/turbovnc";
 
 import { querySqueue } from "./bl/queryJobInfo";
@@ -86,6 +87,8 @@ export const slurmAppOps = (cluster: string): AppOps => {
           await sftpWriteFile(sftp)(remoteEntryPath, script);
 
           // submit entry.sh
+          // createApp is slow already
+          // use executeAsUser increases code complexity greatly
           const { code, stderr, stdout } = await loggedExec(ssh, logger, false,
             "sbatch", [remoteEntryPath], { execOptions: { env: env as NodeJS.ProcessEnv } },
           );
@@ -179,21 +182,23 @@ export const slurmAppOps = (cluster: string): AppOps => {
 
       const { userId } = request;
 
+      // using squeue to get jobs that are running
+      // If a job is not running, it cannot be ready
+      const runningJobsInfo = await sshConnect(host, "root", logger, async (ssh) => {
+        return querySqueue(ssh, userId, logger, ["-u", userId]);
+      });
+
+      const runningJobInfoMap = runningJobsInfo.reduce((prev, curr) => {
+        prev[curr.jobId] = curr;
+        return prev;
+      }, {} as Record<number, RunningJob>);
+
       return await sshConnect(host, userId, logger, async (ssh) => {
         const sftp = await ssh.requestSFTP();
 
         if (!await sftpExists(sftp, portalConfig.appJobsDir)) { return { sessions: []}; }
 
         const list = await sftpReaddir(sftp)(portalConfig.appJobsDir);
-
-        // using squeue to get jobs that are running
-        // If a job is not running, it cannot be ready
-        const runningJobsInfo = await querySqueue(ssh, logger, ["-u", userId]);
-
-        const runningJobInfoMap = runningJobsInfo.reduce((prev, curr) => {
-          prev[curr.jobId] = curr;
-          return prev;
-        }, {} as Record<number, RunningJob>);
 
         const sessions = [] as AppSession[];
 
@@ -319,8 +324,8 @@ export const slurmAppOps = (cluster: string): AppOps => {
               if (displayId) {
                 // the server is run at the compute node
                 // login to the compute node and refresh the password
-                return await sshConnect(host, userId, logger, async (computeNodeSsh) => {
-                  const password = await refreshPassword(computeNodeSsh, logger, displayId!);
+                return await sshConnect(host, "root", logger, async (computeNodeSsh) => {
+                  const password = await refreshPassword(computeNodeSsh, userId, logger, displayId!);
                   return {
                     code: "OK",
                     appId: sessionMetadata.appId,

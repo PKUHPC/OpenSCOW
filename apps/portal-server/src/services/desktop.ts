@@ -13,11 +13,12 @@
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
+import { executeAsUser } from "@scow/lib-ssh";
 import { DesktopServiceServer, DesktopServiceService } from "@scow/protos/build/portal/desktop";
 import { displayIdToPort } from "src/clusterops/slurm/bl/port";
 import { portalConfig } from "src/config/portal";
 import { clusterNotFound } from "src/utils/errors";
-import { getClusterLoginNode, loggedExec, sshConnect } from "src/utils/ssh";
+import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
 import { parseDisplayId, parseListOutput, parseOtp, refreshPassword, VNCSERVER_BIN_PATH } from "src/utils/turbovnc";
 
 function ensureEnabled() {
@@ -42,9 +43,9 @@ export const desktopServiceServer = plugin((server) => {
 
       if (!host) { throw clusterNotFound(cluster); }
 
-      return await sshConnect(host, userId, logger, async (ssh) => {
+      return await sshConnect(host, "root", logger, async (ssh) => {
         // find if the user has running session
-        let resp = await loggedExec(ssh, logger, true,
+        let resp = await executeAsUser(ssh, userId, logger, true,
           VNCSERVER_BIN_PATH, ["-list"],
         );
 
@@ -64,7 +65,7 @@ export const desktopServiceServer = plugin((server) => {
           params.push(wm);
         }
 
-        resp = await loggedExec(ssh, logger, true, VNCSERVER_BIN_PATH, params);
+        resp = await executeAsUser(ssh, userId, logger, true, VNCSERVER_BIN_PATH, params);
 
         // parse the OTP from output. the output was in stderr
         const password = parseOtp(resp.stderr);
@@ -87,10 +88,10 @@ export const desktopServiceServer = plugin((server) => {
 
       if (!host) { throw clusterNotFound(cluster); }
 
-      return await sshConnect(host, userId, logger, async (ssh) => {
+      return await sshConnect(host, "root", logger, async (ssh) => {
 
         // kill specific desktop
-        await loggedExec(ssh, logger, true, VNCSERVER_BIN_PATH, ["-kill", ":" + displayId]);
+        await executeAsUser(ssh, userId, logger, true, VNCSERVER_BIN_PATH, ["-kill", ":" + displayId]);
 
         return [{}];
       });
@@ -108,9 +109,9 @@ export const desktopServiceServer = plugin((server) => {
 
       if (!host) { throw clusterNotFound(cluster); }
 
-      return await sshConnect(host, userId, logger, async (ssh) => {
+      return await sshConnect(host, "root", logger, async (ssh) => {
 
-        const password = await refreshPassword(ssh, logger, displayId);
+        const password = await refreshPassword(ssh, userId, logger, displayId);
 
         return [{ node: host, port: displayIdToPort(displayId), password }];
       });
@@ -127,10 +128,10 @@ export const desktopServiceServer = plugin((server) => {
 
       if (!host) { throw clusterNotFound(cluster); }
 
-      return await sshConnect(host, userId, logger, async (ssh) => {
+      return await sshConnect(host, "root", logger, async (ssh) => {
 
         // list all running session
-        const resp = await loggedExec(ssh, logger, true,
+        const resp = await executeAsUser(ssh, userId, logger, true,
           VNCSERVER_BIN_PATH, ["-list"],
         );
 

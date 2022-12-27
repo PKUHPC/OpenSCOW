@@ -10,10 +10,10 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { executeAsUser } from "@scow/lib-ssh";
 import { NodeSSH } from "node-ssh";
 import { join } from "path";
 import { portalConfig } from "src/config/portal";
-import { loggedExec } from "src/utils/ssh";
 import { Logger } from "ts-log";
 
 export const VNCSERVER_BIN_PATH = join(portalConfig.turboVNCPath, "bin", "vncserver");
@@ -62,8 +62,8 @@ export function parseDisplayId(stdout: string): number {
 
 const vncPasswdPath = join(portalConfig.turboVNCPath, "bin", "vncpasswd");
 
-export const refreshPassword = async (ssh: NodeSSH, logger: Logger, displayId: number) => {
-  const resp = await loggedExec(ssh, logger, true,
+export const refreshPassword = async (ssh: NodeSSH, userId: string, logger: Logger, displayId: number) => {
+  const resp = await executeAsUser(ssh, userId, logger, true,
     vncPasswdPath, ["-o", "-display", ":" + displayId]);
 
   return parseOtp(resp.stderr);

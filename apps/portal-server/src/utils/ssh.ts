@@ -12,14 +12,13 @@
 
 import { ServiceError } from "@ddadaal/tsgrpc-common";
 import { status } from "@grpc/grpc-js";
-import { loggedExec, sshConnect as libConnect, SshConnectError, testRootUserSshLogin } from "@scow/lib-ssh";
+import { sshConnect as libConnect, SshConnectError, testRootUserSshLogin } from "@scow/lib-ssh";
 import type { NodeSSH } from "node-ssh";
 import { clusters } from "src/config/clusters";
 import { rootKeyPair } from "src/config/env";
 import { scowErrorMetadata } from "src/utils/error";
 import { Logger } from "ts-log";
 
-export { loggedExec };
 
 export function getClusterLoginNode(cluster: string): string | undefined {
 
@@ -33,12 +32,12 @@ export async function sshConnect<T>(
 ): Promise<T> {
   return libConnect(address, username, rootKeyPair, logger, run).catch((e) => {
     if (e instanceof SshConnectError) {
-      throw new ServiceError({ 
+      throw new ServiceError({
         code: status.INTERNAL,
         metadata: scowErrorMetadata(SSH_ERROR_CODE),
       });
     }
-    throw e;    
+    throw e;
   });
 }
 
