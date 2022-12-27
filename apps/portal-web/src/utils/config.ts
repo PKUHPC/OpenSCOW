@@ -16,7 +16,8 @@ import type { UiConfigSchema } from "@scow/config/build/ui";
 import getConfig from "next/config";
 
 export interface ServerRuntimeConfig {
-  BASE_PATH: string;
+  AUTH_EXTERNAL_URL: string;
+
   AUTH_INTERNAL_URL: string;
 
   CLUSTERS_CONFIG: {[cluster: string]: ClusterConfigSchema};

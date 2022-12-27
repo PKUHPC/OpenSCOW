@@ -1,6 +1,6 @@
 // @ts-check
 
-const { envConfig, str, bool, parseKeyValue, num, port } = require("@scow/lib-config");
+const { envConfig, str, bool, parseKeyValue } = require("@scow/lib-config");
 const { join } = require("path");
 const { homedir } = require("os");
 const { PHASE_DEVELOPMENT_SERVER, PHASE_PRODUCTION_BUILD, PHASE_PRODUCTION_SERVER, PHASE_TEST } = require("next/constants");
@@ -8,7 +8,6 @@ const { PHASE_DEVELOPMENT_SERVER, PHASE_PRODUCTION_BUILD, PHASE_PRODUCTION_SERVE
 const { getCapabilities } = require("@scow/lib-auth");
 const { DEFAULT_PRIMARY_COLOR, getUiConfig } = require("@scow/config/build/ui");
 const { getPortalConfig } = require("@scow/config/build/portal");
-const { getAppConfigs } = require("@scow/config/build/app");
 const { getClusterConfigs } = require("@scow/config/build/cluster");
 const { getCommonConfig } = require("@scow/config/build/common");
 
@@ -29,7 +28,7 @@ async function queryCapabilities(authUrl, phase) {
 
 const specs = {
 
-  BASE_PATH: str({ desc: "整个系统的base path", default: "/" }),
+  AUTH_EXTERNAL_URL: str({ desc: "认证系统的URL。如果和本系统域名相同，可以只写完整路径", default: "/auth" }),
 
   AUTH_INTERNAL_URL: str({ desc: "认证服务内网地址", default: "http://auth:5000" }),
 
@@ -38,18 +37,18 @@ const specs = {
   SSH_PRIVATE_KEY_PATH: str({ desc: "SSH私钥路径", default: join(homedir(), ".ssh", "id_rsa") }),
   SSH_PUBLIC_KEY_PATH: str({ desc: "SSH公钥路径", default: join(homedir(), ".ssh", "id_rsa.pub") }),
 
-  PROXY_BASE_PATH: str({ desc: "网关的代理路径。相对于整个系统的base path。", default: "/api/proxy/absolute" }),
-  RPROXY_BASE_PATH: str({ desc: "网关的代理路径。相对于整个系统的base path。", default: "/api/proxy/relative" }),
-  WSPROXY_BASE_PATH: str({ desc: "网关的代理路径。相对于整个系统的base path。", default: "/api/proxy/absolute" }),
+  PROXY_BASE_PATH: str({ desc: "网关的代理路径。相对于本系统的base path。", default: "/api/proxy/absolute" }),
+  RPROXY_BASE_PATH: str({ desc: "网关的代理路径。相对于本系统的base path。", default: "/api/proxy/relative" }),
+  WSPROXY_BASE_PATH: str({ desc: "网关的代理路径。相对于本系统的base path。", default: "/api/proxy/absolute" }),
 
   SERVER_URL: str({ desc: "门户后端的路径", default: "portal-server:5000" }),
 
   MOCK_USER_ID: str({ desc: "开发和测试的时候所使用的user id", default: undefined }),
 
   MIS_DEPLOYED: bool({ desc: "是否部署了管理系统", default: false }),
-  MIS_URL: str({ desc: "如果部署了管理系统，设置URL或者路径。相对于整个系统的base path。将会覆盖配置文件。空字符串等价于未部署管理系统", default: "" }),
+  MIS_URL: str({ desc: "如果部署了管理系统，管理系统的URL。如果和本系统域名相同，可以只写完整的路径。将会覆盖配置文件。空字符串等价于未部署管理系统", default: "" }),
 
-  NOVNC_CLIENT_PATH: str({ desc: "novnc客户端的URL。相对于整个系统的base path", default: "/vnc" }),
+  NOVNC_CLIENT_PATH: str({ desc: "novnc客户端的URL。如果和本系统域名相同，可以只写相对于本系统的基础路径", default: "/vnc" }),
 };
 
 // This config is used to provide env doc auto gen
@@ -88,7 +87,7 @@ const buildRuntimeConfig = async (phase) => {
    * @type {import("./src/utils/config").ServerRuntimeConfig}
    */
   const serverRuntimeConfig = {
-    BASE_PATH: config.BASE_PATH,
+    AUTH_EXTERNAL_URL: config.AUTH_EXTERNAL_URL,
     AUTH_INTERNAL_URL: config.AUTH_INTERNAL_URL,
     CLUSTERS_CONFIG: clusters,
     PORTAL_CONFIG: portalConfig,
@@ -102,8 +101,7 @@ const buildRuntimeConfig = async (phase) => {
   // query auth capabilities to set optional auth features
   const capabilities = await queryCapabilities(config.AUTH_INTERNAL_URL, phase);
 
-  const misUrlSetting = config.MIS_URL || portalConfig.misUrl;
-
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
 
   /**
    * @type {import("./src/utils/config").PublicRuntimeConfig}
@@ -121,7 +119,7 @@ const buildRuntimeConfig = async (phase) => {
 
     ENABLE_APPS: portalConfig.apps,
 
-    MIS_URL: config.MIS_DEPLOYED ? join(config.BASE_PATH, config.MIS_URL || portalConfig.misUrl || "") : undefined,
+    MIS_URL: config.MIS_DEPLOYED ? (config.MIS_URL || portalConfig.misUrl) : undefined,
 
     DEFAULT_HOME_TEXT: portalConfig.homeText.defaultText,
     HOME_TEXTS: portalConfig.homeText.hostnameMap,
@@ -137,11 +135,11 @@ const buildRuntimeConfig = async (phase) => {
 
     SUBMIT_JOB_WORKING_DIR: portalConfig.submitJobDefaultPwd,
 
-    PROXY_BASE_PATH: join(config.BASE_PATH, config.PROXY_BASE_PATH),
-    RPROXY_BASE_PATH: join(config.BASE_PATH, config.RPROXY_BASE_PATH),
-    WSPROXY_BASE_PATH: join(config.BASE_PATH, config.WSPROXY_BASE_PATH),
+    PROXY_BASE_PATH: join(basePath, config.PROXY_BASE_PATH),
+    RPROXY_BASE_PATH: join(basePath, config.RPROXY_BASE_PATH),
+    WSPROXY_BASE_PATH: join(basePath, config.WSPROXY_BASE_PATH),
 
-    NOVNC_CLIENT_PATH: join(config.BASE_PATH, config.NOVNC_CLIENT_PATH),
+    NOVNC_CLIENT_PATH: join(basePath, config.NOVNC_CLIENT_PATH),
 
     PASSWORD_PATTERN: commonConfig.passwordPattern?.regex,
     PASSWORD_PATTERN_MESSAGE: commonConfig.passwordPattern?.errorMessage,

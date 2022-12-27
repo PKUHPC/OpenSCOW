@@ -10,6 +10,7 @@
 
 # encoding: utf-8
 
+import functools
 import json
 import os
 import stat
@@ -34,6 +35,16 @@ MIS_PATH = "/mis"
 if cfg.MIS and hasattr(cfg.MIS, "BASE_PATH"):
     MIS_PATH = cfg.MIS["BASE_PATH"]
 check_path_format("MIS.BASE_PATH", MIS_PATH)
+
+def path_join(*args):
+  def join(a, b):
+    if a == "/":
+      return b
+    elif b == "/":
+      return a
+    else:
+      return a + b
+  return functools.reduce(join, args, "/")
 
 class Service:
     def __init__(self, name, image, ports, volumes, environment):
@@ -204,8 +215,7 @@ def create_portal_server_service():
 
 def create_portal_web_service():
     pw_env = {
-        "BASE_PATH": BASE_PATH,
-        "MIS_URL": MIS_PATH,
+        "MIS_URL": path_join(BASE_PATH, MIS_PATH),
         "MIS_DEPLOYED": "true" if cfg.MIS else "false"
     }
     pw_volumes = {
@@ -244,8 +254,7 @@ def create_mis_server_service():
 
 def create_mis_web_service():
     mv_env = {
-        "BASE_PATH": BASE_PATH,
-        "PORTAL_URL": PORTAL_PATH,
+        "PORTAL_URL": path_join(BASE_PATH, PORTAL_PATH),
         "PORTAL_DEPLOYED": "true" if cfg.PORTAL else "false"
     }
     mv_volumes = {
