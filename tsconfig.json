@@ -12,7 +12,6 @@
     "module": "commonjs",
     "moduleResolution": "node",
     "resolveJsonModule": true,
-    "isolatedModules": true,
-    "declarationMap": true
+    "isolatedModules": true
   },
 }

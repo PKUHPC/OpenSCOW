@@ -1,4 +1,5 @@
 {
+  "extends": "../tsconfig.json",
   "compilerOptions": {
     "target": "ESNext",
     "lib": [
@@ -7,13 +8,6 @@
       "esnext"
     ],
     "outDir": "build",
-    "allowJs": true,
-    "skipLibCheck": true,
-    "declaration": true,
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "esModuleInterop": true,
-    "isolatedModules": true,
     "jsx": "react-jsx",
     "baseUrl": ".",
     "paths": {
@@ -29,7 +23,6 @@
     "node_modules"
   ],
   "include": [
-    "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
   ]

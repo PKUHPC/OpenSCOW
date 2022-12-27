@@ -41,7 +41,7 @@ interface JumpToAnotherLinkProps {
 }
 
 export const JumpToAnotherLink = ({ user, link, icon, linkText }: JumpToAnotherLinkProps) => {
-  if (!linkText) { return undefined; }
+  if (!link) { return undefined; }
 
   return (
 
