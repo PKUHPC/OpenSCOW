@@ -22,8 +22,6 @@ export const redirectToAuthLogin = (req: NextApiRequest, res: NextApiResponse, a
     + (authExternalUrl.endsWith("/") ? "" : "/")
     + `public/auth?callbackUrl=${encodeURIComponent(callbackUrl)}`;
 
-  console.log(authExternalUrl, target);
-
   res.redirect(target);
 };
 
