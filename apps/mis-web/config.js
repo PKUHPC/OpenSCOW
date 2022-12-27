@@ -102,7 +102,7 @@ const buildRuntimeConfig = async (phase) => {
     USERID_PATTERN: misConfig.userIdPattern?.regex,
     USERID_PATTERN_MESSAGE: misConfig.userIdPattern?.errorMessage,
 
-    PORTAL_URL: config.PORTAL_DEPLOYED ? join(basePath, config.PORTAL_URL || misConfig.portalUrl || "") : undefined,
+    PORTAL_URL: config.PORTAL_DEPLOYED ? (config.PORTAL_URL || misConfig.portalUrl || "") : undefined,
 
     PASSWORD_PATTERN: commonConfig.passwordPattern?.regex,
     PASSWORD_PATTERN_MESSAGE: commonConfig.passwordPattern?.errorMessage,
