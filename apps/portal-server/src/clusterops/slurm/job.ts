@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { loggedExec, sftpExists, sftpReaddir, sftpReadFile, sftpWriteFile } from "@scow/lib-ssh";
+import { executeAsUser, sftpExists, sftpReaddir, sftpReadFile, sftpWriteFile } from "@scow/lib-ssh";
 import { join } from "path";
 import { JobOps, JobTemplate } from "src/clusterops/api/job";
 import { querySacct, querySqueue } from "src/clusterops/slurm/bl/queryJobInfo";
@@ -28,8 +28,8 @@ export const slurmJobOps = (cluster: string): JobOps => {
     listAccounts: async (request, logger) => {
       const { userId } = request;
 
-      const accounts = await sshConnect(host, userId, logger, async (ssh) => {
-        const { stdout } = await loggedExec(ssh, logger, true,
+      const accounts = await sshConnect(host, "root", logger, async (ssh) => {
+        const { stdout } = await executeAsUser(ssh, userId, logger, true,
           "sacctmgr", ["show", "ass", `user=${userId}`, "format=account%20"]);
 
         /**
@@ -56,7 +56,7 @@ export const slurmJobOps = (cluster: string): JobOps => {
     submitJob: async (request, logger) => {
       const { jobInfo, userId, saveAsTemplate } = request;
 
-      return await sshConnect(host, userId, logger, async (ssh) => {
+      return await sshConnect(host, "root", logger, async (ssh) => {
 
         const dir = jobInfo.workingDirectory;
 
@@ -68,7 +68,7 @@ export const slurmJobOps = (cluster: string): JobOps => {
         await ssh.mkdir(dir, undefined, sftp);
 
         // use sbatch to allocate the script. pass the script into sbatch in stdin
-        const { code, stderr, stdout } = await loggedExec(ssh, logger, false,
+        const { code, stderr, stdout } = await executeAsUser(ssh, userId, logger, false,
           "sbatch", [],
           { stdin: script },
         );
@@ -144,9 +144,9 @@ export const slurmJobOps = (cluster: string): JobOps => {
     listRunningJobs: async (request, logger) => {
       const { userId } = request;
 
-      return await sshConnect(host, userId, logger, async (ssh) => {
+      return await sshConnect(host, "root", logger, async (ssh) => {
 
-        const results = await querySqueue(ssh, logger, ["-u", userId]);
+        const results = await querySqueue(ssh, userId, logger, ["-u", userId]);
 
         return { results };
       });
@@ -156,8 +156,8 @@ export const slurmJobOps = (cluster: string): JobOps => {
     cancelJob: async (request, logger) => {
       const { jobId, userId } = request;
 
-      return await sshConnect(host, userId, logger, async (ssh) => {
-        await loggedExec(ssh, logger, true, "scancel", [jobId + ""]);
+      return await sshConnect(host, "root", logger, async (ssh) => {
+        await executeAsUser(ssh, userId, logger, true, "scancel", [jobId + ""]);
         return { code: "OK" };
       });
     },
@@ -165,8 +165,8 @@ export const slurmJobOps = (cluster: string): JobOps => {
     listAllJobsInfo: async (request, logger) => {
       const { userId, startTime, endTime } = request;
 
-      return await sshConnect(host, userId, logger, async (ssh) => {
-        const results = await querySacct(ssh, logger, startTime, endTime);
+      return await sshConnect(host, "root", logger, async (ssh) => {
+        const results = await querySacct(ssh, userId, logger, startTime, endTime);
 
         return { results };
       });

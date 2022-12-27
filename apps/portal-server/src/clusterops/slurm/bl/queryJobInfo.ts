@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { loggedExec } from "@scow/lib-ssh";
+import { executeAsUser } from "@scow/lib-ssh";
 import { RunningJob } from "@scow/protos/build/common/job";
 import { NodeSSH } from "node-ssh";
 import { JobInfo } from "src/clusterops/api/job";
@@ -19,8 +19,8 @@ import { Logger } from "ts-log";
 
 const SEPARATOR = "__x__x__";
 
-export async function querySqueue(ssh: NodeSSH, logger: Logger, params: string[]) {
-  const result = await loggedExec(ssh, logger, true,
+export async function querySqueue(ssh: NodeSSH, userId: string, logger: Logger, params: string[]) {
+  const result = await executeAsUser(ssh, userId, logger, true,
     "squeue",
     [
       "-o",
@@ -68,12 +68,21 @@ function formatTime(time: Date, tz: string) {
   return applyOffset(dayjs(time), tz).format("YYYY-MM-DD[T]HH:mm:ss");
 }
 
-export async function querySacct(ssh: NodeSSH, logger: Logger, startTime?: Date, endTime?: Date) {
+/**
+ * Query sacct for running jobs
+ * @param ssh ssh object connected as root
+ * @param userId the user
+ * @param logger logger
+ * @param startTime start time
+ * @param endTime end time
+ * @returns
+ */
+export async function querySacct(ssh: NodeSSH, userId: string, logger: Logger, startTime?: Date, endTime?: Date) {
 
   // get the timezone of target machine
-  const { stdout: tz } = await loggedExec(ssh, logger, true, "date", ["+%:z"]);
+  const { stdout: tz } = await executeAsUser(ssh, userId, logger, true, "date", ["+%:z"]);
 
-  const result = await loggedExec(ssh, logger, true,
+  const result = await executeAsUser(ssh, userId, logger, true,
     "sacct",
     [
       "-X",
