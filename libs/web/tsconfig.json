@@ -9,6 +9,7 @@
     ],
     "outDir": "build",
     "jsx": "react-jsx",
+    "module": "ESNext",
     "baseUrl": ".",
     "paths": {
       "src/*": [
