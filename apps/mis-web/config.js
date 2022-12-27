@@ -1,6 +1,6 @@
 // @ts-check
 
-const { envConfig, getConfigFromFile, parseKeyValue, regex, str, bool } = require("@scow/lib-config");
+const { envConfig, str, bool } = require("@scow/lib-config");
 const { getClusterConfigs } = require("@scow/config/build/cluster");
 const { getMisConfig } = require("@scow/config/build/mis");
 const { getCommonConfig } = require("@scow/config/build/common");
@@ -79,9 +79,6 @@ const buildRuntimeConfig = async (phase) => {
     DEFAULT_PRIMARY_COLOR,
     SERVER_URL: config.SERVER_URL,
   };
-
-
-  const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "/";
 
   /**
    * @type {import("./src/utils/config").PublicRuntimeConfig}
