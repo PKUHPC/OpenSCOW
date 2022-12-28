@@ -37,14 +37,14 @@ const PlatformRoleSelector: React.FC<PlatformRoleSelectorProps> = ({ role, userI
   const message = useMessage();
 
   const [loading, setLoading] = useState(false);
-  const roleTexts: string[] = role.map((r) => PlatformRoleTexts[r]);
+
   return (
     <Select
       disabled={loading}
-      defaultValue={roleTexts}
+      value={role.map((x) => ({ label: PlatformRoleTexts[x], value: x }))}
       style={{ width: "100%" }}
       onSelect={
-        async (value: number) => {
+        async ({ value }) => {
           setLoading(true);
           await api.setPlatformRole({ body:{
             userId: userId,
@@ -61,11 +61,11 @@ const PlatformRoleSelector: React.FC<PlatformRoleSelectorProps> = ({ role, userI
         }
       }
       onDeselect={
-        async (value: number) => {
+        async (value) => {
           setLoading(true);
           await api.unsetPlatformRole({ body:{
             userId: userId,
-            roleType: value,
+            roleType: +value,
           } })
             .httpError(200, () => { message.error("用户已经不是该角色"); })
             .httpError(404, () => { message.error("用户不存在"); })
@@ -99,18 +99,18 @@ interface TenantRoleSelectorProps {
 const TenantRoleSelector: React.FC<TenantRoleSelectorProps> = ({ role, userId, reload }) => {
 
   const [loading, setLoading] = useState(false);
-  const roleTexts: string[] = role.map((r) => TenantRoleTexts[r]);
+
   return (
     <Select
       disabled={loading}
-      defaultValue={roleTexts}
+      value={role.map((r) => ({ label: TenantRoleTexts[r], value: r }))}
       style={{ width: "100%" }}
       onSelect={
-        async (value: number) => {
+        async (value) => {
           setLoading(true);
           await api.setTenantRole({ body:{
             userId: userId,
-            roleType: value,
+            roleType: value.value,
           } })
             .httpError(200, () => { message.error("用户已经是该角色"); })
             .httpError(404, () => { message.error("用户不存在"); })
@@ -123,11 +123,11 @@ const TenantRoleSelector: React.FC<TenantRoleSelectorProps> = ({ role, userId, r
         }
       }
       onDeselect={
-        async (value: number) => {
+        async (value) => {
           setLoading(true);
           await api.unsetTenantRole({ body:{
             userId: userId,
-            roleType: value,
+            roleType: value.value,
           } })
             .httpError(200, () => { message.error("用户已经不是该角色"); })
             .httpError(404, () => { message.error("用户不存在"); })
