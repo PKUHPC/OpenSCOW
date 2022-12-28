@@ -20,9 +20,12 @@ import subprocess
 def get_nested(obj, keys, default_val = None):
   if obj == None:
     return default_val
-  def get(o, key):
-    return getattr(o, key, default_val)
-  return functools.reduce(get, keys, obj)
+  for key in keys:
+    if hasattr(obj, key):
+      obj = getattr(obj, key)
+    else:
+      return default_val
+  return obj
 
 
 def check_path_format(name, value):
