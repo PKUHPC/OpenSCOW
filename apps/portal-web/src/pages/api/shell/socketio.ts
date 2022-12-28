@@ -92,7 +92,7 @@ export default async (req: NextApiRequest, res: AugmentedNextApiResponse) => {
       });
 
       socket.on("data", (data) => {
-        stream.write({ message:  { $case :"data", data: { data: data } } });
+        stream.write({ message:  { $case :"data", data: { data: Buffer.from(data) } } });
       });
 
       socket.on("disconnect", () => {
