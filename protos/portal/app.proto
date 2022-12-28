@@ -60,6 +60,7 @@ message CreateAppSessionRequest {
   uint32 core_count = 7;
   uint32 max_time = 8;
   map<string, string> custom_attributes = 9;
+  optional string user_sbatch_options = 10;
 }
 
 // NOT_FOUND: app is not found

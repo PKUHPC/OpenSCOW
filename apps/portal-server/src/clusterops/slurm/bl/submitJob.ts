@@ -58,7 +58,7 @@ export function generateJobScript(jobInfo: NewJobInfo & {
   if (output) {
     append("--output=" + output);
   }
-  if (otherOptions) {
+  if (otherOptions && otherOptions.length !== 0) {
     otherOptions.forEach((opt) => {
       append(opt);
     });

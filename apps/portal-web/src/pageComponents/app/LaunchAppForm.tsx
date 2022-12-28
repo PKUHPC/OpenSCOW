@@ -35,6 +35,7 @@ interface FormFields {
   coreCount: number;
   account: string;
   maxTime: number;
+  sbatchOptions: string | undefined;
 }
 
 
@@ -63,7 +64,7 @@ export const LaunchAppForm: React.FC<Props> = ({ appId }) => {
 
   const onSubmit = async () => {
     const allFormFields = await form.validateFields();
-    const { cluster, coreCount, partition, qos, account, maxTime } = allFormFields;
+    const { cluster, coreCount, partition, qos, account, maxTime, sbatchOptions } = allFormFields;
 
     const customFormKeyValue: {[key: string]: string} = {};
     if (data) {
@@ -83,6 +84,7 @@ export const LaunchAppForm: React.FC<Props> = ({ appId }) => {
       account,
       maxTime,
       customAttributes: customFormKeyValue,
+      userSbatchOptions: sbatchOptions,
     } })
       .then(() => {
         message.success("创建成功！");
@@ -214,6 +216,10 @@ export const LaunchAppForm: React.FC<Props> = ({ appId }) => {
       </Form.Item>
 
       {customFormItems}
+
+      <Form.Item label="其他sbatch参数" name="sbatchOptions">
+        <Input.TextArea placeholder="比如：--gpus gres:2 如果使用多个参数需要换行" />
+      </Form.Item>
 
       <Form.Item>
         <Button type="primary" htmlType="submit" loading={loading}>
