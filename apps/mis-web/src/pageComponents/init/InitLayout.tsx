@@ -10,13 +10,12 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Button, Tabs, Typography } from "antd";
+import { App, Button, Tabs, Typography } from "antd";
 import Link from "next/link";
 import Router, { useRouter } from "next/router";
 import React from "react";
 import { api } from "src/apis";
 import { Centered } from "src/components/layouts";
-import { useModal } from "src/layouts/prompts";
 import { Head } from "src/utils/head";
 import styled from "styled-components";
 
@@ -65,7 +64,7 @@ export const InitTab: React.FC = () => {
 
 export const InitDrawer: React.FC<DrawerProps> = (props) => {
 
-  const modal = useModal();
+  const { modal } = App.useApp();
 
   const { children } = props;
   return (

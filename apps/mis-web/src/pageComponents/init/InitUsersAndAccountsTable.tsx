@@ -13,12 +13,11 @@
 import { FormLayout } from "@scow/lib-web/build/layouts/FormLayout";
 import { Account } from "@scow/protos/build/server/account";
 import { AccountAffiliation, User } from "@scow/protos/build/server/user";
-import { message, Select, Table, Tabs, Typography } from "antd";
+import { App, message, Select, Table, Tabs, Typography } from "antd";
 import { useEffect, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { Centered } from "src/components/layouts";
-import { useMessage } from "src/layouts/prompts";
 import { PlatformRole, PlatformRoleTexts, TenantRole, TenantRoleTexts, UserRole, UserRoleTexts } from "src/models/User";
 
 interface DataTableProps<T> {
@@ -34,7 +33,7 @@ interface PlatformRoleSelectorProps {
 }
 
 const PlatformRoleSelector: React.FC<PlatformRoleSelectorProps> = ({ role, userId, reload }) => {
-  const message = useMessage();
+  const { message } = App.useApp();
 
   const [loading, setLoading] = useState(false);
 

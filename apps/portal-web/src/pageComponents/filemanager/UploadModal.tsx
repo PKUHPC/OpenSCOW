@@ -11,10 +11,9 @@
  */
 
 import { InboxOutlined } from "@ant-design/icons";
-import { Button, Modal, Upload } from "antd";
+import { App, Button, Modal, Upload } from "antd";
 import { join } from "path";
 import { api } from "src/apis";
-import { useMessage, useModal } from "src/layouts/prompts";
 import { urlToUpload } from "src/pageComponents/filemanager/api";
 
 interface Props {
@@ -27,9 +26,8 @@ interface Props {
 
 export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, cluster }) => {
 
-  const modal = useModal();
-  const message = useMessage();
-  
+  const { message, modal } = App.useApp();
+
   return (
     <Modal
       open={open}

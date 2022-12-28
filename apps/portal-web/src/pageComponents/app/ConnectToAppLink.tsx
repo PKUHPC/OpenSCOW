@@ -12,10 +12,10 @@
 
 import { parsePlaceholder } from "@scow/lib-config/build/parse";
 import type { AppSession } from "@scow/protos/build/portal/app";
+import { App } from "antd";
 import { join } from "path";
 import { api } from "src/apis";
 import { ClickableA } from "src/components/ClickableA";
-import { useMessage } from "src/layouts/prompts";
 import { Cluster, publicConfig } from "src/utils/config";
 import { openDesktop } from "src/utils/vnc";
 
@@ -28,7 +28,7 @@ export const ConnectTopAppLink: React.FC<Props> = ({
   session, cluster,
 }) => {
 
-  const message = useMessage();
+  const { message } = App.useApp();
 
   const onClick = async () => {
     const reply = await api.connectToApp({ body: { cluster: cluster.id, sessionId: session.sessionId } })

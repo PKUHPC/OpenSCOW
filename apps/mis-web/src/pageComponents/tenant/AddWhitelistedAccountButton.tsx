@@ -11,10 +11,9 @@
  */
 
 import { PlusOutlined } from "@ant-design/icons";
-import { Button, Form, Input, Modal } from "antd";
+import { App, Button, Form, Input, Modal } from "antd";
 import React, { useState } from "react";
 import { api } from "src/apis";
-import { useMessage } from "src/layouts/prompts";
 
 interface FormProps {
   accountName: string;
@@ -31,7 +30,7 @@ const NewAccountModal: React.FC<ModalProps> = ({
   open, close, refresh,
 }) => {
 
-  const message = useMessage();
+  const { message } = App.useApp();
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm<FormProps>();
 

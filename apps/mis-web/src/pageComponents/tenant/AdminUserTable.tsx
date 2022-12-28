@@ -12,13 +12,12 @@
 
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { compareDateTime, formatDateTime } from "@scow/lib-web/build/utils/datetime";
-import { Button, Divider, Form, Input, Space, Table } from "antd";
+import { App, Button, Divider, Form, Input, Space, Table } from "antd";
 import React, { useMemo, useState } from "react";
 import { api } from "src/apis";
 import { ChangePasswordModalLink } from "src/components/ChangePasswordModal";
 import { DisabledA } from "src/components/DisabledA";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
-import { useMessage, useModal } from "src/layouts/prompts";
 import { FullUserInfo, TenantRole } from "src/models/User";
 import { GetTenantUsersSchema } from "src/pages/api/admin/getTenantUsers";
 import { User } from "src/stores/UserStore";
@@ -39,8 +38,7 @@ export const AdminUserTable: React.FC<Props> = ({
   data, isLoading, reload, user,
 }) => {
 
-  const modal = useModal();
-  const message = useMessage();
+  const { message, modal } = App.useApp();
 
   const [form] = Form.useForm<FilterForm>();
 

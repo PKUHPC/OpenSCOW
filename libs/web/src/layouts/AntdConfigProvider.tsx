@@ -12,11 +12,10 @@
 
 import "dayjs/locale/zh-cn";
 
-import { ConfigProvider, theme } from "antd";
+import { App, ConfigProvider, theme } from "antd";
 import zhCNlocale from "antd/locale/zh_CN";
 import React from "react";
 import { useDarkMode } from "src/layouts/darkMode";
-import { MessageProvider, ModalProvider } from "src/layouts/prompts";
 import { ThemeProvider } from "styled-components";
 
 
@@ -44,11 +43,9 @@ export const AntdConfigProvider: React.FC<Props> = ({ children, color }) => {
       theme={{ token: { colorPrimary: color, colorInfo: color }, algorithm: dark ? theme.darkAlgorithm : undefined }}
     >
       <StyledComponentsThemeProvider color={color}>
-        <MessageProvider>
-          <ModalProvider>
-            {children}
-          </ModalProvider>
-        </MessageProvider>
+        <App>
+          {children}
+        </App>
       </StyledComponentsThemeProvider>
     </ConfigProvider>
   );

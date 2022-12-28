@@ -15,7 +15,7 @@ import { defaultPresets, formatDateTime } from "@scow/lib-web/build/utils/dateti
 import { useDidUpdateEffect } from "@scow/lib-web/build/utils/hooks";
 import { Money } from "@scow/protos/build/common/money";
 import { JobInfo } from "@scow/protos/build/server/job";
-import { Button, DatePicker, Divider, Form, Input, InputNumber, Select, Table } from "antd";
+import { App, Button, DatePicker, Divider, Form, Input, InputNumber, Select, Table } from "antd";
 import dayjs from "dayjs";
 import React, { useCallback, useRef, useState } from "react";
 import { useAsync } from "react-async";
@@ -23,7 +23,6 @@ import { api } from "src/apis";
 import { ClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer, FilterFormTabs } from "src/components/FilterFormContainer";
 import { TableTitle } from "src/components/TableTitle";
-import { useMessage } from "src/layouts/prompts";
 import { HistoryJobDrawer } from "src/pageComponents/job/HistoryJobDrawer";
 import type { GetJobInfoSchema } from "src/pages/api/job/jobInfo";
 import type { Cluster } from "src/utils/config";
@@ -54,7 +53,7 @@ export const JobTable: React.FC<Props> = ({
   showAccount, showUser, showedPrices, priceTexts,
 }) => {
 
-  const message = useMessage();
+  const { message } = App.useApp();
 
   const rangeSearch = useRef(true);
 
