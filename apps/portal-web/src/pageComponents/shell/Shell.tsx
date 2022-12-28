@@ -74,13 +74,9 @@ export const Shell: React.FC<Props> = ({ user, cluster, path }) => {
       });
 
       socket.on("connect", () => {
-        console.log("--------------------------------connected");
-
         term.clear();
 
         term.onData((data) => {
-          console.log("--------------------------------terminal send data", data);
-
           socket.emit("data", data);
         });
 
@@ -89,7 +85,6 @@ export const Shell: React.FC<Props> = ({ user, cluster, path }) => {
         });
 
         socket.on("data", (data: ArrayBuffer) => {
-          console.log("--------------------------------received socket data", typeof data, data, data.toString());
           term.write(Buffer.from(data));
         });
 
