@@ -139,9 +139,6 @@ def dict_to_array(dict_data, *parameter):
             arr.append(key + ":" + dict_data[key])
     return arr
 
-def get_value_or_default(obj, key, default):
-    return obj[key] if key in obj else default
-
 def generate_image(name, postfix):
     if postfix is None:
         return cfg.COMMON["IMAGE_BASE"] + "/" + name + ":" + cfg.COMMON["IMAGE_TAG"]
