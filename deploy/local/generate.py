@@ -15,7 +15,23 @@ import json
 import os
 import stat
 import config as cfg
-import subprocess
+
+def get_cfg(keys, default_val = None):
+  if len(keys) == 0:
+    raise ValueError("keys should not be empty")
+
+  if not hasattr(cfg, keys[0]):
+    return default_val
+
+  obj = getattr(cfg, keys[0])
+
+  for key in keys[1:]:
+    if key in obj:
+      obj = obj[key]
+    else:
+      return default_val
+  return obj
+
 
 def check_path_format(name, value):
     if value != "/" and value.endswith("/"):
@@ -23,17 +39,13 @@ def check_path_format(name, value):
         exit(1)
 
 # set default value
-BASE_PATH = cfg.COMMON.get("BASE_PATH", "/")
+BASE_PATH = get_cfg(["COMMON", "BASE_PATH"], "/")
 check_path_format("COMMON.BASE_PATH", BASE_PATH)
 
-PORTAL_PATH = "/"
-if cfg.PORTAL and hasattr(cfg.PORTAL, "BASE_PATH"):
-    PORTAL_PATH = cfg.PORTAL["BASE_PATH"]
+PORTAL_PATH = get_cfg(["PORTAL", "BASE_PATH"], "/")
 check_path_format("PORTAL.BASE_PATH", PORTAL_PATH)
 
-MIS_PATH = "/mis"
-if cfg.MIS and hasattr(cfg.MIS, "BASE_PATH"):
-    MIS_PATH = cfg.MIS["BASE_PATH"]
+MIS_PATH = get_cfg(["MIS", "BASE_PATH"], "/mis")
 check_path_format("MIS.BASE_PATH", MIS_PATH)
 
 def path_join(*args):
@@ -113,7 +125,7 @@ def tuple_to_array(t):
         return None
     arr = []
     for term in t:
-        arr.append(term[0] + ":" + term[1])
+        arr.append(str(term[0]) + ":" + str(term[1]))
     return arr
 
 
@@ -128,9 +140,6 @@ def dict_to_array(dict_data, *parameter):
         else:
             arr.append(key + ":" + dict_data[key])
     return arr
-
-def get_value_or_default(obj, key, default):
-    return obj[key] if key in obj else default
 
 def generate_image(name, postfix):
     if postfix is None:
@@ -190,16 +199,20 @@ def create_auth_service():
         return Service(
             auth_service_name,
             cfg.AUTH["IMAGE"],
-            get_value_or_default(cfg.AUTH, "PORTS", None),
+            get_cfg(["AUTH", "PORTS"], None),
             au_volumes,
-            get_value_or_default(cfg.AUTH, "ENV", None),
+            get_cfg(["AUTH", "ENV"], None),
         )
 
     au_env = {
         "BASE_PATH": BASE_PATH,
     }
 
-    auth = Service("auth", generate_image("auth", None), None, au_volumes, au_env)
+    AUTH_PORT = get_cfg(["DEBUG", "OPEN_PORTS", "AUTH"])
+
+    auth_ports = [(AUTH_PORT, 5000)] if AUTH_PORT else []
+
+    auth = Service("auth", generate_image("auth", None), auth_ports, au_volumes, au_env)
     return auth
 
 
@@ -229,13 +242,18 @@ def create_portal_web_service():
 
 
 def create_db_service():
+
     db_volumes = {
         "db_data": "/var/lib/mysql"
     }
     db_env = {
         "MYSQL_ROOT_PASSWORD": cfg.MIS["DB_PASSWORD"]
     }
-    db = Service("db", "mysql:" + MYSQL_IMAGE_TAG, None, db_volumes, db_env)
+
+    MYSQL_PORT = get_cfg(["DEBUG", "OPEN_PORTS", "DB"])
+    db_ports = [(MYSQL_PORT, 3306)] if MYSQL_PORT else []
+
+    db = Service("db", "mysql:" + MYSQL_IMAGE_TAG, db_ports, db_volumes, db_env)
     return db
 
 
@@ -269,6 +287,12 @@ def create_novnc_client():
 
     return Service("novnc", url, None, None, None)
 
+def create_redis_service():
+    REDIS_PORT = get_cfg(["DEBUG", "OPEN_PORTS", "REDIS"])
+    ports = [(REDIS_PORT, 6379)] if REDIS_PORT else []
+
+    return Service("redis", "redis:" + REDIS_IMAGE_TAG, ports, None, None)
+
 def create_services():
     com = Compose()
 
@@ -277,7 +301,7 @@ def create_services():
 
     com.add_service(create_gateway_service())
     com.add_service(create_auth_service())
-    com.add_service(Service("redis", "redis:" + REDIS_IMAGE_TAG, None, None, None))
+    com.add_service(create_redis_service())
 
     if cfg.PORTAL:
         com.add_service(create_portal_web_service())
