@@ -17,23 +17,27 @@ import stat
 import config as cfg
 import subprocess
 
+def get_nested(obj, keys, default_val = None):
+  if obj == None:
+    return default_val
+  def get(o, key):
+    return getattr(o, key, default_val)
+  return functools.reduce(get, keys, obj)
+
+
 def check_path_format(name, value):
     if value != "/" and value.endswith("/"):
         print(name + " should not end with /")
         exit(1)
 
 # set default value
-BASE_PATH = cfg.COMMON.get("BASE_PATH", "/")
+BASE_PATH = get_nested(cfg.COMMON, ["BASE_PATH"], "/")
 check_path_format("COMMON.BASE_PATH", BASE_PATH)
 
-PORTAL_PATH = "/"
-if cfg.PORTAL and hasattr(cfg.PORTAL, "BASE_PATH"):
-    PORTAL_PATH = cfg.PORTAL["BASE_PATH"]
+PORTAL_PATH = get_nested(cfg.PORTAL, ["BASE_PATH"], "/")
 check_path_format("PORTAL.BASE_PATH", PORTAL_PATH)
 
-MIS_PATH = "/mis"
-if cfg.MIS and hasattr(cfg.MIS, "BASE_PATH"):
-    MIS_PATH = cfg.MIS["BASE_PATH"]
+MIS_PATH = get_nested(cfg.MIS, ["BASE_PATH"], "/mis")
 check_path_format("MIS.BASE_PATH", MIS_PATH)
 
 def path_join(*args):
@@ -45,6 +49,9 @@ def path_join(*args):
     else:
       return a + b
   return functools.reduce(join, args, "/")
+
+# debug选项
+AUTH_PORT = get_nested(cfg.DEBUG, ["OPEN_PORTS", "AUTH"])
 
 class Service:
     def __init__(self, name, image, ports, volumes, environment):
@@ -190,16 +197,20 @@ def create_auth_service():
         return Service(
             auth_service_name,
             cfg.AUTH["IMAGE"],
-            get_value_or_default(cfg.AUTH, "PORTS", None),
+            get_nested(cfg.AUTH, ["PORTS"], None),
             au_volumes,
-            get_value_or_default(cfg.AUTH, "ENV", None),
+            get_nested(cfg.AUTH, ["ENV"], None),
         )
 
     au_env = {
         "BASE_PATH": BASE_PATH,
     }
 
-    auth = Service("auth", generate_image("auth", None), None, au_volumes, au_env)
+    AUTH_PORT = get_nested(cfg.DEBUG, ["OPEN_PORTS", "MYSQL"])
+
+    auth_ports = ["{}:5000".format(AUTH_PORT)] if AUTH_PORT else []
+
+    auth = Service("auth", generate_image("auth", None), auth_ports, au_volumes, au_env)
     return auth
 
 
@@ -229,13 +240,16 @@ def create_portal_web_service():
 
 
 def create_db_service():
+    MYSQL_PORT = get_nested(cfg.DEBUG, ["OPEN_PORTS", "MYSQL"])
+
     db_volumes = {
         "db_data": "/var/lib/mysql"
     }
     db_env = {
         "MYSQL_ROOT_PASSWORD": cfg.MIS["DB_PASSWORD"]
     }
-    db = Service("db", "mysql:" + MYSQL_IMAGE_TAG, None, db_volumes, db_env)
+    db_ports = ["{}:3306".format(MYSQL_PORT)] if MYSQL_PORT else []
+    db = Service("db", "mysql:" + MYSQL_IMAGE_TAG, [db_ports], db_volumes, db_env)
     return db
 
 
@@ -269,6 +283,12 @@ def create_novnc_client():
 
     return Service("novnc", url, None, None, None)
 
+def create_redis_service():
+    REDIS_PORT = get_nested(cfg.DEBUG, ["OPEN_PORTS", "REDIS"])
+    ports = ["{}:3306".format(REDIS_PORT)] if REDIS_PORT else []
+
+    return Service("redis", "redis:" + REDIS_IMAGE_TAG, ports, None, None)
+
 def create_services():
     com = Compose()
 
@@ -277,7 +297,7 @@ def create_services():
 
     com.add_service(create_gateway_service())
     com.add_service(create_auth_service())
-    com.add_service(Service("redis", "redis:" + REDIS_IMAGE_TAG, None, None, None))
+    com.add_service(create_redis_service())
 
     if cfg.PORTAL:
         com.add_service(create_portal_web_service())
