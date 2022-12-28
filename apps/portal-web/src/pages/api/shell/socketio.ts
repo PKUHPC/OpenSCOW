@@ -92,6 +92,10 @@ export default async (req: NextApiRequest, res: AugmentedNextApiResponse) => {
       });
 
       socket.on("data", ([data]: [string]) => {
+
+        log("--------------------------------Receive terminal data: ", data);
+
+
         stream.write({ message:  { $case :"data", data: { data: Buffer.from(data) } } });
       });
 
