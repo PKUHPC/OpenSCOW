@@ -11,10 +11,9 @@
  */
 
 import { arrayContainsElement } from "@scow/lib-web/build/utils/array";
-import { Divider, Form, Input, InputNumber, Modal, Progress, Select } from "antd";
+import { App, Divider, Form, Input, InputNumber, Modal, Progress, Select } from "antd";
 import { useRef, useState } from "react";
 import { api } from "src/apis";
-import { useMessage } from "src/layouts/prompts";
 import { RunningJobInfo } from "src/models/job";
 import { ChangeStorageMode } from "src/pages/api/admin/changeStorage";
 import type { Cluster } from "src/utils/config";
@@ -45,7 +44,7 @@ interface CompletionStatus {
 
 export const ChangeJobTimeLimitModal: React.FC<Props> = ({ open, onClose, data, reload }) => {
 
-  const message = useMessage();
+  const { message } = App.useApp();
 
   const [form] = Form.useForm<FormProps>();
   const [loading, setLoading] = useState(false);

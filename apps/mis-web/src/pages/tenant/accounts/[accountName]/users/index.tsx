@@ -12,7 +12,7 @@
 
 import { queryToString } from "@scow/lib-web/build/utils/querystring";
 import { RefreshLink, useRefreshToken } from "@scow/lib-web/build/utils/refreshToken";
-import { Divider, Space } from "antd";
+import { App, Divider, Space } from "antd";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useCallback } from "react";
@@ -21,7 +21,6 @@ import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { BackButton } from "src/components/BackButton";
 import { PageTitle } from "src/components/PageTitle";
-import { useMessage } from "src/layouts/prompts";
 import { TenantRole } from "src/models/User";
 import { AddUserButton } from "src/pageComponents/users/AddUserButton";
 import { UserTable } from "src/pageComponents/users/UserTable";
@@ -32,7 +31,7 @@ export const AccountUsersPage: NextPage = requireAuth(
 )(
   ({ userStore }) => {
 
-    const message = useMessage();
+    const { message } = App.useApp();
 
     const router = useRouter();
 

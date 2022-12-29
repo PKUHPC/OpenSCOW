@@ -11,11 +11,10 @@
  */
 
 import { FormLayout } from "@scow/lib-web/build/layouts/FormLayout";
-import { Alert, Button, Form, Typography } from "antd";
+import { Alert, App, Button, Form, Typography } from "antd";
 import { useState } from "react";
 import { api } from "src/apis";
 import { Centered } from "src/components/layouts";
-import { useMessage, useModal } from "src/layouts/prompts";
 import { CreateUserForm, CreateUserFormFields } from "src/pageComponents/users/CreateUserForm";
 import { publicConfig } from "src/utils/config";
 import styled from "styled-components";
@@ -30,8 +29,7 @@ const AlertContainer = styled.div`
 export const InitAdminForm: React.FC = () => {
   const [form] = Form.useForm<FormFields>();
 
-  const message = useMessage();
-  const modal = useModal();
+  const { message, modal } = App.useApp();
 
   const [loading, setLoading] = useState(false);
   const onFinish = async () => {

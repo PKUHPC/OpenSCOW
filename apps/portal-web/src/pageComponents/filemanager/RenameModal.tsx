@@ -10,11 +10,10 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Form, Input, Modal } from "antd";
+import { App, Form, Input, Modal } from "antd";
 import { dirname, join } from "path";
 import { useState } from "react";
 import { api } from "src/apis";
-import { useMessage } from "src/layouts/prompts";
 
 interface Props {
   open: boolean;
@@ -30,7 +29,7 @@ interface FormProps {
 
 export const RenameModal: React.FC<Props> = ({ open, onClose, path, reload, cluster }) => {
 
-  const message = useMessage();
+  const { message } = App.useApp();
 
   const [form] = Form.useForm<FormProps>();
   const [loading, setLoading] = useState(false);
