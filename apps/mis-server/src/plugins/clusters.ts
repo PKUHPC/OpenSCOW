@@ -20,11 +20,16 @@ import { clusters } from "src/config/clusters";
 import { rootKeyPair } from "src/config/env";
 import { scowErrorMetadata } from "src/utils/error";
 
+type CallOnAllResult<T> = ({ cluster: string; } & (
+  | { success: true; result: T }
+  | { success: false; error: any }
+))[];
+
 // Throw ServiceError if failed.
 type CallOnAll = <T>(
   logger: Logger,
   call: (ops: ClusterOps) => Promise<T>,
-) => Promise<void>;
+) => Promise<CallOnAllResult<T>>;
 
 type CallOnOne = <T>(
   cluster: string,
@@ -100,27 +105,29 @@ export const clustersPlugin = plugin(async (f) => {
       const results = await Promise.all(Object.entries(opsForClusters)
         .filter(([_, c]) => !c.ignore)
         .map(async ([cluster, ops]) => {
-          return call(ops.ops).then(() => {
+          return call(ops.ops).then((result) => {
             logger.info("Executing on %s success", cluster);
-            return;
+            return { cluster, success: true, result };
           }).catch((e) => {
-            logger.info("Executing on %s failed for %o", cluster, e);
-            return cluster;
+            logger.error(e, "Executing on %s failed", cluster);
+            return { cluster, success: false, error: e };
           });
         }));
 
       // errors if any fails
-      const failed = results.filter((x) => x) as string[];
+      const failed = results.filter((x) => x.success);
 
       if (failed.length > 0) {
         logger.error("Cluster ops fails at clusters %o", failed);
         throw new ServiceError({
           code: status.INTERNAL,
-          details: failed.join(","),
+          details: failed.map((x) => x.cluster).join(","),
           metadata: scowErrorMetadata(CLUSTEROPS_ERROR_CODE),
           // metadata: scowErrorMetadata(CLUSTEROPS_ERROR_CODE, {failedClusters: failed.join(",")})
         });
       }
+
+      return results;
 
     }),
   };

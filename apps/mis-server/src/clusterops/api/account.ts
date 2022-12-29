@@ -35,18 +35,18 @@ export interface BlockAccountRequest {
 }
 
 /** NOT_FOUND: account is not found. */
-export type BlockAccountReply =
-  | { code: "NOT_FOUND"}
-  | { code: "OK", executed: boolean };
+export type BlockAccountReply = {
+  code: "OK" | "NOT_FOUND" | "ALREADY_BLOCKED";
+};
 
 export interface UnblockAccountRequest {
   accountName: string;
 }
 
 /** NOT_FOUND: account is not found. */
-export type UnblockAccountReply =
-  | { code: "NOT_FOUND"}
-  | { code: "OK"; executed: boolean };
+export type UnblockAccountReply = {
+  code: "OK" | "NOT_FOUND" | "ALREADY_UNBLOCKED"
+};
 
 export interface AccountOps {
   deleteAccount(req: Request<DeleteAccountRequest>): Promise<DeleteAccountReply>;
