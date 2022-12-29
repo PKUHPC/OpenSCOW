@@ -13,12 +13,11 @@
 import { FormLayout } from "@scow/lib-web/build/layouts/FormLayout";
 import { Account } from "@scow/protos/build/server/account";
 import { AccountAffiliation, User } from "@scow/protos/build/server/user";
-import { message, Select, Table, Tabs, Typography } from "antd";
+import { App, message, Select, Table, Tabs, Typography } from "antd";
 import { useEffect, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { Centered } from "src/components/layouts";
-import { useMessage } from "src/layouts/prompts";
 import { PlatformRole, PlatformRoleTexts, TenantRole, TenantRoleTexts, UserRole, UserRoleTexts } from "src/models/User";
 
 interface DataTableProps<T> {
@@ -34,17 +33,17 @@ interface PlatformRoleSelectorProps {
 }
 
 const PlatformRoleSelector: React.FC<PlatformRoleSelectorProps> = ({ role, userId, reload }) => {
-  const message = useMessage();
+  const { message } = App.useApp();
 
   const [loading, setLoading] = useState(false);
-  const roleTexts: string[] = role.map((r) => PlatformRoleTexts[r]);
+
   return (
     <Select
       disabled={loading}
-      defaultValue={roleTexts}
+      value={role.map((x) => ({ label: PlatformRoleTexts[x], value: x }))}
       style={{ width: "100%" }}
       onSelect={
-        async (value: number) => {
+        async ({ value }) => {
           setLoading(true);
           await api.setPlatformRole({ body:{
             userId: userId,
@@ -61,11 +60,11 @@ const PlatformRoleSelector: React.FC<PlatformRoleSelectorProps> = ({ role, userI
         }
       }
       onDeselect={
-        async (value: number) => {
+        async (value) => {
           setLoading(true);
           await api.unsetPlatformRole({ body:{
             userId: userId,
-            roleType: value,
+            roleType: +value,
           } })
             .httpError(200, () => { message.error("用户已经不是该角色"); })
             .httpError(404, () => { message.error("用户不存在"); })
@@ -99,18 +98,18 @@ interface TenantRoleSelectorProps {
 const TenantRoleSelector: React.FC<TenantRoleSelectorProps> = ({ role, userId, reload }) => {
 
   const [loading, setLoading] = useState(false);
-  const roleTexts: string[] = role.map((r) => TenantRoleTexts[r]);
+
   return (
     <Select
       disabled={loading}
-      defaultValue={roleTexts}
+      value={role.map((r) => ({ label: TenantRoleTexts[r], value: r }))}
       style={{ width: "100%" }}
       onSelect={
-        async (value: number) => {
+        async (value) => {
           setLoading(true);
           await api.setTenantRole({ body:{
             userId: userId,
-            roleType: value,
+            roleType: value.value,
           } })
             .httpError(200, () => { message.error("用户已经是该角色"); })
             .httpError(404, () => { message.error("用户不存在"); })
@@ -123,11 +122,11 @@ const TenantRoleSelector: React.FC<TenantRoleSelectorProps> = ({ role, userId, r
         }
       }
       onDeselect={
-        async (value: number) => {
+        async (value) => {
           setLoading(true);
           await api.unsetTenantRole({ body:{
             userId: userId,
-            roleType: value,
+            roleType: value.value,
           } })
             .httpError(200, () => { message.error("用户已经不是该角色"); })
             .httpError(404, () => { message.error("用户不存在"); })

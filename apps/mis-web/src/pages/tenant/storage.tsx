@@ -11,7 +11,7 @@
  */
 
 import { FormLayout } from "@scow/lib-web/build/layouts/FormLayout";
-import { Button, Form, Input, InputNumber, Select } from "antd";
+import { App, Button, Form, Input, InputNumber, Select } from "antd";
 import { NextPage } from "next";
 import React, { useState } from "react";
 import { useStore } from "simstate";
@@ -20,7 +20,6 @@ import { requireAuth } from "src/auth/requireAuth";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { DisabledA } from "src/components/DisabledA";
 import { PageTitle } from "src/components/PageTitle";
-import { useMessage } from "src/layouts/prompts";
 import { TenantRole } from "src/models/User";
 import type { ChangeStorageMode } from "src/pages/api/admin/changeStorage";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
@@ -51,7 +50,7 @@ const StorageForm: React.FC = () => {
 
   const defaultClusterStore = useStore(DefaultClusterStore);
 
-  const message = useMessage();
+  const { message } = App.useApp();
 
   const submit = async () => {
     const { value, userId, cluster, mode } = await form.validateFields();

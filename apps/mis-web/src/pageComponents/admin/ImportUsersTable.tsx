@@ -13,7 +13,7 @@
 import { queryToString, useQuerystring } from "@scow/lib-web/build/utils/querystring";
 import { ClusterAccountInfo, ClusterUserInfo,
   GetClusterUsersResponse, ImportUsersData } from "@scow/protos/build/server/admin";
-import { Button, Checkbox, Form, Input, Select, Space, Table, Tabs, Tooltip } from "antd";
+import { App, Button, Checkbox, Form, Input, Select, Space, Table, Tabs, Tooltip } from "antd";
 import Router from "next/router";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useAsync } from "react-async";
@@ -21,12 +21,11 @@ import { useStore } from "simstate";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
-import { useMessage } from "src/layouts/prompts";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { publicConfig } from "src/utils/config";
 
 export const ImportUsersTable: React.FC = () => {
-  const message = useMessage();
+  const { message } = App.useApp();
 
   const qs = useQuerystring();
 

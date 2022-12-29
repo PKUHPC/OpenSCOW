@@ -19,6 +19,7 @@ import { DarkModeProvider } from "@scow/lib-web/build/layouts/darkMode";
 import { useConstant } from "@scow/lib-web/build/utils/hooks";
 import { isServer } from "@scow/lib-web/build/utils/isServer";
 import { App } from "@scow/protos/build/portal/app";
+import { App as AntdApp } from "antd";
 import type { AppContext, AppProps } from "next/app";
 import NextApp from "next/app";
 import dynamic from "next/dynamic";
@@ -30,7 +31,6 @@ import { USE_MOCK } from "src/apis/useMock";
 import { getTokenFromCookie } from "src/auth/cookie";
 import { BaseLayout } from "src/layouts/BaseLayout";
 import { FloatButtons } from "src/layouts/FloatButtons";
-import { useMessage } from "src/layouts/prompts";
 import { ListAvailableAppsSchema } from "src/pages/api/app/listAvailableApps";
 import { ValidateTokenSchema } from "src/pages/api/auth/validateToken";
 import { AppsStore } from "src/stores/AppsStore";
@@ -44,7 +44,7 @@ import { getHostname } from "src/utils/host";
 
 
 const FailEventHandler: React.FC = () => {
-  const message = useMessage();
+  const { message } = AntdApp.useApp();
   const userStore = useStore(UserStore);
 
   // 登出过程需要调用的几个方法（logout, useState等）都是immutable的

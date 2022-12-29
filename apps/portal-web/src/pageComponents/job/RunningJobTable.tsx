@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Button, Form, InputNumber, Popconfirm, Space, Table } from "antd";
+import { App, Button, Form, InputNumber, Popconfirm, Space, Table } from "antd";
 import Router from "next/router";
 import { join } from "path";
 import React, { useCallback, useMemo, useState } from "react";
@@ -19,7 +19,6 @@ import { useStore } from "simstate";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
-import { useMessage } from "src/layouts/prompts";
 import { runningJobId, RunningJobInfo } from "src/models/job";
 import { RunningJobDrawer } from "src/pageComponents/job/RunningJobDrawer";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
@@ -121,7 +120,7 @@ export const RunningJobInfoTable: React.FC<JobInfoTableProps> = ({
   data, isLoading, showAccount, showCluster, showUser, reload,
 }) => {
 
-  const message = useMessage();
+  const { message } = App.useApp();
 
 
   const [previewItem, setPreviewItem] = useState<RunningJobInfo | undefined>(undefined);

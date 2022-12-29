@@ -17,7 +17,7 @@ import { CloseOutlined,
   ScissorOutlined, SnippetsOutlined, UploadOutlined, UpOutlined } from "@ant-design/icons";
 import { compareDateTime, formatDateTime } from "@scow/lib-web/build/utils/datetime";
 import { compareNumber } from "@scow/lib-web/build/utils/math";
-import { Button, Divider, Space, Table } from "antd";
+import { App, Button, Divider, Space, Table } from "antd";
 import Link from "next/link";
 import Router from "next/router";
 import { join } from "path";
@@ -27,7 +27,6 @@ import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { ModalButton, ModalLink } from "src/components/ModalLink";
 import { TitleText } from "src/components/PageTitle";
 import { TableTitle } from "src/components/TableTitle";
-import { useMessage, useModal } from "src/layouts/prompts";
 import { urlToDownload } from "src/pageComponents/filemanager/api";
 import { CreateFileModal } from "src/pageComponents/filemanager/CreateFileModal";
 import { MkdirModal } from "src/pageComponents/filemanager/MkdirModal";
@@ -96,8 +95,7 @@ const operationTexts = {
 
 export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
 
-  const modal = useModal();
-  const message = useMessage();
+  const { message, modal } = App.useApp();
 
   const prevPathRef = useRef<string>(path);
 

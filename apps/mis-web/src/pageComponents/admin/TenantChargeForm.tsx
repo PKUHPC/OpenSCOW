@@ -10,12 +10,11 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Button, Form, Input, InputNumber, Tag } from "antd";
+import { App, Button, Form, Input, InputNumber, Tag } from "antd";
 import React, { useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { ClickableA } from "src/components/ClickableA";
-import { useMessage } from "src/layouts/prompts";
 import { publicConfig } from "src/utils/config";
 
 import { TenantSelector } from "../tenant/TenantSelector";
@@ -54,7 +53,7 @@ const UsedType: React.FC<{ onClick: (type: string) => void }> = ({ onClick }) =>
 };
 
 export const TenantChargeForm: React.FC = () => {
-  const message = useMessage();
+  const { message } = App.useApp();
   const [form] = Form.useForm<ChargeFields>();
 
   const [loading, setLoading] = useState(false);

@@ -10,10 +10,9 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Button, Form, Input, Spin } from "antd";
+import { App, Button, Form, Input, Spin } from "antd";
 import React, { useState } from "react";
 import { api } from "src/apis";
-import { useMessage } from "src/layouts/prompts";
 import { confirmPasswordFormItemProps, passwordRule } from "src/utils/form";
 
 interface FormProps {
@@ -23,7 +22,7 @@ interface FormProps {
 }
 
 export const ChangePasswordForm: React.FC = () => {
-  const message = useMessage();
+  const { message } = App.useApp();
 
 
   const [form] = Form.useForm<FormProps>();

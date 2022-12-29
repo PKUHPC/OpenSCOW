@@ -13,13 +13,12 @@
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { formatDateTime } from "@scow/lib-web/build/utils/datetime";
 import { PlatformUserInfo } from "@scow/protos/build/server/user";
-import { Divider, Space, Table } from "antd";
+import { App, Divider, Space, Table } from "antd";
 import React, { useCallback, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { ChangePasswordModalLink } from "src/components/ChangePasswordModal";
 import { DisabledA } from "src/components/DisabledA";
-import { useMessage, useModal } from "src/layouts/prompts";
 import { PlatformRole } from "src/models/User";
 import { GetAllUsersSchema } from "src/pages/api/admin/getAllUsers";
 import { User } from "src/stores/UserStore";
@@ -75,8 +74,7 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
   data, pageInfo, setPageInfo, isLoading, reload, user,
 }) => {
 
-  const modal = useModal();
-  const message = useMessage();
+  const { modal, message } = App.useApp();
 
   return (
     <>
