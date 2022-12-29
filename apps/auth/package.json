@@ -26,7 +26,7 @@
     "@scow/config": "workspace:*",
     "@scow/lib-config": "workspace:*",
     "@scow/lib-ssh": "workspace:*",
-    "@sinclair/typebox": "0.25.13",
+    "@sinclair/typebox": "0.25.16",
     "asn1": "0.2.6",
     "fastify": "4.10.2",
     "fastify-graceful-shutdown": "3.4.0",

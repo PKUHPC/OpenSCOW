@@ -25,7 +25,7 @@
     "@scow/lib-config": "workspace:*",
     "@scow/lib-ssh": "workspace:*",
     "@scow/protos": "workspace:*",
-    "@sinclair/typebox": "0.25.13",
+    "@sinclair/typebox": "0.25.16",
     "dotenv": "16.0.3",
     "node-cron": "3.0.2",
     "uuid": "9.0.0",
@@ -36,7 +36,7 @@
   },
   "devDependencies": {
     "@ddadaal/tsgrpc-client": "0.17.2",
-    "@types/node-cron": "3.0.6",
+    "@types/node-cron": "3.0.7",
     "@types/wait-on": "5.3.1",
     "@types/shell-quote": "1.7.1"
   },

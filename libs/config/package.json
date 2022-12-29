@@ -13,7 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "@scow/lib-config": "workspace:*",
-    "@sinclair/typebox": "0.25.13"
+    "@sinclair/typebox": "0.25.16"
   },
   "volta": {
     "extends": "../../package.json"
