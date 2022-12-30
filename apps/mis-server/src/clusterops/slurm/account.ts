@@ -43,14 +43,14 @@ export const slurmAccountOps = ({ executeSlurmScript }: SlurmClusterInfo): Accou
       const result = await executeSlurmScript(["-b", accountName], logger);
 
       if (result.code === 8) {
-        return { code: "OK", executed: false };
+        return { code: "ALREADY_BLOCKED" };
       }
 
       if (result.code === 7) {
         return { code: "NOT_FOUND" };
       }
 
-      return { code: "OK", executed: true };
+      return { code: "OK" };
     },
 
     unblockAccount: async ({ request, logger }) => {
@@ -59,14 +59,14 @@ export const slurmAccountOps = ({ executeSlurmScript }: SlurmClusterInfo): Accou
       const result = await executeSlurmScript(["-d", accountName], logger);
 
       if (result.code === 9) {
-        return { code: "OK", executed: false };
+        return { code: "ALREADY_UNBLOCKED" };
       }
 
       if (result.code === 7) {
         return { code: "NOT_FOUND" };
       }
 
-      return { code: "OK", executed: true };
+      return { code: "OK" };
     },
   };
 };

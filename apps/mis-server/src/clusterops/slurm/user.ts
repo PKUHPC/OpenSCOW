@@ -16,7 +16,7 @@ import { SlurmClusterInfo } from "src/clusterops/slurm";
 export const slurmUserOps = ({ executeSlurmScript }: SlurmClusterInfo): UserOps => {
 
   return {
-    addUser: async ({ request, logger }) => {
+    addUserToAccount: async ({ request, logger }) => {
       const { accountName, userId } = request;
       const result = await executeSlurmScript(["-g", accountName, "0", userId], logger);
       if (result.code === 3) {

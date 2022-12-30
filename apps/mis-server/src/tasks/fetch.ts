@@ -15,7 +15,7 @@ import { MikroORM, QueryOrder } from "@mikro-orm/core";
 import { MariaDbDriver } from "@mikro-orm/mariadb";
 import { SqlEntityManager } from "@mikro-orm/mysql";
 import { parsePlaceholder } from "@scow/lib-config";
-import { charge } from "src/bl/charging";
+import { addJobCharge, charge } from "src/bl/charging";
 import { clusterNameToScowClusterId } from "src/config/clusters";
 import { misConfig } from "src/config/mis";
 import { Account } from "src/entities/Account";
@@ -199,7 +199,7 @@ export async function fetchJobs(
                 target: ua.account.$.tenant.getEntity(),
               }, em, logger, clusterPlugin);
 
-              await ua.addJobCharge(x.tenantPrice, clusterPlugin, logger);
+              await addJobCharge(ua, x.tenantPrice, clusterPlugin, logger);
             }
           }));
 
