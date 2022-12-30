@@ -28,10 +28,7 @@ async function queryCapabilities(authUrl, phase) {
 
 const specs = {
 
-  AUTH_EXTERNAL_URL: str({
-    desc: "认证系统的URL。如果和本系统域名相同，可以只写完整路径",
-    default: join(process.env.NEXT_PUBLIC_BASE_PATH || "/", "/auth")
-  }),
+  AUTH_EXTERNAL_URL: str({ desc: "认证系统的URL。如果和本系统域名相同，可以只写完整路径", default: "/auth" }),
 
   AUTH_INTERNAL_URL: str({ desc: "认证服务内网地址", default: "http://auth:5000" }),
 
