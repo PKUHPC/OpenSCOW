@@ -229,7 +229,8 @@ def create_portal_server_service():
 def create_portal_web_service():
     pw_env = {
         "MIS_URL": path_join(BASE_PATH, MIS_PATH),
-        "MIS_DEPLOYED": "true" if cfg.MIS else "false"
+        "MIS_DEPLOYED": "true" if cfg.MIS else "false",
+        "AUTH_EXTERNAL_URL": path_join(BASE_PATH, "/auth"),
     }
     pw_volumes = {
         "/etc/hosts": "/etc/hosts",
@@ -273,7 +274,8 @@ def create_mis_server_service():
 def create_mis_web_service():
     mv_env = {
         "PORTAL_URL": path_join(BASE_PATH, PORTAL_PATH),
-        "PORTAL_DEPLOYED": "true" if cfg.PORTAL else "false"
+        "PORTAL_DEPLOYED": "true" if cfg.PORTAL else "false",
+        "AUTH_EXTERNAL_URL": path_join(BASE_PATH, "/auth"),
     }
     mv_volumes = {
         "./config": "/etc/scow",
