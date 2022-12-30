@@ -26,7 +26,10 @@ async function queryCapabilities(authUrl, phase) {
 }
 
 const specs = {
-  AUTH_EXTERNAL_URL: str({ desc: "认证系统的URL。如果部署在和本系统一样的域名下，可以只写完整路径", default: "/auth" }),
+  AUTH_EXTERNAL_URL: str({
+    desc: "认证系统的URL。如果和本系统域名相同，可以只写完整路径",
+    default: join(process.env.NEXT_PUBLIC_BASE_PATH || "/", "/auth")
+  }),
 
   SERVER_URL: str({ desc: "后端服务地址", default: "mis-server:5000" }),
 
