@@ -202,3 +202,7 @@ vagrant resume
 # 8. 删除虚机
 vagrant destroy
 ```
+
+# 授权协议
+
+SCOW 使用 [木兰宽松许可证, 第2版](http://license.coscl.org.cn/MulanPSL2) 开源协议。
