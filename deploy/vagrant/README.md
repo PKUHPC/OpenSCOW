@@ -1,5 +1,10 @@
 # scow-vagrant：slurm+SCOW集群一键部署
 
+## 注意
+
+此仓库的内容由[PKUHPC/SCOW](https://github.com/PKUHPC/SCOW)的`deploy/vagrant`的目录通过GitHub Actions自动生成。如果需要提交issue或者PR，请提交到SCOW仓库中。
+
+## 介绍
 
 本项目面向<font color=red size=5>**开发**</font>和<font color='red' size=5>**测试**</font>人员，基于Vagrant，采用VirtualBox作为Provider，提供slurm+SCOW集群一键部署方案，极大简化了部署流程和部署门槛。部署slurm+SCOW四节点集群，节点角色及默认配置如下表所示：
 
@@ -197,3 +202,7 @@ vagrant resume
 # 8. 删除虚机
 vagrant destroy
 ```
+
+# 授权协议
+
+SCOW 使用 [木兰宽松许可证, 第2版](http://license.coscl.org.cn/MulanPSL2) 开源协议。

@@ -1,6 +1,10 @@
-# SCOW 简易部署
+# SCOW 本地部署
 
-https://pkuhpc.github.io/SCOW/docs/common/deployment
+https://pkuhpc.github.io/SCOW/docs/deploy/SCOW
+
+## 注意
+
+此仓库的内容由[PKUHPC/SCOW](https://github.com/PKUHPC/SCOW)的`deploy/local`的目录通过GitHub Actions自动生成。如果需要提交issue或者PR，请提交到SCOW仓库中。
 
 ## 要求
 
@@ -61,9 +65,6 @@ ll
 
 当部署好了管理系统后，可以在仓库下运行`./db.sh`连接并进入数据库。
 
-# 注意
-
-此仓库的内容由[PKUHPC/SCOW](https://github.com/PKUHPC/SCOW)通过GitHub Actions自动生成。查看本仓库commit记录以获取当前版本对应的SCOW版本。
 
 # 授权协议
 
