@@ -13,7 +13,7 @@
 import { FormLayout } from "@scow/lib-web/build/layouts/FormLayout";
 import { Account } from "@scow/protos/build/server/account";
 import { AccountAffiliation, User } from "@scow/protos/build/server/user";
-import { App, message, Select, Table, Tabs, Typography } from "antd";
+import { App, Select, Table, Tabs, Typography } from "antd";
 import { useEffect, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
@@ -32,6 +32,8 @@ interface PlatformRoleSelectorProps {
   reload: () => void;
 }
 
+const platformRoleToLabeledValue = (role: PlatformRole) => ({ label: PlatformRoleTexts[role], value: role });
+
 const PlatformRoleSelector: React.FC<PlatformRoleSelectorProps> = ({ role, userId, reload }) => {
   const { message } = App.useApp();
 
@@ -40,10 +42,11 @@ const PlatformRoleSelector: React.FC<PlatformRoleSelectorProps> = ({ role, userI
   return (
     <Select
       disabled={loading}
-      value={role.map((x) => ({ label: PlatformRoleTexts[x], value: x }))}
+      value={role}
       style={{ width: "100%" }}
+      options={Object.values(PlatformRole).map(platformRoleToLabeledValue)}
       onSelect={
-        async ({ value }) => {
+        async (value) => {
           setLoading(true);
           await api.setPlatformRole({ body:{
             userId: userId,
@@ -64,7 +67,7 @@ const PlatformRoleSelector: React.FC<PlatformRoleSelectorProps> = ({ role, userI
           setLoading(true);
           await api.unsetPlatformRole({ body:{
             userId: userId,
-            roleType: +value,
+            roleType: value,
           } })
             .httpError(200, () => { message.error("用户已经不是该角色"); })
             .httpError(404, () => { message.error("用户不存在"); })
@@ -78,13 +81,7 @@ const PlatformRoleSelector: React.FC<PlatformRoleSelectorProps> = ({ role, userI
       }
       mode="multiple"
       placeholder="Please select"
-    >
-      {
-        Object.entries(PlatformRoleTexts).map(([key, value]) => {
-          return <Select.Option key={key} value={key}>{value}</Select.Option>;
-        })
-      }
-    </Select>
+    />
   );
 };
 
@@ -95,21 +92,29 @@ interface TenantRoleSelectorProps {
   reload: () => void;
 }
 
+const tenantRoleToLabeledValue = (role: TenantRole) => ({ label: TenantRoleTexts[role], value: role });
+
 const TenantRoleSelector: React.FC<TenantRoleSelectorProps> = ({ role, userId, reload }) => {
 
+  const { message } = App.useApp();
+
   const [loading, setLoading] = useState(false);
+
+  console.log(TenantRole);
 
   return (
     <Select
       disabled={loading}
-      value={role.map((r) => ({ label: TenantRoleTexts[r], value: r }))}
+      value={role}
       style={{ width: "100%" }}
+      options={Object.values(TenantRole).map(tenantRoleToLabeledValue)}
       onSelect={
         async (value) => {
+          console.log(value);
           setLoading(true);
           await api.setTenantRole({ body:{
             userId: userId,
-            roleType: value.value,
+            roleType: value,
           } })
             .httpError(200, () => { message.error("用户已经是该角色"); })
             .httpError(404, () => { message.error("用户不存在"); })
@@ -123,10 +128,11 @@ const TenantRoleSelector: React.FC<TenantRoleSelectorProps> = ({ role, userId, r
       }
       onDeselect={
         async (value) => {
+          console.log(value);
           setLoading(true);
           await api.unsetTenantRole({ body:{
             userId: userId,
-            roleType: value.value,
+            roleType: value,
           } })
             .httpError(200, () => { message.error("用户已经不是该角色"); })
             .httpError(404, () => { message.error("用户不存在"); })
@@ -140,13 +146,7 @@ const TenantRoleSelector: React.FC<TenantRoleSelectorProps> = ({ role, userId, r
       }
       mode="multiple"
       placeholder="Please select"
-    >
-      {
-        Object.entries(TenantRoleTexts).map(([key, value]) => {
-          return <Select.Option key={key} value={key}>{value}</Select.Option>;
-        })
-      }
-    </Select>
+    />
   );
 };
 
