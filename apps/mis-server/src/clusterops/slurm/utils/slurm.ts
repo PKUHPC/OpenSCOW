@@ -12,9 +12,10 @@
 
 import { Logger } from "@ddadaal/tsgrpc-server";
 import { SlurmMisConfigSchema } from "@scow/config/build/mis";
-import { loggedExec, sshConnect } from "@scow/lib-ssh";
+import { loggedExec, sshConnect, SSHExecError } from "@scow/lib-ssh";
 import { rootKeyPair } from "src/config/env";
 
+// Won't throw if return code is not zero
 export const executeScript = async (
   slurmMisConfig: SlurmMisConfigSchema, cmd: string, parameters: string[], env: NodeJS.ProcessEnv, logger: Logger,
 ) => {
@@ -22,7 +23,7 @@ export const executeScript = async (
   const host = slurmMisConfig.managerUrl;
 
   return await sshConnect(host, "root", rootKeyPair, logger, async (ssh) => {
-    return await loggedExec(ssh, logger, true, cmd, parameters, { execOptions: { env } });
+    return await loggedExec(ssh, logger, false, cmd, parameters, { execOptions: { env } });
   });
 };
 
@@ -44,5 +45,29 @@ export const executeSlurmScript = async (
   }, logger);
 
   return result;
+};
+
+export const throwIfNotReturn0 = (result: Awaited<ReturnType<typeof executeSlurmScript>>) => {
+  if (result.code !== 0) {
+    throw new SSHExecError(result);
+  }
+};
+
+/**
+ * If result is zero, return "OK". If result is in map, return the corresponding value. Otherwise throw.
+ * @param result the SSH exec response
+ * @param map the map from exit code to error code
+ * @returns the error code
+ */
+export const handleSimpleResponse = <T>(
+  result: Awaited<ReturnType<typeof executeSlurmScript>>, map: Record<number, T>,
+) => {
+  if (result.code === null) { throw new Error("Slurm script exited with null code"); }
+
+  if (result.code === 0) { return { code: "OK" as const }; }
+
+  const code = map[result.code];
+  if (code) { return { code }; }
+  throw new SSHExecError(result);
 };
 

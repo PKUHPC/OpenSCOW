@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { NodeSSH, SSHExecCommandOptions } from "node-ssh";
+import { NodeSSH, SSHExecCommandOptions, SSHExecCommandResponse } from "node-ssh";
 import { join } from "path";
 import { quote } from "shell-quote";
 import type { Logger } from "ts-log";
@@ -135,6 +135,12 @@ export function constructCommand(cmd: string, parameters: readonly string[], env
   return envPrefix + command;
 }
 
+export class SSHExecError extends Error {
+  constructor(public response: SSHExecCommandResponse, options?: ErrorOptions) {
+    super("Error when executing command", options);
+  }
+}
+
 export async function loggedExec(ssh: NodeSSH, logger: Logger, throwIfFailed: boolean,
   cmd: string, parameters: string[], options?: SSHExecCommandOptions) {
 
@@ -147,7 +153,7 @@ export async function loggedExec(ssh: NodeSSH, logger: Logger, throwIfFailed: bo
   if (resp.code !== 0) {
     logger.error("Command %o failed. stdout %s, stderr %s", command, resp.stdout, resp.stderr);
     if (throwIfFailed) {
-      throw new Error("");
+      throw new SSHExecError(resp);
     }
   } else {
     logger.debug("Command %o completed. stdout %s, stderr %s", command, resp.stdout, resp.stderr);
