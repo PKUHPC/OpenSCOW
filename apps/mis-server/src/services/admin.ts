@@ -134,7 +134,9 @@ export const adminServiceServer = plugin((server) => {
         userId: { $in: result.users.map((x) => x.userId) },
       });
       includedUsers.forEach((user) => {
-        const u = result.users.find((x) => x.userId === user.userId)!;
+        // https://slurm.schedmd.com/sacctmgr.html#OPT_user
+        // slurm's username defaults to lower case
+        const u = result.users.find((x) => x.userId === user.userId.toLowerCase())!;
         u.included = true;
         u.userName = user.name;
       });
