@@ -91,7 +91,7 @@ export default async (req: NextApiRequest, res: AugmentedNextApiResponse) => {
         stream.write({ message: { $case: "resize", resize: { cols: data.cols, rows: data.rows } } });
       });
 
-      socket.on("data", ([data]: [string]) => {
+      socket.on("data", (data) => {
         stream.write({ message:  { $case :"data", data: { data: Buffer.from(data) } } });
       });
 

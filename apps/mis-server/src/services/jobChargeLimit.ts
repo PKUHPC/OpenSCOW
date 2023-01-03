@@ -17,6 +17,7 @@ import { LockMode } from "@mikro-orm/core";
 import { Decimal } from "@scow/lib-decimal";
 import { moneyToNumber } from "@scow/lib-decimal/build/convertion";
 import { JobChargeLimitServiceServer, JobChargeLimitServiceService } from "@scow/protos/build/server/job_charge_limit";
+import { setJobCharge } from "src/bl/charging";
 import { UserAccount } from "src/entities/UserAccount";
 
 export const jobChargeLimitServer = plugin((server) => {
@@ -77,7 +78,7 @@ export const jobChargeLimitServer = plugin((server) => {
           };
         }
 
-        await userAccount.setJobCharge(new Decimal(moneyToNumber(limit)), server.ext, logger);
+        await setJobCharge(userAccount, new Decimal(moneyToNumber(limit)), server.ext, logger);
 
         logger.info("Set %s job charge limit to user %s account %s. Current used %s",
           userAccount.jobChargeLimit!.toFixed(2),

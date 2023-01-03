@@ -15,6 +15,7 @@ import { Server } from "@ddadaal/tsgrpc-server";
 import { MySqlDriver, SqlEntityManager } from "@mikro-orm/mysql";
 import { Decimal } from "@scow/lib-decimal";
 import { createServer } from "src/app";
+import { setJobCharge } from "src/bl/charging";
 import { clusterNameToScowClusterId } from "src/config/clusters";
 import { JobInfo } from "src/entities/JobInfo";
 import { OriginalJob } from "src/entities/OriginalJob";
@@ -67,7 +68,7 @@ it("fetches the data", async () => {
 
   // set job charge limit of user b in account b
 
-  await data.uaBB.setJobCharge(new Decimal(0.01), server.ext, server.logger);
+  await setJobCharge(data.uaBB, new Decimal(0.01), server.ext, server.logger);
   await initialEm.flush();
 
   await fetchJobs(server.ext.orm.em.fork(), server.logger, server.ext, server.ext);

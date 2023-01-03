@@ -10,16 +10,14 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { compareDateTime, formatDateTime } from "@scow/lib-web/build/utils/datetime";
-import { Button, Divider, Form, Input, Space, Table } from "antd";
+import { App, Button, Divider, Form, Input, Space, Table } from "antd";
 import React, { useMemo, useState } from "react";
 import { api } from "src/apis";
 import { ChangePasswordModalLink } from "src/components/ChangePasswordModal";
-import { DisabledA } from "src/components/DisabledA";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
-import { useMessage, useModal } from "src/layouts/prompts";
-import { FullUserInfo, TenantRole } from "src/models/User";
+import { TenantRoleSelector } from "src/components/TenantRoleSelector";
+import { FullUserInfo } from "src/models/User";
 import { GetTenantUsersSchema } from "src/pages/api/admin/getTenantUsers";
 import { User } from "src/stores/UserStore";
 
@@ -39,8 +37,7 @@ export const AdminUserTable: React.FC<Props> = ({
   data, isLoading, reload, user,
 }) => {
 
-  const modal = useModal();
-  const message = useMessage();
+  const { message } = App.useApp();
 
   const [form] = Form.useForm<FilterForm>();
 
@@ -99,118 +96,9 @@ export const AdminUserTable: React.FC<Props> = ({
         />
         <Table.Column<FullUserInfo>
           dataIndex="tenantRoles"
-          title="租户管理员"
+          title="租户角色"
           render={(_, r) => (
-            r.tenantRoles.includes(TenantRole.TENANT_ADMIN) ? (
-              <Space size="middle">
-                是
-                <DisabledA
-                  disabled={r.id === user.identityId}
-                  message="不能取消自己的租户管理员权限"
-                  onClick={async () => {
-                    modal.confirm({
-                      title: "确定取消租户管理员权限",
-                      icon: <ExclamationCircleOutlined />,
-                      content: `确定要移除用户${r.name}（ID: ${r.id}）的租户管理员权限？`,
-                      onOk: async () => {
-                        await api.unsetTenantRole({ body: {
-                          userId : r.id,
-                          roleType: TenantRole.TENANT_ADMIN,
-                        } })
-                          .then(() => {
-                            message.success("操作成功！");
-                            reload();
-                          });
-                      },
-                    });
-                  }}
-                >
-                  取消
-                </DisabledA>
-              </Space>
-            ) : (
-              <Space size="middle">
-                否
-                <a
-                  onClick={() => {
-                    modal.confirm({
-                      title: "确定设置为租户管理员",
-                      icon: <ExclamationCircleOutlined />,
-                      content: `确定要设置用户${r.name}（ID: ${r.id}）为租户管理员？`,
-                      onOk: async () => {
-                        await api.setTenantRole({ body: {
-                          userId : r.id,
-                          roleType: TenantRole.TENANT_ADMIN,
-                        } })
-                          .then(() => {
-                            message.success("操作成功！");
-                            reload();
-                          });
-                      },
-                    });
-                  }}
-                >
-                  设置
-                </a>
-              </Space>
-            )
-          )}
-        />
-        <Table.Column<FullUserInfo>
-          dataIndex="tenantRoles"
-          title="租户财务人员"
-          render={(_, r) => (
-            r.tenantRoles.includes(TenantRole.TENANT_FINANCE) ? (
-              <Space size="middle">
-                是
-                <a
-                  onClick={() => {
-                    modal.confirm({
-                      title: "确定取消租户财务人员权限",
-                      icon: <ExclamationCircleOutlined />,
-                      content: `确定要移除用户${r.name}（ID: ${r.id}）的财务人员权限？`,
-                      onOk: async () => {
-                        await api.unsetTenantRole({ body: {
-                          userId : r.id,
-                          roleType: TenantRole.TENANT_FINANCE,
-                        } })
-                          .then(() => {
-                            message.success("操作成功！");
-                            reload();
-                          });
-                      },
-                    });
-                  }}
-                >
-                  取消
-                </a>
-              </Space>
-            ) : (
-              <Space size="middle">
-                否
-                <a
-                  onClick={() => {
-                    modal.confirm({
-                      title: "确定设置为租户财务人员",
-                      icon: <ExclamationCircleOutlined />,
-                      content: `确定要设置用户${r.name}（ID: ${r.id}）为租户财务人员？`,
-                      onOk: async () => {
-                        await api.setTenantRole({ body: {
-                          userId : r.id,
-                          roleType: TenantRole.TENANT_FINANCE,
-                        } })
-                          .then(() => {
-                            message.success("操作成功！");
-                            reload();
-                          });
-                      },
-                    });
-                  }}
-                >
-                  设置
-                </a>
-              </Space>
-            )
+            <TenantRoleSelector reload={reload} roles={r.tenantRoles} userId={r.id} currentUser={user} />
           )}
         />
         <Table.Column<FullUserInfo>

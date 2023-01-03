@@ -333,7 +333,10 @@ export const slurmAppOps = (cluster: string): AppOps => {
               if (displayId) {
                 // the server is run at the compute node
                 // login to the compute node and refresh the password
-                return await sshConnect(host, "root", logger, async (computeNodeSsh) => {
+
+                // connect as user so that
+                // the service node doesn't need to be able to connect to compute nodes with public key
+                return await sshConnect(host, userId, logger, async (computeNodeSsh) => {
                   const password = await refreshPassword(computeNodeSsh, userId, logger, displayId!);
                   return {
                     code: "OK",

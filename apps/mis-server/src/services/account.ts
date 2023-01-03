@@ -17,6 +17,7 @@ import { LockMode, UniqueConstraintViolationException } from "@mikro-orm/core";
 import { decimalToMoney } from "@scow/lib-decimal";
 import { AccountServiceServer, AccountServiceService,
   BlockAccountResponse_Result } from "@scow/protos/build/server/account";
+import { blockAccount, unblockAccount } from "src/bl/block";
 import { Account } from "src/entities/Account";
 import { AccountWhitelist } from "src/entities/AccountWhitelist";
 import { Tenant } from "src/entities/Tenant";
@@ -30,7 +31,7 @@ export const accountServiceServer = plugin((server) => {
     blockAccount: async ({ request, em, logger }) => {
       const { accountName } = request;
 
-      await em.transactional(async (em) => {
+      return await em.transactional(async (em) => {
         const account = await em.findOne(Account, {
           accountName,
         }, { lockMode: LockMode.PESSIMISTIC_WRITE });
@@ -41,21 +42,25 @@ export const accountServiceServer = plugin((server) => {
           };
         }
 
-        if (account.blocked) {
+        const result = await blockAccount(account, server.ext.clusters, logger);
+
+        if (result === "AlreadyBlocked") {
           return [{ result: BlockAccountResponse_Result.ALREADY_BLOCKED }];
         }
 
+        if (result === "Whitelisted") {
+          logger.warn("Trying to block a whitelisted account %s", accountName);
+          return [{ result: BlockAccountResponse_Result.WHITELISTED }];
+        }
 
-        await account.block(server.ext.clusters, logger);
+        return [{ result: BlockAccountResponse_Result.OK }];
       });
-
-      return [{ result: BlockAccountResponse_Result.OK }];
     },
 
     unblockAccount: async ({ request, em, logger }) => {
       const { accountName } = request;
 
-      await em.transactional(async (em) => {
+      return await em.transactional(async (em) => {
         const account = await em.findOne(Account, {
           accountName,
         }, { lockMode: LockMode.PESSIMISTIC_WRITE });
@@ -70,10 +75,14 @@ export const accountServiceServer = plugin((server) => {
           return [{ executed: false }];
         }
 
-        await account.unblock(server.ext.clusters, logger);
-      });
+        const result = await unblockAccount(account, server.ext.clusters, logger);
+        if (result === "ALREADY_UNBLOCKED") {
+          return [{ executed: false }];
+        }
 
-      return [{ executed: true }];
+        return [{ executed: true }];
+
+      });
     },
 
     getAccounts: async ({ request, em }) => {
@@ -155,10 +164,20 @@ export const accountServiceServer = plugin((server) => {
       logger.info("Creating account in cluster.");
       await server.ext.clusters.callOnAll(
         logger,
-        async (ops) => ops.account.createAccount({
-          request: { accountName, ownerId },
-          logger,
-        }),
+        async (ops) => {
+          const resp = await ops.account.createAccount({
+            request: { accountName, ownerId },
+            logger,
+          });
+
+          if (resp.code === "ALREADY_EXISTS") {
+            // the account is already exists. add the owner to the account manually
+            await ops.user.addUserToAccount({
+              request: { accountName, userId: user.userId },
+              logger,
+            });
+          }
+        },
       ).catch(async (e) => {
         await rollback(e);
         throw e;
@@ -223,7 +242,7 @@ export const accountServiceServer = plugin((server) => {
       });
       account.whitelist = toRef(whitelist);
 
-      await account.unblock(server.ext.clusters, logger);
+      await unblockAccount(account, server.ext.clusters, logger);
       await em.persistAndFlush(whitelist);
 
       logger.info("Add account %s to whitelist by %s with comment %s",
@@ -259,7 +278,7 @@ export const accountServiceServer = plugin((server) => {
 
       if (account.balance.isNegative()) {
         logger.info("Account %s is out of balance and not whitelisted. Block the account.", account.accountName);
-        await account.block(server.ext.clusters, logger);
+        await blockAccount(account, server.ext.clusters, logger);
       }
 
       await em.flush();

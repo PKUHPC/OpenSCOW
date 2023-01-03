@@ -34,15 +34,19 @@ export interface RemoveUserRequest {
 }
 
 /** NOT_FOUND: user is not found. */
-export interface RemoveUserReply {}
+export interface RemoveUserReply {
+  code: "OK" | "NOT_FOUND";
+}
 
-export interface AddUserRequest {
+export interface AddUserToAccountRequest {
   userId: string;
   accountName: string;
 }
 
 /** ALREADY_EXISTS: User already exists. */
-export interface AddUserReply {}
+export interface AddUserToAccountReply {
+  code: "OK" | "ALREADY_EXISTS"
+}
 
 export interface GetAllUsersInAccountsRequest {}
 
@@ -51,7 +55,7 @@ export interface GetAllUsersInAccountsReply {
 }
 
 export interface UserOps {
-  addUser(req: Request<AddUserRequest>): Promise<AddUserReply>;
+  addUserToAccount(req: Request<AddUserToAccountRequest>): Promise<AddUserToAccountReply>;
   removeUser(req: Request<RemoveUserRequest>): Promise<RemoveUserReply>;
   blockUserInAccount(req: Request<BlockUserInAccountRequest>): Promise<BlockUserInAccountReply>;
   unblockUserInAccount(req: Request<UnblockUserInAccountRequest>): Promise<UnblockUserInAccountReply>;

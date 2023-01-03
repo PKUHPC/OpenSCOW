@@ -14,7 +14,7 @@ import { compareDateTime, formatDateTime } from "@scow/lib-web/build/utils/datet
 import { compareNumber } from "@scow/lib-web/build/utils/math";
 import { queryToString } from "@scow/lib-web/build/utils/querystring";
 import type { AppSession } from "@scow/protos/build/portal/app";
-import { Button, Checkbox, Form, Popconfirm, Space, Table, TableColumnsType } from "antd";
+import { App, Button, Checkbox, Form, Popconfirm, Space, Table, TableColumnsType } from "antd";
 import type { CheckboxChangeEvent } from "antd/es/checkbox";
 import Router, { useRouter } from "next/router";
 import { join } from "path";
@@ -24,7 +24,6 @@ import { useStore } from "simstate";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
-import { useMessage } from "src/layouts/prompts";
 import { calculateAppRemainingTime, compareState } from "src/models/job";
 import { ConnectTopAppLink } from "src/pageComponents/app/ConnectToAppLink";
 import { AppsStore } from "src/stores/AppsStore";
@@ -38,7 +37,7 @@ export const AppSessionsTable: React.FC<Props> = () => {
 
   const apps = useStore(AppsStore);
 
-  const message = useMessage();
+  const { message } = App.useApp();
 
   const router = useRouter();
 

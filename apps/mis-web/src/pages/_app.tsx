@@ -16,9 +16,9 @@ import "antd/dist/reset.css";
 import { failEvent, fromApi } from "@ddadaal/next-typed-api-routes-runtime/lib/client";
 import { AntdConfigProvider } from "@scow/lib-web/build/layouts/AntdConfigProvider";
 import { DarkModeProvider } from "@scow/lib-web/build/layouts/darkMode";
-import { useMessage, useModal } from "@scow/lib-web/build/layouts/prompts";
 import { useConstant } from "@scow/lib-web/build/utils/hooks";
 import { isServer } from "@scow/lib-web/build/utils/isServer";
+import { App as AntdApp } from "antd";
 import type { AppContext, AppProps } from "next/app";
 import App from "next/app";
 import dynamic from "next/dynamic";
@@ -41,8 +41,7 @@ import { publicConfig, runtimeConfig } from "src/utils/config";
 import { getHostname } from "src/utils/host";
 
 const FailEventHandler: React.FC = () => {
-  const message = useMessage();
-  const modal = useModal();
+  const { message, modal } = AntdApp.useApp();
   const userStore = useStore(UserStore);
 
   // 登出过程需要调用的几个方法（logout, useState等）都是immutable的

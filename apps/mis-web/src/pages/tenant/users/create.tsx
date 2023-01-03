@@ -11,14 +11,13 @@
  */
 
 import { FormLayout } from "@scow/lib-web/build/layouts/FormLayout";
-import { Button, Form } from "antd";
+import { App, Button, Form } from "antd";
 import { NextPage } from "next";
 import React, { useState } from "react";
 import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { NotFoundPage } from "src/components/errorPages/NotFoundPage";
 import { PageTitle } from "src/components/PageTitle";
-import { useMessage, useModal } from "src/layouts/prompts";
 import { TenantRole } from "src/models/User";
 import { CreateUserForm, CreateUserFormFields } from "src/pageComponents/users/CreateUserForm";
 import { publicConfig } from "src/utils/config";
@@ -27,8 +26,7 @@ import { Head } from "src/utils/head";
 const CreateUserPageForm: React.FC = () => {
 
   const [form] = Form.useForm<CreateUserFormFields>();
-  const message = useMessage();
-  const modal = useModal();
+  const { message, modal } = App.useApp();
 
   const [loading, setLoading] = useState(false);
 

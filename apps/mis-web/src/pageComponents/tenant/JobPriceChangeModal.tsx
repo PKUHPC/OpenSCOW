@@ -10,10 +10,9 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Form, Input, InputNumber, Modal } from "antd";
+import { App, Form, Input, InputNumber, Modal } from "antd";
 import { useState } from "react";
 import { api } from "src/apis";
-import { useMessage } from "src/layouts/prompts";
 import type { GetJobFilter } from "src/pages/api/job/jobInfo";
 
 interface Props {
@@ -39,7 +38,7 @@ export const JobPriceChangeModal: React.FC<Props> = ({ open, onClose, jobCount, 
   const [form] = Form.useForm<FormProps>();
   const [loading, setLoading] = useState(false);
 
-  const message = useMessage();
+  const { message } = App.useApp();
 
   return (
     <Modal

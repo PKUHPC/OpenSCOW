@@ -11,13 +11,12 @@
  */
 
 import { FormLayout } from "@scow/lib-web/build/layouts/FormLayout";
-import { Button, Form, Input } from "antd";
+import { App, Button, Form, Input } from "antd";
 import { NextPage } from "next";
 import React, { useState } from "react";
 import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
-import { useMessage } from "src/layouts/prompts";
 import { TenantRole } from "src/models/User";
 import { publicConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
@@ -36,7 +35,7 @@ const CreateAccountForm: React.FC = () => {
 
   const [loading, setLoading] = useState(false);
 
-  const message = useMessage();
+  const { message } = App.useApp();
 
   const submit = async () => {
     const { accountName, ownerId, ownerName, comment } = await form.validateFields();

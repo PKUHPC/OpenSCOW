@@ -26,6 +26,7 @@ import {
   UserRole as PFUserRole, UserServiceServer,
   UserServiceService,
   UserStatus as PFUserStatus } from "@scow/protos/build/server/user";
+import { blockUserInAccount, unblockUserInAccount } from "src/bl/block";
 import { misConfig } from "src/config/mis";
 import { Account } from "src/entities/Account";
 import { PlatformRole, TenantRole, User } from "src/entities/User";
@@ -150,9 +151,9 @@ export const userServiceServer = plugin((server) => {
         };
       }
 
-      await server.ext.clusters.callOnAll(logger,
-        async (ops) => ops.user.addUser({ request: { accountName, userId }, logger }),
-      );
+      await server.ext.clusters.callOnAll(logger, async (ops) => {
+        return await ops.user.addUserToAccount({ request: { accountName, userId }, logger });
+      });
 
       const newUserAccount = new UserAccount({
         account,
@@ -219,7 +220,7 @@ export const userServiceServer = plugin((server) => {
         };
       }
 
-      await user.block(server.ext, logger);
+      await blockUserInAccount(user, server.ext, logger);
 
       user.status = UserStatus.BLOCKED;
 
@@ -248,7 +249,7 @@ export const userServiceServer = plugin((server) => {
         };
       }
 
-      await user.unblock(server.ext, logger);
+      await unblockUserInAccount(user, server.ext, logger);
 
       user.status = UserStatus.UNBLOCKED;
 
@@ -349,7 +350,7 @@ export const userServiceServer = plugin((server) => {
           }
         });
 
-      return [{ 
+      return [{
         createdInAuth: createdInAuth,
         id: user.id,
       }];
