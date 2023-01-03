@@ -40,7 +40,7 @@
     "@scow/lib-web": "workspace:*",
     "@sinclair/typebox": "0.25.16",
     "@scow/protos": "workspace:*",
-    "antd": "5.1.1",
+    "antd": "5.1.2",
     "busboy": "1.6.0",
     "codemirror": "6.0.1",
     "google-protobuf": "3.21.2",
