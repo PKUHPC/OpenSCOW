@@ -13,7 +13,7 @@
 import {
   AccountBookOutlined, BookOutlined, ClockCircleOutlined, CloudServerOutlined,
   DashboardOutlined,
-  InfoOutlined, MoneyCollectOutlined, PartitionOutlined,
+  InfoOutlined, LockOutlined, MoneyCollectOutlined, PartitionOutlined,
   PlusOutlined, PlusSquareOutlined, UserAddOutlined,
   UserOutlined } from "@ant-design/icons";
 import { NavItemProps } from "@scow/lib-web/build/layouts/base/types";
@@ -61,6 +61,11 @@ export const platformAdminRoutes: (platformRoles: PlatformRole[]) => NavItemProp
           Icon: MoneyCollectOutlined,
           text: "管理作业价格表",
           path: "/admin/jobBillingTable",
+        },
+        {
+          Icon: LockOutlined,
+          text: "刷新slurm封锁状态",
+          path: "/admin/slurmBlockStatus",
         },
       ] : []),
       ...(platformRoles.includes(PlatformRole.PLATFORM_FINANCE) ? [
