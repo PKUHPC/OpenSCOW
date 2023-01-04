@@ -3,7 +3,7 @@ name: Deploy Docs Preview to GitHub Pages
 on:
   pull_request:
     branches: [master]
-    types: ["opened", "reopened", "synchronize"]
+    types: ["opened", "reopened", "synchronize", "closed"]
     paths:
       - docs/**
 
@@ -37,4 +37,3 @@ jobs:
         uses: rossjrw/pr-preview-action@v1
         with:
           source-dir: ./docs/build/
-          action: deploy

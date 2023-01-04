@@ -28,13 +28,3 @@ jobs:
           owner: PKUHPC
           repository: scow-vagrant
           branches: ${{ github.event.number }}/merge
-
-  delete-docs-preview:
-    name: Delete Docs Preview
-    runs-on: ubuntu-latest
-    steps:
-      - name: Delete Deploy preview
-        uses: rossjrw/pr-preview-action@v1
-        with:
-          source-dir: ./docs/build/
-          action: remove
