@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/devcontainers/javascript-node:0-18
+FROM mcr.microsoft.com/devcontainers/typescript-node:0-18
 
 # Install Buf command line tools
 ARG BUF_VERSION="1.11.0"
@@ -10,6 +10,7 @@ RUN BIN="/usr/local/bin" && \
   -o "${BIN}/buf" && \
   chmod +x "${BIN}/buf"
 
+# Enable corepack for pnpm
 RUN corepack enable
 
 # [Optional] Uncomment this section to install additional OS packages.
