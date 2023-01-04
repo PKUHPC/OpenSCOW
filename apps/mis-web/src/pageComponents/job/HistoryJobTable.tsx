@@ -15,7 +15,7 @@ import { defaultPresets, formatDateTime } from "@scow/lib-web/build/utils/dateti
 import { useDidUpdateEffect } from "@scow/lib-web/build/utils/hooks";
 import { Money } from "@scow/protos/build/common/money";
 import { JobInfo } from "@scow/protos/build/server/job";
-import { App, Button, DatePicker, Divider, Form, Input, InputNumber, Select, Table } from "antd";
+import { App, Button, DatePicker, Divider, Form, Input, InputNumber, Select, Space, Table } from "antd";
 import dayjs from "dayjs";
 import React, { useCallback, useRef, useState } from "react";
 import { useAsync } from "react-async";
@@ -60,7 +60,7 @@ export const JobTable: React.FC<Props> = ({
   const [query, setQuery] = useState<FilterForm>(() => {
     const now = dayjs();
     return {
-      jobEndTime: [now.subtract(1, "week"), now],
+      jobEndTime: [now.subtract(1, "week").startOf("day"), now.endOf("day")],
       jobId: undefined,
       clusters: Object.values(publicConfig.CLUSTERS),
       accountName: typeof accountNames === "string" ? accountNames : undefined,
@@ -95,7 +95,7 @@ export const JobTable: React.FC<Props> = ({
     });
   }, [pageInfo, query]);
 
-  const { data, isLoading } = useAsync({ promiseFn });
+  const { data, isLoading, reload } = useAsync({ promiseFn });
 
   return (
     <div>
@@ -112,9 +112,10 @@ export const JobTable: React.FC<Props> = ({
         >
           <FilterFormTabs
             button={(
-              <Form.Item>
+              <Space>
                 <Button type="primary" htmlType="submit">搜索</Button>
-              </Form.Item>
+                <Button onClick={reload} loading={isLoading}>刷新</Button>
+              </Space>
             )}
             onChange={(a) => rangeSearch.current = a === "range"}
             tabs={[
