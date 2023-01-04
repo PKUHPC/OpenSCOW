@@ -5,6 +5,7 @@
   "build": {
     "dockerfile": "./Dockerfile"
   },
+  "containerUser": "codespace",
   "customizations": {
     // Configure properties specific to VS Code.
     "vscode": {

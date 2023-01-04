@@ -1,5 +1,7 @@
 FROM mcr.microsoft.com/devcontainers/universal:2-linux
 
+USER codespace
+
 # Install volta
 RUN curl https://get.volta.sh | bash
 
