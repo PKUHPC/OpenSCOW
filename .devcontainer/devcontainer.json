@@ -2,12 +2,9 @@
 // README at: https://github.com/devcontainers/templates/tree/main/src/docker-existing-dockerfile
 {
   "name": "SCOW Development Env",
-  "dockerComposeFile": [
-    "docker-compose.yml",
-    "../dev/docker-compose.dev.yml"
-  ],
-  "service": "app",
-  "workspaceFolder": "/workspace",
+  "build": {
+    "dockerfile": "./Dockerfile"
+  },
   "customizations": {
     // Configure properties specific to VS Code.
     "vscode": {
