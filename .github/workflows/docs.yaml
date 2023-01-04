@@ -14,9 +14,7 @@ concurrency:
 jobs:
   deploy-docs:
     name: Deploy to GitHub Pages
-    concurrency: ci-${{ github.ref }}
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master'
     steps:
       - uses: actions/checkout@v3
       - uses: pnpm/action-setup@v2.2.4
