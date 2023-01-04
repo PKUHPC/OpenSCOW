@@ -4,5 +4,20 @@
   "name": "SCOW Development Env",
   "build": {
     "dockerfile": "./Dockerfile"
+  },
+  "customizations": {
+    // Configure properties specific to VS Code.
+    "vscode": {
+      // Add the IDs of extensions you want installed when the container is created.
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "VisualStudioExptTeam.intellicode-api-usage-examples",
+        "VisualStudioExptTeam.vscodeintellicode",
+        "GitHub.copilot",
+        "bufbuild.vscode-buf",
+        "EditorConfig.EditorConfig",
+        "zxh404.vscode-proto3"
+      ]
+    }
   }
 }
