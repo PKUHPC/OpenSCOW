@@ -23,7 +23,7 @@ title: 相对路径
 docker compose --env-file dev/.env.build -f dev/docker-compose.build.yml build 
 ```
 
-构建完成后，将会生成以下四个镜像：
+构建完成后，将会生成以下四个web相关的镜像：
 
 | 系统 | 镜像（不包括IMAGE_BASE部分） | 相对路径  |
 | ---- | ---------------------------- | --------- |
@@ -32,29 +32,49 @@ docker compose --env-file dev/.env.build -f dev/docker-compose.build.yml build
 | 管理 | `mis-web-root`               | `/`       |
 | 管理 | `mis-web-mis`                | `/mis`    |
 
-如果您选择此方法从源码构建所有镜像，并且您只需要在已经提供的相对路径（`/`、`/portal`和`/mis`）前面加上一段路径，您可以
+如果您只需要在已经提供的相对路径（`/`、`/portal`和`/mis`）前面加上一段路径，您可以在运行此`docker compose build`命令时通过Shell传入`BASE_PATH`环境变量。
 
-- 在运行此`docker compose build`命令时通过Shell传入`BASE_PATH`环境变量
-- 在构建前修改`dev/.env.build`中的`BASE_PATH`变量
+例如，如果修改的或者传入的`BASE_PATH`为`/demo`，那么运行上述命令后镜像生成以下4个web相关的镜像
 
-假设整个系统在`/demo`下，门户系统运行在`/demo`下，管理系统在`/demo/mis`下。
- 
-将`dev/.env.build`中的`BASE_PATH`修改为`/demo`，或者运行
-
-```sh
-BASE_PATH=/demo docker compose --env-file dev/.env.build -f dev/docker-compose.build.yml build 
-```
-
-系统构建的web镜像为以下四个：
+构建完成后，将会生成以下四个web相关的镜像：
 
 | 系统 | 镜像（不包括IMAGE_BASE部分） | 相对路径       |
 | ---- | ---------------------------- | -------------- |
-| 门户 | `portal-web-root`            | `/demo`        |
+| 门户 | `portal-web-root`            | `/demo/`       |
 | 门户 | `portal-web-portal`          | `/demo/portal` |
-| 管理 | `mis-web-root`               | `/demo`        |
+| 管理 | `mis-web-root`               | `/demo/`       |
 | 管理 | `mis-web-mis`                | `/demo/mis`    |
 
-如果使用这种方法，构建好镜像后，`config.py`中的修改如下。
+您也可以选择性地构建您需要的镜像，而不是以上的所有镜像。例如，以下命令只会构建`portal-web-root`一个镜像
+
+```bash
+docker compose --env-file dev/.env.build -f dev/docker-compose.build.yml build portal-web-root
+```
+
+假设整个系统在`/demo`下，门户系统运行在`/demo`下，管理系统在`/demo/mis`下。
+
+您可以直接运行以下命令构建所有镜像：
+
+```bash
+BASE_PATH=/demo docker compose --env-file dev/.env.build -f dev/docker-compose.build.yml build
+```
+
+也可以选择性地只构建部分镜像：
+
+因为`/demo`相对于`/demo`为`/`，`/demo/mis`相对于`/demo`为`/mis`，所以我们只需要重新构建`portal-web-root`和`mis-web-mis`两个镜像。所以运行
+
+```bash
+BASE_PATH=/demo docker compose --env-file dev/.env.build -f dev/docker-compose.build.yml build portal-web-root mis-web-mis
+```
+
+将会构建出两个镜像：
+
+| 系统 | 镜像（不包括IMAGE_BASE部分） | 相对路径    |
+| ---- | ---------------------------- | ----------- |
+| 门户 | `portal-web-root`            | `/demo`     |
+| 管理 | `mis-web-mis`                | `/demo/mis` |
+
+构建好镜像后，`config.py`中的修改如下。
 
 ```python
 # 整个系统的根路径
