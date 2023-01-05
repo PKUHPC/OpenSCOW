@@ -73,6 +73,11 @@ export const LaunchAppForm: React.FC<Props> = ({ appId }) => {
       });
     }
 
+    const userSbatchOptions = sbatchOptions ? sbatchOptions.trim().split(" -").map(function(x, index) {
+      x = x.trim();
+      return index === 0 ? x : "-" + x;
+    }) : [];
+
     setLoading(true);
     await api.createAppSession({ body: {
       cluster: cluster.id,
@@ -83,7 +88,7 @@ export const LaunchAppForm: React.FC<Props> = ({ appId }) => {
       account,
       maxTime,
       customAttributes: customFormKeyValue,
-      userSbatchOptions: sbatchOptions,
+      userSbatchOptions,
     } })
       .then(() => {
         message.success("创建成功！");

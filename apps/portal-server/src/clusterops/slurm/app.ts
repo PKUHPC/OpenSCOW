@@ -136,12 +136,7 @@ export const slurmAppOps = (cluster: string): AppOps => {
           await sftpWriteFile(sftp)(join(workingDirectory, "script.sh"), appConfig.web!.script);
 
           let otherOptions: string[] = appConfig.slurm?.options ?? [];
-          if (userSbatchOptions) {
-            const userOptions = userSbatchOptions.split(" -").map(function(x) {
-              return x.trim();
-            });
-            otherOptions = otherOptions.concat(userOptions);
-          }
+          otherOptions = otherOptions.concat(userSbatchOptions);
 
           const script = generateJobScript({
             jobName,
