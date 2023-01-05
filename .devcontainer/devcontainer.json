@@ -6,8 +6,6 @@
     "dockerfile": "./Dockerfile"
   },
   "features": {
-    "ghcr.io/enricosecondulfo/devcontainer-features/volta:1": {},
-    "ghcr.io/NicoVIII/devcontainer-features/pnpm:2": {},
     "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {}
   },
   "customizations": {

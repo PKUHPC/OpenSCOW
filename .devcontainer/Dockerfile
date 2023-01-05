@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/devcontainers/base:ubuntu
+FROM mcr.microsoft.com/devcontainers/typescript-node:18
 
 # Install Buf command line tools
 ARG BUF_VERSION="1.11.0"
@@ -10,3 +10,4 @@ RUN BIN="/usr/local/bin" && \
   -o "${BIN}/buf" && \
   chmod +x "${BIN}/buf"
 
+RUN corepack enable
