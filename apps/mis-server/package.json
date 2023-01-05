@@ -30,6 +30,7 @@
     "@mikro-orm/seeder": "5.6.3",
     "@scow/config": "workspace:*",
     "@scow/lib-decimal": "workspace:*",
+    "@scow/lib-slurm": "workspace:*",
     "@scow/lib-ssh": "workspace:*",
     "@scow/lib-config": "workspace:*",
     "@sinclair/typebox": "0.25.16",

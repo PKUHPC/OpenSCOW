@@ -23,6 +23,7 @@
     "@grpc/grpc-js": "1.8.0",
     "@scow/config": "workspace:*",
     "@scow/lib-config": "workspace:*",
+    "@scow/lib-slurm": "workspace:*",
     "@scow/lib-ssh": "workspace:*",
     "@scow/protos": "workspace:*",
     "@sinclair/typebox": "0.25.16",

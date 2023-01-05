@@ -124,6 +124,7 @@ importers:
       '@scow/lib-auth': workspace:*
       '@scow/lib-config': workspace:*
       '@scow/lib-decimal': workspace:*
+      '@scow/lib-slurm': workspace:*
       '@scow/lib-ssh': workspace:*
       '@scow/protos': workspace:*
       '@sinclair/typebox': 0.25.16
@@ -148,6 +149,7 @@ importers:
       '@scow/lib-auth': link:../../libs/auth
       '@scow/lib-config': link:../../libs/libconfig
       '@scow/lib-decimal': link:../../libs/decimal
+      '@scow/lib-slurm': link:../../libs/slurm
       '@scow/lib-ssh': link:../../libs/ssh
       '@scow/protos': link:../../libs/protos
       '@sinclair/typebox': 0.25.16
@@ -275,6 +277,7 @@ importers:
       '@grpc/grpc-js': 1.8.0
       '@scow/config': workspace:*
       '@scow/lib-config': workspace:*
+      '@scow/lib-slurm': workspace:*
       '@scow/lib-ssh': workspace:*
       '@scow/protos': workspace:*
       '@sinclair/typebox': 0.25.16
@@ -294,6 +297,7 @@ importers:
       '@grpc/grpc-js': 1.8.0
       '@scow/config': link:../../libs/config
       '@scow/lib-config': link:../../libs/libconfig
+      '@scow/lib-slurm': link:../../libs/slurm
       '@scow/lib-ssh': link:../../libs/ssh
       '@scow/protos': link:../../libs/protos
       '@sinclair/typebox': 0.25.16
@@ -524,6 +528,18 @@ importers:
     dependencies:
       long: 5.2.1
       protobufjs: 7.1.2
+
+  libs/slurm:
+    specifiers:
+      '@scow/lib-ssh': workspace:*
+      '@scow/protos': workspace:*
+      node-ssh: 13.0.0
+      ts-log: 2.2.5
+    dependencies:
+      '@scow/lib-ssh': link:../ssh
+      '@scow/protos': link:../protos
+      node-ssh: 13.0.0
+      ts-log: 2.2.5
 
   libs/ssh:
     specifiers:
