@@ -137,7 +137,7 @@ export const slurmAppOps = (cluster: string): AppOps => {
 
           let otherOptions: string[] = appConfig.slurm?.options ?? [];
           if (userSbatchOptions) {
-            const userOptions = userSbatchOptions.split("\n").map(function(x) {
+            const userOptions = userSbatchOptions.split(" -").map(function(x) {
               return x.trim();
             });
             otherOptions = otherOptions.concat(userOptions);

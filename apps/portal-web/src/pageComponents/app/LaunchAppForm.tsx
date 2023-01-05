@@ -217,7 +217,7 @@ export const LaunchAppForm: React.FC<Props> = ({ appId }) => {
       {customFormItems}
 
       <Form.Item label="其他sbatch参数" name="sbatchOptions">
-        <Input.TextArea placeholder="比如：--gpus gres:2 如果使用多个参数需要换行" />
+        <Input placeholder="比如：--gpus gres:2 --time 10" />
       </Form.Item>
 
       <Form.Item>
