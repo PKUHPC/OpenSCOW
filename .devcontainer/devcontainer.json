@@ -1,11 +1,15 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
 // README at: https://github.com/devcontainers/templates/tree/main/src/docker-existing-dockerfile
 {
-  "name": "SCOW Development Env",
+  "name": "SCOW Dev Env",
   "build": {
     "dockerfile": "./Dockerfile"
   },
-  "containerUser": "codespace",
+  "features": {
+    "ghcr.io/enricosecondulfo/devcontainer-features/volta:1": {},
+    "ghcr.io/NicoVIII/devcontainer-features/pnpm:2": {},
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {}
+  },
   "customizations": {
     // Configure properties specific to VS Code.
     "vscode": {
