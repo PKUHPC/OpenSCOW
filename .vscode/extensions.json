@@ -1,5 +1,8 @@
 {
   "recommendations": [
-    "bufbuild.vscode-buf"
+    "bufbuild.vscode-buf",
+    "dbaeumer.vscode-eslint",
+    "EditorConfig.EditorConfig",
+    "zxh404.vscode-proto3"
   ]
 }

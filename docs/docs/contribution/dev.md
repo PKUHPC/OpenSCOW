@@ -22,7 +22,9 @@ title: 开发
 
 ## 开始开发
 
-要开始开发，请确保安装了以下依赖：
+本项目配置了[VSCode Dev Container](https://code.visualstudio.com/docs/devcontainers/containers)功能，您可以使用`.devcontainer`下的配置自动从GitHub打开一个Codespace或者使用VSCode生成一个开发用的容器。具体如何使用，请参考Dev Container的文档。
+
+下面介绍本地开发。要在本地开发，请确保安装了以下依赖：
 
 - [docker](https://docs.docker.com/engine/install/)
 - [docker compose](https://docs.docker.com/compose/install/)
