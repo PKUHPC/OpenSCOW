@@ -17,13 +17,44 @@ import { Logger } from "ts-log";
 
 const SEPARATOR = "__x__x__";
 
-export interface runningJobFilter {
+export interface RunningJobFilter {
   userId?: string;
   accountNames?: string[];
   jobIdList?: string[];
 }
 
-export async function getRunningJobs(ssh: NodeSSH, username: string, filterOptions: runningJobFilter, logger: Logger) {
+export async function querySqueue(ssh: NodeSSH, userId: string, logger: Logger, params: string[]) {
+  const result = await executeAsUser(ssh, userId, logger, true,
+    "squeue",
+    [
+      "-o",
+      ["%A", "%P", "%j", "%u", "%T", "%M", "%D", "%R", "%a", "%C", "%q", "%V", "%Y", "%l", "%Z"].join(SEPARATOR),
+      "--noheader",
+      ...params,
+    ],
+  );
+
+  const jobs = result.stdout.split("\n").filter((x) => x).map((x) => {
+    const [
+      jobId,
+      partition, name, user, state, runningTime,
+      nodes, nodesOrReason, account, cores,
+      qos, submissionTime, nodesToBeUsed, timeLimit, workingDir,
+    ] = x.split(SEPARATOR);
+
+    return {
+      jobId,
+      partition, name, user, state, runningTime,
+      nodes, nodesOrReason, account, cores,
+      qos, submissionTime, nodesToBeUsed, timeLimit,
+      workingDir,
+    } as RunningJob;
+  });
+
+  return jobs;
+}
+
+export async function getRunningJobs(ssh: NodeSSH, username: string, filterOptions: RunningJobFilter, logger: Logger) {
   const { userId, accountNames, jobIdList } = filterOptions;
   const result = await executeAsUser(ssh, username, logger, true,
     "sacct",
