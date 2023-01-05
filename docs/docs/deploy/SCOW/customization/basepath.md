@@ -32,11 +32,15 @@ docker compose --env-file dev/.env.build -f dev/docker-compose.build.yml build
 | 管理 | `mis-web-root`               | `/`       |
 | 管理 | `mis-web-mis`                | `/mis`    |
 
+您也可以选择性地构建您需要的镜像，而不是以上的所有镜像。例如，以下命令只会构建`portal-web-root`一个镜像
+
+```bash
+docker compose --env-file dev/.env.build -f dev/docker-compose.build.yml build portal-web-root
+```
+
 如果您只需要在已经提供的相对路径（`/`、`/portal`和`/mis`）前面加上一段路径，您可以在运行此`docker compose build`命令时通过Shell传入`BASE_PATH`环境变量。
 
-例如，如果修改的或者传入的`BASE_PATH`为`/demo`，那么运行上述命令后镜像生成以下4个web相关的镜像
-
-构建完成后，将会生成以下四个web相关的镜像：
+例如，如果修改的或者传入的`BASE_PATH`为`/demo`，那么上述命令将会生成以下4个web相关的镜像
 
 | 系统 | 镜像（不包括IMAGE_BASE部分） | 相对路径       |
 | ---- | ---------------------------- | -------------- |
@@ -45,11 +49,6 @@ docker compose --env-file dev/.env.build -f dev/docker-compose.build.yml build
 | 管理 | `mis-web-root`               | `/demo/`       |
 | 管理 | `mis-web-mis`                | `/demo/mis`    |
 
-您也可以选择性地构建您需要的镜像，而不是以上的所有镜像。例如，以下命令只会构建`portal-web-root`一个镜像
-
-```bash
-docker compose --env-file dev/.env.build -f dev/docker-compose.build.yml build portal-web-root
-```
 
 假设整个系统在`/demo`下，门户系统运行在`/demo`下，管理系统在`/demo/mis`下。
 
@@ -59,9 +58,7 @@ docker compose --env-file dev/.env.build -f dev/docker-compose.build.yml build p
 BASE_PATH=/demo docker compose --env-file dev/.env.build -f dev/docker-compose.build.yml build
 ```
 
-也可以选择性地只构建部分镜像：
-
-因为`/demo`相对于`/demo`为`/`，`/demo/mis`相对于`/demo`为`/mis`，所以我们只需要重新构建`portal-web-root`和`mis-web-mis`两个镜像。所以运行
+也可以选择性地只构建部分镜像：因为`/demo`相对于`/demo`为`/`，`/demo/mis`相对于`/demo`为`/mis`，所以我们只需要重新构建`portal-web-root`和`mis-web-mis`两个镜像。所以运行
 
 ```bash
 BASE_PATH=/demo docker compose --env-file dev/.env.build -f dev/docker-compose.build.yml build portal-web-root mis-web-mis
