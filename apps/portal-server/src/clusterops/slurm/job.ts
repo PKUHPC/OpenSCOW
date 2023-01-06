@@ -11,7 +11,7 @@
  */
 
 import { getRunningJobs } from "@scow/lib-slurm";
-import { executeAsUser, sftpExists, sftpReaddir, sftpReadFile, sftpWriteFile } from "@scow/lib-ssh";
+import { executeAsUser, loggedExec, sftpExists, sftpReaddir, sftpReadFile, sftpWriteFile } from "@scow/lib-ssh";
 import { join } from "path";
 import { JobOps, JobTemplate } from "src/clusterops/api/job";
 import { querySacct } from "src/clusterops/slurm/bl/queryJobInfo";
@@ -57,7 +57,7 @@ export const slurmJobOps = (cluster: string): JobOps => {
     submitJob: async (request, logger) => {
       const { jobInfo, userId, saveAsTemplate } = request;
 
-      return await sshConnect(host, "root", logger, async (ssh) => {
+      return await sshConnect(host, userId, logger, async (ssh) => {
 
         const dir = jobInfo.workingDirectory;
 
@@ -69,7 +69,7 @@ export const slurmJobOps = (cluster: string): JobOps => {
         await ssh.mkdir(dir, undefined, sftp);
 
         // use sbatch to allocate the script. pass the script into sbatch in stdin
-        const { code, stderr, stdout } = await executeAsUser(ssh, userId, logger, false,
+        const { code, stderr, stdout } = await loggedExec(ssh, logger, false,
           "sbatch", [],
           { stdin: script },
         );

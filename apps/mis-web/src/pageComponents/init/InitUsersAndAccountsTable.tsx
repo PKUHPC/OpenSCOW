@@ -13,143 +13,20 @@
 import { FormLayout } from "@scow/lib-web/build/layouts/FormLayout";
 import { Account } from "@scow/protos/build/server/account";
 import { AccountAffiliation, User } from "@scow/protos/build/server/user";
-import { App, message, Select, Table, Tabs, Typography } from "antd";
-import { useEffect, useState } from "react";
+import { Table, Tabs, Typography } from "antd";
+import { useEffect } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { Centered } from "src/components/layouts";
-import { PlatformRole, PlatformRoleTexts, TenantRole, TenantRoleTexts, UserRole, UserRoleTexts } from "src/models/User";
+import { PlatformRoleSelector } from "src/components/PlatformRoleSelector";
+import { TenantRoleSelector } from "src/components/TenantRoleSelector";
+import { UserRole, UserRoleTexts } from "src/models/User";
 
 interface DataTableProps<T> {
   data: T[] | undefined;
   loading: boolean;
   reload: () => void;
 }
-
-interface PlatformRoleSelectorProps {
-  role: PlatformRole[];
-  userId: string;
-  reload: () => void;
-}
-
-const PlatformRoleSelector: React.FC<PlatformRoleSelectorProps> = ({ role, userId, reload }) => {
-  const { message } = App.useApp();
-
-  const [loading, setLoading] = useState(false);
-
-  return (
-    <Select
-      disabled={loading}
-      value={role.map((x) => ({ label: PlatformRoleTexts[x], value: x }))}
-      style={{ width: "100%" }}
-      onSelect={
-        async ({ value }) => {
-          setLoading(true);
-          await api.setPlatformRole({ body:{
-            userId: userId,
-            roleType: value,
-          } })
-            .httpError(200, () => { message.error("用户已经是该角色"); })
-            .httpError(404, () => { message.error("用户不存在"); })
-            .httpError(403, () => { message.error("用户没有权限"); })
-            .then(() => {
-              message.success("设置成功");
-              setLoading(false);
-              reload();
-            });
-        }
-      }
-      onDeselect={
-        async (value) => {
-          setLoading(true);
-          await api.unsetPlatformRole({ body:{
-            userId: userId,
-            roleType: +value,
-          } })
-            .httpError(200, () => { message.error("用户已经不是该角色"); })
-            .httpError(404, () => { message.error("用户不存在"); })
-            .httpError(403, () => { message.error("用户没有权限"); })
-            .then(() => {
-              message.success("设置成功");
-              setLoading(false);
-              reload();
-            });
-        }
-      }
-      mode="multiple"
-      placeholder="Please select"
-    >
-      {
-        Object.entries(PlatformRoleTexts).map(([key, value]) => {
-          return <Select.Option key={key} value={key}>{value}</Select.Option>;
-        })
-      }
-    </Select>
-  );
-};
-
-
-interface TenantRoleSelectorProps {
-  role: TenantRole[];
-  userId: string;
-  reload: () => void;
-}
-
-const TenantRoleSelector: React.FC<TenantRoleSelectorProps> = ({ role, userId, reload }) => {
-
-  const [loading, setLoading] = useState(false);
-
-  return (
-    <Select
-      disabled={loading}
-      value={role.map((r) => ({ label: TenantRoleTexts[r], value: r }))}
-      style={{ width: "100%" }}
-      onSelect={
-        async (value) => {
-          setLoading(true);
-          await api.setTenantRole({ body:{
-            userId: userId,
-            roleType: value.value,
-          } })
-            .httpError(200, () => { message.error("用户已经是该角色"); })
-            .httpError(404, () => { message.error("用户不存在"); })
-            .httpError(403, () => { message.error("用户没有权限"); })
-            .then(() => {
-              message.success("设置成功");
-              setLoading(false);
-              reload();
-            });
-        }
-      }
-      onDeselect={
-        async (value) => {
-          setLoading(true);
-          await api.unsetTenantRole({ body:{
-            userId: userId,
-            roleType: value.value,
-          } })
-            .httpError(200, () => { message.error("用户已经不是该角色"); })
-            .httpError(404, () => { message.error("用户不存在"); })
-            .httpError(403, () => { message.error("用户没有权限"); })
-            .then(() => {
-              message.success("设置成功");
-              setLoading(false);
-              reload();
-            });
-        }
-      }
-      mode="multiple"
-      placeholder="Please select"
-    >
-      {
-        Object.entries(TenantRoleTexts).map(([key, value]) => {
-          return <Select.Option key={key} value={key}>{value}</Select.Option>;
-        })
-      }
-    </Select>
-  );
-};
-
 
 const UserTable: React.FC<DataTableProps<User>> = ({ data, loading, reload }) => {
   return (
@@ -167,7 +44,7 @@ const UserTable: React.FC<DataTableProps<User>> = ({ data, loading, reload }) =>
         title="平台角色"
         width={200}
         render={(_, r) => (
-          <PlatformRoleSelector role={r.platformRoles} userId={r.userId} reload={reload} />
+          <PlatformRoleSelector roles={r.platformRoles} userId={r.userId} reload={reload} />
         )}
       />
       <Table.Column<User>
@@ -175,7 +52,7 @@ const UserTable: React.FC<DataTableProps<User>> = ({ data, loading, reload }) =>
         title="租户角色"
         width={200}
         render={(_, r) => (
-          <TenantRoleSelector role={r.tenantRoles} userId={r.userId} reload={reload} />
+          <TenantRoleSelector roles={r.tenantRoles} userId={r.userId} reload={reload} />
         )}
       />
       <Table.Column

@@ -14,6 +14,7 @@ import { getRunningJobs } from "@scow/lib-slurm";
 import { sshConnect } from "@scow/lib-ssh";
 import { JobOps } from "src/clusterops/api/job";
 import { SlurmClusterInfo } from "src/clusterops/slurm";
+import { handleSimpleResponse, throwIfNotReturn0 } from "src/clusterops/slurm/utils/slurm";
 import { rootKeyPair } from "src/config/env";
 
 export const slurmJobOps = ({ slurmConfig, executeSlurmScript }: SlurmClusterInfo): JobOps => {
@@ -37,6 +38,8 @@ export const slurmJobOps = ({ slurmConfig, executeSlurmScript }: SlurmClusterInf
         return { code: "NOT_FOUND" };
       }
 
+      throwIfNotReturn0(result);
+
       // format is [d-]hh:mm:ss, 5-00:00:00 or 00:03:00
       // convert to second
 
@@ -54,11 +57,7 @@ export const slurmJobOps = ({ slurmConfig, executeSlurmScript }: SlurmClusterInf
 
       const result = await executeSlurmScript(["-n", jobId, delta + ""], logger);
 
-      if (result.code === 7) {
-        return { code: "NOT_FOUND" };
-      }
-
-      return { code: "OK" };
+      return handleSimpleResponse(result, { 7: "NOT_FOUND" });
     },
   };
 };

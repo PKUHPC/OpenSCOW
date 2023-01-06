@@ -1,0 +1,41 @@
+name: Update side projects
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+
+jobs:
+  scow-deployment:
+    name: Update scow-deployment
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Pushes to scow-deployment repo
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          token: ${{ secrets.SCOW_DEPLOYMENT_PAT }}
+          folder: ./deploy/local
+          repository-name: PKUHPC/scow-deployment
+          branch: ${{ github.ref_name }}
+
+  scow-vagrant:
+    name: Update scow-vagrant
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Pushes to scow-vagrant repo
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          token: ${{ secrets.SCOW_DEPLOYMENT_PAT }}
+          folder: ./deploy/vagrant
+          repository-name: PKUHPC/scow-vagrant
+          branch: ${{ github.ref_name }}

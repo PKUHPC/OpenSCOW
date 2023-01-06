@@ -12,6 +12,7 @@
 
 import { ChangeStorageQuotaMode, StorageOps } from "src/clusterops/api/storage";
 import { SlurmClusterInfo } from "src/clusterops/slurm";
+import { throwIfNotReturn0 } from "src/clusterops/slurm/utils/slurm";
 
 export const slurmStorageOps = ({ executeSlurmScript }: SlurmClusterInfo): StorageOps => {
   return {
@@ -22,6 +23,8 @@ export const slurmStorageOps = ({ executeSlurmScript }: SlurmClusterInfo): Stora
       if (result.code === 2) {
         return { code: "NOT_FOUND" };
       }
+
+      throwIfNotReturn0(result);
 
       /**
        * format is
@@ -84,6 +87,8 @@ export const slurmStorageOps = ({ executeSlurmScript }: SlurmClusterInfo): Stora
       if (result.code === 4) {
         return { code: "NOT_FOUND" };
       }
+
+      throwIfNotReturn0(result);
 
       // TODO handle output format
       return { code: "OK", currentQuota: 10 };

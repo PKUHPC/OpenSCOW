@@ -1,19 +1,19 @@
-name: Deploy Docs to GitHub Pages
+name: Deploy Docs Preview to GitHub Pages
 
 on:
-  push:
+  pull_request:
+    branches: [master]
+    types: ["opened", "reopened", "synchronize", "closed"]
     paths:
       - docs/**
-    branches:
-      - master
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
 
 jobs:
-  deploy-docs:
-    name: Deploy to GitHub Pages
+  deploy-docs-preview:
+    name: Deploy Docs Preview
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -31,11 +31,9 @@ jobs:
         env:
           GIT_PLATFORM: github
           CR_URL: ghcr.io/pkuhpc/scow
-          BASE_PATH: ${{ github.project_name }}
+          BASE_PATH: /${{ github.event.repository.name }}/pr-preview/pr-${{ github.event.number }}/
 
-      - name: Deploy to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@v4
+      - name: Deploy preview
+        uses: rossjrw/pr-preview-action@v1
         with:
-          folder: ./docs/build
-          clean-exclude: pr-preview/
-          force: false
+          source-dir: ./docs/build/

@@ -115,7 +115,7 @@ export const clustersPlugin = plugin(async (f) => {
         }));
 
       // errors if any fails
-      const failed = results.filter((x) => x.success);
+      const failed = results.filter((x) => !x.success);
 
       if (failed.length > 0) {
         logger.error("Cluster ops fails at clusters %o", failed);

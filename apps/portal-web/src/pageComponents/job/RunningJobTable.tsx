@@ -93,6 +93,9 @@ export const RunningJobQueryTable: React.FC<Props> = ({
           <Form.Item>
             <Button type="primary" htmlType="submit">搜索</Button>
           </Form.Item>
+          <Form.Item>
+            <Button loading={isLoading} onClick={reload}>刷新</Button>
+          </Form.Item>
         </Form>
       </FilterFormContainer>
       <RunningJobInfoTable

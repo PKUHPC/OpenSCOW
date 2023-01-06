@@ -11,17 +11,22 @@
  */
 
 import { Static, Type } from "@sinclair/typebox";
+import { ValueOf } from "next/dist/shared/lib/constants";
 
 // Redefine to avoid importing non client packages
-export enum TenantRole {
-  TENANT_ADMIN = 0,
-  TENANT_FINANCE = 1,
-}
+export const TenantRole = {
+  TENANT_ADMIN: 0,
+  TENANT_FINANCE: 1,
+} as const;
 
-export enum PlatformRole {
-  PLATFORM_ADMIN = 0,
-  PLATFORM_FINANCE = 1,
-}
+export type TenantRole = ValueOf<typeof TenantRole>;
+
+export const PlatformRole = {
+  PLATFORM_ADMIN: 0,
+  PLATFORM_FINANCE: 1,
+} as const;
+
+export type PlatformRole = ValueOf<typeof PlatformRole>;
 
 export const PlatformRoleTexts = {
   [PlatformRole.PLATFORM_FINANCE]: "财务人员",
