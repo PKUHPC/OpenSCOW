@@ -26,6 +26,8 @@ export const config = envConfig({
   SSH_PRIVATE_KEY_PATH: str({ desc: "SSH私钥路径", default: join(homedir(), ".ssh", "id_rsa") }),
   SSH_PUBLIC_KEY_PATH: str({ desc: "SSH公钥路径", default: join(homedir(), ".ssh", "id_rsa.pub") }),
 
+  AUTH_URL: str({ desc: "认证系统地址。如果填写将会覆盖配置文件", default: undefined }),
+
   DB_NAME: str({ desc: "存放系统数据的数据库名，将会覆写配置文件。用于测试", default: undefined }),
   DB_PASSWORD: str({ desc: "管理系统数据库密码，将会覆写配置文件", default: undefined }),
 });

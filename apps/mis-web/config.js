@@ -37,6 +37,8 @@ const specs = {
   PORTAL_URL: str({ desc: "如果部署了门户系统，门户系统的URL。如果和本系统域名相同，可以只写完整路径。将会覆盖配置文件。空字符串等价于未部署门户系统", default: "" }),
 };
 
+const mockEnv = process.env.NEXT_PUBLIC_USE_MOCK === "1";
+
 const config = envConfig(specs, process.env);
 
 const buildRuntimeConfig = async (phase) => {
@@ -58,7 +60,7 @@ const buildRuntimeConfig = async (phase) => {
   // query auth capabilities to set optional auth features
   const capabilities = await queryCapabilities(config.AUTH_INTERNAL_URL, phase);
 
-  const configBasePath = production ? undefined : join(__dirname, "config");
+  const configBasePath = mockEnv ? join(__dirname, "config") : undefined;
 
   const clusters = getClusterConfigs(configBasePath);
   const clusterTexts = getClusterTextsConfig(configBasePath);

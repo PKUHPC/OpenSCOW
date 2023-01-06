@@ -51,6 +51,8 @@ const specs = {
   NOVNC_CLIENT_PATH: str({ desc: "novnc客户端的URL。如果和本系统域名相同，可以只写相对于本系统的基础路径", default: "/vnc" }),
 };
 
+const mockEnv = process.env.NEXT_PUBLIC_USE_MOCK === "1";
+
 // This config is used to provide env doc auto gen
 const config = { _specs: specs };
 
@@ -72,10 +74,7 @@ const buildRuntimeConfig = async (phase) => {
   // reload config after envs are applied
   const config = envConfig(specs, process.env);
 
-
-  // load clusters.json
-
-  const configPath = production ? undefined : join(__dirname, "config");
+  const configPath = mockEnv ? join(__dirname, "config") : undefined;
 
   const clusters = getClusterConfigs(configPath);
 

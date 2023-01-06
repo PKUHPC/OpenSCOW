@@ -13,12 +13,12 @@
 import { Logger } from "@ddadaal/tsgrpc-server";
 import { MySqlDriver, SqlEntityManager } from "@mikro-orm/mysql";
 import { getCapabilities, getUser } from "@scow/lib-auth";
-import { misConfig } from "src/config/mis";
+import { authUrl } from "src/config/auth";
 import { User } from "src/entities/User";
 import { DEFAULT_TENANT_NAME } from "src/utils/constants";
 
 export async function userExists(userId: string, logger: Logger, em: SqlEntityManager<MySqlDriver>) {
-  const capabilities = await getCapabilities(misConfig.authUrl);
+  const capabilities = await getCapabilities(authUrl);
   // Check whether the user already exists in scow
   const user = await em.findOne(User, { userId, tenant: { name: DEFAULT_TENANT_NAME } });
   if (!capabilities.getUser) {
@@ -28,7 +28,7 @@ export async function userExists(userId: string, logger: Logger, em: SqlEntityMa
       existsInAuth: undefined,
     };
   }
-  const userInfo = await getUser(misConfig.authUrl, { identityId: userId }, logger);
+  const userInfo = await getUser(authUrl, { identityId: userId }, logger);
   return {
     existsInScow: !!user,
     existsInAuth: !!userInfo,
