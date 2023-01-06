@@ -15,6 +15,8 @@ import { RunningJob } from "@scow/protos/build/common/job";
 import { NodeSSH } from "node-ssh";
 import { Logger } from "ts-log";
 
+export const getRunningJobs = querySqueue;
+
 const SEPARATOR = "__x__x__";
 
 export interface RunningJobFilter {
@@ -23,14 +25,17 @@ export interface RunningJobFilter {
   jobIdList?: string[];
 }
 
-export async function querySqueue(ssh: NodeSSH, userId: string, logger: Logger, params: string[]) {
-  const result = await executeAsUser(ssh, userId, logger, true,
+export async function querySqueue(ssh: NodeSSH, username: string, filterOptions: RunningJobFilter, logger: Logger) {
+  const { userId, accountNames, jobIdList } = filterOptions;
+  const result = await executeAsUser(ssh, username, logger, true,
     "squeue",
     [
       "-o",
       ["%A", "%P", "%j", "%u", "%T", "%M", "%D", "%R", "%a", "%C", "%q", "%V", "%Y", "%l", "%Z"].join(SEPARATOR),
       "--noheader",
-      ...params,
+      ...userId ? ["-u", userId] : [],
+      ...accountNames ? (accountNames.length > 0 ? ["-A", accountNames.join(",")] : []) : [],
+      ...jobIdList ? (jobIdList.length > 0 ? ["-j", jobIdList.join(",")] : []) : [],
     ],
   );
 
@@ -54,7 +59,7 @@ export async function querySqueue(ssh: NodeSSH, userId: string, logger: Logger, 
   return jobs;
 }
 
-export async function getRunningJobs(ssh: NodeSSH, username: string, filterOptions: RunningJobFilter, logger: Logger) {
+export async function querySacct(ssh: NodeSSH, username: string, filterOptions: RunningJobFilter, logger: Logger) {
   const { userId, accountNames, jobIdList } = filterOptions;
   const result = await executeAsUser(ssh, username, logger, true,
     "sacct",
