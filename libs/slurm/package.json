@@ -14,7 +14,9 @@
   "license": "ISC",
   "dependencies": {
     "@scow/lib-ssh": "workspace:*",
-    "@scow/protos": "workspace:*",
+    "@scow/protos": "workspace:*"
+  },
+  "devDependencies": {
     "node-ssh": "13.0.0",
     "ts-log": "2.2.5"
   },
