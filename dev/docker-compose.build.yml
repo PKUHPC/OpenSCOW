@@ -24,7 +24,7 @@ services:
       context: ..
       dockerfile: dockerfiles/Dockerfile.mis-web
       args:
-        - BASE_PATH=/mis
+        - BASE_PATH=$BASE_PATH/mis
 
   mis-web-root:
     image: $IMAGE_BASE/mis-web-root:$TAG
@@ -32,7 +32,7 @@ services:
       context: ..
       dockerfile: dockerfiles/Dockerfile.mis-web
       args:
-        - BASE_PATH=
+        - BASE_PATH=$BASE_PATH
 
   portal-web-portal:
     image: $IMAGE_BASE/portal-web-portal:$TAG
@@ -40,7 +40,7 @@ services:
       context: ..
       dockerfile: dockerfiles/Dockerfile.portal-web
       args:
-        - BASE_PATH=/portal
+        - BASE_PATH=$BASE_PATH/portal
 
   portal-web-root:
     image: $IMAGE_BASE/portal-web-root:$TAG
@@ -48,7 +48,7 @@ services:
       context: ..
       dockerfile: dockerfiles/Dockerfile.portal-web
       args:
-        - BASE_PATH=
+        - BASE_PATH=$BASE_PATH
 
   mis-server:
     image: $IMAGE_BASE/mis-server:$TAG

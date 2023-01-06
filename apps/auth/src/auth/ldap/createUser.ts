@@ -12,7 +12,7 @@
 
 import { parsePlaceholder } from "@scow/lib-config";
 import { FastifyRequest } from "fastify";
-import ldapjs from "ldapjs";
+import ldapjs, { EntryAlreadyExistsError } from "ldapjs";
 import { CreateUserInfo, CreateUserResult } from "src/auth/AuthProvider";
 import { searchOne, useLdap } from "src/auth/ldap/helpers";
 import { modifyPassword } from "src/auth/ldap/password";
@@ -44,7 +44,7 @@ export async function createUser(
 
   const id = info.id + ldap.addUser.uidStart;
 
-  await useLdap(req.log, ldap)(async (client) => {
+  return await useLdap(req.log, ldap)(async (client) => {
     const userDn =
           `${ldap.addUser.userIdDnKey ?? ldap.attrs.uid}=${info.identityId},` +
           `${ldap.addUser.userBase}`;
@@ -94,11 +94,17 @@ export async function createUser(
       }
 
       req.log.info("Adding group %s with entry info %o", groupDn, groupEntry);
-      await add(groupDn, groupEntry);
+      try {
+        await add(groupDn, groupEntry);
+      } catch (e) {
+        if (e instanceof EntryAlreadyExistsError) {
+          return "AlreadyExists";
+        } else {
+          throw e;
+        }
+      }
 
-    }
-
-    if (ldap.addUser.groupStrategy === NewUserGroupStrategy.oneGroupForAllUsers) {
+    } else if (ldap.addUser.groupStrategy === NewUserGroupStrategy.oneGroupForAllUsers) {
       const config = ldap.addUser.oneGroupForAllUsers!;
 
       req.log.info("ldap.addUser.groupStrategy is one-group-for-all-users.");
@@ -108,7 +114,15 @@ export async function createUser(
     }
 
     req.log.info("Adding people %s with entry info %o", userDn, userEntry);
-    await add(userDn, userEntry);
+    try {
+      await add(userDn, userEntry);
+    } catch (e) {
+      if (e instanceof EntryAlreadyExistsError) {
+        return "AlreadyExists";
+      } else {
+        throw e;
+      }
+    }
 
     // set password as admin user
     await modifyPassword(userDn, undefined, info.password, client);
@@ -146,9 +160,8 @@ export async function createUser(
       }));
     }
 
-
+    return "OK";
   });
 
-  return "OK";
 
 }

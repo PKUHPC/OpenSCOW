@@ -45,7 +45,7 @@ export const AllJobQueryTable: React.FC<Props> = ({
   const [query, setQuery] = useState<FilterForm>(() => {
     const now = dayjs();
     return {
-      time: [now.subtract(1, "week"), now],
+      time: [now.subtract(1, "week").startOf("day"), now.endOf("day")],
       jobId: undefined,
       cluster: defaultClusterStore.cluster,
     };
@@ -102,6 +102,9 @@ export const AllJobQueryTable: React.FC<Props> = ({
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit">搜索</Button>
+          </Form.Item>
+          <Form.Item>
+            <Button loading={isLoading} onClick={reload}>刷新</Button>
           </Form.Item>
         </Form>
       </FilterFormContainer>

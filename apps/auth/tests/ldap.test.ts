@@ -141,6 +141,19 @@ it("creates only user if groupStrategy is oneGroupForAllUsers", async () => {
 
 });
 
+it("returns correct error if user already exists", async () => {
+  await createUser();
+
+  const resp = await server.inject({
+    method: "POST",
+    url: "/user",
+    payload: user,
+  });
+
+  expect(resp.statusCode).toBe(409);
+
+});
+
 it("should login with correct username and password", async () => {
 
   await createUser();
