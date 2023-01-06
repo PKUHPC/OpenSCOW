@@ -65,7 +65,8 @@ export async function getRunningJobs(ssh: NodeSSH, username: string, filterOptio
       `--delimiter=${SEPARATOR}`,
       "-o",
       "JobID,Partition,JobName,User,State,Elapsed,AllocNodes,NodeList,"
-      + "Account,AllocCPUs,QOS,Submit,...,Timelimit,WorkDir",
+      + "Account,AllocCPUs,QOS,Submit,NodeList,Timelimit,WorkDir",
+      // replace %Y with NodeList temporarily
       ...userId ? ["-u", userId] : [],
       ...accountNames ? (accountNames.length > 0 ? ["-A", accountNames.join(",")] : []) : [],
       ...jobIdList ? (jobIdList.length > 0 ? ["-j", jobIdList.join(",")] : []) : [],
