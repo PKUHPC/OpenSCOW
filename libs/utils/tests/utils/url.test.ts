@@ -29,6 +29,7 @@ it.each([
   ["/test//test", "/test/test"],
   ["/test//test/", "/test/test/"],
   ["/test//test?test=ok", "/test/test?test=ok"],
+  ["/test//test?test=ok/test//a", "/test/test?test=ok/test//a"],
 ])("should normalize %o to %o", (pathname, expected) => {
   expect(normalizePathnameWithQuery(pathname)).toBe(expected);
 });
