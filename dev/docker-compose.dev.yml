@@ -25,6 +25,7 @@ services:
     ports:
       - 6379:6379
 
+
   jobTableDb:
     image: mariadb:5.5
     environment:
@@ -56,6 +57,14 @@ services:
       nofile:
         soft: 10240
         hard: 10240
+
+  ldapadmin:
+    image: osixia/phpldapadmin
+    ports:
+      - 3890:80
+    environment:
+      PHPLDAPADMIN_LDAP_HOSTS: ldap
+      PHPLDAPADMIN_HTTPS: false
 
 networks:
   default:
