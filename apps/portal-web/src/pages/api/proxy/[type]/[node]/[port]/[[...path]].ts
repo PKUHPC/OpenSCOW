@@ -10,27 +10,13 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { normalizePathnameWithQuery } from "@scow/utils";
 import http from "http";
 import httpProxy from "http-proxy";
 import { NextApiRequest } from "next";
-import { normalize } from "path";
 import { checkCookie } from "src/auth/server";
 import { AugmentedNextApiResponse } from "src/types/next";
 
-/**
- * Normalize url's pathname part
- * @param url url
- * @returns normalized url
- */
-function normalizeUrl(url: string) {
-  // strip querystring
-  const qsIndex = url.indexOf("?");
-
-  const pathname = url.slice(0, qsIndex === -1 ? undefined : qsIndex);
-  const qs = qsIndex === -1 ? "" : url.slice(qsIndex);
-
-  return normalize(pathname) + qs;
-}
 
 /**
  * Parse proxy target
@@ -40,7 +26,7 @@ function normalizeUrl(url: string) {
  */
 function parseProxyTarget(url: string, urlIncludesBasePath: boolean): string | Error {
 
-  const normalizedUrl = normalizeUrl(url);
+  const normalizedUrl = normalizePathnameWithQuery(url);
 
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "/";
 

@@ -1,6 +1,8 @@
 # 指定使用认证类型为LDAP
 authType: ldap
 
+redisUrl: localhost:6379
+
 # 在此部分输入LDAP的配置
 ldap:
   # LDAP服务器地址。必填

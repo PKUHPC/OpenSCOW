@@ -231,6 +231,7 @@ def create_portal_web_service():
         "MIS_URL": path_join(BASE_PATH, MIS_PATH),
         "MIS_DEPLOYED": "true" if cfg.MIS else "false",
         "AUTH_EXTERNAL_URL": path_join(BASE_PATH, "/auth"),
+        "NOVNC_CLIENT_URL": path_join(BASE_PATH, "/vnc"),
     }
     pw_volumes = {
         "/etc/hosts": "/etc/hosts",

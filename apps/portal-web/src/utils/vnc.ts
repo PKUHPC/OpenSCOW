@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { joinWithUrl } from "@scow/utils";
 import { join } from "path";
 import { publicConfig } from "src/utils/config";
 
@@ -17,12 +18,17 @@ export const openDesktop = (node: string, port: number, password: string) => {
 
   const params = new URLSearchParams({
     path: join(publicConfig.WSPROXY_BASE_PATH, node, String(port)),
+    host: location.hostname,
+    port: location.port,
     password: password,
     autoconnect: "true",
     reconnect: "true",
     resize: "remote",
   });
 
-  window.open(join(publicConfig.NOVNC_CLIENT_PATH, "/vnc.html") + "?" + params.toString(), "_blank");
+
+  const vncUrl = joinWithUrl(publicConfig.NOVNC_CLIENT_URL, "/vnc.html");
+  console.log(publicConfig.NOVNC_CLIENT_URL, vncUrl);
+  window.open(vncUrl + "?" + params.toString(), "_blank");
 };
 

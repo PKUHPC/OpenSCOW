@@ -1,0 +1,52 @@
+# 是否启用作业管理功能
+jobManagement: true
+
+# 登录节点桌面功能
+loginDesktop:
+  # 是否启用桌面功能
+  enabled: true
+
+  # 桌面
+  wms: 
+    # 桌面名和对应的wm值。见文档
+    - name: Xfce
+      wm: xfce
+
+  # 最多启动多少个桌面节点
+  maxDesktops: 3
+
+# 是否启用交互式任务功能
+apps: true
+
+# 主页标题
+homeTitle: 
+  # 默认文本
+  defaultText: "Super Computing on Web"
+  # 从不同域名访问，显示的不同的文本
+  # hostnameMap: 
+  #   a.com: "a.com's SCOW Deployment"
+
+# 主页文本
+homeText: 
+  # 默认文本
+  defaultText: "SCOW"
+  # 从不同域名访问，显示的不同的文本
+  # hostnameMap: 
+  #   a.com: "a.com's SCOW"
+
+# 是否启用终端功能
+shell: true
+
+# 提交作业的默认工作目录。使用{{ name }}代替作业名称。相对于用户的家目录
+# submitJobDefaultPwd: scow/jobs/{{ name }}
+
+# 将保存的作业保存到什么位置。相对于用户家目录
+# savedJobsDir: scow/savedJobs
+
+# 将交互式任务的信息保存到什么位置。相对于用户的家目录
+# appJobsDir: scow/appData
+
+# TurboVNC的安装路径
+# turboVNCPath: /opt/TurboVNC
+
+
