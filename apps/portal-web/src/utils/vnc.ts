@@ -28,7 +28,6 @@ export const openDesktop = (node: string, port: number, password: string) => {
 
 
   const vncUrl = joinWithUrl(publicConfig.NOVNC_CLIENT_URL, "/vnc.html");
-  console.log(publicConfig.NOVNC_CLIENT_URL, vncUrl);
   window.open(vncUrl + "?" + params.toString(), "_blank");
 };
 
