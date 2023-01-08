@@ -11,20 +11,6 @@
 version: "3"
 
 services:
-  db:
-    image: mysql:8
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-    volumes:
-      - "db:/var/lib/mysql"
-    ports:
-      - 3306:3306
-
-  redis:
-    image: redis:alpine
-    ports:
-      - 6379:6379
-
   ldapadmin:
     image: osixia/phpldapadmin
     ports:
@@ -38,10 +24,6 @@ services:
     ports:
       - 6080:80
 
-
 networks:
   default:
     name: scow-vagrant-devenv
-
-volumes:
-  db:

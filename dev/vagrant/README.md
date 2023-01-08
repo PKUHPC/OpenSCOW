@@ -1,10 +1,24 @@
 # 在开发环境下连接本地的vagrant集群
 
-使用vagrant集群的LDAP、job table，但是使用本地开发环境的redis和scow数据库。
+使用vagrant集群的slurm、LDAP、job table、SCOW的数据库和redis，但是在本地开发。
 
 1. 启动`deploy/vagrant`下的vagrant集群
 2. 给vagrant的每个机器(slurm, login, cn01, scow)配置root的免密登录
-3. 在仓库根目录下，运行`npx pm2 start dev/vagrant/pm2.config.js`。访问以下URL以访问各个组件
+3. 给vagrant集群的`config.py`中增加以下部分，打开redis和数据库的端口映射，使得本机可以访问这两个服务
+
+```python
+DEBUG = {
+  "OPEN_PORTS": {
+    # SCOW数据库映射到3308
+    "DB": 3308,
+
+    # redis映射到6379
+    "REDIS": 6379,
+  }
+}
+```
+
+4. 在仓库根目录下，运行`npx pm2 start dev/vagrant/pm2.config.js`。访问以下URL以访问各个组件
 
 | URL                   | 组件                             | 类型 |
 | --------------------- | -------------------------------- | ---- |
@@ -35,4 +49,4 @@ WSL2用户注意
 - 目前Vagrant集群必须在Windows下启动，但是从WSL2下可以连接在Windows下的Virtualbox中启动的机器
 - 请确保配置免密登录时，是把WSL2下的公钥添加到集群的机器中
 
-
+理论上来说，只要修改本目录中的配置文件，可以连接到任何SCOW集群上开发测试。

@@ -43,7 +43,7 @@ module.exports = {
         NEXT_PUBLIC_USE_MOCK: 0,
         SERVER_URL: "localhost:5002",
         MIS_DEPLOYED: 1,
-        MIS_URL: "localhost:5004",
+        MIS_URL: "localhost:5003",
         NOVNC_CLIENT_URL: "http://localhost:6080",
         ...SCOW_CONFIG_PATH_ENV,
       }
@@ -75,7 +75,7 @@ module.exports = {
         NEXT_PUBLIC_USE_MOCK: 0,
         SERVER_URL: "localhost:5004",
         PORTAL_DEPLOYED: 1,
-        PORTAL_URL: "localhost:5002",
+        PORTAL_URL: "localhost:5001",
         ...SCOW_CONFIG_PATH_ENV,
       }
     },
@@ -96,7 +96,7 @@ module.exports = {
       name: "devenv",
       cwd: "./dev/vagrant",
       script: "docker",
-      args: "compose --env-file ../.env.dev -f compose.yml up",
+      args: "compose -f compose.yml up",
     }
   ],
 

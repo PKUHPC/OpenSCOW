@@ -1,8 +1,8 @@
 # 管理系统数据库的信息。可以不修改
 db:
-  host: localhost
-  password: mysqlrootpassword
-  port: 3306
+  host: 192.168.88.100
+  password: must!chang3this
+  port: 3308
   user: root
   dbName: scow
 
