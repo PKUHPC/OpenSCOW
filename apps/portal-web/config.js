@@ -154,7 +154,7 @@ const buildRuntimeConfig = async (phase) => {
     // HACK
     // call /api/proxy/<node>/<port>/ after 3 seconds to init the proxy ws server
     setTimeout(() => {
-      const url = "http://localhost:3000" + join(publicRuntimeConfig.PROXY_BASE_PATH, "127.0.0.1", "3001");
+      const url = "http://localhost:" + (process.env.PORT || 3000) + join(publicRuntimeConfig.PROXY_BASE_PATH, "127.0.0.1", "3001");
       console.log("Calling proxy url to initialize ws proxy server", url);
       fetch(url).then(() => {
         console.log("Call completed.");
