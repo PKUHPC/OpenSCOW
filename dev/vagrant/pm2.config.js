@@ -88,7 +88,6 @@ module.exports = {
       interpreter_args,
       env: {
         PORT: "5004",
-        AUTH_URL: "http://localhost:5000",
         ...PRODUCTION_ENV,
         ...SCOW_CONFIG_PATH_ENV,
       }

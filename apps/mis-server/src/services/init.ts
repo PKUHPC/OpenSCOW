@@ -16,7 +16,7 @@ import { Status } from "@grpc/grpc-js/build/src/constants";
 import { UniqueConstraintViolationException } from "@mikro-orm/core";
 import { createUser } from "@scow/lib-auth";
 import { InitServiceServer, InitServiceService } from "@scow/protos/build/server/init";
-import { authUrl } from "src/config/auth";
+import { misConfig } from "src/config/mis";
 import { SystemState } from "src/entities/SystemState";
 import { PlatformRole, TenantRole, User } from "src/entities/User";
 import { DEFAULT_TENANT_NAME } from "src/utils/constants";
@@ -66,7 +66,7 @@ export const initServiceServer = plugin((server) => {
       await em.flush();
       // call auth
       // createdInAuth反映用户在本次创建之前用户否存在于认证系统，否->true, 是->false
-      const createdInAuth = await createUser(authUrl,
+      const createdInAuth = await createUser(misConfig.authUrl,
         { identityId: user.userId, id: user.id, mail: user.email, name: user.name, password },
         server.logger)
         .then(async () => {

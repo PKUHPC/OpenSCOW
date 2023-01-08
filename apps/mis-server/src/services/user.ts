@@ -27,7 +27,7 @@ import {
   UserServiceService,
   UserStatus as PFUserStatus } from "@scow/protos/build/server/user";
 import { blockUserInAccount, unblockUserInAccount } from "src/bl/block";
-import { authUrl } from "src/config/auth";
+import { misConfig } from "src/config/mis";
 import { Account } from "src/entities/Account";
 import { PlatformRole, TenantRole, User } from "src/entities/User";
 import { UserAccount, UserRole, UserStatus } from "src/entities/UserAccount";
@@ -326,7 +326,7 @@ export const userServiceServer = plugin((server) => {
             message: `Error creating user with userId ${identityId} in database.` };
         });
       // call auth
-      const createdInAuth = await createUser(authUrl,
+      const createdInAuth = await createUser(misConfig.authUrl,
         { identityId: user.userId, id: user.id, mail: user.email, name: user.name, password },
         server.logger)
         .then(async () => {

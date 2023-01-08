@@ -6,6 +6,8 @@ db:
   user: root
   dbName: scow
 
+authUrl: http://localhost:5000
+
 # 获取作业相关配置
 fetchJobs:
   # 源作业信息数据库的数据库信息
