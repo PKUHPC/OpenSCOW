@@ -92,5 +92,13 @@ export function parseTime(time: string) {
 
 }
 
+export function splitSbatchArgs(sbatchArgs: string) {
+  const args = sbatchArgs.split(" -").map(function(x, index) {
+    x = x.trim();
+    return index === 0 ? x : "-" + x;
+  });
+  return args.filter((x) => x); // remove empty string in the array 
+}
+
 
 

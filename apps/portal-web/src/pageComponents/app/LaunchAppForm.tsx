@@ -18,6 +18,7 @@ import { useAsync } from "react-async";
 import { useStore } from "simstate";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
+import { splitSbatchArgs } from "src/models/job";
 import { AccountSelector } from "src/pageComponents/job/AccountSelector";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { Cluster, publicConfig } from "src/utils/config";
@@ -73,10 +74,7 @@ export const LaunchAppForm: React.FC<Props> = ({ appId }) => {
       });
     }
 
-    const userSbatchOptions = sbatchOptions ? sbatchOptions.trim().split(" -").map(function(x, index) {
-      x = x.trim();
-      return index === 0 ? x : "-" + x;
-    }) : [];
+    const userSbatchOptions = sbatchOptions ? splitSbatchArgs(sbatchOptions) : [];
 
     setLoading(true);
     await api.createAppSession({ body: {
