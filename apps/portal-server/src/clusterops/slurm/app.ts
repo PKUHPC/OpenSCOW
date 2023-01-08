@@ -63,7 +63,8 @@ export const slurmAppOps = (cluster: string): AppOps => {
     createApp: async (request, logger) => {
       const apps = getAppConfigs();
 
-      const { appId, userId, account, coreCount, maxTime, partition, qos, customAttributes } = request;
+      const { appId, userId, account, coreCount, maxTime,
+        partition, qos, customAttributes, userSbatchOptions } = request;
 
       // prepare script file
       const appConfig = apps[appId];
@@ -134,6 +135,9 @@ export const slurmAppOps = (cluster: string): AppOps => {
 
           await sftpWriteFile(sftp)(join(workingDirectory, "script.sh"), appConfig.web!.script);
 
+          let otherOptions: string[] = appConfig.slurm?.options ?? [];
+          otherOptions = otherOptions.concat(userSbatchOptions);
+
           const script = generateJobScript({
             jobName,
             command: SERVER_ENTRY_COMMAND,
@@ -144,7 +148,7 @@ export const slurmAppOps = (cluster: string): AppOps => {
             partition: partition,
             workingDirectory,
             qos: qos,
-            otherOptions: appConfig.slurm?.options,
+            otherOptions: otherOptions,
           });
 
           return await submitAndWriteMetadata(script, { SERVER_SESSION_INFO });

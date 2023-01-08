@@ -95,7 +95,8 @@ export const appServiceServer = plugin((server) => {
     createAppSession: async ({ request, logger }) => {
       const apps = getAppConfigs();
 
-      const { account, appId, cluster, coreCount, maxTime, partition, qos, userId, customAttributes } = request;
+      const { account, appId, cluster, coreCount, maxTime,
+        partition, qos, userId, customAttributes, userSbatchOptions } = request;
 
       const app = apps[appId];
       if (!app) {
@@ -158,6 +159,7 @@ export const appServiceServer = plugin((server) => {
         partition,
         qos,
         customAttributes,
+        userSbatchOptions,
       }, logger);
 
       if (reply.code === "SBATCH_FAILED") {

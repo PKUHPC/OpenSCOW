@@ -18,6 +18,7 @@ import { useAsync } from "react-async";
 import { useStore } from "simstate";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
+import { splitSbatchArgs } from "src/models/job";
 import { AccountSelector } from "src/pageComponents/job/AccountSelector";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { Cluster, publicConfig } from "src/utils/config";
@@ -34,6 +35,7 @@ interface FormFields {
   coreCount: number;
   account: string;
   maxTime: number;
+  sbatchOptions: string | undefined;
 }
 
 
@@ -62,7 +64,7 @@ export const LaunchAppForm: React.FC<Props> = ({ appId }) => {
 
   const onSubmit = async () => {
     const allFormFields = await form.validateFields();
-    const { cluster, coreCount, partition, qos, account, maxTime } = allFormFields;
+    const { cluster, coreCount, partition, qos, account, maxTime, sbatchOptions } = allFormFields;
 
     const customFormKeyValue: {[key: string]: string} = {};
     if (data) {
@@ -71,6 +73,8 @@ export const LaunchAppForm: React.FC<Props> = ({ appId }) => {
         customFormKeyValue[customFormKey] = allFormFields[customFormKey];
       });
     }
+
+    const userSbatchOptions = sbatchOptions ? splitSbatchArgs(sbatchOptions) : [];
 
     setLoading(true);
     await api.createAppSession({ body: {
@@ -82,6 +86,7 @@ export const LaunchAppForm: React.FC<Props> = ({ appId }) => {
       account,
       maxTime,
       customAttributes: customFormKeyValue,
+      userSbatchOptions,
     } })
       .then(() => {
         message.success("创建成功！");
@@ -213,6 +218,10 @@ export const LaunchAppForm: React.FC<Props> = ({ appId }) => {
       </Form.Item>
 
       {customFormItems}
+
+      <Form.Item label="其他sbatch参数" name="sbatchOptions">
+        <Input placeholder="比如：--gpus gres:2 --time 10" />
+      </Form.Item>
 
       <Form.Item>
         <Button type="primary" htmlType="submit" loading={loading}>
