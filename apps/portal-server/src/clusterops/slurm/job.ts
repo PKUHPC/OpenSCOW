@@ -10,10 +10,11 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { getRunningJobs } from "@scow/lib-slurm";
 import { executeAsUser, loggedExec, sftpExists, sftpReaddir, sftpReadFile, sftpWriteFile } from "@scow/lib-ssh";
 import { join } from "path";
 import { JobOps, JobTemplate } from "src/clusterops/api/job";
-import { querySacct, querySqueue } from "src/clusterops/slurm/bl/queryJobInfo";
+import { querySacct } from "src/clusterops/slurm/bl/queryJobInfo";
 import { generateJobScript, JobMetadata, parseSbatchOutput } from "src/clusterops/slurm/bl/submitJob";
 import { portalConfig } from "src/config/portal";
 import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
@@ -143,10 +144,9 @@ export const slurmJobOps = (cluster: string): JobOps => {
 
     listRunningJobs: async (request, logger) => {
       const { userId } = request;
-
+      
       return await sshConnect(host, "root", logger, async (ssh) => {
-
-        const results = await querySqueue(ssh, userId, logger, ["-u", userId]);
+        const results = await getRunningJobs(ssh, userId, { userId }, logger);
 
         return { results };
       });

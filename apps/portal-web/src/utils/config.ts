@@ -71,7 +71,7 @@ export interface PublicRuntimeConfig {
   RPROXY_BASE_PATH: string;
   WSPROXY_BASE_PATH: string;
 
-  NOVNC_CLIENT_PATH: string;
+  NOVNC_CLIENT_URL: string;
 
   PASSWORD_PATTERN: string | undefined;
   PASSWORD_PATTERN_MESSAGE: string | undefined;

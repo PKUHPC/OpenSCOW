@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 # Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
 # SCOW is licensed under Mulan PSL v2.
 # You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -8,7 +10,6 @@
 # MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 # See the Mulan PSL v2 for more details.
 
-# encoding: utf-8
 
 import functools
 import json
@@ -231,6 +232,7 @@ def create_portal_web_service():
         "MIS_URL": path_join(BASE_PATH, MIS_PATH),
         "MIS_DEPLOYED": "true" if cfg.MIS else "false",
         "AUTH_EXTERNAL_URL": path_join(BASE_PATH, "/auth"),
+        "NOVNC_CLIENT_URL": path_join(BASE_PATH, "/vnc"),
     }
     pw_volumes = {
         "/etc/hosts": "/etc/hosts",

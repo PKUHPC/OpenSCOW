@@ -1,0 +1,26 @@
+{
+  "name": "@scow/lib-slurm",
+  "version": "1.0.0",
+  "description": "",
+  "main": "build/index.js",
+  "scripts": {
+    "build": "rimraf build && tsc -p tsconfig.build.json"
+  },
+  "files": [
+    "build"
+  ],
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@scow/lib-ssh": "workspace:*",
+    "@scow/protos": "workspace:*"
+  },
+  "devDependencies": {
+    "node-ssh": "13.0.0",
+    "ts-log": "2.2.5"
+  },
+  "volta": {
+    "extends": "../../package.json"
+  }
+}

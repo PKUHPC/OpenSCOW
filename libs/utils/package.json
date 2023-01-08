@@ -4,11 +4,13 @@
   "description": "",
   "main": "build/index.js",
   "scripts": {
-    "build": "rimraf build && tsc -p tsconfig.build.json"
+    "build": "rimraf build && tsc -p tsconfig.build.json",
+    "test": "jest"
   },
   "files": [
     "build"
   ],
+  "dependencies": {},
   "keywords": [],
   "author": "",
   "license": "ISC"
