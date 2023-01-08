@@ -3,7 +3,7 @@ vm_list = [
     {
         :name => "slurm",
         :eth1 => "192.168.88.101",
-        :mem => "4096",
+        :mem => "2048",
         :cpu => "2",
         :sshport => 22231,
         :box => "icode/slurm",
@@ -13,7 +13,7 @@ vm_list = [
     {
         :name => "login",
         :eth1 => "192.168.88.102",
-        :mem => "4096",
+        :mem => "2048",
         :cpu => "2",
         :sshport => 22232,
         :box => "icode/slurm_compute",
@@ -23,8 +23,8 @@ vm_list = [
     {
         :name => "cn01",
         :eth1 => "192.168.88.103",
-        :mem => "4096",
-        :cpu => "4",
+        :mem => "2048",
+        :cpu => "2",
         :sshport => 22233,
         :box => "icode/slurm_compute",
 		    :role => "slurm",

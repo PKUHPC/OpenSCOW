@@ -18,9 +18,9 @@ slurm:
       # 分区内节点数
       nodes: 1
       # 单节点内存数量，单位M
-      mem: 4096
+      mem: 2048
       # 核心数
-      cores: 4
+      cores: 2
       # GPU数
       gpus: 0
       # QOS
