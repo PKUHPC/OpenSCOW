@@ -4,10 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "cross-env NEXT_PUBLIC_USE_MOCK=1 next dev",
-    "devapi": "cross-env NEXT_PUBLIC_USE_MOCK=0 next dev",
+    "dev:server": "cross-env NEXT_PUBLIC_USE_MOCK=0 next dev",
     "serve": "next start",
-    "build": "pnpm prepareDev && npm run build:nogen",
-    "build:nogen": "next build",
+    "build": "pnpm prepareDev && npm run build:next",
+    "build:next": "next build",
     "prepareDev": "ntar schema",
     "test": "jest --passWithNoTests"
   },

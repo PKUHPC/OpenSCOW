@@ -109,6 +109,7 @@ pnpm build
 - 可以通过`22222`端口连接的SSH服务器
     - 可以直接使用本地的`~/.ssh/id_rsa.pub`登录`root`和`test`用户，也可以通过用户名`test`、密码`test`登录`test`用户
 - 可以通过`389`端口连接的LDAP服务器，详情参考[LDAP文档](../deploy/SCOW/auth/ldap.md#LDAP镜像)
+- 可以通过`3890`端口访问的[phpLDAPadmin](https://phpldapadmin.sourceforge.net/wiki/index.php/Main_Page)，可以用于登录`389`端口的LDAP服务器
 
 ```bash
 # 构建并启动开发环境

@@ -48,8 +48,10 @@ const specs = {
   MIS_DEPLOYED: bool({ desc: "是否部署了管理系统", default: false }),
   MIS_URL: str({ desc: "如果部署了管理系统，管理系统的URL。如果和本系统域名相同，可以只写完整的路径。将会覆盖配置文件。空字符串等价于未部署管理系统", default: "" }),
 
-  NOVNC_CLIENT_PATH: str({ desc: "novnc客户端的URL。如果和本系统域名相同，可以只写相对于本系统的基础路径", default: "/vnc" }),
+  NOVNC_CLIENT_URL: str({ desc: "novnc客户端的URL。如果和本系统域名相同，可以只写完整路径", default: "/vnc" }),
 };
+
+const mockEnv = process.env.NEXT_PUBLIC_USE_MOCK === "1";
 
 // This config is used to provide env doc auto gen
 const config = { _specs: specs };
@@ -72,10 +74,7 @@ const buildRuntimeConfig = async (phase) => {
   // reload config after envs are applied
   const config = envConfig(specs, process.env);
 
-
-  // load clusters.json
-
-  const configPath = production ? undefined : join(__dirname, "config");
+  const configPath = mockEnv ? join(__dirname, "config") : undefined;
 
   const clusters = getClusterConfigs(configPath);
 
@@ -139,7 +138,7 @@ const buildRuntimeConfig = async (phase) => {
     RPROXY_BASE_PATH: join(basePath, config.RPROXY_BASE_PATH),
     WSPROXY_BASE_PATH: join(basePath, config.WSPROXY_BASE_PATH),
 
-    NOVNC_CLIENT_PATH: join(basePath, config.NOVNC_CLIENT_PATH),
+    NOVNC_CLIENT_URL: config.NOVNC_CLIENT_URL,
 
     PASSWORD_PATTERN: commonConfig.passwordPattern?.regex,
     PASSWORD_PATTERN_MESSAGE: commonConfig.passwordPattern?.errorMessage,
@@ -150,12 +149,12 @@ const buildRuntimeConfig = async (phase) => {
     console.log("Public Runtime Config", publicRuntimeConfig);
   }
 
-  if (production) {
+  if (!mockEnv) {
 
     // HACK
     // call /api/proxy/<node>/<port>/ after 3 seconds to init the proxy ws server
     setTimeout(() => {
-      const url = "http://localhost:3000" + join(publicRuntimeConfig.PROXY_BASE_PATH, "127.0.0.1", "3001");
+      const url = "http://localhost:" + (process.env.PORT || 3000) + join(publicRuntimeConfig.PROXY_BASE_PATH, "127.0.0.1", "3001");
       console.log("Calling proxy url to initialize ws proxy server", url);
       fetch(url).then(() => {
         console.log("Call completed.");
