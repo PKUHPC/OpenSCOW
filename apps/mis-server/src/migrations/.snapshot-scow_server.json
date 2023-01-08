@@ -162,23 +162,23 @@
         },
         "account": {
           "name": "account",
-          "type": "varchar(20)",
+          "type": "varchar(255)",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": 20,
+          "length": 255,
           "comment": "账户",
           "mappedType": "string"
         },
         "user": {
           "name": "user",
-          "type": "varchar(20)",
+          "type": "varchar(127)",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": 20,
+          "length": 127,
           "comment": "用户名",
           "mappedType": "string"
         },
@@ -199,7 +199,6 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": 65535,
           "comment": "使用节点列表",
           "mappedType": "text"
         },
