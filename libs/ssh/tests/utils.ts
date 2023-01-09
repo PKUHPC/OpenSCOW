@@ -21,6 +21,8 @@ import { SFTPWrapper } from "ssh2";
 
 export const target = "localhost:22222";
 export const rootUserId = "root";
+export const testUserId = "test";
+export const testUserPassword = "1234";
 
 export interface TestSshServer {
   ssh: NodeSSH;
@@ -31,8 +33,6 @@ const SSH_PRIVATE_KEY_PATH = join(homedir(), ".ssh", "id_rsa");
 const SSH_PUBLIC_KEY_PATH = join(homedir(), ".ssh", "id_rsa.pub");
 
 export const rootKeyPair = getKeyPair(SSH_PRIVATE_KEY_PATH, SSH_PUBLIC_KEY_PATH);
-
-
 
 export const connectToTestServerAsRoot = async () => {
 

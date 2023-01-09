@@ -12,8 +12,8 @@
 
 import { getAppConfigs } from "@scow/config/build/app";
 import { getPlaceholderKeys } from "@scow/lib-config/build/parse";
-import { loggedExec, sftpChmod, sftpExists,
-  sftpReaddir, sftpReadFile, sftpRealPath, sftpWriteFile } from "@scow/lib-ssh";
+import { getUserHomedir,
+  loggedExec, sftpChmod, sftpExists, sftpReaddir, sftpReadFile, sftpRealPath, sftpWriteFile } from "@scow/lib-ssh";
 import { RunningJob } from "@scow/protos/build/common/job";
 import { randomUUID } from "crypto";
 import fs from "fs";
@@ -186,28 +186,30 @@ export const slurmAppOps = (cluster: string): AppOps => {
 
       const { userId } = request;
 
-      // using squeue to get jobs that are running
-      // If a job is not running, it cannot be ready
-      const runningJobsInfo = await sshConnect(host, "root", logger, async (ssh) => {
-        return querySqueue(ssh, userId, logger, ["-u", userId]);
-      });
+      return await sshConnect(host, "root", logger, async (ssh) => {
 
-      const runningJobInfoMap = runningJobsInfo.reduce((prev, curr) => {
-        prev[curr.jobId] = curr;
-        return prev;
-      }, {} as Record<number, RunningJob>);
+        // If a job is not running, it cannot be ready
+        const runningJobsInfo = await querySqueue(ssh, userId, logger, ["-u", userId]);
 
-      return await sshConnect(host, userId, logger, async (ssh) => {
+        const runningJobInfoMap = runningJobsInfo.reduce((prev, curr) => {
+          prev[curr.jobId] = curr;
+          return prev;
+        }, {} as Record<number, RunningJob>);
+
         const sftp = await ssh.requestSFTP();
 
-        if (!await sftpExists(sftp, portalConfig.appJobsDir)) { return { sessions: []}; }
+        const userHomeDir = await getUserHomedir(ssh, userId, logger);
+        const userAppJobDir = join(userHomeDir, portalConfig.appJobsDir);
 
-        const list = await sftpReaddir(sftp)(portalConfig.appJobsDir);
+        if (!await sftpExists(sftp, userAppJobDir)) { return { sessions: []}; }
+
+        // get all job directories
+        const list = await sftpReaddir(sftp)(userAppJobDir);
 
         const sessions = [] as AppSession[];
 
         await Promise.all(list.map(async ({ filename }) => {
-          const jobDir = join(portalConfig.appJobsDir, filename);
+          const jobDir = join(userAppJobDir, filename);
           const metadataPath = join(jobDir, SESSION_METADATA_NAME);
 
           if (!await sftpExists(sftp, metadataPath)) {
@@ -271,10 +273,11 @@ export const slurmAppOps = (cluster: string): AppOps => {
 
       const { sessionId, userId } = request;
 
-      return await sshConnect(host, userId, logger, async (ssh) => {
+      return await sshConnect(host, "root", logger, async (ssh) => {
         const sftp = await ssh.requestSFTP();
 
-        const jobDir = join(portalConfig.appJobsDir, sessionId);
+        const userHomeDir = await getUserHomedir(ssh, userId, logger);
+        const jobDir = join(userHomeDir, portalConfig.appJobsDir, sessionId);
 
         if (!await sftpExists(sftp, jobDir)) {
           return { code: "NOT_FOUND" };
