@@ -488,6 +488,12 @@ importers:
       '@types/react': 18.0.18
       typescript: 4.9.4
 
+  e2e:
+    specifiers:
+      '@playwright/test': 1.29.2
+    devDependencies:
+      '@playwright/test': 1.29.2
+
   libs/auth:
     specifiers:
       ts-log: 2.2.5
@@ -4349,6 +4355,15 @@ packages:
       picocolors: 1.0.0
       tiny-glob: 0.2.9
       tslib: 2.4.1
+    dev: true
+
+  /@playwright/test/1.29.2:
+    resolution: {integrity: sha512-+3/GPwOgcoF0xLz/opTnahel1/y42PdcgZ4hs+BZGIUjtmEFSXGg+nFoaH3NSmuc7a6GSFwXDJ5L7VXpqzigNg==}
+    engines: {node: '>=14'}
+    hasBin: true
+    dependencies:
+      '@types/node': 18.11.18
+      playwright-core: 1.29.2
     dev: true
 
   /@pm2/agent/2.0.1:
@@ -12787,6 +12802,12 @@ packages:
     transitivePeerDependencies:
       - encoding
       - supports-color
+    dev: true
+
+  /playwright-core/1.29.2:
+    resolution: {integrity: sha512-94QXm4PMgFoHAhlCuoWyaBYKb92yOcGVHdQLoxQ7Wjlc7Flg4aC/jbFW7xMR52OfXMVkWicue4WXE7QEegbIRA==}
+    engines: {node: '>=14'}
+    hasBin: true
     dev: true
 
   /please-upgrade-node/3.2.0:
