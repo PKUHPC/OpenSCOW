@@ -203,6 +203,19 @@ export async function testRootUserSshLogin(host: string, keyPair: KeyPair, logge
 }
 
 /**
+ * Get a user's home directory
+ * @param ssh ssh object connected as any user
+ * @param username the username to be queried
+ * @param logger logger
+ * @returns the user's home directory
+ */
+export const getUserHomedir = async (ssh: NodeSSH, username: string, logger: Logger) => {
+  const resp = await loggedExec(ssh, logger, true, "eval", ["echo", `~${username}`]);
+
+  return resp.stdout.trim();
+};
+
+/**
  * Login as user by password and insert the host's public key to the user's authorized_keys to enable public key login
  *
  * @param address the address
@@ -217,8 +230,7 @@ export async function insertKeyAsUser(
 ) {
 
   await sshConnectByPassword(address, username, pwd, logger, async (ssh) => {
-    const homeDir = await loggedExec(ssh, logger, true, "eval", ["echo", `~${username}`]);
-    const userHomeDir = homeDir.stdout.trim();
+    const userHomeDir = await getUserHomedir(ssh, username, logger);
 
     const sftp = await ssh.requestSFTP();
     const stat = await sftpStat(sftp)(userHomeDir).catch(() => undefined);

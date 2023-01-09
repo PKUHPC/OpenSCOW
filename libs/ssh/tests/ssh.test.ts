@@ -10,8 +10,9 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { executeAsUser, getEnvPrefix } from "src/ssh";
-import { connectToTestServerAsRoot, resetTestServerAsRoot, TestSshServer } from "tests/utils";
+import { executeAsUser, getEnvPrefix, getUserHomedir, sshConnectByPassword } from "src/ssh";
+import { connectToTestServerAsRoot, resetTestServerAsRoot,
+  rootUserId, target, TestSshServer, testUserId, testUserPassword } from "tests/utils";
 
 let testServer: TestSshServer;
 
@@ -24,15 +25,13 @@ afterEach(async () => {
 });
 
 
-const TEST_USER = "test";
-
 it.each([
-  [["whoami", [], {}], TEST_USER],
-  [["echo", ["$USER"], {}], TEST_USER],
-  [["echo", ["$USER $TEST", "$TEST"], { TEST: "1" }], `${TEST_USER} 1 1`],
+  [["whoami", [], {}], testUserId],
+  [["echo", ["$USER"], {}], testUserId],
+  [["echo", ["$USER $TEST", "$TEST"], { TEST: "1" }], `${testUserId} 1 1`],
 ] as const)("execute command as another user", async ([cmd, parameters, env], stdout) => {
 
-  const resp = await executeAsUser(testServer.ssh, TEST_USER, console, false, cmd, parameters, {
+  const resp = await executeAsUser(testServer.ssh, testUserId, console, false, cmd, parameters, {
     execOptions: { env },
   });
 
@@ -46,4 +45,15 @@ it.each([
   [{ test: "1", test2: "2\"" }, "test=1 test2='2\"' "],
 ])("gets correct env prefix", async (env, expected) => {
   expect(getEnvPrefix(env)).toBe(expected);
+});
+
+it.each([
+  [rootUserId, "/root"],
+  [testUserId, "/home/test"],
+])("get the homedir of user %p to %p", async (user, expected) => {
+  expect(await getUserHomedir(testServer.ssh, user, console)).toBe(expected);
+  await sshConnectByPassword(target, testUserId, testUserPassword, console, async (ssh) => {
+    expect(await getUserHomedir(ssh, user, console)).toBe(expected);
+  });
+
 });
