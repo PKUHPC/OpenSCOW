@@ -223,7 +223,12 @@ def create_portal_server_service():
         "./config": "/etc/scow",
         "~/.ssh": "/root/.ssh"
     }
-    portal_server = Service("portal-server", generate_image("portal-server", None), None, ps_volumes, None)
+
+    port = get_cfg(["DEBUG", "OPEN_PORTS", "PORTAL_SERVER"])
+
+    ports = [(port, 5000)] if port else []
+
+    portal_server = Service("portal-server", generate_image("portal-server", None), ports, ps_volumes, None)
     return portal_server
 
 
@@ -268,8 +273,13 @@ def create_mis_server_service():
         "/etc/hosts": "/etc/hosts",
         "./config": "/etc/scow",
         "~/.ssh": "/root/.ssh"
-    }
-    mis_server = Service("mis-server", generate_image("mis-server", None), None, ms_volumes, ms_env)
+   }
+
+    port = get_cfg(["DEBUG", "OPEN_PORTS", "MIS_SERVER"])
+
+    ports = [(port, 5000)] if port else []
+
+    mis_server = Service("mis-server", generate_image("mis-server", None), ports, ms_volumes, ms_env)
     return mis_server
 
 
