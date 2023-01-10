@@ -33,6 +33,7 @@ import type { SetPlatformRoleSchema } from "src/pages/api/admin/setPlatformRole"
 import type { SetTenantRoleSchema } from "src/pages/api/admin/setTenantRole";
 import type { UnsetPlatformRoleSchema } from "src/pages/api/admin/unsetPlatformRole";
 import type { UnsetTenantRoleSchema } from "src/pages/api/admin/unsetTenantRole";
+import type { UpdateBlockStatusSchema } from "src/pages/api/admin/updateBlock";
 import type { AuthCallbackSchema } from "src/pages/api/auth/callback";
 import type { LogoutSchema } from "src/pages/api/auth/logout";
 import type { ValidateTokenSchema } from "src/pages/api/auth/validateToken";
@@ -97,6 +98,7 @@ export const api = {
   setTenantRole: fromApi<SetTenantRoleSchema>("PUT", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin/setTenantRole")),
   unsetPlatformRole: fromApi<UnsetPlatformRoleSchema>("PUT", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin/unsetPlatformRole")),
   unsetTenantRole: fromApi<UnsetTenantRoleSchema>("PUT", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin/unsetTenantRole")),
+  updateBlockStatus: fromApi<UpdateBlockStatusSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin/updateBlock")),
   authCallback: fromApi<AuthCallbackSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/auth/callback")),
   logout: fromApi<LogoutSchema>("DELETE", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/auth/logout")),
   validateToken: fromApi<ValidateTokenSchema>("GET", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/auth/validateToken")),

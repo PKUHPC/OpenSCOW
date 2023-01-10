@@ -11,10 +11,11 @@
  */
 
 import { formatDateTime } from "@scow/lib-web/build/utils/datetime";
-import { Alert, App, Badge, Descriptions, Space, Spin, Typography } from "antd";
+// import { Alert, App, Badge, Descriptions, Space, Spin, Typography } from "antd"
+import { Alert, App, Descriptions, Space, Spin } from "antd";
 import { NextPage } from "next";
 import { useState } from "react";
-import { useAsync } from "react-async";
+// import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { DisabledA } from "src/components/DisabledA";
@@ -30,6 +31,8 @@ export const SlurmBlockStatusPage: NextPage = requireAuth((u) => u.platformRoles
     const isLoading = false;
     const reload = () => {};
     const data = { lastRun: new Date().toISOString() };
+
+    const { message } = App.useApp();
 
     const [running, setRunning] = useState(false);
 
@@ -63,7 +66,9 @@ export const SlurmBlockStatusPage: NextPage = requireAuth((u) => u.platformRoles
                     <DisabledA
                       onClick={() => {
                         setRunning(true);
-                        // 执行API
+                        api.updateBlockStatus({})
+                          .then(({ updateBlockCount }) => { message.success(`刷新成功，刷新${updateBlockCount}条封锁用户`); })
+                          .finally(() => { setRunning(false); });
                       }}
                       disabled={running}
                     >

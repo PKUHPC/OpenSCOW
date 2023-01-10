@@ -170,5 +170,10 @@ export const adminServiceServer = plugin((server) => {
       return [reply];
     },
 
+    updateBlockStatus: async () => {
+
+      return [{ updateBlockCount: 123 }];
+    },
+
   });
 });

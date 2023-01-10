@@ -323,6 +323,7 @@ export const mockApi: MockApi<typeof api> = {
   // addUserToAccount: async () => { throw new HttpError(404, { code: "USER_NOT_FOUND" }); },
   blockUserInAccount: async () => ({ executed: true }),
   unblockUserInAccount: async () => ({ executed: true }),
+  updateBlockStatus: async () => ({ updateBlockCount: 30 }),
   removeUserFromAccount: async () => null,
   setAdmin: async () => ({ executed: true }),
   unsetAdmin: async () => ({ executed: false }),
