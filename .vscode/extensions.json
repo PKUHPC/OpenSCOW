@@ -2,7 +2,8 @@
   "recommendations": [
     "bufbuild.vscode-buf",
     "dbaeumer.vscode-eslint",
-    "EditorConfig.EditorConfig",
-    "zxh404.vscode-proto3"
+    "editorconfig.editorconfig",
+    "zxh404.vscode-proto3",
+    "ms-playwright.playwright"
   ]
 }

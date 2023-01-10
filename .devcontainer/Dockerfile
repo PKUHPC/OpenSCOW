@@ -10,4 +10,8 @@ RUN BIN="/usr/local/bin" && \
   -o "${BIN}/buf" && \
   chmod +x "${BIN}/buf"
 
+
 RUN corepack enable
+
+# Install browsers
+RUN pnpm dlx playwright install && sudo pnpm dlx playwright install-deps
