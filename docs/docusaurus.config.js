@@ -6,6 +6,7 @@ const darkCodeTheme = require("prism-react-renderer/themes/dracula");
 const { join } = require("path");
 const { plugin, variables } = require("./plugins/var");
 
+
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: "SCOW",

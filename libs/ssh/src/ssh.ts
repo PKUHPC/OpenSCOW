@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { NodeSSH, SSHExecCommandOptions } from "node-ssh";
+import { NodeSSH, SSHExecCommandOptions, SSHExecCommandResponse } from "node-ssh";
 import { join } from "path";
 import { quote } from "shell-quote";
 import type { Logger } from "ts-log";
@@ -135,6 +135,12 @@ export function constructCommand(cmd: string, parameters: readonly string[], env
   return envPrefix + command;
 }
 
+export class SSHExecError extends Error {
+  constructor(public response: SSHExecCommandResponse, options?: ErrorOptions) {
+    super("Error when executing command", options);
+  }
+}
+
 export async function loggedExec(ssh: NodeSSH, logger: Logger, throwIfFailed: boolean,
   cmd: string, parameters: string[], options?: SSHExecCommandOptions) {
 
@@ -147,7 +153,7 @@ export async function loggedExec(ssh: NodeSSH, logger: Logger, throwIfFailed: bo
   if (resp.code !== 0) {
     logger.error("Command %o failed. stdout %s, stderr %s", command, resp.stdout, resp.stderr);
     if (throwIfFailed) {
-      throw new Error("");
+      throw new SSHExecError(resp);
     }
   } else {
     logger.debug("Command %o completed. stdout %s, stderr %s", command, resp.stdout, resp.stderr);
@@ -197,6 +203,19 @@ export async function testRootUserSshLogin(host: string, keyPair: KeyPair, logge
 }
 
 /**
+ * Get a user's home directory
+ * @param ssh ssh object connected as any user
+ * @param username the username to be queried
+ * @param logger logger
+ * @returns the user's home directory
+ */
+export const getUserHomedir = async (ssh: NodeSSH, username: string, logger: Logger) => {
+  const resp = await loggedExec(ssh, logger, true, "eval", ["echo", `~${username}`]);
+
+  return resp.stdout.trim();
+};
+
+/**
  * Login as user by password and insert the host's public key to the user's authorized_keys to enable public key login
  *
  * @param address the address
@@ -211,8 +230,7 @@ export async function insertKeyAsUser(
 ) {
 
   await sshConnectByPassword(address, username, pwd, logger, async (ssh) => {
-    const homeDir = await loggedExec(ssh, logger, true, "eval", ["echo", `~${username}`]);
-    const userHomeDir = homeDir.stdout.trim();
+    const userHomeDir = await getUserHomedir(ssh, username, logger);
 
     const sftp = await ssh.requestSFTP();
     const stat = await sftpStat(sftp)(userHomeDir).catch(() => undefined);

@@ -12,8 +12,8 @@
 
 import { getAppConfigs } from "@scow/config/build/app";
 import { getPlaceholderKeys } from "@scow/lib-config/build/parse";
-import { loggedExec, sftpChmod, sftpExists,
-  sftpReaddir, sftpReadFile, sftpRealPath, sftpWriteFile } from "@scow/lib-ssh";
+import { getUserHomedir,
+  loggedExec, sftpChmod, sftpExists, sftpReaddir, sftpReadFile, sftpRealPath, sftpWriteFile } from "@scow/lib-ssh";
 import { RunningJob } from "@scow/protos/build/common/job";
 import { randomUUID } from "crypto";
 import fs from "fs";
@@ -63,7 +63,8 @@ export const slurmAppOps = (cluster: string): AppOps => {
     createApp: async (request, logger) => {
       const apps = getAppConfigs();
 
-      const { appId, userId, account, coreCount, maxTime, partition, qos, customAttributes } = request;
+      const { appId, userId, account, coreCount, maxTime,
+        partition, qos, customAttributes, userSbatchOptions } = request;
 
       // prepare script file
       const appConfig = apps[appId];
@@ -134,6 +135,9 @@ export const slurmAppOps = (cluster: string): AppOps => {
 
           await sftpWriteFile(sftp)(join(workingDirectory, "script.sh"), appConfig.web!.script);
 
+          let otherOptions: string[] = appConfig.slurm?.options ?? [];
+          otherOptions = otherOptions.concat(userSbatchOptions);
+
           const script = generateJobScript({
             jobName,
             command: SERVER_ENTRY_COMMAND,
@@ -144,7 +148,7 @@ export const slurmAppOps = (cluster: string): AppOps => {
             partition: partition,
             workingDirectory,
             qos: qos,
-            otherOptions: appConfig.slurm?.options,
+            otherOptions: otherOptions,
           });
 
           return await submitAndWriteMetadata(script, { SERVER_SESSION_INFO });
@@ -182,28 +186,30 @@ export const slurmAppOps = (cluster: string): AppOps => {
 
       const { userId } = request;
 
-      // using squeue to get jobs that are running
-      // If a job is not running, it cannot be ready
-      const runningJobsInfo = await sshConnect(host, "root", logger, async (ssh) => {
-        return querySqueue(ssh, userId, logger, ["-u", userId]);
-      });
+      return await sshConnect(host, "root", logger, async (ssh) => {
 
-      const runningJobInfoMap = runningJobsInfo.reduce((prev, curr) => {
-        prev[curr.jobId] = curr;
-        return prev;
-      }, {} as Record<number, RunningJob>);
+        // If a job is not running, it cannot be ready
+        const runningJobsInfo = await querySqueue(ssh, userId, logger, ["-u", userId]);
 
-      return await sshConnect(host, userId, logger, async (ssh) => {
+        const runningJobInfoMap = runningJobsInfo.reduce((prev, curr) => {
+          prev[curr.jobId] = curr;
+          return prev;
+        }, {} as Record<number, RunningJob>);
+
         const sftp = await ssh.requestSFTP();
 
-        if (!await sftpExists(sftp, portalConfig.appJobsDir)) { return { sessions: []}; }
+        const userHomeDir = await getUserHomedir(ssh, userId, logger);
+        const userAppJobDir = join(userHomeDir, portalConfig.appJobsDir);
 
-        const list = await sftpReaddir(sftp)(portalConfig.appJobsDir);
+        if (!await sftpExists(sftp, userAppJobDir)) { return { sessions: []}; }
+
+        // get all job directories
+        const list = await sftpReaddir(sftp)(userAppJobDir);
 
         const sessions = [] as AppSession[];
 
         await Promise.all(list.map(async ({ filename }) => {
-          const jobDir = join(portalConfig.appJobsDir, filename);
+          const jobDir = join(userAppJobDir, filename);
           const metadataPath = join(jobDir, SESSION_METADATA_NAME);
 
           if (!await sftpExists(sftp, metadataPath)) {
@@ -267,10 +273,11 @@ export const slurmAppOps = (cluster: string): AppOps => {
 
       const { sessionId, userId } = request;
 
-      return await sshConnect(host, userId, logger, async (ssh) => {
+      return await sshConnect(host, "root", logger, async (ssh) => {
         const sftp = await ssh.requestSFTP();
 
-        const jobDir = join(portalConfig.appJobsDir, sessionId);
+        const userHomeDir = await getUserHomedir(ssh, userId, logger);
+        const jobDir = join(userHomeDir, portalConfig.appJobsDir, sessionId);
 
         if (!await sftpExists(sftp, jobDir)) {
           return { code: "NOT_FOUND" };
@@ -324,8 +331,11 @@ export const slurmAppOps = (cluster: string): AppOps => {
               if (displayId) {
                 // the server is run at the compute node
                 // login to the compute node and refresh the password
-                return await sshConnect(host, "root", logger, async (computeNodeSsh) => {
-                  const password = await refreshPassword(computeNodeSsh, userId, logger, displayId!);
+
+                // connect as user so that
+                // the service node doesn't need to be able to connect to compute nodes with public key
+                return await sshConnect(host, userId, logger, async (computeNodeSsh) => {
+                  const password = await refreshPassword(computeNodeSsh, null, logger, displayId!);
                   return {
                     code: "OK",
                     appId: sessionMetadata.appId,

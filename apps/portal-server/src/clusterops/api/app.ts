@@ -22,6 +22,7 @@ export interface CreateAppRequest {
   /** in minutes */
   maxTime: number;
   customAttributes: { [key: string]: string };
+  userSbatchOptions: string[];
 }
 
 export type CreateAppReply = {

@@ -10,44 +10,21 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { RunningJob } from "@scow/protos/build/common/job";
+import { getRunningJobs } from "@scow/lib-slurm";
+import { sshConnect } from "@scow/lib-ssh";
 import { JobOps } from "src/clusterops/api/job";
 import { SlurmClusterInfo } from "src/clusterops/slurm";
-import { executeScript } from "src/clusterops/slurm/utils/slurm";
+import { handleSimpleResponse, throwIfNotReturn0 } from "src/clusterops/slurm/utils/slurm";
+import { rootKeyPair } from "src/config/env";
 
 export const slurmJobOps = ({ slurmConfig, executeSlurmScript }: SlurmClusterInfo): JobOps => {
 
   return {
     getRunningJobs: async ({ request, logger }) => {
       const { userId, accountNames, jobIdList } = request;
-      const separator = "__x__x__";
-      const result = await executeScript(
-        slurmConfig,
-        "squeue",
-        [
-          "-o",
-          ["%A", "%P", "%j", "%u", "%T", "%M", "%D", "%R", "%a", "%C", "%q", "%V", "%Y", "%l", "%Z"].join(separator),
-          "--noheader",
-          ...userId ? ["-u", userId] : [],
-          ...accountNames.length > 0 ? ["-A", accountNames.join(",")] : [],
-          ...jobIdList.length > 0 ? ["-j", jobIdList.join(",")] : [],
-        ], {}, logger);
-
-      const jobs = result.stdout.split("\n").filter((x) => x).map((x) => {
-        const [
-          jobId,
-          partition, name, user, state, runningTime,
-          nodes, nodesOrReason, account, cores,
-          qos, submissionTime, nodesToBeUsed, timeLimit, workingDir,
-        ] = x.split(separator);
-
-        return {
-          jobId,
-          partition, name, user, state, runningTime,
-          nodes, nodesOrReason, account, cores,
-          qos, submissionTime, nodesToBeUsed, timeLimit,
-          workingDir,
-        } as RunningJob;
+      
+      const jobs = await sshConnect(slurmConfig.managerUrl, "root", rootKeyPair, logger, async (ssh) => {
+        return await getRunningJobs(ssh, "root", { userId, accountNames, jobIdList }, logger);
       });
 
       return { jobs };
@@ -60,6 +37,8 @@ export const slurmJobOps = ({ slurmConfig, executeSlurmScript }: SlurmClusterInf
       if (result.code === 7) {
         return { code: "NOT_FOUND" };
       }
+
+      throwIfNotReturn0(result);
 
       // format is [d-]hh:mm:ss, 5-00:00:00 or 00:03:00
       // convert to second
@@ -78,11 +57,7 @@ export const slurmJobOps = ({ slurmConfig, executeSlurmScript }: SlurmClusterInf
 
       const result = await executeSlurmScript(["-n", jobId, delta + ""], logger);
 
-      if (result.code === 7) {
-        return { code: "NOT_FOUND" };
-      }
-
-      return { code: "OK" };
+      return handleSimpleResponse(result, { 7: "NOT_FOUND" });
     },
   };
 };

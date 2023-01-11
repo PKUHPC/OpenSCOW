@@ -8,6 +8,10 @@ on:
     branches:
       - master
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
 env:
   GITHUB_CR: ghcr.io
   # ALIYUN_CR: registry.cn-hangzhou.aliyuncs.com
@@ -131,7 +135,7 @@ jobs:
         uses: docker/setup-buildx-action@v2
 
       - name: Log in to the GitHub Container registry
-        uses: docker/login-action@bc135a1993a1d0db3e9debefa0cfcb70443cc94c
+        uses: docker/login-action@3da7dc6e2b31f99ef2cb9fb4c50fb0971e0d0139
         with:
           registry: ${{ env.GITHUB_CR }}
           username: ${{ github.actor }}

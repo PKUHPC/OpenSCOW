@@ -108,7 +108,7 @@ export const RunningJobQueryTable: React.FC<Props> = ({
             button={(
               <Space>
                 <Button type="primary" htmlType="submit">搜索</Button>
-                <Button onClick={reload} disabled={isLoading}>刷新</Button>
+                <Button onClick={reload} loading={isLoading}>刷新</Button>
               </Space>
             )}
             tabs={[

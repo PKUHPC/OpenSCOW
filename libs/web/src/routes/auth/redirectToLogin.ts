@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { joinWithUrl } from "@scow/utils";
 import { NextApiRequest, NextApiResponse } from "next";
 import { join } from "path";
 
@@ -18,9 +19,7 @@ export const redirectToAuthLogin = (req: NextApiRequest, res: NextApiResponse, a
 
   const callbackUrl = url.origin + join(process.env.NEXT_PUBLIC_BASE_PATH || "/", "/api/auth/callback");
 
-  const target = authExternalUrl
-    + (authExternalUrl.endsWith("/") ? "" : "/")
-    + `public/auth?callbackUrl=${encodeURIComponent(callbackUrl)}`;
+  const target = joinWithUrl(authExternalUrl, `public/auth?callbackUrl=${encodeURIComponent(callbackUrl)}`);
 
   res.redirect(target);
 };

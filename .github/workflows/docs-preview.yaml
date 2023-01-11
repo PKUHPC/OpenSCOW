@@ -1,0 +1,39 @@
+name: Deploy Docs Preview to GitHub Pages
+
+on:
+  pull_request:
+    branches: [master]
+    types: ["opened", "reopened", "synchronize", "closed"]
+    paths:
+      - docs/**
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  deploy-docs-preview:
+    name: Deploy Docs Preview
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2.2.4
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm i --frozen-lockfile
+
+      - name: Build website
+        run: pnpm run --filter docs... build
+        env:
+          GIT_PLATFORM: github
+          CR_URL: ghcr.io/pkuhpc/scow
+          BASE_PATH: /${{ github.event.repository.name }}/pr-preview/pr-${{ github.event.number }}/
+
+      - name: Deploy preview
+        uses: rossjrw/pr-preview-action@v1
+        with:
+          source-dir: ./docs/build/

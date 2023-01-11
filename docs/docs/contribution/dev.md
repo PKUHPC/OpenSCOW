@@ -22,7 +22,9 @@ title: 开发
 
 ## 开始开发
 
-要开始开发，请确保安装了以下依赖：
+本项目配置了[VSCode Dev Container](https://code.visualstudio.com/docs/devcontainers/containers)功能，您可以使用`.devcontainer`下的配置自动从GitHub打开一个Codespace或者使用VSCode生成一个开发用的容器。具体如何使用，请参考Dev Container的文档。
+
+下面介绍本地开发。要在本地开发，请确保安装了以下依赖：
 
 - [docker](https://docs.docker.com/engine/install/)
 - [docker compose](https://docs.docker.com/compose/install/)
@@ -107,6 +109,7 @@ pnpm build
 - 可以通过`22222`端口连接的SSH服务器
     - 可以直接使用本地的`~/.ssh/id_rsa.pub`登录`root`和`test`用户，也可以通过用户名`test`、密码`test`登录`test`用户
 - 可以通过`389`端口连接的LDAP服务器，详情参考[LDAP文档](../deploy/SCOW/auth/ldap.md#LDAP镜像)
+- 可以通过`3890`端口访问的[phpLDAPadmin](https://phpldapadmin.sourceforge.net/wiki/index.php/Main_Page)，可以用于登录`389`端口的LDAP服务器
 
 ```bash
 # 构建并启动开发环境

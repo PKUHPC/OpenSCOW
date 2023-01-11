@@ -32,16 +32,16 @@ export class JobInfo {
   @Property({ index: "idJob" })
     idJob!: number;
 
-  @Property({ length: 20, comment: "账户", index: "account" })
+  @Property({ length: 255, comment: "账户", index: "account" })
     account!: string;
 
-  @Property({ length: 20, comment: "用户名", index: "user" })
+  @Property({ length: 127, comment: "用户名", index: "user" })
     user!: string;
 
   @Property({ length: 255, columnType: "tinytext", comment: "分区" })
     partition!: string;
 
-  @Property({ columnType: "text", length: 65535, comment: "使用节点列表" })
+  @Property({ columnType: "text", comment: "使用节点列表" })
     nodelist!: string;
 
   @Property({ length: 255, columnType: "tinytext", comment: "作业名" })
