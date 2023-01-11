@@ -104,7 +104,7 @@ export default route<GetPaymentsSchema>("GetPaymentsSchema", async (req, res) =>
   return {
     200: {
       results: accounts,
-      total: moneyToNumber(reply.total),
+      total: accounts.reduce((prev, curr) => prev.amount + curr.amount, 0),
     },
   };
 });
