@@ -86,7 +86,7 @@ export default route<GetPaymentsSchema>("GetPaymentsSchema", async (req, res) =>
 
   const returnAuditInfo = user.tenantRoles.includes(TenantRole.TENANT_FINANCE);
 
-  const accounts = reply.results.map((x) => {
+  const accounts = reply.results.filter((x) => x.accountName !== undefined).map((x) => {
     const obj = ensureNotUndefined(x, ["time", "amount"]);
 
     return {
