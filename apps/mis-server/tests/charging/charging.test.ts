@@ -194,11 +194,11 @@ it("returns payment records", async () => {
 
   const request1: PayRequest = {
     accountName: account.accountName,
+    tenantName: account.tenant.getProperty("name"),
     amount: amount1,
     comment: "comment",
     operatorId: "tester",
     ipAddress: "127.0.0.1",
-    tenantName: account.tenant.getProperty("name"),
     type: "test",
   };
 
@@ -219,6 +219,8 @@ it("returns payment records", async () => {
   await asyncClientCall(client, "pay", request2);
 
   await reloadEntity(em, account);
+  await reloadEntity(em, account.tenant.getEntity());
+  
   expect(account.balance.toNumber()).toBe(10);
   expect(account.tenant.getProperty("balance").toNumber()).toBe(20);
 
