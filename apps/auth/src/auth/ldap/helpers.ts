@@ -17,7 +17,7 @@ import { promisify } from "util";
 
 export const useLdap = (
   logger: FastifyBaseLogger,
-  config: LdapConfigSchema,
+  config: Pick<LdapConfigSchema, "bindDN" | "bindPassword" | "url">,
   user: { dn: string, password: string } = { dn: config.bindDN, password: config.bindPassword },
 ) => {
 
@@ -28,12 +28,15 @@ export const useLdap = (
       logger.error(err, "LDAP Error occurred.");
     });
 
-    await promisify(client.bind.bind(client))(user.dn, user.password);
-
-    return await consume(client).finally(() => {
-      client.destroy();
+    const unbind = async () => {
+      await promisify(client.unbind.bind(client))();
       logger.info("Disconnected LDAP connection.");
-    });
+    };
+
+    return await (async () => {
+      await promisify(client.bind.bind(client))(user.dn, user.password);
+      return await consume(client);
+    })().finally(unbind);
   };
 };
 
