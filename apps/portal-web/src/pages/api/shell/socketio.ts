@@ -76,6 +76,17 @@ export default async (req: NextApiRequest, res: AugmentedNextApiResponse) => {
 
       log("Connected to shell");
 
+      stream.on("error", (err) => {
+        log("Error occurred from server. Disconnect.", err);
+        socket.emit("exit", { exitCode: -1 });
+      });
+
+      socket.on("error", (err) => {
+        log("Error occurred from client. Disconnect.", err);
+        stream.write({ message: { $case: "disconnect", disconnect: {} } });
+        stream.end();
+      });
+
       stream.on("data", (chunk: ShellResponse) => {
         switch (chunk.message?.$case) {
         case "data":
@@ -86,7 +97,6 @@ export default async (req: NextApiRequest, res: AugmentedNextApiResponse) => {
           break;
         }
       });
-
       socket.on("resize", (data: { cols: number, rows: number }) => {
         stream.write({ message: { $case: "resize", resize: { cols: data.cols, rows: data.rows } } });
       });
