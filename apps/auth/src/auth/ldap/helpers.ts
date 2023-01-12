@@ -24,6 +24,10 @@ export const useLdap = (
   return async <T>(consume: (client: ldapjs.Client) => Promise<T>): Promise<T> => {
     const client = ldapjs.createClient(({ url: config.url, log: logger }));
 
+    client.on("error", (err) => {
+      logger.error(err, "LDAP Error occurred.");
+    });
+
     await promisify(client.bind.bind(client))(user.dn, user.password);
 
     return await consume(client).finally(() => {
