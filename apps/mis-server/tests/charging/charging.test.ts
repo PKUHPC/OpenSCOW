@@ -241,7 +241,7 @@ it("returns payment records", async () => {
     amount: request1.amount,
   } as Partial<PaymentRecord>);
 
-  expect(reply1.total).toBe(numberToMoney(10));
+  expect(reply1.total).toStrictEqual(numberToMoney(10));
 
   // not set accountName, set tenantName
   const reply2 = await asyncClientCall(client, "getPaymentRecords", {
@@ -260,7 +260,7 @@ it("returns payment records", async () => {
     amount: request2.amount,
   } as Partial<PaymentRecord>);
 
-  expect(reply2.total).toBe(numberToMoney(20));
+  expect(reply2.total).toStrictEqual(numberToMoney(20));
 
   // not set accountName, not set tenantName
   const reply3 = await asyncClientCall(client, "getPaymentRecords", {
@@ -278,6 +278,6 @@ it("returns payment records", async () => {
     amount: request2.amount,
   } as Partial<PaymentRecord>);
 
-  expect(reply3.total).toBe(numberToMoney(20));
+  expect(reply3.total).toStrictEqual(numberToMoney(20));
 
 });
