@@ -83,7 +83,7 @@ export const PaymentTable: React.FC<Props> = ({
                 )
               : (
                 <Form.Item label="账户" name="accountName">
-                  <Input />
+                  <Input placeholder="不输入账户时显示租户充值记录" />
                 </Form.Item>
               )
           }
