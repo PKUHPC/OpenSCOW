@@ -72,7 +72,7 @@ export const platformAdminRoutes: (platformRoles: PlatformRole[]) => NavItemProp
           children: [
             {
               Icon: PlusSquareOutlined,
-              text: "账户充值",
+              text: "租户充值",
               path: "/admin/finance/pay",
             },
             {

@@ -147,8 +147,7 @@ export const chargingServiceServer = plugin((server) => {
       const { tenantName, accountName, endTime, startTime } = ensureNotUndefined(request, ["startTime", "endTime"]);
 
       const records = await em.find(PayRecord, {
-        time: { $gte: startTime, $lte: endTime },
-        ...accountName !== undefined ? { accountName } : {},
+        time: { $gte: startTime, $lte: endTime }, accountName,
         ...tenantName !== undefined ? { tenantName } : {},
       }, { orderBy: { time: QueryOrder.DESC } });
 

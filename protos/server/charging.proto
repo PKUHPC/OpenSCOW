@@ -94,8 +94,8 @@ message PaymentRecord {
 }
 
 // If account_name is set, return records of the account, ignoring tenant_name.
-// If account_name is not set and tenant_name is set, return records of the
-// tenant. If none is set, return all
+// If account_name is not set and tenant_name is set, return records of this tenant.
+// If none is set, return records of all tenants.
 message GetPaymentRecordsRequest {
   google.protobuf.Timestamp start_time = 1;
   google.protobuf.Timestamp end_time = 2;
