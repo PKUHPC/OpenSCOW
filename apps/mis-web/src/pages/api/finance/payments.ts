@@ -21,7 +21,7 @@ import { getClient } from "src/utils/client";
 
 export interface PaymentInfo {
   index: number;
-  accountName: string;
+  accountName?: string;
   time: string;
   type: string;
   amount: number;
@@ -86,7 +86,7 @@ export default route<GetPaymentsSchema>("GetPaymentsSchema", async (req, res) =>
 
   const returnAuditInfo = user.tenantRoles.includes(TenantRole.TENANT_FINANCE);
 
-  const accounts = reply.results.filter((x) => x.accountName !== undefined).map((x) => {
+  const records = reply.results.map((x) => {
     const obj = ensureNotUndefined(x, ["time", "amount"]);
 
     return {
@@ -103,8 +103,8 @@ export default route<GetPaymentsSchema>("GetPaymentsSchema", async (req, res) =>
 
   return {
     200: {
-      results: accounts,
-      total: accounts.reduce((prev, curr) => prev + curr.amount, 0),
+      results: records,
+      total: moneyToNumber(reply.total),
     },
   };
 });
