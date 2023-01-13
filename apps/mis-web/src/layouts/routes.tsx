@@ -11,7 +11,7 @@
  */
 
 import {
-  AccountBookOutlined, BookOutlined, ClockCircleOutlined, CloudServerOutlined,
+  AccountBookOutlined, BookOutlined, CloudServerOutlined,
   DashboardOutlined,
   InfoOutlined, MoneyCollectOutlined, PartitionOutlined,
   PlusOutlined, PlusSquareOutlined, UserAddOutlined,
@@ -32,11 +32,6 @@ export const platformAdminRoutes: (platformRoles: PlatformRole[]) => NavItemProp
     clickable: false,
     children: [
       ...(platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ? [
-        {
-          Icon: ClockCircleOutlined,
-          text: "获取作业",
-          path: "/admin/fetchJobs",
-        },
         {
           Icon: UserOutlined,
           text: "导入用户",
