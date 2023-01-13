@@ -73,8 +73,6 @@ export const searchOne = async <T>(
 
         found = true;
         logger.info("Get an entry with valid info. dn: %s.", entry.dn);
-        res.removeAllListeners();
-        res.emit("end");
         resolve({ ...val, dn: entry.dn });
       });
 
