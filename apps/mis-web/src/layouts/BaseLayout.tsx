@@ -15,7 +15,6 @@ import { BaseLayout as LibBaseLayout } from "@scow/lib-web/build/layouts/base/Ba
 import { JumpToAnotherLink } from "@scow/lib-web/build/layouts/base/header/components";
 import { PropsWithChildren, useMemo } from "react";
 import { useStore } from "simstate";
-import { DefaultClusterSelector } from "src/layouts/DefaultClusterSelector";
 import { getAvailableRoutes } from "src/layouts/routes";
 import { UserStore } from "src/stores/UserStore";
 import { publicConfig } from "src/utils/config";
@@ -38,7 +37,6 @@ export const BaseLayout = ({ footerText, children }: PropsWithChildren<Props>) =
       footerText={footerText}
       headerRightContent={(
         <>
-          <DefaultClusterSelector />
           <JumpToAnotherLink
             user={userStore.user}
             icon={<DesktopOutlined style={{ paddingRight: 2 }} />}
