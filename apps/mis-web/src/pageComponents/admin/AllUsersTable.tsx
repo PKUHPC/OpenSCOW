@@ -62,7 +62,8 @@ export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
           form={form}
           initialValues={query}
           onFinish={async () => {
-            setQuery(await form.validateFields());
+            const { idOrName } = await form.validateFields();
+            setQuery({ idOrName: idOrName === "" ? undefined : idOrName });
           }}
         >
           <Form.Item label="用户ID或者姓名" name="idOrName">

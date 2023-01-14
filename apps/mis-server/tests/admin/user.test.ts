@@ -163,28 +163,93 @@ it("get all users", async () => {
   expect(users.platformUsers.map((x) => ({
     userId: x.userId,
     name: x.name,
+    availAccounts: x.availAccounts,
+    tenantName: x.tenantName,
     createTime: x.createTime,
     platformRoles: x.platformRoles,
   }))).toIncludeSameMembers([
     {
       userId: data.userA.userId,
       name: data.userA.name,
+      availAccounts: [data.accountA.accountName],
+      tenantName: data.userA.tenant.getProperty("name"),
       createTime: data.userA.createTime.toISOString(),
       platformRoles: data.userA.platformRoles,
     },
     {
       userId: data.userB.userId,
       name: data.userB.name,
+      availAccounts: [data.accountA.accountName, data.accountB.accountName],
+      tenantName: data.userB.tenant.getProperty("name"),
       createTime: data.userB.createTime.toISOString(),
       platformRoles: data.userB.platformRoles,
     },
     {
       userId: data.userC.userId,
       name: data.userC.name,
+      availAccounts: [],
+      tenantName: data.userC.tenant.getProperty("name"),
       createTime: data.userC.createTime.toISOString(),
       platformRoles: data.userC.platformRoles,
     },
   ]);
+});
+
+it("get all users with idOrName", async () => {
+  const data = await insertInitialData(server.ext.orm.em.fork());
+
+  // with id
+  const users1 = await asyncClientCall(client, "getAllUsers", {
+    page:1,
+    pageSize:10,
+    idOrName: "a",
+  });
+
+  expect(users1.totalCount).toBe(1);
+  expect(users1.platformUsers.map((x) => ({
+    userId: x.userId,
+    name: x.name,
+    availAccounts: x.availAccounts,
+    tenantName: x.tenantName,
+    createTime: x.createTime,
+    platformRoles: x.platformRoles,
+  }))).toIncludeSameMembers([
+    {
+      userId: data.userA.userId,
+      name: data.userA.name,
+      availAccounts: [data.accountA.accountName],
+      tenantName: data.userA.tenant.getProperty("name"),
+      createTime: data.userA.createTime.toISOString(),
+      platformRoles: data.userA.platformRoles,
+    },
+  ]);
+
+  // with name
+  const users2 = await asyncClientCall(client, "getAllUsers", {
+    page:1,
+    pageSize:10,
+    idOrName: "BName",
+  });
+
+  expect(users2.totalCount).toBe(1);
+  expect(users2.platformUsers.map((x) => ({
+    userId: x.userId,
+    name: x.name,
+    availAccounts: x.availAccounts,
+    tenantName: x.tenantName,
+    createTime: x.createTime,
+    platformRoles: x.platformRoles,
+  }))).toIncludeSameMembers([
+    {
+      userId: data.userB.userId,
+      name: data.userB.name,
+      availAccounts: [data.accountA.accountName, data.accountB.accountName],
+      tenantName: data.userB.tenant.getProperty("name"),
+      createTime: data.userB.createTime.toISOString(),
+      platformRoles: data.userB.platformRoles,
+    },
+  ]);
+  
 });
 
 it("manage platform role", async () => {

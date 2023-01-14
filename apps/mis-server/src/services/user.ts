@@ -441,20 +441,31 @@ export const userServiceServer = plugin((server) => {
 
     getAllUsers: async ({ request, em }) => {
 
-      const { page, pageSize } = request;
+      const { page, pageSize, idOrName } = request;
 
-      const [users, count] = await em.findAndCount(User, {}, {
+      const [users, count] = await em.findAndCount(User, idOrName ? {
+        $or: [
+          { userId: idOrName },
+          { name: idOrName },
+        ],
+      } : {}, {
         ...paginationProps(page, pageSize || 10),
       });
 
       return [{
         totalCount: count,
-        platformUsers: users.map((x) => ({
+        platformUsers: await Promise.all(users.map(async (x) => ({
           userId: x.userId,
           name: x.name,
+          availAccounts: await Promise.all((await x.accounts.loadItems())
+            .filter((ua) => ua.status === UserStatus.UNBLOCKED)
+            .map(async (ua) => {
+              return (await ua.account.load()).accountName;
+            })),
+          tenantName: (await x.tenant.load()).name,
           createTime: x.createTime.toISOString(),
           platformRoles: x.platformRoles.map(platformRoleFromJSON),
-        })),
+        }))),
       }];
     },
 
