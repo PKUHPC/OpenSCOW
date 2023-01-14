@@ -32,6 +32,7 @@ export interface GetAllUsersSchema {
        */
       pageSize?: number;
 
+      idOrName?: string;
     };
 
     responses: {
@@ -49,12 +50,13 @@ export default route<GetAllUsersSchema>("GetAllUsersSchema",
       return;
     }
 
-    const { page = 1, pageSize } = req.query;
+    const { page = 1, pageSize, idOrName } = req.query;
 
     const client = getClient(UserServiceClient);
     const result = await asyncClientCall(client, "getAllUsers", {
       page,
       pageSize,
+      idOrName,
     });
 
     return {

@@ -50,6 +50,7 @@ export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
     return await api.getAllUsers({ query: {
       page: pageInfo.page,
       pageSize: pageInfo.pageSize,
+      idOrName: query.idOrName,
     } });
   }, [query, pageInfo]);
   const { data, isLoading, reload } = useAsync({ promiseFn, watch: refreshToken });
@@ -118,6 +119,12 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
       >
         <Table.Column<PlatformUserInfo> dataIndex="userId" title="用户ID" />
         <Table.Column<PlatformUserInfo> dataIndex="name" title="姓名" />
+        <Table.Column<PlatformUserInfo> dataIndex="tenantName" title="所属租户" />
+        <Table.Column<PlatformUserInfo> 
+          dataIndex="availAccounts" 
+          title="可用账户" 
+          render={(accounts) => accounts.join(",")}
+        />
         <Table.Column<PlatformUserInfo>
           dataIndex="createTime"
           title="创建时间"
