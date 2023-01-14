@@ -29,7 +29,7 @@ export const PlatformRole = {
 export type PlatformRole = ValueOf<typeof PlatformRole>;
 
 export const PlatformRoleTexts = {
-  [PlatformRole.PLATFORM_FINANCE]: "财务人员",
+  [PlatformRole.PLATFORM_FINANCE]: "平台财务人员",
   [PlatformRole.PLATFORM_ADMIN]: "平台管理员",
 };
 
