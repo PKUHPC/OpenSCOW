@@ -16,7 +16,6 @@ import { Decimal } from "@scow/lib-decimal";
 import { clusters } from "src/config/clusters";
 import { JobPriceInfo } from "src/entities/JobInfo";
 import { AmountStrategy, JobPriceItem } from "src/entities/JobPriceItem";
-import { DEFAULT_TENANT_NAME } from "src/utils/constants";
 
 export interface JobInfo {
   biJobIndex: number;
@@ -97,7 +96,7 @@ export async function createPriceMap(em: SqlEntityManager<MySqlDriver>, logger: 
 
     const [cluster, partition, qos] = path;
 
-    if (tenantName && tenantName !== DEFAULT_TENANT_NAME && tenantName in tenantSpecificPrices) {
+    if (tenantName && tenantName in tenantSpecificPrices) {
       const specific = tenantSpecificPrices[tenantName][[cluster, partition, qos].join(".")] ||
         tenantSpecificPrices[tenantName][[cluster, partition].join(".")];
 
@@ -148,7 +147,7 @@ export async function createPriceMap(em: SqlEntityManager<MySqlDriver>, logger: 
     getPriceMap: (tenantName) => {
       return {
         ...defaultPrices,
-        ...(tenantName && tenantName !== DEFAULT_TENANT_NAME) ? tenantSpecificPrices[tenantName] : undefined,
+        ...(tenantName) ? tenantSpecificPrices[tenantName] : undefined,
       };
     },
 
