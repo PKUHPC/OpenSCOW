@@ -87,7 +87,7 @@ export const tenantRoutes: (tenantRoles: TenantRole[]) => NavItemProps[] = (tena
     Icon: CloudServerOutlined,
     text: "租户管理",
     path: "/tenant",
-    clickToPath: "/tenant/info",
+    clickToPath: tenantRoles.includes(TenantRole.TENANT_ADMIN) ? "/tenant/info" : "/tenant/finance/payAccount",
     children: [
       ...(tenantRoles.includes(TenantRole.TENANT_ADMIN) ? [
         {
@@ -286,7 +286,7 @@ export const getAvailableRoutes = (user: User | undefined): NavItemProps[] => {
     routes.push(...tenantRoutes(user.tenantRoles));
   }
 
-  if (user.platformRoles.includes(PlatformRole.PLATFORM_ADMIN)) {
+  if (user.platformRoles.length !== 0) {
     routes.push(...platformAdminRoutes(user.platformRoles));
   }
 
