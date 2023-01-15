@@ -450,22 +450,23 @@ export const userServiceServer = plugin((server) => {
         ],
       } : {}, {
         ...paginationProps(page, pageSize || 10),
+        populate: ["tenant", "accounts", "accounts.account"],
       });
 
       return [{
         totalCount: count,
-        platformUsers: await Promise.all(users.map(async (x) => ({
+        platformUsers: users.map((x) => ({
           userId: x.userId,
           name: x.name,
-          availableAccounts: await Promise.all((await x.accounts.loadItems())
+          availableAccounts: x.accounts.getItems()
             .filter((ua) => ua.status === UserStatus.UNBLOCKED)
-            .map(async (ua) => {
-              return (await ua.account.load()).accountName;
-            })),
-          tenantName: (await x.tenant.load()).name,
+            .map((ua) => {
+              return ua.account.getProperty("accountName");
+            }),
+          tenantName: x.tenant.$.name,
           createTime: x.createTime.toISOString(),
           platformRoles: x.platformRoles.map(platformRoleFromJSON),
-        }))),
+        })),
       }];
     },
 
