@@ -239,7 +239,7 @@ message GetUsersResponse {
 message PlatformUserInfo {
   string user_id = 1;
   string name = 2;
-  repeated string avail_accounts = 3;
+  repeated string available_accounts = 3;
   string tenant_name = 4;
   google.protobuf.Timestamp create_time = 5;
   repeated PlatformRole platform_roles = 6;

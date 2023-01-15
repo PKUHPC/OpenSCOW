@@ -140,7 +140,7 @@ export const mockApi: MockApi<typeof api> = {
       {
         userId: "123",
         name: "testuser",
-        availAccounts: ["a_123"],
+        availableAccounts: ["a_123"],
         tenantName: "tenant1",
         createTime: "2022-10-05T23:49:50.000Z",
         platformRoles: [PlatformRole.PLATFORM_FINANCE, PlatformRole.PLATFORM_ADMIN],
@@ -148,7 +148,7 @@ export const mockApi: MockApi<typeof api> = {
       {
         userId: "test01",
         name: "test01",
-        availAccounts: ["a_test", "a_test01"],
+        availableAccounts: ["a_test", "a_test01"],
         tenantName: "tenant2",
         createTime: "2022-10-05T23:49:50.000Z",
         platformRoles: [PlatformRole.PLATFORM_FINANCE, PlatformRole.PLATFORM_ADMIN],
@@ -156,7 +156,7 @@ export const mockApi: MockApi<typeof api> = {
       {
         userId: "test02",
         name: "test02",
-        availAccounts: ["a_test", "a_test02"],
+        availableAccounts: ["a_test", "a_test02"],
         tenantName: "tenant2",
         createTime: "2022-10-05T23:49:50.000Z",
         platformRoles: [PlatformRole.PLATFORM_FINANCE],
@@ -164,7 +164,7 @@ export const mockApi: MockApi<typeof api> = {
       {
         userId: "test03",
         name: "test03",
-        availAccounts: ["a_test", "a_test03"],
+        availableAccounts: ["a_test", "a_test03"],
         tenantName: "tenant2",
         createTime: "2022-10-05T23:49:50.000Z",
         platformRoles: [],

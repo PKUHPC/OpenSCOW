@@ -121,7 +121,7 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
         <Table.Column<PlatformUserInfo> dataIndex="name" title="姓名" />
         <Table.Column<PlatformUserInfo> dataIndex="tenantName" title="所属租户" />
         <Table.Column<PlatformUserInfo> 
-          dataIndex="availAccounts" 
+          dataIndex="availableAccounts" 
           title="可用账户" 
           render={(accounts) => accounts.join(",")}
         />

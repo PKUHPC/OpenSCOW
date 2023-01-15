@@ -457,7 +457,7 @@ export const userServiceServer = plugin((server) => {
         platformUsers: await Promise.all(users.map(async (x) => ({
           userId: x.userId,
           name: x.name,
-          availAccounts: await Promise.all((await x.accounts.loadItems())
+          availableAccounts: await Promise.all((await x.accounts.loadItems())
             .filter((ua) => ua.status === UserStatus.UNBLOCKED)
             .map(async (ua) => {
               return (await ua.account.load()).accountName;

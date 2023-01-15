@@ -163,7 +163,7 @@ it("get all users", async () => {
   expect(users.platformUsers.map((x) => ({
     userId: x.userId,
     name: x.name,
-    availAccounts: x.availAccounts,
+    availableAccounts: x.availableAccounts,
     tenantName: x.tenantName,
     createTime: x.createTime,
     platformRoles: x.platformRoles,
@@ -171,7 +171,7 @@ it("get all users", async () => {
     {
       userId: data.userA.userId,
       name: data.userA.name,
-      availAccounts: [data.accountA.accountName],
+      availableAccounts: [data.accountA.accountName],
       tenantName: data.userA.tenant.getProperty("name"),
       createTime: data.userA.createTime.toISOString(),
       platformRoles: data.userA.platformRoles,
@@ -179,7 +179,7 @@ it("get all users", async () => {
     {
       userId: data.userB.userId,
       name: data.userB.name,
-      availAccounts: [data.accountA.accountName, data.accountB.accountName],
+      availableAccounts: [data.accountA.accountName, data.accountB.accountName],
       tenantName: data.userB.tenant.getProperty("name"),
       createTime: data.userB.createTime.toISOString(),
       platformRoles: data.userB.platformRoles,
@@ -187,7 +187,7 @@ it("get all users", async () => {
     {
       userId: data.userC.userId,
       name: data.userC.name,
-      availAccounts: [],
+      availableAccounts: [],
       tenantName: data.userC.tenant.getProperty("name"),
       createTime: data.userC.createTime.toISOString(),
       platformRoles: data.userC.platformRoles,
@@ -209,7 +209,7 @@ it("get all users with idOrName", async () => {
   expect(users1.platformUsers.map((x) => ({
     userId: x.userId,
     name: x.name,
-    availAccounts: x.availAccounts,
+    availableAccounts: x.availableAccounts,
     tenantName: x.tenantName,
     createTime: x.createTime,
     platformRoles: x.platformRoles,
@@ -217,7 +217,7 @@ it("get all users with idOrName", async () => {
     {
       userId: data.userA.userId,
       name: data.userA.name,
-      availAccounts: [data.accountA.accountName],
+      availableAccounts: [data.accountA.accountName],
       tenantName: data.userA.tenant.getProperty("name"),
       createTime: data.userA.createTime.toISOString(),
       platformRoles: data.userA.platformRoles,
@@ -235,7 +235,7 @@ it("get all users with idOrName", async () => {
   expect(users2.platformUsers.map((x) => ({
     userId: x.userId,
     name: x.name,
-    availAccounts: x.availAccounts,
+    availableAccounts: x.availableAccounts,
     tenantName: x.tenantName,
     createTime: x.createTime,
     platformRoles: x.platformRoles,
@@ -243,7 +243,7 @@ it("get all users with idOrName", async () => {
     {
       userId: data.userB.userId,
       name: data.userB.name,
-      availAccounts: [data.accountA.accountName, data.accountB.accountName],
+      availableAccounts: [data.accountA.accountName, data.accountB.accountName],
       tenantName: data.userB.tenant.getProperty("name"),
       createTime: data.userB.createTime.toISOString(),
       platformRoles: data.userB.platformRoles,
