@@ -441,10 +441,16 @@ export const userServiceServer = plugin((server) => {
 
     getAllUsers: async ({ request, em }) => {
 
-      const { page, pageSize } = request;
+      const { page, pageSize, idOrName } = request;
 
-      const [users, count] = await em.findAndCount(User, {}, {
+      const [users, count] = await em.findAndCount(User, idOrName ? {
+        $or: [
+          { userId: idOrName },
+          { name: idOrName },
+        ],
+      } : {}, {
         ...paginationProps(page, pageSize || 10),
+        populate: ["tenant", "accounts", "accounts.account"],
       });
 
       return [{
@@ -452,6 +458,12 @@ export const userServiceServer = plugin((server) => {
         platformUsers: users.map((x) => ({
           userId: x.userId,
           name: x.name,
+          availableAccounts: x.accounts.getItems()
+            .filter((ua) => ua.status === UserStatus.UNBLOCKED)
+            .map((ua) => {
+              return ua.account.getProperty("accountName");
+            }),
+          tenantName: x.tenant.$.name,
           createTime: x.createTime.toISOString(),
           platformRoles: x.platformRoles.map(platformRoleFromJSON),
         })),
