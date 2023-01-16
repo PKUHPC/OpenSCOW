@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "",
   "main": "build/index.js",
-  "private": false,
+  "private": true,
   "scripts": {
     "build": "rimraf build && tsc -p tsconfig.build.json"
   },
