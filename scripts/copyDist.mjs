@@ -24,11 +24,11 @@
  */
 
 import fs from "node:fs";
-import { join } from "node:path";
-import { promisify } from "node:util";
+import path, { join } from "node:path";
 
 import { readWantedLockfile } from "@pnpm/lockfile-file";
-import rimraf from "rimraf";
+import { globby } from "globby";
+import { rimraf } from "rimraf";
 
 const APPS_BASE_PATH = "apps";
 const DIST_BASE_PATH = "dist";
@@ -75,11 +75,13 @@ const getRequiredFiles = async (packageRoot) => {
 console.log("Creating dist folder ", DIST_BASE_PATH);
 await fs.promises.mkdir(DIST_BASE_PATH, { recursive: true });
 
-const rimrafAsync = promisify(rimraf);
-
 const cleanTsFiles = async (dir) => {
-  await rimrafAsync(join(dir, "**/*.ts"));
-  await rimrafAsync(join(dir, "**/*.map"));
+  // find all deleted files
+  if (!(await fs.promises.stat(dir)).isDirectory()) {
+    return;
+  }
+  const files = await globby(["**/*.ts", "**/*.map"].map((p) => path.posix.join(dir, p)));
+  await rimraf(files);
 };
 
 const cp = async (source, target) => {
