@@ -794,6 +794,17 @@
           "scale": 4,
           "default": "0.0000",
           "mappedType": "decimal"
+        },
+        "create_time": {
+          "name": "create_time",
+          "type": "DATETIME(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 0,
+          "default": "current_timestamp(0)",
+          "mappedType": "datetime"
         }
       },
       "name": "tenant",
