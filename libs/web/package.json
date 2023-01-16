@@ -15,7 +15,7 @@
     "@scow/utils": "workspace:*"
   },
   "peerDependencies": {
-    "antd": "5.1.2",
+    "antd": "5.1.5",
     "next": "13.0.2",
     "styled-components": "5.3.6"
   },
