@@ -6,7 +6,7 @@ importers:
     specifiers:
       '@commitlint/config-conventional': 17.4.0
       '@ddadaal/eslint-config': 1.9.0
-      '@pnpm/lockfile-file': 6.0.5
+      '@pnpm/lockfile-file': 7.0.2
       '@pnpm/logger': 5.0.0
       '@types/jest': 29.2.5
       '@types/node': 18.11.18
@@ -40,7 +40,7 @@ importers:
     devDependencies:
       '@commitlint/config-conventional': 17.4.0
       '@ddadaal/eslint-config': 1.9.0_nwjeoxexcxrs5guqcm64hj5lrq
-      '@pnpm/lockfile-file': 6.0.5_@pnpm+logger@5.0.0
+      '@pnpm/lockfile-file': 7.0.2_@pnpm+logger@5.0.0
       '@pnpm/logger': 5.0.0
       '@types/jest': 29.2.5
       '@types/node': 18.11.18
@@ -4429,9 +4429,9 @@ packages:
       - supports-color
     dev: true
 
-  /@pnpm/constants/6.1.0:
-    resolution: {integrity: sha512-L6AiU3OXv9kjKGTJN9j8n1TeJGDcLX9atQlZvAkthlvbXjvKc5SKNWESc/eXhr5nEfuMWhQhiKHDJCpYejmeCQ==}
-    engines: {node: '>=14.19'}
+  /@pnpm/constants/6.2.0:
+    resolution: {integrity: sha512-GlDVUkeTR2WK0oZAM+wtDY6RBMLw6b0Z/5qKgBbDszx4e+R7CHyfG7JofyypogRCfeWXeAXp2C2FkFTh+sNgIg==}
+    engines: {node: '>=14.6'}
     dev: true
 
   /@pnpm/crypto.base32-hash/1.0.1:
@@ -4441,8 +4441,8 @@ packages:
       rfc4648: 1.5.2
     dev: true
 
-  /@pnpm/dependency-path/1.0.1:
-    resolution: {integrity: sha512-fwce4spFpKilE0GwQnhN2D1gSYknBHS4qxrpHMXnoF6Pyvk0GfTYV8L9tlpNOTJ8SJPWFnsg5MbdWZnvXGXw2w==}
+  /@pnpm/dependency-path/1.1.1:
+    resolution: {integrity: sha512-DISm2k/SfSTRu8zTzu8u4dg4be3rlcOq5pP12pW3fhaB4ILdPg/cTyDiX725MjxswSCgh1wMO11812cRxkNDIQ==}
     engines: {node: '>=14.6'}
     dependencies:
       '@pnpm/crypto.base32-hash': 1.0.1
@@ -4451,11 +4451,11 @@ packages:
       semver: 7.3.8
     dev: true
 
-  /@pnpm/error/4.0.0:
-    resolution: {integrity: sha512-NI4DFCMF6xb1SA0bZiiV5KrMCaJM2QmPJFC6p78FXujn7FpiRSWhT9r032wpuQumsl7DEmN4s3wl/P8TA+bL8w==}
+  /@pnpm/error/4.0.1:
+    resolution: {integrity: sha512-6UFakGqUDhnZVzYCfN+QaG1epxtBVS1M9mb9RzoBuvWxcimBYTT04fdYuyk1Nay8y/TvAVl3AVB/lCziWG0+2w==}
     engines: {node: '>=14.6'}
     dependencies:
-      '@pnpm/constants': 6.1.0
+      '@pnpm/constants': 6.2.0
     dev: true
 
   /@pnpm/git-utils/0.1.0:
@@ -4465,15 +4465,15 @@ packages:
       execa: /safe-execa/0.1.2
     dev: true
 
-  /@pnpm/lockfile-file/6.0.5_@pnpm+logger@5.0.0:
-    resolution: {integrity: sha512-GjEbK3uaOqvxtEV+PZBaiAubaexFG02B9DaNBqeb1UwP8hw1dkOW289PEDlrTBM/4543ISsbfPFj9y7P8iA7dA==}
+  /@pnpm/lockfile-file/7.0.2_@pnpm+logger@5.0.0:
+    resolution: {integrity: sha512-SXWjBO1Fz3VG1QgwN1kdGOiEfS1ESxzzsy9nMJ933SOdKwn1nYe+ztpyJPqMg84+cjpAj+LacYDToTPVja+b6Q==}
     engines: {node: '>=14.6'}
     peerDependencies:
       '@pnpm/logger': ^5.0.0
     dependencies:
-      '@pnpm/constants': 6.1.0
-      '@pnpm/dependency-path': 1.0.1
-      '@pnpm/error': 4.0.0
+      '@pnpm/constants': 6.2.0
+      '@pnpm/dependency-path': 1.1.1
+      '@pnpm/error': 4.0.1
       '@pnpm/git-utils': 0.1.0
       '@pnpm/lockfile-types': 4.3.6
       '@pnpm/logger': 5.0.0
