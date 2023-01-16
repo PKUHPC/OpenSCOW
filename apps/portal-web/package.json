@@ -17,7 +17,9 @@
     "next.config.js",
     "config.js",
     "assets",
-    "api-routes-schemas.json"
+    "api-routes-schemas.json",
+    "!**/*.map",
+    "!**/*.ts"
   ],
   "author": "PKUHPC (https://github.com/PKUHPC)",
   "license": "Mulan PSL v2",

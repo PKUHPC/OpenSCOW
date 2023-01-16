@@ -9,7 +9,9 @@
     "build": "rimraf build && tsc"
   },
   "files": [
-    "build"
+    "build",
+    "!**/*.map",
+    "!**/*.ts"
   ],
   "dependencies": {
     "long": "5.2.1",

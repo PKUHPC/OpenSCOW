@@ -8,7 +8,9 @@
     "build": "rimraf build && tsc -p tsconfig.build.json"
   },
   "files": [
-    "build"
+    "build",
+    "!**/*.map",
+    "!**/*.ts"
   ],
   "author": "PKUHPC (https://github.com/PKUHPC)",
   "license": "Mulan PSL v2",

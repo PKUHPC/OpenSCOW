@@ -14,7 +14,9 @@
   "files": [
     "scripts",
     "build",
-    ".npmrc"
+    ".npmrc",
+    "!**/*.map",
+    "!**/*.ts"
   ],
   "keywords": [],
   "author": "PKUHPC (https://github.com/PKUHPC)",

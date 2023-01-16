@@ -9,7 +9,9 @@
     "test": "jest"
   },
   "files": [
-    "build"
+    "build",
+    "!**/*.map",
+    "!**/*.ts"
   ],
   "author": "PKUHPC (https://github.com/PKUHPC)",
   "license": "Mulan PSL v2",

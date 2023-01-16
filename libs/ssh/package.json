@@ -9,7 +9,9 @@
     "test": "jest"
   },
   "files": [
-    "build"
+    "build",
+    "!**/*.map",
+    "!**/*.ts"
   ],
   "dependencies": {
     "node-ssh": "13.0.0",

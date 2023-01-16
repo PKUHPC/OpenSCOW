@@ -13,7 +13,9 @@
   "files": [
     "build",
     "public",
-    "views"
+    "views",
+    "!**/*.map",
+    "!**/*.ts"
   ],
   "keywords": [],
   "author": "PKUHPC (https://github.com/PKUHPC)",
