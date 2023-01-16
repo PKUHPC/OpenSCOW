@@ -21,7 +21,7 @@ export interface UpdateBlockStatusSchema {
   method: "POST";
 
   responses: {
-    200: { updateBlockCount: number }
+    200: null;
   }
 }
 const auth = authenticate((info) => info.platformRoles.includes(PlatformRole.PLATFORM_ADMIN));
@@ -34,7 +34,7 @@ export default route<UpdateBlockStatusSchema>("UpdateBlockStatusSchema",
 
     const client = getClient(AdminServiceClient);
 
-    const reply = await asyncClientCall(client, "UpdateBlockStatus", {});
-    return { 200: { updateBlockCount: reply.updateBlockCount } };
+    await asyncClientCall(client, "updateBlockStatus", {});
+    return { 200: null };
 
   });

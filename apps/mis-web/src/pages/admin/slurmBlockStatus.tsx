@@ -64,10 +64,11 @@ export const SlurmBlockStatusPage: NextPage = requireAuth((u) => u.platformRoles
                       {data.lastRun ? formatDateTime(data.lastRun) : "未封锁过"}
                     </span>
                     <DisabledA
-                      onClick={() => {
+                      onClick={async () => {
+
                         setRunning(true);
-                        api.updateBlockStatus({})
-                          .then(({ updateBlockCount }) => { message.success(`刷新成功，刷新${updateBlockCount}条封锁用户`); })
+                        await api.updateBlockStatus({})
+                          .then(() => { message.success("刷新成功"); })
                           .finally(() => { setRunning(false); });
                       }}
                       disabled={running}

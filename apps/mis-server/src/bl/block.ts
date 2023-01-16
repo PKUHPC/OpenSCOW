@@ -11,9 +11,61 @@
  */
 
 import { Logger } from "@ddadaal/tsgrpc-server";
+import { ServiceError, status } from "@grpc/grpc-js";
+import { UniqueConstraintViolationException } from "@mikro-orm/core";
+import { MySqlDriver, SqlEntityManager } from "@mikro-orm/mysql";
 import { Account } from "src/entities/Account";
+import { SystemState } from "src/entities/SystemState";
 import { UserAccount, UserStatus } from "src/entities/UserAccount";
 import { ClusterPlugin } from "src/plugins/clusters";
+
+
+/**
+ * Update block status of accounts and users in the slurm.
+ * If it is whitelisted, it doesn't block.
+ *
+ * @returns Updated number of blocked accounts and users
+ **/
+export async function updateBlockStatusInSlurm(
+  em: SqlEntityManager<MySqlDriver>, clusterPlugin: ClusterPlugin["clusters"], logger: Logger,
+) {
+  const accounts = await em.find(Account, { blocked: true });
+  for (const account of accounts) {
+    if (account.whitelist) {
+      continue;
+    }
+    await clusterPlugin.callOnAll(logger, async (ops) => await ops.account.blockAccount({
+      request: { accountName: account.accountName },
+      logger,
+    }));
+  }
+
+  const userAccounts = await em.find(UserAccount, {
+    status: UserStatus.BLOCKED,
+  }, { populate: ["user", "account"]});
+  for (const ua of userAccounts) {
+    await clusterPlugin.callOnAll(logger, async (ops) => ops.user.blockUserInAccount({
+      request: {
+        accountName: ua.account.getProperty("accountName"),
+        userId: ua.user.getProperty("userId"),
+      },
+      logger,
+    }));
+  }
+  const updateTime = new SystemState(SystemState.KEYS.UPDATE_SLURM_BLOCK_STATUS, new Date().toISOString());
+  try {
+    await em.persistAndFlush(updateTime);
+  } catch (e) {
+    if (e instanceof UniqueConstraintViolationException) {
+      throw <ServiceError> {
+        code: status.ALREADY_EXISTS, message: "already initialized",
+      };
+    } else {
+      throw e;
+    }
+  }
+
+}
 
 /**
  * Blocks the account in the slurm.

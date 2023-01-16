@@ -11,6 +11,7 @@
  */
 
 import { Server } from "@ddadaal/tsgrpc-server";
+import { updateBlockStatusInSlurm } from "src/bl/block";
 import { config } from "src/config/env";
 import { plugins } from "src/plugins";
 import { accountServiceServer } from "src/services/account";
@@ -41,6 +42,9 @@ export async function createServer() {
   await server.register(jobServiceServer);
   await server.register(chargingServiceServer);
   await server.register(tenantServiceServer);
+
+  const em = server.ext.orm.em.fork();
+  await updateBlockStatusInSlurm(em, server.ext.clusters, server.logger);
 
   return server;
 }

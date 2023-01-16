@@ -14,6 +14,7 @@ import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { AdminServiceServer, AdminServiceService } from "@scow/protos/build/server/admin";
+import { updateBlockStatusInSlurm } from "src/bl/block";
 import { importUsers, ImportUsersData } from "src/bl/importUsers";
 import { Account } from "src/entities/Account";
 import { StorageQuota } from "src/entities/StorageQuota";
@@ -170,9 +171,9 @@ export const adminServiceServer = plugin((server) => {
       return [reply];
     },
 
-    updateBlockStatus: async () => {
-
-      return [{ updateBlockCount: 123 }];
+    updateBlockStatus: async ({ em, logger }) => {
+      await updateBlockStatusInSlurm(em, server.ext.clusters, logger);
+      return [{}];
     },
 
   });
