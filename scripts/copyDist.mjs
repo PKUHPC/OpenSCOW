@@ -24,11 +24,10 @@
  */
 
 import fs from "node:fs";
-import path, { join } from "node:path";
+import { join } from "node:path";
 
 import { readWantedLockfile } from "@pnpm/lockfile-file";
 import { globby } from "globby";
-import { rimraf } from "rimraf";
 
 const APPS_BASE_PATH = "apps";
 const DIST_BASE_PATH = "dist";
@@ -67,22 +66,17 @@ const getRequiredFiles = async (packageRoot) => {
   if (!packageJson.files) {
     throw new Error("No files specified in package.json of " + packageRoot);
   }
-  return DEFAULT_COPY_ITEMS.concat(packageJson.files);
+
+  // find the files
+  const files = await globby(packageJson.files, { cwd: packageRoot });
+
+  return DEFAULT_COPY_ITEMS.concat(files);
 
 };
 
 // create dist folder
 console.log("Creating dist folder ", DIST_BASE_PATH);
 await fs.promises.mkdir(DIST_BASE_PATH, { recursive: true });
-
-const cleanTsFiles = async (dir) => {
-  // find all deleted files
-  if (!(await fs.promises.stat(dir)).isDirectory()) {
-    return;
-  }
-  const files = await globby(["**/*.ts", "**/*.map"].map((p) => path.posix.join(dir, p)));
-  await rimraf(files);
-};
 
 const cp = async (source, target) => {
   await fs.promises.cp(source, target, { recursive: true });
@@ -109,7 +103,6 @@ for (const [name, value] of Object.entries(snapshot.dependencies)) {
     const to = join(DIST_BASE_PATH, libDir, file);
 
     await cp(from, to);
-    await cleanTsFiles(to);
   }
 }
 
@@ -121,5 +114,4 @@ for (const file of requiredFiles) {
   const to = join(DIST_BASE_PATH, appDir, file);
 
   await cp(from, to);
-  await cleanTsFiles(to);
 }

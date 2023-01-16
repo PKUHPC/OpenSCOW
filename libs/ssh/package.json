@@ -1,14 +1,17 @@
 {
   "name": "@scow/lib-ssh",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "",
   "main": "build/index.js",
+  "private": true,
   "scripts": {
     "build": "rimraf build && tsc -p tsconfig.build.json",
     "test": "jest"
   },
   "files": [
-    "build"
+    "build",
+    "!**/*.map",
+    "!**/*.ts"
   ],
   "dependencies": {
     "node-ssh": "13.0.0",
@@ -19,9 +22,9 @@
     "@types/ssh2": "1.11.7",
     "ts-log": "2.2.5"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "PKUHPC (https://github.com/PKUHPC)",
+  "license": "Mulan PSL v2",
+  "repository": "https://github.com/PKUHPC/SCOW",
   "volta": {
     "extends": "../../package.json"
   }
