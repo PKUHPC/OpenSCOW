@@ -18,15 +18,15 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@ddadaal/tsgrpc-server": "0.18.1",
-    "@ddadaal/tsgrpc-common": "0.2.0",
-    "@grpc/grpc-js": "1.8.1",
+    "@ddadaal/tsgrpc-server": "0.18.2",
+    "@ddadaal/tsgrpc-common": "0.2.1",
+    "@grpc/grpc-js": "1.8.4",
     "@scow/config": "workspace:*",
     "@scow/lib-config": "workspace:*",
     "@scow/lib-slurm": "workspace:*",
     "@scow/lib-ssh": "workspace:*",
     "@scow/protos": "workspace:*",
-    "@sinclair/typebox": "0.25.17",
+    "@sinclair/typebox": "0.25.20",
     "dotenv": "16.0.3",
     "node-cron": "3.0.2",
     "uuid": "9.0.0",
@@ -36,7 +36,7 @@
     "dayjs": "1.11.7"
   },
   "devDependencies": {
-    "@ddadaal/tsgrpc-client": "0.17.2",
+    "@ddadaal/tsgrpc-client": "0.17.3",
     "@types/node-cron": "3.0.7",
     "@types/wait-on": "5.3.1",
     "@types/shell-quote": "1.7.1"
