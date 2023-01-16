@@ -1,7 +1,7 @@
 {
   "name": "@scow/lib-auth",
   "version": "0.1.0",
-  "private": false,
+  "private": true,
   "description": "",
   "main": "build/index.js",
   "scripts": {
