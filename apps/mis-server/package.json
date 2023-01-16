@@ -1,8 +1,9 @@
 {
   "name": "@scow/mis-server",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "",
-  "main": "index.js",
+  "private": true,
+  "main": "build/index.js",
   "scripts": {
     "dev": "dotenv -e env/.env.dev -- node --watch -r ts-node/register -r tsconfig-paths/register src/index.ts",
     "build": "rimraf build && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
@@ -16,8 +17,9 @@
     ".npmrc"
   ],
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "PKUHPC (https://github.com/PKUHPC)",
+  "license": "Mulan PSL v2",
+  "repository": "https://github.com/PKUHPC/SCOW",
   "dependencies": {
     "@ddadaal/tsgrpc-server": "0.18.2",
     "@ddadaal/tsgrpc-common": "0.2.1",

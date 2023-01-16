@@ -1,17 +1,18 @@
 {
   "name": "@scow/lib-slurm",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "",
   "main": "build/index.js",
+  "private": false,
   "scripts": {
     "build": "rimraf build && tsc -p tsconfig.build.json"
   },
   "files": [
     "build"
   ],
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "PKUHPC (https://github.com/PKUHPC)",
+  "license": "Mulan PSL v2",
+  "repository": "https://github.com/PKUHPC/SCOW",
   "dependencies": {
     "@scow/lib-ssh": "workspace:*",
     "@scow/protos": "workspace:*"

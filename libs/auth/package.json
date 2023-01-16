@@ -1,6 +1,7 @@
 {
   "name": "@scow/lib-auth",
-  "version": "1.0.0",
+  "version": "0.1.0",
+  "private": false,
   "description": "",
   "main": "build/index.js",
   "scripts": {
@@ -10,9 +11,9 @@
   "files": [
     "build"
   ],
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "PKUHPC (https://github.com/PKUHPC)",
+  "license": "Mulan PSL v2",
+  "repository": "https://github.com/PKUHPC/SCOW",
   "dependencies": {},
   "devDependencies": {
     "ts-log": "2.2.5"
