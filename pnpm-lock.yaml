@@ -30,7 +30,7 @@ importers:
       pino-pretty: 9.1.1
       pkg: 5.8.0
       pm2: 5.2.2
-      rimraf: 3.0.2
+      rimraf: 4.0.7
       ts-jest: 29.0.3
       ts-node: 10.9.1
       tsc-alias: 1.8.2
@@ -64,7 +64,7 @@ importers:
       pino-pretty: 9.1.1
       pkg: 5.8.0
       pm2: 5.2.2
-      rimraf: 3.0.2
+      rimraf: 4.0.7
       ts-jest: 29.0.3_p6ekqnroyms5nhqbfxosryz7rm
       ts-node: 10.9.1_awa2wsr5thmg3i7jqycphctjfq
       tsc-alias: 1.8.2
@@ -14849,6 +14849,12 @@ packages:
     hasBin: true
     dependencies:
       glob: 7.2.3
+
+  /rimraf/4.0.7:
+    resolution: {integrity: sha512-CUEDDrZvc0swDgVdXGiv3FcYYQMpJxjvSGt85Amj6yU+MCVWurrLCeLiJDdJPHCzNJnwuebBEdcO//eP11Xa7w==}
+    engines: {node: '>=14'}
+    hasBin: true
+    dev: true
 
   /rtl-detect/1.0.4:
     resolution: {integrity: sha512-EBR4I2VDSSYr7PkBmFy04uhycIpDKp+21p/jARYXlCSjQksTBQcJ0HFUPOO79EPPH5JS6VAhiIQbycf0O3JAxQ==}
