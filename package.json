@@ -15,7 +15,8 @@
     "prepare": "node -e \"try { require('husky').install() } catch (e) {if (e.code !== 'MODULE_NOT_FOUND') throw e}\"",
     "lint": "turbo run lint:ts lint:protos",
     "lint:ts": "eslint --cache --ext .tsx,.ts .",
-    "lint:protos": "buf lint"
+    "lint:protos": "buf lint",
+    "publish:ci": "pnpm publish -r"
   },
   "devDependencies": {
     "turbo": "1.7.0",

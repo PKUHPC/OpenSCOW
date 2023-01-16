@@ -70,6 +70,40 @@ jobs:
         with:
           files: ./libs/auth/coverage/lcov.info,./libs/ssh/coverage/lcov.info,./libs/libconfig/coverage/lcov.info,./libs/decimal/coverage/lcov.info,./apps/auth/coverage/lcov.info,./apps/mis-server/coverage/lcov.info,./apps/portal-server/coverage/lcov.info
 
+  packages:
+    name: Build, Version and Publish packages
+    needs: test
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: pnpm/action-setup@v2.2.4
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm i --frozen-lockfile
+
+      - name: Build libs
+        run: pnpm build:libs
+
+      - name: Create Release Pull Request or Publish
+        id: changesets
+        uses: changesets/action@v1
+        if: github.ref == 'refs/heads/master'
+        with:
+          publish: pnpm run publish
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+
   build-images:
     needs: test
     runs-on: ubuntu-latest
