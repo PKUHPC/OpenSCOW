@@ -29,10 +29,16 @@ const rootPackageJson = readPackageJson("./package.json");
 // read version from a app package
 const portalWebPackageJson = readPackageJson("./apps/portal-web/package.json");
 
-console.log("App version is %s", portalWebPackageJson.version);
-rootPackageJson.version = portalWebPackageJson.version;
+console.log("App version is %s. Root version is %s", portalWebPackageJson.version, rootPackageJson.version);
 
-// write back to root package.json
+if (portalWebPackageJson.version === rootPackageJson.version) {
+  console.log("App Version is not changed. Ignored.");
+  process.exit(0);
+}
+
+console.log("App Version is changed. Update root package.json version");
+
+rootPackageJson.version = portalWebPackageJson.version;
 fs.writeFileSync("./package.json", JSON.stringify(rootPackageJson, null, 2));
 
 
