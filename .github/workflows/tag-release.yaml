@@ -11,12 +11,11 @@ concurrency: ${{ github.workflow }}-${{ github.ref }}
 jobs:
   tag-if-needed:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     steps:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 2
+          token: ${{ secrets.SCOW_DEPLOYMENT_PAT }}
       - uses: fregante/setup-git-user@v1
       - uses: actions/setup-node@v3
         with:
