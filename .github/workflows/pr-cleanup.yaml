@@ -16,6 +16,7 @@ jobs:
           owner: PKUHPC
           repository: scow-deployment
           branches: ${{ github.event.number }}/merge
+          soft_fail: true
 
   delete-scow-vagrant:
     name: Delete scow-vagrant PR branch
@@ -28,3 +29,4 @@ jobs:
           owner: PKUHPC
           repository: scow-vagrant
           branches: ${{ github.event.number }}/merge
+          soft_fail: true
