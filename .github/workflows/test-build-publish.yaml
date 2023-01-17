@@ -79,7 +79,9 @@ jobs:
         uses: changesets/action@v1
         if: github.ref == 'refs/heads/master'
         with:
-          publish: pnpm publish:ci
+          version: pnpm ci:version
+          publish: pnpm ci:publish
+          createGithubReleases: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}

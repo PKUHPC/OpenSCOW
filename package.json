@@ -1,6 +1,7 @@
 {
   "name": "scow",
   "private": true,
+  "version": "0.1.0",
   "scripts": {
     "build": "turbo run build",
     "build:libs": "turbo run build --filter \"./libs/**\"",
@@ -16,7 +17,8 @@
     "lint": "turbo run lint:ts lint:protos",
     "lint:ts": "eslint --cache --ext .tsx,.ts .",
     "lint:protos": "buf lint",
-    "publish:ci": "pnpm publish -r"
+    "ci:version": "node scripts/version.mjs",
+    "ci:publish": "pnpm publish -r"
   },
   "devDependencies": {
     "turbo": "1.7.0",
