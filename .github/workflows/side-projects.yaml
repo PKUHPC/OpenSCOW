@@ -2,6 +2,7 @@ name: Update side projects
 
 on:
   push:
+    tags: ["**"]
     branches: [master]
   pull_request:
     branches: [master]
@@ -9,7 +10,6 @@ on:
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
-
 
 jobs:
   scow-deployment:
@@ -24,7 +24,8 @@ jobs:
           token: ${{ secrets.SCOW_DEPLOYMENT_PAT }}
           folder: ./deploy/local
           repository-name: PKUHPC/scow-deployment
-          branch: ${{ github.ref_name }}
+          branch: ${{ github.ref_type == 'branch' && github.ref_name || 'master' }}
+          tag: ${{ github.ref_type == 'tag' && github.ref_name || null }}
 
   scow-vagrant:
     name: Update scow-vagrant
@@ -38,4 +39,5 @@ jobs:
           token: ${{ secrets.SCOW_DEPLOYMENT_PAT }}
           folder: ./deploy/vagrant
           repository-name: PKUHPC/scow-vagrant
-          branch: ${{ github.ref_name }}
+          branch: ${{ github.ref_type == 'branch' && github.ref_name || 'master' }}
+          tag: ${{ github.ref_type == 'tag' && github.ref_name || null }}
