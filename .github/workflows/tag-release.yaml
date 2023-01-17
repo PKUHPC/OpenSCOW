@@ -1,0 +1,26 @@
+name: Tag a release
+on:
+  push:
+    paths:
+      - package.json
+    branches:
+      - "master"
+
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+
+jobs:
+  tag-if-needed:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
+      - uses: fregante/setup-git-user@v1
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+
+      - name: Create tag if needed
+        run: node scripts/tag.mjs

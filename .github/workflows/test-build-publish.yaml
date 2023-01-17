@@ -5,12 +5,12 @@ on:
   pull_request:
     branches: [master]
   push:
+    tags:
+      - "**"
     branches:
       - master
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
-  cancel-in-progress: true
+concurrency: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
 
 env:
   GITHUB_CR: ghcr.io
@@ -79,7 +79,9 @@ jobs:
         uses: changesets/action@v1
         if: github.ref == 'refs/heads/master'
         with:
-          publish: pnpm publish:ci
+          version: pnpm ci:version
+          publish: pnpm ci:publish
+          createGithubReleases: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
