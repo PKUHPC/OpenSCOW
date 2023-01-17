@@ -1,18 +1,21 @@
 {
   "name": "@scow/lib-config",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "",
+  "private": false,
   "main": "build/index.js",
   "scripts": {
     "build": "rimraf build && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
     "test": "jest"
   },
   "files": [
-    "build"
+    "build",
+    "!**/*.map",
+    "!**/*.ts"
   ],
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "PKUHPC (https://github.com/PKUHPC)",
+  "license": "Mulan PSL v2",
+  "repository": "https://github.com/PKUHPC/SCOW",
   "dependencies": {
     "@sinclair/typebox": "0.25.20",
     "ajv": "8.12.0",

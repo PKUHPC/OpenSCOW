@@ -1,8 +1,9 @@
 {
   "name": "@scow/auth",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "",
-  "main": "index.js",
+  "main": "build/index.js",
+  "private": true,
   "scripts": {
     "build": "rimraf build && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
     "dev": "node --watch -r ts-node/register -r tsconfig-paths/register src/index.ts",
@@ -12,11 +13,14 @@
   "files": [
     "build",
     "public",
-    "views"
+    "views",
+    "!**/*.map",
+    "!**/*.ts"
   ],
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "PKUHPC (https://github.com/PKUHPC)",
+  "license": "Mulan PSL v2",
+  "repository": "https://github.com/PKUHPC/SCOW",
   "dependencies": {
     "@fastify/error": "3.2.0",
     "@fastify/formbody": "7.4.0",
