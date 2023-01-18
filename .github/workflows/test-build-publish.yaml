@@ -174,4 +174,4 @@ jobs:
           file: dockerfiles/Dockerfile.${{ matrix.file }}
           labels: ${{ steps.meta.outputs.labels }}
           # only build arm64 in master commits
-          platforms: linux/amd64${{ github.ref == 'refs/heads/master' && ',linux/arm64' || '' }}
+          platforms: linux/amd64${{ github.ref_type == 'tag' && ',linux/arm64' || '' }}
