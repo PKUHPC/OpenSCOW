@@ -18,8 +18,7 @@
     "config.js",
     "assets",
     "api-routes-schemas.json",
-    "!**/*.map",
-    "!**/*.ts"
+    "!**/*.map"
   ],
   "author": "PKUHPC (https://github.com/PKUHPC)",
   "license": "Mulan PSL v2",

@@ -10,8 +10,7 @@
   },
   "files": [
     "build",
-    "!**/*.map",
-    "!**/*.ts"
+    "!**/*.map"
   ],
   "dependencies": {
     "node-ssh": "13.0.0",

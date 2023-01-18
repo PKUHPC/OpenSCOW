@@ -11,8 +11,7 @@
   "files": [
     "build",
     "icons",
-    "!**/*.map",
-    "!**/*.ts"
+    "!**/*.map"
   ],
   "dependencies": {
     "@scow/utils": "workspace:*"

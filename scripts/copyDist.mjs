@@ -67,6 +67,9 @@ const getRequiredFiles = async (packageRoot) => {
     throw new Error("No files specified in package.json of " + packageRoot);
   }
 
+  // filter out ts files
+  packageJson.files.push("!**/*.ts");
+
   // find the files
   const files = await globby(packageJson.files, { cwd: packageRoot });
 

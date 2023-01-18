@@ -14,8 +14,7 @@
     "assets",
     "build",
     ".npmrc",
-    "!**/*.map",
-    "!**/*.ts"
+    "!**/*.map"
   ],
   "author": "PKUHPC (https://github.com/PKUHPC)",
   "license": "Mulan PSL v2",
