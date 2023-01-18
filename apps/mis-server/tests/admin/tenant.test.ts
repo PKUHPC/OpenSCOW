@@ -51,6 +51,7 @@ it("get all tenants", async () => {
     userCount: x.userCount,
     accountCount:x.accountCount,
     balance: x.balance,
+    createTime: x.createTime,
   }))).toIncludeSameMembers([
     {
       tenantId: data.tenant.id,
@@ -58,6 +59,7 @@ it("get all tenants", async () => {
       userCount: 2,
       accountCount:2,
       balance: decimalToMoney(data.tenant.balance),
+      createTime: data.tenant.createTime.toISOString(),
     },
     {
       tenantId: data.anotherTenant.id,
@@ -65,6 +67,7 @@ it("get all tenants", async () => {
       userCount: 1,
       accountCount:1,
       balance: decimalToMoney(data.anotherTenant.balance),
+      createTime: data.anotherTenant.createTime.toISOString(),
     },
 
   ]);

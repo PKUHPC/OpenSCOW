@@ -82,6 +82,7 @@ export const tenantServiceServer = plugin((server) => {
             userCount: userCount[`${x.id}`] ?? 0,
             accountCount: accountCount[`${x.id}`] ?? 0,
             balance:decimalToMoney(x.balance),
+            createTime: x.createTime.toISOString(),
           })),
         }];
     },

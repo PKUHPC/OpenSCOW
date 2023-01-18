@@ -37,3 +37,5 @@ export async function reloadEntities(em: EntityManager, entities: any[]) {
 }
 
 export const DATETIME_TYPE = "DATETIME(6)";
+
+export const CURRENT_TIMESTAMP = "CURRENT_TIMESTAMP(6)";
