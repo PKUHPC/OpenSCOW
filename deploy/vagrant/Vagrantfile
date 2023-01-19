@@ -36,7 +36,7 @@ vm_list = [
         :mem => "4096",
         :cpu => "4",
         :sshport => 22288,
-        :box => "icode/scow",
+        :box => "icode/scow_blank",
 		    :role => "scow",
         :is_service_node => false
     }
