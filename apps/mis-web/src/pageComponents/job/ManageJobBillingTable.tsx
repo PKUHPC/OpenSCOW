@@ -237,29 +237,34 @@ const EditPriceModal: React.FC<CommonModalProps & {
         <Form.Item label="计费项ID">
           <strong>{nextId}</strong>
         </Form.Item>
-        <Form.Item label="计费策略" name="amount" rules={[{ required: true }]}>
-          <Space>
-            <Select 
-              options={
-                Object.values(AmountStrategy)
-                  .map((x) => ({ label: AmountStrategyDescribe[x], value: x }))} 
-              placeholder="请选择计费策略"
-              dropdownMatchSelectWidth={false}
+        <Form.Item 
+          label={(
+            <Space>
+              {"计费策略"}
+              <Popover
+                title={"总量算法"}
+                content={(
+                  <div>
+                    {Object.entries(AmountStrategyAlgorithm)
+                      .map((value) => <p key={value[0]}>{`${value[0]}: ${value[1]}`}</p>)}
+                  </div>
+                )}
+              >
+                <QuestionCircleOutlined />
+              </Popover>
+            </Space>
+          )}
+          name="amount"
+          rules={[{ required: true }]}
+        >
+          <Select 
+            options={
+              Object.values(AmountStrategy)
+                .map((x) => ({ label: AmountStrategyDescribe[x], value: x }))} 
+            placeholder="请选择计费策略"
+            dropdownMatchSelectWidth={false}
               
-            />
-            <Popover
-              title={"总量算法"}
-              content={(
-                <div>
-                  {Object.entries(AmountStrategyAlgorithm)
-                    .map((value) => <p key={value[0]}>{`${value[0]}: ${value[1]}`}</p>)}
-                </div>
-              )}
-            >
-              <QuestionCircleOutlined />
-            </Popover>
-
-          </Space>
+          />
         </Form.Item>
         <Form.Item label="价格（元）" name="price" rules={[{ required: true }]}>
           <InputNumber precision={3} min={0} defaultValue={0} />
