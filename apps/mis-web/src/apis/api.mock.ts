@@ -193,6 +193,8 @@ export const mockApi: MockApi<typeof api> = {
   getTenants: async () => ({ names: ["DEFAULT", "another"]}),
 
   getBillingItems: async () => ({ items: [
+    { id: "HPC08", path: "hpc01.compute.low", price: numberToMoney(0.01), amountStrategy: "gpu" },
+    { id: "HPC07", path: "hpc01.compute.low", price: numberToMoney(0.02), amountStrategy: "gpu" },
     { id: "HPC01", path: "hpc01.compute.low", price: numberToMoney(0.04), amountStrategy: "gpu" },
     { id: "HPC02", path: "hpc01.compute.normal", price: numberToMoney(0.06), amountStrategy: "gpu" },
     { id: "HPC03", path: "hpc01.compute.high", price: numberToMoney(0.08), amountStrategy: "gpu" },
