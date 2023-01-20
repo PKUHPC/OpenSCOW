@@ -64,3 +64,16 @@ export enum AmountStrategy {
   GPU = "gpu",
   CPUS_ALLOC = "cpusAlloc"
 }
+
+export const AmountStrategyDescribe: Record<AmountStrategy, string> = {
+  "max-cpusAlloc-mem": "按最大 CPU|内存 分配量收费",
+  "max-gpu-cpusAlloc": "按最大 GPU|CPU|内存 分配量收费",
+  "gpu": "按 GPU 分配量收费",
+  "cpusAlloc": "按 CPU 分配量收费",
+};
+export const AmountStrategyAlgorithm: Record<AmountStrategy, string> = {
+  "max-cpusAlloc-mem": "max(cpusAlloc, 向上取整(memReq / (分区内存量/分区核心数)))",
+  "max-gpu-cpusAlloc": "max(gpu, 向上取整(cpusAlloc / (分区核心数/分区gpu数)))",
+  "gpu": "gpu",
+  "cpusAlloc": "cpusAlloc",
+};
