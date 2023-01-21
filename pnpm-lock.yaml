@@ -17,7 +17,7 @@ importers:
       cross-env: 7.0.3
       cz-conventional-changelog: 3.3.0
       dotenv: 16.0.3
-      dotenv-cli: 6.0.0
+      dotenv-cli: 7.0.0
       eslint: 8.32.0
       eslint-import-resolver-typescript: 3.5.3
       eslint-plugin-import: 2.27.4
@@ -53,7 +53,7 @@ importers:
       cross-env: 7.0.3
       cz-conventional-changelog: 3.3.0
       dotenv: 16.0.3
-      dotenv-cli: 6.0.0
+      dotenv-cli: 7.0.0
       eslint: 8.32.0
       eslint-import-resolver-typescript: 3.5.3_yx6e7nyocrpjlofwba2pq5a2ny
       eslint-plugin-import: 2.27.4_26i2w5mui4ucix7iyirx6fcd3i
@@ -116,6 +116,9 @@ importers:
     devDependencies:
       '@types/asn1': 0.2.0
       '@types/ldapjs': 2.2.5
+
+  apps/gateway:
+    specifiers: {}
 
   apps/mis-server:
     specifiers:
@@ -8219,18 +8222,18 @@ packages:
     dependencies:
       is-obj: 2.0.0
 
-  /dotenv-cli/6.0.0:
-    resolution: {integrity: sha512-qXlCOi3UMDhCWFKe0yq5sg3X+pJAz+RQDiFN38AMSbUrnY3uZshSfDJUAge951OS7J9gwLZGfsBlWRSOYz/TRg==}
+  /dotenv-cli/7.0.0:
+    resolution: {integrity: sha512-XfMzVdpdDTRnlcgvFLg3lSyiLXqFxS4tH7RbK5IxkC4XIUuxPyrGoDufkfLjy/dA28EILzEu+mros6h8aQmyGg==}
     hasBin: true
     dependencies:
       cross-spawn: 7.0.3
       dotenv: 16.0.3
-      dotenv-expand: 8.0.3
+      dotenv-expand: 10.0.0
       minimist: 1.2.7
     dev: true
 
-  /dotenv-expand/8.0.3:
-    resolution: {integrity: sha512-SErOMvge0ZUyWd5B0NXMQlDkN+8r+HhVUsxgOO7IoPDOdDRD2JjExpN6y3KnFR66jsJMwSn1pqIivhU5rcJiNg==}
+  /dotenv-expand/10.0.0:
+    resolution: {integrity: sha512-GopVGCpVS1UKH75VKHGuQFqS1Gusej0z4FyQkPdwjil2gNIv+LNsqBlboOzpJFZKVT95GkCyWJbBSdFEFUWI2A==}
     engines: {node: '>=12'}
     dev: true
 
