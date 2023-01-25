@@ -8,7 +8,8 @@ const analyze = process.env.ANALYZE === "true";
 
 const { buildRuntimeConfig } = require("./config.js");
 
-const BASE_PATH = process.env.BASE_PATH || "/";
+const BASE_PATH = (!process.env.BASE_PATH || process.env.BASE_PATH === "/") ? "" : process.env.BASE_PATH;
+
 
 module.exports = async (phase) => {
 
@@ -23,8 +24,8 @@ module.exports = async (phase) => {
    */
   const config = {
     ...runtimeConfig,
-    basePath: BASE_PATH === "/" ? undefined : BASE_PATH,
-    assetPrefix: BASE_PATH === "/" ? undefined : BASE_PATH,
+    basePath: BASE_PATH || undefined,
+    assetPrefix: BASE_PATH || undefined,
     webpack(config, options) {
       config.plugins.forEach((i) => {
         if (i instanceof options.webpack.DefinePlugin) {
