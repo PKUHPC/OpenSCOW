@@ -117,9 +117,7 @@ function MyApp({ Component, pageProps, extra }: Props) {
           id="__CONFIG__"
           dangerouslySetInnerHTML={{
             __html: `
-              window.__CONFIG__ = {
-                BASE_PATH: ${JSON.stringify(publicConfig.BASE_PATH)},
-              };
+              window.__CONFIG__ = ${JSON.stringify({ BASE_PATH: publicConfig.BASE_PATH })};
             `,
           }}
         />

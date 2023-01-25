@@ -23,6 +23,7 @@ module.exports = async (phase) => {
    */
   const config = {
     ...runtimeConfig,
+    basePath: BASE_PATH,
     assetPrefix: BASE_PATH,
     webpack(config, options) {
       config.plugins.forEach((i) => {

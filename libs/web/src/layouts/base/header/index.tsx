@@ -63,13 +63,14 @@ interface Props {
   logout: (() => void) | undefined;
   pathname: string;
   right?: React.ReactNode;
+  basePath: string;
 }
 
 export const Header: React.FC<Props> = ({
   hasSidebar, routes,
   setSidebarCollapsed, sidebarCollapsed,
   pathname, user, logout,
-  right,
+  right, basePath,
 }) => {
   return (
     <Container>
@@ -83,7 +84,7 @@ export const Header: React.FC<Props> = ({
               </a>
             ) : undefined
           }
-          <Logo />
+          <Logo basePath={basePath} />
         </Space>
       </HeaderItem>
       <MenuPart>

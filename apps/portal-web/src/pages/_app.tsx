@@ -112,6 +112,14 @@ function MyApp({ Component, pageProps, extra }: Props) {
           type="image/x-icon"
           href={join(publicConfig.BASE_PATH, "/api/icon?type=favicon")}
         ></link>
+        <script
+          id="__CONFIG__"
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.__CONFIG__ = ${JSON.stringify({ BASE_PATH: publicConfig.BASE_PATH })};
+            `,
+          }}
+        />
       </Head>
       <StoreProvider stores={[userStore, defaultClusterStore, appsStore]}>
         <DarkModeProvider>
