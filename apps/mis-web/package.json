@@ -8,7 +8,8 @@
     "serve": "next start",
     "build": "pnpm prepareDev && npm run build:next",
     "build:next": "next build",
-    "prepareDev": "ntar schema"
+    "prepareDev": "ntar schema",
+    "client": "ntar client --basePathVar \"publicConfig.BASE_PATH || ''\" --extraImports \"import { publicConfig } from 'src/utils/config';\""
   },
   "files": [
     ".next",
@@ -64,7 +65,7 @@
     "typescript": "4.9.4"
   },
   "devDependencies": {
-    "@ddadaal/next-typed-api-routes-cli": "0.5.1",
+    "@ddadaal/next-typed-api-routes-cli": "0.6.1",
     "@next/bundle-analyzer": "13.0.2",
     "@types/google-protobuf": "3.15.6",
     "@types/mime-types": "2.1.1",

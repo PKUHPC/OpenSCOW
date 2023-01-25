@@ -100,7 +100,7 @@ const buildRuntimeConfig = async (phase) => {
   // query auth capabilities to set optional auth features
   const capabilities = await queryCapabilities(config.AUTH_INTERNAL_URL, phase);
 
-  const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
+  const basePath = process.env.BASE_PATH || "";
 
   /**
    * @type {import("./src/utils/config").PublicRuntimeConfig}
@@ -142,6 +142,8 @@ const buildRuntimeConfig = async (phase) => {
 
     PASSWORD_PATTERN: commonConfig.passwordPattern?.regex,
     PASSWORD_PATTERN_MESSAGE: commonConfig.passwordPattern?.errorMessage,
+
+    BASE_PATH: basePath,
   }
 
   if (!building) {

@@ -184,7 +184,7 @@ importers:
       '@codemirror/state': 6.2.0
       '@codemirror/theme-one-dark': 6.1.0
       '@codemirror/view': 6.7.3
-      '@ddadaal/next-typed-api-routes-cli': 0.5.1
+      '@ddadaal/next-typed-api-routes-cli': 0.6.1
       '@ddadaal/next-typed-api-routes-runtime': 0.5.2
       '@ddadaal/tsgrpc-client': 0.17.3
       '@grpc/grpc-js': 1.8.4
@@ -267,7 +267,7 @@ importers:
       tslib: 2.4.1
       typescript: 4.9.4
     devDependencies:
-      '@ddadaal/next-typed-api-routes-cli': 0.5.1
+      '@ddadaal/next-typed-api-routes-cli': 0.6.1
       '@next/bundle-analyzer': 13.0.2
       '@types/google-protobuf': 3.15.6
       '@types/mime-types': 2.1.1
@@ -335,7 +335,7 @@ importers:
       '@codemirror/state': 6.2.0
       '@codemirror/theme-one-dark': 6.1.0
       '@codemirror/view': 6.7.3
-      '@ddadaal/next-typed-api-routes-cli': 0.5.1
+      '@ddadaal/next-typed-api-routes-cli': 0.6.1
       '@ddadaal/next-typed-api-routes-runtime': 0.5.2
       '@ddadaal/tsgrpc-client': 0.17.3
       '@grpc/grpc-js': 1.8.4
@@ -440,7 +440,7 @@ importers:
       xterm: 5.1.0
       xterm-addon-fit: 0.7.0_xterm@5.1.0
     devDependencies:
-      '@ddadaal/next-typed-api-routes-cli': 0.5.1
+      '@ddadaal/next-typed-api-routes-cli': 0.6.1
       '@next/bundle-analyzer': 13.0.2
       '@testing-library/jest-dom': 5.16.5
       '@testing-library/react': 13.4.0_biqbaboplfbrettd7655fr4n2y
@@ -2589,8 +2589,8 @@ packages:
       - typescript
     dev: true
 
-  /@ddadaal/next-typed-api-routes-cli/0.5.1:
-    resolution: {integrity: sha512-PlCGfnIKRDHVWE/2J6x8TvXtqdJh6mwHji+Aet6LzHlIduF1Hchv7WZRqjBedi/wH/Wn42XhJRPgCPs6T9pq9A==}
+  /@ddadaal/next-typed-api-routes-cli/0.6.1:
+    resolution: {integrity: sha512-a5dQ1uCUt5Isw/cSWJSgnLbh18ynsi+8Qyplw2iglTGyA/HS4GUxf0dk2IuT41p05V1GGgrOB4VMjncJKzBlqQ==}
     hasBin: true
     dependencies:
       ts-json-schema-generator: 1.0.0

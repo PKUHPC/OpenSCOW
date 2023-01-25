@@ -234,6 +234,7 @@ def create_portal_server_service():
 
 def create_portal_web_service():
     pw_env = {
+        "BASE_PATH": path_join(BASE_PATH, PORTAL_PATH),
         "MIS_URL": path_join(BASE_PATH, MIS_PATH),
         "MIS_DEPLOYED": "true" if cfg.MIS else "false",
         "AUTH_EXTERNAL_URL": path_join(BASE_PATH, "/auth"),
@@ -244,7 +245,7 @@ def create_portal_web_service():
         "./config": "/etc/scow",
         # "~/.ssh": "/root/.ssh"
     }
-    portal_web = Service("portal-web", generate_image("portal-web", cfg.PORTAL["IMAGE_POSTFIX"]), None,
+    portal_web = Service("portal-web", generate_image("portal-web", None), None,
                          pw_volumes, pw_env)
     return portal_web
 
@@ -285,6 +286,7 @@ def create_mis_server_service():
 
 def create_mis_web_service():
     mv_env = {
+        "BASE_PATH": path_join(BASE_PATH, MIS_PATH),
         "PORTAL_URL": path_join(BASE_PATH, PORTAL_PATH),
         "PORTAL_DEPLOYED": "true" if cfg.PORTAL else "false",
         "AUTH_EXTERNAL_URL": path_join(BASE_PATH, "/auth"),
@@ -292,7 +294,7 @@ def create_mis_web_service():
     mv_volumes = {
         "./config": "/etc/scow",
     }
-    mis_web = Service("mis-web", generate_image("mis-web", cfg.MIS["IMAGE_POSTFIX"]), None, mv_volumes, mv_env)
+    mis_web = Service("mis-web", generate_image("mis-web", None), None, mv_volumes, mv_env)
     return mis_web
 
 def create_novnc_client():

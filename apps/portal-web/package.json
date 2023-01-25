@@ -9,7 +9,8 @@
     "build": "pnpm prepareDev && npm run build:next",
     "build:next": "next build",
     "prepareDev": "ntar schema",
-    "test": "jest --passWithNoTests"
+    "test": "jest --passWithNoTests",
+    "client": "ntar client --basePathVar \"publicConfig.BASE_PATH || ''\" --extraImports \"import { publicConfig } from 'src/utils/config';\""
   },
   "files": [
     ".next",
@@ -72,7 +73,7 @@
     "http-proxy": "1.18.1"
   },
   "devDependencies": {
-    "@ddadaal/next-typed-api-routes-cli": "0.5.1",
+    "@ddadaal/next-typed-api-routes-cli": "0.6.1",
     "@next/bundle-analyzer": "13.0.2",
     "@testing-library/jest-dom": "5.16.5",
     "@testing-library/react": "13.4.0",
