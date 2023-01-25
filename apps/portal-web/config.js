@@ -67,6 +67,7 @@ const buildRuntimeConfig = async (phase, basePath) => {
   const building = phase === PHASE_PRODUCTION_BUILD;
   const dev = phase === PHASE_DEVELOPMENT_SERVER;
   const production = phase === PHASE_PRODUCTION_SERVER;
+  const testenv = phase === PHASE_TEST;
 
   // load .env.build if in build
   if (building) {
@@ -150,12 +151,12 @@ const buildRuntimeConfig = async (phase, basePath) => {
     BASE_PATH: basePath,
   }
 
-  if (!building) {
+  if (!building && !testenv) {
     console.log("Server Runtime Config", serverRuntimeConfig);
     console.log("Public Runtime Config", publicRuntimeConfig);
   }
 
-  if (!mockEnv) {
+  if (!mockEnv && !testenv) {
 
     // HACK
     // call /api/proxy/<node>/<port>/ after 3 seconds to init the proxy ws server
