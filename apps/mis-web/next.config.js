@@ -16,7 +16,7 @@ module.exports = async (phase) => {
     BASE_PATH,
   };
 
-  const runtimeConfig = await buildRuntimeConfig(phase);
+  const runtimeConfig = await buildRuntimeConfig(phase, BASE_PATH);
 
   /**
    * @type {import("next").NextConfig}
