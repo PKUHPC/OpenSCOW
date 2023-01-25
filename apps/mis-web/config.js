@@ -112,7 +112,7 @@ const buildRuntimeConfig = async (phase, basePath) => {
     PASSWORD_PATTERN: commonConfig.passwordPattern?.regex,
     PASSWORD_PATTERN_MESSAGE: commonConfig.passwordPattern?.errorMessage,
 
-    BASE_PATH: basePath,
+    BASE_PATH: basePath || "/",
   };
 
   if (!building) {
