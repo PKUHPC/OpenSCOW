@@ -4,7 +4,7 @@ cluster_db_conf = {
     'host':'192.168.88.101',
     'port':3306,
     'user':'slurm',
-    'passwd':'81SLURM@@rabGTjN7',
+    'passwd':'123456',
     'db':'slurm_acct_db',
     'gres_id' : 1001
 }
