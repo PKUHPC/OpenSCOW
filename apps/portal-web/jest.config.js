@@ -8,6 +8,7 @@ const { compilerOptions } = require("./tsconfig.json");
 const { buildRuntimeConfig } = require("./config.js");
 const { PHASE_TEST } = require("next/constants");
 
+const BASE_PATH = (!process.env.BASE_PATH || process.env.BASE_PATH === "/") ? "" : process.env.BASE_PATH;
 
 // createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async
 module.exports = async () => {
@@ -19,7 +20,7 @@ module.exports = async () => {
   });
 
   // build runtime config
-  const runtimeConfig = await buildRuntimeConfig(PHASE_TEST);
+  const runtimeConfig = await buildRuntimeConfig(PHASE_TEST, BASE_PATH);
 
   /**
    * @type {import("jest").Config}

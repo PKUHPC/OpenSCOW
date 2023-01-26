@@ -16,6 +16,7 @@ import httpProxy from "http-proxy";
 import { NextApiRequest } from "next";
 import { checkCookie } from "src/auth/server";
 import { AugmentedNextApiResponse } from "src/types/next";
+import { publicConfig } from "src/utils/config";
 
 
 /**
@@ -28,7 +29,7 @@ function parseProxyTarget(url: string, urlIncludesBasePath: boolean): string | E
 
   const normalizedUrl = normalizePathnameWithQuery(url);
 
-  const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "/";
+  const basePath = publicConfig.BASE_PATH;
 
   // skip base path
   const relativePath = urlIncludesBasePath

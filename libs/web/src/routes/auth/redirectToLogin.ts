@@ -14,10 +14,12 @@ import { joinWithUrl } from "@scow/utils";
 import { NextApiRequest, NextApiResponse } from "next";
 import { join } from "path";
 
-export const redirectToAuthLogin = (req: NextApiRequest, res: NextApiResponse, authExternalUrl: string) => {
+export const redirectToAuthLogin = (
+  req: NextApiRequest, res: NextApiResponse, basePath: string, authExternalUrl: string,
+) => {
   const url = new URL(req.url!, `http://${req.headers.host}`);
 
-  const callbackUrl = url.origin + join(process.env.NEXT_PUBLIC_BASE_PATH || "/", "/api/auth/callback");
+  const callbackUrl = url.origin + join(basePath, "/api/auth/callback");
 
   const target = joinWithUrl(authExternalUrl, `public/auth?callbackUrl=${encodeURIComponent(callbackUrl)}`);
 

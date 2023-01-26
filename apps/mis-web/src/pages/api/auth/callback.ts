@@ -13,6 +13,7 @@
 import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import { setTokenCookie } from "src/auth/cookie";
 import { validateToken } from "src/auth/token";
+import { publicConfig } from "src/utils/config";
 
 export interface AuthCallbackSchema {
   method: "GET";
@@ -36,7 +37,7 @@ export default route<AuthCallbackSchema>("AuthCallbackSchema", async (req, res) 
   if (await validateToken(token)) {
     // set token cache
     setTokenCookie({ res }, token);
-    res.redirect(process.env.NEXT_PUBLIC_BASE_PATH || "/");
+    res.redirect(publicConfig.BASE_PATH);
   } else {
     return { 403: null };
 

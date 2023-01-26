@@ -30,11 +30,9 @@ COMMON = {
 # PORTAL.BASE_PATH: 非必须，默认值为"/"
 #                   若设置则/开头，不要以/结尾.
 #                   如果BASE_PATH为/root1，PORTAL.BASE_PATH为/root2，那么最终访问门户系统的路径是/root1/root2
-# PORTAL.IMAGE_POSTFIX: 门户系统镜像后缀
 # PORTAL.NOVNC_IMAGE: novnc客户端的镜像地址。一般无需修改
 PORTAL = {
 #  "BASE_PATH": "/",
-  "IMAGE_POSTFIX": "root",
 #  "NOVNC_IMAGE": "ghcr.io/pkuhpc/novnc-client-docker:master"
 }
 # 若不部署门户系统，设置PORTAL = False
@@ -46,11 +44,9 @@ PORTAL = {
 # MIS.BASE_PATH: 非必须，默认值为"/mis"
 #                若设置则以/开头，不要以/结尾.
 #                如果BASE_PATH为/root1，MIS.BASE_PATH为/root2，那么最终访问管理系统的路径是/root1/root2
-# MIS.IMAGE_POSTFIX: 管理系统镜像后缀
 # MIS.DB_PASSWORD：管理系统数据库的密码. 第一次启动管理系统时会使用此密码初始化管理系统数据库，之后如需修改需要手动在数据库中修改
 MIS = {
 #  "BASE_PATH": "/mis",
-  "IMAGE_POSTFIX": "mis",
   "DB_PASSWORD": "must!chang3this"
 }
 # 若不部署管理系统，设置MIS = False
