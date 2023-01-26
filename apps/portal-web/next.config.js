@@ -24,8 +24,8 @@ module.exports = async (phase) => {
    */
   const config = {
     ...runtimeConfig,
-    basePath: BASE_PATH || undefined,
-    assetPrefix: BASE_PATH || undefined,
+    basePath: BASE_PATH === "/" ? undefined : BASE_PATH,
+    assetPrefix: BASE_PATH === "/" ? undefined : BASE_PATH,
     webpack(config, options) {
       config.plugins.forEach((i) => {
         if (i instanceof options.webpack.DefinePlugin) {
