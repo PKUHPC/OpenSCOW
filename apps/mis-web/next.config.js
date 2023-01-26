@@ -8,7 +8,7 @@ const analyze = process.env.ANALYZE === "true";
 
 const { buildRuntimeConfig } = require("./config.js");
 
-const BASE_PATH = (!process.env.BASE_PATH || process.env.BASE_PATH === "/") ? "" : process.env.BASE_PATH;
+const BASE_PATH = process.env.BASE_PATH || "/";
 
 module.exports = async (phase) => {
 

@@ -107,7 +107,7 @@ function MyApp({ Component, pageProps, extra }: Props) {
     <>
       <Head>
         <meta name="format-detection" content="telephone=no" />
-        <link href="/manifest.json" rel="manifest" id="manifest" />
+        <link href={join(publicConfig.BASE_PATH, "/manifest.json")} rel="manifest" id="manifest" />
         <link
           rel="icon"
           type="image/x-icon"
@@ -117,7 +117,10 @@ function MyApp({ Component, pageProps, extra }: Props) {
           id="__CONFIG__"
           dangerouslySetInnerHTML={{
             __html: `
-              window.__CONFIG__ = ${JSON.stringify({ BASE_PATH: publicConfig.BASE_PATH })};
+              window.__CONFIG__ = ${
+    JSON.stringify({
+      BASE_PATH: publicConfig.BASE_PATH === "/" ? "" : publicConfig.BASE_PATH,
+    })};
             `,
           }}
         />

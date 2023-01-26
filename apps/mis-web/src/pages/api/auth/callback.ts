@@ -37,7 +37,7 @@ export default route<AuthCallbackSchema>("AuthCallbackSchema", async (req, res) 
   if (await validateToken(token)) {
     // set token cache
     setTokenCookie({ res }, token);
-    res.redirect(publicConfig.BASE_PATH || "/");
+    res.redirect(publicConfig.BASE_PATH);
   } else {
     return { 403: null };
 
