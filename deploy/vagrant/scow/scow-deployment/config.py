@@ -23,7 +23,7 @@ COMMON = {
 #                   如果BASE_PATH为/root1，PORTAL.BASE_PATH为/root2，那么最终访问门户系统的路径是/root1/root2
 # PORTAL.NOVNC_IMAGE: novnc客户端的镜像地址。一般无需修改
 PORTAL = {
-#  "BASE_PATH": "/",
+  "BASE_PATH": "/",
 #  "NOVNC_IMAGE": "ghcr.io/pkuhpc/novnc-client-docker:master"
 }
 # 若不部署门户系统，设置PORTAL = False
