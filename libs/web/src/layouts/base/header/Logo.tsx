@@ -23,13 +23,17 @@ const LogoContainer = styled.h1`
   }
 `;
 
-export const Logo = () => {
+interface Props {
+  basePath: string;
+}
+
+export const Logo: React.FC<Props> = ({ basePath }) => {
 
   return (
     <LogoContainer>
       <Link href="/">
 
-        <img height="40px" src={join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/icon?type=favicon")} />
+        <img height="40px" src={join(basePath, "/api/icon?type=favicon")} />
 
       </Link>
     </LogoContainer>

@@ -15,6 +15,7 @@ syntax = "proto3";
 package scow.server;
 
 import "common/money.proto";
+import "google/protobuf/timestamp.proto";
 
 message GetTenantInfoRequest {
   string tenant_name = 1;
@@ -47,6 +48,7 @@ message PlatformTenantsInfo {
   uint32 user_count = 3;
   uint32 account_count = 4;
   common.Money balance = 5;
+  google.protobuf.Timestamp create_time = 6;
 }
 message GetAllTenantsRequest {
 }

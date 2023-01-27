@@ -19,7 +19,7 @@ import { Server as ServerIO } from "socket.io";
 import { checkCookie } from "src/auth/server";
 import { AugmentedNextApiResponse } from "src/types/next";
 import { getClient } from "src/utils/client";
-import { runtimeConfig } from "src/utils/config";
+import { publicConfig, runtimeConfig } from "src/utils/config";
 
 export const config = {
   api: {
@@ -32,7 +32,7 @@ export default async (req: NextApiRequest, res: AugmentedNextApiResponse) => {
   if (!res.socket.server.io) {
     // @ts-ignore
     const io = new ServerIO(req.socket.server, {
-      path: join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/shell/socketio"),
+      path: join(publicConfig.BASE_PATH, "/api/shell/socketio"),
     });
 
     io.on("connection", async (socket) => {

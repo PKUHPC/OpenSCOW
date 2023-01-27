@@ -10,7 +10,7 @@ on:
     branches:
       - master
 
-concurrency: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 env:
   GITHUB_CR: ghcr.io
@@ -113,29 +113,13 @@ jobs:
             file: auth
             build_args: ""
 
-          - name: mis-web-root
+          - name: mis-web
             file: mis-web
-            build_args: BASE_PATH=
+            build_args: ""
 
-          - name: mis-web-mis
-            file: mis-web
-            build_args: BASE_PATH=/mis
-
-          - name: mis-web-demo
-            file: mis-web
-            build_args: BASE_PATH=/demo/scow/mis
-
-          - name: portal-web-root
+          - name: portal-web
             file: portal-web
-            build_args: BASE_PATH=
-
-          - name: portal-web-portal
-            file: portal-web
-            build_args: BASE_PATH=/portal
-
-          - name: portal-web-demo
-            file: portal-web
-            build_args: BASE_PATH=/demo/scow
+            build_args: ""
 
           - name: docs
             file: docs
@@ -174,4 +158,4 @@ jobs:
           file: dockerfiles/Dockerfile.${{ matrix.file }}
           labels: ${{ steps.meta.outputs.labels }}
           # only build arm64 in master commits
-          platforms: linux/amd64${{ github.ref == 'refs/heads/master' && ',linux/arm64' || '' }}
+          platforms: linux/amd64${{ github.ref_type == 'tag' && ',linux/arm64' || '' }}

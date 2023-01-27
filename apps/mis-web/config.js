@@ -41,7 +41,13 @@ const mockEnv = process.env.NEXT_PUBLIC_USE_MOCK === "1";
 
 const config = envConfig(specs, process.env);
 
-const buildRuntimeConfig = async (phase) => {
+/**
+ * Build system runtime config
+ * @param {string} phase Next.js phase
+ * @param {string} basePath basePath of the system
+ * @returns RuntimeConfig
+ */
+const buildRuntimeConfig = async (phase, basePath) => {
 
   const building = phase === PHASE_PRODUCTION_BUILD;
   const dev = phase === PHASE_DEVELOPMENT_SERVER;
@@ -105,6 +111,8 @@ const buildRuntimeConfig = async (phase) => {
 
     PASSWORD_PATTERN: commonConfig.passwordPattern?.regex,
     PASSWORD_PATTERN_MESSAGE: commonConfig.passwordPattern?.errorMessage,
+
+    BASE_PATH: basePath,
   };
 
   if (!building) {

@@ -15,6 +15,7 @@ import { join } from "path";
 import { useEffect, useRef } from "react";
 import { io } from "socket.io-client";
 import { User } from "src/stores/UserStore";
+import { publicConfig } from "src/utils/config";
 import styled from "styled-components";
 import { Terminal } from "xterm";
 import { FitAddon } from "xterm-addon-fit";
@@ -68,7 +69,7 @@ export const Shell: React.FC<Props> = ({ user, cluster, path }) => {
       resizeObserver.observe(container.current);
 
       const socket = io({
-        path: join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/shell/socketio"),
+        path: join(publicConfig.BASE_PATH, "/api/shell/socketio"),
         query: payload,
         auth: { token: user.token },
       });

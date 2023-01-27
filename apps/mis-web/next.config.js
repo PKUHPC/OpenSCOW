@@ -1,20 +1,41 @@
 /* esslint-disable @typescript-eslint/no-var-requires */
+
+// @ts-check
+
 const withPlugins = require("next-compose-plugins");
 
 const analyze = process.env.ANALYZE === "true";
 
 const { buildRuntimeConfig } = require("./config.js");
 
+const BASE_PATH = process.env.BASE_PATH || "/";
+
 module.exports = async (phase) => {
 
-  const runtimeConfig = await buildRuntimeConfig(phase);
+  global.__CONFIG__ = {
+    BASE_PATH,
+  };
+
+  const runtimeConfig = await buildRuntimeConfig(phase, BASE_PATH);
 
   /**
    * @type {import("next").NextConfig}
    */
   const config = {
     ...runtimeConfig,
-    basePath: process.env.NEXT_PUBLIC_BASE_PATH,
+    basePath: BASE_PATH === "/" ? undefined : BASE_PATH,
+    assetPrefix: BASE_PATH === "/" ? undefined : BASE_PATH,
+    webpack(config, options) {
+      config.plugins.forEach((i) => {
+        if (i instanceof options.webpack.DefinePlugin) {
+          if (i.definitions['process.env.__NEXT_ROUTER_BASEPATH']) {
+            i.definitions['process.env.__NEXT_ROUTER_BASEPATH'] =
+              '(typeof window === "undefined" ? global : window).__CONFIG__?.BASE_PATH';
+          }
+        }
+      });
+      return config;
+    },
   };
 
   return withPlugins([

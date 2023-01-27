@@ -116,6 +116,7 @@ export const mockApi: MockApi<typeof api> = {
         balance: numberToMoney(0.0000),
         userCount: 1,
         accountCount:1,
+        createTime: "2022-10-05T23:49:50.000Z",
       },
       {
         tenantId: 2,
@@ -123,6 +124,7 @@ export const mockApi: MockApi<typeof api> = {
         balance: numberToMoney(10.0000),
         userCount: 4,
         accountCount:2,
+        createTime: "2022-10-05T23:49:50.000Z",
       },
       {
         tenantId: 3,
@@ -130,6 +132,7 @@ export const mockApi: MockApi<typeof api> = {
         balance: numberToMoney(10.5),
         userCount: 5,
         accountCount:3,
+        createTime: "2022-10-05T23:49:50.000Z",
       },
       ],
     }),

@@ -71,7 +71,7 @@ export const userRoutes: (
       Icon: MacCommandOutlined,
       text: "Shell",
       path: "/shell",
-      clickToPath: `${process.env.NEXT_PUBLIC_BASE_PATH || ""}/shell/${defaultCluster.id}`,
+      clickToPath: `${publicConfig.BASE_PATH || ""}/shell/${defaultCluster.id}`,
       openInNewPage: true,
       clickable: true,
       children: publicConfig.CLUSTERS.map(({ name, id }) => ({
