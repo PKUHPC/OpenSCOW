@@ -49,7 +49,8 @@ Vagrant.configure("2") do |config|
   Encoding.default_external = 'UTF-8'
   config.vm.boot_timeout= 600
   config.ssh.username= "root"
-  config.ssh.password= "vagrant"
+  #config.ssh.password= "vagrant"
+  config.ssh.insert_key = true
 
   vm_list.each do |item|
     config.vm.define item[:name] do |vm_config|
