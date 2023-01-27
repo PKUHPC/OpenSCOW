@@ -1,25 +1,27 @@
 {
   "name": "@scow/lib-web",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "",
   "main": "index.js",
+  "private": true,
   "sideEffects": false,
   "scripts": {
     "build": "rimraf build && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json"
   },
   "files": [
     "build",
-    "icons"
+    "icons",
+    "!**/*.map"
   ],
   "dependencies": {
     "@scow/utils": "workspace:*"
   },
   "peerDependencies": {
-    "antd": "5.1.2",
+    "antd": "5.1.5",
     "next": "13.0.2",
     "styled-components": "5.3.6"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC"
+  "author": "PKUHPC (https://github.com/PKUHPC)",
+  "license": "Mulan PSL v2",
+  "repository": "https://github.com/PKUHPC/SCOW"
 }

@@ -11,6 +11,7 @@
  */
 
 import { moneyToNumber } from "@scow/lib-decimal";
+import { formatDateTime } from "@scow/lib-web/build/utils/datetime";
 import { GetTenantInfoResponse } from "@scow/protos/build/server/tenant";
 import { Table } from "antd";
 import React, { useCallback } from "react";
@@ -62,6 +63,11 @@ const TenantInfoTable: React.FC<TenantInfoTableProps> = ({
           render={(_, r) => {
             return moneyToNumber(r.balance || { positive: true, yuan: 0, decimalPlace: 0 });
           }}
+        />
+        <Table.Column<GetTenantInfoResponse>
+          dataIndex="createTime"
+          title="创建时间"
+          render={(time: string) => formatDateTime(time)}
         />
       </Table>
     </>

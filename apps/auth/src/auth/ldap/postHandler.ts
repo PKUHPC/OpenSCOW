@@ -13,7 +13,6 @@
 import formBody from "@fastify/formbody";
 import { Static, Type } from "@sinclair/typebox";
 import { FastifyInstance } from "fastify";
-import ldapjs from "ldapjs";
 import { cacheInfo } from "src/auth/cacheInfo";
 import { findUser, useLdap } from "src/auth/ldap/helpers";
 import { serveLoginHtml } from "src/auth/loginHtml";
@@ -56,29 +55,16 @@ export function registerPostHandler(f: FastifyInstance, ldapConfig: LdapConfigSc
       }
 
       logger.info("Trying binding as %s with credentials", user.dn);
-      const anotherClient = ldapjs.createClient({ url: ldapConfig.url, log: logger });
-      try {
 
-        const err = await new Promise<null | ldapjs.Error>((res) => {
-          anotherClient.bind(user.dn, password, (err) => {
-            res(err);
-          });
-        });
-
-        if (err) {
-          logger.info("Binding as %s failed. Err: %o", user.dn, err);
-          await serveLoginHtml(true, callbackUrl, req, res);
-          return;
-        }
-
+      await useLdap(logger, ldapConfig, { dn: user.dn, password })(async () => {
         logger.info("Binding as %s successful. User info %o", user.dn, user);
-
         const info = await cacheInfo(user.identityId, req);
-
         await redirectToWeb(callbackUrl, info, res);
-      } finally {
-        anotherClient.destroy();
-      }
+      }).catch(async (err) => {
+        logger.info("Binding as %s failed. Err: %o", user.dn, err);
+        await serveLoginHtml(true, callbackUrl, req, res);
+      });
+
     });
   });
 }

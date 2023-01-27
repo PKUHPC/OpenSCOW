@@ -56,11 +56,18 @@ const mockEnv = process.env.NEXT_PUBLIC_USE_MOCK === "1";
 // This config is used to provide env doc auto gen
 const config = { _specs: specs };
 
-const buildRuntimeConfig = async (phase) => {
+/**
+ * Build system runtime config
+ * @param {string} phase Next.js phase
+ * @param {string} basePath basePath of the system
+ * @returns RuntimeConfig
+ */
+const buildRuntimeConfig = async (phase, basePath) => {
 
   const building = phase === PHASE_PRODUCTION_BUILD;
   const dev = phase === PHASE_DEVELOPMENT_SERVER;
   const production = phase === PHASE_PRODUCTION_SERVER;
+  const testenv = phase === PHASE_TEST;
 
   // load .env.build if in build
   if (building) {
@@ -99,8 +106,6 @@ const buildRuntimeConfig = async (phase) => {
 
   // query auth capabilities to set optional auth features
   const capabilities = await queryCapabilities(config.AUTH_INTERNAL_URL, phase);
-
-  const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
 
   /**
    * @type {import("./src/utils/config").PublicRuntimeConfig}
@@ -142,14 +147,16 @@ const buildRuntimeConfig = async (phase) => {
 
     PASSWORD_PATTERN: commonConfig.passwordPattern?.regex,
     PASSWORD_PATTERN_MESSAGE: commonConfig.passwordPattern?.errorMessage,
+
+    BASE_PATH: basePath,
   }
 
-  if (!building) {
+  if (!building && !testenv) {
     console.log("Server Runtime Config", serverRuntimeConfig);
     console.log("Public Runtime Config", publicRuntimeConfig);
   }
 
-  if (!mockEnv) {
+  if (!mockEnv && !testenv) {
 
     // HACK
     // call /api/proxy/<node>/<port>/ after 3 seconds to init the proxy ws server

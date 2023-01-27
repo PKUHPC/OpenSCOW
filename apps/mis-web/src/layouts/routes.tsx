@@ -11,7 +11,7 @@
  */
 
 import {
-  AccountBookOutlined, BookOutlined, ClockCircleOutlined, CloudServerOutlined,
+  AccountBookOutlined, BookOutlined, CloudServerOutlined,
   DashboardOutlined,
   InfoOutlined, LockOutlined, MoneyCollectOutlined, PartitionOutlined,
   PlusOutlined, PlusSquareOutlined, UserAddOutlined,
@@ -33,23 +33,18 @@ export const platformAdminRoutes: (platformRoles: PlatformRole[]) => NavItemProp
     children: [
       ...(platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ? [
         {
-          Icon: ClockCircleOutlined,
-          text: "获取作业",
-          path: "/admin/fetchJobs",
-        },
-        {
           Icon: UserOutlined,
           text: "导入用户",
           path: "/admin/importUsers",
         },
         {
           Icon: UserOutlined,
-          text: "全部租户",
+          text: "平台租户列表",
           path: "/admin/tenants",
         },
         {
           Icon: UserOutlined,
-          text: "全部用户",
+          text: "平台用户列表",
           path: "/admin/users",
         },
         {
@@ -77,7 +72,7 @@ export const platformAdminRoutes: (platformRoles: PlatformRole[]) => NavItemProp
           children: [
             {
               Icon: PlusSquareOutlined,
-              text: "账户充值",
+              text: "租户充值",
               path: "/admin/finance/pay",
             },
             {
@@ -97,7 +92,7 @@ export const tenantRoutes: (tenantRoles: TenantRole[]) => NavItemProps[] = (tena
     Icon: CloudServerOutlined,
     text: "租户管理",
     path: "/tenant",
-    clickToPath: "/tenant/info",
+    clickToPath: tenantRoles.includes(TenantRole.TENANT_ADMIN) ? "/tenant/info" : "/tenant/finance/payAccount",
     children: [
       ...(tenantRoles.includes(TenantRole.TENANT_ADMIN) ? [
         {
@@ -296,7 +291,7 @@ export const getAvailableRoutes = (user: User | undefined): NavItemProps[] => {
     routes.push(...tenantRoutes(user.tenantRoles));
   }
 
-  if (user.platformRoles.includes(PlatformRole.PLATFORM_ADMIN)) {
+  if (user.platformRoles.length !== 0) {
     routes.push(...platformAdminRoutes(user.platformRoles));
   }
 

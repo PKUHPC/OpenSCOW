@@ -1,19 +1,21 @@
 {
   "name": "@scow/config",
-  "version": "1.0.0",
+  "version": "0.1.0",
+  "private": false,
   "description": "",
   "scripts": {
     "build": "rimraf build && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json"
   },
   "files": [
-    "build"
+    "build",
+    "!**/*.map"
   ],
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "PKUHPC (https://github.com/PKUHPC)",
+  "license": "Mulan PSL v2",
+  "repository": "https://github.com/PKUHPC/SCOW",
   "dependencies": {
     "@scow/lib-config": "workspace:*",
-    "@sinclair/typebox": "0.25.17"
+    "@sinclair/typebox": "0.25.20"
   },
   "volta": {
     "extends": "../../package.json"

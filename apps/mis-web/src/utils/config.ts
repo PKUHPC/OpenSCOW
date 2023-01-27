@@ -29,6 +29,7 @@ export interface ServerRuntimeConfig {
 }
 
 export interface PublicRuntimeConfig {
+  BASE_PATH: string;
   CLUSTERS: { [clusterId: string]: Cluster };
   PREDEFINED_CHARGING_TYPES: string[];
   ENABLE_CREATE_USER: boolean;

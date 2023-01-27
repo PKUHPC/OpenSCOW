@@ -9,7 +9,7 @@
 # See the Mulan PSL v2 for more details.
 
 
-FROM node:hydrogen-alpine@sha256:b3f383c13d71066a4e2380d42f4563ac14ac76b3035a5bea4db84209e14665d5 AS base
+FROM node:hydrogen-alpine@sha256:fda98168118e5a8f4269efca4101ee51dd5c75c0fe56d8eb6fad80455c2f5827 AS base
 
 RUN apk update && apk add libc6-compat python3 make gcc g++ curl
 
@@ -50,25 +50,19 @@ COPY tsconfig.json .eslintrc.json turbo.json buf.gen.yaml buf.work.yaml ./
 COPY libs/tsconfig.json ./libs/
 COPY protos ./protos
 
-ARG BASE_PATH=""
-ENV NEXT_PUBLIC_BASE_PATH=$BASE_PATH
-
 RUN pnpm build
 
 COPY scripts scripts
 RUN node scripts/copyDist.mjs
 RUN cd dist && pnpm i --offline --prod --frozen-lockfile
 
-FROM node:hydrogen-alpine@sha256:b3f383c13d71066a4e2380d42f4563ac14ac76b3035a5bea4db84209e14665d5 AS runner
+FROM node:hydrogen-alpine@sha256:fda98168118e5a8f4269efca4101ee51dd5c75c0fe56d8eb6fad80455c2f5827 AS runner
 
 WORKDIR /app
 
 COPY --from=builder /app/dist .
 
 ENV NODE_ENV production
-
-ARG BASE_PATH=""
-ENV NEXT_PUBLIC_BASE_PATH=$BASE_PATH
 
 EXPOSE 3000
 

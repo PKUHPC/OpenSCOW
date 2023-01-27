@@ -15,7 +15,7 @@ import { Collection, Entity, Enum, IdentifiedReference,
 import { StorageQuota } from "src/entities/StorageQuota";
 import { Tenant } from "src/entities/Tenant";
 import { UserAccount } from "src/entities/UserAccount";
-import { DATETIME_TYPE, EntityOrRef, toRef } from "src/utils/orm";
+import { CURRENT_TIMESTAMP, DATETIME_TYPE, EntityOrRef, toRef } from "src/utils/orm";
 
 export enum PlatformRole {
   PLATFORM_FINANCE = "PLATFORM_FINANCE",
@@ -47,7 +47,7 @@ export class User {
   @Property()
     email: string;
 
-  @Property({ columnType: DATETIME_TYPE, defaultRaw: "CURRENT_TIMESTAMP(6)" })
+  @Property({ columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP })
     createTime: Date;
 
   @OneToMany(() => UserAccount, (u) => u.user)

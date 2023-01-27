@@ -19,7 +19,7 @@ import { Server as ServerIO } from "socket.io";
 import { checkCookie } from "src/auth/server";
 import { AugmentedNextApiResponse } from "src/types/next";
 import { getClient } from "src/utils/client";
-import { runtimeConfig } from "src/utils/config";
+import { publicConfig, runtimeConfig } from "src/utils/config";
 
 export const config = {
   api: {
@@ -32,7 +32,7 @@ export default async (req: NextApiRequest, res: AugmentedNextApiResponse) => {
   if (!res.socket.server.io) {
     // @ts-ignore
     const io = new ServerIO(req.socket.server, {
-      path: join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/shell/socketio"),
+      path: join(publicConfig.BASE_PATH, "/api/shell/socketio"),
     });
 
     io.on("connection", async (socket) => {
@@ -76,6 +76,17 @@ export default async (req: NextApiRequest, res: AugmentedNextApiResponse) => {
 
       log("Connected to shell");
 
+      stream.on("error", (err) => {
+        log("Error occurred from server. Disconnect.", err);
+        socket.emit("exit", { exitCode: -1 });
+      });
+
+      socket.on("error", (err) => {
+        log("Error occurred from client. Disconnect.", err);
+        stream.write({ message: { $case: "disconnect", disconnect: {} } });
+        stream.end();
+      });
+
       stream.on("data", (chunk: ShellResponse) => {
         switch (chunk.message?.$case) {
         case "data":
@@ -86,7 +97,6 @@ export default async (req: NextApiRequest, res: AugmentedNextApiResponse) => {
           break;
         }
       });
-
       socket.on("resize", (data: { cols: number, rows: number }) => {
         stream.write({ message: { $case: "resize", resize: { cols: data.cols, rows: data.rows } } });
       });

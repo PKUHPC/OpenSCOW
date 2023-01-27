@@ -1,6 +1,6 @@
 {
   "name": "@scow/portal-web",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "private": true,
   "scripts": {
     "dev": "cross-env NEXT_PUBLIC_USE_MOCK=1 next dev",
@@ -9,7 +9,8 @@
     "build": "pnpm prepareDev && npm run build:next",
     "build:next": "next build",
     "prepareDev": "ntar schema",
-    "test": "jest --passWithNoTests"
+    "test": "jest --passWithNoTests",
+    "client": "ntar client --basePathVar \"publicConfig.BASE_PATH || ''\" --extraImports \"import { publicConfig } from 'src/utils/config';\""
   },
   "files": [
     ".next",
@@ -17,20 +18,24 @@
     "next.config.js",
     "config.js",
     "assets",
-    "api-routes-schemas.json"
+    "api-routes-schemas.json",
+    "!**/*.map"
   ],
+  "author": "PKUHPC (https://github.com/PKUHPC)",
+  "license": "Mulan PSL v2",
+  "repository": "https://github.com/PKUHPC/SCOW",
   "dependencies": {
-    "@ant-design/icons": "4.8.0",
+    "@ant-design/icons": "5.0.0",
     "@codemirror/autocomplete": "6.4.0",
     "@codemirror/commands": "6.1.3",
-    "@codemirror/language": "6.3.2",
+    "@codemirror/language": "6.4.0",
     "@codemirror/legacy-modes": "6.3.1",
     "@codemirror/state": "6.2.0",
     "@codemirror/theme-one-dark": "6.1.0",
-    "@codemirror/view": "6.7.2",
+    "@codemirror/view": "6.7.3",
     "@ddadaal/next-typed-api-routes-runtime": "0.5.2",
-    "@ddadaal/tsgrpc-client": "0.17.2",
-    "@grpc/grpc-js": "1.8.1",
+    "@ddadaal/tsgrpc-client": "0.17.3",
+    "@grpc/grpc-js": "1.8.4",
     "@scow/config": "workspace:*",
     "@scow/lib-config": "workspace:*",
     "@scow/lib-auth": "workspace:*",
@@ -38,9 +43,9 @@
     "@scow/lib-ssh": "workspace:*",
     "@scow/utils": "workspace:*",
     "@scow/lib-web": "workspace:*",
-    "@sinclair/typebox": "0.25.17",
+    "@sinclair/typebox": "0.25.20",
     "@scow/protos": "workspace:*",
-    "antd": "5.1.2",
+    "antd": "5.1.5",
     "busboy": "1.6.0",
     "codemirror": "6.0.1",
     "google-protobuf": "3.21.2",
@@ -68,7 +73,7 @@
     "http-proxy": "1.18.1"
   },
   "devDependencies": {
-    "@ddadaal/next-typed-api-routes-cli": "0.5.1",
+    "@ddadaal/next-typed-api-routes-cli": "0.6.1",
     "@next/bundle-analyzer": "13.0.2",
     "@testing-library/jest-dom": "5.16.5",
     "@testing-library/react": "13.4.0",

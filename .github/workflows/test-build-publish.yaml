@@ -5,12 +5,12 @@ on:
   pull_request:
     branches: [master]
   push:
+    tags:
+      - "**"
     branches:
       - master
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
-  cancel-in-progress: true
+concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 env:
   GITHUB_CR: ghcr.io
@@ -18,9 +18,13 @@ env:
   # ALIYUN_PROJECT_NAME: scow
 
 jobs:
-  test:
-    name: Test
+  test-version-packages:
+    name: Test and version packages
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      pull-requests: write
 
     steps:
       - uses: actions/checkout@v3
@@ -70,8 +74,20 @@ jobs:
         with:
           files: ./libs/auth/coverage/lcov.info,./libs/ssh/coverage/lcov.info,./libs/libconfig/coverage/lcov.info,./libs/decimal/coverage/lcov.info,./apps/auth/coverage/lcov.info,./apps/mis-server/coverage/lcov.info,./apps/portal-server/coverage/lcov.info
 
+      - name: Create Release Pull Request or Publish
+        id: changesets
+        uses: changesets/action@v1
+        if: github.ref == 'refs/heads/master'
+        with:
+          version: pnpm ci:version
+          publish: pnpm ci:publish
+          createGithubReleases: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+
   build-images:
-    needs: test
+    needs: test-version-packages
     runs-on: ubuntu-latest
 
     permissions:
@@ -97,29 +113,13 @@ jobs:
             file: auth
             build_args: ""
 
-          - name: mis-web-root
+          - name: mis-web
             file: mis-web
-            build_args: BASE_PATH=
+            build_args: ""
 
-          - name: mis-web-mis
-            file: mis-web
-            build_args: BASE_PATH=/mis
-
-          - name: mis-web-demo
-            file: mis-web
-            build_args: BASE_PATH=/demo/scow/mis
-
-          - name: portal-web-root
+          - name: portal-web
             file: portal-web
-            build_args: BASE_PATH=
-
-          - name: portal-web-portal
-            file: portal-web
-            build_args: BASE_PATH=/portal
-
-          - name: portal-web-demo
-            file: portal-web
-            build_args: BASE_PATH=/demo/scow
+            build_args: ""
 
           - name: docs
             file: docs
@@ -158,4 +158,4 @@ jobs:
           file: dockerfiles/Dockerfile.${{ matrix.file }}
           labels: ${{ steps.meta.outputs.labels }}
           # only build arm64 in master commits
-          platforms: linux/amd64${{ github.ref == 'refs/heads/master' && ',linux/arm64' || '' }}
+          platforms: linux/amd64${{ github.ref_type == 'tag' && ',linux/arm64' || '' }}

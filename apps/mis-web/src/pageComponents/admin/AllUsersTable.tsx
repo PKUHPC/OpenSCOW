@@ -12,15 +12,19 @@
 
 import { formatDateTime } from "@scow/lib-web/build/utils/datetime";
 import { PlatformUserInfo } from "@scow/protos/build/server/user";
-import { App, Divider, Space, Table } from "antd";
+import { App, Button, Divider, Form, Input, Space, Table } from "antd";
 import React, { useCallback, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { ChangePasswordModalLink } from "src/components/ChangePasswordModal";
+import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { PlatformRoleSelector } from "src/components/PlatformRoleSelector";
 import { GetAllUsersSchema } from "src/pages/api/admin/getAllUsers";
 import { User } from "src/stores/UserStore";
 
+interface FilterForm {
+  idOrName: string | undefined;
+}
 
 interface PageInfo {
     page: number;
@@ -32,8 +36,13 @@ interface Props {
   user: User;
 }
 
-
 export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
+
+  const [ query, setQuery ] = useState<FilterForm>(() => {
+    return { idOrName: undefined };
+  });
+
+  const [form] = Form.useForm<FilterForm>();
 
   const [pageInfo, setPageInfo] = useState<PageInfo>({ page: 1, pageSize: 10 });
 
@@ -41,12 +50,31 @@ export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
     return await api.getAllUsers({ query: {
       page: pageInfo.page,
       pageSize: pageInfo.pageSize,
+      idOrName: query.idOrName,
     } });
-  }, [pageInfo]);
+  }, [query, pageInfo]);
   const { data, isLoading, reload } = useAsync({ promiseFn, watch: refreshToken });
 
   return (
     <div>
+      <FilterFormContainer>
+        <Form<FilterForm>
+          layout="inline"
+          form={form}
+          initialValues={query}
+          onFinish={async () => {
+            const { idOrName } = await form.validateFields();
+            setQuery({ idOrName: idOrName === "" ? undefined : idOrName });
+          }}
+        >
+          <Form.Item label="用户ID或者姓名" name="idOrName">
+            <Input />
+          </Form.Item>
+          <Form.Item>
+            <Button type="primary" htmlType="submit">搜索</Button>
+          </Form.Item>
+        </Form>
+      </FilterFormContainer>
       <UserInfoTable
         data={data}
         pageInfo={pageInfo}
@@ -91,6 +119,12 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
       >
         <Table.Column<PlatformUserInfo> dataIndex="userId" title="用户ID" />
         <Table.Column<PlatformUserInfo> dataIndex="name" title="姓名" />
+        <Table.Column<PlatformUserInfo> dataIndex="tenantName" title="所属租户" />
+        <Table.Column<PlatformUserInfo> 
+          dataIndex="availableAccounts" 
+          title="可用账户" 
+          render={(accounts) => accounts.join(",")}
+        />
         <Table.Column<PlatformUserInfo>
           dataIndex="createTime"
           title="创建时间"

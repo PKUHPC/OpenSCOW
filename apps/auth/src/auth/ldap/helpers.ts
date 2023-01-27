@@ -17,19 +17,26 @@ import { promisify } from "util";
 
 export const useLdap = (
   logger: FastifyBaseLogger,
-  config: LdapConfigSchema,
+  config: Pick<LdapConfigSchema, "bindDN" | "bindPassword" | "url">,
   user: { dn: string, password: string } = { dn: config.bindDN, password: config.bindPassword },
 ) => {
 
   return async <T>(consume: (client: ldapjs.Client) => Promise<T>): Promise<T> => {
     const client = ldapjs.createClient(({ url: config.url, log: logger }));
 
-    await promisify(client.bind.bind(client))(user.dn, user.password);
-
-    return await consume(client).finally(() => {
-      client.destroy();
-      logger.info("Disconnected LDAP connection.");
+    client.on("error", (err) => {
+      logger.error(err, "LDAP Error occurred.");
     });
+
+    const unbind = async () => {
+      await promisify(client.unbind.bind(client))();
+      logger.info("Disconnected LDAP connection.");
+    };
+
+    return await (async () => {
+      await promisify(client.bind.bind(client))(user.dn, user.password);
+      return await consume(client);
+    })().finally(unbind);
   };
 };
 
@@ -66,8 +73,6 @@ export const searchOne = async <T>(
 
         found = true;
         logger.info("Get an entry with valid info. dn: %s.", entry.dn);
-        res.removeAllListeners();
-        res.emit("end");
         resolve({ ...val, dn: entry.dn });
       });
 

@@ -189,15 +189,25 @@ it("concurrently charges", async () => {
 
 
 it("returns payment records", async () => {
-  const amount = numberToMoney(10);
+  const amount1 = numberToMoney(10);
+  const amount2 = numberToMoney(20);
 
-  const request: PayRequest = {
+  const request1: PayRequest = {
     accountName: account.accountName,
-    amount: amount,
+    tenantName: account.tenant.getProperty("name"),
+    amount: amount1,
     comment: "comment",
     operatorId: "tester",
     ipAddress: "127.0.0.1",
+    type: "test",
+  };
+
+  const request2: PayRequest = {
     tenantName: account.tenant.getProperty("name"),
+    amount: amount2,
+    comment: "comment",
+    operatorId: "tester",
+    ipAddress: "127.0.0.1",
     type: "test",
   };
 
@@ -205,23 +215,69 @@ it("returns payment records", async () => {
 
   const client = new ChargingServiceClient(server.serverAddress, ChannelCredentials.createInsecure());
 
-  await asyncClientCall(client, "pay", request);
+  await asyncClientCall(client, "pay", request1);
+  await asyncClientCall(client, "pay", request2);
 
   await reloadEntity(em, account);
+  await reloadEntity(em, account.tenant.getEntity());
+  
   expect(account.balance.toNumber()).toBe(10);
+  expect(account.tenant.getProperty("balance").toNumber()).toBe(20);
 
-  const reply = await asyncClientCall(client, "getPaymentRecords", {
+  // set accountName
+  const reply1 = await asyncClientCall(client, "getPaymentRecords", {
     accountName: account.accountName,
+    tenantName: account.tenant.getProperty("name"),
     startTime: startTime.toISOString(),
     endTime: new Date().toISOString(),
   });
 
-  expect(reply.results).toHaveLength(1);
+  expect(reply1.results).toHaveLength(1);
 
-  expect(reply.results[0]).toMatchObject({
-    accountName: request.accountName,
-    comment: request.comment,
-    ipAddress: request.ipAddress,
-    amount: request.amount,
+  expect(reply1.results[0]).toMatchObject({
+    accountName: request1.accountName,
+    comment: request1.comment,
+    ipAddress: request1.ipAddress,
+    amount: request1.amount,
   } as Partial<PaymentRecord>);
+
+  expect(reply1.total).toStrictEqual(numberToMoney(10));
+
+  // not set accountName, set tenantName
+  const reply2 = await asyncClientCall(client, "getPaymentRecords", {
+    tenantName: account.tenant.getProperty("name"),
+    startTime: startTime.toISOString(),
+    endTime: new Date().toISOString(),
+  });
+
+  expect(reply2.results).toHaveLength(1);
+
+  expect(reply2.results[0]).toMatchObject({
+    tenantName: request2.tenantName,
+    accountName: request2.accountName,
+    comment: request2.comment,
+    ipAddress: request2.ipAddress,
+    amount: request2.amount,
+  } as Partial<PaymentRecord>);
+
+  expect(reply2.total).toStrictEqual(numberToMoney(20));
+
+  // not set accountName, not set tenantName
+  const reply3 = await asyncClientCall(client, "getPaymentRecords", {
+    startTime: startTime.toISOString(),
+    endTime: new Date().toISOString(),
+  });
+
+  expect(reply3.results).toHaveLength(1);
+
+  expect(reply3.results[0]).toMatchObject({
+    tenantName: request2.tenantName,
+    accountName: request2.accountName,
+    comment: request2.comment,
+    ipAddress: request2.ipAddress,
+    amount: request2.amount,
+  } as Partial<PaymentRecord>);
+
+  expect(reply3.total).toStrictEqual(numberToMoney(20));
+
 });

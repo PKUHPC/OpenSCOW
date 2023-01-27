@@ -1,14 +1,16 @@
 {
   "name": "@scow/protos",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "",
   "main": "build/index.js",
+  "private": true,
   "scripts": {
-    "generate": "rimraf generated && cd ../.. && buf generate" ,
+    "generate": "rimraf generated && cd ../.. && buf generate",
     "build": "rimraf build && tsc"
   },
   "files": [
-    "build"
+    "build",
+    "!**/*.map"
   ],
   "dependencies": {
     "long": "5.2.1",
