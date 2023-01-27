@@ -1,9 +1,9 @@
 #!/bin/sh
-#cd /root/scow/ && git clone https://github.com/PKUHPC/scow-deployment.git --depth=1 
-cd /root/scow/ && git clone https://gitee.com/pku_icode/scow-deployment.git --depth=1
+cd /root/scow/ && git clone https://github.com/PKUHPC/scow-deployment.git --depth=1 
+# cd /root/scow/ && git clone https://gitee.com/pku_icode/scow-deployment.git --depth=1
 
-#cd /root/scow/ && git clone https://github.com/PKUHPC/export-jobs.git --depth=1
-cd /root/scow/ && git clone https://gitee.com/pku_icode/export-jobs.git --depth=1
+cd /root/scow/ && git clone https://github.com/PKUHPC/export-jobs.git --depth=1
+# cd /root/scow/ && git clone https://gitee.com/pku_icode/export-jobs.git --depth=1
 
 cp -r /root/scow/scow-deployment/config-example /root/scow/scow-deployment/config
 

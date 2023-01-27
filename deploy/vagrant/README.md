@@ -27,7 +27,9 @@ vagrant up
 
 ![image-20221121092942255](images/image-20221121092942255.png)
 
-> 第一次部署需要从vagrant clould拉取vagrant镜像，速度会比较慢，请耐心等待。
+> - 第一次部署需要从vagrant clould拉取vagrant镜像，速度会比较慢，请耐心等待。
+>
+> - 若镜像有更新，Vagrant不会自动重新下载，请先删除原来的镜像。
 
 ### 1.2 集群初始化
 
@@ -375,11 +377,8 @@ mkdir /root/scow/
 yum install -y python3
 pip3 install -r /root/scow/export-jobs/requirements.txt
 
-# 9. 拉取镜像
-docker login  ghcr.io
-cd /root/scow/scow-deployment && ./compose.sh pull
 
-# 10. 支持密码登录登录
+# 9. 支持密码登录登录
 sed -i 's#PasswordAuthentication no#PasswordAuthentication yes#g' /etc/ssh/sshd_config
 systemctl restart sshd
 ```
@@ -397,6 +396,16 @@ systemctl restart sshd
 进入vagrant的box目录，找到对应box的box.ovf配置文件(默认在`{userhome}/.vagrant.d/boxes/`下进入对应的box目录查找)，删除`AudioAdapter`配置。
 
 ![image-20230126082518267](images/image-20230126082518267.png)
+
+### 6.2 镜像地址
+
+代码和镜像托管在github，由于网络原因，可能导致下载失败，可将代码仓库和docker镜像仓库替换为国内地址。
+
+- 北大镜像仓库已同步SCOW的docker镜像，仓库可修改为：`mirrors.pku.edu.cn/pkuhpc/scow`，对应文件为`deploy\vagrant\scow\scow-deployment\config.py`的`COMMON.IMAGE_BASE`。
+
+- 可将scow-deployment和export-jobs项目代码同步至国内仓库，例如码云，对应文件为`deploy\vagrant\scripts\scow.sh`
+
+
 
 ## 授权协议
 
