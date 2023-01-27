@@ -18,7 +18,7 @@ import { PlatformRole } from "src/models/User";
 import { getClient } from "src/utils/client";
 
 export interface UpdateBlockStatusSchema {
-  method: "POST";
+  method: "PUT";
 
   responses: {
     200: null;

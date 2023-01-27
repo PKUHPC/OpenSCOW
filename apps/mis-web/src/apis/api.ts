@@ -101,7 +101,7 @@ export const api = {
   setTenantRole: fromApi<SetTenantRoleSchema>("PUT", join(basePath, "/api/admin/setTenantRole")),
   unsetPlatformRole: fromApi<UnsetPlatformRoleSchema>("PUT", join(basePath, "/api/admin/unsetPlatformRole")),
   unsetTenantRole: fromApi<UnsetTenantRoleSchema>("PUT", join(basePath, "/api/admin/unsetTenantRole")),
-  updateBlockStatus: fromApi<UpdateBlockStatusSchema>("POST", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin/updateBlock")),
+  updateBlockStatus: fromApi<UpdateBlockStatusSchema>("PUT", join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/admin/updateBlock")),
   authCallback: fromApi<AuthCallbackSchema>("GET", join(basePath, "/api/auth/callback")),
   logout: fromApi<LogoutSchema>("DELETE", join(basePath, "/api/auth/logout")),
   validateToken: fromApi<ValidateTokenSchema>("GET", join(basePath, "/api/auth/validateToken")),
