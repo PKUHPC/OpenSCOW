@@ -26,7 +26,7 @@ import { ManageJobBillingTable } from "src/pageComponents/job/ManageJobBillingTa
 import { PlatformOrTenantRadio } from "src/pageComponents/job/PlatformOrTenantRadio";
 import { Head } from "src/utils/head";
 
-export const AdminJobBillingTablePage: NextPage = 
+export const AdminJobBillingTablePage: NextPage =
   requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))(
     () => {
       const query = useQuerystring();
@@ -87,9 +87,10 @@ export const AdminJobBillingTable: React.FC<{ tenant?: string }> = ({ tenant }) 
       <FilterFormContainer>
         <Form layout="inline">
           <Form.Item label="管理平台或租户计费项">
-            <PlatformOrTenantRadio 
+            <PlatformOrTenantRadio
               value={tenant || null}
-              onChange={(tenant) => Router.push({ pathname: "/admin/jobBilling", query: { tenant } })}
+              onChange={(tenant) => Router.push({
+                pathname: "/admin/jobBilling", query:  tenant ? { tenant } : undefined })}
             />
           </Form.Item>
           <Form.Item>

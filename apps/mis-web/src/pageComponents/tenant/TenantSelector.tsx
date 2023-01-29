@@ -18,15 +18,27 @@ import { useStore } from "simstate";
 import { api } from "src/apis";
 import { UserStore } from "src/stores/UserStore";
 
-type Props = (
-  | { allowUndefined: false; value?: string; onChange: (value: string) => void; }
-  | { allowUndefined: true; value?: string | undefined; onChange?: (value: string | undefined) => void; }
-) & {
+type Props = {
+  value?: string;
+  onChange?: (value: string) => void;
   placeholder?: string;
+  disabled?: boolean;
+  /**
+   * if true, the first tenant will be selected automatically when tenants are fetched
+   */
+  autoSelect?: boolean;
+
+  /**
+   * Called when tenants are fetched
+   * @param tenants all tenants
+   */
+  onTenantsFetched?: (tenants: string[]) => void;
 }
 
+export const TenantSelector: React.FC<Props> = ({
+  onChange, value, placeholder, disabled, autoSelect, onTenantsFetched,
+}) => {
 
-export const TenantSelector: React.FC<Props> = ({ onChange, value, allowUndefined, placeholder }) => {
   const userStore = useStore(UserStore);
 
   const promiseFn = useCallback(async () => {
@@ -35,16 +47,10 @@ export const TenantSelector: React.FC<Props> = ({ onChange, value, allowUndefine
 
   const { data, isLoading, reload } = useAsync({
     promiseFn,
-    onResolve: ({ names }) => {
-      // validate selection
-      if (allowUndefined) {
-        if (value && !names.includes(value)) {
-          onChange?.(undefined);
-        }
-      } else {
-        if ((!value || !names.includes(value)) && names.length > 0) {
-          onChange?.(names[0]);
-        }
+    onResolve(data) {
+      onTenantsFetched?.(data.names);
+      if (autoSelect && !value && data.names.length > 0) {
+        onChange?.(data.names[0]);
       }
     },
   });
@@ -56,12 +62,12 @@ export const TenantSelector: React.FC<Props> = ({ onChange, value, allowUndefine
         options={data ? data.names.map((x) => ({ label: x, value: x })) : []}
         placeholder={placeholder}
         value={value}
+        disabled={disabled}
         style={{ width: "calc(100% - 32px)", minWidth: "200px" }}
-        allowClear={allowUndefined}
         onChange={(v) => onChange?.(v)}
       />
       <Tooltip title="刷新租户列表">
-        <Button icon={<ReloadOutlined spin={isLoading} />} onClick={reload} loading={isLoading} />
+        <Button icon={<ReloadOutlined spin={isLoading} />} disabled={disabled} onClick={reload} loading={isLoading} />
       </Tooltip>
     </Input.Group>
   );

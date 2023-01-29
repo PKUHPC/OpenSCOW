@@ -11,7 +11,7 @@
  */
 
 import { Radio, Space } from "antd";
-import React, { useState } from "react";
+import React, { useRef } from "react";
 
 import { TenantSelector } from "../tenant/TenantSelector";
 
@@ -22,29 +22,31 @@ type Props = {
 
 export const PlatformOrTenantRadio: React.FC<Props> = ({ value, onChange }) => {
 
-  const [tenant, setTenant] = useState(value || "");
+  // 临时保存所有租户，用于切换到租户时选择默认租户
+  const allTenantsRef = useRef<string[]>([]);
+
+  const isPlatform = !value;
 
   return (
     <Radio.Group
       onChange={(e) => {
-        onChange?.(e.target.value);
+        onChange?.(e.target.value ? null : allTenantsRef.current[0]);
       }}
-      value={value}
+      value={isPlatform}
     >
-      <Radio value={null}>{"平台"}</Radio>
-      <Space>
-        <Radio value={tenant}>{"租户:"}</Radio>
-        <TenantSelector 
-          allowUndefined={false} 
-          value={tenant}
+      <Radio value={true}>{"平台"}</Radio>
+      {/* TenantSelector如果放在Radio里将会无法点击 */}
+      <Space size="small">
+        <Radio value={false}>租户</Radio>
+        <TenantSelector
+          onTenantsFetched={(tenants) => { allTenantsRef.current = tenants; }}
+          disabled={isPlatform}
+          value={value ?? undefined}
           onChange={(tenant) => {
-            focus();
-            setTenant(tenant);
             onChange?.(tenant);
           }}
         />
       </Space>
-      
     </Radio.Group>
   );
 };
