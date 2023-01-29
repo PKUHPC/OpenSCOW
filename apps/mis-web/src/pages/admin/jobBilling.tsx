@@ -23,7 +23,7 @@ import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { PageTitle } from "src/components/PageTitle";
 import { PlatformRole } from "src/models/User";
 import { ManageJobBillingTable } from "src/pageComponents/job/ManageJobBillingTable";
-import { TenantSelector } from "src/pageComponents/tenant/TenantSelector";
+import { PlatformOrTenantRadio } from "src/pageComponents/job/PlatformOrTenantRadio";
 import { Head } from "src/utils/head";
 
 export const AdminJobBillingTablePage: NextPage = 
@@ -86,10 +86,8 @@ export const AdminJobBillingTable: React.FC<{ tenant?: string }> = ({ tenant }) 
     <div>
       <FilterFormContainer>
         <Form layout="inline">
-          <Form.Item label="租户">
-            <TenantSelector 
-              placeholder="不选择来管理平台计算项"
-              allowUndefined={true}
+          <Form.Item label="管理平台或租户计费项">
+            <PlatformOrTenantRadio 
               value={tenant}
               onChange={(tenant) => Router.push({ pathname: "/admin/jobBilling", query: { tenant } })}
             />

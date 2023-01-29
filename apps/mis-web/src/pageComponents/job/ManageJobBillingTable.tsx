@@ -18,7 +18,7 @@ import { App, Form, Input, InputNumber, Modal, Popover, Select, Space, Table, To
 import React, { useState } from "react";
 import { api } from "src/apis";
 import { CommonModalProps, ModalLink } from "src/components/ModalLink";
-import { AmountStrategy, AmountStrategyAlgorithm, AmountStrategyDescribe } from "src/models/job";
+import { AmountStrategy, AmountStrategyAlgorithmDescriptions, AmountStrategyDescriptions } from "src/models/job";
 import { moneyToString } from "src/utils/money";
 
 interface Props {
@@ -45,12 +45,12 @@ const calculateNextId = (data?: JobBillingItem[], tenant?: string) => {
     return (nums.length === 0 ? 1 : Math.max(...nums) + 1).toString();
   }
   else {
-    const flag = tenant + " ";
+    const flag = tenant + "_";
     const nums = currentItemIds
       .filter((x) => x.startsWith(flag))
       .map((x) => parseInt(x.replace(flag, "")))
       .filter((x) => !isNaN(x));
-    return tenant + " " + (nums.length === 0 ? 1 : Math.max(...nums) + 1);
+    return tenant + "_" + (nums.length === 0 ? 1 : Math.max(...nums) + 1);
   }
 };
 
@@ -82,7 +82,7 @@ export const ManageJobBillingTable: React.FC<Props> = ({ data, loading, tenant, 
             dataSource={
               data?.historyItems
                 .filter((x) => x.path === [record.cluster, record.partition, record.qos].join("."))
-                .map(sourceToBillingItemType)
+                .map(sourceToBillingItemType).reverse()
             }
             pagination={false}
           >
@@ -93,8 +93,8 @@ export const ManageJobBillingTable: React.FC<Props> = ({ data, loading, tenant, 
               render={(value) => {
                 return (
                   <Space>
-                    {AmountStrategyDescribe[value]}
-                    <Popover title={`总量算法: ${AmountStrategyAlgorithm[value]}`}>
+                    {AmountStrategyDescriptions[value]}
+                    <Popover title={`总量算法: ${AmountStrategyAlgorithmDescriptions[value]}`}>
                       <QuestionCircleOutlined />
                     </Popover>
                   </Space>
@@ -142,10 +142,10 @@ export const ManageJobBillingTable: React.FC<Props> = ({ data, loading, tenant, 
               content={(
                 <div>
                   <p>
-                    {Object.entries(AmountStrategyDescribe)
+                    {Object.entries(AmountStrategyDescriptions)
                       .map((value) => <p key={value[0]}>{`${value[1]}(${value[0]})`}</p>)}
                   </p>
-                  <a href="https://icode.pku.edu.cn/SCOW/docs/info/mis/business/billing">{"细节请查阅文档"}</a>
+                  <a href="https://pkuhpc.github.io/SCOW/docs/info/mis/business/billing">{"细节请查阅文档"}</a>
                 </div>
               )}
             >
@@ -157,8 +157,8 @@ export const ManageJobBillingTable: React.FC<Props> = ({ data, loading, tenant, 
         render={(value) => {
           return (
             <Space>
-              {AmountStrategyDescribe[value]}
-              <Popover title={`总量算法: ${AmountStrategyAlgorithm[value]}`}>
+              {AmountStrategyDescriptions[value]}
+              <Popover title={`总量算法: ${AmountStrategyAlgorithmDescriptions[value]}`}>
                 <QuestionCircleOutlined />
               </Popover>
             </Space>
@@ -245,7 +245,7 @@ const EditPriceModal: React.FC<CommonModalProps & {
                 title={"总量算法"}
                 content={(
                   <div>
-                    {Object.entries(AmountStrategyAlgorithm)
+                    {Object.entries(AmountStrategyAlgorithmDescriptions)
                       .map((value) => <p key={value[0]}>{`${value[0]}: ${value[1]}`}</p>)}
                   </div>
                 )}
@@ -260,7 +260,7 @@ const EditPriceModal: React.FC<CommonModalProps & {
           <Select 
             options={
               Object.values(AmountStrategy)
-                .map((x) => ({ label: AmountStrategyDescribe[x], value: x }))} 
+                .map((x) => ({ label: AmountStrategyDescriptions[x], value: x }))} 
             placeholder="请选择计费策略"
             dropdownMatchSelectWidth={false}
               
