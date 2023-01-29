@@ -18,7 +18,9 @@ import { App, Form, Input, InputNumber, Modal, Popover, Select, Space, Table, To
 import React, { useState } from "react";
 import { api } from "src/apis";
 import { CommonModalProps, ModalLink } from "src/components/ModalLink";
-import { AmountStrategy, AmountStrategyAlgorithmDescriptions, AmountStrategyDescriptions } from "src/models/job";
+import { AmountStrategy, AmountStrategyAlgorithmDescriptions,
+  AmountStrategyDescription,
+  AmountStrategyDescriptions, AmountStrategyText } from "src/models/job";
 import { moneyToString } from "src/utils/money";
 
 interface Props {
@@ -78,7 +80,7 @@ export const ManageJobBillingTable: React.FC<Props> = ({ data, loading, tenant, 
       rowKey="id"
       expandable={{ expandedRowRender: (record) => {
         return (
-          <Table 
+          <Table
             dataSource={
               data?.historyItems
                 .filter((x) => x.path === [record.cluster, record.partition, record.qos].join("."))
@@ -88,13 +90,13 @@ export const ManageJobBillingTable: React.FC<Props> = ({ data, loading, tenant, 
           >
             <Table.Column title="计费价格编号" dataIndex={"id"} />
             <Table.Column
-              title={"计费方式"}
+              title={AmountStrategyText}
               dataIndex={"amountStrategy"}
               render={(value) => {
                 return (
                   <Space>
                     {AmountStrategyDescriptions[value]}
-                    <Popover title={`总量算法: ${AmountStrategyAlgorithmDescriptions[value]}`}>
+                    <Popover title={`${AmountStrategyAlgorithmDescriptions[value]}`}>
                       <QuestionCircleOutlined />
                     </Popover>
                   </Space>
@@ -105,7 +107,7 @@ export const ManageJobBillingTable: React.FC<Props> = ({ data, loading, tenant, 
             <Table.Column title="状态" render={(_) => "已作废"} />
           </Table>
         );
-      }, 
+      },
       showExpandColumn:true,
       expandIcon: ({ expanded, onExpand, record }) =>
         expanded ? (
@@ -136,9 +138,9 @@ export const ManageJobBillingTable: React.FC<Props> = ({ data, loading, tenant, 
       <Table.Column
         title={(
           <Space>
-            {"计费方式"}
+            {AmountStrategyText}
             <Popover
-              title={"计费方式"}
+              title={AmountStrategyDescription}
               content={(
                 <div>
                   <p>
@@ -158,7 +160,7 @@ export const ManageJobBillingTable: React.FC<Props> = ({ data, loading, tenant, 
           return (
             <Space>
               {AmountStrategyDescriptions[value]}
-              <Popover title={`总量算法: ${AmountStrategyAlgorithmDescriptions[value]}`}>
+              <Popover title={`${AmountStrategyAlgorithmDescriptions[value]}`}>
                 <QuestionCircleOutlined />
               </Popover>
             </Space>
@@ -173,13 +175,13 @@ export const ManageJobBillingTable: React.FC<Props> = ({ data, loading, tenant, 
           return {
             children: (
               <Space>
-                <EditPriceModalLink 
+                <EditPriceModalLink
                   nextId={nextId}
-                  cluster={r.cluster} 
-                  partition={r.partition} 
-                  qos={r.qos} 
-                  reload={reload} 
-                  tenant={tenant} 
+                  cluster={r.cluster}
+                  partition={r.partition}
+                  qos={r.qos}
+                  reload={reload}
+                  tenant={tenant}
                 >
                   设置
                 </EditPriceModalLink>
@@ -190,7 +192,7 @@ export const ManageJobBillingTable: React.FC<Props> = ({ data, loading, tenant, 
       />
     </Table>
 
-    
+
   );
 };
 
@@ -211,7 +213,7 @@ const EditPriceModal: React.FC<CommonModalProps & {
     setLoading(true);
 
     await api.addBillingItem({ body: {
-      amount, itemId: nextId, path: [cluster, partition, qos].join("."), 
+      amount, itemId: nextId, path: [cluster, partition, qos].join("."),
       price: numberToMoney(price), description, tenant,
     } })
       .httpError(409, () => { message.error("此ID已经被使用！"); })
@@ -228,21 +230,21 @@ const EditPriceModal: React.FC<CommonModalProps & {
       <Form
         form={form}
       >
-        <Form.Item label="租户">
-          <strong>{tenant ?? "默认价格项"}</strong>
+        <Form.Item label="对象">
+          <strong>{tenant ? ("租户" + tenant) : "平台"}</strong>
         </Form.Item>
-        <Form.Item label="计费路径">
-          <strong>{`${cluster}集群, ${partition}分区, ${qos}QOS`}</strong>
+        <Form.Item label="计费项">
+          集群 <strong>{cluster}</strong>，分区 <strong>{partition}</strong>，QOS <strong>{qos}</strong>
         </Form.Item>
-        <Form.Item label="计费项ID">
+        <Form.Item label="新计费价格编号">
           <strong>{nextId}</strong>
         </Form.Item>
-        <Form.Item 
+        <Form.Item
           label={(
             <Space>
-              {"计费策略"}
+              {AmountStrategyText}
               <Popover
-                title={"总量算法"}
+                title={AmountStrategyDescription}
                 content={(
                   <div>
                     {Object.entries(AmountStrategyAlgorithmDescriptions)
@@ -257,13 +259,12 @@ const EditPriceModal: React.FC<CommonModalProps & {
           name="amount"
           rules={[{ required: true }]}
         >
-          <Select 
+          <Select
             options={
               Object.values(AmountStrategy)
-                .map((x) => ({ label: AmountStrategyDescriptions[x], value: x }))} 
-            placeholder="请选择计费策略"
+                .map((x) => ({ label: AmountStrategyDescriptions[x], value: x }))}
             dropdownMatchSelectWidth={false}
-              
+
           />
         </Form.Item>
         <Form.Item label="价格（元）" name="price" rules={[{ required: true }]}>

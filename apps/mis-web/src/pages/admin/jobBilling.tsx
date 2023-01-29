@@ -86,7 +86,7 @@ export const AdminJobBillingTable: React.FC<{ tenant?: string }> = ({ tenant }) 
     <div>
       <FilterFormContainer>
         <Form layout="inline">
-          <Form.Item label="管理平台或租户计费项">
+          <Form.Item label="管理对象">
             <PlatformOrTenantRadio
               value={tenant || null}
               onChange={(tenant) => Router.push({
