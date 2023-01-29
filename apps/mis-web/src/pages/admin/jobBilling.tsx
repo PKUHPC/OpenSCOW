@@ -88,7 +88,7 @@ export const AdminJobBillingTable: React.FC<{ tenant?: string }> = ({ tenant }) 
         <Form layout="inline">
           <Form.Item label="管理平台或租户计费项">
             <PlatformOrTenantRadio 
-              value={tenant}
+              value={tenant || null}
               onChange={(tenant) => Router.push({ pathname: "/admin/jobBilling", query: { tenant } })}
             />
           </Form.Item>

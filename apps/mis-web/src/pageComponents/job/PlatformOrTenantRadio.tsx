@@ -16,8 +16,8 @@ import React, { useState } from "react";
 import { TenantSelector } from "../tenant/TenantSelector";
 
 type Props = {
-  value: string | undefined;
-  onChange: (value: string) => void;
+  value?: string | null; // value will be null when selecting platform
+  onChange?: (value: string) => void;
 }
 
 export const PlatformOrTenantRadio: React.FC<Props> = ({ value, onChange }) => {
@@ -29,22 +29,21 @@ export const PlatformOrTenantRadio: React.FC<Props> = ({ value, onChange }) => {
     <Radio.Group
       onChange={(e) => {
         setSelect(e.target.value);
-        onChange(e.target.value);
+        onChange?.(e.target.value);
       }}
       value={select}
-      buttonStyle={"outline"}
     >
-      <Radio value={undefined}>{"平台"}</Radio>
+      <Radio value={null}>{"平台"}</Radio>
       <Space>
         <Radio value={tenant}>{"租户:"}</Radio>
         <TenantSelector 
           allowUndefined={false} 
-          value={value}
+          value={tenant}
           onChange={(tenant) => {
             focus();
             setSelect(tenant);
             setTenant(tenant);
-            onChange(tenant);
+            onChange?.(tenant);
           }}
         />
       </Space>

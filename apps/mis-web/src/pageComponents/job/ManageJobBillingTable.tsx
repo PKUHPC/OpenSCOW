@@ -84,7 +84,7 @@ export const ManageJobBillingTable: React.FC<Props> = ({ data, loading, tenant, 
                 .filter((x) => x.path === [record.cluster, record.partition, record.qos].join("."))
                 .map(sourceToBillingItemType).reverse()
             }
-            pagination={false}
+            pagination={{ hideOnSinglePage: true }}
           >
             <Table.Column title="计费价格编号" dataIndex={"id"} />
             <Table.Column
