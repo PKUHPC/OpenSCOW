@@ -21,17 +21,15 @@ type Props = {
 }
 
 export const PlatformOrTenantRadio: React.FC<Props> = ({ value, onChange }) => {
-  const [select, setSelect] = useState(value);
 
   const [tenant, setTenant] = useState(value || "");
 
   return (
     <Radio.Group
       onChange={(e) => {
-        setSelect(e.target.value);
         onChange?.(e.target.value);
       }}
-      value={select}
+      value={value}
     >
       <Radio value={null}>{"平台"}</Radio>
       <Space>
@@ -41,7 +39,6 @@ export const PlatformOrTenantRadio: React.FC<Props> = ({ value, onChange }) => {
           value={tenant}
           onChange={(tenant) => {
             focus();
-            setSelect(tenant);
             setTenant(tenant);
             onChange?.(tenant);
           }}
