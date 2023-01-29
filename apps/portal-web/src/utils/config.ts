@@ -76,6 +76,8 @@ export interface PublicRuntimeConfig {
   PASSWORD_PATTERN: string | undefined;
   PASSWORD_PATTERN_MESSAGE: string | undefined;
 
+  BASE_PATH: string;
+
 }
 
 export const runtimeConfig: ServerRuntimeConfig = getConfig().serverRuntimeConfig;

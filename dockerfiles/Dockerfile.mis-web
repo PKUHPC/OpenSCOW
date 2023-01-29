@@ -50,9 +50,6 @@ COPY tsconfig.json .eslintrc.json turbo.json buf.gen.yaml buf.work.yaml ./
 COPY libs/tsconfig.json ./libs/
 COPY protos ./protos
 
-ARG BASE_PATH=""
-ENV NEXT_PUBLIC_BASE_PATH=$BASE_PATH
-
 RUN pnpm build
 
 COPY scripts scripts
@@ -66,9 +63,6 @@ WORKDIR /app
 COPY --from=builder /app/dist .
 
 ENV NODE_ENV production
-
-ARG BASE_PATH=""
-ENV NEXT_PUBLIC_BASE_PATH=$BASE_PATH
 
 EXPOSE 3000
 

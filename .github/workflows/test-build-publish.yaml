@@ -113,29 +113,13 @@ jobs:
             file: auth
             build_args: ""
 
-          - name: mis-web-root
+          - name: mis-web
             file: mis-web
-            build_args: BASE_PATH=
+            build_args: ""
 
-          - name: mis-web-mis
-            file: mis-web
-            build_args: BASE_PATH=/mis
-
-          - name: mis-web-demo
-            file: mis-web
-            build_args: BASE_PATH=/demo/scow/mis
-
-          - name: portal-web-root
+          - name: portal-web
             file: portal-web
-            build_args: BASE_PATH=
-
-          - name: portal-web-portal
-            file: portal-web
-            build_args: BASE_PATH=/portal
-
-          - name: portal-web-demo
-            file: portal-web
-            build_args: BASE_PATH=/demo/scow
+            build_args: ""
 
           - name: docs
             file: docs
