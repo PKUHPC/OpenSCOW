@@ -17,7 +17,7 @@ import { TenantSelector } from "../tenant/TenantSelector";
 
 type Props = {
   value?: string | null; // value will be null when selecting platform
-  onChange?: (value: string) => void;
+  onChange?: (value: string | null) => void;
 }
 
 export const PlatformOrTenantRadio: React.FC<Props> = ({ value, onChange }) => {
