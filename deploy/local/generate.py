@@ -25,6 +25,8 @@ def get_cfg(keys, default_val = None):
     return default_val
 
   obj = getattr(cfg, keys[0])
+  if not obj:
+    return default_val
 
   for key in keys[1:]:
     if key in obj:
@@ -142,11 +144,8 @@ def dict_to_array(dict_data, *parameter):
             arr.append(key + ":" + dict_data[key])
     return arr
 
-def generate_image(name, postfix):
-    if postfix is None:
-        return cfg.COMMON["IMAGE_BASE"] + "/" + name + ":" + cfg.COMMON["IMAGE_TAG"]
-    else:
-        return cfg.COMMON["IMAGE_BASE"] + "/" + name + "-" + postfix + ":" + cfg.COMMON["IMAGE_TAG"]
+def generate_image(name):
+    return cfg.COMMON["IMAGE_BASE"] + "/" + name + ":" + cfg.COMMON["IMAGE_TAG"]
 
 def create_log_service():
     # 创建日志收集目录 mkdir -p ***
@@ -176,7 +175,7 @@ def create_gateway_service():
         "MIS_PATH": MIS_PATH,
     }
 
-    gateway = Service("gateway", generate_image("gateway", None), gw_ports, {
+    gateway = Service("gateway", generate_image("gateway"), gw_ports, {
         "/etc/hosts": "/etc/hosts",
     }, gw_env)
     return gateway
@@ -213,7 +212,7 @@ def create_auth_service():
 
     auth_ports = [(AUTH_PORT, 5000)] if AUTH_PORT else []
 
-    auth = Service("auth", generate_image("auth", None), auth_ports, au_volumes, au_env)
+    auth = Service("auth", generate_image("auth"), auth_ports, au_volumes, au_env)
     return auth
 
 
@@ -228,12 +227,13 @@ def create_portal_server_service():
 
     ports = [(port, 5000)] if port else []
 
-    portal_server = Service("portal-server", generate_image("portal-server", None), ports, ps_volumes, None)
+    portal_server = Service("portal-server", generate_image("portal-server"), ports, ps_volumes, None)
     return portal_server
 
 
 def create_portal_web_service():
     pw_env = {
+        "BASE_PATH": path_join(BASE_PATH, PORTAL_PATH),
         "MIS_URL": path_join(BASE_PATH, MIS_PATH),
         "MIS_DEPLOYED": "true" if cfg.MIS else "false",
         "AUTH_EXTERNAL_URL": path_join(BASE_PATH, "/auth"),
@@ -244,7 +244,7 @@ def create_portal_web_service():
         "./config": "/etc/scow",
         # "~/.ssh": "/root/.ssh"
     }
-    portal_web = Service("portal-web", generate_image("portal-web", cfg.PORTAL["IMAGE_POSTFIX"]), None,
+    portal_web = Service("portal-web", generate_image("portal-web"), None,
                          pw_volumes, pw_env)
     return portal_web
 
@@ -279,12 +279,13 @@ def create_mis_server_service():
 
     ports = [(port, 5000)] if port else []
 
-    mis_server = Service("mis-server", generate_image("mis-server", None), ports, ms_volumes, ms_env)
+    mis_server = Service("mis-server", generate_image("mis-server"), ports, ms_volumes, ms_env)
     return mis_server
 
 
 def create_mis_web_service():
     mv_env = {
+        "BASE_PATH": path_join(BASE_PATH, MIS_PATH),
         "PORTAL_URL": path_join(BASE_PATH, PORTAL_PATH),
         "PORTAL_DEPLOYED": "true" if cfg.PORTAL else "false",
         "AUTH_EXTERNAL_URL": path_join(BASE_PATH, "/auth"),
@@ -292,7 +293,7 @@ def create_mis_web_service():
     mv_volumes = {
         "./config": "/etc/scow",
     }
-    mis_web = Service("mis-web", generate_image("mis-web", cfg.MIS["IMAGE_POSTFIX"]), None, mv_volumes, mv_env)
+    mis_web = Service("mis-web", generate_image("mis-web"), None, mv_volumes, mv_env)
     return mis_web
 
 def create_novnc_client():
@@ -317,12 +318,12 @@ def create_services():
     com.add_service(create_auth_service())
     com.add_service(create_redis_service())
 
-    if cfg.PORTAL:
+    if cfg.PORTAL != False:
         com.add_service(create_portal_web_service())
         com.add_service(create_portal_server_service())
         com.add_service(create_novnc_client())
 
-    if cfg.MIS:
+    if cfg.MIS != False:
         com.add_service(create_db_service())
         com.add_service(create_mis_server_service())
         com.add_service(create_mis_web_service())

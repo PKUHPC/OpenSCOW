@@ -107,12 +107,23 @@ function MyApp({ Component, pageProps, extra }: Props) {
     <>
       <Head>
         <meta name="format-detection" content="telephone=no" />
-        <link href="/manifest.json" rel="manifest" id="manifest" />
+        <link href={join(publicConfig.BASE_PATH, "/manifest.json")} rel="manifest" id="manifest" />
         <link
           rel="icon"
           type="image/x-icon"
-          href={join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/icon?type=favicon")}
+          href={join(publicConfig.BASE_PATH, "/api/icon?type=favicon")}
         ></link>
+        <script
+          id="__CONFIG__"
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.__CONFIG__ = ${
+    JSON.stringify({
+      BASE_PATH: publicConfig.BASE_PATH === "/" ? "" : publicConfig.BASE_PATH,
+    })};
+            `,
+          }}
+        />
       </Head>
       <StoreProvider stores={[userStore, defaultClusterStore]}>
         <DarkModeProvider>
@@ -170,7 +181,7 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
           "GET",
           join(
             `http://localhost:${process.env.PORT ?? 3000}`,
-            process.env.NEXT_PUBLIC_BASE_PATH || "/",
+            publicConfig.BASE_PATH,
             "/api/auth/validateToken",
           ),
         )({ query: { token } }).catch(() => undefined);

@@ -54,7 +54,7 @@ export const CustomizableLogoAndText: React.FC<Props> = ({ hostname }) => {
       <Logo>
         <img
           alt="logo"
-          src={join(process.env.NEXT_PUBLIC_BASE_PATH || "", "/api/logo")}
+          src={join(publicConfig.BASE_PATH, "/api/logo")}
           style={{
             objectFit: "contain",
             maxWidth: "100%",

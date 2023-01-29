@@ -12,6 +12,7 @@
 
 import { setTokenCookie } from "src/auth/cookie";
 import { validateToken } from "src/auth/token";
+import { publicConfig } from "src/utils/config";
 import { route } from "src/utils/route";
 
 export interface AuthCallbackSchema {
@@ -39,7 +40,7 @@ export default route<AuthCallbackSchema>("AuthCallbackSchema", async (req, res) 
     // set token cache
     setTokenCookie({ res }, token);
 
-    res.redirect(process.env.NEXT_PUBLIC_BASE_PATH || "/");
+    res.redirect(publicConfig.BASE_PATH);
   } else {
     return { 403: null };
 

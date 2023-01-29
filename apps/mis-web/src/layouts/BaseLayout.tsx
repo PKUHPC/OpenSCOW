@@ -35,6 +35,7 @@ export const BaseLayout = ({ footerText, children }: PropsWithChildren<Props>) =
       user={userStore.user}
       routes={routes}
       footerText={footerText}
+      basePath={publicConfig.BASE_PATH}
       headerRightContent={(
         <>
           <JumpToAnotherLink

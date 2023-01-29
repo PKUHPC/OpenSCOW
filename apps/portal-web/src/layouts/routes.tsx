@@ -24,6 +24,7 @@ import {
   SaveOutlined } from "@ant-design/icons";
 import { NavItemProps } from "@scow/lib-web/build/layouts/base/types";
 import { App } from "@scow/protos/build/portal/app";
+import { join } from "path";
 import { User } from "src/stores/UserStore";
 import { Cluster, publicConfig } from "src/utils/config";
 
@@ -71,7 +72,7 @@ export const userRoutes: (
       Icon: MacCommandOutlined,
       text: "Shell",
       path: "/shell",
-      clickToPath: `${process.env.NEXT_PUBLIC_BASE_PATH || ""}/shell/${defaultCluster.id}`,
+      clickToPath: join(publicConfig.BASE_PATH, "shell", defaultCluster.id),
       openInNewPage: true,
       clickable: true,
       children: publicConfig.CLUSTERS.map(({ name, id }) => ({
