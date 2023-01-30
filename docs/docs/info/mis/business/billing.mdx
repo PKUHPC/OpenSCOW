@@ -35,10 +35,10 @@ title: 计费收费
 
 | amount | 总量算法 |
 | -- | -- |
-| `max-cpusAlloc-mem` | `cpusAlloc` |
+| `cpusAlloc` | `cpusAlloc` |
 | `gpu` | `gpu` |
+| `max-cpusAlloc-mem` | `max(cpusAlloc, 向上取整(memReq / (分区内存量/分区核心数)))` |
 | `max-gpu-cpusAlloc` | `max(gpu, 向上取整(cpusAlloc / (分区核心数/分区gpu数)))` |
-| `cpusAlloc` | `max(cpusAlloc, 向上取整(memReq / (分区内存量/分区核心数)))` |
 
 在计算过程中如果发现了其他策略，则整个作业的费用为0。
 
