@@ -10,6 +10,7 @@ title: 部署简介
 - 部署共享存储，可参考[NFS安装和配置](./slurm/nfs.md)
 - 部署LDAP，可参考[LDAP认证系统](./SCOW/auth/ldap.md)
 - 安装module、intel等工具软件，可以参考[module安装](./slurm/module.md)，[intel编译器安装](./slurm/intel.md)
+- 快速部署一套开发测试/环境，可参考[vagrant一键部署slurm+SCOW](./vagrant/index.md)
 
 
 
