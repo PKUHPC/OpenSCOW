@@ -23,8 +23,6 @@
 vagrant up
 ```
 
-![image-20221121092942255](../../docs/docs/deploy/vagrant/images/image-20221121092942255.png)
-
 > - 第一次部署需要从vagrant clould拉取vagrant镜像，速度会比较慢，请耐心等待。
 >
 > - 若镜像有更新，Vagrant不会自动重新下载，请先删除原来的镜像。
@@ -34,8 +32,6 @@ vagrant up
 > 初始化地址：http://192.168.88.100/mis/init/  用户名/密码：demo_admin/demo_admin
 
 进入初始化页面，选择创建初始管理员用户，将`demo_admin`设置为管理员用户。后续用户、账户设置请参考本项目操作手册。
-
-![image-20230126081833205](../../docs/docs/deploy/vagrant/images/image-20230126081833205.png)
 
 ### SCOW运维操作
 
@@ -66,10 +62,10 @@ vagrant destroy
 
 ###  更多文档
 
-- [vagrant环境搭建](/docs/docs/deploy/vagrant/vagrant-env.md)
-- [自定义部署](/docs/docs/deploy/vagrant/customization.md)
-- [vagrant镜像制作](/docs/docs/deploy/vagrant/images.md)
-- [FAQ](/docs/docs/deploy/vagrant/faq.md)
+- [vagrant环境搭建](https://pkuhpc.github.io/SCOW/docs/deploy/vagrant/vagrant-env)
+- [自定义部署](https://pkuhpc.github.io/SCOW/docs/deploy/vagrant/customization)
+- [vagrant镜像制作](https://pkuhpc.github.io/SCOW/docs/deploy/vagrant/images)
+- [FAQ](https://pkuhpc.github.io/SCOW/docs/deploy/vagrant/faq)
 
 ## 授权协议
 
