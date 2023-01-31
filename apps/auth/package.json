@@ -23,7 +23,7 @@
   "dependencies": {
     "@fastify/error": "3.2.0",
     "@fastify/formbody": "7.4.0",
-    "@fastify/static": "6.7.0",
+    "@fastify/static": "6.8.0",
     "@fastify/view": "7.4.1",
     "liquidjs": "10.4.0",
     "@scow/config": "workspace:*",
