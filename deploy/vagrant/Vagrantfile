@@ -36,7 +36,7 @@ vm_list = [
         :mem => "4096",
         :cpu => "4",
         :sshport => 22288,
-        :box => "icode/scow",
+        :box => "icode/scow_blank",
 		    :role => "scow",
         :is_service_node => false
     }
@@ -48,6 +48,9 @@ Vagrant.configure("2") do |config|
   config.vm.box_check_update = false
   Encoding.default_external = 'UTF-8'
   config.vm.boot_timeout= 600
+  config.ssh.username= "root"
+  #config.ssh.password= "vagrant"
+  config.ssh.insert_key = true
 
   vm_list.each do |item|
     config.vm.define item[:name] do |vm_config|
