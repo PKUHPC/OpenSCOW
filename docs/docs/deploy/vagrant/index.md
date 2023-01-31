@@ -20,7 +20,7 @@ title: 快速开始
 vagrant up
 ```
 
-![](images/image-20221121092942255.png)
+![](images/vagrant-up.png)
 
 > - 第一次部署需要从vagrant clould拉取vagrant镜像，速度会比较慢，请耐心等待。
 >
@@ -32,7 +32,7 @@ vagrant up
 
 进入初始化页面，选择创建初始管理员用户，将`demo_admin`设置为管理员用户。后续用户、账户设置请参考本项目操作手册。
 
-![image-20230126081833205](images/image-20230126081833205.png)
+![image-20230126081833205](images/init.png)
 
 ### 3. SCOW运维操作
 

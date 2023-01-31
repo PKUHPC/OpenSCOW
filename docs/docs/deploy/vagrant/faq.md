@@ -7,13 +7,13 @@ title: FAQ
 
 在vagrant up时出现如下报错：
 
-![image-20230126080954387](images/image-20230126080954387.png)
+![image-20230126080954387](images/was-audioadapter-error.png)
 
 **解决方法：**
 
 进入vagrant的box目录，找到对应box的box.ovf配置文件(默认在`{userhome}/.vagrant.d/boxes/`下进入对应的box目录查找)，删除`AudioAdapter`配置。
 
-![image-20230126082518267](images/image-20230126082518267.png)
+![image-20230126082518267](images/was-audioadapter-error-fix.png)
 
 ### 2. 代码或docker镜像拉取过慢或者失败，如何修改仓库地址
 

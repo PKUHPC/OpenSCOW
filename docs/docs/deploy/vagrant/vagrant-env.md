@@ -9,7 +9,7 @@ vagrant支持的provider包括virtualbox、hyperv、libvirt等。virtualbox支�
 
 点击进入[官网](https://www.virtualbox.org/wiki/Downloads)下载virtualbox
 
-![image-20221121104833452](images/image-20221121104833452.png)
+![image-20221121104833452](images/virtualbox-download.png)
 
 此处可选择操作系统版本，选择Windows版本下载、安装(其他操作系统类似)。
 
@@ -19,7 +19,7 @@ vagrant支持的provider包括virtualbox、hyperv、libvirt等。virtualbox支�
 
 点击进入[官网](https://developer.hashicorp.com/vagrant/downloads)下载vagrant
 
-![image-20221121104754043](images/image-20221121104754043.png)
+![image-20221121104754043](images/vagrant-download.png)
 
 这里选择Windows 64位版本，安装过程跟着指引即可。
 
