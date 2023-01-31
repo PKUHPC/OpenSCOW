@@ -40,9 +40,7 @@ module.exports = async (phase) => {
     compiler: {
       styledComponents: true,
     },
-    experimental: {
-      skipTrailingSlashRedirect: true,
-    },
+    skipTrailingSlashRedirect: true,
   };
 
   return withPlugins([
