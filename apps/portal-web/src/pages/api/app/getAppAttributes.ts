@@ -27,6 +27,8 @@ export interface AppCustomAttribute {
   type: "NUMBER" | "SELECT" | "TEXT";
   label: string;
   name: string;
+  required: boolean;
+  placeholder?: string | undefined;
   select: SelectOption[];
 }
 
@@ -71,6 +73,8 @@ export default /* #__PURE__*/route<GetAppAttributesSchema>("GetAppAttributesSche
         label: item.label,
         name: item.name,
         select: item.options,
+        required: item.required,
+        placeholder: item.placeholder,
       });
     });
     return { 200: { appCustomFormAttributes: attributes } };

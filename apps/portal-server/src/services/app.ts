@@ -104,10 +104,10 @@ export const appServiceServer = plugin((server) => {
       }
       const attributesConfig = app.attributes;
       attributesConfig?.forEach((attribute) => {
-        if (!(attribute.name in customAttributes)) {
+        if (attribute.required && !(attribute.name in customAttributes)) {
           throw <ServiceError> {
             code: Status.INVALID_ARGUMENT,
-            message: `custom form attribute ${attribute.name} is not found`,
+            message: `custom form attribute ${attribute.name} is required but not found`,
           };
         }
 
@@ -202,6 +202,8 @@ export const appServiceServer = plugin((server) => {
             type: appCustomAttribute_AttributeTypeFromJSON(item.type.toUpperCase()),
             label: item.label,
             name: item.name,
+            required: item.required,
+            placeholder: item.placeholder,
             options: item.select ?? [],
           });
         });

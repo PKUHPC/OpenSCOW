@@ -35,7 +35,6 @@ interface FormFields {
   coreCount: number;
   account: string;
   maxTime: number;
-  sbatchOptions: string | undefined;
 }
 
 
@@ -64,13 +63,17 @@ export const LaunchAppForm: React.FC<Props> = ({ appId }) => {
 
   const onSubmit = async () => {
     const allFormFields = await form.validateFields();
-    const { cluster, coreCount, partition, qos, account, maxTime, sbatchOptions } = allFormFields;
+    const { cluster, coreCount, partition, qos, account, maxTime } = allFormFields;
 
     const customFormKeyValue: {[key: string]: string} = {};
+    let sbatchOptions: string | undefined;
     if (data) {
       data.forEach((customFormAttribute) => {
         const customFormKey = customFormAttribute.name;
-        customFormKeyValue[customFormKey] = allFormFields[customFormKey];
+        if (customFormKey === "sbatchOptions") {
+          sbatchOptions = allFormFields[customFormKey];
+        }
+        else customFormKeyValue[customFormKey] = allFormFields[customFormKey];
       });
     }
 
@@ -134,15 +137,16 @@ export const LaunchAppForm: React.FC<Props> = ({ appId }) => {
   const customFormItems = data?.map((item, index) => {
 
     const rules: Rule[] = item.type === "NUMBER"
-      ? [{ type: "integer" }, { required: true }]
-      : [{ required: true }];
+      ? [{ type: "integer" }, { required: item.required }]
+      : [{ required: item.required }];
 
-
-    const inputItem = item.type === "NUMBER" ? (<InputNumber />)
-      : item.type === "TEXT" ? (<Input />)
+    const placeholder = item.placeholder ?? "";
+    const inputItem = item.type === "NUMBER" ? (<InputNumber placeholder={placeholder} />)
+      : item.type === "TEXT" ? (<Input placeholder={placeholder} />)
         : (
           <Select
             options={item.select.map((x) => ({ label: x.label, value: x.value }))}
+            placeholder={placeholder}
           />
         );
 
@@ -218,10 +222,6 @@ export const LaunchAppForm: React.FC<Props> = ({ appId }) => {
       </Form.Item>
 
       {customFormItems}
-
-      <Form.Item label="其他sbatch参数" name="sbatchOptions">
-        <Input placeholder="比如：--gpus gres:2 --time 10" />
-      </Form.Item>
 
       <Form.Item>
         <Button type="primary" htmlType="submit" loading={loading}>

@@ -111,6 +111,8 @@ message AppCustomAttribute {
   string label = 2;
   string name = 3;
   repeated SelectOption options = 4;
+  bool required =5;
+  optional string placeholder = 6;
 }
 
 message GetAppAttributesResponse {
