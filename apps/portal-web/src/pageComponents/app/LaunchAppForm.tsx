@@ -13,19 +13,21 @@
 import { App, Button, Form, Input, InputNumber, Select } from "antd";
 import { Rule } from "antd/es/form";
 import Router from "next/router";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useAsync } from "react-async";
+import { useEffect, useMemo, useState } from "react";
 import { useStore } from "simstate";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { splitSbatchArgs } from "src/models/job";
 import { AccountSelector } from "src/pageComponents/job/AccountSelector";
+import { AppCustomAttribute } from "src/pages/api/app/getAppMetadata";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { Cluster, publicConfig } from "src/utils/config";
 import { firstPartition, getPartitionInfo } from "src/utils/jobForm";
 
 interface Props {
   appId: string;
+  appName: string;
+  attributes: AppCustomAttribute[];
 }
 
 interface FormFields {
@@ -46,18 +48,9 @@ const initialValues = {
 } as Partial<FormFields>;
 
 
-export const LaunchAppForm: React.FC<Props> = ({ appId }) => {
+export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
 
   const { message } = App.useApp();
-
-  const { data } = useAsync({
-    promiseFn: useCallback(async () => {
-      const { appCustomFormAttributes } = await api.getAppAttributes({ query: { appId } })
-        .httpError(404, () => { message.error("此应用不存在"); });
-      return appCustomFormAttributes;
-    },
-    [appId]),
-  });
 
   const [form] = Form.useForm<FormFields>();
   const [loading, setLoading] = useState(false);
@@ -67,12 +60,10 @@ export const LaunchAppForm: React.FC<Props> = ({ appId }) => {
     const { cluster, coreCount, partition, qos, account, maxTime, sbatchOptions } = allFormFields;
 
     const customFormKeyValue: {[key: string]: string} = {};
-    if (data) {
-      data.forEach((customFormAttribute) => {
-        const customFormKey = customFormAttribute.name;
-        customFormKeyValue[customFormKey] = allFormFields[customFormKey];
-      });
-    }
+    attributes.forEach((customFormAttribute) => {
+      const customFormKey = customFormAttribute.name;
+      customFormKeyValue[customFormKey] = allFormFields[customFormKey];
+    });
 
     const userSbatchOptions = sbatchOptions ? splitSbatchArgs(sbatchOptions) : [];
 
@@ -131,7 +122,7 @@ export const LaunchAppForm: React.FC<Props> = ({ appId }) => {
     [cluster, partition],
   );
 
-  const customFormItems = data?.map((item, index) => {
+  const customFormItems = attributes.map((item, index) => {
 
     const rules: Rule[] = item.type === "NUMBER"
       ? [{ type: "integer" }, { required: true }]
