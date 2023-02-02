@@ -71,6 +71,7 @@ export const AppConfigSchema = Type.Object({
       label: Type.String({ description: "表单标签" }),
       name: Type.String({ description: "表单字段名" }),
       required: Type.Boolean({ description: "是必填项", default: "true" }),
+      default: Type.Optional(Type.String({ description: "输入的默认值" })),
       placeholder: Type.Optional(Type.String({ description: "输入提示信息" })),
       select: Type.Optional(
         Type.Array(
@@ -100,6 +101,10 @@ export const getAppConfigs: GetConfigFn<Record<string, AppConfigSchema>> = (base
         if (item.type === "select" && !item.select) {
           throw new Error(`
           App ${id}'s form attributes of name ${item.name} is of type select but select options is not set`);
+        }
+        if (!item.required && !item.default) {
+          throw new Error(`
+          App ${id}'s form attributes of name ${item.name} need to have default value`);
         }
       });
     }

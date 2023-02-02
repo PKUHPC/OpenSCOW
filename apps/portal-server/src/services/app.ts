@@ -203,6 +203,7 @@ export const appServiceServer = plugin((server) => {
             label: item.label,
             name: item.name,
             required: item.required,
+            default: item.default,
             placeholder: item.placeholder,
             options: item.select ?? [],
           });

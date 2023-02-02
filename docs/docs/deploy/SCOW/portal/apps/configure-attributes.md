@@ -56,6 +56,7 @@ attributes:
     name: selectVersion
     label: 选择版本
     required: true  # 用户必须选择一个版本
+    default: code-server/4.8.0
     placeholder: 选择code-server的版本  # 提示信息
     select:
       - value: code-server/4.8.0
@@ -98,6 +99,7 @@ attributes:
     name: selectVersion
     label: 选择版本
     required: true  # 用户必须选择一个版本
+    default: emacs/27.1
     placeholder: 选择code-server的版本  # 提示信息
     select:
       - value: emacs/27.1
@@ -119,6 +121,7 @@ attributes:
 | `name`     | 字符串                          | 是    | HTML表单的name属性，在编程中使用，并且会作为计算节点环境变量名，可以在Web应用的`script`或者VNC应用的`xstartop`使用 |
 | `label`    | 字符串                          | 是    | HTML表单的label属性，输入框左侧显示的标签                                                 |
 | `required` | 布尔类型                         | 否    | 如果设置为`true`，用户必须填写此项，如果为`false`，用户可以不填。默认为`true`                          |
+| `default` | 字符串                         | 否    | 表单的默认值。如果`required`设置为`false`，必须配置此项                          |
 | `placeholder`   | 字符串                        | 否    | 描述输入字段预期值的提示信息，提示用户此处的输入                                                  |
 | `select`   | 选项的列表                        | 否    | 如果`type`是`select`，必须配置此项，指明具体的选项，具体配置办法见`select`示例                        |
 

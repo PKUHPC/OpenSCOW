@@ -29,6 +29,7 @@ export interface AppCustomAttribute {
   name: string;
   required: boolean;
   placeholder?: string | undefined;
+  default?: string | undefined;
   select: SelectOption[];
 }
 
@@ -74,6 +75,7 @@ export default /* #__PURE__*/route<GetAppAttributesSchema>("GetAppAttributesSche
         name: item.name,
         select: item.options,
         required: item.required,
+        default: item.default,
         placeholder: item.placeholder,
       });
     });
