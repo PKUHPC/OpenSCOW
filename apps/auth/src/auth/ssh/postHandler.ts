@@ -17,6 +17,7 @@ import { FastifyInstance } from "fastify";
 import { cacheInfo } from "src/auth/cacheInfo";
 import { serveLoginHtml } from "src/auth/loginHtml";
 import { redirectToWeb } from "src/routes/callback";
+import { verifyCode } from "src/utils/vertifyCode";
 
 export function registerPostHandler(f: FastifyInstance, loginNode: string) {
 
@@ -36,6 +37,11 @@ export function registerPostHandler(f: FastifyInstance, loginNode: string) {
 
     const logger = req.log.child({ plugin: "ssh" });
 
+    if (!verifyCode(f)) {
+      await serveLoginHtml(true, callbackUrl, req, res, f, true);
+      return;
+    }
+
     // login to the a login node
 
     await sshConnectByPassword(loginNode, username, password, req.log, async () => {})
@@ -46,7 +52,7 @@ export function registerPostHandler(f: FastifyInstance, loginNode: string) {
       })
       .catch(async (e) => {
         logger.error(e, "Log in as %s failed.", username);
-        await serveLoginHtml(true, callbackUrl, req, res);
+        await serveLoginHtml(true, callbackUrl, req, res, f);
       });
 
   });

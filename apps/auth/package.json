@@ -25,7 +25,6 @@
     "@fastify/formbody": "7.4.0",
     "@fastify/static": "6.8.0",
     "@fastify/view": "7.4.1",
-    "liquidjs": "10.4.0",
     "@scow/config": "workspace:*",
     "@scow/lib-config": "workspace:*",
     "@scow/lib-ssh": "workspace:*",
@@ -36,7 +35,9 @@
     "fastify-plugin": "4.5.0",
     "ioredis": "5.3.0",
     "ldapjs": "2.3.3",
-    "nanoid": "4.0.0"
+    "liquidjs": "10.4.0",
+    "nanoid": "4.0.0",
+    "svg-captcha": "1.4.0"
   },
   "devDependencies": {
     "@types/asn1": "0.2.0",

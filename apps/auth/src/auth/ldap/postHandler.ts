@@ -18,6 +18,7 @@ import { findUser, useLdap } from "src/auth/ldap/helpers";
 import { serveLoginHtml } from "src/auth/loginHtml";
 import { LdapConfigSchema } from "src/config/auth";
 import { redirectToWeb } from "src/routes/callback";
+import { verifyCode } from "src/utils/vertifyCode";
 
 export function registerPostHandler(f: FastifyInstance, ldapConfig: LdapConfigSchema) {
 
@@ -35,6 +36,11 @@ export function registerPostHandler(f: FastifyInstance, ldapConfig: LdapConfigSc
   }, async (req, res) => {
     const { username, password, callbackUrl } = req.body;
 
+    if (!verifyCode(f)) {
+      await serveLoginHtml(true, callbackUrl, req, res, f, true);
+      return;
+    }
+
     // TODO
     // 1. bind with the server
     // 2. find the user using username
@@ -50,7 +56,7 @@ export function registerPostHandler(f: FastifyInstance, ldapConfig: LdapConfigSc
 
       if (!user) {
         logger.info("Didn't find user with %s=%s", ldapConfig.attrs.uid, username);
-        await serveLoginHtml(true, callbackUrl, req, res);
+        await serveLoginHtml(true, callbackUrl, req, res, f);
         return;
       }
 
@@ -62,7 +68,7 @@ export function registerPostHandler(f: FastifyInstance, ldapConfig: LdapConfigSc
         await redirectToWeb(callbackUrl, info, res);
       }).catch(async (err) => {
         logger.info("Binding as %s failed. Err: %o", user.dn, err);
-        await serveLoginHtml(true, callbackUrl, req, res);
+        await serveLoginHtml(true, callbackUrl, req, res, f);
       });
 
     });

@@ -11,10 +11,12 @@
  */
 
 import { DEFAULT_PRIMARY_COLOR } from "@scow/config/build/ui";
-import { FastifyReply, FastifyRequest } from "fastify";
+import { randomUUID } from "crypto";
+import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { join } from "path";
 import { config, FAVICON_URL } from "src/config/env";
 import { uiConfig } from "src/config/ui";
+import svgCaptcha from "svg-captcha";
 
 function parseHostname(req: FastifyRequest): string | undefined {
 
@@ -31,9 +33,28 @@ function parseHostname(req: FastifyRequest): string | undefined {
 }
 
 
-export async function serveLoginHtml(err: boolean, callbackUrl: string, req: FastifyRequest, rep: FastifyReply) {
+export async function serveLoginHtml(
+  err: boolean, callbackUrl: string, req: FastifyRequest, rep: FastifyReply,
+  f: FastifyInstance, vertifyCodeFail?: boolean,
+) {
 
   const hostname = parseHostname(req);
+
+  const options = {
+    size: 4,
+    ignorechars: "0oli1",
+    noise: 3,
+    color: true,
+    background: "#cc9966",
+  };
+
+  const captcha = svgCaptcha.create(options);
+
+  const data = captcha.data;
+  const text = captcha.text;
+  const sid = randomUUID();
+  f.redis.set(sid, text, "EX", 120);
+
 
   return rep.status(err ? 401 : 200).view("login.liquid", {
     cssUrl: join(config.BASE_PATH, config.AUTH_BASE_PATH, "/public/assets/tailwind.min.css"),
@@ -42,6 +63,9 @@ export async function serveLoginHtml(err: boolean, callbackUrl: string, req: Fas
     callbackUrl,
     footerText: (hostname && uiConfig?.footer?.hostnameTextMap?.[hostname]) ?? uiConfig?.footer?.defaultText ?? "",
     err,
+    data,
+    sid,
+    vertifyCodeFail,
   });
 
 }

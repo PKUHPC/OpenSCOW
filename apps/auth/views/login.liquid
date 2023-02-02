@@ -30,7 +30,20 @@
                             class="-mx-6 px-8 w-full border rounded px-3 py-2 text-gray-700 focus:outline-none" />
                     </div>
                 </div>
+                <div class="w-full mb-4">
+                    <div class="flex items-center">
+                        <input name="vertifyCode" placeholder="请输入验证码" type="text"
+                            class="-mx-6 px-8 w-full border rounded px-3 py-2 text-gray-700 focus:outline-none" />
+                    </div>
+                    <div class="flex items-center">
+                          {{ data }}
+                  </div>
+                </div>
+                <input type="hidden" name="vertifyCode" value="{{ sid }}" />
                 <input type="hidden" name="callbackUrl" value="{{ callbackUrl }}" />
+                {% if vertifyCodeFail %}
+                <p class="my-4 text-center text-red-600">验证码无效，请重新输入。</p>
+              {% endif %}
                 {% if err %}
                   <p class="my-4 text-center text-red-600">用户名/密码无效，请检查。</p>
                 {% endif %}
