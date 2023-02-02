@@ -13,7 +13,7 @@
     "!**/*.map"
   ],
   "dependencies": {
-    "node-ssh": "13.0.0",
+    "node-ssh": "13.0.1",
     "shell-quote": "1.7.4"
   },
   "devDependencies": {

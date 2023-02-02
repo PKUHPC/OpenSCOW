@@ -50,7 +50,7 @@ docker compose --env-file dev/.env.build -f dev/docker-compose.build.yml build
 
 :::tip
 
-您可以通过修改`dev/.env.build`文件来修改构建的镜像的名称和tag，以及修改[web镜像的基础路径](./customization/basepath.md)。
+您可以通过修改`dev/.env.build`文件来修改构建的镜像的名称和tag。
 
 :::
 

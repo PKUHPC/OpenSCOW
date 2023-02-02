@@ -64,3 +64,19 @@ export enum AmountStrategy {
   GPU = "gpu",
   CPUS_ALLOC = "cpusAlloc"
 }
+
+export const AmountStrategyText = "计量方式";
+export const AmountStrategyDescription = "确定作业的用量的方式";
+
+export const AmountStrategyDescriptions: Record<AmountStrategy, string> = {
+  "max-cpusAlloc-mem": "CPU和内存分配量",
+  "max-gpu-cpusAlloc": "GPU和CPU分配量",
+  "gpu": "GPU分配量",
+  "cpusAlloc": "CPU分配量",
+};
+export const AmountStrategyAlgorithmDescriptions: Record<AmountStrategy, string> = {
+  "max-cpusAlloc-mem": "max(cpusAlloc, 向上取整(memReq / (分区内存量/分区核心数)))",
+  "max-gpu-cpusAlloc": "max(gpu, 向上取整(cpusAlloc / (分区核心数/分区gpu数)))",
+  "gpu": "gpu",
+  "cpusAlloc": "cpusAlloc",
+};

@@ -49,13 +49,8 @@ export const platformAdminRoutes: (platformRoles: PlatformRole[]) => NavItemProp
         },
         {
           Icon: MoneyCollectOutlined,
-          text: "查询作业计费项",
-          path: "/admin/jobBillingItems",
-        },
-        {
-          Icon: MoneyCollectOutlined,
-          text: "管理作业价格表",
-          path: "/admin/jobBillingTable",
+          text: "作业计费价格表",
+          path: "/admin/jobBilling",
         },
         {
           Icon: LockOutlined,

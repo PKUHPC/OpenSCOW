@@ -25,6 +25,8 @@ def get_cfg(keys, default_val = None):
     return default_val
 
   obj = getattr(cfg, keys[0])
+  if not obj:
+    return default_val
 
   for key in keys[1:]:
     if key in obj:
@@ -316,12 +318,12 @@ def create_services():
     com.add_service(create_auth_service())
     com.add_service(create_redis_service())
 
-    if cfg.PORTAL:
+    if cfg.PORTAL != False:
         com.add_service(create_portal_web_service())
         com.add_service(create_portal_server_service())
         com.add_service(create_novnc_client())
 
-    if cfg.MIS:
+    if cfg.MIS != False:
         com.add_service(create_db_service())
         com.add_service(create_mis_server_service())
         com.add_service(create_mis_web_service())

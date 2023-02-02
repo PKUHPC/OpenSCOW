@@ -101,9 +101,9 @@ export const TenantChargeForm: React.FC = () => {
         rules={[{ required: true }]}
       >
         <TenantSelector
-          allowUndefined={false}
           placeholder="选择租户"
-          onChange={(tenantName) => form.setFieldValue("tenantName", tenantName)}
+          autoSelect
+          // onChange={(tenantName) => form.setFieldValue("tenantName", tenantName)}
         />
       </Form.Item>
       <Form.Item name="amount" label="金额" rules={[{ required: true }]}>

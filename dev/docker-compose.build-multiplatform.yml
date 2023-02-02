@@ -21,50 +21,23 @@ services:
         - linux/amd64
         - linux/arm64
 
-
-  mis-web-mis:
-    image: $IMAGE_BASE/mis-web-mis:$TAG
+  mis-web:
+    image: $IMAGE_BASE/mis-web:$TAG
     build:
       context: ..
       dockerfile: dockerfiles/Dockerfile.mis-web
       platforms:
         - linux/amd64
         - linux/arm64
-      args:
-        - BASE_PATH=$BASE_PATH/mis
 
-  mis-web-root:
-    image: $IMAGE_BASE/mis-web-root:$TAG
-    build:
-      context: ..
-      dockerfile: dockerfiles/Dockerfile.mis-web
-      platforms:
-        - linux/amd64
-        - linux/arm64
-      args:
-        - BASE_PATH=$BASE_PATH
-
-  portal-web-portal:
-    image: $IMAGE_BASE/portal-web-portal:$TAG
+  portal-web:
+    image: $IMAGE_BASE/portal-web:$TAG
     build:
       context: ..
       dockerfile: dockerfiles/Dockerfile.portal-web
       platforms:
         - linux/amd64
         - linux/arm64
-      args:
-        - BASE_PATH=$BASE_PATH/portal
-
-  portal-web-root:
-    image: $IMAGE_BASE/portal-web-root:$TAG
-    build:
-      context: ..
-      dockerfile: dockerfiles/Dockerfile.portal-web
-      platforms:
-        - linux/amd64
-        - linux/arm64
-      args:
-        - BASE_PATH=$BASE_PATH
 
   mis-server:
     image: $IMAGE_BASE/mis-server:$TAG
@@ -92,5 +65,3 @@ services:
       platforms:
         - linux/amd64
         - linux/arm64
-
-

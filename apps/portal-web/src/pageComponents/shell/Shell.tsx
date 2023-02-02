@@ -86,7 +86,6 @@ export const Shell: React.FC<Props> = ({ user, cluster, path }) => {
         });
 
         socket.on("data", (data: ArrayBuffer) => {
-          console.log("received data", typeof data, data, data.toString());
           term.write(Buffer.from(data));
         });
 

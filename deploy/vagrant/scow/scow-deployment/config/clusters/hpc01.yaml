@@ -25,9 +25,7 @@ slurm:
       gpus: 0
       # QOS
       qos:
-        - low
         - normal
-        - high
       # 这个分区的备注信息
       comment: "两个计算节点分区"
 

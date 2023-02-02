@@ -54,8 +54,6 @@ export default route<UploadFileSchema>("UploadFileSchema", async (req, res) => {
     throw new Error("Error when waiting for file upload", { cause: e });
   })) as Parameters<BusboyEvents["file"]>;
 
-  console.log("received file", _name);
-
   return await asyncRequestStreamCall(client, "upload", async ({ writeAsync }, stream) => {
     await writeAsync({ message: { $case: "info", info: { cluster, path, userId: info.identityId } } });
 

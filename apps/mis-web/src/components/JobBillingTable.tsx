@@ -12,6 +12,7 @@
 
 import { Table } from "antd";
 import { ColumnsType } from "antd/es/table";
+import { AmountStrategyText } from "src/models/job";
 import { publicConfig } from "src/utils/config";
 
 export interface JobBillingTableItem {
@@ -73,7 +74,7 @@ const columns: ColumnsType<JobBillingTableItem> = [
   { dataIndex: "price", title: "单价（元）", key: "index", render: (_, r) => ({
     children: r.priceItem?.price ?? "未定义",
   }) },
-  { dataIndex: "amount", title: "计量方式", key: "index", render: (_, r) => ({
+  { dataIndex: "amount", title: AmountStrategyText, key: "index", render: (_, r) => ({
     children: r.priceItem?.amount ?? "未定义",
   }) },
   { dataIndex: "comment", title: "说明", key: "index", render: (_, r) => ({
