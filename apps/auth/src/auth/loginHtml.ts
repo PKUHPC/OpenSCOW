@@ -53,7 +53,7 @@ export async function serveLoginHtml(
   const data = captcha.data;
   const text = captcha.text;
   const sid = randomUUID();
-  f.redis.set(sid, text, "EX", 120);
+  await f.redis.set(sid, text, "EX", 120);
 
 
   return rep.status(err ? 401 : 200).view("login.liquid", {
