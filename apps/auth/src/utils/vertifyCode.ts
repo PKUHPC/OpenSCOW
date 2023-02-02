@@ -10,11 +10,13 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import formBody from "@fastify/formbody";
 import { Static, Type } from "@sinclair/typebox";
 import { FastifyInstance } from "fastify";
 
 
 export function verifyCode(f: FastifyInstance) {
+  f.register(formBody);
   const bodySchema = Type.Object({
     sid: Type.String(),
     vertifyCode: Type.String(),
@@ -31,7 +33,6 @@ export function verifyCode(f: FastifyInstance) {
     if (result?.toLowerCase() !== vertifyCode.toLowerCase()) {
       vertifyPass = false;
     }
-
   });
 
   return vertifyPass;

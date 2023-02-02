@@ -42,7 +42,7 @@ export async function serveLoginHtml(
 
   const options = {
     size: 4,
-    ignorechars: "0oli1",
+    ignorechars: "0oIi1",
     noise: 3,
     color: true,
     background: "#cc9966",
