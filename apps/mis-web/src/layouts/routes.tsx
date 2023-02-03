@@ -14,17 +14,15 @@ import {
   AccountBookOutlined, BookOutlined, CloudServerOutlined,
   DashboardOutlined,
   InfoOutlined, MoneyCollectOutlined, PartitionOutlined,
-  PlusOutlined, PlusSquareOutlined, UserAddOutlined,
+  PlusOutlined, PlusSquareOutlined, StarOutlined, UserAddOutlined,
   UserOutlined } from "@ant-design/icons";
 import { NavItemProps } from "@scow/lib-web/build/layouts/base/types";
 import { NavIcon } from "@scow/lib-web/build/layouts/icon";
-import { addBasePathToImage } from "@scow/lib-web/build/utils/image";
 import { AccountAffiliation } from "@scow/protos/build/server/user";
 import Whitelist from "src/icons/whiteList.svg";
 import { PlatformRole, TenantRole, UserRole } from "src/models/User";
 import { User } from "src/stores/UserStore";
 import { publicConfig } from "src/utils/config";
-console.log(Whitelist);
 
 export const platformAdminRoutes: (platformRoles: PlatformRole[]) => NavItemProps[] = (platformRoles) => [
   {
@@ -152,7 +150,7 @@ export const tenantRoutes: (tenantRoles: TenantRole[]) => NavItemProps[] = (tena
               path: "/tenant/accounts/create",
             },
             {
-              Icon: <NavIcon src={addBasePathToImage(Whitelist, publicConfig.BASE_PATH)} alt="Whitelist" />,
+              Icon: StarOutlined,
               text: "账户白名单",
               path: "/tenant/accounts/whitelist",
             },
