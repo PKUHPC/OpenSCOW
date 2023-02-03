@@ -15,6 +15,7 @@ import dynamic from "next/dynamic";
 import Image from "next/image";
 import React, { PropsWithChildren, useEffect, useState } from "react";
 import { useLocalStorage } from "src/utils/hooks";
+import { addBasePathToImage } from "src/utils/image";
 
 const modes = ["system", "dark", "light"] as const;
 
@@ -31,12 +32,13 @@ export const useDarkMode = () => React.useContext(DarkModeContext);
 
 // all are icons imported from svg files
 export interface DarkModeButtonProps {
-  light: string;
-  system: string;
-  dark: string;
+  light: any;
+  system: any;
+  dark: any;
+  basePath?: string;
 }
 
-const DarkModeButtonInternal = ({ dark, light, system }: DarkModeButtonProps) => {
+const DarkModeButtonInternal = ({ dark, light, system, basePath = "" }: DarkModeButtonProps) => {
   const { mode, setMode } = useDarkMode();
 
   const icons = {
@@ -50,7 +52,7 @@ const DarkModeButtonInternal = ({ dark, light, system }: DarkModeButtonProps) =>
   return (
     <FloatButton
       onClick={() => setMode(mode === "system" ? "dark" : mode === "dark" ? "light" : "system")}
-      icon={<Image src={icon} alt={alt} width={20} height={20} />}
+      icon={<Image src={addBasePathToImage(icon, basePath)} alt={alt} width={20} height={20} />}
       tooltip={label}
       // icon={icon}
     />

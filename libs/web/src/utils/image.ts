@@ -10,18 +10,12 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { AppFloatButtons } from "@scow/lib-web/build/layouts/AppFloatButtons";
-import moon from "@scow/lib-web/icons/moon.svg";
-import sun from "@scow/lib-web/icons/sun.svg";
-import sunMoon from "@scow/lib-web/icons/sun-moon.svg";
-import { publicConfig } from "src/utils/config";
+import { join } from "path";
 
-export const FloatButtons = () => {
-  return (
-    <AppFloatButtons darkModeButtonProps={{
-      dark: moon, light: sun, system: sunMoon,
-      basePath: publicConfig.BASE_PATH,
-    }}
-    />
-  );
-};
+/**
+ * Add base path to image object from next.js
+ * @param image image object imported by next.js
+ * @param basePath base path of the image
+ * @returns an image object with the base path added to the src
+ */
+export const addBasePathToImage = (image: any, basePath: string) => ({ ...image, src: join(basePath, image.src) });
