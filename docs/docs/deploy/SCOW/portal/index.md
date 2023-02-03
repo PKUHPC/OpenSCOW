@@ -12,30 +12,18 @@ title: 部署门户系统
 修改部署路径下的config.py文件
 
 ```python
-#确保门户系统会部署，即PORTAL不能配置为False
-
-# 如果本项目将会部署在域名的根目录下，按如下设置这两个变量
+# 确保门户系统会部署，即PORTAL不能配置为False
 PORTAL = {
+  # 如果门户系统将会部署在系统的根目录下，设置BASE_PATH为/。默认为/
   "BASE_PATH": "/",
-  "IMAGE_POSTFIX": "root"
-}
-
-# 如果将会部署在`/portal`路径下，按如下设置这两个变量
-PORTAL = {
-  "BASE_PATH": "/portal",
-  "IMAGE_POSTFIX": "root"
-}
-
-# PORTAL.BASE_PATH若不设置，将会取其默认值"/"
-PORTAL = {
-  "IMAGE_POSTFIX": "root",
-  # ...
+  # 如果门户系统将会部署在系统的/portal下，设置BASE_PATH为/portal
+  # "BASE_PATH": "/portal",
 }
 ```
 
 :::tip
 
-如果想自定义系统部署的相对路径，或者了解`PORTAL.BASE_PATH`的含义，请参考[自定义相对路径](../customization/basepath.md)。
+如果想自定义系统部署的相对路径，了解`PORTAL.BASE_PATH`的含义，请参考[自定义相对路径](../customization/basepath.md)。
 
 :::
 
