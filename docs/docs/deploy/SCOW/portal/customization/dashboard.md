@@ -17,13 +17,13 @@ title: 自定义仪表盘
 
 系统支持根据不同的域名显示不同的标题文本和描述信息。
 
-在`config/portal.yaml`中可以配置自定义文档：
+在`config/portal.yaml`中可以配置自定义显示的文本。文本支持HTML的标签，将会被放在一个div中。
 
 ```yaml title="config/portal.yaml"
 # 主页标题
 homeTitle: 
-  # 默认文本
-  defaultText: "Super Computing on Web"
+  # 默认文本。支持HTML
+  defaultText: "Super Computing on Web <strong>HTML supported</strong>"
   # 从不同域名访问，显示的不同的文本
   hostnameMap: 
     a.com: "a.com's SCOW Deployment"

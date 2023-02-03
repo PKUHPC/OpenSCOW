@@ -17,11 +17,13 @@ import { useStore } from "simstate";
 import { requireAuth } from "src/auth/requireAuth";
 import { CustomizableLogoAndText } from "src/pageComponents/dashboard/CustomizableLogoAndText";
 import { UserStore } from "src/stores/UserStore";
+import { runtimeConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
 import { getHostname } from "src/utils/host";
 
-interface Props { 
-  hostname: string | undefined
+interface Props {
+  homeText: string;
+  homeTitle: string;
 }
 
 export const DashboardPage: NextPage<Props> = requireAuth(() => true)((props: Props) => {
@@ -36,19 +38,21 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)((props: Pr
   return (
     <div>
       <Head title="仪表盘" />
-
-      <CustomizableLogoAndText hostname={props.hostname} />
+      <CustomizableLogoAndText homeText={props.homeText} homeTitle={props.homeTitle} />
     </div>
   );
 });
 
 export const getServerSideProps: GetServerSideProps<Props> = async ({ req }) => {
- 
+
   const hostname = getHostname(req);
+
+  const homeText = (hostname && runtimeConfig.HOME_TITLES[hostname]) ?? runtimeConfig.DEFAULT_HOME_TITLE;
+  const homeTitle = (hostname && runtimeConfig.HOME_TEXTS[hostname]) ?? runtimeConfig.DEFAULT_HOME_TEXT;
 
   return {
     props: {
-      hostname,
+      homeText, homeTitle,
     },
   };
 };

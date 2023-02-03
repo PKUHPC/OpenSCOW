@@ -27,9 +27,7 @@ interface Props {
 
 export const Footer: React.FC<Props> = ({ text }) => {
   return (
-    <FooterContainer>
-      {text}
-    </FooterContainer>
+    <FooterContainer dangerouslySetInnerHTML={{ __html: text }} />
   );
 };
 

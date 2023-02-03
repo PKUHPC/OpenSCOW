@@ -28,13 +28,13 @@ apps: true
 
 # 主页标题
 homeTitle:
-  defaultText: "Super Computing on Web"
+  defaultText: "Super Computing on Web<br/>Test"
   hostnameMap:
     a.com: "a.com's SCOW Deployment"
 
 # 主页文本
 homeText:
-  defaultText: "SCOW"
+  defaultText: "SCOW<br/>Haha"
   hostnameMap:
     a.com: "a.com's SCOW"
 
@@ -43,7 +43,6 @@ homeText:
 
 # 是否启用终端功能
 shell: true
-
 # 提交作业的默认工作目录。使用{name}代替作业名称。相对于用户的家目录
 # submitJobDefaultPwd: scow/jobs/{name}
 
@@ -55,5 +54,4 @@ shell: true
 
 # TurboVNC的安装路径
 # turboVNCPath: /opt/TurboVNC
-
 
