@@ -47,8 +47,8 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ req }) => 
 
   const hostname = getHostname(req);
 
-  const homeText = (hostname && runtimeConfig.HOME_TITLES[hostname]) ?? runtimeConfig.DEFAULT_HOME_TITLE;
-  const homeTitle = (hostname && runtimeConfig.HOME_TEXTS[hostname]) ?? runtimeConfig.DEFAULT_HOME_TEXT;
+  const homeTitle = (hostname && runtimeConfig.HOME_TITLES[hostname]) ?? runtimeConfig.DEFAULT_HOME_TITLE;
+  const homeText = (hostname && runtimeConfig.HOME_TEXTS[hostname]) ?? runtimeConfig.DEFAULT_HOME_TEXT;
 
   return {
     props: {
