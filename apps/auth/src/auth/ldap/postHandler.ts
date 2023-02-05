@@ -18,7 +18,7 @@ import { findUser, useLdap } from "src/auth/ldap/helpers";
 import { serveLoginHtml } from "src/auth/loginHtml";
 import { LdapConfigSchema } from "src/config/auth";
 import { redirectToWeb } from "src/routes/callback";
-import { verifyCode } from "src/utils/vertifyCode";
+import { verifyCode } from "src/utils/verifyCode";
 
 export function registerPostHandler(f: FastifyInstance, ldapConfig: LdapConfigSchema) {
 
@@ -28,16 +28,17 @@ export function registerPostHandler(f: FastifyInstance, ldapConfig: LdapConfigSc
     username: Type.String(),
     password: Type.String(),
     callbackUrl: Type.String(),
+    token: Type.String(),
+    code: Type.String(),
   });
 
   // register a login handler
   f.post<{ Body: Static<typeof bodySchema> }>("/public/auth", {
     schema: { body: bodySchema },
   }, async (req, res) => {
-    const { username, password, callbackUrl } = req.body;
+    const { username, password, callbackUrl, token, code } = req.body;
 
-    if (!verifyCode(f)) {
-      await serveLoginHtml(true, callbackUrl, req, res, f, true);
+    if (!verifyCode(f, code, token, callbackUrl, req, res)) {
       return;
     }
 

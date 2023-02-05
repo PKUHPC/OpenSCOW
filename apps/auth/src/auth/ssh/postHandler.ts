@@ -17,7 +17,7 @@ import { FastifyInstance } from "fastify";
 import { cacheInfo } from "src/auth/cacheInfo";
 import { serveLoginHtml } from "src/auth/loginHtml";
 import { redirectToWeb } from "src/routes/callback";
-import { verifyCode } from "src/utils/vertifyCode";
+import { verifyCode } from "src/utils/verifyCode";
 
 export function registerPostHandler(f: FastifyInstance, loginNode: string) {
 
@@ -27,18 +27,19 @@ export function registerPostHandler(f: FastifyInstance, loginNode: string) {
     username: Type.String(),
     password: Type.String(),
     callbackUrl: Type.String(),
+    token: Type.String(),
+    code: Type.String(),
   });
 
   // register a login handler
   f.post<{ Body: Static<typeof bodySchema> }>("/public/auth", {
     schema: { body: bodySchema },
   }, async (req, res) => {
-    const { username, password, callbackUrl } = req.body;
+    const { username, password, callbackUrl, code, token } = req.body;
 
     const logger = req.log.child({ plugin: "ssh" });
 
-    if (!verifyCode(f)) {
-      await serveLoginHtml(true, callbackUrl, req, res, f, true);
+    if (!verifyCode(f, code, token, callbackUrl, req, res)) {
       return;
     }
 

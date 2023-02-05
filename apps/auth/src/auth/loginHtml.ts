@@ -52,8 +52,8 @@ export async function serveLoginHtml(
 
   const data = captcha.data;
   const text = captcha.text;
-  const sid = randomUUID();
-  await f.redis.set(sid, text, "EX", 120);
+  const token = randomUUID();
+  await f.redis.set(token, text, "EX", 120);
 
 
   return rep.status(err ? 401 : 200).view("login.liquid", {
@@ -64,7 +64,7 @@ export async function serveLoginHtml(
     footerText: (hostname && uiConfig?.footer?.hostnameTextMap?.[hostname]) ?? uiConfig?.footer?.defaultText ?? "",
     err,
     data,
-    sid,
+    token,
     vertifyCodeFail,
   });
 
