@@ -10,24 +10,12 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import styled from "styled-components";
+import { join } from "path";
 
-const FooterContainer = styled.div`
-  display: flex;
-  justify-content: center;
-
-  margin-bottom: 8px;
-  // https://v1.tailwindcss.com/docs/text-color text-gray-500
-  color: #a0aec0;
-`;
-
-interface Props {
-  text: string;
-}
-
-export const Footer: React.FC<Props> = ({ text }) => {
-  return (
-    <FooterContainer dangerouslySetInnerHTML={{ __html: text }} />
-  );
-};
-
+/**
+ * Add base path to image object from next.js
+ * @param image image object imported by next.js
+ * @param basePath base path of the image
+ * @returns an image object with the base path added to the src
+ */
+export const addBasePathToImage = (image: any, basePath: string) => ({ ...image, src: join(basePath, image.src) });

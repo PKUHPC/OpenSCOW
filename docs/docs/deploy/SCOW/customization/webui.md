@@ -24,6 +24,7 @@ title: 自定义前端项目主题
 # 对portal-web、mis-web和auth的登录界面有效
 footer:
     # 对所有域名生效的footer文本，默认为空字符串
+    # 文本支持HTML的标签，将会被放在一个div中。
     defaultText: ""
     # 对具体hostname生效的footer文本，可以不填
     hostnameTextMap: 

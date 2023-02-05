@@ -12,7 +12,7 @@ FROM alpine:3.17
 
 ENV TZ Asia/Shanghai
 
-RUN apk add --no-cache openssh=9.1_p1-r1 sudo
+RUN apk add --no-cache openssh=9.1_p1-r2 sudo
 
 COPY ./entry.sh /entry.sh
 

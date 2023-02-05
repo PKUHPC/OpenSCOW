@@ -50,7 +50,7 @@ export interface GetAppMetadataSchema {
 
 const auth = authenticate(() => true);
 
-export default /* #__PURE__*/route<GetAppMetadataSchema>("GetAppMetadata Schema", async (req, res) => {
+export default /* #__PURE__*/route<GetAppMetadataSchema>("GetAppMetadataSchema", async (req, res) => {
 
 
   const info = await auth(req, res);

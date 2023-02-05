@@ -14,7 +14,7 @@
   ],
   "dependencies": {
     "node-ssh": "13.0.1",
-    "shell-quote": "1.7.4"
+    "shell-quote": "1.8.0"
   },
   "devDependencies": {
     "@types/shell-quote": "1.7.1",
