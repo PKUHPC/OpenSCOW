@@ -39,7 +39,8 @@ export function registerPostHandler(f: FastifyInstance, loginNode: string) {
 
     const logger = req.log.child({ plugin: "ssh" });
 
-    if (!verifyCode(f, code, token, callbackUrl, req, res)) {
+    const result = await verifyCode(f, code, token, callbackUrl, req, res);
+    if (!result) {
       return;
     }
 
