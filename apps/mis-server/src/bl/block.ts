@@ -52,19 +52,14 @@ export async function updateBlockStatusInSlurm(
       logger,
     }));
   }
-  const updateTime = new SystemState(SystemState.KEYS.UPDATE_SLURM_BLOCK_STATUS, new Date().toISOString());
-  try {
-    await em.persistAndFlush(updateTime);
-  } catch (e) {
-    if (e instanceof UniqueConstraintViolationException) {
-      throw <ServiceError> {
-        code: status.ALREADY_EXISTS, message: "already initialized",
-      };
-    } else {
-      throw e;
-    }
-  }
+  const updateBlockTime = await em.upsert(SystemState, {
+    key: SystemState.KEYS.UPDATE_SLURM_BLOCK_STATUS, 
+    value: new Date().toISOString(),
+  });
+  await em.persistAndFlush(updateBlockTime);
 
+  logger.info("Updated block status in slurm.");
+  
 }
 
 /**

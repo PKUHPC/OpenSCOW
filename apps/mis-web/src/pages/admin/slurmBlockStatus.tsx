@@ -65,11 +65,10 @@ export const SlurmBlockStatusPage: NextPage = requireAuth((u) => u.platformRoles
                     </span>
                     <DisabledA
                       onClick={async () => {
-
                         setRunning(true);
-                        await api.updateBlockStatus({})
-                          .then(() => { message.success("刷新成功"); })
-                          .finally(() => { setRunning(false); });
+                        await api.updateBlockStatus({});
+                        message.success("刷新成功");
+                        setRunning(false);
                       }}
                       disabled={running}
                     >
