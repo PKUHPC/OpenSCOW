@@ -34,7 +34,7 @@
     "uuid": "9.0.0",
     "wait-on": "7.0.1",
     "ts-log": "2.2.5",
-    "shell-quote": "1.7.4",
+    "shell-quote": "1.8.0",
     "dayjs": "1.11.7"
   },
   "devDependencies": {

@@ -17,8 +17,8 @@
     "@scow/utils": "workspace:*"
   },
   "peerDependencies": {
-    "antd": "5.1.6",
-    "next": "13.0.2",
+    "antd": "5.1.7",
+    "next": "13.1.6",
     "styled-components": "5.3.6"
   },
   "author": "PKUHPC (https://github.com/PKUHPC)",

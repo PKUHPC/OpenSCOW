@@ -14,7 +14,7 @@ import {
   AccountBookOutlined, BookOutlined, CloudServerOutlined,
   DashboardOutlined,
   InfoOutlined, LockOutlined, MoneyCollectOutlined, PartitionOutlined,
-  PlusOutlined, PlusSquareOutlined, UserAddOutlined,
+  PlusOutlined, PlusSquareOutlined, StarOutlined, UserAddOutlined,
   UserOutlined } from "@ant-design/icons";
 import { NavItemProps } from "@scow/lib-web/build/layouts/base/types";
 import { NavIcon } from "@scow/lib-web/build/layouts/icon";
@@ -155,7 +155,7 @@ export const tenantRoutes: (tenantRoles: TenantRole[]) => NavItemProps[] = (tena
               path: "/tenant/accounts/create",
             },
             {
-              Icon: <NavIcon src={Whitelist} alt="Whitelist" />,
+              Icon: StarOutlined,
               text: "账户白名单",
               path: "/tenant/accounts/whitelist",
             },

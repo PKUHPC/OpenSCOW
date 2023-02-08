@@ -1,14 +1,14 @@
 /**
- * Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
- * SCOW is licensed under Mulan PSL v2.
- * You can use this software according to the terms and conditions of the Mulan PSL v2.
- * You may obtain a copy of Mulan PSL v2 at:
- *          http://license.coscl.org.cn/MulanPSL2
- * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
- * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
- * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
- * See the Mulan PSL v2 for more details.
- */
+   * Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
+   * SCOW is licensed under Mulan PSL v2.
+   * You can use this software according to the terms and conditions of the Mulan PSL v2.
+   * You may obtain a copy of Mulan PSL v2 at:
+   *          http://license.coscl.org.cn/MulanPSL2
+   * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+   * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+   * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+   * See the Mulan PSL v2 for more details.
+*/
 
 syntax = "proto3";
 
@@ -35,8 +35,7 @@ message WebAppProps {
   map<string, string> custom_form_data = 6;
 }
 
-message VncAppProps {
-}
+message VncAppProps {}
 
 // NOT_FOUND: session id not found
 // UNAVAILABLE: the session cannot be connected
@@ -92,7 +91,7 @@ message ListAppSessionsResponse {
   repeated AppSession sessions = 1;
 }
 
-message GetAppAttributesRequest {
+message GetAppMetadataRequest {
   string app_id = 1;
 }
 
@@ -113,12 +112,12 @@ message AppCustomAttribute {
   repeated SelectOption options = 4;
 }
 
-message GetAppAttributesResponse {
-  repeated AppCustomAttribute attributes = 1;
+message GetAppMetadataResponse {
+  string app_name = 1;
+  repeated AppCustomAttribute attributes = 2;
 }
 
-message ListAvailableAppsRequest {
-}
+message ListAvailableAppsRequest {}
 
 message App {
   string id = 1;
@@ -132,14 +131,11 @@ message ListAvailableAppsResponse {
 service AppService {
   rpc ConnectToApp(ConnectToAppRequest) returns (ConnectToAppResponse);
 
-  rpc CreateAppSession(CreateAppSessionRequest)
-      returns (CreateAppSessionResponse);
+  rpc CreateAppSession(CreateAppSessionRequest) returns (CreateAppSessionResponse);
 
   rpc ListAppSessions(ListAppSessionsRequest) returns (ListAppSessionsResponse);
 
-  rpc GetAppAttributes(GetAppAttributesRequest)
-      returns (GetAppAttributesResponse);
+  rpc GetAppMetadata(GetAppMetadataRequest) returns (GetAppMetadataResponse);
 
-  rpc ListAvailableApps(ListAvailableAppsRequest)
-      returns (ListAvailableAppsResponse);
+  rpc ListAvailableApps(ListAvailableAppsRequest) returns (ListAvailableAppsResponse);
 }
