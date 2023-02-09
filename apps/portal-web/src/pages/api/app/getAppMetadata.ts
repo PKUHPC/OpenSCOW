@@ -33,7 +33,7 @@ export interface AppCustomAttribute {
   select: SelectOption[];
 }
 
-export interface GetAppAttributesSchema {
+export interface GetAppMetadataSchema {
   method: "GET";
 
   query: {
@@ -42,6 +42,7 @@ export interface GetAppAttributesSchema {
 
   responses: {
     200: {
+      appName: string;
       appCustomFormAttributes: AppCustomAttribute[];
     };
 
@@ -52,7 +53,7 @@ export interface GetAppAttributesSchema {
 
 const auth = authenticate(() => true);
 
-export default /* #__PURE__*/route<GetAppAttributesSchema>("GetAppAttributesSchema", async (req, res) => {
+export default /* #__PURE__*/route<GetAppMetadataSchema>("GetAppMetadataSchema", async (req, res) => {
 
 
   const info = await auth(req, res);
@@ -63,23 +64,17 @@ export default /* #__PURE__*/route<GetAppAttributesSchema>("GetAppAttributesSche
 
   const client = getClient(AppServiceClient);
 
-
-  return asyncUnaryCall(client, "getAppAttributes", {
-    appId,
-  }).then((reply) => {
-    const attributes: AppCustomAttribute[] = [];
-    reply.attributes.forEach((item) => {
-      attributes.push({
-        type: appCustomAttribute_AttributeTypeToJSON(item.type) as AppCustomAttribute["type"],
-        label: item.label,
-        name: item.name,
-        select: item.options,
-        required: item.required,
-        default: item.default,
-        placeholder: item.placeholder,
-      });
-    });
-    return { 200: { appCustomFormAttributes: attributes } };
+  return asyncUnaryCall(client, "getAppMetadata", { appId }).then((reply) => {
+    const attributes: AppCustomAttribute[] = reply.attributes.map((item) => ({
+      type: appCustomAttribute_AttributeTypeToJSON(item.type) as AppCustomAttribute["type"],
+      label: item.label,
+      name: item.name,
+      select: item.options,
+      required: item.required,
+      default: item.default,
+      placeholder: item.placeholder,
+    }));
+    return { 200: { appName: reply.appName, appCustomFormAttributes: attributes } };
   }, handlegRPCError({
     [status.NOT_FOUND]: () => ({ 404: { code: "APP_NOT_FOUND" } } as const),
   }));

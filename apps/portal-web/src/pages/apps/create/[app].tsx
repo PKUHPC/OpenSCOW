@@ -10,15 +10,17 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { LoadingOutlined } from "@ant-design/icons";
 import { queryToString } from "@scow/lib-web/build/utils/querystring";
+import { App } from "antd";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
-import { useStore } from "simstate";
+import { useCallback } from "react";
+import { useAsync } from "react-async";
+import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
-import { NotFoundPage } from "src/components/errorPages/NotFoundPage";
 import { PageTitle } from "src/components/PageTitle";
 import { LaunchAppForm } from "src/pageComponents/app/LaunchAppForm";
-import { AppsStore } from "src/stores/AppsStore";
 import { Head } from "src/utils/head";
 
 
@@ -26,22 +28,25 @@ export const AppIndexPage: NextPage = requireAuth(() => true)(() => {
 
   const router = useRouter();
   const appId = queryToString(router.query.app);
+  const { message } = App.useApp();
 
-  const apps = useStore(AppsStore);
+  const { data, isLoading } = useAsync({
+    promiseFn: useCallback(async () => {
+      return await api.getAppMetadata({ query: { appId } })
+        .httpError(404, () => { message.error("此应用不存在"); })
+        .then((res) => res);
+    }, [appId]),
+  });
 
-  const app = apps.find((x) => x.id === appId);
-
-  if (!app) {
-    return (
-      <NotFoundPage />
-    );
+  if (isLoading || !data) {
+    return <LoadingOutlined />;
   }
 
   return (
     <div>
-      <Head title={`启动${app.name}`} />
-      <PageTitle titleText={`启动${app.name}`} />
-      <LaunchAppForm appId={appId} />
+      <Head title={`启动${data.appName}`} />
+      <PageTitle titleText={`启动${data.appName}`} />
+      <LaunchAppForm appName={data.appName} attributes={data.appCustomFormAttributes} appId={appId} />
     </div>
   );
 });

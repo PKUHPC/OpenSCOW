@@ -33,6 +33,12 @@ export interface ServerRuntimeConfig {
   LOGIN_NODES: Record<string, string>;
 
   SERVER_URL: string;
+
+  DEFAULT_HOME_TEXT: string;
+  HOME_TEXTS: {[hostname: string]: string };
+
+  DEFAULT_HOME_TITLE: string;
+  HOME_TITLES: {[hostname: string]: string };
 }
 
 export interface PublicClusterConfig {
@@ -54,12 +60,6 @@ export interface PublicRuntimeConfig {
   ENABLE_APPS: boolean;
 
   MIS_URL: string | undefined;
-
-  DEFAULT_HOME_TEXT: string;
-  HOME_TEXTS: {[hostname: string]: string };
-
-  DEFAULT_HOME_TITLE: string;
-  HOME_TITLES: {[hostname: string]: string };
 
   CLUSTERS_CONFIG: {[cluster: string]: PublicClusterConfig };
 

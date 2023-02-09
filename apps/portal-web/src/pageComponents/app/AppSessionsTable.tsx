@@ -151,7 +151,7 @@ export const AppSessionsTable: React.FC<Props> = () => {
       }, 10000);
       return () => clearInterval(interval);
     }
-  }, [checked]);
+  }, [reload, checked]);
 
   return (
     <div>

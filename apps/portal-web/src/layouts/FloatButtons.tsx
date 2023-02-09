@@ -14,11 +14,13 @@ import { AppFloatButtons } from "@scow/lib-web/build/layouts/AppFloatButtons";
 import moon from "@scow/lib-web/icons/moon.svg";
 import sun from "@scow/lib-web/icons/sun.svg";
 import sunMoon from "@scow/lib-web/icons/sun-moon.svg";
+import { publicConfig } from "src/utils/config";
 
 export const FloatButtons = () => {
   return (
     <AppFloatButtons darkModeButtonProps={{
       dark: moon, light: sun, system: sunMoon,
+      basePath: publicConfig.BASE_PATH,
     }}
     />
   );

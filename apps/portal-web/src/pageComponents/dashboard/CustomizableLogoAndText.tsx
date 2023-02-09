@@ -17,7 +17,8 @@ import { publicConfig } from "src/utils/config";
 import styled from "styled-components";
 
 interface Props {
-  hostname: string | undefined;
+  homeTitle: string;
+  homeText: string;
 }
 
 const Container = styled.div`
@@ -44,10 +45,9 @@ const Title = styled(Typography.Title)`
 `;
 
 const Text = styled(Typography.Paragraph)`
-  text-indent: 2rem ;
 `;
 
-export const CustomizableLogoAndText: React.FC<Props> = ({ hostname }) => {
+export const CustomizableLogoAndText: React.FC<Props> = ({ homeText, homeTitle }) => {
 
   return (
     <Container>
@@ -63,11 +63,11 @@ export const CustomizableLogoAndText: React.FC<Props> = ({ hostname }) => {
       </Logo>
       <TitleAndText>
         <Title>
-          {(hostname && publicConfig.HOME_TITLES[hostname]) ?? publicConfig.DEFAULT_HOME_TITLE}
+          <div dangerouslySetInnerHTML={{ __html: homeTitle }} />
         </Title>
         <Divider />
         <Text>
-          {(hostname && publicConfig.HOME_TEXTS[hostname]) ?? publicConfig.DEFAULT_HOME_TEXT}
+          <div dangerouslySetInnerHTML={{ __html: homeText }} />
         </Text>
       </TitleAndText>
     </Container>

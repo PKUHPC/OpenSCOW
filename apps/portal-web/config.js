@@ -102,6 +102,10 @@ const buildRuntimeConfig = async (phase, basePath) => {
     UI_CONFIG: uiConfig,
     LOGIN_NODES: parseKeyValue(config.LOGIN_NODES),
     SERVER_URL: config.SERVER_URL,
+    DEFAULT_HOME_TEXT: portalConfig.homeText.defaultText,
+    HOME_TEXTS: portalConfig.homeText.hostnameMap,
+    DEFAULT_HOME_TITLE: portalConfig.homeTitle.defaultText,
+    HOME_TITLES: portalConfig.homeTitle.hostnameMap,
   };
 
   // query auth capabilities to set optional auth features
@@ -124,11 +128,6 @@ const buildRuntimeConfig = async (phase, basePath) => {
     ENABLE_APPS: portalConfig.apps,
 
     MIS_URL: config.MIS_DEPLOYED ? (config.MIS_URL || portalConfig.misUrl) : undefined,
-
-    DEFAULT_HOME_TEXT: portalConfig.homeText.defaultText,
-    HOME_TEXTS: portalConfig.homeText.hostnameMap,
-    DEFAULT_HOME_TITLE: portalConfig.homeTitle.defaultText,
-    HOME_TITLES: portalConfig.homeTitle.hostnameMap,
 
     CLUSTERS_CONFIG: Object.entries(clusters).reduce((prev, [name, config]) => {
       prev[name] = { displayName: config.displayName, slurm: { partitions: config.slurm.partitions } }

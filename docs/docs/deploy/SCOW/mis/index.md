@@ -19,32 +19,16 @@ title: 部署管理系统
 
 ```python
 # 确保管理系统会部署，即MIS不能配置为False
-# 如果将会部署在`/mis`路径下，设置"MIS.BASE_PATH"为 "/mis"，"MIS.IMAGE_POSTFIX"为 "mis"
 MIS = {
+  # 如果管理系统部署在`/mis`路径下，设置"MIS.BASE_PATH"为 "/mis"。默认为"/"
   "BASE_PATH": "/mis",
-  "IMAGE_POSTFIX": "mis",
-  # ...
-}
+  # 如果将会部署在域名的根目录下，设置"MIS.BASE_PATH"为 "/"
+  # "BASE_PATH": "/",
 
-# 如果将会部署在域名的根目录下，设置"MIS.BASE_PATH"为 "/"，"MIS.IMAGE_POSTFIX"为 "root"
-MIS = {
-  "BASE_PATH": "/",
-  "IMAGE_POSTFIX": "root",
-  # ...
-}
-
-# MIS.BASE_PATH若不设置，将会取其默认值"/mis"
-MIS = {
-  "IMAGE_POSTFIX": "mis",
-  # ...
-}
-
-# MIS.DB_PASSWORD为管理系统数据库密码
-# 在系统第一次启动前可自由设置，使用此密码可以以root身份登录数据库
-# 一旦数据库启动后即不可修改
-# 必须长于8个字符，并同时包括字母、数字和符号
-MIS = {
-  # ...
+  # MIS.DB_PASSWORD为管理系统数据库密码
+  # 在系统第一次启动前可自由设置，使用此密码可以以root身份登录数据库
+  # 一旦数据库启动后即不可修改
+  # 必须长于8个字符，并同时包括字母、数字和符号
   "DB_PASSWORD": "must!chang3this"
 }
 ```

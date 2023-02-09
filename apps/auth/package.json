@@ -36,7 +36,7 @@
     "fastify-plugin": "4.5.0",
     "ioredis": "5.3.0",
     "ldapjs": "2.3.3",
-    "nanoid": "4.0.0"
+    "nanoid": "4.0.1"
   },
   "devDependencies": {
     "@types/asn1": "0.2.0",

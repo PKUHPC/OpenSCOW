@@ -18,7 +18,7 @@ import type { GetIconSchema } from "src/pages/api//icon";
 import type { GetLogoSchema } from "src/pages/api//logo";
 import type { ConnectToAppSchema } from "src/pages/api/app/connectToApp";
 import type { CreateAppSessionSchema } from "src/pages/api/app/createAppSession";
-import type { GetAppAttributesSchema } from "src/pages/api/app/getAppAttributes";
+import type { GetAppMetadataSchema } from "src/pages/api/app/getAppMetadata";
 import type { GetAppSessionsSchema } from "src/pages/api/app/getAppSessions";
 import type { ListAvailableAppsSchema } from "src/pages/api/app/listAvailableApps";
 import type { AuthCallbackSchema } from "src/pages/api/auth/callback";
@@ -56,7 +56,7 @@ const basePath = publicConfig.BASE_PATH || "";
 export const api = {
   connectToApp: fromApi<ConnectToAppSchema>("POST", join(basePath, "/api/app/connectToApp")),
   createAppSession: fromApi<CreateAppSessionSchema>("POST", join(basePath, "/api/app/createAppSession")),
-  getAppAttributes: fromApi<GetAppAttributesSchema>("GET", join(basePath, "/api/app/getAppAttributes")),
+  getAppMetadata: fromApi<GetAppMetadataSchema>("GET", join(basePath, "/api/app/getAppMetadata")),
   getAppSessions: fromApi<GetAppSessionsSchema>("GET", join(basePath, "/api/app/getAppSessions")),
   listAvailableApps: fromApi<ListAvailableAppsSchema>("GET", join(basePath, "/api/app/listAvailableApps")),
   authCallback: fromApi<AuthCallbackSchema>("GET", join(basePath, "/api/auth/callback")),

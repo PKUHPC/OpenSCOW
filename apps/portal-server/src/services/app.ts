@@ -186,7 +186,7 @@ export const appServiceServer = plugin((server) => {
       return [{ sessions: reply.sessions.map((x) => ({ ...x, submitTime: x.submitTime?.toISOString() })) }];
     },
 
-    getAppAttributes: async ({ request }) => {
+    getAppMetadata: async ({ request }) => {
       const apps = getAppConfigs();
 
       const { appId } = request;
@@ -210,7 +210,7 @@ export const appServiceServer = plugin((server) => {
         });
       }
 
-      return [{ attributes: attributes }];
+      return [{ appName: app.name, attributes: attributes }];
     },
 
     listAvailableApps: async ({}) => {
