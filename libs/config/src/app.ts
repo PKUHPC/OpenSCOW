@@ -70,7 +70,7 @@ export const AppConfigSchema = Type.Object({
       type:  Type.Enum({ number: "number", text: "text", select: "select" }, { description: "表单类型" }),
       label: Type.String({ description: "表单标签" }),
       name: Type.String({ description: "表单字段名" }),
-      required: Type.Boolean({ description: "是必填项", default: "true" }),
+      required: Type.Boolean({ description: "是必填项" }),
       default: Type.Optional(Type.String({ description: "输入的默认值" })),
       placeholder: Type.Optional(Type.String({ description: "输入提示信息" })),
       select: Type.Optional(
