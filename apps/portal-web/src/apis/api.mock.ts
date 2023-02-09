@@ -103,13 +103,13 @@ export const mockApi: MockApi<typeof api> = {
     appName: "test",
     appCustomFormAttributes: [
       { type: "NUMBER", label: "版本", name: "version", required: false, placeholder: "选择版本", default: "123", select: []},
-      { type: "TEXT", label: "文字", name: "text", required: false, placeholder: "提示信息", select: []},
+      { type: "TEXT", label: "文字", name: "text", required: false, placeholder: "提示信息", default: "abc", select: []},
       { type: "TEXT", label: "其他sbatch参数", name: "sbatchOptions",
         required: true, placeholder: "比如：--gpus gres:2 --time 10", select: []},
-      { type: "SELECT", label: "选项", name: "option", required: false, placeholder: "提示信息", default:"version1", select: [
-          { label: "版本1", value: "version1" },
-          { label: "版本2", value: "version2" },
-        ]},
+      { type: "SELECT", label: "选项", name: "option", required: false, placeholder: "提示信息", default:"version2", select: [
+        { label: "版本1", value: "version1" },
+        { label: "版本2", value: "version2" },
+      ]},
     ]}),
 
   connectToApp: async ({ body: { sessionId } }) => sessionId === "124"
