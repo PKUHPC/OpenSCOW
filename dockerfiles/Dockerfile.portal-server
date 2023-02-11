@@ -9,7 +9,7 @@
 # See the Mulan PSL v2 for more details.
 
 
-FROM node:hydrogen-alpine@sha256:bc329c7332cffc30c2d4801e38df03cbfa8dcbae2a7a52a449db104794f168a3 AS base
+FROM node:hydrogen-alpine@sha256:45748c3443410b052e2123dcffbd67838727394f9aacfd23e0b47afd95434ff5 AS base
 
 RUN apk update && apk add libc6-compat python3 make gcc g++ curl
 
@@ -55,7 +55,7 @@ COPY scripts scripts
 RUN node scripts/copyDist.mjs
 RUN cd dist && pnpm i --offline --prod --frozen-lockfile
 
-FROM node:hydrogen-alpine@sha256:bc329c7332cffc30c2d4801e38df03cbfa8dcbae2a7a52a449db104794f168a3 AS runner
+FROM node:hydrogen-alpine@sha256:45748c3443410b052e2123dcffbd67838727394f9aacfd23e0b47afd95434ff5 AS runner
 
 WORKDIR /app
 
