@@ -102,10 +102,6 @@ export const getAppConfigs: GetConfigFn<Record<string, AppConfigSchema>> = (base
           throw new Error(`
           App ${id}'s form attributes of name ${item.name} is of type select but select options is not set`);
         }
-        if (!item.required && !item.default) {
-          throw new Error(`
-          App ${id}'s form attributes of name ${item.name} need to have default value`);
-        }
       });
     }
   });
