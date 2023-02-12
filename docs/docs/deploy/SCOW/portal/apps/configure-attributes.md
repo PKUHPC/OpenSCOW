@@ -56,7 +56,6 @@ attributes:
     name: selectVersion
     label: 选择版本
     required: true  # 用户必须选择一个版本
-    default: code-server/4.8.0
     placeholder: 选择code-server的版本  # 提示信息
     select:
       - value: code-server/4.8.0
@@ -99,7 +98,6 @@ attributes:
     name: selectVersion
     label: 选择版本
     required: true  # 用户必须选择一个版本
-    default: emacs/27.1
     placeholder: 选择code-server的版本  # 提示信息
     select:
       - value: emacs/27.1
@@ -121,7 +119,7 @@ attributes:
 | `name`     | 字符串                          | 是    | HTML表单的name属性，在编程中使用，并且会作为计算节点环境变量名，可以在Web应用的`script`或者VNC应用的`xstartop`使用 |
 | `label`    | 字符串                          | 是    | HTML表单的label属性，输入框左侧显示的标签                                                 |
 | `required` | 布尔类型                         | 是    | 如果设置为`true`，用户必须填写此项，如果为`false`，用户可以不填。                        |
-| `default` | 字符串                         | 否    | 表单的默认值。                       |
+| `default` | 字符串                         | 否    | 表单的默认值，设置`number`类型的默认值需要加`""`，如`"123"`。                       |
 | `placeholder`   | 字符串                        | 否    | 描述输入字段预期值的提示信息，提示用户此处的输入                                                  |
 | `select`   | 选项的列表                        | 否    | 如果`type`是`select`，必须配置此项，指明具体的选项，具体配置办法见`select`示例                        |
 
@@ -139,6 +137,17 @@ attributes:
 
 如果用户输入了`v3.4.5`，计算节点的环境变量`version=v3.4.5`可以在应用启动时被读取。
 
+配置一个不是必填项的表单，并且配置默认值：
+
+```yaml
+attributes:
+  - type: text
+    name: version
+    label: 版本
+    required: false
+    defalt: test input
+```
+
 ### 配置输入类型为数字的HTML表单
 
 配置一个输入内容是数字类型的表单，需要指定`type`为`number`, 此时用户仅能输入数字，示例如下：
@@ -152,6 +161,16 @@ attributes:
 ```
 
 如果用户输入了345，计算节点的环境变量`size=345`可以在应用启动时被读取。
+
+配置一个不是必填项的表单，并且配置默认值：
+```yaml
+attributes:
+  - type: number
+    name: size
+    label: 数量
+    required: false
+    default: "123"
+```
 
 ### 配置输入为下拉选择器的HTML表单
 
