@@ -43,7 +43,7 @@ export interface ServerRuntimeConfig {
 
 export interface PublicClusterConfig {
   displayName: string;
-  slurm: { partitions: string[] }
+  slurm: { partitions: ClusterConfigSchema["slurm"]["partitions"] }
 }
 
 
