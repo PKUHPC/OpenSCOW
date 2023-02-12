@@ -104,7 +104,7 @@ export const appServiceServer = plugin((server) => {
       }
       const attributesConfig = app.attributes;
       attributesConfig?.forEach((attribute) => {
-        if (attribute.required && !(attribute.name in customAttributes && attribute.name !== "sbatchOptions")) {
+        if (attribute.required && !(attribute.name in customAttributes) && attribute.name !== "sbatchOptions") {
           throw <ServiceError> {
             code: Status.INVALID_ARGUMENT,
             message: `custom form attribute ${attribute.name} is required but not found`,
