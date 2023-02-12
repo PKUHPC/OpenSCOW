@@ -113,7 +113,7 @@ export const appServiceServer = plugin((server) => {
 
         switch (attribute.type) {
         case "number":
-          if (Number.isNaN(Number(customAttributes[attribute.name]))) {
+          if (customAttributes[attribute.name] && Number.isNaN(Number(customAttributes[attribute.name]))) {
             throw <ServiceError> {
               code: Status.INVALID_ARGUMENT,
               message: `
@@ -128,7 +128,8 @@ export const appServiceServer = plugin((server) => {
 
         case "select":
           // check the option selected by user is in select attributes as the config defined
-          if (!(attribute.select!.some((optionItem) => optionItem.value === customAttributes[attribute.name]))) {
+          if (customAttributes[attribute.name] 
+            && !(attribute.select!.some((optionItem) => optionItem.value === customAttributes[attribute.name]))) {
             throw <ServiceError> {
               code: Status.INVALID_ARGUMENT,
               message: `
