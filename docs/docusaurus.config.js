@@ -64,7 +64,7 @@ const config = {
             docId: "deploy/index",
             position: "left",
             sidebarId: "deploy",
-            label: "部署文档",
+            label: "部署和配置",
           },
           {
             type: "doc",

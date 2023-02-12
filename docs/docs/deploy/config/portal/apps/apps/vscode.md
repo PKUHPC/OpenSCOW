@@ -1,9 +1,9 @@
 ---
-sidebar_position: 3
+sidebar_position: 1
 title: VSCode
 ---
 
-# 样例：VSCode配置
+# VSCode
 
 ## 前提条件
 
@@ -48,4 +48,3 @@ web:
       password: "{{ PASSWORD }}"
 ```
 
-增加了此文件后，刷新即可。

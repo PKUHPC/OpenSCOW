@@ -1,9 +1,9 @@
 ---
-sidebar_position: 3
+sidebar_position: 2
 title: Jupyter
 ---
 
-# 样例：Jupyter配置
+# Jupyter
 
 ## 前提条件
 

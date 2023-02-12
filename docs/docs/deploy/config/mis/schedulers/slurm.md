@@ -1,6 +1,7 @@
 ---
 sidebar_position: 1
 title: slurm
+description: 使用slurm的集群的配置
 ---
 
 # 配置使用slurm的集群

@@ -1,4 +1,8 @@
 {
   "label": "管理系统",
-  "position": 4
+  "position": 4,
+  "link": {
+    "type": "generated-index",
+    "description": "关于管理系统的部署和配置"
+  }
 }

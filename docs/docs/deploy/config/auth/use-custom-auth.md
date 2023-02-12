@@ -1,6 +1,6 @@
 ---
-sidebar_position: 1
-title: 使用
+sidebar_position: 4
+title: 使用自定义认证系统
 ---
 
 # 使用自定义认证系统

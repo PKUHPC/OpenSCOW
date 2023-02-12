@@ -1,5 +1,5 @@
 ---
-sidebar_position: 4
+sidebar_position: 1
 title: 简介
 ---
 
@@ -22,4 +22,4 @@ title: 简介
 
 # 自定义认证方式
 
-如果您的集群需要使用其他认证方式，您可以参考文档去[使用](./custom/use.md)或者[实现](./custom/implementation.md)一个自定义认证系统。
+如果您的集群需要使用其他认证方式，您可以参考文档去[使用](./use-custom-auth.md)或者[实现](./impl-custom-auth.md)一个自定义认证系统。

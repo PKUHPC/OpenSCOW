@@ -1,4 +1,8 @@
 {
   "label": "快速体验",
-  "position": 2
+  "position": 2,
+  "link": {
+    "type": "generated-index",
+    "description": "从0开始部署一个简单的集群来快速体验SCOW的功能。"
+  }
 }

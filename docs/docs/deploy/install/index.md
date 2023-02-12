@@ -1,9 +1,10 @@
 ---
 sidebar_position: 1
-title: 在已有集群上部署
+title: 安装
+description: 如何在已有超算集群上部署SCOW系统
 ---
 
-# 在已有集群上部署
+# 安装
 
 本节介绍如何在已有的超算集群上部署SCOW系统。您可参考本文档在生产环境中部署SCOW。
 
@@ -22,9 +23,10 @@ title: 在已有集群上部署
 
 ## 准备环境
 
-为了简化部署，系统组件以docker镜像的形式分发。系统采用**环境变量**和**配置文件**配置。系统在运行前将会检查配置，如果配置不合法将会中止运行。
+为了简化部署，系统组件以docker镜像的形式分发。服务节点应该安装好
 
-服务节点应该安装好`docker`（[安装docker的官方文档](https://docs.docker.com/engine/install/)）以及`docker compose`（[安装docker compose的官方文档](https://docs.docker.com/compose/install/)）。
+- `docker`（[安装docker的官方文档](https://docs.docker.com/engine/install/)）
+- `docker compose`（[安装docker compose的官方文档](https://docs.docker.com/compose/install/)）。
 
 ## 获取部署文件
 
@@ -54,10 +56,10 @@ vim config.py
 
 根据以下顺序配置系统：
 
-1. [编写集群信息配置文件](../config/clusterConfig.md)
-2. [配置认证系统](../config/auth/index.md)
-3. （可选）[配置门户系统](../config/portal/index.md)
-4. （可选）[配置管理系统](../config/mis/index.md)
+1. [编写集群信息配置文件](../config/cluster-config.md)
+2. [配置认证系统](../config/auth/intro.md)
+3. （可选）[配置门户系统](../config/portal/intro.md)
+4. （可选）[配置管理系统](../config/mis/intro.md)
 
 部署完成后，运行以下命令启动系统。
 

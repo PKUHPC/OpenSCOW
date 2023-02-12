@@ -1,6 +1,7 @@
 ---
 title: 多架构支持
 sidebar_position: 7
+description: SCOW对各类系统和架构的支持
 ---
 
 # 多架构支持

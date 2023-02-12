@@ -1,11 +1,11 @@
 ---
 sidebar_position: 2
-title: 集群信息配置文件
+title: 集群配置文件
 ---
 
-# 编写集群信息配置文件
+# 集群配置文件
 
-对于每个需要进行部署的集群，需要在`config/clusters`目录下创建一个`{集群ID}.yml`文件，并编写集群的信息。
+对于每个需要进行部署的集群，需要在`config/clusters`目录下创建一个`{集群ID}.yml`文件，并编写集群的信息。当您的集群信息修改后，您需要同时手动修改对应的集群配置文件。
 
 ```yaml title="config/clusters/hpc01.yml"
 # 此文件为hpc01.yml，对应的集群ID为hpc01
