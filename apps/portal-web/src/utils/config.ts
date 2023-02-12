@@ -53,7 +53,6 @@ export interface PublicRuntimeConfig {
   ENABLE_SHELL: boolean;
 
   ENABLE_LOGIN_DESKTOP: boolean;
-  LOGIN_DESKTOP_WMS: { name: string; wm: string }[];
 
   ENABLE_JOB_MANAGEMENT: boolean;
 
