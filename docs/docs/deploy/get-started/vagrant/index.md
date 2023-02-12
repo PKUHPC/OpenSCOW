@@ -1,6 +1,6 @@
 ---
 sidebar_position: 1
-title: 使用Vagrant快速启动slurm+SCOW集群
+title: 使用
 ---
 
 本项目面向**开发**和**测试**人员，基于Vagrant，采用VirtualBox作为Provider，提供slurm+SCOW集群一键部署方案，极大简化了部署流程和部署门槛。

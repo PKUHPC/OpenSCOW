@@ -1,4 +1,8 @@
 {
   "label": "vagrant",
-  "position": 1
+  "position": 1,
+  "link": {
+    "type": "generated-index",
+    "description": "使用vagrant快速启动slurm+SCOW集群。"
+  }
 }
