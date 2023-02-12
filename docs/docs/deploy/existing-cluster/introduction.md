@@ -1,11 +1,11 @@
 ---
 sidebar_position: 1
-title: SCOW部署简介
+title: 在已有集群上部署
 ---
 
-# SCOW部署简介
+# 在已有集群上部署
 
-本节介绍如何部署系统。
+本节介绍如何在已有的超算集群上部署SCOW系统。您可参考本文档在生产环境中部署SCOW。
 
 ## 集群要求
 
@@ -25,42 +25,6 @@ title: SCOW部署简介
 为了简化部署，系统组件以docker镜像的形式分发。系统采用**环境变量**和**配置文件**配置。系统在运行前将会检查配置，如果配置不合法将会中止运行。
 
 服务节点应该安装好`docker`（[安装docker的官方文档](https://docs.docker.com/engine/install/)）以及`docker compose`（[安装docker compose的官方文档](https://docs.docker.com/compose/install/)）。
-
-在部署的过程中，可能有的组件需要其他配置，请参考对应的文档。
-
-## 从源码构建
-
-目前系统处于公开测试阶段，暂不提供构建好的镜像下载。本部分介绍如何从源码构建项目的镜像。
-
-1. 在服务节点中安装以下软件：
-   - [docker](https://docs.docker.com/engine/install/)
-   - [docker compose](https://docs.docker.com/compose/install/)
-
-2. 从仓库clone项目
-
-```bash
-git clone %REPO_URL% --depth=1
-```
-
-3. 构建镜像
-
-```bash
-docker compose --env-file dev/.env.build -f dev/docker-compose.build.yml build 
-```
-
-:::tip
-
-您可以通过修改`dev/.env.build`文件来修改构建的镜像的名称和tag。
-
-:::
-
-:::tip
-
-为了简化构建镜像时所需要的环境和减少所需时间，使用此命令构建镜像时，docker将会自动使用运行此命令时的机器的架构编译镜像。例如如果您在AMD64架构的机器上编译，编译出来的镜像仅支持AMD64架构。
-
-请查看[多架构支持](./multi-platform.md)文档来了解系统对非AMD64架构（如ARM64）的机器的支持。
-
-:::
 
 ## 获取部署文件
 
@@ -88,12 +52,12 @@ vim config.py
 
 ## 配置
 
-根据以下顺序配置系统其他组件：
+根据以下顺序配置系统：
 
 1. [编写集群信息配置文件](../config/clusterConfig.md)
-2. [配置认证系统](./auth/index.md)
-3. （可选）[配置门户系统](./portal/index.md)
-4. （可选）[配置管理系统](./mis/index.md)
+2. [配置认证系统](../config/auth/index.md)
+3. （可选）[配置门户系统](../config/portal/index.md)
+4. （可选）[配置管理系统](../config/mis/index.md)
 
 部署完成后，运行以下命令启动系统。
 

@@ -7,7 +7,7 @@ sidebar_position: 7
 
 SCOW多集群部署架构如下图所示：
 
-![img](../../../diagrams/08-flow.PNG)
+![img](multi-cluster.png)
 
 :::tip
 

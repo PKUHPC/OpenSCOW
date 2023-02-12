@@ -68,6 +68,13 @@ const config = {
           },
           {
             type: "doc",
+            docId: "hpccluster/index",
+            position: "left",
+            sidebarId: "hpccluster",
+            label: "slurm集群部署实践",
+          },
+          {
+            type: "doc",
             docId: "guide/index",
             position: "left",
             sidebarId: "guide",

@@ -12,29 +12,30 @@ sidebar_position: 7
 
 登录成功后，新建Group：
 
-![img](../../../diagrams/-7-1.png)
+![img](./images/-7-1.png)
 
 选择 generic：posix group
 
-![img](../../../diagrams/-7-2.png)
+![img](./images/-7-2.png)
 
 填写group名字
 
-![img](../../../diagrams/-7-3.png)
+![img](./images/-7-3.png)
 
 点击create，然后点击commit，创建成功。
 
 点击people新建用户
 
-![img](../../../diagrams/-7-4.png)
+![img](./images/-7-4.png)
 
 选择generic：user account
 
-![img](../../../diagrams/-7-5.png)
+![img](./images/-7-5.png)
 
 填写fist name，last name，设置密码。
 
-![img](../../../diagrams/-7-6.png)
+
+![img](./images/-7-6.png)
 
 GID选择刚刚设置的组。
 
@@ -44,15 +45,15 @@ home directory需要设置为NFS的目录，按照教程的配置，应该为 /d
 
 系统初始化时，访问部署路径的mis/init路径下，将管理员设置为刚刚创建的用户。
 
-![img](../../../diagrams/-7-7.png)
+![img](./images/-7-7.png)
 
 以该身份登录管理系统，点击租户管理-用户管理-创建用户，可以创建别的用户。
 
-![img](../../../diagrams/-7-8.png)
+![img](./images/-7-8.png)
 
 点击租户管理-账户管理-创建账户，账户的拥有者ID选择刚刚在管理系统创建的新用户。
 
-![img](../../../diagrams/-7-9.png)
+![img](./images/-7-9.png)
 
 ## 2. 命令添加LDAP用户
 

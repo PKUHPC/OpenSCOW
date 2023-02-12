@@ -12,15 +12,15 @@ sidebar_position: 9
 
 本文档以Base Toolkit和HPC Toolkit为例。打开下载的地址：
 
-![img](../../../diagrams/-5-i1.PNG)
+![img](./images/-5-i1.PNG)
 
 以下载Base Toolkit为例，进入页面：
 
-![img](../../../diagrams/-5-i2.png)
+![img](./images/-5-i2.png)
 
 点击Download，选择如下信息：
 
-![img](../../../diagrams/-5-i3.PNG)
+![img](./images/-5-i3.PNG)
 
 在此页面不要点Download（它会让你注册账号），直接复制红框里的地址，在linux系统中直接wget，或者去掉前边wget，放在迅雷里下载即可(安装包比较大，3G多)。
 
@@ -51,11 +51,11 @@ sh l_BaseKit_p_2022.2.0.262_offline.sh
 
 出现如下界面，选择自定义安装：
 
-![img](../../../diagrams/-5-i4.png)
+![img](./images/-5-i4.png)
 
 选择安装的包，下一步：
 
-![img](../../../diagrams/-5-i5.PNG)
+![img](./images/-5-i5.PNG)
 
 自定义安装目录，修改为之前准备好的目录：
 
@@ -65,11 +65,11 @@ sh l_BaseKit_p_2022.2.0.262_offline.sh
 
 :::
 
-![img](../../../diagrams/-5-i6.png)
+![img](./images/-5-i6.png)
 
 开始安装：
 
-![img](../../../diagrams/-5-i7.png)
+![img](./images/-5-i7.png)
 
 等待安装完成即可。
 
@@ -102,4 +102,4 @@ mpirun -n 36 ./xhpl
 mpirun -hosts cn1,cn2,cn3,cn4 -np 36 -ppn 4 /data/software/intel/oneapi/mkl/2022.1.0/benchmarks/mp_linpack/xhpl
 ```
 
-![img](../../../diagrams/-5-i8.png)
+![img](./images/-5-i8.png)

@@ -14,19 +14,19 @@ sidebar_position: 6
 fdisk -l
 ```
 
-![img](../../../diagrams/-8-1.png)
+![img](./images/-8-1.png)
 
 创建磁盘分区：
 
 `fdisk /dev/sdb` ，依次输入：n, p, 1, 两次回车, wq
 
-![img](../../../diagrams/-8-2.png)
+![img](./images/-8-2.png)
 
 格式化磁盘：
 
 `mkfs.ext4 /dev/sdb`，输入：y
 
-![img](../../../diagrams/-8-3.png)
+![img](./images/-8-3.png)
 
 挂载磁盘：
 

@@ -72,4 +72,4 @@ make install
 
 接下来就可以使用`module`命令了：
 
-![img](../../../diagrams/-6-1.PNG)
+![img](./images/-6-1.PNG)

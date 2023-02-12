@@ -1,11 +1,11 @@
 ---
+sidebar_label: 架构
 sidebar_position: 2
-title: 架构
 ---
 
 系统各个组件的关系如下图。此部分简要介绍各个组件的功能，具体部署请参考各个组件的页面。
 
-![架构](../../../diagrams/architecture.png)
+![架构](./architecture.png)
 
 本系统大部分组件可部署在超算集群之外。下文称部署这些组件的节点为**服务节点**。
 

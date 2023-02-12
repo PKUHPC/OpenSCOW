@@ -47,7 +47,7 @@ systemctl enable rngd
 
 查看服务状态`systemctl status rngd`
 
-![img](../../../diagrams/rngd.PNG)
+![img](./images/rngd.PNG)
 
 ### **1.3 部署Munge**
 
@@ -86,7 +86,7 @@ systemctl enable munge
 
 查看状态`systemctl status munge`
 
-![img](../../../diagrams/munge.PNG)
+![img](./images/munge.PNG)
 
 ### **1.4 测试Munge服务**
 
@@ -98,7 +98,7 @@ systemctl enable munge
 munge -n
 ```
 
-![img](../../../diagrams/m-n.PNG)
+![img](./images/m-n.PNG)
 
 本地解码：
 
@@ -106,7 +106,7 @@ munge -n
 munge -n | unmunge
 ```
 
-![img](../../../diagrams/m-nu.png)
+![img](./images/m-nu.png)
 
 验证远程解码：
 
@@ -114,7 +114,7 @@ munge -n | unmunge
 munge -n | ssh compute01 unmunge
 ```
 
-![img](../../../diagrams/m-uns.PNG)
+![img](./images/m-uns.PNG)
 
 munge凭证基准测试
 
@@ -122,7 +122,7 @@ munge凭证基准测试
 remunge
 ```
 
-![img](../../../diagrams/re.PNG)
+![img](./images/re.PNG)
 
 ## **2. 安装slurm**
 
@@ -189,7 +189,7 @@ rpmbuild -ta --nodeps slurm-22.05.3.tar.bz2
 
 编译制作完成后，可在目录`/root/rpmbuild/RPMS/x86_64`下得到如下rpm包
 
-![img](../../../diagrams/rmp.png)
+![img](./images/rmp.png)
 
 将编译好的rpm包拷贝到其他节点
 
@@ -219,9 +219,9 @@ cp /etc/slurm/slurmdbd.conf.example /etc/slurm/slurmdbd.conf
 
 - `cgroup.conf `使用了默认配置；
 
-- slurm.conf 配置参见[附录1：slurm.conf 配置](../config/slurm.conf.md) ；
+- slurm.conf 配置参见[附录1：slurm.conf 配置](./config/slurm.conf.md) ；
 
-- slurmdbd.conf 配置参见[附录2：slurmdbd.conf 配置](../config/slurmdbd.conf.md) 。
+- slurmdbd.conf 配置参见[附录2：slurmdbd.conf 配置](./config/slurmdbd.conf.md) 。
 
 复制配置文件到其他节点
 
