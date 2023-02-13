@@ -17,6 +17,7 @@ export async function verifyCode(
   f: FastifyInstance, code: string, token: string, callbackUrl: string, req: FastifyRequest, res: FastifyReply) {
 
   const redisCode = await f.redis.get(token);
+  console.log("redisCode", redisCode);
   if (code.toLowerCase() === redisCode?.toLowerCase())
     return true;
 

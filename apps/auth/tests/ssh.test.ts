@@ -18,6 +18,8 @@ import { createFormData } from "tests/utils";
 
 const username = "test";
 const password = "1234";
+const token = "token";
+const code = "code";
 
 let server: FastifyInstance;
 
@@ -39,8 +41,11 @@ it("logs in to the ssh login", async () => {
     username: username,
     password: password,
     callbackUrl: callbackUrl,
+    token: token,
+    code: code,
   });
 
+  await server.redis.set(token, code, "EX", 30);
   const resp = await server.inject({
     method: "POST",
     path: "/public/auth",
@@ -61,8 +66,11 @@ it("fails to login with wrong credentials", async () => {
     username: username,
     password: password + "a",
     callbackUrl: callbackUrl,
+    token: token,
+    code: code,
   });
 
+  await server.redis.set(token, code, "EX", 30);
   const resp = await server.inject({
     method: "POST",
     path: "/public/auth",
