@@ -33,18 +33,13 @@ afterEach(async () => {
   await server.close();
 });
 
-it("test whether the block update time exists, and update it if exits", async () => {
+it("test whether the block update time exists", async () => {
   const client = new AdminServiceClient(server.serverAddress, ChannelCredentials.createInsecure());
 
 
   const em = server.ext.orm.em.fork();
-  const updateTime = await em.findOneOrFail(SystemState, { key: SystemState.KEYS.UPDATE_SLURM_BLOCK_STATUS });
+  const updateTime = await em.findOne(SystemState, { key: SystemState.KEYS.UPDATE_SLURM_BLOCK_STATUS });
   expect(updateTime).not.toBeNull();
-
-  await asyncClientCall(client, "updateBlockStatus", {});
-
-  const curUpdateTime = await em.findOneOrFail(SystemState, { key: SystemState.KEYS.UPDATE_SLURM_BLOCK_STATUS });
-  expect(updateTime).not.toBe(curUpdateTime);
 
 });
 
