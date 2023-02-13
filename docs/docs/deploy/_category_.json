@@ -1,0 +1,8 @@
+{
+  "label": "部署和配置",
+  "position": 2,
+  "link": {
+    "type": "generated-index",
+    "description": "介绍如何在您的集群上安装和配置SCOW。"
+  }
+}
