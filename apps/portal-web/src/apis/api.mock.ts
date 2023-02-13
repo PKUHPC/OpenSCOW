@@ -106,7 +106,7 @@ export const mockApi: MockApi<typeof api> = {
   getAppMetadata: async () => ({
     appName: "test",
     appCustomFormAttributes: [
-      { type: "NUMBER", label: "版本", name: "version", required: false, placeholder: "选择版本", default: "123", select: []},
+      { type: "NUMBER", label: "版本", name: "version", required: false, placeholder: "选择版本", default: 123, select: []},
       { type: "TEXT", label: "文字", name: "text", required: false, placeholder: "提示信息", default: "abc", select: []},
       { type: "TEXT", label: "其他sbatch参数", name: "sbatchOptions",
         required: true, placeholder: "比如：--gpus gres:2 --time 10", select: []},

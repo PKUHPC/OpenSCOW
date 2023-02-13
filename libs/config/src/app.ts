@@ -13,6 +13,7 @@
 import { GetConfigFn, getDirConfig } from "@scow/lib-config";
 import { Static, Type } from "@sinclair/typebox";
 import { DEFAULT_CONFIG_BASE_PATH } from "src/constants";
+import { isNumberObject } from "util/types";
 
 export const AppConnectPropsSchema = Type.Object({
   method: Type.Enum({ GET: "GET", POST: "POST" }, { description: "连接所使用的HTTP方法" }),
@@ -71,7 +72,7 @@ export const AppConfigSchema = Type.Object({
       label: Type.String({ description: "表单标签" }),
       name: Type.String({ description: "表单字段名" }),
       required: Type.Boolean({ description: "是必填项", default: true }),
-      default: Type.Optional(Type.String({ description: "输入的默认值" })),
+      default: Type.Optional(Type.Union([Type.String(), Type.Number()])),
       placeholder: Type.Optional(Type.String({ description: "输入提示信息" })),
       select: Type.Optional(
         Type.Array(
@@ -101,6 +102,15 @@ export const getAppConfigs: GetConfigFn<Record<string, AppConfigSchema>> = (base
         if (item.type === "select" && !item.select) {
           throw new Error(`
           App ${id}'s form attributes of name ${item.name} is of type select but select options is not set`);
+        }
+        if (item.default) {
+          if (item.type === "number" && !isNumberObject(item.default)) {
+            throw new Error(`
+            App ${id}'s form attributes of name ${item.name} is of type number, 
+            but the default ${item.default} value is not a number`);
+          } else if (item.type !== "number" && isNumberObject(item.default)) {
+            item.default = item.default.toString();
+          }
         }
       });
     }

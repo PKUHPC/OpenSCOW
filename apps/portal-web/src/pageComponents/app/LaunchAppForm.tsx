@@ -132,7 +132,6 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
       : [{ required: item.required }];
 
     const placeholder = item.placeholder ?? "";
-    const defaultValue = (item.default && item.type === "NUMBER") ? +item.default : item.default;
     const inputItem = item.type === "NUMBER" ? (<InputNumber placeholder={placeholder} />)
       : item.type === "TEXT" ? (<Input placeholder={placeholder} />)
         : (
@@ -148,7 +147,7 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
         label={item.label}
         name={item.name}
         rules={rules}
-        initialValue={defaultValue}
+        initialValue={item.default}
       >
         {inputItem}
       </Form.Item>

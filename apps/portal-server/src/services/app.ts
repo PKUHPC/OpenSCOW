@@ -24,6 +24,7 @@ import {
 } from "@scow/protos/build/portal/app";
 import { getClusterOps } from "src/clusterops";
 import { clusterNotFound } from "src/utils/errors";
+import { isNumberObject, isStringObject } from "util/types";
 
 export const appServiceServer = plugin((server) => {
 
@@ -199,12 +200,20 @@ export const appServiceServer = plugin((server) => {
       const attributes: AppCustomAttribute[] = [];
       if (app.attributes) {
         app.attributes.forEach((item) => {
+          const attributeType = item.type.toUpperCase();
+          let defaultInput: AppCustomAttribute["defaultInput"];
+          if (isNumberObject(item.default)) {
+            defaultInput = { $case: "number", number: item.default };
+          } else if (isStringObject(item.default)) {
+            defaultInput = { $case: "text", text: item.default };
+          }
+          
           attributes.push({
-            type: appCustomAttribute_AttributeTypeFromJSON(item.type.toUpperCase()),
+            type: appCustomAttribute_AttributeTypeFromJSON(attributeType),
             label: item.label,
             name: item.name,
             required: item.required,
-            default: item.default,
+            defaultInput: defaultInput,
             placeholder: item.placeholder,
             options: item.select ?? [],
           });

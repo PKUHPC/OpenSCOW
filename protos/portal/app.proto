@@ -111,8 +111,11 @@ message AppCustomAttribute {
   string name = 3;
   repeated SelectOption options = 4;
   bool required =5;
-  optional string default = 6;
-  optional string placeholder = 7;
+  oneof default_input {
+    string text = 6;
+    uint32 number = 7;
+  }
+  optional string placeholder = 8;
 }
 
 message GetAppMetadataResponse {
