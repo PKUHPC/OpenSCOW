@@ -11,8 +11,6 @@
  */
 
 import { Logger } from "@ddadaal/tsgrpc-server";
-import { ServiceError, status } from "@grpc/grpc-js";
-import { UniqueConstraintViolationException } from "@mikro-orm/core";
 import { MySqlDriver, SqlEntityManager } from "@mikro-orm/mysql";
 import { Account } from "src/entities/Account";
 import { SystemState } from "src/entities/SystemState";
@@ -58,7 +56,14 @@ export async function updateBlockStatusInSlurm(
   });
   await em.persistAndFlush(updateBlockTime);
 
-  logger.info("Updated block status in slurm.");
+  logger.info("Updated block status in slurm of the following accounts: ", accounts.map((x) => x.accountName));
+  logger.info("Updated block status in slurm of the following user account: ", 
+    userAccounts.map((x) => [x.user.getProperty("userId"), x.account.getProperty("accountName")]));
+
+  return {
+    blockedAccounts: accounts.map((x) => x.id),
+    blockedUserAccounts: userAccounts.map((x) => x.id),
+  };
   
 }
 

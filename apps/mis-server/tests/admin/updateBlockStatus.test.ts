@@ -13,17 +13,23 @@
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Server } from "@ddadaal/tsgrpc-server";
 import { ChannelCredentials } from "@grpc/grpc-js";
-import { AdminServiceClient } from "@scow/protos/build/server/admin";
+import { AccountServiceClient } from "@scow/protos/build/server/account";
 import { createServer } from "src/app";
+import { updateBlockStatusInSlurm } from "src/bl/block";
 import { SystemState } from "src/entities/SystemState";
+import { BlockedData, insertBlockedData } from "tests/data/data";
 import { dropDatabase } from "tests/data/helpers";
 
-
 let server: Server;
+let data: BlockedData;
 
 beforeEach(async () => {
 
   server = await createServer();
+
+  const em = server.ext.orm.em.fork();
+
+  data = await insertBlockedData(em);
 
   await server.start();
 });
@@ -33,13 +39,38 @@ afterEach(async () => {
   await server.close();
 });
 
-it("test whether the block update time exists", async () => {
-  const client = new AdminServiceClient(server.serverAddress, ChannelCredentials.createInsecure());
-
-
+it("test whether the block update time exists at startup", async () => {
   const em = server.ext.orm.em.fork();
   const updateTime = await em.findOne(SystemState, { key: SystemState.KEYS.UPDATE_SLURM_BLOCK_STATUS });
   expect(updateTime).not.toBeNull();
-
 });
+
+it("update block status", async () => {
+  const blockedData = await updateBlockStatusInSlurm(
+    server.ext.orm.em.fork(), server.ext.clusters, server.logger);
+
+  expect(blockedData.blockedAccounts).toEqual([data.blockedAccountB.id]);
+  expect(blockedData.blockedUserAccounts).toEqual([data.uaAA.id]);
+});
+
+it("update block status with whitelist accounts", async () => {
+  const client = new AccountServiceClient(server.serverAddress, ChannelCredentials.createInsecure());
+  await asyncClientCall(client, "whitelistAccount", {
+    tenantName: data.tenant.name,
+    accountName: data.blockedAccountB.accountName,
+    comment: "test",
+    operatorId: "123",
+  });
+
+  const blockedData = await updateBlockStatusInSlurm(
+    server.ext.orm.em.fork(), server.ext.clusters, server.logger);
+
+  expect(blockedData.blockedAccounts).not.toContain([data.blockedAccountB.id]);
+});
+
+
+
+
+
+
 
