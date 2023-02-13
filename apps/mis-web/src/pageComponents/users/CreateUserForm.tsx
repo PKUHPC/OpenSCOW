@@ -13,7 +13,7 @@
 import { Form, Input } from "antd";
 import React from "react";
 import { publicConfig } from "src/utils/config";
-import { confirmPasswordFormItemProps, emailRule, passwordRule } from "src/utils/form";
+import { confirmPasswordFormItemProps, emailRule, passwordRule, userIdRule } from "src/utils/form";
 export interface CreateUserFormFields {
   identityId: string;
   name: string;
@@ -35,9 +35,7 @@ export const CreateUserForm: React.FC = () => {
         name="identityId"
         rules={[
           { required: true },
-          ...(publicConfig.USERID_PATTERN ? [{
-            pattern: new RegExp(publicConfig.USERID_PATTERN),
-            message: publicConfig.USERID_PATTERN_MESSAGE }] : []),
+          userIdRule,
         ]}
 
       >
@@ -73,7 +71,7 @@ export const CreateUserForm: React.FC = () => {
             </Form.Item>
           </>
         ) : undefined
-        
+
       }
     </>
   );

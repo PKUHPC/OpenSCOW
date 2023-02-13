@@ -11,24 +11,20 @@
  */
 
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
-import { DesktopServiceClient } from "@scow/protos/build/portal/desktop";
+import { AvailableWm, DesktopServiceClient } from "@scow/protos/build/portal/desktop";
 import { authenticate } from "src/auth/server";
 import { getClient } from "src/utils/client";
 import { publicConfig } from "src/utils/config";
-import { dnsResolve } from "src/utils/dns";
 import { route } from "src/utils/route";
 
-export interface ListDesktopsSchema {
+export interface ListAvailableWmsSchema {
   method: "GET";
 
-  query: {
-    cluster: string;
-  }
+  query: {}
 
   responses: {
     200: {
-      node: string;
-      displayId: number[];
+      wms: AvailableWm[];
     };
 
     // 功能没有启用
@@ -38,7 +34,7 @@ export interface ListDesktopsSchema {
 
 const auth = authenticate(() => true);
 
-export default /* #__PURE__*/route<ListDesktopsSchema>("ListDesktopsSchema", async (req, res) => {
+export default /* #__PURE__*/route<ListAvailableWmsSchema>("ListAvailableWmsSchema", async (req, res) => {
 
 
 
@@ -50,14 +46,7 @@ export default /* #__PURE__*/route<ListDesktopsSchema>("ListDesktopsSchema", asy
 
   if (!info) { return; }
 
-  const { cluster } = req.query;
-
   const client = getClient(DesktopServiceClient);
 
-  return await asyncUnaryCall(client, "listUserDesktops", {
-    cluster, userId: info.identityId,
-  }).then(async ({ node, displayIds }) => ({ 200: { node: await dnsResolve(node), displayId: displayIds } }));
-
-
-
+  return await asyncUnaryCall(client, "listAvailableWms", {}).then(({ wms }) => ({ 200: { wms } }));
 });

@@ -123,7 +123,6 @@ const buildRuntimeConfig = async (phase, basePath) => {
     ENABLE_JOB_MANAGEMENT: portalConfig.jobManagement,
 
     ENABLE_LOGIN_DESKTOP: portalConfig.loginDesktop.enabled,
-    LOGIN_DESKTOP_WMS: portalConfig.loginDesktop.wms,
 
     ENABLE_APPS: portalConfig.apps,
 
