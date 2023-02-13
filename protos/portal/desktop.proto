@@ -1,14 +1,14 @@
 /**
- * Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
- * SCOW is licensed under Mulan PSL v2.
- * You can use this software according to the terms and conditions of the Mulan PSL v2.
- * You may obtain a copy of Mulan PSL v2 at:
- *          http://license.coscl.org.cn/MulanPSL2
- * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
- * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
- * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
- * See the Mulan PSL v2 for more details.
- */
+   * Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
+   * SCOW is licensed under Mulan PSL v2.
+   * You can use this software according to the terms and conditions of the Mulan PSL v2.
+   * You may obtain a copy of Mulan PSL v2 at:
+   *          http://license.coscl.org.cn/MulanPSL2
+   * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+   * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+   * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+   * See the Mulan PSL v2 for more details.
+*/
 
 syntax = "proto3";
 
@@ -36,8 +36,7 @@ message KillDesktopRequest {
 }
 
 // NOT_FOUND: cluster is not found
-message KillDesktopResponse {
-}
+message KillDesktopResponse {}
 
 message ConnectToDesktopRequest {
   string user_id = 1;
@@ -52,21 +51,31 @@ message ConnectToDesktopResponse {
   string password = 3;
 }
 
-message ListDesktopsRequest {
+message ListUserDesktopsRequest {
   string user_id = 1;
   string cluster = 2;
 }
 
 // NOT_FOUND: cluster is not found
-message ListDesktopsResponse {
+message ListUserDesktopsResponse {
   string node = 1;
   repeated uint32 display_ids = 2;
+}
+
+message ListAvailableWmsRequest {}
+
+message AvailableWm {
+  string name = 1;
+  string wm = 2;
+}
+message ListAvailableWmsResponse {
+  repeated AvailableWm wms = 1;
 }
 
 service DesktopService {
   rpc CreateDesktop(CreateDesktopRequest) returns (CreateDesktopResponse);
   rpc KillDesktop(KillDesktopRequest) returns (KillDesktopResponse);
-  rpc ConnectToDesktop(ConnectToDesktopRequest)
-      returns (ConnectToDesktopResponse);
-  rpc ListDesktops(ListDesktopsRequest) returns (ListDesktopsResponse);
+  rpc ConnectToDesktop(ConnectToDesktopRequest) returns (ConnectToDesktopResponse);
+  rpc ListUserDesktops(ListUserDesktopsRequest) returns (ListUserDesktopsResponse);
+  rpc ListAvailableWms(ListAvailableWmsRequest) returns (ListAvailableWmsResponse);
 }

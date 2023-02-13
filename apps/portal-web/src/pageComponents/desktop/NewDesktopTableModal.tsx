@@ -10,10 +10,11 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Form, Modal, Select } from "antd";
+import { App, Form, Modal, Select } from "antd";
 import React, { useState } from "react";
+import { useAsync } from "react-async";
 import { api } from "src/apis";
-import { Cluster, publicConfig } from "src/utils/config";
+import { Cluster } from "src/utils/config";
 import { openDesktop } from "src/utils/vnc";
 
 export interface Props {
@@ -27,11 +28,23 @@ interface FormInfo {
   wm: string;
 }
 
+const promiseFn = async () => api.listAvailableWms({ query: {} });
 
 export const NewDesktopTableModal: React.FC<Props> = ({ open, onClose, reload, cluster }) => {
-  const defaultWm = publicConfig.LOGIN_DESKTOP_WMS[0];
 
   const [form] = Form.useForm<FormInfo>();
+
+  const { data, isLoading } = useAsync({
+    promiseFn,
+    onResolve({ wms }) {
+      if (wms.length > 0) {
+        form.setFieldValue("wm", wms[0].wm);
+      }
+    },
+  });
+
+  const { modal } = App.useApp();
+
   const [submitting, setSubmitting] = useState(false);
 
   const onOk = async () => {
@@ -45,7 +58,7 @@ export const NewDesktopTableModal: React.FC<Props> = ({ open, onClose, reload, c
       .httpError(409, (e) => {
         const { code } = e;
         if (code === "TOO_MANY_DESKTOPS") {
-          Modal.error({
+          modal.error({
             title: "新建桌面失败",
             content: "该集群桌面数目达到最大限制",
           });
@@ -69,10 +82,11 @@ export const NewDesktopTableModal: React.FC<Props> = ({ open, onClose, reload, c
       confirmLoading={submitting}
       onCancel={onClose}
     >
-      <Form form={form} initialValues={{ wm: defaultWm.wm }} onFinish={onOk}>
+      <Form form={form} onFinish={onOk}>
         <Form.Item label="桌面" name="wm" required>
           <Select
-            options={publicConfig.LOGIN_DESKTOP_WMS.map(({ name, wm }) =>
+            loading={isLoading}
+            options={data?.wms.map(({ name, wm }) =>
               ({ label: name, value: wm }))}
           />
         </Form.Item>

@@ -48,8 +48,8 @@ Vagrant.configure("2") do |config|
   config.vm.box_check_update = false
   Encoding.default_external = 'UTF-8'
   config.vm.boot_timeout= 600
-  config.ssh.username= "root"
-  #config.ssh.password= "vagrant"
+  # config.ssh.username= "root"
+  # config.ssh.password= "vagrant"
   config.ssh.insert_key = true
 
   vm_list.each do |item|

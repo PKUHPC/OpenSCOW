@@ -27,6 +27,7 @@ import type { ValidateTokenSchema } from "src/pages/api/auth/validateToken";
 import type { CreateDesktopSchema } from "src/pages/api/desktop/createDesktop";
 import type { KillDesktopSchema } from "src/pages/api/desktop/killDesktop";
 import type { LaunchDesktopSchema } from "src/pages/api/desktop/launchDesktop";
+import type { ListAvailableWmsSchema } from "src/pages/api/desktop/listAvailableWms";
 import type { ListDesktopsSchema } from "src/pages/api/desktop/listDesktops";
 import type { CopyFileItemSchema } from "src/pages/api/file/copy";
 import type { CreateFileSchema } from "src/pages/api/file/createFile";
@@ -65,6 +66,7 @@ export const api = {
   createDesktop: fromApi<CreateDesktopSchema>("POST", join(basePath, "/api/desktop/createDesktop")),
   killDesktop: fromApi<KillDesktopSchema>("POST", join(basePath, "/api/desktop/killDesktop")),
   launchDesktop: fromApi<LaunchDesktopSchema>("POST", join(basePath, "/api/desktop/launchDesktop")),
+  listAvailableWms: fromApi<ListAvailableWmsSchema>("GET", join(basePath, "/api/desktop/listAvailableWms")),
   listDesktops: fromApi<ListDesktopsSchema>("GET", join(basePath, "/api/desktop/listDesktops")),
   copyFileItem: fromApi<CopyFileItemSchema>("PATCH", join(basePath, "/api/file/copy")),
   createFile: fromApi<CreateFileSchema>("POST", join(basePath, "/api/file/createFile")),
