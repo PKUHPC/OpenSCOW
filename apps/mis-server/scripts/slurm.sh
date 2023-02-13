@@ -501,7 +501,7 @@ blockUserfromAcct(){
             echo "User $3 is not exist!"
             exit 4
         fi
-        exist=`sacctmgr show assoc format=user,acct%20 | grep $2 | awk '{print $1}' | uniq | grep $3`
+        exist=`sacctmgr show assoc format=user%50,acct%50 | grep $2 | awk '{print $1}' | uniq | grep $3`
         if [ "$exist" == "" ] ; then
             echo "User $3 is not exist in account $2"
             exit 4
@@ -556,7 +556,7 @@ allowUserfromAcct(){
             echo "User $3 is not exist!"
             exit 4
         fi
-        exist=`sacctmgr show assoc format=user,acct%20 | grep $2 | awk '{print $1}' | uniq | grep $3`
+        exist=`sacctmgr show assoc format=user%50,acct%50 | grep $2 | awk '{print $1}' | uniq | grep $3`
         if [ "$exist" == "" ] ; then
             echo "User $3 is not exist in account $2"
             exit 4
@@ -616,7 +616,7 @@ queryUserInAcct(){
             exit 4
         fi
 
-        exist=`sacctmgr show assoc format=user,acct%20 | grep $2 | awk '{print $1}' | uniq | grep $3`
+        exist=`sacctmgr show assoc format=user%50,acct%50 | grep $2 | awk '{print $1}' | uniq | grep $3`
         if [ "$exist" == "" ] ; then
             echo "User $3 is not exist in account $2"
             exit 4

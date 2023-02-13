@@ -43,7 +43,7 @@ export interface ServerRuntimeConfig {
 
 export interface PublicClusterConfig {
   displayName: string;
-  slurm: { partitions: string[] }
+  slurm: { partitions: ClusterConfigSchema["slurm"]["partitions"] }
 }
 
 
@@ -53,7 +53,6 @@ export interface PublicRuntimeConfig {
   ENABLE_SHELL: boolean;
 
   ENABLE_LOGIN_DESKTOP: boolean;
-  LOGIN_DESKTOP_WMS: { name: string; wm: string }[];
 
   ENABLE_JOB_MANAGEMENT: boolean;
 

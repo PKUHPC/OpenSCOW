@@ -10,11 +10,47 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import type { HttpError } from "@ddadaal/next-typed-api-routes-runtime";
 import { mockApi } from "src/apis/api.mock";
 import { USE_MOCK } from "src/apis/useMock";
 import { delay } from "src/utils/delay";
 
 import { api as realApi } from "./api";
+
+class MockPromise<T> implements PromiseLike<T> {
+
+  constructor(
+    private fn: (...args) => Promise<T>,
+    private args: any[],
+  ) {}
+
+  errorHandlers = new Map<number, (e: HttpError) => any>();
+
+  then<TResult1 = T, TResult2 = never>(
+    onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | null | undefined,
+  ): PromiseLike<TResult1 | TResult2> {
+    console.log(`Calling API ${this.fn.name}, args ${JSON.stringify(this.args)}`);
+    return delay(500).then(() => {
+      return this.fn(...this.args)
+        .then((r) => {
+          return onfulfilled?.(r);
+        }).catch((e) => {
+          if (this.errorHandlers.has(e.status)) {
+            return this.errorHandlers.get(e.status)!(e.data);
+          } else {
+            console.log("Error occurred", e);
+            throw e;
+          }
+        });
+    });
+  }
+
+  httpError(code: number, handler: (e: HttpError) => any) {
+    this.errorHandlers.set(code, handler);
+    return this;
+  }
+
+}
 
 if (USE_MOCK) {
   // filter out null mocks
@@ -27,13 +63,7 @@ if (USE_MOCK) {
 
     // add logging to the mock function
     const newFn = (...args: any) => {
-      const promise = new Promise((res) => {
-        console.log(`Calling API ${fn.name}, args ${JSON.stringify(args)}`);
-        delay(500).then(() => res(fn(...args)));
-      });
-      // @ts-ignore
-      promise.httpError = () => { return promise; };
-      return promise;
+      return new MockPromise(fn, args);
     };
 
     mockApi[k] = newFn;
