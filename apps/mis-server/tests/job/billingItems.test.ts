@@ -10,7 +10,6 @@
  * See the Mulan PSL v2 for more details.
  */
 
-/* eslint-disable max-len */
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Server } from "@ddadaal/tsgrpc-server";
 import { ChannelCredentials } from "@grpc/grpc-js";
@@ -19,10 +18,11 @@ import { MySqlDriver } from "@mikro-orm/mysql";
 import { Decimal, decimalToMoney, numberToMoney } from "@scow/lib-decimal";
 import { AddBillingItemRequest, JobBillingItem, JobServiceClient } from "@scow/protos/build/server/job";
 import { createServer } from "src/app";
+import { calculateJobPrice } from "src/bl/jobPrice";
+import { createPriceMap } from "src/bl/PriceMap";
 import { clusterNameToScowClusterId } from "src/config/clusters";
 import { AmountStrategy, JobPriceItem } from "src/entities/JobPriceItem";
 import { Tenant } from "src/entities/Tenant";
-import { calculateJobPrice, createPriceMap } from "src/plugins/price";
 import { createPriceItems } from "src/tasks/createBillingItems";
 import { DEFAULT_TENANT_NAME } from "src/utils/constants";
 import { dropDatabase } from "tests/data/helpers";
@@ -90,6 +90,10 @@ const expectedPriceItems: PriceItem[] = [
   { itemId: "HPC13", price: new Decimal("4.00"), path: ["hpc01", "gpu", "low"]},
   { itemId: "HPC14", price: new Decimal("5.00"), path: ["hpc01", "gpu", "normal"]},
   { itemId: "HPC15", price: new Decimal("6.00"), path: ["hpc01", "gpu", "high"]},
+  { itemId: "HPC16", price: new Decimal("5.00"), path: ["hpc02", "compute"]},
+  { itemId: "HPC17", price: new Decimal("4.00"), path: ["hpc02", "gpu", "low"]},
+  { itemId: "HPC18", price: new Decimal("5.00"), path: ["hpc02", "gpu", "normal"]},
+  { itemId: "HPC19", price: new Decimal("6.00"), path: ["hpc02", "gpu", "high"]},
   { itemId: "HPC100", price: new Decimal("0.08"), path: ["hpc00", "C032M0128G", "low"], tenant: "another" },
 ];
 
@@ -134,7 +138,10 @@ it("returns only active billing items of default ", async () => {
 });
 
 it("returns all billing items applicable to default tenant", async () => {
-  const reply = await asyncClientCall(client, "getBillingItems", { tenantName: DEFAULT_TENANT_NAME, activeOnly: false });
+  const reply = await asyncClientCall(client, "getBillingItems", {
+    tenantName: DEFAULT_TENANT_NAME,
+    activeOnly: false,
+  });
 
   expect(reply.items).toIncludeSameMembers(
     expectedPriceItems.filter((x) => x.tenant !== "another").map(priceItemToJobBillingItem),
@@ -161,7 +168,9 @@ it("returns active billing items applicable to another tenant", async () => {
   const reply = await asyncClientCall(client, "getBillingItems", { tenantName: "another", activeOnly: true });
 
   expect(reply.items).toIncludeSameMembers(
-    expectedPriceItems.filter((x) => x.itemId !== oldPriceItem.itemId && x.itemId !== "HPC01").map(priceItemToJobBillingItem),
+    expectedPriceItems
+      .filter((x) => x.itemId !== oldPriceItem.itemId && x.itemId !== "HPC01")
+      .map(priceItemToJobBillingItem),
   );
 });
 
@@ -217,10 +226,15 @@ it("calculates price", async () => {
 
 
   // obtain test data by running the following data in db
+  // eslint-disable-next-line
   // select json_object('biJobIndex', bi_job_index, 'cluster', cluster, 'partition', `partition`, 'qos', qos, 'timeUsed', time_used, 'cpusAlloc', cpus_alloc, 'gpu', gpu, 'memReq', mem_req, 'memAlloc', mem_alloc, 'price', price) from job_info where cluster="未名生科一号" limit 20;
   const testData = (await import("./testData.json")).default;
 
-  const wrongPrices = [] as { biJobIndex: number; tenantPrice: { expected: number; actual: number | undefined }; accountPrice: { expected: number; actual: number | undefined } }[];
+  const wrongPrices = [] as {
+    biJobIndex: number;
+    tenantPrice: { expected: number; actual: number | undefined };
+    accountPrice: { expected: number; actual: number | undefined }
+  }[];
 
   testData.forEach((t) => {
     const price = calculateJobPrice({
@@ -239,3 +253,30 @@ it("calculates price", async () => {
   expect(wrongPrices).toBeArrayOfSize(0);
 
 });
+
+it("gets missing price items in platform scope", async () => {
+  {
+    const priceMap = await createPriceMap(orm.em.fork(), server.logger);
+    expect(priceMap.getMissingDefaultPriceItems()).toBeArrayOfSize(0);
+  }
+
+  // delete 2 price items
+  const em = orm.em.fork();
+
+  const priceItemsToBeDeleted = [4, 5].map((x) => expectedPriceItems[x]);
+
+  for (const priceItem of priceItemsToBeDeleted) {
+    await em.nativeDelete(JobPriceItem, { itemId: priceItem.itemId });
+  }
+
+  {
+    const priceMap = await createPriceMap(em.fork(), server.logger);
+    expect(priceMap.getMissingDefaultPriceItems())
+      .toIncludeSameMembers(priceItemsToBeDeleted.map((x) => x.path.join(".")));
+  }
+
+
+}, 10000000);
+
+
+
