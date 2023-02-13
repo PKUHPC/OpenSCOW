@@ -23,13 +23,13 @@ import {
   JobInfo, JobServiceServer, JobServiceService,
 } from "@scow/protos/build/server/job";
 import { charge, pay } from "src/bl/charging";
+import { getActiveBillingItems } from "src/bl/PriceMap";
 import { misConfig } from "src/config/mis";
 import { Account } from "src/entities/Account";
 import { JobInfo as JobInfoEntity } from "src/entities/JobInfo";
 import { JobPriceChange } from "src/entities/JobPriceChange";
 import { AmountStrategy, JobPriceItem } from "src/entities/JobPriceItem";
 import { Tenant } from "src/entities/Tenant";
-import { getActiveBillingItems } from "src/plugins/price";
 import { paginationProps } from "src/utils/orm";
 
 function toGrpc(x: JobInfoEntity) {
@@ -340,6 +340,16 @@ export const jobServiceServer = plugin((server) => {
       } else {
         return [{ items: billingItems.map(priceItemToGrpc) }];
       }
+
+    },
+
+    getMissingDefaultPriceItems: async () => {
+
+      // check price map completeness
+      const priceMap = await server.ext.price.createPriceMap();
+      const missingItems = priceMap.getMissingDefaultPriceItems();
+
+      return [{ items: missingItems }];
 
     },
 
