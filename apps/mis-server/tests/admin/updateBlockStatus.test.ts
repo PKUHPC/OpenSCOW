@@ -39,12 +39,12 @@ it("test whether the block update time exists, and update it if exits", async ()
 
   const em = server.ext.orm.em.fork();
   const updateTime = await em.findOneOrFail(SystemState, { key: SystemState.KEYS.UPDATE_SLURM_BLOCK_STATUS });
-  expect(updateTime !== null).toBeTrue();
+  expect(updateTime).not.toBeNull();
 
   await asyncClientCall(client, "updateBlockStatus", {});
 
   const curUpdateTime = await em.findOneOrFail(SystemState, { key: SystemState.KEYS.UPDATE_SLURM_BLOCK_STATUS });
-  expect(updateTime !== curUpdateTime).toBeTrue();
+  expect(updateTime).not.toBe(curUpdateTime);
 
 });
 
