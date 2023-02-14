@@ -12,6 +12,7 @@
 
 import Link from "next/link";
 import { join } from "path";
+import { useDarkMode } from "src/layouts/darkMode";
 import styled from "styled-components";
 
 const LogoContainer = styled.h1`
@@ -21,6 +22,9 @@ const LogoContainer = styled.h1`
   img {
     padding: 2px 0;
   }
+  a {
+    display: flex;
+  }
 `;
 
 interface Props {
@@ -29,12 +33,14 @@ interface Props {
 
 export const Logo: React.FC<Props> = ({ basePath }) => {
 
+  const { dark } = useDarkMode();
+
+  const query = new URLSearchParams({ type: "logo", preferDark: dark ? "true" : "false" }).toString();
+
   return (
     <LogoContainer>
       <Link href="/">
-
-        <img height="40px" src={join(basePath, "/api/icon?type=favicon")} />
-
+        <img height="40px" alt="logo" src={join(basePath, "/api/logo?" + query.toString())} />
       </Link>
     </LogoContainer>
   );
