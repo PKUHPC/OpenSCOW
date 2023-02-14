@@ -21,6 +21,6 @@ export async function verifyCode(
   if (code.toLowerCase() === redisCode?.toLowerCase())
     return true;
 
-  await serveLoginHtml(true, callbackUrl, req, res, f, true);
+  await serveLoginHtml(false, callbackUrl, req, res, f, true);
   return false;
 }
