@@ -24,7 +24,6 @@ import {
 } from "@scow/protos/build/portal/app";
 import { getClusterOps } from "src/clusterops";
 import { clusterNotFound } from "src/utils/errors";
-import { isNumberObject, isStringObject } from "util/types";
 
 export const appServiceServer = plugin((server) => {
 
