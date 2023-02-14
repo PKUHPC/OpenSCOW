@@ -216,8 +216,6 @@ export const mockApi: MockApi<typeof api> = {
 
   getBillingTable: null,
 
-  getIcon: async () => undefined,
-
   createInitAdmin: async () => ({ createdInAuth: false }),
 
   importUsers: async () => null,

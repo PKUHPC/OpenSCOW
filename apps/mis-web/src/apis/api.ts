@@ -14,7 +14,6 @@
 
 import { fromApi } from "@ddadaal/next-typed-api-routes-runtime/lib/client";
 import { join } from "path";
-import type { GetIconSchema } from "src/pages/api//icon";
 import type { ChangeJobPriceSchema } from "src/pages/api/admin/changeJobPrice";
 import type { ChangePasswordAsPlatformAdminSchema } from "src/pages/api/admin/changePassword";
 import type { ChangeStorageQuotaSchema } from "src/pages/api/admin/changeStorage";
@@ -111,7 +110,6 @@ export const api = {
   getUsedPayTypes: fromApi<GetUsedPayTypesSchema>("GET", join(basePath, "/api/finance/getUsedPayTypes")),
   financePay: fromApi<FinancePaySchema>("POST", join(basePath, "/api/finance/pay")),
   getPayments: fromApi<GetPaymentsSchema>("GET", join(basePath, "/api/finance/payments")),
-  getIcon: fromApi<GetIconSchema>("GET", join(basePath, "/api//icon")),
   completeInit: fromApi<CompleteInitSchema>("POST", join(basePath, "/api/init/completeInit")),
   createInitAdmin: fromApi<CreateInitAdminSchema>("POST", join(basePath, "/api/init/createInitAdmin")),
   initGetAccounts: fromApi<InitGetAccountsSchema>("GET", join(basePath, "/api/init/getAccounts")),
