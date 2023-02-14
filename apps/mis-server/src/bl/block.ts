@@ -51,20 +51,20 @@ export async function updateBlockStatusInSlurm(
     }));
   }
   const updateBlockTime = await em.upsert(SystemState, {
-    key: SystemState.KEYS.UPDATE_SLURM_BLOCK_STATUS, 
+    key: SystemState.KEYS.UPDATE_SLURM_BLOCK_STATUS,
     value: new Date().toISOString(),
   });
   await em.persistAndFlush(updateBlockTime);
 
-  logger.info("Updated block status in slurm of the following accounts: o%", accounts.map((x) => x.accountName));
-  logger.info("Updated block status in slurm of the following user account: o%", 
+  logger.info("Updated block status in slurm of the following accounts: %o", accounts.map((x) => x.accountName));
+  logger.info("Updated block status in slurm of the following user account: %o",
     userAccounts.map((x) => [x.user.getProperty("userId"), x.account.getProperty("accountName")]));
 
   return {
     blockedAccounts: accounts.map((x) => x.id),
     blockedUserAccounts: userAccounts.map((x) => x.id),
   };
-  
+
 }
 
 /**
