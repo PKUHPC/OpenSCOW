@@ -52,7 +52,7 @@ MIS_PATH = get_cfg(["MIS", "BASE_PATH"], "/mis")
 check_path_format("MIS.BASE_PATH", MIS_PATH)
 
 LOG_LEVEL = get_cfg(["LOG", "LEVEL"], "info")
-LOG_PRETTY = get_cfg(["LOG", "PRETTY"], False)
+LOG_PRETTY = json.dumps(get_cfg(["LOG", "PRETTY"], False))
 
 
 def path_join(*args):
