@@ -35,7 +35,7 @@ function parseHostname(req: FastifyRequest): string | undefined {
 
 export async function serveLoginHtml(
   err: boolean, callbackUrl: string, req: FastifyRequest, rep: FastifyReply,
-  f: FastifyInstance, vertifyCodeFail?: boolean,
+  f: FastifyInstance, verifyCodeFail?: boolean,
 ) {
 
   const hostname = parseHostname(req);
@@ -65,7 +65,7 @@ export async function serveLoginHtml(
     err,
     data,
     token,
-    vertifyCodeFail,
+    verifyCodeFail,
   });
 
 }

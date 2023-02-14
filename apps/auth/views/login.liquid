@@ -39,7 +39,7 @@
                 </div>
                 <input type="hidden" name="token" value="{{ token }}" />
                 <input type="hidden" name="callbackUrl" value="{{ callbackUrl }}" />
-                {% if vertifyCodeFail %}
+                {% if verifyCodeFail %}
                 <p class="my-4 text-center text-red-600">验证码无效，请重新输入。</p>
               {% endif %}
                 {% if err %}
