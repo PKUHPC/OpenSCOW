@@ -14,12 +14,17 @@
     "!**/*.map"
   ],
   "dependencies": {
-    "@scow/utils": "workspace:*"
+    "@scow/utils": "workspace:*",
+    "zod": "3.20.6",
+    "mime-types": "2.1.35"
   },
   "peerDependencies": {
     "antd": "5.2.0",
     "next": "13.1.6",
     "styled-components": "5.3.6"
+  },
+  "devDependencies": {
+    "@types/mime-types": "2.1.1"
   },
   "author": "PKUHPC (https://github.com/PKUHPC)",
   "license": "Mulan PSL v2",

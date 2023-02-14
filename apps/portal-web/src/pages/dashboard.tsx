@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { getHostname } from "@scow/lib-web/build/utils/getHostname";
 import { GetServerSideProps, NextPage } from "next";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
@@ -19,7 +20,6 @@ import { CustomizableLogoAndText } from "src/pageComponents/dashboard/Customizab
 import { UserStore } from "src/stores/UserStore";
 import { runtimeConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
-import { getHostname } from "src/utils/host";
 
 interface Props {
   homeText: string;
