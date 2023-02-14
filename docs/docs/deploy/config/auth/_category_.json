@@ -1,0 +1,8 @@
+{
+  "label": "认证",
+  "position": 3,
+  "link": {
+    "type": "generated-index",
+    "description": "关于认证系统的部署和配置"
+  }
+}

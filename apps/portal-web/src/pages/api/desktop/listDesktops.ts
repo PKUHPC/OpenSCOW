@@ -54,7 +54,7 @@ export default /* #__PURE__*/route<ListDesktopsSchema>("ListDesktopsSchema", asy
 
   const client = getClient(DesktopServiceClient);
 
-  return await asyncUnaryCall(client, "listDesktops", {
+  return await asyncUnaryCall(client, "listUserDesktops", {
     cluster, userId: info.identityId,
   }).then(async ({ node, displayIds }) => ({ 200: { node: await dnsResolve(node), displayId: displayIds } }));
 

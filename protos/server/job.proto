@@ -1,14 +1,14 @@
 /**
- * Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
- * SCOW is licensed under Mulan PSL v2.
- * You can use this software according to the terms and conditions of the Mulan PSL v2.
- * You may obtain a copy of Mulan PSL v2 at:
- *          http://license.coscl.org.cn/MulanPSL2
- * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
- * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
- * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
- * See the Mulan PSL v2 for more details.
- */
+   * Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
+   * SCOW is licensed under Mulan PSL v2.
+   * You can use this software according to the terms and conditions of the Mulan PSL v2.
+   * You may obtain a copy of Mulan PSL v2 at:
+   *          http://license.coscl.org.cn/MulanPSL2
+   * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+   * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+   * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+   * See the Mulan PSL v2 for more details.
+*/
 
 syntax = "proto3";
 
@@ -116,8 +116,7 @@ message ChangeJobTimeLimitRequest {
 }
 
 // NOT_FOUND: cluster or job_id is not found.
-message ChangeJobTimeLimitResponse {
-}
+message ChangeJobTimeLimitResponse {}
 
 message QueryJobTimeLimitRequest {
   string cluster = 1;
@@ -159,21 +158,23 @@ message AddBillingItemRequest {
   optional string description = 6;
 }
 
-message AddBillingItemResponse {
+message AddBillingItemResponse {}
+
+message GetMissingDefaultPriceItemsRequest {}
+
+message GetMissingDefaultPriceItemsResponse {
+  repeated string items = 1;
 }
 
 service JobService {
   rpc GetJobs(GetJobsRequest) returns (GetJobsResponse);
-  rpc GetJobByBiJobIndex(GetJobByBiJobIndexRequest)
-      returns (GetJobByBiJobIndexResponse);
+  rpc GetJobByBiJobIndex(GetJobByBiJobIndexRequest) returns (GetJobByBiJobIndexResponse);
   rpc ChangeJobPrice(ChangeJobPriceRequest) returns (ChangeJobPriceResponse);
 
   rpc GetRunningJobs(GetRunningJobsRequest) returns (GetRunningJobsResponse);
 
-  rpc ChangeJobTimeLimit(ChangeJobTimeLimitRequest)
-      returns (ChangeJobTimeLimitResponse);
-  rpc QueryJobTimeLimit(QueryJobTimeLimitRequest)
-      returns (QueryJobTimeLimitResponse);
+  rpc ChangeJobTimeLimit(ChangeJobTimeLimitRequest) returns (ChangeJobTimeLimitResponse);
+  rpc QueryJobTimeLimit(QueryJobTimeLimitRequest) returns (QueryJobTimeLimitResponse);
 
   rpc GetBillingItems(GetBillingItemsRequest) returns (GetBillingItemsResponse);
 
@@ -181,4 +182,6 @@ service JobService {
   // NOT_FOUND: tenant_name is not found
   // INVALID_ARGUMENT: amount is not valid or path is not valid
   rpc AddBillingItem(AddBillingItemRequest) returns (AddBillingItemResponse);
+
+  rpc GetMissingDefaultPriceItems(GetMissingDefaultPriceItemsRequest) returns (GetMissingDefaultPriceItemsResponse);
 }

@@ -11,11 +11,12 @@
  */
 
 import { PlusOutlined } from "@ant-design/icons";
-import { App, Button, Form, Input, message, Modal } from "antd";
+import { App, Button, Form, Input, Modal } from "antd";
 import React, { useState } from "react";
 import { api } from "src/apis";
 import { CreateUserModal } from "src/pageComponents/users/CreateUserModal";
 import { publicConfig } from "src/utils/config";
+import { userIdRule } from "src/utils/form";
 
 
 interface FormProps {
@@ -28,57 +29,36 @@ interface ModalProps {
   open: boolean;
   close: () => void;
   refresh: () => void;
-  onUserNotFound: () => void;
+  onAddUser: (identityId: string, name: string) => Promise<void>;
 }
 
 const NewUserModal: React.FC<ModalProps> = ({
-  open, close, refresh, accountName, onUserNotFound,
+  open, close, onAddUser: onAddingUser,
 }) => {
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm<FormProps>();
-
-  const { message } = App.useApp();
-
-  const onOk = async () => {
-    setLoading(true);
-    const { identityId, name } = await form.validateFields();
-
-    await api.addUserToAccount({ body: { identityId, name, accountName } })
-      .httpError(400, ({ code }) => {
-        if (code === "ID_NAME_NOT_MATCH") {
-          message.error("您输入的用户ID和姓名不匹配。");
-        }
-      })
-      .httpError(404, ({ code }) => {
-        if (code === "ACCOUNT_NOT_FOUND") {
-          message.error("账户不存在");
-        } else if (code === "USER_NOT_FOUND") {
-          onUserNotFound();
-        }
-      })
-      .httpError(409, () => {
-        message.error("用户已经存在于此账户中！");
-      })
-      .then(() => {
-        message.success("添加成功！");
-        refresh();
-        close();
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  };
 
   return (
     <Modal
       title="添加用户"
       open={open}
       onCancel={close}
-      onOk={onOk}
+      onOk={async () => {
+        const { identityId, name } = await form.validateFields();
+        setLoading(true);
+        onAddingUser(identityId, name).finally(() => setLoading(false));
+      }}
       confirmLoading={loading}
     >
       <Form form={form}>
-        <Form.Item name="identityId" required label="用户ID">
+        <Form.Item
+          name="identityId"
+          label="用户ID"
+          rules={[
+            { required: true },
+            userIdRule,
+          ]}
+        >
           <Input />
         </Form.Item>
         <Form.Item name="name" required label="用户姓名">
@@ -95,10 +75,41 @@ interface Props {
 }
 
 export const AddUserButton: React.FC<Props> = ({ refresh, accountName }) => {
+  const { message } = App.useApp();
 
   const [modalShow, setModalShow] = useState(false);
 
-  const [createUserShow, setCreateUserShown] = useState(false);
+  const [newUserInfo, setNewUserInfo] = useState<{ identityId: string; name: string } | undefined>(undefined);
+
+  const onAddUser = async (identityId: string, name: string) => {
+    await api.addUserToAccount({ body: { identityId, name, accountName } })
+      .httpError(400, ({ code }) => {
+        if (code === "ID_NAME_NOT_MATCH") {
+          message.error("您输入的用户ID和姓名不匹配。");
+        }
+      })
+      .httpError(404, ({ code }) => {
+        if (code === "ACCOUNT_NOT_FOUND") {
+          message.error("账户不存在");
+        } else if (code === "USER_NOT_FOUND") {
+          if (publicConfig.ENABLE_CREATE_USER) {
+            setModalShow(false);
+            setNewUserInfo({ identityId, name });
+          } else {
+            message.error("用户不存在！");
+          }
+        }
+      })
+      .httpError(409, () => {
+        message.error("用户已经存在于此账户中！");
+      })
+      .then(() => {
+        message.success("添加成功！");
+        refresh();
+        setModalShow(false);
+        setNewUserInfo(undefined);
+      });
+  };
 
   return (
     <>
@@ -107,21 +118,18 @@ export const AddUserButton: React.FC<Props> = ({ refresh, accountName }) => {
         open={modalShow}
         refresh={refresh}
         accountName={accountName}
-        onUserNotFound={() => {
-          if (publicConfig.ENABLE_CREATE_USER) {
-            setModalShow(false);
-            setCreateUserShown(true);
-          } else {
-            message.error("用户不存在！");
-          }
-        }}
+        onAddUser={onAddUser}
       />
       <CreateUserModal
-        onClose={() => {
-          setCreateUserShown(false);
-          setModalShow(true);
+        accountName={accountName}
+        open={!!newUserInfo}
+        newUserInfo={newUserInfo}
+        onCreated={({ identityId, name }) => {
+          return onAddUser(identityId, name);
         }}
-        open={createUserShow}
+        onClose={() => {
+          setNewUserInfo(undefined);
+        }}
       />
       <Button type="primary" icon={<PlusOutlined />} onClick={() => setModalShow(true)}>
       添加用户

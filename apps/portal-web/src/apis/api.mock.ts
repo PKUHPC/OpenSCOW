@@ -87,6 +87,10 @@ export const mockApi: MockApi<typeof api> = {
 
   cancelJob: async () => null,
 
+  listAvailableWms: async () => ({
+    wms: [{ name: "cinnamon", wm: "Cinnamon" }, { name: "gnome", wm: "GNOME" }],
+  }),
+
   getAppSessions: async () => ({ sessions: [
     { jobId: 100, sessionId: "123", appId: "vscode", state: "PENDING",
       submitTime: new Date().toISOString(), ready: false, dataPath: "/test",

@@ -118,7 +118,7 @@ export const desktopServiceServer = plugin((server) => {
 
     },
 
-    listDesktops: async ({ request, logger }) => {
+    listUserDesktops: async ({ request, logger }) => {
 
       ensureEnabled();
 
@@ -143,6 +143,14 @@ export const desktopServiceServer = plugin((server) => {
         }];
       });
 
+    },
+
+    listAvailableWms: async ({}) => {
+      ensureEnabled();
+
+      const result = portalConfig.loginDesktop.wms;
+
+      return [{ wms: result }];
     },
 
   });

@@ -1,0 +1,8 @@
+{
+  "label": "门户系统",
+  "position": 3,
+  "link": {
+    "type": "generated-index",
+    "description": "关于门户系统的部署和配置"
+  }
+}
