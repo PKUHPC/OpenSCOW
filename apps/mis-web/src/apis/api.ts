@@ -53,6 +53,7 @@ import type { ChangeJobTimeLimitSchema } from "src/pages/api/job/changeJobTimeLi
 import type { GetBillingItemsSchema } from "src/pages/api/job/getBillingItems";
 import type { GetBillingTableSchema } from "src/pages/api/job/getBillingTable";
 import type { GetJobByBiJobIndexSchema } from "src/pages/api/job/getJobByBiJobIndex";
+import type { GetMissingDefaultPriceItemsSchema } from "src/pages/api/job/getMissingDefaultPriceItems";
 import type { GetJobInfoSchema } from "src/pages/api/job/jobInfo";
 import type { QueryJobTimeLimitSchema } from "src/pages/api/job/queryJobTimeLimit";
 import type { GetRunningJobsSchema } from "src/pages/api/job/runningJobs";
@@ -121,6 +122,7 @@ export const api = {
   getBillingItems: fromApi<GetBillingItemsSchema>("GET", join(basePath, "/api/job/getBillingItems")),
   getBillingTable: fromApi<GetBillingTableSchema>("GET", join(basePath, "/api/job/getBillingTable")),
   getJobByBiJobIndex: fromApi<GetJobByBiJobIndexSchema>("GET", join(basePath, "/api/job/getJobByBiJobIndex")),
+  getMissingDefaultPriceItems: fromApi<GetMissingDefaultPriceItemsSchema>("GET", join(basePath, "/api/job/getMissingDefaultPriceItems")),
   getJobInfo: fromApi<GetJobInfoSchema>("GET", join(basePath, "/api/job/jobInfo")),
   queryJobTimeLimit: fromApi<QueryJobTimeLimitSchema>("GET", join(basePath, "/api/job/queryJobTimeLimit")),
   getRunningJobs: fromApi<GetRunningJobsSchema>("GET", join(basePath, "/api/job/runningJobs")),
