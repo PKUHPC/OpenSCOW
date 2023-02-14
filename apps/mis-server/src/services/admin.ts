@@ -17,7 +17,6 @@ import { AdminServiceServer, AdminServiceService } from "@scow/protos/build/serv
 import { importUsers, ImportUsersData } from "src/bl/importUsers";
 import { Account } from "src/entities/Account";
 import { StorageQuota } from "src/entities/StorageQuota";
-import { User } from "src/entities/User";
 import { parseClusterUsers } from "src/utils/slurm";
 
 export const adminServiceServer = plugin((server) => {
@@ -79,7 +78,7 @@ export const adminServiceServer = plugin((server) => {
     },
 
     importUsers: async ({ request, em, logger }) => {
-      const { data, whitelist } = request;
+      const { data, tenantName, whitelist } = request;
 
       if (!data) {
         throw <ServiceError> {
@@ -102,7 +101,7 @@ export const adminServiceServer = plugin((server) => {
         };
       }
 
-      const reply = await importUsers(data as ImportUsersData, em, whitelist, logger);
+      const reply = await importUsers(data as ImportUsersData, em, whitelist, tenantName, logger);
 
       return [reply];
 
@@ -128,17 +127,6 @@ export const adminServiceServer = plugin((server) => {
         const a = result.accounts.find((x) => x.accountName === account.accountName)!;
         a.included = true;
         a.owner = "该账户已导入";
-      });
-
-      const includedUsers = await em.find(User, {
-        userId: { $in: result.users.map((x) => x.userId) },
-      });
-      includedUsers.forEach((user) => {
-        // https://slurm.schedmd.com/sacctmgr.html#OPT_user
-        // slurm's username defaults to lower case
-        const u = result.users.find((x) => x.userId.toLowerCase() === user.userId.toLowerCase())!;
-        u.included = true;
-        u.userName = user.name;
       });
 
       return [result];

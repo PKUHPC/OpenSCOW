@@ -19,6 +19,7 @@ import { MySqlDriver } from "@mikro-orm/mysql";
 import { AdminServiceClient } from "@scow/protos/build/server/admin";
 import { createServer } from "src/app";
 import { Account } from "src/entities/Account";
+import { Tenant } from "src/entities/Tenant";
 import { User } from "src/entities/User";
 import { UserAccount, UserRole, UserStatus } from "src/entities/UserAccount";
 import { dropDatabase } from "tests/data/helpers";
@@ -45,26 +46,25 @@ const data = {
   accounts: [
     {
       accountName: "a_user1",
-      users: [{ userId: "user1", state: "allowed!" }, { userId: "user2", state: "blocked!" }],
+      users: [{ userId: "user1", userName: "user1Name", state: "allowed!" }, { userId: "user2", userName: "user2", state: "blocked!" }],
       owner: "user1",
     },
     {
       accountName: "account2",
-      users: [{ userId: "user2", state: "allowed!" }, { userId: "user3", state: "blocked!" }],
+      users: [{ userId: "user2", userName: "user2", state: "allowed!" }, { userId: "user3", userName: "user3", state: "blocked!" }],
       owner: "user2",
     },
   ],
-  users: [
-    { userId: "user1", userName: "user1Name", accounts: [ "a_user1" ]},
-    { userId: "user2", userName: "user2", accounts: [ "a_user1", "account2" ]},
-    { userId: "user3", userName: "", accounts: [ "account2" ]},
-  ],
 };
 
-it("imports users and accounts from users.json", async () => {
-  await asyncClientCall(client, "importUsers", { data: data, whitelist: true });
-
+it("imports users and accounts", async () => {
   const em = orm.em.fork();
+  
+  // user1 has existed
+  const tenant = await em.findOneOrFail(Tenant, { name: "default" });
+  await em.persistAndFlush(new User({ name: "user1Name", userId: "user1", email: "", tenant }));
+
+  await asyncClientCall(client, "importUsers", { data: data, tenantName: "default", whitelist: true });
 
   const accounts = await em.find(Account, {});
   expect(accounts.map((x) => x.accountName)).toIncludeSameMembers(data.accounts.map((x) => x.accountName));

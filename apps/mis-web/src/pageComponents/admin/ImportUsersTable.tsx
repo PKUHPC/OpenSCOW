@@ -11,11 +11,11 @@
  */
 
 import { queryToString, useQuerystring } from "@scow/lib-web/build/utils/querystring";
-import { ClusterAccountInfo, ClusterUserInfo,
-  GetClusterUsersResponse, ImportUsersData } from "@scow/protos/build/server/admin";
-import { App, Button, Checkbox, Form, Input, Select, Space, Table, Tabs, Tooltip } from "antd";
+import { ClusterAccountInfo, GetClusterUsersResponse, 
+  ImportUsersData, UserInAccount } from "@scow/protos/build/server/admin";
+import { App, Button, Checkbox, Drawer, Form, Select, Space, Table, Tooltip } from "antd";
 import Router from "next/router";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useAsync } from "react-async";
 import { useStore } from "simstate";
 import { api } from "src/apis";
@@ -23,6 +23,8 @@ import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { publicConfig } from "src/utils/config";
+
+import { TenantSelector } from "../tenant/TenantSelector";
 
 export const ImportUsersTable: React.FC = () => {
   const { message } = App.useApp();
@@ -36,7 +38,7 @@ export const ImportUsersTable: React.FC = () => {
     ? publicConfig.CLUSTERS[clusterParam]
     : defaultClusterStore.cluster);
 
-  const [form] = Form.useForm<{data: GetClusterUsersResponse, whitelist: boolean}>();
+  const [form] = Form.useForm<{tenantName: string, data: GetClusterUsersResponse, whitelist: boolean}>();
 
   const [loading, setLoading] = useState(false);
 
@@ -55,27 +57,12 @@ export const ImportUsersTable: React.FC = () => {
     });
   }, [data]);
 
-  const selectedUsers = useMemo(() => data?.users.filter(
-    (x) => (!x.included)).map((x) => (x.userId)), [data],
-  );
-  const selectedAccounts = useMemo(() => data?.accounts.filter(
-    (x) => (!x.included)).map((x) => (x.accountName)), [data],
-  );
+  const [selectedAccounts, setSelectedAccounts] = useState<ClusterAccountInfo[]>();
+  const [usersList, setusersList] = useState<UserInAccount[] | undefined>(undefined);
 
   return (
     <div>
-      <FilterFormContainer>
-        <Form layout="inline">
-          <Form.Item label="集群">
-            <SingleClusterSelector
-              value={cluster}
-              onChange={(value) => {
-                Router.push({ query: { cluster: value.id } });
-              }}
-            />
-          </Form.Item>
-        </Form>
-      </FilterFormContainer>
+      
       <Form
         form={form}
         onFinish={async () => {
@@ -83,20 +70,10 @@ export const ImportUsersTable: React.FC = () => {
 
           setLoading(true);
 
-          const { data: changedData, whitelist } = await form.validateFields();
-          const importData: ImportUsersData = { accounts: [], users: []};
+          const { data: changedData, tenantName, whitelist } = await form.validateFields();
+          const importData: ImportUsersData = { accounts: []};
 
-          changedData.users.forEach((x, i) => {
-            if (!data.users[i].included) {
-              data.users[i].userName = x.userName;
-              importData.users.push({
-                userId: data.users[i].userId,
-                userName: data.users[i].userName,
-                accounts: data.users[i].accounts,
-              });
-            }
-          });
-          changedData.accounts.forEach((x, i) => {
+          changedData?.accounts.forEach((x, i) => {
             if (!data.accounts[i].included) {
               data.accounts[i].owner = x.owner;
               importData.accounts.push({
@@ -109,100 +86,74 @@ export const ImportUsersTable: React.FC = () => {
 
           await api.importUsers({ body: {
             data: importData,
-            whitelist: whitelist,
+            tenantName,
+            whitelist,
           } })
             .httpError(400, () => { message.error("数据格式不正确"); })
             .then(() => { message.success("导入成功"); })
             .finally(() => { setLoading(false); });
         }}
       >
-        <Tabs
-          defaultActiveKey="user"
-          tabBarExtraContent={(
+        <FilterFormContainer>
+          <Space align="center">
+            选择集群：
+            <SingleClusterSelector
+              value={cluster}
+              onChange={(value) => {
+                Router.push({ query: { cluster: value.id } });
+              }}
+            />
+          </Space>
+        </FilterFormContainer>
+        <FilterFormContainer>
+          <Space align="center">
+            导入账户及账户下的用户到SCOW平台的
+            <Form.Item name={"tenantName"}>
+              <TenantSelector placeholder="选择租户" autoSelect />
+            </Form.Item>
+            租户中
             <Space size="large">
-              <a onClick={reload}>
-                刷新
-              </a>
               <Button type="primary" htmlType="submit" loading={loading}>
-                提交
+              导入
               </Button>
+              <a onClick={reload}>
+              刷新
+              </a>
             </Space>
-          )}
+          </Space>
+        </FilterFormContainer>
+        <Table
+          rowSelection={{
+            type: "checkbox",
+            renderCell(_checked, record, _index, node) {
+              if (record.included) {
+                return <Tooltip title="账户已经存在于SCOW中">{node}</Tooltip>;
+              }
+              else {
+                return <Tooltip title="账户不存在于SCOW中，将会导入SCOW">{node}</Tooltip>;
+              }
+            },
+            getCheckboxProps: (r) => ({
+              disabled: r.included,
+            }),
+            onChange: (_, sr) => {
+              setSelectedAccounts(sr);
+            },
+          }}
+          loading={isLoading}
+          dataSource={data?.accounts}
+          scroll={{ x:true }}
+          pagination={{ showSizeChanger: true }}
+          rowKey="accountName"
+          bordered
         >
-          <Tabs.TabPane tab="用户" key="user" forceRender={true}>
-            <Table
-              rowSelection={{
-                selectedRowKeys: selectedUsers,
-                type: "checkbox",
-                renderCell(_checked, record, _index, node) {
-                  if (record.included) {
-                    return <Tooltip title="用户已经存在于SCOW中">{node}</Tooltip>;
-                  }
-                  else {
-                    return <Tooltip title="用户不存在于SCOW中，将会导入SCOW">{node}</Tooltip>;
-                  }
-                },
-                getCheckboxProps: () => ({
-                  disabled: true,
-                }),
-              }}
-              loading={isLoading}
-              dataSource={data?.users}
-              scroll={{ x:true }}
-              bordered
-              rowKey="userId"
-            >
-              <Table.Column<ClusterUserInfo> dataIndex="userId" title="用户ID" key="userId" width={200} />
-              <Table.Column<ClusterUserInfo>
-                dataIndex="name"
-                title="姓名"
-                width={200}
-                render={(_text, record, index) => record.included ? record.userName : (
-                  <Form.Item name={["data", "users", index, "userName"]} rules={[{ required: true, message: "请输入姓名" }]}>
-                    <Input
-                      placeholder="输入用户姓名"
-                      allowClear
-                    />
-                  </Form.Item>
-                )}
-              />
-              <Table.Column<ClusterUserInfo>
-                dataIndex="accounts"
-                key="accounts"
-                title="所属账户"
-                render={(_, r) => r.accounts.join(", ")}
-              />
-            </Table>
-          </Tabs.TabPane>
-          <Tabs.TabPane tab="账户" key="account" forceRender={true}>
-            <Table
-              rowSelection={{
-                selectedRowKeys: selectedAccounts,
-                type: "checkbox",
-                renderCell(_checked, record, _index, node) {
-                  if (record.included) {
-                    return <Tooltip title="账户已经存在于SCOW中">{node}</Tooltip>;
-                  }
-                  else {
-                    return <Tooltip title="账户不存在于SCOW中，将会导入SCOW">{node}</Tooltip>;
-                  }
-                },
-                getCheckboxProps: () => ({
-                  disabled: true,
-                }),
-              }}
-              loading={isLoading}
-              dataSource={data?.accounts}
-              scroll={{ x:true }}
-              pagination={{ showSizeChanger: true }}
-              rowKey="accountName"
-              bordered
-            >
-              <Table.Column<ClusterAccountInfo> dataIndex="accountName" title="账户名" width={400} />
-              <Table.Column<ClusterAccountInfo>
-                dataIndex="owner"
-                title="拥有者"
-                render={(_, r, i) => r.included ? r.owner : (
+          <Table.Column<ClusterAccountInfo> dataIndex="accountName" title="账户名" />
+          <Table.Column<ClusterAccountInfo>
+            dataIndex="owner"
+            title="拥有者"
+            render={(_, r, i) => 
+              r.included ? 
+                r.owner : selectedAccounts?.includes(r) ? (
                   <Form.Item name={["data", "accounts", i, "owner"]} rules={[{ required: true, message: "请选择一个拥有者" }]}>
                     <Select
                       defaultValue={r.owner}
@@ -211,14 +162,31 @@ export const ImportUsersTable: React.FC = () => {
                       placeholder={"请选择一个拥有者"}
                     />
                   </Form.Item>
-                )}
-              />
-            </Table>
-            <Form.Item name="whitelist" valuePropName="checked">
-              <Checkbox>将所有账户加入白名单</Checkbox>
-            </Form.Item>
-          </Tabs.TabPane>
-        </Tabs>
+                ) : ""}
+          />
+          <Table.Column<ClusterAccountInfo>
+            dataIndex="users"
+            title="用户列表"
+            render={(_, r) => (
+              <a onClick={() => setusersList(r.users)}>查看</a>
+            )}
+          />
+        </Table>
+        <Form.Item name="whitelist" valuePropName="checked">
+          <Checkbox>将所有账户加入白名单</Checkbox>
+        </Form.Item>
+        <Drawer
+          placement="right"
+          onClose={() => setusersList(undefined)}
+          open={usersList !== undefined}
+          title="用户列表"
+        >
+          <Table
+            dataSource={usersList}
+          >
+            <Table.Column<UserInAccount> dataIndex="userId" title="用户ID" />
+          </Table>
+        </Drawer>
       </Form>
     </div>
   );
