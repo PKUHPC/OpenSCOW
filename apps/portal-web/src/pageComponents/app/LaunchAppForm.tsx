@@ -37,7 +37,6 @@ interface FormFields {
   coreCount: number;
   account: string;
   maxTime: number;
-  sbatchOptions: string | undefined;
 }
 
 
@@ -57,12 +56,16 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
 
   const onSubmit = async () => {
     const allFormFields = await form.validateFields();
-    const { cluster, coreCount, partition, qos, account, maxTime, sbatchOptions } = allFormFields;
+    const { cluster, coreCount, partition, qos, account, maxTime } = allFormFields;
 
     const customFormKeyValue: {[key: string]: string} = {};
+    let sbatchOptions: string | undefined;
     attributes.forEach((customFormAttribute) => {
       const customFormKey = customFormAttribute.name;
-      customFormKeyValue[customFormKey] = allFormFields[customFormKey];
+      if (customFormKey === "sbatchOptions") {
+        sbatchOptions = allFormFields[customFormKey];
+      }
+      else customFormKeyValue[customFormKey] = allFormFields[customFormKey];
     });
 
     const userSbatchOptions = sbatchOptions ? splitSbatchArgs(sbatchOptions) : [];
@@ -125,15 +128,16 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
   const customFormItems = attributes.map((item, index) => {
 
     const rules: Rule[] = item.type === "NUMBER"
-      ? [{ type: "integer" }, { required: true }]
-      : [{ required: true }];
+      ? [{ type: "integer" }, { required: item.required }]
+      : [{ required: item.required }];
 
-
-    const inputItem = item.type === "NUMBER" ? (<InputNumber />)
-      : item.type === "TEXT" ? (<Input />)
+    const placeholder = item.placeholder ?? "";
+    const inputItem = item.type === "NUMBER" ? (<InputNumber placeholder={placeholder} />)
+      : item.type === "TEXT" ? (<Input placeholder={placeholder} />)
         : (
           <Select
             options={item.select.map((x) => ({ label: x.label, value: x.value }))}
+            placeholder={placeholder}
           />
         );
 
@@ -143,6 +147,7 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
         label={item.label}
         name={item.name}
         rules={rules}
+        initialValue={item.defaultValue}
       >
         {inputItem}
       </Form.Item>
@@ -209,10 +214,6 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
       </Form.Item>
 
       {customFormItems}
-
-      <Form.Item label="其他sbatch参数" name="sbatchOptions">
-        <Input placeholder="比如：--gpus gres:2 --time 10" />
-      </Form.Item>
 
       <Form.Item>
         <Button type="primary" htmlType="submit" loading={loading}>

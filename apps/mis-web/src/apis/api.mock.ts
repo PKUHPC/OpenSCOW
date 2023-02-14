@@ -107,6 +107,10 @@ const mockUsers = [
 
 export const mockApi: MockApi<typeof api> = {
 
+  getMissingDefaultPriceItems: async () => {
+    return { items: ["test.test", "test1.test2"]};
+  },
+
   getAllTenants: async () => (
     {
       totalCount: 3,
@@ -211,8 +215,6 @@ export const mockApi: MockApi<typeof api> = {
   initGetUsers: async () => ({ users: mockUsers }),
 
   getBillingTable: null,
-
-  getIcon: async () => undefined,
 
   createInitAdmin: async () => ({ createdInAuth: false }),
 

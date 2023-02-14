@@ -82,7 +82,7 @@ export const Header: React.FC<Props> = ({
                 {React.createElement(
                   sidebarCollapsed ? MenuUnfoldOutlined : MenuFoldOutlined)}
               </a>
-            ) : undefined
+            ) : <span/>
           }
           <Logo basePath={basePath} />
         </Space>
