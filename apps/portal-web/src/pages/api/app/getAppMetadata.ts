@@ -29,7 +29,7 @@ export interface AppCustomAttribute {
   name: string;
   required: boolean;
   placeholder?: string | undefined;
-  default?: string | number | undefined;
+  defaultValue?: string | number | undefined;
   select: SelectOption[];
 }
 
@@ -71,8 +71,8 @@ export default /* #__PURE__*/route<GetAppMetadataSchema>("GetAppMetadataSchema",
       name: item.name,
       select: item.options,
       required: item.required,
-      default: item.defaultInput 
-        ? (item.defaultInput?.$case === "text" ? item.defaultInput.text : item.defaultInput.number) 
+      defaultValue: item.defaultInput
+        ? (item.defaultInput?.$case === "text" ? item.defaultInput.text : item.defaultInput.number)
         : undefined,
       placeholder: item.placeholder,
     }));

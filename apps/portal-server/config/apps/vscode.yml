@@ -23,14 +23,21 @@ attributes:
   - type: text
     name: version
     label: 版本
+    required: false
+    defaultValue: a version
+    placeholder: aaa
+  - type: text
+    name: version2
+    label: 版本
+    defaultValue: 123
   - type: number
-    name: size
-    label: 数量
-  - type: select
-    name: selectVersion
-    label: 选择版本
-    select:
-      - value: version10
-        label: v10
-      - value: version11
-        label: v11
+    name: version3
+    label: 版本
+    defaultValue: 456
+  - type: number
+    name: version4
+    label: 版本
+
+
+
+

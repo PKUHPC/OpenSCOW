@@ -147,7 +147,7 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
         label={item.label}
         name={item.name}
         rules={rules}
-        initialValue={item.default}
+        initialValue={item.defaultValue}
       >
         {inputItem}
       </Form.Item>

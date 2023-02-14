@@ -129,7 +129,7 @@ export const appServiceServer = plugin((server) => {
 
         case "select":
           // check the option selected by user is in select attributes as the config defined
-          if (customAttributes[attribute.name] 
+          if (customAttributes[attribute.name]
             && !(attribute.select!.some((optionItem) => optionItem.value === customAttributes[attribute.name]))) {
             throw <ServiceError> {
               code: Status.INVALID_ARGUMENT,
@@ -201,13 +201,14 @@ export const appServiceServer = plugin((server) => {
       if (app.attributes) {
         app.attributes.forEach((item) => {
           const attributeType = item.type.toUpperCase();
+
           let defaultInput: AppCustomAttribute["defaultInput"];
-          if (isNumberObject(item.default)) {
-            defaultInput = { $case: "number", number: item.default };
-          } else if (isStringObject(item.default)) {
-            defaultInput = { $case: "text", text: item.default };
+          if (item.defaultValue && typeof item.defaultValue === "number") {
+            defaultInput = { $case: "number", number: item.defaultValue };
+          } else if (item.defaultValue && typeof item.defaultValue === "string") {
+            defaultInput = { $case: "text", text: item.defaultValue };
           }
-          
+
           attributes.push({
             type: appCustomAttribute_AttributeTypeFromJSON(attributeType),
             label: item.label,
