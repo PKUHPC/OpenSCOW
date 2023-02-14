@@ -70,6 +70,9 @@ export const AppConfigSchema = Type.Object({
       type:  Type.Enum({ number: "number", text: "text", select: "select" }, { description: "表单类型" }),
       label: Type.String({ description: "表单标签" }),
       name: Type.String({ description: "表单字段名" }),
+      required: Type.Boolean({ description: "是必填项", default: true }),
+      defaultValue: Type.Optional(Type.Union([Type.String(), Type.Number()])),
+      placeholder: Type.Optional(Type.String({ description: "输入提示信息" })),
       select: Type.Optional(
         Type.Array(
           Type.Object({
@@ -98,6 +101,11 @@ export const getAppConfigs: GetConfigFn<Record<string, AppConfigSchema>> = (base
         if (item.type === "select" && !item.select) {
           throw new Error(`
           App ${id}'s form attributes of name ${item.name} is of type select but select options is not set`);
+        }
+        if (item.defaultValue && item.type === "number" && typeof item.defaultValue !== "number") {
+          throw new Error(`
+          App ${id}'s form attributes of name ${item.name} is of type number,
+          but the default ${item.defaultValue} value is not a number`);
         }
       });
     }

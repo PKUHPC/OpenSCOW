@@ -27,6 +27,9 @@ export interface AppCustomAttribute {
   type: "NUMBER" | "SELECT" | "TEXT";
   label: string;
   name: string;
+  required: boolean;
+  placeholder?: string | undefined;
+  defaultValue?: string | number | undefined;
   select: SelectOption[];
 }
 
@@ -67,6 +70,11 @@ export default /* #__PURE__*/route<GetAppMetadataSchema>("GetAppMetadataSchema",
       label: item.label,
       name: item.name,
       select: item.options,
+      required: item.required,
+      defaultValue: item.defaultInput
+        ? (item.defaultInput?.$case === "text" ? item.defaultInput.text : item.defaultInput.number)
+        : undefined,
+      placeholder: item.placeholder,
     }));
     return { 200: { appName: reply.appName, appCustomFormAttributes: attributes } };
   }, handlegRPCError({
