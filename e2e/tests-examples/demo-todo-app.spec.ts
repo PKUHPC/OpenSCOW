@@ -10,7 +10,8 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { type Page, expect, test } from "@playwright/test";
+// eslint-disable-next-line simple-import-sort/imports
+import { expect, type Page, test } from "@playwright/test";
 
 test.beforeEach(async ({ page }) => {
   await page.goto("https://demo.playwright.dev/todomvc");
