@@ -54,7 +54,7 @@ it("get app metadata", async () => {
   const appId = "vscode";
 
   const reply = await asyncUnaryCall(client, "getAppMetadata", { appId });
-  console.log(reply);
+
   const attributes: AppCustomAttribute[] = reply.attributes.map((item) => ({
     type: appCustomAttribute_AttributeTypeToJSON(item.type) as AppCustomAttribute["type"],
     label: item.label,
@@ -82,7 +82,7 @@ it("get app metadata", async () => {
       label: "版本",
       name: "version2",
       select: [],
-      required: true,
+      required: false,
       default: 123,
       placeholder: undefined,
     },
@@ -91,7 +91,7 @@ it("get app metadata", async () => {
       label: "版本",
       name: "version3",
       select: [],
-      required: true,
+      required: false,
       default: 456,
       placeholder: undefined,
     },
@@ -100,6 +100,21 @@ it("get app metadata", async () => {
       label: "版本",
       name: "version4",
       select: [],
+      required: false,
+      default: undefined,
+      placeholder: undefined,
+    },
+    {
+      type: "SELECT",
+      label: "版本",
+      name: "version5",
+      select: [{
+        label: "version 4.8.0",
+        value: "code-server/4.8.0",
+      }, {
+        label: "version 4.9.0",
+        value: "code-server/4.9.0",
+      }],
       required: true,
       default: undefined,
       placeholder: undefined,

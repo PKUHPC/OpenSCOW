@@ -30,13 +30,24 @@ attributes:
     name: version2
     label: 版本
     defaultValue: 123
+    required: false
   - type: number
     name: version3
     label: 版本
     defaultValue: 456
+    required: false
   - type: number
     name: version4
     label: 版本
+    required: false
+  - type: select
+    name: version5
+    label: 版本
+    select:
+      - value: code-server/4.8.0
+        label: version 4.8.0
+      - value: code-server/4.9.0
+        label: version 4.9.0
 
 
 
