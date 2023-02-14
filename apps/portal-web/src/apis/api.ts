@@ -14,8 +14,6 @@
 
 import { fromApi } from "@ddadaal/next-typed-api-routes-runtime/lib/client";
 import { join } from "path";
-import type { GetIconSchema } from "src/pages/api//icon";
-import type { GetLogoSchema } from "src/pages/api//logo";
 import type { ConnectToAppSchema } from "src/pages/api/app/connectToApp";
 import type { CreateAppSessionSchema } from "src/pages/api/app/createAppSession";
 import type { GetAppMetadataSchema } from "src/pages/api/app/getAppMetadata";
@@ -80,7 +78,6 @@ export const api = {
   mkdir: fromApi<MkdirSchema>("POST", join(basePath, "/api/file/mkdir")),
   moveFileItem: fromApi<MoveFileItemSchema>("PATCH", join(basePath, "/api/file/move")),
   uploadFile: fromApi<UploadFileSchema>("POST", join(basePath, "/api/file/upload")),
-  getIcon: fromApi<GetIconSchema>("GET", join(basePath, "/api//icon")),
   cancelJob: fromApi<CancelJobSchema>("DELETE", join(basePath, "/api/job/cancelJob")),
   getAccounts: fromApi<GetAccountsSchema>("GET", join(basePath, "/api/job/getAccounts")),
   getAllJobs: fromApi<GetAllJobsSchema>("GET", join(basePath, "/api/job/getAllJobs")),
@@ -88,6 +85,6 @@ export const api = {
   getSavedJob: fromApi<GetSavedJobSchema>("GET", join(basePath, "/api/job/getSavedJob")),
   getSavedJobs: fromApi<GetSavedJobsSchema>("GET", join(basePath, "/api/job/getSavedJobs")),
   submitJob: fromApi<SubmitJobSchema>("POST", join(basePath, "/api/job/submitJob")),
-  getLogo: fromApi<GetLogoSchema>("GET", join(basePath, "/api//logo")),
   changePassword: fromApi<ChangePasswordSchema>("PATCH", join(basePath, "/api/profile/changePassword")),
 };
+ 

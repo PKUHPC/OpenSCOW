@@ -16,6 +16,7 @@ import "antd/dist/reset.css";
 import { failEvent, fromApi } from "@ddadaal/next-typed-api-routes-runtime/lib/client";
 import { AntdConfigProvider } from "@scow/lib-web/build/layouts/AntdConfigProvider";
 import { DarkModeProvider } from "@scow/lib-web/build/layouts/darkMode";
+import { getHostname } from "@scow/lib-web/build/utils/getHostname";
 import { useConstant } from "@scow/lib-web/build/utils/hooks";
 import { isServer } from "@scow/lib-web/build/utils/isServer";
 import { App as AntdApp } from "antd";
@@ -38,7 +39,6 @@ import {
 } from "src/stores/UserStore";
 import { GlobalStyle } from "src/styles/globalStyle";
 import { publicConfig, runtimeConfig } from "src/utils/config";
-import { getHostname } from "src/utils/host";
 
 const FailEventHandler: React.FC = () => {
   const { message, modal } = AntdApp.useApp();

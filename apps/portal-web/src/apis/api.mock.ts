@@ -157,10 +157,6 @@ export const mockApi: MockApi<typeof api> = {
     jobName: "sample-apple",
   }]}),
 
-  getIcon: async () => undefined,
-
-  getLogo: async () => undefined,
-
   getAccounts: async () => ({ accounts: ["hpc01", "hpc02"]}),
 
   launchDesktop: async () => ({ node: "login01", password: "123", port: 1234 }),

@@ -10,8 +10,11 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { IncomingMessage } from "http";
+import { DEFAULT_CONFIG_BASE_PATH } from "@scow/config/build/constants";
+import { serveLogo } from "@scow/lib-web/build/routes/icon/logo";
+import { NextApiRequest, NextApiResponse } from "next/types";
 
-export function getHostname(req: IncomingMessage | undefined) {
-  return req?.headers?.host;
-}
+const BUILTIN_DEFAULT_DIR = "assets/logo";
+
+export default (req: NextApiRequest, res: NextApiResponse) =>
+  serveLogo(req, res, BUILTIN_DEFAULT_DIR, DEFAULT_CONFIG_BASE_PATH);

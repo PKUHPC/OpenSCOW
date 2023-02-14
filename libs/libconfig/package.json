@@ -2,7 +2,7 @@
   "name": "@scow/lib-config",
   "version": "0.1.0",
   "description": "",
-  "private": false,
+  "private": true,
   "main": "build/index.js",
   "scripts": {
     "build": "rimraf build && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
