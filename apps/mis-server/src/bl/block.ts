@@ -56,8 +56,8 @@ export async function updateBlockStatusInSlurm(
   });
   await em.persistAndFlush(updateBlockTime);
 
-  logger.info("Updated block status in slurm of the following accounts: ", accounts.map((x) => x.accountName));
-  logger.info("Updated block status in slurm of the following user account: ", 
+  logger.info("Updated block status in slurm of the following accounts: o%", accounts.map((x) => x.accountName));
+  logger.info("Updated block status in slurm of the following user account: o%", 
     userAccounts.map((x) => [x.user.getProperty("userId"), x.account.getProperty("accountName")]));
 
   return {

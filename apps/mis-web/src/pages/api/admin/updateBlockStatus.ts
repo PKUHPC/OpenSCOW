@@ -34,7 +34,6 @@ export default route<UpdateBlockStatusSchema>("UpdateBlockStatusSchema",
 
     const client = getClient(AdminServiceClient);
 
-    await asyncClientCall(client, "updateBlockStatus", {});
-    return { 200: null };
+    return await asyncClientCall(client, "updateBlockStatus", {}).then(() => ({ 200: null }));
 
   });
