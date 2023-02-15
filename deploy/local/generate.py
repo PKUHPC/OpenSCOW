@@ -51,6 +51,10 @@ check_path_format("PORTAL.BASE_PATH", PORTAL_PATH)
 MIS_PATH = get_cfg(["MIS", "BASE_PATH"], "/mis")
 check_path_format("MIS.BASE_PATH", MIS_PATH)
 
+LOG_LEVEL = get_cfg(["LOG", "LEVEL"], "info")
+LOG_PRETTY = json.dumps(get_cfg(["LOG", "PRETTY"], False))
+
+
 def path_join(*args):
   def join(a, b):
     if a == "/":
@@ -206,6 +210,8 @@ def create_auth_service():
 
     au_env = {
         "BASE_PATH": BASE_PATH,
+        "LOG_LEVEL": LOG_LEVEL,
+        "LOG_PRETTY": LOG_PRETTY,
     }
 
     AUTH_PORT = get_cfg(["DEBUG", "OPEN_PORTS", "AUTH"])
@@ -227,7 +233,12 @@ def create_portal_server_service():
 
     ports = [(port, 5000)] if port else []
 
-    portal_server = Service("portal-server", generate_image("portal-server"), ports, ps_volumes, None)
+    env = {
+      "LOG_LEVEL": LOG_LEVEL,
+      "LOG_PRETTY": LOG_PRETTY,
+    }
+
+    portal_server = Service("portal-server", generate_image("portal-server"), ports, ps_volumes, env)
     return portal_server
 
 
@@ -267,7 +278,9 @@ def create_db_service():
 
 def create_mis_server_service():
     ms_env = {
-        "DB_PASSWORD": cfg.MIS["DB_PASSWORD"]
+        "DB_PASSWORD": cfg.MIS["DB_PASSWORD"],
+        "LOG_LEVEL": LOG_LEVEL,
+        "LOG_PRETTY": LOG_PRETTY,
     }
     ms_volumes = {
         "/etc/hosts": "/etc/hosts",

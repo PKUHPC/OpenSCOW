@@ -33,7 +33,12 @@ const ValidationError = createError("BAD_REQUEST", "Errors occurred when validat
 export function buildApp(pluginOverrides?: PluginOverrides) {
 
   const server = fastify({
-    logger: { level: config.LOG_LEVEL },
+    logger: {
+      level: config.LOG_LEVEL,
+      ...config.LOG_PRETTY ? {
+        transport: { target: "pino-pretty" },
+      } : {},
+    },
     ajv: {
       customOptions: {
         coerceTypes: "array",

@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { envConfig, host, port, str } from "@scow/lib-config";
+import { bool, envConfig, host, port, str } from "@scow/lib-config";
 import { getKeyPair } from "@scow/lib-ssh";
 import { homedir } from "os";
 import { join } from "path";
@@ -27,6 +27,7 @@ export const config = envConfig({
     default: "info",
     desc: "日志等级",
   }),
+  LOG_PRETTY: bool({ desc: "以可读的方式输出log", default: false }),
 
   BASE_PATH: str({ desc: "整个系统的base path", default: "/" }),
 
