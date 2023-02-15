@@ -96,6 +96,7 @@ importers:
       ldapjs: 2.3.3
       liquidjs: 10.4.0
       nanoid: 4.0.1
+      pino-pretty: 9.2.0
     dependencies:
       '@fastify/error': 3.2.0
       '@fastify/formbody': 7.4.0
@@ -113,6 +114,7 @@ importers:
       ldapjs: 2.3.3
       liquidjs: 10.4.0
       nanoid: 4.0.1
+      pino-pretty: 9.2.0
     devDependencies:
       '@types/asn1': 0.2.0
       '@types/ldapjs': 2.2.5
@@ -144,6 +146,7 @@ importers:
       '@types/wait-on': 5.3.1
       dotenv: 16.0.3
       node-cron: 3.0.2
+      pino-pretty: 9.2.0
       uuid: 9.0.0
       wait-on: 7.0.1
     dependencies:
@@ -166,6 +169,7 @@ importers:
       '@sinclair/typebox': 0.25.21
       dotenv: 16.0.3
       node-cron: 3.0.2
+      pino-pretty: 9.2.0
       uuid: 9.0.0
       wait-on: 7.0.1
     devDependencies:
@@ -298,6 +302,7 @@ importers:
       dayjs: 1.11.7
       dotenv: 16.0.3
       node-cron: 3.0.2
+      pino-pretty: 9.2.0
       shell-quote: 1.8.0
       ts-log: 2.2.5
       uuid: 9.0.0
@@ -315,6 +320,7 @@ importers:
       dayjs: 1.11.7
       dotenv: 16.0.3
       node-cron: 3.0.2
+      pino-pretty: 9.2.0
       shell-quote: 1.8.0
       ts-log: 2.2.5
       uuid: 9.0.0
@@ -7871,7 +7877,6 @@ packages:
 
   /dateformat/4.6.3:
     resolution: {integrity: sha512-2P0p0pFGzHS5EMnhdxQi7aJN+iMheud0UhG4dlE1DLAlvL8JHjJJTX/CSm4JXwV0Ka5nGk3zC5mcb5bUQUxxMA==}
-    dev: true
 
   /dayjs/1.11.7:
     resolution: {integrity: sha512-+Yw9U6YO5TQohxLcIkrXBeY73WP3ejHWVvx8XCk3gxvQDCTEmS48ZrSZCKciI7Bhl/uCMyxYtE9UqRILmFphkQ==}
@@ -9001,7 +9006,6 @@ packages:
 
   /fast-copy/3.0.0:
     resolution: {integrity: sha512-4HzS+9pQ5Yxtv13Lhs1Z1unMXamBdn5nA4bEi1abYpDNSpSp7ODYQ1KPMF6nTatfEzgH6/zPvXKU1zvHiUjWlA==}
-    dev: true
 
   /fast-decode-uri-component/1.0.1:
     resolution: {integrity: sha512-WKgKWg5eUxvRZGwW8FvfbaH7AXSh2cL+3j5fMGzUMCxWBJ3dV3a7Wz8y2f/uQ0e3B6WmodD3oS54jTQ9HVTIIg==}
@@ -9067,7 +9071,6 @@ packages:
 
   /fast-safe-stringify/2.1.1:
     resolution: {integrity: sha512-W+KJc2dmILlPplD/H4K9l9LcAHAfPtP6BY84uVLXQ6Evcz9Lcg33Y2z1IVblT6xdY54PXYVHEv+0Wpq8Io6zkA==}
-    dev: true
 
   /fast-uri/2.1.0:
     resolution: {integrity: sha512-qKRta6N7BWEFVlyonVY/V+BMLgFqktCUV0QjT259ekAIlbVrMaFnFLxJ4s/JPl4tou56S1BzPufI60bLe29fHA==}
@@ -9933,7 +9936,6 @@ packages:
     dependencies:
       glob: 8.0.3
       readable-stream: 3.6.0
-    dev: true
 
   /history/4.10.1:
     resolution: {integrity: sha512-36nwAD620w12kuzPAsyINPWJqlNbij+hpK1k9XRloDtym8mxzGYl2c17LnV6IAGB2Dmg4tEa7G7DlawS0+qjew==}
@@ -11282,7 +11284,6 @@ packages:
   /joycon/3.1.1:
     resolution: {integrity: sha512-34wB/Y7MW7bzjKRjUKTa46I2Z7eV62Rkhva+KkopW7Qvv/OSWBqvkSY7vusOPrNuZcUG3tApvdVgNB8POj3SPw==}
     engines: {node: '>=10'}
-    dev: true
 
   /js-git/0.7.8:
     resolution: {integrity: sha512-+E5ZH/HeRnoc/LW0AmAyhU+mNcWBzAKE+30+IDMLSLbbK+Tdt02AdkOKq9u15rlJsDEGFqtgckc8ZM59LhhiUA==}
@@ -13317,7 +13318,6 @@ packages:
       secure-json-parse: 2.5.0
       sonic-boom: 3.2.0
       strip-json-comments: 3.1.1
-    dev: true
 
   /pino-std-serializers/6.0.0:
     resolution: {integrity: sha512-mMMOwSKrmyl+Y12Ri2xhH1lbzQxwwpuru9VjyJpgFIH4asSj88F2csdMwN6+M5g1Ll4rmsYghHLQJw81tgZ7LQ==}

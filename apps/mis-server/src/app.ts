@@ -27,7 +27,13 @@ export async function createServer() {
   const server = new Server({
     host: config.HOST,
     port: config.PORT,
-    logger: { level: config.LOG_LEVEL },
+
+    logger: {
+      level: config.LOG_LEVEL,
+      ...config.LOG_PRETTY ? {
+        transport: { target: "pino-pretty" },
+      } : {},
+    },
   });
 
   for (const plugin of plugins) {

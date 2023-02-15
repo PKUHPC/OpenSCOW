@@ -42,7 +42,8 @@
     "dotenv": "16.0.3",
     "node-cron": "3.0.2",
     "uuid": "9.0.0",
-    "wait-on": "7.0.1"
+    "wait-on": "7.0.1",
+    "pino-pretty": "9.2.0"
   },
   "devDependencies": {
     "@types/google-protobuf": "3.15.6",
