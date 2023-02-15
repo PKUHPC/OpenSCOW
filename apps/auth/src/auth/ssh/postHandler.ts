@@ -30,8 +30,8 @@ export function registerPostHandler(f: FastifyInstance, loginNode: string) {
     username: Type.String(),
     password: Type.String(),
     callbackUrl: Type.String(),
-    token: Type.Optional(Type.String()),
-    code: Type.Optional(Type.String()),
+    token: Type.String(),
+    code: Type.String(),
   });
 
   // register a login handler
