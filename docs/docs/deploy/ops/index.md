@@ -50,4 +50,21 @@ LOG = {
 }
 ```
 
+当`LOG.PRETTY`为`True`时，输出日志格式如下：
 
+```
+[02:27:00.372] INFO (18): request completed
+    reqId: "req-3"
+    res: {
+      "statusCode": 200
+    }
+    responseTime: 0.3789879999967525
+```
+
+当`LOG.PRETTY`为`False`时，输出日志格式如下：
+
+```json
+{"level":30,"time":1676429663943,"pid":18,"hostname":"d3fc2f53e863","reqId":"req-1","res":{"statusCode":200},"responseTime":4.37828900013119,"msg":"request completed"}
+```
+
+当您需要使用日志收集工具时，建议您使用JSON格式输出日志，然后使用日志分析工具来查看和分析收集到的日志。
