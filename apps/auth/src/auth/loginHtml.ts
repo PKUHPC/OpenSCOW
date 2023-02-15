@@ -61,9 +61,6 @@ export async function serveLoginHtml(
     await f.redis.set(token, text, "EX", 120);
   }
 
-
-
-
   return rep.status(
     verifyCaptchaFail ? 400 : err ? 401 : 200).view("login.liquid", {
     cssUrl: join(config.BASE_PATH, config.AUTH_BASE_PATH, "/public/assets/tailwind.min.css"),
