@@ -33,6 +33,28 @@ afterEach(async () => {
   await server.close();
 });
 
+it("test to input a wrong verifyCode", async () => {
+
+  const callbackUrl = "/callback";
+
+  // login
+  const { payload, headers } = createFormData({
+    username: username,
+    password: password,
+    callbackUrl,
+    token: token,
+    code: "wrongCode",
+  });
+  await server.redis.set(token, code, "EX", 30);
+  const resp = await server.inject({
+    method: "POST",
+    url: "/public/auth",
+    payload,
+    headers,
+  });
+  expect(resp.statusCode).toBe(400);
+});
+
 it("logs in to the ssh login", async () => {
 
   const callbackUrl = "/callback";

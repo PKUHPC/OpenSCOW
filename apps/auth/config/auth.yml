@@ -1,6 +1,7 @@
 redisUrl: localhost:6379
 authType: ldap
 
+enableCaptcha: true
 ldap:
   url: ldap://localhost:389
   bindDN: cn=Manager,ou=hpc,o=pku

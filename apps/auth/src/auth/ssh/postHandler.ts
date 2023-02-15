@@ -16,12 +16,15 @@ import { Static, Type } from "@sinclair/typebox";
 import { FastifyInstance } from "fastify";
 import { cacheInfo } from "src/auth/cacheInfo";
 import { serveLoginHtml } from "src/auth/loginHtml";
+import { authConfig } from "src/config/auth";
 import { redirectToWeb } from "src/routes/callback";
 import { verifyCode } from "src/utils/verifyCode";
 
 export function registerPostHandler(f: FastifyInstance, loginNode: string) {
 
   f.register(formBody);
+
+  const { enableCaptcha } = authConfig;
 
   const bodySchema = Type.Object({
     username: Type.String(),
@@ -39,9 +42,11 @@ export function registerPostHandler(f: FastifyInstance, loginNode: string) {
 
     const logger = req.log.child({ plugin: "ssh" });
 
-    const result = await verifyCode(f, code, token, callbackUrl, req, res);
-    if (!result) {
-      return;
+    if (enableCaptcha) {
+      const result = await verifyCode(f, code, token, callbackUrl, req, res);
+      if (!result) {
+        return;
+      }
     }
 
     // login to the a login node

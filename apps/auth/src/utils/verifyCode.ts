@@ -16,9 +16,10 @@ import { serveLoginHtml } from "src/auth/loginHtml";
 export async function verifyCode(
   f: FastifyInstance, code: string, token: string, callbackUrl: string, req: FastifyRequest, res: FastifyReply) {
 
-  const redisCode = await f.redis.get(token);
-  if (code.toLowerCase() === redisCode?.toLowerCase())
+  const redisCode = await f.redis.getdel(token);
+  if (code.toLowerCase() === redisCode?.toLowerCase()) {
     return true;
+  }
 
   await serveLoginHtml(false, callbackUrl, req, res, f, true);
   return false;

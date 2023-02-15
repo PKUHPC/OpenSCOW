@@ -14,6 +14,7 @@ import { DEFAULT_PRIMARY_COLOR } from "@scow/config/build/ui";
 import { randomUUID } from "crypto";
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { join } from "path";
+import { authConfig } from "src/config/auth";
 import { config, FAVICON_URL } from "src/config/env";
 import { uiConfig } from "src/config/ui";
 import svgCaptcha from "svg-captcha";
@@ -39,24 +40,32 @@ export async function serveLoginHtml(
 ) {
 
   const hostname = parseHostname(req);
+  const { enableCaptcha } = authConfig;
 
-  const options = {
-    size: 4,
-    ignorechars: "0oIi1",
-    noise: 3,
-    color: true,
-    background: "#cc9966",
-  };
+  let data = "";
+  let token = "";
+  if (enableCaptcha) {
+    const options = {
+      size: 4,
+      ignorechars: "0oIi1l",
+      noise: 3,
+      color: true,
+      background: "#cc9966",
+    };
 
-  const captcha = svgCaptcha.create(options);
+    const captcha = svgCaptcha.create(options);
 
-  const data = captcha.data;
-  const text = captcha.text;
-  const token = randomUUID();
-  await f.redis.set(token, text, "EX", 120);
+    data = captcha.data;
+    const text = captcha.text;
+    token = randomUUID();
+    await f.redis.set(token, text, "EX", 120);
+  }
 
 
-  return rep.status(err ? 401 : 200).view("login.liquid", {
+
+
+  return rep.status(
+    verifyCodeFail ? 400 : err ? 401 : 200).view("login.liquid", {
     cssUrl: join(config.BASE_PATH, config.AUTH_BASE_PATH, "/public/assets/tailwind.min.css"),
     faviconUrl: join(config.BASE_PATH, FAVICON_URL),
     backgroundColor: uiConfig.primaryColor?.defaultColor ?? DEFAULT_PRIMARY_COLOR,
@@ -66,6 +75,7 @@ export async function serveLoginHtml(
     data,
     token,
     verifyCodeFail,
+    enableCaptcha,
   });
 
 }

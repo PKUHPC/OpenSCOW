@@ -118,6 +118,7 @@ export const AuthConfigSchema = Type.Object({
   authType: Type.Enum(AuthType, { description: "认证类型", default: "ssh" }),
   ldap: Type.Optional(LdapConfigSchema),
   ssh: Type.Optional(SshConfigSchema),
+  enableCaptcha: Type.Boolean({ description: "登录时是否启用验证码功能, 默认为false不启用", default: false }),
 });
 
 export type AuthConfigSchema = Static<typeof AuthConfigSchema>;

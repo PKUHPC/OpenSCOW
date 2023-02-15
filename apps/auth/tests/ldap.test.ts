@@ -156,6 +156,29 @@ it("returns correct error if user already exists", async () => {
 
 });
 
+it("test to input a wrong verifyCode", async () => {
+  await createUser();
+
+  const callbackUrl = "/callback";
+
+  // login
+  const { payload, headers } = createFormData({
+    username: user.identityId,
+    password: user.password,
+    callbackUrl,
+    token: user.token,
+    code: "wrongCode",
+  });
+  await server.redis.set(user.token, user.code, "EX", 30);
+  const resp = await server.inject({
+    method: "POST",
+    url: "/public/auth",
+    payload,
+    headers,
+  });
+  expect(resp.statusCode).toBe(400);
+});
+
 it("should login with correct username and password", async () => {
 
   await createUser();

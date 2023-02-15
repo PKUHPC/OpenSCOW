@@ -16,13 +16,15 @@ import { FastifyInstance } from "fastify";
 import { cacheInfo } from "src/auth/cacheInfo";
 import { findUser, useLdap } from "src/auth/ldap/helpers";
 import { serveLoginHtml } from "src/auth/loginHtml";
-import { LdapConfigSchema } from "src/config/auth";
+import { authConfig, LdapConfigSchema } from "src/config/auth";
 import { redirectToWeb } from "src/routes/callback";
 import { verifyCode } from "src/utils/verifyCode";
 
 export function registerPostHandler(f: FastifyInstance, ldapConfig: LdapConfigSchema) {
 
   f.register(formBody);
+
+  const { enableCaptcha } = authConfig;
 
   const bodySchema = Type.Object({
     username: Type.String(),
@@ -37,10 +39,11 @@ export function registerPostHandler(f: FastifyInstance, ldapConfig: LdapConfigSc
     schema: { body: bodySchema },
   }, async (req, res) => {
     const { username, password, callbackUrl, token, code } = req.body;
-
-    const result = await verifyCode(f, code, token, callbackUrl, req, res);
-    if (!result) {
-      return;
+    if (enableCaptcha) {
+      const result = await verifyCode(f, code, token, callbackUrl, req, res);
+      if (!result) {
+        return;
+      }
     }
 
     // TODO
