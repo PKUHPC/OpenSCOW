@@ -43,7 +43,7 @@ it("test to input a wrong verifyCaptcha", async () => {
     password: password,
     callbackUrl,
     token: token,
-    code: "wrongCode",
+    code: "wrongCaptcha",
   });
   await server.redis.set(token, code, "EX", 30);
   const resp = await server.inject({
