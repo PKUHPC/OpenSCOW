@@ -18,20 +18,20 @@ import { cacheInfo } from "src/auth/cacheInfo";
 import { serveLoginHtml } from "src/auth/loginHtml";
 import { authConfig } from "src/config/auth";
 import { redirectToWeb } from "src/routes/callback";
-import { verifyCode } from "src/utils/verifyCode";
+import { verifyCaptcha } from "src/utils/verifyCaptcha";
 
 export function registerPostHandler(f: FastifyInstance, loginNode: string) {
 
   f.register(formBody);
 
-  const { enableCaptcha } = authConfig;
+  const { captcha } = authConfig;
 
   const bodySchema = Type.Object({
     username: Type.String(),
     password: Type.String(),
     callbackUrl: Type.String(),
-    token: Type.String(),
-    code: Type.String(),
+    token: Type.Optional(Type.String()),
+    code: Type.Optional(Type.String()),
   });
 
   // register a login handler
@@ -42,8 +42,8 @@ export function registerPostHandler(f: FastifyInstance, loginNode: string) {
 
     const logger = req.log.child({ plugin: "ssh" });
 
-    if (enableCaptcha) {
-      const result = await verifyCode(f, code, token, callbackUrl, req, res);
+    if (captcha.enabled) {
+      const result = await verifyCaptcha(f, code!, token!, callbackUrl, req, res);
       if (!result) {
         return;
       }

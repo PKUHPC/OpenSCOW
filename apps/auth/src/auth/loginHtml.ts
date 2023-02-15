@@ -36,11 +36,11 @@ function parseHostname(req: FastifyRequest): string | undefined {
 
 export async function serveLoginHtml(
   err: boolean, callbackUrl: string, req: FastifyRequest, rep: FastifyReply,
-  f: FastifyInstance, verifyCodeFail?: boolean,
+  f: FastifyInstance, verifyCaptchaFail?: boolean,
 ) {
 
   const hostname = parseHostname(req);
-  const { enableCaptcha } = authConfig;
+  const enableCaptcha = authConfig.captcha.enabled;
 
   let data = "";
   let token = "";
@@ -65,7 +65,7 @@ export async function serveLoginHtml(
 
 
   return rep.status(
-    verifyCodeFail ? 400 : err ? 401 : 200).view("login.liquid", {
+    verifyCaptchaFail ? 400 : err ? 401 : 200).view("login.liquid", {
     cssUrl: join(config.BASE_PATH, config.AUTH_BASE_PATH, "/public/assets/tailwind.min.css"),
     faviconUrl: join(config.BASE_PATH, FAVICON_URL),
     backgroundColor: uiConfig.primaryColor?.defaultColor ?? DEFAULT_PRIMARY_COLOR,
@@ -74,7 +74,7 @@ export async function serveLoginHtml(
     err,
     data,
     token,
-    verifyCodeFail,
+    verifyCaptchaFail,
     enableCaptcha,
   });
 

@@ -13,7 +13,7 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { serveLoginHtml } from "src/auth/loginHtml";
 
-export async function verifyCode(
+export async function verifyCaptcha(
   f: FastifyInstance, code: string, token: string, callbackUrl: string, req: FastifyRequest, res: FastifyReply) {
 
   const redisCode = await f.redis.getdel(token);

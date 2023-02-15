@@ -33,7 +33,7 @@ afterEach(async () => {
   await server.close();
 });
 
-it("test to input a wrong verifyCode", async () => {
+it("test to input a wrong verifyCaptcha", async () => {
 
   const callbackUrl = "/callback";
 

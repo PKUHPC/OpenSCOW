@@ -156,7 +156,7 @@ it("returns correct error if user already exists", async () => {
 
 });
 
-it("test to input a wrong verifyCode", async () => {
+it("test to input a wrong verifyCaptcha", async () => {
   await createUser();
 
   const callbackUrl = "/callback";
