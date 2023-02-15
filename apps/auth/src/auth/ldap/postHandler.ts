@@ -41,7 +41,7 @@ export function registerPostHandler(f: FastifyInstance, ldapConfig: LdapConfigSc
     const { username, password, callbackUrl, token, code } = req.body;
 
     if (captcha.enabled) {
-      const result = await verifyCaptcha(f, code!, token!, callbackUrl, req, res);
+      const result = await verifyCaptcha(f, code, token, callbackUrl, req, res);
       if (!result) {
         return;
       }

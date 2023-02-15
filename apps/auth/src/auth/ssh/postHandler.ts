@@ -43,7 +43,7 @@ export function registerPostHandler(f: FastifyInstance, loginNode: string) {
     const logger = req.log.child({ plugin: "ssh" });
 
     if (captcha.enabled) {
-      const result = await verifyCaptcha(f, code!, token!, callbackUrl, req, res);
+      const result = await verifyCaptcha(f, code, token, callbackUrl, req, res);
       if (!result) {
         return;
       }
