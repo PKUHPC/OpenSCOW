@@ -11,6 +11,7 @@
  */
 
 import { debounce } from "@scow/lib-web/build/utils/debounce";
+import Router from "next/router";
 import { join } from "path";
 import { useEffect, useRef } from "react";
 import { io } from "socket.io-client";
@@ -74,10 +75,24 @@ export const Shell: React.FC<Props> = ({ user, cluster, path }) => {
         auth: { token: user.token },
       });
 
+      let stack: string = "";
+      const datapath: string = "/";
+
       socket.on("connect", () => {
         term.clear();
 
         term.onData((data) => {
+
+          if (data.length === 1 && data >= "a" && data <= "z") {
+            stack += data;
+          } else if ((data === " " || data === "/r") && stack === "rz") {
+            // todo 获取要下载的路径 or 解析 rz后面的文件名
+            Router.push(join("/files", cluster, datapath));
+          } else {
+            stack = "";
+          }
+
+
           socket.emit("data", data);
         });
 
