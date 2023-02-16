@@ -22,6 +22,7 @@ export class SystemState {
 
   public static KEYS = {
     INITIALIZATION_TIME: "INITIALIZATION_TIME",
+    UPDATE_SLURM_BLOCK_STATUS: "UPDATE_SLURM_BLOCK_STATUS",
   } as const;
 
   constructor(key: keyof typeof SystemState.KEYS, value: string) {

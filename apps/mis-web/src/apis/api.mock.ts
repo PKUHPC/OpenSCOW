@@ -344,6 +344,7 @@ export const mockApi: MockApi<typeof api> = {
   },
   blockUserInAccount: async () => ({ executed: true }),
   unblockUserInAccount: async () => ({ executed: true }),
+  updateBlockStatus: async () => null,
   removeUserFromAccount: async () => null,
   setAdmin: async () => ({ executed: true }),
   unsetAdmin: async () => ({ executed: false }),
