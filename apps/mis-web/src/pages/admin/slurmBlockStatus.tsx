@@ -47,9 +47,10 @@ export const SlurmBlockStatusPage: NextPage = requireAuth((u) => u.platformRoles
           showIcon
           message={(
             <div>
-                由于技术限制，用户/账户/用户账户的封锁状态将会在slurm集群重启后恢复为正常。<br />
+                由于技术限制，当您运行slurm.sh节点和slurm管理节点并非同一节点时，已封锁的用户、账户和用户账户将会在slurm集群重启后被解封。<br />
                 SCOW在启动时将会自动刷新一次slurm封锁状态，但是slurm集群可能在SCOW运行时重启，SCOW暂时不能对这种情况做出反应。 <br />
-                所以，当前您需要在slurm集群重启后手动执行一下本页面的刷新slurm封锁状态的功能。
+                所以，如果您运行slurm.sh节点和slurm管理节点并非同一节点时，您需要在slurm集群重启后手动执行一下本页面的刷新slurm封锁状态的功能。
+                如果slurm.sh节点和slurm管理节点为同一节点，您可以忽略本功能。
             </div>
           )}
         />
