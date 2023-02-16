@@ -16,24 +16,36 @@ import { FastifyInstance } from "fastify";
 import { cacheInfo } from "src/auth/cacheInfo";
 import { findUser, useLdap } from "src/auth/ldap/helpers";
 import { serveLoginHtml } from "src/auth/loginHtml";
-import { LdapConfigSchema } from "src/config/auth";
+import { authConfig, LdapConfigSchema } from "src/config/auth";
 import { redirectToWeb } from "src/routes/callback";
+import { verifyCaptcha } from "src/utils/verifyCaptcha";
 
 export function registerPostHandler(f: FastifyInstance, ldapConfig: LdapConfigSchema) {
 
   f.register(formBody);
 
+  const { captcha } = authConfig;
+
   const bodySchema = Type.Object({
     username: Type.String(),
     password: Type.String(),
     callbackUrl: Type.String(),
+    token: Type.String(),
+    code: Type.String(),
   });
 
   // register a login handler
   f.post<{ Body: Static<typeof bodySchema> }>("/public/auth", {
     schema: { body: bodySchema },
   }, async (req, res) => {
-    const { username, password, callbackUrl } = req.body;
+    const { username, password, callbackUrl, token, code } = req.body;
+
+    if (captcha.enabled) {
+      const result = await verifyCaptcha(f, code, token, callbackUrl, req, res);
+      if (!result) {
+        return;
+      }
+    }
 
     // TODO
     // 1. bind with the server
@@ -50,7 +62,7 @@ export function registerPostHandler(f: FastifyInstance, ldapConfig: LdapConfigSc
 
       if (!user) {
         logger.info("Didn't find user with %s=%s", ldapConfig.attrs.uid, username);
-        await serveLoginHtml(true, callbackUrl, req, res);
+        await serveLoginHtml(true, callbackUrl, req, res, f);
         return;
       }
 
@@ -62,7 +74,7 @@ export function registerPostHandler(f: FastifyInstance, ldapConfig: LdapConfigSc
         await redirectToWeb(callbackUrl, info, res);
       }).catch(async (err) => {
         logger.info("Binding as %s failed. Err: %o", user.dn, err);
-        await serveLoginHtml(true, callbackUrl, req, res);
+        await serveLoginHtml(true, callbackUrl, req, res, f);
       });
 
     });
