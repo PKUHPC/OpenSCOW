@@ -12,7 +12,7 @@
 
 import { ReloadOutlined } from "@ant-design/icons";
 import { parsePlaceholder } from "@scow/lib-config/build/parse";
-import { App, Button, Checkbox, Col, Form, Input, InputNumber, Modal, Row, Select, Tooltip } from "antd";
+import { App, Button, Checkbox, Col, Form, Input, InputNumber, Row, Select, Tooltip } from "antd";
 import Router from "next/router";
 import randomWords from "random-words";
 import React, { useEffect, useMemo, useState } from "react";
@@ -58,7 +58,7 @@ interface Props {
 }
 
 export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
-  const { message } = App.useApp();
+  const { message, modal } = App.useApp();
 
   const [form] = Form.useForm<JobForm>();
   const [loading, setLoading] = useState(false);
@@ -78,12 +78,11 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
       coreCount, maxTime, nodeCount, partition, qos, comment,
       workingDirectory, save,
     } })
-      .httpError(409, (e) => {
-        const { code, message: serverMessage } = e;
-        if (code === "SBATCH_FAILED") {
-          Modal.error({
+      .httpError(500, (e) => {
+        if (e.code === "SCHEDULER_FAILED") {
+          modal.error({
             title: "提交作业失败",
-            content: serverMessage,
+            content: e.message,
           });
         } else {
           throw e;

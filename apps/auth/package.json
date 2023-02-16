@@ -36,7 +36,9 @@
     "fastify-plugin": "4.5.0",
     "ioredis": "5.3.1",
     "ldapjs": "2.3.3",
-    "nanoid": "4.0.1"
+    "nanoid": "4.0.1",
+    "svg-captcha": "1.4.0",
+    "pino-pretty": "9.2.0"
   },
   "devDependencies": {
     "@types/asn1": "0.2.0",

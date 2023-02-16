@@ -10,8 +10,8 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { ServiceError } from "@ddadaal/tsgrpc-common";
 import { plugin } from "@ddadaal/tsgrpc-server";
-import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { JobServiceServer, JobServiceService } from "@scow/protos/build/portal/job";
 import { getClusterOps } from "src/clusterops";
@@ -155,10 +155,13 @@ export const jobServiceServer = plugin((server) => {
       }, logger);
 
       if (reply.code === "SBATCH_FAILED") {
-        return [{ result: { $case: "error", error: { error: reply.message } } }];
+        throw new ServiceError({
+          code: Status.INTERNAL,
+          details: reply.message,
+        });
       }
 
-      return [{ result: { $case: "ok", ok: { jobId: reply.jobId } } }];
+      return [{ jobId: reply.jobId }];
     },
 
 

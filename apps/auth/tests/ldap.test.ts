@@ -30,6 +30,8 @@ const user = {
   identityId: "123",
   name: "name",
   password: "12#",
+  token: "token",
+  code: "code",
 };
 
 const userDn = `${ldap.addUser.userIdDnKey}=${user.identityId},${ldap.addUser.userBase}`;
@@ -154,6 +156,29 @@ it("returns correct error if user already exists", async () => {
 
 });
 
+it("test to input a wrong verifyCaptcha", async () => {
+  await createUser();
+
+  const callbackUrl = "/callback";
+
+  // login
+  const { payload, headers } = createFormData({
+    username: user.identityId,
+    password: user.password,
+    callbackUrl,
+    token: user.token,
+    code: "wrongCaptcha",
+  });
+  await server.redis.set(user.token, user.code, "EX", 30);
+  const resp = await server.inject({
+    method: "POST",
+    url: "/public/auth",
+    payload,
+    headers,
+  });
+  expect(resp.statusCode).toBe(400);
+});
+
 it("should login with correct username and password", async () => {
 
   await createUser();
@@ -165,14 +190,17 @@ it("should login with correct username and password", async () => {
     username: user.identityId,
     password: user.password,
     callbackUrl,
+    token: user.token,
+    code: user.code,
   });
-
+  await server.redis.set(user.token, user.code, "EX", 30);
   const resp = await server.inject({
     method: "POST",
     url: "/public/auth",
     payload,
     headers,
   });
+
 
   expect(resp.statusCode).toBe(302);
   expect(resp.headers.location).toStartWith(callbackUrl + "?");
@@ -189,8 +217,10 @@ it("should not login with wrong password", async () => {
     username: user.identityId,
     password: user.password + "0",
     callbackUrl,
+    token: user.token,
+    code: user.code,
   });
-
+  await server.redis.set(user.token, user.code, "EX", 30);
   const resp = await server.inject({
     method: "POST",
     url: "/public/auth",

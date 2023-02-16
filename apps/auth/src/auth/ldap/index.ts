@@ -28,7 +28,7 @@ export const createLdapAuthProvider = (f: FastifyInstance) => {
   registerPostHandler(f, ldap);
 
   return <AuthProvider>{
-    serveLoginHtml: (callbackUrl, req, rep) => serveLoginHtml(false, callbackUrl, req, rep),
+    serveLoginHtml: (callbackUrl, req, rep) => serveLoginHtml(false, callbackUrl, req, rep, f),
     fetchAuthTokenInfo: async () => undefined,
     validateName: ldap.attrs.name
       ? async (identityId, name, req) => {

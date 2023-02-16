@@ -104,16 +104,16 @@ export const appServiceServer = plugin((server) => {
       }
       const attributesConfig = app.attributes;
       attributesConfig?.forEach((attribute) => {
-        if (!(attribute.name in customAttributes)) {
+        if (attribute.required && !(attribute.name in customAttributes) && attribute.name !== "sbatchOptions") {
           throw <ServiceError> {
             code: Status.INVALID_ARGUMENT,
-            message: `custom form attribute ${attribute.name} is not found`,
+            message: `custom form attribute ${attribute.name} is required but not found`,
           };
         }
 
         switch (attribute.type) {
         case "number":
-          if (Number.isNaN(Number(customAttributes[attribute.name]))) {
+          if (customAttributes[attribute.name] && Number.isNaN(Number(customAttributes[attribute.name]))) {
             throw <ServiceError> {
               code: Status.INVALID_ARGUMENT,
               message: `
@@ -128,7 +128,8 @@ export const appServiceServer = plugin((server) => {
 
         case "select":
           // check the option selected by user is in select attributes as the config defined
-          if (!(attribute.select!.some((optionItem) => optionItem.value === customAttributes[attribute.name]))) {
+          if (customAttributes[attribute.name]
+            && !(attribute.select!.some((optionItem) => optionItem.value === customAttributes[attribute.name]))) {
             throw <ServiceError> {
               code: Status.INVALID_ARGUMENT,
               message: `
@@ -198,10 +199,22 @@ export const appServiceServer = plugin((server) => {
       const attributes: AppCustomAttribute[] = [];
       if (app.attributes) {
         app.attributes.forEach((item) => {
+          const attributeType = item.type.toUpperCase();
+
+          let defaultInput: AppCustomAttribute["defaultInput"];
+          if (item.defaultValue && typeof item.defaultValue === "number") {
+            defaultInput = { $case: "number", number: item.defaultValue };
+          } else if (item.defaultValue && typeof item.defaultValue === "string") {
+            defaultInput = { $case: "text", text: item.defaultValue };
+          }
+
           attributes.push({
-            type: appCustomAttribute_AttributeTypeFromJSON(item.type.toUpperCase()),
+            type: appCustomAttribute_AttributeTypeFromJSON(attributeType),
             label: item.label,
             name: item.name,
+            required: item.required,
+            defaultInput: defaultInput,
+            placeholder: item.placeholder,
             options: item.select ?? [],
           });
         });
