@@ -15,6 +15,7 @@ import Router from "next/router";
 import { join } from "path";
 import { useEffect, useRef } from "react";
 import { io } from "socket.io-client";
+import { urlToDownload } from "src/pageComponents/filemanager/api";
 import { User } from "src/stores/UserStore";
 import { publicConfig } from "src/utils/config";
 import styled from "styled-components";
@@ -76,7 +77,7 @@ export const Shell: React.FC<Props> = ({ user, cluster, path }) => {
       });
 
       let stack: string = "";
-      const datapath: string = "/";
+      let datapath: string = "/";
 
       socket.on("connect", () => {
         term.clear();
@@ -85,9 +86,10 @@ export const Shell: React.FC<Props> = ({ user, cluster, path }) => {
 
           if (data.length === 1 && data >= "a" && data <= "z") {
             stack += data;
-          } else if ((data === " " || data === "/r") && stack === "rz") {
+          } else if ((data === " " || data === "\r") && stack === "rz") {
             // todo 获取要下载的路径 or 解析 rz后面的文件名
-            Router.push(join("/files", cluster, datapath));
+            socket.emit("data", "\rpwd\r");
+            // Router.push(join("/files", cluster, datapath));
           } else {
             stack = "";
           }
@@ -101,6 +103,28 @@ export const Shell: React.FC<Props> = ({ user, cluster, path }) => {
         });
 
         socket.on("data", (data: ArrayBuffer) => {
+          console.log("++++++++++++++", Buffer.from(data).toString());
+          if (Buffer.from(data).toString().search("rz: not found") !== -1) {
+            console.log(Buffer.from(data).toString().split("\n"));
+            datapath = Buffer.from(data).toString().split("\n")[3];
+            // Router.push(join("/files", cluster, datapath));
+            // Router.push(join("/files", cluster, datapath));
+
+
+            // todo 如果弹出这个文件的预览
+
+            const href = urlToDownload(cluster, join("/home/test", "aaa.txt"), false);
+            console.log("000000000000000000000000000000", href);
+            openPreviewLink(href);
+
+
+            // 如果弹出目录 todo
+
+            openPreviewLink("/files/hpc01/home/test");
+
+
+          }
+
           term.write(Buffer.from(data));
         });
 
@@ -127,3 +151,8 @@ export const Shell: React.FC<Props> = ({ user, cluster, path }) => {
     <TerminalContainer ref={container} />
   );
 };
+
+function openPreviewLink(href: string) {
+  window.open(href, "ViewFile", "location=yes,resizable=yes,scrollbars=yes,status=yes");
+}
+
