@@ -10,14 +10,24 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { ClusterConfigSchema } from "@scow/config/build/cluster";
 import { authenticate } from "src/auth/server";
 import { runtimeConfig } from "src/utils/config";
 import { route } from "src/utils/route";
 
+export interface Partition {
+  name: string;
+  mem: number;
+  cores: number;
+  gpus: number;
+  nodes: number;
+  qos?: string[];
+  comment?: string;
+}
+
+
 export interface PublicClusterConfig {
   submitJobDirTemplate: string;
-  slurm: { partitions: ClusterConfigSchema["slurm"]["partitions"] }
+  slurm: { partitions: Partition[] }
 }
 
 export interface GetClusterInfoSchema {
