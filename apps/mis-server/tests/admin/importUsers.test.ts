@@ -88,3 +88,18 @@ it("imports users and accounts", async () => {
       { userId: "user3", name: "user3" },
     ]);
 });
+
+// it("import users and accounts if in different tenant", async () => {
+//   const em = orm.em.fork();
+
+//   // user1 has existed in "tenant1"
+//   const tenant1 = new Tenant({ name: "tenant1" });
+//   await em.persistAndFlush(tenant1);
+//   await em.persistAndFlush(new User({ name: "user1Name", userId: "user1", email: "", tenant: tenant1 }));
+
+//   asyncClientCall(client, "importUsers", { data: data, tenantName: "default", whitelist: true })
+//     .catch((e) => 
+//     { console.log(e); 
+//       expect(e.code).toBe(Status.INVALID_ARGUMENT); });
+
+// });

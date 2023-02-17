@@ -11,6 +11,8 @@
  */
 
 import { Logger } from "@ddadaal/tsgrpc-server";
+import { ServiceError } from "@grpc/grpc-js";
+import { Status } from "@grpc/grpc-js/build/src/constants";
 import { SqlEntityManager } from "@mikro-orm/mysql";
 import { Account } from "src/entities/Account";
 import { AccountWhitelist } from "src/entities/AccountWhitelist";
@@ -44,8 +46,15 @@ export async function importUsers(data: ImportUsersData, em: SqlEntityManager,
     });
   });
 
-  const existedUsers = await em.find(User, { userId: { $in: Object.keys(usersMap) } });
-  existedUsers.forEach((u) => usersMap[u.userId] = u);
+  const existedUsers = await em.find(User, { userId: { $in: Object.keys(usersMap) } }, { populate: ["tenant"]});
+  existedUsers.forEach((u) => {
+    if (u.tenant.$.name !== tenantName) {
+      throw <ServiceError> {
+        code: Status.INVALID_ARGUMENT, message: `user ${u.userId} has existed but doesn't belong to ${tenantName}`,
+      };
+    }
+    usersMap[u.userId] = u;
+  });
 
   const accounts: Account[] = [];
   const userAccounts: UserAccount[] = [];
