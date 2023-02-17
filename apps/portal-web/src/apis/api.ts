@@ -14,6 +14,7 @@
 
 import { fromApi } from "@ddadaal/next-typed-api-routes-runtime/lib/client";
 import { join } from "path";
+import type { GetClusterInfoSchema } from "src/pages/api//cluster";
 import type { ConnectToAppSchema } from "src/pages/api/app/connectToApp";
 import type { CreateAppSessionSchema } from "src/pages/api/app/createAppSession";
 import type { GetAppMetadataSchema } from "src/pages/api/app/getAppMetadata";
@@ -61,6 +62,7 @@ export const api = {
   authCallback: fromApi<AuthCallbackSchema>("GET", join(basePath, "/api/auth/callback")),
   logout: fromApi<LogoutSchema>("DELETE", join(basePath, "/api/auth/logout")),
   validateToken: fromApi<ValidateTokenSchema>("GET", join(basePath, "/api/auth/validateToken")),
+  getClusterInfo: fromApi<GetClusterInfoSchema>("GET", join(basePath, "/api//cluster")),
   createDesktop: fromApi<CreateDesktopSchema>("POST", join(basePath, "/api/desktop/createDesktop")),
   killDesktop: fromApi<KillDesktopSchema>("POST", join(basePath, "/api/desktop/killDesktop")),
   launchDesktop: fromApi<LaunchDesktopSchema>("POST", join(basePath, "/api/desktop/launchDesktop")),
@@ -87,4 +89,3 @@ export const api = {
   submitJob: fromApi<SubmitJobSchema>("POST", join(basePath, "/api/job/submitJob")),
   changePassword: fromApi<ChangePasswordSchema>("PATCH", join(basePath, "/api/profile/changePassword")),
 };
- 

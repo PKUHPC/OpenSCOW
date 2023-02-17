@@ -15,7 +15,8 @@ import { parsePlaceholder } from "@scow/lib-config/build/parse";
 import { App, Button, Checkbox, Col, Form, Input, InputNumber, Row, Select, Tooltip } from "antd";
 import Router from "next/router";
 import randomWords from "random-words";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useAsync } from "react-async";
 import { useStore } from "simstate";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
@@ -23,8 +24,7 @@ import { CodeEditor } from "src/components/CodeEditor";
 import { InputGroupFormItem } from "src/components/InputGroupFormItem";
 import { AccountSelector } from "src/pageComponents/job/AccountSelector";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
-import { Cluster, publicConfig } from "src/utils/config";
-import { firstPartition, getPartitionInfo } from "src/utils/jobForm";
+import { Cluster } from "src/utils/config";
 
 interface JobForm {
   cluster: Cluster;
@@ -51,7 +51,7 @@ const initialValues = {
   coreCount: 1,
   maxTime: 30,
   save: false,
-} as JobForm;
+} as Partial<JobForm>;
 
 interface Props {
   initial?: typeof initialValues;
@@ -63,9 +63,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
   const [form] = Form.useForm<JobForm>();
   const [loading, setLoading] = useState(false);
 
-  const reloadJobName = () => {
-    form.setFieldsValue({ jobName: genJobName() });
-  };
+
 
   const submit = async () => {
     const { cluster, command, jobName, coreCount, workingDirectory, save,
@@ -99,63 +97,59 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
 
   const partition = Form.useWatch("partition", form) as string | undefined;
 
-  const defaultClusterStore = useStore(DefaultClusterStore);
+  const calculateWorkingDirectory = (template: string) =>
+    parsePlaceholder(template, { name: form.getFieldValue("jobName") });
 
-  // set default
-  useEffect(() => {
-    const defaultCluster = defaultClusterStore.cluster;
+  const clusterInfoQuery = useAsync({
+    promiseFn: useCallback(async () => cluster
+      ? api.getClusterInfo({ query: { cluster:  cluster?.id } }) : undefined, [cluster]),
+    onResolve: (data) => {
+      if (data) {
+        const partition = data.clusterInfo.slurm.partitions[0];
+        form.setFieldValue("partition", partition.name);
+        form.setFieldValue("qos", partition.qos?.[0]);
+        form.setFieldValue("workingDirectory", calculateWorkingDirectory(data.clusterInfo.submitJobDirTemplate));
+      }
+    },
+  });
 
-    if (defaultCluster) {
-      const [partition, info] = firstPartition(defaultCluster);
-      form.setFieldsValue({
-        cluster: defaultCluster,
-        partition,
-        qos: info?.qos?.[0],
-      });
+  const reloadJobName = () => {
+    const jobName = genJobName();
+    form.setFieldValue("jobName", jobName);
+
+    if (!form.isFieldTouched("workingDirectory") && clusterInfoQuery.data) {
+      form.setFieldValue("workingDirectory",
+        calculateWorkingDirectory(clusterInfoQuery.data.clusterInfo.submitJobDirTemplate));
     }
+  };
+
+  useEffect(() => {
+    reloadJobName();
   }, []);
 
-  // if partition is no longer available, use the first partition of the cluster
-  useEffect(() => {
-
-    if (!cluster) {
-      form.setFieldsValue({ partition: undefined });
-      return;
-    }
-
-    if (!getPartitionInfo(cluster, partition)) {
-      form.setFieldsValue({ partition: firstPartition(cluster)[0] });
-    }
-
-  }, [cluster, partition]);
-
-  const currentPartitionInfo = useMemo(
-    () => cluster ? getPartitionInfo(cluster, partition) : undefined,
-    [cluster, partition],
+  const currentPartitionInfo = useMemo(() =>
+    clusterInfoQuery.data
+      ? clusterInfoQuery.data.clusterInfo.slurm.partitions.find((x) => x.name === partition)
+      : undefined,
+  [clusterInfoQuery.data, partition],
   );
 
-  const initialJobNameAndDir = useMemo(() => {
-    const jobName = genJobName();
-    return { jobName, workingDirectory: parsePlaceholder(publicConfig.SUBMIT_JOB_WORKING_DIR, { name: jobName }) };
-  }, []);
+  useEffect(() => {
+    if (currentPartitionInfo) {
+      form.setFieldValue("qos", currentPartitionInfo.qos?.[0]);
+    }
+  }, [currentPartitionInfo]);
+
+  const defaultClusterStore = useStore(DefaultClusterStore);
 
   return (
     <Form<JobForm>
       form={form}
       initialValues={{
         ...initial,
-        ...initialJobNameAndDir,
+        cluster: defaultClusterStore.cluster,
       }}
       onFinish={submit}
-      onValuesChange={(changed) => {
-        if (changed.cluster) {
-          const [name, info] = firstPartition(changed.cluster);
-          form.setFieldsValue({ cluster: changed.cluster, partition: name, qos: info?.qos?.[0] });
-        } else if (cluster && changed.partition) {
-          const partitionInfo = getPartitionInfo(cluster, changed.partition);
-          form.setFieldsValue({ qos: partitionInfo?.qos?.[0] });
-        }
-      }}
     >
       <Row gutter={4}>
         <Col span={24} sm={12}>
@@ -195,10 +189,11 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
             rules={[{ required: true }]}
           >
             <Select
+              loading={clusterInfoQuery.isLoading}
               disabled={!currentPartitionInfo}
-              options={cluster
-                ? Object.keys(publicConfig.CLUSTERS_CONFIG[cluster.id].slurm.partitions)
-                  .map((x) => ({ label: x, value: x }))
+              options={clusterInfoQuery.data
+                ? clusterInfoQuery.data.clusterInfo.slurm.partitions
+                  .map((x) => ({ label: x.name, value: x.name }))
                 : []
               }
             />

@@ -106,6 +106,7 @@ const buildRuntimeConfig = async (phase, basePath) => {
     HOME_TEXTS: portalConfig.homeText.hostnameMap,
     DEFAULT_HOME_TITLE: portalConfig.homeTitle.defaultText,
     HOME_TITLES: portalConfig.homeTitle.hostnameMap,
+    SUBMIT_JOB_WORKING_DIR: portalConfig.submitJobDefaultPwd,
   };
 
   // query auth capabilities to set optional auth features
@@ -128,14 +129,8 @@ const buildRuntimeConfig = async (phase, basePath) => {
 
     MIS_URL: config.MIS_DEPLOYED ? (config.MIS_URL || portalConfig.misUrl) : undefined,
 
-    CLUSTERS_CONFIG: Object.entries(clusters).reduce((prev, [name, config]) => {
-      prev[name] = { displayName: config.displayName, slurm: { partitions: config.slurm.partitions } }
-      return prev;
-    }, {}),
-
     CLUSTERS: Object.entries(clusters).map(([id, { displayName }]) => ({ id, name: displayName })),
 
-    SUBMIT_JOB_WORKING_DIR: portalConfig.submitJobDefaultPwd,
 
     PROXY_BASE_PATH: join(basePath, config.PROXY_BASE_PATH),
     RPROXY_BASE_PATH: join(basePath, config.RPROXY_BASE_PATH),
