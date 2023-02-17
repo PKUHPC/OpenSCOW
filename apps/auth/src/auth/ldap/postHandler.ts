@@ -14,17 +14,15 @@ import formBody from "@fastify/formbody";
 import { Static, Type } from "@sinclair/typebox";
 import { FastifyInstance } from "fastify";
 import { cacheInfo } from "src/auth/cacheInfo";
+import { redirectToWeb } from "src/auth/callback";
 import { findUser, useLdap } from "src/auth/ldap/helpers";
 import { serveLoginHtml } from "src/auth/loginHtml";
-import { authConfig, LdapConfigSchema } from "src/config/auth";
-import { redirectToWeb } from "src/routes/callback";
-import { verifyCaptcha } from "src/utils/verifyCaptcha";
+import { validateLoginParams } from "src/auth/validateLoginParams";
+import { LdapConfigSchema } from "src/config/auth";
 
 export function registerPostHandler(f: FastifyInstance, ldapConfig: LdapConfigSchema) {
 
   f.register(formBody);
-
-  const { captcha } = authConfig;
 
   const bodySchema = Type.Object({
     username: Type.String(),
@@ -40,11 +38,8 @@ export function registerPostHandler(f: FastifyInstance, ldapConfig: LdapConfigSc
   }, async (req, res) => {
     const { username, password, callbackUrl, token, code } = req.body;
 
-    if (captcha.enabled) {
-      const result = await verifyCaptcha(f, code, token, callbackUrl, req, res);
-      if (!result) {
-        return;
-      }
+    if (!await validateLoginParams(token, code, callbackUrl, req, res)) {
+      return;
     }
 
     // TODO
@@ -62,7 +57,7 @@ export function registerPostHandler(f: FastifyInstance, ldapConfig: LdapConfigSc
 
       if (!user) {
         logger.info("Didn't find user with %s=%s", ldapConfig.attrs.uid, username);
-        await serveLoginHtml(true, callbackUrl, req, res, f);
+        await serveLoginHtml(true, callbackUrl, req, res);
         return;
       }
 
@@ -74,7 +69,7 @@ export function registerPostHandler(f: FastifyInstance, ldapConfig: LdapConfigSc
         await redirectToWeb(callbackUrl, info, res);
       }).catch(async (err) => {
         logger.info("Binding as %s failed. Err: %o", user.dn, err);
-        await serveLoginHtml(true, callbackUrl, req, res, f);
+        await serveLoginHtml(true, callbackUrl, req, res);
       });
 
     });

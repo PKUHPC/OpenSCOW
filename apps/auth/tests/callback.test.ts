@@ -14,7 +14,8 @@ process.env.AUTH_TYPE = "ssh";
 
 import { FastifyInstance } from "fastify";
 import { buildApp } from "src/app";
-import { allowedCallbackUrl, createFormData } from "tests/utils";
+import { CallbackHostnameNotAllowedError } from "src/auth/callback";
+import { allowedCallbackUrl, createFormData, notAllowedCallbackUrl } from "tests/utils";
 
 const username = "test";
 const password = "1234";
@@ -33,35 +34,38 @@ afterEach(async () => {
   await server.close();
 });
 
-const callbackUrl = allowedCallbackUrl;
 
-it("test to input a wrong verifyCaptcha", async () => {
+it("allows to login page with allowed callback url", async () => {
 
-
-  // login
-  const { payload, headers } = createFormData({
-    username: username,
-    password: password,
-    callbackUrl,
-    token: token,
-    code: "wrongCaptcha",
-  });
-  await server.redis.set(token, code, "EX", 30);
   const resp = await server.inject({
-    method: "POST",
-    url: "/public/auth",
-    payload,
-    headers,
+    method: "GET",
+    path: "/public/auth",
+    query: { callbackUrl: allowedCallbackUrl },
   });
-  expect(resp.statusCode).toBe(400);
+
+  expect(resp.statusCode).toBe(200);
+
 });
 
-it("logs in to the ssh login", async () => {
+// TODO this test did not exit one second after the test run has completed.
+
+it("doesn't allow to login page with not allowed callback url", async () => {
+  const resp = await server.inject({
+    method: "GET",
+    path: "/public/auth",
+    query: { callbackUrl: notAllowedCallbackUrl },
+  });
+
+  expect(resp.statusCode).toBe(400);
+  expect(resp.json().code).toBe(new CallbackHostnameNotAllowedError().code);
+});
+
+it("redirects to allowed origin after login", async () => {
 
   const { payload, headers } = createFormData({
     username: username,
     password: password,
-    callbackUrl: callbackUrl,
+    callbackUrl: allowedCallbackUrl,
     token: token,
     code: code,
   });
@@ -75,15 +79,15 @@ it("logs in to the ssh login", async () => {
   });
 
   expect(resp.statusCode).toBe(302);
-  expect(resp.headers.location).toStartWith(callbackUrl + "?");
+  expect(resp.headers.location).toStartWith(allowedCallbackUrl + "?token=");
 });
 
-it("fails to login with wrong credentials", async () => {
+it("doesn't redirect to not allowed origin after login", async () => {
 
   const { payload, headers } = createFormData({
     username: username,
-    password: password + "a",
-    callbackUrl: callbackUrl,
+    password: password,
+    callbackUrl: notAllowedCallbackUrl,
     token: token,
     code: code,
   });
@@ -96,27 +100,6 @@ it("fails to login with wrong credentials", async () => {
     headers,
   });
 
-  expect(resp.statusCode).toBe(401);
-});
-
-it("gets user info", async () => {
-  const resp = await server.inject({
-    method: "GET",
-    url: "/user",
-    query: { identityId: username },
-  });
-
-  expect(resp.statusCode).toBe(200);
-  expect(resp.json()).toEqual({ user: { identityId: username } });
-});
-
-it("returns 404 if user doesn't exist", async () => {
-  const resp = await server.inject({
-    method: "GET",
-    url: "/user",
-    query: { identityId: username + "wrong" },
-  });
-
-  expect(resp.statusCode).toBe(404);
-  expect(resp.json()).toEqual({ code: "USER_NOT_FOUND" });
+  expect(resp.statusCode).toBe(400);
+  expect(resp.json().code).toBe(new CallbackHostnameNotAllowedError().code);
 });
