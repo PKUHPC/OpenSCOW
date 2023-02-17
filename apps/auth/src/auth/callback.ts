@@ -11,13 +11,14 @@
  */
 
 import { createError } from "@fastify/error";
+import { parseArray } from "@scow/lib-config";
 import { FastifyReply, FastifyRequest } from "fastify";
 import { authConfig } from "src/config/auth";
 import { config } from "src/config/env";
 
 const allowedCallbackHostnames = new Set<string>([
   ...authConfig.allowedCallbackHostnames,
-  ...config.EXTRA_ALLOWED_CALLBACK_HOSTNAMES.split(","),
+  ...parseArray(config.EXTRA_ALLOWED_CALLBACK_HOSTNAMES),
 ]);
 
 export const CallbackHostnameNotAllowedError = createError(
