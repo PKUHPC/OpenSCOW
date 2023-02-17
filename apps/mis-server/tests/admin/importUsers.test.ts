@@ -14,6 +14,7 @@
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Server } from "@ddadaal/tsgrpc-server";
 import { ChannelCredentials } from "@grpc/grpc-js";
+import { Status } from "@grpc/grpc-js/build/src/constants";
 import { MikroORM } from "@mikro-orm/core";
 import { MySqlDriver } from "@mikro-orm/mysql";
 import { AdminServiceClient } from "@scow/protos/build/server/admin";
@@ -89,17 +90,17 @@ it("imports users and accounts", async () => {
     ]);
 });
 
-// it("import users and accounts if in different tenant", async () => {
-//   const em = orm.em.fork();
+it("import users and accounts if in different tenant", async () => {
+  const em = orm.em.fork();
 
-//   // user1 has existed in "tenant1"
-//   const tenant1 = new Tenant({ name: "tenant1" });
-//   await em.persistAndFlush(tenant1);
-//   await em.persistAndFlush(new User({ name: "user1Name", userId: "user1", email: "", tenant: tenant1 }));
+  // user1 has existed in "tenant1"
+  await em.persistAndFlush(new Tenant({ name: "tenant1" }));
+  const tenant1 = await em.findOneOrFail(Tenant, { name: "tenant1" });
+  await em.persistAndFlush(new User({ name: "user1Name", userId: "user1", email: "", tenant: tenant1 }));
 
-//   asyncClientCall(client, "importUsers", { data: data, tenantName: "default", whitelist: true })
-//     .catch((e) => 
-//     { console.log(e); 
-//       expect(e.code).toBe(Status.INVALID_ARGUMENT); });
+  asyncClientCall(client, "importUsers", { data: data, tenantName: "default", whitelist: true })
+    .catch((e) => 
+    { console.log(e); 
+      expect(e.code).toBe(Status.INVALID_ARGUMENT); });
 
-// });
+});
