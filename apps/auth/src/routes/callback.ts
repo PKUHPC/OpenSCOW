@@ -11,15 +11,16 @@
  */
 
 import { Static, Type } from "@sinclair/typebox";
-import { FastifyReply } from "fastify";
 import fp from "fastify-plugin";
-import { AUTH_REDIRECT_URL } from "src/config/env";
+import { redirectToWeb, validateCallbackHostname } from "src/auth/callback";
 
 const QuerystringSchema = Type.Object({
+  callbackUrl: Type.String(),
   token: Type.String(),
 });
 
 enum ErrorCode {
+
   INVALID_TOKEN = "INVALID_TOKEN",
 }
 
@@ -28,11 +29,6 @@ const ResponsesSchema = Type.Object({
     code: Type.Enum(ErrorCode),
   }),
 });
-
-
-export async function redirectToWeb(callbackUrl: string, token: string, rep: FastifyReply) {
-  rep.redirect(302, `${callbackUrl}?token=${token}`);
-}
 
 /**
  * 对于类似OAuth2的认证系统，登录完成后会给一个token，应用系统（即本系统）需要通过此token来请求信息
@@ -59,7 +55,7 @@ export const authCallbackRoute = fp(async (f) => {
     },
     async (req, rep) => {
 
-      const { token } = req.query;
+      const { token, callbackUrl } = req.query;
 
       // validate the token
       const info = await f.auth.fetchAuthTokenInfo(token, req);
@@ -68,7 +64,9 @@ export const authCallbackRoute = fp(async (f) => {
         return await rep.code(400).send({ code: ErrorCode.INVALID_TOKEN });
       }
 
-      await redirectToWeb(AUTH_REDIRECT_URL, info, rep);
+      await validateCallbackHostname(callbackUrl, req);
+
+      await redirectToWeb(callbackUrl, info, rep);
     },
   );
 });

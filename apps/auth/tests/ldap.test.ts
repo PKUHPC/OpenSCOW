@@ -16,10 +16,12 @@ import { buildApp } from "src/app";
 import { extractAttr, findUser, searchOne, takeOne } from "src/auth/ldap/helpers";
 import { authConfig, NewUserGroupStrategy } from "src/config/auth";
 import { ensureNotUndefined } from "src/utils/validations";
-import { createFormData } from "tests/utils";
+import { allowedCallbackUrl, createFormData } from "tests/utils";
 import { promisify } from "util";
 
 let server: FastifyInstance;
+
+const callbackUrl = allowedCallbackUrl;
 
 const { ldap } = ensureNotUndefined(authConfig, ["ldap"]);
 let client: Client;
@@ -159,7 +161,7 @@ it("returns correct error if user already exists", async () => {
 it("test to input a wrong verifyCaptcha", async () => {
   await createUser();
 
-  const callbackUrl = "/callback";
+
 
   // login
   const { payload, headers } = createFormData({
@@ -183,7 +185,7 @@ it("should login with correct username and password", async () => {
 
   await createUser();
 
-  const callbackUrl = "/callback";
+
 
   // login
   const { payload, headers } = createFormData({
@@ -210,7 +212,7 @@ it("should not login with wrong password", async () => {
 
   await createUser();
 
-  const callbackUrl = "/callback";
+
 
   // login
   const { payload, headers } = createFormData({

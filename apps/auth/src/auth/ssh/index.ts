@@ -50,7 +50,7 @@ export const createSshAuthProvider = (f: FastifyInstance) => {
   registerPostHandler(f, loginNode);
 
   return <AuthProvider>{
-    serveLoginHtml: (callbackUrl, req, rep) => serveLoginHtml(false, callbackUrl, req, rep, f),
+    serveLoginHtml: (callbackUrl, req, rep) => serveLoginHtml(false, callbackUrl, req, rep),
     fetchAuthTokenInfo: async () => undefined,
     getUser: async (identityId, req) => {
       return await sshConnect(loginNode, "root", rootKeyPair, req.log, async (ssh) => {
