@@ -15,16 +15,13 @@ import { sshConnectByPassword } from "@scow/lib-ssh";
 import { Static, Type } from "@sinclair/typebox";
 import { FastifyInstance } from "fastify";
 import { cacheInfo } from "src/auth/cacheInfo";
+import { redirectToWeb } from "src/auth/callback";
 import { serveLoginHtml } from "src/auth/loginHtml";
-import { authConfig } from "src/config/auth";
-import { redirectToWeb } from "src/routes/callback";
-import { verifyCaptcha } from "src/utils/verifyCaptcha";
+import { validateLoginParams } from "src/auth/validateLoginParams";
 
 export function registerPostHandler(f: FastifyInstance, loginNode: string) {
 
   f.register(formBody);
-
-  const { captcha } = authConfig;
 
   const bodySchema = Type.Object({
     username: Type.String(),
@@ -42,14 +39,9 @@ export function registerPostHandler(f: FastifyInstance, loginNode: string) {
 
     const logger = req.log.child({ plugin: "ssh" });
 
-    if (captcha.enabled) {
-      const result = await verifyCaptcha(f, code, token, callbackUrl, req, res);
-      if (!result) {
-        return;
-      }
+    if (!await validateLoginParams(token, code, callbackUrl, req, res)) {
+      return;
     }
-
-    // login to the a login node
 
     await sshConnectByPassword(loginNode, username, password, req.log, async () => {})
       .then(async () => {
@@ -59,7 +51,7 @@ export function registerPostHandler(f: FastifyInstance, loginNode: string) {
       })
       .catch(async (e) => {
         logger.error(e, "Log in as %s failed.", username);
-        await serveLoginHtml(true, callbackUrl, req, res, f);
+        await serveLoginHtml(true, callbackUrl, req, res);
       });
 
   });
