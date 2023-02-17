@@ -64,7 +64,14 @@ const config = {
             docId: "deploy/index",
             position: "left",
             sidebarId: "deploy",
-            label: "部署文档",
+            label: "部署和配置",
+          },
+          {
+            type: "doc",
+            docId: "hpccluster/index",
+            position: "left",
+            sidebarId: "hpccluster",
+            label: "slurm集群部署实践",
           },
           {
             type: "doc",

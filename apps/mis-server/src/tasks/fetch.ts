@@ -16,6 +16,7 @@ import { MariaDbDriver } from "@mikro-orm/mariadb";
 import { SqlEntityManager } from "@mikro-orm/mysql";
 import { parsePlaceholder } from "@scow/lib-config";
 import { addJobCharge, charge } from "src/bl/charging";
+import { emptyJobPriceInfo } from "src/bl/jobPrice";
 import { clusterNameToScowClusterId } from "src/config/clusters";
 import { misConfig } from "src/config/mis";
 import { Account } from "src/entities/Account";
@@ -23,7 +24,7 @@ import { JobInfo } from "src/entities/JobInfo";
 import { OriginalJob } from "src/entities/OriginalJob";
 import { UserAccount } from "src/entities/UserAccount";
 import { ClusterPlugin } from "src/plugins/clusters";
-import { emptyJobPriceInfo, PricePlugin } from "src/plugins/price";
+import { PricePlugin } from "src/plugins/price";
 
 export const createSourceDbOrm = async (logger: Logger) => {
   logger.info("Connecting to source db.");

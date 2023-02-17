@@ -22,7 +22,7 @@
   "dependencies": {
     "@ddadaal/tsgrpc-server": "0.18.2",
     "@ddadaal/tsgrpc-common": "0.2.1",
-    "@grpc/grpc-js": "1.8.7",
+    "@grpc/grpc-js": "1.8.8",
     "@scow/config": "workspace:*",
     "@scow/lib-config": "workspace:*",
     "@scow/lib-slurm": "workspace:*",
@@ -35,7 +35,8 @@
     "wait-on": "7.0.1",
     "ts-log": "2.2.5",
     "shell-quote": "1.8.0",
-    "dayjs": "1.11.7"
+    "dayjs": "1.11.7",
+    "pino-pretty": "9.2.0"
   },
   "devDependencies": {
     "@ddadaal/tsgrpc-client": "0.17.3",

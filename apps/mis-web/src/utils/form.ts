@@ -17,4 +17,9 @@ export const passwordRule = {
   message: publicConfig.PASSWORD_PATTERN_MESSAGE,
 };
 
+export const userIdRule = publicConfig.USERID_PATTERN ? {
+  pattern: new RegExp(publicConfig.USERID_PATTERN),
+  message: publicConfig.USERID_PATTERN_MESSAGE,
+} : {};
+
 export { confirmPasswordFormItemProps, emailRule } from "@scow/lib-web/build/utils/form";

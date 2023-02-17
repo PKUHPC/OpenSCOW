@@ -86,6 +86,30 @@
           "amount": "gpu"
         }
       }
+    },
+    "hpc02": {
+      "compute": {
+        "id": "HPC16",
+        "price": "5.00",
+        "amount": "gpu"
+      },
+      "gpu": {
+        "low": {
+          "id": "HPC17",
+          "price": "4.00",
+          "amount": "gpu"
+        },
+        "normal": {
+          "id": "HPC18",
+          "price": "5.00",
+          "amount": "gpu"
+        },
+        "high": {
+          "id": "HPC19",
+          "price": "6.00",
+          "amount": "gpu"
+        }
+      }
     }
   },
   "another": {

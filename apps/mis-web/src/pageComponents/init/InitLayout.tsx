@@ -62,11 +62,38 @@ export const InitTab: React.FC = () => {
   );
 };
 
-export const InitDrawer: React.FC<DrawerProps> = (props) => {
+export const InitDrawer: React.FC<DrawerProps> = ({ children }) => {
 
   const { modal } = App.useApp();
 
-  const { children } = props;
+  const onOk = async () => {
+
+    // check price item completeness
+    const missingPriceItems = await api.getMissingDefaultPriceItems({});
+
+    if (missingPriceItems.items.length > 0) {
+      modal.error({
+        title: "价格表不完整",
+        content: "请对每个作业计费项确定价格后再完成初始化。",
+      });
+      return;
+    }
+
+    modal.confirm({
+      title: "确认完成初始化",
+      content: "一旦完成初始化，您将无法进入此页面重新初始化。",
+      onOk: () => api.completeInit({}).then(() => {
+        modal.success({
+          title: "初始化完成！",
+          content: "点击确认前往登录",
+          closable: false,
+          maskClosable: false,
+          onOk: () => Router.push("/api/auth"),
+        });
+      }),
+    });
+  };
+
   return (
     <div>
       <Head title="系统初始化" />
@@ -76,21 +103,7 @@ export const InitDrawer: React.FC<DrawerProps> = (props) => {
         <CompleteButtonContainer>
           <Button
             type="primary"
-            onClick={() => {
-              modal.confirm({
-                title: "确认完成初始化",
-                content: "一旦完成初始化，您将无法进入此页面重新初始化。",
-                onOk: () => api.completeInit({}).then(() => {
-                  modal.success({
-                    title: "初始化完成！",
-                    content: "点击确认前往登录",
-                    closable: false,
-                    maskClosable: false,
-                    onOk: () => Router.push("/api/auth"),
-                  });
-                }),
-              });
-            }}
+            onClick={onOk}
           >
             完成初始化
           </Button>

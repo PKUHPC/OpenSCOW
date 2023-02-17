@@ -1,0 +1,8 @@
+{
+  "label": "调度器",
+  "position": 3,
+  "link": {
+    "type": "generated-index",
+    "description": "不同调度器的配置"
+  }
+}

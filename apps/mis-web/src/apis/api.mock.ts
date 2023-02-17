@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { JsonFetchResultPromiseLike } from "@ddadaal/next-typed-api-routes-runtime/lib/client";
+import { HttpError, JsonFetchResultPromiseLike } from "@ddadaal/next-typed-api-routes-runtime/lib/client";
 import { numberToMoney } from "@scow/lib-decimal";
 import type { RunningJob } from "@scow/protos/build/common/job";
 import type { Account } from "@scow/protos/build/server/account";
@@ -106,6 +106,10 @@ const mockUsers = [
 
 
 export const mockApi: MockApi<typeof api> = {
+
+  getMissingDefaultPriceItems: async () => {
+    return { items: ["test.test", "test1.test2"]};
+  },
 
   getAllTenants: async () => (
     {
@@ -211,8 +215,6 @@ export const mockApi: MockApi<typeof api> = {
   initGetUsers: async () => ({ users: mockUsers }),
 
   getBillingTable: null,
-
-  getIcon: async () => undefined,
 
   createInitAdmin: async () => ({ createdInAuth: false }),
 
@@ -332,10 +334,17 @@ export const mockApi: MockApi<typeof api> = {
       },
     ] as AccountUserInfo[],
   }),
-  addUserToAccount: async () => null,
-  // addUserToAccount: async () => { throw new HttpError(404, { code: "USER_NOT_FOUND" }); },
+  // addUserToAccount: async () => null,
+  addUserToAccount: async ({ body }) => {
+    if (body.name === "404") {
+      throw new HttpError(404, { code: "USER_NOT_FOUND" });
+    } else {
+      return null;
+    }
+  },
   blockUserInAccount: async () => ({ executed: true }),
   unblockUserInAccount: async () => ({ executed: true }),
+  updateBlockStatus: async () => null,
   removeUserFromAccount: async () => null,
   setAdmin: async () => ({ executed: true }),
   unsetAdmin: async () => ({ executed: false }),

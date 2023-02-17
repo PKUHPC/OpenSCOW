@@ -14,8 +14,6 @@
 
 import { fromApi } from "@ddadaal/next-typed-api-routes-runtime/lib/client";
 import { join } from "path";
-import type { GetIconSchema } from "src/pages/api//icon";
-import type { GetLogoSchema } from "src/pages/api//logo";
 import type { ConnectToAppSchema } from "src/pages/api/app/connectToApp";
 import type { CreateAppSessionSchema } from "src/pages/api/app/createAppSession";
 import type { GetAppMetadataSchema } from "src/pages/api/app/getAppMetadata";
@@ -27,6 +25,7 @@ import type { ValidateTokenSchema } from "src/pages/api/auth/validateToken";
 import type { CreateDesktopSchema } from "src/pages/api/desktop/createDesktop";
 import type { KillDesktopSchema } from "src/pages/api/desktop/killDesktop";
 import type { LaunchDesktopSchema } from "src/pages/api/desktop/launchDesktop";
+import type { ListAvailableWmsSchema } from "src/pages/api/desktop/listAvailableWms";
 import type { ListDesktopsSchema } from "src/pages/api/desktop/listDesktops";
 import type { CopyFileItemSchema } from "src/pages/api/file/copy";
 import type { CreateFileSchema } from "src/pages/api/file/createFile";
@@ -65,6 +64,7 @@ export const api = {
   createDesktop: fromApi<CreateDesktopSchema>("POST", join(basePath, "/api/desktop/createDesktop")),
   killDesktop: fromApi<KillDesktopSchema>("POST", join(basePath, "/api/desktop/killDesktop")),
   launchDesktop: fromApi<LaunchDesktopSchema>("POST", join(basePath, "/api/desktop/launchDesktop")),
+  listAvailableWms: fromApi<ListAvailableWmsSchema>("GET", join(basePath, "/api/desktop/listAvailableWms")),
   listDesktops: fromApi<ListDesktopsSchema>("GET", join(basePath, "/api/desktop/listDesktops")),
   copyFileItem: fromApi<CopyFileItemSchema>("PATCH", join(basePath, "/api/file/copy")),
   createFile: fromApi<CreateFileSchema>("POST", join(basePath, "/api/file/createFile")),
@@ -78,7 +78,6 @@ export const api = {
   mkdir: fromApi<MkdirSchema>("POST", join(basePath, "/api/file/mkdir")),
   moveFileItem: fromApi<MoveFileItemSchema>("PATCH", join(basePath, "/api/file/move")),
   uploadFile: fromApi<UploadFileSchema>("POST", join(basePath, "/api/file/upload")),
-  getIcon: fromApi<GetIconSchema>("GET", join(basePath, "/api//icon")),
   cancelJob: fromApi<CancelJobSchema>("DELETE", join(basePath, "/api/job/cancelJob")),
   getAccounts: fromApi<GetAccountsSchema>("GET", join(basePath, "/api/job/getAccounts")),
   getAllJobs: fromApi<GetAllJobsSchema>("GET", join(basePath, "/api/job/getAllJobs")),
@@ -86,6 +85,6 @@ export const api = {
   getSavedJob: fromApi<GetSavedJobSchema>("GET", join(basePath, "/api/job/getSavedJob")),
   getSavedJobs: fromApi<GetSavedJobsSchema>("GET", join(basePath, "/api/job/getSavedJobs")),
   submitJob: fromApi<SubmitJobSchema>("POST", join(basePath, "/api/job/submitJob")),
-  getLogo: fromApi<GetLogoSchema>("GET", join(basePath, "/api//logo")),
   changePassword: fromApi<ChangePasswordSchema>("PATCH", join(basePath, "/api/profile/changePassword")),
 };
+ 

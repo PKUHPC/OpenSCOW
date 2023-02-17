@@ -13,6 +13,8 @@
 import { DEFAULT_PRIMARY_COLOR } from "@scow/config/build/ui";
 import { FastifyReply, FastifyRequest } from "fastify";
 import { join } from "path";
+import { createCaptcha } from "src/auth/captcha";
+import { authConfig } from "src/config/auth";
 import { config, FAVICON_URL } from "src/config/env";
 import { uiConfig } from "src/config/ui";
 
@@ -31,17 +33,29 @@ function parseHostname(req: FastifyRequest): string | undefined {
 }
 
 
-export async function serveLoginHtml(err: boolean, callbackUrl: string, req: FastifyRequest, rep: FastifyReply) {
+export async function serveLoginHtml(
+  err: boolean, callbackUrl: string, req: FastifyRequest, rep: FastifyReply,
+  verifyCaptchaFail?: boolean,
+) {
 
   const hostname = parseHostname(req);
+  const enableCaptcha = authConfig.captcha.enabled;
 
-  return rep.status(err ? 401 : 200).view("login.liquid", {
+  const captchaInfo = enableCaptcha
+    ? await createCaptcha(req.server)
+    : undefined;
+
+  return rep.status(
+    verifyCaptchaFail ? 400 : err ? 401 : 200).view("login.liquid", {
     cssUrl: join(config.BASE_PATH, config.AUTH_BASE_PATH, "/public/assets/tailwind.min.css"),
     faviconUrl: join(config.BASE_PATH, FAVICON_URL),
     backgroundColor: uiConfig.primaryColor?.defaultColor ?? DEFAULT_PRIMARY_COLOR,
     callbackUrl,
     footerText: (hostname && uiConfig?.footer?.hostnameTextMap?.[hostname]) ?? uiConfig?.footer?.defaultText ?? "",
     err,
+    ...captchaInfo,
+    verifyCaptchaFail,
+    enableCaptcha,
   });
 
 }

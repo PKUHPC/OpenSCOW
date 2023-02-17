@@ -1,7 +1,7 @@
 {
   "name": "@scow/config",
   "version": "0.1.0",
-  "private": false,
+  "private": true,
   "description": "",
   "scripts": {
     "build": "rimraf build && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json"

@@ -110,6 +110,11 @@ message FetchJobsResponse {
   uint32 new_jobs_count = 1;
 }
 
+message UpdateBlockStatusRequest{
+}
+message UpdateBlockStatusResponse{
+}
+
 service AdminService {
   rpc ChangeStorageQuota(ChangeStorageQuotaRequest)
       returns (ChangeStorageQuotaResponse);
@@ -120,4 +125,6 @@ service AdminService {
   rpc GetFetchInfo(GetFetchInfoRequest) returns (GetFetchInfoResponse);
   rpc SetFetchState(SetFetchStateRequest) returns (SetFetchStateResponse);
   rpc FetchJobs(FetchJobsRequest) returns (FetchJobsResponse);
+  rpc UpdateBlockStatus(UpdateBlockStatusRequest)
+    returns (UpdateBlockStatusResponse);
 }
