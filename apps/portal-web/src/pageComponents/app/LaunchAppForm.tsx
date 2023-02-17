@@ -13,7 +13,7 @@
 import { App, Button, Form, Input, InputNumber, Select } from "antd";
 import { Rule } from "antd/es/form";
 import Router from "next/router";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAsync } from "react-async";
 import { useStore } from "simstate";
 import { api } from "src/apis";
@@ -97,8 +97,14 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
   const clusterInfoQuery = useAsync({
     promiseFn: useCallback(async () => cluster
       ? api.getClusterInfo({ query: { cluster:  cluster?.id } }) : undefined, [cluster]),
+    onResolve: (data) => {
+      if (data) {
+        const partition = data.clusterInfo.slurm.partitions[0];
+        form.setFieldValue("partition", partition.name);
+        form.setFieldValue("qos", partition.qos?.[0]);
+      }
+    },
   });
-
 
   const currentPartitionInfo = useMemo(() =>
     clusterInfoQuery.data
@@ -106,6 +112,12 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
       : undefined,
   [clusterInfoQuery.data, partition],
   );
+
+  useEffect(() => {
+    if (currentPartitionInfo) {
+      form.setFieldValue("qos", currentPartitionInfo.qos?.[0]);
+    }
+  }, [currentPartitionInfo]);
 
   const customFormItems = attributes.map((item, index) => {
 
