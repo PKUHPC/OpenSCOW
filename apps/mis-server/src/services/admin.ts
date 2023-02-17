@@ -126,7 +126,6 @@ export const adminServiceServer = plugin((server) => {
       includedAccounts.forEach((account) => {
         const a = result.accounts.find((x) => x.accountName === account.accountName)!;
         a.included = true;
-        a.owner = "该账户已导入";
       });
 
       result.accounts.sort((a, b) => a.included === b.included ? 0 : (a.included === false ? -1 : 1));

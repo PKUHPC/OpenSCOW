@@ -156,7 +156,7 @@ export const ImportUsersTable: React.FC = () => {
             title="拥有者"
             render={(_, r, i) => 
               r.included ? 
-                r.owner : selectedAccounts?.includes(r) ? (
+                "该账户已导入" : selectedAccounts?.includes(r) ? (
                   <Form.Item name={["data", "accounts", i, "owner"]} rules={[{ required: true, message: "请选择一个拥有者" }]}>
                     <Select
                       defaultValue={r.owner}
