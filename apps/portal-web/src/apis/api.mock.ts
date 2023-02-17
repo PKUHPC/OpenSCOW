@@ -61,6 +61,16 @@ export const job: JobInfo = {
 
 export const mockApi: MockApi<typeof api> = {
 
+  getClusterInfo: async ({ query: { cluster } }) => ({ clusterInfo: {
+    submitJobDirTemplate: "/home/ddadaal/Code/{{ name }}",
+    slurm: {
+      partitions: [
+        { cores: 123, name: "123", nodes: 123, qos: ["123"], gpus: 10, mem: 1000 },
+        { cores: 1234, name: cluster, nodes: 1234, qos: ["1234"], gpus: 10, mem: 1000 },
+      ],
+    },
+  } }),
+
   getAllJobs: async () => ({ results: [job]}),
 
   listAvailableApps: async () => ({ apps: [
@@ -74,7 +84,7 @@ export const mockApi: MockApi<typeof api> = {
   createFile: null,
   deleteDir: null,
   deleteFile: null,
-  getHomeDirectory: null,
+  getHomeDirectory: async () => ({ path: "/home/ddadaal" }),
   mkdir: null,
   moveFileItem: null,
 
