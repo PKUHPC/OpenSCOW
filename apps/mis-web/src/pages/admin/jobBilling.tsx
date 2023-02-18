@@ -11,7 +11,6 @@
  */
 
 import { queryToString, useQuerystring } from "@scow/lib-web/build/utils/querystring";
-import { JobBillingItem } from "@scow/protos/build/server/job";
 import { Button, Form, Space } from "antd";
 import { NextPage } from "next";
 import Router from "next/router";
@@ -25,6 +24,7 @@ import { PlatformRole } from "src/models/User";
 import { ManageJobBillingTable } from "src/pageComponents/job/ManageJobBillingTable";
 import { PlatformOrTenantRadio } from "src/pageComponents/job/PlatformOrTenantRadio";
 import { Head } from "src/utils/head";
+import { getActiveBillingItems } from "src/utils/job";
 
 export const AdminJobBillingTablePage: NextPage =
   requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))(
@@ -42,38 +42,6 @@ export const AdminJobBillingTablePage: NextPage =
       );
     },
   );
-
-const getActiveBillingItems = (data: JobBillingItem[], tenant?: string) => {
-
-  // { [cluster.partition[.qos]]: item }
-  const defaultItems: Record<string, JobBillingItem> = {};
-  // { tenantName: { [cluster.partition[.qos] ]: item }}
-  const tenantSpecificItems: Record<string, Record<string, JobBillingItem>> = {};
-
-  data.forEach((item) => {
-    if (!item.tenantName) {
-      defaultItems[item.path] = item;
-    } else {
-      const tenantName = item.tenantName;
-      if (!(tenantName in tenantSpecificItems)) {
-        tenantSpecificItems[tenantName] = {};
-      }
-      tenantSpecificItems[tenantName][item.path] = item;
-    }
-  });
-
-  const activeItems = tenant
-    ? Object.values({ ...defaultItems, ...tenantSpecificItems[tenant] })
-    : [
-      ...Object.values(defaultItems),
-      ...Object.values(tenantSpecificItems).map((x) => Object.values(x)).flat(),
-    ];
-
-  return {
-    activeItems: activeItems,
-    historyItems: data.filter((x) => !activeItems.includes(x)),
-  };
-};
 
 export const AdminJobBillingTable: React.FC<{ tenant?: string }> = ({ tenant }) => {
 

@@ -14,7 +14,7 @@ import { Result } from "antd";
 import { GetServerSideProps, NextPage } from "next";
 import { SSRProps } from "src/auth/server";
 import { UnifiedErrorPage } from "src/components/errorPages/UnifiedErrorPage";
-import { EditJobPriceTableForm } from "src/pageComponents/init/EditJobPriceTableForm";
+import { InitJobBillingTable } from "src/pageComponents/init/InitJobBillingTable";
 import { InitDrawer } from "src/pageComponents/init/InitLayout";
 import { queryIfInitialized } from "src/utils/init";
 
@@ -40,7 +40,7 @@ export const JobPriceTablePage: NextPage<Props> = (props) => {
   return (
     <div>
       <InitDrawer>
-        <EditJobPriceTableForm />
+        <InitJobBillingTable />
       </InitDrawer>
     </div>
   );
