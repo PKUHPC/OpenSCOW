@@ -22,7 +22,6 @@ export const ClusterConfigSchema = Type.Object({
   scheduler: Type.Enum({ slurm: "slurm" }, { description: "集群所使用的调度器，目前只支持slurm", default: "slurm" }),
   slurm: Type.Object({
     loginNodes: Type.Array(Type.String(), { description: "集群的登录节点地址", default: []}),
-    computeNodes: Type.Array(Type.String(), { description: "集群的计算节点地址", default: []}),
     partitions: Type.Array(
       Type.Object(
         {

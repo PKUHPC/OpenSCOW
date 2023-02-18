@@ -73,11 +73,6 @@ slurm:
   loginNodes:
     - login01
 
-  # 各个计算节点的IP，服务节点必须可访问
-  computeNodes:
-    - cn1
-    - cn2
-
   # 集群的分区信息
   partitions:
     # 分区1的名字
