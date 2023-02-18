@@ -50,12 +50,12 @@ export async function getBillingTableItems(tenantName: string | undefined) {
   const clusters = runtimeConfig.CLUSTERS_CONFIG;
 
   for (const [cluster, { slurm: { partitions } }] of Object.entries(clusters)) {
-    const partitionCount = Object.keys(partitions).length;
+    const partitionCount = partitions.length;
     let clusterItemIndex = 0;
-    for (const [partition, partitionInfo] of Object.entries(partitions)) {
-      const qosCount = partitionInfo.qos?.length ?? 1;
+    for (const partition of partitions) {
+      const qosCount = partition.qos?.length ?? 1;
       let partitionItemIndex = 0;
-      for (const qos of partitionInfo.qos ?? [""]) {
+      for (const qos of partition.qos ?? [""]) {
 
         const path = [cluster, partition, qos].filter((x) => x).join(".");
 
@@ -66,11 +66,11 @@ export async function getBillingTableItems(tenantName: string | undefined) {
           clusterItemIndex: clusterItemIndex++,
           partitionItemIndex: partitionItemIndex++,
           cluster: publicConfig.CLUSTERS[cluster]?.name ?? cluster,
-          cores: partitionInfo.cores,
-          gpus: partitionInfo.gpus,
-          mem: partitionInfo.mem,
-          nodes: partitionInfo.nodes,
-          partition,
+          cores: partition.cores,
+          gpus: partition.gpus,
+          mem: partition.mem,
+          nodes: partition.nodes,
+          partition: partition.name,
           partitionCount,
           qosCount,
           qos,
@@ -80,7 +80,7 @@ export async function getBillingTableItems(tenantName: string | undefined) {
             price: moneyToString(item.price!),
           } : undefined,
           path,
-          comment: partitionInfo.comment,
+          comment: partition.comment,
         });
       }
     }
