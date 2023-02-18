@@ -78,9 +78,9 @@ export default /* #__PURE__*/route<GetBillingItemsSchema>("GetBillingItemsSchema
   const items = await getBillingItems(tenant, activeOnly);
 
   for (const [cluster, { slurm: { partitions } }] of Object.entries(runtimeConfig.CLUSTERS_CONFIG)) {
-    for (const [partition, partitionInfo] of Object.entries(partitions)) {
-      for (const qos of partitionInfo.qos ?? [""]) {
-        const path = [cluster, partition, qos].filter((x) => x).join(".");
+    for (const partition of partitions) {
+      for (const qos of partition.qos ?? [""]) {
+        const path = [cluster, partition.name, qos].filter((x) => x).join(".");
         if (!items.find((item) => item.path === path)) {
           items.push({ id: "", path });
         }
