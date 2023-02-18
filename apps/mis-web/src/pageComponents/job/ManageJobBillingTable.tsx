@@ -77,7 +77,7 @@ export const ManageJobBillingTable: React.FC<Props> = ({ data, loading, tenant, 
       dataSource={data?.activeItems.map(sourceToBillingItemType)}
       bordered
       loading={loading}
-      rowKey="id"
+      rowKey={(record) => [record.cluster, record.partition, record.qos].join(".")}
       expandable={{ expandedRowRender: (record) => {
         return (
           <Table
@@ -171,7 +171,7 @@ export const ManageJobBillingTable: React.FC<Props> = ({ data, loading, tenant, 
         }}
       />
       <Table.Column title="单价（元）" dataIndex={"price"} render={(value) => value ? moneyToString(value) : undefined} />
-      <Table.Column title="状态" render={(_) => "执行中"} />
+      <Table.Column title="状态" render={(record) => record.id !== "" ? "执行中" : ""} />
       <Table.Column<BillingItemType>
         title="设置"
         render={(_, r) => {
