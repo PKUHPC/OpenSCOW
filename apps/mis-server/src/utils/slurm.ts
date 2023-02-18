@@ -10,15 +10,13 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { ClusterAccountInfo, ClusterUserInfo,
-  GetClusterUsersResponse, UserInAccount } from "@scow/protos/build/server/admin";
+import { ClusterAccountInfo, GetClusterUsersResponse, UserInAccount } from "@scow/protos/build/server/admin";
 
 // Parses slurm.sh output to GetClusterUsersResponse
 // Accounts with no user are not included
 export function parseClusterUsers(dataStr: string): GetClusterUsersResponse {
   const obj: GetClusterUsersResponse = {
     accounts:[] as ClusterAccountInfo[],
-    users:[] as ClusterUserInfo[],
   };
 
   if (dataStr.trim() === "") { return obj; }
@@ -37,19 +35,10 @@ export function parseClusterUsers(dataStr: string): GetClusterUsersResponse {
         break;
       }
       const [user, status] = lines[i].split(":").map((x) => x.trim());
-      const userIndex = obj.users.findIndex((x) => x.userId === user);
-      if (userIndex === -1) {
-        obj.users.push({ userId: user, userName: user, accounts: [account], included: false });
+      if (account === "a_" + user && obj.accounts[accountIndex - 1].owner === undefined) {
+        obj.accounts[accountIndex - 1].owner = user;
       }
-      else {
-        obj.users[userIndex].accounts.push(account);
-      }
-      if (account === "a_" + user) {
-        if (obj.accounts[accountIndex - 1].owner === undefined) {
-          obj.accounts[accountIndex - 1].owner = user;
-        }
-      }
-      obj.accounts[accountIndex - 1].users.push({ userId: user, state: status });
+      obj.accounts[accountIndex - 1].users.push({ userId: user, userName: user, state: status });
       i++;
     }
     i++;
