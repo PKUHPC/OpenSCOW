@@ -75,7 +75,7 @@ export async function getBillingTableItems(tenantName: string | undefined) {
           qosCount,
           qos,
           priceItem: item ? {
-            amount: item.amountStrategy,
+            amount: item.amountStrategy!,
             itemId: item.id,
             price: moneyToString(item.price!),
           } : undefined,

@@ -18,6 +18,7 @@ import { USE_MOCK } from "src/apis/useMock";
 import { authenticate } from "src/auth/server";
 import { PlatformRole } from "src/models/User";
 import { getClient } from "src/utils/client";
+import { runtimeConfig } from "src/utils/config";
 
 export interface GetBillingItemsSchema {
   method: "GET";
@@ -75,6 +76,17 @@ export default /* #__PURE__*/route<GetBillingItemsSchema>("GetBillingItemsSchema
   }
 
   const items = await getBillingItems(tenant, activeOnly);
+
+  for (const [cluster, { slurm: { partitions } }] of Object.entries(runtimeConfig.CLUSTERS_CONFIG)) {
+    for (const [partition, partitionInfo] of Object.entries(partitions)) {
+      for (const qos of partitionInfo.qos ?? [""]) {
+        const path = [cluster, partition, qos].filter((x) => x).join(".");
+        if (!items.find((item) => item.path === path)) {
+          items.push({ id: "", path });
+        }
+      }
+    }
+  }
 
   return { 200: { items } };
 });

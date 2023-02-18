@@ -158,16 +158,19 @@ export const ManageJobBillingTable: React.FC<Props> = ({ data, loading, tenant, 
         dataIndex={"amountStrategy"}
         render={(value) => {
           return (
-            <Space>
-              {AmountStrategyDescriptions[value]}
-              <Popover title={`${AmountStrategyAlgorithmDescriptions[value]}`}>
-                <QuestionCircleOutlined />
-              </Popover>
-            </Space>
+            value ? 
+              (
+                <Space>
+                  {AmountStrategyDescriptions[value]}
+                  <Popover title={`${AmountStrategyAlgorithmDescriptions[value]}`}>
+                    <QuestionCircleOutlined />
+                  </Popover>
+                </Space>
+              ) : undefined
           );
         }}
       />
-      <Table.Column title="单价（元）" dataIndex={"price"} render={(value) => moneyToString(value)} />
+      <Table.Column title="单价（元）" dataIndex={"price"} render={(value) => value ? moneyToString(value) : undefined} />
       <Table.Column title="状态" render={(_) => "执行中"} />
       <Table.Column<BillingItemType>
         title="设置"
