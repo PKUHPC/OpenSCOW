@@ -103,8 +103,8 @@ ldap:
   # 进行LDAP操作的用户密码。默认为空
   # bindPassword: ""
 
-  # 在哪个节点下搜索要登录的用户。默认为空
-  # searchBase: ""
+  # 在哪个节点下搜索要登录的用户。必填。
+  searchBase: ""
   # 搜索登录用户时的筛选器。必填
   userFilter: "(uid=*)"
 
