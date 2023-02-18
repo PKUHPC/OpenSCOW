@@ -23,7 +23,7 @@ export enum NewUserGroupStrategy {
 
 export const LdapConfigSchema = Type.Object({
   url: Type.String({ description: "LDAP地址" }),
-  searchBase: Type.String({ description: "LDAP用户搜索base。", default: "" }),
+  searchBase: Type.String({ description: "从哪个节点搜索登录用户对应的LDAP节点" }),
   bindDN: Type.String({ description: "操作LDAP时以什么用户操作，默认为空字符串", default: "" }),
   bindPassword: Type.String({ description: "操作LDAP的用户的密码，默认为空字符串", default: "" }),
   userFilter: Type.String({ description: "LDAP用户筛选器" }),

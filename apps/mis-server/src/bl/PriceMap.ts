@@ -86,10 +86,10 @@ export async function createPriceMap(em: SqlEntityManager<MySqlDriver>, logger: 
       const missingPaths = [] as string[];
 
       for (const cluster in clusters) {
-        for (const partition in clusters[cluster].slurm.partitions) {
-          const path = [cluster, partition];
+        for (const partition of clusters[cluster].slurm.partitions) {
+          const path = [cluster, partition.name];
 
-          const { qos } = clusters[cluster].slurm.partitions[partition];
+          const { qos } = partition;
 
           if (path.join(".") in defaultPrices) {
             continue;

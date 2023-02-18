@@ -52,19 +52,13 @@ message ImportUsersData {
     string owner = 3;
   }
 
-  message UserInfo {
-    string user_id = 1;
-    string user_name = 2;
-    repeated string accounts = 3;
-  }
-
   repeated AccountInfo accounts = 1;
-  repeated UserInfo users = 2;
 }
 
 message ImportUsersRequest {
   ImportUsersData data = 1;
-  bool whitelist = 2;
+  string tenant_name = 2;
+  bool whitelist = 3;
 }
 
 // INVAD_ARGUMENT: the data format is not acceptable
@@ -76,7 +70,8 @@ message ImportUsersResponse {
 
 message UserInAccount {
   string user_id = 1;
-  string state = 2;
+  string user_name = 2;
+  string state = 3;
 }
 
 message ClusterAccountInfo {
@@ -86,20 +81,12 @@ message ClusterAccountInfo {
   bool included = 4;
 }
 
-message ClusterUserInfo {
-  string user_id = 1;
-  string user_name = 2;
-  repeated string accounts = 3;
-  bool included = 4;
-}
-
 message GetClusterUsersRequest {
   string cluster = 1;
 }
 
 message GetClusterUsersResponse {
   repeated ClusterAccountInfo accounts = 1;
-  repeated ClusterUserInfo users = 2;
 }
 
 message GetFetchInfoRequest {

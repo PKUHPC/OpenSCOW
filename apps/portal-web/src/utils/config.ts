@@ -16,6 +16,7 @@ import type { UiConfigSchema } from "@scow/config/build/ui";
 import getConfig from "next/config";
 
 export interface ServerRuntimeConfig {
+
   AUTH_EXTERNAL_URL: string;
 
   AUTH_INTERNAL_URL: string;
@@ -39,12 +40,10 @@ export interface ServerRuntimeConfig {
 
   DEFAULT_HOME_TITLE: string;
   HOME_TITLES: {[hostname: string]: string };
+
+  SUBMIT_JOB_WORKING_DIR: string;
 }
 
-export interface PublicClusterConfig {
-  displayName: string;
-  slurm: { partitions: ClusterConfigSchema["slurm"]["partitions"] }
-}
 
 
 export interface PublicRuntimeConfig {
@@ -60,11 +59,7 @@ export interface PublicRuntimeConfig {
 
   MIS_URL: string | undefined;
 
-  CLUSTERS_CONFIG: {[cluster: string]: PublicClusterConfig };
-
   CLUSTERS: Cluster[];
-
-  SUBMIT_JOB_WORKING_DIR: string;
 
   PROXY_BASE_PATH: string;
   RPROXY_BASE_PATH: string;
@@ -84,8 +79,3 @@ export const publicConfig: PublicRuntimeConfig = getConfig().publicRuntimeConfig
 
 export type Cluster = { id: string; name: string; }
 
-export function clusterConfigToCluster(id: string): Cluster | undefined {
-  const config = publicConfig.CLUSTERS_CONFIG[id];
-
-  return config ? { id, name: config.displayName } : undefined;
-}
