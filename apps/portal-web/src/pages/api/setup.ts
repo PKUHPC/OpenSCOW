@@ -10,12 +10,22 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Server } from "http";
-import { Socket } from "net";
-import { NextApiResponse } from "next";
+import { NextApiRequest } from "next";
+import { setupWssProxy } from "src/pages/api/proxy/[type]/[node]/[port]/[[...path]]";
+import { setupShellServer } from "src/pages/api/shell";
+import { AugmentedNextApiResponse } from "src/types/next";
 
-export type AugmentedNextApiResponse = NextApiResponse & {
-  socket: Socket & {
-    server: Server;
-  };
+let setup = false;
+
+export default async (req: NextApiRequest, res: AugmentedNextApiResponse) => {
+  if (setup) {
+    res.send("Already setup");
+    return;
+  }
+
+  setupWssProxy(res);
+  setupShellServer(res);
+
+  setup = true;
+  res.send("Setup complete");
 };

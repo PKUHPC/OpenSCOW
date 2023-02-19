@@ -13,7 +13,7 @@
 import { debounce } from "@scow/lib-web/build/utils/debounce";
 import { join } from "path";
 import { useEffect, useRef } from "react";
-import { io } from "socket.io-client";
+import { ShellInputData, ShellOutputData } from "src/pages/api/shell";
 import { User } from "src/stores/UserStore";
 import { publicConfig } from "src/utils/config";
 import styled from "styled-components";
@@ -41,9 +41,14 @@ export const Shell: React.FC<Props> = ({ user, cluster, path }) => {
   useEffect(() => {
     if (container.current) {
 
+
       const term = new Terminal({
         cursorBlink: true,
       });
+
+      const fitAddon = new FitAddon();
+      term.loadAddon(fitAddon);
+      term.open(container.current);
 
       const payload = {
         cluster,
@@ -52,58 +57,55 @@ export const Shell: React.FC<Props> = ({ user, cluster, path }) => {
         rows: term.rows + "",
       };
 
-      const fitAddon = new FitAddon();
-      term.loadAddon(fitAddon);
-      term.open(container.current);
-
       term.write(
         `\r\n*** Connecting to cluster ${payload.cluster} as ${user.identityId} to ` +
         `${path ? "path " + path : "home path"} ***\r\n`,
       );
 
-      const resizeObserver = new ResizeObserver(debounce(() => {
-        fitAddon.fit();
-        socket.emit("resize", { cols: term.cols, rows: term.rows });
-      }));
 
-      resizeObserver.observe(container.current);
+      const socket = new WebSocket(
+        (location.protocol === "http:" ? "ws" : "wss") + "://" + location.host +
+        join(publicConfig.BASE_PATH, "/api/shell/socketio") + "?" + new URLSearchParams(payload).toString(),
+      );
 
-      const socket = io({
-        path: join(publicConfig.BASE_PATH, "/api/shell/socketio"),
-        query: payload,
-        auth: { token: user.token },
-      });
-
-      socket.on("connect", () => {
+      socket.onopen = () => {
         term.clear();
 
+        const send = (data: ShellInputData) => {
+          socket.send(JSON.stringify(data));
+        };
+
+        const resizeObserver = new ResizeObserver(debounce(() => {
+          fitAddon.fit();
+          send({ $case: "resize", resize: { cols: term.cols, rows: term.rows } });
+        }));
+
+        resizeObserver.observe(container.current!);
+
         term.onData((data) => {
-          socket.emit("data", data);
+          send({ $case: "data", data: { data } });
         });
 
         term.onResize(({ cols, rows }) => {
-          socket.emit("resize", { cols, rows });
+          send({ $case: "resize", resize: { cols, rows } });
         });
+      };
 
-        socket.on("data", (data: ArrayBuffer) => {
-          term.write(Buffer.from(data));
-        });
+      socket.onmessage = (e) => {
+        const message = JSON.parse(e.data) as ShellOutputData;
+        switch (message.$case) {
+        case "data":
+          term.write(Buffer.from(message.data.data));
+          break;
+        case "exit":
+          term.write(`Process exited with code ${message.exit.code} and signal ${message.exit.signal}.`);
+          break;
+        }
 
-        socket.on("exit", (e: { exitCode: number, signal?: number }) => {
-          socket.disconnect();
-          term.write(`Process exited with code ${e.exitCode}.`);
-        });
-
-        socket.on("disconnect", () => {
-          term.write("\r\n*** Disconnected.***\r\n");
-        });
-      });
+      };
 
       return () => {
-        socket.disconnect();
-        if (container.current) {
-          resizeObserver.unobserve(container.current);
-        }
+        socket.close();
       };
     }
   }, [container.current]);

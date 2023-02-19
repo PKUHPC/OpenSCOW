@@ -152,12 +152,12 @@ const buildRuntimeConfig = async (phase, basePath) => {
   if (!mockEnv && !testenv) {
 
     // HACK
-    // call /api/proxy/<node>/<port>/ after 3 seconds to init the proxy ws server
+    // call /api/setup after 3 seconds to init the proxy and shell server
     setTimeout(() => {
-      const url = "http://localhost:" + (process.env.PORT || 3000) + join(publicRuntimeConfig.PROXY_BASE_PATH, "127.0.0.1", "3001");
-      console.log("Calling proxy url to initialize ws proxy server", url);
-      fetch(url).then(() => {
-        console.log("Call completed.");
+      const url = `http://localhost:${process.env.PORT || 3000}${basePath === "/" ? "" : basePath}/api/setup`;
+      console.log("Calling setup url to initialize proxy and shell server", url);
+      fetch(url).then(async (res) => {
+        console.log("Call completed. Response: ", await res.text());
       }).catch((e) => {
         console.error("Error when calling proxy url to initialize ws proxy server", e);
       });
