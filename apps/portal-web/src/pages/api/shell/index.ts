@@ -13,6 +13,7 @@
 import { asyncDuplexStreamCall } from "@ddadaal/tsgrpc-client";
 import { queryToIntOrDefault } from "@scow/lib-web/build/utils/querystring";
 import { ShellResponse, ShellServiceClient } from "@scow/protos/build/portal/shell";
+import { normalizePathnameWithQuery } from "@scow/utils";
 import { NextApiRequest } from "next";
 import { join } from "path";
 import { checkCookie } from "src/auth/server";
@@ -135,7 +136,8 @@ wss.on("connection", async (ws, req) => {
 
 export const setupShellServer = (res: AugmentedNextApiResponse) => {
   res.socket.server.on("upgrade", (request, socket, head) => {
-    if (!request.url?.startsWith(join(publicConfig.BASE_PATH, "/api/shell"))) {
+    const url = normalizePathnameWithQuery(request.url!);
+    if (!url.startsWith(join(publicConfig.BASE_PATH, "/api/shell"))) {
       return;
     }
 
