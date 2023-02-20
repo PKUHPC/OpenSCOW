@@ -13,7 +13,6 @@
 import { MinusCircleOutlined, PlusCircleOutlined, QuestionCircleOutlined } from "@ant-design/icons";
 import { numberToMoney } from "@scow/lib-decimal";
 import { Money } from "@scow/protos/build/common/money";
-import { JobBillingItem } from "@scow/protos/build/server/job";
 import { App, Form, Input, InputNumber, Modal, Popover, Select, Space, Table, Tooltip } from "antd";
 import React, { useState } from "react";
 import { api } from "src/apis";
@@ -24,24 +23,31 @@ import { AmountStrategy, AmountStrategyAlgorithmDescriptions,
 import { moneyToString } from "src/utils/money";
 
 interface Props {
-  data?: {activeItems: JobBillingItem[], historyItems: JobBillingItem[]};
+  data?: {
+    items: BillingItemType[],
+    historyItems: BillingItemType[],
+  };
   loading?: boolean;
   tenant?: string;
   reload: () => void;
 }
 
-interface BillingItemType {
-  id: string;
+export interface BillingItemType {
   cluster: string;
   partition: string;
   qos: string;
   tenantName?: string;
-  price?: Money;
-  amountStrategy: string,
+
+  priceItem?: {
+    itemId: string;
+    price: Money;
+    amountStrategy: string,
+  }
 }
 
-const calculateNextId = (data?: JobBillingItem[], tenant?: string) => {
-  const currentItemIds = data ? data.filter((x) => x.tenantName === tenant).map((x) => x.id) : [];
+const calculateNextId = (data?: BillingItemType[], tenant?: string) => {
+  const currentItemIds = data 
+    ? data.filter((x) => x.priceItem && x.tenantName === tenant).map((x) => x.priceItem!.itemId) : [];
   if (!tenant) {
     const nums = currentItemIds.map((x) => parseInt(x)).filter((x) => !isNaN(x));
     return (nums.length === 0 ? 1 : Math.max(...nums) + 1).toString();
@@ -56,25 +62,12 @@ const calculateNextId = (data?: JobBillingItem[], tenant?: string) => {
   }
 };
 
-const sourceToBillingItemType = (item: JobBillingItem) => {
-  const priceItem = item.path.split(".");
-  return {
-    id: item.id,
-    cluster: priceItem[0],
-    partition: priceItem[1],
-    qos: priceItem[2],
-    tenantName: item.tenantName,
-    price: item.price,
-    amountStrategy: item.amountStrategy,
-  } as BillingItemType;
-};
-
 export const ManageJobBillingTable: React.FC<Props> = ({ data, loading, tenant, reload }) => {
-  const nextId = calculateNextId(data?.activeItems, tenant);
+  const nextId = calculateNextId(data?.items, tenant);
 
   return (
     <Table
-      dataSource={data?.activeItems.map(sourceToBillingItemType)}
+      dataSource={data?.items}
       bordered
       loading={loading}
       rowKey={(record) => [record.cluster, record.partition, record.qos].join(".")}
@@ -83,15 +76,15 @@ export const ManageJobBillingTable: React.FC<Props> = ({ data, loading, tenant, 
           <Table
             dataSource={
               data?.historyItems
-                .filter((x) => x.path === [record.cluster, record.partition, record.qos].join("."))
-                .map(sourceToBillingItemType).reverse()
+                .filter((x) => x.cluster === record.cluster && x.partition === record.partition && x.qos === record.qos)
+                .reverse()
             }
             pagination={{ hideOnSinglePage: true }}
           >
-            <Table.Column title="计费价格编号" dataIndex={"id"} />
+            <Table.Column title="计费价格编号" dataIndex={["priceItem", "itemId"]} />
             <Table.Column
               title={AmountStrategyText}
-              dataIndex={"amountStrategy"}
+              dataIndex={["priceItem", "amountStrategy"]}
               render={(value) => {
                 return (
                   <Space>
@@ -103,7 +96,7 @@ export const ManageJobBillingTable: React.FC<Props> = ({ data, loading, tenant, 
                 );
               }}
             />
-            <Table.Column title="单价（元）" dataIndex={"price"} render={(value) => moneyToString(value)} />
+            <Table.Column title="单价（元）" dataIndex={["priceItem", "price"]} render={(value) => moneyToString(value)} />
             <Table.Column title="状态" render={(_) => "已作废"} />
           </Table>
         );
@@ -121,7 +114,6 @@ export const ManageJobBillingTable: React.FC<Props> = ({ data, loading, tenant, 
         ),
       }}
     >
-      <Table.Column title="计费价格编号" dataIndex={"id"} />
       <Table.ColumnGroup title={(
         <Space>
           {"计费项"}
@@ -135,6 +127,7 @@ export const ManageJobBillingTable: React.FC<Props> = ({ data, loading, tenant, 
         <Table.Column title="分区" dataIndex={"partition"} />
         <Table.Column title="QOS" dataIndex={"qos"} />
       </Table.ColumnGroup>
+      <Table.Column title="计费价格编号" dataIndex={["priceItem", "itemId"]} />
       <Table.Column
         title={(
           <Space>
@@ -155,7 +148,7 @@ export const ManageJobBillingTable: React.FC<Props> = ({ data, loading, tenant, 
             </Popover>
           </Space>
         )}
-        dataIndex={"amountStrategy"}
+        dataIndex={["priceItem", "amountStrategy"]}
         render={(value) => {
           return (
             value ? 
@@ -170,8 +163,12 @@ export const ManageJobBillingTable: React.FC<Props> = ({ data, loading, tenant, 
           );
         }}
       />
-      <Table.Column title="单价（元）" dataIndex={"price"} render={(value) => value ? moneyToString(value) : undefined} />
-      <Table.Column title="状态" render={(record) => record.id !== "" ? "执行中" : ""} />
+      <Table.Column 
+        title="单价（元）" 
+        dataIndex={["priceItem", "price"]}
+        render={(value) => value ? moneyToString(value) : undefined}
+      />
+      <Table.Column title="状态" render={(record) => record.priceItem ? "执行中" : "未设置"} />
       <Table.Column<BillingItemType>
         title="设置"
         render={(_, r) => {

@@ -16,14 +16,12 @@ import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { Centered } from "src/components/layouts";
 import { ManageJobBillingTable } from "src/pageComponents/job/ManageJobBillingTable";
-import { getActiveBillingItems } from "src/utils/job";
 
 export const InitJobBillingTable: React.FC = () => {
   const { data, isLoading, reload } = useAsync({ promiseFn: useCallback(async () => {
-    const sourceData = await api.getBillingItems({ 
+    return await api.getBillingItems({ 
       query: { tenant: undefined, activeOnly: false },
-    }).then((x) => x.items);
-    return getActiveBillingItems(sourceData, undefined);
+    });
   }, []) });
 
   return (

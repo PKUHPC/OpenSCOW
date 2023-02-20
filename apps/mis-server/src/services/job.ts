@@ -326,21 +326,18 @@ export const jobServiceServer = plugin((server) => {
         amountStrategy: item.amount,
       });
 
-      if (activeOnly) {
-        const { defaultPrices, tenantSpecificPrices } = getActiveBillingItems(billingItems);
+      const { defaultPrices, tenantSpecificPrices } = getActiveBillingItems(billingItems);
 
-        const activePrices = tenantName
-          ? Object.values({ ...defaultPrices, ...tenantSpecificPrices[tenantName] })
-          : [
-            ...Object.values(defaultPrices),
-            ...Object.values(tenantSpecificPrices).map((x) => Object.values(x)).flat(),
-          ];
+      const activePrices = tenantName
+        ? Object.values({ ...defaultPrices, ...tenantSpecificPrices[tenantName] })
+        : [
+          ...Object.values(defaultPrices),
+          ...Object.values(tenantSpecificPrices).map((x) => Object.values(x)).flat(),
+        ];
 
-        return [{ items: activePrices.map(priceItemToGrpc) }];
-      } else {
-        return [{ items: billingItems.map(priceItemToGrpc) }];
-      }
-
+      return [{ 
+        items: activePrices.map(priceItemToGrpc), 
+        historyItems: activeOnly ? [] : billingItems.filter((x) => !activePrices.includes(x)).map(priceItemToGrpc) }];
     },
 
     getMissingDefaultPriceItems: async () => {

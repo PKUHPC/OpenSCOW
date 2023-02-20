@@ -125,7 +125,10 @@ it("returns all default billing items", async () => {
   const reply = await asyncClientCall(client, "getBillingItems", { activeOnly: false });
 
   expect(reply.items).toIncludeSameMembers(
-    expectedPriceItems.filter((x) => !x.tenant).map(priceItemToJobBillingItem),
+    expectedPriceItems.filter((x) => !x.tenant && x.itemId !== oldPriceItem.itemId).map(priceItemToJobBillingItem),
+  );
+  expect(reply.historyItems).toIncludeSameMembers(
+    expectedPriceItems.filter((x) => x.itemId === oldPriceItem.itemId).map(priceItemToJobBillingItem),
   );
 });
 
@@ -135,6 +138,7 @@ it("returns only active billing items of default ", async () => {
   expect(reply.items).toIncludeSameMembers(
     expectedPriceItems.filter((x) => !x.tenant && x.itemId !== oldPriceItem.itemId).map(priceItemToJobBillingItem),
   );
+  expect(reply.historyItems.length).toBe(0);
 });
 
 it("returns all billing items applicable to default tenant", async () => {
@@ -144,7 +148,12 @@ it("returns all billing items applicable to default tenant", async () => {
   });
 
   expect(reply.items).toIncludeSameMembers(
-    expectedPriceItems.filter((x) => x.tenant !== "another").map(priceItemToJobBillingItem),
+    expectedPriceItems.filter((x) => x.tenant !== "another" && x.itemId !== oldPriceItem.itemId)
+      .map(priceItemToJobBillingItem),
+  );
+  expect(reply.historyItems).toIncludeSameMembers(
+    expectedPriceItems.filter((x) => x.tenant !== "another" && x.itemId === oldPriceItem.itemId)
+      .map(priceItemToJobBillingItem),
   );
 });
 
@@ -152,7 +161,12 @@ it("returns all billing items applicable to another tenant", async () => {
   const reply = await asyncClientCall(client, "getBillingItems", { tenantName: "another", activeOnly: false });
 
   expect(reply.items).toIncludeSameMembers(
-    expectedPriceItems.map(priceItemToJobBillingItem),
+    expectedPriceItems.filter((x) => x.itemId !== oldPriceItem.itemId && x.itemId !== "HPC01")
+      .map(priceItemToJobBillingItem),
+  );
+  expect(reply.historyItems).toIncludeSameMembers(
+    expectedPriceItems.filter((x) => x.itemId === oldPriceItem.itemId || x.itemId === "HPC01")
+      .map(priceItemToJobBillingItem),
   );
 });
 
@@ -162,6 +176,7 @@ it("returns active billing items applicable to default tenant", async () => {
   expect(reply.items).toIncludeSameMembers(
     expectedPriceItems.filter((x) => x.itemId !== oldPriceItem.itemId && !x.tenant).map(priceItemToJobBillingItem),
   );
+  expect(reply.historyItems.length).toBe(0);
 });
 
 it("returns active billing items applicable to another tenant", async () => {
@@ -172,6 +187,7 @@ it("returns active billing items applicable to another tenant", async () => {
       .filter((x) => x.itemId !== oldPriceItem.itemId && x.itemId !== "HPC01")
       .map(priceItemToJobBillingItem),
   );
+  expect(reply.historyItems.length).toBe(0);
 });
 
 it("adds billing item to default", async () => {
@@ -195,6 +211,7 @@ it("adds billing item to default", async () => {
   } as JobBillingItem]);
 
   expect(reply.items.find((x) => x.id === "HPC01")).toBeUndefined();
+  expect(reply.historyItems.length).toBe(0);
 });
 
 it("adds billing item to another tenant", async () => {
@@ -218,6 +235,7 @@ it("adds billing item to another tenant", async () => {
   } as JobBillingItem]);
 
   expect(reply.items.find((x) => x.id === "HPC01")).toBeUndefined();
+  expect(reply.historyItems.length).toBe(0);
 });
 
 it("calculates price", async () => {

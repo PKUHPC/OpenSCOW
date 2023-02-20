@@ -24,7 +24,6 @@ import { PlatformRole } from "src/models/User";
 import { ManageJobBillingTable } from "src/pageComponents/job/ManageJobBillingTable";
 import { PlatformOrTenantRadio } from "src/pageComponents/job/PlatformOrTenantRadio";
 import { Head } from "src/utils/head";
-import { getActiveBillingItems } from "src/utils/job";
 
 export const AdminJobBillingTablePage: NextPage =
   requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))(
@@ -46,8 +45,7 @@ export const AdminJobBillingTablePage: NextPage =
 export const AdminJobBillingTable: React.FC<{ tenant?: string }> = ({ tenant }) => {
 
   const { data, isLoading, reload } = useAsync({ promiseFn: useCallback(async () => {
-    const sourceData = await api.getBillingItems({ query: { tenant, activeOnly: false } }).then((x) => x.items);
-    return getActiveBillingItems(sourceData, tenant);
+    return await api.getBillingItems({ query: { tenant, activeOnly: false } });
   }, [tenant]) });
 
   return (
