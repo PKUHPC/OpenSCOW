@@ -84,18 +84,19 @@ export const Shell: React.FC<Props> = ({ user, cluster, path }) => {
 
         term.onData((data) => {
 
-          if (data.length === 1 && data >= "a" && data <= "z") {
+          if (data.length === 1 && (data === "r" || data === "z")) {
             stack += data;
-          } else if ((data === " " || data === "\r") && stack === "rz") {
-            // todo 获取要下载的路径 or 解析 rz后面的文件名
-            socket.emit("data", "\rpwd\r");
-            // Router.push(join("/files", cluster, datapath));
-          } else {
-            stack = "";
+            socket.emit("data", data);
           }
-
-
-          socket.emit("data", data);
+          else {
+            if ((data === "\r") && stack === "rz") {
+              // todo 获取要下载的路径 or 解析 rz后面的文件名
+              socket.emit("data", "rz || pwd");
+            } else {
+              stack = "";
+            }
+            socket.emit("data", data);
+          }
         });
 
         term.onResize(({ cols, rows }) => {
@@ -104,28 +105,21 @@ export const Shell: React.FC<Props> = ({ user, cluster, path }) => {
 
         socket.on("data", (data: ArrayBuffer) => {
           console.log("++++++++++++++", Buffer.from(data).toString());
-          if (Buffer.from(data).toString().search("rz: not found") !== -1) {
-            console.log(Buffer.from(data).toString().split("\n"));
-            datapath = Buffer.from(data).toString().split("\n")[3];
-            // Router.push(join("/files", cluster, datapath));
-            // Router.push(join("/files", cluster, datapath));
+          if (Buffer.from(data).toString().search("rz: not found") >= 0) {
+            console.log(Buffer.from(data).toString().split("\r\n"));
+            datapath = Buffer.from(data).toString().trim().split("\r\n")[1];
+            openPreviewLink(join("/files", cluster, datapath));
 
-
-            // todo 如果弹出这个文件的预览
-
-            const href = urlToDownload(cluster, join("/home/test", "aaa.txt"), false);
-            console.log("000000000000000000000000000000", href);
-            openPreviewLink(href);
-
-
-            // 如果弹出目录 todo
-
-            openPreviewLink("/files/hpc01/home/test");
-
-
+            term.write(Buffer.from(data).toString().split("\r\n")[2]);
           }
+          else {
+            if (Buffer.from(data).toString().search("rz") >= 0) {
+            }
 
-          term.write(Buffer.from(data));
+            else {
+              term.write(Buffer.from(data));
+            }
+          }
         });
 
         socket.on("exit", (e: { exitCode: number, signal?: number }) => {
