@@ -30,7 +30,7 @@ export const InitJobBillingTable: React.FC = () => {
     <Centered>
       <div>
         <Typography.Paragraph>
-          您可以在这里设置默认作业价格表。未设置的将会以0元计费。
+          您可以在这里设置默认作业价格表。您必须全部设置完全部价格才能完成初始化。
           <a onClick={reload}>刷新</a>
         </Typography.Paragraph>
         <ManageJobBillingTable
