@@ -17,7 +17,6 @@ import { Table, Tabs, Typography } from "antd";
 import { useEffect } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
-import { Centered } from "src/components/layouts";
 import { PlatformRoleSelector } from "src/components/PlatformRoleSelector";
 import { TenantRoleSelector } from "src/components/TenantRoleSelector";
 import { UserRole, UserRoleTexts } from "src/models/User";
@@ -108,7 +107,7 @@ export const InitUsersAndAccountsTable: React.FC = () => {
   }, []);
 
   return (
-    <Centered>
+    <div>
       <FormLayout maxWidth={800}>
         <Typography.Paragraph>
           您可以在这里管理当前系统中默认租户下的用户和账户，以及设置某个用户为<strong>初始管理员</strong>。
@@ -125,7 +124,7 @@ export const InitUsersAndAccountsTable: React.FC = () => {
           </Tabs.TabPane>
         </Tabs>
       </FormLayout>
-    </Centered>
+    </div>
   );
 
 };

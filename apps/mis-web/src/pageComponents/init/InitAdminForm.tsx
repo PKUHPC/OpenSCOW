@@ -10,7 +10,6 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { FormLayout } from "@scow/lib-web/build/layouts/FormLayout";
 import { Alert, App, Button, Form, Typography } from "antd";
 import { useState } from "react";
 import { api } from "src/apis";
@@ -116,30 +115,28 @@ export const InitAdminForm: React.FC = () => {
 
   };
   return (
-    <Centered>
-      <FormLayout maxWidth={800}>
-        <Typography.Paragraph>您可以在此创建初始管理员用户。</Typography.Paragraph>
-        <Typography.Paragraph>
+    <div>
+      <Typography.Paragraph>您可以在此创建初始管理员用户。</Typography.Paragraph>
+      <Typography.Paragraph>
           这里添加的用户为初始管理员，位于默认租户中，将会自动拥有<strong>平台管理员</strong>和<strong>默认租户的租户管理员</strong>角色。
-        </Typography.Paragraph>
-        <AlertContainer>
-          <Alert
-            type={publicConfig.ENABLE_CREATE_USER ? "success" : "warning"}
-            message={publicConfig.ENABLE_CREATE_USER ? "当前认证系统支持创建用户，您可以选择加入一个已存在于认证系统的用户，或者创建一个全新的用户。系统将会在认证系统中创建此用户"
-              : "当前认证系统不支持创建用户，请确认要添加的用户必须已经存在于认证系统，且用户的ID必须和认证系统中的用户ID保持一致"}
-          />
-        </AlertContainer>
-        <Form form={form} onFinish={onFinish}>
-          <CreateUserForm />
-          <Centered>
-            <Form.Item>
-              <Button type="primary" htmlType="submit" loading={loading}>
+      </Typography.Paragraph>
+      <AlertContainer>
+        <Alert
+          type={publicConfig.ENABLE_CREATE_USER ? "success" : "warning"}
+          message={publicConfig.ENABLE_CREATE_USER ? "当前认证系统支持创建用户，您可以选择加入一个已存在于认证系统的用户，或者创建一个全新的用户。系统将会在认证系统中创建此用户"
+            : "当前认证系统不支持创建用户，请确认要添加的用户必须已经存在于认证系统，且用户的ID必须和认证系统中的用户ID保持一致"}
+        />
+      </AlertContainer>
+      <Form form={form} onFinish={onFinish}>
+        <CreateUserForm />
+        <Centered>
+          <Form.Item>
+            <Button type="primary" htmlType="submit" loading={loading}>
               添加
-              </Button>
-            </Form.Item>
-          </Centered>
-        </Form>
-      </FormLayout>
-    </Centered>
+            </Button>
+          </Form.Item>
+        </Centered>
+      </Form>
+    </div>
   );
 };
