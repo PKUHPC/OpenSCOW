@@ -13,11 +13,13 @@
 import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { numberToMoney } from "@scow/lib-decimal";
-import { GetBillingItemsResponse, JobServiceClient } from "@scow/protos/build/server/job";
+import { GetBillingItemsResponse, JobBillingItem, JobServiceClient } from "@scow/protos/build/server/job";
 import { USE_MOCK } from "src/apis/useMock";
 import { authenticate } from "src/auth/server";
 import { PlatformRole } from "src/models/User";
+import { BillingItemType } from "src/pageComponents/job/ManageJobBillingTable";
 import { getClient } from "src/utils/client";
+import { runtimeConfig } from "src/utils/config";
 
 export interface GetBillingItemsSchema {
   method: "GET";
@@ -37,7 +39,10 @@ export interface GetBillingItemsSchema {
   }
 
   responses: {
-    200: GetBillingItemsResponse;
+    200: {
+      activeItems: BillingItemType[],
+      historyItems: BillingItemType[],
+    };
   }
 }
 
@@ -50,8 +55,12 @@ const mockBillingItems = [
   { id: "HPC06", path: "hpc01.GPU.high", price: numberToMoney(14.00), amountStrategy: "gpu" },
 ];
 
+const mockHistoryBillingItems = [
+  { id: "HPC00", path: "hpc01.compute.low", price: numberToMoney(0.02), amountStrategy: "gpu" },
+];
+
 async function mockReply(): Promise<GetBillingItemsResponse> {
-  return { items: mockBillingItems };
+  return { activeItems: mockBillingItems, historyItems: mockHistoryBillingItems };
 }
 
 export async function getBillingItems(tenantName: string | undefined, activeOnly: boolean) {
@@ -61,7 +70,7 @@ export async function getBillingItems(tenantName: string | undefined, activeOnly
     ? await mockReply()
     : await asyncClientCall(client, "getBillingItems", { tenantName, activeOnly });
 
-  return reply.items;
+  return reply;
 }
 
 
@@ -74,7 +83,38 @@ export default /* #__PURE__*/route<GetBillingItemsSchema>("GetBillingItemsSchema
     if (!info) { return; }
   }
 
-  const items = await getBillingItems(tenant, activeOnly);
+  const reply = await getBillingItems(tenant, activeOnly);
 
-  return { 200: { items } };
+  const sourceToBillingItemType = (item: JobBillingItem) => {
+    const priceItem = item.path.split(".");
+    return {
+      cluster: priceItem[0],
+      partition: priceItem[1],
+      qos: priceItem[2],
+      tenantName: item.tenantName,
+      priceItem: {
+        itemId: item.id,
+        price: item.price!,
+        amountStrategy: item.amountStrategy,
+      },
+    } as BillingItemType;
+  };
+
+  const result = { activeItems: [] as BillingItemType[], historyItems: [] as BillingItemType[] };
+
+  for (const [cluster, { slurm: { partitions } }] of Object.entries(runtimeConfig.CLUSTERS_CONFIG)) {
+    for (const partition of partitions) {
+      for (const qos of partition.qos ?? [""]) {
+        const path = [cluster, partition.name, qos].filter((x) => x).join(".");
+        const pathItem = reply.activeItems.find((item) => item.path === path);
+        result.activeItems.push(pathItem ? sourceToBillingItemType(pathItem) : {
+          cluster, partition: partition.name, qos, tenantName: undefined,
+        });
+      }
+    }
+  }
+
+  result.historyItems = reply.historyItems.map(sourceToBillingItemType);
+
+  return { 200: result };
 });

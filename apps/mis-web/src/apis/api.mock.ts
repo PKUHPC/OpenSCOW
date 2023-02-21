@@ -196,16 +196,28 @@ export const mockApi: MockApi<typeof api> = {
 
   getTenants: async () => ({ names: ["DEFAULT", "another"]}),
 
-  getBillingItems: async () => ({ items: [
-    { id: "HPC08", path: "hpc01.compute.low", price: numberToMoney(0.01), amountStrategy: "max-cpusAlloc-mem" },
-    { id: "HPC07", path: "hpc01.compute.low", price: numberToMoney(0.02), amountStrategy: "gpu" },
-    { id: "HPC01", path: "hpc01.compute.low", price: numberToMoney(0.04), amountStrategy: "max-cpusAlloc-mem" },
-    { id: "HPC02", path: "hpc01.compute.normal", price: numberToMoney(0.06), amountStrategy: "gpu" },
-    { id: "HPC03", path: "hpc01.compute.high", price: numberToMoney(0.08), amountStrategy: "gpu" },
-    { id: "HPC04", path: "hpc01.GPU.low", price: numberToMoney(10.00), amountStrategy: "gpu" },
-    { id: "HPC05", path: "hpc01.GPU.normal", price: numberToMoney(12.00), amountStrategy: "gpu" },
-    { id: "HPC06", path: "hpc01.GPU.high", price: numberToMoney(14.00), amountStrategy: "gpu" },
-  ]}),
+  getBillingItems: async () => ({ 
+    activeItems: [
+      { cluster: "hpc01", partition: "compute", qos: "low", 
+        priceItem: { itemId: "HPC08", price: numberToMoney(0.01), amountStrategy: "max-cpusAlloc-mem" } },
+      { cluster: "hpc01", partition: "compute", qos: "normal", 
+        priceItem: { itemId: "HPC02", price: numberToMoney(0.06), amountStrategy: "gpu" } },
+      { cluster: "hpc01", partition: "compute", qos: "high", 
+        priceItem: { itemId: "HPC03", price: numberToMoney(0.08), amountStrategy: "gpu" } },
+      { cluster: "hpc01", partition: "GPU", qos: "low", 
+        priceItem: { itemId: "HPC04", price: numberToMoney(10.00), amountStrategy: "gpu" } },
+      { cluster: "hpc01", partition: "GPU", qos: "normal", 
+        priceItem: { itemId: "HPC05", price: numberToMoney(12.00), amountStrategy: "gpu" } },
+      { cluster: "hpc01", partition: "GPU", qos: "high", 
+        priceItem: { itemId: "HPC06", price: numberToMoney(14.00), amountStrategy: "gpu" } },
+    ],
+    historyItems: [
+      { cluster: "hpc01", partition: "compute", qos: "low", 
+        priceItem: { itemId: "HPC01", price: numberToMoney(0.04), amountStrategy: "max-cpusAlloc-mem" } },
+      { cluster: "hpc01", partition: "compute", qos: "low", 
+        priceItem: { itemId: "HPC07", price: numberToMoney(0.02), amountStrategy: "gpu" } },
+    ],
+  }),
 
   setAsInitAdmin: async () => null,
   unsetInitAdmin: async () => null,

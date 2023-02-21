@@ -124,17 +124,21 @@ const priceItemToJobBillingItem = (x: PriceItem) => <JobBillingItem>({
 it("returns all default billing items", async () => {
   const reply = await asyncClientCall(client, "getBillingItems", { activeOnly: false });
 
-  expect(reply.items).toIncludeSameMembers(
-    expectedPriceItems.filter((x) => !x.tenant).map(priceItemToJobBillingItem),
+  expect(reply.activeItems).toIncludeSameMembers(
+    expectedPriceItems.filter((x) => !x.tenant && x.itemId !== oldPriceItem.itemId).map(priceItemToJobBillingItem),
+  );
+  expect(reply.historyItems).toIncludeSameMembers(
+    expectedPriceItems.filter((x) => x.itemId === oldPriceItem.itemId).map(priceItemToJobBillingItem),
   );
 });
 
 it("returns only active billing items of default ", async () => {
   const reply = await asyncClientCall(client, "getBillingItems", { activeOnly: true });
 
-  expect(reply.items).toIncludeSameMembers(
+  expect(reply.activeItems).toIncludeSameMembers(
     expectedPriceItems.filter((x) => !x.tenant && x.itemId !== oldPriceItem.itemId).map(priceItemToJobBillingItem),
   );
+  expect(reply.historyItems.length).toBe(0);
 });
 
 it("returns all billing items applicable to default tenant", async () => {
@@ -143,35 +147,47 @@ it("returns all billing items applicable to default tenant", async () => {
     activeOnly: false,
   });
 
-  expect(reply.items).toIncludeSameMembers(
-    expectedPriceItems.filter((x) => x.tenant !== "another").map(priceItemToJobBillingItem),
+  expect(reply.activeItems).toIncludeSameMembers(
+    expectedPriceItems.filter((x) => x.tenant !== "another" && x.itemId !== oldPriceItem.itemId)
+      .map(priceItemToJobBillingItem),
+  );
+  expect(reply.historyItems).toIncludeSameMembers(
+    expectedPriceItems.filter((x) => x.tenant !== "another" && x.itemId === oldPriceItem.itemId)
+      .map(priceItemToJobBillingItem),
   );
 });
 
 it("returns all billing items applicable to another tenant", async () => {
   const reply = await asyncClientCall(client, "getBillingItems", { tenantName: "another", activeOnly: false });
 
-  expect(reply.items).toIncludeSameMembers(
-    expectedPriceItems.map(priceItemToJobBillingItem),
+  expect(reply.activeItems).toIncludeSameMembers(
+    expectedPriceItems.filter((x) => x.itemId !== oldPriceItem.itemId && x.itemId !== "HPC01")
+      .map(priceItemToJobBillingItem),
+  );
+  expect(reply.historyItems).toIncludeSameMembers(
+    expectedPriceItems.filter((x) => x.itemId === oldPriceItem.itemId || x.itemId === "HPC01")
+      .map(priceItemToJobBillingItem),
   );
 });
 
 it("returns active billing items applicable to default tenant", async () => {
   const reply = await asyncClientCall(client, "getBillingItems", { tenantName: DEFAULT_TENANT_NAME, activeOnly: true });
 
-  expect(reply.items).toIncludeSameMembers(
+  expect(reply.activeItems).toIncludeSameMembers(
     expectedPriceItems.filter((x) => x.itemId !== oldPriceItem.itemId && !x.tenant).map(priceItemToJobBillingItem),
   );
+  expect(reply.historyItems.length).toBe(0);
 });
 
 it("returns active billing items applicable to another tenant", async () => {
   const reply = await asyncClientCall(client, "getBillingItems", { tenantName: "another", activeOnly: true });
 
-  expect(reply.items).toIncludeSameMembers(
+  expect(reply.activeItems).toIncludeSameMembers(
     expectedPriceItems
       .filter((x) => x.itemId !== oldPriceItem.itemId && x.itemId !== "HPC01")
       .map(priceItemToJobBillingItem),
   );
+  expect(reply.historyItems.length).toBe(0);
 });
 
 it("adds billing item to default", async () => {
@@ -185,7 +201,7 @@ it("adds billing item to default", async () => {
 
   const reply = await asyncClientCall(client, "getBillingItems", { activeOnly: true });
 
-  expect(reply.items).toIncludeAllMembers([{
+  expect(reply.activeItems).toIncludeAllMembers([{
     amountStrategy: request.amountStrategy,
     id: request.itemId,
     path: request.path,
@@ -194,7 +210,8 @@ it("adds billing item to default", async () => {
     tenantName: request.tenantName,
   } as JobBillingItem]);
 
-  expect(reply.items.find((x) => x.id === "HPC01")).toBeUndefined();
+  expect(reply.activeItems.find((x) => x.id === "HPC01")).toBeUndefined();
+  expect(reply.historyItems.length).toBe(0);
 });
 
 it("adds billing item to another tenant", async () => {
@@ -208,7 +225,7 @@ it("adds billing item to another tenant", async () => {
 
   const reply = await asyncClientCall(client, "getBillingItems", { tenantName: "another", activeOnly: true });
 
-  expect(reply.items).toIncludeAllMembers([{
+  expect(reply.activeItems).toIncludeAllMembers([{
     amountStrategy: request.amountStrategy,
     id: request.itemId,
     path: request.path,
@@ -217,7 +234,8 @@ it("adds billing item to another tenant", async () => {
     tenantName: request.tenantName,
   } as JobBillingItem]);
 
-  expect(reply.items.find((x) => x.id === "HPC01")).toBeUndefined();
+  expect(reply.activeItems.find((x) => x.id === "HPC01")).toBeUndefined();
+  expect(reply.historyItems.length).toBe(0);
 });
 
 it("calculates price", async () => {
