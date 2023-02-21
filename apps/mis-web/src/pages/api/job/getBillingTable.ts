@@ -38,7 +38,7 @@ export interface GetBillingTableSchema {
 
 
 export async function getBillingTableItems(tenantName: string | undefined) {
-  const items = (await getBillingItems(tenantName, true)).items;
+  const items = (await getBillingItems(tenantName, true)).activeItems;
 
   const pathItemMap = items.reduce((prev, curr) => {
     prev[curr.path] = curr;

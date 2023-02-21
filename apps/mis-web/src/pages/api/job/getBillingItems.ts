@@ -40,7 +40,7 @@ export interface GetBillingItemsSchema {
 
   responses: {
     200: {
-      items: BillingItemType[],
+      activeItems: BillingItemType[],
       historyItems: BillingItemType[],
     };
   }
@@ -60,7 +60,7 @@ const mockHistoryBillingItems = [
 ];
 
 async function mockReply(): Promise<GetBillingItemsResponse> {
-  return { items: mockBillingItems, historyItems: mockHistoryBillingItems };
+  return { activeItems: mockBillingItems, historyItems: mockHistoryBillingItems };
 }
 
 export async function getBillingItems(tenantName: string | undefined, activeOnly: boolean) {
@@ -100,14 +100,14 @@ export default /* #__PURE__*/route<GetBillingItemsSchema>("GetBillingItemsSchema
     } as BillingItemType;
   };
 
-  const result = { items: [] as BillingItemType[], historyItems: [] as BillingItemType[] };
+  const result = { activeItems: [] as BillingItemType[], historyItems: [] as BillingItemType[] };
 
   for (const [cluster, { slurm: { partitions } }] of Object.entries(runtimeConfig.CLUSTERS_CONFIG)) {
     for (const partition of partitions) {
       for (const qos of partition.qos ?? [""]) {
         const path = [cluster, partition.name, qos].filter((x) => x).join(".");
-        const pathItem = reply.items.find((item) => item.path === path);
-        result.items.push(pathItem ? sourceToBillingItemType(pathItem) : {
+        const pathItem = reply.activeItems.find((item) => item.path === path);
+        result.activeItems.push(pathItem ? sourceToBillingItemType(pathItem) : {
           cluster, partition: partition.name, qos, tenantName: undefined,
         });
       }

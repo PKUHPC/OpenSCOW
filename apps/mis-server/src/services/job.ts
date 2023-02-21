@@ -336,7 +336,7 @@ export const jobServiceServer = plugin((server) => {
         ];
 
       return [{ 
-        items: activePrices.map(priceItemToGrpc), 
+        activeItems: activePrices.map(priceItemToGrpc), 
         historyItems: activeOnly ? [] : billingItems.filter((x) => !activePrices.includes(x)).map(priceItemToGrpc) }];
     },
 

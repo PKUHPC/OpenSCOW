@@ -141,7 +141,7 @@ message JobBillingItem {
 }
 
 message GetBillingItemsResponse {
-  repeated JobBillingItem items = 1;
+  repeated JobBillingItem active_items = 1;
   repeated JobBillingItem history_items = 2;
 }
 

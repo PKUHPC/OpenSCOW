@@ -197,7 +197,7 @@ export const mockApi: MockApi<typeof api> = {
   getTenants: async () => ({ names: ["DEFAULT", "another"]}),
 
   getBillingItems: async () => ({ 
-    items: [
+    activeItems: [
       { cluster: "hpc01", partition: "compute", qos: "low", 
         priceItem: { itemId: "HPC08", price: numberToMoney(0.01), amountStrategy: "max-cpusAlloc-mem" } },
       { cluster: "hpc01", partition: "compute", qos: "normal", 

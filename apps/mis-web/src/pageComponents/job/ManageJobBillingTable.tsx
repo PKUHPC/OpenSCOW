@@ -24,7 +24,7 @@ import { moneyToString } from "src/utils/money";
 
 interface Props {
   data?: {
-    items: BillingItemType[],
+    activeItems: BillingItemType[],
     historyItems: BillingItemType[],
   };
   loading?: boolean;
@@ -63,11 +63,11 @@ const calculateNextId = (data?: BillingItemType[], tenant?: string) => {
 };
 
 export const ManageJobBillingTable: React.FC<Props> = ({ data, loading, tenant, reload }) => {
-  const nextId = calculateNextId(data?.items, tenant);
+  const nextId = calculateNextId(data?.activeItems, tenant);
 
   return (
     <Table
-      dataSource={data?.items}
+      dataSource={data?.activeItems}
       bordered
       loading={loading}
       rowKey={(record) => [record.cluster, record.partition, record.qos].join(".")}
