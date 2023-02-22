@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { splitSbatchArgs } from "src/models/job";
+import { splitSbatchArgs } from "src/utils/app";
 
 it.each([
   [" ", []],
