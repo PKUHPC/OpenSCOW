@@ -1,0 +1,8 @@
+{
+  "label": "与SCOW集成",
+  "position": 3,
+  "link": {
+    "type": "generated-index",
+    "description": "介绍如何将您的代码与SCOW集成"
+  }
+}
