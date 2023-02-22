@@ -1,6 +1,6 @@
 {
   "name": "@scow/grpc-api",
-  "private": true,
+  "private": false,
   "version": "0.1.2",
   "description": "The gRPC API for SCOW",
   "main": "index.js",
