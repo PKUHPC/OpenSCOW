@@ -68,9 +68,11 @@ export const Shell: React.FC<Props> = ({ user, cluster, path }) => {
         join(publicConfig.BASE_PATH, "/api/shell") + "?" + new URLSearchParams(payload).toString(),
       );
 
+      const FILE_JUMP_COMMAND = "goto-file";
+
       socket.onopen = () => {
 
-        let stack: string = "";
+        let stackIndex: number = 0;
 
         term.clear();
 
@@ -85,17 +87,18 @@ export const Shell: React.FC<Props> = ({ user, cluster, path }) => {
 
         resizeObserver.observe(container.current!);
 
+
+
         term.onData((data) => {
-          if (data.length === 1 && (data === "r" || data === "z")) {
-            stack += data;
+          if (data.length === 1 && stackIndex < FILE_JUMP_COMMAND.length && FILE_JUMP_COMMAND[stackIndex] === data) {
+            stackIndex++;
           }
           else {
-            if ((data === "\r") && stack === "rz") {
-              // todo 获取要下载的路径 or 解析 rz后面的文件名
-              const cmd = "rz || pwd";
+            if ((data === "\r") && stackIndex === FILE_JUMP_COMMAND.length) {
+              const cmd = FILE_JUMP_COMMAND + " || pwd";
               send({ $case: "data", data: { data: cmd } });
             } else {
-              stack = "";
+              stackIndex = 0;
             }
           }
           send({ $case: "data", data: { data } });
@@ -107,43 +110,32 @@ export const Shell: React.FC<Props> = ({ user, cluster, path }) => {
         });
       };
 
+
       socket.onmessage = (e) => {
         const message = JSON.parse(e.data) as ShellOutputData;
         switch (message.$case) {
         case "data":
-          console.log("----------------sokete get data", Buffer.from(message.data.data).toString());
-          if (Buffer.from(message.data.data).toString().search("rz: not found") >= 0) {
-            const list = Buffer.from(message.data.data).toString().trim().split("\r\n");
-            console.log(list);
-            let datapath: string = "";
-            const rExp: RegExp = /home/;
-            list.forEach((x) => {
-              if (rExp.test(x)) {
-                datapath = x;
-              }
-            });
+          if (Buffer.from(message.data.data).toString().search(FILE_JUMP_COMMAND + ": not found") >= 0) {
+            const result = Buffer.from(message.data.data).toString().trim().split("\r\n");
 
-            openPreviewLink(join("/files", cluster, datapath));
+
+            const rExp: RegExp = /home/;
+            const paths = result.filter((x) => rExp.test(x));
+            const currentPath = (paths.length === 0) ? "/" : paths[0];
+
+            openPreviewLink(join("/files", cluster, currentPath));
             term.write("\r\n");
 
-
-            const a = list.at(-1);
-
-            const promptRegExp: RegExp = /babdd3/;
-            if (a && promptRegExp.test(a)) {
-              term.write(a);
+            const prompt = result.at(-1);
+            const promptRegExp: RegExp = /\$/;
+            if (prompt && promptRegExp.test(prompt)) {
+              term.write(prompt);
             } else {
               term.write("\r\n");
-
             }
-
           }
           else {
-            if (Buffer.from(message.data.data).toString().search("rz") >= 0) {
-
-            }
-
-            else {
+            if (Buffer.from(message.data.data).toString().search(FILE_JUMP_COMMAND) < 0) {
               term.write(Buffer.from(message.data.data));
             }
           }
@@ -166,7 +158,6 @@ export const Shell: React.FC<Props> = ({ user, cluster, path }) => {
   );
 };
 
-// todo
 function openPreviewLink(href: string) {
   window.open(href, "ViewFile", "location=yes,resizable=yes,scrollbars=yes,status=yes");
 }
