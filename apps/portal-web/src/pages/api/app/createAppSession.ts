@@ -30,7 +30,6 @@ export interface CreateAppSessionSchema {
     coreCount: number;
     maxTime: number;
     customAttributes: { [key: string]: string };
-    userSbatchOptions: string[];
   }
 
   responses: {
