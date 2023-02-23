@@ -65,7 +65,7 @@ export const Shell: React.FC<Props> = ({ user, cluster, path }) => {
 
       const socket = new WebSocket(
         (location.protocol === "http:" ? "ws" : "wss") + "://" + location.host +
-        join(publicConfig.BASE_PATH, "/api/shell/socketio") + "?" + new URLSearchParams(payload).toString(),
+        join(publicConfig.BASE_PATH, "/api/shell") + "?" + new URLSearchParams(payload).toString(),
       );
 
       socket.onopen = () => {
