@@ -100,7 +100,6 @@ export const Shell: React.FC<Props> = ({ user, cluster, path }) => {
             }
             send({ $case: "data", data: { data } });
           }
-          send({ $case: "data", data: { data } });
         });
 
         term.onResize(({ cols, rows }) => {
