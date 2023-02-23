@@ -15,12 +15,14 @@
       ]
     },
     "prepareDev": {
+      "dependsOn": [
+        "^@scow/protos#build"
+      ],
       "outputs": [
         "api-routes-schemas.json",
         "src/generated"
       ],
       "inputs": [
-        "../../protos",
         "src/pages/api/**/*.ts"
       ]
     },
@@ -35,8 +37,8 @@
     },
     "@scow/protos#generate": {
       "inputs": [
-        "../../protos",
-        "../../buf.gen.yaml"
+        "node_modules/@scow/grpc-api/**/*.proto",
+        "buf.gen.yaml"
       ],
       "outputs": [
         "generated/**"
@@ -62,7 +64,7 @@
         ".eslintcache"
       ]
     },
-    "//#lint:protos": {
+    "@scow/protos#lint": {
       "inputs": [
         "protos/**"
       ]

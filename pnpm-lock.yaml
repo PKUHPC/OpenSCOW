@@ -444,6 +444,12 @@ importers:
       ts-log: 2.2.5
       webpack: 5.75.0
 
+  deploy/local:
+    specifiers: {}
+
+  deploy/vagrant:
+    specifiers: {}
+
   docs:
     specifiers:
       '@adobe/jsonschema2md': 7.1.5
@@ -524,9 +530,11 @@ importers:
 
   libs/protos:
     specifiers:
+      '@scow/grpc-api': workspace:*
       long: 5.2.1
       protobufjs: 7.2.2
     dependencies:
+      '@scow/grpc-api': link:../../protos
       long: 5.2.1
       protobufjs: registry.npmmirror.com/protobufjs/7.2.2
 
@@ -573,6 +581,9 @@ importers:
       zod: registry.npmmirror.com/zod/3.20.6
     devDependencies:
       '@types/mime-types': registry.npmmirror.com/@types/mime-types/2.1.1
+
+  protos:
+    specifiers: {}
 
 packages:
 
