@@ -149,7 +149,7 @@ const buildRuntimeConfig = async (phase, basePath) => {
     console.log("Public Runtime Config", publicRuntimeConfig);
   }
 
-  if (!mockEnv && !testenv) {
+  if (!testenv) {
 
     // HACK
     // call /api/setup after 3 seconds to init the proxy and shell server
