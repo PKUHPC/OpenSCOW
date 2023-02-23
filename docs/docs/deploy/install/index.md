@@ -21,6 +21,19 @@ description: 如何在已有超算集群上部署SCOW系统
   - 版本为21.08.4及以上
   - 已经部署slurm的[Accounting](https://slurm.schedmd.com/accounting.html#database-configuration)功能
 
+:::caution
+
+因为[这个issue](https://github.com/mscdex/ssh2/issues/989)，如果您的登录节点和计算节点的所使用的OpenSSH的版本高于**8.2**（大多比CentOS 7新的操作系统默认的版本均高于此），那么即使您能在SCOW节点上通过`ssh`命令连接到登录和计算节点上，SCOW可能也无法通过SSH连接到这些节点上。如果您遇到了这个问题，您需要在您的各个节点的`/etc/ssh/sshd_config`文件中增加以下内容，并重启`sshd`服务。
+
+```bash
+PubkeyAcceptedKeyTypes=+ssh-rsa
+```
+
+这是因为OpenSSH从8.2版本开始默认取消了对`ssh-rsa`公钥签名算法的支持（[OpenSSH 8.2 Release Note](https://www.openssh.com/txt/release-8.2)）。当前系统仅支持使用`ssh-rsa`类型的公钥对进行SSH登录，在后续我们会增加对使用更新算法（例如`ed25519`）的公私钥对的默认支持。
+
+:::
+
+
 ## 准备环境
 
 为了简化部署，系统组件以docker镜像的形式分发。服务节点应该安装好

@@ -80,6 +80,7 @@ jobs:
         if: github.ref == 'refs/heads/master'
         with:
           version: pnpm ci:version
+          publish: pnpm ci:publish
           createGithubReleases: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

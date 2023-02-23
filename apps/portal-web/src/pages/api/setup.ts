@@ -10,15 +10,22 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Cluster, publicConfig } from "src/utils/config";
+import { NextApiRequest } from "next";
+import { setupWssProxy } from "src/pages/api/proxy/[type]/[node]/[port]/[[...path]]";
+import { setupShellServer } from "src/pages/api/shell";
+import { AugmentedNextApiResponse } from "src/types/next";
 
-export const getPartitionInfo = (cluster: Cluster, partition: string | undefined) => {
-  return partition
-    ? publicConfig.CLUSTERS_CONFIG[cluster.id].slurm.partitions[partition]
-    : undefined;
+let setup = false;
+
+export default async (req: NextApiRequest, res: AugmentedNextApiResponse) => {
+  if (setup) {
+    res.send("Already setup");
+    return;
+  }
+
+  setupWssProxy(res);
+  setupShellServer(res);
+
+  setup = true;
+  res.send("Setup complete");
 };
-
-export function firstPartition(cluster: Cluster) {
-  const partitionName = Object.keys(publicConfig.CLUSTERS_CONFIG[cluster.id].slurm.partitions)[0];
-  return [partitionName, getPartitionInfo(cluster, partitionName)] as const;
-}

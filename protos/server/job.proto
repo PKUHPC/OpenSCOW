@@ -126,7 +126,8 @@ message QueryJobTimeLimitRequest {
 message GetBillingItemsRequest {
   // if not specified, return default price items
   optional string tenant_name = 1;
-  // returns only active billing items
+  // if true, returns only active billing items
+  // if false, includes history_items
   bool active_only = 2;
 }
 
@@ -140,7 +141,8 @@ message JobBillingItem {
 }
 
 message GetBillingItemsResponse {
-  repeated JobBillingItem items = 1;
+  repeated JobBillingItem active_items = 1;
+  repeated JobBillingItem history_items = 2;
 }
 
 // NOT_FOUND: cluster or job_id is not found.

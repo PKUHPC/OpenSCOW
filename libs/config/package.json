@@ -1,9 +1,10 @@
 {
   "name": "@scow/config",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "description": "",
   "scripts": {
+    "dev": "tsc -p tsconfig.build.json && (concurrently \"tsc -p tsconfig.build.json -w\" \"tsc-alias -p tsconfig.build.json -w\")",
     "build": "rimraf build && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json"
   },
   "files": [
@@ -15,7 +16,7 @@
   "repository": "https://github.com/PKUHPC/SCOW",
   "dependencies": {
     "@scow/lib-config": "workspace:*",
-    "@sinclair/typebox": "0.25.21"
+    "@sinclair/typebox": "0.25.23"
   },
   "volta": {
     "extends": "../../package.json"

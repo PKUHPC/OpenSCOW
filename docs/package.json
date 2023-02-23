@@ -1,6 +1,6 @@
 {
   "name": "@scow/docs",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
   "scripts": {
     "docusaurus": "docusaurus",
@@ -31,7 +31,7 @@
     "@algolia/client-search": "4.14.3",
     "@docusaurus/module-type-aliases": "2.3.1",
     "@scow/config": "workspace:*",
-    "@sinclair/typebox": "0.25.21",
+    "@sinclair/typebox": "0.25.23",
     "@tsconfig/docusaurus": "1.0.6",
     "@types/react": "18.0.18",
     "typescript": "4.9.5"

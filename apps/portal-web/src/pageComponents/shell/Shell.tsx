@@ -11,11 +11,9 @@
  */
 
 import { debounce } from "@scow/lib-web/build/utils/debounce";
-import Router from "next/router";
 import { join } from "path";
 import { useEffect, useRef } from "react";
-import { io } from "socket.io-client";
-import { urlToDownload } from "src/pageComponents/filemanager/api";
+import { ShellInputData, ShellOutputData } from "src/pages/api/shell";
 import { User } from "src/stores/UserStore";
 import { publicConfig } from "src/utils/config";
 import styled from "styled-components";
@@ -43,9 +41,14 @@ export const Shell: React.FC<Props> = ({ user, cluster, path }) => {
   useEffect(() => {
     if (container.current) {
 
+
       const term = new Terminal({
         cursorBlink: true,
       });
+
+      const fitAddon = new FitAddon();
+      term.loadAddon(fitAddon);
+      term.open(container.current);
 
       const payload = {
         cluster,
@@ -54,89 +57,86 @@ export const Shell: React.FC<Props> = ({ user, cluster, path }) => {
         rows: term.rows + "",
       };
 
-      const fitAddon = new FitAddon();
-      term.loadAddon(fitAddon);
-      term.open(container.current);
-
       term.write(
         `\r\n*** Connecting to cluster ${payload.cluster} as ${user.identityId} to ` +
         `${path ? "path " + path : "home path"} ***\r\n`,
       );
 
-      const resizeObserver = new ResizeObserver(debounce(() => {
-        fitAddon.fit();
-        socket.emit("resize", { cols: term.cols, rows: term.rows });
-      }));
 
-      resizeObserver.observe(container.current);
+      const socket = new WebSocket(
+        (location.protocol === "http:" ? "ws" : "wss") + "://" + location.host +
+        join(publicConfig.BASE_PATH, "/api/shell") + "?" + new URLSearchParams(payload).toString(),
+      );
 
-      const socket = io({
-        path: join(publicConfig.BASE_PATH, "/api/shell/socketio"),
-        query: payload,
-        auth: { token: user.token },
-      });
+      socket.onopen = () => {
 
-      let stack: string = "";
-      let datapath: string = "/";
+        let stack: string = "";
 
-      socket.on("connect", () => {
         term.clear();
 
-        term.onData((data) => {
+        const send = (data: ShellInputData) => {
+          socket.send(JSON.stringify(data));
+        };
 
+        const resizeObserver = new ResizeObserver(debounce(() => {
+          fitAddon.fit();
+          send({ $case: "resize", resize: { cols: term.cols, rows: term.rows } });
+        }));
+
+        resizeObserver.observe(container.current!);
+
+        term.onData((data) => {
           if (data.length === 1 && (data === "r" || data === "z")) {
             stack += data;
-            socket.emit("data", data);
+            send({ $case: "data", data: { data } });
           }
           else {
             if ((data === "\r") && stack === "rz") {
               // todo 获取要下载的路径 or 解析 rz后面的文件名
-              socket.emit("data", "rz || pwd");
+              const cmd = "rz || pwd";
+              send({ $case: "data", data: { data: cmd } });
             } else {
               stack = "";
             }
-            socket.emit("data", data);
+            send({ $case: "data", data: { data } });
           }
+          send({ $case: "data", data: { data } });
         });
 
         term.onResize(({ cols, rows }) => {
-          socket.emit("resize", { cols, rows });
+          send({ $case: "resize", resize: { cols, rows } });
         });
+      };
 
-        socket.on("data", (data: ArrayBuffer) => {
-          console.log("++++++++++++++", Buffer.from(data).toString());
-          if (Buffer.from(data).toString().search("rz: not found") >= 0) {
-            console.log(Buffer.from(data).toString().split("\r\n"));
-            datapath = Buffer.from(data).toString().trim().split("\r\n")[1];
+      socket.onmessage = (e) => {
+        const message = JSON.parse(e.data) as ShellOutputData;
+        switch (message.$case) {
+        case "data":
+          if (Buffer.from(message.data.data).toString().search("rz: not found") >= 0) {
+            console.log(Buffer.from(message.data.data).toString().split("\r\n"));
+            const datapath = Buffer.from(message.data.data).toString().trim().split("\r\n")[1];
             openPreviewLink(join("/files", cluster, datapath));
 
-            term.write(Buffer.from(data).toString().split("\r\n")[2]);
+            term.write(Buffer.from(message.data.data).toString().split("\r\n")[2]);
           }
           else {
-            if (Buffer.from(data).toString().search("rz") >= 0) {
+            if (Buffer.from(message.data.data).toString().search("rz") >= 0) {
             }
 
             else {
-              term.write(Buffer.from(data));
+              term.write(Buffer.from(message.data.data));
             }
           }
-        });
+          break;
+        case "exit":
+          term.write(`Process exited with code ${message.exit.code} and signal ${message.exit.signal}.`);
+          break;
+        }
 
-        socket.on("exit", (e: { exitCode: number, signal?: number }) => {
-          socket.disconnect();
-          term.write(`Process exited with code ${e.exitCode}.`);
-        });
-
-        socket.on("disconnect", () => {
-          term.write("\r\n*** Disconnected.***\r\n");
-        });
-      });
+      };
 
       return () => {
-        socket.disconnect();
-        if (container.current) {
-          resizeObserver.unobserve(container.current);
-        }
+        socket.close();
       };
     }
   }, [container.current]);
@@ -146,6 +146,7 @@ export const Shell: React.FC<Props> = ({ user, cluster, path }) => {
   );
 };
 
+// todo
 function openPreviewLink(href: string) {
   window.open(href, "ViewFile", "location=yes,resizable=yes,scrollbars=yes,status=yes");
 }

@@ -1,6 +1,6 @@
 {
   "name": "@scow/portal-server",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "",
   "main": "build/index.js",
   "private": true,
@@ -22,20 +22,21 @@
   "dependencies": {
     "@ddadaal/tsgrpc-server": "0.18.2",
     "@ddadaal/tsgrpc-common": "0.2.1",
-    "@grpc/grpc-js": "1.8.8",
+    "@grpc/grpc-js": "1.8.9",
     "@scow/config": "workspace:*",
     "@scow/lib-config": "workspace:*",
     "@scow/lib-slurm": "workspace:*",
     "@scow/lib-ssh": "workspace:*",
     "@scow/protos": "workspace:*",
-    "@sinclair/typebox": "0.25.21",
+    "@sinclair/typebox": "0.25.23",
     "dotenv": "16.0.3",
     "node-cron": "3.0.2",
     "uuid": "9.0.0",
     "wait-on": "7.0.1",
     "ts-log": "2.2.5",
     "shell-quote": "1.8.0",
-    "dayjs": "1.11.7"
+    "dayjs": "1.11.7",
+    "pino-pretty": "9.3.0"
   },
   "devDependencies": {
     "@ddadaal/tsgrpc-client": "0.17.3",

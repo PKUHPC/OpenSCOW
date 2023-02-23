@@ -1,11 +1,12 @@
 {
   "name": "@scow/lib-web",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "",
   "main": "index.js",
   "private": true,
   "sideEffects": false,
   "scripts": {
+    "dev": "tsc -p tsconfig.build.json && (concurrently \"tsc -p tsconfig.build.json -w\" \"tsc-alias -p tsconfig.build.json -w\")",
     "build": "rimraf build && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json"
   },
   "files": [
@@ -19,7 +20,7 @@
     "mime-types": "2.1.35"
   },
   "peerDependencies": {
-    "antd": "5.2.0",
+    "antd": "5.2.2",
     "next": "13.1.6",
     "styled-components": "5.3.6"
   },

@@ -68,6 +68,13 @@ const config = {
           },
           {
             type: "doc",
+            docId: "integration/index",
+            position: "left",
+            sidebarId: "deploy",
+            label: "与SCOW集成",
+          },
+          {
+            type: "doc",
             docId: "hpccluster/index",
             position: "left",
             sidebarId: "hpccluster",

@@ -13,7 +13,8 @@
 import { App, Button, Form, Input, InputNumber, Select } from "antd";
 import { Rule } from "antd/es/form";
 import Router from "next/router";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useAsync } from "react-async";
 import { useStore } from "simstate";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
@@ -21,8 +22,7 @@ import { splitSbatchArgs } from "src/models/job";
 import { AccountSelector } from "src/pageComponents/job/AccountSelector";
 import { AppCustomAttribute } from "src/pages/api/app/getAppMetadata";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
-import { Cluster, publicConfig } from "src/utils/config";
-import { firstPartition, getPartitionInfo } from "src/utils/jobForm";
+import { Cluster } from "src/utils/config";
 
 interface Props {
   appId: string;
@@ -93,37 +93,31 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
   const cluster = Form.useWatch("cluster", form) as Cluster | undefined;
   const partition = Form.useWatch("partition", form) as string | undefined;
 
-  const defaultClusterStore = useStore(DefaultClusterStore);
 
-  // set default
-  useEffect(() => {
-    const defaultCluster = defaultClusterStore.cluster;
+  const clusterInfoQuery = useAsync({
+    promiseFn: useCallback(async () => cluster
+      ? api.getClusterInfo({ query: { cluster:  cluster?.id } }) : undefined, [cluster]),
+    onResolve: (data) => {
+      if (data) {
+        const partition = data.clusterInfo.slurm.partitions[0];
+        form.setFieldValue("partition", partition.name);
+        form.setFieldValue("qos", partition.qos?.[0]);
+      }
+    },
+  });
 
-    if (defaultCluster) {
-      const [partition, info] = firstPartition(defaultCluster);
-      form.setFieldsValue({
-        cluster: defaultCluster,
-        partition,
-        qos: info?.qos?.[0],
-      });
-    }
-  }, []);
-
-  // if partition is no longer available, use the first partition of the cluster
-  useEffect(() => {
-    if (!cluster) {
-      form.setFieldsValue({ partition: undefined });
-      return;
-    }
-    if (!getPartitionInfo(cluster, partition)) {
-      form.setFieldsValue({ partition: firstPartition(cluster)[0] });
-    }
-  }, [cluster, partition]);
-
-  const currentPartitionInfo = useMemo(
-    () => cluster ? getPartitionInfo(cluster, partition) : undefined,
-    [cluster, partition],
+  const currentPartitionInfo = useMemo(() =>
+    clusterInfoQuery.data
+      ? clusterInfoQuery.data.clusterInfo.slurm.partitions.find((x) => x.name === partition)
+      : undefined,
+  [clusterInfoQuery.data, partition],
   );
+
+  useEffect(() => {
+    if (currentPartitionInfo) {
+      form.setFieldValue("qos", currentPartitionInfo.qos?.[0]);
+    }
+  }, [currentPartitionInfo]);
 
   const customFormItems = attributes.map((item, index) => {
 
@@ -154,8 +148,10 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
     );
   });
 
+  const defaultClusterStore = useStore(DefaultClusterStore);
+
   return (
-    <Form form={form} onFinish={onSubmit} initialValues={initialValues}>
+    <Form form={form} onFinish={onSubmit} initialValues={{ ...initialValues, cluster: defaultClusterStore.cluster }}>
 
       <Form.Item name="cluster" label="集群" rules={[{ required: true }]}>
         <SingleClusterSelector />
@@ -177,10 +173,11 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
         rules={[{ required: true }]}
       >
         <Select
+          loading={clusterInfoQuery.isLoading}
           disabled={!currentPartitionInfo}
-          options={cluster
-            ? Object.keys(publicConfig.CLUSTERS_CONFIG[cluster.id].slurm.partitions)
-              .map((x) => ({ label: x, value: x }))
+          options={clusterInfoQuery.data
+            ? clusterInfoQuery.data.clusterInfo.slurm.partitions
+              .map((x) => ({ label: x.name, value: x.name }))
             : []
           }
         />

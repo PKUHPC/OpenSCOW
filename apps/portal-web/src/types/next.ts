@@ -10,16 +10,12 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Server, Socket } from "net";
+import { Server } from "http";
+import { Socket } from "net";
 import { NextApiResponse } from "next";
-import { Server as SocketIOServer } from "socket.io";
-
 
 export type AugmentedNextApiResponse = NextApiResponse & {
   socket: Socket & {
-    server: Server & {
-      io: SocketIOServer;
-      upgrade: boolean;
-    };
+    server: Server;
   };
 };

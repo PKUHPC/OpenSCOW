@@ -44,12 +44,12 @@ export const createSlurmOps = (cluster: string, logger: Logger): ClusterOps | un
     return undefined;
   }
 
-  const partitions = Object.keys(slurmConfig.partitions);
+  const partitionNames = slurmConfig.partitions.map((x) => x.name);
 
   const clusterInfo: SlurmClusterInfo = {
-    partitions,
+    partitions: partitionNames,
     slurmConfig: slurmMisConfig,
-    executeSlurmScript: (params, logger) => executeSlurmScript(slurmMisConfig, partitions, params, logger),
+    executeSlurmScript: (params, logger) => executeSlurmScript(slurmMisConfig, partitionNames, params, logger),
   };
 
   return {

@@ -14,6 +14,7 @@ import { normalizePathnameWithQuery } from "@scow/utils";
 import http from "http";
 import httpProxy from "http-proxy";
 import { NextApiRequest } from "next";
+import { join } from "path";
 import { checkCookie } from "src/auth/server";
 import { AugmentedNextApiResponse } from "src/types/next";
 import { publicConfig } from "src/utils/config";
@@ -58,54 +59,54 @@ export const config = {
   },
 };
 
-export default async (req: NextApiRequest, res: AugmentedNextApiResponse) => {
+/**
+ * Node的原生http服务器（http.Server）在收到WebSocket连接的时候将会触发一个`upgrade`事件，而且并不走正常的HTTP请求响应流程
+ * 所以整个系统第一次启动后，在以HTTP形式访问此代理地址之前，到本地址的WebSocket将会失败
+ * 因为此时并没有注册upgrade事件的监听器，无法处理WebSocket连接。
+ *
+ * 所以系统启动后，需要手动触发一次到本地址的HTTP请求，以便注册upgrade事件的监听器
+ */
+export const setupWssProxy = (res: AugmentedNextApiResponse) => {
+  const server: http.Server = res.socket.server;
 
-  /**
-   * Node的原生http服务器（http.Server）在收到WebSocket连接的时候将会触发一个`upgrade`事件，而且并不走正常的HTTP请求响应流程
-   * 所以整个系统第一次启动后，在以HTTP形式访问此代理地址之前，到本地址的WebSocket将会失败
-   * 因为此时并没有注册upgrade事件的监听器，无法处理WebSocket连接。
-   *
-   * 所以系统启动后，需要手动触发一次到本地址的HTTP请求，以便注册upgrade事件的监听器
-   */
-  if (!res.socket.server.upgrade) {
-    // @ts-ignore
-    const server: http.Server = res.socket.server;
+  server.on("upgrade", async (req, socket, head) => {
 
-    server.on("upgrade", async (req, socket, head) => {
+    const url = normalizePathnameWithQuery(req.url!);
 
-      const writeError = (statusLine: string, msg: string) => {
-        socket.end(`HTTP/1.1 ${statusLine}\r\n${msg}`);
-      };
+    if (!url.startsWith(join(publicConfig.BASE_PATH, "/api/proxy"))) { return; }
 
-      const user = await checkCookie(() => true, req).catch(() => {
-        writeError("500 Internal Server Error", "Error when authenticating request");
-        return 500;
-      });
+    const writeError = (statusLine: string, msg: string) => {
+      socket.end(`HTTP/1.1 ${statusLine}\r\n${msg}`);
+    };
 
-      if (typeof user === "number") {
-        writeError("401 Unauthorized", "token is not valid");
-        return;
-      }
-
-      // req.url of raw node.js request object doesn't remove base path
-      const target = parseProxyTarget(req.url!, true);
-
-      if (target instanceof Error) {
-        writeError("400 Bad Request", target.message);
-        return;
-      }
-
-      proxy.ws(req, socket, head, { target, ignorePath: true, xfwd: true }, (err) => {
-        console.error(err, "Error when proxing WS requests");
-        writeError("500 Internal Server Error", "Error when proxing WS requests");
-      });
-
+    const user = await checkCookie(() => true, req).catch(() => {
+      writeError("500 Internal Server Error", "Error when authenticating request");
+      return 500;
     });
 
-    res.socket.server.upgrade = true;
-    // reload the page at first call
-    return res.redirect(307, req.url!);
-  }
+    if (typeof user === "number") {
+      writeError("401 Unauthorized", "token is not valid");
+      return;
+    }
+
+    // req.url of raw node.js request object doesn't remove base path
+    const target = parseProxyTarget(req.url!, true);
+
+    if (target instanceof Error) {
+      writeError("400 Bad Request", target.message);
+      return;
+    }
+
+    proxy.ws(req, socket, head, { target, ignorePath: true, xfwd: true }, (err) => {
+      console.error(err, "Error when proxing WS requests");
+      writeError("500 Internal Server Error", "Error when proxing WS requests");
+    });
+
+  });
+
+};
+
+export default async (req: NextApiRequest, res: AugmentedNextApiResponse) => {
 
   const user = await checkCookie(() => true, req).catch(() => {
     res.status(500).send("Error when authenticating request");

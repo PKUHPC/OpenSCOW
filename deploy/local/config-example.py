@@ -24,6 +24,15 @@ COMMON = {
   "IMAGE_TAG": "master",
 }
 
+# ------- 日志配置 -------
+#
+# LOG.LEVEL: 日志等级，可选trace, debug, info, warn, error。默认info
+# LOG.PRETTY: 是否输出更适合直接读的log。如果为False，则输出json格式的日志。默认False
+# LOG = {
+#   # "LEVEL": "info",
+#   # "PRETTY": False,
+# }
+
 #
 # ------- 门户系统 -------
 #

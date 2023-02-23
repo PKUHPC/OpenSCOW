@@ -3,6 +3,9 @@ authType: ldap
 
 redisUrl: 192.168.88.100:6379
 
+allowedCallbackHostnames:
+  - localhost
+
 # 在此部分输入LDAP的配置
 ldap:
   # LDAP服务器地址。必填
@@ -13,7 +16,7 @@ ldap:
   # 进行LDAP操作的用户密码。默认为空
   bindPassword: "admin"
 
-  # 在哪个节点下搜索要登录的用户。默认为空
+  # 在哪个节点下搜索要登录的用户。必填
   searchBase: "ou=hpc,o=pku"
   # 搜索登录用户时的筛选器。必填
   userFilter: "(uid=*)"

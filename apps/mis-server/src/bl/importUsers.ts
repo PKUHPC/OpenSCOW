@@ -19,35 +19,42 @@ import { AccountWhitelist } from "src/entities/AccountWhitelist";
 import { Tenant } from "src/entities/Tenant";
 import { User } from "src/entities/User";
 import { UserAccount, UserRole, UserStatus } from "src/entities/UserAccount";
-import { DEFAULT_TENANT_NAME } from "src/utils/constants";
 import { toRef } from "src/utils/orm";
 
 export interface ImportUsersData {
   accounts: {
     accountName: string;
-    users: {userId: string; state: string}[];
+    users: {userId: string; userName: string; state: string}[];
     owner: string;
-  }[];
-  users: {
-    userId: string;
-    userName: string;
-    accounts: string[];
   }[];
 }
 
 export async function importUsers(data: ImportUsersData, em: SqlEntityManager, 
-  whitelistAll: boolean, logger: Logger) 
+  whitelistAll: boolean, tenantName: string, logger: Logger) 
 {
-  const tenant = await em.findOneOrFail(Tenant, { name: DEFAULT_TENANT_NAME });
+  const tenant = await em.findOneOrFail(Tenant, { name: tenantName });
 
   const usersMap: Record<string, User> = {};
   
   const idsWithoutName = [] as string[];
-  data.users.forEach(({ userId, userName }) => {
-    usersMap[userId] = new User({ name: userName === "" ? userId : userName, userId, email: "", tenant });
-    if (userName === "") { idsWithoutName.push(userId); }
+  data.accounts.forEach(({ users }) => {
+    users.forEach(({ userId, userName }) => {
+      if (!(userId in usersMap)) {
+        usersMap[userId] = new User({ name: userName === "" ? userId : userName, userId, email: "", tenant });
+        if (userName === "") { idsWithoutName.push(userId); }
+      }
+    });
   });
 
+  const existedUsers = await em.find(User, { userId: { $in: Object.keys(usersMap) } }, { populate: ["tenant"]});
+  existedUsers.forEach((u) => {
+    if (u.tenant.$.name !== tenantName) {
+      throw <ServiceError> {
+        code: Status.INVALID_ARGUMENT, message: `user ${u.userId} has existed but doesn't belong to ${tenantName}`,
+      };
+    }
+    usersMap[u.userId] = u;
+  });
 
   const accounts: Account[] = [];
   const userAccounts: UserAccount[] = [];
@@ -73,11 +80,6 @@ export async function importUsers(data: ImportUsersData, em: SqlEntityManager,
       const state = u.state;
 
       const user = usersMap[u.userId];
-      if (!user) {
-        throw <ServiceError> {
-          code: Status.INVALID_ARGUMENT, message: `Account user ${u.userId} is not in users which will be imported.`,
-        };
-      }
       userAccounts.push(new UserAccount({
         account,
         user,
@@ -89,7 +91,8 @@ export async function importUsers(data: ImportUsersData, em: SqlEntityManager,
 
   await em.persistAndFlush([...Object.values(usersMap), ...accounts, ...userAccounts]);
 
-  logger.info(`Import users complete. ${accounts.length} accounts, ${Object.keys(usersMap).length} users.`);
+  logger.info(
+    `Import users complete. ${accounts.length} accounts, ${Object.keys(usersMap).length - existedUsers.length} users.`);
   if (idsWithoutName.length !== 0) {
     logger.warn(`${idsWithoutName.length} users don't have names.`);
     logger.warn(idsWithoutName.join(", "));
@@ -97,7 +100,7 @@ export async function importUsers(data: ImportUsersData, em: SqlEntityManager,
 
   return {
     accountCount: accounts.length,
-    userCount: Object.keys(usersMap).length,
+    userCount: Object.keys(usersMap).length - existedUsers.length,
     usersWithoutName: idsWithoutName.length,
   };
 }

@@ -10,14 +10,13 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { envConfig, host, port, str } from "@scow/lib-config";
+import { bool, envConfig, host, port, str } from "@scow/lib-config";
 import { getKeyPair } from "@scow/lib-ssh";
 import { homedir } from "os";
 import { join } from "path";
 
 import { AuthType } from "./AuthType";
 
-export const AUTH_REDIRECT_URL = "/api/auth/callback";
 export const FAVICON_URL = "/api/icon?type=favicon";
 
 export const config = envConfig({
@@ -27,6 +26,7 @@ export const config = envConfig({
     default: "info",
     desc: "日志等级",
   }),
+  LOG_PRETTY: bool({ desc: "以可读的方式输出log", default: false }),
 
   BASE_PATH: str({ desc: "整个系统的base path", default: "/" }),
 
@@ -37,6 +37,8 @@ export const config = envConfig({
   TEST_USERS: str({ desc: "测试用户，如果这些用户登录，将其ID改为另一个ID。格式：原用户ID=新用户ID,原用户ID=新用户ID。", default: "" }),
   SSH_PRIVATE_KEY_PATH: str({ desc: "SSH私钥路径", default: join(homedir(), ".ssh", "id_rsa") }),
   SSH_PUBLIC_KEY_PATH: str({ desc: "SSH公钥路径", default: join(homedir(), ".ssh", "id_rsa.pub") }),
+
+  EXTRA_ALLOWED_CALLBACK_HOSTNAMES: str({ desc: "额外的信任回调域名，以逗号分隔", default: "" }),
 
 });
 

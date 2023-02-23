@@ -10,6 +10,11 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { authConfig } from "src/config/auth";
+
+export const allowedCallbackUrl = "http://" + authConfig.allowedCallbackHostnames[0] + "/callback";
+export const notAllowedCallbackUrl = "http://baddomain.com:29392/callback";
+
 export const createFormData = (values: Record<string, string>) => {
   const formData = new URLSearchParams();
   Object.entries(values).forEach(([k, v]) => {
