@@ -43,7 +43,6 @@ it("create app with wrong argument", async () => {
     partition: "default",
     qos: "high",
     customAttributes: { version5: "abc" },
-    userSbatchOptions: [],
   }).catch((e) => e);
   expect(reply.code).toBe(status.INVALID_ARGUMENT);
 
