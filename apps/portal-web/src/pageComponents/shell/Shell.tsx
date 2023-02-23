@@ -88,7 +88,6 @@ export const Shell: React.FC<Props> = ({ user, cluster, path }) => {
         term.onData((data) => {
           if (data.length === 1 && (data === "r" || data === "z")) {
             stack += data;
-            send({ $case: "data", data: { data } });
           }
           else {
             if ((data === "\r") && stack === "rz") {
@@ -98,8 +97,9 @@ export const Shell: React.FC<Props> = ({ user, cluster, path }) => {
             } else {
               stack = "";
             }
-            send({ $case: "data", data: { data } });
           }
+          send({ $case: "data", data: { data } });
+
         });
 
         term.onResize(({ cols, rows }) => {
@@ -111,15 +111,36 @@ export const Shell: React.FC<Props> = ({ user, cluster, path }) => {
         const message = JSON.parse(e.data) as ShellOutputData;
         switch (message.$case) {
         case "data":
+          console.log("----------------sokete get data", Buffer.from(message.data.data).toString());
           if (Buffer.from(message.data.data).toString().search("rz: not found") >= 0) {
-            console.log(Buffer.from(message.data.data).toString().split("\r\n"));
-            const datapath = Buffer.from(message.data.data).toString().trim().split("\r\n")[1];
-            openPreviewLink(join("/files", cluster, datapath));
+            const list = Buffer.from(message.data.data).toString().trim().split("\r\n");
+            console.log(list);
+            let datapath: string = "";
+            const rExp: RegExp = /home/;
+            list.forEach((x) => {
+              if (rExp.test(x)) {
+                datapath = x;
+              }
+            });
 
-            term.write(Buffer.from(message.data.data).toString().split("\r\n")[2]);
+            openPreviewLink(join("/files", cluster, datapath));
+            term.write("\r\n");
+
+
+            const a = list.at(-1);
+
+            const promptRegExp: RegExp = /babdd3/;
+            if (a && promptRegExp.test(a)) {
+              term.write(a);
+            } else {
+              term.write("\r\n");
+
+            }
+
           }
           else {
             if (Buffer.from(message.data.data).toString().search("rz") >= 0) {
+
             }
 
             else {
