@@ -115,21 +115,24 @@ export const Shell: React.FC<Props> = ({ user, cluster, path }) => {
         const message = JSON.parse(e.data) as ShellOutputData;
         switch (message.$case) {
         case "data":
-          if (Buffer.from(message.data.data).toString().search(FILE_JUMP_COMMAND + ": not found") >= 0) {
+          if (Buffer.from(message.data.data).toString().search(FILE_JUMP_COMMAND) >= 0) {
             const result = Buffer.from(message.data.data).toString().trim().split("\r\n");
 
-
-            const rExp: RegExp = /home/;
-            const paths = result.filter((x) => rExp.test(x));
+            const pathRedExo: RegExp = /home/;
+            const paths = result.filter((x) => pathRedExo.test(x));
             const currentPath = (paths.length === 0) ? "/" : paths[0];
 
             openPreviewLink(join("/files", cluster, currentPath));
-            term.write("\r\n");
 
             const prompt = result.at(-1);
-            const promptRegExp: RegExp = /\$/;
+            const promptRegExp: RegExp = /[#$]/;
             if (prompt && promptRegExp.test(prompt)) {
-              term.write(prompt);
+              if (result.length === 1) {
+                term.write(Buffer.from(message.data.data));
+              }
+              else {
+                term.write(prompt);
+              }
             } else {
               term.write("\r\n");
             }
