@@ -29,8 +29,6 @@ title: 开发
 - Linux/macOS/Windows
 - 安装好[docker](https://docs.docker.com/engine/install/)和[docker compose](https://docs.docker.com/compose/install/)
   - Windows和macOS用户推荐使用[Docker Desktop](https://www.docker.com/products/docker-desktop/)
-- `~/.ssh`目录下存在SSH RSA格式公私钥文件（`id_rsa`和`id_rsa.pub`）
-  - 如果不存在，请运行`ssh-keygen`生成
 
 ### 推荐：Dev Container
 
@@ -39,6 +37,8 @@ title: 开发
 ### 本地开发
 
 如果您不使用Dev Container，也可以在本地构建开发环境。
+
+请确保主机的`~/.ssh`目录下存在SSH RSA格式公私钥文件（`id_rsa`和`id_rsa.pub`）。如果不存在，请运行`ssh-keygen`生成。
 
 请安装以下软件：
 
@@ -112,6 +112,12 @@ pnpm build
 ## 测试开发环境
 
 我们使用docker搭建了一套简单的开发环境，可以用来跑一些项目的测试。具体开发环境请参考[docker-compose.dev.yml](%REPO_FILE_URL%/dev/docker-compose.dev.yml)。
+
+:::caution
+
+使用Dev Container环境启动的开发环境目前无法直接使用测试开发环境。请使用vagrant进行开发，请参考(文档)[%REPO_FILE_URL%/dev/vagrant/README.md]。
+
+:::
 
 开发环境包括
 
