@@ -25,11 +25,11 @@
     "@fastify/formbody": "7.4.0",
     "@fastify/static": "6.9.0",
     "@fastify/view": "7.4.1",
-    "liquidjs": "10.5.0",
+    "liquidjs": "10.6.0",
     "@scow/config": "workspace:*",
     "@scow/lib-config": "workspace:*",
     "@scow/lib-ssh": "workspace:*",
-    "@sinclair/typebox": "0.25.23",
+    "@sinclair/typebox": "0.25.24",
     "asn1": "0.2.6",
     "fastify": "4.13.0",
     "fastify-graceful-shutdown": "3.4.0",
@@ -38,7 +38,7 @@
     "ldapjs": "2.3.3",
     "nanoid": "4.0.1",
     "svg-captcha": "1.4.0",
-    "pino-pretty": "9.3.0"
+    "pino-pretty": "9.4.0"
   },
   "devDependencies": {
     "@types/asn1": "0.2.0",
