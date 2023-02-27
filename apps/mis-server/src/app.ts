@@ -39,7 +39,7 @@ export async function createServer() {
     },
   });
 
-  server.logger.info("@scow/mis-server: ", readVersionFile());
+  server.logger.info({ version: readVersionFile() }, "@scow/mis-server: ");
   server.logger.info({ config: omitConfigSpec(config) }, "Loaded env config");
 
   for (const plugin of plugins) {

@@ -35,7 +35,7 @@ export async function createServer() {
     },
   });
 
-  server.logger.info("@scow/portal-server: ", readVersionFile());
+  server.logger.info({ version: readVersionFile() }, "Running @scow/portal-server");
   server.logger.info({ config: omitConfigSpec(config) }, "Loaded env config");
 
   for (const plugin of plugins) {

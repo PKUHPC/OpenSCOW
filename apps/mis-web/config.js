@@ -9,7 +9,7 @@ const { DEFAULT_PRIMARY_COLOR, getUiConfig } = require("@scow/config/build/ui");
 const { PHASE_DEVELOPMENT_SERVER, PHASE_PRODUCTION_BUILD, PHASE_PRODUCTION_SERVER } = require("next/constants");
 const { join } = require("path");
 const { getCapabilities } = require("@scow/lib-auth");
-const { getVersionMessage, readVersionFile } = require("@scow/utils/build/version");
+const { readVersionFile } = require("@scow/utils/build/version");
 
 /**
  * Get auth capabilities
@@ -117,7 +117,8 @@ const buildRuntimeConfig = async (phase, basePath) => {
   };
 
   if (!building) {
-    console.log("@scow/mis-web", readVersionFile());
+    console.log("Running @scow/mis-web");
+    console.log("Version: ", readVersionFile());
     console.log("Server Runtime Config", serverRuntimeConfig);
     console.log("Public Runtime Config", publicRuntimeConfig);
   }
