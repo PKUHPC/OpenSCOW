@@ -21,7 +21,7 @@
   },
   "peerDependencies": {
     "antd": "5.2.2",
-    "next": "13.1.6",
+    "next": "13.2.1",
     "styled-components": "5.3.6"
   },
   "devDependencies": {

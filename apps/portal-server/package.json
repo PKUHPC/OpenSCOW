@@ -22,13 +22,13 @@
   "dependencies": {
     "@ddadaal/tsgrpc-server": "0.18.2",
     "@ddadaal/tsgrpc-common": "0.2.1",
-    "@grpc/grpc-js": "1.8.9",
+    "@grpc/grpc-js": "1.8.11",
     "@scow/config": "workspace:*",
     "@scow/lib-config": "workspace:*",
     "@scow/lib-slurm": "workspace:*",
     "@scow/lib-ssh": "workspace:*",
     "@scow/protos": "workspace:*",
-    "@sinclair/typebox": "0.25.23",
+    "@sinclair/typebox": "0.25.24",
     "dotenv": "16.0.3",
     "node-cron": "3.0.2",
     "uuid": "9.0.0",
@@ -36,7 +36,7 @@
     "ts-log": "2.2.5",
     "shell-quote": "1.8.0",
     "dayjs": "1.11.7",
-    "pino-pretty": "9.3.0"
+    "pino-pretty": "9.4.0"
   },
   "devDependencies": {
     "@ddadaal/tsgrpc-client": "0.17.3",
