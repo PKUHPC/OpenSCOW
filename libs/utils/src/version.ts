@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { readFileSync } from "fs";
+import { existsSync, readFileSync } from "fs";
 
 interface VersionJsonInfo {
   tag?: string;
@@ -21,8 +21,12 @@ export interface VersionInfo extends VersionJsonInfo {
   packageJsonVersion: string;
 }
 
-export function readVersionFile(filename = "version.json") {
-  const jsonInfo = JSON.parse(readFileSync(filename, "utf-8")) as VersionInfo;
+export function readVersionFile(versionJsonFileName = "version.json") {
+
+  const jsonInfo: VersionJsonInfo = existsSync(versionJsonFileName)
+    ? JSON.parse(readFileSync(versionJsonFileName, "utf-8"))
+    : {};
+
   const packageJson = JSON.parse(readFileSync("package.json", "utf-8"));
 
   return {
