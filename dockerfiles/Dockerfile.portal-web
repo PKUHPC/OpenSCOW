@@ -16,10 +16,10 @@ RUN apk update && apk add libc6-compat python3 make gcc g++ curl
 ARG BUF_VERSION="1.11.0"
 
 RUN BIN="/usr/local/bin" && \
-VERSION="${BUF_VERSION}" && \
+  VERSION="${BUF_VERSION}" && \
   curl -sSL \
-    "https://github.com/bufbuild/buf/releases/download/v${VERSION}/buf-$(uname -s)-$(uname -m)" \
-    -o "${BIN}/buf" && \
+  "https://github.com/bufbuild/buf/releases/download/v${VERSION}/buf-$(uname -s)-$(uname -m)" \
+  -o "${BIN}/buf" && \
   chmod +x "${BIN}/buf"
 
 RUN corepack enable
@@ -35,6 +35,7 @@ WORKDIR /app
 
 COPY . .
 
+RUN node scripts/createVersionFile.mjs version.json
 RUN pnpm dlx turbo prune --scope="@scow/portal-web" --docker
 
 FROM base AS builder
@@ -53,7 +54,11 @@ RUN pnpm build
 
 COPY scripts scripts
 RUN node scripts/copyDist.mjs
-RUN cd dist && pnpm i --offline --prod --frozen-lockfile
+
+WORKDIR /app/dist
+
+RUN pnpm i --offline --prod --frozen-lockfile
+COPY --from=pruner /app/version.json ./version.json
 
 FROM node:hydrogen-alpine@sha256:0d2712ac2b2c1149391173de670406f6e3dbdb1b2ba44e8530647e623e0e1b17 AS runner
 
