@@ -1,5 +1,15 @@
 # @scow/mis-web
 
+## 0.3.0
+
+### Minor Changes
+
+- 73939f15f: 在租户计费价格表中使用新的 ui
+
+### Patch Changes
+
+- @scow/protos@0.1.1
+
 ## 0.2.0
 
 ### Minor Changes
