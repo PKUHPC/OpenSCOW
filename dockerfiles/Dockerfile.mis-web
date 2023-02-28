@@ -58,7 +58,6 @@ RUN node scripts/copyDist.mjs
 WORKDIR /app/dist
 
 RUN pnpm i --offline --prod --frozen-lockfile
-COPY --from=pruner /app/version.json ./version.json
 
 FROM node:hydrogen-alpine@sha256:0d2712ac2b2c1149391173de670406f6e3dbdb1b2ba44e8530647e623e0e1b17 AS runner
 
@@ -71,5 +70,7 @@ ENV NODE_ENV production
 EXPOSE 3000
 
 WORKDIR /app/apps/mis-web
+
+COPY --from=pruner /app/version.json ./version.json
 
 CMD ["npm", "run", "serve"]
