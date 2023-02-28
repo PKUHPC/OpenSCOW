@@ -5,6 +5,7 @@ const { join } = require("path");
 const { homedir } = require("os");
 const { PHASE_DEVELOPMENT_SERVER, PHASE_PRODUCTION_BUILD, PHASE_PRODUCTION_SERVER, PHASE_TEST } = require("next/constants");
 
+const { readVersionFile } = require("@scow/utils/build/version");
 const { getCapabilities } = require("@scow/lib-auth");
 const { DEFAULT_PRIMARY_COLOR, getUiConfig } = require("@scow/config/build/ui");
 const { getPortalConfig } = require("@scow/config/build/portal");
@@ -145,6 +146,8 @@ const buildRuntimeConfig = async (phase, basePath) => {
   }
 
   if (!building && !testenv) {
+    console.log("Running @scow/portal-web");
+    console.log("Version", readVersionFile());
     console.log("Server Runtime Config", serverRuntimeConfig);
     console.log("Public Runtime Config", publicRuntimeConfig);
   }

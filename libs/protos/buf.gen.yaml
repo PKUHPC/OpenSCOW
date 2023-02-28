@@ -1,7 +1,7 @@
 version: v1
 plugins:
   - remote: buf.build/stephenh/plugins/ts-proto
-    out: libs/protos/generated
+    out: generated
     opt:
       - unrecognizedEnum=false
       - useDate=string
@@ -9,4 +9,3 @@ plugins:
       - esModuleInterop=true
       - useOptionals=messages
       - outputServices=grpc-js
-
