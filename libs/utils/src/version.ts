@@ -17,9 +17,7 @@ interface VersionJsonInfo {
   commit: string;
 }
 
-export interface VersionInfo extends VersionJsonInfo {
-  packageJsonVersion: string;
-}
+export interface VersionInfo extends VersionJsonInfo {}
 
 export function readVersionFile(versionJsonFileName = "version.json") {
 
@@ -27,12 +25,6 @@ export function readVersionFile(versionJsonFileName = "version.json") {
     ? JSON.parse(readFileSync(versionJsonFileName, "utf-8"))
     : {};
 
-  const packageJson = JSON.parse(readFileSync("package.json", "utf-8"));
-
-  return {
-    ...jsonInfo,
-    packageJsonVersion: packageJson.version as string,
-  };
-}
+  return jsonInfo; }
 
 
