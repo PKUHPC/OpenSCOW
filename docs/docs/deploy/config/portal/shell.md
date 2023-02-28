@@ -11,7 +11,6 @@ shell支持输入命令跳转到文件系统，在登录节点需要修改`/etc/
 
 ```bash
 function scow-goto-file() {
-    #在函数内改变变量内容
     echo "scow is opening the file system `pwd`"
 }
 ```
