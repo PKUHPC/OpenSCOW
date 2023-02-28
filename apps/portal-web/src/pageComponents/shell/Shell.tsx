@@ -68,11 +68,9 @@ export const Shell: React.FC<Props> = ({ user, cluster, path }) => {
         join(publicConfig.BASE_PATH, "/api/shell") + "?" + new URLSearchParams(payload).toString(),
       );
 
-      const FILE_JUMP_COMMAND = "goto-file";
 
       socket.onopen = () => {
 
-        let stackIndex: number = 0;
 
         term.clear();
 
@@ -90,19 +88,7 @@ export const Shell: React.FC<Props> = ({ user, cluster, path }) => {
 
 
         term.onData((data) => {
-          if (data.length === 1 && stackIndex < FILE_JUMP_COMMAND.length && FILE_JUMP_COMMAND[stackIndex] === data) {
-            stackIndex++;
-          }
-          else {
-            if ((data === "\r") && stackIndex === FILE_JUMP_COMMAND.length) {
-              const cmd = FILE_JUMP_COMMAND + " || pwd";
-              send({ $case: "data", data: { data: cmd } });
-            } else {
-              stackIndex = 0;
-            }
-          }
           send({ $case: "data", data: { data } });
-
         });
 
         term.onResize(({ cols, rows }) => {
@@ -115,33 +101,17 @@ export const Shell: React.FC<Props> = ({ user, cluster, path }) => {
         const message = JSON.parse(e.data) as ShellOutputData;
         switch (message.$case) {
         case "data":
-          if (Buffer.from(message.data.data).toString().search(FILE_JUMP_COMMAND) >= 0) {
-            const result = Buffer.from(message.data.data).toString().trim().split("\r\n");
+          const data = Buffer.from(message.data.data);
 
-            const pathRedExo: RegExp = /home/;
-            const paths = result.filter((x) => pathRedExo.test(x));
-            const currentPath = (paths.length === 0) ? "/" : paths[0];
-
-            openPreviewLink(join("/files", cluster, currentPath));
-
-            const prompt = result.at(-1);
-            const promptRegExp: RegExp = /[#$]/;
-            if (prompt && promptRegExp.test(prompt)) {
-              if (result.length === 1) {
-                term.write(Buffer.from(message.data.data));
-              }
-              else {
-                term.write(prompt);
-              }
-            } else {
-              term.write("\r\n");
-            }
+          const dataString = data.toString();
+          if (dataString.search("scow is opening the file system") >= 0) {
+            const result = dataString.split("\r\n")[0];
+            const pathStartIndex = result.search("/");
+            const path = result.substring(pathStartIndex);
+            openPreviewLink(join(publicConfig.BASE_PATH, "/files", cluster, path));
           }
-          else {
-            if (Buffer.from(message.data.data).toString().search(FILE_JUMP_COMMAND) < 0) {
-              term.write(Buffer.from(message.data.data));
-            }
-          }
+          term.write(data);
+
           break;
         case "exit":
           term.write(`Process exited with code ${message.exit.code} and signal ${message.exit.signal}.`);

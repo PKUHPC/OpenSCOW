@@ -12,7 +12,7 @@
 
 import "xterm/css/xterm.css";
 
-import { Button } from "antd";
+import { Button, Collapse } from "antd";
 import { NextPage } from "next";
 import dynamic from "next/dynamic";
 import Router, { useRouter } from "next/router";
@@ -21,6 +21,8 @@ import { NotFoundPage } from "src/components/errorPages/NotFoundPage";
 import { publicConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
 import styled from "styled-components";
+
+const { Panel } = Collapse;
 
 const Container = styled.div`
   position: fixed;
@@ -71,6 +73,10 @@ export const ShellPage: NextPage = requireAuth(() => true)(({ userStore }) => {
   const cluster = router.query.cluster as string;
   const paths = router.query.path as (string[] | undefined);
 
+
+  const text = "跳转到文件系统：scow-goto-file";
+
+
   return (
     <Container>
       <Head title={`${cluster}的终端`} />
@@ -81,6 +87,12 @@ export const ShellPage: NextPage = requireAuth(() => true)(({ userStore }) => {
         <Button onClick={() => Router.reload()}>
         刷新并重新连接
         </Button>
+        <Collapse>
+          <Panel header="命令" key="1">
+            {text}
+          </Panel>
+        </Collapse>
+
       </Header>
       <TerminalContainer>
         <DynamicShellComponent
