@@ -85,6 +85,7 @@ importers:
       '@scow/config': workspace:*
       '@scow/lib-config': workspace:*
       '@scow/lib-ssh': workspace:*
+      '@scow/utils': workspace:*
       '@sinclair/typebox': 0.25.24
       '@types/asn1': 0.2.0
       '@types/ldapjs': 2.2.5
@@ -106,6 +107,7 @@ importers:
       '@scow/config': link:../../libs/config
       '@scow/lib-config': link:../../libs/libconfig
       '@scow/lib-ssh': link:../../libs/ssh
+      '@scow/utils': link:../../libs/utils
       '@sinclair/typebox': 0.25.24
       asn1: 0.2.6
       fastify: registry.npmmirror.com/fastify/4.13.0
@@ -142,6 +144,7 @@ importers:
       '@scow/lib-slurm': workspace:*
       '@scow/lib-ssh': workspace:*
       '@scow/protos': workspace:*
+      '@scow/utils': workspace:*
       '@sinclair/typebox': 0.25.24
       '@types/google-protobuf': 3.15.6
       '@types/node-cron': 3.0.7
@@ -168,6 +171,7 @@ importers:
       '@scow/lib-slurm': link:../../libs/slurm
       '@scow/lib-ssh': link:../../libs/ssh
       '@scow/protos': link:../../libs/protos
+      '@scow/utils': link:../../libs/utils
       '@sinclair/typebox': 0.25.24
       dotenv: 16.0.3
       node-cron: 3.0.2
@@ -279,6 +283,7 @@ importers:
       '@scow/lib-slurm': workspace:*
       '@scow/lib-ssh': workspace:*
       '@scow/protos': workspace:*
+      '@scow/utils': workspace:*
       '@sinclair/typebox': 0.25.24
       '@types/node-cron': 3.0.7
       '@types/shell-quote': 1.7.1
@@ -300,6 +305,7 @@ importers:
       '@scow/lib-slurm': link:../../libs/slurm
       '@scow/lib-ssh': link:../../libs/ssh
       '@scow/protos': link:../../libs/protos
+      '@scow/utils': link:../../libs/utils
       '@sinclair/typebox': 0.25.24
       dayjs: 1.11.7
       dotenv: 16.0.3
@@ -6296,7 +6302,7 @@ packages:
   /axios/0.21.4_debug@4.3.4:
     resolution: {integrity: sha512-ut5vewkiu8jjGBdqpM44XxjuCjq9LAKeHVmoVfHVzy8eHgxxq8SbAVQNovDA8mVi05kP0Ea/n/UzcSHcTJQfNg==}
     dependencies:
-      follow-redirects: 1.15.2_debug@4.3.4
+      follow-redirects: 1.15.2
     transitivePeerDependencies:
       - debug
     dev: true
@@ -9061,19 +9067,6 @@ packages:
     peerDependenciesMeta:
       debug:
         optional: true
-    dev: false
-
-  /follow-redirects/1.15.2_debug@4.3.4:
-    resolution: {integrity: sha512-VQLG33o04KaQ8uYi2tVNbdrWp1QWxNNea+nmIB4EVM28v0hmP17z7aG1+wAkNzVq4KeXTq3221ye5qTJP91JwA==}
-    engines: {node: '>=4.0'}
-    peerDependencies:
-      debug: '*'
-    peerDependenciesMeta:
-      debug:
-        optional: true
-    dependencies:
-      debug: 4.3.4
-    dev: true
 
   /for-each/0.3.3:
     resolution: {integrity: sha512-jqYfLp7mo9vIyQf8ykW2v7A+2N4QjeCeI5+Dz9XraiO1ign81wjiH7Fb9vSOWvQfNtmSa4H2RoQTrrXivdUZmw==}
