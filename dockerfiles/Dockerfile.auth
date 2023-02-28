@@ -11,7 +11,7 @@
 
 FROM node:hydrogen-alpine@sha256:0d2712ac2b2c1149391173de670406f6e3dbdb1b2ba44e8530647e623e0e1b17 AS base
 
-RUN apk update && apk add libc6-compat python3 make gcc g++
+RUN apk update && apk add libc6-compat python3 make gcc g++ git
 
 RUN corepack enable
 
@@ -25,6 +25,8 @@ FROM base as pruner
 WORKDIR /app
 
 COPY . .
+
+RUN node scripts/createVersionFile.mjs version.json
 
 RUN pnpm dlx turbo prune --scope="@scow/auth" --docker
 
@@ -40,12 +42,14 @@ COPY tsconfig.json .eslintrc.json turbo.json ./
 COPY libs/tsconfig.json ./libs/
 COPY protos ./protos
 
-
 RUN pnpm build
 
 COPY scripts scripts
 RUN node scripts/copyDist.mjs
-RUN cd dist && pnpm i --offline --prod --frozen-lockfile
+
+WORKDIR /app/dist
+
+RUN pnpm i --offline --prod --frozen-lockfile
 
 FROM node:hydrogen-alpine@sha256:0d2712ac2b2c1149391173de670406f6e3dbdb1b2ba44e8530647e623e0e1b17 AS runner
 
@@ -58,5 +62,7 @@ ENV NODE_ENV production
 EXPOSE 5000
 
 WORKDIR /app/apps/auth
+
+COPY --from=pruner /app/version.json ./version.json
 
 CMD ["npm", "run", "serve"]
