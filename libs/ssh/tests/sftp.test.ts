@@ -10,6 +10,8 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { SFTPWrapper } from "ssh2";
+
 import {
   sftpChmod, sftpChown, SftpError, sftpMkdir, sftpReaddir, sftpReadFile,
   sftpRealPath, sftpRename, sftpRmdir, sftpStat, sftpUnlink, sftpWriteFile,
@@ -30,7 +32,13 @@ afterEach(async () => {
 });
 
 
-const sftpErrorCase: Array<{ name: string, func: Function, args: Array<any> }> = [
+interface SftpTestCase {
+  name: string;
+  func: (sftp: SFTPWrapper) => (...args: any[]) => Promise<unknown>;
+  args: (string | number | Buffer)[];
+  toString: () => string;
+}
+const sftpErrorCases: SftpTestCase[] = [
   { name: "sftpWriteFile", func: sftpWriteFile, args: ["/data/home/newfile", Buffer.alloc(0)]},
   { name: "sftpReadFile", func: sftpReadFile, args: ["/data/home/demo_admin"]},
   { name: "sftpReaddir", func: sftpReaddir, args: ["/data/home/test"]},
@@ -44,15 +52,15 @@ const sftpErrorCase: Array<{ name: string, func: Function, args: Array<any> }> =
   { name: "sftpMkdir", func: sftpMkdir, args: ["/data/home/test"]},
 ];
 
-sftpErrorCase.forEach(({ name, func, args }) => {
+sftpErrorCases.forEach((item) => {
+  item.toString = () => { return item.name; };
+});
 
-  it(`${name} should catch error and throw SftpError`, async () => {
-    try {
-      await func(testServer.sftp)(...args);
-      expect("").toThrowError("should not reach here");
-    } catch (e) {
-      expect(e).toBeInstanceOf(SftpError);
-    }
-  });
-
+it.each(sftpErrorCases)("%s should catch error and throw SftpError ", async ({ name, func, args }) => {
+  try {
+    await func(testServer.sftp)(...args);
+    fail("should not reach here");
+  } catch (e) {
+    expect(e).toBeInstanceOf(SftpError);
+  }
 });
