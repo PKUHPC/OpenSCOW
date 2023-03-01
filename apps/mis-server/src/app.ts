@@ -11,6 +11,8 @@
  */
 
 import { Server } from "@ddadaal/tsgrpc-server";
+import { omitConfigSpec } from "@scow/lib-config";
+import { readVersionFile } from "@scow/utils/build/version";
 import { updateBlockStatusInSlurm } from "src/bl/block";
 import { config } from "src/config/env";
 import { plugins } from "src/plugins";
@@ -36,6 +38,9 @@ export async function createServer() {
       } : {},
     },
   });
+
+  server.logger.info({ version: readVersionFile() }, "@scow/mis-server: ");
+  server.logger.info({ config: omitConfigSpec(config) }, "Loaded env config");
 
   for (const plugin of plugins) {
     await server.register(plugin);

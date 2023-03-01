@@ -22,15 +22,28 @@ title: 开发
 
 ## 开始开发
 
-本项目配置了[VSCode Dev Container](https://code.visualstudio.com/docs/devcontainers/containers)功能，您可以使用`.devcontainer`下的配置自动从GitHub打开一个Codespace或者使用VSCode生成一个开发用的容器。具体如何使用，请参考Dev Container的文档。
+### 准备主机环境
 
-下面介绍本地开发。要在本地开发，请确保安装了以下依赖：
+要开发SCOW，你的主机环境需要满足以下要求：
 
-- [docker](https://docs.docker.com/engine/install/)
-- [docker compose](https://docs.docker.com/compose/install/)
+- Linux/macOS/Windows
+- 安装好[docker](https://docs.docker.com/engine/install/)和[docker compose](https://docs.docker.com/compose/install/)
+  - Windows和macOS用户推荐使用[Docker Desktop](https://www.docker.com/products/docker-desktop/)
+
+### 推荐：Dev Container
+
+本项目配置了[VSCode Dev Container](https://code.visualstudio.com/docs/devcontainers/containers)，您可以使用`.devcontainer`下的配置自动从GitHub打开一个Codespace或者使用VSCode生成一个开发用的容器。具体如何使用，请参考上述Dev Container的文档。
+
+### 本地开发
+
+如果您不使用Dev Container，也可以在本地构建开发环境。
+
+请确保主机的`~/.ssh`目录下存在SSH RSA格式公私钥文件（`id_rsa`和`id_rsa.pub`）。如果不存在，请运行`ssh-keygen`生成。
+
+请安装以下软件：
+
 - [volta](https://volta.sh/)：管理node环境
 - [pnpm](https://pnpm.io/pnpm-cli)：推荐standalone安装
-- [buf](https://docs.buf.build/installation)：管理protobuf文件
 
 无需手动安装node。volta将会在第一次运行npm或者node命令时自动安装对应工具的对应版本。
 
@@ -98,6 +111,12 @@ pnpm build
 ## 测试开发环境
 
 我们使用docker搭建了一套简单的开发环境，可以用来跑一些项目的测试。具体开发环境请参考[docker-compose.dev.yml](%REPO_FILE_URL%/dev/docker-compose.dev.yml)。
+
+:::caution
+
+使用Dev Container环境启动的开发环境目前无法直接使用测试开发环境。请使用vagrant进行开发，请参考(文档)[%REPO_FILE_URL%/dev/vagrant/README.md]。
+
+:::
 
 开发环境包括
 

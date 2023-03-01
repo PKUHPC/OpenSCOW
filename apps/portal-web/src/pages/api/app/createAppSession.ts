@@ -30,7 +30,6 @@ export interface CreateAppSessionSchema {
     coreCount: number;
     maxTime: number;
     customAttributes: { [key: string]: string };
-    userSbatchOptions: string[];
   }
 
   responses: {
@@ -65,7 +64,7 @@ export default /* #__PURE__*/route<CreateAppSessionSchema>("CreateAppSessionSche
 
   if (!info) { return; }
 
-  const { appId, cluster, coreCount, partition, qos, account, maxTime, customAttributes, userSbatchOptions } = req.body;
+  const { appId, cluster, coreCount, partition, qos, account, maxTime, customAttributes } = req.body;
 
   const client = getClient(AppServiceClient);
 
@@ -79,7 +78,6 @@ export default /* #__PURE__*/route<CreateAppSessionSchema>("CreateAppSessionSche
     partition,
     qos,
     customAttributes,
-    userSbatchOptions,
   }).then((reply) => {
     return { 200: { jobId: reply.jobId, sessionId: reply.sessionId } };
   }, handlegRPCError({

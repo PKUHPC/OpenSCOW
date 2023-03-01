@@ -19,8 +19,7 @@
         "GitHub.copilot",
         "bufbuild.vscode-buf",
         "EditorConfig.EditorConfig",
-        "zxh404.vscode-proto3",
-        "ms-playwright.playwright"
+        "zxh404.vscode-proto3"
       ]
     }
   }

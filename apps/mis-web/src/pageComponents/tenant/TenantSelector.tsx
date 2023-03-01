@@ -58,6 +58,7 @@ export const TenantSelector: React.FC<Props> = ({
   return (
     <Input.Group compact>
       <Select
+        showSearch
         loading={isLoading}
         options={data ? data.names.map((x) => ({ label: x, value: x })) : []}
         placeholder={placeholder}
