@@ -11,11 +11,9 @@
  */
 
 import { formatDateTime } from "@scow/lib-web/build/utils/datetime";
-// import { Alert, App, Badge, Descriptions, Space, Spin, Typography } from "antd"
 import { Alert, App, Collapse, Descriptions, Space, Spin } from "antd";
 import { NextPage } from "next";
 import { useState } from "react";
-// import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { DisabledA } from "src/components/DisabledA";
@@ -24,18 +22,6 @@ import { PlatformRole } from "src/models/User";
 import { Head } from "src/utils/head";
 
 const { Panel } = Collapse;
-
-const slurmText = `
-如果您使用的是slurm调度器，由于技术限制，当您运行slurm.sh节点和slurm管理节点并非同一节点时，已封锁的用户、账户和用户账户将会在slurm集群重启后被解封。
-SCOW在启动时将会自动刷新一次slurm封锁状态，但是slurm集群可能在SCOW运行时重启，SCOW暂时不能对这种情况做出反应。
-所以，如果您运行slurm.sh节点和slurm管理节点并非同一节点时，您需要在slurm集群重启后手动执行一下本页面的刷新调度器用户封锁状态的功能。
-如果slurm.sh节点和slurm管理节点为同一节点，您可以忽略本功能。
-`;
-
-const otherText = `
-如果您使用的是slurm之外的调度器，在调度器和SCOW间用户封锁状态不同步时，可以手动执行一下本页面的刷新调度器用户封锁状态的功能。
-`;
-
 
 export const SlurmBlockStatusPage: NextPage = requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))(
   () => {
@@ -66,10 +52,17 @@ export const SlurmBlockStatusPage: NextPage = requireAuth((u) => u.platformRoles
 
         <Collapse defaultActiveKey={["1"]}>
           <Panel header="slurm调度器" key="1">
-            <p>{slurmText}</p>
+            <p>
+              如果您使用的是slurm调度器，由于技术限制，当您运行slurm.sh节点和slurm管理节点并非同一节点时，已封锁的用户、账户和用户账户将会在slurm集群重启后被解封。<br />
+              SCOW在启动时将会自动刷新一次slurm封锁状态，但是slurm集群可能在SCOW运行时重启，SCOW暂时不能对这种情况做出反应。<br />
+              所以，如果您运行slurm.sh节点和slurm管理节点并非同一节点时，您需要在slurm集群重启后手动执行一下本页面的刷新调度器用户封锁状态的功能。
+              如果slurm.sh节点和slurm管理节点为同一节点，您可以忽略本功能。
+            </p>
           </Panel>
           <Panel header="其他调度器" key="2">
-            <p>{otherText}</p>
+            <p>
+              如果您使用的是slurm之外的调度器，在调度器和SCOW间用户封锁状态不同步时，可以手动执行一下本页面的刷新调度器用户封锁状态的功能。
+            </p>
           </Panel>
 
         </Collapse>
