@@ -50,7 +50,9 @@ export const CreateUserModal: React.FC<Props> = ({
   };
 
   useEffect(() => {
-    newUserInfo && form.setFieldsValue(newUserInfo);
+    if (newUserInfo) {
+      form.setFieldsValue(newUserInfo);
+    }
   }, [newUserInfo]);
 
   return (
