@@ -16,12 +16,14 @@ import {
   DashboardOutlined,
   DesktopOutlined,
   EyeOutlined,
+  FileSyncOutlined,
   FolderOutlined,
   Loading3QuartersOutlined,
   MacCommandOutlined,
   PlusCircleOutlined,
   PlusOutlined,
-  SaveOutlined } from "@ant-design/icons";
+  SaveOutlined,
+} from "@ant-design/icons";
 import { NavItemProps } from "@scow/lib-web/build/layouts/base/types";
 import { App } from "@scow/protos/build/portal/app";
 import { join } from "path";
@@ -123,7 +125,12 @@ export const userRoutes: (
         text: cluster.name,
         path: `/files/${cluster.id}`,
         clickToPath: `/files/${cluster.id}/~`,
-      } as NavItemProps)),
+      } as NavItemProps)).concat([{
+        Icon: FileSyncOutlined,
+        text: "文件传输",
+        path: "/files/fileTransfer",
+      }]),
+
     }] : []),
   ];
 };
