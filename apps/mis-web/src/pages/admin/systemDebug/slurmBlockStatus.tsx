@@ -36,8 +36,8 @@ export const SlurmBlockStatusPage: NextPage = requireAuth((u) => u.platformRoles
 
     return (
       <div>
-        <Head title="用户封锁状态同步" />
-        <PageTitle titleText={"用户封锁状态同步"} isLoading={isLoading} reload={reload} />
+        <Head title="用户账户封锁状态同步" />
+        <PageTitle titleText={"用户账户封锁状态同步"} isLoading={isLoading} reload={reload} />
 
         <Alert
           type="info"
