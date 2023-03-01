@@ -11,7 +11,7 @@
  */
 
 import { formatDateTime } from "@scow/lib-web/build/utils/datetime";
-import { App, Badge, Descriptions, Space, Spin } from "antd";
+import { Alert, App, Badge, Descriptions, Space, Spin } from "antd";
 import { NextPage } from "next";
 import { useState } from "react";
 import { useAsync } from "react-async";
@@ -41,6 +41,16 @@ export const FetchJobsInfoPage: NextPage = requireAuth((u) => u.platformRoles.in
       <div>
         <Head title="作业信息同步" />
         <PageTitle titleText={"作业信息同步"} isLoading={isLoading} reload={reload} />
+        <Alert
+          type="info"
+          style={{ marginBottom: "4px" }}
+          showIcon
+          message={(
+            <div>
+                SCOW会定时从集群同步作业信息，您可以点击立刻同步执行一次手动同步。
+            </div>
+          )}
+        />
         <Spin spinning={isLoading}>
           {
             data ? (
