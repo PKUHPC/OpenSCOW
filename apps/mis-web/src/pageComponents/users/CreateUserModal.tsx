@@ -11,7 +11,7 @@
  */
 
 import { App, Form, Input, Modal } from "antd";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { api } from "src/apis";
 import { CreateUserFormFields } from "src/pageComponents/users/CreateUserForm";
 import { confirmPasswordFormItemProps, emailRule, passwordRule, userIdRule } from "src/utils/form";
@@ -48,6 +48,10 @@ export const CreateUserModal: React.FC<Props> = ({
       .finally(() => setLoading(false));
 
   };
+
+  useEffect(() => {
+    newUserInfo && form.setFieldsValue(newUserInfo);
+  }, [newUserInfo]);
 
   return (
     <Modal
