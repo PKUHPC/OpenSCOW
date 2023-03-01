@@ -64,9 +64,9 @@
         ".eslintcache"
       ]
     },
-    "@scow/protos#lint": {
+    "lint": {
       "inputs": [
-        "protos/**"
+        "**/*.proto"
       ]
     }
   }

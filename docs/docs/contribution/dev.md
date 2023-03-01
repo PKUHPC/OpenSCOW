@@ -44,7 +44,6 @@ title: 开发
 
 - [volta](https://volta.sh/)：管理node环境
 - [pnpm](https://pnpm.io/pnpm-cli)：推荐standalone安装
-- [buf](https://docs.buf.build/installation)：管理protobuf文件
 
 无需手动安装node。volta将会在第一次运行npm或者node命令时自动安装对应工具的对应版本。
 
