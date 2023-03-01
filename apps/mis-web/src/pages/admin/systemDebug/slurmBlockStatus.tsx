@@ -45,7 +45,7 @@ export const SlurmBlockStatusPage: NextPage = requireAuth((u) => u.platformRoles
           showIcon
           message={(
             <div>
-                在调度器重新启动后，集群与SCOW中用户的封锁状态可能出现不同步的情况，您可以点击刷新手动刷新同步所有用户状态。
+                在调度器重新启动后，集群与SCOW中用户的封锁状态可能出现不同步的情况，您可以点击刷新调度器用户封锁状态，手动刷新同步所有用户状态。
             </div>
           )}
         />
