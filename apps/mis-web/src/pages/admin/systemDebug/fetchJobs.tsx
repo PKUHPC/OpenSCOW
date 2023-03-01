@@ -39,13 +39,13 @@ export const FetchJobsInfoPage: NextPage = requireAuth((u) => u.platformRoles.in
 
     return (
       <div>
-        <Head title="获取作业信息" />
-        <PageTitle titleText={"获取作业信息"} isLoading={isLoading} reload={reload} />
+        <Head title="作业信息同步" />
+        <PageTitle titleText={"作业信息同步"} isLoading={isLoading} reload={reload} />
         <Spin spinning={isLoading}>
           {
             data ? (
               <Descriptions bordered column={1}>
-                <Descriptions.Item label="周期性获取作业状态">
+                <Descriptions.Item label="周期性同步作业信息">
                   <Space>
                     {data.fetchStarted
                       ? <Badge status="success" text="已开启" />
@@ -60,31 +60,31 @@ export const FetchJobsInfoPage: NextPage = requireAuth((u) => u.platformRoles.in
                       }}
                       disabled={changingState}
                     >
-                      {data.fetchStarted ? "停止获取" : "开始获取"}
+                      {data.fetchStarted ? "停止同步" : "开始同步"}
                     </DisabledA>
                   </Space>
                 </Descriptions.Item>
-                <Descriptions.Item label="作业获取周期">
+                <Descriptions.Item label="作业同步周期">
                   {data.schedule}
                 </Descriptions.Item>
-                <Descriptions.Item label="上次获取时间">
+                <Descriptions.Item label="上次同步时间">
                   <Space>
                     <span>
-                      {data.lastFetchTime ? formatDateTime(data.lastFetchTime) : "未获取过"}
+                      {data.lastFetchTime ? formatDateTime(data.lastFetchTime) : "未同步过"}
                     </span>
                     <DisabledA
                       onClick={() => {
                         setFetching(true);
                         api.fetchJobs({})
                           .then(({ newJobsCount }) => {
-                            message.success(`作业获取完成，获取到${newJobsCount}条新纪录。`);
+                            message.success(`作业同步完成，同步到${newJobsCount}条新纪录。`);
                             reload();
                           })
                           .finally(() => setFetching(false));
                       }}
                       disabled={fetching}
                     >
-                    立刻获取作业
+                    立刻同步作业
                     </DisabledA>
                   </Space>
                 </Descriptions.Item>
