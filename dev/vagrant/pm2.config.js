@@ -35,7 +35,6 @@ module.exports = {
       args: "run dev:server",
       interpreter: "pnpm",
       cwd: "./apps/portal-web",
-      watch: "./apps/portal-web",
       env: {
         PORT: "5001",
         AUTH_EXTERNAL_URL: "http://localhost:5000",
@@ -66,7 +65,6 @@ module.exports = {
       script: "npm",
       args: "run dev:server",
       cwd: "./apps/mis-web",
-      watch: "./apps/mis-web",
       interpreter: "pnpm",
       env: {
         PORT: "5003",
@@ -93,10 +91,11 @@ module.exports = {
       }
     },
     {
-      name: "devenv",
-      cwd: "./dev/vagrant",
-      script: "docker",
-      args: "compose -f compose.yml up",
+      name: "dev:libs",
+      cwd: ".",
+      script: "npm",
+      args: "run dev:libs",
+      interpreter: "pnpm"
     }
   ],
 
