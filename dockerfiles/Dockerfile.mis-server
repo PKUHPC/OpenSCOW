@@ -13,15 +13,6 @@ FROM node:hydrogen-alpine@sha256:0d2712ac2b2c1149391173de670406f6e3dbdb1b2ba44e8
 
 RUN apk update && apk add libc6-compat python3 make gcc g++ curl git
 
-ARG BUF_VERSION="1.11.0"
-
-RUN BIN="/usr/local/bin" && \
-  VERSION="${BUF_VERSION}" && \
-  curl -sSL \
-  "https://github.com/bufbuild/buf/releases/download/v${VERSION}/buf-$(uname -s)-$(uname -m)" \
-  -o "${BIN}/buf" && \
-  chmod +x "${BIN}/buf"
-
 RUN corepack enable
 
 WORKDIR /app
