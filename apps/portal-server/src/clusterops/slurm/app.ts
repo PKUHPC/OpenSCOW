@@ -135,8 +135,7 @@ export const slurmAppOps = (cluster: string): AppOps => {
 
           await sftpWriteFile(sftp)(join(workingDirectory, "script.sh"), appConfig.web!.script);
 
-          let otherOptions: string[] = appConfig.slurm?.options ?? [];
-          otherOptions = otherOptions.concat(userSbatchOptions);
+          const configSlurmOptions: string[] = appConfig.slurm?.options ?? [];
 
           const script = generateJobScript({
             jobName,
@@ -148,7 +147,7 @@ export const slurmAppOps = (cluster: string): AppOps => {
             partition: partition,
             workingDirectory,
             qos: qos,
-            otherOptions: otherOptions,
+            otherOptions: configSlurmOptions.concat(userSbatchOptions),
           });
 
           return await submitAndWriteMetadata(script, { SERVER_SESSION_INFO });
@@ -161,6 +160,8 @@ export const slurmAppOps = (cluster: string): AppOps => {
           await sftpWriteFile(sftp)(xstartupPath, appConfig.vnc!.xstartup);
           await sftpChmod(sftp)(xstartupPath, "755");
 
+          const configSlurmOptions: string[] = appConfig.slurm?.options ?? [];
+
           const script = generateJobScript({
             jobName,
             command: VNC_ENTRY_COMMAND,
@@ -172,7 +173,7 @@ export const slurmAppOps = (cluster: string): AppOps => {
             workingDirectory,
             qos: qos,
             output: VNC_OUTPUT_FILE,
-            otherOptions: appConfig.slurm?.options,
+            otherOptions: configSlurmOptions.concat(userSbatchOptions),
           });
 
           return await submitAndWriteMetadata(script, { VNC_SESSION_INFO, VNCSERVER_BIN_PATH });

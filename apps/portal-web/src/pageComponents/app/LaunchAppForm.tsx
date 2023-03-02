@@ -18,7 +18,6 @@ import { useAsync } from "react-async";
 import { useStore } from "simstate";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
-import { splitSbatchArgs } from "src/models/job";
 import { AccountSelector } from "src/pageComponents/job/AccountSelector";
 import { AppCustomAttribute } from "src/pages/api/app/getAppMetadata";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
@@ -59,16 +58,10 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
     const { cluster, coreCount, partition, qos, account, maxTime } = allFormFields;
 
     const customFormKeyValue: {[key: string]: string} = {};
-    let sbatchOptions: string | undefined;
     attributes.forEach((customFormAttribute) => {
       const customFormKey = customFormAttribute.name;
-      if (customFormKey === "sbatchOptions") {
-        sbatchOptions = allFormFields[customFormKey];
-      }
-      else customFormKeyValue[customFormKey] = allFormFields[customFormKey];
+      customFormKeyValue[customFormKey] = allFormFields[customFormKey];
     });
-
-    const userSbatchOptions = sbatchOptions ? splitSbatchArgs(sbatchOptions) : [];
 
     setLoading(true);
     await api.createAppSession({ body: {
@@ -80,7 +73,6 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
       account,
       maxTime,
       customAttributes: customFormKeyValue,
-      userSbatchOptions,
     } })
       .then(() => {
         message.success("创建成功！");

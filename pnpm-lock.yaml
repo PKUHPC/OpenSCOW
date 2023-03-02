@@ -4,6 +4,7 @@ importers:
 
   .:
     specifiers:
+      '@bufbuild/buf': 1.15.0
       '@changesets/cli': 2.26.0
       '@commitlint/config-conventional': 17.4.4
       '@ddadaal/eslint-config': 1.9.0
@@ -40,6 +41,7 @@ importers:
       turbo: 1.8.2
       typescript: 4.9.5
     devDependencies:
+      '@bufbuild/buf': 1.15.0
       '@changesets/cli': 2.26.0
       '@commitlint/config-conventional': 17.4.4
       '@ddadaal/eslint-config': 1.9.0_5iaio6tyb3577flnrafh2uytzm
@@ -2159,6 +2161,74 @@ packages:
 
   /@bcoe/v8-coverage/0.2.3:
     resolution: {integrity: sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==}
+    dev: true
+
+  /@bufbuild/buf-darwin-arm64/1.15.0:
+    resolution: {integrity: sha512-sLN6uGc8sIBALa7Q4fB6rW9NM0MXK32pH6RRDUdl7aDrp/3A6TLKKBGiHcY81axUyxDTUNFb8dOwhHTI2H8FzQ==}
+    engines: {node: '>=12'}
+    cpu: [arm64]
+    os: [darwin]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /@bufbuild/buf-darwin-x64/1.15.0:
+    resolution: {integrity: sha512-iHml29I/hOl7ORyp9ohiV7fC1WqPbM5UjogwVpA8j06o5SgxRhp42nd80XRAXCM+65ecwiu5JVuspicGzQFOgg==}
+    engines: {node: '>=12'}
+    cpu: [x64]
+    os: [darwin]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /@bufbuild/buf-linux-aarch64/1.15.0:
+    resolution: {integrity: sha512-YQHXqV1HhdpmIUrYg+gZNWCf43XHJJO5TlJT+pzXB/92PoN8gNP3KdxeRaM2sExcCs91G6zy1/Ms9N6DpeidUQ==}
+    engines: {node: '>=12'}
+    cpu: [arm64]
+    os: [linux]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /@bufbuild/buf-linux-x64/1.15.0:
+    resolution: {integrity: sha512-DD2OcsfofawRPQKXLFMqV2GSzi4WyE7kKE1PvXBtJy7sombv5TM26vgdb+DQv4T4Z2i7vhKshnflNkfd3QXtXA==}
+    engines: {node: '>=12'}
+    cpu: [x64]
+    os: [linux]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /@bufbuild/buf-win32-arm64/1.15.0:
+    resolution: {integrity: sha512-wk65iDXWRicfrt/9Gb1voAn9eGP2giQfKMrKOoEyytnDHFolMSmQimKH6iQ1uS5Vn0gI/BVp582cF1m9YsbXEg==}
+    engines: {node: '>=12'}
+    cpu: [arm64]
+    os: [win32]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /@bufbuild/buf-win32-x64/1.15.0:
+    resolution: {integrity: sha512-KVoMj52ghYfLwGjQ+t19XZiQy8jGSGUYIe/yVZz08rsm5msXHGYOt++Bk3wr48rcv8gts8jo2/h1Ebkj+F6emw==}
+    engines: {node: '>=12'}
+    cpu: [x64]
+    os: [win32]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /@bufbuild/buf/1.15.0:
+    resolution: {integrity: sha512-HX6AjKiI8TVFJKWdDGIUC/zZQG/8sf5FbmU5VdbK/U8tbfCwBADkJ6I+qP6HnDDtSU4obS164J0sibdGhAJKqg==}
+    engines: {node: '>=12'}
+    hasBin: true
+    requiresBuild: true
+    optionalDependencies:
+      '@bufbuild/buf-darwin-arm64': 1.15.0
+      '@bufbuild/buf-darwin-x64': 1.15.0
+      '@bufbuild/buf-linux-aarch64': 1.15.0
+      '@bufbuild/buf-linux-x64': 1.15.0
+      '@bufbuild/buf-win32-arm64': 1.15.0
+      '@bufbuild/buf-win32-x64': 1.15.0
     dev: true
 
   /@changesets/apply-release-plan/6.1.3:
