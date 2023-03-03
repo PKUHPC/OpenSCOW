@@ -39,7 +39,6 @@ export const CreateFileModal: React.FC<Props> = ({ open, onClose, path, reload, 
     setLoading(true);
     await api.createFile({ body: { cluster, path: join(path, newFileName) } })
       .httpError(409, () => { message.error("同名文件或者目录已经存在！"); })
-      .httpError(500, (e) => { message.error(e?.message); })
       .then(() => {
         message.success("创建成功");
         reload();

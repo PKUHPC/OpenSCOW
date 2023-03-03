@@ -30,7 +30,6 @@ export interface CreateFileSchema {
     204: null;
     409: { code: "ALREADY_EXISTS" };
     400: { code: "INVALID_CLUSTER" };
-    500: { code: "INVALID_ARGUMENT", message: string };
   }
 }
 
@@ -51,7 +50,6 @@ export default route<CreateFileSchema>("CreateFileSchema", async (req, res) => {
   }).then(() => ({ 204: null }), handlegRPCError({
     [status.NOT_FOUND]: () => ({ 400: { code: "INVALID_CLUSTER" as const } }),
     [status.ALREADY_EXISTS]: () => ({ 409: { code: "ALREADY_EXISTS" as const } }),
-    [status.INVALID_ARGUMENT]: (e) => ({ 500: { code: "INVALID_ARGUMENT" as const, message: e?.details } }),
   }));
 
 });

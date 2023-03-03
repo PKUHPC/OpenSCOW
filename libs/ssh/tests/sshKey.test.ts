@@ -12,8 +12,8 @@
 
 import { join } from "path";
 import { insertKeyAsRoot } from "src/key";
-import { sftpExists, sftpReadFile, sftpStat, sshRmrf } from "src/sftp";
-import { insertKeyAsUser, sshConnect } from "src/ssh";
+import { sftpExists, sftpReadFile, sftpStat } from "src/sftp";
+import { insertKeyAsUser, sshConnect, sshRmrf } from "src/ssh";
 
 import { connectToTestServerAsRoot,
   createTestItems, resetTestServerAsRoot, rootKeyPair, target, TestSshServer } from "./utils";
