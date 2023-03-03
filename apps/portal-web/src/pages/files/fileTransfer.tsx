@@ -20,19 +20,27 @@ import difference from "lodash/difference";
 import React, { useState } from "react";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { FileInfo, FileType } from "src/pages/api/file/list";
+import { Cluster } from "src/utils/config";
 import styled from "styled-components";
 
 
-interface TableTransferProps extends TransferProps<TransferItem> {
-  dataSource: FileInfo[];
-  leftColumns: ColumnsType<FileInfo>;
-  rightColumns: ColumnsType<FileInfo>;
-  leftPath: string;
-  rightPath: string;
-  leftURLPrefix: string;
-  rightURLPrefix: string;
+interface FileItem extends FileInfo {
+  clusterId: string;
 }
 
+interface TableTransferProps extends TransferProps<TransferItem> {
+  dataSource: FileItem[];
+  leftColumns: ColumnsType<FileInfo>;
+  rightColumns: ColumnsType<FileInfo>;
+  leftCluster: Cluster | undefined;
+  rightCluster: Cluster | undefined;
+  leftPath: string | undefined;
+  rightPath: string | undefined;
+  leftURLPrefix: string | undefined;
+  rightURLPrefix: string | undefined;
+}
+
+// 解析权限函数
 const nodeModeToString = (mode: number) => {
   const numberPermission = (mode & parseInt("777", 8)).toString(8);
 
@@ -54,11 +62,7 @@ const TopBar = styled(FilterFormContainer)`
   }
 `;
 
-
-
-
-
-// Customize Table Transfer
+// 自定义Table Transfer
 const TableTransfer = ({ leftColumns, rightColumns, leftPath, rightPath, ...restProps }: TableTransferProps) => (
   <Transfer {...restProps}>
     {({
@@ -115,7 +119,8 @@ const TableTransfer = ({ leftColumns, rightColumns, leftPath, rightPath, ...rest
 );
 
 
-const mockData: FileInfo[] = Array.from({ length: 20 }).map((_, i) => ({
+const mockData: FileItem[] = Array.from({ length: 20 }).map((_, i) => ({
+  clusterId: i < 10 ? "cluster1" : "cluster2",
   name: i.toString(),
   type: "FILE" as FileType,
   mtime: `content${i + 1}`,
@@ -124,10 +129,14 @@ const mockData: FileInfo[] = Array.from({ length: 20 }).map((_, i) => ({
 }));
 
 const originTargetKeys = mockData
-  .filter((item) => Number(item.name) % 3 > 1)
+  .filter((item) => item.clusterId === "cluster2")
   .map((item) => item.name);
 
 const TableColumns: ColumnsType<FileInfo> = [
+  {
+    dataIndex: "clusterId",
+    title: "集群ID",
+  },
   {
     dataIndex: "name",
     title: "文件名",
@@ -157,6 +166,13 @@ const TableColumns: ColumnsType<FileInfo> = [
 const FileTransferPage: React.FC = () => {
   const [targetKeys, setTargetKeys] = useState<string[]>(originTargetKeys);
 
+  const [leftCluster, setLeftCluster] = useState<Cluster>();
+  const [rightCluster, setRightCluster] = useState<Cluster>();
+  const [leftPath, setLeftPath] = useState<string>("");
+  const [rightPath, setRightPath] = useState<string>("");
+  const [leftURLPrefix, setLeftURLPrefix] = useState<string>("");
+  const [rightURLPrefix, setRightURLPrefix] = useState<string>("");
+
   const onChange = (nextTargetKeys: string[]) => {
     setTargetKeys(nextTargetKeys);
   };
@@ -172,10 +188,12 @@ const FileTransferPage: React.FC = () => {
           (inputValue, item) => item.title!.indexOf(inputValue) !== -1 || item.tag.indexOf(inputValue) !== -1}
         leftColumns={TableColumns}
         rightColumns={TableColumns}
-        leftPath={""}
-        rightPath={""}
-        leftURLPrefix={""}
-        rightURLPrefix={""}
+        leftCluster={leftCluster}
+        rightCluster={rightCluster}
+        leftPath={leftPath}
+        rightPath={rightPath}
+        leftURLPrefix={leftURLPrefix}
+        rightURLPrefix={rightURLPrefix}
       />
     </>
   );
