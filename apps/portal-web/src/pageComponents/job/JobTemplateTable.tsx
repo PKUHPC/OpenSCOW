@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { JobTemplate } from "@scow/protos/build/portal/job";
+import { JobTemplateInfo } from "@scow/protos/build/portal/job";
 import { Button, Form, Space, Table } from "antd";
 import Link from "next/link";
 import React, { useCallback, useState } from "react";
@@ -28,7 +28,7 @@ interface FilterForm {
   cluster: Cluster;
 }
 
-export const SavedJobsTable: React.FC<Props> = () => {
+export const JobTemplateTable: React.FC<Props> = () => {
 
   const defaultClusterStore = useStore(DefaultClusterStore);
 
@@ -41,7 +41,7 @@ export const SavedJobsTable: React.FC<Props> = () => {
   const [form] = Form.useForm<FilterForm>();
 
   const promiseFn = useCallback(async () => {
-    return await api.getSavedJobs({ query: {
+    return await api.listJobTemplates({ query: {
       cluster: query.cluster.id,
     } }).then((x) => x.results);
   }, [query.cluster]);
@@ -82,7 +82,7 @@ export const SavedJobsTable: React.FC<Props> = () => {
 };
 
 interface InfoTableProps {
-  data?: JobTemplate[];
+  data?: JobTemplateInfo[];
   isLoading: boolean;
   cluster: Cluster;
 }
@@ -99,13 +99,13 @@ const InfoTable: React.FC<InfoTableProps> = ({
       rowKey={(x) => x.jobName}
       scroll={{ x: true }}
     >
-      <Table.Column<JobTemplate>
+      <Table.Column<JobTemplateInfo>
         dataIndex="jobName"
         title="模板名"
         sorter={(a, b) => a.jobName.localeCompare(b.jobName)}
       />
-      <Table.Column<JobTemplate> dataIndex="comment" title="备注" />
-      <Table.Column<JobTemplate>
+      <Table.Column<JobTemplateInfo> dataIndex="comment" title="备注" />
+      <Table.Column<JobTemplateInfo>
         title="操作"
         render={(_, r) => (
           <Space>
@@ -113,7 +113,7 @@ const InfoTable: React.FC<InfoTableProps> = ({
               pathname: "/jobs/submit",
               query: {
                 cluster: cluster.id,
-                savedJobId: r.id,
+                jobTemplateId: r.id,
               },
             }}
             >

@@ -11,12 +11,12 @@
  */
 
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
-import { JobServiceClient, JobTemplate } from "@scow/protos/build/portal/job";
+import { JobServiceClient, JobTemplateInfo } from "@scow/protos/build/portal/job";
 import { authenticate } from "src/auth/server";
 import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
 
-export interface GetSavedJobsSchema {
+export interface ListJobTemplatesSchema {
 
   method: "GET";
 
@@ -26,7 +26,7 @@ export interface GetSavedJobsSchema {
 
   responses: {
     200: {
-      results: JobTemplate[];
+      results: JobTemplateInfo[];
     }
 
     400: {
@@ -39,7 +39,7 @@ export interface GetSavedJobsSchema {
 
 const auth = authenticate(() => true);
 
-export default route<GetSavedJobsSchema>("GetSavedJobsSchema", async (req, res) => {
+export default route<ListJobTemplatesSchema>("ListJobTemplatesSchema", async (req, res) => {
 
   const info = await auth(req, res);
 
