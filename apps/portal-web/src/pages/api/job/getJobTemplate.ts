@@ -12,13 +12,13 @@
 
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { status } from "@grpc/grpc-js";
-import { JobServiceClient, NewJobInfo } from "@scow/protos/build/portal/job";
+import { JobServiceClient, JobTemplate } from "@scow/protos/build/portal/job";
 import { authenticate } from "src/auth/server";
 import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
 import { handlegRPCError } from "src/utils/server";
 
-export interface GetSavedJobSchema {
+export interface GetJobTemplateSchema {
 
   method: "GET";
 
@@ -29,7 +29,7 @@ export interface GetSavedJobSchema {
 
   responses: {
     200: {
-      jobInfo: NewJobInfo;
+      template: JobTemplate;
     }
 
     400: {
@@ -43,7 +43,7 @@ export interface GetSavedJobSchema {
 
 const auth = authenticate(() => true);
 
-export default route<GetSavedJobSchema>("GetSavedJobSchema", async (req, res) => {
+export default route<GetJobTemplateSchema>("GetJobTemplateSchema", async (req, res) => {
 
 
   const info = await auth(req, res);
@@ -56,7 +56,7 @@ export default route<GetSavedJobSchema>("GetSavedJobSchema", async (req, res) =>
 
   return asyncUnaryCall(client, "getJobTemplate", {
     userId: info.identityId, cluster, templateId: id,
-  }).then(({ jobInfo }) => ({ 200: { jobInfo: jobInfo! } }), handlegRPCError({
+  }).then(({ template }) => ({ 200: { template: template! } }), handlegRPCError({
     [status.NOT_FOUND]: () => ({ 404: { code: "TEMPLATE_NOT_FOUND" } as const }),
   }));
 

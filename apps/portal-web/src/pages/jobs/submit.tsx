@@ -28,33 +28,33 @@ export const SubmitJobPage: NextPage = requireAuth(() => true)(
     const query = useQuerystring();
 
     const cluster = queryToString(query.cluster);
-    const savedJobId = queryToString(query.savedJobId);
+    const jobTemplateId = queryToString(query.jobTemplateId);
 
     const { data, isLoading } = useAsync({
       promiseFn: useCallback(async () => {
-        if (cluster && savedJobId) {
+        if (cluster && jobTemplateId) {
           const clusterObj = publicConfig.CLUSTERS.find((x) => x.id === cluster);
           if (!clusterObj) { return undefined; }
-          return api.getSavedJob({ query: { cluster, id: savedJobId } })
-            .then(({ jobInfo }) => ({
+          return api.getJobTemplate({ query: { cluster, id: jobTemplateId } })
+            .then(({ template }) => ({
               cluster: clusterObj,
-              command: jobInfo.command,
-              jobName: jobInfo.jobName,
-              partition: jobInfo.partition,
-              nodeCount: jobInfo.nodeCount,
-              coreCount: jobInfo.coreCount,
-              qos: jobInfo.qos,
-              maxTime: jobInfo.maxTime,
-              account: jobInfo.account,
-              comment: jobInfo.comment || "",
-              workingDirectory: jobInfo.workingDirectory,
+              command: template.command,
+              jobName: template.jobName,
+              partition: template.partition,
+              nodeCount: template.nodeCount,
+              coreCount: template.coreCount,
+              qos: template.qos,
+              maxTime: template.maxTime,
+              account: template.account,
+              comment: template.comment || "",
+              workingDirectory: template.workingDirectory,
               save: false,
             }));
         } else {
           return undefined;
         }
       },
-      [cluster, savedJobId]),
+      [cluster, jobTemplateId]),
     });
 
     return (

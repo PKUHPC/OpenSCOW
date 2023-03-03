@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { NewJobInfo } from "src/clusterops/api/job";
+import { JobTemplate } from "src/clusterops/api/job";
 
 export function parseSbatchOutput(output: string): number {
   // Submitted batch job 34987
@@ -32,7 +32,7 @@ export interface JobMetadata {
   workingDirectory: string;
 }
 
-export function generateJobScript(jobInfo: NewJobInfo & {
+export function generateJobScript(jobInfo: JobTemplate & {
   output?: string;
   otherOptions?: string[];
 }) {
