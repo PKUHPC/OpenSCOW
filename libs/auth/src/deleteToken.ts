@@ -10,22 +10,6 @@
  * See the Mulan PSL v2 for more details.
  */
 
-// import { jsonFetch } from "@ddadaal/next-typed-api-routes-runtime";
-// import path from "path";
-
-// interface deleteTokenSchema {
-//     query: { token: string },
-//     responses: { 204: null }
-// }
-
-// export async function deleteToken(token: string, authUrl: string) {
-//   await jsonFetch<deleteTokenSchema>({
-//     method: "DELETE",
-//     path: path.join(authUrl, "/token"),
-//     query: { token },
-//   });
-// }
-
 import { applicationJsonHeaders } from "./utils";
 
 
