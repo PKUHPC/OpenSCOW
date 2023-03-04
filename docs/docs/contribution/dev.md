@@ -109,7 +109,7 @@ pnpm build
 
 ## 测试开发环境
 
-我们使用docker搭建了一套简单的开发环境，可以用来跑一些项目的测试。具体开发环境请参考[docker-compose.dev.yml](%REPO_FILE_URL%/dev/docker-compose.dev.yml)。
+我们使用docker搭建了一套简单的开发环境，主要用于运行项目的单元和集成测试。具体开发环境请参考[docker-compose.dev.yml](%REPO_FILE_URL%/dev/docker-compose.dev.yml)。
 
 开发环境包括
 
@@ -130,7 +130,7 @@ pnpm build
 
 Dev Container在启动时同时会启动测试开发环境，且测试开发环境的故启动后您不再需要手动启动开发环境。且这些服务均启动于开发容器的网络中，可以直接使用`localhost`连接到这些服务。
 
-SSH服务器注意：由于SSH服务器容器和开发环境所在容器为并列关系，SSH服务器不能直接使用开发容器所在的文件，故您需要在启动Dev Container后手动生成SSH密钥并配置公钥登录：
+注意：由于SSH服务器容器和开发环境所在容器为并列关系，SSH服务器不能直接使用开发容器所在的文件，故您需要在启动Dev Container后手动生成SSH密钥并配置公钥登录：
 
 ```bash
 # 在Dev Container中执行
