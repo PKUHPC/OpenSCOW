@@ -12,6 +12,7 @@
 
 export { changePassword } from "./changePassword";
 export { createUser } from "./createUser";
+export { deleteToken } from "./deleteToken";
 export type { Capabilities } from "./getCapabilities";
 export { getCapabilities } from "./getCapabilities";
 export { getUser } from "./getUser";

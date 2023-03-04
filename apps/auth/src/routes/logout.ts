@@ -12,7 +12,7 @@
 
 import { Static, Type } from "@sinclair/typebox";
 import fp from "fastify-plugin";
-const QuerystringSchema = Type.Object({
+const BodySchema = Type.Object({
   token: Type.String(),
 });
 
@@ -25,19 +25,19 @@ const ResponsesSchema = Type.Object({
  */
 export const logoutRoute = fp(async (f) => {
   f.delete<{
-    Querystring: Static<typeof QuerystringSchema>
+    Body: Static<typeof BodySchema>
     Responses: Static<typeof ResponsesSchema>,
   }>(
     "/token",
     {
       schema: {
-        querystring: QuerystringSchema,
+        body: BodySchema,
         response: ResponsesSchema.properties,
       },
     },
     async (req, rep) => {
 
-      const { token } = req.query;
+      const { token } = req.body;
 
       await f.redis.del(token);
 
