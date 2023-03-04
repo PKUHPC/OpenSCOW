@@ -107,28 +107,47 @@ pnpm build
 
 ```
 
-
 ## 测试开发环境
 
 我们使用docker搭建了一套简单的开发环境，可以用来跑一些项目的测试。具体开发环境请参考[docker-compose.dev.yml](%REPO_FILE_URL%/dev/docker-compose.dev.yml)。
 
-:::caution
-
-使用Dev Container环境启动的开发环境目前无法直接使用测试开发环境。请使用vagrant进行开发，请参考(文档)[%REPO_FILE_URL%/dev/vagrant/README.md]。
-
-:::
-
 开发环境包括
 
 - 可以通过`3306`端口连接的的MySQL8数据库
-    - root密码为[dev/.env.dev](%REPO_FILE_URL%/dev/.env.dev)中的`MYSQL_ROOT_PASSWORD`
+    - root密码为[dev/.env.dev](%REPO_FILE_URL%/dev/.env.dev)中的`MYSQL_ROOT_PASSWORD`，为`mysqlrootpassword`
 - 可以通过`6379`端口连接的redis:alpine
 - 可以通过`3307`端口连接的mariadb:5.5作为job table
-    - root密码为[dev/.env.dev](%REPO_FILE_URL%/dev/.env.dev)中的`JOB_TABLE_PASSWORD`
-- 可以通过`22222`端口连接的SSH服务器
-    - 可以直接使用本地的`~/.ssh/id_rsa.pub`登录`root`和`test`用户，也可以通过用户名`test`、密码`test`登录`test`用户
+    - root密码为[dev/.env.dev](%REPO_FILE_URL%/dev/.env.dev)中的`JOB_TABLE_PASSWORD`，为`jobtablepassword`
 - 可以通过`389`端口连接的LDAP服务器，详情参考[LDAP文档](../deploy/config/auth/ldap.md#LDAP镜像)
 - 可以通过`3890`端口访问的[phpLDAPadmin](https://phpldapadmin.sourceforge.net/wiki/index.php/Main_Page)，可以用于登录`389`端口的LDAP服务器
+    - **Dev Container**：由于这个容器修改监听端口比较复杂，且开发环境并不会直接和这个容器交互，故这个容器映射到的宿主机的3890端口。
+- 可以通过`22222`端口连接的SSH服务器
+    - 具有两个用户：root用户`root`（密码`root`）和普通用户`test`（密码`test`）
+    - **本地开发**：可以直接使用本地的`~/.ssh/id_rsa.pub`登录`root`和`test`用户
+    - **Dev Container**：见下文
+
+### Dev Container环境
+
+Dev Container在启动时同时会启动测试开发环境，且测试开发环境的故启动后您不再需要手动启动开发环境。且这些服务均启动于开发容器的网络中，可以直接使用`localhost`连接到这些服务。
+
+SSH服务器注意：由于SSH服务器容器和开发环境所在容器为并列关系，SSH服务器不能直接使用开发容器所在的文件，故您需要在启动Dev Container后手动生成SSH密钥并配置公钥登录：
+
+```bash
+# 在Dev Container中执行
+
+# 生成RSA类型SSH公钥
+ssh-keygen -t rsa -N '' -f ~/.ssh/id_rsa
+
+# 给root和test用户配置公钥登录
+
+# 运行后输入root密码root
+ssh-copy-id -p22222 root@localhost
+
+# 运行后输入test密码test
+ssh-copy-id -p22222 test@localhost
+```
+
+### 本地开发
 
 ```bash
 # 构建并启动开发环境

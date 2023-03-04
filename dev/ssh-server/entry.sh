@@ -8,10 +8,17 @@
 # MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 # See the Mulan PSL v2 for more details.
 
-cp /id_rsa.pub /home/test/.ssh/authorized_keys
-cp /id_rsa.pub /root/.ssh/authorized_keys
+if [ -f /id_rsa.pub ]; then
+  cp /id_rsa.pub /home/test/.ssh/authorized_keys
+  cp /id_rsa.pub /root/.ssh/authorized_keys
 
-chown -R root: /root/.ssh/
-chown -R test: /home/test/.ssh/
+  chown -R root: /root/.ssh/
+  chown -R test: /home/test/.ssh/
+fi
+
+
+if [ -n "$SSH_PORT" ]; then
+  echo -e "Port $SSH_PORT\n" >>/etc/ssh/sshd_config
+fi
 
 /usr/sbin/sshd -D
