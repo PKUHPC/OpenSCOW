@@ -32,7 +32,7 @@ const authUrl = "auth:5000";
 
 it("raises correct request", async () => {
   await getUser(authUrl, { identityId });
-  
+
   expect(fetch).toHaveBeenCalledWith(
     authUrl + "/user?identityId=" + identityId,
     {
