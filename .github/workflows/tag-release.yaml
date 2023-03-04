@@ -16,7 +16,7 @@ jobs:
         with:
           fetch-depth: 2
           token: ${{ secrets.SCOW_DEPLOYMENT_PAT }}
-      - uses: fregante/setup-git-user@v1
+      - uses: fregante/setup-git-user@v2
       - uses: actions/setup-node@v3
         with:
           node-version: 18.x
