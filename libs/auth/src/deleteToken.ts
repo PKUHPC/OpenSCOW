@@ -19,5 +19,6 @@ export async function deleteToken(token: string, authUrl: string) {
     body: JSON.stringify(token),
     headers: applicationJsonHeaders,
   });
+  return { 204: null };
 }
 
