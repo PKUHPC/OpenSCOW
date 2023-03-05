@@ -126,7 +126,10 @@ importers:
       '@types/ldapjs': 2.2.5
 
   apps/gateway:
-    specifiers: {}
+    specifiers:
+      '@scow/lib-config': workspace:*
+    dependencies:
+      '@scow/lib-config': link:../../libs/libconfig
 
   apps/mis-server:
     specifiers:

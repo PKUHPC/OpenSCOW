@@ -1,0 +1,43 @@
+# Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
+# SCOW is licensed under Mulan PSL v2.
+# You can use this software according to the terms and conditions of the Mulan PSL v2.
+# You may obtain a copy of Mulan PSL v2 at:
+#          http://license.coscl.org.cn/MulanPSL2
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+# EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+# MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+# See the Mulan PSL v2 for more details.
+
+
+FROM node:hydrogen-alpine@sha256:f8a51c36b0be7434bbf867d4a08decf0100e656203d893b9b0f8b1fe9e40daea AS base
+
+RUN apk update && apk add libc6-compat python3 make gcc g++ curl nginx
+
+RUN corepack enable
+
+WORKDIR /app
+COPY pnpm-lock.yaml .
+
+RUN pnpm fetch
+
+COPY . .
+
+RUN pnpm build
+
+RUN node scripts/copyDist.mjs
+
+RUN cd ./dist && pnpm i --offline --prod --frozen-lockfile
+
+FROM node:hydrogen-alpine@sha256:f8a51c36b0be7434bbf867d4a08decf0100e656203d893b9b0f8b1fe9e40daea AS runner
+
+WORKDIR /app
+
+COPY --from=builder /app/dist .
+COPY entrypoint.sh .
+
+ENV NODE_ENV production
+
+EXPOSE 3000 80 5000
+
+ENTRYPOINT [ "./entrypoint.sh" ]
+

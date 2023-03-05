@@ -96,28 +96,8 @@ jobs:
     strategy:
       matrix:
         include:
-          - name: gateway
-            file: gateway
-            build_args: ""
-
-          - name: mis-server
-            file: mis-server
-            build_args: ""
-
-          - name: portal-server
-            file: portal-server
-            build_args: ""
-
-          - name: auth
-            file: auth
-            build_args: ""
-
-          - name: mis-web
-            file: mis-web
-            build_args: ""
-
-          - name: portal-web
-            file: portal-web
+          - name: scow
+            file: unified
             build_args: ""
 
           - name: docs

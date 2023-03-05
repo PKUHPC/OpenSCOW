@@ -15,12 +15,11 @@
  * The files specified in the `files` fields of package.json of the app and libs will be copied.
  *
  * Usage:
-  *  node scripts/copyDist.mjs [appDir]
+  *  node scripts/copyDist.mjs [appDir...]
   *
   *  e.g. node scripts/copyDist.mjs apps/mis-server
  *
- * If appDir is not specified, the script will use the only app under apps folder.
- * If there are multiple apps under apps folder, an error will be thrown.
+ * If appDir is not specified, the script will copy all apps and libs
  */
 
 import fs from "node:fs";
@@ -40,14 +39,11 @@ const lockFile = await readWantedLockfile(".", {});
 if (!lockFile) { throw new Error("No lockfile found"); }
 
 // apps/mis-server
-let appDir = process.argv[2];
+let appDirs = process.argv.slice(2);
 
-if (!appDir) {
-  const apps = await fs.promises.readdir(APPS_BASE_PATH);
-  if (apps.length !== 1) {
-    throw new Error(`Expected one project under ${APPS_BASE_PATH}.`);
-  }
-  appDir = join(APPS_BASE_PATH, apps[0]);
+if (appDirs.length === 0) {
+  appDirs = ["portal-web", "portal-server", "auth", "mis-web", "mis-server", "gateway"]
+    .map((x) => join(APPS_BASE_PATH, x));
 }
 
 /**
@@ -90,31 +86,39 @@ for (const item of ROOT_ITEMS) {
   await cp(item, join(DIST_BASE_PATH, item));
 }
 
-// copy lib depepdencies
-const snapshot = lockFile.importers[appDir];
+const copiedLibs = new Set();
 
-for (const [name, value] of Object.entries(snapshot.dependencies)) {
-  if (!name.startsWith("@scow/")) { continue; }
+for (const appDir of appDirs) {
 
-  console.log("Handling internal dep", name);
-  const libDir = value.substring("link:../../".length);
+  console.log("Copying app " + appDir);
 
-  const requiredFiles = await getRequiredFiles(libDir);
+  // copy the app
+  const requiredFiles = await getRequiredFiles(appDir);
   for (const file of requiredFiles) {
 
-    const from = join(libDir, file);
-    const to = join(DIST_BASE_PATH, libDir, file);
+    const from = join(appDir, file);
+    const to = join(DIST_BASE_PATH, appDir, file);
 
     await cp(from, to);
   }
-}
 
-// copy app
-const requiredFiles = await getRequiredFiles(appDir);
-for (const file of requiredFiles) {
+  // copy lib depepdencies
+  const snapshot = lockFile.importers[appDir];
+  for (const [name, value] of Object.entries(snapshot.dependencies)) {
+    if (name.startsWith("@scow/") && !copiedLibs.has(name)) {
+      console.log("Copying lib " + name);
+      const libDir = value.substring("link:../../".length);
 
-  const from = join(appDir, file);
-  const to = join(DIST_BASE_PATH, appDir, file);
+      const requiredFiles = await getRequiredFiles(libDir);
+      for (const file of requiredFiles) {
 
-  await cp(from, to);
+        const from = join(libDir, file);
+        const to = join(DIST_BASE_PATH, libDir, file);
+
+        await cp(from, to);
+      }
+
+      copiedLibs.add(name);
+    }
+  }
 }
