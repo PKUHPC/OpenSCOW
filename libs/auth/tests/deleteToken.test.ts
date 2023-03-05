@@ -17,12 +17,8 @@ import { mockFetch } from "tests/utils";
 const token = "123";
 
 mockFetch((input) => {
-  const query = new URL(input as string).searchParams.get("token");
-  if (query === token) {
-    return { status: 204 };
-  } else {
-    return { status: 204 };
-  }
+  new URL(input as string).searchParams.get("token");
+  return { status: 204 };
 });
 
 const authUrl = "auth:5000";

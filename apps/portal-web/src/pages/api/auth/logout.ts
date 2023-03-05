@@ -17,7 +17,7 @@ import { runtimeConfig } from "src/utils/config";
 
 export interface LogoutSchema {
   method: "DELETE";
-  
+
   responses: {
     204: null;
   }
