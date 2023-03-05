@@ -14,10 +14,10 @@ process.env.AUTH_TYPE = "ssh";
 
 import { FastifyInstance } from "fastify";
 import { buildApp } from "src/app";
-import { allowedCallbackUrl, createFormData } from "tests/utils";
+import { allowedCallbackUrl, createFormData, testUserPassword, testUserUsername } from "tests/utils";
 
-const username = "test";
-const password = "1234";
+const username = testUserUsername;
+const password = testUserPassword;
 const token = "token";
 const code = "code";
 

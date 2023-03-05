@@ -12,6 +12,9 @@
 
 import { authConfig } from "src/config/auth";
 
+export const testUserUsername = "test";
+export const testUserPassword = "test";
+
 export const allowedCallbackUrl = "http://" + authConfig.allowedCallbackHostnames[0] + "/callback";
 export const notAllowedCallbackUrl = "http://baddomain.com:29392/callback";
 
