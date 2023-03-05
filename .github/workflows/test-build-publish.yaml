@@ -97,7 +97,7 @@ jobs:
       matrix:
         include:
           - name: scow
-            file: unified
+            file: scow
             build_args: ""
 
           - name: docs
@@ -134,7 +134,7 @@ jobs:
           push: true
           build-args: ${{ matrix.build_args }}
           tags: ${{ steps.meta.outputs.tags }}
-          file: dockerfiles/Dockerfile.${{ matrix.file }}
+          file: docker/Dockerfile.${{ matrix.file }}
           labels: ${{ steps.meta.outputs.labels }}
           # only build arm64 in master commits
           platforms: linux/amd64${{ github.ref_type == 'tag' && ',linux/arm64' || '' }}
