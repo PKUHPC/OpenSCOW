@@ -28,6 +28,7 @@ COPY . .
 
 RUN pnpm i --offline --frozen-lockfile
 
+RUN node scripts/createVersionFile.mjs version.json
 RUN pnpm build
 
 RUN node scripts/copyDist.mjs
@@ -41,6 +42,7 @@ RUN apk update && apk add nginx
 WORKDIR /app
 
 COPY --from=builder /app/dist .
+COPY --from=builder /app/version.json ./
 COPY docker/entrypoint.sh .
 
 ENV NODE_ENV production
