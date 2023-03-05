@@ -27,10 +27,9 @@ it("raises correct request", async () => {
   await deleteToken(token, authUrl);
 
   expect(fetch).toHaveBeenCalledWith(
-    authUrl + "/token",
+    authUrl + "/token?token=" + token,
     {
       method: "DELETE",
-      body: JSON.stringify(token),
       headers: applicationJsonHeaders,
     },
   );

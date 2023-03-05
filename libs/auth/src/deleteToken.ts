@@ -12,13 +12,10 @@
 
 import { applicationJsonHeaders } from "./utils";
 
-
 export async function deleteToken(token: string, authUrl: string) {
-  await fetch(authUrl + "/token", {
+  return await fetch(authUrl + "/token?token=" + token, {
     method: "DELETE",
-    body: JSON.stringify(token),
     headers: applicationJsonHeaders,
   });
-  return { 204: null };
 }
 
