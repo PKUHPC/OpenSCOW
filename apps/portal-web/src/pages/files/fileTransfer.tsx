@@ -10,35 +10,30 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Col, Row } from "antd";
+import { ArrowLeftOutlined, ArrowRightOutlined } from "@ant-design/icons";
+import { Button, Col, Row } from "antd";
 import { NextPage } from "next";
 import { requireAuth } from "src/auth/requireAuth";
 import { ClusterFileTable } from "src/pageComponents/filemanager/ClusterFileTable";
-import { publicConfig } from "src/utils/config";
 
 export const FileTransferPage: NextPage = requireAuth(() => true)(() => {
-  const cluster1 = "hpc01";
-  const clusterObj1 = publicConfig.CLUSTERS.find((x) => x.id === cluster1);
-  const homePath1 = "/data/home/demo_user";
-
-  const cluster2 = "hpc02";
-  const clusterObj2 = publicConfig.CLUSTERS.find((x) => x.id === cluster2);
-  const homePath2 = "/data/home/demo_user";
 
   return (
     <>
-      <Row>
-        <Col span={12}>
-          <ClusterFileTable
-            cluster={clusterObj1!}
-            homePath={ homePath1 }
-          />
+      <Row justify="space-around" align="middle">
+        <Col span={11}>
+          <ClusterFileTable />
         </Col>
-        <Col span={12}>
-          <ClusterFileTable
-            cluster={clusterObj2!}
-            homePath={ homePath2 }
-          />
+        <Col span={0.5}>
+          <Row justify="center">
+            <Button icon={<ArrowRightOutlined />} />
+          </Row>
+          <Row justify="center">
+            <Button icon={<ArrowLeftOutlined />} />
+          </Row>
+        </Col>
+        <Col span={11}>
+          <ClusterFileTable />
         </Col>
       </Row>
     </>
