@@ -18,6 +18,13 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Create version file for tag commit
+        if: github.ref_type == 'tag'
+        uses: finnp/create-file-action@master
+        env:
+          FILE_NAME: "./deploy/local/VERSION"
+          FILE_DATA: "${{ github.ref_name }}"
+
       - name: Pushes to scow-deployment repo
         uses: JamesIves/github-pages-deploy-action@v4
         with:
@@ -32,6 +39,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+
+      - name: Create version file for tag commit
+        if: github.ref_type == 'tag'
+        uses: finnp/create-file-action@master
+        env:
+          FILE_NAME: "./deploy/vagrant/VERSION"
+          FILE_DATA: "${{ github.ref_name }}"
 
       - name: Pushes to scow-vagrant repo
         uses: JamesIves/github-pages-deploy-action@v4
