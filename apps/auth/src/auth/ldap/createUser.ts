@@ -25,11 +25,13 @@ import { promisify } from "util";
  * @param extraProps the extraProps config
  * @param placeholderObj the object where the values of placeholders ({{ }}) are from
  */
-const applyExtraProps = (obj: object, extraProps: Record<string, string | string[]>, placeholderObj: object) => {
+const applyExtraProps = (obj: object, extraProps: Record<string, string | string[] | null>, placeholderObj: object) => {
 
   for (const key in extraProps) {
     const value = extraProps[key];
-    if (Array.isArray(value)) {
+    if (value === null) {
+      delete obj[key];
+    } else if (Array.isArray(value)) {
       obj[key] = value.map((x) => parsePlaceholder(x, placeholderObj));
     } else {
       obj[key] = parsePlaceholder(value, placeholderObj);
