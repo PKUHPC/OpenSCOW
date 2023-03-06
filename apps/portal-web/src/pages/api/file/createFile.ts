@@ -28,7 +28,7 @@ export interface CreateFileSchema {
 
   responses: {
     204: null;
-    409: { code: "ALREADY_EXISTS" }
+    409: { code: "ALREADY_EXISTS" };
     400: { code: "INVALID_CLUSTER" };
   }
 }
@@ -36,8 +36,6 @@ export interface CreateFileSchema {
 const auth = authenticate(() => true);
 
 export default route<CreateFileSchema>("CreateFileSchema", async (req, res) => {
-
-
 
   const info = await auth(req, res);
 

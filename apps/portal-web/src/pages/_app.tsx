@@ -61,6 +61,11 @@ const FailEventHandler: React.FC = () => {
         return;
       }
 
+      if (e.data?.code === "SFTP_ERROR") {
+        message.error(e.data?.details || "SFTP操作失败，请确认您是否有操作的权限");
+        return;
+      }
+
       message.error(`服务器出错啦！(${e.status}, ${e.data?.code}))`);
     });
   }, []);

@@ -260,3 +260,10 @@ export async function insertKeyAsUser(
   });
 }
 
+export async function sshRmrf(ssh: NodeSSH, path: string) {
+  await ssh.exec("rm", ["-rf", path]).catch((e) => {
+    throw new SSHExecError(e);
+  });
+}
+
+
