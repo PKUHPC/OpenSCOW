@@ -5,7 +5,7 @@
   "scripts": {
     "build": "turbo run build",
     "build:libs": "turbo run build --filter \"./libs/**\"",
-    "build:images": "docker compose --env-file dev/.env.build -f dev/docker-compose.build.yml build",
+    "build:images": "docker build -f docker/Dockerfile.scow -t scow .",
     "build:protos": "turbo run build --filter protos",
     "prepareDev": "pnpm build:libs && turbo run prepareDev",
     "prune": "pnpm clean --yes && pnpm bootstrap --ci -- --production",
@@ -14,7 +14,7 @@
     "devenv:stop": "docker compose --env-file dev/.env.dev -f dev/docker-compose.dev.yml down",
     "test": "turbo run test",
     "test:ci": "pnpm run -r test --ci --coverage --runInBand",
-    "prepare": "node -e \"try { require('husky').install() } catch (e) {if (e.code !== 'MODULE_NOT_FOUND') throw e}\"",
+    "prepare": "node -e \"try { require('husky').install() } catch (e) {if (e.code !== 'MODULE_NOT_FOUND' && !e.message.startsWith('.git')) throw e}\"",
     "lint": "turbo run lint lint:ts",
     "lint:ts": "eslint --cache --ext .tsx,.ts .",
     "ci:version": "node scripts/version.mjs",

@@ -16,8 +16,7 @@
 // Don't know why.
 
 import type { MikroORM } from "@mikro-orm/core";
-import type { SqlEntityManager } from "@mikro-orm/knex";
-import type { MySqlDriver } from "@mikro-orm/mysql";
+import type { MySqlDriver, SqlEntityManager } from "@mikro-orm/mysql";
 import { Capabilities } from "@scow/lib-auth";
 import { authPlugin } from "src/plugins/auth";
 import { ClusterPlugin, clustersPlugin } from "src/plugins/clusters";

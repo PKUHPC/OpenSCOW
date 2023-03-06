@@ -43,8 +43,8 @@ export async function createUserInDatabase(
     await em.persistAndFlush(user);
   } catch (e) {
     if (e instanceof UniqueConstraintViolationException) {
-      throw <ServiceError> { 
-        code: Status.ALREADY_EXISTS, 
+      throw <ServiceError> {
+        code: Status.ALREADY_EXISTS,
         message:`User with userId ${userId} already exists.`,
         details: "EXISTS_IN_SCOW",
       };
@@ -62,7 +62,7 @@ export async function insertKeyToNewUser(userId: string, password: string, logge
       if (misIgnore) { return; }
       const node = slurm.loginNodes[0];
       logger.info("Checking if user can login to %s by login node %s", displayName, node);
-    
+
       const error = await insertKeyAsUser(node, userId, password, rootKeyPair, logger).catch((e) => e);
       if (error) {
         logger

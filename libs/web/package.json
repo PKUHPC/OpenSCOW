@@ -22,10 +22,22 @@
   "peerDependencies": {
     "antd": "5.2.2",
     "next": "13.2.1",
-    "styled-components": "5.3.6"
+    "styled-components": "5.3.6",
+    "@ant-design/icons": "5.0.1",
+    "dayjs": "1.11.7"
   },
   "devDependencies": {
-    "@types/mime-types": "2.1.1"
+    "antd": "5.2.2",
+    "next": "13.2.1",
+    "styled-components": "5.3.6",
+    "@types/mime-types": "2.1.1",
+    "react": "18.2.0",
+    "@types/react": "18.0.28",
+    "react-dom": "18.2.0",
+    "@types/react-dom": "18.0.11",
+    "react-is": "18.2.0",
+    "@ant-design/icons": "5.0.1",
+    "dayjs": "1.11.7"
   },
   "author": "PKUHPC (https://github.com/PKUHPC)",
   "license": "Mulan PSL v2",

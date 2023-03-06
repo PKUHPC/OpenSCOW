@@ -27,6 +27,7 @@
     "@ant-design/icons": "5.0.1",
     "@ddadaal/next-typed-api-routes-runtime": "0.5.2",
     "@ddadaal/tsgrpc-client": "0.17.3",
+    "@ddadaal/tsgrpc-common": "0.2.1",
     "@grpc/grpc-js": "1.8.11",
     "@scow/config": "workspace:*",
     "@scow/lib-config": "workspace:*",

@@ -10,17 +10,13 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { autocompletion } from "@codemirror/autocomplete";
 import { StreamLanguage } from "@codemirror/language";
 import { shell } from "@codemirror/legacy-modes/mode/shell";
-import { EditorState } from "@codemirror/state";
-import { EditorView } from "@codemirror/view";
 import { useDarkMode } from "@scow/lib-web/build/layouts/darkMode";
 import { githubDark, githubLight } from "@uiw/codemirror-theme-github";
 import CodeMirror from "@uiw/react-codemirror";
-import { basicSetup } from "codemirror";
-import { useCallback, useEffect, useRef } from "react";
-import styled, { useTheme } from "styled-components";
+import { useCallback } from "react";
+import styled from "styled-components";
 
 interface Props {
   value?: string;
@@ -36,19 +32,7 @@ const Container = styled.div`
 const extensions = [StreamLanguage.define(shell)];
 
 export const CodeEditor: React.FC<Props> = ({ value, onChange, height = "" }) => {
-  const { token } = useTheme();
   const { dark } = useDarkMode();
-
-  // useEffect(() => {
-  //   if (currentView) {
-  //     const currentValue = currentView.state.doc.toString();
-  //     if (value !== currentValue) {
-  //       currentView.dispatch({
-  //         changes: { from: 0, to: currentValue.length, insert: value || "" },
-  //       });
-  //     }
-  //   }
-  // }, [value, token]);
 
   return (
     <Container>

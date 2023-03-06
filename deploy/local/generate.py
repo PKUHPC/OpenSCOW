@@ -54,6 +54,16 @@ check_path_format("MIS.BASE_PATH", MIS_PATH)
 LOG_LEVEL = get_cfg(["LOG", "LEVEL"], "info")
 LOG_PRETTY = json.dumps(get_cfg(["LOG", "PRETTY"], False))
 
+SCOW_IMAGE = get_cfg(["COMMON", "IMAGE"])
+if not SCOW_IMAGE:
+  SCOW_IMAGE_BASE = get_cfg(["COMMON", "IMAGE_BASE"])
+  if SCOW_IMAGE_BASE:
+    SCOW_IMAGE = SCOW_IMAGE_BASE + "/scow"
+  else:
+    print("Please define COMMON.IMAGE or COMMON.IMAGE_BASE")
+    exit(1)
+
+SCOW_IMAGE_NAME = SCOW_IMAGE + ":" + cfg.COMMON["IMAGE_TAG"]
 
 def path_join(*args):
   def join(a, b):
@@ -148,9 +158,6 @@ def dict_to_array(dict_data, *parameter):
             arr.append(key + ":" + dict_data[key])
     return arr
 
-def generate_image(name):
-    return cfg.COMMON["IMAGE_BASE"] + "/" + name + ":" + cfg.COMMON["IMAGE_TAG"]
-
 def create_log_service():
     # 创建日志收集目录 mkdir -p ***
     if os.path.exists(cfg.FLUENTD["LOG_DIR"]):
@@ -174,12 +181,13 @@ def create_gateway_service():
     gw_ports = [(str(cfg.COMMON["PORT"]), "80")]
 
     gw_env = {
+        "SCOW_LAUNCH_APP": "gateway",
         "BASE_PATH": "" if BASE_PATH == "/" else BASE_PATH,
         "PORTAL_PATH": PORTAL_PATH,
         "MIS_PATH": MIS_PATH,
     }
 
-    gateway = Service("gateway", generate_image("gateway"), gw_ports, {
+    gateway = Service("gateway", SCOW_IMAGE_NAME, gw_ports, {
         "/etc/hosts": "/etc/hosts",
     }, gw_env)
     return gateway
@@ -209,6 +217,7 @@ def create_auth_service():
         )
 
     au_env = {
+        "SCOW_LAUNCH_APP": "auth",
         "BASE_PATH": BASE_PATH,
         "LOG_LEVEL": LOG_LEVEL,
         "LOG_PRETTY": LOG_PRETTY,
@@ -218,7 +227,7 @@ def create_auth_service():
 
     auth_ports = [(AUTH_PORT, 5000)] if AUTH_PORT else []
 
-    auth = Service("auth", generate_image("auth"), auth_ports, au_volumes, au_env)
+    auth = Service("auth", SCOW_IMAGE_NAME, auth_ports, au_volumes, au_env)
     return auth
 
 
@@ -234,16 +243,18 @@ def create_portal_server_service():
     ports = [(port, 5000)] if port else []
 
     env = {
+      "SCOW_LAUNCH_APP": "portal-server",
       "LOG_LEVEL": LOG_LEVEL,
       "LOG_PRETTY": LOG_PRETTY,
     }
 
-    portal_server = Service("portal-server", generate_image("portal-server"), ports, ps_volumes, env)
+    portal_server = Service("portal-server", SCOW_IMAGE_NAME, ports, ps_volumes, env)
     return portal_server
 
 
 def create_portal_web_service():
     pw_env = {
+        "SCOW_LAUNCH_APP": "portal-web",
         "BASE_PATH": path_join(BASE_PATH, PORTAL_PATH),
         "MIS_URL": path_join(BASE_PATH, MIS_PATH),
         "MIS_DEPLOYED": "false" if cfg.MIS == False else "true",
@@ -255,7 +266,7 @@ def create_portal_web_service():
         "./config": "/etc/scow",
         # "~/.ssh": "/root/.ssh"
     }
-    portal_web = Service("portal-web", generate_image("portal-web"), None,
+    portal_web = Service("portal-web", SCOW_IMAGE_NAME, None,
                          pw_volumes, pw_env)
     return portal_web
 
@@ -278,6 +289,7 @@ def create_db_service():
 
 def create_mis_server_service():
     ms_env = {
+        "SCOW_LAUNCH_APP": "mis-server",
         "DB_PASSWORD": cfg.MIS["DB_PASSWORD"],
         "LOG_LEVEL": LOG_LEVEL,
         "LOG_PRETTY": LOG_PRETTY,
@@ -292,12 +304,13 @@ def create_mis_server_service():
 
     ports = [(port, 5000)] if port else []
 
-    mis_server = Service("mis-server", generate_image("mis-server"), ports, ms_volumes, ms_env)
+    mis_server = Service("mis-server", SCOW_IMAGE_NAME, ports, ms_volumes, ms_env)
     return mis_server
 
 
 def create_mis_web_service():
     mv_env = {
+        "SCOW_LAUNCH_APP": "mis-web",
         "BASE_PATH": path_join(BASE_PATH, MIS_PATH),
         "PORTAL_URL": path_join(BASE_PATH, PORTAL_PATH),
         "PORTAL_DEPLOYED": "false" if cfg.PORTAL == False else "true",
@@ -306,7 +319,7 @@ def create_mis_web_service():
     mv_volumes = {
         "./config": "/etc/scow",
     }
-    mis_web = Service("mis-web", generate_image("mis-web"), None, mv_volumes, mv_env)
+    mis_web = Service("mis-web", SCOW_IMAGE_NAME, None, mv_volumes, mv_env)
     return mis_web
 
 def create_novnc_client():
