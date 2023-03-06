@@ -43,7 +43,9 @@ WORKDIR /app
 
 COPY --from=builder /app/dist .
 COPY --from=builder /app/version.json ./
+
 COPY docker/entrypoint.sh .
+RUN chmod +x entrypoint.sh
 
 ENV NODE_ENV production
 
