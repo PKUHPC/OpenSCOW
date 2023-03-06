@@ -19,13 +19,13 @@ import { config } from "./env";
 export function parsePlaceholder(str: string, values: Record<string, string>): string {
   return str.replace(/\$\{([a-zA-Z0-9_]+)\}/g, (_, p1) => values[p1] ?? "");
 }
-const nginxConfTemplate = readFileSync("nginx.conf", "utf8");
+const nginxConfTemplate = readFileSync("assets/nginx.conf", "utf8");
 
 const nginxConf = parsePlaceholder(nginxConfTemplate, omitConfigSpec(config));
 
 writeFileSync("/etc/nginx/default.conf", nginxConf);
 
-cpSync("includes", "/etc/nginx", { recursive: true });
+cpSync("assets/includes", "/etc/nginx/includes", { recursive: true });
 
 spawnSync("nginx", ["-g", "daemon off;"]);
 

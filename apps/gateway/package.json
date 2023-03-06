@@ -4,8 +4,7 @@
   "version": "0.3.0",
   "main": "build/index.js",
   "files": [
-    "includes",
-    "nginx.conf"
+    "assets"
   ],
   "scripts": {
     "build": "rimraf build && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
