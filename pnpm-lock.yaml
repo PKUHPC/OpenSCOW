@@ -128,8 +128,10 @@ importers:
   apps/gateway:
     specifiers:
       '@scow/lib-config': workspace:*
+      '@scow/utils': workspace:*
     dependencies:
       '@scow/lib-config': link:../../libs/libconfig
+      '@scow/utils': link:../../libs/utils
 
   apps/mis-server:
     specifiers:

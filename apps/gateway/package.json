@@ -12,6 +12,7 @@
     "serve": "node build/index.js"
   },
   "dependencies": {
-    "@scow/lib-config": "workspace:*"
+    "@scow/lib-config": "workspace:*",
+    "@scow/utils": "workspace:*"
   }
 }
