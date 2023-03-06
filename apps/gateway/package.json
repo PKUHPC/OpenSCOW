@@ -4,6 +4,7 @@
   "version": "0.3.0",
   "main": "build/index.js",
   "files": [
+    "build",
     "assets"
   ],
   "scripts": {
