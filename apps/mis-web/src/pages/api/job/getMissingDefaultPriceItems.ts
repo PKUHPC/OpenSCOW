@@ -16,6 +16,7 @@ import { JobServiceClient } from "@scow/protos/build/server/job";
 import { authenticate } from "src/auth/server";
 import { PlatformRole } from "src/models/User";
 import { getClient } from "src/utils/client";
+import { queryIfInitialized } from "src/utils/init";
 
 export interface GetMissingDefaultPriceItemsSchema {
   method: "GET";
@@ -30,9 +31,10 @@ const auth = authenticate((info) => info.platformRoles.includes(PlatformRole.PLA
 export default route<GetMissingDefaultPriceItemsSchema>("GetMissingDefaultPriceItemsSchema",
   async (req, res) => {
 
-    const info = await auth(req, res);
-    if (!info) {
-      return;
+    // 如果还未初始化，本接口不做登录校验
+    if (await queryIfInitialized()) {
+      const info = await auth(req, res);
+      if (!info) { return; }
     }
 
     const client = getClient(JobServiceClient);
