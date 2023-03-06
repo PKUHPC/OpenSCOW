@@ -27,6 +27,6 @@ writeFileSync("/etc/nginx/default.conf", nginxConf);
 
 cpSync("assets/includes", "/etc/nginx/includes", { recursive: true });
 
-spawnSync("nginx", ["-g", "daemon off;"]);
+spawnSync("nginx", ["-g", "daemon off;"], { stdio: "inherit" });
 
 
