@@ -31,7 +31,6 @@ FROM base AS builder
 
 WORKDIR /app
 COPY --from=pruner /app/out/json/ .
-COPY .npmrc ./
 RUN pnpm i --offline --frozen-lockfile
 
 COPY --from=pruner /app/out/full/ .
