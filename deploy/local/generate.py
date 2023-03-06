@@ -173,7 +173,7 @@ def create_gateway_service():
     gw_ports = [(str(cfg.COMMON["PORT"]), "80")]
 
     gw_env = {
-        "LAUNCH_APP": "gateway",
+        "SCOW_LAUNCH_APP": "gateway",
         "BASE_PATH": "" if BASE_PATH == "/" else BASE_PATH,
         "PORTAL_PATH": PORTAL_PATH,
         "MIS_PATH": MIS_PATH,
@@ -209,7 +209,7 @@ def create_auth_service():
         )
 
     au_env = {
-        "LAUNCH_APP": "auth",
+        "SCOW_LAUNCH_APP": "auth",
         "BASE_PATH": BASE_PATH,
         "LOG_LEVEL": LOG_LEVEL,
         "LOG_PRETTY": LOG_PRETTY,
@@ -235,7 +235,7 @@ def create_portal_server_service():
     ports = [(port, 5000)] if port else []
 
     env = {
-      "LAUNCH_APP": "portal-server",
+      "SCOW_LAUNCH_APP": "portal-server",
       "LOG_LEVEL": LOG_LEVEL,
       "LOG_PRETTY": LOG_PRETTY,
     }
@@ -246,7 +246,7 @@ def create_portal_server_service():
 
 def create_portal_web_service():
     pw_env = {
-        "LAUNCH_APP": "portal-web",
+        "SCOW_LAUNCH_APP": "portal-web",
         "BASE_PATH": path_join(BASE_PATH, PORTAL_PATH),
         "MIS_URL": path_join(BASE_PATH, MIS_PATH),
         "MIS_DEPLOYED": "false" if cfg.MIS == False else "true",
@@ -281,7 +281,7 @@ def create_db_service():
 
 def create_mis_server_service():
     ms_env = {
-        "LAUNCH_APP": "mis-server",
+        "SCOW_LAUNCH_APP": "mis-server",
         "DB_PASSWORD": cfg.MIS["DB_PASSWORD"],
         "LOG_LEVEL": LOG_LEVEL,
         "LOG_PRETTY": LOG_PRETTY,
@@ -302,7 +302,7 @@ def create_mis_server_service():
 
 def create_mis_web_service():
     mv_env = {
-        "LAUNCH_APP": "mis-web",
+        "SCOW_LAUNCH_APP": "mis-web",
         "BASE_PATH": path_join(BASE_PATH, MIS_PATH),
         "PORTAL_URL": path_join(BASE_PATH, PORTAL_PATH),
         "PORTAL_DEPLOYED": "false" if cfg.PORTAL == False else "true",
