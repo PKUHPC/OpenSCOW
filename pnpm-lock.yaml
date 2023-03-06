@@ -133,6 +133,7 @@ importers:
 
   apps/mis-server:
     specifiers:
+      '@ddadaal/tsgrpc-client': 0.17.3
       '@ddadaal/tsgrpc-common': 0.2.1
       '@ddadaal/tsgrpc-server': 0.18.2
       '@grpc/grpc-js': 1.8.11
@@ -184,6 +185,7 @@ importers:
       uuid: 9.0.0
       wait-on: 7.0.1
     devDependencies:
+      '@ddadaal/tsgrpc-client': 0.17.3_@grpc+grpc-js@1.8.11
       '@types/google-protobuf': 3.15.6
       '@types/node-cron': 3.0.7
       '@types/wait-on': 5.3.1
@@ -294,9 +296,11 @@ importers:
       '@sinclair/typebox': 0.25.24
       '@types/node-cron': 3.0.7
       '@types/shell-quote': 1.7.1
+      '@types/ssh2': 1.11.7
       '@types/wait-on': 5.3.1
       dayjs: 1.11.7
       dotenv: 16.0.3
+      form-data: 4.0.0
       node-cron: 3.0.2
       node-ssh: 13.0.1
       pino-pretty: 9.4.0
@@ -328,7 +332,9 @@ importers:
       '@ddadaal/tsgrpc-client': 0.17.3_@grpc+grpc-js@1.8.11
       '@types/node-cron': 3.0.7
       '@types/shell-quote': 1.7.1
+      '@types/ssh2': 1.11.7
       '@types/wait-on': 5.3.1
+      form-data: 4.0.0
 
   apps/portal-web:
     specifiers:
@@ -5907,7 +5913,7 @@ packages:
     resolution: {integrity: sha512-PYAthTa2m2VKxuvSD3DPC/Gy+U+sOA1LAuT8mkmRuvw+NACSaeXEQ+NHcVF7rONl6qcaxV3Uuemwawk+7+SJLw==}
     engines: {node: '>= 0.6'}
     dependencies:
-      mime-types: registry.npmmirror.com/mime-types/2.1.35
+      mime-types: 2.1.35
       negotiator: 0.6.3
 
   /acorn-globals/7.0.1:
@@ -6342,6 +6348,9 @@ packages:
   /async/3.2.4:
     resolution: {integrity: sha512-iAB+JbDEGXhyIUavoDl9WP/Jj106Kz9DEn1DPgYw5ruDn0e3Wgi3sKFm55sASdGBNOQB8F59d9qQ7deqrHA8wQ==}
     dev: true
+
+  /asynckit/0.4.0:
+    resolution: {integrity: sha512-Oei9OH4tRh0YqU3GxhX79dM/mwVgvbZJaSNaRk+bshkj0S5cfHcgYakreBjrHwatXKbz+IoIdYLxrKim2MjW0Q==}
 
   /at-least-node/1.0.0:
     resolution: {integrity: sha512-+q/t7Ekv1EDY2l6Gda6LLiX14rU9TV20Wa3ofeQmwPFZbOMo9DXrLbOjFaaclkXKWidIaopwAObQDqwWtGUjqg==}
@@ -7137,6 +7146,12 @@ packages:
     resolution: {integrity: sha512-ZI9jvcLDxqwaXEixOhArm3r7ReIivsXkpbyEWyeOhzz1QS0iSgBPnWvEqvIQtYyamGCYA88gFhmUrs9hrrQ0pg==}
     engines: {node: '>=10'}
     dev: false
+
+  /combined-stream/1.0.8:
+    resolution: {integrity: sha512-FQN4MRfuJeHf7cBbBMJFXhKSDq+2kAArBlmRBvcvFE5BB1HZKXtSFASDhdlz9zOYwxh8lDdnvmMOe/+5cdoEdg==}
+    engines: {node: '>= 0.8'}
+    dependencies:
+      delayed-stream: 1.0.0
 
   /comma-separated-tokens/1.0.8:
     resolution: {integrity: sha512-GHuDRO12Sypu2cV70d1dkA2EUmXHgntrzbpvOB+Qy+49ypNfGgFQIC2fhhXbnyrJRynDCAARsT7Ou0M6hirpfw==}
@@ -7943,6 +7958,10 @@ packages:
       rimraf: 3.0.2
       slash: 3.0.0
     dev: false
+
+  /delayed-stream/1.0.0:
+    resolution: {integrity: sha512-ZySD7Nf91aLB0RxL4KGrKHBXl7Eds1DAmEdcoVawXnLD7SDhpNgtuII2aAkg7a7QS41jxPSZ17p4VdGnMHk3MQ==}
+    engines: {node: '>=0.4.0'}
 
   /delegates/1.0.0:
     resolution: {integrity: sha512-bd2L678uiWATM6m5Z1VzNCErI3jiGzt6HGY8OVICs40JQq/HALfbyNJmp0UDakEY4pMMaN0Ly5om/B1VI/+xfQ==}
@@ -9171,9 +9190,9 @@ packages:
     resolution: {integrity: sha512-ETEklSGi5t0QMZuiXoA/Q6vcnxcLQP5vdugSpuAyi6SVGi2clPPp+xgEhuMaHC+zGgn31Kd235W35f7Hykkaww==}
     engines: {node: '>= 6'}
     dependencies:
-      asynckit: registry.npmmirror.com/asynckit/0.4.0
-      combined-stream: registry.npmmirror.com/combined-stream/1.0.8
-      mime-types: registry.npmmirror.com/mime-types/2.1.35
+      asynckit: 0.4.0
+      combined-stream: 1.0.8
+      mime-types: 2.1.35
 
   /fraction.js/4.2.0:
     resolution: {integrity: sha512-MhLuK+2gUcnZe8ZHlaaINnQLl0xRIGRfcGk2yl8xoQAfHrSsL3rYu6FCmBdkdbhc9EPlwyGHewaRsvwRMJtAlA==}
@@ -12027,6 +12046,13 @@ packages:
   /mime-db/1.52.0:
     resolution: {integrity: sha512-sPU4uV7dYlvtWJxwwxHD0PuihVNiE7TyAbQ5SWxDCB9mUYvOgroQOwYQQOKPJ8CIbE+1ETVlOoK1UC2nU3gYvg==}
     engines: {node: '>= 0.6'}
+
+  /mime-types/2.1.18:
+    resolution: {integrity: sha512-lc/aahn+t4/SWV/qcmumYjymLsWfN3ELhpmVuUFjgsORruuZPVSwAQryq+HHGvO/SI2KVX26bx+En+zhM8g8hQ==}
+    engines: {node: '>= 0.6'}
+    dependencies:
+      mime-db: registry.npmmirror.com/mime-db/1.33.0
+    dev: false
 
   /mime-types/2.1.35:
     resolution: {integrity: sha512-ZDY+bPm5zTTF+YpCrAU9nK0UgICYPT0QtT1NZWFv4s++TNkcgVaT0g6+4R2uI4MjQjzysHB1zxuWL50hzaeXiw==}
@@ -15314,7 +15340,7 @@ packages:
       bytes: 3.0.0
       content-disposition: registry.npmmirror.com/content-disposition/0.5.2
       fast-url-parser: 1.1.3
-      mime-types: registry.npmmirror.com/mime-types/2.1.18
+      mime-types: 2.1.18
       minimatch: 3.1.2
       path-is-inside: 1.0.2
       path-to-regexp: 2.2.1
@@ -15330,7 +15356,7 @@ packages:
       debug: 2.6.9
       escape-html: registry.npmmirror.com/escape-html/1.0.3
       http-errors: registry.npmmirror.com/http-errors/1.6.3
-      mime-types: registry.npmmirror.com/mime-types/2.1.35
+      mime-types: 2.1.35
       parseurl: 1.3.3
     transitivePeerDependencies:
       - supports-color
@@ -16498,7 +16524,7 @@ packages:
     engines: {node: '>= 0.6'}
     dependencies:
       media-typer: 0.3.0
-      mime-types: registry.npmmirror.com/mime-types/2.1.35
+      mime-types: 2.1.35
 
   /typedarray-to-buffer/3.1.5:
     resolution: {integrity: sha512-zdu8XMNEDepKKR+XYOXAVPtWui0ly0NtohUscw+UmaHiAWT8hrV1rr//H6V+0DvJ3OQ19S979M0laLfX8rm82Q==}
@@ -16764,7 +16790,7 @@ packages:
     dependencies:
       file-loader: 6.2.0_webpack@5.75.0
       loader-utils: 2.0.4
-      mime-types: registry.npmmirror.com/mime-types/2.1.35
+      mime-types: 2.1.35
       schema-utils: 3.1.1
       webpack: 5.75.0
     dev: false
@@ -17077,7 +17103,7 @@ packages:
     dependencies:
       colorette: 2.0.19
       memfs: 3.4.11
-      mime-types: registry.npmmirror.com/mime-types/2.1.35
+      mime-types: 2.1.35
       range-parser: 1.2.1
       schema-utils: 4.0.0
       webpack: 5.75.0
@@ -17966,11 +17992,6 @@ packages:
     version: 1.0.0
     dev: false
 
-  registry.npmmirror.com/asynckit/0.4.0:
-    resolution: {integrity: sha512-Oei9OH4tRh0YqU3GxhX79dM/mwVgvbZJaSNaRk+bshkj0S5cfHcgYakreBjrHwatXKbz+IoIdYLxrKim2MjW0Q==, registry: http://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/asynckit/-/asynckit-0.4.0.tgz}
-    name: asynckit
-    version: 0.4.0
-
   registry.npmmirror.com/atomic-sleep/1.0.0:
     resolution: {integrity: sha512-kNOjDqAh7px0XWNI+4QbzoiR/nTkHAWNud2uvnJquD1/x5a7EQZMJT0AczqK0Qn67oY/TTQ1LbUKajZpp3I9tQ==, registry: http://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/atomic-sleep/-/atomic-sleep-1.0.0.tgz}
     name: atomic-sleep
@@ -18064,14 +18085,6 @@ packages:
     name: color-name
     version: 1.1.4
 
-  registry.npmmirror.com/combined-stream/1.0.8:
-    resolution: {integrity: sha512-FQN4MRfuJeHf7cBbBMJFXhKSDq+2kAArBlmRBvcvFE5BB1HZKXtSFASDhdlz9zOYwxh8lDdnvmMOe/+5cdoEdg==, registry: http://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/combined-stream/-/combined-stream-1.0.8.tgz}
-    name: combined-stream
-    version: 1.0.8
-    engines: {node: '>= 0.8'}
-    dependencies:
-      delayed-stream: registry.npmmirror.com/delayed-stream/1.0.0
-
   registry.npmmirror.com/concat-map/0.0.1:
     resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==, registry: http://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/concat-map/-/concat-map-0.0.1.tgz}
     name: concat-map
@@ -18119,12 +18132,6 @@ packages:
     dependencies:
       ms: registry.npmmirror.com/ms/2.1.2
     dev: false
-
-  registry.npmmirror.com/delayed-stream/1.0.0:
-    resolution: {integrity: sha512-ZySD7Nf91aLB0RxL4KGrKHBXl7Eds1DAmEdcoVawXnLD7SDhpNgtuII2aAkg7a7QS41jxPSZ17p4VdGnMHk3MQ==, registry: http://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/delayed-stream/-/delayed-stream-1.0.0.tgz}
-    name: delayed-stream
-    version: 1.0.0
-    engines: {node: '>=0.4.0'}
 
   registry.npmmirror.com/denque/2.1.0:
     resolution: {integrity: sha512-HVQE3AAb/pxF8fQAoiqpvg9i3evqug3hoiwakOyZAwJm+6vZehbkYXZ0l4JxS+I3QxM97v5aaRNhj8v5oBhekw==, registry: http://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/denque/-/denque-2.1.0.tgz}
@@ -18615,14 +18622,6 @@ packages:
     name: mime-db
     version: 1.52.0
     engines: {node: '>= 0.6'}
-
-  registry.npmmirror.com/mime-types/2.1.18:
-    resolution: {integrity: sha512-lc/aahn+t4/SWV/qcmumYjymLsWfN3ELhpmVuUFjgsORruuZPVSwAQryq+HHGvO/SI2KVX26bx+En+zhM8g8hQ==, registry: http://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/mime-types/-/mime-types-2.1.18.tgz}
-    name: mime-types
-    version: 2.1.18
-    engines: {node: '>= 0.6'}
-    dependencies:
-      mime-db: registry.npmmirror.com/mime-db/1.33.0
     dev: false
 
   registry.npmmirror.com/mime-types/2.1.35:
@@ -18632,6 +18631,7 @@ packages:
     engines: {node: '>= 0.6'}
     dependencies:
       mime-db: registry.npmmirror.com/mime-db/1.52.0
+    dev: false
 
   registry.npmmirror.com/mime/3.0.0:
     resolution: {integrity: sha512-jSCU7/VB1loIWBZe14aEYHU/+1UMEHoaO7qxCOVJOw9GgH72VAWppxNcjU+x9a2k3GSIBXNKxXQFqRvvZ7vr3A==, registry: http://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/mime/-/mime-3.0.0.tgz}
