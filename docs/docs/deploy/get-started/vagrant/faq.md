@@ -19,7 +19,7 @@ title: FAQ
 
 代码和镜像托管在github，由于网络原因，可能导致下载失败，可将代码仓库和docker镜像仓库替换为国内地址。
 
-- 北大镜像仓库已同步SCOW的docker镜像，仓库可修改为：`mirrors.pku.edu.cn/pkuhpc/scow`，对应文件为`deploy\vagrant\scow\scow-deployment\config.py`的`COMMON.IMAGE_BASE`。
+- 北大镜像仓库已同步SCOW的docker镜像，仓库可修改为：`mirrors.pku.edu.cn/pkuhpc/scow/scow`，对应文件为`deploy\vagrant\scow\scow-deployment\config.py`的`COMMON.IMAGE`。
 
 - 可将scow-deployment和export-jobs项目代码同步至国内仓库，例如码云，对应文件为`deploy\vagrant\scripts\scow.sh`
 

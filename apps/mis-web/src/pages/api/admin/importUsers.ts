@@ -25,6 +25,7 @@ export interface ImportUsersSchema {
 
   body: {
     data: ImportUsersData;
+    tenantName: string;
     whitelist: boolean;
   }
 
@@ -45,12 +46,12 @@ export default route<ImportUsersSchema>("ImportUsersSchema",
       if (!info) { return; }
     }
 
-    const { data, whitelist } = req.body;
+    const { data, tenantName, whitelist } = req.body;
 
     const client = getClient(AdminServiceClient);
 
     return await asyncClientCall(client, "importUsers", {
-      data, whitelist,
+      data, tenantName, whitelist,
     })
       .then(() => ({ 204: null }))
       .catch(handlegRPCError({

@@ -14,15 +14,24 @@
 #
 # COMMON.PORT: 整个系统的入口端口
 # COMMON.BASE_PATH: 整个系统的部署根路径。以/开头，不要以/结尾，如果是根路径写"/"
-# COMMON.IMAGE_BASE: 镜像仓库地址，据实际情况填写
+# COMMON.IMAGE: 镜像地址，据实际情况填写
 # COMMON.IMAGE_TAG: 镜像tag，据实际情况填写
-# 如果您的镜像是本地构建的，IMAGE_BASE和IMAGE_TAG必须和构建时.env.build中的值保持一致。
+# 如果您的镜像是本地构建的，IMAGE和IMAGE_TAG必须和构建时的镜像名和tag保持一致。
 COMMON = {
   "PORT": 80,
   "BASE_PATH": "/",
-  "IMAGE_BASE": "ghcr.io/pkuhpc/scow",
+  "IMAGE": "ghcr.io/pkuhpc/scow/scow",
   "IMAGE_TAG": "master",
 }
+
+# ------- 日志配置 -------
+#
+# LOG.LEVEL: 日志等级，可选trace, debug, info, warn, error。默认info
+# LOG.PRETTY: 是否输出更适合直接读的log。如果为False，则输出json格式的日志。默认False
+# LOG = {
+#   # "LEVEL": "info",
+#   # "PRETTY": False,
+# }
 
 #
 # ------- 门户系统 -------

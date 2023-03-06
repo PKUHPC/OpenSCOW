@@ -17,7 +17,7 @@ import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
 import { TenantRole } from "src/models/User";
-import { EditableJobBillingTable } from "src/pageComponents/job/EditableJobBillingTable";
+import { ManageJobBillingTable } from "src/pageComponents/job/ManageJobBillingTable";
 import { Head } from "src/utils/head";
 
 export const TenantAdminJobBillingTablePage: NextPage = requireAuth(
@@ -28,14 +28,14 @@ export const TenantAdminJobBillingTablePage: NextPage = requireAuth(
     const tenant = userStore.user.tenant;
 
     const { data, isLoading, reload } = useAsync({ promiseFn: useCallback(async () => {
-      return await api.getBillingTable({ query: { tenant: tenant } }).then((x) => x.items);
+      return await api.getBillingItems({ query: { tenant: tenant, activeOnly: true } });
     }, [userStore.user]) });
 
     return (
       <div>
         <Head title="管理本租户作业价格表" />
         <PageTitle titleText={`管理租户${tenant}作业价格表`} reload={reload} />
-        <EditableJobBillingTable tenant={tenant} reload={reload} data={data} loading={isLoading} />
+        <ManageJobBillingTable tenant={tenant} reload={reload} data={data} loading={isLoading} />
       </div>
     );
   });

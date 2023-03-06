@@ -1,5 +1,12 @@
-redisUrl: localhost:6379
 authType: ldap
+
+redisUrl: localhost:6379
+
+allowedCallbackHostnames:
+  - localhost
+
+captcha:
+  enabled: true
 
 ldap:
   url: ldap://localhost:389

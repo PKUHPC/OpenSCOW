@@ -15,8 +15,9 @@ import { sshConnectByPassword } from "@scow/lib-ssh";
 import { Static, Type } from "@sinclair/typebox";
 import { FastifyInstance } from "fastify";
 import { cacheInfo } from "src/auth/cacheInfo";
+import { redirectToWeb } from "src/auth/callback";
 import { serveLoginHtml } from "src/auth/loginHtml";
-import { redirectToWeb } from "src/routes/callback";
+import { validateLoginParams } from "src/auth/validateLoginParams";
 
 export function registerPostHandler(f: FastifyInstance, loginNode: string) {
 
@@ -26,17 +27,21 @@ export function registerPostHandler(f: FastifyInstance, loginNode: string) {
     username: Type.String(),
     password: Type.String(),
     callbackUrl: Type.String(),
+    token: Type.String(),
+    code: Type.String(),
   });
 
   // register a login handler
   f.post<{ Body: Static<typeof bodySchema> }>("/public/auth", {
     schema: { body: bodySchema },
   }, async (req, res) => {
-    const { username, password, callbackUrl } = req.body;
+    const { username, password, callbackUrl, code, token } = req.body;
 
     const logger = req.log.child({ plugin: "ssh" });
 
-    // login to the a login node
+    if (!await validateLoginParams(token, code, callbackUrl, req, res)) {
+      return;
+    }
 
     await sshConnectByPassword(loginNode, username, password, req.log, async () => {})
       .then(async () => {

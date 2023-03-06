@@ -10,12 +10,12 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { ServiceError } from "@ddadaal/tsgrpc-common";
 import { plugin } from "@ddadaal/tsgrpc-server";
-import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { JobServiceServer, JobServiceService } from "@scow/protos/build/portal/job";
 import { getClusterOps } from "src/clusterops";
-import { NewJobInfo } from "src/clusterops/api/job";
+import { JobTemplate } from "src/clusterops/api/job";
 import { clusterNotFound, jobNotFound } from "src/utils/errors";
 
 export const jobServiceServer = plugin((server) => {
@@ -72,7 +72,7 @@ export const jobServiceServer = plugin((server) => {
         throw <ServiceError> { code: Status.NOT_FOUND, message: `Job template id ${templateId} is not found.` };
       }
 
-      return [{ jobInfo: reply.jobInfo }];
+      return [{ template: reply.template }];
 
     },
 
@@ -128,7 +128,7 @@ export const jobServiceServer = plugin((server) => {
       const { cluster, command, jobName, coreCount, maxTime, saveAsTemplate, userId,
         nodeCount, partition, qos, account, comment, workingDirectory } = request;
 
-      const jobInfo: NewJobInfo = {
+      const jobInfo: JobTemplate = {
         jobName,
         coreCount,
         maxTime,
@@ -155,10 +155,13 @@ export const jobServiceServer = plugin((server) => {
       }, logger);
 
       if (reply.code === "SBATCH_FAILED") {
-        return [{ result: { $case: "error", error: { error: reply.message } } }];
+        throw new ServiceError({
+          code: Status.INTERNAL,
+          details: reply.message,
+        });
       }
 
-      return [{ result: { $case: "ok", ok: { jobId: reply.jobId } } }];
+      return [{ jobId: reply.jobId }];
     },
 
 

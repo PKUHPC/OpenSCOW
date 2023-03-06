@@ -12,6 +12,7 @@
 
 import createError from "@fastify/error";
 import { omitConfigSpec } from "@scow/lib-config";
+import { readVersionFile } from "@scow/utils/build/version";
 import fastify, { FastifyInstance, FastifyPluginAsync, FastifyPluginCallback } from "fastify";
 import { config } from "src/config/env";
 import { plugins } from "src/plugins";
@@ -33,7 +34,12 @@ const ValidationError = createError("BAD_REQUEST", "Errors occurred when validat
 export function buildApp(pluginOverrides?: PluginOverrides) {
 
   const server = fastify({
-    logger: { level: config.LOG_LEVEL },
+    logger: {
+      level: config.LOG_LEVEL,
+      ...config.LOG_PRETTY ? {
+        transport: { target: "pino-pretty" },
+      } : {},
+    },
     ajv: {
       customOptions: {
         coerceTypes: "array",
@@ -48,7 +54,9 @@ export function buildApp(pluginOverrides?: PluginOverrides) {
     },
   });
 
-  server.log.info({ config: omitConfigSpec(config) }, "Loaded config");
+  server.log.info({ version: readVersionFile() }, "Running @scow/auth");
+
+  server.log.info({ config: omitConfigSpec(config) }, "Loaded env config");
 
   applyPlugins(server, pluginOverrides);
 

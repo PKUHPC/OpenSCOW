@@ -59,7 +59,6 @@ message CreateAppSessionRequest {
   uint32 core_count = 7;
   uint32 max_time = 8;
   map<string, string> custom_attributes = 9;
-  repeated string user_sbatch_options = 10;
 }
 
 // NOT_FOUND: app is not found
@@ -110,6 +109,12 @@ message AppCustomAttribute {
   string label = 2;
   string name = 3;
   repeated SelectOption options = 4;
+  bool required =5;
+  oneof default_input {
+    string text = 6;
+    uint32 number = 7;
+  }
+  optional string placeholder = 8;
 }
 
 message GetAppMetadataResponse {

@@ -1,11 +1,11 @@
 {
   "name": "@scow/protos",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "",
   "main": "build/index.js",
   "private": true,
   "scripts": {
-    "generate": "rimraf generated && cd ../.. && buf generate",
+    "generate": "rimraf generated && buf generate --template buf.gen.yaml node_modules/@scow/grpc-api",
     "build": "rimraf build && tsc"
   },
   "files": [
@@ -13,8 +13,10 @@
     "!**/*.map"
   ],
   "dependencies": {
+    "@grpc/grpc-js": "1.8.11",
     "long": "5.2.1",
-    "protobufjs": "7.2.2"
+    "protobufjs": "7.2.2",
+    "@scow/grpc-api": "workspace:*"
   },
   "keywords": [],
   "author": "",

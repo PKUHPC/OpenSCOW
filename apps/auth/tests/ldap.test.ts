@@ -16,10 +16,12 @@ import { buildApp } from "src/app";
 import { extractAttr, findUser, searchOne, takeOne } from "src/auth/ldap/helpers";
 import { authConfig, NewUserGroupStrategy } from "src/config/auth";
 import { ensureNotUndefined } from "src/utils/validations";
-import { createFormData } from "tests/utils";
+import { allowedCallbackUrl, createFormData } from "tests/utils";
 import { promisify } from "util";
 
 let server: FastifyInstance;
+
+const callbackUrl = allowedCallbackUrl;
 
 const { ldap } = ensureNotUndefined(authConfig, ["ldap"]);
 let client: Client;
@@ -30,6 +32,8 @@ const user = {
   identityId: "123",
   name: "name",
   password: "12#",
+  token: "token",
+  code: "code",
 };
 
 const userDn = `${ldap.addUser.userIdDnKey}=${user.identityId},${ldap.addUser.userBase}`;
@@ -154,25 +158,51 @@ it("returns correct error if user already exists", async () => {
 
 });
 
-it("should login with correct username and password", async () => {
-
+it("test to input a wrong verifyCaptcha", async () => {
   await createUser();
 
-  const callbackUrl = "/callback";
+
 
   // login
   const { payload, headers } = createFormData({
     username: user.identityId,
     password: user.password,
     callbackUrl,
+    token: user.token,
+    code: "wrongCaptcha",
   });
-
+  await server.redis.set(user.token, user.code, "EX", 30);
   const resp = await server.inject({
     method: "POST",
     url: "/public/auth",
     payload,
     headers,
   });
+  expect(resp.statusCode).toBe(400);
+});
+
+it("should login with correct username and password", async () => {
+
+  await createUser();
+
+
+
+  // login
+  const { payload, headers } = createFormData({
+    username: user.identityId,
+    password: user.password,
+    callbackUrl,
+    token: user.token,
+    code: user.code,
+  });
+  await server.redis.set(user.token, user.code, "EX", 30);
+  const resp = await server.inject({
+    method: "POST",
+    url: "/public/auth",
+    payload,
+    headers,
+  });
+
 
   expect(resp.statusCode).toBe(302);
   expect(resp.headers.location).toStartWith(callbackUrl + "?");
@@ -182,15 +212,17 @@ it("should not login with wrong password", async () => {
 
   await createUser();
 
-  const callbackUrl = "/callback";
+
 
   // login
   const { payload, headers } = createFormData({
     username: user.identityId,
     password: user.password + "0",
     callbackUrl,
+    token: user.token,
+    code: user.code,
   });
-
+  await server.redis.set(user.token, user.code, "EX", 30);
   const resp = await server.inject({
     method: "POST",
     url: "/public/auth",

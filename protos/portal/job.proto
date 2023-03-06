@@ -1,14 +1,14 @@
 /**
- * Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
- * SCOW is licensed under Mulan PSL v2.
- * You can use this software according to the terms and conditions of the Mulan PSL v2.
- * You may obtain a copy of Mulan PSL v2 at:
- *          http://license.coscl.org.cn/MulanPSL2
- * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
- * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
- * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
- * See the Mulan PSL v2 for more details.
- */
+   * Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
+   * SCOW is licensed under Mulan PSL v2.
+   * You can use this software according to the terms and conditions of the Mulan PSL v2.
+   * You may obtain a copy of Mulan PSL v2 at:
+   *          http://license.coscl.org.cn/MulanPSL2
+   * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+   * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+   * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+   * See the Mulan PSL v2 for more details.
+*/
 
 syntax = "proto3";
 
@@ -24,8 +24,7 @@ message CancelJobRequest {
 }
 
 // NOT_FOUND: cluster is not found
-message CancelJobResponse {
-}
+message CancelJobResponse {}
 
 message ListAccountsRequest {
   string user_id = 1;
@@ -58,7 +57,7 @@ message JobInfo {
   string submit_time = 11;
 }
 
-message NewJobInfo {
+message JobTemplate {
   string job_name = 1;
   string account = 2;
   optional string partition = 3;
@@ -89,7 +88,7 @@ message ListJobTemplatesRequest {
   string cluster = 2;
 }
 
-message JobTemplate {
+message JobTemplateInfo {
   string id = 1;
   string job_name = 2;
   google.protobuf.Timestamp submit_time = 3;
@@ -97,7 +96,7 @@ message JobTemplate {
 }
 
 message ListJobTemplatesResponse {
-  repeated JobTemplate results = 1;
+  repeated JobTemplateInfo results = 1;
 }
 
 message GetJobTemplateRequest {
@@ -107,7 +106,7 @@ message GetJobTemplateRequest {
 }
 
 message GetJobTemplateResponse {
-  NewJobInfo job_info = 1;
+  JobTemplate template = 1;
 }
 message SubmitJobRequest {
   string user_id = 1;
@@ -126,20 +125,9 @@ message SubmitJobRequest {
 }
 
 // NOT_FOUND: cluster is not found
+// INTERNAL: error raised from scheduler. details has the error message
 message SubmitJobResponse {
-
-  message OK {
-    uint32 job_id = 1;
-  }
-
-  message SchedulerError {
-    string error = 1;
-  }
-
-  oneof result {
-    OK ok = 1;
-    SchedulerError error = 2;
-  }
+  uint32 job_id = 1;
 }
 
 service JobService {
@@ -151,8 +139,7 @@ service JobService {
 
   rpc ListRunningJobs(ListRunningJobsRequest) returns (ListRunningJobsResponse);
 
-  rpc ListJobTemplates(ListJobTemplatesRequest)
-      returns (ListJobTemplatesResponse);
+  rpc ListJobTemplates(ListJobTemplatesRequest) returns (ListJobTemplatesResponse);
 
   rpc GetJobTemplate(GetJobTemplateRequest) returns (GetJobTemplateResponse);
 

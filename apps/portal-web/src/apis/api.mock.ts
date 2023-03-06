@@ -61,6 +61,16 @@ export const job: JobInfo = {
 
 export const mockApi: MockApi<typeof api> = {
 
+  getClusterInfo: async ({ query: { cluster } }) => ({ clusterInfo: {
+    submitJobDirTemplate: "/home/ddadaal/Code/{{ name }}",
+    slurm: {
+      partitions: [
+        { cores: 123, name: "123", nodes: 123, qos: ["123"], gpus: 10, mem: 1000 },
+        { cores: 1234, name: cluster, nodes: 1234, qos: ["1234"], gpus: 10, mem: 1000 },
+      ],
+    },
+  } }),
+
   getAllJobs: async () => ({ results: [job]}),
 
   listAvailableApps: async () => ({ apps: [
@@ -106,12 +116,17 @@ export const mockApi: MockApi<typeof api> = {
   getAppMetadata: async () => ({
     appName: "test",
     appCustomFormAttributes: [
-      { type: "NUMBER", label: "版本", name: "version", select: []},
-      { type: "TEXT", label: "文字", name: "text", select: []},
-      { type: "SELECT", label: "选项", name: "option", select: [
-        { label: "版本1", value: "version1" },
-        { label: "版本2", value: "version2" },
-      ]},
+      { type: "NUMBER", label: "版本", name: "version", required: false,
+        placeholder: "选择版本", defaultValue: 123, select: []},
+      { type: "TEXT", label: "文字", name: "text", required: false,
+        placeholder: "提示信息", defaultValue: 555, select: []},
+      { type: "TEXT", label: "其他sbatch参数", name: "sbatchOptions",
+        required: true, placeholder: "比如：--gpus gres:2 --time 10", select: []},
+      { type: "SELECT", label: "选项", name: "option", required: false,
+        placeholder: "提示信息", defaultValue: "version2", select: [
+          { label: "版本1", value: "version1" },
+          { label: "版本2", value: "version2" },
+        ]},
     ]}),
 
   connectToApp: async ({ body: { sessionId } }) => sessionId === "124"
@@ -131,8 +146,8 @@ export const mockApi: MockApi<typeof api> = {
     }
   ,
 
-  getSavedJob: async () => ({
-    jobInfo: {
+  getJobTemplate: async () => ({
+    template: {
       account: "123",
       command: "123",
       coreCount: 2,
@@ -145,16 +160,12 @@ export const mockApi: MockApi<typeof api> = {
     },
   }),
 
-  getSavedJobs: async () => ({ results: [{
+  listJobTemplates: async () => ({ results: [{
     id: "123-sample-apple",
     comment: "1234",
     submitTime: new Date().toString(),
     jobName: "sample-apple",
   }]}),
-
-  getIcon: async () => undefined,
-
-  getLogo: async () => undefined,
 
   getAccounts: async () => ({ accounts: ["hpc01", "hpc02"]}),
 

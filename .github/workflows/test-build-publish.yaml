@@ -84,7 +84,6 @@ jobs:
           createGithubReleases: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
 
   build-images:
     needs: test-version-packages
@@ -97,28 +96,8 @@ jobs:
     strategy:
       matrix:
         include:
-          - name: gateway
-            file: gateway
-            build_args: ""
-
-          - name: mis-server
-            file: mis-server
-            build_args: ""
-
-          - name: portal-server
-            file: portal-server
-            build_args: ""
-
-          - name: auth
-            file: auth
-            build_args: ""
-
-          - name: mis-web
-            file: mis-web
-            build_args: ""
-
-          - name: portal-web
-            file: portal-web
+          - name: scow
+            file: scow
             build_args: ""
 
           - name: docs
@@ -135,7 +114,7 @@ jobs:
         uses: docker/setup-buildx-action@v2
 
       - name: Log in to the GitHub Container registry
-        uses: docker/login-action@3da7dc6e2b31f99ef2cb9fb4c50fb0971e0d0139
+        uses: docker/login-action@ec9cdf07d570632daeb912f5b2099cb9ec1d01e6
         with:
           registry: ${{ env.GITHUB_CR }}
           username: ${{ github.actor }}
@@ -155,7 +134,7 @@ jobs:
           push: true
           build-args: ${{ matrix.build_args }}
           tags: ${{ steps.meta.outputs.tags }}
-          file: dockerfiles/Dockerfile.${{ matrix.file }}
+          file: docker/Dockerfile.${{ matrix.file }}
           labels: ${{ steps.meta.outputs.labels }}
           # only build arm64 in master commits
           platforms: linux/amd64${{ github.ref_type == 'tag' && ',linux/arm64' || '' }}

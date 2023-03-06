@@ -34,11 +34,11 @@ import { PathBar } from "src/pageComponents/filemanager/PathBar";
 import { RenameModal } from "src/pageComponents/filemanager/RenameModal";
 import { UploadModal } from "src/pageComponents/filemanager/UploadModal";
 import { FileInfo, FileType } from "src/pages/api/file/list";
-import { publicConfig } from "src/utils/config";
+import { Cluster, publicConfig } from "src/utils/config";
 import styled from "styled-components";
 
 interface Props {
-  cluster: string;
+  cluster: Cluster;
   path: string;
   urlPrefix: string;
 }
@@ -107,7 +107,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
 
   const reload = async (signal?: AbortSignal) => {
     setLoading(true);
-    await api.listFile({ query: { cluster, path } }, signal)
+    await api.listFile({ query: { cluster: cluster.id, path } }, signal)
       .then((d) => {
         setFiles(d.items);
       })
@@ -116,7 +116,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
       });
   };
 
-  const fullUrl = (path: string) => join(urlPrefix, cluster, path);
+  const fullUrl = (path: string) => join(urlPrefix, cluster.id, path);
 
   const up = () => {
     const paths = path.split("/");
@@ -172,7 +172,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
     const operationApi = operation.op === "copy" ? api.copyFileItem : api.moveFileItem;
 
     const pasteFile = async (file: FileInfo, fromPath: string, toPath: string) => {
-      await operationApi({ body: { cluster, fromPath, toPath } })
+      await operationApi({ body: { cluster: cluster.id, fromPath, toPath } })
         .httpError(415, ({ error }) => {
           modal.error({
             title: `文件${file.name}${operationText}出错`,
@@ -192,7 +192,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
     const allCount = operation.selected.length;
     try {
       for (const x of operation.selected) {
-        const exists = await api.fileExist({ query: { cluster, path: join(path, x.name) } });
+        const exists = await api.fileExist({ query: { cluster: cluster.id, path: join(path, x.name) } });
         if (exists.result) {
           await new Promise<void>(async (res) => {
             modal.confirm({
@@ -200,9 +200,9 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
               content: `文件/目录${x.name}已存在，是否覆盖？`,
               okText: "确认",
               onOk: async () => {
-                const fileType = await api.getFileType({ query: { cluster, path: join(path, x.name) } });
+                const fileType = await api.getFileType({ query: { cluster: cluster.id, path: join(path, x.name) } });
                 const deleteOperation = fileType.type === "dir" ? api.deleteDir : api.deleteFile;
-                await deleteOperation({ body: { cluster: cluster, path: join(path, x.name) } });
+                await deleteOperation({ body: { cluster: cluster.id, path: join(path, x.name) } });
                 await pasteFile(x, join(operation.originalPath, x.name), join(path, x.name));
                 successfulCount++;
                 res();
@@ -240,7 +240,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
         await Promise.allSettled(files.map(async (x) => {
           return (x.type === "FILE" ? api.deleteFile : api.deleteDir)({
             body: {
-              cluster,
+              cluster: cluster.id,
               path: join(path, x.name),
             },
           }).then(() => x).catch(() => undefined);
@@ -277,7 +277,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
     <div>
       <TitleText>
         <span>
-        集群{publicConfig.CLUSTERS_CONFIG[cluster]?.displayName ?? cluster}文件管理
+        集群{cluster.name}文件管理
         </span>
       </TitleText>
       <TopBar>
@@ -296,7 +296,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
       <OperationBar>
         <Space wrap>
           <UploadButton
-            cluster={cluster}
+            cluster={cluster.id}
             path={path}
             reload={reload}
           >
@@ -365,14 +365,14 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
             ) : null
           }
           <CreateFileButton
-            cluster={cluster}
+            cluster={cluster.id}
             path={path}
             reload={reload}
           >
             新文件
           </CreateFileButton>
           <MkdirButton
-            cluster={cluster}
+            cluster={cluster.id}
             path={path}
             reload={reload}
           >
@@ -399,7 +399,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
             if (r.type === "DIR") {
               Router.push(fullUrl(join(path, r.name)));
             } else if (r.type === "FILE") {
-              const href = urlToDownload(cluster, join(path, r.name), false);
+              const href = urlToDownload(cluster.id, join(path, r.name), false);
               openPreviewLink(href);
             }
           },
@@ -424,12 +424,12 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
           sortDirections={["ascend", "descend"]}
           render={(_, r) => (
             r.type === "DIR" ? (
-              <Link href={join(urlPrefix, cluster, path, r.name)} passHref>
+              <Link href={join(urlPrefix, cluster.id, path, r.name)} passHref>
                 {r.name}
               </Link>
             ) : (
               <a onClick={() => {
-                const href = urlToDownload(cluster, join(path, r.name), false);
+                const href = urlToDownload(cluster.id, join(path, r.name), false);
                 openPreviewLink(href);
               }}
               >
@@ -466,13 +466,13 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
             <Space>
               {
                 i.type === "FILE" ? (
-                  <a href={urlToDownload(cluster, join(path, i.name), true)}>
+                  <a href={urlToDownload(cluster.id, join(path, i.name), true)}>
                 下载
                   </a>
                 ) : undefined
               }
               <RenameLink
-                cluster={cluster}
+                cluster={cluster.id}
                 path={join(path, i.name)}
                 reload={reload}
               >
@@ -488,7 +488,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
                   onOk: async () => {
                     await (i.type === "FILE" ? api.deleteFile : api.deleteDir)({
                       body: {
-                        cluster,
+                        cluster: cluster.id,
                         path: fullPath,
                       },
                     })

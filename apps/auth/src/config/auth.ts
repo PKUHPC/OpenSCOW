@@ -23,7 +23,7 @@ export enum NewUserGroupStrategy {
 
 export const LdapConfigSchema = Type.Object({
   url: Type.String({ description: "LDAP地址" }),
-  searchBase: Type.String({ description: "LDAP用户搜索base。", default: "" }),
+  searchBase: Type.String({ description: "从哪个节点搜索登录用户对应的LDAP节点" }),
   bindDN: Type.String({ description: "操作LDAP时以什么用户操作，默认为空字符串", default: "" }),
   bindPassword: Type.String({ description: "操作LDAP的用户的密码，默认为空字符串", default: "" }),
   userFilter: Type.String({ description: "LDAP用户筛选器" }),
@@ -55,9 +55,16 @@ export const LdapConfigSchema = Type.Object({
       新的组节点的DN为{groupIdDnKey}={用户ID},{groupBase}
       如果不填写，则使用ldap.attrs.uid的值
       ` })),
-      extraProps: Type.Optional(Type.Record(Type.String(), Type.Union([Type.String(), Type.Array(Type.String())], {
-        description: "组的节点应该额外拥有的属性值。可以使用 {{ 用户节点的属性key }}来使用用户节点的属性值",
-      }))),
+      extraProps: Type.Optional(Type.Record(
+        Type.String(), 
+        Type.Union([Type.Null(), Type.String(), Type.Array(Type.String())],
+          {
+            description: `
+          组的节点应该额外拥有的属性值。
+          值可以为字符串、字符串列表或者null。如果为null，则不会添加此值。
+          符串可以使用 {{ 用户节点的属性key }}来使用用户节点的属性值
+        `,
+          }))),
     }, { description: "如果groupStrategy采用newGroupPerUser，填写新的组节点的配置信息" })),
 
     oneGroupForAllUsers: Type.Optional(Type.Object({
@@ -78,9 +85,11 @@ export const LdapConfigSchema = Type.Object({
     extraProps: Type.Optional(
       Type.Record(
         Type.String(),
-        Type.Union([Type.String(), Type.Array(Type.String())]),
+        Type.Union([Type.Null(), Type.String(), Type.Array(Type.String())]),
         { description: `
-          LDAP增加用户时，用户项除了id、name和mail，还应该添加哪些属性
+          LDAP增加用户时，用户项除了id、name和mail，还应该添加哪些属性。
+          属性值可以为字符串、字符串列表或者null。
+          如果属性值为null，那么将不会添加这个属性。如果值为null的属性名为默认添加的值，则那个默认添加的值也不会被添加。
           如果这里出现了uid, name或email同名的属性，这里的值将替代用户输入的值。
           属性值支持使用 {{ 用户节点的属性key }} 格式来使用已有用户节点的属性值
           例如：{ sn: "{{ cn }}" }，那么添加时将会增加一个sn属性，其值为cn的属性，即为用户输入的姓名
@@ -118,6 +127,10 @@ export const AuthConfigSchema = Type.Object({
   authType: Type.Enum(AuthType, { description: "认证类型", default: "ssh" }),
   ldap: Type.Optional(LdapConfigSchema),
   ssh: Type.Optional(SshConfigSchema),
+  allowedCallbackHostnames: Type.Array(Type.String({ description: "信任的回调域名" }), { default: []}),
+  captcha: Type.Object({
+    enabled: Type.Boolean({ description: "验证码功能是否启用", default: false }),
+  }, { default: {} }),
 });
 
 export type AuthConfigSchema = Static<typeof AuthConfigSchema>;

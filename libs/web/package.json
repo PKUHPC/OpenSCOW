@@ -1,11 +1,12 @@
 {
   "name": "@scow/lib-web",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "",
   "main": "index.js",
   "private": true,
   "sideEffects": false,
   "scripts": {
+    "dev": "tsc -p tsconfig.build.json && (concurrently \"tsc -p tsconfig.build.json -w\" \"tsc-alias -p tsconfig.build.json -w\")",
     "build": "rimraf build && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json"
   },
   "files": [
@@ -14,12 +15,29 @@
     "!**/*.map"
   ],
   "dependencies": {
-    "@scow/utils": "workspace:*"
+    "@scow/utils": "workspace:*",
+    "zod": "3.21.2",
+    "mime-types": "2.1.35"
   },
   "peerDependencies": {
-    "antd": "5.2.0",
-    "next": "13.1.6",
-    "styled-components": "5.3.6"
+    "antd": "5.3.0",
+    "next": "13.2.3",
+    "styled-components": "5.3.8",
+    "@ant-design/icons": "5.0.1",
+    "dayjs": "1.11.7"
+  },
+  "devDependencies": {
+    "antd": "5.3.0",
+    "next": "13.2.3",
+    "styled-components": "5.3.8",
+    "@types/mime-types": "2.1.1",
+    "react": "18.2.0",
+    "@types/react": "18.0.28",
+    "react-dom": "18.2.0",
+    "@types/react-dom": "18.0.11",
+    "react-is": "18.2.0",
+    "@ant-design/icons": "5.0.1",
+    "dayjs": "1.11.7"
   },
   "author": "PKUHPC (https://github.com/PKUHPC)",
   "license": "Mulan PSL v2",

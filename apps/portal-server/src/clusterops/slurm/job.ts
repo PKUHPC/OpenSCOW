@@ -13,7 +13,7 @@
 import { getRunningJobs } from "@scow/lib-slurm";
 import { executeAsUser, loggedExec, sftpExists, sftpReaddir, sftpReadFile, sftpWriteFile } from "@scow/lib-ssh";
 import { join } from "path";
-import { JobOps, JobTemplate } from "src/clusterops/api/job";
+import { JobOps, JobTemplateInfo } from "src/clusterops/api/job";
 import { querySacct } from "src/clusterops/slurm/bl/queryJobInfo";
 import { generateJobScript, JobMetadata, parseSbatchOutput } from "src/clusterops/slurm/bl/submitJob";
 import { portalConfig } from "src/config/portal";
@@ -112,7 +112,7 @@ export const slurmJobOps = (cluster: string): JobOps => {
 
         const data = JSON.parse(content.toString()) as JobMetadata;
 
-        return { code: "OK", jobInfo: data };
+        return { code: "OK", template: data };
       });
     },
 
@@ -135,7 +135,7 @@ export const slurmJobOps = (cluster: string): JobOps => {
             submitTime: new Date(data.submitTime),
             comment: data.comment,
             jobName: data.jobName,
-          } as JobTemplate;
+          } as JobTemplateInfo;
         }));
 
         return { results };
@@ -144,7 +144,7 @@ export const slurmJobOps = (cluster: string): JobOps => {
 
     listRunningJobs: async (request, logger) => {
       const { userId } = request;
-      
+
       return await sshConnect(host, "root", logger, async (ssh) => {
         const results = await getRunningJobs(ssh, userId, { userId }, logger);
 

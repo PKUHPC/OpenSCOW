@@ -1,5 +1,18 @@
 {
   "name": "@scow/gateway",
   "private": true,
-  "version": "0.1.2"
+  "version": "0.3.0",
+  "main": "build/index.js",
+  "files": [
+    "build",
+    "assets"
+  ],
+  "scripts": {
+    "build": "rimraf build && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
+    "serve": "node build/index.js"
+  },
+  "dependencies": {
+    "@scow/lib-config": "workspace:*",
+    "@scow/utils": "workspace:*"
+  }
 }

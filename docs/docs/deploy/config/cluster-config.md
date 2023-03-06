@@ -21,12 +21,6 @@ slurm:
     - login01
     - login02
 
-  # 各个计算节点的IP，服务节点必须可访问
-  # 如果设置的是域名，请确认此节点的/etc/hosts中包含了域名到IP的解析信息
-  computeNodes:
-    - cn01
-    - cn02
-
   # 集群的分区信息，结构为一个列表
   partitions:
     # 分区1的名字

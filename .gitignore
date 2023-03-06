@@ -9,3 +9,5 @@ internal
 .turbo
 out
 dist
+version.json
+.pnpm-store

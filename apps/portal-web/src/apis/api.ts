@@ -14,8 +14,7 @@
 
 import { fromApi } from "@ddadaal/next-typed-api-routes-runtime/lib/client";
 import { join } from "path";
-import type { GetIconSchema } from "src/pages/api//icon";
-import type { GetLogoSchema } from "src/pages/api//logo";
+import type { GetClusterInfoSchema } from "src/pages/api//cluster";
 import type { ConnectToAppSchema } from "src/pages/api/app/connectToApp";
 import type { CreateAppSessionSchema } from "src/pages/api/app/createAppSession";
 import type { GetAppMetadataSchema } from "src/pages/api/app/getAppMetadata";
@@ -44,9 +43,9 @@ import type { UploadFileSchema } from "src/pages/api/file/upload";
 import type { CancelJobSchema } from "src/pages/api/job/cancelJob";
 import type { GetAccountsSchema } from "src/pages/api/job/getAccounts";
 import type { GetAllJobsSchema } from "src/pages/api/job/getAllJobs";
+import type { GetJobTemplateSchema } from "src/pages/api/job/getJobTemplate";
 import type { GetRunningJobsSchema } from "src/pages/api/job/getRunningJobs";
-import type { GetSavedJobSchema } from "src/pages/api/job/getSavedJob";
-import type { GetSavedJobsSchema } from "src/pages/api/job/getSavedJobs";
+import type { ListJobTemplatesSchema } from "src/pages/api/job/listJobTemplates";
 import type { SubmitJobSchema } from "src/pages/api/job/submitJob";
 import type { ChangePasswordSchema } from "src/pages/api/profile/changePassword";
 import { publicConfig } from "src/utils/config";
@@ -63,6 +62,7 @@ export const api = {
   authCallback: fromApi<AuthCallbackSchema>("GET", join(basePath, "/api/auth/callback")),
   logout: fromApi<LogoutSchema>("DELETE", join(basePath, "/api/auth/logout")),
   validateToken: fromApi<ValidateTokenSchema>("GET", join(basePath, "/api/auth/validateToken")),
+  getClusterInfo: fromApi<GetClusterInfoSchema>("GET", join(basePath, "/api//cluster")),
   createDesktop: fromApi<CreateDesktopSchema>("POST", join(basePath, "/api/desktop/createDesktop")),
   killDesktop: fromApi<KillDesktopSchema>("POST", join(basePath, "/api/desktop/killDesktop")),
   launchDesktop: fromApi<LaunchDesktopSchema>("POST", join(basePath, "/api/desktop/launchDesktop")),
@@ -80,14 +80,12 @@ export const api = {
   mkdir: fromApi<MkdirSchema>("POST", join(basePath, "/api/file/mkdir")),
   moveFileItem: fromApi<MoveFileItemSchema>("PATCH", join(basePath, "/api/file/move")),
   uploadFile: fromApi<UploadFileSchema>("POST", join(basePath, "/api/file/upload")),
-  getIcon: fromApi<GetIconSchema>("GET", join(basePath, "/api//icon")),
   cancelJob: fromApi<CancelJobSchema>("DELETE", join(basePath, "/api/job/cancelJob")),
   getAccounts: fromApi<GetAccountsSchema>("GET", join(basePath, "/api/job/getAccounts")),
   getAllJobs: fromApi<GetAllJobsSchema>("GET", join(basePath, "/api/job/getAllJobs")),
+  getJobTemplate: fromApi<GetJobTemplateSchema>("GET", join(basePath, "/api/job/getJobTemplate")),
   getRunningJobs: fromApi<GetRunningJobsSchema>("GET", join(basePath, "/api/job/getRunningJobs")),
-  getSavedJob: fromApi<GetSavedJobSchema>("GET", join(basePath, "/api/job/getSavedJob")),
-  getSavedJobs: fromApi<GetSavedJobsSchema>("GET", join(basePath, "/api/job/getSavedJobs")),
+  listJobTemplates: fromApi<ListJobTemplatesSchema>("GET", join(basePath, "/api/job/listJobTemplates")),
   submitJob: fromApi<SubmitJobSchema>("POST", join(basePath, "/api/job/submitJob")),
-  getLogo: fromApi<GetLogoSchema>("GET", join(basePath, "/api//logo")),
   changePassword: fromApi<ChangePasswordSchema>("PATCH", join(basePath, "/api/profile/changePassword")),
 };

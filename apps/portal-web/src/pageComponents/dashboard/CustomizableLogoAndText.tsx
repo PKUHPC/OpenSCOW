@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { useDarkMode } from "@scow/lib-web/build/layouts/darkMode";
 import { Divider, Typography } from "antd";
 import { join } from "path";
 import React from "react";
@@ -49,12 +50,16 @@ const Text = styled(Typography.Paragraph)`
 
 export const CustomizableLogoAndText: React.FC<Props> = ({ homeText, homeTitle }) => {
 
+  const { dark } = useDarkMode();
+
+  const query = new URLSearchParams({ type: "banner", preferDark: dark ? "true" : "false" }).toString();
+
   return (
     <Container>
       <Logo>
         <img
           alt="logo"
-          src={join(publicConfig.BASE_PATH, "/api/logo")}
+          src={join(publicConfig.BASE_PATH, "/api/logo?" + query)}
           style={{
             objectFit: "contain",
             maxWidth: "100%",

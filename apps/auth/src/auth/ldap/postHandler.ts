@@ -14,10 +14,11 @@ import formBody from "@fastify/formbody";
 import { Static, Type } from "@sinclair/typebox";
 import { FastifyInstance } from "fastify";
 import { cacheInfo } from "src/auth/cacheInfo";
+import { redirectToWeb } from "src/auth/callback";
 import { findUser, useLdap } from "src/auth/ldap/helpers";
 import { serveLoginHtml } from "src/auth/loginHtml";
+import { validateLoginParams } from "src/auth/validateLoginParams";
 import { LdapConfigSchema } from "src/config/auth";
-import { redirectToWeb } from "src/routes/callback";
 
 export function registerPostHandler(f: FastifyInstance, ldapConfig: LdapConfigSchema) {
 
@@ -27,13 +28,19 @@ export function registerPostHandler(f: FastifyInstance, ldapConfig: LdapConfigSc
     username: Type.String(),
     password: Type.String(),
     callbackUrl: Type.String(),
+    token: Type.String(),
+    code: Type.String(),
   });
 
   // register a login handler
   f.post<{ Body: Static<typeof bodySchema> }>("/public/auth", {
     schema: { body: bodySchema },
   }, async (req, res) => {
-    const { username, password, callbackUrl } = req.body;
+    const { username, password, callbackUrl, token, code } = req.body;
+
+    if (!await validateLoginParams(token, code, callbackUrl, req, res)) {
+      return;
+    }
 
     // TODO
     // 1. bind with the server

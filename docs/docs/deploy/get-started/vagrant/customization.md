@@ -71,10 +71,6 @@ slurm:
   loginNodes:
     - login
  
-  computeNodes:
-    - cn01
-    - cn02 		# 增加cn02
-
   partitions:
     - name: compute
       # 分区内节点数修改为2

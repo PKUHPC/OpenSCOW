@@ -11,20 +11,23 @@
  */
 
 import { Logger } from "@ddadaal/tsgrpc-server";
+import { ClusterConfigSchema } from "@scow/config/build/cluster";
 import { Decimal } from "@scow/lib-decimal";
 import { JobInfo, PriceMap } from "src/bl/PriceMap";
 import { clusters } from "src/config/clusters";
 import { JobPriceInfo } from "src/entities/JobInfo";
 import { AmountStrategy, JobPriceItem } from "src/entities/JobPriceItem";
 
-type AmountStrategyFunc = (info: JobInfo) => Decimal;
+type Partition = ClusterConfigSchema["slurm"]["partitions"][number];
+
+type AmountStrategyFunc = (info: JobInfo, partition: Partition) => Decimal;
 
 const amountStrategyFuncs: Record<AmountStrategy, AmountStrategyFunc> = {
   [AmountStrategy.GPU]: (info) => new Decimal(info.gpu),
   [AmountStrategy.CPUS_ALLOC]: (info) => new Decimal(info.cpusAlloc),
-  [AmountStrategy.MAX_GPU_CPUSALLOC]: (info) => {
+  [AmountStrategy.MAX_GPU_CPUSALLOC]: (info, partition) => {
     const { gpu, cpusAlloc } = info;
-    const { cores, gpus } = clusters[info.cluster].slurm.partitions[info.partition];
+    const { cores, gpus } = partition;
     return Decimal.max(
       gpu,
       new Decimal(cpusAlloc).div(
@@ -32,9 +35,9 @@ const amountStrategyFuncs: Record<AmountStrategy, AmountStrategyFunc> = {
       ).integerValue(Decimal.ROUND_CEIL),
     );
   },
-  [AmountStrategy.MAX_CPUSALLOC_MEM]: (info) => {
+  [AmountStrategy.MAX_CPUSALLOC_MEM]: (info, partition) => {
 
-    const { mem, cores } = clusters[info.cluster].slurm.partitions[info.partition];
+    const { mem, cores } = partition;
     return Decimal.max(
       // 核心数
       info.cpusAlloc,
@@ -62,7 +65,7 @@ export function calculateJobPrice(
     return emptyJobPriceInfo();
   }
 
-  const partitionInfo = clusterInfo.slurm.partitions[info.partition];
+  const partitionInfo = clusterInfo.slurm.partitions.find((x) => x.name === info.partition);
   if (!partitionInfo) {
     logger.warn(`Unknown partition ${info.partition} of cluster ${info.cluster}`);
     return emptyJobPriceInfo();
@@ -70,12 +73,12 @@ export function calculateJobPrice(
 
   const path = [info.cluster, info.partition, info.qos] as [string, string, string];
 
-  function calculatePrice(priceItem: JobPriceItem) {
+  function calculatePrice(priceItem: JobPriceItem, partition: Partition) {
     const time = new Decimal(info.timeUsed).div(3600); // 秒到小时
 
     const amountFn = amountStrategyFuncs[priceItem.amount];
 
-    let amount = amountFn ? amountFn(info) : new Decimal(0);
+    let amount = amountFn ? amountFn(info, partition) : new Decimal(0);
 
     if (!amountFn) {
       logger.warn("Unknown AmountStrategy %s. Count as 0.", priceItem.amount);
@@ -90,8 +93,8 @@ export function calculateJobPrice(
   const accountBase = getPriceItem(path, info.tenant);
   const tenantBase = getPriceItem(path);
 
-  const accountPrice = calculatePrice(accountBase);
-  const tenantPrice = calculatePrice(tenantBase);
+  const accountPrice = calculatePrice(accountBase, partitionInfo);
+  const tenantPrice = calculatePrice(tenantBase, partitionInfo);
 
   return {
     tenant: { billingItemId: tenantBase.itemId, price: tenantPrice },

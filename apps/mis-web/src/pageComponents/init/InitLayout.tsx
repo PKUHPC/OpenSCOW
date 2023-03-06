@@ -45,6 +45,16 @@ const TabsContainer = styled.div`
   }
 `;
 
+const Content = styled.div`
+  display: flex;
+  justify-content: center;
+`;
+
+const ContentInside = styled.div`
+  max-width: 1400px;
+`;
+
+
 export const InitTab: React.FC = () => {
 
   const router = useRouter();
@@ -110,8 +120,11 @@ export const InitDrawer: React.FC<DrawerProps> = ({ children }) => {
         </CompleteButtonContainer>
       </Title>
       <InitTab />
-      <div>{children}</div>
+      <Content>
+        <ContentInside>
+          {children}
+        </ContentInside>
+      </Content>
     </div>
   );
 };
-

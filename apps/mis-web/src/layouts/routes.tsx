@@ -13,13 +13,11 @@
 import {
   AccountBookOutlined, BookOutlined, CloudServerOutlined,
   DashboardOutlined,
-  InfoOutlined, MoneyCollectOutlined, PartitionOutlined,
-  PlusOutlined, PlusSquareOutlined, StarOutlined, UserAddOutlined,
+  InfoOutlined, LockOutlined, MoneyCollectOutlined, PartitionOutlined,
+  PlusOutlined, PlusSquareOutlined, StarOutlined, ToolOutlined, UserAddOutlined,
   UserOutlined } from "@ant-design/icons";
 import { NavItemProps } from "@scow/lib-web/build/layouts/base/types";
-import { NavIcon } from "@scow/lib-web/build/layouts/icon";
 import { AccountAffiliation } from "@scow/protos/build/server/user";
-import Whitelist from "src/icons/whiteList.svg";
 import { PlatformRole, TenantRole, UserRole } from "src/models/User";
 import { User } from "src/stores/UserStore";
 import { publicConfig } from "src/utils/config";
@@ -73,6 +71,25 @@ export const platformAdminRoutes: (platformRoles: PlatformRole[]) => NavItemProp
           ],
         },
       ] : []),
+      {
+        Icon: ToolOutlined,
+        text: "平台调试",
+        path: "/admin/systemDebug",
+        clickable: false,
+        children: [
+          {
+            Icon: LockOutlined,
+            text: "封锁状态同步",
+            path: "/admin/systemDebug/slurmBlockStatus",
+          },
+          {
+            Icon: BookOutlined,
+            text: "作业信息同步",
+            path: "/admin/systemDebug/fetchJobs",
+          },
+        ],
+      },
+
     ],
   },
 ];

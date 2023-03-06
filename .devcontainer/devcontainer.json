@@ -2,9 +2,9 @@
 // README at: https://github.com/devcontainers/templates/tree/main/src/docker-existing-dockerfile
 {
   "name": "SCOW Dev Env",
-  "build": {
-    "dockerfile": "./Dockerfile"
-  },
+  "dockerComposeFile": "./docker-compose.devcontainer.yml",
+  "service": "scow-dev",
+  "workspaceFolder": "/workspace/SCOW",
   "features": {
     "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {}
   },
@@ -19,8 +19,7 @@
         "GitHub.copilot",
         "bufbuild.vscode-buf",
         "EditorConfig.EditorConfig",
-        "zxh404.vscode-proto3",
-        "ms-playwright.playwright"
+        "zxh404.vscode-proto3"
       ]
     }
   }

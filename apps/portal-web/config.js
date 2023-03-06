@@ -5,6 +5,7 @@ const { join } = require("path");
 const { homedir } = require("os");
 const { PHASE_DEVELOPMENT_SERVER, PHASE_PRODUCTION_BUILD, PHASE_PRODUCTION_SERVER, PHASE_TEST } = require("next/constants");
 
+const { readVersionFile } = require("@scow/utils/build/version");
 const { getCapabilities } = require("@scow/lib-auth");
 const { DEFAULT_PRIMARY_COLOR, getUiConfig } = require("@scow/config/build/ui");
 const { getPortalConfig } = require("@scow/config/build/portal");
@@ -106,6 +107,7 @@ const buildRuntimeConfig = async (phase, basePath) => {
     HOME_TEXTS: portalConfig.homeText.hostnameMap,
     DEFAULT_HOME_TITLE: portalConfig.homeTitle.defaultText,
     HOME_TITLES: portalConfig.homeTitle.hostnameMap,
+    SUBMIT_JOB_WORKING_DIR: portalConfig.submitJobDefaultPwd,
   };
 
   // query auth capabilities to set optional auth features
@@ -128,14 +130,8 @@ const buildRuntimeConfig = async (phase, basePath) => {
 
     MIS_URL: config.MIS_DEPLOYED ? (config.MIS_URL || portalConfig.misUrl) : undefined,
 
-    CLUSTERS_CONFIG: Object.entries(clusters).reduce((prev, [name, config]) => {
-      prev[name] = { displayName: config.displayName, slurm: { partitions: config.slurm.partitions } }
-      return prev;
-    }, {}),
-
     CLUSTERS: Object.entries(clusters).map(([id, { displayName }]) => ({ id, name: displayName })),
 
-    SUBMIT_JOB_WORKING_DIR: portalConfig.submitJobDefaultPwd,
 
     PROXY_BASE_PATH: join(basePath, config.PROXY_BASE_PATH),
     RPROXY_BASE_PATH: join(basePath, config.RPROXY_BASE_PATH),
@@ -150,19 +146,21 @@ const buildRuntimeConfig = async (phase, basePath) => {
   }
 
   if (!building && !testenv) {
+    console.log("Running @scow/portal-web");
+    console.log("Version", readVersionFile());
     console.log("Server Runtime Config", serverRuntimeConfig);
     console.log("Public Runtime Config", publicRuntimeConfig);
   }
 
-  if (!mockEnv && !testenv) {
+  if (!testenv) {
 
     // HACK
-    // call /api/proxy/<node>/<port>/ after 3 seconds to init the proxy ws server
+    // call /api/setup after 3 seconds to init the proxy and shell server
     setTimeout(() => {
-      const url = "http://localhost:" + (process.env.PORT || 3000) + join(publicRuntimeConfig.PROXY_BASE_PATH, "127.0.0.1", "3001");
-      console.log("Calling proxy url to initialize ws proxy server", url);
-      fetch(url).then(() => {
-        console.log("Call completed.");
+      const url = `http://localhost:${process.env.PORT || 3000}${basePath === "/" ? "" : basePath}/api/setup`;
+      console.log("Calling setup url to initialize proxy and shell server", url);
+      fetch(url).then(async (res) => {
+        console.log("Call completed. Response: ", await res.text());
       }).catch((e) => {
         console.error("Error when calling proxy url to initialize ws proxy server", e);
       });
