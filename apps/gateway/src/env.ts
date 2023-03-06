@@ -25,7 +25,7 @@ export const config = envConfig({
   MIS_PATH_INTERNAL_URL: str({ desc: "管理系统内部路径", default: "http://mis-web:3000" }),
 
   VNC_PATH: str({ desc: "VNC客户端路径", default: "/vnc/" }),
-  NOVNC_INTERNAL_URL: str({ desc: "NOVNC内部地址", default: "http://novnc:80" }),
+  NOVNC_INTERNAL_URL: str({ desc: "NOVNC内部地址", default: "http://novnc:80/" }),
 
   AUTH_INTERNAL_URL: str({ desc: "认证服务内部地址", default: "http://auth:5000" }),
 
