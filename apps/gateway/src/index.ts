@@ -26,7 +26,7 @@ const nginxConfTemplate = readFileSync("assets/nginx.conf", "utf8");
 
 const nginxConf = parsePlaceholder(nginxConfTemplate, omitConfigSpec(config));
 
-writeFileSync("/etc/nginx/default.conf", nginxConf);
+writeFileSync("/etc/nginx/http.d/default.conf", nginxConf);
 
 cpSync("assets/includes", "/etc/nginx/includes", { recursive: true });
 
