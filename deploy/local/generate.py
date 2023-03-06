@@ -54,8 +54,16 @@ check_path_format("MIS.BASE_PATH", MIS_PATH)
 LOG_LEVEL = get_cfg(["LOG", "LEVEL"], "info")
 LOG_PRETTY = json.dumps(get_cfg(["LOG", "PRETTY"], False))
 
-SCOW_IMAGE_NAME = cfg.COMMON["IMAGE"] + ":" + cfg.COMMON["IMAGE_TAG"]
+SCOW_IMAGE = get_cfg(["COMMON", "IMAGE"])
+if not SCOW_IMAGE:
+  SCOW_IMAGE_BASE = get_cfg(["COMMON", "IMAGE_BASE"])
+  if SCOW_IMAGE_BASE:
+    SCOW_IMAGE = SCOW_IMAGE_BASE + "/scow"
+  else:
+    print("Please define COMMON.IMAGE or COMMON.IMAGE_BASE")
+    exit(1)
 
+SCOW_IMAGE_NAME = SCOW_IMAGE + ":" + cfg.COMMON["IMAGE_TAG"]
 
 def path_join(*args):
   def join(a, b):
