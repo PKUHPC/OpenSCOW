@@ -21,14 +21,9 @@ git clone %REPO_URL% --depth=1
 3. 构建镜像
 
 ```bash
-docker compose --env-file dev/.env.build -f dev/docker-compose.build.yml build 
+# 构建tag为scow:latest的镜像。如果需要修改镜像的tag，请修改-t参数的值
+docker build -f docker/Dockerfile.scow -t scow .
 ```
-
-:::tip
-
-您可以通过修改`dev/.env.build`文件来修改构建的镜像的名称和tag。
-
-:::
 
 :::tip
 

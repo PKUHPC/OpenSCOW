@@ -54,6 +54,7 @@ check_path_format("MIS.BASE_PATH", MIS_PATH)
 LOG_LEVEL = get_cfg(["LOG", "LEVEL"], "info")
 LOG_PRETTY = json.dumps(get_cfg(["LOG", "PRETTY"], False))
 
+# easy migration from IMAGE_BASE to IMAGE
 SCOW_IMAGE = get_cfg(["COMMON", "IMAGE"])
 if not SCOW_IMAGE:
   SCOW_IMAGE_BASE = get_cfg(["COMMON", "IMAGE_BASE"])
