@@ -31,7 +31,7 @@ import { globby } from "globby";
 const APPS_BASE_PATH = "apps";
 const DIST_BASE_PATH = "dist";
 
-const ROOT_ITEMS = ["package.json", "pnpm-lock.yaml", ".npmrc", "pnpm-workspace.yaml"];
+const ROOT_ITEMS = ["package.json", "pnpm-lock.yaml", "pnpm-workspace.yaml"];
 const DEFAULT_COPY_ITEMS = ["package.json"];
 
 const lockFile = await readWantedLockfile(".", {});
