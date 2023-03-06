@@ -34,16 +34,17 @@ export const CallbackUrlNotValidError = createError(
 
 export async function validateCallbackHostname(callbackUrl: string, req: FastifyRequest) {
 
-  const incomingDomain = req.hostname;
+  // req.hostname includes port, which we don't want
+  const incomingHostname = req.hostname.split(":")[0];
 
   try {
-    const domain = new URL(callbackUrl).hostname;
+    const callbackHostname = new URL(callbackUrl).hostname;
 
-    if (domain === incomingDomain) {
+    if (callbackHostname === incomingHostname) {
       return;
     }
 
-    if (!allowedCallbackHostnames.has(domain)) {
+    if (!allowedCallbackHostnames.has(callbackHostname)) {
       throw new CallbackHostnameNotAllowedError();
 
     }
