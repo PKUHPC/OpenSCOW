@@ -10,10 +10,12 @@
  * See the Mulan PSL v2 for more details.
  */
 
-export { changePassword } from "./changePassword";
-export { createUser } from "./createUser";
-export { deleteToken } from "./deleteToken";
-export type { Capabilities } from "./getCapabilities";
-export { getCapabilities } from "./getCapabilities";
-export { getUser } from "./getUser";
-export { validateToken } from "./validateToken";
+import { applicationJsonHeaders } from "./utils";
+
+export async function deleteToken(token: string, authUrl: string) {
+  return await fetch(authUrl + "/token?token=" + token, {
+    method: "DELETE",
+    headers: applicationJsonHeaders,
+  });
+}
+
