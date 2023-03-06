@@ -64,7 +64,7 @@ function toGrpc(x: JobInfoEntity) {
 
 async function filterJobs({
   clusters, accountName, jobEndTimeEnd, tenantName,
-  jobEndTimeStart, jobId, userId,
+  jobEndTimeStart, jobId, userId, startBiJobIndex,
 }: JobFilter, em: SqlEntityManager<MySqlDriver>) {
 
   const accountNames = (accountName === undefined && userId === undefined)
@@ -72,6 +72,7 @@ async function filterJobs({
     : accountName;
 
   return {
+    ...startBiJobIndex ? { biJobIndex: { $gte: startBiJobIndex } } : {},
     ...userId ? { user: userId } : {},
     ...clusters.length > 0 ? { cluster: clusters } : {},
     ...jobId
@@ -335,8 +336,8 @@ export const jobServiceServer = plugin((server) => {
           ...Object.values(tenantSpecificPrices).map((x) => Object.values(x)).flat(),
         ];
 
-      return [{ 
-        activeItems: activePrices.map(priceItemToGrpc), 
+      return [{
+        activeItems: activePrices.map(priceItemToGrpc),
         historyItems: activeOnly ? [] : billingItems.filter((x) => !activePrices.includes(x)).map(priceItemToGrpc) }];
     },
 

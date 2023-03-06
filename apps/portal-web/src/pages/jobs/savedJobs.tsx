@@ -13,7 +13,7 @@
 import { NextPage } from "next";
 import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
-import { SavedJobsTable } from "src/pageComponents/job/SavedJobsTable";
+import { JobTemplateTable } from "src/pageComponents/job/JobTemplateTable";
 import { Head } from "src/utils/head";
 
 export const SavedJobsPage: NextPage = requireAuth(() => true)(
@@ -22,7 +22,7 @@ export const SavedJobsPage: NextPage = requireAuth(() => true)(
       <div>
         <Head title="作业模板" />
         <PageTitle titleText={"作业模板列表"} />
-        <SavedJobsTable />
+        <JobTemplateTable />
       </div>
     );
 

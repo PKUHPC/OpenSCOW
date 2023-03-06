@@ -23,7 +23,7 @@ export interface ListRunningJobsReply {
 
 export interface SubmitJobRequest {
   userId: string;
-  jobInfo: NewJobInfo;
+  jobInfo: JobTemplate;
   script: string;
   saveAsTemplate: boolean;
 }
@@ -32,7 +32,7 @@ export type SubmitJobReply =
   | { code: "OK", jobId: number; }
   | { code: "SBATCH_FAILED", message: string };
 
-export interface NewJobInfo {
+export interface JobTemplate {
   jobName: string;
   account: string;
   partition?: string | undefined;
@@ -47,7 +47,7 @@ export interface NewJobInfo {
 }
 
 export interface GenerateJobScriptRequest {
-  jobInfo: NewJobInfo;
+  jobInfo: JobTemplate;
 }
 
 export interface GenerateJobScriptReply {
@@ -62,29 +62,29 @@ export interface ListAccountsReply {
   accounts: string[];
 }
 
-export interface ListSavedJobsRequest {
+export interface ListJobTemplatesRequest {
   userId: string;
 }
 
-export interface JobTemplate {
+export interface JobTemplateInfo {
   id: string;
   jobName: string;
   submitTime: Date;
   comment: string | undefined;
 }
 
-export interface ListSavedJobsReply {
-  results: JobTemplate[];
+export interface ListJobTemplatesReply {
+  results: JobTemplateInfo[];
 }
 
-export interface GetSavedJobRequest {
+export interface GetJobTemplateRequest {
   userId: string;
   id: string;
 }
 
-export type GetSavedJobReply = {
+export type GetJobTemplateReply = {
   code: "OK"
-  jobInfo: NewJobInfo;
+  template: JobTemplate;
 } | {
   code: "NOT_FOUND"
 }
@@ -125,8 +125,8 @@ export interface JobOps {
   listAccounts(req: ListAccountsRequest, logger: Logger): Promise<ListAccountsReply>;
   generateJobScript(req: GenerateJobScriptRequest, logger: Logger): Promise<GenerateJobScriptReply>;
   submitJob(req: SubmitJobRequest, logger: Logger): Promise<SubmitJobReply>;
-  listJobTemplates(req: ListSavedJobsRequest, logger: Logger): Promise<ListSavedJobsReply>;
-  getJobTamplate(req: GetSavedJobRequest, logger: Logger): Promise<GetSavedJobReply>;
+  listJobTemplates(req: ListJobTemplatesRequest, logger: Logger): Promise<ListJobTemplatesReply>;
+  getJobTamplate(req: GetJobTemplateRequest, logger: Logger): Promise<GetJobTemplateReply>;
   cancelJob(req: CancelJobRequest, logger: Logger): Promise<CancelJobReply>;
   listAllJobsInfo(req: ListAllJobsInfoRequest, logger: Logger): Promise<ListAllJobsInfoReply>;
 }

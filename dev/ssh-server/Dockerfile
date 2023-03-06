@@ -14,12 +14,14 @@ ENV TZ Asia/Shanghai
 
 RUN apk add --no-cache openssh=9.1_p1-r2 sudo
 
+RUN echo 'root:root' | chpasswd
+
 COPY ./entry.sh /entry.sh
 
 RUN ssh-keygen -A ; mkdir /root/.ssh
 
 RUN echo "PermitRootLogin yes" >> /etc/ssh/sshd_config; sed -i -e '$aPubkeyAcceptedKeyTypes=+ssh-rsa\n' /etc/ssh/sshd_config
 
-RUN adduser -D test;echo "test:1234" | chpasswd ; mkdir /home/test/.ssh/ ; chown test.test home/test/.ssh/
+RUN adduser -D test;echo "test:test" | chpasswd ; mkdir /home/test/.ssh/ ; chown test.test home/test/.ssh/
 
 CMD ["sh", "/entry.sh"]

@@ -1,0 +1,81 @@
+# Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
+# SCOW is licensed under Mulan PSL v2.
+# You can use this software according to the terms and conditions of the Mulan PSL v2.
+# You may obtain a copy of Mulan PSL v2 at:
+#          http://license.coscl.org.cn/MulanPSL2
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+# EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+# MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+# See the Mulan PSL v2 for more details.
+
+version: "3"
+
+services:
+
+  scow-dev:
+    image: scow-dev
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: /bin/sh -c "while sleep 1000; do :; done"
+    volumes:
+      # Mounts the project folder to '/workspace'. The target path inside the container
+      # should match what your application expects. In this case, the compose file is
+      # in a sub-folder, so you will mount '..'. You would then reference this path as the
+      # 'workspaceFolder' in '.devcontainer/devcontainer.json' so VS Code starts here.
+      - ..:/workspace/SCOW:cached
+
+  db:
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_PASSWORD: mysqlrootpassword
+    volumes:
+      - "db:/var/lib/mysql"
+    network_mode: service:scow-dev
+
+  redis:
+    image: redis:alpine
+    network_mode: service:scow-dev
+
+  jobTableDb:
+    image: mariadb:5.5
+    command: mysqld --port 3307
+    environment:
+      MYSQL_ROOT_PASSWORD: jobtablepassword
+    volumes:
+      - jobtabledb:/var/lib/mysql
+    network_mode: service:scow-dev
+
+  ssh-server:
+    image: alpine-ssh
+    build:
+      context: ../dev/ssh-server
+    environment:
+      SSH_PORT: 22222
+    network_mode: service:scow-dev
+
+  ldap:
+    image: ldaptest
+    build:
+      context: ..
+      dockerfile: dev/ldap/Dockerfile
+    volumes:
+      - ldap:/var/lib/ldap
+    ulimits:
+      nofile:
+        soft: 10240
+        hard: 10240
+    network_mode: service:scow-dev
+
+  ldapadmin:
+    image: osixia/phpldapadmin
+    ports:
+      - 3890:80
+    environment:
+      PHPLDAPADMIN_LDAP_HOSTS: ldap://scow-dev:389
+      PHPLDAPADMIN_HTTPS: false
+
+volumes:
+  db:
+  ldap:
+  jobtabledb:
