@@ -14,6 +14,7 @@ import { HomeOutlined, UpOutlined } from "@ant-design/icons";
 import { Button } from "antd";
 import { useState } from "react";
 import { api } from "src/apis/api";
+import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { FileInfo } from "src/pages/api/file/list";
 import { Cluster } from "src/utils/config";
@@ -42,6 +43,7 @@ export const ClusterFileTable: React.FC<Props> = ({ cluster, homePath }) => {
   const [loading, setLoading] = useState(false);
   const [files, setFiles] = useState<FileInfo[]>([]);
   const [path, setPath] = useState<string>(homePath);
+  const [selectCluster, setSelectCluster] = useState<Cluster>();
 
   const reload = async (signal?: AbortSignal) => {
     setLoading(true);
@@ -68,17 +70,28 @@ export const ClusterFileTable: React.FC<Props> = ({ cluster, homePath }) => {
 
 
   return (
-    <TopBar>
-      <Button onClick={toHome} icon={<HomeOutlined />} shape="circle" />
-      <Button onClick={up} icon={<UpOutlined />} shape="circle" />
-      <PathBar
-        path={path}
-        reload={reload}
-        loading={loading}
-        go={(path) => setPath(path)}
-        fullUrl={() => "files/fileTransfer"}
+    <>
+      <SingleClusterSelector
+        value={selectCluster}
+        onChange={(cluster) => {
+          setSelectCluster(cluster);
+          setPath(homePath);
+          reload();
+        }}
       />
-    </TopBar>
+      <TopBar>
+        <Button onClick={toHome} icon={<HomeOutlined />} shape="circle" />
+        <Button onClick={up} icon={<UpOutlined />} shape="circle" />
+        <PathBar
+          path={path}
+          reload={reload}
+          loading={loading}
+          go={(path) => setPath(path)}
+          fullUrl={() => "files/fileTransfer"}
+        />
+      </TopBar>
+    </>
+
 
   );
 };

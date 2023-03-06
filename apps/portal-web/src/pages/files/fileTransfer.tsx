@@ -10,22 +10,38 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { Col, Row } from "antd";
 import { NextPage } from "next";
 import { requireAuth } from "src/auth/requireAuth";
 import { ClusterFileTable } from "src/pageComponents/filemanager/ClusterFileTable";
 import { publicConfig } from "src/utils/config";
 
 export const FileTransferPage: NextPage = requireAuth(() => true)(() => {
-  const cluster = "hpc01";
-  const clusterObj = publicConfig.CLUSTERS.find((x) => x.id === cluster);
-  const homePath = "/data/home/demo_user";
+  const cluster1 = "hpc01";
+  const clusterObj1 = publicConfig.CLUSTERS.find((x) => x.id === cluster1);
+  const homePath1 = "/data/home/demo_user";
+
+  const cluster2 = "hpc02";
+  const clusterObj2 = publicConfig.CLUSTERS.find((x) => x.id === cluster2);
+  const homePath2 = "/data/home/demo_user";
+
   return (
-    <div>
-      <ClusterFileTable
-        cluster={clusterObj!}
-        homePath={ homePath }
-      />
-    </div>
+    <>
+      <Row>
+        <Col span={12}>
+          <ClusterFileTable
+            cluster={clusterObj1!}
+            homePath={ homePath1 }
+          />
+        </Col>
+        <Col span={12}>
+          <ClusterFileTable
+            cluster={clusterObj2!}
+            homePath={ homePath2 }
+          />
+        </Col>
+      </Row>
+    </>
   );
 });
 
