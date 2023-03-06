@@ -84,7 +84,7 @@ export const mockApi: MockApi<typeof api> = {
   createFile: null,
   deleteDir: null,
   deleteFile: null,
-  getHomeDirectory: async () => ({ path: "/home/ddadaal" }),
+  getHomeDirectory: null,
   mkdir: null,
   moveFileItem: null,
 
