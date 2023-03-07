@@ -19,8 +19,7 @@ export const GlobalStyle = createGlobalStyle`
 
  // HACK
   a {
-    color: ${({ theme }) => theme.token.colorPrimary};
+    color: ${({ theme }) => theme.token.colorPrimaryText};
   }
 `;
-
 
