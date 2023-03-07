@@ -162,7 +162,22 @@ message ExistsRequest {
 }
 
 message ExistsResponse {
-  bool exists = 1; 
+  bool exists = 1;
+}
+
+message FilesTransferRequest {
+  string user_id = 1;
+  string src_cluster = 2;
+  string dst_cluster = 3;
+  string from_path = 4;
+  string to_path = 5;
+  uint32 max_depth = 6;
+  string ssh_password_path = 7;
+}
+
+// NOT_FOUND: cluster is not found
+// INTERNAL: scow-sync command failed. details has stderr
+message FilesTransferResponse {
 }
 
 service FileService {
@@ -184,4 +199,6 @@ service FileService {
   rpc GetFileMetadata(GetFileMetadataRequest) returns (GetFileMetadataResponse);
 
   rpc Exists(ExistsRequest) returns (ExistsResponse);
+
+  rpc FilesTransfer(FilesTransferRequest) returns (FilesTransferResponse);
 }
