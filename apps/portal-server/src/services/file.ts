@@ -364,7 +364,7 @@ export const fileServiceServer = plugin((server) => {
 
     filesTransfer: async ({ request, logger }) => {
 
-      const { userId, srcCluster, dstCluster, fromPath, toPath, maxDepth, sshPasswordPath } = request;
+      const { userId, srcCluster, dstCluster, fromPath, toPath, maxDepth, port, sshKeyPath } = request;
 
       const srcHost = getClusterLoginNode(srcCluster);
       const dstHost = getClusterLoginNode(dstCluster);
@@ -377,7 +377,8 @@ export const fileServiceServer = plugin((server) => {
         const resp = await ssh.exec(
           "scow-sync",
           [
-            "-a", dstHost, "-u", userId, "-s", fromPath, "-d", toPath, "-m", String(maxDepth), "-p", sshPasswordPath,
+            "-a", dstHost, "-u", userId, "-s", fromPath, "-d", toPath,
+            "-m", String(maxDepth), "-p", String(port), "-k", sshKeyPath,
           ], { stream: "both" });
 
         if (resp.code !== 0) {
