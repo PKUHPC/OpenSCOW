@@ -10,7 +10,8 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { executeAsUser, getEnvPrefix, getUserHomedir, sshConnectByPassword } from "src/ssh";
+import { NodeSSH } from "node-ssh";
+import { executeAsUser, getEnvPrefix, getUserHomedir, sshConnectByPassword, SSHExecError, sshRmrf } from "src/ssh";
 import { connectToTestServerAsRoot, resetTestServerAsRoot,
   rootUserId, target, TestSshServer, testUserId, testUserPassword } from "tests/utils";
 
@@ -55,5 +56,18 @@ it.each([
   await sshConnectByPassword(target, testUserId, testUserPassword, console, async (ssh) => {
     expect(await getUserHomedir(ssh, user, console)).toBe(expected);
   });
+
+});
+
+it("sshRmrf should catches error and throws SSHExecError", async () => {
+
+  const filePath = "/data/home/test";
+  const ssh = new NodeSSH;
+  try {
+    await sshRmrf(ssh, filePath);
+    expect("").fail("should not reach here");
+  } catch (e) {
+    expect(e).toBeInstanceOf(SSHExecError);
+  }
 
 });

@@ -24,7 +24,6 @@
     "node_modules"
   ],
   "include": [
-    "**/*.ts",
-    "**/*.tsx",
+    "src/**/*",
   ]
 }

@@ -4,14 +4,14 @@
 #
 # COMMON.PORT: 整个系统的入口端口
 # COMMON.BASE_PATH: 整个系统的部署根路径。以/开头，不要以/结尾，如果是根路径写"/"
-# COMMON.IMAGE_BASE: 镜像仓库地址，据实际情况填写
+# COMMON.IMAGE: 镜像仓库地址，据实际情况填写
 # COMMON.IMAGE_TAG: 镜像tag，据实际情况填写
 # 如果您的镜像是本地构建的，IMAGE_BASE和IMAGE_TAG必须和构建时.env.build中的值保持一致。
 COMMON = {
   "PORT": 80,
   "BASE_PATH": "/",
-  # "IMAGE_BASE": "mirrors.pku.edu.cn/pkuhpc/scow",
-  "IMAGE_BASE": "ghcr.io/pkuhpc/scow",
+  # "IMAGE": "mirrors.pku.edu.cn/pkuhpc/scow/scow",
+  "IMAGE": "ghcr.io/pkuhpc/scow/scow",
   "IMAGE_TAG": "master",
 }
 

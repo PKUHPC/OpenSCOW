@@ -10,17 +10,27 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { createGlobalStyle } from "styled-components";
+import { deleteToken } from "src/deleteToken";
+import { applicationJsonHeaders } from "src/utils";
+import { mockFetch } from "tests/utils";
 
-export const GlobalStyle = createGlobalStyle`
-  #nprogress .bar {
-    background-color: ${({ theme }) => theme.token.colorPrimary};
-  }
+const token = "123";
 
- // HACK
-  a {
-    color: ${({ theme }) => theme.token.colorPrimary};
-  }
-`;
+mockFetch((input) => {
+  new URL(input as string).searchParams.get("token");
+  return { status: 204 };
+});
 
+const authUrl = "auth:5000";
 
+it("raises correct request", async () => {
+  await deleteToken(token, authUrl);
+
+  expect(fetch).toHaveBeenCalledWith(
+    authUrl + "/token?token=" + token,
+    {
+      method: "DELETE",
+      headers: applicationJsonHeaders,
+    },
+  );
+});

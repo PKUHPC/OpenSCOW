@@ -16,7 +16,6 @@ import { randomBytes } from "crypto";
 import FormData from "form-data";
 import { NodeSSH } from "node-ssh";
 import path from "path";
-import pino from "pino";
 import { rootKeyPair } from "src/config/env";
 import { SFTPWrapper } from "ssh2";
 
@@ -42,7 +41,7 @@ export interface TestSshServer {
 
 export const connectToTestServer = async () => {
 
-  const ssh = await sshRawConnect(target, userId, rootKeyPair, pino());
+  const ssh = await sshRawConnect(target, userId, rootKeyPair, console);
 
   return { ssh, sftp: await ssh.requestSFTP() } as TestSshServer;
 };

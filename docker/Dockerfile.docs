@@ -25,16 +25,12 @@ FROM base as pruner
 WORKDIR /app
 
 COPY . .
-
-RUN node scripts/createVersionFile.mjs version.json
-
-RUN pnpm dlx turbo prune --scope="@scow/auth" --docker
+RUN pnpm dlx turbo prune --scope="@scow/docs" --docker
 
 FROM base AS builder
 
 WORKDIR /app
 COPY --from=pruner /app/out/json/ .
-COPY .npmrc ./
 RUN pnpm i --offline --frozen-lockfile
 
 COPY --from=pruner /app/out/full/ .
@@ -44,25 +40,12 @@ COPY protos ./protos
 
 RUN pnpm build
 
-COPY scripts scripts
-RUN node scripts/copyDist.mjs
+FROM nginx:alpine@sha256:207332a7d1d17b884b5a0e94bcf7c0f67f1a518b9bf8da6c2ea72c83eec889b8 as runner
 
-WORKDIR /app/dist
+COPY docs/nginx.conf /etc/nginx/templates/default.conf.template
+COPY --from=builder --chown=nginx:nginx /app/docs/build /etc/nginx/html/
 
-RUN pnpm i --offline --prod --frozen-lockfile
+ARG BASE_PATH="/"
+ENV BASE_PATH=${BASE_PATH}
 
-FROM node:hydrogen-alpine@sha256:f8a51c36b0be7434bbf867d4a08decf0100e656203d893b9b0f8b1fe9e40daea AS runner
-
-WORKDIR /app
-
-COPY --from=builder /app/dist .
-
-ENV NODE_ENV production
-
-EXPOSE 5000
-
-WORKDIR /app/apps/auth
-
-COPY --from=pruner /app/version.json ./version.json
-
-CMD ["npm", "run", "serve"]
+EXPOSE 80

@@ -10,10 +10,4 @@
  * See the Mulan PSL v2 for more details.
  */
 
-export { changePassword } from "./changePassword";
-export { createUser } from "./createUser";
-export { deleteToken } from "./deleteToken";
-export type { Capabilities } from "./getCapabilities";
-export { getCapabilities } from "./getCapabilities";
-export { getUser } from "./getUser";
-export { validateToken } from "./validateToken";
+import "jest-extended";
