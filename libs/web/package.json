@@ -37,7 +37,8 @@
     "@types/react-dom": "18.0.11",
     "react-is": "18.2.0",
     "@ant-design/icons": "5.0.1",
-    "dayjs": "1.11.7"
+    "dayjs": "1.11.7",
+    "@types/styled-components": "5.1.26"
   },
   "author": "PKUHPC (https://github.com/PKUHPC)",
   "license": "Mulan PSL v2",
