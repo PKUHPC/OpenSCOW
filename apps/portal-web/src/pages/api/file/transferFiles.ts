@@ -27,7 +27,8 @@ export interface TransferFilesSchema {
     fromPath: string;
     toPath: string;
     maxDepth: number;
-    sshPasswordPath: string;
+    port: number;
+    sshKeyPath: string;
   }
 
   responses: {
@@ -49,12 +50,12 @@ export default route<TransferFilesSchema>("TransferFilesSchema", async (req, res
 
   if (!info) { return; }
 
-  const { srcCluster, dstCluster, fromPath, toPath, maxDepth, sshPasswordPath } = req.body;
+  const { srcCluster, dstCluster, fromPath, toPath, maxDepth, port, sshKeyPath } = req.body;
 
   const client = getClient(FileServiceClient);
 
   return asyncUnaryCall(client, "filesTransfer", {
-    srcCluster, dstCluster, fromPath, toPath, maxDepth, sshPasswordPath, userId: info.identityId,
+    srcCluster, dstCluster, fromPath, toPath, maxDepth, port, sshKeyPath, userId: info.identityId,
   }).then(() => ({ 204: null }), handlegRPCError({
     [status.INTERNAL]: (e) => ({ 415: { code: "SCOW-SYNC_CMD_FAILED" as const, error: e.details } }),
     [status.NOT_FOUND]: () => ({ 400: { code: "INVALID_CLUSTER" as const } }),
