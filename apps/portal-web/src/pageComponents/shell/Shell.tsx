@@ -37,9 +37,6 @@ interface Props {
 const OPEN_FILE = "This command is only valid for SCOW web shells";
 const OPEN_EXPLORER_PREFIX = "SCOW is opening the file system";
 const DOWNLOAD_FILE_PREFIX = "SCOW is downloading file ";
-const DOWNLOAD_FILE_SUFFIX = " in directory";
-
-
 
 export const Shell: React.FC<Props> = ({ user, cluster, path }) => {
 
