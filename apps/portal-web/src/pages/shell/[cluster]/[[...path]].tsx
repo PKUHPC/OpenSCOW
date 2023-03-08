@@ -12,17 +12,18 @@
 
 import "xterm/css/xterm.css";
 
-import { Button, Collapse, Space } from "antd";
+import { Button, Popover, Space, Typography } from "antd";
 import { NextPage } from "next";
 import dynamic from "next/dynamic";
 import Router, { useRouter } from "next/router";
+import { useRef } from "react";
 import { requireAuth } from "src/auth/requireAuth";
 import { NotFoundPage } from "src/components/errorPages/NotFoundPage";
 import { publicConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
 import styled from "styled-components";
 
-const { Panel } = Collapse;
+const { Text } = Typography;
 
 const Container = styled.div`
   position: fixed;
@@ -42,11 +43,11 @@ const Header = styled.div`
   background-color: #333;
 
   h2 { color: white; margin: 0px; }
-  .command { background-color: #ffffff; }
-  .refresh { height: 46px; }
+
+  .ant-popover-content p {
+    margin: 0;
+  }
 `;
-
-
 
 
 const TerminalContainer = styled.div`
@@ -78,23 +79,34 @@ export const ShellPage: NextPage = requireAuth(() => true)(({ userStore }) => {
   const cluster = router.query.cluster as string;
   const paths = router.query.path as (string[] | undefined);
 
+  const headerRef = useRef<HTMLDivElement>(null);
+
   return (
     <Container>
       <Head title={`${cluster}的终端`} />
-      <Header>
+      <Header ref={headerRef}>
         <h2>
         以ID: {userStore.user.identityId} 连接到集群 {cluster}
         </h2>
         <Space wrap>
-          <Button className="refresh" onClick={() => Router.reload()}>
+          <Button onClick={() => Router.reload()}>
           刷新并重新连接
           </Button>
-          <Collapse className="command">
-            <Panel header="命令" key="1">
-            文件上传：sup <br />
-            文件下载：sdown
-            </Panel>
-          </Collapse>
+          <Popover
+            title="命令"
+            trigger="hover"
+            placement="bottom"
+            zIndex={2000}
+            getPopupContainer={() => headerRef.current || document.body}
+            content={() => (
+              <div>
+                <p>文件上传：<Text code>sup</Text></p>
+                <p>文件下载：<Text code>sdown</Text></p>
+              </div>
+            )}
+          >
+            <Button>命令</Button>
+          </Popover>
         </Space>
 
 
