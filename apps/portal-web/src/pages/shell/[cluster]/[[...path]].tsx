@@ -91,8 +91,8 @@ export const ShellPage: NextPage = requireAuth(() => true)(({ userStore }) => {
           </Button>
           <Collapse className="command">
             <Panel header="命令" key="1">
-            文件上传：scowupload <br />
-            文件下载：scowdownload
+            文件上传：sup <br />
+            文件下载：sdown
             </Panel>
           </Collapse>
         </Space>
