@@ -15,7 +15,7 @@ import { plugin } from "@ddadaal/tsgrpc-server";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { JobServiceServer, JobServiceService } from "@scow/protos/build/portal/job";
 import { getClusterOps } from "src/clusterops";
-import { NewJobInfo } from "src/clusterops/api/job";
+import { JobTemplate } from "src/clusterops/api/job";
 import { clusterNotFound, jobNotFound } from "src/utils/errors";
 
 export const jobServiceServer = plugin((server) => {
@@ -72,7 +72,7 @@ export const jobServiceServer = plugin((server) => {
         throw <ServiceError> { code: Status.NOT_FOUND, message: `Job template id ${templateId} is not found.` };
       }
 
-      return [{ jobInfo: reply.jobInfo }];
+      return [{ template: reply.template }];
 
     },
 
@@ -128,7 +128,7 @@ export const jobServiceServer = plugin((server) => {
       const { cluster, command, jobName, coreCount, maxTime, saveAsTemplate, userId,
         nodeCount, partition, qos, account, comment, workingDirectory } = request;
 
-      const jobInfo: NewJobInfo = {
+      const jobInfo: JobTemplate = {
         jobName,
         coreCount,
         maxTime,

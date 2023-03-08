@@ -10,3 +10,4 @@ internal
 out
 dist
 version.json
+.pnpm-store

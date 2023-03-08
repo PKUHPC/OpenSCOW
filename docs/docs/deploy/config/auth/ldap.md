@@ -50,21 +50,21 @@ LDAP认证系统支持的功能如下表：
 
 表中`??`表示如果前面的配置值设置了，就采用前面的值，如果没有设置，则采用后面的值。
 
-| 属性名                               | 值                                                                            |
-| ------------------------------------ | ----------------------------------------------------------------------------- |
-| DN                                   | `{ldap.addUser.userIdDnKey ?? ldap.attrs.uid}=用户名,{ldap.addUser.userBase}` |
-| `ldap.attrs.uid`                     | 用户名                                                                        |
-| sn                                   | 用户名                                                                        |
-| loginShell                           | /bin/bash                                                                     |
-| objectClass                          | ["inetOrgPerson", "posixAccount", "shadowAccount"]                            |
-| homeDirectory                        | `ldap.addUser.homeDir`，其中的`{{ username }}`替换为用户名                    |
-| uidNumber                            | 数据库中的用户项的id + `ldap.addUser.uidStart`                                |
-| gidNumber                            | 取决于`ldap.groupStrategy`，见下文                                            |
-| `ldap.attrs.name`（如果设置了）      | 用户姓名                                                                      |
-| `ldap.attrs.mail`（如果设置了）      | 用户的邮箱                                                                    |
-| `ldap.addUser.extraProps`中的每个key | key对应的值，其中`{{ key }}`替换为`key`本节点的对应的属性的值                 |
+| 属性名                               | 值                                                                                                                                          |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| DN                                   | `{ldap.addUser.userIdDnKey ?? ldap.attrs.uid}=用户名,{ldap.addUser.userBase}`                                                               |
+| `ldap.attrs.uid`                     | 用户名                                                                                                                                      |
+| sn                                   | 用户名                                                                                                                                      |
+| loginShell                           | /bin/bash                                                                                                                                   |
+| objectClass                          | ["inetOrgPerson", "posixAccount", "shadowAccount"]                                                                                          |
+| homeDirectory                        | `ldap.addUser.homeDir`，其中的`{{ username }}`替换为用户名                                                                                  |
+| uidNumber                            | 数据库中的用户项的id + `ldap.addUser.uidStart`                                                                                              |
+| gidNumber                            | 取决于`ldap.groupStrategy`，见下文                                                                                                          |
+| `ldap.attrs.name`（如果设置了）      | 用户姓名                                                                                                                                    |
+| `ldap.attrs.mail`（如果设置了）      | 用户的邮箱                                                                                                                                  |
+| `ldap.addUser.extraProps`中的每个key | key对应的值，对应的值可以为字符串、字符串列表或者`null`。字符串或者字符串列表中的每一项其中的`{{ key }}`替换为`key`本节点的对应的属性的值。 |
 
-如果`ldap.addUser.extraProps`中包括已经存在的key，则会替换对应的属性。
+如果`ldap.addUser.extraProps`中包括已经存在的属性名，则会替换对应的属性。如果这里面某个值为`null`，则会删除对应的属性。
 
 3. 配置新用户所属的组。
 
@@ -72,15 +72,15 @@ LDAP认证系统支持的功能如下表：
 
 如果`ldap.addUser.groupStrategy`设置为`newGroupPerUser`，则新用户的`gidNumber`的值等于用户的uidNumber，并且会创建一个新的LDAP节点作为新用户的group，其DN以及属性值如下表所示。
 
-| 属性名                                               | 值                                                                                                         |
-| ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| DN                                                   | `{ldap.newGroupPerUser.groupIdDnKey ?? ldap.attrs.userId}=用户名,{ldap.addUser.newGroupPerUser.groupBase}` |
-| objectClass                                          | ["posixGroup"]                                                                                             |
-| memberUid                                            | 用户名                                                                                                     |
-| gidNumber                                            | 同用户的uidNumber                                                                                          |
-| `ldap.addUser.newGroupPerUser.extraProps`中的每个key | key对应的值，其中`{{ key }}`替换为本节点的`key`对应的属性的值                                              |
+| 属性名                                               | 值                                                                                                                                          |
+| ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| DN                                                   | `{ldap.newGroupPerUser.groupIdDnKey ?? ldap.attrs.userId}=用户名,{ldap.addUser.newGroupPerUser.groupBase}`                                  |
+| objectClass                                          | ["posixGroup"]                                                                                                                              |
+| memberUid                                            | 用户名                                                                                                                                      |
+| gidNumber                                            | 同用户的uidNumber                                                                                                                           |
+| `ldap.addUser.newGroupPerUser.extraProps`中的每个key | key对应的值，对应的值可以为字符串、字符串列表或者`null`。字符串或者字符串列表中的每一项其中的`{{ key }}`替换为`key`本节点的对应的属性的值。 |
 
-如果`ldap.addUser.newGroupPerUser.extraProps`中包括已经存在的key，则会替换对应的属性。
+如果`ldap.addUser.newGroupPerUser.extraProps`中包括已经存在的属性名，则会替换对应的属性。如果这里面某个值为`null`，则会删除对应的属性。
 
 4. 设置新用户的密码为用户输入的密码
 

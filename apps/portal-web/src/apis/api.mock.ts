@@ -84,7 +84,7 @@ export const mockApi: MockApi<typeof api> = {
   createFile: null,
   deleteDir: null,
   deleteFile: null,
-  getHomeDirectory: async () => ({ path: "/home/ddadaal" }),
+  getHomeDirectory: null,
   mkdir: null,
   moveFileItem: null,
 
@@ -146,8 +146,8 @@ export const mockApi: MockApi<typeof api> = {
     }
   ,
 
-  getSavedJob: async () => ({
-    jobInfo: {
+  getJobTemplate: async () => ({
+    template: {
       account: "123",
       command: "123",
       coreCount: 2,
@@ -160,7 +160,7 @@ export const mockApi: MockApi<typeof api> = {
     },
   }),
 
-  getSavedJobs: async () => ({ results: [{
+  listJobTemplates: async () => ({ results: [{
     id: "123-sample-apple",
     comment: "1234",
     submitTime: new Date().toString(),

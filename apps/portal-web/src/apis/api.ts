@@ -43,9 +43,9 @@ import type { UploadFileSchema } from "src/pages/api/file/upload";
 import type { CancelJobSchema } from "src/pages/api/job/cancelJob";
 import type { GetAccountsSchema } from "src/pages/api/job/getAccounts";
 import type { GetAllJobsSchema } from "src/pages/api/job/getAllJobs";
+import type { GetJobTemplateSchema } from "src/pages/api/job/getJobTemplate";
 import type { GetRunningJobsSchema } from "src/pages/api/job/getRunningJobs";
-import type { GetSavedJobSchema } from "src/pages/api/job/getSavedJob";
-import type { GetSavedJobsSchema } from "src/pages/api/job/getSavedJobs";
+import type { ListJobTemplatesSchema } from "src/pages/api/job/listJobTemplates";
 import type { SubmitJobSchema } from "src/pages/api/job/submitJob";
 import type { ChangePasswordSchema } from "src/pages/api/profile/changePassword";
 import { publicConfig } from "src/utils/config";
@@ -83,9 +83,9 @@ export const api = {
   cancelJob: fromApi<CancelJobSchema>("DELETE", join(basePath, "/api/job/cancelJob")),
   getAccounts: fromApi<GetAccountsSchema>("GET", join(basePath, "/api/job/getAccounts")),
   getAllJobs: fromApi<GetAllJobsSchema>("GET", join(basePath, "/api/job/getAllJobs")),
+  getJobTemplate: fromApi<GetJobTemplateSchema>("GET", join(basePath, "/api/job/getJobTemplate")),
   getRunningJobs: fromApi<GetRunningJobsSchema>("GET", join(basePath, "/api/job/getRunningJobs")),
-  getSavedJob: fromApi<GetSavedJobSchema>("GET", join(basePath, "/api/job/getSavedJob")),
-  getSavedJobs: fromApi<GetSavedJobsSchema>("GET", join(basePath, "/api/job/getSavedJobs")),
+  listJobTemplates: fromApi<ListJobTemplatesSchema>("GET", join(basePath, "/api/job/listJobTemplates")),
   submitJob: fromApi<SubmitJobSchema>("POST", join(basePath, "/api/job/submitJob")),
   changePassword: fromApi<ChangePasswordSchema>("PATCH", join(basePath, "/api/profile/changePassword")),
 };

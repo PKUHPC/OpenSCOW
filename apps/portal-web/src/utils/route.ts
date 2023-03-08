@@ -24,7 +24,8 @@ export const route: typeof rawRoute = (schemaName, handler) => {
         if (SCOW_ERROR.length === 0) { throw e; }
 
         const code = e.metadata.get("SCOW_ERROR_CODE")[0].toString();
-        return { 500: { code } };
+        const details = e.details;
+        return { 500: { code, details } };
       });
     }
   });

@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { SqlEntityManager } from "@mikro-orm/knex";
+import { SqlEntityManager } from "@mikro-orm/mysql";
 import { Account } from "src/entities/Account";
 import { Tenant } from "src/entities/Tenant";
 import { TenantRole, User } from "src/entities/User";

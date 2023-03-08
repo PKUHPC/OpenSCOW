@@ -163,3 +163,32 @@ it("returns 10 jobs if pageSize is undefined or 0", async () => {
   await Promise.all([test(0), test()]);
 
 });
+
+it("returns jobs starting from start_bi_job_index", async () => {
+  const em = server.ext.orm.em.fork();
+
+  await em.persistAndFlush(range(1, 20).map((x) =>
+    mockOriginalJobData(x, data.uaAA, new Decimal(20), new Decimal(10))));
+
+  await em.persistAndFlush(range(20, 40).map((x) =>
+    mockOriginalJobData(x, data.uaCC, new Decimal(20), new Decimal(10))));
+
+  await em.persistAndFlush(range(40, 60).map((x) =>
+    mockOriginalJobData(x, data.uaAB, new Decimal(20), new Decimal(10))));
+
+  const client = createClient();
+
+  const reply = await asyncClientCall(client, "getJobs", {
+    page: 1,
+    pageSize: 100,
+    filter: {
+      clusters: [],
+      tenantName: data.tenant.name,
+      startBiJobIndex: 10,
+    },
+  });
+
+  expect(reply.jobs).toSatisfyAll((x: JobInfo) => x.biJobIndex >= 10);
+  expect(reply.jobs).toHaveLength(30);
+
+});

@@ -16,6 +16,7 @@ import "antd/dist/reset.css";
 import { failEvent, fromApi } from "@ddadaal/next-typed-api-routes-runtime/lib/client";
 import { AntdConfigProvider } from "@scow/lib-web/build/layouts/AntdConfigProvider";
 import { DarkModeProvider } from "@scow/lib-web/build/layouts/darkMode";
+import { GlobalStyle } from "@scow/lib-web/build/layouts/globalStyle";
 import { getHostname } from "@scow/lib-web/build/utils/getHostname";
 import { useConstant } from "@scow/lib-web/build/utils/hooks";
 import { isServer } from "@scow/lib-web/build/utils/isServer";
@@ -39,7 +40,6 @@ import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import {
   User, UserStore,
 } from "src/stores/UserStore";
-import { GlobalStyle } from "src/styles/globalStyle";
 import { publicConfig, runtimeConfig } from "src/utils/config";
 
 
@@ -58,6 +58,11 @@ const FailEventHandler: React.FC = () => {
 
       if (e.data?.code === "SSH_ERROR") {
         message.error("无法以用户身份连接到登录节点。请确认您的家目录的权限为700、750或者755");
+        return;
+      }
+
+      if (e.data?.code === "SFTP_ERROR") {
+        message.error(e.data?.details || "SFTP操作失败，请确认您是否有操作的权限");
         return;
       }
 

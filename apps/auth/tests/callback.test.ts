@@ -15,10 +15,11 @@ process.env.AUTH_TYPE = "ssh";
 import { FastifyInstance } from "fastify";
 import { buildApp } from "src/app";
 import { CallbackHostnameNotAllowedError } from "src/auth/callback";
-import { allowedCallbackUrl, createFormData, notAllowedCallbackUrl } from "tests/utils";
+import { allowedCallbackUrl, createFormData,
+  notAllowedCallbackUrl, testUserPassword, testUserUsername } from "tests/utils";
 
-const username = "test";
-const password = "1234";
+const username = testUserUsername;
+const password = testUserPassword;
 const token = "token";
 const code = "code";
 

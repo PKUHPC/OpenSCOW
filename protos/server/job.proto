@@ -56,6 +56,7 @@ message JobFilter {
   optional uint64 job_id = 6;
   // if length === 0, get from all clusters
   repeated string clusters = 7;
+  optional uint64 start_bi_job_index = 8;
 }
 
 message GetJobsRequest {
