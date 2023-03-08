@@ -36,8 +36,3 @@ systemctl status slurmctld
 sleep 5s
 sacctmgr -i create qos name=low
 sacctmgr -i create qos name=high
-
-# 设置slurm数据root密码
-mysqladmin -u root password "123456"
-# 设置slurm数据库远程权限
-mysql -uroot -p123456 -e "grant all on slurm_acct_db.* TO 'slurm'@'%' identified by '123456' with grant option;"

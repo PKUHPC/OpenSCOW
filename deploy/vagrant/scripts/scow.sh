@@ -15,6 +15,8 @@ echo "*/10 * * * * root python3 /root/scow/export-jobs/main.py >> /root/scow/exp
 
 chmod 777 /root/scow/scow-deployment/compose.sh
 
+rm -rf /root/.docker/config.json
+
 cd /root/scow/scow-deployment/
 echo $(pwd)
 sleep 5s
