@@ -13,27 +13,73 @@
 import { ArrowLeftOutlined, ArrowRightOutlined } from "@ant-design/icons";
 import { Button, Col, Row } from "antd";
 import { NextPage } from "next";
+import { useState } from "react";
+import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { ClusterFileTable } from "src/pageComponents/filemanager/ClusterFileTable";
+import { Cluster } from "src/utils/config";
+
+type FileInfoKey = React.Key;
 
 export const FileTransferPage: NextPage = requireAuth(() => true)(() => {
+
+
+  const [clusterLeft, setClusterLeft] = useState<Cluster>();
+  const [clusterRight, setClusterRight] = useState<Cluster>();
+
+  const [pathLeft, setPathLeft] = useState<string>();
+  const [pathRight, setPathRight] = useState<string>();
+
+  const [selectedKeysLeft, setSelectedKeysLeft] = useState<FileInfoKey[]>();
+  const [selectedKeysRight, setSelectedKeysRight] = useState<FileInfoKey[]>();
+
+
 
   return (
     <>
       <Row justify="space-around" align="middle">
         <Col span={11}>
-          <ClusterFileTable />
+          <ClusterFileTable
+            selectedCluster={ clusterLeft! }
+            setSelectedCluster={ setClusterLeft }
+            path={ pathLeft! }
+            setPath={ setPathLeft }
+            selectedKeys={ selectedKeysLeft! }
+            setSelectedKeys={ setSelectedKeysLeft }
+          />
         </Col>
         <Col span={0.5}>
           <Row justify="center">
-            <Button icon={<ArrowRightOutlined />} />
+            <Button
+              icon={<ArrowRightOutlined />}
+              onClick={ () => {
+                selectedKeysLeft!.forEach(async (key) => {
+                  await api.transferFiles({ body: {
+                    srcCluster: clusterLeft!.id,
+                    dstCluster: clusterRight!.id,
+                    fromPath: String(key),
+                    toPath: pathRight!,
+                    maxDepth: 2,
+                    port: 22222,
+                    sshKeyPath: "~/.ssh/id_rsa",
+                  } });
+                });
+              }}
+            />
           </Row>
           <Row justify="center">
             <Button icon={<ArrowLeftOutlined />} />
           </Row>
         </Col>
         <Col span={11}>
-          <ClusterFileTable />
+          <ClusterFileTable
+            selectedCluster={ clusterRight! }
+            setSelectedCluster={ setClusterRight }
+            path={ pathRight! }
+            setPath={ setPathRight }
+            selectedKeys={ selectedKeysRight! }
+            setSelectedKeys={ setSelectedKeysRight }
+          />
         </Col>
       </Row>
     </>

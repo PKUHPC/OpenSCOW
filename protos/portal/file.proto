@@ -165,7 +165,7 @@ message ExistsResponse {
   bool exists = 1;
 }
 
-message FilesTransferRequest {
+message TransferFilesRequest {
   string user_id = 1;
   string src_cluster = 2;
   string dst_cluster = 3;
@@ -178,7 +178,7 @@ message FilesTransferRequest {
 
 // NOT_FOUND: cluster is not found
 // INTERNAL: scow-sync command failed. details has stderr
-message FilesTransferResponse {
+message TransferFilesResponse {
 }
 
 service FileService {
@@ -201,5 +201,5 @@ service FileService {
 
   rpc Exists(ExistsRequest) returns (ExistsResponse);
 
-  rpc FilesTransfer(FilesTransferRequest) returns (FilesTransferResponse);
+  rpc TransferFiles(TransferFilesRequest) returns (TransferFilesResponse);
 }

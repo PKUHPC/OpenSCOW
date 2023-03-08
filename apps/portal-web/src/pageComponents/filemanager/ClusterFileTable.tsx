@@ -28,6 +28,16 @@ import { PathBar } from "./PathBar";
 
 type FileInfoKey = React.Key;
 
+interface Props {
+  selectedCluster: Cluster;
+  setSelectedCluster: (cluster: Cluster) => void;
+  path: string;
+  setPath: (path: string) => void;
+  selectedKeys: FileInfoKey[];
+  setSelectedKeys: (keys: FileInfoKey[]) => void;
+}
+
+
 const TopBar = styled(FilterFormContainer)`
   display: flex;
   flex-direction: row;
@@ -50,13 +60,12 @@ const fileTypeIcons = {
   "ERROR": CloseOutlined,
 } as Record<FileType, React.ComponentType>;
 
-export const ClusterFileTable: React.FC = () => {
+export const ClusterFileTable: React.FC<Props> = ({
+  selectedCluster, setSelectedCluster, path, setPath, selectedKeys, setSelectedKeys,
+}) => {
 
   const [loading, setLoading] = useState(false);
   const [files, setFiles] = useState<FileInfo[]>([]);
-  const [path, setPath] = useState<string>();
-  const [selectedCluster, setSelectedCluster] = useState<Cluster>();
-  const [selectedKeys, setSelectedKeys] = useState<FileInfoKey[]>([]);
 
   const reload = async () => {
     setLoading(true);
@@ -85,7 +94,6 @@ export const ClusterFileTable: React.FC = () => {
   const toHome = async () => {
     await api.getHomeDirectory({ query: { cluster: selectedCluster!.id } })
       .then((d) => {
-        console.log(d);
         setPath(d.path);
       });
     // reload();
@@ -135,7 +143,7 @@ export const ClusterFileTable: React.FC = () => {
         scroll={{ x: true }}
         rowSelection={{
           selectedRowKeys: selectedKeys,
-          onChange: (keys) => setSelectedKeys(keys),
+          onChange: (keys) => { setSelectedKeys(keys); console.log(selectedKeys); },
         }}
         onRow={(r) => ({
           onClick: () => {

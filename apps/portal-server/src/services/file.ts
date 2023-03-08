@@ -362,25 +362,29 @@ export const fileServiceServer = plugin((server) => {
       });
     },
 
-    filesTransfer: async ({ request, logger }) => {
+    transferFiles: async ({ request, logger }) => {
 
       const { userId, srcCluster, dstCluster, fromPath, toPath, maxDepth, port, sshKeyPath } = request;
 
+      console.log("transferFiles", request);
+
       const srcHost = getClusterLoginNode(srcCluster);
       const dstHost = getClusterLoginNode(dstCluster);
-
       if (!srcHost) { throw clusterNotFound(srcCluster); }
       if (!dstHost) { throw clusterNotFound(dstCluster); }
+      const dstAddress = dstHost!.indexOf(":") === -1 ? dstHost : dstHost.split(":")[0];
 
       return await sshConnect(srcHost, userId, logger, async (ssh) => {
-
         const resp = await ssh.exec(
-          "scow-sync",
-          [
-            "-a", dstHost, "-u", userId, "-s", fromPath, "-d", toPath,
-            "-m", String(maxDepth), "-p", String(port), "-k", sshKeyPath,
+          "scow-sync", [
+            "-a", dstAddress,
+            "-u", userId,
+            "-s", fromPath,
+            "-d", toPath,
+            "-m", maxDepth.toString(),
+            "-p", port.toString(),
+            "-k", sshKeyPath,
           ], { stream: "both" });
-
         if (resp.code !== 0) {
           throw <ServiceError> {
             code: status.INTERNAL,
@@ -388,8 +392,7 @@ export const fileServiceServer = plugin((server) => {
             details: resp.stderr,
           };
         }
-
-
+        return [{}];
       });
     },
 

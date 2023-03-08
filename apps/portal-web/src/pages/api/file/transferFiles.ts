@@ -54,7 +54,7 @@ export default route<TransferFilesSchema>("TransferFilesSchema", async (req, res
 
   const client = getClient(FileServiceClient);
 
-  return asyncUnaryCall(client, "filesTransfer", {
+  return asyncUnaryCall(client, "transferFiles", {
     srcCluster, dstCluster, fromPath, toPath, maxDepth, port, sshKeyPath, userId: info.identityId,
   }).then(() => ({ 204: null }), handlegRPCError({
     [status.INTERNAL]: (e) => ({ 415: { code: "SCOW-SYNC_CMD_FAILED" as const, error: e.details } }),

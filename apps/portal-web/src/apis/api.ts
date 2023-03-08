@@ -49,9 +49,10 @@ import type { GetRunningJobsSchema } from "src/pages/api/job/getRunningJobs";
 import type { ListJobTemplatesSchema } from "src/pages/api/job/listJobTemplates";
 import type { SubmitJobSchema } from "src/pages/api/job/submitJob";
 import type { ChangePasswordSchema } from "src/pages/api/profile/changePassword";
-import { publicConfig } from "src/utils/config";
 
-const basePath = publicConfig.BASE_PATH || "";
+
+
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
 
 
 export const api = {
@@ -80,6 +81,7 @@ export const api = {
   listFile: fromApi<ListFileSchema>("GET", join(basePath, "/api/file/list")),
   mkdir: fromApi<MkdirSchema>("POST", join(basePath, "/api/file/mkdir")),
   moveFileItem: fromApi<MoveFileItemSchema>("PATCH", join(basePath, "/api/file/move")),
+  transferFiles: fromApi<TransferFilesSchema>("PATCH", join(basePath, "/api/file/transferFiles")),
   uploadFile: fromApi<UploadFileSchema>("POST", join(basePath, "/api/file/upload")),
   cancelJob: fromApi<CancelJobSchema>("DELETE", join(basePath, "/api/job/cancelJob")),
   getAccounts: fromApi<GetAccountsSchema>("GET", join(basePath, "/api/job/getAccounts")),
@@ -89,5 +91,4 @@ export const api = {
   listJobTemplates: fromApi<ListJobTemplatesSchema>("GET", join(basePath, "/api/job/listJobTemplates")),
   submitJob: fromApi<SubmitJobSchema>("POST", join(basePath, "/api/job/submitJob")),
   changePassword: fromApi<ChangePasswordSchema>("PATCH", join(basePath, "/api/profile/changePassword")),
-  transferfiles: fromApi<TransferFilesSchema>("PATCH", join(basePath, "/api/file/transferFiles")),
 };
