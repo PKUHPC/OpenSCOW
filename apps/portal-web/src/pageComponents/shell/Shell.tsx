@@ -13,6 +13,7 @@
 import { debounce } from "@scow/lib-web/build/utils/debounce";
 import { join } from "path";
 import { useEffect, useRef } from "react";
+import { urlToDownload } from "src/pageComponents/filemanager/api";
 import { ShellInputData, ShellOutputData } from "src/pages/api/shell";
 import { User } from "src/stores/UserStore";
 import { publicConfig } from "src/utils/config";
@@ -32,6 +33,12 @@ interface Props {
   cluster: string;
   path: string;
 }
+
+const OPEN_FILE = "This command is only valid for SCOW web shells";
+const OPEN_EXPLORER_PREFIX = "SCOW is opening the file system";
+const DOWNLOAD_FILE_PREFIX = "SCOW is downloading file ";
+const DOWNLOAD_FILE_SUFFIX = " in directory";
+
 
 
 export const Shell: React.FC<Props> = ({ user, cluster, path }) => {
@@ -104,11 +111,22 @@ export const Shell: React.FC<Props> = ({ user, cluster, path }) => {
           const data = Buffer.from(message.data.data);
 
           const dataString = data.toString();
-          if (dataString.search("scow is opening the file system") >= 0) {
+          if (dataString.includes(OPEN_FILE) && !dataString.includes("pwd")) {
             const result = dataString.split("\r\n")[0];
+
             const pathStartIndex = result.search("/");
             const path = result.substring(pathStartIndex);
-            openPreviewLink(join(publicConfig.BASE_PATH, "/files", cluster, path));
+
+            if (result.includes(OPEN_EXPLORER_PREFIX)) {
+              window.open(join(publicConfig.BASE_PATH, "/files", cluster, path));
+            }
+            else {
+              const fileStartIndex = result.search(DOWNLOAD_FILE_PREFIX);
+
+              const file = result.substring(fileStartIndex + DOWNLOAD_FILE_PREFIX.length).split(" ")[0];
+              window.location.href = urlToDownload(cluster, join(path, file), true);
+
+            }
           }
           term.write(data);
 
@@ -130,8 +148,4 @@ export const Shell: React.FC<Props> = ({ user, cluster, path }) => {
     <TerminalContainer ref={container} />
   );
 };
-
-function openPreviewLink(href: string) {
-  window.open(href, "ViewFile", "location=yes,resizable=yes,scrollbars=yes,status=yes");
-}
 

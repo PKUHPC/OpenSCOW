@@ -91,7 +91,8 @@ export const ShellPage: NextPage = requireAuth(() => true)(({ userStore }) => {
           </Button>
           <Collapse className="command">
             <Panel header="命令" key="1">
-            跳转到文件系统：scow-goto-file
+            文件上传：scowupload <br />
+            文件下载：scowdownload
             </Panel>
           </Collapse>
         </Space>
