@@ -1,16 +1,17 @@
 ---
 sidebar_position: 5
-title: shell文件跳转功能
+title: Shell终端功能
 ---
 
-# shell文件跳转功能
+# Shell终端功能
 
-shell支持输入命令跳转到文件系统，在登录节点需要修改`/etc/bashrc`
+用户可以通过点击Shell直接访问集群的终端。
 
-插入以下函数：
+## 配置Shell终端文件传输功能
+
+Shell终端支持输入命令跳转到文件系统，进行文件的上传和下载。需要在登录节点需要修改`/etc/bashrc`，插入以下函数：
 
 ```bash
-
 sdown () {
     if [ "$1" == "-h" ]; then
       echo "Usage: sdown [-h] [FILE]"
