@@ -13,8 +13,10 @@
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { status } from "@grpc/grpc-js";
 import { AppServiceClient } from "@scow/protos/build/portal/app";
+import { join } from "path";
 import { authenticate } from "src/auth/server";
 import { getClient } from "src/utils/client";
+import { publicConfig } from "src/utils/config";
 import { route } from "src/utils/route";
 import { handlegRPCError } from "src/utils/server";
 
@@ -68,6 +70,8 @@ export default /* #__PURE__*/route<CreateAppSessionSchema>("CreateAppSessionSche
 
   const client = getClient(AppServiceClient);
 
+  const proxyBasePath = join(publicConfig.BASE_PATH, "/api/proxy");
+
   return await asyncUnaryCall(client, "createAppSession", {
     appId,
     cluster,
@@ -77,6 +81,7 @@ export default /* #__PURE__*/route<CreateAppSessionSchema>("CreateAppSessionSche
     maxTime,
     partition,
     qos,
+    proxyBasePath,
     customAttributes,
   }).then((reply) => {
     return { 200: { jobId: reply.jobId, sessionId: reply.sessionId } };

@@ -96,7 +96,7 @@ export const appServiceServer = plugin((server) => {
     createAppSession: async ({ request, logger }) => {
       const apps = getAppConfigs();
 
-      const { account, appId, cluster, coreCount, maxTime,
+      const { account, appId, cluster, coreCount, maxTime, proxyBasePath,
         partition, qos, userId, customAttributes } = request;
 
       const userSbatchOptions = customAttributes["sbatchOptions"]
@@ -166,6 +166,7 @@ export const appServiceServer = plugin((server) => {
         partition,
         qos,
         customAttributes,
+        proxyBasePath,
         userSbatchOptions,
       }, logger);
 

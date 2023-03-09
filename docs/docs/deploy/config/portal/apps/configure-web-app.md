@@ -55,25 +55,31 @@ web:
 
 ### `proxyType`
 
+
+用户通过以下格式的URL访问Web类的交互式应用
+
+> http[s]://`${域名或者IP}`/`${SCOW系统的base path}`/api/proxy/`${这个应用的proxyType}`/`${计算节点的IP或者主机名}`/`${应用所在的端口号}`/`${...应用所需要的path}`
+
 对于web类型的应用，需要配置`proxyType`。不同的交互式应用使用了不同的nginx proxy方式，通过配置`proxyType`，可以允许应用携带不同类型的uri到后端计算节点。
 
 `proxyType`可以配置为`relative`或者`absolute`，如果不配置默认是`relative`。
 
 - 如果设置成`absolute`，会把完整URL请求路径反向代理到给定的主机和端口。比如访问以下地址：
   
-  > https://hpc.pku.edu/proxy/192.168.220.133/7383/index.html
+  > https://hpc.pku.edu.cn/demo/scow/api/proxy/absolute/192.168.220.133/7383/index.html
 
   以下URL请求将会被发送给计算节点`192.168.220.133`的`7383`端口。
 
-  > /proxy/192.168.220.133/7383/index.html
+  > /demo/scow/api/proxy/absolute/192.168.220.133/7383/index.html
   
 - 如果设置成`relative`，只使用URL请求路径的路径部分将请求反向代理到给定的主机和端口。比如访问以下地址：
 
-  > https://hpc.pku.edu/rproxy/192.168.220.133/4253/index.html
+  > https://hpc.pku.edu.cn/demo/scow/api/proxy/relative/192.168.220.133/4253/index.html
 
   以下URL请求将会被发送给计算节点`192.168.220.133`的`4253`端口。
 
   > /index.html
+
 
 
 ### `beforeScript`和`script`
@@ -95,6 +101,13 @@ web:
 | -------------- | ------------------------------- | -------------- | ----------------------- |
 | `get_port`     | 获得一个可用的TCP端口           | 无             | 一个调用时可用的TCP端口 |
 | `get_password` | 生成一个包含A-Za-z0-9的随机密码 | `$1`: 密码长度 | 密码                    |
+
+还可以使用以下变量。如果[自定义属性](./configure-attributes.md)中出现了和这里同名的变量，这里的变量将会被覆盖。
+
+| 变量名            | 值                                                                                                     |
+| ----------------- | ------------------------------------------------------------------------------------------------------ |
+| `PROXY_BASE_PATH` | 这个应用在被访问时，其URL中位于`proxyType`的值之前的内容，不以`/`结尾。对SCOW来说，为`${SCOW的base path}/api/proxy` |
+
 
 这些脚本，以及一些辅助的脚本将会被作为一个作业提交给调度系统，并最终在某个计算节点上运行。
 

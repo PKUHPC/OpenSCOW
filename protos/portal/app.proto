@@ -58,7 +58,10 @@ message CreateAppSessionRequest {
   optional string qos = 6;
   uint32 core_count = 7;
   uint32 max_time = 8;
-  map<string, string> custom_attributes = 9;
+  // the base path before /${proxyType}/{compute node ip}/{port}
+  // for SCOW, this is ${BASE_PATH}/api/proxy
+  string proxy_base_path = 9;
+  map<string, string> custom_attributes = 10;
 }
 
 // NOT_FOUND: app is not found
