@@ -39,10 +39,6 @@ export function validateObject<TObj extends TSchema>(
 ): Static<TObj> | Error {
 
   const ajv = createAjv();
-
-  // add format. partition name can't include space
-  ajv.addFormat("no-spaces", (data: string) => !data.includes(" "));
-
   const ok = ajv.validate(schema, object);
 
   if (!ok) {
