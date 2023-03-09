@@ -139,7 +139,7 @@ export const desktopServiceServer = plugin((server) => {
         const ids = parseListOutput(resp.stdout);
 
         return [{
-          node: host,
+          host,
           displayIds: ids,
         }];
       });
