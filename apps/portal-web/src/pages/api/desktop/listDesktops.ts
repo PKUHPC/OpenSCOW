@@ -15,7 +15,6 @@ import { DesktopServiceClient } from "@scow/protos/build/portal/desktop";
 import { authenticate } from "src/auth/server";
 import { getClient } from "src/utils/client";
 import { publicConfig } from "src/utils/config";
-import { dnsResolve } from "src/utils/dns";
 import { route } from "src/utils/route";
 
 export interface ListDesktopsSchema {
@@ -27,7 +26,7 @@ export interface ListDesktopsSchema {
 
   responses: {
     200: {
-      node: string;
+      host: string;
       displayId: number[];
     };
 
@@ -56,7 +55,7 @@ export default /* #__PURE__*/route<ListDesktopsSchema>("ListDesktopsSchema", asy
 
   return await asyncUnaryCall(client, "listUserDesktops", {
     cluster, userId: info.identityId,
-  }).then(async ({ node, displayIds }) => ({ 200: { node: await dnsResolve(node), displayId: displayIds } }));
+  }).then(async ({ host, displayIds }) => ({ 200: { host, displayId: displayIds } }));
 
 
 
