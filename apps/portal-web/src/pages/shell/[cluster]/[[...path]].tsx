@@ -100,8 +100,9 @@ export const ShellPage: NextPage = requireAuth(() => true)(({ userStore }) => {
             getPopupContainer={() => headerRef.current || document.body}
             content={() => (
               <div>
-                <p>文件上传：<Text code>sup</Text></p>
-                <p>文件下载：<Text code>sdown</Text></p>
+                <p>文件下载：<Text code>sdown</Text>，输入<Text code>sdown 文件名</Text>，
+                您当前路径下的该文件会被下载到本地；如果<Text code>sdown</Text>后不加文件名，会跳转到文件系统，您可以选择文件进行下载</p>
+                <p>文件上传：<Text code>sup</Text>，输入该命令后会跳转到文件系统，您可以进行文件的上传</p>
               </div>
             )}
           >
