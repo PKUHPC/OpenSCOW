@@ -25,8 +25,16 @@ sdown () {
       echo  "This command is only valid for SCOW web shells."
       return 0
     fi
-    echo  "SCOW is downloading file $@ in directory `pwd`"
-    echo  "This command is only valid for SCOW web shells."
+
+    result=$(echo $@ | grep "/")
+    if [[ "$result" != "" ]]
+    then
+        echo "sdown does not support relative paths. Please enter the file name."
+    else
+      echo  "SCOW is downloading file $@ in directory `pwd`"
+      echo  "This command is only valid for SCOW web shells."
+    fi
+
 }
 
 sup () {
