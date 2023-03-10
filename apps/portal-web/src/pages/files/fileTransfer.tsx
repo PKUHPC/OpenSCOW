@@ -48,10 +48,13 @@ export const FileTransferPage: NextPage = requireAuth(() => true)(() => {
             setSelectedKeys={ setSelectedKeysLeft }
           />
         </Col>
+
         <Col span={0.5}>
+
           <Row justify="center">
             <Button
               icon={<ArrowRightOutlined />}
+              disabled={ !selectedKeysLeft || selectedKeysLeft!.length === 0}
               onClick={ () => {
                 selectedKeysLeft!.forEach(async (key) => {
                   await api.transferFiles({ body: {
@@ -65,11 +68,52 @@ export const FileTransferPage: NextPage = requireAuth(() => true)(() => {
                   } });
                 });
               }}
-            />
+            >
+              复制
+            </Button>
           </Row>
+
           <Row justify="center">
-            <Button icon={<ArrowLeftOutlined />} />
+            <Button
+              icon={<ArrowLeftOutlined />}
+              disabled={ !selectedKeysRight || selectedKeysRight!.length === 0 }
+              onClick={ () => {
+                selectedKeysRight!.forEach(async (key) => {
+                  await api.transferFiles({ body: {
+                    srcCluster: clusterRight!.id,
+                    dstCluster: clusterLeft!.id,
+                    fromPath: String(key),
+                    toPath: pathLeft!,
+                    maxDepth: 2,
+                    port: 22222,
+                    sshKeyPath: "~/.ssh/id_rsa",
+                  } });
+                });
+              } }
+            >
+              复制
+            </Button>
           </Row>
+
+
+          <Row justify="center">
+            <Button
+              icon={<ArrowRightOutlined />}
+              disabled={ !selectedKeysLeft || selectedKeysLeft!.length === 0}
+            >
+              移动
+            </Button>
+          </Row>
+
+          <Row justify="center">
+            <Button
+              icon={<ArrowLeftOutlined />}
+              disabled={ !selectedKeysRight || selectedKeysRight!.length === 0 }
+            >
+              移动
+            </Button>
+          </Row>
+
         </Col>
         <Col span={11}>
           <ClusterFileTable
@@ -81,6 +125,7 @@ export const FileTransferPage: NextPage = requireAuth(() => true)(() => {
             setSelectedKeys={ setSelectedKeysRight }
           />
         </Col>
+
       </Row>
     </>
   );

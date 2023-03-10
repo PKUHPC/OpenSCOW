@@ -88,7 +88,6 @@ export const ClusterFileTable: React.FC<Props> = ({
     const paths = path!.split("/");
     const newPath = paths.length === 1 ? path : paths.slice(0, paths.length - 1).join("/");
     setPath(newPath);
-    // reload();
   };
 
   const toHome = async () => {
@@ -96,7 +95,6 @@ export const ClusterFileTable: React.FC<Props> = ({
       .then((d) => {
         setPath(d.path);
       });
-    // reload();
   };
 
   const nodeModeToString = (mode: number) => {
@@ -128,7 +126,7 @@ export const ClusterFileTable: React.FC<Props> = ({
         <Button onClick={up} icon={<UpOutlined />} shape="circle" />
         <PathBar
           path={path ? path : ""}
-          reload={() => {}}
+          reload={reload}
           loading={loading}
           go={(path) => setPath(path)}
           fullUrl={() => "files/fileTransfer"}
