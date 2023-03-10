@@ -15,7 +15,6 @@ import { status } from "@grpc/grpc-js";
 import { AppServiceClient, WebAppProps_ProxyType } from "@scow/protos/build/portal/app";
 import { authenticate } from "src/auth/server";
 import { getClient } from "src/utils/client";
-import { dnsResolve } from "src/utils/dns";
 import { route } from "src/utils/route";
 import { handlegRPCError } from "src/utils/server";
 
@@ -71,9 +70,6 @@ export default /* #__PURE__*/route<ConnectToAppSchema>("ConnectToAppSchema", asy
   return await asyncUnaryCall(client, "connectToApp", {
     sessionId, userId: info.identityId, cluster,
   }).then(async (x) => {
-    const resolvedHost = await dnsResolve(x.host);
-
-
     if (x.appProps?.$case === "web") {
       const connect: AppConnectProps = {
         method: x.appProps.web.method,
@@ -84,7 +80,7 @@ export default /* #__PURE__*/route<ConnectToAppSchema>("ConnectToAppSchema", asy
 
       return {
         200: {
-          host: resolvedHost,
+          host: x.host,
           port: x.port,
           password: x.password,
           type: "web" as const,
@@ -100,7 +96,7 @@ export default /* #__PURE__*/route<ConnectToAppSchema>("ConnectToAppSchema", asy
     } else {
       return {
         200: {
-          host: resolvedHost,
+          host: x.host,
           port: x.port,
           password: x.password,
           type: "vnc" as const,

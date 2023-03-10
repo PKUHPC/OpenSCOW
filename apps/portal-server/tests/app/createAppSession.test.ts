@@ -42,6 +42,7 @@ it("create app with wrong argument", async () => {
     maxTime: 60,
     partition: "default",
     qos: "high",
+    proxyBasePath: "/api/proxy",
     customAttributes: { version5: "abc" },
   }).catch((e) => e);
   expect(reply.code).toBe(status.INVALID_ARGUMENT);

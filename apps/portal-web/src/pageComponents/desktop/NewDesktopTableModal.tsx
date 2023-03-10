@@ -67,7 +67,7 @@ export const NewDesktopTableModal: React.FC<Props> = ({ open, onClose, reload, c
         }
       })
       .then((resp) => {
-        openDesktop(resp.node, resp.port, resp.password);
+        openDesktop(resp.host, resp.port, resp.password);
         onClose();
         reload();
       })
