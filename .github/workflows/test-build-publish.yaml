@@ -85,6 +85,32 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+  scow-cli:
+    needs: test-version-packages
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: pnpm/action-setup@v2.2.4
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+          cache: pnpm
+
+      - name: Install dependencies for scow-cli
+        run: pnpm i --frozen-lockfile --filter @scow/cli...
+
+      - name: Build scow-cli
+        run: pnpm build "--filter=@scow/cli"
+
+      - name: Archive scow-cli
+        uses: actions/upload-artifact@v3
+        with:
+          name: scow-cli
+          path: apps/cli/build/cli
+
   build-images:
     needs: test-version-packages
     runs-on: ubuntu-latest
