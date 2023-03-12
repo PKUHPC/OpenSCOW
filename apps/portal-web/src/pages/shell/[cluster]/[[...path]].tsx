@@ -102,7 +102,7 @@ export const ShellPage: NextPage = requireAuth(() => true)(({ userStore }) => {
               <div>
                 <p><b>跳转到文件系统</b>：<Text code>sopen</Text>，输入该命令后会跳转到文件系统，您可以进行文件的上传和下载</p>
                 <p><b>文件下载</b>：<Text code>sdown [文件名]</Text>，输入<Text code>sdown [文件名]</Text>，
-                您当前路径下的该文件会被下载到本地，目前不支持输入相对路径，
+                您当前路径下的该文件会被下载到本地，目前不支持输入相对路径，<br />
                 如果需要下载其他目录下的文件请使用<Text code>sopen</Text>命令跳转到文件系统</p>
               </div>
             )}
