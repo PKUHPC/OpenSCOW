@@ -22,6 +22,7 @@ import { quote } from "shell-quote";
 import { AppOps, AppSession } from "src/clusterops/api/app";
 import { displayIdToPort } from "src/clusterops/slurm/bl/port";
 import { portalConfig } from "src/config/portal";
+import { splitSbatchArgs } from "src/utils/app";
 import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
 import { parseDisplayId, refreshPassword, VNCSERVER_BIN_PATH } from "src/utils/turbovnc";
 
@@ -64,7 +65,12 @@ export const slurmAppOps = (cluster: string): AppOps => {
       const apps = getAppConfigs();
 
       const { appId, userId, account, coreCount, maxTime, proxyBasePath,
-        partition, qos, customAttributes, userSbatchOptions } = request;
+        partition, qos, customAttributes } = request;
+
+
+      const userSbatchOptions = customAttributes["sbatchOptions"]
+        ? splitSbatchArgs(customAttributes["sbatchOptions"])
+        : [];
 
       // prepare script file
       const appConfig = apps[appId];
