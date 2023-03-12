@@ -7,6 +7,7 @@ vm_list = [
         :cpu => "2",
         :sshport => 22231,
         :box => "icode/slurm",
+        :box_version => "1.1",
 		    :role => "slurm",
         :is_service_node => true
     },
@@ -17,6 +18,7 @@ vm_list = [
         :cpu => "2",
         :sshport => 22232,
         :box => "icode/slurm_compute",
+        :box_version => "1.1",
 		    :role => "slurm",
         :is_service_node => false
     },
@@ -27,6 +29,7 @@ vm_list = [
         :cpu => "2",
         :sshport => 22233,
         :box => "icode/slurm_compute",
+        :box_version => "1.1",
 		    :role => "slurm",
         :is_service_node => false
     },
@@ -37,6 +40,7 @@ vm_list = [
         :cpu => "4",
         :sshport => 22288,
         :box => "icode/scow_blank",
+        :box_version => "1.1",
 		    :role => "scow",
         :is_service_node => false
     }
@@ -48,14 +52,15 @@ Vagrant.configure("2") do |config|
   config.vm.box_check_update = false
   Encoding.default_external = 'UTF-8'
   config.vm.boot_timeout= 600
-  # config.ssh.username= "root"
-  # config.ssh.password= "vagrant"
+  config.ssh.username= "root"
+  config.ssh.password= "vagrant"
   config.ssh.insert_key = true
 
   vm_list.each do |item|
     config.vm.define item[:name] do |vm_config|
       vm_config.vm.box = item[:box]
       vm_config.vm.hostname = item[:name]
+      vm_config.vm.box_version  = item[:box_version ]
       vm_config.vm.network "private_network", ip: item[:eth1]
 
       # 禁用掉默认的SSH服务转发端口

@@ -15,7 +15,6 @@ import { DesktopServiceClient } from "@scow/protos/build/portal/desktop";
 import { authenticate } from "src/auth/server";
 import { getClient } from "src/utils/client";
 import { publicConfig } from "src/utils/config";
-import { dnsResolve } from "src/utils/dns";
 import { route } from "src/utils/route";
 import { handlegRPCError } from "src/utils/server";
 
@@ -29,7 +28,7 @@ export interface LaunchDesktopSchema {
 
   responses: {
     200: {
-      node: string;
+      host: string;
       port: number;
       password: string;
     };
@@ -55,8 +54,8 @@ export default /* #__PURE__*/route<LaunchDesktopSchema>("LaunchDesktopSchema", a
 
   return await asyncUnaryCall(client, "connectToDesktop", {
     cluster, displayId, userId: info.identityId,
-  }).then(async ({ node, password, port }) => ({ 200: {
-    node: await dnsResolve(node),
+  }).then(async ({ host, password, port }) => ({ 200: {
+    host,
     password,
     port,
   } }), handlegRPCError({

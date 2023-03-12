@@ -51,7 +51,7 @@ export const DesktopTable: React.FC<Props> = () => {
       // List all desktop
       const result = await api.listDesktops({ query: { cluster: cluster.id } });
 
-      return result.displayId.map((x) => ({ desktopId: x, addr: result.node }));
+      return result.displayId.map((x) => ({ desktopId: x, addr: result.host }));
 
     }, [cluster]),
   });
