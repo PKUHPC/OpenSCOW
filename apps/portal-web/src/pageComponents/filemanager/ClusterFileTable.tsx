@@ -141,7 +141,7 @@ export const ClusterFileTable: React.FC<Props> = ({
         scroll={{ x: true }}
         rowSelection={{
           selectedRowKeys: selectedKeys,
-          onChange: (keys) => { setSelectedKeys(keys); console.log(selectedKeys); },
+          onChange: (keys) => { setSelectedKeys(keys); },
         }}
         onRow={(r) => ({
           onClick: () => {

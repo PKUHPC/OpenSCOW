@@ -366,11 +366,17 @@ export const fileServiceServer = plugin((server) => {
 
       const { userId, srcCluster, dstCluster, fromPath, toPath, maxDepth, port, sshKeyPath, remove } = request;
 
+      console.log("transferFiles", request);
+
       const srcHost = getClusterLoginNode(srcCluster);
       const dstHost = getClusterLoginNode(dstCluster);
       if (!srcHost) { throw clusterNotFound(srcCluster); }
       if (!dstHost) { throw clusterNotFound(dstCluster); }
       const dstAddress = dstHost!.indexOf(":") === -1 ? dstHost : dstHost.split(":")[0]; // 如果是域名，去掉端口号
+
+      // eslint-disable-next-line max-len
+      const cmd = `scow-sync -a ${dstAddress} -u ${userId} -s ${fromPath} -d ${toPath} -m ${maxDepth} -p ${port} -k ${sshKeyPath} -r ${remove ? "1" : "0"}`;
+      console.log("cmd", cmd);
 
 
       return await sshConnect(srcHost, userId, logger, async (ssh) => {
