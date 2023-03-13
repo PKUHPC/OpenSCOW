@@ -24,6 +24,7 @@ import {
 } from "@scow/protos/build/portal/app";
 import { getClusterOps } from "src/clusterops";
 import { splitSbatchArgs } from "src/utils/app";
+import { dnsResolve } from "src/utils/dns";
 import { clusterNotFound } from "src/utils/errors";
 
 export const appServiceServer = plugin((server) => {
@@ -86,7 +87,7 @@ export const appServiceServer = plugin((server) => {
       }
 
       return [{
-        host: reply.host,
+        host: await dnsResolve(reply.host),
         port: reply.port,
         password: reply.password,
         appProps,
@@ -96,7 +97,7 @@ export const appServiceServer = plugin((server) => {
     createAppSession: async ({ request, logger }) => {
       const apps = getAppConfigs();
 
-      const { account, appId, cluster, coreCount, maxTime,
+      const { account, appId, cluster, coreCount, maxTime, proxyBasePath,
         partition, qos, userId, customAttributes } = request;
 
       const userSbatchOptions = customAttributes["sbatchOptions"]
@@ -166,6 +167,7 @@ export const appServiceServer = plugin((server) => {
         partition,
         qos,
         customAttributes,
+        proxyBasePath,
         userSbatchOptions,
       }, logger);
 

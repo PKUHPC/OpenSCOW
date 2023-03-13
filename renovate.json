@@ -4,7 +4,8 @@
   ],
   "ignorePaths": [
     "docker-compose.dev.yml",
-    "dev/ldap/Dockerfile"
+    "dev/ldap/Dockerfile",
+    ".devcontainer/docker-compose.devcontainer.yml"
   ],
   "schedule": [
     "every weekend"

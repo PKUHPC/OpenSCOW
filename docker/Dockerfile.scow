@@ -9,9 +9,13 @@
 # See the Mulan PSL v2 for more details.
 
 
-FROM node:hydrogen-alpine@sha256:f8a51c36b0be7434bbf867d4a08decf0100e656203d893b9b0f8b1fe9e40daea AS base
+FROM node:hydrogen-alpine@sha256:f605fcd5254d0e398e04d93c7b11e2aec2a6e1aeb7da1f99bc40cd101dd8cde4 AS base
 
-RUN apk update && apk add libc6-compat python3 make gcc g++ curl git
+RUN apk update
+
+FROM base as builder
+
+RUN apk add libc6-compat python3 make gcc g++ curl git
 
 RUN corepack enable
 
@@ -20,48 +24,38 @@ COPY pnpm-lock.yaml .
 
 RUN pnpm fetch
 
-FROM base as pruner
-
-WORKDIR /app
-
 COPY . .
 
-RUN node scripts/createVersionFile.mjs version.json
-RUN pnpm dlx turbo prune --scope="@scow/portal-server" --docker
-
-FROM base AS builder
-
-WORKDIR /app
-COPY --from=pruner /app/out/json/ .
-COPY .npmrc ./
 RUN pnpm i --offline --frozen-lockfile
 
-COPY --from=pruner /app/out/full/ .
-COPY tsconfig.json .eslintrc.json turbo.json ./
-COPY libs/tsconfig.json ./libs/
-COPY protos ./protos
+RUN node scripts/createVersionFile.mjs version.json
 
-RUN pnpm build
+RUN pnpm build --filter="!docs"
 
-COPY scripts scripts
 RUN node scripts/copyDist.mjs
 
 WORKDIR /app/dist
 
 RUN pnpm i --offline --prod --frozen-lockfile
 
-FROM node:hydrogen-alpine@sha256:f8a51c36b0be7434bbf867d4a08decf0100e656203d893b9b0f8b1fe9e40daea AS runner
+# delete next.js build caches to reduce 200MB+ image size
+RUN rm -rf apps/mis-web/.next/cache apps/portal-web/.next/cache 
+
+FROM base AS runner
+
+RUN apk add nginx
 
 WORKDIR /app
 
 COPY --from=builder /app/dist .
+COPY --from=builder /app/version.json ./
+
+COPY docker/entrypoint.sh .
+RUN chmod +x entrypoint.sh
 
 ENV NODE_ENV production
 
-EXPOSE 5000
+EXPOSE 3000 80 5000
 
-WORKDIR /app/apps/portal-server
+ENTRYPOINT [ "./entrypoint.sh" ]
 
-COPY --from=pruner /app/version.json ./version.json
-
-CMD ["npm", "run", "serve"]

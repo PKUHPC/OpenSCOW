@@ -63,7 +63,7 @@ export const slurmAppOps = (cluster: string): AppOps => {
     createApp: async (request, logger) => {
       const apps = getAppConfigs();
 
-      const { appId, userId, account, coreCount, maxTime,
+      const { appId, userId, account, coreCount, maxTime, proxyBasePath,
         partition, qos, customAttributes, userSbatchOptions } = request;
 
       // prepare script file
@@ -130,7 +130,9 @@ export const slurmAppOps = (cluster: string): AppOps => {
           }
           const sessionInfo = `echo -e "{${customForm}}" >$SERVER_SESSION_INFO`;
 
-          const beforeScript = customAttributesExport + appConfig.web!.beforeScript + sessionInfo;
+          const runtimeVariables = `export PROXY_BASE_PATH=${quote([join(proxyBasePath, appConfig.web!.proxyType)])}\n`;
+
+          const beforeScript = runtimeVariables + customAttributesExport + appConfig.web!.beforeScript + sessionInfo;
           await sftpWriteFile(sftp)(join(workingDirectory, "before.sh"), beforeScript);
 
           await sftpWriteFile(sftp)(join(workingDirectory, "script.sh"), appConfig.web!.script);

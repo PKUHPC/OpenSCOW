@@ -12,7 +12,7 @@
 
 import { ServiceError } from "@ddadaal/tsgrpc-common";
 import { status } from "@grpc/grpc-js";
-import { sshConnect as libConnect, SshConnectError, testRootUserSshLogin } from "@scow/lib-ssh";
+import { SftpError, sshConnect as libConnect, SshConnectError, testRootUserSshLogin } from "@scow/lib-ssh";
 import type { NodeSSH } from "node-ssh";
 import { clusters } from "src/config/clusters";
 import { rootKeyPair } from "src/config/env";
@@ -26,17 +26,28 @@ export function getClusterLoginNode(cluster: string): string | undefined {
 }
 
 export const SSH_ERROR_CODE = "SSH_ERROR";
+export const SFTP_ERROR_CODE = "SFTP_ERROR";
 
 export async function sshConnect<T>(
   address: string, username: string, logger: Logger, run: (ssh: NodeSSH) => Promise<T>,
 ): Promise<T> {
   return libConnect(address, username, rootKeyPair, logger, run).catch((e) => {
+
     if (e instanceof SshConnectError) {
       throw new ServiceError({
         code: status.INTERNAL,
         metadata: scowErrorMetadata(SSH_ERROR_CODE),
       });
     }
+
+    if (e instanceof SftpError) {
+      throw new ServiceError({
+        code: status.UNKNOWN,
+        details: e.message,
+        metadata: scowErrorMetadata(SFTP_ERROR_CODE),
+      });
+    }
+
     throw e;
   });
 }

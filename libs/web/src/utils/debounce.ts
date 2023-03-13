@@ -10,8 +10,6 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import type { Awaited } from "@ddadaal/next-typed-api-routes-runtime/lib/client";
-
 export function debounce<F extends(...args: any[]) => any>(
   func: F,
   interval = 200,

@@ -30,6 +30,7 @@
     "@scow/protos": "workspace:*",
     "@scow/utils": "workspace:*",
     "@sinclair/typebox": "0.25.24",
+    "node-ssh": "13.0.1",
     "dotenv": "16.0.3",
     "node-cron": "3.0.2",
     "uuid": "9.0.0",
@@ -43,7 +44,9 @@
     "@ddadaal/tsgrpc-client": "0.17.3",
     "@types/node-cron": "3.0.7",
     "@types/wait-on": "5.3.1",
-    "@types/shell-quote": "1.7.1"
+    "@types/shell-quote": "1.7.1",
+    "form-data": "4.0.0",
+    "@types/ssh2": "1.11.7"
   },
   "volta": {
     "extends": "../../package.json"

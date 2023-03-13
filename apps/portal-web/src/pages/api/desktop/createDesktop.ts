@@ -16,7 +16,6 @@ import { DesktopServiceClient } from "@scow/protos/build/portal/desktop";
 import { authenticate } from "src/auth/server";
 import { getClient } from "src/utils/client";
 import { publicConfig } from "src/utils/config";
-import { dnsResolve } from "src/utils/dns";
 import { route } from "src/utils/route";
 import { handlegRPCError } from "src/utils/server";
 
@@ -32,7 +31,7 @@ export interface CreateDesktopSchema {
 
   responses: {
     200: {
-      node: string;
+      host: string;
       port: number;
       password: string;
     };
@@ -69,8 +68,8 @@ export default /* #__PURE__*/route<CreateDesktopSchema>("CreateDesktopSchema", a
   return await asyncUnaryCall(client, "createDesktop", {
     cluster, userId: info.identityId, wm,
   }).then(
-    async ({ node, password, port }) => ({
-      200: { node: await dnsResolve(node), password, port },
+    async ({ host, password, port }) => ({
+      200: { host, password, port },
     }),
     handlegRPCError({
       [status.NOT_FOUND]: () => ({ 400: { code: "INVALID_CLUSTER" as const } }),

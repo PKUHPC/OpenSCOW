@@ -12,7 +12,6 @@
 
 import AntdIcon from "@ant-design/icons";
 import Image from "next/image";
-import { useDarkMode } from "src/layouts/darkMode";
 import { addBasePathToImage } from "src/utils/image";
 
 interface Props {
@@ -22,8 +21,6 @@ interface Props {
 }
 
 export function NavIcon({ src, alt, basePath = "" }: Props) {
-
-  const { dark } = useDarkMode();
 
   return (
     <AntdIcon

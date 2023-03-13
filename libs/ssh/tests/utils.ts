@@ -15,8 +15,8 @@ import { NodeSSH } from "node-ssh";
 import { homedir } from "os";
 import { dirname, join } from "path";
 import { getKeyPair } from "src/key";
-import { sftpWriteFile, sshRmrf } from "src/sftp";
-import { sshRawConnect } from "src/ssh";
+import { sftpWriteFile } from "src/sftp";
+import { sshRawConnect, sshRmrf } from "src/ssh";
 import { SFTPWrapper } from "ssh2";
 
 export const target = "localhost:22222";

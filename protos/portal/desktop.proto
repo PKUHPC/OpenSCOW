@@ -24,7 +24,7 @@ message CreateDesktopRequest {
 // INVALID_ARGUMENT: wm is not valid
 // RESOURCE_EXHAUSTED: too many desktops
 message CreateDesktopResponse {
-  string node = 1;
+  string host = 1;
   uint32 port = 2;
   string password = 3;
 }
@@ -46,7 +46,7 @@ message ConnectToDesktopRequest {
 
 // NOT_FOUND: cluster is not found
 message ConnectToDesktopResponse {
-  string node = 1;
+  string host = 1;
   uint32 port = 2;
   string password = 3;
 }
@@ -58,7 +58,7 @@ message ListUserDesktopsRequest {
 
 // NOT_FOUND: cluster is not found
 message ListUserDesktopsResponse {
-  string node = 1;
+  string host = 1;
   repeated uint32 display_ids = 2;
 }
 
