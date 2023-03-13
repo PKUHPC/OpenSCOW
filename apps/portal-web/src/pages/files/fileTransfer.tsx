@@ -29,13 +29,16 @@ interface ButtonProps {
   dstCluster: Cluster;
   selectedKeys: FileInfoKey[];
   toPath: string;
-  maxDepth: number;
-  port: number;
-  sshKeyPath: string;
+  maxDepth?: number;
+  port?: number;
+  sshKeyPath?: string;
+  remove: boolean;
 }
 
 const OperationButton: React.FC<ButtonProps> = (props) => {
-  const { icon, text, disabled, srcCluster, dstCluster, selectedKeys, toPath, maxDepth, port, sshKeyPath } = props;
+  const {
+    icon, text, disabled, srcCluster, dstCluster, selectedKeys, toPath, maxDepth, port, sshKeyPath, remove,
+  } = props;
   return (
     <Button
       icon={icon}
@@ -50,6 +53,7 @@ const OperationButton: React.FC<ButtonProps> = (props) => {
             maxDepth: maxDepth,
             port: port,
             sshKeyPath: sshKeyPath,
+            remove: remove,
           } });
         });
       }}
@@ -98,9 +102,8 @@ export const FileTransferPage: NextPage = requireAuth(() => true)(() => {
               dstCluster={clusterRight!}
               selectedKeys={selectedKeysLeft!}
               toPath={pathRight!}
-              maxDepth={2}
               port={22222}
-              sshKeyPath={"~/.ssh/id_rsa"}
+              remove={false}
             />
           </Row>
 
@@ -113,9 +116,8 @@ export const FileTransferPage: NextPage = requireAuth(() => true)(() => {
               dstCluster={clusterLeft!}
               selectedKeys={selectedKeysRight!}
               toPath={pathLeft!}
-              maxDepth={2}
               port={22222}
-              sshKeyPath={"~/.ssh/id_rsa"}
+              remove={false}
             />
           </Row>
 
@@ -129,9 +131,8 @@ export const FileTransferPage: NextPage = requireAuth(() => true)(() => {
               dstCluster={clusterRight!}
               selectedKeys={selectedKeysLeft!}
               toPath={pathRight!}
-              maxDepth={2}
               port={22222}
-              sshKeyPath={"~/.ssh/id_rsa"}
+              remove={true}
             />
           </Row>
 
@@ -144,9 +145,8 @@ export const FileTransferPage: NextPage = requireAuth(() => true)(() => {
               dstCluster={clusterLeft!}
               selectedKeys={selectedKeysRight!}
               toPath={pathLeft!}
-              maxDepth={2}
               port={22222}
-              sshKeyPath={"~/.ssh/id_rsa"}
+              remove={true}
             />
           </Row>
 
