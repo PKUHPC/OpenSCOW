@@ -372,6 +372,7 @@ export const fileServiceServer = plugin((server) => {
       if (!dstHost) { throw clusterNotFound(dstCluster); }
       const dstAddress = dstHost!.indexOf(":") === -1 ? dstHost : dstHost.split(":")[0]; // 如果是域名，去掉端口号
 
+
       return await sshConnect(srcHost, userId, logger, async (ssh) => {
         const resp = await ssh.exec(
           "scow-sync", [
@@ -382,7 +383,7 @@ export const fileServiceServer = plugin((server) => {
             "-m", maxDepth.toString(),
             "-p", port.toString(),
             "-k", sshKeyPath,
-            "-r", remove,
+            "-r", remove ? "1" : "0",
           ], { stream: "both" });
         if (resp.code !== 0) {
           throw <ServiceError> {
