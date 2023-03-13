@@ -127,15 +127,19 @@ importers:
     specifiers:
       '@scow/lib-config': workspace:*
       '@sinclair/typebox': 0.25.24
+      '@types/prompts': 2.4.3
       '@types/yargs': 17.0.22
       pkg: 5.8.1
+      prompts: 2.4.2
       yargs: 17.7.1
     dependencies:
       '@scow/lib-config': link:../../libs/libconfig
       '@sinclair/typebox': 0.25.24
       pkg: 5.8.1
+      prompts: 2.4.2
       yargs: 17.7.1
     devDependencies:
+      '@types/prompts': 2.4.3
       '@types/yargs': 17.0.22
 
   apps/gateway:
@@ -5553,6 +5557,13 @@ packages:
 
   /@types/prettier/2.7.1:
     resolution: {integrity: sha512-ri0UmynRRvZiiUJdiz38MmIblKK+oH30MztdBVR95dv/Ubw6neWSb8u1XpRb72L4qsZOhz+L+z9JD40SJmfWow==}
+    dev: true
+
+  /@types/prompts/2.4.3:
+    resolution: {integrity: sha512-qpzXlxoPv67TCtTCS+SwYmz1M+G5ARTrE5YVlrZPy/xBD36dzLqiJLDzOzsMXkcJYq6+6UkWqFwtLAOjsfec5Q==}
+    dependencies:
+      '@types/node': 18.15.10
+      kleur: 3.0.3
     dev: true
 
   /@types/prop-types/15.7.5:

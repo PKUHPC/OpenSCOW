@@ -20,7 +20,7 @@ interface Options {
  * Output sample config files to outputPath
  * @param options options
  */
-export const viewConfig = (options: Options) => {
+export const viewInstallationConfig = (options: Options) => {
   const config = getInstallationConfig(options.configPath);
   console.log(JSON.stringify(config, null, 2));
 };

@@ -11,6 +11,10 @@
  */
 
 import fs from "fs";
+import { join } from "path";
+import prompt from "prompts";
+
+
 
 interface Options {
   configPath: string;
@@ -23,13 +27,22 @@ const EXAMPLE_CONFIG_PATH = "assets/config-example";
  * Output sample config files to outputPath
  * @param options options
  */
-export const extractConfig = (options: Options) => {
+export const extractConfig = async (options: Options) => {
+
+  const fullPath = join(process.cwd(), options.outputPath);
+
+  console.log("Output path is " + fullPath);
 
   if (fs.existsSync(options.outputPath)) {
-    console.warn("Output path already exists, skipping extraction");
-    return;
+    const answer = await prompt({
+      type: "confirm",
+      name: "continue",
+      message: `Output path ${fullPath} already exists. Continue?`,
+    });
+    if (!answer.continue) {
+      return;
+    }
   }
 
-  console.log("Output path is " + options.outputPath);
-  fs.cpSync(EXAMPLE_CONFIG_PATH, options.outputPath, { recursive: true });
+  await fs.promises.cp(EXAMPLE_CONFIG_PATH, fullPath, { recursive: true });
 };

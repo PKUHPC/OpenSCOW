@@ -10,9 +10,9 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { extractConfig } from "src/cmd/extractConfig";
+import { extractConfig } from "src/cmd/config/extract";
+import { viewInstallationConfig } from "src/cmd/config/installation";
 import { generateDockerComposeYml } from "src/cmd/generate";
-import { viewConfig } from "src/cmd/viewConfig";
 import { hideBin } from "yargs/helpers";
 import yargs from "yargs/yargs";
 
@@ -25,23 +25,27 @@ yargs(hideBin(process.argv))
       default: "./installation.yml",
     },
   })
-  .command("view-config", "View installation config", (yargs) => {
-    return yargs;
-  }, (argv) => {
-    viewConfig(argv);
-  })
-  .command("extract-config", "Generate config files", (yargs) => {
+  .command("config", "Configurations functionalities", (yargs) => {
     return yargs
-      .options({
-        outputPath: {
-          alias: "o",
-          type: "string",
-          description: "output dir",
-          default: "./config",
-        },
-      });
-  }, (argv) => {
-    extractConfig(argv);
+      .command("installation", "View installation config", (yargs) => {
+        return yargs;
+      }, (argv) => {
+        viewInstallationConfig(argv);
+      })
+      .command("extract", "Extract sample configurations file", (yargs) => {
+        return yargs
+          .options({
+            outputPath: {
+              alias: "o",
+              type: "string",
+              description: "output dir",
+              default: "./config",
+            },
+          });
+      }, async (argv) => {
+        await extractConfig(argv);
+      })
+      .demandCommand().help();
   })
   .command("generate", "Generate docker-compose.yml", (yargs) => {
     return yargs
@@ -56,6 +60,8 @@ yargs(hideBin(process.argv))
   }, (argv) => {
     generateDockerComposeYml(argv);
   })
+  .completion()
+  .strict()
   .scriptName("scow-cli")
   .demandCommand()
   .help()

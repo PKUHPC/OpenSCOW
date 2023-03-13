@@ -5,6 +5,7 @@
   "main": "build/index.js",
   "bin": "build/index.js",
   "scripts": {
+    "dev": "node -r ts-node/register -r tsconfig-paths/register src/index.ts",
     "build": "rimraf build && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json && pkg --compress GZip .",
     "test": "echo \"Error: no test specified\""
   },
@@ -12,10 +13,12 @@
     "@scow/lib-config": "workspace:*",
     "pkg": "5.8.1",
     "yargs": "17.7.1",
+    "prompts": "2.4.2",
     "@sinclair/typebox": "0.25.24"
   },
   "devDependencies": {
-    "@types/yargs": "17.0.22"
+    "@types/yargs": "17.0.22",
+    "@types/prompts": "2.4.3"
   },
   "author": "PKUHPC (https://github.com/PKUHPC)",
   "license": "Mulan PSL v2",

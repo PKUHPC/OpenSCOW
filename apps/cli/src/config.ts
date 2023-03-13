@@ -55,7 +55,7 @@ export const InstallationConfigSchema = Type.Object({
       portalServer: Type.Optional(Type.Integer({ description: "门户系统服务端口" })),
       auth: Type.Optional(Type.Integer({ description: "认证系统端口。对自定义认证系统无效" })),
     }, { description: "开放的端口" })),
-  }),
+  }, { default: {}, description: "调试选项" }),
 
 
 });
