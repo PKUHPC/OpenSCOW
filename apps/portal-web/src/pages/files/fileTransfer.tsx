@@ -21,6 +21,44 @@ import { Cluster } from "src/utils/config";
 
 type FileInfoKey = React.Key;
 
+interface ButtonProps {
+  icon: React.ReactNode;
+  text: string;
+  disabled: boolean;
+  srcCluster: Cluster;
+  dstCluster: Cluster;
+  selectedKeys: FileInfoKey[];
+  toPath: string;
+  maxDepth: number;
+  port: number;
+  sshKeyPath: string;
+}
+
+const OperationButton: React.FC<ButtonProps> = (props) => {
+  const { icon, text, disabled, srcCluster, dstCluster, selectedKeys, toPath, maxDepth, port, sshKeyPath } = props;
+  return (
+    <Button
+      icon={icon}
+      disabled={disabled}
+      onClick={ () => {
+        selectedKeys.forEach(async (key) => {
+          await api.transferFiles({ body: {
+            srcCluster: srcCluster.id,
+            dstCluster: dstCluster.id,
+            fromPath: String(key),
+            toPath: toPath,
+            maxDepth: maxDepth,
+            port: port,
+            sshKeyPath: sshKeyPath,
+          } });
+        });
+      }}
+    >
+      {text}
+    </Button>
+  );
+};
+
 export const FileTransferPage: NextPage = requireAuth(() => true)(() => {
 
 
@@ -52,66 +90,64 @@ export const FileTransferPage: NextPage = requireAuth(() => true)(() => {
         <Col span={0.5}>
 
           <Row justify="center">
-            <Button
+            <OperationButton
               icon={<ArrowRightOutlined />}
-              disabled={ !selectedKeysLeft || selectedKeysLeft!.length === 0}
-              onClick={ () => {
-                selectedKeysLeft!.forEach(async (key) => {
-                  await api.transferFiles({ body: {
-                    srcCluster: clusterLeft!.id,
-                    dstCluster: clusterRight!.id,
-                    fromPath: String(key),
-                    toPath: pathRight!,
-                    maxDepth: 2,
-                    port: 22222,
-                    sshKeyPath: "~/.ssh/id_rsa",
-                  } });
-                });
-              }}
-            >
-              复制
-            </Button>
+              text="复制"
+              disabled={!selectedKeysLeft || selectedKeysLeft!.length === 0}
+              srcCluster={clusterLeft!}
+              dstCluster={clusterRight!}
+              selectedKeys={selectedKeysLeft!}
+              toPath={pathRight!}
+              maxDepth={2}
+              port={22222}
+              sshKeyPath={"~/.ssh/id_rsa"}
+            />
           </Row>
 
           <Row justify="center">
-            <Button
+            <OperationButton
               icon={<ArrowLeftOutlined />}
-              disabled={ !selectedKeysRight || selectedKeysRight!.length === 0 }
-              onClick={ () => {
-                selectedKeysRight!.forEach(async (key) => {
-                  await api.transferFiles({ body: {
-                    srcCluster: clusterRight!.id,
-                    dstCluster: clusterLeft!.id,
-                    fromPath: String(key),
-                    toPath: pathLeft!,
-                    maxDepth: 2,
-                    port: 22222,
-                    sshKeyPath: "~/.ssh/id_rsa",
-                  } });
-                });
-              } }
-            >
-              复制
-            </Button>
+              text="复制"
+              disabled={!selectedKeysRight || selectedKeysRight!.length === 0}
+              srcCluster={clusterRight!}
+              dstCluster={clusterLeft!}
+              selectedKeys={selectedKeysRight!}
+              toPath={pathLeft!}
+              maxDepth={2}
+              port={22222}
+              sshKeyPath={"~/.ssh/id_rsa"}
+            />
           </Row>
 
 
           <Row justify="center">
-            <Button
+            <OperationButton
               icon={<ArrowRightOutlined />}
-              disabled={ !selectedKeysLeft || selectedKeysLeft!.length === 0}
-            >
-              移动
-            </Button>
+              text="移动"
+              disabled={!selectedKeysLeft || selectedKeysLeft!.length === 0}
+              srcCluster={clusterLeft!}
+              dstCluster={clusterRight!}
+              selectedKeys={selectedKeysLeft!}
+              toPath={pathRight!}
+              maxDepth={2}
+              port={22222}
+              sshKeyPath={"~/.ssh/id_rsa"}
+            />
           </Row>
 
           <Row justify="center">
-            <Button
+            <OperationButton
               icon={<ArrowLeftOutlined />}
-              disabled={ !selectedKeysRight || selectedKeysRight!.length === 0 }
-            >
-              移动
-            </Button>
+              text="移动"
+              disabled={!selectedKeysRight || selectedKeysRight!.length === 0}
+              srcCluster={clusterRight!}
+              dstCluster={clusterLeft!}
+              selectedKeys={selectedKeysRight!}
+              toPath={pathLeft!}
+              maxDepth={2}
+              port={22222}
+              sshKeyPath={"~/.ssh/id_rsa"}
+            />
           </Row>
 
         </Col>
