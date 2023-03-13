@@ -364,15 +364,13 @@ export const fileServiceServer = plugin((server) => {
 
     transferFiles: async ({ request, logger }) => {
 
-      const { userId, srcCluster, dstCluster, fromPath, toPath, maxDepth, port, sshKeyPath } = request;
-
-      console.log("transferFiles", request);
+      const { userId, srcCluster, dstCluster, fromPath, toPath, maxDepth, port, sshKeyPath, remove } = request;
 
       const srcHost = getClusterLoginNode(srcCluster);
       const dstHost = getClusterLoginNode(dstCluster);
       if (!srcHost) { throw clusterNotFound(srcCluster); }
       if (!dstHost) { throw clusterNotFound(dstCluster); }
-      const dstAddress = dstHost!.indexOf(":") === -1 ? dstHost : dstHost.split(":")[0];
+      const dstAddress = dstHost!.indexOf(":") === -1 ? dstHost : dstHost.split(":")[0]; // 如果是域名，去掉端口号
 
       return await sshConnect(srcHost, userId, logger, async (ssh) => {
         const resp = await ssh.exec(
@@ -384,6 +382,7 @@ export const fileServiceServer = plugin((server) => {
             "-m", maxDepth.toString(),
             "-p", port.toString(),
             "-k", sshKeyPath,
+            "-r", remove,
           ], { stream: "both" });
         if (resp.code !== 0) {
           throw <ServiceError> {
