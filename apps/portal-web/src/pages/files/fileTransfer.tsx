@@ -102,7 +102,6 @@ export const FileTransferPage: NextPage = requireAuth(() => true)(() => {
               dstCluster={clusterRight!}
               selectedKeys={selectedKeysLeft!}
               toPath={pathRight!}
-              port={22222}
               remove={false}
             />
           </Row>
@@ -116,7 +115,6 @@ export const FileTransferPage: NextPage = requireAuth(() => true)(() => {
               dstCluster={clusterLeft!}
               selectedKeys={selectedKeysRight!}
               toPath={pathLeft!}
-              port={22222}
               remove={false}
             />
           </Row>
@@ -131,7 +129,6 @@ export const FileTransferPage: NextPage = requireAuth(() => true)(() => {
               dstCluster={clusterRight!}
               selectedKeys={selectedKeysLeft!}
               toPath={pathRight!}
-              port={22222}
               remove={true}
             />
           </Row>
@@ -145,7 +142,6 @@ export const FileTransferPage: NextPage = requireAuth(() => true)(() => {
               dstCluster={clusterLeft!}
               selectedKeys={selectedKeysRight!}
               toPath={pathLeft!}
-              port={22222}
               remove={true}
             />
           </Row>
