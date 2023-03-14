@@ -23,7 +23,6 @@ export interface CreateAppRequest {
   maxTime: number;
   customAttributes: { [key: string]: string };
   proxyBasePath: string;
-  userSbatchOptions: string[];
 }
 
 export type CreateAppReply = {

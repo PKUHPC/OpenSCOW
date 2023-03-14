@@ -23,7 +23,6 @@ import {
   WebAppProps_ProxyType,
 } from "@scow/protos/build/portal/app";
 import { getClusterOps } from "src/clusterops";
-import { splitSbatchArgs } from "src/utils/app";
 import { dnsResolve } from "src/utils/dns";
 import { clusterNotFound } from "src/utils/errors";
 
@@ -100,9 +99,7 @@ export const appServiceServer = plugin((server) => {
       const { account, appId, cluster, coreCount, maxTime, proxyBasePath,
         partition, qos, userId, customAttributes } = request;
 
-      const userSbatchOptions = customAttributes["sbatchOptions"]
-        ? splitSbatchArgs(customAttributes["sbatchOptions"])
-        : [];
+
 
 
       const app = apps[appId];
@@ -168,7 +165,6 @@ export const appServiceServer = plugin((server) => {
         qos,
         customAttributes,
         proxyBasePath,
-        userSbatchOptions,
       }, logger);
 
       if (reply.code === "SBATCH_FAILED") {
