@@ -18,6 +18,7 @@ import { registerPostHandler } from "src/auth/ssh/postHandler";
 import { authConfig, SshConfigSchema } from "src/config/auth";
 import { clusters } from "src/config/clusters";
 import { rootKeyPair } from "src/config/env";
+import { getClusterLoginNode } from "src/utils/ssh";
 import { ensureNotUndefined } from "src/utils/validations";
 
 function checkLoginNode(sshConfig: SshConfigSchema) {
@@ -28,17 +29,12 @@ function checkLoginNode(sshConfig: SshConfigSchema) {
     if (Object.keys(clusters).length === 0) {
       throw new Error("No cluster has been set in clusters config");
     }
-    const clusterConfig = Object.values(clusters)[0];
-    if (typeof clusterConfig.slurm?.loginNodes?.[0] === "string") {
-      loginNode = clusterConfig.slurm.loginNodes[0];
-    }
-    else {
-      loginNode = clusterConfig.slurm.loginNodes[0].address + ":" + clusterConfig.slurm.loginNodes[0].port.toString();
-    }
-
+    const clusterKey = Object.keys(clusters)[0];
+    loginNode = getClusterLoginNode(clusterKey).address;
+    const displayName = clusters[clusterKey].displayName;
 
     if (!loginNode) {
-      throw new Error(`Cluster ${clusterConfig.displayName} has no login node.`);
+      throw new Error(`Cluster ${displayName} has no login node.`);
     }
   }
 

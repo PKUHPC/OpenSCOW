@@ -22,6 +22,8 @@ import { StorageQuota } from "src/entities/StorageQuota";
 import { Tenant } from "src/entities/Tenant";
 import { User } from "src/entities/User";
 
+import { getClusterLoginNode } from "./ssh";
+
 export async function createUserInDatabase(
   userId: string, name: string, email: string, tenantName: string, logger: Logger, em: SqlEntityManager<MySqlDriver>) {
   // get default tenant
@@ -58,10 +60,12 @@ export async function createUserInDatabase(
 export async function insertKeyToNewUser(userId: string, password: string, logger: Logger) {
   // Making an ssh Request to the login node as the user created.
   if (process.env.NODE_ENV === "production") {
-    await Promise.all(Object.values(clusters).map(async ({ displayName, slurm, misIgnore }) => {
+    await Promise.all(Object.keys(clusters).map(async (id) => {
+      const misIgnore = clusters[id].misIgnore;
       if (misIgnore) { return; }
-      const loginNode = slurm.loginNodes[0];
-      const node = typeof loginNode === "string" ? loginNode : (loginNode.address + ":" + loginNode.port.toString());
+      const loginNode = getClusterLoginNode(id);
+      const node = loginNode.address;
+      const displayName = clusters[id].displayName;
       logger.info("Checking if user can login to %s by login node %s", displayName, node);
 
       const error = await insertKeyAsUser(node, userId, password, rootKeyPair, logger).catch((e) => e);

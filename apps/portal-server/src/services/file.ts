@@ -20,7 +20,7 @@ import { FileInfo, FileInfo_FileType,
 import { config } from "src/config/env";
 import { clusterNotFound } from "src/utils/errors";
 import { pipeline } from "src/utils/pipeline";
-import { getClusterLoginNode, getClusterLoginNodePrivateKeyPath, sshConnect } from "src/utils/ssh";
+import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
 import { once } from "stream";
 
 export const fileServiceServer = plugin((server) => {
@@ -29,7 +29,7 @@ export const fileServiceServer = plugin((server) => {
     copy: async ({ request, logger }) => {
       const { userId, cluster, fromPath, toPath } = request;
 
-      const host = getClusterLoginNode(cluster);
+      const host = getClusterLoginNode(cluster).address;
 
       if (!host) { throw clusterNotFound(cluster); }
 
@@ -50,7 +50,7 @@ export const fileServiceServer = plugin((server) => {
 
       const { userId, cluster, path } = request;
 
-      const host = getClusterLoginNode(cluster);
+      const host = getClusterLoginNode(cluster).address;
 
       if (!host) { throw clusterNotFound(cluster); }
 
@@ -71,7 +71,7 @@ export const fileServiceServer = plugin((server) => {
     deleteDirectory: async ({ request, logger }) => {
       const { userId, cluster, path } = request;
 
-      const host = getClusterLoginNode(cluster);
+      const host = getClusterLoginNode(cluster).address;
 
       if (!host) { throw clusterNotFound(cluster); }
 
@@ -87,7 +87,7 @@ export const fileServiceServer = plugin((server) => {
 
       const { userId, cluster, path } = request;
 
-      const host = getClusterLoginNode(cluster);
+      const host = getClusterLoginNode(cluster).address;
 
       if (!host) { throw clusterNotFound(cluster); }
 
@@ -104,7 +104,7 @@ export const fileServiceServer = plugin((server) => {
     getHomeDirectory: async ({ request, logger }) => {
       const { cluster, userId } = request;
 
-      const host = getClusterLoginNode(cluster);
+      const host = getClusterLoginNode(cluster).address;
 
       if (!host) { throw clusterNotFound(cluster); }
 
@@ -120,7 +120,7 @@ export const fileServiceServer = plugin((server) => {
     makeDirectory: async ({ request, logger }) => {
       const { userId, cluster, path } = request;
 
-      const host = getClusterLoginNode(cluster);
+      const host = getClusterLoginNode(cluster).address;
 
       if (!host) { throw clusterNotFound(cluster); }
 
@@ -142,7 +142,7 @@ export const fileServiceServer = plugin((server) => {
     move: async ({ request, logger }) => {
       const { userId, cluster, fromPath, toPath } = request;
 
-      const host = getClusterLoginNode(cluster);
+      const host = getClusterLoginNode(cluster).address;
 
       if (!host) { throw clusterNotFound(cluster); }
 
@@ -160,7 +160,7 @@ export const fileServiceServer = plugin((server) => {
     readDirectory: async ({ request, logger }) => {
       const { userId, cluster, path } = request;
 
-      const host = getClusterLoginNode(cluster);
+      const host = getClusterLoginNode(cluster).address;
 
       if (!host) { throw clusterNotFound(cluster); }
 
@@ -203,7 +203,7 @@ export const fileServiceServer = plugin((server) => {
     download: async (call) => {
       const { logger, request: { cluster, path, userId } } = call;
 
-      const host = getClusterLoginNode(cluster);
+      const host = getClusterLoginNode(cluster).address;
 
       if (!host) { throw clusterNotFound(cluster); }
 
@@ -251,7 +251,7 @@ export const fileServiceServer = plugin((server) => {
 
       const { cluster, path, userId } = info.message?.info;
 
-      const host = getClusterLoginNode(cluster);
+      const host = getClusterLoginNode(cluster).address;
 
       if (!host) { throw clusterNotFound(cluster); }
 
@@ -330,7 +330,7 @@ export const fileServiceServer = plugin((server) => {
     getFileMetadata: async ({ request, logger }) => {
       const { userId, cluster, path } = request;
 
-      const host = getClusterLoginNode(cluster);
+      const host = getClusterLoginNode(cluster).address;
 
       if (!host) { throw clusterNotFound(cluster); }
 
@@ -351,7 +351,7 @@ export const fileServiceServer = plugin((server) => {
     exists: async ({ request, logger }) => {
       const { userId, cluster, path } = request;
 
-      const host = getClusterLoginNode(cluster);
+      const host = getClusterLoginNode(cluster).address;
 
       if (!host) { throw clusterNotFound(cluster); }
 
@@ -365,21 +365,21 @@ export const fileServiceServer = plugin((server) => {
     transferFiles: async ({ request, logger }) => {
       const { userId, srcCluster, dstCluster, fromPath, toPath, maxDepth } = request;
 
-      const srcHost = getClusterLoginNode(srcCluster);
-      const dstHost = getClusterLoginNode(dstCluster);
-      if (!srcHost) { throw clusterNotFound(srcCluster); }
-      if (!dstHost) { throw clusterNotFound(dstCluster); }
+      const srcLoginNode = getClusterLoginNode(srcCluster);
+      const dstLoginNode = getClusterLoginNode(dstCluster);
+      if (!srcLoginNode.address) { throw clusterNotFound(srcCluster); }
+      if (!dstLoginNode.address) { throw clusterNotFound(dstCluster); }
 
-      const dstAddress = dstHost!.indexOf(":") === -1 ? dstHost : dstHost.split(":")[0];
-      const dstPort = dstHost!.indexOf(":") === -1 ? "22" : dstHost.split(":")[1];
+      const dstAddress = dstLoginNode.host;
+      const dstPort = dstLoginNode.port;
 
-      const privateKeyPath = getClusterLoginNodePrivateKeyPath(srcCluster);
+      const privateKeyPath = dstLoginNode.privateKeyPath;
 
       // eslint-disable-next-line max-len
       // const cmd = `scow-sync -a ${dstAddress} -u ${userId} -s ${fromPath} -d ${toPath} -m ${maxDepth} -p ${dstPort} -k ${privateKeyPath} `;
       // console.log("cmd", cmd);
 
-      return await sshConnect(srcHost, userId, logger, async (ssh) => {
+      return await sshConnect(srcLoginNode.address, userId, logger, async (ssh) => {
         const resp = await ssh.exec(
           "scow-sync", [
             "-a", dstAddress,
@@ -387,7 +387,7 @@ export const fileServiceServer = plugin((server) => {
             "-s", fromPath,
             "-d", toPath,
             "-m", maxDepth.toString(),
-            "-p", dstPort,
+            "-p", dstPort.toString(),
             "-k", privateKeyPath!,
           ], { stream: "both" });
         if (resp.code !== 0) {

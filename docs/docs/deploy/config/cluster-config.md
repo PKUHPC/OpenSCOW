@@ -20,7 +20,7 @@ slurm:
   # 如果只有一个string类型，则表示ssh端口默认为22，密钥路径默认为~/.ssh/id_rsa
   loginNodes:
       - login01
-      - address: login02
+      - host: login02
         port: 22222
         key: ~/.ssh/rsa/id_rsa
 

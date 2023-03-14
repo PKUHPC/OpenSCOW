@@ -1,7 +1,7 @@
 displayName: hpc01Name
 slurm:
   loginNodes:
-      - address: localhost
+      - host: localhost
       - port: 22222
       - keypath: ~/.ssh/id_rsa
   partitions:

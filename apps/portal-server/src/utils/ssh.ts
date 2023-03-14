@@ -20,27 +20,35 @@ import { scowErrorMetadata } from "src/utils/error";
 import { Logger } from "ts-log";
 
 
-export function getClusterLoginNode(cluster: string): string | undefined {
-
-  const loginNodes = clusters[cluster]?.slurm?.loginNodes?.[0];
-  // 如果是string，那么就是address:port
-  if (typeof loginNodes === "string") {
-    return loginNodes;
-  }
-  else {
-    return loginNodes?.address + ":" + loginNodes?.port.toString();
-  }
+interface ClusterLoginNode {
+  host: string;
+  port: number;
+  privateKeyPath: string;
+  address: string; // host:port
 }
 
-export function getClusterLoginNodePrivateKeyPath(cluster: string): string | undefined {
+export function getClusterLoginNode(cluster: string): ClusterLoginNode {
+
   const loginNodes = clusters[cluster]?.slurm?.loginNodes?.[0];
-  // 如果是string，那么默认为"~/.ssh/id_rsa"
+
   if (typeof loginNodes === "string") {
-    return "~/.ssh/id_rsa";
+    const [host, port] = loginNodes.indexOf(":") ? loginNodes.split(":") : [loginNodes, "22"];
+    return {
+      host,
+      port: parseInt(port, 10),
+      privateKeyPath: "~/.ssh/id_rsa",
+      address: loginNodes,
+    };
   }
   else {
-    return loginNodes?.privateKeyPath;
+    return {
+      host: loginNodes.host,
+      port: loginNodes.port,
+      privateKeyPath: "~/.ssh/id_rsa",
+      address: `${loginNodes.host}:${loginNodes.port}`,
+    };
   }
+
 }
 
 export const SSH_ERROR_CODE = "SSH_ERROR";
@@ -74,9 +82,10 @@ export async function sshConnect<T>(
  * Check whether all clusters can be logged in as root user
  */
 export async function checkClustersRootUserLogin(logger: Logger) {
-  await Promise.all(Object.values(clusters).map(async ({ displayName, slurm: { loginNodes } }) => {
-    const loginNode = loginNodes[0];
-    const node = typeof loginNode === "string" ? loginNode : (loginNode.address + ":" + loginNode.port.toString());
+  await Promise.all(Object.keys(clusters).map(async (id) => {
+    const loginNode = getClusterLoginNode(id);
+    const node = loginNode.address;
+    const displayName = clusters[id].displayName;
     logger.info("Checking if root can login to %s by login node %s", displayName, node);
     const error = await testRootUserSshLogin(node, rootKeyPair, console);
     if (error) {

@@ -23,9 +23,9 @@ export const ClusterConfigSchema = Type.Object({
   slurm: Type.Object({
     loginNodes: Type.Array(
       Type.Union([
-        Type.String({ description: "登录节点地址:端口" }),
+        Type.String({ description: "登录节点地址:ssh端口" }),
         Type.Object({
-          address: Type.String({ description: "登录节点地址" }),
+          host: Type.String({ description: "登录节点地址" }),
           port: Type.Integer({ description: "登录节点ssh端口", default: 22 }),
           privateKeyPath: Type.String({ description: "登录节点私钥路径", default: "~/.ssh/id_rsa" }),
         }, { description: "登录节点信息，地址、ssh端口、私钥路径", default: []}),
