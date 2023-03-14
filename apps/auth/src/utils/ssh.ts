@@ -36,8 +36,8 @@ export function getClusterLoginNode(cluster: string): ClusterLoginNode {
   else {
     return {
       host: loginNodes.host,
-      port: loginNodes.port,
-      privateKeyPath: "~/.ssh/id_rsa",
+      port: loginNodes.port!,
+      privateKeyPath: loginNodes.privateKeyPath!,
       address: `${loginNodes.host}:${loginNodes.port}`,
     };
   }
