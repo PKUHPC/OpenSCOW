@@ -22,7 +22,25 @@ import { Logger } from "ts-log";
 
 export function getClusterLoginNode(cluster: string): string | undefined {
 
-  return clusters[cluster]?.slurm?.loginNodes?.[0];
+  const loginNodes = clusters[cluster]?.slurm?.loginNodes?.[0];
+  // 如果是string，那么就是address:port
+  if (typeof loginNodes === "string") {
+    return loginNodes;
+  }
+  else {
+    return loginNodes?.address + ":" + loginNodes?.port.toString();
+  }
+}
+
+export function getClusterLoginNodePrivateKeyPath(cluster: string): string | undefined {
+  const loginNodes = clusters[cluster]?.slurm?.loginNodes?.[0];
+  // 如果是string，那么默认为"~/.ssh/id_rsa"
+  if (typeof loginNodes === "string") {
+    return "~/.ssh/id_rsa";
+  }
+  else {
+    return loginNodes?.privateKeyPath;
+  }
 }
 
 export const SSH_ERROR_CODE = "SSH_ERROR";
@@ -57,7 +75,8 @@ export async function sshConnect<T>(
  */
 export async function checkClustersRootUserLogin(logger: Logger) {
   await Promise.all(Object.values(clusters).map(async ({ displayName, slurm: { loginNodes } }) => {
-    const node = loginNodes[0];
+    const loginNode = loginNodes[0];
+    const node = typeof loginNode === "string" ? loginNode : (loginNode.address + ":" + loginNode.port.toString());
     logger.info("Checking if root can login to %s by login node %s", displayName, node);
     const error = await testRootUserSshLogin(node, rootKeyPair, console);
     if (error) {

@@ -21,7 +21,16 @@ export const ClusterConfigSchema = Type.Object({
   displayName: Type.String({ description: "集群的显示名称" }),
   scheduler: Type.Enum({ slurm: "slurm" }, { description: "集群所使用的调度器，目前只支持slurm", default: "slurm" }),
   slurm: Type.Object({
-    loginNodes: Type.Array(Type.String(), { description: "集群的登录节点地址", default: []}),
+    loginNodes: Type.Array(
+      Type.Union([
+        Type.String({ description: "登录节点地址:端口" }),
+        Type.Object({
+          address: Type.String({ description: "登录节点地址" }),
+          port: Type.Integer({ description: "登录节点ssh端口", default: 22 }),
+          privateKeyPath: Type.String({ description: "登录节点私钥路径", default: "~/.ssh/id_rsa" }),
+        }, { description: "登录节点信息，地址、ssh端口、私钥路径", default: []}),
+      ]),
+    ),
     partitions: Type.Array(
       Type.Object(
         {

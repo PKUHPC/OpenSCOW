@@ -20,7 +20,7 @@ import { FileInfo, FileInfo_FileType,
 import { config } from "src/config/env";
 import { clusterNotFound } from "src/utils/errors";
 import { pipeline } from "src/utils/pipeline";
-import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
+import { getClusterLoginNode, getClusterLoginNodePrivateKeyPath, sshConnect } from "src/utils/ssh";
 import { once } from "stream";
 
 export const fileServiceServer = plugin((server) => {
@@ -363,21 +363,21 @@ export const fileServiceServer = plugin((server) => {
     },
 
     transferFiles: async ({ request, logger }) => {
-
-      const { userId, srcCluster, dstCluster, fromPath, toPath, maxDepth, port, sshKeyPath, remove } = request;
-
-      console.log("transferFiles", request);
+      const { userId, srcCluster, dstCluster, fromPath, toPath, maxDepth } = request;
 
       const srcHost = getClusterLoginNode(srcCluster);
       const dstHost = getClusterLoginNode(dstCluster);
       if (!srcHost) { throw clusterNotFound(srcCluster); }
       if (!dstHost) { throw clusterNotFound(dstCluster); }
-      const dstAddress = dstHost!.indexOf(":") === -1 ? dstHost : dstHost.split(":")[0]; // 如果是域名，去掉端口号
+
+      const dstAddress = dstHost!.indexOf(":") === -1 ? dstHost : dstHost.split(":")[0];
+      const dstPort = dstHost!.indexOf(":") === -1 ? "22" : dstHost.split(":")[1];
+
+      const privateKeyPath = getClusterLoginNodePrivateKeyPath(srcCluster);
 
       // eslint-disable-next-line max-len
-      const cmd = `scow-sync -a ${dstAddress} -u ${userId} -s ${fromPath} -d ${toPath} -m ${maxDepth} -p ${port} -k ${sshKeyPath} -r ${remove ? "1" : "0"}`;
-      console.log("cmd", cmd);
-
+      // const cmd = `scow-sync -a ${dstAddress} -u ${userId} -s ${fromPath} -d ${toPath} -m ${maxDepth} -p ${dstPort} -k ${privateKeyPath} `;
+      // console.log("cmd", cmd);
 
       return await sshConnect(srcHost, userId, logger, async (ssh) => {
         const resp = await ssh.exec(
@@ -387,9 +387,8 @@ export const fileServiceServer = plugin((server) => {
             "-s", fromPath,
             "-d", toPath,
             "-m", maxDepth.toString(),
-            "-p", port.toString(),
-            "-k", sshKeyPath,
-            "-r", remove ? "1" : "0",
+            "-p", dstPort,
+            "-k", privateKeyPath!,
           ], { stream: "both" });
         if (resp.code !== 0) {
           throw <ServiceError> {

@@ -23,21 +23,17 @@ type FileInfoKey = React.Key;
 
 interface ButtonProps {
   icon: React.ReactNode;
-  text: string;
   disabled: boolean;
   srcCluster: Cluster;
   dstCluster: Cluster;
   selectedKeys: FileInfoKey[];
   toPath: string;
   maxDepth?: number;
-  port?: number;
-  sshKeyPath?: string;
-  remove: boolean;
 }
 
 const OperationButton: React.FC<ButtonProps> = (props) => {
   const {
-    icon, text, disabled, srcCluster, dstCluster, selectedKeys, toPath, maxDepth, port, sshKeyPath, remove,
+    icon, disabled, srcCluster, dstCluster, selectedKeys, toPath, maxDepth,
   } = props;
   return (
     <Button
@@ -51,15 +47,11 @@ const OperationButton: React.FC<ButtonProps> = (props) => {
             fromPath: String(key),
             toPath: toPath,
             maxDepth: maxDepth,
-            port: port,
-            sshKeyPath: sshKeyPath,
-            remove: remove,
           } });
         });
       }}
-    >
-      {text}
-    </Button>
+    />
+
   );
 };
 
@@ -96,57 +88,27 @@ export const FileTransferPage: NextPage = requireAuth(() => true)(() => {
           <Row justify="center">
             <OperationButton
               icon={<ArrowRightOutlined />}
-              text="复制"
               disabled={!selectedKeysLeft || selectedKeysLeft!.length === 0}
               srcCluster={clusterLeft!}
               dstCluster={clusterRight!}
               selectedKeys={selectedKeysLeft!}
               toPath={pathRight!}
-              remove={false}
             />
           </Row>
 
           <Row justify="center">
             <OperationButton
               icon={<ArrowLeftOutlined />}
-              text="复制"
               disabled={!selectedKeysRight || selectedKeysRight!.length === 0}
               srcCluster={clusterRight!}
               dstCluster={clusterLeft!}
               selectedKeys={selectedKeysRight!}
               toPath={pathLeft!}
-              remove={false}
-            />
-          </Row>
-
-
-          <Row justify="center">
-            <OperationButton
-              icon={<ArrowRightOutlined />}
-              text="移动"
-              disabled={!selectedKeysLeft || selectedKeysLeft!.length === 0}
-              srcCluster={clusterLeft!}
-              dstCluster={clusterRight!}
-              selectedKeys={selectedKeysLeft!}
-              toPath={pathRight!}
-              remove={true}
-            />
-          </Row>
-
-          <Row justify="center">
-            <OperationButton
-              icon={<ArrowLeftOutlined />}
-              text="移动"
-              disabled={!selectedKeysRight || selectedKeysRight!.length === 0}
-              srcCluster={clusterRight!}
-              dstCluster={clusterLeft!}
-              selectedKeys={selectedKeysRight!}
-              toPath={pathLeft!}
-              remove={true}
             />
           </Row>
 
         </Col>
+
         <Col span={11}>
           <ClusterFileTable
             selectedCluster={ clusterRight! }

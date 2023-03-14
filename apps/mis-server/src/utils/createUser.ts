@@ -60,7 +60,8 @@ export async function insertKeyToNewUser(userId: string, password: string, logge
   if (process.env.NODE_ENV === "production") {
     await Promise.all(Object.values(clusters).map(async ({ displayName, slurm, misIgnore }) => {
       if (misIgnore) { return; }
-      const node = slurm.loginNodes[0];
+      const loginNode = slurm.loginNodes[0];
+      const node = typeof loginNode === "string" ? loginNode : (loginNode.address + ":" + loginNode.port.toString());
       logger.info("Checking if user can login to %s by login node %s", displayName, node);
 
       const error = await insertKeyAsUser(node, userId, password, rootKeyPair, logger).catch((e) => e);
