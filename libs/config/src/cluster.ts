@@ -26,8 +26,8 @@ export const ClusterConfigSchema = Type.Object({
         Type.String({ description: "登录节点地址:ssh端口" }),
         Type.Object({
           host: Type.String({ description: "登录节点地址" }),
-          port: Type.Integer({ description: "登录节点ssh端口", default: 22 }),
-          privateKeyPath: Type.String({ description: "登录节点私钥路径", default: "~/.ssh/id_rsa" }),
+          port: Type.Optional(Type.Integer({ description: "登录节点ssh端口" })),
+          privateKeyPath: Type.Optional(Type.String({ description: "登录节点私钥路径" })),
         }, { description: "登录节点信息，地址、ssh端口、私钥路径", default: []}),
       ]),
     ),
