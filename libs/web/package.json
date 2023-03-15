@@ -16,19 +16,19 @@
   ],
   "dependencies": {
     "@scow/utils": "workspace:*",
-    "zod": "3.21.2",
+    "zod": "3.21.4",
     "mime-types": "2.1.35"
   },
   "peerDependencies": {
     "antd": "5.3.0",
-    "next": "13.2.3",
+    "next": "13.2.4",
     "styled-components": "5.3.8",
     "@ant-design/icons": "5.0.1",
     "dayjs": "1.11.7"
   },
   "devDependencies": {
     "antd": "5.3.0",
-    "next": "13.2.3",
+    "next": "13.2.4",
     "styled-components": "5.3.8",
     "@types/mime-types": "2.1.1",
     "react": "18.2.0",
