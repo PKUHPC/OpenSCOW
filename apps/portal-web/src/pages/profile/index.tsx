@@ -25,7 +25,7 @@ const Container = styled.div`
 `;
 
 const Part = styled(Section)`
-  min-width: 400px;
+  min-width: 350px;
   max-width: 600px;
   flex: 1;
   margin: 0 16px 32px 0;

@@ -21,5 +21,15 @@ export const GlobalStyle = createGlobalStyle`
   a {
     color: ${({ theme }) => theme.token.colorPrimaryText};
   }
+
+ // 对日期组件在手机端展示做样式兼容处理(起)
+  .ant-picker-dropdown {
+    max-width: 100%;
+  }
+
+  .ant-picker-dropdown .ant-picker-panel-layout {
+    overflow-y: scroll;
+  }
+ // 对日期组件在手机端展示做样式兼容处理(止)
 `;
 
