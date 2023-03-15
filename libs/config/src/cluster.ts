@@ -28,8 +28,8 @@ export const ClusterConfigSchema = Type.Object({
           host: Type.String({ description: "登录节点地址" }),
           port: Type.Optional(Type.Integer({ description: "登录节点ssh端口" })),
           privateKeyPath: Type.Optional(Type.String({ description: "登录节点私钥路径" })),
-        }, { description: "登录节点信息，地址、ssh端口、私钥路径", default: []}),
-      ]),
+        }),
+      ]), { description: "登录节点信息，地址、ssh端口、私钥路径", default: []},
     ),
     partitions: Type.Array(
       Type.Object(
