@@ -12,12 +12,16 @@
 
 import { defaultPresets, formatDateTime } from "@scow/lib-web/build/utils/datetime";
 import { useDidUpdateEffect } from "@scow/lib-web/build/utils/hooks";
-import { Button, DatePicker, Form, Input, Select, Table } from "antd";
+import { queryToString, useQuerystring } from "@scow/lib-web/build/utils/querystring";
+import { Button, DatePicker, Form, Table } from "antd";
 import dayjs from "dayjs";
+import Router from "next/router";
 import { useCallback, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
+
+import { TenantOrAccountRadio } from "./TenantOrAccountRadio";
 
 interface Props {
   accountNames?: string[];
@@ -37,20 +41,25 @@ export const PaymentTable: React.FC<Props> = ({
   accountNames, showAccountName, showAuditInfo,
 }) => {
 
+  const urlQuery = useQuerystring();
+  const account = queryToString(urlQuery.account) || undefined;
+
   const [form] = Form.useForm<FilterForm>();
 
   const [query, setQuery] = useState(() => ({
-    accountName: accountNames?.[0],
+    accountName: showAccountName ? account : accountNames?.[0],
     time: [today.subtract(1, "year"), today],
   }));
 
   const { data, isLoading } = useAsync({
     promiseFn: useCallback(async () => {
-      return api.getPayments({ query: {
-        accountName: query.accountName,
-        startTime: query.time[0].startOf("day").toISOString(),
-        endTime: query.time[1].endOf("day").toISOString(),
-      } });
+      return api.getPayments({
+        query: {
+          accountName: query.accountName,
+          startTime: query.time[0].startOf("day").toISOString(),
+          endTime: query.time[1].endOf("day").toISOString(),
+        },
+      });
     }, [query]),
   });
 
@@ -71,22 +80,22 @@ export const PaymentTable: React.FC<Props> = ({
           }}
         >
           {
-            accountNames
-              ? accountNames.length === 1
-                ? undefined
-                : (
-                  <Form.Item label="账户" name="accountName">
-                    <Select placeholder="选择账户">
-                      {accountNames.map((x) => <Select.Option key={x} value={x}>{x}</Select.Option>)}
-                    </Select>
-                  </Form.Item>
-                )
-              : (
-                <Form.Item label="账户" name="accountName">
-                  <Input placeholder="不输入账户时显示租户充值记录" />
-                </Form.Item>
-              )
+            // 根据是否在table展示账户名来判断是租户管理还是账户管理下的充值记录，如果是租户下才展示
+            showAccountName ? (
+              <Form.Item label="充值对象" name="accountName">
+                <TenantOrAccountRadio
+                  value={account || undefined}
+                  onChange={(account) => {
+                    setQuery((q) => ({ ...q, accountName: account }));
+                    Router.push({
+                      pathname: "/tenant/finance/payments", query: account ? { account } : undefined,
+                    }); }
+                  }
+                />
+              </Form.Item>
+            ) : ""
           }
+
           <Form.Item label="时间" name="time">
             <DatePicker.RangePicker allowClear={false} presets={defaultPresets} />
           </Form.Item>
@@ -112,7 +121,7 @@ export const PaymentTable: React.FC<Props> = ({
         pagination={{ showSizeChanger: true }}
       >
         {
-          showAccountName ? (
+          showAccountName && account ? (
             <Table.Column dataIndex="accountName" title="账户" />
           ) : undefined
         }
