@@ -32,7 +32,7 @@ export const executeSlurmScript = async (
   slurmMisConfig: SlurmMisConfigSchema, partitions: string[], params: string[], logger: Logger,
 ) => {
 
-  const partitionsParam = partitions.map((x) => "\"" + x + "\"").join(" ");
+  const partitionsParam = partitions.join(" ");
 
   const result = await executeScript(slurmMisConfig, slurmMisConfig.scriptPath, params, {
     BASE_PARTITIONS: partitionsParam,

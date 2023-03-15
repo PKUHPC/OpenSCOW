@@ -177,6 +177,16 @@ export const accountServiceServer = plugin((server) => {
               logger,
             });
           }
+
+          const blockResp = await ops.account.blockAccount({
+            request: { accountName },
+            logger,
+          });
+          if (blockResp.code === "NOT_FOUND") {
+            throw <ServiceError>{
+              code: Status.INTERNAL, message: `Account ${accountName} hasn't been created. block failed`,
+            };
+          }
         },
       ).catch(async (e) => {
         await rollback(e);

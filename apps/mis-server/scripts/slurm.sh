@@ -169,7 +169,6 @@ example:
 query timelimit of job 4300: ./slurm -t 4300
 "
 
-
 mysql="mysql -h$DB_HOST -P$DB_PORT -u$DB_USER -p$DB_PASSWORD"
 slurm_acct_db_name="$SLURM_ACCT_DB_NAME"
 basePartition=($BASE_PARTITIONS)
@@ -177,7 +176,6 @@ base_qos=`sacctmgr -n show qos format=Name | tr '\n' ',' | sed s/[[:space:]]//g`
 base_qos=${base_qos%?}
 default_qos="normal"
 assoc_table=${CLUSTER_NAME}_assoc_table
-
 
 addUser() #abandon !!!!!2017-09-24
 {
@@ -285,7 +283,6 @@ delUser(){
         echo -e "$delUser\n"
         echo "$nocommand"
     fi
-
 }
 delAcct(){ ## attention: ensure this account is not any user's default account
 ## ./slurm -a account
@@ -396,7 +393,7 @@ addAllowAcct(){
             echo "Account $2 is not exist!"
             exit 7
         fi
-        allow=`scontrol show partition compute | grep AllowAccounts | awk '{print $2}' | awk -F "=" '{print $2}'`
+        allow=`scontrol show partition ${basePartition[0]} | grep AllowAccounts | awk '{print $2}' | awk -F "=" '{print $2}'`
         if echo "${allow}" | grep -w "$2" > /dev/null ; then
             echo "Account $2 is already allowed!"
             exit 9
@@ -408,8 +405,6 @@ addAllowAcct(){
             do
                 scontrol update partition=$var AllowAccounts=$allowAcct
             done
-            # GPU36 parition only can use by cryoem teams
-            # scontrol update partition=GPU36 AllowAccounts=hpc1606182266,hpc1706178357,hpc1506177320,hpc0006155389
             sed -i "s/\(AllowAccounts=\).*/\1$allowAcct/"   /etc/slurm/slurm.conf
             echo "Allow account $2 succeed!"
             exit 0
@@ -418,7 +413,6 @@ addAllowAcct(){
         echo -e "$addAllowAcct\n"
         echo "$nocommand"
     fi
-
 }
 
 blockAcct(){
@@ -433,15 +427,23 @@ blockAcct(){
             echo "Account $2 is not exist!"
             exit 7
         fi
-        allow=`scontrol show partition compute | grep AllowAccounts | awk '{print $2}' | awk -F "=" '{print $2}'`
-        if echo "${allow}" | grep -w "$2" > /dev/null ; then
+        allow=`scontrol show partition ${basePartition[0]} | grep AllowAccounts | awk '{print $2}' | awk -F "=" '{print $2}'`
+        if [ $allow == "ALL" ] ; then
+            acct=`$mysql --skip-column-names $slurm_acct_db_name -e "select DISTINCT acct from $assoc_table where deleted=0 and acct != '$2'"`
+            allowAcct=`echo $acct | tr ' ' ','`
+            for var in ${basePartition[@]}
+            do
+                scontrol update partition=$var AllowAccounts=$allowAcct
+            done
+            sed -i "s/\(AllowAccounts=\).*/\1$allowAcct/"   /etc/slurm/slurm.conf
+            echo "Block account $2 succeed!"
+            exit 0
+        elif echo "${allow}" | grep -w "$2" > /dev/null ; then
             allowAcct=`echo $allow | sed "s/$2//g" | sed 's/,,/,/g'`
             for var in ${basePartition[@]}
             do
                 scontrol update partition=$var AllowAccounts=$allowAcct
             done
-            # GPU36 parition only can use by cryoem teams
-            # scontrol update partition=GPU36 AllowAccounts=hpc1606182266,hpc1706178357,hpc1506177320,hpc0006155389
             sed -i "s/\(AllowAccounts=\).*/\1$allowAcct/"   /etc/slurm/slurm.conf
             echo "Block account $2 succeed!"
             exit 0
@@ -453,7 +455,6 @@ blockAcct(){
         echo -e "$blockAcct\n"
         echo $nocommand
     fi
-
 }
 blockUser(){
 #blockUser="Usage: block a user
@@ -480,10 +481,9 @@ blockUser(){
         echo -e "$blockUser\n"
         echo $nocommand
     fi
-
 }
 blockUserfromAcct(){
-# sacctmgr modify user where name=1601214515 account=hpc0006177054  set MaxSubmitJobs=0
+# sacctmgr modify user where name=0005533333 account=hpc0005533333  set MaxSubmitJobs=0
 #blockUserfromAcct="Usage: block a user from an account
 #./slurm -o account user
 #example:
@@ -514,7 +514,6 @@ blockUserfromAcct(){
         echo -e "$blockUserfromAcct\n"
         echo $nocommand
     fi
-
 }
 
 allowUser(){
@@ -536,8 +535,6 @@ allowUser(){
         echo -e "$allowUser\n"
         echo $nocommand
     fi
-
-
 }
 allowUserfromAcct(){
 #allowUserfromAcct="Usage: allow a user from an account
@@ -569,7 +566,6 @@ allowUserfromAcct(){
         echo -e "$allowUserfromAcct\n"
         echo $nocommand
     fi
-
 }
 
 queryUser(){
@@ -635,7 +631,6 @@ queryUserInAcct(){
         echo -e "$queryUserInAcct\n"
         echo $nocommand
     fi
-
 }
 
 queryDenyAcct(){
@@ -650,7 +645,11 @@ queryDenyAcct(){
             echo "Account $2 is not exist!"
             exit 7
         fi
-        allow=`scontrol show partition compute | grep AllowAccounts | awk '{print $2}' | awk -F "=" '{print $2}'`
+        allow=`scontrol show partition ${basePartition[0]} | grep AllowAccounts | awk '{print $2}' | awk -F "=" '{print $2}'`
+        if [ $allow == "ALL" ] ; then
+            echo "Account $2 is allowed!"
+            exit 0
+        fi
         if echo "${allow}" | grep -w "$2" > /dev/null ; then
             echo "Account $2 is allowed!"
             exit 0
@@ -673,7 +672,7 @@ queryAcctBatch(){
     if [[ $# == 2 ]] ; then
         str=$2
         str=${str//,/ }
-        allow=`scontrol show partition compute | grep AllowAccounts | awk '{print $2}' | awk -F "=" '{print $2}'`
+        allow=`scontrol show partition ${basePartition[0]} | grep AllowAccounts | awk '{print $2}' | awk -F "=" '{print $2}'`
         arr=($str)
         for acct in ${arr[*]}
         do
@@ -682,7 +681,9 @@ queryAcctBatch(){
                 echo "Account $acct is not exist!"
                 continue
             fi
-            if echo "${allow}" | grep -w "$acct" > /dev/null ; then
+            if [ $allow == "ALL" ] ; then
+                echo "Account $acct is allowed!"
+            elif echo "${allow}" | grep -w "$acct" > /dev/null ; then
                 echo "Account $acct is allowed!"
             else
                 echo "Account $acct is blocked!"
@@ -692,7 +693,6 @@ queryAcctBatch(){
         echo -e "$queryDenyAcct\n"
         echo "$nocommand"
     fi
-
 }
 
 AllUserInAcct(){
@@ -737,7 +737,6 @@ AllUserInAcct(){
         echo -e "$AllUserInAcct\n"
         echo "$nocommand"
     fi
-
 }
 
 AllUserInAllAcct(){
@@ -779,7 +778,6 @@ AllUserInAllAcct(){
         echo -e "$AllUserInAllAcct\n"
         echo "$nocommand"
     fi
-
 }
 addQuota()
 {
@@ -812,7 +810,6 @@ addQuota()
         echo -e "$addQuota\n"
         echo "$nocommand"
     fi
-
 }
 
 decreaseQuota()
@@ -846,7 +843,6 @@ decreaseQuota()
         echo -e "$decreaseQuota\n"
         echo "$nocommand"
     fi
-
 }
 setQuota(){
 # Usage: set quota to a user
@@ -875,7 +871,6 @@ setQuota(){
         echo -e "$setQuota\n"
         echo "$nocommand"
     fi
-
 }
 
 queryQuota(){
@@ -898,7 +893,6 @@ queryQuota(){
         echo -e "$queryQuota\n"
         echo "$nocommand"
     fi
-
 }
 changeTimelimit(){
 #./slurm -n jobId time(minute)
@@ -924,7 +918,6 @@ changeTimelimit(){
         echo -e "$changeTimelimit\n"
         echo "$nocommand"
     fi
-
 }
 queryJobTime(){
 #./slurm -t jobId
@@ -945,7 +938,6 @@ queryJobTime(){
         echo -e "$changeTimelimit\n"
         echo "$nocommand"
     fi
-
 }
 
 case $1 in
