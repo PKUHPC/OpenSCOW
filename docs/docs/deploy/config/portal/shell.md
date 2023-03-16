@@ -39,15 +39,26 @@ sdown () {
       return 0
     fi
 
+    if [ $# -gt 1 ];then
+      echo "Please enter only one file name. Multiple file names are not supported."
+      return 0
+    fi
+
+
     result=$(echo $@ | grep "/")
     if [[ "$result" != "" ]]
     then
         echo "sdown does not support relative paths. Please enter the file name."
-    else
-      echo  "SCOW is downloading file $@ in directory `pwd`"
-      echo  "This command is only valid for SCOW web shells."
+        return 0
     fi
 
+    if [ ! -f "$@" ]; then
+      echo  "File $@ does not exist."
+      return 0
+    fi
+
+    echo  "SCOW is downloading file $@ in directory `pwd`"
+    echo  "This command is only valid for SCOW web shells."
 }
 
 sopen () {
