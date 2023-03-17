@@ -37,6 +37,7 @@ interface Props {
 const OPEN_FILE = "This command is only valid for SCOW web shells";
 const OPEN_EXPLORER_PREFIX = "SCOW is opening the file system";
 const DOWNLOAD_FILE_PREFIX = "SCOW is downloading file ";
+const DOWNLOAD_FILE_SUFFIX = " in directory ";
 
 export const Shell: React.FC<Props> = ({ user, cluster, path }) => {
 
@@ -44,7 +45,6 @@ export const Shell: React.FC<Props> = ({ user, cluster, path }) => {
 
   useEffect(() => {
     if (container.current) {
-
 
       const term = new Terminal({
         cursorBlink: true,
@@ -66,15 +66,12 @@ export const Shell: React.FC<Props> = ({ user, cluster, path }) => {
         `${path ? "path " + path : "home path"} ***\r\n`,
       );
 
-
       const socket = new WebSocket(
         (location.protocol === "http:" ? "ws" : "wss") + "://" + location.host +
         join(publicConfig.BASE_PATH, "/api/shell") + "?" + new URLSearchParams(payload).toString(),
       );
 
-
       socket.onopen = () => {
-
 
         term.clear();
 
@@ -89,8 +86,6 @@ export const Shell: React.FC<Props> = ({ user, cluster, path }) => {
 
         resizeObserver.observe(container.current!);
 
-
-
         term.onData((data) => {
           send({ $case: "data", data: { data } });
         });
@@ -100,7 +95,6 @@ export const Shell: React.FC<Props> = ({ user, cluster, path }) => {
         });
       };
 
-
       socket.onmessage = (e) => {
         const message = JSON.parse(e.data) as ShellOutputData;
         switch (message.$case) {
@@ -108,11 +102,8 @@ export const Shell: React.FC<Props> = ({ user, cluster, path }) => {
           const data = Buffer.from(message.data.data);
 
           const dataString = data.toString();
-          console.log("------------------------", dataString);
           if (dataString.includes(OPEN_FILE) && !dataString.includes("pwd")) {
-
             const result = dataString.split("\r\n")[0];
-
             const pathStartIndex = result.search("/");
             const path = result.substring(pathStartIndex);
 
@@ -120,11 +111,9 @@ export const Shell: React.FC<Props> = ({ user, cluster, path }) => {
               window.open(join(publicConfig.BASE_PATH, "/files", cluster, path));
             } else {
               const fileStartIndex = result.search(DOWNLOAD_FILE_PREFIX);
-              const fileEndIndex = result.search(" in directory ");
-
+              const fileEndIndex = result.search(DOWNLOAD_FILE_SUFFIX);
               const file = result.substring(fileStartIndex + DOWNLOAD_FILE_PREFIX.length, fileEndIndex);
               window.location.href = urlToDownload(cluster, join(path, file), true);
-
             }
           }
           term.write(data);
