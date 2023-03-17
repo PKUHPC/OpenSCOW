@@ -108,7 +108,9 @@ export const Shell: React.FC<Props> = ({ user, cluster, path }) => {
           const data = Buffer.from(message.data.data);
 
           const dataString = data.toString();
+          console.log("------------------------", dataString);
           if (dataString.includes(OPEN_FILE) && !dataString.includes("pwd")) {
+
             const result = dataString.split("\r\n")[0];
 
             const pathStartIndex = result.search("/");
@@ -118,8 +120,9 @@ export const Shell: React.FC<Props> = ({ user, cluster, path }) => {
               window.open(join(publicConfig.BASE_PATH, "/files", cluster, path));
             } else {
               const fileStartIndex = result.search(DOWNLOAD_FILE_PREFIX);
+              const fileEndIndex = result.search(" in directory ");
 
-              const file = result.substring(fileStartIndex + DOWNLOAD_FILE_PREFIX.length).split(" ")[0];
+              const file = result.substring(fileStartIndex + DOWNLOAD_FILE_PREFIX.length, fileEndIndex);
               window.location.href = urlToDownload(cluster, join(path, file), true);
 
             }
