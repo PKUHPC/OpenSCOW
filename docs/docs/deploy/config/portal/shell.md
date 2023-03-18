@@ -1,9 +1,9 @@
 ---
 sidebar_position: 5
-title: 配置Shell终端文件传输功能
+title: Shell终端文件传输功能
 ---
 
-# 配置Shell终端文件传输功能
+# Shell终端文件传输功能
 
 Shell终端支持输入命令跳转到文件系统，进行文件的上传和下载；支持下载指定文件。
 
@@ -22,52 +22,6 @@ sdown hello.txt
 2. 也可以`sopen`进入文件系统以后，在图形界面切换到A目录选择文件进行下载。
 
 
-
 `sopen`和`sdown [文件名]`这两个命令仅在SCOW的Shell终端中使用有效。
 
-该功能需要在登录节点需要修改`/etc/bashrc`，插入以下函数：
-
-```bash
-sdown () {
-    if [ "$1" == "-h" ]; then
-      echo "Usage: sdown [-h] [FILE]"
-      echo "Downloading the specified file (only valid in SCOW)."
-      return 0
-    fi
-    if [ $# -eq 0 ];then
-      echo "Please enter the file name you want to download."
-      return 0
-    fi
-
-    if [ $# -gt 1 ];then
-      echo "Please enter only one file name. Multiple file names are not supported."
-      return 0
-    fi
-
-
-    result=$(echo $@ | grep "/")
-    if [[ "$result" != "" ]]
-    then
-        echo "sdown does not support relative paths. Please enter the file name."
-        return 0
-    fi
-
-    if [ ! -f "$@" ]; then
-      echo  "File $@ does not exist."
-      return 0
-    fi
-
-    echo  "SCOW is downloading file $@ in directory `pwd`"
-    echo  "This command is only valid for SCOW web shells."
-}
-
-sopen () {
-    if [ "$1" == "-h" ]; then
-      echo "Usage: sopen [-h]"
-      echo "Open file explorer (only valid in SCOW)."
-      return 0
-    fi
-    echo "SCOW is opening the file system `pwd`"
-    echo  "This command is only valid for SCOW web shells."
-}
-```
+在系统启动时，系统会自动上传到登录节点的`/etc/profile.d/`目录下一个`scow-shell-file.sh`脚本，用于在Shell终端中进行文件系统的跳转和文件的下载。如果`/etc/profile.d/`目录不存在会创建该目录。
