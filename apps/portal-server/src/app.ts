@@ -13,6 +13,7 @@
 import { Server } from "@ddadaal/tsgrpc-server";
 import { omitConfigSpec } from "@scow/lib-config";
 import { readVersionFile } from "@scow/utils/build/version";
+import { clusters } from "src/config/clusters";
 import { config } from "src/config/env";
 import { plugins } from "src/plugins";
 import { appServiceServer } from "src/services/app";
@@ -20,6 +21,7 @@ import { desktopServiceServer } from "src/services/desktop";
 import { fileServiceServer } from "src/services/file";
 import { jobServiceServer } from "src/services/job";
 import { shellServiceServer } from "src/services/shell";
+import { initShellFile } from "src/utils/shell";
 import { checkClustersRootUserLogin } from "src/utils/ssh";
 
 export async function createServer() {
@@ -51,6 +53,10 @@ export async function createServer() {
   if (process.env.NODE_ENV === "production") {
     await checkClustersRootUserLogin(server.logger);
   }
+
+  await Promise.all(Object.entries(clusters).map(async ([id]) => {
+    await initShellFile(id, server.logger);
+  }));
 
   return server;
 }
