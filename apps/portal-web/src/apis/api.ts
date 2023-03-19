@@ -39,7 +39,7 @@ import type { GetHomeDirectorySchema } from "src/pages/api/file/getHome";
 import type { ListFileSchema } from "src/pages/api/file/list";
 import type { MkdirSchema } from "src/pages/api/file/mkdir";
 import type { MoveFileItemSchema } from "src/pages/api/file/move";
-import type { TransferFilesSchema } from "src/pages/api/file/transferFiles";
+import type { StartTransferFilesSchema } from "src/pages/api/file/startTransferFiles";
 import type { UploadFileSchema } from "src/pages/api/file/upload";
 import type { CancelJobSchema } from "src/pages/api/job/cancelJob";
 import type { GetAccountsSchema } from "src/pages/api/job/getAccounts";
@@ -81,7 +81,7 @@ export const api = {
   listFile: fromApi<ListFileSchema>("GET", join(basePath, "/api/file/list")),
   mkdir: fromApi<MkdirSchema>("POST", join(basePath, "/api/file/mkdir")),
   moveFileItem: fromApi<MoveFileItemSchema>("PATCH", join(basePath, "/api/file/move")),
-  transferFiles: fromApi<TransferFilesSchema>("PATCH", join(basePath, "/api/file/transferFiles")),
+  startTransferFiles: fromApi<StartTransferFilesSchema>("PATCH", join(basePath, "/api/file/startTransferFiles")),
   uploadFile: fromApi<UploadFileSchema>("POST", join(basePath, "/api/file/upload")),
   cancelJob: fromApi<CancelJobSchema>("DELETE", join(basePath, "/api/job/cancelJob")),
   getAccounts: fromApi<GetAccountsSchema>("GET", join(basePath, "/api/job/getAccounts")),

@@ -165,19 +165,27 @@ message ExistsResponse {
   bool exists = 1;
 }
 
-message TransferFilesRequest {
-  string user_id = 1;
-  string src_cluster = 2;
-  string dst_cluster = 3;
+message StartTransferFilesRequest {
+  string from_cluster = 1;
+  string to_cluster = 2;
+  string user_id = 3;
   string from_path = 4;
   string to_path = 5;
-  uint32 max_depth = 6;
 }
 
-// NOT_FOUND: cluster is not found
-// INTERNAL: scow-sync command failed. details has stderr
-message TransferFilesResponse {
+message StartTransferFilesResponse {
+  uint32 transfer_id = 1;
+  uint32 process_id = 2;
 }
+
+// message QueryTransferFilesRequest {
+//   uint32 transfer_id = 1;
+//   uint32 process_id = 2;
+// }
+
+// message QueryTransferFilesResponse {
+
+// }
 
 service FileService {
   rpc Copy(CopyRequest) returns (CopyResponse);
@@ -199,5 +207,7 @@ service FileService {
 
   rpc Exists(ExistsRequest) returns (ExistsResponse);
 
-  rpc TransferFiles(TransferFilesRequest) returns (TransferFilesResponse);
+  rpc StartTransferFiles(StartTransferFilesRequest) returns (StartTransferFilesResponse);
+
+  // rpc QueryTransferFiles(QueryTransferFilesRequest) returns (QueryTransferFilesResponse);
 }

@@ -28,12 +28,11 @@ interface ButtonProps {
   dstCluster: Cluster;
   selectedKeys: FileInfoKey[];
   toPath: string;
-  maxDepth?: number;
 }
 
 const OperationButton: React.FC<ButtonProps> = (props) => {
   const {
-    icon, disabled, srcCluster, dstCluster, selectedKeys, toPath, maxDepth,
+    icon, disabled, srcCluster, dstCluster, selectedKeys, toPath,
   } = props;
   return (
     <Button
@@ -41,13 +40,16 @@ const OperationButton: React.FC<ButtonProps> = (props) => {
       disabled={disabled}
       onClick={ () => {
         selectedKeys.forEach(async (key) => {
-          await api.transferFiles({ body: {
-            srcCluster: srcCluster.id,
-            dstCluster: dstCluster.id,
+          await api.startTransferFiles({ body: {
+            fromCluster: srcCluster.id,
+            toCluster: dstCluster.id,
             fromPath: String(key),
             toPath: toPath,
-            maxDepth: maxDepth,
-          } });
+          } })
+            .then((resp) => {
+              console.log(resp.transferId);
+              console.log(resp.processId);
+            });
         });
       }}
     />

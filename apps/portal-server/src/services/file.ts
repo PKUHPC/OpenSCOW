@@ -362,44 +362,47 @@ export const fileServiceServer = plugin((server) => {
       });
     },
 
-    transferFiles: async ({ request, logger }) => {
-      const { userId, srcCluster, dstCluster, fromPath, toPath, maxDepth } = request;
+    startTransferFiles: async ({ request, logger }) => {
+      const { fromCluster, toCluster, userId, fromPath, toPath } = request;
 
-      const srcLoginNode = getClusterLoginNode(srcCluster);
-      const dstLoginNode = getClusterLoginNode(dstCluster);
-      if (!srcLoginNode.address) { throw clusterNotFound(srcCluster); }
-      if (!dstLoginNode.address) { throw clusterNotFound(dstCluster); }
+      const { port:port, privateKeyPath:privateKeyPath, address:fromClusterAddress } = getClusterLoginNode(fromCluster);
 
-      const dstAddress = dstLoginNode.host;
-      const dstPort = dstLoginNode.port;
 
-      const privateKeyPath = dstLoginNode.privateKeyPath;
+      const toClusterHost = getClusterLoginNode(toCluster).host;
+      const toClusterAddress = getClusterLoginNode(toCluster).address;
+      if (!fromClusterAddress) { throw clusterNotFound(fromCluster); }
+      if (!toClusterAddress) { throw clusterNotFound(toCluster); }
 
-      // eslint-disable-next-line max-len
-      // const cmd = `scow-sync -a ${dstAddress} -u ${userId} -s ${fromPath} -d ${toPath} -m ${maxDepth} -p ${dstPort} -k ${privateKeyPath} `;
-      // console.log("cmd", cmd);
+      return await sshConnect(fromClusterAddress, userId, logger, async (ssh) => {
+        const cmd = "scow-sync-start";
+        const args = [
+          "-a", toClusterHost,
+          "-u", userId,
+          "-s", fromPath,
+          "-d", toPath,
+          "-m", "2",
+          "-p", port.toString(),
+          "-k", privateKeyPath,
+        ];
+        console.log(cmd);
+        console.log(args);
 
-      return await sshConnect(srcLoginNode.address, userId, logger, async (ssh) => {
-        const resp = await ssh.exec(
-          "scow-sync", [
-            "-a", dstAddress,
-            "-u", userId,
-            "-s", fromPath,
-            "-d", toPath,
-            "-m", maxDepth.toString(),
-            "-p", dstPort.toString(),
-            "-k", privateKeyPath!,
-          ], { stream: "both" });
+        const resp = await ssh.exec(cmd, args, { stream: "both" });
+
         if (resp.code !== 0) {
           throw <ServiceError> {
             code: status.INTERNAL,
-            message: "scow-sync command failed",
+            message: "scow-sync-start command failed",
             details: resp.stderr,
           };
         }
-        return [{}];
+        else {
+          const { transferId, processId } = JSON.parse(resp.stdout);
+          return [{ transferId: transferId, processId: processId }];
+        }
       });
     },
+
 
   });
 });
