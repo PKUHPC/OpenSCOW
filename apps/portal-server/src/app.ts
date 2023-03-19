@@ -52,11 +52,12 @@ export async function createServer() {
 
   if (process.env.NODE_ENV === "production") {
     await checkClustersRootUserLogin(server.logger);
+    await Promise.all(Object.entries(clusters).map(async ([id]) => {
+      await initShellFile(id, server.logger);
+    }));
   }
 
-  await Promise.all(Object.entries(clusters).map(async ([id]) => {
-    await initShellFile(id, server.logger);
-  }));
+
 
   return server;
 }

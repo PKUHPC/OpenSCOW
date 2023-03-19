@@ -10,9 +10,8 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { sftpChmod, sshConnect } from "@scow/lib-ssh";
-import { rootKeyPair } from "src/config/env";
-import { getClusterLoginNode } from "src/utils/ssh";
+import { sftpChmod } from "@scow/lib-ssh";
+import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
 import { Logger } from "ts-log";
 
 
@@ -26,13 +25,13 @@ export async function initShellFile(cluster: string, logger: Logger) {
   const host = getClusterLoginNode(cluster);
   if (!host) { throw new Error(`Cluster ${cluster} has no login node`); }
 
-  return await sshConnect(host, "root", rootKeyPair, logger, async (ssh) => {
+  return await sshConnect(host, "root", logger, async (ssh) => {
     // make sure directory /etc/profile.d exists.
     await ssh.mkdir(PROFILE_DIRECTORY);
     const sftp = await ssh.requestSFTP();
 
     await ssh.putFile(SHELL_FILE_LOCAL, SHELL_FILE_REMOTE);
     await sftpChmod(sftp)(SHELL_FILE_REMOTE, "755");
-    logger.info("Copy scow-shell-file.sh to", SHELL_FILE_REMOTE);
+    logger.info(`Copy scow-shell-file.sh to the ${SHELL_FILE_REMOTE} of the login node of cluster ${cluster}.`);
   });
 }
