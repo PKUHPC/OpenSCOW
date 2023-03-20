@@ -34,7 +34,7 @@ export const ClusterConfigSchema = Type.Object({
     partitions: Type.Array(
       Type.Object(
         {
-          name: Type.String({ description: "分区名" }),
+          name: Type.String({ description: "分区名", pattern: "^[^ ]+$" }),
           mem: Type.Integer({ description: "内存，单位M" }),
           cores: Type.Integer({ description: "核心数" }),
           gpus: Type.Integer({ description: "GPU卡数" }),

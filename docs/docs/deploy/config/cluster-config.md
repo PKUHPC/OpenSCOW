@@ -26,7 +26,7 @@ slurm:
 
   # 集群的分区信息，结构为一个列表
   partitions:
-    # 分区1的名字
+    # 分区1的名字, 不能包含空格
     - name: compute
       # 分区内节点数
       nodes: 28
@@ -55,3 +55,9 @@ slurm:
         - high
       comment: ""
 ```
+
+:::caution
+
+集群的分区名，即`slurm.partitions[].name`不能包含空格，否则系统将启动失败
+
+:::

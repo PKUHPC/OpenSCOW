@@ -44,7 +44,7 @@
     "node-cron": "3.0.2",
     "uuid": "9.0.0",
     "wait-on": "7.0.1",
-    "pino-pretty": "9.4.0"
+    "pino-pretty": "10.0.0"
   },
   "devDependencies": {
     "@types/google-protobuf": "3.15.6",
