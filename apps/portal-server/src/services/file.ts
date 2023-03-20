@@ -21,7 +21,8 @@ import { config } from "src/config/env";
 import { clusterNotFound } from "src/utils/errors";
 import { pipeline } from "src/utils/pipeline";
 import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
-import { once } from "stream";
+import stream, { once } from "stream";
+import { userId } from "tests/file/utils";
 
 export const fileServiceServer = plugin((server) => {
 
@@ -384,8 +385,6 @@ export const fileServiceServer = plugin((server) => {
           "-p", port.toString(),
           "-k", privateKeyPath,
         ];
-        console.log(cmd);
-        console.log(args);
 
         const resp = await ssh.exec(cmd, args, { stream: "both" });
 
@@ -403,6 +402,53 @@ export const fileServiceServer = plugin((server) => {
       });
     },
 
+    queryTransferFiles: async (call) => {
+      const { logger, request: { cluster, userId, transferId, processId } } = call;
+
+      const clusterAddress = getClusterLoginNode(cluster).address;
+      if (!clusterAddress) { throw clusterNotFound(cluster); }
+
+      const subLogger = logger.child({ userId, cluster });
+      subLogger.info("Querying the progress of transferring files");
+
+      await sshConnect(clusterAddress, userId, subLogger, async (ssh) => {
+        const cmd = "scow-sync-query";
+        const args = [
+          "-f", transferId.toString(),
+          "-p", processId.toString(),
+        ];
+
+        const resp = await ssh.exec(cmd, args, { stream:"both" });
+
+        const stdoutStream = stream.Readable.from(resp.stdout);
+
+        await pipeline(
+          stdoutStream,
+          async (chunk) => {
+            return { chunk: Buffer.from(chunk) };
+          },
+          call,
+        ).catch((e) => {
+          throw <ServiceError> {
+            code: status.INTERNAL,
+            message: "Error when querying transferfiles",
+            details: e?.message,
+          };
+        }).finally(async () => {
+          stdoutStream.destroy();
+          await once(stdoutStream, "close");
+        });
+
+        if (resp.code !== 0) {
+          throw <ServiceError> {
+            code: status.INTERNAL,
+            message: "scow-sync-start command failed",
+            details: resp.stderr,
+          };
+        }
+
+      });
+    },
 
   });
 });

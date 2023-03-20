@@ -178,14 +178,16 @@ message StartTransferFilesResponse {
   uint32 process_id = 2;
 }
 
-// message QueryTransferFilesRequest {
-//   uint32 transfer_id = 1;
-//   uint32 process_id = 2;
-// }
+message QueryTransferFilesRequest {
+  string cluster = 1;
+  string user_id = 2;
+  uint32 transfer_id = 3;
+  uint32 process_id = 4;
+}
 
-// message QueryTransferFilesResponse {
-
-// }
+message QueryTransferFilesResponse {
+  bytes chunk = 1;
+}
 
 service FileService {
   rpc Copy(CopyRequest) returns (CopyResponse);
@@ -209,5 +211,5 @@ service FileService {
 
   rpc StartTransferFiles(StartTransferFilesRequest) returns (StartTransferFilesResponse);
 
-  // rpc QueryTransferFiles(QueryTransferFilesRequest) returns (QueryTransferFilesResponse);
+  rpc QueryTransferFiles(QueryTransferFilesRequest) returns (stream QueryTransferFilesResponse);
 }
