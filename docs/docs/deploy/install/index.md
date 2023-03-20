@@ -17,6 +17,7 @@ description: 如何在已有超算集群上部署SCOW系统
 - 集群中的各个节点可相互通过网络连接
 - **服务节点**可以免密以root用户SSH登录到各个**登录节点**，并且**服务节点**的`~/.ssh`目录下有登录所需要的`id_rsa.pub`和`id_rsa`文件
   - 运行所有部署的命令用户不需要为root，但是此用户的`~/.ssh`下的密钥对需可以以root用户登录登录节点
+- **服务节点**可以SSH连接到所有**计算节点**，并且**计算节点**和**登录节点**的所有用户共享同样的`SSH authorized_keys`配置文件
 - 使用slurm调度器，并且
   - 版本为21.08.4及以上
   - 已经部署slurm的[Accounting](https://slurm.schedmd.com/accounting.html#database-configuration)功能
