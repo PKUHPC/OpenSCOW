@@ -30,7 +30,7 @@ importers:
       jest-extended: 3.2.4
       node-glob: 1.2.0
       nodemon: 2.0.21
-      pino-pretty: 9.4.0
+      pino-pretty: 10.0.0
       pkg: 5.8.1
       pm2: 5.2.2
       rimraf: 4.4.0
@@ -67,7 +67,7 @@ importers:
       jest-extended: 3.2.4_jest@29.5.0
       node-glob: 1.2.0
       nodemon: 2.0.21
-      pino-pretty: 9.4.0
+      pino-pretty: 10.0.0
       pkg: 5.8.1
       pm2: 5.2.2
       rimraf: 4.4.0
@@ -99,7 +99,7 @@ importers:
       ldapjs: 2.3.3
       liquidjs: 10.6.1
       nanoid: 4.0.1
-      pino-pretty: 9.4.0
+      pino-pretty: 10.0.0
       svg-captcha: 1.4.0
     dependencies:
       '@fastify/error': 3.2.0
@@ -119,7 +119,7 @@ importers:
       ldapjs: 2.3.3
       liquidjs: 10.6.1
       nanoid: registry.npmmirror.com/nanoid/4.0.1
-      pino-pretty: 9.4.0
+      pino-pretty: 10.0.0
       svg-captcha: registry.npmmirror.com/svg-captcha/1.4.0
     devDependencies:
       '@types/asn1': 0.2.0
@@ -159,7 +159,7 @@ importers:
       '@types/wait-on': 5.3.1
       dotenv: 16.0.3
       node-cron: 3.0.2
-      pino-pretty: 9.4.0
+      pino-pretty: 10.0.0
       uuid: 9.0.0
       wait-on: 7.0.1
     dependencies:
@@ -183,7 +183,7 @@ importers:
       '@sinclair/typebox': 0.25.24
       dotenv: 16.0.3
       node-cron: 3.0.2
-      pino-pretty: 9.4.0
+      pino-pretty: 10.0.0
       uuid: 9.0.0
       wait-on: 7.0.1
     devDependencies:
@@ -305,7 +305,7 @@ importers:
       form-data: 4.0.0
       node-cron: 3.0.2
       node-ssh: 13.0.1
-      pino-pretty: 9.4.0
+      pino-pretty: 10.0.0
       shell-quote: 1.8.0
       ts-log: 2.2.5
       uuid: 9.0.0
@@ -325,7 +325,7 @@ importers:
       dotenv: 16.0.3
       node-cron: 3.0.2
       node-ssh: 13.0.1
-      pino-pretty: 9.4.0
+      pino-pretty: 10.0.0
       shell-quote: 1.8.0
       ts-log: 2.2.5
       uuid: 9.0.0
@@ -13168,8 +13168,8 @@ packages:
       readable-stream: 4.2.0
       split2: 4.1.0
 
-  /pino-pretty/9.4.0:
-    resolution: {integrity: sha512-NIudkNLxnl7MGj1XkvsqVyRgo6meFP82ECXF2PlOI+9ghmbGuBUUqKJ7IZPIxpJw4vhhSva0IuiDSAuGh6TV9g==}
+  /pino-pretty/10.0.0:
+    resolution: {integrity: sha512-zKFjYXBzLaLTEAN1ayKpHXtL5UeRQC7R3lvhKe7fWs7hIVEjKGG/qIXwQt9HmeUp71ogUd/YcW+LmMwRp4KT6Q==}
     hasBin: true
     dependencies:
       colorette: 2.0.19

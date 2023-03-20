@@ -39,7 +39,7 @@
     "ldapjs": "2.3.3",
     "nanoid": "4.0.1",
     "svg-captcha": "1.4.0",
-    "pino-pretty": "9.4.0"
+    "pino-pretty": "10.0.0"
   },
   "devDependencies": {
     "@types/asn1": "0.2.0",
