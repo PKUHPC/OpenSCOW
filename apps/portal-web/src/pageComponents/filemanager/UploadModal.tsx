@@ -34,6 +34,7 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
       title="上传文件"
       onCancel={onClose}
       destroyOnClose
+      maskClosable={false}
       footer={[
         <Button key="close" onClick={onClose}>
           关闭
