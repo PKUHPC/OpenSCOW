@@ -39,6 +39,7 @@ import type { GetHomeDirectorySchema } from "src/pages/api/file/getHome";
 import type { ListFileSchema } from "src/pages/api/file/list";
 import type { MkdirSchema } from "src/pages/api/file/mkdir";
 import type { MoveFileItemSchema } from "src/pages/api/file/move";
+import type { QueryTransferFilesSchema } from "src/pages/api/file/queryTransferFiles";
 import type { StartTransferFilesSchema } from "src/pages/api/file/startTransferFiles";
 import type { UploadFileSchema } from "src/pages/api/file/upload";
 import type { CancelJobSchema } from "src/pages/api/job/cancelJob";
@@ -91,4 +92,5 @@ export const api = {
   listJobTemplates: fromApi<ListJobTemplatesSchema>("GET", join(basePath, "/api/job/listJobTemplates")),
   submitJob: fromApi<SubmitJobSchema>("POST", join(basePath, "/api/job/submitJob")),
   changePassword: fromApi<ChangePasswordSchema>("PATCH", join(basePath, "/api/profile/changePassword")),
+  queryTransferFiles: fromApi<QueryTransferFilesSchema>("GET", join(basePath, "/api/file/queryTransferFiles")),
 };
