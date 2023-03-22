@@ -28,6 +28,10 @@ interface ButtonProps {
   selectedKeys: FileInfoKey[];
   toPath: string;
 }
+interface TransferInfo {
+  transferId: number;
+  processId: number;
+}
 const OperationButton: React.FC<ButtonProps> = (props) => {
   const {
     icon,
@@ -37,11 +41,11 @@ const OperationButton: React.FC<ButtonProps> = (props) => {
     selectedKeys,
     toPath,
   } = props;
-  const [transferId, setTransferId] = useState<string>();
-  const [processId, setProcessId] = useState<string>();
+  const [transferInfos, setTransferInfos] = useState<TransferInfo[]>([]);
   const [showModal, setShowModal] = useState(false);
   const handleProcessStart = async () => {
-    selectedKeys.forEach(async (key) => {
+    const newTransferInfos: TransferInfo[] = [];
+    for (const key of selectedKeys) {
       const resp = await api.startTransferFiles({
         body: {
           fromCluster: srcCluster.id,
@@ -50,11 +54,10 @@ const OperationButton: React.FC<ButtonProps> = (props) => {
           toPath: toPath,
         },
       });
-      const { transferId, processId } = resp;
-      setTransferId(transferId.toString());
-      setProcessId(processId.toString());
-      setShowModal(true);
-    });
+      newTransferInfos.push({ transferId: resp.transferId, processId: resp.processId });
+    }
+    setTransferInfos(newTransferInfos);
+    setShowModal(true);
   };
   const handleModalClose = () => {
     setShowModal(false);
@@ -64,11 +67,14 @@ const OperationButton: React.FC<ButtonProps> = (props) => {
       <Button icon={icon} disabled={disabled} onClick={handleProcessStart} />
       {showModal && (
         <Modal visible={showModal} onCancel={handleModalClose} footer={null}>
-          <ProcessTable
-            transferId={transferId!.toString()}
-            processId={processId!.toString()}
-            cluster={srcCluster.id}
-          />
+          {transferInfos.map((info) => (
+            <ProcessTable
+              key={`${info.transferId}-${info.processId}`}
+              transferId={info.transferId}
+              processId={info.processId}
+              cluster={srcCluster.id}
+            />
+          ))}
         </Modal>
       )}
     </>

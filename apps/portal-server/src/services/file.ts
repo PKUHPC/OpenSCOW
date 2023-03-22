@@ -17,6 +17,7 @@ import { sftpExists,
   sftpMkdir, sftpReaddir, sftpRealPath, sftpRename, sftpStat, sftpUnlink, sftpWriteFile, sshRmrf } from "@scow/lib-ssh";
 import { FileInfo, FileInfo_FileType,
   FileServiceServer, FileServiceService } from "@scow/protos/build/portal/file";
+import { createReadStream } from "fs";
 import { config } from "src/config/env";
 import { clusterNotFound } from "src/utils/errors";
 import { pipeline } from "src/utils/pipeline";
@@ -419,8 +420,7 @@ export const fileServiceServer = plugin((server) => {
 
         const resp = await ssh.exec(cmd, args, { stream:"both" });
 
-        const stdoutStream = stream.Readable.from(resp.stdout);
-
+        const stdoutStream = createReadStream(resp.stdout);
         await pipeline(
           stdoutStream,
           async (chunk) => {
@@ -434,7 +434,7 @@ export const fileServiceServer = plugin((server) => {
             details: e?.message,
           };
         }).finally(async () => {
-          stdoutStream.destroy();
+          stdoutStream.close();
           await once(stdoutStream, "close");
         });
 

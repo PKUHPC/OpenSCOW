@@ -12,6 +12,7 @@
 
 import { Progress, Table } from "antd";
 import { useEffect, useState } from "react";
+import { api } from "src/apis";
 interface TransferFile {
   key: string;
   filePath: string;
@@ -21,15 +22,19 @@ interface TransferFile {
 }
 interface Props {
   cluster: string;
-  transferId: string;
-  processId: string;
+  transferId: number;
+  processId: number;
 }
 export const ProcessTable: React.FC<Props> = ({ cluster, transferId, processId }) => {
   const [transferFiles, setTransferFiles] = useState<TransferFile[]>([]);
 
   useEffect(() => {
     // 发起 HTTP 请求，获取数据流
-    const stream = fetch(`/query-transfer-files?cluster=${cluster}&transferId=${transferId}&processId=${processId}`)
+    const stream = api.queryTransferFiles({ query:{
+      cluster: cluster,
+      transferId: transferId,
+      processId: processId,
+    } })
       .then((res) => {
         if (!res.ok) {
           throw new Error(`HTTP error ${res.status}`);
