@@ -4,12 +4,14 @@
 #
 # COMMON.PORT: 整个系统的入口端口
 # COMMON.BASE_PATH: 整个系统的部署根路径。以/开头，不要以/结尾，如果是根路径写"/"
+# COMMON.UPLOAD_FILE_SIZE_LIMIT：限制整个系统上传（请求）文件的大小，可接受的格式为nginx的client_max_body_size可接受的值，默认为1G
 # COMMON.IMAGE: 镜像仓库地址，据实际情况填写
 # COMMON.IMAGE_TAG: 镜像tag，据实际情况填写
 # 如果您的镜像是本地构建的，IMAGE_BASE和IMAGE_TAG必须和构建时.env.build中的值保持一致。
 COMMON = {
   "PORT": 80,
   "BASE_PATH": "/",
+  "UPLOAD_FILE_SIZE_LIMIT": "1G",
   # "IMAGE": "mirrors.pku.edu.cn/pkuhpc/scow/scow",
   "IMAGE": "ghcr.io/pkuhpc/scow/scow",
   "IMAGE_TAG": "master",
