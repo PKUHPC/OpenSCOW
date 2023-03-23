@@ -55,7 +55,7 @@ LOG_LEVEL = get_cfg(["LOG", "LEVEL"], "info")
 LOG_PRETTY = json.dumps(get_cfg(["LOG", "PRETTY"], False))
 
 # 设置上传（请求）文件大小限制
-CLIENT_MAX_BODY_SIZE = get_cfg(["COMMON", "UPLOAD_FILE_SIZE_LIMIT"], "1G")
+CLIENT_MAX_BODY_SIZE = get_cfg(["GATEWAY", "UPLOAD_FILE_SIZE_LIMIT"], "1G")
 
 # easy migration from IMAGE_BASE to IMAGE
 SCOW_IMAGE = get_cfg(["COMMON", "IMAGE"])
