@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { ImportState } from "@scow/protos/build/server/admin";
 import { parseClusterUsers } from "src/utils/slurm";
 
 
@@ -35,18 +36,18 @@ it("test whether the string from 'slurm.sh -l all' can be parsed successfully", 
     {
       accountName: "a_user1",
       users: [
-        { userId: "user1", userName: "user1", state: "allowed!" }, 
+        { userId: "user1", userName: "user1", state: "allowed!" },
         { userId: "user2", userName: "user2", state: "blocked!" },
       ],
       owner: "user1",
-      included: false,
+      importState: ImportState.NOT_EXISTED,
     },
     {
       accountName: "account2",
       users: [
-        { userId: "user2", userName: "user2", state: "allowed!" }, 
+        { userId: "user2", userName: "user2", state: "allowed!" },
         { userId: "user3", userName: "user3", state: "blocked!" }],
-      included: false,
+      importState: ImportState.NOT_EXISTED,
     },
   ],
   });
