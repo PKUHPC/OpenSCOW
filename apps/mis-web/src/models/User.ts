@@ -55,6 +55,12 @@ export enum UserStatus {
   BLOCKED = 1,
 }
 
+export enum ImportState {
+  EXISTED = 0,
+  NOT_EXISTED = 1,
+  USER_NOT_EXISTED = 2,
+}
+
 export const AccountAffiliationSchema = Type.Object({
   accountName: Type.String(),
   role: Type.Enum(UserRole),

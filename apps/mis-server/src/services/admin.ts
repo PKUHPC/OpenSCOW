@@ -13,11 +13,12 @@
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
-import { AdminServiceServer, AdminServiceService } from "@scow/protos/build/server/admin";
+import { AdminServiceServer, AdminServiceService, ImportState } from "@scow/protos/build/server/admin";
 import { updateBlockStatusInSlurm } from "src/bl/block";
 import { importUsers, ImportUsersData } from "src/bl/importUsers";
 import { Account } from "src/entities/Account";
 import { StorageQuota } from "src/entities/StorageQuota";
+import { User } from "src/entities/User";
 import { parseClusterUsers } from "src/utils/slurm";
 
 export const adminServiceServer = plugin((server) => {
@@ -87,14 +88,7 @@ export const adminServiceServer = plugin((server) => {
         };
       }
 
-      const accountWithoutOwner = data.accounts.find((x) => x.owner === undefined);
-      if (accountWithoutOwner) {
-        throw <ServiceError> {
-          code: Status.INVALID_ARGUMENT, message: `Account ${accountWithoutOwner.accountName} doesn't have owner`,
-        };
-      }
-
-      const ownerNotInAccount = data.accounts.find((x) => !x.users.find((user) => user.userId === x.owner));
+      const ownerNotInAccount = data.accounts.find((x) => x.owner && !x.users.find((user) => user.userId === x.owner));
       if (ownerNotInAccount) {
         throw <ServiceError> {
           code: Status.INVALID_ARGUMENT,
@@ -124,12 +118,35 @@ export const adminServiceServer = plugin((server) => {
       const includedAccounts = await em.find(Account, {
         accountName: { $in: result.accounts.map((x) => x.accountName) },
       });
-      includedAccounts.forEach((account) => {
-        const a = result.accounts.find((x) => x.accountName === account.accountName)!;
-        a.included = true;
+
+      const allUsers = result.accounts.flatMap(
+        (account) => account.users.map((user) => user.userId),
+      );
+      const includedUsers = await em.find(User, { userId: { $in: allUsers } });
+
+      result.accounts.forEach((account) => {
+        if (!includedAccounts.find((x) => x.accountName === account.accountName)) {
+          // account not existed in scow
+          account.importState = ImportState.NOT_EXISTED;
+        } else if (!account.users.every((user) => includedUsers.map((x) => x.userId).includes(user.userId))) {
+          // some users in account not existed in scow
+          account.importState = ImportState.USER_NOT_EXISTED;
+        } else {
+          // both users and account exist in scow
+          account.importState = ImportState.EXISTED;
+        }
       });
 
-      result.accounts.sort((a, b) => a.included === b.included ? 0 : (a.included === false ? -1 : 1));
+      result.accounts.sort((a, b) => {
+        const order = {
+          [ImportState.NOT_EXISTED]: 0,
+          [ImportState.USER_NOT_EXISTED]: 1,
+          [ImportState.EXISTED]: 2,
+        };
+
+        return order[a.importState] - order[b.importState];
+      });
+      console.log(result);
       return [result];
     },
 

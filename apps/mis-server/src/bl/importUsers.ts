@@ -57,13 +57,31 @@ export async function importUsers(data: ImportUsersData, em: SqlEntityManager,
     usersMap[u.userId] = u;
   });
 
+  const accountMap: Record<string, Account> = {};
+  data.accounts.forEach((account) => {
+    accountMap[account.accountName] = new Account({
+      accountName: account.accountName, comment: "", blocked: false,
+      tenant,
+    });
+  });
+  const existedAccounts = await em.find(Account,
+    { accountName: { $in: data.accounts.map((x) => x.accountName) } },
+    { populate: ["tenant"]},
+  );
+  existedAccounts.forEach((a) => {
+    if (a.tenant.$.name !== DEFAULT_TENANT_NAME) {
+      throw <ServiceError> {
+        code: Status.INVALID_ARGUMENT,
+        message: `account ${a.accountName} has existed and belongs to ${a.tenant.$.name}`,
+      };
+    }
+    accountMap[a.accountName] = a;
+  });
+
   const accounts: Account[] = [];
   const userAccounts: UserAccount[] = [];
   data.accounts.forEach((a) => {
-    const account = new Account({
-      accountName: a.accountName, comment: "", blocked: false,
-      tenant,
-    });
+    const account = accountMap[a.accountName];
     accounts.push(account);
 
     if (whitelistAll) {
@@ -90,7 +108,21 @@ export async function importUsers(data: ImportUsersData, em: SqlEntityManager,
     });
   });
 
-  await em.persistAndFlush([...Object.values(usersMap), ...accounts, ...userAccounts]);
+  const existedUserAccounts = await em.find(UserAccount, {
+    $or: userAccounts.map((ua) => ({ user: ua.user, account: ua.account })),
+  });
+  const existedUserAccountMap = new Map(existedUserAccounts.map((ua) => [`${ua.user.id}-${ua.account.id}`, ua]));
+
+  const indexes: number[] = [];
+  for (const userAccount of userAccounts) {
+    const key = `${userAccount.user.id}-${userAccount.account.id}`;
+    if (existedUserAccountMap.has(key)) {
+      indexes.push(userAccounts.indexOf(userAccount));
+    }
+  }
+  const finalUserAccounts = userAccounts.filter((_, i) => !indexes.includes(i));
+
+  await em.persistAndFlush([...Object.values(usersMap), ...accounts, ...finalUserAccounts]);
 
   logger.info(
     `Import users complete. ${accounts.length} accounts, ${Object.keys(usersMap).length - existedUsers.length} users.`);
@@ -100,7 +132,7 @@ export async function importUsers(data: ImportUsersData, em: SqlEntityManager,
   }
 
   return {
-    accountCount: accounts.length,
+    accountCount: accounts.length - existedAccounts.length,
     userCount: Object.keys(usersMap).length - existedUsers.length,
     usersWithoutName: idsWithoutName.length,
   };
