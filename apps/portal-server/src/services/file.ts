@@ -22,7 +22,7 @@ import { config } from "src/config/env";
 import { clusterNotFound } from "src/utils/errors";
 import { pipeline } from "src/utils/pipeline";
 import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
-import stream, { once } from "stream";
+import { once } from "stream";
 
 export const fileServiceServer = plugin((server) => {
 
