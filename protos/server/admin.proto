@@ -57,8 +57,7 @@ message ImportUsersData {
 
 message ImportUsersRequest {
   ImportUsersData data = 1;
-  string tenant_name = 2;
-  bool whitelist = 3;
+  bool whitelist = 2;
 }
 
 // INVAD_ARGUMENT: the data format is not acceptable

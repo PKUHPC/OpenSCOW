@@ -19,6 +19,7 @@ import { AccountWhitelist } from "src/entities/AccountWhitelist";
 import { Tenant } from "src/entities/Tenant";
 import { User } from "src/entities/User";
 import { UserAccount, UserRole, UserStatus } from "src/entities/UserAccount";
+import { DEFAULT_TENANT_NAME } from "src/utils/constants";
 import { toRef } from "src/utils/orm";
 
 export interface ImportUsersData {
@@ -29,13 +30,13 @@ export interface ImportUsersData {
   }[];
 }
 
-export async function importUsers(data: ImportUsersData, em: SqlEntityManager, 
-  whitelistAll: boolean, tenantName: string, logger: Logger) 
+export async function importUsers(data: ImportUsersData, em: SqlEntityManager,
+  whitelistAll: boolean, logger: Logger)
 {
-  const tenant = await em.findOneOrFail(Tenant, { name: tenantName });
+  const tenant = await em.findOneOrFail(Tenant, { name: DEFAULT_TENANT_NAME });
 
   const usersMap: Record<string, User> = {};
-  
+
   const idsWithoutName = [] as string[];
   data.accounts.forEach(({ users }) => {
     users.forEach(({ userId, userName }) => {
@@ -48,9 +49,9 @@ export async function importUsers(data: ImportUsersData, em: SqlEntityManager,
 
   const existedUsers = await em.find(User, { userId: { $in: Object.keys(usersMap) } }, { populate: ["tenant"]});
   existedUsers.forEach((u) => {
-    if (u.tenant.$.name !== tenantName) {
+    if (u.tenant.$.name !== DEFAULT_TENANT_NAME) {
       throw <ServiceError> {
-        code: Status.INVALID_ARGUMENT, message: `user ${u.userId} has existed but doesn't belong to ${tenantName}`,
+        code: Status.INVALID_ARGUMENT, message: `user ${u.userId} has existed and belongs to ${u.tenant.$.name}`,
       };
     }
     usersMap[u.userId] = u;
@@ -64,7 +65,7 @@ export async function importUsers(data: ImportUsersData, em: SqlEntityManager,
       tenant,
     });
     accounts.push(account);
-    
+
     if (whitelistAll) {
       logger.info("Add %s to whitelist", a.accountName);
       const whitelist = new AccountWhitelist({
