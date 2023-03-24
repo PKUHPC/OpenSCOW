@@ -60,7 +60,10 @@ export const RunningJobQueryTable: React.FC<Props> = ({
   });
 
   useDidUpdateEffect(() => {
-    setQuery((q) => ({ ...q, accountName: accountNames ? accountNames[0] : undefined }));
+    setQuery((q) => ({
+      ...q,
+      accountName: Array.isArray(accountNames) ? accountNames[0] : accountNames ? accountNames : undefined,
+    }));
   }, [accountNames]);
 
   const [form] = Form.useForm<FilterForm>();
