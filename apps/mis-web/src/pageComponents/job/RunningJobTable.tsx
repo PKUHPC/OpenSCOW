@@ -79,7 +79,7 @@ export const RunningJobQueryTable: React.FC<Props> = ({
     if (!data) { return undefined; }
 
     let filtered = data.results;
-    if (searchType.current === "precision") {
+    if (searchType.current === "precision" && query.jobId) {
       filtered = filtered.filter((x) => x.jobId === query.jobId + "");
     } else {
       // add local range filters here
