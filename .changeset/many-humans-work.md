@@ -1,8 +1,8 @@
 ---
-"@scow/portal-web": patch
-"@scow/demo-vagrant": patch
-"@scow/gateway": patch
-"@scow/deploy-compose": patch
+"@scow/portal-web": minor
+"@scow/demo-vagrant": minor
+"@scow/gateway": minor
+"@scow/deploy-compose": minor
 ---
 
 上传文件、请求最大体积限制可配置

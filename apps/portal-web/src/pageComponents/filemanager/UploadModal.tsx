@@ -46,7 +46,7 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
         文件将会上传到：<strong>{path}</strong>。同名文件将会被覆盖。
       </p>
       <p>
-        单个上传文件体积最大为：<strong>{publicConfig.CLIENT_MAX_BODY_SIZE}</strong>。
+        单个上传文件大小最大为：<strong>{publicConfig.CLIENT_MAX_BODY_SIZE}</strong>。
       </p>
       <Upload.Dragger
         name="file"
