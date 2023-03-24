@@ -70,7 +70,7 @@ export const JobTable: React.FC<Props> = ({
   useDidUpdateEffect(() => {
     setQuery((q) => ({
       ...q,
-      accountName:Array.isArray(accountNames) ? accountNames[0] : accountNames,
+      accountName: Array.isArray(accountNames) ? accountNames[0] : accountNames,
     }));
   }, [accountNames]);
 
