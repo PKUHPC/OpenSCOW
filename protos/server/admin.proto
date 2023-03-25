@@ -76,8 +76,8 @@ message UserInAccount {
 
 message ClusterAccountInfo {
   enum ImportStatus {
-    EXISTED = 0;
-    NOT_EXISTED = 1;
+    EXISTING = 0;
+    NOT_EXISTING = 1;
     HAS_NEW_USERS = 2;
   }
   string account_name = 1;

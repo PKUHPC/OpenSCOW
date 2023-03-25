@@ -56,8 +56,8 @@ export enum UserStatus {
 }
 
 export enum ClusterAccountInfo_ImportStatus {
-  EXISTED = 0,
-  NOT_EXISTED = 1,
+  EXISTING = 0,
+  NOT_EXISTING = 1,
   HAS_NEW_USERS = 2,
 }
 

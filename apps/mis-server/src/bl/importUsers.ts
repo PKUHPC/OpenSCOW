@@ -47,11 +47,11 @@ export async function importUsers(data: ImportUsersData, em: SqlEntityManager,
     });
   });
 
-  const existedUsers = await em.find(User, { userId: { $in: Object.keys(usersMap) } }, { populate: ["tenant"]});
-  existedUsers.forEach((u) => {
+  const existingUsers = await em.find(User, { userId: { $in: Object.keys(usersMap) } }, { populate: ["tenant"]});
+  existingUsers.forEach((u) => {
     if (u.tenant.$.name !== DEFAULT_TENANT_NAME) {
       throw <ServiceError> {
-        code: Status.INVALID_ARGUMENT, message: `user ${u.userId} has existed and belongs to ${u.tenant.$.name}`,
+        code: Status.INVALID_ARGUMENT, message: `user ${u.userId} has existing and belongs to ${u.tenant.$.name}`,
       };
     }
     usersMap[u.userId] = u;
@@ -64,15 +64,15 @@ export async function importUsers(data: ImportUsersData, em: SqlEntityManager,
       tenant,
     });
   });
-  const existedAccounts = await em.find(Account,
+  const existingAccounts = await em.find(Account,
     { accountName: { $in: data.accounts.map((x) => x.accountName) } },
     { populate: ["tenant"]},
   );
-  existedAccounts.forEach((a) => {
+  existingAccounts.forEach((a) => {
     if (a.tenant.$.name !== DEFAULT_TENANT_NAME) {
       throw <ServiceError> {
         code: Status.INVALID_ARGUMENT,
-        message: `account ${a.accountName} has existed and belongs to ${a.tenant.$.name}`,
+        message: `account ${a.accountName} has existing and belongs to ${a.tenant.$.name}`,
       };
     }
     accountMap[a.accountName] = a;
@@ -108,15 +108,15 @@ export async function importUsers(data: ImportUsersData, em: SqlEntityManager,
     });
   });
 
-  const existedUserAccounts = await em.find(UserAccount, {
+  const existingUserAccounts = await em.find(UserAccount, {
     $or: userAccounts.map((ua) => ({ user: ua.user, account: ua.account })),
   });
-  const existedUserAccountMap = new Map(existedUserAccounts.map((ua) => [`${ua.user.id}-${ua.account.id}`, ua]));
+  const existingUserAccountMap = new Map(existingUserAccounts.map((ua) => [`${ua.user.id}-${ua.account.id}`, ua]));
 
   const indexes: number[] = [];
   for (const userAccount of userAccounts) {
     const key = `${userAccount.user.id}-${userAccount.account.id}`;
-    if (existedUserAccountMap.has(key)) {
+    if (existingUserAccountMap.has(key)) {
       indexes.push(userAccounts.indexOf(userAccount));
     }
   }
@@ -125,15 +125,16 @@ export async function importUsers(data: ImportUsersData, em: SqlEntityManager,
   await em.persistAndFlush([...Object.values(usersMap), ...accounts, ...finalUserAccounts]);
 
   logger.info(
-    `Import users complete. ${accounts.length} accounts, ${Object.keys(usersMap).length - existedUsers.length} users.`);
+    `Import users complete. ${accounts.length} accounts, \
+    ${Object.keys(usersMap).length - existingUsers.length} users.`);
   if (idsWithoutName.length !== 0) {
     logger.warn(`${idsWithoutName.length} users don't have names.`);
     logger.warn(idsWithoutName.join(", "));
   }
 
   return {
-    accountCount: accounts.length - existedAccounts.length,
-    userCount: Object.keys(usersMap).length - existedUsers.length,
+    accountCount: accounts.length - existingAccounts.length,
+    userCount: Object.keys(usersMap).length - existingUsers.length,
     usersWithoutName: idsWithoutName.length,
   };
 }

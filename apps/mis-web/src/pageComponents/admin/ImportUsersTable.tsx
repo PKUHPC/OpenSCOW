@@ -74,7 +74,7 @@ export const ImportUsersTable: React.FC = () => {
           const importData: ImportUsersData = { accounts: []};
 
           changedData?.accounts.forEach((x, i) => {
-            if (data.accounts[i].importStatus === ClusterAccountInfo_ImportStatus.NOT_EXISTED) {
+            if (data.accounts[i].importStatus === ClusterAccountInfo_ImportStatus.NOT_EXISTING) {
               data.accounts[i].owner = x.owner;
             }
           });
@@ -82,7 +82,7 @@ export const ImportUsersTable: React.FC = () => {
           importData.accounts.push(...selectedAccounts?.map((x) => ({
             accountName: x.accountName,
             users: x.users,
-            owner: x.importStatus === ClusterAccountInfo_ImportStatus.NOT_EXISTED ? x.owner! : undefined,
+            owner: x.importStatus === ClusterAccountInfo_ImportStatus.NOT_EXISTING ? x.owner! : undefined,
           })) || []);
 
           await api.importUsers({ body: {
@@ -118,16 +118,16 @@ export const ImportUsersTable: React.FC = () => {
           rowSelection={{
             type: "checkbox",
             renderCell(_checked, record, _index, node) {
-              if (record.importStatus === ClusterAccountInfo_ImportStatus.EXISTED) {
+              if (record.importStatus === ClusterAccountInfo_ImportStatus.EXISTING) {
                 return <Tooltip title="账户已经存在于SCOW中">{node}</Tooltip>;
-              } else if (record.importStatus === ClusterAccountInfo_ImportStatus.NOT_EXISTED) {
+              } else if (record.importStatus === ClusterAccountInfo_ImportStatus.NOT_EXISTING) {
                 return <Tooltip title="账户不存在于SCOW中，将会导入SCOW">{node}</Tooltip>;
               } else if (record.importStatus === ClusterAccountInfo_ImportStatus.HAS_NEW_USERS) {
                 return <Tooltip title="账户中部分用户不存在于SCOW中，将会导入新的用户">{node}</Tooltip>;
               }
             },
             getCheckboxProps: (r) => ({
-              disabled: r.importStatus === ClusterAccountInfo_ImportStatus.EXISTED,
+              disabled: r.importStatus === ClusterAccountInfo_ImportStatus.EXISTING,
             }),
             onChange: (_, sr) => {
               setSelectedAccounts(sr);
@@ -145,7 +145,7 @@ export const ImportUsersTable: React.FC = () => {
             dataIndex="owner"
             title="拥有者"
             render={(_, r, i) => {
-              if (r.importStatus === ClusterAccountInfo_ImportStatus.EXISTED) {
+              if (r.importStatus === ClusterAccountInfo_ImportStatus.EXISTING) {
                 return "已导入";
               } else if (r.importStatus === ClusterAccountInfo_ImportStatus.HAS_NEW_USERS) {
                 return "账户已导入，部分用户未导入";

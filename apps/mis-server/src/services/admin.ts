@@ -128,21 +128,21 @@ export const adminServiceServer = plugin((server) => {
       result.accounts.forEach((account) => {
         if (!includedAccounts.find((x) => x.accountName === account.accountName)) {
           // account not existed in scow
-          account.importStatus = ClusterAccountInfo_ImportStatus.NOT_EXISTED;
+          account.importStatus = ClusterAccountInfo_ImportStatus.NOT_EXISTING;
         } else if (!account.users.every((user) => includedUsers.map((x) => x.userId).includes(user.userId))) {
           // some users in account not existed in scow
           account.importStatus = ClusterAccountInfo_ImportStatus.HAS_NEW_USERS;
         } else {
           // both users and account exist in scow
-          account.importStatus = ClusterAccountInfo_ImportStatus.EXISTED;
+          account.importStatus = ClusterAccountInfo_ImportStatus.EXISTING;
         }
       });
 
       result.accounts.sort((a, b) => {
         const order = {
-          [ClusterAccountInfo_ImportStatus.NOT_EXISTED]: 0,
+          [ClusterAccountInfo_ImportStatus.NOT_EXISTING]: 0,
           [ClusterAccountInfo_ImportStatus.HAS_NEW_USERS]: 1,
-          [ClusterAccountInfo_ImportStatus.EXISTED]: 2,
+          [ClusterAccountInfo_ImportStatus.EXISTING]: 2,
         };
 
         return order[a.importStatus] - order[b.importStatus];

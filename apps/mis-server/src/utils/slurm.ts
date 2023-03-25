@@ -31,7 +31,7 @@ export function parseClusterUsers(dataStr: string): GetClusterUsersResponse {
     const accountIndex = obj.accounts.push({
       accountName: account,
       users: [] as UserInAccount[],
-      importStatus: ClusterAccountInfo_ImportStatus.NOT_EXISTED,
+      importStatus: ClusterAccountInfo_ImportStatus.NOT_EXISTING,
     });
     i++;
     while (i < lines.length && lines[i].trim() !== "") {
