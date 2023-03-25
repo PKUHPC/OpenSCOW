@@ -13,7 +13,8 @@
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
-import { AdminServiceServer, AdminServiceService, ImportState } from "@scow/protos/build/server/admin";
+import { AdminServiceServer, AdminServiceService,
+  ClusterAccountInfo_ImportStatus } from "@scow/protos/build/server/admin";
 import { updateBlockStatusInSlurm } from "src/bl/block";
 import { importUsers, ImportUsersData } from "src/bl/importUsers";
 import { Account } from "src/entities/Account";
@@ -127,24 +128,24 @@ export const adminServiceServer = plugin((server) => {
       result.accounts.forEach((account) => {
         if (!includedAccounts.find((x) => x.accountName === account.accountName)) {
           // account not existed in scow
-          account.importState = ImportState.NOT_EXISTED;
+          account.importStatus = ClusterAccountInfo_ImportStatus.NOT_EXISTED;
         } else if (!account.users.every((user) => includedUsers.map((x) => x.userId).includes(user.userId))) {
           // some users in account not existed in scow
-          account.importState = ImportState.USER_NOT_EXISTED;
+          account.importStatus = ClusterAccountInfo_ImportStatus.HAS_NEW_USERS;
         } else {
           // both users and account exist in scow
-          account.importState = ImportState.EXISTED;
+          account.importStatus = ClusterAccountInfo_ImportStatus.EXISTED;
         }
       });
 
       result.accounts.sort((a, b) => {
         const order = {
-          [ImportState.NOT_EXISTED]: 0,
-          [ImportState.USER_NOT_EXISTED]: 1,
-          [ImportState.EXISTED]: 2,
+          [ClusterAccountInfo_ImportStatus.NOT_EXISTED]: 0,
+          [ClusterAccountInfo_ImportStatus.HAS_NEW_USERS]: 1,
+          [ClusterAccountInfo_ImportStatus.EXISTED]: 2,
         };
 
-        return order[a.importState] - order[b.importState];
+        return order[a.importStatus] - order[b.importStatus];
       });
       console.log(result);
       return [result];

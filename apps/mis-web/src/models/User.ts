@@ -55,10 +55,10 @@ export enum UserStatus {
   BLOCKED = 1,
 }
 
-export enum ImportState {
+export enum ClusterAccountInfo_ImportStatus {
   EXISTED = 0,
   NOT_EXISTED = 1,
-  USER_NOT_EXISTED = 2,
+  HAS_NEW_USERS = 2,
 }
 
 export const AccountAffiliationSchema = Type.Object({

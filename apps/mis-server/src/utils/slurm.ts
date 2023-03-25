@@ -10,8 +10,8 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { ClusterAccountInfo, GetClusterUsersResponse,
-  ImportState, UserInAccount } from "@scow/protos/build/server/admin";
+import { ClusterAccountInfo, ClusterAccountInfo_ImportStatus, GetClusterUsersResponse,
+  UserInAccount } from "@scow/protos/build/server/admin";
 
 // Parses slurm.sh output to GetClusterUsersResponse
 // Accounts with no user are not included
@@ -31,7 +31,7 @@ export function parseClusterUsers(dataStr: string): GetClusterUsersResponse {
     const accountIndex = obj.accounts.push({
       accountName: account,
       users: [] as UserInAccount[],
-      importState: ImportState.NOT_EXISTED,
+      importStatus: ClusterAccountInfo_ImportStatus.NOT_EXISTED,
     });
     i++;
     while (i < lines.length && lines[i].trim() !== "") {
