@@ -68,7 +68,10 @@ export const JobTable: React.FC<Props> = ({
   });
 
   useDidUpdateEffect(() => {
-    setQuery((q) => ({ ...q, accountName: accountNames[0] }));
+    setQuery((q) => ({
+      ...q,
+      accountName: Array.isArray(accountNames) ? accountNames[0] : accountNames,
+    }));
   }, [accountNames]);
 
   const [form] = Form.useForm<FilterForm>();
