@@ -147,7 +147,6 @@ export const adminServiceServer = plugin((server) => {
 
         return order[a.importStatus] - order[b.importStatus];
       });
-      console.log(result);
       return [result];
     },
 
