@@ -16,7 +16,7 @@
   "repository": "https://github.com/PKUHPC/SCOW",
   "dependencies": {
     "@scow/lib-config": "workspace:*",
-    "@sinclair/typebox": "0.25.24"
+    "@sinclair/typebox": "0.26.5"
   },
   "volta": {
     "extends": "../../package.json"
