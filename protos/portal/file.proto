@@ -174,8 +174,7 @@ message StartTransferFilesRequest {
 }
 
 message StartTransferFilesResponse {
-  uint32 transfer_id = 1;
-  uint32 process_id = 2;
+
 }
 
 message QueryTransferFilesRequest {

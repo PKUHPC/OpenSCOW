@@ -385,7 +385,6 @@ export const fileServiceServer = plugin((server) => {
           "-p", port.toString(),
           "-k", privateKeyPath,
         ];
-
         const resp = await ssh.exec(cmd, args, { stream: "both" });
 
         if (resp.code !== 0) {
@@ -395,10 +394,7 @@ export const fileServiceServer = plugin((server) => {
             details: resp.stderr,
           };
         }
-        else {
-          const { transferId, processId } = JSON.parse(resp.stdout);
-          return [{ transferId: transferId, processId: processId }];
-        }
+        return [{}];
       });
     },
 
@@ -419,7 +415,6 @@ export const fileServiceServer = plugin((server) => {
         ];
 
         const resp = await ssh.exec(cmd, args, { stream:"both" });
-
         const stdoutStream = createReadStream(resp.stdout);
         await pipeline(
           stdoutStream,

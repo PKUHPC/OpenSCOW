@@ -19,7 +19,7 @@ import { route } from "src/utils/route";
 import { handlegRPCError } from "src/utils/server";
 
 export interface StartTransferFilesSchema {
-  method: " POST";
+  method: "POST";
 
   body: {
     fromCluster: string;
@@ -29,10 +29,7 @@ export interface StartTransferFilesSchema {
   }
 
   responses: {
-    200: {
-      transferId: number;
-      processId: number;
-    }
+    204: null;
     415: {
       code: "SCOW-SYNC-START_CMD_FAILED";
       // stderr of the scow-sync command
@@ -61,9 +58,7 @@ export default route<StartTransferFilesSchema>("StartTransferFilesSchema", async
     fromPath: fromPath,
     toPath: toPath,
   }).then(
-    async ({ transferId, processId }) => ({
-      200: { transferId, processId },
-    }),
+    () => ({ 204: null }),
     handlegRPCError({
       [status.INTERNAL]: (e) => ({ 415: { code: "SCOW-SYNC-START_CMD_FAILED" as const, error: e.details } }),
       [status.NOT_FOUND]: () => ({ 400: { code: "INVALID_CLUSTER" as const } }),
