@@ -4,7 +4,7 @@
   "name": "SCOW Dev Env",
   "dockerComposeFile": "./docker-compose.devcontainer.yml",
   "service": "scow-dev",
-  "workspaceFolder": "/workspace/SCOW",
+  "workspaceFolder": "/workspaces/SCOW",
   "features": {
     "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {}
   },
