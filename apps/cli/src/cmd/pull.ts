@@ -15,6 +15,7 @@ import { getInstallationConfig } from "src/config/installation";
 
 interface Options {
   configPath: string;
+  scowOnly: boolean;
   _: (string | number)[];
 }
 
@@ -24,6 +25,7 @@ export const pull = (options: Options) => {
 
   runComposeCommand(config, [
     "pull",
+    options.scowOnly ? "gateway" : "",
     ...(options._.slice(1).map((x) => String(x))),
   ]);
 };

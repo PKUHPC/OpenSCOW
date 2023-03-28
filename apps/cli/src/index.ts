@@ -76,7 +76,7 @@ yargs(hideBin(process.argv))
   .command("db", "Enter mis db", (y) => y, (argv) => {
     enterDb(argv);
   })
-  .command("up", "Start SCOW", (y) => {
+  .command("up", "Start SCOW services", (y) => {
     return y.options({
       detach: {
         alias: "d",
@@ -88,14 +88,20 @@ yargs(hideBin(process.argv))
   }, (argv) => {
     up(argv);
   })
-  .command("down", "Stop SCOW", (y) => {
+  .command("down", "Stop SCOW services", (y) => {
     return y.options({
     });
   }, (argv) => {
     down(argv);
   })
-  .command("pull", "Stop SCOW", (y) => {
+  .command("pull", "Pull images to update SCOW", (y) => {
     return y.options({
+      scowOnly: {
+        alias: "s",
+        type: "boolean",
+        description: "Only pull SCOW image",
+        default: false,
+      },
     });
   }, (argv) => {
     pull(argv);
