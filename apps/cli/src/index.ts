@@ -10,15 +10,16 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { extractConfig } from "src/cmd/config/extract";
-import { viewInstallationConfig } from "src/cmd/config/installation";
 import { enterDb } from "src/cmd/db";
 import { down } from "src/cmd/down";
+import { extractConfig } from "src/cmd/extractConfig";
+import { extractInstallConfig } from "src/cmd/extractInstall";
 import { generateDockerComposeYml } from "src/cmd/generate";
 import { logs } from "src/cmd/logs";
 import { migrateFromScowDeployment } from "src/cmd/migrate";
 import { pull } from "src/cmd/pull";
 import { up } from "src/cmd/up";
+import { viewInstallationConfig } from "src/cmd/view-config";
 import { hideBin } from "yargs/helpers";
 import yargs from "yargs/yargs";
 
@@ -31,27 +32,35 @@ yargs(hideBin(process.argv))
       default: "./installation.yml",
     },
   })
-  .command("config", "Configurations functionalities", (yargs) => {
+  .command("view-config", "Extract installation config", (yargs) => {
+    return yargs;
+  }, (argv) => {
+    viewInstallationConfig(argv);
+  })
+  .command("extract-install", "Extract sample installation.yaml config", (yargs) => {
+    return yargs.options({
+      outputPath: {
+        alias: "o",
+        type: "string",
+        description: "output installation.yaml path",
+        default: "./installation.yaml",
+      },
+    });
+  }, (argv) => {
+    extractInstallConfig(argv);
+  })
+  .command("extract-config", "Extract sample SCOW config files", (yargs) => {
     return yargs
-      .command("installation", "View installation config", (yargs) => {
-        return yargs;
-      }, (argv) => {
-        viewInstallationConfig(argv);
-      })
-      .command("extract", "Extract sample configurations file", (yargs) => {
-        return yargs
-          .options({
-            outputPath: {
-              alias: "o",
-              type: "string",
-              description: "output dir",
-              default: "./config",
-            },
-          });
-      }, async (argv) => {
-        await extractConfig(argv);
-      })
-      .demandCommand().help();
+      .options({
+        outputPath: {
+          alias: "o",
+          type: "string",
+          description: "output dir",
+          default: "./config",
+        },
+      });
+  }, async (argv) => {
+    await extractConfig(argv);
   })
   .command("generate", "Generate docker-compose.yml", (yargs) => {
     return yargs
