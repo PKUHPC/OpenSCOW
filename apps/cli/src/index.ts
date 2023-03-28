@@ -29,7 +29,7 @@ yargs(hideBin(process.argv))
       alias: "c",
       type: "string",
       description: "Path to installation config",
-      default: "./installation.yml",
+      default: "./installation.yaml",
     },
   })
   .command("view-config", "Extract installation config", (yargs) => {
