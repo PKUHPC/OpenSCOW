@@ -29,6 +29,13 @@ export const InstallationConfigSchema = Type.Object({
     })),
   }, { default: {} }),
 
+  gateway: Type.Object({
+    uploadFileSizeLimit: Type.String({
+      description: "限制整个系统上传（请求）文件的大小，可接受的格式为nginx的client_max_body_size可接受的值",
+      default: "1G",
+    }),
+  }, { default: {} }),
+
   portal: Type.Optional(Type.Object({
     basePath: Type.String({ description: "门户系统的部署路径，相对于整个系统的basePath", default: "/" }),
     novncClientImage: Type.String({ description: "novnc客户端镜像", default: "ghcr.io/pkuhpc/novnc-client-docker:master" }),

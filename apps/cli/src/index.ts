@@ -16,6 +16,7 @@ import { enterDb } from "src/cmd/db";
 import { down } from "src/cmd/down";
 import { generateDockerComposeYml } from "src/cmd/generate";
 import { logs } from "src/cmd/logs";
+import { migrateFromScowDeployment } from "src/cmd/migrate";
 import { pull } from "src/cmd/pull";
 import { up } from "src/cmd/up";
 import { hideBin } from "yargs/helpers";
@@ -98,6 +99,17 @@ yargs(hideBin(process.argv))
     });
   }, (argv) => {
     pull(argv);
+  })
+  .command("migrate", "Migrate from scow-deployment", (y) => {
+    return y.options({
+      configPyPath: {
+        type: "string",
+        description: "scow-deployment config.py file path",
+        default: "./config.py",
+      },
+    });
+  }, (argv) => {
+    migrateFromScowDeployment(argv);
   })
   .command("logs <service>", "View logs", (y) => {
     return y

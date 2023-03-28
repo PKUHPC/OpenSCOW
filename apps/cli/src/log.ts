@@ -18,6 +18,6 @@ export const logger = pino({
   ...config.LOG_PRETTY ? {
     transport: { target: "pino-pretty" },
   } : {},
-  
+
 });
 
