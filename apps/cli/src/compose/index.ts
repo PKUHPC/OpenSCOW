@@ -95,7 +95,7 @@ export const createComposeSpec = (config: InstallationConfigSchema) => {
 
   addService("redis", {
     image: config.auth.redisImage,
-    ports: config.debug.openPorts?.redis ? { [config.debug.openPorts.redis]: 6379 } : {},
+    ports: config.auth.publicPorts?.redis ? { [config.auth.publicPorts?.redis]: 6379 } : {},
     environment: {},
     volumes: {},
   });
@@ -106,15 +106,15 @@ export const createComposeSpec = (config: InstallationConfigSchema) => {
     "~/.ssh": "/root/.ssh",
   };
 
-  if (config.auth) {
-    for (const key in config.auth.volumes) {
-      authVolumes[key] = config.auth.volumes[key];
+  if (config.auth.custom) {
+    for (const key in config.auth.custom.volumes) {
+      authVolumes[key] = config.auth.custom.volumes[key];
     }
 
     addService("auth", {
-      image: config.auth.image,
-      ports: config.auth.ports ?? {},
-      environment: config.auth.env ?? {},
+      image: config.auth.custom.image,
+      ports: config.auth.custom.ports ?? {},
+      environment: config.auth.custom.env ?? {},
       volumes: authVolumes,
     });
   } else {
@@ -125,7 +125,7 @@ export const createComposeSpec = (config: InstallationConfigSchema) => {
         "BASE_PATH": BASE_PATH,
         ...serviceLogEnv,
       },
-      ports: config.debug.openPorts?.auth ? { [config.debug.openPorts.auth]: 5000 } : {},
+      ports: config.auth.publicPorts?.auth ? { [config.auth.publicPorts?.auth]: 5000 } : {},
       volumes: authVolumes,
     });
   }
@@ -138,7 +138,7 @@ export const createComposeSpec = (config: InstallationConfigSchema) => {
         SCOW_LAUNCH_APP: "portal-server",
         ...serviceLogEnv,
       },
-      ports: config.debug.openPorts?.portalServer ? { [config.debug.openPorts.portalServer]: 5000 } : {},
+      ports: config.portal.publicPorts?.portalServer ? { [config.portal.publicPorts.portalServer]: 5000 } : {},
       volumes: {
         "/etc/hosts": "/etc/hosts",
         "./config": "/etc/scow",
@@ -176,7 +176,7 @@ export const createComposeSpec = (config: InstallationConfigSchema) => {
   if (config.mis) {
     addService("mis-server", {
       image: scowImage,
-      ports: config.debug.openPorts?.misServer ? { [config.debug.openPorts.misServer]: 5000 } : {},
+      ports: config.mis.publicPorts?.misServer ? { [config.mis.publicPorts.misServer]: 5000 } : {},
       environment: {
         "SCOW_LAUNCH_APP": "mis-server",
         "DB_PASSWORD": config.mis.dbPassword,
@@ -215,7 +215,7 @@ export const createComposeSpec = (config: InstallationConfigSchema) => {
       environment: {
         "MYSQL_ROOT_PASSWORD": config.mis.dbPassword,
       },
-      ports: config.debug.openPorts?.db ? { [config.debug.openPorts.db]: 3306 } : {},
+      ports: config.mis.publicPorts?.db ? { [config.mis.publicPorts?.db]: 3306 } : {},
     });
   }
 

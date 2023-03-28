@@ -66,11 +66,18 @@ export const migrateFromScowDeployment = (_options: Props) => {
     portal: portal ? {
       basePath: portal.BASE_PATH,
       novncClientImage: portal.NOVNC_IMAGE,
+      publicPorts: {
+        ...debug.OPEN_PORTS.PORTAL_SERVER ? { portalServer: debug.OPEN_PORTS.PORTAL_SERVER } : {},
+      },
     } : undefined,
 
     mis: mis ? {
       basePath: mis.BASE_PATH,
       dbPassword: mis.DB_PASSWORD,
+      publicPorts: {
+        ...debug.OPEN_PORTS.MIS_SERVER ? { misServer: debug.OPEN_PORTS.MIS_SERVER } : {},
+        ...debug.OPEN_PORTS.DB ? { db: debug.OPEN_PORTS.DB } : {},
+      },
     } : undefined,
 
     log: log ? {
@@ -81,23 +88,20 @@ export const migrateFromScowDeployment = (_options: Props) => {
       } : undefined,
     } : undefined,
 
-    auth: auth ? {
-      image: auth.IMAGE,
-      ports: auth.PORTS,
-      volumes: auth.VOLUMES,
-      env: auth.ENV,
-    } : undefined,
-
-    debug: debug ? {
-      openPorts: debug.OPEN_PORTS ? {
-        auth: debug.OPEN_PORTS.AUTH,
-        db: debug.OPEN_PORTS.DB,
-        redis: debug.OPEN_PORTS.REDIS,
-        misServer: debug.OPEN_PORTS.MIS_SERVER,
-        portalServer: debug.OPEN_PORTS.PORTAL_SERVER,
-      } : undefined,
-    } : undefined,
-
+    auth: {
+      publicPorts: {
+        ...debug.OPEN_PORTS.REDIS ? { redis: debug.OPEN_PORTS.REDIS } : {},
+        ...debug.OPEN_PORTS.AUTH ? { auth: debug.OPEN_PORTS.AUTH } : {},
+      },
+      ...auth ? {
+        custom: {
+          image: auth.IMAGE,
+          ports: auth.PORTS,
+          volumes: auth.VOLUMES,
+          env: auth.ENV,
+        },
+      } : {},
+    },
   };
 
   const data = dump(config);
