@@ -11,8 +11,8 @@
  */
 
 import path from "path";
-import { LoggingOption, ServiceSpec, toComposeSpec, VolumeSpec } from "src/compose/ComposeSpec";
-import { InstallationConfigSchema } from "src/config";
+import { LoggingOption, ServiceSpec } from "src/compose/spec";
+import { InstallationConfigSchema } from "src/config/installation";
 
 function checkPathFormat(configKey: string, value: string) {
   if (value !== "/" && value.endsWith("/")) {
@@ -32,45 +32,53 @@ export const createComposeSpec = (config: InstallationConfigSchema) => {
   const MIS_PATH = config.mis?.basePath || "/mis";
   checkPathFormat("mis.basePath", MIS_PATH);
 
-  // logging
-  const logging: LoggingOption | undefined = config.log.fluentd
-    ? {
-      driver: "fluentd",
-      options: {
-        "fluentd-address": "localhost:24224",
-        "mode": "non-blocking",
-        "tag": "scow.{{.Name}}",
-      },
-    } : undefined;
-
   const serviceLogEnv = {
     LOG_LEVEL: config.log.level,
     LOG_PRETTY: String(config.log.pretty),
   };
 
-  const services: ServiceSpec[] = [];
-  const volumes: VolumeSpec[] = [];
+  const composeSpec = {
+    version: "3",
+    services: {} as Record<string, ServiceSpec>,
+    volumes: {} as Record<string, object>,
+  };
 
   // service creation function
-  const createSpec = (options:
-    Pick<ServiceSpec, "name" | "image" | "environment" | "ports" | "volumes" | "depends_on">,
+  const addService = (
+    name: string,
+    options: {
+      image: string,
+      environment: Record<string, string>,
+      ports: Record<string, number>,
+      volumes: Record<string, string>,
+      depends_on?: string[],
+    },
   ) => {
-    services.push({
-      name: options.name,
+
+    const logging: LoggingOption | undefined = config.log.fluentd
+      ? {
+        driver: "fluentd",
+        options: {
+          "fluentd-address": "localhost:24224",
+          "mode": "non-blocking",
+          "tag": name,
+        },
+      } : undefined;
+
+    composeSpec.services[name] = {
       restart: "unless-stopped",
-      environment: options.environment,
+      environment: Object.entries(options.environment).map(([key, val]) => `${key}=${val}`),
+      ports: Object.entries(options.ports).map(([from, to]) => `${from}:${to}`),
       image: options.image,
-      ports: options.ports,
-      volumes: options.volumes,
+      volumes: Object.entries(options.volumes).map(([from, to]) => `${from}:${to}`),
       depends_on: options.depends_on,
       logging,
-    });
+    };
   };
 
 
   // GATEWAY
-  createSpec({
-    name: "gateway",
+  addService("gateway", {
     image: scowImage,
     environment: {
       "SCOW_LAUNCH_APP": "gateway",
@@ -84,8 +92,7 @@ export const createComposeSpec = (config: InstallationConfigSchema) => {
 
   // AUTH
 
-  createSpec({
-    name: "redis",
+  addService("redis", {
     image: config.auth.redisImage,
     ports: config.debug.openPorts?.redis ? { [config.debug.openPorts.redis]: 6379 } : {},
     environment: {},
@@ -103,16 +110,14 @@ export const createComposeSpec = (config: InstallationConfigSchema) => {
       authVolumes[key] = config.auth.volumes[key];
     }
 
-    createSpec({
-      name: "auth",
+    addService("auth", {
       image: config.auth.image,
       ports: config.auth.ports ?? {},
       environment: config.auth.env ?? {},
       volumes: authVolumes,
     });
   } else {
-    createSpec({
-      name: "auth",
+    addService("auth", {
       image: scowImage,
       environment: {
         "SCOW_LAUNCH_APP": "auth",
@@ -126,8 +131,7 @@ export const createComposeSpec = (config: InstallationConfigSchema) => {
 
   // PORTAL
   if (config.portal) {
-    createSpec({
-      name: "portal-server",
+    addService("portal-server", {
       image: scowImage,
       environment: {
         SCOW_LAUNCH_APP: "portal-server",
@@ -141,8 +145,7 @@ export const createComposeSpec = (config: InstallationConfigSchema) => {
       },
     });
 
-    createSpec({
-      name: "portal-web",
+    addService("portal-web", {
       image: scowImage,
       environment: {
         "SCOW_LAUNCH_APP": "portal-web",
@@ -159,8 +162,7 @@ export const createComposeSpec = (config: InstallationConfigSchema) => {
       },
     });
 
-    createSpec({
-      name: "novnc",
+    addService("novnc", {
       image: config.portal.novncClientImage,
       environment: {},
       ports: {},
@@ -170,8 +172,7 @@ export const createComposeSpec = (config: InstallationConfigSchema) => {
 
   // MIS
   if (config.mis) {
-    createSpec({
-      name: "mis-server",
+    addService("mis-server", {
       image: scowImage,
       ports: config.debug.openPorts?.misServer ? { [config.debug.openPorts.misServer]: 5000 } : {},
       environment: {
@@ -187,8 +188,7 @@ export const createComposeSpec = (config: InstallationConfigSchema) => {
     });
 
 
-    createSpec({
-      name: "mis-web",
+    addService("mis-web", {
       image: scowImage,
       environment: {
         "SCOW_LAUNCH_APP": "mis-web",
@@ -203,13 +203,9 @@ export const createComposeSpec = (config: InstallationConfigSchema) => {
       },
     });
 
-    volumes.push({
-      name: "db_data",
-      options: {},
-    });
+    composeSpec.volumes["db_data"] = {};
 
-    createSpec({
-      name: "db",
+    addService("db", {
       image: config.mis.mysqlImage,
       volumes: {
         "db_data": "/var/lib/mysql",
@@ -220,9 +216,6 @@ export const createComposeSpec = (config: InstallationConfigSchema) => {
       ports: config.debug.openPorts?.db ? { [config.debug.openPorts.db]: 3306 } : {},
     });
   }
-
-  // merge extra services and volumes
-  const composeSpec = toComposeSpec(services, volumes, config.extra?.composeServices, config.extra?.composeVolumes);
 
   return composeSpec;
 };

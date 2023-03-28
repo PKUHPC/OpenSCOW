@@ -17,45 +17,14 @@ export interface LoggingOption {
   }
 }
 
-export interface VolumeSpec {
-  name: string;
-  options: Record<string, string>;
-}
-
 export interface ServiceSpec {
-  name: string;
   image: string;
   restart: string;
-  ports: Record<string, number>;
-  volumes: Record<string, string>;
-  environment: Record<string, string>;
+  ports: string[];
+  volumes: string[];
+  environment: string[];
   depends_on?: string[];
 
   logging?: LoggingOption;
 }
 
-export function toComposeSpec(
-  services: ServiceSpec[], volumes: VolumeSpec[],
-  extraServices?: Record<string, object>,
-  extraVolumes?: Record<string, object>,
-) {
-
-  function extractName(specs: (ServiceSpec | VolumeSpec)[]) {
-    return specs.reduce((acc, { name, ...rest }) => {
-      acc[name] = rest;
-      return acc;
-    }, {});
-  }
-
-  return {
-    version: "3",
-    services: {
-      ...extractName(services),
-      ...extraServices,
-    },
-    volumes: {
-      ...extractName(volumes),
-      ...extraVolumes,
-    },
-  };
-}

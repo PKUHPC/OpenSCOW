@@ -131,6 +131,8 @@ importers:
       '@types/prompts': 2.4.3
       '@types/yargs': 17.0.22
       js-yaml: 4.1.0
+      pino: 8.11.0
+      pino-pretty: 10.0.0
       pkg: 5.8.1
       prompts: 2.4.2
       yargs: 17.7.1
@@ -138,6 +140,8 @@ importers:
       '@scow/lib-config': link:../../libs/libconfig
       '@sinclair/typebox': 0.26.5
       js-yaml: 4.1.0
+      pino: 8.11.0
+      pino-pretty: 10.0.0
       pkg: 5.8.1
       prompts: 2.4.2
       yargs: 17.7.1

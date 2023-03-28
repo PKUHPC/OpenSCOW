@@ -13,7 +13,7 @@
 import fs from "fs";
 import { join } from "path";
 import prompt from "prompts";
-import { log } from "src/log";
+import { logger } from "src/log";
 
 
 
@@ -32,7 +32,7 @@ export const extractConfig = async (options: Options) => {
 
   const fullPath = join(process.cwd(), options.outputPath);
 
-  log("Output path is " + fullPath);
+  logger.info("Output path is " + fullPath);
 
   if (fs.existsSync(options.outputPath)) {
     const answer = await prompt({
@@ -41,6 +41,7 @@ export const extractConfig = async (options: Options) => {
       message: `Output path ${fullPath} already exists. Continue?`,
     });
     if (!answer.continue) {
+      logger.debug("Selected no.");
       return;
     }
   }

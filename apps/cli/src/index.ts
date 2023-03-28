@@ -12,7 +12,10 @@
 
 import { extractConfig } from "src/cmd/config/extract";
 import { viewInstallationConfig } from "src/cmd/config/installation";
+import { enterDb } from "src/cmd/db";
+import { down } from "src/cmd/down";
 import { generateDockerComposeYml } from "src/cmd/generate";
+import { up } from "src/cmd/up";
 import { hideBin } from "yargs/helpers";
 import yargs from "yargs/yargs";
 
@@ -56,9 +59,43 @@ yargs(hideBin(process.argv))
           description: "输出路径",
           default: "./docker-compose.yml",
         },
+        format: {
+          alias: "f",
+          type: "string",
+          choices: ["yaml", "json"],
+          description: "输出格式",
+          default: "yaml",
+        },
       });
   }, (argv) => {
     generateDockerComposeYml(argv);
+  })
+  .command("db", "Enter mis db", (y) => y, (argv) => {
+    enterDb(argv);
+  })
+  .command("up", "Start SCOW", (y) => {
+    return y.options({
+      detach: {
+        alias: "d",
+        type: "boolean",
+        description: "Detached mode: Run containers in the background",
+        default: false,
+      },
+    });
+  }, (argv) => {
+    up(argv);
+  })
+  .command("down", "Stop SCOW", (y) => {
+    return y.options({
+    });
+  }, (argv) => {
+    down(argv);
+  })
+  .command("down", "Stop SCOW", (y) => {
+    return y.options({
+    });
+  }, (argv) => {
+    down(argv);
   })
   .completion()
   .strict()

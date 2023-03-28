@@ -10,17 +10,20 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { runComposeCommand } from "src/compose/cmd";
 import { getInstallationConfig } from "src/config/installation";
 
 interface Options {
   configPath: string;
 }
 
-/**
- * Output sample config files to outputPath
- * @param options options
- */
-export const viewInstallationConfig = (options: Options) => {
+export const enterDb = async (options: Options) => {
+
   const config = getInstallationConfig(options.configPath);
-  console.log(JSON.stringify(config, null, 2));
+
+  if (!config.mis) {
+    throw new Error("MIS is not deployed. db is not deployed");
+  }
+
+  runComposeCommand(config, ["exec", "db", "mysql", "-uroot", `-p'${config.mis.dbPassword}'`]);
 };

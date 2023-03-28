@@ -10,17 +10,13 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { getInstallationConfig } from "src/config/installation";
+import { bool, envConfig, str } from "@scow/lib-config";
 
-interface Options {
-  configPath: string;
-}
+export const config = envConfig({
+  LOG_LEVEL: str({
+    default: "info",
+    desc: "日志等级",
+  }),
+  LOG_PRETTY: bool({ desc: "以可读的方式输出log", default: true }),
+});
 
-/**
- * Output sample config files to outputPath
- * @param options options
- */
-export const viewInstallationConfig = (options: Options) => {
-  const config = getInstallationConfig(options.configPath);
-  console.log(JSON.stringify(config, null, 2));
-};

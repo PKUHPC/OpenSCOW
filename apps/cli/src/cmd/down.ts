@@ -10,17 +10,20 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { runComposeCommand } from "src/compose/cmd";
 import { getInstallationConfig } from "src/config/installation";
 
 interface Options {
   configPath: string;
+  _: (string | number)[];
 }
 
-/**
- * Output sample config files to outputPath
- * @param options options
- */
-export const viewInstallationConfig = (options: Options) => {
+export const down = (options: Options) => {
+
   const config = getInstallationConfig(options.configPath);
-  console.log(JSON.stringify(config, null, 2));
+
+  runComposeCommand(config, [
+    "down",
+    ...(options._.slice(1).map((x) => String(x))),
+  ]);
 };

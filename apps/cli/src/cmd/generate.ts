@@ -13,25 +13,18 @@
 import { writeFileSync } from "fs";
 import { dump } from "js-yaml";
 import { createComposeSpec } from "src/compose";
-import { getInstallationConfig } from "src/config";
-import { log } from "src/log";
+import { getInstallationConfig } from "src/config/installation";
+import { logger } from "src/log";
 
 interface Options {
   configPath: string;
   outputPath: string;
+  format: string;
 }
 
-/**
- * Generate docker-compose.yml content from config
- * @param options config
- */
-export const generateContent = (options: Pick<Options, "configPath">) => {
-  const config = getInstallationConfig(options.configPath);
-
-  const composeSpec = createComposeSpec(config);
-
-  return composeSpec;
-
+const formatters: Record<string, (value: any) => string> = {
+  "json": JSON.stringify,
+  "yaml": dump,
 };
 
 /**
@@ -39,11 +32,18 @@ export const generateContent = (options: Pick<Options, "configPath">) => {
  * @param options config
  */
 export const generateDockerComposeYml = (options: Options) => {
-  const spec = generateContent(options);
 
-  const content = dump(spec);
+  const config = getInstallationConfig(options.configPath);
+
+  const spec = createComposeSpec(config);
+
+  const formatter = formatters[options.format];
+
+  if (!formatter) { throw new Error("Unknown format " + options.format); }
+
+  const content = formatter(spec);
 
   writeFileSync(options.outputPath, content, { encoding: "utf-8" });
 
-  log("Generated docker-compose.yml at " + options.outputPath);
+  logger.info("Generated compose spec as %s at %s", options.format, options.outputPath);
 };

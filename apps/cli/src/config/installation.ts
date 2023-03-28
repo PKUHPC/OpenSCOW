@@ -60,19 +60,6 @@ export const InstallationConfigSchema = Type.Object({
     }, { description: "开放的端口" })),
   }, { default: {}, description: "调试选项" }),
 
-  extra: Type.Optional(Type.Object({
-    composeServices: Type.Record(
-      Type.String(),
-      Type.Object({}, { additionalProperties: true }),
-      { description: "额外的docker-compose服务" },
-    ),
-    composeVolumes: Type.Record(
-      Type.String(),
-      Type.Object({}, { additionalProperties: true }),
-      { description: "额外的docker-compose卷" },
-    ),
-  })),
-
 });
 
 export type InstallationConfigSchema = Static<typeof InstallationConfigSchema>;
