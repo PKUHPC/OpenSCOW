@@ -10,7 +10,11 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { writeFileSync } from "fs";
+import { dump } from "js-yaml";
+import { createComposeSpec } from "src/compose";
 import { getInstallationConfig } from "src/config";
+import { log } from "src/log";
 
 interface Options {
   configPath: string;
@@ -23,6 +27,11 @@ interface Options {
  */
 export const generateContent = (options: Pick<Options, "configPath">) => {
   const config = getInstallationConfig(options.configPath);
+
+  const composeSpec = createComposeSpec(config);
+
+  return composeSpec;
+
 };
 
 /**
@@ -30,6 +39,11 @@ export const generateContent = (options: Pick<Options, "configPath">) => {
  * @param options config
  */
 export const generateDockerComposeYml = (options: Options) => {
-  // TODO
+  const spec = generateContent(options);
 
+  const content = dump(spec);
+
+  writeFileSync(options.outputPath, content, { encoding: "utf-8" });
+
+  log("Generated docker-compose.yml at " + options.outputPath);
 };

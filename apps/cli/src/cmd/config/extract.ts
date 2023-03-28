@@ -13,6 +13,7 @@
 import fs from "fs";
 import { join } from "path";
 import prompt from "prompts";
+import { log } from "src/log";
 
 
 
@@ -31,7 +32,7 @@ export const extractConfig = async (options: Options) => {
 
   const fullPath = join(process.cwd(), options.outputPath);
 
-  console.log("Output path is " + fullPath);
+  log("Output path is " + fullPath);
 
   if (fs.existsSync(options.outputPath)) {
     const answer = await prompt({

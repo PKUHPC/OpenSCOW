@@ -10,18 +10,6 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { getInstallationConfig } from "src/config";
-import { log } from "src/log";
-
-interface Options {
-  configPath: string;
-}
-
-/**
- * Output sample config files to outputPath
- * @param options options
- */
-export const viewInstallationConfig = (options: Options) => {
-  const config = getInstallationConfig(options.configPath);
-  log(JSON.stringify(config, null, 2));
+export const log = (content: string, ...args: any[]) => {
+  console.log(content, ...args);
 };
