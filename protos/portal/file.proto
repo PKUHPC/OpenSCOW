@@ -180,12 +180,18 @@ message StartTransferFilesResponse {
 message QueryTransferFilesRequest {
   string cluster = 1;
   string user_id = 2;
-  uint32 transfer_id = 3;
-  uint32 process_id = 4;
+}
+
+message TransferInfo {
+  string file_name = 1;
+  string transfer_size = 2;
+  string progress = 3;
+  string speed = 4;
+  string left_time = 5;
 }
 
 message QueryTransferFilesResponse {
-  bytes chunk = 1;
+  repeated TransferInfo transfer_infos = 1;
 }
 
 service FileService {
@@ -210,5 +216,5 @@ service FileService {
 
   rpc StartTransferFiles(StartTransferFilesRequest) returns (StartTransferFilesResponse);
 
-  rpc QueryTransferFiles(QueryTransferFilesRequest) returns (stream QueryTransferFilesResponse);
+  rpc QueryTransferFiles(QueryTransferFilesRequest) returns (QueryTransferFilesResponse);
 }

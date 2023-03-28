@@ -13,10 +13,10 @@
 import {
   BookOutlined,
   CloudServerOutlined,
+  CloudSyncOutlined,
   DashboardOutlined,
   DesktopOutlined,
   EyeOutlined,
-  FileSyncOutlined,
   FolderOutlined,
   Loading3QuartersOutlined,
   MacCommandOutlined,
@@ -125,11 +125,18 @@ export const userRoutes: (
         text: cluster.name,
         path: `/files/${cluster.id}`,
         clickToPath: `/files/${cluster.id}/~`,
-      } as NavItemProps)).concat([{
-        Icon: FileSyncOutlined,
-        text: "文件传输",
-        path: "/files/fileTransfer",
-      }]),
+      } as NavItemProps)).concat([
+        {
+          Icon: CloudSyncOutlined,
+          text: "文件传输",
+          path: "/files/fileTransfer",
+        },
+        {
+          Icon: CloudServerOutlined,
+          text: "传输进度",
+          path: "/files/currentTransferInfo",
+        },
+      ]),
 
     }] : []),
   ];

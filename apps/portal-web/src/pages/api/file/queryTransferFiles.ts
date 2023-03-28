@@ -10,25 +10,30 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { asyncReplyStreamCall } from "@ddadaal/tsgrpc-client";
+import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
+import { status } from "@grpc/grpc-js";
 import { FileServiceClient } from "@scow/protos/build/portal/file";
 import { authenticate } from "src/auth/server";
 import { getClient } from "src/utils/client";
-import { pipeline } from "src/utils/pipeline";
 import { route } from "src/utils/route";
+import { handlegRPCError } from "src/utils/server";
+
+
+interface TransferInfo {
+  fileName: string, transferSize: string, progress: string, speed: string, leftTime: string
+}
+
 export interface QueryTransferFilesSchema {
   method: "GET";
 
   query: {
     cluster: string;
-    transferId: number;
-    processId: number;
   }
 
   responses: {
-    200: any;
+    200: { result: TransferInfo[] };
     400: { code: "INVALID_CLUSTER" }
-    404: { code: "TRANSFER_NOT_EXISTS" }
+    415: { code: "SCOW-SYNC-QUERY_CMD_FAILED" }
   }
 }
 
@@ -40,22 +45,13 @@ export default route<QueryTransferFilesSchema>("QueryTransferFilesSchema", async
 
   if (!info) { return; }
 
-  const { cluster, transferId, processId } = req.query;
+  const { cluster } = req.query;
 
   const client = getClient(FileServiceClient);
-
-  const stream = asyncReplyStreamCall(client, "queryTransferFiles", {
-    cluster, transferId, processId, userId: info.identityId,
-  });
-
-  await pipeline(
-    stream.iter(),
-    async (x) => {
-      return x.chunk;
-    },
-    res,
-  ).finally(() => {
-    res.end();
-  });
-
+  return asyncUnaryCall(client, "queryTransferFiles", {
+    cluster, userId: info.identityId,
+  }).then((results) => ({ 200: { result: results.transferInfos } }), handlegRPCError({
+    [status.NOT_FOUND]: () => ({ 400: { code: "INVALID_CLUSTER" as const } }),
+    [status.INTERNAL]: () => ({ 415: { code: "SCOW-SYNC-QUERY_CMD_FAILED" as const } }),
+  }));
 });

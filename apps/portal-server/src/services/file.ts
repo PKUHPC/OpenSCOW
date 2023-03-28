@@ -16,8 +16,7 @@ import { ServiceError, status } from "@grpc/grpc-js";
 import { sftpExists,
   sftpMkdir, sftpReaddir, sftpRealPath, sftpRename, sftpStat, sftpUnlink, sftpWriteFile, sshRmrf } from "@scow/lib-ssh";
 import { FileInfo, FileInfo_FileType,
-  FileServiceServer, FileServiceService } from "@scow/protos/build/portal/file";
-import { createReadStream } from "fs";
+  FileServiceServer, FileServiceService, TransferInfo } from "@scow/protos/build/portal/file";
 import { config } from "src/config/env";
 import { clusterNotFound } from "src/utils/errors";
 import { pipeline } from "src/utils/pipeline";
@@ -398,51 +397,35 @@ export const fileServiceServer = plugin((server) => {
       });
     },
 
-    queryTransferFiles: async (call) => {
-      const { logger, request: { cluster, userId, transferId, processId } } = call;
+    queryTransferFiles: async ({ request, logger }) => {
+
+      const { cluster, userId } = request;
 
       const clusterAddress = getClusterLoginNode(cluster).address;
+
       if (!clusterAddress) { throw clusterNotFound(cluster); }
 
-      const subLogger = logger.child({ userId, cluster });
-      subLogger.info("Querying the progress of transferring files");
-
-      await sshConnect(clusterAddress, userId, subLogger, async (ssh) => {
+      return await sshConnect(clusterAddress, userId, logger, async (ssh) => {
         const cmd = "scow-sync-query";
-        const args = [
-          "-f", transferId.toString(),
-          "-p", processId.toString(),
-        ];
-
-        const resp = await ssh.exec(cmd, args, { stream:"both" });
-        const stdoutStream = createReadStream(resp.stdout);
-        await pipeline(
-          stdoutStream,
-          async (chunk) => {
-            return { chunk: Buffer.from(chunk) };
-          },
-          call,
-        ).catch((e) => {
-          throw <ServiceError> {
-            code: status.INTERNAL,
-            message: "Error when querying transferfiles",
-            details: e?.message,
-          };
-        }).finally(async () => {
-          stdoutStream.close();
-          await once(stdoutStream, "close");
-        });
+        const resp = await ssh.exec(cmd, [], { stream: "both" });
 
         if (resp.code !== 0) {
           throw <ServiceError> {
             code: status.INTERNAL,
-            message: "scow-sync-start command failed",
+            message: "scow-sync-query command failed",
             details: resp.stderr,
           };
         }
 
+
+        // 解析scow-sync-query返回的json数组
+        const transferInfos: TransferInfo[] = JSON.parse(resp.stdout);
+
+        console.log(transferInfos);
+        return [{ transferInfos:transferInfos }];
       });
     },
+
 
   });
 });
