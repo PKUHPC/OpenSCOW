@@ -6,7 +6,7 @@
   "bin": "build/index.js",
   "scripts": {
     "dev": "node -r ts-node/register -r tsconfig-paths/register src/index.ts",
-    "build": "rimraf build && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json && pkg --compress GZip .",
+    "build": "rimraf build && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json && pkg --compress GZip --no-bytecode --public-packages \"*\" --public .",
     "test": "echo \"Error: no test specified\""
   },
   "dependencies": {
