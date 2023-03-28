@@ -14,7 +14,7 @@ import { getConfig } from "@scow/lib-config/build/fileConfig";
 import { Static, Type } from "@sinclair/typebox";
 import { join } from "path";
 
-export const InstallationConfigSchema = Type.Object({
+export const InstallConfigSchema = Type.Object({
   port: Type.Integer({ description: "端口号", default: 80 }),
   basePath: Type.String({ description: "整个系统的部署路径", default: "/" }),
   image: Type.String({ description: "镜像", default: "ghcr.io/pkuhpc/scow/scow" }),
@@ -83,9 +83,9 @@ export const InstallationConfigSchema = Type.Object({
   }, { default: {} }),
 });
 
-export type InstallationConfigSchema = Static<typeof InstallationConfigSchema>;
+export type InstallConfigSchema = Static<typeof InstallConfigSchema>;
 
-export function getInstallationConfig(filePath: string) {
+export function getInstallConfig(filePath: string) {
 
-  return getConfig(InstallationConfigSchema, join(process.cwd(), filePath));
+  return getConfig(InstallConfigSchema, join(process.cwd(), filePath));
 }

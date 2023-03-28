@@ -25,11 +25,11 @@ yargs(hideBin(process.argv))
     configPath: {
       alias: "c",
       type: "string",
-      description: "Path to installation config",
-      default: "./installation.yaml",
+      description: "Path to install config",
+      default: "./install.yaml",
     },
   })
-  .command("view-install", "Extract installation config", (yargs) => {
+  .command("view-install", "Extract install config", (yargs) => {
     return yargs.options({
       format: {
         alias: "f",
@@ -42,13 +42,13 @@ yargs(hideBin(process.argv))
   }, (argv) => {
     viewInstall(argv);
   })
-  .command("extract-install", "Extract sample installation.yaml config", (yargs) => {
+  .command("extract-install", "Extract sample install.yaml config", (yargs) => {
     return yargs.options({
       outputPath: {
         alias: "o",
         type: "string",
-        description: "output installation.yaml path",
-        default: "./installation.yaml",
+        description: "output install.yaml path",
+        default: "./install.yaml",
       },
     });
   }, (argv) => {

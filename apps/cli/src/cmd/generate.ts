@@ -12,7 +12,7 @@
 
 import { writeFileSync } from "fs";
 import { createComposeSpec } from "src/compose";
-import { getInstallationConfig } from "src/config/installation";
+import { getInstallConfig } from "src/config/install";
 import { log } from "src/log";
 import { format } from "src/utils/formatter";
 
@@ -28,7 +28,7 @@ interface Options {
  */
 export const generateDockerComposeYml = (options: Options) => {
 
-  const config = getInstallationConfig(options.configPath);
+  const config = getInstallConfig(options.configPath);
 
   const spec = createComposeSpec(config);
 

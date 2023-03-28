@@ -11,7 +11,7 @@
  */
 
 import { runComposeCommand } from "src/compose/cmd";
-import { getInstallationConfig } from "src/config/installation";
+import { getInstallConfig } from "src/config/install";
 
 interface Options {
   configPath: string;
@@ -20,7 +20,7 @@ interface Options {
 
 export const down = (options: Options) => {
 
-  const config = getInstallationConfig(options.configPath);
+  const config = getInstallConfig(options.configPath);
 
   runComposeCommand(config, [
     "down",

@@ -11,7 +11,7 @@
  */
 
 import { runComposeCommand } from "src/compose/cmd";
-import { getInstallationConfig } from "src/config/installation";
+import { getInstallConfig } from "src/config/install";
 
 interface Options {
   configPath: string;
@@ -19,7 +19,7 @@ interface Options {
 
 export const enterDb = async (options: Options) => {
 
-  const config = getInstallationConfig(options.configPath);
+  const config = getInstallConfig(options.configPath);
 
   if (!config.mis) {
     throw new Error("MIS is not deployed. db is not deployed");

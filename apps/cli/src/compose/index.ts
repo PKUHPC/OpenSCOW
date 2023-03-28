@@ -12,7 +12,7 @@
 
 import path from "path";
 import { LoggingOption, ServiceSpec } from "src/compose/spec";
-import { InstallationConfigSchema } from "src/config/installation";
+import { InstallConfigSchema } from "src/config/install";
 
 function checkPathFormat(configKey: string, value: string) {
   if (value !== "/" && value.endsWith("/")) {
@@ -20,7 +20,7 @@ function checkPathFormat(configKey: string, value: string) {
   }
 }
 
-export const createComposeSpec = (config: InstallationConfigSchema) => {
+export const createComposeSpec = (config: InstallConfigSchema) => {
   const scowImage = `${config.image}:${config.imageTag}`;
 
   const BASE_PATH = config.basePath;

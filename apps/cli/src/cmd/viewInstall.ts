@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { getInstallationConfig } from "src/config/installation";
+import { getInstallConfig } from "src/config/install";
 import { log } from "src/log";
 import { format } from "src/utils/formatter";
 
@@ -24,6 +24,6 @@ interface Options {
  * @param options options
  */
 export const viewInstall = (options: Options) => {
-  const config = getInstallationConfig(options.configPath);
+  const config = getInstallConfig(options.configPath);
   log(format(config, options.format));
 };

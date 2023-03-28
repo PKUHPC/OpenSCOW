@@ -13,7 +13,7 @@
 import { spawnSync } from "child_process";
 import { writeFileSync } from "fs";
 import { dump } from "js-yaml";
-import { InstallationConfigSchema } from "src/config/installation";
+import { InstallConfigSchema } from "src/config/install";
 import { log as logger } from "src/log";
 
 interface Props {
@@ -53,7 +53,7 @@ export const migrateFromScowDeployment = (_options: Props) => {
   const debug = getSectionContent("DEBUG");
   const gateway = getSectionContent("GATEWAY");
 
-  const config: DeepPartial<InstallationConfigSchema> = {
+  const config: DeepPartial<InstallConfigSchema> = {
     port: common.PORT,
     basePath: common.BASE_PATH,
     image: common.IMAGE,

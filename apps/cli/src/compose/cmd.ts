@@ -14,7 +14,7 @@ import { spawnSync } from "child_process";
 import { writeFileSync } from "fs";
 import { dump } from "js-yaml";
 import { createComposeSpec } from "src/compose";
-import { InstallationConfigSchema } from "src/config/installation";
+import { InstallConfigSchema } from "src/config/install";
 import { debug } from "src/log";
 
 export function getAvailabelDockerComposeCommand() {
@@ -34,7 +34,7 @@ export function getAvailabelDockerComposeCommand() {
   throw new Error("docker compose is not available, please install docker compose first.");
 }
 
-export function runComposeCommand(config: InstallationConfigSchema, args: string[]) {
+export function runComposeCommand(config: InstallConfigSchema, args: string[]) {
 
   const dockerComposeCommand = getAvailabelDockerComposeCommand();
 
