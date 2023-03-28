@@ -107,7 +107,7 @@ export const jobServiceServer = plugin((server) => {
     getJobs: async ({ request, em, logger }) => {
 
       const { filter, page, pageSize } = ensureNotUndefined(request, ["filter"]);
-      logger.info("getJobs filter %s", JSON.stringify(filter));
+
       let sqlFilter: FilterQuery<JobInfoEntity>;
       try {
         sqlFilter = await filterJobs(filter, em);
@@ -118,8 +118,8 @@ export const jobServiceServer = plugin((server) => {
           jobs: [],
         }];
       }
-
       logger.info("getJobs sqlFilter %s", JSON.stringify(sqlFilter));
+
       const [jobs, count] = await em.findAndCount(JobInfoEntity, sqlFilter, {
         ...paginationProps(page, pageSize || 10),
         orderBy: { timeEnd: QueryOrder.DESC },
@@ -150,6 +150,7 @@ export const jobServiceServer = plugin((server) => {
       const newTenantPrice = tenantPrice ? new Decimal(moneyToNumber(tenantPrice)) : undefined;
 
       return await em.transactional(async (em) => {
+
         let sqlFilter: FilterQuery<JobInfoEntity>;
         try {
           sqlFilter = await filterJobs(filter, em);
@@ -159,9 +160,7 @@ export const jobServiceServer = plugin((server) => {
             count: 0,
           }];
         }
-        logger.info("Change sqlFilter %s", JSON.stringify(sqlFilter));
         const jobs = await em.find(JobInfoEntity, sqlFilter, {});
-        logger.info("Change jobs %s", JSON.stringify(jobs));
 
         const record = new JobPriceChange({
           jobs,

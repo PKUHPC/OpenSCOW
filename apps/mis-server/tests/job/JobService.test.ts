@@ -15,7 +15,7 @@ import { Server } from "@ddadaal/tsgrpc-server";
 import { ChannelCredentials } from "@grpc/grpc-js";
 import { SqlEntityManager } from "@mikro-orm/mysql";
 import { Decimal, moneyToNumber, numberToMoney } from "@scow/lib-decimal";
-import { JobServiceClient } from "@scow/protos/build/server/job";
+import { JobFilter, JobServiceClient } from "@scow/protos/build/server/job";
 import { createServer } from "src/app";
 import { JobInfo } from "src/entities/JobInfo";
 import { JobPriceChange } from "src/entities/JobPriceChange";
@@ -193,25 +193,27 @@ it("returns jobs starting from start_bi_job_index", async () => {
 
 });
 
-it("returns 0 jobs if Accout not exist or is not in scope of permissions", async () => {
-
+it("returns 0 job if Accout not exist or is not in scope of permissions", async () => {
   const em = server.ext.orm.em.fork();
 
   await em.persistAndFlush(range(1, 20).map((x) =>
     mockOriginalJobData(x, data.uaAA, new Decimal(20), new Decimal(10))));
 
-  const test = async (tenantName: string) => {
+  const test = async (filter: JobFilter) => {
     const client = createClient();
-
     const reply = await asyncClientCall(client, "getJobs", {
-      filter: { tenantName: tenantName, clusters: []},
+      filter,
       page: 1,
       pageSize: 10,
     });
-
     expect(reply.jobs).toHaveLength(0);
   };
 
-  await Promise.all([test("another3"), test("another4")]);
+  await Promise.all([
+    // 当用户id与账号无关时，查不到数据
+    test({ tenantName: "default2", clusters: []}),
+    // 当用户id与账号无关时，查不到数据
+    test({ tenantName: data.tenant.name, userId: "a", accountName: "hpcb", clusters: []}),
+  ]);
 
 });
