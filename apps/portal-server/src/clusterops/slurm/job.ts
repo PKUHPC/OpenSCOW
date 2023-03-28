@@ -42,7 +42,7 @@ export const slurmJobOps = (cluster: string): JobOps => {
 
         const accounts = stdout.split("\n").slice(2).map((x) => x.trim());
 
-        return accounts;
+        return [...new Set(accounts)];
       });
 
       return { accounts };
