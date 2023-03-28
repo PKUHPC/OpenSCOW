@@ -22,7 +22,5 @@ export const runCompose = (options: Options) => {
 
   const config = getInstallConfig(options.configPath);
 
-  console.log(options);
-
   runComposeCommand(config, options._.slice(1).map((x) => String(x)));
 };

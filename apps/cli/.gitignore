@@ -1,2 +1,3 @@
 config.py
-./installation.yaml
+./install.yaml
+docker-compose.yml

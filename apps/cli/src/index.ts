@@ -91,7 +91,7 @@ yargs(hideBin(process.argv))
     enterDb(argv);
   })
   .command("compose", "Run compose commands", (y) => {
-    return y.parserConfiguration({ "unknown-options-as-args": true });
+    return y.strict(false).parserConfiguration({ "unknown-options-as-args": true });
   }, (argv) => {
     runCompose(argv);
   })
