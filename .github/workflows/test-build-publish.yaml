@@ -109,9 +109,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: scow-cli
-          path: |
-            apps/cli/build/cli-arm64
-            apps/cli/build/cli-x64
+          path: apps/cli/exe
 
   build-images:
     needs: test-version-packages
