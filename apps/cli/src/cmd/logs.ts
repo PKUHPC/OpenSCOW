@@ -10,14 +10,27 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import pino from "pino";
-import { config } from "src/config/env";
+import { runComposeCommand } from "src/compose/cmd";
+import { getInstallationConfig } from "src/config/installation";
+import { logger } from "src/log";
 
-export const logger = pino({
-  level: config.LOG_LEVEL,
-  ...config.LOG_PRETTY ? {
-    transport: { target: "pino-pretty" },
-  } : {},
-  
-});
+interface Options {
+  configPath: string;
+  service: string;
+  follow: boolean;
+  _: (string | number)[];
+}
 
+export const logs = (options: Options) => {
+
+  logger.debug("Extra options: %o", options._);
+
+  const config = getInstallationConfig(options.configPath);
+
+  runComposeCommand(config, [
+    "logs",
+    options.follow ? "-f" : "",
+    ...(options._.slice(2).map((x) => String(x))),
+    options.service,
+  ]);
+};

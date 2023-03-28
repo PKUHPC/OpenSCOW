@@ -11,12 +11,9 @@
  */
 
 import { spawnSync } from "child_process";
-import { unlinkSync, writeFileSync } from "fs";
-import path from "path";
 import { createComposeSpec } from "src/compose";
 import { InstallationConfigSchema } from "src/config/installation";
 import { logger } from "src/log";
-
 
 export function getAvailabelDockerComposeCommand() {
 
@@ -42,16 +39,11 @@ export function runComposeCommand(config: InstallationConfigSchema, args: string
 
   const composeConfig = createComposeSpec(config);
 
-  // write to a local temp file
-  const tempFileName = `docker-compose-${Date.now()}.json`;
-  const tempFilePath = path.join(process.cwd(), tempFileName);
-  writeFileSync(tempFilePath, JSON.stringify(composeConfig));
-
-  logger.debug("Written compose file to %s", tempFilePath);
-
-  const resp = spawnSync(dockerComposeCommand, ["-f", tempFilePath, ...args], { shell: true, stdio: "inherit" });
-
-  unlinkSync(tempFilePath);
+  const resp = spawnSync(
+    dockerComposeCommand,
+    args,
+    { input: JSON.stringify(composeConfig), shell: true, stdio: "inherit" },
+  );
 
   return resp;
 

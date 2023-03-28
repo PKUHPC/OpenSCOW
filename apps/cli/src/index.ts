@@ -15,6 +15,7 @@ import { viewInstallationConfig } from "src/cmd/config/installation";
 import { enterDb } from "src/cmd/db";
 import { down } from "src/cmd/down";
 import { generateDockerComposeYml } from "src/cmd/generate";
+import { logs } from "src/cmd/logs";
 import { pull } from "src/cmd/pull";
 import { up } from "src/cmd/up";
 import { hideBin } from "yargs/helpers";
@@ -97,6 +98,24 @@ yargs(hideBin(process.argv))
     });
   }, (argv) => {
     pull(argv);
+  })
+  .command("logs <service>", "View logs", (y) => {
+    return y
+      .positional("service", {
+        type: "string",
+        description: "Service name",
+      })
+      .demandOption("service")
+      .options({
+        follow: {
+          alias: "f",
+          type: "boolean",
+          description: "Follow log output.",
+          default: false,
+        },
+      });
+  }, (argv) => {
+    logs(argv);
   })
   .completion()
   .strict()
