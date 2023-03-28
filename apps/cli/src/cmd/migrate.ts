@@ -14,6 +14,7 @@ import { spawnSync } from "child_process";
 import { writeFileSync } from "fs";
 import { dump } from "js-yaml";
 import { InstallationConfigSchema } from "src/config/installation";
+import { log as logger } from "src/log";
 
 interface Props {
   configPyPath: string;
@@ -103,5 +104,5 @@ export const migrateFromScowDeployment = (_options: Props) => {
 
   writeFileSync("installation.yaml", data);
 
-  log("config.py migrated to installation.yaml");
+  logger("installation.yaml is created based on config.py. Migration completed.");
 };

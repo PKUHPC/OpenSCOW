@@ -13,5 +13,5 @@
 import debugPkg from "debug";
 
 export const debug = debugPkg("scow:cli");
-export const log = (msg: string, ...args: string[]) => console.log(msg, args);
+export const log = (msg: string, ...args: string[]) => console.log(msg, ...args);
 
