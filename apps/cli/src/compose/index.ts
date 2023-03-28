@@ -48,9 +48,9 @@ export const createComposeSpec = (config: InstallationConfigSchema) => {
     name: string,
     options: {
       image: string,
-      environment: Record<string, string>,
-      ports: Record<string, number>,
-      volumes: Record<string, string>,
+      environment: string[] | Record<string, string>,
+      ports: string[] | Record<string, number>,
+      volumes: string [] | Record<string, string>,
       depends_on?: string[],
     },
   ) => {
@@ -65,12 +65,16 @@ export const createComposeSpec = (config: InstallationConfigSchema) => {
         },
       } : undefined;
 
+    function toStringArray(dict: Record<string, string | number>, splitter: string) {
+      return Object.entries(dict).map(([from, to]) => `${from}${splitter}${to}`);
+    }
+
     composeSpec.services[name] = {
       restart: "unless-stopped",
-      environment: Object.entries(options.environment).map(([key, val]) => `${key}=${val}`),
-      ports: Object.entries(options.ports).map(([from, to]) => `${from}:${to}`),
+      environment: Array.isArray(options.environment) ? options.environment : toStringArray(options.environment, "="),
+      ports: Array.isArray(options.ports) ? options.ports : toStringArray(options.ports, ":"),
       image: options.image,
-      volumes: Object.entries(options.volumes).map(([from, to]) => `${from}:${to}`),
+      volumes: Array.isArray(options.volumes) ? options.volumes : toStringArray(options.volumes, ":"),
       depends_on: options.depends_on,
       logging,
     };
@@ -95,7 +99,7 @@ export const createComposeSpec = (config: InstallationConfigSchema) => {
 
   addService("redis", {
     image: config.auth.redisImage,
-    ports: config.auth.publicPorts?.redis ? { [config.auth.publicPorts?.redis]: 6379 } : {},
+    ports: config.auth.portMappings?.redis ? { [config.auth.portMappings?.redis]: 6379 } : {},
     environment: {},
     volumes: {},
   });
@@ -114,7 +118,7 @@ export const createComposeSpec = (config: InstallationConfigSchema) => {
     addService("auth", {
       image: config.auth.custom.image,
       ports: config.auth.custom.ports ?? {},
-      environment: config.auth.custom.env ?? {},
+      environment: config.auth.custom.environment ?? {},
       volumes: authVolumes,
     });
   } else {
@@ -125,7 +129,7 @@ export const createComposeSpec = (config: InstallationConfigSchema) => {
         "BASE_PATH": BASE_PATH,
         ...serviceLogEnv,
       },
-      ports: config.auth.publicPorts?.auth ? { [config.auth.publicPorts?.auth]: 5000 } : {},
+      ports: config.auth.portMappings?.auth ? { [config.auth.portMappings?.auth]: 5000 } : {},
       volumes: authVolumes,
     });
   }
@@ -138,7 +142,7 @@ export const createComposeSpec = (config: InstallationConfigSchema) => {
         SCOW_LAUNCH_APP: "portal-server",
         ...serviceLogEnv,
       },
-      ports: config.portal.publicPorts?.portalServer ? { [config.portal.publicPorts.portalServer]: 5000 } : {},
+      ports: config.portal.portMappings?.portalServer ? { [config.portal.portMappings.portalServer]: 5000 } : {},
       volumes: {
         "/etc/hosts": "/etc/hosts",
         "./config": "/etc/scow",
@@ -176,7 +180,7 @@ export const createComposeSpec = (config: InstallationConfigSchema) => {
   if (config.mis) {
     addService("mis-server", {
       image: scowImage,
-      ports: config.mis.publicPorts?.misServer ? { [config.mis.publicPorts.misServer]: 5000 } : {},
+      ports: config.mis.portMappings?.misServer ? { [config.mis.portMappings.misServer]: 5000 } : {},
       environment: {
         "SCOW_LAUNCH_APP": "mis-server",
         "DB_PASSWORD": config.mis.dbPassword,
@@ -215,7 +219,7 @@ export const createComposeSpec = (config: InstallationConfigSchema) => {
       environment: {
         "MYSQL_ROOT_PASSWORD": config.mis.dbPassword,
       },
-      ports: config.mis.publicPorts?.db ? { [config.mis.publicPorts?.db]: 3306 } : {},
+      ports: config.mis.portMappings?.db ? { [config.mis.portMappings?.db]: 3306 } : {},
     });
   }
 

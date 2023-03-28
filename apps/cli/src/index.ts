@@ -10,15 +10,12 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { runCompose } from "src/cmd/compose";
 import { enterDb } from "src/cmd/db";
-import { down } from "src/cmd/down";
 import { extractConfig } from "src/cmd/extractConfig";
 import { extractInstallConfig } from "src/cmd/extractInstall";
 import { generateDockerComposeYml } from "src/cmd/generate";
-import { logs } from "src/cmd/logs";
 import { migrateFromScowDeployment } from "src/cmd/migrate";
-import { pull } from "src/cmd/pull";
-import { up } from "src/cmd/up";
 import { viewInstall } from "src/cmd/viewInstall";
 import { hideBin } from "yargs/helpers";
 import yargs from "yargs/yargs";
@@ -93,35 +90,10 @@ yargs(hideBin(process.argv))
   .command("db", "Enter mis db", (y) => y, (argv) => {
     enterDb(argv);
   })
-  .command("up", "Start SCOW services", (y) => {
-    return y.options({
-      detach: {
-        alias: "d",
-        type: "boolean",
-        description: "Detached mode: Run containers in the background",
-        default: false,
-      },
-    });
+  .command("compose", "Run compose commands", (y) => {
+    return y.parserConfiguration({ "unknown-options-as-args": true });
   }, (argv) => {
-    up(argv);
-  })
-  .command("down", "Stop SCOW services", (y) => {
-    return y.options({
-    });
-  }, (argv) => {
-    down(argv);
-  })
-  .command("pull", "Pull images to update SCOW", (y) => {
-    return y.options({
-      scowOnly: {
-        alias: "s",
-        type: "boolean",
-        description: "Only pull SCOW image",
-        default: false,
-      },
-    });
-  }, (argv) => {
-    pull(argv);
+    runCompose(argv);
   })
   .command("migrate", "Migrate from scow-deployment", (y) => {
     return y.options({
@@ -133,24 +105,6 @@ yargs(hideBin(process.argv))
     });
   }, (argv) => {
     migrateFromScowDeployment(argv);
-  })
-  .command("logs <service>", "View logs", (y) => {
-    return y
-      .positional("service", {
-        type: "string",
-        description: "Service name",
-      })
-      .demandOption("service")
-      .options({
-        follow: {
-          alias: "f",
-          type: "boolean",
-          description: "Follow log output.",
-          default: false,
-        },
-      });
-  }, (argv) => {
-    logs(argv);
   })
   .completion()
   .strict()

@@ -10,11 +10,9 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import fs, { writeFileSync } from "fs";
-import { dump } from "js-yaml";
+import fs, { cpSync } from "fs";
 import { join } from "path";
 import prompt from "prompts";
-import { getInstallationConfig } from "src/config/installation";
 import { debug, log } from "src/log";
 
 
@@ -22,6 +20,8 @@ interface Options {
   configPath: string;
   outputPath: string;
 }
+
+const SAMPLE_INSTLLATION = "assets/install.yaml";
 
 export const extractInstallConfig = async (options: Options) => {
 
@@ -41,7 +41,5 @@ export const extractInstallConfig = async (options: Options) => {
     }
   }
 
-  const config = getInstallationConfig(options.configPath);
-
-  writeFileSync(fullPath, dump(config), { encoding: "utf-8" });
+  cpSync(SAMPLE_INSTLLATION, fullPath);
 };

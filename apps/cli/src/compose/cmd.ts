@@ -35,6 +35,7 @@ export function getAvailabelDockerComposeCommand() {
 }
 
 export function runComposeCommand(config: InstallationConfigSchema, args: string[]) {
+
   const dockerComposeCommand = getAvailabelDockerComposeCommand();
 
   debug("Using %s to run docker compose commands", dockerComposeCommand);

@@ -40,7 +40,7 @@ export const InstallationConfigSchema = Type.Object({
     basePath: Type.String({ description: "门户系统的部署路径，相对于整个系统的basePath", default: "/" }),
     novncClientImage: Type.String({ description: "novnc客户端镜像", default: "ghcr.io/pkuhpc/novnc-client-docker:master" }),
 
-    publicPorts: Type.Optional(Type.Object({
+    portMappings: Type.Optional(Type.Object({
       portalServer: Type.Optional(Type.Union([Type.String(), Type.Integer()], {
         description: "portal-server映射出来的端口",
       })),
@@ -53,7 +53,7 @@ export const InstallationConfigSchema = Type.Object({
     basePath: Type.String({ description: "管理系统的部署路径，相对于整个系统的", default: "/" }),
     dbPassword: Type.String({ description: "管理系统数据库密码", default: "must!chang3this" }),
 
-    publicPorts: Type.Optional(Type.Object({
+    portMappings: Type.Optional(Type.Object({
       db: Type.Optional(Type.Union([Type.String(), Type.Integer()], { description: "数据库映射出来的端口" })),
       misServer: Type.Optional(Type.Union([Type.String(), Type.Integer()], {
         description: "mis-server映射出来的端口",
@@ -65,7 +65,7 @@ export const InstallationConfigSchema = Type.Object({
 
     redisImage: Type.String({ description: "认证系统redis镜像", default: "redis:alpine" }),
 
-    publicPorts: Type.Optional(Type.Object({
+    portMappings: Type.Optional(Type.Object({
       redis: Type.Optional(Type.Union([Type.String(), Type.Integer()], { description: "redis服务映射出来的端口" })),
       auth: Type.Optional(Type.Union([Type.String(), Type.Integer()], {
         description: "自带认证系统映射出来的端口，对自定义认证系统无效",
@@ -74,9 +74,9 @@ export const InstallationConfigSchema = Type.Object({
 
     custom: Type.Optional(Type.Object({
       image: Type.String({ description: "认证系统镜像" }),
-      ports: Type.Optional(Type.Record(Type.String(), Type.Integer(), { description: "端口映射" })),
-      env: Type.Optional(Type.Record(Type.String(), Type.String(), { description: "环境变量" })),
-      volumes: Type.Optional(Type.Record(Type.String(), Type.String(), {
+      ports: Type.Optional(Type.Array(Type.String(), { description: "端口映射" })),
+      environment: Type.Optional(Type.Array(Type.String(), { description: "环境变量" })),
+      volumes: Type.Optional(Type.Array(Type.String(), {
         description: "更多挂载卷。默认添加/etc/hosts:/etc/hosts和./config:/etc/scow",
       })),
     }, { description: "自定义认证系统配置" })),
