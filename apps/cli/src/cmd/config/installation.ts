@@ -11,6 +11,7 @@
  */
 
 import { getInstallationConfig } from "src/config/installation";
+import { log } from "src/log";
 
 interface Options {
   configPath: string;
@@ -22,5 +23,5 @@ interface Options {
  */
 export const viewInstallationConfig = (options: Options) => {
   const config = getInstallationConfig(options.configPath);
-  console.log(JSON.stringify(config, null, 2));
+  log(JSON.stringify(config, null, 2));
 };

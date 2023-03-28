@@ -13,7 +13,7 @@
 import { spawnSync } from "child_process";
 import { createComposeSpec } from "src/compose";
 import { InstallationConfigSchema } from "src/config/installation";
-import { logger } from "src/log";
+import { debug } from "src/log";
 
 export function getAvailabelDockerComposeCommand() {
 
@@ -35,7 +35,7 @@ export function getAvailabelDockerComposeCommand() {
 export function runComposeCommand(config: InstallationConfigSchema, args: string[]) {
   const dockerComposeCommand = getAvailabelDockerComposeCommand();
 
-  logger.debug("Using %s to run docker compose commands", dockerComposeCommand);
+  debug("Using %s to run docker compose commands", dockerComposeCommand);
 
   const composeConfig = createComposeSpec(config);
 

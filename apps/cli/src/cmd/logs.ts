@@ -12,7 +12,6 @@
 
 import { runComposeCommand } from "src/compose/cmd";
 import { getInstallationConfig } from "src/config/installation";
-import { logger } from "src/log";
 
 interface Options {
   configPath: string;
@@ -22,8 +21,6 @@ interface Options {
 }
 
 export const logs = (options: Options) => {
-
-  logger.debug("Extra options: %o", options._);
 
   const config = getInstallationConfig(options.configPath);
 

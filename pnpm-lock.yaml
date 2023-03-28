@@ -127,25 +127,25 @@ importers:
     specifiers:
       '@scow/lib-config': workspace:*
       '@sinclair/typebox': 0.26.5
+      '@types/debug': 4.1.7
       '@types/js-yaml': 4.0.5
       '@types/prompts': 2.4.3
       '@types/yargs': 17.0.22
+      debug: 4.3.4
       js-yaml: 4.1.0
-      pino: 8.11.0
-      pino-pretty: 10.0.0
       pkg: 5.8.1
       prompts: 2.4.2
       yargs: 17.7.1
     dependencies:
       '@scow/lib-config': link:../../libs/libconfig
       '@sinclair/typebox': 0.26.5
+      debug: 4.3.4
       js-yaml: 4.1.0
-      pino: 8.11.0
-      pino-pretty: 10.0.0
       pkg: 5.8.1
       prompts: 2.4.2
       yargs: 17.7.1
     devDependencies:
+      '@types/debug': 4.1.7
       '@types/js-yaml': 4.0.5
       '@types/prompts': 2.4.3
       '@types/yargs': 17.0.22

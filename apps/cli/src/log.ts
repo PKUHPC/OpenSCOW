@@ -10,14 +10,8 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import pino from "pino";
-import { config } from "src/config/env";
+import debugPkg from "debug";
 
-export const logger = pino({
-  level: config.LOG_LEVEL,
-  ...config.LOG_PRETTY ? {
-    transport: { target: "pino-pretty" },
-  } : {},
-
-});
+export const debug = debugPkg("scow:cli");
+export const log = (msg: string, ...args: string[]) => console.log(msg, args);
 
