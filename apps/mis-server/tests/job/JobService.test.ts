@@ -192,3 +192,26 @@ it("returns jobs starting from start_bi_job_index", async () => {
   expect(reply.jobs).toHaveLength(30);
 
 });
+
+it("returns 0 jobs if Accout not exist or is not in scope of permissions", async () => {
+
+  const em = server.ext.orm.em.fork();
+
+  await em.persistAndFlush(range(1, 20).map((x) =>
+    mockOriginalJobData(x, data.uaAA, new Decimal(20), new Decimal(10))));
+
+  const test = async (tenantName: string) => {
+    const client = createClient();
+
+    const reply = await asyncClientCall(client, "getJobs", {
+      filter: { tenantName: tenantName, clusters: []},
+      page: 1,
+      pageSize: 10,
+    });
+
+    expect(reply.jobs).toHaveLength(0);
+  };
+
+  await Promise.all([test("another3"), test("another4")]);
+
+});

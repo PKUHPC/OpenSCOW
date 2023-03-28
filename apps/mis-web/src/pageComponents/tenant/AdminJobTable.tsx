@@ -91,7 +91,9 @@ export const AdminJobTable: React.FC<Props> = () => {
           form={form}
           initialValues={query}
           onFinish={async () => {
-            setQuery(await form.validateFields());
+            const currentQuery = await form.validateFields();
+            setQuery(currentQuery);
+            setPageInfo({ page: 1, pageSize: pageInfo.pageSize });
           }}
         >
           <FilterFormTabs

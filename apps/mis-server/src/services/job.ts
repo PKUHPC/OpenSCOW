@@ -67,9 +67,18 @@ async function filterJobs({
   jobEndTimeStart, jobId, userId, startBiJobIndex,
 }: JobFilter, em: SqlEntityManager<MySqlDriver>) {
 
-  const accountNames = (accountName === undefined && userId === undefined)
-    ? (await em.find(Account, { tenant: { name: tenantName } }, { fields: ["accountName"]})).map((x) => x.accountName)
-    : accountName;
+  // 查询当前租户下的账户，操作权限仅在这些账户内
+  const permissionAccounts = (await em.find(Account, { tenant: { name: tenantName } }, { fields: ["accountName"]}))
+    .map((x) => x.accountName);
+
+  if (accountName && !permissionAccounts.includes(accountName)) {
+    throw <ServiceError> {
+      code: status.PERMISSION_DENIED,
+      message: `Accout ${accountName} not exist or is not in scope of permissions`,
+    };
+  }
+
+  const accountNames = accountName === undefined ? permissionAccounts : accountName;
 
   return {
     ...startBiJobIndex ? { biJobIndex: { $gte: startBiJobIndex } } : {},
@@ -78,6 +87,7 @@ async function filterJobs({
     ...jobId
       ? {
         idJob: jobId,
+        ...accountNames === undefined ? {} : { account: accountNames },
       } : {
         ...accountNames === undefined ? {} : { account: accountNames },
         ...(jobEndTimeEnd || jobEndTimeStart) ? {
@@ -94,12 +104,22 @@ export const jobServiceServer = plugin((server) => {
 
   server.addService<JobServiceServer>(JobServiceService, {
 
-    getJobs: async ({ request, em }) => {
+    getJobs: async ({ request, em, logger }) => {
 
       const { filter, page, pageSize } = ensureNotUndefined(request, ["filter"]);
+      logger.info("getJobs filter %s", JSON.stringify(filter));
+      let sqlFilter: FilterQuery<JobInfoEntity>;
+      try {
+        sqlFilter = await filterJobs(filter, em);
+      } catch (e) {
+        // 如果查询条件出错，说明权限不够或没有数据，直接返回
+        return [{
+          totalCount: 0,
+          jobs: [],
+        }];
+      }
 
-      const sqlFilter = await filterJobs(filter, em);
-
+      logger.info("getJobs sqlFilter %s", JSON.stringify(sqlFilter));
       const [jobs, count] = await em.findAndCount(JobInfoEntity, sqlFilter, {
         ...paginationProps(page, pageSize || 10),
         orderBy: { timeEnd: QueryOrder.DESC },
@@ -130,8 +150,18 @@ export const jobServiceServer = plugin((server) => {
       const newTenantPrice = tenantPrice ? new Decimal(moneyToNumber(tenantPrice)) : undefined;
 
       return await em.transactional(async (em) => {
-
-        const jobs = await em.find(JobInfoEntity, await filterJobs(filter, em), {});
+        let sqlFilter: FilterQuery<JobInfoEntity>;
+        try {
+          sqlFilter = await filterJobs(filter, em);
+        } catch (e) {
+          // 如果查询条件出错，说明权限不够或没有数据，直接返回
+          return [{
+            count: 0,
+          }];
+        }
+        logger.info("Change sqlFilter %s", JSON.stringify(sqlFilter));
+        const jobs = await em.find(JobInfoEntity, sqlFilter, {});
+        logger.info("Change jobs %s", JSON.stringify(jobs));
 
         const record = new JobPriceChange({
           jobs,
