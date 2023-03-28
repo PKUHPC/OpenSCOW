@@ -15,6 +15,7 @@ import { viewInstallationConfig } from "src/cmd/config/installation";
 import { enterDb } from "src/cmd/db";
 import { down } from "src/cmd/down";
 import { generateDockerComposeYml } from "src/cmd/generate";
+import { pull } from "src/cmd/pull";
 import { up } from "src/cmd/up";
 import { hideBin } from "yargs/helpers";
 import yargs from "yargs/yargs";
@@ -91,11 +92,11 @@ yargs(hideBin(process.argv))
   }, (argv) => {
     down(argv);
   })
-  .command("down", "Stop SCOW", (y) => {
+  .command("pull", "Stop SCOW", (y) => {
     return y.options({
     });
   }, (argv) => {
-    down(argv);
+    pull(argv);
   })
   .completion()
   .strict()
