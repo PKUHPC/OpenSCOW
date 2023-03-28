@@ -19,7 +19,7 @@ import { logs } from "src/cmd/logs";
 import { migrateFromScowDeployment } from "src/cmd/migrate";
 import { pull } from "src/cmd/pull";
 import { up } from "src/cmd/up";
-import { viewInstallationConfig } from "src/cmd/view-config";
+import { viewInstall } from "src/cmd/viewInstall";
 import { hideBin } from "yargs/helpers";
 import yargs from "yargs/yargs";
 
@@ -32,10 +32,18 @@ yargs(hideBin(process.argv))
       default: "./installation.yaml",
     },
   })
-  .command("view-config", "Extract installation config", (yargs) => {
-    return yargs;
+  .command("view-install", "Extract installation config", (yargs) => {
+    return yargs.options({
+      format: {
+        alias: "f",
+        type: "string",
+        choices: ["yaml", "json"],
+        description: "输出格式",
+        default: "yaml",
+      },
+    });
   }, (argv) => {
-    viewInstallationConfig(argv);
+    viewInstall(argv);
   })
   .command("extract-install", "Extract sample installation.yaml config", (yargs) => {
     return yargs.options({

@@ -10,18 +10,18 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { getInstallationConfig } from "src/config/installation";
-import { log } from "src/log";
+import { dump } from "js-yaml";
 
-interface Options {
-  configPath: string;
-}
-
-/**
- * Output sample config files to outputPath
- * @param options options
- */
-export const viewInstallationConfig = (options: Options) => {
-  const config = getInstallationConfig(options.configPath);
-  log(JSON.stringify(config, null, 2));
+const formatters: Record<string, (value: any) => string> = {
+  "json": JSON.stringify,
+  "yaml": dump,
 };
+
+export const format = (value: any, format: string) => {
+  const formatter = formatters[format];
+
+  if (!formatter) { throw new Error("Unknown format " + format); }
+
+  return formatter(value);
+};
+

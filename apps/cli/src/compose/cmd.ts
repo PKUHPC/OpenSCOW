@@ -11,6 +11,8 @@
  */
 
 import { spawnSync } from "child_process";
+import { writeFileSync } from "fs";
+import { dump } from "js-yaml";
 import { createComposeSpec } from "src/compose";
 import { InstallationConfigSchema } from "src/config/installation";
 import { debug } from "src/log";
@@ -18,13 +20,13 @@ import { debug } from "src/log";
 export function getAvailabelDockerComposeCommand() {
 
   // check if docker compose is available
-  const r1 = spawnSync("docker compose", { shell: true, stdio: "ignore" });
-  if (!r1.error) {
+  const r1 = spawnSync("docker compose", { shell: true, stdio: "pipe" });
+  if (!r1.error && !r1.output.toString().includes("is not a docker command")) {
     return "docker compose";
   }
 
   // check if docker-compose is available
-  const r2 = spawnSync("docker-compose", { shell: true, stdio: "ignore" });
+  const r2 = spawnSync("docker-compose", { shell: true, stdio: "pipe" });
   if (!r2.error) {
     return "docker-compose";
   }
@@ -39,12 +41,13 @@ export function runComposeCommand(config: InstallationConfigSchema, args: string
 
   const composeConfig = createComposeSpec(config);
 
-  const resp = spawnSync(
+  writeFileSync("docker-compose.yml", dump(composeConfig), { encoding: "utf-8" });
+  debug("Generated docker-compose.yml");
+
+  spawnSync(
     dockerComposeCommand,
     args,
-    { input: JSON.stringify(composeConfig), shell: true, stdio: "inherit" },
+    { shell: true, stdio: "inherit" },
   );
-
-  return resp;
 
 }
