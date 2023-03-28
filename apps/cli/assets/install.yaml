@@ -22,9 +22,9 @@
 #   # novncClientImage: ghcr.io/pkuhpc/novnc-client-docker:master
 
 #   # 端口映射。如果不进行二次开发，请勿开放
-#   portMappings:
-#     # portal-server的5000映射到。不填写则不映射
-#     # portalServer: 127.0.0.1:7572
+#   # portMappings:
+#   #   # portal-server的5000映射到。不填写则不映射
+#   #   # portalServer: 127.0.0.1:7572
 
 # 管理系统相关配置。默认不部署
 # 如果不部署，请删除或者注释整个部分
