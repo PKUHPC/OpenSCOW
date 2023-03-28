@@ -24,6 +24,13 @@ COMMON = {
   "IMAGE_TAG": "master",
 }
 
+# ------- 网关配置 -------
+#
+# GATEWAY.UPLOAD_FILE_SIZE_LIMIT：限制整个系统上传（请求）文件的大小，可接受的格式为nginx的client_max_body_size可接受的值，默认为1G
+# GATEWAY = {
+#   "UPLOAD_FILE_SIZE_LIMIT": "1G",
+# }
+
 # ------- 日志配置 -------
 #
 # LOG.LEVEL: 日志等级，可选trace, debug, info, warn, error。默认info
