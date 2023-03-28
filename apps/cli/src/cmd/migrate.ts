@@ -51,12 +51,17 @@ export const migrateFromScowDeployment = (_options: Props) => {
   const mis = getSectionContent("MIS");
   const auth = getSectionContent("AUTH");
   const debug = getSectionContent("DEBUG");
+  const gateway = getSectionContent("GATEWAY");
 
   const config: DeepPartial<InstallationConfigSchema> = {
     port: common.PORT,
     basePath: common.BASE_PATH,
     image: common.IMAGE,
     imageTag: common.IMAGE_TAG,
+
+    gateway: gateway ? {
+      uploadFileSizeLimit: gateway.UPLOAD_FILE_SIZE_LIMIT,
+    } : undefined,
 
     portal: portal ? {
       basePath: portal.BASE_PATH,

@@ -85,6 +85,7 @@ export const createComposeSpec = (config: InstallationConfigSchema) => {
       "BASE_PATH": BASE_PATH == "/" ? "" : BASE_PATH,
       "PORTAL_PATH": PORTAL_PATH,
       "MIS_PATH": MIS_PATH,
+      "CLIENT_MAX_BODY_SIZE": config.gateway.uploadFileSizeLimit,
     },
     ports: { [config.port]: 80 },
     volumes: { "/etc/hosts": "/etc/hosts" },
@@ -154,6 +155,7 @@ export const createComposeSpec = (config: InstallationConfigSchema) => {
         "MIS_DEPLOYED": config.mis ? "true" : "false",
         "AUTH_EXTERNAL_URL": path.join(BASE_PATH, "/auth"),
         "NOVNC_CLIENT_URL": path.join(BASE_PATH, "/vnc"),
+        "CLIENT_MAX_BODY_SIZE": config.gateway.uploadFileSizeLimit,
       },
       ports: {},
       volumes: {
