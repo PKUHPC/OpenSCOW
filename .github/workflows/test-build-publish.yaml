@@ -105,11 +105,17 @@ jobs:
       - name: Build scow-cli
         run: pnpm build "--filter=@scow/cli"
 
-      - name: Archive scow-cli
+      - name: Archive scow-cli-x64
         uses: actions/upload-artifact@v3
         with:
-          name: scow-cli
-          path: apps/cli/exe
+          name: scow-cli-x64
+          path: apps/cli/exe/cli-x64
+
+      - name: Archive scow-cli-arm64
+        uses: actions/upload-artifact@v3
+        with:
+          name: scow-cli-arm64
+          path: apps/cli/exe/cli-arm64
 
   build-images:
     needs: test-version-packages
