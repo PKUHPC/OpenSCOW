@@ -48,6 +48,10 @@ PubkeyAcceptedKeyTypes=+ssh-rsa
 
 请通过以下方法下载scow-cli：
 
+- [GitHub Release](https://github.com/PKUHPC/SCOW/releases): SCOW每次发布新的版本时，将会将此版本的`scow-cli`上传到Release中
+
+想获取最新的scow-cli版本？您可以从GitHub Actions的[`Test, Build and Publish Projects` workflow](https://github.com/PKUHPC/SCOW/actions/workflows/test-build-publish.yaml)中下载到上传到Archive的`scow-cli`。
+
 ## 准备配置文件
 
 运行以下命令生成示例配置文件：
