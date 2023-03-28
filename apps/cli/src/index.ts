@@ -12,9 +12,8 @@
 
 import { runCompose } from "src/cmd/compose";
 import { enterDb } from "src/cmd/db";
-import { extractConfig } from "src/cmd/extractConfig";
-import { extractInstallConfig } from "src/cmd/extractInstall";
 import { generateDockerComposeYml } from "src/cmd/generate";
+import { init } from "src/cmd/init";
 import { migrateFromScowDeployment } from "src/cmd/migrate";
 import { viewInstall } from "src/cmd/viewInstall";
 import { hideBin } from "yargs/helpers";
@@ -42,30 +41,17 @@ yargs(hideBin(process.argv))
   }, (argv) => {
     viewInstall(argv);
   })
-  .command("extract-install", "Extract sample install.yaml config", (yargs) => {
+  .command("init", "Extract sample config files", (yargs) => {
     return yargs.options({
       outputPath: {
         alias: "o",
         type: "string",
-        description: "output install.yaml path",
-        default: "./install.yaml",
+        description: "output path",
+        default: ".",
       },
     });
   }, (argv) => {
-    extractInstallConfig(argv);
-  })
-  .command("extract-config", "Extract sample SCOW config files", (yargs) => {
-    return yargs
-      .options({
-        outputPath: {
-          alias: "o",
-          type: "string",
-          description: "output dir",
-          default: "./config",
-        },
-      });
-  }, async (argv) => {
-    await extractConfig(argv);
+    init(argv);
   })
   .command("generate", "Generate docker-compose.yml", (yargs) => {
     return yargs

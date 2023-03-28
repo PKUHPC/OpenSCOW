@@ -50,14 +50,11 @@ PubkeyAcceptedKeyTypes=+ssh-rsa
 
 ## 准备配置文件
 
-运行以下命令生成相关示例配置文件
+运行以下命令生成示例配置文件：
 
 ```bash
-# 生成安装配置文件./install.yaml
-./cli extract-install
-
-# 生成SCOW示例配置文件./config目录
-./cli extract-config
+# 生成安装配置文件./install.yaml和示例配置文件目录./config
+./cli init
 ```
 
 ## 配置

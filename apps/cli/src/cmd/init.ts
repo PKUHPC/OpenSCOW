@@ -10,33 +10,29 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import fs from "fs";
+import { existsSync, promises } from "fs";
 import { join } from "path";
 import prompt from "prompts";
 import { debug, log } from "src/log";
+
 
 interface Options {
   configPath: string;
   outputPath: string;
 }
 
-const EXAMPLE_CONFIG_PATH = "assets/config-example";
+const SAMPLE_INSTALLATION = "assets/install.yaml";
+const SAMPLE_CONFIG_PATH = "assets/config";
 
-/**
- * Output sample config files to outputPath
- * @param options options
- */
-export const extractConfig = async (options: Options) => {
+async function cpWarn(file: string, targetDir: string) {
 
-  const fullPath = join(process.cwd(), options.outputPath);
+  const targetPath = join(targetDir, file);
 
-  log("Output path is " + fullPath);
-
-  if (fs.existsSync(options.outputPath)) {
+  if (existsSync(targetPath)) {
     const answer = await prompt({
       type: "confirm",
       name: "continue",
-      message: `Output path ${fullPath} already exists. Continue?`,
+      message: `Output path ${targetPath} already exists. Continue?`,
     });
     if (!answer.continue) {
       debug("Selected no.");
@@ -44,5 +40,16 @@ export const extractConfig = async (options: Options) => {
     }
   }
 
-  await fs.promises.cp(EXAMPLE_CONFIG_PATH, fullPath, { recursive: true });
+  await promises.cp(file, targetPath, { recursive: true });
+
+}
+
+export const init = async (options: Options) => {
+
+  const fullPath = join(process.cwd(), options.outputPath);
+
+  log("Output path is %s. ", fullPath);
+
+  await cpWarn(SAMPLE_INSTALLATION, fullPath);
+  await cpWarn(SAMPLE_CONFIG_PATH, fullPath);
 };
