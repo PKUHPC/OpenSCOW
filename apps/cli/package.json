@@ -1,7 +1,7 @@
 {
   "name": "@scow/cli",
   "version": "0.3.0",
-  "description": "",
+  "description": "CLI to manage SCOW",
   "main": "build/index.js",
   "bin": "build/index.js",
   "scripts": {
