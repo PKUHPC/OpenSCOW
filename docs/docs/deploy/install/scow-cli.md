@@ -4,7 +4,7 @@ title: scow-cli
 description: 使用scow-cli管理SCOW集群
 ---
 
-scow-cli是新一代的SCOW集群安装、配置和管理工具，您可以使用scow-cli高效管理您的集群。
+scow-cli是SCOW集群安装、配置和管理工具，您可以使用scow-cli高效管理您的集群。
 
 # 下载
 
@@ -22,7 +22,8 @@ scow-cli使用运行目录下的`install.yaml`作为配置来管理集群，但�
 
 ```bash
 # docker compose 操作
-# 每次运行此操作时，cli将会在本目录下创建docker-compose.yml文件，以保证此文件内容最新
+# 每次运行此操作时，cli将会在本目录下创建一个临时的docker-compose-{时间戳}.yml文件，运行结束后会删除此文件
+# 以保证此文件内容最新
 # 在compose后跟任意compose参数，例如
 # 启动集群
 ./cli compose up -d
@@ -30,6 +31,9 @@ scow-cli使用运行目录下的`install.yaml`作为配置来管理集群，但�
 ./cli compose down
 # 更新镜像
 ./cli compose pull
+
+# 生成docker-compose.yml文件
+./cli generate -o docker-compose.yml
 
 # 进入数据库
 ./cli db
