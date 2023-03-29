@@ -10,14 +10,21 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import dotenv from "dotenv";
+import { readFileSync } from "fs";
 import { runCompose } from "src/cmd/compose";
 import { enterDb } from "src/cmd/db";
 import { generateDockerComposeYml } from "src/cmd/generate";
 import { init } from "src/cmd/init";
 import { migrateFromScowDeployment } from "src/cmd/migrate";
+import { updateCli } from "src/cmd/updateCli";
 import { viewInstall } from "src/cmd/viewInstall";
 import { hideBin } from "yargs/helpers";
 import yargs from "yargs/yargs";
+
+dotenv.config();
+
+const version = JSON.parse(readFileSync("package.json", "utf-8")).version;
 
 yargs(hideBin(process.argv))
   .options({
@@ -52,6 +59,32 @@ yargs(hideBin(process.argv))
     });
   }, (argv) => {
     init(argv);
+  })
+  .command("update", "Update cli", (yargs) => {
+    return yargs.options({
+      pr: {
+        type: "number",
+        description: "Pull request number",
+        conflicts: ["branch", "version"],
+      },
+      branch: {
+        type: "string",
+        description: "Branch name",
+        conflicts: ["pr", "version"],
+      },
+      ver: {
+        type: "string",
+        description: "Version number",
+        conflicts: ["branch", "pr"],
+      },
+      downloadPath: {
+        alias: "o",
+        type: "string",
+        description: "Download path. If not specified, the cli itself will be replaced",
+      },
+    });
+  }, (argv) => {
+    updateCli(argv);
   })
   .command("generate", "Generate docker-compose.yml", (yargs) => {
     return yargs
@@ -94,7 +127,7 @@ yargs(hideBin(process.argv))
   })
   .completion()
   .strict()
-  .scriptName("scow-cli")
+  .scriptName("scow-cli v" + version)
   .demandCommand()
   .help()
   .argv;
