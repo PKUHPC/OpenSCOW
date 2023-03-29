@@ -15,6 +15,7 @@ import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError, status } from "@grpc/grpc-js";
 import { sftpExists,
   sftpMkdir, sftpReaddir, sftpRealPath, sftpRename, sftpStat, sftpUnlink, sftpWriteFile, sshRmrf } from "@scow/lib-ssh";
+import { loggedExec } from "@scow/lib-ssh";
 import { FileInfo, FileInfo_FileType,
   FileServiceServer, FileServiceService, TransferInfo } from "@scow/protos/build/portal/file";
 import { clusters } from "src/config/clusters";
@@ -385,7 +386,8 @@ export const fileServiceServer = plugin((server) => {
           "-p", port.toString(),
           "-k", privateKeyPath,
         ];
-        const resp = await ssh.exec(cmd, args, { stream: "both" });
+        const resp = await loggedExec(ssh, logger, true, cmd, args);
+        // const resp = await ssh.exec(cmd, args, { stream: "both" });
 
         if (resp.code !== 0) {
           throw <ServiceError> {
@@ -408,7 +410,8 @@ export const fileServiceServer = plugin((server) => {
 
       return await sshConnect(clusterAddress, userId, logger, async (ssh) => {
         const cmd = "scow-sync-query";
-        const resp = await ssh.exec(cmd, [], { stream: "both" });
+        const resp = await loggedExec(ssh, logger, true, cmd, []);
+        // const resp = await ssh.exec(cmd, [], { stream: "both" });
 
         if (resp.code !== 0) {
           throw <ServiceError> {
