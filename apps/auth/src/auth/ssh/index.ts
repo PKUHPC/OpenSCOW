@@ -23,22 +23,21 @@ import { ensureNotUndefined } from "src/utils/validations";
 
 function checkLoginNode(sshConfig: SshConfigSchema) {
 
-  let loginNode = sshConfig.baseNode;
+  let loginNodeAddress = sshConfig.baseNode;
 
-  if (!loginNode) {
+  if (!loginNodeAddress) {
     if (Object.keys(clusters).length === 0) {
       throw new Error("No cluster has been set in clusters config");
     }
     const clusterKey = Object.keys(clusters)[0];
-    loginNode = getClusterLoginNode(clusterKey).address;
-    const displayName = clusters[clusterKey].displayName;
-
+    const loginNode = getClusterLoginNode(clusterKey);
     if (!loginNode) {
-      throw new Error(`Cluster ${displayName} has no login node.`);
+      throw new Error("No slurm for Cluster or cluster has no login node");
     }
+    loginNodeAddress = loginNode.address;
   }
 
-  return loginNode;
+  return loginNodeAddress;
 }
 
 export const createSshAuthProvider = (f: FastifyInstance) => {

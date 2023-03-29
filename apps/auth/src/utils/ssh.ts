@@ -20,8 +20,16 @@ interface ClusterLoginNode {
   address: string; // host:port
 }
 
-export function getClusterLoginNode(cluster: string): ClusterLoginNode {
+export function getClusterLoginNode(cluster: string): ClusterLoginNode | undefined {
 
+  if (
+    clusters[cluster] === undefined ||
+    clusters[cluster].slurm === undefined ||
+    clusters[cluster].slurm.loginNodes === undefined ||
+    clusters[cluster].slurm.loginNodes.length === 0
+  ) {
+    return undefined;
+  }
   const loginNodes = clusters[cluster]?.slurm?.loginNodes?.[0];
 
   if (typeof loginNodes === "string") {
