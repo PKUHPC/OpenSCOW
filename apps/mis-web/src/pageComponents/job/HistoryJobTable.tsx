@@ -253,6 +253,7 @@ export const JobInfoTable: React.FC<JobInfoTableProps> = ({
         }
       </TableTitle>
       <Table
+        rowKey={i=>i.idJob}
         dataSource={data?.jobs}
         loading={isLoading}
         pagination={setPageInfo ? {
