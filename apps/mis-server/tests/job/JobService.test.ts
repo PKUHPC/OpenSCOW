@@ -189,7 +189,7 @@ it("returns jobs starting from start_bi_job_index", async () => {
   });
 
   expect(reply.jobs).toSatisfyAll((x: JobInfo) => x.biJobIndex >= 10);
-  expect(reply.jobs).toHaveLength(30);
+  expect(reply.jobs).toHaveLength(50);
 
 });
 
