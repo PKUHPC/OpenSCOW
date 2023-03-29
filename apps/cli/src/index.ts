@@ -127,7 +127,10 @@ yargs(hideBin(process.argv))
   })
   .completion()
   .strict()
-  .scriptName("scow-cli v" + version)
+  .scriptName("scow-cli")
   .demandCommand()
+  .epilogue(`Versoin ${version}`)
+  .epilogue("For more information, find our manual at https://pkuhpc.github.io/scow")
   .help()
-  .argv;
+  .parse();
+
