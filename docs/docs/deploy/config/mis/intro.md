@@ -102,7 +102,7 @@ predefinedChargingTypes:
 
 ## 启动服务
 
-运行`./compose.sh up -d`启动管理系统。
+运行`./cli compose up -d`启动管理系统。
 
 ## 系统初始化
 

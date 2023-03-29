@@ -91,4 +91,4 @@ shell: true
 
 ## 启动服务
 
-运行`./compose.sh up -d`启动门户系统。
+运行`./cli compose up -d`启动门户系统。
