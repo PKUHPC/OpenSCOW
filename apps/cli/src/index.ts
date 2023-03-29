@@ -129,7 +129,7 @@ yargs(hideBin(process.argv))
   .strict()
   .scriptName("scow-cli")
   .demandCommand()
-  .epilogue(`Versoin ${version}`)
+  .epilogue(`Version ${version}`)
   .epilogue("For more information, find our manual at https://pkuhpc.github.io/scow")
   .help()
   .parse();

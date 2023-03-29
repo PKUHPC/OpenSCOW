@@ -10,10 +10,11 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import fs from "fs";
-import { chmod } from "fs/promises";
+import fs, { existsSync } from "fs";
+import { chmod, unlink } from "fs/promises";
 import JSZip from "jszip";
 import { Octokit } from "octokit";
+import prompt from "prompts";
 import { debug, log } from "src/log";
 import { pipeline } from "stream/promises";
 
@@ -51,11 +52,25 @@ async function getBranchName(prNumber: number, octokit: Octokit) {
 
 export const updateCli = async (options: Options) => {
   if (!options.pr && !options.ver && !options.branch) {
-    throw new Error("Either pr or ver option must be specified.");
+    throw new Error("Either --pr, --ver or --branch option must be specified.");
   }
 
   const outputPath = options.downloadPath ? options.downloadPath : process.execPath;
+
   debug("Output path is %s", outputPath);
+
+  if (options.downloadPath && existsSync(outputPath)) {
+    const answer = await prompt({
+      type: "confirm",
+      name: "continue",
+      message: `Output path ${outputPath} already exists. Continue?`,
+    });
+    if (!answer.continue) {
+      debug("Selected no.");
+      return;
+    }
+  }
+
 
   const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
 
@@ -77,7 +92,7 @@ Please provide your GitHub personal access token via GITHUB_TOKEN in env.
     const user = await octokit.rest.users.getAuthenticated();
     debug("GitHub authenticated %s via GITHUB_TOKEN env.", user.data.login);
 
-    const branch = options.branch ? options.branch : await getBranchName(options.pr!, new Octokit());
+    const branch = options.branch ? options.branch : await getBranchName(options.pr!, octokit);
     log("Branch: %s", branch);
 
     debug("Download cli for PR %s", options.pr);
@@ -124,10 +139,15 @@ Please provide your GitHub personal access token via GITHUB_TOKEN in env.
       throw new Error("Cannot find binary file " + binaryName);
     }
 
+    await unlink(outputPath);
     await pipeline(file.nodeStream(), fs.createWriteStream(outputPath));
     await chmod(outputPath, 0o755);
 
-    log("Downloaded to %s", outputPath);
+    if (options.downloadPath) {
+      log("CLI of specified PR or branch has been downloaded to %s", outputPath);
+    } else {
+      log("CLI has been updated.");
+    }
 
   } else {
     throw new Error("Not yet implemented");
