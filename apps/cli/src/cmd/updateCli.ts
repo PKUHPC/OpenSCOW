@@ -57,7 +57,7 @@ export const updateCli = async (options: Options) => {
   const outputPath = options.downloadPath ? options.downloadPath : process.execPath;
   debug("Output path is %s", outputPath);
 
-  const octokit = new Octokit();
+  const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
 
   if (options.pr || options.branch) {
 
@@ -74,7 +74,6 @@ Please provide your GitHub personal access token via GITHUB_TOKEN in env.
       return;
     }
 
-    await octokit.auth(process.env.GITHUB_TOKEN);
     const user = await octokit.rest.users.getAuthenticated();
     debug("GitHub authenticated %s via GITHUB_TOKEN env.", user.data.login);
 
