@@ -20,7 +20,7 @@ import { handlegRPCError } from "src/utils/server";
 
 
 interface TransferInfo {
-  fileName: string, transferSize: string, progress: string, speed: string, leftTime: string
+  recvCluster: string, filePath: string, transferSize: string, progress: string, speed: string, leftTime: string
 }
 
 export interface QueryTransferFilesSchema {

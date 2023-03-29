@@ -17,6 +17,7 @@ import { sftpExists,
   sftpMkdir, sftpReaddir, sftpRealPath, sftpRename, sftpStat, sftpUnlink, sftpWriteFile, sshRmrf } from "@scow/lib-ssh";
 import { FileInfo, FileInfo_FileType,
   FileServiceServer, FileServiceService, TransferInfo } from "@scow/protos/build/portal/file";
+import { clusters } from "src/config/clusters";
 import { config } from "src/config/env";
 import { clusterNotFound } from "src/utils/errors";
 import { pipeline } from "src/utils/pipeline";
@@ -417,11 +418,37 @@ export const fileServiceServer = plugin((server) => {
           };
         }
 
+        interface TransferInfosJson {
+          recvAddress: string,
+          filePath: string,
+          transferSize: string,
+          progress: string,
+          speed: string,
+          leftTime: string
+        }
 
         // 解析scow-sync-query返回的json数组
-        const transferInfos: TransferInfo[] = JSON.parse(resp.stdout);
+        const transferInfosJsons: TransferInfosJson[] = JSON.parse(resp.stdout);
+        const transferInfos: TransferInfo[] = [];
 
-        console.log(transferInfos);
+        // 根据host确定clusterId
+        transferInfosJsons.forEach((info) => {
+          let recvCluster = info.recvAddress;
+          for (const key in clusters) {
+            if (getClusterLoginNode(key).host === info.recvAddress) {
+              recvCluster = key;
+            }
+          }
+          transferInfos.push({
+            recvCluster: recvCluster,
+            filePath: info.filePath,
+            transferSize: info.transferSize,
+            progress: info.progress,
+            speed: info.speed,
+            leftTime: info.leftTime,
+          });
+        });
+
         return [{ transferInfos:transferInfos }];
       });
     },

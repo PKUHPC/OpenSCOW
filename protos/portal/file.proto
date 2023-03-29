@@ -183,11 +183,12 @@ message QueryTransferFilesRequest {
 }
 
 message TransferInfo {
-  string file_name = 1;
-  string transfer_size = 2;
-  string progress = 3;
-  string speed = 4;
-  string left_time = 5;
+  string recv_cluster = 1;
+  string file_path = 2;
+  string transfer_size = 3;
+  string progress = 4;
+  string speed = 5;
+  string left_time = 6;
 }
 
 message QueryTransferFilesResponse {

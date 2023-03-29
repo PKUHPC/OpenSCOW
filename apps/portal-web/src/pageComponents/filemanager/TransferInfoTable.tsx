@@ -15,7 +15,8 @@ import { useEffect, useState } from "react";
 import { api } from "src/apis";
 import { publicConfig } from "src/utils/config";
 interface TransferInfo {
-  fileName: string;
+  recvCluster: string;
+  filePath: string;
   transferSize: string;
   progress: string;
   speed: string;
@@ -34,7 +35,7 @@ export const TransferInfoTable: React.FC = () => {
         if (cluster.id === "hpc02") continue;
         const response = await api.queryTransferFiles({ query: { cluster: cluster.id } });
         newTransferData.push({
-          cluster: cluster.name,
+          cluster: cluster.id,
           files: response.result,
         });
       } catch (error) {
@@ -51,14 +52,17 @@ export const TransferInfoTable: React.FC = () => {
   }, []);
   const columns = [
     {
-      title: "集群",
+      title: "发送集群",
       dataIndex: "cluster",
       sorter: (a, b) => a.cluster.localeCompare(b.cluster),
-
+    },
+    {
+      title: "接收集群",
+      dataIndex: "recvCluster",
     },
     {
       title: "文件",
-      dataIndex: "fileName",
+      dataIndex: "filePath",
     },
     {
       title: "传输数量",
