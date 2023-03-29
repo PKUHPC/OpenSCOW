@@ -83,7 +83,7 @@ Download CLI from PR or branch requires GitHub authentication,
 and the authenticated user/token must have actions scope.
 See: https://docs.github.com/en/rest/actions/artifacts?apiVersion=2022-11-28#download-an-artifact
 
-Please provide your GitHub personal access token via GITHUB_TOKEN in env.
+Please provide your GitHub personal access token via GITHUB_TOKEN in env or .env file.
     `);
 
       return;
