@@ -46,7 +46,17 @@ PubkeyAcceptedKeyTypes=+ssh-rsa
 
 `scow-cli`是我们官方维护的SCOW部署和运维工具，能够帮助您快速部署、管理和维护SCOW集群。
 
-参考[scow-cli](./scow-cli.md)下载`scow-cli`。
+参考[scow-cli](./scow-cli.md)下载`scow-cli`，并将其存放到一个你用于存放SCOW配置文件的目录下。
+
+```bash
+# scow目录将会用于存在SCOW相关的配置文件
+mkdir scow
+cd scow
+
+# 将下载的scow-cli移动到scow目录下
+cp /path/to/scow-cli ./
+chmod +x scow-cli
+```
 
 ## 准备配置文件
 
