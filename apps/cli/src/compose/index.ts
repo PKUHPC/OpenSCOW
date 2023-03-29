@@ -83,11 +83,23 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
       ports: Array.isArray(options.ports) ? options.ports : toStringArray(options.ports, ":"),
       image: options.image,
       volumes: Array.isArray(options.volumes) ? options.volumes : toStringArray(options.volumes, ":"),
-      depends_on: options.depends_on,
+      depends_on: ((logging && name !== "log") ? ["log"] : []).concat(options.depends_on ?? []),
       logging,
     };
   };
 
+  // fluentd
+  if (config.log.fluentd) {
+    addService("log", {
+      image: config.log.fluentd.image,
+      environment: {},
+      ports: ["24224:24224", "24224:24224/udp"],
+      volumes: {
+        [config.log.fluentd.logDir]: "/fluentd/log",
+        "./fluent/fluent.conf": "/fluentd/etc/fluent.conf",
+      },
+    });
+  }
 
   // GATEWAY
   addService("gateway", {

@@ -71,7 +71,7 @@ export const migrateFromScowDeployment = (options: Props) => {
       basePath: portal.BASE_PATH,
       novncClientImage: portal.NOVNC_IMAGE,
       portMappings: {
-        ...debug.OPEN_PORTS.PORTAL_SERVER ? { portalServer: debug.OPEN_PORTS.PORTAL_SERVER } : {},
+        ...debug?.OPEN_PORTS?.PORTAL_SERVER ? { portalServer: debug.OPEN_PORTS.PORTAL_SERVER } : {},
       },
     } : undefined,
 
@@ -79,14 +79,14 @@ export const migrateFromScowDeployment = (options: Props) => {
       basePath: mis.BASE_PATH,
       dbPassword: mis.DB_PASSWORD,
       portMappings: {
-        ...debug.OPEN_PORTS.MIS_SERVER ? { misServer: debug.OPEN_PORTS.MIS_SERVER } : {},
-        ...debug.OPEN_PORTS.DB ? { db: debug.OPEN_PORTS.DB } : {},
+        ...debug?.OPEN_PORTS?.MIS_SERVER ? { misServer: debug.OPEN_PORTS.MIS_SERVER } : {},
+        ...debug?.OPEN_PORTS?.DB ? { db: debug.OPEN_PORTS.DB } : {},
       },
     } : undefined,
 
-    log: log ? {
-      level: log.LEVEL,
-      pretty: log.PRETTY,
+    log: (log || fluentd) ? {
+      level: log?.LEVEL,
+      pretty: log?.PRETTY,
       fluentd: fluentd ? {
         logDir: fluentd.LOG_DIR,
       } : undefined,
@@ -94,8 +94,8 @@ export const migrateFromScowDeployment = (options: Props) => {
 
     auth: {
       portMappings: {
-        ...debug.OPEN_PORTS.REDIS ? { redis: debug.OPEN_PORTS.REDIS } : {},
-        ...debug.OPEN_PORTS.AUTH ? { auth: debug.OPEN_PORTS.AUTH } : {},
+        ...debug?.OPEN_PORTS?.REDIS ? { redis: debug.OPEN_PORTS.REDIS } : {},
+        ...debug?.OPEN_PORTS?.AUTH ? { auth: debug.OPEN_PORTS.AUTH } : {},
       },
       ...auth ? {
         custom: {
@@ -110,7 +110,7 @@ export const migrateFromScowDeployment = (options: Props) => {
 
   const data = dump(config);
 
-  writeFileSync("installation.yaml", data);
+  writeFileSync("install.yaml", data);
 
-  logger("installation.yaml is created based on config.py. Migration completed.");
+  logger("install.yaml is created based on config.py. Migration completed.");
 };

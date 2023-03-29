@@ -24,7 +24,7 @@ export const InstallConfigSchema = Type.Object({
     level: Type.String({ description: "日志级别", default: "info" }),
     pretty: Type.Boolean({ description: "日志格式", default: false }),
     fluentd: Type.Optional(Type.Object({
-      image: Type.Optional(Type.String({ description: "fluentd镜像", default: "fluentd:v1.14.0-1.0" })),
+      image: Type.String({ description: "fluentd镜像", default: "fluentd:v1.14.0-1.0" }),
       logDir: Type.String({ description: "日志目录", default: "/var/log/fluentd" }),
     })),
   }, { default: {} }),
