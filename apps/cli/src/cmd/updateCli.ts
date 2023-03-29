@@ -22,7 +22,7 @@ import { pipeline } from "stream/promises";
 interface Options {
   configPath: string;
   pr: number | undefined;
-  ver: string | undefined;
+  release: string | undefined;
   branch: string | undefined;
   downloadPath?: string;
 }
@@ -30,7 +30,6 @@ interface Options {
 const owner = "PKUHPC";
 const repo = "SCOW";
 const workflow_id = "test-build-publish.yaml";
-
 
 const allowedArch = ["x64", "arm64"];
 
@@ -50,10 +49,20 @@ async function getBranchName(prNumber: number, octokit: Octokit) {
   return pr.data.head.ref;
 }
 
-export const updateCli = async (options: Options) => {
-  if (!options.pr && !options.ver && !options.branch) {
-    throw new Error("Either --pr, --ver or --branch option must be specified.");
+async function download(...params: Parameters<typeof fetch>) {
+  const res = await fetch(...params);
+
+  if (!res.ok) {
+    throw new Error(`Non-ok response ${res.status} during download. Body: ${await res.text()}`);
   }
+
+  return res.arrayBuffer();
+}
+
+
+export const updateCli = async (options: Options) => {
+
+  const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 
   const outputPath = options.downloadPath ? options.downloadPath : process.execPath;
 
@@ -71,12 +80,13 @@ export const updateCli = async (options: Options) => {
     }
   }
 
+  const arch = getArch();
 
-  const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
+  const octokit = new Octokit({ auth: GITHUB_TOKEN });
 
   if (options.pr || options.branch) {
 
-    if (!process.env.GITHUB_TOKEN) {
+    if (!GITHUB_TOKEN) {
 
       log(`
 Download CLI from PR or branch requires GitHub authentication,
@@ -103,7 +113,6 @@ Please provide your GitHub personal access token via GITHUB_TOKEN in env or .env
 
     debug("Latest run: %s. Run URL: %s", String(latestRun.id), latestRun.html_url);
 
-    const arch = getArch();
 
     debug("Architecture: %s", arch);
 
@@ -125,7 +134,7 @@ Please provide your GitHub personal access token via GITHUB_TOKEN in env or .env
     });
 
     if (!(content.data instanceof ArrayBuffer)) {
-      throw new Error("Cannot download artifact: " + content.data);
+      throw new Error("Downloaded content is not ArrayBuffer");
     }
 
     log("Download completed. Unzip");
@@ -149,10 +158,41 @@ Please provide your GitHub personal access token via GITHUB_TOKEN in env or .env
       log("CLI has been updated.");
     }
 
-  } else {
-    throw new Error("Not yet implemented");
+    return;
   }
 
+
+  const release = await (async function() {
+    if (!options.release) {
+      log("Neither --pr, --release nor --branch is specified. Downloading latest release.");
+      const resp = await octokit.rest.repos.getLatestRelease({ owner, repo });
+      log("Downloading release %s", resp.data.tag_name);
+      return resp.data;
+    } else {
+      log("Downloading release %s", options.release);
+      const resp = await octokit.rest.repos.getReleaseByTag({ owner, repo, tag: options.release });
+      return resp.data;
+    }
+  })();
+
+  const assetName = "scow-cli-" + arch;
+
+  const asset = release.assets.find((a) => a.name === assetName);
+
+  if (!asset) {
+    throw new Error("Cannot find asset for architecture " + arch);
+  }
+
+  log("Asset: %s. Download URL: %s", asset.name, asset.browser_download_url);
+
+  log("Downloading...");
+  const content = await download(asset.browser_download_url);
+
+  await unlink(outputPath);
+  await fs.promises.writeFile(outputPath, Buffer.from(content));
+  await chmod(outputPath, 0o755);
+
+  log("Downloaded release %s", release.name ?? "");
 };
 
 

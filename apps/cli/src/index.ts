@@ -11,6 +11,8 @@
  */
 
 import dotenv from "dotenv";
+dotenv.config();
+
 import { readFileSync } from "fs";
 import { runCompose } from "src/cmd/compose";
 import { enterDb } from "src/cmd/db";
@@ -22,7 +24,6 @@ import { viewInstall } from "src/cmd/viewInstall";
 import { hideBin } from "yargs/helpers";
 import yargs from "yargs/yargs";
 
-dotenv.config();
 
 const version = JSON.parse(readFileSync("package.json", "utf-8")).version;
 
@@ -72,9 +73,9 @@ yargs(hideBin(process.argv))
         description: "Branch name",
         conflicts: ["pr", "version"],
       },
-      ver: {
+      release: {
         type: "string",
-        description: "Version number",
+        description: "release version number (e.g. v0.3)",
         conflicts: ["branch", "pr"],
       },
       downloadPath: {
