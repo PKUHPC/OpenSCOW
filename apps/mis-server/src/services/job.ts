@@ -14,7 +14,6 @@ import { ensureNotUndefined, plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError, status } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { FilterQuery, QueryOrder, UniqueConstraintViolationException } from "@mikro-orm/core";
-import { MySqlDriver, SqlEntityManager } from "@mikro-orm/mysql";
 import { Decimal, decimalToMoney, moneyToNumber } from "@scow/lib-decimal";
 import {
   GetJobsResponse,
@@ -96,7 +95,7 @@ export const jobServiceServer = plugin((server) => {
 
       const { filter, page, pageSize } = ensureNotUndefined(request, ["filter"]);
 
-      let sqlFilter= filterJobs(filter);
+      const sqlFilter = filterJobs(filter);
 
       logger.info("getJobs sqlFilter %s", JSON.stringify(sqlFilter));
 
