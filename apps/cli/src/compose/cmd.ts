@@ -11,7 +11,8 @@
  */
 
 import { spawnSync } from "child_process";
-import { writeFileSync } from "fs";
+import onDeath from "death";
+import { unlinkSync, writeFileSync } from "fs";
 import { dump } from "js-yaml";
 import { createComposeSpec } from "src/compose";
 import { InstallConfigSchema } from "src/config/install";
@@ -42,13 +43,30 @@ export function runComposeCommand(config: InstallConfigSchema, args: string[]) {
 
   const composeConfig = createComposeSpec(config);
 
-  writeFileSync("docker-compose.yml", dump(composeConfig), { encoding: "utf-8" });
-  debug("Generated docker-compose.yml");
 
-  spawnSync(
-    dockerComposeCommand,
-    args,
-    { shell: true, stdio: "inherit" },
-  );
+  const filename = `docker-compose-${Date.now()}.yml`;
 
+  writeFileSync(filename, dump(composeConfig), { encoding: "utf-8" });
+  debug("Generated " + filename);
+
+  const clean = () => {
+    unlinkSync(filename);
+  };
+
+  onDeath((arg) => {
+    debug("Received %s. Deleting compose file", arg);
+    clean();
+  });
+
+  try {
+
+    spawnSync(
+      dockerComposeCommand,
+      ["-f", filename, ...args],
+      { shell: true, stdio: "inherit" },
+    );
+  } finally {
+    debug("Process exited. Deleting compose file");
+    clean();
+  }
 }

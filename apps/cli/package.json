@@ -19,13 +19,15 @@
     "debug": "4.3.4",
     "octokit": "2.0.14",
     "jszip": "3.10.1",
-    "dotenv": "16.0.3"
+    "dotenv": "16.0.3",
+    "death": "1.1.0"
   },
   "devDependencies": {
     "@types/yargs": "17.0.22",
     "@types/prompts": "2.4.3",
     "@types/js-yaml": "4.0.5",
-    "@types/debug": "4.1.7"
+    "@types/debug": "4.1.7",
+    "@types/death": "1.1.2"
   },
   "author": "PKUHPC (https://github.com/PKUHPC)",
   "license": "Mulan PSL v2",

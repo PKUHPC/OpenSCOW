@@ -185,6 +185,9 @@ importers:
       '@sinclair/typebox':
         specifier: 0.26.5
         version: 0.26.5
+      death:
+        specifier: 1.1.0
+        version: 1.1.0
       debug:
         specifier: 4.3.4
         version: 4.3.4(supports-color@5.5.0)
@@ -210,6 +213,9 @@ importers:
         specifier: 17.7.1
         version: 17.7.1
     devDependencies:
+      '@types/death':
+        specifier: 1.1.2
+        version: 1.1.2
       '@types/debug':
         specifier: 4.1.7
         version: 4.1.7
@@ -5628,6 +5634,10 @@ packages:
       '@types/node': 18.15.10
     dev: false
 
+  /@types/death@1.1.2:
+    resolution: {integrity: sha512-Rr5NV/H/zj6zgbh6TCwMEe0NhCVS2QbAor0pikvzGx5fh+xsnmV3KUEq2Vb4vgi9ytBHorva+ryQmij2rrstTQ==}
+    dev: true
+
   /@types/debug@4.1.7:
     resolution: {integrity: sha512-9AonUzyTjXXhEOa0DnqpzZi6VHlqKMswga9EXjpXnnqxwLtdvPPtlO8evrI5D9S6asFRCQ6v+wpiUKbw+vKqyg==}
     dependencies:
@@ -8244,6 +8254,10 @@ packages:
   /dayjs@1.8.36:
     resolution: {integrity: sha512-3VmRXEtw7RZKAf+4Tv1Ym9AGeo8r8+CjDi26x+7SYQil1UqtqdaokhzoEJohqlzt0m5kacJSDhJQkG/LWhpRBw==}
     dev: true
+
+  /death@1.1.0:
+    resolution: {integrity: sha512-vsV6S4KVHvTGxbEcij7hkWRv0It+sGGWVOM67dQde/o5Xjnr+KmLjxWJii2uEObIrt1CcM9w0Yaovx+iOlIL+w==}
+    dev: false
 
   /debug@2.6.9:
     resolution: {integrity: sha512-bC7ElrdJaJnPbAP+1EotYvqZsb3ecl5wi6Bfi6BJTUcNowp6cvspg0jXznRTKDjm/E7AdgFBVeAPVMNcKGsHMA==}

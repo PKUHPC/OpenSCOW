@@ -50,7 +50,7 @@ export const InstallConfigSchema = Type.Object({
 
   mis: Type.Optional(Type.Object({
     mysqlImage: Type.String({ description: "管理系统数据库镜像", default: "mysql:8" }),
-    basePath: Type.String({ description: "管理系统的部署路径，相对于整个系统的", default: "/" }),
+    basePath: Type.String({ description: "管理系统的部署路径，相对于整个系统的", default: "/mis" }),
     dbPassword: Type.String({ description: "管理系统数据库密码", default: "must!chang3this" }),
 
     portMappings: Type.Optional(Type.Object({

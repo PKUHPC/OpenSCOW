@@ -20,6 +20,14 @@ function checkPathFormat(configKey: string, value: string) {
   }
 }
 
+function join(...segments: string[]) {
+  const r = path.normalize(path.join(...segments));
+  if (r.endsWith("/")) {
+    return r.substring(0, r.length - 1);
+  }
+  return r;
+}
+
 export const createComposeSpec = (config: InstallConfigSchema) => {
   const scowImage = `${config.image}:${config.imageTag}`;
 
@@ -154,11 +162,11 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
       image: scowImage,
       environment: {
         "SCOW_LAUNCH_APP": "portal-web",
-        "BASE_PATH": path.join(BASE_PATH, PORTAL_PATH),
-        "MIS_URL": path.join(BASE_PATH, MIS_PATH),
+        "BASE_PATH": join(BASE_PATH, PORTAL_PATH),
+        "MIS_URL": join(BASE_PATH, MIS_PATH),
         "MIS_DEPLOYED": config.mis ? "true" : "false",
-        "AUTH_EXTERNAL_URL": path.join(BASE_PATH, "/auth"),
-        "NOVNC_CLIENT_URL": path.join(BASE_PATH, "/vnc"),
+        "AUTH_EXTERNAL_URL": join(BASE_PATH, "/auth"),
+        "NOVNC_CLIENT_URL": join(BASE_PATH, "/vnc"),
         "CLIENT_MAX_BODY_SIZE": config.gateway.uploadFileSizeLimit,
       },
       ports: {},
@@ -198,10 +206,10 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
       image: scowImage,
       environment: {
         "SCOW_LAUNCH_APP": "mis-web",
-        "BASE_PATH": path.join(BASE_PATH, MIS_PATH),
-        "PORTAL_URL": path.join(BASE_PATH, PORTAL_PATH),
+        "BASE_PATH": join(BASE_PATH, MIS_PATH),
+        "PORTAL_URL": join(BASE_PATH, PORTAL_PATH),
         "PORTAL_DEPLOYED": config.portal ? "true" : "false",
-        "AUTH_EXTERNAL_URL": path.join(BASE_PATH, "/auth"),
+        "AUTH_EXTERNAL_URL": join(BASE_PATH, "/auth"),
       },
       ports: {},
       volumes: {

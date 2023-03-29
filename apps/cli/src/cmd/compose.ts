@@ -18,9 +18,9 @@ interface Options {
   _: (string | number)[];
 }
 
-export const runCompose = (options: Options) => {
+export const runCompose = (options: Options, ...baseCommands: string[]) => {
 
   const config = getInstallConfig(options.configPath);
 
-  runComposeCommand(config, options._.slice(1).map((x) => String(x)));
+  runComposeCommand(config, [...baseCommands, ...options._.slice(1).map((x) => String(x))]);
 };
