@@ -17,6 +17,7 @@ import type { NodeSSH } from "node-ssh";
 import { clusters } from "src/config/clusters";
 import { rootKeyPair } from "src/config/env";
 import { scowErrorMetadata } from "src/utils/error";
+import { clusterNotFound, loginNodeNotFound, slurmNotFound } from "src/utils/errors";
 import { Logger } from "ts-log";
 
 
@@ -29,7 +30,17 @@ interface ClusterLoginNode {
 
 export function getClusterLoginNode(cluster: string): ClusterLoginNode {
 
-  const loginNodes = clusters[cluster]?.slurm?.loginNodes?.[0];
+  if (clusters[cluster] === undefined) {
+    throw clusterNotFound(cluster);
+  }
+  if (clusters[cluster].slurm === undefined) {
+    throw slurmNotFound(cluster);
+  }
+  if (clusters[cluster].slurm.loginNodes === undefined || clusters[cluster].slurm.loginNodes.length === 0) {
+    throw loginNodeNotFound(cluster);
+  }
+
+  const loginNodes = clusters[cluster].slurm.loginNodes[0];
 
   if (typeof loginNodes === "string") {
     const [host, port] = loginNodes.indexOf(":") ? loginNodes.split(":") : [loginNodes, "22"];

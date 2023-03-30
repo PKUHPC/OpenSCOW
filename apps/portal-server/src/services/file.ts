@@ -13,9 +13,8 @@
 import { createWriterExtensions } from "@ddadaal/tsgrpc-common";
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError, status } from "@grpc/grpc-js";
-import { sftpExists,
+import { loggedExec, sftpExists,
   sftpMkdir, sftpReaddir, sftpRealPath, sftpRename, sftpStat, sftpUnlink, sftpWriteFile, sshRmrf } from "@scow/lib-ssh";
-import { loggedExec } from "@scow/lib-ssh";
 import { FileInfo, FileInfo_FileType,
   FileServiceServer, FileServiceService, TransferInfo } from "@scow/protos/build/portal/file";
 import { clusters } from "src/config/clusters";

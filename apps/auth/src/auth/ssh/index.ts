@@ -32,7 +32,7 @@ function checkLoginNode(sshConfig: SshConfigSchema) {
     const clusterKey = Object.keys(clusters)[0];
     const loginNode = getClusterLoginNode(clusterKey);
     if (!loginNode) {
-      throw new Error("No slurm for Cluster or cluster has no login node");
+      throw new Error("Cluster doesn't support slurm or cluster has no login node");
     }
     loginNodeAddress = loginNode.address;
   }
