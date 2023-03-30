@@ -20,7 +20,6 @@ import { importUsers, ImportUsersData } from "src/bl/importUsers";
 import { Account } from "src/entities/Account";
 import { StorageQuota } from "src/entities/StorageQuota";
 import { User } from "src/entities/User";
-import { parseClusterUsers } from "src/utils/slurm";
 
 export const adminServiceServer = plugin((server) => {
 
@@ -106,15 +105,13 @@ export const adminServiceServer = plugin((server) => {
     getClusterUsers: async ({ request, em, logger }) => {
       const { cluster } = request;
 
-      const reply = await server.ext.clusters.callOnOne(
+      const result = await server.ext.clusters.callOnOne(
         cluster,
         logger,
-        async (ops) => ops.user.getAllUsersInAccounts({
+        async (ops) => ops.account.getAllAccountsWithUsers({
           request: {}, logger,
         }),
       );
-
-      const result = parseClusterUsers(reply.result);
 
       const includedAccounts = await em.find(Account, {
         accountName: { $in: result.accounts.map((x) => x.accountName) },

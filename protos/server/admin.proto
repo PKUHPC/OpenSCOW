@@ -51,6 +51,7 @@ message ImportUsersData {
     repeated UserInAccount users = 2;
     // owner is undefined while account has existed
     optional string owner = 3;
+    bool blocked = 4;
   }
 
   repeated AccountInfo accounts = 1;
@@ -84,6 +85,7 @@ message ClusterAccountInfo {
   repeated UserInAccount users = 2;
   optional string owner = 3;
   ImportStatus import_status = 4;
+  bool blocked = 5;
 }
 
 message GetClusterUsersRequest {

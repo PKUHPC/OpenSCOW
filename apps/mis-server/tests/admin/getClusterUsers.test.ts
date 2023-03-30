@@ -11,7 +11,7 @@
  */
 
 import { ClusterAccountInfo_ImportStatus } from "@scow/protos/build/server/admin";
-import { parseClusterUsers } from "src/utils/slurm";
+import { parseClusterAccounts } from "src/clusterops/slurm/utils/parse";
 
 
 const dataStr = `
@@ -30,9 +30,9 @@ There is no user in account !
 `;
 
 it("test whether the string from 'slurm.sh -l all' can be parsed successfully", async () => {
-  const result = parseClusterUsers(dataStr);
+  const result = parseClusterAccounts(dataStr);
 
-  expect(result).toStrictEqual({ accounts: [
+  expect(result).toStrictEqual([
     {
       accountName: "a_user1",
       users: [
@@ -41,6 +41,7 @@ it("test whether the string from 'slurm.sh -l all' can be parsed successfully", 
       ],
       owner: "user1",
       importStatus: ClusterAccountInfo_ImportStatus.NOT_EXISTING,
+      blocked: true,
     },
     {
       accountName: "account2",
@@ -48,7 +49,8 @@ it("test whether the string from 'slurm.sh -l all' can be parsed successfully", 
         { userId: "user2", userName: "user2", state: "allowed!" },
         { userId: "user3", userName: "user3", state: "blocked!" }],
       importStatus: ClusterAccountInfo_ImportStatus.NOT_EXISTING,
+      blocked: true,
     },
   ],
-  });
+  );
 });

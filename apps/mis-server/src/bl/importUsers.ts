@@ -27,6 +27,7 @@ export interface ImportUsersData {
     accountName: string;
     users: {userId: string; userName: string; state: string}[];
     owner: string;
+    blocked: boolean;
   }[];
 }
 
@@ -60,7 +61,7 @@ export async function importUsers(data: ImportUsersData, em: SqlEntityManager,
   const accountMap: Record<string, Account> = {};
   data.accounts.forEach((account) => {
     accountMap[account.accountName] = new Account({
-      accountName: account.accountName, comment: "", blocked: false,
+      accountName: account.accountName, comment: "", blocked: account.blocked,
       tenant,
     });
   });

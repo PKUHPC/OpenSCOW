@@ -83,6 +83,7 @@ export const ImportUsersTable: React.FC = () => {
             accountName: x.accountName,
             users: x.users,
             owner: x.importStatus === ClusterAccountInfo_ImportStatus.NOT_EXISTING ? x.owner! : undefined,
+            blocked: x.blocked,
           })) || []);
 
           await api.importUsers({ body: {

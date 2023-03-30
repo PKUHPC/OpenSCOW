@@ -49,11 +49,13 @@ const data = {
       accountName: "a_user1",
       users: [{ userId: "user1", userName: "user1Name", state: "allowed!" }, { userId: "user2", userName: "user2", state: "blocked!" }],
       owner: "user1",
+      blocked: false,
     },
     {
       accountName: "account2",
       users: [{ userId: "user2", userName: "user2", state: "allowed!" }, { userId: "user3", userName: "user3", state: "blocked!" }],
       owner: "user2",
+      blocked: false,
     },
   ],
 };
