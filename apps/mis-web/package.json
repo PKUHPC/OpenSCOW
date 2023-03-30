@@ -28,7 +28,7 @@
     "@ddadaal/next-typed-api-routes-runtime": "0.5.2",
     "@ddadaal/tsgrpc-client": "0.17.3",
     "@ddadaal/tsgrpc-common": "0.2.1",
-    "@grpc/grpc-js": "1.8.12",
+    "@grpc/grpc-js": "1.8.13",
     "@scow/config": "workspace:*",
     "@scow/lib-config": "workspace:*",
     "@scow/lib-auth": "workspace:*",
@@ -36,7 +36,7 @@
     "@scow/protos": "workspace:*",
     "@scow/lib-web": "workspace:*",
     "@scow/utils": "workspace:*",
-    "@sinclair/typebox": "0.25.24",
+    "@sinclair/typebox": "0.26.5",
     "antd": "5.3.2",
     "dayjs": "1.11.7",
     "google-protobuf": "3.21.2",
@@ -61,14 +61,14 @@
     "@next/bundle-analyzer": "13.2.4",
     "@types/google-protobuf": "3.15.6",
     "@types/mime-types": "2.1.1",
-    "@types/node": "18.15.5",
+    "@types/node": "18.15.10",
     "@types/nprogress": "0.2.0",
-    "@types/react": "18.0.28",
+    "@types/react": "18.0.29",
     "@types/react-dom": "18.0.11",
     "@types/styled-components": "5.1.26",
     "babel-plugin-import": "1.13.6",
     "postcss": "8.4.21",
-    "webpack": "5.76.2"
+    "webpack": "5.76.3"
   },
   "browserslist": {
     "production": [

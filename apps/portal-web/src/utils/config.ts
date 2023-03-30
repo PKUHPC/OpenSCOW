@@ -71,7 +71,8 @@ export interface PublicRuntimeConfig {
   PASSWORD_PATTERN_MESSAGE: string | undefined;
 
   BASE_PATH: string;
-
+  // 上传（请求）文件的大小限制
+  CLIENT_MAX_BODY_SIZE: string;
 }
 
 export const runtimeConfig: ServerRuntimeConfig = getConfig().serverRuntimeConfig;
