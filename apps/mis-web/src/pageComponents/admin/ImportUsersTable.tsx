@@ -145,13 +145,9 @@ export const ImportUsersTable: React.FC = () => {
             dataIndex="owner"
             title="拥有者"
             render={(_, r, i) => {
-              if (r.importStatus === ClusterAccountInfo_ImportStatus.EXISTING) {
-                return "已导入";
-              } else if (r.importStatus === ClusterAccountInfo_ImportStatus.HAS_NEW_USERS) {
-                return "账户已导入，部分用户未导入";
-              } else {
-                return (
-                  selectedAccounts?.includes(r) ? (
+              return r.importStatus === ClusterAccountInfo_ImportStatus.NOT_EXISTING
+                ? selectedAccounts?.includes(r)
+                  ? (
                     <Form.Item
                       name={["data", "accounts", i, "owner"]}
                       rules={[{ required: true, message: "请选择一个拥有者" }]}
@@ -163,11 +159,25 @@ export const ImportUsersTable: React.FC = () => {
                         placeholder={"请选择一个拥有者"}
                       />
                     </Form.Item>
-                  ) : ""
-                );
+                  )
+                  : ""
+                : "";
+            }
+            }
+
+          />
+          <Table.Column<ClusterAccountInfo>
+            dataIndex="importStatus"
+            title="导入状态"
+            render={(value) => {
+              if (value === ClusterAccountInfo_ImportStatus.EXISTING) {
+                return "已导入";
+              } else if (value === ClusterAccountInfo_ImportStatus.HAS_NEW_USERS) {
+                return "账户已导入，部分用户未导入";
+              } else {
+                return "未导入";
               }
-            }
-            }
+            }}
           />
           <Table.Column<ClusterAccountInfo>
             dataIndex="users"
