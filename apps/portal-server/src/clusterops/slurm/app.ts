@@ -56,7 +56,7 @@ const VNC_SESSION_INFO = "VNC_SESSION_INFO";
 
 export const slurmAppOps = (cluster: string): AppOps => {
 
-  const host = getClusterLoginNode(cluster).address;
+  const host = getClusterLoginNode(cluster);
 
   if (!host) { throw new Error(`Cluster ${cluster} has no login node`); }
 
@@ -363,4 +363,3 @@ export const slurmAppOps = (cluster: string): AppOps => {
     },
   };
 };
-

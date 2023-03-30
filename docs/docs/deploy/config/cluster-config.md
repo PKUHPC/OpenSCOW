@@ -15,14 +15,11 @@ displayName: hpc01Name
 
 # 指定slurm配置
 slurm:
-  # 各个登录节点的地址、ssh端口和ssh密钥路径
+  # 各个登录节点的IP或者域名
   # 如果设置的是域名，请确认此节点的/etc/hosts中包含了域名到IP的解析信息
-  # 如果只有一个string类型，则表示ssh端口默认为22，密钥路径默认为~/.ssh/id_rsa
   loginNodes:
-      - login01
-      - host: login02
-        port: 22222
-        key: ~/.ssh/rsa/id_rsa
+    - login01
+    - login02
 
   # 集群的分区信息，结构为一个列表
   partitions:

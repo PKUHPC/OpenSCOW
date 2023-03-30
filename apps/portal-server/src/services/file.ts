@@ -30,7 +30,7 @@ export const fileServiceServer = plugin((server) => {
     copy: async ({ request, logger }) => {
       const { userId, cluster, fromPath, toPath } = request;
 
-      const host = getClusterLoginNode(cluster).address;
+      const host = getClusterLoginNode(cluster);
 
       if (!host) { throw clusterNotFound(cluster); }
 
@@ -51,7 +51,7 @@ export const fileServiceServer = plugin((server) => {
 
       const { userId, cluster, path } = request;
 
-      const host = getClusterLoginNode(cluster).address;
+      const host = getClusterLoginNode(cluster);
 
       if (!host) { throw clusterNotFound(cluster); }
 
@@ -72,7 +72,7 @@ export const fileServiceServer = plugin((server) => {
     deleteDirectory: async ({ request, logger }) => {
       const { userId, cluster, path } = request;
 
-      const host = getClusterLoginNode(cluster).address;
+      const host = getClusterLoginNode(cluster);
 
       if (!host) { throw clusterNotFound(cluster); }
 
@@ -88,7 +88,7 @@ export const fileServiceServer = plugin((server) => {
 
       const { userId, cluster, path } = request;
 
-      const host = getClusterLoginNode(cluster).address;
+      const host = getClusterLoginNode(cluster);
 
       if (!host) { throw clusterNotFound(cluster); }
 
@@ -105,7 +105,7 @@ export const fileServiceServer = plugin((server) => {
     getHomeDirectory: async ({ request, logger }) => {
       const { cluster, userId } = request;
 
-      const host = getClusterLoginNode(cluster).address;
+      const host = getClusterLoginNode(cluster);
 
       if (!host) { throw clusterNotFound(cluster); }
 
@@ -121,7 +121,7 @@ export const fileServiceServer = plugin((server) => {
     makeDirectory: async ({ request, logger }) => {
       const { userId, cluster, path } = request;
 
-      const host = getClusterLoginNode(cluster).address;
+      const host = getClusterLoginNode(cluster);
 
       if (!host) { throw clusterNotFound(cluster); }
 
@@ -143,7 +143,7 @@ export const fileServiceServer = plugin((server) => {
     move: async ({ request, logger }) => {
       const { userId, cluster, fromPath, toPath } = request;
 
-      const host = getClusterLoginNode(cluster).address;
+      const host = getClusterLoginNode(cluster);
 
       if (!host) { throw clusterNotFound(cluster); }
 
@@ -161,7 +161,7 @@ export const fileServiceServer = plugin((server) => {
     readDirectory: async ({ request, logger }) => {
       const { userId, cluster, path } = request;
 
-      const host = getClusterLoginNode(cluster).address;
+      const host = getClusterLoginNode(cluster);
 
       if (!host) { throw clusterNotFound(cluster); }
 
@@ -204,7 +204,7 @@ export const fileServiceServer = plugin((server) => {
     download: async (call) => {
       const { logger, request: { cluster, path, userId } } = call;
 
-      const host = getClusterLoginNode(cluster).address;
+      const host = getClusterLoginNode(cluster);
 
       if (!host) { throw clusterNotFound(cluster); }
 
@@ -252,7 +252,7 @@ export const fileServiceServer = plugin((server) => {
 
       const { cluster, path, userId } = info.message?.info;
 
-      const host = getClusterLoginNode(cluster).address;
+      const host = getClusterLoginNode(cluster);
 
       if (!host) { throw clusterNotFound(cluster); }
 
@@ -331,7 +331,7 @@ export const fileServiceServer = plugin((server) => {
     getFileMetadata: async ({ request, logger }) => {
       const { userId, cluster, path } = request;
 
-      const host = getClusterLoginNode(cluster).address;
+      const host = getClusterLoginNode(cluster);
 
       if (!host) { throw clusterNotFound(cluster); }
 
@@ -352,7 +352,7 @@ export const fileServiceServer = plugin((server) => {
     exists: async ({ request, logger }) => {
       const { userId, cluster, path } = request;
 
-      const host = getClusterLoginNode(cluster).address;
+      const host = getClusterLoginNode(cluster);
 
       if (!host) { throw clusterNotFound(cluster); }
 
@@ -366,13 +366,16 @@ export const fileServiceServer = plugin((server) => {
     startTransferFiles: async ({ request, logger }) => {
       const { fromCluster, toCluster, userId, fromPath, toPath } = request;
 
-      const { port:port, privateKeyPath:privateKeyPath, address:fromClusterAddress } = getClusterLoginNode(fromCluster);
-
-
-      const toClusterHost = getClusterLoginNode(toCluster).host;
-      const toClusterAddress = getClusterLoginNode(toCluster).address;
+      const fromClusterAddress = getClusterLoginNode(fromCluster);
+      const toClusterAddress = getClusterLoginNode(toCluster);
       if (!fromClusterAddress) { throw clusterNotFound(fromCluster); }
       if (!toClusterAddress) { throw clusterNotFound(toCluster); }
+
+      const [toClusterHost, toClusterPort] = toClusterAddress.indexOf(":") > 0 ?
+        toClusterAddress.split(":") : [toClusterAddress, "22"];
+
+      const privateKeyPath = "~/.ssh/id_rsa";
+
 
       return await sshConnect(fromClusterAddress, userId, logger, async (ssh) => {
         const cmd = "scow-sync-start";
@@ -382,7 +385,7 @@ export const fileServiceServer = plugin((server) => {
           "-s", fromPath,
           "-d", toPath,
           "-m", "2",
-          "-p", port.toString(),
+          "-p", toClusterPort.toString(),
           "-k", privateKeyPath,
         ];
         const resp = await loggedExec(ssh, logger, true, cmd, args);
@@ -403,8 +406,7 @@ export const fileServiceServer = plugin((server) => {
 
       const { cluster, userId } = request;
 
-      const clusterAddress = getClusterLoginNode(cluster).address;
-
+      const clusterAddress = getClusterLoginNode(cluster);
       if (!clusterAddress) { throw clusterNotFound(cluster); }
 
       return await sshConnect(clusterAddress, userId, logger, async (ssh) => {
@@ -437,7 +439,9 @@ export const fileServiceServer = plugin((server) => {
         transferInfosJsons.forEach((info) => {
           let recvCluster = info.recvAddress;
           for (const key in clusters) {
-            if (getClusterLoginNode(key).host === info.recvAddress) {
+            const clusterHost = getClusterLoginNode(key)!.indexOf(":") > 0 ?
+              getClusterLoginNode(key)?.split(":")[0] : getClusterLoginNode(key);
+            if (clusterHost === info.recvAddress) {
               recvCluster = key;
             }
           }

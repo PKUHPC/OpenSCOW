@@ -41,7 +41,7 @@ export const shellServiceServer = plugin((server) => {
 
       const { cluster, userId, rows, cols, path } = connect;
 
-      const loginNode = getClusterLoginNode(cluster).address;
+      const loginNode = getClusterLoginNode(cluster);
 
       if (!loginNode) { throw clusterNotFound(cluster); }
 

@@ -17,49 +17,12 @@ import type { NodeSSH } from "node-ssh";
 import { clusters } from "src/config/clusters";
 import { rootKeyPair } from "src/config/env";
 import { scowErrorMetadata } from "src/utils/error";
-import { clusterNotFound, loginNodeNotFound, slurmNotFound } from "src/utils/errors";
 import { Logger } from "ts-log";
 
 
-interface ClusterLoginNode {
-  host: string;
-  port: number;
-  privateKeyPath: string;
-  address: string; // host:port
-}
+export function getClusterLoginNode(cluster: string): string | undefined {
 
-export function getClusterLoginNode(cluster: string): ClusterLoginNode {
-
-  if (clusters[cluster] === undefined) {
-    throw clusterNotFound(cluster);
-  }
-  if (clusters[cluster].slurm === undefined) {
-    throw slurmNotFound(cluster);
-  }
-  if (clusters[cluster].slurm.loginNodes === undefined || clusters[cluster].slurm.loginNodes.length === 0) {
-    throw loginNodeNotFound(cluster);
-  }
-
-  const loginNodes = clusters[cluster].slurm.loginNodes[0];
-
-  if (typeof loginNodes === "string") {
-    const [host, port] = loginNodes.indexOf(":") ? loginNodes.split(":") : [loginNodes, "22"];
-    return {
-      host,
-      port: parseInt(port, 10),
-      privateKeyPath: "~/.ssh/id_rsa",
-      address: loginNodes,
-    };
-  }
-  else {
-    return {
-      host: loginNodes.host,
-      port: loginNodes.port!,
-      privateKeyPath: loginNodes.privateKeyPath!,
-      address: `${loginNodes.host}:${loginNodes.port}`,
-    };
-  }
-
+  return clusters[cluster]?.slurm?.loginNodes?.[0];
 }
 
 export const SSH_ERROR_CODE = "SSH_ERROR";
@@ -93,10 +56,8 @@ export async function sshConnect<T>(
  * Check whether all clusters can be logged in as root user
  */
 export async function checkClustersRootUserLogin(logger: Logger) {
-  await Promise.all(Object.keys(clusters).map(async (id) => {
-    const loginNode = getClusterLoginNode(id);
-    const node = loginNode.address;
-    const displayName = clusters[id].displayName;
+  await Promise.all(Object.values(clusters).map(async ({ displayName, slurm: { loginNodes } }) => {
+    const node = loginNodes[0];
     logger.info("Checking if root can login to %s by login node %s", displayName, node);
     const error = await testRootUserSshLogin(node, rootKeyPair, console);
     if (error) {

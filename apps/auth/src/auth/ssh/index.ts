@@ -18,26 +18,25 @@ import { registerPostHandler } from "src/auth/ssh/postHandler";
 import { authConfig, SshConfigSchema } from "src/config/auth";
 import { clusters } from "src/config/clusters";
 import { rootKeyPair } from "src/config/env";
-import { getClusterLoginNode } from "src/utils/ssh";
 import { ensureNotUndefined } from "src/utils/validations";
 
 function checkLoginNode(sshConfig: SshConfigSchema) {
 
-  let loginNodeAddress = sshConfig.baseNode;
+  let loginNode = sshConfig.baseNode;
 
-  if (!loginNodeAddress) {
+  if (!loginNode) {
     if (Object.keys(clusters).length === 0) {
       throw new Error("No cluster has been set in clusters config");
     }
-    const clusterKey = Object.keys(clusters)[0];
-    const loginNode = getClusterLoginNode(clusterKey);
+    const clusterConfig = Object.values(clusters)[0];
+    loginNode = clusterConfig.slurm.loginNodes[0];
+
     if (!loginNode) {
-      throw new Error("Cluster doesn't support slurm or cluster has no login node");
+      throw new Error(`Cluster ${clusterConfig.displayName} has no login node.`);
     }
-    loginNodeAddress = loginNode.address;
   }
 
-  return loginNodeAddress;
+  return loginNode;
 }
 
 export const createSshAuthProvider = (f: FastifyInstance) => {

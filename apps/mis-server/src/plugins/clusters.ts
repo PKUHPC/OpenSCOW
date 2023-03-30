@@ -19,7 +19,6 @@ import { createSlurmOps } from "src/clusterops/slurm";
 import { clusters } from "src/config/clusters";
 import { rootKeyPair } from "src/config/env";
 import { scowErrorMetadata } from "src/utils/error";
-import { getClusterLoginNode } from "src/utils/ssh";
 
 type CallOnAllResult<T> = ({ cluster: string; } & (
   | { success: true; result: T }
@@ -54,10 +53,8 @@ export const CLUSTEROPS_ERROR_CODE = "CLUSTEROPS_ERROR";
 export const clustersPlugin = plugin(async (f) => {
 
   if (process.env.NODE_ENV === "production") {
-    await Promise.all(Object.keys(clusters).map(async (id) => {
-      const loginNode = getClusterLoginNode(id);
-      const node = loginNode.address;
-      const displayName = clusters[id].displayName;
+    await Promise.all(Object.values(clusters).map(async ({ displayName, slurm: { loginNodes } }) => {
+      const node = loginNodes[0];
       f.logger.info("Checking if root can login to %s by login node %s", displayName, node);
       const error = await testRootUserSshLogin(node, rootKeyPair, f.logger);
       if (error) {

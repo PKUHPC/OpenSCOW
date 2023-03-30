@@ -21,7 +21,7 @@ import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
 
 export const slurmJobOps = (cluster: string): JobOps => {
 
-  const host = getClusterLoginNode(cluster).address;
+  const host = getClusterLoginNode(cluster);
 
   if (!host) { throw new Error(`Cluster ${cluster} has no login node`); }
 
@@ -42,7 +42,7 @@ export const slurmJobOps = (cluster: string): JobOps => {
 
         const accounts = stdout.split("\n").slice(2).map((x) => x.trim());
 
-        return accounts;
+        return [...new Set(accounts)];
       });
 
       return { accounts };

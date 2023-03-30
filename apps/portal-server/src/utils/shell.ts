@@ -22,10 +22,10 @@ const SHELL_FILE_REMOTE = "/etc/profile.d/scow-shell-file.sh";
 
 export async function initShellFile(cluster: string, logger: Logger) {
 
-  const address = getClusterLoginNode(cluster).address;
-  if (!address) { throw new Error(`Cluster ${cluster} has no login node`); }
+  const host = getClusterLoginNode(cluster);
+  if (!host) { throw new Error(`Cluster ${cluster} has no login node`); }
 
-  return await sshConnect(address, "root", logger, async (ssh) => {
+  return await sshConnect(host, "root", logger, async (ssh) => {
     // make sure directory /etc/profile.d exists.
     await ssh.mkdir(PROFILE_DIRECTORY);
     const sftp = await ssh.requestSFTP();

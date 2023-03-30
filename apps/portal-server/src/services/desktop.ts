@@ -40,7 +40,7 @@ export const desktopServiceServer = plugin((server) => {
         throw <ServiceError>{ code: Status.INVALID_ARGUMENT, message: `${wm} is not a acceptable wm.` };
       }
 
-      const host = getClusterLoginNode(cluster).address;
+      const host = getClusterLoginNode(cluster);
 
       if (!host) { throw clusterNotFound(cluster); }
 
@@ -85,7 +85,7 @@ export const desktopServiceServer = plugin((server) => {
 
       const { cluster, displayId, userId } = request;
 
-      const host = getClusterLoginNode(cluster).address;
+      const host = getClusterLoginNode(cluster);
 
       if (!host) { throw clusterNotFound(cluster); }
 
@@ -106,7 +106,7 @@ export const desktopServiceServer = plugin((server) => {
       const { cluster, displayId, userId } = request;
 
 
-      const host = getClusterLoginNode(cluster).address;
+      const host = getClusterLoginNode(cluster);
 
       if (!host) { throw clusterNotFound(cluster); }
 
@@ -125,7 +125,7 @@ export const desktopServiceServer = plugin((server) => {
 
       const { cluster, userId } = request;
 
-      const host = getClusterLoginNode(cluster).address;
+      const host = getClusterLoginNode(cluster);
 
       if (!host) { throw clusterNotFound(cluster); }
 

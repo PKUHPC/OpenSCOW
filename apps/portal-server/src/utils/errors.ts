@@ -20,10 +20,3 @@ export const clusterNotFound = (cluster: string) => {
 export const jobNotFound = (jobId: number) => {
   return <ServiceError> { code: Status.NOT_FOUND, message: `job id ${jobId} is not found` };
 };
-
-export const slurmNotFound = (cluster: string) => {
-  return <ServiceError> { code: Status.NOT_FOUND, message: `Cluster ${cluster} doesn't support slurm` };
-};
-export const loginNodeNotFound = (cluster: string) => {
-  return <ServiceError> { code: Status.NOT_FOUND, message: `Cluster ${cluster} has no login node` };
-};
