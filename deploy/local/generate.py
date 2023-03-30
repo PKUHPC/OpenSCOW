@@ -54,6 +54,9 @@ check_path_format("MIS.BASE_PATH", MIS_PATH)
 LOG_LEVEL = get_cfg(["LOG", "LEVEL"], "info")
 LOG_PRETTY = json.dumps(get_cfg(["LOG", "PRETTY"], False))
 
+# 设置上传（请求）文件大小限制
+CLIENT_MAX_BODY_SIZE = get_cfg(["GATEWAY", "UPLOAD_FILE_SIZE_LIMIT"], "1G")
+
 # easy migration from IMAGE_BASE to IMAGE
 SCOW_IMAGE = get_cfg(["COMMON", "IMAGE"])
 if not SCOW_IMAGE:
@@ -186,6 +189,7 @@ def create_gateway_service():
         "BASE_PATH": "" if BASE_PATH == "/" else BASE_PATH,
         "PORTAL_PATH": PORTAL_PATH,
         "MIS_PATH": MIS_PATH,
+        "CLIENT_MAX_BODY_SIZE": CLIENT_MAX_BODY_SIZE,
     }
 
     gateway = Service("gateway", SCOW_IMAGE_NAME, gw_ports, {
@@ -261,6 +265,7 @@ def create_portal_web_service():
         "MIS_DEPLOYED": "false" if cfg.MIS == False else "true",
         "AUTH_EXTERNAL_URL": path_join(BASE_PATH, "/auth"),
         "NOVNC_CLIENT_URL": path_join(BASE_PATH, "/vnc"),
+        "CLIENT_MAX_BODY_SIZE": CLIENT_MAX_BODY_SIZE,
     }
     pw_volumes = {
         "/etc/hosts": "/etc/hosts",

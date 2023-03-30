@@ -9,7 +9,7 @@ title: "gateway"
 
 | 名字 | 类型 | 描述 | 默认值 |
 | -- | -- | -- | -- |
-|`CLIENT_MAX_BODY_SIZE`|字符串|请求body最大大小，nginx的client_max_body_size配置|1g|
+|`CLIENT_MAX_BODY_SIZE`|字符串|请求body最大大小，nginx的client_max_body_size配置，从配置项UPLOAD_FILE_SIZE_LIMIT获取|1G|
 |`ACCESS_LOG`|字符串|nginx的access_log配置|/var/log/nginx/access.log|
 |`ERROR_LOG`|字符串|nginx的error_log配置|/var/log/nginx/error.log|
 |`EXTRA`|字符串|更多的配置，将会应用到server块里||

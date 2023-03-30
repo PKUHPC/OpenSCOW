@@ -11,7 +11,7 @@
  */
 
 import { queryToString, useQuerystring } from "@scow/lib-web/build/utils/querystring";
-import { ClusterAccountInfo, GetClusterUsersResponse, 
+import { ClusterAccountInfo, GetClusterUsersResponse,
   ImportUsersData, UserInAccount } from "@scow/protos/build/server/admin";
 import { App, Button, Checkbox, Drawer, Form, Select, Space, Table, Tooltip } from "antd";
 import Router from "next/router";
@@ -24,7 +24,6 @@ import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { publicConfig } from "src/utils/config";
 
-import { TenantSelector } from "../tenant/TenantSelector";
 
 export const ImportUsersTable: React.FC = () => {
   const { message } = App.useApp();
@@ -38,7 +37,7 @@ export const ImportUsersTable: React.FC = () => {
     ? publicConfig.CLUSTERS[clusterParam]
     : defaultClusterStore.cluster);
 
-  const [form] = Form.useForm<{tenantName: string, data: GetClusterUsersResponse, whitelist: boolean}>();
+  const [form] = Form.useForm<{data: GetClusterUsersResponse, whitelist: boolean}>();
 
   const [loading, setLoading] = useState(false);
 
@@ -62,7 +61,7 @@ export const ImportUsersTable: React.FC = () => {
 
   return (
     <div>
-      
+
       <Form
         form={form}
         onFinish={async () => {
@@ -70,7 +69,7 @@ export const ImportUsersTable: React.FC = () => {
 
           setLoading(true);
 
-          const { data: changedData, tenantName, whitelist } = await form.validateFields();
+          const { data: changedData, whitelist } = await form.validateFields();
           const importData: ImportUsersData = { accounts: []};
 
           changedData?.accounts.forEach((x, i) => {
@@ -86,12 +85,11 @@ export const ImportUsersTable: React.FC = () => {
 
           await api.importUsers({ body: {
             data: importData,
-            tenantName,
             whitelist,
           } })
             .httpError(400, () => { message.error("数据格式不正确"); })
             .then(() => { message.success("导入成功"); })
-            .finally(() => { 
+            .finally(() => {
               setLoading(false);
               reload();
             });
@@ -99,30 +97,19 @@ export const ImportUsersTable: React.FC = () => {
       >
         <FilterFormContainer>
           <Space align="center">
-            选择集群：
+            选择集群，以账户为单位导入到默认租户中
             <SingleClusterSelector
               value={cluster}
               onChange={(value) => {
                 Router.push({ query: { cluster: value.id } });
               }}
             />
-          </Space>
-        </FilterFormContainer>
-        <FilterFormContainer>
-          <Space align="center">
-            导入账户及账户下的用户到SCOW平台的
-            <Form.Item name={"tenantName"}>
-              <TenantSelector placeholder="选择租户" autoSelect />
-            </Form.Item>
-            租户中
-            <Space size="large">
-              <Button type="primary" htmlType="submit" loading={loading}>
+            <Button type="primary" htmlType="submit" loading={loading}>
               导入
-              </Button>
-              <a onClick={reload}>
+            </Button>
+            <a onClick={reload}>
               刷新
-              </a>
-            </Space>
+            </a>
           </Space>
         </FilterFormContainer>
         <Table
@@ -154,8 +141,8 @@ export const ImportUsersTable: React.FC = () => {
           <Table.Column<ClusterAccountInfo>
             dataIndex="owner"
             title="拥有者"
-            render={(_, r, i) => 
-              r.included ? 
+            render={(_, r, i) =>
+              r.included ?
                 "该账户已导入" : selectedAccounts?.includes(r) ? (
                   <Form.Item name={["data", "accounts", i, "owner"]} rules={[{ required: true, message: "请选择一个拥有者" }]}>
                     <Select

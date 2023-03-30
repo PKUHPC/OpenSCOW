@@ -15,6 +15,7 @@ import { App, Button, Modal, Upload } from "antd";
 import { join } from "path";
 import { api } from "src/apis";
 import { urlToUpload } from "src/pageComponents/filemanager/api";
+import { publicConfig } from "src/utils/config";
 
 interface Props {
   open: boolean;
@@ -34,6 +35,7 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
       title="上传文件"
       onCancel={onClose}
       destroyOnClose
+      maskClosable={false}
       footer={[
         <Button key="close" onClick={onClose}>
           关闭
@@ -42,6 +44,9 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
     >
       <p>
         文件将会上传到：<strong>{path}</strong>。同名文件将会被覆盖。
+      </p>
+      <p>
+        单个上传文件大小最大为：<strong>{publicConfig.CLIENT_MAX_BODY_SIZE}</strong>。
       </p>
       <Upload.Dragger
         name="file"

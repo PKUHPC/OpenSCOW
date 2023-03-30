@@ -14,7 +14,8 @@ import { envConfig, str } from "@scow/lib-config";
 
 export const config = envConfig({
   RESOLVER: str({ desc: "DNS地址", default: "127.0.0.11" }),
-  CLIENT_MAX_BODY_SIZE: str({ desc: "请求文件大小限制", default: "1g" }),
+
+  CLIENT_MAX_BODY_SIZE: str({ desc: "请求文件大小限制", default: "1G" }),
 
   BASE_PATH: str({ desc: "base path", default: "" }),
 

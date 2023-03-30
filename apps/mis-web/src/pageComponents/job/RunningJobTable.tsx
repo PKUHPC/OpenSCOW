@@ -60,7 +60,10 @@ export const RunningJobQueryTable: React.FC<Props> = ({
   });
 
   useDidUpdateEffect(() => {
-    setQuery((q) => ({ ...q, accountName: accountNames ? accountNames[0] : undefined }));
+    setQuery((q) => ({
+      ...q,
+      accountName: Array.isArray(accountNames) ? accountNames[0] : accountNames ? accountNames : undefined,
+    }));
   }, [accountNames]);
 
   const [form] = Form.useForm<FilterForm>();
@@ -79,7 +82,7 @@ export const RunningJobQueryTable: React.FC<Props> = ({
     if (!data) { return undefined; }
 
     let filtered = data.results;
-    if (searchType.current === "precision") {
+    if (searchType.current === "precision" && query.jobId) {
       filtered = filtered.filter((x) => x.jobId === query.jobId + "");
     } else {
       // add local range filters here

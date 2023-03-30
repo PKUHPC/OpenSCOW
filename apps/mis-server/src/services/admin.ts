@@ -79,7 +79,7 @@ export const adminServiceServer = plugin((server) => {
     },
 
     importUsers: async ({ request, em, logger }) => {
-      const { data, tenantName, whitelist } = request;
+      const { data, whitelist } = request;
 
       if (!data) {
         throw <ServiceError> {
@@ -102,7 +102,7 @@ export const adminServiceServer = plugin((server) => {
         };
       }
 
-      const reply = await importUsers(data as ImportUsersData, em, whitelist, tenantName, logger);
+      const reply = await importUsers(data as ImportUsersData, em, whitelist, logger);
 
       return [reply];
 
