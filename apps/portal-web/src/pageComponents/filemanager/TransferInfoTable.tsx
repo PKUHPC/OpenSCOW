@@ -32,7 +32,8 @@ export const TransferInfoTable: React.FC = () => {
     const newTransferData: TransferData[] = [];
     for (const cluster of publicConfig.CLUSTERS) {
       try {
-        if (cluster.id === "hpc02") continue;
+        // 在测试开发环境中需要将hpc02排除在外，因为hpc02并没有容器化
+        // if (cluster.id === "hpc02") continue;
         const response = await api.queryTransferFiles({ query: { cluster: cluster.id } });
         newTransferData.push({
           cluster: cluster.id,
