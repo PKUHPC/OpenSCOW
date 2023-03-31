@@ -1,0 +1,61 @@
+/**
+   * Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
+   * SCOW is licensed under Mulan PSL v2.
+   * You can use this software according to the terms and conditions of the Mulan PSL v2.
+   * You may obtain a copy of Mulan PSL v2 at:
+   *          http://license.coscl.org.cn/MulanPSL2
+   * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+   * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+   * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+   * See the Mulan PSL v2 for more details.
+*/
+
+syntax = "proto3";
+
+package scheduler.adapter;
+
+import "google/protobuf/timestamp.proto";
+
+message CreateAppRequest {
+  string app_id = 1;
+  string user_id = 2;
+  string account = 3;
+  optional string partition = 4;
+  optional string qos = 5;
+  uint32 core_count = 6;
+  uint32 max_time = 7;
+  map<string, string> custom_attributes = 8;
+  repeated string user_sbatch_options = 9;
+}
+
+// "OK" | "SBATCH_FAILED": message | "APP_NOT_FOUND"
+message CreateAppResponse {
+  string session_id = 1;
+  int32 job_id = 2;
+}
+
+message ListAppSessionsRequest {
+  string user_id = 1;
+}
+
+message AppSession {
+  string session_id = 1;
+  uint32 job_id = 2;
+  google.protobuf.Timestamp submit_time = 3;
+  string app_id = 4;
+  string state = 5;
+  bool ready = 6;
+  string data_path = 7;
+  string running_time = 8;
+  string time_limit = 9;
+}
+
+message ListAppSessionsResponse {
+  repeated AppSession sessions=1;
+}
+
+
+service AppService {
+   rpc CreateApp(CreateAppRequest) returns (CreateAppResponse);
+   rpc ListAppSessions(ListAppSessionsRequest) returns (ListAppSessionsResponse);
+}

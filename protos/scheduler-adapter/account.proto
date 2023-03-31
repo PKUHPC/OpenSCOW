@@ -1,0 +1,92 @@
+/**
+   * Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
+   * SCOW is licensed under Mulan PSL v2.
+   * You can use this software according to the terms and conditions of the Mulan PSL v2.
+   * You may obtain a copy of Mulan PSL v2 at:
+   *          http://license.coscl.org.cn/MulanPSL2
+   * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+   * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+   * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+   * See the Mulan PSL v2 for more details.
+*/
+
+syntax = "proto3";
+
+package scheduler.adapter;
+
+message ListAccountsRequest {
+  string user_id = 1;
+}
+
+message ListAccountsResponse {
+  repeated string accounts = 1;
+}
+
+message CreateAccountRequest {
+  string account_name = 1;
+  string owner_id = 2;
+}
+
+// "ALREADY_EXISTS" | "OK"
+message CreateAccountResponse {
+}
+
+
+message DeleteAccountRequest {
+  string account_name = 1;
+}
+
+// "NOT_FOUND" | "OK"
+message DeleteAccountResponse {
+}
+
+
+message BlockAccountRequest {
+  string account_name = 1;
+}
+
+// "NOT_FOUND" | success: "ALREADY_BLOCKED" , "OK"
+message BlockAccountResponse {
+}
+
+message UnblockAccountRequest {
+  string account_name = 1;
+}
+
+// "NOT_FOUND" | success: "ALREADY_UNBLOCKED" , "OK"
+message UnblockAccountResponse {
+}
+
+message UserInAccount {
+  string user_id = 1;
+  string user_name = 2;
+  string state = 3;
+}
+message ClusterAccountInfo {
+  string account_name = 1;
+  repeated UserInAccount users = 2;
+  optional string owner = 3;
+  bool blocked = 4;
+}
+
+message GetAllAccountsWithUsersRequest {
+
+}
+
+message GetAllAccountsWithUsersResponse {
+  repeated ClusterAccountInfo accounts = 1;
+}
+service AccountService {
+
+  rpc ListAccounts(ListAccountsRequest) returns (ListAccountsResponse);
+
+  rpc CreateAccount(CreateAccountRequest) returns (CreateAccountResponse);
+
+  rpc DeleteAccount(DeleteAccountRequest) returns (DeleteAccountResponse);
+
+  rpc BlockAccount(BlockAccountRequest) returns (BlockAccountResponse);
+
+  rpc UnblockAccount(UnblockAccountRequest) returns (UnblockAccountResponse);
+
+  rpc GetAllAccountsWithUsers(GetAllAccountsWithUsersRequest) returns (GetAllAccountsWithUsersResponse);
+}

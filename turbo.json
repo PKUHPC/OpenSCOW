@@ -38,6 +38,7 @@
     "@scow/protos#generate": {
       "inputs": [
         "node_modules/@scow/grpc-api/**/*.proto",
+        "node_modules/@scow/grpc-adapter/**/*.proto",
         "buf.gen.yaml"
       ],
       "outputs": [

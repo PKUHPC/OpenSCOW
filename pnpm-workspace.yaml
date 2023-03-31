@@ -3,5 +3,5 @@ packages:
   - apps/**
   - docs
   - "!**/.next"
-  - protos
+  - protos/**
   - deploy/**
