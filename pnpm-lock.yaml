@@ -178,7 +178,7 @@ importers:
       '@scow/lib-decimal': link:../../libs/decimal
       '@scow/lib-slurm': link:../../libs/slurm
       '@scow/lib-ssh': link:../../libs/ssh
-      '@scow/protos': link:../../libs/protos
+      '@scow/protos': link:../../libs/protos/scow
       '@scow/utils': link:../../libs/utils
       '@sinclair/typebox': 0.25.24
       dotenv: 16.0.3
@@ -248,7 +248,7 @@ importers:
       '@scow/lib-config': link:../../libs/libconfig
       '@scow/lib-decimal': link:../../libs/decimal
       '@scow/lib-web': link:../../libs/web
-      '@scow/protos': link:../../libs/protos
+      '@scow/protos': link:../../libs/protos/scow
       '@scow/utils': link:../../libs/utils
       '@sinclair/typebox': 0.25.24
       antd: 5.3.2_biqbaboplfbrettd7655fr4n2y
@@ -318,7 +318,7 @@ importers:
       '@scow/lib-config': link:../../libs/libconfig
       '@scow/lib-slurm': link:../../libs/slurm
       '@scow/lib-ssh': link:../../libs/ssh
-      '@scow/protos': link:../../libs/protos
+      '@scow/protos': link:../../libs/protos/scow
       '@scow/utils': link:../../libs/utils
       '@sinclair/typebox': 0.25.24
       dayjs: 1.11.7
@@ -418,7 +418,7 @@ importers:
       '@scow/lib-decimal': link:../../libs/decimal
       '@scow/lib-ssh': link:../../libs/ssh
       '@scow/lib-web': link:../../libs/web
-      '@scow/protos': link:../../libs/protos
+      '@scow/protos': link:../../libs/protos/scow
       '@scow/utils': link:../../libs/utils
       '@sinclair/typebox': 0.25.24
       '@uiw/codemirror-theme-github': 4.19.9_24gumbi44ebqnfvtgijke3b3zq
@@ -547,19 +547,29 @@ importers:
     devDependencies:
       '@types/js-yaml': 4.0.5
 
-  libs/protos:
+  libs/protos/scheduler-adapter:
     specifiers:
       '@grpc/grpc-js': 1.8.12
       '@scow/grpc-adapter': workspace:*
+      long: 5.2.1
+      protobufjs: 7.2.2
+    dependencies:
+      '@grpc/grpc-js': 1.8.12
+      '@scow/grpc-adapter': link:../../../protos/scheduler-adapter
+      long: 5.2.1
+      protobufjs: 7.2.2
+
+  libs/protos/scow:
+    specifiers:
+      '@grpc/grpc-js': 1.8.12
       '@scow/grpc-api': workspace:*
       long: 5.2.1
       protobufjs: 7.2.2
     dependencies:
       '@grpc/grpc-js': 1.8.12
-      '@scow/grpc-adapter': link:../../protos/scheduler-adapter
-      '@scow/grpc-api': link:../../protos/scow
+      '@scow/grpc-api': link:../../../protos/scow
       long: 5.2.1
-      protobufjs: registry.npmmirror.com/protobufjs/7.2.2
+      protobufjs: 7.2.2
 
   libs/slurm:
     specifiers:
@@ -569,7 +579,7 @@ importers:
       ts-log: 2.2.5
     dependencies:
       '@scow/lib-ssh': link:../ssh
-      '@scow/protos': link:../protos
+      '@scow/protos': link:../protos/scow
     devDependencies:
       node-ssh: 13.0.1
       ts-log: 2.2.5
@@ -18430,69 +18440,6 @@ packages:
     engines: {node: '>=8'}
     dev: false
 
-  registry.npmmirror.com/@protobufjs/aspromise/1.1.2:
-    resolution: {integrity: sha512-j+gKExEuLmKwvz3OgROXtrJ2UG2x8Ch2YZUxahh+s1F2HZ+wAceUNLkvy6zKCPVRkU++ZWQrdxsUeQXmcg4uoQ==, registry: http://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/@protobufjs/aspromise/-/aspromise-1.1.2.tgz}
-    name: '@protobufjs/aspromise'
-    version: 1.1.2
-    dev: false
-
-  registry.npmmirror.com/@protobufjs/base64/1.1.2:
-    resolution: {integrity: sha512-AZkcAA5vnN/v4PDqKyMR5lx7hZttPDgClv83E//FMNhR2TMcLUhfRUBHCmSl0oi9zMgDDqRUJkSxO3wm85+XLg==, registry: http://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/@protobufjs/base64/-/base64-1.1.2.tgz}
-    name: '@protobufjs/base64'
-    version: 1.1.2
-    dev: false
-
-  registry.npmmirror.com/@protobufjs/codegen/2.0.4:
-    resolution: {integrity: sha512-YyFaikqM5sH0ziFZCN3xDC7zeGaB/d0IUb9CATugHWbd1FRFwWwt4ld4OYMPWu5a3Xe01mGAULCdqhMlPl29Jg==, registry: http://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/@protobufjs/codegen/-/codegen-2.0.4.tgz}
-    name: '@protobufjs/codegen'
-    version: 2.0.4
-    dev: false
-
-  registry.npmmirror.com/@protobufjs/eventemitter/1.1.0:
-    resolution: {integrity: sha512-j9ednRT81vYJ9OfVuXG6ERSTdEL1xVsNgqpkxMsbIabzSo3goCjDIveeGv5d03om39ML71RdmrGNjG5SReBP/Q==, registry: http://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/@protobufjs/eventemitter/-/eventemitter-1.1.0.tgz}
-    name: '@protobufjs/eventemitter'
-    version: 1.1.0
-    dev: false
-
-  registry.npmmirror.com/@protobufjs/fetch/1.1.0:
-    resolution: {integrity: sha512-lljVXpqXebpsijW71PZaCYeIcE5on1w5DlQy5WH6GLbFryLUrBD4932W/E2BSpfRJWseIL4v/KPgBFxDOIdKpQ==, registry: http://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/@protobufjs/fetch/-/fetch-1.1.0.tgz}
-    name: '@protobufjs/fetch'
-    version: 1.1.0
-    dependencies:
-      '@protobufjs/aspromise': 1.1.2
-      '@protobufjs/inquire': 1.1.0
-    dev: false
-
-  registry.npmmirror.com/@protobufjs/float/1.0.2:
-    resolution: {integrity: sha512-Ddb+kVXlXst9d+R9PfTIxh1EdNkgoRe5tOX6t01f1lYWOvJnSPDBlG241QLzcyPdoNTsblLUdujGSE4RzrTZGQ==, registry: http://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/@protobufjs/float/-/float-1.0.2.tgz}
-    name: '@protobufjs/float'
-    version: 1.0.2
-    dev: false
-
-  registry.npmmirror.com/@protobufjs/inquire/1.1.0:
-    resolution: {integrity: sha512-kdSefcPdruJiFMVSbn801t4vFK7KB/5gd2fYvrxhuJYg8ILrmn9SKSX2tZdV6V+ksulWqS7aXjBcRXl3wHoD9Q==, registry: http://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/@protobufjs/inquire/-/inquire-1.1.0.tgz}
-    name: '@protobufjs/inquire'
-    version: 1.1.0
-    dev: false
-
-  registry.npmmirror.com/@protobufjs/path/1.1.2:
-    resolution: {integrity: sha512-6JOcJ5Tm08dOHAbdR3GrvP+yUUfkjG5ePsHYczMFLq3ZmMkAD98cDgcT2iA1lJ9NVwFd4tH/iSSoe44YWkltEA==, registry: http://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/@protobufjs/path/-/path-1.1.2.tgz}
-    name: '@protobufjs/path'
-    version: 1.1.2
-    dev: false
-
-  registry.npmmirror.com/@protobufjs/pool/1.1.0:
-    resolution: {integrity: sha512-0kELaGSIDBKvcgS4zkjz1PeddatrjYcmMWOlAuAPwAeccUrPHdUqo/J6LiymHHEiJT5NrF1UVwxY14f+fy4WQw==, registry: http://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/@protobufjs/pool/-/pool-1.1.0.tgz}
-    name: '@protobufjs/pool'
-    version: 1.1.0
-    dev: false
-
-  registry.npmmirror.com/@protobufjs/utf8/1.1.0:
-    resolution: {integrity: sha512-Vvn3zZrhQZkkBE8LSuW3em98c0FwgO4nxzv6OdSxPKJIEKY2bGbHn+mhGIPerzI4twdxaP8/0+06HBpwf345Lw==, registry: http://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/@protobufjs/utf8/-/utf8-1.1.0.tgz}
-    name: '@protobufjs/utf8'
-    version: 1.1.0
-    dev: false
-
   registry.npmmirror.com/@types/mime-types/2.1.1:
     resolution: {integrity: sha512-vXOTGVSLR2jMw440moWTC7H19iUyLtP3Z1YTj7cSsubOICinjMxFeb/V57v9QdyyPGbbWolUFSSmSiRSn94tFw==, registry: http://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/@types/mime-types/-/mime-types-2.1.1.tgz}
     name: '@types/mime-types'
@@ -18735,12 +18682,6 @@ packages:
     version: 3.1.0
     dev: false
 
-  registry.npmmirror.com/long/5.2.1:
-    resolution: {integrity: sha512-GKSNGeNAtw8IryjjkhZxuKB3JzlcLTwjtiQCHKvqQet81I93kXslhDQruGI/QsddO83mcDToBVy7GqGS/zYf/A==, registry: http://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/long/-/long-5.2.1.tgz}
-    name: long
-    version: 5.2.1
-    dev: false
-
   registry.npmmirror.com/mime-db/1.33.0:
     resolution: {integrity: sha512-BHJ/EKruNIqJf/QahvxwQZXKygOQ256myeN/Ew+THcAa5q+PjyTTMMeNQC4DZw5AwfvelsUrA6B67NKMqXDbzQ==, registry: http://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/mime-db/-/mime-db-1.33.0.tgz}
     name: mime-db
@@ -18843,27 +18784,6 @@ packages:
     name: process
     version: 0.11.10
     engines: {node: '>= 0.6.0'}
-    dev: false
-
-  registry.npmmirror.com/protobufjs/7.2.2:
-    resolution: {integrity: sha512-++PrQIjrom+bFDPpfmqXfAGSQs40116JRrqqyf53dymUMvvb5d/LMRyicRoF1AUKoXVS1/IgJXlEgcpr4gTF3Q==, registry: http://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/protobufjs/-/protobufjs-7.2.2.tgz}
-    name: protobufjs
-    version: 7.2.2
-    engines: {node: '>=12.0.0'}
-    requiresBuild: true
-    dependencies:
-      '@protobufjs/aspromise': registry.npmmirror.com/@protobufjs/aspromise/1.1.2
-      '@protobufjs/base64': registry.npmmirror.com/@protobufjs/base64/1.1.2
-      '@protobufjs/codegen': registry.npmmirror.com/@protobufjs/codegen/2.0.4
-      '@protobufjs/eventemitter': registry.npmmirror.com/@protobufjs/eventemitter/1.1.0
-      '@protobufjs/fetch': registry.npmmirror.com/@protobufjs/fetch/1.1.0
-      '@protobufjs/float': registry.npmmirror.com/@protobufjs/float/1.0.2
-      '@protobufjs/inquire': registry.npmmirror.com/@protobufjs/inquire/1.1.0
-      '@protobufjs/path': registry.npmmirror.com/@protobufjs/path/1.1.2
-      '@protobufjs/pool': registry.npmmirror.com/@protobufjs/pool/1.1.0
-      '@protobufjs/utf8': registry.npmmirror.com/@protobufjs/utf8/1.1.0
-      '@types/node': 18.15.5
-      long: registry.npmmirror.com/long/5.2.1
     dev: false
 
   registry.npmmirror.com/readable-stream/4.2.0:

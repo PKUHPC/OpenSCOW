@@ -6,7 +6,7 @@
     "build": "turbo run build",
     "build:libs": "turbo run build --filter \"./libs/**\"",
     "build:images": "docker build -f docker/Dockerfile.scow -t scow .",
-    "build:protos": "turbo run build --filter protos",
+    "build:protos": "turbo run build --filter \"./libs/protos/**\"",
     "prepareDev": "pnpm build:libs && turbo run prepareDev",
     "prune": "pnpm clean --yes && pnpm bootstrap --ci -- --production",
     "dev:libs": "turbo run dev --filter \"./libs/**\"",

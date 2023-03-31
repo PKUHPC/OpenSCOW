@@ -1,0 +1,24 @@
+{
+  "name": "@scow/scheduler-adapter-protos",
+  "version": "0.1.0",
+  "description": "",
+  "main": "build/index.js",
+  "private": true,
+  "scripts": {
+    "generate": "rimraf generated && buf generate --template buf.gen.yaml node_modules/@scow/grpc-adapter",
+    "build": "rimraf build && tsc"
+  },
+  "files": [
+    "build",
+    "!**/*.map"
+  ],
+  "dependencies": {
+    "@grpc/grpc-js": "1.8.12",
+    "long": "5.2.1",
+    "protobufjs": "7.2.2",
+    "@scow/grpc-adapter": "workspace:*"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
