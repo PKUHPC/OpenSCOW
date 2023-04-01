@@ -31,6 +31,7 @@ interface JobForm {
   partition: string | undefined;
   nodeCount: number;
   coreCount: number;
+  gpuCount: number | undefined;
   command: string;
   jobName: string;
   qos: string | undefined;
@@ -49,6 +50,7 @@ const initialValues = {
   command: "",
   nodeCount: 1,
   coreCount: 1,
+  gpuCount: 1,
   maxTime: 30,
   save: false,
 } as Partial<JobForm>;
@@ -96,6 +98,12 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
   const cluster = Form.useWatch("cluster", form) as Cluster | undefined;
 
   const partition = Form.useWatch("partition", form) as string | undefined;
+
+  const nodeCount = Form.useWatch("nodeCount", form) as number;
+
+  const coreCount = Form.useWatch("coreCount", form) as number;
+
+  const gpuCount = Form.useWatch("gpuCount", form) as number;
 
   const calculateWorkingDirectory = (template: string) =>
     parsePlaceholder(template, { name: form.getFieldValue("jobName") });
@@ -225,16 +233,37 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
           </Form.Item>
         </Col>
         <Col span={12} sm={6}>
-          <Form.Item
-            label="CPU核心数"
-            name="coreCount"
-            dependencies={["cluster", "partition"]}
-            rules={[
-              { required: true, type: "integer", max: currentPartitionInfo?.cores },
-            ]}
-          >
-            <InputNumber min={1} />
-          </Form.Item>
+          {currentPartitionInfo?.gpus ? (
+            <Form.Item
+              label="单节点GPU卡数"
+              name="gpuCount"
+              dependencies={["cluster", "partition"]}
+              rules={[
+                {
+                  required: true,
+                  type: "integer",
+                  max: currentPartitionInfo?.gpus,
+                },
+              ]}
+            >
+              <InputNumber min={1} />
+            </Form.Item>
+          ) : (
+            <Form.Item
+              label="单节点核心数"
+              name="coreCount"
+              dependencies={["cluster", "partition"]}
+              rules={[
+                {
+                  required: true,
+                  type: "integer",
+                  max: currentPartitionInfo?.cores,
+                },
+              ]}
+            >
+              <InputNumber min={1} />
+            </Form.Item>
+          )}
         </Col>
         <Col span={24} sm={12}>
           <Form.Item label="最长运行时间" name="maxTime" rules={[{ required: true }]}>
@@ -245,6 +274,29 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
           <Form.Item<JobForm> label="工作目录" name="workingDirectory" rules={[{ required: true }]}>
             <Input addonBefore="~/" />
           </Form.Item>
+        </Col>
+        <Col className="ant-form-item" span={12} sm={6}>
+          总节点数：{nodeCount}
+        </Col>
+
+        {currentPartitionInfo?.gpus ? (
+          <Col className="ant-form-item" span={12} sm={6}>
+            总卡数：{nodeCount * gpuCount}
+          </Col>
+        ) : (
+          ""
+        )}
+
+        <Col className="ant-form-item" span={12} sm={6}>
+          总核心数：
+          {currentPartitionInfo?.gpus
+            ? Math.floor(nodeCount * gpuCount * (currentPartitionInfo.cores / currentPartitionInfo.gpus))
+            : nodeCount * coreCount}
+        </Col>
+        <Col className="ant-form-item" span={12} sm={6}>
+          总内存容量：{currentPartitionInfo ?
+            currentPartitionInfo.gpus ? nodeCount * gpuCount * (currentPartitionInfo.mem / currentPartitionInfo.gpus) :
+              nodeCount * coreCount * (currentPartitionInfo.mem / currentPartitionInfo.cores) : 0} MB
         </Col>
       </Row>
       <Form.Item label="备注" name="comment">

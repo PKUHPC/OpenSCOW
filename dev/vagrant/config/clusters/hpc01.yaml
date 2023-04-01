@@ -27,6 +27,22 @@ slurm:
       # 这个分区的备注信息
       comment: "两个计算节点分区"
 
+    # 分区2的名字
+    - name: GPU
+      # 分区内节点数
+      nodes: 1
+      # 单节点内存数量，单位M
+      mem: 2048
+      # 核心数
+      cores: 2
+      # GPU数
+      gpus: 2
+      # QOS
+      qos:
+        - normal
+      # 这个分区的备注信息
+      comment: "GPU计算节点分区"
+
   # 如果这个集群要部署管理系统，请增加以下配置
   # 如果不需要，将整个mis块注释掉
   mis:
