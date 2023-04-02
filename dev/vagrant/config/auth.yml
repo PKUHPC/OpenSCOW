@@ -42,6 +42,7 @@ otp:
         host: "smtp.ethereal.email"
         #是否启用安全连接，默认false
         secure: false
+        #服务器端口默认25
         port: 587
         #SMTP身份验证用户名
         user: "morgan68@ethereal.email"

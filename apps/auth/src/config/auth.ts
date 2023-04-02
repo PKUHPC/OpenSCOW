@@ -69,7 +69,7 @@ export const LdapConfigSchema = Type.Object({
       如果不填写，则使用ldap.attrs.uid的值
       ` })),
       extraProps: Type.Optional(Type.Record(
-        Type.String(), 
+        Type.String(),
         Type.Union([Type.Null(), Type.String(), Type.Array(Type.String())],
           {
             description: `
@@ -168,12 +168,12 @@ export const AuthConfigSchema = Type.Object({
         mailTransportInfo: Type.Object({
           host: Type.String({ description: "SMTP服务器", default: "" }),
           secure: Type.Boolean({ description: "是否启用SSL加密", default: false }),
-          port: Type.Number({ description: "服务器端口", default: "" }),
+          port: Type.Number({ description: "服务器端口", default: 25 }),
           user: Type.String({ description: "SMTP身份验证用户名", default: "" }),
-          password: Type.String({ description: "SMTP身份验证密码", default: "passwd" }),
+          password: Type.String({ description: "SMTP身份验证密码", default: "" }),
         }, { default: {} }),
-      }, { description: "", default: {} }),
-    }, { description: "", default: {} }),
+      }, { description: "邮件配置", default: {} }),
+    }, { description: "发送绑定链接相关配置", default: {} }),
     remote: Type.Object({
       url: Type.String({ description: "otp验证url，应返回boolean", default: "" }),
       redirectUrl: Type.String({ description: "当用户点击绑定OTP时，302重定向的链接", default: "" }),
