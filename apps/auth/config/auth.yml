@@ -47,7 +47,7 @@ otp:
           #SMTP身份验证授权码
           password: ""
 
-  #如果mode指定为remote，需要配置以下认证url
+  #如果mode指定为remote，需要配置以下内容
   remote:
     #远程验证url
     url: ""

@@ -23,7 +23,7 @@ import { authConfig, LdapConfigSchema } from "src/config/auth";
 import { rootKeyPair } from "src/config/env";
 import { promisify } from "util";
 
-import { aesDecryptData, aesEncryptData } from "./aesUtils";
+import { aesDecryptData } from "./aesUtils";
 import { getAbsoluteUTCTimestamp, sendEmailAuthLink, storeOTPSessionAndGoSendEmailUI } from "./helper";
 
 
@@ -31,7 +31,7 @@ import { getAbsoluteUTCTimestamp, sendEmailAuthLink, storeOTPSessionAndGoSendEma
    *  登录界面->绑定OTP界面
    *  绑定OTP界面->登录界面重定向
    * */
-export async function redirectLoinUIAndBindUI(f: FastifyInstance) {
+export function redirectLoinUIAndBindUI(f: FastifyInstance) {
   const QuerystringSchema = Type.Object({
     action: Type.String(),
     backToLoginUrl: Type.String(),
@@ -75,7 +75,7 @@ export async function redirectLoinUIAndBindUI(f: FastifyInstance) {
 }
 
 //  验证用户名密码->发送邮件页面
-export async function validateUserNameAndPassword(f: FastifyInstance, ldapConfig: LdapConfigSchema) {
+export function validateUserNameAndPassword(f: FastifyInstance, ldapConfig: LdapConfigSchema) {
   const bodySchema = Type.Object({
     username: Type.String(),
     password: Type.String(),
@@ -118,7 +118,7 @@ export async function validateUserNameAndPassword(f: FastifyInstance, ldapConfig
 }
 
 // 点击获取绑定链接
-export async function clickRequestBindingLink(
+export function clickRequestBindingLink(
   f: FastifyInstance) {
   const bodySchema = Type.Object({
     OTPSessionToken: Type.String(),
@@ -142,7 +142,7 @@ export async function clickRequestBindingLink(
   );
 }
 // 点击邮箱中的绑定链接
-export async function clickAuthLinkInEmail(
+export function clickAuthLinkInEmail(
   f: FastifyInstance,
   ldapConfig: LdapConfigSchema,
 ) {
@@ -206,45 +206,3 @@ export async function clickAuthLinkInEmail(
       });
 }
 
-// 远程验证OTP码
-export async function remoteValidateOTPCode(
-  f: FastifyInstance,
-  ldapConfig: LdapConfigSchema,
-) {
-
-  const bodySchema = Type.Object({
-    OTPCode: Type.String(),
-    userId: Type.String(),
-  });
-
-  f.post<{Body: Static<typeof bodySchema>}>(
-    "/otp/remote/validateCode",
-    {
-      schema: {
-        body: bodySchema,
-      },
-    },
-    async (req, res) => {
-      const { OTPCode, userId } = req.body;
-
-      const logger = req.log;
-      const secret = await sshConnect("192.168.88.102", "root", rootKeyPair, logger, async (ssh) => {
-        const homedir = parsePlaceholder(ldapConfig.addUser.homeDir, { userId });
-        const fileContent =
-          await ssh.execCommand(`su ${userId} && cat ${homedir}/.google_authenticator`);
-        return fileContent.stdout.toString().split("\n")[0];
-      });
-      const time = await getAbsoluteUTCTimestamp();
-      const result = speakeasy.totp.verify({
-        token: OTPCode,
-        time: time / 1000,
-        encoding: "base32",
-        secret: secret,
-        digits: authConfig.otp.digits,
-        step: authConfig.otp.period,
-        algorithm: authConfig.otp.algorithm,
-      });
-      res.send(result);
-    },
-  );
-}

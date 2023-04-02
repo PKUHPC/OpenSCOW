@@ -41,7 +41,3 @@ export function aesDecryptData(text: string) {
   decrypted = Buffer.concat([decrypted, decipher.final()]);
   return decrypted.toString();
 }
-
-
-
-

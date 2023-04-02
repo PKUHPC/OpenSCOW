@@ -50,7 +50,7 @@ mockUsers:
 
   1. 目前仅支持ldap认证方式启用otp，ssh方式不支持。
   2. 手机端您可以使用FreeOTP, authenticator等，但是请注意有的手机端app可能不支持配置OTP码的digits和加密方式等。
-  3. 您需要自己在ldap中定义一个属性名用来存储string类型的OTP密钥。
+  3. 您需要自己在ldap中定义一个属性名用来存储string类型的OTP密钥,并配置为auth.yaml中的opt.secretAttributeName。
   4. 您需要配置一个邮件传输代理（MTA）以实现邮件服务。其中，您需要提供有效的发件人地址、SMTP 服务器地址、SMTP 服务器端口号以及 SMTP 认证凭据（包括用户名和授权码）。
   5. 如果您的密钥要自己存储在某个地方（即otp.status为remote），那么您需要提供一个验证otp码的接口，返回验证的结果。返回结果用string类型false或者true字符串即可。scow会使用fetch向config/auth.yml中的otp.remote.url发起请求。
 
@@ -166,12 +166,12 @@ otp:
         #SMTP服务器
         host: "smtp.ethereal.email"
         #是否启用安全连接，默认false
-        secure: STARTTLS
+        secure: false
         port: 587
         #SMTP身份验证用户名
-        user: "melyssa12@ethereal.email"
+        user: "morgan68@ethereal.email"
         #SMTP身份验证授权码
-        password: "JEYPbjY77DNV1erpzt"
+        password: "y2es3bd3rYwxWs5n8g"
   #如果mode指定为remote，需要配置以下认证url
   remote:
     #远程验证url，例如http://localhost:5000/otp/remote/validateCode

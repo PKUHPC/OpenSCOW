@@ -17,6 +17,7 @@ import { findUser, useLdap } from "src/auth/ldap/helpers";
 import { modifyPasswordAsSelf } from "src/auth/ldap/password";
 import { registerPostHandler } from "src/auth/ldap/postHandler";
 import { serveLoginHtml } from "src/auth/loginHtml";
+import { registerOTPBindPostHandler } from "src/auth/otp";
 import { authConfig, LdapConfigSchema } from "src/config/auth";
 import { ensureNotUndefined, RequiredBy } from "src/utils/validations";
 
@@ -26,6 +27,7 @@ export const createLdapAuthProvider = (f: FastifyInstance) => {
 
   registerPostHandler(f, ldap);
 
+  registerOTPBindPostHandler(f, ldap);
   return <AuthProvider>{
     serveLoginHtml: (callbackUrl, req, rep) => serveLoginHtml(false, callbackUrl, req, rep),
     fetchAuthTokenInfo: async () => undefined,

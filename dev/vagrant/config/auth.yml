@@ -28,7 +28,7 @@ otp:
     mail:
       enabled: true
       #发件邮箱地址
-      from: "melyssa12@ethereal.email"
+      from: "morgan68@ethereal.email"
       #邮件主题，默认为"otp绑定链接"
       subject: "otp绑定链接"
       #邮件内容标题，默认为"Bind OTP""
@@ -41,12 +41,12 @@ otp:
         #SMTP服务器
         host: "smtp.ethereal.email"
         #是否启用安全连接，默认false
-        secure: STARTTLS
+        secure: false
         port: 587
         #SMTP身份验证用户名
-        user: "melyssa12@ethereal.email"
+        user: "morgan68@ethereal.email"
         #SMTP身份验证授权码
-        password: "JEYPbjY77DNV1erpzt"
+        password: "y2es3bd3rYwxWs5n8g"
   #如果mode指定为remote，需要配置以下认证url
   remote:
     #远程验证url

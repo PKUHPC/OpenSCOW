@@ -17,7 +17,7 @@ import { generateIvAndKey } from "./aesUtils";
 import { clickAuthLinkInEmail, clickRequestBindingLink,
   redirectLoinUIAndBindUI, validateUserNameAndPassword } from "./routeHandles";
 
-export async function registerOTPBindPostHandler(f: FastifyInstance, ldapConfig: LdapConfigSchema) {
+export function registerOTPBindPostHandler(f: FastifyInstance, ldapConfig: LdapConfigSchema) {
 
   if (authConfig.otp.status === OTPStatusOptions.disabled) {
     return;
@@ -27,16 +27,16 @@ export async function registerOTPBindPostHandler(f: FastifyInstance, ldapConfig:
    *  登录界面->绑定OTP界面
    *  绑定OTP界面->登录界面重定向
    * */
-  await redirectLoinUIAndBindUI(f);
+  redirectLoinUIAndBindUI(f);
 
   if (authConfig.otp.status === "local") {
     // 用于绑定账户时OTPSession不暴露于前端
     generateIvAndKey();
     // 验证账户密码
-    await validateUserNameAndPassword(f, ldapConfig);
+    validateUserNameAndPassword(f, ldapConfig);
     // 发邮件
-    await clickRequestBindingLink(f);
+    clickRequestBindingLink(f);
     // 绑定获取二维码
-    await clickAuthLinkInEmail(f, ldapConfig);
+    clickAuthLinkInEmail(f, ldapConfig);
   }
 }

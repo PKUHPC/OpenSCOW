@@ -22,7 +22,7 @@ import { registerOTPBindPostHandler } from "src/auth/otp/index";
 import { validateLoginParams } from "src/auth/validateLoginParams";
 import { LdapConfigSchema } from "src/config/auth";
 
-export async function registerPostHandler(f: FastifyInstance, ldapConfig: LdapConfigSchema) {
+export function registerPostHandler(f: FastifyInstance, ldapConfig: LdapConfigSchema) {
 
   f.register(formBody);
 
@@ -35,7 +35,6 @@ export async function registerPostHandler(f: FastifyInstance, ldapConfig: LdapCo
     OTPCode: Type.String(),
   });
 
-  await registerOTPBindPostHandler(f, ldapConfig);
   // register a login handler
   f.post<{ Body: Static<typeof bodySchema> }>("/public/auth", {
     schema: { body: bodySchema },
