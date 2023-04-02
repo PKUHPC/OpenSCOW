@@ -125,20 +125,22 @@ export const jobServiceServer = plugin((server) => {
     },
 
     submitJob: async ({ request, logger }) => {
-      const { cluster, command, jobName, coreCount, maxTime, saveAsTemplate, userId,
-        nodeCount, partition, qos, account, comment, workingDirectory } = request;
+      const { cluster, command, jobName, coreCount, gpuCount, maxTime, saveAsTemplate, userId,
+        nodeCount, partition, qos, account, comment, workingDirectory, memory } = request;
 
       const jobInfo: JobTemplate = {
         jobName,
         coreCount,
         maxTime,
         nodeCount,
+        gpuCount,
         partition,
         qos,
         account,
         command,
         comment,
         workingDirectory,
+        memory,
       };
 
       const clusterops = getClusterOps(cluster);

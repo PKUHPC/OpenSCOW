@@ -18,6 +18,7 @@ import { querySacct } from "src/clusterops/slurm/bl/queryJobInfo";
 import { generateJobScript, JobMetadata, parseSbatchOutput } from "src/clusterops/slurm/bl/submitJob";
 import { portalConfig } from "src/config/portal";
 import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
+import { json } from "stream/consumers";
 
 export const slurmJobOps = (cluster: string): JobOps => {
 
@@ -56,6 +57,7 @@ export const slurmJobOps = (cluster: string): JobOps => {
 
     submitJob: async (request, logger) => {
       const { jobInfo, userId, saveAsTemplate } = request;
+      logger.info("submitJob jobInfo  %s", JSON.stringify(jobInfo));
 
       return await sshConnect(host, userId, logger, async (ssh) => {
 

@@ -68,15 +68,17 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
 
 
   const submit = async () => {
-    const { cluster, command, jobName, coreCount, workingDirectory, save,
+    const { cluster, command, jobName, coreCount, gpuCount, workingDirectory, save,
       maxTime, nodeCount, partition, qos, account, comment } = await form.validateFields();
 
     setLoading(true);
 
     await api.submitJob({ body: {
       cluster: cluster.id, command, jobName, account,
-      coreCount, maxTime, nodeCount, partition, qos, comment,
-      workingDirectory, save,
+      coreCount: gpuCount ? gpuCount * Math.floor(currentPartitionInfo!.cores / currentPartitionInfo!.gpus) : coreCount,
+      gpuCount,
+      maxTime, nodeCount, partition, qos, comment,
+      workingDirectory, save, memory,
     } })
       .httpError(500, (e) => {
         if (e.code === "SCHEDULER_FAILED") {
@@ -149,6 +151,15 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
   }, [currentPartitionInfo]);
 
   const defaultClusterStore = useStore(DefaultClusterStore);
+
+  const memory = (currentPartitionInfo ?
+    currentPartitionInfo.gpus ? nodeCount * gpuCount * (currentPartitionInfo.mem / currentPartitionInfo.gpus) :
+      nodeCount * coreCount * (currentPartitionInfo.mem / currentPartitionInfo.cores) : 0) + "MB";
+
+  const coreCountSum = currentPartitionInfo?.gpus
+    ? nodeCount * gpuCount * Math.floor(currentPartitionInfo.cores / currentPartitionInfo.gpus)
+    : nodeCount * coreCount;
+
 
   return (
     <Form<JobForm>
@@ -288,15 +299,10 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
         )}
 
         <Col className="ant-form-item" span={12} sm={6}>
-          总核心数：
-          {currentPartitionInfo?.gpus
-            ? Math.floor(nodeCount * gpuCount * (currentPartitionInfo.cores / currentPartitionInfo.gpus))
-            : nodeCount * coreCount}
+          总核心数：{coreCountSum}
         </Col>
         <Col className="ant-form-item" span={12} sm={6}>
-          总内存容量：{currentPartitionInfo ?
-            currentPartitionInfo.gpus ? nodeCount * gpuCount * (currentPartitionInfo.mem / currentPartitionInfo.gpus) :
-              nodeCount * coreCount * (currentPartitionInfo.mem / currentPartitionInfo.cores) : 0} MB
+          总内存容量：{memory}
         </Col>
       </Row>
       <Form.Item label="备注" name="comment">
