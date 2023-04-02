@@ -50,13 +50,6 @@ message UnblockUserInAccountRequest {
 message UnblockUserInAccountResponse {
 }
 
-message GetAllUsersInAccountsRequest {
-}
-
-message GetAllUsersInAccountsResponse {
-  string result = 1;
-}
-
 
 service UserService {
   rpc AddUserToAccount(AddUserToAccountRequest) returns (AddUserToAccountResponse);
@@ -67,5 +60,4 @@ service UserService {
 
   rpc UnblockUserInAccount(UnblockUserInAccountRequest) returns (UnblockUserInAccountResponse);
 
-  rpc GetAllUsersInAccounts(GetAllUsersInAccountsRequest) returns (GetAllUsersInAccountsResponse);
 }

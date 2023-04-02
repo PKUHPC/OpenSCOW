@@ -152,6 +152,7 @@ importers:
       '@scow/lib-slurm': workspace:*
       '@scow/lib-ssh': workspace:*
       '@scow/protos': workspace:*
+      '@scow/scheduler-adapter-protos': workspace:*
       '@scow/utils': workspace:*
       '@sinclair/typebox': 0.25.24
       '@types/google-protobuf': 3.15.6
@@ -179,6 +180,7 @@ importers:
       '@scow/lib-slurm': link:../../libs/slurm
       '@scow/lib-ssh': link:../../libs/ssh
       '@scow/protos': link:../../libs/protos/scow
+      '@scow/scheduler-adapter-protos': link:../../libs/protos/scheduler-adapter
       '@scow/utils': link:../../libs/utils
       '@sinclair/typebox': 0.25.24
       dotenv: 16.0.3
@@ -468,6 +470,22 @@ importers:
       postcss: 8.4.21
       ts-log: 2.2.5
       webpack: 5.76.2
+
+  apps/slurm-adapter:
+    specifiers:
+      '@ddadaal/tsgrpc-common': 0.2.1
+      '@ddadaal/tsgrpc-server': 0.19.0
+      '@grpc/grpc-js': 1.8.12
+      '@scow/lib-config': workspace:*
+      '@scow/lib-ssh': workspace:*
+      '@scow/scheduler-adapter-protos': workspace:*
+    dependencies:
+      '@ddadaal/tsgrpc-common': 0.2.1
+      '@ddadaal/tsgrpc-server': 0.19.0_@grpc+grpc-js@1.8.12
+      '@grpc/grpc-js': 1.8.12
+      '@scow/lib-config': link:../../libs/libconfig
+      '@scow/lib-ssh': link:../../libs/ssh
+      '@scow/scheduler-adapter-protos': link:../../libs/protos/scheduler-adapter
 
   deploy/local:
     specifiers: {}
@@ -4061,7 +4079,7 @@ packages:
     engines: {node: ^8.13.0 || >=10.10.0}
     dependencies:
       '@grpc/proto-loader': 0.7.3
-      '@types/node': 18.15.1
+      '@types/node': 18.15.5
 
   /@grpc/proto-loader/0.7.3:
     resolution: {integrity: sha512-5dAvoZwna2Py3Ef96Ux9jIkp3iZ62TUsV00p3wVBPNX5K178UbNi8Q7gQVqwXT1Yq9RejIGG9G2IPEo93T6RcA==}
@@ -5754,9 +5772,6 @@ packages:
   /@types/node/18.14.2:
     resolution: {integrity: sha512-1uEQxww3DaghA0RxqHx0O0ppVlo43pJhepY51OxuQIKHpjbnYLA7vcdwioNPzIqmC2u3I/dmylcqjlh0e7AyUA==}
     dev: true
-
-  /@types/node/18.15.1:
-    resolution: {integrity: sha512-U2TWca8AeHSmbpi314QBESRk7oPjSZjDsR+c+H4ECC1l+kFgpZf8Ydhv3SJpPy51VyZHHqxlb6mTTqYNNRVAIw==}
 
   /@types/node/18.15.5:
     resolution: {integrity: sha512-Ark2WDjjZO7GmvsyFFf81MXuGTA/d6oP38anyxWOL6EREyBKAxKoFHwBhaZxCfLRLpO8JgVXwqOwSwa7jRcjew==}

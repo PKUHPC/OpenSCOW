@@ -16,7 +16,8 @@
     },
     "prepareDev": {
       "dependsOn": [
-        "^@scow/protos#build"
+        "^@scow/protos#build",
+        "^@scow/scheduler-adapter-protos#build"
       ],
       "outputs": [
         "api-routes-schemas.json",

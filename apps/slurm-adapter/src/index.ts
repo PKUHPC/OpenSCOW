@@ -10,20 +10,14 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { ClusterOps } from "src/clusterops/api";
-import { createSlurmClusterOps } from "src/clusterops/slurm";
-import { clusters } from "src/config/clusters";
+import { createServer } from "src/app";
 
-const clusterOpsMaps = {
-  "slurm": createSlurmClusterOps,
-} as const;
+async function main() {
+  const server = await createServer();
 
-// client for clusters(if use adapter)
-const opsForClusters = Object.entries(clusters).reduce((prev, [cluster, c]) => {
-  prev[cluster] = clusterOpsMaps[c.scheduler](cluster);
-  return prev;
-}, {} as Record<string, ClusterOps>);
 
-export const getClusterOps = (cluster: string) => {
-  return opsForClusters[cluster];
-};
+  await server.start();
+
+}
+
+main();

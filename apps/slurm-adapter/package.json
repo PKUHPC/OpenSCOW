@@ -1,0 +1,37 @@
+{
+  "name": "@scow/slurm-adapter",
+  "version": "0.1.0",
+  "description": "",
+  "private": true,
+  "main": "build/index.js",
+  "scripts": {
+    "dev": "node --watch -r ts-node/register -r tsconfig-paths/register src/index.ts",
+    "build": "",
+    "serve": "node build/index.js",
+    "test": "jest"
+  },
+  "files": [
+    "scripts",
+    "build",
+    "!**/*.map"
+  ],
+  "keywords": [],
+  "author": "PKUHPC (https://github.com/PKUHPC)",
+  "license": "Mulan PSL v2",
+  "repository": "https://github.com/PKUHPC/SCOW",
+  "dependencies": {
+    "@ddadaal/tsgrpc-server": "0.19.0",
+    "@ddadaal/tsgrpc-common": "0.2.1",
+    "@grpc/grpc-js": "1.8.12",
+    "@scow/lib-ssh": "workspace:*",
+    "@scow/lib-config": "workspace:*",
+    "@scow/scheduler-adapter-protos": "workspace:*"
+
+  },
+  "devDependencies": {
+
+  },
+  "volta": {
+    "extends": "../../package.json"
+  }
+}

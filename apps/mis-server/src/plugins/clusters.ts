@@ -66,6 +66,7 @@ export const clustersPlugin = plugin(async (f) => {
     }));
   }
 
+  // client for clusters(if use adapter)
   const opsForClusters = Object.entries(clusters).reduce((prev, [cluster, c]) => {
     const ops = clusterOpsMaps[(c.scheduler as keyof typeof clusterOpsMaps)](cluster, f.logger);
 
