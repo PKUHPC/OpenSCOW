@@ -15,8 +15,9 @@ import { FastifyReply, FastifyRequest } from "fastify";
 import { join } from "path";
 import { createCaptcha } from "src/auth/captcha";
 import { authConfig, OTPStatusOptions } from "src/config/auth";
-import { config, FAVICON_URL, LOGO_URL } from "src/config/env";
+import { config, FAVICON_URL } from "src/config/env";
 import { uiConfig } from "src/config/ui";
+
 
 function parseHostname(req: FastifyRequest): string | undefined {
 
@@ -33,35 +34,31 @@ function parseHostname(req: FastifyRequest): string | undefined {
 }
 
 
-export async function serveLoginHtml(
-  err: boolean, callbackUrl: string, req: FastifyRequest, rep: FastifyReply,
-  verifyCaptchaFail?: boolean,
-  verifyOTPFail?: boolean,
+export async function bindOTPHtml(
+  err: boolean, req: FastifyRequest, rep: FastifyReply,
+  otp?: {
+    sendEmailUI?: boolean,
+    sendSucceeded?: boolean,
+    redisUserInfoExpiration?: boolean,
+    emailAddress?: string,
+    qrcode?: string,
+    OTPSessionToken?: string,
+    backToLoginUrl?: string,
+    timeDiffNotEnough?: number,
+  },
 ) {
 
   const hostname = parseHostname(req);
-  const enableCaptcha = authConfig.captcha.enabled;
   const enableTOTP = authConfig.otp.status !== OTPStatusOptions.disabled;
 
-  const captchaInfo = enableCaptcha
-    ? await createCaptcha(req.server)
-    : undefined;
-
-  return rep.status(
-    verifyCaptchaFail ? 400 : err ? 401 : 200).view("login.liquid", {
+  return rep.status(err ? 401 : 200).view("bindOTP.liquid", {
     cssUrl: join(config.BASE_PATH, config.AUTH_BASE_PATH, "/public/assets/tailwind.min.css"),
     faviconUrl: join(config.BASE_PATH, FAVICON_URL),
-    logoUrl: join(config.BASE_PATH, LOGO_URL),
     backgroundColor: uiConfig.primaryColor?.defaultColor ?? DEFAULT_PRIMARY_COLOR,
-    callbackUrl,
-    footerText: (hostname && uiConfig?.footer?.hostnameTextMap?.[hostname]) ?? uiConfig?.footer?.defaultText ?? "",
     err,
-    ...captchaInfo,
-    verifyCaptchaFail,
-    enableCaptcha,
+    footerText: (hostname && uiConfig?.footer?.hostnameTextMap?.[hostname]) ?? uiConfig?.footer?.defaultText ?? "",
     enableTOTP,
-    verifyOTPFail,
-    refreshCaptchaPath: join(config.BASE_PATH, config.AUTH_BASE_PATH, "/public/refreshCaptcha"),
+    ...otp,
   });
 
 }

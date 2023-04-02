@@ -22,7 +22,8 @@
 
 <body style="font-family:Roboto">
     <div class="w-full h-screen flex items-center justify-center">
-        <form class="w-full md:w-1/3 max-w-lg bg-white rounded-lg py-12 " method="post" action="">
+      <div class="w-full md:w-1/3 max-w-lg bg-white rounded-lg py-12">
+        <form method="post" action="">
             <img class="m-auto pb-12 w-1/2" src="{{ logoUrl }}" alt="登录"/>
 
             <div class="px-12">
@@ -38,6 +39,14 @@
                             class="px-8 w-full border rounded px-3 py-2 text-gray-700 focus:outline-none" />
                     </div>
                 </div>
+                {% if enableTOTP %}
+                <div class="w-full mb-4">
+                  <div class="flex items-center">
+                    <input name="OTPCode" placeholder="OTP验证码" type="text" required
+                      class="px-8 w-full py-2 border rounded text-gray-700 focus:outline-none"/>
+                  </div>
+                </div>
+                {% endif %}
                 {% if enableCaptcha %}
                 <div class="w-full mb-4">
                     <div class="flex items-center">
@@ -75,14 +84,29 @@
                 <input type="hidden" name="callbackUrl" value="{{ callbackUrl }}" />
 
                 {% if err %}
-                  <p class="my-4 text-center text-red-600">用户名/密码无效，请检查。</p>
+                <p class="my-4 text-center text-red-600">用户名/密码无效，请检查。</p>
+                {% endif %}
+                {% if verifyOTPFail %}
+                <p class="my-4 text-center text-red-600">OTP验证码无效，请重新输入。</p>
                 {% endif %}
                 <button type="submit" class="w-full mt-4 py-2 rounded-full button-primary text-gray-100 focus:outline-none">
                     登录
                 </button>
-        </form>
+            </div>
+          </form>
+          {% if enableTOTP %}
+          <div class="px-12 mt-4">
+            <form action="/otp/bind" method="get">
+              <button type="submit" name="action" value="bindOTP" class="px text-gray-400">
+                绑定otp
+              </button>
+              <input type="hidden" name="backToLoginUrl" value="">
+            </form>
+          </div>
+        {% endif %}
+        </div>
       </div>
-    <p class="absolute bottom-0 w-full text-center my-4 text-gray-500 text-sm">
+    <p class="absolute bottom-0 w-full text-center my-4 text-gray-500 text-sm ">
       {{ footerText }}
     </p>
 </body>

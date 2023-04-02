@@ -6,6 +6,54 @@ redisUrl: 192.168.88.100:6379
 allowedCallbackHostnames:
   - localhost
 
+captcha:
+  enabled: false
+
+#目前仅支持ldap认证方式启用otp，ssh方式不支持
+otp:
+  #status指定otp状态，分别为disabled:不启用,local：启用为本地模式，remote：启用为远程认证模式。默认为disabled
+  status: local
+  #密钥存储属性名,需要用户自己定义, 这里仅便于测试使用title存储
+  secretAttributeName: title
+  #认证系统地址，例如：http://localhost:5000
+  authUrl: http://localhost:5000
+  #OTP码位数，默认为6
+  digits: 8
+  #加密算法(sha1，sha256，sha512)，默认为sha1,
+  algorithm: sha256
+  #OTP码有效时间，默认为30
+  period: 30
+  #绑定otp时发送绑定信息方式
+  authenticationMethod:
+    mail:
+      enabled: true
+      #发件邮箱地址
+      from: "melyssa12@ethereal.email"
+      #邮件主题，默认为"otp绑定链接"
+      subject: "otp绑定链接"
+      #邮件内容标题，默认为"Bind OTP""
+      title: "Bind OTP"
+      #邮件内容,默认为"Please click on the following link to bind your OTP:"
+      contentText: "Please click on the following link to bind your OTP"
+      #标签点击文字,默认为"Bind OTP"
+      labelText: "Bind OTP"
+      mailTransportInfo:
+        #SMTP服务器
+        host: "smtp.ethereal.email"
+        #是否启用安全连接，默认false
+        secure: STARTTLS
+        port: 587
+        #SMTP身份验证用户名
+        user: "melyssa12@ethereal.email"
+        #SMTP身份验证授权码
+        password: "JEYPbjY77DNV1erpzt"
+  #如果mode指定为remote，需要配置以下认证url
+  remote:
+    #远程验证url
+    url: http://localhost:9999/otp/remote/validateCode
+    #当用户点击绑定OTP时，302重定向的链接
+    redirectUrl: https://pkuhpc.github.io/SCOW/
+
 # 在此部分输入LDAP的配置
 ldap:
   # LDAP服务器地址。必填

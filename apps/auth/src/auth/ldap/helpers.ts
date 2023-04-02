@@ -57,6 +57,7 @@ export const searchOne = async <T>(
       let found = false;
 
       res.on("searchEntry", (entry) => {
+        console.log("entry:", entry);
         if (found) {
           logger.info("An entry has already be found. Ignoring more entities.");
           return;
