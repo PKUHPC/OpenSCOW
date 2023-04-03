@@ -87,7 +87,7 @@ scow-cli使用运行目录下的`install.yaml`作为配置来管理集群，但�
 ./cli update --release v0.4.0 -o ./cli-test
 ```
 
-使用`--pr`或者`--branch`选项需要您创建一个有`workflow`权限的GitHub Token (https://github.com/settings/tokens/new)，并将这个token放到cli目录下的`.env`文件
+使用`--pr`或者`--branch`选项需要您创建一个有`workflow`权限的GitHub Token ( https://github.com/settings/tokens/new )，并将这个token放到cli目录下的`.env`文件
 
 ```env title=".env"
 # .env
