@@ -19,7 +19,7 @@ import { updateBlockStatusInSlurm } from "src/bl/block";
 import { importUsers, ImportUsersData } from "src/bl/importUsers";
 import { Account } from "src/entities/Account";
 import { StorageQuota } from "src/entities/StorageQuota";
-import { User } from "src/entities/User";
+import { UserAccount, UserRole } from "src/entities/UserAccount";
 
 export const adminServiceServer = plugin((server) => {
 
@@ -115,23 +115,36 @@ export const adminServiceServer = plugin((server) => {
 
       const includedAccounts = await em.find(Account, {
         accountName: { $in: result.accounts.map((x) => x.accountName) },
-      });
+      }, { populate: ["users", "users.user"]});
 
-      const allUsers = result.accounts.flatMap(
-        (account) => account.users.map((user) => user.userId),
-      );
-      const includedUsers = await em.find(User, { userId: { $in: allUsers } });
+      const includedUserAccounts = await em.find(UserAccount, {
+        account: { accountName: result.accounts.map((x) => x.accountName) },
+      }, { populate: ["account", "user"]});
 
       result.accounts.forEach((account) => {
-        if (!includedAccounts.find((x) => x.accountName === account.accountName)) {
+        const includedAccount = includedAccounts.find((x) => x.accountName === account.accountName);
+        if (!includedAccount) {
           // account not existed in scow
           account.importStatus = ClusterAccountInfo_ImportStatus.NOT_EXISTING;
-        } else if (!account.users.every((user) => includedUsers.map((x) => x.userId).includes(user.userId))) {
-          // some users in account not existed in scow
-          account.importStatus = ClusterAccountInfo_ImportStatus.HAS_NEW_USERS;
         } else {
-          // both users and account exist in scow
-          account.importStatus = ClusterAccountInfo_ImportStatus.EXISTING;
+
+          if (
+            !account.users.every((user) =>
+              includedUserAccounts
+                .filter((x) => x.account.$.accountName === account.accountName)
+                .map((x) => x.user.$.userId)
+                .includes(user.userId),
+            )
+          ) {
+            // some users in account not existed in scow
+            account.importStatus = ClusterAccountInfo_ImportStatus.HAS_NEW_USERS;
+          } else {
+            // both users and account exist in scow
+            account.importStatus = ClusterAccountInfo_ImportStatus.EXISTING;
+          }
+
+          account.owner = includedUserAccounts
+            .find((x) => x.account.$.accountName === account.accountName && x.role === UserRole.OWNER)!.user.$.userId;
         }
       });
 

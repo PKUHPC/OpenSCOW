@@ -162,7 +162,7 @@ export const ImportUsersTable: React.FC = () => {
                     </Form.Item>
                   )
                   : ""
-                : "";
+                : r.owner;
             }
             }
 
