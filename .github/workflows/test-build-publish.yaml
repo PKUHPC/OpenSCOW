@@ -187,13 +187,13 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: scow-cli-x64
-          path: release/scow-cli-x64
+          path: release/scow-cli
 
       - name: Download cli-arm64
         uses: actions/download-artifact@v3
         with:
           name: scow-cli-arm64
-          path: release/scow-cli-arm64
+          path: release/scow-cli
 
       - name: Display structure of downloaded files
         run: ls -R
@@ -207,5 +207,5 @@ jobs:
             SCOW ${{ github.ref_name }} has been released!
           generate_release_notes: true
           files: |
-            release/scow-cli-x64
-            release/scow-cli-arm64
+            release/scow-cli/cli-x64
+            release/scow-cli/cli-arm64
