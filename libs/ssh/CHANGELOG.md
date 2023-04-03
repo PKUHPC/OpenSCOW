@@ -1,4 +1,4 @@
-# @scow/lib-decimal
+# @scow/lib-ssh
 
 ## 0.2.0
 
@@ -6,8 +6,6 @@
 
 - 86e0f5b2d: 整个系统打包为一个镜像
 
-## 0.1.1
-
 ### Patch Changes
 
-- c24e21662: publish .d.ts files
+- 419184a93: 统一处理多个 sftp 操作命令报错
