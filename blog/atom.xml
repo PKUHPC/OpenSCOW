@@ -2,11 +2,26 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://PKUHPC.github.io/SCOW/blog</id>
     <title>SCOW Blog</title>
-    <updated>2022-10-22T00:00:00.000Z</updated>
+    <updated>2023-03-29T00:00:00.000Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://PKUHPC.github.io/SCOW/blog"/>
     <subtitle>SCOW Blog</subtitle>
     <icon>https://PKUHPC.github.io/SCOW/img/favicon.ico</icon>
+    <entry>
+        <title type="html"><![CDATA[scow-cli]]></title>
+        <id>https://PKUHPC.github.io/SCOW/blog/scow-cli-release</id>
+        <link href="https://PKUHPC.github.io/SCOW/blog/scow-cli-release"/>
+        <updated>2023-03-29T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[我们致力于以让大家更方便地部署、运维和管理SCOW集群。]]></summary>
+        <content type="html"><![CDATA[<p>我们致力于以让大家更方便地部署、运维和管理SCOW集群。</p><p>之前的<code>scow-deployment</code>为了保证无需安装依赖均可使用，所以采用了和SCOW其他部分不一样的python语言开发，且无法使用第三方包的功能，限制了<code>scow-deployment</code>的功能。</p><p>为了解决这些问题，我们重新编写了<code>scow-cli</code>。此工具有以下特点：</p><ul><li>使用<code>install.yaml</code>进行配置，配置方式和系统其他部分相同</li><li>可自由使用第三方包，功能扩展起来更加方便</li><li>此工具采用和系统其他部分相同的技术栈编写，方便后续功能开发和维护</li><li>打包为一个可以直接执行的可执行文件，同样无需安装任何依赖即可使用</li></ul><p><code>scow-cli</code>是后续增加更多命令行维护功能的基础，建议大家尽快从<code>scow-deployment</code>迁移到<code>scow-cli</code>。</p><p>请参考<a href="https://PKUHPC.github.io/SCOW/docs/deploy/install/scow-cli" target="_blank" rel="noopener noreferrer">scow-cli</a>文档以下载scow-cli，以及了解如何从<code>scow-deployment</code>迁移到<code>scow-cli</code>。</p>]]></content>
+        <author>
+            <name>Chen Junda</name>
+            <uri>https://ddadaal.me</uri>
+        </author>
+        <category label="scow" term="scow"/>
+        <category label="scow-cli" term="scow-cli"/>
+        <category label="scow-deployment" term="scow-deployment"/>
+    </entry>
     <entry>
         <title type="html"><![CDATA[scow-deployment平滑升级指导]]></title>
         <id>https://PKUHPC.github.io/SCOW/blog/update-to-python-deployment</id>
