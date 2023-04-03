@@ -31,10 +31,10 @@
     "@algolia/client-search": "4.16.0",
     "@docusaurus/module-type-aliases": "2.4.0",
     "@scow/config": "workspace:*",
-    "@sinclair/typebox": "0.26.5",
+    "@sinclair/typebox": "0.26.8",
     "@tsconfig/docusaurus": "1.0.7",
     "@types/react": "18.0.18",
-    "typescript": "5.0.2"
+    "typescript": "5.0.3"
   },
   "browserslist": {
     "production": [
