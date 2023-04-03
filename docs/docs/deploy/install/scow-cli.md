@@ -22,7 +22,7 @@ scow-cli使用运行目录下的`install.yaml`作为配置来管理集群，但�
 
 ```bash
 # docker compose 操作
-# 在compose后跟任意compose参数，例如
+# 在compose后跟任意compose参数
 # 注意：每次运行compose的操作时，cli将会在本目录下创建一个临时的docker-compose-{时间戳}.yml文件，运行结束后会删除此文件
 # 以保证docker compose配置的内容为最新
 # 启动集群
@@ -61,13 +61,13 @@ scow-cli使用运行目录下的`install.yaml`作为配置来管理集群，但�
 
 ## 常见命令的对照
 
-| 使用             | `scow-deployment`   | `scow-cli`              |
-| ---------------- | ------------------- | ----------------------- |
-| 启动系统         | `./compose up -d`   | `./cli compose up -d`   |
-| 停止系统         | `./compose down`    | `./cli compose down`    |
-| 跟随查看所有日志 | `./compose logs -f` | `./cli compose logs -f` |
-| 更新镜像         | `./compose pull`    | `./cli compose pull`    |
-| 进入数据库       | `./db.sh`           | `./cli db`              |
+| 使用             | `scow-deployment`      | `scow-cli`              |
+| ---------------- | ---------------------- | ----------------------- |
+| 启动系统         | `./compose.sh up -d`   | `./cli compose up -d`   |
+| 停止系统         | `./compose.sh down`    | `./cli compose down`    |
+| 跟随查看所有日志 | `./compose.sh logs -f` | `./cli compose logs -f` |
+| 更新镜像         | `./compose.sh pull`    | `./cli compose pull`    |
+| 进入数据库       | `./db.sh`              | `./cli db`              |
 
 # 更新`scow-cli`
 
