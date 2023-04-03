@@ -1,6 +1,6 @@
 {
   "name": "@scow/mis-server",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "",
   "private": true,
   "main": "build/index.js",
@@ -36,7 +36,7 @@
     "@scow/lib-slurm": "workspace:*",
     "@scow/lib-ssh": "workspace:*",
     "@scow/lib-config": "workspace:*",
-    "@sinclair/typebox": "0.26.5",
+    "@sinclair/typebox": "0.26.8",
     "@scow/lib-auth": "workspace:*",
     "@scow/protos": "workspace:*",
     "@scow/utils": "workspace:*",

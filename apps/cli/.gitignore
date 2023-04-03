@@ -1,0 +1,5 @@
+config.py
+./install.yaml
+docker-compose.yml
+exe
+.env

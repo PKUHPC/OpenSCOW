@@ -1,5 +1,20 @@
 # @scow/docs
 
+## 0.2.0
+
+### Minor Changes
+
+- 9a1d3b81b: 认证系统新建用户和组时支持删除预添加的属性
+- 8145061ba: 增加 scow-cli
+- d4b0cde25: 创建 web 类交互式应用时由前端传入 base path，将节点名解析为 IP 地址的工作由 portal-server 完成
+- 22a5bc3c2: 支持 shell 中跳转文件系统
+
+### Patch Changes
+
+- 9a9159505: 增加集群网络连接要求
+- 883521f26: 修复当部署的端口号非 80 时，回调地址出错的问题
+- 06cd94230: 刷新 slurm 封锁状态和同步作业信息状态功能放到平台调试中
+
 ## 0.1.0
 
 ### Minor Changes

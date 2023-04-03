@@ -14,7 +14,6 @@ import { ensureNotUndefined, plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError, status } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { FilterQuery, QueryOrder, UniqueConstraintViolationException } from "@mikro-orm/core";
-import { MySqlDriver, SqlEntityManager } from "@mikro-orm/mysql";
 import { Decimal, decimalToMoney, moneyToNumber } from "@scow/lib-decimal";
 import {
   GetJobsResponse,
@@ -62,14 +61,10 @@ function toGrpc(x: JobInfoEntity) {
   };
 }
 
-async function filterJobs({
+function filterJobs({
   clusters, accountName, jobEndTimeEnd, tenantName,
   jobEndTimeStart, jobId, userId, startBiJobIndex,
-}: JobFilter, em: SqlEntityManager<MySqlDriver>) {
-
-  const accountNames = (accountName === undefined && userId === undefined)
-    ? (await em.find(Account, { tenant: { name: tenantName } }, { fields: ["accountName"]})).map((x) => x.accountName)
-    : accountName;
+}: JobFilter) {
 
   return {
     ...startBiJobIndex ? { biJobIndex: { $gte: startBiJobIndex } } : {},
@@ -78,8 +73,9 @@ async function filterJobs({
     ...jobId
       ? {
         idJob: jobId,
+        ...accountName === undefined ? {} : { account: accountName },
       } : {
-        ...accountNames === undefined ? {} : { account: accountNames },
+        ...accountName === undefined ? {} : { account: accountName },
         ...(jobEndTimeEnd || jobEndTimeStart) ? {
           timeEnd: {
             ...jobEndTimeStart ? { $gte: jobEndTimeStart } : {},
@@ -87,6 +83,7 @@ async function filterJobs({
           },
         } : {},
       },
+    tenant: tenantName,
   } as FilterQuery<JobInfoEntity>;
 }
 
@@ -94,11 +91,13 @@ export const jobServiceServer = plugin((server) => {
 
   server.addService<JobServiceServer>(JobServiceService, {
 
-    getJobs: async ({ request, em }) => {
+    getJobs: async ({ request, em, logger }) => {
 
       const { filter, page, pageSize } = ensureNotUndefined(request, ["filter"]);
 
-      const sqlFilter = await filterJobs(filter, em);
+      const sqlFilter = filterJobs(filter);
+
+      logger.info("getJobs sqlFilter %s", JSON.stringify(sqlFilter));
 
       const [jobs, count] = await em.findAndCount(JobInfoEntity, sqlFilter, {
         ...paginationProps(page, pageSize || 10),
@@ -131,7 +130,7 @@ export const jobServiceServer = plugin((server) => {
 
       return await em.transactional(async (em) => {
 
-        const jobs = await em.find(JobInfoEntity, await filterJobs(filter, em), {});
+        const jobs = await em.find(JobInfoEntity, filterJobs(filter), {});
 
         const record = new JobPriceChange({
           jobs,
