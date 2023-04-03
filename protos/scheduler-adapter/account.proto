@@ -27,7 +27,7 @@ message CreateAccountRequest {
   string owner_id = 2;
 }
 
-// "ALREADY_EXISTS" | "OK"
+// if account exists, throw grpc error. code: "ALREADY_EXISTS"
 message CreateAccountResponse {
 }
 
@@ -36,7 +36,6 @@ message DeleteAccountRequest {
   string account_name = 1;
 }
 
-// "NOT_FOUND" | "OK"
 message DeleteAccountResponse {
 }
 
@@ -45,7 +44,6 @@ message BlockAccountRequest {
   string account_name = 1;
 }
 
-// "NOT_FOUND" | success: "ALREADY_BLOCKED" , "OK"
 message BlockAccountResponse {
 }
 
@@ -53,7 +51,6 @@ message UnblockAccountRequest {
   string account_name = 1;
 }
 
-// "NOT_FOUND" | success: "ALREADY_UNBLOCKED" , "OK"
 message UnblockAccountResponse {
 }
 

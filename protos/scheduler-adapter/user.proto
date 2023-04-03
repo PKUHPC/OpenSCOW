@@ -19,7 +19,6 @@ message AddUserToAccountRequest {
   string account_name = 2;
 }
 
-// "OK" | "ALREADY_EXISTS"
 message AddUserToAccountResponse {
 }
 
@@ -28,7 +27,6 @@ message RemoveUserRequest {
   string account_name = 2;
 }
 
-// "OK" | "NOT_FOUND"
 message RemoveUserResponse {
 }
 
@@ -37,7 +35,6 @@ message BlockUserInAccountRequest {
   string account_name = 2;
 }
 
-// "OK" | "NOT_FOUND"
 message BlockUserInAccountResponse {
 }
 
@@ -46,7 +43,6 @@ message UnblockUserInAccountRequest {
   string account_name = 2;
 }
 
-// "OK" | "NOT_FOUND"
 message UnblockUserInAccountResponse {
 }
 

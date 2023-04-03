@@ -83,7 +83,6 @@ message ChangeJobTimeLimitRequest {
   int64 delta = 2;
 }
 
-// NOT_FOUND | OK
 message ChangeJobTimeLimitResponse {
 }
 
@@ -91,7 +90,6 @@ message QueryJobTimeLimitRequest {
   string job_id = 1;
 }
 
-// NOT_FOUND | OK
 message QueryJobTimeLimitResponse {
   uint64 limit = 1;
 }
@@ -103,7 +101,6 @@ message SubmitJobRequest {
   bool save_as_template = 4;
 }
 
-// OK | SBATCH_FAILED: message
 message SubmitJobResponse {
   uint32 job_id = 1;
 }
@@ -121,7 +118,6 @@ message CancelJobRequest {
   int32 job_id = 2;
 }
 
-// OK | NOT_FOUND
 message CancelJobResponse {
 }
 
@@ -133,4 +129,14 @@ message ListAllJobsInfoRequest{
 
 message ListAllJobsInfoResponse {
   repeated JobInfo results = 1;
+}
+
+service JobService {
+  rpc GetRunningJobs(GetRunningJobsRequest) returns (GetRunningJobsResponse);
+  rpc ChangeJobTimeLimit(ChangeJobTimeLimitRequest) returns (ChangeJobTimeLimitResponse);
+  rpc QueryJobTimeLimit(QueryJobTimeLimitRequest) returns (QueryJobTimeLimitResponse);
+  rpc SubmitJob(SubmitJobRequest) returns (SubmitJobResponse);
+  rpc GenerateJobScript(GenerateJobScriptRequest) returns (GenerateJobScriptResponse);
+  rpc CancelJob(CancelJobRequest) returns (CancelJobResponse);
+  rpc ListAllJobsInfo(ListAllJobsInfoRequest) returns (ListAllJobsInfoResponse);
 }

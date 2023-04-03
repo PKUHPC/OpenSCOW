@@ -14,30 +14,31 @@ syntax = "proto3";
 
 package scheduler.adapter;
 
-message ChangeStorageQuotaRequest {
-  string user_id = 1;
-  enum Mode {
-    INCREASE = 0;
-    DECREASE = 1;
-    SET = 2;
-  }
-  Mode mode = 2;
-  uint64 value = 3;
+message GetClusterConfigRequest {
+
 }
 
-message ChangeStorageQuotaResponse {
-  uint64 current_quota = 1;
+message Partition {
+  string name = 1;
+  // mem: memory size in M
+  int64 mem = 2;
+  // cores: number of cores
+  int32 cores = 3;
+  // gpus: number of gpu
+  int32 gpus = 4;
+  // nodes: number of nodes
+  int32 nodes = 5;
+  repeated string qos = 6;
+  // price item description
+  optional string comment = 7;
 }
 
-message QueryUsedStorageQuotaRequest {
-  string user_id = 1;
+message GetClusterConfigResponse {
+  repeated string login_nodes = 1;
+  repeated Partition partitions = 2;
+  bool mis_ignore = 3;
 }
 
-message QueryUsedStorageQuotaResponse {
-  uint64 used = 1;
-}
-
-service StorageService {
-  rpc ChangeStorageQuota(ChangeStorageQuotaRequest) returns (ChangeStorageQuotaResponse);
-  rpc QueryUsedStorageQuota(QueryUsedStorageQuotaRequest) returns (QueryUsedStorageQuotaResponse);
+service ConfigService {
+  rpc GetClusterConfig(GetClusterConfigRequest) returns (GetClusterConfigResponse);
 }
