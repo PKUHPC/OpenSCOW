@@ -57,6 +57,8 @@ export const JobTable: React.FC<Props> = ({
 
   const rangeSearch = useRef(true);
 
+  const [pageInfo, setPageInfo] = useState({ page: 1, pageSize: 10 });
+
   const [query, setQuery] = useState<FilterForm>(() => {
     const now = dayjs();
     return {
@@ -68,24 +70,26 @@ export const JobTable: React.FC<Props> = ({
   });
 
   useDidUpdateEffect(() => {
+    setPageInfo({ page: 1, pageSize: pageInfo.pageSize });
     setQuery((q) => ({
       ...q,
       accountName: Array.isArray(accountNames) ? accountNames[0] : accountNames,
     }));
+
   }, [accountNames]);
 
   const [form] = Form.useForm<FilterForm>();
 
-  const [pageInfo, setPageInfo] = useState({ page: 1, pageSize: 10 });
 
   const promiseFn = useCallback(async () => {
     return await api.getJobInfo({ query: {
-      userId: rangeSearch.current ? (query.userId || userId || undefined) : undefined,
+      // userId: rangeSearch.current ? (query.userId || userId || undefined) : undefined,
+      userId: query.userId || userId || undefined,
       jobId: rangeSearch.current ? undefined : query.jobId,
       page: pageInfo.page,
       pageSize: pageInfo.pageSize,
       clusters: query.clusters?.map((x) => x.id),
-      accountName: query.accountName || undefined,
+      accountName: query.accountName || (Array.isArray(accountNames) ? undefined : accountNames),
       jobEndTimeStart: query.jobEndTime[0].toISOString(),
       jobEndTimeEnd: query.jobEndTime[1].toISOString(),
     } }).catch((e: HttpError) => {
@@ -107,10 +111,9 @@ export const JobTable: React.FC<Props> = ({
           form={form}
           initialValues={query}
           onFinish={async () => {
-            setQuery({
-              accountName: query.accountName,
-              ...(await form.validateFields()),
-            });
+            const currentQuery = await form.validateFields();
+            setQuery(currentQuery);
+            setPageInfo({ page: 1, pageSize: pageInfo.pageSize });
           }}
         >
           <FilterFormTabs
@@ -250,6 +253,7 @@ export const JobInfoTable: React.FC<JobInfoTableProps> = ({
         }
       </TableTitle>
       <Table
+        rowKey={(i) => i.idJob}
         dataSource={data?.jobs}
         loading={isLoading}
         pagination={setPageInfo ? {

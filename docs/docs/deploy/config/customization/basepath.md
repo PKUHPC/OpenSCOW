@@ -13,13 +13,13 @@ title: 相对路径
 
 ## 配置
 
-SCOW支持将系统的门户和管理系统部署在不同的相对路径下，仅需通过修改`config.py`中的`COMMON.BASE_PATH`, `PORTAL.BASE_PATH`和`MIS.BASE_PATH`配置即可。
+SCOW支持将系统的门户和管理系统部署在不同的相对路径下，仅需通过修改`install.yaml`中的`basePath`, `portal.basePath`和`mis.basePath`配置即可。
 
-`config.py`中，`COMMON.BASE_PATH`、`PORTAL.BASE_PATH`和`MIS.BASE_PATH`均不以`/`结尾。`COMMON.BASE_PATH`填写整个系统的根路径，`PORTAL.BASE_PATH`和`MIS.BASE_PATH`分别表示门户系统和管理系统相对于系统的相对路径，遵循以下的编写原则：
+`install.yaml`中，`basePath`、`portal.basePath`和`mis.basePath`均不以`/`结尾。`basePath`填写整个系统的根路径，`portal.basePath`和`mis.basePath`分别表示门户系统和管理系统相对于系统的相对路径，遵循以下的编写原则：
 
-| 整个系统的访问路径 | 门户系统的访问路径 | 管理系统的访问路径 | `COMMON.BASE_PATH` | `PORTAL.BASE_PATH` | `MIS.BASE_PATH` |
-| ------------------ | ------------------ | ------------------ | ------------------ | ------------------ | --------------- |
-| /                  | /                  | /mis               | /                  | /                  | /mis            |
-| /                  | /portal            | /                  | /                  | /portal            | /               |
-| /scow              | /scow              | /scow/mis          | /scow              | /                  | /mis            |
-| /scow              | /scow/portal       | /scow              | /scow              | /portal            | /               |
+| 整个系统的访问路径 | 门户系统的访问路径 | 管理系统的访问路径 | `basePath` | `portal.basePath` | `mis.basePath` |
+| ------------------ | ------------------ | ------------------ | ---------- | ----------------- | -------------- |
+| /                  | /                  | /mis               | /          | /                 | /mis           |
+| /                  | /portal            | /                  | /          | /portal           | /              |
+| /scow              | /scow              | /scow/mis          | /scow      | /                 | /mis           |
+| /scow              | /scow/portal       | /scow              | /scow      | /portal           | /              |
