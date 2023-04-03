@@ -83,7 +83,13 @@ scow-cli使用运行目录下的`install.yaml`作为配置来管理集群，但�
 # 更新到test分支的最新cli版本
 ./cli update --branch test
 
-# 更新至v0.4.0版本的scow-cli
+# 更新至最新版本的scow-cli
+./cli update
+
+# 更新cli至v0.4.0版本
+./cli update --release v0.4.0
+
+# 下载v0.4.0版本的scow-cli并保存到./cli-test
 ./cli update --release v0.4.0 -o ./cli-test
 ```
 
