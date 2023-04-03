@@ -16,15 +16,15 @@ scow-cli是SCOW集群安装、配置和管理工具，您可以使用scow-cli高
 
 # 配置
 
-scow-cli使用运行目录下的`install.yaml`作为配置来管理集群，但您可以通过`-c`命令行选项指定`install.yaml`的目录。
+scow-cli使用运行目录下的`install.yaml`作为配置来管理集群，但您可以通过`-c`命令行选项指定`install.yaml`的路径。
 
 # 使用
 
 ```bash
 # docker compose 操作
-# 每次运行此操作时，cli将会在本目录下创建一个临时的docker-compose-{时间戳}.yml文件，运行结束后会删除此文件
-# 以保证此文件内容最新
 # 在compose后跟任意compose参数，例如
+# 注意：每次运行compose的操作时，cli将会在本目录下创建一个临时的docker-compose-{时间戳}.yml文件，运行结束后会删除此文件
+# 以保证docker compose配置的内容为最新
 # 启动集群
 ./cli compose up -d
 # 关闭集群
