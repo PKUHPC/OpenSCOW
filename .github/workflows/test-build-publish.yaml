@@ -205,6 +205,7 @@ jobs:
           name: SCOW ${{ github.ref_name }}
           body: |
             SCOW ${{ github.ref_name }} has been released!
+          generate_release_notes: true
           files: |
             release/scow-cli-x64
             release/scow-cli-arm64
