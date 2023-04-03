@@ -183,8 +183,8 @@ importers:
         specifier: workspace:*
         version: link:../../libs/libconfig
       '@sinclair/typebox':
-        specifier: 0.26.5
-        version: 0.26.5
+        specifier: 0.26.8
+        version: 0.26.8
       death:
         specifier: 1.1.0
         version: 1.1.0
@@ -5310,10 +5310,6 @@ packages:
 
   /@sinclair/typebox@0.25.24:
     resolution: {integrity: sha512-XJfwUVUKDHF5ugKwIcxEgc9k8b7HbznCp6eUfWgu710hMPNIO4aw4/zB5RogDQz8nd6gyCDpU9O/m6qYEWY6yQ==}
-
-  /@sinclair/typebox@0.26.5:
-    resolution: {integrity: sha512-bCAUB2mTRhSCbDKjtlsqfmIAahNLdW7T854jnbruGHsH8p7CZKJQgU84x9b59HQ6NKvI9GUCimxBJSrp5f7fbA==}
-    dev: false
 
   /@sinclair/typebox@0.26.8:
     resolution: {integrity: sha512-fvAkOrUWndf5vjptkW+4TeTH84/bILWQHgk7rbbzT8trZxW+b84lr8dZQPM/r7cGNRFxDaJYsMjHCikEYyAHaw==}
