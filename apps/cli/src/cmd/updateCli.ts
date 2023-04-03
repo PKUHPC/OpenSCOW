@@ -166,7 +166,7 @@ Please provide your GitHub personal access token via GITHUB_TOKEN in env or .env
     if (!options.release) {
       log("Neither --pr, --release nor --branch is specified. Downloading latest release.");
       const resp = await octokit.rest.repos.getLatestRelease({ owner, repo });
-      log("Downloading release %s", resp.data.tag_name);
+      log("Latest release is %s.", resp.data.tag_name);
       return resp.data;
     } else {
       log("Downloading release %s", options.release);
@@ -175,7 +175,7 @@ Please provide your GitHub personal access token via GITHUB_TOKEN in env or .env
     }
   })();
 
-  const assetName = "scow-cli-" + arch;
+  const assetName = "cli-" + arch;
 
   const asset = release.assets.find((a) => a.name === assetName);
 
