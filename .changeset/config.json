@@ -9,7 +9,8 @@
       "@scow/mis-server",
       "@scow/mis-web",
       "@scow/portal-server",
-      "@scow/portal-web"
+      "@scow/portal-web",
+      "@scow/cli"
     ]
   ],
   "linked": [],

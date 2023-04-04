@@ -7,18 +7,17 @@ title: 配置门户系统
 
 本节介绍如何配置门户系统。
 
-## 修改config.py文件
+## 修改安装配置文件
 
-修改部署路径下的config.py文件
+修改安装配置文件`install.yaml`
 
-```python
-# 确保门户系统会部署，即PORTAL不能配置为False
-PORTAL = {
+```yaml title="install.yaml"
+# 确保门户系统会部署
+portal:
   # 如果门户系统将会部署在系统的根目录下，设置BASE_PATH为/。默认为/
-  "BASE_PATH": "/",
+  basePath: /
   # 如果门户系统将会部署在系统的/portal下，设置BASE_PATH为/portal
-  # "BASE_PATH": "/portal",
-}
+  # basePath: /portal
 ```
 
 :::tip
@@ -92,4 +91,4 @@ shell: true
 
 ## 启动服务
 
-运行`./compose.sh up -d`启动门户系统。
+运行`./cli compose up -d`启动门户系统。

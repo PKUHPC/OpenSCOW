@@ -42,28 +42,29 @@ PubkeyAcceptedKeyTypes=+ssh-rsa
 - `docker`（[安装docker的官方文档](https://docs.docker.com/engine/install/)）
 - `docker compose`（[安装docker compose的官方文档](https://docs.docker.com/compose/install/)）。
 
-## 获取部署文件
+## 下载scow-cli
 
-运行以下命令获取部署需要的文件：
+`scow-cli`是我们官方维护的SCOW部署和运维工具，能够帮助您快速部署、管理和维护SCOW集群。
+
+参考[scow-cli](./scow-cli.md)下载`scow-cli`，并将其存放到一个你用于存放SCOW配置文件的目录下。
 
 ```bash
-git clone --depth=1 https://%GIT_PLATFORM%.com/%ORGANIZATION_NAME%/scow-deployment
-cd scow-deployment
+# scow目录将会用于存在SCOW相关的配置文件
+mkdir scow
+cd scow
+
+# 将下载的scow-cli移动到scow目录下
+cp /path/to/scow-cli ./
+chmod +x scow-cli
 ```
 
 ## 准备配置文件
 
-运行以下命令从示例生成配置文件
+运行以下命令生成示例配置文件：
 
 ```bash
-cp -r config-example config
-cp config-example.py config.py
-```
-
-打开`config.py`，根据内部备注提示修改基础配置。
-
-```bash
-vim config.py
+# 生成安装配置文件./install.yaml和示例配置文件目录./config
+./cli init
 ```
 
 ## 配置
@@ -78,11 +79,11 @@ vim config.py
 部署完成后，运行以下命令启动系统。
 
 ```bash
-./compose.sh up -d
+./cli compose up -d
 ```
 
 当修改了配置文件后，运行以下命令重启系统
 
 ```bash
-./compose.sh restart
+./cli compose restart
 ```

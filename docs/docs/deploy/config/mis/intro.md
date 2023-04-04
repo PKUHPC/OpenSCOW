@@ -13,24 +13,23 @@ title: 配置管理系统
 
 请参考[export-jobs](https://%GIT_PLATFORM%.com/%ORGANIZATION_NAME%/export-jobs)项目配置源作业信息数据库。
 
-## 修改config.py文件
+## 修改安装配置文件
 
-修改部署路径下的`config.py`文件
+修改安装配置文件
 
-```python
-# 确保管理系统会部署，即MIS不能配置为False
-MIS = {
+```yaml title="install.yaml"
+# 确保管理系统会部署
+mis:
   # 如果管理系统部署在`/mis`路径下，设置"MIS.BASE_PATH"为 "/mis"。默认为"/"
-  "BASE_PATH": "/mis",
+  basePath: "/mis"
   # 如果将会部署在域名的根目录下，设置"MIS.BASE_PATH"为 "/"
-  # "BASE_PATH": "/",
+  basePath: "/"
 
-  # MIS.DB_PASSWORD为管理系统数据库密码
+  # dbPassword为管理系统数据库密码
   # 在系统第一次启动前可自由设置，使用此密码可以以root身份登录数据库
   # 一旦数据库启动后即不可修改
   # 必须长于8个字符，并同时包括字母、数字和符号
-  "DB_PASSWORD": "must!chang3this"
-}
+  dbPassword: "must!chang3this"
 ```
 
 :::tip
@@ -103,7 +102,7 @@ predefinedChargingTypes:
 
 ## 启动服务
 
-运行`./compose.sh up -d`启动管理系统。
+运行`./cli compose up -d`启动管理系统。
 
 ## 系统初始化
 

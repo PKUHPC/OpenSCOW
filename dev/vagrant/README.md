@@ -19,18 +19,17 @@ ssh-copy-id root@192.168.88.103
 
 3. 打开redis和数据库的端口映射，使得本机可以访问这两个服务
 
-给vagrant集群的`config.py`中增加以下部分，并运行`./compose.sh up -d`重启服务。
+给vagrant集群的`install.yaml`中增加以下部分，并运行`./cli compose up -d`重启服务。
 
-```python
-DEBUG = {
-  "OPEN_PORTS": {
-    # SCOW数据库映射到3308
-    "DB": 3308,
+```yaml title="install.yaml"
 
-    # redis映射到6379
-    "REDIS": 6379,
-  }
-}
+mis:
+  portMappings:
+    db: 3308
+
+auth:
+  portMappings:
+    redis: 6379
 ```
 
 4. 在仓库根目录下，运行`npx pm2 start dev/vagrant/pm2.config.js`启动各个服务

@@ -1,5 +1,17 @@
 # @scow/lib-web
 
+## 0.3.0
+
+### Minor Changes
+
+- 86e0f5b2d: 整个系统打包为一个镜像
+
+### Patch Changes
+
+- ff7eec37e: 修复因 table 超出页面的问题，搜索模块、个人信息页面手机端样式兼容
+- Updated dependencies [bdc990a0c]
+  - @scow/utils@0.1.2
+
 ## 0.2.0
 
 ### Minor Changes
