@@ -67,7 +67,6 @@ export async function sendEmailAuthLink(
 
   const redisUserInfoObject = JSON.parse(redisUserJSON);
   const currentTimestamp = await getAbsoluteUTCTimestamp();
-
   if (redisUserInfoObject["senEmailTimestamp"] !== undefined) {
     // 获取邮件链接需间隔至少60秒
     const timeDiff = Math.floor(currentTimestamp / 1000 - redisUserInfoObject["senEmailTimestamp"]);
@@ -79,7 +78,6 @@ export async function sendEmailAuthLink(
       return;
     }
   }
-
   redisUserInfoObject["senEmailTimestamp"] = Math.floor(currentTimestamp / 1000);
   const ttl = await f.redis.ttl(aesDecryptData(OTPSessionToken));
   await f.redis.set(OTPSessionToken, JSON.stringify(redisUserInfoObject), "EX", ttl);
@@ -115,6 +113,7 @@ export async function sendEmailAuthLink(
   };
 
   let success = true;
+  console.log("发邮件了");
   transporter.sendMail(mailOptions, (e) => {
     if (e) {
       logger.info("fail to send email", e);
@@ -241,6 +240,12 @@ export async function validateOTPCode(
     return true;
   }
 
+  console.log("jjjj", authConfig.otp.status);
+  console.log("jjjj", authConfig.otp.status);
+  console.log("jjjj", authConfig.otp.status);
+  console.log("jjjj", authConfig.otp.status);
+  console.log("jjjj", authConfig.otp.status);
+  console.log("jjjj", authConfig.otp.status);
   const time = await getAbsoluteUTCTimestamp();
 
   if (authConfig.otp.status === OTPStatusOptions.remote) {
@@ -250,7 +255,7 @@ export async function validateOTPCode(
       return undefined;
     }
 
-    return await fetch(authConfig.otp.remote.url, {
+    const result = await fetch(authConfig.otp.remote.url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -269,6 +274,12 @@ export async function validateOTPCode(
         return false;
       });
 
+    if (result) {
+      return true;
+    } else {
+      await serveLoginHtml(false, callbackUrl, req, res, undefined, true);
+    }
+
   }
   // 如果是otp.status是local
   const secret = await searchOneAttributeValueFromLdap(userInfo.dn, logger, authConfig.otp.secretAttributeName, client);
@@ -285,6 +296,10 @@ export async function validateOTPCode(
     step: authConfig.otp.period,
     algorithm: authConfig.otp.algorithm,
   });
-  return result;
+  if (result) {
+    return true;
+  } else {
+    await serveLoginHtml(false, callbackUrl, req, res, undefined, true);
+  }
 }
 

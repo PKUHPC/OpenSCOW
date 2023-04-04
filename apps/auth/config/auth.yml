@@ -8,7 +8,7 @@ allowedCallbackHostnames:
 #目前仅支持ldap认证方式启用otp，ssh方式不支持
 otp:
   #status指定otp状态，分别为disabled:不启用,local：启用为本地模式，remote：启用为远程认证模式。默认为disabled
-  status: local
+  status: disabled
   local:
     #密钥存储属性名
     secretAttributeName: ""

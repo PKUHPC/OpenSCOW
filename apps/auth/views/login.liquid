@@ -46,6 +46,8 @@
                       class="px-8 w-full py-2 border rounded text-gray-700 focus:outline-none"/>
                   </div>
                 </div>
+                {% else %}
+                <input type="hidden" name="OTPCode" value="" />
                 {% endif %}
                 {% if enableCaptcha %}
                 <div class="w-full mb-4">

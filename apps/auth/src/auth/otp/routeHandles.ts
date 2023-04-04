@@ -133,7 +133,6 @@ export function clickRequestBindingLink(
       },
     },
     async (req, res) => {
-
       const { OTPSessionToken, emailAddress, backToLoginUrl } = req.body;
       const logger = req.log;
 

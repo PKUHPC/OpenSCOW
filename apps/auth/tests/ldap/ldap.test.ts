@@ -219,8 +219,6 @@ it("should login with correct username and password", async () => {
     payload,
     headers,
   });
-
-
   expect(resp.statusCode).toBe(302);
   expect(resp.headers.location).toStartWith(callbackUrl + "?");
 });

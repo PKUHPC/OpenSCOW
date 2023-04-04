@@ -18,7 +18,6 @@ import { redirectToWeb } from "src/auth/callback";
 import { findUser, useLdap } from "src/auth/ldap/helpers";
 import { serveLoginHtml } from "src/auth/loginHtml";
 import { validateOTPCode } from "src/auth/otp/helper";
-import { registerOTPBindPostHandler } from "src/auth/otp/index";
 import { validateLoginParams } from "src/auth/validateLoginParams";
 import { LdapConfigSchema } from "src/config/auth";
 
@@ -66,10 +65,8 @@ export function registerPostHandler(f: FastifyInstance, ldapConfig: LdapConfigSc
 
       logger.info("Trying binding as %s with credentials", user.dn);
 
-      const result = await validateOTPCode(
-        { userId: user.identityId, dn: user.dn }, OTPCode, callbackUrl, req, res, logger, client);
-      if (!result) {
-        await serveLoginHtml(false, callbackUrl, req, res, undefined, true);
+      if (!await validateOTPCode({ userId: user.identityId, dn: user.dn },
+        OTPCode, callbackUrl, req, res, logger, client)) {
         return;
       }
       await useLdap(logger, ldapConfig, { dn: user.dn, password })(async () => {
