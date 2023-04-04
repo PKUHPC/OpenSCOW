@@ -153,8 +153,10 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
   const defaultClusterStore = useStore(DefaultClusterStore);
 
   const memory = (currentPartitionInfo ?
-    currentPartitionInfo.gpus ? nodeCount * gpuCount * (currentPartitionInfo.mem / currentPartitionInfo.gpus) :
-      nodeCount * coreCount * (currentPartitionInfo.mem / currentPartitionInfo.cores) : 0) + "MB";
+    currentPartitionInfo.gpus ? nodeCount * gpuCount
+    * Math.floor(currentPartitionInfo.cores / currentPartitionInfo.gpus)
+    * Math.floor(currentPartitionInfo.mem / currentPartitionInfo.cores) :
+      nodeCount * coreCount * Math.floor(currentPartitionInfo.mem / currentPartitionInfo.cores) : 0) + "MB";
 
   const coreCountSum = currentPartitionInfo?.gpus
     ? nodeCount * gpuCount * Math.floor(currentPartitionInfo.cores / currentPartitionInfo.gpus)
