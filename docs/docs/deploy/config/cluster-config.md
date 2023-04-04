@@ -51,6 +51,10 @@ slurm:
         - normal
         - high
       comment: ""
+# 跨集群传输模块，可选功能
+transferCrossCluster:
+  # 传输结点，要求是公网ip，如不配置端口号则默认为22
+  transferNode: 10.2.3.1:22222
 ```
 
 :::caution
