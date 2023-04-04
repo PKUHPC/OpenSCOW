@@ -68,3 +68,7 @@ export async function checkClustersRootUserLogin(logger: Logger) {
     }
   }));
 }
+
+export function getClusterTransferNode(cluster: string): string | undefined {
+  return (clusters[cluster]?.transferCrossCluster) ? clusters[cluster]?.transferCrossCluster?.transferNode : undefined;
+}
