@@ -113,7 +113,6 @@ export async function sendEmailAuthLink(
   };
 
   let success = true;
-  console.log("发邮件了");
   transporter.sendMail(mailOptions, (e) => {
     if (e) {
       logger.info("fail to send email", e);
@@ -240,12 +239,6 @@ export async function validateOTPCode(
     return true;
   }
 
-  console.log("jjjj", authConfig.otp.status);
-  console.log("jjjj", authConfig.otp.status);
-  console.log("jjjj", authConfig.otp.status);
-  console.log("jjjj", authConfig.otp.status);
-  console.log("jjjj", authConfig.otp.status);
-  console.log("jjjj", authConfig.otp.status);
   const time = await getAbsoluteUTCTimestamp();
 
   if (authConfig.otp.status === OTPStatusOptions.remote) {
