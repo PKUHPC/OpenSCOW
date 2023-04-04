@@ -33,6 +33,7 @@ const config = {
         blog: {
           showReadingTime: true,
           editUrl: join(variables.REPO_URL, "/edit/main/website/blog/"),
+          beforeDefaultRemarkPlugins: [plugin],
         },
         theme: {
           customCss: require.resolve("./src/css/custom.css"),

@@ -1,5 +1,25 @@
 # @scow/auth
 
+## 0.4.0
+
+### Minor Changes
+
+- 9a1d3b81b: 认证系统新建用户和组时支持删除预添加的属性
+
+### Patch Changes
+
+- bdc990a0c: 系统启动时，各个容器在日志中打印版本信息
+- 883521f26: 修复当部署的端口号非 80 时，回调地址出错的问题
+- ac298dc4a: 登录页面增加必填校验，增加 logo
+- Updated dependencies [bdc990a0c]
+- Updated dependencies [86e0f5b2d]
+- Updated dependencies [419184a93]
+- Updated dependencies [8145061ba]
+  - @scow/utils@0.1.2
+  - @scow/lib-ssh@0.2.0
+  - @scow/lib-config@0.2.0
+  - @scow/config@0.1.2
+
 ## 0.3.0
 
 ## 0.2.0

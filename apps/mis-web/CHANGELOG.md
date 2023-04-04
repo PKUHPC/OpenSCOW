@@ -1,5 +1,36 @@
 # @scow/mis-web
 
+## 0.4.0
+
+### Minor Changes
+
+- 86e0f5b2d: 整个系统打包为一个镜像
+- 50a5b858c: 系统初试化页面用户选择下拉框支持搜索
+- 0eb41fed5: 导入用户功能只支持导入默认租户
+
+### Patch Changes
+
+- fb2af3d6c: 修复充值记录查询的 bug
+- bdc990a0c: 系统启动时，各个容器在日志中打印版本信息
+- 584069cfd: 修复账户管理下的作业列表，只能正常显示第一个账户的数据的问题
+- debcf7bc3: 从最终镜像中去除 next.js build cache，减小镜像大小
+- 5deada9da: 初始化页面获取丢失默认价格接口不做登录校验
+- ff7eec37e: 修复因 table 超出页面的问题，搜索模块、个人信息页面手机端样式兼容
+- 06cd94230: 刷新 slurm 封锁状态和同步作业信息状态功能放到平台调试中
+- 8b666552e: 解决再次添加用户不成功的问题
+- ece2b014d: 修复管理端的作业操作权限问题
+- 0ed5d925e: ID 为空时精确搜索页面展示搜索结果
+- Updated dependencies [bdc990a0c]
+- Updated dependencies [86e0f5b2d]
+- Updated dependencies [ff7eec37e]
+- Updated dependencies [8145061ba]
+  - @scow/utils@0.1.2
+  - @scow/lib-decimal@0.2.0
+  - @scow/protos@0.2.0
+  - @scow/lib-web@0.3.0
+  - @scow/lib-config@0.2.0
+  - @scow/config@0.1.2
+
 ## 0.3.0
 
 ### Minor Changes

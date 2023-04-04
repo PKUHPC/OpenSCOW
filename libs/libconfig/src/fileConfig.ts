@@ -26,6 +26,32 @@ const parsers = {
 const candidates = Object.entries(parsers);
 
 /**
+ * 从具体的文件中读取配置
+ * @param schema JSON Schema对象
+ * @param filePath 文件路径
+ * @returns 配置对象
+ * @throws 如果配置文件不存在，或者不匹配格式，抛出异常
+ */
+export function getConfig<T extends TSchema>(
+  schema: T, filePath: string,
+): Static<T> {
+  // extname returns .yml
+  const ext = extname(filePath).substring(1);
+
+  if (!(ext in parsers)) {
+    throw new Error(`Unsupported config file extension ${ext}`);
+  }
+
+  const content = fs.readFileSync(filePath, { encoding: "utf8" });
+
+  const result = validateObject(schema, parsers[ext](content));
+  if (result instanceof Error) {
+    throw new Error("Error reading config file " + filePath + ": " + result.message);
+  }
+  return result;
+}
+
+/**
  * 从文件中读取配置。
  * 读取优先级：yml -> yaml -> json
  *
