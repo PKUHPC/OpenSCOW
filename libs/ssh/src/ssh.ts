@@ -149,7 +149,7 @@ export async function loggedExec(ssh: NodeSSH, logger: Logger, throwIfFailed: bo
   const command = constructCommand(cmd, parameters, env);
 
   const resp = await ssh.execCommand(command, options);
-  logger.error("Command execCommand %s. options %s", command, JSON.stringify(options));
+  logger.info("Command execCommand %s, options %s", command, JSON.stringify(options));
 
   if (resp.code !== 0) {
     logger.error("Command %o failed. stdout %s, stderr %s", command, resp.stdout, resp.stderr);
