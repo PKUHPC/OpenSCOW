@@ -1,6 +1,6 @@
 {
   "name": "@scow/lib-web",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "",
   "main": "index.js",
   "private": true,
@@ -20,19 +20,19 @@
     "mime-types": "2.1.35"
   },
   "peerDependencies": {
-    "antd": "5.3.2",
+    "antd": "5.3.3",
     "next": "13.2.4",
     "styled-components": "5.3.9",
     "@ant-design/icons": "5.0.1",
     "dayjs": "1.11.7"
   },
   "devDependencies": {
-    "antd": "5.3.2",
+    "antd": "5.3.3",
     "next": "13.2.4",
     "styled-components": "5.3.9",
     "@types/mime-types": "2.1.1",
     "react": "18.2.0",
-    "@types/react": "18.0.29",
+    "@types/react": "18.0.32",
     "react-dom": "18.2.0",
     "@types/react-dom": "18.0.11",
     "react-is": "18.2.0",

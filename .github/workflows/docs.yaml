@@ -31,7 +31,7 @@ jobs:
         env:
           GIT_PLATFORM: github
           CR_URL: ghcr.io/pkuhpc/scow
-          BASE_PATH: ${{ github.project_name }}
+          BASE_PATH: /${{ github.event.repository.name }}/
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
