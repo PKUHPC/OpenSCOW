@@ -13,15 +13,15 @@
 import { createWriterExtensions } from "@ddadaal/tsgrpc-common";
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError, status } from "@grpc/grpc-js";
-import { loggedExec, sftpExists,
-  sftpMkdir, sftpReaddir, sftpRealPath, sftpRename, sftpStat, sftpUnlink, sftpWriteFile, sshRmrf } from "@scow/lib-ssh";
+import { loggedExec, sftpAppendFile, sftpExists, sftpMkdir, sftpReaddir,
+  sftpReadFile, sftpRealPath, sftpRename, sftpStat, sftpUnlink, sftpWriteFile, sshRmrf } from "@scow/lib-ssh";
 import { FileInfo, FileInfo_FileType,
   FileServiceServer, FileServiceService, TransferInfo } from "@scow/protos/build/portal/file";
 import { clusters } from "src/config/clusters";
 import { config } from "src/config/env";
 import { clusterNotFound } from "src/utils/errors";
 import { pipeline } from "src/utils/pipeline";
-import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
+import { getClusterLoginNode, getClusterTransferNode, sshConnect } from "src/utils/ssh";
 import { once } from "stream";
 
 export const fileServiceServer = plugin((server) => {
@@ -371,25 +371,98 @@ export const fileServiceServer = plugin((server) => {
       if (!fromClusterAddress) { throw clusterNotFound(fromCluster); }
       if (!toClusterAddress) { throw clusterNotFound(toCluster); }
 
-      const [toClusterHost, toClusterPort] = toClusterAddress.indexOf(":") > 0 ?
-        toClusterAddress.split(":") : [toClusterAddress, "22"];
+      const fromTransferNode = getClusterTransferNode(fromCluster);
+      const toTransferNode = getClusterTransferNode(toCluster);
+      if (!fromTransferNode) {
+        throw <ServiceError> {
+          code: status.INTERNAL,
+          message: "No transfer node is configured for source cluster",
+        };
+      }
+      if (!toTransferNode) {
+        throw <ServiceError> {
+          code: status.INTERNAL,
+          message: "No transfer node is configured for destination cluster",
+        };
+      }
 
-      const privateKeyPath = "~/.ssh/id_rsa";
+      const [toTransferNodeHost, toTransferNodePort] = toTransferNode.indexOf(":") > 0 ?
+        toTransferNode.split(":") : [toTransferNode, "22"];
 
+      // 获取privateKeyPath路径
+      let homePath = "";
+      await sshConnect(fromTransferNode, userId, logger, async (ssh) => {
+        const sftp = await ssh.requestSFTP();
+        homePath = await sftpRealPath(sftp)(".");
+      });
+      const scowDir = `${homePath}/scow`;
+      const keyDir = `${scowDir}/.scow-sync-ssh`;
+      const privateKeyPath = `${keyDir}/id_rsa`;
 
-      return await sshConnect(fromClusterAddress, userId, logger, async (ssh) => {
+      // 检查是否fromTransferNode -> toTransferNode是否已经免密
+      let keyConfiged = true;
+      await sshConnect(fromTransferNode, userId, logger, async (ssh) => {
+        const sftp = await ssh.requestSFTP();
+        if (!await sftpExists(sftp, scowDir)) {
+          keyConfiged = false;
+        } else if (!await sftpExists(sftp, keyDir)) {
+          keyConfiged = false;
+        } else if (!await sftpExists(sftp, privateKeyPath)) {
+          keyConfiged = false;
+        } else {
+          // 通过使用ssh连接测试是否免密
+          const cmd = `ssh -p ${toTransferNodePort} -i ${privateKeyPath} ${userId}@${toTransferNodeHost} echo ok`;
+          const resp = await loggedExec(ssh, logger, true, cmd, []);
+          if (resp.stdout !== "ok")
+            keyConfiged = false;
+        }
+      });
+      console.log("keyConfiged", keyConfiged);
+
+      // 如果没有配置免密，则生成密钥并配置免密
+      if (!keyConfiged) {
+        let publicKey: string;
+        // 随机生成密钥
+        await sshConnect(fromTransferNode, userId, logger, async (ssh) => {
+          const sftp = await ssh.requestSFTP();
+          if (!await sftpExists(sftp, scowDir)) {
+            await sftpMkdir(sftp)(scowDir);
+          }
+          if (await sftpExists(sftp, keyDir)) {
+            await sshRmrf(ssh, keyDir);
+          }
+          await sftpMkdir(sftp)(keyDir);
+          const genKeyCmd = `ssh-keygen -t rsa -b 4096 -C "for scow-sync" -f ${privateKeyPath} -N ""`;
+          await loggedExec(ssh, logger, true, genKeyCmd, []);
+          // 读公钥
+          const fileData = await sftpReadFile(sftp)(`${privateKeyPath}.pub`);
+          publicKey = fileData.toString();
+        });
+
+        // 配置fromTransferNode -> toTransferNode的免密登录
+        await sshConnect(toTransferNode, userId, logger, async (ssh) => {
+          const sftp = await ssh.requestSFTP();
+          const homePath = await sftpRealPath(sftp)(".");
+          // 将公钥写入到authorized_keys中
+          const authorizedKeysPath = `${homePath}/.ssh/authorized_keys`;
+          await sftpAppendFile(sftp)(authorizedKeysPath, `\n${publicKey}\n`);
+        });
+      }
+
+      // 执行scow-sync-start
+      return await sshConnect(fromTransferNode, userId, logger, async (ssh) => {
         const cmd = "scow-sync-start";
         const args = [
-          "-a", toClusterHost,
+          "-a", toTransferNodeHost,
           "-u", userId,
           "-s", fromPath,
           "-d", toPath,
           "-m", "2",
-          "-p", toClusterPort.toString(),
+          "-p", toTransferNodePort.toString(),
           "-k", privateKeyPath,
         ];
+        console.log("cmd", cmd, args);
         const resp = await loggedExec(ssh, logger, true, cmd, args);
-        // const resp = await ssh.exec(cmd, args, { stream: "both" });
 
         if (resp.code !== 0) {
           throw <ServiceError> {
@@ -409,10 +482,16 @@ export const fileServiceServer = plugin((server) => {
       const clusterAddress = getClusterLoginNode(cluster);
       if (!clusterAddress) { throw clusterNotFound(cluster); }
 
+      const transferNode = getClusterTransferNode(cluster);
+      if (!transferNode) {
+        throw <ServiceError> {
+          code: status.INTERNAL,
+          message: "No transfer node is configured for cluster",
+        };
+      }
       return await sshConnect(clusterAddress, userId, logger, async (ssh) => {
         const cmd = "scow-sync-query";
         const resp = await loggedExec(ssh, logger, true, cmd, []);
-        // const resp = await ssh.exec(cmd, [], { stream: "both" });
 
         if (resp.code !== 0) {
           throw <ServiceError> {

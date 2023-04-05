@@ -66,5 +66,6 @@ export const sftpRename = (sftp: SFTPWrapper) =>
 export const sftpMkdir = (sftp: SFTPWrapper) =>
   handleSftpError(promisify(sftp.mkdir.bind(sftp) as typeof sftp["mkdir"]));
 
-
+export const sftpAppendFile = (sftp: SFTPWrapper) =>
+  handleSftpError(promisify(sftp.appendFile.bind(sftp) as typeof sftp["appendFile"]));
 
