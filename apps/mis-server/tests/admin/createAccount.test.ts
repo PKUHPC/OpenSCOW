@@ -18,6 +18,7 @@ import { AccountServiceClient } from "@scow/protos/build/server/account";
 import { createServer } from "src/app";
 import { Account } from "src/entities/Account";
 import { Tenant } from "src/entities/Tenant";
+import { User } from "src/entities/User";
 import { dropDatabase } from "tests/data/helpers";
 
 let server: Server;
@@ -41,12 +42,13 @@ afterEach(async () => {
 
 it("cannot create a account if the name exists", async () => {
   const tenant = new Tenant({ name: "tenant" });
+  const user = new User({ name: "test", userId: "test", tenant: tenant, email:"test@test.com" });
   const account = new Account({ accountName: "123", tenant, blocked: false, comment: "test" });
   await server.ext.orm.em.fork().persistAndFlush(account);
 
   const reply = await asyncClientCall(client, "createAccount", {
     accountName: "123", tenantName: "tenant",
-    ownerId: "123",
+    ownerId: user.userId,
   }).catch((e) => e);
   console.log(reply);
   expect(reply.code).toBe(Status.ALREADY_EXISTS);
@@ -54,8 +56,10 @@ it("cannot create a account if the name exists", async () => {
 
 
 it("create a new account", async () => {
+  const tenant = new Tenant({ name: "tenant" });
+  const user = new User({ name: "test", userId: "test", tenant: tenant, email:"test@test.com" });
   await asyncClientCall(client, "createAccount", { accountName: "a1234", tenantName: "tenant",
-    ownerId: "123" });
+    ownerId: user.userId });
   const em = server.ext.orm.em.fork();
   const account = await em.findOneOrFail(Account, { accountName: "a1234" });
   expect(account.accountName).toBe("a1234");

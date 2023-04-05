@@ -35,7 +35,7 @@ export interface CreateAccountSchema {
   }
 
   responses: {
-    200: CreateAccountResponse;
+    200: null;
     400: {
       code: "ID_NAME_NOT_MATCH" | "ACCOUNT_NAME_NOT_VALID";
     }
@@ -82,7 +82,7 @@ export default route<CreateAccountSchema>("CreateAccountSchema",
     return await asyncClientCall(client, "createAccount", {
       accountName, ownerId, comment, tenantName: info.tenant,
     })
-      .then((x) => ({ 200: x }))
+      .then((x) => ({ 200: x as unknown as null }))
       .catch(handlegRPCError({
         [Status.ALREADY_EXISTS]: () => ({ 409: null }),
         [Status.NOT_FOUND]: () => ({ 404: null }),
