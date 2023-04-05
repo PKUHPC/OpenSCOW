@@ -66,11 +66,11 @@ export async function sendEmailAuthLink(
     return;
   }
 
-  const redisUserInfoObject = JSON.parse(redisUserJSON);
-  const currentTimestamp = await getAbsoluteUTCTimestamp();
-  if (redisUserInfoObject["senEmailTimestamp"] !== undefined) {
+  const redisUserInfoObject = JSON.parse(redisUserJSON) as Object;
+  const currentTimestamp = getAbsoluteUTCTimestamp();
+  if (redisUserInfoObject["sendEmaililTimestamp"] !== undefined) {
     // 获取邮件链接需间隔至少60秒
-    const timeDiff = Math.floor(currentTimestamp / 1000 - redisUserInfoObject["senEmailTimestamp"]);
+    const timeDiff = Math.floor(currentTimestamp / 1000 - redisUserInfoObject["sendEmaililTimestamp"]);
     if (timeDiff < 60) {
       await bindOtpHtml(
         false, req, res,
@@ -79,7 +79,7 @@ export async function sendEmailAuthLink(
       return;
     }
   }
-  redisUserInfoObject["senEmailTimestamp"] = Math.floor(currentTimestamp / 1000);
+  redisUserInfoObject["sendEmaililTimestamp"] = Math.floor(currentTimestamp / 1000);
   const ttl = await f.redis.ttl(aesDecryptData(otpSessionToken));
   await f.redis.set(aesDecryptData(otpSessionToken), JSON.stringify(redisUserInfoObject), "EX", ttl);
   const transporter = nodemailer.createTransport({
@@ -114,12 +114,13 @@ export async function sendEmailAuthLink(
   };
 
   let success = true;
-  transporter.sendMail(mailOptions, (e) => {
-    if (e) {
-      logger.info("fail to send email", e);
-      success = false;
-    }
-  });
+  try {
+    await transporter.sendMail(mailOptions);
+    logger.info("email sent successfully");
+  } catch (e) {
+    logger.info("fail to send email", e);
+    success = false;
+  }
 
   await bindOtpHtml(
     false, req, res,
@@ -127,7 +128,7 @@ export async function sendEmailAuthLink(
       emailAddress: emailAddress, otpSessionToken: otpSessionToken, backToLoginUrl: backToLoginUrl });
 }
 
-export async function getAbsoluteUTCTimestamp() {
+export function getAbsoluteUTCTimestamp() {
   const currentTime = new Date();
   return Date.UTC(currentTime.getUTCFullYear(), currentTime.getUTCMonth(), currentTime.getUTCDate(),
     currentTime.getUTCHours(), currentTime.getUTCMinutes(), currentTime.getUTCSeconds(),
@@ -171,7 +172,7 @@ export async function validateOtpCode(
     return false;
   }
 
-  const time = await getAbsoluteUTCTimestamp();
+  const time = getAbsoluteUTCTimestamp();
 
   if (authConfig.otp.status === otpStatusOptions.remote) {
     if (!authConfig.otp.remote.url || !authConfig.otp.remote.url)

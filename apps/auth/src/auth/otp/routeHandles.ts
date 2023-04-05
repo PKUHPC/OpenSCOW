@@ -173,7 +173,7 @@ export function bindClickAuthLinkInEmailRoute(
           return;
         }
         // 将secret信息存入ldap;
-        const redisUserInfoObject = JSON.parse(redisUserJSON);
+        const redisUserInfoObject = JSON.parse(redisUserJSON) as Record<string, string>;
         const secret = speakeasy.generateSecret({ length: 20 }).base32;
         await useLdap(logger, ldapConfig)(async (client) => {
           logger.info("Binding as %s successful.", redisUserInfoObject.dn);
