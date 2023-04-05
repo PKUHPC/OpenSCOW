@@ -103,27 +103,29 @@ export const AppSessionsTable: React.FC<Props> = () => {
         <Space>
           {
             (record.ready) ? (
-              <>
-                <ConnectTopAppLink
-                  session={record}
-                  cluster={cluster}
-                />
-                <Popconfirm
-                  title="确定结束这个任务吗？"
-                  onConfirm={async () =>
-                    api.cancelJob({ body: {
-                      cluster: cluster.id,
-                      jobId: record.jobId,
-                    } })
-                      .then(() => {
-                        message.success("任务结束请求已经提交！");
-                        reload();
-                      })
-                  }
-                >
-                  <a>结束</a>
-                </Popconfirm>
-              </>
+              <ConnectTopAppLink
+                session={record}
+                cluster={cluster}
+              />
+            ) : undefined
+          }
+          {
+            (record.ready || record.state === "PENDING") ? (
+              <Popconfirm
+                title="确定结束这个任务吗？"
+                onConfirm={async () =>
+                  api.cancelJob({ body: {
+                    cluster: cluster.id,
+                    jobId: record.jobId,
+                  } })
+                    .then(() => {
+                      message.success("任务结束请求已经提交！");
+                      reload();
+                    })
+                }
+              >
+                <a>结束</a>
+              </Popconfirm>
             ) : undefined
           }
           <a onClick={() => {
