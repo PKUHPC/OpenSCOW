@@ -11,15 +11,14 @@
  */
 
 import { FastifyInstance } from "fastify";
-import { authConfig, LdapConfigSchema, OTPStatusOptions } from "src/config/auth";
+import { authConfig, LdapConfigSchema, otpStatusOptions } from "src/config/auth";
 
-import { generateIvAndKey } from "./aesUtils";
-import { clickAuthLinkInEmail, clickRequestBindingLink,
-  redirectLoinUIAndBindUI, validateUserNameAndPassword } from "./routeHandles";
+import { bindClickAuthLinkInEmailRoute, bindClickRequestBindingLinkRoute,
+  bindRedirectLoinUIAndBindUIRoute, bindValidateUserNameAndPasswordRoute } from "./routeHandles";
 
-export function registerOTPBindPostHandler(f: FastifyInstance, ldapConfig: LdapConfigSchema) {
+export function registerOtpBindPostHandler(f: FastifyInstance, ldapConfig: LdapConfigSchema) {
 
-  if (authConfig.otp.status === OTPStatusOptions.disabled) {
+  if (authConfig.otp.status === otpStatusOptions.disabled) {
     return;
   }
 
@@ -27,16 +26,15 @@ export function registerOTPBindPostHandler(f: FastifyInstance, ldapConfig: LdapC
    *  登录界面->绑定OTP界面
    *  绑定OTP界面->登录界面重定向
    * */
-  redirectLoinUIAndBindUI(f);
+  bindRedirectLoinUIAndBindUIRoute(f);
 
   if (authConfig.otp.status === "local") {
-    // 用于绑定账户时OTPSession不暴露于前端
-    generateIvAndKey();
-    // 验证账户密码
-    validateUserNameAndPassword(f, ldapConfig);
-    // 发邮件
-    clickRequestBindingLink(f);
-    // 绑定获取二维码
-    clickAuthLinkInEmail(f, ldapConfig);
+    // 绑定路由，路由处理验证账户密码
+    bindValidateUserNameAndPasswordRoute(f, ldapConfig);
+    // 绑定路由，路由处理发邮件
+    bindClickRequestBindingLinkRoute(f);
+    // 绑定路由，路由处理绑定获取二维码
+    bindClickAuthLinkInEmailRoute(f, ldapConfig);
+
   }
 }

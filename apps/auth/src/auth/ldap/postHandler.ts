@@ -17,7 +17,7 @@ import { cacheInfo } from "src/auth/cacheInfo";
 import { redirectToWeb } from "src/auth/callback";
 import { findUser, useLdap } from "src/auth/ldap/helpers";
 import { serveLoginHtml } from "src/auth/loginHtml";
-import { validateOTPCode } from "src/auth/otp/helper";
+import { validateOtpCode } from "src/auth/otp/helper";
 import { validateLoginParams } from "src/auth/validateLoginParams";
 import { LdapConfigSchema } from "src/config/auth";
 
@@ -31,14 +31,15 @@ export function registerPostHandler(f: FastifyInstance, ldapConfig: LdapConfigSc
     callbackUrl: Type.String(),
     token: Type.String(),
     code: Type.String(),
-    OTPCode: Type.String(),
+    otpCode: Type.Optional(Type.String()),
   });
 
   // register a login handler
   f.post<{ Body: Static<typeof bodySchema> }>("/public/auth", {
     schema: { body: bodySchema },
   }, async (req, res) => {
-    const { username, password, callbackUrl, token, code, OTPCode } = req.body;
+
+    const { username, password, callbackUrl, token, code, otpCode } = req.body;
 
     if (!await validateLoginParams(token, code, callbackUrl, req, res)) {
       return;
@@ -63,12 +64,11 @@ export function registerPostHandler(f: FastifyInstance, ldapConfig: LdapConfigSc
         return;
       }
 
-      logger.info("Trying binding as %s with credentials", user.dn);
-
-      if (!await validateOTPCode({ userId: user.identityId, dn: user.dn },
-        OTPCode, callbackUrl, req, res, logger, client)) {
+      if (!await validateOtpCode({ userId: user.identityId, dn: user.dn },
+        otpCode, callbackUrl, req, res, logger, client)) {
         return;
       }
+      logger.info("Trying binding as %s with credentials", user.dn);
       await useLdap(logger, ldapConfig, { dn: user.dn, password })(async () => {
         logger.info("Binding as %s successful. User info %o", user.dn, user);
         const info = await cacheInfo(user.identityId, req);
@@ -77,7 +77,6 @@ export function registerPostHandler(f: FastifyInstance, ldapConfig: LdapConfigSc
         logger.info("Binding as %s failed. Err: %o", user.dn, err);
         await serveLoginHtml(true, callbackUrl, req, res);
       });
-
     });
   });
 }

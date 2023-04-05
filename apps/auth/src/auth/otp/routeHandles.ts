@@ -17,21 +17,21 @@ import { FastifyInstance } from "fastify";
 import ldapjs from "ldapjs";
 import * as QRCode from "qrcode";
 import * as speakeasy from "speakeasy";
-import { bindOTPHtml } from "src/auth/bindOTPHtml";
+import { bindOtpHtml } from "src/auth/bindOtpHtml";
 import { findUser, useLdap } from "src/auth/ldap/helpers";
 import { authConfig, LdapConfigSchema } from "src/config/auth";
 import { rootKeyPair } from "src/config/env";
 import { promisify } from "util";
 
-import { aesDecryptData } from "./aesUtils";
-import { getAbsoluteUTCTimestamp, sendEmailAuthLink, storeOTPSessionAndGoSendEmailUI } from "./helper";
+import { aesDecryptData, generateIvAndKey } from "./aesUtils";
+import { getAbsoluteUTCTimestamp, sendEmailAuthLink, storeOtpSessionAndGoSendEmailUI } from "./helper";
 
 
 /**
    *  登录界面->绑定OTP界面
    *  绑定OTP界面->登录界面重定向
    * */
-export function redirectLoinUIAndBindUI(f: FastifyInstance) {
+export function bindRedirectLoinUIAndBindUIRoute(f: FastifyInstance) {
   const QuerystringSchema = Type.Object({
     action: Type.String(),
     backToLoginUrl: Type.String(),
@@ -50,12 +50,15 @@ export function redirectLoinUIAndBindUI(f: FastifyInstance) {
 
       const { action, backToLoginUrl } = req.query;
 
-      if (authConfig.otp.status === "local" && action === "bindOTP") {
+      if (authConfig.otp.status === "local" && action === "bindOtp") {
+        // 产生iv和key
+        await generateIvAndKey(f);
+
         const backToLoginUrl = req.headers.referer;
-        await bindOTPHtml(false, req, res, { backToLoginUrl: backToLoginUrl });
+        await bindOtpHtml(false, req, res, { backToLoginUrl: backToLoginUrl });
         return;
       }
-      if (authConfig.otp.status === "remote" && action === "bindOTP") {
+      if (authConfig.otp.status === "remote" && action === "bindOtp") {
 
         if (!authConfig.otp.remote.redirectUrl) {
           res.redirect(backToLoginUrl);
@@ -75,7 +78,7 @@ export function redirectLoinUIAndBindUI(f: FastifyInstance) {
 }
 
 //  验证用户名密码->发送邮件页面
-export function validateUserNameAndPassword(f: FastifyInstance, ldapConfig: LdapConfigSchema) {
+export function bindValidateUserNameAndPasswordRoute(f: FastifyInstance, ldapConfig: LdapConfigSchema) {
   const bodySchema = Type.Object({
     username: Type.String(),
     password: Type.String(),
@@ -89,28 +92,26 @@ export function validateUserNameAndPassword(f: FastifyInstance, ldapConfig: Ldap
     const { username, password, backToLoginUrl } = req.body;
 
     const logger = req.log.child({ plugin: "ldap" });
-
     await useLdap(logger, ldapConfig)(async (client) => {
       const user = await findUser(logger, ldapConfig, client, username).catch(async () => {
-        await bindOTPHtml(true, req, res);
+        await bindOtpHtml(true, req, res);
       });
 
       if (!user) {
         logger.info("Didn't find user with %s=%s", ldapConfig.attrs.uid, username);
-        await bindOTPHtml(true, req, res);
+        await bindOtpHtml(true, req, res);
         return;
       }
       logger.info("Trying binding as %s with credentials", user.dn);
-
       await useLdap(logger, ldapConfig, { dn: user.dn, password })(async () => {
 
         logger.info("Binding as %s successful. User info %o", user.dn, user);
-        await storeOTPSessionAndGoSendEmailUI(f, req, res, ldapConfig, logger, client, backToLoginUrl,
-          { dn: user.dn, password: password });
+        await storeOtpSessionAndGoSendEmailUI(f, req, res, ldapConfig, logger, client, backToLoginUrl,
+          { dn: user.dn });
         return;
       }).catch(async (err) => {
         logger.info("error occurs. Err: %o", err);
-        await bindOTPHtml(true, req, res);
+        await bindOtpHtml(true, req, res);
       });
 
     });
@@ -118,10 +119,10 @@ export function validateUserNameAndPassword(f: FastifyInstance, ldapConfig: Ldap
 }
 
 // 点击获取绑定链接
-export function clickRequestBindingLink(
+export function bindClickRequestBindingLinkRoute(
   f: FastifyInstance) {
   const bodySchema = Type.Object({
-    OTPSessionToken: Type.String(),
+    otpSessionToken: Type.String(),
     emailAddress: Type.String(),
     backToLoginUrl: Type.String(),
   });
@@ -133,15 +134,15 @@ export function clickRequestBindingLink(
       },
     },
     async (req, res) => {
-      const { OTPSessionToken, emailAddress, backToLoginUrl } = req.body;
+      const { otpSessionToken, emailAddress, backToLoginUrl } = req.body;
       const logger = req.log;
 
-      await sendEmailAuthLink(f, OTPSessionToken, req, res, logger, emailAddress, backToLoginUrl);
+      await sendEmailAuthLink(f, otpSessionToken, req, res, logger, emailAddress, backToLoginUrl);
     },
   );
 }
 // 点击邮箱中的绑定链接
-export function clickAuthLinkInEmail(
+export function bindClickAuthLinkInEmailRoute(
   f: FastifyInstance,
   ldapConfig: LdapConfigSchema,
 ) {
@@ -167,7 +168,7 @@ export function clickAuthLinkInEmail(
         const redisUserJSON = await f.redis.get(aesDecryptData(token));
         if (!redisUserJSON) {
           // 信息过期
-          await bindOTPHtml(false, req, res,
+          await bindOtpHtml(false, req, res,
             { sendEmailUI: true, redisUserInfoExpiration: true, backToLoginUrl: backToLoginUrl });
           return;
         }

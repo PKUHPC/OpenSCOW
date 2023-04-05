@@ -13,7 +13,7 @@
 import { DEFAULT_PRIMARY_COLOR } from "@scow/config/build/ui";
 import { FastifyReply, FastifyRequest } from "fastify";
 import { join } from "path";
-import { authConfig, OTPStatusOptions } from "src/config/auth";
+import { authConfig, otpStatusOptions } from "src/config/auth";
 import { config, FAVICON_URL } from "src/config/env";
 import { uiConfig } from "src/config/ui";
 
@@ -33,7 +33,7 @@ function parseHostname(req: FastifyRequest): string | undefined {
 }
 
 
-export async function bindOTPHtml(
+export async function bindOtpHtml(
   err: boolean, req: FastifyRequest, rep: FastifyReply,
   otp?: {
     sendEmailUI?: boolean,
@@ -41,22 +41,22 @@ export async function bindOTPHtml(
     redisUserInfoExpiration?: boolean,
     emailAddress?: string,
     qrcode?: string,
-    OTPSessionToken?: string,
+    otpSessionToken?: string,
     backToLoginUrl?: string,
     timeDiffNotEnough?: number,
   },
 ) {
 
   const hostname = parseHostname(req);
-  const enableTOTP = authConfig.otp.status !== OTPStatusOptions.disabled;
+  const enableTotp = authConfig.otp.status !== otpStatusOptions.disabled;
 
-  return rep.status(err ? 401 : 200).view("bindOTP.liquid", {
+  return rep.status(err ? 401 : 200).view("bindOtp.liquid", {
     cssUrl: join(config.BASE_PATH, config.AUTH_BASE_PATH, "/public/assets/tailwind.min.css"),
     faviconUrl: join(config.BASE_PATH, FAVICON_URL),
     backgroundColor: uiConfig.primaryColor?.defaultColor ?? DEFAULT_PRIMARY_COLOR,
     err,
     footerText: (hostname && uiConfig?.footer?.hostnameTextMap?.[hostname]) ?? uiConfig?.footer?.defaultText ?? "",
-    enableTOTP,
+    enableTotp,
     ...otp,
   });
 

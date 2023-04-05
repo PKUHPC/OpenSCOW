@@ -14,7 +14,7 @@ import { DEFAULT_PRIMARY_COLOR } from "@scow/config/build/ui";
 import { FastifyReply, FastifyRequest } from "fastify";
 import { join } from "path";
 import { createCaptcha } from "src/auth/captcha";
-import { authConfig, OTPStatusOptions } from "src/config/auth";
+import { authConfig, otpStatusOptions } from "src/config/auth";
 import { config, FAVICON_URL, LOGO_URL } from "src/config/env";
 import { uiConfig } from "src/config/ui";
 
@@ -36,12 +36,12 @@ function parseHostname(req: FastifyRequest): string | undefined {
 export async function serveLoginHtml(
   err: boolean, callbackUrl: string, req: FastifyRequest, rep: FastifyReply,
   verifyCaptchaFail?: boolean,
-  verifyOTPFail?: boolean,
+  verifyOtpFail?: boolean,
 ) {
 
   const hostname = parseHostname(req);
   const enableCaptcha = authConfig.captcha.enabled;
-  const enableTOTP = authConfig.otp.status !== OTPStatusOptions.disabled;
+  const enableTotp = authConfig.otp.status !== otpStatusOptions.disabled;
 
   const captchaInfo = enableCaptcha
     ? await createCaptcha(req.server)
@@ -59,8 +59,8 @@ export async function serveLoginHtml(
     ...captchaInfo,
     verifyCaptchaFail,
     enableCaptcha,
-    enableTOTP,
-    verifyOTPFail,
+    enableTotp,
+    verifyOtpFail,
     refreshCaptchaPath: join(config.BASE_PATH, config.AUTH_BASE_PATH, "/public/refreshCaptcha"),
   });
 

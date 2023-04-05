@@ -16,15 +16,15 @@ import ldapjs from "ldapjs";
 import * as nodemailer from "nodemailer";
 import { TransportOptions } from "nodemailer";
 import * as speakeasy from "speakeasy";
-import { bindOTPHtml } from "src/auth/bindOTPHtml";
-import { extractAttr, takeOne } from "src/auth/ldap/helpers";
+import { bindOtpHtml } from "src/auth/bindOtpHtml";
+import { extractAttr, searchOne, takeOne } from "src/auth/ldap/helpers";
 import { serveLoginHtml } from "src/auth/loginHtml";
-import { authConfig, AuthConfigSchema, LdapConfigSchema, OTPStatusOptions } from "src/config/auth";
+import { authConfig, LdapConfigSchema, otpStatusOptions } from "src/config/auth";
 import * as url from "url";
 
 import { aesDecryptData, aesEncryptData } from "./aesUtils";
 
-export async function storeOTPSessionAndGoSendEmailUI(
+export async function storeOtpSessionAndGoSendEmailUI(
   f: FastifyInstance,
   req: FastifyRequest,
   res: FastifyReply,
@@ -34,34 +34,35 @@ export async function storeOTPSessionAndGoSendEmailUI(
   backToLoginUrl: string,
   userInfo: {
     dn: string,
-    password: string,
   },
 ) {
-  const OTPSessionToken = crypto.randomUUID();
-  const encryptOTPSessionToken = aesEncryptData(OTPSessionToken);
-  f.redis.set(OTPSessionToken, JSON.stringify(userInfo), "EX", 600);
+  const otpSessionToken = crypto.randomUUID();
+  const encryptOtpSessionToken = aesEncryptData(otpSessionToken);
+  await f.redis.set(otpSessionToken, JSON.stringify(userInfo), "EX", 600);
   const mailAttributeName = ldapConfig.attrs.mail || "mail";
-  const emailAddress = await searchOneAttributeValueFromLdap(userInfo.dn, logger, mailAttributeName, client);
-  await bindOTPHtml(false, req, res,
-    { sendEmailUI: true, OTPSessionToken: encryptOTPSessionToken, emailAddress: emailAddress, backToLoginUrl });
+  const emailAddressInfo =
+    await searchOneAttributeValueFromLdap(userInfo.dn, logger, mailAttributeName, client);
+  await bindOtpHtml(false, req, res,
+    { sendEmailUI: true, otpSessionToken: encryptOtpSessionToken,
+      emailAddress: emailAddressInfo?.value, backToLoginUrl });
   return;
 }
 
 export async function sendEmailAuthLink(
   f: FastifyInstance,
-  OTPSessionToken: string,
+  otpSessionToken: string,
   req: FastifyRequest,
   res: FastifyReply,
   logger: FastifyBaseLogger,
   emailAddress: string,
   backToLoginUrl: string,
 ) {
-  const redisUserJSON = await f.redis.get(aesDecryptData(OTPSessionToken));
+  const redisUserJSON = await f.redis.get(aesDecryptData(otpSessionToken));
   if (!redisUserJSON) {
     // 信息过期
-    await bindOTPHtml(false, req, res,
+    await bindOtpHtml(false, req, res,
       { sendEmailUI: true, redisUserInfoExpiration: true,
-        OTPSessionToken: OTPSessionToken, backToLoginUrl: backToLoginUrl });
+        otpSessionToken: otpSessionToken, backToLoginUrl: backToLoginUrl });
     return;
   }
 
@@ -71,16 +72,16 @@ export async function sendEmailAuthLink(
     // 获取邮件链接需间隔至少60秒
     const timeDiff = Math.floor(currentTimestamp / 1000 - redisUserInfoObject["senEmailTimestamp"]);
     if (timeDiff < 60) {
-      await bindOTPHtml(
+      await bindOtpHtml(
         false, req, res,
         { sendEmailUI: true, emailAddress: emailAddress,
-          timeDiffNotEnough: 60 - timeDiff, OTPSessionToken, backToLoginUrl: backToLoginUrl });
+          timeDiffNotEnough: 60 - timeDiff, otpSessionToken, backToLoginUrl: backToLoginUrl });
       return;
     }
   }
   redisUserInfoObject["senEmailTimestamp"] = Math.floor(currentTimestamp / 1000);
-  const ttl = await f.redis.ttl(aesDecryptData(OTPSessionToken));
-  await f.redis.set(OTPSessionToken, JSON.stringify(redisUserInfoObject), "EX", ttl);
+  const ttl = await f.redis.ttl(aesDecryptData(otpSessionToken));
+  await f.redis.set(aesDecryptData(otpSessionToken), JSON.stringify(redisUserInfoObject), "EX", ttl);
   const transporter = nodemailer.createTransport({
     host: authConfig.otp.authenticationMethod.mail.mailTransportInfo.host,
     port: authConfig.otp.authenticationMethod.mail.mailTransportInfo.port,
@@ -98,7 +99,7 @@ export async function sendEmailAuthLink(
     host: authUrl.host,
     pathname: "/otp/email/validation",
     query: {
-      token: OTPSessionToken,
+      token: otpSessionToken,
       backToLoginUrl: backToLoginUrl,
     },
   }) + "\">{{labelText}}</a>";
@@ -119,55 +120,12 @@ export async function sendEmailAuthLink(
       success = false;
     }
   });
-  await bindOTPHtml(
+
+  await bindOtpHtml(
     false, req, res,
     { sendEmailUI: true, sendSucceeded: success,
-      emailAddress: emailAddress, OTPSessionToken: OTPSessionToken, backToLoginUrl: backToLoginUrl });
+      emailAddress: emailAddress, otpSessionToken: otpSessionToken, backToLoginUrl: backToLoginUrl });
 }
-
-export const extractSecretFromEntry = (
-  authConfig: AuthConfigSchema, entry: ldapjs.SearchEntry, log: FastifyBaseLogger,
-) => {
-  const secret = takeOne(extractAttr(entry, authConfig.otp.secretAttributeName));
-
-  if (!secret) {
-    log.info("Candidate user (dn %s) doesn't has property key %s (set by otp.secretAttributeName)");
-    return undefined;
-  }
-
-  return { secret };
-};
-
-export const extractEmailAddressFromEntry = (
-  config: LdapConfigSchema, entry: ldapjs.SearchEntry, log: FastifyBaseLogger,
-) => {
-  const emailAddress = takeOne(extractAttr(entry, config.attrs.mail || "mail"));
-
-  if (!emailAddress) {
-    log.info("Candidate user (dn %s) doesn't has property key %s (set by ldap.attrs.mail). Ignored.");
-    return undefined;
-  }
-
-  return { emailAddress };
-};
-
-export const extractUserInfoFromEntry = (
-  config: LdapConfigSchema, entry: ldapjs.SearchEntry, log: FastifyBaseLogger,
-) => {
-  const identityId = takeOne(extractAttr(entry, config.attrs.uid));
-
-  if (!identityId) {
-    log.info("Candidate user (dn %s) doesn't has property key %s (set by ldap.attrs.uid). Ignored.");
-    return undefined;
-  }
-
-  const name = config.attrs.name ? takeOne(extractAttr(entry, config.attrs.name)) : identityId;
-
-  const emailAddress = takeOne(extractAttr(entry, config.attrs.mail || "mail"));
-
-  return { identityId, name, emailAddress };
-};
-
 
 export async function getAbsoluteUTCTimestamp() {
   const currentTime = new Date();
@@ -175,50 +133,20 @@ export async function getAbsoluteUTCTimestamp() {
     currentTime.getUTCHours(), currentTime.getUTCMinutes(), currentTime.getUTCSeconds(),
     currentTime.getUTCMilliseconds());
 }
-// 用于查找secret和mail
+
 export async function searchOneAttributeValueFromLdap(
-  dn: string, logger: FastifyBaseLogger, attributeName: string, client: ldapjs.Client): Promise<string | undefined > {
-  return new Promise<string | undefined >((resolve, reject) => {
-    client.search(dn, {
-      scope: "sub",
-      filter: "(objectclass=*)",
-      attributes: [attributeName],
-    }, (err, searchRes) => {
-      if (err) {
-        logger.error(`error in search attribute type ${attributeName}, dn: ${dn}`);
-        reject(err);
-      }
-
-      searchRes.on("error", (error) => {
-        logger.error(`error in search attribute type ${attributeName}, dn: ${dn}`);
-        reject(error);
-      });
-      let found = false;
-      searchRes.on("searchEntry", (entry) => {
-        if (found) {
-          logger.info("An entry has already be found. Ignoring more entities.");
-          found = true;
-          return;
-        }
-        const attributeValue = entry.object[attributeName];
-        if (Array.isArray(attributeValue)) {
-          resolve(attributeValue[0]);
-        }
-        else {
-          resolve(attributeValue);
-        }
-      });
-      searchRes.on("end", (result) => {
-        logger.info("Received end event. %o", result);
-        if (result?.status === 0) {
-          resolve(undefined);
-        } else {
-          reject(result?.errorMessage);
-        }
-      });
-    });
-  });
-
+  dn: string, logger: FastifyBaseLogger, attributeName: string,
+  client: ldapjs.Client) {
+  return await searchOne(logger, client, dn,
+    {
+      scope: "base",
+      filter: "(objectClass=*)",
+      attributes: ["*"],
+    }, (e) => {
+      const value = takeOne(extractAttr(e, attributeName));
+      return { value };
+    },
+  );
 }
 
 interface UserInfo {
@@ -226,22 +154,26 @@ interface UserInfo {
   dn: string,
 }
 
-export async function validateOTPCode(
+export async function validateOtpCode(
   userInfo: UserInfo,
-  inputCode: string,
+  inputCode: string | undefined,
   callbackUrl: string,
   req: FastifyRequest,
   res: FastifyReply,
   logger: FastifyBaseLogger,
   client: ldapjs.Client,
 ) {
-  if (authConfig.otp.status === OTPStatusOptions.disabled) {
+  if (authConfig.otp.status === otpStatusOptions.disabled) {
     return true;
+  }
+  if (!inputCode) {
+    await serveLoginHtml(false, callbackUrl, req, res, undefined, true);
+    return false;
   }
 
   const time = await getAbsoluteUTCTimestamp();
 
-  if (authConfig.otp.status === OTPStatusOptions.remote) {
+  if (authConfig.otp.status === otpStatusOptions.remote) {
     if (!authConfig.otp.remote.url || !authConfig.otp.remote.url)
     {
       logger.info("otp.remoteConfig.validateCodeUrl is undefined");
@@ -252,18 +184,15 @@ export async function validateOTPCode(
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        OTPCode: inputCode,
+        otpCode: inputCode,
         userId: userInfo.userId,
       }),
-    }).then(async (isValid) => {
-      const res = await isValid.text();
-      if (res === "true") {
-        return true;
-      }
-      return false;
+    }).then(async (res) => {
+
+      return (await JSON.parse(await res.text()).result) as boolean;
     })
       .catch((e) => {
-        logger.error(`error in verify OTP code in remote status, error ${e}`);
+        logger.error(`error in verify otp code in remote status, error ${e}`);
         return false;
       });
 
@@ -271,20 +200,23 @@ export async function validateOTPCode(
       return true;
     } else {
       await serveLoginHtml(false, callbackUrl, req, res, undefined, true);
+      return false;
     }
 
   }
   // 如果是otp.status是local
-  const secret = await searchOneAttributeValueFromLdap(userInfo.dn, logger, authConfig.otp.secretAttributeName, client);
-  if (!secret) {
+  const secretInfo = await searchOneAttributeValueFromLdap(
+    userInfo.dn, logger, authConfig.otp.secretAttributeName, client);
+  if (!secretInfo?.value) {
+    logger.info("fail to find otp secret");
     await serveLoginHtml(false, callbackUrl, req, res, undefined, true);
-    return;
+    return false;
   }
   const result = speakeasy.totp.verify({
     token: inputCode,
     time: time / 1000,
     encoding: "base32",
-    secret: secret,
+    secret: secretInfo.value,
     digits: authConfig.otp.digits,
     step: authConfig.otp.period,
     algorithm: authConfig.otp.algorithm,
@@ -293,6 +225,7 @@ export async function validateOTPCode(
     return true;
   } else {
     await serveLoginHtml(false, callbackUrl, req, res, undefined, true);
+    return false;
   }
 }
 

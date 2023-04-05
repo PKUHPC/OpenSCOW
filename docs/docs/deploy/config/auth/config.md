@@ -44,49 +44,54 @@ mockUsers:
 
 ## OTP功能
 
-在`auth.yaml`配置中，可以配置关于登录验证码的功能
+在`auth.yaml`配置中，可以配置关于otp验证码的功能, 但目前仅支持ldap认证方式启用otp，ssh认证方式不支持。
 
-但是请注意：
+#### 一、如果您配置otp状态为本地(即otp.status为local，密钥存到ldap中):
 
-  1. 目前仅支持ldap认证方式启用otp，ssh方式不支持。
-  2. 手机端您可以使用FreeOTP, authenticator等，但是请注意有的手机端app可能不支持配置OTP码的digits和加密方式等。
-  3. 您需要自己在ldap中定义一个属性名用来存储string类型的OTP密钥,并配置为auth.yaml中的opt.secretAttributeName。
-  4. 您需要配置一个邮件传输代理（MTA）以实现邮件服务。其中，您需要提供有效的发件人地址、SMTP 服务器地址、SMTP 服务器端口号以及 SMTP 认证凭据（包括用户名和授权码）。
-  5. 如果您的密钥要自己存储在某个地方（即otp.status为remote），那么您需要提供一个验证otp码的接口，返回验证的结果。返回结果用string类型false或者true字符串即可。scow会使用fetch向config/auth.yml中的otp.remote.url发起请求。
+   
+  1. 手机端您可以使用FreeOTP, authenticator等，但是请注意有的手机端app可能不支持配置OTP码的digits和加密方式等。
+  2. 您需要自己在ldap中定义一个属性名用来存储string类型的OTP密钥,并配置为auth.yaml中的opt.secretAttributeName。
+  3. 您需要配置一个邮件传输代理（MTA）以实现邮件服务。其中，您需要提供有效的发件人地址、SMTP 服务器地址、SMTP 服务器端口号以及 SMTP 认证凭据（包括用户名和授权码）。
+
+#### 二、如果您配置otp状态为本地(otp.status为remote, 自己存密钥于某个地方):
+
+  1. 那么您需要提供一个验证otp码的接口，返回验证的结果。返回结果要求json格式{"result": true|false}。
+  2. scow会使用fetch向config/auth.yml中的otp.remote.url发起请求。这个配置需要您根据上述接口和存储密钥的主机，端口配置。fetch请求中otpCode为用户输入的otp码，userId为用户名，类型均为string。
 
   | fetch| |
   |:----:|:---------------------------------: |
   |headers|"Content-Type": "application/json" |
-  | body  | OTPCode, userId                   |
+  | body  | otpCode, userId                   |
 
-比如您是像Google Authenticator一样将密钥存在用户家目录下的.google_authenticator第一行内容，那么您可以提供的路由接口及服务示例：
+例：假设您是像Google Authenticator一样将密钥存在用户家目录下的.google_authenticator第一行内容，那么您可以提供的路由接口及服务示例：
 
 ```
 import { Static, Type } from "@sinclair/typebox";
 import fastify from "fastify";
 import { NodeSSH } from "node-ssh";
 import * as speakeasy from "speakeasy";
+
 // 远程验证OTP码
 const app = fastify({ logger: true });
-const bodySchema = Type.Object({
-  OTPCode: Type.String(),
-  userId: Type.String(),
-});
 
 /**
  * 假设您的OTP密钥存放主机host="192.168.88.102"上/data/home/{{userId}}/.google_authenticator文件的第一行内容，其中{{userId}}为实际的用户名
  * 可以以root身份ssh登录到目标主机的私钥地址为/home/node/.ssh/id_rsa
  */
-
-const host = "192.168.88.102";
 const sshUserName = "root";
-const homedir = "/data/home/{{ userId }}";
-// routePath需要您与配置的auth.yaml中otp.remote.url的路径一致
-const routePath = "/otp/remote/validateCode";
-
 // 假设私钥路径为/home/node/.ssh/id_rsa
 const privateKeyPath = "/home/node/.ssh/id_rsa";
 
+const host = "192.168.88.102";
+const homedir = "/data/home/{{ userId }}";
+
+// routePath需要与您实现的验证接口一致
+const routePath = "/otp/remote/validateCode";
+
+const bodySchema = Type.Object({
+  otpCode: Type.String(),
+  userId: Type.String(),
+});
 app.post<{Body: Static<typeof bodySchema>}>(
   routePath,
   {
@@ -95,14 +100,14 @@ app.post<{Body: Static<typeof bodySchema>}>(
     },
   },
   async (req, res) => {
-    // OTPCode为scow的fetch请求携带的OTP验证码，userId为OTP验证的用户名
-    const { OTPCode, userId } = req.body;
+    // otpCode为scow的fetch请求携带的OTP验证码，userId为OTP验证的用户名
+    const { otpCode, userId } = req.body;
     const ssh = new NodeSSH();
     // 获取OTP密钥
-    const OTPSecret = await ssh.connect({ host: host, username: sshUserName, privateKeyPath: privateKeyPath })
+    const otpSecret = await ssh.connect({ host: host, username: sshUserName, privateKeyPath: privateKeyPath })
       .then(async () => {
-        const OTPSecretFilePath = homedir.replace("{{ userId }}", userId) + "/.google_authenticator";
-        const fileContent = await ssh.execCommand(`su ${userId} && cat ${OTPSecretFilePath}`);
+        const otpSecretFilePath = homedir.replace("{{ userId }}", userId) + "/.google_authenticator";
+        const fileContent = await ssh.execCommand(`su ${userId} && cat ${otpSecretFilePath}`);
         return fileContent.stdout.toString().split("\n")[0];
       }).finally(() => {
         ssh.dispose();
@@ -112,15 +117,16 @@ app.post<{Body: Static<typeof bodySchema>}>(
     const timeStamp = Date.UTC(currentTime.getUTCFullYear(), currentTime.getUTCMonth(), currentTime.getUTCDate(),
       currentTime.getUTCHours(), currentTime.getUTCMinutes(), currentTime.getUTCSeconds(),
       currentTime.getUTCMilliseconds());
-      // 验证
+
+    // 验证
     const result = speakeasy.totp.verify({
-      token: OTPCode,
+      token: otpCode,
       time: timeStamp / 1000,
       encoding: "base32",
-      secret: OTPSecret,
-      // digits, step, algorithm需要您与手机端保持一致
+      secret: otpSecret,
+      // digits, step, algorithm需要您与手机端设置保持一致
     });
-    res.send(result);
+    res.send({ result });
   },
 );
 
@@ -182,4 +188,3 @@ otp:
 
 
 ```
-

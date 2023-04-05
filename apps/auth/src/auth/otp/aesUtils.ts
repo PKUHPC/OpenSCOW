@@ -11,13 +11,27 @@
  */
 
 import * as crypto from "crypto";
+import { FastifyInstance } from "fastify";
 
 let iv: Buffer = Buffer.alloc(16);
 let key: Buffer = Buffer.alloc(32);
+const separator = "#";
+export const REDIS_KEY = "ccd9a558-3404-4c65-8b39-27181861ecf8";
 
-export function generateIvAndKey() {
-  iv = crypto.randomBytes(16);
-  key = crypto.randomBytes(32);
+export async function generateIvAndKey(f: FastifyInstance) {
+
+  const result = await f.redis.get(REDIS_KEY);
+  if (!result) {
+    iv = crypto.randomBytes(16);
+    key = crypto.randomBytes(32);
+    const encryStr = iv.toString("base64") + separator + key.toString("base64");
+    await f.redis.set(REDIS_KEY, encryStr);
+  } else {
+    const encryIv = result.split(separator)[0];
+    const encryKey = result.split(separator)[1];
+    iv = Buffer.from(encryIv, "base64");
+    key = Buffer.from(encryKey, "base64");
+  }
 }
 export function getIvAndKey() {
   return {

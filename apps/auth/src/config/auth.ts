@@ -21,13 +21,13 @@ export enum NewUserGroupStrategy {
   "oneGroupForAllUsers" = "oneGroupForAllUsers"
 }
 
-export enum OTPStatusOptions {
+export enum otpStatusOptions {
   "disabled" = "disabled",
   "local" = "local",
   "remote" = "remote",
 }
 
-export enum OTPAlgorithm {
+export enum otpAlgorithm {
   "sha1" = "sha1",
   "sha256" = "sha256",
   "sha512" = "sha512",
@@ -149,12 +149,12 @@ export const AuthConfigSchema = Type.Object({
     enabled: Type.Boolean({ description: "验证码功能是否启用", default: false }),
   }, { default: {} }),
   otp: Type.Object({
-    status: Type.Enum(OTPStatusOptions, { description: "otp功能状态", default: "disabled" }),
+    status: Type.Enum(otpStatusOptions, { description: "otp功能状态", default: "disabled" }),
     authUrl: Type.String({ description: "认证系统地址", default: "" }),
     secretAttributeName: Type.String({ description: "存储otp密钥的属性名", default: "" }),
     digits: Type.Number({ description: "otp验证码位数", default: 6 }),
     period: Type.Number({ description: "otp验证码有效期", default: 30 }),
-    algorithm: Type.Enum(OTPAlgorithm, { description: "加密算法", default: "sha1" }),
+    algorithm: Type.Enum(otpAlgorithm, { description: "加密算法", default: "sha1" }),
     qrcodeDescription: Type.String({ description: "secret二维码上方文字描述信息", default: "此二维码仅出现一次，用过即毁" }),
     authenticationMethod: Type.Object({
       mail: Type.Object({
