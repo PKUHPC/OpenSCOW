@@ -60,6 +60,7 @@ export async function sendEmailAuthLink(
 
   const decryptedOtpSessionToken = await aesDecryptData(f, otpSessionToken);
   if (!decryptedOtpSessionToken) {
+    // redis中没有iv和key，返回信息过期UI
     await bindOtpHtml(false, req, res,
       { sendEmailUI: true, redisUserInfoExpiration: true, backToLoginUrl: backToLoginUrl });
     return;

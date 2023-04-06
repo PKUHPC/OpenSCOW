@@ -23,48 +23,51 @@ function deBase64(data: string) {
   const encryKey = data.split(separator)[1];
   iv = Buffer.from(encryIv, "base64");
   key = Buffer.from(encryKey, "base64");
-}
-
-export async function generateIvAndKey(f: FastifyInstance) {
-
-  const result = await f.redis.get(REDIS_KEY);
-  if (!result) {
-    iv = crypto.randomBytes(16);
-    key = crypto.randomBytes(32);
-    const encryStr = iv.toString("base64") + separator + key.toString("base64");
-    await f.redis.set(REDIS_KEY, encryStr);
-  } else {
-    deBase64(result);
-  }
-}
-export function getIvAndKey() {
   return {
     iv,
     key,
   };
 }
-export async function aesEncryptData(f: FastifyInstance, text: string) {
-  let ivAndKey = getIvAndKey();
-  if (!ivAndKey) {
-    await generateIvAndKey(f);
-    ivAndKey = getIvAndKey();
+
+export async function generateIvAndKey(f: FastifyInstance) {
+  iv = crypto.randomBytes(16);
+  key = crypto.randomBytes(32);
+  const encryStr = iv.toString("base64") + separator + key.toString("base64");
+  await f.redis.set(REDIS_KEY, encryStr);
+  return {
+    iv,
+    key,
+  };
+}
+export async function GetIvAndKeyWhenEncrypt(f: FastifyInstance) {
+  const result = await f.redis.get(REDIS_KEY);
+  if (!result) {
+    return await generateIvAndKey(f);
+  } else {
+    return deBase64(result);
   }
+}
+export async function GetIvAndKeyWhenDecrypt(f: FastifyInstance) {
+  const result = await f.redis.get(REDIS_KEY);
+  if (!result) {
+    return;
+  } else {
+    return deBase64(result);
+  }
+}
+export async function aesEncryptData(f: FastifyInstance, text: string) {
+  const ivAndKey = await GetIvAndKeyWhenEncrypt(f);
   const cipher = crypto.createCipheriv("aes-256-cbc", ivAndKey.key, ivAndKey.iv);
   let encrypted = cipher.update(text);
   encrypted = Buffer.concat([encrypted, cipher.final()]);
   return encrypted.toString("hex");
 }
 
+// 解密时，如果redis服务器重启, 返回undefined,通知上层函数
 export async function aesDecryptData(f: FastifyInstance, text: string) {
-  let ivAndKey = getIvAndKey();
+  const ivAndKey = await GetIvAndKeyWhenDecrypt(f);
   if (!ivAndKey) {
-    const result = await f.redis.get(REDIS_KEY);
-    if (!result) {
-      return;
-    } else {
-      deBase64(result);
-      ivAndKey = getIvAndKey();
-    }
+    return undefined;
   }
   const encryptedTexyt = Buffer.from(text, "hex");
   const decipher = crypto.createDecipheriv("aes-256-cbc", ivAndKey.key, ivAndKey.iv);

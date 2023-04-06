@@ -51,9 +51,6 @@ export function bindRedirectLoinUIAndBindUIRoute(f: FastifyInstance) {
       const { action, backToLoginUrl } = req.query;
 
       if (authConfig.otp.status === "local" && action === "bindOtp") {
-        // 产生iv和key
-        await generateIvAndKey(f);
-
         const backToLoginUrl = req.headers.referer;
         await bindOtpHtml(false, req, res, { backToLoginUrl: backToLoginUrl });
         return;
