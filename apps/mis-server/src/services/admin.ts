@@ -148,13 +148,12 @@ export const adminServiceServer = plugin((server) => {
         }
       });
 
+      const order = {
+        [ClusterAccountInfo_ImportStatus.NOT_EXISTING]: 0,
+        [ClusterAccountInfo_ImportStatus.HAS_NEW_USERS]: 1,
+        [ClusterAccountInfo_ImportStatus.EXISTING]: 2,
+      };
       result.accounts.sort((a, b) => {
-        const order = {
-          [ClusterAccountInfo_ImportStatus.NOT_EXISTING]: 0,
-          [ClusterAccountInfo_ImportStatus.HAS_NEW_USERS]: 1,
-          [ClusterAccountInfo_ImportStatus.EXISTING]: 2,
-        };
-
         return order[a.importStatus] - order[b.importStatus];
       });
       return [result];
