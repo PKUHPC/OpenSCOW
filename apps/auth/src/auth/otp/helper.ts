@@ -68,8 +68,7 @@ export async function sendEmailAuthLink(
   if (!redisUserJSON) {
     // 信息过期
     await bindOtpHtml(false, req, res,
-      { sendEmailUI: true, redisUserInfoExpiration: true,
-        otpSessionToken: otpSessionToken, backToLoginUrl: backToLoginUrl });
+      { sendEmailUI: true, redisUserInfoExpiration: true, backToLoginUrl: backToLoginUrl });
     return;
   }
 
