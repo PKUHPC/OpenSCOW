@@ -37,11 +37,11 @@ export async function storeOtpSessionAndGoSendEmailUI(
   },
 ) {
   const otpSessionToken = crypto.randomUUID();
-  const encryptOtpSessionToken = aesEncryptData(otpSessionToken);
   await f.redis.set(otpSessionToken, JSON.stringify(userInfo), "EX", 600);
   const mailAttributeName = ldapConfig.attrs.mail || "mail";
   const emailAddressInfo =
     await searchOneAttributeValueFromLdap(userInfo.dn, logger, mailAttributeName, client);
+  const encryptOtpSessionToken = await aesEncryptData(f, otpSessionToken);
   await bindOtpHtml(false, req, res,
     { sendEmailUI: true, otpSessionToken: encryptOtpSessionToken,
       emailAddress: emailAddressInfo?.value, backToLoginUrl });
@@ -57,7 +57,14 @@ export async function sendEmailAuthLink(
   emailAddress: string,
   backToLoginUrl: string,
 ) {
-  const redisUserJSON = await f.redis.get(aesDecryptData(otpSessionToken));
+
+  const decryptedOtpSessionToken = await aesDecryptData(f, otpSessionToken);
+  if (!decryptedOtpSessionToken) {
+    await bindOtpHtml(false, req, res,
+      { sendEmailUI: true, redisUserInfoExpiration: true, backToLoginUrl: backToLoginUrl });
+    return;
+  }
+  const redisUserJSON = await f.redis.get(decryptedOtpSessionToken);
   if (!redisUserJSON) {
     // 信息过期
     await bindOtpHtml(false, req, res,
@@ -80,8 +87,9 @@ export async function sendEmailAuthLink(
     }
   }
   redisUserInfoObject["sendEmaililTimestamp"] = Math.floor(currentTimestamp / 1000);
-  const ttl = await f.redis.ttl(aesDecryptData(otpSessionToken));
-  await f.redis.set(aesDecryptData(otpSessionToken), JSON.stringify(redisUserInfoObject), "EX", ttl);
+
+  const ttl = await f.redis.ttl(decryptedOtpSessionToken);
+  await f.redis.set(decryptedOtpSessionToken, JSON.stringify(redisUserInfoObject), "EX", ttl);
   const transporter = nodemailer.createTransport({
     host: authConfig.otp.authenticationMethod.mail.mailTransportInfo.host,
     port: authConfig.otp.authenticationMethod.mail.mailTransportInfo.port,

@@ -18,6 +18,13 @@ let key: Buffer = Buffer.alloc(32);
 const separator = "#";
 export const REDIS_KEY = "ccd9a558-3404-4c65-8b39-27181861ecf8";
 
+function deBase64(data: string) {
+  const encryIv = data.split(separator)[0];
+  const encryKey = data.split(separator)[1];
+  iv = Buffer.from(encryIv, "base64");
+  key = Buffer.from(encryKey, "base64");
+}
+
 export async function generateIvAndKey(f: FastifyInstance) {
 
   const result = await f.redis.get(REDIS_KEY);
@@ -27,10 +34,7 @@ export async function generateIvAndKey(f: FastifyInstance) {
     const encryStr = iv.toString("base64") + separator + key.toString("base64");
     await f.redis.set(REDIS_KEY, encryStr);
   } else {
-    const encryIv = result.split(separator)[0];
-    const encryKey = result.split(separator)[1];
-    iv = Buffer.from(encryIv, "base64");
-    key = Buffer.from(encryKey, "base64");
+    deBase64(result);
   }
 }
 export function getIvAndKey() {
@@ -39,17 +43,30 @@ export function getIvAndKey() {
     key,
   };
 }
-export function aesEncryptData(text: string) {
-  const ivAndKey = getIvAndKey();
+export async function aesEncryptData(f: FastifyInstance, text: string) {
+  let ivAndKey = getIvAndKey();
+  if (!ivAndKey) {
+    await generateIvAndKey(f);
+    ivAndKey = getIvAndKey();
+  }
   const cipher = crypto.createCipheriv("aes-256-cbc", ivAndKey.key, ivAndKey.iv);
   let encrypted = cipher.update(text);
   encrypted = Buffer.concat([encrypted, cipher.final()]);
   return encrypted.toString("hex");
 }
 
-export function aesDecryptData(text: string) {
+export async function aesDecryptData(f: FastifyInstance, text: string) {
+  let ivAndKey = getIvAndKey();
+  if (!ivAndKey) {
+    const result = await f.redis.get(REDIS_KEY);
+    if (!result) {
+      return;
+    } else {
+      deBase64(result);
+      ivAndKey = getIvAndKey();
+    }
+  }
   const encryptedTexyt = Buffer.from(text, "hex");
-  const ivAndKey = getIvAndKey();
   const decipher = crypto.createDecipheriv("aes-256-cbc", ivAndKey.key, ivAndKey.iv);
   let decrypted = decipher.update(encryptedTexyt);
   decrypted = Buffer.concat([decrypted, decipher.final()]);

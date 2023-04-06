@@ -164,8 +164,13 @@ export function bindClickAuthLinkInEmailRoute(
       async (req, res) => {
         const { token, backToLoginUrl } = req.query;
         const logger = req.log;
-
-        const redisUserJSON = await f.redis.get(aesDecryptData(token));
+        const decryptedOtpSessionToken = await aesDecryptData(f, token);
+        if (!decryptedOtpSessionToken) {
+          await bindOtpHtml(false, req, res,
+            { sendEmailUI: true, redisUserInfoExpiration: true, backToLoginUrl: backToLoginUrl });
+          return;
+        }
+        const redisUserJSON = await f.redis.get(decryptedOtpSessionToken);
         if (!redisUserJSON) {
           // 信息过期
           await bindOtpHtml(false, req, res,
@@ -197,7 +202,7 @@ export function bindClickAuthLinkInEmailRoute(
           encoding: "base32",
         });
         const urlImg = await QRCode.toDataURL(url);
-        await f.redis.del(aesDecryptData(token));
+        await f.redis.del(decryptedOtpSessionToken);
         const html = `<div style="display: flex; justify-content: center;\
           align-items: center; height: 100vh; flex-direction: column">\
           <p>${authConfig.otp.qrcodeDescription}</p><img src="${urlImg}">\
