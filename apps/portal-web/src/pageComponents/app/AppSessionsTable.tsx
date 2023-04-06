@@ -127,7 +127,7 @@ export const AppSessionsTable: React.FC<Props> = () => {
             ) : undefined
           }
           {
-            (record.state === "PENDING") ? (
+            (record.state === "PENDING" || record.state === "SUSPENDED") ? (
               <Popconfirm
                 title="确定取消这个任务吗？"
                 onConfirm={async () =>
