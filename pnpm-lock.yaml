@@ -495,7 +495,7 @@ importers:
         specifier: 16.0.3
         version: 16.0.3
       is-port-reachable:
-        specifier: ^4.0.0
+        specifier: 4.0.0
         version: 4.0.0
       node-cron:
         specifier: 3.0.2
