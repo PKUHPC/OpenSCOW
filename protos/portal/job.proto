@@ -121,9 +121,11 @@ message SubmitJobRequest {
   uint32 max_time = 10; // in minutes
   string account = 11;
   string working_directory = 12;
-  optional string memory = 13;
-  optional string comment = 14;
-  bool save_as_template = 15;
+  string output = 13;
+  string error_output = 14;
+  optional string memory = 15;
+  optional string comment = 16;
+  bool save_as_template = 17;
 }
 
 // NOT_FOUND: cluster is not found

@@ -39,6 +39,8 @@ interface JobForm {
   account: string;
   comment: string;
   workingDirectory: string;
+  output: string;
+  errorOutput: string;
   save: boolean;
 }
 
@@ -68,7 +70,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
 
 
   const submit = async () => {
-    const { cluster, command, jobName, coreCount, gpuCount, workingDirectory, save,
+    const { cluster, command, jobName, coreCount, gpuCount, workingDirectory, output, errorOutput, save,
       maxTime, nodeCount, partition, qos, account, comment } = await form.validateFields();
 
     setLoading(true);
@@ -78,7 +80,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
       coreCount: gpuCount ? gpuCount * Math.floor(currentPartitionInfo!.cores / currentPartitionInfo!.gpus) : coreCount,
       gpuCount,
       maxTime, nodeCount, partition, qos, comment,
-      workingDirectory, save, memory,
+      workingDirectory, save, memory, output, errorOutput,
     } })
       .httpError(500, (e) => {
         if (e.code === "SCHEDULER_FAILED") {
@@ -116,9 +118,13 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
     onResolve: (data) => {
       if (data) {
         const partition = data.clusterInfo.slurm.partitions[0];
-        form.setFieldValue("partition", partition.name);
-        form.setFieldValue("qos", partition.qos?.[0]);
-        form.setFieldValue("workingDirectory", calculateWorkingDirectory(data.clusterInfo.submitJobDirTemplate));
+        form.setFieldsValue({
+          partition: partition.name,
+          qos: partition.qos?.[0],
+          workingDirectory: calculateWorkingDirectory(data.clusterInfo.submitJobDirTemplate),
+          output: calculateWorkingDirectory(data.clusterInfo.submitJobDirTemplate) + "/job.%j.out",
+          errorOutput: calculateWorkingDirectory(data.clusterInfo.submitJobDirTemplate) + "/job.%j.err",
+        });
       }
     },
   });
@@ -128,8 +134,11 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
     form.setFieldValue("jobName", jobName);
 
     if (!form.isFieldTouched("workingDirectory") && clusterInfoQuery.data) {
-      form.setFieldValue("workingDirectory",
-        calculateWorkingDirectory(clusterInfoQuery.data.clusterInfo.submitJobDirTemplate));
+      form.setFieldsValue({
+        workingDirectory: calculateWorkingDirectory(clusterInfoQuery.data.clusterInfo.submitJobDirTemplate),
+        output: calculateWorkingDirectory(clusterInfoQuery.data.clusterInfo.submitJobDirTemplate) + "/job.%j.out",
+        errorOutput: calculateWorkingDirectory(clusterInfoQuery.data.clusterInfo.submitJobDirTemplate) + "/job.%j.err",
+      });
     }
   };
 
@@ -283,8 +292,18 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
             <InputNumber min={1} step={1} addonAfter={"分钟"} />
           </Form.Item>
         </Col>
-        <Col span={24} sm={24}>
+        <Col span={12} sm={8}>
           <Form.Item<JobForm> label="工作目录" name="workingDirectory" rules={[{ required: true }]}>
+            <Input addonBefore="~/" />
+          </Form.Item>
+        </Col>
+        <Col span={12} sm={8}>
+          <Form.Item<JobForm> label="输出文件" name="output" rules={[{ required: true }]}>
+            <Input addonBefore="~/" />
+          </Form.Item>
+        </Col>
+        <Col span={12} sm={8}>
+          <Form.Item<JobForm> label="错误文件" name="errorOutput" rules={[{ required: true }]}>
             <Input addonBefore="~/" />
           </Form.Item>
         </Col>
