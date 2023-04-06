@@ -1,8 +1,12 @@
 ---
-"@scow/portal-server": major
-"@scow/portal-web": major
-"@scow/lib-ssh": major
-"@scow/grpc-api": major
+"@scow/portal-server": minor
+"@scow/portal-web": minor
+"@scow/demo-vagrant": minor
+"@scow/deploy-compose": minor
+"@scow/cli": minor
+"@scow/lib-ssh": minor
+"@scow/grpc-api": minor
+"@scow/docs": minor
 ---
 
 提交作业时增加 GPU 选项
