@@ -54,6 +54,8 @@ const initialValues = {
   coreCount: 1,
   gpuCount: 1,
   maxTime: 30,
+  output: "job.%j.out",
+  errorOutput: "job.%j.err",
   save: false,
 } as Partial<JobForm>;
 
@@ -118,13 +120,9 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
     onResolve: (data) => {
       if (data) {
         const partition = data.clusterInfo.slurm.partitions[0];
-        form.setFieldsValue({
-          partition: partition.name,
-          qos: partition.qos?.[0],
-          workingDirectory: calculateWorkingDirectory(data.clusterInfo.submitJobDirTemplate),
-          output: calculateWorkingDirectory(data.clusterInfo.submitJobDirTemplate) + "/job.%j.out",
-          errorOutput: calculateWorkingDirectory(data.clusterInfo.submitJobDirTemplate) + "/job.%j.err",
-        });
+        form.setFieldValue("partition", partition.name);
+        form.setFieldValue("qos", partition.qos?.[0]);
+        form.setFieldValue("workingDirectory", calculateWorkingDirectory(data.clusterInfo.submitJobDirTemplate));
       }
     },
   });
@@ -134,11 +132,8 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
     form.setFieldValue("jobName", jobName);
 
     if (!form.isFieldTouched("workingDirectory") && clusterInfoQuery.data) {
-      form.setFieldsValue({
-        workingDirectory: calculateWorkingDirectory(clusterInfoQuery.data.clusterInfo.submitJobDirTemplate),
-        output: calculateWorkingDirectory(clusterInfoQuery.data.clusterInfo.submitJobDirTemplate) + "/job.%j.out",
-        errorOutput: calculateWorkingDirectory(clusterInfoQuery.data.clusterInfo.submitJobDirTemplate) + "/job.%j.err",
-      });
+      form.setFieldValue("workingDirectory",
+        calculateWorkingDirectory(clusterInfoQuery.data.clusterInfo.submitJobDirTemplate));
     }
   };
 
@@ -292,19 +287,19 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
             <InputNumber min={1} step={1} addonAfter={"分钟"} />
           </Form.Item>
         </Col>
-        <Col span={12} sm={8}>
+        <Col span={24} sm={10}>
           <Form.Item<JobForm> label="工作目录" name="workingDirectory" rules={[{ required: true }]}>
             <Input addonBefore="~/" />
           </Form.Item>
         </Col>
-        <Col span={12} sm={8}>
+        <Col span={24} sm={7}>
           <Form.Item<JobForm> label="输出文件" name="output" rules={[{ required: true }]}>
-            <Input addonBefore="~/" />
+            <Input />
           </Form.Item>
         </Col>
-        <Col span={12} sm={8}>
+        <Col span={24} sm={7}>
           <Form.Item<JobForm> label="错误文件" name="errorOutput" rules={[{ required: true }]}>
-            <Input addonBefore="~/" />
+            <Input />
           </Form.Item>
         </Col>
         <Col className="ant-form-item" span={12} sm={6}>

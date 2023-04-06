@@ -67,7 +67,7 @@ export function generateJobScript(jobInfo: JobTemplate & {
     append("--output=" + output);
   }
   if (errorOutput) {
-    append("--error=" + output);
+    append("--error=" + errorOutput);
   }
 
   if (otherOptions) {
