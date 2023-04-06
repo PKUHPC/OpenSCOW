@@ -17,6 +17,7 @@ import { getUserHomedir,
 import { RunningJob } from "@scow/protos/build/common/job";
 import { randomUUID } from "crypto";
 import fs from "fs";
+import isPortReachable from "is-port-reachable";
 import { join } from "path";
 import { quote } from "shell-quote";
 import { AppOps, AppSession } from "src/clusterops/api/app";
@@ -240,20 +241,30 @@ export const slurmAppOps = (cluster: string): AppOps => {
             // for server apps,
             // try to read the SESSION_INFO file to get port and password
               const infoFilePath = join(jobDir, SERVER_SESSION_INFO);
-              ready = await sftpExists(sftp, infoFilePath);
+              if (await sftpExists(sftp, infoFilePath)) {
+                const content = await sftpReadFile(sftp)(infoFilePath);
+                const serverSessionInfo = JSON.parse(content.toString()) as ServerSessionInfoData;
+                const { HOST, PORT } = serverSessionInfo;
 
+                ready = await isPortReachable(PORT, { host: HOST });
+              }
             } else {
             // for vnc apps,
             // try to find the output file and try to parse the display number
-              const outputFilePath = join(jobDir, VNC_OUTPUT_FILE);
+              const vncSessionInfoPath = join(jobDir, VNC_SESSION_INFO);
+              if (await sftpExists(sftp, vncSessionInfoPath)) {
+                const host = (await sftpReadFile(sftp)(vncSessionInfoPath)).toString().trim();
 
-              if (await sftpExists(sftp, outputFilePath)) {
-                const content = (await sftpReadFile(sftp)(outputFilePath)).toString();
-                try {
-                  parseDisplayId(content);
-                  ready = true;
-                } catch {
-                // ignored if displayId cannot be parsed
+                const outputFilePath = join(jobDir, VNC_OUTPUT_FILE);
+                if (await sftpExists(sftp, outputFilePath)) {
+                  const content = (await sftpReadFile(sftp)(outputFilePath)).toString();
+                  try {
+                    const displayId = parseDisplayId(content);
+
+                    ready = await isPortReachable(displayIdToPort(displayId!), { host: host });
+                  } catch {
+                  // ignored if displayId cannot be parsed
+                  }
                 }
               }
             }
