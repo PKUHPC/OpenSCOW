@@ -88,6 +88,7 @@ shell: true
 一些功能可能需要进一步的配置，请根据对应的文档完成。
 
 - [登录节点桌面](./desktop.md)
+- [跨集群传输](./transfer-cross-clusters.md)
 
 ## 启动服务
 
