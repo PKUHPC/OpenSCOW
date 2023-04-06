@@ -6,6 +6,10 @@ redisUrl: 192.168.88.100:6379
 allowedCallbackHostnames:
   - localhost
 
+captcha:
+  #启用captcha验证码需将enabled设置为true,默认false
+  enabled: false
+
 # 在此部分输入LDAP的配置
 ldap:
   # LDAP服务器地址。必填
