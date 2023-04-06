@@ -39,7 +39,7 @@
     "shell-quote": "1.8.0",
     "dayjs": "1.11.7",
     "pino-pretty": "10.0.0",
-    "is-port-reachable": "4.0.0"
+    "is-port-reachable": "^4.0.0"
   },
   "devDependencies": {
     "@ddadaal/tsgrpc-client": "0.17.3",
