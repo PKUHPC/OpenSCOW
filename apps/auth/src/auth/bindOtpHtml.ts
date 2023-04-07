@@ -51,11 +51,6 @@ export async function bindOtpHtml(
   const hostname = parseHostname(req);
   const enableTotp = (!authConfig.otp?.status) !== true && authConfig.otp?.status !== OtpStatusOptions.disabled;
 
-  console.log("jjjjjjjj", otp?.timeLimitMinutes);
-  console.log("jjjjjjjj", otp?.timeLimitMinutes);
-  console.log("jjjjjjjj", otp?.timeLimitMinutes);
-  console.log("jjjjjjjj", otp?.timeLimitMinutes);
-  console.log("jjjjjjjj", authConfig.otp?.ldap?.timeLimitMinutes);
   return rep.status(err ? 401 : 200).view("bindOtp.liquid", {
     cssUrl: join(config.BASE_PATH, config.AUTH_BASE_PATH, "/public/assets/tailwind.min.css"),
     faviconUrl: join(config.BASE_PATH, FAVICON_URL),
