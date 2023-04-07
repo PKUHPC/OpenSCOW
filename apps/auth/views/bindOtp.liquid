@@ -26,7 +26,7 @@
               <input type="hidden" name="backToLoginUrl" value="{{ backToLoginUrl }}">
             </form>
           </div>
-        {% if sendEmailUI != true %}
+        {% unless timeLimitMinutes %}
         <form class="w-full" method="post" action="/otp/bind">
           <div class="px-8">
             <div class="w-full mb-4">
@@ -57,7 +57,7 @@
         </form>
 
         {%  else %}
-        {% if redisUserInfoExpiration %}
+        {% if tokenNotFound %}
         <div class="w-full mt-8 mb-8 justify-center items-center">
           <p class="text-center text-xl text-red-700"> 用户信息过期，请重新绑定! </p>
         </div>
@@ -65,7 +65,7 @@
 
         <form class="w-full flex flex-wrap" method="post" action="/otp/sendEmail">
           <div class="w-full mb-8 ml-8 justify-between">
-            <p class="mt-1">请于10分钟内完成绑定</p>
+            <p class="mt-1">请于{{ timeLimitMinutes }}分钟内完成绑定</p>
           </div>
           <div class="w-full overflow-x-scroll">
             <div class="flex w-full mb-4 items-center justify-between">
@@ -98,7 +98,7 @@
           <input type="hidden" name="emailAddress" value="{{ emailAddress }}" />
           <input type="hidden" name="backToLoginUrl" value="{{ backToLoginUrl }}">
         </form>
-        {% endif %}
+        {% endunless %}
         </div>
       </div>
       <p class="absolute bottom-0 w-full text-center my-4 text-gray-500 text-sm ">

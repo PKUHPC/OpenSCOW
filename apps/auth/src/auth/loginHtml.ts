@@ -14,7 +14,7 @@ import { DEFAULT_PRIMARY_COLOR } from "@scow/config/build/ui";
 import { FastifyReply, FastifyRequest } from "fastify";
 import { join } from "path";
 import { createCaptcha } from "src/auth/captcha";
-import { authConfig, otpStatusOptions } from "src/config/auth";
+import { authConfig, OtpStatusOptions } from "src/config/auth";
 import { config, FAVICON_URL, LOGO_URL } from "src/config/env";
 import { uiConfig } from "src/config/ui";
 
@@ -41,7 +41,7 @@ export async function serveLoginHtml(
 
   const hostname = parseHostname(req);
   const enableCaptcha = authConfig.captcha.enabled;
-  const enableTotp = authConfig.otp.status !== otpStatusOptions.disabled;
+  const enableTotp = authConfig.otp?.status !== OtpStatusOptions.disabled && authConfig.otp?.status !== undefined;
 
   const captchaInfo = enableCaptcha
     ? await createCaptcha(req.server)

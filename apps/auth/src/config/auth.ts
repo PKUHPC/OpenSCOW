@@ -21,13 +21,13 @@ export enum NewUserGroupStrategy {
   "oneGroupForAllUsers" = "oneGroupForAllUsers"
 }
 
-export enum otpStatusOptions {
+export enum OtpStatusOptions {
   "disabled" = "disabled",
-  "local" = "local",
+  "ldap" = "ldap",
   "remote" = "remote",
 }
 
-export enum otpAlgorithm {
+export enum OtpAlgorithm {
   "sha1" = "sha1",
   "sha256" = "sha256",
   "sha512" = "sha512",
@@ -148,37 +148,40 @@ export const AuthConfigSchema = Type.Object({
   captcha: Type.Object({
     enabled: Type.Boolean({ description: "验证码功能是否启用", default: false }),
   }, { default: {} }),
-  otp: Type.Object({
-    status: Type.Enum(otpStatusOptions, { description: "otp功能状态", default: "disabled" }),
-    authUrl: Type.String({ description: "认证系统地址", default: "" }),
-    secretAttributeName: Type.String({ description: "存储otp密钥的属性名", default: "" }),
-    digits: Type.Number({ description: "otp验证码位数", default: 6 }),
-    period: Type.Number({ description: "otp验证码有效期", default: 30 }),
-    algorithm: Type.Enum(otpAlgorithm, { description: "加密算法", default: "sha1" }),
-    qrcodeDescription: Type.String({ description: "secret二维码上方文字描述信息", default: "此二维码仅出现一次，用过即毁" }),
-    authenticationMethod: Type.Object({
-      mail: Type.Object({
-        enabled: Type.Boolean({ description: "是否启用otp功能", default: false }),
-        from: Type.String({ description: "发件邮箱地址", default: "" }),
-        subject: Type.String({ description: "邮件主题", default: "otp绑定链接" }),
-        title: Type.String({ description: "邮件内容标题", default: "Bind OTP" }),
-        contentText: Type.String({ description: "邮件内容",
-          default: "Please click on the following link to bind your OTP:" }),
-        labelText: Type.String({ description: "标签点击文字", default: "Bind OTP" }),
-        mailTransportInfo: Type.Object({
-          host: Type.String({ description: "SMTP服务器", default: "" }),
-          secure: Type.Boolean({ description: "是否启用SSL加密", default: false }),
-          port: Type.Number({ description: "服务器端口", default: 25 }),
-          user: Type.String({ description: "SMTP身份验证用户名", default: "" }),
-          password: Type.String({ description: "SMTP身份验证密码", default: "" }),
-        }, { default: {} }),
-      }, { description: "邮件配置", default: {} }),
-    }, { description: "发送绑定链接相关配置", default: {} }),
-    remote: Type.Object({
-      url: Type.String({ description: "otp验证url，应返回boolean", default: "" }),
+  otp: Type.Optional(Type.Object({
+    status: Type.Enum(OtpStatusOptions, { description: "otp功能状态", default: "disabled" }),
+    ldap: Type.Optional(Type.Object({
+      timeLimitMinutes: Type.Integer({ description: "限制绑定otp要在多少分钟内完成", default: 10 }),
+      authUrl: Type.String({ description: "认证系统地址" }),
+      secretAttributeName: Type.String({ description: "存储otp密钥的属性名" }),
+      digits: Type.Integer({ description: "otp验证码位数", default: 6 }),
+      period: Type.Integer({ description: "otp验证码有效期", default: 30 }),
+      algorithm: Type.Enum(OtpAlgorithm, { description: "加密算法", default: "sha1" }),
+      qrcodeDescription: Type.String({ description: "secret二维码上方文字描述信息", default: "此二维码仅出现一次，用过即毁" }),
+      authenticationMethod: Type.Object({
+        mail: Type.Object({
+          sendEmailFrequencyLimitInSeconds: Type.Integer({ description: "发送邮件频率限制", default: 60 }),
+          from: Type.String({ description: "发件邮箱地址" }),
+          subject: Type.String({ description: "邮件主题", default: "otp绑定链接" }),
+          title: Type.String({ description: "邮件内容标题", default: "Bind OTP" }),
+          contentText: Type.String({ description: "邮件内容",
+            default: "Please click on the following link to bind your OTP:" }),
+          labelText: Type.String({ description: "标签点击文字", default: "Bind OTP" }),
+          mailTransportInfo: Type.Object({
+            host: Type.String({ description: "SMTP服务器" }),
+            secure: Type.Boolean({ description: "是否启用SSL/TSL加密", default: false }),
+            port: Type.Integer({ description: "服务器端口" }),
+            user: Type.String({ description: "SMTP身份验证用户名" }),
+            password: Type.String({ description: "SMTP身份验证授权码" }),
+          }),
+        }, { description: "发送邮件的配置信息" }),
+      }, { description: "发送绑定链接相关配置" }),
+    }, { description: "将otp密钥存在ldap需要配置信息" })),
+    remote: Type.Optional(Type.Object({
+      url: Type.String({ description: "tig远程otp验证的url" }),
       redirectUrl: Type.String({ description: "当用户点击绑定OTP时，302重定向的链接", default: "" }),
-    }, { default: {} }),
-  }, { default: {} }),
+    }, { description: "将密钥存在远程地址时的配置信息" })),
+  }, { description: "otp功能配置" })),
 });
 
 export type AuthConfigSchema = Static<typeof AuthConfigSchema>;
@@ -217,6 +220,13 @@ export const getAuthConfig = () => {
 
   if (config.authType === AuthType.ssh && !config.ssh) {
     throw new Error("authType is set to ssh, but ssh config is not set");
+  }
+
+  if (config.otp?.status === OtpStatusOptions.ldap && !config.otp?.ldap) {
+    throw new Error("otp status is set to ldap, but otp.ldap config is not set");
+  }
+  if (config.otp?.status === OtpStatusOptions.remote && !config.otp?.remote) {
+    throw new Error("otp status is set to remote, but otp.remote config is not set");
   }
 
   return config;

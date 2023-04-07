@@ -13,7 +13,7 @@
 import { DEFAULT_PRIMARY_COLOR } from "@scow/config/build/ui";
 import { FastifyReply, FastifyRequest } from "fastify";
 import { join } from "path";
-import { authConfig, otpStatusOptions } from "src/config/auth";
+import { authConfig, OtpStatusOptions } from "src/config/auth";
 import { config, FAVICON_URL } from "src/config/env";
 import { uiConfig } from "src/config/ui";
 
@@ -38,18 +38,24 @@ export async function bindOtpHtml(
   otp?: {
     sendEmailUI?: boolean,
     sendSucceeded?: boolean,
-    redisUserInfoExpiration?: boolean,
+    tokenNotFound?: boolean,
     emailAddress?: string,
     qrcode?: string,
     otpSessionToken?: string,
     backToLoginUrl?: string,
     timeDiffNotEnough?: number,
+    timeLimitMinutes?: number,
   },
 ) {
 
   const hostname = parseHostname(req);
-  const enableTotp = authConfig.otp.status !== otpStatusOptions.disabled;
+  const enableTotp = (!authConfig.otp?.status) !== true && authConfig.otp?.status !== OtpStatusOptions.disabled;
 
+  console.log("jjjjjjjj", otp?.timeLimitMinutes);
+  console.log("jjjjjjjj", otp?.timeLimitMinutes);
+  console.log("jjjjjjjj", otp?.timeLimitMinutes);
+  console.log("jjjjjjjj", otp?.timeLimitMinutes);
+  console.log("jjjjjjjj", authConfig.otp?.ldap?.timeLimitMinutes);
   return rep.status(err ? 401 : 200).view("bindOtp.liquid", {
     cssUrl: join(config.BASE_PATH, config.AUTH_BASE_PATH, "/public/assets/tailwind.min.css"),
     faviconUrl: join(config.BASE_PATH, FAVICON_URL),

@@ -10,8 +10,6 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { parsePlaceholder } from "@scow/lib-config";
-import { sshConnect } from "@scow/lib-ssh";
 import { Static, Type } from "@sinclair/typebox";
 import { FastifyInstance } from "fastify";
 import ldapjs from "ldapjs";
@@ -20,11 +18,10 @@ import * as speakeasy from "speakeasy";
 import { bindOtpHtml } from "src/auth/bindOtpHtml";
 import { findUser, useLdap } from "src/auth/ldap/helpers";
 import { authConfig, LdapConfigSchema } from "src/config/auth";
-import { rootKeyPair } from "src/config/env";
 import { promisify } from "util";
 
-import { aesDecryptData, generateIvAndKey } from "./aesUtils";
-import { getAbsoluteUTCTimestamp, sendEmailAuthLink, storeOtpSessionAndGoSendEmailUI } from "./helper";
+import { aesDecryptData } from "./aesUtils";
+import { renderLiquidFile, sendEmailAuthLink, storeOtpSessionAndGoSendEmailUI } from "./helper";
 
 
 /**
@@ -33,7 +30,7 @@ import { getAbsoluteUTCTimestamp, sendEmailAuthLink, storeOtpSessionAndGoSendEma
    * */
 export function bindRedirectLoinUIAndBindUIRoute(f: FastifyInstance) {
   const QuerystringSchema = Type.Object({
-    action: Type.String(),
+    action: Type.Enum({ bindOtp: "bindOtp", backToLoginUI: "backToLoginUI" }),
     backToLoginUrl: Type.String(),
   });
 
@@ -49,20 +46,20 @@ export function bindRedirectLoinUIAndBindUIRoute(f: FastifyInstance) {
     async (req, res) => {
 
       const { action, backToLoginUrl } = req.query;
-
-      if (authConfig.otp.status === "local" && action === "bindOtp") {
+      const otp = authConfig.otp!;
+      if (otp.status === "ldap" && action === "bindOtp") {
         const backToLoginUrl = req.headers.referer;
         await bindOtpHtml(false, req, res, { backToLoginUrl: backToLoginUrl });
         return;
       }
-      if (authConfig.otp.status === "remote" && action === "bindOtp") {
+      if (otp.status === "remote" && action === "bindOtp") {
 
-        if (!authConfig.otp.remote.redirectUrl) {
+        if (!otp.remote!.redirectUrl) {
           res.redirect(backToLoginUrl);
           return;
         }
 
-        res.redirect(authConfig.otp.remote.redirectUrl);
+        res.redirect(otp.remote!.redirectUrl);
         return;
       }
 
@@ -161,17 +158,18 @@ export function bindClickAuthLinkInEmailRoute(
       async (req, res) => {
         const { token, backToLoginUrl } = req.query;
         const logger = req.log;
+        const otpLdap = authConfig.otp!.ldap!;
         const decryptedOtpSessionToken = await aesDecryptData(f, token);
         if (!decryptedOtpSessionToken) {
           await bindOtpHtml(false, req, res,
-            { sendEmailUI: true, redisUserInfoExpiration: true, backToLoginUrl: backToLoginUrl });
+            { timeLimitMinutes: otpLdap.timeLimitMinutes, tokenNotFound: true, backToLoginUrl: backToLoginUrl });
           return;
         }
         const redisUserJSON = await f.redis.get(decryptedOtpSessionToken);
         if (!redisUserJSON) {
           // 信息过期
           await bindOtpHtml(false, req, res,
-            { sendEmailUI: true, redisUserInfoExpiration: true, backToLoginUrl: backToLoginUrl });
+            { timeLimitMinutes: otpLdap.timeLimitMinutes, tokenNotFound: true, backToLoginUrl: backToLoginUrl });
           return;
         }
         // 将secret信息存入ldap;
@@ -183,7 +181,7 @@ export function bindClickAuthLinkInEmailRoute(
           await modify(redisUserInfoObject.dn, new ldapjs.Change({
             operation: "replace",
             modification: {
-              [authConfig.otp.secretAttributeName]: secret,
+              [otpLdap.secretAttributeName]: secret,
             },
           }),
           );
@@ -193,18 +191,19 @@ export function bindClickAuthLinkInEmailRoute(
           secret: secret,
           label: `${uid}@scow`,
           issuer: uid as string,
-          digits: authConfig.otp.digits,
-          period: authConfig.otp.period,
-          algorithm: authConfig.otp.algorithm,
+          digits: otpLdap.digits,
+          period: otpLdap.period,
+          algorithm: otpLdap.algorithm,
           encoding: "base32",
         });
         const urlImg = await QRCode.toDataURL(url);
         await f.redis.del(decryptedOtpSessionToken);
-        const html = `<div style="display: flex; justify-content: center;\
-          align-items: center; height: 100vh; flex-direction: column">\
-          <p>${authConfig.otp.qrcodeDescription}</p><img src="${urlImg}">\
-          <input type="hidden" name="backToLoginUrl" value="${backToLoginUrl}"></div> `;
-        res.header("Content-Type", "text/html; charset=utf-8").send(html);
+        const renderedFile = await renderLiquidFile("qrcode", {
+          contentText: otpLdap.qrcodeDescription,
+          urlImg,
+          backToLoginUrl,
+        });
+        res.header("Content-Type", "text/html; charset=utf-8").send(renderedFile);
       });
 }
 

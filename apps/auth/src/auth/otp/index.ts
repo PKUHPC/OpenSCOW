@@ -11,14 +11,14 @@
  */
 
 import { FastifyInstance } from "fastify";
-import { authConfig, LdapConfigSchema, otpStatusOptions } from "src/config/auth";
+import { authConfig, LdapConfigSchema, OtpStatusOptions } from "src/config/auth";
 
 import { bindClickAuthLinkInEmailRoute, bindClickRequestBindingLinkRoute,
   bindRedirectLoinUIAndBindUIRoute, bindValidateUserNameAndPasswordRoute } from "./routeHandles";
 
 export function registerOtpBindPostHandler(f: FastifyInstance, ldapConfig: LdapConfigSchema) {
 
-  if (authConfig.otp.status === otpStatusOptions.disabled) {
+  if (authConfig.otp?.status === OtpStatusOptions.disabled || !authConfig.otp?.status) {
     return;
   }
 
@@ -28,7 +28,7 @@ export function registerOtpBindPostHandler(f: FastifyInstance, ldapConfig: LdapC
    * */
   bindRedirectLoinUIAndBindUIRoute(f);
 
-  if (authConfig.otp.status === "local") {
+  if (authConfig.otp.status === "ldap") {
     // 绑定路由，路由处理验证账户密码
     bindValidateUserNameAndPasswordRoute(f, ldapConfig);
     // 绑定路由，路由处理发邮件

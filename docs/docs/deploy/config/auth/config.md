@@ -46,14 +46,14 @@ mockUsers:
 
 在`auth.yaml`配置中，可以配置关于otp验证码的功能, 但目前仅支持ldap认证方式启用otp，ssh认证方式不支持。
 
-#### 一、如果您配置otp状态为本地(即otp.status为local，密钥存到ldap中):
+#### 一、如果您配置otp将密钥存在ldap中(即otp.status为ldap):
 
    
   1. 手机端您可以使用FreeOTP, authenticator等，但是请注意有的手机端app可能不支持配置OTP码的digits和加密方式等。
   2. 您需要自己在ldap中定义一个属性名用来存储string类型的OTP密钥,并配置为auth.yaml中的opt.secretAttributeName。
   3. 您需要配置一个邮件传输代理（MTA）以实现邮件服务。其中，您需要提供有效的发件人地址、SMTP 服务器地址、SMTP 服务器端口号以及 SMTP 认证凭据（包括用户名和授权码）。
 
-#### 二、如果您配置otp状态为本地(otp.status为remote, 自己存密钥于某个地方):
+#### 二、如果您配置otp状态为远程(otp.status为remote, 自己存密钥于某个地方):
 
   1. 那么您需要提供一个验证otp码的接口，返回验证的结果。返回结果要求json格式{"result": true|false}。
   2. scow会使用fetch向config/auth.yml中的otp.remote.url发起请求。这个配置需要您根据上述接口和存储密钥的主机，端口配置。fetch请求中otpCode为用户输入的otp码，userId为用户名，类型均为string。
@@ -137,54 +137,60 @@ start();
 
 ```
 
-auth.yaml:
-```yaml title="config/auth.yml"
-otp:
-  #status指定otp状态，分别为disabled:不启用,local：启用为本地模式，remote：启用为远程认证模式。默认为disabled
-  status: local
-  #密钥存储属性名,需要定义
-  secretAttributeName: secret
-  #认证系统地址，例如：http://localhost:5000
-  authUrl: http://localhost:5000
-  #OTP码位数，默认为6
-  #digits: 6
-  #加密算法(sha1，sha256，sha512)，默认为sha1,
-  #algorithm: sha1
-  #OTP码有效时间，默认为30
-  #period: 30
-  #绑定otp时发送绑定信息方式
-  authenticationMethod:
-    mail:
-      enabled: true
-      #发件邮箱地址
-      from: "example@excample.com"
-      #邮件主题，默认为"otp绑定链接"
-      #subject: "otp绑定链接"
-      #邮件内容标题，默认为"Bind OTP"
-      #title: "Bind OTP"
-      #邮件内容,默认为"Please click on the following link to bind your OTP:"
-      #contentText: "Please click on the following link to bind your OTP:"
-      #标签点击文字,默认为"Bind OTP"
-      #labelText: "Bind OTP"
-      #secret二维码上方文字描述信息, 默认为"此二维码仅出现一次，用过即毁"
-      #qrcodeDescription:
-      mailTransportInfo:
-        #SMTP服务器
-        host: "smtp.ethereal.email"
-        #是否启用安全连接，默认false
-        secure: false
-        #服务器端口默认25
-        port: 587
-        #SMTP身份验证用户名
-        user: "morgan68@ethereal.email"
-        #SMTP身份验证授权码
-        password: "y2es3bd3rYwxWs5n8g"
-  #如果mode指定为remote，需要配置以下认证url
-  remote:
-    #远程验证url，例如http://localhost:5000/otp/remote/validateCode
-    url: 
-    #当用户点击绑定OTP时，302重定向的链接，例如https://pkuhpc.github.io/SCOW/
-    redirectUrl: 
+如果您不打算启用`otp`功能，那么以下的所有配置可均不写，或者`otp.status`配置为`disabled`；如果您将`otp.ldap.status`配置为`ldap`, 那么`otp.ldap`下所有没有默认值的配置项都需要配置，同样地如果您将`otp.ldap.status`配置为`remote`, 那么`otp.remote`下所有没有默认值的配置项都需要配置
 
+`auth.yaml:`
+```yaml title="config/auth.yml"
+
+#目前仅支持ldap认证方式启用otp，ssh方式不支持
+otp:
+  #status指定otp状态，分别为disabled:不启用,ldap：密钥存在ldap，remote：启用为远程认证模式。默认为disabled
+  status: ldap
+  #当status为ldap时间，需配置以下这段内容来本地注册
+  ldap:
+    #限制绑定otp要在多少分钟内完成，需要整数, 默认10
+    #timeLimitMinutes: 10
+    #密钥存储属性名,需要用户自己在ldap中进行定义
+    secretAttributeName: 
+    #认证系统地址，例如：http://localhost:5000
+    authUrl: 
+    #OTP码位数，默认为6
+    #digits: 6
+    #加密算法(sha1，sha256，sha512)，默认为sha1,
+    #algorithm: sha1
+    #OTP码有效时间，默认为30
+    #period: 30
+    #绑定otp时发送绑定信息方式
+    authenticationMethod:
+      mail:
+        #发件邮箱地址
+        from: "morgan68@ethereal.email"
+        #发送邮件频率限制，需要整数，单位秒，默认60秒间隔
+        #sendEmailFrequencyLimitInSeconds: 60
+        #邮件主题，默认为"otp绑定链接"
+        #subject: "otp绑定链接"
+        #邮件内容标题，默认为"Bind OTP""
+        #title: "Bind OTP"
+        #邮件内容,默认为"Please click on the following link to bind your OTP:"
+        #contentText: "Please click on the following link to bind your OTP"
+        #标签点击文字,默认为"Bind OTP"
+        #labelText: "Bind OTP"
+        mailTransportInfo:
+          #SMTP服务器
+          host: "smtp.ethereal.email"
+          #是否启用安全连接，默认false
+          #secure: false
+          #服务器端口
+          port: 587
+          #SMTP身份验证用户名
+          user: "morgan68@ethereal.email"
+          #SMTP身份验证授权码
+          password: "y2es3bd3rYwxWs5n8g"
+  #如果mode指定为remote，需要配置以下认证url
+  #remote:
+    #远程验证url，例如http://localhost:9999/otp/remote/validateCode
+    #url: 
+    #当用户点击绑定OTP时，302重定向的链接, 默认为空
+    #redirectUrl: https://pkuhpc.github.io/SCOW/ 
 
 ```
