@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { ClusterAccountInfo } from "@scow/protos/build/server/admin";
 import { Request } from "src/clusterops/api";
 
 export interface CreateAccountRequest {
@@ -48,11 +49,17 @@ export type UnblockAccountReply = {
   code: "OK" | "NOT_FOUND" | "ALREADY_UNBLOCKED"
 };
 
+export interface GetAllAccountsWithUsersRequest {}
+
+export interface GetAllAccountsWithUsersReply {
+  accounts: ClusterAccountInfo[]
+}
+
 export interface AccountOps {
   deleteAccount(req: Request<DeleteAccountRequest>): Promise<DeleteAccountReply>;
   createAccount(req: Request<CreateAccountRequest>): Promise<CreateAccountReply>;
   blockAccount(req: Request<BlockAccountRequest>): Promise<BlockAccountReply>;
   unblockAccount(req: Request<UnblockAccountRequest>): Promise<UnblockAccountReply>;
-
+  getAllAccountsWithUsers(req: Request<GetAllAccountsWithUsersRequest>): Promise<GetAllAccountsWithUsersReply>;
 }
 

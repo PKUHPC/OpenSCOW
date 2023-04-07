@@ -12,7 +12,7 @@
 
 import { UserOps } from "src/clusterops/api/user";
 import { SlurmClusterInfo } from "src/clusterops/slurm";
-import { handleSimpleResponse, throwIfNotReturn0 } from "src/clusterops/slurm/utils/slurm";
+import { handleSimpleResponse } from "src/clusterops/slurm/utils/slurm";
 
 export const slurmUserOps = ({ executeSlurmScript }: SlurmClusterInfo): UserOps => {
 
@@ -42,14 +42,6 @@ export const slurmUserOps = ({ executeSlurmScript }: SlurmClusterInfo): UserOps 
       const result = await executeSlurmScript(["-r", accountName, userId], logger);
 
       return handleSimpleResponse(result, { 4: "NOT_FOUND" });
-    },
-
-    getAllUsersInAccounts: async ({ logger }) => {
-      const result = await executeSlurmScript(["-l", "all"], logger);
-
-      throwIfNotReturn0(result);
-
-      return { result: result.stdout };
     },
 
   };

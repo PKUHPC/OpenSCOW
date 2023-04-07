@@ -17,7 +17,8 @@ import type { Account } from "@scow/protos/build/server/account";
 import { JobInfo } from "@scow/protos/build/server/job";
 import type { AccountUserInfo, GetUserStatusResponse } from "@scow/protos/build/server/user";
 import { api } from "src/apis/api";
-import { PlatformRole, TenantRole, UserInfo, UserRole, UserStatus } from "src/models/User";
+import { ClusterAccountInfo_ImportStatus, PlatformRole,
+  TenantRole, UserInfo, UserRole, UserStatus } from "src/models/User";
 import { DEFAULT_TENANT_NAME } from "src/utils/constants";
 
 export type MockApi<TApi extends Record<
@@ -196,25 +197,25 @@ export const mockApi: MockApi<typeof api> = {
 
   getTenants: async () => ({ names: ["DEFAULT", "another"]}),
 
-  getBillingItems: async () => ({ 
+  getBillingItems: async () => ({
     activeItems: [
-      { cluster: "hpc01", partition: "compute", qos: "low", 
+      { cluster: "hpc01", partition: "compute", qos: "low",
         priceItem: { itemId: "HPC08", price: numberToMoney(0.01), amountStrategy: "max-cpusAlloc-mem" } },
-      { cluster: "hpc01", partition: "compute", qos: "normal", 
+      { cluster: "hpc01", partition: "compute", qos: "normal",
         priceItem: { itemId: "HPC02", price: numberToMoney(0.06), amountStrategy: "gpu" } },
-      { cluster: "hpc01", partition: "compute", qos: "high", 
+      { cluster: "hpc01", partition: "compute", qos: "high",
         priceItem: { itemId: "HPC03", price: numberToMoney(0.08), amountStrategy: "gpu" } },
-      { cluster: "hpc01", partition: "GPU", qos: "low", 
+      { cluster: "hpc01", partition: "GPU", qos: "low",
         priceItem: { itemId: "HPC04", price: numberToMoney(10.00), amountStrategy: "gpu" } },
-      { cluster: "hpc01", partition: "GPU", qos: "normal", 
+      { cluster: "hpc01", partition: "GPU", qos: "normal",
         priceItem: { itemId: "HPC05", price: numberToMoney(12.00), amountStrategy: "gpu" } },
-      { cluster: "hpc01", partition: "GPU", qos: "high", 
+      { cluster: "hpc01", partition: "GPU", qos: "high",
         priceItem: { itemId: "HPC06", price: numberToMoney(14.00), amountStrategy: "gpu" } },
     ],
     historyItems: [
-      { cluster: "hpc01", partition: "compute", qos: "low", 
+      { cluster: "hpc01", partition: "compute", qos: "low",
         priceItem: { itemId: "HPC01", price: numberToMoney(0.04), amountStrategy: "max-cpusAlloc-mem" } },
-      { cluster: "hpc01", partition: "compute", qos: "low", 
+      { cluster: "hpc01", partition: "compute", qos: "low",
         priceItem: { itemId: "HPC07", price: numberToMoney(0.02), amountStrategy: "gpu" } },
     ],
   }),
@@ -238,25 +239,27 @@ export const mockApi: MockApi<typeof api> = {
         {
           accountName: "a_user1",
           users: [
-            { userId: "user1", userName: "user1", state: "allowed!" }, 
+            { userId: "user1", userName: "user1", state: "allowed!" },
             { userId: "user2", userName: "user2", state: "allowed!" },
           ],
           owner: "user1",
-          included: false,
+          importStatus: ClusterAccountInfo_ImportStatus.NOT_EXISTING,
+          blocked: false,
         },
         {
           accountName: "account2",
           users: [
-            { userId: "user2", userName: "user2", state: "allowed!" }, 
+            { userId: "user2", userName: "user2", state: "allowed!" },
             { userId: "user3", userName: "user3", state: "allowed!" },
           ],
-          included: false,
+          importStatus: ClusterAccountInfo_ImportStatus.HAS_NEW_USERS,
+          blocked: false,
         },
         {
           accountName: "a_user4",
           users: [{ userId: "user4", userName: "user4", state: "allowed!" }],
-          owner: "该账户已导入",
-          included: true,
+          importStatus: ClusterAccountInfo_ImportStatus.EXISTING,
+          blocked: false,
         },
       ],
     });
