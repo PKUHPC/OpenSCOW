@@ -44,6 +44,8 @@ export interface JobTemplate {
   maxTime: number;
   command: string;
   workingDirectory: string;
+  output?: string;
+  errorOutput?: string;
   memory?: string;
   comment?: string | undefined;
 }

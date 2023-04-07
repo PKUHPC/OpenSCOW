@@ -41,7 +41,7 @@ export function generateJobScript(jobInfo: JobTemplate & {
   const {
     jobName, account, coreCount, gpuCount, maxTime, nodeCount,
     partition, qos, command, workingDirectory,
-    output, otherOptions, memory,
+    output, errorOutput, otherOptions, memory,
   } = jobInfo;
   let script = "#!/bin/bash\n";
 
@@ -65,6 +65,9 @@ export function generateJobScript(jobInfo: JobTemplate & {
   }
   if (output) {
     append("--output=" + output);
+  }
+  if (errorOutput) {
+    append("--error=" + errorOutput);
   }
 
   if (otherOptions) {

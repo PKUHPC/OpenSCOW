@@ -126,7 +126,7 @@ export const jobServiceServer = plugin((server) => {
 
     submitJob: async ({ request, logger }) => {
       const { cluster, command, jobName, coreCount, gpuCount, maxTime, saveAsTemplate, userId,
-        nodeCount, partition, qos, account, comment, workingDirectory, memory } = request;
+        nodeCount, partition, qos, account, comment, workingDirectory, output, errorOutput, memory } = request;
 
       const jobInfo: JobTemplate = {
         jobName,
@@ -140,6 +140,8 @@ export const jobServiceServer = plugin((server) => {
         command,
         comment,
         workingDirectory,
+        output,
+        errorOutput,
         memory,
       };
 

@@ -64,10 +64,13 @@ message JobTemplate {
   optional string qos = 4;
   uint32 node_count = 5;
   uint32 core_count = 6;
-  uint32 max_time = 7; // in minutes
-  string command = 8;
-  string working_directory = 9;
-  optional string comment = 10;
+  optional uint32 gpu_count = 7;
+  uint32 max_time = 8; // in minutes
+  string command = 9;
+  string working_directory = 10;
+  optional string output = 11;
+  optional string error_output = 12;
+  optional string comment = 13;
 }
 
 message ListAllJobsResponse {
@@ -121,9 +124,11 @@ message SubmitJobRequest {
   uint32 max_time = 10; // in minutes
   string account = 11;
   string working_directory = 12;
-  optional string memory = 13;
-  optional string comment = 14;
-  bool save_as_template = 15;
+  string output = 13;
+  string error_output = 14;
+  optional string memory = 15;
+  optional string comment = 16;
+  bool save_as_template = 17;
 }
 
 // NOT_FOUND: cluster is not found
