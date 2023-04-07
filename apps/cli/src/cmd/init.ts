@@ -66,4 +66,6 @@ export const init = async (options: Options) => {
 
   await copyWithWarning(SAMPLE_INSTALLATION, fullPath);
   await copyWithWarning(SAMPLE_CONFIG_PATH, fullPath);
+
+  log("File initialization complete");
 };

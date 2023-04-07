@@ -36,11 +36,13 @@ export async function compareDirectories(dir1: string, dir2: string): Promise<bo
     const stat2 = await fsp.stat(filePath2);
 
     if (stat1.isDirectory() && stat2.isDirectory()) {
-      if (!compareDirectories(filePath1, filePath2)) {
+      if (!(await compareDirectories(filePath1, filePath2))) {
         return false;
       }
     } else if (stat1.isFile() && stat2.isFile()) {
-      if (fsp.readFile(filePath1).toString() !== fsp.readFile(filePath2).toString()) {
+      const content1 = await fsp.readFile(filePath1);
+      const content2 = await fsp.readFile(filePath2);
+      if (content1.compare(content2) !== 0) {
         return false;
       }
     } else {
