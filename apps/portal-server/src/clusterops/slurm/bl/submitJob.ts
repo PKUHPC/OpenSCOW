@@ -25,11 +25,13 @@ export interface JobMetadata {
   qos?: string;
   nodeCount: number;
   coreCount: number;
+  gpuCount?: number;
   maxTime: number;
   command: string;
   comment?: string;
   submitTime: string;
   workingDirectory: string;
+  memory?: string;
 }
 
 export function generateJobScript(jobInfo: JobTemplate & {
@@ -37,9 +39,9 @@ export function generateJobScript(jobInfo: JobTemplate & {
   otherOptions?: string[];
 }) {
   const {
-    jobName, account, coreCount, maxTime, nodeCount,
+    jobName, account, coreCount, gpuCount, maxTime, nodeCount,
     partition, qos, command, workingDirectory,
-    output, otherOptions,
+    output, otherOptions, memory,
   } = jobInfo;
   let script = "#!/bin/bash\n";
 
@@ -55,9 +57,16 @@ export function generateJobScript(jobInfo: JobTemplate & {
   append("-c " + coreCount);
   append("--time=" + maxTime);
   append("--chdir=" + workingDirectory);
+  if (gpuCount) {
+    append("--gres=gpu:" + gpuCount);
+  }
+  if (memory) {
+    append("--mem=" + memory);
+  }
   if (output) {
     append("--output=" + output);
   }
+
   if (otherOptions) {
     otherOptions.forEach((opt) => {
       append(opt);
