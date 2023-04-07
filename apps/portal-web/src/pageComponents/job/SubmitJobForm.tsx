@@ -39,6 +39,8 @@ interface JobForm {
   account: string;
   comment: string;
   workingDirectory: string;
+  output: string;
+  errorOutput: string;
   save: boolean;
 }
 
@@ -52,6 +54,8 @@ const initialValues = {
   coreCount: 1,
   gpuCount: 1,
   maxTime: 30,
+  output: "job.%j.out",
+  errorOutput: "job.%j.err",
   save: false,
 } as Partial<JobForm>;
 
@@ -68,7 +72,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
 
 
   const submit = async () => {
-    const { cluster, command, jobName, coreCount, gpuCount, workingDirectory, save,
+    const { cluster, command, jobName, coreCount, gpuCount, workingDirectory, output, errorOutput, save,
       maxTime, nodeCount, partition, qos, account, comment } = await form.validateFields();
 
     setLoading(true);
@@ -78,7 +82,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
       coreCount: gpuCount ? gpuCount * Math.floor(currentPartitionInfo!.cores / currentPartitionInfo!.gpus) : coreCount,
       gpuCount,
       maxTime, nodeCount, partition, qos, comment,
-      workingDirectory, save, memory,
+      workingDirectory, save, memory, output, errorOutput,
     } })
       .httpError(500, (e) => {
         if (e.code === "SCHEDULER_FAILED") {
@@ -283,9 +287,19 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
             <InputNumber min={1} step={1} addonAfter={"分钟"} />
           </Form.Item>
         </Col>
-        <Col span={24} sm={24}>
+        <Col span={24} sm={10}>
           <Form.Item<JobForm> label="工作目录" name="workingDirectory" rules={[{ required: true }]}>
             <Input addonBefore="~/" />
+          </Form.Item>
+        </Col>
+        <Col span={24} sm={7}>
+          <Form.Item<JobForm> label="标准输出文件" name="output" rules={[{ required: true }]}>
+            <Input />
+          </Form.Item>
+        </Col>
+        <Col span={24} sm={7}>
+          <Form.Item<JobForm> label="错误输出文件" name="errorOutput" rules={[{ required: true }]}>
+            <Input />
           </Form.Item>
         </Col>
         <Col className="ant-form-item" span={12} sm={6}>
