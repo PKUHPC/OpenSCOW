@@ -293,12 +293,12 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
           </Form.Item>
         </Col>
         <Col span={24} sm={7}>
-          <Form.Item<JobForm> label="输出文件" name="output" rules={[{ required: true }]}>
+          <Form.Item<JobForm> label="标准输出文件" name="output" rules={[{ required: true }]}>
             <Input />
           </Form.Item>
         </Col>
         <Col span={24} sm={7}>
-          <Form.Item<JobForm> label="错误文件" name="errorOutput" rules={[{ required: true }]}>
+          <Form.Item<JobForm> label="错误输出文件" name="errorOutput" rules={[{ required: true }]}>
             <Input />
           </Form.Item>
         </Col>
