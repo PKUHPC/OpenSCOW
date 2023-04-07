@@ -158,6 +158,8 @@ export const mockApi: MockApi<typeof api> = {
       nodeCount: 4,
       partition: "low",
       qos: "low",
+      output: "job.%j.out",
+      errorOutput: "job.%j.err",
       workingDirectory: "/nfs/jobs/123",
     },
   }),

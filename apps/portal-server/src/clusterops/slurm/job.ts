@@ -109,7 +109,7 @@ export const slurmJobOps = (cluster: string): JobOps => {
         if (!await sftpExists(sftp, file)) { return { code: "NOT_FOUND" }; }
 
         const content = await sftpReadFile(sftp)(file);
-
+        logger.info("getJobTamplate to %s", content);
         const data = JSON.parse(content.toString()) as JobMetadata;
 
         return { code: "OK", template: data };
