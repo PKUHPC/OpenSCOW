@@ -10,8 +10,8 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { existsSync, promises } from "fs";
-import { join } from "path";
+import { existsSync, promises as fsp } from "fs";
+import { basename, join } from "path";
 import prompt from "prompts";
 import { debug, log } from "src/log";
 
@@ -19,29 +19,54 @@ import { debug, log } from "src/log";
 interface Options {
   configPath: string;
   outputPath: string;
+  overwrite: boolean;
 }
 
-const SAMPLE_INSTALLATION = "assets/install.yaml";
-const SAMPLE_CONFIG_PATH = "assets/config";
+const SAMPLE_INSTALLATION = join(__dirname, "../../assets/install.yaml");
+const SAMPLE_CONFIG_PATH = join(__dirname, "../../assets/config");
 
-async function cpWarn(file: string, targetDir: string) {
+// fs.promise.cp throws error for config dir
+async function copyWithWarn(src: string, dest: string, overwrite: boolean) {
 
-  const targetPath = join(targetDir, file);
+  async function copyFile(src: string, dest: string) {
+    if (existsSync(dest)) {
+      if (!overwrite) {
 
-  if (existsSync(targetPath)) {
-    const answer = await prompt({
-      type: "confirm",
-      name: "continue",
-      message: `Output path ${targetPath} already exists. Continue?`,
-    });
-    if (!answer.continue) {
-      debug("Selected no.");
-      return;
+        const answer = await prompt({
+          type: "confirm",
+          name: "continue",
+          message: `Output ${dest} already exists. Overwrite?`,
+        });
+        if (!answer.continue) {
+          debug("Selected no.");
+          return;
+        }
+      } else {
+        log("Overwriting %s", dest);
+      }
     }
+    await fsp.copyFile(src, dest);
   }
 
-  await promises.cp(file, targetPath, { recursive: true });
+  const destPath = join(dest, basename(src));
+  if (!existsSync(destPath)) {
+    await fsp.mkdir(destPath, { recursive: true });
+  }
 
+  const stat = await fsp.lstat(src);
+  if (stat.isDirectory()) {
+    const entries = await fsp.readdir(src, { withFileTypes: true });
+    for (const entry of entries) {
+      const srcPath = join(src, entry.name);
+      if (entry.isDirectory()) {
+        await copyWithWarn(srcPath, destPath, overwrite);
+      } else {
+        await copyFile(srcPath, join(destPath, entry.name));
+      }
+    }
+  } else {
+    await copyFile(src, destPath);
+  }
 }
 
 export const init = async (options: Options) => {
@@ -50,6 +75,6 @@ export const init = async (options: Options) => {
 
   log("Output path is %s. ", fullPath);
 
-  await cpWarn(SAMPLE_INSTALLATION, fullPath);
-  await cpWarn(SAMPLE_CONFIG_PATH, fullPath);
+  await copyWithWarn(SAMPLE_INSTALLATION, fullPath, options.overwrite);
+  await copyWithWarn(SAMPLE_CONFIG_PATH, fullPath, options.overwrite);
 };

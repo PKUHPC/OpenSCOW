@@ -40,7 +40,8 @@
   "pkg": {
     "scripts": "build/**/*.js",
     "assets": [
-      "assets/**/*"
+      "assets/**/*",
+      "package.json"
     ],
     "targets": [
       "node18-linux-x64",

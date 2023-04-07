@@ -14,6 +14,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 import { readFileSync } from "fs";
+import { join } from "path";
 import { runCompose } from "src/cmd/compose";
 import { enterDb } from "src/cmd/db";
 import { generateDockerComposeYml } from "src/cmd/generate";
@@ -25,7 +26,7 @@ import { hideBin } from "yargs/helpers";
 import yargs from "yargs/yargs";
 
 
-const version = JSON.parse(readFileSync("package.json", "utf-8")).version;
+const version = JSON.parse(readFileSync(join(__dirname, "../package.json"), "utf-8")).version;
 
 yargs(hideBin(process.argv))
   .options({
@@ -56,6 +57,12 @@ yargs(hideBin(process.argv))
         type: "string",
         description: "output path",
         default: ".",
+      },
+      overwrite: {
+        alias: "f",
+        type: "boolean",
+        description: "Overwrite existing files",
+        default: false,
       },
     });
   }, (argv) => {
