@@ -148,18 +148,14 @@ export async function sendEmailAuthLink(
     }),
   };
 
-  let success = true;
-  try {
-    await transporter.sendMail(mailOptions);
-    logger.info("email sent successfully");
-  } catch (e) {
-    logger.info("fail to send email", e);
-    success = false;
-  }
+  const emailSent = await transporter.sendMail(mailOptions).then(() => true).catch((e) => {
+    logger.error(e);
+    return false;
+  });
 
   await bindOtpHtml(
     false, req, res,
-    { timeLimitMinutes: otpLdap.timeLimitMinutes, sendSucceeded: success,
+    { timeLimitMinutes: otpLdap.timeLimitMinutes, sendSucceeded: emailSent,
       emailAddress: emailAddress, otpSessionToken: otpSessionToken, backToLoginUrl: backToLoginUrl });
 }
 
@@ -222,7 +218,7 @@ export async function validateOtpCode(
       return (await JSON.parse(await res.text()).result) as boolean;
     })
       .catch((e) => {
-        logger.error(`error in verify otp code in remote status, error ${e}`);
+        logger.error(e, "error when verifying otp code in remote");
         return false;
       });
 
