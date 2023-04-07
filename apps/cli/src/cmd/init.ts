@@ -27,40 +27,34 @@ const SAMPLE_CONFIG_PATH = join(__dirname, "../../assets/config");
 // fs.promise.cp throws error for config dir
 async function copyWithWarning(src: string, dest: string) {
 
-  async function copyFile(src: string, dest: string) {
-    if (existsSync(dest)) {
+  const stat = await fsp.lstat(src);
+  const destPath = join(dest, basename(src));
+
+  if (stat.isDirectory()) {
+    if (!existsSync(destPath)) {
+      await fsp.mkdir(destPath, { recursive: true });
+    }
+
+    const entries = await fsp.readdir(src, { withFileTypes: true });
+    for (const entry of entries) {
+      const srcDir = join(src, entry.name);
+      await copyWithWarning(srcDir, destPath);
+    }
+  } else {
+    if (existsSync(destPath)) {
       const answer = await prompt({
         type: "confirm",
         name: "continue",
-        message: `Output ${dest} already exists. Overwrite?`,
+        message: `Output ${destPath} already exists. Overwrite?`,
       });
       if (!answer.continue) {
         debug("Selected no.");
         return;
       }
-
     }
-    await fsp.copyFile(src, dest);
-  }
 
-  const destPath = join(dest, basename(src));
-  if (!existsSync(destPath)) {
-    await fsp.mkdir(destPath, { recursive: true });
-  }
-
-  const stat = await fsp.lstat(src);
-  if (stat.isDirectory()) {
-    const entries = await fsp.readdir(src, { withFileTypes: true });
-    for (const entry of entries) {
-      const srcPath = join(src, entry.name);
-      if (entry.isDirectory()) {
-        await copyWithWarning(srcPath, destPath);
-      } else {
-        await copyFile(srcPath, join(destPath, entry.name));
-      }
-    }
-  } else {
-    await copyFile(src, destPath);
+    log("Copying %s to %s", src, destPath);
+    await fsp.copyFile(src, destPath);
   }
 }
 
