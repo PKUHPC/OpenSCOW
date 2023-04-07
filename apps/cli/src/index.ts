@@ -58,12 +58,6 @@ yargs(hideBin(process.argv))
         description: "output path",
         default: ".",
       },
-      overwrite: {
-        alias: "f",
-        type: "boolean",
-        description: "Overwrite existing files",
-        default: false,
-      },
     });
   }, (argv) => {
     init(argv);
