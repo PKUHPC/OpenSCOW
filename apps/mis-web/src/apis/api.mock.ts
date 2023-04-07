@@ -196,25 +196,25 @@ export const mockApi: MockApi<typeof api> = {
 
   getTenants: async () => ({ names: ["DEFAULT", "another"]}),
 
-  getBillingItems: async () => ({ 
+  getBillingItems: async () => ({
     activeItems: [
-      { cluster: "hpc01", partition: "compute", qos: "low", 
+      { cluster: "hpc01", partition: "compute", qos: "low",
         priceItem: { itemId: "HPC08", price: numberToMoney(0.01), amountStrategy: "max-cpusAlloc-mem" } },
-      { cluster: "hpc01", partition: "compute", qos: "normal", 
+      { cluster: "hpc01", partition: "compute", qos: "normal",
         priceItem: { itemId: "HPC02", price: numberToMoney(0.06), amountStrategy: "gpu" } },
-      { cluster: "hpc01", partition: "compute", qos: "high", 
+      { cluster: "hpc01", partition: "compute", qos: "high",
         priceItem: { itemId: "HPC03", price: numberToMoney(0.08), amountStrategy: "gpu" } },
-      { cluster: "hpc01", partition: "GPU", qos: "low", 
+      { cluster: "hpc01", partition: "GPU", qos: "low",
         priceItem: { itemId: "HPC04", price: numberToMoney(10.00), amountStrategy: "gpu" } },
-      { cluster: "hpc01", partition: "GPU", qos: "normal", 
+      { cluster: "hpc01", partition: "GPU", qos: "normal",
         priceItem: { itemId: "HPC05", price: numberToMoney(12.00), amountStrategy: "gpu" } },
-      { cluster: "hpc01", partition: "GPU", qos: "high", 
+      { cluster: "hpc01", partition: "GPU", qos: "high",
         priceItem: { itemId: "HPC06", price: numberToMoney(14.00), amountStrategy: "gpu" } },
     ],
     historyItems: [
-      { cluster: "hpc01", partition: "compute", qos: "low", 
+      { cluster: "hpc01", partition: "compute", qos: "low",
         priceItem: { itemId: "HPC01", price: numberToMoney(0.04), amountStrategy: "max-cpusAlloc-mem" } },
-      { cluster: "hpc01", partition: "compute", qos: "low", 
+      { cluster: "hpc01", partition: "compute", qos: "low",
         priceItem: { itemId: "HPC07", price: numberToMoney(0.02), amountStrategy: "gpu" } },
     ],
   }),
@@ -238,7 +238,7 @@ export const mockApi: MockApi<typeof api> = {
         {
           accountName: "a_user1",
           users: [
-            { userId: "user1", userName: "user1", state: "allowed!" }, 
+            { userId: "user1", userName: "user1", state: "allowed!" },
             { userId: "user2", userName: "user2", state: "allowed!" },
           ],
           owner: "user1",
@@ -247,7 +247,7 @@ export const mockApi: MockApi<typeof api> = {
         {
           accountName: "account2",
           users: [
-            { userId: "user2", userName: "user2", state: "allowed!" }, 
+            { userId: "user2", userName: "user2", state: "allowed!" },
             { userId: "user3", userName: "user3", state: "allowed!" },
           ],
           included: false,
@@ -366,7 +366,7 @@ export const mockApi: MockApi<typeof api> = {
   getAccounts: async () => ({ totalCount: mockAccounts.length, results: mockAccounts }),
   changeJobTimeLimit: async () => null,
   queryJobTimeLimit: async () => ({ result: 10 }),
-  createAccount: async () => null,
+  createAccount: async () => { return {}; },
   dewhitelistAccount: async () => null,
   whitelistAccount: async () => null,
   getWhitelistedAccounts: async () => ({ results: [{

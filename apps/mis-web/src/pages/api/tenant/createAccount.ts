@@ -12,7 +12,7 @@
 
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Status } from "@grpc/grpc-js/build/src/constants";
-import { AccountServiceClient } from "@scow/protos/build/server/account";
+import { AccountServiceClient, CreateAccountResponse } from "@scow/protos/build/server/account";
 import { authenticate } from "src/auth/server";
 import { TenantRole } from "src/models/User";
 import { checkNameMatch } from "src/server/checkIdNameMatch";
@@ -35,7 +35,7 @@ export interface CreateAccountSchema {
   }
 
   responses: {
-    200: null;
+    200: CreateAccountResponse;
     400: {
       code: "ID_NAME_NOT_MATCH" | "ACCOUNT_NAME_NOT_VALID";
     }
@@ -82,7 +82,7 @@ export default route<CreateAccountSchema>("CreateAccountSchema",
     return await asyncClientCall(client, "createAccount", {
       accountName, ownerId, comment, tenantName: info.tenant,
     })
-      .then((x) => ({ 200: x as unknown as null }))
+      .then((x) => ({ 200: x }))
       .catch(handlegRPCError({
         [Status.ALREADY_EXISTS]: () => ({ 409: null }),
         [Status.NOT_FOUND]: () => ({ 404: null }),
