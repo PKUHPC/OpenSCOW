@@ -1,5 +1,5 @@
 ---
-sidebar_position: 5
+sidebar_position: 1
 title: 使用自定义认证系统
 ---
 
