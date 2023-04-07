@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e" scale="2" border="0">
     <diagram id="Pjbi3EagdmSRB1L1AeHt" name="Page-1">
-        <mxGraphModel dx="534" dy="364" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+        <mxGraphModel dx="738" dy="521" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -10,46 +10,59 @@
                 <mxCell id="2" value="登录节点" style="rounded=0;whiteSpace=wrap;fillColor=none;verticalAlign=top;spacing=0;labelBackgroundColor=none;" parent="1" vertex="1">
                     <mxGeometry x="550" y="650" width="120" height="70" as="geometry"/>
                 </mxCell>
-                <mxCell id="5" value="" style="edgeStyle=none;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;spacing=0;labelBackgroundColor=none;" parent="1" source="3" target="93" edge="1">
-                    <mxGeometry relative="1" as="geometry">
-                        <mxPoint x="360" y="615" as="targetPoint"/>
-                    </mxGeometry>
-                </mxCell>
-                <mxCell id="10" value="HTTP&#10;WebSocket" style="edgeLabel;align=center;verticalAlign=middle;resizable=0;points=[];spacing=0;labelBackgroundColor=none;" parent="5" vertex="1" connectable="0">
-                    <mxGeometry x="-0.2092" y="-2" relative="1" as="geometry">
-                        <mxPoint x="-18" y="4" as="offset"/>
-                    </mxGeometry>
-                </mxCell>
                 <mxCell id="97" value="" style="edgeStyle=none;exitX=0.5;exitY=1;exitDx=0;exitDy=0;spacing=0;labelBackgroundColor=none;" parent="1" source="3" target="15" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="3" value="客户端浏览器" style="whiteSpace=wrap;fillColor=none;spacing=0;labelBackgroundColor=none;" parent="1" vertex="1">
-                    <mxGeometry x="470" y="460" width="90" height="30" as="geometry"/>
+                <mxCell id="110" value="HTTP" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="97">
+                    <mxGeometry x="-0.1579" y="2" relative="1" as="geometry">
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
                 </mxCell>
-                <mxCell id="73" value="" style="edgeStyle=none;exitX=0.393;exitY=1.035;exitDx=0;exitDy=0;startArrow=none;entryX=0.321;entryY=0.002;entryDx=0;entryDy=0;entryPerimeter=0;spacing=0;labelBackgroundColor=none;exitPerimeter=0;" parent="1" source="93" target="77" edge="1">
+                <mxCell id="108" style="edgeStyle=none;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.428;entryY=0.025;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="3" target="107">
                     <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="109" value="WebSocket" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="108">
+                    <mxGeometry x="-0.2543" y="-1" relative="1" as="geometry">
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="3" value="客户端浏览器" style="whiteSpace=wrap;fillColor=none;spacing=0;labelBackgroundColor=none;" parent="1" vertex="1">
+                    <mxGeometry x="475" y="460" width="90" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="73" value="" style="edgeStyle=none;exitX=0.5;exitY=1;exitDx=0;exitDy=0;startArrow=none;entryX=0.5;entryY=0;entryDx=0;entryDy=0;spacing=0;labelBackgroundColor=none;" parent="1" source="107" target="77" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="417.51" y="582.0374999999999" as="sourcePoint"/>
+                    </mxGeometry>
                 </mxCell>
                 <mxCell id="83" value="HTTP/WebSocket&#10;连接到作业监听的端口" style="edgeLabel;align=center;verticalAlign=middle;resizable=0;points=[];spacing=0;labelBackgroundColor=none;" parent="73" vertex="1" connectable="0">
                     <mxGeometry x="0.2536" y="-2" relative="1" as="geometry">
-                        <mxPoint x="53" y="-24" as="offset"/>
+                        <mxPoint x="-13" y="-24" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="111" style="edgeStyle=none;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="15" target="58">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="113" value="获取/刷新密码" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="111">
+                    <mxGeometry x="0.1845" y="-3" relative="1" as="geometry">
+                        <mxPoint as="offset"/>
                     </mxGeometry>
                 </mxCell>
                 <mxCell id="15" value="portal-web" style="rounded=0;whiteSpace=wrap;fillColor=none;spacing=0;labelBackgroundColor=none;" parent="1" vertex="1">
-                    <mxGeometry x="560" y="558.75" width="80" height="22.5" as="geometry"/>
+                    <mxGeometry x="550" y="558.75" width="80" height="22.5" as="geometry"/>
                 </mxCell>
-                <mxCell id="72" value="" style="edgeStyle=none;exitX=0.596;exitY=1.024;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;exitPerimeter=0;spacing=0;labelBackgroundColor=none;" parent="1" source="15" target="74" edge="1">
+                <mxCell id="72" value="" style="edgeStyle=none;exitX=0.5;exitY=1;exitDx=0;exitDy=0;spacing=0;labelBackgroundColor=none;" parent="1" source="15" edge="1">
                     <mxGeometry relative="1" as="geometry">
                         <mxPoint x="642" y="590.9090000000001" as="sourcePoint"/>
-                        <mxPoint x="610.78" y="703.75" as="targetPoint"/>
+                        <mxPoint x="600" y="680" as="targetPoint"/>
                     </mxGeometry>
                 </mxCell>
                 <mxCell id="75" value="SSH到登录节点&#10;并提交作业" style="edgeLabel;align=center;verticalAlign=middle;resizable=0;points=[];spacing=0;labelBackgroundColor=none;" parent="72" vertex="1" connectable="0">
                     <mxGeometry x="-0.1546" y="-2" relative="1" as="geometry">
-                        <mxPoint x="-41" y="-4" as="offset"/>
+                        <mxPoint x="18" y="-4" as="offset"/>
                     </mxGeometry>
                 </mxCell>
                 <mxCell id="74" value="调度器" style="rounded=0;whiteSpace=wrap;spacing=0;labelBackgroundColor=none;fillColor=none;" parent="1" vertex="1">
-                    <mxGeometry x="568.75" y="680" width="90" height="30" as="geometry"/>
+                    <mxGeometry x="565" y="680" width="90" height="30" as="geometry"/>
                 </mxCell>
                 <mxCell id="58" value="计算节点" style="rounded=0;whiteSpace=wrap;fillColor=none;verticalAlign=top;spacing=0;labelBackgroundColor=none;" parent="1" vertex="1">
                     <mxGeometry x="370" y="650" width="120" height="70" as="geometry"/>
@@ -67,15 +80,7 @@
                 <mxCell id="77" value="作业" style="rounded=0;whiteSpace=wrap;spacing=0;labelBackgroundColor=none;fillColor=none;" parent="1" vertex="1">
                     <mxGeometry x="389.25" y="680" width="79" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="93" value="gateway" style="rounded=0;whiteSpace=wrap;fillColor=none;spacing=0;labelBackgroundColor=none;" parent="1" vertex="1">
-                    <mxGeometry x="390" y="558.75" width="70" height="22.5" as="geometry"/>
-                </mxCell>
-                <mxCell id="98" value="HTTP" style="edgeLabel;align=center;verticalAlign=middle;resizable=0;points=[];spacing=0;labelBackgroundColor=none;" parent="1" vertex="1" connectable="0">
-                    <mxGeometry x="490.0030191479076" y="519.7841067566858" as="geometry">
-                        <mxPoint x="54" as="offset"/>
-                    </mxGeometry>
-                </mxCell>
-                <mxCell id="102" value="" style="endArrow=classic;html=1;" edge="1" parent="1">
+                <mxCell id="102" value="" style="endArrow=classic;html=1;" parent="1" edge="1">
                     <mxGeometry width="50" height="50" relative="1" as="geometry">
                         <mxPoint x="440" y="470" as="sourcePoint"/>
                         <mxPoint x="330" y="700" as="targetPoint"/>
@@ -84,12 +89,12 @@
                         </Array>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="103" value="连接到作业" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontColor=default;labelBackgroundColor=none;" vertex="1" connectable="0" parent="102">
+                <mxCell id="103" value="连接到作业" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontColor=default;labelBackgroundColor=none;" parent="102" vertex="1" connectable="0">
                     <mxGeometry x="0.0854" y="1" relative="1" as="geometry">
                         <mxPoint as="offset"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="104" value="" style="endArrow=classic;html=1;" edge="1" parent="1">
+                <mxCell id="104" value="" style="endArrow=classic;html=1;" parent="1" edge="1">
                     <mxGeometry width="50" height="50" relative="1" as="geometry">
                         <mxPoint x="620" y="470" as="sourcePoint"/>
                         <mxPoint x="710" y="700" as="targetPoint"/>
@@ -98,10 +103,13 @@
                         </Array>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="105" value="提交作业" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];labelBackgroundColor=none;" vertex="1" connectable="0" parent="104">
+                <mxCell id="105" value="提交作业" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];labelBackgroundColor=none;" parent="104" vertex="1" connectable="0">
                     <mxGeometry x="0.0001" relative="1" as="geometry">
                         <mxPoint as="offset"/>
                     </mxGeometry>
+                </mxCell>
+                <mxCell id="107" value="novnc-client" style="rounded=0;whiteSpace=wrap;fillColor=none;spacing=0;labelBackgroundColor=none;" vertex="1" parent="1">
+                    <mxGeometry x="388.25" y="562" width="80" height="22.5" as="geometry"/>
                 </mxCell>
             </root>
         </mxGraphModel>
