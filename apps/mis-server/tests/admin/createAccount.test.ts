@@ -24,11 +24,19 @@ import { dropDatabase } from "tests/data/helpers";
 let server: Server;
 let client: AccountServiceClient;
 let account: Account;
+let tenant: Tenant;
+let user: User;
 
 beforeEach(async () => {
   server = await createServer();
   await server.start();
   await server.ext.orm.em.fork().persistAndFlush(account);
+
+  tenant = new Tenant({ name: "tenant" });
+  await server.ext.orm.em.fork().persistAndFlush(tenant);
+
+  user = new User({ name: "test", userId: "test", tenant: tenant, email:"test@test.com" });
+  await server.ext.orm.em.fork().persistAndFlush(user);
 
   client = new AccountServiceClient(server.serverAddress, ChannelCredentials.createInsecure());
 
@@ -40,9 +48,17 @@ afterEach(async () => {
 });
 
 
+it("create a new account", async () => {
+  await asyncClientCall(client, "createAccount", { accountName: "a1234", tenantName: tenant.name,
+    ownerId: user.userId });
+  const em = server.ext.orm.em.fork();
+
+  const account = await em.findOneOrFail(Account, { accountName: "a1234" });
+  expect(account.accountName).toBe("a1234");
+});
+
+
 it("cannot create a account if the name exists", async () => {
-  const tenant = new Tenant({ name: "tenant" });
-  const user = new User({ name: "test", userId: "test", tenant: tenant, email:"test@test.com" });
   const account = new Account({ accountName: "123", tenant, blocked: false, comment: "test" });
   await server.ext.orm.em.fork().persistAndFlush(account);
 
@@ -50,17 +66,7 @@ it("cannot create a account if the name exists", async () => {
     accountName: "123", tenantName: "tenant",
     ownerId: user.userId,
   }).catch((e) => e);
-  console.log(reply);
   expect(reply.code).toBe(Status.ALREADY_EXISTS);
 });
 
 
-it("create a new account", async () => {
-  const tenant = new Tenant({ name: "tenant" });
-  const user = new User({ name: "test", userId: "test", tenant: tenant, email:"test@test.com" });
-  await asyncClientCall(client, "createAccount", { accountName: "a1234", tenantName: "tenant",
-    ownerId: user.userId });
-  const em = server.ext.orm.em.fork();
-  const account = await em.findOneOrFail(Account, { accountName: "a1234" });
-  expect(account.accountName).toBe("a1234");
-});
