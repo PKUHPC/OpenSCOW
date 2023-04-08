@@ -16,6 +16,7 @@ import { NextPage } from "next";
 import { useState } from "react";
 import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
+import { PageTitle } from "src/components/PageTitle";
 import { ClusterFileTable } from "src/pageComponents/filemanager/ClusterFileTable";
 import { Cluster } from "src/utils/config";
 
@@ -69,6 +70,7 @@ export const FileTransferPage: NextPage = requireAuth(() => true)(() => {
 
   return (
     <>
+      <PageTitle titleText={"跨集群文件传输"} />
       <Row justify="space-around" align="middle">
         <Col span={11}>
           <ClusterFileTable

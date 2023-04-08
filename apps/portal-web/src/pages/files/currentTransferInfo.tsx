@@ -12,11 +12,16 @@
 
 import { NextPage } from "next";
 import { requireAuth } from "src/auth/requireAuth";
+import { PageTitle } from "src/components/PageTitle";
 import { TransferInfoTable } from "src/pageComponents/filemanager/TransferInfoTable";
 export const FileTransferPage: NextPage = requireAuth(() => true)(() => {
   return (
-    <TransferInfoTable />
+    <div>
+      <PageTitle titleText={"文件传输进度查看"} />
+      <TransferInfoTable />
+    </div>
   );
+
 });
 
 export default FileTransferPage;
