@@ -23,7 +23,7 @@ otp:
     #OTP码有效时间，需要整数，默认为30
     period: 30
     #绑定otp时发送绑定信息方式
-   authenticationMethod:
+    authenticationMethod:
       mail:
         #发件邮箱地址
         from: "morgan68@ethereal.email"
