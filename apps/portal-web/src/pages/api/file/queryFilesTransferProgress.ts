@@ -18,49 +18,40 @@ import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
 import { handlegRPCError } from "src/utils/server";
 
-export interface StartTransferFilesSchema {
-  method: "POST";
 
-  body: {
-    fromCluster: string;
-    toCluster: string;
-    fromPath: string;
-    toPath: string;
+interface TransferInfo {
+  recvCluster: string, filePath: string, transferSize: string, progress: string, speed: string, leftTime: string
+}
+
+export interface QueryFilesTransferProgressSchema {
+  method: "GET";
+
+  query: {
+    cluster: string;
   }
 
   responses: {
-    204: null;
-    415: {
-      code: "SCOW-SYNC-START_CMD_FAILED";
-      // stderr of the scow-sync command
-      error: string;
-    }
-    400: { code: "INVALID_CLUSTER" };
+    200: { result: TransferInfo[] };
+    400: { code: "INVALID_CLUSTER" }
+    415: { code: "SCOW-SYNC-QUERY_CMD_FAILED" }
   }
 }
 
 const auth = authenticate(() => true);
 
-export default route<StartTransferFilesSchema>("StartTransferFilesSchema", async (req, res) => {
+export default route<QueryFilesTransferProgressSchema>("QueryFilesTransferProgressSchema", async (req, res) => {
 
   const info = await auth(req, res);
 
   if (!info) { return; }
 
-  const { fromCluster, toCluster, fromPath, toPath } = req.body;
+  const { cluster } = req.query;
 
   const client = getClient(FileServiceClient);
-
-  return asyncUnaryCall(client, "startTransferFiles", {
-    userId: info.identityId,
-    fromCluster: fromCluster,
-    toCluster: toCluster,
-    fromPath: fromPath,
-    toPath: toPath,
-  }).then(
-    () => ({ 204: null }),
-    handlegRPCError({
-      [status.INTERNAL]: (e) => ({ 415: { code: "SCOW-SYNC-START_CMD_FAILED" as const, error: e.details } }),
-      [status.NOT_FOUND]: () => ({ 400: { code: "INVALID_CLUSTER" as const } }),
-    }));
+  return asyncUnaryCall(client, "queryFilesTransfer", {
+    cluster, userId: info.identityId,
+  }).then((results) => ({ 200: { result: results.transferInfos } }), handlegRPCError({
+    [status.NOT_FOUND]: () => ({ 400: { code: "INVALID_CLUSTER" as const } }),
+    [status.INTERNAL]: () => ({ 415: { code: "SCOW-SYNC-QUERY_CMD_FAILED" as const } }),
+  }));
 });

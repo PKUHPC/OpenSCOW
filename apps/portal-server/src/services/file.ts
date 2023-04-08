@@ -363,28 +363,11 @@ export const fileServiceServer = plugin((server) => {
       });
     },
 
-    startTransferFiles: async ({ request, logger }) => {
+    startFilesTransfer: async ({ request, logger }) => {
       const { fromCluster, toCluster, userId, fromPath, toPath } = request;
-
-      const fromClusterAddress = getClusterLoginNode(fromCluster);
-      const toClusterAddress = getClusterLoginNode(toCluster);
-      if (!fromClusterAddress) { throw clusterNotFound(fromCluster); }
-      if (!toClusterAddress) { throw clusterNotFound(toCluster); }
 
       const fromTransferNode = getClusterTransferNode(fromCluster);
       const toTransferNode = getClusterTransferNode(toCluster);
-      if (!fromTransferNode) {
-        throw <ServiceError> {
-          code: status.INTERNAL,
-          message: "No transfer node is configured for source cluster",
-        };
-      }
-      if (!toTransferNode) {
-        throw <ServiceError> {
-          code: status.INTERNAL,
-          message: "No transfer node is configured for destination cluster",
-        };
-      }
 
       const [toTransferNodeHost, toTransferNodePort] = toTransferNode.indexOf(":") > 0 ?
         toTransferNode.split(":") : [toTransferNode, "22"];
@@ -417,7 +400,6 @@ export const fileServiceServer = plugin((server) => {
             keyConfiged = false;
         }
       });
-      // console.log("keyConfiged", keyConfiged);
 
       // 如果没有配置免密，则生成密钥并配置免密
       if (!keyConfiged) {
@@ -475,21 +457,13 @@ export const fileServiceServer = plugin((server) => {
       });
     },
 
-    queryTransferFiles: async ({ request, logger }) => {
+    queryFilesTransfer: async ({ request, logger }) => {
 
       const { cluster, userId } = request;
 
-      const clusterAddress = getClusterLoginNode(cluster);
-      if (!clusterAddress) { throw clusterNotFound(cluster); }
-
       const transferNode = getClusterTransferNode(cluster);
-      if (!transferNode) {
-        throw <ServiceError> {
-          code: status.INTERNAL,
-          message: "No transfer node is configured for cluster",
-        };
-      }
-      return await sshConnect(clusterAddress, userId, logger, async (ssh) => {
+
+      return await sshConnect(transferNode, userId, logger, async (ssh) => {
         const cmd = "scow-sync-query";
         const resp = await loggedExec(ssh, logger, true, cmd, []);
 
@@ -518,8 +492,8 @@ export const fileServiceServer = plugin((server) => {
         transferInfosJsons.forEach((info) => {
           let recvCluster = info.recvAddress;
           for (const key in clusters) {
-            const clusterHost = getClusterLoginNode(key)!.indexOf(":") > 0 ?
-              getClusterLoginNode(key)?.split(":")[0] : getClusterLoginNode(key);
+            const clusterHost = getClusterTransferNode(key).indexOf(":") > 0 ?
+              getClusterTransferNode(key).split(":")[0] : getClusterTransferNode(key);
             if (clusterHost === info.recvAddress) {
               recvCluster = key;
             }

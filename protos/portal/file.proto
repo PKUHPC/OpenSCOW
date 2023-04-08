@@ -165,7 +165,7 @@ message ExistsResponse {
   bool exists = 1;
 }
 
-message StartTransferFilesRequest {
+message StartFilesTransferRequest {
   string from_cluster = 1;
   string to_cluster = 2;
   string user_id = 3;
@@ -173,11 +173,11 @@ message StartTransferFilesRequest {
   string to_path = 5;
 }
 
-message StartTransferFilesResponse {
+message StartFilesTransferResponse {
 
 }
 
-message QueryTransferFilesRequest {
+message QueryFilesTransferRequest {
   string cluster = 1;
   string user_id = 2;
 }
@@ -191,7 +191,7 @@ message TransferInfo {
   string left_time = 6;
 }
 
-message QueryTransferFilesResponse {
+message QueryFilesTransferResponse {
   repeated TransferInfo transfer_infos = 1;
 }
 
@@ -215,7 +215,7 @@ service FileService {
 
   rpc Exists(ExistsRequest) returns (ExistsResponse);
 
-  rpc StartTransferFiles(StartTransferFilesRequest) returns (StartTransferFilesResponse);
+  rpc StartFilesTransfer(StartFilesTransferRequest) returns (StartFilesTransferResponse);
 
-  rpc QueryTransferFiles(QueryTransferFilesRequest) returns (QueryTransferFilesResponse);
+  rpc QueryFilesTransfer(QueryFilesTransferRequest) returns (QueryFilesTransferResponse);
 }

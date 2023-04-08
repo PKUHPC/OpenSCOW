@@ -20,3 +20,11 @@ export const clusterNotFound = (cluster: string) => {
 export const jobNotFound = (jobId: number) => {
   return <ServiceError> { code: Status.NOT_FOUND, message: `job id ${jobId} is not found` };
 };
+
+export const loginNodeNotFound = (cluster: string) => {
+  return <ServiceError> { code: Status.NOT_FOUND, message: `login node of cluster ${cluster} is not found` };
+};
+
+export const transferNodeNotFound = (cluster: string) => {
+  return <ServiceError> { code: Status.NOT_FOUND, message: `transfer node of cluster ${cluster} is not found` };
+};

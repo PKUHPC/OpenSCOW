@@ -25,5 +25,5 @@ slurm:
           - high
           - highest
         comment: 说明
-transferCrossCluster:
+crossClusterFilesTransfer:
   transferNode: localhost:22222

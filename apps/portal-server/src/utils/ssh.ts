@@ -12,17 +12,29 @@
 
 import { ServiceError } from "@ddadaal/tsgrpc-common";
 import { status } from "@grpc/grpc-js";
-import { getKeyPair, SftpError, sshConnect as libConnect, SshConnectError, testRootUserSshLogin } from "@scow/lib-ssh";
+import { SftpError, sshConnect as libConnect, SshConnectError, testRootUserSshLogin } from "@scow/lib-ssh";
 import { NodeSSH } from "node-ssh";
 import { clusters } from "src/config/clusters";
 import { rootKeyPair } from "src/config/env";
 import { scowErrorMetadata } from "src/utils/error";
+import { loginNodeNotFound, transferNodeNotFound } from "src/utils/errors";
 import { Logger } from "ts-log";
 
 
-export function getClusterLoginNode(cluster: string): string | undefined {
+export function getClusterLoginNode(cluster: string): string {
+  const loginNode = clusters[cluster]?.slurm?.loginNodes?.[0];
+  if (!loginNode) {
+    throw loginNodeNotFound(cluster);
+  }
+  return loginNode;
+}
 
-  return clusters[cluster]?.slurm?.loginNodes?.[0];
+export function getClusterTransferNode(cluster: string): string {
+  const transferNode = clusters[cluster]?.crossClusterFilesTransfer?.transferNode;
+  if (!transferNode) {
+    throw transferNodeNotFound(cluster);
+  }
+  return transferNode;
 }
 
 export const SSH_ERROR_CODE = "SSH_ERROR";
@@ -69,6 +81,3 @@ export async function checkClustersRootUserLogin(logger: Logger) {
   }));
 }
 
-export function getClusterTransferNode(cluster: string): string | undefined {
-  return (clusters[cluster]?.transferCrossCluster) ? clusters[cluster]?.transferCrossCluster?.transferNode : undefined;
-}
