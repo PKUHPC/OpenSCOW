@@ -66,6 +66,7 @@ mockUsers:
 例：假设您是像Google Authenticator一样将密钥存在用户家目录下的.google_authenticator第一行内容，那么您可以提供的路由接口及服务示例：
 
 ```
+
 import { Static, Type } from "@sinclair/typebox";
 import fastify from "fastify";
 import { NodeSSH } from "node-ssh";
@@ -190,7 +191,7 @@ otp:
   #remote:
     #远程验证url，例如http://localhost:9999/otp/remote/validateCode
     #url: 
-    #当用户点击绑定OTP时，302重定向的链接, 默认为空
-    #redirectUrl: https://pkuhpc.github.io/SCOW/ 
+    #当用户点击绑定OTP时，302重定向的链接, 默认为空，建议配置，不配置会不显示绑定otp按钮
+    #redirectUrl: https://pkuhpc.github.io/SCOW/docs/deploy/config/auth/config 
 
 ```

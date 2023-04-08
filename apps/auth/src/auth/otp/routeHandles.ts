@@ -21,7 +21,7 @@ import { authConfig, LdapConfigSchema } from "src/config/auth";
 import { promisify } from "util";
 
 import { aesDecryptData } from "./aesUtils";
-import { renderLiquidFile, sendEmailAuthLink, storeOtpSessionAndGoSendEmailUI } from "./helper";
+import { getOptSession, renderLiquidFile, sendEmailAuthLink, storeOtpSessionAndGoSendEmailUI } from "./helper";
 
 
 /**
@@ -165,20 +165,19 @@ export function bindClickAuthLinkInEmailRoute(
             { timeLimitMinutes: otpLdap.timeLimitMinutes, tokenNotFound: true, backToLoginUrl: backToLoginUrl });
           return;
         }
-        const redisUserJSON = await f.redis.get(decryptedOtpSessionToken);
-        if (!redisUserJSON) {
+        const otpSession = await getOptSession(decryptedOtpSessionToken, f);
+        if (!otpSession) {
           // 信息过期
           await bindOtpHtml(false, req, res,
             { timeLimitMinutes: otpLdap.timeLimitMinutes, tokenNotFound: true, backToLoginUrl: backToLoginUrl });
           return;
         }
         // 将secret信息存入ldap;
-        const redisUserInfoObject = JSON.parse(redisUserJSON) as Record<string, string>;
         const secret = speakeasy.generateSecret({ length: 20 }).base32;
         await useLdap(logger, ldapConfig)(async (client) => {
-          logger.info("Binding as %s successful.", redisUserInfoObject.dn);
+          logger.info("Binding as %s successful.", otpSession.dn);
           const modify = promisify(client.modify.bind(client));
-          await modify(redisUserInfoObject.dn, new ldapjs.Change({
+          await modify(otpSession.dn, new ldapjs.Change({
             operation: "replace",
             modification: {
               [otpLdap.secretAttributeName]: secret,
@@ -186,7 +185,7 @@ export function bindClickAuthLinkInEmailRoute(
           }),
           );
         });
-        const uid = redisUserInfoObject.dn.match(/uid=([^,]+)/i)?.[1];
+        const uid = otpSession.dn.match(/uid=([^,]+)/i)?.[1];
         const url = speakeasy.otpauthURL({
           secret: secret,
           label: `${uid}@scow`,

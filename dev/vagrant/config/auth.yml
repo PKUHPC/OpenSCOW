@@ -54,11 +54,11 @@ otp:
           #SMTP身份验证授权码
           password: "y2es3bd3rYwxWs5n8g"
   #如果mode指定为remote，需要配置以下认证url
-  remote:
-    #远程验证url
-    url: http://localhost:9999/otp/remote/validateCode
-    #当用户点击绑定OTP时，302重定向的链接, 默认为空
-    redirectUrl: https://pkuhpc.github.io/SCOW/
+  # remote:
+  #   #远程验证url
+  #   url: http://localhost:9999/otp/remote/validateCode
+  #   #当用户点击绑定OTP时，302重定向的链接, 默认为空, 建议配置，不配置会不显示绑定otp按钮
+  #   redirectUrl: https://pkuhpc.github.io/SCOW/docs/deploy/config/auth/config
 
 # 在此部分输入LDAP的配置
 ldap:

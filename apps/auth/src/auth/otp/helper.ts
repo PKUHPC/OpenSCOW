@@ -31,7 +31,7 @@ interface OtpSessionInfo {
   sendEmaililTimestamp?: number,
 }
 
-async function getOptSession(key: string, f: FastifyInstance): Promise<OtpSessionInfo | undefined> {
+export async function getOptSession(key: string, f: FastifyInstance): Promise<OtpSessionInfo | undefined> {
   const redisUserInfoJSON = await f.redis.get(key);
   if (!redisUserInfoJSON) {
     return;
@@ -213,9 +213,9 @@ export async function validateOtpCode(
         otpCode: inputCode,
         userId: userInfo.userId,
       }),
-    }).then(async (res) => {
-
-      return (await JSON.parse(await res.text()).result) as boolean;
+    }).then(async (response) => {
+      const result: {result: boolean} = await response.json();
+      return result.result;
     })
       .catch((e) => {
         logger.error(e, "error when verifying otp code in remote");
