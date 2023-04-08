@@ -40,14 +40,14 @@ const OperationButton: React.FC<ButtonProps> = (props) => {
       icon={icon}
       disabled={disabled}
       onClick={ () => {
-        selectedKeys.forEach(async (key) => {
+        Promise.all(selectedKeys.map(async (key) => {
           await api.startFilesTransfer({ body: {
             fromCluster: srcCluster.id,
             toCluster: dstCluster.id,
             fromPath: String(key),
             toPath: toPath,
           } });
-        });
+        }));
       }}
     />
 
