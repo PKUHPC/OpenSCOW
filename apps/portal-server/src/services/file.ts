@@ -377,28 +377,28 @@ export const fileServiceServer = plugin((server) => {
       let scowDir = "";
       let keyDir = "";
       let privateKeyPath = "";
+
       // 检查fromTransferNode -> toTransferNode是否已经免密
       let keyConfiged = true;
       await sshConnect(fromTransferNode, userId, logger, async (ssh) => {
+        // 获取密钥路径
         const sftp = await ssh.requestSFTP();
-        // 将privateKeyPath传出
         homePath = await sftpRealPath(sftp)(".");
         scowDir = `${homePath}/scow`;
         keyDir = `${scowDir}/.scow-sync-ssh`;
         privateKeyPath = `${keyDir}/id_rsa`;
-        // 检查是否已经配置免密
-        if (!await sftpExists(sftp, scowDir)) {
+
+        const cmd = "scow-sync-start";
+        const args = [
+          "-a", toTransferNodeHost,
+          "-u", userId,
+          "-p", toTransferNodePort.toString(),
+          "-k", privateKeyPath,
+          "-c", // -c,--check参数检查是否免密，并stdout返回true/false
+        ];
+        const resp = await loggedExec(ssh, logger, true, cmd, args);
+        if (resp.stdout !== "true") {
           keyConfiged = false;
-        } else if (!await sftpExists(sftp, keyDir)) {
-          keyConfiged = false;
-        } else if (!await sftpExists(sftp, privateKeyPath)) {
-          keyConfiged = false;
-        } else {
-          // 通过使用ssh连接测试是否免密
-          const cmd = `ssh -p ${toTransferNodePort} -i ${privateKeyPath} ${userId}@${toTransferNodeHost} echo ok`;
-          const resp = await loggedExec(ssh, logger, true, cmd, []);
-          if (resp.stdout !== "ok")
-            keyConfiged = false;
         }
       });
 
