@@ -154,6 +154,11 @@ export const JobInfoTable: React.FC<JobInfoTableProps> = ({
         render={(t) => formatDateTime(t)}
       />
       <Table.Column<JobInfo>
+        dataIndex="endTime"
+        title="结束时间"
+        render={(t) => t === "Unknown" ? "-" : formatDateTime(t)}
+      />
+      <Table.Column<JobInfo>
         dataIndex="elapsed"
         title="运行时间"
       />

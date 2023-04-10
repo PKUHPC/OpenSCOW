@@ -55,6 +55,7 @@ message JobInfo {
   string elapsed = 9;
   string time_limit = 10;
   string submit_time = 11;
+  optional string end_time = 12;
 }
 
 message JobTemplate {
