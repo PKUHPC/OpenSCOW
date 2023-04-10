@@ -10,10 +10,9 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { CloseOutlined,
-  CopyOutlined,
-  DeleteOutlined, FileAddOutlined, FileOutlined, FolderAddOutlined,
-  FolderOutlined, HomeOutlined, LeftOutlined, MacCommandOutlined, RightOutlined,
+import { CopyOutlined,
+  DeleteOutlined, FileAddOutlined, FolderAddOutlined,
+  HomeOutlined, LeftOutlined, MacCommandOutlined, RightOutlined,
   ScissorOutlined, SnippetsOutlined, UploadOutlined, UpOutlined } from "@ant-design/icons";
 import { compareDateTime, formatDateTime } from "@scow/lib-web/build/utils/datetime";
 import { compareNumber } from "@scow/lib-web/build/utils/math";
@@ -23,7 +22,6 @@ import Router from "next/router";
 import { join } from "path";
 import React, { useEffect, useRef, useState } from "react";
 import { api } from "src/apis/api";
-import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { ModalButton, ModalLink } from "src/components/ModalLink";
 import { TitleText } from "src/components/PageTitle";
 import { TableTitle } from "src/components/TableTitle";
@@ -33,8 +31,9 @@ import { MkdirModal } from "src/pageComponents/filemanager/MkdirModal";
 import { PathBar } from "src/pageComponents/filemanager/PathBar";
 import { RenameModal } from "src/pageComponents/filemanager/RenameModal";
 import { UploadModal } from "src/pageComponents/filemanager/UploadModal";
-import { FileInfo, FileType } from "src/pages/api/file/list";
+import { FileInfo } from "src/pages/api/file/list";
 import { Cluster, publicConfig } from "src/utils/config";
+import { FileInfoKey, fileInfoKey, fileTypeIcons, nodeModeToString, openPreviewLink, TopBar } from "src/utils/file";
 import styled from "styled-components";
 
 interface Props {
@@ -43,42 +42,11 @@ interface Props {
   urlPrefix: string;
 }
 
-const fileTypeIcons = {
-  "FILE": FileOutlined,
-  "DIR": FolderOutlined,
-  "ERROR": CloseOutlined,
-} as Record<FileType, React.ComponentType>;
-
-const TopBar = styled(FilterFormContainer)`
-  display: flex;
-  flex-direction: row;
-  padding-bottom: 8px;
-
-  &>button {
-    margin: 0px 4px;
-  }
-`;
-
 const OperationBar = styled(TableTitle)`
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 4px;
 `;
-
-const nodeModeToString = (mode: number) => {
-  const numberPermission = (mode & parseInt("777", 8)).toString(8);
-
-  const toStr = (char: string) => {
-    const num = +char;
-    return ((num & 4) !== 0 ? "r" : "-") + ((num & 2) !== 0 ? "w" : "-") + ((num & 1) !== 0 ? "x" : "-");
-  };
-
-  return [0, 1, 2].reduce((prev, curr) => prev + toStr(numberPermission[curr]), "");
-};
-
-type FileInfoKey = React.Key;
-
-const fileInfoKey = (f: FileInfo, path: string): FileInfoKey => join(path, f.name);
 
 interface Operation {
   op: "copy" | "move";
@@ -144,9 +112,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
     if (path === "~") {
       return;
     }
-
     setSelectedKeys([]);
-
     reload()
       .then(() => { prevPathRef.current = path; })
       .catch(() => {
@@ -516,8 +482,3 @@ const RenameLink = ModalLink(RenameModal);
 const CreateFileButton = ModalButton(CreateFileModal, { icon: <FileAddOutlined /> });
 const MkdirButton = ModalButton(MkdirModal, { icon: <FolderAddOutlined /> });
 const UploadButton = ModalButton(UploadModal, { icon: <UploadOutlined /> });
-
-
-function openPreviewLink(href: string) {
-  window.open(href, "ViewFile", "location=yes,resizable=yes,scrollbars=yes,status=yes");
-}

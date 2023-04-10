@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { CloseOutlined, FileOutlined, FolderOutlined, HomeOutlined, UpOutlined } from "@ant-design/icons";
+import { HomeOutlined, UpOutlined } from "@ant-design/icons";
 import { compareDateTime, formatDateTime } from "@scow/lib-web/build/utils/datetime";
 import { compareNumber } from "@scow/lib-web/build/utils/math";
 import { Button, Table } from "antd";
@@ -18,15 +18,12 @@ import { join } from "path";
 import React, { useEffect, useState } from "react";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
-import { FilterFormContainer } from "src/components/FilterFormContainer";
-import { FileInfo, FileType } from "src/pages/api/file/list";
+import { FileInfo } from "src/pages/api/file/list";
 import { Cluster } from "src/utils/config";
-import styled from "styled-components";
+import { FileInfoKey, fileInfoKey, fileTypeIcons, nodeModeToString, openPreviewLink, TopBar } from "src/utils/file";
 
 import { urlToDownload } from "./api";
 import { PathBar } from "./PathBar";
-
-type FileInfoKey = React.Key;
 
 interface Props {
   selectedCluster: Cluster;
@@ -36,29 +33,6 @@ interface Props {
   selectedKeys: FileInfoKey[];
   setSelectedKeys: (keys: FileInfoKey[]) => void;
 }
-
-
-const TopBar = styled(FilterFormContainer)`
-  display: flex;
-  flex-direction: row;
-  padding-bottom: 8px;
-
-  &>button {
-    margin: 0px 4px;
-  }
-`;
-
-const fileInfoKey = (f: FileInfo, path: string): FileInfoKey => join(path, f.name);
-
-function openPreviewLink(href: string) {
-  window.open(href, "ViewFile", "location=yes,resizable=yes,scrollbars=yes,status=yes");
-}
-
-const fileTypeIcons = {
-  "FILE": FileOutlined,
-  "DIR": FolderOutlined,
-  "ERROR": CloseOutlined,
-} as Record<FileType, React.ComponentType>;
 
 export const ClusterFileTable: React.FC<Props> = ({
   selectedCluster, setSelectedCluster, path, setPath, selectedKeys, setSelectedKeys,
@@ -95,17 +69,6 @@ export const ClusterFileTable: React.FC<Props> = ({
       .then((d) => {
         setPath(d.path);
       });
-  };
-
-  const nodeModeToString = (mode: number) => {
-    const numberPermission = (mode & parseInt("777", 8)).toString(8);
-
-    const toStr = (char: string) => {
-      const num = +char;
-      return ((num & 4) !== 0 ? "r" : "-") + ((num & 2) !== 0 ? "w" : "-") + ((num & 1) !== 0 ? "x" : "-");
-    };
-
-    return [0, 1, 2].reduce((prev, curr) => prev + toStr(numberPermission[curr]), "");
   };
 
   return (
@@ -178,7 +141,6 @@ export const ClusterFileTable: React.FC<Props> = ({
             r.type === "DIR" ? (
               <a onClick={() => {
                 setPath(join(path!, r.name));
-                // reload();
               }}
               >
                 {r.name}
@@ -197,7 +159,7 @@ export const ClusterFileTable: React.FC<Props> = ({
 
         <Table.Column<FileInfo>
           dataIndex="mtime"
-          title="修改时间"
+          title="修改日期"
           render={(mtime: string | undefined) => mtime ? formatDateTime(mtime) : ""}
           sorter={(a, b) => compareDateTime(a.mtime, b.mtime)}
         />
