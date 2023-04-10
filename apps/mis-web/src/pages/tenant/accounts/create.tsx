@@ -26,7 +26,7 @@ interface FormProps {
   ownerId: string;
   ownerName: string;
   accountName: string;
-  comment: string;
+  comment?: string;
 }
 
 
@@ -90,7 +90,7 @@ const CreateAccountForm: React.FC = () => {
       >
         <Input />
       </Form.Item>
-      <Form.Item<FormProps> name="comment" label="备注" required>
+      <Form.Item<FormProps> name="comment" label="备注">
         <Input.TextArea />
       </Form.Item>
       <Form.Item wrapperCol={{ span: 6, offset: 4 }}>
