@@ -49,7 +49,9 @@ message ImportUsersData {
   message AccountInfo {
     string account_name = 1;
     repeated UserInAccount users = 2;
-    string owner = 3;
+    // owner is undefined while account has existed
+    optional string owner = 3;
+    bool blocked = 4;
   }
 
   repeated AccountInfo accounts = 1;
@@ -74,10 +76,16 @@ message UserInAccount {
 }
 
 message ClusterAccountInfo {
+  enum ImportStatus {
+    EXISTING = 0;
+    NOT_EXISTING = 1;
+    HAS_NEW_USERS = 2;
+  }
   string account_name = 1;
   repeated UserInAccount users = 2;
   optional string owner = 3;
-  bool included = 4;
+  ImportStatus import_status = 4;
+  bool blocked = 5;
 }
 
 message GetClusterUsersRequest {

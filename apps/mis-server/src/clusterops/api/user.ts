@@ -48,16 +48,9 @@ export interface AddUserToAccountReply {
   code: "OK" | "ALREADY_EXISTS"
 }
 
-export interface GetAllUsersInAccountsRequest {}
-
-export interface GetAllUsersInAccountsReply {
-  result: string;
-}
-
 export interface UserOps {
   addUserToAccount(req: Request<AddUserToAccountRequest>): Promise<AddUserToAccountReply>;
   removeUser(req: Request<RemoveUserRequest>): Promise<RemoveUserReply>;
   blockUserInAccount(req: Request<BlockUserInAccountRequest>): Promise<BlockUserInAccountReply>;
   unblockUserInAccount(req: Request<UnblockUserInAccountRequest>): Promise<UnblockUserInAccountReply>;
-  getAllUsersInAccounts(req: Request<GetAllUsersInAccountsRequest>): Promise<GetAllUsersInAccountsReply>;
 }

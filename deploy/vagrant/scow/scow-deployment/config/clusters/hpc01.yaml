@@ -17,7 +17,7 @@ slurm:
       mem: 2048
       # 核心数
       cores: 2
-      # GPU数
+      # GPU卡数
       gpus: 0
       # QOS
       qos:

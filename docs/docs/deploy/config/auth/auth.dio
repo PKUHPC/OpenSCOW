@@ -1,0 +1,121 @@
+<mxfile host="65bd71144e" scale="2" border="0">
+    <diagram id="8dIte24XG44FDQEg_GWE" name="Page-1">
+        <mxGraphModel dx="891" dy="629" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="3" value="portal/mis-web" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;" diagramCategory="uml" diagramName="Lifeline" vertex="1" parent="1">
+                    <mxGeometry x="90" y="50" width="100" height="450" as="geometry"/>
+                </mxCell>
+                <mxCell id="41" value="" style="html=1;points=[];perimeter=orthogonalPerimeter;" vertex="1" parent="3">
+                    <mxGeometry x="45" y="260" width="10" height="170" as="geometry"/>
+                </mxCell>
+                <mxCell id="4" value="LDAP/IAAA等" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;" diagramCategory="uml" diagramName="Lifeline" vertex="1" parent="1">
+                    <mxGeometry x="400" y="50" width="90" height="450" as="geometry"/>
+                </mxCell>
+                <mxCell id="38" value="" style="html=1;points=[];perimeter=orthogonalPerimeter;" vertex="1" parent="4">
+                    <mxGeometry x="45" y="90" width="10" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="7" value="auth" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;" diagramCategory="uml" diagramName="Lifeline" vertex="1" parent="1">
+                    <mxGeometry x="200" y="50" width="80" height="450" as="geometry"/>
+                </mxCell>
+                <mxCell id="22" value="" style="html=1;points=[];perimeter=orthogonalPerimeter;" vertex="1" parent="7">
+                    <mxGeometry x="35" y="300" width="10" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="30" value="" style="html=1;points=[];perimeter=orthogonalPerimeter;" vertex="1" parent="7">
+                    <mxGeometry x="35" y="70" width="10" height="160" as="geometry"/>
+                </mxCell>
+                <mxCell id="26" value="根据token查询用户信息" style="html=1;verticalAlign=bottom;endArrow=block;entryX=0.045;entryY=0.063;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" target="25" parent="7">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="52.59034482758602" y="310" as="sourcePoint"/>
+                        <mxPoint x="192.77999999999997" y="310" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="12" value="redis" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;" diagramCategory="uml" diagramName="Lifeline" vertex="1" parent="1">
+                    <mxGeometry x="300" y="50" width="90" height="460" as="geometry"/>
+                </mxCell>
+                <mxCell id="25" value="" style="html=1;points=[];perimeter=orthogonalPerimeter;" vertex="1" parent="12">
+                    <mxGeometry x="42.59" y="310" width="10" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="34" value="" style="html=1;points=[];perimeter=orthogonalPerimeter;" vertex="1" parent="12">
+                    <mxGeometry x="44" y="160" width="10" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="23" value="根据token查询用户信息" style="html=1;verticalAlign=bottom;endArrow=block;entryX=0;entryY=0;" edge="1" target="22" parent="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="140" y="350" as="sourcePoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="24" value="用户信息" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;endSize=8;exitX=0;exitY=0.95;" edge="1" source="22" parent="1" target="41">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="137.40034482758628" y="426" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="27" value="用户信息" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;endSize=8;entryX=0.964;entryY=0.841;entryDx=0;entryDy=0;entryPerimeter=0;exitX=0.451;exitY=0.991;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" source="25" parent="1" target="22">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="362.59" y="436" as="targetPoint"/>
+                        <mxPoint x="417.59" y="408" as="sourcePoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="29" value="用户浏览器" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;" diagramCategory="uml" diagramName="Lifeline" vertex="1" parent="1">
+                    <mxGeometry y="50" width="80" height="450" as="geometry"/>
+                </mxCell>
+                <mxCell id="31" value="发起登录" style="html=1;verticalAlign=bottom;endArrow=block;entryX=0;entryY=0;" edge="1" target="30" parent="1" source="29">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="225" y="120" as="sourcePoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="32" value="登录完成，在cookie中设置token" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;endSize=8;exitX=0;exitY=0.95;" edge="1" source="30" parent="1" target="29">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="205" y="196" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="35" value="保存用户信息" style="html=1;verticalAlign=bottom;endArrow=block;entryX=0;entryY=0;" edge="1" target="34" parent="1" source="7">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="345" y="120" as="sourcePoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="36" value="token" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;endSize=8;exitX=0;exitY=0.95;" edge="1" source="34" parent="1" target="7">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="345" y="196" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="37" value="portal/mis-server" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;" diagramCategory="uml" diagramName="Lifeline" vertex="1" parent="1">
+                    <mxGeometry x="500" y="50" width="100" height="470" as="geometry"/>
+                </mxCell>
+                <mxCell id="44" value="" style="html=1;points=[];perimeter=orthogonalPerimeter;" vertex="1" parent="37">
+                    <mxGeometry x="45" y="380" width="10" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="39" value="获取登录信息" style="html=1;verticalAlign=bottom;endArrow=block;entryX=0;entryY=0;" edge="1" target="38" parent="1" source="7">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="475" y="140" as="sourcePoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="42" value="进行操作" style="html=1;verticalAlign=bottom;endArrow=block;entryX=0;entryY=0;" edge="1" target="41" parent="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="40" y="310" as="sourcePoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="43" value="操作结果" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;endSize=8;exitX=0;exitY=0.95;" edge="1" source="41" parent="1" target="29">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="19.81034482758605" y="452.4999999999998" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="46" value="操作结果" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;endSize=8;exitX=0;exitY=0.95;" edge="1" source="44" parent="1" target="41">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="139.81034482758605" y="448" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="45" value="进行实际操作，带上用户信息" style="html=1;verticalAlign=bottom;endArrow=block;entryX=0;entryY=0;" edge="1" target="44" parent="1" source="41">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="139.81034482758605" y="410" as="sourcePoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="40" value="用户信息" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;endSize=8;exitX=0;exitY=0.95;" edge="1" source="38" parent="1" target="30">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="230" y="180" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>
