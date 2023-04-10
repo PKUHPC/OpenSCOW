@@ -17,7 +17,8 @@ import type { Account } from "@scow/protos/build/server/account";
 import { JobInfo } from "@scow/protos/build/server/job";
 import type { AccountUserInfo, GetUserStatusResponse } from "@scow/protos/build/server/user";
 import { api } from "src/apis/api";
-import { PlatformRole, TenantRole, UserInfo, UserRole, UserStatus } from "src/models/User";
+import { ClusterAccountInfo_ImportStatus, PlatformRole,
+  TenantRole, UserInfo, UserRole, UserStatus } from "src/models/User";
 import { DEFAULT_TENANT_NAME } from "src/utils/constants";
 
 export type MockApi<TApi extends Record<
@@ -242,7 +243,8 @@ export const mockApi: MockApi<typeof api> = {
             { userId: "user2", userName: "user2", state: "allowed!" },
           ],
           owner: "user1",
-          included: false,
+          importStatus: ClusterAccountInfo_ImportStatus.NOT_EXISTING,
+          blocked: false,
         },
         {
           accountName: "account2",
@@ -250,13 +252,14 @@ export const mockApi: MockApi<typeof api> = {
             { userId: "user2", userName: "user2", state: "allowed!" },
             { userId: "user3", userName: "user3", state: "allowed!" },
           ],
-          included: false,
+          importStatus: ClusterAccountInfo_ImportStatus.HAS_NEW_USERS,
+          blocked: false,
         },
         {
           accountName: "a_user4",
           users: [{ userId: "user4", userName: "user4", state: "allowed!" }],
-          owner: "该账户已导入",
-          included: true,
+          importStatus: ClusterAccountInfo_ImportStatus.EXISTING,
+          blocked: false,
         },
       ],
     });

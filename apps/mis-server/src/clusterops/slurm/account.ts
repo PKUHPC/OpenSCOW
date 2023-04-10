@@ -12,7 +12,8 @@
 
 import { AccountOps } from "src/clusterops/api/account";
 import { SlurmClusterInfo } from "src/clusterops/slurm";
-import { handleSimpleResponse } from "src/clusterops/slurm/utils/slurm";
+import { parseBlockStatus, parseClusterAccounts } from "src/clusterops/slurm/utils/parse";
+import { handleSimpleResponse, throwIfNotReturn0 } from "src/clusterops/slurm/utils/slurm";
 
 export const slurmAccountOps = ({ executeSlurmScript }: SlurmClusterInfo): AccountOps => {
 
@@ -47,5 +48,24 @@ export const slurmAccountOps = ({ executeSlurmScript }: SlurmClusterInfo): Accou
 
       return handleSimpleResponse(result, { 9: "ALREADY_UNBLOCKED", 7: "NOT_FOUND" });
     },
+
+    getAllAccountsWithUsers: async ({ logger }) => {
+      const result = await executeSlurmScript(["-l", "all"], logger);
+
+      throwIfNotReturn0(result);
+
+      const accounts = parseClusterAccounts(result.stdout);
+
+      const blockStatusReply = await executeSlurmScript(["-m", accounts.map((x) => x.accountName).join(",")], logger);
+      const accountsBlockStatus = parseBlockStatus(blockStatusReply.stdout);
+
+      for (const account of accounts) {
+        const status = accountsBlockStatus[account.accountName];
+        account.blocked = status === undefined ? true : status;
+      }
+
+      return { accounts };
+    },
+
   };
 };
