@@ -82,7 +82,7 @@ afterEach(async () => {
 
 
 it.skip("query the transfer information of scow-sync", async () => {
-  const result = await asyncUnaryCall(client, "queryTransferFiles", {
+  const result = await asyncUnaryCall(client, "queryFilesTransfer", {
     cluster, userId,
   });
 
