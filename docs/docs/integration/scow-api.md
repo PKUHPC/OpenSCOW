@@ -1,9 +1,9 @@
 ---
 sidebar_position: 2
-title: SCOW gRPC API
+title: SCOW API
 ---
 
-# SCOW gRPC API
+# SCOW API
 
 SCOW系统总体来说分为前端和后端部分（[架构](./deploy/../../deploy/architecture/index.md)），SCOW的前端和后端部分使用gRPC进行通信。
 

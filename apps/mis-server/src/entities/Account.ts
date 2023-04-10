@@ -53,7 +53,7 @@ export class Account {
     whitelist?: EntityOrRef<AccountWhitelist>;
     tenant: EntityOrRef<Tenant>;
     blocked: boolean;
-    comment: string;
+    comment?: string;
   }) {
     this.accountName = init.accountName;
     this.blocked = init.blocked;
@@ -61,7 +61,7 @@ export class Account {
     if (init.whitelist) {
       this.whitelist = toRef(init.whitelist);
     }
-    this.comment = init.comment;
+    this.comment = init.comment || "";
   }
 
 

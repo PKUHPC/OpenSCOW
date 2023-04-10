@@ -13,12 +13,13 @@
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
-import { AdminServiceServer, AdminServiceService } from "@scow/protos/build/server/admin";
+import { AdminServiceServer, AdminServiceService,
+  ClusterAccountInfo_ImportStatus } from "@scow/protos/build/server/admin";
 import { updateBlockStatusInSlurm } from "src/bl/block";
 import { importUsers, ImportUsersData } from "src/bl/importUsers";
 import { Account } from "src/entities/Account";
 import { StorageQuota } from "src/entities/StorageQuota";
-import { parseClusterUsers } from "src/utils/slurm";
+import { UserAccount, UserRole } from "src/entities/UserAccount";
 
 export const adminServiceServer = plugin((server) => {
 
@@ -87,14 +88,7 @@ export const adminServiceServer = plugin((server) => {
         };
       }
 
-      const accountWithoutOwner = data.accounts.find((x) => x.owner === undefined);
-      if (accountWithoutOwner) {
-        throw <ServiceError> {
-          code: Status.INVALID_ARGUMENT, message: `Account ${accountWithoutOwner.accountName} doesn't have owner`,
-        };
-      }
-
-      const ownerNotInAccount = data.accounts.find((x) => !x.users.find((user) => user.userId === x.owner));
+      const ownerNotInAccount = data.accounts.find((x) => x.owner && !x.users.find((user) => user.userId === x.owner));
       if (ownerNotInAccount) {
         throw <ServiceError> {
           code: Status.INVALID_ARGUMENT,
@@ -111,25 +105,57 @@ export const adminServiceServer = plugin((server) => {
     getClusterUsers: async ({ request, em, logger }) => {
       const { cluster } = request;
 
-      const reply = await server.ext.clusters.callOnOne(
+      const result = await server.ext.clusters.callOnOne(
         cluster,
         logger,
-        async (ops) => ops.user.getAllUsersInAccounts({
+        async (ops) => ops.account.getAllAccountsWithUsers({
           request: {}, logger,
         }),
       );
 
-      const result = parseClusterUsers(reply.result);
-
       const includedAccounts = await em.find(Account, {
         accountName: { $in: result.accounts.map((x) => x.accountName) },
-      });
-      includedAccounts.forEach((account) => {
-        const a = result.accounts.find((x) => x.accountName === account.accountName)!;
-        a.included = true;
+      }, { populate: ["users", "users.user"]});
+
+      const includedUserAccounts = await em.find(UserAccount, {
+        account: { accountName: result.accounts.map((x) => x.accountName) },
+      }, { populate: ["account", "user"]});
+
+      result.accounts.forEach((account) => {
+        const includedAccount = includedAccounts.find((x) => x.accountName === account.accountName);
+        if (!includedAccount) {
+          // account not existed in scow
+          account.importStatus = ClusterAccountInfo_ImportStatus.NOT_EXISTING;
+        } else {
+
+          if (
+            !account.users.every((user) =>
+              includedUserAccounts
+                .filter((x) => x.account.$.accountName === account.accountName)
+                .map((x) => x.user.$.userId)
+                .includes(user.userId),
+            )
+          ) {
+            // some users in account not existed in scow
+            account.importStatus = ClusterAccountInfo_ImportStatus.HAS_NEW_USERS;
+          } else {
+            // both users and account exist in scow
+            account.importStatus = ClusterAccountInfo_ImportStatus.EXISTING;
+          }
+
+          account.owner = includedUserAccounts
+            .find((x) => x.account.$.accountName === account.accountName && x.role === UserRole.OWNER)!.user.$.userId;
+        }
       });
 
-      result.accounts.sort((a, b) => a.included === b.included ? 0 : (a.included === false ? -1 : 1));
+      const order = {
+        [ClusterAccountInfo_ImportStatus.NOT_EXISTING]: 0,
+        [ClusterAccountInfo_ImportStatus.HAS_NEW_USERS]: 1,
+        [ClusterAccountInfo_ImportStatus.EXISTING]: 2,
+      };
+      result.accounts.sort((a, b) => {
+        return order[a.importStatus] - order[b.importStatus];
+      });
       return [result];
     },
 

@@ -23,12 +23,16 @@ export interface SubmitJobInfo {
   partition: string | undefined;
   nodeCount: number;
   coreCount: number;
+  gpuCount?: number;
   command: string;
   jobName: string;
   qos: string | undefined;
   maxTime: number;
   account: string;
   workingDirectory: string;
+  output: string;
+  errorOutput: string;
+  memory?: string;
   comment?: string;
   save: boolean;
 }
@@ -65,8 +69,8 @@ export default route<SubmitJobSchema>("SubmitJobSchema", async (req, res) => {
 
   if (!info) { return; }
 
-  const { cluster, command, jobName, coreCount, maxTime, save,
-    nodeCount, partition, qos, account, comment, workingDirectory } = req.body;
+  const { cluster, command, jobName, coreCount, gpuCount, maxTime, save,
+    nodeCount, partition, qos, account, comment, workingDirectory, output, errorOutput, memory } = req.body;
 
   const client = getClient(JobServiceClient);
 
@@ -74,14 +78,18 @@ export default route<SubmitJobSchema>("SubmitJobSchema", async (req, res) => {
     cluster, userId: info.identityId,
     jobName,
     coreCount,
+    gpuCount,
     maxTime,
     nodeCount,
     partition,
     qos,
     account,
     command,
+    memory,
     comment,
     workingDirectory,
+    output,
+    errorOutput,
     saveAsTemplate: save,
   })
     .then(({ jobId }) => ({ 201: { jobId } } as const))

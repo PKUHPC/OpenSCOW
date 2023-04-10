@@ -49,11 +49,13 @@ const data = {
       accountName: "a_user1",
       users: [{ userId: "user1", userName: "user1Name", state: "allowed!" }, { userId: "user2", userName: "user2", state: "blocked!" }],
       owner: "user1",
+      blocked: false,
     },
     {
       accountName: "account2",
       users: [{ userId: "user2", userName: "user2", state: "allowed!" }, { userId: "user3", userName: "user3", state: "blocked!" }],
       owner: "user2",
+      blocked: false,
     },
   ],
 };
@@ -103,4 +105,38 @@ it("import users and accounts if in different tenant", async () => {
     { console.log(e);
       expect(e.code).toBe(Status.INVALID_ARGUMENT); });
 
+});
+
+it("import users and accounts if an account exists", async () => {
+  const em = orm.em.fork();
+
+  // a_user1 and user1 exist
+  const tenant = await em.findOneOrFail(Tenant, { name: "default" });
+  const user = new User({ name: "user1Name", userId: "user1", email: "", tenant });
+  const account = new Account({ accountName: "a_user1", comment: "", blocked: false, tenant });
+  await em.persistAndFlush([user, account]);
+
+  await asyncClientCall(client, "importUsers", { data: data, whitelist: true });
+
+  const accounts = await em.find(Account, {});
+  expect(accounts.map((x) => x.accountName)).toIncludeSameMembers(data.accounts.map((x) => x.accountName));
+
+  const ua = await em.find(UserAccount, { }, {
+    populate: ["account", "user"],
+  });
+  expect(ua.map((x) => ({ accountName: x.account.$.accountName, userId: x.user.$.userId, role: x.role, blocked: x.status === UserStatus.BLOCKED })))
+    .toIncludeSameMembers([
+      { accountName: "a_user1", userId: "user1", role: UserRole.OWNER, blocked: false },
+      { accountName: "a_user1", userId: "user2", role: UserRole.USER, blocked: true },
+      { accountName: "account2", userId: "user2", role: UserRole.OWNER, blocked: false },
+      { accountName: "account2", userId: "user3", role: UserRole.USER, blocked: true },
+    ]);
+
+  const users = await em.find(User, { });
+  expect(users.map((x) => ({ userId: x.userId, name: x.name })))
+    .toIncludeSameMembers([
+      { userId: "user1", name: "user1Name" },
+      { userId: "user2", name: "user2" },
+      { userId: "user3", name: "user3" },
+    ]);
 });
