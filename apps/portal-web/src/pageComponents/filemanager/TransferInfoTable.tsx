@@ -11,9 +11,11 @@
  */
 
 import { Progress, Table } from "antd";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect } from "react";
+import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { publicConfig } from "src/utils/config";
+
 interface TransferInfo {
   recvCluster: string;
   filePath: string;
@@ -22,35 +24,36 @@ interface TransferInfo {
   speed: string;
   leftTime: string;
 }
+
 interface TransferData {
   cluster: string;
   files: TransferInfo[];
 }
+
 export const TransferInfoTable: React.FC = () => {
-  const [transferData, setTransferData] = useState<TransferData[]>([]);
-  const fetchTransferData = async () => {
-    const newTransferData: TransferData[] = [];
-    for (const cluster of publicConfig.CLUSTERS) {
-      try {
+  const { data: transferData, isLoading, reload } = useAsync({
+    promiseFn: useCallback(async () => {
+      const newTransferData: TransferData[] = [];
+      for (const cluster of publicConfig.CLUSTERS) {
         // 在测试开发环境中需要将hpc02排除在外，因为hpc02并没有容器化
-        // if (cluster.id === "hpc02") continue;
+        if (cluster.id === "hpc02") continue;
         const response = await api.queryFilesTransferProgress({ query: { cluster: cluster.id } });
         newTransferData.push({
           cluster: cluster.id,
           files: response.result,
         });
-      } catch (error) {
-        console.log(error);
       }
-    }
-    setTransferData(newTransferData);
-  };
+      return newTransferData;
+    }, []),
+  });
+
   useEffect(() => {
     const interval = setInterval(() => {
-      fetchTransferData();
+      reload();
     }, 1000);
     return () => clearInterval(interval);
-  }, []);
+  }, [reload]);
+
   const columns = [
     {
       title: "发送集群",
@@ -84,7 +87,10 @@ export const TransferInfoTable: React.FC = () => {
     },
   ];
 
-  const getDataSource = (datas: TransferData[]) => {
+  const getDataSource = (datas: TransferData[] | undefined) => {
+    if (!datas) {
+      return [];
+    }
     return datas.flatMap((data) =>
       data.files.map((file) => ({ ...file, cluster: data.cluster })),
     );

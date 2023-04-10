@@ -29,12 +29,13 @@ export function getClusterLoginNode(cluster: string): string {
   return loginNode;
 }
 
-export function getClusterTransferNode(cluster: string): string {
-  const transferNode = clusters[cluster]?.crossClusterFilesTransfer?.transferNode;
-  if (!transferNode) {
-    throw transferNodeNotFound(cluster);
+export function getClusterTransferNode(cluster: string): string | undefined {
+  if (clusters[cluster]?.crossClusterFilesTransfer && clusters[cluster]?.crossClusterFilesTransfer?.transferNode) {
+    return clusters[cluster]?.crossClusterFilesTransfer?.transferNode;
   }
-  return transferNode;
+  else {
+    return undefined;
+  }
 }
 
 export const SSH_ERROR_CODE = "SSH_ERROR";

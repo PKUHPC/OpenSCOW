@@ -368,6 +368,7 @@ export const fileServiceServer = plugin((server) => {
 
       const fromTransferNode = getClusterTransferNode(fromCluster);
       const toTransferNode = getClusterTransferNode(toCluster);
+      if (!fromTransferNode || !toTransferNode) return [{}];
 
       const [toTransferNodeHost, toTransferNodePort] = toTransferNode.indexOf(":") > 0 ?
         toTransferNode.split(":") : [toTransferNode, "22"];
@@ -443,7 +444,7 @@ export const fileServiceServer = plugin((server) => {
           "-p", toTransferNodePort.toString(),
           "-k", privateKeyPath,
         ];
-        console.log("cmd", cmd, args);
+        // console.log("cmd", cmd, args);
         const resp = await loggedExec(ssh, logger, true, cmd, args);
 
         if (resp.code !== 0) {
@@ -462,6 +463,7 @@ export const fileServiceServer = plugin((server) => {
       const { cluster, userId } = request;
 
       const transferNode = getClusterTransferNode(cluster);
+      if (!transferNode) return [{ transferInfos:[]}];
 
       return await sshConnect(transferNode, userId, logger, async (ssh) => {
         const cmd = "scow-sync-query";
@@ -492,11 +494,18 @@ export const fileServiceServer = plugin((server) => {
         transferInfosJsons.forEach((info) => {
           let recvCluster = info.recvAddress;
           for (const key in clusters) {
-            const clusterHost = getClusterTransferNode(key).indexOf(":") > 0 ?
-              getClusterTransferNode(key).split(":")[0] : getClusterTransferNode(key);
-            if (clusterHost === info.recvAddress) {
-              recvCluster = key;
+            const transferNode = getClusterTransferNode(key);
+            if (transferNode) {
+              const clusterHost = transferNode.indexOf(":") > 0 ?
+                transferNode.split(":")[0] : getClusterTransferNode(key);
+              if (clusterHost === info.recvAddress) {
+                recvCluster = key;
+              }
             }
+            else {
+              continue;
+            }
+
           }
           transferInfos.push({
             recvCluster: recvCluster,
