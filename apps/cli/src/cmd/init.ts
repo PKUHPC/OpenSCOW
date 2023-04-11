@@ -17,7 +17,6 @@ import { debug, log } from "src/log";
 
 
 interface Options {
-  configPath: string;
   outputPath: string;
 }
 
