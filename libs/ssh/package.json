@@ -14,12 +14,12 @@
     "!**/*.map"
   ],
   "dependencies": {
-    "node-ssh": "13.0.1",
-    "shell-quote": "1.8.0"
+    "node-ssh": "13.1.0",
+    "shell-quote": "1.8.1"
   },
   "devDependencies": {
     "@types/shell-quote": "1.7.1",
-    "@types/ssh2": "1.11.8",
+    "@types/ssh2": "1.11.10",
     "ts-log": "2.2.5"
   },
   "author": "PKUHPC (https://github.com/PKUHPC)",
