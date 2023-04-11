@@ -268,7 +268,7 @@ const EditPriceModal: React.FC<CommonModalProps & {
           />
         </Form.Item>
         <Form.Item label="价格（元）" name="price" initialValue={0} rules={[{ required: true }]}>
-          <InputNumber precision={3} min={0} defaultValue={0} />
+          <InputNumber precision={3} min={0} />
         </Form.Item>
         <Form.Item label="备注" name="description">
           <Input />
