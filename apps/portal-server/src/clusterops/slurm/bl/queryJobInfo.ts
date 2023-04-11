@@ -87,7 +87,7 @@ export async function querySacct(ssh: NodeSSH, userId: string, logger: Logger, s
     [
       "-X",
       "--noheader",
-      "--format", "JobID,JobName,Account,Partition,QOS,State,WorkDir,Reason,Elapsed,TimeLimit,Submit,End",
+      "--format", "JobID,JobName,Account,Partition,QOS,State,WorkDir,Reason,Elapsed,TimeLimit,Submit,Start,End",
       ...startTime ? ["--starttime", formatTime(startTime, tz)] : [],
       ...endTime ? ["--endtime", formatTime(endTime, tz)] : [],
       "--parsable2",
@@ -101,12 +101,12 @@ export async function querySacct(ssh: NodeSSH, userId: string, logger: Logger, s
   const jobs = result.stdout.split("\n").map((x) => {
     const [
       jobId, name, account, partition, qos, state,
-      workingDirectory, reason, elapsed, timeLimit, submitTime, endTime,
+      workingDirectory, reason, elapsed, timeLimit, submitTime, startTime, endTime,
     ] = x.split("|");
 
     return {
       jobId: +jobId, name, account, partition, qos, state,
-      workingDirectory, reason, elapsed, timeLimit, submitTime, endTime,
+      workingDirectory, reason, elapsed, timeLimit, submitTime, startTime, endTime,
     } as JobInfo;
   });
 

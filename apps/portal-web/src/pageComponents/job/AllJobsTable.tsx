@@ -10,10 +10,11 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { QuestionCircleOutlined } from "@ant-design/icons";
 import { defaultPresets, formatDateTime } from "@scow/lib-web/build/utils/datetime";
 import { compareNumber } from "@scow/lib-web/build/utils/math";
 import { JobInfo } from "@scow/protos/build/portal/job";
-import { Button, DatePicker, Form, InputNumber, Space, Table } from "antd";
+import { Button, DatePicker, Form, InputNumber, Popover, Space, Table } from "antd";
 import dayjs from "dayjs";
 import Router from "next/router";
 import { join } from "path";
@@ -90,7 +91,19 @@ export const AllJobQueryTable: React.FC<Props> = ({
           <Form.Item label="集群" name="cluster">
             <SingleClusterSelector />
           </Form.Item>
-          <Form.Item label="时间" name="time">
+          <Form.Item
+            label={(
+              <Space>
+                时间
+                <Popover
+                  title="查询该时间区域内所有有活动（如作业开始、运行、失败、完成）的作业"
+                >
+                  <QuestionCircleOutlined />
+                </Popover>
+              </Space>
+            )}
+            name="time"
+          >
             <DatePicker.RangePicker
               showTime
               presets={defaultPresets}
@@ -154,9 +167,14 @@ export const JobInfoTable: React.FC<JobInfoTableProps> = ({
         render={(t) => formatDateTime(t)}
       />
       <Table.Column<JobInfo>
+        dataIndex="startTime"
+        title="开始时间"
+        render={(t) => formatDateTime(t) === "Invalid Date" ? "-" : formatDateTime(t)}
+      />
+      <Table.Column<JobInfo>
         dataIndex="endTime"
         title="结束时间"
-        render={(t) => t === "Unknown" ? "-" : formatDateTime(t)}
+        render={(t) => formatDateTime(t) === "Invalid Date" ? "-" : formatDateTime(t)}
       />
       <Table.Column<JobInfo>
         dataIndex="elapsed"
