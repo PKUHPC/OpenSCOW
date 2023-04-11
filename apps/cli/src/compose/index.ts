@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { chmodSync, mkdirSync } from "fs";
 import path from "path";
 import { LoggingOption, ServiceSpec } from "src/compose/spec";
 import { InstallConfigSchema } from "src/config/install";
@@ -90,6 +91,11 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
 
   // fluentd
   if (config.log.fluentd) {
+    // create log dir
+    mkdirSync(config.log.fluentd.logDir, { recursive: true });
+    // TODO may give fewer permissions
+    chmodSync(config.log.fluentd.logDir, 0o777);
+
     addService("log", {
       image: config.log.fluentd.image,
       environment: {},
