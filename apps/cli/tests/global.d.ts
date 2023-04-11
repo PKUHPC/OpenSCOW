@@ -10,15 +10,4 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { init } from "src/cmd/init";
-import { compareDirectories, testBaseFolder } from "tests/utils";
-
-it("extracts init config to output path", async () => {
-  await init({
-    outputPath: testBaseFolder,
-  });
-
-  // testBaseFolder and configPath should be the same
-  expect(await compareDirectories(testBaseFolder, "assets")).toBe(true);
-});
-
+import "jest-extended";

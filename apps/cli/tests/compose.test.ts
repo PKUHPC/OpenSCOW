@@ -10,15 +10,23 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { init } from "src/cmd/init";
-import { compareDirectories, testBaseFolder } from "tests/utils";
+import { statSync } from "fs";
+import { join } from "path";
+import { createComposeSpec } from "src/compose";
+import { getInstallConfig } from "src/config/install";
+import { configPath, testBaseFolder } from "tests/utils";
 
-it("extracts init config to output path", async () => {
-  await init({
-    outputPath: testBaseFolder,
-  });
+it("creates log dir for fluentd", async () => {
 
-  // testBaseFolder and configPath should be the same
-  expect(await compareDirectories(testBaseFolder, "assets")).toBe(true);
+  const config = getInstallConfig(configPath);
+
+  const logDir = join(testBaseFolder, "logdir");
+
+  config.log.fluentd = { logDir, image: "fluentd:v1.14.0-1.0" };
+
+  createComposeSpec(config);
+
+  const s = statSync(logDir);
+
+  expect(s.mode).toBe(0o40777);
 });
-
