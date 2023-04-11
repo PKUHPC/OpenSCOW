@@ -43,7 +43,6 @@ export function runComposeCommand(config: InstallConfigSchema, args: string[]) {
 
   const composeConfig = createComposeSpec(config);
 
-
   const filename = `docker-compose-${Date.now()}.yml`;
 
   writeFileSync(filename, dump(composeConfig), { encoding: "utf-8" });

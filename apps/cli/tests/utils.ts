@@ -13,8 +13,17 @@
 import { existsSync, promises as fsp } from "fs";
 import { join } from "path";
 
-export const configPath = "tests/init.test.ts";
+export const configPath = "tests/install.yaml";
 export const testBaseFolder = `tests/testFolder${process.env.JEST_WORKER_ID}`;
+
+beforeEach(async () => {
+  await fsp.mkdir(testBaseFolder, { recursive: true });
+
+});
+
+afterEach(async () => {
+  await fsp.rm(testBaseFolder, { recursive: true });
+});
 
 export async function compareDirectories(dir1: string, dir2: string): Promise<boolean> {
   const files1 = await fsp.readdir(dir1);
