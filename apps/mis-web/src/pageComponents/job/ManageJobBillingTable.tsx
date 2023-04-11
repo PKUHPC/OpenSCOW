@@ -46,7 +46,7 @@ export interface BillingItemType {
 }
 
 const calculateNextId = (data?: BillingItemType[], tenant?: string) => {
-  const currentItemIds = data 
+  const currentItemIds = data
     ? data.filter((x) => x.priceItem && x.tenantName === tenant).map((x) => x.priceItem!.itemId) : [];
   if (!tenant) {
     const nums = currentItemIds.map((x) => parseInt(x)).filter((x) => !isNaN(x));
@@ -151,7 +151,7 @@ export const ManageJobBillingTable: React.FC<Props> = ({ data, loading, tenant, 
         dataIndex={["priceItem", "amountStrategy"]}
         render={(value) => {
           return (
-            value ? 
+            value ?
               (
                 <Space>
                   {AmountStrategyDescriptions[value]}
@@ -163,8 +163,8 @@ export const ManageJobBillingTable: React.FC<Props> = ({ data, loading, tenant, 
           );
         }}
       />
-      <Table.Column 
-        title="单价（元）" 
+      <Table.Column
+        title="单价（元）"
         dataIndex={["priceItem", "price"]}
         render={(value) => value ? moneyToString(value) : undefined}
       />
@@ -267,7 +267,7 @@ const EditPriceModal: React.FC<CommonModalProps & {
 
           />
         </Form.Item>
-        <Form.Item label="价格（元）" name="price" rules={[{ required: true }]}>
+        <Form.Item label="价格（元）" name="price" initialValue={0} rules={[{ required: true }]}>
           <InputNumber precision={3} min={0} defaultValue={0} />
         </Form.Item>
         <Form.Item label="备注" name="description">
