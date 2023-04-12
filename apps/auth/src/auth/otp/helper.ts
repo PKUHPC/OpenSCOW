@@ -16,27 +16,56 @@ import ldapjs from "ldapjs";
 import { Liquid } from "liquidjs";
 import * as nodemailer from "nodemailer";
 import { TransportOptions } from "nodemailer";
-import path from "path";
+import path, { join } from "path";
 import * as speakeasy from "speakeasy";
 import { bindOtpHtml } from "src/auth/bindOtpHtml";
 import { extractAttr, searchOne, takeOne } from "src/auth/ldap/helpers";
 import { serveLoginHtml } from "src/auth/loginHtml";
 import { authConfig, LdapConfigSchema, OtpStatusOptions } from "src/config/auth";
+import { config } from "src/config/env";
 import * as url from "url";
 
-import { aesDecryptData, aesEncryptData } from "./aesUtils";
+import { decryptData, encryptData, generateIvAndKey } from "./aesUtils";
+
+const separator = "#";
+export const AES_ENCRYPTION_IV_KEY_REDIS_KEY = "auth:otp:ivkey";
 
 interface OtpSessionInfo {
   dn: string,
   sendEmaililTimestamp?: number,
 }
 
-export async function getOptSession(key: string, f: FastifyInstance): Promise<OtpSessionInfo | undefined> {
+function decodeIvKeyFromBase64(data: string) {
+  const encryIv = data.split(separator)[0];
+  const encryKey = data.split(separator)[1];
+  const iv = Buffer.from(encryIv, "base64");
+  const key = Buffer.from(encryKey, "base64");
+  return {
+    iv,
+    key,
+  };
+}
+
+export async function getIvAndKey(f: FastifyInstance) {
+  const data = await f.redis.get(AES_ENCRYPTION_IV_KEY_REDIS_KEY);
+  if (!data) {
+    return undefined;
+  }
+  return decodeIvKeyFromBase64(data);
+}
+
+export async function getOtpSession(key: string, f: FastifyInstance): Promise<OtpSessionInfo | undefined> {
   const redisUserInfoJSON = await f.redis.get(key);
   if (!redisUserInfoJSON) {
     return;
   }
   return JSON.parse(redisUserInfoJSON);
+}
+
+export async function saveOtpSession(
+  key: string, data: OtpSessionInfo, expirationTimeSeconds: number, f: FastifyInstance,
+) {
+  await f.redis.set(key, JSON.stringify(data), "EX", expirationTimeSeconds);
 }
 
 export async function renderLiquidFile(fileName: string, data: Record<string, string>): Promise<string> {
@@ -60,11 +89,18 @@ export async function storeOtpSessionAndGoSendEmailUI(
   },
 ) {
   const otpSessionToken = crypto.randomUUID();
-  await f.redis.set(otpSessionToken, JSON.stringify(userInfo), "EX", authConfig.otp!.ldap!.timeLimitMinutes * 60);
+  await saveOtpSession(otpSessionToken, userInfo, authConfig.otp!.ldap!.timeLimitMinutes * 60, f);
   const mailAttributeName = ldapConfig.attrs.mail || "mail";
   const emailAddressInfo =
     await searchOneAttributeValueFromLdap(userInfo.dn, logger, mailAttributeName, client);
-  const encryptOtpSessionToken = await aesEncryptData(f, otpSessionToken);
+
+  let ivAndKey = await getIvAndKey(f);
+  if (!ivAndKey) {
+    ivAndKey = generateIvAndKey();
+    const encryptedIvKey = ivAndKey.iv.toString("base64") + separator + ivAndKey.key.toString("base64");
+    await f.redis.set(AES_ENCRYPTION_IV_KEY_REDIS_KEY, encryptedIvKey);
+  }
+  const encryptOtpSessionToken = encryptData(ivAndKey, otpSessionToken);
   const timeLimitMinutes = authConfig.otp!.ldap!.timeLimitMinutes;
   await bindOtpHtml(false, req, res,
     { timeLimitMinutes: timeLimitMinutes, otpSessionToken: encryptOtpSessionToken,
@@ -81,16 +117,16 @@ export async function sendEmailAuthLink(
   emailAddress: string,
   backToLoginUrl: string,
 ) {
-
-  const decryptedOtpSessionToken = await aesDecryptData(f, otpSessionToken);
   const otpLdap = authConfig.otp!.ldap!;
-  if (!decryptedOtpSessionToken) {
-    // redis中没有iv和key，返回信息过期UI
+  const ivAndKey = await getIvAndKey(f);
+  if (!ivAndKey) {
+    // redis中没有ivKey信息，返回信息过期UI
     await bindOtpHtml(false, req, res,
       { timeLimitMinutes: otpLdap.timeLimitMinutes, tokenNotFound: true, backToLoginUrl: backToLoginUrl });
     return;
   }
-  const otpSession = await getOptSession(decryptedOtpSessionToken, f);
+  const decryptedOtpSessionToken = decryptData(ivAndKey, otpSessionToken);
+  const otpSession = await getOtpSession(decryptedOtpSessionToken, f);
   if (!otpSession) {
     // 信息过期
     await bindOtpHtml(false, req, res,
@@ -115,7 +151,7 @@ export async function sendEmailAuthLink(
 
   const ttl = await f.redis.ttl(decryptedOtpSessionToken);
 
-  await f.redis.set(decryptedOtpSessionToken, JSON.stringify(otpSession), "EX", ttl);
+  await saveOtpSession(decryptedOtpSessionToken, otpSession, ttl, f);
   const transporter = nodemailer.createTransport({
     host: otpLdap.authenticationMethod.mail.mailTransportInfo.host,
     port: otpLdap.authenticationMethod.mail.mailTransportInfo.port,
@@ -129,7 +165,7 @@ export async function sendEmailAuthLink(
   const href = url.format({
     protocol: authUrl.protocol,
     host: authUrl.host,
-    pathname: "/otp/email/validation",
+    pathname: join(config.BASE_PATH, config.AUTH_BASE_PATH, "/otp/email/validation"),
     query: {
       token: otpSessionToken,
       backToLoginUrl: backToLoginUrl,
@@ -149,7 +185,7 @@ export async function sendEmailAuthLink(
   };
 
   const emailSent = await transporter.sendMail(mailOptions).then(() => true).catch((e) => {
-    logger.error(e);
+    logger.error(e, "error in sending OTP binding email");
     return false;
   });
 
@@ -186,6 +222,27 @@ interface UserInfo {
   dn: string,
 }
 
+export async function remoteValidateOtpCode(userId: string, logger: FastifyBaseLogger, inputCode?: string) {
+  if (authConfig.otp?.type === OtpStatusOptions.disabled || !authConfig.otp?.type) {
+    return true;
+  }
+  const otpRemote = authConfig.otp.remote!;
+  return await fetch(otpRemote.validateUrl, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      otpCode: inputCode,
+      userId: userId,
+    }),
+  }).then(async (response) => {
+    const result: {result: boolean} = await response.json();
+    return result.result;
+  }).catch((e) => {
+    logger.error(e, "error in verifying otp code in remote");
+    return false;
+  });
+}
+
 export async function validateOtpCode(
   userInfo: UserInfo,
   inputCode: string | undefined,
@@ -195,7 +252,7 @@ export async function validateOtpCode(
   logger: FastifyBaseLogger,
   client: ldapjs.Client,
 ) {
-  if (authConfig.otp?.status === OtpStatusOptions.disabled || !authConfig.otp?.status) {
+  if (authConfig.otp?.type === OtpStatusOptions.disabled || !authConfig.otp?.type) {
     return true;
   }
   if (!inputCode) {
@@ -204,25 +261,8 @@ export async function validateOtpCode(
   }
 
   const time = getAbsoluteUTCTimestamp();
-  const otpRemote = authConfig.otp.remote!;
-  if (authConfig.otp.status === OtpStatusOptions.remote) {
-    const result = await fetch(otpRemote.url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        otpCode: inputCode,
-        userId: userInfo.userId,
-      }),
-    }).then(async (response) => {
-      const result: {result: boolean} = await response.json();
-      return result.result;
-    })
-      .catch((e) => {
-        logger.error(e, "error when verifying otp code in remote");
-        return false;
-      });
-
-    if (result) {
+  if (authConfig.otp.type === OtpStatusOptions.remote) {
+    if (await remoteValidateOtpCode(userInfo.userId, logger, inputCode)) {
       return true;
     } else {
       await serveLoginHtml(false, callbackUrl, req, res, undefined, true);
@@ -230,7 +270,7 @@ export async function validateOtpCode(
     }
 
   }
-  // 如果是otp.status是local
+  // 如果是otp.type是ldap
   const otpLdap = authConfig.otp.ldap!;
   const secretInfo = await searchOneAttributeValueFromLdap(
     userInfo.dn, logger, otpLdap.secretAttributeName, client);
@@ -244,15 +284,29 @@ export async function validateOtpCode(
     time: time / 1000,
     encoding: "base32",
     secret: secretInfo.value,
-    digits: otpLdap.digits,
-    step: otpLdap.period,
-    algorithm: otpLdap.algorithm,
+    digits: 6,
+    step: 30,
+    algorithm: "sha1",
   });
   if (result) {
     return true;
   } else {
-    await serveLoginHtml(false, callbackUrl, req, res, undefined, true);
-    return false;
+    // 如果验证失败，验证是否是上一个otp码
+    const validatePreOtpCode = speakeasy.totp.verify({
+      token: inputCode,
+      time: time / 1000 - 30,
+      encoding: "base32",
+      secret: secretInfo.value,
+      digits: 6,
+      step: 30,
+      algorithm: "sha1",
+    });
+    if (validatePreOtpCode) {
+      return true;
+    } else {
+      await serveLoginHtml(false, callbackUrl, req, res, undefined, true);
+      return false;
+    }
   }
 }
 

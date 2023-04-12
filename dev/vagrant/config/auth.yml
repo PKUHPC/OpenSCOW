@@ -12,21 +12,17 @@ captcha:
 #目前仅支持ldap认证方式启用otp，ssh方式不支持
 otp:
   #status指定otp状态，分别为disabled:不启用,ldap：密钥存在ldap，remote：启用为远程认证模式。默认为disabled
-  status: disabled
+  type: disabled
   #当status为ldap时间，需配置以下这段内容来本地注册
   ldap:
     #限制绑定otp要在多少分钟内完成，需要整数,默认10分钟
-    timeLimitMinutes: 20
-    #密钥存储属性名,需要用户自己定义, 这里仅便于测试使用title存储
+    timeLimitMinutes: 10
+    #密钥存储属性名,需要用户自己定义, 这里使用title存储仅便于测试
     secretAttributeName: title
-    #认证系统地址，例如：http://localhost:5000
+    #访问scow系统的域名
     authUrl: http://localhost:5000
-    #OTP码位数，默认为6
-    digits: 6
-    #加密算法(sha1，sha256，sha512)，默认为sha1,
-    algorithm: sha1
-    #OTP码有效时间，默认为30
-    period: 30
+    #otp验证软件扫描二维码之后，出现的label中，用户名和@后显示的名称, 默认为SCOW
+    label: "scow"
     #绑定otp时发送绑定信息方式
     authenticationMethod:
       mail:
@@ -53,12 +49,12 @@ otp:
           user: "morgan68@ethereal.email"
           #SMTP身份验证授权码
           password: "y2es3bd3rYwxWs5n8g"
-  #如果mode指定为remote，需要配置以下认证url
-  # remote:
-  #   #远程验证url
-  #   url: http://localhost:9999/otp/remote/validateCode
-  #   #当用户点击绑定OTP时，302重定向的链接, 默认为空, 建议配置，不配置会不显示绑定otp按钮
-  #   redirectUrl: https://pkuhpc.github.io/SCOW/docs/deploy/config/auth/config
+  #如果mode指定为remote，需要配置以下内容
+  remote:
+    #远程验证url,详见https://pkuhpc.github.io/SCOW/docs/
+    validateUrl: http://localhost:9999/otp/remote/validateCode
+    #登录界面绑定otp按钮跳转的链接, 建议配置，不配置会不显示绑定otp按钮
+    redirectUrl: https://pkuhpc.github.io/SCOW/docs/deploy/config/auth/config
 
 # 在此部分输入LDAP的配置
 ldap:

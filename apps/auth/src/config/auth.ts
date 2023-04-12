@@ -27,12 +27,6 @@ export enum OtpStatusOptions {
   "remote" = "remote",
 }
 
-export enum OtpAlgorithm {
-  "sha1" = "sha1",
-  "sha256" = "sha256",
-  "sha512" = "sha512",
-}
-
 export const LdapConfigSchema = Type.Object({
   url: Type.String({ description: "LDAP地址" }),
   searchBase: Type.String({ description: "从哪个节点搜索登录用户对应的LDAP节点" }),
@@ -149,20 +143,18 @@ export const AuthConfigSchema = Type.Object({
     enabled: Type.Boolean({ description: "验证码功能是否启用", default: false }),
   }, { default: {} }),
   otp: Type.Optional(Type.Object({
-    status: Type.Enum(OtpStatusOptions, { description: "otp功能状态", default: "disabled" }),
+    type: Type.Enum(OtpStatusOptions, { description: "otp功能状态", default: "disabled" }),
     ldap: Type.Optional(Type.Object({
       timeLimitMinutes: Type.Integer({ description: "限制绑定otp要在多少分钟内完成", default: 10 }),
       authUrl: Type.String({ description: "认证系统地址" }),
-      secretAttributeName: Type.String({ description: "存储otp密钥的属性名" }),
-      digits: Type.Integer({ description: "otp验证码位数", default: 6 }),
-      period: Type.Integer({ description: "otp验证码有效期", default: 30 }),
-      algorithm: Type.Enum(OtpAlgorithm, { description: "加密算法", default: "sha1" }),
+      secretAttributeName: Type.String({ description: "存储otp密钥的属性名", default: "otpSecret" }),
       qrcodeDescription: Type.String({ description: "secret二维码上方文字描述信息", default: "此二维码仅出现一次，用过即毁" }),
+      label:  Type.String({ description: "otp验证软件扫描二维码之后，出现的label中，用户名和@后显示的名称", default: "SCOW" }),
       authenticationMethod: Type.Object({
         mail: Type.Object({
           sendEmailFrequencyLimitInSeconds: Type.Integer({ description: "发送邮件频率限制", default: 60 }),
           from: Type.String({ description: "发件邮箱地址" }),
-          subject: Type.String({ description: "邮件主题", default: "otp绑定链接" }),
+          subject: Type.String({ description: "邮件主题", default: "OTP绑定链接" }),
           title: Type.String({ description: "邮件内容标题", default: "Bind OTP" }),
           contentText: Type.String({ description: "邮件内容",
             default: "Please click on the following link to bind your OTP:" }),
@@ -178,8 +170,8 @@ export const AuthConfigSchema = Type.Object({
       }, { description: "发送绑定链接相关配置" }),
     }, { description: "将otp密钥存在ldap需要配置信息" })),
     remote: Type.Optional(Type.Object({
-      url: Type.String({ description: "tig远程otp验证的url" }),
-      redirectUrl: Type.String({ description: "当用户点击绑定OTP时，302重定向的链接", default: "" }),
+      validateUrl: Type.String({ description: "远程验证otp码的url" }),
+      redirectUrl: Type.Optional(Type.String({ description: "当用户点击绑定OTP时，302重定向的链接" })),
     }, { description: "将密钥存在远程地址时的配置信息" })),
   }, { description: "otp功能配置" })),
 });
@@ -222,11 +214,14 @@ export const getAuthConfig = () => {
     throw new Error("authType is set to ssh, but ssh config is not set");
   }
 
-  if (config.otp?.status === OtpStatusOptions.ldap && !config.otp?.ldap) {
+  if (config.otp?.type === OtpStatusOptions.ldap && !config.otp?.ldap) {
     throw new Error("otp status is set to ldap, but otp.ldap config is not set");
   }
-  if (config.otp?.status === OtpStatusOptions.remote && !config.otp?.remote) {
+  if (config.otp?.type === OtpStatusOptions.remote && !config.otp?.remote) {
     throw new Error("otp status is set to remote, but otp.remote config is not set");
+  }
+  if (config.authType === AuthType.ssh && config.otp?.type === OtpStatusOptions.ldap) {
+    throw new Error("When authType is set to ssh, otp.type can only be set to remote");
   }
 
   return config;

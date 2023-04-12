@@ -11,42 +11,18 @@
  */
 
 import * as crypto from "crypto";
-import { FastifyInstance } from "fastify";
 
 
-const separator = "#";
-export const REDIS_KEY = "auth:otp:ivkey";
-
-function decodeIvKeyFromBase64(data: string) {
-  const encryIv = data.split(separator)[0];
-  const encryKey = data.split(separator)[1];
-  const iv = Buffer.from(encryIv, "base64");
-  const key = Buffer.from(encryKey, "base64");
-  return {
-    iv,
-    key,
-  };
-}
-
-export async function generateIvAndKey(f: FastifyInstance) {
+export function generateIvAndKey() {
   const iv = crypto.randomBytes(16);
   const key = crypto.randomBytes(32);
-  const encryStr = iv.toString("base64") + separator + key.toString("base64");
-  await f.redis.set(REDIS_KEY, encryStr);
   return {
     iv,
     key,
   };
 }
 
-export async function aesEncryptData(f: FastifyInstance, text: string) {
-  let ivAndKey: {iv: Buffer, key: Buffer};
-  const result = await f.redis.get(REDIS_KEY);
-  if (!result) {
-    ivAndKey = await generateIvAndKey(f);
-  } else {
-    ivAndKey = decodeIvKeyFromBase64(result);
-  }
+export function encryptData(ivAndKey: { iv: Buffer; key: Buffer }, text: string) {
   const cipher = crypto.createCipheriv("aes-256-cbc", ivAndKey.key, ivAndKey.iv);
   let encrypted = cipher.update(text);
   encrypted = Buffer.concat([encrypted, cipher.final()]);
@@ -54,14 +30,7 @@ export async function aesEncryptData(f: FastifyInstance, text: string) {
 }
 
 // 解密时，如果redis服务器重启, 返回undefined,通知上层函数
-export async function aesDecryptData(f: FastifyInstance, text: string) {
-  let ivAndKey: {iv: Buffer, key: Buffer};
-  const result = await f.redis.get(REDIS_KEY);
-  if (!result) {
-    return;
-  } else {
-    ivAndKey = decodeIvKeyFromBase64(result);
-  }
+export function decryptData(ivAndKey: { iv: Buffer; key: Buffer }, text: string) {
   const encryptedTexyt = Buffer.from(text, "hex");
   const decipher = crypto.createDecipheriv("aes-256-cbc", ivAndKey.key, ivAndKey.iv);
   let decrypted = decipher.update(encryptedTexyt);

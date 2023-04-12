@@ -46,24 +46,24 @@ mockUsers:
 
 在`auth.yaml`配置中，可以配置关于otp验证码的功能, 但目前仅支持ldap认证方式启用otp，ssh认证方式不支持。
 
-#### 一、如果您配置otp将密钥存在ldap中(即otp.status为ldap):
+#### 一、如果您配置otp将密钥存在ldap中(即otp.type为ldap):
 
    
-  1. 手机端您可以使用FreeOTP, authenticator等，但是请注意有的手机端app可能不支持配置OTP码的digits和加密方式等。
-  2. 您需要自己在ldap中定义一个属性名用来存储string类型的OTP密钥,并配置为auth.yaml中的opt.secretAttributeName。
-  3. 您需要配置一个邮件传输代理（MTA）以实现邮件服务。其中，您需要提供有效的发件人地址、SMTP 服务器地址、SMTP 服务器端口号以及 SMTP 认证凭据（包括用户名和授权码）。
+  1. 手机app您可以使用authenticator，FreeOTP等。
+  2. 您需要自己在ldap中定义一个属性名用来存储string类型的OTP密钥,并配置为`auth.yaml`中的`opt.secretAttributeName`，这个密钥名默认为`otpSecret`。
+  3. 您需要配置邮件发送信息。其中，您需要提供有效的发件人地址、SMTP 服务器地址、SMTP 服务器端口号以及 SMTP 认证凭据（包括用户名和授权码）。
 
-#### 二、如果您配置otp状态为远程(otp.status为remote, 自己存密钥于某个地方):
+#### 二、如果您配置otp状态为远程(otp.type为remote, 由您自己管理密钥):
 
-  1. 那么您需要提供一个验证otp码的接口，返回验证的结果。返回结果要求json格式{"result": true|false}。
-  2. scow会使用fetch向config/auth.yml中的otp.remote.url发起请求。这个配置需要您根据上述接口和存储密钥的主机，端口配置。fetch请求中otpCode为用户输入的otp码，userId为用户名，类型均为string。
+  1. 那么您需要提供一个验证otp码的接口, 并配置为`otp.remote.validateUrl`，返回验证的结果。返回结果要求json格式{"result": true|false}。
+  2. scow会使用fetch向上述接口（`otp.remote.validateUrl`）发起请求。fetch请求中`otpCode`为用户输入的otp码，`userId`为用户名，类型均为`string`。
 
   | fetch| |
   |:----:|:---------------------------------: |
   |headers|"Content-Type": "application/json" |
   | body  | otpCode, userId                   |
 
-例：假设您是像Google Authenticator一样将密钥存在用户家目录下的.google_authenticator第一行内容，那么您可以提供的路由接口及服务示例：
+例：假设您是像[Google Authenticator](https://github.com/google/google-authenticator-libpam)一样将密钥存在用户家目录下的`.google_authenticator`第一行内容，那么您可以提供的路由接口及服务TypeScript示例：
 
 ```
 
@@ -76,17 +76,21 @@ import * as speakeasy from "speakeasy";
 const app = fastify({ logger: true });
 
 /**
- * 假设您的OTP密钥存放主机host="192.168.88.102"上/data/home/{{userId}}/.google_authenticator文件的第一行内容，其中{{userId}}为实际的用户名
- * 可以以root身份ssh登录到目标主机的私钥地址为/home/node/.ssh/id_rsa
+ * 要求启动该服务的主机可以ssh免密登录到存放otp密钥的主机的root用户。启动该服务的主机的私钥地址为/home/node/.ssh/id_rsa，node为用户名。
+ * 假设您的OTP密钥存放主机host="192.168.88.102"上/data/home/{{userId}}/.google_authenticator文件的第一行内容，其中{{userId}}为需要验证otp码是否正确的用户名
+ * 
  */
+// ssh免密登录到存放otp密钥的root用户
 const sshUserName = "root";
-// 假设私钥路径为/home/node/.ssh/id_rsa
+// 假设启动该服务的主机的私钥地址为/home/node/.ssh/id_rsa
 const privateKeyPath = "/home/node/.ssh/id_rsa";
 
+// OTP密钥存放主机host="192.168.88.102"
 const host = "192.168.88.102";
+// otp密钥文件路径
 const homedir = "/data/home/{{ userId }}";
 
-// routePath需要与您实现的验证接口一致
+// routePath需要与您实现的验证接口(otp.remote.url中的path)一致
 const routePath = "/otp/remote/validateCode";
 
 const bodySchema = Type.Object({
@@ -101,7 +105,7 @@ app.post<{Body: Static<typeof bodySchema>}>(
     },
   },
   async (req, res) => {
-    // otpCode为scow的fetch请求携带的OTP验证码，userId为OTP验证的用户名
+    // otpCode为scow发起的请求携带的OTP验证码，userId为OTP验证的用户名
     const { otpCode, userId } = req.body;
     const ssh = new NodeSSH();
     // 获取OTP密钥
@@ -120,13 +124,22 @@ app.post<{Body: Static<typeof bodySchema>}>(
       currentTime.getUTCMilliseconds());
 
     // 验证
-    const result = speakeasy.totp.verify({
+    let result = speakeasy.totp.verify({
       token: otpCode,
       time: timeStamp / 1000,
       encoding: "base32",
       secret: otpSecret,
-      // digits, step, algorithm需要您与手机端设置保持一致
+      // digits, step, algorithm需要您与手机app设置保持一致,默认digits为6，step为30，algorithm为sha1
     });
+    // 验证失败则检测输入的是否是上一个step的otp码，如果是，也算通过
+    if (!result) {
+      result = speakeasy.totp.verify({
+        token: otpCode,
+        time: timeStamp / 1000 - 30,
+        encoding: "base32",
+        secret: otpSecret,
+      });
+    }
     res.send({ result });
   },
 );
@@ -138,39 +151,35 @@ start();
 
 ```
 
-如果您不打算启用`otp`功能，那么以下的所有配置可均不写，或者`otp.status`配置为`disabled`；如果您将`otp.ldap.status`配置为`ldap`, 那么`otp.ldap`下所有没有默认值的配置项都需要配置，同样地如果您将`otp.ldap.status`配置为`remote`, 那么`otp.remote`下所有没有默认值的配置项都需要配置
+默认不启用`otp`功能，无需配置。启用时，如果您将`otp.ldap.status`配置为`ldap`, 那么`otp.ldap`下所有没有默认值的配置项都需要配置，同样地如果您将`otp.ldap.status`配置为`remote`, 那么`otp.remote`下所有没有默认值的配置项都需要配置
 
 `auth.yaml:`
 ```yaml title="config/auth.yml"
 
-#目前仅支持ldap认证方式启用otp，ssh方式不支持
+#使用ldap认证方式时，支持启用otp.type为ldap和remote，ssh方式仅支持otp.type为remote
 otp:
-  #status指定otp状态，分别为disabled:不启用,ldap：密钥存在ldap，remote：启用为远程认证模式。默认为disabled
-  status: ldap
-  #当status为ldap时间，需配置以下这段内容来本地注册
+  #status指定otp状态，分别为disabled:不启用,ldap：密钥存在ldap，remote：用户自行实现otp码认证接口。默认为disabled
+  type: ldap
+  #当status为ldap时间，需配置以下这段内容
   ldap:
     #限制绑定otp要在多少分钟内完成，需要整数, 默认10
     #timeLimitMinutes: 10
-    #密钥存储属性名,需要用户自己在ldap中进行定义
+    #密钥存储属性名, 默认为otpSecret, 需要用户自己在ldap中进行定义
     secretAttributeName: 
-    #认证系统地址，例如：http://localhost:5000
-    authUrl: 
-    #OTP码位数，默认为6
-    #digits: 6
-    #加密算法(sha1，sha256，sha512)，默认为sha1,
-    #algorithm: sha1
-    #OTP码有效时间，默认为30
-    #period: 30
+    #访问scow系统的域名或ip地址,用于发送邮件中组成OTP绑定页面的地址，例如：https://pku.edu.cn
+    scowHost: 
+    #otp验证软件扫描二维码之后，出现的label中，用户名和@后显示的名称, 默认为SCOW
+    #ldabel: "scow"
     #绑定otp时发送绑定信息方式
     authenticationMethod:
       mail:
         #发件邮箱地址
         from: "morgan68@ethereal.email"
-        #发送邮件频率限制，需要整数，单位秒，默认60秒间隔
+        #向每个用户发送邮件频率限制，需要整数，单位秒，默认60秒间隔
         #sendEmailFrequencyLimitInSeconds: 60
-        #邮件主题，默认为"otp绑定链接"
-        #subject: "otp绑定链接"
-        #邮件内容标题，默认为"Bind OTP""
+        #邮件主题，默认为"OTP绑定链接"
+        #subject: "OTP绑定链接"
+        #邮件内容标题，默认为"Bind OTP"
         #title: "Bind OTP"
         #邮件内容,默认为"Please click on the following link to bind your OTP:"
         #contentText: "Please click on the following link to bind your OTP"
@@ -187,11 +196,11 @@ otp:
           user: "morgan68@ethereal.email"
           #SMTP身份验证授权码
           password: "y2es3bd3rYwxWs5n8g"
-  #如果mode指定为remote，需要配置以下认证url
+  #如果mode指定为remote，需要配置以下内容
   #remote:
-    #远程验证url，例如http://localhost:9999/otp/remote/validateCode
-    #url: 
-    #当用户点击绑定OTP时，302重定向的链接, 默认为空，建议配置，不配置会不显示绑定otp按钮
+    #远程验证url，例如http://localhost:9999/otp/remote/validateCode,详见https://pkuhpc.github.io/SCOW/docs/deploy/config/auth/config
+    #validateUrl: 
+    #当用户点击绑定OTP按钮时跳转的按钮，建议配置，不配置会不显示绑定otp按钮
     #redirectUrl: https://pkuhpc.github.io/SCOW/docs/deploy/config/auth/config 
 
 ```

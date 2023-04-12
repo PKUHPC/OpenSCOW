@@ -20,8 +20,9 @@ import { findUser, useLdap } from "src/auth/ldap/helpers";
 import { authConfig, LdapConfigSchema } from "src/config/auth";
 import { promisify } from "util";
 
-import { aesDecryptData } from "./aesUtils";
-import { getOptSession, renderLiquidFile, sendEmailAuthLink, storeOtpSessionAndGoSendEmailUI } from "./helper";
+import { decryptData } from "./aesUtils";
+import { getIvAndKey, getOtpSession, renderLiquidFile,
+  sendEmailAuthLink, storeOtpSessionAndGoSendEmailUI } from "./helper";
 
 
 /**
@@ -47,12 +48,12 @@ export function bindRedirectLoinUIAndBindUIRoute(f: FastifyInstance) {
 
       const { action, backToLoginUrl } = req.query;
       const otp = authConfig.otp!;
-      if (otp.status === "ldap" && action === "bindOtp") {
+      if (otp.type === "ldap" && action === "bindOtp") {
         const backToLoginUrl = req.headers.referer;
         await bindOtpHtml(false, req, res, { backToLoginUrl: backToLoginUrl });
         return;
       }
-      if (otp.status === "remote" && action === "bindOtp") {
+      if (otp.type === "remote" && action === "bindOtp") {
 
         if (!otp.remote!.redirectUrl) {
           res.redirect(backToLoginUrl);
@@ -159,13 +160,15 @@ export function bindClickAuthLinkInEmailRoute(
         const { token, backToLoginUrl } = req.query;
         const logger = req.log;
         const otpLdap = authConfig.otp!.ldap!;
-        const decryptedOtpSessionToken = await aesDecryptData(f, token);
-        if (!decryptedOtpSessionToken) {
+        const ivAndKey = await getIvAndKey(f);
+        if (!ivAndKey) {
+          // 返回用户信息过期
           await bindOtpHtml(false, req, res,
             { timeLimitMinutes: otpLdap.timeLimitMinutes, tokenNotFound: true, backToLoginUrl: backToLoginUrl });
           return;
         }
-        const otpSession = await getOptSession(decryptedOtpSessionToken, f);
+        const decryptedOtpSessionToken = decryptData(ivAndKey, token);
+        const otpSession = await getOtpSession(decryptedOtpSessionToken, f);
         if (!otpSession) {
           // 信息过期
           await bindOtpHtml(false, req, res,
@@ -188,11 +191,11 @@ export function bindClickAuthLinkInEmailRoute(
         const uid = otpSession.dn.match(/uid=([^,]+)/i)?.[1];
         const url = speakeasy.otpauthURL({
           secret: secret,
-          label: `${uid}@scow`,
+          label: `${uid}@${otpLdap.label}`,
           issuer: uid as string,
-          digits: otpLdap.digits,
-          period: otpLdap.period,
-          algorithm: otpLdap.algorithm,
+          digits: 6,
+          period: 30,
+          algorithm: "sha1",
           encoding: "base32",
         });
         const urlImg = await QRCode.toDataURL(url);

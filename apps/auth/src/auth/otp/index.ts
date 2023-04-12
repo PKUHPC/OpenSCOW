@@ -18,7 +18,7 @@ import { bindClickAuthLinkInEmailRoute, bindClickRequestBindingLinkRoute,
 
 export function registerOtpBindPostHandler(f: FastifyInstance, ldapConfig: LdapConfigSchema) {
 
-  if (authConfig.otp?.status === OtpStatusOptions.disabled || !authConfig.otp?.status) {
+  if (authConfig.otp?.type === OtpStatusOptions.disabled || !authConfig.otp?.type) {
     return;
   }
 
@@ -28,7 +28,7 @@ export function registerOtpBindPostHandler(f: FastifyInstance, ldapConfig: LdapC
    * */
   bindRedirectLoinUIAndBindUIRoute(f);
 
-  if (authConfig.otp.status === "ldap") {
+  if (authConfig.otp.type === "ldap") {
     // 绑定路由，路由处理验证账户密码
     bindValidateUserNameAndPasswordRoute(f, ldapConfig);
     // 绑定路由，路由处理发邮件

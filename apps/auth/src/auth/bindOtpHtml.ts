@@ -49,7 +49,7 @@ export async function bindOtpHtml(
 ) {
 
   const hostname = parseHostname(req);
-  const enableTotp = (!authConfig.otp?.status) !== true && authConfig.otp?.status !== OtpStatusOptions.disabled;
+  const enableTotp = (!authConfig.otp?.type) !== true && authConfig.otp?.type !== OtpStatusOptions.disabled;
 
   return rep.status(err ? 401 : 200).view("bindOtp.liquid", {
     cssUrl: join(config.BASE_PATH, config.AUTH_BASE_PATH, "/public/assets/tailwind.min.css"),
