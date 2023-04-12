@@ -169,12 +169,12 @@ export const JobInfoTable: React.FC<JobInfoTableProps> = ({
       <Table.Column<JobInfo>
         dataIndex="startTime"
         title="开始时间"
-        render={(t) => formatDateTime(t) === "Invalid Date" ? "-" : formatDateTime(t)}
+        render={(t) => formatDateTime(t)}
       />
       <Table.Column<JobInfo>
         dataIndex="endTime"
         title="结束时间"
-        render={(t) => formatDateTime(t) === "Invalid Date" ? "-" : formatDateTime(t)}
+        render={(t) => formatDateTime(t)}
       />
       <Table.Column<JobInfo>
         dataIndex="elapsed"
