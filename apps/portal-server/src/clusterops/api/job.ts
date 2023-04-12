@@ -118,6 +118,8 @@ export interface JobInfo {
   elapsed: string;
   timeLimit: string;
   submitTime: string;
+  startTime: string;
+  endTime: string;
 }
 
 export interface ListAllJobsInfoReply {
