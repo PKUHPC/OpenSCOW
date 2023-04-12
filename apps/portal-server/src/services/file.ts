@@ -521,6 +521,40 @@ export const fileServiceServer = plugin((server) => {
       });
     },
 
+    terminateFilesTransfer: async ({ request, logger }) => {
+      const { toCluster, userId, fromPath } = request;
 
+      const toTransferNode = getClusterTransferNode(toCluster);
+
+      if (!toTransferNode) return [{}];
+
+      const [toTransferNodeHost, toTransferNodePort] = toTransferNode.indexOf(":") > 0 ?
+        toTransferNode.split(":") : [toTransferNode, "22"];
+
+      return await sshConnect(toTransferNode, userId, logger, async (ssh) => {
+        const sftp = await ssh.requestSFTP();
+        const homePath = await sftpRealPath(sftp)(".");
+        const privateKeyPath = `${homePath}/scow/.scow-sync-ssh/id_rsa`;
+
+        const cmd = "scow-sync-terminate";
+        const args = [
+          "-a", toTransferNodeHost,
+          "-u", userId,
+          "-s", fromPath,
+          "-p", toTransferNodePort.toString(),
+          "-k", privateKeyPath,
+        ];
+        const resp = await loggedExec(ssh, logger, true, cmd, args);
+
+        if (resp.code !== 0) {
+          throw <ServiceError> {
+            code: status.INTERNAL,
+            message: "scow-sync-terminate command failed",
+            details: resp.stderr,
+          };
+        }
+        return [{}];
+      });
+    },
   });
 });

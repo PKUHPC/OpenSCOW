@@ -41,6 +41,7 @@ import type { MkdirSchema } from "src/pages/api/file/mkdir";
 import type { MoveFileItemSchema } from "src/pages/api/file/move";
 import type { QueryFilesTransferProgressSchema } from "src/pages/api/file/queryFilesTransferProgress";
 import type { StartFilesTransferSchema } from "src/pages/api/file/startFilesTransfer";
+import type { TerminateFilesTransferSchema } from "src/pages/api/file/terminateFilesTransfer";
 import type { UploadFileSchema } from "src/pages/api/file/upload";
 import type { CancelJobSchema } from "src/pages/api/job/cancelJob";
 import type { GetAccountsSchema } from "src/pages/api/job/getAccounts";
@@ -94,4 +95,5 @@ export const api = {
   submitJob: fromApi<SubmitJobSchema>("POST", join(basePath, "/api/job/submitJob")),
   changePassword: fromApi<ChangePasswordSchema>("PATCH", join(basePath, "/api/profile/changePassword")),
   queryFilesTransferProgress: fromApi<QueryFilesTransferProgressSchema>("GET", join(basePath, "/api/file/queryFilesTransferProgress")),
+  terminateFilesTransfer: fromApi<TerminateFilesTransferSchema>("POST", join(basePath, "/api/file/terminateFilesTransfer")),
 };

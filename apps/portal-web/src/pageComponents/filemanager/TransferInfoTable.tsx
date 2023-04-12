@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Progress, Table } from "antd";
+import { App, Button, Progress, Table } from "antd";
 import { useCallback, useEffect } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
@@ -31,6 +31,8 @@ interface TransferData {
 }
 
 export const TransferInfoTable: React.FC = () => {
+  const { message, modal } = App.useApp();
+
   const { data: transferData, isLoading, reload } = useAsync({
     promiseFn: useCallback(async () => {
       const newTransferData: TransferData[] = [];
@@ -84,6 +86,35 @@ export const TransferInfoTable: React.FC = () => {
       title: "当前进度",
       dataIndex: "progress",
       render: (progress: string) => <Progress percent={parseInt(progress.replace(/%/g, ""))} />,
+    },
+    {
+      title: "操作",
+      dataIndex: "action",
+      render: (_, row: TransferInfo & { cluster: string }) => (
+        <Button
+          type="link"
+          onClick={() => {
+            modal.confirm({
+              title: "确认取消",
+              content: `确认取消${row.cluster} -> ${row.recvCluster}的文件${row.filePath}的传输吗？`,
+              okText: "确认",
+              onOk: async () => {
+                await api.terminateFilesTransfer({ body: {
+                  toCluster: row.recvCluster,
+                  fromPath: row.filePath,
+                } })
+                  .then(() => {
+                    message.success("取消成功");
+                    reload();
+                  });
+              },
+            });
+          }}
+        >
+            取消
+        </Button>
+
+      ),
     },
   ];
 

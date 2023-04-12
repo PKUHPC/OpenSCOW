@@ -195,6 +195,16 @@ message QueryFilesTransferResponse {
   repeated TransferInfo transfer_infos = 1;
 }
 
+message TerminateFilesTransferRequest {
+  string to_cluster = 1;
+  string user_id = 2;
+  string from_path = 3;
+}
+
+message TerminateFilesTransferResponse {
+
+}
+
 service FileService {
   rpc Copy(CopyRequest) returns (CopyResponse);
   rpc CreateFile(CreateFileRequest) returns (CreateFileResponse);
@@ -218,4 +228,6 @@ service FileService {
   rpc StartFilesTransfer(StartFilesTransferRequest) returns (StartFilesTransferResponse);
 
   rpc QueryFilesTransfer(QueryFilesTransferRequest) returns (QueryFilesTransferResponse);
+
+  rpc TerminateFilesTransfer(TerminateFilesTransferRequest) returns (TerminateFilesTransferResponse);
 }
