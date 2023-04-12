@@ -44,7 +44,7 @@ mockUsers:
 
 ## OTP功能
 
-在`auth.yaml`配置中，可以配置关于otp验证码的功能, 但目前仅支持ldap认证方式启用otp，ssh认证方式不支持。
+在`auth.yaml`配置中，可以配置关于otp验证码的功能, ldap认证方式支持支持绑定otp和验证，ssh认证方式仅支持远程验证。
 
 #### 一、如果您配置otp将密钥存在ldap中(即otp.type为ldap):
 
@@ -151,7 +151,7 @@ start();
 
 ```
 
-默认不启用`otp`功能，无需配置。启用时，如果您将`otp.ldap.status`配置为`ldap`, 那么`otp.ldap`下所有没有默认值的配置项都需要配置，同样地如果您将`otp.ldap.status`配置为`remote`, 那么`otp.remote`下所有没有默认值的配置项都需要配置
+默认不启用`otp`功能，无需配置。启用时，如果您将`otp.type`配置为`ldap`, 那么`otp.ldap`下所有没有默认值的配置项都需要配置，同样地如果您将`otp.type`配置为`remote`, 那么`otp.remote`下所有没有默认值的配置项都需要配置
 
 `auth.yaml:`
 ```yaml title="config/auth.yml"
