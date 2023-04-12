@@ -120,10 +120,10 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
     onResolve: (data) => {
       if (data) {
         // 如果是从模板导入，则判断当前选中的分区中是否仍有模板中的partition，若有，则将默认值设为模板值；
-        const setTemple = initial.partition &&
+        const setValueFromTemplate = initial.partition &&
           data.clusterInfo.slurm.partitions.some((item) => { return item.name === initial.partition; });
         const partition = data.clusterInfo.slurm.partitions[0];
-        const setInitialValues = setTemple ? {
+        const setInitialValues = setValueFromTemplate ? {
           partition: initial.partition,
           qos: initial.qos,
           workingDirectory: initial.workingDirectory,
@@ -161,8 +161,8 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
   useEffect(() => {
     if (currentPartitionInfo) {
       // 如果是从模板导入，则判断当前选中的分区中是否仍有模板中的qos，若有，则将默认值设为模板值；
-      const setTemple = initial.partition && currentPartitionInfo.qos?.some((i) => i === initial.qos);
-      form.setFieldValue("qos", setTemple ? initial.qos : currentPartitionInfo.qos?.[0]);
+      const setValueFromTemplate = initial.partition && currentPartitionInfo.qos?.some((i) => i === initial.qos);
+      form.setFieldValue("qos", setValueFromTemplate ? initial.qos : currentPartitionInfo.qos?.[0]);
     }
   }, [currentPartitionInfo]);
 
