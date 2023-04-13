@@ -161,16 +161,14 @@ export async function sendEmailAuthLink(
       pass: otpLdap.authenticationMethod.mail.mailTransportInfo.password,
     },
   } as TransportOptions);
-  const authUrl = new URL(otpLdap.authUrl);
-  const href = url.format({
-    protocol: authUrl.protocol,
-    host: authUrl.host,
-    pathname: join(config.BASE_PATH, config.AUTH_BASE_PATH, "/otp/email/validation"),
-    query: {
-      token: otpSessionToken,
-      backToLoginUrl: backToLoginUrl,
-    },
-  });
+  const scowHostUrl = new URL(otpLdap.scowHost);
+  const hrefWithoutBackToLoginUrlParam = String(Object.assign(new URL("http://example.com"), {
+    protocol: scowHostUrl.protocol,
+    host: scowHostUrl.host,
+    path: join(config.BASE_PATH, config.AUTH_BASE_PATH, "/otp/email/validation"),
+    search: `token=${otpSessionToken}`,
+  }));
+  const href = hrefWithoutBackToLoginUrlParam + `&backToLoginUrl=${encodeURIComponent(backToLoginUrl)}`;
 
   const mailOptions = {
     from: otpLdap.authenticationMethod.mail.from,

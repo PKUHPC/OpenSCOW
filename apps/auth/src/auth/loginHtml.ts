@@ -44,7 +44,8 @@ export async function serveLoginHtml(
   const enableTotp = authConfig.otp?.type !== OtpStatusOptions.disabled && authConfig.otp?.type !== undefined;
 
   // 显示按钮绑定otp按钮：密钥存于ldap时 || 配置了redirectUrl
-  const showBindOtpButton = authConfig.otp?.type === OtpStatusOptions.ldap || !!authConfig.otp?.remote?.redirectUrl;
+  const showBindOtpButton = authConfig.otp?.type === OtpStatusOptions.ldap
+    || (!!authConfig.otp?.remote?.redirectUrl && authConfig.otp?.type === OtpStatusOptions.remote);
   const captchaInfo = enableCaptcha
     ? await createCaptcha(req.server)
     : undefined;

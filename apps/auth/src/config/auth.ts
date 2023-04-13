@@ -146,7 +146,7 @@ export const AuthConfigSchema = Type.Object({
     type: Type.Enum(OtpStatusOptions, { description: "otp功能状态", default: "disabled" }),
     ldap: Type.Optional(Type.Object({
       timeLimitMinutes: Type.Integer({ description: "限制绑定otp要在多少分钟内完成", default: 10 }),
-      authUrl: Type.String({ description: "认证系统地址" }),
+      scowHost: Type.String({ description: "scow访问地址，用来组成发送邮件地址" }),
       secretAttributeName: Type.String({ description: "存储otp密钥的属性名", default: "otpSecret" }),
       qrcodeDescription: Type.String({ description: "secret二维码上方文字描述信息", default: "此二维码仅出现一次，用过即毁" }),
       label:  Type.String({ description: "otp验证软件扫描二维码之后，出现的label中，用户名和@后显示的名称", default: "SCOW" }),

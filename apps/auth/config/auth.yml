@@ -14,8 +14,8 @@ otp:
     timeLimitMinutes: 10
     #密钥存储属性名
     secretAttributeName: title
-    #认证系统地址，例如：http://localhost:5000
-    authUrl: http://localhost:5000
+    #scow系统访问地址，例如：http://localhost:5000
+    scowHost: http://localhost:5000
     #绑定otp时发送绑定信息方式
     authenticationMethod:
       mail:

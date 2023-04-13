@@ -19,8 +19,8 @@ otp:
     timeLimitMinutes: 10
     #密钥存储属性名,需要用户自己定义, 这里使用title存储仅便于测试
     secretAttributeName: title
-    #访问scow系统的域名
-    authUrl: http://localhost:5000
+    #访问scow系统的域名或ip
+    scowHost: http://localhost:5000
     #otp验证软件扫描二维码之后，出现的label中，用户名和@后显示的名称, 默认为SCOW
     label: "scow"
     #绑定otp时发送绑定信息方式
