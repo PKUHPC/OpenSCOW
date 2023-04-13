@@ -83,13 +83,14 @@ export const JobTable: React.FC<Props> = ({
 
   const promiseFn = useCallback(async () => {
     return await api.getJobInfo({ query: {
-      // userId: rangeSearch.current ? (query.userId || userId || undefined) : undefined,
       userId: query.userId || userId || undefined,
       jobId: rangeSearch.current ? undefined : query.jobId,
       page: pageInfo.page,
       pageSize: pageInfo.pageSize,
       clusters: query.clusters?.map((x) => x.id),
-      accountName: query.accountName || (Array.isArray(accountNames) ? undefined : accountNames),
+      // 根据accountNames是否数组来判定用户空间或账户管理菜单，账户管理下需加accountNames限制搜索范围；
+      // 用户空间菜单下批量搜索时需传搜索参数accountName，精确搜做下不需传accountName
+      accountName:Array.isArray(accountNames) ? rangeSearch.current ? query.accountName : undefined : accountNames,
       jobEndTimeStart: query.jobEndTime[0].toISOString(),
       jobEndTimeEnd: query.jobEndTime[1].toISOString(),
     } }).catch((e: HttpError) => {
@@ -253,7 +254,7 @@ export const JobInfoTable: React.FC<JobInfoTableProps> = ({
         }
       </TableTitle>
       <Table
-        rowKey={(i) => i.idJob}
+        rowKey={(i) => i.cluster + i.biJobIndex + i.idJob}
         dataSource={data?.jobs}
         loading={isLoading}
         pagination={setPageInfo ? {
