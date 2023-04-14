@@ -28,6 +28,7 @@ export interface Partition {
 export interface PublicClusterConfig {
   submitJobDirTemplate: string;
   slurm: { partitions: Partition[] }
+  crossClusterFilesTransfer: { enabled: boolean, transferNode?: string }
 }
 
 export interface GetClusterInfoSchema {
@@ -62,6 +63,10 @@ export default route<GetClusterInfoSchema>("GetClusterInfoSchema", async (req, r
   return { 200: { clusterInfo: {
     submitJobDirTemplate: runtimeConfig.SUBMIT_JOB_WORKING_DIR,
     slurm: { partitions: clusterInfo.slurm.partitions },
+    crossClusterFilesTransfer: {
+      enabled: clusterInfo.crossClusterFilesTransfer.enabled,
+      transferNode: clusterInfo.crossClusterFilesTransfer.transferNode,
+    },
   } } };
 
 });

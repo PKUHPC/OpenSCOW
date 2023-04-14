@@ -11,26 +11,10 @@
  */
 
 import { Select } from "antd";
+import React, { useEffect, useState } from "react";
+import { api } from "src/apis";
 import { Cluster, publicConfig } from "src/utils/config";
 
-
-interface Props {
-  value?: Cluster[];
-  onChange?: (clusters: Cluster[]) => void;
-}
-
-export const ClusterSelector: React.FC<Props> = ({ value, onChange }) => {
-  return (
-    <Select
-      mode="multiple"
-      labelInValue
-      placeholder="请选择集群"
-      value={value ? value.map((v) => ({ value: v.id, label: v.name })) : undefined}
-      onChange={(values) => onChange?.(values.map((x) => ({ id: x.value, name: x.label })))}
-      options={publicConfig.CLUSTERS.map((x) => ({ value: x.id, label: x.name }))}
-    />
-  );
-};
 
 interface SingleSelectionProps {
   value?: Cluster;
@@ -38,7 +22,24 @@ interface SingleSelectionProps {
   label?: string;
 }
 
-export const SingleClusterSelector: React.FC<SingleSelectionProps> = ({ value, onChange, label }) => {
+export const SingleCrossClusterTransferSelector: React.FC<SingleSelectionProps> = ({ value, onChange, label }) => {
+  const [availableClusters, setAvailableClusters] = useState<Cluster[]>([]);
+
+  useEffect(() => {
+    const fetchClusters = async () => {
+      const filteredClusters: Cluster[] = [];
+      for (const cluster of publicConfig.CLUSTERS) {
+        const response = await api.getClusterInfo({ query:{ cluster: cluster.id } });
+        if (response.clusterInfo.crossClusterFilesTransfer.enabled) {
+          filteredClusters.push(cluster);
+        }
+      }
+      setAvailableClusters(filteredClusters);
+    };
+
+    fetchClusters();
+  }, []);
+
   return (
     <Select
       labelInValue
@@ -47,7 +48,7 @@ export const SingleClusterSelector: React.FC<SingleSelectionProps> = ({ value, o
       onChange={({ value, label }) => onChange?.({ id: value, name: label })}
       options={
         (label ? [{ value: label, label, disabled: true }] : [])
-          .concat(publicConfig.CLUSTERS.map((x) => ({ value: x.id, label: x.name, disabled: false })))
+          .concat(availableClusters.map((x) => ({ value: x.id, label: x.name, disabled: false })))
       }
       dropdownMatchSelectWidth={false}
     />

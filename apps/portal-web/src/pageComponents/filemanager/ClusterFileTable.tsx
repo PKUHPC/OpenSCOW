@@ -17,7 +17,7 @@ import { Button, Table } from "antd";
 import { join } from "path";
 import React, { useEffect, useState } from "react";
 import { api } from "src/apis";
-import { SingleCrossClusterTransferSelector } from "src/components/ClusterSelector";
+import { SingleCrossClusterTransferSelector } from "src/pageComponents/filemanager/SingleCrossClusterTransferSelector";
 import { FileInfo } from "src/pages/api/file/list";
 import { Cluster } from "src/utils/config";
 import { FileInfoKey, fileInfoKey, fileTypeIcons, nodeModeToString, openPreviewLink, TopBar } from "src/utils/file";

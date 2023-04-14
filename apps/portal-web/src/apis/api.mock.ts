@@ -62,19 +62,7 @@ export const job: JobInfo = {
 };
 
 export const mockApi: MockApi<typeof api> = {
-
-  getClusterInfo: async ({ query: { cluster } }) => ({ clusterInfo: {
-    submitJobDirTemplate: "/home/ddadaal/Code/{{ name }}",
-    slurm: {
-      partitions: [
-        { cores: 123, name: "123", nodes: 123, qos: ["123"], gpus: 10, mem: 1000 },
-        { cores: 1234, name: cluster, nodes: 1234, qos: ["1234"], gpus: 10, mem: 1000 },
-        { name : "compute", mem: 2048, cores:2, gpus:0, nodes: 1, qos: ["normal"], comment: "两个计算节点分区" },
-        { name : "GPU", mem: 2048, cores:2, gpus:2, nodes: 1, qos: ["normal"], comment: "GPU" },
-      ],
-    },
-  } }),
-
+  getClusterInfo: null,
   getAllJobs: async () => ({ results: [job]}),
 
   listAvailableApps: async () => ({ apps: [
