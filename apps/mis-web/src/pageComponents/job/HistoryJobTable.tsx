@@ -82,17 +82,22 @@ export const JobTable: React.FC<Props> = ({
 
 
   const promiseFn = useCallback(async () => {
+    // 根据 rangeSearch.current来判断是批量/精确搜索，
+    // accountName 根据accountNames是否数组来判断顶部导航类型，如是用户空间用输入值，账户管理则用props中的accountNames限制搜索范围
+    const diffQuery = rangeSearch.current ? {
+      accountName: Array.isArray(accountNames) ? query.accountName : accountNames,
+      jobEndTimeStart: query.jobEndTime[0].toISOString(),
+      jobEndTimeEnd: query.jobEndTime[1].toISOString(),
+    } : {
+      jobId: query.jobId,
+      accountName: Array.isArray(accountNames) ? undefined : accountNames,
+    };
     return await api.getJobInfo({ query: {
+      ...diffQuery,
       userId: query.userId || userId || undefined,
-      jobId: rangeSearch.current ? undefined : query.jobId,
       page: pageInfo.page,
       pageSize: pageInfo.pageSize,
       clusters: query.clusters?.map((x) => x.id),
-      // 根据accountNames是否数组来判定用户空间或账户管理菜单，账户管理下需加accountNames限制搜索范围；
-      // 用户空间菜单下批量搜索时需传搜索参数accountName，精确搜做下不需传accountName
-      accountName:Array.isArray(accountNames) ? rangeSearch.current ? query.accountName : undefined : accountNames,
-      jobEndTimeStart: query.jobEndTime[0].toISOString(),
-      jobEndTimeEnd: query.jobEndTime[1].toISOString(),
     } }).catch((e: HttpError) => {
       if (e.status === 403) {
         message.error("您没有权限查看此信息。");
