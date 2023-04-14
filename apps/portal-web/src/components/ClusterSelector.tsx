@@ -11,7 +11,8 @@
  */
 
 import { Select } from "antd";
-import { Cluster, publicConfig } from "src/utils/config";
+import getConfig from "next/config";
+import { Cluster, publicConfig, runtimeConfig } from "src/utils/config";
 
 
 interface Props {
@@ -48,6 +49,31 @@ export const SingleClusterSelector: React.FC<SingleSelectionProps> = ({ value, o
       options={
         (label ? [{ value: label, label, disabled: true }] : [])
           .concat(publicConfig.CLUSTERS.map((x) => ({ value: x.id, label: x.name, disabled: false })))
+      }
+      dropdownMatchSelectWidth={false}
+    />
+  );
+};
+
+export const SingleCrossClusterTransferSelector: React.FC<SingleSelectionProps> = ({ value, onChange, label }) => {
+  // console.log("getconfig", getConfig());
+  return (
+    <Select
+      labelInValue
+      placeholder="请选择集群"
+      value={value ? ({ value: value.id, label: value.name }) : undefined}
+      onChange={({ value, label }) => onChange?.({ id: value, name: label })}
+      options={
+        (label ? [{ value: label, label, disabled: true }] : [])
+          .concat(
+            // publicConfig.CLUSTERS.map((x) => ({ value: x.id, label: x.name, disabled: false }))
+            Object.entries(runtimeConfig.CLUSTERS_CONFIG)
+              .filter(([, cluster]) => cluster.crossClusterFilesTransfer.enabled)
+              .map(([clusterId, cluster]) => ({
+                value: clusterId,
+                label: cluster.displayName,
+                disabled: false,
+              })))
       }
       dropdownMatchSelectWidth={false}
     />
