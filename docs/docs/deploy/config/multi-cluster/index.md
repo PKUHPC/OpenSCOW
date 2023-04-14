@@ -83,7 +83,7 @@ slurm:
       mem: 14000
       # 核心数
       cores: 4
-      # GPU数
+      # GPU卡数
       gpus: 0
       # QOS
       qos:

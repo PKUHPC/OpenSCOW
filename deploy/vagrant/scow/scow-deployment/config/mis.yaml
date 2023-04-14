@@ -35,3 +35,10 @@ accountNamePattern:
 
   # 出错时的消息
   # errorMessage: ""
+
+# 创建用户时，用户ID的规则。不设置就没有限制
+userIdPattern:
+  # 正则表达式
+  regex: "^[a-zA-Z0-9_]+$"
+  # 出错时的消息
+  errorMessage: "只能由字母、下划线、数字组成"

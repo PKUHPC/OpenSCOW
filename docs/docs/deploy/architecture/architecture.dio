@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e" scale="2" border="0">
     <diagram id="aekzRgjksSTJDkMgN9YQ" name="Page-1">
-        <mxGraphModel dx="852" dy="628" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+        <mxGraphModel dx="1077" dy="760" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -29,6 +29,14 @@
                         <mxPoint as="offset"/>
                     </mxGeometry>
                 </mxCell>
+                <mxCell id="105" style="edgeStyle=none;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fillColor=#0050ef;strokeColor=#001DBC;" edge="1" parent="1" source="48" target="100">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="107" value="WebSocket" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="105">
+                    <mxGeometry x="0.3103" relative="1" as="geometry">
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
                 <mxCell id="48" value="gateway" style="rounded=0;whiteSpace=wrap;html=1;fontSize=18;fillColor=#647687;fontColor=#ffffff;strokeColor=#314354;labelBackgroundColor=none;" parent="1" vertex="1">
                     <mxGeometry x="147" y="150" width="505" height="30" as="geometry"/>
                 </mxCell>
@@ -43,8 +51,10 @@
                         <mxPoint x="127" y="320" as="targetPoint"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="56" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;fillColor=#0050ef;strokeColor=#001DBC;labelBackgroundColor=none;" parent="1" source="5" target="9" edge="1">
-                    <mxGeometry relative="1" as="geometry"/>
+                <mxCell id="56" style="edgeStyle=none;html=1;fillColor=#0050ef;strokeColor=#001DBC;labelBackgroundColor=none;" parent="1" target="9" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="300" y="290" as="sourcePoint"/>
+                    </mxGeometry>
                 </mxCell>
                 <mxCell id="87" value="HTTP" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];labelBackgroundColor=none;" parent="56" vertex="1" connectable="0">
                     <mxGeometry x="-0.3138" relative="1" as="geometry">
@@ -59,19 +69,19 @@
                         <mxPoint as="offset"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="96" style="edgeStyle=none;html=1;exitX=0.75;exitY=1;exitDx=0;exitDy=0;entryX=0.138;entryY=0.011;entryDx=0;entryDy=0;fillColor=#0050ef;strokeColor=#001DBC;entryPerimeter=0;" edge="1" parent="1" target="95">
+                <mxCell id="96" style="edgeStyle=none;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fillColor=#0050ef;strokeColor=#001DBC;" parent="1" target="95" edge="1" source="92">
                     <mxGeometry relative="1" as="geometry">
                         <mxPoint x="270" y="290" as="sourcePoint"/>
                         <mxPoint x="325.25" y="570" as="targetPoint"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="97" value="HTTP/WebSocket" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontColor=default;labelBackgroundColor=none;" vertex="1" connectable="0" parent="96">
-                    <mxGeometry x="-0.7004" y="1" relative="1" as="geometry">
+                <mxCell id="99" value="SSH" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="96">
+                    <mxGeometry x="0.2881" y="-1" relative="1" as="geometry">
                         <mxPoint as="offset"/>
                     </mxGeometry>
                 </mxCell>
                 <mxCell id="5" value="portal-web" style="whiteSpace=wrap;html=1;fontSize=18;fillColor=#0050ef;fontColor=#ffffff;strokeColor=#001DBC;labelBackgroundColor=none;" parent="1" vertex="1">
-                    <mxGeometry x="170" y="230" width="120" height="60" as="geometry"/>
+                    <mxGeometry x="280" y="230" width="120" height="60" as="geometry"/>
                 </mxCell>
                 <mxCell id="28" style="edgeStyle=none;html=1;fontSize=18;fillColor=#a20025;strokeColor=#6F0000;labelBackgroundColor=none;" parent="1" source="8" target="27" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
@@ -85,7 +95,7 @@
                     </mxGeometry>
                 </mxCell>
                 <mxCell id="8" value="&lt;span style=&quot;font-size: 18px&quot;&gt;mis-server&lt;br&gt;&lt;/span&gt;" style="whiteSpace=wrap;html=1;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;labelBackgroundColor=none;" parent="1" vertex="1">
-                    <mxGeometry x="340" y="350" width="120" height="60" as="geometry"/>
+                    <mxGeometry x="400" y="360" width="120" height="60" as="geometry"/>
                 </mxCell>
                 <mxCell id="45" style="edgeStyle=none;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=18;exitX=1;exitY=0.5;exitDx=0;exitDy=0;labelBackgroundColor=none;" parent="1" source="9" target="44" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
@@ -102,7 +112,7 @@
                 <mxCell id="43" value="LDAP" style="whiteSpace=wrap;html=1;fontSize=18;labelBackgroundColor=none;" parent="1" vertex="1">
                     <mxGeometry x="707" y="370" width="120" height="60" as="geometry"/>
                 </mxCell>
-                <mxCell id="44" value="&lt;span style=&quot;font-size: 18px&quot;&gt;OpenID&lt;/span&gt;" style="whiteSpace=wrap;html=1;labelBackgroundColor=none;" parent="1" vertex="1">
+                <mxCell id="44" value="&lt;span style=&quot;font-size: 18px&quot;&gt;PKU IAAA&lt;/span&gt;" style="whiteSpace=wrap;html=1;labelBackgroundColor=none;" parent="1" vertex="1">
                     <mxGeometry x="707" y="200" width="120" height="60" as="geometry"/>
                 </mxCell>
                 <mxCell id="55" style="edgeStyle=none;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=-0.016;entryY=0.42;entryDx=0;entryDy=0;entryPerimeter=0;fillColor=#a20025;strokeColor=#6F0000;labelBackgroundColor=none;" parent="1" source="49" target="9" edge="1">
@@ -122,10 +132,10 @@
                     </mxGeometry>
                 </mxCell>
                 <mxCell id="49" value="mis-web" style="whiteSpace=wrap;html=1;fontSize=18;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;labelBackgroundColor=none;" parent="1" vertex="1">
-                    <mxGeometry x="400" y="220" width="120" height="60" as="geometry"/>
+                    <mxGeometry x="430" y="230" width="120" height="60" as="geometry"/>
                 </mxCell>
                 <mxCell id="27" value="" style="shape=datastore;whiteSpace=wrap;html=1;fontSize=18;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;labelBackgroundColor=none;" parent="1" vertex="1">
-                    <mxGeometry x="310" y="430" width="40" height="40" as="geometry"/>
+                    <mxGeometry x="400" y="440" width="40" height="40" as="geometry"/>
                 </mxCell>
                 <mxCell id="60" value="slurm" style="rounded=0;whiteSpace=wrap;html=1;fontSize=18;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;labelBackgroundColor=none;" parent="1" vertex="1">
                     <mxGeometry x="430" y="570" width="110" height="50" as="geometry"/>
@@ -142,21 +152,54 @@
                     </mxGeometry>
                 </mxCell>
                 <mxCell id="80" value="login-node" style="rounded=0;whiteSpace=wrap;html=1;fontSize=18;labelBackgroundColor=none;" parent="1" vertex="1">
-                    <mxGeometry x="147" y="570" width="113" height="50" as="geometry"/>
+                    <mxGeometry x="287" y="570" width="113" height="50" as="geometry"/>
                 </mxCell>
                 <mxCell id="93" style="edgeStyle=none;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;fillColor=#0050ef;strokeColor=#001DBC;" parent="1" source="92" target="80" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
                 <mxCell id="94" value="SSH" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];labelBackgroundColor=none;" parent="93" vertex="1" connectable="0">
                     <mxGeometry x="-0.2742" y="-1" relative="1" as="geometry">
-                        <mxPoint as="offset"/>
+                        <mxPoint x="5" y="52" as="offset"/>
                     </mxGeometry>
                 </mxCell>
                 <mxCell id="92" value="portal-server" style="whiteSpace=wrap;html=1;fontSize=18;fillColor=#0050ef;fontColor=#ffffff;strokeColor=#001DBC;labelBackgroundColor=none;" parent="1" vertex="1">
-                    <mxGeometry x="150" y="350" width="120" height="60" as="geometry"/>
+                    <mxGeometry x="240" y="360" width="120" height="60" as="geometry"/>
                 </mxCell>
-                <mxCell id="95" value="compute" style="rounded=0;whiteSpace=wrap;html=1;fontSize=18;labelBackgroundColor=none;" vertex="1" parent="1">
-                    <mxGeometry x="287" y="570" width="113" height="50" as="geometry"/>
+                <mxCell id="95" value="compute" style="rounded=0;whiteSpace=wrap;html=1;fontSize=18;labelBackgroundColor=none;" parent="1" vertex="1">
+                    <mxGeometry x="153.5" y="570" width="113" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="98" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;dashed=1;" vertex="1" parent="1">
+                    <mxGeometry x="595" y="540" width="125" height="90" as="geometry"/>
+                </mxCell>
+                <mxCell id="100" value="novnc-client" style="whiteSpace=wrap;html=1;fontSize=18;fillColor=#0050ef;fontColor=#ffffff;strokeColor=#001DBC;labelBackgroundColor=none;" vertex="1" parent="1">
+                    <mxGeometry x="147" y="230" width="110" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="102" style="edgeStyle=none;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fillColor=#0050ef;strokeColor=#001DBC;" edge="1" parent="1" source="100" target="95">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="220" y="420" as="sourcePoint"/>
+                        <mxPoint x="312.59400000000005" y="580.55" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="103" value="HTTP/WebSocket" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontColor=default;labelBackgroundColor=none;" vertex="1" connectable="0" parent="102">
+                    <mxGeometry x="-0.7004" y="1" relative="1" as="geometry">
+                        <mxPoint x="-5" y="135" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="108" style="edgeStyle=none;html=1;fillColor=#0050ef;strokeColor=#001DBC;entryX=0.558;entryY=-0.005;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" target="60">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="280" y="410" as="sourcePoint"/>
+                        <mxPoint x="345.3243243243244" y="580" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="109" value="SSH" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];labelBackgroundColor=none;" vertex="1" connectable="0" parent="108">
+                    <mxGeometry x="-0.2742" y="-1" relative="1" as="geometry">
+                        <mxPoint x="5" y="52" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="110" value="SSH" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="108">
+                    <mxGeometry x="-0.4309" y="-2" relative="1" as="geometry">
+                        <mxPoint x="41" y="23" as="offset"/>
+                    </mxGeometry>
                 </mxCell>
             </root>
         </mxGraphModel>

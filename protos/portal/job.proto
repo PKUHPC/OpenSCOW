@@ -55,6 +55,8 @@ message JobInfo {
   string elapsed = 9;
   string time_limit = 10;
   string submit_time = 11;
+  optional string start_time = 12;
+  optional string end_time = 13;
 }
 
 message JobTemplate {
@@ -64,10 +66,13 @@ message JobTemplate {
   optional string qos = 4;
   uint32 node_count = 5;
   uint32 core_count = 6;
-  uint32 max_time = 7; // in minutes
-  string command = 8;
-  string working_directory = 9;
-  optional string comment = 10;
+  optional uint32 gpu_count = 7;
+  uint32 max_time = 8; // in minutes
+  string command = 9;
+  string working_directory = 10;
+  optional string output = 11;
+  optional string error_output = 12;
+  optional string comment = 13;
 }
 
 message ListAllJobsResponse {
@@ -114,14 +119,18 @@ message SubmitJobRequest {
   optional string partition = 3;
   uint32 node_count = 4;
   uint32 core_count = 5;
-  string command = 6;
-  string job_name = 7;
-  optional string qos = 8;
-  uint32 max_time = 9; // in minutes
-  string account = 10;
-  string working_directory = 11;
-  optional string comment = 12;
-  bool save_as_template = 13;
+  optional uint32 gpu_count = 6;
+  string command = 7;
+  string job_name = 8;
+  optional string qos = 9;
+  uint32 max_time = 10; // in minutes
+  string account = 11;
+  string working_directory = 12;
+  string output = 13;
+  string error_output = 14;
+  optional string memory = 15;
+  optional string comment = 16;
+  bool save_as_template = 17;
 }
 
 // NOT_FOUND: cluster is not found

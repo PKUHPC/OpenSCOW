@@ -126,6 +126,25 @@ export const AppSessionsTable: React.FC<Props> = () => {
               </>
             ) : undefined
           }
+          {
+            (record.state === "PENDING" || record.state === "SUSPENDED") ? (
+              <Popconfirm
+                title="确定取消这个任务吗？"
+                onConfirm={async () =>
+                  api.cancelJob({ body: {
+                    cluster: cluster.id,
+                    jobId: record.jobId,
+                  } })
+                    .then(() => {
+                      message.success("任务取消请求已经提交！");
+                      reload();
+                    })
+                }
+              >
+                <a>取消</a>
+              </Popconfirm>
+            ) : undefined
+          }
           <a onClick={() => {
             Router.push(join("/files", cluster.id, record.dataPath));
           }}

@@ -85,7 +85,7 @@ message CreateAccountRequest {
   string tenant_name = 1;
   string account_name = 2;
   string owner_id = 3;
-  string comment = 4;
+  optional string comment = 4;
 }
 
 // ALREADY_EXISTS: Account already exists.

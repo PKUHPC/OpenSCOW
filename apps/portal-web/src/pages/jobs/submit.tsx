@@ -43,11 +43,14 @@ export const SubmitJobPage: NextPage = requireAuth(() => true)(
               partition: template.partition,
               nodeCount: template.nodeCount,
               coreCount: template.coreCount,
+              gpuCount: template.gpuCount,
               qos: template.qos,
               maxTime: template.maxTime,
               account: template.account,
               comment: template.comment || "",
               workingDirectory: template.workingDirectory,
+              output: template.output,
+              errorOutput: template.errorOutput,
               save: false,
             }));
         } else {

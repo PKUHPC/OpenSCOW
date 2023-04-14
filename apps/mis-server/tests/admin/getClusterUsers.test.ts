@@ -10,7 +10,8 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { parseClusterUsers } from "src/utils/slurm";
+import { ClusterAccountInfo_ImportStatus } from "@scow/protos/build/server/admin";
+import { parseClusterAccounts } from "src/clusterops/slurm/utils/parse";
 
 
 const dataStr = `
@@ -29,25 +30,27 @@ There is no user in account !
 `;
 
 it("test whether the string from 'slurm.sh -l all' can be parsed successfully", async () => {
-  const result = parseClusterUsers(dataStr);
+  const result = parseClusterAccounts(dataStr);
 
-  expect(result).toStrictEqual({ accounts: [
+  expect(result).toStrictEqual([
     {
       accountName: "a_user1",
       users: [
-        { userId: "user1", userName: "user1", state: "allowed!" }, 
+        { userId: "user1", userName: "user1", state: "allowed!" },
         { userId: "user2", userName: "user2", state: "blocked!" },
       ],
       owner: "user1",
-      included: false,
+      importStatus: ClusterAccountInfo_ImportStatus.NOT_EXISTING,
+      blocked: true,
     },
     {
       accountName: "account2",
       users: [
-        { userId: "user2", userName: "user2", state: "allowed!" }, 
+        { userId: "user2", userName: "user2", state: "allowed!" },
         { userId: "user3", userName: "user3", state: "blocked!" }],
-      included: false,
+      importStatus: ClusterAccountInfo_ImportStatus.NOT_EXISTING,
+      blocked: true,
     },
   ],
-  });
+  );
 });

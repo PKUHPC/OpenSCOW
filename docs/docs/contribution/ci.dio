@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e" scale="2" border="0">
     <diagram id="CCmktOVLaJpoyg_8QXb8" name="Page-1">
-        <mxGraphModel dx="628" dy="508" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+        <mxGraphModel dx="1292" dy="912" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -10,7 +10,7 @@
                 <mxCell id="8" value="" style="edgeStyle=none;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=18;labelBackgroundColor=none;" parent="1" source="2" target="5" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="22" style="edgeStyle=none;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="2" target="21">
+                <mxCell id="22" style="edgeStyle=none;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" parent="1" source="2" target="21" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
                 <mxCell id="2" value="代码更新&#10;(commit, PR)" style="rounded=0;whiteSpace=wrap;fontSize=18;labelBackgroundColor=none;" parent="1" vertex="1">
@@ -51,13 +51,13 @@
                 <mxCell id="17" value="上传镜像到GitHub CR" style="rounded=0;whiteSpace=wrap;fontSize=18;labelBackgroundColor=none;" parent="1" vertex="1">
                     <mxGeometry x="610" y="400" width="120" height="60" as="geometry"/>
                 </mxCell>
-                <mxCell id="24" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="21" target="23">
+                <mxCell id="24" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="21" target="23" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="21" value="更新部署项目" style="rounded=0;whiteSpace=wrap;fontSize=18;labelBackgroundColor=none;" vertex="1" parent="1">
+                <mxCell id="21" value="构建二进制文件" style="rounded=0;whiteSpace=wrap;fontSize=18;labelBackgroundColor=none;" parent="1" vertex="1">
                     <mxGeometry x="280" y="130" width="120" height="60" as="geometry"/>
                 </mxCell>
-                <mxCell id="23" value="推送到&#10;scow-depoyment" style="rounded=0;whiteSpace=wrap;fontSize=18;labelBackgroundColor=none;" vertex="1" parent="1">
+                <mxCell id="23" value="上传到CI Archive/Release" style="rounded=0;whiteSpace=wrap;fontSize=18;labelBackgroundColor=none;" parent="1" vertex="1">
                     <mxGeometry x="450" y="130" width="140" height="60" as="geometry"/>
                 </mxCell>
             </root>

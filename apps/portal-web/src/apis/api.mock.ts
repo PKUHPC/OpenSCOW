@@ -57,6 +57,8 @@ export const job: JobInfo = {
   elapsed: "00:00:00",
   reason: "None",
   submitTime: "2022-07-07T09:21:42",
+  startTime: "2022-07-07T09:21:42",
+  endTime: "2022-07-07T09:21:52",
 };
 
 export const mockApi: MockApi<typeof api> = {
@@ -67,6 +69,8 @@ export const mockApi: MockApi<typeof api> = {
       partitions: [
         { cores: 123, name: "123", nodes: 123, qos: ["123"], gpus: 10, mem: 1000 },
         { cores: 1234, name: cluster, nodes: 1234, qos: ["1234"], gpus: 10, mem: 1000 },
+        { name : "compute", mem: 2048, cores:2, gpus:0, nodes: 1, qos: ["normal"], comment: "两个计算节点分区" },
+        { name : "GPU", mem: 2048, cores:2, gpus:2, nodes: 1, qos: ["normal"], comment: "GPU" },
       ],
     },
   } }),
@@ -159,6 +163,8 @@ export const mockApi: MockApi<typeof api> = {
       nodeCount: 4,
       partition: "low",
       qos: "low",
+      output: "job.%j.out",
+      errorOutput: "job.%j.err",
       workingDirectory: "/nfs/jobs/123",
     },
   }),

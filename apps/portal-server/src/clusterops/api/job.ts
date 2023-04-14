@@ -39,10 +39,14 @@ export interface JobTemplate {
   qos?: string | undefined;
   nodeCount: number;
   coreCount: number;
+  gpuCount?: number;
   /** in minutes */
   maxTime: number;
   command: string;
   workingDirectory: string;
+  output?: string;
+  errorOutput?: string;
+  memory?: string;
   comment?: string | undefined;
 }
 
@@ -114,6 +118,8 @@ export interface JobInfo {
   elapsed: string;
   timeLimit: string;
   submitTime: string;
+  startTime: string;
+  endTime: string;
 }
 
 export interface ListAllJobsInfoReply {
