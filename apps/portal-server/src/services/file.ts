@@ -368,7 +368,6 @@ export const fileServiceServer = plugin((server) => {
 
       const fromTransferNode = getClusterTransferNode(fromCluster);
       const toTransferNode = getClusterTransferNode(toCluster);
-      if (!fromTransferNode || !toTransferNode) return [{}];
 
       const [toTransferNodeHost, toTransferNodePort] = toTransferNode.indexOf(":") > 0 ?
         toTransferNode.split(":") : [toTransferNode, "22"];
@@ -401,7 +400,7 @@ export const fileServiceServer = plugin((server) => {
           keyConfiged = false;
         }
       });
-
+      // console.log("KeyConfiged", keyConfiged);
       // 如果没有配置免密，则生成密钥并配置免密
       if (!keyConfiged) {
         let publicKey: string;
@@ -463,7 +462,6 @@ export const fileServiceServer = plugin((server) => {
       const { cluster, userId } = request;
 
       const transferNode = getClusterTransferNode(cluster);
-      if (!transferNode) return [{ transferInfos:[]}];
 
       return await sshConnect(transferNode, userId, logger, async (ssh) => {
         const cmd = "scow-sync-query";
@@ -525,8 +523,6 @@ export const fileServiceServer = plugin((server) => {
       const { toCluster, userId, fromPath } = request;
 
       const toTransferNode = getClusterTransferNode(toCluster);
-
-      if (!toTransferNode) return [{}];
 
       const [toTransferNodeHost, toTransferNodePort] = toTransferNode.indexOf(":") > 0 ?
         toTransferNode.split(":") : [toTransferNode, "22"];

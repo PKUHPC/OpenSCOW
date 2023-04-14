@@ -1,6 +1,6 @@
 displayName: hpc01Name
 slurm:
-  loginNodes: 
+  loginNodes:
     - localhost:22222
   partitions:
       - name: compute
@@ -25,3 +25,6 @@ slurm:
           - high
           - highest
         comment: 说明
+crossClusterFilesTransfer:
+  enabled: true
+  transferNode: localhost:22222

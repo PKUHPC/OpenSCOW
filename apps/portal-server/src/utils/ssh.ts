@@ -17,7 +17,7 @@ import { NodeSSH } from "node-ssh";
 import { clusters } from "src/config/clusters";
 import { rootKeyPair } from "src/config/env";
 import { scowErrorMetadata } from "src/utils/error";
-import { loginNodeNotFound, transferNodeNotFound } from "src/utils/errors";
+import { loginNodeNotFound, transferNodeNotFound, TransferNotEnabled } from "src/utils/errors";
 import { Logger } from "ts-log";
 
 
@@ -29,13 +29,16 @@ export function getClusterLoginNode(cluster: string): string {
   return loginNode;
 }
 
-export function getClusterTransferNode(cluster: string): string | undefined {
-  if (clusters[cluster]?.crossClusterFilesTransfer && clusters[cluster]?.crossClusterFilesTransfer?.transferNode) {
-    return clusters[cluster]?.crossClusterFilesTransfer?.transferNode;
+export function getClusterTransferNode(cluster: string): string {
+  const enabled = clusters[cluster]?.crossClusterFilesTransfer?.enabled;
+  const transferNode = clusters[cluster]?.crossClusterFilesTransfer?.transferNode;
+  if (!enabled) {
+    throw TransferNotEnabled(cluster);
   }
-  else {
-    return undefined;
+  else if (!transferNode) {
+    throw transferNodeNotFound(cluster);
   }
+  return transferNode;
 }
 
 export const SSH_ERROR_CODE = "SSH_ERROR";

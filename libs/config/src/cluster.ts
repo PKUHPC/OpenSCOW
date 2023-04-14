@@ -42,11 +42,10 @@ export const ClusterConfigSchema = Type.Object({
     mis: Type.Optional(SlurmMisConfigSchema),
   }),
   misIgnore: Type.Boolean({ description: "在实际进行MIS操作时忽略这个集群", default: false }),
-  crossClusterFilesTransfer: Type.Optional(
-    Type.Object({
-      transferNode: Type.String({ description: "跨集群传输文件的节点" }),
-    }),
-  ),
+  crossClusterFilesTransfer: Type.Object({
+    enabled: Type.Boolean({ description: "是否开启跨集群传输功能", default: false }),
+    transferNode: Type.Optional(Type.String({ description: "跨集群传输文件的节点" })),
+  }),
 });
 
 export type ClusterConfigSchema = Static<typeof ClusterConfigSchema>;

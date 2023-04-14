@@ -26,4 +26,5 @@ slurm:
           - highest
         comment: 说明
 crossClusterFilesTransfer:
+  enabled: true
   transferNode: localhost:22222

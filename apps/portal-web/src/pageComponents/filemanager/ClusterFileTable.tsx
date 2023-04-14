@@ -78,7 +78,7 @@ export const ClusterFileTable: React.FC<Props> = ({
         onChange={async (cluster) => {
           await api.getHomeDirectory({ query: { cluster: cluster!.id } })
             .then((d) => {
-              console.log(d);
+              // console.log(d);
               setPath(d.path);
               setSelectedCluster(cluster);
             });
