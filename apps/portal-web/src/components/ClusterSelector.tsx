@@ -11,7 +11,6 @@
  */
 
 import { Select } from "antd";
-import getConfig from "next/config";
 import { Cluster, publicConfig, runtimeConfig } from "src/utils/config";
 
 
@@ -66,14 +65,14 @@ export const SingleCrossClusterTransferSelector: React.FC<SingleSelectionProps> 
       options={
         (label ? [{ value: label, label, disabled: true }] : [])
           .concat(
-            // publicConfig.CLUSTERS.map((x) => ({ value: x.id, label: x.name, disabled: false }))
-            Object.entries(runtimeConfig.CLUSTERS_CONFIG)
-              .filter(([, cluster]) => cluster.crossClusterFilesTransfer.enabled)
-              .map(([clusterId, cluster]) => ({
-                value: clusterId,
-                label: cluster.displayName,
-                disabled: false,
-              })))
+            publicConfig.CLUSTERS.map((x) => ({ value: x.id, label: x.name, disabled: false })))
+        // Object.entries(runtimeConfig.CLUSTERS_CONFIG)
+        //   .filter(([, cluster]) => cluster.crossClusterFilesTransfer.enabled)
+        //   .map(([clusterId, cluster]) => ({
+        //     value: clusterId,
+        //     label: cluster.displayName,
+        //     disabled: false,
+        //   })))
       }
       dropdownMatchSelectWidth={false}
     />
