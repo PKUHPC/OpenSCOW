@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { Static, Type } from "@sinclair/typebox";
 import { randomUUID } from "crypto";
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { serveLoginHtml } from "src/auth/loginHtml";
@@ -21,7 +22,7 @@ export interface CaptchaInfo {
   token: string;
 }
 
-export async function createCaptcha(f: FastifyInstance): Promise<CaptchaInfo> {
+export async function createCaptcha(f: FastifyInstance, key?: string): Promise<CaptchaInfo> {
 
   const options = {
     size: 4,
@@ -35,10 +36,10 @@ export async function createCaptcha(f: FastifyInstance): Promise<CaptchaInfo> {
 
   const data = captcha.data;
   const text = captcha.text;
-  const token = randomUUID();
+  const token = key || randomUUID();
   await f.redis.set(token, text, "EX", 120);
   return { code: data, token };
-
+  
 }
 
 export async function validateCaptcha(
@@ -54,4 +55,22 @@ export async function validateCaptcha(
 
   await serveLoginHtml(false, callbackUrl, req, res, true);
   return false;
+}
+
+const bodySchema = Type.Object({
+  token: Type.String(),
+});
+export function registerCaptchaRoute(f: FastifyInstance) {
+  f.post<{ Body: Static<typeof bodySchema> }>(
+    "/refreshCaptcha",
+    {
+      schema:{
+        body: bodySchema,
+      },
+    },
+    async (req, res) => {
+      const { token } = req.body;
+      const data = (await createCaptcha(f, token)).code;
+      res.type("image/svg+xml").send(data);
+    });
 }
