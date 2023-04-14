@@ -37,8 +37,10 @@ export const TransferInfoTable: React.FC = () => {
     promiseFn: useCallback(async () => {
       const newTransferData: TransferData[] = [];
       for (const cluster of publicConfig.CLUSTERS) {
-        // 在测试开发环境中需要将hpc02排除在外，因为hpc02并没有容器化
-        if (cluster.id === "hpc02") continue;
+        // 判断是否开启了crossClusterFilesTransfer
+        const responseClusterInfo = await api.getClusterInfo({ query: { cluster: cluster.id } });
+        if (!responseClusterInfo.clusterInfo.crossClusterFilesTransfer.enabled) continue;
+        // 查询
         const response = await api.queryFilesTransferProgress({ query: { cluster: cluster.id } });
         newTransferData.push({
           cluster: cluster.id,
