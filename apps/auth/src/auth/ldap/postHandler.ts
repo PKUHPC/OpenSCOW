@@ -38,6 +38,11 @@ export function registerPostHandler(f: FastifyInstance, ldapConfig: LdapConfigSc
   }, async (req, res) => {
     const { username, password, callbackUrl, token, code } = req.body;
 
+    if (!code) {
+      await serveLoginHtml(false, callbackUrl, req, res);
+      return;
+    }
+
     if (!await validateLoginParams(token, code, callbackUrl, req, res)) {
       return;
     }
