@@ -57,7 +57,7 @@
                               ).then( async function (response) {
                                 captchaDiv.innerHTML = await response.text();
                               }).catch(() => {
-                                captchaDiv.textContent="刷新失败，请点击重试"
+                                captchaDiv.textContent = "刷新失败，请点击重试"
                               });
                           }
                           </script>
