@@ -64,7 +64,7 @@ export function buildApp(pluginOverrides?: PluginOverrides) {
 
   routes.forEach((r) => server.register(r));
 
-  if (authConfig.captcha) {
+  if (authConfig.captcha.enabled) {
     registerCaptchaRoute(server);
   }
 
