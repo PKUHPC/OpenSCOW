@@ -17,7 +17,7 @@ import { serveLoginHtml } from "src/auth/loginHtml";
 import { authConfig } from "src/config/auth";
 import svgCaptcha from "svg-captcha";
 
-const CAPTCHA_TOKEN_PREFIX = "captcha:";
+export const CAPTCHA_TOKEN_PREFIX = "captcha:";
 export interface CaptchaInfo {
   code: string;
   token: string;

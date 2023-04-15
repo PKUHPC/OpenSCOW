@@ -14,6 +14,7 @@ process.env.AUTH_TYPE = "ssh";
 
 import { FastifyInstance } from "fastify";
 import { buildApp } from "src/app";
+import { CAPTCHA_TOKEN_PREFIX } from "src/auth/captcha";
 import { allowedCallbackUrl, createFormData, testUserPassword, testUserUsername } from "tests/utils";
 
 const username = testUserUsername;
@@ -46,7 +47,7 @@ it("test to input a wrong verifyCaptcha", async () => {
     token: token,
     code: "wrongCaptcha",
   });
-  await server.redis.set(token, code, "EX", 30);
+  await server.redis.set(CAPTCHA_TOKEN_PREFIX + token, code, "EX", 30);
   const resp = await server.inject({
     method: "POST",
     url: "/public/auth",
@@ -66,7 +67,7 @@ it("logs in to the ssh login", async () => {
     code: code,
   });
 
-  await server.redis.set(token, code, "EX", 30);
+  await server.redis.set(CAPTCHA_TOKEN_PREFIX + token, code, "EX", 30);
   const resp = await server.inject({
     method: "POST",
     path: "/public/auth",
@@ -88,7 +89,7 @@ it("fails to login with wrong credentials", async () => {
     code: code,
   });
 
-  await server.redis.set(token, code, "EX", 30);
+  await server.redis.set(CAPTCHA_TOKEN_PREFIX + token, code, "EX", 30);
   const resp = await server.inject({
     method: "POST",
     path: "/public/auth",

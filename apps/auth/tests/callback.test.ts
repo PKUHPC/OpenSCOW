@@ -15,6 +15,7 @@ process.env.AUTH_TYPE = "ssh";
 import { FastifyInstance } from "fastify";
 import { buildApp } from "src/app";
 import { CallbackHostnameNotAllowedError } from "src/auth/callback";
+import { CAPTCHA_TOKEN_PREFIX } from "src/auth/captcha";
 import { allowedCallbackUrl, createFormData,
   notAllowedCallbackUrl, testUserPassword, testUserUsername } from "tests/utils";
 
@@ -71,7 +72,7 @@ it("redirects to allowed origin after login", async () => {
     code: code,
   });
 
-  await server.redis.set(token, code, "EX", 30);
+  await server.redis.set(CAPTCHA_TOKEN_PREFIX + token, code, "EX", 30);
   const resp = await server.inject({
     method: "POST",
     path: "/public/auth",
@@ -93,7 +94,7 @@ it("doesn't redirect to not allowed origin after login", async () => {
     code: code,
   });
 
-  await server.redis.set(token, code, "EX", 30);
+  await server.redis.set(CAPTCHA_TOKEN_PREFIX + token, code, "EX", 30);
   const resp = await server.inject({
     method: "POST",
     path: "/public/auth",
