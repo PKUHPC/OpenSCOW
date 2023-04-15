@@ -17,12 +17,19 @@ import { serveLoginHtml } from "src/auth/loginHtml";
 import { authConfig } from "src/config/auth";
 import svgCaptcha from "svg-captcha";
 
+const CAPTCHA_TOKEN_PREFIX = "captcha:";
 export interface CaptchaInfo {
   code: string;
   token: string;
 }
-
-export async function createCaptcha(f: FastifyInstance, key?: string): Promise<CaptchaInfo> {
+/**
+ * @param f the FastifyInstance
+ * @param token If a token is passed in,
+ * the generated text will be stored in Redis with this token as the key.
+ * If no token is passed in, a random token will be generated as the key to store the generated text.
+ * for both case, the key will use CAPTCHA_TOKEN_PREFIX as prefix.
+ */
+export async function createCaptcha(f: FastifyInstance, token?: string): Promise<CaptchaInfo> {
 
   const options = {
     size: 4,
@@ -36,10 +43,14 @@ export async function createCaptcha(f: FastifyInstance, key?: string): Promise<C
 
   const data = captcha.data;
   const text = captcha.text;
-  const token = key || randomUUID();
+  if (!!token && token.slice(0, CAPTCHA_TOKEN_PREFIX.length) !== CAPTCHA_TOKEN_PREFIX) {
+    token = CAPTCHA_TOKEN_PREFIX + token;
+  } else {
+    token = CAPTCHA_TOKEN_PREFIX + randomUUID();
+  }
   await f.redis.set(token, text, "EX", 120);
   return { code: data, token };
-  
+
 }
 
 export async function validateCaptcha(
@@ -71,6 +82,6 @@ export function registerCaptchaRoute(f: FastifyInstance) {
     async (req, res) => {
       const { token } = req.body;
       const data = (await createCaptcha(f, token)).code;
-      res.type("image/svg+xml").send(data);
+      await res.type("image/svg+xml").send(data);
     });
 }

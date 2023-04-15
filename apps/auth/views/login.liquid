@@ -46,17 +46,18 @@
                         <div id="captcha" onclick="refreshCaptcha()" class="cursor-pointer">{{ code }}</div>
                         <script>
                           function refreshCaptcha(){
-                            const captchaDiv=document.getElementById("captcha");
-                            fetch('/refreshCaptcha', {
-                            method: "POST",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({
-                              token: "{{ token }}",
-                            }),}
-                            ).then( async function (response) {
-                              captchaDiv.innerHTML=await response.text();
-                            }).catch(() => {
-                              captchaDiv.textContent="刷新失败，请点击重试"
+                            const captchaDiv = document.getElementById("captcha");
+                            const releativePath = "{{ authBasePath }}" == "/" ? "/refreshCaptcha" : "{{ authBasePath }}/refreshCaptcha"
+                            fetch(releativePath, {
+                              method: "POST",
+                              headers: { "Content-Type": "application/json" },
+                              body: JSON.stringify({
+                                token: "{{ token }}",
+                              }),}
+                              ).then( async function (response) {
+                                captchaDiv.innerHTML=await response.text();
+                              }).catch(() => {
+                                captchaDiv.textContent="刷新失败，请点击重试"
                               });
                           }
                           </script>
