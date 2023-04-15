@@ -27,7 +27,6 @@ export interface CaptchaInfo {
  * @param token If a token is passed in,
  * the generated text will be stored in Redis with this token as the key.
  * If no token is passed in, a random token will be generated as the key to store the generated text.
- * for both case, the key will use CAPTCHA_TOKEN_PREFIX as prefix.
  */
 export async function createCaptcha(f: FastifyInstance, token?: string): Promise<CaptchaInfo> {
 
@@ -43,12 +42,8 @@ export async function createCaptcha(f: FastifyInstance, token?: string): Promise
 
   const data = captcha.data;
   const text = captcha.text;
-  if (!!token && token.slice(0, CAPTCHA_TOKEN_PREFIX.length) !== CAPTCHA_TOKEN_PREFIX) {
-    token = CAPTCHA_TOKEN_PREFIX + token;
-  } else {
-    token = CAPTCHA_TOKEN_PREFIX + randomUUID();
-  }
-  await f.redis.set(token, text, "EX", 120);
+  token = token ?? randomUUID();
+  await f.redis.set(CAPTCHA_TOKEN_PREFIX + token, text, "EX", 120);
   return { code: data, token };
 
 }
@@ -59,7 +54,7 @@ export async function validateCaptcha(
 
   if (!authConfig.captcha.enabled) { return true; }
 
-  const redisCode = await req.server.redis.getdel(token);
+  const redisCode = await req.server.redis.getdel(CAPTCHA_TOKEN_PREFIX + token);
   if (code.toLowerCase() === redisCode?.toLowerCase()) {
     return true;
   }
