@@ -29,7 +29,6 @@ export function encryptData(ivAndKey: { iv: Buffer; key: Buffer }, text: string)
   return encrypted.toString("hex");
 }
 
-// 解密时，如果redis服务器重启, 返回undefined,通知上层函数
 export function decryptData(ivAndKey: { iv: Buffer; key: Buffer }, text: string) {
   const encryptedTexyt = Buffer.from(text, "hex");
   const decipher = crypto.createDecipheriv("aes-256-cbc", ivAndKey.key, ivAndKey.iv);

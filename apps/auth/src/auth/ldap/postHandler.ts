@@ -19,7 +19,7 @@ import { findUser, useLdap } from "src/auth/ldap/helpers";
 import { serveLoginHtml } from "src/auth/loginHtml";
 import { validateOtpCode } from "src/auth/otp/helper";
 import { validateLoginParams } from "src/auth/validateLoginParams";
-import { LdapConfigSchema } from "src/config/auth";
+import { authConfig, LdapConfigSchema, OtpStatusOptions } from "src/config/auth";
 
 export function registerPostHandler(f: FastifyInstance, ldapConfig: LdapConfigSchema) {
 
@@ -31,7 +31,8 @@ export function registerPostHandler(f: FastifyInstance, ldapConfig: LdapConfigSc
     callbackUrl: Type.String(),
     token: Type.String(),
     code: Type.String(),
-    otpCode: Type.Optional(Type.String()),
+    ...(authConfig.otp?.type === OtpStatusOptions.ldap || authConfig.otp?.type === OtpStatusOptions.remote)
+      ? { otpCode: Type.String() } : undefined,
   });
 
   // register a login handler

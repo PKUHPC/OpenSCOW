@@ -21,9 +21,8 @@ import * as speakeasy from "speakeasy";
 import { bindOtpHtml } from "src/auth/bindOtpHtml";
 import { extractAttr, searchOne, takeOne } from "src/auth/ldap/helpers";
 import { serveLoginHtml } from "src/auth/loginHtml";
-import { authConfig, LdapConfigSchema, OtpStatusOptions } from "src/config/auth";
+import { authConfig, LdapConfigSchema, OtpLdapSchema, OtpStatusOptions } from "src/config/auth";
 import { config } from "src/config/env";
-import * as url from "url";
 
 import { decryptData, encryptData, generateIvAndKey } from "./aesUtils";
 
@@ -34,8 +33,15 @@ interface OtpSessionInfo {
   dn: string,
   sendEmaililTimestamp?: number,
 }
+interface IvAndKey {
+  iv: Buffer,
+  key: Buffer,
+}
 
-function decodeIvKeyFromBase64(data: string) {
+function encodeIvKeyToBase64(ivAndKey: IvAndKey) {
+  return ivAndKey.iv.toString("base64") + separator + ivAndKey.key.toString("base64");
+}
+function decodeIvKeyFromBase64(data: string): IvAndKey {
   const encryIv = data.split(separator)[0];
   const encryKey = data.split(separator)[1];
   const iv = Buffer.from(encryIv, "base64");
@@ -84,12 +90,14 @@ export async function storeOtpSessionAndGoSendEmailUI(
   logger: FastifyBaseLogger,
   client: ldapjs.Client,
   backToLoginUrl: string,
+  bindLimitMinutes: number,
   userInfo: {
     dn: string,
   },
 ) {
   const otpSessionToken = crypto.randomUUID();
-  await saveOtpSession(otpSessionToken, userInfo, authConfig.otp!.ldap!.timeLimitMinutes * 60, f);
+  // await saveOtpSession(otpSessionToken, userInfo, authConfig.otp!.ldap!.bindLimitMinutes * 60, f);
+  await saveOtpSession(otpSessionToken, userInfo, bindLimitMinutes * 60, f);
   const mailAttributeName = ldapConfig.attrs.mail || "mail";
   const emailAddressInfo =
     await searchOneAttributeValueFromLdap(userInfo.dn, logger, mailAttributeName, client);
@@ -97,13 +105,12 @@ export async function storeOtpSessionAndGoSendEmailUI(
   let ivAndKey = await getIvAndKey(f);
   if (!ivAndKey) {
     ivAndKey = generateIvAndKey();
-    const encryptedIvKey = ivAndKey.iv.toString("base64") + separator + ivAndKey.key.toString("base64");
+    const encryptedIvKey = encodeIvKeyToBase64(ivAndKey);
     await f.redis.set(AES_ENCRYPTION_IV_KEY_REDIS_KEY, encryptedIvKey);
   }
   const encryptOtpSessionToken = encryptData(ivAndKey, otpSessionToken);
-  const timeLimitMinutes = authConfig.otp!.ldap!.timeLimitMinutes;
   await bindOtpHtml(false, req, res,
-    { timeLimitMinutes: timeLimitMinutes, otpSessionToken: encryptOtpSessionToken,
+    { bindLimitMinutes: bindLimitMinutes, otpSessionToken: encryptOtpSessionToken,
       emailAddress: emailAddressInfo?.value, backToLoginUrl });
   return;
 }
@@ -116,13 +123,13 @@ export async function sendEmailAuthLink(
   logger: FastifyBaseLogger,
   emailAddress: string,
   backToLoginUrl: string,
+  otpLdap: OtpLdapSchema,
 ) {
-  const otpLdap = authConfig.otp!.ldap!;
   const ivAndKey = await getIvAndKey(f);
   if (!ivAndKey) {
     // redis中没有ivKey信息，返回信息过期UI
     await bindOtpHtml(false, req, res,
-      { timeLimitMinutes: otpLdap.timeLimitMinutes, tokenNotFound: true, backToLoginUrl: backToLoginUrl });
+      { bindLimitMinutes: otpLdap.bindLimitMinutes, tokenNotFound: true, backToLoginUrl: backToLoginUrl });
     return;
   }
   const decryptedOtpSessionToken = decryptData(ivAndKey, otpSessionToken);
@@ -130,18 +137,18 @@ export async function sendEmailAuthLink(
   if (!otpSession) {
     // 信息过期
     await bindOtpHtml(false, req, res,
-      { timeLimitMinutes: otpLdap.timeLimitMinutes, tokenNotFound: true, backToLoginUrl: backToLoginUrl });
+      { bindLimitMinutes: otpLdap.bindLimitMinutes, tokenNotFound: true, backToLoginUrl: backToLoginUrl });
     return;
   }
 
   const currentTimestamp = getAbsoluteUTCTimestamp();
   if (otpSession["sendEmaililTimestamp"] !== undefined) {
-    // 获取邮件链接需间隔至少authConfig.otp!.ldap!.timeLimitMinutes秒
+    // 获取邮件链接需间隔至少authConfig.otp!.ldap!.bindLimitMinutes秒
     const timeDiff = Math.floor(currentTimestamp / 1000 - otpSession["sendEmaililTimestamp"]);
     if (timeDiff < otpLdap.authenticationMethod.mail.sendEmailFrequencyLimitInSeconds) {
       await bindOtpHtml(
         false, req, res,
-        { timeLimitMinutes: otpLdap.timeLimitMinutes, emailAddress: emailAddress,
+        { bindLimitMinutes: otpLdap.bindLimitMinutes, emailAddress: emailAddress,
           timeDiffNotEnough: otpLdap.authenticationMethod.mail.sendEmailFrequencyLimitInSeconds
            - timeDiff, otpSessionToken, backToLoginUrl: backToLoginUrl });
       return;
@@ -162,14 +169,12 @@ export async function sendEmailAuthLink(
     },
   } as TransportOptions);
   const scowHostUrl = new URL(otpLdap.scowHost);
-  const hrefWithoutBackToLoginUrlParam = String(Object.assign(new URL("http://example.com"), {
+  const href = String(Object.assign(new URL("http://example.com"), {
     protocol: scowHostUrl.protocol,
     host: scowHostUrl.host,
-    path: join(config.BASE_PATH, config.AUTH_BASE_PATH, "/otp/email/validation"),
-    search: `token=${otpSessionToken}`,
+    pathname: join(config.BASE_PATH, config.AUTH_BASE_PATH, "/otp/email/validation"),
+    search: `token=${otpSessionToken}&backToLoginUrl=${encodeURIComponent(backToLoginUrl)}`,
   }));
-  const href = hrefWithoutBackToLoginUrlParam + `&backToLoginUrl=${encodeURIComponent(backToLoginUrl)}`;
-
   const mailOptions = {
     from: otpLdap.authenticationMethod.mail.from,
     to: emailAddress,
@@ -189,7 +194,7 @@ export async function sendEmailAuthLink(
 
   await bindOtpHtml(
     false, req, res,
-    { timeLimitMinutes: otpLdap.timeLimitMinutes, sendSucceeded: emailSent,
+    { bindLimitMinutes: otpLdap.bindLimitMinutes, sendSucceeded: emailSent,
       emailAddress: emailAddress, otpSessionToken: otpSessionToken, backToLoginUrl: backToLoginUrl });
 }
 

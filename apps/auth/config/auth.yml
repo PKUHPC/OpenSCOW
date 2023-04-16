@@ -11,10 +11,10 @@ otp:
   type: disabled
   ldap:
     #限制绑定otp要在多久时间内完成，需要整数，默认10
-    timeLimitMinutes: 10
+    bindLimitMinutes: 10
     #密钥存储属性名
     secretAttributeName: title
-    #scow系统访问地址，例如：http://localhost:5000
+    #scow系统访问地址ip或域名，例如：http://localhost:5000
     scowHost: http://localhost:5000
     #绑定otp时发送绑定信息方式
     authenticationMethod:
@@ -26,10 +26,10 @@ otp:
         #邮件主题，默认为"otp绑定链接"
         subject: "otp绑定链接"
         #邮件内容标题，默认为"Bind OTP""
-        title: "Bind OTP"
+        title: "Bind OTP", 也可以是html标签
         #邮件内容,默认为"Please click on the following link to bind your OTP:"
         contentText: "Please click on the following link to bind your OTP"
-        #标签点击文字,默认为"Bind OTP"
+        #标签点击文字,默认为"Bind OTP", 也可以是html标签
         labelText: "Bind OTP"
         mailTransportInfo:
           #SMTP服务器

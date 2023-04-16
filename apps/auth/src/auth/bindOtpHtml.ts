@@ -44,7 +44,7 @@ export async function bindOtpHtml(
     otpSessionToken?: string,
     backToLoginUrl?: string,
     timeDiffNotEnough?: number,
-    timeLimitMinutes?: number,
+    bindLimitMinutes?: number,
   },
 ) {
 

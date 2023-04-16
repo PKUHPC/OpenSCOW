@@ -102,7 +102,7 @@ export function bindValidateUserNameAndPasswordRoute(f: FastifyInstance, ldapCon
 
         logger.info("Binding as %s successful. User info %o", user.dn, user);
         await storeOtpSessionAndGoSendEmailUI(f, req, res, ldapConfig, logger, client, backToLoginUrl,
-          { dn: user.dn });
+          authConfig.otp!.ldap!.bindLimitMinutes, { dn: user.dn });
         return;
       }).catch(async (err) => {
         logger.info("error occurs. Err: %o", err);
@@ -132,7 +132,8 @@ export function bindClickRequestBindingLinkRoute(
       const { otpSessionToken, emailAddress, backToLoginUrl } = req.body;
       const logger = req.log;
 
-      await sendEmailAuthLink(f, otpSessionToken, req, res, logger, emailAddress, backToLoginUrl);
+      await sendEmailAuthLink(
+        f, otpSessionToken, req, res, logger, emailAddress, backToLoginUrl, authConfig.otp!.ldap!);
     },
   );
 }
@@ -164,7 +165,7 @@ export function bindClickAuthLinkInEmailRoute(
         if (!ivAndKey) {
           // 返回用户信息过期
           await bindOtpHtml(false, req, res,
-            { timeLimitMinutes: otpLdap.timeLimitMinutes, tokenNotFound: true, backToLoginUrl: backToLoginUrl });
+            { bindLimitMinutes: otpLdap.bindLimitMinutes, tokenNotFound: true, backToLoginUrl: backToLoginUrl });
           return;
         }
         const decryptedOtpSessionToken = decryptData(ivAndKey, token);
@@ -172,7 +173,7 @@ export function bindClickAuthLinkInEmailRoute(
         if (!otpSession) {
           // 信息过期
           await bindOtpHtml(false, req, res,
-            { timeLimitMinutes: otpLdap.timeLimitMinutes, tokenNotFound: true, backToLoginUrl: backToLoginUrl });
+            { bindLimitMinutes: otpLdap.bindLimitMinutes, tokenNotFound: true, backToLoginUrl: backToLoginUrl });
           return;
         }
         // 将secret信息存入ldap;

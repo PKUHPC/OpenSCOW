@@ -126,7 +126,34 @@ export const SshConfigSchema = Type.Object({
   baseNode: Type.Optional(Type.String({ description: "SSH认证中，以哪个节点为认证用户的基础。如果不设置则为第一个集群的第一个登录节点" })),
 }, { description: "SSH配置", default: {} });
 
+export const OtpLdapSchema = Type.Object({
+  bindLimitMinutes: Type.Integer({ description: "限制绑定otp要在多少分钟内完成", default: 10 }),
+  scowHost: Type.String({ description: "scow访问地址，用来组成发送邮件地址" }),
+  secretAttributeName: Type.String({ description: "存储otp密钥的属性名", default: "otpSecret" }),
+  qrcodeDescription: Type.String({ description: "secret二维码上方文字描述信息", default: "此二维码仅出现一次，用过即毁" }),
+  label:  Type.String({ description: "otp验证软件扫描二维码之后，出现的label中，用户名和@后显示的名称", default: "SCOW" }),
+  authenticationMethod: Type.Object({
+    mail: Type.Object({
+      sendEmailFrequencyLimitInSeconds: Type.Integer({ description: "发送邮件频率限制", default: 60 }),
+      from: Type.String({ description: "发件邮箱地址" }),
+      subject: Type.String({ description: "邮件主题", default: "OTP绑定链接" }),
+      title: Type.String({ description: "邮件内容标题", default: "Bind OTP" }),
+      contentText: Type.String({ description: "邮件内容",
+        default: "Please click on the following link to bind your OTP:" }),
+      labelText: Type.String({ description: "标签点击文字", default: "Bind OTP" }),
+      mailTransportInfo: Type.Object({
+        host: Type.String({ description: "SMTP服务器" }),
+        secure: Type.Boolean({ description: "是否启用SSL/TSL加密", default: false }),
+        port: Type.Integer({ description: "服务器端口" }),
+        user: Type.String({ description: "SMTP身份验证用户名" }),
+        password: Type.String({ description: "SMTP身份验证授权码" }),
+      }),
+    }, { description: "发送邮件的配置信息" }),
+  }, { description: "发送绑定链接相关配置" }),
+}, { description: "将otp密钥存在ldap需要配置信息" });
+
 export type SshConfigSchema = Static<typeof SshConfigSchema>;
+export type OtpLdapSchema = Static<typeof OtpLdapSchema>;
 
 export const AuthConfigSchema = Type.Object({
   redisUrl: Type.String({ description: "存放token的redis地址", default: "redis:6379" }),
@@ -144,31 +171,7 @@ export const AuthConfigSchema = Type.Object({
   }, { default: {} }),
   otp: Type.Optional(Type.Object({
     type: Type.Enum(OtpStatusOptions, { description: "otp功能状态", default: "disabled" }),
-    ldap: Type.Optional(Type.Object({
-      timeLimitMinutes: Type.Integer({ description: "限制绑定otp要在多少分钟内完成", default: 10 }),
-      scowHost: Type.String({ description: "scow访问地址，用来组成发送邮件地址" }),
-      secretAttributeName: Type.String({ description: "存储otp密钥的属性名", default: "otpSecret" }),
-      qrcodeDescription: Type.String({ description: "secret二维码上方文字描述信息", default: "此二维码仅出现一次，用过即毁" }),
-      label:  Type.String({ description: "otp验证软件扫描二维码之后，出现的label中，用户名和@后显示的名称", default: "SCOW" }),
-      authenticationMethod: Type.Object({
-        mail: Type.Object({
-          sendEmailFrequencyLimitInSeconds: Type.Integer({ description: "发送邮件频率限制", default: 60 }),
-          from: Type.String({ description: "发件邮箱地址" }),
-          subject: Type.String({ description: "邮件主题", default: "OTP绑定链接" }),
-          title: Type.String({ description: "邮件内容标题", default: "Bind OTP" }),
-          contentText: Type.String({ description: "邮件内容",
-            default: "Please click on the following link to bind your OTP:" }),
-          labelText: Type.String({ description: "标签点击文字", default: "Bind OTP" }),
-          mailTransportInfo: Type.Object({
-            host: Type.String({ description: "SMTP服务器" }),
-            secure: Type.Boolean({ description: "是否启用SSL/TSL加密", default: false }),
-            port: Type.Integer({ description: "服务器端口" }),
-            user: Type.String({ description: "SMTP身份验证用户名" }),
-            password: Type.String({ description: "SMTP身份验证授权码" }),
-          }),
-        }, { description: "发送邮件的配置信息" }),
-      }, { description: "发送绑定链接相关配置" }),
-    }, { description: "将otp密钥存在ldap需要配置信息" })),
+    ldap: Type.Optional(OtpLdapSchema),
     remote: Type.Optional(Type.Object({
       validateUrl: Type.String({ description: "远程验证otp码的url" }),
       redirectUrl: Type.Optional(Type.String({ description: "当用户点击绑定OTP时，302重定向的链接" })),

@@ -26,7 +26,7 @@
               <input type="hidden" name="backToLoginUrl" value="{{ backToLoginUrl }}">
             </form>
           </div>
-        {% unless timeLimitMinutes %}
+        {% unless bindLimitMinutes %}
         <form class="w-full" method="post" action="/otp/bind">
           <div class="px-8">
             <div class="w-full mb-4">
@@ -65,7 +65,7 @@
 
         <form class="w-full flex flex-wrap" method="post" action="/otp/sendEmail">
           <div class="w-full mb-8 ml-8 justify-between">
-            <p class="mt-1">请于{{ timeLimitMinutes }}分钟内完成绑定</p>
+            <p class="mt-1">请于{{ bindLimitMinutes }}分钟内完成绑定</p>
           </div>
           <div class="w-full overflow-x-scroll">
             <div class="flex w-full mb-4 items-center justify-between">

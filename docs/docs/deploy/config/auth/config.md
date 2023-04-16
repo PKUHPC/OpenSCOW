@@ -163,7 +163,7 @@ otp:
   #当status为ldap时间，需配置以下这段内容
   ldap:
     #限制绑定otp要在多少分钟内完成，需要整数, 默认10
-    #timeLimitMinutes: 10
+    #bindLimitMinutes: 10
     #密钥存储属性名, 默认为otpSecret, 需要用户自己在ldap中进行定义
     secretAttributeName: 
     #访问scow系统的域名或ip地址,用于发送邮件中组成OTP绑定页面的地址，例如：https://pku.edu.cn
@@ -179,11 +179,11 @@ otp:
         #sendEmailFrequencyLimitInSeconds: 60
         #邮件主题，默认为"OTP绑定链接"
         #subject: "OTP绑定链接"
-        #邮件内容标题，默认为"Bind OTP"
+        #邮件内容标题，默认为"Bind OTP"，也可以是html标签内容
         #title: "Bind OTP"
         #邮件内容,默认为"Please click on the following link to bind your OTP:"
         #contentText: "Please click on the following link to bind your OTP"
-        #标签点击文字,默认为"Bind OTP"
+        #标签点击文字,默认为"Bind OTP"，也可以是html标签内容
         #labelText: "Bind OTP"
         mailTransportInfo:
           #SMTP服务器
