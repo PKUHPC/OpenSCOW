@@ -15,14 +15,14 @@ process.env.AUTH_TYPE = "ssh";
 import { FastifyInstance } from "fastify";
 import { buildApp } from "src/app";
 import { CallbackHostnameNotAllowedError } from "src/auth/callback";
-import { CAPTCHA_TOKEN_PREFIX } from "src/auth/captcha";
+import { saveCaptchaText } from "src/auth/captcha";
 import { allowedCallbackUrl, createFormData,
   notAllowedCallbackUrl, testUserPassword, testUserUsername } from "tests/utils";
 
 const username = testUserUsername;
 const password = testUserPassword;
-const token = "token";
-const code = "code";
+const captchaToken = "captchaToken";
+const captchaCode = "captchaCode";
 
 let server: FastifyInstance;
 
@@ -68,11 +68,11 @@ it("redirects to allowed origin after login", async () => {
     username: username,
     password: password,
     callbackUrl: allowedCallbackUrl,
-    token: token,
-    code: code,
+    token: captchaToken,
+    code: captchaCode,
   });
 
-  await server.redis.set(CAPTCHA_TOKEN_PREFIX + token, code, "EX", 30);
+  await saveCaptchaText(server, captchaCode, captchaToken);
   const resp = await server.inject({
     method: "POST",
     path: "/public/auth",
@@ -90,11 +90,11 @@ it("doesn't redirect to not allowed origin after login", async () => {
     username: username,
     password: password,
     callbackUrl: notAllowedCallbackUrl,
-    token: token,
-    code: code,
+    token: captchaToken,
+    code: captchaCode,
   });
 
-  await server.redis.set(CAPTCHA_TOKEN_PREFIX + token, code, "EX", 30);
+  await saveCaptchaText(server, captchaCode, captchaToken);
   const resp = await server.inject({
     method: "POST",
     path: "/public/auth",

@@ -12,7 +12,7 @@
 
 import { Static, Type } from "@sinclair/typebox";
 import { randomUUID } from "crypto";
-import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
+import fastify, { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { serveLoginHtml } from "src/auth/loginHtml";
 import { authConfig } from "src/config/auth";
 import svgCaptcha from "svg-captcha";
@@ -22,6 +22,19 @@ export interface CaptchaInfo {
   code: string;
   token: string;
 }
+/**
+ * @param f the FastifyInstance
+ * @param token If a token is passed in,
+ * the generated text will be stored in Redis with this token as the key.
+ * If no token is passed in, a random token will be generated as the key to store the generated text.
+ */
+export async function saveCaptchaText(
+  f: FastifyInstance, text: string, token?: string, validSeconds: number = 120): Promise<string> {
+  token = token ?? randomUUID();
+  await f.redis.set(CAPTCHA_TOKEN_PREFIX + token, text, "EX", validSeconds);
+  return token;
+}
+
 /**
  * @param f the FastifyInstance
  * @param token If a token is passed in,
@@ -42,8 +55,7 @@ export async function createCaptcha(f: FastifyInstance, token?: string): Promise
 
   const data = captcha.data;
   const text = captcha.text;
-  token = token ?? randomUUID();
-  await f.redis.set(CAPTCHA_TOKEN_PREFIX + token, text, "EX", 120);
+  token = await saveCaptchaText(f, text, token);
   return { code: data, token };
 
 }
