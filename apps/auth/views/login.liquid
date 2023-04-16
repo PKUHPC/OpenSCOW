@@ -47,7 +47,8 @@
                         <script>
                           function refreshCaptcha(){
                             const captchaDiv = document.getElementById("captcha");
-                            fetch("/refreshCaptcha", {
+                            const releativePath = "{{ authBasePath }}" === "/" ? "/refreshCaptcha" : "{{ authBasePath }}/refreshCaptcha";
+                            fetch(releativePath, {
                               method: "POST",
                               headers: { "Content-Type": "application/json" },
                               body: JSON.stringify({
