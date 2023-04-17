@@ -73,13 +73,13 @@ const TenantInfoTable: React.FC<TenantInfoTableProps> = ({
     {
       dataIndex: "balance",
       title: "余额",
-      render: (balance: Money | undefined) => moneyToString(balance || { positive: true, yuan: 0, decimalPlace: 0 }),
+      render: (balance: Money) => moneyToString(balance),
 
     },
     {
       dataIndex: "createTime",
       title: "创建时间",
-      render: (time: string | undefined) => formatDateTime(time || ""),
+      render: (time: string) => formatDateTime(time),
     },
   ];
 
