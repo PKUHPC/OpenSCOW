@@ -114,7 +114,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
   const gpuCount = Form.useWatch("gpuCount", form) as number;
 
   const calculateWorkingDirectory = (template: string) =>
-    parsePlaceholder(template, { name: form.getFieldValue("jobName") });
+    parsePlaceholder(template, { name: jobName });
 
   const clusterInfoQuery = useAsync({
     promiseFn: useCallback(async () => cluster
@@ -133,12 +133,12 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
           qos: partition.qos?.[0],
         };
         form.setFieldsValue(setInitialValues);
-        form.setFieldValue("workingDirectory", calculateWorkingDirectory(data.clusterInfo.submitJobDirTemplate));
       }
     },
   });
 
   const setWorkingDirectoryValue = () => {
+    console.log(!form.isFieldTouched("workingDirectory") && clusterInfoQuery.data);
     if (!form.isFieldTouched("workingDirectory") && clusterInfoQuery.data) {
       form.setFieldValue("workingDirectory",
         calculateWorkingDirectory(clusterInfoQuery.data.clusterInfo.submitJobDirTemplate));
@@ -157,7 +157,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
 
   useEffect(() => {
     setWorkingDirectoryValue();
-  }, [jobName]);
+  }, [jobName, clusterInfoQuery.data]);
 
   const currentPartitionInfo = useMemo(() =>
     clusterInfoQuery.data
