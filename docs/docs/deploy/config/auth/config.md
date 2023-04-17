@@ -181,9 +181,9 @@ otp:
         #subject: "OTP绑定链接"
         #邮件内容标题，默认为"Bind OTP"，也可以是html标签内容
         #title: "Bind OTP"
-        #邮件内容,默认为"Please click on the following link to bind your OTP:"
+        #邮件内容,默认为"Please click on the following link to bind your OTP:"，也可以是html标签内容
         #contentText: "Please click on the following link to bind your OTP"
-        #标签点击文字,默认为"Bind OTP"，也可以是html标签内容
+        #标签点击文字,默认为"Bind OTP"
         #labelText: "Bind OTP"
         mailTransportInfo:
           #SMTP服务器
