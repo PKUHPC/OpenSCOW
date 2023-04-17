@@ -13,8 +13,8 @@
 import { FastifyInstance } from "fastify";
 import { authConfig, LdapConfigSchema, OtpStatusOptions } from "src/config/auth";
 
-import { clickAuthLinkInEmailRoute, clickRequestBindingLinkRoute,
-  redirectLoinUIAndBindUIRoute, validateUserNameAndPasswordRoute } from "./routeHandles";
+import { bindClickAuthLinkInEmailRoute, bindClickRequestBindingLinkRoute,
+  bindRedirectLoinUIAndBindUIRoute, bindValidateUserNameAndPasswordRoute } from "./routeHandles";
 
 export function registerOtpBindPostHandler(f: FastifyInstance, ldapConfig: LdapConfigSchema) {
 
@@ -26,15 +26,15 @@ export function registerOtpBindPostHandler(f: FastifyInstance, ldapConfig: LdapC
    *  登录界面->绑定OTP界面
    *  绑定OTP界面->登录界面重定向
    * */
-  redirectLoinUIAndBindUIRoute(f, authConfig.otp);
+  bindRedirectLoinUIAndBindUIRoute(f, authConfig.otp);
 
   if (authConfig.otp.type === OtpStatusOptions.ldap) {
     // 绑定路由，路由处理验证账户密码
-    validateUserNameAndPasswordRoute(f, ldapConfig);
+    bindValidateUserNameAndPasswordRoute(f, ldapConfig);
     // 绑定路由，路由处理发邮件
-    clickRequestBindingLinkRoute(f);
+    bindClickRequestBindingLinkRoute(f);
     // 绑定路由，路由处理绑定获取二维码
-    clickAuthLinkInEmailRoute(f, ldapConfig, authConfig.otp.ldap!);
+    bindClickAuthLinkInEmailRoute(f, ldapConfig, authConfig.otp.ldap!);
 
   }
 }

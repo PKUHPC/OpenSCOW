@@ -18,7 +18,7 @@ import * as nodemailer from "nodemailer";
 import { TransportOptions } from "nodemailer";
 import path, { join } from "path";
 import * as speakeasy from "speakeasy";
-import { bindOtpHtml } from "src/auth/bindOtpHtml";
+import { renderBindOtpHtml } from "src/auth/bindOtpHtml";
 import { extractAttr, searchOne, takeOne } from "src/auth/ldap/helpers";
 import { serveLoginHtml } from "src/auth/loginHtml";
 import { authConfig, LdapConfigSchema, OtpLdapSchema, OtpStatusOptions } from "src/config/auth";
@@ -111,7 +111,7 @@ export async function storeOtpSessionAndGoSendEmailUI(
     await f.redis.set(AES_ENCRYPTION_IV_KEY_REDIS_KEY, encryptedIvKey);
   }
   const encryptOtpSessionToken = encryptData(ivAndKey, otpSessionToken);
-  await bindOtpHtml(false, req, res,
+  await renderBindOtpHtml(false, req, res,
     { bindLimitMinutes: bindLimitMinutes, otpSessionToken: encryptOtpSessionToken,
       emailAddress: emailAddressInfo?.value, backToLoginUrl });
   return;
@@ -130,7 +130,7 @@ export async function sendEmailAuthLink(
   const ivAndKey = await getIvAndKey(f);
   if (!ivAndKey) {
     // redis中没有ivKey信息，返回信息过期UI
-    await bindOtpHtml(false, req, res,
+    await renderBindOtpHtml(false, req, res,
       { bindLimitMinutes: otpLdap.bindLimitMinutes, tokenNotFound: true, backToLoginUrl: backToLoginUrl });
     return;
   }
@@ -138,7 +138,7 @@ export async function sendEmailAuthLink(
   const otpSession = await getOtpSession(decryptedOtpSessionToken, f);
   if (!otpSession) {
     // 信息过期
-    await bindOtpHtml(false, req, res,
+    await renderBindOtpHtml(false, req, res,
       { bindLimitMinutes: otpLdap.bindLimitMinutes, tokenNotFound: true, backToLoginUrl: backToLoginUrl });
     return;
   }
@@ -148,7 +148,7 @@ export async function sendEmailAuthLink(
     // 获取邮件链接需至少间隔authConfig.otp.ldap.mail.sendEmailFrequencyLimitInSeconds
     const timeDiff = Math.floor(currentTimestamp / 1000 - otpSession.sendEmailTimestamp);
     if (timeDiff < otpLdap.authenticationMethod.mail.sendEmailFrequencyLimitInSeconds) {
-      await bindOtpHtml(
+      await renderBindOtpHtml(
         false, req, res,
         { bindLimitMinutes: otpLdap.bindLimitMinutes, emailAddress: emailAddress,
           timeDiffNotEnough: otpLdap.authenticationMethod.mail.sendEmailFrequencyLimitInSeconds
@@ -194,7 +194,7 @@ export async function sendEmailAuthLink(
     return false;
   });
 
-  await bindOtpHtml(
+  await renderBindOtpHtml(
     false, req, res,
     { bindLimitMinutes: otpLdap.bindLimitMinutes, sendSucceeded: emailSent,
       emailAddress: emailAddress, otpSessionToken: otpSessionToken, backToLoginUrl: backToLoginUrl });

@@ -62,7 +62,7 @@ export const LdapConfigSchema = Type.Object({
       如果不填写，则使用ldap.attrs.uid的值
       ` })),
       extraProps: Type.Optional(Type.Record(
-        Type.String(), 
+        Type.String(),
         Type.Union([Type.Null(), Type.String(), Type.Array(Type.String())],
           {
             description: `
@@ -226,6 +226,9 @@ export const getAuthConfig = () => {
     }
     if (config.otp?.type === OtpStatusOptions.ldap && !config.otp?.ldap) {
       throw new Error("otp status is set to ldap, but otp.ldap config is not set");
+    }
+    if (config.otp?.type === OtpStatusOptions.ldap && !config.ldap?.attrs.mail) {
+      throw new Error("otp status is set to ldap, but ldap.attrs.mail is not set");
     }
     if (config.otp?.type === OtpStatusOptions.remote && !config.otp?.remote) {
       throw new Error("otp status is set to remote, but otp.remote config is not set");

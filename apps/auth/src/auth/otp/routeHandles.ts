@@ -15,7 +15,7 @@ import { FastifyInstance } from "fastify";
 import ldapjs from "ldapjs";
 import * as QRCode from "qrcode";
 import * as speakeasy from "speakeasy";
-import { bindOtpHtml } from "src/auth/bindOtpHtml";
+import { renderBindOtpHtml } from "src/auth/bindOtpHtml";
 import { findUser, useLdap } from "src/auth/ldap/helpers";
 import { authConfig, LdapConfigSchema, OtpConfigSchema, OtpLdapSchema, OtpStatusOptions } from "src/config/auth";
 import { promisify } from "util";
@@ -29,7 +29,7 @@ import { getIvAndKey, getOtpSession, renderLiquidFile,
    *  登录界面->绑定OTP界面
    *  绑定OTP界面->登录界面重定向
    * */
-export function redirectLoinUIAndBindUIRoute(f: FastifyInstance, otp: OtpConfigSchema) {
+export function bindRedirectLoinUIAndBindUIRoute(f: FastifyInstance, otp: OtpConfigSchema) {
   const QuerystringSchema = Type.Object({
     action: Type.Enum({ bindOtp: "bindOtp", backToLoginUI: "backToLoginUI" }),
     backToLoginUrl: Type.String(),
@@ -49,7 +49,7 @@ export function redirectLoinUIAndBindUIRoute(f: FastifyInstance, otp: OtpConfigS
       const { action, backToLoginUrl } = req.query;
       if (otp.type === OtpStatusOptions.ldap && action === "bindOtp") {
         const backToLoginUrl = req.headers.referer;
-        await bindOtpHtml(false, req, res, { backToLoginUrl: backToLoginUrl });
+        await renderBindOtpHtml(false, req, res, { backToLoginUrl: backToLoginUrl });
         return;
       }
       if (otp.type === OtpStatusOptions.remote && action === "bindOtp") {
@@ -66,12 +66,12 @@ export function redirectLoinUIAndBindUIRoute(f: FastifyInstance, otp: OtpConfigS
         res.redirect(backToLoginUrl);
         return;
       }
-
+      return;
     });
 }
 
 //  验证用户名密码->发送邮件页面
-export function validateUserNameAndPasswordRoute(f: FastifyInstance, ldapConfig: LdapConfigSchema) {
+export function bindValidateUserNameAndPasswordRoute(f: FastifyInstance, ldapConfig: LdapConfigSchema) {
   const bodySchema = Type.Object({
     username: Type.String(),
     password: Type.String(),
@@ -87,12 +87,12 @@ export function validateUserNameAndPasswordRoute(f: FastifyInstance, ldapConfig:
     const logger = req.log.child({ plugin: "ldap" });
     await useLdap(logger, ldapConfig)(async (client) => {
       const user = await findUser(logger, ldapConfig, client, username).catch(async () => {
-        await bindOtpHtml(true, req, res);
+        await renderBindOtpHtml(true, req, res);
       });
 
       if (!user) {
         logger.info("Didn't find user with %s=%s", ldapConfig.attrs.uid, username);
-        await bindOtpHtml(true, req, res);
+        await renderBindOtpHtml(true, req, res);
         return;
       }
       logger.info("Trying binding as %s with credentials", user.dn);
@@ -102,10 +102,9 @@ export function validateUserNameAndPasswordRoute(f: FastifyInstance, ldapConfig:
 
         await storeOtpSessionAndGoSendEmailUI(f, req, res, ldapConfig, logger, client, backToLoginUrl,
           authConfig.otp!.ldap!.bindLimitMinutes, { dn: user.dn });
-        return;
       }).catch(async (err) => {
         logger.info("error occurs. Err: %o", err);
-        await bindOtpHtml(true, req, res);
+        await renderBindOtpHtml(true, req, res);
       });
 
     });
@@ -113,7 +112,7 @@ export function validateUserNameAndPasswordRoute(f: FastifyInstance, ldapConfig:
 }
 
 // 点击获取绑定链接
-export function clickRequestBindingLinkRoute(
+export function bindClickRequestBindingLinkRoute(
   f: FastifyInstance) {
   const bodySchema = Type.Object({
     otpSessionToken: Type.String(),
@@ -137,7 +136,7 @@ export function clickRequestBindingLinkRoute(
   );
 }
 // 点击邮箱中的绑定链接
-export function clickAuthLinkInEmailRoute(
+export function bindClickAuthLinkInEmailRoute(
   f: FastifyInstance,
   ldapConfig: LdapConfigSchema,
   otpLdap: OtpLdapSchema,
@@ -163,7 +162,7 @@ export function clickAuthLinkInEmailRoute(
         const ivAndKey = await getIvAndKey(f);
         if (!ivAndKey) {
           // 返回用户信息过期
-          await bindOtpHtml(false, req, res,
+          await renderBindOtpHtml(false, req, res,
             { bindLimitMinutes: otpLdap.bindLimitMinutes, tokenNotFound: true, backToLoginUrl: backToLoginUrl });
           return;
         }
@@ -171,7 +170,7 @@ export function clickAuthLinkInEmailRoute(
         const otpSession = await getOtpSession(decryptedOtpSessionToken, f);
         if (!otpSession) {
           // 信息过期
-          await bindOtpHtml(false, req, res,
+          await renderBindOtpHtml(false, req, res,
             { bindLimitMinutes: otpLdap.bindLimitMinutes, tokenNotFound: true, backToLoginUrl: backToLoginUrl });
           return;
         }
@@ -205,7 +204,7 @@ export function clickAuthLinkInEmailRoute(
           urlImg,
           backToLoginUrl,
         });
-        res.header("Content-Type", "text/html; charset=utf-8").send(renderedFile);
+        await res.header("Content-Type", "text/html; charset=utf-8").send(renderedFile);
       });
 }
 

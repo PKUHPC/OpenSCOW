@@ -13,7 +13,6 @@
 import { DEFAULT_PRIMARY_COLOR } from "@scow/config/build/ui";
 import { FastifyReply, FastifyRequest } from "fastify";
 import { join } from "path";
-import { authConfig, OtpStatusOptions } from "src/config/auth";
 import { config, FAVICON_URL } from "src/config/env";
 import { uiConfig } from "src/config/ui";
 
@@ -33,7 +32,7 @@ function parseHostname(req: FastifyRequest): string | undefined {
 }
 
 
-export async function bindOtpHtml(
+export async function renderBindOtpHtml(
   err: boolean, req: FastifyRequest, rep: FastifyReply,
   otp?: {
     sendEmailUI?: boolean,
