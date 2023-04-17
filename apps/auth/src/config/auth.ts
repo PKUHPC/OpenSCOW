@@ -215,22 +215,24 @@ export const getAuthConfig = () => {
       }
     }
   }
-  if (config.otp?.enabled && !config.otp.type) {
-    throw new Error("config.otp.enabled is set to true, but config.otp.type is not to set");
-  }
 
   if (config.authType === AuthType.ssh && !config.ssh) {
     throw new Error("authType is set to ssh, but ssh config is not set");
   }
 
-  if (config.otp?.type === OtpStatusOptions.ldap && !config.otp?.ldap) {
-    throw new Error("otp status is set to ldap, but otp.ldap config is not set");
-  }
-  if (config.otp?.type === OtpStatusOptions.remote && !config.otp?.remote) {
-    throw new Error("otp status is set to remote, but otp.remote config is not set");
-  }
-  if (config.authType === AuthType.ssh && config.otp?.type === OtpStatusOptions.ldap) {
-    throw new Error("When authType is set to ssh, otp.type can only be set to remote");
+  if (config.otp?.enabled) {
+    if (!config.otp.type) {
+      throw new Error("config.otp.enabled is set to true, but config.otp.type is not to set");
+    }
+    if (config.otp?.type === OtpStatusOptions.ldap && !config.otp?.ldap) {
+      throw new Error("otp status is set to ldap, but otp.ldap config is not set");
+    }
+    if (config.otp?.type === OtpStatusOptions.remote && !config.otp?.remote) {
+      throw new Error("otp status is set to remote, but otp.remote config is not set");
+    }
+    if (config.authType === AuthType.ssh && config.otp?.type === OtpStatusOptions.ldap) {
+      throw new Error("When authType is set to ssh, otp.type can only be set to remote");
+    }
   }
 
   return config;

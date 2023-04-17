@@ -97,7 +97,10 @@ export async function storeOtpSessionAndGoSendEmailUI(
 ) {
   const otpSessionToken = crypto.randomUUID();
   await saveOtpSession(otpSessionToken, userInfo, bindLimitMinutes * 60, f);
-  const mailAttributeName = ldapConfig.attrs.mail || "mail";
+  const mailAttributeName = ldapConfig.attrs.mail;
+  if (!mailAttributeName) {
+    throw new Error("ldapConfig.attrs.mail can not be undefined");
+  }
   const emailAddressInfo =
     await searchOneAttributeValueFromLdap(userInfo.dn, logger, mailAttributeName, client);
 
