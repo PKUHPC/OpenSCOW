@@ -69,6 +69,7 @@ export function registerPostHandler(f: FastifyInstance, ldapConfig: LdapConfigSc
         return;
       }
       logger.info("Trying binding as %s with credentials", user.dn);
+
       await useLdap(logger, ldapConfig, { dn: user.dn, password })(async () => {
         logger.info("Binding as %s successful. User info %o", user.dn, user);
         const info = await cacheInfo(user.identityId, req);
@@ -77,6 +78,7 @@ export function registerPostHandler(f: FastifyInstance, ldapConfig: LdapConfigSc
         logger.info("Binding as %s failed. Err: %o", user.dn, err);
         await serveLoginHtml(true, callbackUrl, req, res);
       });
+      
     });
   });
 }
