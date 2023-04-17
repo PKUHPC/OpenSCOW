@@ -151,14 +151,18 @@ start();
 
 ```
 
-默认不启用`otp`功能，无需配置。启用时，如果您将`otp.type`配置为`ldap`, 那么`otp.ldap`下所有没有默认值的配置项都需要配置，同样地如果您将`otp.type`配置为`remote`, 那么`otp.remote`下所有没有默认值的配置项都需要配置
+默认不启用`otp`功能，无需配置。若要启用`otp`, 则需要将`otp.enabled`配置为`true`, 此时必须配置`otp.type`为`ldap`或者`remote`。
+
+启用时，如果您将`otp.type`配置为`ldap`, 那么`otp.ldap`下所有没有默认值的配置项都需要配置，同样地如果您将`otp.type`配置为`remote`, 那么`otp.remote`下所有没有默认值的配置项都需要配置
 
 `auth.yaml:`
 ```yaml title="config/auth.yml"
 
-#使用ldap认证方式时，支持启用otp.type为ldap和remote，ssh方式仅支持otp.type为remote
+#ldap认证支持绑定和验证otp，ssh认证仅支持验证
 otp:
-  #status指定otp状态，分别为disabled:不启用,ldap：密钥存在ldap，remote：用户自行实现otp码认证接口。默认为disabled
+  #是否启用otp功能， 默认false
+  enabled: false
+  #status指定otp启用类型，分别为ldap：密钥存在ldap，remote：密钥您自己管理。
   type: ldap
   #当status为ldap时间，需配置以下这段内容
   ldap:
@@ -166,7 +170,7 @@ otp:
     #bindLimitMinutes: 10
     #密钥存储属性名, 默认为otpSecret, 需要用户自己在ldap中进行定义
     secretAttributeName: 
-    #访问scow系统的域名或ip地址,用于发送邮件中组成OTP绑定页面的地址，例如：https://pku.edu.cn
+    #访问scow系统的域名或ip地址(不需要填写scow的base path),用于发送邮件中组成OTP绑定页面的地址，例如：https://pku.edu.cn
     scowHost: 
     #otp验证软件扫描二维码之后，出现的label中，用户名和@后显示的名称, 默认为SCOW
     #ldabel: "scow"
@@ -197,9 +201,9 @@ otp:
           #SMTP身份验证授权码
           password: "y2es3bd3rYwxWs5n8g"
   #如果mode指定为remote，需要配置以下内容
-  #remote:
+  remote:
     #远程验证url，例如http://localhost:9999/otp/remote/validateCode,详见https://pkuhpc.github.io/SCOW/docs/deploy/config/auth/config
-    #validateUrl: 
+    validateUrl: 
     #当用户点击绑定OTP按钮时跳转的按钮，建议配置，不配置会不显示绑定otp按钮
     #redirectUrl: https://pkuhpc.github.io/SCOW/docs/deploy/config/auth/config 
 

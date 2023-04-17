@@ -17,7 +17,7 @@ import * as QRCode from "qrcode";
 import * as speakeasy from "speakeasy";
 import { bindOtpHtml } from "src/auth/bindOtpHtml";
 import { findUser, useLdap } from "src/auth/ldap/helpers";
-import { authConfig, LdapConfigSchema } from "src/config/auth";
+import { authConfig, LdapConfigSchema, OtpConfigSchema, OtpLdapSchema, OtpStatusOptions } from "src/config/auth";
 import { promisify } from "util";
 
 import { decryptData } from "./aesUtils";
@@ -29,7 +29,7 @@ import { getIvAndKey, getOtpSession, renderLiquidFile,
    *  登录界面->绑定OTP界面
    *  绑定OTP界面->登录界面重定向
    * */
-export function bindRedirectLoinUIAndBindUIRoute(f: FastifyInstance) {
+export function redirectLoinUIAndBindUIRoute(f: FastifyInstance, otp: OtpConfigSchema) {
   const QuerystringSchema = Type.Object({
     action: Type.Enum({ bindOtp: "bindOtp", backToLoginUI: "backToLoginUI" }),
     backToLoginUrl: Type.String(),
@@ -47,14 +47,12 @@ export function bindRedirectLoinUIAndBindUIRoute(f: FastifyInstance) {
     async (req, res) => {
 
       const { action, backToLoginUrl } = req.query;
-      const otp = authConfig.otp!;
-      if (otp.type === "ldap" && action === "bindOtp") {
+      if (otp.type === OtpStatusOptions.ldap && action === "bindOtp") {
         const backToLoginUrl = req.headers.referer;
         await bindOtpHtml(false, req, res, { backToLoginUrl: backToLoginUrl });
         return;
       }
-      if (otp.type === "remote" && action === "bindOtp") {
-
+      if (otp.type === OtpStatusOptions.remote && action === "bindOtp") {
         if (!otp.remote!.redirectUrl) {
           res.redirect(backToLoginUrl);
           return;
@@ -73,7 +71,7 @@ export function bindRedirectLoinUIAndBindUIRoute(f: FastifyInstance) {
 }
 
 //  验证用户名密码->发送邮件页面
-export function bindValidateUserNameAndPasswordRoute(f: FastifyInstance, ldapConfig: LdapConfigSchema) {
+export function validateUserNameAndPasswordRoute(f: FastifyInstance, ldapConfig: LdapConfigSchema) {
   const bodySchema = Type.Object({
     username: Type.String(),
     password: Type.String(),
@@ -101,6 +99,7 @@ export function bindValidateUserNameAndPasswordRoute(f: FastifyInstance, ldapCon
       await useLdap(logger, ldapConfig, { dn: user.dn, password })(async () => {
 
         logger.info("Binding as %s successful. User info %o", user.dn, user);
+
         await storeOtpSessionAndGoSendEmailUI(f, req, res, ldapConfig, logger, client, backToLoginUrl,
           authConfig.otp!.ldap!.bindLimitMinutes, { dn: user.dn });
         return;
@@ -114,7 +113,7 @@ export function bindValidateUserNameAndPasswordRoute(f: FastifyInstance, ldapCon
 }
 
 // 点击获取绑定链接
-export function bindClickRequestBindingLinkRoute(
+export function clickRequestBindingLinkRoute(
   f: FastifyInstance) {
   const bodySchema = Type.Object({
     otpSessionToken: Type.String(),
@@ -138,9 +137,10 @@ export function bindClickRequestBindingLinkRoute(
   );
 }
 // 点击邮箱中的绑定链接
-export function bindClickAuthLinkInEmailRoute(
+export function clickAuthLinkInEmailRoute(
   f: FastifyInstance,
   ldapConfig: LdapConfigSchema,
+  otpLdap: OtpLdapSchema,
 ) {
   const QuerystringSchema = Type.Object ({
     token: Type.String(),
@@ -160,7 +160,6 @@ export function bindClickAuthLinkInEmailRoute(
       async (req, res) => {
         const { token, backToLoginUrl } = req.query;
         const logger = req.log;
-        const otpLdap = authConfig.otp!.ldap!;
         const ivAndKey = await getIvAndKey(f);
         if (!ivAndKey) {
           // 返回用户信息过期

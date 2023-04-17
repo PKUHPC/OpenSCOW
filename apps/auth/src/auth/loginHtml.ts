@@ -41,11 +41,11 @@ export async function serveLoginHtml(
 
   const hostname = parseHostname(req);
   const enableCaptcha = authConfig.captcha.enabled;
-  const enableTotp = authConfig.otp?.type !== OtpStatusOptions.disabled && authConfig.otp?.type !== undefined;
+  const enableTotp = authConfig.otp?.enabled;
 
-  // 显示按钮绑定otp按钮：密钥存于ldap时 || 配置了redirectUrl
-  const showBindOtpButton = authConfig.otp?.type === OtpStatusOptions.ldap
-    || (!!authConfig.otp?.remote?.redirectUrl && authConfig.otp?.type === OtpStatusOptions.remote);
+  // 显示绑定otp按钮：otp.enabled为true && (密钥存于ldap时 || (otp.type===remote && 配置了otp.remote.redirectUrl))
+  const showBindOtpButton = authConfig.otp?.enabled && (authConfig.otp?.type === OtpStatusOptions.ldap
+    || (!!authConfig.otp?.remote?.redirectUrl && authConfig.otp?.type === OtpStatusOptions.remote));
   const captchaInfo = enableCaptcha
     ? await createCaptcha(req.server)
     : undefined;

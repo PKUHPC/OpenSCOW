@@ -5,16 +5,18 @@ redisUrl: localhost:6379
 allowedCallbackHostnames:
   - localhost
 
-#目前仅支持ldap认证方式启用otp，ssh方式不支持
+#ldap认证支持绑定和验证otp，ssh认证仅支持验证
 otp:
-  #status指定otp状态，分别为disabled:不启用,ldap：密钥存于ldap，remote：启用密钥存在远程。默认为disabled
-  type: disabled
+  #是否启用otp功能， 默认false
+  enabled: false
+  #status指定otp状态，分别为 ldap：密钥存于ldap，remote：密钥您自己管理。
+  type: ldap
   ldap:
     #限制绑定otp要在多久时间内完成，需要整数，默认10
     bindLimitMinutes: 10
     #密钥存储属性名
     secretAttributeName: title
-    #scow系统访问地址ip或域名，例如：http://localhost:5000
+    #scow系统访问地址ip或域名(不需要填写scow的base path)，例如：http://localhost:5000
     scowHost: http://localhost:5000
     #绑定otp时发送绑定信息方式
     authenticationMethod:

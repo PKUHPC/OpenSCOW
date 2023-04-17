@@ -22,7 +22,6 @@ export enum NewUserGroupStrategy {
 }
 
 export enum OtpStatusOptions {
-  "disabled" = "disabled",
   "ldap" = "ldap",
   "remote" = "remote",
 }
@@ -128,7 +127,7 @@ export const SshConfigSchema = Type.Object({
 
 export const OtpLdapSchema = Type.Object({
   bindLimitMinutes: Type.Integer({ description: "限制绑定otp要在多少分钟内完成", default: 10 }),
-  scowHost: Type.String({ description: "scow访问地址，用来组成发送邮件地址" }),
+  scowHost: Type.String({ description: "scow的ip地址或者域名，用来组成发送邮件地址" }),
   secretAttributeName: Type.String({ description: "存储otp密钥的属性名", default: "otpSecret" }),
   qrcodeDescription: Type.String({ description: "secret二维码上方文字描述信息", default: "此二维码仅出现一次，用过即毁" }),
   label:  Type.String({ description: "otp验证软件扫描二维码之后，出现的label中，用户名和@后显示的名称", default: "SCOW" }),
@@ -152,8 +151,19 @@ export const OtpLdapSchema = Type.Object({
   }, { description: "发送绑定链接相关配置" }),
 }, { description: "将otp密钥存在ldap需要配置信息" });
 
+export const OtpConfigSchema = Type.Object({
+  enabled: Type.Boolean({ description: "是否启用otp", default: false }),
+  type: Type.Optional(Type.Enum(OtpStatusOptions, { description: "otp功能状态" })),
+  ldap: Type.Optional(OtpLdapSchema),
+  remote: Type.Optional(Type.Object({
+    validateUrl: Type.String({ description: "远程验证otp码的url" }),
+    redirectUrl: Type.Optional(Type.String({ description: "当用户点击绑定OTP时，302重定向的链接" })),
+  }, { description: "将密钥存在远程地址时的配置信息" })),
+}, { description: "otp功能配置" });
+
 export type SshConfigSchema = Static<typeof SshConfigSchema>;
 export type OtpLdapSchema = Static<typeof OtpLdapSchema>;
+export type OtpConfigSchema = Static<typeof OtpConfigSchema>;
 
 export const AuthConfigSchema = Type.Object({
   redisUrl: Type.String({ description: "存放token的redis地址", default: "redis:6379" }),
@@ -169,14 +179,7 @@ export const AuthConfigSchema = Type.Object({
   captcha: Type.Object({
     enabled: Type.Boolean({ description: "验证码功能是否启用", default: false }),
   }, { default: {} }),
-  otp: Type.Optional(Type.Object({
-    type: Type.Enum(OtpStatusOptions, { description: "otp功能状态", default: "disabled" }),
-    ldap: Type.Optional(OtpLdapSchema),
-    remote: Type.Optional(Type.Object({
-      validateUrl: Type.String({ description: "远程验证otp码的url" }),
-      redirectUrl: Type.Optional(Type.String({ description: "当用户点击绑定OTP时，302重定向的链接" })),
-    }, { description: "将密钥存在远程地址时的配置信息" })),
-  }, { description: "otp功能配置" })),
+  otp: Type.Optional(OtpConfigSchema),
 });
 
 export type AuthConfigSchema = Static<typeof AuthConfigSchema>;
@@ -211,6 +214,9 @@ export const getAuthConfig = () => {
         );
       }
     }
+  }
+  if (config.otp?.enabled && !config.otp.type) {
+    throw new Error("config.otp.enabled is set to true, but config.otp.type is not to set");
   }
 
   if (config.authType === AuthType.ssh && !config.ssh) {

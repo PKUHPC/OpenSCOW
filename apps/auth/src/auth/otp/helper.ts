@@ -31,7 +31,7 @@ export const AES_ENCRYPTION_IV_KEY_REDIS_KEY = "auth:otp:ivkey";
 
 interface OtpSessionInfo {
   dn: string,
-  sendEmaililTimestamp?: number,
+  sendEmailTimestamp?: number,
 }
 interface IvAndKey {
   iv: Buffer,
@@ -96,7 +96,6 @@ export async function storeOtpSessionAndGoSendEmailUI(
   },
 ) {
   const otpSessionToken = crypto.randomUUID();
-  // await saveOtpSession(otpSessionToken, userInfo, authConfig.otp!.ldap!.bindLimitMinutes * 60, f);
   await saveOtpSession(otpSessionToken, userInfo, bindLimitMinutes * 60, f);
   const mailAttributeName = ldapConfig.attrs.mail || "mail";
   const emailAddressInfo =
@@ -142,9 +141,9 @@ export async function sendEmailAuthLink(
   }
 
   const currentTimestamp = getAbsoluteUTCTimestamp();
-  if (otpSession.sendEmaililTimestamp !== undefined) {
-    // 获取邮件链接需间隔至少authConfig.otp!.ldap!.bindLimitMinutes秒
-    const timeDiff = Math.floor(currentTimestamp / 1000 - otpSession["sendEmaililTimestamp"]);
+  if (otpSession.sendEmailTimestamp !== undefined) {
+    // 获取邮件链接需至少间隔authConfig.otp.ldap.mail.sendEmailFrequencyLimitInSeconds
+    const timeDiff = Math.floor(currentTimestamp / 1000 - otpSession.sendEmailTimestamp);
     if (timeDiff < otpLdap.authenticationMethod.mail.sendEmailFrequencyLimitInSeconds) {
       await bindOtpHtml(
         false, req, res,
@@ -154,7 +153,7 @@ export async function sendEmailAuthLink(
       return;
     }
   }
-  otpSession.sendEmaililTimestamp = Math.floor(currentTimestamp / 1000);
+  otpSession.sendEmailTimestamp = Math.floor(currentTimestamp / 1000);
 
   const ttl = await f.redis.ttl(decryptedOtpSessionToken);
 
@@ -226,7 +225,7 @@ interface UserInfo {
 }
 
 export async function remoteValidateOtpCode(userId: string, logger: FastifyBaseLogger, inputCode?: string) {
-  if (authConfig.otp?.type === OtpStatusOptions.disabled || !authConfig.otp?.type) {
+  if (!authConfig.otp?.enabled) {
     return true;
   }
   const otpRemote = authConfig.otp.remote!;
@@ -255,7 +254,7 @@ export async function validateOtpCode(
   logger: FastifyBaseLogger,
   client: ldapjs.Client,
 ) {
-  if (authConfig.otp?.type === OtpStatusOptions.disabled || !authConfig.otp?.type) {
+  if (!authConfig.otp?.enabled) {
     return true;
   }
   if (!inputCode) {
@@ -273,12 +272,13 @@ export async function validateOtpCode(
     }
 
   }
+
   // 如果是otp.type是ldap
   const otpLdap = authConfig.otp.ldap!;
   const secretInfo = await searchOneAttributeValueFromLdap(
     userInfo.dn, logger, otpLdap.secretAttributeName, client);
   if (!secretInfo?.value) {
-    logger.error("fail to find otp secret");
+    logger.error("fail to find otp secret from ldap");
     await serveLoginHtml(false, callbackUrl, req, res, undefined, true);
     return false;
   }
@@ -295,7 +295,7 @@ export async function validateOtpCode(
     return true;
   } else {
     // 如果验证失败，验证是否是上一个otp码
-    const validatePreOtpCode = speakeasy.totp.verify({
+    const isPreOtpCode = speakeasy.totp.verify({
       token: inputCode,
       time: time / 1000 - 30,
       encoding: "base32",
@@ -304,7 +304,7 @@ export async function validateOtpCode(
       step: 30,
       algorithm: "sha1",
     });
-    if (validatePreOtpCode) {
+    if (isPreOtpCode) {
       return true;
     } else {
       await serveLoginHtml(false, callbackUrl, req, res, undefined, true);

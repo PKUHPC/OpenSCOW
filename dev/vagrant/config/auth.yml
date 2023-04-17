@@ -9,17 +9,19 @@ allowedCallbackHostnames:
 captcha:
   enabled: false
 
-#目前仅支持ldap认证方式启用otp，ssh方式不支持
+#ldap认证支持绑定和验证otp，ssh认证仅支持验证
 otp:
-  #status指定otp状态，分别为disabled:不启用,ldap：密钥存在ldap，remote：启用为远程认证模式。默认为disabled
-  type: disabled
+  #是否启用otp功能， 默认false
+  enabled: false
+  #status指定otp启用类型，分别为ldap：密钥存在ldap，remote：密钥您自己管理。
+  type: ldap
   #当status为ldap时间，需配置以下这段内容来本地注册
   ldap:
     #限制绑定otp要在多少分钟内完成，需要整数,默认10分钟
     timeLimitMinutes: 10
     #密钥存储属性名,需要用户自己定义, 这里使用title存储仅便于测试
     secretAttributeName: title
-    #访问scow系统的域名或ip
+    #访问scow系统的域名或ip(不需要填写scow的base path)
     scowHost: http://localhost:5000
     #otp验证软件扫描二维码之后，出现的label中，用户名和@后显示的名称, 默认为SCOW
     label: "scow"

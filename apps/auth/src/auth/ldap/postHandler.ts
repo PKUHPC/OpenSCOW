@@ -31,8 +31,7 @@ export function registerPostHandler(f: FastifyInstance, ldapConfig: LdapConfigSc
     callbackUrl: Type.String(),
     token: Type.String(),
     code: Type.String(),
-    ...(authConfig.otp?.type === OtpStatusOptions.ldap || authConfig.otp?.type === OtpStatusOptions.remote)
-      ? { otpCode: Type.String() } : undefined,
+    ...authConfig.otp?.enabled ? { otpCode: Type.String() } : undefined,
   });
 
   // register a login handler
