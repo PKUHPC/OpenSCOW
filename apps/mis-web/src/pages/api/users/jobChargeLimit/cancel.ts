@@ -22,7 +22,7 @@ import { handlegRPCError } from "src/utils/server";
 export interface CancelJobChargeLimitSchema {
   method: "DELETE",
 
-  body: {
+  query: {
     accountName: string;
     userId: string;
   }
@@ -36,7 +36,7 @@ export interface CancelJobChargeLimitSchema {
 
 export default /* #__PURE__*/route<CancelJobChargeLimitSchema>("CancelJobChargeLimitSchema", async (req, res) => {
 
-  const { accountName, userId } = req.body;
+  const { accountName, userId } = req.query;
 
   const auth = authenticate((u) => u.accountAffiliations.some((x) =>
     x.accountName === accountName && x.role !== UserRole.USER));

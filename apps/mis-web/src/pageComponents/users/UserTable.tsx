@@ -206,7 +206,7 @@ export const UserTable: React.FC<Props> = ({
                   icon: <ExclamationCircleOutlined />,
                   content: `确认要从账户${accountName}移出用户${r.name}（ID：${r.userId}）？`,
                   onOk: async () => {
-                    await api.removeUserFromAccount({ body: {
+                    await api.removeUserFromAccount({ query: {
                       identityId: r.userId,
                       accountName: accountName,
                     } })
