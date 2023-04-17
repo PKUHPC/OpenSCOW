@@ -103,6 +103,8 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
 
   const cluster = Form.useWatch("cluster", form) as Cluster | undefined;
 
+  const jobName = Form.useWatch("jobName", form) as string;
+
   const partition = Form.useWatch("partition", form) as string | undefined;
 
   const nodeCount = Form.useWatch("nodeCount", form) as number;
@@ -126,30 +128,36 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
         const setInitialValues = setValueFromTemplate ? {
           partition: initial.partition,
           qos: initial.qos,
-          workingDirectory: initial.workingDirectory,
         } : {
           partition: partition.name,
           qos: partition.qos?.[0],
-          workingDirectory: calculateWorkingDirectory(data.clusterInfo.submitJobDirTemplate),
         };
         form.setFieldsValue(setInitialValues);
+        form.setFieldValue("workingDirectory", calculateWorkingDirectory(data.clusterInfo.submitJobDirTemplate));
       }
     },
   });
 
-  const reloadJobName = () => {
-    const jobName = genJobName();
-    form.setFieldValue("jobName", jobName);
-
+  const setWorkingDirectoryValue = () => {
     if (!form.isFieldTouched("workingDirectory") && clusterInfoQuery.data) {
       form.setFieldValue("workingDirectory",
         calculateWorkingDirectory(clusterInfoQuery.data.clusterInfo.submitJobDirTemplate));
     }
   };
 
+  const reloadJobName = () => {
+    const jobName = genJobName();
+    form.setFieldValue("jobName", jobName);
+    setWorkingDirectoryValue();
+  };
+
   useEffect(() => {
     reloadJobName();
   }, []);
+
+  useEffect(() => {
+    setWorkingDirectoryValue();
+  }, [jobName]);
 
   const currentPartitionInfo = useMemo(() =>
     clusterInfoQuery.data
