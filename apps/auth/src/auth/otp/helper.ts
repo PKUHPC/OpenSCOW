@@ -142,7 +142,7 @@ export async function sendEmailAuthLink(
   }
 
   const currentTimestamp = getAbsoluteUTCTimestamp();
-  if (otpSession["sendEmaililTimestamp"] !== undefined) {
+  if (otpSession.sendEmaililTimestamp !== undefined) {
     // 获取邮件链接需间隔至少authConfig.otp!.ldap!.bindLimitMinutes秒
     const timeDiff = Math.floor(currentTimestamp / 1000 - otpSession["sendEmaililTimestamp"]);
     if (timeDiff < otpLdap.authenticationMethod.mail.sendEmailFrequencyLimitInSeconds) {
@@ -154,7 +154,7 @@ export async function sendEmailAuthLink(
       return;
     }
   }
-  otpSession["sendEmaililTimestamp"] = Math.floor(currentTimestamp / 1000);
+  otpSession.sendEmaililTimestamp = Math.floor(currentTimestamp / 1000);
 
   const ttl = await f.redis.ttl(decryptedOtpSessionToken);
 
