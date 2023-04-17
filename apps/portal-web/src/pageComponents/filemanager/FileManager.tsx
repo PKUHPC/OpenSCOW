@@ -178,20 +178,22 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
             title: `文件${file.name}${operationText}出错`,
             content: error,
           });
+          throw error;
         })
         .then(() => {
           setOperation((o) => o ? { ...operation, completed: o.completed.concat(file) } : undefined);
           return file;
-        }).catch(() => {
-          return undefined;
+        }).catch((e) => {
+          throw e;
         });
     };
 
     let successfulCount: number = 0;
     let abandonCount: number = 0;
     const allCount = operation.selected.length;
-    try {
-      for (const x of operation.selected) {
+    for (const x of operation.selected) {
+      try {
+
         const exists = await api.fileExist({ query: { cluster: cluster.id, path: join(path, x.name) } });
         if (exists.result) {
           await new Promise<void>(async (res) => {
@@ -203,31 +205,43 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
                 const fileType = await api.getFileType({ query: { cluster: cluster.id, path: join(path, x.name) } });
                 const deleteOperation = fileType.type === "dir" ? api.deleteDir : api.deleteFile;
                 await deleteOperation({ body: { cluster: cluster.id, path: join(path, x.name) } });
-                await pasteFile(x, join(operation.originalPath, x.name), join(path, x.name));
-                successfulCount++;
+                try {
+                  await pasteFile(x, join(operation.originalPath, x.name), join(path, x.name));
+                  successfulCount++;
+                } catch (e) {
+                  throw e;
+                }
                 res();
               },
               onCancel: async () => { abandonCount++; res(); },
             });
           });
         } else {
-          await pasteFile(x, join(operation.originalPath, x.name), join(path, x.name));
-          successfulCount++;
+          try {
+            await pasteFile(x, join(operation.originalPath, x.name), join(path, x.name));
+            successfulCount++;
+          } catch (e) {
+            throw e;
+          }
         }
+      } catch (e) {
+        console.error(e);
       }
+    }
+
+    if (allCount - successfulCount - abandonCount) {
+      message.error(
+        `${operationText}错误！总计${allCount}项文件/目录，其中成功${successfulCount}项，放弃${abandonCount}项，` +
+        `失败${allCount - successfulCount - abandonCount}项`,
+      );
+    } else {
       message.success(
         `${operationText}成功！总计${allCount}项文件/目录，其中成功${successfulCount}项，放弃${abandonCount}项`,
       );
-    } catch (e) {
-      console.error(e);
-      message.error(
-        `${operationText}错误！总计${allCount}项文件/目录，其中成功${successfulCount}项，放弃${abandonCount}项` +
-        `失败${allCount - successfulCount - abandonCount}项`,
-      );
-    } finally {
-      resetSelectedAndOperation();
-      reload();
     }
+
+    resetSelectedAndOperation();
+    reload();
   };
 
   const onDeleteClick = () => {
@@ -246,7 +260,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
           }).then(() => x).catch(() => undefined);
         }))
           .then((successfulInfo) => {
-            const failedCount = successfulInfo.filter((x) => !x).length;
+            const failedCount = successfulInfo.filter((x) => (!x || x.status === "fulfilled")).length;
             const allCount = files.length;
             if (failedCount === 0) {
               message.success(`删除${allCount}项成功！`);
