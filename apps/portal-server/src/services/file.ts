@@ -21,7 +21,7 @@ import { clusters } from "src/config/clusters";
 import { config } from "src/config/env";
 import { clusterNotFound } from "src/utils/errors";
 import { pipeline } from "src/utils/pipeline";
-import { getClusterLoginNode, getClusterTransferNode, sshConnect } from "src/utils/ssh";
+import { getClusterLoginNode, getClusterTransferNode, sshConnect, tryGetClusterTransferNode } from "src/utils/ssh";
 import { once } from "stream";
 
 export const fileServiceServer = plugin((server) => {
@@ -492,7 +492,7 @@ export const fileServiceServer = plugin((server) => {
         transferInfosJsons.forEach((info) => {
           let recvCluster = info.recvAddress;
           for (const key in clusters) {
-            const transferNode = getClusterTransferNode(key);
+            const transferNode = tryGetClusterTransferNode(key);
             if (transferNode) {
               const clusterHost = transferNode.indexOf(":") > 0 ?
                 transferNode.split(":")[0] : getClusterTransferNode(key);

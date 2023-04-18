@@ -41,6 +41,18 @@ export function getClusterTransferNode(cluster: string): string {
   return transferNode;
 }
 
+export function tryGetClusterTransferNode(cluster: string): string | undefined {
+  const enabled = clusters[cluster]?.crossClusterFilesTransfer?.enabled;
+  const transferNode = clusters[cluster]?.crossClusterFilesTransfer?.transferNode;
+  if (!enabled) {
+    return undefined;
+  }
+  else if (!transferNode) {
+    return undefined;
+  }
+  return transferNode;
+}
+
 export const SSH_ERROR_CODE = "SSH_ERROR";
 export const SFTP_ERROR_CODE = "SFTP_ERROR";
 
