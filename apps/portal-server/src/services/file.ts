@@ -524,21 +524,16 @@ export const fileServiceServer = plugin((server) => {
 
       const toTransferNode = getClusterTransferNode(toCluster);
 
-      const [toTransferNodeHost, toTransferNodePort] = toTransferNode.indexOf(":") > 0 ?
-        toTransferNode.split(":") : [toTransferNode, "22"];
+      const toTransferNodeHost = toTransferNode.indexOf(":") > 0 ?
+        toTransferNode.split(":")[0] : toTransferNode;
 
       return await sshConnect(toTransferNode, userId, logger, async (ssh) => {
-        const sftp = await ssh.requestSFTP();
-        const homePath = await sftpRealPath(sftp)(".");
-        const privateKeyPath = `${homePath}/scow/.scow-sync-ssh/id_rsa`;
 
         const cmd = "scow-sync-terminate";
         const args = [
           "-a", toTransferNodeHost,
           "-u", userId,
           "-s", fromPath,
-          "-p", toTransferNodePort.toString(),
-          "-k", privateKeyPath,
         ];
         const resp = await loggedExec(ssh, logger, true, cmd, args);
 
