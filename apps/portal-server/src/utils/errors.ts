@@ -25,7 +25,7 @@ export const loginNodeNotFound = (cluster: string) => {
   return <ServiceError> { code: Status.NOT_FOUND, message: `login node of cluster ${cluster} is not found` };
 };
 
-export const TransferNotEnabled = (cluster: string) => {
+export const transferNotEnabled = (cluster: string) => {
   return <ServiceError> {
     code: Status.INTERNAL, message: `the transmission function is not enabled for the cluster ${cluster}`,
   };
