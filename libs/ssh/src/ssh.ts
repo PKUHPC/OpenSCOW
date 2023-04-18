@@ -263,7 +263,7 @@ export async function insertKeyAsUser(
 
 export async function sshRmrf(ssh: NodeSSH, path: string) {
   await ssh.exec("rm", ["-rf", path]).catch((e) => {
-    // rm -rf 并非sftp命令，属于Linux命令，但其的仍是文件夹，且报错形式与sftp报错一致，故使用SftpError
+    // rm -rf 并非sftp命令，属于Linux命令，但其操作的是文件夹，且报错形式与sftp报错一致，故使用SftpError
     throw new SftpError(e);
   });
 }
