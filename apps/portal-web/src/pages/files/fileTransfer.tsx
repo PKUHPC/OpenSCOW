@@ -25,8 +25,8 @@ type FileInfoKey = React.Key;
 interface ButtonProps {
   icon: React.ReactNode;
   disabled: boolean;
-  srcCluster: Cluster;
-  dstCluster: Cluster;
+  srcCluster: Cluster | undefined;
+  dstCluster: Cluster | undefined;
   selectedKeys: FileInfoKey[];
   toPath: string;
 }
@@ -40,14 +40,16 @@ const OperationButton: React.FC<ButtonProps> = (props) => {
       icon={icon}
       disabled={disabled}
       onClick={ () => {
-        Promise.all(selectedKeys.map(async (key) => {
-          await api.startFilesTransfer({ body: {
-            fromCluster: srcCluster.id,
-            toCluster: dstCluster.id,
-            fromPath: String(key),
-            toPath: toPath,
-          } });
-        }));
+        if (srcCluster && dstCluster) {
+          Promise.all(selectedKeys.map(async (key) => {
+            await api.startFilesTransfer({ body: {
+              fromCluster: srcCluster.id,
+              toCluster: dstCluster.id,
+              fromPath: String(key),
+              toPath: toPath,
+            } });
+          }));
+        }
       }}
     />
 
@@ -60,11 +62,11 @@ export const FileTransferPage: NextPage = requireAuth(() => true)(() => {
   const [clusterLeft, setClusterLeft] = useState<Cluster>();
   const [clusterRight, setClusterRight] = useState<Cluster>();
 
-  const [pathLeft, setPathLeft] = useState<string>();
-  const [pathRight, setPathRight] = useState<string>();
+  const [pathLeft, setPathLeft] = useState<string>("");
+  const [pathRight, setPathRight] = useState<string>("");
 
-  const [selectedKeysLeft, setSelectedKeysLeft] = useState<FileInfoKey[]>();
-  const [selectedKeysRight, setSelectedKeysRight] = useState<FileInfoKey[]>();
+  const [selectedKeysLeft, setSelectedKeysLeft] = useState<FileInfoKey[]>([]);
+  const [selectedKeysRight, setSelectedKeysRight] = useState<FileInfoKey[]>([]);
 
 
 
@@ -74,11 +76,11 @@ export const FileTransferPage: NextPage = requireAuth(() => true)(() => {
       <Row justify="space-around" align="middle">
         <Col span={11}>
           <ClusterFileTable
-            selectedCluster={ clusterLeft! }
+            selectedCluster={ clusterLeft }
             setSelectedCluster={ setClusterLeft }
-            path={ pathLeft! }
+            path={ pathLeft }
             setPath={ setPathLeft }
-            selectedKeys={ selectedKeysLeft! }
+            selectedKeys={ selectedKeysLeft }
             setSelectedKeys={ setSelectedKeysLeft }
           />
         </Col>
@@ -88,22 +90,22 @@ export const FileTransferPage: NextPage = requireAuth(() => true)(() => {
           <Row justify="center">
             <OperationButton
               icon={<ArrowRightOutlined />}
-              disabled={!selectedKeysLeft || selectedKeysLeft!.length === 0}
-              srcCluster={clusterLeft!}
-              dstCluster={clusterRight!}
-              selectedKeys={selectedKeysLeft!}
-              toPath={pathRight!}
+              disabled={!selectedKeysLeft || selectedKeysLeft.length === 0}
+              srcCluster={clusterLeft}
+              dstCluster={clusterRight}
+              selectedKeys={selectedKeysLeft}
+              toPath={pathRight}
             />
           </Row>
 
           <Row justify="center">
             <OperationButton
               icon={<ArrowLeftOutlined />}
-              disabled={!selectedKeysRight || selectedKeysRight!.length === 0}
-              srcCluster={clusterRight!}
-              dstCluster={clusterLeft!}
-              selectedKeys={selectedKeysRight!}
-              toPath={pathLeft!}
+              disabled={!selectedKeysRight || selectedKeysRight.length === 0}
+              srcCluster={clusterRight}
+              dstCluster={clusterLeft}
+              selectedKeys={selectedKeysRight}
+              toPath={pathLeft}
             />
           </Row>
 
@@ -111,11 +113,11 @@ export const FileTransferPage: NextPage = requireAuth(() => true)(() => {
 
         <Col span={11}>
           <ClusterFileTable
-            selectedCluster={ clusterRight! }
+            selectedCluster={ clusterRight }
             setSelectedCluster={ setClusterRight }
-            path={ pathRight! }
+            path={ pathRight }
             setPath={ setPathRight }
-            selectedKeys={ selectedKeysRight! }
+            selectedKeys={ selectedKeysRight }
             setSelectedKeys={ setSelectedKeysRight }
           />
         </Col>

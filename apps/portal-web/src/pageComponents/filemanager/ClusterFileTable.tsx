@@ -26,7 +26,7 @@ import { urlToDownload } from "./api";
 import { PathBar } from "./PathBar";
 
 interface Props {
-  selectedCluster: Cluster;
+  selectedCluster?: Cluster;
   setSelectedCluster: (cluster: Cluster) => void;
   path: string;
   setPath: (path: string) => void;
@@ -44,7 +44,7 @@ export const ClusterFileTable: React.FC<Props> = ({
   const reload = async () => {
     setLoading(true);
     selectedCluster ? (
-      await api.listFile({ query: { cluster: selectedCluster.id, path: path! } })
+      await api.listFile({ query: { cluster: selectedCluster.id, path: path } })
         .then((d) => {
           setFiles(d.items);
         })
@@ -59,16 +59,18 @@ export const ClusterFileTable: React.FC<Props> = ({
   }, [selectedCluster, path]);
 
   const up = () => {
-    const paths = path!.split("/");
+    const paths = path.split("/");
     const newPath = paths.length === 1 ? path : paths.slice(0, paths.length - 1).join("/");
     setPath(newPath);
   };
 
   const toHome = async () => {
-    await api.getHomeDirectory({ query: { cluster: selectedCluster!.id } })
-      .then((d) => {
-        setPath(d.path);
-      });
+    if (selectedCluster) {
+      await api.getHomeDirectory({ query: { cluster: selectedCluster.id } })
+        .then((d) => {
+          setPath(d.path);
+        });
+    }
   };
 
   return (
@@ -76,17 +78,18 @@ export const ClusterFileTable: React.FC<Props> = ({
       <SingleCrossClusterTransferSelector
         value={selectedCluster}
         onChange={async (cluster) => {
-          await api.getHomeDirectory({ query: { cluster: cluster!.id } })
-            .then((d) => {
-              // console.log(d);
-              setPath(d.path);
-              setSelectedCluster(cluster);
-            });
+          if (cluster) {
+            await api.getHomeDirectory({ query: { cluster: cluster.id } })
+              .then((d) => {
+                setPath(d.path);
+                setSelectedCluster(cluster);
+              });
+          }
         }}
       />
       <TopBar>
-        <Button onClick={toHome} icon={<HomeOutlined />} shape="circle" />
-        <Button onClick={up} icon={<UpOutlined />} shape="circle" />
+        <Button disabled={!selectedCluster} onClick={toHome} icon={<HomeOutlined />} shape="circle" />
+        <Button disabled={!selectedCluster} onClick={up} icon={<UpOutlined />} shape="circle" />
         <PathBar
           path={path ? path : ""}
           reload={reload}
@@ -100,7 +103,7 @@ export const ClusterFileTable: React.FC<Props> = ({
         loading={loading}
         pagination={false}
         size="small"
-        rowKey={(r) => fileInfoKey(r, path!)}
+        rowKey={(r) => fileInfoKey(r, path)}
         scroll={{ x: true }}
         rowSelection={{
           selectedRowKeys: selectedKeys,
@@ -108,15 +111,18 @@ export const ClusterFileTable: React.FC<Props> = ({
         }}
         onRow={(r) => ({
           onClick: () => {
-            setSelectedKeys([fileInfoKey(r, path!)]);
+            setSelectedKeys([fileInfoKey(r, path)]);
           },
           onDoubleClick: () => {
             if (r.type === "DIR") {
-              setPath(join(path!, r.name));
+              setPath(join(path, r.name));
               // reload();
             } else if (r.type === "FILE") {
-              const href = urlToDownload(selectedCluster!.id, join(path!, r.name), false);
-              openPreviewLink(href);
+              if (selectedCluster) {
+                const href = urlToDownload(selectedCluster.id, join(path, r.name), false);
+                openPreviewLink(href);
+              }
+
             }
           },
         })}
@@ -140,15 +146,17 @@ export const ClusterFileTable: React.FC<Props> = ({
           render={(_, r) => (
             r.type === "DIR" ? (
               <a onClick={() => {
-                setPath(join(path!, r.name));
+                setPath(join(path, r.name));
               }}
               >
                 {r.name}
               </a>
             ) : (
               <a onClick={() => {
-                const href = urlToDownload(selectedCluster!.id, join(path!, r.name), false);
-                openPreviewLink(href);
+                if (selectedCluster) {
+                  const href = urlToDownload(selectedCluster.id, join(path, r.name), false);
+                  openPreviewLink(href);
+                }
               }}
               >
                 {r.name}
