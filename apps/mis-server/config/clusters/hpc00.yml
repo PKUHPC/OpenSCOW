@@ -32,3 +32,5 @@ slurm:
       cores: 28
       gpus: 4
       nodes: 32
+crossClusterFilesTransfer:
+  enabled: false

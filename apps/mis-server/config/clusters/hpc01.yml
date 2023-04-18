@@ -27,3 +27,6 @@ slurm:
         - low
         - normal
         - high
+crossClusterFilesTransfer:
+  enabled: true
+  transferNode: localhost:22222

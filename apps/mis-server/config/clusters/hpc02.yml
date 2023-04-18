@@ -21,3 +21,5 @@ slurm:
         - low
         - normal
         - high
+crossClusterFilesTransfer:
+  enabled: false
