@@ -21,7 +21,7 @@ import { handlegRPCError } from "src/utils/server";
 export interface CancelJobSchema {
   method: "DELETE";
 
-  body: {
+  query: {
     cluster: string;
     jobId: number;
   }
@@ -40,7 +40,7 @@ export default /* #__PURE__*/route<CancelJobSchema>("CancelJobSchema", async (re
 
   if (!info) { return; }
 
-  const { cluster, jobId } = req.body;
+  const { cluster, jobId } = req.query;
 
   const client = getClient(JobServiceClient);
 

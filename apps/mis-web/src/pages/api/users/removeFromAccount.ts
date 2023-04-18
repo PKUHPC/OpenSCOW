@@ -22,7 +22,7 @@ import { handlegRPCError } from "src/utils/server";
 export interface RemoveUserFromAccountSchema {
   method: "DELETE";
 
-  body: {
+  query: {
     accountName: string;
     identityId: string;
   }
@@ -39,7 +39,7 @@ export interface RemoveUserFromAccountSchema {
 }
 
 export default /* #__PURE__*/route<RemoveUserFromAccountSchema>("RemoveUserFromAccountSchema", async (req, res) => {
-  const { identityId, accountName } = req.body;
+  const { identityId, accountName } = req.query;
 
   const auth = authenticate((u) =>
     u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ||
