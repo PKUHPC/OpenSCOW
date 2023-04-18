@@ -111,7 +111,7 @@ export const AppSessionsTable: React.FC<Props> = () => {
                 <Popconfirm
                   title="确定结束这个任务吗？"
                   onConfirm={async () =>
-                    api.cancelJob({ body: {
+                    api.cancelJob({ query: {
                       cluster: cluster.id,
                       jobId: record.jobId,
                     } })
@@ -131,7 +131,7 @@ export const AppSessionsTable: React.FC<Props> = () => {
               <Popconfirm
                 title="确定取消这个任务吗？"
                 onConfirm={async () =>
-                  api.cancelJob({ body: {
+                  api.cancelJob({ query: {
                     cluster: cluster.id,
                     jobId: record.jobId,
                   } })
