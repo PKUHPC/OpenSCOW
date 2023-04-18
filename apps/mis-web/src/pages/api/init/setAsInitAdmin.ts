@@ -19,7 +19,7 @@ import { queryIfInitialized } from "src/utils/init";
 export interface UnsetInitAdminSchema {
   method: "DELETE";
 
-  body: {
+  query: {
     userId: string;
   };
 
@@ -36,7 +36,7 @@ export default route<UnsetInitAdminSchema>("UnsetInitAdminSchema", async (req) =
 
   if (result) { return { 409: { code: "ALREADY_INITIALIZED" } }; }
 
-  const { userId } = req.body;
+  const { userId } = req.query;
 
   const client = getClient(InitServiceClient);
 

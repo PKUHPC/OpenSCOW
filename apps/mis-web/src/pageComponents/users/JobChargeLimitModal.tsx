@@ -86,7 +86,7 @@ export const JobChargeLimitModal: React.FC<Props> = ({
                     icon: <ExclamationCircleOutlined />,
                     content: "确认要取消此用户在此账户中的限额吗？",
                     onOk: async () => {
-                      await api.cancelJobChargeLimit({ body: { accountName, userId } })
+                      await api.cancelJobChargeLimit({ query: { accountName, userId } })
                         .then(() => {
                           message.success("取消成功！");
                           onClose();

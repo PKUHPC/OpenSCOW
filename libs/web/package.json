@@ -20,19 +20,19 @@
     "mime-types": "2.1.35"
   },
   "peerDependencies": {
-    "antd": "5.4.1",
+    "antd": "5.4.2",
     "next": "13.3.0",
     "styled-components": "5.3.9",
     "@ant-design/icons": "5.0.1",
     "dayjs": "1.11.7"
   },
   "devDependencies": {
-    "antd": "5.4.1",
+    "antd": "5.4.2",
     "next": "13.3.0",
     "styled-components": "5.3.9",
     "@types/mime-types": "2.1.1",
     "react": "18.2.0",
-    "@types/react": "18.0.34",
+    "@types/react": "18.0.35",
     "react-dom": "18.2.0",
     "@types/react-dom": "18.0.11",
     "react-is": "18.2.0",
