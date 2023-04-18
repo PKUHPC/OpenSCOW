@@ -149,7 +149,7 @@ export const ImportUsersTable: React.FC = () => {
           loading={isLoading}
           dataSource={data?.accounts}
           scroll={{ x:true }}
-          pagination={{ showSizeChanger: true, pageSize:1 }}
+          pagination={{ showSizeChanger: true }}
           rowKey="accountName"
           bordered
         >
