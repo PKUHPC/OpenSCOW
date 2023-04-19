@@ -11,7 +11,8 @@
  */
 
 import { Select } from "antd";
-import React, { useEffect, useState } from "react";
+import React, { useCallback } from "react";
+import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { Cluster } from "src/utils/config";
 
@@ -23,29 +24,30 @@ interface SingleSelectionProps {
 }
 
 export const SingleCrossClusterTransferSelector: React.FC<SingleSelectionProps> = ({ value, onChange, label }) => {
-  const [availableClusters, setAvailableClusters] = useState<Cluster[]>([]);
 
-  useEffect(() => {
-    const fetchClusters = async () => {
+  const { data: availableClusters = [], isLoading, reload } = useAsync({
+    promiseFn: useCallback(async () => {
       const listClustersResponse = await api.listAvailableTransferClusters({ query: {} });
       const clusterList: Cluster[] = listClustersResponse.clusterList;
-      setAvailableClusters(clusterList);
-    };
-
-    fetchClusters();
-  }, []);
+      return clusterList;
+    }, []),
+  });
 
   return (
     <Select
       labelInValue
       placeholder="请选择集群"
       value={value ? ({ value: value.id, label: value.name }) : undefined}
-      onChange={({ value, label }) => onChange?.({ id: value, name: label })}
+      onChange={({ value, label }) => {
+        onChange?.({ id: value, name: label });
+        reload();
+      }}
       options={
         (label ? [{ value: label, label, disabled: true }] : [])
           .concat(availableClusters.map((x) => ({ value: x.id, label: x.name, disabled: false })))
       }
       dropdownMatchSelectWidth={false}
+      loading={isLoading}
     />
   );
 };
