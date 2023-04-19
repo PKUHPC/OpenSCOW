@@ -48,3 +48,23 @@ git clone https://github.com/PKUHPC/scow-sync.git
 # 执行安装脚本
 sudo bash install.sh
 ```
+
+### 4. 配置scow-sync的输出路径
+
+配置scow-sync的输出路径为可选操作，默认的输出路径为~/scow/.scow-sync
+
+进入scow-sync文件夹
+
+```bash
+cd /data/software/scow-sync
+```
+
+修改config.py，以下为默认配置
+
+```python
+SCOWSYNC_PATH = os.path.expanduser('~/scow/.scow-sync')  
+LOG_PATH = os.path.join(SCOWSYNC_PATH, 'scow-sync.log')
+ERROR_PATH = os.path.join(SCOWSYNC_PATH, 'scow-sync.err')
+```
+
+注：SCOWSYNC_PATH的路径必须为以~开头的用户路径。SCOWSYNC_PATH文件夹内保存了文件传输进度等信息，不同用户之间相互无权访问。
