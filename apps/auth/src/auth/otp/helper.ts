@@ -76,7 +76,7 @@ export async function saveOtpSession(
 
 export async function renderLiquidFile(fileName: string, data: Record<string, string>): Promise<string> {
   const engine = new Liquid({
-    root: path.resolve(__dirname, "views/"),
+    root: "views/otp",
     extname: ".liquid",
   });
   return await engine.renderFile(fileName, data);

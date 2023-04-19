@@ -49,7 +49,7 @@ export async function renderBindOtpHtml(
 
   const hostname = parseHostname(req);
 
-  return rep.status(err ? 401 : 200).view("bindOtp.liquid", {
+  return rep.status(err ? 401 : 200).view("/otp/bindOtp.liquid", {
     cssUrl: join(config.BASE_PATH, config.AUTH_BASE_PATH, "/public/assets/tailwind.min.css"),
     faviconUrl: join(config.BASE_PATH, FAVICON_URL),
     backgroundColor: uiConfig.primaryColor?.defaultColor ?? DEFAULT_PRIMARY_COLOR,
