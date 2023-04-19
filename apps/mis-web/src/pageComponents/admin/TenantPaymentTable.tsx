@@ -67,7 +67,7 @@ export const TenantPaymentTable: React.FC<Props> = ({
           initialValues={query}
           onFinish={async () => {
             const { tenantName, time } = await form.validateFields();
-            setQuery({ tenantName, time });
+            setQuery({ tenantName: tenantName === "" ? undefined : tenantName, time });
           }}
         >
           {
