@@ -41,3 +41,4 @@ export const TenantAdminJobBillingTablePage: NextPage = requireAuth(
   });
 
 export default TenantAdminJobBillingTablePage;
+
