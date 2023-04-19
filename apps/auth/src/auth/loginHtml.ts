@@ -57,7 +57,7 @@ export async function serveLoginHtml(
     ...captchaInfo,
     verifyCaptchaFail,
     enableCaptcha,
-    authBasePath: join(config.BASE_PATH, config.AUTH_BASE_PATH),
+    refreshCaptchaPath: join(config.BASE_PATH, config.AUTH_BASE_PATH, "/public/auth/refreshCaptcha"),
   });
 
 }
