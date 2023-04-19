@@ -65,6 +65,7 @@ export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
           onFinish={async () => {
             const { idOrName } = await form.validateFields();
             setQuery({ idOrName: idOrName === "" ? undefined : idOrName });
+            setPageInfo({ page: 1, pageSize: pageInfo.pageSize });
           }}
         >
           <Form.Item label="用户ID或者姓名" name="idOrName">
@@ -120,9 +121,9 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
         <Table.Column<PlatformUserInfo> dataIndex="userId" title="用户ID" />
         <Table.Column<PlatformUserInfo> dataIndex="name" title="姓名" />
         <Table.Column<PlatformUserInfo> dataIndex="tenantName" title="所属租户" />
-        <Table.Column<PlatformUserInfo> 
-          dataIndex="availableAccounts" 
-          title="可用账户" 
+        <Table.Column<PlatformUserInfo>
+          dataIndex="availableAccounts"
+          title="可用账户"
           render={(accounts) => accounts.join(",")}
         />
         <Table.Column<PlatformUserInfo>

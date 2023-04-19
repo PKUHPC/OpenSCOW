@@ -188,7 +188,7 @@ export const RunningJobInfoTable: React.FC<JobInfoTableProps> = ({
               <Popconfirm
                 title="确定结束这个任务吗？"
                 onConfirm={async () =>
-                  api.cancelJob({ body: {
+                  api.cancelJob({ query: {
                     cluster: r.cluster.id,
                     jobId: +r.jobId,
                   } })

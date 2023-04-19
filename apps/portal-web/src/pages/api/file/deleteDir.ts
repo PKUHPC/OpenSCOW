@@ -21,7 +21,7 @@ import { handlegRPCError } from "src/utils/server";
 export interface DeleteDirSchema {
   method: "DELETE";
 
-  body: {
+  query: {
     cluster: string;
     path: string;
   }
@@ -42,7 +42,7 @@ export default route<DeleteDirSchema>("DeleteDirSchema", async (req, res) => {
 
   if (!info) { return; }
 
-  const { cluster, path } = req.body;
+  const { cluster, path } = req.query;
 
   const client = getClient(FileServiceClient);
 
