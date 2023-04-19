@@ -16,7 +16,7 @@ import ldapjs from "ldapjs";
 import { Liquid } from "liquidjs";
 import * as nodemailer from "nodemailer";
 import { TransportOptions } from "nodemailer";
-import path, { join } from "path";
+import { join } from "path";
 import * as speakeasy from "speakeasy";
 import { renderBindOtpHtml } from "src/auth/bindOtpHtml";
 import { extractAttr, searchOne, takeOne } from "src/auth/ldap/helpers";
