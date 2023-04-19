@@ -174,7 +174,7 @@ export async function sendEmailAuthLink(
   const href = String(Object.assign(new URL("http://example.com"), {
     protocol: scowHostUrl.protocol,
     host: scowHostUrl.host,
-    pathname: join(config.BASE_PATH, config.AUTH_BASE_PATH, "/otp/email/validation"),
+    pathname: join(config.BASE_PATH, config.AUTH_BASE_PATH, "/public/otp/email/validation"),
     search: `token=${otpSessionToken}&backToLoginUrl=${encodeURIComponent(backToLoginUrl)}`,
   }));
   const mailOptions = {

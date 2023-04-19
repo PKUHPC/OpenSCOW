@@ -38,7 +38,7 @@ export function bindRedirectLoinUIAndBindUIRoute(f: FastifyInstance, otp: OtpCon
   f.get<{
     Querystring: Static<typeof QuerystringSchema>
   }>(
-    "/otp/bind",
+    "/public/otp/bind",
     {
       schema: {
         querystring: QuerystringSchema,
@@ -78,7 +78,7 @@ export function bindValidateUserNameAndPasswordRoute(f: FastifyInstance, ldapCon
     action: Type.String(),
     backToLoginUrl: Type.String(),
   });
-  f.post<{ Body: Static<typeof bodySchema> }>("/otp/bind", {
+  f.post<{ Body: Static<typeof bodySchema> }>("/public/otp/bind", {
     schema: { body: bodySchema },
   }, async (req, res) => {
 
@@ -120,7 +120,7 @@ export function bindClickRequestBindingLinkRoute(
     backToLoginUrl: Type.String(),
   });
   f.post<{Body: Static<typeof bodySchema>}>(
-    "/otp/sendEmail",
+    "/public/otp/sendEmail",
     {
       schema: {
         body: bodySchema,
@@ -150,7 +150,7 @@ export function bindClickAuthLinkInEmailRoute(
   f.get<{
       Querystring: Static<typeof QuerystringSchema>
     }>(
-      "/otp/email/validation",
+      "/public/otp/email/validation",
       {
         schema: {
           querystring: QuerystringSchema,
