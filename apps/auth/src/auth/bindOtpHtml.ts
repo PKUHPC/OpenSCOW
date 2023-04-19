@@ -56,6 +56,7 @@ export async function renderBindOtpHtml(
     err,
     footerText: (hostname && uiConfig?.footer?.hostnameTextMap?.[hostname]) ?? uiConfig?.footer?.defaultText ?? "",
     ...otp,
+    basePath: join(config.BASE_PATH, config.AUTH_BASE_PATH, "/public"),
   });
 
 }
