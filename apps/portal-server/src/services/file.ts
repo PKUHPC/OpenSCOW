@@ -372,34 +372,34 @@ export const fileServiceServer = plugin((server) => {
       const [toTransferNodeHost, toTransferNodePort] = toTransferNode.indexOf(":") > 0 ?
         toTransferNode.split(":") : [toTransferNode, "22"];
 
-      let homePath = "";
-      let scowDir = "";
-      let keyDir = "";
-      let privateKeyPath = "";
 
       // 检查fromTransferNode -> toTransferNode是否已经免密
-      let keyConfiged = true;
-      await sshConnect(fromTransferNode, userId, logger, async (ssh) => {
+      const { keyConfiged, scowDir, keyDir, privateKeyPath } = await sshConnect(
+        fromTransferNode, userId, logger, async (ssh) => {
         // 获取密钥路径
-        const sftp = await ssh.requestSFTP();
-        homePath = await sftpRealPath(sftp)(".");
-        scowDir = `${homePath}/scow`;
-        keyDir = `${scowDir}/.scow-sync-ssh`;
-        privateKeyPath = `${keyDir}/id_rsa`;
+          const sftp = await ssh.requestSFTP();
+          const homePath = await sftpRealPath(sftp)(".");
+          const scowDir = `${homePath}/scow`;
+          const keyDir = `${scowDir}/.scow-sync-ssh`;
+          const privateKeyPath = `${keyDir}/id_rsa`;
 
-        const cmd = "scow-sync-start";
-        const args = [
-          "-a", toTransferNodeHost,
-          "-u", userId,
-          "-p", toTransferNodePort.toString(),
-          "-k", privateKeyPath,
-          "-c", // -c,--check参数检查是否免密，并stdout返回true/false
-        ];
-        const resp = await loggedExec(ssh, logger, true, cmd, args);
-        if (resp.stdout !== "true") {
-          keyConfiged = false;
-        }
-      });
+          const cmd = "scow-sync-start";
+          const args = [
+            "-a", toTransferNodeHost,
+            "-u", userId,
+            "-p", toTransferNodePort.toString(),
+            "-k", privateKeyPath,
+            "-c", // -c,--check参数检查是否免密，并stdout返回true/false
+          ];
+          const resp = await loggedExec(ssh, logger, true, cmd, args);
+          const keyConfiged = resp.stdout === "true";
+          return {
+            keyConfiged: keyConfiged,
+            scowDir: scowDir,
+            keyDir: keyDir,
+            privateKeyPath: privateKeyPath,
+          };
+        });
 
       // 如果没有配置免密，则生成密钥并配置免密
       if (!keyConfiged) {
