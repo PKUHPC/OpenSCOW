@@ -50,6 +50,7 @@ export interface AppSession {
   dataPath: string;
   runningTime: string;
   timeLimit: string;
+  reason?: string;
 }
 
 export interface GetAppSessionsReply {

@@ -106,7 +106,7 @@ export const mockApi: MockApi<typeof api> = {
   }),
 
   getAppSessions: async () => ({ sessions: [
-    { jobId: 100, sessionId: "123", appId: "vscode", state: "PENDING",
+    { jobId: 100, sessionId: "123", appId: "vscode", state: "PENDING", reason: "resource",
       submitTime: new Date().toISOString(), ready: false, dataPath: "/test",
       timeLimit: "01:00:00", runningTime: "" },
     { jobId: 101, sessionId: "124", appId: "vscode", state: "RUNNING",
@@ -127,7 +127,7 @@ export const mockApi: MockApi<typeof api> = {
       { type: "TEXT", label: "其他sbatch参数", name: "sbatchOptions",
         required: true, placeholder: "比如：--gpus gres:2 --time 10", select: []},
       { type: "SELECT", label: "选项", name: "option", required: false,
-        placeholder: "提示信息", defaultValue: "version2", select: [
+        placeholder: "提示信息", select: [
           { label: "版本1", value: "version1" },
           { label: "版本2", value: "version2" },
         ]},
