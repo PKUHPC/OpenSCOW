@@ -196,13 +196,26 @@ it("get all users", async () => {
 });
 
 it("get all users with idOrName", async () => {
-  const data = await insertInitialData(server.ext.orm.em.fork());
+  const em = server.ext.orm.em.fork();
+  const data = await insertInitialData(em);
+
+  // insert a user for fuzzy search in ids
+  const user = new User({
+    name: "test", userId: "aa", email: "test@test.com",
+    tenant: data.tenant,
+  });
+  data.accountA.users.add(new UserAccount({
+    user, account: data.accountA, role: UserRole.USER, status: UserStatus.BLOCKED,
+  }));
+
+  await em.persistAndFlush([user]);
+  em.clear();
 
   // with id
   const users1 = await asyncClientCall(client, "getAllUsers", {
     page:1,
     pageSize:10,
-    idOrName: "a",
+    idOrName: "c",
   });
 
   expect(users1.totalCount).toBe(1);
@@ -215,12 +228,12 @@ it("get all users with idOrName", async () => {
     platformRoles: x.platformRoles,
   }))).toIncludeSameMembers([
     {
-      userId: data.userA.userId,
-      name: data.userA.name,
-      availableAccounts: [data.accountA.accountName],
-      tenantName: data.userA.tenant.getProperty("name"),
-      createTime: data.userA.createTime.toISOString(),
-      platformRoles: data.userA.platformRoles,
+      userId: data.userC.userId,
+      name: data.userC.name,
+      availableAccounts: [],
+      tenantName: data.userC.tenant.getProperty("name"),
+      createTime: data.userC.createTime.toISOString(),
+      platformRoles: data.userC.platformRoles,
     },
   ]);
 
@@ -249,7 +262,56 @@ it("get all users with idOrName", async () => {
       platformRoles: data.userB.platformRoles,
     },
   ]);
-  
+
+  // with id Or name
+  const users3 = await asyncClientCall(client, "getAllUsers", {
+    page:1,
+    pageSize:10,
+    idOrName: "A",
+  });
+
+  expect(users3.totalCount).toBe(4);
+  expect(users3.platformUsers.map((x) => ({
+    userId: x.userId,
+    name: x.name,
+    availableAccounts: x.availableAccounts,
+    tenantName: x.tenantName,
+    createTime: x.createTime,
+    platformRoles: x.platformRoles,
+  }))).toIncludeSameMembers([
+    {
+      userId: data.userA.userId,
+      name: data.userA.name,
+      availableAccounts: [data.accountA.accountName],
+      tenantName: data.userA.tenant.getProperty("name"),
+      createTime: data.userA.createTime.toISOString(),
+      platformRoles: data.userA.platformRoles,
+    },
+    {
+      userId: data.userB.userId,
+      name: data.userB.name,
+      availableAccounts: [data.accountA.accountName, data.accountB.accountName],
+      tenantName: data.userB.tenant.getProperty("name"),
+      createTime: data.userB.createTime.toISOString(),
+      platformRoles: data.userB.platformRoles,
+    },
+    {
+      userId: data.userC.userId,
+      name: data.userC.name,
+      availableAccounts: [],
+      tenantName: data.userC.tenant.getProperty("name"),
+      createTime: data.userC.createTime.toISOString(),
+      platformRoles: data.userC.platformRoles,
+    },
+    {
+      userId: user.userId,
+      name: user.name,
+      availableAccounts: [],
+      tenantName: user.tenant.getProperty("name"),
+      createTime: user.createTime.toISOString(),
+      platformRoles: user.platformRoles,
+    },
+  ]);
 });
 
 it("manage platform role", async () => {
