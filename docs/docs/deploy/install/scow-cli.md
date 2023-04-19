@@ -14,6 +14,22 @@ scow-cli是SCOW集群安装、配置和管理工具，您可以使用scow-cli高
 
 想获取最新的scow-cli版本？您可以从GitHub Actions的[`Test, Build and Publish Projects` workflow](https://github.com/PKUHPC/SCOW/actions/workflows/test-build-publish.yaml)中下载到上传到Archive的`scow-cli`。
 
+- 参考命令
+
+```bash
+# 如果没有wget，可以先install
+yum install wget
+
+# 下载对应的release版本，修改latest、cli-x64即可下载指定版本
+wget https://github.com/PKUHPC/SCOW/releases/download/latest/cli-x64
+
+# 重命名
+mv cli-x64 cli
+
+#修改文件权限
+chmod 777 cli
+```
+
 # 配置
 
 scow-cli使用运行目录下的`install.yaml`作为配置来管理集群，但您可以通过`-c`命令行选项指定`install.yaml`的路径。
