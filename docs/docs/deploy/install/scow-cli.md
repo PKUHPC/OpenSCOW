@@ -20,16 +20,16 @@ scow-cli是SCOW集群安装、配置和管理工具，您可以使用scow-cli高
 # 如果没有wget，可以先install
 yum install wget
 
-# 下载对应的release版本。修改latest、cli-x64可下载指定版本
-# 可修改latest为v0.4.0即可下载0.4.0版本的cli，如 https://github.com/PKUHPC/SCOW/releases/download/v0.4.0/cli-x64
-# 可修改cli-x64为cli-arm64下载arm64版本，如 https://github.com/PKUHPC/SCOW/releases/download/latest/cli-arm64
+# 下载对应的release版本。修改latest、cli-x64可下载指定版本cli
+# 修改latest为v0.4.0即可下载0.4.0版本的cli，如 https://github.com/PKUHPC/SCOW/releases/download/v0.4.0/cli-x64
+# 可修改cli-x64为cli-arm64下载arm64版本，如 https://github.com/PKUHPC/SCOW/releases/download/v0.4.0/cli-arm64
 wget https://github.com/PKUHPC/SCOW/releases/download/latest/cli-x64
 
 # 重命名
 mv cli-x64 cli
 
 #修改文件权限
-chmod 777 cli
+chmod +x cli
 ```
 
 # 配置
