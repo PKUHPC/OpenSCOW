@@ -12,7 +12,7 @@
 
 import { Static, Type } from "@sinclair/typebox";
 import { randomUUID } from "crypto";
-import fastify, { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
+import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { serveLoginHtml } from "src/auth/loginHtml";
 import { authConfig } from "src/config/auth";
 import svgCaptcha from "svg-captcha";
@@ -80,7 +80,7 @@ const bodySchema = Type.Object({
 });
 export function registerCaptchaRoute(f: FastifyInstance) {
   f.post<{ Body: Static<typeof bodySchema> }>(
-    "/refreshCaptcha",
+    "/public/auth/refreshCaptcha",
     {
       schema:{
         body: bodySchema,
