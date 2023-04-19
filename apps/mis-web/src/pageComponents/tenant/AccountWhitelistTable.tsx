@@ -62,7 +62,7 @@ export const AccountWhitelistTable: React.FC<Props> = ({
                 icon: <ExclamationCircleOutlined />,
                 content: `确认要将账户${r.accountName}从白名单移除？`,
                 onOk: async () => {
-                  await api.dewhitelistAccount({ body: {
+                  await api.dewhitelistAccount({ query: {
                     accountName: r.accountName,
                   } })
                     .then(() => {

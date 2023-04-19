@@ -57,6 +57,8 @@ export const job: JobInfo = {
   elapsed: "00:00:00",
   reason: "None",
   submitTime: "2022-07-07T09:21:42",
+  startTime: "2022-07-07T09:21:42",
+  endTime: "2022-07-07T09:21:52",
 };
 
 export const mockApi: MockApi<typeof api> = {

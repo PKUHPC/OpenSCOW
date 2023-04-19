@@ -60,7 +60,7 @@ jobs:
         run: pnpm prepareDev
 
       - name: Wait for ports
-        uses: ifaxity/wait-on-action@master
+        uses: ifaxity/wait-on-action@main
         with:
           log: true
           verbose: true

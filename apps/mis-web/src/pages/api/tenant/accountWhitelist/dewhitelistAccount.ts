@@ -22,7 +22,7 @@ import { handlegRPCError } from "src/utils/server";
 export interface DewhitelistAccountSchema {
   method: "DELETE";
 
-  body: {
+  query: {
     accountName: string;
   }
 
@@ -40,7 +40,7 @@ export default route<DewhitelistAccountSchema>("DewhitelistAccountSchema",
     const info = await auth(req, res);
     if (!info) { return; }
 
-    const { accountName } = req.body;
+    const { accountName } = req.query;
 
     const client = getClient(AccountServiceClient);
 

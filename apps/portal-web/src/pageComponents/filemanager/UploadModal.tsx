@@ -72,7 +72,7 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
                 onOk: async () => {
                   const fileType = await api.getFileType({ query:{ cluster: cluster, path: join(path, file.name) } });
                   const deleteOperation = fileType.type === "dir" ? api.deleteDir : api.deleteFile;
-                  await deleteOperation({ body: { cluster: cluster, path: join(path, file.name) } })
+                  await deleteOperation({ query: { cluster: cluster, path: join(path, file.name) } })
                     .then(() => resolve(file));
                 },
                 onCancel: () => { reject(file); },

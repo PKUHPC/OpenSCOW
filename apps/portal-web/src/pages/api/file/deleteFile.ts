@@ -22,7 +22,7 @@ import { handlegRPCError } from "src/utils/server";
 export interface DeleteFileSchema {
   method: "DELETE";
 
-  body: {
+  query: {
     cluster: string;
     path: string;
   }
@@ -37,12 +37,11 @@ const auth = authenticate(() => true);
 
 export default route<DeleteFileSchema>("DeleteFileSchema", async (req, res) => {
 
-
   const info = await auth(req, res);
 
   if (!info) { return; }
 
-  const { cluster, path } = req.body;
+  const { cluster, path } = req.query;
 
   const client = getClient(FileServiceClient);
 

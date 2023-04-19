@@ -202,7 +202,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
               onOk: async () => {
                 const fileType = await api.getFileType({ query: { cluster: cluster.id, path: join(path, x.name) } });
                 const deleteOperation = fileType.type === "dir" ? api.deleteDir : api.deleteFile;
-                await deleteOperation({ body: { cluster: cluster.id, path: join(path, x.name) } });
+                await deleteOperation({ query: { cluster: cluster.id, path: join(path, x.name) } });
                 await pasteFile(x, join(operation.originalPath, x.name), join(path, x.name));
                 successfulCount++;
                 res();
@@ -239,7 +239,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
       onOk: async () => {
         await Promise.allSettled(files.map(async (x) => {
           return (x.type === "FILE" ? api.deleteFile : api.deleteDir)({
-            body: {
+            query: {
               cluster: cluster.id,
               path: join(path, x.name),
             },
@@ -487,7 +487,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
                   okText: "确认",
                   onOk: async () => {
                     await (i.type === "FILE" ? api.deleteFile : api.deleteDir)({
-                      body: {
+                      query: {
                         cluster: cluster.id,
                         path: fullPath,
                       },
