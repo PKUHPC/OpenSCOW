@@ -63,6 +63,7 @@ export const job: JobInfo = {
 
 export const mockApi: MockApi<typeof api> = {
   getClusterInfo: null,
+  listAvailableTransferClusters: null,
   getAllJobs: async () => ({ results: [job]}),
 
   listAvailableApps: async () => ({ apps: [

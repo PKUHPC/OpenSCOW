@@ -13,7 +13,7 @@
 import { Select } from "antd";
 import React, { useEffect, useState } from "react";
 import { api } from "src/apis";
-import { Cluster, publicConfig } from "src/utils/config";
+import { Cluster } from "src/utils/config";
 
 
 interface SingleSelectionProps {
@@ -27,14 +27,9 @@ export const SingleCrossClusterTransferSelector: React.FC<SingleSelectionProps> 
 
   useEffect(() => {
     const fetchClusters = async () => {
-      const filteredClusters: Cluster[] = [];
-      for (const cluster of publicConfig.CLUSTERS) {
-        const response = await api.getClusterInfo({ query:{ cluster: cluster.id } });
-        if (response.clusterInfo.crossClusterFilesTransfer.enabled) {
-          filteredClusters.push(cluster);
-        }
-      }
-      setAvailableClusters(filteredClusters);
+      const listClustersResponse = await api.listAvailableTransferClusters({ query: {} });
+      const clusterList: Cluster[] = listClustersResponse.clusterList;
+      setAvailableClusters(clusterList);
     };
 
     fetchClusters();

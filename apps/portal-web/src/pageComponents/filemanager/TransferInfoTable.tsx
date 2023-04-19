@@ -14,7 +14,7 @@ import { App, Button, Progress, Table } from "antd";
 import { useCallback, useEffect } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
-import { publicConfig } from "src/utils/config";
+import { Cluster } from "src/utils/config";
 
 interface TransferInfo {
   recvCluster: string;
@@ -36,17 +36,15 @@ export const TransferInfoTable: React.FC = () => {
   const { data: transferData, isLoading, reload } = useAsync({
     promiseFn: useCallback(async () => {
       const newTransferData: TransferData[] = [];
-      for (const cluster of publicConfig.CLUSTERS) {
-        // 判断是否开启了crossClusterFilesTransfer
-        const responseClusterInfo = await api.getClusterInfo({ query: { cluster: cluster.id } });
-        if (!responseClusterInfo.clusterInfo.crossClusterFilesTransfer.enabled) continue;
-        // 查询
+      const listClustersResponse = await api.listAvailableTransferClusters({ query: {} });
+      const clusterList: Cluster[] = listClustersResponse.clusterList;
+      await Promise.all(clusterList.map(async (cluster) => {
         const response = await api.queryFilesTransferProgress({ query: { cluster: cluster.id } });
         newTransferData.push({
           cluster: cluster.id,
           files: response.result,
         });
-      }
+      }));
       return newTransferData;
     }, []),
   });

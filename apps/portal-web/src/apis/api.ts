@@ -37,6 +37,7 @@ import type { FileExistSchema } from "src/pages/api/file/fileExist";
 import type { GetFileTypeSchema } from "src/pages/api/file/getFileType";
 import type { GetHomeDirectorySchema } from "src/pages/api/file/getHome";
 import type { ListFileSchema } from "src/pages/api/file/list";
+import type { ListAvailableTransferClustersSchema } from "src/pages/api/file/listAvailableTransferClusters";
 import type { MkdirSchema } from "src/pages/api/file/mkdir";
 import type { MoveFileItemSchema } from "src/pages/api/file/move";
 import type { QueryFilesTransferProgressSchema } from "src/pages/api/file/queryFilesTransferProgress";
@@ -96,4 +97,5 @@ export const api = {
   changePassword: fromApi<ChangePasswordSchema>("PATCH", join(basePath, "/api/profile/changePassword")),
   queryFilesTransferProgress: fromApi<QueryFilesTransferProgressSchema>("GET", join(basePath, "/api/file/queryFilesTransferProgress")),
   terminateFilesTransfer: fromApi<TerminateFilesTransferSchema>("POST", join(basePath, "/api/file/terminateFilesTransfer")),
+  listAvailableTransferClusters: fromApi<ListAvailableTransferClustersSchema>("GET", join(basePath, "/api/file/listAvailableTransferClusters")),
 };

@@ -400,12 +400,11 @@ export const fileServiceServer = plugin((server) => {
           keyConfiged = false;
         }
       });
-      // console.log("KeyConfiged", keyConfiged);
+
       // 如果没有配置免密，则生成密钥并配置免密
       if (!keyConfiged) {
-        let publicKey: string;
         // 随机生成密钥
-        await sshConnect(fromTransferNode, userId, logger, async (ssh) => {
+        const publicKey = await sshConnect(fromTransferNode, userId, logger, async (ssh) => {
           const sftp = await ssh.requestSFTP();
           if (!await sftpExists(sftp, scowDir)) {
             await sftpMkdir(sftp)(scowDir);
@@ -418,7 +417,7 @@ export const fileServiceServer = plugin((server) => {
           await loggedExec(ssh, logger, true, genKeyCmd, []);
           // 读公钥
           const fileData = await sftpReadFile(sftp)(`${privateKeyPath}.pub`);
-          publicKey = fileData.toString();
+          return fileData.toString();
         });
 
         // 配置fromTransferNode -> toTransferNode的免密登录
