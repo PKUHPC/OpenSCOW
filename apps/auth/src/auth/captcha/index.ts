@@ -80,7 +80,7 @@ const bodySchema = Type.Object({
 });
 export function registerCaptchaRoute(f: FastifyInstance) {
   f.post<{ Body: Static<typeof bodySchema> }>(
-    "/public/auth/refreshCaptcha",
+    "/public/refreshCaptcha",
     {
       schema:{
         body: bodySchema,
