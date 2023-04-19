@@ -19,7 +19,7 @@
             <h2 class="border-b-2 border-red-300 text-2xl text-center text-red-700">
               绑定OTP
             </h2>
-            <form action="/otp/bind" method="get">
+            <form action="/public/otp/bind" method="get">
               <button type="submit" name="action" value="backToLoginUI" class="text-x text-gray-500 mr-4">
                 返回登录
               </button>
@@ -27,7 +27,7 @@
             </form>
           </div>
         {% unless bindLimitMinutes %}
-        <form class="w-full" method="post" action="/otp/bind">
+        <form class="w-full" method="post" action="/public/otp/bind">
           <div class="px-8">
             <div class="w-full mb-4">
               <div class="flex items-center">
@@ -63,7 +63,7 @@
         </div>
         {% else %}
 
-        <form class="w-full flex flex-wrap" method="post" action="/otp/sendEmail">
+        <form class="w-full flex flex-wrap" method="post" action="/public/otp/sendEmail">
           <div class="w-full mb-8 ml-8 justify-between">
             <p class="mt-1">请于{{ bindLimitMinutes }}分钟内完成绑定</p>
           </div>
