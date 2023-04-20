@@ -38,10 +38,15 @@ const fileName = "transfer_file";
 // queryTransferFiles的返回结果
 const filePath = path.join(fatherPath, fileName);
 const recvCluster = "123.123.123.123";
-const transferSize = "44,564,480";
+const transferSize = "1,048,576";
 const progress = "42%";
-const speed = "1.74MB/s";
+const speed = "1.74KB/s";
 const leftTime = "0:00:33";
+
+const transferSizeKBs = 1024;
+const progressInt = 42;
+const speedKBps = 1.74;
+const leftTimeSeconds = 33;
 
 const content = recvCluster + " " + fatherPath + "\n"
   + fileName + "\n"
@@ -91,9 +96,9 @@ it.skip("query the transfer information of scow-sync", async () => {
 
   expect(transferInfo.recvCluster).toBe(recvCluster);
   expect(transferInfo.filePath).toBe(filePath);
-  expect(transferInfo.transferSize).toBe(transferSize);
-  expect(transferInfo.progress).toBe(progress);
-  expect(transferInfo.speed).toBe(speed);
-  expect(transferInfo.leftTime).toBe(leftTime);
+  expect(transferInfo.transferSizeKBs).toBe(transferSizeKBs);
+  expect(transferInfo.progress).toBe(progressInt);
+  expect(transferInfo.speedKBps).toBe(speedKBps);
+  expect(transferInfo.remainingTimeSeconds).toBe(leftTimeSeconds);
 
 });
