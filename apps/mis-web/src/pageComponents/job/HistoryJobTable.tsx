@@ -85,16 +85,17 @@ export const JobTable: React.FC<Props> = ({
     // 根据 rangeSearch.current来判断是批量/精确搜索，
     // accountName 根据accountNames是否数组来判断顶部导航类型，如是用户空间用输入值，账户管理则用props中的accountNames限制搜索范围
     const diffQuery = rangeSearch.current ? {
+      userId: userId || query.userId,
       accountName: Array.isArray(accountNames) ? query.accountName : accountNames,
       jobEndTimeStart: query.jobEndTime[0].toISOString(),
       jobEndTimeEnd: query.jobEndTime[1].toISOString(),
     } : {
+      userId: userId,
       jobId: query.jobId,
       accountName: Array.isArray(accountNames) ? undefined : accountNames,
     };
     return await api.getJobInfo({ query: {
       ...diffQuery,
-      userId: query.userId || userId || undefined,
       page: pageInfo.page,
       pageSize: pageInfo.pageSize,
       clusters: query.clusters?.map((x) => x.id),
