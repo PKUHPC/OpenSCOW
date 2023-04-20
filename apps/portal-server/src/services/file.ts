@@ -486,7 +486,6 @@ export const fileServiceServer = plugin((server) => {
         // 解析scow-sync-query返回的json数组
         const transferInfosJsons: TransferInfosJson[] = JSON.parse(resp.stdout);
         const transferInfos: TransferInfo[] = [];
-
         // 根据host确定clusterId
         transferInfosJsons.forEach((info) => {
           let recvCluster = info.recvAddress;
@@ -502,15 +501,36 @@ export const fileServiceServer = plugin((server) => {
             else {
               continue;
             }
-
           }
+          // 将json数组中的string类型解析成protos中定义的格式
+          let speedInKB = 0;
+          const speedMatch = info.speed.match(/([\d\.]+)([kMGB]?B\/s)/);
+          if (speedMatch) {
+            const speed = Number(speedMatch[1]);
+            switch (speedMatch[2]) {
+            case "B/s":
+              speedInKB = speed / 1024;
+              break;
+            case "kB/s":
+              speedInKB = speed;
+              break;
+            case "MB/s":
+              speedInKB = speed * 1024;
+              break;
+            case "GB/s":
+              speedInKB = speed * 1024 * 1024;
+              break;
+            }
+          }
+          const [hours, minutes, seconds] = info.leftTime.split(":").map(Number);
+          const leftTimeSeconds = hours * 3600 + minutes * 60 + seconds;
           transferInfos.push({
             recvCluster: recvCluster,
             filePath: info.filePath,
-            transferSize: info.transferSize,
-            progress: info.progress,
-            speed: info.speed,
-            leftTime: info.leftTime,
+            transferSizeKBs: Math.floor(Number(info.transferSize.replace(/,/g, "")) / 1024),
+            progress: Number(info.progress.split("%")[0]),
+            speedKBps: speedInKB,
+            remainingTimeSeconds: leftTimeSeconds,
           });
         });
 

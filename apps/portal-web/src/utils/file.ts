@@ -18,6 +18,15 @@ import styled from "styled-components";
 
 export type FileInfoKey = React.Key;
 
+export interface TransferInfo {
+  recvCluster: string;
+  filePath: string;
+  transferSizeKBs: number;
+  progress: number;
+  speedKBps: number;
+  remainingTimeSeconds: number;
+}
+
 export const fileInfoKey = (f: FileInfo, path: string): FileInfoKey => join(path, f.name);
 
 export const TopBar = styled(FilterFormContainer)`

@@ -15,15 +15,7 @@ import { useCallback, useEffect } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { Cluster } from "src/utils/config";
-
-interface TransferInfo {
-  recvCluster: string;
-  filePath: string;
-  transferSize: string;
-  progress: string;
-  speed: string;
-  leftTime: string;
-}
+import { TransferInfo } from "src/utils/file";
 
 interface TransferData {
   cluster: string;
@@ -72,20 +64,23 @@ export const TransferInfoTable: React.FC = () => {
     },
     {
       title: "传输数量",
-      dataIndex: "transferSize",
+      dataIndex: "transferSizeKBs",
+      render: (transferSizeKBs: number) => transferSizeKBs + "KB",
     },
     {
       title: "传输速度",
-      dataIndex: "speed",
+      dataIndex: "speedKBps",
+      render: (speedKBps: number) => speedKBps.toFixed(3) + "KB/s",
     },
     {
       title: "剩余时间",
-      dataIndex: "leftTime",
+      dataIndex: "remainingTimeSeconds",
+      render: (remainingTimeSeconds: number) => remainingTimeSeconds + "s",
     },
     {
       title: "当前进度",
       dataIndex: "progress",
-      render: (progress: string) => <Progress percent={parseInt(progress.replace(/%/g, ""))} />,
+      render: (progress: number) => <Progress percent={progress} />,
     },
     {
       title: "操作",
