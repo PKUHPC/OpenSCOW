@@ -89,6 +89,16 @@ export const MisConfigSchema = Type.Object({
     description: "给作业扣费时，扣费项的备注。可以使用{{ 属性名 }}使用作业信息中的属性。字段参考src/entities/JobInfo",
     default: "集群: {{ cluster }}，作业ID：{{ idJob }}",
   }),
+
+  monthlyRent: Type.Object({
+    enabled: Type.Boolean({ description:"是否默认打开", default: true }),
+    cron: Type.String({ description: "计算账户月租的周期的cron表达式", default: "0 0 0 1 * *" }),
+  }, { default: {} }),
+
+  storageRent: Type.Object({
+    enabled: Type.Boolean({ description:"是否默认打开", default: true }),
+    cron: Type.String({ description: "获取存储并计费的周期的cron表达式", default: "0 0 0 * * *" }),
+  }, { default: {} }),
 });
 
 const MIS_CONFIG_NAME = "mis";
