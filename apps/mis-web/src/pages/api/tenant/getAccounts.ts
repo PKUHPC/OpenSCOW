@@ -48,7 +48,8 @@ export async function getAccounts(req: GetAccountsRequest) {
   return results.map((x) => ensureNotUndefined(x, ["balance"]));
 }
 
-const auth = authenticate((info) => info.tenantRoles.includes(TenantRole.TENANT_ADMIN));
+const auth = authenticate((info) => info.tenantRoles.includes(TenantRole.TENANT_ADMIN)
+  || info.tenantRoles.includes(TenantRole.TENANT_FINANCE));
 
 export default route<GetAccountsSchema>("GetAccountsSchema",
   async (req, res) => {
