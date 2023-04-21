@@ -96,11 +96,11 @@
           </form>
           {% if showBindOtpButton %}
           <div class="px-12 mt-4">
-            <form action="{{ basePath }}/otp/bind" method="get">
+            <form action="{{ otpBasePath }}/bind" method="get">
               <button type="submit" name="action" value="bindOtp" class="px text-gray-400">
                 绑定otp
               </button>
-              <input type="hidden" name="backToLoginUrl" value="">
+              <input type="hidden" name="callbackUrl" value="{{ callbackUrl }}" />
             </form>
           </div>
         {% endif %}

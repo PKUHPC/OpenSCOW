@@ -19,15 +19,15 @@
             <h2 class="border-b-2 border-red-300 text-2xl text-center text-red-700">
               绑定OTP
             </h2>
-            <form action="{{ basePath }}/otp/bind" method="get">
+            <form action="{{ otpBasePath }}/bind" method="get">
               <button type="submit" name="action" value="backToLoginUI" class="text-x text-gray-500 mr-4">
                 返回登录
               </button>
-              <input type="hidden" name="backToLoginUrl" value="{{ backToLoginUrl }}">
+              <input type="hidden" name="callbackUrl" value="{{ callbackUrl }}">
             </form>
           </div>
         {% unless bindLimitMinutes %}
-        <form class="w-full" method="post" action="{{ basePath }}/otp/bind">
+        <form class="w-full" method="post" action="{{ otpBasePath }}/bind">
           <div class="px-8">
             <div class="w-full mb-4">
               <div class="flex items-center">
@@ -53,7 +53,7 @@
                 确认
             </button>
           </div>
-          <input type="hidden" name="backToLoginUrl" value="{{ backToLoginUrl }}">
+          <input type="hidden" name="callbackUrl" value="{{ callbackUrl }}">
         </form>
 
         {%  else %}
@@ -63,7 +63,7 @@
         </div>
         {% else %}
 
-        <form class="w-full flex flex-wrap" method="post" action="{{ basePath }}/otp/sendEmail">
+        <form class="w-full flex flex-wrap" method="post" action="{{ otpBasePath }}/sendEmail">
           <div class="w-full mb-8 ml-8 justify-between">
             <p class="mt-1">请于{{ bindLimitMinutes }}分钟内完成绑定</p>
           </div>
@@ -96,7 +96,7 @@
           </div>
           <input type="hidden" name="otpSessionToken" value="{{ otpSessionToken }}" />
           <input type="hidden" name="emailAddress" value="{{ emailAddress }}" />
-          <input type="hidden" name="backToLoginUrl" value="{{ backToLoginUrl }}">
+          <input type="hidden" name="callbackUrl" value="{{ callbackUrl }}">
         </form>
         {% endunless %}
         </div>

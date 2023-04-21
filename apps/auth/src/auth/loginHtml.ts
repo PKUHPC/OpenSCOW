@@ -65,6 +65,7 @@ export async function serveLoginHtml(
     enableTotp,
     showBindOtpButton,
     verifyOtpFail,
+    otpBasePath: join(config.BASE_PATH, config.AUTH_BASE_PATH, "/public/otp"),
     refreshCaptchaPath: join(config.BASE_PATH, config.AUTH_BASE_PATH, "/public/refreshCaptcha"),
   });
 

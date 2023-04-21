@@ -33,7 +33,7 @@ function parseHostname(req: FastifyRequest): string | undefined {
 
 
 export async function renderBindOtpHtml(
-  err: boolean, req: FastifyRequest, rep: FastifyReply,
+  err: boolean, req: FastifyRequest, rep: FastifyReply, callbackUrl: string,
   otp?: {
     sendEmailUI?: boolean,
     sendSucceeded?: boolean,
@@ -41,7 +41,6 @@ export async function renderBindOtpHtml(
     emailAddress?: string,
     qrcode?: string,
     otpSessionToken?: string,
-    backToLoginUrl?: string,
     timeDiffNotEnough?: number,
     bindLimitMinutes?: number,
   },
@@ -54,9 +53,10 @@ export async function renderBindOtpHtml(
     faviconUrl: join(config.BASE_PATH, FAVICON_URL),
     backgroundColor: uiConfig.primaryColor?.defaultColor ?? DEFAULT_PRIMARY_COLOR,
     err,
+    callbackUrl,
     footerText: (hostname && uiConfig?.footer?.hostnameTextMap?.[hostname]) ?? uiConfig?.footer?.defaultText ?? "",
     ...otp,
-    basePath: join(config.BASE_PATH, config.AUTH_BASE_PATH, "/public"),
+    otpBasePath: join(config.BASE_PATH, config.AUTH_BASE_PATH, "/public/otp"),
   });
 
 }
