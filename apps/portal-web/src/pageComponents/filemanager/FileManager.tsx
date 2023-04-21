@@ -10,11 +10,13 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { CloseOutlined,
+import {
+  CloseOutlined,
   CopyOutlined,
   DeleteOutlined, FileAddOutlined, FileOutlined, FolderAddOutlined,
   FolderOutlined, HomeOutlined, LeftOutlined, MacCommandOutlined, RightOutlined,
-  ScissorOutlined, SnippetsOutlined, UploadOutlined, UpOutlined } from "@ant-design/icons";
+  ScissorOutlined, SnippetsOutlined, UploadOutlined, UpOutlined,
+} from "@ant-design/icons";
 import { compareDateTime, formatDateTime } from "@scow/lib-web/build/utils/datetime";
 import { compareNumber } from "@scow/lib-web/build/utils/math";
 import { App, Button, Divider, Space, Table } from "antd";
@@ -277,7 +279,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
     <div>
       <TitleText>
         <span>
-        集群{cluster.name}文件管理
+          集群{cluster.name}文件管理
         </span>
       </TitleText>
       <TopBar>
@@ -314,7 +316,8 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
           <Button
             icon={<CopyOutlined />}
             onClick={() =>
-              setOperation({ op: "copy",
+              setOperation({
+                op: "copy",
                 selected: keysToFiles(selectedKeys), originalPath: path, started: false, completed: [],
               })}
             disabled={selectedKeys.length === 0 || operation?.started}
@@ -324,8 +327,10 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
           <Button
             icon={<ScissorOutlined />}
             onClick={() =>
-              setOperation({ op:"move",
-                selected: keysToFiles(selectedKeys), originalPath: path, started: false, completed: []})}
+              setOperation({
+                op: "move",
+                selected: keysToFiles(selectedKeys), originalPath: path, started: false, completed: [],
+              })}
             disabled={selectedKeys.length === 0 || operation?.started}
           >
             移动选中
@@ -342,13 +347,13 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
               operation.started ? (
                 <span>
                   {`正在${operationTexts[operation.op]}，` +
-                  `已完成：${operation.completed.length} / ${operation.selected.length}`}
+                    `已完成：${operation.completed.length} / ${operation.selected.length}`}
                 </span>
               ) : (
                 <span>
                   {`已选择${operationTexts[operation.op]}${operation.selected.length}个项`}
                   <a onClick={() => setOperation(undefined)} style={{ marginLeft: "4px" }}>
-                  取消
+                    取消
                   </a>
                 </span>
               )) : ""
@@ -443,14 +448,17 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
           dataIndex="mtime"
           title="修改日期"
           render={(mtime: string | undefined) => mtime ? formatDateTime(mtime) : ""}
-          sorter={(a, b) => compareDateTime(a.mtime, b.mtime) }
+          sorter={(a, b) => compareDateTime(a.mtime, b.mtime)}
         />
 
         <Table.Column<FileInfo>
           dataIndex="size"
           title="大小"
-          render={(size: number | undefined) => size === undefined ? "" : Math.floor(size / 1024) + " KB"}
-          sorter={(a, b) => compareNumber(a.size, b.size) }
+          render={
+            (size: number | undefined, file: FileInfo) =>
+              (size === undefined || file.type === "DIR") ? "" : Math.floor(size / 1024) + " KB"
+          }
+          sorter={(a, b) => compareNumber(a.size, b.size)}
         />
 
         <Table.Column<FileInfo>
@@ -467,7 +475,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
               {
                 i.type === "FILE" ? (
                   <a href={urlToDownload(cluster.id, join(path, i.name), true)}>
-                下载
+                    下载
                   </a>
                 ) : undefined
               }
