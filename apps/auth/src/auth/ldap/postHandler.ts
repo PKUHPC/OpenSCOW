@@ -19,7 +19,7 @@ import { findUser, useLdap } from "src/auth/ldap/helpers";
 import { serveLoginHtml } from "src/auth/loginHtml";
 import { validateOtpCode } from "src/auth/otp/helper";
 import { validateLoginParams } from "src/auth/validateLoginParams";
-import { authConfig, LdapConfigSchema, OtpStatusOptions } from "src/config/auth";
+import { authConfig, LdapConfigSchema } from "src/config/auth";
 
 export function registerPostHandler(f: FastifyInstance, ldapConfig: LdapConfigSchema) {
 
@@ -78,7 +78,7 @@ export function registerPostHandler(f: FastifyInstance, ldapConfig: LdapConfigSc
         logger.info("Binding as %s failed. Err: %o", user.dn, err);
         await serveLoginHtml(true, callbackUrl, req, res);
       });
-      
+
     });
   });
 }
