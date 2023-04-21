@@ -357,7 +357,7 @@ delFromAcct(){   #####2017-08-31   not rewrite it
                 else
                     choose=`echo $user_acct | awk {'print $1'}`
                     #wrong if the default account is not $2 , user's default account shouldn't change
-                    defAcct=`$mysql --skip-column-names $slurm_acct_db_name -e "select acct from $assoc_table where user="$1" and deleted=0 and is_def=1" | sort | uniq`
+                    defAcct=`$mysql --skip-column-names $slurm_acct_db_name -e "select acct from $assoc_table where user='$1' and deleted=0 and is_def=1" | sort | uniq`
                     #echo defAcct=$defAcct
                     if [ "$defAcct" = "$acct" ] ; then
                         sacctmgr -i update user set DefaultAccount=$choose where user=$1
