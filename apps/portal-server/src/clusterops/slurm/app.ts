@@ -17,7 +17,6 @@ import { getUserHomedir,
 import { RunningJob } from "@scow/protos/build/common/job";
 import { randomUUID } from "crypto";
 import fs from "fs";
-import isPortReachable from "is-port-reachable";
 import { join } from "path";
 import { quote } from "shell-quote";
 import { AppOps, AppSession } from "src/clusterops/api/app";
@@ -246,7 +245,14 @@ export const slurmAppOps = (cluster: string): AppOps => {
                 const serverSessionInfo = JSON.parse(content.toString()) as ServerSessionInfoData;
                 const { HOST, PORT } = serverSessionInfo;
 
-                ready = await isPortReachable(PORT, { host: HOST });
+                import("is-port-reachable").then(async (isPortReachable) => {
+                  ready = await isPortReachable.default(PORT, { host: HOST });
+                  if (ready) {
+                    logger.info(`${HOST}:${PORT} for web app ${app.name} is reachable.`);
+                  } else {
+                    logger.info(`${HOST}:${PORT} for web app ${app.name} is not reachable.`);
+                  }
+                });
               }
             } else {
             // for vnc apps,
@@ -260,8 +266,15 @@ export const slurmAppOps = (cluster: string): AppOps => {
                   const content = (await sftpReadFile(sftp)(outputFilePath)).toString();
                   try {
                     const displayId = parseDisplayId(content);
-
-                    ready = await isPortReachable(displayIdToPort(displayId!), { host: host });
+                    import("is-port-reachable").then(async (isPortReachable) => {
+                      const port = displayIdToPort(displayId!);
+                      ready = await isPortReachable.default(port, { host: host });
+                      if (ready) {
+                        logger.info(`${host}:{port} for vnc app ${app.name} is reachable.`);
+                      } else {
+                        logger.info(`${host}:{port} for vnc app ${app.name} is not reachable.`);
+                      }
+                    });
                   } catch {
                   // ignored if displayId cannot be parsed
                   }
