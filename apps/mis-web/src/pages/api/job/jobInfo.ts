@@ -22,12 +22,12 @@ export interface GetJobFilter {
     /**
      * @format date-time
      */
-    jobEndTimeStart: string;
+    jobEndTimeStart?: string;
 
     /**
      * @format date-time
      */
-    jobEndTimeEnd: string;
+    jobEndTimeEnd?: string;
     /**
      * @minimum 1
      * @type integer

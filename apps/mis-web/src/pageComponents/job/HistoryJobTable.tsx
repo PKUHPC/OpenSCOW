@@ -82,16 +82,23 @@ export const JobTable: React.FC<Props> = ({
 
 
   const promiseFn = useCallback(async () => {
+    // 根据 rangeSearch.current来判断是批量/精确搜索，
+    // accountName 根据accountNames是否数组来判断顶部导航类型，如是用户空间用输入值，账户管理则用props中的accountNames限制搜索范围
+    const diffQuery = rangeSearch.current ? {
+      userId: userId || query.userId,
+      accountName: Array.isArray(accountNames) ? query.accountName : accountNames,
+      jobEndTimeStart: query.jobEndTime[0].toISOString(),
+      jobEndTimeEnd: query.jobEndTime[1].toISOString(),
+    } : {
+      userId: userId,
+      jobId: query.jobId,
+      accountName: Array.isArray(accountNames) ? undefined : accountNames,
+    };
     return await api.getJobInfo({ query: {
-      // userId: rangeSearch.current ? (query.userId || userId || undefined) : undefined,
-      userId: query.userId || userId || undefined,
-      jobId: rangeSearch.current ? undefined : query.jobId,
+      ...diffQuery,
       page: pageInfo.page,
       pageSize: pageInfo.pageSize,
       clusters: query.clusters?.map((x) => x.id),
-      accountName: query.accountName || (Array.isArray(accountNames) ? undefined : accountNames),
-      jobEndTimeStart: query.jobEndTime[0].toISOString(),
-      jobEndTimeEnd: query.jobEndTime[1].toISOString(),
     } }).catch((e: HttpError) => {
       if (e.status === 403) {
         message.error("您没有权限查看此信息。");
@@ -253,7 +260,7 @@ export const JobInfoTable: React.FC<JobInfoTableProps> = ({
         }
       </TableTitle>
       <Table
-        rowKey={(i) => i.idJob}
+        rowKey={(i) => i.cluster + i.biJobIndex + i.idJob}
         dataSource={data?.jobs}
         loading={isLoading}
         pagination={setPageInfo ? {

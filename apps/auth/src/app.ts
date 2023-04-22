@@ -14,6 +14,8 @@ import createError from "@fastify/error";
 import { omitConfigSpec } from "@scow/lib-config";
 import { readVersionFile } from "@scow/utils/build/version";
 import fastify, { FastifyInstance, FastifyPluginAsync, FastifyPluginCallback } from "fastify";
+import { registerCaptchaRoute } from "src/auth/captcha";
+import { authConfig } from "src/config/auth";
 import { config } from "src/config/env";
 import { plugins } from "src/plugins";
 import { routes } from "src/routes";
@@ -61,6 +63,10 @@ export function buildApp(pluginOverrides?: PluginOverrides) {
   applyPlugins(server, pluginOverrides);
 
   routes.forEach((r) => server.register(r));
+
+  if (authConfig.captcha.enabled) {
+    registerCaptchaRoute(server);
+  }
 
   return server;
 }
