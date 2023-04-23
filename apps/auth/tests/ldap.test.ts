@@ -13,6 +13,7 @@
 import { FastifyInstance } from "fastify";
 import { Client, createClient, NoSuchObjectError, SearchEntry } from "ldapjs";
 import { buildApp } from "src/app";
+import { saveCaptchaText } from "src/auth/captcha";
 import { extractAttr, findUser, searchOne, takeOne } from "src/auth/ldap/helpers";
 import { authConfig, NewUserGroupStrategy } from "src/config/auth";
 import { ensureNotUndefined } from "src/utils/validations";
@@ -32,8 +33,8 @@ const user = {
   identityId: "123",
   name: "name",
   password: "12#",
-  token: "token",
-  code: "code",
+  captchaToken: "captchaToken",
+  captchaCode: "captchaCode",
 };
 
 const userDn = `${ldap.addUser.userIdDnKey}=${user.identityId},${ldap.addUser.userBase}`;
@@ -168,10 +169,10 @@ it("test to input a wrong verifyCaptcha", async () => {
     username: user.identityId,
     password: user.password,
     callbackUrl,
-    token: user.token,
+    token: user.captchaToken,
     code: "wrongCaptcha",
   });
-  await server.redis.set(user.token, user.code, "EX", 30);
+  await saveCaptchaText(server, user.captchaCode, user.captchaToken);
   const resp = await server.inject({
     method: "POST",
     url: "/public/auth",
@@ -192,10 +193,10 @@ it("should login with correct username and password", async () => {
     username: user.identityId,
     password: user.password,
     callbackUrl,
-    token: user.token,
-    code: user.code,
+    token: user.captchaToken,
+    code: user.captchaCode,
   });
-  await server.redis.set(user.token, user.code, "EX", 30);
+  await saveCaptchaText(server, user.captchaCode, user.captchaToken);
   const resp = await server.inject({
     method: "POST",
     url: "/public/auth",
@@ -219,10 +220,10 @@ it("should not login with wrong password", async () => {
     username: user.identityId,
     password: user.password + "0",
     callbackUrl,
-    token: user.token,
-    code: user.code,
+    token: user.captchaToken,
+    code: user.captchaCode,
   });
-  await server.redis.set(user.token, user.code, "EX", 30);
+  await saveCaptchaText(server, user.captchaCode, user.captchaToken);
   const resp = await server.inject({
     method: "POST",
     url: "/public/auth",
