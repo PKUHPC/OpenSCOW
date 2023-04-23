@@ -287,7 +287,7 @@ importers:
         version: link:../../libs/ssh
       '@scow/protos':
         specifier: workspace:*
-        version: link:../../libs/protos
+        version: link:../../libs/protos/scow
       '@scow/utils':
         specifier: workspace:*
         version: link:../../libs/utils
@@ -357,7 +357,7 @@ importers:
         version: link:../../libs/web
       '@scow/protos':
         specifier: workspace:*
-        version: link:../../libs/protos
+        version: link:../../libs/protos/scow
       '@scow/utils':
         specifier: workspace:*
         version: link:../../libs/utils
@@ -481,7 +481,7 @@ importers:
         version: link:../../libs/ssh
       '@scow/protos':
         specifier: workspace:*
-        version: link:../../libs/protos
+        version: link:../../libs/protos/scow
       '@scow/utils':
         specifier: workspace:*
         version: link:../../libs/utils
@@ -581,7 +581,7 @@ importers:
         version: link:../../libs/web
       '@scow/protos':
         specifier: workspace:*
-        version: link:../../libs/protos
+        version: link:../../libs/protos/scow
       '@scow/utils':
         specifier: workspace:*
         version: link:../../libs/utils
@@ -824,14 +824,26 @@ importers:
         specifier: 4.0.5
         version: 4.0.5
 
-  libs/protos:
+  libs/protos/scheduler-adapter:
+    dependencies:
+      '@grpc/grpc-js':
+        specifier: 1.8.12
+        version: 1.8.12
+      long:
+        specifier: 5.2.1
+        version: 5.2.1
+      protobufjs:
+        specifier: 7.2.2
+        version: 7.2.2
+
+  libs/protos/scow:
     dependencies:
       '@grpc/grpc-js':
         specifier: 1.8.14
         version: 1.8.14
       '@scow/grpc-api':
         specifier: workspace:*
-        version: link:../../protos
+        version: link:../../../protos
       long:
         specifier: 5.2.3
         version: 5.2.3
@@ -846,7 +858,7 @@ importers:
         version: link:../ssh
       '@scow/protos':
         specifier: workspace:*
-        version: link:../protos
+        version: link:../protos/scow
     devDependencies:
       node-ssh:
         specifier: 13.1.0
@@ -3919,6 +3931,14 @@ packages:
     dependencies:
       fastify-plugin: 4.5.0
       hashlru: 2.3.0
+    dev: false
+
+  /@grpc/grpc-js@1.8.12:
+    resolution: {integrity: sha512-MbUMvpVvakeKhdYux6gbSIPJaFMLNSY8jw4PqLI+FFztGrQRrYYAnHlR94+ncBQQewkpXQaW449m3tpH/B/ZnQ==}
+    engines: {node: ^8.13.0 || >=10.10.0}
+    dependencies:
+      '@grpc/proto-loader': 0.7.3
+      '@types/node': 18.15.11
     dev: false
 
   /@grpc/grpc-js@1.8.14:
@@ -12002,6 +12022,10 @@ packages:
   /long@4.0.0:
     resolution: {integrity: sha512-XsP+KhQif4bjX1kbuSiySJFNAehNxgLb6hPRGJ9QsUr8ajHkuXGdrHmFUTUUXhDwVX2R5bY4JNZEwbUiMhV+MA==}
 
+  /long@5.2.1:
+    resolution: {integrity: sha512-GKSNGeNAtw8IryjjkhZxuKB3JzlcLTwjtiQCHKvqQet81I93kXslhDQruGI/QsddO83mcDToBVy7GqGS/zYf/A==}
+    dev: false
+
   /long@5.2.3:
     resolution: {integrity: sha512-lcHwpNoggQTObv5apGNCTdJrO69eHOZMi4BNC+rTLER8iHAqGrUVeLh/irVIM7zTw2bOXA8T6uNPeujwOLg/2Q==}
 
@@ -14354,6 +14378,25 @@ packages:
     resolution: {integrity: sha512-YUHSPk+A30YPv+0Qf8i9Mbfe/C0hdPXk1s1jPVToV8pk8BQtpw10ct89Eo7OWkutrwqvT0eicAxlOg3dOAu8JA==}
     dependencies:
       xtend: 4.0.2
+    dev: false
+
+  /protobufjs@7.2.2:
+    resolution: {integrity: sha512-++PrQIjrom+bFDPpfmqXfAGSQs40116JRrqqyf53dymUMvvb5d/LMRyicRoF1AUKoXVS1/IgJXlEgcpr4gTF3Q==}
+    engines: {node: '>=12.0.0'}
+    requiresBuild: true
+    dependencies:
+      '@protobufjs/aspromise': 1.1.2
+      '@protobufjs/base64': 1.1.2
+      '@protobufjs/codegen': 2.0.4
+      '@protobufjs/eventemitter': 1.1.0
+      '@protobufjs/fetch': 1.1.0
+      '@protobufjs/float': 1.0.2
+      '@protobufjs/inquire': 1.1.0
+      '@protobufjs/path': 1.1.2
+      '@protobufjs/pool': 1.1.0
+      '@protobufjs/utf8': 1.1.0
+      '@types/node': 18.15.11
+      long: 5.2.3
     dev: false
 
   /protobufjs@7.2.3:

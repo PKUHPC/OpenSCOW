@@ -16,7 +16,8 @@
     },
     "prepareDev": {
       "dependsOn": [
-        "^@scow/protos#build"
+        "^@scow/protos#build",
+        "^@scow/scheduler-adapter-protos#build"
       ],
       "outputs": [
         "api-routes-schemas.json",
@@ -47,6 +48,26 @@
     "@scow/protos#build": {
       "dependsOn": [
         "^@scow/protos#generate"
+      ],
+      "inputs": [
+        "generated/**"
+      ],
+      "outputs": [
+        "build/**"
+      ]
+    },
+    "@scow/scheduler-adapter-protos#generate": {
+      "inputs": [
+        "node_modules/@scow/grpc-adapter/**/*.proto",
+        "buf.gen.yaml"
+      ],
+      "outputs": [
+        "generated/**"
+      ]
+    },
+    "@scow/scheduler-adapter-protos#build": {
+      "dependsOn": [
+        "^@scow/scheduler-adapter-protos#generate"
       ],
       "inputs": [
         "generated/**"
