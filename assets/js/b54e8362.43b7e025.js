@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk_scow_docs=self.webpackChunk_scow_docs||[]).push([[3425],{7516:o=>{o.exports=JSON.parse('{"permalink":"/SCOW/blog","page":1,"postsPerPage":10,"totalPages":1,"totalCount":3,"blogDescription":"Blog","blogTitle":"Blog"}')}}]);
