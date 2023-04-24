@@ -16,6 +16,7 @@ export const config = envConfig({
   RESOLVER: str({ desc: "DNS地址", default: "127.0.0.11" }),
 
   CLIENT_MAX_BODY_SIZE: str({ desc: "请求文件大小限制", default: "1G" }),
+  PROXY_READ_TIMEOUT: str({ desc: "应用到server块的proxy_read_timeout", default: "60s" }),
 
   BASE_PATH: str({ desc: "base path", default: "" }),
 
