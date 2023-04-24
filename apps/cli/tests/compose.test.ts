@@ -30,3 +30,16 @@ it("creates log dir for fluentd", async () => {
 
   expect(s.mode).toBe(0o40777);
 });
+
+it("generate correct paths", async () => {
+
+  const config = getInstallConfig(configPath);
+
+  config.portal = { basePath: "/", novncClientImage: "" };
+  config.mis = { basePath: "/mis", dbPassword: "must!chang3this", mysqlImage: "" };
+
+  const composeConfig = createComposeSpec(config);
+
+  expect(composeConfig.services["portal-web"].environment).toContain("MIS_URL=/mis");
+  expect(composeConfig.services["mis-web"].environment).toContain("PORTAL_URL=/");
+});
