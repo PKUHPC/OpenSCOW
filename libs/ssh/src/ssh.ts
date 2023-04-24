@@ -16,7 +16,7 @@ import { quote } from "shell-quote";
 import type { Logger } from "ts-log";
 
 import { insertKeyAsRoot, KeyPair } from "./key";
-import { sftpChmod, SftpError, sftpMkdir, sftpStat, sftpWriteFile } from "./sftp";
+import { sftpAppendFile, sftpChmod, SftpError, sftpMkdir, sftpStatOrUndefined, sftpWriteFile } from "./sftp";
 
 export class SshConnectError extends Error {
   constructor(options?: ErrorOptions) {
@@ -221,20 +221,20 @@ export const getUserHomedir = async (ssh: NodeSSH, username: string, logger: Log
  *
  * @param address the address
  * @param username the username
- * @param pwd password
+ * @param password password
  * @param rootKeyPair key pair
  * @param logger logger
  */
 export async function insertKeyAsUser(
-  address: string, username: string, pwd: string,
+  address: string, username: string, password: string,
   rootKeyPair: KeyPair, logger: Logger,
 ) {
 
-  await sshConnectByPassword(address, username, pwd, logger, async (ssh) => {
+  await sshConnectByPassword(address, username, password, logger, async (ssh) => {
     const userHomeDir = await getUserHomedir(ssh, username, logger);
 
     const sftp = await ssh.requestSFTP();
-    const stat = await sftpStat(sftp)(userHomeDir).catch(() => undefined);
+    const stat = await sftpStatOrUndefined(sftp)(userHomeDir);
 
     if (!stat) {
       logger.warn("Home directory %s of user %s doesn't exist even after login as the user. Insert key as root.",
@@ -249,15 +249,27 @@ export async function insertKeyAsUser(
       throw new Error(`${userHomeDir} of user ${username} exists but is not a directory`);
     }
 
-    // creat ~/.ssh/authorized_keys and write keys
+    // make sure ~/.ssh exists and has correct permission
     const sshDir = join(userHomeDir, ".ssh");
-    await sftpMkdir(sftp)(sshDir);
-    await sftpChmod(sftp)(sshDir, "700");
+    const sshDirStat = await sftpStatOrUndefined(sftp)(sshDir);
+    if (!sshDirStat) {
+      logger.info("%s not exists in %s user %s. Creating it.", sshDir, address, username);
+      await sftpMkdir(sftp)(sshDir);
+      await sftpChmod(sftp)(sshDir, "700");
+    }
 
+    // check if authorized_keys exists
     const keyFilePath = join(sshDir, "authorized_keys");
-    await sftpWriteFile(sftp)(keyFilePath, rootKeyPair.publicKey);
-    logger.info("Writing key for user %s to %s in file %s", username, address, keyFilePath);
-    await sftpChmod(sftp)(keyFilePath, "644");
+    const authorizedKeysStat = await sftpStatOrUndefined(sftp)(keyFilePath);
+    if (!authorizedKeysStat) {
+      logger.info("%s not exists in %s for user %s. Create the file and insert public key",
+        keyFilePath, address, username);
+      await sftpWriteFile(sftp)(keyFilePath, rootKeyPair.publicKey + "\n");
+      await sftpChmod(sftp)(keyFilePath, "644");
+    } else {
+      logger.info("%s exists in %s for user %s. Insert public key", keyFilePath, address, username);
+      await sftpAppendFile(sftp)(keyFilePath, "\n" + rootKeyPair.publicKey + "\n");
+    }
   });
 }
 

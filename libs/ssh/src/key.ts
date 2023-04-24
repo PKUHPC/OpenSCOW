@@ -14,7 +14,7 @@ import fs from "fs";
 import { join } from "path";
 import type { Logger } from "ts-log";
 
-import { sftpChmod, sftpChown, sftpWriteFile } from "./sftp";
+import { sftpAppendFile, sftpChmod, sftpChown, sftpStatOrUndefined, sftpWriteFile } from "./sftp";
 import { sshConnect } from "./ssh";
 export interface KeyPair {
   publicKey: string;
@@ -47,29 +47,40 @@ export async function insertKeyAsRoot(
     const userID = await ssh.execCommand(`id -u ${user}`);
     const userGID = await ssh.execCommand(`id -g ${user}`);
 
+    const uid = Number(userID.stdout.trim());
+    const gid = Number(userGID.stdout.trim());
+
     const userHomeDir = homeDir.stdout.trim();
 
     const sftp = await ssh.requestSFTP();
+
     // make sure user home directory exists.
     await ssh.mkdir(userHomeDir, undefined, sftp);
-
-    const sshDir = join(userHomeDir, ".ssh");
-
-    await ssh.mkdir(sshDir, undefined, sftp);
     // root create the directory, so we need to change the owner
-    await sftpChown(sftp)(userHomeDir, Number(userID.stdout.trim()), Number(userGID.stdout.trim()));
+    await sftpChown(sftp)(userHomeDir, uid, gid);
 
+    // make sure .ssh dir exists
+    const sshDir = join(userHomeDir, ".ssh");
+    const sshDirStat = await sftpStatOrUndefined(sftp)(sshDir);
+    if (!sshDirStat) {
+      logger.info("%s not exists in %s user %s. Creating it.", sshDir, host, user);
+      await ssh.mkdir(sshDir, undefined, sftp);
+      await sftpChmod(sftp)(sshDir, "700");
+      await sftpChown(sftp)(sshDir, uid, gid);
+    }
+
+    // insert key
     const keyFilePath = join(sshDir, "authorized_keys");
-    await sftpChmod(sftp)(sshDir, "700");
-    await sftpWriteFile(sftp)(keyFilePath, rootKeyPair.publicKey);
-    logger.info("Writing key to user %s, userID %s to %s in file %s", user, userID, host, keyFilePath);
-
-    await sftpChmod(sftp)(keyFilePath, "644");
-
-    await sftpChown(sftp)(sshDir, Number(userID.stdout.trim()), Number(userGID.stdout.trim()));
-
-    await sftpChown(sftp)(keyFilePath, Number(userID.stdout.trim()), Number(userGID.stdout.trim()));
-
+    const keyFileStat = await sftpStatOrUndefined(sftp)(keyFilePath);
+    if (!keyFileStat) {
+      logger.info("Writing key to user %s, userID %s to %s in file %s", user, uid, host, keyFilePath);
+      await sftpWriteFile(sftp)(keyFilePath, rootKeyPair.publicKey + "\n");
+      await sftpChmod(sftp)(keyFilePath, "644");
+      await sftpChown(sftp)(keyFilePath, uid, gid);
+    } else {
+      logger.info("%s exists for user %s in %s. Appending public key", keyFilePath, user, host);
+      await sftpAppendFile(sftp)(keyFilePath, "\n" + rootKeyPair.publicKey + "\n");
+    }
   });
 }
 
