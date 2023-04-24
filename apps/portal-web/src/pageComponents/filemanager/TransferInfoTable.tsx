@@ -10,12 +10,12 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { TransferInfo } from "@scow/protos/build/portal/file";
 import { App, Button, Progress, Table } from "antd";
 import { useCallback, useEffect } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { Cluster } from "src/utils/config";
-import { TransferInfo } from "src/utils/file";
 
 interface TransferData {
   cluster: string;
@@ -91,12 +91,12 @@ export const TransferInfoTable: React.FC = () => {
           onClick={() => {
             modal.confirm({
               title: "确认取消",
-              content: `确认取消${row.cluster} -> ${row.recvCluster}的文件${row.filePath}的传输吗？`,
+              content: `确认取消${row.cluster} -> ${row.toCluster}的文件${row.filePath}的传输吗？`,
               okText: "确认",
               onOk: async () => {
                 await api.terminateFilesTransfer({ body: {
                   fromCluster: row.cluster,
-                  toCluster: row.recvCluster,
+                  toCluster: row.toCluster,
                   fromPath: row.filePath,
                 } })
                   .then(() => {

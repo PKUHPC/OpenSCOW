@@ -489,13 +489,13 @@ export const fileServiceServer = plugin((server) => {
         const transferInfos: TransferInfo[] = [];
         // 根据host确定clusterId
         transferInfosJsons.forEach((info) => {
-          let recvCluster = info.recvAddress;
+          let toCluster = info.recvAddress;
           for (const key in clusters) {
             const transferNode = tryGetClusterTransferNode(key);
             if (transferNode) {
               const clusterHost = transferNode.host;
               if (clusterHost === info.recvAddress) {
-                recvCluster = key;
+                toCluster = key;
               }
             }
             else {
@@ -525,7 +525,7 @@ export const fileServiceServer = plugin((server) => {
           const [hours, minutes, seconds] = info.leftTime.split(":").map(Number);
           const leftTimeSeconds = hours * 3600 + minutes * 60 + seconds;
           transferInfos.push({
-            recvCluster: recvCluster,
+            toCluster: toCluster,
             filePath: info.filePath,
             transferSizeKb: Math.floor(Number(info.transferSize.replace(/,/g, "")) / 1024),
             progress: Number(info.progress.split("%")[0]),

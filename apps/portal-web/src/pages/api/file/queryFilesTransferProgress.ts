@@ -12,10 +12,9 @@
 
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { status } from "@grpc/grpc-js";
-import { FileServiceClient } from "@scow/protos/build/portal/file";
+import { FileServiceClient, TransferInfo } from "@scow/protos/build/portal/file";
 import { authenticate } from "src/auth/server";
 import { getClient } from "src/utils/client";
-import { TransferInfo } from "src/utils/file";
 import { route } from "src/utils/route";
 import { handlegRPCError } from "src/utils/server";
 
