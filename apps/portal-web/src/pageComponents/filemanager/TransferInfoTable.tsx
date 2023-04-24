@@ -95,6 +95,7 @@ export const TransferInfoTable: React.FC = () => {
               okText: "确认",
               onOk: async () => {
                 await api.terminateFilesTransfer({ body: {
+                  fromCluster: row.cluster,
                   toCluster: row.recvCluster,
                   fromPath: row.filePath,
                 } })

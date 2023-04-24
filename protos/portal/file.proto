@@ -196,9 +196,10 @@ message QueryFilesTransferResponse {
 }
 
 message TerminateFilesTransferRequest {
-  string to_cluster = 1;
-  string user_id = 2;
-  string from_path = 3;
+  string from_cluster = 1;
+  string to_cluster = 2;
+  string user_id = 3;
+  string from_path = 4;
 }
 
 message TerminateFilesTransferResponse {

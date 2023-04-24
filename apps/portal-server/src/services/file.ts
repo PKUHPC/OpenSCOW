@@ -539,14 +539,15 @@ export const fileServiceServer = plugin((server) => {
     },
 
     terminateFilesTransfer: async ({ request, logger }) => {
-      const { toCluster, userId, fromPath } = request;
+      const { fromCluster, toCluster, userId, fromPath } = request;
 
+      const fromTransferNode = getClusterTransferNode(fromCluster);
       const toTransferNode = getClusterTransferNode(toCluster);
 
       const toTransferNodeHost = toTransferNode.indexOf(":") > 0 ?
         toTransferNode.split(":")[0] : toTransferNode;
 
-      return await sshConnect(toTransferNode, userId, logger, async (ssh) => {
+      return await sshConnect(fromTransferNode, userId, logger, async (ssh) => {
 
         const cmd = "scow-sync-terminate";
         const args = [

@@ -22,6 +22,7 @@ export interface TerminateFilesTransferSchema {
   method: "POST";
 
   body: {
+    fromCluster: string;
     toCluster: string;
     fromPath: string;
   }
@@ -44,12 +45,13 @@ export default route<TerminateFilesTransferSchema>("TerminateFilesTransferSchema
 
   if (!info) { return; }
 
-  const { toCluster, fromPath } = req.body;
+  const { fromCluster, toCluster, fromPath } = req.body;
 
   const client = getClient(FileServiceClient);
 
   return asyncUnaryCall(client, "terminateFilesTransfer", {
     userId: info.identityId,
+    fromCluster: fromCluster,
     toCluster: toCluster,
     fromPath: fromPath,
   }).then(() => ({ 204: null }), handlegRPCError({
