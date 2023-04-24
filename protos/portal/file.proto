@@ -185,7 +185,7 @@ message QueryFilesTransferRequest {
 message TransferInfo {
   string recv_cluster = 1;
   string file_path = 2;
-  uint64 transfer_size_k_bs = 3;
+  uint64 transfer_size_kb = 3; // 单位为KB，B：Byte
   uint32 progress = 4;
   float speed_k_bps = 5;
   uint64 remaining_time_seconds = 6;

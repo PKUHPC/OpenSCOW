@@ -21,7 +21,7 @@ export type FileInfoKey = React.Key;
 export interface TransferInfo {
   recvCluster: string;
   filePath: string;
-  transferSizeKBs: number;
+  transferSizeKb: number;
   progress: number;
   speedKBps: number;
   remainingTimeSeconds: number;

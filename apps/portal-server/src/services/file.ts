@@ -527,7 +527,7 @@ export const fileServiceServer = plugin((server) => {
           transferInfos.push({
             recvCluster: recvCluster,
             filePath: info.filePath,
-            transferSizeKBs: Math.floor(Number(info.transferSize.replace(/,/g, "")) / 1024),
+            transferSizeKb: Math.floor(Number(info.transferSize.replace(/,/g, "")) / 1024),
             progress: Number(info.progress.split("%")[0]),
             speedKBps: speedInKB,
             remainingTimeSeconds: leftTimeSeconds,
