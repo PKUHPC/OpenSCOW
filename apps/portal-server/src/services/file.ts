@@ -366,16 +366,17 @@ export const fileServiceServer = plugin((server) => {
     startFilesTransfer: async ({ request, logger }) => {
       const { fromCluster, toCluster, userId, fromPath, toPath } = request;
 
-      const fromTransferNode = getClusterTransferNode(fromCluster);
-      const toTransferNode = getClusterTransferNode(toCluster);
-
-      const [toTransferNodeHost, toTransferNodePort] = toTransferNode.indexOf(":") > 0 ?
-        toTransferNode.split(":") : [toTransferNode, "22"];
+      const fromTransferNodeAddress = getClusterTransferNode(fromCluster).address;
+      const {
+        address: toTransferNodeAddress,
+        host: toTransferNodeHost,
+        port: toTransferNodePort,
+      } = getClusterTransferNode(toCluster);
 
 
       // 检查fromTransferNode -> toTransferNode是否已经免密
       const { keyConfiged, scowDir, keyDir, privateKeyPath } = await sshConnect(
-        fromTransferNode, userId, logger, async (ssh) => {
+        fromTransferNodeAddress, userId, logger, async (ssh) => {
         // 获取密钥路径
           const sftp = await ssh.requestSFTP();
           const homePath = await sftpRealPath(sftp)(".");
@@ -404,7 +405,7 @@ export const fileServiceServer = plugin((server) => {
       // 如果没有配置免密，则生成密钥并配置免密
       if (!keyConfiged) {
         // 随机生成密钥
-        const publicKey = await sshConnect(fromTransferNode, userId, logger, async (ssh) => {
+        const publicKey = await sshConnect(fromTransferNodeAddress, userId, logger, async (ssh) => {
           const sftp = await ssh.requestSFTP();
           if (!await sftpExists(sftp, scowDir)) {
             await sftpMkdir(sftp)(scowDir);
@@ -421,7 +422,7 @@ export const fileServiceServer = plugin((server) => {
         });
 
         // 配置fromTransferNode -> toTransferNode的免密登录
-        await sshConnect(toTransferNode, userId, logger, async (ssh) => {
+        await sshConnect(toTransferNodeAddress, userId, logger, async (ssh) => {
           const sftp = await ssh.requestSFTP();
           const homePath = await sftpRealPath(sftp)(".");
           // 将公钥写入到authorized_keys中
@@ -431,7 +432,7 @@ export const fileServiceServer = plugin((server) => {
       }
 
       // 执行scow-sync-start
-      return await sshConnect(fromTransferNode, userId, logger, async (ssh) => {
+      return await sshConnect(fromTransferNodeAddress, userId, logger, async (ssh) => {
         const cmd = "scow-sync-start";
         const args = [
           "-a", toTransferNodeHost,
@@ -460,9 +461,9 @@ export const fileServiceServer = plugin((server) => {
 
       const { cluster, userId } = request;
 
-      const transferNode = getClusterTransferNode(cluster);
+      const transferNodeAddress = getClusterTransferNode(cluster).address;
 
-      return await sshConnect(transferNode, userId, logger, async (ssh) => {
+      return await sshConnect(transferNodeAddress, userId, logger, async (ssh) => {
         const cmd = "scow-sync-query";
         const resp = await loggedExec(ssh, logger, true, cmd, []);
 
@@ -492,8 +493,7 @@ export const fileServiceServer = plugin((server) => {
           for (const key in clusters) {
             const transferNode = tryGetClusterTransferNode(key);
             if (transferNode) {
-              const clusterHost = transferNode.indexOf(":") > 0 ?
-                transferNode.split(":")[0] : getClusterTransferNode(key);
+              const clusterHost = transferNode.host;
               if (clusterHost === info.recvAddress) {
                 recvCluster = key;
               }
@@ -541,13 +541,10 @@ export const fileServiceServer = plugin((server) => {
     terminateFilesTransfer: async ({ request, logger }) => {
       const { fromCluster, toCluster, userId, fromPath } = request;
 
-      const fromTransferNode = getClusterTransferNode(fromCluster);
-      const toTransferNode = getClusterTransferNode(toCluster);
+      const fromTransferNodeAddress = getClusterTransferNode(fromCluster).address;
+      const toTransferNodeHost = getClusterTransferNode(toCluster).host;
 
-      const toTransferNodeHost = toTransferNode.indexOf(":") > 0 ?
-        toTransferNode.split(":")[0] : toTransferNode;
-
-      return await sshConnect(fromTransferNode, userId, logger, async (ssh) => {
+      return await sshConnect(fromTransferNodeAddress, userId, logger, async (ssh) => {
 
         const cmd = "scow-sync-terminate";
         const args = [

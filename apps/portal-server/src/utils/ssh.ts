@@ -20,6 +20,11 @@ import { scowErrorMetadata } from "src/utils/error";
 import { loginNodeNotFound, transferNodeNotFound, transferNotEnabled } from "src/utils/errors";
 import { Logger } from "ts-log";
 
+interface NodeNetInfo {
+  address: string,
+  host: string,
+  port: number,
+}
 
 export function getClusterLoginNode(cluster: string): string {
   const loginNode = clusters[cluster]?.slurm?.loginNodes?.[0];
@@ -29,7 +34,7 @@ export function getClusterLoginNode(cluster: string): string {
   return loginNode;
 }
 
-export function getClusterTransferNode(cluster: string): string {
+export function getClusterTransferNode(cluster: string): NodeNetInfo {
   const enabled = clusters[cluster]?.crossClusterFilesTransfer?.enabled;
   const transferNode = clusters[cluster]?.crossClusterFilesTransfer?.transferNode;
   if (!enabled) {
@@ -38,10 +43,19 @@ export function getClusterTransferNode(cluster: string): string {
   else if (!transferNode) {
     throw transferNodeNotFound(cluster);
   }
-  return transferNode;
+  // 解析为host, port
+  const [host, port] = transferNode.indexOf(":") > 0 ?
+    [transferNode.split(":")[0], parseInt(transferNode.split(":")[1])] :
+    [transferNode, 22];
+  const address = `${host}:${port}`;
+  return {
+    address: address,
+    host: host,
+    port: port,
+  };
 }
 
-export function tryGetClusterTransferNode(cluster: string): string | undefined {
+export function tryGetClusterTransferNode(cluster: string): NodeNetInfo | undefined {
   const enabled = clusters[cluster]?.crossClusterFilesTransfer?.enabled;
   const transferNode = clusters[cluster]?.crossClusterFilesTransfer?.transferNode;
   if (!enabled) {
@@ -50,7 +64,16 @@ export function tryGetClusterTransferNode(cluster: string): string | undefined {
   else if (!transferNode) {
     return undefined;
   }
-  return transferNode;
+  // 解析为host, port
+  const [host, port] = transferNode.indexOf(":") > 0 ?
+    [transferNode.split(":")[0], parseInt(transferNode.split(":")[1])] :
+    [transferNode, 22];
+  const address = `${host}:${port}`;
+  return {
+    address: address,
+    host: host,
+    port: port,
+  };
 }
 
 export const SSH_ERROR_CODE = "SSH_ERROR";
