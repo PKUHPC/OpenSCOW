@@ -36,13 +36,9 @@ export default route<ListAvailableTransferClustersSchema>("ListAvailableTransfer
 
   if (!info) { return; }
 
-  const clusterList: Cluster[] = [];
+  const clusterList: Cluster[] = publicConfig.CLUSTERS.filter(
+    (x) => runtimeConfig.CLUSTERS_CONFIG[x.id].crossClusterFilesTransfer.enabled);
 
-  for (const cluster of publicConfig.CLUSTERS) {
-    if (runtimeConfig.CLUSTERS_CONFIG[cluster.id].crossClusterFilesTransfer.enabled) {
-      clusterList.push(cluster);
-    }
-  }
 
   return { 200: { clusterList: clusterList } };
 
