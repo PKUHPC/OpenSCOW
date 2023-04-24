@@ -29,7 +29,7 @@
     "@scow/lib-ssh": "workspace:*",
     "@scow/protos": "workspace:*",
     "@scow/utils": "workspace:*",
-    "@sinclair/typebox": "0.27.8",
+    "@sinclair/typebox": "0.28.5",
     "node-ssh": "13.1.0",
     "dotenv": "16.0.3",
     "node-cron": "3.0.2",
