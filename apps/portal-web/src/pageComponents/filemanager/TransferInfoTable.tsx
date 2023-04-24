@@ -64,7 +64,7 @@ export const TransferInfoTable: React.FC = () => {
     },
     {
       title: "传输数量",
-      dataIndex: "transferSizeKBs",
+      dataIndex: "transferSizeKb",
       render: (transferSizeKb: number) => transferSizeKb + "KB",
     },
     {
