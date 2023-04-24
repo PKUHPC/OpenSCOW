@@ -56,7 +56,7 @@ export const TransferInfoTable: React.FC = () => {
     },
     {
       title: "接收集群",
-      dataIndex: "recvCluster",
+      dataIndex: "toCluster",
     },
     {
       title: "文件",
