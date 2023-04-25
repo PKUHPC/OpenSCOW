@@ -21,6 +21,11 @@ const config = {
   projectName: variables.PROJECT_NAME,
   trailingSlash: false,
 
+  i18n: {
+    defaultLocale: "zh",
+    locales: ["zh"],
+  },
+
   plugins: [
     [require.resolve("@cmfcmf/docusaurus-search-local"), {
       language: "zh",
