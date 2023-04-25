@@ -10,11 +10,11 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { randomBytes } from "crypto";
+import { generateKeyPair, randomBytes } from "crypto";
 import { NodeSSH } from "node-ssh";
 import { homedir } from "os";
 import { dirname, join } from "path";
-import { getKeyPair } from "src/key";
+import { getKeyPair, KeyPair } from "src/key";
 import { sftpWriteFile } from "src/sftp";
 import { sshRawConnect, sshRmrf } from "src/ssh";
 import { SFTPWrapper } from "ssh2";
@@ -64,3 +64,25 @@ export async function createTestItems({ sftp, ssh }: TestSshServer): Promise<str
   return base;
 }
 
+export async function generateSshKeyPair() {
+  return new Promise<KeyPair>((res, rej) => {
+    generateKeyPair("rsa", {
+      modulusLength: 2048,
+      publicKeyEncoding: {
+        type: "spki",
+        format: "pem",
+      },
+      privateKeyEncoding: {
+        type: "pkcs8",
+        format: "pem",
+        cipher: "aes-256-cbc",
+        passphrase: "",
+      },
+    }, (err, publicKey, privateKey) => {
+      // Handle errors and use the generated key pair.
+      if (err) { rej(err); }
+
+      res({ publicKey, privateKey });
+    });
+  });
+}

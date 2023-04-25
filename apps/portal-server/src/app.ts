@@ -21,6 +21,7 @@ import { desktopServiceServer } from "src/services/desktop";
 import { fileServiceServer } from "src/services/file";
 import { jobServiceServer } from "src/services/job";
 import { shellServiceServer } from "src/services/shell";
+import { logger } from "src/utils/logger";
 import { initShellFile } from "src/utils/shell";
 import { checkClustersRootUserLogin } from "src/utils/ssh";
 
@@ -29,12 +30,7 @@ export async function createServer() {
   const server = new Server({
     host: config.HOST,
     port: config.PORT,
-    logger: {
-      level: config.LOG_LEVEL,
-      ...config.LOG_PRETTY ? {
-        transport: { target: "pino-pretty" },
-      } : {},
-    },
+    logger,
   });
 
   server.logger.info({ version: readVersionFile() }, "Running @scow/portal-server");

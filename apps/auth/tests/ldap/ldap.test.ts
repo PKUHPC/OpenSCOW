@@ -37,6 +37,14 @@ const user = {
   captchaCode: "captchaCode",
 };
 
+const savedUserMail = "mail is " + user.mail;
+
+class ConfigNoAddUserError extends Error {}
+
+if (!ldap.addUser) {
+  throw new ConfigNoAddUserError();
+}
+
 const userDn = `${ldap.addUser.userIdDnKey}=${user.identityId},${ldap.addUser.userBase}`;
 const groupDn =
   `${ldap.addUser.newGroupPerUser!.groupIdDnKey}=${user.identityId},`
@@ -98,6 +106,10 @@ const createUser = async () => {
 
 it("creates user and group if groupStrategy is newGroupPerUser", async () => {
 
+  if (!ldap.addUser) {
+    throw new ConfigNoAddUserError();
+  }
+
   ldap.addUser.groupStrategy = NewUserGroupStrategy.newGroupPerUser;
 
   await createUser();
@@ -107,6 +119,7 @@ it("creates user and group if groupStrategy is newGroupPerUser", async () => {
   expect(responseUser).toEqual({
     dn: userDn,
     identityId: user.identityId,
+    mail: savedUserMail,
     name: user.name,
   });
 
@@ -130,8 +143,12 @@ it("creates user and group if groupStrategy is newGroupPerUser", async () => {
 
 });
 
-
 it("creates only user if groupStrategy is oneGroupForAllUsers", async () => {
+
+  if (!ldap.addUser) {
+    throw new ConfigNoAddUserError();
+  }
+
   ldap.addUser.groupStrategy = NewUserGroupStrategy.oneGroupForAllUsers;
 
   await createUser();
@@ -185,7 +202,6 @@ it("test to input a wrong verifyCaptcha", async () => {
 it("should login with correct username and password", async () => {
 
   await createUser();
-
 
 
   // login
@@ -244,7 +260,11 @@ it("gets user info", async () => {
   });
 
   expect(resp.statusCode).toBe(200);
-  expect(resp.json()).toEqual({ user: { identityId: user.identityId } });
+  expect(resp.json()).toEqual({ user: {
+    identityId: user.identityId,
+    name: user.name,
+    mail: savedUserMail,
+  } });
 });
 
 it("returns 404 if user doesn't exist", async () => {

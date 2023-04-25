@@ -29,7 +29,7 @@
     "@scow/lib-ssh": "workspace:*",
     "@scow/protos": "workspace:*",
     "@scow/utils": "workspace:*",
-    "@sinclair/typebox": "0.27.8",
+    "@sinclair/typebox": "0.28.5",
     "node-ssh": "13.1.0",
     "dotenv": "16.0.3",
     "node-cron": "3.0.2",
@@ -39,7 +39,8 @@
     "shell-quote": "1.8.1",
     "dayjs": "1.11.7",
     "pino-pretty": "10.0.0",
-    "is-port-reachable": "4.0.0"
+    "is-port-reachable": "4.0.0",
+    "pino": "8.11.0"
   },
   "devDependencies": {
     "@ddadaal/tsgrpc-client": "0.17.3",

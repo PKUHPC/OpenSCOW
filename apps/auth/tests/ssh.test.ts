@@ -108,7 +108,10 @@ it("gets user info", async () => {
   });
 
   expect(resp.statusCode).toBe(200);
-  expect(resp.json()).toEqual({ user: { identityId: username } });
+  expect(resp.json()).toEqual({ user: {
+    identityId: username,
+    name: "Linux User",
+  } });
 });
 
 it("returns 404 if user doesn't exist", async () => {
