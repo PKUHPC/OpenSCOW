@@ -19,6 +19,8 @@ import { UserInfo } from "src/models/User";
 import { getClient } from "src/utils/client";
 import { runtimeConfig } from "src/utils/config";
 
+export interface AuthUserInfo {
+}
 
 export async function validateToken(token: string): Promise<UserInfo | undefined> {
 
@@ -44,7 +46,7 @@ export async function validateToken(token: string): Promise<UserInfo | undefined
   return {
     accountAffiliations: userInfo.affiliations,
     identityId: resp.identityId,
-    name: authUserInfo?.name || resp.identityId,
+    name: authUserInfo?.name,
     platformRoles: userInfo.platformRoles,
     tenant: userInfo.tenantName,
     tenantRoles: userInfo.tenantRoles,

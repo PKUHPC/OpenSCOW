@@ -16,7 +16,7 @@ import { destroyUserInfoCookie } from "src/auth/cookie";
 
 export interface User {
   identityId: string;
-  name: string;
+  name?: string;
   token: string;
 }
 

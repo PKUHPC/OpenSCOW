@@ -37,7 +37,7 @@ export async function validateToken(token: string | undefined): Promise<UserInfo
 
   return {
     identityId: resp.identityId,
-    name: userInfo?.name ?? resp.identityId,
+    name: userInfo?.name,
   };
 
 }
