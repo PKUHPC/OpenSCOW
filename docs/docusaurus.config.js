@@ -3,11 +3,12 @@
 
 const lightCodeTheme = require("prism-react-renderer/themes/github");
 const darkCodeTheme = require("prism-react-renderer/themes/dracula");
-const { join } = require("path");
+const { join, resolve } = require("path");
 const { plugin, variables } = require("./plugins/var");
 
 
-/** @type {import('@docusaurus/types').Config} */
+
+/** @type {import("@docusaurus/types").Config} */
 const config = {
   title: "SCOW",
   tagline: "Super Computing On Web",
@@ -19,6 +20,25 @@ const config = {
   organizationName: variables.ORGANIZATION_NAME,
   projectName: variables.PROJECT_NAME,
   trailingSlash: false,
+
+  plugins: [
+    [require.resolve("@cmfcmf/docusaurus-search-local"), {
+      language: "zh",
+    }],
+    () => ({
+      name: 'resolve-react',
+      configureWebpack() {
+        return {
+          resolve: {
+            alias: {
+              // assuming root node_modules is up from "./packages/<your-docusaurus>
+              react: resolve('node_modules/react'),
+            },
+          },
+        };
+      },
+    }),
+  ],
 
   presets: [
     [
