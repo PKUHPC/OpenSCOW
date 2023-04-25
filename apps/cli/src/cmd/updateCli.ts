@@ -82,13 +82,13 @@ export const updateCli = async (options: Options) => {
     }
   }
 
-  const arch = getArch();
-
   const agent = proxyUrl ? createProxyAgent(proxyUrl) : undefined;
 
   if (proxyUrl) {
     log("Using proxy %s", proxyUrl);
   }
+
+  const arch = getArch();
 
   // built-in fetch doesn't work with proxy
   // https://github.com/octokit/rest.js/issues/43
@@ -196,7 +196,7 @@ Please provide your GitHub personal access token via GITHUB_TOKEN in env or .env
   log("Asset: %s. Download URL: %s", asset.name, asset.browser_download_url);
 
   log("Downloading...");
-  const content = await download(asset.browser_download_url);
+  const content = await download(asset.browser_download_url, { agent });
 
   await unlink(outputPath);
   await fs.promises.writeFile(outputPath, Buffer.from(content));
