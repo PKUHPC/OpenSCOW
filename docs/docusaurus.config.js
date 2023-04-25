@@ -25,6 +25,9 @@ const config = {
     [require.resolve("@cmfcmf/docusaurus-search-local"), {
       language: "zh",
     }],
+
+    // make webpack resolve react from docs node_modules
+    // https://github.com/facebook/docusaurus/issues/8091#issuecomment-1269112001
     () => ({
       name: 'resolve-react',
       configureWebpack() {
