@@ -64,7 +64,7 @@ export const MisConfigSchema = Type.Object({
     userIdPattern: Type.Optional(Type.Object({
       regex: Type.String({ description: "用户ID的正则规则" }),
       errorMessage: Type.Optional(Type.String({ description: "如果用户ID不符合规则显示什么" })),
-    }, { description: "从" })),
+    }, { description: "从管理系统里创建用户时，用户ID的验证规则" })),
 
   }, { default: {}, description: "当认证系统允许创建用户时，SCOW的创建用户相关配置" }),
 
