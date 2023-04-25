@@ -237,6 +237,10 @@ importers:
       '@scow/utils':
         specifier: workspace:*
         version: link:../../libs/utils
+    devDependencies:
+      '@webantic/nginx-config-parser':
+        specifier: 1.6.1
+        version: 1.6.1
 
   apps/mis-server:
     dependencies:
@@ -6225,6 +6229,12 @@ packages:
       - '@codemirror/search'
     dev: false
 
+  /@webantic/nginx-config-parser@1.6.1:
+    resolution: {integrity: sha512-MVmDOOOcLMlUOeCP49R9K//lFIwmu4IRuwQhT6J8Cn5gXP0cNQpD4dH3MWqsWPHoRchvVZyb2lJCLhY7yTpT1g==}
+    dependencies:
+      glob: 7.2.3
+    dev: true
+
   /@webassemblyjs/ast@1.11.5:
     resolution: {integrity: sha512-LHY/GSAZZRpsNQH+/oHqhRQ5FT7eoULcBqgfyTB5nQHogFnK3/7QoN7dLnwSE/JkUAF0SrRuclT7ODqMFtWxxQ==}
     dependencies:
@@ -7176,7 +7186,7 @@ packages:
     resolution: {integrity: sha512-iCuPHDFgrHX7H2vEI/5xpz07zSHB00TpugqhmYtVmMO6518mCuRMoOYFldEBl0g187ufozdaHgWKcYFb61qGiA==}
     dependencies:
       balanced-match: 1.0.2
-      concat-map: registry.npmmirror.com/concat-map@0.0.1
+      concat-map: 0.0.1
 
   /brace-expansion@2.0.1:
     resolution: {integrity: sha512-XnAIvQ8eM+kC6aULx6wuQiwVsnzsi9d3WxzV3FpWTGA19F621kwdbsAcFKXgKUHZWsy+mY6iL1sHTxWEFCytDA==}
@@ -7733,6 +7743,9 @@ packages:
     resolution: {integrity: sha512-gcGtbRxjwROQOdXLUWH1fQAXqThUVRZ219aAwgtX3KfYw429/Zv6EIJRf5TBSzWdAGwePmqH7w70WTaX4MDqag==}
     engines: {node: '>=12.17'}
     dev: true
+
+  /concat-map@0.0.1:
+    resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==}
 
   /concurrently@8.0.1:
     resolution: {integrity: sha512-Sh8bGQMEL0TAmAm2meAXMjcASHZa7V0xXQVDBLknCPa9TPtkY9yYs+0cnGGgfdkW0SV1Mlg+hVGfXcoI8d3MJA==}
@@ -18381,11 +18394,6 @@ packages:
     name: '@types/mime-types'
     version: 2.1.1
     dev: true
-
-  registry.npmmirror.com/concat-map@0.0.1:
-    resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==, registry: https://registry.npmjs.org/, tarball: https://registry.npmmirror.com/concat-map/-/concat-map-0.0.1.tgz}
-    name: concat-map
-    version: 0.0.1
 
   registry.npmmirror.com/doctrine@2.1.0:
     resolution: {integrity: sha512-35mSku4ZXK0vfCuHEDAwt55dg2jNajHZ1odvF+8SSr82EsZY4QmXfuWso8oEd8zRhVObSN18aM0CjSdoBX7zIw==, registry: https://registry.npmjs.org/, tarball: https://registry.npmmirror.com/doctrine/-/doctrine-2.1.0.tgz}
