@@ -47,7 +47,7 @@ export const UserIndicator: React.FC<Props> = ({
             trigger={["click"]}
             menu={{
               items: [
-                ...user.name !== undefined ? [{ key: "username", disabled: true, label: `用户姓名：${user.name}` }] : [],
+                { key: "username", disabled: true, label: `用户姓名：${user.name}` },
                 { key: "userid", disabled: true, label: `用户ID：${user.identityId}` },
                 { key: "profileLink", label: <Link href="/profile">个人信息</Link> },
                 { key: "logout", onClick: logout, label: "退出登录" },

@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { validateToken as valToken } from "@scow/lib-auth"; 
+import { getUser, validateToken as authValidateToken } from "@scow/lib-auth";
 import { USE_MOCK } from "src/apis/useMock";
 import { UserInfo } from "src/models/User";
 import { runtimeConfig } from "src/utils/config";
@@ -21,19 +21,23 @@ export async function validateToken(token: string | undefined): Promise<UserInfo
     if (!runtimeConfig.MOCK_USER_ID) {
       throw new Error("Using mock user id but runtimeConfig.MOCK_USER_ID is not set");
     }
-    return { identityId: runtimeConfig.MOCK_USER_ID };
+    return { identityId: runtimeConfig.MOCK_USER_ID, name: runtimeConfig.MOCK_USER_ID };
   }
 
   if (!token) { return undefined; }
 
-  const resp = await valToken(runtimeConfig.AUTH_INTERNAL_URL, token).catch(() => undefined);
+  const resp = await authValidateToken(runtimeConfig.AUTH_INTERNAL_URL, token).catch(() => undefined);
 
   if (!resp) {
     return undefined;
   }
 
+  const userInfo = await getUser(runtimeConfig.AUTH_INTERNAL_URL, { identityId: resp.identityId })
+    .catch(() => undefined);
+
   return {
     identityId: resp.identityId,
+    name: userInfo?.name ?? resp.identityId,
   };
 
 }
