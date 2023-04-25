@@ -18,8 +18,8 @@ import { extractUserInfoFromEntry, findUser, searchOne, useLdap } from "src/auth
 import { modifyPasswordAsSelf } from "src/auth/ldap/password";
 import { registerPostHandler } from "src/auth/ldap/postHandler";
 import { serveLoginHtml } from "src/auth/loginHtml";
-import { authConfig } from "src/config/auth";
-import { ensureNotUndefined } from "src/utils/validations";
+import { authConfig, LdapConfigSchema } from "src/config/auth";
+import { ensureNotUndefined, RequiredBy } from "src/utils/validations";
 
 export const createLdapAuthProvider = (f: FastifyInstance) => {
 
@@ -64,7 +64,7 @@ export const createLdapAuthProvider = (f: FastifyInstance) => {
       findUser(req.log, ldap, client, identityId)
     )),
     createUser: ldap.addUser ? async (info, req) => {
-      return createUser(info, req, ldap);
+      return createUser(info, req, ldap as RequiredBy<LdapConfigSchema, "addUser">);
     } : undefined,
     changePassword: async (id, oldPassword, newPassword, req) => {
       return useLdap(req.log, ldap)(async (client) => {

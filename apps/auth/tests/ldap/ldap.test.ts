@@ -37,8 +37,10 @@ const user = {
   captchaCode: "captchaCode",
 };
 
+class ConfigNoAddUserError extends Error {}
+
 if (!ldap.addUser) {
-  throw new Error("Test config should configure ldap.addUser");
+  throw new ConfigNoAddUserError();
 }
 
 const userDn = `${ldap.addUser.userIdDnKey}=${user.identityId},${ldap.addUser.userBase}`;
@@ -102,6 +104,10 @@ const createUser = async () => {
 
 it("creates user and group if groupStrategy is newGroupPerUser", async () => {
 
+  if (!ldap.addUser) {
+    throw new ConfigNoAddUserError();
+  }
+
   ldap.addUser.groupStrategy = NewUserGroupStrategy.newGroupPerUser;
 
   await createUser();
@@ -134,8 +140,12 @@ it("creates user and group if groupStrategy is newGroupPerUser", async () => {
 
 });
 
-
 it("creates only user if groupStrategy is oneGroupForAllUsers", async () => {
+
+  if (!ldap.addUser) {
+    throw new ConfigNoAddUserError();
+  }
+
   ldap.addUser.groupStrategy = NewUserGroupStrategy.oneGroupForAllUsers;
 
   await createUser();

@@ -16,7 +16,8 @@ import ldapjs, { EntryAlreadyExistsError } from "ldapjs";
 import { CreateUserInfo, CreateUserResult } from "src/auth/AuthProvider";
 import { searchOne, useLdap } from "src/auth/ldap/helpers";
 import { modifyPassword } from "src/auth/ldap/password";
-import { AuthConfigSchema, NewUserGroupStrategy } from "src/config/auth";
+import { LdapConfigSchema, NewUserGroupStrategy } from "src/config/auth";
+import { RequiredBy } from "src/utils/validations";
 import { promisify } from "util";
 
 /*
@@ -42,9 +43,7 @@ const applyExtraProps = (obj: object, extraProps: Record<string, string | string
 
 export async function createUser(
   info: CreateUserInfo, req: FastifyRequest,
-  ldap: NonNullable<AuthConfigSchema["ldap"]> & {
-    addUser: NonNullable<NonNullable<AuthConfigSchema["ldap"]>["addUser"]>
-  },
+  ldap: RequiredBy<LdapConfigSchema, "addUser">,
 ): Promise<CreateUserResult> {
 
 
