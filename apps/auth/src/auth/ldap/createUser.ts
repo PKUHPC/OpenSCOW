@@ -41,8 +41,12 @@ const applyExtraProps = (obj: object, extraProps: Record<string, string | string
 };
 
 export async function createUser(
-  info: CreateUserInfo, req: FastifyRequest, ldap: NonNullable<AuthConfigSchema["ldap"]>,
+  info: CreateUserInfo, req: FastifyRequest,
+  ldap: NonNullable<AuthConfigSchema["ldap"]> & {
+    addUser: NonNullable<NonNullable<AuthConfigSchema["ldap"]>["addUser"]>
+  },
 ): Promise<CreateUserResult> {
+
 
   const id = info.id + ldap.addUser.uidStart;
 

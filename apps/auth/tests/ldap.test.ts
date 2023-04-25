@@ -37,6 +37,10 @@ const user = {
   captchaCode: "captchaCode",
 };
 
+if (!ldap.addUser) {
+  throw new Error("Test config should configure ldap.addUser");
+}
+
 const userDn = `${ldap.addUser.userIdDnKey}=${user.identityId},${ldap.addUser.userBase}`;
 const groupDn =
   `${ldap.addUser.newGroupPerUser!.groupIdDnKey}=${user.identityId},`

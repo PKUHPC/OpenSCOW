@@ -63,9 +63,9 @@ export const createLdapAuthProvider = (f: FastifyInstance) => {
     getUser: async (identityId, req) => useLdap(req.log, ldap)(async (client) => (
       findUser(req.log, ldap, client, identityId)
     )),
-    createUser: async (info, req) => {
+    createUser: ldap.addUser ? async (info, req) => {
       return createUser(info, req, ldap);
-    },
+    } : undefined,
     changePassword: async (id, oldPassword, newPassword, req) => {
       return useLdap(req.log, ldap)(async (client) => {
         const user = await findUser(req.log, ldap, client, id);
