@@ -13,13 +13,13 @@
 import "xterm/css/xterm.css";
 
 import { Button, Popover, Space, Typography } from "antd";
-import { GetServerSideProps, NextPage } from "next";
+import { NextPage } from "next";
 import dynamic from "next/dynamic";
 import Router, { useRouter } from "next/router";
 import { useRef } from "react";
-import { requireAuth, RequireAuthProps } from "src/auth/requireAuth";
+import { requireAuth } from "src/auth/requireAuth";
 import { NotFoundPage } from "src/components/errorPages/NotFoundPage";
-import { publicConfig, runtimeConfig } from "src/utils/config";
+import { publicConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
 import styled from "styled-components";
 
@@ -67,13 +67,7 @@ const DynamicShellComponent = dynamic(
     loading: Black,
   });
 
-type Props = {
-  loginNode: string
-}
-
-export const ShellPage: NextPage = requireAuth(() => true)((props: Props & RequireAuthProps) => {
-
-  const { userStore, loginNode } = props;
+export const ShellPage: NextPage = requireAuth(() => true)(({ userStore }) => {
 
   if (!publicConfig.ENABLE_SHELL) {
     return <NotFoundPage />;
@@ -93,7 +87,7 @@ export const ShellPage: NextPage = requireAuth(() => true)((props: Props & Requi
       <Head title={`${cluster}的终端`} />
       <Header ref={headerRef}>
         <h2>
-          以ID: {userStore.user.identityId} 连接到 {clusterName} 集群的 {loginNode} 节点
+          以ID: {userStore.user.identityId} 连接到集群 {clusterName}
         </h2>
         <Space wrap>
           <Button onClick={() => Router.reload()}>
@@ -132,18 +126,5 @@ export const ShellPage: NextPage = requireAuth(() => true)((props: Props & Requi
     </Container>
   );
 });
-
-
-export const getServerSideProps: GetServerSideProps<Props> = async (ctx) => {
-
-  const cluster = ctx.query.cluster as string;
-
-  return {
-    props: {
-      loginNode: runtimeConfig.CLUSTERS_CONFIG[cluster]?.slurm?.loginNodes?.[0],
-    },
-  };
-};
-
 
 export default ShellPage;
