@@ -10,8 +10,8 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { getAppConfigs } from "@scow/config/build/app";
+import { getAppConfigs as libGetAppConfigs } from "@scow/config/build/app";
 import { logger } from "src/utils/logger";
 
-export const apps = getAppConfigs(undefined, logger);
+export const getAppConfigs = () => libGetAppConfigs(undefined, logger);
 
