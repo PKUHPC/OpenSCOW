@@ -37,6 +37,8 @@ const user = {
   captchaCode: "captchaCode",
 };
 
+const savedUserMail = "mail is " + user.mail;
+
 class ConfigNoAddUserError extends Error {}
 
 if (!ldap.addUser) {
@@ -117,6 +119,7 @@ it("creates user and group if groupStrategy is newGroupPerUser", async () => {
   expect(responseUser).toEqual({
     dn: userDn,
     identityId: user.identityId,
+    mail: savedUserMail,
     name: user.name,
   });
 
@@ -201,7 +204,6 @@ it("should login with correct username and password", async () => {
   await createUser();
 
 
-
   // login
   const { payload, headers } = createFormData({
     username: user.identityId,
@@ -258,7 +260,11 @@ it("gets user info", async () => {
   });
 
   expect(resp.statusCode).toBe(200);
-  expect(resp.json()).toEqual({ user: { identityId: user.identityId } });
+  expect(resp.json()).toEqual({ user: {
+    identityId: user.identityId,
+    name: user.name,
+    mail: savedUserMail,
+  } });
 });
 
 it("returns 404 if user doesn't exist", async () => {
