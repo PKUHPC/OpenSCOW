@@ -10,19 +10,20 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { readVersionFile } from "@scow/utils/build/version";
-import { spawnSync } from "child_process";
-import { cpSync, writeFileSync } from "fs";
+import ConfigParser from "@webantic/nginx-config-parser";
 import { getNginxConfig } from "src/parse";
 
-console.log("@scow/gateway: ", readVersionFile());
+const parser = new ConfigParser();
 
-const nginxConf = getNginxConfig();
+function parseNginxConfig() {
+  const config = getNginxConfig();
 
-writeFileSync("/etc/nginx/http.d/default.conf", nginxConf);
+  return parser.parse(config);
+}
 
-cpSync("assets/includes", "/etc/nginx/includes", { recursive: true });
+it("parses nginx config", () => {
 
-spawnSync("nginx", ["-g", "daemon off;"], { stdio: "inherit" });
+  const config = parseNginxConfig();
 
-
+  expect(config.server.listen).toBe("80");
+});

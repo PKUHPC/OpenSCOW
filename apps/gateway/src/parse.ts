@@ -10,19 +10,19 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { readVersionFile } from "@scow/utils/build/version";
-import { spawnSync } from "child_process";
-import { cpSync, writeFileSync } from "fs";
-import { getNginxConfig } from "src/parse";
+import { omitConfigSpec } from "@scow/lib-config";
+import { readFileSync } from "fs";
+import { config } from "src/env";
 
-console.log("@scow/gateway: ", readVersionFile());
+export function parsePlaceholder(str: string, values: Record<string, string>): string {
+  return str.replace(/\$\{([a-zA-Z0-9_]+)\}/g, (_, p1) => values[p1] ?? "");
+}
 
-const nginxConf = getNginxConfig();
+export function getNginxConfig() {
 
-writeFileSync("/etc/nginx/http.d/default.conf", nginxConf);
+  const nginxConfTemplate = readFileSync("assets/nginx.conf", "utf8");
 
-cpSync("assets/includes", "/etc/nginx/includes", { recursive: true });
+  const nginxConf = parsePlaceholder(nginxConfTemplate, omitConfigSpec(config));
 
-spawnSync("nginx", ["-g", "daemon off;"], { stdio: "inherit" });
-
-
+  return nginxConf;
+}
