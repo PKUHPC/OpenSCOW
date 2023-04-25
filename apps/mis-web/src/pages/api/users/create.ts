@@ -43,7 +43,7 @@ export interface CreateUserSchema {
     };
 
     400: {
-      code: "PASSWORD_NOT_VALID" | "USER_ID_NOT_VALID";
+      code: "PASSWORD_NOT_VALID";
       message: string | undefined;
     }
 
@@ -55,7 +55,6 @@ export interface CreateUserSchema {
   }
 }
 
-const userIdPattern = publicConfig.USERID_PATTERN && new RegExp(publicConfig.USERID_PATTERN);
 const passwordPattern = publicConfig.PASSWORD_PATTERN && new RegExp(publicConfig.PASSWORD_PATTERN);
 
 export default /* #__PURE__*/route<CreateUserSchema>("CreateUserSchema", async (req, res) => {
@@ -74,10 +73,6 @@ export default /* #__PURE__*/route<CreateUserSchema>("CreateUserSchema", async (
   const info = await auth(req, res);
 
   if (!info) { return; }
-
-  if (userIdPattern && !userIdPattern.test(identityId)) {
-    return { 400: { code: "USER_ID_NOT_VALID", message: publicConfig.USERID_PATTERN_MESSAGE } };
-  }
 
   if (passwordPattern && !passwordPattern.test(password)) {
     return { 400: { code: "PASSWORD_NOT_VALID", message: publicConfig.PASSWORD_PATTERN_MESSAGE } };
