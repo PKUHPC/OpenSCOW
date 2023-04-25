@@ -75,7 +75,7 @@ export default /* #__PURE__*/route<CreateUserSchema>("CreateUserSchema", async (
 
   if (!info) { return; }
 
-  if (userIdPattern && !userIdPattern.test(password)) {
+  if (userIdPattern && !userIdPattern.test(identityId)) {
     return { 400: { code: "USERID_NOT_VALID", message: publicConfig.USERID_PATTERN_MESSAGE } };
   }
 
