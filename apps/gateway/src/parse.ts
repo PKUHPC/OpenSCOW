@@ -12,17 +12,17 @@
 
 import { omitConfigSpec } from "@scow/lib-config";
 import { readFileSync } from "fs";
-import { config } from "src/env";
+import { type config } from "src/env";
 
 export function parsePlaceholder(str: string, values: Record<string, string>): string {
   return str.replace(/\$\{([a-zA-Z0-9_]+)\}/g, (_, p1) => values[p1] ?? "");
 }
 
-export function getNginxConfig() {
+export function getNginxConfig(envConfig: typeof config) {
 
   const nginxConfTemplate = readFileSync("assets/nginx.conf", "utf8");
 
-  const nginxConf = parsePlaceholder(nginxConfTemplate, omitConfigSpec(config));
+  const nginxConf = parsePlaceholder(nginxConfTemplate, omitConfigSpec(envConfig));
 
   return nginxConf;
 }

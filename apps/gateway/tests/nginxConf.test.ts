@@ -11,19 +11,19 @@
  */
 
 import ConfigParser from "@webantic/nginx-config-parser";
+import { config } from "src/env";
 import { getNginxConfig } from "src/parse";
 
 const parser = new ConfigParser();
 
-function parseNginxConfig() {
-  const config = getNginxConfig();
-
-  return parser.parse(config);
+function parseNginxConfig(envConfig: typeof config) {
+  const nginxConf = getNginxConfig(envConfig);
+  return parser.parse(nginxConf);
 }
 
 it("parses nginx config", () => {
 
-  const config = parseNginxConfig();
+  const nginxConf = parseNginxConfig(config);
 
-  expect(config.server.listen).toBe("80");
+  expect(nginxConf.server.listen).toBe("80");
 });
