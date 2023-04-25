@@ -27,3 +27,11 @@ it("parses nginx config", () => {
 
   expect(nginxConf.server.listen).toBe("80");
 });
+
+it("configures proxy_read_timeout", async () => {
+
+  const nginxConf = parseNginxConfig(config);
+
+  expect(nginxConf.server.proxy_read_timeout).toBe(config.PROXY_READ_TIMEOUT);
+
+});
