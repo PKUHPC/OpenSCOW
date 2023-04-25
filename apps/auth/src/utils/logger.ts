@@ -10,7 +10,12 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { getClusterConfigs } from "@scow/config/build/cluster";
-import { logger } from "src/utils/logger";
+import pino from "pino";
+import { config } from "src/config/env";
 
-export const clusters = getClusterConfigs(undefined, logger);
+export const logger = pino({
+  level: config.LOG_LEVEL,
+  ...config.LOG_PRETTY ? {
+    transport: { target: "pino-pretty" },
+  } : {},
+});

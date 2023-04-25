@@ -19,6 +19,7 @@ import { authConfig } from "src/config/auth";
 import { config } from "src/config/env";
 import { plugins } from "src/plugins";
 import { routes } from "src/routes";
+import { logger } from "src/utils/logger";
 
 type Plugin = FastifyPluginAsync | FastifyPluginCallback;
 type PluginOverrides = Map<Plugin, Plugin>;
@@ -36,12 +37,7 @@ const ValidationError = createError("BAD_REQUEST", "Errors occurred when validat
 export function buildApp(pluginOverrides?: PluginOverrides) {
 
   const server = fastify({
-    logger: {
-      level: config.LOG_LEVEL,
-      ...config.LOG_PRETTY ? {
-        transport: { target: "pino-pretty" },
-      } : {},
-    },
+    logger,
     ajv: {
       customOptions: {
         coerceTypes: "array",
