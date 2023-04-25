@@ -13,7 +13,7 @@
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
-import { AppType, getAppConfigs } from "@scow/config/build/app";
+import { AppType } from "@scow/config/build/app";
 import {
   AppCustomAttribute,
   appCustomAttribute_AttributeTypeFromJSON,
@@ -23,6 +23,7 @@ import {
   WebAppProps_ProxyType,
 } from "@scow/protos/build/portal/app";
 import { getClusterOps } from "src/clusterops";
+import { getAppConfigs } from "src/config/apps";
 import { dnsResolve } from "src/utils/dns";
 import { clusterNotFound } from "src/utils/errors";
 

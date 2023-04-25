@@ -24,7 +24,8 @@
     "js-yaml": "4.1.0"
   },
   "devDependencies": {
-    "@types/js-yaml": "4.0.5"
+    "@types/js-yaml": "4.0.5",
+    "ts-log": "2.2.5"
   },
   "volta": {
     "extends": "../../package.json"
