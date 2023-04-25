@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk_scow_docs=self.webpackChunk_scow_docs||[]).push([[1500],{8267:s=>{s.exports=JSON.parse('{"label":"scow","permalink":"/SCOW/pr-preview/pr-585/blog/tags/scow","allTagsPath":"/SCOW/pr-preview/pr-585/blog/tags","count":3}')}}]);
