@@ -21,7 +21,9 @@
     "octokit": "2.0.14",
     "jszip": "3.10.1",
     "dotenv": "16.0.3",
-    "death": "1.1.0"
+    "death": "1.1.0",
+    "https-proxy-agent": "5.0.1",
+    "node-fetch-commonjs": "3.2.4"
   },
   "devDependencies": {
     "@types/yargs": "17.0.24",

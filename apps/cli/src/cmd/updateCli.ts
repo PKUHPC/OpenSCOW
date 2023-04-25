@@ -13,11 +13,13 @@
 import fs, { existsSync } from "fs";
 import { chmod, unlink } from "fs/promises";
 import JSZip from "jszip";
+// node-fetch is esm only
+import fetch from "node-fetch-commonjs";
 import { Octokit } from "octokit";
 import prompt from "prompts";
+import { createProxyAgent, proxyUrl } from "src/config/proxy";
 import { debug, log } from "src/log";
 import { pipeline } from "stream/promises";
-
 
 interface Options {
   configPath: string;
@@ -82,7 +84,15 @@ export const updateCli = async (options: Options) => {
 
   const arch = getArch();
 
-  const octokit = new Octokit({ auth: GITHUB_TOKEN });
+  const agent = proxyUrl ? createProxyAgent(proxyUrl) : undefined;
+
+  if (proxyUrl) {
+    log("Using proxy %s", proxyUrl);
+  }
+
+  // built-in fetch doesn't work with proxy
+  // https://github.com/octokit/rest.js/issues/43
+  const octokit = new Octokit({ auth: GITHUB_TOKEN, request: { agent, fetch } });
 
   if (options.pr || options.branch) {
 
