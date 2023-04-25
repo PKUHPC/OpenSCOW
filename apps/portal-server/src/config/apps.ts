@@ -11,6 +11,7 @@
  */
 
 import { getAppConfigs } from "@scow/config/build/app";
+import { logger } from "src/utils/logger";
 
-export const apps = getAppConfigs();
+export const apps = getAppConfigs(undefined, logger);
 

@@ -24,6 +24,7 @@ import { jobServiceServer } from "src/services/job";
 import { jobChargeLimitServer } from "src/services/jobChargeLimit";
 import { tenantServiceServer } from "src/services/tenant";
 import { userServiceServer } from "src/services/user";
+import { logger } from "src/utils/logger";
 
 export async function createServer() {
 
@@ -31,12 +32,7 @@ export async function createServer() {
     host: config.HOST,
     port: config.PORT,
 
-    logger: {
-      level: config.LOG_LEVEL,
-      ...config.LOG_PRETTY ? {
-        transport: { target: "pino-pretty" },
-      } : {},
-    },
+    logger,
   });
 
   server.logger.info({ version: readVersionFile() }, "@scow/mis-server: ");

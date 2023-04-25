@@ -86,11 +86,11 @@ const buildRuntimeConfig = async (phase, basePath) => {
 
   const configPath = mockEnv ? join(__dirname, "config") : undefined;
 
-  const clusters = getClusterConfigs(configPath);
+  const clusters = getClusterConfigs(configPath, console);
 
-  const uiConfig = getUiConfig(configPath);
-  const portalConfig = getPortalConfig(configPath);
-  const commonConfig = getCommonConfig(configPath);
+  const uiConfig = getUiConfig(configPath, console);
+  const portalConfig = getPortalConfig(configPath, console);
+  const commonConfig = getCommonConfig(configPath, console);
 
   /**
    * @type {import("./src/utils/config").ServerRuntimeConfig}
