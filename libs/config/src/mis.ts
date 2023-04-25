@@ -105,5 +105,14 @@ const MIS_CONFIG_NAME = "mis";
 
 export type MisConfigSchema = Static<typeof MisConfigSchema>;
 
-export const getMisConfig: GetConfigFn<MisConfigSchema> = (baseConfigPath) =>
-  getConfigFromFile(MisConfigSchema, MIS_CONFIG_NAME, baseConfigPath ?? DEFAULT_CONFIG_BASE_PATH);
+export const getMisConfig: GetConfigFn<MisConfigSchema> = (baseConfigPath, logger) => {
+  const config = getConfigFromFile(MisConfigSchema, MIS_CONFIG_NAME, baseConfigPath ?? DEFAULT_CONFIG_BASE_PATH);
+
+  if (config.userIdPattern && !config.createUser.userIdPattern) {
+    logger?.warn("mis.yaml userIdPattern is deprecated and will be removed in a future version. " +
+    "Use createUser.userIdPattern instead");
+  }
+
+  return config;
+
+};
