@@ -37,5 +37,6 @@ it("sets proxy_read_timeout", async () => {
 
   const composeSpec = createComposeSpec(config);
 
-  expect(composeSpec.services["gateway"].environment["PROXY_READ_TIMEOUT"]).toBe(config.gateway.proxyReadTimeout);
+  expect(composeSpec.services["gateway"].environment)
+    .toInclude(`PROXY_READ_TIMEOUT=${config.gateway.proxyReadTimeout}`);
 });
