@@ -89,11 +89,13 @@ const buildRuntimeConfig = async (phase, basePath) => {
     SERVER_URL: config.SERVER_URL,
   };
 
+  const userIdPattern = misConfig.createUser.userIdPattern ?? misConfig.userIdPattern;
+
   /**
    * @type {import("./src/utils/config").PublicRuntimeConfig}
    */
   const publicRuntimeConfig = {
-    ENABLE_CREATE_USER: capabilities.createUser,
+    ENABLE_CREATE_USER: capabilities.createUser && misConfig.createUser.enabled,
     ENABLE_CHANGE_PASSWORD: capabilities.changePassword,
     PREDEFINED_CHARGING_TYPES: misConfig.predefinedChargingTypes,
 
@@ -105,8 +107,8 @@ const buildRuntimeConfig = async (phase, basePath) => {
     ACCOUNT_NAME_PATTERN: misConfig.accountNamePattern?.regex,
     ACCOUNT_NAME_PATTERN_MESSAGE: misConfig.accountNamePattern?.errorMessage,
 
-    USERID_PATTERN: misConfig.userIdPattern?.regex,
-    USERID_PATTERN_MESSAGE: misConfig.userIdPattern?.errorMessage,
+    USERID_PATTERN: userIdPattern.regex,
+    USERID_PATTERN_MESSAGE: userIdPattern.errorMessage,
 
     PORTAL_URL: config.PORTAL_DEPLOYED ? (config.PORTAL_URL || misConfig.portalUrl || "") : undefined,
 
