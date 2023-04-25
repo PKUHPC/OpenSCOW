@@ -128,9 +128,10 @@ export const extractUserInfoFromEntry = (
     return undefined;
   }
 
-  const name = config.attrs.name ? takeOne(extractAttr(entry, config.attrs.name)) : identityId;
+  const name = config.attrs.name ? takeOne(extractAttr(entry, config.attrs.name)) : undefined;
+  const mail = config.attrs.mail ? takeOne(extractAttr(entry, config.attrs.mail)) : undefined;
 
-  return { identityId, name };
+  return { identityId, name, mail };
 };
 
 export function takeOne(val: string | string[] | undefined) {

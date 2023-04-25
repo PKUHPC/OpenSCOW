@@ -49,19 +49,30 @@ export const createSshAuthProvider = (f: FastifyInstance) => {
 
   registerPostHandler(f, loginNode);
 
-  return <AuthProvider>{
+  return {
     serveLoginHtml: (callbackUrl, req, rep) => serveLoginHtml(false, callbackUrl, req, rep),
     fetchAuthTokenInfo: async () => undefined,
     getUser: async (identityId, req) => {
       return await sshConnect(loginNode, "root", rootKeyPair, req.log, async (ssh) => {
-        return loggedExec(ssh, req.log, true, "id", [identityId])
-          .then(() => ({ identityId }))
-          .catch(() => undefined);
+
+        const resp = await loggedExec(ssh, req.log, false, "getent", ["passwd", identityId]);
+
+        if (resp.code !== 0) { return undefined; }
+
+        // https://en.wikipedia.org/wiki/Gecos_field
+        // ddadaal:x:1000:1000::/home/ddadaal:/bin/zsh
+        const gecosField = resp.stdout.split(":")[4];
+        const fullName = gecosField.split(",")[0];
+
+        return {
+          identityId,
+          name: fullName,
+        };
       });
     },
     validateName: undefined,
     createUser: undefined,
     changePassword: undefined,
-  };
+  } satisfies AuthProvider;
 
 };
