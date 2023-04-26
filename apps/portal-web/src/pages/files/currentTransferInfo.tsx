@@ -11,10 +11,18 @@
  */
 
 import { NextPage } from "next";
+import { useRouter } from "next/router";
 import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
 import { TransferInfoTable } from "src/pageComponents/filemanager/TransferInfoTable";
+import { publicConfig } from "src/utils/config";
+import { redirectToDashboard } from "src/utils/file";
 export const FileTransferPage: NextPage = requireAuth(() => true)(() => {
+  const router = useRouter();
+  if (!publicConfig.CROSS_CLUSTER_FILE_TRANSFER_ENABLED) {
+    redirectToDashboard(router);
+  }
+
   return (
     <div>
       <PageTitle titleText={"文件传输进度查看"} />

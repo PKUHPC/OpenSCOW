@@ -16,6 +16,8 @@ import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { FileInfo, FileType } from "src/pages/api/file/list";
 import styled from "styled-components";
 
+import { publicConfig } from "./config";
+
 export type FileInfoKey = React.Key;
 
 export const fileInfoKey = (f: FileInfo, path: string): FileInfoKey => join(path, f.name);
@@ -49,4 +51,10 @@ export const nodeModeToString = (mode: number) => {
 
 export const openPreviewLink = (href: string) => {
   window.open(href, "ViewFile", "location=yes,resizable=yes,scrollbars=yes,status=yes");
+};
+
+export const redirectToDashboard = (router) => {
+  if (typeof window !== "undefined") {
+    router.push("/dashboard");
+  }
 };
