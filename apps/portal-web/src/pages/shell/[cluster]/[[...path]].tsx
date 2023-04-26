@@ -67,7 +67,6 @@ const DynamicShellComponent = dynamic(
     loading: Black,
   });
 
-
 export const ShellPage: NextPage = requireAuth(() => true)(({ userStore }) => {
 
   if (!publicConfig.ENABLE_SHELL) {
@@ -81,12 +80,14 @@ export const ShellPage: NextPage = requireAuth(() => true)(({ userStore }) => {
 
   const headerRef = useRef<HTMLDivElement>(null);
 
+  const clusterName = publicConfig.CLUSTERS.find((x) => x.id === cluster)?.name || cluster;
+
   return (
     <Container>
       <Head title={`${cluster}的终端`} />
       <Header ref={headerRef}>
         <h2>
-        以ID: {userStore.user.identityId} 连接到集群 {cluster}
+          以ID: {userStore.user.identityId} 连接到集群 {clusterName}
         </h2>
         <Space wrap>
           <Button onClick={() => Router.reload()}>

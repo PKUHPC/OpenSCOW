@@ -6,7 +6,7 @@ on:
     branches: [master]
   push:
     tags:
-      - "**"
+      - "v**"
     branches:
       - master
 
@@ -72,7 +72,7 @@ jobs:
       - name: Upload test converage
         uses: codecov/codecov-action@v3
         with:
-          files: ./libs/auth/coverage/lcov.info,./libs/ssh/coverage/lcov.info,./libs/libconfig/coverage/lcov.info,./libs/decimal/coverage/lcov.info,./apps/cli/coverage/lcov.info,./apps/auth/coverage/lcov.info,./apps/mis-server/coverage/lcov.info,./apps/portal-server/coverage/lcov.info
+          files: ./libs/auth/coverage/lcov.info,./libs/ssh/coverage/lcov.info,./libs/libconfig/coverage/lcov.info,./libs/decimal/coverage/lcov.info,./apps/cli/coverage/lcov.info,./apps/auth/coverage/lcov.info,./apps/mis-server/coverage/lcov.info,./apps/portal-server/coverage/lcov.info,./apps/gateway/coverage/lcov.info
 
       - name: Create Release Pull Request or Publish
         id: changesets
@@ -147,7 +147,7 @@ jobs:
         uses: docker/setup-buildx-action@v2
 
       - name: Log in to the GitHub Container registry
-        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+        uses: docker/login-action@40891eba8c2bcd1309b07ba8b11232f313e86779
         with:
           registry: ${{ env.GITHUB_CR }}
           username: ${{ github.actor }}

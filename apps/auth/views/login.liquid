@@ -13,6 +13,10 @@
         .button-primary {
             background-color: {{ backgroundColor }}
         }
+        svg{
+          height: 100%;
+          width: 100%;
+        }
     </style>
 </head>
 
@@ -39,7 +43,23 @@
                     <div class="flex items-center">
                         <input name="code" placeholder="请输入验证码" type="text" required
                             class=" px-8 w-full border rounded px-3 py-2 text-gray-700 focus:outline-none" />
-                        {{ code }}
+                        <div id="captcha" onclick="refreshCaptcha()" class="cursor-pointer">{{ code }}</div>
+                        <script>
+                          function refreshCaptcha(){
+                            const captchaDiv = document.getElementById("captcha");
+                            fetch("{{ refreshCaptchaPath }}", {
+                              method: "POST",
+                              headers: { "Content-Type": "application/json" },
+                              body: JSON.stringify({
+                                token: "{{ token }}",
+                              }),}
+                              ).then( async function (response) {
+                                captchaDiv.innerHTML = await response.text();
+                              }).catch(() => {
+                                captchaDiv.textContent = "刷新失败，请点击重试"
+                              });
+                          }
+                          </script>
                     </div>
                 </div>
 

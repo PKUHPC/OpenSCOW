@@ -11,8 +11,7 @@
  */
 
 import { queryToString, useQuerystring } from "@scow/lib-web/build/utils/querystring";
-import { ClusterAccountInfo, GetClusterUsersResponse,
-  ImportUsersData, UserInAccount } from "@scow/protos/build/server/admin";
+import { ClusterAccountInfo, ImportUsersData, UserInAccount } from "@scow/protos/build/server/admin";
 import { App, Button, Checkbox, Drawer, Form, Select, Space, Table, Tooltip } from "antd";
 import Router from "next/router";
 import React, { useCallback, useEffect, useState } from "react";
@@ -38,7 +37,7 @@ export const ImportUsersTable: React.FC = () => {
     ? publicConfig.CLUSTERS[clusterParam]
     : defaultClusterStore.cluster);
 
-  const [form] = Form.useForm<{data: GetClusterUsersResponse, whitelist: boolean}>();
+  const [form] = Form.useForm<{ whitelist: boolean}>();
 
   const [loading, setLoading] = useState(false);
 
@@ -52,7 +51,6 @@ export const ImportUsersTable: React.FC = () => {
 
   useEffect(() => {
     form.setFieldsValue({
-      data: data,
       whitelist: true,
     });
   }, [data]);
@@ -70,28 +68,42 @@ export const ImportUsersTable: React.FC = () => {
 
           setLoading(true);
 
-          const { data: changedData, whitelist } = await form.validateFields();
-          const importData: ImportUsersData = { accounts: []};
+          const { whitelist } = await form.validateFields();
+          const importData = selectedAccounts?.filter(
+            (a) => a.importStatus !== ClusterAccountInfo_ImportStatus.EXISTING,
+          );
 
-          changedData?.accounts.forEach((x, i) => {
-            if (data.accounts[i].importStatus === ClusterAccountInfo_ImportStatus.NOT_EXISTING) {
-              data.accounts[i].owner = x.owner;
-            }
-          });
+          if (!importData || importData.length === 0) {
+            message.info("请选择账户！");
+            setLoading(false);
+            return;
+          }
 
-          importData.accounts.push(...selectedAccounts?.map((x) => ({
-            accountName: x.accountName,
-            users: x.users,
-            owner: x.importStatus === ClusterAccountInfo_ImportStatus.NOT_EXISTING ? x.owner! : undefined,
-            blocked: x.blocked,
-          })) || []);
+          if (!importData.every((account) =>
+            account.importStatus !== ClusterAccountInfo_ImportStatus.NOT_EXISTING ||
+            account.owner,
+          )) {
+            message.error("请为每个账户指定拥有者");
+            setLoading(false);
+            return;
+          }
 
           await api.importUsers({ body: {
-            data: importData,
+            data: {
+              accounts: importData?.map((x) => ({
+                accountName: x.accountName,
+                users: x.users,
+                owner: x.importStatus === ClusterAccountInfo_ImportStatus.NOT_EXISTING ? x.owner! : undefined,
+                blocked: x.blocked,
+              })),
+            } as ImportUsersData,
             whitelist,
           } })
             .httpError(400, () => { message.error("数据格式不正确"); })
-            .then(() => { message.success("导入成功"); })
+            .then(() => {
+              setSelectedAccounts([]);
+              message.success("导入成功");
+            })
             .finally(() => {
               setLoading(false);
               reload();
@@ -145,21 +157,19 @@ export const ImportUsersTable: React.FC = () => {
           <Table.Column<ClusterAccountInfo>
             dataIndex="owner"
             title="拥有者"
-            render={(_, r, i) => {
+            render={(_, r) => {
               return r.importStatus === ClusterAccountInfo_ImportStatus.NOT_EXISTING
                 ? selectedAccounts?.includes(r)
                   ? (
-                    <Form.Item
-                      name={["data", "accounts", i, "owner"]}
-                      rules={[{ required: true, message: "请选择一个拥有者" }]}
-                    >
-                      <Select
-                        defaultValue={r.owner}
-                        options={r.users.map((user) => ({ value: user.userId, label: user.userId }))}
-                        style={{ width: "100%" }}
-                        placeholder={"请选择一个拥有者"}
-                      />
-                    </Form.Item>
+                    <Select
+                      defaultValue={r.owner}
+                      options={r.users.map((user) => ({ value: user.userId, label: user.userId }))}
+                      style={{ width: "100%" }}
+                      placeholder={"请选择一个拥有者"}
+                      onChange={(value) => {
+                        r.owner = value;
+                      }}
+                    />
                   )
                   : ""
                 : r.owner;

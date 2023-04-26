@@ -28,7 +28,7 @@ export const TenantAdminJobBillingTablePage: NextPage = requireAuth(
     const tenant = userStore.user.tenant;
 
     const { data, isLoading, reload } = useAsync({ promiseFn: useCallback(async () => {
-      return await api.getBillingItems({ query: { tenant: tenant, activeOnly: true } });
+      return await api.getBillingItems({ query: { tenant: tenant, activeOnly: false } });
     }, [userStore.user]) });
 
     return (
@@ -41,3 +41,4 @@ export const TenantAdminJobBillingTablePage: NextPage = requireAuth(
   });
 
 export default TenantAdminJobBillingTablePage;
+

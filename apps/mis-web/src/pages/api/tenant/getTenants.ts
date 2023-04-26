@@ -27,7 +27,8 @@ export interface GetTenantsSchema {
   }
 }
 
-const auth = authenticate((info) => info.platformRoles.includes(PlatformRole.PLATFORM_ADMIN));
+const auth = authenticate((info) => info.platformRoles.includes(PlatformRole.PLATFORM_ADMIN)
+  || info.platformRoles.includes(PlatformRole.PLATFORM_FINANCE));
 
 export default route<GetTenantsSchema>("GetTenantsSchema",
   async (req, res) => {

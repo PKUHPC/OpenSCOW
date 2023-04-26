@@ -10,7 +10,6 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { getAppConfigs } from "@scow/config/build/app";
 import { getPlaceholderKeys } from "@scow/lib-config/build/parse";
 import { getUserHomedir,
   loggedExec, sftpChmod, sftpExists, sftpReaddir, sftpReadFile, sftpRealPath, sftpWriteFile } from "@scow/lib-ssh";
@@ -21,6 +20,7 @@ import { join } from "path";
 import { quote } from "shell-quote";
 import { AppOps, AppSession } from "src/clusterops/api/app";
 import { displayIdToPort } from "src/clusterops/slurm/bl/port";
+import { getAppConfigs } from "src/config/apps";
 import { portalConfig } from "src/config/portal";
 import { splitSbatchArgs } from "src/utils/app";
 import { getClusterLoginNode, sshConnect } from "src/utils/ssh";

@@ -23,7 +23,7 @@ function checkPathFormat(configKey: string, value: string) {
 
 function join(...segments: string[]) {
   const r = path.normalize(path.join(...segments));
-  if (r.endsWith("/")) {
+  if (r !== "/" && r.endsWith("/")) {
     return r.substring(0, r.length - 1);
   }
   return r;
@@ -116,6 +116,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
       "PORTAL_PATH": PORTAL_PATH,
       "MIS_PATH": MIS_PATH,
       "CLIENT_MAX_BODY_SIZE": config.gateway.uploadFileSizeLimit,
+      "PROXY_READ_TIMEOUT": config.gateway.proxyReadTimeout,
     },
     ports: { [config.port]: 80 },
     volumes: { "/etc/hosts": "/etc/hosts" },
@@ -218,7 +219,6 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
         "~/.ssh": "/root/.ssh",
       },
     });
-
 
     addService("mis-web", {
       image: scowImage,

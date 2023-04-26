@@ -14,12 +14,13 @@ process.env.AUTH_TYPE = "ssh";
 
 import { FastifyInstance } from "fastify";
 import { buildApp } from "src/app";
+import { saveCaptchaText } from "src/auth/captcha";
 import { allowedCallbackUrl, createFormData, testUserPassword, testUserUsername } from "tests/utils";
 
 const username = testUserUsername;
 const password = testUserPassword;
-const token = "token";
-const code = "code";
+const captchaToken = "captchaToken";
+const captchaCode = "captchaToken";
 
 let server: FastifyInstance;
 
@@ -43,10 +44,10 @@ it("test to input a wrong verifyCaptcha", async () => {
     username: username,
     password: password,
     callbackUrl,
-    token: token,
+    token: captchaToken,
     code: "wrongCaptcha",
   });
-  await server.redis.set(token, code, "EX", 30);
+  await saveCaptchaText(server, captchaCode, captchaToken);
   const resp = await server.inject({
     method: "POST",
     url: "/public/auth",
@@ -62,11 +63,11 @@ it("logs in to the ssh login", async () => {
     username: username,
     password: password,
     callbackUrl: callbackUrl,
-    token: token,
-    code: code,
+    token: captchaToken,
+    code: captchaCode,
   });
 
-  await server.redis.set(token, code, "EX", 30);
+  await saveCaptchaText(server, captchaCode, captchaToken);
   const resp = await server.inject({
     method: "POST",
     path: "/public/auth",
@@ -84,11 +85,11 @@ it("fails to login with wrong credentials", async () => {
     username: username,
     password: password + "a",
     callbackUrl: callbackUrl,
-    token: token,
-    code: code,
+    token: captchaToken,
+    code: captchaCode,
   });
 
-  await server.redis.set(token, code, "EX", 30);
+  await saveCaptchaText(server, captchaCode, captchaToken);
   const resp = await server.inject({
     method: "POST",
     path: "/public/auth",
@@ -107,7 +108,10 @@ it("gets user info", async () => {
   });
 
   expect(resp.statusCode).toBe(200);
-  expect(resp.json()).toEqual({ user: { identityId: username } });
+  expect(resp.json()).toEqual({ user: {
+    identityId: username,
+    name: "Linux User",
+  } });
 });
 
 it("returns 404 if user doesn't exist", async () => {
