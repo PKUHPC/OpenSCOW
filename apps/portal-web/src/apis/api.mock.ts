@@ -127,7 +127,7 @@ export const mockApi: MockApi<typeof api> = {
       { type: "TEXT", label: "其他sbatch参数", name: "sbatchOptions",
         required: true, placeholder: "比如：--gpus gres:2 --time 10", select: []},
       { type: "SELECT", label: "选项", name: "option", required: false,
-        placeholder: "提示信息", select: [
+        placeholder: "提示信息", defaultValue: "version2", select: [
           { label: "版本1", value: "version1" },
           { label: "版本2", value: "version2" },
         ]},

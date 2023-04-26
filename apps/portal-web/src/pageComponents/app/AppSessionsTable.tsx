@@ -14,7 +14,7 @@ import { compareDateTime, formatDateTime } from "@scow/lib-web/build/utils/datet
 import { compareNumber } from "@scow/lib-web/build/utils/math";
 import { queryToString } from "@scow/lib-web/build/utils/querystring";
 import type { AppSession } from "@scow/protos/build/portal/app";
-import { App, Button, Checkbox, Form, Popconfirm, Popover, Space, Table, TableColumnsType } from "antd";
+import { App, Button, Checkbox, Form, Popconfirm, Space, Table, TableColumnsType, Tooltip } from "antd";
 import type { CheckboxChangeEvent } from "antd/es/checkbox";
 import Router, { useRouter } from "next/router";
 import { join } from "path";
@@ -85,20 +85,13 @@ export const AppSessionsTable: React.FC<Props> = () => {
       title: "状态",
       dataIndex: "state",
       render: (_, record) => (
-        (record.state === "PENDING"
-        || ["BOOT_FAIL", "COMPLETED", "DEADLINE", "FAILED",
-          "NODE_FAIL", "PREEMPTED", "SPECIAL_EXIT", "TIMEOUT"]
-          .includes(record.state)) ? (
-            <Popover content={record.reason} title="未运行原因">
-              <Button>
-                {record.state}
-              </Button>
-            </Popover>
-          ) : (
-            <Button>
-              {record.state}
-            </Button>
-          )
+        record.reason ? (
+          <Tooltip title={record.reason}>
+            <span>{record.state}</span>
+          </Tooltip>
+        ) : (
+          <span>{record.state}</span>
+        )
       ),
       sorter: (a, b) => compareState (a.state, b.state)
         ? compareState (a.state, b.state) :
