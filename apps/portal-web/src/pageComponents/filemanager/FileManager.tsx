@@ -17,7 +17,6 @@ import {
   FolderOutlined, HomeOutlined, LeftOutlined, MacCommandOutlined, RightOutlined,
   ScissorOutlined, SnippetsOutlined, UploadOutlined, UpOutlined,
 } from "@ant-design/icons";
-import { Decimal } from "@scow/lib-decimal";
 import { compareDateTime, formatDateTime } from "@scow/lib-web/build/utils/datetime";
 import { compareNumber } from "@scow/lib-web/build/utils/math";
 import { App, Button, Divider, Space, Table, Tooltip } from "antd";
@@ -79,26 +78,26 @@ const nodeModeToString = (mode: number) => {
   return [0, 1, 2].reduce((prev, curr) => prev + toStr(numberPermission[curr]), "");
 };
 
-const formateFileSize = (size: number): string => {
-  const unitMap = ["KB", "MB", "GB", "TB"];
+const formatFileSize = (size: number): string => {
+  const unitMap = ["KB", "MB", "GB", "TB", "PB"];
   const CARRY = 1024;
   // 最大1024TB
-  const MAX_SIZE = 1125899906842624;
+  const MAX_SIZE = 1024 * 1024 * 1024 * 1024 * 1024;
 
   if (size >= MAX_SIZE) {
     return "";
   }
 
   let carryCount = 0;
-  let decimalSize = new Decimal(size).div(CARRY);
+  let decimalSize = size / CARRY;
 
-  while (decimalSize.isGreaterThan(CARRY)) {
-    decimalSize = decimalSize.div(CARRY);
+  while (decimalSize > CARRY) {
+    decimalSize = decimalSize / CARRY;
     carryCount++;
   }
 
-  if (decimalSize.isGreaterThanOrEqualTo(1000)) {
-    decimalSize = decimalSize.div(CARRY);
+  if (decimalSize >= 1000) {
+    decimalSize = decimalSize / CARRY;
     carryCount++;
     return `${decimalSize.toFixed(2)} ${unitMap[carryCount]}`;
   }
@@ -501,7 +500,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
                 ? ""
                 : (
                   <Tooltip title={Math.floor((size) / 1024).toLocaleString() + "KB"} placement="topRight">
-                    <span>{formateFileSize(size)}</span>
+                    <span>{formatFileSize(size)}</span>
                   </Tooltip>
                 )
           }
