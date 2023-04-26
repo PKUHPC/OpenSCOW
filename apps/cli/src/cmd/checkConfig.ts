@@ -13,6 +13,7 @@
 import { getAppConfigs } from "@scow/config/build/app";
 import { getClusterConfigs } from "@scow/config/build/cluster";
 import { getClusterTextsConfig } from "@scow/config/build/clusterTexts";
+import { getCommonConfig } from "@scow/config/build/common";
 import { getMisConfig } from "@scow/config/build/mis";
 import { getPortalConfig } from "@scow/config/build/portal";
 import { getUiConfig } from "@scow/config/build/ui";
@@ -44,10 +45,13 @@ export const checkConfig = ({
     }
   };
 
+  logger.info("Check common config");
+  tryRead(getCommonConfig);
+
   logger.info("Checking cluster config files");
   tryRead(getClusterConfigs);
 
-  logger.info("Checking cluster texts files");
+  logger.info("Checking clusterTexts config");
   tryRead(getClusterTextsConfig);
 
   logger.info("Checking UI config");
