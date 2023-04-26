@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { ExclamationCircleFilled, ExclamationCircleOutlined, ExclamationOutlined } from "@ant-design/icons";
 import { compareDateTime, formatDateTime } from "@scow/lib-web/build/utils/datetime";
 import { compareNumber } from "@scow/lib-web/build/utils/math";
 import { queryToString } from "@scow/lib-web/build/utils/querystring";
@@ -87,7 +88,10 @@ export const AppSessionsTable: React.FC<Props> = () => {
       render: (_, record) => (
         record.reason ? (
           <Tooltip title={record.reason}>
-            <span>{record.state}</span>
+            <Space>
+              {record.state}
+              <ExclamationCircleOutlined />
+            </Space>
           </Tooltip>
         ) : (
           <span>{record.state}</span>
