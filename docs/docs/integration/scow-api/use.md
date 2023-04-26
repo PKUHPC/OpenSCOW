@@ -5,7 +5,7 @@ title: SCOW API
 
 # SCOW API
 
-SCOW系统总体来说分为前端和后端部分（[架构](./deploy/../../deploy/architecture/index.md)），SCOW的前端和后端部分使用gRPC进行通信。
+SCOW系统总体来说分为前端和后端部分（[架构](../../deploy/architecture/index.md)），SCOW的前端和后端部分使用gRPC进行通信。
 
 若您有需求，您可以编写程序直接通过gRPC与SCOW的后端部分组件`mis-server`, `portal-server`交互。
 
