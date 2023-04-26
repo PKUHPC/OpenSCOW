@@ -182,6 +182,9 @@ importers:
 
   apps/cli:
     dependencies:
+      '@scow/config':
+        specifier: workspace:*
+        version: link:../../libs/config
       '@scow/lib-config':
         specifier: workspace:*
         version: link:../../libs/libconfig
