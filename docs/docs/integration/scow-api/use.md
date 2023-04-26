@@ -37,7 +37,7 @@ proto文件分为`common`, `portal`和`server`。其中，`common`和`portal`里
 
 ```bash
 # 使用本地buf.gen.yaml生成模板，使用SCOW仓库的master分支的SCOW API
-buf generate --template buf.gen.yaml https://github.com/PKUHPC/SCOW.git#branch=master
+buf generate --template buf.gen.yaml https://github.com/PKUHPC/SCOW.git#subdir=protos,branch=master
 ```
 
 不同语言示例：
