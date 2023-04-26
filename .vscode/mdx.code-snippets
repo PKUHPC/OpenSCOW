@@ -1,0 +1,14 @@
+{
+  "Import Drawio component": {
+    "prefix": "importdio",
+    "body": "import Drawio from '@theme/Drawio';"
+  },
+  "Drawio image": {
+    "prefix": "dio",
+    "body": [
+      "import $2 from '!!raw-loader!./$1';",
+      "",
+      "<Drawio content={$2} />"
+    ]
+  }
+}

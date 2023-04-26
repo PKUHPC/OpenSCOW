@@ -31,6 +31,8 @@ const config = {
       language: "zh",
     }],
 
+    ["drawio", {}],
+
     // make webpack resolve react from docs node_modules
     // https://github.com/facebook/docusaurus/issues/8091#issuecomment-1269112001
     () => ({

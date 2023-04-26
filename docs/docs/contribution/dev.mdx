@@ -95,7 +95,7 @@ pnpm build:protos
 # 在某一个具体项目下运行特定的脚本
 # {项目名}请替换为项目package.json中name字段的@scow/后面的内容
 # 项目可以运行什么脚本请查看项目package.json中的scripts
-pnpm --filter {项目名} build 
+pnpm --filter {项目名} build
 
 # 如运行@scow/config项目的build命令（编译），则运行
 # 要想使用任何libs项目下的修改，必须先运行对应的build命令编译好
@@ -190,6 +190,9 @@ pnpm devenv:stop
 
 项目CI配置如下：
 
-![CI流程](./ci.png)
+import Drawio from '@theme/Drawio';
+
+import ci from '!!raw-loader!./ci.dio';
+<Drawio content={ci} />
 
 
