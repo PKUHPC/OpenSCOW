@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { ExclamationCircleFilled, ExclamationCircleOutlined, ExclamationOutlined } from "@ant-design/icons";
+import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { compareDateTime, formatDateTime } from "@scow/lib-web/build/utils/datetime";
 import { compareNumber } from "@scow/lib-web/build/utils/math";
 import { queryToString } from "@scow/lib-web/build/utils/querystring";
