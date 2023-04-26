@@ -9,7 +9,7 @@ SCOW系统总体来说分为前端和后端部分（[架构](./deploy/../../depl
 
 若您有需求，您可以编写程序直接通过gRPC与SCOW的后端部分组件`mis-server`, `portal-server`交互。
 
-# API版本控制
+## API版本控制
 
 我们通过npm对API版本进行控制。当前的版本为：![npm](https://img.shields.io/npm/v/@scow/grpc-api?label=%40scow%2Fgrpc-api)
 
@@ -21,12 +21,100 @@ API的版本通过`@scow/grpc-api`包的版本进行定义。SCOW gRPC API版本
 
 当前，我们并不保证新版本SCOW对老版本API的兼容性。
 
-# 获取proto文件
+## 使用SCOW API
 
-要与SCOW系统交互，您首先需要获取API的Protocol Buffer (proto)文件。
+要与SCOW系统交互，您首先需要获取API的Protocol Buffer (proto)文件，并通过这些proto文件生成您所需要的语言的模板代码，然后根据这些模板代码进行开发。
 
-- 您可以直接从代码仓库中获取源码，其中`protos`目录下则为proto文件：[master分支protos目录链接](%REPO_FILE_URL%/protos)
-- 您可以通过npm从`npmjs.org`上获取任意版本的proto文件
+我们将SCOW API的proto文件放到了代码仓库中，您可以直接从代码仓库中获取。代码仓库中`protos`目录下则为proto文件：[master分支protos目录链接](%REPO_FILE_URL%/protos)
+
+proto文件分为`common`, `portal`和`server`。其中，`common`和`portal`里的用于和`portal-server`门户后端交互，`common`和`server`用于和`mis-server`管理系统后端交互。
+
+要获取SCOW API所需要的文件并进行代码生成，您有以下几个方案：
+
+### 1. 使用Buf获取和生成代码（推荐）
+
+[Buf](https://buf.build/docs/tutorials/getting-started-with-buf-cli/)是一个管理gRPC API和proto文件的一站式工具，可完成获取文件、生成代码等常见功能。我们推荐通过使用Buf直接从GitHub上获取代码并生成您的语言的模板的代码的工作。
+
+以使用Go语言为例，步骤如下（示例项目：https://github.com/PKUHPC/scow-grpc-api-go-client-demo ）
+
+1. 安装Buf CLI（[官网文档](https://buf.build/docs/installation/)）
+2. 初始化一个Go项目，假设模块名为`github.com/PKUHPC/scow-grpc-client-demo`
+  
+```bash
+go mod init github.com/PKUHPC/scow-grpc-api-client-demo
+```
+
+3. 创建`buf.gen.yaml`文件，内容如下：
+
+```yaml title="buf.gen.yaml"
+version: v1
+managed:
+  enabled: true
+  go_package_prefix:
+    # 项目模块名+生成路径（plugins中out）
+    default: github.com/PKUHPC/scow-grpc-api-client-demo/gen/go
+    except:
+        - buf.build/googleapis/googleapis
+plugins:
+  - plugin: go
+    out: gen/go
+    opt: paths=source_relative
+  - plugin: go-grpc
+    out: gen/go
+    opt: paths=source_relative,require_unimplemented_servers=false
+```
+
+4. 根据某个具体SCOW版本生成代码
+
+```bash
+# 修改#后的值以确定SCOW的版本，可输入分支（#branch=master）, SCOW Tag号（#tag=v0.4.0）
+# 不写#部分默认master
+buf generate --template buf.gen.yaml https://github.com/PKUHPC/SCOW.git#branch=master
+```
+
+5. 编写Go代码
+
+```go title="main.go"
+package main
+
+import (
+	"context"
+	"log"
+
+	"github.com/PKUHPC/scow-grpc-api-client-demo/gen/go/server"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+)
+
+func main() {
+	conn, err := grpc.Dial("192.168.88.100:7571", grpc.WithTransportCredentials(insecure.NewCredentials()))
+
+  if err != nil {
+    panic(err)
+  }
+
+	client := server.NewAccountServiceClient(conn)
+
+	resp, err := client.GetAccounts(context.Background(), &server.GetAccountsRequest{})
+
+	if err != nil {
+		panic(err)
+	}
+
+	log.Printf("Account list: %v", resp)
+}
+```
+
+6. 下载依赖并运行
+
+```bash
+go mod tidy
+go run main.go
+```
+
+### 2. 通过npm获取proto文件
+
+您可以通过npm从`npmjs.org`上获取任意版本的proto文件
 
 ```bash
 # 最新版本的API文件
@@ -43,9 +131,7 @@ npm install --save @scow/grpc-api
 cd node_modules/@scow/grpc-api
 ```
 
-proto文件分为`common`, `portal`和`server`。其中，`common`和`portal`里的用于和`portal-server`门户后端交互，`common`和`server`用于和`mis-server`管理系统后端交互。
-
-# 打开后端服务网络接口
+## 打开后端服务网络接口
 
 部署好的系统的后端服务容器`mis-server`, `portal-server`位于docker compose创建的网络中，从外界无法直接访问`mis-server`和`portal-server`两个服务。
 
