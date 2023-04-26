@@ -11,7 +11,20 @@ title: 跨集群文件传输功能（可选）
 
 ### 1. 为每个集群添加传输节点
 
-每个集群需要有一个专门用来做文件传输的节点TransferNode，该TransferNode要求拥有**互联网公网地址**。该TransferNode可以是登录节点LoginNode，但同样要求具有公网地址。
+#### 网络区分
+
+通常情况下，同属一个集群的所有节点，均在同一个子网下，我们称之为**集群内网**。例如：登录节点访问计算结点便是通过集群内网。
+
+不同集群之间的节点，互相通常是访问不到的，除非接入到更大的网络之中，我们称之为**集群间可达网**。
+
+任何机器都可以通过网络访问到的地址，为公网地址，我们称之为**互联网公网**。
+
+网络范围排序：互联网公网 > 集群间可达网 > 集群内网
+
+#### 配置
+
+在跨集群传输功能的配置中，每个集群需要有一个专门用来做文件传输的节点TransferNode，该TransferNode要求具有**集群间可达网**的地址，也就是说接入SCOW系统的所有集群的传输节点之间彼此是可以访问的。传输节点TransferNode可以和登录节点LoginNode是同一个节点。
+
 准备好传输节点后，需要将其接入到scow集群中，具体方式为修改集群配置文件`config/clusters/xxx.yaml`，在yaml文件最后添加transferCrossCluster模块，添加enabled和transferNode配置，enabled为true表示开启该功能，transferNode配置格式为ip:port，如果不配置port默认为22端口。
 
 ```yaml title="config/clusters/xxx.yaml"
