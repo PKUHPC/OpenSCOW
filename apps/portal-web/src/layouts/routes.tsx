@@ -125,7 +125,7 @@ export const userRoutes: (
         text: cluster.name,
         path: `/files/${cluster.id}`,
         clickToPath: `/files/${cluster.id}/~`,
-      } as NavItemProps)).concat([
+      } as NavItemProps)).concat(publicConfig.CROSS_CLUSTER_FILE_TRANSFER_ENABLED ? [
         {
           Icon: CloudSyncOutlined,
           text: "文件传输",
@@ -136,7 +136,7 @@ export const userRoutes: (
           text: "传输进度",
           path: "/files/currentTransferInfo",
         },
-      ]),
+      ] : []),
 
     }] : []),
   ];

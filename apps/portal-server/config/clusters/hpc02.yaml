@@ -21,4 +21,5 @@ slurm:
         gpus: 8
         comment: 说明
 crossClusterFilesTransfer:
-  enabled: false
+  enabled: true
+  transferNode: localhost:222

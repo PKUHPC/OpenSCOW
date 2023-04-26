@@ -147,6 +147,8 @@ const buildRuntimeConfig = async (phase, basePath) => {
     BASE_PATH: basePath,
 
     CLIENT_MAX_BODY_SIZE: config.CLIENT_MAX_BODY_SIZE,
+
+    CROSS_CLUSTER_FILE_TRANSFER_ENABLED: Object.values(clusters).filter(cluster => cluster.crossClusterFilesTransfer.enabled).length > 1,
   }
 
   if (!building && !testenv) {
