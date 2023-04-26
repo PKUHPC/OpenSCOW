@@ -30,3 +30,13 @@ it("creates log dir for fluentd", async () => {
 
   expect(s.mode).toBe(0o40777);
 });
+
+it("sets proxy_read_timeout", async () => {
+  const config = getInstallConfig(configPath);
+  config.gateway.proxyReadTimeout = "100";
+
+  const composeSpec = createComposeSpec(config);
+
+  expect(composeSpec.services["gateway"].environment)
+    .toInclude(`PROXY_READ_TIMEOUT=${config.gateway.proxyReadTimeout}`);
+});

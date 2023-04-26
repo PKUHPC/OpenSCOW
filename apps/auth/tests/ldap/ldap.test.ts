@@ -13,6 +13,7 @@
 import { FastifyInstance } from "fastify";
 import { Client, createClient, NoSuchObjectError, SearchEntry } from "ldapjs";
 import { buildApp } from "src/app";
+import { saveCaptchaText } from "src/auth/captcha";
 import { extractAttr, findUser, searchOne, takeOne } from "src/auth/ldap/helpers";
 import { authConfig, NewUserGroupStrategy } from "src/config/auth";
 import { ensureNotUndefined } from "src/utils/validations";
@@ -32,9 +33,17 @@ const user = {
   identityId: "123",
   name: "name",
   password: "12#",
-  token: "token",
-  code: "code",
+  captchaToken: "captchaToken",
+  captchaCode: "captchaCode",
 };
+
+const savedUserMail = "mail is " + user.mail;
+
+class ConfigNoAddUserError extends Error {}
+
+if (!ldap.addUser) {
+  throw new ConfigNoAddUserError();
+}
 
 const userDn = `${ldap.addUser.userIdDnKey}=${user.identityId},${ldap.addUser.userBase}`;
 const groupDn =
@@ -97,6 +106,10 @@ const createUser = async () => {
 
 it("creates user and group if groupStrategy is newGroupPerUser", async () => {
 
+  if (!ldap.addUser) {
+    throw new ConfigNoAddUserError();
+  }
+
   ldap.addUser.groupStrategy = NewUserGroupStrategy.newGroupPerUser;
 
   await createUser();
@@ -106,6 +119,7 @@ it("creates user and group if groupStrategy is newGroupPerUser", async () => {
   expect(responseUser).toEqual({
     dn: userDn,
     identityId: user.identityId,
+    mail: savedUserMail,
     name: user.name,
   });
 
@@ -129,8 +143,12 @@ it("creates user and group if groupStrategy is newGroupPerUser", async () => {
 
 });
 
-
 it("creates only user if groupStrategy is oneGroupForAllUsers", async () => {
+
+  if (!ldap.addUser) {
+    throw new ConfigNoAddUserError();
+  }
+
   ldap.addUser.groupStrategy = NewUserGroupStrategy.oneGroupForAllUsers;
 
   await createUser();
@@ -168,10 +186,10 @@ it("test to input a wrong verifyCaptcha", async () => {
     username: user.identityId,
     password: user.password,
     callbackUrl,
-    token: user.token,
+    token: user.captchaToken,
     code: "wrongCaptcha",
   });
-  await server.redis.set(user.token, user.code, "EX", 30);
+  await saveCaptchaText(server, user.captchaCode, user.captchaToken);
   const resp = await server.inject({
     method: "POST",
     url: "/public/auth",
@@ -186,16 +204,15 @@ it("should login with correct username and password", async () => {
   await createUser();
 
 
-
   // login
   const { payload, headers } = createFormData({
     username: user.identityId,
     password: user.password,
     callbackUrl,
-    token: user.token,
-    code: user.code,
+    token: user.captchaToken,
+    code: user.captchaCode,
   });
-  await server.redis.set(user.token, user.code, "EX", 30);
+  await saveCaptchaText(server, user.captchaCode, user.captchaToken);
   const resp = await server.inject({
     method: "POST",
     url: "/public/auth",
@@ -219,10 +236,10 @@ it("should not login with wrong password", async () => {
     username: user.identityId,
     password: user.password + "0",
     callbackUrl,
-    token: user.token,
-    code: user.code,
+    token: user.captchaToken,
+    code: user.captchaCode,
   });
-  await server.redis.set(user.token, user.code, "EX", 30);
+  await saveCaptchaText(server, user.captchaCode, user.captchaToken);
   const resp = await server.inject({
     method: "POST",
     url: "/public/auth",
@@ -243,7 +260,11 @@ it("gets user info", async () => {
   });
 
   expect(resp.statusCode).toBe(200);
-  expect(resp.json()).toEqual({ user: { identityId: user.identityId } });
+  expect(resp.json()).toEqual({ user: {
+    identityId: user.identityId,
+    name: user.name,
+    mail: savedUserMail,
+  } });
 });
 
 it("returns 404 if user doesn't exist", async () => {

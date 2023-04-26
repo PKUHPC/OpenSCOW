@@ -445,8 +445,8 @@ export const userServiceServer = plugin((server) => {
 
       const [users, count] = await em.findAndCount(User, idOrName ? {
         $or: [
-          { userId: idOrName },
-          { name: idOrName },
+          { userId: { $like: `%${idOrName}%` } },
+          { name: { $like: `%${idOrName}%` } },
         ],
       } : {}, {
         ...paginationProps(page, pageSize || 10),

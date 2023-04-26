@@ -27,7 +27,8 @@ export const LdapConfigSchema = Type.Object({
   bindDN: Type.String({ description: "操作LDAP时以什么用户操作，默认为空字符串", default: "" }),
   bindPassword: Type.String({ description: "操作LDAP的用户的密码，默认为空字符串", default: "" }),
   userFilter: Type.String({ description: "LDAP用户筛选器" }),
-  addUser: Type.Object({
+  addUser: Type.Optional(Type.Object({
+    enabledForScow: Type.Boolean({ description: "是否允许从SCOW中创建用户", default: true }),
     userBase: Type.String({ description: "LDAP增加用户节点时，把用户增加到哪个节点下" }),
     homeDir: Type.String({
       description: "LDAP增加用户时，用户的homeDirectory值。使用{{ userId }}代替新用户的用户名",
@@ -56,7 +57,7 @@ export const LdapConfigSchema = Type.Object({
       如果不填写，则使用ldap.attrs.uid的值
       ` })),
       extraProps: Type.Optional(Type.Record(
-        Type.String(), 
+        Type.String(),
         Type.Union([Type.Null(), Type.String(), Type.Array(Type.String())],
           {
             description: `
@@ -95,7 +96,7 @@ export const LdapConfigSchema = Type.Object({
           例如：{ sn: "{{ cn }}" }，那么添加时将会增加一个sn属性，其值为cn的属性，即为用户输入的姓名
         `,
         })),
-  }, { description: "添加用户的配置" }),
+  }, { description: "添加用户的配置" })),
   attrs: Type.Object({
     uid: Type.String({ description: "LDAP中对应用户的id的属性名。" }),
     name: Type.Optional(Type.String({ description: `
@@ -146,22 +147,25 @@ function validateConfig(config: AuthConfigSchema) {
       throw new Error("authType is set to ldap, but ldap config is not set");
     }
 
-    if (config.ldap.addUser.groupStrategy === NewUserGroupStrategy.newGroupPerUser
+    if (config.ldap.addUser) {
+
+
+      if (config.ldap.addUser.groupStrategy === NewUserGroupStrategy.newGroupPerUser
     && !config.ldap.addUser.newGroupPerUser) {
-      throw new Error(`
+        throw new Error(`
       ldap.addUser.groupStrategy is set to ${NewUserGroupStrategy.newGroupPerUser} is set to ldap,
       but ldap.addUser.groupStrategy.newGroupPerUser config is not set`,
-      );
-    }
+        );
+      }
 
-    if (config.ldap.addUser.groupStrategy === NewUserGroupStrategy.oneGroupForAllUsers
+      if (config.ldap.addUser.groupStrategy === NewUserGroupStrategy.oneGroupForAllUsers
     && !config.ldap.addUser.oneGroupForAllUsers) {
-      throw new Error(`
+        throw new Error(`
       ldap.addUser.groupStrategy is set to ${NewUserGroupStrategy.oneGroupForAllUsers} is set to ldap,
       but ldap.addUser.groupStrategy.oneGroupFroAllUsers config is not set`,
-      );
+        );
+      }
     }
-
   }
 
   if (config.authType === AuthType.ssh && !config.ssh) {

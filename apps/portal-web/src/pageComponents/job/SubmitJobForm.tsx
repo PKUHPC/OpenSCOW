@@ -24,7 +24,7 @@ import { CodeEditor } from "src/components/CodeEditor";
 import { InputGroupFormItem } from "src/components/InputGroupFormItem";
 import { AccountSelector } from "src/pageComponents/job/AccountSelector";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
-import { Cluster } from "src/utils/config";
+import { Cluster, publicConfig } from "src/utils/config";
 
 interface JobForm {
   cluster: Cluster;
@@ -103,6 +103,8 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
 
   const cluster = Form.useWatch("cluster", form) as Cluster | undefined;
 
+  const jobName = Form.useWatch("jobName", form) as string;
+
   const partition = Form.useWatch("partition", form) as string | undefined;
 
   const nodeCount = Form.useWatch("nodeCount", form) as number;
@@ -112,34 +114,50 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
   const gpuCount = Form.useWatch("gpuCount", form) as number;
 
   const calculateWorkingDirectory = (template: string) =>
-    parsePlaceholder(template, { name: form.getFieldValue("jobName") });
+    parsePlaceholder(template, { name: jobName });
 
   const clusterInfoQuery = useAsync({
     promiseFn: useCallback(async () => cluster
       ? api.getClusterInfo({ query: { cluster:  cluster?.id } }) : undefined, [cluster]),
     onResolve: (data) => {
       if (data) {
+        // 如果是从模板导入，则判断当前选中的分区中是否仍有模板中的partition，若有，则将默认值设为模板值；
+        const setValueFromTemplate = initial.partition &&
+          data.clusterInfo.slurm.partitions.some((item) => { return item.name === initial.partition; });
         const partition = data.clusterInfo.slurm.partitions[0];
-        form.setFieldValue("partition", partition.name);
-        form.setFieldValue("qos", partition.qos?.[0]);
-        form.setFieldValue("workingDirectory", calculateWorkingDirectory(data.clusterInfo.submitJobDirTemplate));
+        const setInitialValues = setValueFromTemplate ? {
+          partition: initial.partition,
+          qos: initial.qos,
+        } : {
+          partition: partition.name,
+          qos: partition.qos?.[0],
+        };
+        form.setFieldsValue(setInitialValues);
       }
     },
   });
 
-  const reloadJobName = () => {
-    const jobName = genJobName();
-    form.setFieldValue("jobName", jobName);
-
+  const setWorkingDirectoryValue = () => {
+    console.log(!form.isFieldTouched("workingDirectory") && clusterInfoQuery.data);
     if (!form.isFieldTouched("workingDirectory") && clusterInfoQuery.data) {
       form.setFieldValue("workingDirectory",
         calculateWorkingDirectory(clusterInfoQuery.data.clusterInfo.submitJobDirTemplate));
     }
   };
 
+  const reloadJobName = () => {
+    const jobName = genJobName();
+    form.setFieldValue("jobName", jobName);
+    setWorkingDirectoryValue();
+  };
+
   useEffect(() => {
     reloadJobName();
   }, []);
+
+  useEffect(() => {
+    setWorkingDirectoryValue();
+  }, [jobName, clusterInfoQuery.data]);
 
   const currentPartitionInfo = useMemo(() =>
     clusterInfoQuery.data
@@ -150,11 +168,15 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
 
   useEffect(() => {
     if (currentPartitionInfo) {
-      form.setFieldValue("qos", currentPartitionInfo.qos?.[0]);
+      // 如果是从模板导入，则判断当前选中的分区中是否仍有模板中的qos，若有，则将默认值设为模板值；
+      const setValueFromTemplate = initial.partition && currentPartitionInfo.qos?.some((i) => i === initial.qos);
+      form.setFieldValue("qos", setValueFromTemplate ? initial.qos : currentPartitionInfo.qos?.[0]);
     }
   }, [currentPartitionInfo]);
 
   const defaultClusterStore = useStore(DefaultClusterStore);
+  // 判断是使用template中的cluster还是系统默认cluster，防止系统配置文件更改时仍选改动前的cluster
+  const defaultCluster = publicConfig.CLUSTERS.find((x) => x.id === initial.cluster?.id) ?? defaultClusterStore.cluster;
 
   const memory = (currentPartitionInfo ?
     currentPartitionInfo.gpus ? nodeCount * gpuCount
@@ -172,7 +194,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
       form={form}
       initialValues={{
         ...initial,
-        cluster: defaultClusterStore.cluster,
+        cluster: defaultCluster,
       }}
       onFinish={submit}
     >
@@ -203,7 +225,8 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
             rules={[{ required: true }]}
             dependencies={["cluster"]}
           >
-            <AccountSelector cluster={cluster?.id} />
+            {/* 加载完集群后再加载账户，保证initial值能被赋值成功 */}
+            {cluster?.id && <AccountSelector cluster={cluster.id} />}
           </Form.Item>
         </Col>
         <Col span={24} sm={6}>

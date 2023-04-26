@@ -54,6 +54,9 @@ export const sftpRealPath = (sftp: SFTPWrapper) =>
 export const sftpStat = (sftp: SFTPWrapper) =>
   handleSftpError(promisify(sftp.stat.bind(sftp) as typeof sftp["stat"]));
 
+export const sftpStatOrUndefined = (sftp: SFTPWrapper) => (path: string) =>
+  sftpStat(sftp)(path).catch(() => undefined);
+
 export const sftpUnlink = (sftp: SFTPWrapper) =>
   handleSftpError(promisify(sftp.unlink.bind(sftp) as typeof sftp["unlink"]));
 
