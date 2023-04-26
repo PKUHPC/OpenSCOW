@@ -116,6 +116,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
       "PORTAL_PATH": PORTAL_PATH,
       "MIS_PATH": MIS_PATH,
       "CLIENT_MAX_BODY_SIZE": config.gateway.uploadFileSizeLimit,
+      "PROXY_READ_TIMEOUT": config.gateway.proxyReadTimeout,
     },
     ports: { [config.port]: 80 },
     volumes: { "/etc/hosts": "/etc/hosts" },

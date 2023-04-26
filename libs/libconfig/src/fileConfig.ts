@@ -14,6 +14,7 @@ import { Static, TSchema } from "@sinclair/typebox";
 import fs from "fs";
 import { load } from "js-yaml";
 import { basename, extname, join } from "path";
+import { Logger } from "ts-log";
 
 import { validateObject } from "./validation";
 
@@ -115,5 +116,5 @@ export function getDirConfig<T extends TSchema>(
   }, {});
 }
 
-export type GetConfigFn<T> = (baseConfigPath?: string) => T;
+export type GetConfigFn<T> = (baseConfigPath?: string, logger?: Logger) => T;
 

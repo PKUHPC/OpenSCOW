@@ -16,6 +16,8 @@ import { Logger } from "ts-log";
 
 export interface AuthUserInfo {
   identityId: string;
+  name?: string;
+  mail?: string;
 }
 
 /**

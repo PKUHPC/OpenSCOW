@@ -43,3 +43,13 @@ it("generate correct paths", async () => {
   expect(composeConfig.services["portal-web"].environment).toContain("MIS_URL=/mis");
   expect(composeConfig.services["mis-web"].environment).toContain("PORTAL_URL=/");
 });
+
+it("sets proxy_read_timeout", async () => {
+  const config = getInstallConfig(configPath);
+  config.gateway.proxyReadTimeout = "100";
+
+  const composeSpec = createComposeSpec(config);
+
+  expect(composeSpec.services["gateway"].environment)
+    .toInclude(`PROXY_READ_TIMEOUT=${config.gateway.proxyReadTimeout}`);
+});

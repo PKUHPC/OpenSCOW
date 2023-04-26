@@ -34,6 +34,11 @@ export const InstallConfigSchema = Type.Object({
       description: "限制整个系统上传（请求）文件的大小，可接受的格式为nginx的client_max_body_size可接受的值",
       default: "1G",
     }),
+
+    proxyReadTimeout: Type.String({
+      description: "限制后端服务发出响应的超时时间，可接受的格式为nginx的proxy_read_timeout可接受的值",
+      default: "60s",
+    }),
   }, { default: {} }),
 
   portal: Type.Optional(Type.Object({
