@@ -17,9 +17,10 @@ import {
   FolderOutlined, HomeOutlined, LeftOutlined, MacCommandOutlined, RightOutlined,
   ScissorOutlined, SnippetsOutlined, UploadOutlined, UpOutlined,
 } from "@ant-design/icons";
+import { Decimal } from "@scow/lib-decimal";
 import { compareDateTime, formatDateTime } from "@scow/lib-web/build/utils/datetime";
 import { compareNumber } from "@scow/lib-web/build/utils/math";
-import { App, Button, Divider, Space, Table } from "antd";
+import { App, Button, Divider, Space, Table, Tooltip } from "antd";
 import Link from "next/link";
 import Router from "next/router";
 import { join } from "path";
@@ -76,6 +77,32 @@ const nodeModeToString = (mode: number) => {
   };
 
   return [0, 1, 2].reduce((prev, curr) => prev + toStr(numberPermission[curr]), "");
+};
+
+const formateFileSize = (size: number): string => {
+  const unitMap = ["KB", "MB", "GB", "TB"];
+  const CARRY = 1024;
+  // 最大1024TB
+  const MAX_SIZE = 1125899906842624;
+
+  if (size >= MAX_SIZE) {
+    return "";
+  }
+
+  let carryCount = 0;
+  let decimalSize = new Decimal(size).div(CARRY);
+
+  while (decimalSize.isGreaterThan(CARRY)) {
+    decimalSize = decimalSize.div(CARRY);
+    carryCount++;
+  }
+
+  if (decimalSize.isGreaterThanOrEqualTo(1000)) {
+    decimalSize = decimalSize.div(CARRY);
+    carryCount++;
+    return `${decimalSize.toFixed(2)} ${unitMap[carryCount]}`;
+  }
+  return `${decimalSize.toFixed(0)} ${unitMap[carryCount]}`;
 };
 
 type FileInfoKey = React.Key;
@@ -470,7 +497,13 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
           title="大小"
           render={
             (size: number | undefined, file: FileInfo) =>
-              (size === undefined || file.type === "DIR") ? "" : Math.floor(size / 1024) + " KB"
+              (size === undefined || file.type === "DIR")
+                ? ""
+                : (
+                  <Tooltip title={Math.floor((size) / 1024).toLocaleString() + "KB"} placement="topRight">
+                    <span>{formateFileSize(size)}</span>
+                  </Tooltip>
+                )
           }
           sorter={(a, b) => compareNumber(a.size, b.size)}
         />
