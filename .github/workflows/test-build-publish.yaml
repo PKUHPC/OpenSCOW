@@ -6,7 +6,7 @@ on:
     branches: [master]
   push:
     tags:
-      - "**"
+      - "v**"
     branches:
       - master
 
