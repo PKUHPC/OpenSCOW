@@ -1,5 +1,5 @@
 ---
-sidebar_position: 2
+sidebar_position: 1
 title: SCOW API
 ---
 
@@ -35,82 +35,14 @@ proto文件分为`common`, `portal`和`server`。其中，`common`和`portal`里
 
 [Buf](https://buf.build/docs/tutorials/getting-started-with-buf-cli/)是一个管理gRPC API和proto文件的一站式工具，可完成获取文件、生成代码等常见功能。我们推荐通过使用Buf直接从GitHub上获取代码并生成您的语言的模板的代码的工作。
 
-以使用Go语言为例，步骤如下（示例项目：https://github.com/PKUHPC/scow-grpc-api-go-client-demo ）
-
-1. 安装Buf CLI（[官网文档](https://buf.build/docs/installation/)）
-2. 初始化一个Go项目，假设模块名为`github.com/PKUHPC/scow-grpc-client-demo`
-  
 ```bash
-go mod init github.com/PKUHPC/scow-grpc-api-client-demo
-```
-
-3. 创建`buf.gen.yaml`文件，内容如下：
-
-```yaml title="buf.gen.yaml"
-version: v1
-managed:
-  enabled: true
-  go_package_prefix:
-    # 项目模块名+生成路径（plugins中out）
-    default: github.com/PKUHPC/scow-grpc-api-client-demo/gen/go
-    except:
-        - buf.build/googleapis/googleapis
-plugins:
-  - plugin: go
-    out: gen/go
-    opt: paths=source_relative
-  - plugin: go-grpc
-    out: gen/go
-    opt: paths=source_relative,require_unimplemented_servers=false
-```
-
-4. 根据某个具体SCOW版本生成代码
-
-```bash
-# 修改#后的值以确定SCOW的版本，可输入分支（#branch=master）, SCOW Tag号（#tag=v0.4.0）
-# 不写#部分默认master
+# 使用本地buf.gen.yaml生成模板，使用SCOW仓库的master分支的SCOW API
 buf generate --template buf.gen.yaml https://github.com/PKUHPC/SCOW.git#branch=master
 ```
 
-5. 编写Go代码
+不同语言示例：
 
-```go title="main.go"
-package main
-
-import (
-	"context"
-	"log"
-
-	"github.com/PKUHPC/scow-grpc-api-client-demo/gen/go/server"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
-)
-
-func main() {
-	conn, err := grpc.Dial("192.168.88.100:7571", grpc.WithTransportCredentials(insecure.NewCredentials()))
-
-  if err != nil {
-    panic(err)
-  }
-
-	client := server.NewAccountServiceClient(conn)
-
-	resp, err := client.GetAccounts(context.Background(), &server.GetAccountsRequest{})
-
-	if err != nil {
-		panic(err)
-	}
-
-	log.Printf("Account list: %v", resp)
-}
-```
-
-6. 下载依赖并运行
-
-```bash
-go mod tidy
-go run main.go
-```
+- [Go](./go.md)
 
 ### 2. 通过npm获取proto文件
 
@@ -158,5 +90,4 @@ SCOW的gRPC后端并不包含任何鉴权和认证过程。如果您在映射端
 - 给SCOW服务节点设置好防火墙，防止集群内部的服务访问到SCOW服务
 
 :::
-
 
