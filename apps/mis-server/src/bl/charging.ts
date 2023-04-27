@@ -56,15 +56,15 @@ export async function pay(
   const prevBalance = target.balance;
   target.balance = target.balance.plus(amount);
 
-  if (target instanceof Account && prevBalance.lte(0) && target.balance.gt(0)) {
-    logger.info("Unblock account %s", target.accountName);
-    await unblockAccount(target, clusterPlugin.clusters, logger);
-  }
-
   if (target instanceof Account) {
     await callHook("accountPaid", { accountName: target.accountName, amount: decimalToMoney(amount) }, logger);
   } else {
     await callHook("tenantPaid", { tenantName: target.name, amount: decimalToMoney(amount) }, logger);
+  }
+
+  if (target instanceof Account && prevBalance.lte(0) && target.balance.gt(0)) {
+    logger.info("Unblock account %s", target.accountName);
+    await unblockAccount(target, clusterPlugin.clusters, logger);
   }
 
   return {

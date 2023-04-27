@@ -18,10 +18,19 @@ import { Logger } from "ts-log";
 
 type Event = Exclude<OnEventRequest["event"], undefined>;
 
-export const createHookClient = (config: ScowHookConfigSchema | undefined) => {
+export const createHookClient = (
+  config: ScowHookConfigSchema | undefined,
+  logger: Logger,
+) => {
   const client = (config && config.enabled)
     ? new HookServiceClient(config.url, ChannelCredentials.createInsecure())
     : undefined;
+
+  if (config && client) {
+    logger.info("Hook configured to %s", config.url);
+  } else {
+    logger.info("Hook disabled");
+  }
 
   return {
     callHook: async <TEventName extends Event["$case"]>(
