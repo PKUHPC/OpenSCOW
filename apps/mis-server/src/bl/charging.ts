@@ -11,6 +11,7 @@
  */
 
 import { Logger } from "@ddadaal/tsgrpc-server";
+import { Loaded } from "@mikro-orm/core";
 import { SqlEntityManager } from "@mikro-orm/mysql";
 import { Decimal, decimalToMoney } from "@scow/lib-decimal";
 import { blockAccount, blockUserInAccount, unblockAccount, unblockUserInAccount } from "src/bl/block";
@@ -109,7 +110,10 @@ export async function charge(
   };
 }
 
-export async function addJobCharge(ua: UserAccount, charge: Decimal, clusterPlugin: ClusterPlugin, logger: Logger) {
+export async function addJobCharge(
+  ua: Loaded<UserAccount, "user" | "account">,
+  charge: Decimal, clusterPlugin: ClusterPlugin, logger: Logger,
+) {
   if (ua.usedJobCharge && ua.jobChargeLimit) {
     ua.usedJobCharge = ua.usedJobCharge.plus(charge);
     if (ua.usedJobCharge.gt(ua.jobChargeLimit)) {
@@ -120,7 +124,10 @@ export async function addJobCharge(ua: UserAccount, charge: Decimal, clusterPlug
   }
 }
 
-export async function setJobCharge(ua: UserAccount, charge: Decimal, clusterPlugin: ClusterPlugin, logger: Logger) {
+export async function setJobCharge(
+  ua: Loaded<UserAccount, "user" | "account">,
+  charge: Decimal, clusterPlugin: ClusterPlugin, logger: Logger,
+) {
   ua.jobChargeLimit = charge;
   if (!ua.usedJobCharge) {
     ua.usedJobCharge = new Decimal(0);

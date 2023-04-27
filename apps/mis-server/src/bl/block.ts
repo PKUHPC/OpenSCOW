@@ -11,6 +11,7 @@
  */
 
 import { Logger } from "@ddadaal/tsgrpc-server";
+import { Loaded } from "@mikro-orm/core";
 import { MySqlDriver, SqlEntityManager } from "@mikro-orm/mysql";
 import { Account } from "src/entities/Account";
 import { SystemState } from "src/entities/SystemState";
@@ -137,15 +138,15 @@ export async function unblockAccount(
  * Call flush after this.
  * */
 export async function blockUserInAccount(
-  ua: UserAccount,
+  ua: Loaded<UserAccount, "user" | "account">,
   clusterPlugin: ClusterPlugin, logger: Logger,
 ) {
   if (ua.status === UserStatus.BLOCKED) {
     return;
   }
 
-  const accountName = ua.account.getProperty("accountName");
-  const userId = ua.user.getProperty("userId");
+  const accountName = ua.account.$.accountName;
+  const userId = ua.user.$.userId;
 
   await clusterPlugin.clusters.callOnAll(logger, async (ops) => ops.user.blockUserInAccount({
     request: {
@@ -164,10 +165,12 @@ export async function blockUserInAccount(
 }
 
 /**
- * User and account must be loaded.
  * Call flush after this.
  * */
-export async function unblockUserInAccount(ua: UserAccount, clusterPlugin: ClusterPlugin, logger: Logger) {
+export async function unblockUserInAccount(
+  ua: Loaded<UserAccount, "user" | "account">,
+  clusterPlugin: ClusterPlugin, logger: Logger,
+) {
   if (ua.status === UserStatus.UNBLOCKED) {
     return;
   }
