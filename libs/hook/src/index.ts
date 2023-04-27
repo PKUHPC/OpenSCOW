@@ -13,14 +13,14 @@
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { ChannelCredentials } from "@grpc/grpc-js";
 import { ScowHookConfigSchema } from "@scow/config/build/common";
-import { MisHookServiceClient, OnEventRequest } from "@scow/protos/build/server/hook";
+import { HookServiceClient, OnEventRequest } from "@scow/protos/build/hook/hook";
 import { Logger } from "ts-log";
 
 type Event = Exclude<OnEventRequest["event"], undefined>;
 
-export const createMisHookClient = (config: ScowHookConfigSchema | undefined) => {
+export const createHookClient = (config: ScowHookConfigSchema | undefined) => {
   const client = (config && config.enabled)
-    ? new MisHookServiceClient(config.url, ChannelCredentials.createInsecure())
+    ? new HookServiceClient(config.url, ChannelCredentials.createInsecure())
     : undefined;
 
   return {
