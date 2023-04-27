@@ -23,6 +23,17 @@ scowHook:
 
 5. 重启SCOW
 
+## SCOW服务连接到Hook服务
+
+请注意，SCOW的服务器是运行在容器中的，通过`localhost`无法访问到运行到SCOW节点上的服务。当设定hook的URL时，请使用服务在您的局域网中的地址。
+
+如果您不确定一个地址是否能从容器中连接，您可以手动在容器中运行`ping`等命令尝试是否能到达您的Hook服务：
+
+```bash
+./cli compose exec mis-server sh
+ping 您的gRPC服务器的地址
+```
+
 ## 实际项目示例
 
 - [Go](./examples/go.md#实现并注册scow-hook)
