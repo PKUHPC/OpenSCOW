@@ -35,6 +35,8 @@ predefinedChargingTypes:
 monthlyRent:
   # 是否开启
   enabled: true
+  # 租金（元）
+  rent: 10
   # 周期的cron表达式
   cron: "0 0 0 1 * *"
 
