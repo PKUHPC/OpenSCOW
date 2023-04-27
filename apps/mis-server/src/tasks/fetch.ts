@@ -200,7 +200,7 @@ export async function fetchJobs(
                 target: ua.account.$.tenant.getEntity(),
               }, em, logger, clusterPlugin);
 
-              await addJobCharge(ua, x.tenantPrice, clusterPlugin, logger);
+              await addJobCharge(ua, x.accountPrice, clusterPlugin, logger);
             }
           }));
 

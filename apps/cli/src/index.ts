@@ -15,6 +15,7 @@ dotenv.config();
 
 import { readFileSync } from "fs";
 import { join } from "path";
+import { checkConfig } from "src/cmd/checkConfig";
 import { runCompose } from "src/cmd/compose";
 import { enterDb } from "src/cmd/db";
 import { generateDockerComposeYml } from "src/cmd/generate";
@@ -49,6 +50,22 @@ yargs(hideBin(process.argv))
     });
   }, (argv) => {
     viewInstall(argv);
+  })
+  .command("check-config", "Check SCOW config files", (yargs) => {
+    return yargs.options({
+      scowConfigPath: {
+        type: "string",
+        description: "The directory containing SCOW config files",
+        default: "./config",
+      },
+      continueOnError: {
+        type: "boolean",
+        description: "Continue even a config has error",
+        default: false,
+      },
+    });
+  }, (argv) => {
+    checkConfig(argv);
   })
   .command("init", "Extract sample config files", (yargs) => {
     return yargs.options({

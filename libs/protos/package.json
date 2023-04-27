@@ -18,6 +18,9 @@
     "protobufjs": "7.2.3",
     "@scow/grpc-api": "workspace:*"
   },
+  "devDependencies": {
+    "ts-proto": "1.146.0"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC"
