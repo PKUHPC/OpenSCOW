@@ -61,6 +61,9 @@ scow-cli使用运行目录下的`install.yaml`作为配置来管理集群，但�
 
 # 查看当前使用install.yaml的内容
 ./cli view-install
+
+# 检查./config目录下的SCOW配置文件的格式
+./cli check-config
 ```
 
 # 从scow-deployment迁移
