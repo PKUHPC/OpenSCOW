@@ -11,7 +11,6 @@
  */
 
 import { Logger } from "@ddadaal/tsgrpc-server";
-import { Loaded } from "@mikro-orm/core";
 import { MySqlDriver, SqlEntityManager } from "@mikro-orm/mysql";
 import { Account } from "src/entities/Account";
 import { SystemState } from "src/entities/SystemState";

@@ -311,7 +311,7 @@ export const userServiceServer = plugin((server) => {
       return [{}];
     },
 
-    createUser: async ({ request, em }) => {
+    createUser: async ({ request, em, logger }) => {
       const { name, tenantName, email, identityId, password } = request;
       const user = await createUserInDatabase(identityId, name, email, tenantName, server.logger, em)
         .catch((e) => {
@@ -351,7 +351,7 @@ export const userServiceServer = plugin((server) => {
           }
         });
 
-      await callHook("userCreated", { tenantName, userId }, logger);
+      await callHook("userCreated", { tenantName, userId: user.userId }, logger);
 
       return [{
         createdInAuth: createdInAuth,

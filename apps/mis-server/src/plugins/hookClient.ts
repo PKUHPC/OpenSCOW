@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { createMisHookClient } from "@scow/lib-hook";
+import { createHookClient } from "@scow/lib-hook";
 import { commonConfig } from "src/config/common";
 
-export const { callHook } = createMisHookClient(commonConfig.scowHook);
+export const { callHook } = createHookClient(commonConfig.scowHook);
