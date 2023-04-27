@@ -51,9 +51,10 @@ export const createHookClient = (
         metadata: { time: new Date().toISOString() },
         // @ts-ignore
         event: { $case: eventName, [eventName]: eventPayload },
-      }).catch((e) => {
-        logger.error(e, "Error when calling hook");
-      });
+      }).then(
+        () => { logger.debug("Hook call completed"); },
+        (e) => { logger.error(e, "Error when calling hook"); },
+      );
     },
   };
 };
