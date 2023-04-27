@@ -17,7 +17,7 @@ title: SCOW Hook
 4. 在SCOW中配置SCOW Hook功能
 
 ```yaml title="config/common.yaml"
-hook:
+scowHook:
   url: 您的gRPC服务器的地址
 ```
 

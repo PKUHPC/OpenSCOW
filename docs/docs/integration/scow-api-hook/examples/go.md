@@ -152,7 +152,7 @@ go run hook.go
 修改`config/common.yaml`文件，配置Hook Server的地址
 
 ```yaml title="config/common.yaml"
-hook:
+scowHook:
   url: localhost:5000
 ```
 
