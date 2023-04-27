@@ -5,7 +5,7 @@ title: Go客户端示例
 
 # Go示例
 
-示例项目：https://github.com/PKUHPC/scow-grpc-api-go-client-demo
+示例项目：https://github.com/PKUHPC/scow-go-demo
 
 ## 准备环境
 
@@ -56,7 +56,7 @@ buf generate --template buf.gen.yaml https://github.com/PKUHPC/SCOW.git#subdir=p
 
 编写Go代码使用调用SCOW API的代码
 
-```go title="api-client.go"
+```go title="api.go"
 package main
 
 import (
@@ -94,9 +94,69 @@ func main() {
 
 ```bash
 go mod tidy
-go run main.go
+go run api.go
 ```
 
 ## 实现并注册SCOW Hook
+
+创建一个`hook.go`文件，实现HookServiceServer (protos/hook/hook.proto)
+
+```go title="hook.go"
+package main
+
+import (
+	"context"
+	"log"
+	"net"
+
+	"github.com/PKUHPC/scow-go-demo/gen/go/hook"
+	"google.golang.org/grpc"
+)
+
+type MyHookServer struct{}
+
+func (s *MyHookServer) OnEvent(ctx context.Context, req *hook.OnEventRequest) (*hook.OnEventResponse, error) {
+
+	log.Printf("Received event: %v", req)
+
+	return &hook.OnEventResponse{}, nil
+}
+
+func main() {
+
+	addr := "0.0.0.0:5000"
+
+	lis, err := net.Listen("tcp", addr)
+	if err != nil {
+		log.Fatalf("failed to listen: %v", err)
+	}
+	var opts []grpc.ServerOption
+	grpcServer := grpc.NewServer(opts...)
+
+	server := MyHookServer{}
+
+	hook.RegisterHookServiceServer(grpcServer, &server)
+	print("Listening at " + addr)
+
+	grpcServer.Serve(lis)
+}
+```
+
+下载依赖并运行
+
+```bash
+go mod tidy
+go run hook.go
+```
+
+修改`config/common.yaml`文件，配置Hook Server的地址
+
+```yaml title="config/common.yaml"
+hook:
+  url: localhost:5000
+```
+
+重启SCOW。当SCOW有相关事件发生时，SCOW会调用Hook Server。
+
 
 

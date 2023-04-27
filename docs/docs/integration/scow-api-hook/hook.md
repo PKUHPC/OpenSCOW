@@ -7,6 +7,8 @@ title: SCOW Hook
 
 如果用户配置了SCOW Hook，那么SCOW在发生一些事件时，会通过SCOW Hook调用监听的Hook服务器。您可以通过SCOW Hook监听SCOW中发生的事件，并自己进行一些后续处理。
 
+会调用Hook的事件请参考[`protos/hook/hook.proto`](%REPO_FILE_URL%/protos/hook/hook.proto)文件中`OnEventRequest`消息的`message`属性。
+
 要使用SCOW Hook，您需要：
 
 1. [获取SCOW Protobuf文件](./proto.md)并生成代码
