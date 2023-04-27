@@ -32,10 +32,11 @@ export const createHookClient = (config: ScowHookConfigSchema | undefined) => {
     ) => {
 
       if (!client) {
+        logger.debug("Attempt to call hook %s with %o", eventName, eventPayload);
         return;
       }
 
-      logger.info("Calling hook %o", event);
+      logger.info("Calling hook %s with %o", eventName, eventPayload);
 
       return await asyncUnaryCall(client, "onEvent", {
         metadata: { time: new Date().toISOString() },
