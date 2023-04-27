@@ -1,0 +1,32 @@
+{
+  "name": "@scow/lib-hook",
+  "version": "0.1.0",
+  "description": "",
+  "private": true,
+  "main": "build/index.js",
+  "scripts": {
+    "dev": "tsc -p tsconfig.build.json && (concurrently \"tsc -p tsconfig.build.json -w\" \"tsc-alias -p tsconfig.build.json -w\")",
+    "build": "rimraf build && tsc -p tsconfig.build.json",
+    "test": "jest"
+  },
+  "files": [
+    "build",
+    "!**/*.map"
+  ],
+  "author": "PKUHPC (https://github.com/PKUHPC)",
+  "license": "Mulan PSL v2",
+  "repository": "https://github.com/PKUHPC/SCOW",
+  "dependencies": {
+    "@grpc/grpc-js": "1.8.14",
+    "bignumber.js": "9.1.1",
+    "@scow/protos": "workspace:*",
+    "@ddadaal/tsgrpc-client": "0.17.3"
+  },
+  "devDependencies": {
+    "@scow/config": "workspace:*",
+    "ts-log": "2.2.5"
+  },
+  "volta": {
+    "extends": "../../package.json"
+  }
+}

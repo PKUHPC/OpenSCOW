@@ -40,6 +40,7 @@
     "@scow/lib-auth": "workspace:*",
     "@scow/protos": "workspace:*",
     "@scow/utils": "workspace:*",
+    "@scow/lib-hook": "workspace:*",
     "dotenv": "16.0.3",
     "node-cron": "3.0.2",
     "uuid": "9.0.0",

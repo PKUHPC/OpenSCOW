@@ -1,0 +1,72 @@
+/**
+ * Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
+ * SCOW is licensed under Mulan PSL v2.
+ * You can use this software according to the terms and conditions of the Mulan PSL v2.
+ * You may obtain a copy of Mulan PSL v2 at:
+ *          http://license.coscl.org.cn/MulanPSL2
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+ * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+ * See the Mulan PSL v2 for more details.
+ */
+
+syntax = "proto3";
+
+package scow.server;
+
+import "google/protobuf/timestamp.proto";
+
+message AccountBlocked {
+  string account_name = 1;
+}
+
+message AccountUnblocked {
+  string account_name = 1;
+}
+
+message AccountCreated {
+  string account_name = 1;
+  string tenant_name = 2;
+  string owner_id = 3;
+  optional string comment = 4;
+}
+
+message UserBlockedInAccount {
+  string user_id = 1;
+  string account_name = 2;
+}
+
+message UserUnblockedInAccount {
+  string user_id = 1;
+  string account_name = 2;
+}
+
+message UserCreated {
+  string user_id = 1;
+  string tenant_name = 2;
+}
+
+message OnEventRequest {
+  message Metadata {
+    google.protobuf.Timestamp time = 1;
+  }
+
+  Metadata metadata = 1;
+
+  oneof event {
+    AccountBlocked account_blocked = 2;
+    AccountUnblocked account_unblocked = 3;
+    AccountCreated account_created = 4;
+    UserBlockedInAccount user_blocked_in_account = 5;
+    UserUnblockedInAccount user_unblocked_in_account = 6;
+    UserCreated user_created = 7;
+  }
+}
+message OnEventResponse {
+
+}
+
+
+service MisHookService {
+  rpc OnEvent (OnEventRequest) returns (OnEventResponse);
+}
