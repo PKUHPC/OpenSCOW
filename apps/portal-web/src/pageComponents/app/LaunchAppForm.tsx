@@ -88,46 +88,64 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
 
   const clusterInfoQuery = useAsync({
     promiseFn: useCallback(async () => {
-      const [clusterInfoQuery, lastSubmissionInfo] = await Promise.all([
-        cluster ? api.getClusterInfo({ query: { cluster:  cluster?.id } }) : undefined,
-        cluster ? api.getAppLastSubmission({ query: { cluster: cluster?.id, appId } }) : undefined,
-      ]);
-      return {
-        clusterInfo: clusterInfoQuery?.clusterInfo,
-        lastSubmissionInfo: lastSubmissionInfo?.lastSubmissionInfo,
-      };
+      return cluster ? Promise.all([
+        api.getClusterInfo({ query: { cluster:  cluster?.id } }),
+        api.getAppLastSubmission({ query: { cluster: cluster?.id, appId } }),
+      ]) : undefined;
     }, [cluster]),
     onResolve: (data) => {
       if (data) {
 
-        const lastSubmitPartition = data.lastSubmissionInfo?.partition;
-        const lastSubmitQos = data.lastSubmissionInfo?.qos;
-        const lastSubmitCoreCount = data.lastSubmissionInfo?.coreCount;
-        const clusterPartition = data.clusterInfo?.slurm.partitions[0];
-        const clusterPartitionCoreCount = clusterPartition?.cores;
+        const [clusterData, lastSubmitData] = data;
 
-        // 如果存在上一次提交信息且上一次提交信息中的分区，qos，cpu核心数满足当前集群配置，则填入上一次提交信息中的值
-        const setPartitionFromSubmission = lastSubmitPartition &&
-          data.clusterInfo?.slurm.partitions.some((item) => { return item.name === lastSubmitPartition; });
-        const setLastSubmitQos = setPartitionFromSubmission &&
-          clusterPartition?.qos?.some((item) => { return item === lastSubmitQos; });
-        const setLastSubmitCoreCount = setPartitionFromSubmission &&
+        const lastSubmitPartition = lastSubmitData.lastSubmissionInfo.partition;
+        const lastSubmitQos = lastSubmitData.lastSubmissionInfo.qos;
+        const lastSubmitCoreCount = lastSubmitData.lastSubmissionInfo.coreCount;
+        const clusterPartition = clusterData.clusterInfo.slurm.partitions[0];
+        const clusterPartitionCoreCount = clusterPartition.cores;
+
+        // 如果存在上一次提交信息，且上一次提交信息中的分区，qos，cpu核心数满足当前集群配置，则填入上一次提交信息中的相应值
+        const seSubmitPartition = lastSubmitPartition &&
+          clusterData.clusterInfo.slurm.partitions.some((item) => { return item.name === lastSubmitPartition; });
+        const setSubmitQos = seSubmitPartition &&
+          clusterPartition.qos?.some((item) => { return item === lastSubmitQos; });
+        const setSubmitCoreCount = seSubmitPartition &&
           lastSubmitCoreCount && clusterPartitionCoreCount && clusterPartitionCoreCount >= lastSubmitCoreCount;
+        const requiredObj = {
+          partition: seSubmitPartition ? lastSubmitPartition : clusterPartition.name,
+          qos: setSubmitQos ? lastSubmitQos : clusterPartition?.qos?.[0],
+          coreCount: setSubmitCoreCount ? lastSubmitCoreCount : initialValues.coreCount,
+          maxTime: lastSubmitData ? lastSubmitData.lastSubmissionInfo.maxTime : initialValues.maxTime,
+        };
 
-        form.setFieldValue("partition", setPartitionFromSubmission ? lastSubmitPartition : clusterPartition);
-        form.setFieldValue("qos", setLastSubmitQos ? lastSubmitQos : clusterPartition?.qos?.[0]);
-        form.setFieldValue("coreCount", setLastSubmitCoreCount ? lastSubmitCoreCount : initialValues.coreCount);
-
-        // 如果存在上一次提交信息，填入上一次提交信息中的最长运行时间
-        form.setFieldValue("maxTime", data.lastSubmissionInfo ?
-          data.lastSubmissionInfo.maxTime : initialValues.maxTime);
+        // 如果存在上一次提交信息且上一次提交信息中的配置HTML表单与当前配置HTML表单内容相同，则填入上一次提交信息中的值
+        const attributesObj = {};
+        const lastSubmitAttributes = lastSubmitData.lastSubmissionInfo.customAttributes;
+        if (lastSubmitAttributes) {
+          attributes.forEach((attribute) => {
+            if (attribute.name in lastSubmitAttributes) {
+              switch (attribute.type) {
+              case "NUMBER":
+              case "TEXT":
+                attributesObj[attribute.name] = lastSubmitAttributes[attribute.name];
+                break;
+              case "SELECT":
+                if (attribute.select!.some((optionItem) => optionItem.value === lastSubmitAttributes[attribute.name])) {
+                  attributesObj[attribute.name] = lastSubmitAttributes[attribute.name];
+                }
+                break;
+              }
+            }
+          });
+        }
+        form.setFieldsValue({ ...requiredObj, ...attributesObj });
       }
     },
   });
 
   const currentPartitionInfo = useMemo(() =>
     clusterInfoQuery.data
-      ? clusterInfoQuery.data.clusterInfo?.slurm.partitions.find((x) => x.name === partition)
+      ? clusterInfoQuery.data[0].clusterInfo.slurm.partitions.find((x) => x.name === partition)
       : undefined,
   [clusterInfoQuery.data, partition],
   );
@@ -138,8 +156,6 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
     }
   }, [currentPartitionInfo]);
 
-  // 如果存在上一次提交信息且上一次提交信息中的配置HTML表单与当前配置HTML表单内容相同，则填入上一次提交信息中的值
-  // const setLastSubmitCustomAttribute = clusterInfoQuery.data?.lastSubmissionInfo?.customAttributes &&
 
   const customFormItems = attributes.map((item, index) => {
 
@@ -173,7 +189,7 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
   const defaultClusterStore = useStore(DefaultClusterStore);
 
   return (
-    <Form form={form} onFinish={onSubmit} initialValues={{ ...initialValues, cluster: defaultClusterStore.cluster }}>
+    <Form form={form} onFinish={onSubmit} initialValues={{ cluster: defaultClusterStore.cluster }}>
 
       <Form.Item name="cluster" label="集群" rules={[{ required: true }]}>
         <SingleClusterSelector />
@@ -198,7 +214,7 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
           loading={clusterInfoQuery.isLoading}
           disabled={!currentPartitionInfo}
           options={clusterInfoQuery.data
-            ? clusterInfoQuery.data.clusterInfo?.slurm.partitions
+            ? clusterInfoQuery.data[0].clusterInfo.slurm.partitions
               .map((x) => ({ label: x.name, value: x.name }))
             : []
           }
