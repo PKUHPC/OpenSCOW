@@ -295,6 +295,9 @@ importers:
       '@scow/lib-decimal':
         specifier: workspace:*
         version: link:../../libs/decimal
+      '@scow/lib-hook':
+        specifier: workspace:*
+        version: link:../../libs/hook
       '@scow/lib-slurm':
         specifier: workspace:*
         version: link:../../libs/slurm
@@ -832,6 +835,28 @@ importers:
       bignumber.js:
         specifier: 9.1.1
         version: 9.1.1
+
+  libs/hook:
+    dependencies:
+      '@ddadaal/tsgrpc-client':
+        specifier: 0.17.3
+        version: 0.17.3(@grpc/grpc-js@1.8.14)
+      '@grpc/grpc-js':
+        specifier: 1.8.14
+        version: 1.8.14
+      '@scow/protos':
+        specifier: workspace:*
+        version: link:../protos
+      bignumber.js:
+        specifier: 9.1.1
+        version: 9.1.1
+    devDependencies:
+      '@scow/config':
+        specifier: workspace:*
+        version: link:../config
+      ts-log:
+        specifier: 2.2.5
+        version: 2.2.5
 
   libs/libconfig:
     dependencies:

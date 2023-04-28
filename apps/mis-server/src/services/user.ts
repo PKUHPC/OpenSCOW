@@ -31,6 +31,7 @@ import { misConfig } from "src/config/mis";
 import { Account } from "src/entities/Account";
 import { PlatformRole, TenantRole, User } from "src/entities/User";
 import { UserAccount, UserRole, UserStatus } from "src/entities/UserAccount";
+import { callHook } from "src/plugins/hookClient";
 import { createUserInDatabase, insertKeyToNewUser } from "src/utils/createUser";
 import { paginationProps } from "src/utils/orm";
 
@@ -310,7 +311,7 @@ export const userServiceServer = plugin((server) => {
       return [{}];
     },
 
-    createUser: async ({ request, em }) => {
+    createUser: async ({ request, em, logger }) => {
       const { name, tenantName, email, identityId, password } = request;
       const user = await createUserInDatabase(identityId, name, email, tenantName, server.logger, em)
         .catch((e) => {
@@ -349,6 +350,8 @@ export const userServiceServer = plugin((server) => {
               message: `Error creating user with userId ${identityId} in auth.` };
           }
         });
+
+      await callHook("userCreated", { tenantName, userId: user.userId }, logger);
 
       return [{
         createdInAuth: createdInAuth,

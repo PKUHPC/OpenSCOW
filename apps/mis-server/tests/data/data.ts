@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { Loaded } from "@mikro-orm/core";
 import { SqlEntityManager } from "@mikro-orm/mysql";
 import { Account } from "src/entities/Account";
 import { Tenant } from "src/entities/Tenant";
@@ -32,19 +33,19 @@ export async function insertInitialData(em: SqlEntityManager) {
     account: accountA,
     user: userA,
     role: UserRole.OWNER, status: UserStatus.UNBLOCKED,
-  });
+  }) as Loaded<UserAccount, "account" | "user">;
 
   const uaAB = new UserAccount({
     account: accountA,
     user: userB,
     role: UserRole.ADMIN, status: UserStatus.UNBLOCKED,
-  });
+  }) as Loaded<UserAccount, "account" | "user">;
 
   const uaBB = new UserAccount({
     account: accountB,
     user: userB,
     role: UserRole.OWNER, status: UserStatus.UNBLOCKED,
-  });
+  }) as Loaded<UserAccount, "account" | "user">;
 
   await em.persistAndFlush([userA, userB, accountA, accountB, uaAA, uaAB, uaBB]);
 

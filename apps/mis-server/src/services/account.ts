@@ -23,6 +23,7 @@ import { AccountWhitelist } from "src/entities/AccountWhitelist";
 import { Tenant } from "src/entities/Tenant";
 import { User } from "src/entities/User";
 import { UserAccount, UserRole as EntityUserRole, UserStatus } from "src/entities/UserAccount";
+import { callHook } from "src/plugins/hookClient";
 import { toRef } from "src/utils/orm";
 
 export const accountServiceServer = plugin((server) => {
@@ -194,6 +195,8 @@ export const accountServiceServer = plugin((server) => {
       });
 
       logger.info("Account has been created in cluster.");
+
+      await callHook("accountCreated", { accountName, comment, ownerId, tenantName }, logger);
 
       return [{}];
     },
