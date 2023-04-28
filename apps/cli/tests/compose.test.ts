@@ -14,7 +14,7 @@ import { statSync } from "fs";
 import { join } from "path";
 import { createComposeSpec } from "src/compose";
 import { getInstallConfig } from "src/config/install";
-import { configPath, testBaseFolder } from "tests/utils";
+import { configPath, createInstallYaml, testBaseFolder } from "tests/utils";
 
 it("creates log dir for fluentd", async () => {
 
@@ -52,4 +52,44 @@ it("sets proxy_read_timeout", async () => {
 
   expect(composeSpec.services["gateway"].environment)
     .toInclude(`PROXY_READ_TIMEOUT=${config.gateway.proxyReadTimeout}`);
+});
+
+describe("sets custom auth environment", () => {
+
+  it("accepts object", async () => {
+
+    const configPath = await createInstallYaml({
+      auth: {
+        custom: {
+          image: "",
+          environment: {
+            "CUSTOM_AUTH_KEY": "CUSTOM_AUTH_VALUE",
+          },
+        },
+      },
+    });
+
+    const spec = createComposeSpec(getInstallConfig(configPath));
+
+    expect(spec.services["auth"].environment)
+      .toInclude("CUSTOM_AUTH_KEY=CUSTOM_AUTH_VALUE");
+  });
+
+  it("accepts array", async () => {
+    const configPath = await createInstallYaml({
+      auth: {
+        custom: {
+          image: "",
+          environment: [
+            "CUSTOM_AUTH_KEY=CUSTOM_AUTH_VALUE",
+          ],
+        },
+      },
+    });
+
+    const spec = createComposeSpec(getInstallConfig(configPath));
+
+    expect(spec.services["auth"].environment)
+      .toInclude("CUSTOM_AUTH_KEY=CUSTOM_AUTH_VALUE");
+  });
 });
