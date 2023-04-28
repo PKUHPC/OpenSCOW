@@ -13,6 +13,7 @@
 import { getConfig } from "@scow/lib-config/build/fileConfig";
 import { Static, Type } from "@sinclair/typebox";
 import { join } from "path";
+import { logger } from "src/log";
 
 export const InstallConfigSchema = Type.Object({
   port: Type.Integer({ description: "端口号", default: 80 }),
@@ -94,6 +95,9 @@ export const InstallConfigSchema = Type.Object({
 export type InstallConfigSchema = Static<typeof InstallConfigSchema>;
 
 export function getInstallConfig(filePath: string) {
+  const fullPath = join(process.cwd(), filePath);
 
-  return getConfig(InstallConfigSchema, join(process.cwd(), filePath));
+  logger.debug("Using install config %s", fullPath);
+
+  return getConfig(InstallConfigSchema, fullPath);
 }

@@ -11,9 +11,9 @@
  */
 
 import createHttpsProxyAgent from "https-proxy-agent";
+import { config } from "src/config/env";
 
-export const proxyUrl =
-  process.env.HTTPS_PROXY || process.env.https_proxy || process.env.HTTP_PROXY || process.env.http_proxy;
+export const proxyUrl = config.HTTPS_PROXY || config.https_proxy || config.HTTP_PROXY || config.http_proxy;
 
 export const createProxyAgent = (proxyUrl: string) => {
   return createHttpsProxyAgent(proxyUrl);

@@ -13,7 +13,7 @@
 import { existsSync, promises as fsp } from "fs";
 import { basename, join } from "path";
 import prompt from "prompts";
-import { debug, log } from "src/log";
+import { logger } from "src/log";
 
 
 interface Options {
@@ -47,12 +47,12 @@ async function copyWithWarning(src: string, dest: string) {
         message: `Output ${destPath} already exists. Overwrite?`,
       });
       if (!answer.continue) {
-        debug("Selected no.");
+        logger.debug("Selected no.");
         return;
       }
     }
 
-    log("Copying %s to %s", src, destPath);
+    logger.info("Copying %s to %s", src, destPath);
     await fsp.copyFile(src, destPath);
   }
 }
@@ -61,10 +61,10 @@ export const init = async (options: Options) => {
 
   const fullPath = join(process.cwd(), options.outputPath);
 
-  log("Output path is %s. ", fullPath);
+  logger.info("Output path is %s. ", fullPath);
 
   await copyWithWarning(SAMPLE_INSTALLATION, fullPath);
   await copyWithWarning(SAMPLE_CONFIG_PATH, fullPath);
 
-  log("File initialization complete");
+  logger.info("File initialization complete");
 };

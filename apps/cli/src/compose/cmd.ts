@@ -16,7 +16,7 @@ import { unlinkSync, writeFileSync } from "fs";
 import { dump } from "js-yaml";
 import { createComposeSpec } from "src/compose";
 import { InstallConfigSchema } from "src/config/install";
-import { debug } from "src/log";
+import { logger } from "src/log";
 
 export function getAvailabelDockerComposeCommand() {
 
@@ -39,33 +39,32 @@ export function runComposeCommand(config: InstallConfigSchema, args: string[]) {
 
   const dockerComposeCommand = getAvailabelDockerComposeCommand();
 
-  debug("Using %s to run docker compose commands", dockerComposeCommand);
+  logger.debug("Using %s to run docker compose commands", dockerComposeCommand);
 
   const composeConfig = createComposeSpec(config);
 
   const filename = `docker-compose-${Date.now()}.yml`;
 
   writeFileSync(filename, dump(composeConfig), { encoding: "utf-8" });
-  debug("Generated " + filename);
+  logger.debug("Generated " + filename);
 
   const clean = () => {
     unlinkSync(filename);
   };
 
   onDeath((arg) => {
-    debug("Received %s. Deleting compose file", arg);
+    logger.debug("Received %s. Deleting compose file", arg);
     clean();
   });
 
   try {
-
     spawnSync(
       dockerComposeCommand,
       ["-f", filename, ...args],
       { shell: true, stdio: "inherit" },
     );
   } finally {
-    debug("Process exited. Deleting compose file");
+    logger.debug("Process exited. Deleting compose file");
     clean();
   }
 }

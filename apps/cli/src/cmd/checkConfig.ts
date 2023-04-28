@@ -17,7 +17,9 @@ import { getCommonConfig } from "@scow/config/build/common";
 import { getMisConfig } from "@scow/config/build/mis";
 import { getPortalConfig } from "@scow/config/build/portal";
 import { getUiConfig } from "@scow/config/build/ui";
+import { Logger } from "pino";
 import { getInstallConfig } from "src/config/install";
+import { logger } from "src/log";
 
 interface Options {
   configPath: string;
@@ -30,11 +32,9 @@ export const checkConfig = ({
   configPath, continueOnError, scowConfigPath,
 }: Options) => {
 
-  const logger = console;
-
   const config = getInstallConfig(configPath);
 
-  const tryRead = (readFn: (path: string, logger) => any) => {
+  const tryRead = (readFn: (path: string, logger: Logger) => any) => {
     try {
       readFn(scowConfigPath, logger);
     } catch (e) {
@@ -45,32 +45,32 @@ export const checkConfig = ({
     }
   };
 
-  logger.info("Check common config");
+  logger.debug("Checking common config");
   tryRead(getCommonConfig);
 
-  logger.info("Checking cluster config files");
+  logger.debug("Checking cluster config files");
   tryRead(getClusterConfigs);
 
-  logger.info("Checking clusterTexts config");
+  logger.debug("Checking clusterTexts config");
   tryRead(getClusterTextsConfig);
 
-  logger.info("Checking UI config");
+  logger.debug("Checking UI config");
   tryRead(getUiConfig);
 
   if (config.portal) {
-    logger.info("Checking portal config");
+    logger.debug("Checking portal config");
     tryRead(getPortalConfig);
 
-    logger.info("Checking app config");
+    logger.debug("Checking app config");
     tryRead(getAppConfigs);
   } else {
-    logger.info("Portal is not deployed. Skip portal config check.");
+    logger.debug("Portal is not deployed. Skip portal config check.");
   }
 
   if (config.mis) {
-    logger.info("Checking MIS configuration");
+    logger.debug("Checking MIS configuration");
     tryRead(getMisConfig);
   } else {
-    logger.info("MIS is not deployed. Skip MIS config check.");
+    logger.debug("MIS is not deployed. Skip MIS config check.");
   }
 };
