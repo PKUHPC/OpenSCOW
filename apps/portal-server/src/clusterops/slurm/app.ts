@@ -19,7 +19,7 @@ import { randomUUID } from "crypto";
 import fs from "fs";
 import { join } from "path";
 import { quote } from "shell-quote";
-import { AppOps, AppSession } from "src/clusterops/api/app";
+import { AppOps, AppSession, SubmissionInfo } from "src/clusterops/api/app";
 import { displayIdToPort } from "src/clusterops/slurm/bl/port";
 import { portalConfig } from "src/config/portal";
 import { splitSbatchArgs } from "src/utils/app";
@@ -54,6 +54,8 @@ const SESSION_METADATA_NAME = "session.json";
 const SERVER_SESSION_INFO = "server_session_info.json";
 const VNC_SESSION_INFO = "VNC_SESSION_INFO";
 
+const APP_LAST_SUBMISSION_INFO = "last_submission.json";
+
 export const slurmAppOps = (cluster: string): AppOps => {
 
   const host = getClusterLoginNode(cluster);
@@ -81,10 +83,14 @@ export const slurmAppOps = (cluster: string): AppOps => {
 
       const workingDirectory = join(portalConfig.appJobsDir, jobName);
 
+      const lastSubmissionDirectory = join(portalConfig.appLastSubmissionDir, appId);
+
       return await sshConnect(host, userId, logger, async (ssh) => {
 
         // make sure workingDirectory exists.
         await ssh.mkdir(workingDirectory);
+        // make sure lastSubmissionDirectory exists.
+        await ssh.mkdir(lastSubmissionDirectory);
 
         const sftp = await ssh.requestSFTP();
 
@@ -116,6 +122,25 @@ export const slurmAppOps = (cluster: string): AppOps => {
           };
 
           await sftpWriteFile(sftp)(join(workingDirectory, SESSION_METADATA_NAME), JSON.stringify(metadata));
+
+          // write a last_submission session
+          const lastSubmissionInfo: SubmissionInfo = {
+            userId,
+            cluster,
+            appId,
+            appName: apps[appId].name,
+            account: request.account,
+            partition: request.partition,
+            qos: request.qos,
+            coreCount: request.coreCount,
+            maxTime: request.maxTime,
+            submitTime: new Date().toISOString(),
+            customAttributes: request.customAttributes,
+          };
+
+          await sftpWriteFile(sftp)(join(lastSubmissionDirectory, APP_LAST_SUBMISSION_INFO),
+            JSON.stringify(lastSubmissionInfo));
+
           return { code: "OK", jobId, sessionId: metadata.sessionId } as const;
         };
 
@@ -187,6 +212,24 @@ export const slurmAppOps = (cluster: string): AppOps => {
           return await submitAndWriteMetadata(script, { VNC_SESSION_INFO, VNCSERVER_BIN_PATH });
         }
 
+      });
+    },
+
+    getAppLastSubmission: async (requset, logger) => {
+      const { userId, appId } = requset;
+
+      return await sshConnect(host, userId, logger, async (ssh) => {
+
+        const sftp = await ssh.requestSFTP();
+        const file = join(portalConfig.appLastSubmissionDir, appId, APP_LAST_SUBMISSION_INFO);
+
+        if (!await sftpExists(sftp, file)) { return { code: "NOT_FOUND" }; }
+
+        const content = await sftpReadFile(sftp)(file);
+        logger.info("getAppLastSubmission to %s", content);
+        const data = JSON.parse(content.toString()) as SubmissionInfo;
+
+        return { code: "OK", lastSubmissionInfo: data };
       });
     },
 

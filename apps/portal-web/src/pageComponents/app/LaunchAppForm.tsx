@@ -87,20 +87,47 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
 
 
   const clusterInfoQuery = useAsync({
-    promiseFn: useCallback(async () => cluster
-      ? api.getClusterInfo({ query: { cluster:  cluster?.id } }) : undefined, [cluster]),
+    promiseFn: useCallback(async () => {
+      const [clusterInfoQuery, lastSubmissionInfo] = await Promise.all([
+        cluster ? api.getClusterInfo({ query: { cluster:  cluster?.id } }) : undefined,
+        cluster ? api.getAppLastSubmission({ query: { cluster: cluster?.id, appId } }) : undefined,
+      ]);
+      return {
+        clusterInfo: clusterInfoQuery?.clusterInfo,
+        lastSubmissionInfo: lastSubmissionInfo?.lastSubmissionInfo,
+      };
+    }, [cluster]),
     onResolve: (data) => {
       if (data) {
-        const partition = data.clusterInfo.slurm.partitions[0];
-        form.setFieldValue("partition", partition.name);
-        form.setFieldValue("qos", partition.qos?.[0]);
+
+        const lastSubmitPartition = data.lastSubmissionInfo?.partition;
+        const lastSubmitQos = data.lastSubmissionInfo?.qos;
+        const lastSubmitCoreCount = data.lastSubmissionInfo?.coreCount;
+        const clusterPartition = data.clusterInfo?.slurm.partitions[0];
+        const clusterPartitionCoreCount = clusterPartition?.cores;
+
+        // 如果存在上一次提交信息且上一次提交信息中的分区，qos，cpu核心数满足当前集群配置，则填入上一次提交信息中的值
+        const setPartitionFromSubmission = lastSubmitPartition &&
+          data.clusterInfo?.slurm.partitions.some((item) => { return item.name === lastSubmitPartition; });
+        const setLastSubmitQos = setPartitionFromSubmission &&
+          clusterPartition?.qos?.some((item) => { return item === lastSubmitQos; });
+        const setLastSubmitCoreCount = setPartitionFromSubmission &&
+          lastSubmitCoreCount && clusterPartitionCoreCount && clusterPartitionCoreCount >= lastSubmitCoreCount;
+
+        form.setFieldValue("partition", setPartitionFromSubmission ? lastSubmitPartition : clusterPartition);
+        form.setFieldValue("qos", setLastSubmitQos ? lastSubmitQos : clusterPartition?.qos?.[0]);
+        form.setFieldValue("coreCount", setLastSubmitCoreCount ? lastSubmitCoreCount : initialValues.coreCount);
+
+        // 如果存在上一次提交信息，填入上一次提交信息中的最长运行时间
+        form.setFieldValue("maxTime", data.lastSubmissionInfo ?
+          data.lastSubmissionInfo.maxTime : initialValues.maxTime);
       }
     },
   });
 
   const currentPartitionInfo = useMemo(() =>
     clusterInfoQuery.data
-      ? clusterInfoQuery.data.clusterInfo.slurm.partitions.find((x) => x.name === partition)
+      ? clusterInfoQuery.data.clusterInfo?.slurm.partitions.find((x) => x.name === partition)
       : undefined,
   [clusterInfoQuery.data, partition],
   );
@@ -110,6 +137,9 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
       form.setFieldValue("qos", currentPartitionInfo.qos?.[0]);
     }
   }, [currentPartitionInfo]);
+
+  // 如果存在上一次提交信息且上一次提交信息中的配置HTML表单与当前配置HTML表单内容相同，则填入上一次提交信息中的值
+  // const setLastSubmitCustomAttribute = clusterInfoQuery.data?.lastSubmissionInfo?.customAttributes &&
 
   const customFormItems = attributes.map((item, index) => {
 
@@ -168,7 +198,7 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
           loading={clusterInfoQuery.isLoading}
           disabled={!currentPartitionInfo}
           options={clusterInfoQuery.data
-            ? clusterInfoQuery.data.clusterInfo.slurm.partitions
+            ? clusterInfoQuery.data.clusterInfo?.slurm.partitions
               .map((x) => ({ label: x.name, value: x.name }))
             : []
           }

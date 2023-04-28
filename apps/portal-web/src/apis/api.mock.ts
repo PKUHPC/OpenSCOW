@@ -203,5 +203,20 @@ export const mockApi: MockApi<typeof api> = {
 
   submitJob: async () => ({ jobId: 10 }),
 
+  getAppLastSubmission: async () => ({
+    lastSubmissionInfo: {
+      userId: "last-submission",
+      cluster: "hpc1111",
+      appId: "vscode",
+      appName: "vscode",
+      account: "a_aaaaaa",
+      partition: "1",
+      qos: "1",
+      coreCount: 1,
+      maxTime: 10,
+      submitTime: "2021-12-22T16:16:02",
+      customAttributes: {},
+    },
+  }),
 };
 

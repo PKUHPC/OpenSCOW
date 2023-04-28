@@ -233,6 +233,26 @@ export const appServiceServer = plugin((server) => {
       return [{ apps: Object.keys(apps).map((x) => ({ id: x, name: apps[x].name })) }];
     },
 
+    getAppLastSubmission: async ({ request, logger }) => {
+
+      const { userId, cluster, appId } = request;
+      const clusterops = getClusterOps(cluster);
+
+      if (!clusterops) { throw clusterNotFound(cluster); }
+
+      const reply = await clusterops.app.getAppLastSubmission({
+        userId, appId,
+      }, logger);
+
+      if (reply.code === "NOT_FOUND") {
+        throw <ServiceError> { code: Status.NOT_FOUND, message: `Last Submission of ${appId} is not found.` };
+      }
+
+      return [{
+        lastSubmissionInfo: reply.lastSubmissionInfo,
+      }];
+    },
+
   });
 
 });
