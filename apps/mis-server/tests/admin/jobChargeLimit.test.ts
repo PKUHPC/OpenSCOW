@@ -13,6 +13,7 @@
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Server } from "@ddadaal/tsgrpc-server";
 import { ChannelCredentials } from "@grpc/grpc-js";
+import { Loaded } from "@mikro-orm/core";
 import { SqlEntityManager } from "@mikro-orm/mysql";
 import { Decimal, decimalToMoney } from "@scow/lib-decimal";
 import { JobChargeLimitServiceClient } from "@scow/protos/build/server/job_charge_limit";
@@ -27,7 +28,7 @@ let server: Server;
 let em: SqlEntityManager;
 let client: JobChargeLimitServiceClient;
 let data: InitialData;
-let ua: UserAccount;
+let ua: Loaded<UserAccount, "user" | "account">;
 
 beforeEach(async () => {
   server = await createServer();

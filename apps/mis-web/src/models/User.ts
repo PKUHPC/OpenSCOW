@@ -71,7 +71,7 @@ export type AccountAffiliation = Static<typeof AccountAffiliationSchema>;
 
 export const UserInfoSchema = Type.Object({
   tenant: Type.String(),
-  name: Type.String(),
+  name: Type.Optional(Type.String()),
   identityId: Type.String(),
   accountAffiliations: Type.Array(AccountAffiliationSchema),
   tenantRoles: Type.Array(Type.Enum(TenantRole)),

@@ -80,7 +80,10 @@ export const InstallConfigSchema = Type.Object({
     custom: Type.Optional(Type.Object({
       image: Type.String({ description: "认证系统镜像" }),
       ports: Type.Optional(Type.Array(Type.String(), { description: "端口映射" })),
-      environment: Type.Optional(Type.Array(Type.String(), { description: "环境变量" })),
+      environment: Type.Optional(Type.Union([
+        Type.Array(Type.String({ description: "格式：变量名=变量值" })),
+        Type.Record(Type.String(), Type.String(), { description: "格式：字符串: 字符串" }),
+      ], { description: "环境变量配置" })),
       volumes: Type.Optional(Type.Array(Type.String(), {
         description: "更多挂载卷。默认添加/etc/hosts:/etc/hosts和./config:/etc/scow",
       })),

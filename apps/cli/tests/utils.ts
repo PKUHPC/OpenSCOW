@@ -11,6 +11,8 @@
  */
 
 import { existsSync, promises as fsp } from "fs";
+import { writeFile } from "fs/promises";
+import { dump } from "js-yaml";
 import { join } from "path";
 
 export const configPath = "tests/install.yaml";
@@ -24,6 +26,16 @@ beforeEach(async () => {
 afterEach(async () => {
   await fsp.rm(testBaseFolder, { recursive: true });
 });
+
+export async function createInstallYaml(content: object) {
+  const yamlContent = dump(content);
+
+  const configPath = join(testBaseFolder, "install.yaml");
+
+  await writeFile(configPath, yamlContent);
+
+  return configPath;
+}
 
 export async function compareDirectories(dir1: string, dir2: string): Promise<boolean> {
   const files1 = await fsp.readdir(dir1);

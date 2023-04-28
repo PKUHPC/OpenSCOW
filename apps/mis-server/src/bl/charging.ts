@@ -11,8 +11,9 @@
  */
 
 import { Logger } from "@ddadaal/tsgrpc-server";
+import { Loaded } from "@mikro-orm/core";
 import { SqlEntityManager } from "@mikro-orm/mysql";
-import { Decimal } from "@scow/lib-decimal";
+import { Decimal, decimalToMoney } from "@scow/lib-decimal";
 import { blockAccount, blockUserInAccount, unblockAccount, unblockUserInAccount } from "src/bl/block";
 import { Account } from "src/entities/Account";
 import { ChargeRecord } from "src/entities/ChargeRecord";
@@ -20,6 +21,7 @@ import { PayRecord } from "src/entities/PayRecord";
 import { Tenant } from "src/entities/Tenant";
 import { UserAccount } from "src/entities/UserAccount";
 import { ClusterPlugin } from "src/plugins/clusters";
+import { callHook } from "src/plugins/hookClient";
 
 interface PayRequest {
   target: Tenant | Account;
@@ -53,6 +55,12 @@ export async function pay(
 
   const prevBalance = target.balance;
   target.balance = target.balance.plus(amount);
+
+  if (target instanceof Account) {
+    await callHook("accountPaid", { accountName: target.accountName, amount: decimalToMoney(amount) }, logger);
+  } else {
+    await callHook("tenantPaid", { tenantName: target.name, amount: decimalToMoney(amount) }, logger);
+  }
 
   if (target instanceof Account && prevBalance.lte(0) && target.balance.gt(0)) {
     logger.info("Unblock account %s", target.accountName);
@@ -102,7 +110,10 @@ export async function charge(
   };
 }
 
-export async function addJobCharge(ua: UserAccount, charge: Decimal, clusterPlugin: ClusterPlugin, logger: Logger) {
+export async function addJobCharge(
+  ua: Loaded<UserAccount, "user" | "account">,
+  charge: Decimal, clusterPlugin: ClusterPlugin, logger: Logger,
+) {
   if (ua.usedJobCharge && ua.jobChargeLimit) {
     ua.usedJobCharge = ua.usedJobCharge.plus(charge);
     if (ua.usedJobCharge.gt(ua.jobChargeLimit)) {
@@ -113,7 +124,10 @@ export async function addJobCharge(ua: UserAccount, charge: Decimal, clusterPlug
   }
 }
 
-export async function setJobCharge(ua: UserAccount, charge: Decimal, clusterPlugin: ClusterPlugin, logger: Logger) {
+export async function setJobCharge(
+  ua: Loaded<UserAccount, "user" | "account">,
+  charge: Decimal, clusterPlugin: ClusterPlugin, logger: Logger,
+) {
   ua.jobChargeLimit = charge;
   if (!ua.usedJobCharge) {
     ua.usedJobCharge = new Decimal(0);

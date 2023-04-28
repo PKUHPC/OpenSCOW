@@ -139,7 +139,7 @@ export default /* #__PURE__*/route<GetBillingItemsSchema>("GetBillingItemsSchema
     }
   }
 
-  result.historyItems = reply.historyItems.map(sourceToBillingItemType);
+  result.historyItems = reply.historyItems.filter((item) => item.tenantName === tenant).map(sourceToBillingItemType);
 
   return { 200: result };
 });

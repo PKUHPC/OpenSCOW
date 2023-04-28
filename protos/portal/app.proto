@@ -87,6 +87,7 @@ message AppSession {
   string data_path = 7;
   string running_time = 8;
   string time_limit = 9;
+  optional string reason = 10;
 }
 
 message ListAppSessionsResponse {

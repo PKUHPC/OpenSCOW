@@ -23,7 +23,8 @@
     "dotenv": "16.0.3",
     "death": "1.1.0",
     "https-proxy-agent": "5.0.1",
-    "node-fetch-commonjs": "3.2.4"
+    "node-fetch-commonjs": "3.2.4",
+    "@scow/config": "workspace:*"
   },
   "devDependencies": {
     "@types/yargs": "17.0.24",
