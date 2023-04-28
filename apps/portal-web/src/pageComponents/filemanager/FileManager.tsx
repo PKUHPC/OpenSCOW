@@ -13,7 +13,8 @@
 import {
   CloseOutlined,
   CopyOutlined,
-  DeleteOutlined, FileAddOutlined, FileOutlined, FolderAddOutlined,
+  DeleteOutlined, EyeInvisibleOutlined,
+  EyeOutlined, FileAddOutlined, FileOutlined, FolderAddOutlined,
   FolderOutlined, HomeOutlined, LeftOutlined, MacCommandOutlined, RightOutlined,
   ScissorOutlined, SnippetsOutlined, UploadOutlined, UpOutlined,
 } from "@ant-design/icons";
@@ -106,6 +107,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
   const [selectedKeys, setSelectedKeys] = useState<FileInfoKey[]>([]);
 
   const [operation, setOperation] = useState<Operation | undefined>(undefined);
+  const [showHiddenFile, setShowHiddenFile] = useState(false);
 
   const reload = async (signal?: AbortSignal) => {
     setLoading(true);
@@ -289,6 +291,10 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
     return files.filter((x) => keys.includes(fileInfoKey(x, path)));
   };
 
+  const onHiddenClick = () => {
+    setShowHiddenFile(!showHiddenFile);
+  };
+
   return (
     <div>
       <TitleText>
@@ -374,6 +380,12 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
           }
         </Space>
         <Space wrap>
+          <Button
+            onClick={onHiddenClick}
+            icon={showHiddenFile ? <EyeInvisibleOutlined /> : <EyeOutlined />}
+          >
+            {showHiddenFile ? "不显示" : "显示"}隐藏的项目
+          </Button>
           {
             publicConfig.ENABLE_SHELL ? (
               <Link href={`/shell/${cluster.id}${path}`} target="_blank" legacyBehavior>
@@ -400,7 +412,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
         </Space>
       </OperationBar>
       <Table
-        dataSource={files}
+        dataSource={files.filter((file) => showHiddenFile || !file.name.startsWith("."))}
         loading={loading}
         pagination={false}
         size="small"
