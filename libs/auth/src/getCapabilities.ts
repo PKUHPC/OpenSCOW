@@ -15,7 +15,6 @@ import { join } from "path";
 export interface Capabilities {
   createUser: boolean;
   changePassword: boolean;
-  validateName: boolean;
   getUser: boolean;
 }
 
