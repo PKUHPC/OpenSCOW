@@ -91,13 +91,19 @@ predefinedChargingTypes:
   # 出错时的消息
   # errorMessage: ""
 
-# 用户ID的规则
-# userIdPattern:
-  # 正则表达式
-  # regex: ""
+# 创建用户相关配置
+# createUser:
 
-  # 出错时的消息
-  # errorMessage: ""
+  # 当认证系统允许创建用户时，是否启用SCOW中创建用户的配置
+  # enabled: true
+
+  # 用户ID的规则
+  # userIdPattern:
+    # 正则表达式
+    # regex: ""
+
+    # 出错时的消息
+    # errorMessage: ""
 ```
 
 ## 启动服务
