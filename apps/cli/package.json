@@ -17,7 +17,8 @@
     "prompts": "2.4.2",
     "@sinclair/typebox": "0.28.5",
     "js-yaml": "4.1.0",
-    "debug": "4.3.4",
+    "pino": "8.11.0",
+    "pino-pretty": "10.0.0",
     "octokit": "2.0.14",
     "jszip": "3.10.1",
     "dotenv": "16.0.3",
@@ -30,7 +31,6 @@
     "@types/yargs": "17.0.24",
     "@types/prompts": "2.4.4",
     "@types/js-yaml": "4.0.5",
-    "@types/debug": "4.1.7",
     "@types/death": "1.1.2"
   },
   "author": "PKUHPC (https://github.com/PKUHPC)",

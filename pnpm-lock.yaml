@@ -194,9 +194,6 @@ importers:
       death:
         specifier: 1.1.0
         version: 1.1.0
-      debug:
-        specifier: 4.3.4
-        version: 4.3.4(supports-color@5.5.0)
       dotenv:
         specifier: 16.0.3
         version: 16.0.3
@@ -215,6 +212,12 @@ importers:
       octokit:
         specifier: 2.0.14
         version: 2.0.14
+      pino:
+        specifier: 8.11.0
+        version: 8.11.0
+      pino-pretty:
+        specifier: 10.0.0
+        version: 10.0.0
       pkg:
         specifier: 5.8.1
         version: 5.8.1
@@ -228,9 +231,6 @@ importers:
       '@types/death':
         specifier: 1.1.2
         version: 1.1.2
-      '@types/debug':
-        specifier: 4.1.7
-        version: 4.1.7
       '@types/js-yaml':
         specifier: 4.0.5
         version: 4.0.5
