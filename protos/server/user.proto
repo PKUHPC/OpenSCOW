@@ -296,6 +296,17 @@ message UnsetTenantRoleRequest {
 message UnsetTenantRoleResponse {
 }
 
+message CheckUserNameMatchRequest {
+  string user_id = 1;
+  string name = 2;
+}
+
+// NOT_FOUND: user is not found
+message CheckUserNameMatchResponse {
+  bool match = 1;
+}
+
+
 service UserService {
 
   rpc GetUsers(GetUsersRequest) returns (GetUsersResponse);
@@ -321,9 +332,10 @@ service UserService {
       returns (UnblockUserInAccountResponse);
   rpc SetAsAdmin(SetAsAdminRequest) returns (SetAsAdminResponse);
   rpc UnsetAdmin(UnsetAdminRequest) returns (UnsetAdminResponse);
-  rpc GetName(GetNameRequest) returns (GetNameResponse);
   rpc SetPlatformRole(SetPlatformRoleRequest) returns (SetPlatformRoleResponse);
   rpc UnsetPlatformRole(UnsetPlatformRoleRequest) returns (UnsetPlatformRoleResponse);
   rpc SetTenantRole(SetTenantRoleRequest) returns (SetTenantRoleResponse);
   rpc UnsetTenantRole(UnsetTenantRoleRequest) returns (UnsetTenantRoleResponse);
+
+  rpc CheckUserNameMatch (CheckUserNameMatchRequest) returns (CheckUserNameMatchResponse);
 }

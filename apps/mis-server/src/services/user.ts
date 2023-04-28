@@ -13,7 +13,7 @@
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
-import { createUser } from "@scow/lib-auth";
+import { createUser, getUser } from "@scow/lib-auth";
 import { decimalToMoney } from "@scow/lib-decimal";
 import {
   AccountStatus,
@@ -384,16 +384,31 @@ export const userServiceServer = plugin((server) => {
       return [{}];
     },
 
-    getName: async ({ request, em }) => {
-      const { userId, tenantName } = request;
+    checkUserNameMatch: async ({ request, em }) => {
+      const { userId, name } = request;
 
-      const user = await em.findOne(User, { userId, tenant: { name: tenantName } }, { fields: ["name"]});
+      // query auth
+      if (server.ext.capabilities.getUser) {
+        const authUser = await getUser(misConfig.authUrl, { identityId: userId }, server.logger);
 
-      if (!user) {
-        throw <ServiceError> { code: Status.NOT_FOUND, message:`User ${userId} is not found.` };
+        if (!authUser) {
+          throw <ServiceError> { code: Status.NOT_FOUND, message:`User ${userId} is not found from auth` };
+        }
+
+        if (authUser.name !== undefined) {
+          return [{ match: authUser.name === name }];
+        }
       }
 
-      return [{ name: user.name }];
+      // auth doesn't support getUser or user name is not set in auth
+      // check mis db
+      const user = await em.findOne(User, { userId }, { fields: ["name"]});
+
+      if (!user) {
+        throw <ServiceError> { code: Status.NOT_FOUND, message:`User ${userId} is not found in mis db` };
+      }
+
+      return [{ match: user.name === name }];
     },
 
     getUsers: async ({ request, em }) => {

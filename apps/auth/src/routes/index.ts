@@ -15,7 +15,6 @@ import { changePasswordRoute } from "src/routes/changePassword";
 import { createUserRoute } from "src/routes/createUser";
 import { getUserRoute } from "src/routes/getUser";
 import { logoutRoute } from "src/routes/logout";
-import { validateNameRoute } from "src/routes/validateName";
 
 import { authRoute } from "./auth";
 import { authCallbackRoute } from "./callback";
@@ -25,7 +24,6 @@ export const routes = [
   authRoute,
   authCallbackRoute,
   validateTokenRoute,
-  validateNameRoute,
   createUserRoute,
   changePasswordRoute,
   logoutRoute,
