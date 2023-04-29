@@ -1,12 +1,13 @@
 {
-  "name": "@scow/lib-hook",
+  "name": "@scow/lib-server",
   "version": "0.1.0",
-  "description": "",
+  "description": "Server libraries",
   "private": true,
   "main": "build/index.js",
   "scripts": {
     "dev": "tsc -p tsconfig.build.json && (concurrently \"tsc -p tsconfig.build.json -w\" \"tsc-alias -p tsconfig.build.json -w\")",
-    "build": "rimraf build && tsc -p tsconfig.build.json"
+    "build": "rimraf build && tsc -p tsconfig.build.json",
+    "test": "jest"
   },
   "files": [
     "build",
@@ -16,14 +17,14 @@
   "license": "Mulan PSL v2",
   "repository": "https://github.com/PKUHPC/SCOW",
   "dependencies": {
-    "@ddadaal/tsgrpc-client": "0.17.4",
-    "@grpc/grpc-js": "1.8.14",
-    "@scow/protos": "workspace:*",
-    "bignumber.js": "9.1.1"
+    "@ddadaal/tsgrpc-common": "0.2.2",
+    "@grpc/grpc-js": "1.8.14"
   },
   "devDependencies": {
+    "@ddadaal/tsgrpc-server": "0.19.1",
+    "@ddadaal/tsgrpc-client": "0.17.4",
     "@scow/config": "workspace:*",
-    "ts-log": "2.2.5"
+    "@scow/protos": "workspace:*"
   },
   "volta": {
     "extends": "../../package.json"
