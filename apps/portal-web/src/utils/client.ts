@@ -10,25 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { ChannelCredentials, ClientOptions } from "@grpc/grpc-js";
+import { getClientFn } from "@scow/lib-web/build/utils/api";
 import { runtimeConfig } from "src/utils/config";
 
-type ClientConstructor<TClient> =
-  new (address: string, credentials: ChannelCredentials, options?: ClientOptions) => TClient;
-
-export function getClient<TClient>(
-  ctor: ClientConstructor<TClient>,
-): TClient {
-  return new ctor(
-    runtimeConfig.SERVER_URL,
-    ChannelCredentials.createInsecure(),
-    {
-      callInvocationTransformer: (props) => {
-        if (runtimeConfig.SCOW_API_AUTH_TOKEN) {
-          props.metadata.add("authorization", `Bearer ${runtimeConfig.SCOW_API_AUTH_TOKEN}`);
-        }
-        return props;
-      },
-    },
-  );
-}
+export const getClient = getClientFn(runtimeConfig);

@@ -87,6 +87,7 @@ const buildRuntimeConfig = async (phase, basePath) => {
     UI_CONFIG: uiConfig,
     DEFAULT_PRIMARY_COLOR,
     SERVER_URL: config.SERVER_URL,
+    SCOW_API_AUTH_TOKEN: commonConfig.scowApi?.auth?.token,
   };
 
   const userIdPattern = misConfig.createUser.userIdPattern ?? misConfig.userIdPattern;
