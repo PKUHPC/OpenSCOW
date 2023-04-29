@@ -5,19 +5,6 @@ on:
     types: [closed]
 
 jobs:
-  delete-scow-deployment:
-    name: Delete scow-deployment PR branch
-    runs-on: ubuntu-latest
-    steps:
-      - name: Delete scow-deployment PR branch
-        uses: dawidd6/action-delete-branch@v3
-        with:
-          github_token: ${{ secrets.SCOW_DEPLOYMENT_PAT }}
-          owner: PKUHPC
-          repository: scow-deployment
-          branches: ${{ github.event.number }}/merge
-          soft_fail: true
-
   delete-scow-vagrant:
     name: Delete scow-vagrant PR branch
     runs-on: ubuntu-latest
