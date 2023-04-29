@@ -23,6 +23,7 @@ import { displayIdToPort } from "src/clusterops/slurm/bl/port";
 import { getAppConfigs } from "src/config/apps";
 import { portalConfig } from "src/config/portal";
 import { splitSbatchArgs } from "src/utils/app";
+import { isPortReachable } from "src/utils/isPortReachable";
 import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
 import { parseDisplayId, refreshPassword, VNCSERVER_BIN_PATH } from "src/utils/turbovnc";
 
@@ -245,8 +246,7 @@ export const slurmAppOps = (cluster: string): AppOps => {
                 const serverSessionInfo = JSON.parse(content.toString()) as ServerSessionInfoData;
                 const { HOST, PORT } = serverSessionInfo;
 
-                const isPortReachable = await import("is-port-reachable");
-                ready = await isPortReachable.default(PORT, { host: HOST });
+                ready = await isPortReachable(PORT, HOST);
                 if (ready) {
                   logger.info(`${HOST}:${PORT} for web app ${app.name} is reachable.`);
                 } else {
@@ -264,10 +264,9 @@ export const slurmAppOps = (cluster: string): AppOps => {
                 if (await sftpExists(sftp, outputFilePath)) {
                   const content = (await sftpReadFile(sftp)(outputFilePath)).toString();
                   try {
-                    const isPortReachable = await import("is-port-reachable");
                     const displayId = parseDisplayId(content);
                     const port = displayIdToPort(displayId!);
-                    ready = await isPortReachable.default(port, { host: host });
+                    ready = await isPortReachable(port, host);
                     if (ready) {
                       logger.info(`${host}:{port} for vnc app ${app.name} is reachable.`);
                     } else {
