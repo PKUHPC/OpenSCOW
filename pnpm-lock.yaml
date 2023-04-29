@@ -406,7 +406,7 @@ importers:
         version: 2.1.35
       next:
         specifier: 13.3.1
-        version: 13.3.1(react-dom@18.2.0)(react@18.2.0)
+        version: 13.3.1(@babel/core@7.20.2)(react-dom@18.2.0)(react@18.2.0)
       next-compose-plugins:
         specifier: 2.2.1
         version: 2.2.1
@@ -648,7 +648,7 @@ importers:
         version: 2.1.35
       next:
         specifier: 13.3.1
-        version: 13.3.1(react-dom@18.2.0)(react@18.2.0)
+        version: 13.3.1(@babel/core@7.20.2)(react-dom@18.2.0)(react@18.2.0)
       next-compose-plugins:
         specifier: 2.2.1
         version: 2.2.1
@@ -917,12 +917,18 @@ importers:
         specifier: 1.8.14
         version: 1.8.14
     devDependencies:
+      '@ddadaal/tsgrpc-client':
+        specifier: 0.17.4
+        version: 0.17.4(@grpc/grpc-js@1.8.14)
       '@ddadaal/tsgrpc-server':
         specifier: 0.19.1
         version: 0.19.1(@grpc/grpc-js@1.8.14)
       '@scow/config':
         specifier: workspace:*
         version: link:../config
+      '@scow/protos':
+        specifier: workspace:*
+        version: link:../protos
 
   libs/slurm:
     dependencies:
@@ -3187,7 +3193,7 @@ packages:
       ajv-formats: 2.1.1(ajv@8.11.2)
       ajv-formats-draft2019: 1.6.1(ajv@8.11.2)
       fast-json-stringify: 4.1.0
-      next: 13.3.1(react-dom@18.2.0)(react@18.2.0)
+      next: 13.3.1(@babel/core@7.20.2)(react-dom@18.2.0)(react@18.2.0)
       tslib: 2.4.0
     dev: false
 
@@ -4336,7 +4342,7 @@ packages:
     dependencies:
       '@jridgewell/trace-mapping': 0.3.17
       callsites: 3.1.0
-      graceful-fs: 4.2.10
+      graceful-fs: 4.2.11
     dev: true
 
   /@jest/test-result@29.5.0:
@@ -4354,7 +4360,7 @@ packages:
     engines: {node: ^14.15.0 || ^16.10.0 || >=18.0.0}
     dependencies:
       '@jest/test-result': 29.5.0
-      graceful-fs: 4.2.10
+      graceful-fs: 4.2.11
       jest-haste-map: 29.5.0
       slash: 3.0.0
     dev: true
@@ -7197,7 +7203,7 @@ packages:
   /axios@0.27.2:
     resolution: {integrity: sha512-t+yRIyySRTp/wua5xEr+z1q60QmLq8ABsS5O9Me1AsE5dfKqgnCFzwiCZZ/cGNd1lq4/7akDWMxdhVlucjmnOQ==}
     dependencies:
-      follow-redirects: 1.15.2
+      follow-redirects: 1.15.2(debug@4.3.4)
       form-data: 4.0.0
     transitivePeerDependencies:
       - debug
@@ -7215,7 +7221,7 @@ packages:
       babel-plugin-istanbul: 6.1.1
       babel-preset-jest: 29.5.0(@babel/core@7.20.2)
       chalk: 4.1.2
-      graceful-fs: 4.2.10
+      graceful-fs: 4.2.11
       slash: 3.0.0
     transitivePeerDependencies:
       - supports-color
@@ -8110,7 +8116,7 @@ packages:
     engines: {node: '>=8'}
     dependencies:
       dot-prop: 5.3.0
-      graceful-fs: 4.2.10
+      graceful-fs: 4.2.11
       make-dir: 3.1.0
       unique-string: 2.0.0
       write-file-atomic: 3.0.3
@@ -8641,18 +8647,6 @@ packages:
       ms: 2.0.0
     dev: false
 
-  /debug@3.2.7:
-    resolution: {integrity: sha512-CFjzYYAi4ThfiQvizrFQevTTXHtnCqWfe7x1AhgEscTz6ZbLbfoLRLPugTQyBth6f8ZERVUSyWHFD/7Wu4t1XQ==}
-    peerDependencies:
-      supports-color: '*'
-    peerDependenciesMeta:
-      supports-color:
-        optional: true
-    dependencies:
-      ms: 2.1.3
-    dev: false
-    optional: true
-
   /debug@3.2.7(supports-color@5.5.0):
     resolution: {integrity: sha512-CFjzYYAi4ThfiQvizrFQevTTXHtnCqWfe7x1AhgEscTz6ZbLbfoLRLPugTQyBth6f8ZERVUSyWHFD/7Wu4t1XQ==}
     peerDependencies:
@@ -8663,7 +8657,6 @@ packages:
     dependencies:
       ms: 2.1.3
       supports-color: 5.5.0
-    dev: true
 
   /debug@4.3.4(supports-color@5.5.0):
     resolution: {integrity: sha512-PRWFHuSU3eDtQJPvnNY7Jcket1j0t5OuOsFzPPzsekD52Zl8qUfFIPEiswXqIvHWGVHOgX+7G/vCNNhehwxfkQ==}
@@ -8793,7 +8786,7 @@ packages:
     engines: {node: '>=10'}
     dependencies:
       globby: 11.1.0
-      graceful-fs: 4.2.10
+      graceful-fs: 4.2.11
       is-glob: 4.0.3
       is-path-cwd: 2.2.0
       is-path-inside: 3.0.3
@@ -10041,16 +10034,6 @@ packages:
       - encoding
     dev: false
 
-  /follow-redirects@1.15.2:
-    resolution: {integrity: sha512-VQLG33o04KaQ8uYi2tVNbdrWp1QWxNNea+nmIB4EVM28v0hmP17z7aG1+wAkNzVq4KeXTq3221ye5qTJP91JwA==}
-    engines: {node: '>=4.0'}
-    peerDependencies:
-      debug: '*'
-    peerDependenciesMeta:
-      debug:
-        optional: true
-    dev: false
-
   /follow-redirects@1.15.2(debug@4.3.4):
     resolution: {integrity: sha512-VQLG33o04KaQ8uYi2tVNbdrWp1QWxNNea+nmIB4EVM28v0hmP17z7aG1+wAkNzVq4KeXTq3221ye5qTJP91JwA==}
     engines: {node: '>=4.0'}
@@ -10147,7 +10130,7 @@ packages:
     resolution: {integrity: sha512-oRXApq54ETRj4eMiFzGnHWGy+zo5raudjuxN0b8H7s/RU2oW0Wvsx9O0ACRN/kRq9E8Vu/ReskGB5o3ji+FzHQ==}
     engines: {node: '>=12'}
     dependencies:
-      graceful-fs: 4.2.10
+      graceful-fs: 4.2.11
       jsonfile: 6.1.0
       universalify: 2.0.0
     dev: false
@@ -10853,7 +10836,7 @@ packages:
     engines: {node: '>=8.0.0'}
     dependencies:
       eventemitter3: 4.0.7
-      follow-redirects: 1.15.2
+      follow-redirects: 1.15.2(debug@4.3.4)
       requires-port: 1.0.0
     transitivePeerDependencies:
       - debug
@@ -12092,7 +12075,7 @@ packages:
   /jsonfile@4.0.0:
     resolution: {integrity: sha512-m6F1R3z8jjlf2imQHS2Qez5sjKWQzbuuhuJ/FKYFRZvPE3PuHcSMVZzfsLhGVOkfd20obL5SWEBew5ShlquNxg==}
     optionalDependencies:
-      graceful-fs: 4.2.10
+      graceful-fs: 4.2.11
     dev: true
 
   /jsonfile@6.1.0:
@@ -12100,7 +12083,7 @@ packages:
     dependencies:
       universalify: 2.0.0
     optionalDependencies:
-      graceful-fs: 4.2.10
+      graceful-fs: 4.2.11
 
   /jsonwebtoken@9.0.0:
     resolution: {integrity: sha512-tuGfYXxkQGDPnLJ7SibiQgVgeDgfbPq2k2ICcbgqW8WxWLBAxKQM/ZCu/IT8SOSwmaYl4dpTFCW5xZv7YbbWUw==}
@@ -12322,7 +12305,7 @@ packages:
     resolution: {integrity: sha512-OfCBkGEw4nN6JLtgRidPX6QxjBQGQf72q3si2uvqyFEMbycSFFHwAZeXx6cJgFM9wmLrf9zBwCP3Ivqa+LLZPw==}
     engines: {node: '>=6'}
     dependencies:
-      graceful-fs: 4.2.10
+      graceful-fs: 4.2.11
       js-yaml: 3.14.1
       pify: 4.0.1
       strip-bom: 3.0.0
@@ -13312,7 +13295,7 @@ packages:
     hasBin: true
     requiresBuild: true
     dependencies:
-      debug: 3.2.7
+      debug: 3.2.7(supports-color@5.5.0)
       iconv-lite: 0.6.3
       sax: 1.2.4
     transitivePeerDependencies:
@@ -13384,51 +13367,6 @@ packages:
     transitivePeerDependencies:
       - '@babel/core'
       - babel-plugin-macros
-    dev: true
-
-  /next@13.3.1(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-eByWRxPzKHs2oQz1yE41LX35umhz86ZSZ+mYyXBqn2IBi2hyUqxBA88avywdr4uyH+hCJczegGsDGWbzQA5Rqw==}
-    engines: {node: '>=14.18.0'}
-    hasBin: true
-    peerDependencies:
-      '@opentelemetry/api': ^1.1.0
-      fibers: '>= 3.1.0'
-      node-sass: ^6.0.0 || ^7.0.0
-      react: ^18.2.0
-      react-dom: ^18.2.0
-      sass: ^1.3.0
-    peerDependenciesMeta:
-      '@opentelemetry/api':
-        optional: true
-      fibers:
-        optional: true
-      node-sass:
-        optional: true
-      sass:
-        optional: true
-    dependencies:
-      '@next/env': 13.3.1
-      '@swc/helpers': 0.5.0
-      busboy: 1.6.0
-      caniuse-lite: 1.0.30001431
-      postcss: 8.4.14
-      react: 18.2.0
-      react-dom: 18.2.0(react@18.2.0)
-      styled-jsx: 5.1.1(react@18.2.0)
-    optionalDependencies:
-      '@next/swc-darwin-arm64': 13.3.1
-      '@next/swc-darwin-x64': 13.3.1
-      '@next/swc-linux-arm64-gnu': 13.3.1
-      '@next/swc-linux-arm64-musl': 13.3.1
-      '@next/swc-linux-x64-gnu': 13.3.1
-      '@next/swc-linux-x64-musl': 13.3.1
-      '@next/swc-win32-arm64-msvc': 13.3.1
-      '@next/swc-win32-ia32-msvc': 13.3.1
-      '@next/swc-win32-x64-msvc': 13.3.1
-    transitivePeerDependencies:
-      - '@babel/core'
-      - babel-plugin-macros
-    dev: false
 
   /no-case@3.0.4:
     resolution: {integrity: sha512-fgAN3jGAh+RoxUGZHTSOLJIqUc2wmoBwGR4tbpNAKmmovFoWq0OdRkb0VkldReO2a2iBT/OEulG9XSUc10r3zg==}
@@ -17141,24 +17079,6 @@ packages:
       '@babel/core': 7.20.2
       client-only: 0.0.1
       react: 18.2.0
-    dev: true
-
-  /styled-jsx@5.1.1(react@18.2.0):
-    resolution: {integrity: sha512-pW7uC1l4mBZ8ugbiZrcIsiIvVx1UmTfw7UkC3Um2tmfUq9Bhk8IiyEIPl6F8agHgjzku6j0xQEZbfA5uSgSaCw==}
-    engines: {node: '>= 12.0.0'}
-    peerDependencies:
-      '@babel/core': '*'
-      babel-plugin-macros: '*'
-      react: '>= 16.8.0 || 17.x.x || ^18.0.0-0'
-    peerDependenciesMeta:
-      '@babel/core':
-        optional: true
-      babel-plugin-macros:
-        optional: true
-    dependencies:
-      client-only: 0.0.1
-      react: 18.2.0
-    dev: false
 
   /stylehacks@5.1.1(postcss@8.4.23):
     resolution: {integrity: sha512-sBpcd5Hx7G6seo7b1LkpttvTz7ikD0LlH5RmdcBNb6fFR0Fl7LQwHDFr300q4cwUqi+IYrFGmsIHieMBfnN/Bw==}
@@ -18476,7 +18396,7 @@ packages:
       connect-history-api-fallback: 2.0.0
       default-gateway: 6.0.3
       express: 4.18.2
-      graceful-fs: 4.2.10
+      graceful-fs: 4.2.11
       html-entities: 2.3.3
       http-proxy-middleware: 2.0.6(@types/express@4.17.14)
       ipaddr.js: 2.0.1
