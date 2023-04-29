@@ -1,8 +1,0 @@
-{
-  "label": "SCOW API",
-  "position": 3,
-  "link": {
-    "type": "generated-index",
-    "description": "介绍如何将您的代码与SCOW集成"
-  }
-}

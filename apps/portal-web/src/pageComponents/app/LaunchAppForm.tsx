@@ -126,6 +126,7 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
             placeholder={placeholder}
           />
         );
+    const initialValue = item.type === "SELECT" ? (item.defaultValue ?? item.select[0]) : item.defaultValue;
 
     return (
       <Form.Item
@@ -133,7 +134,7 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
         label={item.label}
         name={item.name}
         rules={rules}
-        initialValue={item.defaultValue}
+        initialValue={initialValue}
       >
         {inputItem}
       </Form.Item>

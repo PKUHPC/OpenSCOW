@@ -18,7 +18,7 @@ import fetch from "node-fetch-commonjs";
 import { Octokit } from "octokit";
 import prompt from "prompts";
 import { createProxyAgent, proxyUrl } from "src/config/proxy";
-import { debug, log } from "src/log";
+import { logger } from "src/log";
 import { pipeline } from "stream/promises";
 
 interface Options {
@@ -68,7 +68,7 @@ export const updateCli = async (options: Options) => {
 
   const outputPath = options.downloadPath ? options.downloadPath : process.execPath;
 
-  debug("Output path is %s", outputPath);
+  logger.debug("Output path is %s", outputPath);
 
   if (options.downloadPath && existsSync(outputPath)) {
     const answer = await prompt({
@@ -77,7 +77,7 @@ export const updateCli = async (options: Options) => {
       message: `Output path ${outputPath} already exists. Continue?`,
     });
     if (!answer.continue) {
-      debug("Selected no.");
+      logger.debug("Selected no.");
       return;
     }
   }
@@ -85,7 +85,7 @@ export const updateCli = async (options: Options) => {
   const agent = proxyUrl ? createProxyAgent(proxyUrl) : undefined;
 
   if (proxyUrl) {
-    log("Using proxy %s", proxyUrl);
+    logger.info("Using proxy %s", proxyUrl);
   }
 
   const arch = getArch();
@@ -98,7 +98,7 @@ export const updateCli = async (options: Options) => {
 
     if (!GITHUB_TOKEN) {
 
-      log(`
+      logger.info(`
 Download CLI from PR or branch requires GitHub authentication,
 and the authenticated user/token must have actions scope.
 See: https://docs.github.com/en/rest/actions/artifacts?apiVersion=2022-11-28#download-an-artifact
@@ -110,21 +110,21 @@ Please provide your GitHub personal access token via GITHUB_TOKEN in env or .env
     }
 
     const user = await octokit.rest.users.getAuthenticated();
-    debug("GitHub authenticated %s via GITHUB_TOKEN env.", user.data.login);
+    logger.debug("GitHub authenticated %s via GITHUB_TOKEN env.", user.data.login);
 
     const branch = options.branch ? options.branch : await getBranchName(options.pr!, octokit);
-    log("Branch: %s", branch);
+    logger.info("Branch: %s", branch);
 
-    debug("Download cli for PR %s", options.pr);
+    logger.debug("Download cli for PR %s", options.pr);
 
     const runs = await octokit.rest.actions.listWorkflowRuns({ owner, repo, workflow_id, branch });
 
     const latestRun = runs.data.workflow_runs[0];
 
-    debug("Latest run: %s. Run URL: %s", String(latestRun.id), latestRun.html_url);
+    logger.debug("Latest run: %s. Run URL: %s", String(latestRun.id), latestRun.html_url);
 
 
-    debug("Architecture: %s", arch);
+    logger.debug("Architecture: %s", arch);
 
     const artifacts = await octokit.rest.actions.listWorkflowRunArtifacts({ owner, repo, run_id: latestRun.id });
 
@@ -136,9 +136,9 @@ Please provide your GitHub personal access token via GITHUB_TOKEN in env or .env
       throw new Error("Cannot find artifact for architecture " + arch);
     }
 
-    log("Artifact: %s. Download URL: %s", artifact.name, artifact.archive_download_url);
+    logger.info("Artifact: %s. Download URL: %s", artifact.name, artifact.archive_download_url);
 
-    log("Downloading...");
+    logger.info("Downloading...");
     const content = await octokit.rest.actions.downloadArtifact({
       owner, repo, artifact_id: artifact.id, archive_format: "zip",
     });
@@ -147,7 +147,7 @@ Please provide your GitHub personal access token via GITHUB_TOKEN in env or .env
       throw new Error("Downloaded content is not ArrayBuffer");
     }
 
-    log("Download completed. Unzip");
+    logger.info("Download completed. Unzip");
     const binaryName = "cli-" + arch;
 
     const jszip = new JSZip();
@@ -163,9 +163,9 @@ Please provide your GitHub personal access token via GITHUB_TOKEN in env or .env
     await chmod(outputPath, 0o755);
 
     if (options.downloadPath) {
-      log("CLI of specified PR or branch has been downloaded to %s", outputPath);
+      logger.info("CLI of specified PR or branch has been downloaded to %s", outputPath);
     } else {
-      log("CLI has been updated.");
+      logger.info("CLI has been updated.");
     }
 
     return;
@@ -174,12 +174,12 @@ Please provide your GitHub personal access token via GITHUB_TOKEN in env or .env
 
   const release = await (async function() {
     if (!options.release) {
-      log("Neither --pr, --release nor --branch is specified. Downloading latest release.");
+      logger.info("Neither --pr, --release nor --branch is specified. Downloading latest release.");
       const resp = await octokit.rest.repos.getLatestRelease({ owner, repo });
-      log("Latest release is %s.", resp.data.tag_name);
+      logger.info("Latest release is %s.", resp.data.tag_name);
       return resp.data;
     } else {
-      log("Downloading release %s", options.release);
+      logger.info("Downloading release %s", options.release);
       const resp = await octokit.rest.repos.getReleaseByTag({ owner, repo, tag: options.release });
       return resp.data;
     }
@@ -193,16 +193,16 @@ Please provide your GitHub personal access token via GITHUB_TOKEN in env or .env
     throw new Error("Cannot find asset for architecture " + arch);
   }
 
-  log("Asset: %s. Download URL: %s", asset.name, asset.browser_download_url);
+  logger.info("Asset: %s. Download URL: %s", asset.name, asset.browser_download_url);
 
-  log("Downloading...");
+  logger.info("Downloading...");
   const content = await download(asset.browser_download_url, { agent });
 
   await unlink(outputPath);
   await fs.promises.writeFile(outputPath, Buffer.from(content));
   await chmod(outputPath, 0o755);
 
-  log("Downloaded release %s", release.name ?? "");
+  logger.info("Downloaded release %s", release.name ?? "");
 };
 
 

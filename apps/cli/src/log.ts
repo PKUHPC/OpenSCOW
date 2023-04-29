@@ -10,8 +10,20 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import debugPkg from "debug";
+import pino from "pino";
+import pretty from "pino-pretty";
+import { config } from "src/config/env";
 
-export const debug = debugPkg("scow:cli");
-export const log = (msg: string, ...args: string[]) => console.log(msg, ...args);
+const logPretty = pretty({
+  include: [
+    "level",
+    config.LOG_SHOW_TIMESTAMP ? "time" : undefined,
+    "msg",
+  ].filter((x) => x).join(","),
+});
+
+export const logger = pino({
+  level: config.LOG_LEVEL,
+}, logPretty);
+
 

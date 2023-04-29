@@ -70,7 +70,6 @@ export const createSshAuthProvider = (f: FastifyInstance) => {
         };
       });
     },
-    validateName: undefined,
     createUser: undefined,
     changePassword: undefined,
   } satisfies AuthProvider;

@@ -281,6 +281,11 @@ export const slurmAppOps = (cluster: string): AppOps => {
             }
           }
 
+          const terminatedStates = ["BOOT_FAIL", "COMPLETED", "DEADLINE", "FAILED",
+            "NODE_FAIL", "PREEMPTED", "SPECIAL_EXIT", "TIMEOUT"];
+          const isPendingOrTerminated = runningJobInfo?.state === "PENDING"
+            || terminatedStates.includes(runningJobInfo?.state);
+
           sessions.push({
             jobId: sessionMetadata.jobId,
             appId: sessionMetadata.appId,
@@ -291,6 +296,7 @@ export const slurmAppOps = (cluster: string): AppOps => {
             dataPath: await sftpRealPath(sftp)(jobDir),
             runningTime: runningJobInfo?.runningTime ?? "",
             timeLimit: runningJobInfo?.timeLimit ?? "",
+            reason: isPendingOrTerminated ? (runningJobInfo?.nodesOrReason ?? "") : undefined,
           });
 
         }));

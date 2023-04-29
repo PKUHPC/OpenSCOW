@@ -126,6 +126,7 @@ GITHUB_TOKEN={token}
 CLI需要访问网络的功能（例如更新scow-cli）可以设置HTTP代理。您可以通过设置`HTTPS_PROXY`, `https_proxy`, `HTTP_PROXY`, `http_proxy`环境变量来设置代理。如果多个环境变量同时存在，则使用优先级为上面列出来的顺序。
 
 ```bash
+# 环境变量也可以写入.env中
 export HTTPS_PROXY=http://localhost:1080
 ./cli update
 ```
@@ -133,5 +134,5 @@ export HTTPS_PROXY=http://localhost:1080
 # 打印调试日志
 
 ```bash
-DEBUG="scow:cli" ./cli
+LOG_LEVEL="debug" ./cli
 ```
