@@ -27,6 +27,7 @@
     "@scow/lib-config": "workspace:*",
     "@scow/lib-slurm": "workspace:*",
     "@scow/lib-ssh": "workspace:*",
+    "@scow/lib-server": "workspace:*",
     "@scow/protos": "workspace:*",
     "@scow/utils": "workspace:*",
     "@sinclair/typebox": "0.28.5",

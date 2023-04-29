@@ -42,9 +42,9 @@ export interface ServerRuntimeConfig {
   HOME_TITLES: {[hostname: string]: string };
 
   SUBMIT_JOB_WORKING_DIR: string;
+
+  SCOW_API_AUTH_TOKEN?: string;
 }
-
-
 
 export interface PublicRuntimeConfig {
   ENABLE_CHANGE_PASSWORD: boolean;

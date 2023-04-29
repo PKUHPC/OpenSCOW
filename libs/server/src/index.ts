@@ -10,16 +10,4 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Plugin } from "@ddadaal/tsgrpc-server";
-import { apiAuthPlugin } from "@scow/lib-server";
-import { commonConfig } from "src/config/common";
-
-declare module "@ddadaal/tsgrpc-server" {
-}
-
-export const plugins = [
-] as Plugin[];
-
-if (commonConfig.scowApi) {
-  plugins.push(apiAuthPlugin(commonConfig.scowApi));
-}
+export * from "./apiAuthPlugin";

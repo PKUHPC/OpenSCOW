@@ -18,7 +18,9 @@
 import type { MikroORM } from "@mikro-orm/core";
 import type { MySqlDriver, SqlEntityManager } from "@mikro-orm/mysql";
 import { Capabilities } from "@scow/lib-auth";
-import { authPlugin } from "src/plugins/auth";
+import { apiAuthPlugin } from "@scow/lib-server";
+import { commonConfig } from "src/config/common";
+import { authServicePlugin } from "src/plugins/authService";
 import { ClusterPlugin, clustersPlugin } from "src/plugins/clusters";
 import { FetchPlugin, fetchPlugin } from "src/plugins/fetch";
 import { ormPlugin } from "src/plugins/orm";
@@ -40,5 +42,9 @@ export const plugins = [
   clustersPlugin,
   pricePlugin,
   fetchPlugin,
-  authPlugin,
+  authServicePlugin,
 ];
+
+if (commonConfig.scowApi) {
+  plugins.push(apiAuthPlugin(commonConfig.scowApi));
+}

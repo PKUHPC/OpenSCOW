@@ -36,6 +36,7 @@
     "@scow/lib-slurm": "workspace:*",
     "@scow/lib-ssh": "workspace:*",
     "@scow/lib-config": "workspace:*",
+    "@scow/lib-server": "workspace:*",
     "@sinclair/typebox": "0.28.5",
     "@scow/lib-auth": "workspace:*",
     "@scow/protos": "workspace:*",
