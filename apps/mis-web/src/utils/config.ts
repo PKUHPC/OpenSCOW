@@ -26,6 +26,8 @@ export interface ServerRuntimeConfig {
 
   CLUSTERS_CONFIG: {[clusterId: string]: ClusterConfigSchema};
   CLUSTER_TEXTS_CONFIG: ClusterTextsConfigSchema;
+
+  SCOW_API_AUTH_TOKEN?: string;
 }
 
 export interface PublicRuntimeConfig {

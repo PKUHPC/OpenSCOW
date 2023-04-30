@@ -14,6 +14,12 @@ import { GetConfigFn, getConfigFromFile } from "@scow/lib-config";
 import { Static, Type } from "@sinclair/typebox";
 import { DEFAULT_CONFIG_BASE_PATH } from "src/constants";
 
+export const ScowApiConfigSchema = Type.Object({
+  auth: Type.Optional(Type.Object({
+    token: Type.Optional(Type.String({ description: "允许使用Token认证，token的值" })),
+  }, { description: "SCOW API认证配置" })),
+});
+
 export const ScowHookConfigSchema = Type.Object({
   enabled: Type.Boolean({ description: "是否启用SCOW Hook", default: true }),
   url: Type.String({ description: "SCOW Hook的URL" }),
@@ -32,11 +38,13 @@ export const CommonConfigSchema = Type.Object({
   }, { description: "创建用户、修改密码时的密码的规则" }),
 
   scowHook: Type.Optional(ScowHookConfigSchema),
+  scowApi: Type.Optional(ScowApiConfigSchema),
 });
 
 const COMMON_CONFIG_NAME = "common";
 
 export type ScowHookConfigSchema = Static<typeof ScowHookConfigSchema>;
+export type ScowApiConfigSchema = Static<typeof ScowApiConfigSchema>;
 export type CommonConfigSchema = Static<typeof CommonConfigSchema>;
 
 export const getCommonConfig: GetConfigFn<CommonConfigSchema> = (baseConfigPath) =>
