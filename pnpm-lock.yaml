@@ -979,6 +979,9 @@ importers:
       mime-types:
         specifier: 2.1.35
         version: registry.npmmirror.com/mime-types@2.1.35
+      nookies:
+        specifier: 2.5.2
+        version: 2.5.2
       zod:
         specifier: 3.21.4
         version: 3.21.4
