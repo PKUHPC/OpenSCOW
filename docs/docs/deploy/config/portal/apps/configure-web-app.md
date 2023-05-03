@@ -13,9 +13,9 @@ title: 配置Web类应用
 
 下面以使用[coder/code-server](https://github.com/coder/code-server)启动VSCode的配置为例来讲解如何配置一个服务器类应用。
 
-创建`config/apps`目录，在里面创建`vscode.yml`文件，其内容如下：
+创建`config/apps`目录，在里面创建`vscode/config.yml`或`vscode.yml`文件，其内容如下：
 
-```yaml title="config/apps/vscode.yml"
+```yaml title="config/apps/vscode/config.yml"
 # 这个应用的ID
 id: vscode
 
