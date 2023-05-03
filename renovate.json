@@ -7,8 +7,9 @@
     "dev/ldap/Dockerfile",
     ".devcontainer/docker-compose.devcontainer.yml"
   ],
+  "timezone": "Asia/Shanghai",
   "schedule": [
-    "every weekend"
+    "every monday"
   ],
   "packageRules": [
     {
