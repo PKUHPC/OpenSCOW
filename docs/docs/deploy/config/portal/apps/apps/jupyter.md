@@ -13,9 +13,9 @@ title: Jupyter
 
 ## 配置文件
 
-创建`config/apps`目录，在里面创建`jupyter.yml`文件，其内容如下：
+创建`config/apps`目录，在里面创建`jupyter/config.yml`文件，其内容如下：
 
-```yaml title="config/apps/jupyter.yml"
+```yaml title="config/apps/jupyter/config.yml"
 # 这个应用的ID
 id: jupyter
 

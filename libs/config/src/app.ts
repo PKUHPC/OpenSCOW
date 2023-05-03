@@ -88,9 +88,14 @@ export type AppConfigSchema = Static<typeof AppConfigSchema>;
 
 export const APP_CONFIG_BASE_PATH = "apps";
 
-export const getAppConfigs: GetConfigFn<Record<string, AppConfigSchema>> = (baseConfigPath) => {
+export const getAppConfigs: GetConfigFn<Record<string, AppConfigSchema>> = (baseConfigPath, logger) => {
 
-  const appsConfig = getDirConfig(AppConfigSchema, APP_CONFIG_BASE_PATH, baseConfigPath ?? DEFAULT_CONFIG_BASE_PATH);
+  const appsConfig = getDirConfig(
+    AppConfigSchema,
+    APP_CONFIG_BASE_PATH,
+    baseConfigPath ?? DEFAULT_CONFIG_BASE_PATH,
+    logger,
+  );
 
   Object.entries(appsConfig).forEach(([id, config]) => {
     if (!config[config.type]) {

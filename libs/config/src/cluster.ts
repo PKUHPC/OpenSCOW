@@ -47,10 +47,14 @@ export const ClusterConfigSchema = Type.Object({
 export type ClusterConfigSchema = Static<typeof ClusterConfigSchema>;
 
 
-export const getClusterConfigs: GetConfigFn<Record<string, ClusterConfigSchema>> = (baseConfigPath) => {
+export const getClusterConfigs: GetConfigFn<Record<string, ClusterConfigSchema>> = (baseConfigPath, logger) => {
 
-  const config = getDirConfig(ClusterConfigSchema,
-    CLUSTER_CONFIG_BASE_PATH, baseConfigPath ?? DEFAULT_CONFIG_BASE_PATH);
+  const config = getDirConfig(
+    ClusterConfigSchema,
+    CLUSTER_CONFIG_BASE_PATH,
+    baseConfigPath ?? DEFAULT_CONFIG_BASE_PATH,
+    logger,
+  );
 
   Object.entries(config).forEach(([id, c]) => {
     if (!c[c.scheduler]) {
