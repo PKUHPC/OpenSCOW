@@ -42,6 +42,7 @@
     "@scow/protos": "workspace:*",
     "@scow/utils": "workspace:*",
     "@sinclair/typebox": "0.28.5",
+    "@ant-design/cssinjs": "1.9.1",
     "@uiw/codemirror-theme-github": "4.19.16",
     "@uiw/react-codemirror": "4.19.16",
     "antd": "5.4.5",

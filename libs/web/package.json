@@ -17,7 +17,8 @@
   "dependencies": {
     "@scow/utils": "workspace:*",
     "zod": "3.21.4",
-    "mime-types": "2.1.35"
+    "mime-types": "2.1.35",
+    "nookies": "2.5.2"
   },
   "peerDependencies": {
     "antd": "5.4.5",

@@ -11,10 +11,11 @@
  */
 
 import { FloatButton } from "antd";
+import { IncomingMessage } from "http";
 import dynamic from "next/dynamic";
 import Image from "next/image";
+import { parseCookies, setCookie } from "nookies";
 import React, { PropsWithChildren, useEffect, useState } from "react";
-import { useLocalStorage } from "src/utils/hooks";
 import { addBasePathToImage } from "src/utils/image";
 
 const modes = ["system", "dark", "light"] as const;
@@ -59,17 +60,40 @@ const DarkModeButtonInternal = ({ dark, light, system, basePath = "" }: DarkMode
   );
 };
 
-const DARK_MODE_KEY = "scow-dark-mode";
+export interface DarkModeCookie {
+  dark: boolean;
+  mode: DarkMode;
+}
+
+
+interface Props {
+  initial?: DarkModeCookie;
+}
+
+const DARK_MODE_COOKIE_NAME = "scow-dark";
+
+export function getDarkModeCookieValue(req?: IncomingMessage): DarkModeCookie | undefined {
+  const darkModeCookie = parseCookies({ req })[DARK_MODE_COOKIE_NAME];
+
+  return darkModeCookie ? JSON.parse(darkModeCookie) : undefined;
+}
 
 // disable ssr for the button
 // for the image rendered in server and client is different
 export const DarkModeButton = dynamic(() => Promise.resolve(DarkModeButtonInternal), { ssr: false });
 
-export const DarkModeProvider = ({ children }: PropsWithChildren<{}>) => {
+export const DarkModeProvider = ({ initial, children }: PropsWithChildren<Props>) => {
 
-  const [mode, setMode] = useLocalStorage<DarkMode>(DARK_MODE_KEY, "system");
+  const [mode, setMode] = useState<DarkMode>(initial?.mode ?? "system");
 
-  const [dark, setDark] = useState(false);
+  const [dark, setDark] = useState(initial?.dark ?? false);
+
+  useEffect(() => {
+    setCookie(null, DARK_MODE_COOKIE_NAME, JSON.stringify({ mode, dark } as DarkModeCookie), {
+      maxAge: 30 * 24 * 60 * 60,
+      path: "/",
+    });
+  }, [dark, mode]);
 
   useEffect(() => {
     if (mode === "system") {
