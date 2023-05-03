@@ -2,7 +2,6 @@
 "@scow/portal-server": minor
 "@scow/portal-web": minor
 "@scow/demo-vagrant": minor
-"@scow/deploy-compose": minor
 "@scow/cli": minor
 "@scow/lib-ssh": minor
 "@scow/grpc-api": minor
