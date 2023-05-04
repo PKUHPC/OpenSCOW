@@ -89,7 +89,7 @@ const formatFileSize = (size: number): string => {
   }
 
   let carryCount = 0;
-  let decimalSize = size / CARRY;
+  let decimalSize = Math.round(size / CARRY);
 
   while (decimalSize > CARRY) {
     decimalSize = decimalSize / CARRY;
@@ -99,9 +99,10 @@ const formatFileSize = (size: number): string => {
   if (decimalSize >= 1000) {
     decimalSize = decimalSize / CARRY;
     carryCount++;
-    return `${decimalSize.toFixed(2)} ${unitMap[carryCount]}`;
   }
-  return `${decimalSize.toFixed(0)} ${unitMap[carryCount]}`;
+
+  const fixedNumber = decimalSize < 9.996 ? 2 : (decimalSize < 99.95 ? 1 : 0);
+  return `${decimalSize.toFixed(fixedNumber)} ${unitMap[carryCount]}`;
 };
 
 type FileInfoKey = React.Key;
@@ -499,7 +500,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
               (size === undefined || file.type === "DIR")
                 ? ""
                 : (
-                  <Tooltip title={Math.floor((size) / 1024).toLocaleString() + "KB"} placement="topRight">
+                  <Tooltip title={Math.round((size) / 1024).toLocaleString() + "KB"} placement="topRight">
                     <span>{formatFileSize(size)}</span>
                   </Tooltip>
                 )
