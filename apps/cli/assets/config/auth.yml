@@ -99,7 +99,7 @@ authType: ssh
 # tokenTimeoutSeconds: 3600
 
 # 测试用户，如果这些用户登录，将其ID改为另一个ID。修改此配置无需重启认证系统
-# testUsers:
+# mockUsers:
 #   fromUserId1: toUserId1
 #   fromUser2: toUser2
 

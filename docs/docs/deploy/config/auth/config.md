@@ -29,12 +29,12 @@ allowedCallbackHostnames：
 
 ![验证码登录UI](./%E9%AA%8C%E8%AF%81%E7%A0%81%E7%99%BB%E5%BD%95UI.png)
 
-## 测试用户
+## 模仿用户
 
 如果登录用户的ID为某个key，那么实际将会以其对应的value的用户登录。修改此配置无需重启认证系统。
 
 ```yaml title="config/auth.yml"
-testUsers:
+mockUsers:
   # 当登录用户的ID为fromUser1，实际上以toUser1登录
   fromUser1: toUser1
   fromUser2: toUser2

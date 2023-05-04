@@ -16,13 +16,13 @@ import { FastifyRequest } from "fastify";
 import { authConfig, getAuthConfig } from "src/config/auth";
 import { config } from "src/config/env";
 
-const getTestUsers = () => {
+const getMockUsers = () => {
 
-  const configTestUsers = getAuthConfig();
+  const configMockUsers = getAuthConfig();
 
-  const envTestUsers = parseKeyValue(config.TEST_USERS);
+  const envMockUsers = parseKeyValue(config.MOCK_USERS);
 
-  return { ...configTestUsers.testUsers, ...envTestUsers };
+  return { ...configMockUsers.mockUsers, ...envMockUsers };
 };
 
 /**
@@ -30,11 +30,11 @@ const getTestUsers = () => {
  */
 export async function cacheInfo(identityId: string, req: FastifyRequest): Promise<string> {
 
-  const testUsers = getTestUsers();
+  const mockUsers = getMockUsers();
 
-  if (testUsers[identityId]) {
-    req.log.info("Rewrite test user %s to user %s", identityId, testUsers[identityId]);
-    identityId = testUsers[identityId];
+  if (mockUsers[identityId]) {
+    req.log.info("Rewrite mock user %s to user %s", identityId, mockUsers[identityId]);
+    identityId = mockUsers[identityId];
   }
 
   const token = randomUUID();
