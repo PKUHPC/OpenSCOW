@@ -244,10 +244,6 @@ export const appServiceServer = plugin((server) => {
         userId, appId,
       }, logger);
 
-      if (reply.code === "NOT_FOUND") {
-        throw <ServiceError> { code: Status.NOT_FOUND, message: `Last Submission of ${appId} is not found.` };
-      }
-
       return [{
         lastSubmissionInfo: reply.lastSubmissionInfo,
       }];

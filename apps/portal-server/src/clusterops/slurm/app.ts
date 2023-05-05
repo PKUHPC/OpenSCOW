@@ -223,13 +223,13 @@ export const slurmAppOps = (cluster: string): AppOps => {
         const sftp = await ssh.requestSFTP();
         const file = join(portalConfig.appLastSubmissionDir, appId, APP_LAST_SUBMISSION_INFO);
 
-        if (!await sftpExists(sftp, file)) { return { code: "NOT_FOUND" }; }
+        if (!await sftpExists(sftp, file)) { return { lastSubmissionInfo: undefined }; }
 
         const content = await sftpReadFile(sftp)(file);
         logger.info("getAppLastSubmission to %s", content);
         const data = JSON.parse(content.toString()) as SubmissionInfo;
 
-        return { code: "OK", lastSubmissionInfo: data };
+        return { lastSubmissionInfo: data };
       });
     },
 

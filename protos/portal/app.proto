@@ -157,7 +157,7 @@ message GetAppLastSubmissionRequest {
 }
 
 message GetAppLastSubmissionResponse {
-  SubmissionInfo last_submission_info = 1;
+  optional SubmissionInfo last_submission_info = 1;
 }
 
 service AppService {

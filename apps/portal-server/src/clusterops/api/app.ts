@@ -81,10 +81,7 @@ export interface GetAppLastSubmissionRequest {
 }
 
 export type GetAppLastSubmissionReply = {
-  code: "OK"
-  lastSubmissionInfo: SubmissionInfo;
-} | {
-  code: "NOT_FOUND"
+  lastSubmissionInfo?: SubmissionInfo;
 }
 
 export type ConnectToAppReply =

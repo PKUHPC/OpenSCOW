@@ -11,12 +11,10 @@
  */
 
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
-import { status } from "@grpc/grpc-js";
 import { AppServiceClient, SubmissionInfo } from "@scow/protos/build/portal/app";
 import { authenticate } from "src/auth/server";
 import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
-import { handlegRPCError } from "src/utils/server";
 
 export interface GetAppLastSubmissionSchema {
   method: "GET";
@@ -28,13 +26,7 @@ export interface GetAppLastSubmissionSchema {
 
   responses: {
     200: {
-      lastSubmissionInfo: SubmissionInfo;
-    };
-    400: {
-      message: string;
-    };
-    404: {
-      code: "APP_NOT_FOUND"
+      lastSubmissionInfo?: SubmissionInfo;
     };
   }
 }
@@ -52,8 +44,5 @@ export default /* #__PURE__*/route<GetAppLastSubmissionSchema>("GetAppLastSubmis
 
   return asyncUnaryCall(client, "getAppLastSubmission", {
     userId: info.identityId, cluster, appId,
-  }).then(({ lastSubmissionInfo }) => ({ 200: { lastSubmissionInfo: lastSubmissionInfo! } }), handlegRPCError({
-    [status.NOT_FOUND]: () => ({ 404: { code: "APP_NOT_FOUND" } as const }),
-  }));
-
+  }).then(({ lastSubmissionInfo }) => ({ 200: { lastSubmissionInfo: lastSubmissionInfo } }));
 });
