@@ -44,7 +44,7 @@ SCOW中使用`identityId`标识一个用户，并同时使用此`identityId`作�
 
 如果您在后端使用类似OAuth2的认证系统，这些认证系统登录完成后会给一个token用于跟踪用户状态并重定向到您指定的回调地址。对于这些系统，您应该自己实现一个单独的回调地址（且这些回调地址的URL必须以`/public`为前缀以使用户可以直接访问），在这些地址的处理函数中获取认证系统给予的token，并使用token进行后续的处理（例如生成自己的token，将这些token映射到用户等）。处理完成后，再回调到`callbackUrl`指定的URL。
 
-### GET /validateToken
+### GET /public/validateToken
 
 验证token，返回对应的用户ID。SCOW将会在每次需要验证的请求发生时，使用登录时获取的token请求此API，所以请保证此API的性能。
 

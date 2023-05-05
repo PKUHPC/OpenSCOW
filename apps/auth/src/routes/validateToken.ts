@@ -43,7 +43,7 @@ export const validateTokenRoute = fp(async (f) => {
     Querystring: Static<typeof QuerystringSchema>
     Responses: Static<typeof ResponsesSchema>,
   }>(
-    "/validateToken",
+    "/public/validateToken",
     {
       schema: {
         querystring: QuerystringSchema,
