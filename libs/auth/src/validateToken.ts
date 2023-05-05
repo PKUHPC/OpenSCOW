@@ -17,7 +17,7 @@ export interface UserInfo {
 }
 
 export async function validateToken(authUrl: string, token: string, logger?: Logger): Promise<UserInfo | undefined> {
-  const resp = await fetch(authUrl + "/validateToken?token=" + token, {
+  const resp = await fetch(authUrl + "/public/validateToken?token=" + token, {
     method: "GET",
   });
 
