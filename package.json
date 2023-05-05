@@ -55,6 +55,7 @@
     "node-glob": "1.2.0",
     "globby": "13.1.4",
     "@changesets/cli": "2.26.1",
+    "front-matter": "4.0.2",
     "@bufbuild/buf": "1.15.0"
   },
   "volta": {
