@@ -22,122 +22,55 @@ import { join } from "path";
 
 const exec = (cmd) => execSync(cmd, { stdio: "inherit" });
 
-
 /**
- * Aggregate current changes by reading changeset files
+ * 1. Aggregate current changes by reading changeset files
  */
-async function aggregateChanges() {
+const CHANGESET_DIR = ".changeset";
 
-  const CHANGESET_DIR = ".changeset";
+const files = await readdir(CHANGESET_DIR);
 
-  const files = await readdir(CHANGESET_DIR);
+const changes = {
+  "portal-web": [],
+  "portal-server": [],
+  "mis-web": [],
+  "mis-server": [],
+  "auth": [],
+  "cli": [],
+  "gateway": [],
+  "grpc-api": [],
+};
 
-  const changes = {
-    "portal-web": [],
-    "portal-server": [],
-    "mis-web": [],
-    "mis-server": [],
-    "auth": [],
-    "cli": [],
-    "gateway": [],
-    "grpc-api": [],
-  };
+for (const file of files) {
+  if (!file.endsWith(".md") || file === "README.md") { continue; }
+  const changesetFilePath = join(CHANGESET_DIR, file);
 
-  for (const file of files) {
-    if (!file.endsWith(".md") || file === "README.md") { continue; }
-    const changesetFilePath = join(CHANGESET_DIR, file);
+  const gitCommit = execSync(`git log -n 1 --pretty=format:%H -- ${changesetFilePath}`, {
+    encoding: "utf-8",
+  });
 
-    const gitCommit = exec(`git log -n 1 --pretty=format:%H -- ${changesetFilePath}`);
+  const fileContent = await readFile(changesetFilePath, "utf8");
+  const content = fm(fileContent);
 
-    const fileContent = await readFile(changesetFilePath, "utf8");
-    const content = fm(fileContent);
-
-    for (const [scowPackage, type] of Object.entries(content.attributes)) {
-      const part = scowPackage.substring("@scow/".length);
-      if (part in changes) {
-        changes[part].push({ type, content: content.body.trim(), gitCommit });
-      }
+  for (const [scowPackage, type] of Object.entries(content.attributes)) {
+    const part = scowPackage.substring("@scow/".length);
+    if (part in changes) {
+      changes[part].push({ type, content: content.body.trim(), gitCommit });
     }
   }
-
-  // sort
-  const typePriority = { "patch": 0, "minor": 1, "major": 2 };
-  Object.values(changes).forEach((x) => x.sort((a, b) => typePriority[b.type] - typePriority[a.type]));
-
-  return changes;
 }
 
 
 /**
- * Write changelog content to changelogs/${version}.md
- * @param {ReturnType<typeof aggregateChanges>} changes Aggregated changes
- * @param {string} version New version
+ * 2. Run changeset version to update versions of packages
  */
-async function writeChangelog(changes, version) {
-
-  const getChangesetLine = (line) =>
-    `[${line.type}]: ${line.content}` +
-  ` ([${line.gitCommit.substring(0, 8)}](https://github.com/PKUHPC/SCOW/commit/${line.gitCommit}))`;
-
-  const generateContent = (changes) => changes.map(getChangesetLine).join("\n");
-
-  const changelogContent = `
-# SCOW ${version}
-
-## 门户系统
-
-### 前端 (portal-web)
-
-${generateContent(changes["portal-web"])}
-
-### 服务器 (portal-server)
-
-${generateContent(changes["portal-server"])}
-
-## 管理系统
-
-### 前端 (mis-web)
-
-${generateContent(changes["mis-web"])}
-
-### 服务器 (mis-server)
-
-${generateContent(changes["mis-server"])}
-
-## 认证系统
-
-${generateContent(changes["auth"])}
-
-## CLI
-
-${generateContent(changes["cli"])}
-
-## 网关
-
-${generateContent(changes["gateway"])}
-
-## SCOW API和Hook
-
-${generateContent(changes["grpc-api"])}
-`;
-
-  const CHANGELOG_BASE_PATH = "changelogs";
-
-  if (!existsSync(CHANGELOG_BASE_PATH)) {
-    await mkdir(CHANGELOG_BASE_PATH);
-  }
-
-  const CHANGELOG_PATH = join(CHANGELOG_BASE_PATH, `${version}.md`);
-  await writeFile(CHANGELOG_PATH, changelogContent);
-}
-
-const changes = await aggregateChanges();
-
+console.log("Run changeset version to bump package versions");
 exec("pnpm changeset version");
 
-// update root package version
+/**
+ * 3. Update root package version
+ */
+console.log("Update root package version");
 const readPackageJson = (path) => JSON.parse(fs.readFileSync(path, { encoding: "utf8" }));
-
 const rootPackageJson = readPackageJson("./package.json");
 
 // read version from a app package
@@ -151,10 +84,89 @@ if (portalWebPackageJson.version === rootPackageJson.version) {
 }
 
 console.log("App Version is changed. Update root package.json version");
-
 rootPackageJson.version = portalWebPackageJson.version;
-
 await writeFile("./package.json", JSON.stringify(rootPackageJson, null, 2));
-await writeChangelog(changes, rootPackageJson.version);
 
+/**
+ * 4. Generate changelog
+ */
+console.log("Generate changelog for version %s", rootPackageJson.version);
+
+const getChangesetLine = (line) =>
+  `- ${line.content}` +
+  ` ([${line.gitCommit.substring(0, 8)}](https://github.com/PKUHPC/SCOW/commit/${line.gitCommit}))`;
+
+const generateContent = (scowPackage) => {
+
+  const packageChanges = changes[scowPackage];
+
+  // categories changes by type
+
+  const changesByType = { "patch": [], "minor": [], "major":[]};
+
+  for (const change of packageChanges) {
+    changesByType[change.type].push(change);
+  }
+
+  let content = "";
+  if (changesByType.major.length > 0) {
+    content += "### 重大更新\n" + changesByType.major.map(getChangesetLine).join("\n") + "\n\n";
+  }
+
+  if (changesByType.minor.length > 0) {
+    content += "### 重要更新\n" + changesByType.minor.map(getChangesetLine).join("\n") + "\n\n";
+  }
+
+  if (changesByType.patch.length > 0) {
+    content += "### 小型更新\n" + changesByType.patch.map(getChangesetLine).join("\n") + "\n\n";
+  }
+
+  return content.trim();
+};
+
+const changelogContent = `# ${rootPackageJson.version}
+
+发布于：${new Date().toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" })}
+
+## 门户系统前端 (portal-web)
+
+${generateContent("portal-web")}
+
+## 门户系统后端 (portal-server)
+
+${generateContent("portal-server")}
+
+## 管理系统前端（mis-web)
+
+${generateContent("mis-web")}
+
+## 管理系统服务器 (mis-server)
+
+${generateContent("mis-server")}
+
+## 认证系统 (auth)
+
+${generateContent("auth")}
+
+## CLI (cli)
+
+${generateContent("cli")}
+
+## 网关 (gateway)
+
+${generateContent("gateway")}
+
+## SCOW API和Hook
+
+${generateContent("grpc-api")}
+`;
+
+const CHANGELOG_BASE_PATH = "changelogs";
+
+if (!existsSync(CHANGELOG_BASE_PATH)) {
+  await mkdir(CHANGELOG_BASE_PATH);
+}
+
+const CHANGELOG_PATH = join(CHANGELOG_BASE_PATH, `v${rootPackageJson.version}.md`);
+await writeFile(CHANGELOG_PATH, changelogContent);
 
