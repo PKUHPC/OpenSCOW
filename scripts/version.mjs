@@ -124,7 +124,7 @@ const generateContent = (scowPackage) => {
   return content.trim();
 };
 
-const changelogContent = `# ${rootPackageJson.version}
+const changelogContent = `# v${rootPackageJson.version}
 
 发布于：${new Date().toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" })}
 
