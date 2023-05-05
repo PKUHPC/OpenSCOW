@@ -12,7 +12,8 @@
 
 import { execSync } from "child_process";
 import fm from "front-matter";
-import { readdir, readFile } from "fs/promises";
+import { existsSync } from "fs";
+import { appendFile, readdir, readFile, writeFile } from "fs/promises";
 import { join } from "path";
 
 const VERSION = JSON.parse(await readFile("package.json")).version;
@@ -29,6 +30,7 @@ const changes = {
   "auth": [],
   "cli": [],
   "gateway": [],
+  "grpc-api": [],
 };
 
 const exec = (cmd) => execSync(cmd, { encoding: "utf-8" });
@@ -54,18 +56,62 @@ for (const file of files) {
 const typePriority = { "patch": 0, "minor": 1, "major": 2 };
 Object.values(changes).forEach((x) => x.sort((a, b) => typePriority[b.type] - typePriority[a.type]));
 
-console.log(changes);
-
 // generate markdown
 
 const getChangesetLine = (line) =>
-  `[${line.type}]: ${line.content} (${line.gitCommit})`;
+  `[${line.type}]: ${line.content}` +
+  ` ([${line.gitCommit.substring(0, 8)}](https://github.com/PKUHPC/SCOW/commit/${line.gitCommit}))`;
+
+const generateContent = (changes) => changes.map(getChangesetLine).join("\n");
 
 const changelogContent = `
 ## ${VERSION}
 
 ### 门户系统
 
+#### 前端 (portal-web)
+
+${generateContent(changes["portal-web"])}
+
+#### 服务器 (portal-server)
+
+${generateContent(changes["portal-server"])}
+
+### 管理系统
+
+#### 前端 (mis-web)
+
+${generateContent(changes["mis-web"])}
+
+#### 服务器 (mis-server)
+
+${generateContent(changes["mis-server"])}
+
+### 认证系统
+
+${generateContent(changes["auth"])}
+
+### CLI
+
+${generateContent(changes["cli"])}
+
+### 网关
+
+${generateContent(changes["gateway"])}
+
+### SCOW API和Hook
+
+${generateContent(changes["grpc-api"])}
+
 `;
+
+// insert
+const CHANGELOG_PATH = "CHANGELOG.md";
+
+if (!existsSync(CHANGELOG_PATH)) {
+  await writeFile(CHANGELOG_PATH, "# SCOW 发布日志\n\n");
+}
+
+await appendFile(CHANGELOG_PATH, changelogContent);
 
 
