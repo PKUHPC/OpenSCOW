@@ -28,8 +28,6 @@ export const setupProxyGateway = async (logger: Logger) => {
 
     if (!proxyGatewayConfig?.autoSetupNginx) { continue; }
 
-    logger.info("Setup proxy gateway for cluster %s", id);
-
     const url = new URL(proxyGatewayConfig.url);
 
     const content = `
@@ -57,11 +55,22 @@ server {
     const nginxConfigPath = "/etc/nginx/conf.d/scow-portal-proxy-gateway.conf";
 
     await sshConnect(url.host, "root", logger, async (ssh) => {
+
+      // check if nginx is installed
+      const resp = await loggedExec(ssh, logger, false, "nginx", ["-v"]);
+
+      if (resp.code !== 0) {
+        logger.error("nginx -v returned code %d. nginx might not be installed on %s", resp.code, url.host);
+        return;
+      }
+
       const sftp = await ssh.requestSFTP();
       await sftpMkdir(sftp)(dirname(nginxConfigPath));
       await sftpWriteFile(sftp)(nginxConfigPath, content);
 
       await loggedExec(ssh, logger, true, "nginx", ["-s", "reload"]);
+
+      logger.info("Successfully setup proxy gateway for cluster %s", id);
     }).catch((e) => {
       logger.error(e, "Error occurred during setup proxy gateway for cluster %s", id);
     });
