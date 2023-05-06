@@ -11,7 +11,7 @@
  */
 
 import { ServiceError } from "@grpc/grpc-js";
-import { sftpWriteFile, sshRawConnect, sshRmrf } from "@scow/lib-ssh";
+import { sftpReadFile, sftpWriteFile, sshRawConnect, sshRmrf } from "@scow/lib-ssh";
 import { SubmissionInfo } from "@scow/protos/build/portal/app";
 import { randomBytes } from "crypto";
 import FormData from "form-data";
@@ -89,7 +89,9 @@ export async function expectGrpcThrow(promise: Promise<unknown>, expectError: (e
   await promise.then(() => expect("").fail("Promise resolved"), expectError);
 }
 
+// cereate a lastSubmission file of app[vscode]
 export async function createVscodeLastSubmitFile(sftp: SFTPWrapper, filePath: string) {
+
   const lastSubmissionInfo: SubmissionInfo = {
     userId: "test",
     cluster: "hpc01",
@@ -103,19 +105,18 @@ export async function createVscodeLastSubmitFile(sftp: SFTPWrapper, filePath: st
     submitTime: "2021-12-22T16:16:02",
     customAttributes: { selectVersion: "code-server/4.9.0", sbatchOptions: "--time 10" },
   };
-  return await sftpWriteFile(sftp)(join(filePath, "last_submission.json"),
-    JSON.stringify(lastSubmissionInfo));
+
+  const newFilePath = join(filePath, "last_submission.json");
+  await sftpWriteFile(sftp)(newFilePath, JSON.stringify(lastSubmissionInfo));
+
 }
 
-// cereate a lastSubmission base folder of app[vscode]
-export async function createTestLastSubmissionForVscode(sftp: SFTPWrapper): Promise<string> {
+export async function createTestLastSubmissionForVscode({ sftp, ssh }: TestSshServer): Promise<string> {
   const base = baseFolder();
+  await ssh.mkdir(path.join(base, "scow/apps/vscode"), undefined, sftp);
   const appId1 = path.join(base, "scow/apps/vscode");
-  console.log("【*******getAppLastSubmissionTestFilePath*********】");
-  console.log(appId1);
-  const testFile = await createVscodeLastSubmitFile(sftp, appId1);
-  console.log("【*******getAppLastSubmissionTestFile*********】");
-  console.log(testFile);
+
+  await createVscodeLastSubmitFile(sftp, appId1);
 
   return base;
 }
