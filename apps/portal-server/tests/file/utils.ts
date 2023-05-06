@@ -108,10 +108,9 @@ export async function createVscodeLastSubmitFile(sftp: SFTPWrapper, filePath: st
 }
 
 // cereate a lastSubmission base folder of app[vscode]
-export async function createTestLastSubmissionForVscode({ sftp, ssh }: TestSshServer): Promise<string> {
+export async function createTestLastSubmissionForVscode(sftp: SFTPWrapper): Promise<string> {
   const base = baseFolder();
-  await ssh.mkdir(path.join(base, "scow/apps"), undefined, sftp);
-  const appId1 = path.join(base, "vscode");
+  const appId1 = path.join(base, "scow/apps/vscode");
   console.log("【*******getAppLastSubmissionTestFilePath*********】");
   console.log(appId1);
   const testFile = await createVscodeLastSubmitFile(sftp, appId1);

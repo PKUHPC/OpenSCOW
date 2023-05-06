@@ -26,7 +26,7 @@ let client: AppServiceClient;
 beforeEach(async () => {
 
   ssh = await connectToTestServer();
-  await createTestLastSubmissionForVscode(ssh);
+  await createTestLastSubmissionForVscode(ssh.sftp);
 
   server = await createServer();
   await server.start();
