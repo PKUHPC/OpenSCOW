@@ -29,7 +29,6 @@ touch /etc/nginx/conf.d/scow-portal-proxy-gateway.conf
 
 ```conf title="/etc/nginx/conf.d/scow-portal-proxy-gateway.conf"
 server {
-
   # 监听端口号，可修改
   listen 12031;
 
@@ -41,12 +40,12 @@ server {
   proxy_set_header Upgrade $http_upgrade;
   proxy_set_header Connection "upgrade";
 
-  location ~ ^/relative/(?<node>[\d|\.]*)/(?<port>\d+)(?<rest>.*)$ {
+  location ~ ^/api/proxy/(?<clusterId>.*)/relative/(?<node>[\d|\.]*)/(?<port>\d+)(?<rest>.*)$ {
     proxy_pass http://$node:$port$rest$is_args$args;
   }
 
-  location ~ ^/absolute/(?<node>[\d|\.]*)/(?<port>\d+)(?<rest>.*)$ {
-    proxy_pass http://$node:$port/absolute/$node/$port$rest$is_args$args;
+  location ~ ^/api/proxy/(?<clusterId>.*)/absolute/(?<node>[\d|\.]*)/(?<port>\d+)(?<rest>.*)$ {
+     proxy_pass http://$node:$port$request_uri;
   }
 }
 ```

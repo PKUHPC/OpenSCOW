@@ -45,19 +45,20 @@ function parseProxyTarget(url: string, urlIncludesBasePath: boolean): string | E
     return new Error("Invalid clusterId");
   }
 
+  const fullUri = `${(urlIncludesBasePath || basePath === "/") ? "" : basePath}${url}`;
+
   const proxyGateway = runtimeConfig.CLUSTERS_CONFIG[clusterId].proxyGatewayUrl;
 
   if (proxyGateway) {
     // proxy to proxy gateway node
-    return `${proxyGateway}/${type}/${node}/${port}/${path.join("/")}`;
+    return `${proxyGateway}${fullUri}`;
   }
 
   // connect directly to compute node
   if (type === "relative") {
     return `http://${node}:${port}/${path.join("/")}`;
   } else if (type === "absolute") {
-    const path = `${(urlIncludesBasePath || basePath === "/") ? "" : basePath}${url}`;
-    return `http://${node}:${port}${path}`;
+    return `http://${node}:${port}${fullUri}`;
   } else {
     return new Error("type is not absolute or relative");
   }
