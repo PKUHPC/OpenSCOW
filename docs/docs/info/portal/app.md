@@ -19,7 +19,8 @@ title: 交互式应用
 
 ![在浏览器上使用Web类应用VSCode](interactive-apps.png)
 
-## 原理
+## 配置
 
-![交互式应用的原理](./app.png)
+参考[配置交互式应用](../../deploy/config/portal/apps/intro.md)文档。
+
 

@@ -71,3 +71,11 @@ slurm:
 
     # 这个集群在slurm中的集群名字
     clusterName: pkuhpc
+
+# 门户系统代理网关节点配置
+# proxyGateway:
+#   # 带协议，不要以/结尾
+#   url: http://10.2.3.2:1080
+
+#   # 是否在这个机器上自动配置nginx
+#   autoSetupNginx: true

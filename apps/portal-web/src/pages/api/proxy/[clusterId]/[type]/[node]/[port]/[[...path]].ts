@@ -17,7 +17,7 @@ import { NextApiRequest } from "next";
 import { join } from "path";
 import { checkCookie } from "src/auth/server";
 import { AugmentedNextApiResponse } from "src/types/next";
-import { publicConfig } from "src/utils/config";
+import { publicConfig, runtimeConfig } from "src/utils/config";
 
 
 /**
@@ -39,13 +39,26 @@ function parseProxyTarget(url: string, urlIncludesBasePath: boolean): string | E
       : normalizedUrl.slice(basePath.length)
     : normalizedUrl;
 
-  const [_empty, _api, _proxy, type, node, port, ...path] = relativePath.split("/");
+  const [_empty, _api, _proxy, clusterId, type, node, port, ...path] = relativePath.split("/");
 
+  if (!runtimeConfig.CLUSTERS_CONFIG[clusterId]) {
+    return new Error("Invalid clusterId");
+  }
+
+  const fullUri = `${(urlIncludesBasePath || basePath === "/") ? "" : basePath}${url}`;
+
+  const proxyGateway = runtimeConfig.CLUSTERS_CONFIG[clusterId].proxyGateway;
+
+  if (proxyGateway) {
+    // proxy to proxy gateway node
+    return `${proxyGateway.url}${fullUri}`;
+  }
+
+  // connect directly to compute node
   if (type === "relative") {
     return `http://${node}:${port}/${path.join("/")}`;
   } else if (type === "absolute") {
-    const path = `${(urlIncludesBasePath || basePath === "/") ? "" : basePath}${url}`;
-    return `http://${node}:${port}${path}`;
+    return `http://${node}:${port}${fullUri}`;
   } else {
     return new Error("type is not absolute or relative");
   }

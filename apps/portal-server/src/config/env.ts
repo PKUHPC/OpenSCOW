@@ -24,6 +24,8 @@ export const config = envConfig({
   }),
   LOG_PRETTY: bool({ desc: "以可读的方式输出log", default: false }),
 
+  PORTAL_BASE_PATH: str({ desc: "门户系统base path", default: "/" }),
+
   SSH_PRIVATE_KEY_PATH: str({ desc: "SSH私钥路径", default: join(homedir(), ".ssh", "id_rsa") }),
   SSH_PUBLIC_KEY_PATH: str({ desc: "SSH公钥路径", default: join(homedir(), ".ssh", "id_rsa.pub") }),
 
