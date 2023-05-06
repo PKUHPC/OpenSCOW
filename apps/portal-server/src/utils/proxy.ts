@@ -54,7 +54,7 @@ server {
 
     const nginxConfigPath = "/etc/nginx/conf.d/scow-portal-proxy-gateway.conf";
 
-    await sshConnect(url.host, "root", logger, async (ssh) => {
+    await sshConnect(url.hostname, "root", logger, async (ssh) => {
 
       // check if nginx is installed
       const resp = await loggedExec(ssh, logger, false, "nginx", ["-v"]);
