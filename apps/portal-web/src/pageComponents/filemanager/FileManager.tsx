@@ -467,9 +467,6 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
           dataIndex="type"
           title=""
           width="32px"
-          defaultSortOrder={"ascend"}
-          sorter={(a, b) => a.type.localeCompare(b.type)}
-          sortDirections={["ascend", "descend"]}
           render={(_, r) => (
             React.createElement(fileTypeIcons[r.type])
           )}
@@ -478,7 +475,12 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
         <Table.Column<FileInfo>
           dataIndex="name"
           title="文件名"
-          sorter={(a, b) => a.name.localeCompare(b.name)}
+          defaultSortOrder={"ascend"}
+          sorter={
+            (a, b) => a.type.localeCompare(b.type) === 0
+              ? a.name.localeCompare(b.name)
+              : a.type.localeCompare(b.type)
+          }
           sortDirections={["ascend", "descend"]}
           render={(_, r) => (
             r.type === "DIR" ? (
@@ -501,7 +503,13 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
           dataIndex="mtime"
           title="修改日期"
           render={(mtime: string | undefined) => mtime ? formatDateTime(mtime) : ""}
-          sorter={(a, b) => compareDateTime(a.mtime, b.mtime)}
+          sorter={
+            (a, b) => a.type.localeCompare(b.type) === 0
+              ? compareDateTime(a.mtime, b.mtime) === 0
+                ? a.name.localeCompare(b.name)
+                : compareDateTime(a.mtime, b.mtime)
+              : a.type.localeCompare(b.type)
+          }
         />
 
         <Table.Column<FileInfo>
@@ -517,7 +525,14 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
                   </Tooltip>
                 )
           }
-          sorter={(a, b) => compareNumber(a.size, b.size)}
+          sorter={
+            (a, b) => {
+              return a.type.localeCompare(b.type) === 0
+                ? compareNumber(a.size, b.size) === 0
+                  ? a.name.localeCompare(b.name)
+                  : compareNumber(a.size, b.size)
+                : a.type.localeCompare(b.type);
+            }}
         />
 
         <Table.Column<FileInfo>
