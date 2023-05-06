@@ -1,0 +1,45 @@
+<mxfile host="65bd71144e" scale="2" border="0">
+    <diagram id="Pjbi3EagdmSRB1L1AeHt" name="Page-1">
+        <mxGraphModel dx="738" dy="521" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="122" style="edgeStyle=none;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="24" target="58">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="124" value="HTTP/WebSocket" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="122">
+                    <mxGeometry x="-0.2624" y="2" relative="1" as="geometry">
+                        <mxPoint x="22" y="-1" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="24" value="service" style="rounded=0;whiteSpace=wrap;fillColor=none;verticalAlign=middle;spacing=0;labelBackgroundColor=none;" parent="1" vertex="1">
+                    <mxGeometry x="445" y="540" width="150" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="97" value="" style="edgeStyle=none;exitX=0.5;exitY=1;exitDx=0;exitDy=0;spacing=0;labelBackgroundColor=none;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="3" target="24" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="571.8918918918919" y="562" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="120" value="HTTP/WebSocket" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="97">
+                    <mxGeometry x="-0.2511" y="-2" relative="1" as="geometry">
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="3" value="客户端浏览器" style="whiteSpace=wrap;fillColor=none;spacing=0;labelBackgroundColor=none;" parent="1" vertex="1">
+                    <mxGeometry x="475" y="470" width="90" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="111" style="edgeStyle=none;html=1;exitX=0.542;exitY=1;exitDx=0;exitDy=0;entryX=0.358;entryY=0.014;entryDx=0;entryDy=0;entryPerimeter=0;exitPerimeter=0;" parent="1" source="24" target="2" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="580" y="584.5" as="sourcePoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="58" value="计算节点" style="rounded=0;whiteSpace=wrap;fillColor=none;verticalAlign=middle;spacing=0;labelBackgroundColor=none;" parent="1" vertex="1">
+                    <mxGeometry x="397" y="610" width="123" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="2" value="登录节点" style="rounded=0;whiteSpace=wrap;fillColor=none;verticalAlign=middle;spacing=0;labelBackgroundColor=none;" parent="1" vertex="1">
+                    <mxGeometry x="540" y="610" width="103" height="30" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

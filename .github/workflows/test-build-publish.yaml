@@ -206,9 +206,8 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           name: SCOW ${{ github.ref_name }}
-          body: |
-            SCOW ${{ github.ref_name }} has been released!
-          generate_release_notes: true
+          body_path: changelogs/${{ github.ref_name }}.md
+          generate_release_notes: false
           files: |
             release/scow-cli/cli-x64
             release/scow-cli/cli-arm64

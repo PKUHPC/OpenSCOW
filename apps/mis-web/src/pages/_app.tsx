@@ -15,7 +15,7 @@ import "antd/dist/reset.css";
 
 import { failEvent, fromApi } from "@ddadaal/next-typed-api-routes-runtime/lib/client";
 import { AntdConfigProvider } from "@scow/lib-web/build/layouts/AntdConfigProvider";
-import { DarkModeProvider } from "@scow/lib-web/build/layouts/darkMode";
+import { DarkModeCookie, DarkModeProvider, getDarkModeCookieValue } from "@scow/lib-web/build/layouts/darkMode";
 import { GlobalStyle } from "@scow/lib-web/build/layouts/globalStyle";
 import { getHostname } from "@scow/lib-web/build/utils/getHostname";
 import { useConstant } from "@scow/lib-web/build/utils/hooks";
@@ -83,6 +83,7 @@ interface ExtraProps {
   userInfo: User | undefined;
   primaryColor: string;
   footerText: string;
+  darkModeCookieValue: DarkModeCookie | undefined;
 }
 
 type Props = AppProps & { extra: ExtraProps };
@@ -126,8 +127,7 @@ function MyApp({ Component, pageProps, extra }: Props) {
         />
       </Head>
       <StoreProvider stores={[userStore, defaultClusterStore]}>
-        <DarkModeProvider>
-
+        <DarkModeProvider initial={extra.darkModeCookieValue}>
           <AntdConfigProvider color={primaryColor}>
             <FloatButtons />
             <GlobalStyle />
@@ -148,6 +148,7 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
     userInfo: undefined,
     footerText: "",
     primaryColor: "",
+    darkModeCookieValue: getDarkModeCookieValue(appContext.ctx.req),
   };
 
   // This is called on server on first load, and on client on every page transition

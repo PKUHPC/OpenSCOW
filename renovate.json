@@ -5,10 +5,11 @@
   "ignorePaths": [
     "docker-compose.dev.yml",
     "dev/ldap/Dockerfile",
-    ".devcontainer/docker-compose.devcontainer.yml"
+    ".devcontainer/**"
   ],
+  "timezone": "Asia/Shanghai",
   "schedule": [
-    "every weekend"
+    "every monday"
   ],
   "packageRules": [
     {

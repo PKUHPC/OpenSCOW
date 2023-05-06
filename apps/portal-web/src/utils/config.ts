@@ -61,10 +61,6 @@ export interface PublicRuntimeConfig {
 
   CLUSTERS: Cluster[];
 
-  PROXY_BASE_PATH: string;
-  RPROXY_BASE_PATH: string;
-  WSPROXY_BASE_PATH: string;
-
   NOVNC_CLIENT_URL: string;
 
   PASSWORD_PATTERN: string | undefined;
