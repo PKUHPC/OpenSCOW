@@ -14,9 +14,11 @@ import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { Server } from "@ddadaal/tsgrpc-server";
 import { credentials } from "@grpc/grpc-js";
 import { AppServiceClient } from "@scow/protos/build/portal/app";
+import path from "path";
 import { createServer } from "src/app";
 
-import { connectToTestServer, createTestLastSubmissionForVscode, resetTestServer, TestSshServer } from "../file/utils";
+import { cluster, connectToTestServer, createTestLastSubmissionForVscode,
+  createVscodeLastSubmitFile, resetTestServer, TestSshServer, userId } from "../file/utils";
 
 let ssh: TestSshServer;
 let server: Server;
@@ -41,10 +43,11 @@ afterEach(async () => {
 it("gets app last submission with attributes", async () => {
 
   const appId = "vscode";
-  const userId = "test";
-  const cluster = "hpc01";
 
   const reply = await asyncUnaryCall(client, "getAppLastSubmission", { userId, cluster, appId });
+
+  console.log("【*******getAppLastSubmissionReply*********】");
+  console.log(reply);
 
   expect(reply).toEqual(
     {
@@ -61,14 +64,12 @@ it("gets app last submission with attributes", async () => {
       customAttributes: { selectVersion: "code-server/4.9.0", sbatchOptions: "--time 10" },
     },
   );
+
 });
 
 
 it("returns undefined if not exists", async () => {
   const appId = "emacs";
-  const userId = "test";
-  const cluster = "hpc01";
-
   const reply = await asyncUnaryCall(client, "getAppLastSubmission", { userId, cluster, appId });
   expect(reply).toEqual({});
 });
