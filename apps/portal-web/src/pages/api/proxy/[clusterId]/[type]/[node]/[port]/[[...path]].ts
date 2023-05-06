@@ -47,11 +47,11 @@ function parseProxyTarget(url: string, urlIncludesBasePath: boolean): string | E
 
   const fullUri = `${(urlIncludesBasePath || basePath === "/") ? "" : basePath}${url}`;
 
-  const proxyGateway = runtimeConfig.CLUSTERS_CONFIG[clusterId].proxyGatewayUrl;
+  const proxyGateway = runtimeConfig.CLUSTERS_CONFIG[clusterId].proxyGateway;
 
   if (proxyGateway) {
     // proxy to proxy gateway node
-    return `${proxyGateway}${fullUri}`;
+    return `${proxyGateway.url}${fullUri}`;
   }
 
   // connect directly to compute node
