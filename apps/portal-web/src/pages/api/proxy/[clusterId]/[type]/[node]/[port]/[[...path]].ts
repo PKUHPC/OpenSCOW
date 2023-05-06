@@ -45,11 +45,11 @@ function parseProxyTarget(url: string, urlIncludesBasePath: boolean): string | E
     return new Error("Invalid clusterId");
   }
 
-  const proxyGatewayUrl = runtimeConfig.CLUSTERS_CONFIG[clusterId].proxyGatewayUrl;
+  const proxyGateway = runtimeConfig.CLUSTERS_CONFIG[clusterId].proxyGatewayUrl;
 
-  if (proxyGatewayUrl) {
+  if (proxyGateway) {
     // proxy to proxy gateway node
-    return `${proxyGatewayUrl}/${type}/${node}/${port}/${path.join("/")}`;
+    return `${proxyGateway}/${type}/${node}/${port}/${path.join("/")}`;
   }
 
   // connect directly to compute node

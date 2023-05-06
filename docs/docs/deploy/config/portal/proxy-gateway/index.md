@@ -19,15 +19,42 @@ title: 代理网关节点
 
 您需要在您的需要代理网关节点的集群中选择一个节点作为**代理网关节点**。这个节点必须能被SCOW直接访问，也能访问自己集群中的所有机器。
 
-当您选择好了节点后，您需要在网关节点上安装nginx，并增加如下配置：
-
-```
-```
-
-重启nginx。
+当您选择好了节点后，您需要在网关节点上安装nginx，并创建`/etc/nginx/conf.d/scow-portal-proxy-gateway.conf`
 
 ```bash
-sudo systemctl restart nginx
+touch /etc/nginx/conf.d/scow-portal-proxy-gateway.conf
+```
+
+然后将以下内容写入此文件：
+
+```conf title="/etc/nginx/conf.d/scow-portal-proxy-gateway.conf"
+server {
+
+  # 监听端口号，可修改
+  listen 12031;
+
+  proxy_set_header Host   $http_host;
+  proxy_set_header X-Real-IP      $remote_addr;
+  proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+  proxy_http_version 1.1;
+  proxy_set_header Upgrade $http_upgrade;
+  proxy_set_header Connection "upgrade";
+
+  location ~ ^/relative/(?<node>[\d|\.]*)/(?<port>\d+)(?<rest>.*)$ {
+    proxy_pass http://$node:$port$rest$is_args$args;
+  }
+
+  location ~ ^/absolute/(?<node>[\d|\.]*)/(?<port>\d+)(?<rest>.*)$ {
+    proxy_pass http://$node:$port/absolute/$node/$port$rest$is_args$args;
+  }
+}
+```
+
+重新加载nginx配置
+
+```bash
+nginx -s reload
 ```
 
 # 在SCOW集群配置文件中配置代理网关节点
@@ -38,7 +65,17 @@ sudo systemctl restart nginx
 proxyGatewayUrl: {代理网关节点nginx监听地址}
 ```
 
-重启SCOW即可生效。
+例如，这个集群的代理网关节点为`192.168.88.100`，上面新增的文件中监听端口号为`12031`，则此处填写
+
+```yaml title="config/clusters/hpc01/config.yaml"
+proxyGatewayUrl: http://192.168.88.100:12031
+```
+
+重启portal-web即可生效。
+
+```bash
+./cli compose restart portal-web
+```
 
 注意，一旦修改了此配置，被修改了配置的集群在修改配置之间启动的交互式作业将会无法重新连接。
 
