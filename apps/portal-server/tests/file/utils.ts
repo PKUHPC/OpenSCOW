@@ -11,7 +11,7 @@
  */
 
 import { ServiceError } from "@grpc/grpc-js";
-import { sftpReadFile, sftpWriteFile, sshRawConnect, sshRmrf } from "@scow/lib-ssh";
+import { sftpWriteFile, sshRawConnect, sshRmrf } from "@scow/lib-ssh";
 import { SubmissionInfo } from "@scow/protos/build/portal/app";
 import { randomBytes } from "crypto";
 import FormData from "form-data";
