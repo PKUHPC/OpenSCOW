@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { loggedExec, sftpMkdir, sftpWriteFile } from "@scow/lib-ssh";
+import { loggedExec, sftpWriteFile } from "@scow/lib-ssh";
 import { dirname } from "path";
 import { clusters } from "src/config/clusters";
 import { config } from "src/config/env";
@@ -42,11 +42,11 @@ server {
   proxy_set_header Upgrade $http_upgrade;
   proxy_set_header Connection "upgrade";
 
-  location ~ ^${portalBasePath}api/proxy/(?<clusterId>.*)/relative/(?<node>[\d|\.]*)/(?<port>\d+)(?<rest>.*)$ {
+  location ~ ^${portalBasePath}api/proxy/(?<clusterId>.*)/relative/(?<node>[\\d|\\.]*)/(?<port>\\d+)(?<rest>.*)$ {
     proxy_pass http://$node:$port$rest$is_args$args;
   }
 
-  location ~ ^${portalBasePath}api/proxy/(?<clusterId>.*)/absolute/(?<node>[\d|\.]*)/(?<port>\d+)(?<rest>.*)$ {
+  location ~ ^${portalBasePath}api/proxy/(?<clusterId>.*)/absolute/(?<node>[\\d|\\.]*)/(?<port>\\d+)(?<rest>.*)$ {
       proxy_pass http://$node:$port$request_uri;
   }
 }
@@ -65,7 +65,7 @@ server {
       }
 
       const sftp = await ssh.requestSFTP();
-      await sftpMkdir(sftp)(dirname(nginxConfigPath));
+      await ssh.mkdir(dirname(nginxConfigPath), "exec", sftp);
       await sftpWriteFile(sftp)(nginxConfigPath, content);
 
       await loggedExec(ssh, logger, true, "nginx", ["-s", "reload"]);
