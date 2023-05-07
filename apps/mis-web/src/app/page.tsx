@@ -10,12 +10,13 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { NextPage } from "next";
+"use client";
+
 import { useStore } from "simstate";
 import { Redirect } from "src/components/Redirect";
 import { UserStore } from "src/stores/UserStore";
 
-export const IndexPage: NextPage = () => {
+export default function() {
   const userStore = useStore(UserStore);
 
   if (userStore.user) {
@@ -31,8 +32,4 @@ export const IndexPage: NextPage = () => {
   } else {
     return <Redirect url="/api/auth" />;
   }
-
-};
-
-
-export default IndexPage;
+}

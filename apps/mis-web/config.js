@@ -1,3 +1,15 @@
+/**
+ * Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
+ * SCOW is licensed under Mulan PSL v2.
+ * You can use this software according to the terms and conditions of the Mulan PSL v2.
+ * You may obtain a copy of Mulan PSL v2 at:
+ *          http://license.coscl.org.cn/MulanPSL2
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+ * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+ * See the Mulan PSL v2 for more details.
+ */
+
 // @ts-check
 
 const { envConfig, str, bool } = require("@scow/lib-config");
@@ -71,7 +83,6 @@ const buildRuntimeConfig = async (phase, basePath) => {
 
   const clusters = getClusterConfigs(configBasePath, console);
   const clusterTexts = getClusterTextsConfig(configBasePath, console);
-  const uiConfig = getUiConfig(configBasePath, console);
   const misConfig = getMisConfig(configBasePath, console);
 
   const commonConfig = getCommonConfig(configBasePath, console);
@@ -84,8 +95,6 @@ const buildRuntimeConfig = async (phase, basePath) => {
     AUTH_INTERNAL_URL: config.AUTH_INTERNAL_URL,
     CLUSTERS_CONFIG: clusters,
     CLUSTER_TEXTS_CONFIG: clusterTexts,
-    UI_CONFIG: uiConfig,
-    DEFAULT_PRIMARY_COLOR,
     SERVER_URL: config.SERVER_URL,
     SCOW_API_AUTH_TOKEN: commonConfig.scowApi?.auth?.token,
   };
@@ -135,4 +144,4 @@ const buildRuntimeConfig = async (phase, basePath) => {
 module.exports = {
   buildRuntimeConfig,
   config,
-}
+};

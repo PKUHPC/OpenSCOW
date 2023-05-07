@@ -25,6 +25,7 @@
     "next": "13.3.1",
     "styled-components": "5.3.10",
     "@ant-design/icons": "5.0.1",
+    "@ant-design/cssinjs": "1.9.1",
     "dayjs": "1.11.7"
   },
   "devDependencies": {

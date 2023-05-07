@@ -13,7 +13,7 @@
 import { arrayContainsElement } from "@scow/utils";
 import { ItemType } from "antd/es/menu/hooks/useItems";
 import Link from "next/link";
-import Router from "next/router";
+import { useRouter } from "next/navigation";
 import React from "react";
 import { match } from "src/layouts/base/matchers";
 import { NavItemProps } from "src/layouts/base/types";
@@ -30,6 +30,8 @@ export function createMenuItems(
   parentClickable: boolean,
 ) {
 
+  const router = useRouter();
+
   function createMenuItem(route: NavItemProps): ItemType {
     if (arrayContainsElement(route.children)) {
       return {
@@ -43,7 +45,7 @@ export function createMenuItems(
             if (route.openInNewPage) {
               window.open(target);
             } else {
-              Router.push(target);
+              router.push(target);
             }
           }
           : undefined,

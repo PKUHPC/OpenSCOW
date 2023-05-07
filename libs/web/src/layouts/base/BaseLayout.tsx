@@ -14,7 +14,7 @@
 
 import { arrayContainsElement } from "@scow/utils";
 import { Grid, Layout } from "antd";
-import { useRouter } from "next/router";
+import { usePathname } from "next/navigation";
 import React, { PropsWithChildren, useState } from "react";
 import { Footer } from "src/layouts/base/Footer";
 import { Header } from "src/layouts/base/header";
@@ -66,10 +66,10 @@ export const BaseLayout: React.FC<PropsWithChildren<Props>> = ({
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
 
-  const router = useRouter();
+  const pathname = usePathname();
 
   // get the first level route
-  const firstLevelRoute = routes.find((x) => match(x, router.asPath));
+  const firstLevelRoute = routes.find((x) => match(x, pathname));
 
   const { md } = useBreakpoint();
 
@@ -81,7 +81,7 @@ export const BaseLayout: React.FC<PropsWithChildren<Props>> = ({
     <Root>
       <Header
         setSidebarCollapsed={setSidebarCollapsed}
-        pathname={router.asPath}
+        pathname={pathname}
         sidebarCollapsed={sidebarCollapsed}
         hasSidebar={hasSidebar}
         routes={routes}
@@ -94,7 +94,7 @@ export const BaseLayout: React.FC<PropsWithChildren<Props>> = ({
         {
           hasSidebar ? (
             <SideNav
-              pathname={router.asPath}
+              pathname={pathname}
               collapsed={sidebarCollapsed}
               routes={sidebarRoutes}
               setCollapsed={setSidebarCollapsed}
