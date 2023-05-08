@@ -19,7 +19,7 @@ interface Props {
   path: string;
   loading: boolean;
   onPathChange: (path: string) => void;
-  breadcrumbItemRender: (pathSegament: string, index: number, path) => React.ReactNode;
+  breadcrumbItemRender: (pathSegament: string, index: number, path: string) => React.ReactNode;
 }
 
 const Bar = styled.div`
