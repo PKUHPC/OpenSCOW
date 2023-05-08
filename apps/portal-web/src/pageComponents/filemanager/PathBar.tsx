@@ -10,18 +10,16 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { DatabaseOutlined, ReloadOutlined, RightOutlined } from "@ant-design/icons";
+import { ReloadOutlined, RightOutlined } from "@ant-design/icons";
 import { Breadcrumb, Button, Input } from "antd";
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 
 interface Props {
   path: string;
   loading: boolean;
-  reload: () => void;
-  go: (path: string) => void;
-  fullUrl: (path: string) => string;
+  onPathChange: (path: string) => void;
+  breadcrumbItemRender: (pathSegament: string, index: number, path) => React.ReactNode;
 }
 
 const Bar = styled.div`
@@ -40,7 +38,12 @@ const BarStateBar = styled(Bar)`
   }
 `;
 
-export const PathBar: React.FC<Props> = ({ path, loading, reload, go, fullUrl }) => {
+export const PathBar: React.FC<Props> = ({
+  path,
+  loading,
+  onPathChange,
+  breadcrumbItemRender,
+}) => {
 
   const [state, setState] = useState<"bar" | "input">("bar");
 
@@ -50,16 +53,7 @@ export const PathBar: React.FC<Props> = ({ path, loading, reload, go, fullUrl })
     setInput(path);
   }, [path]);
 
-  const goOrReload = () => {
-    if (input === path) {
-      reload();
-    } else {
-      go(input);
-    }
-
-  };
-
-  const pathSegments = path === "/" ? [] : path.split("/").splice(1);
+  const pathSegments = path === "/" ? [""] : path.split("/");
 
   const icon = path === input
     ? <ReloadOutlined spin={loading} />
@@ -78,27 +72,16 @@ export const PathBar: React.FC<Props> = ({ path, loading, reload, go, fullUrl })
             onChange={(e) => {
               setInput(e.target.value);
             }}
-            onSearch={goOrReload}
+            onSearch={onPathChange}
             enterButton={icon}
           />
         ) : (
           <>
             <BarStateBar onClick={() => setState("input")}>
               <Breadcrumb style={{ alignSelf: "center" }}>
-                <Breadcrumb.Item>
-                  <Link href={fullUrl("/")} title="/" onClick={(e) => e.stopPropagation()}>
-                    <DatabaseOutlined />
-                  </Link>
-                </Breadcrumb.Item>
-                {pathSegments.map((x, i) => (
-                  <Breadcrumb.Item key={i}>
-                    <Link
-                      href={fullUrl(pathSegments.slice(0, i + 1).join("/"))}
-                      key={i}
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      {x}
-                    </Link>
+                {pathSegments.map((segament, index) => (
+                  <Breadcrumb.Item key={index}>
+                    {breadcrumbItemRender(segament, index, pathSegments.slice(1, index + 1).join("/"))}
                   </Breadcrumb.Item>
                 ))}
               </Breadcrumb>
@@ -106,7 +89,7 @@ export const PathBar: React.FC<Props> = ({ path, loading, reload, go, fullUrl })
             <Button
               onClick={(e) => {
                 e.stopPropagation();
-                goOrReload();
+                onPathChange(input);
               }}
               icon={icon}
             />
