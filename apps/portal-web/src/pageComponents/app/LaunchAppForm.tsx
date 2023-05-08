@@ -95,65 +95,63 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
         const clusterPartitionCoreCount = clusterPartition.cores;
         setCurrentPartitionInfo(clusterPartition);
 
-        const [lastSubmitDataPromise] = [cluster
-          ? api.getAppLastSubmission({ query: { cluster: cluster?.id, appId } }) : undefined];
+        if (cluster) { await api.getAppLastSubmission({ query: { cluster: cluster?.id, appId } })
+          .then((lastSubmitData) => {
 
-        await Promise.allSettled([lastSubmitDataPromise]).then(([lastSubmitDataResult]) => {
+            const lastSubmitPartition = lastSubmitData?.lastSubmissionInfo?.partition;
+            const lastSubmitQos = lastSubmitData?.lastSubmissionInfo?.qos;
+            const lastSubmitCoreCount = lastSubmitData?.lastSubmissionInfo?.coreCount;
 
-          const lastSubmitData = lastSubmitDataResult.status === "fulfilled" ? lastSubmitDataResult.value : undefined;
-          const lastSubmitPartition = lastSubmitData?.lastSubmissionInfo?.partition;
-          const lastSubmitQos = lastSubmitData?.lastSubmissionInfo?.qos;
-          const lastSubmitCoreCount = lastSubmitData?.lastSubmissionInfo?.coreCount;
+            // 如果存在上一次提交信息，且上一次提交信息中的分区，qos，cpu核心数满足当前集群配置，则填入上一次提交信息中的相应值
+            const setSubmitPartition = lastSubmitPartition &&
+            data.clusterInfo.slurm.partitions.some((item) => { return item.name === lastSubmitPartition; });
+            const setSubmitQos = setSubmitPartition &&
+              clusterPartition.qos?.some((item) => { return item === lastSubmitQos; });
+            const setSubmitCoreCount = setSubmitPartition &&
+              lastSubmitCoreCount && clusterPartitionCoreCount && clusterPartitionCoreCount >= lastSubmitCoreCount;
 
-          // 如果存在上一次提交信息，且上一次提交信息中的分区，qos，cpu核心数满足当前集群配置，则填入上一次提交信息中的相应值
-          const setSubmitPartition = lastSubmitPartition &&
-          data.clusterInfo.slurm.partitions.some((item) => { return item.name === lastSubmitPartition; });
-          const setSubmitQos = setSubmitPartition &&
-            clusterPartition.qos?.some((item) => { return item === lastSubmitQos; });
-          const setSubmitCoreCount = setSubmitPartition &&
-            lastSubmitCoreCount && clusterPartitionCoreCount && clusterPartitionCoreCount >= lastSubmitCoreCount;
+            const requiredObj = {
+              partition: setSubmitPartition ? lastSubmitPartition : clusterPartition.name,
+              qos: setSubmitQos ? lastSubmitQos : clusterPartition?.qos?.[0],
+              coreCount: setSubmitCoreCount ? lastSubmitCoreCount : initialValues.coreCount,
+              maxTime: lastSubmitData?.lastSubmissionInfo
+                ? lastSubmitData.lastSubmissionInfo.maxTime : initialValues.maxTime,
+            };
 
-          const requiredObj = {
-            partition: setSubmitPartition ? lastSubmitPartition : clusterPartition.name,
-            qos: setSubmitQos ? lastSubmitQos : clusterPartition?.qos?.[0],
-            coreCount: setSubmitCoreCount ? lastSubmitCoreCount : initialValues.coreCount,
-            maxTime: lastSubmitData?.lastSubmissionInfo
-              ? lastSubmitData.lastSubmissionInfo.maxTime : initialValues.maxTime,
-          };
-
-          // 如果存在上一次提交信息且上一次提交信息中的配置HTML表单与当前配置HTML表单内容相同，则填入上一次提交信息中的值
-          const attributesObj = {};
-          const lastSubmitAttributes = lastSubmitData?.lastSubmissionInfo?.customAttributes;
-          if (lastSubmitAttributes) {
-            attributes.forEach((attribute) => {
-              if (attribute.name in lastSubmitAttributes) {
-                switch (attribute.type) {
-                case "NUMBER":
-                case "TEXT":
-                  attributesObj[attribute.name] = lastSubmitAttributes[attribute.name];
-                  break;
-                case "SELECT":
-                  if (attribute.select!.some((optionItem) =>
-                    optionItem.value === lastSubmitAttributes[attribute.name])) {
+            // 如果存在上一次提交信息且上一次提交信息中的配置HTML表单与当前配置HTML表单内容相同，则填入上一次提交信息中的值
+            const attributesObj = {};
+            const lastSubmitAttributes = lastSubmitData?.lastSubmissionInfo?.customAttributes;
+            if (lastSubmitAttributes) {
+              attributes.forEach((attribute) => {
+                if (attribute.name in lastSubmitAttributes) {
+                  switch (attribute.type) {
+                  case "NUMBER":
+                  case "TEXT":
                     attributesObj[attribute.name] = lastSubmitAttributes[attribute.name];
+                    break;
+                  case "SELECT":
+                    if (attribute.select!.some((optionItem) =>
+                      optionItem.value === lastSubmitAttributes[attribute.name])) {
+                      attributesObj[attribute.name] = lastSubmitAttributes[attribute.name];
+                    }
+                    break;
+                  default:
+                    break;
                   }
-                  break;
-                default:
-                  break;
                 }
-              }
-            });
-          }
-          form.setFieldsValue({ ...requiredObj, ...attributesObj });
+              });
+            }
+            form.setFieldsValue({ ...requiredObj, ...attributesObj });
 
-          // 如果上一次提交信息存在，则填入账户值；如果不存在，不对表单中账户进行操作
-          if (lastSubmitData?.lastSubmissionInfo) {
-            form.setFieldValue("account", lastSubmitData?.lastSubmissionInfo.account);
-          }
+            // 如果上一次提交信息存在，则填入账户值；如果不存在，不对表单中账户进行操作
+            if (lastSubmitData?.lastSubmissionInfo) {
+              form.setFieldValue("account", lastSubmitData?.lastSubmissionInfo.account);
+            }
 
-        }).finally(() => {
-          setLoading(false);
-        });
+          }).finally(() => {
+            setLoading(false);
+          });
+        }
       }
     },
   });

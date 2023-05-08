@@ -224,9 +224,7 @@ export const slurmAppOps = (cluster: string): AppOps => {
         const file = join(portalConfig.appLastSubmissionDir, appId, APP_LAST_SUBMISSION_INFO);
 
         if (!await sftpExists(sftp, file)) { return { lastSubmissionInfo: undefined }; }
-
         const content = await sftpReadFile(sftp)(file);
-        logger.info("getAppLastSubmission to %s", content);
         const data = JSON.parse(content.toString()) as SubmissionInfo;
 
         return { lastSubmissionInfo: data };
