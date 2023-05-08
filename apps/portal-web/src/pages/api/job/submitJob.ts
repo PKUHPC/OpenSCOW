@@ -20,7 +20,7 @@ import { handlegRPCError } from "src/utils/server";
 
 export interface SubmitJobInfo {
   cluster: string;
-  partition: string | undefined;
+  partition: string;
   nodeCount: number;
   coreCount: number;
   gpuCount?: number;
