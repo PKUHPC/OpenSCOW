@@ -123,7 +123,7 @@ GITHUB_TOKEN={token}
 
 # 代理
 
-CLI需要访问网络的功能（例如更新scow-cli）可以设置HTTP代理。您可以通过设置`HTTPS_PROXY`, `https_proxy`, `HTTP_PROXY`, `http_proxy`环境变量来设置代理。如果多个环境变量同时存在，则使用优先级为上面列出来的顺序。
+CLI需要访问网络的功能（例如更新scow-cli）可以设置代理。您可以通过设置`HTTPS_PROXY`, `https_proxy`环境变量来设置代理。具体环境变量的规则请参考[proxy-from-env](https://www.npmjs.com/package/proxy-from-env)的文档。
 
 ```bash
 # 环境变量也可以写入.env中

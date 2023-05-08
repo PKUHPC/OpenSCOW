@@ -17,7 +17,7 @@ import JSZip from "jszip";
 import fetch from "node-fetch-commonjs";
 import { Octokit } from "octokit";
 import prompt from "prompts";
-import { createProxyAgent, proxyUrl } from "src/config/proxy";
+import { proxyAgent } from "src/config/proxy";
 import { logger } from "src/log";
 import { pipeline } from "stream/promises";
 
@@ -82,17 +82,11 @@ export const updateCli = async (options: Options) => {
     }
   }
 
-  const agent = proxyUrl ? createProxyAgent(proxyUrl) : undefined;
-
-  if (proxyUrl) {
-    logger.info("Using proxy %s", proxyUrl);
-  }
-
   const arch = getArch();
 
   // built-in fetch doesn't work with proxy
   // https://github.com/octokit/rest.js/issues/43
-  const octokit = new Octokit({ auth: GITHUB_TOKEN, request: { agent, fetch } });
+  const octokit = new Octokit({ auth: GITHUB_TOKEN, request: { agent: proxyAgent, fetch } });
 
   if (options.pr || options.branch) {
 
@@ -196,7 +190,7 @@ Please provide your GitHub personal access token via GITHUB_TOKEN in env or .env
   logger.info("Asset: %s. Download URL: %s", asset.name, asset.browser_download_url);
 
   logger.info("Downloading...");
-  const content = await download(asset.browser_download_url, { agent });
+  const content = await download(asset.browser_download_url, { agent: proxyAgent });
 
   await unlink(outputPath);
   await fs.promises.writeFile(outputPath, Buffer.from(content));

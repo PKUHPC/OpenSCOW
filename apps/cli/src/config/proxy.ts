@@ -10,12 +10,6 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import createHttpsProxyAgent from "https-proxy-agent";
-import { config } from "src/config/env";
+import { ProxyAgent } from "proxy-agent";
 
-export const proxyUrl = config.HTTPS_PROXY || config.https_proxy || config.HTTP_PROXY || config.http_proxy;
-
-export const createProxyAgent = (proxyUrl: string) => {
-  return createHttpsProxyAgent(proxyUrl);
-};
-
+export const proxyAgent = new ProxyAgent();
