@@ -32,12 +32,12 @@
     "@algolia/client-search": "4.17.0",
     "@docusaurus/module-type-aliases": "2.4.0",
     "@scow/config": "workspace:*",
-    "@sinclair/typebox": "0.28.5",
+    "@sinclair/typebox": "0.28.9",
     "@tsconfig/docusaurus": "1.0.7",
     "@docusaurus/types": "2.4.0",
     "@types/react": "18.0.18",
     "typescript": "5.0.4",
-    "@node-rs/jieba": "1.6.2"
+    "@node-rs/jieba": "1.7.0"
   },
   "browserslist": {
     "production": [
