@@ -116,7 +116,7 @@ message GetJobTemplateResponse {
 message SubmitJobRequest {
   string user_id = 1;
   string cluster = 2;
-  optional string partition = 3;
+  string partition = 3;
   uint32 node_count = 4;
   uint32 core_count = 5;
   optional uint32 gpu_count = 6;
