@@ -23,7 +23,7 @@
     "jszip": "3.10.1",
     "dotenv": "16.0.3",
     "death": "1.1.0",
-    "https-proxy-agent": "5.0.1",
+    "https-proxy-agent": "6.1.0",
     "node-fetch-commonjs": "3.2.4",
     "@scow/config": "workspace:*"
   },
