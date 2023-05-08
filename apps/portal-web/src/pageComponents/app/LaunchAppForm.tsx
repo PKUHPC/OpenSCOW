@@ -212,7 +212,7 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
           rules={[{ required: true }]}
           dependencies={["cluster"]}
         >
-          <AccountSelector cluster={cluster?.id} />
+          {clusterInfoQuery.data && <AccountSelector cluster={cluster?.id} />}
         </Form.Item>
 
         <Form.Item
