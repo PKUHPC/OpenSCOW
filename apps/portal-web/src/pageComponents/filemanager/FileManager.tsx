@@ -292,32 +292,22 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
         <PathBar
           path={path}
           loading={loading}
-          onPathChange={(curPath) => {
-            if (curPath === path) {
-              reload();
-            } else {
-              Router.push(fullUrl(curPath));
-            }
-          }}
-          breadcrumbItemRender={(pathSegament, index, path) => {
-            if (index === 0) {
-              return (
-                <Link href={fullUrl("/")} title="/" onClick={(e) => e.stopPropagation()}>
-                  <DatabaseOutlined />
-                </Link>
-              );
-            } else {
-              return (
-                <Link
-                  href={fullUrl(path)}
-                  key={index}
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  {pathSegament}
-                </Link>
-              );
-            }
-          }}
+          onPathChange={(curPath) => { curPath === path ? reload() : Router.push(fullUrl(curPath)); }}
+          breadcrumbItemRender={(pathSegament, index, path) =>
+            (index === 0 ? (
+              <Link href={fullUrl("/")} title="/" onClick={(e) => e.stopPropagation()}>
+                <DatabaseOutlined />
+              </Link>
+            ) : (
+              <Link
+                href={fullUrl(path)}
+                key={index}
+                onClick={(e) => e.stopPropagation()}
+              >
+                {pathSegament}
+              </Link>
+            ))
+          }
         />
       </TopBar>
       <OperationBar>
