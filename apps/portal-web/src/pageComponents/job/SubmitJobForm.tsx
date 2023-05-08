@@ -10,18 +10,16 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { ReloadOutlined } from "@ant-design/icons";
 import { parsePlaceholder } from "@scow/lib-config/build/parse";
-import { App, Button, Checkbox, Col, Form, Input, InputNumber, Row, Select, Tooltip } from "antd";
+import { App, Button, Checkbox, Col, Form, Input, InputNumber, Row, Select } from "antd";
+import dayjs from "dayjs";
 import Router from "next/router";
-import randomWords from "random-words";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useAsync } from "react-async";
 import { useStore } from "simstate";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { CodeEditor } from "src/components/CodeEditor";
-import { InputGroupFormItem } from "src/components/InputGroupFormItem";
 import { AccountSelector } from "src/pageComponents/job/AccountSelector";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { Cluster, publicConfig } from "src/utils/config";
@@ -44,12 +42,50 @@ interface JobForm {
   save: boolean;
 }
 
-function genJobName() {
-  return randomWords({ exactly: 2, join: "-" });
-}
+// 生成默认工作名称，命名规则为job-日期-序号（如job-20230428-01）
+const genJobName = (str: string): string => {
+  const today = dayjs().toISOString();
+  const paddedStr = parseInt(str) < 10 ? "0" + str : str;
+  return `job-${today.slice(0, 4)}${today.slice(5, 7)}${today.slice(8, 10)}-${paddedStr}`;
+};
+
+const formatMemorySize = (size: number): string => {
+  const unitMap = ["MB", "GB", "TB"];
+  const CARRY = 1024;
+
+  let carryCount = 0;
+  let decimalSize = Math.round(size);
+
+  while (decimalSize > CARRY) {
+    decimalSize = decimalSize / CARRY;
+    carryCount++;
+  }
+
+  if (decimalSize >= 1000) {
+    decimalSize = decimalSize / CARRY;
+    carryCount++;
+  }
+
+  const fixedNumber = decimalSize < 9.996 ? 2 : (decimalSize < 99.95 ? 1 : 0);
+  return `${decimalSize.toFixed(fixedNumber)} ${unitMap[carryCount]}`;
+};
+
+// 设置节点数，单节点核心数，单节点GPU卡数填入变化config
+const inputNumberFloorConfig = {
+
+  precision: 0,
+  formatter: (value: number) => `${Math.floor(value)}`,
+  parser: (value: string) => Math.floor(parseInt(value)),
+  onBlur: (e: React.FocusEvent<HTMLInputElement>) => {
+    if (!e.target.value) {
+      e.target.value = "1";
+    }
+  },
+
+};
 
 const initialValues = {
-  command: "",
+  command: "#此参数设置的优先级高于页面其他地方，两者冲突时以此处为准\n",
   nodeCount: 1,
   coreCount: 1,
   gpuCount: 1,
@@ -133,6 +169,24 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
           qos: partition.qos?.[0],
         };
         form.setFieldsValue(setInitialValues);
+
+        if (cluster) {
+          api.getAllJobs({
+            query: {
+              cluster: cluster?.id,
+              startTime: dayjs().startOf("day").toISOString(),
+              endTime: dayjs().endOf("day").toISOString(),
+            },
+          }).then((result) => {
+            let jobsNumOfToday = 0;
+            if (result) {
+              jobsNumOfToday = result.results.length;
+            }
+            const jobName = genJobName((jobsNumOfToday + 1).toString());
+            form.setFieldValue("jobName", jobName);
+            setWorkingDirectoryValue();
+          });
+        }
       }
     },
   });
@@ -144,16 +198,6 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
         calculateWorkingDirectory(clusterInfoQuery.data.clusterInfo.submitJobDirTemplate));
     }
   };
-
-  const reloadJobName = () => {
-    const jobName = genJobName();
-    form.setFieldValue("jobName", jobName);
-    setWorkingDirectoryValue();
-  };
-
-  useEffect(() => {
-    reloadJobName();
-  }, []);
 
   useEffect(() => {
     setWorkingDirectoryValue();
@@ -178,11 +222,12 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
   // 判断是使用template中的cluster还是系统默认cluster，防止系统配置文件更改时仍选改动前的cluster
   const defaultCluster = publicConfig.CLUSTERS.find((x) => x.id === initial.cluster?.id) ?? defaultClusterStore.cluster;
 
-  const memory = (currentPartitionInfo ?
+  const memorySize = (currentPartitionInfo ?
     currentPartitionInfo.gpus ? nodeCount * gpuCount
     * Math.floor(currentPartitionInfo.cores / currentPartitionInfo.gpus)
     * Math.floor(currentPartitionInfo.mem / currentPartitionInfo.cores) :
-      nodeCount * coreCount * Math.floor(currentPartitionInfo.mem / currentPartitionInfo.cores) : 0) + "MB";
+      nodeCount * coreCount * Math.floor(currentPartitionInfo.mem / currentPartitionInfo.cores) : 0);
+  const memory = formatMemorySize(memorySize);
 
   const coreCountSum = currentPartitionInfo?.gpus
     ? nodeCount * gpuCount * Math.floor(currentPartitionInfo.cores / currentPartitionInfo.gpus)
@@ -206,11 +251,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
         </Col>
         <Col span={24} sm={12}>
           <Form.Item<JobForm> label="作业名" name="jobName" rules={[{ required: true }]}>
-            <InputGroupFormItem deltaWidth="32px">
-              <Tooltip title="重新生成作业名">
-                <Button icon={<ReloadOutlined />} onClick={reloadJobName} />
-              </Tooltip>
-            </InputGroupFormItem>
+            <Input />
           </Form.Item>
         </Col>
       </Row>
@@ -269,7 +310,11 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
               { required: true, type: "integer", max: currentPartitionInfo?.nodes },
             ]}
           >
-            <InputNumber min={1} />
+            <InputNumber
+              min={1}
+              max={currentPartitionInfo?.nodes}
+              {...inputNumberFloorConfig}
+            />
           </Form.Item>
         </Col>
         <Col span={12} sm={6}>
@@ -286,7 +331,11 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
                 },
               ]}
             >
-              <InputNumber min={1} />
+              <InputNumber
+                min={1}
+                max={currentPartitionInfo?.gpus}
+                {...inputNumberFloorConfig}
+              />
             </Form.Item>
           ) : (
             <Form.Item
@@ -301,7 +350,11 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
                 },
               ]}
             >
-              <InputNumber min={1} />
+              <InputNumber
+                min={1}
+                max={currentPartitionInfo?.cores}
+                {...inputNumberFloorConfig}
+              />
             </Form.Item>
           )}
         </Col>
@@ -331,14 +384,14 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
 
         {currentPartitionInfo?.gpus ? (
           <Col className="ant-form-item" span={12} sm={6}>
-            总卡数：{nodeCount * gpuCount}
+            总GPU卡数：{nodeCount * gpuCount}
           </Col>
         ) : (
           ""
         )}
 
         <Col className="ant-form-item" span={12} sm={6}>
-          总核心数：{coreCountSum}
+          总CPU核心数：{coreCountSum}
         </Col>
         <Col className="ant-form-item" span={12} sm={6}>
           总内存容量：{memory}
