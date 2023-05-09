@@ -38,6 +38,7 @@ const changes = {
   "cli": [],
   "gateway": [],
   "grpc-api": [],
+  "config": [],
 };
 
 for (const file of files) {
@@ -124,9 +125,16 @@ const generateContent = (scowPackage) => {
   return content.trim();
 };
 
+const scowApiVersion = readPackageJson("protos/package.json").version;
+const configVersion = readPackageJson("libs/config/package.json").version;
+
 const changelogContent = `# v${rootPackageJson.version}
 
 发布于：${new Date().toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" })}
+
+SCOW API版本：${scowApiVersion} ([查看变更](#scow-api-和-hook))
+
+配置文件版本：${configVersion} ([查看变更](#配置文件))
 
 ## 门户系统前端 (portal-web)
 
@@ -159,6 +167,10 @@ ${generateContent("gateway")}
 ## SCOW API和Hook
 
 ${generateContent("grpc-api")}
+
+## 配置文件
+
+${generateContent("config")}
 `;
 
 const CHANGELOG_BASE_PATH = "changelogs";
