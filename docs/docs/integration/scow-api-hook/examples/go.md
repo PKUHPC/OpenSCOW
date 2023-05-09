@@ -47,9 +47,12 @@ plugins:
 指定需要使用的SCOW的版本，生成代码
 
 ```bash
-# 通过#后的参数确认SCOW版本，可输入分支（branch=master）, SCOW Tag号（tag=v0.4.0）
+# 通过#后的参数确认SCOW和SCOW API版本，可输入
+#    SCOW API的版本号（tag=api-v0.3.0）（推荐，从v0.3.0版本开始可用）
+#    SCOW的分支（branch=master）
+#    SCOW Tag号（tag=v0.4.0）
 # 不写默认使用SCOW的master分支版本
-buf generate --template buf.gen.yaml https://github.com/PKUHPC/SCOW.git#subdir=protos,branch=master
+buf generate --template buf.gen.yaml https://github.com/PKUHPC/SCOW.git#subdir=protos,branch=api-v0.3.0
 ```
 
 ## 使用SCOW API
