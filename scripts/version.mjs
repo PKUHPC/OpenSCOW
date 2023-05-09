@@ -97,6 +97,12 @@ const getChangesetLine = (line) =>
   `- ${line.content}` +
   ` ([${line.gitCommit.substring(0, 8)}](https://github.com/PKUHPC/SCOW/commit/${line.gitCommit}))`;
 
+/**
+ * Generate changelog content for a package
+ * @param {string} scowPackage the package name
+ * @param {string | undefined} title title. if not set, no title is shown
+ * @returns changelog content
+ */
 const generateContent = (scowPackage, title) => {
 
   const packageChanges = changes[scowPackage];
@@ -111,7 +117,7 @@ const generateContent = (scowPackage, title) => {
     changesByType[change.type].push(change);
   }
 
-  let content = `## ${title} (${scowPackage}) \n\n`;
+  let content = title ? `## ${title} (${scowPackage}) \n\n` : "";
   if (changesByType.major.length > 0) {
     content += "### 重大更新\n" + changesByType.major.map(getChangesetLine).join("\n") + "\n\n";
   }
@@ -134,9 +140,19 @@ const changelogContent = `# v${rootPackageJson.version}
 
 发布于：${new Date().toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" })}
 
-SCOW API版本：${scowApiVersion} ([查看变更](#scow-api和hook-grpc-api))
+# 配置文件更新
 
-配置文件版本：${configVersion} ([查看变更](#配置文件-config))
+配置文件版本：${configVersion}
+
+${generateContent("config")}
+
+# SCOW API和Hook更新
+
+SCOW API版本：${scowApiVersion}
+
+${generateContent("grpc-api")}
+
+# SCOW更新
 
 ${generateContent("portal-web", "门户系统前端")
  + generateContent("portal-server", "门户系统后端")
@@ -145,8 +161,6 @@ ${generateContent("portal-web", "门户系统前端")
  + generateContent("auth", "认证系统")
  + generateContent("cli", "CLI")
  + generateContent("gateway", "网关")
- + generateContent("grpc-api", "SCOW API和Hook")
- + generateContent("config", "配置文件")
 }
 `;
 
