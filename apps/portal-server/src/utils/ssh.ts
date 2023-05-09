@@ -22,7 +22,7 @@ import { Logger } from "ts-log";
 
 export function getClusterLoginNode(cluster: string): string | undefined {
 
-  return clusters[cluster]?.slurm?.loginNodes?.[0];
+  return clusters[cluster]?.loginNodes?.[0];
 }
 
 export const SSH_ERROR_CODE = "SSH_ERROR";
@@ -56,7 +56,7 @@ export async function sshConnect<T>(
  * Check whether all clusters can be logged in as root user
  */
 export async function checkClustersRootUserLogin(logger: Logger) {
-  await Promise.all(Object.values(clusters).map(async ({ displayName, slurm: { loginNodes } }) => {
+  await Promise.all(Object.values(clusters).map(async ({ displayName, loginNodes }) => {
     const node = loginNodes[0];
     logger.info("Checking if root can login to %s by login node %s", displayName, node);
     const error = await testRootUserSshLogin(node, rootKeyPair, console);

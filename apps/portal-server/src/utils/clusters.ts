@@ -10,11 +10,16 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { ClusterOps } from "src/clusterops/api";
-import { slurmAppOps } from "src/clusterops/slurm/app";
-import { slurmJobOps } from "src/clusterops/slurm/job";
+import { getSchedulerAdapterClient, SchedulerAdapterClient } from "@scow/lib-scheduler-adapter";
+import { clusters } from "src/config/clusters";
 
-export const createSlurmClusterOps = (cluster: string): ClusterOps => ({
-  app: slurmAppOps(cluster),
-  job: slurmJobOps(cluster),
-});
+
+const adapterClientForClusters = Object.entries(clusters).reduce((prev, [cluster, c]) => {
+  const client = getSchedulerAdapterClient(c.adapterUrl);
+  prev[cluster] = client;
+  return prev;
+}, {} as Record<string, SchedulerAdapterClient>);
+
+export const getAdapterClient = (cluster: string) => {
+  return adapterClientForClusters[cluster];
+};

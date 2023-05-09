@@ -10,24 +10,24 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { asyncClientCall } from "@ddadaal/tsgrpc-client";
+import { ServiceError } from "@grpc/grpc-js";
+import { Status } from "@grpc/grpc-js/build/src/constants";
 import { getAppConfigs } from "@scow/config/build/app";
 import { getPlaceholderKeys } from "@scow/lib-config/build/parse";
+import { formatTime } from "@scow/lib-scheduler-adapter";
 import { getUserHomedir,
-  loggedExec, sftpChmod, sftpExists, sftpReaddir, sftpReadFile, sftpRealPath, sftpWriteFile } from "@scow/lib-ssh";
-import { RunningJob } from "@scow/protos/build/common/job";
+  sftpChmod, sftpExists, sftpReaddir, sftpReadFile, sftpRealPath, sftpWriteFile } from "@scow/lib-ssh";
+import { JobInfo, SubmitJobRequest } from "@scow/scheduler-adapter-protos/build/protos/job";
 import { randomUUID } from "crypto";
 import fs from "fs";
 import { join } from "path";
 import { quote } from "shell-quote";
 import { AppOps, AppSession } from "src/clusterops/api/app";
-import { displayIdToPort } from "src/clusterops/slurm/bl/port";
 import { portalConfig } from "src/config/portal";
-import { splitSbatchArgs } from "src/utils/app";
+import { getAdapterClient } from "src/utils/clusters";
 import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
-import { parseDisplayId, refreshPassword, VNCSERVER_BIN_PATH } from "src/utils/turbovnc";
-
-import { querySqueue } from "./bl/queryJobInfo";
-import { generateJobScript, parseSbatchOutput } from "./bl/submitJob";
+import { displayIdToPort, parseDisplayId, refreshPassword, VNCSERVER_BIN_PATH } from "src/utils/turbovnc";
 
 interface SessionMetadata {
   sessionId: string;
@@ -54,7 +54,7 @@ const SESSION_METADATA_NAME = "session.json";
 const SERVER_SESSION_INFO = "server_session_info.json";
 const VNC_SESSION_INFO = "VNC_SESSION_INFO";
 
-export const slurmAppOps = (cluster: string): AppOps => {
+export const appOps = (cluster: string): AppOps => {
 
   const host = getClusterLoginNode(cluster);
 
@@ -68,14 +68,17 @@ export const slurmAppOps = (cluster: string): AppOps => {
         partition, qos, customAttributes } = request;
 
 
-      const userSbatchOptions = customAttributes["sbatchOptions"]
-        ? splitSbatchArgs(customAttributes["sbatchOptions"])
-        : [];
+      // TODO: support extra sbatch options for slurm
+      // const userSbatchOptions = customAttributes["sbatchOptions"]
+      //   ? splitSbatchArgs(customAttributes["sbatchOptions"])
+      //   : [];
 
       // prepare script file
       const appConfig = apps[appId];
 
-      if (!appConfig) { return { code: "APP_NOT_FOUND" }; }
+      if (!appConfig) {
+        throw <ServiceError> { code: Status.NOT_FOUND, message: `app id ${appId} is not found` };
+      }
 
       const jobName = randomUUID();
 
@@ -88,24 +91,29 @@ export const slurmAppOps = (cluster: string): AppOps => {
 
         const sftp = await ssh.requestSFTP();
 
-        const submitAndWriteMetadata = async (script: string, env?: Record<string, string>) => {
+        const getEnvVariables = (env: Record<string, string>) =>
+          Object.keys(env).map((x) => `export ${x}=${quote([env[x] ?? ""])}\n`).join("");
+
+        const submitAndWriteMetadata = async (request: SubmitJobRequest) => {
           const remoteEntryPath = join(workingDirectory, "entry.sh");
 
-          await sftpWriteFile(sftp)(remoteEntryPath, script);
-
           // submit entry.sh
-          // createApp is slow already
-          // use executeAsUser increases code complexity greatly
-          const { code, stderr, stdout } = await loggedExec(ssh, logger, false,
-            "sbatch", [remoteEntryPath], { execOptions: { env: env as NodeJS.ProcessEnv } },
-          );
+          const client = getAdapterClient(cluster);
+          // TODO: partition
+          const reply = await asyncClientCall(client.job, "submitJob", request).catch((e) => {
+            // TODO: check error format
+            if (e.code === Status.UNKNOWN && e.details.reason === "SBATCH_FAILED") {
+              throw <ServiceError> {
+                code: Status.INTERNAL,
+                message: "sbatch failed",
+                details: e.details.metadata["reason"],
+              };
+            } else {
+              throw e;
+            }
+          });
 
-          if (code !== 0) {
-            return { code: "SBATCH_FAILED", message: stderr } as const;
-          }
-
-          // parse stdout output to get the job id
-          const jobId = parseSbatchOutput(stdout);
+          const jobId = reply.jobId;
 
           // write session metadata
           const metadata: SessionMetadata = {
@@ -115,8 +123,11 @@ export const slurmAppOps = (cluster: string): AppOps => {
             appId,
           };
 
+          // entry.sh save the generated script
+          await sftpWriteFile(sftp)(remoteEntryPath, reply.generatedScript);
+
           await sftpWriteFile(sftp)(join(workingDirectory, SESSION_METADATA_NAME), JSON.stringify(metadata));
-          return { code: "OK", jobId, sessionId: metadata.sessionId } as const;
+          return { jobId, sessionId: metadata.sessionId } as const;
         };
 
         let customAttributesExport: string = "";
@@ -143,22 +154,16 @@ export const slurmAppOps = (cluster: string): AppOps => {
 
           await sftpWriteFile(sftp)(join(workingDirectory, "script.sh"), appConfig.web!.script);
 
-          const configSlurmOptions: string[] = appConfig.slurm?.options ?? [];
+          // TODO: extra slurm option
+          // const configSlurmOptions: string[] = appConfig.slurm?.options ?? [];
 
-          const script = generateJobScript({
-            jobName,
-            command: SERVER_ENTRY_COMMAND,
-            account: account,
-            coreCount: coreCount,
-            maxTime: maxTime,
-            nodeCount: 1,
-            partition: partition,
+          const envVariables = getEnvVariables({ SERVER_SESSION_INFO });
+
+          return await submitAndWriteMetadata({
+            userId, jobName, account, partition: partition!, qos, nodeCount: 1, gpuCount: 0,
+            coreCount, timeLimitMinutes: maxTime, script: envVariables + SERVER_ENTRY_COMMAND,
             workingDirectory,
-            qos: qos,
-            otherOptions: configSlurmOptions.concat(userSbatchOptions),
           });
-
-          return await submitAndWriteMetadata(script, { SERVER_SESSION_INFO });
         } else {
           // vnc app
           const beforeScript = customAttributesExport + (appConfig.vnc!.beforeScript ?? "");
@@ -168,23 +173,17 @@ export const slurmAppOps = (cluster: string): AppOps => {
           await sftpWriteFile(sftp)(xstartupPath, appConfig.vnc!.xstartup);
           await sftpChmod(sftp)(xstartupPath, "755");
 
-          const configSlurmOptions: string[] = appConfig.slurm?.options ?? [];
+          // TODO: extra slurm option
+          // const configSlurmOptions: string[] = appConfig.slurm?.options ?? [];
 
-          const script = generateJobScript({
-            jobName,
-            command: VNC_ENTRY_COMMAND,
-            account: account,
-            coreCount: coreCount,
-            maxTime: maxTime,
-            nodeCount: 1,
-            partition: partition,
-            workingDirectory,
-            qos: qos,
-            output: VNC_OUTPUT_FILE,
-            otherOptions: configSlurmOptions.concat(userSbatchOptions),
+          const envVariables = getEnvVariables({ VNC_SESSION_INFO, VNCSERVER_BIN_PATH });
+
+          return await submitAndWriteMetadata({
+            userId, jobName, account, partition: partition!, qos, nodeCount: 1, gpuCount: 0,
+            coreCount, timeLimitMinutes: maxTime, script: envVariables + VNC_ENTRY_COMMAND,
+            workingDirectory, stdout: VNC_OUTPUT_FILE,
           });
 
-          return await submitAndWriteMetadata(script, { VNC_SESSION_INFO, VNCSERVER_BIN_PATH });
         }
 
       });
@@ -198,12 +197,20 @@ export const slurmAppOps = (cluster: string): AppOps => {
       return await sshConnect(host, "root", logger, async (ssh) => {
 
         // If a job is not running, it cannot be ready
-        const runningJobsInfo = await querySqueue(ssh, userId, logger, ["-u", userId]);
+        const client = getAdapterClient(cluster);
+        const runningJobsInfo = await asyncClientCall(client.job, "getJobs", {
+          fields: ["job_id", "state", "elapsed_seconds", "time_limit_minutes"],
+          filter: {
+            users: [userId], accounts: [],
+            states: ["RUNNING", "PENDING"],
+          },
+        }).then((resp) => resp.jobs);
+
 
         const runningJobInfoMap = runningJobsInfo.reduce((prev, curr) => {
           prev[curr.jobId] = curr;
           return prev;
-        }, {} as Record<number, RunningJob>);
+        }, {} as Record<number, JobInfo>);
 
         const sftp = await ssh.requestSFTP();
 
@@ -228,7 +235,7 @@ export const slurmAppOps = (cluster: string): AppOps => {
           const content = await sftpReadFile(sftp)(metadataPath);
           const sessionMetadata = JSON.parse(content.toString()) as SessionMetadata;
 
-          const runningJobInfo: RunningJob | undefined = runningJobInfoMap[sessionMetadata.jobId];
+          const runningJobInfo: JobInfo | undefined = runningJobInfoMap[sessionMetadata.jobId];
 
           const app = apps[sessionMetadata.appId];
 
@@ -267,8 +274,8 @@ export const slurmAppOps = (cluster: string): AppOps => {
             state: runningJobInfo?.state ?? "ENDED",
             ready,
             dataPath: await sftpRealPath(sftp)(jobDir),
-            runningTime: runningJobInfo?.runningTime ?? "",
-            timeLimit: runningJobInfo?.timeLimit ?? "",
+            runningTime: runningJobInfo?.elapsedSeconds ? formatTime(runningJobInfo.elapsedSeconds * 1000) : "",
+            timeLimit: runningJobInfo?.timeLimitMinutes ? formatTime(runningJobInfo.timeLimitMinutes * 60 * 1000) : "",
           });
 
         }));
@@ -289,7 +296,7 @@ export const slurmAppOps = (cluster: string): AppOps => {
         const jobDir = join(userHomeDir, portalConfig.appJobsDir, sessionId);
 
         if (!await sftpExists(sftp, jobDir)) {
-          return { code: "NOT_FOUND" };
+          throw <ServiceError>{ code: Status.NOT_FOUND, message: `session id ${sessionId} is not found` };
         }
 
         const metadataPath = join(jobDir, SESSION_METADATA_NAME);
@@ -307,7 +314,6 @@ export const slurmAppOps = (cluster: string): AppOps => {
             const { HOST, PORT, PASSWORD, ...rest } = serverSessionInfo;
             const customFormData = rest as {[key: string]: string};
             return {
-              code: "OK",
               appId: sessionMetadata.appId,
               host: HOST,
               port: +PORT,
@@ -346,7 +352,6 @@ export const slurmAppOps = (cluster: string): AppOps => {
                 return await sshConnect(host, userId, logger, async (computeNodeSsh) => {
                   const password = await refreshPassword(computeNodeSsh, null, logger, displayId!);
                   return {
-                    code: "OK",
                     appId: sessionMetadata.appId,
                     host,
                     port: displayIdToPort(displayId!),
@@ -357,7 +362,8 @@ export const slurmAppOps = (cluster: string): AppOps => {
             }
           }
         }
-        return { code: "UNAVAILABLE" };
+
+        throw <ServiceError>{ code: Status.UNAVAILABLE, message: `session id ${sessionId} cannot be connected` };
 
       });
     },

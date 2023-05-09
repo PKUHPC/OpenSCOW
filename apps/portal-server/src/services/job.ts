@@ -10,49 +10,45 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { ServiceError } from "@ddadaal/tsgrpc-common";
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { Status } from "@grpc/grpc-js/build/src/constants";
+import { jobInfoToPortalJobInfo, jobInfoToRunningjob } from "@scow/lib-scheduler-adapter";
 import { JobServiceServer, JobServiceService } from "@scow/protos/build/portal/job";
 import { getClusterOps } from "src/clusterops";
 import { JobTemplate } from "src/clusterops/api/job";
-import { clusterNotFound, jobNotFound } from "src/utils/errors";
+import { getAdapterClient } from "src/utils/clusters";
+import { clusterNotFound } from "src/utils/errors";
 
 export const jobServiceServer = plugin((server) => {
 
   server.addService<JobServiceServer>(JobServiceService, {
 
-    cancelJob: async ({ request, logger }) => {
+    cancelJob: async ({ request }) => {
 
       const { cluster, jobId, userId } = request;
 
-      const clusterops = getClusterOps(cluster);
+      const client = getAdapterClient(cluster);
+      if (!client) { throw clusterNotFound(cluster); }
 
-      if (!clusterops) { throw clusterNotFound(cluster); }
-
-      const reply = await clusterops.job.cancelJob({
-        jobId,
-        userId,
-      }, logger);
-
-      if (reply.code === "NOT_FOUND") {
-        throw jobNotFound(jobId);
-      }
+      await asyncClientCall(client.job, "cancelJob", {
+        userId, jobId,
+      });
 
       return [{}];
 
     },
 
-    listAccounts: async ({ request, logger }) => {
+    listAccounts: async ({ request }) => {
       const { cluster, userId } = request;
 
-      const clusterops = getClusterOps(cluster);
+      const client = getAdapterClient(cluster);
+      if (!client) { throw clusterNotFound(cluster); }
 
-      if (!clusterops) { throw clusterNotFound(cluster); }
-
-      const reply = await clusterops.job.listAccounts({
+      const reply = await asyncClientCall(client.account, "listAccounts", {
         userId,
-      }, logger);
+      });
 
       return [{ accounts: reply.accounts }];
     },
@@ -64,13 +60,9 @@ export const jobServiceServer = plugin((server) => {
 
       if (!clusterops) { throw clusterNotFound(cluster); }
 
-      const reply = await clusterops.job.getJobTamplate({
+      const reply = await clusterops.job.getJobTemplate({
         id: templateId, userId,
       }, logger);
-
-      if (reply.code === "NOT_FOUND") {
-        throw <ServiceError> { code: Status.NOT_FOUND, message: `Job template id ${templateId} is not found.` };
-      }
 
       return [{ template: reply.template }];
 
@@ -92,35 +84,44 @@ export const jobServiceServer = plugin((server) => {
 
     },
 
-    listRunningJobs: async ({ request, logger }) => {
+    listRunningJobs: async ({ request }) => {
 
       const { cluster, userId } = request;
 
-      const clusterops = getClusterOps(cluster);
+      const client = getAdapterClient(cluster);
+      if (!client) { throw clusterNotFound(cluster); }
 
-      if (!clusterops) { throw clusterNotFound(cluster); }
+      const reply = await asyncClientCall(client.job, "getJobs", {
+        fields: [
+          "job_id", "partition", "name", "user", "state", "elapsed_seconds",
+          "nodes_alloc", "node_list", "reason", "account", "cpus_alloc",
+          "qos", "submit_time", "time_limit_minutes", "working_directory",
+        ],
+        filter: { users: [userId], accounts: [], states: []},
+      });
 
-      const reply = await clusterops.job.listRunningJobs({
-        userId,
-      }, logger);
-
-      return [{ results: reply.results }];
+      return [{ results: reply.jobs.map(jobInfoToRunningjob) }];
     },
 
-    listAllJobs: async ({ request, logger }) => {
+    listAllJobs: async ({ request }) => {
       const { cluster, userId, endTime, startTime } = request;
 
-      const clusterops = getClusterOps(cluster);
+      const client = getAdapterClient(cluster);
+      if (!client) { throw clusterNotFound(cluster); }
 
-      if (!clusterops) { throw clusterNotFound(cluster); }
+      const reply = await asyncClientCall(client.job, "getJobs", {
+        fields: [
+          "job_id", "name", "account", "partition", "qos", "state", "working_directory",
+          "reason", "elapsed_seconds", "time_limit_minutes", "submit_time",
+          "start_time", "end_time",
+        ],
+        filter: {
+          users: [userId], accounts: [], states: [],
+          submitTime: { startTime, endTime },
+        },
+      });
 
-      const reply = await clusterops.job.listAllJobsInfo({
-        userId,
-        endTime: endTime ? new Date(endTime) : undefined,
-        startTime: startTime ? new Date(startTime) : undefined,
-      }, logger);
-
-      return [{ results: reply.results }];
+      return [{ results: reply.jobs.map(jobInfoToPortalJobInfo) }];
 
     },
 
@@ -128,46 +129,55 @@ export const jobServiceServer = plugin((server) => {
       const { cluster, command, jobName, coreCount, gpuCount, maxTime, saveAsTemplate, userId,
         nodeCount, partition, qos, account, comment, workingDirectory, output, errorOutput, memory } = request;
 
-      const jobInfo: JobTemplate = {
-        jobName,
-        coreCount,
-        maxTime,
-        nodeCount,
-        gpuCount,
-        partition,
-        qos,
-        account,
-        command,
-        comment,
-        workingDirectory,
-        output,
-        errorOutput,
-        memory,
-      };
 
-      const clusterops = getClusterOps(cluster);
+      const client = getAdapterClient(cluster);
+      if (!client) { throw clusterNotFound(cluster); }
 
-      const scriptReply = await clusterops.job.generateJobScript({
-        jobInfo,
-      }, logger);
+      const reply = await asyncClientCall(client.job, "submitJob", {
+        userId, jobName, account, partition: partition!, qos, nodeCount, gpuCount: gpuCount || 0,
+        memoryMb: Number(memory?.split("M")[0]), coreCount, timeLimitMinutes: maxTime,
+        script: command, workingDirectory, stdout: output, stderr: errorOutput,
+      }).catch((e) => {
+        // TODO: check error format
+        if (e.code === Status.UNKNOWN && e.details.reason === "SBATCH_FAILED") {
+          throw <ServiceError> {
+            code: Status.INTERNAL,
+            message: "sbatch failed",
+            details: e.details.metadata["reason"],
+          };
+        } else {
+          throw e;
+        }
+      });
 
-      const reply = await clusterops.job.submitJob({
-        userId,
-        jobInfo,
-        script: scriptReply.script,
-        saveAsTemplate,
-      }, logger);
+      if (saveAsTemplate) {
+        const jobInfo: JobTemplate = {
+          jobName,
+          coreCount,
+          maxTime,
+          nodeCount,
+          gpuCount,
+          partition,
+          qos,
+          account,
+          command,
+          comment,
+          workingDirectory,
+          output,
+          errorOutput,
+          memory,
+        };
 
-      if (reply.code === "SBATCH_FAILED") {
-        throw new ServiceError({
-          code: Status.INTERNAL,
-          details: reply.message,
-        });
+        const clusterOps = getClusterOps(cluster);
+        if (!clusterOps) { throw clusterNotFound(cluster); }
+
+        await clusterOps.job.saveJobTemplate({
+          userId, jobId: reply.jobId, jobInfo,
+        }, logger);
       }
 
       return [{ jobId: reply.jobId }];
     },
-
 
   });
 

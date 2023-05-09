@@ -43,14 +43,6 @@ export const appServiceServer = plugin((server) => {
         sessionId, userId,
       }, logger);
 
-      if (reply.code === "NOT_FOUND") {
-        throw <ServiceError>{ code: Status.NOT_FOUND, message: `session id ${sessionId} is not found` };
-      }
-
-      if (reply.code === "UNAVAILABLE") {
-        throw <ServiceError>{ code: Status.UNAVAILABLE, message: `session id ${sessionId} cannot be connected` };
-      }
-
       const app = apps[reply.appId];
 
       if (!app) {
@@ -98,9 +90,6 @@ export const appServiceServer = plugin((server) => {
 
       const { account, appId, cluster, coreCount, maxTime, proxyBasePath,
         partition, qos, userId, customAttributes } = request;
-
-
-
 
       const app = apps[appId];
       if (!app) {
@@ -166,14 +155,6 @@ export const appServiceServer = plugin((server) => {
         customAttributes,
         proxyBasePath,
       }, logger);
-
-      if (reply.code === "SBATCH_FAILED") {
-        throw <ServiceError> { code: Status.INTERNAL, message: "sbatch failed", details: reply.message };
-      }
-
-      if (reply.code === "APP_NOT_FOUND") {
-        throw <ServiceError> { code: Status.NOT_FOUND, message: `app id ${appId} is not found` };
-      }
 
       return [{ jobId: reply.jobId, sessionId: reply.sessionId }];
 
