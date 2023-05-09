@@ -134,26 +134,18 @@ const changelogContent = `# v${rootPackageJson.version}
 
 发布于：${new Date().toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" })}
 
-SCOW API版本：${scowApiVersion} ([查看变更](#scow-api-和-hook))
+SCOW API版本：${scowApiVersion} ([查看变更](#scow-api-和-hook-(grpc-api))))
 
 配置文件版本：${configVersion} ([查看变更](#配置文件))
 
 ${generateContent("portal-web", "门户系统前端")}
-
 ${generateContent("portal-server", "门户系统后端")}
-
 ${generateContent("mis-web", "管理系统前端")}
-
 ${generateContent("mis-server", "管理系统后端")}
-
 ${generateContent("auth", "认证系统")}
-
 ${generateContent("cli", "CLI")}
-
 ${generateContent("gateway", "网关")}
-
 ${generateContent("grpc-api", "SCOW API和Hook")}
-
 ${generateContent("config", "配置文件")}
 `;
 
