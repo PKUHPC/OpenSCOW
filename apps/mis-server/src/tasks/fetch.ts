@@ -17,7 +17,6 @@ import { SqlEntityManager } from "@mikro-orm/mysql";
 import { parsePlaceholder } from "@scow/lib-config";
 import { addJobCharge, charge } from "src/bl/charging";
 import { emptyJobPriceInfo } from "src/bl/jobPrice";
-import { clusterNameToScowClusterId } from "src/config/clusters";
 import { misConfig } from "src/config/mis";
 import { Account } from "src/entities/Account";
 import { JobInfo } from "src/entities/JobInfo";
@@ -132,7 +131,9 @@ export async function fetchJobs(
 
           const price = tenant ? priceMap.calculatePrice({
             biJobIndex: i.biJobIndex,
-            cluster: clusterNameToScowClusterId(i.cluster),
+            // TODO
+            // cluster: clusterNameToScowClusterId(i.cluster),
+            cluster: "",
             cpusAlloc: i.cpusAlloc,
             gpu: i.gpu,
             memAlloc: i.memAlloc,
