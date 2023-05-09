@@ -410,8 +410,10 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
         files={files}
         filesFilter={(files) => files.filter((file) => showHiddenFile || !file.name.startsWith("."))}
         loading={loading}
-        selectedKeys={selectedKeys}
-        setSelectedKeys={setSelectedKeys}
+        rowSelection={{
+          selectedRowKeys: selectedKeys,
+          onChange: setSelectedKeys,
+        }}
         rowKey={(r) => fileInfoKey(r, path)}
         onRow={(r) => ({
           onClick: () => {

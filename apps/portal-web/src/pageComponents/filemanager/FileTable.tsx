@@ -13,8 +13,8 @@
 import { CloseOutlined, FileOutlined, FolderOutlined } from "@ant-design/icons";
 import { compareDateTime, formatDateTime } from "@scow/lib-web/build/utils/datetime";
 import { compareNumber } from "@scow/lib-web/build/utils/math";
-import { Table, Tooltip } from "antd";
-import React, { Key } from "react";
+import { Table, TableProps, Tooltip } from "antd";
+import React from "react";
 import { FileInfo, FileType } from "src/pages/api/file/list";
 
 const nodeModeToString = (mode: number) => {
@@ -55,14 +55,9 @@ const formatFileSize = (size: number): string => {
   return `${decimalSize.toFixed(fixedNumber)} ${unitMap[carryCount]}`;
 };
 
-interface Props {
+interface Props extends TableProps<FileInfo> {
   files: FileInfo[];
-  loading: boolean;
-  selectedKeys: Key[];
-  setSelectedKeys: (keys: Key[]) => void;
-  rowKey: (r: FileInfo) => Key;
   filesFilter?: (files: FileInfo[]) => FileInfo[];
-  onRow?: (r: FileInfo) => React.HTMLAttributes<HTMLElement>;
   fileNameRender?: (fileName: string, r: FileInfo) => React.ReactNode;
   actionRender?: (_, r: FileInfo) => React.ReactNode;
 }
@@ -76,29 +71,19 @@ const fileTypeIcons = {
 export const FileTable: React.FC<Props> = (
   {
     files,
-    loading,
-    selectedKeys,
-    setSelectedKeys,
-    rowKey,
-    onRow,
     fileNameRender,
     actionRender,
     filesFilter,
+    ...otherProps
   },
 ) => {
   return (
     <Table
+      {...otherProps}
       dataSource={filesFilter ? filesFilter(files) : files}
-      loading={loading}
       pagination={false}
       size="small"
-      rowKey={rowKey}
       scroll={{ x: true }}
-      rowSelection={{
-        selectedRowKeys: selectedKeys,
-        onChange: (keys) => setSelectedKeys(keys),
-      }}
-      onRow={onRow}
     >
       <Table.Column<FileInfo>
         dataIndex="type"
