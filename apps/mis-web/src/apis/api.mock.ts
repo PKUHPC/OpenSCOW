@@ -240,8 +240,8 @@ export const mockApi: MockApi<typeof api> = {
         {
           accountName: "a_user1",
           users: [
-            { userId: "user1", userName: "user1", state: "allowed!" },
-            { userId: "user2", userName: "user2", state: "allowed!" },
+            { userId: "user1", userName: "user1", blocked: false },
+            { userId: "user2", userName: "user2", blocked: false },
           ],
           owner: "user1",
           importStatus: ClusterAccountInfo_ImportStatus.NOT_EXISTING,
@@ -250,15 +250,15 @@ export const mockApi: MockApi<typeof api> = {
         {
           accountName: "account2",
           users: [
-            { userId: "user2", userName: "user2", state: "allowed!" },
-            { userId: "user3", userName: "user3", state: "allowed!" },
+            { userId: "user2", userName: "user2", blocked: false },
+            { userId: "user3", userName: "user3", blocked: false },
           ],
           importStatus: ClusterAccountInfo_ImportStatus.HAS_NEW_USERS,
           blocked: false,
         },
         {
           accountName: "a_user4",
-          users: [{ userId: "user4", userName: "user4", state: "allowed!" }],
+          users: [{ userId: "user4", userName: "user4", blocked: false }],
           importStatus: ClusterAccountInfo_ImportStatus.EXISTING,
           blocked: false,
         },
