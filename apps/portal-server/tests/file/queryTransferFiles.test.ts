@@ -10,8 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { asyncRequestStreamCall } from "@ddadaal/tsgrpc-client";
-import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
+import { asyncRequestStreamCall, asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { Server } from "@ddadaal/tsgrpc-server";
 import { credentials } from "@grpc/grpc-js";
 import { sftpExists, sftpMkdir, sftpRmdir, sftpUnlink } from "@scow/lib-ssh";
