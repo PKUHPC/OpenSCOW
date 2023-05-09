@@ -140,17 +140,17 @@ const changelogContent = `# v${rootPackageJson.version}
 
 发布于：${new Date().toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" })}
 
-# 配置文件更新
+# 配置文件
 
 配置文件版本：${configVersion}
 
 ${generateContent("config")}
-# SCOW API和Hook更新
+# SCOW API和Hook
 
 SCOW API版本：${scowApiVersion}
 
 ${generateContent("grpc-api")}
-# SCOW更新
+# SCOW
 
 ${generateContent("portal-web", "门户系统前端")
  + generateContent("portal-server", "门户系统后端")
