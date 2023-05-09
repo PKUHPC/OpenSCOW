@@ -97,9 +97,11 @@ const getChangesetLine = (line) =>
   `- ${line.content}` +
   ` ([${line.gitCommit.substring(0, 8)}](https://github.com/PKUHPC/SCOW/commit/${line.gitCommit}))`;
 
-const generateContent = (scowPackage) => {
+const generateContent = (scowPackage, title) => {
 
   const packageChanges = changes[scowPackage];
+
+  if (packageChanges.length === 0) { return ""; }
 
   // categories changes by type
 
@@ -109,7 +111,7 @@ const generateContent = (scowPackage) => {
     changesByType[change.type].push(change);
   }
 
-  let content = "";
+  let content = `## ${title} (${scowPackage}) \n\n`;
   if (changesByType.major.length > 0) {
     content += "### 重大更新\n" + changesByType.major.map(getChangesetLine).join("\n") + "\n\n";
   }
@@ -136,41 +138,23 @@ SCOW API版本：${scowApiVersion} ([查看变更](#scow-api-和-hook))
 
 配置文件版本：${configVersion} ([查看变更](#配置文件))
 
-## 门户系统前端 (portal-web)
+${generateContent("portal-web", "门户系统前端")}
 
-${generateContent("portal-web")}
+${generateContent("portal-server", "门户系统后端")}
 
-## 门户系统后端 (portal-server)
+${generateContent("mis-web", "管理系统前端")}
 
-${generateContent("portal-server")}
+${generateContent("mis-server", "管理系统后端")}
 
-## 管理系统前端（mis-web)
+${generateContent("auth", "认证系统")}
 
-${generateContent("mis-web")}
+${generateContent("cli", "CLI")}
 
-## 管理系统服务器 (mis-server)
+${generateContent("gateway", "网关")}
 
-${generateContent("mis-server")}
+${generateContent("grpc-api", "SCOW API和Hook")}
 
-## 认证系统 (auth)
-
-${generateContent("auth")}
-
-## CLI (cli)
-
-${generateContent("cli")}
-
-## 网关 (gateway)
-
-${generateContent("gateway")}
-
-## SCOW API和Hook
-
-${generateContent("grpc-api")}
-
-## 配置文件
-
-${generateContent("config")}
+${generateContent("config", "配置文件")}
 `;
 
 const CHANGELOG_BASE_PATH = "changelogs";
