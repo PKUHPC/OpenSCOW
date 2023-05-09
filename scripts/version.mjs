@@ -101,7 +101,7 @@ const generateContent = (scowPackage, title) => {
 
   const packageChanges = changes[scowPackage];
 
-  if (packageChanges.length === 0) { return ""; }
+  if (packageChanges.length === 0) { return "\n"; }
 
   // categories changes by type
 
