@@ -13,9 +13,9 @@
     "!**/*.map"
   ],
   "dependencies": {
-    "@grpc/grpc-js": "1.8.12",
-    "long": "5.2.1",
-    "protobufjs": "7.2.2"
+    "@grpc/grpc-js": "1.8.14",
+    "long": "5.2.3",
+    "protobufjs": "7.2.3"
   },
   "keywords": [],
   "author": "",
