@@ -134,7 +134,7 @@ const changelogContent = `# v${rootPackageJson.version}
 
 发布于：${new Date().toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" })}
 
-SCOW API版本：${scowApiVersion} ([查看变更](#scow-api-和-hook-(grpc-api))))
+SCOW API版本：${scowApiVersion} ([查看变更](#scow-api和hook-grpc-api))
 
 配置文件版本：${configVersion} ([查看变更](#配置文件))
 
