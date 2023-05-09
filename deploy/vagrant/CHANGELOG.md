@@ -1,5 +1,15 @@
 # @scow/demo-vagrant
 
+## 1.1.0
+
+### Minor Changes
+
+- 1562ebbd2: 提交作业时增加 GPU 选项
+
+### Patch Changes
+
+- f663f5025: 修改创建用户 ID 时的配置文件
+
 ## 1.0.0
 
 ### Major Changes
