@@ -136,7 +136,7 @@ const changelogContent = `# v${rootPackageJson.version}
 
 SCOW API版本：${scowApiVersion} ([查看变更](#scow-api和hook-grpc-api))
 
-配置文件版本：${configVersion} ([查看变更](#配置文件))
+配置文件版本：${configVersion} ([查看变更](#配置文件-config))
 
 ${generateContent("portal-web", "门户系统前端")}
 ${generateContent("portal-server", "门户系统后端")}
