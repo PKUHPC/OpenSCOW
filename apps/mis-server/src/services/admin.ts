@@ -10,10 +10,12 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { AdminServiceServer, AdminServiceService,
+  ClusterAccountInfo,
   ClusterAccountInfo_ImportStatus } from "@scow/protos/build/server/admin";
 import { updateBlockStatusInSlurm } from "src/bl/block";
 import { importUsers, ImportUsersData } from "src/bl/importUsers";
@@ -25,41 +27,42 @@ export const adminServiceServer = plugin((server) => {
 
   server.addService<AdminServiceServer>(AdminServiceService, {
     changeStorageQuota: async ({ request, em, logger }) => {
-      const { cluster, mode, userId, value } = request;
+      // const { cluster, mode, userId, value } = request;
 
-      const quota = await em.findOne(StorageQuota, {
-        user: { userId }, cluster,
-      });
+      // const quota = await em.findOne(StorageQuota, {
+      //   user: { userId }, cluster,
+      // });
 
-      if (!quota) {
-        throw <ServiceError>{
-          code: Status.NOT_FOUND, message: `User ${userId} or cluster ${cluster} is not found`,
-        };
-      }
+      // if (!quota) {
+      //   throw <ServiceError>{
+      //     code: Status.NOT_FOUND, message: `User ${userId} or cluster ${cluster} is not found`,
+      //   };
+      // }
 
-      const reply = await server.ext.clusters.callOnOne(
-        cluster,
-        logger,
-        async (ops) => ops.storage.changeStorageQuota({ request: { mode, userId, value }, logger }),
-      );
+      // const reply = await server.ext.clusters.callOnOne(
+      //   cluster,
+      //   logger,
+      //   async (ops) => ops.storage.changeStorageQuota({ request: { mode, userId, value }, logger }),
+      // );
 
-      if (reply.code === "NOT_FOUND") {
-        throw <ServiceError> {
-          code: Status.NOT_FOUND, message: `User ${userId} or cluster ${cluster} is not found`,
-        };
-      }
+      // if (reply.code === "NOT_FOUND") {
+      //   throw <ServiceError> {
+      //     code: Status.NOT_FOUND, message: `User ${userId} or cluster ${cluster} is not found`,
+      //   };
+      // }
 
-      if (reply.code === "INVALID_VALUE") {
-        throw <ServiceError> {
-          code: Status.INVALID_ARGUMENT, message: `The changed storage quota value ${value} is not valid`,
-        };
-      }
+      // if (reply.code === "INVALID_VALUE") {
+      //   throw <ServiceError> {
+      //     code: Status.INVALID_ARGUMENT, message: `The changed storage quota value ${value} is not valid`,
+      //   };
+      // }
 
-      quota.storageQuota = reply.currentQuota;
+      // quota.storageQuota = reply.currentQuota;
 
-      await em.flush();
+      // await em.flush();
 
-      return [{ currentQuota: quota.storageQuota }];
+      // return [{ currentQuota: quota.storageQuota }];
+      return [{ currentQuota: 10 }];
 
     },
 
@@ -108,10 +111,10 @@ export const adminServiceServer = plugin((server) => {
       const result = await server.ext.clusters.callOnOne(
         cluster,
         logger,
-        async (ops) => ops.account.getAllAccountsWithUsers({
-          request: {}, logger,
-        }),
+        async (client) => await asyncClientCall(client.account, "getAllAccountsWithUsers", {}),
       );
+
+      const accounts: ClusterAccountInfo[] = [];
 
       const includedAccounts = await em.find(Account, {
         accountName: { $in: result.accounts.map((x) => x.accountName) },
@@ -125,8 +128,9 @@ export const adminServiceServer = plugin((server) => {
         const includedAccount = includedAccounts.find((x) => x.accountName === account.accountName);
         if (!includedAccount) {
           // account not existed in scow
-          account.importStatus = ClusterAccountInfo_ImportStatus.NOT_EXISTING;
+          accounts.push({ ...account, importStatus: ClusterAccountInfo_ImportStatus.NOT_EXISTING });
         } else {
+          let status: ClusterAccountInfo_ImportStatus;
 
           if (
             !account.users.every((user) =>
@@ -137,14 +141,16 @@ export const adminServiceServer = plugin((server) => {
             )
           ) {
             // some users in account not existed in scow
-            account.importStatus = ClusterAccountInfo_ImportStatus.HAS_NEW_USERS;
+            status = ClusterAccountInfo_ImportStatus.HAS_NEW_USERS;
           } else {
             // both users and account exist in scow
-            account.importStatus = ClusterAccountInfo_ImportStatus.EXISTING;
+            status = ClusterAccountInfo_ImportStatus.EXISTING;
           }
 
           account.owner = includedUserAccounts
             .find((x) => x.account.$.accountName === account.accountName && x.role === UserRole.OWNER)!.user.$.userId;
+
+          accounts.push({ ...account, importStatus: status });
         }
       });
 
@@ -153,10 +159,10 @@ export const adminServiceServer = plugin((server) => {
         [ClusterAccountInfo_ImportStatus.HAS_NEW_USERS]: 1,
         [ClusterAccountInfo_ImportStatus.EXISTING]: 2,
       };
-      result.accounts.sort((a, b) => {
+      accounts.sort((a, b) => {
         return order[a.importStatus] - order[b.importStatus];
       });
-      return [result];
+      return [{ accounts }];
     },
 
     getFetchInfo: async () => {

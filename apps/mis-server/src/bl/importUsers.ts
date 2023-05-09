@@ -25,7 +25,7 @@ import { toRef } from "src/utils/orm";
 export interface ImportUsersData {
   accounts: {
     accountName: string;
-    users: {userId: string; userName: string; state: string}[];
+    users: {userId: string; userName: string; blocked: boolean}[];
     owner: string;
     blocked: boolean;
   }[];
@@ -97,14 +97,13 @@ export async function importUsers(data: ImportUsersData, em: SqlEntityManager,
     }
 
     a.users.forEach((u) => {
-      const state = u.state;
 
       const user = usersMap[u.userId];
       userAccounts.push(new UserAccount({
         account,
         user,
         role: a.owner === u.userId ? UserRole.OWNER : UserRole.USER,
-        status: state === "allowed!" ? UserStatus.UNBLOCKED : UserStatus.BLOCKED,
+        status: u.blocked ? UserStatus.BLOCKED : UserStatus.UNBLOCKED,
       }));
     });
   });

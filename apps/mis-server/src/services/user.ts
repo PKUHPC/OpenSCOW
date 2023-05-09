@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
@@ -106,24 +107,24 @@ export const userServiceServer = plugin((server) => {
     },
 
     queryUsedStorageQuota: async ({ request, logger }) => {
-      const { cluster, userId } = request;
+      // const { cluster, userId } = request;
 
-      const reply = await server.ext.clusters.callOnOne(
-        cluster,
-        logger,
-        async (ops) => ops.storage.queryUsedStorageQuota({
-          request: { userId }, logger,
-        }),
-      );
+      // const reply = await server.ext.clusters.callOnOne(
+      //   cluster,
+      //   logger,
+      //   async (ops) => ops.storage.queryUsedStorageQuota({
+      //     request: { userId }, logger,
+      //   }),
+      // );
 
-      if (reply.code === "NOT_FOUND") {
-        throw <ServiceError>{
-          code: Status.NOT_FOUND, message: `User ${userId}  is not found.`,
-        };
-      }
+      // if (reply.code === "NOT_FOUND") {
+      //   throw <ServiceError>{
+      //     code: Status.NOT_FOUND, message: `User ${userId}  is not found.`,
+      //   };
+      // }
 
       return [{
-        used: reply.used,
+        used: 10,
       }];
     },
 
@@ -151,8 +152,8 @@ export const userServiceServer = plugin((server) => {
         };
       }
 
-      await server.ext.clusters.callOnAll(logger, async (ops) => {
-        return await ops.user.addUserToAccount({ request: { accountName, userId }, logger });
+      await server.ext.clusters.callOnAll(logger, async (client) => {
+        return await asyncClientCall(client.user, "addUserToAccount", { userId, accountName });
       });
 
       const newUserAccount = new UserAccount({
@@ -190,9 +191,9 @@ export const userServiceServer = plugin((server) => {
         };
       }
 
-      await server.ext.clusters.callOnAll(logger,
-        async (ops) => ops.user.removeUser({ request: { accountName, userId }, logger }),
-      );
+      await server.ext.clusters.callOnAll(logger, async (client) => {
+        return await asyncClientCall(client.user, "removeUserFromAccount", { userId, accountName });
+      });
 
       await em.removeAndFlush(userAccount);
 

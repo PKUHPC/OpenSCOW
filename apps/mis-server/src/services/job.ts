@@ -10,17 +10,20 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { ensureNotUndefined, plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError, status } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { FilterQuery, QueryOrder, UniqueConstraintViolationException } from "@mikro-orm/core";
 import { Decimal, decimalToMoney, moneyToNumber } from "@scow/lib-decimal";
+import { jobInfoToRunningjob } from "@scow/lib-scheduler-adapter";
 import {
   GetJobsResponse,
   JobBillingItem,
   JobFilter,
   JobInfo, JobServiceServer, JobServiceService,
 } from "@scow/protos/build/server/job";
+import { JobInfo as AdapterJobInfo } from "@scow/scheduler-adapter-protos/build/protos/job";
 import { charge, pay } from "src/bl/charging";
 import { getActiveBillingItems } from "src/bl/PriceMap";
 import { misConfig } from "src/config/mis";
@@ -248,31 +251,42 @@ export const jobServiceServer = plugin((server) => {
       const reply = await server.ext.clusters.callOnOne(
         cluster,
         logger,
-        async (ops) => ops.job.getRunningJobs({
-          request: { userId, accountNames, jobIdList },
-          logger,
-        }),
+        async (client) => {
+          const fields = [
+            "job_id", "partition", "name", "user", "state", "elapsed_seconds",
+            "nodes_alloc", "node_list", "reason", "account", "cpus_alloc",
+            "qos", "submit_time", "time_limit_minutes", "working_directory",
+          ];
+          if (jobIdList.length > 0) {
+            const jobInfoList: AdapterJobInfo[] = [];
+            for (const jobId in jobIdList) {
+              const jobInfo = await asyncClientCall(client.job, "getJobById", { fields, jobId: Number(jobId) });
+              if (jobInfo.job) jobInfoList.push(jobInfo.job);
+            }
+            return jobInfoList;
+          } else {
+            return await asyncClientCall(client.job, "getJobs", {
+              fields,
+              filter: { users: userId ? [userId] : [], accounts: accountNames, states: ["RUNNING", "PENDING"]},
+            }).then((x) => x.jobs);
+          }
+        },
       );
 
-      return [{ jobs: reply.jobs }];
+      return [{ jobs: reply.map(jobInfoToRunningjob) }];
 
     },
 
     changeJobTimeLimit: async ({ request, logger }) => {
       const { cluster, delta, jobId } = request;
 
-      const reply = await server.ext.clusters.callOnOne(
+      await server.ext.clusters.callOnOne(
         cluster,
         logger,
-        async (ops) => ops.job.changeJobTimeLimit({
-          request: { delta, jobId }, logger,
+        async (client) => await asyncClientCall(client.job, "changeJobTimeLimit", {
+          jobId: Number(jobId), deltaMinutes: delta,
         }),
       );
-      if (reply.code === "NOT_FOUND") {
-        throw <ServiceError>{
-          code: Status.NOT_FOUND, message: `Cluster ${cluster} or  job ${jobId} is not found.`,
-        };
-      }
 
       return [{}];
     },
@@ -284,19 +298,10 @@ export const jobServiceServer = plugin((server) => {
       const reply = await server.ext.clusters.callOnOne(
         cluster,
         logger,
-        async (ops) => ops.job.queryJobTimeLimit({
-          request: { jobId },
-          logger,
-        }),
+        async (client) => asyncClientCall(client.job, "queryJobTimeLimit", { jobId: Number(jobId) }),
       );
 
-      if (reply.code === "NOT_FOUND") {
-        throw <ServiceError>{
-          code: Status.NOT_FOUND, message: `Cluster ${cluster} or  job ${jobId} is not found.`,
-        };
-      }
-
-      return [{ limit: reply.limit }];
+      return [{ limit: reply.timeLimitMinutes * 60 }];
     },
 
     getBillingItems: async ({ request, em }) => {
