@@ -13,6 +13,7 @@
 import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { numberToMoney } from "@scow/lib-decimal";
+import { getSchedulerAdapterClient } from "@scow/lib-scheduler-adapter";
 import { GetBillingItemsResponse, JobBillingItem, JobServiceClient } from "@scow/protos/build/server/job";
 import { USE_MOCK } from "src/apis/useMock";
 import { authenticate } from "src/auth/server";
@@ -102,7 +103,9 @@ export default /* #__PURE__*/route<GetBillingItemsSchema>("GetBillingItemsSchema
 
   const result = { activeItems: [] as BillingItemType[], historyItems: [] as BillingItemType[] };
 
-  for (const [cluster, { slurm: { partitions } }] of Object.entries(runtimeConfig.CLUSTERS_CONFIG)) {
+  for (const [cluster, { adapterUrl }] of Object.entries(runtimeConfig.CLUSTERS_CONFIG)) {
+    const client = getSchedulerAdapterClient(adapterUrl);
+    const partitions = await asyncClientCall(client.config, "getClusterConfig", {}).then((resp) => resp.partitions);
     for (const partition of partitions) {
       for (const qos of partition.qos ?? [""]) {
         const path = [cluster, partition.name, qos].filter((x) => x).join(".");

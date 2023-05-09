@@ -11,6 +11,8 @@
  */
 
 import { route } from "@ddadaal/next-typed-api-routes-runtime";
+import { asyncClientCall } from "@ddadaal/tsgrpc-client";
+import { getSchedulerAdapterClient } from "@scow/lib-scheduler-adapter";
 import { JobBillingItem } from "@scow/protos/build/server/job";
 import { authenticate } from "src/auth/server";
 import { JobBillingTableItem } from "src/components/JobBillingTable";
@@ -49,7 +51,10 @@ export async function getBillingTableItems(tenantName: string | undefined) {
   const tableItems: JobBillingTableItem[] = [];
   const clusters = runtimeConfig.CLUSTERS_CONFIG;
 
-  for (const [cluster, { slurm: { partitions } }] of Object.entries(clusters)) {
+  for (const [cluster, { adapterUrl }] of Object.entries(clusters)) {
+    const client = getSchedulerAdapterClient(adapterUrl);
+    const partitions = await asyncClientCall(client.config, "getClusterConfig", {}).then((resp) => resp.partitions);
+
     const partitionCount = partitions.length;
     let clusterItemIndex = 0;
     for (const partition of partitions) {
@@ -68,7 +73,7 @@ export async function getBillingTableItems(tenantName: string | undefined) {
           cluster: publicConfig.CLUSTERS[cluster]?.name ?? cluster,
           cores: partition.cores,
           gpus: partition.gpus,
-          mem: partition.mem,
+          mem: partition.memMb,
           nodes: partition.nodes,
           partition: partition.name,
           partitionCount,
