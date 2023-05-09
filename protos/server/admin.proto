@@ -72,7 +72,7 @@ message ImportUsersResponse {
 message UserInAccount {
   string user_id = 1;
   string user_name = 2;
-  string state = 3;
+  bool blocked = 3;
 }
 
 message ClusterAccountInfo {
