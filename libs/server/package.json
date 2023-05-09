@@ -1,6 +1,6 @@
 {
   "name": "@scow/lib-server",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Server libraries",
   "private": true,
   "main": "build/index.js",
@@ -17,12 +17,12 @@
   "license": "Mulan PSL v2",
   "repository": "https://github.com/PKUHPC/SCOW",
   "dependencies": {
-    "@ddadaal/tsgrpc-common": "0.2.2",
+    "@ddadaal/tsgrpc-common": "0.2.3",
     "@grpc/grpc-js": "1.8.14"
   },
   "devDependencies": {
-    "@ddadaal/tsgrpc-server": "0.19.1",
-    "@ddadaal/tsgrpc-client": "0.17.4",
+    "@ddadaal/tsgrpc-server": "0.19.2",
+    "@ddadaal/tsgrpc-client": "0.17.5",
     "@scow/config": "workspace:*",
     "@scow/protos": "workspace:*"
   },

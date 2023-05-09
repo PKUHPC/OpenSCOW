@@ -9,7 +9,7 @@
   ],
   "timezone": "Asia/Shanghai",
   "schedule": [
-    "every monday"
+    "every sunday"
   ],
   "packageRules": [
     {

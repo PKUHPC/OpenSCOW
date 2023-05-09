@@ -1,5 +1,36 @@
 # @scow/portal-server
 
+## 0.5.0
+
+### Minor Changes
+
+- 2981664f4: 门户所有作业列增加开始、结束时间列，增加时间说明
+- aa4d0ff1c: 为 PENDING 等需要显示作业未运行原因的状态的 APP，显示原因
+- 7bd2578c4: SCOW API 增加静态 token 认证方法
+- 88899d41f: 提交任务增加默认输出文件
+- 1562ebbd2: 提交作业时增加 GPU 选项
+
+### Patch Changes
+
+- a7fd75778: 修复文件管理界面，操作无权限文件/文件夹时页面的错误提示
+- 583e9f98b: 修复交互式应用创建后初始化阶段无法连接问题
+- d6e06e841: 读取配置文件时允许传入 logger 对象
+- cb90eb64b: 门户支持配置代理网关节点
+- Updated dependencies [5c066e4a5]
+- Updated dependencies [7bd2578c4]
+- Updated dependencies [ef8b7eee0]
+- Updated dependencies [9cb6822e6]
+- Updated dependencies [74d718ba1]
+- Updated dependencies [1562ebbd2]
+- Updated dependencies [d6e06e841]
+- Updated dependencies [cb90eb64b]
+  - @scow/lib-ssh@0.3.0
+  - @scow/config@0.2.0
+  - @scow/lib-server@0.2.0
+  - @scow/lib-config@0.2.1
+  - @scow/protos@0.2.1
+  - @scow/lib-slurm@0.1.3
+
 ## 0.4.0
 
 ### Minor Changes
