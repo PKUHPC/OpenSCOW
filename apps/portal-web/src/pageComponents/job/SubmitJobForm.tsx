@@ -70,15 +70,8 @@ const formatMemorySize = (size: number): string => {
 
 // 设置节点数，单节点核心数，单节点GPU卡数填入变化config
 const inputNumberFloorConfig = {
-  precision: 0,
-  formatter: (value: number) => `${Math.floor(value)}`,
-  parser: (value: string) => Math.floor(parseInt(value)),
-  onBlur: (e: React.FocusEvent<HTMLInputElement>) => {
-    if (!e.target.value) {
-      e.target.value = "1";
-    }
-  },
-
+  formatter: (value) => `${Math.floor(value)}`,
+  parser: (value) => Math.floor(+value),
 };
 
 const initialValues = {
@@ -189,7 +182,6 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
   });
 
   const setWorkingDirectoryValue = () => {
-    console.log(!form.isFieldTouched("workingDirectory") && clusterInfoQuery.data);
     if (!form.isFieldTouched("workingDirectory") && clusterInfoQuery.data) {
       form.setFieldValue("workingDirectory",
         calculateWorkingDirectory(clusterInfoQuery.data.clusterInfo.submitJobDirTemplate));
@@ -231,7 +223,6 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
     ? nodeCount * gpuCount * Math.floor(currentPartitionInfo.cores / currentPartitionInfo.gpus)
     : nodeCount * coreCount;
 
-
   return (
     <Form<JobForm>
       form={form}
@@ -260,6 +251,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
       >
         <CodeEditor
           height="50vh"
+          placeholder="#此处参数设置的优先级高于页面其它地方，两者冲突时以此处为准\n"
         />
       </Form.Item>
       <Row gutter={4}>
