@@ -101,7 +101,7 @@ const generateContent = (scowPackage, title) => {
 
   const packageChanges = changes[scowPackage];
 
-  if (packageChanges.length === 0) { return "\n"; }
+  if (packageChanges.length === 0) { return ""; }
 
   // categories changes by type
 
@@ -124,7 +124,7 @@ const generateContent = (scowPackage, title) => {
     content += "### 小型更新\n" + changesByType.patch.map(getChangesetLine).join("\n") + "\n\n";
   }
 
-  return content.trim();
+  return content.trim() + "\n";
 };
 
 const scowApiVersion = readPackageJson("protos/package.json").version;
