@@ -148,6 +148,7 @@ ${generateContent("config")}
 # SCOW API和Hook更新
 
 SCOW API版本：${scowApiVersion}
+
 ${generateContent("grpc-api")}
 # SCOW更新
 
