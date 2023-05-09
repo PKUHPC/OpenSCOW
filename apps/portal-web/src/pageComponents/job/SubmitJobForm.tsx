@@ -43,10 +43,10 @@ interface JobForm {
 }
 
 // 生成默认工作名称，命名规则为job-日期-序号（如job-20230428-01）
-const genJobName = (str: string): string => {
+const genJobName = (jobsNum: number): string => {
   const today = dayjs().toISOString();
-  const paddedStr = parseInt(str) < 10 ? "0" + str : str;
-  return `job-${today.slice(0, 4)}${today.slice(5, 7)}${today.slice(8, 10)}-${paddedStr}`;
+  const paddedStr = jobsNum < 10 ? "0" + jobsNum : jobsNum;
+  return `job-${today.slice(0, 10).replace(/-/g, "")}-${paddedStr}`;
 };
 
 const formatMemorySize = (size: number): string => {
@@ -55,12 +55,10 @@ const formatMemorySize = (size: number): string => {
 
   let carryCount = 0;
   let decimalSize = Math.round(size);
-
   while (decimalSize > CARRY) {
     decimalSize = decimalSize / CARRY;
     carryCount++;
   }
-
   if (decimalSize >= 1000) {
     decimalSize = decimalSize / CARRY;
     carryCount++;
@@ -72,7 +70,6 @@ const formatMemorySize = (size: number): string => {
 
 // 设置节点数，单节点核心数，单节点GPU卡数填入变化config
 const inputNumberFloorConfig = {
-
   precision: 0,
   formatter: (value: number) => `${Math.floor(value)}`,
   parser: (value: string) => Math.floor(parseInt(value)),
@@ -85,7 +82,7 @@ const inputNumberFloorConfig = {
 };
 
 const initialValues = {
-  command: "#此参数设置的优先级高于页面其他地方，两者冲突时以此处为准\n",
+  command: "",
   nodeCount: 1,
   coreCount: 1,
   gpuCount: 1,
@@ -182,7 +179,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
             if (result) {
               jobsNumOfToday = result.results.length;
             }
-            const jobName = genJobName((jobsNumOfToday + 1).toString());
+            const jobName = genJobName(jobsNumOfToday + 1);
             form.setFieldValue("jobName", jobName);
             setWorkingDirectoryValue();
           });
@@ -227,7 +224,8 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
     * Math.floor(currentPartitionInfo.cores / currentPartitionInfo.gpus)
     * Math.floor(currentPartitionInfo.mem / currentPartitionInfo.cores) :
       nodeCount * coreCount * Math.floor(currentPartitionInfo.mem / currentPartitionInfo.cores) : 0);
-  const memory = formatMemorySize(memorySize);
+  const memory = memorySize + "MB";
+  const memoryDisplay = formatMemorySize(memorySize);
 
   const coreCountSum = currentPartitionInfo?.gpus
     ? nodeCount * gpuCount * Math.floor(currentPartitionInfo.cores / currentPartitionInfo.gpus)
@@ -251,12 +249,18 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
         </Col>
         <Col span={24} sm={12}>
           <Form.Item<JobForm> label="作业名" name="jobName" rules={[{ required: true }]}>
-            <Input />
+            <Input disabled={!form.getFieldValue("jobName")} />
           </Form.Item>
         </Col>
       </Row>
-      <Form.Item<JobForm> label="命令" name="command" rules={[{ required: true }]}>
-        <CodeEditor height="50vh" />
+      <Form.Item<JobForm>
+        label="命令"
+        name="command"
+        rules={[{ required: true }]}
+      >
+        <CodeEditor
+          height="50vh"
+        />
       </Form.Item>
       <Row gutter={4}>
         <Col span={24} sm={12}>
@@ -394,7 +398,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
           总CPU核心数：{coreCountSum}
         </Col>
         <Col className="ant-form-item" span={12} sm={6}>
-          总内存容量：{memory}
+          总内存容量：{memoryDisplay}
         </Col>
       </Row>
       <Form.Item label="备注" name="comment">

@@ -33,7 +33,7 @@ const extensions = [StreamLanguage.define(shell)];
 
 export const CodeEditor: React.FC<Props> = ({ value, onChange, height = "" }) => {
   const { dark } = useDarkMode();
-
+  const INITIAL_REMINDER = "#此处参数设置的优先级高于页面其它地方，两者冲突时以此处为准\n";
   return (
     <Container>
       <CodeMirror
@@ -45,6 +45,7 @@ export const CodeEditor: React.FC<Props> = ({ value, onChange, height = "" }) =>
         }, [onChange])}
         // theme={dark ? "dark" : "light"}
         extensions={extensions}
+        placeholder={INITIAL_REMINDER}
       />
     </Container>
   );
