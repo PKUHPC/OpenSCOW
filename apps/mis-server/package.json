@@ -39,6 +39,8 @@
     "@sinclair/typebox": "0.27.8",
     "@scow/lib-auth": "workspace:*",
     "@scow/protos": "workspace:*",
+    "@scow/scheduler-adapter-protos": "workspace:*",
+    "@scow/lib-scheduler-adapter": "workspace:*",
     "@scow/utils": "workspace:*",
     "dotenv": "16.0.3",
     "node-cron": "3.0.2",

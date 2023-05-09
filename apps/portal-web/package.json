@@ -44,6 +44,7 @@
     "@scow/lib-web": "workspace:*",
     "@sinclair/typebox": "0.27.8",
     "@scow/protos": "workspace:*",
+    "@scow/lib-scheduler-adapter": "workspace:*",
     "antd": "5.4.2",
     "busboy": "1.6.0",
     "google-protobuf": "3.21.2",

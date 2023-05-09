@@ -28,6 +28,8 @@
     "@scow/lib-slurm": "workspace:*",
     "@scow/lib-ssh": "workspace:*",
     "@scow/protos": "workspace:*",
+    "@scow/scheduler-adapter-protos": "workspace:*",
+    "@scow/lib-scheduler-adapter": "workspace:*",
     "@scow/utils": "workspace:*",
     "@sinclair/typebox": "0.27.8",
     "node-ssh": "13.1.0",
