@@ -202,7 +202,7 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
         <SingleClusterSelector />
       </Form.Item>
 
-      <Spin spinning={loading}>
+      <Spin spinning={loading} tip="查询上次提交记录中">
 
         <Form.Item
           label="账户"
