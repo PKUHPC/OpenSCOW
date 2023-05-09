@@ -69,12 +69,12 @@ const buildRuntimeConfig = async (phase, basePath) => {
 
   const configBasePath = mockEnv ? join(__dirname, "config") : undefined;
 
-  const clusters = getClusterConfigs(configBasePath);
-  const clusterTexts = getClusterTextsConfig(configBasePath);
-  const uiConfig = getUiConfig(configBasePath);
-  const misConfig = getMisConfig(configBasePath);
+  const clusters = getClusterConfigs(configBasePath, console);
+  const clusterTexts = getClusterTextsConfig(configBasePath, console);
+  const uiConfig = getUiConfig(configBasePath, console);
+  const misConfig = getMisConfig(configBasePath, console);
 
-  const commonConfig = getCommonConfig(configBasePath);
+  const commonConfig = getCommonConfig(configBasePath, console);
 
   /**
    * @type {import ("./src/utils/config").ServerRuntimeConfig}
@@ -87,13 +87,16 @@ const buildRuntimeConfig = async (phase, basePath) => {
     UI_CONFIG: uiConfig,
     DEFAULT_PRIMARY_COLOR,
     SERVER_URL: config.SERVER_URL,
+    SCOW_API_AUTH_TOKEN: commonConfig.scowApi?.auth?.token,
   };
+
+  const userIdPattern = misConfig.createUser.userIdPattern ?? misConfig.userIdPattern;
 
   /**
    * @type {import("./src/utils/config").PublicRuntimeConfig}
    */
   const publicRuntimeConfig = {
-    ENABLE_CREATE_USER: capabilities.createUser,
+    ENABLE_CREATE_USER: capabilities.createUser && misConfig.createUser.enabled,
     ENABLE_CHANGE_PASSWORD: capabilities.changePassword,
     PREDEFINED_CHARGING_TYPES: misConfig.predefinedChargingTypes,
 
@@ -105,8 +108,8 @@ const buildRuntimeConfig = async (phase, basePath) => {
     ACCOUNT_NAME_PATTERN: misConfig.accountNamePattern?.regex,
     ACCOUNT_NAME_PATTERN_MESSAGE: misConfig.accountNamePattern?.errorMessage,
 
-    USERID_PATTERN: misConfig.userIdPattern?.regex,
-    USERID_PATTERN_MESSAGE: misConfig.userIdPattern?.errorMessage,
+    USERID_PATTERN: userIdPattern?.regex,
+    USERID_PATTERN_MESSAGE: userIdPattern?.errorMessage,
 
     PORTAL_URL: config.PORTAL_DEPLOYED ? (config.PORTAL_URL || misConfig.portalUrl || "") : undefined,
 

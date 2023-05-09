@@ -20,6 +20,10 @@ const CLUSTER_CONFIG_BASE_PATH = "clusters";
 export const ClusterConfigSchema = Type.Object({
   displayName: Type.String({ description: "集群的显示名称" }),
   adapterUrl: Type.String({ description: "调度器适配器服务地址" }),
+  proxyGateway: Type.Optional(Type.Object({
+    url: Type.String({ description: "代理网关节点监听URL" }),
+    autoSetupNginx: Type.Boolean({ description: "是否自动配置nginx", default: false }),
+  })),
   loginNodes: Type.Array(Type.String(), { description: "集群的登录节点地址", default: []}),
   // scheduler: Type.Enum({ slurm: "slurm" }, { description: "集群所使用的调度器，目前只支持slurm", default: "slurm" }),
   // slurm: Type.Object({
@@ -49,10 +53,14 @@ export const ClusterConfigSchema = Type.Object({
 export type ClusterConfigSchema = Static<typeof ClusterConfigSchema>;
 
 
-export const getClusterConfigs: GetConfigFn<Record<string, ClusterConfigSchema>> = (baseConfigPath) => {
+export const getClusterConfigs: GetConfigFn<Record<string, ClusterConfigSchema>> = (baseConfigPath, logger) => {
 
-  const config = getDirConfig(ClusterConfigSchema,
-    CLUSTER_CONFIG_BASE_PATH, baseConfigPath ?? DEFAULT_CONFIG_BASE_PATH);
+  const config = getDirConfig(
+    ClusterConfigSchema,
+    CLUSTER_CONFIG_BASE_PATH,
+    baseConfigPath ?? DEFAULT_CONFIG_BASE_PATH,
+    logger,
+  );
 
   // Object.entries(config).forEach(([id, c]) => {
   //   if (!c[c.scheduler]) {

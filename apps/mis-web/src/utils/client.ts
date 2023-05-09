@@ -10,17 +10,9 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { ChannelCredentials } from "@grpc/grpc-js";
+import { getClientFn } from "@scow/lib-web/build/utils/api";
 import { runtimeConfig } from "src/utils/config";
 
-type ClientConstructor<TClient> =
-  new (address: string, credentials: ChannelCredentials) => TClient;
+export const getClient = getClientFn(runtimeConfig);
 
-export function getClient<TClient>(
-  ctor: ClientConstructor<TClient>,
-): TClient {
-  return new ctor(
-    runtimeConfig.SERVER_URL,
-    ChannelCredentials.createInsecure(),
-  );
-}
+

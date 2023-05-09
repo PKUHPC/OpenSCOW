@@ -11,7 +11,6 @@
  */
 
 import { getInstallConfig } from "src/config/install";
-import { log } from "src/log";
 import { format } from "src/utils/formatter";
 
 interface Options {
@@ -20,10 +19,10 @@ interface Options {
 }
 
 /**
- * Output sample config files to outputPath
+ * Output sample config files to console
  * @param options options
  */
 export const viewInstall = (options: Options) => {
   const config = getInstallConfig(options.configPath);
-  log(format(config, options.format));
+  console.log(format(config, options.format));
 };

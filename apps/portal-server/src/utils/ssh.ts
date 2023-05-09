@@ -36,6 +36,8 @@ export async function sshConnect<T>(
     if (e instanceof SshConnectError) {
       throw new ServiceError({
         code: status.INTERNAL,
+        details: e.message,
+        message: e.message,
         metadata: scowErrorMetadata(SSH_ERROR_CODE),
       });
     }
@@ -44,6 +46,7 @@ export async function sshConnect<T>(
       throw new ServiceError({
         code: status.UNKNOWN,
         details: e.message,
+        message: e.message,
         metadata: scowErrorMetadata(SFTP_ERROR_CODE),
       });
     }

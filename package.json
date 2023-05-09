@@ -1,7 +1,7 @@
 {
   "name": "scow",
   "private": true,
-  "version": "0.4.0",
+  "version": "0.5.0",
   "scripts": {
     "build": "turbo run build",
     "build:libs": "turbo run build --filter \"./libs/**\"",
@@ -21,18 +21,18 @@
     "ci:publish": "pnpm publish -r"
   },
   "devDependencies": {
-    "turbo": "1.9.1",
+    "turbo": "1.9.3",
     "@ddadaal/eslint-config": "1.9.0",
-    "@commitlint/config-conventional": "17.6.1",
-    "@types/jest": "29.5.0",
-    "@types/node": "18.15.11",
-    "@typescript-eslint/eslint-plugin": "5.58.0",
-    "@typescript-eslint/parser": "5.58.0",
+    "@commitlint/config-conventional": "17.6.3",
+    "@types/jest": "29.5.1",
+    "@types/node": "18.16.6",
+    "@typescript-eslint/eslint-plugin": "5.59.5",
+    "@typescript-eslint/parser": "5.59.5",
     "cross-env": "7.0.3",
     "cz-conventional-changelog": "3.3.0",
     "dotenv": "16.0.3",
     "dotenv-cli": "7.2.1",
-    "eslint": "8.38.0",
+    "eslint": "8.40.0",
     "eslint-import-resolver-typescript": "3.5.5",
     "eslint-plugin-import": "2.27.5",
     "eslint-plugin-simple-import-sort": "10.0.0",
@@ -45,20 +45,21 @@
     "rimraf": "5.0.0",
     "ts-jest": "29.1.0",
     "ts-node": "10.9.1",
-    "tsc-alias": "1.8.5",
+    "tsc-alias": "1.8.6",
     "tsconfig-paths": "4.2.0",
     "typescript": "5.0.4",
-    "@pnpm/lockfile-file": "8.0.1",
+    "@pnpm/lockfile-file": "8.0.2",
     "@pnpm/logger": "5.0.0",
     "pm2": "5.3.0",
     "concurrently": "8.0.1",
     "node-glob": "1.2.0",
     "globby": "13.1.4",
     "@changesets/cli": "2.26.1",
+    "front-matter": "4.0.2",
     "@bufbuild/buf": "1.15.0"
   },
   "volta": {
     "node": "18.16.0"
   },
-  "packageManager": "pnpm@8.2.0"
+  "packageManager": "pnpm@8.4.0"
 }

@@ -50,7 +50,7 @@ it("returns undefined if 404 and USER_NOT_FOUND", async () => {
 
 it("returns user if user exists", async () => {
   const user = await getUser(authUrl, { identityId: identityId });
-  expect(user).toEqual({ user: { identityId } });
+  expect(user).toEqual({ identityId });
 });
 
 

@@ -218,6 +218,7 @@ export const mockApi: MockApi<typeof api> = {
       { cluster: "hpc01", partition: "compute", qos: "low",
         priceItem: { itemId: "HPC07", price: numberToMoney(0.02), amountStrategy: "gpu" } },
     ],
+    nextId: "1",
   }),
 
   setAsInitAdmin: async () => null,

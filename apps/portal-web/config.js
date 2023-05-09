@@ -1,3 +1,15 @@
+/**
+ * Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
+ * SCOW is licensed under Mulan PSL v2.
+ * You can use this software according to the terms and conditions of the Mulan PSL v2.
+ * You may obtain a copy of Mulan PSL v2 at:
+ *          http://license.coscl.org.cn/MulanPSL2
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+ * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+ * See the Mulan PSL v2 for more details.
+ */
+
 // @ts-check
 
 const { envConfig, str, bool, parseKeyValue } = require("@scow/lib-config");
@@ -37,10 +49,6 @@ const specs = {
 
   SSH_PRIVATE_KEY_PATH: str({ desc: "SSH私钥路径", default: join(homedir(), ".ssh", "id_rsa") }),
   SSH_PUBLIC_KEY_PATH: str({ desc: "SSH公钥路径", default: join(homedir(), ".ssh", "id_rsa.pub") }),
-
-  PROXY_BASE_PATH: str({ desc: "网关的代理路径。相对于本系统的base path。", default: "/api/proxy/absolute" }),
-  RPROXY_BASE_PATH: str({ desc: "网关的代理路径。相对于本系统的base path。", default: "/api/proxy/relative" }),
-  WSPROXY_BASE_PATH: str({ desc: "网关的代理路径。相对于本系统的base path。", default: "/api/proxy/absolute" }),
 
   SERVER_URL: str({ desc: "门户后端的路径", default: "portal-server:5000" }),
 
@@ -86,11 +94,11 @@ const buildRuntimeConfig = async (phase, basePath) => {
 
   const configPath = mockEnv ? join(__dirname, "config") : undefined;
 
-  const clusters = getClusterConfigs(configPath);
+  const clusters = getClusterConfigs(configPath, console);
 
-  const uiConfig = getUiConfig(configPath);
-  const portalConfig = getPortalConfig(configPath);
-  const commonConfig = getCommonConfig(configPath);
+  const uiConfig = getUiConfig(configPath, console);
+  const portalConfig = getPortalConfig(configPath, console);
+  const commonConfig = getCommonConfig(configPath, console);
 
   /**
    * @type {import("./src/utils/config").ServerRuntimeConfig}
@@ -110,6 +118,7 @@ const buildRuntimeConfig = async (phase, basePath) => {
     DEFAULT_HOME_TITLE: portalConfig.homeTitle.defaultText,
     HOME_TITLES: portalConfig.homeTitle.hostnameMap,
     SUBMIT_JOB_WORKING_DIR: portalConfig.submitJobDefaultPwd,
+    SCOW_API_AUTH_TOKEN: commonConfig.scowApi?.auth?.token,
   };
 
   // query auth capabilities to set optional auth features
@@ -134,11 +143,6 @@ const buildRuntimeConfig = async (phase, basePath) => {
 
     CLUSTERS: Object.entries(clusters).map(([id, { displayName }]) => ({ id, name: displayName })),
 
-
-    PROXY_BASE_PATH: join(basePath, config.PROXY_BASE_PATH),
-    RPROXY_BASE_PATH: join(basePath, config.RPROXY_BASE_PATH),
-    WSPROXY_BASE_PATH: join(basePath, config.WSPROXY_BASE_PATH),
-
     NOVNC_CLIENT_URL: config.NOVNC_CLIENT_URL,
 
     PASSWORD_PATTERN: commonConfig.passwordPattern?.regex,
@@ -147,7 +151,7 @@ const buildRuntimeConfig = async (phase, basePath) => {
     BASE_PATH: basePath,
 
     CLIENT_MAX_BODY_SIZE: config.CLIENT_MAX_BODY_SIZE,
-  }
+  };
 
   if (!building && !testenv) {
     console.log("Running @scow/portal-web");
@@ -175,8 +179,8 @@ const buildRuntimeConfig = async (phase, basePath) => {
   return {
     serverRuntimeConfig,
     publicRuntimeConfig,
-  }
-}
+  };
+};
 
 module.exports = {
   buildRuntimeConfig,

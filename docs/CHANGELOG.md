@@ -1,5 +1,30 @@
 # @scow/docs
 
+## 0.3.0
+
+### Minor Changes
+
+- c2a8ab7a5: 删除认证系统验证用户姓名的 API，通过认证系统获取用户姓名和管理系统数据库实现
+- bb9d9bb8b: 认证系统 GET /user API 增加返回用户姓名和邮箱
+- 47b99ad80: CLI 使用 pino logger
+- 215ac2fc7: 认证系统 GET /validateToken 改为 GET /public/validateToken
+- 6d08aa823: 文档网站支持本地搜索
+- 7bd2578c4: SCOW API 增加静态 token 认证方法
+- ef8b7eee0: 增加 SCOW Hook
+- 88899d41f: 提交任务增加默认输出文件
+- 1562ebbd2: 提交作业时增加 GPU 选项
+
+### Patch Changes
+
+- c4138d75a: 丰富 scow-cli 文档，增加下载参考命令
+- 943195451: 认证系统支持测试用户功能
+- 9cb6822e6: 集群和应用配置文件可放在子文件夹中
+- 42b4cd123: cli 支持设置 HTTP 代理
+- 02b5f6e22: 用户自定义表单默认选择第一项
+- 5411d4d64: cli 增加 check-config 命令，可检查 SCOW 配置文件格式
+- cb90eb64b: 门户支持配置代理网关节点
+- f52067437: 修复 cli 更新 release 版本
+
 ## 0.2.0
 
 ### Minor Changes

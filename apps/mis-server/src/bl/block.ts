@@ -12,11 +12,13 @@
 
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Logger } from "@ddadaal/tsgrpc-server";
+import { Loaded } from "@mikro-orm/core";
 import { MySqlDriver, SqlEntityManager } from "@mikro-orm/mysql";
 import { Account } from "src/entities/Account";
 import { SystemState } from "src/entities/SystemState";
 import { UserAccount, UserStatus } from "src/entities/UserAccount";
 import { ClusterPlugin } from "src/plugins/clusters";
+import { callHook } from "src/plugins/hookClient";
 
 
 /**
@@ -92,6 +94,9 @@ export async function blockAccount(
   });
 
   account.blocked = true;
+
+  await callHook("accountBlocked", { accountName: account.accountName }, logger);
+
   return "OK";
 }
 
@@ -115,46 +120,66 @@ export async function unblockAccount(
   });
 
   account.blocked = false;
+  await callHook("accountUnblocked", { accountName: account.accountName }, logger);
 
   return "OK";
 }
 
 /**
- * User and account must be loaded.
+ * UA's account.accountName and user.userId must be loaded
  * Call flush after this.
  * */
-export async function blockUserInAccount(ua: UserAccount, clusterPlugin: ClusterPlugin, logger: Logger) {
+export async function blockUserInAccount(
+  ua: Loaded<UserAccount, "user" | "account">,
+  clusterPlugin: ClusterPlugin, logger: Logger,
+) {
   if (ua.status === UserStatus.BLOCKED) {
     return;
   }
 
+  const accountName = ua.account.$.accountName;
+  const userId = ua.user.$.userId;
+
   await clusterPlugin.clusters.callOnAll(logger, async (client) =>
     await asyncClientCall(client.user, "blockUserInAccount", {
-      accountName: ua.account.getProperty("accountName"),
-      userId: ua.user.getProperty("userId"),
+      accountName,
+      userId,
     }),
   );
 
   ua.status = UserStatus.BLOCKED;
+
+  await callHook("userBlockedInAccount", {
+    accountName,
+    userId,
+  }, logger);
 }
 
 /**
- * User and account must be loaded.
  * Call flush after this.
  * */
-export async function unblockUserInAccount(ua: UserAccount, clusterPlugin: ClusterPlugin, logger: Logger) {
+export async function unblockUserInAccount(
+  ua: Loaded<UserAccount, "user" | "account">,
+  clusterPlugin: ClusterPlugin, logger: Logger,
+) {
   if (ua.status === UserStatus.UNBLOCKED) {
     return;
-
   }
+
+  const accountName = ua.account.getProperty("accountName");
+  const userId = ua.user.getProperty("userId");
 
   await clusterPlugin.clusters.callOnAll(logger, async (client) =>
     await asyncClientCall(client.user, "unblockUserInAccount", {
-      accountName: ua.account.getProperty("accountName"),
-      userId: ua.user.getProperty("userId"),
+      accountName,
+      userId,
     }),
   );
 
   ua.status = UserStatus.UNBLOCKED;
+
+  await callHook("userUnblockedInAccount", {
+    accountName, userId,
+  }, logger);
 }
 

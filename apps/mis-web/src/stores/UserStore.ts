@@ -18,7 +18,7 @@ import { AccountAffiliation, PlatformRole, TenantRole } from "src/models/User";
 export interface User {
   tenant: string;
   identityId: string;
-  name: string;
+  name?: string;
   token: string;
   tenantRoles: TenantRole[];
   platformRoles: PlatformRole[];

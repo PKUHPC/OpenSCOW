@@ -13,6 +13,7 @@
 import { getConfig } from "@scow/lib-config/build/fileConfig";
 import { Static, Type } from "@sinclair/typebox";
 import { join } from "path";
+import { logger } from "src/log";
 
 export const InstallConfigSchema = Type.Object({
   port: Type.Integer({ description: "端口号", default: 80 }),
@@ -33,6 +34,11 @@ export const InstallConfigSchema = Type.Object({
     uploadFileSizeLimit: Type.String({
       description: "限制整个系统上传（请求）文件的大小，可接受的格式为nginx的client_max_body_size可接受的值",
       default: "1G",
+    }),
+
+    proxyReadTimeout: Type.String({
+      description: "限制后端服务发出响应的超时时间，可接受的格式为nginx的proxy_read_timeout可接受的值",
+      default: "60s",
     }),
   }, { default: {} }),
 
@@ -75,7 +81,10 @@ export const InstallConfigSchema = Type.Object({
     custom: Type.Optional(Type.Object({
       image: Type.String({ description: "认证系统镜像" }),
       ports: Type.Optional(Type.Array(Type.String(), { description: "端口映射" })),
-      environment: Type.Optional(Type.Array(Type.String(), { description: "环境变量" })),
+      environment: Type.Optional(Type.Union([
+        Type.Array(Type.String({ description: "格式：变量名=变量值" })),
+        Type.Record(Type.String(), Type.String(), { description: "格式：字符串: 字符串" }),
+      ], { description: "环境变量配置" })),
       volumes: Type.Optional(Type.Array(Type.String(), {
         description: "更多挂载卷。默认添加/etc/hosts:/etc/hosts和./config:/etc/scow",
       })),
@@ -86,6 +95,9 @@ export const InstallConfigSchema = Type.Object({
 export type InstallConfigSchema = Static<typeof InstallConfigSchema>;
 
 export function getInstallConfig(filePath: string) {
+  const fullPath = join(process.cwd(), filePath);
 
-  return getConfig(InstallConfigSchema, join(process.cwd(), filePath));
+  logger.debug("Using install config %s", fullPath);
+
+  return getConfig(InstallConfigSchema, fullPath);
 }

@@ -13,10 +13,9 @@
 import { Static, Type } from "@sinclair/typebox";
 import fs from "fs";
 import { dump } from "js-yaml";
-import path from "path";
-import { getConfigFromFile } from "src/fileConfig";
+import path, { dirname, join } from "path";
+import { ConfigFileNotExistError, ConfigFileSchemaError, getConfigFromFile, getDirConfig } from "src/fileConfig";
 
-const configName = "test";
 
 const Schema = Type.Object({
   loaded: Type.String(),
@@ -32,12 +31,16 @@ const exts = {
 
 type Ext = keyof typeof exts;
 
-function createConfig(ext: Ext) {
-  const obj: Static<typeof Schema> = { loaded: ext };
+function createConfig(configName: string, ext: Ext) {
+  const obj: Static<typeof Schema> = { loaded: configName + "." + ext };
 
   const content = exts[ext](obj);
 
-  fs.writeFileSync(path.join(folderPath, configName + "." + ext), content);
+  const fullConfigFilePath = path.join(folderPath, configName + "." + ext);
+
+  fs.mkdirSync(dirname(fullConfigFilePath), { recursive: true });
+
+  fs.writeFileSync(fullConfigFilePath, content);
 }
 
 beforeEach(() => {
@@ -48,14 +51,6 @@ afterEach(() => {
   fs.rmSync(folderPath, { recursive: true });
 });
 
-function runTest(createdFiles: readonly Ext[], expectedLoaded: Ext) {
-  createdFiles.forEach(createConfig);
-
-  const obj = getConfigFromFile(Schema, configName, folderPath);
-
-  expect(obj.loaded).toBe(expectedLoaded);
-}
-
 it.each([
   [["yml"], "yml"],
   [["yaml"], "yaml"],
@@ -63,21 +58,46 @@ it.each([
   [["yml", "yaml"], "yml"],
   [["yaml", "json"], "yaml"],
 ] as const)("creates %o, should load %o", async (createdExts: readonly Ext[], expectedLoaded: Ext) => {
-  runTest(createdExts, expectedLoaded);
+
+  const configName = "test";
+
+  createdExts.forEach((ext) => createConfig(configName, ext));
+
+  const obj = getConfigFromFile(Schema, configName, folderPath);
+
+  expect(obj.loaded).toBe(configName + "." + expectedLoaded);
 });
 
-
 it("reports error if config not exist", async () => {
-  expect(() => runTest([], "yml")).toThrow();
+  expect(() => getConfigFromFile(Schema, "config", "yml")).toThrow(ConfigFileNotExistError);
 });
 
 it("reports file path", async () => {
+  const configName = "test";
 
   fs.writeFileSync(path.join(folderPath, configName + ".yaml"), exts.yaml({ loaded: false }));
   try {
     getConfigFromFile(Schema, configName, folderPath);
     expect("").fail("should throw");
   } catch (e: any) {
+    expect(e).toBeInstanceOf(ConfigFileSchemaError);
     expect(e.message).toContain(path.join(folderPath, configName + ".yaml"));
   }
+});
+
+it("reads dir config", async () => {
+  const configName = "clusters";
+
+  createConfig(join(configName, "a"), "yaml");
+  createConfig(join(configName, "b"), "json");
+  createConfig(join(configName, "b", "config"), "yaml");
+  createConfig(join(configName, "b", "config"), "json");
+
+  const config = getDirConfig(Schema, configName, folderPath);
+
+  expect(config).toEqual({
+    "a": { loaded: join(configName, "a.yaml") },
+    "b": { loaded: join(configName, "b", "config.yaml") },
+  });
+
 });

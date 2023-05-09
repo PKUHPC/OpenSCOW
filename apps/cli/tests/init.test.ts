@@ -11,7 +11,7 @@
  */
 
 import { init } from "src/cmd/init";
-import { compareDirectories, testBaseFolder } from "tests/utils";
+import { ensureDirectoriesTheSame, testBaseFolder } from "tests/utils";
 
 it("extracts init config to output path", async () => {
   await init({
@@ -19,6 +19,6 @@ it("extracts init config to output path", async () => {
   });
 
   // testBaseFolder and configPath should be the same
-  expect(await compareDirectories(testBaseFolder, "assets")).toBe(true);
+  await ensureDirectoriesTheSame(testBaseFolder, "assets");
 });
 

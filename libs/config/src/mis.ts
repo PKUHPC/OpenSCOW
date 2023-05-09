@@ -56,7 +56,17 @@ export const MisConfigSchema = Type.Object({
   userIdPattern: Type.Optional(Type.Object({
     regex: Type.String({ description: "用户ID的正则规则" }),
     errorMessage: Type.Optional(Type.String({ description: "如果用户ID不符合规则显示什么" })),
-  })),
+  }, { deprecated: true, description: "请使用createUser.userIdPattern配置" })),
+
+  createUser: Type.Object({
+    enabled: Type.Boolean({ description: "是否启用用户从SCOW中创建用户", default: true }),
+
+    userIdPattern: Type.Optional(Type.Object({
+      regex: Type.String({ description: "用户ID的正则规则" }),
+      errorMessage: Type.Optional(Type.String({ description: "如果用户ID不符合规则显示什么" })),
+    }, { description: "从管理系统里创建用户时，用户ID的验证规则" })),
+
+  }, { default: {}, description: "当认证系统允许创建用户时，SCOW的创建用户相关配置" }),
 
   fetchJobs: Type.Object({
     db: Type.Object({
@@ -95,5 +105,14 @@ const MIS_CONFIG_NAME = "mis";
 
 export type MisConfigSchema = Static<typeof MisConfigSchema>;
 
-export const getMisConfig: GetConfigFn<MisConfigSchema> = (baseConfigPath) =>
-  getConfigFromFile(MisConfigSchema, MIS_CONFIG_NAME, baseConfigPath ?? DEFAULT_CONFIG_BASE_PATH);
+export const getMisConfig: GetConfigFn<MisConfigSchema> = (baseConfigPath, logger) => {
+  const config = getConfigFromFile(MisConfigSchema, MIS_CONFIG_NAME, baseConfigPath ?? DEFAULT_CONFIG_BASE_PATH);
+
+  if (config.userIdPattern && !config.createUser.userIdPattern) {
+    logger?.warn("mis.yaml userIdPattern is deprecated and will be removed in a future version. " +
+    "Use createUser.userIdPattern instead");
+  }
+
+  return config;
+
+};

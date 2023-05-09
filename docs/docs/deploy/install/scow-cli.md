@@ -61,6 +61,9 @@ scow-cli使用运行目录下的`install.yaml`作为配置来管理集群，但�
 
 # 查看当前使用install.yaml的内容
 ./cli view-install
+
+# 检查./config目录下的SCOW配置文件的格式
+./cli check-config
 ```
 
 # 从scow-deployment迁移
@@ -118,8 +121,18 @@ scow-cli使用运行目录下的`install.yaml`作为配置来管理集群，但�
 GITHUB_TOKEN={token}
 ```
 
-## 打印调试日志
+# 代理
+
+CLI需要访问网络的功能（例如更新scow-cli）可以设置HTTP代理。您可以通过设置`HTTPS_PROXY`, `https_proxy`, `HTTP_PROXY`, `http_proxy`环境变量来设置代理。如果多个环境变量同时存在，则使用优先级为上面列出来的顺序。
 
 ```bash
-DEBUG="scow:cli" ./cli
+# 环境变量也可以写入.env中
+export HTTPS_PROXY=http://localhost:1080
+./cli update
+```
+
+# 打印调试日志
+
+```bash
+LOG_LEVEL="debug" ./cli
 ```

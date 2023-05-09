@@ -10,25 +10,24 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { jsonFetch } from "@ddadaal/next-typed-api-routes-runtime";
-import { runtimeConfig } from "src/utils/config";
+import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
+import { status } from "@grpc/grpc-js";
+import { UserServiceClient } from "@scow/protos/build/server/user";
+import { getClient } from "src/utils/client";
+import { handlegRPCError } from "src/utils/server";
 
 export type CheckNameMatchResult = "OK" | "NotMatch" | "NotFound";
 
-// check in auth whether identity and name matches.
 export async function checkNameMatch(identityId: string, name: string): Promise<CheckNameMatchResult> {
-  return await jsonFetch({
-    method: "GET",
-    path: `${runtimeConfig.AUTH_INTERNAL_URL}/validateName`,
-    query: { identityId, name },
-  })
-    .httpError(404, () => "NotFound")
-    .then(({ result }) => result ? "OK" : "NotMatch")
-    .catch((r) => {
-      if (r === "NotFound") {
-        return "NotFound";
-      } else {
-        throw r;
-      }
-    });
+
+  const client = getClient(UserServiceClient);
+
+  return await asyncUnaryCall(client, "checkUserNameMatch", {
+    name, userId: identityId,
+  }).then(({ match }) => {
+    return match ? "OK" : "NotMatch" as const;
+  }).catch(handlegRPCError({
+    [status.NOT_FOUND]: () => "NotFound" as const,
+  }));
+
 }

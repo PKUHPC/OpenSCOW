@@ -10,14 +10,17 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { CloseOutlined,
+import {
+  CloseOutlined,
   CopyOutlined,
-  DeleteOutlined, FileAddOutlined, FileOutlined, FolderAddOutlined,
+  DeleteOutlined, EyeInvisibleOutlined,
+  EyeOutlined, FileAddOutlined, FileOutlined, FolderAddOutlined,
   FolderOutlined, HomeOutlined, LeftOutlined, MacCommandOutlined, RightOutlined,
-  ScissorOutlined, SnippetsOutlined, UploadOutlined, UpOutlined } from "@ant-design/icons";
+  ScissorOutlined, SnippetsOutlined, UploadOutlined, UpOutlined,
+} from "@ant-design/icons";
 import { compareDateTime, formatDateTime } from "@scow/lib-web/build/utils/datetime";
 import { compareNumber } from "@scow/lib-web/build/utils/math";
-import { App, Button, Divider, Space, Table } from "antd";
+import { App, Button, Divider, Space, Table, Tooltip } from "antd";
 import Link from "next/link";
 import Router from "next/router";
 import { join } from "path";
@@ -76,6 +79,33 @@ const nodeModeToString = (mode: number) => {
   return [0, 1, 2].reduce((prev, curr) => prev + toStr(numberPermission[curr]), "");
 };
 
+const formatFileSize = (size: number): string => {
+  const unitMap = ["KB", "MB", "GB", "TB", "PB"];
+  const CARRY = 1024;
+  // 最大1024TB
+  const MAX_SIZE = 1024 * 1024 * 1024 * 1024 * 1024;
+
+  if (size >= MAX_SIZE) {
+    return "";
+  }
+
+  let carryCount = 0;
+  let decimalSize = Math.round(size / CARRY);
+
+  while (decimalSize > CARRY) {
+    decimalSize = decimalSize / CARRY;
+    carryCount++;
+  }
+
+  if (decimalSize >= 1000) {
+    decimalSize = decimalSize / CARRY;
+    carryCount++;
+  }
+
+  const fixedNumber = decimalSize < 9.996 ? 2 : (decimalSize < 99.95 ? 1 : 0);
+  return `${decimalSize.toFixed(fixedNumber)} ${unitMap[carryCount]}`;
+};
+
 type FileInfoKey = React.Key;
 
 const fileInfoKey = (f: FileInfo, path: string): FileInfoKey => join(path, f.name);
@@ -104,6 +134,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
   const [selectedKeys, setSelectedKeys] = useState<FileInfoKey[]>([]);
 
   const [operation, setOperation] = useState<Operation | undefined>(undefined);
+  const [showHiddenFile, setShowHiddenFile] = useState(false);
 
   const reload = async (signal?: AbortSignal) => {
     setLoading(true);
@@ -178,20 +209,22 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
             title: `文件${file.name}${operationText}出错`,
             content: error,
           });
+          throw error;
         })
         .then(() => {
           setOperation((o) => o ? { ...operation, completed: o.completed.concat(file) } : undefined);
           return file;
-        }).catch(() => {
-          return undefined;
+        }).catch((e) => {
+          throw e;
         });
     };
 
     let successfulCount: number = 0;
     let abandonCount: number = 0;
     const allCount = operation.selected.length;
-    try {
-      for (const x of operation.selected) {
+    for (const x of operation.selected) {
+      try {
+
         const exists = await api.fileExist({ query: { cluster: cluster.id, path: join(path, x.name) } });
         if (exists.result) {
           await new Promise<void>(async (res) => {
@@ -203,31 +236,43 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
                 const fileType = await api.getFileType({ query: { cluster: cluster.id, path: join(path, x.name) } });
                 const deleteOperation = fileType.type === "dir" ? api.deleteDir : api.deleteFile;
                 await deleteOperation({ query: { cluster: cluster.id, path: join(path, x.name) } });
-                await pasteFile(x, join(operation.originalPath, x.name), join(path, x.name));
-                successfulCount++;
+                try {
+                  await pasteFile(x, join(operation.originalPath, x.name), join(path, x.name));
+                  successfulCount++;
+                } catch (e) {
+                  throw e;
+                }
                 res();
               },
               onCancel: async () => { abandonCount++; res(); },
             });
           });
         } else {
-          await pasteFile(x, join(operation.originalPath, x.name), join(path, x.name));
-          successfulCount++;
+          try {
+            await pasteFile(x, join(operation.originalPath, x.name), join(path, x.name));
+            successfulCount++;
+          } catch (e) {
+            throw e;
+          }
         }
+      } catch (e) {
+        console.error(e);
       }
+    }
+
+    if (allCount - successfulCount - abandonCount) {
+      message.error(
+        `${operationText}错误！总计${allCount}项文件/目录，其中成功${successfulCount}项，放弃${abandonCount}项，` +
+        `失败${allCount - successfulCount - abandonCount}项`,
+      );
+    } else {
       message.success(
         `${operationText}成功！总计${allCount}项文件/目录，其中成功${successfulCount}项，放弃${abandonCount}项`,
       );
-    } catch (e) {
-      console.error(e);
-      message.error(
-        `${operationText}错误！总计${allCount}项文件/目录，其中成功${successfulCount}项，放弃${abandonCount}项` +
-        `失败${allCount - successfulCount - abandonCount}项`,
-      );
-    } finally {
-      resetSelectedAndOperation();
-      reload();
     }
+
+    resetSelectedAndOperation();
+    reload();
   };
 
   const onDeleteClick = () => {
@@ -246,7 +291,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
           }).then(() => x).catch(() => undefined);
         }))
           .then((successfulInfo) => {
-            const failedCount = successfulInfo.filter((x) => !x).length;
+            const failedCount = successfulInfo.filter((x) => (!x || x.status === "fulfilled")).length;
             const allCount = files.length;
             if (failedCount === 0) {
               message.success(`删除${allCount}项成功！`);
@@ -273,11 +318,15 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
     return files.filter((x) => keys.includes(fileInfoKey(x, path)));
   };
 
+  const onHiddenClick = () => {
+    setShowHiddenFile(!showHiddenFile);
+  };
+
   return (
     <div>
       <TitleText>
         <span>
-        集群{cluster.name}文件管理
+          集群{cluster.name}文件管理
         </span>
       </TitleText>
       <TopBar>
@@ -314,7 +363,8 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
           <Button
             icon={<CopyOutlined />}
             onClick={() =>
-              setOperation({ op: "copy",
+              setOperation({
+                op: "copy",
                 selected: keysToFiles(selectedKeys), originalPath: path, started: false, completed: [],
               })}
             disabled={selectedKeys.length === 0 || operation?.started}
@@ -324,8 +374,10 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
           <Button
             icon={<ScissorOutlined />}
             onClick={() =>
-              setOperation({ op:"move",
-                selected: keysToFiles(selectedKeys), originalPath: path, started: false, completed: []})}
+              setOperation({
+                op: "move",
+                selected: keysToFiles(selectedKeys), originalPath: path, started: false, completed: [],
+              })}
             disabled={selectedKeys.length === 0 || operation?.started}
           >
             移动选中
@@ -342,19 +394,25 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
               operation.started ? (
                 <span>
                   {`正在${operationTexts[operation.op]}，` +
-                  `已完成：${operation.completed.length} / ${operation.selected.length}`}
+                    `已完成：${operation.completed.length} / ${operation.selected.length}`}
                 </span>
               ) : (
                 <span>
                   {`已选择${operationTexts[operation.op]}${operation.selected.length}个项`}
                   <a onClick={() => setOperation(undefined)} style={{ marginLeft: "4px" }}>
-                  取消
+                    取消
                   </a>
                 </span>
               )) : ""
           }
         </Space>
         <Space wrap>
+          <Button
+            onClick={onHiddenClick}
+            icon={showHiddenFile ? <EyeInvisibleOutlined /> : <EyeOutlined />}
+          >
+            {showHiddenFile ? "不显示" : "显示"}隐藏的项目
+          </Button>
           {
             publicConfig.ENABLE_SHELL ? (
               <Link href={`/shell/${cluster.id}${path}`} target="_blank" legacyBehavior>
@@ -381,7 +439,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
         </Space>
       </OperationBar>
       <Table
-        dataSource={files}
+        dataSource={files.filter((file) => showHiddenFile || !file.name.startsWith("."))}
         loading={loading}
         pagination={false}
         size="small"
@@ -409,9 +467,6 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
           dataIndex="type"
           title=""
           width="32px"
-          defaultSortOrder={"ascend"}
-          sorter={(a, b) => a.type.localeCompare(b.type)}
-          sortDirections={["ascend", "descend"]}
           render={(_, r) => (
             React.createElement(fileTypeIcons[r.type])
           )}
@@ -420,7 +475,12 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
         <Table.Column<FileInfo>
           dataIndex="name"
           title="文件名"
-          sorter={(a, b) => a.name.localeCompare(b.name)}
+          defaultSortOrder={"ascend"}
+          sorter={
+            (a, b) => a.type.localeCompare(b.type) === 0
+              ? a.name.localeCompare(b.name)
+              : a.type.localeCompare(b.type)
+          }
           sortDirections={["ascend", "descend"]}
           render={(_, r) => (
             r.type === "DIR" ? (
@@ -443,14 +503,36 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
           dataIndex="mtime"
           title="修改日期"
           render={(mtime: string | undefined) => mtime ? formatDateTime(mtime) : ""}
-          sorter={(a, b) => compareDateTime(a.mtime, b.mtime) }
+          sorter={
+            (a, b) => a.type.localeCompare(b.type) === 0
+              ? compareDateTime(a.mtime, b.mtime) === 0
+                ? a.name.localeCompare(b.name)
+                : compareDateTime(a.mtime, b.mtime)
+              : a.type.localeCompare(b.type)
+          }
         />
 
         <Table.Column<FileInfo>
           dataIndex="size"
           title="大小"
-          render={(size: number | undefined) => size === undefined ? "" : Math.floor(size / 1024) + " KB"}
-          sorter={(a, b) => compareNumber(a.size, b.size) }
+          render={
+            (size: number | undefined, file: FileInfo) =>
+              (size === undefined || file.type === "DIR")
+                ? ""
+                : (
+                  <Tooltip title={Math.round((size) / 1024).toLocaleString() + "KB"} placement="topRight">
+                    <span>{formatFileSize(size)}</span>
+                  </Tooltip>
+                )
+          }
+          sorter={
+            (a, b) => {
+              return a.type.localeCompare(b.type) === 0
+                ? compareNumber(a.size, b.size) === 0
+                  ? a.name.localeCompare(b.name)
+                  : compareNumber(a.size, b.size)
+                : a.type.localeCompare(b.type);
+            }}
         />
 
         <Table.Column<FileInfo>
@@ -467,7 +549,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
               {
                 i.type === "FILE" ? (
                   <a href={urlToDownload(cluster.id, join(path, i.name), true)}>
-                下载
+                    下载
                   </a>
                 ) : undefined
               }

@@ -13,15 +13,16 @@
 import { existsSync, promises as fsp } from "fs";
 import { basename, join } from "path";
 import prompt from "prompts";
-import { debug, log } from "src/log";
+import { logger } from "src/log";
 
 
 interface Options {
   outputPath: string;
 }
 
-const SAMPLE_INSTALLATION = join(__dirname, "../../assets/install.yaml");
-const SAMPLE_CONFIG_PATH = join(__dirname, "../../assets/config");
+const EXAMPLE_INSTALL_CONFIG = join(__dirname, "../../assets/install.yaml");
+const EXAMPLE_CONFIG_PATH = join(__dirname, "../../assets/config");
+const EXAMPLE_FLUENT_CONFIG_PATH = join(__dirname, "../../assets/fluent");
 
 // fs.promise.cp throws error for config dir
 async function copyWithWarning(src: string, dest: string) {
@@ -47,12 +48,12 @@ async function copyWithWarning(src: string, dest: string) {
         message: `Output ${destPath} already exists. Overwrite?`,
       });
       if (!answer.continue) {
-        debug("Selected no.");
+        logger.debug("Selected no.");
         return;
       }
     }
 
-    log("Copying %s to %s", src, destPath);
+    logger.info("Copying %s to %s", src, destPath);
     await fsp.copyFile(src, destPath);
   }
 }
@@ -61,10 +62,11 @@ export const init = async (options: Options) => {
 
   const fullPath = join(process.cwd(), options.outputPath);
 
-  log("Output path is %s. ", fullPath);
+  logger.info("Output path is %s. ", fullPath);
 
-  await copyWithWarning(SAMPLE_INSTALLATION, fullPath);
-  await copyWithWarning(SAMPLE_CONFIG_PATH, fullPath);
+  await copyWithWarning(EXAMPLE_INSTALL_CONFIG, fullPath);
+  await copyWithWarning(EXAMPLE_CONFIG_PATH, fullPath);
+  await copyWithWarning(EXAMPLE_FLUENT_CONFIG_PATH, fullPath);
 
-  log("File initialization complete");
+  logger.info("File initialization complete");
 };

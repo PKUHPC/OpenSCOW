@@ -90,6 +90,7 @@
 #   pretty: false
 
 #   # fluentd日志收集服务配置。
+#   # 将会使用fluent/fluent.conf作为配置文件
 #   # 如果不使用，请注释整个部分
 #   fluentd:
 #     # fluentd镜像
@@ -102,3 +103,7 @@
 #   # 限制整个系统上传（请求）文件的大小。默认1G
 #   # 可接受的格式为nginx的client_max_body_size可接受的值
 #   uploadFileSizeLimit: 1G
+
+#   # 限制后端服务发出响应的超时时间，默认60s
+#   # 可接受的格式为nginx的proxy_read_timeout可接受的值
+#   proxyReadTimeout: 60s

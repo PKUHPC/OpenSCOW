@@ -10,11 +10,12 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { compareDateTime, formatDateTime } from "@scow/lib-web/build/utils/datetime";
 import { compareNumber } from "@scow/lib-web/build/utils/math";
 import { queryToString } from "@scow/lib-web/build/utils/querystring";
 import type { AppSession } from "@scow/protos/build/portal/app";
-import { App, Button, Checkbox, Form, Popconfirm, Space, Table, TableColumnsType } from "antd";
+import { App, Button, Checkbox, Form, Popconfirm, Space, Table, TableColumnsType, Tooltip } from "antd";
 import type { CheckboxChangeEvent } from "antd/es/checkbox";
 import Router, { useRouter } from "next/router";
 import { join } from "path";
@@ -84,6 +85,18 @@ export const AppSessionsTable: React.FC<Props> = () => {
     {
       title: "状态",
       dataIndex: "state",
+      render: (_, record) => (
+        record.reason ? (
+          <Tooltip title={record.reason}>
+            <Space>
+              {record.state}
+              <ExclamationCircleOutlined />
+            </Space>
+          </Tooltip>
+        ) : (
+          <span>{record.state}</span>
+        )
+      ),
       sorter: (a, b) => compareState (a.state, b.state)
         ? compareState (a.state, b.state) :
         compareNumber(a.jobId, b.jobId),

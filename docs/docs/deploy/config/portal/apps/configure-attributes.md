@@ -1,5 +1,5 @@
 ---
-sidebar_position: 3
+sidebar_position: 4
 title: 配置HTML表单
 ---
 
@@ -119,7 +119,7 @@ attributes:
 | `name`     | 字符串                          | 是    | HTML表单的name属性，在编程中使用，并且会作为计算节点环境变量名，可以在Web应用的`script`或者VNC应用的`xstartop`使用 |
 | `label`    | 字符串                          | 是    | HTML表单的label属性，输入框左侧显示的标签                                                 |
 | `required` | 布尔类型                         | 否    | 如果设置为`true`，用户必须填写此项，如果为`false`，用户可以不填，默认为`true`。                        |
-| `default` | 字符串或者数字                         | 否    | 表单的默认值，`number`类型的默认值必须设置为数字。                       |
+| `default` | 字符串或者数字                         | 否    | 表单的默认值，`number`类型的默认值必须设置为数字。对于`select`类型的表单，如果没有配置`default`，则默认值为第一项                      |
 | `placeholder`   | 字符串                        | 否    | 描述输入字段预期值的提示信息，提示用户此处的输入                                                  |
 | `select`   | 选项的列表                        | 否    | 如果`type`是`select`，必须配置此项，指明具体的选项，具体配置办法见`select`示例                        |
 

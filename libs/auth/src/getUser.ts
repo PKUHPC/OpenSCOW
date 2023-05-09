@@ -16,6 +16,8 @@ import { Logger } from "ts-log";
 
 export interface AuthUserInfo {
   identityId: string;
+  name?: string;
+  mail?: string;
 }
 
 /**
@@ -37,7 +39,7 @@ export async function getUser(
   });
 
   if (resp.status === 200) {
-    return await resp.json();
+    return (await resp.json()).user;
   } else if (resp.status === 404) {
     const json = await resp.json().catch(() => undefined);
 

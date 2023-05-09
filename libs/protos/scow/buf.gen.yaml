@@ -1,6 +1,8 @@
 version: v1
 plugins:
-  - remote: buf.build/stephenh/plugins/ts-proto
+  - name: ts-proto
+    path: node_modules/ts-proto/protoc-gen-ts_proto
+    strategy: all
     out: generated
     opt:
       - unrecognizedEnum=false

@@ -11,7 +11,8 @@
  */
 
 import { NodeSSH } from "node-ssh";
-import { executeAsUser, getEnvPrefix, getUserHomedir, sshConnectByPassword, SSHExecError, sshRmrf } from "src/ssh";
+import { SftpError } from "src/sftp";
+import { executeAsUser, getEnvPrefix, getUserHomedir, sshConnectByPassword, sshRmrf } from "src/ssh";
 import { connectToTestServerAsRoot, resetTestServerAsRoot,
   rootUserId, target, TestSshServer, testUserId, testUserPassword } from "tests/utils";
 
@@ -67,7 +68,7 @@ it("sshRmrf should catches error and throws SSHExecError", async () => {
     await sshRmrf(ssh, filePath);
     expect("").fail("should not reach here");
   } catch (e) {
-    expect(e).toBeInstanceOf(SSHExecError);
+    expect(e).toBeInstanceOf(SftpError);
   }
 
 });

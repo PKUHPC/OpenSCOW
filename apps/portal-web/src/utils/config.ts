@@ -42,9 +42,9 @@ export interface ServerRuntimeConfig {
   HOME_TITLES: {[hostname: string]: string };
 
   SUBMIT_JOB_WORKING_DIR: string;
+
+  SCOW_API_AUTH_TOKEN?: string;
 }
-
-
 
 export interface PublicRuntimeConfig {
   ENABLE_CHANGE_PASSWORD: boolean;
@@ -60,10 +60,6 @@ export interface PublicRuntimeConfig {
   MIS_URL: string | undefined;
 
   CLUSTERS: Cluster[];
-
-  PROXY_BASE_PATH: string;
-  RPROXY_BASE_PATH: string;
-  WSPROXY_BASE_PATH: string;
 
   NOVNC_CLIENT_URL: string;
 

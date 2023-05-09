@@ -14,7 +14,7 @@ import { statSync } from "fs";
 import { join } from "path";
 import { createComposeSpec } from "src/compose";
 import { getInstallConfig } from "src/config/install";
-import { configPath, testBaseFolder } from "tests/utils";
+import { configPath, createInstallYaml, testBaseFolder } from "tests/utils";
 
 it("creates log dir for fluentd", async () => {
 
@@ -29,4 +29,67 @@ it("creates log dir for fluentd", async () => {
   const s = statSync(logDir);
 
   expect(s.mode).toBe(0o40777);
+});
+
+it("generate correct paths", async () => {
+
+  const config = getInstallConfig(configPath);
+
+  config.portal = { basePath: "/", novncClientImage: "" };
+  config.mis = { basePath: "/mis", dbPassword: "must!chang3this", mysqlImage: "" };
+
+  const composeConfig = createComposeSpec(config);
+
+  expect(composeConfig.services["portal-web"].environment).toContain("MIS_URL=/mis");
+  expect(composeConfig.services["mis-web"].environment).toContain("PORTAL_URL=/");
+});
+
+it("sets proxy_read_timeout", async () => {
+  const config = getInstallConfig(configPath);
+  config.gateway.proxyReadTimeout = "100";
+
+  const composeSpec = createComposeSpec(config);
+
+  expect(composeSpec.services["gateway"].environment)
+    .toInclude(`PROXY_READ_TIMEOUT=${config.gateway.proxyReadTimeout}`);
+});
+
+describe("sets custom auth environment", () => {
+
+  it("accepts object", async () => {
+
+    const configPath = await createInstallYaml({
+      auth: {
+        custom: {
+          image: "",
+          environment: {
+            "CUSTOM_AUTH_KEY": "CUSTOM_AUTH_VALUE",
+          },
+        },
+      },
+    });
+
+    const spec = createComposeSpec(getInstallConfig(configPath));
+
+    expect(spec.services["auth"].environment)
+      .toInclude("CUSTOM_AUTH_KEY=CUSTOM_AUTH_VALUE");
+  });
+
+  it("accepts array", async () => {
+    const configPath = await createInstallYaml({
+      auth: {
+        custom: {
+          image: "",
+          environment: [
+            "CUSTOM_AUTH_KEY=CUSTOM_AUTH_VALUE",
+          ],
+        },
+      },
+    });
+
+    const spec = createComposeSpec(getInstallConfig(configPath));
+
+    expect(spec.services["auth"].environment)
+      .toInclude("CUSTOM_AUTH_KEY=CUSTOM_AUTH_VALUE");
+  });
 });

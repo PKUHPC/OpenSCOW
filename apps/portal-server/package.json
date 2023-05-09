@@ -1,6 +1,6 @@
 {
   "name": "@scow/portal-server",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "",
   "main": "build/index.js",
   "private": true,
@@ -20,35 +20,37 @@
   "license": "Mulan PSL v2",
   "repository": "https://github.com/PKUHPC/SCOW",
   "dependencies": {
-    "@ddadaal/tsgrpc-server": "0.19.0",
-    "@ddadaal/tsgrpc-common": "0.2.1",
+    "@ddadaal/tsgrpc-common": "0.2.3",
+    "@ddadaal/tsgrpc-server": "0.19.2",
     "@grpc/grpc-js": "1.8.14",
     "@scow/config": "workspace:*",
     "@scow/lib-config": "workspace:*",
+    "@scow/lib-server": "workspace:*",
     "@scow/lib-slurm": "workspace:*",
     "@scow/lib-ssh": "workspace:*",
     "@scow/protos": "workspace:*",
     "@scow/scheduler-adapter-protos": "workspace:*",
     "@scow/lib-scheduler-adapter": "workspace:*",
     "@scow/utils": "workspace:*",
-    "@sinclair/typebox": "0.27.8",
-    "node-ssh": "13.1.0",
+    "@sinclair/typebox": "0.28.9",
+    "dayjs": "1.11.7",
     "dotenv": "16.0.3",
     "node-cron": "3.0.2",
-    "uuid": "9.0.0",
-    "wait-on": "7.0.1",
-    "ts-log": "2.2.5",
+    "node-ssh": "13.1.0",
+    "pino": "8.14.1",
+    "pino-pretty": "10.0.0",
     "shell-quote": "1.8.1",
-    "dayjs": "1.11.7",
-    "pino-pretty": "10.0.0"
+    "ts-log": "2.2.5",
+    "uuid": "9.0.0",
+    "wait-on": "7.0.1"
   },
   "devDependencies": {
-    "@ddadaal/tsgrpc-client": "0.17.3",
+    "@ddadaal/tsgrpc-client": "0.17.5",
     "@types/node-cron": "3.0.7",
-    "@types/wait-on": "5.3.1",
     "@types/shell-quote": "1.7.1",
-    "form-data": "4.0.0",
-    "@types/ssh2": "1.11.11"
+    "@types/ssh2": "1.11.11",
+    "@types/wait-on": "5.3.1",
+    "form-data": "4.0.0"
   },
   "volta": {
     "extends": "../../package.json"

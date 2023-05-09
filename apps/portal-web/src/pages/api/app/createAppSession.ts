@@ -70,7 +70,7 @@ export default /* #__PURE__*/route<CreateAppSessionSchema>("CreateAppSessionSche
 
   const client = getClient(AppServiceClient);
 
-  const proxyBasePath = join(publicConfig.BASE_PATH, "/api/proxy");
+  const proxyBasePath = join(publicConfig.BASE_PATH, "/api/proxy", cluster);
 
   return await asyncUnaryCall(client, "createAppSession", {
     appId,

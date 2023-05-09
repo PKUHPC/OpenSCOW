@@ -17,6 +17,7 @@ import { route } from "src/utils/route";
 // Write another plain UserInfo;
 export interface UserInfo {
   identityId: string;
+  name?: string;
 }
 
 export interface ValidateTokenSchema {

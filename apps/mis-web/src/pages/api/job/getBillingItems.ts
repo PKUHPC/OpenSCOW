@@ -37,12 +37,18 @@ export interface GetBillingItemsSchema {
      * If only returns active billing items
      */
     activeOnly: boolean;
+
   }
 
   responses: {
     200: {
       activeItems: BillingItemType[],
       historyItems: BillingItemType[],
+
+      /**
+       * next item id for this tenant
+       */
+      nextId: string;
     };
   }
 }
@@ -74,6 +80,23 @@ export async function getBillingItems(tenantName: string | undefined, activeOnly
   return reply;
 }
 
+const calculateNextId = (data?: JobBillingItem[], tenant?: string) => {
+  const currentItemIds = data
+    ? data.filter((x) => x.tenantName === tenant).map((x) => x.id) : [];
+  if (!tenant) {
+    const nums = currentItemIds.map((x) => parseInt(x)).filter((x) => !isNaN(x));
+    return (nums.length === 0 ? 1 : Math.max(...nums) + 1).toString();
+  }
+  else {
+    const flag = tenant + "_";
+    const nums = currentItemIds
+      .filter((x) => x.startsWith(flag))
+      .map((x) => parseInt(x.replace(flag, "")))
+      .filter((x) => !isNaN(x));
+    return tenant + "_" + (nums.length === 0 ? 1 : Math.max(...nums) + 1);
+  }
+};
+
 
 export default /* #__PURE__*/route<GetBillingItemsSchema>("GetBillingItemsSchema", async (req, res) => {
   const { tenant, activeOnly } = req.query;
@@ -85,6 +108,8 @@ export default /* #__PURE__*/route<GetBillingItemsSchema>("GetBillingItemsSchema
   }
 
   const reply = await getBillingItems(tenant, activeOnly);
+
+  const nextId = calculateNextId(reply.activeItems, tenant);
 
   const sourceToBillingItemType = (item: JobBillingItem) => {
     const priceItem = item.path.split(".");
@@ -101,7 +126,7 @@ export default /* #__PURE__*/route<GetBillingItemsSchema>("GetBillingItemsSchema
     } as BillingItemType;
   };
 
-  const result = { activeItems: [] as BillingItemType[], historyItems: [] as BillingItemType[] };
+  const result = { activeItems: [] as BillingItemType[], historyItems: [] as BillingItemType[], nextId };
 
   for (const [cluster, { adapterUrl }] of Object.entries(runtimeConfig.CLUSTERS_CONFIG)) {
     const client = getSchedulerAdapterClient(adapterUrl);
@@ -117,7 +142,7 @@ export default /* #__PURE__*/route<GetBillingItemsSchema>("GetBillingItemsSchema
     }
   }
 
-  result.historyItems = reply.historyItems.map(sourceToBillingItemType);
+  result.historyItems = reply.historyItems.filter((item) => item.tenantName === tenant).map(sourceToBillingItemType);
 
   return { 200: result };
 });
