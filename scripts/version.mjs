@@ -124,7 +124,7 @@ const generateContent = (scowPackage, title) => {
     content += "### 小型更新\n" + changesByType.patch.map(getChangesetLine).join("\n") + "\n\n";
   }
 
-  return content.trim() + "\n";
+  return content.trim() + "\n\n";
 };
 
 const scowApiVersion = readPackageJson("protos/package.json").version;
@@ -138,15 +138,16 @@ SCOW API版本：${scowApiVersion} ([查看变更](#scow-api和hook-grpc-api))
 
 配置文件版本：${configVersion} ([查看变更](#配置文件-config))
 
-${generateContent("portal-web", "门户系统前端")}
-${generateContent("portal-server", "门户系统后端")}
-${generateContent("mis-web", "管理系统前端")}
-${generateContent("mis-server", "管理系统后端")}
-${generateContent("auth", "认证系统")}
-${generateContent("cli", "CLI")}
-${generateContent("gateway", "网关")}
-${generateContent("grpc-api", "SCOW API和Hook")}
-${generateContent("config", "配置文件")}
+${generateContent("portal-web", "门户系统前端")
+ + generateContent("portal-server", "门户系统后端")
+ + generateContent("mis-web", "管理系统前端")
+ + generateContent("mis-server", "管理系统后端")
+ + generateContent("auth", "认证系统")
+ + generateContent("cli", "CLI")
+ + generateContent("gateway", "网关")
+ + generateContent("grpc-api", "SCOW API和Hook")
+ + generateContent("config", "配置文件")
+}
 `;
 
 const CHANGELOG_BASE_PATH = "changelogs";
