@@ -10,6 +10,8 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { asyncClientCall } from "@ddadaal/tsgrpc-client";
+import { getSchedulerAdapterClient } from "@scow/lib-scheduler-adapter";
 import { authenticate } from "src/auth/server";
 import { runtimeConfig } from "src/utils/config";
 import { route } from "src/utils/route";
@@ -57,11 +59,26 @@ export default route<GetClusterInfoSchema>("GetClusterInfoSchema", async (req, r
 
   const { cluster } = req.query;
 
-  const clusterInfo = runtimeConfig.CLUSTERS_CONFIG[cluster];
+  const client = getSchedulerAdapterClient(runtimeConfig.CLUSTERS_CONFIG[cluster].adapterUrl);
+
+  const reply = await asyncClientCall(client.config, "getClusterConfig", {});
+
+  const partitions = reply.partitions.map((x) => {
+    return {
+      name: x.name,
+      mem: x.memMb,
+      cores: x.cores,
+      gpus: x.gpus,
+      nodes: x.nodes,
+      qos: x.qos,
+      comment: x.comment,
+    } as Partition;
+  });
+
 
   return { 200: { clusterInfo: {
     submitJobDirTemplate: runtimeConfig.SUBMIT_JOB_WORKING_DIR,
-    slurm: { partitions: clusterInfo.slurm.partitions },
+    slurm: { partitions: partitions },
   } } };
 
 });
