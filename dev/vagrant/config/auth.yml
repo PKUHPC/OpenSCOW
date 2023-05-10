@@ -25,6 +25,8 @@ otp:
     scowHost: http://localhost:5000
     # otp验证软件扫描二维码之后，出现的label中，用户名和@后显示的名称, 默认为SCOW
     label: "scow"
+    # otp的二维码上方文字描述信息", 默认为 "此二维码仅出现一次，用过即毁", 支持html标签
+    qrcodeDescription: "此二维码仅出现一次"
     # 绑定otp时发送绑定信息方式
     authenticationMethod:
       mail:

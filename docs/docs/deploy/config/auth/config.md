@@ -86,7 +86,7 @@ const privateKeyPath = "/home/node/.ssh/id_rsa";
 
 // OTP密钥存放主机host="192.168.88.102"
 const host = "192.168.88.102";
-// otp密钥文件路径
+// 用户家目录，otp密钥存放于此目录下的.google_authenticator文件的第一行内容
 const homedir = "/data/home/{{ userId }}";
 
 // routePath需要与您实现的验证接口(otp.remote.url中的path)一致
@@ -144,7 +144,8 @@ app.post<{Body: Static<typeof bodySchema>}>(
 );
 
 export const start = async () => {
-  await app.listen({ port: 9999 });
+  // 配置监听的ip和端口
+  await app.listen({ port: 9999, host: "192.168.88.100" });
 };
 start();
 
@@ -173,6 +174,8 @@ otp:
     scowHost: 
     # otp验证软件扫描二维码之后，出现的label中，用户名和@后显示的名称, 默认为SCOW
     # ldabel: "scow"
+    # otp的二维码上方文字描述信息", 默认为 "此二维码仅出现一次，用过即毁", 支持html标签
+    # qrcodeDescription: "此二维码仅出现一次"
     # 绑定otp时发送绑定信息方式
     authenticationMethod:
       mail:
