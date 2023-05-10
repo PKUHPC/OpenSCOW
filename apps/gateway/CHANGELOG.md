@@ -1,5 +1,16 @@
 # @scow/gateway
 
+## 0.5.0
+
+### Patch Changes
+
+- 5c4e42d91: 增加网关基础测试代码
+- 42b4cd123: cli 支持设置 HTTP 代理
+- 695e5d590: install.yaml 支持配置网关服务器超时时间
+- Updated dependencies [9cb6822e6]
+- Updated dependencies [d6e06e841]
+  - @scow/lib-config@0.2.1
+
 ## 0.4.0
 
 ### Minor Changes

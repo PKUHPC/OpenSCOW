@@ -11,10 +11,9 @@
  */
 
 import { FastifyInstance } from "fastify";
-import ldapjs from "ldapjs";
 import { AuthProvider } from "src/auth/AuthProvider";
 import { createUser } from "src/auth/ldap/createUser";
-import { extractUserInfoFromEntry, findUser, searchOne, useLdap } from "src/auth/ldap/helpers";
+import { findUser, useLdap } from "src/auth/ldap/helpers";
 import { modifyPasswordAsSelf } from "src/auth/ldap/password";
 import { registerPostHandler } from "src/auth/ldap/postHandler";
 import { serveLoginHtml } from "src/auth/loginHtml";
@@ -30,36 +29,6 @@ export const createLdapAuthProvider = (f: FastifyInstance) => {
   return <AuthProvider>{
     serveLoginHtml: (callbackUrl, req, rep) => serveLoginHtml(false, callbackUrl, req, rep),
     fetchAuthTokenInfo: async () => undefined,
-    validateName: ldap.attrs.name
-      ? async (identityId, name, req) => {
-      // Use LDAP to query a user with identityId and name
-        return useLdap(req.log, ldap)(async (client) => {
-          const user = await searchOne(req.log, client, ldap.searchBase,
-            {
-              scope: "sub",
-              filter: new ldapjs.AndFilter({
-                filters: [
-                  ldapjs.parseFilter(ldap.userFilter),
-                  new ldapjs.EqualityFilter({
-                    attribute: ldap.attrs.uid,
-                    value: identityId,
-                  }),
-                ],
-              }),
-            }, (e) => extractUserInfoFromEntry(ldap, e, req.log),
-          );
-
-          if (!user) {
-            return "NotFound";
-          }
-
-          if (user.name !== name) {
-            return "NotMatch";
-          }
-
-          return "Match";
-        });
-      } : undefined,
     getUser: async (identityId, req) => useLdap(req.log, ldap)(async (client) => (
       findUser(req.log, ldap, client, identityId)
     )),

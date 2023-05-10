@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import Link from "@docusaurus/Link";
 import useBaseUrl from "@docusaurus/useBaseUrl";
 import clsx from "clsx";
 import React from "react";
@@ -45,9 +46,15 @@ const FeatureList: FeatureItem[] = [
     title: "方便扩展",
     image: "/img/undraw_docusaurus_mountain.svg",
     description: (
-      <>
-        SCOW采用现代技术栈，方便用户定制。
-      </>
+      <p>
+        使用任何语言，<br/>
+        通过
+        <Link href="/docs/integration/scow-api-hook/api">SCOW API</Link>
+        调用SCOW API，<br/>
+        或者通过
+        <Link href="/docs/integration/scow-api-hook/hook">SCOW Hook</Link>
+        监听SCOW事件
+      </p>
     ),
   },
 ];

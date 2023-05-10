@@ -41,7 +41,7 @@ export const DesktopTableActions: React.FC<Props> = ({ cluster, reload, record }
               },
             });
 
-            openDesktop(resp.host, resp.port, resp.password);
+            openDesktop(cluster.id, resp.host, resp.port, resp.password);
           }}
         >
           启动

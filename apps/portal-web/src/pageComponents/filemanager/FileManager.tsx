@@ -11,12 +11,13 @@
  */
 
 import { CopyOutlined,
-  DeleteOutlined, FileAddOutlined, FolderAddOutlined,
+  DeleteOutlined, EyeInvisibleOutlined,
+  EyeOutlined, FileAddOutlined, FolderAddOutlined,
   HomeOutlined, LeftOutlined, MacCommandOutlined, RightOutlined,
   ScissorOutlined, SnippetsOutlined, UploadOutlined, UpOutlined } from "@ant-design/icons";
 import { compareDateTime, formatDateTime } from "@scow/lib-web/build/utils/datetime";
 import { compareNumber } from "@scow/lib-web/build/utils/math";
-import { App, Button, Divider, Space, Table } from "antd";
+import { App, Button, Divider, Space, Table, Tooltip } from "antd";
 import Link from "next/link";
 import Router from "next/router";
 import { join } from "path";
@@ -48,6 +49,48 @@ const OperationBar = styled(TableTitle)`
   gap: 4px;
 `;
 
+const nodeModeToString = (mode: number) => {
+  const numberPermission = (mode & parseInt("777", 8)).toString(8);
+
+  const toStr = (char: string) => {
+    const num = +char;
+    return ((num & 4) !== 0 ? "r" : "-") + ((num & 2) !== 0 ? "w" : "-") + ((num & 1) !== 0 ? "x" : "-");
+  };
+
+  return [0, 1, 2].reduce((prev, curr) => prev + toStr(numberPermission[curr]), "");
+};
+
+const formatFileSize = (size: number): string => {
+  const unitMap = ["KB", "MB", "GB", "TB", "PB"];
+  const CARRY = 1024;
+  // 最大1024TB
+  const MAX_SIZE = 1024 * 1024 * 1024 * 1024 * 1024;
+
+  if (size >= MAX_SIZE) {
+    return "";
+  }
+
+  let carryCount = 0;
+  let decimalSize = Math.round(size / CARRY);
+
+  while (decimalSize > CARRY) {
+    decimalSize = decimalSize / CARRY;
+    carryCount++;
+  }
+
+  if (decimalSize >= 1000) {
+    decimalSize = decimalSize / CARRY;
+    carryCount++;
+  }
+
+  const fixedNumber = decimalSize < 9.996 ? 2 : (decimalSize < 99.95 ? 1 : 0);
+  return `${decimalSize.toFixed(fixedNumber)} ${unitMap[carryCount]}`;
+};
+
+type FileInfoKey = React.Key;
+
+const fileInfoKey = (f: FileInfo, path: string): FileInfoKey => join(path, f.name);
+
 interface Operation {
   op: "copy" | "move";
   originalPath: string
@@ -72,6 +115,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
   const [selectedKeys, setSelectedKeys] = useState<FileInfoKey[]>([]);
 
   const [operation, setOperation] = useState<Operation | undefined>(undefined);
+  const [showHiddenFile, setShowHiddenFile] = useState(false);
 
   const reload = async (signal?: AbortSignal) => {
     setLoading(true);
@@ -253,6 +297,10 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
     return files.filter((x) => keys.includes(fileInfoKey(x, path)));
   };
 
+  const onHiddenClick = () => {
+    setShowHiddenFile(!showHiddenFile);
+  };
+
   return (
     <div>
       <TitleText>
@@ -338,6 +386,12 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
           }
         </Space>
         <Space wrap>
+          <Button
+            onClick={onHiddenClick}
+            icon={showHiddenFile ? <EyeInvisibleOutlined /> : <EyeOutlined />}
+          >
+            {showHiddenFile ? "不显示" : "显示"}隐藏的项目
+          </Button>
           {
             publicConfig.ENABLE_SHELL ? (
               <Link href={`/shell/${cluster.id}${path}`} target="_blank" legacyBehavior>
@@ -364,7 +418,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
         </Space>
       </OperationBar>
       <Table
-        dataSource={files}
+        dataSource={files.filter((file) => showHiddenFile || !file.name.startsWith("."))}
         loading={loading}
         pagination={false}
         size="small"
@@ -392,9 +446,6 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
           dataIndex="type"
           title=""
           width="32px"
-          defaultSortOrder={"ascend"}
-          sorter={(a, b) => a.type.localeCompare(b.type)}
-          sortDirections={["ascend", "descend"]}
           render={(_, r) => (
             React.createElement(fileTypeIcons[r.type])
           )}
@@ -403,7 +454,12 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
         <Table.Column<FileInfo>
           dataIndex="name"
           title="文件名"
-          sorter={(a, b) => a.name.localeCompare(b.name)}
+          defaultSortOrder={"ascend"}
+          sorter={
+            (a, b) => a.type.localeCompare(b.type) === 0
+              ? a.name.localeCompare(b.name)
+              : a.type.localeCompare(b.type)
+          }
           sortDirections={["ascend", "descend"]}
           render={(_, r) => (
             r.type === "DIR" ? (
@@ -426,7 +482,13 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
           dataIndex="mtime"
           title="修改日期"
           render={(mtime: string | undefined) => mtime ? formatDateTime(mtime) : ""}
-          sorter={(a, b) => compareDateTime(a.mtime, b.mtime)}
+          sorter={
+            (a, b) => a.type.localeCompare(b.type) === 0
+              ? compareDateTime(a.mtime, b.mtime) === 0
+                ? a.name.localeCompare(b.name)
+                : compareDateTime(a.mtime, b.mtime)
+              : a.type.localeCompare(b.type)
+          }
         />
 
         <Table.Column<FileInfo>
@@ -434,9 +496,22 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
           title="大小"
           render={
             (size: number | undefined, file: FileInfo) =>
-              (size === undefined || file.type === "DIR") ? "" : Math.floor(size / 1024) + " KB"
+              (size === undefined || file.type === "DIR")
+                ? ""
+                : (
+                  <Tooltip title={Math.round((size) / 1024).toLocaleString() + "KB"} placement="topRight">
+                    <span>{formatFileSize(size)}</span>
+                  </Tooltip>
+                )
           }
-          sorter={(a, b) => compareNumber(a.size, b.size)}
+          sorter={
+            (a, b) => {
+              return a.type.localeCompare(b.type) === 0
+                ? compareNumber(a.size, b.size) === 0
+                  ? a.name.localeCompare(b.name)
+                  : compareNumber(a.size, b.size)
+                : a.type.localeCompare(b.type);
+            }}
         />
 
         <Table.Column<FileInfo>

@@ -13,7 +13,7 @@
 import { writeFileSync } from "fs";
 import { createComposeSpec } from "src/compose";
 import { getInstallConfig } from "src/config/install";
-import { log } from "src/log";
+import { logger } from "src/log";
 import { format } from "src/utils/formatter";
 
 interface Options {
@@ -34,5 +34,5 @@ export const generateDockerComposeYml = (options: Options) => {
 
   writeFileSync(options.outputPath, format(spec, options.format), { encoding: "utf-8" });
 
-  log("Generated compose spec as %s at %s", options.format, options.outputPath);
+  logger.info("Generated compose spec as %s at %s", options.format, options.outputPath);
 };

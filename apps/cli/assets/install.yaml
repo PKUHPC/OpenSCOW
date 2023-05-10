@@ -90,6 +90,7 @@
 #   pretty: false
 
 #   # fluentd日志收集服务配置。
+#   # 将会使用fluent/fluent.conf作为配置文件
 #   # 如果不使用，请注释整个部分
 #   fluentd:
 #     # fluentd镜像

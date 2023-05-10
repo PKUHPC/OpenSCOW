@@ -28,7 +28,7 @@ import { Cluster, publicConfig } from "src/utils/config";
 
 interface JobForm {
   cluster: Cluster;
-  partition: string | undefined;
+  partition: string;
   nodeCount: number;
   coreCount: number;
   gpuCount: number | undefined;
@@ -105,7 +105,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
 
   const jobName = Form.useWatch("jobName", form) as string;
 
-  const partition = Form.useWatch("partition", form) as string | undefined;
+  const partition = Form.useWatch("partition", form) as string;
 
   const nodeCount = Form.useWatch("nodeCount", form) as number;
 

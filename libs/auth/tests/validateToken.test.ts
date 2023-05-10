@@ -31,7 +31,7 @@ it("raises correct request", async () => {
   await validateToken(authUrl, validToken);
 
   expect(fetch).toHaveBeenCalledWith(
-    authUrl + "/validateToken?token=" + validToken,
+    authUrl + "/public/validateToken?token=" + validToken,
     { method: "GET" },
   );
 });

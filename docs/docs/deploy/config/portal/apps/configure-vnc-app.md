@@ -1,5 +1,5 @@
 ---
-sidebar_position: 2
+sidebar_position: 3
 title: 配置桌面类应用
 ---
 
@@ -16,9 +16,9 @@ title: 配置桌面类应用
 
 下面以使用emacs为示例介绍如何配置桌面类应用。
 
-创建`config/apps`目录，在里面创建`emacs.yml`文件，其内容如下：
+创建`config/apps`目录，在里面创建`emacs/config.yml`或者`emacs.yml`文件，其内容如下：
 
-```yaml title="config/apps/emacs.yml"
+```yaml title="config/apps/emacs/config.yml"
 # 这个应用的ID
 id: emacs
 

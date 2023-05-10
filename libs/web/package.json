@@ -1,6 +1,6 @@
 {
   "name": "@scow/lib-web",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "",
   "main": "index.js",
   "private": true,
@@ -17,24 +17,26 @@
   "dependencies": {
     "@scow/utils": "workspace:*",
     "zod": "3.21.4",
-    "mime-types": "2.1.35"
+    "mime-types": "2.1.35",
+    "nookies": "2.5.2"
   },
   "peerDependencies": {
-    "antd": "5.4.5",
-    "next": "13.3.1",
+    "antd": "5.4.7",
+    "next": "13.4.1",
     "styled-components": "5.3.10",
     "@ant-design/icons": "5.0.1",
     "dayjs": "1.11.7"
   },
   "devDependencies": {
-    "antd": "5.4.5",
-    "next": "13.3.1",
+    "antd": "5.4.7",
+    "next": "13.4.1",
     "styled-components": "5.3.10",
+    "@grpc/grpc-js": "1.8.14",
     "@types/mime-types": "2.1.1",
     "react": "18.2.0",
-    "@types/react": "18.0.38",
+    "@types/react": "18.2.6",
     "react-dom": "18.2.0",
-    "@types/react-dom": "18.0.11",
+    "@types/react-dom": "18.2.4",
     "react-is": "18.2.0",
     "@ant-design/icons": "5.0.1",
     "dayjs": "1.11.7",

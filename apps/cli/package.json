@@ -1,6 +1,6 @@
 {
   "name": "@scow/cli",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "CLI to manage SCOW",
   "main": "build/index.js",
   "bin": "build/index.js",
@@ -13,23 +13,24 @@
   "dependencies": {
     "@scow/lib-config": "workspace:*",
     "pkg": "5.8.1",
-    "yargs": "17.7.1",
+    "yargs": "17.7.2",
     "prompts": "2.4.2",
-    "@sinclair/typebox": "0.28.5",
+    "@sinclair/typebox": "0.28.9",
     "js-yaml": "4.1.0",
-    "debug": "4.3.4",
+    "pino": "8.14.1",
+    "pino-pretty": "10.0.0",
     "octokit": "2.0.14",
     "jszip": "3.10.1",
     "dotenv": "16.0.3",
     "death": "1.1.0",
-    "https-proxy-agent": "5.0.1",
-    "node-fetch-commonjs": "3.2.4"
+    "https-proxy-agent": "6.1.0",
+    "node-fetch-commonjs": "3.2.4",
+    "@scow/config": "workspace:*"
   },
   "devDependencies": {
     "@types/yargs": "17.0.24",
     "@types/prompts": "2.4.4",
     "@types/js-yaml": "4.0.5",
-    "@types/debug": "4.1.7",
     "@types/death": "1.1.2"
   },
   "author": "PKUHPC (https://github.com/PKUHPC)",

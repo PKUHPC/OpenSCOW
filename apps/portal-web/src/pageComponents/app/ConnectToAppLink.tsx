@@ -50,11 +50,7 @@ export const ConnectTopAppLink: React.FC<Props> = ({
       const query = connect.query ? interpolateValues(connect.query) : {};
       const formData = connect.formData ? interpolateValues(connect.formData) : undefined;
 
-      const proxyBasePath = proxyType === "relative"
-        ? publicConfig.RPROXY_BASE_PATH
-        : publicConfig.PROXY_BASE_PATH;
-
-      const pathname = join(proxyBasePath, host, String(port), path);
+      const pathname = join(publicConfig.BASE_PATH, "/api/proxy", cluster.id, proxyType, host, String(port), path);
 
       const url = pathname + "?" + new URLSearchParams(query).toString();
 
@@ -82,7 +78,7 @@ export const ConnectTopAppLink: React.FC<Props> = ({
 
     } else {
       const { host, port, password } = reply;
-      openDesktop(host, port, password);
+      openDesktop(cluster.id, host, port, password);
     }
 
   };

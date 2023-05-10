@@ -1,0 +1,8 @@
+{
+  "label": "SCOW API和Hook",
+  "position": 3,
+  "link": {
+    "type": "generated-index",
+    "description": "介绍如何通过SCOW API和Hook调用SCOW的功能以及监听SCOW的事件"
+  }
+}

@@ -37,7 +37,6 @@ export interface AuthProvider {
   fetchAuthTokenInfo: (token: string, req: FastifyRequest) => Promise<string | undefined>;
   getUser: undefined | ((identityId: string, req: FastifyRequest) => Promise<UserInfo | undefined>);
   createUser: undefined | ((info: CreateUserInfo, req: FastifyRequest) => Promise<CreateUserResult>);
-  validateName: undefined | ((identityId: string, name: string, req: FastifyRequest) => Promise<ValidateNameResult>);
   changePassword: undefined | ((id: string, oldPassword: string, newPassword: string,
     req: FastifyRequest) => Promise<ChangePasswordResult>);
 }

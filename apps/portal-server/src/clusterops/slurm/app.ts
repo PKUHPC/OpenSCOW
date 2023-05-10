@@ -23,6 +23,7 @@ import { displayIdToPort } from "src/clusterops/slurm/bl/port";
 import { getAppConfigs } from "src/config/apps";
 import { portalConfig } from "src/config/portal";
 import { splitSbatchArgs } from "src/utils/app";
+import { isPortReachable } from "src/utils/isPortReachable";
 import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
 import { parseDisplayId, refreshPassword, VNCSERVER_BIN_PATH } from "src/utils/turbovnc";
 
@@ -240,24 +241,49 @@ export const slurmAppOps = (cluster: string): AppOps => {
             // for server apps,
             // try to read the SESSION_INFO file to get port and password
               const infoFilePath = join(jobDir, SERVER_SESSION_INFO);
-              ready = await sftpExists(sftp, infoFilePath);
+              if (await sftpExists(sftp, infoFilePath)) {
+                const content = await sftpReadFile(sftp)(infoFilePath);
+                const serverSessionInfo = JSON.parse(content.toString()) as ServerSessionInfoData;
+                const { HOST, PORT } = serverSessionInfo;
 
+                ready = await isPortReachable(PORT, HOST);
+                if (ready) {
+                  logger.info(`${HOST}:${PORT} for web app ${app.name} is reachable.`);
+                } else {
+                  logger.info(`${HOST}:${PORT} for web app ${app.name} is not reachable.`);
+                }
+              }
             } else {
             // for vnc apps,
             // try to find the output file and try to parse the display number
-              const outputFilePath = join(jobDir, VNC_OUTPUT_FILE);
+              const vncSessionInfoPath = join(jobDir, VNC_SESSION_INFO);
+              if (await sftpExists(sftp, vncSessionInfoPath)) {
+                const host = (await sftpReadFile(sftp)(vncSessionInfoPath)).toString().trim();
 
-              if (await sftpExists(sftp, outputFilePath)) {
-                const content = (await sftpReadFile(sftp)(outputFilePath)).toString();
-                try {
-                  parseDisplayId(content);
-                  ready = true;
-                } catch {
-                // ignored if displayId cannot be parsed
+                const outputFilePath = join(jobDir, VNC_OUTPUT_FILE);
+                if (await sftpExists(sftp, outputFilePath)) {
+                  const content = (await sftpReadFile(sftp)(outputFilePath)).toString();
+                  try {
+                    const displayId = parseDisplayId(content);
+                    const port = displayIdToPort(displayId!);
+                    ready = await isPortReachable(port, host);
+                    if (ready) {
+                      logger.info(`${host}:{port} for vnc app ${app.name} is reachable.`);
+                    } else {
+                      logger.info(`${host}:{port} for vnc app ${app.name} is not reachable.`);
+                    }
+                  } catch {
+                  // ignored if displayId cannot be parsed
+                  }
                 }
               }
             }
           }
+
+          const terminatedStates = ["BOOT_FAIL", "COMPLETED", "DEADLINE", "FAILED",
+            "NODE_FAIL", "PREEMPTED", "SPECIAL_EXIT", "TIMEOUT"];
+          const isPendingOrTerminated = runningJobInfo?.state === "PENDING"
+            || terminatedStates.includes(runningJobInfo?.state);
 
           sessions.push({
             jobId: sessionMetadata.jobId,
@@ -269,6 +295,7 @@ export const slurmAppOps = (cluster: string): AppOps => {
             dataPath: await sftpRealPath(sftp)(jobDir),
             runningTime: runningJobInfo?.runningTime ?? "",
             timeLimit: runningJobInfo?.timeLimit ?? "",
+            reason: isPendingOrTerminated ? (runningJobInfo?.nodesOrReason ?? "") : undefined,
           });
 
         }));
