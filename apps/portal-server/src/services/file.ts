@@ -367,72 +367,20 @@ export const fileServiceServer = plugin((server) => {
       const { fromCluster, toCluster, userId, fromPath, toPath } = request;
 
       const fromTransferNodeAddress = getClusterTransferNode(fromCluster).address;
+
       const {
-        address: toTransferNodeAddress,
         host: toTransferNodeHost,
         port: toTransferNodePort,
       } = getClusterTransferNode(toCluster);
 
-
-      // 检查fromTransferNode -> toTransferNode是否已经免密
-      const { keyConfiged, scowDir, keyDir, privateKeyPath } = await sshConnect(
-        fromTransferNodeAddress, userId, logger, async (ssh) => {
-        // 获取密钥路径
-          const sftp = await ssh.requestSFTP();
-          const homePath = await sftpRealPath(sftp)(".");
-          const scowDir = `${homePath}/scow`;
-          const keyDir = `${scowDir}/.scow-sync-ssh`;
-          const privateKeyPath = `${keyDir}/id_rsa`;
-
-          const cmd = "scow-sync-start";
-          const args = [
-            "-a", toTransferNodeHost,
-            "-u", userId,
-            "-p", toTransferNodePort.toString(),
-            "-k", privateKeyPath,
-            "-c", // -c,--check参数检查是否免密，并stdout返回true/false
-          ];
-          const resp = await loggedExec(ssh, logger, true, cmd, args);
-          const keyConfiged = resp.stdout === "true";
-          return {
-            keyConfiged: keyConfiged,
-            scowDir: scowDir,
-            keyDir: keyDir,
-            privateKeyPath: privateKeyPath,
-          };
-        });
-
-      // 如果没有配置免密，则生成密钥并配置免密
-      if (!keyConfiged) {
-        // 随机生成密钥
-        const publicKey = await sshConnect(fromTransferNodeAddress, userId, logger, async (ssh) => {
-          const sftp = await ssh.requestSFTP();
-          if (!await sftpExists(sftp, scowDir)) {
-            await sftpMkdir(sftp)(scowDir);
-          }
-          if (await sftpExists(sftp, keyDir)) {
-            await sshRmrf(ssh, keyDir);
-          }
-          await sftpMkdir(sftp)(keyDir);
-          const genKeyCmd = `ssh-keygen -t rsa -b 4096 -C "for scow-sync" -f ${privateKeyPath} -N ""`;
-          await loggedExec(ssh, logger, true, genKeyCmd, []);
-          // 读公钥
-          const fileData = await sftpReadFile(sftp)(`${privateKeyPath}.pub`);
-          return fileData.toString();
-        });
-
-        // 配置fromTransferNode -> toTransferNode的免密登录
-        await sshConnect(toTransferNodeAddress, userId, logger, async (ssh) => {
-          const sftp = await ssh.requestSFTP();
-          const homePath = await sftpRealPath(sftp)(".");
-          // 将公钥写入到authorized_keys中
-          const authorizedKeysPath = `${homePath}/.ssh/authorized_keys`;
-          await sftpAppendFile(sftp)(authorizedKeysPath, `\n${publicKey}\n`);
-        });
-      }
-
       // 执行scow-sync-start
       return await sshConnect(fromTransferNodeAddress, userId, logger, async (ssh) => {
+
+        // 密钥路径
+        const sftp = await ssh.requestSFTP();
+        const homePath = await sftpRealPath(sftp)(".");
+        const privateKeyPath = `${homePath}/scow/.scow-sync-ssh/id_rsa`;
+
         const cmd = "scow-sync-start";
         const args = [
           "-a", toTransferNodeHost,
@@ -563,6 +511,86 @@ export const fileServiceServer = plugin((server) => {
         }
         return [{}];
       });
+    },
+
+    checkTransferKey: async ({ request, logger }) => {
+
+      const { fromCluster, toCluster, userId } = request;
+
+      const fromTransferNodeAddress = getClusterTransferNode(fromCluster).address;
+      const {
+        address: toTransferNodeAddress,
+        host: toTransferNodeHost,
+        port: toTransferNodePort,
+      } = getClusterTransferNode(toCluster);
+
+      // 检查fromTransferNode -> toTransferNode是否已经免密
+      const { keyConfiged, scowDir, keyDir, privateKeyPath } = await sshConnect(
+        fromTransferNodeAddress, userId, logger, async (ssh) => {
+          // 获取密钥路径
+          const sftp = await ssh.requestSFTP();
+          const homePath = await sftpRealPath(sftp)(".");
+          const scowDir = `${homePath}/scow`;
+          const keyDir = `${scowDir}/.scow-sync-ssh`;
+          const privateKeyPath = `${keyDir}/id_rsa`;
+
+          const cmd = "scow-sync-start";
+          const args = [
+            "-a", toTransferNodeHost,
+            "-u", userId,
+            "-p", toTransferNodePort.toString(),
+            "-k", privateKeyPath,
+            "-c", // -c,--check参数检查是否免密，并stdout返回true/false
+          ];
+          const resp = await loggedExec(ssh, logger, true, cmd, args);
+
+          if (resp.code !== 0) {
+            throw <ServiceError> {
+              code: status.INTERNAL,
+              message: "check the key of transferring cross clusters failed",
+              details: resp.stderr,
+            };
+          }
+
+          const keyConfiged = resp.stdout === "true";
+
+          return {
+            keyConfiged: keyConfiged,
+            scowDir: scowDir,
+            keyDir: keyDir,
+            privateKeyPath: privateKeyPath,
+          };
+        });
+
+      // 如果没有配置免密，则生成密钥并配置免密
+      if (!keyConfiged) {
+        // 随机生成密钥
+        const publicKey = await sshConnect(fromTransferNodeAddress, userId, logger, async (ssh) => {
+          const sftp = await ssh.requestSFTP();
+          if (!await sftpExists(sftp, scowDir)) {
+            await sftpMkdir(sftp)(scowDir);
+          }
+          if (await sftpExists(sftp, keyDir)) {
+            await sshRmrf(ssh, keyDir);
+          }
+          await sftpMkdir(sftp)(keyDir);
+          const genKeyCmd = `ssh-keygen -t rsa -b 4096 -C "for scow-sync" -f ${privateKeyPath} -N ""`;
+          await loggedExec(ssh, logger, true, genKeyCmd, []);
+          // 读公钥
+          const fileData = await sftpReadFile(sftp)(`${privateKeyPath}.pub`);
+          return fileData.toString();
+        });
+
+        // 配置fromTransferNode -> toTransferNode的免密登录
+        await sshConnect(toTransferNodeAddress, userId, logger, async (ssh) => {
+          const sftp = await ssh.requestSFTP();
+          const homePath = await sftpRealPath(sftp)(".");
+          // 将公钥写入到authorized_keys中
+          const authorizedKeysPath = `${homePath}/.ssh/authorized_keys`;
+          await sftpAppendFile(sftp)(authorizedKeysPath, `\n${publicKey}\n`);
+        });
+      }
+      return [{}];
     },
   });
 });

@@ -206,6 +206,16 @@ message TerminateFilesTransferResponse {
 
 }
 
+message CheckTransferKeyRequest {
+  string from_cluster = 1;
+  string to_cluster = 2;
+  string user_id = 3;
+}
+
+message CheckTransferKeyResponse {
+
+}
+
 service FileService {
   rpc Copy(CopyRequest) returns (CopyResponse);
   rpc CreateFile(CreateFileRequest) returns (CreateFileResponse);
@@ -231,4 +241,6 @@ service FileService {
   rpc QueryFilesTransfer(QueryFilesTransferRequest) returns (QueryFilesTransferResponse);
 
   rpc TerminateFilesTransfer(TerminateFilesTransferRequest) returns (TerminateFilesTransferResponse);
+
+  rpc CheckTransferKey(CheckTransferKeyRequest) returns (CheckTransferKeyResponse);
 }

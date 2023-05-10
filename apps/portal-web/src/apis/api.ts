@@ -28,6 +28,7 @@ import type { KillDesktopSchema } from "src/pages/api/desktop/killDesktop";
 import type { LaunchDesktopSchema } from "src/pages/api/desktop/launchDesktop";
 import type { ListAvailableWmsSchema } from "src/pages/api/desktop/listAvailableWms";
 import type { ListDesktopsSchema } from "src/pages/api/desktop/listDesktops";
+import { CheckTransferKeySchema } from "src/pages/api/file/checkTransferKey";
 import type { CopyFileItemSchema } from "src/pages/api/file/copy";
 import type { CreateFileSchema } from "src/pages/api/file/createFile";
 import type { DeleteDirSchema } from "src/pages/api/file/deleteDir";
@@ -98,4 +99,5 @@ export const api = {
   queryFilesTransferProgress: fromApi<QueryFilesTransferProgressSchema>("GET", join(basePath, "/api/file/queryFilesTransferProgress")),
   terminateFilesTransfer: fromApi<TerminateFilesTransferSchema>("POST", join(basePath, "/api/file/terminateFilesTransfer")),
   listAvailableTransferClusters: fromApi<ListAvailableTransferClustersSchema>("GET", join(basePath, "/api/file/listAvailableTransferClusters")),
+  checkTransferKey: fromApi<CheckTransferKeySchema>("POST", join(basePath, "/api/file/checkTransferKey")),
 };

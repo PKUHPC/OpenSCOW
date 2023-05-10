@@ -24,24 +24,21 @@ let ssh: TestSshServer;
 let server: Server;
 let client: FileServiceClient;
 
-// 传输进度
-const scowPath = `/home/${userId}/scow`;
-const scowSyncPath = path.join(scowPath, ".scow-sync");
-const testTransferDir = path.join(scowSyncPath, "test");
-const testTransferFile = path.join(testTransferDir, "test1.out");
+// 用于测试的目录和文件
+let testTransferDir: string = "";
+let testTransferFile: string = "";
 
-// 传输进度记录的传输文件
+// 写入文件的内容
+const toCluster = "123.123.123.123";
 const fatherPath = "/transfer_dir";
 const fileName = "transfer_file";
-
-// queryTransferFiles的返回结果
-const filePath = path.join(fatherPath, fileName);
-const toCluster = "123.123.123.123";
 const transferSize = "1,048,576";
 const progress = "42%";
 const speed = "1.74KB/s";
 const leftTime = "0:00:33";
 
+// queryFilesTransfer应该返回的结果
+const filePath = path.join(fatherPath, fileName);
 const transferSizeKb = 1024;
 const progressInt = 42;
 const speedKBps = 1.74;
@@ -61,6 +58,14 @@ beforeEach(async () => {
   client = new FileServiceClient(server.serverAddress, credentials.createInsecure());
 
   // 上传测试文件，用于scow-sync-query读取
+  const HomePath = await asyncUnaryCall(client, "getHomeDirectory", {
+    cluster, userId,
+  });
+  const scowPath = `${HomePath}/scow`;
+  const scowSyncPath = path.join(scowPath, ".scow-sync");
+  testTransferDir = path.join(scowSyncPath, "test");
+  testTransferFile = path.join(testTransferDir, "test1.out");
+
   const scowExist = await sftpExists(ssh.sftp, scowPath);
   if (!scowExist) { await sftpMkdir(ssh.sftp)(scowPath); }
 

@@ -41,8 +41,9 @@ const OperationButton: React.FC<ButtonProps> = (props) => {
     <Button
       icon={icon}
       disabled={disabled}
-      onClick={ () => {
+      onClick={ async () => {
         if (srcCluster && dstCluster) {
+          await api.checkTransferKey({ body: { fromCluster:srcCluster.id, toCluster: dstCluster.id } });
           Promise.all(selectedKeys.map(async (key) => {
             await api.startFilesTransfer({ body: {
               fromCluster: srcCluster.id,

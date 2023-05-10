@@ -88,6 +88,7 @@ export const mockApi: MockApi<typeof api> = {
   startFilesTransfer: null,
   queryFilesTransferProgress: null,
   terminateFilesTransfer: null,
+  checkTransferKey: null,
 
   createAppSession: async () => ({ jobId: 123, sessionId: "is" }),
 
