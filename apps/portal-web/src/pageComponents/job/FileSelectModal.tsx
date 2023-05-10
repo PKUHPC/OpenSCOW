@@ -50,7 +50,6 @@ interface Props {
 
 // 处理path的特殊情况,比如为空或者不以"/"开头
 const formatPath = (path: string) => {
-  console.log("formatPath: ", path);
   if (path === "") {
     return "/";
   }
