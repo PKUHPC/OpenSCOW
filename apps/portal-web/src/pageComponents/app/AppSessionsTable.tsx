@@ -202,14 +202,15 @@ export const AppSessionsTable: React.FC<Props> = () => {
               <Button loading={isLoading} onClick={reload}>刷新</Button>
             </Space>
           </Form.Item>
-          <Checkbox
-            checked={checked}
-            disabled={disabled}
-            onChange={onChange}
-            style={{ lineHeight: "40px", marginLeft: "10px" }}
-          >
-            10s自动刷新
-          </Checkbox>
+          <Form.Item>
+            <Checkbox
+              checked={checked}
+              disabled={disabled}
+              onChange={onChange}
+            >
+              10s自动刷新
+            </Checkbox>
+          </Form.Item>
         </Form>
       </FilterFormContainer>
       <Table

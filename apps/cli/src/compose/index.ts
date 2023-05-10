@@ -163,10 +163,14 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
 
   // PORTAL
   if (config.portal) {
+
+    const portalBasePath = join(BASE_PATH, PORTAL_PATH);
+
     addService("portal-server", {
       image: scowImage,
       environment: {
         SCOW_LAUNCH_APP: "portal-server",
+        PORTAL_BASE_PATH: portalBasePath,
         ...serviceLogEnv,
       },
       ports: config.portal.portMappings?.portalServer ? { [config.portal.portMappings.portalServer]: 5000 } : {},
@@ -181,7 +185,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
       image: scowImage,
       environment: {
         "SCOW_LAUNCH_APP": "portal-web",
-        "BASE_PATH": join(BASE_PATH, PORTAL_PATH),
+        "BASE_PATH": portalBasePath,
         "MIS_URL": join(BASE_PATH, MIS_PATH),
         "MIS_DEPLOYED": config.mis ? "true" : "false",
         "AUTH_EXTERNAL_URL": join(BASE_PATH, "/auth"),

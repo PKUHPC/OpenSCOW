@@ -1,5 +1,12 @@
 # @scow/lib-web
 
+## 0.3.1
+
+### Patch Changes
+
+- fc36c57ca: 修复 web 项目第一次访问时页面布局混乱的问题
+- caefcddcd: 前端显示用户姓名时使用认证系统返回的用户姓名
+
 ## 0.3.0
 
 ### Minor Changes

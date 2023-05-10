@@ -25,7 +25,10 @@ proto文件分为`common`, `portal`，`server`和`hook`。其中，
 [Buf](https://buf.build/docs/tutorials/getting-started-with-buf-cli/)是一个管理gRPC API和proto文件的一站式工具，可完成获取文件、生成代码等常见功能。我们推荐通过使用Buf直接从GitHub上获取代码并生成您的语言的模板的代码的工作。
 
 ```bash
-# 使用本地buf.gen.yaml生成模板，使用SCOW仓库的master分支的SCOW API
+# 使用本地buf.gen.yaml生成模板，使用v0.3.0版本的SCOW API(v0.3.0开始可以通过此方式，推荐)
+buf generate --template buf.gen.yaml https://github.com/PKUHPC/SCOW.git#subdir=protos,branch=api-v0.3.0
+
+# 使用本地buf.gen.yaml生成模板，使用SCOW仓库的master分支的代码对应的SCOW API
 buf generate --template buf.gen.yaml https://github.com/PKUHPC/SCOW.git#subdir=protos,branch=master
 ```
 
@@ -62,4 +65,4 @@ API的版本通过`@scow/grpc-api`包的版本进行定义。SCOW gRPC API版本
 - 修改了API，但是兼容当前的API：提高MINOR号
 - 不兼容已有的配置文件，提高MAJOR版本
 
-当前，我们并不保证新版本SCOW对老版本API的兼容性。
+当前，我们并不保证新版本SCOW对老版本API的兼容性。SCOW每次发布版本时，会同时公布此版本支持的SCOW API的版本号。

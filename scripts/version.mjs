@@ -38,6 +38,7 @@ const changes = {
   "cli": [],
   "gateway": [],
   "grpc-api": [],
+  "config": [],
 };
 
 for (const file of files) {
@@ -96,9 +97,17 @@ const getChangesetLine = (line) =>
   `- ${line.content}` +
   ` ([${line.gitCommit.substring(0, 8)}](https://github.com/PKUHPC/SCOW/commit/${line.gitCommit}))`;
 
-const generateContent = (scowPackage) => {
+/**
+ * Generate changelog content for a package
+ * @param {string} scowPackage the package name
+ * @param {string | undefined} title title. if not set, no title is shown
+ * @returns changelog content
+ */
+const generateContent = (scowPackage, title) => {
 
   const packageChanges = changes[scowPackage];
+
+  if (packageChanges.length === 0) { return ""; }
 
   // categories changes by type
 
@@ -108,7 +117,7 @@ const generateContent = (scowPackage) => {
     changesByType[change.type].push(change);
   }
 
-  let content = "";
+  let content = title ? `## ${title} (${scowPackage}) \n\n` : "";
   if (changesByType.major.length > 0) {
     content += "### 重大更新\n" + changesByType.major.map(getChangesetLine).join("\n") + "\n\n";
   }
@@ -121,44 +130,36 @@ const generateContent = (scowPackage) => {
     content += "### 小型更新\n" + changesByType.patch.map(getChangesetLine).join("\n") + "\n\n";
   }
 
-  return content.trim();
+  return content.trim() + "\n\n";
 };
+
+const scowApiVersion = readPackageJson("protos/package.json").version;
+const configVersion = readPackageJson("libs/config/package.json").version;
 
 const changelogContent = `# v${rootPackageJson.version}
 
 发布于：${new Date().toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" })}
 
-## 门户系统前端 (portal-web)
+# 配置文件
 
-${generateContent("portal-web")}
+配置文件版本：${configVersion}
 
-## 门户系统后端 (portal-server)
+${generateContent("config")}
+# SCOW API和Hook
 
-${generateContent("portal-server")}
-
-## 管理系统前端（mis-web)
-
-${generateContent("mis-web")}
-
-## 管理系统服务器 (mis-server)
-
-${generateContent("mis-server")}
-
-## 认证系统 (auth)
-
-${generateContent("auth")}
-
-## CLI (cli)
-
-${generateContent("cli")}
-
-## 网关 (gateway)
-
-${generateContent("gateway")}
-
-## SCOW API和Hook
+SCOW API版本：${scowApiVersion}
 
 ${generateContent("grpc-api")}
+# SCOW
+
+${generateContent("portal-web", "门户系统前端")
+ + generateContent("portal-server", "门户系统后端")
+ + generateContent("mis-web", "管理系统前端")
+ + generateContent("mis-server", "管理系统后端")
+ + generateContent("auth", "认证系统")
+ + generateContent("cli", "CLI")
+ + generateContent("gateway", "网关")
+}
 `;
 
 const CHANGELOG_BASE_PATH = "changelogs";
