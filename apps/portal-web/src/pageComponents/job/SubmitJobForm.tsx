@@ -42,11 +42,10 @@ interface JobForm {
   save: boolean;
 }
 
-// 生成默认工作名称，命名规则为job-日期-序号（如job-20230428-01）
-const genJobName = (jobsNum: number): string => {
+// 生成默认工作名称，命名规则为年月日-时分秒，如job-20230510-103010
+const genJobName = (): string => {
   const today = dayjs().toISOString();
-  const paddedStr = jobsNum < 10 ? "0" + jobsNum : jobsNum;
-  return `job-${today.slice(0, 10).replace(/-/g, "")}-${paddedStr}`;
+  return `job-${today.slice(0, 10).replace(/-/g, "")}-${today.slice(11, 19).replace(/:/g, "")}`;
 };
 
 const formatMemorySize = (size: number): string => {
@@ -159,25 +158,12 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
           qos: partition.qos?.[0],
         };
         form.setFieldsValue(setInitialValues);
-
-        if (cluster) {
-          api.getAllJobs({
-            query: {
-              cluster: cluster?.id,
-              startTime: dayjs().startOf("day").toISOString(),
-              endTime: dayjs().endOf("day").toISOString(),
-            },
-          }).then((result) => {
-            let jobsNumOfToday = 0;
-            if (result) {
-              jobsNumOfToday = result.results.length;
-            }
-            const jobName = genJobName(jobsNumOfToday + 1);
-            form.setFieldValue("jobName", jobName);
-            setWorkingDirectoryValue();
-          });
-        }
       }
+
+      const jobInitialName = genJobName();
+      form.setFieldValue("jobName", jobInitialName);
+      setWorkingDirectoryValue();
+
     },
   });
 
@@ -240,7 +226,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
         </Col>
         <Col span={24} sm={12}>
           <Form.Item<JobForm> label="作业名" name="jobName" rules={[{ required: true }]}>
-            <Input disabled={!form.getFieldValue("jobName")} />
+            <Input />
           </Form.Item>
         </Col>
       </Row>
