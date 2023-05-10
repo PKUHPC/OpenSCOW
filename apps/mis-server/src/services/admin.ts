@@ -26,7 +26,7 @@ import { UserAccount, UserRole } from "src/entities/UserAccount";
 export const adminServiceServer = plugin((server) => {
 
   server.addService<AdminServiceServer>(AdminServiceService, {
-    changeStorageQuota: async ({ request, em, logger }) => {
+    changeStorageQuota: async ({}) => {
       // const { cluster, mode, userId, value } = request;
 
       // const quota = await em.findOne(StorageQuota, {

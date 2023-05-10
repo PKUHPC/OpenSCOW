@@ -107,7 +107,7 @@ export const userServiceServer = plugin((server) => {
       }];
     },
 
-    queryUsedStorageQuota: async ({ request, logger }) => {
+    queryUsedStorageQuota: async ({}) => {
       // const { cluster, userId } = request;
 
       // const reply = await server.ext.clusters.callOnOne(
