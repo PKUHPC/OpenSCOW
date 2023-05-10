@@ -14,7 +14,7 @@ import { DatabaseOutlined, FolderAddOutlined } from "@ant-design/icons";
 import { Button, Modal } from "antd";
 import Link from "next/link";
 import { join } from "path";
-import React, { Key, useCallback, useState } from "react";
+import React, { Key, useCallback, useRef, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis/api";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
@@ -66,6 +66,8 @@ export const FileSelectModal: React.FC<Props> = ({ cluster, onSubmit }) => {
   const [path, setPath] = useState<string>("/");
   const [selectedKeys, setSelectedKeys] = useState<Key[]>([]);
 
+  const prevPathRef = useRef<string>(path);
+
 
   const fileFilter = (files: FileInfo[]): FileInfo[] => {
     return files.filter(
@@ -84,12 +86,15 @@ export const FileSelectModal: React.FC<Props> = ({ cluster, onSubmit }) => {
       : { items: []};
   }, [path, cluster, visible, homePath]);
 
-
   const { data, isLoading: isFileLoading, reload } = useAsync({
     promiseFn: listFilePromiseFn,
-    onReject() {
-      // 用户输入地址不正确请求报错时,重置为根目录
-      setPath("/");
+    onResolve(_) {
+      prevPathRef.current = path;
+    },
+    onReject(_) {
+      if (prevPathRef.current !== path) {
+        setPath(prevPathRef.current);
+      }
     },
   });
 
@@ -112,7 +117,7 @@ export const FileSelectModal: React.FC<Props> = ({ cluster, onSubmit }) => {
     <>
       <Button size="small" onClick={() => { setVisible(true); }}>选择</Button>
       <Modal
-        width={800}
+        width={600}
         open={visible}
         onCancel={() => { closeModal(); }}
         title="文件目录选择框"
@@ -160,6 +165,7 @@ export const FileSelectModal: React.FC<Props> = ({ cluster, onSubmit }) => {
             style={{ width: "100%" }}
             files={data?.items || []}
             filesFilter={fileFilter}
+            hiddenColumns={["size", "mode"]}
             loading={isLoading}
             rowKey={(r: FileInfo): React.Key => join(path, r.name)}
             onRow={(r) => ({

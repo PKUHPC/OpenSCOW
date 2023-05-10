@@ -14,8 +14,11 @@ import { CloseOutlined, FileOutlined, FolderOutlined } from "@ant-design/icons";
 import { compareDateTime, formatDateTime } from "@scow/lib-web/build/utils/datetime";
 import { compareNumber } from "@scow/lib-web/build/utils/math";
 import { Table, TableProps, Tooltip } from "antd";
+import { ColumnsType } from "antd/es/table";
 import React from "react";
 import { FileInfo, FileType } from "src/pages/api/file/list";
+
+type ColumnKey = ("type" | "name" | "mtime" | "size" | "mode" | "action");
 
 const nodeModeToString = (mode: number) => {
   const numberPermission = (mode & parseInt("777", 8)).toString(8);
@@ -60,6 +63,7 @@ interface Props extends TableProps<FileInfo> {
   filesFilter?: (files: FileInfo[]) => FileInfo[];
   fileNameRender?: (fileName: string, r: FileInfo) => React.ReactNode;
   actionRender?: (_, r: FileInfo) => React.ReactNode;
+  hiddenColumns?: ColumnKey[];
 }
 
 const fileTypeIcons = {
@@ -74,86 +78,90 @@ export const FileTable: React.FC<Props> = (
     fileNameRender,
     actionRender,
     filesFilter,
+    hiddenColumns,
     ...otherProps
   },
 ) => {
+
+  const columns: ColumnsType<FileInfo> = [
+    {
+      key: "type",
+      dataIndex: "type",
+      title: "",
+      width: "32px",
+      render: (_, r) => React.createElement(fileTypeIcons[r.type]),
+    },
+    {
+      key: "name",
+      dataIndex: "name",
+      title: "文件名",
+      defaultSortOrder: "ascend",
+      sorter: (a, b) => a.type.localeCompare(b.type) === 0
+        ? a.name.localeCompare(b.name)
+        : a.type.localeCompare(b.type),
+      sortDirections: ["ascend", "descend"],
+      render: (name: string, file: FileInfo) => (
+        <span title={name} className={`file-type-${file.type}`}>
+          {name}
+        </span>
+      ),
+    },
+    {
+      key: "mtime",
+      dataIndex: "mtime",
+      title: "修改日期",
+      render: (mtime: string | undefined) => mtime ? formatDateTime(mtime) : "",
+      sorter: (a, b) => a.type.localeCompare(b.type) === 0
+        ? compareDateTime(a.mtime, b.mtime) === 0
+          ? a.name.localeCompare(b.name)
+          : compareDateTime(a.mtime, b.mtime)
+        : a.type.localeCompare(b.type),
+    },
+    {
+      key: "size",
+      dataIndex: "size",
+      title: "大小",
+      render: (size: number | undefined, file: FileInfo) => (size === undefined || file.type === "DIR")
+        ? ""
+        : (
+          <Tooltip title={Math.round((size) / 1024).toLocaleString() + "KB"} placement="topRight">
+            <span>{formatFileSize(size)}</span>
+          </Tooltip>
+        ),
+      sorter: (a, b) => {
+        return a.type.localeCompare(b.type) === 0
+          ? compareNumber(a.size, b.size) === 0
+            ? a.name.localeCompare(b.name)
+            : compareNumber(a.size, b.size)
+          : a.type.localeCompare(b.type);
+      },
+    },
+    {
+      key: "mode",
+      dataIndex: "mode",
+      title: "权限",
+      render: (mode: number | undefined) => mode === undefined ? "" : nodeModeToString(mode),
+    },
+    ...(actionRender ? [{
+      key: "action",
+      dataIndex: "action",
+      title: "操作",
+      render: actionRender,
+    }] : []),
+  ];
+
   return (
     <Table
       {...otherProps}
       dataSource={filesFilter ? filesFilter(files) : files}
+      columns={
+        hiddenColumns
+          ? columns.filter((column) => column.key ? !hiddenColumns.includes(column.key as ColumnKey) : true)
+          : columns
+      }
       pagination={false}
       size="small"
       scroll={{ x: true }}
-    >
-      <Table.Column<FileInfo>
-        dataIndex="type"
-        title=""
-        width="32px"
-        render={(_, r) => (
-          React.createElement(fileTypeIcons[r.type])
-        )}
-      />
-
-      <Table.Column<FileInfo>
-        dataIndex="name"
-        title="文件名"
-        defaultSortOrder={"ascend"}
-        sorter={
-          (a, b) => a.type.localeCompare(b.type) === 0
-            ? a.name.localeCompare(b.name)
-            : a.type.localeCompare(b.type)
-        }
-        sortDirections={["ascend", "descend"]}
-        render={fileNameRender}
-      />
-
-      <Table.Column<FileInfo>
-        dataIndex="mtime"
-        title="修改日期"
-        render={(mtime: string | undefined) => mtime ? formatDateTime(mtime) : ""}
-        sorter={
-          (a, b) => a.type.localeCompare(b.type) === 0
-            ? compareDateTime(a.mtime, b.mtime) === 0
-              ? a.name.localeCompare(b.name)
-              : compareDateTime(a.mtime, b.mtime)
-            : a.type.localeCompare(b.type)
-        }
-      />
-      <Table.Column<FileInfo>
-        dataIndex="size"
-        title="大小"
-        render={
-          (size: number | undefined, file: FileInfo) =>
-            (size === undefined || file.type === "DIR")
-              ? ""
-              : (
-                <Tooltip title={Math.round((size) / 1024).toLocaleString() + "KB"} placement="topRight">
-                  <span>{formatFileSize(size)}</span>
-                </Tooltip>
-              )
-        }
-        sorter={
-          (a, b) => {
-            return a.type.localeCompare(b.type) === 0
-              ? compareNumber(a.size, b.size) === 0
-                ? a.name.localeCompare(b.name)
-                : compareNumber(a.size, b.size)
-              : a.type.localeCompare(b.type);
-          }}
-      />
-      <Table.Column<FileInfo>
-        dataIndex="mode"
-        title="权限"
-        render={(mode: number | undefined) => mode === undefined ? "" : nodeModeToString(mode)}
-      />
-      {actionRender ? (
-        <Table.Column<FileInfo>
-          dataIndex="action"
-          title="操作"
-          render={actionRender}
-        />
-      ) : undefined}
-
-    </Table>
+    />
   );
 };
