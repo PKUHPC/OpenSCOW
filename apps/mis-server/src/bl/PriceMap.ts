@@ -12,6 +12,7 @@
 
 import { Logger } from "@ddadaal/tsgrpc-server";
 import { MySqlDriver, SqlEntityManager } from "@mikro-orm/mysql";
+import { Partition } from "@scow/scheduler-adapter-protos/build/protos/config";
 import { calculateJobPrice } from "src/bl/jobPrice";
 import { clusters } from "src/config/clusters";
 import { JobPriceInfo } from "src/entities/JobInfo";
@@ -43,7 +44,11 @@ export interface PriceMap {
 }
 
 
-export async function createPriceMap(em: SqlEntityManager<MySqlDriver>, logger: Logger): Promise<PriceMap> {
+export async function createPriceMap(
+  em: SqlEntityManager<MySqlDriver>,
+  partitionsForClusters: Record<string, Partition[]>,
+  logger: Logger,
+): Promise<PriceMap> {
   // get all billing items
   // order by ASC so that items added later overrides items added before.
   const billingItems = await em.find(JobPriceItem, {}, {
@@ -79,14 +84,14 @@ export async function createPriceMap(em: SqlEntityManager<MySqlDriver>, logger: 
 
   return {
 
-    calculatePrice: (info) => calculateJobPrice(info, getPriceItem, logger),
+    calculatePrice: (info) => calculateJobPrice(partitionsForClusters, info, getPriceItem, logger),
 
     getMissingDefaultPriceItems: () => {
 
       const missingPaths = [] as string[];
 
       for (const cluster in clusters) {
-        for (const partition of clusters[cluster].slurm.partitions) {
+        for (const partition of partitionsForClusters[cluster]) {
           const path = [cluster, partition.name];
 
           const { qos } = partition;

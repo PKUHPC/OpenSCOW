@@ -12,7 +12,7 @@
 
 import { Entity, Index, PrimaryKey, Property } from "@mikro-orm/core";
 import { Decimal } from "@scow/lib-decimal";
-import { clusterNameToScowClusterId } from "src/config/clusters";
+// import { clusterNameToScowClusterId } from "src/config/clusters";
 import type { OriginalJob } from "src/entities/OriginalJob";
 import { DECIMAL_DEFAULT_RAW, DecimalType } from "src/utils/decimal";
 
@@ -132,7 +132,9 @@ export class JobInfo {
     this.partition = job.partition;
     this.nodelist = job.nodelist;
     this.jobName = job.jobName;
-    this.cluster = clusterNameToScowClusterId(job.cluster);
+    // TODO: 重构fetchjob
+    // this.cluster = clusterNameToScowClusterId(job.cluster);
+    this.cluster = "",
     this.gpu = job.gpu;
     this.cpusReq = job.cpusReq;
     this.memReq = job.memReq;
