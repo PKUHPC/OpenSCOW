@@ -99,9 +99,22 @@ vnc:
     module switch ${SINGULARITY_VERSION}
     unset SESSION_MANAGER
     unset DBUS_SESSION_BUS_ADDRESS
+
+    # Disable startup services 
+    xfconf-query -c xfce4-session -p /startup/ssh-agent/enabled -n -t bool -s false
+    xfconf-query -c xfce4-session -p /startup/gpg-agent/enabled -n -t bool -s false
+    xfconf-query --channel xfce4-desktop -p /desktop-icons/file-icons/show-filesystem -s false --create -t bool
+    xfconf-query --channel xfce4-desktop -p /desktop-icons/file-icons/show-removable -s false --create -t bool
+    # 配置默认面板
+    if [ ! -d "${HOME}/.config/xfce4/panel/launcher-9" ] || [ ! -d "${HOME}/.config/xfce4/panel/launcher-10" ] || [ ! -d "${HOME}/.config/xfce4/panel/launcher-11" ] || [ ! -d "${HOME}/.config/xfce4/panel/launcher-12" ]; then
+      cp -f /etc/xdg/xfce4/panel/default.xml ${HOME}/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-panel.xml
+    fi
+    # 桌面终端默认进入到家目录
+    cd ~
     startxfce4 &
-    mkdir ~/fonts
-    cp -r /data/software/baltamatica/SubsetOTF ~/fonts
+
+    mkdir ~/.fonts
+    cp -r /data/software/baltamatica/SubsetOTF ~/.fonts
     singularity exec /data/software/baltamatica/balt-sing.sif baltamatica.sh
       
 # 配置HTML表单
