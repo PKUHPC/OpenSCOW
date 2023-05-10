@@ -49,17 +49,6 @@ const OperationBar = styled(TableTitle)`
   gap: 4px;
 `;
 
-const nodeModeToString = (mode: number) => {
-  const numberPermission = (mode & parseInt("777", 8)).toString(8);
-
-  const toStr = (char: string) => {
-    const num = +char;
-    return ((num & 4) !== 0 ? "r" : "-") + ((num & 2) !== 0 ? "w" : "-") + ((num & 1) !== 0 ? "x" : "-");
-  };
-
-  return [0, 1, 2].reduce((prev, curr) => prev + toStr(numberPermission[curr]), "");
-};
-
 const formatFileSize = (size: number): string => {
   const unitMap = ["KB", "MB", "GB", "TB", "PB"];
   const CARRY = 1024;
@@ -86,10 +75,6 @@ const formatFileSize = (size: number): string => {
   const fixedNumber = decimalSize < 9.996 ? 2 : (decimalSize < 99.95 ? 1 : 0);
   return `${decimalSize.toFixed(fixedNumber)} ${unitMap[carryCount]}`;
 };
-
-type FileInfoKey = React.Key;
-
-const fileInfoKey = (f: FileInfo, path: string): FileInfoKey => join(path, f.name);
 
 interface Operation {
   op: "copy" | "move";

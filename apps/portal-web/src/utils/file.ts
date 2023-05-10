@@ -16,7 +16,6 @@ import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { FileInfo, FileType } from "src/pages/api/file/list";
 import styled from "styled-components";
 
-import { publicConfig } from "./config";
 
 export type FileInfoKey = React.Key;
 
