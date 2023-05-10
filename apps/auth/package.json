@@ -43,7 +43,7 @@
     "pino": "8.14.1",
     "nodemailer": "6.9.1",
     "qrcode": "1.5.1",
-    "speakeasy": "2.0.0",
+    "speakeasy": "2.0.0"
   },
   "devDependencies": {
     "@types/asn1": "0.2.0",
