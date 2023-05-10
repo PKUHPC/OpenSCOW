@@ -74,6 +74,7 @@ export const PathBar: React.FC<Props> = ({
             }}
             onSearch={onPathChange}
             enterButton={icon}
+            autoFocus
           />
         ) : (
           <>

@@ -23,6 +23,7 @@ import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { CodeEditor } from "src/components/CodeEditor";
 import { InputGroupFormItem } from "src/components/InputGroupFormItem";
 import { AccountSelector } from "src/pageComponents/job/AccountSelector";
+import { FileSelectModal } from "src/pageComponents/job/FileSelectModal";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { Cluster, publicConfig } from "src/utils/config";
 
@@ -138,7 +139,6 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
   });
 
   const setWorkingDirectoryValue = () => {
-    console.log(!form.isFieldTouched("workingDirectory") && clusterInfoQuery.data);
     if (!form.isFieldTouched("workingDirectory") && clusterInfoQuery.data) {
       form.setFieldValue("workingDirectory",
         calculateWorkingDirectory(clusterInfoQuery.data.clusterInfo.submitJobDirTemplate));
@@ -312,7 +312,20 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
         </Col>
         <Col span={24} sm={10}>
           <Form.Item<JobForm> label="工作目录" name="workingDirectory" rules={[{ required: true }]}>
-            <Input addonBefore="~/" />
+            <Input
+              addonBefore="~/"
+              suffix={
+                (
+                  <FileSelectModal
+                    onSubmit={(path: string) => {
+                      form.setFieldValue("workingDirectory", path);
+                      form.validateFields(["workingDirectory"]);
+                    }}
+                    cluster={cluster || defaultCluster}
+                  />
+                )
+              }
+            />
           </Form.Item>
         </Col>
         <Col span={24} sm={7}>
