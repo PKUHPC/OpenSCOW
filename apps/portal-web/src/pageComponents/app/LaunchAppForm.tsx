@@ -52,6 +52,8 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
   const [form] = Form.useForm<FormFields>();
   const [loading, setLoading] = useState(false);
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const onSubmit = async () => {
     const allFormFields = await form.validateFields();
     const { cluster, coreCount, partition, qos, account, maxTime } = allFormFields;
@@ -63,6 +65,7 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
     });
 
     setLoading(true);
+    setIsSubmitting(true);
     await api.createAppSession({ body: {
       cluster: cluster.id,
       appId,
@@ -83,6 +86,7 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
 
   const cluster = Form.useWatch("cluster", form) as Cluster | undefined;
   const [currentPartitionInfo, setCurrentPartitionInfo] = useState<Partition | undefined>();
+  const account = Form.useWatch("account", form) as string | undefined;
 
   const clusterInfoQuery = useAsync({
     promiseFn: useCallback(async () => cluster
@@ -143,10 +147,9 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
             }
             form.setFieldsValue({ ...requiredObj, ...attributesObj });
 
-            // 如果上一次提交信息存在，则填入账户值；如果不存在，不对表单中账户进行操作
-            if (lastSubmitData?.lastSubmissionInfo) {
-              form.setFieldValue("account", lastSubmitData?.lastSubmissionInfo.account);
-            }
+            // 如果上一次提交信息存在，则填入账户值
+            form.setFieldValue("account", lastSubmitData?.lastSubmissionInfo
+              ? lastSubmitData?.lastSubmissionInfo.account : undefined);
 
           }).finally(() => {
             setLoading(false);
@@ -202,7 +205,7 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
         <SingleClusterSelector />
       </Form.Item>
 
-      <Spin spinning={loading} tip="查询上次提交记录中">
+      <Spin spinning={loading} tip={isSubmitting ? "" : "查询上次提交记录中"}>
 
         <Form.Item
           label="账户"
@@ -210,7 +213,7 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
           rules={[{ required: true }]}
           dependencies={["cluster"]}
         >
-          {clusterInfoQuery.data && <AccountSelector cluster={cluster?.id} />}
+          {account && <AccountSelector cluster={cluster?.id} />}
         </Form.Item>
 
         <Form.Item
