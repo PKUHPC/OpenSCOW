@@ -12,10 +12,17 @@
 
 import { publicConfig } from "src/utils/config";
 
-export const passwordRule = {
-  pattern: publicConfig.PASSWORD_PATTERN ? new RegExp(publicConfig.PASSWORD_PATTERN) : undefined,
-  message: publicConfig.PASSWORD_PATTERN_MESSAGE,
+export const useBuiltinCreateUser = () => {
+  return (
+    publicConfig.CREATE_USER_CONFIG.authSupportsCreateUser &&
+    publicConfig.CREATE_USER_CONFIG.misConfig.enabled &&
+    publicConfig.CREATE_USER_CONFIG.misConfig.type === "builtin"
+  );
 };
 
-
-export { confirmPasswordFormItemProps, emailRule } from "@scow/lib-web/build/utils/form";
+export const userIdRule = (
+  useBuiltinCreateUser() && publicConfig.CREATE_USER_CONFIG.misConfig.builtin?.userIdPattern
+) ? {
+    pattern: new RegExp(publicConfig.CREATE_USER_CONFIG.misConfig.builtin.userIdPattern.regex),
+    message: publicConfig.CREATE_USER_CONFIG.misConfig.builtin.userIdPattern.errorMessage,
+  } : undefined;

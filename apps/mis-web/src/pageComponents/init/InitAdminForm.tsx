@@ -15,7 +15,7 @@ import { useState } from "react";
 import { api } from "src/apis";
 import { Centered } from "src/components/layouts";
 import { CreateUserForm, CreateUserFormFields } from "src/pageComponents/users/CreateUserForm";
-import { publicConfig } from "src/utils/config";
+import { useBuiltinCreateUser } from "src/utils/createUser";
 import styled from "styled-components";
 
 
@@ -45,7 +45,7 @@ export const InitAdminForm: React.FC = () => {
           setLoading(false);
         },
       });
-    } else if (!result.existsInAuth && result.existsInAuth !== undefined && !publicConfig.ENABLE_CREATE_USER) {
+    } else if (!result.existsInAuth && result.existsInAuth !== undefined && !useBuiltinCreateUser()) {
       // 用户不存在于scow: 且认证系统支持查询，且查询结果不存在于认证系统，且当前系统不支持创建用户
       modal.confirm({
         title: "用户不存在于认证系统",
@@ -72,7 +72,7 @@ export const InitAdminForm: React.FC = () => {
           result.existsInAuth ?
             "用户已经在认证系统中存在，您此处输入的密码将会不起作用，新用户的密码将是认证系统中的已有用户的当前密码。确认添加为初始管理员？" : "用户不存在于认证系统，是否确认创建此用户并添加为初始管理员？"
           : // 认证系统不支持查询
-          publicConfig.ENABLE_CREATE_USER ?
+          useBuiltinCreateUser() ?
             " 无法确认用户是否在认证系统中存在， 将会尝试在认证系统中创建。如果用户已经在认证系统中存在，您此处输入的密码将会不起作用，新用户的密码将是认证系统中的已有用户的当前密码"
             : "无法确认用户是否在认证系统中存在，并且当前认证系统不支持创建用户，请您确认此用户已经在认证系统中存在，确认将会直接加入到数据库中"
             + ", 并且您此处输入的密码将不会起作用，新用户的密码将是认证系统中的已有用户的当前密码。",
@@ -122,9 +122,11 @@ export const InitAdminForm: React.FC = () => {
       </Typography.Paragraph>
       <AlertContainer>
         <Alert
-          type={publicConfig.ENABLE_CREATE_USER ? "success" : "warning"}
-          message={publicConfig.ENABLE_CREATE_USER ? "当前认证系统支持创建用户，您可以选择加入一个已存在于认证系统的用户，或者创建一个全新的用户。系统将会在认证系统中创建此用户"
-            : "当前认证系统不支持创建用户，请确认要添加的用户必须已经存在于认证系统，且用户的ID必须和认证系统中的用户ID保持一致"}
+          type={useBuiltinCreateUser() ? "success" : "warning"}
+          message={useBuiltinCreateUser()
+            ? "当前认证系统支持创建用户，您可以选择加入一个已存在于认证系统的用户，或者创建一个全新的用户。系统将会在认证系统中创建此用户"
+            : "当前认证系统不支持创建用户，请确认要添加的用户必须已经存在于认证系统，且用户的ID必须和认证系统中的用户ID保持一致"
+          }
         />
       </AlertContainer>
       <Form form={form} onFinish={onFinish}>

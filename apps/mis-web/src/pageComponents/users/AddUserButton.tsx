@@ -16,7 +16,7 @@ import React, { useState } from "react";
 import { api } from "src/apis";
 import { CreateUserModal } from "src/pageComponents/users/CreateUserModal";
 import { publicConfig } from "src/utils/config";
-import { userIdRule } from "src/utils/form";
+import { useBuiltinCreateUser, userIdRule } from "src/utils/createUser";
 
 
 interface FormProps {
@@ -56,10 +56,10 @@ const NewUserModal: React.FC<ModalProps> = ({
           label="用户ID"
           rules={[
             { required: true },
-            userIdRule,
+            ...userIdRule ? [userIdRule] : [],
           ]}
         >
-          <Input />
+          <Input placeholder={userIdRule?.message} />
         </Form.Item>
         <Form.Item name="name" required label="用户姓名">
           <Input />
@@ -92,9 +92,19 @@ export const AddUserButton: React.FC<Props> = ({ refresh, accountName }) => {
         if (code === "ACCOUNT_NOT_FOUND") {
           message.error("账户不存在");
         } else if (code === "USER_NOT_FOUND") {
-          if (publicConfig.ENABLE_CREATE_USER) {
+          if (useBuiltinCreateUser()) {
             setModalShow(false);
             setNewUserInfo({ identityId, name });
+          } else if (publicConfig.CREATE_USER_CONFIG.misConfig.type === "external") {
+
+            const params = new URLSearchParams({
+              type: "addUserToAccount",
+              accountName,
+              userId: identityId,
+              userName: name,
+            });
+
+            window.open(publicConfig.CREATE_USER_CONFIG.misConfig.external!.url + "?" + params.toString(), "_blank");
           } else {
             message.error("用户不存在！");
           }

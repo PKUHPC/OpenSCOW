@@ -18,6 +18,7 @@ import { authenticate } from "src/auth/server";
 import { PlatformRole, UserRole } from "src/models/User";
 import { getClient } from "src/utils/client";
 import { publicConfig } from "src/utils/config";
+import { useBuiltinCreateUser, userIdRule } from "src/utils/createUser";
 import { handlegRPCError } from "src/utils/server";
 
 export interface CreateUserSchema {
@@ -55,14 +56,11 @@ export interface CreateUserSchema {
   }
 }
 
-const userIdPattern = publicConfig.USERID_PATTERN && new RegExp(publicConfig.USERID_PATTERN);
 const passwordPattern = publicConfig.PASSWORD_PATTERN && new RegExp(publicConfig.PASSWORD_PATTERN);
 
 export default /* #__PURE__*/route<CreateUserSchema>("CreateUserSchema", async (req, res) => {
 
-  if (!publicConfig.ENABLE_CREATE_USER) {
-    return { 501: null };
-  }
+  if (!useBuiltinCreateUser()) { return { 501: null }; }
 
   const { email, identityId, name, password } = req.body;
 
@@ -75,8 +73,9 @@ export default /* #__PURE__*/route<CreateUserSchema>("CreateUserSchema", async (
 
   if (!info) { return; }
 
-  if (userIdPattern && !userIdPattern.test(identityId)) {
-    return { 400: { code: "USERID_NOT_VALID", message: publicConfig.USERID_PATTERN_MESSAGE } };
+
+  if (userIdRule && !userIdRule.pattern.test(identityId)) {
+    return { 400: { code: "USERID_NOT_VALID", message: userIdRule.message } };
   }
 
   if (passwordPattern && !passwordPattern.test(password)) {

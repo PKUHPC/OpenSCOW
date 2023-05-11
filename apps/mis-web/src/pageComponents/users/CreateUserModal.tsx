@@ -14,7 +14,8 @@ import { App, Form, Input, Modal } from "antd";
 import React, { useEffect, useState } from "react";
 import { api } from "src/apis";
 import { CreateUserFormFields } from "src/pageComponents/users/CreateUserForm";
-import { confirmPasswordFormItemProps, emailRule, passwordRule, userIdRule } from "src/utils/form";
+import { userIdRule } from "src/utils/createUser";
+import { confirmPasswordFormItemProps, emailRule, passwordRule } from "src/utils/form";
 
 export interface NewUserInfo {
   identityId: string;
@@ -70,7 +71,7 @@ export const CreateUserModal: React.FC<Props> = ({
           name="identityId"
           rules={[
             { required: true },
-            userIdRule,
+            ...userIdRule ? [userIdRule] : [],
           ]}
         >
           <Input disabled />
