@@ -38,6 +38,11 @@ export const ClusterFileTable: React.FC<Props> = ({
   selectedCluster, setSelectedCluster, path, setPath, selectedKeys, setSelectedKeys,
 }) => {
 
+  const setNewPath = (newPath: string) => {
+    setPath(newPath);
+    setSelectedKeys([]); // 每进入一个新的path，清空SelectedKeys
+  };
+
   const [loading, setLoading] = useState(false);
   const [files, setFiles] = useState<FileInfo[]>([]);
 
@@ -61,14 +66,14 @@ export const ClusterFileTable: React.FC<Props> = ({
   const up = () => {
     const paths = path.split("/");
     const newPath = paths.length === 1 ? path : paths.slice(0, paths.length - 1).join("/");
-    setPath(newPath);
+    setNewPath(newPath);
   };
 
   const toHome = async () => {
     if (selectedCluster) {
       await api.getHomeDirectory({ query: { cluster: selectedCluster.id } })
         .then((d) => {
-          setPath(d.path);
+          setNewPath(d.path);
         });
     }
   };
@@ -81,7 +86,7 @@ export const ClusterFileTable: React.FC<Props> = ({
           if (cluster) {
             await api.getHomeDirectory({ query: { cluster: cluster.id } })
               .then((d) => {
-                setPath(d.path);
+                setNewPath(d.path);
                 setSelectedCluster(cluster);
               });
           }
@@ -94,7 +99,7 @@ export const ClusterFileTable: React.FC<Props> = ({
           path={path ? path : ""}
           reload={reload}
           loading={loading}
-          go={(path) => setPath(path)}
+          go={(path) => setNewPath(path)}
           fullUrl={() => "files/fileTransfer"}
         />
       </TopBar>
@@ -115,7 +120,7 @@ export const ClusterFileTable: React.FC<Props> = ({
           },
           onDoubleClick: () => {
             if (r.type === "DIR") {
-              setPath(join(path, r.name));
+              setNewPath(join(path, r.name));
               // reload();
             } else if (r.type === "FILE") {
               if (selectedCluster) {
@@ -145,14 +150,16 @@ export const ClusterFileTable: React.FC<Props> = ({
           sortDirections={["ascend", "descend"]}
           render={(_, r) => (
             r.type === "DIR" ? (
-              <a onClick={() => {
-                setPath(join(path, r.name));
+              <a onClick={(event) => {
+                event.stopPropagation(); // 阻止冒泡，防止点击文件夹进入新Path时选中
+                setNewPath(join(path, r.name));
               }}
               >
                 {r.name}
               </a>
             ) : (
-              <a onClick={() => {
+              <a onClick={(event) => {
+                event.stopPropagation();
                 if (selectedCluster) {
                   const href = urlToDownload(selectedCluster.id, join(path, r.name), false);
                   openPreviewLink(href);
