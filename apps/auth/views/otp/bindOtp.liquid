@@ -85,11 +85,11 @@
             </div>
             {% elsif sendSucceeded == false%}
             <div class="flex items-center justify-between mb-4 mt-6">
-              <p class="ml-8"> 验证链接发送失败，请在<span id="countdown">{{ timeDiffNotEnough }}</span>秒后重新获取 </p>
+              <p class="ml-8" id="countdown"> 验证链接发送失败，请在{{ timeDiffNotEnough }}秒后重新获取 </p>
             </div>
             {% elsif timeDiffNotEnough %}
               <div class="flex items-center justify-between mb-4 mt-6">
-              <p class="ml-8 text-red"> 请勿频繁获取绑定链接，请在<span id="countdown">{{ timeDiffNotEnough }}</span>秒后重新获取 </p>
+              <p class="ml-8 text-red" id="countdown"> 请勿频繁获取绑定链接，请在{{ timeDiffNotEnough }}秒后重新获取 </p>
               </div>
             {% endif %}
             {% endif %}
@@ -97,12 +97,14 @@
             <script>
               window.onload = function () {
                 var count = {{ timeDiffNotEnough }}
+                var countDownElement = document.getElementById("countdown")
                 var countdown = setInterval(function() {
                   count--;
-                  if (count < 0) {
+                  if (count < 0.5) {
                     clearInterval(countdown);
+                    countDownElement.innerHTML = "现在您可以重新获取链接";
                   } else {
-                    document.getElementById("countdown").innerHTML = count;
+                    countDownElement.innerHTML = countDownElement.innerText.replace(/\d+/, count);
                   }
                 }, 1000);
               }
