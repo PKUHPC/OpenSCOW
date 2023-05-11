@@ -197,6 +197,7 @@ export async function sendEmailAuthLink(
   await renderBindOtpHtml(
     false, req, res, callbackUrl,
     { bindLimitMinutes: otpLdap.bindLimitMinutes, sendSucceeded: emailSent,
+      timeDiffNotEnough: otpLdap.authenticationMethod.mail.sendEmailFrequencyLimitInSeconds,
       emailAddress: emailAddress, otpSessionToken: otpSessionToken });
 }
 
