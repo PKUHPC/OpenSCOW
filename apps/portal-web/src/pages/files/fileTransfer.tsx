@@ -11,7 +11,7 @@
  */
 
 import { ArrowLeftOutlined, ArrowRightOutlined } from "@ant-design/icons";
-import { Button, Col, Row } from "antd";
+import { App, Button, Col, Row } from "antd";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useState } from "react";
@@ -34,6 +34,7 @@ interface ButtonProps {
 }
 
 const OperationButton: React.FC<ButtonProps> = (props) => {
+  const { message, modal } = App.useApp();
   const {
     icon, disabled, srcCluster, dstCluster, selectedKeys, toPath,
   } = props;
@@ -43,15 +44,26 @@ const OperationButton: React.FC<ButtonProps> = (props) => {
       disabled={disabled}
       onClick={ async () => {
         if (srcCluster && dstCluster) {
-          await api.checkTransferKey({ body: { fromCluster:srcCluster.id, toCluster: dstCluster.id } });
-          Promise.all(selectedKeys.map(async (key) => {
-            await api.startFilesTransfer({ body: {
-              fromCluster: srcCluster.id,
-              toCluster: dstCluster.id,
-              fromPath: String(key),
-              toPath: toPath,
-            } });
-          }));
+          modal.confirm({
+            title: "确认开启传输?",
+            content: `确认从${srcCluster.name}传输到${dstCluster.name}吗?`,
+            okText: "确认",
+            onOk: async () => {
+              await api.checkTransferKey({ body: { fromCluster:srcCluster.id, toCluster: dstCluster.id } });
+              Promise.all(selectedKeys.map(async (key) => {
+                await api.startFilesTransfer({ body: {
+                  fromCluster: srcCluster.id,
+                  toCluster: dstCluster.id,
+                  fromPath: String(key),
+                  toPath: toPath,
+                } })
+                  .then(() => {
+                    message.success("传输任务已经开始");
+                  });
+              }));
+            },
+          });
+
         }
       }}
     />
