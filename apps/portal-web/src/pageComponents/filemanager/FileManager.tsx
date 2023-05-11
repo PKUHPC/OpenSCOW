@@ -46,6 +46,11 @@ interface Props {
   urlPrefix: string;
 }
 
+interface PromiseSettledResult {
+  status: string;
+  value?: FileInfo | undefined;
+}
+
 const fileTypeIcons = {
   "FILE": FileOutlined,
   "DIR": FolderOutlined,
@@ -291,7 +296,8 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
           }).then(() => x).catch(() => undefined);
         }))
           .then((successfulInfo) => {
-            const failedCount = successfulInfo.filter((x) => (!x || x.status === "fulfilled")).length;
+            const failedCount = successfulInfo.filter((x: PromiseSettledResult) =>
+              (!x || x.status === "rejected" || !x.value)).length;
             const allCount = files.length;
             if (failedCount === 0) {
               message.success(`删除${allCount}项成功！`);
