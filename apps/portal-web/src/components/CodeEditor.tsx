@@ -32,13 +32,14 @@ const Container = styled.div`
 
 const extensions = [StreamLanguage.define(shell)];
 
-export const CodeEditor: React.FC<Props> = ({ value, onChange, height = "" }) => {
+export const CodeEditor: React.FC<Props> = ({ value, onChange, height = "", placeholder = "" }) => {
   const { dark } = useDarkMode();
   return (
     <Container>
       <CodeMirror
         value={value}
         height={height}
+        placeholder={placeholder}
         theme={dark ? githubDark : githubLight}
         onChange={useCallback((value) => {
           onChange?.(value);
