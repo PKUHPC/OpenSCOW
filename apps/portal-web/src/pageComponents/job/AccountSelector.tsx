@@ -12,7 +12,7 @@
 
 import { ReloadOutlined } from "@ant-design/icons";
 import { Button, Input, Select, Tooltip } from "antd";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { useAsync } from "react-async";
 import { useStore } from "simstate";
 import { api } from "src/apis";
@@ -34,12 +34,15 @@ export const AccountSelector: React.FC<Props> = ({ cluster, onChange, value }) =
   const { data, isLoading, reload } = useAsync({
     promiseFn,
     watch: userStore.user,
-    onResolve: ({ accounts }) => {
-      if (!value || !accounts.includes(value)) {
-        onChange?.(accounts[0]);
-      }
-    },
   });
+
+  useEffect(() => {
+    if (data && data.accounts) {
+      if (!value || !data.accounts.includes(value)) {
+        onChange?.(data.accounts[0]);
+      }
+    }
+  }, [data, value]);
 
   return (
     <Input.Group compact>

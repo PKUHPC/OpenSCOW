@@ -148,8 +148,9 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
             form.setFieldsValue({ ...requiredObj, ...attributesObj });
 
             // 如果上一次提交信息存在，则填入账户值
-            form.setFieldValue("account", lastSubmitData?.lastSubmissionInfo
-              ? lastSubmitData?.lastSubmissionInfo.account : undefined);
+            if (lastSubmitData.lastSubmissionInfo) {
+              form.setFieldValue("account", lastSubmitData.lastSubmissionInfo.account);
+            }
 
           }).finally(() => {
             setLoading(false);
@@ -213,7 +214,7 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
           rules={[{ required: true }]}
           dependencies={["cluster"]}
         >
-          {account && <AccountSelector cluster={cluster?.id} />}
+          <AccountSelector cluster={cluster?.id} />
         </Form.Item>
 
         <Form.Item
