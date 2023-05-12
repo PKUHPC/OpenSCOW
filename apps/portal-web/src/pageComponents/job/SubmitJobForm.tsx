@@ -44,8 +44,7 @@ interface JobForm {
 
 // 生成默认工作名称，命名规则为年月日-时分秒，如job-20230510-103010
 const genJobName = (): string => {
-  const today = dayjs().toISOString();
-  return `job-${today.slice(0, 10).replace(/-/g, "")}-${today.slice(11, 19).replace(/:/g, "")}`;
+  return `job-${dayjs().format("YYYYMMDD-HHmmss")}`;
 };
 
 const formatMemorySize = (size: number): string => {
@@ -237,7 +236,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
       >
         <CodeEditor
           height="50vh"
-          placeholder="#此处参数设置的优先级高于页面其它地方，两者冲突时以此处为准\n"
+          placeholder="#此处参数设置的优先级高于页面其它地方，两者冲突时以此处为准"
         />
       </Form.Item>
       <Row gutter={4}>
