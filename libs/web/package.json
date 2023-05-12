@@ -22,14 +22,14 @@
   },
   "peerDependencies": {
     "antd": "5.4.7",
-    "next": "13.4.1",
+    "next": "13.2.4",
     "styled-components": "5.3.10",
     "@ant-design/icons": "5.0.1",
     "dayjs": "1.11.7"
   },
   "devDependencies": {
     "antd": "5.4.7",
-    "next": "13.4.1",
+    "next": "13.2.4",
     "styled-components": "5.3.10",
     "@grpc/grpc-js": "1.8.14",
     "@types/mime-types": "2.1.1",
