@@ -23,7 +23,7 @@ clusters:
       associationTableName: user_association
       scriptPath: /test/slurm.sh
 
-createUser:
-  type: external
-  external:
-    url: http://localhost:12312
+# createUser:
+#   type: external
+#   external:
+#     url: http://localhost:12312

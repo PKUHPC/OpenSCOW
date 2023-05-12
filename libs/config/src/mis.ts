@@ -74,7 +74,7 @@ export const MisConfigSchema = Type.Object({
         regex: Type.String({ description: "用户ID的正则规则" }),
         errorMessage: Type.Optional(Type.String({ description: "如果用户ID不符合规则显示什么" })),
       }, { description: "从管理系统里创建用户时，用户ID的验证规则" })),
-    }, { description: "通过内置页面创建用户时的配置。要使用内置页面，认证系统需要支持创建用户" })),
+    }, { default: {}, description: "通过内置页面创建用户时的配置。要使用内置页面，认证系统需要支持创建用户" })),
   }, { default: {}, description: "SCOW的创建用户相关配置" }),
 
   fetchJobs: Type.Object({
