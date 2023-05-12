@@ -26,3 +26,12 @@ export const userIdRule = (
     pattern: new RegExp(publicConfig.CREATE_USER_CONFIG.misConfig.builtin.userIdPattern.regex),
     message: publicConfig.CREATE_USER_CONFIG.misConfig.builtin.userIdPattern.errorMessage,
   } : undefined;
+
+
+export const createUserParams = () => new URLSearchParams({ type: "createUser" }).toString();
+export const addUserToAccountParams = (
+  accountName: string, userId: string, userName: string,
+) =>
+  new URLSearchParams({ type: "addUserToAccount", accountName, userId, userName }).toString();
+
+

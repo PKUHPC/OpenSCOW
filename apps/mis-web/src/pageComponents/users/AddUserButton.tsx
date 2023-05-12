@@ -16,7 +16,7 @@ import React, { useState } from "react";
 import { api } from "src/apis";
 import { CreateUserModal } from "src/pageComponents/users/CreateUserModal";
 import { publicConfig } from "src/utils/config";
-import { useBuiltinCreateUser, userIdRule } from "src/utils/createUser";
+import { addUserToAccountParams, useBuiltinCreateUser, userIdRule } from "src/utils/createUser";
 
 
 interface FormProps {
@@ -75,7 +75,7 @@ interface Props {
 }
 
 export const AddUserButton: React.FC<Props> = ({ refresh, accountName }) => {
-  const { message } = App.useApp();
+  const { message, modal } = App.useApp();
 
   const [modalShow, setModalShow] = useState(false);
 
@@ -97,16 +97,20 @@ export const AddUserButton: React.FC<Props> = ({ refresh, accountName }) => {
             setNewUserInfo({ identityId, name });
           } else if (publicConfig.CREATE_USER_CONFIG.misConfig.type === "external") {
 
-            const params = new URLSearchParams({
-              type: "addUserToAccount",
-              accountName,
-              userId: identityId,
-              userName: name,
+            modal.info({
+              title: "用户不存在",
+              content: "用户不存在，是否跳转到用户创建页面？",
+              onOk: () => {
+                window.open(
+                  publicConfig.CREATE_USER_CONFIG.misConfig.external!.url + "?" + addUserToAccountParams(
+                    accountName, identityId, name,
+                  ),
+                  "_blank",
+                );
+              },
             });
-
-            window.open(publicConfig.CREATE_USER_CONFIG.misConfig.external!.url + "?" + params.toString(), "_blank");
           } else {
-            message.error("用户不存在！");
+            message.error("用户不存在。请先创建用户");
           }
         }
       })
