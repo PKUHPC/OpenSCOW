@@ -23,3 +23,23 @@ web:
     path: /login
     formData:
       password: "{{ PASSWORD }}"
+
+
+# 配置HTML表单，用户可以指定code-server版本
+attributes:
+  - type: select
+    name: selectVersion
+    label: 选择版本
+    required: true  # 用户必须选择一个版本
+    placeholder: 选择code-server的版本  # 提示信息
+    select:
+      - value: code-server/4.8.0
+        label: version 4.8.0
+      - value: code-server/4.9.0
+        label: version 4.9.0
+
+  - type: text
+    name: sbatchOptions
+    label: 其他sbatch参数
+    required: false
+    placeholder: "比如：--gpus gres:2 --time 10"

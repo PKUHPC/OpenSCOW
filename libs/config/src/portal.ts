@@ -56,6 +56,9 @@ export const PortalConfigSchema = Type.Object({
 
   turboVNCPath: Type.String({ description: "TurboVNC的安装路径", default: "/opt/TurboVNC" }),
 
+  appLastSubmissionDir: Type.String({
+    description: "提交交互式应用上一次填写信息的默认工作目录。相对于用户的家目录", default: "scow/apps" }),
+
 });
 
 const PORTAL_CONFIG_NAME = "portal";
