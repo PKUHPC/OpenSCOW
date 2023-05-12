@@ -14,7 +14,7 @@ import { App, Form, Input, Modal } from "antd";
 import React, { useEffect, useState } from "react";
 import { api } from "src/apis";
 import { CreateUserFormFields } from "src/pageComponents/users/CreateUserForm";
-import { userIdRule } from "src/utils/createUser";
+import { getUserIdRule } from "src/utils/createUser";
 import { confirmPasswordFormItemProps, emailRule, passwordRule } from "src/utils/form";
 
 export interface NewUserInfo {
@@ -56,6 +56,8 @@ export const CreateUserModal: React.FC<Props> = ({
     }
   }, [newUserInfo]);
 
+  const userIdRule = getUserIdRule();
+
   return (
     <Modal
       title="创建用户"
@@ -74,7 +76,7 @@ export const CreateUserModal: React.FC<Props> = ({
             ...userIdRule ? [userIdRule] : [],
           ]}
         >
-          <Input disabled />
+          <Input disabled placeholder={userIdRule?.message} />
         </Form.Item>
         <Form.Item label="用户姓名" name="name" rules={[{ required: true }]}>
           <Input />

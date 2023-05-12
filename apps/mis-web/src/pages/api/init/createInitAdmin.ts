@@ -15,7 +15,7 @@ import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { InitServiceClient } from "@scow/protos/build/server/init";
 import { getClient } from "src/utils/client";
-import { userIdRule } from "src/utils/createUser";
+import { getUserIdRule } from "src/utils/createUser";
 import { queryIfInitialized } from "src/utils/init";
 import { handlegRPCError } from "src/utils/server";
 
@@ -45,6 +45,8 @@ export default route<CreateInitAdminSchema>("CreateInitAdminSchema", async (req)
   if (result) { return { 409: { code: "ALREADY_INITIALIZED" as const } }; }
 
   const { email, identityId, name, password } = req.body;
+
+  const userIdRule = getUserIdRule();
 
   if (userIdRule && !userIdRule.pattern.test(identityId)) {
     return { 400: {

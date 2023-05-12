@@ -16,7 +16,7 @@ import React, { useState } from "react";
 import { api } from "src/apis";
 import { CreateUserModal } from "src/pageComponents/users/CreateUserModal";
 import { publicConfig } from "src/utils/config";
-import { addUserToAccountParams, useBuiltinCreateUser, userIdRule } from "src/utils/createUser";
+import { addUserToAccountParams, getUserIdRule, useBuiltinCreateUser } from "src/utils/createUser";
 
 
 interface FormProps {
@@ -37,6 +37,8 @@ const NewUserModal: React.FC<ModalProps> = ({
 }) => {
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm<FormProps>();
+
+  const userIdRule = getUserIdRule();
 
   return (
     <Modal

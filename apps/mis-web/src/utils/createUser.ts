@@ -20,7 +20,7 @@ export const useBuiltinCreateUser = () => {
   );
 };
 
-export const userIdRule = (
+export const getUserIdRule = () => (
   useBuiltinCreateUser() && publicConfig.CREATE_USER_CONFIG.misConfig.builtin?.userIdPattern
 ) ? {
     pattern: new RegExp(publicConfig.CREATE_USER_CONFIG.misConfig.builtin.userIdPattern.regex),

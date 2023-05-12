@@ -12,7 +12,7 @@
 
 import { Form, Input } from "antd";
 import React from "react";
-import { useBuiltinCreateUser, userIdRule } from "src/utils/createUser";
+import { getUserIdRule, useBuiltinCreateUser } from "src/utils/createUser";
 import { confirmPasswordFormItemProps, emailRule, passwordRule } from "src/utils/form";
 export interface CreateUserFormFields {
   identityId: string;
@@ -27,6 +27,8 @@ export interface CreateUserFormFields {
 export const CreateUserForm: React.FC = () => {
 
   const form = Form.useFormInstance<CreateUserFormFields>();
+
+  const userIdRule = getUserIdRule();
 
   return (
     <>

@@ -18,7 +18,7 @@ import { authenticate } from "src/auth/server";
 import { PlatformRole, UserRole } from "src/models/User";
 import { getClient } from "src/utils/client";
 import { publicConfig } from "src/utils/config";
-import { useBuiltinCreateUser, userIdRule } from "src/utils/createUser";
+import { getUserIdRule, useBuiltinCreateUser } from "src/utils/createUser";
 import { handlegRPCError } from "src/utils/server";
 
 export interface CreateUserSchema {
@@ -72,6 +72,8 @@ export default /* #__PURE__*/route<CreateUserSchema>("CreateUserSchema", async (
   const info = await auth(req, res);
 
   if (!info) { return; }
+
+  const userIdRule = getUserIdRule();
 
 
   if (userIdRule && !userIdRule.pattern.test(identityId)) {

@@ -19,7 +19,7 @@ import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
 import { TenantRole } from "src/models/User";
 import { publicConfig } from "src/utils/config";
-import { userIdRule } from "src/utils/createUser";
+import { getUserIdRule } from "src/utils/createUser";
 import { Head } from "src/utils/head";
 
 interface FormProps {
@@ -51,6 +51,8 @@ const CreateAccountForm: React.FC = () => {
       })
       .finally(() => setLoading(false));
   };
+
+  const userIdRule = getUserIdRule();
 
   return (
     <Form
