@@ -95,7 +95,7 @@ export const platformAdminRoutes: (platformRoles: PlatformRole[]) => NavItemProp
   },
 ];
 
-export const tenantRoutes: (tenantRoles: TenantRole[]) => NavItemProps[] = (tenantRoles) => [
+export const tenantRoutes: (tenantRoles: TenantRole[], token: string) => NavItemProps[] = (tenantRoles, token) => [
   {
     Icon: CloudServerOutlined,
     text: "租户管理",
@@ -145,7 +145,7 @@ export const tenantRoutes: (tenantRoles: TenantRole[]) => NavItemProps[] = (tena
             ) ? [{
                 Icon: UserAddOutlined,
                 text: "创建用户",
-                path: publicConfig.CREATE_USER_CONFIG.misConfig.external!.url + "?" + createUserParams(),
+                path: publicConfig.CREATE_USER_CONFIG.misConfig.external!.url + "?" + createUserParams(token),
                 openInNewPage: true,
               }] : []),
           ],
@@ -305,7 +305,7 @@ export const getAvailableRoutes = (user: User | undefined): NavItemProps[] => {
   }
 
   if (user.tenantRoles.length !== 0) {
-    routes.push(...tenantRoutes(user.tenantRoles));
+    routes.push(...tenantRoutes(user.tenantRoles, user.token));
   }
 
   if (user.platformRoles.length !== 0) {

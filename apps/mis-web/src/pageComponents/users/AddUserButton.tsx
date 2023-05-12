@@ -72,9 +72,11 @@ const NewUserModal: React.FC<ModalProps> = ({
 interface Props {
   accountName: string;
   refresh: () => void;
+  token: string;
 }
 
-export const AddUserButton: React.FC<Props> = ({ refresh, accountName }) => {
+export const AddUserButton: React.FC<Props> = ({ refresh, accountName, token }) => {
+
   const { message, modal } = App.useApp();
 
   const [modalShow, setModalShow] = useState(false);
@@ -97,13 +99,14 @@ export const AddUserButton: React.FC<Props> = ({ refresh, accountName }) => {
             setNewUserInfo({ identityId, name });
           } else if (publicConfig.CREATE_USER_CONFIG.misConfig.type === "external") {
 
-            modal.info({
+            modal.confirm({
               title: "用户不存在",
-              content: "用户不存在，是否跳转到用户创建页面？",
+              content: "用户不存在，是否跳转到创建用户并添加到账户中页面？",
+              okText: "跳转",
               onOk: () => {
                 window.open(
                   publicConfig.CREATE_USER_CONFIG.misConfig.external!.url + "?" + addUserToAccountParams(
-                    accountName, identityId, name,
+                    accountName, identityId, name, token,
                   ),
                   "_blank",
                 );

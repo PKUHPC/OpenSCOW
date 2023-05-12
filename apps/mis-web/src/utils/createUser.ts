@@ -28,10 +28,10 @@ export const userIdRule = (
   } : undefined;
 
 
-export const createUserParams = () => new URLSearchParams({ type: "createUser" }).toString();
+export const createUserParams = (token: string) => new URLSearchParams({ type: "createUser", token }).toString();
 export const addUserToAccountParams = (
-  accountName: string, userId: string, userName: string,
+  accountName: string, userId: string, userName: string, token: string,
 ) =>
-  new URLSearchParams({ type: "addUserToAccount", accountName, userId, userName }).toString();
+  new URLSearchParams({ type: "addUserToAccount", accountName, userId, userName, token }).toString();
 
 
