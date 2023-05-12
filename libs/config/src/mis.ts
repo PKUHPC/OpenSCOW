@@ -64,6 +64,11 @@ export const MisConfigSchema = Type.Object({
       url: Type.String({ description: "创建用户的页面" }),
     }, { description: "通过外置页面创建用户时的配置。使用此配置无需认证系统支持创建用户" })),
 
+    userIdPattern: Type.Optional(Type.Object({
+      regex: Type.String({ description: "用户ID的正则规则" }),
+      errorMessage: Type.Optional(Type.String({ description: "如果用户ID不符合规则显示什么" })),
+    }, { deprecated: true, description: "请使用createUser.builtin.userIdPattern" })),
+
     builtin: Type.Optional(Type.Object({
       userIdPattern: Type.Optional(Type.Object({
         regex: Type.String({ description: "用户ID的正则规则" }),
@@ -109,7 +114,7 @@ const MIS_CONFIG_NAME = "mis";
 
 export type MisConfigSchema = Static<typeof MisConfigSchema>;
 
-export const getMisConfig: GetConfigFn<MisConfigSchema> = (baseConfigPath) => {
+export const getMisConfig: GetConfigFn<MisConfigSchema> = (baseConfigPath, logger) => {
   const config = getConfigFromFile(MisConfigSchema, MIS_CONFIG_NAME, baseConfigPath ?? DEFAULT_CONFIG_BASE_PATH);
 
   if (config.createUser.type === "external" && !config.createUser.external) {
@@ -118,6 +123,11 @@ export const getMisConfig: GetConfigFn<MisConfigSchema> = (baseConfigPath) => {
 
   if (config.createUser.type === "builtin" && !config.createUser.builtin) {
     throw new Error("createUser.builtin is required when createUser.type is builtin");
+  }
+
+  if (config.createUser.type === "builtin"
+  && config.createUser.userIdPattern && !config.createUser.builtin?.userIdPattern) {
+    logger?.warn("createUser.userIdPattern is deprecated, please use createUser.builtin.userIdPattern");
   }
 
   return config;
