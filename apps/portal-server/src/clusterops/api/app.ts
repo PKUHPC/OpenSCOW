@@ -46,11 +46,12 @@ export interface AppSession {
   submitTime: Date;
   appId: string;
   state: string;
-  ready: boolean;
   dataPath: string;
   runningTime: string;
   timeLimit: string;
   reason?: string;
+  host: string | undefined;
+  port: number | undefined;
 }
 
 export interface GetAppSessionsReply {
