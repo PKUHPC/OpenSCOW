@@ -86,7 +86,6 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
 
   const cluster = Form.useWatch("cluster", form) as Cluster | undefined;
   const [currentPartitionInfo, setCurrentPartitionInfo] = useState<Partition | undefined>();
-  const account = Form.useWatch("account", form) as string | undefined;
 
   const clusterInfoQuery = useAsync({
     promiseFn: useCallback(async () => cluster
@@ -101,7 +100,8 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
 
         if (cluster) { await api.getAppLastSubmission({ query: { cluster: cluster?.id, appId } })
           .then((lastSubmitData) => {
-
+            debugger;
+            console.log(lastSubmitData);
             const lastSubmitPartition = lastSubmitData?.lastSubmissionInfo?.partition;
             const lastSubmitQos = lastSubmitData?.lastSubmissionInfo?.qos;
             const lastSubmitCoreCount = lastSubmitData?.lastSubmissionInfo?.coreCount;
@@ -149,6 +149,8 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
 
             // 如果上一次提交信息存在，则填入账户值
             if (lastSubmitData.lastSubmissionInfo) {
+              debugger;
+              console.log("submit-account", lastSubmitData.lastSubmissionInfo.account);
               form.setFieldValue("account", lastSubmitData.lastSubmissionInfo.account);
             }
 
@@ -198,6 +200,9 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
   });
 
   const defaultClusterStore = useStore(DefaultClusterStore);
+
+  debugger;
+  console.log("accountFormValue", form.getFieldValue("acccount"));
 
   return (
     <Form form={form} onFinish={onSubmit} initialValues={{ cluster: defaultClusterStore.cluster }}>

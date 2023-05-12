@@ -37,7 +37,11 @@ export const AccountSelector: React.FC<Props> = ({ cluster, onChange, value }) =
   });
 
   useEffect(() => {
+    debugger;
+    console.log("useEffect-accountValue", value);
+    console.log("useEffect-data", data);
     if (data && data.accounts) {
+      console.log("useEffect-if-accounts-accountValue", value);
       if (!value || !data.accounts.includes(value)) {
         onChange?.(data.accounts[0]);
       }
