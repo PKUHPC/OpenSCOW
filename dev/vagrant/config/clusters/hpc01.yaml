@@ -1,7 +1,7 @@
 # 集群显示名称
 displayName: hpc01
 
-adapterUrl: "192.168.88.102:5000"
+adapterUrl: "192.168.88.101:8972"
 
 loginNodes:
   - "192.168.88.102"

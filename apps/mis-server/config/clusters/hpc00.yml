@@ -1,34 +1,35 @@
 displayName: hpc00
-misIgnore: true
-slurm:
-  mis:
-    managerUrl: localhost:22222
-    dbPassword: password
-    clusterName: pkuhpc
-    scriptPath: /slurmshTest/slurm.sh
-  partitions:
-    - name: C032M0128G
-      mem: 131072
-      cores: 32
-      nodes: 32
-      gpus: 0
-      qos:
-        - low
-        - normal
-        - high
-        - cryoem
-    - name: GPU
-      mem: 262144
-      cores: 28
-      nodes: 32
-      gpus: 4
-      qos:
-        - low
-        - normal
-        - high
-        - cryoem
-    - name: life
-      mem: 262144
-      cores: 28
-      gpus: 4
-      nodes: 32
+adapterUrl: 0.0.0.0
+# misIgnore: true
+# slurm:
+#   mis:
+#     managerUrl: localhost:22222
+#     dbPassword: password
+#     clusterName: pkuhpc
+#     scriptPath: /slurmshTest/slurm.sh
+#   partitions:
+#     - name: C032M0128G
+#       mem: 131072
+#       cores: 32
+#       nodes: 32
+#       gpus: 0
+#       qos:
+#         - low
+#         - normal
+#         - high
+#         - cryoem
+#     - name: GPU
+#       mem: 262144
+#       cores: 28
+#       nodes: 32
+#       gpus: 4
+#       qos:
+#         - low
+#         - normal
+#         - high
+#         - cryoem
+#     - name: life
+#       mem: 262144
+#       cores: 28
+#       gpus: 4
+#       nodes: 32
