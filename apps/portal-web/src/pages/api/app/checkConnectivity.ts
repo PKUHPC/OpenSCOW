@@ -60,11 +60,11 @@ export default /* #__PURE__*/route<CheckAppConnectivitySchema>("CheckAppConnecti
 
     clearTimeout(timeoutId);
 
-    if (resp.status === 500) {
+    if (resp.status === 500 && resp.headers.get("content-type")?.startsWith("application/json")) {
       const json = await resp.json();
-      // If the port is listening to WS, it will return ECONNRESET
-      // Otherwise, if the port is not listening, it will return ECONNREFUSED
-      return { ok: json.code === "ECONNRESET" };
+      // If the port is not listening, it will return ECONNREFUSED
+      // Other error is considered as a success
+      return { ok: json.code !== "ECONNREFUSED" };
     }
 
     return { 200: { ok: true } };
