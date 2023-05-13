@@ -52,14 +52,26 @@ export default /* #__PURE__*/route<CheckAppConnectivitySchema>("CheckAppConnecti
     ? proxyGateway.url + join(publicConfig.BASE_PATH, "/api/proxy", cluster, host, String(port))
     : `http://${host}:${port}`;
 
-  return await fetch(targetUrl, {
-    signal: timeoutController.signal,
-  }).then(() => {
+  try {
+
+    const resp = await fetch(targetUrl, {
+      signal: timeoutController.signal,
+    });
+
     clearTimeout(timeoutId);
+
+    if (resp.status === 500) {
+      const json = await resp.json();
+      // If the port is listening to WS, it will return ECONNRESET
+      // Otherwise, if the port is not listening, it will return ECONNREFUSED
+      return { ok: json.code === "ECONNRESET" };
+    }
+
     return { 200: { ok: true } };
-  }).catch(() => {
+
+  } catch {
     return { 200: { ok: false } };
-  });
+  }
 
 
 });
