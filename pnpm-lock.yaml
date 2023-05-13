@@ -389,9 +389,6 @@ importers:
       '@scow/lib-decimal':
         specifier: workspace:*
         version: link:../../libs/decimal
-      '@scow/lib-scheduler-adapter':
-        specifier: workspace:*
-        version: link:../../libs/scheduler-adapter
       '@scow/lib-web':
         specifier: workspace:*
         version: link:../../libs/web
@@ -628,9 +625,6 @@ importers:
       '@scow/lib-decimal':
         specifier: workspace:*
         version: link:../../libs/decimal
-      '@scow/lib-scheduler-adapter':
-        specifier: workspace:*
-        version: link:../../libs/scheduler-adapter
       '@scow/lib-ssh':
         specifier: workspace:*
         version: link:../../libs/ssh

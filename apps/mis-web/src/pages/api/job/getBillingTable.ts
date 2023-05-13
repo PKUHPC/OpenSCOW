@@ -12,12 +12,13 @@
 
 import { route } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
-import { getSchedulerAdapterClient } from "@scow/lib-scheduler-adapter";
+import { ConfigServiceClient } from "@scow/protos/build/common/config";
 import { JobBillingItem } from "@scow/protos/build/server/job";
 import { authenticate } from "src/auth/server";
 import { JobBillingTableItem } from "src/components/JobBillingTable";
 import { PlatformRole } from "src/models/User";
 import { getBillingItems } from "src/pages/api/job/getBillingItems";
+import { getClient } from "src/utils/client";
 import { publicConfig, runtimeConfig } from "src/utils/config";
 import { moneyToString } from "src/utils/money";
 
@@ -51,9 +52,9 @@ export async function getBillingTableItems(tenantName: string | undefined) {
   const tableItems: JobBillingTableItem[] = [];
   const clusters = runtimeConfig.CLUSTERS_CONFIG;
 
-  for (const [cluster, { adapterUrl }] of Object.entries(clusters)) {
-    const client = getSchedulerAdapterClient(adapterUrl);
-    const partitions = await asyncClientCall(client.config, "getClusterConfig", {}).then((resp) => resp.partitions);
+  for (const [cluster] of Object.entries(clusters)) {
+    const client = getClient(ConfigServiceClient);
+    const partitions = await asyncClientCall(client, "getClusterConfig", { cluster }).then((resp) => resp.partitions);
 
     const partitionCount = partitions.length;
     let clusterItemIndex = 0;

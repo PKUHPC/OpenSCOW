@@ -10,26 +10,19 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { asyncClientCall } from "@ddadaal/tsgrpc-client";
-import { getSchedulerAdapterClient } from "@scow/lib-scheduler-adapter";
+import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
+import { ConfigServiceClient, Partition } from "@scow/protos/build/common/config";
 import { authenticate } from "src/auth/server";
+import { getClient } from "src/utils/client";
 import { runtimeConfig } from "src/utils/config";
 import { route } from "src/utils/route";
 
-export interface Partition {
-  name: string;
-  mem: number;
-  cores: number;
-  gpus: number;
-  nodes: number;
-  qos?: string[];
-  comment?: string;
-}
-
-
 export interface PublicClusterConfig {
   submitJobDirTemplate: string;
-  slurm: { partitions: Partition[] }
+  scheduler: {
+    name: string;
+    partitions: Partition[];
+  }
 }
 
 export interface GetClusterInfoSchema {
@@ -59,26 +52,18 @@ export default route<GetClusterInfoSchema>("GetClusterInfoSchema", async (req, r
 
   const { cluster } = req.query;
 
-  const client = getSchedulerAdapterClient(runtimeConfig.CLUSTERS_CONFIG[cluster].adapterUrl);
+  const client = getClient(ConfigServiceClient);
 
-  const reply = await asyncClientCall(client.config, "getClusterConfig", {});
-
-  const partitions = reply.partitions.map((x) => {
-    return {
-      name: x.name,
-      mem: x.memMb,
-      cores: x.cores,
-      gpus: x.gpus,
-      nodes: x.nodes,
-      qos: x.qos,
-      comment: x.comment,
-    } as Partition;
+  const reply = await asyncUnaryCall(client, "getClusterConfig", {
+    cluster,
   });
-
 
   return { 200: { clusterInfo: {
     submitJobDirTemplate: runtimeConfig.SUBMIT_JOB_WORKING_DIR,
-    slurm: { partitions: partitions },
+    scheduler: {
+      name: reply.schedulerName,
+      partitions: reply.partitions,
+    },
   } } };
 
 });

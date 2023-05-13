@@ -70,7 +70,6 @@ export const runningJob: RunningJob = {
   name: "123",
   nodes: "123",
   nodesOrReason: "!23",
-  nodesToBeUsed: "123",
   partition: "123",
   qos: "123",
   runningTime: "123",

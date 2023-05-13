@@ -40,7 +40,6 @@
     "@scow/lib-ssh": "workspace:*",
     "@scow/lib-web": "workspace:*",
     "@scow/protos": "workspace:*",
-    "@scow/lib-scheduler-adapter": "workspace:*",
     "@scow/utils": "workspace:*",
     "@sinclair/typebox": "0.28.9",
     "@ant-design/cssinjs": "1.9.1",

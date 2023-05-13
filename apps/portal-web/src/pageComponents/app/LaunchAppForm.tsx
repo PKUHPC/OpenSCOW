@@ -91,7 +91,7 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
       ? api.getClusterInfo({ query: { cluster:  cluster?.id } }) : undefined, [cluster]),
     onResolve: (data) => {
       if (data) {
-        const partition = data.clusterInfo.slurm.partitions[0];
+        const partition = data.clusterInfo.scheduler.partitions[0];
         form.setFieldValue("partition", partition.name);
         form.setFieldValue("qos", partition.qos?.[0]);
       }
@@ -100,7 +100,7 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
 
   const currentPartitionInfo = useMemo(() =>
     clusterInfoQuery.data
-      ? clusterInfoQuery.data.clusterInfo.slurm.partitions.find((x) => x.name === partition)
+      ? clusterInfoQuery.data.clusterInfo.scheduler.partitions.find((x) => x.name === partition)
       : undefined,
   [clusterInfoQuery.data, partition],
   );
@@ -169,7 +169,7 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
           loading={clusterInfoQuery.isLoading}
           disabled={!currentPartitionInfo}
           options={clusterInfoQuery.data
-            ? clusterInfoQuery.data.clusterInfo.slurm.partitions
+            ? clusterInfoQuery.data.clusterInfo.scheduler.partitions
               .map((x) => ({ label: x.name, value: x.name }))
             : []
           }
