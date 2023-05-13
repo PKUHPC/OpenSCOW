@@ -97,7 +97,7 @@ export const jobServiceServer = plugin((server) => {
           "nodes_alloc", "node_list", "reason", "account", "cpus_alloc",
           "qos", "submit_time", "time_limit_minutes", "working_directory",
         ],
-        filter: { users: [userId], accounts: [], states: []},
+        filter: { users: [userId], accounts: [], states: ["PENDING", "RUNNING"]},
       });
 
       return [{ results: reply.jobs.map(jobInfoToRunningjob) }];
@@ -136,7 +136,7 @@ export const jobServiceServer = plugin((server) => {
       const reply = await asyncClientCall(client.job, "submitJob", {
         userId, jobName, account, partition: partition!, qos, nodeCount, gpuCount: gpuCount || 0,
         memoryMb: Number(memory?.split("M")[0]), coreCount, timeLimitMinutes: maxTime,
-        script: command, workingDirectory, stdout: output, stderr: errorOutput,
+        script: command, workingDirectory, stdout: output, stderr: errorOutput, extraOptions: [],
       }).catch((e) => {
         // TODO: check error format
         if (e.code === Status.UNKNOWN && e.details.reason === "SBATCH_FAILED") {

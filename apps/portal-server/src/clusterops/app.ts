@@ -25,6 +25,7 @@ import { join } from "path";
 import { quote } from "shell-quote";
 import { AppOps, AppSession } from "src/clusterops/api/app";
 import { portalConfig } from "src/config/portal";
+import { splitSbatchArgs } from "src/utils/app";
 import { getAdapterClient } from "src/utils/clusters";
 import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
 import { displayIdToPort, parseDisplayId, refreshPassword, VNCSERVER_BIN_PATH } from "src/utils/turbovnc";
@@ -68,10 +69,9 @@ export const appOps = (cluster: string): AppOps => {
         partition, qos, customAttributes } = request;
 
 
-      // TODO: support extra sbatch options for slurm
-      // const userSbatchOptions = customAttributes["sbatchOptions"]
-      //   ? splitSbatchArgs(customAttributes["sbatchOptions"])
-      //   : [];
+      const userSbatchOptions = customAttributes["sbatchOptions"]
+        ? splitSbatchArgs(customAttributes["sbatchOptions"])
+        : [];
 
       // prepare script file
       const appConfig = apps[appId];
@@ -154,15 +154,16 @@ export const appOps = (cluster: string): AppOps => {
 
           await sftpWriteFile(sftp)(join(workingDirectory, "script.sh"), appConfig.web!.script);
 
-          // TODO: extra slurm option
-          // const configSlurmOptions: string[] = appConfig.slurm?.options ?? [];
+          const configSlurmOptions: string[] = appConfig.slurm?.options ?? [];
+
+          const extraOptions = configSlurmOptions.concat(userSbatchOptions);
 
           const envVariables = getEnvVariables({ SERVER_SESSION_INFO });
 
           return await submitAndWriteMetadata({
             userId, jobName, account, partition: partition!, qos, nodeCount: 1, gpuCount: 0,
             coreCount, timeLimitMinutes: maxTime, script: envVariables + SERVER_ENTRY_COMMAND,
-            workingDirectory,
+            workingDirectory, extraOptions,
           });
         } else {
           // vnc app
@@ -173,15 +174,16 @@ export const appOps = (cluster: string): AppOps => {
           await sftpWriteFile(sftp)(xstartupPath, appConfig.vnc!.xstartup);
           await sftpChmod(sftp)(xstartupPath, "755");
 
-          // TODO: extra slurm option
-          // const configSlurmOptions: string[] = appConfig.slurm?.options ?? [];
+          const configSlurmOptions: string[] = appConfig.slurm?.options ?? [];
+
+          const extraOptions = configSlurmOptions.concat(userSbatchOptions);
 
           const envVariables = getEnvVariables({ VNC_SESSION_INFO, VNCSERVER_BIN_PATH });
 
           return await submitAndWriteMetadata({
             userId, jobName, account, partition: partition!, qos, nodeCount: 1, gpuCount: 0,
             coreCount, timeLimitMinutes: maxTime, script: envVariables + VNC_ENTRY_COMMAND,
-            workingDirectory, stdout: VNC_OUTPUT_FILE,
+            workingDirectory, stdout: VNC_OUTPUT_FILE, extraOptions,
           });
 
         }
