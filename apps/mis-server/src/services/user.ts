@@ -50,6 +50,7 @@ export const userServiceServer = plugin((server) => {
         results: accountUsers.map((x) => ({
           userId: x.user.$.userId,
           name: x.user.$.name,
+          email: x.user.$.email,
           role: PFUserRole[x.role],
           status: PFUserStatus[x.status],
           jobChargeLimit: x.jobChargeLimit ? decimalToMoney(x.jobChargeLimit) : undefined,
