@@ -26,7 +26,6 @@ export function getTokenFromCookie(ctx?: ParseCookieContext): string | undefined
 
 function setCookieWithAge(ctx: SetCookieContext, key: string, value: string) {
   setCookie(ctx, key, value, {
-    maxAge: 30 * 24 * 60 * 60,
     path: COOKIE_PATH,
   });
 }
