@@ -17,6 +17,7 @@ import { Table, TableProps, Tooltip } from "antd";
 import { ColumnsType } from "antd/es/table";
 import React from "react";
 import { FileInfo, FileType } from "src/pages/api/file/list";
+import { formatSize } from "src/utils/format";
 
 type ColumnKey = ("type" | "name" | "mtime" | "size" | "mode" | "action");
 
@@ -29,33 +30,6 @@ const nodeModeToString = (mode: number) => {
   };
 
   return [0, 1, 2].reduce((prev, curr) => prev + toStr(numberPermission[curr]), "");
-};
-
-const formatFileSize = (size: number): string => {
-  const unitMap = ["KB", "MB", "GB", "TB", "PB"];
-  const CARRY = 1024;
-  // 最大1024TB
-  const MAX_SIZE = 1024 * 1024 * 1024 * 1024 * 1024;
-
-  if (size >= MAX_SIZE) {
-    return "";
-  }
-
-  let carryCount = 0;
-  let decimalSize = Math.round(size / CARRY);
-
-  while (decimalSize > CARRY) {
-    decimalSize = decimalSize / CARRY;
-    carryCount++;
-  }
-
-  if (decimalSize >= 1000) {
-    decimalSize = decimalSize / CARRY;
-    carryCount++;
-  }
-
-  const fixedNumber = decimalSize < 9.996 ? 2 : (decimalSize < 99.95 ? 1 : 0);
-  return `${decimalSize.toFixed(fixedNumber)} ${unitMap[carryCount]}`;
 };
 
 interface Props extends TableProps<FileInfo> {
@@ -125,7 +99,7 @@ export const FileTable: React.FC<Props> = (
         ? ""
         : (
           <Tooltip title={Math.round((size) / 1024).toLocaleString() + "KB"} placement="topRight">
-            <span>{formatFileSize(size)}</span>
+            <span>{formatSize({ size })}</span>
           </Tooltip>
         ),
       sorter: (a, b) => {
