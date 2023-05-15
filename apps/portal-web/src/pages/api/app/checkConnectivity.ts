@@ -12,7 +12,7 @@
 
 import { authenticate } from "src/auth/server";
 import { runtimeConfig } from "src/utils/config";
-import { isPortReachable } from "src/utils/port";
+import { isPortReachable } from "src/utils/isPortReachable";
 import { route } from "src/utils/route";
 
 export interface CheckAppConnectivitySchema {
@@ -41,7 +41,7 @@ export default /* #__PURE__*/route<CheckAppConnectivitySchema>("CheckAppConnecti
 
   const { host, port, cluster } = req.query;
 
-  // TODO ignore proxy gatewya
+  // TODO ignore proxy gateway
   const proxyGateway = runtimeConfig.CLUSTERS_CONFIG[cluster].proxyGateway;
 
   if (proxyGateway) {
