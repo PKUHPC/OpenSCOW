@@ -14,6 +14,7 @@ import { PlusOutlined } from "@ant-design/icons";
 import { App, Button, Form, Input, Modal } from "antd";
 import React, { useState } from "react";
 import { api } from "src/apis";
+import { CountdownText } from "src/components/CountdownText";
 import { CreateUserModal } from "src/pageComponents/users/CreateUserModal";
 import { publicConfig } from "src/utils/config";
 import { addUserToAccountParams, getUserIdRule, useBuiltinCreateUser } from "src/utils/createUser";
@@ -77,9 +78,10 @@ interface Props {
   token: string;
 }
 
+
 export const AddUserButton: React.FC<Props> = ({ refresh, accountName, token }) => {
 
-  const { message, modal } = App.useApp();
+  const { message } = App.useApp();
 
   const [modalShow, setModalShow] = useState(false);
 
@@ -101,18 +103,22 @@ export const AddUserButton: React.FC<Props> = ({ refresh, accountName, token }) 
             setNewUserInfo({ identityId, name });
           } else if (publicConfig.CREATE_USER_CONFIG.misConfig.type === "external") {
 
-            modal.confirm({
-              title: "用户不存在",
-              content: "用户不存在，是否跳转到创建用户并添加到账户中页面？",
-              okText: "跳转",
-              onOk: () => {
-                window.open(
+            const TIMEOUT_SECONDS = 2;
+
+            message.info((
+              <>
+              将在
+                <CountdownText seconds={TIMEOUT_SECONDS} />
+              秒后打开创建用户界面
+              </>
+            ), TIMEOUT_SECONDS, () => {
+              window.open(
                   publicConfig.CREATE_USER_CONFIG.misConfig.external!.url + "?" + addUserToAccountParams(
-                    accountName, identityId, name, token,
-                  ),
+                  accountName, identityId, name, token,
+                ),
                   "_blank",
-                );
-              },
+              );
+              setModalShow(false);
             });
           } else {
             message.error("用户不存在。请先创建用户");
