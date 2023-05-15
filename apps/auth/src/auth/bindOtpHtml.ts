@@ -13,10 +13,9 @@
 import { DEFAULT_PRIMARY_COLOR } from "@scow/config/build/ui";
 import { FastifyReply, FastifyRequest } from "fastify";
 import { join } from "path";
-import { createCaptcha } from "src/auth/captcha";
-import { authConfig, OtpStatusOptions } from "src/config/auth";
-import { config, FAVICON_URL, LOGO_URL } from "src/config/env";
+import { config, FAVICON_URL } from "src/config/env";
 import { uiConfig } from "src/config/ui";
+
 
 function parseHostname(req: FastifyRequest): string | undefined {
 
@@ -33,40 +32,31 @@ function parseHostname(req: FastifyRequest): string | undefined {
 }
 
 
-export async function serveLoginHtml(
-  err: boolean, callbackUrl: string, req: FastifyRequest, rep: FastifyReply,
-  verifyCaptchaFail?: boolean,
-  verifyOtpFail?: boolean,
+export async function renderBindOtpHtml(
+  err: boolean, req: FastifyRequest, rep: FastifyReply, callbackUrl: string,
+  otp?: {
+    sendEmailUI?: boolean,
+    sendSucceeded?: boolean,
+    tokenNotFound?: boolean,
+    emailAddress?: string,
+    qrcode?: string,
+    otpSessionToken?: string,
+    timeDiffNotEnough?: number,
+    bindLimitMinutes?: number,
+  },
 ) {
 
   const hostname = parseHostname(req);
-  const enableCaptcha = authConfig.captcha.enabled;
-  const enableTotp = authConfig.otp?.enabled;
 
-  // 显示绑定otp按钮：otp.enabled为true && (密钥存于ldap时 || (otp.type===remote && 配置了otp.remote.redirectUrl))
-  const showBindOtpButton = authConfig.otp?.enabled && (authConfig.otp?.type === OtpStatusOptions.ldap
-    || (!!authConfig.otp?.remote?.redirectUrl && authConfig.otp?.type === OtpStatusOptions.remote));
-  const captchaInfo = enableCaptcha
-    ? await createCaptcha(req.server)
-    : undefined;
-
-  return rep.status(
-    verifyCaptchaFail ? 400 : err ? 401 : 200).view("login.liquid", {
+  return rep.status(err ? 401 : 200).view("/otp/bindOtp.liquid", {
     cssUrl: join(config.BASE_PATH, config.AUTH_BASE_PATH, "/public/assets/tailwind.min.css"),
     faviconUrl: join(config.BASE_PATH, FAVICON_URL),
-    logoUrl: join(config.BASE_PATH, LOGO_URL),
     backgroundColor: uiConfig.primaryColor?.defaultColor ?? DEFAULT_PRIMARY_COLOR,
+    err,
     callbackUrl,
     footerText: (hostname && uiConfig?.footer?.hostnameTextMap?.[hostname]) ?? uiConfig?.footer?.defaultText ?? "",
-    err,
-    ...captchaInfo,
-    verifyCaptchaFail,
-    enableCaptcha,
-    enableTotp,
-    showBindOtpButton,
-    verifyOtpFail,
+    ...otp,
     otpBasePath: join(config.BASE_PATH, config.AUTH_BASE_PATH, "/public/otp"),
-    refreshCaptchaPath: join(config.BASE_PATH, config.AUTH_BASE_PATH, "/public/refreshCaptcha"),
   });
 
 }

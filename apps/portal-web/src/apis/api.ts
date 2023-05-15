@@ -17,6 +17,7 @@ import { join } from "path";
 import type { GetClusterInfoSchema } from "src/pages/api//cluster";
 import type { ConnectToAppSchema } from "src/pages/api/app/connectToApp";
 import type { CreateAppSessionSchema } from "src/pages/api/app/createAppSession";
+import { GetAppLastSubmissionSchema } from "src/pages/api/app/getAppLastSubmission";
 import type { GetAppMetadataSchema } from "src/pages/api/app/getAppMetadata";
 import type { GetAppSessionsSchema } from "src/pages/api/app/getAppSessions";
 import type { ListAvailableAppsSchema } from "src/pages/api/app/listAvailableApps";
@@ -59,6 +60,7 @@ export const api = {
   getAppMetadata: fromApi<GetAppMetadataSchema>("GET", join(basePath, "/api/app/getAppMetadata")),
   getAppSessions: fromApi<GetAppSessionsSchema>("GET", join(basePath, "/api/app/getAppSessions")),
   listAvailableApps: fromApi<ListAvailableAppsSchema>("GET", join(basePath, "/api/app/listAvailableApps")),
+  getAppLastSubmission: fromApi<GetAppLastSubmissionSchema>("GET", join(basePath, "/api/app/getAppLastSubmission")),
   authCallback: fromApi<AuthCallbackSchema>("GET", join(basePath, "/api/auth/callback")),
   logout: fromApi<LogoutSchema>("DELETE", join(basePath, "/api/auth/logout")),
   validateToken: fromApi<ValidateTokenSchema>("GET", join(basePath, "/api/auth/validateToken")),

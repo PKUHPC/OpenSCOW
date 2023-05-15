@@ -10,16 +10,17 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { App, Button, Form, Input, InputNumber, Select } from "antd";
+import { App, Button, Form, Input, InputNumber, Select, Spin } from "antd";
 import { Rule } from "antd/es/form";
 import Router from "next/router";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 import { useAsync } from "react-async";
 import { useStore } from "simstate";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { AccountSelector } from "src/pageComponents/job/AccountSelector";
 import { AppCustomAttribute } from "src/pages/api/app/getAppMetadata";
+import { Partition } from "src/pages/api/cluster";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { Cluster } from "src/utils/config";
 
@@ -38,13 +39,11 @@ interface FormFields {
   maxTime: number;
 }
 
-
 const initialValues = {
   nodeCount: 1,
   coreCount: 1,
   maxTime: 60,
 } as Partial<FormFields>;
-
 
 export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
 
@@ -52,6 +51,8 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
 
   const [form] = Form.useForm<FormFields>();
   const [loading, setLoading] = useState(false);
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const onSubmit = async () => {
     const allFormFields = await form.validateFields();
@@ -64,6 +65,7 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
     });
 
     setLoading(true);
+    setIsSubmitting(true);
     await api.createAppSession({ body: {
       cluster: cluster.id,
       appId,
@@ -83,33 +85,86 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
   };
 
   const cluster = Form.useWatch("cluster", form) as Cluster | undefined;
-  const partition = Form.useWatch("partition", form) as string | undefined;
-
+  const [currentPartitionInfo, setCurrentPartitionInfo] = useState<Partition | undefined>();
 
   const clusterInfoQuery = useAsync({
     promiseFn: useCallback(async () => cluster
       ? api.getClusterInfo({ query: { cluster:  cluster?.id } }) : undefined, [cluster]),
-    onResolve: (data) => {
+    onResolve: async (data) => {
       if (data) {
-        const partition = data.clusterInfo.slurm.partitions[0];
-        form.setFieldValue("partition", partition.name);
-        form.setFieldValue("qos", partition.qos?.[0]);
+
+        setLoading(true);
+        const clusterPartition = data.clusterInfo.slurm.partitions[0];
+        const clusterPartitionCoreCount = clusterPartition.cores;
+        setCurrentPartitionInfo(clusterPartition);
+
+        if (cluster) { await api.getAppLastSubmission({ query: { cluster: cluster?.id, appId } })
+          .then((lastSubmitData) => {
+            const lastSubmitPartition = lastSubmitData?.lastSubmissionInfo?.partition;
+            const lastSubmitQos = lastSubmitData?.lastSubmissionInfo?.qos;
+            const lastSubmitCoreCount = lastSubmitData?.lastSubmissionInfo?.coreCount;
+
+            // 如果存在上一次提交信息，且上一次提交信息中的分区，qos，cpu核心数满足当前集群配置，则填入上一次提交信息中的相应值
+            const setSubmitPartition = lastSubmitPartition &&
+            data.clusterInfo.slurm.partitions.some((item) => { return item.name === lastSubmitPartition; });
+            const setSubmitQos = setSubmitPartition &&
+              clusterPartition.qos?.some((item) => { return item === lastSubmitQos; });
+            const setSubmitCoreCount = setSubmitPartition &&
+              lastSubmitCoreCount && clusterPartitionCoreCount && clusterPartitionCoreCount >= lastSubmitCoreCount;
+
+            const requiredObj = {
+              partition: setSubmitPartition ? lastSubmitPartition : clusterPartition.name,
+              qos: setSubmitQos ? lastSubmitQos : clusterPartition?.qos?.[0],
+              coreCount: setSubmitCoreCount ? lastSubmitCoreCount : initialValues.coreCount,
+              maxTime: lastSubmitData?.lastSubmissionInfo
+                ? lastSubmitData.lastSubmissionInfo.maxTime : initialValues.maxTime,
+            };
+
+            // 如果存在上一次提交信息且上一次提交信息中的配置HTML表单与当前配置HTML表单内容相同，则填入上一次提交信息中的值
+            const attributesObj = {};
+            const lastSubmitAttributes = lastSubmitData?.lastSubmissionInfo?.customAttributes;
+            if (lastSubmitAttributes) {
+              attributes.forEach((attribute) => {
+                if (attribute.name in lastSubmitAttributes) {
+                  switch (attribute.type) {
+                  case "NUMBER":
+                  case "TEXT":
+                    attributesObj[attribute.name] = lastSubmitAttributes[attribute.name];
+                    break;
+                  case "SELECT":
+                    if (attribute.select!.some((optionItem) =>
+                      optionItem.value === lastSubmitAttributes[attribute.name])) {
+                      attributesObj[attribute.name] = lastSubmitAttributes[attribute.name];
+                    }
+                    break;
+                  default:
+                    break;
+                  }
+                }
+              });
+            }
+            form.setFieldsValue({ ...requiredObj, ...attributesObj });
+
+            // 如果上一次提交信息存在，则填入账户值
+            if (lastSubmitData.lastSubmissionInfo) {
+              form.setFieldValue("account", lastSubmitData.lastSubmissionInfo.account);
+            }
+
+          }).finally(() => {
+            setLoading(false);
+          });
+        }
       }
     },
   });
 
-  const currentPartitionInfo = useMemo(() =>
-    clusterInfoQuery.data
+  const handlePartitionChange = (partition) => {
+    const partitionInfo = clusterInfoQuery.data
       ? clusterInfoQuery.data.clusterInfo.slurm.partitions.find((x) => x.name === partition)
-      : undefined,
-  [clusterInfoQuery.data, partition],
-  );
-
-  useEffect(() => {
-    if (currentPartitionInfo) {
-      form.setFieldValue("qos", currentPartitionInfo.qos?.[0]);
-    }
-  }, [currentPartitionInfo]);
+      : undefined;
+    form.setFieldValue("qos", partitionInfo?.qos?.[0]);
+    setCurrentPartitionInfo(partitionInfo);
+  };
 
   const customFormItems = attributes.map((item, index) => {
 
@@ -144,66 +199,70 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
   const defaultClusterStore = useStore(DefaultClusterStore);
 
   return (
-    <Form form={form} onFinish={onSubmit} initialValues={{ ...initialValues, cluster: defaultClusterStore.cluster }}>
+    <Form form={form} onFinish={onSubmit} initialValues={{ cluster: defaultClusterStore.cluster }}>
 
       <Form.Item name="cluster" label="集群" rules={[{ required: true }]}>
         <SingleClusterSelector />
       </Form.Item>
 
-      <Form.Item
-        label="账户"
-        name="account"
-        rules={[{ required: true }]}
-        dependencies={["cluster"]}
-      >
-        <AccountSelector cluster={cluster?.id} />
-      </Form.Item>
+      <Spin spinning={loading} tip={isSubmitting ? "" : "查询上次提交记录中"}>
 
-      <Form.Item
-        label="分区"
-        name="partition"
-        dependencies={["cluster"]}
-        rules={[{ required: true }]}
-      >
-        <Select
-          loading={clusterInfoQuery.isLoading}
-          disabled={!currentPartitionInfo}
-          options={clusterInfoQuery.data
-            ? clusterInfoQuery.data.clusterInfo.slurm.partitions
-              .map((x) => ({ label: x.name, value: x.name }))
-            : []
-          }
-        />
-      </Form.Item>
+        <Form.Item
+          label="账户"
+          name="account"
+          rules={[{ required: true }]}
+          dependencies={["cluster"]}
+        >
+          <AccountSelector cluster={cluster?.id} />
+        </Form.Item>
 
-      <Form.Item
-        label="QOS"
-        name="qos"
-        dependencies={["cluster", "partition"]}
-        rules={[{ required: true }]}
-      >
-        <Select
-          disabled={(!currentPartitionInfo?.qos) || currentPartitionInfo.qos.length === 0}
-          options={currentPartitionInfo?.qos?.map((x) => ({ label: x, value: x }))}
-        />
-      </Form.Item>
+        <Form.Item
+          label="分区"
+          name="partition"
+          dependencies={["cluster"]}
+          rules={[{ required: true }]}
+        >
+          <Select
+            disabled={!currentPartitionInfo}
+            options={clusterInfoQuery.data
+              ? clusterInfoQuery.data.clusterInfo.slurm.partitions
+                .map((x) => ({ label: x.name, value: x.name }))
+              : []
+            }
+            onChange={handlePartitionChange}
+          />
+        </Form.Item>
 
-      <Form.Item
-        label="CPU核心数"
-        name="coreCount"
-        dependencies={["cluster", "partition"]}
-        rules={[
-          { required: true, type: "integer", max: currentPartitionInfo?.cores },
-        ]}
-      >
-        <InputNumber min={1} />
-      </Form.Item>
+        <Form.Item
+          label="QOS"
+          name="qos"
+          dependencies={["cluster"]}
+          rules={[{ required: true }]}
+        >
+          <Select
+            disabled={(!currentPartitionInfo?.qos) || currentPartitionInfo.qos.length === 0}
+            options={currentPartitionInfo?.qos?.map((x) => ({ label: x, value: x }))}
+          />
+        </Form.Item>
 
-      <Form.Item label="最长运行时间" name="maxTime" rules={[{ required: true }]}>
-        <InputNumber min={1} step={1} addonAfter={"分钟"} />
-      </Form.Item>
+        <Form.Item
+          label="CPU核心数"
+          name="coreCount"
+          dependencies={["cluster"]}
+          rules={[
+            { required: true, type: "integer", max: currentPartitionInfo?.cores },
+          ]}
+        >
+          <InputNumber min={1} />
+        </Form.Item>
 
-      {customFormItems}
+        <Form.Item label="最长运行时间" name="maxTime" rules={[{ required: true }]}>
+          <InputNumber min={1} step={1} addonAfter={"分钟"} />
+        </Form.Item>
+
+        {customFormItems}
+
+      </Spin>
 
       <Form.Item>
         <Button type="primary" htmlType="submit" loading={loading}>
