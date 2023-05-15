@@ -10,11 +10,10 @@
  * See the Mulan PSL v2 for more details.
  */
 
-export const formatSize = (size: number, unitMap?: string[]): string => {
+const DEFAULT_UNIT_MAP = ["KB", "MB", "GB", "TB", "PB"];
 
-  if (!unitMap) {
-    unitMap = ["KB", "MB", "GB", "TB", "PB"];
-  }
+export const formatSize = (size: number, unitMap: string[] = DEFAULT_UNIT_MAP): string => {
+
   const CARRY = 1024;
   const maxSize = Math.pow(CARRY, unitMap.length);
 
