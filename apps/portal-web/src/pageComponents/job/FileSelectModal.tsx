@@ -151,7 +151,7 @@ export const FileSelectModal: React.FC<Props> = ({ cluster, onSubmit }) => {
               onPathChange={(curPath) => {
                 curPath === path ? reload() : setPath(curPath);
               }}
-              breadcrumbItemRender={(segament, index, curPath) =>
+              breadcrumbItemRender={(segment, index, curPath) =>
                 index === 0
                   ? (
                     <Link
@@ -164,7 +164,7 @@ export const FileSelectModal: React.FC<Props> = ({ cluster, onSubmit }) => {
                       href=""
                       onClick={(e) => onClickLink(e, curPath)}
                     >
-                      {segament}
+                      {segment}
                     </Link>
                   )
               }

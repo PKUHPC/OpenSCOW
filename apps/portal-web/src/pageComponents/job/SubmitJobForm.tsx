@@ -185,7 +185,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
     * Math.floor(currentPartitionInfo.mem / currentPartitionInfo.cores) :
       nodeCount * coreCount * Math.floor(currentPartitionInfo.mem / currentPartitionInfo.cores) : 0);
   const memory = memorySize + "MB";
-  const memoryDisplay = formatSize({ size: memorySize, unitMap: ["MB", "GB", "TB"]});
+  const memoryDisplay = formatSize(memorySize, ["MB", "GB", "TB"]);
 
   const coreCountSum = currentPartitionInfo?.gpus
     ? nodeCount * gpuCount * Math.floor(currentPartitionInfo.cores / currentPartitionInfo.gpus)

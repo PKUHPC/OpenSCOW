@@ -10,10 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-export const formatSize = (
-  { size, unitMap }:
-    { size: number, unitMap?: string[] },
-): string => {
+export const formatSize = (size: number, unitMap?: string[]): string => {
 
   if (!unitMap) {
     unitMap = ["KB", "MB", "GB", "TB", "PB"];

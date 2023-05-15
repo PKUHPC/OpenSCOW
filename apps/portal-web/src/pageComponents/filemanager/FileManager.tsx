@@ -299,7 +299,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
           path={path}
           loading={loading}
           onPathChange={(curPath) => { curPath === path ? reload() : Router.push(fullUrl(curPath)); }}
-          breadcrumbItemRender={(pathSegament, index, path) =>
+          breadcrumbItemRender={(pathSegment, index, path) =>
             (index === 0 ? (
               <Link href={fullUrl("/")} title="/" onClick={(e) => e.stopPropagation()}>
                 <DatabaseOutlined />
@@ -310,7 +310,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
                 key={index}
                 onClick={(e) => e.stopPropagation()}
               >
-                {pathSegament}
+                {pathSegment}
               </Link>
             ))
           }

@@ -19,7 +19,7 @@ interface Props {
   path: string;
   loading: boolean;
   onPathChange: (path: string) => void;
-  breadcrumbItemRender: (pathSegament: string, index: number, path: string) => React.ReactNode;
+  breadcrumbItemRender: (pathSegment: string, index: number, path: string) => React.ReactNode;
   prefix?: React.ReactNode
 }
 
@@ -83,9 +83,9 @@ export const PathBar: React.FC<Props> = ({
           <>
             <BarStateBar onClick={() => setState("input")}>
               <Breadcrumb style={{ alignSelf: "center" }}>
-                {pathSegments.map((segament, index) => (
+                {pathSegments.map((segment, index) => (
                   <Breadcrumb.Item key={index}>
-                    {breadcrumbItemRender(segament, index, pathSegments.slice(1, index + 1).join("/"))}
+                    {breadcrumbItemRender(segment, index, pathSegments.slice(1, index + 1).join("/"))}
                   </Breadcrumb.Item>
                 ))}
               </Breadcrumb>
