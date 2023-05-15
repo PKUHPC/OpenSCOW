@@ -55,3 +55,19 @@ shell: true
 # TurboVNC的安装路径
 # turboVNCPath: /opt/TurboVNC
 
+# 新增导航链接
+navLinks:
+    - text: "一级导航1"
+      href: "https://hahahaha1.com/"
+      # Icon:
+      children:
+        - text: "二级导航1"
+          href: "https://hahahaha1.1.com"
+          # Icon
+        - text: "二级导航2"
+          href: "https://hahahaha1.2.com"
+          # Icon
+    - text: "一级导航2"
+      href: "https:////hahahaha2.com"
+      children: []
+      # Icon

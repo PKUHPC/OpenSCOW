@@ -151,6 +151,8 @@ const buildRuntimeConfig = async (phase, basePath) => {
     BASE_PATH: basePath,
 
     CLIENT_MAX_BODY_SIZE: config.CLIENT_MAX_BODY_SIZE,
+
+    NAV_LINKS: portalConfig.navLinks,
   };
 
   if (!building && !testenv) {

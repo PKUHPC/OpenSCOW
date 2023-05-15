@@ -54,4 +54,12 @@ shell: true
 # TurboVNC的安装路径
 # turboVNCPath: /opt/TurboVNC
 
+# navLinks:
+#     - text: "一级导航"
+#       href: "一级导航链接"
+#       children:
+#       - text: "二级导航"
+#         href: "二级导航链接"
+
+
 

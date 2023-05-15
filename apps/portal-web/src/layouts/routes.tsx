@@ -17,6 +17,7 @@ import {
   DesktopOutlined,
   EyeOutlined,
   FolderOutlined,
+  LinkOutlined,
   Loading3QuartersOutlined,
   MacCommandOutlined,
   PlusCircleOutlined,
@@ -125,6 +126,24 @@ export const userRoutes: (
         clickToPath: `/files/${cluster.id}/~`,
       } as NavItemProps)),
     }] : []),
+    ...(publicConfig.NAV_LINKS.length > 0 ? publicConfig.NAV_LINKS.map((link) => ({
+      // Icon确认
+      Icon: LinkOutlined,
+      text: link.text,
+      path: link.href,
+      clickToPath: `?token=${user.token}`,
+      clickable: true,
+      openInNewPage: true,
+      children: link.children?.length ? link.children?.map((childLink) => ({
+        // Icon确认
+        Icon: LinkOutlined,
+        text: childLink.text,
+        path: childLink.href,
+        clickToPath: `?token=${user.token}`,
+        clickable: true,
+        openInNewPage: true,
+      } as NavItemProps)) : [],
+    }) as NavItemProps) : []),
   ];
 };
 
