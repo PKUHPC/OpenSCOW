@@ -16,7 +16,7 @@ import Link from "next/link";
 import { join } from "path";
 import React, { Key, useCallback, useRef, useState } from "react";
 import { useAsync } from "react-async";
-import { api } from "src/apis/api";
+import { api } from "src/apis";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { ModalButton } from "src/components/ModalLink";
 import { FileTable } from "src/pageComponents/filemanager/FileTable";
@@ -66,6 +66,7 @@ export const FileSelectModal: React.FC<Props> = ({ cluster, onSubmit }) => {
   const [path, setPath] = useState<string>("/");
   const [selectedKeys, setSelectedKeys] = useState<Key[]>([]);
 
+
   const prevPathRef = useRef<string>(path);
 
 
@@ -111,6 +112,13 @@ export const FileSelectModal: React.FC<Props> = ({ cluster, onSubmit }) => {
     closeModal();
   };
 
+  const onClickLink = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>, clickPath: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setPath(clickPath);
+    setSelectedKeys([]);
+  };
+
   const isLoading = isHomePathLoading || isFileLoading;
 
   return (
@@ -139,21 +147,22 @@ export const FileSelectModal: React.FC<Props> = ({ cluster, onSubmit }) => {
             <PathBar
               path={formatPath(path)}
               loading={isLoading}
+              prefix="~"
               onPathChange={(curPath) => {
                 curPath === path ? reload() : setPath(curPath);
               }}
-              breadcrumbItemRender={(segament, index, path) =>
+              breadcrumbItemRender={(segament, index, curPath) =>
                 index === 0
-                  ? <DatabaseOutlined onClick={(e) => { e.stopPropagation(); setPath("/"); }} />
+                  ? (
+                    <Link
+                      href=""
+                      onClick={(e) => onClickLink(e, "/")}
+                    ><DatabaseOutlined /> ~ </Link>
+                  )
                   : (
                     <Link
                       href=""
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        setPath(path);
-                        setSelectedKeys([]);
-                      }}
+                      onClick={(e) => onClickLink(e, curPath)}
                     >
                       {segament}
                     </Link>

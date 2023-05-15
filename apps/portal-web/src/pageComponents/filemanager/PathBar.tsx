@@ -20,6 +20,7 @@ interface Props {
   loading: boolean;
   onPathChange: (path: string) => void;
   breadcrumbItemRender: (pathSegament: string, index: number, path: string) => React.ReactNode;
+  prefix?: React.ReactNode
 }
 
 const Bar = styled.div`
@@ -43,6 +44,7 @@ export const PathBar: React.FC<Props> = ({
   loading,
   onPathChange,
   breadcrumbItemRender,
+  prefix,
 }) => {
 
   const [state, setState] = useState<"bar" | "input">("bar");
@@ -75,6 +77,7 @@ export const PathBar: React.FC<Props> = ({
             onSearch={onPathChange}
             enterButton={icon}
             autoFocus
+            prefix={prefix}
           />
         ) : (
           <>
