@@ -10,9 +10,9 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { join } from "path";
 import { authenticate } from "src/auth/server";
-import { publicConfig, runtimeConfig } from "src/utils/config";
+import { runtimeConfig } from "src/utils/config";
+import { isPortReachable } from "src/utils/port";
 import { route } from "src/utils/route";
 
 export interface CheckAppConnectivitySchema {
@@ -39,39 +39,16 @@ export default /* #__PURE__*/route<CheckAppConnectivitySchema>("CheckAppConnecti
 
   if (!info) { return; }
 
-  const { cluster, host, port } = req.query;
+  const { host, port, cluster } = req.query;
 
+  // TODO ignore proxy gatewya
   const proxyGateway = runtimeConfig.CLUSTERS_CONFIG[cluster].proxyGateway;
 
-  const timeoutController = new AbortController();
-  const timeoutId = setTimeout(() => {
-    timeoutController.abort();
-  }, TIMEOUT_MS);
-
-  const targetUrl = proxyGateway
-    ? proxyGateway.url + join(publicConfig.BASE_PATH, "/api/proxy", cluster, host, String(port))
-    : `http://${host}:${port}`;
-
-  try {
-
-    const resp = await fetch(targetUrl, {
-      signal: timeoutController.signal,
-    });
-
-    clearTimeout(timeoutId);
-
-    if (resp.status === 500 && resp.headers.get("content-type")?.startsWith("application/json")) {
-      const json = await resp.json();
-      // If the port is not listening, it will return ECONNREFUSED
-      // Other error is considered as a success
-      return { ok: json.code !== "ECONNREFUSED" };
-    }
-
+  if (proxyGateway) {
     return { 200: { ok: true } };
-
-  } catch {
-    return { 200: { ok: false } };
   }
 
+  const reachable = await isPortReachable(port, host, TIMEOUT_MS);
 
+  return { 200: { ok: reachable } };
 });
