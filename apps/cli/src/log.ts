@@ -20,6 +20,7 @@ const logPretty = pretty({
     config.LOG_SHOW_TIMESTAMP ? "time" : undefined,
     "msg",
   ].filter((x) => x).join(","),
+  sync: true,
 });
 
 export const logger = pino({
