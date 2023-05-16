@@ -70,7 +70,7 @@
     "xterm-addon-fit": "0.7.0"
   },
   "devDependencies": {
-    "@ddadaal/next-typed-api-routes-cli": "0.6.1",
+    "@ddadaal/next-typed-api-routes-cli": "0.6.2",
     "@next/bundle-analyzer": "13.4.1",
     "@testing-library/jest-dom": "5.16.5",
     "@testing-library/react": "14.0.0",

@@ -469,8 +469,8 @@ importers:
         version: 5.0.4
     devDependencies:
       '@ddadaal/next-typed-api-routes-cli':
-        specifier: 0.6.1
-        version: 0.6.1
+        specifier: 0.6.2
+        version: 0.6.2
       '@next/bundle-analyzer':
         specifier: 13.4.1
         version: 13.4.1
@@ -723,8 +723,8 @@ importers:
         version: 0.7.0(xterm@5.1.0)
     devDependencies:
       '@ddadaal/next-typed-api-routes-cli':
-        specifier: 0.6.1
-        version: 0.6.1
+        specifier: 0.6.2
+        version: 0.6.2
       '@next/bundle-analyzer':
         specifier: 13.4.1
         version: 13.4.1
@@ -3196,13 +3196,13 @@ packages:
       - typescript
     dev: true
 
-  /@ddadaal/next-typed-api-routes-cli@0.6.1:
-    resolution: {integrity: sha512-a5dQ1uCUt5Isw/cSWJSgnLbh18ynsi+8Qyplw2iglTGyA/HS4GUxf0dk2IuT41p05V1GGgrOB4VMjncJKzBlqQ==}
+  /@ddadaal/next-typed-api-routes-cli@0.6.2:
+    resolution: {integrity: sha512-rXhEiLDt0V7eHIqFFRwzSBgv5BS0T1qQe8nyuvf3UeD5HdDyoGw1TwGkIgbdDbo2JhIT80MeWBqeNRHRyWMs5A==}
     hasBin: true
     dependencies:
-      ts-json-schema-generator: 1.0.0
+      ts-json-schema-generator: 1.2.0
       tslib: 2.5.0
-      typescript: 4.6.4
+      typescript: 4.9.5
       yargs: 17.7.2
     dev: true
 
@@ -17555,17 +17555,18 @@ packages:
       yargs-parser: 21.1.1
     dev: true
 
-  /ts-json-schema-generator@1.0.0:
-    resolution: {integrity: sha512-F5VofsyMhNSXKII32NDS8/Ur8o2K3Sh5i/U2ke3UgCKf26ybgm2cZeT2x7VJPl1trML/9QLzz/82l0mvzmb3Vw==}
+  /ts-json-schema-generator@1.2.0:
+    resolution: {integrity: sha512-tUMeO3ZvA12d3HHh7T/AK8W5hmUhDRNtqWRHSMN3ZRbUFt+UmV0oX8k1RK4SA+a+BKNHpmW2v06MS49e8Fi3Yg==}
     engines: {node: '>=10.0.0'}
     hasBin: true
     dependencies:
       '@types/json-schema': 7.0.11
       commander: 9.4.1
-      glob: 7.2.3
+      glob: 8.0.3
       json5: 2.2.3
+      normalize-path: 3.0.0
       safe-stable-stringify: 2.4.1
-      typescript: 4.6.4
+      typescript: 4.9.5
     dev: true
 
   /ts-log@2.2.5:
@@ -17878,18 +17879,11 @@ packages:
       is-typedarray: 1.0.0
     dev: false
 
-  /typescript@4.6.4:
-    resolution: {integrity: sha512-9ia/jWHIEbo49HfjrLGfKbZSuWo9iTMwXO+Ca3pRsSpbsMbc7/IU8NKdCZVRRBafVPGnoJeFL76ZOAA84I9fEg==}
-    engines: {node: '>=4.2.0'}
-    hasBin: true
-    dev: true
-
   /typescript@4.9.5:
     resolution: {integrity: sha512-1FXk9E2Hm+QzZQ7z+McJiHL4NW1F2EzMu9Nq9i3zAaGqibafqYwCVU6WyWAuyQRRzOlxou8xZSyXLEN8oKj24g==}
     engines: {node: '>=4.2.0'}
     hasBin: true
     dev: true
-    optional: true
 
   /typescript@5.0.4:
     resolution: {integrity: sha512-cW9T5W9xY37cc+jfEnaUvX91foxtHkza3Nw3wkoF4sSlKn0MONdkdEndig/qPBWXNkmplh3NzayQzCiHM4/hqw==}
