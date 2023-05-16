@@ -28,7 +28,7 @@
     "@ant-design/icons": "5.0.1",
     "@codemirror/language": "6.6.0",
     "@codemirror/legacy-modes": "6.3.2",
-    "@codemirror/view": "6.11.0",
+    "@codemirror/view": "6.11.2",
     "@ddadaal/next-typed-api-routes-runtime": "0.5.2",
     "@ddadaal/tsgrpc-client": "0.17.5",
     "@ddadaal/tsgrpc-common": "0.2.3",
@@ -41,11 +41,11 @@
     "@scow/lib-web": "workspace:*",
     "@scow/protos": "workspace:*",
     "@scow/utils": "workspace:*",
-    "@sinclair/typebox": "0.28.9",
+    "@sinclair/typebox": "0.28.10",
     "@ant-design/cssinjs": "1.9.1",
     "@uiw/codemirror-theme-github": "4.19.16",
     "@uiw/react-codemirror": "4.19.16",
-    "antd": "5.4.7",
+    "antd": "5.5.0",
     "busboy": "1.6.0",
     "dayjs": "1.11.7",
     "google-protobuf": "3.21.2",
@@ -77,7 +77,7 @@
     "@types/busboy": "1.5.0",
     "@types/google-protobuf": "3.15.6",
     "@types/mime-types": "2.1.1",
-    "@types/node": "18.16.6",
+    "@types/node": "18.16.10",
     "@types/nprogress": "0.2.0",
     "@types/react": "18.2.6",
     "@types/react-dom": "18.2.4",
@@ -88,7 +88,7 @@
     "node-mocks-http": "1.12.2",
     "postcss": "8.4.23",
     "ts-log": "2.2.5",
-    "webpack": "5.82.0"
+    "webpack": "5.82.1"
   },
   "browserslist": {
     "production": [

@@ -30,7 +30,7 @@
     "@scow/lib-ssh": "workspace:*",
     "@scow/protos": "workspace:*",
     "@scow/utils": "workspace:*",
-    "@sinclair/typebox": "0.28.9",
+    "@sinclair/typebox": "0.28.10",
     "dayjs": "1.11.7",
     "dotenv": "16.0.3",
     "node-cron": "3.0.2",
