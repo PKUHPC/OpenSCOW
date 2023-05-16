@@ -60,7 +60,7 @@ export async function runComposeCommand(config: InstallConfigSchema, args: strin
 
   const params = ["-f", filename];
 
-  const plugins = await readEnabledPlugins(config.pluginsDir, config.plugins);
+  const plugins = await readEnabledPlugins(config);
 
   for (const plugin of plugins) {
     if (plugin.dockerComposeFilePath) {

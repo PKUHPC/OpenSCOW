@@ -91,9 +91,10 @@ export const InstallConfigSchema = Type.Object({
     }, { description: "自定义认证系统配置" })),
   }, { default: {} }),
 
-  plugins: Type.Optional(Type.Array(Type.String(), { description: "启用的插件ID列表" })),
-
-  pluginsDir: Type.String({ description: "插件目录", default: "./plugins" }),
+  plugins: Type.Object({
+    enabledPlugins: Type.Optional(Type.Array(Type.String(), { description: "启用的插件列表" })),
+    pluginsDir: Type.String({ description: "插件目录", default: "./plugins" }),
+  }, { default: {} }),
 });
 
 export type InstallConfigSchema = Static<typeof InstallConfigSchema>;

@@ -42,7 +42,9 @@ beforeEach(async () => {
 
 it("should read plugins", async () => {
 
-  const plugins = await readEnabledPlugins(testPluginFolder, ["plugin1", "plugin2"]);
+  const plugins = await readEnabledPlugins({
+    plugins: { pluginsDir: testPluginFolder, enabledPlugins: ["plugin1", "plugin2"]},
+  });
 
   expect(plugins).toEqual([
     { id: "plugin1" },

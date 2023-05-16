@@ -11,6 +11,7 @@
  */
 
 import { existsSync } from "fs";
+import { InstallConfigSchema } from "src/config/install";
 import { logger } from "src/log";
 
 
@@ -34,14 +35,13 @@ const readPlugin = async (pluginsDir: string, id: string): Promise<Plugin | unde
 };
 
 
-export const readEnabledPlugins = async (pluginsDir: string, enabledPlugins?: string[]) => {
+export const readEnabledPlugins = async (installConfig: Pick<InstallConfigSchema, "plugins">) => {
 
   const plugins = [] as Plugin[];
 
-  if (enabledPlugins) {
-    for (const pluginId of enabledPlugins) {
-
-      const plugin = await readPlugin(pluginsDir, pluginId);
+  if (installConfig.plugins.enabledPlugins) {
+    for (const pluginId of installConfig.plugins.enabledPlugins) {
+      const plugin = await readPlugin(installConfig.plugins.pluginsDir, pluginId);
 
       if (plugin) {
         plugins.push(plugin);
