@@ -20,13 +20,21 @@ export const useBuiltinCreateUser = () => {
   );
 };
 
-export const getUserIdRule = () => (
-  useBuiltinCreateUser() && publicConfig.CREATE_USER_CONFIG.misConfig.builtin?.userIdPattern
-) ? {
-    pattern: new RegExp(publicConfig.CREATE_USER_CONFIG.misConfig.builtin.userIdPattern.regex),
-    message: publicConfig.CREATE_USER_CONFIG.misConfig.builtin.userIdPattern.errorMessage,
-  } : undefined;
+export const getUserIdRule = () => {
+  if (!useBuiltinCreateUser()) { return undefined; }
 
+  const pattern = publicConfig.CREATE_USER_CONFIG.misConfig.builtin?.userIdPattern
+    ?? publicConfig.CREATE_USER_CONFIG.misConfig.userIdPattern;
+
+  if (pattern) {
+    return {
+      pattern: new RegExp(pattern.regex),
+      message: pattern.errorMessage,
+    };
+  } else {
+    return undefined;
+  }
+};
 
 export const createUserParams = (token: string) => new URLSearchParams({ type: "createUser", token }).toString();
 export const addUserToAccountParams = (
