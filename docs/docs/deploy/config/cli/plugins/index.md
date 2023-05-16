@@ -9,7 +9,7 @@ title: 插件
 
 您可以通过和cli同级的`plugins`目录编写CLI插件。
 
-每个插件占据一个目录，目录名为插件的ID。例如`plugins/plugin1`，则此插件id为`xscow-agent`。
+每个插件占据一个目录，目录名为插件的ID。例如`plugins/plugin1`，则此插件id为`plugin1`。
 
 当您编写好插件后，您可以通过`install.yml`的`plugins`选项，指定启用的插件。
 
