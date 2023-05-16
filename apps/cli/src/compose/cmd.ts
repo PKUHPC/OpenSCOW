@@ -17,6 +17,7 @@ import { dump } from "js-yaml";
 import { createComposeSpec } from "src/compose";
 import { InstallConfigSchema } from "src/config/install";
 import { logger } from "src/log";
+import { readEnabledPlugins } from "src/plugin";
 
 export function getAvailabelDockerComposeCommand() {
 
@@ -35,7 +36,7 @@ export function getAvailabelDockerComposeCommand() {
   throw new Error("docker compose is not available, please install docker compose first.");
 }
 
-export function runComposeCommand(config: InstallConfigSchema, args: string[]) {
+export async function runComposeCommand(config: InstallConfigSchema, args: string[]) {
 
   const dockerComposeCommand = getAvailabelDockerComposeCommand();
 
@@ -57,10 +58,22 @@ export function runComposeCommand(config: InstallConfigSchema, args: string[]) {
     clean();
   });
 
+  const params = ["-f", filename];
+
+  const plugins = await readEnabledPlugins(config.pluginsDir, config.plugins);
+
+  for (const plugin of plugins) {
+    if (plugin.dockerComposeFilePath) {
+      logger.info("Using docker compose config from %s of plugin %s", plugin.dockerComposeFilePath, plugin.id);
+      params.push("-f", plugin.dockerComposeFilePath);
+    }
+  }
+  params.push(...args);
+
   try {
     spawnSync(
       dockerComposeCommand,
-      ["-f", filename, ...args],
+      params,
       { shell: true, stdio: "inherit" },
     );
   } finally {

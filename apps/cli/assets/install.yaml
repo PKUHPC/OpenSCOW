@@ -107,3 +107,6 @@
 #   # 限制后端服务发出响应的超时时间，默认60s
 #   # 可接受的格式为nginx的proxy_read_timeout可接受的值
 #   proxyReadTimeout: 60s
+
+# 启用的CLI插件
+# plugins: ["plugin1"]
