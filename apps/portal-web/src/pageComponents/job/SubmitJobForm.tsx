@@ -21,8 +21,10 @@ import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { CodeEditor } from "src/components/CodeEditor";
 import { AccountSelector } from "src/pageComponents/job/AccountSelector";
+import { FileSelectModal } from "src/pageComponents/job/FileSelectModal";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { Cluster, publicConfig } from "src/utils/config";
+import { formatSize } from "src/utils/format";
 
 interface JobForm {
   cluster: Cluster;
@@ -45,25 +47,6 @@ interface JobForm {
 // 生成默认工作名称，命名规则为年月日-时分秒，如job-20230510-103010
 const genJobName = (): string => {
   return `job-${dayjs().format("YYYYMMDD-HHmmss")}`;
-};
-
-const formatMemorySize = (size: number): string => {
-  const unitMap = ["MB", "GB", "TB"];
-  const CARRY = 1024;
-
-  let carryCount = 0;
-  let decimalSize = Math.round(size);
-  while (decimalSize > CARRY) {
-    decimalSize = decimalSize / CARRY;
-    carryCount++;
-  }
-  if (decimalSize >= 1000) {
-    decimalSize = decimalSize / CARRY;
-    carryCount++;
-  }
-
-  const fixedNumber = decimalSize < 9.996 ? 2 : (decimalSize < 99.95 ? 1 : 0);
-  return `${decimalSize.toFixed(fixedNumber)} ${unitMap[carryCount]}`;
 };
 
 // 设置节点数，单节点核心数，单节点GPU卡数填入变化config
@@ -202,7 +185,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
     * Math.floor(currentPartitionInfo.mem / currentPartitionInfo.cores) :
       nodeCount * coreCount * Math.floor(currentPartitionInfo.mem / currentPartitionInfo.cores) : 0);
   const memory = memorySize + "MB";
-  const memoryDisplay = formatMemorySize(memorySize);
+  const memoryDisplay = formatSize(memorySize, ["MB", "GB", "TB"]);
 
   const coreCountSum = currentPartitionInfo?.gpus
     ? nodeCount * gpuCount * Math.floor(currentPartitionInfo.cores / currentPartitionInfo.gpus)
@@ -346,7 +329,20 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
         </Col>
         <Col span={24} sm={10}>
           <Form.Item<JobForm> label="工作目录" name="workingDirectory" rules={[{ required: true }]}>
-            <Input addonBefore="~/" />
+            <Input
+              addonBefore="~/"
+              suffix={
+                (
+                  <FileSelectModal
+                    onSubmit={(path: string) => {
+                      form.setFieldValue("workingDirectory", path);
+                      form.validateFields(["workingDirectory"]);
+                    }}
+                    cluster={cluster || defaultCluster}
+                  />
+                )
+              }
+            />
           </Form.Item>
         </Col>
         <Col span={24} sm={7}>
