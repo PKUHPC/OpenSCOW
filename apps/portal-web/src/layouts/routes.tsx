@@ -17,13 +17,13 @@ import {
   DesktopOutlined,
   EyeOutlined,
   FolderOutlined,
-  LinkOutlined,
   Loading3QuartersOutlined,
   MacCommandOutlined,
   PlusCircleOutlined,
   PlusOutlined,
   SaveOutlined } from "@ant-design/icons";
 import { NavItemProps } from "@scow/lib-web/build/layouts/base/types";
+import { IconFont } from "@scow/lib-web/src/layouts/IconFont";
 import { App } from "@scow/protos/build/portal/app";
 import { join } from "path";
 import { User } from "src/stores/UserStore";
@@ -34,6 +34,8 @@ export const userRoutes: (
 ) => NavItemProps[] = (user, defaultCluster, apps) => {
 
   if (!user) { return []; }
+
+  console.log(publicConfig.NAV_LINKS);
 
   return [
     {
@@ -126,19 +128,17 @@ export const userRoutes: (
         clickToPath: `/files/${cluster.id}/~`,
       } as NavItemProps)),
     }] : []),
-    ...(publicConfig.NAV_LINKS.length > 0 ? publicConfig.NAV_LINKS.map((link) => ({
-      // Icon确认
-      Icon: LinkOutlined,
-      text: link.text,
-      path: link.href,
+    ...(publicConfig.NAV_LINKS.length > 0 ? publicConfig.NAV_LINKS.map((navLink) => ({
+      Icon: <IconFont type={navLink.icon} />,
+      text: navLink.text,
+      path: navLink.url,
       clickToPath: `?token=${user.token}`,
       clickable: true,
       openInNewPage: true,
-      children: link.children?.length ? link.children?.map((childLink) => ({
-        // Icon确认
-        Icon: LinkOutlined,
+      children: navLink.children?.length ? navLink.children?.map((childLink) => ({
+        Icon: <IconFont type={childLink.icon} />,
         text: childLink.text,
-        path: childLink.href,
+        path: childLink.url,
         clickToPath: `?token=${user.token}`,
         clickable: true,
         openInNewPage: true,

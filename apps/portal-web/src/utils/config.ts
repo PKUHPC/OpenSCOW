@@ -70,12 +70,21 @@ export interface PublicRuntimeConfig {
   // 上传（请求）文件的大小限制
   CLIENT_MAX_BODY_SIZE: string;
 
-  NAV_LINKS: NavLinks[];
+  NAV_LINKS: NavLink[];
 }
 
 export const runtimeConfig: ServerRuntimeConfig = getConfig().serverRuntimeConfig;
 export const publicConfig: PublicRuntimeConfig = getConfig().publicRuntimeConfig;
 
 export type Cluster = { id: string; name: string; }
-export type NavLinks = { text: string; href: string; children?: [ {text: string; href: string;} ] }
+export type NavLink = {
+  text: string;
+  url: string;
+  icon: string;
+  children?: {
+    text: string;
+    url: string;
+    icon: string;
+  }[]
+}
 

@@ -54,12 +54,25 @@ shell: true
 # TurboVNC的安装路径
 # turboVNCPath: /opt/TurboVNC
 
-# navLinks:
-#     - text: "一级导航"
-#       href: "一级导航链接"
-#       children:
-#       - text: "二级导航"
-#         href: "二级导航链接"
 
-
-
+# 新增导航链接
+# text: 链接名
+# url: 链接地址
+# icon: 链接显示icon，填入antd icon id form https://ant.design/components/icon-cn
+# children: [同样的nav对象，但是不允许再设置children]
+# iconSourceUrl?
+navLinks:
+    - text: "一级导航1"
+      url: "https://hahahaha1.com/"
+      icon: "icon-tuichu"
+      children:
+        - text: "二级导航1"
+          url: "https://hahahaha1.1.com"
+          icon: "icon-facebook"
+        - text: "二级导航2"
+          url: "https://hahahaha1.2.com"
+          icon: "icon-facebook"
+    - text: "一级导航2"
+      url: "https:////hahahaha2.com"
+      icon: "icon-twitter"
+      children: []

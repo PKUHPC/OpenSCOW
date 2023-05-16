@@ -17,6 +17,8 @@ import {
   PlusOutlined, PlusSquareOutlined, StarOutlined, ToolOutlined, UserAddOutlined,
   UserOutlined } from "@ant-design/icons";
 import { NavItemProps } from "@scow/lib-web/build/layouts/base/types";
+// import { IconFont } from "@scow/lib-web/src/layouts/IconFont";
+import { DynamicIcon } from "@scow/lib-web/src/layouts/DynamicIcon";
 import { AccountAffiliation } from "@scow/protos/build/server/user";
 import { PlatformRole, TenantRole, UserRole } from "src/models/User";
 import { User } from "src/stores/UserStore";
@@ -280,10 +282,13 @@ export const accountAdminRoutes: (adminAccounts: AccountAffiliation[]) => NavIte
 
 ];
 
+export const AddedNavLinksRoutes = (navLinkItems: NavItemProps[]): NavItemProps[] => {
+  return navLinkItems;
+};
+
 export const getAvailableRoutes = (user: User | undefined): NavItemProps[] => {
 
   if (!user) { return []; }
-
 
   const routes = [] as NavItemProps[];
 
@@ -302,6 +307,82 @@ export const getAvailableRoutes = (user: User | undefined): NavItemProps[] => {
     routes.push(...platformAdminRoutes(user.platformRoles));
   }
 
+
+  const userCurrentRoleMap = CreateUserCurrentRoleMap(user);
+
+  if (publicConfig.NAV_LINKS.length > 0) {
+
+    const mappedNavLinkItems = publicConfig.NAV_LINKS
+      .filter((link) => !link.allowedRoles?.length
+        || (link.allowedRoles.length && link.allowedRoles.some((role) => userCurrentRoleMap.get(role) === 1)))
+      .map((link) => ({
+        // Icon: <IconFont type={link.icon} />,
+        Icon: <DynamicIcon icon={link.icon} />,
+        text: link.text,
+        path: link.url,
+        clickToPath: `?token=${user.token}`,
+        clickable: true,
+        openInNewPage: true,
+        children: link.children?.filter((childLink) => !childLink.allowedRoles?.length
+          || (childLink.allowedRoles.length &&
+            childLink.allowedRoles.some((role) => userCurrentRoleMap.get(role) === 1)))
+          .map((childLink) => ({
+            // Icon: <IconFont type={childLink.icon} />,
+            Icon: <DynamicIcon icon={link.icon} />,
+            text: childLink.text,
+            path: childLink.url,
+            clickToPath: `?token=${user.token}`,
+            clickable: true,
+            openInNewPage: true,
+          })),
+      }));
+
+    routes.push(...AddedNavLinksRoutes(mappedNavLinkItems));
+  }
+
   return routes;
 };
 
+
+export const CreateUserCurrentRoleMap = (user: User | undefined): Map<string, number> => {
+
+  const roleMap = new Map<string, number>();
+
+  if (!user) { return roleMap; }
+
+  user.accountAffiliations.forEach((afflication) => {
+    switch (afflication.role) {
+    case UserRole.USER:
+      roleMap.set("user", 1);
+      break;
+    case UserRole.ADMIN:
+      roleMap.set("accountAdmin", 1);
+      break;
+    case UserRole.OWNER:
+      roleMap.set("accountOwner", 1);
+      break;
+    default:
+      break;
+    }
+  });
+
+  user.platformRoles.forEach((platformRole) => {
+    if (platformRole === PlatformRole.PLATFORM_ADMIN) {
+      roleMap.set("platformAdmin", 1);
+    }
+    if (platformRole === PlatformRole.PLATFORM_FINANCE) {
+      roleMap.set("platformFinance", 1);
+    }
+  });
+
+  user.tenantRoles.forEach((tenantRole) => {
+    if (tenantRole === TenantRole.TENANT_ADMIN) {
+      roleMap.set("tenantAdmin", 1);
+    }
+    if (tenantRole === TenantRole.TENANT_FINANCE) {
+      roleMap.set("tenantFinance", 1);
+    }
+  });
+
+  return roleMap;
+};

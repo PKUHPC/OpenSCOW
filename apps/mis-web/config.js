@@ -117,6 +117,7 @@ const buildRuntimeConfig = async (phase, basePath) => {
     PASSWORD_PATTERN_MESSAGE: commonConfig.passwordPattern?.errorMessage,
 
     BASE_PATH: basePath,
+    NAV_LINKS: misConfig.navLinks,
   };
 
   if (!building) {

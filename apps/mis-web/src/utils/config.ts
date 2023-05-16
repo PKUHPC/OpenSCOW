@@ -47,10 +47,24 @@ export interface PublicRuntimeConfig {
   PASSWORD_PATTERN_MESSAGE: string | undefined;
 
   PORTAL_URL: string | undefined;
+
+  NAV_LINKS: NavLink[];
 }
 
 export const runtimeConfig: ServerRuntimeConfig = getConfig().serverRuntimeConfig;
 export const publicConfig: PublicRuntimeConfig = getConfig().publicRuntimeConfig;
 
 export type Cluster = { id: string; name: string; }
+export type NavLink = {
+  text: string;
+  url: string;
+  icon: string;
+  allowedRoles?: string[],
+  children?: {
+    text: string;
+    url: string;
+    icon: string;
+    allowedRoles?: string[]
+  }[]
+}
 
