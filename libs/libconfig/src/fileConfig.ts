@@ -152,7 +152,7 @@ export function getDirConfig<T extends TSchema>(
 
       const id = basename(filename, ext);
 
-      if (!(ext in parsers)) {
+      if (!parsers[ext.substring(1)]) {
         logger?.debug("Ignore config file %s with unknown extension name %s", filename, ext);
         continue;
       }
