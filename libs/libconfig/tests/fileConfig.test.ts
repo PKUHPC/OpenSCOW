@@ -11,7 +11,7 @@
  */
 
 import { Static, Type } from "@sinclair/typebox";
-import fs from "fs";
+import fs, { writeFileSync } from "fs";
 import { dump } from "js-yaml";
 import path, { dirname, join } from "path";
 import { ConfigFileNotExistError, ConfigFileSchemaError, getConfigFromFile, getDirConfig } from "src/fileConfig";
@@ -92,6 +92,8 @@ it("reads dir config", async () => {
   createConfig(join(configName, "b"), "json");
   createConfig(join(configName, "b", "config"), "yaml");
   createConfig(join(configName, "b", "config"), "json");
+  // create a invalid file
+  writeFileSync(join(folderPath, configName, "c.c"), "invalid");
 
   const config = getDirConfig(Schema, configName, folderPath);
 

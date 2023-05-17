@@ -148,8 +148,14 @@ export function getDirConfig<T extends TSchema>(
         }
       }
     } else {
+      const ext = extname(filename);
 
-      const id = basename(filename, extname(filename));
+      const id = basename(filename, ext);
+
+      if (!parsers[ext.substring(1)]) {
+        logger?.debug("Ignore config file %s with unknown extension name %s", filename, ext);
+        continue;
+      }
 
       if (id in result) {
         continue;
