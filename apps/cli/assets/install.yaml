@@ -108,5 +108,7 @@
 #   # 可接受的格式为nginx的proxy_read_timeout可接受的值
 #   proxyReadTimeout: 60s
 
-# 启用的CLI插件
-# plugins: ["plugin1"]
+# 插件配置
+# plugins:
+#   # 启用的插件
+#   enabledPlugins: ["plugin1"]
