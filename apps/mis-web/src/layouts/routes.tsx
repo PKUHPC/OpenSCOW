@@ -17,8 +17,7 @@ import {
   PlusOutlined, PlusSquareOutlined, StarOutlined, ToolOutlined, UserAddOutlined,
   UserOutlined } from "@ant-design/icons";
 import { NavItemProps } from "@scow/lib-web/build/layouts/base/types";
-// import { IconFont } from "@scow/lib-web/src/layouts/IconFont";
-import { DynamicIcon } from "@scow/lib-web/src/layouts/DynamicIcon";
+import { IconFont } from "@scow/lib-web/build/layouts/IconFont";
 import { AccountAffiliation } from "@scow/protos/build/server/user";
 import { PlatformRole, TenantRole, UserRole } from "src/models/User";
 import { User } from "src/stores/UserStore";
@@ -310,28 +309,24 @@ export const getAvailableRoutes = (user: User | undefined): NavItemProps[] => {
 
   const userCurrentRoleMap = CreateUserCurrentRoleMap(user);
 
-  if (publicConfig.NAV_LINKS.length > 0) {
+  if (publicConfig.NAV_LINKS && publicConfig.NAV_LINKS.length > 0) {
 
     const mappedNavLinkItems = publicConfig.NAV_LINKS
       .filter((link) => !link.allowedRoles?.length
         || (link.allowedRoles.length && link.allowedRoles.some((role) => userCurrentRoleMap.get(role) === 1)))
       .map((link) => ({
-        // Icon: <IconFont type={link.icon} />,
-        Icon: <DynamicIcon icon={link.icon} />,
+        Icon: <IconFont type={link.icon} scriptUrls={publicConfig.ICON_SCRIPT_URLS} />,
         text: link.text,
-        path: link.url,
-        clickToPath: `?token=${user.token}`,
+        path: `${link.url}?token=${user.token}`,
         clickable: true,
         openInNewPage: true,
         children: link.children?.filter((childLink) => !childLink.allowedRoles?.length
           || (childLink.allowedRoles.length &&
             childLink.allowedRoles.some((role) => userCurrentRoleMap.get(role) === 1)))
           .map((childLink) => ({
-            // Icon: <IconFont type={childLink.icon} />,
-            Icon: <DynamicIcon icon={link.icon} />,
+            Icon: <IconFont type={childLink.icon} scriptUrls={publicConfig.ICON_SCRIPT_URLS} />,
             text: childLink.text,
-            path: childLink.url,
-            clickToPath: `?token=${user.token}`,
+            path: `${childLink.url}?token=${user.token}`,
             clickable: true,
             openInNewPage: true,
           })),

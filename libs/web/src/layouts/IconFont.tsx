@@ -11,12 +11,18 @@
  */
 
 import { createFromIconfontCN } from "@ant-design/icons";
+import React from "react";
 
-export const IconFont = createFromIconfontCN({
-  scriptUrl:  [
-    // "//at.alicdn.com/t/font_1788044_0dwu4guekcwr.js", // icon-javascript, icon-java, icon-shoppingcart (overridden)
-    // "//at.alicdn.com/t/font_1788592_a5xf2bdic3u.js", // icon-shoppingcart, icon-python
-    // "//at.alicdn.com/t/font_8d5l8fzk5b87iudi.js", // icon-social?
-    "//at.alicdb.com/t/font_1684227218238.js",
-  ],
-});
+interface Props {
+  scriptUrls?: string[];
+  type: string;
+}
+
+export const IconFont: React.FC<Props> = ({ scriptUrls, type }) => {
+  const defaultScriptUrl = "//at.alicdn.com/t/c/font_4071713_6zxyzqrl1yb.js"; // Ant Design 3.0 全新线性图标体系
+  const newScriptUrls = scriptUrls && scriptUrls.length > 0 ? scriptUrls : [defaultScriptUrl];
+  const IconFontCN = createFromIconfontCN({
+    scriptUrl: newScriptUrls,
+  });
+  return <IconFontCN type={type} />;
+};

@@ -104,6 +104,33 @@ predefinedChargingTypes:
 
     # 出错时的消息
     # errorMessage: ""
+
+# 新增导航链接相关配置
+# navLinks:
+
+  # 链接名
+  # text: ""
+
+  # 链接地址
+  # url: ""
+
+  # 导航icon,"icon-iconId"形式字符串
+  # icon: ""
+
+  # 可以看到这个链接的用户
+  # 用户类型： user, accountAdmin, accountOwner, tenantFinance, tenantAdmin, tenantOwner, platformAdmin, platformFinance
+  # allowedRoles: []
+
+  # 二级导航
+  # children:
+    # 二级导航相关配置，与一级导航相同，但是不允许再设置children
+    # text: ""
+    # url: ""
+    # icon: ""
+    # allowedRoles: []
+
+# 用户灵活管理 iconfont.cn 图标的脚本地址配置，如果存在则替换默认脚本库地址
+# iconScirptUrls: []
 ```
 
 ## 启动服务

@@ -153,6 +153,7 @@ const buildRuntimeConfig = async (phase, basePath) => {
     CLIENT_MAX_BODY_SIZE: config.CLIENT_MAX_BODY_SIZE,
 
     NAV_LINKS: portalConfig.navLinks,
+    ICON_SCRIPT_URLS: portalConfig.iconScriptUrls,
   };
 
   if (!building && !testenv) {

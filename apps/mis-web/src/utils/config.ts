@@ -48,7 +48,8 @@ export interface PublicRuntimeConfig {
 
   PORTAL_URL: string | undefined;
 
-  NAV_LINKS: NavLink[];
+  NAV_LINKS?: NavLink[];
+  ICON_SCRIPT_URLS?: string[];
 }
 
 export const runtimeConfig: ServerRuntimeConfig = getConfig().serverRuntimeConfig;
@@ -59,12 +60,7 @@ export type NavLink = {
   text: string;
   url: string;
   icon: string;
-  allowedRoles?: string[],
-  children?: {
-    text: string;
-    url: string;
-    icon: string;
-    allowedRoles?: string[]
-  }[]
+  allowedRoles?: string[];
+  children?: Omit<NavLink, "children">[];
 }
 

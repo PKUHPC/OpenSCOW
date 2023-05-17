@@ -81,6 +81,28 @@ shell: true
 
 # TurboVNC的安装路径
 # turboVNCPath: /opt/TurboVNC
+
+# 新增导航链接相关配置
+# navLinks:
+
+  # 链接名
+  # text: ""
+
+  # 链接地址
+  # url: ""
+
+  # 导航icon,"icon-iconId"形式字符p串
+  # icon: ""
+
+  # 二级导航
+  # children:
+    # 二级导航相关配置，与一级导航相同，但是不允许再设置children
+    # text: ""
+    # url: ""
+    # icon: ""
+
+# 用户灵活管理 iconfont.cn 图标的脚本地址配置,如果存在则替换默认脚本库地址
+# iconScirptUrls: []
 ```
 
 ## 更多配置

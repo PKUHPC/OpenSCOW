@@ -23,7 +23,7 @@ import {
   PlusOutlined,
   SaveOutlined } from "@ant-design/icons";
 import { NavItemProps } from "@scow/lib-web/build/layouts/base/types";
-import { IconFont } from "@scow/lib-web/src/layouts/IconFont";
+import { IconFont } from "@scow/lib-web/build/layouts/IconFont";
 import { App } from "@scow/protos/build/portal/app";
 import { join } from "path";
 import { User } from "src/stores/UserStore";
@@ -34,8 +34,6 @@ export const userRoutes: (
 ) => NavItemProps[] = (user, defaultCluster, apps) => {
 
   if (!user) { return []; }
-
-  console.log(publicConfig.NAV_LINKS);
 
   return [
     {
@@ -128,22 +126,21 @@ export const userRoutes: (
         clickToPath: `/files/${cluster.id}/~`,
       } as NavItemProps)),
     }] : []),
-    ...(publicConfig.NAV_LINKS.length > 0 ? publicConfig.NAV_LINKS.map((navLink) => ({
-      Icon: <IconFont type={navLink.icon} />,
-      text: navLink.text,
-      path: navLink.url,
-      clickToPath: `?token=${user.token}`,
-      clickable: true,
-      openInNewPage: true,
-      children: navLink.children?.length ? navLink.children?.map((childLink) => ({
-        Icon: <IconFont type={childLink.icon} />,
-        text: childLink.text,
-        path: childLink.url,
-        clickToPath: `?token=${user.token}`,
+    ...(publicConfig.NAV_LINKS && publicConfig.NAV_LINKS.length > 0
+      ? publicConfig.NAV_LINKS.map((link) => ({
+        Icon: <IconFont type={link.icon} scriptUrls={publicConfig.ICON_SCRIPT_URLS} />,
+        text: link.text,
+        path: `${link.url}?token=${user.token}`,
         clickable: true,
         openInNewPage: true,
-      } as NavItemProps)) : [],
-    }) as NavItemProps) : []),
+        children: link.children?.length ? link.children?.map((childLink) => ({
+          Icon: <IconFont type={childLink.icon} scriptUrls={publicConfig.ICON_SCRIPT_URLS} />,
+          text: childLink.text,
+          path: `${childLink.url}?token=${user.token}`,
+          clickable: true,
+          openInNewPage: true,
+        } as NavItemProps)) : [],
+      }) as NavItemProps) : []),
   ];
 };
 

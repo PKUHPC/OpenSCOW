@@ -56,16 +56,16 @@ export const PortalConfigSchema = Type.Object({
 
   turboVNCPath: Type.String({ description: "TurboVNC的安装路径", default: "/opt/TurboVNC" }),
 
-  navLinks: Type.Array(
+  navLinks: Type.Optional(Type.Array(
     Type.Object({ text: Type.String({ description: "一级导航名称" }), url: Type.String({ description: "一级导航链接" }),
-      icon: Type.String({ description: "一级导航链接显示icon" }), children: Type.Array(
+      icon: Type.String({ description: "一级导航链接显示icon" }), children: Type.Optional(Type.Array(
         Type.Object({ text: Type.String({ description: "二级导航名称" }), url: Type.String({ description: "二级导航链接" }),
           icon: Type.String({ description: "二级导航链接显示icon" }),
-        })),
+        }))),
     }),
-    // { default: [{ text: "", url: "", icon: "", children: []}]},
-    { default: []},
-  ),
+  )),
+
+  iconScriptUrls: Type.Optional(Type.Array(Type.String(), { description: "可以获取icon的仓库脚本地址" })),
 
 });
 
