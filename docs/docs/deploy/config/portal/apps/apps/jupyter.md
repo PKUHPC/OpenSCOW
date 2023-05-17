@@ -36,7 +36,7 @@ web:
     export SALT=123
     export PASSWORD_SHA1="$(echo -n "${PASSWORD}${SALT}" | openssl dgst -sha1 | awk '{print $NF}')"
     export CONFIG_FILE="${PWD}/config.py"
-    export SLURM_COMPUTE_NODE_IP=$(get_ip)
+    export SLURM_COMPUTE_NODE_HOSTNAME=$(hostname)
 
   # 运行任务的脚本。可以使用准备脚本定义的变量
   script: |
@@ -48,7 +48,7 @@ web:
     c.NotebookApp.port_retries = 0
     c.NotebookApp.password = u'sha1:${SALT}:${PASSWORD_SHA1}'
     c.NotebookApp.open_browser = False
-    c.NotebookApp.base_url = "${PROXY_BASE_PATH}/${SLURM_COMPUTE_NODE_IP}/${PORT}/"
+    c.NotebookApp.base_url = "${PROXY_BASE_PATH}/${SLURM_COMPUTE_NODE_HOSTNAME}/${PORT}/"
     c.NotebookApp.allow_origin = '*'
     c.NotebookApp.disable_check_xsrf = True
     EOL
