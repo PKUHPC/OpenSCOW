@@ -1,5 +1,11 @@
 # @scow/lib-web
 
+## 0.3.2
+
+### Patch Changes
+
+- 01e18fa28: 临时解决 Shell 和 VNC 类应用不可用的问题
+
 ## 0.3.1
 
 ### Patch Changes

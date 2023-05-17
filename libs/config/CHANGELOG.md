@@ -1,5 +1,17 @@
 # @scow/config
 
+## 0.3.0
+
+### Minor Changes
+
+- 901ecdb7e: 完全去除 mis.yaml 中 userIdPattern 配置。使 createUser.userIdPattern 过时，修改为使用 createUser.builtin.userIdPattern
+
+### Patch Changes
+
+- d2c8e765e: 优化创建交互式应用页面：在用户家目录下的 apps/app[Id]路径下存入上一次提交记录；创建了查找上一次提交记录的 API 接口，每次创建交互式应用时查找上一次提交记录，如果有则与当前集群下配置对比选择填入相应的值。
+- Updated dependencies [ce077930a]
+  - @scow/lib-config@0.2.2
+
 ## 0.2.0
 
 ### Minor Changes

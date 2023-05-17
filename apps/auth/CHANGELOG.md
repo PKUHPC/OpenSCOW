@@ -1,5 +1,19 @@
 # @scow/auth
 
+## 0.6.0
+
+### Minor Changes
+
+- 6f1c9f24e: 增加了 otp 功能
+
+### Patch Changes
+
+- Updated dependencies [901ecdb7e]
+- Updated dependencies [d2c8e765e]
+- Updated dependencies [ce077930a]
+  - @scow/config@0.3.0
+  - @scow/lib-config@0.2.2
+
 ## 0.5.0
 
 ### Minor Changes
