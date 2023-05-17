@@ -17,7 +17,6 @@ import { executeAsUser } from "@scow/lib-ssh";
 import { DesktopServiceServer, DesktopServiceService } from "@scow/protos/build/portal/desktop";
 import { displayIdToPort } from "src/clusterops/slurm/bl/port";
 import { portalConfig } from "src/config/portal";
-import { dnsResolve } from "src/utils/dns";
 import { clusterNotFound } from "src/utils/errors";
 import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
 import { parseDisplayId, parseListOutput, parseOtp, refreshPassword, VNCSERVER_BIN_PATH } from "src/utils/turbovnc";
@@ -75,7 +74,7 @@ export const desktopServiceServer = plugin((server) => {
 
         const port = displayIdToPort(displayId);
 
-        return [{ host: await dnsResolve(host), password, port }];
+        return [{ host, password, port }];
 
       });
     },
@@ -114,7 +113,7 @@ export const desktopServiceServer = plugin((server) => {
 
         const password = await refreshPassword(ssh, userId, logger, displayId);
 
-        return [{ host: await dnsResolve(host), port: displayIdToPort(displayId), password }];
+        return [{ host, port: displayIdToPort(displayId), password }];
       });
 
     },
