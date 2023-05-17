@@ -12,8 +12,8 @@
 
 import { Form, Input } from "antd";
 import React from "react";
-import { publicConfig } from "src/utils/config";
-import { confirmPasswordFormItemProps, emailRule, passwordRule, userIdRule } from "src/utils/form";
+import { getUserIdRule, useBuiltinCreateUser } from "src/utils/createUser";
+import { confirmPasswordFormItemProps, emailRule, passwordRule } from "src/utils/form";
 export interface CreateUserFormFields {
   identityId: string;
   name: string;
@@ -28,6 +28,8 @@ export const CreateUserForm: React.FC = () => {
 
   const form = Form.useFormInstance<CreateUserFormFields>();
 
+  const userIdRule = getUserIdRule();
+
   return (
     <>
       <Form.Item
@@ -35,11 +37,11 @@ export const CreateUserForm: React.FC = () => {
         name="identityId"
         rules={[
           { required: true },
-          userIdRule,
+          ...userIdRule ? [userIdRule] : [],
         ]}
 
       >
-        <Input placeholder={publicConfig.USERID_PATTERN_MESSAGE} />
+        <Input placeholder={userIdRule?.message} />
       </Form.Item>
       <Form.Item label="用户姓名" name="name" rules={[{ required: true }]}>
         <Input />
@@ -59,7 +61,7 @@ export const CreateUserForm: React.FC = () => {
         <Input.Password placeholder={passwordRule.message} />
       </Form.Item>
       {
-        publicConfig.ENABLE_CREATE_USER ? (
+        useBuiltinCreateUser() ? (
           <>
             <Form.Item
               label="确认密码"

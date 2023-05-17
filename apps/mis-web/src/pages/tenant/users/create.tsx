@@ -20,7 +20,7 @@ import { NotFoundPage } from "src/components/errorPages/NotFoundPage";
 import { PageTitle } from "src/components/PageTitle";
 import { TenantRole } from "src/models/User";
 import { CreateUserForm, CreateUserFormFields } from "src/pageComponents/users/CreateUserForm";
-import { publicConfig } from "src/utils/config";
+import { useBuiltinCreateUser } from "src/utils/createUser";
 import { Head } from "src/utils/head";
 
 const CreateUserPageForm: React.FC = () => {
@@ -109,7 +109,7 @@ const CreateUserPageForm: React.FC = () => {
 export const CreateUserPage: NextPage = requireAuth((i) => i.tenantRoles.includes(TenantRole.TENANT_ADMIN))(
   () => {
 
-    if (!publicConfig.ENABLE_CREATE_USER) {
+    if (!useBuiltinCreateUser()) {
       return <NotFoundPage />;
     }
 

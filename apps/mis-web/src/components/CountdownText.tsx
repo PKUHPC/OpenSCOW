@@ -10,12 +10,24 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { publicConfig } from "src/utils/config";
+import { useEffect, useState } from "react";
 
-export const passwordRule = {
-  pattern: publicConfig.PASSWORD_PATTERN ? new RegExp(publicConfig.PASSWORD_PATTERN) : undefined,
-  message: publicConfig.PASSWORD_PATTERN_MESSAGE,
+interface Props {
+  seconds: number;
+}
+
+export const CountdownText: React.FC<Props> = ({ seconds }) => {
+  const [remaining, setRemaining] = useState(seconds);
+
+  useEffect(() => {
+    if (remaining > 0) {
+      const timeoutId = setTimeout(() => {
+        setRemaining(remaining - 1);
+      }, 1000);
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [remaining]);
+
+  return <>{remaining}</>;
 };
-
-
-export { confirmPasswordFormItemProps, emailRule } from "@scow/lib-web/build/utils/form";
