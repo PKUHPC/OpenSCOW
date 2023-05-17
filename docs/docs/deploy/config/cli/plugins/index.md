@@ -3,7 +3,13 @@ sidebar_position: 8
 title: 插件
 ---
 
-# scow-cli插件
+# CLI插件
+
+:::caution
+
+实验性功能！
+
+:::
 
 ## 编写和配置
 
