@@ -50,10 +50,9 @@ import type { GetRunningJobsSchema } from "src/pages/api/job/getRunningJobs";
 import type { ListJobTemplatesSchema } from "src/pages/api/job/listJobTemplates";
 import type { SubmitJobSchema } from "src/pages/api/job/submitJob";
 import type { ChangePasswordSchema } from "src/pages/api/profile/changePassword";
+import { publicConfig } from "src/utils/config";
 
-
-
-const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
+const basePath = publicConfig.BASE_PATH || "";
 
 
 export const api = {
