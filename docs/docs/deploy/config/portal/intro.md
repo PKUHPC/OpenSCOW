@@ -94,7 +94,7 @@ shell: true
   # 导航icon,"icon-iconId"形式字符p串
   # icon: ""
 
-  # 二级导航
+  # 二级导航,可选填
   # children:
     # 二级导航相关配置，与一级导航相同，但是不允许再设置children
     # text: ""
