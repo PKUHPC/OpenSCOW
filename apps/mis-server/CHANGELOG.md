@@ -1,5 +1,24 @@
 # @scow/mis-server
 
+## 0.6.0
+
+### Minor Changes
+
+- 750a51e84: 修复用户从某些账号中移除但 slurm 并没有删除掉依赖关系从而导致仍然可以在该账号下提交作业的问题
+
+### Patch Changes
+
+- b78e1363f: 账户下的用户列表接口 response 增加 email 字段
+- Updated dependencies [901ecdb7e]
+- Updated dependencies [d2c8e765e]
+- Updated dependencies [ce077930a]
+  - @scow/config@0.3.0
+  - @scow/lib-config@0.2.2
+  - @scow/lib-hook@0.2.1
+  - @scow/lib-server@0.2.0
+  - @scow/protos@0.2.2
+  - @scow/lib-slurm@0.1.4
+
 ## 0.5.0
 
 ### Minor Changes

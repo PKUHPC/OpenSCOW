@@ -1,5 +1,16 @@
 # @scow/grpc-api
 
+## 0.4.0
+
+### Minor Changes
+
+- 8b36bf0bc: ListAppSessions 返回的 AppSession 中，去掉 ready 属性，增加 host 和 port，表示应用监听的主机和端口
+
+### Patch Changes
+
+- d2c8e765e: 优化创建交互式应用页面：在用户家目录下的 apps/app[Id]路径下存入上一次提交记录；创建了查找上一次提交记录的 API 接口，每次创建交互式应用时查找上一次提交记录，如果有则与当前集群下配置对比选择填入相应的值。
+- b78e1363f: 账户下的用户列表接口 response 增加 email 字段
+
 ## 0.3.0
 
 ### Minor Changes

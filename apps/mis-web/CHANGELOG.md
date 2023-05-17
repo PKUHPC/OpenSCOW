@@ -1,5 +1,26 @@
 # @scow/mis-web
 
+## 0.6.0
+
+### Minor Changes
+
+- 901ecdb7e: 支持使用外部页面创建用户
+
+### Patch Changes
+
+- dc51bfde6: 浏览器关闭后，用户登录 cookie 失效
+- 01e18fa28: 临时解决 Shell 和 VNC 类应用不可用的问题
+- ed073f9ac: 管理系统右上角用户名以管理系统数据库为准
+- f5e1d45ab: 管理系统导入账户时, 在没有拥有者的情况下账户拥有者默认选择账户的第一个用户
+- Updated dependencies [901ecdb7e]
+- Updated dependencies [01e18fa28]
+- Updated dependencies [d2c8e765e]
+- Updated dependencies [ce077930a]
+  - @scow/config@0.3.0
+  - @scow/lib-web@0.3.2
+  - @scow/lib-config@0.2.2
+  - @scow/protos@0.2.2
+
 ## 0.5.0
 
 ### Minor Changes
