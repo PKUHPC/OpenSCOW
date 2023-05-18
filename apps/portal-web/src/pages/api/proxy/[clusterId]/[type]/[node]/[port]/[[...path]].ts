@@ -110,6 +110,8 @@ export const setupWssProxy = (res: AugmentedNextApiResponse) => {
       return;
     }
 
+    console.debug("Proxing WS requests to " + target);
+
     proxy.ws(req, socket, head, { target, ignorePath: true, xfwd: true }, (err) => {
       console.error(err, "Error when proxing WS requests to " + target);
       writeError("500 Internal Server Error", "Error when proxing WS requests");
@@ -138,6 +140,8 @@ export default async (req: NextApiRequest, res: AugmentedNextApiResponse) => {
     res.status(400).send(target.message);
     return;
   }
+
+  console.debug("Proxying HTTP request to " + target);
 
   proxy.web(req, res, {
     target,
