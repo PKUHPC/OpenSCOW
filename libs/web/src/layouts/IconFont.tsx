@@ -18,9 +18,11 @@ interface Props {
   type: string;
 }
 
+const DEFAULT_SCRIPT_URL = "//at.alicdn.com/t/c/font_4071713_6zxyzqrl1yb.js"; // Ant Design 3.0 全新线性图标体系
+
 export const IconFont: React.FC<Props> = ({ scriptUrls, type }) => {
-  const defaultScriptUrl = "//at.alicdn.com/t/c/font_4071713_6zxyzqrl1yb.js"; // Ant Design 3.0 全新线性图标体系
-  const newScriptUrls = scriptUrls && scriptUrls.length > 0 ? scriptUrls : [defaultScriptUrl];
+
+  const newScriptUrls = scriptUrls && scriptUrls.length > 0 ? scriptUrls : [DEFAULT_SCRIPT_URL];
   const IconFontCN = createFromIconfontCN({
     scriptUrl: newScriptUrls,
   });

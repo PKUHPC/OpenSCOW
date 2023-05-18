@@ -349,38 +349,16 @@ export const getAvailableRoutes = (user: User | undefined): NavItemProps[] => {
   return routes;
 };
 
-const roles = {
-  user: false,
-  accountAdmin: false,
-  accountOwner: false,
-  tenantAdmin: false,
-  tenantFinance: false,
-  platformAdmin: false,
-  platformFinance: false,
-};
+const getCurrentUserRoles = (user: User) => {
 
-const getCurrentUserRoles = (user: User | undefined): typeof roles => {
+  return {
+    user: user.accountAffiliations.some((affiliation) => affiliation.role === UserRole.USER),
+    accountAdmin: user.accountAffiliations.some((affiliation) => affiliation.role === UserRole.ADMIN),
+    accountOwner: user.accountAffiliations.some((affiliation) => affiliation.role === UserRole.OWNER),
+    platformAdmin: user.platformRoles.includes(PlatformRole.PLATFORM_ADMIN),
+    platformFinance: user.platformRoles.includes(PlatformRole.PLATFORM_FINANCE),
+    tenantAdmin: user.tenantRoles.includes(TenantRole.TENANT_ADMIN),
+    tenantFinance: user.tenantRoles.includes(TenantRole.TENANT_FINANCE),
+  };
 
-  if (!user) { return roles; }
-
-  user.accountAffiliations.forEach((afflication) => {
-
-    roles.user = afflication.role === UserRole.USER ? true : false;
-    roles.accountAdmin = afflication.role === UserRole.ADMIN ? true : false;
-    roles.accountOwner = afflication.role === UserRole.OWNER ? true : false;
-  });
-
-  user.platformRoles.forEach((platformRole) => {
-
-    roles.platformAdmin = platformRole === PlatformRole.PLATFORM_ADMIN ? true : false;
-    roles.platformFinance = platformRole === PlatformRole.PLATFORM_FINANCE ? true : false;
-  });
-
-  user.tenantRoles.forEach((tenantRole) => {
-
-    roles.tenantAdmin = tenantRole === TenantRole.TENANT_ADMIN ? true : false;
-    roles.tenantFinance = tenantRole === TenantRole.TENANT_FINANCE ? true : false;
-  });
-
-  return roles;
 };

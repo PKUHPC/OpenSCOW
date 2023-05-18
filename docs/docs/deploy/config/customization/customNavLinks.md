@@ -10,7 +10,7 @@ title: 自定义导航链接功能
 
 :::note
 
-当您点击导航链接时，我们会在当前链接后面加入查询参数`?token={用来跟踪登录用户的状态的token}`，以此来保证您后续链接的安全验证。
+当您点击导航链接时，我们会在当前链接后面加入查询参数`?token={用来跟踪登录用户的状态的token}`，以此来保证您后续链接的安全验证：您可以通过token查询当前操作用户。
 
 :::
 
@@ -141,9 +141,9 @@ iconfontScriptUrls:
 
 | 角色名称            | 解释                          |
 | ------------------ | ----------------------------- | 
-| `user`             | 在账户中的角色：普通用户        |
-| `accountAdmin`     | 在账户中的角色：账户管理员      |
-| `accountOwner`     | 在账户中的角色：账户管理员      |
+| `user`             | 在所有账户中均为普通用户，或者未加入账户 |
+| `accountAdmin`     | 在某个账户中为账户管理员      |
+| `accountOwner`     | 在某个账户中为账户拥有者     |
 | `tenantAdmin`      | 在租户中的角色：租户管理员      |
 | `tenantFinance`    | 在租户中的角色：租户财务人员    |
 | `platformAdmin`    | 在平台中的角色：平台管理员      |
@@ -160,7 +160,7 @@ iconfontScriptUrls:
 系统支持用户灵活管理自己自定义导航链接的显示图标。
 您可以通过指定当前系统配置下的默认仓库的图标ID来进行图标管理，同时也可以提供自己在[iconfont.cn](https://www.iconfont.cn/)上的项目图标库的脚本地址来自由灵活的配置图标。
 
-#### 1 默认图标仓库
+#### 默认图标仓库
 
 在当前系统配置下，我们使用了**IconFont**组件来进行图标展示。
 我们使用了[iconfont.cn](https://www.iconfont.cn/)上提供的公开免费的[Ant Design 官方图标库](https://www.iconfont.cn/collections/detail?cid=9402)来作为**默认图标库**。您可以通过在其中选择的图标ID来指定图标。
@@ -175,9 +175,9 @@ navLinks:
     icon: "icon-earth"
 ```
 
-#### 2 自定义图标仓库脚本
+#### 自定义图标仓库脚本
 
-在使用默认图标仓库以外，您还可以通过配置`iconfontScriptUrls`来指定自己在[iconfont.cn](https://www.iconfont.cn/)上拥有的项目图标仓库的脚本地址使用自己的上传的图标。
+在使用默认图标仓库以外，您还可以通过配置`iconfontScriptUrls`来指定自己在[iconfont.cn](https://www.iconfont.cn/)上拥有的项目图标仓库的脚本地址，从而使用自己上传的图标。
 我们在系统中使用的**IconFont**组件通过[iconfont.cn](https://www.iconfont.cn/)上项目下生成的symbol代码来实现图标库的选择。
 - 例如您在[iconfont.cn](https://www.iconfont.cn/)上自己的项目下上传了图标，并生成了**symbol代码**，您会得到类似
 `//at.alicdn.com/t/font_1788044_0dwu4guekcwr.js`的js文件代码。
