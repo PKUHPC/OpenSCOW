@@ -111,7 +111,7 @@ export async function blockAccount(
  * @returns Operation result
 **/
 export async function unblockAccount(
-  account: Account, clusterPlugin: ClusterPlugin["clusters"], logger: Logger,
+  account: Loaded<Account, "tenant">, clusterPlugin: ClusterPlugin["clusters"], logger: Logger,
 ): Promise<"OK" | "ALREADY_UNBLOCKED"> {
 
   if (!account.blocked) { return "ALREADY_UNBLOCKED"; }
@@ -128,7 +128,7 @@ export async function unblockAccount(
   });
 
   account.blocked = false;
-  await callHook("accountUnblocked", { accountName: account.accountName }, logger);
+  await callHook("accountUnblocked", { accountName: account.accountName, tenantName: account.tenant.$.name }, logger);
 
   return "OK";
 }
