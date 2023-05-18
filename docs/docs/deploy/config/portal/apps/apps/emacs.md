@@ -1,8 +1,12 @@
 ---
-sidebar_position: 7
+sidebar_position: 3
 ---
 
 # Emacs
+
+## 软件简介
+
+Emacs是一个非常强大的文本编辑器和开发环境，它有一个强大的命令行界面和一系列图形用户界面，它支持多个操作系统，包括Unix、Linux、Windows和macOS。
 
 ## 前提条件
 
@@ -12,11 +16,7 @@ sidebar_position: 7
 
 - 您需要运行的Emacs
 
-### 1、软件介绍
-
-Emacs是一个非常强大的文本编辑器和开发环境，它有一个强大的命令行界面和一系列图形用户界面，它支持多个操作系统，包括Unix、Linux、Windows和macOS。
-
-### 2、TurboVNC安装
+### 1、TurboVNC安装
 
 ```bash
 wget https://turbovnc.org/pmwiki/uploads/Downloads/TurboVNC.repo --no-check-certificate
@@ -25,7 +25,7 @@ mv TurboVNC.repo /etc/yum.repos.d
 yum install turbovnc -y
 ```
 
-### 3、Emacs安装
+### 2、Emacs安装
 
 ```bash
 yum install emacs -y

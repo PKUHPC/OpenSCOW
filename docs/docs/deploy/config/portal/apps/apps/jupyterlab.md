@@ -1,8 +1,12 @@
 ---
-sidebar_position: 9
+sidebar_position: 6
 ---
 
 # JupyterLab
+
+## 软件简介
+
+JupyterLab是Jupyter Notebook的下一代版本，提供了更强大的用户界面和功能，可用于更复杂的工作流程和项目。
 
 ## 前提条件
 
@@ -12,15 +16,30 @@ sidebar_position: 9
 
 JupyterLab是Jupyter Notebook的下一代版本，提供了更强大的用户界面和功能，可用于更复杂的工作流程和项目。
 
-JupyterLab可以通过Anaconda进行安装，Anaconda集成了JupyterLab，安装上Anaconda发行版后也就自动安装上了JupyterLab，安装好Anaconda后如果JupyterLab没有自动安装成功的话，在终端输入以下命令进行安装：
+JupyterLab建议通过[Anaconda进行安装](./jupyter.md)，Anaconda集成了JupyterLab，安装上Anaconda发行版后也就自动安装上了JupyterLab，安装好Anaconda后如果JupyterLab没有自动安装成功的话，在终端输入以下命令进行安装：
 
 ```bash
 conda install jupyterlab
 ```
 
-### 2、Anaconda安装
+JupyterLab运行时依赖的Python环境，建议用户可自行使用conda创建所需的Python环境，并在该环境内安装ipykernel，环境创建好后，用户可以通过两种方式来使用：
 
-请参考Jupyter应用配置中的[Anaconda安装](./jupyter.md)。
+- 在启动JupyterLab应用时，用户可填入所创建的conda环境名来使用该Python环境；
+
+- 在JupyterLab启动后，在Kernel菜单切换到新创建的Python环境。
+
+以下示例创建一个Python3.7的虚拟环境：
+
+```bash
+# 创建一个Python版本为3.7的conda虚拟环境，环境名字为python3.7
+conda create -n python3.7 python=3.7 -y
+# 激活进入到python3.7环境
+conda activate python3.7
+# 在新的环境安装ipykernel
+conda install ipykernel
+# 将新环境的ipykernel到base环境的jupyter中
+python -m ipykernel install --user --name python3.7 --display-name "python3.7"
+```
 
 下面讲解如何配置使用JupyterLab。
 

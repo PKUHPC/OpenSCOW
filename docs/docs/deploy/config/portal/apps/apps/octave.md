@@ -1,8 +1,12 @@
 ---
-sidebar_position: 5
+sidebar_position: 8
 ---
 
 # Octave
+
+## 软件简介
+
+Octave是一种开源的数值计算工具，可用于执行各种数值计算任务，包括线性代数、非线性优化、信号处理、图像处理和统计分析等。
 
 ## 前提条件
 
@@ -12,11 +16,7 @@ sidebar_position: 5
 
 - 您需要运行的Octave
 
-### 1、软件介绍
-
-Octave是一种开源的数值计算工具，可用于执行各种数值计算任务，包括线性代数、非线性优化、信号处理、图像处理和统计分析等。
-
-### 2、TurboVNC安装
+### 1、TurboVNC安装
 
 ```bash
 wget https://turbovnc.org/pmwiki/uploads/Downloads/TurboVNC.repo --no-check-certificate
@@ -25,9 +25,9 @@ mv TurboVNC.repo /etc/yum.repos.d
 yum install turbovnc -y
 ```
 
-### 3、Octave安装
+### 2、Octave安装
 
-- octave可以通过conda进行安装，请参考Jupyter应用配置中的[Anaconda安装](./jupyter.md)。
+- octave可以通过conda进行安装，请参考Jupyter应用配置附章中的[Anaconda安装](./jupyter.md)。
 
 - 创建一个新的conda环境，新环境名称格式使用“软件名-版本号”：
 

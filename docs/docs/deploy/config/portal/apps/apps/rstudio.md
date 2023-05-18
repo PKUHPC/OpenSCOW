@@ -1,18 +1,295 @@
 ---
-sidebar_position: 3
+sidebar_position: 10
 ---
 
 # RStudio
 
-## 前提条件
-
-请确保在需要运行应用的计算节点上安装有Singularity、R和RStudio Server。
-
-### 1、软件介绍
+## 软件简介
 
 RStudio Server是RStudio公司提供的一款基于Web的R开发环境，可以通过Web浏览器远程访问，实现对R编程语言的开发、调试和管理。RStudio Server支持多用户并发访问，具有良好的用户管理和权限控制，支持SSH和HTTPS等安全协议，是企业级和团队协作开发的理想选择。
 
-### 2、Singularity安装
+## 前提条件
+
+请确保在需要运行应用的计算节点上安装有R和RStudio Server。RStudio Server 1.4.1103之前版本，建议下载相应系统的rpm包进行安装，这样相对比较简单。RStudio Server 1.4.1103及之后的版本，为保证和平台的兼容性，建议通过编译后构建Singularity镜像进行安装，这样可以减少跨平台、跨集群的重复编译。
+
+### 1、RStudio Server 1.4.1103之前版本的安装
+
+#### 1.1、R安装
+
+具体安装步骤请参考附章中R的安装。
+
+#### 1.2、RStudio Server安装
+
+```bash
+# 下载rpm包
+wget https://download2.rstudio.org/server/centos6/x86_64/rstudio-server-rhel-1.3.959-x86_64.rpm
+
+# 拷贝只共享存储
+mkdir -p /data/software/rstudio-server/1.3.959
+cp rstudio-server-rhel-1.3.959-x86_64.rpm /data/software/rstudio-server/1.3.959
+cd /data/software/rstudio-server/1.3.959
+
+# 解压安装
+rpm2cpio rstudio-server-rhel-1.3.959-x86_64.rpm | cpio -div
+```
+
+### 2、RStudio Server 1.4.1103及之后版本的安装
+
+#### 2.1、Singularity安装
+
+具体安装步骤请参考附章中Singularity的安装。
+
+#### 2.2、R安装
+
+通过构建Singularity镜像的方式安装RStudio Server，Singularity镜像内无需安装R环境，可直接使用宿主机系统里面的R环境，所以R安装在宿主机系统即可，具体安装步骤请参考附章中R的安装。
+
+### 2.3、构建RStudio Server镜像
+
+具体安装步骤请参考附章中构建RStudio Server镜像。
+
+下面讲解如何配置使用RStudio Server。
+
+## 配置文件
+
+创建`config/apps`目录，在里面创建`rstudio.yml`文件，其内容如下：
+
+### 1、RStudio Server 1.4.1103之前版本
+
+```yaml title="config/apps/rstudio.yml"
+# 这个应用的ID
+id: rstudio
+
+# 这个应用的名字
+name: RStudio
+
+# 指定应用类型为web
+type: web
+
+# Web应用的配置
+web:
+  # 指定反向代理类型
+  proxyType: relative
+  # 准备脚本
+  beforeScript: |
+    export PORT=$(get_port)
+    export PASSWORD=$(get_password 12)
+    export SLURM_COMPUTE_NODE_IP=$(get_ip)
+    export APPURI="${PROXY_BASE_PATH}/${SLURM_COMPUTE_NODE_IP}/${PORT}/"
+    export USER=${USER}
+
+  # 运行任务的脚本。可以使用准备脚本定义的变量
+  script: |
+    setup_env () {
+        # Additional environment which could be moved into a module
+        export RSTUDIO_PASSWORD=${PASSWORD}
+
+        # rstudio的路径
+        export RSTUDIO_HOME=/data/software/rstudio-server/1.3.959/usr/lib/rstudio-server
+        export RSTUDIO_BIN_PATH=${RSTUDIO_HOME}/bin
+        export RSTUDIO_RSERVER=${RSTUDIO_BIN_PATH}/rserver
+        export RSTUDIO_RSESSION=${RSTUDIO_BIN_PATH}/rsession
+
+        export RSTUDIO_AUTH="/data/software/rstudio-server/auth"
+        export RSESSION_WRAPPER_FILE="${PWD}/rsession.sh"
+        export DB_CONF_FILE="${PWD}/database.conf"
+        export WHICHR=/data/software/R/${r_version}/bin/R
+    }
+    setup_env
+
+    (
+    umask 077
+    sed 's/^ \{2\}//' > "${RSESSION_WRAPPER_FILE}" << EOL
+    #!/usr/bin/env bash
+    # Log all output from this script
+    export RSESSION_LOG_FILE="${PWD}/rsession.log"
+    exec &>>"\${RSESSION_LOG_FILE}"
+    # Launch the original command
+    echo "Launching rsession..."
+    set -x
+    exec ${RSTUDIO_RSESSION} --r-libs-user "${R_LIBS_USER}" "\${@}"
+    EOL
+    )
+
+    chmod 700 "${RSESSION_WRAPPER_FILE}"
+    cd "${HOME}"
+    export TMPDIR="$(mktemp -d)"
+    mkdir -p "$TMPDIR/rstudio-server"
+    python -c 'from uuid import uuid4; print(uuid4())' > "$TMPDIR/rstudio-server/secure-cookie-key"
+    chmod 0600 "$TMPDIR/rstudio-server/secure-cookie-key"
+    
+    set -x
+    # Launch the RStudio Server
+    export PATH=/data/software/rstudio-server/1.3.959/usr/lib/rstudio-server/bin:$PATH
+    echo "Starting up rserver..."
+    # RStudio Server 1.4.1103之前版本不需要--database-config-file，之后版本需要增加此配置
+    /data/software/rstudio-server/1.3.959/usr/lib/rstudio-server/bin/rserver \
+      --www-port "${PORT}" \
+      --auth-none 1 \
+      --auth-pam-helper-path "${RSTUDIO_AUTH}" \
+      --auth-encrypt-password 0 \
+      --rsession-path "${RSESSION_WRAPPER_FILE}" \
+      --server-data-dir "${TMPDIR}" \
+      --server-user ${USER} \
+      --secure-cookie-key-file "${TMPDIR}/rstudio-server/secure-cookie-key" \
+      --rsession-which-r ${WHICHR}
+      
+      echo 'Singularity as exited...'
+
+  # 如何连接应用
+  connect:
+    method: POST
+    path: /auth-do-sign-in
+    formData:
+      password: "{{ PASSWORD }}"
+      username: "{{ USER }}"
+      appUri: "{{ APPURI }}"
+      
+# 配置HTML表单   
+attributes:
+  - type: select
+    name: r_version
+    label: 请选择R版本
+    select:
+      - value: R-3.6.0
+        label: 3.6.0
+      - value: R-4.2.3
+        label: 4.2.3
+  - type: text
+    name: sbatchOptions
+    label: 其他sbatch参数
+    required: false
+    placeholder: "比如：--gpus gres:2 --time 10"
+```
+
+### 2、RStudio Server 1.4.1103及之后版本
+
+```yaml title="config/apps/rstudio.yml"
+# 这个应用的ID
+id: rstudio
+
+# 这个应用的名字
+name: RStudio
+
+# 指定应用类型为web
+type: web
+
+# Web应用的配置
+web:
+  # 指定反向代理类型
+  proxyType: relative
+  # 准备脚本
+  beforeScript: |
+    export PORT=$(get_port)
+    export PASSWORD=$(get_password 12)
+    export SLURM_COMPUTE_NODE_IP=$(get_ip)
+    export APPURI="${PROXY_BASE_PATH}/${SLURM_COMPUTE_NODE_IP}/${PORT}/"
+    export USER=${USER}
+    export SINGULARITY_VERSION="singularity/3.9.2"
+
+  # 运行任务的脚本。可以使用准备脚本定义的变量
+  script: |
+    setup_env () {
+        # Additional environment which could be moved into a module
+        export RSTUDIO_PASSWORD=${PASSWORD}
+        # Change these to suit
+        export RSTUDIO_SERVER_IMAGE="/data/software/rstudio-server/rstudio.sif"
+
+        # 容器中rstudio的路径
+        export RSTUDIO_HOME=/usr/lib/rstudio-server
+        export RSTUDIO_BIN_PATH=${RSTUDIO_HOME}/bin
+        export RSTUDIO_RSERVER=${RSTUDIO_BIN_PATH}/rserver
+        export RSTUDIO_RSESSION=${RSTUDIO_BIN_PATH}/rsession
+
+        export RSTUDIO_AUTH="/data/software/rstudio-server/auth"
+        export RSESSION_WRAPPER_FILE="${PWD}/rsession.sh"
+        export DB_CONF_FILE="${PWD}/database.conf"
+        export WHICHR=/data/software/R/${r_version}/bin/R
+    }
+    setup_env
+    module switch ${SINGULARITY_VERSION}
+    (
+    umask 077
+    sed 's/^ \{2\}//' > "${RSESSION_WRAPPER_FILE}" << EOL
+    #!/usr/bin/env bash
+    # Log all output from this script
+    export RSESSION_LOG_FILE="${PWD}/rsession.log"
+    exec &>>"\${RSESSION_LOG_FILE}"
+    # Launch the original command
+    echo "Launching rsession..."
+    set -x
+    exec ${RSTUDIO_RSESSION} --r-libs-user "${R_LIBS_USER}" "\${@}"
+    EOL
+    )
+
+    chmod 700 "${RSESSION_WRAPPER_FILE}"
+    cd "${HOME}"
+    export TMPDIR="$(mktemp -d)"
+    mkdir -p "$TMPDIR/rstudio-server"
+    python -c 'from uuid import uuid4; print(uuid4())' > "$TMPDIR/rstudio-server/secure-cookie-key"
+    chmod 0600 "$TMPDIR/rstudio-server/secure-cookie-key"
+
+    (
+    umask 177
+    cat > "${DB_CONF_FILE}" << EOL
+    provider=sqlite
+    directory=${HOME}/.local/share/rstudio/database
+    EOL
+    )
+    
+    set -x
+    # Launch the RStudio Server
+    echo "Starting up rserver..."
+    # RStudio Server 1.4.1103之前版本不需要--database-config-file，之后版本需要增加此配置
+    singularity run -B "/tmp:/tmp","/data:/data" "$RSTUDIO_SERVER_IMAGE" ${RSTUDIO_RSERVER} \
+      --www-port "${PORT}" \
+      --auth-none 1 \
+      --auth-pam-helper-path "${RSTUDIO_AUTH}" \
+      --auth-encrypt-password 0 \
+      --rsession-path "${RSESSION_WRAPPER_FILE}" \
+      --server-data-dir "${TMPDIR}" \
+      --server-user ${USER} \
+      --secure-cookie-key-file "${TMPDIR}/rstudio-server/secure-cookie-key" \
+      --database-config-file "${DB_CONF_FILE}" \
+      --rsession-which-r ${WHICHR}
+      
+      echo 'Singularity as exited...'
+
+  # 如何连接应用
+  connect:
+    method: POST
+    path: /auth-do-sign-in
+    formData:
+      password: "{{ PASSWORD }}"
+      username: "{{ USER }}"
+      appUri: "{{ APPURI }}"
+      
+# 配置HTML表单   
+attributes:
+  - type: select
+    name: r_version
+    label: 请选择R版本
+    select:
+      - value: R-3.6.0
+        label: 3.6.0
+      - value: R-4.2.3
+        label: 4.2.3
+  - type: text
+    name: sbatchOptions
+    label: 其他sbatch参数
+    required: false
+    placeholder: "比如：--gpus gres:2 --time 10"
+```
+
+增加了此文件后，刷新WEB浏览器即可。
+
+对于RStudio，export以下变量的含义是：
+
+- `SLURM_COMPUTE_NODE_IP`: 计算节点的IP地址
+- `SINGULARITY_VERSION`：Singularity版本
+
+## 附章
+
+### 1、Singularity安装
 
 Singularity用于构建和运行RStudio Server容器镜像，建议安装在共享存储上，集群各节点只需要挂载上共享存储，并配置好环境变量后便可以使用。
 
@@ -89,7 +366,7 @@ Singularity用于构建和运行RStudio Server容器镜像，建议安装在共�
     EOF
     ```
 
-### 3、R安装
+### 2、R安装
 
 - 安装R的依赖包:
 
@@ -130,7 +407,7 @@ Singularity用于构建和运行RStudio Server容器镜像，建议安装在共�
     EOF
     ```
 
-### 4、构建RStudio Server镜像
+### 3、构建RStudio Server镜像
 
 - 下载RStudio Server源码包进行编译打包：
 
@@ -155,7 +432,7 @@ Singularity用于构建和运行RStudio Server容器镜像，建议安装在共�
     # 以下脚本首先构建编译rstudio server所需环境的docker容器，然后在容器内进行rstudio server编译，编译完成后会在源码包路径的package目录下生成rstudio server的rpm包
     # 执行过程如果遇到git克隆包克隆不下来的情况，可以在执行的shell环境添加代理或者修改代码中的克隆地址
     sh docker/docker-compile.sh centos7 server 2023.03.0-386
-    # 可以看到目录下有rstudio-server-rhel-2023.03.0-386-x86_64-relwithdebinfo.rpm包
+    # 可以看到目录下有编译好的rstudio-server-rhel-2023.03.0-386-x86_64-relwithdebinfo.rpm包
     ls package
     ```
 
@@ -192,133 +469,3 @@ Singularity用于构建和运行RStudio Server容器镜像，建议安装在共�
     ```bash
     cp rstudio.sif /data/software/rstudio-server/
     ```
-
-下面讲解如何配置使用RStudio Server。
-
-## 配置文件
-
-创建`config/apps`目录，在里面创建`rstudio.yml`文件，其内容如下：
-
-```yaml title="config/apps/rstudio.yml"
-# 这个应用的ID
-id: rstudio
-
-# 这个应用的名字
-name: RStudio
-
-# 指定应用类型为web
-type: web
-
-# Web应用的配置
-web:
-  # 指定反向代理类型
-  proxyType: relative
-  # 准备脚本
-  beforeScript: |
-    export PORT=$(get_port)
-    export PASSWORD=$(get_password 12)
-    export SLURM_COMPUTE_NODE_IP=$(get_ip)
-    export APPURI="${PROXY_BASE_PATH}/${SLURM_COMPUTE_NODE_IP}/${PORT}/"
-    export USER=${USER}
-
-  # 运行任务的脚本。可以使用准备脚本定义的变量
-  script: |
-    setup_env () {
-        # Additional environment which could be moved into a module
-        export SINGULARITY_VERSION="singularity/3.9.2"
-        module switch ${SINGULARITY_VERSION}
-
-        export RSTUDIO_PASSWORD=${PASSWORD}
-        # Change these to suit
-        export RSTUDIO_SERVER_IMAGE="/data/software/rstudio-server/rstudio.sif"
-
-        # 容器中rstudio的路径
-        export RSTUDIO_HOME=/usr/lib/rstudio-server
-        export RSTUDIO_BIN_PATH=${RSTUDIO_HOME}/bin
-        export RSTUDIO_RSERVER=${RSTUDIO_BIN_PATH}/rserver
-        export RSTUDIO_RSESSION=${RSTUDIO_BIN_PATH}/rsession
-
-        export RSTUDIO_AUTH="/data/software/rstudio-server/auth"
-        export RSESSION_WRAPPER_FILE="${PWD}/rsession.sh"
-        export DB_CONF_FILE="${PWD}/database.conf"
-        export WHICHR=/data/software/R/${r_version}/bin/R
-    }
-    setup_env
-    
-    (
-    umask 077
-    sed 's/^ \{2\}//' > "${RSESSION_WRAPPER_FILE}" << EOL
-    #!/usr/bin/env bash
-    # Log all output from this script
-    export RSESSION_LOG_FILE="${PWD}/rsession.log"
-    exec &>>"\${RSESSION_LOG_FILE}"
-    # Launch the original command
-    echo "Launching rsession..."
-    set -x
-    exec ${RSTUDIO_RSESSION} --r-libs-user "${R_LIBS_USER}" "\${@}"
-    EOL
-    )
-
-    chmod 700 "${RSESSION_WRAPPER_FILE}"
-    cd "${HOME}"
-    export TMPDIR="$(mktemp -d)"
-    mkdir -p "$TMPDIR/rstudio-server"
-    python -c 'from uuid import uuid4; print(uuid4())' > "$TMPDIR/rstudio-server/secure-cookie-key"
-    chmod 0600 "$TMPDIR/rstudio-server/secure-cookie-key"
-
-    (
-    umask 177
-    cat > "${DB_CONF_FILE}" << EOL
-    provider=sqlite
-    directory=${HOME}/.local/share/rstudio/database
-    EOL
-    )
-    
-    set -x
-    # Launch the RStudio Server
-    echo "Starting up rserver..."
-    singularity run -B "/tmp:/tmp","/data:/data" "$RSTUDIO_SERVER_IMAGE" ${RSTUDIO_RSERVER} \
-      --www-port "${PORT}" \
-      --auth-none 1 \
-      --auth-pam-helper-path "${RSTUDIO_AUTH}" \
-      --auth-encrypt-password 0 \
-      --rsession-path "${RSESSION_WRAPPER_FILE}" \
-      --server-data-dir "${TMPDIR}" \
-      --server-user ${USER} \
-      --secure-cookie-key-file "${TMPDIR}/rstudio-server/secure-cookie-key" \
-      --database-config-file "${DB_CONF_FILE}" \
-      --rsession-which-r ${WHICHR}
-      
-      echo 'Singularity as exited...'
-
-  # 如何连接应用
-  connect:
-    method: POST
-    path: /auth-do-sign-in
-    formData:
-      password: "{{ PASSWORD }}"
-      username: "{{ USER }}"
-      appUri: "{{ APPURI }}"
-      
-# 配置HTML表单   
-attributes:
-  - type: select
-    name: r_version
-    label: 请选择R版本
-    select:
-      - value: R-3.6.0
-        label: 3.6.0
-      - value: R-4.2.3
-        label: 4.2.3
-  - type: text
-    name: sbatchOptions
-    label: 其他sbatch参数
-    required: false
-    placeholder: "比如：--gpus gres:2 --time 10"
-```
-
-增加了此文件后，刷新WEB浏览器即可。
-
-对于RStudio，export以下变量的含义是：
-
-- `SLURM_COMPUTE_NODE_IP`: 计算节点的IP地址

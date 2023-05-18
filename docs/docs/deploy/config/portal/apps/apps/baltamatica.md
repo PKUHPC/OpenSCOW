@@ -1,8 +1,12 @@
 ---
-sidebar_position: 6
+sidebar_position: 1
 ---
 
 # Baltamatica
+
+## 软件简介
+
+北太天元（Baltamatica）是面向科学计算与工程计算的国产通用型科学计算软件。本软件提供科学计算、可视化、交互式程序设计，具备强大的底层数学函数库，支持数值计算、数据分析、数据可视化、 数据优化、算法开发等工作，并通过SDK与API接口，扩展支持各类学科与行业场景，为各领域科学家与工程师提供优质、可靠的科学计算环境。
 
 ## 前提条件
 
@@ -12,11 +16,7 @@ sidebar_position: 6
 
 - 您需要运行的Baltamatica
 
-### 1、软件介绍
-
-北太天元（Baltamatica）是面向科学计算与工程计算的国产通用型科学计算软件。本软件提供科学计算、可视化、交互式程序设计，具备强大的底层数学函数库，支持数值计算、数据分析、数据可视化、 数据优化、算法开发等工作，并通过SDK与API接口，扩展支持各类学科与行业场景，为各领域科学家与工程师提供优质、可靠的科学计算环境。
-
-### 2、TurboVNC安装
+### 1、TurboVNC安装
 
 ```bash
 wget https://turbovnc.org/pmwiki/uploads/Downloads/TurboVNC.repo --no-check-certificate
@@ -25,9 +25,9 @@ mv TurboVNC.repo /etc/yum.repos.d
 yum install turbovnc -y
 ```
 
-### 3、构建Baltamatica镜像
+### 2、构建Baltamatica镜像
 
-构建Singularity镜像需要先安装Singularity软件，具体安装步骤请参考RStudio应用配置中的[Singularity安装](./rstudio.md)。
+构建Singularity镜像需要先安装Singularity软件，具体安装步骤请参考RStudio应用配置附章中的[Singularity安装](./rstudio.md)。
 
 - 创建容器并进行北太天元安装
 

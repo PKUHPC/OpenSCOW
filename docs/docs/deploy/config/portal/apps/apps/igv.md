@@ -4,6 +4,10 @@ sidebar_position: 4
 
 # IGV
 
+## 软件简介
+
+IGV (Integrative Genomics Viewer) 是一个功能强大的基因组数据分析工具，被广泛应用于生物医学研究和生物信息学领域。它支持多种数据类型，包括基因组序列、注释、比对、变异和表达等数据。
+
 ## 前提条件
 
 请确保在需要运行桌面类应用的机器上安装有：
@@ -14,11 +18,7 @@ sidebar_position: 4
 
 - 您需要运行的IGV
 
-### 1、软件介绍
-
-IGV (Integrative Genomics Viewer) 是一个功能强大的基因组数据分析工具，被广泛应用于生物医学研究和生物信息学领域。它支持多种数据类型，包括基因组序列、注释、比对、变异和表达等数据。
-
-### 2、TurboVNC安装
+### 1、TurboVNC安装
 
 ```bash
 wget https://turbovnc.org/pmwiki/uploads/Downloads/TurboVNC.repo --no-check-certificate
@@ -27,28 +27,23 @@ mv TurboVNC.repo /etc/yum.repos.d
 yum install turbovnc -y
 ```
 
-### 3、Java安装
+### 2、Java安装
 
 ```bash
 yum install java-1.8.0-openjdk
 ```
 
-#### 4、IGV安装
+#### 3、IGV安装
 
-- 下载软件包：
+```bash
+# 下载软件包
+wget https://data.broadinstitute.org/igv/projects/downloads/2.16/IGV_Linux_2.16.1_WithJava.zip
+# 解压软件包到指定安装路径
+mkdir /data/software/igv
+unzip IGV_Linux_2.16.1_WithJava.zip -d /data/software/igv/
+```
 
-    ```bash
-    wget https://data.broadinstitute.org/igv/projects/downloads/2.16/IGV_Linux_2.16.1_WithJava.zip
-    ```
-
-- 解压软件包到指定路径：
-
-    ```bash
-    mkdir /data/software/igv
-    unzip IGV_Linux_2.16.1_WithJava.zip -d /data/software/igv/
-    ```
-
-### 5、添加modulefile文件
+### 4、添加modulefile文件
 
 配置已安装好的IGV的modulefile文件:
 
