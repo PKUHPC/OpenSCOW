@@ -26,8 +26,12 @@ export async function insertInitialData(em: SqlEntityManager) {
     tenantRoles: [TenantRole.TENANT_ADMIN]});
   const userB = new User({ name: "BName", userId: "b", email: "b@b.com", tenant });
 
-  const accountA = new Account({ accountName: "hpca", comment: "", blocked: false, tenant });
-  const accountB = new Account({ accountName: "hpcb", comment: "", blocked: false, tenant });
+  const accountA = new Account({
+    accountName: "hpca", comment: "", blocked: false, tenant,
+  }) as Loaded<Account, "tenant">;
+  const accountB = new Account({
+    accountName: "hpcb", comment: "", blocked: false, tenant,
+  }) as Loaded<Account, "tenant">;
 
   const uaAA = new UserAccount({
     account: accountA,

@@ -74,7 +74,7 @@ export async function pay(
 }
 
 type ChargeRequest = {
-  target: Account | Tenant;
+  target: Loaded<Account, "tenant"> | Tenant;
   amount: Decimal;
   comment: string;
   type: string;

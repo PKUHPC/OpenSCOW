@@ -19,12 +19,11 @@ import "google/protobuf/timestamp.proto";
 
 message AccountBlocked {
   string account_name = 1;
-  uint32 tenant_id = 2;
+  string tenant_name = 2;
 }
 
 message AccountUnblocked {
   string account_name = 1;
-  uint32 tenant_id = 2;
 }
 
 message AccountCreated {

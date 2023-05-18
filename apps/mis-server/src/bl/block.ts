@@ -77,7 +77,7 @@ export async function updateBlockStatusInSlurm(
  * @returns Operation result
 **/
 export async function blockAccount(
-  account: Account, clusterPlugin: ClusterPlugin["clusters"], logger: Logger,
+  account: Loaded<Account, "tenant">, clusterPlugin: ClusterPlugin["clusters"], logger: Logger,
 ): Promise<"AlreadyBlocked" | "Whitelisted" | "OK"> {
 
   if (account.blocked) { return "AlreadyBlocked"; }
@@ -98,7 +98,7 @@ export async function blockAccount(
 
   account.blocked = true;
 
-  await callHook("accountBlocked", { accountName: account.accountName, tenantId: account.tenant.id }, logger);
+  await callHook("accountBlocked", { accountName: account.accountName, tenantName: account.tenant.$.name }, logger);
 
   return "OK";
 }
@@ -128,7 +128,7 @@ export async function unblockAccount(
   });
 
   account.blocked = false;
-  await callHook("accountUnblocked", { accountName: account.accountName, tenantId: account.tenant.id }, logger);
+  await callHook("accountUnblocked", { accountName: account.accountName }, logger);
 
   return "OK";
 }
