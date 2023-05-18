@@ -50,7 +50,7 @@ export interface PublicRuntimeConfig {
   PORTAL_URL: string | undefined;
 
   NAV_LINKS?: NavLink[];
-  ICON_SCRIPT_URLS?: string[];
+  ICONFONT_SCRIPT_URLS?: string[];
 }
 
 export const runtimeConfig: ServerRuntimeConfig = getConfig().serverRuntimeConfig;

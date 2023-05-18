@@ -102,7 +102,7 @@ shell: true
     # icon: ""
 
 # 用户灵活管理 iconfont.cn 图标的脚本地址配置,如果存在则替换默认脚本库地址
-# iconScirptUrls: []
+# iconfontScirptUrls: []
 ```
 
 ## 更多配置

@@ -291,7 +291,7 @@ export const accountAdminRoutes: (adminAccounts: AccountAffiliation[]) => NavIte
 
 ];
 
-export const AddedNavLinksRoutes = (navLinkItems: NavItemProps[]): NavItemProps[] => {
+export const customNavLinkRoutes = (navLinkItems: NavItemProps[]): NavItemProps[] => {
   return navLinkItems;
 };
 
@@ -316,25 +316,26 @@ export const getAvailableRoutes = (user: User | undefined): NavItemProps[] => {
     routes.push(...platformAdminRoutes(user.platformRoles));
   }
 
+  // 获取当前用户角色
+  const userCurrentRoles = getCurrentUserRoles(user);
 
-  const userCurrentRoleMap = CreateUserCurrentRoleMap(user);
-
+  // 根据配置文件判断是否增加导航链接
   if (publicConfig.NAV_LINKS && publicConfig.NAV_LINKS.length > 0) {
 
     const mappedNavLinkItems = publicConfig.NAV_LINKS
       .filter((link) => !link.allowedRoles?.length
-        || (link.allowedRoles.length && link.allowedRoles.some((role) => userCurrentRoleMap.get(role) === 1)))
+        || (link.allowedRoles.length && link.allowedRoles.some((role) => userCurrentRoles[role])))
       .map((link) => ({
-        Icon: <IconFont type={link.icon} scriptUrls={publicConfig.ICON_SCRIPT_URLS} />,
+        Icon: <IconFont type={link.icon} scriptUrls={publicConfig.ICONFONT_SCRIPT_URLS} />,
         text: link.text,
         path: `${link.url}?token=${user.token}`,
         clickable: true,
         openInNewPage: true,
         children: link.children?.filter((childLink) => !childLink.allowedRoles?.length
           || (childLink.allowedRoles.length &&
-            childLink.allowedRoles.some((role) => userCurrentRoleMap.get(role) === 1)))
+            childLink.allowedRoles.some((role) => userCurrentRoles[role])))
           .map((childLink) => ({
-            Icon: <IconFont type={childLink.icon} scriptUrls={publicConfig.ICON_SCRIPT_URLS} />,
+            Icon: <IconFont type={childLink.icon} scriptUrls={publicConfig.ICONFONT_SCRIPT_URLS} />,
             text: childLink.text,
             path: `${childLink.url}?token=${user.token}`,
             clickable: true,
@@ -342,52 +343,44 @@ export const getAvailableRoutes = (user: User | undefined): NavItemProps[] => {
           })),
       }));
 
-    routes.push(...AddedNavLinksRoutes(mappedNavLinkItems));
+    routes.push(...customNavLinkRoutes(mappedNavLinkItems));
   }
 
   return routes;
 };
 
+const roles = {
+  user: false,
+  accountAdmin: false,
+  accountOwner: false,
+  tenantAdmin: false,
+  tenantFinance: false,
+  platformAdmin: false,
+  platformFinance: false,
+};
 
-export const CreateUserCurrentRoleMap = (user: User | undefined): Map<string, number> => {
+const getCurrentUserRoles = (user: User | undefined): typeof roles => {
 
-  const roleMap = new Map<string, number>();
-
-  if (!user) { return roleMap; }
+  if (!user) { return roles; }
 
   user.accountAffiliations.forEach((afflication) => {
-    switch (afflication.role) {
-    case UserRole.USER:
-      roleMap.set("user", 1);
-      break;
-    case UserRole.ADMIN:
-      roleMap.set("accountAdmin", 1);
-      break;
-    case UserRole.OWNER:
-      roleMap.set("accountOwner", 1);
-      break;
-    default:
-      break;
-    }
+
+    roles.user = afflication.role === UserRole.USER ? true : false;
+    roles.accountAdmin = afflication.role === UserRole.ADMIN ? true : false;
+    roles.accountOwner = afflication.role === UserRole.OWNER ? true : false;
   });
 
   user.platformRoles.forEach((platformRole) => {
-    if (platformRole === PlatformRole.PLATFORM_ADMIN) {
-      roleMap.set("platformAdmin", 1);
-    }
-    if (platformRole === PlatformRole.PLATFORM_FINANCE) {
-      roleMap.set("platformFinance", 1);
-    }
+
+    roles.platformAdmin = platformRole === PlatformRole.PLATFORM_ADMIN ? true : false;
+    roles.platformFinance = platformRole === PlatformRole.PLATFORM_FINANCE ? true : false;
   });
 
   user.tenantRoles.forEach((tenantRole) => {
-    if (tenantRole === TenantRole.TENANT_ADMIN) {
-      roleMap.set("tenantAdmin", 1);
-    }
-    if (tenantRole === TenantRole.TENANT_FINANCE) {
-      roleMap.set("tenantFinance", 1);
-    }
+
+    roles.tenantAdmin = tenantRole === TenantRole.TENANT_ADMIN ? true : false;
+    roles.tenantFinance = tenantRole === TenantRole.TENANT_FINANCE ? true : false;
   });
 
-  return roleMap;
+  return roles;
 };

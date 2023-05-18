@@ -71,7 +71,7 @@ export interface PublicRuntimeConfig {
   CLIENT_MAX_BODY_SIZE: string;
 
   NAV_LINKS?: NavLink[];
-  ICON_SCRIPT_URLS?: string[];
+  ICONFONT_SCRIPT_URLS?: string[];
 }
 
 export const runtimeConfig: ServerRuntimeConfig = getConfig().serverRuntimeConfig;

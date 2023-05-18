@@ -118,7 +118,7 @@ predefinedChargingTypes:
   # icon: ""
 
   # 可以看到这个链接的用户,可选填
-  # 用户类型： user, accountAdmin, accountOwner, tenantFinance, tenantAdmin, tenantOwner, platformAdmin, platformFinance
+  # 用户类型： user, accountAdmin, accountOwner, tenantFinance, tenantAdmin, platformAdmin, platformFinance
   # allowedRoles: []
 
   # 二级导航,可选填
@@ -130,7 +130,7 @@ predefinedChargingTypes:
     # allowedRoles: []
 
 # 用户灵活管理 iconfont.cn 图标的脚本地址配置，如果存在则替换默认脚本库地址
-# iconScirptUrls: []
+# iconfontScirptUrls: []
 ```
 
 ## 启动服务

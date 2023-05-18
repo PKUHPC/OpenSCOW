@@ -128,13 +128,13 @@ export const userRoutes: (
     }] : []),
     ...(publicConfig.NAV_LINKS && publicConfig.NAV_LINKS.length > 0
       ? publicConfig.NAV_LINKS.map((link) => ({
-        Icon: <IconFont type={link.icon} scriptUrls={publicConfig.ICON_SCRIPT_URLS} />,
+        Icon: <IconFont type={link.icon} scriptUrls={publicConfig.ICONFONT_SCRIPT_URLS} />,
         text: link.text,
         path: `${link.url}?token=${user.token}`,
         clickable: true,
         openInNewPage: true,
         children: link.children?.length ? link.children?.map((childLink) => ({
-          Icon: <IconFont type={childLink.icon} scriptUrls={publicConfig.ICON_SCRIPT_URLS} />,
+          Icon: <IconFont type={childLink.icon} scriptUrls={publicConfig.ICONFONT_SCRIPT_URLS} />,
           text: childLink.text,
           path: `${childLink.url}?token=${user.token}`,
           clickable: true,

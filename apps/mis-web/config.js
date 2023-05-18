@@ -130,7 +130,7 @@ const buildRuntimeConfig = async (phase, basePath) => {
     BASE_PATH: basePath,
 
     NAV_LINKS: misConfig.navLinks,
-    ICON_SCRIPT_URLS: misConfig.iconScriptUrls,
+    ICONFONT_SCRIPT_URLS: misConfig.iconfontScriptUrls,
   };
 
   if (!building) {

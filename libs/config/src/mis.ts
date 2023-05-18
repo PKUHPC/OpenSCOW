@@ -121,7 +121,7 @@ export const MisConfigSchema = Type.Object({
     })),
   ),
 
-  iconScriptUrls: Type.Optional(Type.Array(Type.String(), { description: "可以获取icon的仓库脚本地址" })),
+  iconfontScriptUrls: Type.Optional(Type.Array(Type.String(), { description: "可以获取icon的仓库脚本地址" })),
 });
 
 const MIS_CONFIG_NAME = "mis";
