@@ -20,9 +20,12 @@ interface Options {
   outputPath: string;
 }
 
-const EXAMPLE_INSTALL_CONFIG = join(__dirname, "../../assets/install.yaml");
-const EXAMPLE_CONFIG_PATH = join(__dirname, "../../assets/config");
-const EXAMPLE_FLUENT_CONFIG_PATH = join(__dirname, "../../assets/fluent");
+const initAssets = [
+  join(__dirname, "../../assets/install.yaml"),
+  join(__dirname, "../../assets/config"),
+  join(__dirname, "../../assets/fluent"),
+  join(__dirname, "../../assets/plugins"),
+];
 
 // fs.promise.cp throws error for config dir
 async function copyWithWarning(src: string, dest: string) {
@@ -64,9 +67,9 @@ export const init = async (options: Options) => {
 
   logger.info("Output path is %s. ", fullPath);
 
-  await copyWithWarning(EXAMPLE_INSTALL_CONFIG, fullPath);
-  await copyWithWarning(EXAMPLE_CONFIG_PATH, fullPath);
-  await copyWithWarning(EXAMPLE_FLUENT_CONFIG_PATH, fullPath);
+  for (const asset of initAssets) {
+    await copyWithWarning(asset, fullPath);
+  }
 
   logger.info("File initialization complete");
 };

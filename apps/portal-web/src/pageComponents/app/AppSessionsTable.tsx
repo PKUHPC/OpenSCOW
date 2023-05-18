@@ -17,7 +17,7 @@ import { queryToString } from "@scow/lib-web/build/utils/querystring";
 import type { AppSession } from "@scow/protos/build/portal/app";
 import { App, Button, Checkbox, Form, Popconfirm, Space, Table, TableColumnsType, Tooltip } from "antd";
 import type { CheckboxChangeEvent } from "antd/es/checkbox";
-import Router, { useRouter } from "next/router";
+import { useRouter } from "next/router";
 import { join } from "path";
 import React, { useCallback, useEffect, useState } from "react";
 import { useAsync } from "react-async";
@@ -48,6 +48,8 @@ export const AppSessionsTable: React.FC<Props> = () => {
 
   const cluster = publicConfig.CLUSTERS.find((x) => x.id === clusterQuery) ?? defaultClusterStore.cluster;
 
+  const [connectivityRefreshToken, setConnectivityRefreshToken] = useState(false);
+
   const { data, isLoading, reload } = useAsync({
     promiseFn: useCallback(async () => {
       // List all desktop
@@ -55,7 +57,7 @@ export const AppSessionsTable: React.FC<Props> = () => {
 
       return sessions.map((x) => ({
         ...x,
-        remainingTime: x.ready ? calculateAppRemainingTime(x.runningTime, x.timeLimit) : x.timeLimit,
+        remainingTime: x.state === "RUNNING" ? calculateAppRemainingTime(x.runningTime, x.timeLimit) : x.timeLimit,
       }));
 
     }, [cluster]),
@@ -115,11 +117,12 @@ export const AppSessionsTable: React.FC<Props> = () => {
       render: (_, record) => (
         <Space>
           {
-            (record.ready) ? (
+            (record.state === "RUNNING") ? (
               <>
                 <ConnectTopAppLink
                   session={record}
                   cluster={cluster}
+                  refreshToken={connectivityRefreshToken}
                 />
                 <Popconfirm
                   title="确定结束这个任务吗？"
@@ -159,7 +162,7 @@ export const AppSessionsTable: React.FC<Props> = () => {
             ) : undefined
           }
           <a onClick={() => {
-            Router.push(join("/files", cluster.id, record.dataPath));
+            router.push(join("/files", cluster.id, record.dataPath));
           }}
           >
             进入目录
@@ -172,6 +175,11 @@ export const AppSessionsTable: React.FC<Props> = () => {
   const [checked, setChecked] = useState(true);
   const [disabled] = useState(false);
 
+  const reloadTable = useCallback(() => {
+    reload();
+    setConnectivityRefreshToken((f) => !f);
+  }, [reload, setConnectivityRefreshToken]);
+
   const onChange = (e: CheckboxChangeEvent) => {
     setChecked(e.target.checked);
   };
@@ -179,7 +187,7 @@ export const AppSessionsTable: React.FC<Props> = () => {
   useEffect(() => {
     if (checked) {
       const interval = setInterval(() => {
-        reload();
+        reloadTable();
       }, 10000);
       return () => clearInterval(interval);
     }
@@ -217,7 +225,7 @@ export const AppSessionsTable: React.FC<Props> = () => {
         dataSource={data}
         columns={columns}
         rowKey={(record) => record.sessionId}
-        loading={isLoading}
+        loading={!data && isLoading}
       />
     </div>
   );

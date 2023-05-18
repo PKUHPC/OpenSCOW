@@ -234,6 +234,22 @@ export const appServiceServer = plugin((server) => {
       return [{ apps: Object.keys(apps).map((x) => ({ id: x, name: apps[x].name })) }];
     },
 
+    getAppLastSubmission: async ({ request, logger }) => {
+
+      const { userId, cluster, appId } = request;
+      const clusterops = getClusterOps(cluster);
+
+      if (!clusterops) { throw clusterNotFound(cluster); }
+
+      const reply = await clusterops.app.getAppLastSubmission({
+        userId, appId,
+      }, logger);
+
+      return [{
+        lastSubmissionInfo: reply.lastSubmissionInfo,
+      }];
+    },
+
   });
 
 });

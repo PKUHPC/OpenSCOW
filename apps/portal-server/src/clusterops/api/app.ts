@@ -46,11 +46,12 @@ export interface AppSession {
   submitTime: Date;
   appId: string;
   state: string;
-  ready: boolean;
   dataPath: string;
   runningTime: string;
   timeLimit: string;
   reason?: string;
+  host: string | undefined;
+  port: number | undefined;
 }
 
 export interface GetAppSessionsReply {
@@ -60,6 +61,29 @@ export interface GetAppSessionsReply {
 export interface ConnectToAppRequest {
   userId: string;
   sessionId: string;
+}
+
+export interface SubmissionInfo {
+  userId: string;
+  cluster: string;
+  appId: string;
+  appName: string;
+  account: string;
+  partition?: string;
+  qos?: string;
+  coreCount: number;
+  maxTime: number;
+  submitTime?: string;
+  customAttributes: { [key: string]: string };
+}
+
+export interface GetAppLastSubmissionRequest {
+  userId: string;
+  appId: string;
+}
+
+export type GetAppLastSubmissionReply = {
+  lastSubmissionInfo?: SubmissionInfo;
 }
 
 export type ConnectToAppReply =
@@ -77,4 +101,5 @@ export interface AppOps {
   createApp(req: CreateAppRequest, logger: Logger): Promise<CreateAppReply>;
   listAppSessions(req: GetAppSessionsRequest, logger: Logger): Promise<GetAppSessionsReply>;
   connectToApp(req: ConnectToAppRequest, logger: Logger): Promise<ConnectToAppReply>;
+  getAppLastSubmission(req: GetAppLastSubmissionRequest, logger: Logger): Promise<GetAppLastSubmissionReply>;
 }

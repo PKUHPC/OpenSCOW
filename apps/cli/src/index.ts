@@ -130,8 +130,8 @@ yargs(hideBin(process.argv))
   })
   .command("compose", "Run  arbitrary compose commands", (y) => {
     return y.strict(false).parserConfiguration({ "unknown-options-as-args": true });
-  }, (argv) => {
-    runCompose(argv);
+  }, async (argv) => {
+    await runCompose(argv);
   })
   .command("migrate", "Migrate from scow-deployment", (y) => {
     return y.options({

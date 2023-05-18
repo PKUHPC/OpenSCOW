@@ -22,6 +22,7 @@ import { AccountAffiliation } from "@scow/protos/build/server/user";
 import { PlatformRole, TenantRole, UserRole } from "src/models/User";
 import { User } from "src/stores/UserStore";
 import { publicConfig } from "src/utils/config";
+import { createUserParams, useBuiltinCreateUser } from "src/utils/createUser";
 
 export const platformAdminRoutes: (platformRoles: PlatformRole[]) => NavItemProps[] = (platformRoles) => [
   {
@@ -95,7 +96,7 @@ export const platformAdminRoutes: (platformRoles: PlatformRole[]) => NavItemProp
   },
 ];
 
-export const tenantRoutes: (tenantRoles: TenantRole[]) => NavItemProps[] = (tenantRoles) => [
+export const tenantRoutes: (tenantRoles: TenantRole[], token: string) => NavItemProps[] = (tenantRoles, token) => [
   {
     Icon: CloudServerOutlined,
     text: "租户管理",
@@ -134,11 +135,20 @@ export const tenantRoutes: (tenantRoles: TenantRole[]) => NavItemProps[] = (tena
               text: "用户列表",
               path: "/tenant/users/list",
             },
-            ...(publicConfig.ENABLE_CREATE_USER ? [{
+            ...(useBuiltinCreateUser() ? [{
               Icon: UserAddOutlined,
               text: "创建用户",
               path: "/tenant/users/create",
             }] : []),
+            ...((
+              publicConfig.CREATE_USER_CONFIG.misConfig.enabled &&
+              publicConfig.CREATE_USER_CONFIG.misConfig.type === "external"
+            ) ? [{
+                Icon: UserAddOutlined,
+                text: "创建用户",
+                path: publicConfig.CREATE_USER_CONFIG.misConfig.external!.url + "?" + createUserParams(token),
+                openInNewPage: true,
+              }] : []),
           ],
         },
         // {
@@ -299,7 +309,7 @@ export const getAvailableRoutes = (user: User | undefined): NavItemProps[] => {
   }
 
   if (user.tenantRoles.length !== 0) {
-    routes.push(...tenantRoutes(user.tenantRoles));
+    routes.push(...tenantRoutes(user.tenantRoles, user.token));
   }
 
   if (user.platformRoles.length !== 0) {

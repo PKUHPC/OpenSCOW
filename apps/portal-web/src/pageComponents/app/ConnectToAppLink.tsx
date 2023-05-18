@@ -14,21 +14,32 @@ import { parsePlaceholder } from "@scow/lib-config/build/parse";
 import type { AppSession } from "@scow/protos/build/portal/app";
 import { App } from "antd";
 import { join } from "path";
+import { useCallback } from "react";
+import { useAsync } from "react-async";
 import { api } from "src/apis";
-import { ClickableA } from "src/components/ClickableA";
+import { DisabledA } from "src/components/DisabledA";
 import { Cluster, publicConfig } from "src/utils/config";
 import { openDesktop } from "src/utils/vnc";
 
 export interface Props {
   cluster: Cluster;
   session: AppSession;
+  refreshToken: boolean;
 }
 
 export const ConnectTopAppLink: React.FC<Props> = ({
-  session, cluster,
+  session, cluster, refreshToken,
 }) => {
 
   const { message } = App.useApp();
+
+  const checkConnectivityPromiseFn = useCallback(async () => {
+    if (!session.host || !session.port) { return false; }
+    return api.checkAppConnectivity({ query: { cluster: cluster.id, host: session.host, port: session.port } })
+      .then((x) => x.ok);
+  }, [session.host, session.port, cluster.id]);
+
+  const { data } = useAsync({ promiseFn: checkConnectivityPromiseFn, watch: refreshToken });
 
   const onClick = async () => {
     const reply = await api.connectToApp({ body: { cluster: cluster.id, sessionId: session.sessionId } })
@@ -84,7 +95,7 @@ export const ConnectTopAppLink: React.FC<Props> = ({
   };
 
   return (
-    <ClickableA onClick={onClick}>连接</ClickableA>
+    <DisabledA disabled={!data} onClick={onClick} message="应用还未准备好">连接</DisabledA>
   );
 
 
