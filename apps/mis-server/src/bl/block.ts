@@ -98,7 +98,7 @@ export async function blockAccount(
 
   account.blocked = true;
 
-  await callHook("accountBlocked", { accountName: account.accountName }, logger);
+  await callHook("accountBlocked", { accountName: account.accountName, tenantId: account.tenant.id }, logger);
 
   return "OK";
 }
@@ -128,7 +128,7 @@ export async function unblockAccount(
   });
 
   account.blocked = false;
-  await callHook("accountUnblocked", { accountName: account.accountName }, logger);
+  await callHook("accountUnblocked", { accountName: account.accountName, tenantId: account.tenant.id }, logger);
 
   return "OK";
 }
