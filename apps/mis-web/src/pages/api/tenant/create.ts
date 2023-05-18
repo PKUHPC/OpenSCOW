@@ -17,25 +17,48 @@ import { TenantServiceClient } from "@scow/protos/build/server/tenant";
 import { authenticate } from "src/auth/server";
 import { PlatformRole } from "src/models/User";
 import { getClient } from "src/utils/client";
+import { publicConfig } from "src/utils/config";
+import { getUserIdRule } from "src/utils/createUser";
 import { handlegRPCError } from "src/utils/server";
 export interface CreateTenantSchema {
   method: "POST";
 
   body: {
-    name: string;
+    tenantName: string;
+    userId: string,
+    userName: string,
+    userEmail: string,
+    userPassword: string,
   }
 
     responses: {
-      204: null;
+      200: {
+        createdInAuth: boolean;
+      };
+
+      400: {
+        code: "PASSWORD_NOT_VALID" | "USERID_NOT_VALID";
+        message: string | undefined;
+      }
 
     /** 租户已经存在 */
-      409: null;
+      409: {
+        code: "TENANT_ALREADY_EXISTS" | "USER_ALREADY_EXISTS",
+        message: string;
+      };
+
+      500: null;
   }
 }
 
+const passwordPattern = publicConfig.PASSWORD_PATTERN && new RegExp(publicConfig.PASSWORD_PATTERN);
+
 export default /* #__PURE__*/route<CreateTenantSchema>("CreateTenantSchema", async (req, res) => {
 
-  const { name } = req.body;
+  const { tenantName, userId, userName, userEmail, userPassword } = req.body;
+
+  const userIdRule = getUserIdRule();
+
   const auth = authenticate((u) =>
     u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN));
 
@@ -43,14 +66,35 @@ export default /* #__PURE__*/route<CreateTenantSchema>("CreateTenantSchema", asy
 
   if (!info) { return; }
 
+  if (userIdRule && !userIdRule.pattern.test(userId)) {
+    return { 400: { code: "USERID_NOT_VALID", message: userIdRule.message } };
+  }
+
+  if (passwordPattern && !passwordPattern.test(userPassword)) {
+    return { 400: { code: "PASSWORD_NOT_VALID", message: publicConfig.PASSWORD_PATTERN_MESSAGE } };
+  }
+
   // create tenant on server
   const client = getClient(TenantServiceClient);
 
   return await asyncClientCall(client, "createTenant", {
-    name: name,
+    tenantName: tenantName,
+    userId: userId,
+    userName: userName,
+    userEmail: userEmail,
+    userPassword: userPassword,
   })
-    .then(() => ({ 204: null }))
+    .then((res) => ({ 200: { createdInAuth: res.createdInAuth } }))
     .catch(handlegRPCError({
-      [status.ALREADY_EXISTS]: () => ({ 409: null }),
+      [status.ALREADY_EXISTS]: (e) => {
+        return {
+          409: e.details === "TENANT_ALREADY_EXISTS"
+            ? {
+              code: "TENANT_ALREADY_EXISTS" as const,
+              message: `Tenant with tenantName ${tenantName} already exists`,
+            }
+            : { code: "USER_ALREADY_EXISTS" as const, message: `User with userId ${userId} already exists` },
+        };
+      },
     }));
 });

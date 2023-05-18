@@ -58,9 +58,21 @@ message GetAllTenantsResponse {
 }
 
 message CreateTenantRequest {
-  string name=1;
+  string tenant_name=1;
+  string user_id = 2;
+  string user_name = 3;
+  string user_email = 4;
+  string user_password = 5;
 }
+
+// ALREADY_EXISTS: tenant or user already exists
 message CreateTenantResponse {
+  // The id of the new tenant
+  uint32 tenant_id = 1;
+  // The id of the new tenant's admin user
+  uint32 user_id = 2;
+  bool created_in_auth = 3;
+
 }
 
 service TenantService {

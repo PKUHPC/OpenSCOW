@@ -37,9 +37,22 @@ export const platformAdminRoutes: (platformRoles: PlatformRole[]) => NavItemProp
           path: "/admin/importUsers",
         },
         {
-          Icon: UserOutlined,
-          text: "平台租户列表",
+          Icon: CloudServerOutlined,
+          text: "平台租户管理",
           path: "/admin/tenants",
+          clickToPath: "/admin/tenants/list",
+          children: [
+            {
+              Icon: CloudServerOutlined,
+              text: "平台租户列表",
+              path: "/admin/tenants/list",
+            },
+            {
+              Icon: PlusOutlined,
+              text: "创建租户",
+              path: "/admin/tenants/create",
+            },
+          ],
         },
         {
           Icon: UserOutlined,
