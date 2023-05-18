@@ -31,7 +31,7 @@ mv TurboVNC.repo /etc/yum.repos.d
 yum install turbovnc -y
 ```
 
-### 3、Xfce安装
+### 3、桌面环境安装
 
 ```bash
 yum groupinstall "Xfce" -y
