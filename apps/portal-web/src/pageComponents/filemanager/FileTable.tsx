@@ -74,11 +74,7 @@ export const FileTable: React.FC<Props> = (
         ? a.name.localeCompare(b.name)
         : a.type.localeCompare(b.type),
       sortDirections: ["ascend", "descend"],
-      render: (name: string, file: FileInfo) => (
-        <span title={name} className={`file-type-${file.type}`}>
-          {name}
-        </span>
-      ),
+      render: fileNameRender,
     },
     {
       key: "mtime",
