@@ -13,6 +13,7 @@
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Server } from "@ddadaal/tsgrpc-server";
 import { ChannelCredentials } from "@grpc/grpc-js";
+import { Loaded } from "@mikro-orm/core";
 import { SqlEntityManager } from "@mikro-orm/mysql";
 import { Decimal } from "@scow/lib-decimal";
 import { AccountServiceClient } from "@scow/protos/build/server/account";
@@ -28,7 +29,7 @@ let server: Server;
 let em: SqlEntityManager;
 let client: AccountServiceClient;
 let data: InitialData;
-let a: Account;
+let a: Loaded<Account, "tenant">;
 
 beforeEach(async () => {
   server = await createServer();
