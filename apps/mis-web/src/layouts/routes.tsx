@@ -43,7 +43,7 @@ export const platformAdminRoutes: (platformRoles: PlatformRole[]) => NavItemProp
           clickToPath: "/admin/tenants/list",
           children: [
             {
-              Icon: CloudServerOutlined,
+              Icon: UserOutlined,
               text: "平台租户列表",
               path: "/admin/tenants/list",
             },
