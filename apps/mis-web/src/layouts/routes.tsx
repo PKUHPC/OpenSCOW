@@ -323,7 +323,7 @@ export const getAvailableRoutes = (user: User | undefined): NavItemProps[] => {
   if (publicConfig.NAV_LINKS && publicConfig.NAV_LINKS.length > 0) {
 
     const mappedNavLinkItems = publicConfig.NAV_LINKS
-      .filter((link) => !link.allowedRoles?.length
+      .filter((link) => !link.allowedRoles
         || (link.allowedRoles.length && link.allowedRoles.some((role) => userCurrentRoles[role])))
       .map((link) => ({
         Icon: <IconFont type={link.icon} scriptUrls={publicConfig.ICONFONT_SCRIPT_URLS} />,
@@ -331,7 +331,7 @@ export const getAvailableRoutes = (user: User | undefined): NavItemProps[] => {
         path: `${link.url}?token=${user.token}`,
         clickable: true,
         openInNewPage: true,
-        children: link.children?.filter((childLink) => !childLink.allowedRoles?.length
+        children: link.children?.filter((childLink) => !childLink.allowedRoles
           || (childLink.allowedRoles.length &&
             childLink.allowedRoles.some((role) => userCurrentRoles[role])))
           .map((childLink) => ({
@@ -352,7 +352,8 @@ export const getAvailableRoutes = (user: User | undefined): NavItemProps[] => {
 const getCurrentUserRoles = (user: User) => {
 
   return {
-    user: user.accountAffiliations.some((affiliation) => affiliation.role === UserRole.USER),
+    user: user.accountAffiliations.length === 0,
+    accountUser: user.accountAffiliations.every((affiliation) => affiliation.role === UserRole.USER),
     accountAdmin: user.accountAffiliations.some((affiliation) => affiliation.role === UserRole.ADMIN),
     accountOwner: user.accountAffiliations.some((affiliation) => affiliation.role === UserRole.OWNER),
     platformAdmin: user.platformRoles.includes(PlatformRole.PLATFORM_ADMIN),
