@@ -162,7 +162,7 @@ export const ImportUsersTable: React.FC = () => {
                 ? selectedAccounts?.includes(r)
                   ? (
                     <Select
-                      defaultValue={r.owner}
+                      defaultValue={r.owner || r.users[0]?.userId}
                       options={r.users.map((user) => ({ value: user.userId, label: user.userId }))}
                       style={{ width: "100%" }}
                       placeholder={"请选择一个拥有者"}

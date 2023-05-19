@@ -22,3 +22,8 @@ clusters:
       dbPassword: password
       associationTableName: user_association
       scriptPath: /test/slurm.sh
+
+createUser:
+  type: external
+  external:
+    url: http://localhost:12312

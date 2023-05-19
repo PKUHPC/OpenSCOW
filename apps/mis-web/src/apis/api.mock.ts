@@ -331,6 +331,7 @@ export const mockApi: MockApi<typeof api> = {
     results: [
       {
         name: "123",
+        email: "123@123.com",
         status: UserStatus.BLOCKED,
         storageQuotas: {},
         userId: "123456",
@@ -340,6 +341,7 @@ export const mockApi: MockApi<typeof api> = {
       },
       {
         name: "1234",
+        email: "1234@123.com",
         status: UserStatus.UNBLOCKED,
         userId: "123456",
         role: UserRole.OWNER,

@@ -18,12 +18,11 @@ import { randomUUID } from "crypto";
 import fs from "fs";
 import { join } from "path";
 import { quote } from "shell-quote";
-import { AppOps, AppSession } from "src/clusterops/api/app";
+import { AppOps, AppSession, SubmissionInfo } from "src/clusterops/api/app";
 import { displayIdToPort } from "src/clusterops/slurm/bl/port";
 import { getAppConfigs } from "src/config/apps";
 import { portalConfig } from "src/config/portal";
 import { splitSbatchArgs } from "src/utils/app";
-import { isPortReachable } from "src/utils/isPortReachable";
 import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
 import { parseDisplayId, refreshPassword, VNCSERVER_BIN_PATH } from "src/utils/turbovnc";
 
@@ -55,6 +54,8 @@ const SESSION_METADATA_NAME = "session.json";
 const SERVER_SESSION_INFO = "server_session_info.json";
 const VNC_SESSION_INFO = "VNC_SESSION_INFO";
 
+const APP_LAST_SUBMISSION_INFO = "last_submission.json";
+
 export const slurmAppOps = (cluster: string): AppOps => {
 
   const host = getClusterLoginNode(cluster);
@@ -82,10 +83,14 @@ export const slurmAppOps = (cluster: string): AppOps => {
 
       const workingDirectory = join(portalConfig.appJobsDir, jobName);
 
+      const lastSubmissionDirectory = join(portalConfig.appLastSubmissionDir, appId);
+
       return await sshConnect(host, userId, logger, async (ssh) => {
 
         // make sure workingDirectory exists.
         await ssh.mkdir(workingDirectory);
+        // make sure lastSubmissionDirectory exists.
+        await ssh.mkdir(lastSubmissionDirectory);
 
         const sftp = await ssh.requestSFTP();
 
@@ -117,6 +122,25 @@ export const slurmAppOps = (cluster: string): AppOps => {
           };
 
           await sftpWriteFile(sftp)(join(workingDirectory, SESSION_METADATA_NAME), JSON.stringify(metadata));
+
+          // write a last_submission session
+          const lastSubmissionInfo: SubmissionInfo = {
+            userId,
+            cluster,
+            appId,
+            appName: apps[appId].name,
+            account: request.account,
+            partition: request.partition,
+            qos: request.qos,
+            coreCount: request.coreCount,
+            maxTime: request.maxTime,
+            submitTime: new Date().toISOString(),
+            customAttributes: request.customAttributes,
+          };
+
+          await sftpWriteFile(sftp)(join(lastSubmissionDirectory, APP_LAST_SUBMISSION_INFO),
+            JSON.stringify(lastSubmissionInfo));
+
           return { code: "OK", jobId, sessionId: metadata.sessionId } as const;
         };
 
@@ -191,6 +215,22 @@ export const slurmAppOps = (cluster: string): AppOps => {
       });
     },
 
+    getAppLastSubmission: async (requset, logger) => {
+      const { userId, appId } = requset;
+
+      return await sshConnect(host, userId, logger, async (ssh) => {
+
+        const sftp = await ssh.requestSFTP();
+        const file = join(portalConfig.appLastSubmissionDir, appId, APP_LAST_SUBMISSION_INFO);
+
+        if (!await sftpExists(sftp, file)) { return { lastSubmissionInfo: undefined }; }
+        const content = await sftpReadFile(sftp)(file);
+        const data = JSON.parse(content.toString()) as SubmissionInfo;
+
+        return { lastSubmissionInfo: data };
+      });
+    },
+
     listAppSessions: async (request, logger) => {
       const apps = getAppConfigs();
 
@@ -233,7 +273,8 @@ export const slurmAppOps = (cluster: string): AppOps => {
 
           const app = apps[sessionMetadata.appId];
 
-          let ready = false;
+          let host: string | undefined = undefined;
+          let port: number | undefined = undefined;
 
           // judge whether the app is ready
           if (runningJobInfo && runningJobInfo.state === "RUNNING") {
@@ -244,34 +285,23 @@ export const slurmAppOps = (cluster: string): AppOps => {
               if (await sftpExists(sftp, infoFilePath)) {
                 const content = await sftpReadFile(sftp)(infoFilePath);
                 const serverSessionInfo = JSON.parse(content.toString()) as ServerSessionInfoData;
-                const { HOST, PORT } = serverSessionInfo;
 
-                ready = await isPortReachable(PORT, HOST);
-                if (ready) {
-                  logger.info(`${HOST}:${PORT} for web app ${app.name} is reachable.`);
-                } else {
-                  logger.info(`${HOST}:${PORT} for web app ${app.name} is not reachable.`);
-                }
+                host = serverSessionInfo.HOST;
+                port = serverSessionInfo.PORT;
               }
             } else {
             // for vnc apps,
             // try to find the output file and try to parse the display number
               const vncSessionInfoPath = join(jobDir, VNC_SESSION_INFO);
               if (await sftpExists(sftp, vncSessionInfoPath)) {
-                const host = (await sftpReadFile(sftp)(vncSessionInfoPath)).toString().trim();
+                host = (await sftpReadFile(sftp)(vncSessionInfoPath)).toString().trim();
 
                 const outputFilePath = join(jobDir, VNC_OUTPUT_FILE);
                 if (await sftpExists(sftp, outputFilePath)) {
                   const content = (await sftpReadFile(sftp)(outputFilePath)).toString();
                   try {
                     const displayId = parseDisplayId(content);
-                    const port = displayIdToPort(displayId!);
-                    ready = await isPortReachable(port, host);
-                    if (ready) {
-                      logger.info(`${host}:{port} for vnc app ${app.name} is reachable.`);
-                    } else {
-                      logger.info(`${host}:{port} for vnc app ${app.name} is not reachable.`);
-                    }
+                    port = displayIdToPort(displayId!);
                   } catch {
                   // ignored if displayId cannot be parsed
                   }
@@ -291,11 +321,12 @@ export const slurmAppOps = (cluster: string): AppOps => {
             sessionId: sessionMetadata.sessionId,
             submitTime: new Date(sessionMetadata.submitTime),
             state: runningJobInfo?.state ?? "ENDED",
-            ready,
             dataPath: await sftpRealPath(sftp)(jobDir),
             runningTime: runningJobInfo?.runningTime ?? "",
             timeLimit: runningJobInfo?.timeLimit ?? "",
             reason: isPendingOrTerminated ? (runningJobInfo?.nodesOrReason ?? "") : undefined,
+            host,
+            port,
           });
 
         }));

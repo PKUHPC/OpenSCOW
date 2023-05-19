@@ -42,13 +42,24 @@ predefinedChargingTypes:
 # 创建用户相关配置
 # createUser:
 
-  # 当认证系统允许创建用户时，是否启用SCOW中创建用户的配置
+  # 是否允许用户从SCOW中创建用户
   # enabled: true
 
-  # 创建用户时，用户ID的规则
-  # userIdPattern:
-    # 正则表达式
-    # regex: ""
+  # SCOW中创建用户界面是使用内置的（builtin）或者使用外置页面（external）
+  # 默认builtin
+  # type: builtin
 
-    # 出错时的消息
-    # errorMessage: ""
+  # 内置创建用户界面配置
+  # builtin:
+    # 用户ID的格式
+    # userIdPattern:
+      # 正则表达式
+      # regex: ""
+
+      # 出错时的消息
+      # errorMessage: ""
+
+  # 外置页面配置
+  # external:
+    # 外置页面URL
+    # url: http://your-create-user-page.com

@@ -60,12 +60,13 @@ message GetAccountUsersRequest {
 message AccountUserInfo {
   string user_id = 1;
   string name = 2;
-  UserStatus status = 3;
-  UserRole role = 4;
+  string email = 3;
+  UserStatus status = 4;
+  UserRole role = 5;
   // cluster and quota
-  map<string, uint64> storage_quotas = 5;
-  optional common.Money job_charge_limit = 6;
-  optional common.Money used_job_charge_limit = 7;
+  map<string, uint64> storage_quotas = 6;
+  optional common.Money job_charge_limit = 7;
+  optional common.Money used_job_charge_limit = 8;
 }
 
 message GetAccountUsersResponse {

@@ -14,9 +14,10 @@ import { PlusOutlined } from "@ant-design/icons";
 import { App, Button, Form, Input, Modal } from "antd";
 import React, { useState } from "react";
 import { api } from "src/apis";
+import { CountdownText } from "src/components/CountdownText";
 import { CreateUserModal } from "src/pageComponents/users/CreateUserModal";
 import { publicConfig } from "src/utils/config";
-import { userIdRule } from "src/utils/form";
+import { addUserToAccountParams, getUserIdRule, useBuiltinCreateUser } from "src/utils/createUser";
 
 
 interface FormProps {
@@ -38,6 +39,8 @@ const NewUserModal: React.FC<ModalProps> = ({
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm<FormProps>();
 
+  const userIdRule = getUserIdRule();
+
   return (
     <Modal
       title="添加用户"
@@ -56,10 +59,10 @@ const NewUserModal: React.FC<ModalProps> = ({
           label="用户ID"
           rules={[
             { required: true },
-            userIdRule,
+            ...userIdRule ? [userIdRule] : [],
           ]}
         >
-          <Input />
+          <Input placeholder={userIdRule?.message} />
         </Form.Item>
         <Form.Item name="name" required label="用户姓名">
           <Input />
@@ -72,9 +75,12 @@ const NewUserModal: React.FC<ModalProps> = ({
 interface Props {
   accountName: string;
   refresh: () => void;
+  token: string;
 }
 
-export const AddUserButton: React.FC<Props> = ({ refresh, accountName }) => {
+
+export const AddUserButton: React.FC<Props> = ({ refresh, accountName, token }) => {
+
   const { message } = App.useApp();
 
   const [modalShow, setModalShow] = useState(false);
@@ -92,11 +98,30 @@ export const AddUserButton: React.FC<Props> = ({ refresh, accountName }) => {
         if (code === "ACCOUNT_NOT_FOUND") {
           message.error("账户不存在");
         } else if (code === "USER_NOT_FOUND") {
-          if (publicConfig.ENABLE_CREATE_USER) {
+          if (useBuiltinCreateUser()) {
             setModalShow(false);
             setNewUserInfo({ identityId, name });
+          } else if (publicConfig.CREATE_USER_CONFIG.misConfig.type === "external") {
+
+            const TIMEOUT_SECONDS = 2;
+
+            message.info((
+              <>
+              将在
+                <CountdownText seconds={TIMEOUT_SECONDS} />
+              秒后打开创建用户界面
+              </>
+            ), TIMEOUT_SECONDS, () => {
+              window.open(
+                  publicConfig.CREATE_USER_CONFIG.misConfig.external!.url + "?" + addUserToAccountParams(
+                  accountName, identityId, name, token,
+                ),
+                  "_blank",
+              );
+              setModalShow(false);
+            });
           } else {
-            message.error("用户不存在！");
+            message.error("用户不存在。请先创建用户");
           }
         }
       })

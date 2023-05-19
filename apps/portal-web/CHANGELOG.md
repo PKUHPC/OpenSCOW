@@ -1,5 +1,29 @@
 # @scow/portal-web
 
+## 0.6.0
+
+### Patch Changes
+
+- dc51bfde6: 浏览器关闭后，用户登录 cookie 失效
+- 01e18fa28: 临时解决 Shell 和 VNC 类应用不可用的问题
+- 7903c8cbd: 修复 app 自定义表单默认选项无法提交的问题
+- 8b36bf0bc: 当交互式应用列表中存在内容时，刷新交互式应用列表不会使表格进入正在加载状态
+- d2c8e765e: 优化创建交互式应用页面：在用户家目录下的 apps/app[Id]路径下存入上一次提交记录；创建了查找上一次提交记录的 API 接口，每次创建交互式应用时查找上一次提交记录，如果有则与当前集群下配置对比选择填入相应的值。
+- 6021d29d7: 门户网站提交作业选择工作目录新增文件夹选择功能
+- 020e7b8e0: 修改已创建的交互式应用页面刷新 checkbox 为居中显示
+- 4ef4ddef6: 修复成功删除错误文件时的提醒
+- 8b36bf0bc: 检查交互式应用是否可连接的逻辑移动到前端
+- 0dcecf742: 提交作业页面显示优化：1.增加 integer 输入框的最大值输入限制及向下取整，并增加光标失焦后填写默认值最小值；2.修改内存显示；3.修改默认作业名显示；4.在 code-editor 中添加优先级提示语言的 placeholder。
+- 7a64b72b0: 更新文件上传时文件列表中取消按钮的提示文本
+- Updated dependencies [901ecdb7e]
+- Updated dependencies [01e18fa28]
+- Updated dependencies [d2c8e765e]
+- Updated dependencies [ce077930a]
+  - @scow/config@0.3.0
+  - @scow/lib-web@0.3.2
+  - @scow/lib-config@0.2.2
+  - @scow/protos@0.2.2
+
 ## 0.5.0
 
 ### Minor Changes

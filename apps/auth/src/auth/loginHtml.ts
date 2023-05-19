@@ -14,7 +14,7 @@ import { DEFAULT_PRIMARY_COLOR } from "@scow/config/build/ui";
 import { FastifyReply, FastifyRequest } from "fastify";
 import { join } from "path";
 import { createCaptcha } from "src/auth/captcha";
-import { authConfig } from "src/config/auth";
+import { authConfig, OtpStatusOptions } from "src/config/auth";
 import { config, FAVICON_URL, LOGO_URL } from "src/config/env";
 import { uiConfig } from "src/config/ui";
 
@@ -36,11 +36,16 @@ function parseHostname(req: FastifyRequest): string | undefined {
 export async function serveLoginHtml(
   err: boolean, callbackUrl: string, req: FastifyRequest, rep: FastifyReply,
   verifyCaptchaFail?: boolean,
+  verifyOtpFail?: boolean,
 ) {
 
   const hostname = parseHostname(req);
   const enableCaptcha = authConfig.captcha.enabled;
+  const enableTotp = authConfig.otp?.enabled;
 
+  // 显示绑定otp按钮：otp.enabled为true && (密钥存于ldap时 || (otp.type===remote && 配置了otp.remote.redirectUrl))
+  const showBindOtpButton = authConfig.otp?.enabled && (authConfig.otp?.type === OtpStatusOptions.ldap
+    || (!!authConfig.otp?.remote?.redirectUrl && authConfig.otp?.type === OtpStatusOptions.remote));
   const captchaInfo = enableCaptcha
     ? await createCaptcha(req.server)
     : undefined;
@@ -57,6 +62,10 @@ export async function serveLoginHtml(
     ...captchaInfo,
     verifyCaptchaFail,
     enableCaptcha,
+    enableTotp,
+    showBindOtpButton,
+    verifyOtpFail,
+    otpBasePath: join(config.BASE_PATH, config.AUTH_BASE_PATH, "/public/otp"),
     refreshCaptchaPath: join(config.BASE_PATH, config.AUTH_BASE_PATH, "/public/refreshCaptcha"),
   });
 

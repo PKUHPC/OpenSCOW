@@ -12,6 +12,7 @@
 
 import type { ClusterConfigSchema } from "@scow/config/build/cluster";
 import type { ClusterTextsConfigSchema } from "@scow/config/build/clusterTexts";
+import type { MisConfigSchema } from "@scow/config/build/mis";
 import type { UiConfigSchema } from "@scow/config/build/ui";
 import getConfig from "next/config";
 
@@ -34,14 +35,14 @@ export interface PublicRuntimeConfig {
   BASE_PATH: string;
   CLUSTERS: { [clusterId: string]: Cluster };
   PREDEFINED_CHARGING_TYPES: string[];
-  ENABLE_CREATE_USER: boolean;
+  CREATE_USER_CONFIG: {
+    misConfig: MisConfigSchema["createUser"],
+    authSupportsCreateUser: boolean,
+  },
   ENABLE_CHANGE_PASSWORD: boolean;
 
   ACCOUNT_NAME_PATTERN: string | undefined;
   ACCOUNT_NAME_PATTERN_MESSAGE: string | undefined;
-
-  USERID_PATTERN: string | undefined;
-  USERID_PATTERN_MESSAGE: string | undefined;
 
   PASSWORD_PATTERN: string | undefined;
   PASSWORD_PATTERN_MESSAGE: string | undefined;

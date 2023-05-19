@@ -11,7 +11,7 @@
  */
 
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
-import { getUser, validateToken as authValidateToken } from "@scow/lib-auth";
+import { validateToken as authValidateToken } from "@scow/lib-auth";
 import { GetUserInfoResponse, UserServiceClient } from "@scow/protos/build/server/user";
 import { MOCK_USER_INFO } from "src/apis/api.mock";
 import { USE_MOCK } from "src/apis/useMock";
@@ -34,9 +34,6 @@ export async function validateToken(token: string): Promise<UserInfo | undefined
     return undefined;
   }
 
-  const authUserInfo = await getUser(runtimeConfig.AUTH_INTERNAL_URL, { identityId: resp.identityId })
-    .catch(() => undefined);
-
   const client = getClient(UserServiceClient);
 
   const userInfo: GetUserInfoResponse = await asyncClientCall(client, "getUserInfo", {
@@ -46,7 +43,7 @@ export async function validateToken(token: string): Promise<UserInfo | undefined
   return {
     accountAffiliations: userInfo.affiliations,
     identityId: resp.identityId,
-    name: authUserInfo?.name,
+    name: userInfo.name,
     platformRoles: userInfo.platformRoles,
     tenant: userInfo.tenantName,
     tenantRoles: userInfo.tenantRoles,

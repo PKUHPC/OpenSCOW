@@ -1,5 +1,16 @@
 # @scow/docs
 
+## 0.4.0
+
+### Minor Changes
+
+- 901ecdb7e: 支持使用外部页面创建用户
+
+### Patch Changes
+
+- f76b41a66: 增加通过 api-v{API 版本号}的 tag 获取某具体 SCOW API 的 proto 文件的方式
+- b796fca16: 文档中配置部分提及`check-config` CLI 命令
+
 ## 0.3.0
 
 ### Minor Changes

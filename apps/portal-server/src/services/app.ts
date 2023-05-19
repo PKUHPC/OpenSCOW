@@ -24,7 +24,6 @@ import {
 } from "@scow/protos/build/portal/app";
 import { getClusterOps } from "src/clusterops";
 import { getAppConfigs } from "src/config/apps";
-import { dnsResolve } from "src/utils/dns";
 import { clusterNotFound } from "src/utils/errors";
 
 export const appServiceServer = plugin((server) => {
@@ -87,7 +86,7 @@ export const appServiceServer = plugin((server) => {
       }
 
       return [{
-        host: await dnsResolve(reply.host),
+        host: reply.host,
         port: reply.port,
         password: reply.password,
         appProps,
@@ -232,6 +231,22 @@ export const appServiceServer = plugin((server) => {
       const apps = getAppConfigs();
 
       return [{ apps: Object.keys(apps).map((x) => ({ id: x, name: apps[x].name })) }];
+    },
+
+    getAppLastSubmission: async ({ request, logger }) => {
+
+      const { userId, cluster, appId } = request;
+      const clusterops = getClusterOps(cluster);
+
+      if (!clusterops) { throw clusterNotFound(cluster); }
+
+      const reply = await clusterops.app.getAppLastSubmission({
+        userId, appId,
+      }, logger);
+
+      return [{
+        lastSubmissionInfo: reply.lastSubmissionInfo,
+      }];
     },
 
   });

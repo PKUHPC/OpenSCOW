@@ -1,5 +1,11 @@
 # @scow/lib-config
 
+## 0.2.2
+
+### Patch Changes
+
+- ce077930a: 读取目录配置时，忽略扩展名不认识的文件
+
 ## 0.2.1
 
 ### Patch Changes

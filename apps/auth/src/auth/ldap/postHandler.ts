@@ -17,8 +17,9 @@ import { cacheInfo } from "src/auth/cacheInfo";
 import { redirectToWeb } from "src/auth/callback";
 import { findUser, useLdap } from "src/auth/ldap/helpers";
 import { serveLoginHtml } from "src/auth/loginHtml";
+import { validateOtpCode } from "src/auth/otp/helper";
 import { validateLoginParams } from "src/auth/validateLoginParams";
-import { LdapConfigSchema } from "src/config/auth";
+import { authConfig, LdapConfigSchema } from "src/config/auth";
 
 export function registerPostHandler(f: FastifyInstance, ldapConfig: LdapConfigSchema) {
 
@@ -30,13 +31,15 @@ export function registerPostHandler(f: FastifyInstance, ldapConfig: LdapConfigSc
     callbackUrl: Type.String(),
     token: Type.String(),
     code: Type.String(),
+    ...authConfig.otp?.enabled ? { otpCode: Type.String() } : undefined,
   });
 
   // register a login handler
   f.post<{ Body: Static<typeof bodySchema> }>("/public/auth", {
     schema: { body: bodySchema },
   }, async (req, res) => {
-    const { username, password, callbackUrl, token, code } = req.body;
+
+    const { username, password, callbackUrl, token, code, otpCode } = req.body;
 
     if (!await validateLoginParams(token, code, callbackUrl, req, res)) {
       return;
@@ -61,6 +64,10 @@ export function registerPostHandler(f: FastifyInstance, ldapConfig: LdapConfigSc
         return;
       }
 
+      if (!await validateOtpCode({ userId: user.identityId, dn: user.dn },
+        otpCode, callbackUrl, req, res, logger, client)) {
+        return;
+      }
       logger.info("Trying binding as %s with credentials", user.dn);
 
       await useLdap(logger, ldapConfig, { dn: user.dn, password })(async () => {

@@ -20,4 +20,6 @@ export const config = envConfig({
   https_proxy: str({ desc: "https代理，优先级2", default: undefined }),
   HTTP_PROXY: str({ desc: "https代理，优先级3", default: undefined }),
   http_proxy: str({ desc: "https代理，优先级4", default: undefined }),
+
+  PLUGINS_DIR: str({ desc: "插件目录", default: "plugins" }),
 });

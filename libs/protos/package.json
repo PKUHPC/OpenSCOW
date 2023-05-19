@@ -1,6 +1,6 @@
 {
   "name": "@scow/protos",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "",
   "main": "build/index.js",
   "private": true,
@@ -19,7 +19,7 @@
     "@scow/grpc-api": "workspace:*"
   },
   "devDependencies": {
-    "ts-proto": "1.147.2"
+    "ts-proto": "1.147.3"
   },
   "keywords": [],
   "author": "",

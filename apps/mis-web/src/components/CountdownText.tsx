@@ -10,10 +10,24 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import dns from "dns";
+import { useEffect, useState } from "react";
 
-export const dnsResolve = async (host: string) => {
-  const result = await dns.promises.lookup(host);
+interface Props {
+  seconds: number;
+}
 
-  return result.address;
+export const CountdownText: React.FC<Props> = ({ seconds }) => {
+  const [remaining, setRemaining] = useState(seconds);
+
+  useEffect(() => {
+    if (remaining > 0) {
+      const timeoutId = setTimeout(() => {
+        setRemaining(remaining - 1);
+      }, 1000);
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [remaining]);
+
+  return <>{remaining}</>;
 };

@@ -15,7 +15,7 @@ import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { InitServiceClient } from "@scow/protos/build/server/init";
 import { getClient } from "src/utils/client";
-import { publicConfig } from "src/utils/config";
+import { getUserIdRule } from "src/utils/createUser";
 import { queryIfInitialized } from "src/utils/init";
 import { handlegRPCError } from "src/utils/server";
 
@@ -39,8 +39,6 @@ export interface CreateInitAdminSchema {
   }
 }
 
-const userIdRegex = publicConfig.USERID_PATTERN ? new RegExp(publicConfig.USERID_PATTERN) : undefined;
-
 export default route<CreateInitAdminSchema>("CreateInitAdminSchema", async (req) => {
   const result = await queryIfInitialized();
 
@@ -48,10 +46,12 @@ export default route<CreateInitAdminSchema>("CreateInitAdminSchema", async (req)
 
   const { email, identityId, name, password } = req.body;
 
-  if (userIdRegex && !userIdRegex.test(identityId)) {
+  const userIdRule = getUserIdRule();
+
+  if (userIdRule && !userIdRule.pattern.test(identityId)) {
     return { 400: {
       code: "USER_ID_NOT_VALID",
-      message: `user id must match ${publicConfig.USERID_PATTERN}`,
+      message: userIdRule.message,
     } };
   }
 
