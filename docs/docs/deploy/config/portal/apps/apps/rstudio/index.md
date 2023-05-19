@@ -1,5 +1,5 @@
 ---
-sidebar_position: 10
+sidebar_position: 1
 ---
 
 # RStudio
@@ -73,8 +73,8 @@ web:
   beforeScript: |
     export PORT=$(get_port)
     export PASSWORD=$(get_password 12)
-    export SLURM_COMPUTE_NODE_IP=$(get_ip)
-    export APPURI="${PROXY_BASE_PATH}/${SLURM_COMPUTE_NODE_IP}/${PORT}/"
+    export SLURM_COMPUTE_NODE_HOSTNAME=$(hostname)
+    export APPURI="${PROXY_BASE_PATH}/${SLURM_COMPUTE_NODE_HOSTNAME}/${PORT}/"
     export USER=${USER}
 
   # 运行任务的脚本。可以使用准备脚本定义的变量
@@ -181,8 +181,8 @@ web:
   beforeScript: |
     export PORT=$(get_port)
     export PASSWORD=$(get_password 12)
-    export SLURM_COMPUTE_NODE_IP=$(get_ip)
-    export APPURI="${PROXY_BASE_PATH}/${SLURM_COMPUTE_NODE_IP}/${PORT}/"
+    export SLURM_COMPUTE_NODE_HOSTNAME=$(hostname)
+    export APPURI="${PROXY_BASE_PATH}/${SLURM_COMPUTE_NODE_HOSTNAME}/${PORT}/"
     export USER=${USER}
     export SINGULARITY_VERSION="singularity/3.9.2"
 
@@ -284,7 +284,7 @@ attributes:
 
 对于RStudio，export以下变量的含义是：
 
-- `SLURM_COMPUTE_NODE_IP`: 计算节点的IP地址
+- `SLURM_COMPUTE_NODE_HOSTNAME`: 计算节点的主机名
 - `SINGULARITY_VERSION`：Singularity版本
 
 ## 附章

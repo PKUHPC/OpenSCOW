@@ -1,5 +1,5 @@
 ---
-sidebar_position: 6
+sidebar_position: 1
 ---
 
 # JupyterLab
@@ -16,7 +16,7 @@ JupyterLab是Jupyter Notebook的下一代版本，提供了更强大的用户界
 
 JupyterLab是Jupyter Notebook的下一代版本，提供了更强大的用户界面和功能，可用于更复杂的工作流程和项目。
 
-JupyterLab建议通过[Anaconda进行安装](./jupyter.md)，Anaconda集成了JupyterLab，安装上Anaconda发行版后也就自动安装上了JupyterLab，安装好Anaconda后如果JupyterLab没有自动安装成功的话，在终端输入以下命令进行安装：
+JupyterLab建议通过[Anaconda进行安装](../jupyter/index.md)，Anaconda集成了JupyterLab，安装上Anaconda发行版后也就自动安装上了JupyterLab，安装好Anaconda后如果JupyterLab没有自动安装成功的话，在终端输入以下命令进行安装：
 
 ```bash
 conda install jupyterlab
@@ -68,7 +68,7 @@ web:
     export SALT=123
     export PASSWORD_SHA1="$(echo -n "${PASSWORD}${SALT}" | openssl dgst -sha1 | awk '{print $NF}')"
     export CONFIG_FILE="${PWD}/config.py"
-    export SLURM_COMPUTE_NODE_IP=$(get_ip)
+    export SLURM_COMPUTE_NODE_HOSTNAME=$(hostname)
     export SHELL_NAME=$(echo ${SHELL} | awk -F'/' '{print $NF}')
     export CONDA_VERSION="anaconda/3-2023.03"
 
@@ -101,7 +101,7 @@ web:
     c.NotebookApp.port_retries = 0
     c.NotebookApp.password = u'sha1:${SALT}:${PASSWORD_SHA1}'
     c.NotebookApp.open_browser = False
-    c.NotebookApp.base_url = "${PROXY_BASE_PATH}/${SLURM_COMPUTE_NODE_IP}/${PORT}/"
+    c.NotebookApp.base_url = "${PROXY_BASE_PATH}/${SLURM_COMPUTE_NODE_HOSTNAME}/${PORT}/"
     c.NotebookApp.allow_origin = '*'
     c.NotebookApp.disable_check_xsrf = True
     EOL
@@ -139,7 +139,7 @@ attributes:
 
 对于JupyterLab，export以下变量的含义是：
 
-- `SLURM_COMPUTE_NODE_IP`: 计算节点的IP地址
+- `SLURM_COMPUTE_NODE_HOSTNAME`: 计算节点的主机名
 
 - `CONFIG_FILE`: 指定JupyterLab的配置文件
 

@@ -1,5 +1,5 @@
 ---
-sidebar_position: 5
+sidebar_position: 1
 ---
 
 # Jupyter
@@ -64,7 +64,7 @@ web:
     export SALT=123
     export PASSWORD_SHA1="$(echo -n "${PASSWORD}${SALT}" | openssl dgst -sha1 | awk '{print $NF}')"
     export CONFIG_FILE="${PWD}/config.py"
-    export SLURM_COMPUTE_NODE_IP=$(get_ip)
+    export SLURM_COMPUTE_NODE_HOSTNAME=$(hostname)
     export SHELL_NAME=$(echo ${SHELL} | awk -F'/' '{print $NF}')
     export CONDA_VERSION="anaconda/3-2023.03"
 
@@ -95,7 +95,7 @@ web:
     c.NotebookApp.port_retries = 0
     c.NotebookApp.password = u'sha1:${SALT}:${PASSWORD_SHA1}'
     c.NotebookApp.open_browser = False
-    c.NotebookApp.base_url = "${PROXY_BASE_PATH}/${SLURM_COMPUTE_NODE_IP}/${PORT}/"
+    c.NotebookApp.base_url = "${PROXY_BASE_PATH}/${SLURM_COMPUTE_NODE_HOSTNAME}/${PORT}/"
     c.NotebookApp.allow_origin = '*'
     c.NotebookApp.disable_check_xsrf = True
     EOL
@@ -133,7 +133,7 @@ attributes:
 
 对于Jupyter，export以下变量的含义是：
 
-- `SLURM_COMPUTE_NODE_IP`: 计算节点的IP地址
+- `SLURM_COMPUTE_NODE_HOSTNAME`: 计算节点的主机名
 - `CONFIG_FILE`: 指定Jupyter的配置文件
 - `SHELL_NAME`：当前会话的shell名称
 - `CONDA_VERSION`：系统默认的conda版本
@@ -164,19 +164,19 @@ Anaconda建议安装在共享存储上，集群各节点只需要挂载上共享
 
 - 安装过程中，看到提示“In order to continue the installation process, please review the license agreement.”（“请浏览许可证协议以便继续安装。”），点击“Enter”查看“许可证协议”。
 
-  ![anaconda安装图1](./images/conda-install-1.png)
+  ![anaconda安装图1](./conda-install-1.png)
 
 - 在“许可证协议”界面将屏幕滚动至底，输入“yes”表示同意许可证协议内容。然后进行下一步。
 
-  ![anaconda安装图2](./images/conda-install-2.png)
+  ![anaconda安装图2](./conda-install-2.png)
 
 - 安装过程中，提示选择Anaconda的安装路径，这里指定安装到共享存储上：/data/software/anaconda/3-2023.03。
 
-  ![anaconda安装图3](./images/conda-install-3.png)
+  ![anaconda安装图3](./conda-install-3.png)
 
 - 安装完成后，会提示是否通过安装程序运行conda init来初始化Anaconda。
 
-  ![anaconda安装图4](./images/conda-install-4.png)
+  ![anaconda安装图4](./conda-install-4.png)
 
 - 如果安装时不进行初始化的话，用户后续可以执行以下命令手动进行初始化：
 
@@ -189,7 +189,7 @@ Anaconda建议安装在共享存储上，集群各节点只需要挂载上共享
 
 - 验证是否安装成功，执行以下命令，如果显示包名和版本号，说明Anaconda、Jupyter Notebook和JupyterLab都已经安装成功。
 
-  ![anaconda安装图5](./images/conda-install-5.png)
+  ![anaconda安装图5](./conda-install-5.png)
 
 ### 2、添加modulefile文件
 

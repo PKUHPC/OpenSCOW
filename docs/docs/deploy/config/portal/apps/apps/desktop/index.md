@@ -1,5 +1,5 @@
 ---
-sidebar_position: 2
+sidebar_position: 1
 ---
 
 # Desktop
@@ -122,7 +122,7 @@ attributes:
 
 ### Q1：首次连接进入到Xfce桌面时，会报XFCE PolicyKit Agent的弹窗错误
 
-![Xfce认证代理报错图](./images/xfce-policykit-agent.png)
+![Xfce认证代理报错图](./xfce-policykit-agent.png)
 
 系统管理员可通过禁用Xfce PolicyKit验证代理解决：
 

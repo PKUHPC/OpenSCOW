@@ -1,5 +1,5 @@
 ---
-sidebar_position: 11
+sidebar_position: 1
 ---
 
 # VSCode
@@ -118,7 +118,7 @@ VSCode扩展安装有三种方式：
 
 - 在VSCode左侧的侧边栏中，点击底部的扩展图标（通常是一个正方形方块或拼图图标），以打开扩展面板。
 
-  ![vscode扩展商店](./images/vscode-ext-shop.png)
+  ![vscode扩展商店](./vscode-ext-shop.png)
 
 - 在扩展面板中，你可以浏览并搜索可用的扩展。
 
@@ -145,7 +145,7 @@ VSCode扩展安装有三种方式：
 
 - 执行命令后，VSCode将开始下载并安装指定的扩展。安装完成后，你将在终端中看到相应的成功消息。
 
-  ![vscode扩展ID安装](./images/vscode-ext-install-1.png)
+  ![vscode扩展ID安装](./vscode-ext-install-1.png)
 
 - 安装的扩展现在应该已经在VSCode中可用。你可以在左侧的侧边栏中点击扩展图标来查看已安装的扩展，并根据需要启用、禁用或配置它们。
 
@@ -161,10 +161,10 @@ VSCode扩展安装有三种方式：
   code-server --install-extension /path/to/extension.vsix
   ```
 
-  ![vscode扩展包安装1](./images/vscode-ext-install-2.png)
+  ![vscode扩展包安装1](./vscode-ext-install-2.png)
 
 - VSCode将开始安装指定的扩展。安装完成后，你将在终端中看到相应的成功消息。另外需要注意的是，在Visual Studio Code Marketplace上或者非官方下载的扩展包会存在和VSCode不兼容的情况。
 
-  ![vscode扩展包安装2](./images/vscode-ext-install-3.png)
+  ![vscode扩展包安装2](./vscode-ext-install-3.png)
 
 - 安装的扩展现在应该已经在VSCode中可用。你可以在左侧的侧边栏中点击扩展图标来查看已安装的扩展，并根据需要启用、禁用或配置它们。

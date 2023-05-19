@@ -1,5 +1,5 @@
 ---
-sidebar_position: 8
+sidebar_position: 1
 ---
 
 # Octave
@@ -27,7 +27,7 @@ yum install turbovnc -y
 
 ### 2、Octave安装
 
-- octave可以通过conda进行安装，请参考Jupyter应用配置附章中的[Anaconda安装](./jupyter.md)。
+- octave可以通过conda进行安装，请参考Jupyter应用配置附章中的[Anaconda安装](../jupyter/index.md)。
 
 - 创建一个新的conda环境，新环境名称格式使用“软件名-版本号”：
 

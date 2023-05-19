@@ -27,7 +27,7 @@ yum install turbovnc -y
 
 ### 2、构建Baltamatica镜像
 
-构建Singularity镜像需要先安装Singularity软件，具体安装步骤请参考RStudio应用配置附章中的[Singularity安装](./rstudio.md)。
+构建Singularity镜像需要先安装Singularity软件，具体安装步骤请参考RStudio应用配置附章中的[Singularity安装](../rstudio/index.md)。
 
 - 创建容器并进行北太天元安装
 
