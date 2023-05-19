@@ -289,7 +289,7 @@ export const accountServiceServer = plugin((server) => {
         accountName,
       );
 
-      if (account.balance.isNegative()) {
+      if (account.balance.isNegative() || account.balance.isZero()) {
         logger.info("Account %s is out of balance and not whitelisted. Block the account.", account.accountName);
         await blockAccount(account, server.ext.clusters, logger);
       }
