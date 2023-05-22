@@ -61,14 +61,11 @@ export const PortalConfigSchema = Type.Object({
 
   navLinks: Type.Optional(Type.Array(
     Type.Object({ text: Type.String({ description: "一级导航名称" }), url: Type.String({ description: "一级导航链接" }),
-      icon: Type.String({ description: "一级导航链接显示icon" }), children: Type.Optional(Type.Array(
+      children: Type.Optional(Type.Array(
         Type.Object({ text: Type.String({ description: "二级导航名称" }), url: Type.String({ description: "二级导航链接" }),
-          icon: Type.String({ description: "二级导航链接显示icon" }),
         }))),
     }),
   )),
-
-  iconfontScriptUrls: Type.Optional(Type.Array(Type.String(), { description: "可以获取icon的仓库脚本地址" })),
 
 });
 

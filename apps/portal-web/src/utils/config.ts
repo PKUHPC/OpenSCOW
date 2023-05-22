@@ -71,7 +71,6 @@ export interface PublicRuntimeConfig {
   CLIENT_MAX_BODY_SIZE: string;
 
   NAV_LINKS?: NavLink[];
-  ICONFONT_SCRIPT_URLS?: string[];
 }
 
 export const runtimeConfig: ServerRuntimeConfig = getConfig().serverRuntimeConfig;
@@ -81,7 +80,6 @@ export type Cluster = { id: string; name: string; }
 export type NavLink = {
   text: string;
   url: string;
-  icon: string;
   children?: Omit<NavLink, "children">[];
 }
 

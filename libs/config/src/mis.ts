@@ -111,17 +111,14 @@ export const MisConfigSchema = Type.Object({
 
   navLinks: Type.Optional(Type.Array(
     Type.Object({ text: Type.String({ description: "一级导航名称" }), url: Type.String({ description: "一级导航链接" }),
-      icon: Type.String({ description: "一级导航链接显示icon" }),
       allowedRoles: Type.Optional(Type.Array(Type.String(), { description: "可以看到这个链接的用户" })),
       children: Type.Optional(Type.Array(
         Type.Object({ text: Type.String({ description: "二级导航名称" }), url: Type.String({ description: "二级导航链接" }),
-          icon: Type.String({ description: "二级导航链接显示icon" }),
           allowedRoles: Type.Optional(Type.Array(Type.String(), { description: "可以看到这个链接的用户" })),
         }))),
     })),
   ),
 
-  iconfontScriptUrls: Type.Optional(Type.Array(Type.String(), { description: "可以获取icon的仓库脚本地址" })),
 });
 
 const MIS_CONFIG_NAME = "mis";

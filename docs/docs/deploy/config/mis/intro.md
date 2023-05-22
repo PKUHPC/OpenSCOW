@@ -114,9 +114,6 @@ predefinedChargingTypes:
   # 链接地址
   # url: ""
 
-  # 导航icon,"icon-iconId"形式字符串
-  # icon: ""
-
   # 可以看到这个链接的用户,可选填
   # 用户类型： user, accountUser, accountAdmin, accountOwner, tenantFinance, tenantAdmin, platformAdmin, platformFinance
   # allowedRoles: []
@@ -126,11 +123,7 @@ predefinedChargingTypes:
     # 二级导航相关配置，与一级导航相同，但是不允许再设置children
     # text: ""
     # url: ""
-    # icon: ""
     # allowedRoles: []
-
-# 用户灵活管理 iconfont.cn 图标的脚本地址配置，如果存在则替换默认脚本库地址
-# iconfontScirptUrls: []
 ```
 
 ## 启动服务

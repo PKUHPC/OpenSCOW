@@ -50,7 +50,6 @@ export interface PublicRuntimeConfig {
   PORTAL_URL: string | undefined;
 
   NAV_LINKS?: NavLink[];
-  ICONFONT_SCRIPT_URLS?: string[];
 }
 
 export const runtimeConfig: ServerRuntimeConfig = getConfig().serverRuntimeConfig;
@@ -60,7 +59,6 @@ export type Cluster = { id: string; name: string; }
 export type NavLink = {
   text: string;
   url: string;
-  icon: string;
   allowedRoles?: string[];
   children?: Omit<NavLink, "children">[];
 }

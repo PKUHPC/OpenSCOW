@@ -13,11 +13,10 @@
 import {
   AccountBookOutlined, BookOutlined, CloudServerOutlined,
   DashboardOutlined,
-  InfoOutlined, LockOutlined, MoneyCollectOutlined, PartitionOutlined,
+  InfoOutlined, LinkOutlined, LockOutlined, MoneyCollectOutlined, PartitionOutlined,
   PlusOutlined, PlusSquareOutlined, StarOutlined, ToolOutlined, UserAddOutlined,
   UserOutlined } from "@ant-design/icons";
 import { NavItemProps } from "@scow/lib-web/build/layouts/base/types";
-import { IconFont } from "@scow/lib-web/build/layouts/IconFont";
 import { AccountAffiliation } from "@scow/protos/build/server/user";
 import { PlatformRole, TenantRole, UserRole } from "src/models/User";
 import { User } from "src/stores/UserStore";
@@ -326,7 +325,7 @@ export const getAvailableRoutes = (user: User | undefined): NavItemProps[] => {
       .filter((link) => !link.allowedRoles
         || (link.allowedRoles.length && link.allowedRoles.some((role) => userCurrentRoles[role])))
       .map((link) => ({
-        Icon: <IconFont type={link.icon} scriptUrls={publicConfig.ICONFONT_SCRIPT_URLS} />,
+        Icon: LinkOutlined,
         text: link.text,
         path: `${link.url}?token=${user.token}`,
         clickable: true,
@@ -335,7 +334,7 @@ export const getAvailableRoutes = (user: User | undefined): NavItemProps[] => {
           || (childLink.allowedRoles.length &&
             childLink.allowedRoles.some((role) => userCurrentRoles[role])))
           .map((childLink) => ({
-            Icon: <IconFont type={childLink.icon} scriptUrls={publicConfig.ICONFONT_SCRIPT_URLS} />,
+            Icon: LinkOutlined,
             text: childLink.text,
             path: `${childLink.url}?token=${user.token}`,
             clickable: true,

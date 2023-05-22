@@ -61,26 +61,14 @@ shell: true
 #   - text: "一级导航1"
 #     # 链接地址
 #     url: "https://hahahaha1.com/"
-#     # 导航icon,"icon-iconId"形式字符串
-#     # icon默认脚本库来源 https://www.iconfont.cn/collections/detail?cid=9402
-#     icon: "icon-java"
 #     # 二级导航,可选填
 #     children:
 #       # 二级导航相关配置，与一级导航相同，但是不允许再设置children
 #       - text: "二级导航1"
 #         url: "https://hahahaha1.1.com"
-#         icon: "icon-java"
 #       - text: "二级导航2"
 #         url: "https://hahahaha1.2.com"
-#         icon: "icon-java"
 #   - text: "一级导航2"
 #     url: "https://hahahaha2.com"
-#     icon: "icon-python"
 #     children: []
 
-# # 用户灵活管理 iconfont.cn 图标的脚本地址配置,如果存在则替换默认脚本库地址
-# iconfontScriptUrls:
-#   # icon-javascript, icon-java, icon-shoppingcart (overridden)
-#   - "//at.alicdn.com/t/font_1788044_0dwu4guekcwr.js"
-#   # icon-shoppingcart, icon-python
-#   - "//at.alicdn.com/t/font_1788592_a5xf2bdic3u.js"

@@ -91,18 +91,11 @@ shell: true
   # 链接地址
   # url: ""
 
-  # 导航icon,"icon-iconId"形式字符p串
-  # icon: ""
-
   # 二级导航,可选填
   # children:
     # 二级导航相关配置，与一级导航相同，但是不允许再设置children
     # text: ""
     # url: ""
-    # icon: ""
-
-# 用户灵活管理 iconfont.cn 图标的脚本地址配置,如果存在则替换默认脚本库地址
-# iconfontScirptUrls: []
 ```
 
 ## 更多配置
