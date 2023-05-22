@@ -31,7 +31,12 @@ export const CreateTenantForm: React.FC = () => {
 
   return (
     <>
-      <Divider orientation="left" orientationMargin="0" plain>请输入租户名并为其创建一个新用户作为该租户的管理员</Divider>
+      <Divider
+        style={{ marginTop: 0 }}
+        orientation="left"
+        orientationMargin="0"
+        plain
+      >请输入租户名并为其创建一个新用户作为该租户的管理员</Divider>
       <Form.Item
         label="租户名称"
         name="tenantName"
