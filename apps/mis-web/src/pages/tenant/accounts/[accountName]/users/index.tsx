@@ -64,7 +64,7 @@ export const AccountUsersPage: NextPage = requireAuth(
           titleText={title}
         >
           <Space split={<Divider type="vertical" />}>
-            <AddUserButton refresh={reload} accountName={accountName} />
+            <AddUserButton refresh={reload} accountName={accountName} token={userStore.user.token} />
             <RefreshLink refresh={update} />
           </Space>
         </PageTitle>

@@ -1,5 +1,20 @@
 # @scow/portal-server
 
+## 0.6.0
+
+### Patch Changes
+
+- d2c8e765e: 优化创建交互式应用页面：在用户家目录下的 apps/app[Id]路径下存入上一次提交记录；创建了查找上一次提交记录的 API 接口，每次创建交互式应用时查找上一次提交记录，如果有则与当前集群下配置对比选择填入相应的值。
+- 8b36bf0bc: 检查交互式应用是否可连接的逻辑移动到前端
+- Updated dependencies [901ecdb7e]
+- Updated dependencies [d2c8e765e]
+- Updated dependencies [ce077930a]
+  - @scow/config@0.3.0
+  - @scow/lib-config@0.2.2
+  - @scow/lib-server@0.2.0
+  - @scow/protos@0.2.2
+  - @scow/lib-slurm@0.1.4
+
 ## 0.5.0
 
 ### Minor Changes

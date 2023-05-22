@@ -83,11 +83,13 @@ message AppSession {
   google.protobuf.Timestamp submit_time = 3;
   string app_id = 4;
   string state = 5;
-  bool ready = 6;
-  string data_path = 7;
-  string running_time = 8;
-  string time_limit = 9;
-  optional string reason = 10;
+  string data_path = 6;
+  string running_time = 7;
+  string time_limit = 8;
+  optional string reason = 9;
+
+  optional string host = 10;
+  optional uint32 port = 11;
 }
 
 message ListAppSessionsResponse {

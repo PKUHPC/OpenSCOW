@@ -181,7 +181,7 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
             placeholder={placeholder}
           />
         );
-    const initialValue = item.type === "SELECT" ? (item.defaultValue ?? item.select[0]) : item.defaultValue;
+    const initialValue = item.type === "SELECT" ? (item.defaultValue ?? item.select[0].value) : item.defaultValue;
 
     return (
       <Form.Item

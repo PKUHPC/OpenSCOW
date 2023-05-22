@@ -15,9 +15,10 @@
 import { fromApi } from "@ddadaal/next-typed-api-routes-runtime/lib/client";
 import { join } from "path";
 import type { GetClusterInfoSchema } from "src/pages/api//cluster";
+import type { CheckAppConnectivitySchema } from "src/pages/api/app/checkConnectivity";
 import type { ConnectToAppSchema } from "src/pages/api/app/connectToApp";
 import type { CreateAppSessionSchema } from "src/pages/api/app/createAppSession";
-import { GetAppLastSubmissionSchema } from "src/pages/api/app/getAppLastSubmission";
+import type { GetAppLastSubmissionSchema } from "src/pages/api/app/getAppLastSubmission";
 import type { GetAppMetadataSchema } from "src/pages/api/app/getAppMetadata";
 import type { GetAppSessionsSchema } from "src/pages/api/app/getAppSessions";
 import type { ListAvailableAppsSchema } from "src/pages/api/app/listAvailableApps";
@@ -55,12 +56,13 @@ const basePath = publicConfig.BASE_PATH || "";
 
 
 export const api = {
+  checkAppConnectivity: fromApi<CheckAppConnectivitySchema>("GET", join(basePath, "/api/app/checkConnectivity")),
   connectToApp: fromApi<ConnectToAppSchema>("POST", join(basePath, "/api/app/connectToApp")),
   createAppSession: fromApi<CreateAppSessionSchema>("POST", join(basePath, "/api/app/createAppSession")),
+  getAppLastSubmission: fromApi<GetAppLastSubmissionSchema>("GET", join(basePath, "/api/app/getAppLastSubmission")),
   getAppMetadata: fromApi<GetAppMetadataSchema>("GET", join(basePath, "/api/app/getAppMetadata")),
   getAppSessions: fromApi<GetAppSessionsSchema>("GET", join(basePath, "/api/app/getAppSessions")),
   listAvailableApps: fromApi<ListAvailableAppsSchema>("GET", join(basePath, "/api/app/listAvailableApps")),
-  getAppLastSubmission: fromApi<GetAppLastSubmissionSchema>("GET", join(basePath, "/api/app/getAppLastSubmission")),
   authCallback: fromApi<AuthCallbackSchema>("GET", join(basePath, "/api/auth/callback")),
   logout: fromApi<LogoutSchema>("DELETE", join(basePath, "/api/auth/logout")),
   validateToken: fromApi<ValidateTokenSchema>("GET", join(basePath, "/api/auth/validateToken")),

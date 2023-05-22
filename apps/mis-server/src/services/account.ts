@@ -36,7 +36,7 @@ export const accountServiceServer = plugin((server) => {
       return await em.transactional(async (em) => {
         const account = await em.findOne(Account, {
           accountName,
-        }, { lockMode: LockMode.PESSIMISTIC_WRITE });
+        }, { lockMode: LockMode.PESSIMISTIC_WRITE, populate: ["tenant"]});
 
         if (!account) {
           throw <ServiceError>{
@@ -65,7 +65,7 @@ export const accountServiceServer = plugin((server) => {
       return await em.transactional(async (em) => {
         const account = await em.findOne(Account, {
           accountName,
-        }, { lockMode: LockMode.PESSIMISTIC_WRITE });
+        }, { lockMode: LockMode.PESSIMISTIC_WRITE, populate: [ "tenant"]});
 
         if (!account) {
           throw <ServiceError>{
@@ -230,7 +230,8 @@ export const accountServiceServer = plugin((server) => {
     whitelistAccount: async ({ request, em, logger }) => {
       const { accountName, comment, operatorId, tenantName } = request;
 
-      const account = await em.findOne(Account, { accountName, tenant: { name: tenantName } });
+      const account = await em.findOne(Account, { accountName, tenant: { name: tenantName } },
+        { populate: [ "tenant"]});
 
       if (!account) {
         throw <ServiceError>{
@@ -265,7 +266,7 @@ export const accountServiceServer = plugin((server) => {
     dewhitelistAccount: async ({ request, em, logger }) => {
       const { accountName, tenantName } = request;
 
-      const account = await em.findOne(Account, { accountName, tenant: { name: tenantName } });
+      const account = await em.findOne(Account, { accountName, tenant: { name: tenantName } }, { populate: ["tenant"]});
 
       if (!account) {
         throw <ServiceError>{
@@ -284,7 +285,7 @@ export const accountServiceServer = plugin((server) => {
         accountName,
       );
 
-      if (account.balance.isNegative()) {
+      if (account.balance.isLessThanOrEqualTo(0)) {
         logger.info("Account %s is out of balance and not whitelisted. Block the account.", account.accountName);
         await blockAccount(account, server.ext.clusters, logger);
       }

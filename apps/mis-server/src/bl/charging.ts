@@ -24,7 +24,7 @@ import { ClusterPlugin } from "src/plugins/clusters";
 import { callHook } from "src/plugins/hookClient";
 
 interface PayRequest {
-  target: Tenant | Account;
+  target: Tenant | Loaded<Account, "tenant">;
   amount: Decimal;
   comment: string;
   type: string;
@@ -74,7 +74,7 @@ export async function pay(
 }
 
 type ChargeRequest = {
-  target: Account | Tenant;
+  target: Loaded<Account, "tenant"> | Tenant;
   amount: Decimal;
   comment: string;
   type: string;

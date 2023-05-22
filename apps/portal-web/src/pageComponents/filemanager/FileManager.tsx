@@ -11,16 +11,14 @@
  */
 
 import {
-  CloseOutlined,
   CopyOutlined,
+  DatabaseOutlined,
   DeleteOutlined, EyeInvisibleOutlined,
-  EyeOutlined, FileAddOutlined, FileOutlined, FolderAddOutlined,
-  FolderOutlined, HomeOutlined, LeftOutlined, MacCommandOutlined, RightOutlined,
+  EyeOutlined, FileAddOutlined, FolderAddOutlined,
+  HomeOutlined, LeftOutlined, MacCommandOutlined, RightOutlined,
   ScissorOutlined, SnippetsOutlined, UploadOutlined, UpOutlined,
 } from "@ant-design/icons";
-import { compareDateTime, formatDateTime } from "@scow/lib-web/build/utils/datetime";
-import { compareNumber } from "@scow/lib-web/build/utils/math";
-import { App, Button, Divider, Space, Table, Tooltip } from "antd";
+import { App, Button, Divider, Space } from "antd";
 import Link from "next/link";
 import Router from "next/router";
 import { join } from "path";
@@ -32,11 +30,12 @@ import { TitleText } from "src/components/PageTitle";
 import { TableTitle } from "src/components/TableTitle";
 import { urlToDownload } from "src/pageComponents/filemanager/api";
 import { CreateFileModal } from "src/pageComponents/filemanager/CreateFileModal";
+import { FileTable } from "src/pageComponents/filemanager/FileTable";
 import { MkdirModal } from "src/pageComponents/filemanager/MkdirModal";
 import { PathBar } from "src/pageComponents/filemanager/PathBar";
 import { RenameModal } from "src/pageComponents/filemanager/RenameModal";
 import { UploadModal } from "src/pageComponents/filemanager/UploadModal";
-import { FileInfo, FileType } from "src/pages/api/file/list";
+import { FileInfo } from "src/pages/api/file/list";
 import { Cluster, publicConfig } from "src/utils/config";
 import styled from "styled-components";
 
@@ -50,12 +49,6 @@ interface PromiseSettledResult {
   status: string;
   value?: FileInfo | undefined;
 }
-
-const fileTypeIcons = {
-  "FILE": FileOutlined,
-  "DIR": FolderOutlined,
-  "ERROR": CloseOutlined,
-} as Record<FileType, React.ComponentType>;
 
 const TopBar = styled(FilterFormContainer)`
   display: flex;
@@ -72,44 +65,6 @@ const OperationBar = styled(TableTitle)`
   flex-wrap: wrap;
   gap: 4px;
 `;
-
-const nodeModeToString = (mode: number) => {
-  const numberPermission = (mode & parseInt("777", 8)).toString(8);
-
-  const toStr = (char: string) => {
-    const num = +char;
-    return ((num & 4) !== 0 ? "r" : "-") + ((num & 2) !== 0 ? "w" : "-") + ((num & 1) !== 0 ? "x" : "-");
-  };
-
-  return [0, 1, 2].reduce((prev, curr) => prev + toStr(numberPermission[curr]), "");
-};
-
-const formatFileSize = (size: number): string => {
-  const unitMap = ["KB", "MB", "GB", "TB", "PB"];
-  const CARRY = 1024;
-  // 最大1024TB
-  const MAX_SIZE = 1024 * 1024 * 1024 * 1024 * 1024;
-
-  if (size >= MAX_SIZE) {
-    return "";
-  }
-
-  let carryCount = 0;
-  let decimalSize = Math.round(size / CARRY);
-
-  while (decimalSize > CARRY) {
-    decimalSize = decimalSize / CARRY;
-    carryCount++;
-  }
-
-  if (decimalSize >= 1000) {
-    decimalSize = decimalSize / CARRY;
-    carryCount++;
-  }
-
-  const fixedNumber = decimalSize < 9.996 ? 2 : (decimalSize < 99.95 ? 1 : 0);
-  return `${decimalSize.toFixed(fixedNumber)} ${unitMap[carryCount]}`;
-};
 
 type FileInfoKey = React.Key;
 
@@ -342,10 +297,23 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
         <Button onClick={up} icon={<UpOutlined />} shape="circle" />
         <PathBar
           path={path}
-          reload={reload}
-          go={(path) => Router.push(fullUrl(path))}
           loading={loading}
-          fullUrl={fullUrl}
+          onPathChange={(curPath) => { curPath === path ? reload() : Router.push(fullUrl(curPath)); }}
+          breadcrumbItemRender={(pathSegment, index, path) =>
+            (index === 0 ? (
+              <Link href={fullUrl("/")} title="/" onClick={(e) => e.stopPropagation()}>
+                <DatabaseOutlined />
+              </Link>
+            ) : (
+              <Link
+                href={fullUrl(path)}
+                key={index}
+                onClick={(e) => e.stopPropagation()}
+              >
+                {pathSegment}
+              </Link>
+            ))
+          }
         />
       </TopBar>
       <OperationBar>
@@ -444,17 +412,15 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
           </MkdirButton>
         </Space>
       </OperationBar>
-      <Table
-        dataSource={files.filter((file) => showHiddenFile || !file.name.startsWith("."))}
+      <FileTable
+        files={files}
+        filesFilter={(files) => files.filter((file) => showHiddenFile || !file.name.startsWith("."))}
         loading={loading}
-        pagination={false}
-        size="small"
-        rowKey={(r) => fileInfoKey(r, path)}
-        scroll={{ x: true }}
         rowSelection={{
           selectedRowKeys: selectedKeys,
-          onChange: (keys) => setSelectedKeys(keys),
+          onChange: setSelectedKeys,
         }}
+        rowKey={(r) => fileInfoKey(r, path)}
         onRow={(r) => ({
           onClick: () => {
             setSelectedKeys([fileInfoKey(r, path)]);
@@ -468,134 +434,65 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
             }
           },
         })}
-      >
-        <Table.Column<FileInfo>
-          dataIndex="type"
-          title=""
-          width="32px"
-          render={(_, r) => (
-            React.createElement(fileTypeIcons[r.type])
-          )}
-        />
-
-        <Table.Column<FileInfo>
-          dataIndex="name"
-          title="文件名"
-          defaultSortOrder={"ascend"}
-          sorter={
-            (a, b) => a.type.localeCompare(b.type) === 0
-              ? a.name.localeCompare(b.name)
-              : a.type.localeCompare(b.type)
-          }
-          sortDirections={["ascend", "descend"]}
-          render={(_, r) => (
-            r.type === "DIR" ? (
-              <Link href={join(urlPrefix, cluster.id, path, r.name)} passHref>
-                {r.name}
-              </Link>
-            ) : (
-              <a onClick={() => {
-                const href = urlToDownload(cluster.id, join(path, r.name), false);
-                openPreviewLink(href);
-              }}
-              >
-                {r.name}
-              </a>
-            )
-          )}
-        />
-
-        <Table.Column<FileInfo>
-          dataIndex="mtime"
-          title="修改日期"
-          render={(mtime: string | undefined) => mtime ? formatDateTime(mtime) : ""}
-          sorter={
-            (a, b) => a.type.localeCompare(b.type) === 0
-              ? compareDateTime(a.mtime, b.mtime) === 0
-                ? a.name.localeCompare(b.name)
-                : compareDateTime(a.mtime, b.mtime)
-              : a.type.localeCompare(b.type)
-          }
-        />
-
-        <Table.Column<FileInfo>
-          dataIndex="size"
-          title="大小"
-          render={
-            (size: number | undefined, file: FileInfo) =>
-              (size === undefined || file.type === "DIR")
-                ? ""
-                : (
-                  <Tooltip title={Math.round((size) / 1024).toLocaleString() + "KB"} placement="topRight">
-                    <span>{formatFileSize(size)}</span>
-                  </Tooltip>
-                )
-          }
-          sorter={
-            (a, b) => {
-              return a.type.localeCompare(b.type) === 0
-                ? compareNumber(a.size, b.size) === 0
-                  ? a.name.localeCompare(b.name)
-                  : compareNumber(a.size, b.size)
-                : a.type.localeCompare(b.type);
+        fileNameRender={(_, r) => (
+          r.type === "DIR" ? (
+            <Link href={join(urlPrefix, cluster.id, path, r.name)} passHref>
+              {r.name}
+            </Link>
+          ) : (
+            <a onClick={() => {
+              const href = urlToDownload(cluster.id, join(path, r.name), false);
+              openPreviewLink(href);
             }}
-        />
-
-        <Table.Column<FileInfo>
-          dataIndex="mode"
-          title="权限"
-          render={(mode: number | undefined) => mode === undefined ? "" : nodeModeToString(mode)}
-        />
-
-        <Table.Column<FileInfo>
-          dataIndex="action"
-          title="操作"
-          render={(_, i: FileInfo) => (
-            <Space>
-              {
-                i.type === "FILE" ? (
-                  <a href={urlToDownload(cluster.id, join(path, i.name), true)}>
-                    下载
-                  </a>
-                ) : undefined
-              }
-              <RenameLink
-                cluster={cluster.id}
-                path={join(path, i.name)}
-                reload={reload}
-              >
-                重命名
-              </RenameLink>
-              <a onClick={() => {
-                const fullPath = join(path, i.name);
-                modal.confirm({
-                  title: "确认删除",
-                  // icon: < />,
-                  content: `确认删除${fullPath}？`,
-                  okText: "确认",
-                  onOk: async () => {
-                    await (i.type === "FILE" ? api.deleteFile : api.deleteDir)({
-                      query: {
-                        cluster: cluster.id,
-                        path: fullPath,
-                      },
-                    })
-                      .then(() => {
-                        message.success("删除成功！");
-                        resetSelectedAndOperation();
-                        reload();
-                      });
-                  },
-                });
-              }}
-              >
-                删除
-              </a>
-            </Space>
-          )}
-        />
-
-      </Table>
+            >
+              {r.name}
+            </a>
+          )
+        )}
+        actionRender={(_, i: FileInfo) => (
+          <Space>
+            {
+              i.type === "FILE" ? (
+                <a href={urlToDownload(cluster.id, join(path, i.name), true)}>
+                  下载
+                </a>
+              ) : undefined
+            }
+            <RenameLink
+              cluster={cluster.id}
+              path={join(path, i.name)}
+              reload={reload}
+            >
+              重命名
+            </RenameLink>
+            <a onClick={() => {
+              const fullPath = join(path, i.name);
+              modal.confirm({
+                title: "确认删除",
+                // icon: < />,
+                content: `确认删除${fullPath}？`,
+                okText: "确认",
+                onOk: async () => {
+                  await (i.type === "FILE" ? api.deleteFile : api.deleteDir)({
+                    query: {
+                      cluster: cluster.id,
+                      path: fullPath,
+                    },
+                  })
+                    .then(() => {
+                      message.success("删除成功！");
+                      resetSelectedAndOperation();
+                      reload();
+                    });
+                },
+              });
+            }}
+            >
+              删除
+            </a>
+          </Space>
+        )}
+      />
     </div>
   );
 };

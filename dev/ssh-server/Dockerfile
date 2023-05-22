@@ -8,11 +8,11 @@
 # MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 # See the Mulan PSL v2 for more details.
 
-FROM alpine:3.17
+FROM alpine:3.18
 
 ENV TZ Asia/Shanghai
 
-RUN apk add --no-cache openssh=9.1_p1-r2 sudo
+RUN apk add --no-cache openssh=9.3_p1-r3 sudo
 
 RUN echo 'root:root' | chpasswd
 

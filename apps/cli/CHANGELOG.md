@@ -1,5 +1,19 @@
 # @scow/cli
 
+## 0.6.0
+
+### Minor Changes
+
+- 901ecdb7e: 支持使用外部页面创建用户
+
+### Patch Changes
+
+- Updated dependencies [901ecdb7e]
+- Updated dependencies [d2c8e765e]
+- Updated dependencies [ce077930a]
+  - @scow/config@0.3.0
+  - @scow/lib-config@0.2.2
+
 ## 0.5.0
 
 ### Minor Changes

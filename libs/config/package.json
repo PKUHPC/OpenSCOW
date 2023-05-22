@@ -1,6 +1,6 @@
 {
   "name": "@scow/config",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "description": "",
   "scripts": {
@@ -16,7 +16,7 @@
   "repository": "https://github.com/PKUHPC/SCOW",
   "dependencies": {
     "@scow/lib-config": "workspace:*",
-    "@sinclair/typebox": "0.28.9"
+    "@sinclair/typebox": "0.28.10"
   },
   "volta": {
     "extends": "../../package.json"

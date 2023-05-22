@@ -1,6 +1,6 @@
 {
   "name": "@scow/auth",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "",
   "main": "build/index.js",
   "private": true,
@@ -30,7 +30,7 @@
     "@scow/lib-config": "workspace:*",
     "@scow/lib-ssh": "workspace:*",
     "@scow/utils": "workspace:*",
-    "@sinclair/typebox": "0.28.9",
+    "@sinclair/typebox": "0.28.10",
     "asn1": "0.2.6",
     "fastify": "4.17.0",
     "fastify-graceful-shutdown": "3.4.0",
@@ -41,8 +41,8 @@
     "svg-captcha": "1.4.0",
     "pino-pretty": "10.0.0",
     "pino": "8.14.1",
-    "nodemailer": "6.9.1",
-    "qrcode": "1.5.1",
+    "nodemailer": "6.9.2",
+    "qrcode": "1.5.3",
     "speakeasy": "2.0.0"
   },
   "devDependencies": {

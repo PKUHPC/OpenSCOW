@@ -242,7 +242,7 @@ export const appOps = (cluster: string): AppOps => {
         // If a job is not running, it cannot be ready
         const client = getAdapterClient(cluster);
         const runningJobsInfo = await asyncClientCall(client.job, "getJobs", {
-          fields: ["job_id", "state", "elapsed_seconds", "time_limit_minutes"],
+          fields: ["job_id", "state", "elapsed_seconds", "time_limit_minutes", "reason"],
           filter: {
             users: [userId], accounts: [],
             states: ["RUNNING", "PENDING"],
@@ -282,7 +282,8 @@ export const appOps = (cluster: string): AppOps => {
 
           const app = apps[sessionMetadata.appId];
 
-          let ready = false;
+          let host: string | undefined = undefined;
+          let port: number | undefined = undefined;
 
           // judge whether the app is ready
           if (runningJobInfo && runningJobInfo.state === "RUNNING") {
@@ -290,24 +291,38 @@ export const appOps = (cluster: string): AppOps => {
             // for server apps,
             // try to read the SESSION_INFO file to get port and password
               const infoFilePath = join(jobDir, SERVER_SESSION_INFO);
-              ready = await sftpExists(sftp, infoFilePath);
+              if (await sftpExists(sftp, infoFilePath)) {
+                const content = await sftpReadFile(sftp)(infoFilePath);
+                const serverSessionInfo = JSON.parse(content.toString()) as ServerSessionInfoData;
 
+                host = serverSessionInfo.HOST;
+                port = serverSessionInfo.PORT;
+              }
             } else {
             // for vnc apps,
             // try to find the output file and try to parse the display number
-              const outputFilePath = join(jobDir, VNC_OUTPUT_FILE);
+              const vncSessionInfoPath = join(jobDir, VNC_SESSION_INFO);
+              if (await sftpExists(sftp, vncSessionInfoPath)) {
+                host = (await sftpReadFile(sftp)(vncSessionInfoPath)).toString().trim();
 
-              if (await sftpExists(sftp, outputFilePath)) {
-                const content = (await sftpReadFile(sftp)(outputFilePath)).toString();
-                try {
-                  parseDisplayId(content);
-                  ready = true;
-                } catch {
-                // ignored if displayId cannot be parsed
+                const outputFilePath = join(jobDir, VNC_OUTPUT_FILE);
+                if (await sftpExists(sftp, outputFilePath)) {
+                  const content = (await sftpReadFile(sftp)(outputFilePath)).toString();
+                  try {
+                    const displayId = parseDisplayId(content);
+                    port = displayIdToPort(displayId!);
+                  } catch {
+                  // ignored if displayId cannot be parsed
+                  }
                 }
               }
             }
           }
+
+          const terminatedStates = ["BOOT_FAIL", "COMPLETED", "DEADLINE", "FAILED",
+            "NODE_FAIL", "PREEMPTED", "SPECIAL_EXIT", "TIMEOUT"];
+          const isPendingOrTerminated = runningJobInfo?.state === "PENDING"
+            || terminatedStates.includes(runningJobInfo?.state);
 
           sessions.push({
             jobId: sessionMetadata.jobId,
@@ -315,10 +330,12 @@ export const appOps = (cluster: string): AppOps => {
             sessionId: sessionMetadata.sessionId,
             submitTime: new Date(sessionMetadata.submitTime),
             state: runningJobInfo?.state ?? "ENDED",
-            ready,
             dataPath: await sftpRealPath(sftp)(jobDir),
             runningTime: runningJobInfo?.elapsedSeconds ? formatTime(runningJobInfo.elapsedSeconds * 1000) : "",
             timeLimit: runningJobInfo?.timeLimitMinutes ? formatTime(runningJobInfo.timeLimitMinutes * 60 * 1000) : "",
+            reason: isPendingOrTerminated ? (runningJobInfo?.reason ?? "") : undefined,
+            host,
+            port,
           });
 
         }));

@@ -53,20 +53,29 @@ export const MisConfigSchema = Type.Object({
     errorMessage: Type.Optional(Type.String({ description: "如果账户名不符合规则显示什么" })),
   })),
 
-  userIdPattern: Type.Optional(Type.Object({
-    regex: Type.String({ description: "用户ID的正则规则" }),
-    errorMessage: Type.Optional(Type.String({ description: "如果用户ID不符合规则显示什么" })),
-  }, { deprecated: true, description: "请使用createUser.userIdPattern配置" })),
-
   createUser: Type.Object({
     enabled: Type.Boolean({ description: "是否启用用户从SCOW中创建用户", default: true }),
+
+    type: Type.Union([Type.Literal("builtin"), Type.Literal("external")], {
+      description: "用户创建方式", default: "builtin",
+    }),
+
+    external: Type.Optional(Type.Object({
+      url: Type.String({ description: "创建用户的页面" }),
+    }, { description: "通过外置页面创建用户时的配置。使用此配置无需认证系统支持创建用户" })),
 
     userIdPattern: Type.Optional(Type.Object({
       regex: Type.String({ description: "用户ID的正则规则" }),
       errorMessage: Type.Optional(Type.String({ description: "如果用户ID不符合规则显示什么" })),
-    }, { description: "从管理系统里创建用户时，用户ID的验证规则" })),
+    }, { deprecated: true, description: "请使用createUser.builtin.userIdPattern" })),
 
-  }, { default: {}, description: "当认证系统允许创建用户时，SCOW的创建用户相关配置" }),
+    builtin: Type.Optional(Type.Object({
+      userIdPattern: Type.Optional(Type.Object({
+        regex: Type.String({ description: "用户ID的正则规则" }),
+        errorMessage: Type.Optional(Type.String({ description: "如果用户ID不符合规则显示什么" })),
+      }, { description: "从管理系统里创建用户时，用户ID的验证规则" })),
+    }, { default: {}, description: "通过内置页面创建用户时的配置。要使用内置页面，认证系统需要支持创建用户" })),
+  }, { default: {}, description: "SCOW的创建用户相关配置" }),
 
   fetchJobs: Type.Object({
     startDate: Type.Optional(Type.String({ description: "从哪个时间点开始获取结束作业信息(ISO 8601)", format: "date-time" })),
@@ -98,9 +107,17 @@ export type MisConfigSchema = Static<typeof MisConfigSchema>;
 export const getMisConfig: GetConfigFn<MisConfigSchema> = (baseConfigPath, logger) => {
   const config = getConfigFromFile(MisConfigSchema, MIS_CONFIG_NAME, baseConfigPath ?? DEFAULT_CONFIG_BASE_PATH);
 
-  if (config.userIdPattern && !config.createUser.userIdPattern) {
-    logger?.warn("mis.yaml userIdPattern is deprecated and will be removed in a future version. " +
-    "Use createUser.userIdPattern instead");
+  if (config.createUser.type === "external" && !config.createUser.external) {
+    throw new Error("createUser.external is required when createUser.type is external");
+  }
+
+  if (config.createUser.type === "builtin" && !config.createUser.builtin) {
+    throw new Error("createUser.builtin is required when createUser.type is builtin");
+  }
+
+  if (config.createUser.type === "builtin"
+  && config.createUser.userIdPattern && !config.createUser.builtin?.userIdPattern) {
+    logger?.warn("createUser.userIdPattern is deprecated, please use createUser.builtin.userIdPattern");
   }
 
   return config;

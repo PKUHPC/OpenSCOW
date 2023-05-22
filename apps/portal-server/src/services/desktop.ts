@@ -16,7 +16,6 @@ import { Status } from "@grpc/grpc-js/build/src/constants";
 import { executeAsUser } from "@scow/lib-ssh";
 import { DesktopServiceServer, DesktopServiceService } from "@scow/protos/build/portal/desktop";
 import { portalConfig } from "src/config/portal";
-import { dnsResolve } from "src/utils/dns";
 import { clusterNotFound } from "src/utils/errors";
 import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
 import { displayIdToPort,
@@ -75,7 +74,7 @@ export const desktopServiceServer = plugin((server) => {
 
         const port = displayIdToPort(displayId);
 
-        return [{ host: await dnsResolve(host), password, port }];
+        return [{ host, password, port }];
 
       });
     },
@@ -114,7 +113,7 @@ export const desktopServiceServer = plugin((server) => {
 
         const password = await refreshPassword(ssh, userId, logger, displayId);
 
-        return [{ host: await dnsResolve(host), port: displayIdToPort(displayId), password }];
+        return [{ host, port: displayIdToPort(displayId), password }];
       });
 
     },
