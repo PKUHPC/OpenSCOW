@@ -95,7 +95,7 @@ export const FileTable: React.FC<Props> = (
         ? ""
         : (
           <Tooltip title={Math.round((size) / 1024).toLocaleString() + "KB"} placement="topRight">
-            <span>{formatSize(size)}</span>
+            <span>{formatSize(Math.round(size / 1024))}</span>
           </Tooltip>
         ),
       sorter: (a, b) => {
