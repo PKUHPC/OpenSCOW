@@ -21,7 +21,8 @@ import { JobPriceItem } from "src/entities/JobPriceItem";
 import { ClusterPlugin } from "src/plugins/clusters";
 
 export interface JobInfo {
-  biJobIndex: number;
+  // cluster job id
+  jobId: number;
   // scow cluster id
   cluster: string;
   partition: string;

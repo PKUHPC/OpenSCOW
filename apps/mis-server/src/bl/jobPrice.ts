@@ -58,7 +58,7 @@ export function calculateJobPrice(
   info: JobInfo, getPriceItem: PriceMap["getPriceItem"],
   logger: Logger): JobPriceInfo {
 
-  logger.trace(`Calculating price for job ${info.biJobIndex}`);
+  logger.trace(`Calculating price for job ${info.jobId} in cluster ${info.cluster}`);
 
   const clusterInfo = clusters[info.cluster];
 
