@@ -13,7 +13,7 @@
 const DEFAULT_UNIT_MAP = ["KB", "MB", "GB", "TB", "PB"];
 
 /**
- * 传入size的单位应为unitMap的最小单位，默认传入KB
+ * @description 传入size的单位应为unitMap的最小单位，默认传入KB
  * @param size
  * @param unitMap
  * @returns
