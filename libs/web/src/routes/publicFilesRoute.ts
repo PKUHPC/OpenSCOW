@@ -18,7 +18,7 @@ export const publicFilesRoute = (req: NextApiRequest, res: NextApiResponse) => {
 
   const path = queryToArray(req.query.path);
 
-  send(req, path.join("/"), { root: "public/scow" }).pipe(res);
+  send(req, path.join("/"), { root: "public/scow", dotfiles: "allow" }).pipe(res);
 
 };
 
