@@ -196,6 +196,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
       volumes: {
         "/etc/hosts": "/etc/hosts",
         "./config": "/etc/scow",
+        "./public": "/app/apps/portal-web/public/scow",
       },
     });
 
@@ -236,6 +237,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
       ports: {},
       volumes: {
         "./config": "/etc/scow",
+        "./public": "/app/apps/mis-web/public/scow",
       },
     });
 

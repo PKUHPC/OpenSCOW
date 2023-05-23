@@ -25,6 +25,7 @@ const initAssets = [
   join(__dirname, "../../assets/config"),
   join(__dirname, "../../assets/fluent"),
   join(__dirname, "../../assets/plugins"),
+  join(__dirname, "../../assets/public"),
 ];
 
 // fs.promise.cp throws error for config dir
