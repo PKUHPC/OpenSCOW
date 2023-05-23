@@ -11,6 +11,7 @@
  */
 
 import ConfigParser from "@webantic/nginx-config-parser";
+import { join } from "path";
 import { config } from "src/env";
 import { getNginxConfig } from "src/parse";
 
@@ -34,4 +35,13 @@ it("configures proxy_read_timeout", async () => {
 
   expect(nginxConf.server.proxy_read_timeout).toBe(config.PROXY_READ_TIMEOUT);
 
+});
+
+it("generates static files location", async () => {
+  const nginxConf = parseNginxConfig(config);
+
+  expect(nginxConf.server[`location ${join(config.BASE_PATH, config.PUBLIC_PATH)}`]).toEqual({
+    alias: config.PUBLIC_DIR,
+    autoindex: "off",
+  });
 });
