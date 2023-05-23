@@ -33,7 +33,7 @@ export const config = envConfig({
 
   EXTRA: str({ desc: "更多nginx配置", default: "" }),
 
-  PUBLIC_DIR: str({ desc: "静态文件路径", default: "/app/apps/gateway/public" }),
+  PUBLIC_DIR: str({ desc: "静态文件在文件系统中的路径。以/结尾", default: "/app/apps/gateway/public/" }),
   PUBLIC_PATH: str({ desc: "静态文件路径前缀。以/开头，以/结尾", default: "/__public__/" }),
 });
 

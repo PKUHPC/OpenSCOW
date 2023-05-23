@@ -107,7 +107,8 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
     });
   }
 
-  const publicPath = "/public/";
+  const publicPath = "/__public__/";
+  const publicDir = "/app/apps/gateway/public/";
 
   // GATEWAY
   addService("gateway", {
@@ -120,11 +121,12 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
       "CLIENT_MAX_BODY_SIZE": config.gateway.uploadFileSizeLimit,
       "PROXY_READ_TIMEOUT": config.gateway.proxyReadTimeout,
       "PUBLIC_PATH": publicPath,
+      "PUBLIC_DIR": publicDir,
     },
     ports: { [config.port]: 80 },
     volumes: {
       "/etc/hosts": "/etc/hosts",
-      "./public": "/app/apps/gateway/public",
+      "./public": publicDir,
     },
   });
 
