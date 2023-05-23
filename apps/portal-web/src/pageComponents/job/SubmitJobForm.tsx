@@ -14,6 +14,7 @@ import { parsePlaceholder } from "@scow/lib-config/build/parse";
 import { App, Button, Checkbox, Col, Form, Input, InputNumber, Row, Select } from "antd";
 import dayjs from "dayjs";
 import Router from "next/router";
+import { join } from "path";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useAsync } from "react-async";
 import { useStore } from "simstate";
@@ -76,8 +77,6 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
   const [form] = Form.useForm<JobForm>();
   const [loading, setLoading] = useState(false);
 
-
-
   const submit = async () => {
     const { cluster, command, jobName, coreCount, gpuCount, workingDirectory, output, errorOutput, save,
       maxTime, nodeCount, partition, qos, account, comment } = await form.validateFields();
@@ -120,8 +119,8 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
 
   const gpuCount = Form.useWatch("gpuCount", form) as number;
 
-  const calculateWorkingDirectory = (template: string) =>
-    parsePlaceholder(template, { name: jobName });
+  const calculateWorkingDirectory = (template: string, homePath: string = "") =>
+    join(homePath + "/", parsePlaceholder(template, { name: jobName }));
 
   const clusterInfoQuery = useAsync({
     promiseFn: useCallback(async () => cluster
@@ -144,21 +143,24 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
 
       const jobInitialName = genJobName();
       form.setFieldValue("jobName", jobInitialName);
-      setWorkingDirectoryValue();
-
     },
+  });
+
+  const { data: homePath, isLoading: isHomePathLoading } = useAsync({
+    promiseFn: useCallback(async () => cluster
+      ? api.getHomeDirectory({ query: { cluster: cluster.id } }) : { path: "" }, [cluster?.id]),
   });
 
   const setWorkingDirectoryValue = () => {
     if (!form.isFieldTouched("workingDirectory") && clusterInfoQuery.data) {
       form.setFieldValue("workingDirectory",
-        calculateWorkingDirectory(clusterInfoQuery.data.clusterInfo.submitJobDirTemplate));
+        calculateWorkingDirectory(clusterInfoQuery.data.clusterInfo.submitJobDirTemplate, homePath?.path));
     }
   };
 
   useEffect(() => {
     setWorkingDirectoryValue();
-  }, [jobName, clusterInfoQuery.data]);
+  }, [jobName, clusterInfoQuery.data, homePath?.path]);
 
   const currentPartitionInfo = useMemo(() =>
     clusterInfoQuery.data
@@ -330,7 +332,6 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
         <Col span={24} sm={10}>
           <Form.Item<JobForm> label="工作目录" name="workingDirectory" rules={[{ required: true }]}>
             <Input
-              addonBefore="~/"
               suffix={
                 (
                   <FileSelectModal
@@ -380,7 +381,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
       <Form.Item name="save" valuePropName="checked">
         <Checkbox>保存为模板</Checkbox>
       </Form.Item>
-      <Button type="primary" htmlType="submit" loading={loading}>
+      <Button type="primary" htmlType="submit" loading={loading || isHomePathLoading}>
           提交
       </Button>
     </Form>

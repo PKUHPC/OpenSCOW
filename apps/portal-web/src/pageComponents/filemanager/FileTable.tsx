@@ -131,7 +131,6 @@ export const FileTable: React.FC<Props> = (
       }
       pagination={false}
       size="small"
-      scroll={{ x: true }}
     />
   );
 };
