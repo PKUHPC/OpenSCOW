@@ -35,3 +35,12 @@ it("configures proxy_read_timeout", async () => {
   expect(nginxConf.server.proxy_read_timeout).toBe(config.PROXY_READ_TIMEOUT);
 
 });
+
+it("generates static files location", async () => {
+  const nginxConf = parseNginxConfig(config);
+
+  expect(nginxConf.server["location /__public__/"]).toEqual({
+    root: "/app/apps/gateway/public",
+    autoindex: "off",
+  });
+});

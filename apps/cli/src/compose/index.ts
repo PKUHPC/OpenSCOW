@@ -107,6 +107,8 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
     });
   }
 
+  const publicPath = "/public/";
+
   // GATEWAY
   addService("gateway", {
     image: scowImage,
@@ -117,9 +119,13 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
       "MIS_PATH": MIS_PATH,
       "CLIENT_MAX_BODY_SIZE": config.gateway.uploadFileSizeLimit,
       "PROXY_READ_TIMEOUT": config.gateway.proxyReadTimeout,
+      "PUBLIC_PATH": publicPath,
     },
     ports: { [config.port]: 80 },
-    volumes: { "/etc/hosts": "/etc/hosts" },
+    volumes: {
+      "/etc/hosts": "/etc/hosts",
+      "./public": "/app/apps/gateway/public",
+    },
   });
 
   // AUTH
@@ -191,12 +197,12 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
         "AUTH_EXTERNAL_URL": join(BASE_PATH, "/auth"),
         "NOVNC_CLIENT_URL": join(BASE_PATH, "/vnc"),
         "CLIENT_MAX_BODY_SIZE": config.gateway.uploadFileSizeLimit,
+        "PUBLIC_PATH": join(BASE_PATH, publicPath),
       },
       ports: {},
       volumes: {
         "/etc/hosts": "/etc/hosts",
         "./config": "/etc/scow",
-        "./public": "/app/apps/portal-web/public/scow",
       },
     });
 
@@ -233,11 +239,11 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
         "PORTAL_URL": join(BASE_PATH, PORTAL_PATH),
         "PORTAL_DEPLOYED": config.portal ? "true" : "false",
         "AUTH_EXTERNAL_URL": join(BASE_PATH, "/auth"),
+        "PUBLIC_PATH": join(BASE_PATH, publicPath),
       },
       ports: {},
       volumes: {
         "./config": "/etc/scow",
-        "./public": "/app/apps/mis-web/public/scow",
       },
     });
 
