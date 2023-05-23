@@ -70,6 +70,8 @@ export interface PublicRuntimeConfig {
   // 上传（请求）文件的大小限制
   CLIENT_MAX_BODY_SIZE: string;
 
+  PUBLIC_PATH: string;
+
   NAV_LINKS?: NavLink[];
 }
 

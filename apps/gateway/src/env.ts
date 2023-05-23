@@ -32,5 +32,8 @@ export const config = envConfig({
   AUTH_INTERNAL_URL: str({ desc: "认证服务内部地址", default: "http://auth:5000" }),
 
   EXTRA: str({ desc: "更多nginx配置", default: "" }),
+
+  PUBLIC_DIR: str({ desc: "静态文件在文件系统中的路径。以/结尾", default: "/app/apps/gateway/public/" }),
+  PUBLIC_PATH: str({ desc: "静态文件路径前缀。以/开头，以/结尾", default: "/__public__/" }),
 });
 

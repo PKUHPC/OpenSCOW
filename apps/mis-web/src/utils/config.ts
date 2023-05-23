@@ -49,6 +49,8 @@ export interface PublicRuntimeConfig {
 
   PORTAL_URL: string | undefined;
 
+  PUBLIC_PATH: string | undefined;
+
   NAV_LINKS?: NavLink[];
 }
 

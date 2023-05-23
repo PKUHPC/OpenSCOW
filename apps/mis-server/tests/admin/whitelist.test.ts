@@ -13,6 +13,7 @@
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Server } from "@ddadaal/tsgrpc-server";
 import { ChannelCredentials } from "@grpc/grpc-js";
+import { Loaded } from "@mikro-orm/core";
 import { SqlEntityManager } from "@mikro-orm/mysql";
 import { Decimal } from "@scow/lib-decimal";
 import { AccountServiceClient } from "@scow/protos/build/server/account";
@@ -28,7 +29,7 @@ let server: Server;
 let em: SqlEntityManager;
 let client: AccountServiceClient;
 let data: InitialData;
-let a: Account;
+let a: Loaded<Account, "tenant">;
 
 beforeEach(async () => {
   server = await createServer();
@@ -76,6 +77,36 @@ it("blocks account when it is dewhitelisted and balance is < 0", async () => {
   await em.persistAndFlush(whitelist);
 
   a.balance = new Decimal(-1);
+
+  a.blocked = false;
+  a.whitelist = toRef(whitelist);
+
+  await em.flush();
+
+  const resp = await asyncClientCall(client, "dewhitelistAccount", {
+    tenantName: a.tenant.getProperty("name"),
+    accountName: a.accountName,
+  });
+
+  expect(resp.executed).toBeTrue();
+
+  await em.refresh(a);
+  await reloadEntity(em, a);
+
+  expect(a.blocked).toBeTrue();
+});
+
+it("blocks account when it is dewhitelisted and balance is = 0", async () => {
+
+  const whitelist = new AccountWhitelist({
+    account: a,
+    comment: "",
+    operatorId: "123",
+  });
+
+  await em.persistAndFlush(whitelist);
+
+  a.balance = new Decimal(0);
 
   a.blocked = false;
   a.whitelist = toRef(whitelist);

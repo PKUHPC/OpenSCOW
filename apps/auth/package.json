@@ -30,7 +30,7 @@
     "@scow/lib-config": "workspace:*",
     "@scow/lib-ssh": "workspace:*",
     "@scow/utils": "workspace:*",
-    "@sinclair/typebox": "0.28.10",
+    "@sinclair/typebox": "0.28.11",
     "asn1": "0.2.6",
     "fastify": "4.17.0",
     "fastify-graceful-shutdown": "3.4.0",
@@ -48,7 +48,7 @@
   "devDependencies": {
     "@types/asn1": "0.2.0",
     "@types/ldapjs": "2.2.5",
-    "@types/nodemailer": "6.4.7",
+    "@types/nodemailer": "6.4.8",
     "@types/qrcode": "1.5.0",
     "@types/speakeasy": "2.0.7"
   },
