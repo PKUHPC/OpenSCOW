@@ -55,10 +55,6 @@ const TenantInfoTable: React.FC<TenantInfoTableProps> = ({
       title: "租户ID",
     },
     {
-      dataIndex: "tenantId",
-      title: "租户ID",
-    },
-    {
       dataIndex: "tenantName",
       title: "租户名称",
     },
