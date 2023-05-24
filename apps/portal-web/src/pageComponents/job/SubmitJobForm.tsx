@@ -330,7 +330,18 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
           </Form.Item>
         </Col>
         <Col span={24} sm={10}>
-          <Form.Item<JobForm> label="工作目录" name="workingDirectory" rules={[{ required: true }]}>
+          <Form.Item<JobForm>
+            label="工作目录"
+            name="workingDirectory"
+            rules={[{ required: true }]}
+            tooltip={(
+              <>
+                <span>1. 请填写绝对路径，如填写相对路径，则相对于该用户家目录；</span>
+                <br />
+                <span>2. 填写目录不可访问或者不可操作时，提交作业或者作业运行将失败；</span>
+              </>
+            )}
+          >
             <Input
               suffix={
                 (
