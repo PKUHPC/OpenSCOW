@@ -15,7 +15,7 @@ import { compareDateTime, formatDateTime } from "@scow/lib-web/build/utils/datet
 import { compareNumber } from "@scow/lib-web/build/utils/math";
 import { queryToString } from "@scow/lib-web/build/utils/querystring";
 import type { AppSession } from "@scow/protos/build/portal/app";
-import { App, Button, Checkbox, Form, Popconfirm, Space, Table, TableColumnsType, Tooltip } from "antd";
+import { App, Button, Checkbox, Form, Popconfirm, Select, Space, Table, TableColumnsType, Tooltip } from "antd";
 import type { CheckboxChangeEvent } from "antd/es/checkbox";
 import { useRouter } from "next/router";
 import { join } from "path";
@@ -30,6 +30,11 @@ import { ConnectTopAppLink } from "src/pageComponents/app/ConnectToAppLink";
 import { AppsStore } from "src/stores/AppsStore";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { publicConfig } from "src/utils/config";
+
+type Status = "RUNNING" | "PENDING";
+
+const RUNNING: Status = "RUNNING";
+const PENDING: Status = "PENDING";
 
 interface Props {
 }
@@ -49,6 +54,8 @@ export const AppSessionsTable: React.FC<Props> = () => {
   const cluster = publicConfig.CLUSTERS.find((x) => x.id === clusterQuery) ?? defaultClusterStore.cluster;
 
   const [connectivityRefreshToken, setConnectivityRefreshToken] = useState(false);
+
+  const [appSessionState, setAppSessionState] = useState<Status>(RUNNING);
 
   const { data, isLoading, reload } = useAsync({
     promiseFn: useCallback(async () => {
@@ -219,10 +226,21 @@ export const AppSessionsTable: React.FC<Props> = () => {
               10s自动刷新
             </Checkbox>
           </Form.Item>
+          <Form.Item label="状态">
+            <Select
+              style={{ minWidth: "100px" }}
+              value={appSessionState}
+              allowClear
+              onChange={(value) => setAppSessionState(value)}
+            >
+              <Select.Option value={RUNNING}>运行中</Select.Option>
+              <Select.Option value={PENDING}>排队中</Select.Option>
+            </Select>
+          </Form.Item>
         </Form>
       </FilterFormContainer>
       <Table
-        dataSource={data}
+        dataSource={appSessionState ? data?.filter((x) => x.state === appSessionState) : data}
         columns={columns}
         rowKey={(record) => record.sessionId}
         loading={!data && isLoading}
