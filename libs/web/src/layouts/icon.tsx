@@ -12,28 +12,23 @@
 
 import AntdIcon from "@ant-design/icons";
 import Image from "next/image";
-import { addBasePathToImage } from "src/utils/image";
 
 interface Props {
   src: any;
   alt: string;
-  basePath?: string;
 }
 
-export function NavIcon({ src, alt, basePath = "" }: Props) {
+export function NavIcon({ src, alt }: Props) {
 
   return (
     <AntdIcon
-      component={({ width, height, style, className, fill }: any) => (
+      component={({ style, className }: any) => (
         <Image
-          src={addBasePathToImage(src, basePath)}
+          src={src}
           alt={alt}
-          style={{
-            width,
-            height,
-            fill,
-            ...style,
-          }}
+          style={{ ...style }}
+          width={14}
+          height={14}
           className={className}
         />
       )}

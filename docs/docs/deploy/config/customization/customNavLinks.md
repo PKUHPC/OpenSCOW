@@ -43,7 +43,7 @@ navLinks:
     # 链接地址
     url: ""
     # 可以看到这个链接的用户,可选填
-    # 用户类型： user, accountAdmin, accountOwner, tenantFinance, tenantAdmin, platformAdmin, platformFinance
+    # 用户类型： user, accountUser, accountAdmin, accountOwner, tenantFinance, tenantAdmin, platformAdmin, platformFinance
     allowedRoles: []
     # 二级导航,可选填
     children:

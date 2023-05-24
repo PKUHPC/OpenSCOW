@@ -17,7 +17,9 @@ import {
   PlusOutlined, PlusSquareOutlined, StarOutlined, ToolOutlined, UserAddOutlined,
   UserOutlined } from "@ant-design/icons";
 import { NavItemProps } from "@scow/lib-web/build/layouts/base/types";
+import { NavIcon } from "@scow/lib-web/build/layouts/icon";
 import { AccountAffiliation } from "@scow/protos/build/server/user";
+import { join } from "path";
 import { PlatformRole, TenantRole, UserRole } from "src/models/User";
 import { User } from "src/stores/UserStore";
 import { publicConfig } from "src/utils/config";
@@ -317,6 +319,8 @@ export const getAvailableRoutes = (user: User | undefined): NavItemProps[] => {
 
   // 获取当前用户角色
   const userCurrentRoles = getCurrentUserRoles(user);
+  console.log("mis-web-publicPath", publicConfig.PUBLIC_PATH);
+  console.log("user-role", userCurrentRoles);
 
   // 根据配置文件判断是否增加导航链接
   if (publicConfig.NAV_LINKS && publicConfig.NAV_LINKS.length > 0) {
@@ -325,7 +329,13 @@ export const getAvailableRoutes = (user: User | undefined): NavItemProps[] => {
       .filter((link) => !link.allowedRoles
         || (link.allowedRoles.length && link.allowedRoles.some((role) => userCurrentRoles[role])))
       .map((link) => ({
-        Icon: LinkOutlined,
+        Icon: !link.iconPath ? LinkOutlined : (
+          <NavIcon
+            src={publicConfig.PUBLIC_PATH ?
+              join(publicConfig.PUBLIC_PATH, link.iconPath) : link.iconPath}
+            alt={link.iconPath.split(".")[0]}
+          />
+        ),
         text: link.text,
         path: `${link.url}?token=${user.token}`,
         clickable: true,
@@ -334,7 +344,13 @@ export const getAvailableRoutes = (user: User | undefined): NavItemProps[] => {
           || (childLink.allowedRoles.length &&
             childLink.allowedRoles.some((role) => userCurrentRoles[role])))
           .map((childLink) => ({
-            Icon: LinkOutlined,
+            Icon: !childLink.iconPath ? LinkOutlined : (
+              <NavIcon
+                src={publicConfig.PUBLIC_PATH ?
+                  join(publicConfig.PUBLIC_PATH, childLink.iconPath) : childLink.iconPath}
+                alt={childLink.iconPath.split(".")[0]}
+              />
+            ),
             text: childLink.text,
             path: `${childLink.url}?token=${user.token}`,
             clickable: true,

@@ -24,6 +24,7 @@ import {
   PlusOutlined,
   SaveOutlined } from "@ant-design/icons";
 import { NavItemProps } from "@scow/lib-web/build/layouts/base/types";
+import { NavIcon } from "@scow/lib-web/build/layouts/icon";
 import { App } from "@scow/protos/build/portal/app";
 import { join } from "path";
 import { User } from "src/stores/UserStore";
@@ -34,6 +35,8 @@ export const userRoutes: (
 ) => NavItemProps[] = (user, defaultCluster, apps) => {
 
   if (!user) { return []; }
+
+  console.log("portal-web-publicPath", publicConfig.PUBLIC_PATH);
 
   return [
     {
@@ -128,13 +131,17 @@ export const userRoutes: (
     }] : []),
     ...(publicConfig.NAV_LINKS && publicConfig.NAV_LINKS.length > 0
       ? publicConfig.NAV_LINKS.map((link) => ({
-        Icon: LinkOutlined,
+        Icon: !link.iconPath ? LinkOutlined : (
+          <NavIcon src={join(publicConfig.PUBLIC_PATH, link.iconPath)} alt={link.iconPath.split(".")[0]} />
+        ),
         text: link.text,
         path: `${link.url}?token=${user.token}`,
         clickable: true,
         openInNewPage: true,
         children: link.children?.length ? link.children?.map((childLink) => ({
-          Icon: LinkOutlined,
+          Icon: !childLink.iconPath ? LinkOutlined : (
+            <NavIcon src={join(publicConfig.PUBLIC_PATH, childLink.iconPath)} alt={childLink.iconPath.split(".")[0]} />
+          ),
           text: childLink.text,
           path: `${childLink.url}?token=${user.token}`,
           clickable: true,
