@@ -44,7 +44,15 @@ export const ImportUsersTable: React.FC = () => {
   const promiseFn = useCallback(async () => {
     return await api.getClusterUsers({ query: {
       cluster: cluster.id,
-    } });
+    },
+    }).then((data) => {
+      return ({
+        accounts: data?.accounts?.map((account) => ({
+          owner: account.users[0]?.userId,
+          ...account,
+        })),
+      });
+    });
   }, [cluster]);
 
   const { data, isLoading, reload } = useAsync({ promiseFn });
