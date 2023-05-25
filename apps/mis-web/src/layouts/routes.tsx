@@ -331,9 +331,9 @@ export const getAvailableRoutes = (user: User | undefined): NavItemProps[] => {
       .map((link) => ({
         Icon: !link.iconPath ? LinkOutlined : (
           <NavIcon
-            src={publicConfig.PUBLIC_PATH ?
-              join(publicConfig.PUBLIC_PATH, link.iconPath) : link.iconPath}
-            alt={link.iconPath.split(".")[0]}
+            // src={publicConfig.PUBLIC_PATH ?
+            //   join(publicConfig.PUBLIC_PATH, "/", link.iconPath) : link.iconPath}
+            src="/icon-test.png"
           />
         ),
         text: link.text,
@@ -346,17 +346,17 @@ export const getAvailableRoutes = (user: User | undefined): NavItemProps[] => {
           .map((childLink) => ({
             Icon: !childLink.iconPath ? LinkOutlined : (
               <NavIcon
-                src={publicConfig.PUBLIC_PATH ?
-                  join(publicConfig.PUBLIC_PATH, childLink.iconPath) : childLink.iconPath}
-                alt={childLink.iconPath.split(".")[0]}
+                // src={publicConfig.PUBLIC_PATH ?
+                //   join(publicConfig.PUBLIC_PATH, childLink.iconPath) : childLink.iconPath}
+                src="/earth.svg"
               />
             ),
             text: childLink.text,
             path: `${childLink.url}?token=${user.token}`,
             clickable: true,
             openInNewPage: true,
-          })),
-      }));
+          }) as NavItemProps),
+      }) as NavItemProps);
 
     routes.push(...customNavLinkRoutes(mappedNavLinkItems));
   }

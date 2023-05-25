@@ -132,7 +132,10 @@ export const userRoutes: (
     ...(publicConfig.NAV_LINKS && publicConfig.NAV_LINKS.length > 0
       ? publicConfig.NAV_LINKS.map((link) => ({
         Icon: !link.iconPath ? LinkOutlined : (
-          <NavIcon src={join(publicConfig.PUBLIC_PATH, link.iconPath)} alt={link.iconPath.split(".")[0]} />
+          <NavIcon
+            // src={join(publicConfig.PUBLIC_PATH, "/", link.iconPath)}
+            src="/earth.svg"
+          />
         ),
         text: link.text,
         path: `${link.url}?token=${user.token}`,
@@ -140,7 +143,10 @@ export const userRoutes: (
         openInNewPage: true,
         children: link.children?.length ? link.children?.map((childLink) => ({
           Icon: !childLink.iconPath ? LinkOutlined : (
-            <NavIcon src={join(publicConfig.PUBLIC_PATH, childLink.iconPath)} alt={childLink.iconPath.split(".")[0]} />
+            <NavIcon
+              // src={join(publicConfig.PUBLIC_PATH, childLink.iconPath)}
+              src="/desktop.jpg"
+            />
           ),
           text: childLink.text,
           path: `${childLink.url}?token=${user.token}`,

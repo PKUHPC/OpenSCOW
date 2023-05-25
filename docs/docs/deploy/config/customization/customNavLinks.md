@@ -24,11 +24,14 @@ navLinks:
   - text: ""
     # 链接地址
     url: ""
+    # 图标路径，可选填
+    iconPath: ""
     # 二级导航,可选填
     children:
       # 二级导航相关配置，与一级导航相同，但是不允许再设置children
       - text: ""
         url: ""
+        iconPath: ""
 ```
 
 ## 管理系统中的配置
@@ -42,6 +45,8 @@ navLinks:
   - text: ""
     # 链接地址
     url: ""
+    # 图标路径，可选填
+    iconPath: ""
     # 可以看到这个链接的用户,可选填
     # 用户类型： user, accountUser, accountAdmin, accountOwner, tenantFinance, tenantAdmin, platformAdmin, platformFinance
     allowedRoles: []
@@ -50,19 +55,23 @@ navLinks:
       # 二级导航相关配置，与一级导航相同，但是不允许再设置children
       - text: ""
         url: ""
+        iconPath: ""
         allowedRoles: []
 ```
 
 ## 配置示例
 
 ### 门户系统自定义导航链接配置示例
+
 ```yaml title="config/portal.yaml"
 navLinks:
   - text: "一级导航1"
     url: "https://hahahaha1.com/"
+    iconPath: "/icon-test.png"
     children:
       - text: "二级导航1"
         url: "https://hahahaha1.1.com"
+        iconPath: "/earth.svg"
       - text: "二级导航2"
         url: "https://hahahaha1.2.com"
   - text: "一级导航2"
@@ -78,9 +87,11 @@ navLinks:
 navLinks:
   - text: "一级导航1"
     url: "https://hahahaha1.com/"
+    iconPath: "/icon-test.png"
     children:
       - text: "二级导航1"
         url: "https://hahahaha1.1.com"
+        iconPath: "/earth.svg"
         allowedRoles: [tenantFinance]
       - text: "二级导航2"
         url: "https://hahahaha1.2.com"
@@ -101,6 +112,7 @@ navLinks:
 | `navLinks`                | /                    | /                 |/           |/                                                                                          |
 | `text`                    | 字符串                | `portal`，`mis`    | 是         | 链接名称，SCOW导航栏上显示的名称                                                            |
 | `url`                     | 字符串                | `portal`，`mis`    | 是         | 链接地址，自定义导航链接地址，跳转时会在后面加入查询参数`?token={用来跟踪登录用户的状态的token}`  |
+| `iconPath`                     | 字符串           | `portal`，`mis`    | 否         | 图标路径，用户上传的自定义图标路径。可选填，如未填写则显示默认链接图标。  |
 | `allowedRoles`            |  用户角色字符串列表    | `mis`             |否           | 管理系统指定可以看到该导航链接的角色列表，用户角色类型包括  `user`, `accountUser`, `accountAdmin`, `accountOwner`, `tenantFinance`, `tenantAdmin`, `platformAdmin`, `platformFinance` 。如果没有指定，则不再限定用户角色，即所有用户都可以看到该导航链接。  |
 | `children`                |  导航内容的列表    | `portal`，`mis`   | 否          | 二级导航列表，内容包括该系统下一级导航的所有内容，内容类型以及是否必填与一级导航内容完全相同，但是不允许再继续设置chilidren，不允许继续添加三级导航。如果没有指定，则没有可以显示的二级导航链接。    |
 
@@ -110,7 +122,7 @@ navLinks:
 在当前的SCOW系统中，我们支持以下角色：
 
 | 角色名称            | 解释                          |
-| ------------------ | ----------------------------- | 
+| ------------------ | ----------------------------- |
 | `user`             | 未加入账户的普通用户 |
 | `accountUser`     | 在所有账户中均为普通用户      |
 | `accountAdmin`     | 在某个账户中为账户管理员      |
@@ -125,5 +137,3 @@ navLinks:
 如果您想更加详细的了解系统用户模型，请参考[用户模型](../../../info/mis/business/users.md)。
 
 :::
-
-

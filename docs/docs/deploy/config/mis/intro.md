@@ -114,6 +114,9 @@ predefinedChargingTypes:
   # 链接地址
   # url: ""
 
+  # 自定义图标地址,可选填
+  # iconPath: ""
+
   # 可以看到这个链接的用户,可选填
   # 用户类型： user, accountUser, accountAdmin, accountOwner, tenantFinance, tenantAdmin, platformAdmin, platformFinance
   # allowedRoles: []
@@ -123,6 +126,7 @@ predefinedChargingTypes:
     # 二级导航相关配置，与一级导航相同，但是不允许再设置children
     # text: ""
     # url: ""
+    # iconPath: ""
     # allowedRoles: []
 ```
 

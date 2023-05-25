@@ -11,22 +11,33 @@
  */
 
 import AntdIcon from "@ant-design/icons";
+import { theme } from "antd";
 import Image from "next/image";
+
+import { useDarkMode } from "./darkMode";
 
 interface Props {
   src: any;
-  alt: string;
+  alt?: string;
 }
 
-export function NavIcon({ src, alt }: Props) {
+export function NavIcon({ src, alt = "" }: Props) {
+
+  const { dark } = useDarkMode();
+
+  const altName = alt ? alt : src.substring(src.lastIndexOf("/") + 1, src.lastIndexOf("."));
 
   return (
     <AntdIcon
-      component={({ style, className }: any) => (
+      component={({ style, className, fill }: any) => (
         <Image
           src={src}
-          alt={alt}
-          style={{ ...style }}
+          alt={altName}
+          style={{
+            ...style,
+            fill,
+            // fill: dark ? "#fff" : "#000",
+          }}
           width={14}
           height={14}
           className={className}
