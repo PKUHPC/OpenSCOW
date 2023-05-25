@@ -330,7 +330,7 @@ export const getAvailableRoutes = (user: User | undefined): NavItemProps[] => {
         Icon: !link.iconPath ? LinkOutlined : (
           <NavIcon
             src={publicConfig.PUBLIC_PATH ?
-              join(publicConfig.PUBLIC_PATH, "/", link.iconPath) : link.iconPath}
+              join(publicConfig.PUBLIC_PATH, link.iconPath) : link.iconPath}
           />
         ),
         text: link.text,
