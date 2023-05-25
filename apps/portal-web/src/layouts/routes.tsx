@@ -133,8 +133,9 @@ export const userRoutes: (
       ? publicConfig.NAV_LINKS.map((link) => ({
         Icon: !link.iconPath ? LinkOutlined : (
           <NavIcon
-            // src={join(publicConfig.PUBLIC_PATH, "/", link.iconPath)}
-            src="/earth.svg"
+            src={join(publicConfig.PUBLIC_PATH, link.iconPath)}
+            // src="/earth.svg"
+            // src="/Peking_University_seal.svg"
           />
         ),
         text: link.text,
@@ -144,8 +145,8 @@ export const userRoutes: (
         children: link.children?.length ? link.children?.map((childLink) => ({
           Icon: !childLink.iconPath ? LinkOutlined : (
             <NavIcon
-              // src={join(publicConfig.PUBLIC_PATH, childLink.iconPath)}
-              src="/desktop.jpg"
+              src={join(publicConfig.PUBLIC_PATH, childLink.iconPath)}
+              // src="/desktop.jpg"
             />
           ),
           text: childLink.text,

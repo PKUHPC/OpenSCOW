@@ -29,15 +29,16 @@ export function NavIcon({ src, alt = "" }: Props) {
 
   return (
     <AntdIcon
-      component={({ style, className, fill }: any) => (
+      component={({ style, className }: any) => (
         <Image
           src={src}
           alt={altName}
+
           style={{
             ...style,
-            fill,
-            // fill: dark ? "#fff" : "#000",
+            filter: dark ? "invert(100%)" : "none",
           }}
+          // fill={dark ? "#fff" : "#000"}
           width={14}
           height={14}
           className={className}
