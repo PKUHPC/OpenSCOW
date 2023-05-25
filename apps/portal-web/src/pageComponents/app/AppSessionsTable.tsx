@@ -31,10 +31,12 @@ import { AppsStore } from "src/stores/AppsStore";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { publicConfig } from "src/utils/config";
 
-type Status = "RUNNING" | "PENDING";
+const filterStates = {
+  RUNNING: "运行中",
+  PENDING: "排队中",
+};
 
-const RUNNING: Status = "RUNNING";
-const PENDING: Status = "PENDING";
+type State = keyof typeof filterStates;
 
 interface Props {
 }
@@ -55,7 +57,7 @@ export const AppSessionsTable: React.FC<Props> = () => {
 
   const [connectivityRefreshToken, setConnectivityRefreshToken] = useState(false);
 
-  const [appSessionState, setAppSessionState] = useState<Status>(RUNNING);
+  const [appSessionState, setAppSessionState] = useState<State>("PENDING");
 
   const { data, isLoading, reload } = useAsync({
     promiseFn: useCallback(async () => {
@@ -233,8 +235,11 @@ export const AppSessionsTable: React.FC<Props> = () => {
               allowClear
               onChange={(value) => setAppSessionState(value)}
             >
-              <Select.Option value={RUNNING}>运行中</Select.Option>
-              <Select.Option value={PENDING}>排队中</Select.Option>
+              {Object.keys(filterStates).map((key) => (
+                <Select.Option key={key} value={key}>
+                  {filterStates[key]}
+                </Select.Option>
+              ))}
             </Select>
           </Form.Item>
         </Form>
