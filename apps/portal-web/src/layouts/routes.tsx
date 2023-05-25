@@ -36,8 +36,6 @@ export const userRoutes: (
 
   if (!user) { return []; }
 
-  console.log("portal-web-publicPath", publicConfig.PUBLIC_PATH);
-
   return [
     {
       Icon: DashboardOutlined,
@@ -134,8 +132,6 @@ export const userRoutes: (
         Icon: !link.iconPath ? LinkOutlined : (
           <NavIcon
             src={join(publicConfig.PUBLIC_PATH, link.iconPath)}
-            // src="/earth.svg"
-            // src="/Peking_University_seal.svg"
           />
         ),
         text: link.text,
@@ -146,7 +142,6 @@ export const userRoutes: (
           Icon: !childLink.iconPath ? LinkOutlined : (
             <NavIcon
               src={join(publicConfig.PUBLIC_PATH, childLink.iconPath)}
-              // src="/desktop.jpg"
             />
           ),
           text: childLink.text,

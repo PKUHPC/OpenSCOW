@@ -319,8 +319,6 @@ export const getAvailableRoutes = (user: User | undefined): NavItemProps[] => {
 
   // 获取当前用户角色
   const userCurrentRoles = getCurrentUserRoles(user);
-  console.log("mis-web-publicPath", publicConfig.PUBLIC_PATH);
-  console.log("user-role", userCurrentRoles);
 
   // 根据配置文件判断是否增加导航链接
   if (publicConfig.NAV_LINKS && publicConfig.NAV_LINKS.length > 0) {
@@ -333,7 +331,6 @@ export const getAvailableRoutes = (user: User | undefined): NavItemProps[] => {
           <NavIcon
             src={publicConfig.PUBLIC_PATH ?
               join(publicConfig.PUBLIC_PATH, "/", link.iconPath) : link.iconPath}
-            // src="/desktop.jpg"
           />
         ),
         text: link.text,
@@ -348,7 +345,6 @@ export const getAvailableRoutes = (user: User | undefined): NavItemProps[] => {
               <NavIcon
                 src={publicConfig.PUBLIC_PATH ?
                   join(publicConfig.PUBLIC_PATH, childLink.iconPath) : childLink.iconPath}
-                // src="/earth.svg"
               />
             ),
             text: childLink.text,

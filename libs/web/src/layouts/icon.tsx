@@ -11,8 +11,6 @@
  */
 
 import AntdIcon from "@ant-design/icons";
-import { theme } from "antd";
-import Image from "next/image";
 
 import { useDarkMode } from "./darkMode";
 
@@ -30,7 +28,7 @@ export function NavIcon({ src, alt = "" }: Props) {
   return (
     <AntdIcon
       component={({ style, className }: any) => (
-        <Image
+        <img
           src={src}
           alt={altName}
 
@@ -38,13 +36,11 @@ export function NavIcon({ src, alt = "" }: Props) {
             ...style,
             filter: dark ? "invert(100%)" : "none",
           }}
-          // fill={dark ? "#fff" : "#000"}
           width={14}
           height={14}
           className={className}
         />
       )}
     />
-
   );
 }
