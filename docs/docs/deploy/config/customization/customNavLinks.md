@@ -67,19 +67,29 @@ navLinks:
 navLinks:
   - text: "一级导航1"
     url: "https://hahahaha1.com/"
-    iconPath: "/icon-test.png"
+    iconPath: "/desktop.jpg"
     children:
       - text: "二级导航1"
         url: "https://hahahaha1.1.com"
-        iconPath: "/earth.svg"
+        iconPath: "/PKU_seal.svg"
       - text: "二级导航2"
         url: "https://hahahaha1.2.com"
+      - text: "二级导航3"
+        url: "https://hahahaha1.3.com"
+        iconPath: "/earth.png"
   - text: "一级导航2"
     url: "https://hahahaha2.com"
     children: []
+    iconPath: "/earth.svg"
+  - text: "一级导航3"
+    url: "https://hahahaha3.com"
+    iconPath: "/icon-test.png"
+    children: []
 ```
 
-![门户系统自定义导航链接配置示例](images/portal-custom-navlinks.png)
+门户系统用户可以阅览到的导航链接如下,绿色框线中的图标为系统默认导航链接图标。
+
+![门户系统自定义导航链接配置示例](images/portal-custom-nav-links.png)
 
 ### 管理系统自定义导航链接配置示例
 
@@ -98,12 +108,15 @@ navLinks:
         allowedRoles: [tenantAdmin, platformAdmin]
   - text: "一级导航2"
     url: "https://hahahaha2.com"
-    allowedRoles: [platformFinance]
+    iconPath: "/earth.png"
+  - text: "一级导航3"
+    url: "https://hahahaha3.com"
+    allowedRoles: [user]
 ```
 
-当前登录用户的用户角色为`accountOwner`，`tenantAdmin`，`platformAdmin`时,他可以阅览到的导航链接如下。
+当前登录用户的用户角色为`accountOwner`，`tenantAdmin`，`platformAdmin`时,他可以阅览到的导航链接如下,绿色框线中的图标为系统默认导航链接图标。
 
-![管理系统自定义导航链接配置示例](images/mis-custom-navlinks.png)
+![管理系统自定义导航链接配置示例](images/mis-custom-nav-links.png)
 
 ## 配置解释
 
