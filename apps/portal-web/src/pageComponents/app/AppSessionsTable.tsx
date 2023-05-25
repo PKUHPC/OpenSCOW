@@ -57,7 +57,7 @@ export const AppSessionsTable: React.FC<Props> = () => {
 
   const [connectivityRefreshToken, setConnectivityRefreshToken] = useState(false);
 
-  const [appSessionState, setAppSessionState] = useState<State>("PENDING");
+  const [appSessionState, setAppSessionState] = useState<State>("RUNNING");
 
   const { data, isLoading, reload } = useAsync({
     promiseFn: useCallback(async () => {
