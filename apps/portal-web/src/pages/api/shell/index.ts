@@ -20,7 +20,7 @@ import { checkCookie } from "src/auth/server";
 import { getClient } from "src/utils/client";
 import { publicConfig, runtimeConfig } from "src/utils/config";
 import { parse } from "url";
-import { WebSocketServer } from "ws";
+import { WebSocket, WebSocketServer } from "ws";
 
 export type ShellQuery = {
   cluster: string;
@@ -47,7 +47,34 @@ export const config = {
 
 const wss = new WebSocketServer({ noServer: true });
 
-wss.on("connection", async (ws, req) => {
+// https://github.com/websockets/ws#how-to-detect-and-close-broken-connections
+type AliveCheckedWebSocket = WebSocket & { isAlive: boolean };
+
+function heartbeat(this: AliveCheckedWebSocket) {
+  this.isAlive = true;
+}
+
+// ping every clients every 30s
+const pingInterval = setInterval(function ping() {
+  wss.clients.forEach(function each(ws: AliveCheckedWebSocket) {
+    if (ws.isAlive === false) {
+      return ws.terminate();
+    }
+
+    ws.isAlive = false;
+    ws.ping();
+  });
+}, 30000);
+
+wss.on("close", function close() {
+  clearInterval(pingInterval);
+});
+
+wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
+
+  ws.isAlive = true;
+  ws.on("pong", heartbeat);
+
   const user = await checkCookie(() => true, req);
 
   if (typeof user === "number") {
