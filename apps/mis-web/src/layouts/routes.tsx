@@ -329,8 +329,7 @@ export const getAvailableRoutes = (user: User | undefined): NavItemProps[] => {
       .map((link) => ({
         Icon: !link.iconPath ? LinkOutlined : (
           <NavIcon
-            src={publicConfig.PUBLIC_PATH ?
-              join(publicConfig.PUBLIC_PATH, link.iconPath) : link.iconPath}
+            src={join(publicConfig.PUBLIC_PATH, link.iconPath)}
           />
         ),
         text: link.text,
@@ -343,8 +342,7 @@ export const getAvailableRoutes = (user: User | undefined): NavItemProps[] => {
           .map((childLink) => ({
             Icon: !childLink.iconPath ? LinkOutlined : (
               <NavIcon
-                src={publicConfig.PUBLIC_PATH ?
-                  join(publicConfig.PUBLIC_PATH, childLink.iconPath) : childLink.iconPath}
+                src={join(publicConfig.PUBLIC_PATH, childLink.iconPath)}
               />
             ),
             text: childLink.text,

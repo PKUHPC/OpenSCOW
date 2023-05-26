@@ -1,5 +1,5 @@
 ---
-sidebar_position: 3
+sidebar_position: 4
 title: 自定义导航链接
 ---
 
@@ -125,7 +125,7 @@ navLinks:
 | `navLinks`                | /                    | /                 |/           |/                                                                                          |
 | `text`                    | 字符串                | `portal`，`mis`    | 是         | 链接名称，SCOW导航栏上显示的名称                                                            |
 | `url`                     | 字符串                | `portal`，`mis`    | 是         | 链接地址，自定义导航链接地址，跳转时会在后面加入查询参数`?token={用来跟踪登录用户的状态的token}`  |
-| `iconPath`                     | 字符串           | `portal`，`mis`    | 否         | 图标路径，用户上传到公共文件路径`public`下的自定义图标路径，如您将图片`icon.svg`上传到`public`,则您配置时需填写`iconPath:"/icon.svg"`。可选填，如未填写则显示默认链接图标。公共文件路径的使用详见[公共文件](./public-files.md)。  |
+| `iconPath`                     | 字符串           | `portal`，`mis`    | 否         | 图标路径，用户上传到[公共文件](./public-files.md)下的自定义导航链接图标路径。可选填，如未填写则显示系统默认导航链接图标。  |
 | `allowedRoles`            |  用户角色字符串列表    | `mis`             |否           | 管理系统指定可以看到该导航链接的角色列表，用户角色类型包括  `user`, `accountUser`, `accountAdmin`, `accountOwner`, `tenantFinance`, `tenantAdmin`, `platformAdmin`, `platformFinance` 。如果没有指定，则不再限定用户角色，即所有用户都可以看到该导航链接。  |
 | `children`                |  导航内容的列表    | `portal`，`mis`   | 否          | 二级导航列表，内容包括该系统下一级导航的所有内容，内容类型以及是否必填与一级导航内容完全相同，但是不允许再继续设置chilidren，不允许继续添加三级导航。如果没有指定，则没有可以显示的二级导航链接。    |
 
@@ -134,6 +134,18 @@ navLinks:
 如果您想更加详细的了解系统用户模型，请参考[用户模型](../../../info/mis/business/users.md)。
 
 :::
+
+### 自定义图标配置说明
+
+系统支持自定义导航链接的灵活图标配置。
+
+您可以通过把存放在和`install.yml`同级的`public`目录下图片文件的路径添加到`iconPath`来进行自定义图标配置。公共文件路径的使用详见[公共文件](./public-files.md)。
+
+您所添加的图片文件后缀应为常用图片文件`.svg`，`.png`或者`.jpg`等。
+
+如您将图片`icon.svg`上传到公共文件`public`目录下,则您在配置时需填写`iconPath:"/icon.svg"`。
+
+`iconPath`可以选填，如不填写，则将统一显示系统默认导航链接图标。
 
 ### 角色配置说明
 
