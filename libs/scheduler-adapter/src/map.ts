@@ -13,7 +13,8 @@
 import { RunningJob } from "@scow/protos/build/common/job";
 import { JobInfo as PortalJobInfo } from "@scow/protos/build/portal/job";
 import { JobInfo } from "@scow/scheduler-adapter-protos/build/protos/job";
-import { formatTime } from "src/time";
+
+import { formatTime } from "./time";
 
 export const jobInfoToRunningjob = (jobInfo: JobInfo) => {
   return {
