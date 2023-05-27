@@ -88,7 +88,7 @@ export const MisConfigSchema = Type.Object({
       enabled: Type.Boolean({ description:"是否默认打开", default: true }),
       cron: Type.String({ description: "获取信息的周期的cron表达式", default: "* * 1 * * *" }),
     }, { default: {} }),
-  }),
+  }, { default: {}, description: "获取作业功能的相关配置" }),
 
 
   jobChargeType: Type.String({ description: "对作业计费时，计费费用的的付款类型", default: "作业费用" }),

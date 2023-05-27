@@ -5,7 +5,6 @@ db:
   password: mysqlrootpassword
   dbName: scow_server_${JEST_WORKER_ID}
 
-fetchJobs:
 
 createUser:
   type: external
