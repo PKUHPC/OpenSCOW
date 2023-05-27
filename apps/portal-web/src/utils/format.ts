@@ -12,6 +12,12 @@
 
 const DEFAULT_UNIT_MAP = ["KB", "MB", "GB", "TB", "PB"];
 
+/**
+ * @description 传入size的单位应为unitMap的最小单位，默认传入KB
+ * @param size
+ * @param unitMap
+ * @returns
+ */
 export const formatSize = (size: number, unitMap: string[] = DEFAULT_UNIT_MAP): string => {
 
   const CARRY = 1024;
@@ -22,18 +28,17 @@ export const formatSize = (size: number, unitMap: string[] = DEFAULT_UNIT_MAP): 
   }
 
   let carryCount = 0;
-  let decimalSize = Math.round(size / CARRY);
 
-  while (decimalSize > CARRY) {
-    decimalSize = decimalSize / CARRY;
+  while (size > CARRY) {
+    size = size / CARRY;
     carryCount++;
   }
 
-  if (decimalSize >= 1000) {
-    decimalSize = decimalSize / CARRY;
+  if (size >= 1000) {
+    size = size / CARRY;
     carryCount++;
   }
 
-  const fixedNumber = decimalSize < 9.996 ? 2 : (decimalSize < 99.95 ? 1 : 0);
-  return `${decimalSize.toFixed(fixedNumber)} ${unitMap[carryCount]}`;
+  const fixedNumber = size < 9.996 ? 2 : (size < 99.95 ? 1 : 0);
+  return `${size.toFixed(fixedNumber)} ${unitMap[carryCount]}`;
 };

@@ -48,6 +48,8 @@ export interface PublicRuntimeConfig {
   PASSWORD_PATTERN_MESSAGE: string | undefined;
 
   PORTAL_URL: string | undefined;
+
+  PUBLIC_PATH: string | undefined;
 }
 
 export const runtimeConfig: ServerRuntimeConfig = getConfig().serverRuntimeConfig;

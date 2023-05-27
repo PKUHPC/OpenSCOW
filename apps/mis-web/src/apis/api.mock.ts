@@ -390,7 +390,7 @@ export const mockApi: MockApi<typeof api> = {
     { id: 1,
       createdInAuth: false,
     }),
-  createTenant: async () => null,
+  createTenant: async () => ({ createdInAuth: true }),
   validateToken: async () => MOCK_USER_INFO,
 };
 

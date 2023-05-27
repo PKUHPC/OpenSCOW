@@ -24,7 +24,7 @@
   "license": "Mulan PSL v2",
   "repository": "https://github.com/PKUHPC/SCOW",
   "dependencies": {
-    "@ant-design/icons": "5.0.1",
+    "@ant-design/icons": "5.1.0",
     "@ddadaal/next-typed-api-routes-runtime": "0.5.2",
     "@ddadaal/tsgrpc-client": "0.17.5",
     "@ddadaal/tsgrpc-common": "0.2.3",
@@ -36,7 +36,7 @@
     "@scow/protos": "workspace:*",
     "@scow/lib-web": "workspace:*",
     "@scow/utils": "workspace:*",
-    "@sinclair/typebox": "0.28.10",
+    "@sinclair/typebox": "0.28.11",
     "antd": "5.5.0",
     "dayjs": "1.11.7",
     "google-protobuf": "3.21.2",
@@ -53,7 +53,7 @@
     "react-is": "18.2.0",
     "simstate": "3.0.1",
     "styled-components": "5.3.10",
-    "tslib": "2.5.0",
+    "tslib": "2.5.2",
     "typescript": "5.0.4",
     "@ant-design/cssinjs": "1.9.1"
   },
@@ -62,14 +62,14 @@
     "@next/bundle-analyzer": "13.4.1",
     "@types/google-protobuf": "3.15.6",
     "@types/mime-types": "2.1.1",
-    "@types/node": "18.16.10",
+    "@types/node": "18.16.14",
     "@types/nprogress": "0.2.0",
     "@types/react": "18.2.6",
     "@types/react-dom": "18.2.4",
     "@types/styled-components": "5.1.26",
     "babel-plugin-import": "1.13.6",
     "postcss": "8.4.23",
-    "webpack": "5.82.1"
+    "webpack": "5.83.1"
   },
   "browserslist": {
     "production": [

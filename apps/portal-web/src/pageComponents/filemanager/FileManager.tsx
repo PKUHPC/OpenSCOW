@@ -416,6 +416,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
         files={files}
         filesFilter={(files) => files.filter((file) => showHiddenFile || !file.name.startsWith("."))}
         loading={loading}
+        scroll={{ x: true }}
         rowSelection={{
           selectedRowKeys: selectedKeys,
           onChange: setSelectedKeys,

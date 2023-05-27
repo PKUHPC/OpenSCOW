@@ -107,6 +107,9 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
     });
   }
 
+  const publicPath = "/__public__/";
+  const publicDir = "/app/apps/gateway/public/";
+
   // GATEWAY
   addService("gateway", {
     image: scowImage,
@@ -117,9 +120,14 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
       "MIS_PATH": MIS_PATH,
       "CLIENT_MAX_BODY_SIZE": config.gateway.uploadFileSizeLimit,
       "PROXY_READ_TIMEOUT": config.gateway.proxyReadTimeout,
+      "PUBLIC_PATH": publicPath,
+      "PUBLIC_DIR": publicDir,
     },
     ports: { [config.port]: 80 },
-    volumes: { "/etc/hosts": "/etc/hosts" },
+    volumes: {
+      "/etc/hosts": "/etc/hosts",
+      "./public": publicDir,
+    },
   });
 
   // AUTH
@@ -191,6 +199,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
         "AUTH_EXTERNAL_URL": join(BASE_PATH, "/auth"),
         "NOVNC_CLIENT_URL": join(BASE_PATH, "/vnc"),
         "CLIENT_MAX_BODY_SIZE": config.gateway.uploadFileSizeLimit,
+        "PUBLIC_PATH": join(BASE_PATH, publicPath),
       },
       ports: {},
       volumes: {
@@ -232,6 +241,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
         "PORTAL_URL": join(BASE_PATH, PORTAL_PATH),
         "PORTAL_DEPLOYED": config.portal ? "true" : "false",
         "AUTH_EXTERNAL_URL": join(BASE_PATH, "/auth"),
+        "PUBLIC_PATH": join(BASE_PATH, publicPath),
       },
       ports: {},
       volumes: {

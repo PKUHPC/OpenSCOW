@@ -15,7 +15,7 @@ import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { status } from "@grpc/grpc-js";
 import { UserServiceClient } from "@scow/protos/build/server/user";
 import { authenticate } from "src/auth/server";
-import { PlatformRole, UserRole } from "src/models/User";
+import { PlatformRole, TenantRole, UserRole } from "src/models/User";
 import { getClient } from "src/utils/client";
 import { publicConfig } from "src/utils/config";
 import { getUserIdRule, useBuiltinCreateUser } from "src/utils/createUser";
@@ -66,7 +66,8 @@ export default /* #__PURE__*/route<CreateUserSchema>("CreateUserSchema", async (
 
   const auth = authenticate((u) =>
     u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ||
-    u.accountAffiliations.some((x) => x.role !== UserRole.USER),
+    u.accountAffiliations.some((x) => x.role !== UserRole.USER) ||
+    u.tenantRoles.includes(TenantRole.TENANT_ADMIN),
   );
 
   const info = await auth(req, res);
