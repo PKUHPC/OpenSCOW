@@ -66,8 +66,8 @@ jobs:
           verbose: true
           resource: "tcp:localhost:3306 tcp:localhost:6379 tcp:localhost:3307 tcp:localhost:389"
 
-      # - name: Run tests
-      #   run: pnpm test:ci
+      - name: Run tests
+        run: pnpm test:ci
 
       - name: Upload test converage
         uses: codecov/codecov-action@v3
