@@ -24,6 +24,7 @@ import { JobInfo } from "src/entities/JobInfo";
 import { UserAccount } from "src/entities/UserAccount";
 import { ClusterPlugin } from "src/plugins/clusters";
 import { PricePlugin } from "src/plugins/price";
+import testData from "tests/job/testData.json";
 
 async function getLatestDate(em: SqlEntityManager, logger: Logger) {
 
@@ -78,35 +79,46 @@ export async function fetchJobs(
   const priceMap = await pricePlugin.price.createPriceMap();
 
   try {
-    const fields: string[] = [
-      "job_id", "name", "user", "account", "cpus_alloc", "gpus_alloc", "mem_alloc_mb", "mem_req_mb",
-      "partition", "qos", "elapsed_seconds", "node_list", "nodes_req", "nodes_alloc", "time_limit_minutes",
-      "submit_time", "start_time", "end_time",
-    ];
+    const jobsInfo: ({cluster: string} & ClusterJobInfo)[] = [];
+    if (!process.env.SCOW_CONFIG_PATH && process.env.NODE_ENV !== "production") {
+      // data for test
+      jobsInfo.push(...testData.map(({ tenant, accountPrice, tenantPrice, ...rest }) => {
+        return {
+          ...rest,
+          state: "COMPLETED",
+          workingDirectory: "",
+        };
+      }));
+    } else {
+      const fields: string[] = [
+        "job_id", "name", "user", "account", "cpus_alloc", "gpus_alloc", "mem_alloc_mb", "mem_req_mb",
+        "partition", "qos", "elapsed_seconds", "node_list", "nodes_req", "nodes_alloc", "time_limit_minutes",
+        "submit_time", "start_time", "end_time",
+      ];
 
-    const latestDate = await getLatestDate(em, logger);
-    const nextDate = latestDate && new Date(latestDate.getTime() + 1000);
-    const configDate: Date | undefined =
-      (misConfig.fetchJobs.startDate && new Date(misConfig.fetchJobs.startDate)) as Date | undefined;
+      const latestDate = await getLatestDate(em, logger);
+      const nextDate = latestDate && new Date(latestDate.getTime() + 1000);
+      const configDate: Date | undefined =
+        (misConfig.fetchJobs.startDate && new Date(misConfig.fetchJobs.startDate)) as Date | undefined;
 
-    const startFetchDate = (nextDate && configDate)
-      ? (nextDate > configDate ? nextDate : configDate)
-      : (nextDate || configDate);
-    const endFetchDate = new Date();
-    logger.info(`Fetching new info which end_time is from ${startFetchDate} to ${endFetchDate}`);
+      const startFetchDate = (nextDate && configDate)
+        ? (nextDate > configDate ? nextDate : configDate)
+        : (nextDate || configDate);
+      const endFetchDate = new Date();
+      logger.info(`Fetching new info which end_time is from ${startFetchDate} to ${endFetchDate}`);
 
-    // Fetch new info
-    const jobsInfo = await clusterPlugin.clusters.callOnAll(logger, async (client) =>
-      await asyncClientCall(client.job, "getJobs", {
-        fields,
-        filter: {
-          users: [], accounts: [], states: [],
-          endTime: { startTime: startFetchDate?.toISOString(), endTime: endFetchDate.toISOString() },
-        },
-      }),
-    ).then(processGetJobsResult);
+      // Fetch new info
+      jobsInfo.push(...(await clusterPlugin.clusters.callOnAll(logger, async (client) =>
+        await asyncClientCall(client.job, "getJobs", {
+          fields,
+          filter: {
+            users: [], accounts: [], states: [],
+            endTime: { startTime: startFetchDate?.toISOString(), endTime: endFetchDate.toISOString() },
+          },
+        }),
+      ).then(processGetJobsResult)));
 
-    console.log(jobsInfo);
+    }
 
     const persistJobAndCharge = async (jobs: ({ cluster: string } & ClusterJobInfo)[]) => {
       await em.transactional(async (em) => {
