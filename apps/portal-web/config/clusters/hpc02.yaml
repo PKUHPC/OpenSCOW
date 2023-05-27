@@ -1,5 +1,5 @@
 displayName: hpc02Name
-adapterUrl: ""
+adapterUrl: 0.0.0.0:6000
 # slurm:
 #   loginNodes:
 #     - localhost:22

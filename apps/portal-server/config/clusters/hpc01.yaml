@@ -1,5 +1,5 @@
 displayName: hpc01Name
-adapterUrl: 0.0.0.0
+adapterUrl: 0.0.0.0:6000
 loginNodes:
   - localhost:22222
 # slurm:
