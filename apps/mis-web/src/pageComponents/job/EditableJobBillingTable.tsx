@@ -20,41 +20,6 @@ import { CommonModalProps, ModalLink } from "src/components/ModalLink";
 import { AmountStrategy } from "src/models/job";
 import { publicConfig } from "src/utils/config";
 
-const columns: ColumnsType<JobBillingTableItem> = [
-  { dataIndex: "cluster", title: "集群", key: "index", render: (_, r) => ({
-    children: publicConfig.CLUSTERS[r.cluster]?.name ?? r.cluster,
-    props: { rowSpan: r.clusterItemIndex === 0 ? r.partitionCount * r.qosCount : 0 },
-  }) },
-  { dataIndex: "partition", title: "分区全名", key: "index", render: (_, r) => ({
-    children: r.partition,
-    props: { rowSpan: r.partitionItemIndex === 0 ? r.qosCount : 0 },
-  }) },
-  { dataIndex: "nodes", title: "分区节点数", key: "index", render: (_, r) => ({
-    children: r.nodes,
-    props: { rowSpan: r.partitionItemIndex === 0 ? r.qosCount : 0 },
-  }) },
-  { dataIndex: "cores", title: "单节点核心数", key: "index", render: (_, r) => ({
-    children: r.cores,
-    props: { rowSpan: r.partitionItemIndex === 0 ? r.qosCount : 0 },
-  }) },
-  { dataIndex: "gpus", title: "单节点GPU数", key: "index", render: (_, r) => ({
-    children: r.gpus,
-    props: { rowSpan: r.partitionItemIndex === 0 ? r.qosCount : 0 },
-  }) },
-  { dataIndex: "mem", title: "单节点内存（MB）", key: "index", render: (_, r) => ({
-    children: r.mem,
-    props: { rowSpan: r.partitionItemIndex === 0 ? r.qosCount : 0 },
-  }) },
-  { dataIndex: "qos", title: "QOS", key: "index", render: (_, r) => ({
-    children: r.qos,
-  }) },
-  { dataIndex: "priceItem", title: "当前计费项", key: "index", render: (_, r) => ({
-    children: r.priceItem
-      ? `${r.priceItem.itemId} (${r.priceItem.price}, ${r.priceItem.amount})`
-      : "未设置",
-  }) },
-];
-
 const EditPriceModal: React.FC<CommonModalProps & {
   current: JobBillingTableItem["priceItem"]; path: string; tenant?: string; reload: () => void
 }> = ({
@@ -128,6 +93,53 @@ interface Props {
 }
 
 export const EditableJobBillingTable: React.FC<Props> = ({ data, loading, tenant, reload }) => {
+
+  const clusterTotalQosCounts = data && data.length ?
+    data.reduce((totalQosCounts: { [cluster: string]: number }, item) => {
+      const { cluster } = item;
+      if (!totalQosCounts[cluster]) {
+        totalQosCounts[cluster] = 1;
+      } else {
+        totalQosCounts[cluster]++;
+      }
+      return totalQosCounts;
+    }, {}) : {};
+
+  const columns: ColumnsType<JobBillingTableItem> = [
+    { dataIndex: "cluster", title: "集群", key: "index", render: (_, r) => ({
+      children: publicConfig.CLUSTERS[r.cluster]?.name ?? r.cluster,
+      props: { rowSpan: r.clusterItemIndex === 0 && clusterTotalQosCounts ? clusterTotalQosCounts[r.cluster] : 0 },
+    }) },
+    { dataIndex: "partition", title: "分区全名", key: "index", render: (_, r) => ({
+      children: r.partition,
+      props: { rowSpan: r.partitionItemIndex === 0 ? r.qosCount : 0 },
+    }) },
+    { dataIndex: "nodes", title: "分区节点数", key: "index", render: (_, r) => ({
+      children: r.nodes,
+      props: { rowSpan: r.partitionItemIndex === 0 ? r.qosCount : 0 },
+    }) },
+    { dataIndex: "cores", title: "单节点核心数", key: "index", render: (_, r) => ({
+      children: r.cores,
+      props: { rowSpan: r.partitionItemIndex === 0 ? r.qosCount : 0 },
+    }) },
+    { dataIndex: "gpus", title: "单节点GPU数", key: "index", render: (_, r) => ({
+      children: r.gpus,
+      props: { rowSpan: r.partitionItemIndex === 0 ? r.qosCount : 0 },
+    }) },
+    { dataIndex: "mem", title: "单节点内存（MB）", key: "index", render: (_, r) => ({
+      children: r.mem,
+      props: { rowSpan: r.partitionItemIndex === 0 ? r.qosCount : 0 },
+    }) },
+    { dataIndex: "qos", title: "QOS", key: "index", render: (_, r) => ({
+      children: r.qos,
+    }) },
+    { dataIndex: "priceItem", title: "当前计费项", key: "index", render: (_, r) => ({
+      children: r.priceItem
+        ? `${r.priceItem.itemId} (${r.priceItem.price}, ${r.priceItem.amount})`
+        : "未设置",
+    }) },
+  ];
+
   return (
     <Table
       dataSource={data}
