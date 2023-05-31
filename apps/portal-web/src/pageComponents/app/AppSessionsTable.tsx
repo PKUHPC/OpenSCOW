@@ -50,7 +50,7 @@ export const AppSessionsTable: React.FC<Props> = () => {
 
   const [connectivityRefreshToken, setConnectivityRefreshToken] = useState(false);
 
-  const [statusChecked, setStatusChecked] = useState(false);
+  const [onlyNotEnded, setOnlyNotEnded] = useState(false);
 
   const { data, isLoading, reload } = useAsync({
     promiseFn: useCallback(async () => {
@@ -223,8 +223,8 @@ export const AppSessionsTable: React.FC<Props> = () => {
           </Form.Item>
           <Form.Item>
             <Checkbox
-              checked={statusChecked}
-              onChange={(e) => setStatusChecked(e.target.checked)}
+              checked={onlyNotEnded}
+              onChange={(e) => setOnlyNotEnded(e.target.checked)}
             >
               只展示未结束的作业
             </Checkbox>
@@ -232,7 +232,7 @@ export const AppSessionsTable: React.FC<Props> = () => {
         </Form>
       </FilterFormContainer>
       <Table
-        dataSource={statusChecked ? data?.filter((x) => (x.state === "RUNNING" || x.state === "PENDING")) : data}
+        dataSource={onlyNotEnded ? data?.filter((x) => x.state !== "ENDED") : data}
         columns={columns}
         rowKey={(record) => record.sessionId}
         loading={!data && isLoading}
