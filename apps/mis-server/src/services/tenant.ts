@@ -39,12 +39,12 @@ export const tenantServiceServer = plugin((server) => {
       const accountCount = await em.count(Account, { tenant });
       const userCount = await em.count(User, { tenant });
       const admins = await em.find(User, { tenant, tenantRoles: { $like: `%${TenantRole.TENANT_ADMIN}%` } }, {
-        fields: ["id", "userId", "name"],
+        fields: ["userId", "name"],
       });
 
       return [{
         accountCount,
-        admins: admins.map((a) => ({ id: a.id + "", userId: a.userId, userName: a.name })),
+        admins: admins.map((a) => ({ userId: a.userId, userName: a.name })),
         userCount,
         balance: decimalToMoney(tenant.balance),
       }];
