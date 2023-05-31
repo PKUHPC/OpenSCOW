@@ -15,7 +15,7 @@ import { compareDateTime, formatDateTime } from "@scow/lib-web/build/utils/datet
 import { compareNumber } from "@scow/lib-web/build/utils/math";
 import { queryToString } from "@scow/lib-web/build/utils/querystring";
 import type { AppSession } from "@scow/protos/build/portal/app";
-import { App, Button, Checkbox, Form, Popconfirm, Select, Space, Table, TableColumnsType, Tooltip } from "antd";
+import { App, Button, Checkbox, Form, Popconfirm, Space, Table, TableColumnsType, Tooltip } from "antd";
 import type { CheckboxChangeEvent } from "antd/es/checkbox";
 import { useRouter } from "next/router";
 import { join } from "path";
@@ -30,13 +30,6 @@ import { ConnectTopAppLink } from "src/pageComponents/app/ConnectToAppLink";
 import { AppsStore } from "src/stores/AppsStore";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { publicConfig } from "src/utils/config";
-
-const filterStates = {
-  RUNNING: "运行中",
-  PENDING: "排队中",
-};
-
-type State = keyof typeof filterStates;
 
 interface Props {
 }
@@ -57,7 +50,7 @@ export const AppSessionsTable: React.FC<Props> = () => {
 
   const [connectivityRefreshToken, setConnectivityRefreshToken] = useState(false);
 
-  const [appSessionState, setAppSessionState] = useState<State>("RUNNING");
+  const [statusChecked, setStatusChecked] = useState(false);
 
   const { data, isLoading, reload } = useAsync({
     promiseFn: useCallback(async () => {
@@ -228,24 +221,18 @@ export const AppSessionsTable: React.FC<Props> = () => {
               10s自动刷新
             </Checkbox>
           </Form.Item>
-          <Form.Item label="状态">
-            <Select
-              style={{ minWidth: "100px" }}
-              value={appSessionState}
-              allowClear
-              onChange={(value) => setAppSessionState(value)}
+          <Form.Item>
+            <Checkbox
+              checked={statusChecked}
+              onChange={(e) => setStatusChecked(e.target.checked)}
             >
-              {Object.keys(filterStates).map((key) => (
-                <Select.Option key={key} value={key}>
-                  {filterStates[key]}
-                </Select.Option>
-              ))}
-            </Select>
+              只展示未结束的作业
+            </Checkbox>
           </Form.Item>
         </Form>
       </FilterFormContainer>
       <Table
-        dataSource={appSessionState ? data?.filter((x) => x.state === appSessionState) : data}
+        dataSource={statusChecked ? data?.filter((x) => (x.state === "RUNNING" || x.state === "PENDING")) : data}
         columns={columns}
         rowKey={(record) => record.sessionId}
         loading={!data && isLoading}
