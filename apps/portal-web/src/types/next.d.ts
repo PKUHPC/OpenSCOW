@@ -11,11 +11,11 @@
  */
 
 import { Server } from "http";
-import { Socket } from "net";
-import { NextApiResponse } from "next";
 
-export type AugmentedNextApiResponse = NextApiResponse & {
-  socket: Socket & {
-    server: Server;
-  };
-};
+declare module "next" {
+  interface NextApiRequest {
+    socket: NextApiRequest["socket"] & {
+      server: Server;
+    }
+  }
+}

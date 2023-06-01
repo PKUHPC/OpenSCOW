@@ -11,12 +11,10 @@
  */
 
 import { normalizePathnameWithQuery } from "@scow/utils";
-import http from "http";
 import httpProxy from "http-proxy";
-import { NextApiRequest } from "next";
+import { NextApiRequest, NextApiResponse } from "next";
 import { join } from "path";
 import { checkCookie } from "src/auth/server";
-import { AugmentedNextApiResponse } from "src/types/next";
 import { publicConfig, runtimeConfig } from "src/utils/config";
 
 
@@ -79,10 +77,8 @@ export const config = {
  *
  * 所以系统启动后，需要手动触发一次到本地址的HTTP请求，以便注册upgrade事件的监听器
  */
-export const setupWssProxy = (res: AugmentedNextApiResponse) => {
-  const server: http.Server = res.socket.server;
-
-  server.on("upgrade", async (req, socket, head) => {
+export const setupWssProxy = (req: NextApiRequest) => {
+  req.socket.server.on("upgrade", async (req, socket, head) => {
 
     const url = normalizePathnameWithQuery(req.url!);
 
@@ -119,7 +115,7 @@ export const setupWssProxy = (res: AugmentedNextApiResponse) => {
 
 };
 
-export default async (req: NextApiRequest, res: AugmentedNextApiResponse) => {
+export default async (req: NextApiRequest, res: NextApiResponse) => {
 
   const user = await checkCookie(() => true, req).catch(() => {
     res.status(500).send("Error when authenticating request");
