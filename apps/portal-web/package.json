@@ -8,7 +8,7 @@
     "serve": "node build/server/index.js",
     "build": "pnpm prepareDev && npm run build:next && npm run build:ts",
     "build:next": "next build",
-    "build:ts": "rimraf build && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
+    "build:ts": "rimraf build && tsc -p tsconfig.server.json && tsc-alias -p tsconfig.server.json",
     "prepareDev": "ntar schema",
     "test": "jest --passWithNoTests",
     "client": "ntar client --basePathVar \"publicConfig.BASE_PATH || ''\" --extraImports \"import { publicConfig } from 'src/utils/config';\""

@@ -78,7 +78,7 @@ export const config = {
  * 所以系统启动后，需要手动触发一次到本地址的HTTP请求，以便注册upgrade事件的监听器
  */
 export const setupWssProxy = (req: NextApiRequest) => {
-  req.socket.server.on("upgrade", async (req, socket, head) => {
+  (req.socket as any).server.on("upgrade", async (req, socket, head) => {
 
     const url = normalizePathnameWithQuery(req.url!);
 

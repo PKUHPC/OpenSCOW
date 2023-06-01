@@ -134,7 +134,7 @@ wss.on("connection", async (ws, req) => {
 });
 
 export const setupShellServer = (req: NextApiRequest) => {
-  req.socket.server.on("upgrade", (request, socket, head) => {
+  (req.socket as any).server.on("upgrade", (request, socket, head) => {
     const url = normalizePathnameWithQuery(request.url!);
     if (!url.startsWith(join(publicConfig.BASE_PATH, "/api/shell"))) {
       return;
