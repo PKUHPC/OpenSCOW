@@ -164,21 +164,7 @@ const buildRuntimeConfig = async (phase, basePath) => {
     console.log("Public Runtime Config", publicRuntimeConfig);
   }
 
-  if (!testenv) {
 
-    // HACK
-    // call /api/setup after 3 seconds to init the proxy and shell server
-    setTimeout(() => {
-      const url = `http://localhost:${process.env.PORT || 3000}${basePath === "/" ? "" : basePath}/api/setup`;
-      console.log("Calling setup url to initialize proxy and shell server", url);
-      fetch(url).then(async (res) => {
-        console.log("Call completed. Response: ", await res.text());
-      }).catch((e) => {
-        console.error("Error when calling proxy url to initialize ws proxy server", e);
-      });
-    }, 3000);
-
-  }
 
   return {
     serverRuntimeConfig,
