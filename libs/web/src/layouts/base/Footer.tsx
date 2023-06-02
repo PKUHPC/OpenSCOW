@@ -29,24 +29,24 @@ interface Props {
 
 export const Footer: React.FC<Props> = ({ text, versionTag }) => {
 
-  const scowGithubLink = versionTag
-    ? `https://github.com/PKUHPC/SCOW/tree/${versionTag}`
-    : "https://github.com/PKUHPC/SCOW";
+  const versionTagLink = versionTag
+    ? `https://github.com/PKUHPC/SCOW/releases/tag/${versionTag}`
+    : "";
 
   return (
     <>
-      <FooterContainer
-        dangerouslySetInnerHTML={{ __html: text }} />
-      <Divider style={{ marginTop: 0, marginBottom: 10 }} />
       <FooterContainer>
         <span>Powered by&nbsp;
-          <a href={scowGithubLink} target="_blank">
+          <a href="https://github.com/PKUHPC/SCOW" target="_blank">
             SCOW
           </a>
           &nbsp;
-          {versionTag || ""}
+          <a href={versionTagLink}>{versionTag || ""}</a>
         </span>
       </FooterContainer>
+      <Divider style={{ marginTop: 0, marginBottom: 10 }} />
+      <FooterContainer
+        dangerouslySetInnerHTML={{ __html: text }} />
     </>
   );
 };
