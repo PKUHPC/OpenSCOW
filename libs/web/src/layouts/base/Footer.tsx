@@ -48,7 +48,6 @@ export const Footer: React.FC<Props> = ({ text, versionTag }) => {
         </span>
       </FooterContainer>
     </>
-
   );
 };
 
