@@ -96,7 +96,7 @@ export const adminServiceServer = plugin((server) => {
         };
       }
 
-      const reply = await importUsers(data as ImportUsersData, em, whitelist, logger);
+      const reply = await importUsers(data as ImportUsersData, em, whitelist, server.ext.clusters, logger);
 
       return [reply];
 
