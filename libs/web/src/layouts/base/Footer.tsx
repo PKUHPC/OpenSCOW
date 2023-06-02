@@ -41,7 +41,7 @@ export const Footer: React.FC<Props> = ({ text, versionTag }) => {
             SCOW
           </a>
           &nbsp;
-          <a href={versionTagLink}>
+          <a href={versionTagLink} target="_blank">
             {versionTag || ""}
           </a>
         </span>
