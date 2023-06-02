@@ -133,7 +133,7 @@ function MyApp({ Component, pageProps, extra }: Props) {
             <GlobalStyle />
             <FailEventHandler />
             <TopProgressBar />
-            <BaseLayout footerText={footerText}>
+            <BaseLayout footerText={footerText} versionTag={publicConfig.VERSION_TAG}>
               <Component {...pageProps} />
             </BaseLayout>
           </AntdConfigProvider>

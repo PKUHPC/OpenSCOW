@@ -72,6 +72,8 @@ export interface PublicRuntimeConfig {
 
   PUBLIC_PATH: string;
 
+  VERSION_TAG: string | undefined;
+
 }
 
 export const runtimeConfig: ServerRuntimeConfig = getConfig().serverRuntimeConfig;

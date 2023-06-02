@@ -52,6 +52,7 @@ const StyledLayout = styled(Layout)`
 
 type Props = PropsWithChildren<{
   footerText: string;
+  versionTag: string | undefined;
   routes: NavItemProps[];
   logout: (() => void) | undefined;
   user: UserInfo | undefined;
@@ -60,7 +61,7 @@ type Props = PropsWithChildren<{
 }>;
 
 export const BaseLayout: React.FC<PropsWithChildren<Props>> = ({
-  children, footerText, routes, user, logout,
+  children, footerText, versionTag, routes, user, logout,
   headerRightContent, basePath,
 }) => {
 
@@ -105,7 +106,7 @@ export const BaseLayout: React.FC<PropsWithChildren<Props>> = ({
           <Content>
             {children}
           </Content>
-          <Footer text={footerText} />
+          <Footer text={footerText} versionTag={versionTag}/>
         </ContentPart>
       </StyledLayout>
     </Root>
