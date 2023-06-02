@@ -22,6 +22,7 @@
   "dependencies": {
     "@ddadaal/tsgrpc-common": "0.2.3",
     "@ddadaal/tsgrpc-server": "0.19.2",
+    "@ddadaal/tsgrpc-client": "0.17.5",
     "@grpc/grpc-js": "1.8.14",
     "@scow/config": "workspace:*",
     "@scow/lib-config": "workspace:*",
@@ -45,7 +46,6 @@
     "wait-on": "7.0.1"
   },
   "devDependencies": {
-    "@ddadaal/tsgrpc-client": "0.17.5",
     "@types/node-cron": "3.0.7",
     "@types/shell-quote": "1.7.1",
     "@types/ssh2": "1.11.11",

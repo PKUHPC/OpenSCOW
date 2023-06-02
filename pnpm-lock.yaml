@@ -277,6 +277,9 @@ importers:
 
   apps/mis-server:
     dependencies:
+      '@ddadaal/tsgrpc-client':
+        specifier: 0.17.5
+        version: 0.17.5(@grpc/grpc-js@1.8.14)
       '@ddadaal/tsgrpc-common':
         specifier: 0.2.3
         version: 0.2.3
@@ -362,9 +365,6 @@ importers:
         specifier: 7.0.1
         version: 7.0.1
     devDependencies:
-      '@ddadaal/tsgrpc-client':
-        specifier: 0.17.5
-        version: 0.17.5(@grpc/grpc-js@1.8.14)
       '@types/google-protobuf':
         specifier: 3.15.6
         version: 3.15.6
@@ -513,6 +513,9 @@ importers:
 
   apps/portal-server:
     dependencies:
+      '@ddadaal/tsgrpc-client':
+        specifier: 0.17.5
+        version: 0.17.5(@grpc/grpc-js@1.8.14)
       '@ddadaal/tsgrpc-common':
         specifier: 0.2.3
         version: 0.2.3
@@ -583,9 +586,6 @@ importers:
         specifier: 7.0.1
         version: 7.0.1
     devDependencies:
-      '@ddadaal/tsgrpc-client':
-        specifier: 0.17.5
-        version: 0.17.5(@grpc/grpc-js@1.8.14)
       '@types/node-cron':
         specifier: 3.0.7
         version: 3.0.7
