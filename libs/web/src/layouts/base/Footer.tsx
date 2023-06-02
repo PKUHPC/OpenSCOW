@@ -41,7 +41,9 @@ export const Footer: React.FC<Props> = ({ text, versionTag }) => {
             SCOW
           </a>
           &nbsp;
-          <a href={versionTagLink}>{versionTag || ""}</a>
+          <a href={versionTagLink}>
+            {versionTag || ""}
+          </a>
         </span>
       </FooterContainer>
       <Divider style={{ marginTop: 0, marginBottom: 10 }} />
