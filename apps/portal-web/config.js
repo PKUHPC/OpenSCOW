@@ -11,11 +11,13 @@
  */
 
 // @ts-check
+/* eslint-disable @typescript-eslint/no-var-requires */
 
 const { envConfig, str, bool, parseKeyValue } = require("@scow/lib-config");
 const { join } = require("path");
 const { homedir } = require("os");
-const { PHASE_DEVELOPMENT_SERVER, PHASE_PRODUCTION_BUILD, PHASE_PRODUCTION_SERVER, PHASE_TEST } = require("next/constants");
+const { PHASE_DEVELOPMENT_SERVER, PHASE_PRODUCTION_BUILD,
+  PHASE_PRODUCTION_SERVER, PHASE_TEST } = require("next/constants");
 
 const { readVersionFile } = require("@scow/utils/build/version");
 const { getCapabilities } = require("@scow/lib-auth");
@@ -102,6 +104,8 @@ const buildRuntimeConfig = async (phase, basePath) => {
   const portalConfig = getPortalConfig(configPath, console);
   const commonConfig = getCommonConfig(configPath, console);
 
+  const versionTag = readVersionFile()?.tag;
+
   /**
    * @type {import("./src/utils/config").ServerRuntimeConfig}
    */
@@ -155,6 +159,8 @@ const buildRuntimeConfig = async (phase, basePath) => {
     CLIENT_MAX_BODY_SIZE: config.CLIENT_MAX_BODY_SIZE,
 
     PUBLIC_PATH: config.PUBLIC_PATH,
+
+    VERSION_TAG: versionTag,
   };
 
   if (!building && !testenv) {

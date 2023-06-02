@@ -91,6 +91,8 @@ const buildRuntimeConfig = async (phase, basePath) => {
 
   const commonConfig = getCommonConfig(configBasePath, console);
 
+  const versionTag = readVersionFile()?.tag;
+
   /**
    * @type {import ("./src/utils/config").ServerRuntimeConfig}
    */
@@ -132,6 +134,8 @@ const buildRuntimeConfig = async (phase, basePath) => {
     PASSWORD_PATTERN_MESSAGE: commonConfig.passwordPattern?.errorMessage,
 
     BASE_PATH: basePath,
+
+    VERSION_TAG: versionTag,
   };
 
   if (!building) {
