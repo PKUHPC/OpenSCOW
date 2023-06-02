@@ -46,9 +46,16 @@ export const Footer: React.FC<Props> = ({ text, versionTag }) => {
           </a>
         </span>
       </FooterContainer>
-      <Divider style={{ marginTop: 0, marginBottom: 10 }} />
-      <FooterContainer
-        dangerouslySetInnerHTML={{ __html: text }} />
+      {
+        text && (
+          <>
+            <Divider style={{ marginTop: 0, marginBottom: 10 }} />
+            <FooterContainer
+              dangerouslySetInnerHTML={{ __html: text }} />
+          </>
+        )
+      }
+
     </>
   );
 };
