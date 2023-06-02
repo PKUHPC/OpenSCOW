@@ -24,7 +24,7 @@ import { JobInfo } from "src/entities/JobInfo";
 import { UserAccount } from "src/entities/UserAccount";
 import { ClusterPlugin } from "src/plugins/clusters";
 import { PricePlugin } from "src/plugins/price";
-import testData from "tests/job/testData.json";
+import testData from "src/testData.json";
 
 async function getLatestDate(em: SqlEntityManager, logger: Logger) {
 

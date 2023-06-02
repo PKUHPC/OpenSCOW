@@ -21,11 +21,11 @@ import { JobInfo } from "src/entities/JobInfo";
 import { UserStatus } from "src/entities/UserAccount";
 import { createPriceItems } from "src/tasks/createBillingItems";
 import { fetchJobs } from "src/tasks/fetch";
+import testData from "src/testData.json";
 import { reloadEntities } from "src/utils/orm";
 import { InitialData, insertInitialData } from "tests/data/data";
 import { dropDatabase } from "tests/data/helpers";
 
-import testData from "./testData.json";
 
 let data: InitialData;
 let server: Server;
