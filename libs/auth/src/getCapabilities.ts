@@ -16,6 +16,7 @@ export interface Capabilities {
   createUser: boolean;
   changePassword: boolean;
   getUser: boolean;
+  accountUserRelation: boolean;
 }
 
 

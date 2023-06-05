@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+export * from "./accountUserRelation";
 export { changePassword } from "./changePassword";
 export { createUser } from "./createUser";
 export { deleteToken } from "./deleteToken";
