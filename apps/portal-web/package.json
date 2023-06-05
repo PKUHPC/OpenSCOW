@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "cross-env NEXT_PUBLIC_USE_MOCK=1 TS_NODE_PROJECT=tsconfig.server.json node --watch -r ts-node/register -r tsconfig-paths/register server/index.ts",
-    "dev:server": "cross-env NEXT_PUBLIC_USE_MOCK=1 TS_NODE_PROJECT=tsconfig.server.json node --watch -r ts-node/register -r tsconfig-paths/register server/index.ts",
+    "dev:server": "cross-env NEXT_PUBLIC_USE_MOCK=0 TS_NODE_PROJECT=tsconfig.server.json node --watch -r ts-node/register -r tsconfig-paths/register server/index.ts",
     "serve": "node build/server/index.js",
     "build": "pnpm prepareDev && npm run build:next && npm run build:ts",
     "build:next": "next build",
