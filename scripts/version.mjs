@@ -171,3 +171,6 @@ if (!existsSync(CHANGELOG_BASE_PATH)) {
 const CHANGELOG_PATH = join(CHANGELOG_BASE_PATH, `v${rootPackageJson.version}.md`);
 await writeFile(CHANGELOG_PATH, changelogContent);
 
+console.log("Generated changelog at %s", CHANGELOG_PATH);
+console.debug("Changelog content:\n%s", changelogContent);
+
