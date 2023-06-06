@@ -102,14 +102,14 @@ SCOW中使用`identityId`标识一个用户，并同时使用此`identityId`作�
 
 | 字段                  | 类型    | 是否必须 | 解释                               |
 | --------------------- | ------- | -------- | ---------------------------------- |
-| `createUser`          | boolean | 是       | 此认证系统是否支持创建用户         |
-| `getUser`             | boolean | 是       | 此认证系统是否支持查询用户         |
-| `changePassword`      | boolean | 是       | 此认证系统是否支持修改用户密码     |
-| `accountUserRelation` | boolean | 是       | 此认证系统是否支持管理用户账户关系 |
+| `createUser`          | boolean | 否       | 此认证系统是否支持创建用户         |
+| `getUser`             | boolean | 否       | 此认证系统是否支持查询用户         |
+| `changePassword`      | boolean | 否       | 此认证系统是否支持修改用户密码     |
+| `accountUserRelation` | boolean | 否       | 此认证系统是否支持管理用户账户关系 |
 
 #### 解释
 
-此API用于认证系统声明自己的支持的能力。系统的其他部分将会根据此API的返回值选择性地选择是否显示某些功能。例如，如果`changePassword`为false，那么前端系统将会不显示修改密码的功能。
+此API用于认证系统声明自己的支持的能力。系统的其他部分将会根据此API的返回值选择性地选择是否显示某些功能。例如，如果`changePassword`为`false`或者为`undefined`，那么前端系统将会不显示修改密码的功能。
 
 ## 创建用户功能相关API
 
