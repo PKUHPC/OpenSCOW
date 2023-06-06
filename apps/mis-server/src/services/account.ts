@@ -14,10 +14,12 @@ import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { LockMode, UniqueConstraintViolationException } from "@mikro-orm/core";
+import { createAccount } from "@scow/lib-auth";
 import { decimalToMoney } from "@scow/lib-decimal";
 import { AccountServiceServer, AccountServiceService,
   BlockAccountResponse_Result } from "@scow/protos/build/server/account";
 import { blockAccount, unblockAccount } from "src/bl/block";
+import { misConfig } from "src/config/mis";
 import { Account } from "src/entities/Account";
 import { AccountWhitelist } from "src/entities/AccountWhitelist";
 import { Tenant } from "src/entities/Tenant";
@@ -197,6 +199,10 @@ export const accountServiceServer = plugin((server) => {
       logger.info("Account has been created in cluster.");
 
       await callHook("accountCreated", { accountName, comment, ownerId, tenantName }, logger);
+
+      if (server.ext.capabilities.accountUserRelation) {
+        await createAccount(misConfig.authUrl, { accountName, ownerUserId: ownerId }, logger);
+      }
 
       return [{}];
     },
