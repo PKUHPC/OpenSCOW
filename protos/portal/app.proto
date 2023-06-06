@@ -62,6 +62,9 @@ message CreateAppSessionRequest {
   // for SCOW, this is ${BASE_PATH}/api/proxy
   string proxy_base_path = 9;
   map<string, string> custom_attributes = 10;
+  uint32 node_count  = 11;
+  optional uint32 gpu_count = 12;
+  optional string memory = 13;
 }
 
 // NOT_FOUND: app is not found
@@ -151,6 +154,8 @@ message SubmissionInfo {
   uint32 max_time = 9;
   google.protobuf.Timestamp submit_time = 10;
   map<string, string> custom_attributes = 11;
+  uint32 node_count = 12;
+  optional uint32 gpu_count = 13;
 }
 
 message GetAppLastSubmissionRequest {

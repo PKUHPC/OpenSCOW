@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { App, Button, Form, Input, InputNumber, Select, Spin } from "antd";
+import { App, Button, Col, Form, Input, InputNumber, Row, Select, Spin } from "antd";
 import { Rule } from "antd/es/form";
 import Router from "next/router";
 import { useCallback, useState } from "react";
@@ -23,6 +23,7 @@ import { AppCustomAttribute } from "src/pages/api/app/getAppMetadata";
 import { Partition } from "src/pages/api/cluster";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { Cluster } from "src/utils/config";
+import { formatSize } from "src/utils/format";
 
 interface Props {
   appId: string;
@@ -34,7 +35,9 @@ interface FormFields {
   cluster: Cluster;
   partition: string | undefined;
   qos: string | undefined;
+  nodeCount: number;
   coreCount: number;
+  gpuCount: number | undefined;
   account: string;
   maxTime: number;
 }
@@ -42,8 +45,14 @@ interface FormFields {
 const initialValues = {
   nodeCount: 1,
   coreCount: 1,
+  gpuCount: 1,
   maxTime: 60,
 } as Partial<FormFields>;
+
+const inputNumberFloorConfig = {
+  formatter: (value: number) => `${Math.floor(value)}`,
+  parser: (value: string) => Math.floor(+value),
+};
 
 export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
 
@@ -56,7 +65,7 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
 
   const onSubmit = async () => {
     const allFormFields = await form.validateFields();
-    const { cluster, coreCount, partition, qos, account, maxTime } = allFormFields;
+    const { cluster, nodeCount, coreCount, gpuCount, partition, qos, account, maxTime } = allFormFields;
 
     const customFormKeyValue: {[key: string]: string} = {};
     attributes.forEach((customFormAttribute) => {
@@ -69,7 +78,10 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
     await api.createAppSession({ body: {
       cluster: cluster.id,
       appId,
-      coreCount,
+      nodeCount: nodeCount,
+      coreCount: gpuCount ? gpuCount * Math.floor(currentPartitionInfo!.cores / currentPartitionInfo!.gpus) : coreCount,
+      gpuCount,
+      memory,
       partition,
       qos,
       account,
@@ -96,6 +108,8 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
         setLoading(true);
         const clusterPartition = data.clusterInfo.slurm.partitions[0];
         const clusterPartitionCoreCount = clusterPartition.cores;
+        const clusterPartitionNodeCount = clusterPartition.nodes;
+        const clusterPartitionGpuCount = clusterPartition.gpus;
         setCurrentPartitionInfo(clusterPartition);
 
         if (cluster) { await api.getAppLastSubmission({ query: { cluster: cluster?.id, appId } })
@@ -103,6 +117,8 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
             const lastSubmitPartition = lastSubmitData?.lastSubmissionInfo?.partition;
             const lastSubmitQos = lastSubmitData?.lastSubmissionInfo?.qos;
             const lastSubmitCoreCount = lastSubmitData?.lastSubmissionInfo?.coreCount;
+            const lastSubmissionNodeCount = lastSubmitData?.lastSubmissionInfo?.nodeCount;
+            const lastSubmissionGpuCount = lastSubmitData?.lastSubmissionInfo?.gpuCount;
 
             // 如果存在上一次提交信息，且上一次提交信息中的分区，qos，cpu核心数满足当前集群配置，则填入上一次提交信息中的相应值
             const setSubmitPartition = lastSubmitPartition &&
@@ -111,11 +127,18 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
               clusterPartition.qos?.some((item) => { return item === lastSubmitQos; });
             const setSubmitCoreCount = setSubmitPartition &&
               lastSubmitCoreCount && clusterPartitionCoreCount && clusterPartitionCoreCount >= lastSubmitCoreCount;
+            const setSubmitNodeCount = setSubmitPartition &&
+                lastSubmissionNodeCount && clusterPartitionNodeCount &&
+                clusterPartitionNodeCount >= lastSubmissionNodeCount;
+            const setSubmitGpuCount = setSubmitPartition && lastSubmissionGpuCount && clusterPartitionGpuCount &&
+            clusterPartitionGpuCount >= lastSubmissionGpuCount;
 
             const requiredObj = {
               partition: setSubmitPartition ? lastSubmitPartition : clusterPartition.name,
               qos: setSubmitQos ? lastSubmitQos : clusterPartition?.qos?.[0],
+              nodeCount: setSubmitNodeCount ? lastSubmissionNodeCount : initialValues.nodeCount,
               coreCount: setSubmitCoreCount ? lastSubmitCoreCount : initialValues.coreCount,
+              gpuCount: setSubmitGpuCount ? lastSubmissionGpuCount : initialValues.gpuCount,
               maxTime: lastSubmitData?.lastSubmissionInfo
                 ? lastSubmitData.lastSubmissionInfo.maxTime : initialValues.maxTime,
             };
@@ -145,6 +168,13 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
             }
             form.setFieldsValue({ ...requiredObj, ...attributesObj });
 
+            // 如果填入上次提交分区信息，则保存该分区信息
+            if (setSubmitPartition) {
+              const setSubmitPartitionInfo =
+                data.clusterInfo.slurm.partitions.filter((item) => { return item.name === lastSubmitPartition; })[0];
+              setCurrentPartitionInfo(setSubmitPartitionInfo);
+            }
+
             // 如果上一次提交信息存在，则填入账户值
             if (lastSubmitData.lastSubmissionInfo) {
               form.setFieldValue("account", lastSubmitData.lastSubmissionInfo.account);
@@ -158,11 +188,16 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
     },
   });
 
-  const handlePartitionChange = (partition) => {
+  const handlePartitionChange = (partition: string) => {
     const partitionInfo = clusterInfoQuery.data
       ? clusterInfoQuery.data.clusterInfo.slurm.partitions.find((x) => x.name === partition)
       : undefined;
     form.setFieldValue("qos", partitionInfo?.qos?.[0]);
+    if (!!partitionInfo?.gpus) {
+      form.setFieldValue("gpuCount", 1);
+    } else {
+      form.setFieldValue("coreCount", 1);
+    }
     setCurrentPartitionInfo(partitionInfo);
   };
 
@@ -198,9 +233,32 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
 
   const defaultClusterStore = useStore(DefaultClusterStore);
 
-  return (
-    <Form form={form} onFinish={onSubmit} initialValues={{ cluster: defaultClusterStore.cluster }}>
+  const nodeCount = Form.useWatch("nodeCount", form) as number;
 
+  const coreCount = Form.useWatch("coreCount", form) as number;
+
+  const gpuCount = Form.useWatch("gpuCount", form) as number;
+
+  const memorySize = (currentPartitionInfo ?
+    currentPartitionInfo.gpus ? nodeCount * gpuCount
+    * Math.floor(currentPartitionInfo.cores / currentPartitionInfo.gpus)
+    * Math.floor(currentPartitionInfo.mem / currentPartitionInfo.cores) :
+      nodeCount * coreCount * Math.floor(currentPartitionInfo.mem / currentPartitionInfo.cores) : 0);
+  const memory = memorySize + "MB";
+  const memoryDisplay = formatSize(memorySize, ["MB", "GB", "TB"]);
+
+  const coreCountSum = currentPartitionInfo?.gpus
+    ? nodeCount * gpuCount * Math.floor(currentPartitionInfo.cores / currentPartitionInfo.gpus)
+    : nodeCount * coreCount;
+
+  return (
+    <Form
+      form={form}
+      onFinish={onSubmit}
+      initialValues={{
+        cluster: defaultClusterStore.cluster, ... initialValues,
+      }}
+    >
       <Form.Item name="cluster" label="集群" rules={[{ required: true }]}>
         <SingleClusterSelector />
       </Form.Item>
@@ -244,24 +302,85 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
             options={currentPartitionInfo?.qos?.map((x) => ({ label: x, value: x }))}
           />
         </Form.Item>
-
         <Form.Item
-          label="CPU核心数"
-          name="coreCount"
-          dependencies={["cluster"]}
+          label="节点数"
+          name="nodeCount"
+          dependencies={["cluster", "partition"]}
           rules={[
-            { required: true, type: "integer", max: currentPartitionInfo?.cores },
+            { required: true, type: "integer", max: currentPartitionInfo?.nodes },
           ]}
         >
-          <InputNumber min={1} />
+          <InputNumber
+            min={1}
+            max={currentPartitionInfo?.nodes}
+            {...inputNumberFloorConfig}
+          />
         </Form.Item>
-
+        {
+          currentPartitionInfo?.gpus ? (
+            <Form.Item
+              label="单节点GPU卡数"
+              name="gpuCount"
+              dependencies={["cluster", "partition"]}
+              rules={[
+                {
+                  required: true,
+                  type: "integer",
+                  max: currentPartitionInfo?.gpus,
+                },
+              ]}
+            >
+              <InputNumber
+                min={1}
+                max={currentPartitionInfo?.gpus}
+                {...inputNumberFloorConfig}
+              />
+            </Form.Item>
+          ) : (
+            <Form.Item
+              label="单节点CPU核心数"
+              name="coreCount"
+              dependencies={["cluster", "partition"]}
+              rules={[
+                { required: true, type: "integer", max: currentPartitionInfo?.cores },
+              ]}
+            >
+              <InputNumber
+                min={1}
+                max={currentPartitionInfo?.cores}
+                {...inputNumberFloorConfig}
+              />
+            </Form.Item>
+          )
+        }
         <Form.Item label="最长运行时间" name="maxTime" rules={[{ required: true }]}>
           <InputNumber min={1} step={1} addonAfter={"分钟"} />
         </Form.Item>
 
         {customFormItems}
-
+        <Row>
+          {
+            currentPartitionInfo?.gpus
+              ?
+              (
+                <Col span={12} sm={6}>
+                  <Form.Item label="总GPU卡数">
+                    {nodeCount * gpuCount}
+                  </Form.Item>
+                </Col>
+              ) : null
+          }
+          <Col span={12} sm={6}>
+            <Form.Item label="总CPU核心数">
+              {coreCountSum}
+            </Form.Item>
+          </Col>
+          <Col span={12} sm={6}>
+            <Form.Item label="总内存容量">
+              {memoryDisplay}
+            </Form.Item>
+          </Col>
+        </Row>
       </Spin>
 
       <Form.Item>

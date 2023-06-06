@@ -66,7 +66,7 @@ export const slurmAppOps = (cluster: string): AppOps => {
     createApp: async (request, logger) => {
       const apps = getAppConfigs();
 
-      const { appId, userId, account, coreCount, maxTime, proxyBasePath,
+      const { appId, userId, account, coreCount, nodeCount, gpuCount, memory, maxTime, proxyBasePath,
         partition, qos, customAttributes } = request;
 
 
@@ -132,7 +132,9 @@ export const slurmAppOps = (cluster: string): AppOps => {
             account: request.account,
             partition: request.partition,
             qos: request.qos,
+            nodeCount: request.nodeCount,
             coreCount: request.coreCount,
+            gpuCount: request.gpuCount,
             maxTime: request.maxTime,
             submitTime: new Date().toISOString(),
             customAttributes: request.customAttributes,
@@ -174,9 +176,11 @@ export const slurmAppOps = (cluster: string): AppOps => {
             jobName,
             command: SERVER_ENTRY_COMMAND,
             account: account,
+            nodeCount: nodeCount,
             coreCount: coreCount,
+            gpuCount: gpuCount,
+            memory: memory,
             maxTime: maxTime,
-            nodeCount: 1,
             partition: partition,
             workingDirectory,
             qos: qos,
@@ -199,9 +203,11 @@ export const slurmAppOps = (cluster: string): AppOps => {
             jobName,
             command: VNC_ENTRY_COMMAND,
             account: account,
+            nodeCount: nodeCount,
             coreCount: coreCount,
+            gpuCount: gpuCount,
+            memory: memory,
             maxTime: maxTime,
-            nodeCount: 1,
             partition: partition,
             workingDirectory,
             qos: qos,

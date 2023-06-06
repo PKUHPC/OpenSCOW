@@ -30,6 +30,9 @@ export interface CreateAppSessionSchema {
     partition: string | undefined;
     qos: string | undefined;
     coreCount: number;
+    nodeCount: number;
+    gpuCount?: number;
+    memory?: string;
     maxTime: number;
     customAttributes: { [key: string]: string };
   }
@@ -66,7 +69,9 @@ export default /* #__PURE__*/route<CreateAppSessionSchema>("CreateAppSessionSche
 
   if (!info) { return; }
 
-  const { appId, cluster, coreCount, partition, qos, account, maxTime, customAttributes } = req.body;
+  const {
+    appId, cluster, coreCount, nodeCount, gpuCount, memory, partition, qos, account, maxTime, customAttributes,
+  } = req.body;
 
   const client = getClient(AppServiceClient);
 
@@ -77,6 +82,9 @@ export default /* #__PURE__*/route<CreateAppSessionSchema>("CreateAppSessionSche
     cluster,
     userId: info.identityId,
     coreCount,
+    nodeCount,
+    gpuCount,
+    memory,
     account,
     maxTime,
     partition,
