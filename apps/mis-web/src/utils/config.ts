@@ -50,6 +50,8 @@ export interface PublicRuntimeConfig {
   PORTAL_URL: string | undefined;
 
   PUBLIC_PATH: string | undefined;
+
+  VERSION_TAG: string | undefined;
 }
 
 export const runtimeConfig: ServerRuntimeConfig = getConfig().serverRuntimeConfig;

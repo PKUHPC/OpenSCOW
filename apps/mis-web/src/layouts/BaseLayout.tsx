@@ -21,9 +21,10 @@ import { publicConfig } from "src/utils/config";
 
 interface Props {
   footerText: string;
+  versionTag: string | undefined;
 }
 
-export const BaseLayout = ({ footerText, children }: PropsWithChildren<Props>) => {
+export const BaseLayout = ({ footerText, versionTag, children }: PropsWithChildren<Props>) => {
 
   const userStore = useStore(UserStore);
 
@@ -35,6 +36,7 @@ export const BaseLayout = ({ footerText, children }: PropsWithChildren<Props>) =
       user={userStore.user}
       routes={routes}
       footerText={footerText}
+      versionTag={versionTag}
       basePath={publicConfig.BASE_PATH}
       headerRightContent={(
         <>

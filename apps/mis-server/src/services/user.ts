@@ -13,7 +13,7 @@
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
-import { createUser, getUser } from "@scow/lib-auth";
+import { addUserToAccount, createUser, getUser, removeUserFromAccount } from "@scow/lib-auth";
 import { decimalToMoney } from "@scow/lib-decimal";
 import {
   AccountStatus,
@@ -168,6 +168,10 @@ export const userServiceServer = plugin((server) => {
 
       await em.persistAndFlush([account, user, newUserAccount]);
 
+      if (server.ext.capabilities.accountUserRelation) {
+        await addUserToAccount(misConfig.authUrl, { accountName, userId }, logger);
+      }
+
       return [{}];
     },
 
@@ -197,6 +201,10 @@ export const userServiceServer = plugin((server) => {
       );
 
       await em.removeAndFlush(userAccount);
+
+      if (server.ext.capabilities.accountUserRelation) {
+        await removeUserFromAccount(misConfig.authUrl, { accountName, userId }, logger);
+      }
 
       return [{}];
 

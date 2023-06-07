@@ -28,8 +28,13 @@ export const platformAdminRoutes: (platformRoles: PlatformRole[]) => NavItemProp
     Icon: UserOutlined,
     text: "平台管理",
     path: "/admin",
-    clickable: false,
+    clickToPath: "/admin/info",
     children: [
+      {
+        Icon: InfoOutlined,
+        text: "平台信息",
+        path: "/admin/info",
+      },
       ...(platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ? [
         {
           Icon: UserOutlined,

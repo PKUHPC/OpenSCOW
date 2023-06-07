@@ -34,12 +34,6 @@
         "@types/react"
       ],
       "enabled": false
-    },
-    {
-      "matchPackagePatterns": [
-        "next"
-      ],
-      "enabled": false
     }
   ]
 }
