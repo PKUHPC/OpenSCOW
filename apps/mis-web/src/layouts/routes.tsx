@@ -319,6 +319,8 @@ export const getAvailableRoutes = (user: User | undefined): NavItemProps[] => {
 
   // 获取当前用户角色
   const userCurrentRoles = getCurrentUserRoles(user);
+  console.log(userCurrentRoles);
+  console.log(publicConfig.NAV_LINKS);
 
   // 根据配置文件判断是否增加导航链接
   if (publicConfig.NAV_LINKS && publicConfig.NAV_LINKS.length > 0) {
@@ -359,10 +361,10 @@ export const getAvailableRoutes = (user: User | undefined): NavItemProps[] => {
 };
 
 const getCurrentUserRoles = (user: User) => {
-
   return {
     user: user.accountAffiliations.length === 0,
-    accountUser: user.accountAffiliations.every((affiliation) => affiliation.role === UserRole.USER),
+    accountUser: user.accountAffiliations.length > 0
+      && user.accountAffiliations.every((affiliation) => affiliation.role === UserRole.USER),
     accountAdmin: user.accountAffiliations.some((affiliation) => affiliation.role === UserRole.ADMIN),
     accountOwner: user.accountAffiliations.some((affiliation) => affiliation.role === UserRole.OWNER),
     platformAdmin: user.platformRoles.includes(PlatformRole.PLATFORM_ADMIN),
