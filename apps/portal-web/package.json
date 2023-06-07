@@ -6,10 +6,9 @@
     "dev": "cross-env NEXT_PUBLIC_USE_MOCK=1 TS_NODE_PROJECT=tsconfig.server.json node --watch -r ts-node/register -r tsconfig-paths/register server/index.ts",
     "dev:server": "cross-env NEXT_PUBLIC_USE_MOCK=0 TS_NODE_PROJECT=tsconfig.server.json node --watch -r ts-node/register -r tsconfig-paths/register server/index.ts",
     "serve": "node build/server/index.js",
-    "build": "pnpm prepareDev && npm run build:next && npm run build:ts",
+    "build": "npm run build:next && npm run build:ts",
     "build:next": "next build",
     "build:ts": "rimraf build && tsc -p tsconfig.server.json && tsc-alias -p tsconfig.server.json",
-    "prepareDev": "",
     "test": "jest --passWithNoTests",
     "client": "ntar client --basePathVar \"publicConfig.BASE_PATH || ''\" --extraImports \"import { publicConfig } from 'src/utils/config';\""
   },

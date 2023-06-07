@@ -26,11 +26,11 @@ export const GetAccountUsersSchema = typeboxRouteSchema({
     accountName: Type.String(),
   }),
 
-  responses: {
+  responses: Type.Object({
     200: Type.Object({
       results: Type.Array(AccountUserInfo),
     }),
-  },
+  }),
 });
 
 export default typeboxRoute(GetAccountUsersSchema, async (req, res) => {

@@ -6,9 +6,8 @@
     "dev": "cross-env NEXT_PUBLIC_USE_MOCK=1 next dev",
     "dev:server": "cross-env NEXT_PUBLIC_USE_MOCK=0 next dev",
     "serve": "next start",
-    "build": "pnpm prepareDev && npm run build:next",
+    "build": "npm run build:next",
     "build:next": "next build",
-    "prepareDev": "",
     "client": "ntar client --basePathVar \"publicConfig.BASE_PATH || ''\" --extraImports \"import { publicConfig } from 'src/utils/config';\""
   },
   "files": [
