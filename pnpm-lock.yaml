@@ -379,7 +379,7 @@ importers:
         version: 5.1.0(react-dom@18.2.0)(react@18.2.0)
       '@ddadaal/next-typed-api-routes-runtime':
         specifier: 0.7.1
-        version: 0.7.1(next@13.2.4)
+        version: 0.7.1(next@13.4.4)
       '@ddadaal/tsgrpc-client':
         specifier: 0.17.5
         version: 0.17.5(@grpc/grpc-js@1.8.14)
@@ -609,7 +609,7 @@ importers:
         version: 6.12.0
       '@ddadaal/next-typed-api-routes-runtime':
         specifier: 0.7.1
-        version: 0.7.1(next@13.2.4)
+        version: 0.7.1(next@13.4.4)
       '@ddadaal/tsgrpc-client':
         specifier: 0.17.5
         version: 0.17.5(@grpc/grpc-js@1.8.14)
@@ -3198,7 +3198,7 @@ packages:
       yargs: 17.7.2
     dev: true
 
-  /@ddadaal/next-typed-api-routes-runtime@0.7.1(next@13.2.4):
+  /@ddadaal/next-typed-api-routes-runtime@0.7.1(next@13.4.4):
     resolution: {integrity: sha512-uetsuMuusXzGO448zm6ardljcoL0snfjgAwIZVq29Fp0x38hLOYiEoEwn3/BcnzlShyHRMCkFu8XZ3U6GcmdNg==}
     peerDependencies:
       next: '>=11.x'
@@ -3208,7 +3208,7 @@ packages:
       ajv-formats: 2.1.1(ajv@8.12.0)
       ajv-formats-draft2019: 1.6.1(ajv@8.12.0)
       fast-json-stringify: 5.7.0
-      next: 13.2.4(@babel/core@7.20.2)(react-dom@18.2.0)(react@18.2.0)
+      next: 13.4.4(@babel/core@7.20.2)(react-dom@18.2.0)(react@18.2.0)
       tslib: 2.5.2
       zod: 3.21.4
     dev: false
