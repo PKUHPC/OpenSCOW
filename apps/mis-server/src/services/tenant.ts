@@ -14,11 +14,15 @@ import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError, status } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { UniqueConstraintViolationException } from "@mikro-orm/core";
+import { createUser } from "@scow/lib-auth";
 import { decimalToMoney } from "@scow/lib-decimal";
 import { TenantServiceServer, TenantServiceService } from "@scow/protos/build/server/tenant";
+import { misConfig } from "src/config/mis";
 import { Account } from "src/entities/Account";
 import { Tenant } from "src/entities/Tenant";
 import { TenantRole, User } from "src/entities/User";
+import { callHook } from "src/plugins/hookClient";
+import { createUserInDatabase, insertKeyToNewUser } from "src/utils/createUser";
 
 
 export const tenantServiceServer = plugin((server) => {
@@ -35,12 +39,12 @@ export const tenantServiceServer = plugin((server) => {
       const accountCount = await em.count(Account, { tenant });
       const userCount = await em.count(User, { tenant });
       const admins = await em.find(User, { tenant, tenantRoles: { $like: `%${TenantRole.TENANT_ADMIN}%` } }, {
-        fields: ["id", "name"],
+        fields: ["userId", "name"],
       });
 
       return [{
         accountCount,
-        admins: admins.map((a) => ({ userId: a.id + "", userName: a.name })),
+        admins: admins.map((a) => ({ userId: a.userId, userName: a.name })),
         userCount,
         balance: decimalToMoney(tenant.balance),
       }];
@@ -87,25 +91,73 @@ export const tenantServiceServer = plugin((server) => {
         }];
     },
 
-    createTenant: async ({ request, em }) => {
-      const { name } = request;
-      const tenant = await em.findOne(Tenant, { name: name });
+    createTenant: async ({ request, em, logger }) => {
+      const { tenantName, userId, userName, userEmail, userPassword } = request;
+
+      const tenant = await em.findOne(Tenant, { name: tenantName });
       if (tenant) {
-        throw <ServiceError> { code: Status.ALREADY_EXISTS, details: "The tenant already exists" };
+        throw <ServiceError>{
+          code: Status.ALREADY_EXISTS, message: "The tenant already exists", details: "TENANT_ALREADY_EXISTS",
+        };
       }
-      server.logger.info(`start to create tenant: ${name} `);
-      // create tenant in database
-      const newTenant = new Tenant({ name });
-      try {
-        await em.persistAndFlush(newTenant);
-      } catch (e) {
-        if (e instanceof UniqueConstraintViolationException) {
-          throw <ServiceError> { code: Status.ALREADY_EXISTS, message:`Tenant with ${newTenant.name} already exists.` };
-        } else {
-          throw e;
-        }
-      }
-      return [{}];
+      logger.info(`start to create tenant: ${tenantName} `);
+      const newTenant = new Tenant({ name: tenantName });
+
+      return await em.transactional(async (em) => {
+        // 在数据库中创建租户
+        await em.persistAndFlush(newTenant).catch((e) => {
+          if (e instanceof UniqueConstraintViolationException) {
+            throw <ServiceError>{
+              code: Status.ALREADY_EXISTS, message: "The tenant already exists", details: "TENANT_ALREADY_EXISTS",
+            };
+          }
+          throw <ServiceError>{ code: Status.INTERNAL, message: "Error creating tenant in database." };
+        });
+
+        // 在数据库中创建user
+        const user = await createUserInDatabase(userId, userName, userEmail, tenantName, logger, em)
+          .then(async (user) => {
+            user.tenantRoles = [TenantRole.TENANT_ADMIN];
+            await em.persistAndFlush(user);
+            return user;
+          }).catch((e) => {
+            if (e.code === Status.ALREADY_EXISTS) {
+              throw <ServiceError>{
+                code: Status.ALREADY_EXISTS,
+                message: `User with userId ${userId} already exists in scow.`,
+                details: "USER_ALREADY_EXISTS",
+              };
+            }
+            throw <ServiceError>{
+              code: Status.INTERNAL,
+              message: `Error creating user with userId ${userId} in database.`,
+            };
+          });
+        // call auth
+        const createdInAuth = await createUser(misConfig.authUrl,
+          { identityId: user.userId, id: user.id, mail: user.email, name: user.name, password: userPassword },
+          logger)
+          .then(async () => {
+            await insertKeyToNewUser(userId, userPassword, logger)
+              .catch(() => { });
+            return true;
+          })
+          .catch(async (e) => {
+            if (e.status === 409) {
+              logger.warn("User exists in auth.");
+              return false;
+            } else {
+              logger.error("Error creating user in auth.", e);
+              throw <ServiceError>{
+                code: Status.INTERNAL,
+                message: `Error creating user with userId ${userId} in auth.`,
+              };
+            }
+          });
+        await callHook("userCreated", { tenantName, userId: user.userId }, logger);
+        return [{ tenantId: newTenant.id, userId: user.id, createdInAuth: createdInAuth }];
+      },
+      );
     },
   });
 

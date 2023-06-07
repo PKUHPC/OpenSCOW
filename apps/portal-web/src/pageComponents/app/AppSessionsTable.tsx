@@ -50,6 +50,8 @@ export const AppSessionsTable: React.FC<Props> = () => {
 
   const [connectivityRefreshToken, setConnectivityRefreshToken] = useState(false);
 
+  const [onlyNotEnded, setOnlyNotEnded] = useState(false);
+
   const { data, isLoading, reload } = useAsync({
     promiseFn: useCallback(async () => {
       // List all desktop
@@ -219,10 +221,18 @@ export const AppSessionsTable: React.FC<Props> = () => {
               10s自动刷新
             </Checkbox>
           </Form.Item>
+          <Form.Item>
+            <Checkbox
+              checked={onlyNotEnded}
+              onChange={(e) => setOnlyNotEnded(e.target.checked)}
+            >
+              只展示未结束的作业
+            </Checkbox>
+          </Form.Item>
         </Form>
       </FilterFormContainer>
       <Table
-        dataSource={data}
+        dataSource={onlyNotEnded ? data?.filter((x) => x.state !== "ENDED") : data}
         columns={columns}
         rowKey={(record) => record.sessionId}
         loading={!data && isLoading}

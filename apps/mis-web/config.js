@@ -91,6 +91,8 @@ const buildRuntimeConfig = async (phase, basePath) => {
 
   const commonConfig = getCommonConfig(configBasePath, console);
 
+  const versionTag = readVersionFile()?.tag;
+
   /**
    * @type {import ("./src/utils/config").ServerRuntimeConfig}
    */
@@ -134,6 +136,8 @@ const buildRuntimeConfig = async (phase, basePath) => {
     BASE_PATH: basePath,
 
     NAV_LINKS: misConfig.navLinks,
+
+    VERSION_TAG: versionTag,
   };
 
   if (!building) {

@@ -32,7 +32,6 @@
   "include": [
     "next-env.d.ts",
     "**/*.ts",
-    "**/*.tsx",
-    "jest.config.js"
-, "../../libs/web/src/layouts/DefaultClusterSelector.tsx", "../../libs/web/src/utils/form.ts"  ]
+    "**/*.tsx"
+  ]
 }

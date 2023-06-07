@@ -15,12 +15,11 @@ import { MySqlDriver, SqlEntityManager } from "@mikro-orm/mysql";
 import { getCapabilities, getUser } from "@scow/lib-auth";
 import { misConfig } from "src/config/mis";
 import { User } from "src/entities/User";
-import { DEFAULT_TENANT_NAME } from "src/utils/constants";
 
 export async function userExists(userId: string, logger: Logger, em: SqlEntityManager<MySqlDriver>) {
   const capabilities = await getCapabilities(misConfig.authUrl);
   // Check whether the user already exists in scow
-  const user = await em.findOne(User, { userId, tenant: { name: DEFAULT_TENANT_NAME } });
+  const user = await em.findOne(User, { userId });
   if (!capabilities.getUser) {
     // 如果不支持查询，则直接返回existsInAuth: undefined
     return {

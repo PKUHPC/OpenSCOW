@@ -11,11 +11,13 @@
  */
 
 // @ts-check
+/* eslint-disable @typescript-eslint/no-var-requires */
 
 const { envConfig, str, bool, parseKeyValue } = require("@scow/lib-config");
 const { join } = require("path");
 const { homedir } = require("os");
-const { PHASE_DEVELOPMENT_SERVER, PHASE_PRODUCTION_BUILD, PHASE_PRODUCTION_SERVER, PHASE_TEST } = require("next/constants");
+const { PHASE_DEVELOPMENT_SERVER, PHASE_PRODUCTION_BUILD,
+  PHASE_PRODUCTION_SERVER, PHASE_TEST } = require("next/constants");
 
 const { readVersionFile } = require("@scow/utils/build/version");
 const { getCapabilities } = require("@scow/lib-auth");
@@ -102,6 +104,8 @@ const buildRuntimeConfig = async (phase, basePath) => {
   const portalConfig = getPortalConfig(configPath, console);
   const commonConfig = getCommonConfig(configPath, console);
 
+  const versionTag = readVersionFile()?.tag;
+
   /**
    * @type {import("./src/utils/config").ServerRuntimeConfig}
    */
@@ -158,6 +162,7 @@ const buildRuntimeConfig = async (phase, basePath) => {
 
     NAV_LINKS: portalConfig.navLinks,
 
+    VERSION_TAG: versionTag,
   };
 
   if (!building && !testenv) {
@@ -167,21 +172,7 @@ const buildRuntimeConfig = async (phase, basePath) => {
     console.log("Public Runtime Config", publicRuntimeConfig);
   }
 
-  if (!testenv) {
 
-    // HACK
-    // call /api/setup after 3 seconds to init the proxy and shell server
-    setTimeout(() => {
-      const url = `http://localhost:${process.env.PORT || 3000}${basePath === "/" ? "" : basePath}/api/setup`;
-      console.log("Calling setup url to initialize proxy and shell server", url);
-      fetch(url).then(async (res) => {
-        console.log("Call completed. Response: ", await res.text());
-      }).catch((e) => {
-        console.error("Error when calling proxy url to initialize ws proxy server", e);
-      });
-    }, 3000);
-
-  }
 
   return {
     serverRuntimeConfig,

@@ -30,8 +30,13 @@ export const platformAdminRoutes: (platformRoles: PlatformRole[]) => NavItemProp
     Icon: UserOutlined,
     text: "平台管理",
     path: "/admin",
-    clickable: false,
+    clickToPath: "/admin/info",
     children: [
+      {
+        Icon: InfoOutlined,
+        text: "平台信息",
+        path: "/admin/info",
+      },
       ...(platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ? [
         {
           Icon: UserOutlined,
@@ -39,9 +44,22 @@ export const platformAdminRoutes: (platformRoles: PlatformRole[]) => NavItemProp
           path: "/admin/importUsers",
         },
         {
-          Icon: UserOutlined,
-          text: "平台租户列表",
+          Icon: CloudServerOutlined,
+          text: "平台租户管理",
           path: "/admin/tenants",
+          clickToPath: "/admin/tenants/list",
+          children: [
+            {
+              Icon: UserOutlined,
+              text: "平台租户列表",
+              path: "/admin/tenants/list",
+            },
+            {
+              Icon: PlusOutlined,
+              text: "创建租户",
+              path: "/admin/tenants/create",
+            },
+          ],
         },
         {
           Icon: UserOutlined,
@@ -319,8 +337,6 @@ export const getAvailableRoutes = (user: User | undefined): NavItemProps[] => {
 
   // 获取当前用户角色
   const userCurrentRoles = getCurrentUserRoles(user);
-  console.log(userCurrentRoles);
-  console.log(publicConfig.NAV_LINKS);
 
   // 根据配置文件判断是否增加导航链接
   if (publicConfig.NAV_LINKS && publicConfig.NAV_LINKS.length > 0) {

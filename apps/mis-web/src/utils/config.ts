@@ -52,6 +52,8 @@ export interface PublicRuntimeConfig {
   PUBLIC_PATH: string;
 
   NAV_LINKS?: NavLink[];
+
+  VERSION_TAG: string | undefined;
 }
 
 export const runtimeConfig: ServerRuntimeConfig = getConfig().serverRuntimeConfig;
