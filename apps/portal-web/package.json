@@ -8,7 +8,7 @@
     "serve": "next start",
     "build": "pnpm prepareDev && npm run build:next",
     "build:next": "next build",
-    "prepareDev": "ntar schema",
+    "prepareDev": "",
     "test": "jest --passWithNoTests",
     "client": "ntar client --basePathVar \"publicConfig.BASE_PATH || ''\" --extraImports \"import { publicConfig } from 'src/utils/config';\""
   },
