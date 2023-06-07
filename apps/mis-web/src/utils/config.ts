@@ -39,7 +39,7 @@ export interface PublicRuntimeConfig {
     misConfig: MisConfigSchema["createUser"],
     authSupportsCreateUser: boolean,
   },
-  ENABLE_CHANGE_PASSWORD: boolean;
+  ENABLE_CHANGE_PASSWORD?: boolean;
 
   ACCOUNT_NAME_PATTERN: string | undefined;
   ACCOUNT_NAME_PATTERN_MESSAGE: string | undefined;
