@@ -80,15 +80,6 @@ export const UserInfoSchema = Type.Object({
 
 export type UserInfo = Static<typeof UserInfoSchema>;
 
-// export interface FullUserInfo {
-//   id: string;
-//   name: string;
-//   email: string;
-//   createTime: string;
-//   accountAffiliations: { accountName: string; role: UserRole }[];
-//   tenantRoles: TenantRole[];
-// }
-
 export const FullUserInfo = Type.Object({
   id: Type.String(),
   name: Type.String(),
