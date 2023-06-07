@@ -10,21 +10,22 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { route } from "@ddadaal/next-typed-api-routes-runtime";
+import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { deleteToken } from "@scow/lib-auth";
+import { Type } from "@sinclair/typebox";
 import { getTokenFromCookie } from "src/auth/cookie";
 import { runtimeConfig } from "src/utils/config";
 
-export interface LogoutSchema {
-  method: "DELETE";
+export const LogoutSchema = typeboxRouteSchema({
+  method: "DELETE",
 
   responses: {
-    204: null;
-  }
-}
+    204: Type.Null(),
+  },
+});
 
 
-export default route<LogoutSchema>("LogoutSchema", async (req) => {
+export default typeboxRoute(LogoutSchema, async (req) => {
 
   const token = getTokenFromCookie({ req });
 

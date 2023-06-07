@@ -10,28 +10,29 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { route } from "@ddadaal/next-typed-api-routes-runtime";
+import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { InitServiceClient } from "@scow/protos/build/server/init";
+import { Type } from "@sinclair/typebox";
 import { getClient } from "src/utils/client";
 import { queryIfInitialized } from "src/utils/init";
 
-export interface UnsetInitAdminSchema {
-  method: "DELETE";
+export const UnsetInitAdminSchema = typeboxRouteSchema({
+  method: "DELETE",
 
-  query: {
-    userId: string;
-  };
+  query: Type.Object({
+    userId: Type.String(),
+  }),
 
-  responses: {
-    204: null;
+  responses: Type.Object({
+    204: Type.Null(),
 
-    409: { code: "ALREADY_INITIALIZED"; }
+    409: Type.Object({ code: Type.Literal("ALREADY_INITIALIZED") }),
 
-  }
-}
+  }),
+});
 
-export default route<UnsetInitAdminSchema>("UnsetInitAdminSchema", async (req) => {
+export default typeboxRoute(UnsetInitAdminSchema, async (req) => {
   const result = await queryIfInitialized();
 
   if (result) { return { 409: { code: "ALREADY_INITIALIZED" } }; }

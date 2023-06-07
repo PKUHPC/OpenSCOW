@@ -13,7 +13,7 @@
 import "nprogress/nprogress.css";
 import "antd/dist/reset.css";
 
-import { failEvent, fromApi } from "@ddadaal/next-typed-api-routes-runtime/lib/client";
+import { failEvent, fromTypeboxRoute } from "@ddadaal/next-typed-api-routes-runtime/lib/client";
 import { AntdConfigProvider } from "@scow/lib-web/build/layouts/AntdConfigProvider";
 import { DarkModeCookie, DarkModeProvider, getDarkModeCookieValue } from "@scow/lib-web/build/layouts/darkMode";
 import { GlobalStyle } from "@scow/lib-web/build/layouts/globalStyle";
@@ -178,10 +178,9 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
         // Why not use api object directly?
         // fetch in server (node-fetch per se) only supports absolute url
         // but next-typed-api-routes's object has only pathname
-        const result = await fromApi<ValidateTokenSchema>(
+        const result = await fromTypeboxRoute<typeof ValidateTokenSchema>(
           "GET",
           join(
-            `http://localhost:${process.env.PORT ?? 3000}`,
             publicConfig.BASE_PATH,
             "/api/auth/validateToken",
           ),

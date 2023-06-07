@@ -10,52 +10,54 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { route } from "@ddadaal/next-typed-api-routes-runtime";
+import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { moneyToNumber } from "@scow/lib-decimal";
 import { ChargingServiceClient } from "@scow/protos/build/server/charging";
+import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { TenantRole, UserInfo, UserRole } from "src/models/User";
 import { ensureNotUndefined } from "src/utils/checkNull";
 import { getClient } from "src/utils/client";
 
-export interface PaymentInfo {
-  index: number;
-  accountName?: string;
-  time: string;
-  type: string;
-  amount: number;
-  comment: string;
-  ipAddress: string;
-  operatorId: string;
-}
+export const PaymentInfo = Type.Object({
+  index: Type.Number(),
+  accountName: Type.Optional(Type.String()),
+  time: Type.String(),
+  type: Type.String(),
+  amount: Type.Number(),
+  comment: Type.String(),
+  ipAddress: Type.String(),
+  operatorId: Type.String(),
+});
+export type PaymentInfo = Static<typeof PaymentInfo>;
 
-export interface GetPaymentsSchema {
-  method: "GET";
+export const GetPaymentsSchema = typeboxRouteSchema({
+  method: "GET",
 
-  query: {
+  query: Type.Object({
     /**
      * @format date-time
      */
-    startTime: string;
+    startTime: Type.String(),
 
     /**
      * @format date-time
      */
-    endTime: string;
+    endTime: Type.String(),
 
-    accountName?: string;
-  };
+    accountName: Type.Optional(Type.String()),
+  }),
 
   responses: {
-    200: {
-      results: PaymentInfo[];
-      total: number;
-    }
-  }
-}
+    200: Type.Object({
+      results: Type.Array(PaymentInfo),
+      total: Type.Number(),
+    }),
+  },
+});
 
-export default route<GetPaymentsSchema>("GetPaymentsSchema", async (req, res) => {
+export default typeboxRoute(GetPaymentsSchema, async (req, res) => {
 
   const { endTime, startTime, accountName } = req.query;
 

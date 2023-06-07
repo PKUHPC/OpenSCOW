@@ -10,10 +10,11 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { route } from "@ddadaal/next-typed-api-routes-runtime";
+import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { UserServiceClient } from "@scow/protos/build/server/user";
+import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { TenantRole } from "src/models/User";
 import { getClient } from "src/utils/client";
@@ -21,23 +22,23 @@ import { queryIfInitialized } from "src/utils/init";
 import { handlegRPCError } from "src/utils/server";
 
 
-export interface UnsetTenantRoleSchema {
-  method: "PUT";
+export const UnsetTenantRoleSchema = typeboxRouteSchema({
+  method: "PUT",
 
-  body: {
-    userId: string;
-    roleType: TenantRole;
-  }
+  body: Type.Object({
+    userId: Type.String(),
+    roleType: Type.Enum(TenantRole),
+  }),
 
   responses: {
     // 如果用户已经不是这个角色，那么executed为false
-    200: { executed: boolean };
+    200: Type.Object({ executed: Type.Boolean() }),
     // 用户不存在
-    404: null;
-  }
-}
+    404: Type.Null(),
+  },
+});
 
-export default route<UnsetTenantRoleSchema>("UnsetTenantRoleSchema", async (req, res) => {
+export default typeboxRoute(UnsetTenantRoleSchema, async (req, res) => {
   const { userId, roleType } = req.body;
 
   if (await queryIfInitialized()) {

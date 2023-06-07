@@ -10,9 +10,11 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Status } from "@grpc/grpc-js/build/src/constants";
-import { AccountServiceClient, CreateAccountResponse } from "@scow/protos/build/server/account";
+import { AccountServiceClient } from "@scow/protos/build/server/account";
+import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { TenantRole } from "src/models/User";
 import { checkNameMatch } from "src/server/checkIdNameMatch";
@@ -21,35 +23,42 @@ import { publicConfig } from "src/utils/config";
 import { route } from "src/utils/route";
 import { handlegRPCError } from "src/utils/server";
 
-export interface CreateAccountSchema {
-  method: "POST";
+// Cannot use CreateAccountResponse from protos
+export const CreateAccountResponse = Type.Object({});
+export type CreateAccountResponse = Static<typeof CreateAccountResponse>;
 
-  body: {
+export const CreateAccountSchema = typeboxRouteSchema({
+  method: "POST",
+
+  body: Type.Object({
     /**
      * 账户名
      */
-    accountName: string;
-    ownerId: string;
-    ownerName: string;
-    comment?: string;
-  }
+    accountName: Type.String(),
+    ownerId: Type.String(),
+    ownerName: Type.String(),
+    comment: Type.Optional(Type.String()),
+  }),
 
-  responses: {
-    200: CreateAccountResponse;
-    400: {
-      code: "ID_NAME_NOT_MATCH" | "ACCOUNT_NAME_NOT_VALID";
-    }
+  responses: Type.Object({
+    200: CreateAccountResponse,
+    400: Type.Object({
+      code: Type.Union([
+        Type.Literal("ID_NAME_NOT_MATCH"),
+        Type.Literal("ACCOUNT_NAME_NOT_VALID"),
+      ]),
+    }),
     /** ownerId不存在 */
-    404: null;
-    409: null;
-  }
-}
+    404: Type.Null(),
+    409: Type.Null(),
+  }),
+});
 
 const accountNameRegex = publicConfig.ACCOUNT_NAME_PATTERN ? new RegExp(publicConfig.ACCOUNT_NAME_PATTERN) : undefined;
 
 const auth = authenticate((info) => info.tenantRoles.includes(TenantRole.TENANT_ADMIN));
 
-export default route<CreateAccountSchema>("CreateAccountSchema",
+export default route(CreateAccountSchema,
   async (req, res) => {
 
     const info = await auth(req, res);

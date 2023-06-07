@@ -10,10 +10,11 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { route } from "@ddadaal/next-typed-api-routes-runtime";
+import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { status } from "@grpc/grpc-js";
 import { UserServiceClient } from "@scow/protos/build/server/user";
+import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { PlatformRole, TenantRole, UserRole } from "src/models/User";
 import { getClient } from "src/utils/client";
@@ -21,44 +22,47 @@ import { publicConfig } from "src/utils/config";
 import { getUserIdRule, useBuiltinCreateUser } from "src/utils/createUser";
 import { handlegRPCError } from "src/utils/server";
 
-export interface CreateUserSchema {
-  method: "POST";
+export const CreateUserSchema = typeboxRouteSchema({
+  method: "POST",
 
-  body: {
+  body: Type.Object({
     /**
      * 用户ID
      */
-    identityId: string;
-    name: string;
-    email: string;
+    identityId: Type.String(),
+    name: Type.String(),
+    email: Type.String(),
 
     /**
      * 密码
      */
-    password: string;
-  }
+    password: Type.String(),
+  }),
 
-  responses: {
-    200: {
-      createdInAuth: boolean;
-    };
+  responses: Type.Object({
+    200: Type.Object({
+      createdInAuth: Type.Boolean(),
+    }),
 
-    400: {
-      code: "PASSWORD_NOT_VALID" | "USERID_NOT_VALID";
-      message: string | undefined;
-    }
+    400: Type.Object({
+      code: Type.Union([
+        Type.Literal("PASSWORD_NOT_VALID"),
+        Type.Literal("USERID_NOT_VALID"),
+      ]),
+      message: Type.Union([Type.String(), Type.Undefined()]),
+    }),
 
     /** 用户已经存在 */
-    409: null;
+    409: Type.Null(),
 
     /** 本功能在当前配置下不可用 */
-    501: null;
-  }
-}
+    501: Type.Null(),
+  }),
+});
 
 const passwordPattern = publicConfig.PASSWORD_PATTERN && new RegExp(publicConfig.PASSWORD_PATTERN);
 
-export default /* #__PURE__*/route<CreateUserSchema>("CreateUserSchema", async (req, res) => {
+export default /* #__PURE__*/typeboxRoute(CreateUserSchema, async (req, res) => {
 
   if (!useBuiltinCreateUser()) { return { 501: null }; }
 

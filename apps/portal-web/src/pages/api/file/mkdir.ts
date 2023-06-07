@@ -10,33 +10,35 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { status } from "@grpc/grpc-js";
 import { FileServiceClient } from "@scow/protos/build/portal/file";
+import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
 import { handlegRPCError } from "src/utils/server";
 
 
-export interface MkdirSchema {
-  method: "POST";
+export const MkdirSchema = typeboxRouteSchema({
+  method: "POST",
 
-  body: {
-    cluster: string;
-    path: string;
-  }
+  body: Type.Object({
+    cluster: Type.String(),
+    path: Type.String(),
+  }),
 
   responses: {
-    204: null;
-    409: { code: "ALREADY_EXISTS" };
-    400: { code: "INVALID_CLUSTER" };
-  }
-}
+    204: Type.Null(),
+    409: Type.Object({ code: Type.Literal("ALREADY_EXISTS") }),
+    400: Type.Object({ code: Type.Literal("INVALID_CLUSTER") }),
+  },
+});
 
 const auth = authenticate(() => true);
 
-export default route<MkdirSchema>("MkdirSchema", async (req, res) => {
+export default route(MkdirSchema, async (req, res) => {
 
   const info = await auth(req, res);
 

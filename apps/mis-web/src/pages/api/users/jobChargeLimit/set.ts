@@ -10,33 +10,34 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { route } from "@ddadaal/next-typed-api-routes-runtime";
+import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { numberToMoney } from "@scow/lib-decimal";
 import { JobChargeLimitServiceClient } from "@scow/protos/build/server/job_charge_limit";
+import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { UserRole } from "src/models/User";
 import { getClient } from "src/utils/client";
 import { handlegRPCError } from "src/utils/server";
 
-export interface SetJobChargeLimitSchema {
+export const SetJobChargeLimitSchema = typeboxRouteSchema({
   method: "PUT",
 
-  body: {
-    accountName: string;
-    userId: string;
-    limit: number;
-  }
+  body: Type.Object({
+    accountName: Type.String(),
+    userId: Type.String(),
+    limit: Type.Number(),
+  }),
 
   responses: {
-    204: null;
+    204: Type.Null(),
     // 用户不存在
-    404: null;
-  }
-}
+    404: Type.Null(),
+  },
+});
 
-export default /* #__PURE__*/route<SetJobChargeLimitSchema>("SetJobChargeLimitSchema", async (req, res) => {
+export default typeboxRoute(SetJobChargeLimitSchema, async (req, res) => {
 
   const { accountName, userId, limit } = req.body;
 

@@ -10,54 +10,74 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { status } from "@grpc/grpc-js";
 import { AppServiceClient, WebAppProps_ProxyType } from "@scow/protos/build/portal/app";
+import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { getClient } from "src/utils/client";
-import { route } from "src/utils/route";
 import { handlegRPCError } from "src/utils/server";
 
 // Cannot use ServerConnectPropsConfig from appConfig package
-export type AppConnectProps = {
-  method: string;
-  path: string;
-  query?: { [key: string]: string };
-  formData?: { [key: string]: string };
-}
+export const AppConnectProps = Type.Object({
+  method: Type.String(),
+  path: Type.String(),
+  query: Type.Optional(Type.Record(Type.String(), Type.String())),
+  formData: Type.Optional(Type.Record(Type.String(), Type.String())),
+});
+export type AppConnectProps = Static<typeof AppConnectProps>;
 
-export interface ConnectToAppSchema {
-  method: "POST";
+export const AppConnectResponse = Type.Object({
+  host: Type.String(),
+  port: Type.Number(),
+  password: Type.String(),
+});
+export type AppConnectResponse = Static<typeof AppConnectResponse>;
 
-  body: {
-    cluster: string;
-    sessionId: string;
-  }
+export const ConnectToAppSchema = typeboxRouteSchema({
+  method: "POST",
 
-  responses: {
-    200: { host: string; port: number; password: string} & (
-      | {
-        type: "web";
-        connect: AppConnectProps;
-        proxyType: "relative" | "absolute";
-        customFormData?: {[key: string]: string};
-       }
-      | { type: "vnc"; }
-    );
+  body: Type.Object({
+    cluster: Type.String(),
+    sessionId: Type.String(),
+  }),
 
+  responses: Type.Object({
+
+    200: Type.Intersect([
+      Type.Object({
+        host: Type.String(),
+        port: Type.Number(),
+        password: Type.String(),
+      }),
+      Type.Union([
+        Type.Object({}),
+        Type.Object({
+          type: Type.Literal("web"),
+          connect: AppConnectProps,
+          proxyType: Type.Union([
+            Type.Literal("relative"),
+            Type.Literal("absolute"),
+          ]),
+          customFormData: Type.Optional(Type.Record(Type.String(), Type.String())),
+        }),
+        Type.Object({ type: Type.Literal("vnc") }),
+      ]),
+    ]),
 
     // sessionId not exists
-    404: { code: "SESSION_ID_NOT_FOUND" };
+    404: Type.Object({ code: Type.Literal("SESSION_ID_NOT_FOUND") }),
 
     // the session cannot be connected
-    409: { code: "SESSION_NOT_AVAILABLE" };
+    409: Type.Object({ code: Type.Literal("SESSION_NOT_AVAILABLE") }),
 
-  }
-}
+  }),
+});
 
 const auth = authenticate(() => true);
 
-export default /* #__PURE__*/route<ConnectToAppSchema>("ConnectToAppSchema", async (req, res) => {
+export default /* #__PURE__*/typeboxRoute(ConnectToAppSchema, async (req, res) => {
 
   const info = await auth(req, res);
 

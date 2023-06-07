@@ -10,48 +10,52 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { numberToMoney } from "@scow/lib-decimal";
 import { JobServiceClient } from "@scow/protos/build/server/job";
+import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { PlatformRole, TenantRole } from "src/models/User";
-import type { GetJobFilter } from "src/pages/api/job/jobInfo";
+import { GetJobFilter } from "src/pages/api/job/jobInfo";
 import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
 import { handlegRPCError, parseIp } from "src/utils/server";
 
-export interface ChangeJobPriceSchema {
-  method: "PATCH";
+export const ChangeJobPriceSchema = typeboxRouteSchema({
+  method: "PATCH",
 
-  body: GetJobFilter & {
+  body: Type.Object({
+    ...GetJobFilter.properties,
 
-    reason: string;
+    reason: Type.String(),
 
     /**
      * @minimum 0
      */
-    price: number;
+    price: Type.Number({}),
 
     /** which price to change */
-    target: "tenant" | "account";
-  }
+    target: Type.Union([Type.Literal("tenant"), Type.Literal("account")]),
 
-  responses: {
-    200: { count: number };
+  }),
+
+  responses: Type.Object({
+    200: Type.Object({ count: Type.Number() }),
     /** 作业未找到 */
-    404: null;
+    404: Type.Null(),
     /** 非租户管理员不能修改作业的账户价格；非平台管理员不能修改作业的租户价格 */
-    403: null;
-  }
-}
+    403: Type.Null(),
+  }),
+});
 
 const auth = authenticate((info) =>
   info.tenantRoles.includes(TenantRole.TENANT_ADMIN)
   || info.platformRoles.includes(PlatformRole.PLATFORM_ADMIN),
 );
 
-export default route<ChangeJobPriceSchema>("ChangeJobPriceSchema",
+export default route(ChangeJobPriceSchema,
   async (req, res) => {
 
     const info = await auth(req, res);

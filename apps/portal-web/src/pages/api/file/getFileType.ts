@@ -10,31 +10,38 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { status } from "@grpc/grpc-js";
 import { FileServiceClient } from "@scow/protos/build/portal/file";
+import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
 import { handlegRPCError } from "src/utils/server";
 
-export interface GetFileTypeSchema {
-    method: "GET";
+export const GetFileTypeSchema = typeboxRouteSchema({
+  method: "GET",
 
-    query: {
-      cluster: string;
-      path: string;
-    };
+  query: Type.Object({
+    cluster: Type.String(),
+    path: Type.String(),
+  }),
 
-    responses: {
-      200: { type: string };
-      400: { code: "INVALID_CLUSTER" | "INVALID_PATH" };
-    };
-}
+  responses: {
+    200: Type.Object({ type: Type.String() }),
+    400: Type.Object({
+      code: Type.Union([
+        Type.Literal("INVALID_CLUSTER"),
+        Type.Literal("INVALID_PATH"),
+      ]),
+    }),
+  },
+});
 
 const auth = authenticate(() => true);
 
-export default route<GetFileTypeSchema>("GetFileTypeSchema", async (req, res) => {
+export default route(GetFileTypeSchema, async (req, res) => {
 
   const info = await auth(req, res);
 

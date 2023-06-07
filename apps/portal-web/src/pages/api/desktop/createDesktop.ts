@@ -10,48 +10,49 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { status } from "@grpc/grpc-js";
 import { DesktopServiceClient } from "@scow/protos/build/portal/desktop";
+import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { getClient } from "src/utils/client";
 import { publicConfig } from "src/utils/config";
-import { route } from "src/utils/route";
 import { handlegRPCError } from "src/utils/server";
 
-export interface CreateDesktopSchema {
-  method: "POST";
+export const CreateDesktopSchema = typeboxRouteSchema({
+  method: "POST",
 
-  body: {
-    cluster: string;
+  body: Type.Object({
+    cluster: Type.String(),
 
     // the name of the wm
-    wm: string;
-  }
+    wm: Type.String(),
+  }),
 
   responses: {
-    200: {
-      host: string;
-      port: number;
-      password: string;
-    };
+    200: Type.Object({
+      host: Type.String(),
+      port: Type.Number(),
+      password: Type.String(),
+    }),
 
-    400: {
-      code: "INVALID_WM" | "INVALID_CLUSTER";
-    }
+    400: Type.Object({
+      code: Type.Union([Type.Literal("INVALID_WM"), Type.Literal("INVALID_CLUSTER")]),
+    }),
 
-    409: {
-      code: "TOO_MANY_DESKTOPS";
-    }
+    409: Type.Object({
+      code: Type.Literal("TOO_MANY_DESKTOPS"),
+    }),
 
     // 功能没有启用
-    501: null;
-  }
-}
+    501: Type.Null(),
+  },
+});
 
 const auth = authenticate(() => true);
 
-export default /* #__PURE__*/route<CreateDesktopSchema>("CreateDesktopSchema", async (req, res) => {
+export default /* #__PURE__*/typeboxRoute(CreateDesktopSchema, async (req, res) => {
 
   if (!publicConfig.ENABLE_LOGIN_DESKTOP) {
     return { 501: null };

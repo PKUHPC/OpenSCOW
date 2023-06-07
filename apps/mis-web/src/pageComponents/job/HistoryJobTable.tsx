@@ -196,7 +196,7 @@ export const JobTable: React.FC<Props> = ({
 
 
 interface JobInfoTableProps {
-  data: GetJobInfoSchema["responses"]["200"] | undefined;
+  data: typeof GetJobInfoSchema["responses"]["200"] | undefined;
   pageInfo: { page: number, pageSize: number };
   setPageInfo?: (info: { page: number, pageSize: number }) => void;
   isLoading: boolean;

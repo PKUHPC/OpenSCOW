@@ -36,7 +36,7 @@ export type AccountInfo = Omit<AccountStatus, "balance"> & {
 type Props = {
   error: AuthResultError;
 } | {
-  storageQuotas: GetUserStatusSchema["responses"]["200"]["storageQuotas"],
+  storageQuotas: typeof GetUserStatusSchema["responses"]["200"]["storageQuotas"],
   accounts: Record<string, AccountInfo>;
 };
 

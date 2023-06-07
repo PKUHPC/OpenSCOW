@@ -10,31 +10,32 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { route } from "@ddadaal/next-typed-api-routes-runtime";
+import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { JobChargeLimitServiceClient } from "@scow/protos/build/server/job_charge_limit";
+import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { UserRole } from "src/models/User";
 import { getClient } from "src/utils/client";
 import { handlegRPCError } from "src/utils/server";
 
-export interface CancelJobChargeLimitSchema {
+export const CancelJobChargeLimitSchema = typeboxRouteSchema({
   method: "DELETE",
 
-  query: {
-    accountName: string;
-    userId: string;
-  }
+  query: Type.Object({
+    accountName: Type.String(),
+    userId: Type.String(),
+  }),
 
   responses: {
-    204: null;
+    204: Type.Null(),
     // 用户不存在，或者用户没有设置限制
-    404: null;
-  }
-}
+    404: Type.Null(),
+  },
+});
 
-export default /* #__PURE__*/route<CancelJobChargeLimitSchema>("CancelJobChargeLimitSchema", async (req, res) => {
+export default typeboxRoute(CancelJobChargeLimitSchema, async (req, res) => {
 
   const { accountName, userId } = req.query;
 

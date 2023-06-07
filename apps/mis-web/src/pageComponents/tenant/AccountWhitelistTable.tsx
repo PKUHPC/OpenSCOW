@@ -20,7 +20,7 @@ import type {
   GetWhitelistedAccountsSchema } from "src/pages/api/tenant/accountWhitelist/getWhitelistedAccounts";
 
 interface Props {
-  data: GetWhitelistedAccountsSchema["responses"]["200"] | undefined;
+  data: typeof GetWhitelistedAccountsSchema["responses"]["200"] | undefined;
   isLoading: boolean;
   reload: () => void;
 }

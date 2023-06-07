@@ -10,25 +10,26 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { route } from "@ddadaal/next-typed-api-routes-runtime";
+import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { JobServiceClient } from "@scow/protos/build/server/job";
+import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { PlatformRole } from "src/models/User";
 import { getClient } from "src/utils/client";
 import { queryIfInitialized } from "src/utils/init";
 
-export interface GetMissingDefaultPriceItemsSchema {
-  method: "GET";
+export const GetMissingDefaultPriceItemsSchema = typeboxRouteSchema({
+  method: "GET",
 
-  responses: {
-    200: { items: string[] };
-  }
-}
+  responses: Type.Object({
+    200: Type.Object({ items: Type.Array(Type.String()) }),
+  }),
+});
 
 const auth = authenticate((info) => info.platformRoles.includes(PlatformRole.PLATFORM_ADMIN));
 
-export default route<GetMissingDefaultPriceItemsSchema>("GetMissingDefaultPriceItemsSchema",
+export default typeboxRoute(GetMissingDefaultPriceItemsSchema,
   async (req, res) => {
 
     // 如果还未初始化，本接口不做登录校验

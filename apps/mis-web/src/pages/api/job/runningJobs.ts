@@ -10,19 +10,45 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { route } from "@ddadaal/next-typed-api-routes-runtime";
+import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
-import { RunningJob } from "@scow/protos/build/common/job";
+// import { RunningJob } from "@scow/protos/build/common/job";
 import { GetRunningJobsRequest, JobServiceClient } from "@scow/protos/build/server/job";
+import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { PlatformRole, TenantRole } from "src/models/User";
 import { getClient } from "src/utils/client";
 
-export interface GetRunningJobsSchema {
+// Cannot use RunningJob from protos
+export const RunningJob = Type.Object({
+  jobId: Type.String(),
+  partition: Type.String(),
+  name: Type.String(),
+  user: Type.String(),
+  state: Type.String(),
+  runningTime: Type.String(),
+  nodes: Type.String(),
+  nodesOrReason: Type.String(),
+  account: Type.String(),
+  cores: Type.String(),
+  qos: Type.String(),
+  submissionTime: Type.String(),
+  nodesToBeUsed: Type.String(),
+  /**
+   * days-hours:minutes:seconds.
+   * The value may be  "NOT_SET"  if not yet established or "UNLIMITED" for no
+   * limit.  (Valid for jobs and job steps)
+   */
+  timeLimit: Type.String(),
+  workingDir: Type.String(),
+});
+export type RunningJob = Static<typeof RunningJob>;
 
-  method: "GET";
+export const GetRunningJobsSchema = typeboxRouteSchema({
 
-  query: {
+  method: "GET",
+
+  query: Type.Object({
 
     /**
       如果是平台管理员，那么不输入租户名，否则都只看当前租户的
@@ -30,21 +56,21 @@ export interface GetRunningJobsSchema {
         显示userId用户在accountName中的作业
       否则：403
      */
-    userId?: string;
-    accountName?: string;
+    userId: Type.Optional(Type.String()),
+    accountName: Type.Optional(Type.String()),
 
-    cluster: string;
-  }
+    cluster: Type.String(),
+  }),
 
   responses: {
-    200: {
-      results: RunningJob[];
-    }
+    200: Type.Object({
+      results: Type.Array(RunningJob),
+    }),
 
 
-    403: null;
-  }
-}
+    403: Type.Null(),
+  },
+});
 
 export const getRunningJobs = async (request: GetRunningJobsRequest) => {
 
@@ -56,7 +82,7 @@ export const getRunningJobs = async (request: GetRunningJobsRequest) => {
 };
 
 
-export default route<GetRunningJobsSchema>("GetRunningJobsSchema", async (req, res) => {
+export default typeboxRoute(GetRunningJobsSchema, async (req, res) => {
   const auth = authenticate((u) =>
     u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ||
     u.tenantRoles.includes(TenantRole.TENANT_ADMIN) ||

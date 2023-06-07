@@ -10,30 +10,31 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
+import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { runtimeConfig } from "src/utils/config";
 import { isPortReachable } from "src/utils/isPortReachable";
-import { route } from "src/utils/route";
 
-export interface CheckAppConnectivitySchema {
-  method: "GET";
+export const CheckAppConnectivitySchema = typeboxRouteSchema({
+  method: "GET",
 
-  query: {
-    cluster: string;
-    host: string;
-    port: number;
-  };
+  query: Type.Object({
+    cluster: Type.String(),
+    host: Type.String(),
+    port: Type.Number(),
+  }),
 
   responses: {
-    200: { ok: boolean; }
-  }
-}
+    200: Type.Object({ ok: Type.Boolean() }),
+  },
+});
 
 const auth = authenticate(() => true);
 
 const TIMEOUT_MS = 3000;
 
-export default /* #__PURE__*/route<CheckAppConnectivitySchema>("CheckAppConnectivitySchema", async (req, res) => {
+export default /* #__PURE__*/typeboxRoute(CheckAppConnectivitySchema, async (req, res) => {
 
   const info = await auth(req, res);
 

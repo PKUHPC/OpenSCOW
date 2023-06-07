@@ -28,10 +28,10 @@ export const CancelJobSchema = typeboxRouteSchema({
     jobId: Type.Number(),
   }),
 
-  responses: {
-    204: Type.Object({}),
+  responses: Type.Object({
+    204: Type.Null(),
     404: Type.Object({ code: Type.Literal("JOB_NOT_FOUND") }),
-  },
+  }),
 });
 
 const auth = authenticate(() => true);

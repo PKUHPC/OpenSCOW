@@ -10,32 +10,33 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { route } from "@ddadaal/next-typed-api-routes-runtime";
+import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { UserServiceClient } from "@scow/protos/build/server/user";
+import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { PlatformRole, UserRole } from "src/models/User";
 import { getClient } from "src/utils/client";
 import { handlegRPCError } from "src/utils/server";
 
-export interface SetAdminSchema {
-  method: "PUT";
+export const SetAdminSchema = typeboxRouteSchema({
+  method: "PUT",
 
-  body: {
-    accountName: string;
-    identityId: string;
-  }
+  body: Type.Object({
+    accountName: Type.String(),
+    identityId: Type.String(),
+  }),
 
   responses: {
     // 如果用户已经为管理员，那么executed为false
-    200: { executed: boolean };
+    200: Type.Object({ executed: Type.Boolean() }),
     // 用户不在账户中
-    404: null;
-  }
-}
+    404: Type.Null(),
+  },
+});
 
-export default /* #__PURE__*/route<SetAdminSchema>("SetAdminSchema", async (req, res) => {
+export default /* #__PURE__*/typeboxRoute(SetAdminSchema, async (req, res) => {
   const { identityId, accountName } = req.body;
 
   const auth = authenticate((u) =>

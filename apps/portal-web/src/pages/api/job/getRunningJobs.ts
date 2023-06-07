@@ -10,36 +10,63 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
-import { RunningJob } from "@scow/protos/build/common/job";
 import { JobServiceClient } from "@scow/protos/build/portal/job";
+import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
 
-export interface GetRunningJobsSchema {
+// Cannot use RunningJob from protos
+export const RunningJob = Type.Object({
+  jobId: Type.String(),
+  partition: Type.String(),
+  name: Type.String(),
+  user: Type.String(),
+  state: Type.String(),
+  runningTime: Type.String(),
+  nodes: Type.String(),
+  nodesOrReason: Type.String(),
+  account: Type.String(),
+  cores: Type.String(),
+  qos: Type.String(),
+  submissionTime: Type.String(),
+  nodesToBeUsed: Type.String(),
+  /**
+   * days-hours:minutes:seconds.
+   * The value may be  "NOT_SET"  if not yet established or "UNLIMITED" for no
+   * limit.  (Valid for jobs and job steps)
+   */
+  timeLimit: Type.String(),
+  workingDir: Type.String(),
+});
 
-  method: "GET";
+export type RunningJob = Static<typeof RunningJob>;
 
-  query: {
+export const GetRunningJobsSchema = typeboxRouteSchema({
 
-    userId: string;
+  method: "GET",
 
-    cluster: string;
-  }
+  query: Type.Object({
+
+    userId: Type.String(),
+
+    cluster: Type.String(),
+  }),
 
   responses: {
-    200: {
-      results: RunningJob[];
-    }
+    200: Type.Object({
+      results: Type.Array(RunningJob),
+    }),
 
-    403: null;
-  }
-}
+    403: Type.Null(),
+  },
+});
 
 const auth = authenticate(() => true);
 
-export default route<GetRunningJobsSchema>("GetRunningJobsSchema", async (req, res) => {
+export default route(GetRunningJobsSchema, async (req, res) => {
 
 
   const info = await auth(req, res);

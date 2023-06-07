@@ -89,7 +89,7 @@ export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
 };
 
 interface UserInfoTableProps {
-  data: GetAllUsersSchema["responses"]["200"] | undefined;
+  data: typeof GetAllUsersSchema["responses"]["200"] | undefined;
   pageInfo: PageInfo;
   setPageInfo?: (info: PageInfo) => void;
   isLoading: boolean;

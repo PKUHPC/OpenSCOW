@@ -10,40 +10,65 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { status } from "@grpc/grpc-js";
-import { JobServiceClient, JobTemplate } from "@scow/protos/build/portal/job";
+import { JobServiceClient } from "@scow/protos/build/portal/job";
+import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
 import { handlegRPCError } from "src/utils/server";
 
-export interface GetJobTemplateSchema {
+// Cannot use JobTemplate from protos
+export const JobTemplate = Type.Object({
+  jobName: Type.String(),
+  account: Type.String(),
+  partition: Type.Optional(Type.Union([Type.String(), Type.Undefined()])),
+  qos: Type.Optional(Type.Union([Type.String(), Type.Undefined()])),
+  nodeCount: Type.Number(),
+  coreCount: Type.Number(),
+  gpuCount: Type.Optional(Type.Union([
+    Type.Null(),
+    Type.Number(),
+    Type.Undefined(),
+  ])),
+  /** in minutes */
+  maxTime: Type.Number(),
+  command: Type.String(),
+  workingDirectory: Type.String(),
+  output: Type.Optional(Type.Union([Type.String(), Type.Undefined()])),
+  errorOutput: Type.Optional(Type.Union([Type.String(), Type.Undefined()])),
+  comment: Type.Optional(Type.Union([Type.String(), Type.Undefined()])),
+});
+export type JobTemplate = Static<typeof JobTemplate>;
 
-  method: "GET";
+export const GetJobTemplateSchema = typeboxRouteSchema({
 
-  query: {
-    cluster: string;
-    id: string;
-  };
+  method: "GET",
 
-  responses: {
-    200: {
-      template: JobTemplate;
-    }
+  query: Type.Object({
+    cluster: Type.String(),
+    id: Type.String(),
+  }),
 
-    400: {
-      message: string;
-    }
+  responses: Type.Object({
+    200: Type.Object({
+      template: JobTemplate,
+    }),
 
-    404: { code: "TEMPLATE_NOT_FOUND" };
+    400: Type.Object({
+      message: Type.String(),
+    }),
 
-   }
-}
+    404: Type.Object({ code: Type.Literal("TEMPLATE_NOT_FOUND") }),
+
+  }),
+});
 
 const auth = authenticate(() => true);
 
-export default route<GetJobTemplateSchema>("GetJobTemplateSchema", async (req, res) => {
+export default route(GetJobTemplateSchema, async (req, res) => {
 
 
   const info = await auth(req, res);

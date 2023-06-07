@@ -80,12 +80,24 @@ export const UserInfoSchema = Type.Object({
 
 export type UserInfo = Static<typeof UserInfoSchema>;
 
-export interface FullUserInfo {
-  id: string;
-  name: string;
-  email: string;
-  createTime: string;
-  accountAffiliations: { accountName: string; role: UserRole }[];
-  tenantRoles: TenantRole[];
-}
+// export interface FullUserInfo {
+//   id: string;
+//   name: string;
+//   email: string;
+//   createTime: string;
+//   accountAffiliations: { accountName: string; role: UserRole }[];
+//   tenantRoles: TenantRole[];
+// }
+
+export const FullUserInfo = Type.Object({
+  id: Type.String(),
+  name: Type.String(),
+  email: Type.String(),
+  createTime: Type.String(),
+  accountAffiliations: Type.Array(
+    Type.Object({ accountName: Type.String(), role: Type.Enum(UserRole) }),
+  ),
+  tenantRoles: Type.Array(Type.Enum(TenantRole)),
+});
+export type FullUserInfo = Static<typeof FullUserInfo>;
 

@@ -22,7 +22,7 @@ import { GetTenantUsersSchema } from "src/pages/api/admin/getTenantUsers";
 import { User } from "src/stores/UserStore";
 
 interface Props {
-  data: GetTenantUsersSchema["responses"]["200"] | undefined;
+  data: typeof GetTenantUsersSchema["responses"]["200"] | undefined;
   isLoading: boolean;
   reload: () => void;
   user: User;

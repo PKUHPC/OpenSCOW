@@ -10,21 +10,31 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { route } from "@ddadaal/next-typed-api-routes-runtime";
+import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
-import type { GetUserStatusResponse } from "@scow/protos/build/server/user";
 import { UserServiceClient } from "@scow/protos/build/server/user";
+import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
+import { AccountStatus } from "src/models/UserSchemaModel";
 import { getClient } from "src/utils/client";
 
-export interface GetUserStatusSchema {
+// Cannot use GetUserStatusResponse from protos
+export const GetUserStatusResponse = Type.Object({
+  /** account and its status */
+  accountStatuses: Type.Record(Type.String(), AccountStatus),
+  /** cluster and quota */
+  storageQuotas: Type.Record(Type.String(), Type.Number()),
+});
+export type GetUserStatusResponse = Static<typeof GetUserStatusResponse>;
 
-  method: "GET";
+export const GetUserStatusSchema = typeboxRouteSchema({
+
+  method: "GET",
 
   responses: {
-    200: GetUserStatusResponse;
-  }
-}
+    200: GetUserStatusResponse,
+  },
+});
 
 export const getUserStatus = async (userId: string, tenant: string) => {
 
@@ -36,7 +46,7 @@ export const getUserStatus = async (userId: string, tenant: string) => {
   });
 };
 
-export default route<GetUserStatusSchema>("GetUserStatusSchema", async (req, res) => {
+export default typeboxRoute(GetUserStatusSchema, async (req, res) => {
   const auth = authenticate((i) => i.accountAffiliations.length > 0);
 
   const info = await auth(req, res);

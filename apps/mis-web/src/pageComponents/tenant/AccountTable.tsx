@@ -19,7 +19,7 @@ import type { AdminAccountInfo, GetAccountsSchema } from "src/pages/api/tenant/g
 import { moneyToString } from "src/utils/money";
 
 interface Props {
-  data: GetAccountsSchema["responses"]["200"] | undefined;
+  data: typeof GetAccountsSchema["responses"]["200"] | undefined;
   isLoading: boolean;
   reload: () => void;
 }

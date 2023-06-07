@@ -13,7 +13,7 @@
 import "nprogress/nprogress.css";
 import "antd/dist/reset.css";
 
-import { failEvent, fromApi } from "@ddadaal/next-typed-api-routes-runtime/lib/client";
+import { failEvent, fromTypeboxRoute } from "@ddadaal/next-typed-api-routes-runtime/lib/client";
 import { AntdConfigProvider } from "@scow/lib-web/build/layouts/AntdConfigProvider";
 import { DarkModeCookie, DarkModeProvider, getDarkModeCookieValue } from "@scow/lib-web/build/layouts/darkMode";
 import { GlobalStyle } from "@scow/lib-web/build/layouts/globalStyle";
@@ -177,13 +177,15 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
       // but next-typed-api-routes's object has only pathname
 
       const basePrefix = join(
-        `http://localhost:${process.env.PORT ?? 3000}`,
         publicConfig.BASE_PATH,
       );
 
-      const userInfo = await fromApi<ValidateTokenSchema>(
+      const userInfo = await fromTypeboxRoute<typeof ValidateTokenSchema>(
         "GET",
-        join(basePrefix, "/api/auth/validateToken"),
+        join(
+          basePrefix,
+          "/api/auth/validateToken",
+        ),
       )({ query: { token } }).catch(() => undefined);
 
       if (userInfo) {
@@ -194,9 +196,12 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
 
         const apps = USE_MOCK
           ? [{ id: "vscode", name: "VSCode" }, { id: "emacs", name: "Emacs" }]
-          : await fromApi<ListAvailableAppsSchema>(
+          : await fromTypeboxRoute<typeof ListAvailableAppsSchema>(
             "GET",
-            join(basePrefix, "/api/app/listAvailableApps"),
+            join(
+              basePrefix,
+              "/api/app/listAvailableApps",
+            ),
           )({ query: { token } }).then((x) => x.apps);
 
         extra.apps = apps;

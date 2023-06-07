@@ -10,39 +10,47 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { status } from "@grpc/grpc-js";
 import { FileInfo_FileType, FileServiceClient } from "@scow/protos/build/portal/file";
+import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
 import { handlegRPCError } from "src/utils/server";
 
-export type FileType = "FILE" | "DIR";
+export const FileType = Type.Union([
+  Type.Literal("FILE"),
+  Type.Literal("DIR"),
+]);
 
-export type FileInfo = {
-  name: string;
-  type: FileType;
-  mtime: string;
-  mode: number;
-  size: number;
-}
+export type FileType = Static<typeof FileType>;
 
-export interface ListFileSchema {
-  method: "GET";
+export const FileInfo = Type.Object({
+  name: Type.String(),
+  type: FileType,
+  mtime: Type.String(),
+  mode: Type.Number(),
+  size: Type.Number(),
+});
+export type FileInfo = Static<typeof FileInfo>;
 
-  query: {
-    cluster: string;
-    path: string;
-  }
+export const ListFileSchema = typeboxRouteSchema({
+  method: "GET",
+
+  query: Type.Object({
+    cluster: Type.String(),
+    path: Type.String(),
+  }),
 
   responses: {
-    200: { items: FileInfo[] };
-    400: { code: "INVALID_CLUSTER" };
-    403: { code: "NOT_ACCESSIBLE" };
-    412: { code: "DIRECTORY_NOT_FOUND" };
-  }
-}
+    200: Type.Object({ items: Type.Array(FileInfo) }),
+    400: Type.Object({ code: Type.Literal("INVALID_CLUSTER") }),
+    403: Type.Object({ code: Type.Literal("NOT_ACCESSIBLE") }),
+    412: Type.Object({ code: Type.Literal("DIRECTORY_NOT_FOUND") }),
+  },
+});
 
 const auth = authenticate(() => true);
 
@@ -51,7 +59,7 @@ const mapType = {
   [FileInfo_FileType.FILE]: "FILE",
 } as const;
 
-export default route<ListFileSchema>("ListFileSchema", async (req, res) => {
+export default route(ListFileSchema, async (req, res) => {
 
 
   const info = await auth(req, res);

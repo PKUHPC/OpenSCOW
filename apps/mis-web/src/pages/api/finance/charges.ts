@@ -10,50 +10,52 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { route } from "@ddadaal/next-typed-api-routes-runtime";
+import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { moneyToNumber } from "@scow/lib-decimal";
 import { ChargingServiceClient } from "@scow/protos/build/server/charging";
+import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { UserRole } from "src/models/User";
 import { ensureNotUndefined } from "src/utils/checkNull";
 import { getClient } from "src/utils/client";
 
-export interface ChargeInfo {
-  index: number;
-  accountName: string;
-  time: string;
-  type: string;
-  amount: number;
-  comment: string;
-}
+export const ChargeInfo = Type.Object({
+  index: Type.Number(),
+  accountName: Type.String(),
+  time: Type.String(),
+  type: Type.String(),
+  amount: Type.Number(),
+  comment: Type.String(),
+});
+export type ChargeInfo = Static<typeof ChargeInfo>;
 
-export interface GetChargesSchema {
-  method: "GET";
+export const GetChargesSchema = typeboxRouteSchema({
+  method: "GET",
 
-  query: {
+  query: Type.Object({
     /**
      * @format date-time
      */
-    startTime: string;
+    startTime: Type.String(),
 
     /**
      * @format date-time
      */
-    endTime: string;
+    endTime: Type.String(),
 
-    accountName: string;
-  };
+    accountName: Type.String(),
+  }),
 
   responses: {
-    200: {
-      results: ChargeInfo[];
-      total: number;
-    }
-  }
-}
+    200: Type.Object({
+      results: Type.Array(ChargeInfo),
+      total: Type.Number(),
+    }),
+  },
+});
 
-export default route<GetChargesSchema>("GetChargesSchema", async (req, res) => {
+export default typeboxRoute(GetChargesSchema, async (req, res) => {
   const { endTime, startTime, accountName } = req.query;
 
   const auth = authenticate((i) =>

@@ -10,66 +10,106 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { route } from "@ddadaal/next-typed-api-routes-runtime";
+import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
-import { GetJobsRequest, GetJobsResponse, JobFilter, JobServiceClient } from "@scow/protos/build/server/job";
+import { GetJobsRequest, JobFilter, JobServiceClient } from "@scow/protos/build/server/job";
+import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { TenantRole } from "src/models/User";
+import { Money } from "src/models/UserSchemaModel";
 import { getClient } from "src/utils/client";
 
-export interface GetJobFilter {
+export const GetJobFilter = Type.Object({
 
-    /**
-     * @format date-time
-     */
-    jobEndTimeStart?: string;
+  /**
+   * @format date-time
+   */
+  jobEndTimeStart: Type.Optional(Type.String({})),
 
-    /**
-     * @format date-time
-     */
-    jobEndTimeEnd?: string;
+  /**
+   * @format date-time
+   */
+  jobEndTimeEnd: Type.Optional(Type.String()),
+  /**
+   * @minimum 1
+   * @type integer
+   */
+  jobId: Type.Optional(Type.Number()),
+
+  /**
+    如果是平台管理员，或者userId是自己，或者（设置了accountName，而且当前用户是accountName账户的管理员或者拥有者），那么
+      显示userId用户在accountName中的作业
+    否则：403
+    */
+  userId: Type.Optional(Type.String()),
+  accountName: Type.Optional(Type.String()),
+
+  clusters: Type.Optional(Type.Array(Type.String())),
+});
+export type GetJobFilter = Static<typeof GetJobFilter>;
+
+// Cannot use JobInfo from protos
+export const JobInfo = Type.Object({
+  biJobIndex: Type.Number(),
+  idJob: Type.Number(),
+  account: Type.String(),
+  user: Type.String(),
+  partition: Type.String(),
+  nodelist: Type.String(),
+  jobName: Type.String(),
+  cluster: Type.String(),
+  timeSubmit: Type.Optional(Type.String()),
+  timeStart: Type.Optional(Type.String()),
+  timeEnd: Type.Optional(Type.String()),
+  gpu: Type.Number(),
+  cpusReq:Type.Number(),
+  memReq: Type.Number(),
+  nodesReq: Type.Number(),
+  cpusAlloc: Type.Number(),
+  memAlloc: Type.Number(),
+  nodesAlloc: Type.Number(),
+  timelimit: Type.Number(),
+  timeUsed: Type.Number(),
+  timeWait: Type.Number(),
+  qos: Type.String(),
+  recordTime: Type.Optional(Type.String()),
+  accountPrice: Type.Optional(Money),
+  tenantPrice: Type.Optional(Money),
+});
+export type JobInfo = Static<typeof JobInfo>;
+
+export const GetJobsResponse = Type.Object({
+  totalCount: Type.Number(),
+  jobs: Type.Array(JobInfo),
+  totalAccountPrice: Type.Optional(Money),
+  totalTenantPrice: Type.Optional(Money),
+});
+export type GetJobsResponse = Static<typeof GetJobsResponse>;
+
+export const GetJobInfoSchema = typeboxRouteSchema({
+
+  method: "GET",
+
+  query: Type.Object({
+    ...GetJobFilter.properties,
     /**
      * @minimum 1
      * @type integer
      */
-    jobId?: number;
-
-    /**
-      如果是平台管理员，或者userId是自己，或者（设置了accountName，而且当前用户是accountName账户的管理员或者拥有者），那么
-        显示userId用户在accountName中的作业
-      否则：403
-     */
-    userId?: string;
-    accountName?: string;
-
-    clusters?: string[];
-}
-
-export interface GetJobInfoSchema {
-
-  method: "GET";
-
-  query: GetJobFilter & {
-
-    /**
-     * @minimum 1
-     * @type integer
-     */
-    page?: number;
+    page: Type.Optional(Type.Integer({ minimum: 1 })),
 
     /**
      * @type integer
      */
-    pageSize?: number;
+    pageSize: Type.Optional(Type.Integer()),
+  }),
 
-  };
+  responses: Type.Object({
+    200: GetJobsResponse,
 
-  responses: {
-    200: GetJobsResponse;
-
-    403: null;
-  }
-}
+    403: Type.Null(),
+  }),
+});
 
 export const getJobInfo = async (request: GetJobsRequest) => {
 
@@ -79,7 +119,7 @@ export const getJobInfo = async (request: GetJobsRequest) => {
 };
 
 
-export default /* #__PURE__*/route<GetJobInfoSchema>("GetJobInfoSchema", async (req, res) => {
+export default /* #__PURE__*/typeboxRoute(GetJobInfoSchema, async (req, res) => {
   const auth = authenticate((u) =>
     u.tenantRoles.includes(TenantRole.TENANT_ADMIN) || u.accountAffiliations.length > 0);
 

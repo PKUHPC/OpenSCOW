@@ -23,7 +23,7 @@ import { GetAccountUsersSchema } from "src/pages/api/users";
 import { moneyToString } from "src/utils/money";
 
 interface Props {
-  data: GetAccountUsersSchema["responses"]["200"] | undefined;
+  data: typeof GetAccountUsersSchema["responses"]["200"] | undefined;
   isLoading: boolean;
   reload: () => void;
   accountName: string;

@@ -10,34 +10,25 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { route } from "@ddadaal/next-typed-api-routes-runtime";
+import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
+import { Type } from "@sinclair/typebox";
 import { validateToken } from "src/auth/token";
-import type { PlatformRole, TenantRole, UserRole } from "src/models/User";
+import { UserInfoSchema } from "src/models/User";
 
-// ts-json-schema-generator fails to generate from Static<typeof UserInfoSchema>
-// Write another plain UserInfo;
-export interface UserInfo {
-  identityId: string;
-  tenant: string;
-  name?: string;
-  accountAffiliations: { accountName: string; role: UserRole }[];
-  platformRoles: PlatformRole[];
-  tenantRoles: TenantRole[];
-}
 
-export interface ValidateTokenSchema {
-  method: "GET";
+export const ValidateTokenSchema = typeboxRouteSchema({
+  method: "GET",
 
-  query: { token: string }
+  query: Type.Object({ token: Type.String() }),
 
   responses: {
-    200: UserInfo;
-    403: null;
-  }
+    200: UserInfoSchema,
+    403: Type.Null(),
+  },
 
-}
+});
 
-export default route<ValidateTokenSchema>("ValidateTokenSchema", async (req) => {
+export default typeboxRoute(ValidateTokenSchema, async (req) => {
 
   const { token } = req.query;
 

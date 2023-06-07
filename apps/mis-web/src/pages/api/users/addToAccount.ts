@@ -10,43 +10,47 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { UserServiceClient } from "@scow/protos/build/server/user";
+import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { PlatformRole, UserRole } from "src/models/User";
 import { checkNameMatch } from "src/server/checkIdNameMatch";
 import { getClient } from "src/utils/client";
-import { route } from "src/utils/route";
 import { handlegRPCError } from "src/utils/server";
 
-export interface AddUserToAccountSchema {
-  method: "POST";
+export const AddUserToAccountSchema = typeboxRouteSchema({
+  method: "POST",
 
-  body: {
-    identityId: string;
-    accountName: string;
-    name: string;
-  }
+  body: Type.Object({
+    identityId: Type.String(),
+    accountName: Type.String(),
+    name: Type.String(),
+  }),
 
-  responses: {
-    204: null;
+  responses: Type.Object({
+    204: Type.Null(),
 
-    400: {
-      code: "ID_NAME_NOT_MATCH";
-    }
+    400: Type.Object({
+      code: Type.Literal("ID_NAME_NOT_MATCH"),
+    }),
 
-    404: {
-      code: "ACCOUNT_NOT_FOUND" | "USER_NOT_FOUND";
-    }
+    404: Type.Object({
+      code: Type.Union([
+        Type.Literal("ACCOUNT_NOT_FOUND"),
+        Type.Literal("USER_NOT_FOUND"),
+      ]),
+    }),
 
     /** 用户已经存在 */
-    409: null;
+    409: Type.Null(),
 
-  }
-}
+  }),
+});
 
-export default /* #__PURE__*/route<AddUserToAccountSchema>("AddUserToAccountSchema", async (req, res) => {
+export default /* #__PURE__*/typeboxRoute(AddUserToAccountSchema, async (req, res) => {
   const { identityId, accountName, name } = req.body;
 
   const auth = authenticate((u) =>

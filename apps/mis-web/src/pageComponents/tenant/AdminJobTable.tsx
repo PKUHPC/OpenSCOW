@@ -183,7 +183,7 @@ const ChangePriceButton: React.FC<{
 };
 
 interface JobInfoTableProps {
-  data: GetJobInfoSchema["responses"]["200"] | undefined;
+  data: typeof GetJobInfoSchema["responses"]["200"] | undefined;
   pageInfo: PageInfo;
   setPageInfo?: (info: PageInfo) => void;
   isLoading: boolean;

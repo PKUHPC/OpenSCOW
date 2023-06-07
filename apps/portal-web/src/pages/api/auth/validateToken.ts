@@ -10,8 +10,8 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Type, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
-import { Static } from "@sinclair/typebox";
+import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
+import { Static, Type } from "@sinclair/typebox";
 import { validateToken } from "src/auth/token";
 import { route } from "src/utils/route";
 

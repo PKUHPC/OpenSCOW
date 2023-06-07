@@ -39,7 +39,7 @@ export const AllTenantsTable: React.FC<Props> = ({ refreshToken }) => {
   );
 };
 interface TenantInfoTableProps {
-  data: GetAllTenantsSchema["responses"]["200"] | undefined;
+  data: typeof GetAllTenantsSchema["responses"]["200"] | undefined;
   isLoading: boolean;
   reload: () => void;
 }

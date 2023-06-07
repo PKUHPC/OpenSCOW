@@ -10,29 +10,30 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { route } from "@ddadaal/next-typed-api-routes-runtime";
+import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { ChargingServiceClient } from "@scow/protos/build/server/charging";
+import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { PlatformRole, TenantRole } from "src/models/User";
 import { getClient } from "src/utils/client";
 
-export interface GetUsedPayTypesSchema {
-  method: "GET";
+export const GetUsedPayTypesSchema = typeboxRouteSchema({
+  method: "GET",
 
   responses: {
-    200: {
-      types: string[];
-    }
-  }
-}
+    200: Type.Object({
+      types: Type.Array(Type.String()),
+    }),
+  },
+});
 
 const auth = authenticate((u) =>
   u.tenantRoles.includes(TenantRole.TENANT_FINANCE) ||
   u.platformRoles.includes(PlatformRole.PLATFORM_FINANCE),
 );
 
-export default route<GetUsedPayTypesSchema>("GetUsedPayTypesSchema",
+export default typeboxRoute(GetUsedPayTypesSchema,
   async (req, res) => {
 
 
