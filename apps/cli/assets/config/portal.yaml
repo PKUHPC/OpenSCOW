@@ -7,7 +7,7 @@ loginDesktop:
   enabled: true
 
   # 桌面
-  wms: 
+  wms:
     # 桌面名和对应的wm值。见文档
     - name: Xfce
       wm: xfce
@@ -19,19 +19,19 @@ loginDesktop:
 apps: true
 
 # 主页标题
-homeTitle: 
+homeTitle:
   # 默认文本
   defaultText: "Super Computing on Web"
   # 从不同域名访问，显示的不同的文本
-  # hostnameMap: 
+  # hostnameMap:
   #   a.com: "a.com's SCOW Deployment"
 
 # 主页文本
-homeText: 
+homeText:
   # 默认文本
   defaultText: "SCOW"
   # 从不同域名访问，显示的不同的文本
-  # hostnameMap: 
+  # hostnameMap:
   #   a.com: "a.com's SCOW"
 
 # 是否启用终端功能
@@ -49,4 +49,22 @@ shell: true
 # TurboVNC的安装路径
 # turboVNCPath: /opt/TurboVNC
 
+# 新增门户系统导航链接相关配置
+# navLinks:
+
+  # 链接名
+  # text: ""
+
+  # 链接地址
+  # url: ""
+
+  # 自定义图标地址,可选填
+  # iconPath: ""
+
+  # 二级导航,可选填
+  # children:
+    # 二级导航相关配置，与一级导航相同，但是不允许再设置children
+    # text: ""
+    # url: ""
+    # iconPath: ""
 

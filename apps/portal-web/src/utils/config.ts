@@ -72,6 +72,8 @@ export interface PublicRuntimeConfig {
 
   PUBLIC_PATH: string;
 
+  NAV_LINKS?: NavLink[];
+
   VERSION_TAG: string | undefined;
 
 }
@@ -80,4 +82,10 @@ export const runtimeConfig: ServerRuntimeConfig = getConfig().serverRuntimeConfi
 export const publicConfig: PublicRuntimeConfig = getConfig().publicRuntimeConfig;
 
 export type Cluster = { id: string; name: string; }
+export type NavLink = {
+  text: string;
+  url: string;
+  iconPath?: string;
+  children?: Omit<NavLink, "children">[];
+}
 
