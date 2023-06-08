@@ -12,8 +12,7 @@
 
 /* eslint-disable max-len */
 
-import { fromTypeboxRoute } from "@ddadaal/next-typed-api-routes-runtime/lib/client";
-import { join } from "path";
+import { apiClient } from "src/apis/client";
 import type { GetClusterInfoSchema } from "src/pages/api//cluster";
 import type { CheckAppConnectivitySchema } from "src/pages/api/app/checkConnectivity";
 import type { ConnectToAppSchema } from "src/pages/api/app/connectToApp";
@@ -50,46 +49,43 @@ import type { GetRunningJobsSchema } from "src/pages/api/job/getRunningJobs";
 import type { ListJobTemplatesSchema } from "src/pages/api/job/listJobTemplates";
 import type { SubmitJobSchema } from "src/pages/api/job/submitJob";
 import type { ChangePasswordSchema } from "src/pages/api/profile/changePassword";
-import { publicConfig } from "src/utils/config";
-
-const basePath = publicConfig.BASE_PATH || "";
 
 
 export const api = {
-  checkAppConnectivity: fromTypeboxRoute<typeof CheckAppConnectivitySchema>("GET", join(basePath, "/api/app/checkConnectivity")),
-  connectToApp: fromTypeboxRoute<typeof ConnectToAppSchema>("POST", join(basePath, "/api/app/connectToApp")),
-  createAppSession: fromTypeboxRoute<typeof CreateAppSessionSchema>("POST", join(basePath, "/api/app/createAppSession")),
-  getAppLastSubmission: fromTypeboxRoute<typeof GetAppLastSubmissionSchema>("GET", join(basePath, "/api/app/getAppLastSubmission")),
-  getAppMetadata: fromTypeboxRoute<typeof GetAppMetadataSchema>("GET", join(basePath, "/api/app/getAppMetadata")),
-  getAppSessions: fromTypeboxRoute<typeof GetAppSessionsSchema>("GET", join(basePath, "/api/app/getAppSessions")),
-  listAvailableApps: fromTypeboxRoute<typeof ListAvailableAppsSchema>("GET", join(basePath, "/api/app/listAvailableApps")),
-  authCallback: fromTypeboxRoute<typeof AuthCallbackSchema>("GET", join(basePath, "/api/auth/callback")),
-  logout: fromTypeboxRoute<typeof LogoutSchema>("DELETE", join(basePath, "/api/auth/logout")),
-  validateToken: fromTypeboxRoute<typeof ValidateTokenSchema>("GET", join(basePath, "/api/auth/validateToken")),
-  getClusterInfo: fromTypeboxRoute<typeof GetClusterInfoSchema>("GET", join(basePath, "/api//cluster")),
-  createDesktop: fromTypeboxRoute<typeof CreateDesktopSchema>("POST", join(basePath, "/api/desktop/createDesktop")),
-  killDesktop: fromTypeboxRoute<typeof KillDesktopSchema>("POST", join(basePath, "/api/desktop/killDesktop")),
-  launchDesktop: fromTypeboxRoute<typeof LaunchDesktopSchema>("POST", join(basePath, "/api/desktop/launchDesktop")),
-  listAvailableWms: fromTypeboxRoute<typeof ListAvailableWmsSchema>("GET", join(basePath, "/api/desktop/listAvailableWms")),
-  listDesktops: fromTypeboxRoute<typeof ListDesktopsSchema>("GET", join(basePath, "/api/desktop/listDesktops")),
-  copyFileItem: fromTypeboxRoute<typeof CopyFileItemSchema>("PATCH", join(basePath, "/api/file/copy")),
-  createFile: fromTypeboxRoute<typeof CreateFileSchema>("POST", join(basePath, "/api/file/createFile")),
-  deleteDir: fromTypeboxRoute<typeof DeleteDirSchema>("DELETE", join(basePath, "/api/file/deleteDir")),
-  deleteFile: fromTypeboxRoute<typeof DeleteFileSchema>("DELETE", join(basePath, "/api/file/deleteFile")),
-  downloadFile: fromTypeboxRoute<typeof DownloadFileSchema>("GET", join(basePath, "/api/file/download")),
-  fileExist: fromTypeboxRoute<typeof FileExistSchema>("GET", join(basePath, "/api/file/fileExist")),
-  getFileType: fromTypeboxRoute<typeof GetFileTypeSchema>("GET", join(basePath, "/api/file/getFileType")),
-  getHomeDirectory: fromTypeboxRoute<typeof GetHomeDirectorySchema>("GET", join(basePath, "/api/file/getHome")),
-  listFile: fromTypeboxRoute<typeof ListFileSchema>("GET", join(basePath, "/api/file/list")),
-  mkdir: fromTypeboxRoute<typeof MkdirSchema>("POST", join(basePath, "/api/file/mkdir")),
-  moveFileItem: fromTypeboxRoute<typeof MoveFileItemSchema>("PATCH", join(basePath, "/api/file/move")),
-  uploadFile: fromTypeboxRoute<typeof UploadFileSchema>("POST", join(basePath, "/api/file/upload")),
-  cancelJob: fromTypeboxRoute<typeof CancelJobSchema>("DELETE", join(basePath, "/api/job/cancelJob")),
-  getAccounts: fromTypeboxRoute<typeof GetAccountsSchema>("GET", join(basePath, "/api/job/getAccounts")),
-  getAllJobs: fromTypeboxRoute<typeof GetAllJobsSchema>("GET", join(basePath, "/api/job/getAllJobs")),
-  getJobTemplate: fromTypeboxRoute<typeof GetJobTemplateSchema>("GET", join(basePath, "/api/job/getJobTemplate")),
-  getRunningJobs: fromTypeboxRoute<typeof GetRunningJobsSchema>("GET", join(basePath, "/api/job/getRunningJobs")),
-  listJobTemplates: fromTypeboxRoute<typeof ListJobTemplatesSchema>("GET", join(basePath, "/api/job/listJobTemplates")),
-  submitJob: fromTypeboxRoute<typeof SubmitJobSchema>("POST", join(basePath, "/api/job/submitJob")),
-  changePassword: fromTypeboxRoute<typeof ChangePasswordSchema>("PATCH", join(basePath, "/api/profile/changePassword")),
+  checkAppConnectivity: apiClient.fromTypeboxRoute<typeof CheckAppConnectivitySchema>("GET", "/api/app/checkConnectivity"),
+  connectToApp: apiClient.fromTypeboxRoute<typeof ConnectToAppSchema>("POST", "/api/app/connectToApp"),
+  createAppSession: apiClient.fromTypeboxRoute<typeof CreateAppSessionSchema>("POST", "/api/app/createAppSession"),
+  getAppLastSubmission: apiClient.fromTypeboxRoute<typeof GetAppLastSubmissionSchema>("GET", "/api/app/getAppLastSubmission"),
+  getAppMetadata: apiClient.fromTypeboxRoute<typeof GetAppMetadataSchema>("GET", "/api/app/getAppMetadata"),
+  getAppSessions: apiClient.fromTypeboxRoute<typeof GetAppSessionsSchema>("GET", "/api/app/getAppSessions"),
+  listAvailableApps: apiClient.fromTypeboxRoute<typeof ListAvailableAppsSchema>("GET", "/api/app/listAvailableApps"),
+  authCallback: apiClient.fromTypeboxRoute<typeof AuthCallbackSchema>("GET", "/api/auth/callback"),
+  logout: apiClient.fromTypeboxRoute<typeof LogoutSchema>("DELETE", "/api/auth/logout"),
+  validateToken: apiClient.fromTypeboxRoute<typeof ValidateTokenSchema>("GET", "/api/auth/validateToken"),
+  getClusterInfo: apiClient.fromTypeboxRoute<typeof GetClusterInfoSchema>("GET", "/api//cluster"),
+  createDesktop: apiClient.fromTypeboxRoute<typeof CreateDesktopSchema>("POST", "/api/desktop/createDesktop"),
+  killDesktop: apiClient.fromTypeboxRoute<typeof KillDesktopSchema>("POST", "/api/desktop/killDesktop"),
+  launchDesktop: apiClient.fromTypeboxRoute<typeof LaunchDesktopSchema>("POST", "/api/desktop/launchDesktop"),
+  listAvailableWms: apiClient.fromTypeboxRoute<typeof ListAvailableWmsSchema>("GET", "/api/desktop/listAvailableWms"),
+  listDesktops: apiClient.fromTypeboxRoute<typeof ListDesktopsSchema>("GET", "/api/desktop/listDesktops"),
+  copyFileItem: apiClient.fromTypeboxRoute<typeof CopyFileItemSchema>("PATCH", "/api/file/copy"),
+  createFile: apiClient.fromTypeboxRoute<typeof CreateFileSchema>("POST", "/api/file/createFile"),
+  deleteDir: apiClient.fromTypeboxRoute<typeof DeleteDirSchema>("DELETE", "/api/file/deleteDir"),
+  deleteFile: apiClient.fromTypeboxRoute<typeof DeleteFileSchema>("DELETE", "/api/file/deleteFile"),
+  downloadFile: apiClient.fromTypeboxRoute<typeof DownloadFileSchema>("GET", "/api/file/download"),
+  fileExist: apiClient.fromTypeboxRoute<typeof FileExistSchema>("GET", "/api/file/fileExist"),
+  getFileType: apiClient.fromTypeboxRoute<typeof GetFileTypeSchema>("GET", "/api/file/getFileType"),
+  getHomeDirectory: apiClient.fromTypeboxRoute<typeof GetHomeDirectorySchema>("GET", "/api/file/getHome"),
+  listFile: apiClient.fromTypeboxRoute<typeof ListFileSchema>("GET", "/api/file/list"),
+  mkdir: apiClient.fromTypeboxRoute<typeof MkdirSchema>("POST", "/api/file/mkdir"),
+  moveFileItem: apiClient.fromTypeboxRoute<typeof MoveFileItemSchema>("PATCH", "/api/file/move"),
+  uploadFile: apiClient.fromTypeboxRoute<typeof UploadFileSchema>("POST", "/api/file/upload"),
+  cancelJob: apiClient.fromTypeboxRoute<typeof CancelJobSchema>("DELETE", "/api/job/cancelJob"),
+  getAccounts: apiClient.fromTypeboxRoute<typeof GetAccountsSchema>("GET", "/api/job/getAccounts"),
+  getAllJobs: apiClient.fromTypeboxRoute<typeof GetAllJobsSchema>("GET", "/api/job/getAllJobs"),
+  getJobTemplate: apiClient.fromTypeboxRoute<typeof GetJobTemplateSchema>("GET", "/api/job/getJobTemplate"),
+  getRunningJobs: apiClient.fromTypeboxRoute<typeof GetRunningJobsSchema>("GET", "/api/job/getRunningJobs"),
+  listJobTemplates: apiClient.fromTypeboxRoute<typeof ListJobTemplatesSchema>("GET", "/api/job/listJobTemplates"),
+  submitJob: apiClient.fromTypeboxRoute<typeof SubmitJobSchema>("POST", "/api/job/submitJob"),
+  changePassword: apiClient.fromTypeboxRoute<typeof ChangePasswordSchema>("PATCH", "/api/profile/changePassword"),
 };

@@ -13,7 +13,7 @@
 import "nprogress/nprogress.css";
 import "antd/dist/reset.css";
 
-import { failEvent, fromTypeboxRoute } from "@ddadaal/next-typed-api-routes-runtime/lib/client";
+import { failEvent } from "@ddadaal/next-typed-api-routes-runtime/lib/client";
 import { AntdConfigProvider } from "@scow/lib-web/build/layouts/AntdConfigProvider";
 import { DarkModeCookie, DarkModeProvider, getDarkModeCookieValue } from "@scow/lib-web/build/layouts/darkMode";
 import { GlobalStyle } from "@scow/lib-web/build/layouts/globalStyle";
@@ -28,12 +28,11 @@ import Head from "next/head";
 import { join } from "path";
 import { useEffect, useRef } from "react";
 import { createStore, StoreProvider, useStore } from "simstate";
-import { MOCK_USER_INFO } from "src/apis/api.mock";
+import { api } from "src/apis";
 import { USE_MOCK } from "src/apis/useMock";
-import { getTokenFromCookie, setTokenCookie } from "src/auth/cookie";
+import { getTokenFromCookie } from "src/auth/cookie";
 import { BaseLayout } from "src/layouts/BaseLayout";
 import { FloatButtons } from "src/layouts/FloatButtons";
-import { ValidateTokenSchema } from "src/pages/api/auth/validateToken";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import {
   User, UserStore,
@@ -157,41 +156,21 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
   // Also, validateToken relies on redis, which is not available in client bundle
   if (isServer()) {
 
-    if (USE_MOCK) {
-      const token = "123";
-      extra.userInfo = {
-        ...MOCK_USER_INFO,
-        token,
-      };
-      setTokenCookie(appContext.ctx, token);
-    } else {
-      const token = getTokenFromCookie(appContext.ctx);
+    const token = USE_MOCK ? "123" : getTokenFromCookie(appContext.ctx);
 
+    if (token) {
+      // Why not directly call validateToken but create an api?
+      // Because this method will (in next.js's perspective) be called both in client and server,
+      // so next.js will import validateToken into the client bundle
+      // validateToken depends on ioredis, which cannot be brought into frontend.
+      // dynamic import also doesn't work.
+      const result = await api.validateToken({ query: { token } }).then((x) => x, () => undefined);
 
-      if (token) {
-        // Why not directly call validateToken but create an api?
-        // Because this method will (in next.js's perspective) be called both in client and server,
-        // so next.js will import validateToken into the client bundle
-        // validateToken depends on ioredis, which cannot be brought into frontend.
-        // dynamic import also doesn't work.
-
-        // Why not use api object directly?
-        // fetch in server (node-fetch per se) only supports absolute url
-        // but next-typed-api-routes's object has only pathname
-        const result = await fromTypeboxRoute<typeof ValidateTokenSchema>(
-          "GET",
-          join(
-            publicConfig.BASE_PATH,
-            "/api/auth/validateToken",
-          ),
-        )({ query: { token } }).catch(() => undefined);
-
-        if (result) {
-          extra.userInfo = {
-            ...result,
-            token: token,
-          };
-        }
+      if (result) {
+        extra.userInfo = {
+          ...result,
+          token: token,
+        };
       }
     }
 

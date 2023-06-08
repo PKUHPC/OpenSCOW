@@ -10,7 +10,7 @@
     "build:next": "next build",
     "build:ts": "rimraf build && tsc -p tsconfig.server.json && tsc-alias -p tsconfig.server.json",
     "test": "jest --passWithNoTests",
-    "client": "ntar client --basePathVar \"publicConfig.BASE_PATH || ''\" --extraImports \"import { publicConfig } from 'src/utils/config';\""
+    "client": "ntar client"
   },
   "files": [
     ".next",
@@ -30,7 +30,7 @@
     "@codemirror/language": "6.7.0",
     "@codemirror/legacy-modes": "6.3.2",
     "@codemirror/view": "6.12.0",
-    "@ddadaal/next-typed-api-routes-runtime": "0.7.1",
+    "@ddadaal/next-typed-api-routes-runtime": "0.8.0",
     "@ddadaal/tsgrpc-client": "0.17.5",
     "@ddadaal/tsgrpc-common": "0.2.3",
     "@grpc/grpc-js": "1.8.14",
@@ -71,7 +71,7 @@
     "xterm-addon-fit": "0.7.0"
   },
   "devDependencies": {
-    "@ddadaal/next-typed-api-routes-cli": "0.8.0",
+    "@ddadaal/next-typed-api-routes-cli": "0.9.0",
     "@next/bundle-analyzer": "13.4.1",
     "@testing-library/jest-dom": "5.16.5",
     "@testing-library/react": "14.0.0",

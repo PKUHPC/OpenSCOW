@@ -74,7 +74,6 @@ export const ConnectToAppSchema = typeboxRouteSchema({
         password: Type.String(),
       }),
       Type.Union([
-        Type.Object({}),
         Type.Object({
           type: Type.Literal("web"),
           connect: AppConnectProps,
@@ -130,8 +129,8 @@ export default /* #__PURE__*/typeboxRoute(ConnectToAppSchema, async (req, res) =
           connect: connect,
 
           proxyType: x.appProps.web.proxyType === WebAppProps_ProxyType.RELATIVE
-            ? "relative"
-            : "absolute",
+            ? "relative" as const
+            : "absolute" as const,
           customFormData: x.appProps.web.customFormData,
         },
       };
