@@ -35,28 +35,6 @@ export const AppConnectResponse = Type.Object({
 });
 export type AppConnectResponse = Static<typeof AppConnectResponse>;
 
-// export const HostResponse = Type.Object({
-//   host: Type.String(),
-//   port: Type.Number(),
-//   password: Type.String(),
-// });
-// export type HostResponse = Static<typeof HostResponse>;
-
-// export const TypeResponse = Type.Union([
-//   Type.Object({}),
-//   Type.Object({
-//     type: Type.Literal("web"),
-//     connect: AppConnectProps,
-//     proxyType: Type.Union([
-//       Type.Literal("relative"),
-//       Type.Literal("absolute"),
-//     ]),
-//     customFormData: Type.Optional(Type.Record(Type.String(), Type.String())),
-//   }),
-//   Type.Object({ type: Type.Literal("vnc") }),
-// ]);
-// export type TypeResponse = Static<typeof TypeResponse>;
-
 export const ConnectToAppSchema = typeboxRouteSchema({
   method: "POST",
 
