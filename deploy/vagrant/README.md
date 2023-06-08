@@ -45,11 +45,11 @@ vagrant ssh scow
 /root/scow/scow-deployment
 
 # 拉取最新镜像
-./compose.sh pull
+./cli compose pull
 
 # 重启服务
-./compose.sh down
-./compose.sh up -d
+./cli compose down
+./cli compose up -d
 ```
 
 ### 集群一键销毁命令
