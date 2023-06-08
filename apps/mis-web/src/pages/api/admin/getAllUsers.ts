@@ -34,19 +34,19 @@ export const GetAllUsersSchema = typeboxRouteSchema({
      * @minimum 1
      * @type integer
      */
-    page: Type.Optional(Type.Number()),
+    page: Type.Optional(Type.Integer({ minimum: 1 })),
 
     /**
      * @type integer
      */
-    pageSize: Type.Optional(Type.Number()),
+    pageSize: Type.Optional(Type.Integer()),
 
     idOrName: Type.Optional(Type.String()),
   }),
 
-  responses: Type.Object({
+  responses: {
     200: GetAllUsersResponse,
-  }),
+  },
 });
 
 const auth = authenticate((info) => info.platformRoles.includes(PlatformRole.PLATFORM_ADMIN));

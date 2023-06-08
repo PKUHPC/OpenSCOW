@@ -40,7 +40,7 @@ export const ChangeStorageQuotaSchema = typeboxRouteSchema({
      * @minimum 0
      * @type integer
      */
-    value: Type.Number(),
+    value: Type.Integer({ minimum: 0 }),
 
   }),
 

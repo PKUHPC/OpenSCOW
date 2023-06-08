@@ -35,13 +35,13 @@ export const DownloadFileSchema = typeboxRouteSchema({
     download: Type.Optional(Type.Boolean()),
   }),
 
-  responses: Type.Object({
+  responses:{
     200: Type.Any(),
 
     400: Type.Object({ code: Type.Literal("INVALID_CLUSTER") }),
 
     404: Type.Object({ code: Type.Literal("NOT_EXISTS") }),
-  }),
+  },
 });
 
 // if the contentType is one of these, they can be previewed

@@ -22,20 +22,20 @@ import { queryIfInitialized } from "src/utils/init";
 export const InitGetUsersSchema = typeboxRouteSchema({
   method: "GET",
 
-  responses: Type.Object({
+  responses: {
     200: Type.Object({
       users: Type.Array(User),
     }),
 
     409: Type.Object({ code: Type.Literal("ALREADY_INITIALIZED") }),
-  }),
+  },
 });
 
 export default typeboxRoute(InitGetUsersSchema, async () => {
 
   const result = await queryIfInitialized();
 
-  if (result) { return { 409: { code: "ALREADY_INITIALIZED" } }; }
+  if (result) { return { 409: { code: "ALREADY_INITIALIZED" as const } }; }
 
   const client = getClient(UserServiceClient);
 

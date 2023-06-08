@@ -37,12 +37,12 @@ export const GetChargesSchema = typeboxRouteSchema({
     /**
      * @format date-time
      */
-    startTime: Type.String(),
+    startTime: Type.String({ format: "date-time" }),
 
     /**
      * @format date-time
      */
-    endTime: Type.String(),
+    endTime: Type.String({ format: "date-time" }),
 
     accountName: Type.String(),
   }),

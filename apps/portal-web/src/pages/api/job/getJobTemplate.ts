@@ -28,11 +28,7 @@ export const JobTemplate = Type.Object({
   qos: Type.Optional(Type.Union([Type.String(), Type.Undefined()])),
   nodeCount: Type.Number(),
   coreCount: Type.Number(),
-  gpuCount: Type.Optional(Type.Union([
-    Type.Null(),
-    Type.Number(),
-    Type.Undefined(),
-  ])),
+  gpuCount: Type.Optional(Type.Number()),
   /** in minutes */
   maxTime: Type.Number(),
   command: Type.String(),
@@ -52,7 +48,7 @@ export const GetJobTemplateSchema = typeboxRouteSchema({
     id: Type.String(),
   }),
 
-  responses: Type.Object({
+  responses: {
     200: Type.Object({
       template: JobTemplate,
     }),
@@ -63,7 +59,7 @@ export const GetJobTemplateSchema = typeboxRouteSchema({
 
     404: Type.Object({ code: Type.Literal("TEMPLATE_NOT_FOUND") }),
 
-  }),
+  },
 });
 
 const auth = authenticate(() => true);

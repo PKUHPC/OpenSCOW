@@ -12,6 +12,7 @@
 
 import { formatDateTime } from "@scow/lib-web/build/utils/datetime";
 import { PlatformUserInfo } from "@scow/protos/build/server/user";
+import { Static } from "@sinclair/typebox";
 import { App, Button, Divider, Form, Input, Space, Table } from "antd";
 import React, { useCallback, useState } from "react";
 import { useAsync } from "react-async";
@@ -89,7 +90,7 @@ export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
 };
 
 interface UserInfoTableProps {
-  data: typeof GetAllUsersSchema["responses"]["200"] | undefined;
+  data: Static<typeof GetAllUsersSchema["responses"]["200"]> | undefined;
   pageInfo: PageInfo;
   setPageInfo?: (info: PageInfo) => void;
   isLoading: boolean;

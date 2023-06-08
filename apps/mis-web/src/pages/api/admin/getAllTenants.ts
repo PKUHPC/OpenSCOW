@@ -28,9 +28,9 @@ export type GetAllTenantsResponse = Static<typeof GetAllTenantsResponse>;
 
 export const GetAllTenantsSchema = typeboxRouteSchema({
   method: "GET",
-  responses: Type.Object({
+  responses: {
     200: GetAllTenantsResponse,
-  }),
+  },
 });
 const auth = authenticate((info) => info.platformRoles.includes(PlatformRole.PLATFORM_ADMIN));
 export default typeboxRoute(GetAllTenantsSchema,

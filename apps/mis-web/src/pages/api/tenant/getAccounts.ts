@@ -35,11 +35,11 @@ export type AdminAccountInfo = Static<typeof AdminAccountInfo>;
 export const GetAccountsSchema = typeboxRouteSchema({
   method: "GET",
 
-  responses: Type.Object({
+  responses: {
     200: Type.Object({
       results: Type.Array(AdminAccountInfo),
     }),
-  }),
+  },
 });
 
 export async function getAccounts(req: GetAccountsRequest) {

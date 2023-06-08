@@ -40,12 +40,12 @@ export const GetTenantPaymentsSchema = typeboxRouteSchema({
     /**
      * @format date-time
      */
-    startTime: Type.String(),
+    startTime: Type.String({ format: "date-time" }),
 
     /**
      * @format date-time
      */
-    endTime: Type.String(),
+    endTime: Type.String({ format: "date-time" }),
 
     tenantName: Type.Optional(Type.String()),
   }),

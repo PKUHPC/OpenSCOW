@@ -34,20 +34,20 @@ export const ChangeJobPriceSchema = typeboxRouteSchema({
     /**
      * @minimum 0
      */
-    price: Type.Number({}),
+    price: Type.Number({ minimum: 0 }),
 
     /** which price to change */
     target: Type.Union([Type.Literal("tenant"), Type.Literal("account")]),
 
   }),
 
-  responses: Type.Object({
+  responses: {
     200: Type.Object({ count: Type.Number() }),
     /** 作业未找到 */
     404: Type.Null(),
     /** 非租户管理员不能修改作业的账户价格；非平台管理员不能修改作业的租户价格 */
     403: Type.Null(),
-  }),
+  },
 });
 
 const auth = authenticate((info) =>

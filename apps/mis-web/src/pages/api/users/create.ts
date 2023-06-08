@@ -39,7 +39,7 @@ export const CreateUserSchema = typeboxRouteSchema({
     password: Type.String(),
   }),
 
-  responses: Type.Object({
+  responses: {
     200: Type.Object({
       createdInAuth: Type.Boolean(),
     }),
@@ -57,7 +57,7 @@ export const CreateUserSchema = typeboxRouteSchema({
 
     /** 本功能在当前配置下不可用 */
     501: Type.Null(),
-  }),
+  },
 });
 
 const passwordPattern = publicConfig.PASSWORD_PATTERN && new RegExp(publicConfig.PASSWORD_PATTERN);
@@ -82,11 +82,11 @@ export default /* #__PURE__*/typeboxRoute(CreateUserSchema, async (req, res) => 
 
 
   if (userIdRule && !userIdRule.pattern.test(identityId)) {
-    return { 400: { code: "USERID_NOT_VALID", message: userIdRule.message } };
+    return { 400: { code: "USERID_NOT_VALID" as const, message: userIdRule.message } };
   }
 
   if (passwordPattern && !passwordPattern.test(password)) {
-    return { 400: { code: "PASSWORD_NOT_VALID", message: publicConfig.PASSWORD_PATTERN_MESSAGE } };
+    return { 400: { code: "PASSWORD_NOT_VALID" as const, message: publicConfig.PASSWORD_PATTERN_MESSAGE } };
   }
 
   // create user on server

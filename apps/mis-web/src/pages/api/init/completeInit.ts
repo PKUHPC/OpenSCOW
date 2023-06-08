@@ -20,11 +20,11 @@ import { queryIfInitialized } from "src/utils/init";
 export const CompleteInitSchema = typeboxRouteSchema({
   method: "POST",
 
-  responses: Type.Object({
+  responses: {
     204: Type.Null(),
 
     409: Type.Object({ code: Type.Literal("ALREADY_INITIALIZED") }),
-  }),
+  },
 });
 
 export default typeboxRoute(CompleteInitSchema, async () => {
@@ -36,7 +36,7 @@ export default typeboxRoute(CompleteInitSchema, async () => {
 
   await asyncClientCall(client, "completeInit", {});
 
-  return { 204: null };
+  return { 204: null } as any;
 });
 
 

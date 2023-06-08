@@ -33,7 +33,7 @@ export const CreateTenantSchema = typeboxRouteSchema({
     userPassword: Type.String(),
   }),
 
-  responses: Type.Object({
+  responses: {
     200: Type.Object({
       createdInAuth: Type.Boolean(),
     }),
@@ -56,7 +56,7 @@ export const CreateTenantSchema = typeboxRouteSchema({
     }),
 
     500: Type.Null(),
-  }),
+  },
 });
 
 const passwordPattern = publicConfig.PASSWORD_PATTERN && new RegExp(publicConfig.PASSWORD_PATTERN);
@@ -75,11 +75,11 @@ export default /* #__PURE__*/typeboxRoute(CreateTenantSchema, async (req, res) =
   if (!info) { return; }
 
   if (userIdRule && !userIdRule.pattern.test(userId)) {
-    return { 400: { code: "USERID_NOT_VALID", message: userIdRule.message } };
+    return { 400: { code: "USERID_NOT_VALID" as const, message: userIdRule.message } };
   }
 
   if (passwordPattern && !passwordPattern.test(userPassword)) {
-    return { 400: { code: "PASSWORD_NOT_VALID", message: publicConfig.PASSWORD_PATTERN_MESSAGE } };
+    return { 400: { code: "PASSWORD_NOT_VALID" as const, message: publicConfig.PASSWORD_PATTERN_MESSAGE } };
   }
 
   // create tenant on server

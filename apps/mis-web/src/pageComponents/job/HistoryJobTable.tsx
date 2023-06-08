@@ -15,6 +15,7 @@ import { defaultPresets, formatDateTime } from "@scow/lib-web/build/utils/dateti
 import { useDidUpdateEffect } from "@scow/lib-web/build/utils/hooks";
 import { Money } from "@scow/protos/build/common/money";
 import { JobInfo } from "@scow/protos/build/server/job";
+import { Static } from "@sinclair/typebox";
 import { App, Button, DatePicker, Divider, Form, Input, InputNumber, Select, Space, Table } from "antd";
 import dayjs from "dayjs";
 import React, { useCallback, useRef, useState } from "react";
@@ -196,7 +197,7 @@ export const JobTable: React.FC<Props> = ({
 
 
 interface JobInfoTableProps {
-  data: typeof GetJobInfoSchema["responses"]["200"] | undefined;
+  data: Static<typeof GetJobInfoSchema["responses"]["200"]> | undefined;
   pageInfo: { page: number, pageSize: number };
   setPageInfo?: (info: { page: number, pageSize: number }) => void;
   isLoading: boolean;

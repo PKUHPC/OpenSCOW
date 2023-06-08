@@ -24,17 +24,17 @@ export const GetJobFilter = Type.Object({
   /**
    * @format date-time
    */
-  jobEndTimeStart: Type.Optional(Type.String({})),
+  jobEndTimeStart: Type.Optional(Type.String({ format: "date-time" })),
 
   /**
    * @format date-time
    */
-  jobEndTimeEnd: Type.Optional(Type.String()),
+  jobEndTimeEnd: Type.Optional(Type.String({ format: "date-time" })),
   /**
    * @minimum 1
    * @type integer
    */
-  jobId: Type.Optional(Type.Number()),
+  jobId: Type.Optional(Type.Integer({ minimum: 1 })),
 
   /**
     如果是平台管理员，或者userId是自己，或者（设置了accountName，而且当前用户是accountName账户的管理员或者拥有者），那么
@@ -104,11 +104,11 @@ export const GetJobInfoSchema = typeboxRouteSchema({
     pageSize: Type.Optional(Type.Integer()),
   }),
 
-  responses: Type.Object({
+  responses: {
     200: GetJobsResponse,
 
     403: Type.Null(),
-  }),
+  },
 });
 
 export const getJobInfo = async (request: GetJobsRequest) => {

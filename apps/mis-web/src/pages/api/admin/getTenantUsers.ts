@@ -21,11 +21,11 @@ import { getClient } from "src/utils/client";
 export const GetTenantUsersSchema = typeboxRouteSchema({
   method: "GET",
 
-  responses: Type.Object({
+  responses: {
     200: Type.Object({
       results: Type.Array(FullUserInfo),
     }),
-  }),
+  },
 });
 
 const auth = authenticate((info) => info.tenantRoles.includes(TenantRole.TENANT_ADMIN));

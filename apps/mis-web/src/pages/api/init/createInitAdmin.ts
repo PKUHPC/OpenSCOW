@@ -30,7 +30,7 @@ export const CreateInitAdminSchema = typeboxRouteSchema({
     password: Type.String(),
   }),
 
-  responses: Type.Object({
+  responses: {
     200: Type.Object({
       createdInAuth: Type.Boolean(),
     }),
@@ -40,7 +40,7 @@ export const CreateInitAdminSchema = typeboxRouteSchema({
       Type.Literal("ALREADY_INITIALIZED"),
       Type.Literal("ALREADY_EXISTS_IN_SCOW"),
     ]) }),
-  }),
+  },
 });
 
 export default typeboxRoute(CreateInitAdminSchema, async (req) => {
@@ -54,7 +54,7 @@ export default typeboxRoute(CreateInitAdminSchema, async (req) => {
 
   if (userIdRule && !userIdRule.pattern.test(identityId)) {
     return { 400: {
-      code: "USER_ID_NOT_VALID",
+      code: "USER_ID_NOT_VALID" as const,
       message: userIdRule.message,
     } };
   }

@@ -35,6 +35,28 @@ export const AppConnectResponse = Type.Object({
 });
 export type AppConnectResponse = Static<typeof AppConnectResponse>;
 
+// export const HostResponse = Type.Object({
+//   host: Type.String(),
+//   port: Type.Number(),
+//   password: Type.String(),
+// });
+// export type HostResponse = Static<typeof HostResponse>;
+
+// export const TypeResponse = Type.Union([
+//   Type.Object({}),
+//   Type.Object({
+//     type: Type.Literal("web"),
+//     connect: AppConnectProps,
+//     proxyType: Type.Union([
+//       Type.Literal("relative"),
+//       Type.Literal("absolute"),
+//     ]),
+//     customFormData: Type.Optional(Type.Record(Type.String(), Type.String())),
+//   }),
+//   Type.Object({ type: Type.Literal("vnc") }),
+// ]);
+// export type TypeResponse = Static<typeof TypeResponse>;
+
 export const ConnectToAppSchema = typeboxRouteSchema({
   method: "POST",
 
@@ -43,7 +65,7 @@ export const ConnectToAppSchema = typeboxRouteSchema({
     sessionId: Type.String(),
   }),
 
-  responses: Type.Object({
+  responses: {
 
     200: Type.Intersect([
       Type.Object({
@@ -72,7 +94,7 @@ export const ConnectToAppSchema = typeboxRouteSchema({
     // the session cannot be connected
     409: Type.Object({ code: Type.Literal("SESSION_NOT_AVAILABLE") }),
 
-  }),
+  },
 });
 
 const auth = authenticate(() => true);

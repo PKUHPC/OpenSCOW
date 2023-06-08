@@ -30,7 +30,7 @@ export const AddUserToAccountSchema = typeboxRouteSchema({
     name: Type.String(),
   }),
 
-  responses: Type.Object({
+  responses: {
     204: Type.Null(),
 
     400: Type.Object({
@@ -47,7 +47,7 @@ export const AddUserToAccountSchema = typeboxRouteSchema({
     /** 用户已经存在 */
     409: Type.Null(),
 
-  }),
+  },
 });
 
 export default /* #__PURE__*/typeboxRoute(AddUserToAccountSchema, async (req, res) => {
@@ -64,11 +64,11 @@ export default /* #__PURE__*/typeboxRoute(AddUserToAccountSchema, async (req, re
   const result = await checkNameMatch(identityId, name);
 
   if (result === "NotFound") {
-    return { 404: { code: "USER_NOT_FOUND" } };
+    return { 404: { code: "USER_NOT_FOUND" as const } };
   }
 
   if (result === "NotMatch") {
-    return { 400: { code: "ID_NAME_NOT_MATCH" } };
+    return { 400: { code: "ID_NAME_NOT_MATCH" as const } };
   }
 
   // call ua service to add user

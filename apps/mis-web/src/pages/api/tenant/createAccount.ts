@@ -40,7 +40,7 @@ export const CreateAccountSchema = typeboxRouteSchema({
     comment: Type.Optional(Type.String()),
   }),
 
-  responses: Type.Object({
+  responses: {
     200: CreateAccountResponse,
     400: Type.Object({
       code: Type.Union([
@@ -51,7 +51,7 @@ export const CreateAccountSchema = typeboxRouteSchema({
     /** ownerId不存在 */
     404: Type.Null(),
     409: Type.Null(),
-  }),
+  },
 });
 
 const accountNameRegex = publicConfig.ACCOUNT_NAME_PATTERN ? new RegExp(publicConfig.ACCOUNT_NAME_PATTERN) : undefined;
@@ -70,7 +70,7 @@ export default route(CreateAccountSchema,
 
     if (accountNameRegex && !accountNameRegex.test(accountName)) {
       return { 400: {
-        code: "ACCOUNT_NAME_NOT_VALID",
+        code: "ACCOUNT_NAME_NOT_VALID" as const,
         message: `Account name must match ${publicConfig.ACCOUNT_NAME_PATTERN}`,
       } };
     }
@@ -83,7 +83,7 @@ export default route(CreateAccountSchema,
     }
 
     if (result === "NotMatch") {
-      return { 400: { code: "ID_NAME_NOT_MATCH" } };
+      return { 400: { code: "ID_NAME_NOT_MATCH" as const } };
     }
 
     const client = getClient(AccountServiceClient);

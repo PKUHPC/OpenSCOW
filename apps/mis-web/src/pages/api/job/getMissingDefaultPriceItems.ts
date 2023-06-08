@@ -22,9 +22,9 @@ import { queryIfInitialized } from "src/utils/init";
 export const GetMissingDefaultPriceItemsSchema = typeboxRouteSchema({
   method: "GET",
 
-  responses: Type.Object({
+  responses: {
     200: Type.Object({ items: Type.Array(Type.String()) }),
-  }),
+  },
 });
 
 const auth = authenticate((info) => info.platformRoles.includes(PlatformRole.PLATFORM_ADMIN));
