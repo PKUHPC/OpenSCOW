@@ -106,11 +106,7 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
       if (data) {
 
         setLoading(true);
-        const clusterPartition = data.clusterInfo.slurm.partitions[0];
-        const clusterPartitionCoreCount = clusterPartition.cores;
-        const clusterPartitionNodeCount = clusterPartition.nodes;
-        const clusterPartitionGpuCount = clusterPartition.gpus;
-        setCurrentPartitionInfo(clusterPartition);
+        setCurrentPartitionInfo(data.clusterInfo.slurm.partitions[0]);
 
         if (cluster) { await api.getAppLastSubmission({ query: { cluster: cluster?.id, appId } })
           .then((lastSubmitData) => {
@@ -123,6 +119,16 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
             // 如果存在上一次提交信息，且上一次提交信息中的分区，qos，cpu核心数满足当前集群配置，则填入上一次提交信息中的相应值
             const setSubmitPartition = lastSubmitPartition &&
             data.clusterInfo.slurm.partitions.some((item) => { return item.name === lastSubmitPartition; });
+
+            const clusterPartition = setSubmitPartition
+              ? data.clusterInfo.slurm.partitions.filter((item) => { return item.name === lastSubmitPartition; })[0]
+              : data.clusterInfo.slurm.partitions[0];
+            setCurrentPartitionInfo(clusterPartition);
+
+            const clusterPartitionCoreCount = clusterPartition.cores;
+            const clusterPartitionNodeCount = clusterPartition.nodes;
+            const clusterPartitionGpuCount = clusterPartition.gpus;
+
             const setSubmitQos = setSubmitPartition &&
               clusterPartition.qos?.some((item) => { return item === lastSubmitQos; });
             const setSubmitCoreCount = setSubmitPartition &&
@@ -130,6 +136,7 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
             const setSubmitNodeCount = setSubmitPartition &&
                 lastSubmissionNodeCount && clusterPartitionNodeCount &&
                 clusterPartitionNodeCount >= lastSubmissionNodeCount;
+
             const setSubmitGpuCount = setSubmitPartition && lastSubmissionGpuCount && clusterPartitionGpuCount &&
             clusterPartitionGpuCount >= lastSubmissionGpuCount;
 
@@ -167,13 +174,6 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
               });
             }
             form.setFieldsValue({ ...requiredObj, ...attributesObj });
-
-            // 如果填入上次提交分区信息，则保存该分区信息
-            if (setSubmitPartition) {
-              const setSubmitPartitionInfo =
-                data.clusterInfo.slurm.partitions.filter((item) => { return item.name === lastSubmitPartition; })[0];
-              setCurrentPartitionInfo(setSubmitPartitionInfo);
-            }
 
             // 如果上一次提交信息存在，则填入账户值
             if (lastSubmitData.lastSubmissionInfo) {
