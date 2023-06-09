@@ -95,7 +95,7 @@ export const ConnectTopAppLink: React.FC<Props> = ({
   };
 
   return (
-    <DisabledA disabled={!data} onClick={onClick} message="应用还未准备好">连接</DisabledA>
+    <DisabledA disabled={data} onClick={onClick} message="应用还未准备好">连接</DisabledA>
   );
 
 

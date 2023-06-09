@@ -24,6 +24,7 @@ import { AuthResultError, ssrAuthenticate } from "src/auth/server";
 import { UnifiedErrorPage } from "src/components/errorPages/UnifiedErrorPage";
 import { AccountInfoSection } from "src/pageComponents/dashboard/AccountInfoSection";
 import { JobsSection } from "src/pageComponents/dashboard/JobsSection";
+import { StorageSection } from "src/pageComponents/dashboard/StorageSection";
 import { getUserStatus, GetUserStatusSchema } from "src/pages/api/dashboard/status";
 import { UserStore } from "src/stores/UserStore";
 import { ensureNotUndefined } from "src/utils/checkNull";
@@ -60,7 +61,7 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)((props: Pr
       <Head title="仪表盘" />
       <AccountInfoSection info={accounts} />
       {/* <Divider /> */}
-      {/* <StorageSection storageQuotas={storageQuotas} /> */}
+      <StorageSection storageQuotas={props.storageQuotas} />
       <Divider />
       <JobsSection user={userStore.user!} />
     </div>

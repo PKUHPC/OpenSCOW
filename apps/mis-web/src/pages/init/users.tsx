@@ -21,22 +21,22 @@ import { queryIfInitialized } from "src/utils/init";
 type Props = SSRProps<{}>;
 
 export const UsersPage: NextPage<Props> = (props) => {
-  if ("error" in props) {
-    return (
-      <UnifiedErrorPage
-        code={props.error}
-        customComponents={{
-          409: (
-            <Result
-              status="error"
-              title="系统已初始化"
-              subTitle="系统已经初始化完成，无法重新初始化！"
-            />
-          ),
-        }}
-      />
-    );
-  }
+  // if ("error" in props) {
+  //   return (
+  //     <UnifiedErrorPage
+  //       code={props.error}
+  //       customComponents={{
+  //         409: (
+  //           <Result
+  //             status="error"
+  //             title="系统已初始化"
+  //             subTitle="系统已经初始化完成，无法重新初始化！"
+  //           />
+  //         ),
+  //       }}
+  //     />
+  //   );
+  // }
   return (
     <div>
       <InitDrawer>
