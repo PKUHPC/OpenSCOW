@@ -347,7 +347,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
                 (
                   <FileSelectModal
                     onSubmit={(path: string) => {
-                      form.setFieldValue("workingDirectory", path);
+                      form.setFields([{ name: "workingDirectory", value: path, touched: true }]);
                       form.validateFields(["workingDirectory"]);
                     }}
                     cluster={cluster || defaultCluster}
