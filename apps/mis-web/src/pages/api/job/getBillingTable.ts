@@ -61,7 +61,7 @@ export const GetBillingTableSchema = typeboxRouteSchema({
   }),
 
   responses: {
-    200: Type.Object({ items: JobBillingTableItem }),
+    200: Type.Object({ items: Type.Array(JobBillingTableItem) }),
   },
 });
 
@@ -130,5 +130,5 @@ export default /* #__PURE__*/typeboxRoute(GetBillingTableSchema, async (req, res
 
   const items = await getBillingTableItems(tenant);
 
-  return { 200: { items } as any };
+  return { 200: { items } };
 });

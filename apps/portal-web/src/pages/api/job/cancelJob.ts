@@ -28,15 +28,15 @@ export const CancelJobSchema = typeboxRouteSchema({
     jobId: Type.Number(),
   }),
 
-  responses: Type.Object({
+  responses: {
     204: Type.Null(),
     404: Type.Object({ code: Type.Literal("JOB_NOT_FOUND") }),
-  }),
+  },
 });
 
 const auth = authenticate(() => true);
 
-export default route(CancelJobSchema, async (req, res) => {
+export default /* #__PURE__*/route(CancelJobSchema, async (req, res) => {
 
   const info = await auth(req, res);
 

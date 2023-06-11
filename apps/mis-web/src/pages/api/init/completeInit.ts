@@ -30,13 +30,13 @@ export const CompleteInitSchema = typeboxRouteSchema({
 export default typeboxRoute(CompleteInitSchema, async () => {
   const result = await queryIfInitialized();
 
-  if (result) { return { 409: { code: "ALREADY_INITIALIZED" } }; }
+  if (result) { return { 409: { code: "ALREADY_INITIALIZED" as const } }; }
 
   const client = getClient(InitServiceClient);
 
   await asyncClientCall(client, "completeInit", {});
 
-  return { 204: null } as any;
+  return { 204: null };
 });
 
 

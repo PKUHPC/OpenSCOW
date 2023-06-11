@@ -47,7 +47,7 @@ export const GetClusterInfoSchema = typeboxRouteSchema({
       clusterInfo: PublicClusterConfig,
     }),
 
-    403: Type.Object({}),
+    403: Type.Null(),
   },
 });
 

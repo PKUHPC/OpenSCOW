@@ -38,7 +38,7 @@ export const ChangeJobTimeLimitSchema = typeboxRouteSchema({
      * 时间变化，单位分钟
      * @type integer
      */
-    delta: Type.Number(),
+    delta: Type.Integer(),
   }),
 
   responses: {

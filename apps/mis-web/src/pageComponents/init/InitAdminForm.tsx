@@ -35,83 +35,83 @@ export const InitAdminForm: React.FC = () => {
     const { email, identityId, name, password } = await form.validateFields();
     setLoading(true);
     const result = await api.userExists({ body: { identityId } });
-    // if (result.existsInScow) {
-    //   // 如果在scow中已经存在这个用户，则不用创建操作
-    //   // modal.error({
-    //   //   title: "用户已存在",
-    //   //   content: "用户已存在于SCOW数据库，无法再添加此用户",
-    //   //   okText: "确认",
-    //   //   onOk: async () => {
-    //   //     setLoading(false);
-    //   //   },
-    //   // });
-    // } else if (!result.existsInAuth && result.existsInAuth !== undefined && !useBuiltinCreateUser()) {
-    //   // // 用户不存在于scow: 且认证系统支持查询，且查询结果不存在于认证系统，且当前系统不支持创建用户
-    //   // modal.confirm({
-    //   //   title: "用户不存在于认证系统",
-    //   //   content: "用户不存在，请确认用户ID是否正确",
-    //   //   okText: "确认",
-    //   //   onOk: async () => {
-    //   //     setLoading(false);
-    //   //   },
-    //   //   onCancel: async () => {
-    //   //     setLoading(false);
-    //   //   },
-    //   // });
-    // } else {
-    // 其他情况：
-    // 情况1.用户不存在于scow && 认证系统支持查询 && 存在于认证系统 ->数据库创建
-    // 情况2：用户不存在于scow && 认证系统支持查询 &&不存在于认证系统 && 系统支持创建用户 -> 认证系统创建用户->数据库创建
-    // 情况1与2合并为：用户不存在于scow && 认证系统支持查询 &&(存在于认证系统 || (不存在于认证系统 && 系统支持创建用户))
-    // 情况3.用户不存在于scow && 认证系统不支持查询->判断认证系统是否支持创建用户 ->数据库创建->尝试->认证系统创建
-    // result.existsInAuth ? "此用户存在于已经认证系统，确认添加为初始管理员？" : "用户不存在，是否确认创建此用户并添加为初始管理员？",
-    modal.confirm({
-      title: "提示",
-      content: result.existsInAuth !== undefined ?
-        // 认证系统支持查询
-        result.existsInAuth ?
-          "用户已经在认证系统中存在，您此处输入的密码将会不起作用，新用户的密码将是认证系统中的已有用户的当前密码。确认添加为初始管理员？" : "用户不存在于认证系统，是否确认创建此用户并添加为初始管理员？"
-        : // 认证系统不支持查询
-        useBuiltinCreateUser() ?
-          " 无法确认用户是否在认证系统中存在， 将会尝试在认证系统中创建。如果用户已经在认证系统中存在，您此处输入的密码将会不起作用，新用户的密码将是认证系统中的已有用户的当前密码"
-          : "无法确认用户是否在认证系统中存在，并且当前认证系统不支持创建用户，请您确认此用户已经在认证系统中存在，确认将会直接加入到数据库中"
-          + ", 并且您此处输入的密码将不会起作用，新用户的密码将是认证系统中的已有用户的当前密码。",
-      okText: "确认",
-      onCancel: () => {
-        setLoading(false);
-      },
-      onOk: async () => {
-        await api.createInitAdmin(
-          { body: { email, identityId, name, password } })
-          .httpError(409, (e) => {
-            if (e.code === "ALREADY_EXISTS_IN_SCOW")
+    if (result.existsInScow) {
+      // 如果在scow中已经存在这个用户，则不用创建操作
+      modal.error({
+        title: "用户已存在",
+        content: "用户已存在于SCOW数据库，无法再添加此用户",
+        okText: "确认",
+        onOk: async () => {
+          setLoading(false);
+        },
+      });
+    } else if (!result.existsInAuth && result.existsInAuth !== undefined && !useBuiltinCreateUser()) {
+      // 用户不存在于scow: 且认证系统支持查询，且查询结果不存在于认证系统，且当前系统不支持创建用户
+      modal.confirm({
+        title: "用户不存在于认证系统",
+        content: "用户不存在，请确认用户ID是否正确",
+        okText: "确认",
+        onOk: async () => {
+          setLoading(false);
+        },
+        onCancel: async () => {
+          setLoading(false);
+        },
+      });
+    } else {
+      // 其他情况：
+      // 情况1.用户不存在于scow && 认证系统支持查询 && 存在于认证系统 ->数据库创建
+      // 情况2：用户不存在于scow && 认证系统支持查询 &&不存在于认证系统 && 系统支持创建用户 -> 认证系统创建用户->数据库创建
+      // 情况1与2合并为：用户不存在于scow && 认证系统支持查询 &&(存在于认证系统 || (不存在于认证系统 && 系统支持创建用户))
+      // 情况3.用户不存在于scow && 认证系统不支持查询->判断认证系统是否支持创建用户 ->数据库创建->尝试->认证系统创建
+      // result.existsInAuth ? "此用户存在于已经认证系统，确认添加为初始管理员？" : "用户不存在，是否确认创建此用户并添加为初始管理员？",
+      modal.confirm({
+        title: "提示",
+        content: result.existsInAuth !== undefined ?
+          // 认证系统支持查询
+          result.existsInAuth ?
+            "用户已经在认证系统中存在，您此处输入的密码将会不起作用，新用户的密码将是认证系统中的已有用户的当前密码。确认添加为初始管理员？" : "用户不存在于认证系统，是否确认创建此用户并添加为初始管理员？"
+          : // 认证系统不支持查询
+          useBuiltinCreateUser() ?
+            " 无法确认用户是否在认证系统中存在， 将会尝试在认证系统中创建。如果用户已经在认证系统中存在，您此处输入的密码将会不起作用，新用户的密码将是认证系统中的已有用户的当前密码"
+            : "无法确认用户是否在认证系统中存在，并且当前认证系统不支持创建用户，请您确认此用户已经在认证系统中存在，确认将会直接加入到数据库中"
+            + ", 并且您此处输入的密码将不会起作用，新用户的密码将是认证系统中的已有用户的当前密码。",
+        okText: "确认",
+        onCancel: () => {
+          setLoading(false);
+        },
+        onOk: async () => {
+          await api.createInitAdmin(
+            { body: { email, identityId, name, password } })
+            .httpError(409, (e) => {
+              if (e.code === "ALREADY_EXISTS_IN_SCOW")
+                modal.error({
+                  title: "添加失败",
+                  content: "此用户存在于scow数据库",
+                  okText: "确认",
+                });
+            })
+            .then((createdInAuth) => {
+              !createdInAuth.createdInAuth ?
+                modal.info({
+                  title: "添加成功",
+                  content: "此用户存在于认证系统中，已成功添加到SCOW数据库",
+                  okText: "确认",
+                })
+                : message.success("添加完成！"); })
+            .catch(() => {
               modal.error({
                 title: "添加失败",
-                content: "此用户存在于scow数据库",
-                okText: "确认",
+                content: "创建用户失败",
               });
-          })
-          .then((createdInAuth) => {
-            !createdInAuth.createdInAuth ?
-              modal.info({
-                title: "添加成功",
-                content: "此用户存在于认证系统中，已成功添加到SCOW数据库",
-                okText: "确认",
-              })
-              : message.success("添加完成！"); })
-          .catch(() => {
-            modal.error({
-              title: "添加失败",
-              content: "创建用户失败",
+            })
+            .finally(() => {
+              form.resetFields();
+              setLoading(false);
             });
-          })
-          .finally(() => {
-            form.resetFields();
-            setLoading(false);
-          });
-      },
-    });
-    // }
+        },
+      });
+    }
 
   };
   return (

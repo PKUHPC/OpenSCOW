@@ -40,11 +40,11 @@ export const GetAppSessionsSchema = typeboxRouteSchema({
     cluster: Type.String(),
   }),
 
-  responses: Type.Object({
+  responses: {
     200: Type.Object({
       sessions: Type.Array(AppSession),
     }),
-  }),
+  },
 });
 
 const auth = authenticate(() => true);
@@ -63,7 +63,7 @@ export default /* #__PURE__*/typeboxRoute(GetAppSessionsSchema, async (req, res)
   return asyncUnaryCall(client, "listAppSessions", {
     cluster, userId: info.identityId,
   }).then((reply) => {
-    return { 200: { sessions: reply.sessions } };
+    return { 200: { sessions: reply.sessions } as any };
   });
 
 });

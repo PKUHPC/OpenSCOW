@@ -30,7 +30,7 @@ export const ChangePasswordAsPlatformAdminSchema = typeboxRouteSchema({
      * @pattern ^(?=.*\d)(?=.*[a-zA-Z])(?=.*[`~!@#\$%^&*()_+\-[\];',./{}|:"<>?]).{8,}$
      */
     newPassword: Type.String({
-      pattern:  "^(?=.*\d)(?=.*[a-zA-Z])(?=.*[`~!@#\$%^&*()_+\-[\];',./{}|:\"<>?]).{8,}$",
+      pattern:  "^(?=.*\\d)(?=.*[a-zA-Z])(?=.*[`~!@#\\$%^&*()_+\\-[\\];',./{}|:\"<>?]).{8,}$",
     }),
   }),
 
@@ -50,7 +50,7 @@ export const ChangePasswordAsPlatformAdminSchema = typeboxRouteSchema({
 });
 
 
-export default typeboxRoute(
+export default /* #__PURE__*/typeboxRoute(
   ChangePasswordAsPlatformAdminSchema, async (req, res) => {
 
     if (!publicConfig.ENABLE_CHANGE_PASSWORD) {
