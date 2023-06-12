@@ -25,6 +25,7 @@ import {
 import { getClusterOps } from "src/clusterops";
 import { getAppConfigs } from "src/config/apps";
 import { clusterNotFound } from "src/utils/errors";
+import { getHostsFromGateway } from "src/utils/proxy";
 
 export const appServiceServer = plugin((server) => {
 
@@ -85,8 +86,13 @@ export const appServiceServer = plugin((server) => {
         throw new Error(`Unknown app type ${app.type} of app id ${reply.appId}`);
       }
 
+      const { host } = reply;
+      const hostsIpMap = await getHostsFromGateway(cluster, logger);
+      server.logger.info(`getHostsFromGateway: ${JSON.stringify(hostsIpMap)}`);
+      server.logger.info(hostsIpMap ? `connectToApp to ${hostsIpMap[host]}` : "");
+      
       return [{
-        host: reply.host,
+        host: hostsIpMap ? hostsIpMap[host] : reply.host,
         port: reply.port,
         password: reply.password,
         appProps,
@@ -248,7 +254,6 @@ export const appServiceServer = plugin((server) => {
         lastSubmissionInfo: reply.lastSubmissionInfo,
       }];
     },
-
   });
 
 });

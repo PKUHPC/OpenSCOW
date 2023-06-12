@@ -79,3 +79,36 @@ server {
 
 
 };
+
+interface Hosts {
+  [key: string]: string;
+}
+
+// TODO: if no proxyGateway
+export const getHostsFromGateway
+  = async (clusterId: string, logger: Logger): Promise<Hosts | undefined> => {
+
+    const proxyGatewayConfig = Object.keys(clusters)[clusterId];
+    if (!proxyGatewayConfig) return;
+    const url = new URL(proxyGatewayConfig.url);
+
+    return await sshConnect(url.host, "root", logger, async (ssh) => {
+      // get file /etc/hosts
+      const resp = await loggedExec(ssh, logger, false, "cat", ["/etc/hosts"]);
+      if (resp.code !== 0) {
+        logger.error("cat /etc/hosts returned code %d. /etc/hosts might not exist on %s", resp.code, url.host);
+        return;
+      }
+
+      return resp.stdout.split("\n").reduce((acc, item) => {
+        const [ip, value] = item.split(" ");
+        if (value && ip) {
+          acc[value] = ip;
+        }
+        return acc;
+      }, {}) as Hosts;
+    }).catch((e) => {
+      logger.error(e, "Error occurred during get hosts from gateway for cluster %s", clusterId);
+      return undefined;
+    });
+  };
