@@ -165,14 +165,14 @@ message CreateUserResponse {
   bool created_in_auth = 2;
 }
 
-message CreateUserOnlyInDatabaseRequest {
+message AddUserRequest {
   string tenant_name = 1;
   string identity_id = 2;
   string name = 3;
   string email = 4;
 }
 
-message CreateUserOnlyInDatabaseResponse {
+message AddUserResponse {
   uint32 id = 1;
 }
 
@@ -334,7 +334,7 @@ service UserService {
   rpc QueryUsedStorageQuota(QueryUsedStorageQuotaRequest)
       returns (QueryUsedStorageQuotaResponse);
   rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
-  rpc CreateUserOnlyInDatabase(CreateUserOnlyInDatabaseRequest) returns (CreateUserOnlyInDatabaseResponse);
+  rpc AddUser(AddUserRequest) returns (AddUserResponse);
   rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse);
   rpc AddUserToAccount(AddUserToAccountRequest) returns (AddUserToAccountResponse);
   rpc RemoveUserFromAccount(RemoveUserFromAccountRequest)
