@@ -80,6 +80,23 @@ it("creates user", async () => {
   );
 });
 
+it("creates user only in database", async () => {
+
+  const name = "123";
+  const userId = "2";
+  const email = "test@test.com";
+
+  await asyncClientCall(client, "createUserOnlyInDatabase",
+    { name, identityId: userId, email, tenantName: tenant.name });
+
+  const em = server.ext.orm.em.fork();
+
+  const user = await em.findOneOrFail(User, { userId });
+
+  expect(user.name).toBe(name);
+
+});
+
 it("cannot create user if userId exists", async () => {
   const name = "123";
   const userId = "2";
