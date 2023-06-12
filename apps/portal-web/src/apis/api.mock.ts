@@ -111,13 +111,13 @@ export const mockApi: MockApi<typeof api> = {
 
   getAppSessions: async () => ({ sessions: [
     { jobId: 100, sessionId: "123", appId: "vscode", state: "PENDING", reason: "resource",
-      submitTime: new Date().toISOString(), host: "192.168.88.100", port: "1000", dataPath: "/test",
+      submitTime: new Date().toISOString(), host: "192.168.88.100", port: 1000, dataPath: "/test",
       timeLimit: "01:00:00", runningTime: "" },
     { jobId: 101, sessionId: "124", appId: "vscode", state: "RUNNING",
       submitTime: new Date().toISOString(), dataPath: "/test",
       timeLimit: "1-01:00:00", runningTime: "01:50" },
     { jobId: 102, sessionId: "125", appId: "vscode", state: "RUNNING",
-      submitTime: new Date().toISOString(), host: "192.168.88.100", port: "10000", dataPath: "/test",
+      submitTime: new Date().toISOString(), host: "192.168.88.100", port: 10000, dataPath: "/test",
       timeLimit: "INVALID", runningTime: "01:55" },
   ]}),
 

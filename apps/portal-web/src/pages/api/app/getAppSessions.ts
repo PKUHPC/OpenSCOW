@@ -29,7 +29,7 @@ export const AppSession = Type.Object({
   timeLimit: Type.String(),
   reason: Type.Optional(Type.Union([Type.String(), Type.Undefined()])),
   host: Type.Optional(Type.Union([Type.String(), Type.Undefined()])),
-  port: Type.Optional(Type.Union([Type.String(), Type.Undefined()])),
+  port: Type.Optional(Type.Union([Type.Number(), Type.Undefined()])),
 });
 export type AppSession = Static<typeof AppSession>
 
@@ -63,7 +63,7 @@ export default /* #__PURE__*/typeboxRoute(GetAppSessionsSchema, async (req, res)
   return asyncUnaryCall(client, "listAppSessions", {
     cluster, userId: info.identityId,
   }).then((reply) => {
-    return { 200: { sessions: reply.sessions } as any };
+    return { 200: { sessions: reply.sessions } };
   });
 
 });
