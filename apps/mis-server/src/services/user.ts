@@ -368,6 +368,29 @@ export const userServiceServer = plugin((server) => {
       }];
     },
 
+    createUserOnlyInDatabase: async ({ request, em, logger }) => {
+      const { name, tenantName, email, identityId } = request;
+      const user = await createUserInDatabase(identityId, name, email, tenantName, server.logger, em)
+        .catch((e) => {
+          if (e.code === Status.ALREADY_EXISTS) {
+            throw <ServiceError> {
+              code: Status.ALREADY_EXISTS,
+              message: `User with userId ${identityId} already exists in scow.`,
+              details: "EXISTS_IN_SCOW",
+            };
+          }
+          throw <ServiceError> {
+            code: Status.INTERNAL,
+            message: `Error creating user with userId ${identityId} in database.` };
+        });
+
+      await callHook("userCreated", { tenantName, userId: user.userId }, logger);
+
+      return [{
+        id: user.id,
+      }];
+    },
+
     deleteUser: async ({ request, em }) => {
       const { userId, tenantName } = request;
 
