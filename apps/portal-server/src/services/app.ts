@@ -88,6 +88,7 @@ export const appServiceServer = plugin((server) => {
 
       const { host } = reply;
       const ip = await getIpFromProxyGateway(cluster, host, logger);
+      server.logger.info(`connect to app ${reply.appId} on ip ${ip}`);
 
       return [{
         host: ip || host,

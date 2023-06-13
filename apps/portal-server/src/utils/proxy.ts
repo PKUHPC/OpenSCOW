@@ -84,6 +84,9 @@ export const getIpFromProxyGateway
   = async (clusterId: string, hostName: string, logger: Logger): Promise<string> => {
 
     const proxyGatewayConfig = Object.keys(clusters)?.[clusterId];
+
+    logger.info("proxyGatewayConfig: %s", proxyGatewayConfig);
+
     if (!proxyGatewayConfig) return "";
     const url = new URL(proxyGatewayConfig.url);
 
