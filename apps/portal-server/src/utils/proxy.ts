@@ -85,16 +85,14 @@ export const getIpFromProxyGateway
 
     const proxyGatewayConfig = clusters?.[clusterId]?.proxyGateway;
 
-    logger.info("proxyGatewayConfig: %s", proxyGatewayConfig);
-
     if (!proxyGatewayConfig) return "";
     const url = new URL(proxyGatewayConfig.url);
 
-    return await sshConnect(url.host, "root", logger, async (ssh) => {
+    return await sshConnect(url.hostname, "root", logger, async (ssh) => {
       const resp = await loggedExec(ssh, logger, false, "ping", ["-c 1", "-W 1", hostName]);
       if (resp.code !== 0) {
         logger.error(
-          "Ping %s returned code %d. %s might not be reachable from %s", hostName, resp.code, hostName, url.host,
+          "Ping %s returned code %d. %s might not be reachable from %s", hostName, resp.code, hostName, url.hostname,
         );
         return "";
       }
