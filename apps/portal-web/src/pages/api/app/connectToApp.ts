@@ -28,13 +28,6 @@ export const AppConnectProps = Type.Object({
 });
 export type AppConnectProps = Static<typeof AppConnectProps>;
 
-export const AppConnectResponse = Type.Object({
-  host: Type.String(),
-  port: Type.Number(),
-  password: Type.String(),
-});
-export type AppConnectResponse = Static<typeof AppConnectResponse>;
-
 export const ConnectToAppSchema = typeboxRouteSchema({
   method: "POST",
 

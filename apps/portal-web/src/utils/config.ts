@@ -47,7 +47,7 @@ export interface ServerRuntimeConfig {
 }
 
 export interface PublicRuntimeConfig {
-  ENABLE_CHANGE_PASSWORD?: boolean;
+  ENABLE_CHANGE_PASSWORD: boolean | undefined;
 
   ENABLE_SHELL: boolean;
 

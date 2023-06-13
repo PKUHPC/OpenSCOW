@@ -39,6 +39,9 @@ import {
 } from "src/stores/UserStore";
 import { publicConfig, runtimeConfig } from "src/utils/config";
 
+
+console.log("【【【【【refactor-http-api】】】】】");
+
 const FailEventHandler: React.FC = () => {
   const { message, modal } = AntdApp.useApp();
   const userStore = useStore(UserStore);

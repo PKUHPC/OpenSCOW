@@ -37,9 +37,9 @@ export interface PublicRuntimeConfig {
   PREDEFINED_CHARGING_TYPES: string[];
   CREATE_USER_CONFIG: {
     misConfig: MisConfigSchema["createUser"],
-    authSupportsCreateUser?: boolean,
+    authSupportsCreateUser: boolean | undefined,
   },
-  ENABLE_CHANGE_PASSWORD?: boolean;
+  ENABLE_CHANGE_PASSWORD: boolean | undefined;
 
   ACCOUNT_NAME_PATTERN: string | undefined;
   ACCOUNT_NAME_PATTERN_MESSAGE: string | undefined;
