@@ -83,7 +83,7 @@ server {
 export const getIpFromProxyGateway
   = async (clusterId: string, hostName: string, logger: Logger): Promise<string> => {
 
-    const proxyGatewayConfig = Object.keys(clusters)?.[clusterId];
+    const proxyGatewayConfig = clusters?.[clusterId]?.proxyGateway;
 
     logger.info("proxyGatewayConfig: %s", proxyGatewayConfig);
 
