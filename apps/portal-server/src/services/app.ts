@@ -25,7 +25,7 @@ import {
 import { getClusterOps } from "src/clusterops";
 import { getAppConfigs } from "src/config/apps";
 import { clusterNotFound } from "src/utils/errors";
-import { getHostsFromGateway } from "src/utils/proxy";
+import { getIpFromProxyGateway } from "src/utils/proxy";
 
 export const appServiceServer = plugin((server) => {
 
@@ -87,12 +87,10 @@ export const appServiceServer = plugin((server) => {
       }
 
       const { host } = reply;
-      const hostsIpMap = await getHostsFromGateway(cluster, logger);
-      server.logger.info(`getHostsFromGateway: ${JSON.stringify(hostsIpMap)}`);
-      server.logger.info(hostsIpMap ? `connectToApp to ${hostsIpMap[host]}` : "");
-      
+      const ip = await getIpFromProxyGateway(cluster, host, logger);
+
       return [{
-        host: hostsIpMap ? hostsIpMap[host] : reply.host,
+        host: ip || host,
         port: reply.port,
         password: reply.password,
         appProps,
@@ -104,9 +102,6 @@ export const appServiceServer = plugin((server) => {
 
       const { account, appId, cluster, coreCount, maxTime, proxyBasePath,
         partition, qos, userId, customAttributes } = request;
-
-
-
 
       const app = apps[appId];
       if (!app) {

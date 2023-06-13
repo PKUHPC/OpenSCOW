@@ -80,35 +80,29 @@ server {
 
 };
 
-interface Hosts {
-  [key: string]: string;
-}
+export const getIpFromProxyGateway
+  = async (clusterId: string, hostName: string, logger: Logger): Promise<string> => {
 
-// TODO: if no proxyGateway
-export const getHostsFromGateway
-  = async (clusterId: string, logger: Logger): Promise<Hosts | undefined> => {
-
-    const proxyGatewayConfig = Object.keys(clusters)[clusterId];
-    if (!proxyGatewayConfig) return;
+    const proxyGatewayConfig = Object.keys(clusters)?.[clusterId];
+    if (!proxyGatewayConfig) return "";
     const url = new URL(proxyGatewayConfig.url);
 
     return await sshConnect(url.host, "root", logger, async (ssh) => {
-      // get file /etc/hosts
-      const resp = await loggedExec(ssh, logger, false, "cat", ["/etc/hosts"]);
+      const resp = await loggedExec(ssh, logger, false, "ping", ["-c 1", "-W 1", hostName]);
       if (resp.code !== 0) {
-        logger.error("cat /etc/hosts returned code %d. /etc/hosts might not exist on %s", resp.code, url.host);
-        return;
+        logger.error(
+          "Ping %s returned code %d. %s might not be reachable from %s", hostName, resp.code, hostName, url.host,
+        );
+        return "";
       }
-
-      return resp.stdout.split("\n").reduce((acc, item) => {
-        const [ip, value] = item.split(" ");
-        if (value && ip) {
-          acc[value] = ip;
-        }
-        return acc;
-      }, {}) as Hosts;
+      const ipReg = /(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)/;
+      const ip = resp.stdout.split("\n")[0]?.match(ipReg)?.[0] || "";
+      return ip;
     }).catch((e) => {
-      logger.error(e, "Error occurred during get hosts from gateway for cluster %s", clusterId);
-      return undefined;
+      logger.error(
+        e,
+        "Error occurred during get ip of host %s from proxy gateway %s for cluster %s", hostName, url.host, clusterId,
+      );
+      return "";
     });
   };
