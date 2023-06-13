@@ -333,8 +333,15 @@ service UserService {
   rpc GetUserStatus(GetUserStatusRequest) returns (GetUserStatusResponse);
   rpc QueryUsedStorageQuota(QueryUsedStorageQuotaRequest)
       returns (QueryUsedStorageQuotaResponse);
+
+  //新增用户，在数据库中增加用户，然后调用auth服务在ldap中增加该用户，
+  //并将公钥插入用户的authorized_keys
   rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
+
+  //仅在数据库中增加用户数据，用于结合自定义认证系统新增scow用户，
+  //与createUser的区别在于不需要password，不调用auth服务，暂不将公钥插入用户authorized_keys
   rpc AddUser(AddUserRequest) returns (AddUserResponse);
+
   rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse);
   rpc AddUserToAccount(AddUserToAccountRequest) returns (AddUserToAccountResponse);
   rpc RemoveUserFromAccount(RemoveUserFromAccountRequest)

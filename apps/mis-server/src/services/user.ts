@@ -392,7 +392,7 @@ export const userServiceServer = plugin((server) => {
             message: `Error creating user with userId ${identityId} in database.` };
         });
 
-      await callHook("userCreated", { tenantName, userId: user.userId }, logger);
+      await callHook("userAdded", { tenantName, userId: user.userId }, logger);
 
       return [{
         id: user.id,
