@@ -42,8 +42,6 @@ import {
 import { publicConfig, runtimeConfig } from "src/utils/config";
 
 
-console.log("【【【【【refactor-http-api】】】】】");
-
 const FailEventHandler: React.FC = () => {
   const { message } = AntdApp.useApp();
   const userStore = useStore(UserStore);
@@ -181,11 +179,11 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
           token: token,
         };
 
+        const apps = await api.listAvailableApps({ query: { token } }).then((x) => x.apps).catch(() => []);
+        extra.apps = apps;
+
       }
 
-      const apps = await api.listAvailableApps({ query: { token } }).then((x) => x.apps);
-
-      extra.apps = apps;
     }
 
     const hostname = getHostname(appContext.ctx.req);
