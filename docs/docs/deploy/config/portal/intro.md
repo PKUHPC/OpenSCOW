@@ -81,6 +81,25 @@ shell: true
 
 # TurboVNC的安装路径
 # turboVNCPath: /opt/TurboVNC
+
+# 新增导航链接相关配置
+# navLinks:
+
+  # 链接名
+  # text: ""
+
+  # 链接地址
+  # url: ""
+
+  # 自定义图标地址,可选填
+  # iconPath: ""
+
+  # 二级导航,可选填
+  # children:
+    # 二级导航相关配置，与一级导航相同，但是不允许再设置children
+    # text: ""
+    # url: ""
+    # iconPath: ""
 ```
 
 ## 更多配置

@@ -14,11 +14,13 @@ import { Logger } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { SqlEntityManager } from "@mikro-orm/mysql";
+import { unblockAccount } from "src/bl/block";
 import { Account } from "src/entities/Account";
 import { AccountWhitelist } from "src/entities/AccountWhitelist";
 import { Tenant } from "src/entities/Tenant";
 import { User } from "src/entities/User";
 import { UserAccount, UserRole, UserStatus } from "src/entities/UserAccount";
+import { ClusterPlugin } from "src/plugins/clusters";
 import { DEFAULT_TENANT_NAME } from "src/utils/constants";
 import { toRef } from "src/utils/orm";
 
@@ -32,7 +34,7 @@ export interface ImportUsersData {
 }
 
 export async function importUsers(data: ImportUsersData, em: SqlEntityManager,
-  whitelistAll: boolean, logger: Logger)
+  whitelistAll: boolean, clusterPlugin: ClusterPlugin["clusters"], logger: Logger)
 {
   const tenant = await em.findOneOrFail(Tenant, { name: DEFAULT_TENANT_NAME });
 
@@ -85,17 +87,6 @@ export async function importUsers(data: ImportUsersData, em: SqlEntityManager,
     const account = accountMap[a.accountName];
     accounts.push(account);
 
-    if (whitelistAll) {
-      logger.info("Add %s to whitelist", a.accountName);
-      const whitelist = new AccountWhitelist({
-        account,
-        comment: "initial",
-        operatorId: "",
-      });
-      account.whitelist = toRef(whitelist);
-      em.persist(whitelist);
-    }
-
     a.users.forEach((u) => {
 
       const user = usersMap[u.userId];
@@ -124,12 +115,45 @@ export async function importUsers(data: ImportUsersData, em: SqlEntityManager,
 
   await em.persistAndFlush([...Object.values(usersMap), ...accounts, ...finalUserAccounts]);
 
+  // 账户信息导入scow完成后，更新slurm的block状态
+  const failedUnblockAccounts = [] as string[];
+  if (whitelistAll) {
+    await Promise.allSettled(accounts.map((acc) => {
+      return em.transactional(async (em) => {
+        const account = await em.findOne(Account, { accountName: acc.accountName },
+          { populate: ["tenant"]});
+        if (!account) {
+          failedUnblockAccounts.push(acc.accountName);
+        } else {
+          try {
+            await unblockAccount(account, clusterPlugin, logger);
+          } catch (e) {
+            // 集群解锁账户失败，记录失败账户
+            failedUnblockAccounts.push(account.accountName);
+            throw e;
+          }
+          logger.info("Add %s to whitelist", account.accountName);
+          const whitelist = new AccountWhitelist({
+            account,
+            comment: "initial",
+            operatorId: "",
+          });
+          account.whitelist = toRef(whitelist);
+          await em.persistAndFlush(whitelist);
+        }
+      });
+    }));
+  }
   logger.info(
     `Import users complete. ${accounts.length} accounts, \
-    ${Object.keys(usersMap).length - existingUsers.length} users.`);
+      ${Object.keys(usersMap).length - existingUsers.length} users.`);
   if (idsWithoutName.length !== 0) {
     logger.warn(`${idsWithoutName.length} users don't have names.`);
     logger.warn(idsWithoutName.join(", "));
+  }
+  if (failedUnblockAccounts.length !== 0) {
+    logger.warn(`${failedUnblockAccounts.length} accounts failed to unblock.`);
+    logger.warn(failedUnblockAccounts.join(", "));
   }
 
   return {

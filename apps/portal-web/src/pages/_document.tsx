@@ -28,7 +28,7 @@ export default class MyDocument extends Document {
           enhanceApp: (App) => (props) =>
             sheet.collectStyles(
               <StyleProvider cache={antdCache}>
-                <App {...props} />,
+                <App {...props} />
               </StyleProvider>,
             ),
         });

@@ -14,10 +14,9 @@ import { asyncDuplexStreamCall } from "@ddadaal/tsgrpc-client";
 import { queryToIntOrDefault } from "@scow/lib-web/build/utils/querystring";
 import { ShellResponse, ShellServiceClient } from "@scow/protos/build/portal/shell";
 import { normalizePathnameWithQuery } from "@scow/utils";
-import { NextApiRequest } from "next";
+import { NextApiRequest, NextApiResponse } from "next";
 import { join } from "path";
 import { checkCookie } from "src/auth/server";
-import { AugmentedNextApiResponse } from "src/types/next";
 import { getClient } from "src/utils/client";
 import { publicConfig, runtimeConfig } from "src/utils/config";
 import { parse } from "url";
@@ -134,8 +133,8 @@ wss.on("connection", async (ws, req) => {
 
 });
 
-export const setupShellServer = (res: AugmentedNextApiResponse) => {
-  res.socket.server.on("upgrade", (request, socket, head) => {
+export const setupShellServer = (req: NextApiRequest) => {
+  (req.socket as any).server.on("upgrade", (request, socket, head) => {
     const url = normalizePathnameWithQuery(request.url!);
     if (!url.startsWith(join(publicConfig.BASE_PATH, "/api/shell"))) {
       return;
@@ -148,6 +147,6 @@ export const setupShellServer = (res: AugmentedNextApiResponse) => {
   });
 };
 
-export default async (req: NextApiRequest, res: AugmentedNextApiResponse) => {
+export default async (req: NextApiRequest, res: NextApiResponse) => {
   res.end();
 };

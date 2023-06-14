@@ -21,6 +21,8 @@ import { updateBlockStatusInSlurm } from "src/bl/block";
 import { importUsers, ImportUsersData } from "src/bl/importUsers";
 import { Account } from "src/entities/Account";
 import { StorageQuota } from "src/entities/StorageQuota";
+import { Tenant } from "src/entities/Tenant";
+import { PlatformRole, User } from "src/entities/User";
 import { UserAccount, UserRole } from "src/entities/UserAccount";
 
 export const adminServiceServer = plugin((server) => {
@@ -99,7 +101,7 @@ export const adminServiceServer = plugin((server) => {
         };
       }
 
-      const reply = await importUsers(data as ImportUsersData, em, whitelist, logger);
+      const reply = await importUsers(data as ImportUsersData, em, whitelist, server.ext.clusters, logger);
 
       return [reply];
 
@@ -196,5 +198,18 @@ export const adminServiceServer = plugin((server) => {
       return [{}];
     },
 
+    getAdminInfo: async ({ em }) => {
+      const userCount = await em.count(User, {});
+      const accountCount = await em.count(Account, {});
+      const tenantCount = await em.count(Tenant, {});
+      const platformAdmins = await em.find(User, { platformRoles: { $like: `%${PlatformRole.PLATFORM_ADMIN}%` } });
+
+      return [{
+        platformAdmins: platformAdmins.map((x) => ({ userId: x.userId, userName: x.name })),
+        tenantCount,
+        accountCount,
+        userCount,
+      }];
+    },
   });
 });

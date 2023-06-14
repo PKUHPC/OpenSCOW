@@ -98,6 +98,22 @@ export const MisConfigSchema = Type.Object({
     description: "给作业扣费时，扣费项的备注。可以使用{{ 属性名 }}使用作业信息中的属性。字段参考src/entities/JobInfo",
     default: "集群: {{ cluster }}，作业ID：{{ idJob }}",
   }),
+
+  navLinks: Type.Optional(Type.Array(
+    Type.Object({
+      text: Type.String({ description: "一级导航名称" }),
+      url: Type.String({ description: "一级导航链接" }),
+      iconPath: Type.Optional(Type.String({ description: "一级导航链接显示图标路径" })),
+      allowedRoles: Type.Optional(Type.Array(Type.String(), { description: "可以看到这个链接的用户" })),
+      children: Type.Optional(Type.Array(Type.Object({
+        text: Type.String({ description: "二级导航名称" }),
+        url: Type.String({ description: "二级导航链接" }),
+        iconPath: Type.Optional(Type.String({ description: "二级导航链接显示图标路径" })),
+        allowedRoles: Type.Optional(Type.Array(Type.String(), { description: "可以看到这个链接的用户" })),
+      }))),
+    })),
+  ),
+
 });
 
 const MIS_CONFIG_NAME = "mis";

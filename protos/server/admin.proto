@@ -22,6 +22,11 @@ enum ChangeStorageQuotaMode {
   SET = 2;
 }
 
+message PlatFormAdminInfo {
+  string user_id = 1;
+  string user_name = 2;
+}
+
 message ChangeStorageQuotaRequest {
   string user_id = 1;
   string cluster = 2;
@@ -122,6 +127,16 @@ message UpdateBlockStatusRequest{
 message UpdateBlockStatusResponse{
 }
 
+message GetAdminInfoRequest {
+}
+
+message GetAdminInfoResponse {
+  repeated PlatFormAdminInfo platform_admins = 1;
+  uint64 tenant_count = 2;
+  uint64 account_count = 3;
+  uint64 user_count = 4;
+}
+
 service AdminService {
   rpc ChangeStorageQuota(ChangeStorageQuotaRequest)
       returns (ChangeStorageQuotaResponse);
@@ -134,4 +149,5 @@ service AdminService {
   rpc FetchJobs(FetchJobsRequest) returns (FetchJobsResponse);
   rpc UpdateBlockStatus(UpdateBlockStatusRequest)
     returns (UpdateBlockStatusResponse);
+  rpc GetAdminInfo(GetAdminInfoRequest) returns (GetAdminInfoResponse);
 }

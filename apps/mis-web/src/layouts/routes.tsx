@@ -13,11 +13,13 @@
 import {
   AccountBookOutlined, BookOutlined, CloudServerOutlined,
   DashboardOutlined,
-  InfoOutlined, LockOutlined, MoneyCollectOutlined, PartitionOutlined,
+  InfoOutlined, LinkOutlined, LockOutlined, MoneyCollectOutlined, PartitionOutlined,
   PlusOutlined, PlusSquareOutlined, StarOutlined, ToolOutlined, UserAddOutlined,
   UserOutlined } from "@ant-design/icons";
 import { NavItemProps } from "@scow/lib-web/build/layouts/base/types";
+import { NavIcon } from "@scow/lib-web/build/layouts/icon";
 import { AccountAffiliation } from "@scow/protos/build/server/user";
+import { join } from "path";
 import { PlatformRole, TenantRole, UserRole } from "src/models/User";
 import { User } from "src/stores/UserStore";
 import { publicConfig } from "src/utils/config";
@@ -28,8 +30,13 @@ export const platformAdminRoutes: (platformRoles: PlatformRole[]) => NavItemProp
     Icon: UserOutlined,
     text: "平台管理",
     path: "/admin",
-    clickable: false,
+    clickToPath: "/admin/info",
     children: [
+      {
+        Icon: InfoOutlined,
+        text: "平台信息",
+        path: "/admin/info",
+      },
       ...(platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ? [
         {
           Icon: UserOutlined,
@@ -303,10 +310,13 @@ export const accountAdminRoutes: (adminAccounts: AccountAffiliation[]) => NavIte
 
 ];
 
+export const customNavLinkRoutes = (navLinkItems: NavItemProps[]): NavItemProps[] => {
+  return navLinkItems;
+};
+
 export const getAvailableRoutes = (user: User | undefined): NavItemProps[] => {
 
   if (!user) { return []; }
-
 
   const routes = [] as NavItemProps[];
 
@@ -325,6 +335,58 @@ export const getAvailableRoutes = (user: User | undefined): NavItemProps[] => {
     routes.push(...platformAdminRoutes(user.platformRoles));
   }
 
+  // 获取当前用户角色
+  const userCurrentRoles = getCurrentUserRoles(user);
+
+  // 根据配置文件判断是否增加导航链接
+  if (publicConfig.NAV_LINKS && publicConfig.NAV_LINKS.length > 0) {
+
+    const mappedNavLinkItems = publicConfig.NAV_LINKS
+      .filter((link) => !link.allowedRoles
+        || (link.allowedRoles.length && link.allowedRoles.some((role) => userCurrentRoles[role])))
+      .map((link) => ({
+        Icon: !link.iconPath ? LinkOutlined : (
+          <NavIcon
+            src={join(publicConfig.PUBLIC_PATH, link.iconPath)}
+          />
+        ),
+        text: link.text,
+        path: `${link.url}?token=${user.token}`,
+        clickable: true,
+        openInNewPage: true,
+        children: link.children?.filter((childLink) => !childLink.allowedRoles
+          || (childLink.allowedRoles.length &&
+            childLink.allowedRoles.some((role) => userCurrentRoles[role])))
+          .map((childLink) => ({
+            Icon: !childLink.iconPath ? LinkOutlined : (
+              <NavIcon
+                src={join(publicConfig.PUBLIC_PATH, childLink.iconPath)}
+              />
+            ),
+            text: childLink.text,
+            path: `${childLink.url}?token=${user.token}`,
+            clickable: true,
+            openInNewPage: true,
+          }) as NavItemProps),
+      }) as NavItemProps);
+
+    routes.push(...customNavLinkRoutes(mappedNavLinkItems));
+  }
+
   return routes;
 };
 
+const getCurrentUserRoles = (user: User) => {
+  return {
+    user: user.accountAffiliations.length === 0,
+    accountUser: user.accountAffiliations.length > 0
+      && user.accountAffiliations.every((affiliation) => affiliation.role === UserRole.USER),
+    accountAdmin: user.accountAffiliations.some((affiliation) => affiliation.role === UserRole.ADMIN),
+    accountOwner: user.accountAffiliations.some((affiliation) => affiliation.role === UserRole.OWNER),
+    platformAdmin: user.platformRoles.includes(PlatformRole.PLATFORM_ADMIN),
+    platformFinance: user.platformRoles.includes(PlatformRole.PLATFORM_FINANCE),
+    tenantAdmin: user.tenantRoles.includes(TenantRole.TENANT_ADMIN),
+    tenantFinance: user.tenantRoles.includes(TenantRole.TENANT_FINANCE),
+  };
+
+};
