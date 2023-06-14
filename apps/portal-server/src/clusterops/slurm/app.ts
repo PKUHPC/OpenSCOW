@@ -21,6 +21,7 @@ import { quote } from "shell-quote";
 import { AppOps, AppSession, SubmissionInfo } from "src/clusterops/api/app";
 import { displayIdToPort } from "src/clusterops/slurm/bl/port";
 import { getAppConfigs } from "src/config/apps";
+import { clusters } from "src/config/clusters";
 import { portalConfig } from "src/config/portal";
 import { splitSbatchArgs } from "src/utils/app";
 import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
@@ -401,6 +402,28 @@ export const slurmAppOps = (cluster: string): AppOps => {
 
                 // connect as user so that
                 // the service node doesn't need to be able to connect to compute nodes with public key
+
+                const proxyGatewayConfig = clusters?.[cluster]?.proxyGateway;
+                if (proxyGatewayConfig) {
+                  const url = new URL(proxyGatewayConfig.url);
+                  return await sshConnect(url.hostname, "root", logger, async (proxyGatewaySsh) => {
+                    logger.info(`Connecting to compute node ${host} via proxy gateway ${url.hostname}`);
+                    const resp = await loggedExec(proxyGatewaySsh, logger, false, "ssh", [host]);
+                    if (resp.code !== 0) {
+                      logger.error(`Failed to connect to compute node ${host} via proxy gateway ${url.hostname}`);
+                      return { code: "UNAVAILABLE" };
+                    }
+                    logger.info(`Connected to compute node ${host} via proxy gateway ${url.hostname}`);
+                    const password = await refreshPassword(proxyGatewaySsh, userId, logger, displayId!);
+                    return {
+                      code: "OK",
+                      appId: sessionMetadata.appId,
+                      host,
+                      port: displayIdToPort(displayId!),
+                      password,
+                    };
+                  });
+                }
                 return await sshConnect(host, userId, logger, async (computeNodeSsh) => {
                   const password = await refreshPassword(computeNodeSsh, null, logger, displayId!);
                   return {
