@@ -1,5 +1,33 @@
 # @scow/portal-web
 
+## 0.7.0
+
+### Patch Changes
+
+- 1aad4a345: 去掉 web 端多余的逗号
+- 5b8b8be2c: 修复 dev container 和本地 vagrant 开发模式下集群配置不一致问题
+- 09bcc565b: 交互式应用已创建的应用列表新增状态过滤，默认展示运行中应用
+- 31198304c: portal-web 使用 custom server 注册 upgrade 事件，更新 next.js 至最新并恢复日常更新
+- f74d6c6e1: 修复文件列表文件标题不可点击问题
+- e011f42ff: 门户和管理系统添加 footer 展示 SCOW 版本和 github 跳转链接
+- 8cf189cd2: 修改了 config 中 ENABLE_CHANGE_PASSWORD 与 authSupportsCreateUser 的类型属性可以为 Undefined
+- 31b1662df: 修改 formatSize 公共函数传参单位统一问题
+- 932c01255: portal-web 交互式应用列表状态筛选改为勾选只展示未结束的作业
+- 27d346fd8: 修复 portal-web 项目 API 路径没有正确添加 base path 的问题
+- a07fed634: 文件选择器及提交作业允许选择任意目录
+- 4e304b61e: 提交作业选择文件目录后，工作目录不随作业名改变
+- 81895f4be: mis.yaml 和 portal.yaml 中支持增加导航链接
+- Updated dependencies [31198304c]
+- Updated dependencies [e011f42ff]
+- Updated dependencies [0f64e5404]
+- Updated dependencies [4bfd80986]
+- Updated dependencies [81895f4be]
+- Updated dependencies [81895f4be]
+  - @scow/lib-web@0.3.3
+  - @scow/config@0.3.1
+  - @scow/lib-auth@0.2.1
+  - @scow/protos@0.2.3
+
 ## 0.6.0
 
 ### Patch Changes

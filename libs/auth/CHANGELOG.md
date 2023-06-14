@@ -1,5 +1,11 @@
 # @scow/lib-auth
 
+## 0.2.1
+
+### Patch Changes
+
+- 4bfd80986: 认证系统增加管理用户账户关系相关 API
+
 ## 0.2.0
 
 ### Minor Changes
