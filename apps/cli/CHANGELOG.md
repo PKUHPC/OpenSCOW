@@ -1,5 +1,20 @@
 # @scow/cli
 
+## 0.7.0
+
+### Minor Changes
+
+- 548bce714: 支持 CLI 插件
+
+### Patch Changes
+
+- bba446a18: 支持公共文件配置
+- 4125d2ca0: 修复 CLI 初始化时，public/README.md 中文档不正确
+- 81895f4be: mis.yaml 和 portal.yaml 中支持增加导航链接
+- Updated dependencies [0f64e5404]
+- Updated dependencies [81895f4be]
+  - @scow/config@0.3.1
+
 ## 0.6.0
 
 ### Minor Changes

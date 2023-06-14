@@ -1,5 +1,14 @@
 # @scow/grpc-api
 
+## 0.4.1
+
+### Patch Changes
+
+- 7df3b5e61: scow hook 中 accountBlocked、accountUnblocked 事件增加参数 tenantName
+- 17d8bcd31: 增加仅在 scow 数据库新增用户的 API
+- d00ae0da3: 创建租户 api 修改，新增创建租户管理员用户逻辑
+- 9e79e2a9f: 新增 getAdminInfo api 获取平台信息
+
 ## 0.4.0
 
 ### Minor Changes
