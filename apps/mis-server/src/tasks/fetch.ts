@@ -57,7 +57,8 @@ const processGetJobsResult = (result: ({ cluster: string; } & (
     return endTimeA - endTimeB;
   });
 
-  return jobs;
+  // filter jobs without start time
+  return jobs.filter((x) => x.startTime);
 };
 
 export let lastFetched: Date | null = null;
