@@ -25,7 +25,6 @@ vagrant up
 
 > - 第一次部署需要从vagrant clould拉取vagrant镜像，速度会比较慢，请耐心等待。
 >
-> - 若镜像有更新，Vagrant不会自动重新下载，请先删除原来的镜像。
 
 ### 集群初始化
 
