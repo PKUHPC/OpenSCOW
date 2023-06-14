@@ -49,6 +49,11 @@ message UserCreated {
   string tenant_name = 2;
 }
 
+message UserAdded {
+  string user_id = 1;
+  string tenant_name = 2;
+}
+
 message AccountPaid {
   string account_name = 1;
   common.Money amount = 2;
@@ -73,8 +78,9 @@ message OnEventRequest {
     UserBlockedInAccount user_blocked_in_account = 5;
     UserUnblockedInAccount user_unblocked_in_account = 6;
     UserCreated user_created = 7;
-    AccountPaid account_paid = 8;
-    TenantPaid tenant_paid = 9;
+    UserAdded user_added = 8;
+    AccountPaid account_paid = 9;
+    TenantPaid tenant_paid = 10;
   }
 }
 message OnEventResponse {

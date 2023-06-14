@@ -160,6 +160,8 @@ const buildRuntimeConfig = async (phase, basePath) => {
 
     PUBLIC_PATH: config.PUBLIC_PATH,
 
+    NAV_LINKS: portalConfig.navLinks,
+
     VERSION_TAG: versionTag,
   };
 

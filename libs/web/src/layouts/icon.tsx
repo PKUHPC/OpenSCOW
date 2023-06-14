@@ -11,33 +11,36 @@
  */
 
 import AntdIcon from "@ant-design/icons";
-import Image from "next/image";
-import { addBasePathToImage } from "src/utils/image";
+
+import { useDarkMode } from "./darkMode";
 
 interface Props {
   src: any;
-  alt: string;
-  basePath?: string;
+  alt?: string;
 }
 
-export function NavIcon({ src, alt, basePath = "" }: Props) {
+export function NavIcon({ src, alt = "" }: Props) {
+
+  const { dark } = useDarkMode();
+
+  const altName = alt ? alt : src.substring(src.lastIndexOf("/") + 1, src.lastIndexOf("."));
 
   return (
     <AntdIcon
-      component={({ width, height, style, className, fill }: any) => (
-        <Image
-          src={addBasePathToImage(src, basePath)}
-          alt={alt}
+      component={({ style, className }: any) => (
+        <img
+          src={src}
+          alt={altName}
+
           style={{
-            width,
-            height,
-            fill,
             ...style,
+            filter: dark ? "invert(100%)" : "none",
           }}
+          width={14}
+          height={14}
           className={className}
         />
       )}
     />
-
   );
 }

@@ -37,9 +37,9 @@ export interface PublicRuntimeConfig {
   PREDEFINED_CHARGING_TYPES: string[];
   CREATE_USER_CONFIG: {
     misConfig: MisConfigSchema["createUser"],
-    authSupportsCreateUser: boolean,
+    authSupportsCreateUser: boolean | undefined,
   },
-  ENABLE_CHANGE_PASSWORD: boolean;
+  ENABLE_CHANGE_PASSWORD: boolean | undefined;
 
   ACCOUNT_NAME_PATTERN: string | undefined;
   ACCOUNT_NAME_PATTERN_MESSAGE: string | undefined;
@@ -49,7 +49,9 @@ export interface PublicRuntimeConfig {
 
   PORTAL_URL: string | undefined;
 
-  PUBLIC_PATH: string | undefined;
+  PUBLIC_PATH: string;
+
+  NAV_LINKS?: NavLink[];
 
   VERSION_TAG: string | undefined;
 }
@@ -58,4 +60,11 @@ export const runtimeConfig: ServerRuntimeConfig = getConfig().serverRuntimeConfi
 export const publicConfig: PublicRuntimeConfig = getConfig().publicRuntimeConfig;
 
 export type Cluster = { id: string; name: string; }
+export type NavLink = {
+  text: string;
+  url: string;
+  iconPath?: string;
+  allowedRoles?: string[];
+  children?: Omit<NavLink, "children">[];
+}
 
