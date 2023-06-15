@@ -398,27 +398,28 @@ export const slurmAppOps = (cluster: string): AppOps => {
 
               if (displayId) {
                 // the server is run at the compute node
-                // login to the compute node and refresh the password
 
-                // connect as user so that
-                // the service node doesn't need to be able to connect to compute nodes with public key
-
+                // if proxyGateway configured, connect to compute node by proxyGateway and get ip of compute node
                 const proxyGatewayConfig = clusters?.[cluster]?.proxyGateway;
                 if (proxyGatewayConfig) {
                   const url = new URL(proxyGatewayConfig.url);
                   return await sshConnect(url.hostname, "root", logger, async (proxyGatewaySsh) => {
                     logger.info(`Connecting to compute node ${host} via proxy gateway ${url.hostname}`);
-                    const password =
+                    const { password, ip } =
                       await refreshPasswordByProxyGateway(proxyGatewaySsh, host, userId, logger, displayId!);
                     return {
                       code: "OK",
                       appId: sessionMetadata.appId,
-                      host,
+                      host: ip || host,
                       port: displayIdToPort(displayId!),
                       password,
                     };
                   });
                 }
+
+                // login to the compute node and refresh the password
+                // connect as user so that
+                // the service node doesn't need to be able to connect to compute nodes with public key
                 return await sshConnect(host, userId, logger, async (computeNodeSsh) => {
                   const password = await refreshPassword(computeNodeSsh, null, logger, displayId!);
                   return {
