@@ -67,7 +67,7 @@ export const AdminJobTable: React.FC<Props> = () => {
       jobId: undefined,
       userId: "",
       accountName: "",
-      jobEndTime: [now.clone().subtract(1, "week"), now],
+      jobEndTime: [now.subtract(1, "week").startOf("day"), now.endOf("day")],
       clusters: Object.values(publicConfig.CLUSTERS),
     };
   });
