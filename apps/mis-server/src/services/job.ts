@@ -238,12 +238,20 @@ export const jobServiceServer = plugin((server) => {
     getRunningJobs: async ({ request, em, logger }) => {
       const { cluster, userId, accountName, tenantName, jobIdList } = request;
 
+      const tenantAccounts = tenantName !== undefined
+        ? (await em.find(Account, { tenant: { name: tenantName } }, { fields: ["accountName"]}))
+          .map((x) => x.accountName) : [];
+
+      if (!!tenantAccounts && !!accountName && !tenantAccounts.includes(accountName)) {
+        console.log("【【aaaa】】");
+        // throw <ServiceError>{ code: status.NOT_FOUND, message: `Account ${accountName} is not found.` };
+        return [{ jobs: []}];
+      }
+
       const accountNames = accountName !== undefined
         ? [accountName]
         : tenantName !== undefined
-          ? (await em.find(Account, { tenant: { name: tenantName } }, { fields: ["accountName"]}))
-            .map((x) => x.accountName)
-          : [];
+          ? tenantAccounts : [];
 
       const reply = await server.ext.clusters.callOnOne(
         cluster,

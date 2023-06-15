@@ -50,7 +50,7 @@ export const GetRunningJobsSchema = typeboxRouteSchema({
   query: Type.Object({
 
     /**
-      如果是平台管理员，那么不输入租户名，否则都只看当前租户的
+      如果是租户管理员，只看当前租户的
       如果userId是自己，或者（设置了accountName，而且当前用户是accountName账户的管理员或者拥有者），那么
         显示userId用户在accountName中的作业
       否则：403
@@ -83,7 +83,7 @@ export const getRunningJobs = async (request: GetRunningJobsRequest) => {
 
 export default typeboxRoute(GetRunningJobsSchema, async (req, res) => {
   const auth = authenticate((u) =>
-    u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ||
+    // u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ||
     u.tenantRoles.includes(TenantRole.TENANT_ADMIN) ||
     u.accountAffiliations.length > 0);
 
@@ -98,14 +98,11 @@ export default typeboxRoute(GetRunningJobsSchema, async (req, res) => {
     jobIdList: [],
   };
 
-  if (!info.platformRoles.includes(PlatformRole.PLATFORM_ADMIN)) {
-    filter.tenantName = info.tenant;
-  }
-
   if (info.tenantRoles.includes(TenantRole.TENANT_ADMIN)
     || userId === info.identityId
     || (accountName && info.accountAffiliations.find((x) => x.accountName === accountName))
   ) {
+    filter.tenantName = info.tenantRoles.includes(TenantRole.TENANT_ADMIN) ? info.tenant : undefined;
     filter.userId = userId;
     filter.accountName = accountName;
   } else {
