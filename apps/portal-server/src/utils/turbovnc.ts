@@ -100,6 +100,6 @@ export const refreshPasswordByProxyGateway = async (
     await loggedExec(proxyGatewaySsh, logger, true, cmd, [...params]);
   const ipResp = await loggedExec(proxyGatewaySsh, logger, true, "ping", ["-c 1", "-W 1", computeNode]);
   const ip = parseIp(ipResp.stdout);
-  const password = parseOtp(passwordResp.stdout);
+  const password = parseOtp(passwordResp.stderr);
   return { ip, password };
 };
