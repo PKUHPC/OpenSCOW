@@ -406,22 +406,20 @@ export const slurmAppOps = (cluster: string): AppOps => {
                 const proxyGatewayConfig = clusters?.[cluster]?.proxyGateway;
                 if (proxyGatewayConfig) {
                   const url = new URL(proxyGatewayConfig.url);
-                  return await sshConnect(url.hostname, "root", logger, async (proxyGatewaySsh) => {
+                  return await sshConnect(url.hostname, "root", logger, async () => {
                     logger.info(`Connecting to compute node ${host} via proxy gateway ${url.hostname}`);
-                    const resp = await loggedExec(proxyGatewaySsh, logger, false, "ssh", [host]);
-                    if (resp.code !== 0) {
-                      logger.error(`Failed to connect to compute node ${host} via proxy gateway ${url.hostname}`);
-                      return { code: "UNAVAILABLE" };
-                    }
-                    logger.info(`Connected to compute node ${host} via proxy gateway ${url.hostname}`);
-                    const password = await refreshPassword(proxyGatewaySsh, userId, logger, displayId!);
-                    return {
-                      code: "OK",
-                      appId: sessionMetadata.appId,
-                      host,
-                      port: displayIdToPort(displayId!),
-                      password,
-                    };
+                    return await sshConnect(host, "root", logger, async (computeNodeSsh) => {
+                      logger.info(`Connected to compute node ${host} via proxy gateway ${url.hostname}`);
+                      const password = await refreshPassword(computeNodeSsh, userId, logger, displayId!);
+                      return {
+                        code: "OK",
+                        appId: sessionMetadata.appId,
+                        host,
+                        port: displayIdToPort(displayId!),
+                        password,
+                      };
+                    });
+
                   });
                 }
                 return await sshConnect(host, userId, logger, async (computeNodeSsh) => {
