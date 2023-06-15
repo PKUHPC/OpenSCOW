@@ -81,7 +81,15 @@ export const refreshPassword = async (ssh: NodeSSH, runAsUserId: string | null, 
   return parseOtp(resp.stderr);
 };
 
-
+/**
+ * Refresh VNC session's OTP by proxy gateway
+ * @param proxyGatewaySsh SSH connection to proxy gateway
+ * @param computeNode compute node
+ * @param user  the user id to run as.
+ * @param logger logger
+ * @param displayId displayId
+ * @returns new OTP
+ */
 export const refreshPasswordByProxyGateway = async (
   proxyGatewaySsh: NodeSSH, computeNode: string, user: string, logger: Logger, displayId: number,
 ) => {

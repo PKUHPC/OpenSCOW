@@ -75,9 +75,11 @@ server {
       logger.error(e, "Error occurred during setup proxy gateway for cluster %s", id);
     });
   }
+};
 
-
-
+export const parseIp = (stdout: string): string => {
+  const ipReg = /(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)/;
+  return stdout.split("\n")[0]?.match(ipReg)?.[0] || "";
 };
 
 export const getIpFromProxyGateway
@@ -96,8 +98,7 @@ export const getIpFromProxyGateway
         );
         return "";
       }
-      const ipReg = /(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)/;
-      const ip = resp.stdout.split("\n")[0]?.match(ipReg)?.[0] || "";
+      const ip = parseIp(resp.stdout);
       return ip;
     }).catch((e) => {
       logger.error(
