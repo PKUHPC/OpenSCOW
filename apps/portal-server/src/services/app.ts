@@ -86,7 +86,7 @@ export const appServiceServer = plugin((server) => {
         throw new Error(`Unknown app type ${app.type} of app id ${reply.appId}`);
       }
 
-      const ip = app.type === "web" ? await getIpFromProxyGateway(cluster, reply.host, logger) : undefined;
+      const ip = app.type === AppType.web ? await getIpFromProxyGateway(cluster, reply.host, logger) : undefined;
       server.logger.info(`Connecting to app ${reply.appId} on ip ${ip || reply.host}`);
 
       return [{

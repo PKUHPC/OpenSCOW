@@ -96,9 +96,11 @@ export const refreshPasswordByProxyGateway = async (
 ) => {
   const params = ["-u", user, "-s", vncPasswdPath, "-o", "-display", ":" + displayId];
   const cmd = `ssh ${computeNode} sudo`;
-  const passwordResp =
-    await loggedExec(proxyGatewaySsh, logger, true, cmd, [...params]);
-  const ipResp = await loggedExec(proxyGatewaySsh, logger, true, "ping", ["-c 1", "-W 1", computeNode]);
+  const [passwordResp, ipResp] =
+    await Promise.all([
+      loggedExec(proxyGatewaySsh, logger, true, cmd, [...params]),
+      loggedExec(proxyGatewaySsh, logger, true, "ping", ["-c 1", "-W 1", computeNode]),
+    ]);
   const ip = parseIp(ipResp.stdout);
   const password = parseOtp(passwordResp.stderr);
   return { ip, password };
