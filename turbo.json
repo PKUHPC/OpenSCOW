@@ -19,7 +19,6 @@
         "^@scow/protos#build"
       ],
       "outputs": [
-        "api-routes-schemas.json",
         "src/generated"
       ],
       "inputs": [

@@ -10,34 +10,55 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
-import { JobInfo, JobServiceClient } from "@scow/protos/build/portal/job";
+import { JobServiceClient } from "@scow/protos/build/portal/job";
+import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
 
-export interface GetAllJobsSchema {
+// Cannot use JobInfo from protos
+export const JobInfo = Type.Object({
+  jobId: Type.Number(),
+  name: Type.String(),
+  account: Type.String(),
+  partition: Type.String(),
+  qos: Type.String(),
+  state: Type.String(),
+  workingDirectory: Type.String(),
+  reason: Type.String(),
+  elapsed: Type.String(),
+  timeLimit: Type.String(),
+  submitTime: Type.String(),
+  startTime: Type.Optional(Type.Union([Type.String(), Type.Undefined()])),
+  endTime: Type.Optional(Type.Union([Type.String(), Type.Undefined()])),
+});
 
-  method: "GET";
+export type JobInfo = Static<typeof JobInfo>;
 
-  query: {
-    cluster: string;
-    startTime: string;
-    endTime: string;
-  }
+export const GetAllJobsSchema = typeboxRouteSchema({
+
+  method: "GET",
+
+  query: Type.Object({
+    cluster: Type.String(),
+    startTime: Type.String(),
+    endTime: Type.String(),
+  }),
 
   responses: {
-    200: {
-      results: JobInfo[];
-    }
+    200: Type.Object({
+      results: Type.Array(JobInfo),
+    }),
 
-    403: null;
-  }
-}
+    403: Type.Null(),
+  },
+});
 
 const auth = authenticate(() => true);
 
-export default route<GetAllJobsSchema>("GetAllJobsSchema", async (req, res) => {
+export default route(GetAllJobsSchema, async (req, res) => {
 
 
 

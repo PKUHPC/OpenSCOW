@@ -10,60 +10,61 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { status } from "@grpc/grpc-js";
 import { JobServiceClient } from "@scow/protos/build/portal/job";
+import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
 import { handlegRPCError } from "src/utils/server";
 
-export interface SubmitJobInfo {
-  cluster: string;
-  partition: string;
-  nodeCount: number;
-  coreCount: number;
-  gpuCount?: number;
-  command: string;
-  jobName: string;
-  qos: string | undefined;
-  maxTime: number;
-  account: string;
-  workingDirectory: string;
-  output: string;
-  errorOutput: string;
-  memory?: string;
-  comment?: string;
-  save: boolean;
-}
+export const SubmitJobInfo = Type.Object({
+  cluster: Type.String(),
+  partition: Type.String(),
+  nodeCount: Type.Number(),
+  coreCount: Type.Number(),
+  gpuCount: Type.Optional(Type.Number()),
+  command: Type.String(),
+  jobName: Type.String(),
+  qos: Type.Optional(Type.String()),
+  maxTime: Type.Number(),
+  account: Type.String(),
+  workingDirectory: Type.String(),
+  output: Type.String(),
+  errorOutput: Type.String(),
+  memory: Type.Optional(Type.String()),
+  comment: Type.Optional(Type.String()),
+  save: Type.Boolean(),
+});
 
-export interface SubmitJobSchema {
+export type SubmitJobInfo = Static<typeof SubmitJobInfo>;
 
-  method: "POST";
+export const SubmitJobSchema = typeboxRouteSchema({
+  method: "POST",
 
-  body: SubmitJobInfo;
+  body: SubmitJobInfo,
 
   responses: {
-    201: {
-      jobId: number;
-    }
+    201: Type.Object({
+      jobId: Type.Number(),
+    }),
 
-    400: {
-      message: string;
-    }
+    400: Type.Object({
+      message: Type.String(),
+    }),
 
-    500: {
-      code: "SCHEDULER_FAILED";
-      message: string;
-    }
-   }
-}
+    500: Type.Object({
+      code: Type.Literal("SCHEDULER_FAILED"),
+      message: Type.String(),
+    }),
+  },
+});
 
 const auth = authenticate(() => true);
 
-export default route<SubmitJobSchema>("SubmitJobSchema", async (req, res) => {
-
-
+export default route(SubmitJobSchema, async (req, res) => {
 
   const info = await auth(req, res);
 

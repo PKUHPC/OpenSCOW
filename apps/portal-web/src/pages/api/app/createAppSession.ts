@@ -10,9 +10,11 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { status } from "@grpc/grpc-js";
 import { AppServiceClient } from "@scow/protos/build/portal/app";
+import { Type } from "@sinclair/typebox";
 import { join } from "path";
 import { authenticate } from "src/auth/server";
 import { getClient } from "src/utils/client";
@@ -20,46 +22,48 @@ import { publicConfig } from "src/utils/config";
 import { route } from "src/utils/route";
 import { handlegRPCError } from "src/utils/server";
 
-export interface CreateAppSessionSchema {
-  method: "POST";
+export const CreateAppSessionSchema = typeboxRouteSchema({
+  method: "POST",
 
-  body: {
-    cluster: string;
-    appId: string;
-    account: string;
-    partition: string | undefined;
-    qos: string | undefined;
-    coreCount: number;
-    maxTime: number;
-    customAttributes: { [key: string]: string };
-  }
+  body: Type.Object({
+    cluster: Type.String(),
+    appId: Type.String(),
+    account: Type.String(),
+    partition: Type.Optional(Type.String()),
+    qos: Type.Optional(Type.String()),
+    coreCount: Type.Number(),
+    maxTime: Type.Number(),
+    customAttributes: Type.Record(Type.String(), Type.String()),
+  }),
+
+
 
   responses: {
-    200: {
-      jobId: number;
-      sessionId: string;
-    };
+    200: Type.Object({
+      jobId: Type.Number(),
+      sessionId: Type.String(),
+    }),
 
-    400: {
-      code: "INVALID_INPUT";
-      message: string;
-    }
+    400: Type.Object({
+      code: Type.Literal("INVALID_INPUT"),
+      message: Type.String(),
+    }),
 
-    404: {
-      code: "APP_NOT_FOUND";
-    }
+    404: Type.Object({
+      code: Type.Literal("APP_NOT_FOUND"),
+    }),
 
-    409: {
-      code: "SBATCH_FAILED";
-      message: string;
-    }
+    409: Type.Object({
+      code: Type.Literal("SBATCH_FAILED"),
+      message: Type.String(),
+    }),
 
-  }
-}
+  },
+});
 
 const auth = authenticate(() => true);
 
-export default /* #__PURE__*/route<CreateAppSessionSchema>("CreateAppSessionSchema", async (req, res) => {
+export default /* #__PURE__*/route(CreateAppSessionSchema, async (req, res) => {
 
 
   const info = await auth(req, res);

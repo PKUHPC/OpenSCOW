@@ -10,32 +10,34 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { UserServiceClient } from "@scow/protos/build/server/user";
+import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { PlatformRole, UserRole } from "src/models/User";
 import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
 import { handlegRPCError } from "src/utils/server";
 
-export interface BlockUserInAccountSchema {
-  method: "PUT";
+export const BlockUserInAccountSchema = typeboxRouteSchema({
+  method: "PUT",
 
-  body: {
-    accountName: string;
-    identityId: string;
-  }
+  body: Type.Object({
+    accountName: Type.String(),
+    identityId: Type.String(),
+  }),
 
   responses: {
     // 如果用户已经block，那么executed为false
-    200: { executed: boolean };
+    200: Type.Object({ executed: Type.Boolean() }),
     // 用户不存在
-    404: null;
-  }
-}
+    404: Type.Null(),
+  },
+});
 
-export default /* #__PURE__*/route<BlockUserInAccountSchema>("BlockUserInAccountSchema", async (req, res) => {
+export default /* #__PURE__*/route(BlockUserInAccountSchema, async (req, res) => {
   const { identityId, accountName } = req.body;
 
   const auth = authenticate((u) =>

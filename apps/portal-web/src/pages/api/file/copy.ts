@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { Type, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { status } from "@grpc/grpc-js";
 import { FileServiceClient } from "@scow/protos/build/portal/file";
@@ -18,29 +19,28 @@ import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
 import { handlegRPCError } from "src/utils/server";
 
-export interface CopyFileItemSchema {
-  method: "PATCH";
+export const CopyFileItemSchema = typeboxRouteSchema({
+  method: "PATCH",
 
-  body: {
-    cluster: string;
-    fromPath: string;
-    toPath: string;
-  }
+  body: Type.Object({
+    cluster: Type.String(),
+    fromPath: Type.String(),
+    toPath: Type.String(),
+  }),
 
   responses: {
-    204: null;
-    415: {
-      code: "CP_CMD_FAILED";
-      // stderr of the cp command
-      error: string;
-    }
-    400: { code: "INVALID_CLUSTER" };
-  }
-}
+    204: Type.Null(),
+    415: Type.Object({
+      code: Type.Literal("CP_CMD_FAILED"),
+      error: Type.String(),
+    }),
+    400: Type.Object({ code: Type.Literal("INVALID_CLUSTER") }),
+  },
+});
 
 const auth = authenticate(() => true);
 
-export default route<CopyFileItemSchema>("CopyFileItemSchema", async (req, res) => {
+export default route(CopyFileItemSchema, async (req, res) => {
 
   const info = await auth(req, res);
 

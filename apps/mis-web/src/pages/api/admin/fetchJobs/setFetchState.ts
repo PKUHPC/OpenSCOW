@@ -10,27 +10,28 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { route } from "@ddadaal/next-typed-api-routes-runtime";
+import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { AdminServiceClient } from "@scow/protos/build/server/admin";
+import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { PlatformRole } from "src/models/User";
 import { getClient } from "src/utils/client";
 
-export interface SetFetchStateSchema {
-  method: "POST";
+export const SetFetchStateSchema = typeboxRouteSchema({
+  method: "POST",
 
-  query: {
-    started: boolean;
-  }
+  query: Type.Object({
+    started: Type.Boolean(),
+  }),
 
   responses: {
-    204: null;
-  }
-}
+    204: Type.Null(),
+  },
+});
 const auth = authenticate((info) => info.platformRoles.includes(PlatformRole.PLATFORM_ADMIN));
 
-export default route<SetFetchStateSchema>("SetFetchStateSchema",
+export default typeboxRoute(SetFetchStateSchema,
   async (req, res) => {
 
     const info = await auth(req, res);

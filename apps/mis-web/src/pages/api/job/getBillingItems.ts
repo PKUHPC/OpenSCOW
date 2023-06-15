@@ -10,47 +10,64 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { route } from "@ddadaal/next-typed-api-routes-runtime";
+import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { numberToMoney } from "@scow/lib-decimal";
 import { GetBillingItemsResponse, JobBillingItem, JobServiceClient } from "@scow/protos/build/server/job";
+import { Static, Type } from "@sinclair/typebox";
 import { USE_MOCK } from "src/apis/useMock";
 import { authenticate } from "src/auth/server";
 import { PlatformRole } from "src/models/User";
-import { BillingItemType } from "src/pageComponents/job/ManageJobBillingTable";
+import { Money } from "src/models/UserSchemaModel";
 import { getClient } from "src/utils/client";
 import { runtimeConfig } from "src/utils/config";
 
-export interface GetBillingItemsSchema {
-  method: "GET";
+// Cannot use BillingItemType from pageComponents/job/ManageJobBillingTable
+export const BillingItemType = Type.Object({
+  cluster: Type.String(),
+  partition: Type.String(),
+  qos: Type.String(),
+  tenantName: Type.Optional(Type.String()),
 
-  query: {
+  priceItem: Type.Optional(
+    Type.Object({
+      itemId: Type.String(),
+      price: Money,
+      amountStrategy: Type.String(),
+    })),
+});
+export type BillingItemType = Static<typeof BillingItemType>;
+
+export const GetBillingItemsSchema = typeboxRouteSchema({
+  method: "GET",
+
+  query: Type.Object({
     /**
      * Platform admin can query any tenant
      * Not login user can only query platform default (by not setting the tenant field)
      * Login user can only query the platform default and tenant the user belongs to
      */
-    tenant?: string;
+    tenant: Type.Optional(Type.String()),
 
     /**
      * If only returns active billing items
      */
-    activeOnly: boolean;
+    activeOnly: Type.Boolean(),
 
-  }
+  }),
 
   responses: {
-    200: {
-      activeItems: BillingItemType[],
-      historyItems: BillingItemType[],
+    200: Type.Object({
+      activeItems: Type.Array(BillingItemType),
+      historyItems: Type.Array(BillingItemType),
 
       /**
        * next item id for this tenant
        */
-      nextId: string;
-    };
-  }
-}
+      nextId: Type.String(),
+    }),
+  },
+});
 
 const mockBillingItems = [
   { id: "HPC01", path: "hpc01.compute.low", price: numberToMoney(0.04), amountStrategy: "gpu" },
@@ -97,7 +114,7 @@ const calculateNextId = (data?: JobBillingItem[], tenant?: string) => {
 };
 
 
-export default /* #__PURE__*/route<GetBillingItemsSchema>("GetBillingItemsSchema", async (req, res) => {
+export default /* #__PURE__*/typeboxRoute(GetBillingItemsSchema, async (req, res) => {
   const { tenant, activeOnly } = req.query;
 
   if (tenant) {

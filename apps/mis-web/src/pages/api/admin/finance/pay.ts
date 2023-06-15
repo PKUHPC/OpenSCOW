@@ -10,10 +10,12 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { moneyToNumber, numberToMoney } from "@scow/lib-decimal";
 import { ChargingServiceClient } from "@scow/protos/build/server/charging";
+import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { PlatformRole } from "src/models/User";
 import { ensureNotUndefined } from "src/utils/checkNull";
@@ -22,29 +24,29 @@ import { route } from "src/utils/route";
 import { handlegRPCError, parseIp } from "src/utils/server";
 
 
-export interface TenantFinancePaySchema {
-  method: "POST";
+export const TenantFinancePaySchema = typeboxRouteSchema({
+  method: "POST",
 
-  body: {
-    amount: number;
-    tenantName: string;
-    comment?: string;
-    type: string;
-  }
+  body: Type.Object({
+    amount: Type.Number(),
+    tenantName: Type.String(),
+    comment: Type.Optional(Type.String()),
+    type: Type.String(),
+  }),
 
   responses: {
-    200: {
-      balance: number;
-    }
+    200: Type.Object({
+      balance: Type.Number(),
+    }),
     // tenant is not found in platform.
-    404: null;
+    404: Type.Null(),
 
-  }
-}
+  },
+});
 
 const auth = authenticate((info) => info.platformRoles.includes(PlatformRole.PLATFORM_FINANCE));
 
-export default route<TenantFinancePaySchema>("TenantFinancePaySchema",
+export default route(TenantFinancePaySchema,
   async (req, res) => {
     const info = await auth(req, res);
     if (!info) { return; }

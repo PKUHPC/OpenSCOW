@@ -10,27 +10,35 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
-import { App, AppServiceClient } from "@scow/protos/build/portal/app";
+import { AppServiceClient } from "@scow/protos/build/portal/app";
+import { Static, Type } from "@sinclair/typebox";
 import { validateToken } from "src/auth/token";
 import { getClient } from "src/utils/client";
-import { route } from "src/utils/route";
 
-export interface ListAvailableAppsSchema {
-  method: "GET";
+// Cannot use App from protos
+export const App = Type.Object({
+  id: Type.String(),
+  name: Type.String(),
+});
+export type App = Static<typeof App>;
 
-  query: {
-    token: string;
-  }
+export const ListAvailableAppsSchema = typeboxRouteSchema({
+  method: "GET",
+
+  query: Type.Object({
+    token: Type.String(),
+  }),
 
   responses: {
-    200: {
-      apps: App[];
-    };
+    200: Type.Object({
+      apps: Type.Array(App),
+    }),
 
-    403: null;
-  }
-}
+    403: Type.Null(),
+  },
+});
 
 // This API is called from server
 // API call from server doesn't contain any cookie
@@ -41,7 +49,7 @@ export interface ListAvailableAppsSchema {
 //
 // For now, the API requires token from query
 // and authenticate manually
-export default /* #__PURE__*/route<ListAvailableAppsSchema>("ListAvailableAppsSchema", async (req) => {
+export default /* #__PURE__*/typeboxRoute(ListAvailableAppsSchema, async (req) => {
 
   const { token } = req.query;
 

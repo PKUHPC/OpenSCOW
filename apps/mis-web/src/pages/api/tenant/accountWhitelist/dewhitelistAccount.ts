@@ -10,31 +10,33 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { AccountServiceClient } from "@scow/protos/build/server/account";
+import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { TenantRole } from "src/models/User";
 import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
 import { handlegRPCError } from "src/utils/server";
 
-export interface DewhitelistAccountSchema {
-  method: "DELETE";
+export const DewhitelistAccountSchema = typeboxRouteSchema({
+  method: "DELETE",
 
-  query: {
-    accountName: string;
-  }
+  query: Type.Object({
+    accountName: Type.String(),
+  }),
 
   responses: {
-    204: null;
-    404: null;
-  }
-}
+    204: Type.Null(),
+    404: Type.Null(),
+  },
+});
 
 const auth = authenticate((info) => info.tenantRoles.includes(TenantRole.TENANT_ADMIN));
 
-export default route<DewhitelistAccountSchema>("DewhitelistAccountSchema",
+export default route(DewhitelistAccountSchema,
   async (req, res) => {
 
     const info = await auth(req, res);

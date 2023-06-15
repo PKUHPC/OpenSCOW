@@ -10,31 +10,33 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { status } from "@grpc/grpc-js";
 import { JobServiceClient } from "@scow/protos/build/portal/job";
+import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
 import { handlegRPCError } from "src/utils/server";
 
-export interface CancelJobSchema {
-  method: "DELETE";
+export const CancelJobSchema = typeboxRouteSchema({
+  method: "DELETE",
 
-  query: {
-    cluster: string;
-    jobId: number;
-  }
+  query: Type.Object({
+    cluster: Type.String(),
+    jobId: Type.Number(),
+  }),
 
   responses: {
-    204: null;
-    404: { code: "JOB_NOT_FOUND" };
-  }
-}
+    204: Type.Null(),
+    404: Type.Object({ code: Type.Literal("JOB_NOT_FOUND") }),
+  },
+});
 
 const auth = authenticate(() => true);
 
-export default /* #__PURE__*/route<CancelJobSchema>("CancelJobSchema", async (req, res) => {
+export default /* #__PURE__*/route(CancelJobSchema, async (req, res) => {
 
   const info = await auth(req, res);
 
