@@ -81,3 +81,12 @@ export const refreshPassword = async (ssh: NodeSSH, runAsUserId: string | null, 
   return parseOtp(resp.stderr);
 };
 
+
+export const refreshPasswordByProxyGateway = async (
+  proxyGatewaySsh: NodeSSH, computeNode: string, user: string, logger: Logger, displayId: number,
+) => {
+  const params = ["-o", "-display", ":" + displayId];
+  const cmd = `ssh ${computeNode} sudo`;
+  const resp = await loggedExec(proxyGatewaySsh, logger, true, cmd, ["-u", user, "-s", vncPasswdPath, ...params]);
+  return parseOtp(resp.stderr);
+};

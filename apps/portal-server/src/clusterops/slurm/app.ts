@@ -25,7 +25,7 @@ import { clusters } from "src/config/clusters";
 import { portalConfig } from "src/config/portal";
 import { splitSbatchArgs } from "src/utils/app";
 import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
-import { parseDisplayId, refreshPassword, VNCSERVER_BIN_PATH } from "src/utils/turbovnc";
+import { parseDisplayId, refreshPassword, refreshPasswordByProxyGateway, VNCSERVER_BIN_PATH } from "src/utils/turbovnc";
 
 import { querySqueue } from "./bl/queryJobInfo";
 import { generateJobScript, parseSbatchOutput } from "./bl/submitJob";
@@ -406,20 +406,17 @@ export const slurmAppOps = (cluster: string): AppOps => {
                 const proxyGatewayConfig = clusters?.[cluster]?.proxyGateway;
                 if (proxyGatewayConfig) {
                   const url = new URL(proxyGatewayConfig.url);
-                  return await sshConnect(url.hostname, "root", logger, async () => {
+                  return await sshConnect(url.hostname, "root", logger, async (proxyGatewaySsh) => {
                     logger.info(`Connecting to compute node ${host} via proxy gateway ${url.hostname}`);
-                    return await sshConnect(host, "root", logger, async (computeNodeSsh) => {
-                      logger.info(`Connected to compute node ${host} via proxy gateway ${url.hostname}`);
-                      const password = await refreshPassword(computeNodeSsh, userId, logger, displayId!);
-                      return {
-                        code: "OK",
-                        appId: sessionMetadata.appId,
-                        host,
-                        port: displayIdToPort(displayId!),
-                        password,
-                      };
-                    });
-
+                    const password =
+                      await refreshPasswordByProxyGateway(proxyGatewaySsh, host, userId, logger, displayId!);
+                    return {
+                      code: "OK",
+                      appId: sessionMetadata.appId,
+                      host,
+                      port: displayIdToPort(displayId!),
+                      password,
+                    };
                   });
                 }
                 return await sshConnect(host, userId, logger, async (computeNodeSsh) => {
