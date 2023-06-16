@@ -15,7 +15,7 @@ import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { GetRunningJobsRequest, JobServiceClient } from "@scow/protos/build/server/job";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
-import { PlatformRole, TenantRole } from "src/models/User";
+import { TenantRole } from "src/models/User";
 import { getClient } from "src/utils/client";
 
 // Cannot use RunningJob from protos

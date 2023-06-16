@@ -242,9 +242,7 @@ export const jobServiceServer = plugin((server) => {
         ? (await em.find(Account, { tenant: { name: tenantName } }, { fields: ["accountName"]}))
           .map((x) => x.accountName) : [];
 
-      if (!!tenantAccounts && !!accountName && !tenantAccounts.includes(accountName)) {
-        console.log("【【aaaa】】");
-        // throw <ServiceError>{ code: status.NOT_FOUND, message: `Account ${accountName} is not found.` };
+      if (tenantAccounts.length > 0 && !!accountName && !tenantAccounts.includes(accountName)) {
         return [{ jobs: []}];
       }
 
