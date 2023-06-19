@@ -12,8 +12,7 @@
 
 /* eslint-disable max-len */
 
-import { fromApi } from "@ddadaal/next-typed-api-routes-runtime/lib/client";
-import { join } from "path";
+import { apiClient } from "src/apis/client";
 import type { GetClusterInfoSchema } from "src/pages/api//cluster";
 import type { CheckAppConnectivitySchema } from "src/pages/api/app/checkConnectivity";
 import type { ConnectToAppSchema } from "src/pages/api/app/connectToApp";
@@ -50,46 +49,43 @@ import type { GetRunningJobsSchema } from "src/pages/api/job/getRunningJobs";
 import type { ListJobTemplatesSchema } from "src/pages/api/job/listJobTemplates";
 import type { SubmitJobSchema } from "src/pages/api/job/submitJob";
 import type { ChangePasswordSchema } from "src/pages/api/profile/changePassword";
-import { publicConfig } from "src/utils/config";
-
-const basePath = publicConfig.BASE_PATH || "";
 
 
 export const api = {
-  checkAppConnectivity: fromApi<CheckAppConnectivitySchema>("GET", join(basePath, "/api/app/checkConnectivity")),
-  connectToApp: fromApi<ConnectToAppSchema>("POST", join(basePath, "/api/app/connectToApp")),
-  createAppSession: fromApi<CreateAppSessionSchema>("POST", join(basePath, "/api/app/createAppSession")),
-  getAppLastSubmission: fromApi<GetAppLastSubmissionSchema>("GET", join(basePath, "/api/app/getAppLastSubmission")),
-  getAppMetadata: fromApi<GetAppMetadataSchema>("GET", join(basePath, "/api/app/getAppMetadata")),
-  getAppSessions: fromApi<GetAppSessionsSchema>("GET", join(basePath, "/api/app/getAppSessions")),
-  listAvailableApps: fromApi<ListAvailableAppsSchema>("GET", join(basePath, "/api/app/listAvailableApps")),
-  authCallback: fromApi<AuthCallbackSchema>("GET", join(basePath, "/api/auth/callback")),
-  logout: fromApi<LogoutSchema>("DELETE", join(basePath, "/api/auth/logout")),
-  validateToken: fromApi<ValidateTokenSchema>("GET", join(basePath, "/api/auth/validateToken")),
-  getClusterInfo: fromApi<GetClusterInfoSchema>("GET", join(basePath, "/api//cluster")),
-  createDesktop: fromApi<CreateDesktopSchema>("POST", join(basePath, "/api/desktop/createDesktop")),
-  killDesktop: fromApi<KillDesktopSchema>("POST", join(basePath, "/api/desktop/killDesktop")),
-  launchDesktop: fromApi<LaunchDesktopSchema>("POST", join(basePath, "/api/desktop/launchDesktop")),
-  listAvailableWms: fromApi<ListAvailableWmsSchema>("GET", join(basePath, "/api/desktop/listAvailableWms")),
-  listDesktops: fromApi<ListDesktopsSchema>("GET", join(basePath, "/api/desktop/listDesktops")),
-  copyFileItem: fromApi<CopyFileItemSchema>("PATCH", join(basePath, "/api/file/copy")),
-  createFile: fromApi<CreateFileSchema>("POST", join(basePath, "/api/file/createFile")),
-  deleteDir: fromApi<DeleteDirSchema>("DELETE", join(basePath, "/api/file/deleteDir")),
-  deleteFile: fromApi<DeleteFileSchema>("DELETE", join(basePath, "/api/file/deleteFile")),
-  downloadFile: fromApi<DownloadFileSchema>("GET", join(basePath, "/api/file/download")),
-  fileExist: fromApi<FileExistSchema>("GET", join(basePath, "/api/file/fileExist")),
-  getFileType: fromApi<GetFileTypeSchema>("GET", join(basePath, "/api/file/getFileType")),
-  getHomeDirectory: fromApi<GetHomeDirectorySchema>("GET", join(basePath, "/api/file/getHome")),
-  listFile: fromApi<ListFileSchema>("GET", join(basePath, "/api/file/list")),
-  mkdir: fromApi<MkdirSchema>("POST", join(basePath, "/api/file/mkdir")),
-  moveFileItem: fromApi<MoveFileItemSchema>("PATCH", join(basePath, "/api/file/move")),
-  uploadFile: fromApi<UploadFileSchema>("POST", join(basePath, "/api/file/upload")),
-  cancelJob: fromApi<CancelJobSchema>("DELETE", join(basePath, "/api/job/cancelJob")),
-  getAccounts: fromApi<GetAccountsSchema>("GET", join(basePath, "/api/job/getAccounts")),
-  getAllJobs: fromApi<GetAllJobsSchema>("GET", join(basePath, "/api/job/getAllJobs")),
-  getJobTemplate: fromApi<GetJobTemplateSchema>("GET", join(basePath, "/api/job/getJobTemplate")),
-  getRunningJobs: fromApi<GetRunningJobsSchema>("GET", join(basePath, "/api/job/getRunningJobs")),
-  listJobTemplates: fromApi<ListJobTemplatesSchema>("GET", join(basePath, "/api/job/listJobTemplates")),
-  submitJob: fromApi<SubmitJobSchema>("POST", join(basePath, "/api/job/submitJob")),
-  changePassword: fromApi<ChangePasswordSchema>("PATCH", join(basePath, "/api/profile/changePassword")),
+  checkAppConnectivity: apiClient.fromTypeboxRoute<typeof CheckAppConnectivitySchema>("GET", "/api/app/checkConnectivity"),
+  connectToApp: apiClient.fromTypeboxRoute<typeof ConnectToAppSchema>("POST", "/api/app/connectToApp"),
+  createAppSession: apiClient.fromTypeboxRoute<typeof CreateAppSessionSchema>("POST", "/api/app/createAppSession"),
+  getAppLastSubmission: apiClient.fromTypeboxRoute<typeof GetAppLastSubmissionSchema>("GET", "/api/app/getAppLastSubmission"),
+  getAppMetadata: apiClient.fromTypeboxRoute<typeof GetAppMetadataSchema>("GET", "/api/app/getAppMetadata"),
+  getAppSessions: apiClient.fromTypeboxRoute<typeof GetAppSessionsSchema>("GET", "/api/app/getAppSessions"),
+  listAvailableApps: apiClient.fromTypeboxRoute<typeof ListAvailableAppsSchema>("GET", "/api/app/listAvailableApps"),
+  authCallback: apiClient.fromTypeboxRoute<typeof AuthCallbackSchema>("GET", "/api/auth/callback"),
+  logout: apiClient.fromTypeboxRoute<typeof LogoutSchema>("DELETE", "/api/auth/logout"),
+  validateToken: apiClient.fromTypeboxRoute<typeof ValidateTokenSchema>("GET", "/api/auth/validateToken"),
+  getClusterInfo: apiClient.fromTypeboxRoute<typeof GetClusterInfoSchema>("GET", "/api//cluster"),
+  createDesktop: apiClient.fromTypeboxRoute<typeof CreateDesktopSchema>("POST", "/api/desktop/createDesktop"),
+  killDesktop: apiClient.fromTypeboxRoute<typeof KillDesktopSchema>("POST", "/api/desktop/killDesktop"),
+  launchDesktop: apiClient.fromTypeboxRoute<typeof LaunchDesktopSchema>("POST", "/api/desktop/launchDesktop"),
+  listAvailableWms: apiClient.fromTypeboxRoute<typeof ListAvailableWmsSchema>("GET", "/api/desktop/listAvailableWms"),
+  listDesktops: apiClient.fromTypeboxRoute<typeof ListDesktopsSchema>("GET", "/api/desktop/listDesktops"),
+  copyFileItem: apiClient.fromTypeboxRoute<typeof CopyFileItemSchema>("PATCH", "/api/file/copy"),
+  createFile: apiClient.fromTypeboxRoute<typeof CreateFileSchema>("POST", "/api/file/createFile"),
+  deleteDir: apiClient.fromTypeboxRoute<typeof DeleteDirSchema>("DELETE", "/api/file/deleteDir"),
+  deleteFile: apiClient.fromTypeboxRoute<typeof DeleteFileSchema>("DELETE", "/api/file/deleteFile"),
+  downloadFile: apiClient.fromTypeboxRoute<typeof DownloadFileSchema>("GET", "/api/file/download"),
+  fileExist: apiClient.fromTypeboxRoute<typeof FileExistSchema>("GET", "/api/file/fileExist"),
+  getFileType: apiClient.fromTypeboxRoute<typeof GetFileTypeSchema>("GET", "/api/file/getFileType"),
+  getHomeDirectory: apiClient.fromTypeboxRoute<typeof GetHomeDirectorySchema>("GET", "/api/file/getHome"),
+  listFile: apiClient.fromTypeboxRoute<typeof ListFileSchema>("GET", "/api/file/list"),
+  mkdir: apiClient.fromTypeboxRoute<typeof MkdirSchema>("POST", "/api/file/mkdir"),
+  moveFileItem: apiClient.fromTypeboxRoute<typeof MoveFileItemSchema>("PATCH", "/api/file/move"),
+  uploadFile: apiClient.fromTypeboxRoute<typeof UploadFileSchema>("POST", "/api/file/upload"),
+  cancelJob: apiClient.fromTypeboxRoute<typeof CancelJobSchema>("DELETE", "/api/job/cancelJob"),
+  getAccounts: apiClient.fromTypeboxRoute<typeof GetAccountsSchema>("GET", "/api/job/getAccounts"),
+  getAllJobs: apiClient.fromTypeboxRoute<typeof GetAllJobsSchema>("GET", "/api/job/getAllJobs"),
+  getJobTemplate: apiClient.fromTypeboxRoute<typeof GetJobTemplateSchema>("GET", "/api/job/getJobTemplate"),
+  getRunningJobs: apiClient.fromTypeboxRoute<typeof GetRunningJobsSchema>("GET", "/api/job/getRunningJobs"),
+  listJobTemplates: apiClient.fromTypeboxRoute<typeof ListJobTemplatesSchema>("GET", "/api/job/listJobTemplates"),
+  submitJob: apiClient.fromTypeboxRoute<typeof SubmitJobSchema>("POST", "/api/job/submitJob"),
+  changePassword: apiClient.fromTypeboxRoute<typeof ChangePasswordSchema>("PATCH", "/api/profile/changePassword"),
 };

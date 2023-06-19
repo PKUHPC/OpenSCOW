@@ -23,3 +23,6 @@ mkdir /data/software
 
 tar -xf /root/code-server-4.7.1-linux-amd64.tar.gz -C /data/software
 mv /data/software/code-server-4.7.1-linux-amd64 /data/software/code-server
+
+# 静默安装 Anaconda
+bash /root/Anaconda3-2023.03-Linux-x86_64.sh -b -p /data/software/anaconda

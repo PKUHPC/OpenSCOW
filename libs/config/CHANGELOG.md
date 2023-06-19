@@ -1,5 +1,12 @@
 # @scow/config
 
+## 0.3.1
+
+### Patch Changes
+
+- 0f64e5404: 交互式应用 URL 修改为/api/proxy/集群 ID/代理类型/节点 hostname/端口。如果有交互式应用在使用 get_ip 函数以生成 base path，请将 get_ip 调用修改为 hostname
+- 81895f4be: 在 portal.yaml 和 mis.yaml 中增加 navLinks 来支持增加一级二级导航链接
+
 ## 0.3.0
 
 ### Minor Changes

@@ -10,31 +10,39 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
-import { AvailableWm, DesktopServiceClient } from "@scow/protos/build/portal/desktop";
+import { DesktopServiceClient } from "@scow/protos/build/portal/desktop";
+import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { getClient } from "src/utils/client";
 import { publicConfig } from "src/utils/config";
-import { route } from "src/utils/route";
 
-export interface ListAvailableWmsSchema {
-  method: "GET";
+// Cannot use AvailableWm from protos
+export const AvailableWm = Type.Object({
+  name: Type.String(),
+  wm: Type.String(),
+});
+export type AvailableWm = Static<typeof AvailableWm>;
 
-  query: {}
+export const ListAvailableWmsSchema = typeboxRouteSchema({
+  method: "GET",
+
+  query: Type.Object({}),
 
   responses: {
-    200: {
-      wms: AvailableWm[];
-    };
+    200: Type.Object({
+      wms: Type.Array(AvailableWm),
+    }),
 
     // 功能没有启用
-    501: null;
-  }
-}
+    501: Type.Null(),
+  },
+});
 
 const auth = authenticate(() => true);
 
-export default /* #__PURE__*/route<ListAvailableWmsSchema>("ListAvailableWmsSchema", async (req, res) => {
+export default /* #__PURE__*/typeboxRoute(ListAvailableWmsSchema, async (req, res) => {
 
 
 

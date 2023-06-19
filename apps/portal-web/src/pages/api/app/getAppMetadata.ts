@@ -10,50 +10,62 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { status } from "@grpc/grpc-js";
 import { appCustomAttribute_AttributeTypeToJSON, AppServiceClient } from "@scow/protos/build/portal/app";
+import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { getClient } from "src/utils/client";
-import { route } from "src/utils/route";
 import { handlegRPCError } from "src/utils/server";
 
-export interface SelectOption {
-  value: string;
-  label: string;
-}
+export const SelectOption = Type.Object({
+  value: Type.String(),
+  label: Type.String(),
+});
+export type SelectOption = Static<typeof SelectOption>;
 
-export interface AppCustomAttribute {
-  type: "NUMBER" | "SELECT" | "TEXT";
-  label: string;
-  name: string;
-  required: boolean;
-  placeholder?: string | undefined;
-  defaultValue?: string | number | undefined;
-  select: SelectOption[];
-}
+// Cannot use AppCustomAttribute from protos
+export const AppCustomAttribute = Type.Object({
+  type: Type.Union([
+    Type.Literal("NUMBER"),
+    Type.Literal("SELECT"),
+    Type.Literal("TEXT"),
+  ]),
+  label: Type.String(),
+  name: Type.String(),
+  required: Type.Boolean(),
+  placeholder: Type.Optional(Type.Union([Type.String(), Type.Undefined()])),
+  defaultValue: Type.Optional(Type.Union([
+    Type.String(),
+    Type.Number(),
+    Type.Undefined(),
+  ])),
+  select: Type.Array(SelectOption),
+});
+export type AppCustomAttribute = Static<typeof AppCustomAttribute>;
 
-export interface GetAppMetadataSchema {
-  method: "GET";
+export const GetAppMetadataSchema = typeboxRouteSchema({
+  method: "GET",
 
-  query: {
-    appId: string;
-  }
+  query: Type.Object({
+    appId: Type.String(),
+  }),
 
   responses: {
-    200: {
-      appName: string;
-      appCustomFormAttributes: AppCustomAttribute[];
-    };
+    200: Type.Object({
+      appName: Type.String(),
+      appCustomFormAttributes: Type.Array(AppCustomAttribute),
+    }),
 
     // appId not exists
-    404: { code: "APP_NOT_FOUND" };
-  }
-}
+    404: Type.Object({ code: Type.Literal("APP_NOT_FOUND") }),
+  },
+});
 
 const auth = authenticate(() => true);
 
-export default /* #__PURE__*/route<GetAppMetadataSchema>("GetAppMetadataSchema", async (req, res) => {
+export default /* #__PURE__*/typeboxRoute(GetAppMetadataSchema, async (req, res) => {
 
 
   const info = await auth(req, res);

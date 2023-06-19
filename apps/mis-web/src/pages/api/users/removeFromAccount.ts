@@ -10,35 +10,37 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { UserServiceClient } from "@scow/protos/build/server/user";
+import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { PlatformRole, UserRole } from "src/models/User";
 import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
 import { handlegRPCError } from "src/utils/server";
 
-export interface RemoveUserFromAccountSchema {
-  method: "DELETE";
+export const RemoveUserFromAccountSchema = typeboxRouteSchema({
+  method: "DELETE",
 
-  query: {
-    accountName: string;
-    identityId: string;
-  }
+  query: Type.Object({
+    accountName: Type.String(),
+    identityId: Type.String(),
+  }),
 
   responses: {
-    204: null;
+    204: Type.Null(),
     // 用户不存在
-    404: null;
+    404: Type.Null(),
 
     // 不能移出账户拥有者
-    406: null;
+    406: Type.Null(),
 
-  }
-}
+  },
+});
 
-export default /* #__PURE__*/route<RemoveUserFromAccountSchema>("RemoveUserFromAccountSchema", async (req, res) => {
+export default /* #__PURE__*/route(RemoveUserFromAccountSchema, async (req, res) => {
   const { identityId, accountName } = req.query;
 
   const auth = authenticate((u) =>

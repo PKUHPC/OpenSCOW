@@ -10,54 +10,56 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { route } from "@ddadaal/next-typed-api-routes-runtime";
+import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { AdminServiceClient, ChangeStorageQuotaMode } from "@scow/protos/build/server/admin";
+import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { TenantRole } from "src/models/User";
 import { getClient } from "src/utils/client";
 import { handlegRPCError } from "src/utils/server";
 
-export type ChangeStorageMode =
-  | "INCREASE"
-  | "DECREASE"
-  | "SET";
+export const ChangeStorageMode = Type.Union([
+  Type.Literal("INCREASE"),
+  Type.Literal("DECREASE"),
+  Type.Literal("SET"),
+]);
+export type ChangeStorageMode = Static<typeof ChangeStorageMode>;
 
+export const ChangeStorageQuotaSchema = typeboxRouteSchema({
+  method: "PUT",
 
-export interface ChangeStorageQuotaSchema {
-  method: "PUT";
+  body: Type.Object({
+    cluster: Type.String(),
+    userId: Type.String(),
 
-  body: {
-    cluster: string;
-    userId: string;
-
-    mode: ChangeStorageMode;
+    mode: ChangeStorageMode,
 
     /**
      * @minimum 0
      * @type integer
      */
-    value: number;
+    value: Type.Integer({ minimum: 0 }),
 
-  }
+  }),
 
   responses: {
-    200: {
-      currentQuota: number;
-    }
+    200: Type.Object({
+      currentQuota: Type.Number(),
+    }),
 
-    400: {
-      code: "DELTA_NOT_VALID";
-    }
+    400: Type.Object({
+      code: Type.Literal("DELTA_NOT_VALID"),
+    }),
 
-    404: null;
-  }
-}
+    404: Type.Null(),
+  },
+});
 
 const auth = authenticate((info) => info.tenantRoles.includes(TenantRole.TENANT_ADMIN));
 
-export default route<ChangeStorageQuotaSchema>("ChangeStorageQuotaSchema",
+export default typeboxRoute(ChangeStorageQuotaSchema,
   async (req, res) => {
 
     const info = await auth(req, res);

@@ -1,6 +1,6 @@
 {
   "name": "@scow/mis-server",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "",
   "private": true,
   "main": "build/index.js",
@@ -41,7 +41,7 @@
     "@scow/lib-ssh": "workspace:*",
     "@scow/protos": "workspace:*",
     "@scow/utils": "workspace:*",
-    "@sinclair/typebox": "0.28.11",
+    "@sinclair/typebox": "0.28.13",
     "dotenv": "16.0.3",
     "node-cron": "3.0.2",
     "pino": "8.14.1",

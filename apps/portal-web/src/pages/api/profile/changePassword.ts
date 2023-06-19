@@ -10,45 +10,45 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { route } from "@ddadaal/next-typed-api-routes-runtime";
+import { Type, typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { changePassword as libChangePassword } from "@scow/lib-auth";
 import { authenticate } from "src/auth/server";
 import { publicConfig, runtimeConfig } from "src/utils/config";
 
-export interface ChangePasswordSchema {
+export const ChangePasswordSchema = typeboxRouteSchema({
 
-  method: "PATCH";
+  method: "PATCH",
 
-  body: {
-    oldPassword: string;
-    newPassword: string;
-  };
+  body: Type.Object({
+    oldPassword: Type.String(),
+    newPassword: Type.String(),
+  }),
 
   responses: {
     /** 更改成功 */
-    204: null;
+    204: Type.Null(),
 
-    400: {
+    400: Type.Object({
       // 密码不合规则
-      code: "PASSWORD_NOT_VALID"
-      message: string | undefined;
-    }
+      code: Type.Literal("PASSWORD_NOT_VALID"),
+      message: Type.Optional(Type.String()),
+    }),
 
     /** 用户未找到 */
-    404: null;
+    404: Type.Null(),
 
     /** 密码不正确 */
-    412: null;
+    412: Type.Null(),
 
     /** 本功能在当前配置下不可用。 */
-    501: null;
-  }
-}
+    501: Type.Null(),
+  },
+});
 
 
 const passwordPattern = publicConfig.PASSWORD_PATTERN && new RegExp(publicConfig.PASSWORD_PATTERN);
 
-export default /* #__PURE__*/route<ChangePasswordSchema>("ChangePasswordSchema", async (req, res) => {
+export default typeboxRoute(ChangePasswordSchema, async (req, res) => {
 
   if (!publicConfig.ENABLE_CHANGE_PASSWORD) {
     return { 501: null };
@@ -63,7 +63,7 @@ export default /* #__PURE__*/route<ChangePasswordSchema>("ChangePasswordSchema",
   const { newPassword, oldPassword } = req.body;
 
   if (passwordPattern && !passwordPattern.test(newPassword)) {
-    return { 400: { code: "PASSWORD_NOT_VALID", message: publicConfig.PASSWORD_PATTERN_MESSAGE } };
+    return { 400: { code: "PASSWORD_NOT_VALID" as const, message: publicConfig.PASSWORD_PATTERN_MESSAGE } };
   }
 
   return await libChangePassword(runtimeConfig.AUTH_INTERNAL_URL, {

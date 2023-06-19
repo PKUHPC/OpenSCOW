@@ -1,5 +1,13 @@
 # @scow/auth
 
+## 0.7.0
+
+### Patch Changes
+
+- Updated dependencies [0f64e5404]
+- Updated dependencies [81895f4be]
+  - @scow/config@0.3.1
+
 ## 0.6.0
 
 ### Minor Changes

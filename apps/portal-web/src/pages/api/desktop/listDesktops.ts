@@ -10,34 +10,35 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { DesktopServiceClient } from "@scow/protos/build/portal/desktop";
+import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { getClient } from "src/utils/client";
 import { publicConfig } from "src/utils/config";
-import { route } from "src/utils/route";
 
-export interface ListDesktopsSchema {
-  method: "GET";
+export const ListDesktopsSchema = typeboxRouteSchema({
+  method: "GET",
 
-  query: {
-    cluster: string;
-  }
+  query: Type.Object({
+    cluster: Type.String(),
+  }),
 
   responses: {
-    200: {
-      host: string;
-      displayId: number[];
-    };
+    200: Type.Object({
+      host: Type.String(),
+      displayId: Type.Array(Type.Number()),
+    }),
 
     // 功能没有启用
-    501: null;
-  }
-}
+    501: Type.Null(),
+  },
+});
 
 const auth = authenticate(() => true);
 
-export default /* #__PURE__*/route<ListDesktopsSchema>("ListDesktopsSchema", async (req, res) => {
+export default /* #__PURE__*/typeboxRoute(ListDesktopsSchema, async (req, res) => {
 
 
 
