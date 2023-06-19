@@ -15,11 +15,13 @@ import { ServiceError } from "@ddadaal/tsgrpc-common";
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { jobInfoToPortalJobInfo, jobInfoToRunningjob } from "@scow/lib-scheduler-adapter";
+import { sftpExists, sftpMkdir } from "@scow/lib-ssh";
 import { JobServiceServer, JobServiceService } from "@scow/protos/build/portal/job";
 import { getClusterOps } from "src/clusterops";
 import { JobTemplate } from "src/clusterops/api/job";
 import { getAdapterClient } from "src/utils/clusters";
 import { clusterNotFound } from "src/utils/errors";
+import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
 
 export const jobServiceServer = plugin((server) => {
 
@@ -132,6 +134,18 @@ export const jobServiceServer = plugin((server) => {
 
       const client = getAdapterClient(cluster);
       if (!client) { throw clusterNotFound(cluster); }
+
+      // make sure working directory exists
+      const host = getClusterLoginNode(cluster);
+      if (!host) { throw clusterNotFound(cluster); }
+      await sshConnect(host, userId, logger, async (ssh) => {
+
+        const sftp = await ssh.requestSFTP();
+
+        if (!(await sftpExists(sftp, workingDirectory))) {
+          await sftpMkdir(sftp)(workingDirectory);
+        }
+      });
 
       const reply = await asyncClientCall(client.job, "submitJob", {
         userId, jobName, account, partition: partition!, qos, nodeCount, gpuCount: gpuCount || 0,
