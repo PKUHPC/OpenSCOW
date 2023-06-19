@@ -21,25 +21,25 @@
     "nookies": "2.5.2"
   },
   "peerDependencies": {
-    "antd": "5.5.0",
-    "next": "13.4.4",
-    "styled-components": "5.3.10",
-    "@ant-design/icons": "5.1.0",
-    "dayjs": "1.11.7"
+    "antd": "5.6.2",
+    "next": "13.4.6",
+    "styled-components": "5.3.11",
+    "@ant-design/icons": "5.1.4",
+    "dayjs": "1.11.8"
   },
   "devDependencies": {
-    "antd": "5.5.0",
-    "next": "13.4.4",
-    "styled-components": "5.3.10",
-    "@grpc/grpc-js": "1.8.14",
+    "antd": "5.6.2",
+    "next": "13.4.6",
+    "styled-components": "5.3.11",
+    "@grpc/grpc-js": "1.8.15",
     "@types/mime-types": "2.1.1",
     "react": "18.2.0",
-    "@types/react": "18.2.6",
+    "@types/react": "18.2.13",
     "react-dom": "18.2.0",
-    "@types/react-dom": "18.2.4",
+    "@types/react-dom": "18.2.6",
     "react-is": "18.2.0",
-    "@ant-design/icons": "5.1.0",
-    "dayjs": "1.11.7",
+    "@ant-design/icons": "5.1.4",
+    "dayjs": "1.11.8",
     "@types/styled-components": "5.1.26"
   },
   "author": "PKUHPC (https://github.com/PKUHPC)",
