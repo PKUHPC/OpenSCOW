@@ -108,6 +108,10 @@
 #   # 可接受的格式为nginx的proxy_read_timeout可接受的值
 #   proxyReadTimeout: 60s
 
+#   # 更多nginx配置，可以增加在当前系统nginx端口（默认80）的服务
+#   # 可接受的格式为nginx的location块可接受的配置
+#   extra: ""
+
 # 插件配置
 # plugins:
 #   # 启用的插件
