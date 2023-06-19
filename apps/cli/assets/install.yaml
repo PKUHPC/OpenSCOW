@@ -108,9 +108,13 @@
 #   # 可接受的格式为nginx的proxy_read_timeout可接受的值
 #   proxyReadTimeout: 60s
 
-#   # 更多nginx配置，可以增加在当前系统nginx端口（默认80）的服务
-#   # 可接受的格式为nginx的server可接受的属性配置
-#   extra: ""
+#   # 更多nginx配置
+#   # 可接受的格式为nginx的server可接受的属性配置，例如可增加在当前系统nginx端口（默认80）的服务
+#   extra: "location /extra {
+#           proxy_pass http://extra-web:3000;
+#           include includes/headers;
+#           include includes/websocket;
+#          }"
 
 # 插件配置
 # plugins:
