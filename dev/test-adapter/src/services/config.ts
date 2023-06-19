@@ -25,5 +25,9 @@ export const configServiceServer = plugin((server) => {
       }];
     },
 
+    getAvailablePartitions: async () => {
+      return [];
+    },
+
   });
 });

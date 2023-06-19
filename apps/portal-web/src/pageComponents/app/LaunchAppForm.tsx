@@ -10,7 +10,6 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Partition } from "@scow/protos/build/common/config";
 import { App, Button, Form, Input, InputNumber, Select, Spin } from "antd";
 import { Rule } from "antd/es/form";
 import Router from "next/router";
@@ -21,6 +20,7 @@ import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { AccountSelector } from "src/pageComponents/job/AccountSelector";
 import { AppCustomAttribute } from "src/pages/api/app/getAppMetadata";
+import { Partition } from "src/pages/api/cluster";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { Cluster } from "src/utils/config";
 
