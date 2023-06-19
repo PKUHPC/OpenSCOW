@@ -1,5 +1,29 @@
 # @scow/mis-web
 
+## 0.7.0
+
+### Patch Changes
+
+- 1aad4a345: 去掉 web 端多余的逗号
+- 1227c7347: 修复导入用户时账户选择默认拥有者提交无效问题
+- 31198304c: portal-web 使用 custom server 注册 upgrade 事件，更新 next.js 至最新并恢复日常更新
+- d00ae0da3: 新增创建租户页面，同时创建该租户的管理员用户
+- e011f42ff: 门户和管理系统添加 footer 展示 SCOW 版本和 github 跳转链接
+- 8cf189cd2: 修改了 config 中 ENABLE_CHANGE_PASSWORD 与 authSupportsCreateUser 的类型属性可以为 Undefined
+- 07160d9de: 修改了管理系统用户空间集群和分区信息页面集群项跨越行数显示不正确的问题
+- 9e79e2a9f: 管理平台新增平台信息页面
+- 81895f4be: mis.yaml 和 portal.yaml 中支持增加导航链接
+- Updated dependencies [31198304c]
+- Updated dependencies [e011f42ff]
+- Updated dependencies [0f64e5404]
+- Updated dependencies [4bfd80986]
+- Updated dependencies [81895f4be]
+- Updated dependencies [81895f4be]
+  - @scow/lib-web@0.3.3
+  - @scow/config@0.3.1
+  - @scow/lib-auth@0.2.1
+  - @scow/protos@0.2.3
+
 ## 0.6.0
 
 ### Minor Changes

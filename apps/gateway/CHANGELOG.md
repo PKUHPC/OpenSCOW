@@ -1,5 +1,11 @@
 # @scow/gateway
 
+## 0.7.0
+
+### Patch Changes
+
+- bba446a18: 支持公共文件配置
+
 ## 0.6.0
 
 ### Patch Changes

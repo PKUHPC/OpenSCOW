@@ -10,30 +10,32 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { status } from "@grpc/grpc-js";
 import { FileServiceClient } from "@scow/protos/build/portal/file";
+import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
 import { handlegRPCError } from "src/utils/server";
 
-export interface GetHomeDirectorySchema {
-  method: "GET";
+export const GetHomeDirectorySchema = typeboxRouteSchema({
+  method: "GET",
 
-  query: {
-    cluster: string;
-  }
+  query: Type.Object({
+    cluster: Type.String(),
+  }),
 
   responses: {
-    200: { path: string };
-    400: { code: "INVALID_CLUSTER" };
-  }
-}
+    200: Type.Object({ path: Type.String() }),
+    400: Type.Object({ code: Type.Literal("INVALID_CLUSTER") }),
+  },
+});
 
 const auth = authenticate(() => true);
 
-export default route<GetHomeDirectorySchema>("GetHomeDirectorySchema", async (req, res) => {
+export default route(GetHomeDirectorySchema, async (req, res) => {
 
   const info = await auth(req, res);
 

@@ -10,35 +10,37 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { route } from "@ddadaal/next-typed-api-routes-runtime";
+import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
-import { Money } from "@scow/protos/build/common/money";
 import { AccountServiceClient, GetAccountsRequest } from "@scow/protos/build/server/account";
+import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { TenantRole } from "src/models/User";
+import { Money } from "src/models/UserSchemaModel";
 import { ensureNotUndefined } from "src/utils/checkNull";
 import { getClient } from "src/utils/client";
 
-export type AdminAccountInfo = {
-  tenantName: string;
-  accountName: string;
-  userCount: number;
-  blocked: boolean;
-  ownerId: string;
-  ownerName: string;
-  comment: string;
-  balance: Money;
-}
+export const AdminAccountInfo = Type.Object({
+  tenantName: Type.String(),
+  accountName: Type.String(),
+  userCount: Type.Number(),
+  blocked: Type.Boolean(),
+  ownerId: Type.String(),
+  ownerName: Type.String(),
+  comment: Type.String(),
+  balance: Money,
+});
+export type AdminAccountInfo = Static<typeof AdminAccountInfo>;
 
-export interface GetAccountsSchema {
-  method: "GET";
+export const GetAccountsSchema = typeboxRouteSchema({
+  method: "GET",
 
   responses: {
-    200: {
-      results: AdminAccountInfo[];
-    }
-  }
-}
+    200: Type.Object({
+      results: Type.Array(AdminAccountInfo),
+    }),
+  },
+});
 
 export async function getAccounts(req: GetAccountsRequest) {
   const uaClient = getClient(AccountServiceClient);
@@ -51,7 +53,7 @@ export async function getAccounts(req: GetAccountsRequest) {
 const auth = authenticate((info) => info.tenantRoles.includes(TenantRole.TENANT_ADMIN)
   || info.tenantRoles.includes(TenantRole.TENANT_FINANCE));
 
-export default route<GetAccountsSchema>("GetAccountsSchema",
+export default typeboxRoute(GetAccountsSchema,
   async (req, res) => {
 
     const info = await auth(req, res);

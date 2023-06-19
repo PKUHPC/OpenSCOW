@@ -1,15 +1,14 @@
 {
   "name": "@scow/mis-web",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "private": true,
   "scripts": {
     "dev": "cross-env NEXT_PUBLIC_USE_MOCK=1 next dev",
     "dev:server": "cross-env NEXT_PUBLIC_USE_MOCK=0 next dev",
     "serve": "next start",
-    "build": "pnpm prepareDev && npm run build:next",
+    "build": "npm run build:next",
     "build:next": "next build",
-    "prepareDev": "ntar schema",
-    "client": "ntar client --basePathVar \"publicConfig.BASE_PATH || ''\" --extraImports \"import { publicConfig } from 'src/utils/config';\""
+    "client": "ntar client"
   },
   "files": [
     ".next",
@@ -25,7 +24,7 @@
   "repository": "https://github.com/PKUHPC/SCOW",
   "dependencies": {
     "@ant-design/icons": "5.1.0",
-    "@ddadaal/next-typed-api-routes-runtime": "0.5.2",
+    "@ddadaal/next-typed-api-routes-runtime": "0.8.0",
     "@ddadaal/tsgrpc-client": "0.17.5",
     "@ddadaal/tsgrpc-common": "0.2.3",
     "@grpc/grpc-js": "1.8.14",
@@ -36,7 +35,7 @@
     "@scow/protos": "workspace:*",
     "@scow/lib-web": "workspace:*",
     "@scow/utils": "workspace:*",
-    "@sinclair/typebox": "0.28.11",
+    "@sinclair/typebox": "0.28.13",
     "antd": "5.5.0",
     "dayjs": "1.11.7",
     "google-protobuf": "3.21.2",
@@ -58,7 +57,7 @@
     "@ant-design/cssinjs": "1.9.1"
   },
   "devDependencies": {
-    "@ddadaal/next-typed-api-routes-cli": "0.6.2",
+    "@ddadaal/next-typed-api-routes-cli": "0.9.0",
     "@next/bundle-analyzer": "13.4.1",
     "@types/google-protobuf": "3.15.6",
     "@types/mime-types": "2.1.1",

@@ -10,8 +10,10 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncRequestStreamCall } from "@ddadaal/tsgrpc-client";
 import { FileServiceClient } from "@scow/protos/build/portal/file";
+import { Type } from "@sinclair/typebox";
 import busboy, { BusboyEvents } from "busboy";
 import { once } from "events";
 import { authenticate } from "src/auth/server";
@@ -20,23 +22,23 @@ import { pipeline } from "src/utils/pipeline";
 import { route } from "src/utils/route";
 import { pipeline as pipelineStream } from "stream/promises";
 
-export interface UploadFileSchema {
-  method: "POST";
+export const UploadFileSchema = typeboxRouteSchema({
+  method: "POST",
 
-  query: {
-    cluster: string;
-    path: string;
-  }
+  query: Type.Object({
+    cluster: Type.String(),
+    path: Type.String(),
+  }),
 
   responses: {
-    204: null;
-    400: { code: "INVALID_CLUSTER" }
-  }
-}
+    204: Type.Null(),
+    400: Type.Object({ code: Type.Literal("INVALID_CLUSTER") }),
+  },
+});
 
 const auth = authenticate(() => true);
 
-export default route<UploadFileSchema>("UploadFileSchema", async (req, res) => {
+export default route(UploadFileSchema, async (req, res) => {
 
   const { cluster, path } = req.query;
 

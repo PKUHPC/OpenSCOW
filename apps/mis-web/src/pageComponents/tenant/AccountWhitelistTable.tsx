@@ -13,6 +13,7 @@
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { formatDateTime } from "@scow/lib-web/build/utils/datetime";
 import { WhitelistedAccount } from "@scow/protos/build/server/account";
+import { Static } from "@sinclair/typebox";
 import { App, Divider, Space, Table } from "antd";
 import React from "react";
 import { api } from "src/apis";
@@ -20,7 +21,7 @@ import type {
   GetWhitelistedAccountsSchema } from "src/pages/api/tenant/accountWhitelist/getWhitelistedAccounts";
 
 interface Props {
-  data: GetWhitelistedAccountsSchema["responses"]["200"] | undefined;
+  data: Static<typeof GetWhitelistedAccountsSchema["responses"]["200"]> | undefined;
   isLoading: boolean;
   reload: () => void;
 }

@@ -1,5 +1,13 @@
 # @scow/lib-web
 
+## 0.3.3
+
+### Patch Changes
+
+- 31198304c: portal-web 使用 custom server 注册 upgrade 事件，更新 next.js 至最新并恢复日常更新
+- e011f42ff: 门户和管理系统添加 footer 展示 SCOW 版本和 github 跳转链接
+- 81895f4be: mis.yaml 和 portal.yaml 中支持增加导航链接
+
 ## 0.3.2
 
 ### Patch Changes

@@ -10,36 +10,47 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
-import { JobServiceClient, JobTemplateInfo } from "@scow/protos/build/portal/job";
+import { JobServiceClient } from "@scow/protos/build/portal/job";
+import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
 
-export interface ListJobTemplatesSchema {
+// Cannot use JobTemplateInfo from protos
+export const JobTemplateInfo = Type.Object({
+  id: Type.String(),
+  jobName: Type.String(),
+  submitTime: Type.Optional(Type.String()),
+  comment: Type.Optional(Type.Union([Type.String(), Type.Undefined()])),
+});
 
-  method: "GET";
+export type JobTemplateInfo = Static<typeof JobTemplateInfo>;
+export const ListJobTemplatesSchema = typeboxRouteSchema({
 
-  query: {
-    cluster: string;
-  };
+  method: "GET",
+
+  query: Type.Object({
+    cluster: Type.String(),
+  }),
 
   responses: {
-    200: {
-      results: JobTemplateInfo[];
-    }
+    200: Type.Object({
+      results: Type.Array(JobTemplateInfo),
+    }),
 
-    400: {
-      message: string;
-    }
+    400: Type.Object({
+      message: Type.String(),
+    }),
 
-    404: null;
-   }
-}
+    404: Type.Null(),
+  },
+});
 
 const auth = authenticate(() => true);
 
-export default route<ListJobTemplatesSchema>("ListJobTemplatesSchema", async (req, res) => {
+export default route(ListJobTemplatesSchema, async (req, res) => {
 
   const info = await auth(req, res);
 

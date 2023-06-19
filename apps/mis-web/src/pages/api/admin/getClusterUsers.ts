@@ -10,30 +10,37 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { route } from "@ddadaal/next-typed-api-routes-runtime";
+import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
-import { AdminServiceClient, GetClusterUsersResponse } from "@scow/protos/build/server/admin";
+import { AdminServiceClient } from "@scow/protos/build/server/admin";
+import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { PlatformRole } from "src/models/User";
+import { ClusterAccountInfo } from "src/models/UserSchemaModel";
 import { getClient } from "src/utils/client";
 import { queryIfInitialized } from "src/utils/init";
 
+// Cannot use GetClusterUsersResponse from protos
+export const GetClusterUsersResponse = Type.Object({
+  accounts: Type.Array(ClusterAccountInfo),
+});
+export type GetClusterUsersResponse = Static<typeof GetClusterUsersResponse>;
 
-export interface GetClusterUsersSchema {
-  method: "GET";
+export const GetClusterUsersSchema = typeboxRouteSchema({
+  method: "GET",
 
-  query: {
-    cluster: string;
-  }
+  query: Type.Object({
+    cluster: Type.String(),
+  }),
 
   responses: {
-    200: GetClusterUsersResponse;
-  }
-}
+    200: GetClusterUsersResponse,
+  },
+});
 
 const auth = authenticate((info) => info.platformRoles.includes(PlatformRole.PLATFORM_ADMIN));
 
-export default route<GetClusterUsersSchema>("GetClusterUsersSchema",
+export default typeboxRoute(GetClusterUsersSchema,
   async (req, res) => {
 
     // if not initialized, every one can import users

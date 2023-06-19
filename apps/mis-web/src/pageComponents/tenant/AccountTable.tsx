@@ -11,6 +11,7 @@
  */
 
 import { Money } from "@scow/protos/build/common/money";
+import { Static } from "@sinclair/typebox";
 import { Button, Divider, Form, Input, Select, Space, Table, Tag } from "antd";
 import Link from "next/link";
 import React, { useMemo, useState } from "react";
@@ -19,7 +20,7 @@ import type { AdminAccountInfo, GetAccountsSchema } from "src/pages/api/tenant/g
 import { moneyToString } from "src/utils/money";
 
 interface Props {
-  data: GetAccountsSchema["responses"]["200"] | undefined;
+  data: Static<typeof GetAccountsSchema["responses"]["200"]> | undefined;
   isLoading: boolean;
   reload: () => void;
 }

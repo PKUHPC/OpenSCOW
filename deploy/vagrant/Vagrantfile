@@ -7,7 +7,7 @@ vm_list = [
         :cpu => "2",
         :sshport => 22231,
         :box => "icode/slurm",
-        :box_version => "1.1",
+        :box_version => "1.2",
 		    :role => "slurm",
         :is_service_node => true
     },
@@ -40,7 +40,7 @@ vm_list = [
         :cpu => "4",
         :sshport => 22288,
         :box => "icode/scow_blank",
-        :box_version => "1.1",
+        :box_version => "1.2",
 		    :role => "scow",
         :is_service_node => false
     }

@@ -10,29 +10,46 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
-import { AppServiceClient, AppSession } from "@scow/protos/build/portal/app";
+import { AppServiceClient } from "@scow/protos/build/portal/app";
+import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { getClient } from "src/utils/client";
-import { route } from "src/utils/route";
 
-export interface GetAppSessionsSchema {
-  method: "GET";
+// Cannot use AppSession from protos
+export const AppSession = Type.Object({
+  sessionId: Type.String(),
+  jobId: Type.Number(),
+  submitTime: Type.Optional(Type.String()),
+  appId: Type.String(),
+  state: Type.String(),
+  dataPath: Type.String(),
+  runningTime: Type.String(),
+  timeLimit: Type.String(),
+  reason: Type.Optional(Type.Union([Type.String(), Type.Undefined()])),
+  host: Type.Optional(Type.Union([Type.String(), Type.Undefined()])),
+  port: Type.Optional(Type.Union([Type.Number(), Type.Undefined()])),
+});
+export type AppSession = Static<typeof AppSession>
 
-  query: {
-    cluster: string;
-  }
+export const GetAppSessionsSchema = typeboxRouteSchema({
+  method: "GET",
+
+  query: Type.Object({
+    cluster: Type.String(),
+  }),
 
   responses: {
-    200: {
-      sessions: AppSession[];
-    };
-  }
-}
+    200: Type.Object({
+      sessions: Type.Array(AppSession),
+    }),
+  },
+});
 
 const auth = authenticate(() => true);
 
-export default /* #__PURE__*/route<GetAppSessionsSchema>("GetAppSessionsSchema", async (req, res) => {
+export default /* #__PURE__*/typeboxRoute(GetAppSessionsSchema, async (req, res) => {
 
 
   const info = await auth(req, res);

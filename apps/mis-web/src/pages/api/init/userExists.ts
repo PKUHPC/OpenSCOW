@@ -10,29 +10,30 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { route } from "@ddadaal/next-typed-api-routes-runtime";
+import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { InitServiceClient } from "@scow/protos/build/server/init";
+import { Type } from "@sinclair/typebox";
 import { getClient } from "src/utils/client";
 
-export interface UserExistsSchema {
-  method: "POST";
+export const UserExistsSchema = typeboxRouteSchema({
+  method: "POST",
 
-  body: {
-    identityId: string;
-  };
+  body: Type.Object({
+    identityId: Type.String(),
+  }),
 
   responses: {
-    200: {
-      existsInScow: boolean,
-      existsInAuth: boolean | undefined,
-    };
+    200: Type.Object({
+      existsInScow: Type.Boolean(),
+      existsInAuth: Type.Union([Type.Boolean(), Type.Undefined()]),
+    }),
 
     // 204: null;
-  }
-}
+  },
+});
 
-export default route<UserExistsSchema>("UserExistsSchema", async (req) => {
+export default typeboxRoute(UserExistsSchema, async (req) => {
 
   const { identityId } = req.body;
 

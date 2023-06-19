@@ -10,41 +10,42 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { route } from "@ddadaal/next-typed-api-routes-runtime";
+import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { status } from "@grpc/grpc-js";
-import { Money } from "@scow/protos/build/common/money";
 import { JobServiceClient } from "@scow/protos/build/server/job";
+import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { AmountStrategy } from "src/models/job";
 import { PlatformRole, TenantRole } from "src/models/User";
+import { Money } from "src/models/UserSchemaModel";
 import { getClient } from "src/utils/client";
 import { queryIfInitialized } from "src/utils/init";
 import { handlegRPCError } from "src/utils/server";
 
-export interface AddBillingItemSchema {
-  method: "POST";
+export const AddBillingItemSchema = typeboxRouteSchema({
+  method: "POST",
 
-  body: {
+  body: Type.Object({
     // if not set, add to platform default
-    tenant?: string;
+    tenant: Type.Optional(Type.String()),
 
-    itemId: string;
-    price: Money;
-    amount: string;
-    path: string;
-    description?: string;
-  }
+    itemId: Type.String(),
+    price: Money,
+    amount: Type.String(),
+    path: Type.String(),
+    description: Type.Optional(Type.String()),
+  }),
 
   responses: {
-    204: null;
-    409: { code: "ITEM_ID_EXISTS" };
-    404: { code: "TENANT_NOT_FOUND"};
-    400: { code: "INVALID_AMOUNT" };
-  }
-}
+    204: Type.Null(),
+    409: Type.Object({ code: Type.Literal("ITEM_ID_EXISTS") }),
+    404: Type.Object({ code: Type.Literal("TENANT_NOT_FOUND") }),
+    400: Type.Object({ code: Type.Literal("INVALID_AMOUNT") }),
+  },
+});
 
-export default /* #__PURE__*/route<AddBillingItemSchema>("AddBillingItemSchema", async (req, res) => {
+export default /* #__PURE__*/typeboxRoute(AddBillingItemSchema, async (req, res) => {
   const { tenant, amount, itemId, path, price, description } = req.body;
 
   if (await queryIfInitialized()) {

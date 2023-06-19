@@ -11,6 +11,7 @@
  */
 
 import { compareDateTime, formatDateTime } from "@scow/lib-web/build/utils/datetime";
+import { Static } from "@sinclair/typebox";
 import { App, Button, Divider, Form, Input, Space, Table } from "antd";
 import React, { useMemo, useState } from "react";
 import { api } from "src/apis";
@@ -22,7 +23,7 @@ import { GetTenantUsersSchema } from "src/pages/api/admin/getTenantUsers";
 import { User } from "src/stores/UserStore";
 
 interface Props {
-  data: GetTenantUsersSchema["responses"]["200"] | undefined;
+  data: Static<typeof GetTenantUsersSchema["responses"]["200"]> | undefined;
   isLoading: boolean;
   reload: () => void;
   user: User;

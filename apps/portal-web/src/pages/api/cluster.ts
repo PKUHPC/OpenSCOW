@@ -10,41 +10,56 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
-import { ConfigServiceClient, Partition } from "@scow/protos/build/common/config";
+import { ConfigServiceClient } from "@scow/protos/build/common/config";
+import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { getClient } from "src/utils/client";
 import { runtimeConfig } from "src/utils/config";
 import { route } from "src/utils/route";
 
-export interface PublicClusterConfig {
-  submitJobDirTemplate: string;
-  scheduler: {
-    name: string;
-    partitions: Partition[];
-  }
-}
+export const Partition = Type.Object({
+  name: Type.String(),
+  memMb: Type.Number(),
+  cores: Type.Number(),
+  gpus: Type.Number(),
+  nodes: Type.Number(),
+  qos: Type.Optional(Type.Array(Type.String())),
+  comment: Type.Optional(Type.String()),
+});
 
-export interface GetClusterInfoSchema {
+export type Partition = Static<typeof Partition>;
 
-  method: "GET";
+export const PublicClusterConfig = Type.Object({
+  submitJobDirTemplate: Type.String(),
+  scheduler: Type.Object({
+    name: Type.String(),
+    partitions: Type.Array(Partition),
+  }),
+});
 
-  query: {
-    cluster: string;
-  }
+export type PublicClusterConfig = Static<typeof PublicClusterConfig>;
+
+export const GetClusterInfoSchema = typeboxRouteSchema({
+  method: "GET",
+
+  query: Type.Object({
+    cluster: Type.String(),
+  }),
 
   responses: {
-    200: {
-      clusterInfo: PublicClusterConfig;
-    }
+    200: Type.Object({
+      clusterInfo: PublicClusterConfig,
+    }),
 
-    403: null;
-  }
-}
+    403: Type.Null(),
+  },
+});
 
 const auth = authenticate(() => true);
 
-export default route<GetClusterInfoSchema>("GetClusterInfoSchema", async (req, res) => {
+export default route(GetClusterInfoSchema, async (req, res) => {
 
   const info = await auth(req, res);
 
