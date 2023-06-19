@@ -24,6 +24,7 @@ import { getAppConfigs } from "src/config/apps";
 import { clusters } from "src/config/clusters";
 import { portalConfig } from "src/config/portal";
 import { splitSbatchArgs } from "src/utils/app";
+import { getIpFromProxyGateway } from "src/utils/proxy";
 import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
 import { parseDisplayId, refreshPassword, refreshPasswordByProxyGateway, VNCSERVER_BIN_PATH } from "src/utils/turbovnc";
 
@@ -365,10 +366,11 @@ export const slurmAppOps = (cluster: string): AppOps => {
 
             const { HOST, PORT, PASSWORD, ...rest } = serverSessionInfo;
             const customFormData = rest as {[key: string]: string};
+            const ip = await getIpFromProxyGateway(cluster, HOST, logger);
             return {
               code: "OK",
               appId: sessionMetadata.appId,
-              host: HOST,
+              host: ip || HOST,
               port: +PORT,
               password: PASSWORD,
               customFormData:  customFormData ?? {},

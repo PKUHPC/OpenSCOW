@@ -25,7 +25,6 @@ import {
 import { getClusterOps } from "src/clusterops";
 import { getAppConfigs } from "src/config/apps";
 import { clusterNotFound } from "src/utils/errors";
-import { getIpFromProxyGateway } from "src/utils/proxy";
 
 export const appServiceServer = plugin((server) => {
 
@@ -86,11 +85,8 @@ export const appServiceServer = plugin((server) => {
         throw new Error(`Unknown app type ${app.type} of app id ${reply.appId}`);
       }
 
-      const ip = app.type === AppType.web ? await getIpFromProxyGateway(cluster, reply.host, logger) : undefined;
-      server.logger.info(`Connecting to app ${reply.appId} on ip ${ip || reply.host}`);
-
       return [{
-        host: ip || reply.host,
+        host: reply.host,
         port: reply.port,
         password: reply.password,
         appProps,
