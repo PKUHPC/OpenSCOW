@@ -1,5 +1,9 @@
 lockfileVersion: '6.0'
 
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
 importers:
 
   .:
@@ -968,18 +972,6 @@ importers:
       ts-proto:
         specifier: 1.147.3
         version: 1.147.3
-
-  libs/scheduler-adapter:
-    dependencies:
-      '@grpc/grpc-js':
-        specifier: 1.8.14
-        version: 1.8.14
-      '@scow/protos':
-        specifier: workspace:*
-        version: link:../protos/scow
-      '@scow/scheduler-adapter-protos':
-        specifier: workspace:*
-        version: link:../protos/scheduler-adapter
 
   libs/server:
     dependencies:

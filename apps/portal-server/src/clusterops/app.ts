@@ -24,11 +24,14 @@ import { join } from "path";
 import { quote } from "shell-quote";
 import { AppOps, AppSession, SubmissionInfo } from "src/clusterops/api/app";
 import { getAppConfigs } from "src/config/apps";
+import { clusters } from "src/config/clusters";
 import { portalConfig } from "src/config/portal";
 import { splitSbatchArgs } from "src/utils/app";
 import { getAdapterClient } from "src/utils/clusters";
+import { getIpFromProxyGateway } from "src/utils/proxy";
 import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
-import { displayIdToPort, parseDisplayId, refreshPassword, VNCSERVER_BIN_PATH } from "src/utils/turbovnc";
+import { displayIdToPort, parseDisplayId,
+  refreshPassword, refreshPasswordByProxyGateway, VNCSERVER_BIN_PATH } from "src/utils/turbovnc";
 
 interface SessionMetadata {
   sessionId: string;
@@ -373,9 +376,10 @@ export const appOps = (cluster: string): AppOps => {
 
             const { HOST, PORT, PASSWORD, ...rest } = serverSessionInfo;
             const customFormData = rest as {[key: string]: string};
+            const ip = await getIpFromProxyGateway(cluster, HOST, logger);
             return {
               appId: sessionMetadata.appId,
-              host: HOST,
+              host: ip || HOST,
               port: +PORT,
               password: PASSWORD,
               customFormData:  customFormData ?? {},
@@ -405,8 +409,26 @@ export const appOps = (cluster: string): AppOps => {
 
               if (displayId) {
                 // the server is run at the compute node
-                // login to the compute node and refresh the password
 
+                // if proxyGateway configured, connect to compute node by proxyGateway and get ip of compute node
+                const proxyGatewayConfig = clusters?.[cluster]?.proxyGateway;
+                if (proxyGatewayConfig) {
+                  const url = new URL(proxyGatewayConfig.url);
+                  return await sshConnect(url.hostname, "root", logger, async (proxyGatewaySsh) => {
+                    logger.info(`Connecting to compute node ${host} via proxy gateway ${url.hostname}`);
+                    const { password, ip } =
+                      await refreshPasswordByProxyGateway(proxyGatewaySsh, host, userId, logger, displayId!);
+                    return {
+                      code: "OK",
+                      appId: sessionMetadata.appId,
+                      host: ip || host,
+                      port: displayIdToPort(displayId!),
+                      password,
+                    };
+                  });
+                }
+
+                // login to the compute node and refresh the password
                 // connect as user so that
                 // the service node doesn't need to be able to connect to compute nodes with public key
                 return await sshConnect(host, userId, logger, async (computeNodeSsh) => {

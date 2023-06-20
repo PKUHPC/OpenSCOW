@@ -1,4 +1,14 @@
-
+/**
+ * Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
+ * SCOW is licensed under Mulan PSL v2.
+ * You can use this software according to the terms and conditions of the Mulan PSL v2.
+ * You may obtain a copy of Mulan PSL v2 at:
+ *          http://license.coscl.org.cn/MulanPSL2
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+ * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+ * See the Mulan PSL v2 for more details.
+ */
 
 // @ts-check
 
@@ -30,20 +40,20 @@ const variables = {
  */
 const replace = (template) => {
   return template.replace(/%([a-zA-Z0-9_]+)%/g, (_, p1) => variables[p1] ?? "");
-}
+};
 
-const visit = require('unist-util-visit');
+const visit = require("unist-util-visit");
 
 const types = [
   { type: "link", property: "url" },
   { type: "code", property: "value" },
   { type: "inlineCode", property: "value" },
-]
+];
 
-const plugin = (options) => {
+const plugin = () => {
   const transformer = async (ast) => {
     visit(ast, types.map((x) => x.type), (node) => {
-      const selected = types.find((x) => x.type === node.type)
+      const selected = types.find((x) => x.type === node.type);
       if (selected) {
         node[selected.property] = replace(node[selected.property]);
       }

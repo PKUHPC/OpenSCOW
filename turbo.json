@@ -5,9 +5,24 @@
       "persistent": true,
       "cache": false
     },
+    "generate": {
+      "dependsOn": [
+        "^generate"
+      ],
+      "inputs": [
+        "node_modules/@scow/grpc-api/**/*.proto",
+        "protos/**/*.proto",
+        "buf.gen.yaml"
+      ],
+      "outputs": [
+        "generated",
+        "src/generated"
+      ]
+    },
     "build": {
       "dependsOn": [
-        "^build"
+        "^build",
+        "generate"
       ],
       "outputs": [
         ".next/**",

@@ -16,7 +16,7 @@
     "test:ci": "pnpm run -r test --ci --coverage --runInBand",
     "prepare": "node -e \"try { require('husky').install() } catch (e) {if (e.code !== 'MODULE_NOT_FOUND' && !e.message.startsWith('.git')) throw e}\"",
     "lint": "turbo run lint lint:ts",
-    "lint:ts": "eslint --cache --ext .tsx,.ts .",
+    "lint:ts": "eslint --cache --ext .tsx,.ts,.js .",
     "ci:version": "node scripts/version.mjs",
     "ci:publish": "pnpm publish -r"
   },

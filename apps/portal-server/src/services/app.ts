@@ -229,7 +229,6 @@ export const appServiceServer = plugin((server) => {
         lastSubmissionInfo: reply.lastSubmissionInfo,
       }];
     },
-
   });
 
 });

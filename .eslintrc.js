@@ -10,17 +10,29 @@
  * See the Mulan PSL v2 for more details.
  */
 
-// In the following statement, replace `./tsconfig` with the path to your `tsconfig` file
-// which contains the path mapping (ie the `compilerOptions.paths` option):
+const path = require("path");
 
-/** @type {import('@jest/types').Config.InitialOptions} */
 module.exports = {
-  rootDir: ".",
-  preset: "ts-jest",
-  testMatch: [
-    "<rootDir>/tests/**/*.test.ts?(x)",
+  "extends": "@ddadaal",
+  "plugins": [
+    "license-header",
   ],
-  coverageDirectory: "coverage",
-  testTimeout: 30000,
-  coverageReporters: ["lcov"],
+  "rules": {
+    "license-header/header": [
+      "error",
+      path.join(__dirname, "license-header"),
+    ],
+  },
+  "overrides": [
+    {
+      "files": ["**/*.js", "apps/**/*.js"],
+      "rules": {
+        "@typescript-eslint/no-var-requires": "off",
+      },
+    },
+    {
+      "files": ["./license-header"],
+      "rules": { "license-header/header": "off" },
+    },
+  ],
 };

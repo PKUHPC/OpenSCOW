@@ -14,6 +14,7 @@ import { executeAsUser, loggedExec } from "@scow/lib-ssh";
 import { NodeSSH } from "node-ssh";
 import { join } from "path";
 import { portalConfig } from "src/config/portal";
+import { parseIp } from "src/utils/proxy";
 import { Logger } from "ts-log";
 
 export const VNCSERVER_BIN_PATH = join(portalConfig.turboVNCPath, "bin", "vncserver");
@@ -91,3 +92,25 @@ export const refreshPassword = async (ssh: NodeSSH, runAsUserId: string | null, 
   return parseOtp(resp.stderr);
 };
 
+/**
+ * Refresh VNC session's OTP and get ip of compute node by proxy gateway
+ * @param proxyGatewaySsh SSH connection to proxy gateway
+ * @param computeNode compute node
+ * @param user the user id to run as.
+ * @param logger logger
+ * @param displayId displayId
+ * @returns new OTP and compute node IP
+ */
+export const refreshPasswordByProxyGateway = async (
+  proxyGatewaySsh: NodeSSH, computeNode: string, user: string, logger: Logger, displayId: number,
+) => {
+  const params = [computeNode, "sudo", "-u", user, "-s", vncPasswdPath, "-o", "-display", ":" + displayId];
+  const [passwordResp, ipResp] =
+    await Promise.all([
+      loggedExec(proxyGatewaySsh, logger, true, "ssh", [...params]),
+      loggedExec(proxyGatewaySsh, logger, true, "ping", ["-c 1", "-W 1", computeNode]),
+    ]);
+  const ip = parseIp(ipResp.stdout);
+  const password = parseOtp(passwordResp.stderr);
+  return { ip, password };
+};

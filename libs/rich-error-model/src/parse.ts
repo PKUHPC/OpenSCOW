@@ -10,17 +10,17 @@
  * See the Mulan PSL v2 for more details.
  */
 
-// In the following statement, replace `./tsconfig` with the path to your `tsconfig` file
-// which contains the path mapping (ie the `compilerOptions.paths` option):
+import { Metadata } from "@grpc/grpc-js";
+import { decodeErrorDetails } from "src/errorDetail";
+import { Status } from "src/generated/status";
 
-/** @type {import('@jest/types').Config.InitialOptions} */
-module.exports = {
-  rootDir: ".",
-  preset: "ts-jest",
-  testMatch: [
-    "<rootDir>/tests/**/*.test.ts?(x)",
-  ],
-  coverageDirectory: "coverage",
-  testTimeout: 30000,
-  coverageReporters: ["lcov"],
+export const parseErrorDetails = (metadata: Metadata) => {
+
+  const data = metadata.get("grpc-status-details-bin");
+
+  const status = data.map((x) => Status.decode(Buffer.from(x)));
+
+  return decodeErrorDetails(status.flatMap((x) => x.details));
 };
+
+
