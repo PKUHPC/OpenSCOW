@@ -35,7 +35,7 @@ COPY --from=pruner /app/out/json/ .
 RUN pnpm i --offline --frozen-lockfile
 
 COPY --from=pruner /app/out/full/ .
-COPY tsconfig.json .eslintrc.json turbo.json ./
+COPY tsconfig.json .eslintrc.js turbo.json ./
 COPY libs/tsconfig.json ./libs/
 COPY protos ./protos
 COPY scripts/ ./scripts
