@@ -110,11 +110,12 @@
 
 #   # 更多nginx配置
 #   # 可接受的格式为nginx的server可接受的属性配置，例如可增加在当前系统nginx默认端口的服务
-#   extra: "location /extra {
+#   extra: >
+#         location /extra {
 #             proxy_pass http://extra-web:3000;
 #             include includes/headers;
 #             include includes/websocket;
-#          }"
+#          }
 
 # 插件配置
 # plugins:
