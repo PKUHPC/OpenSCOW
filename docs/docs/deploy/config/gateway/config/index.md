@@ -24,6 +24,6 @@ gateway:
          }
 ```
 
-您增加`extra`配置后，可以在使用`./cli compose up -d`启动scow后，使用 ` docker exec -it gateway_container_name /bin/sh` 进入gateway服务，在 `/etc/nginx/http.d` 目录下的 `default.conf` 文件最下方查看到您添加的配置。
+您增加`extra`配置后，可以在使用`./cli compose up -d`启动scow后，使用 ` ./cli compose exec gateway sh` 进入gateway服务，在 `/etc/nginx/http.d` 目录下的 `default.conf` 文件最下方查看到您添加的配置。
 如果gateway服务启动失败，说明您的配置不符合规范，请保证其正确性。
 
