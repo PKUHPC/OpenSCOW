@@ -42,7 +42,7 @@ export const InstallConfigSchema = Type.Object({
     }),
 
     extra: Type.String({
-      description: "更多nginx配置，可以增加在当前系统nginx端口（默认80）的服务",
+      description: "更多nginx配置，可接受的格式为nginx的server可接受的属性配置，可增加在当前系统nginx端口（默认80）的服务等",
       default: "",
     }),
   }, { default: {} }),
