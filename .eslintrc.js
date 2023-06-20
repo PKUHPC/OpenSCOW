@@ -30,5 +30,9 @@ module.exports = {
         "@typescript-eslint/no-var-requires": "off",
       },
     },
+    {
+      "files": ["./license-header"],
+      "rules": { "license-header/header": "off" },
+    },
   ],
 };
