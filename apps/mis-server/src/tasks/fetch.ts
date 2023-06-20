@@ -155,43 +155,44 @@ export async function fetchJobs(
 
 
         // add job charge for user account
-        await Promise.all(pricedJobs
-          .map(async (x) => {
-            // add job charge for the user
-            const ua = await em.findOne(UserAccount, {
-              account: { accountName: x.account },
-              user: { userId: x.user },
-            }, {
-              populate: ["user", "account", "account.tenant"],
-            });
+        for (const x of pricedJobs) {
 
-            if (!ua) {
-              logger.warn({ biJobIndex: x.biJobIndex },
-                "User %s in account %s is not found. Don't charge the job.", x.user, x.account);
-            }
+          // add job charge for the user
+          const ua = await em.findOne(UserAccount, {
+            account: { accountName: x.account },
+            user: { userId: x.user },
+          }, {
+            populate: ["user", "account", "account.tenant"],
+          });
 
-            const comment = parsePlaceholder(misConfig.jobChargeComment, x);
+          if (!ua) {
+            logger.warn({ biJobIndex: x.biJobIndex },
+              "User %s in account %s is not found. Don't charge the job.", x.user, x.account);
+          }
 
-            if (ua) {
-              // charge account
-              await charge({
-                amount: x.accountPrice,
-                type: misConfig.jobChargeType,
-                comment,
-                target: ua.account.$,
-              }, em, logger, clusterPlugin);
+          const comment = parsePlaceholder(misConfig.jobChargeComment, x);
 
-              // charge tenant
-              await charge({
-                amount: x.tenantPrice,
-                type: misConfig.jobChargeType,
-                comment,
-                target: ua.account.$.tenant.getEntity(),
-              }, em, logger, clusterPlugin);
+          if (ua) {
+            // charge account
+            await charge({
+              amount: x.accountPrice,
+              type: misConfig.jobChargeType,
+              comment,
+              target: ua.account.$,
+            }, em, logger, clusterPlugin);
 
-              await addJobCharge(ua, x.accountPrice, clusterPlugin, logger);
-            }
-          }));
+            // charge tenant
+            await charge({
+              amount: x.tenantPrice,
+              type: misConfig.jobChargeType,
+              comment,
+              target: ua.account.$.tenant.getEntity(),
+            }, em, logger, clusterPlugin);
+
+            await addJobCharge(ua, x.accountPrice, clusterPlugin, logger);
+          }
+        }
+
       });
 
     };
