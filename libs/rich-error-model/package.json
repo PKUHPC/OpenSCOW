@@ -5,16 +5,16 @@
   "main": "build/index.js",
   "scripts": {
     "generate": "rimraf generated && buf generate --template buf.gen.yaml https://github.com/googleapis/googleapis.git#subdir=google/rpc",
-    "build": "rimraf build && tsc",
+    "build": "rimraf build && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
     "test": "jest"
   },
   "dependencies": {
-    "@grpc/grpc-js": "1.8.14",
+    "@grpc/grpc-js": "1.8.15",
     "long": "5.2.3",
     "protobufjs": "7.2.3"
   },
   "devDependencies": {
-    "ts-proto": "1.147.3",
+    "ts-proto": "1.149.0",
     "@ddadaal/tsgrpc-server": "0.19.2",
     "@ddadaal/tsgrpc-common": "0.2.3",
     "@ddadaal/tsgrpc-client": "0.17.5",

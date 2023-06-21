@@ -122,6 +122,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
       "PROXY_READ_TIMEOUT": config.gateway.proxyReadTimeout,
       "PUBLIC_PATH": publicPath,
       "PUBLIC_DIR": publicDir,
+      "EXTRA": config.gateway.extra,
     },
     ports: { [config.port]: 80 },
     volumes: {
