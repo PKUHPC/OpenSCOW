@@ -808,10 +808,10 @@ importers:
         version: 0.2.3
       '@ddadaal/tsgrpc-server':
         specifier: 0.19.2
-        version: 0.19.2(@grpc/grpc-js@1.8.14)
+        version: 0.19.2(@grpc/grpc-js@1.8.15)
       '@grpc/grpc-js':
-        specifier: 1.8.14
-        version: 1.8.14
+        specifier: 1.8.15
+        version: 1.8.15
       '@scow/lib-config':
         specifier: workspace:*
         version: link:../../libs/libconfig
@@ -948,8 +948,8 @@ importers:
   libs/protos/scheduler-adapter:
     dependencies:
       '@grpc/grpc-js':
-        specifier: 1.8.14
-        version: 1.8.14
+        specifier: 1.8.15
+        version: 1.8.15
       long:
         specifier: 5.2.3
         version: 5.2.3
@@ -1007,8 +1007,8 @@ importers:
   libs/scheduler-adapter:
     dependencies:
       '@grpc/grpc-js':
-        specifier: 1.8.14
-        version: 1.8.14
+        specifier: 1.8.15
+        version: 1.8.15
       '@scow/protos':
         specifier: workspace:*
         version: link:../protos/scow
@@ -3311,17 +3311,6 @@ packages:
     dependencies:
       tslib: 2.5.0
 
-  /@ddadaal/tsgrpc-server@0.19.2(@grpc/grpc-js@1.8.14):
-    resolution: {integrity: sha512-3JlFLqsJScpM9QWfqTN5PXzLaQHfiXVqWOWfVtrlCF6YqttswYl9ZjqmMcBhaXzui+s77zjDIPD6WKpD3BiOPQ==}
-    peerDependencies:
-      '@grpc/grpc-js': '>=1.7.0'
-    dependencies:
-      '@ddadaal/tsgrpc-common': 0.2.3
-      '@grpc/grpc-js': 1.8.14
-      pino: 8.14.1
-      tslib: 2.5.0
-    dev: false
-
   /@ddadaal/tsgrpc-server@0.19.2(@grpc/grpc-js@1.8.15):
     resolution: {integrity: sha512-3JlFLqsJScpM9QWfqTN5PXzLaQHfiXVqWOWfVtrlCF6YqttswYl9ZjqmMcBhaXzui+s77zjDIPD6WKpD3BiOPQ==}
     peerDependencies:
@@ -4226,14 +4215,6 @@ packages:
     dependencies:
       fastify-plugin: 4.5.0
       hashlru: 2.3.0
-    dev: false
-
-  /@grpc/grpc-js@1.8.14:
-    resolution: {integrity: sha512-w84maJ6CKl5aApCMzFll0hxtFNT6or9WwMslobKaqWUEf1K+zhlL43bSQhFreyYWIWR+Z0xnVFC1KtLm4ZpM/A==}
-    engines: {node: ^8.13.0 || >=10.10.0}
-    dependencies:
-      '@grpc/proto-loader': 0.7.3
-      '@types/node': 18.16.18
     dev: false
 
   /@grpc/grpc-js@1.8.15:

@@ -21,7 +21,7 @@
   "dependencies": {
     "@ddadaal/tsgrpc-common": "0.2.3",
     "@ddadaal/tsgrpc-server": "0.19.2",
-    "@grpc/grpc-js": "1.8.14",
+    "@grpc/grpc-js": "1.8.15",
     "@scow/lib-config": "workspace:*",
     "@scow/scheduler-adapter-protos": "workspace:*"
 
