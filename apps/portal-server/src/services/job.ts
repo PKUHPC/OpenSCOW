@@ -17,6 +17,7 @@ import { Status } from "@grpc/grpc-js/build/src/constants";
 import { jobInfoToPortalJobInfo, jobInfoToRunningjob } from "@scow/lib-scheduler-adapter";
 import { sftpExists, sftpMkdir } from "@scow/lib-ssh";
 import { JobServiceServer, JobServiceService } from "@scow/protos/build/portal/job";
+import { parseErrorDetails } from "@scow/rich-error-model";
 import { getClusterOps } from "src/clusterops";
 import { JobTemplate } from "src/clusterops/api/job";
 import { getAdapterClient } from "src/utils/clusters";
@@ -152,12 +153,13 @@ export const jobServiceServer = plugin((server) => {
         memoryMb: Number(memory?.split("M")[0]), coreCount, timeLimitMinutes: maxTime,
         script: command, workingDirectory, stdout: output, stderr: errorOutput, extraOptions: [],
       }).catch((e) => {
-        // TODO: check error format
-        if (e.code === Status.UNKNOWN && e.details.reason === "SBATCH_FAILED") {
+        const ex = e as ServiceError;
+        const errors = parseErrorDetails(ex.metadata);
+        if (errors[0] && errors[0].$type === "google.rpc.ErrorInfo" && errors[0].reason === "SBATCH_FAILED") {
           throw <ServiceError> {
             code: Status.INTERNAL,
             message: "sbatch failed",
-            details: e.details.metadata["reason"],
+            details: e.details,
           };
         } else {
           throw e;

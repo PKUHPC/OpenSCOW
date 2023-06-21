@@ -17,6 +17,7 @@ import { getPlaceholderKeys } from "@scow/lib-config/build/parse";
 import { formatTime } from "@scow/lib-scheduler-adapter";
 import { getUserHomedir,
   sftpChmod, sftpExists, sftpReaddir, sftpReadFile, sftpRealPath, sftpWriteFile } from "@scow/lib-ssh";
+import { parseErrorDetails } from "@scow/rich-error-model";
 import { JobInfo, SubmitJobRequest } from "@scow/scheduler-adapter-protos/build/protos/job";
 import { randomUUID } from "crypto";
 import fs from "fs";
@@ -108,16 +109,17 @@ export const appOps = (cluster: string): AppOps => {
 
           // submit entry.sh
           const client = getAdapterClient(cluster);
-          // TODO: partition
           const reply = await asyncClientCall(client.job, "submitJob", request).catch((e) => {
-            // TODO: check error format
-            if (e.code === Status.UNKNOWN && e.details.reason === "SBATCH_FAILED") {
+            const ex = e as ServiceError;
+            const errors = parseErrorDetails(ex.metadata);
+            if (errors[0] && errors[0].$type === "google.rpc.ErrorInfo" && errors[0].reason === "SBATCH_FAILED") {
               throw <ServiceError> {
                 code: Status.INTERNAL,
                 message: "sbatch failed",
-                details: e.details.metadata["reason"],
+                details: e.details,
               };
-            } else {
+            }
+            else {
               throw e;
             }
           });

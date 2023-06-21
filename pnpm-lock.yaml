@@ -546,6 +546,9 @@ importers:
       '@scow/protos':
         specifier: workspace:*
         version: link:../../libs/protos/scow
+      '@scow/rich-error-model':
+        specifier: workspace:*
+        version: link:../../libs/rich-error-model
       '@scow/scheduler-adapter-protos':
         specifier: workspace:*
         version: link:../../libs/protos/scheduler-adapter
