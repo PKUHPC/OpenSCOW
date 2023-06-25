@@ -75,7 +75,36 @@ server {
       logger.error(e, "Error occurred during setup proxy gateway for cluster %s", id);
     });
   }
-
-
-
 };
+
+export const parseIp = (stdout: string): string => {
+  const ipReg = /(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)/;
+  return stdout.split("\n")[0]?.match(ipReg)?.[0] || "";
+};
+
+export const getIpFromProxyGateway
+  = async (clusterId: string, hostName: string, logger: Logger): Promise<string> => {
+
+    const proxyGatewayConfig = clusters?.[clusterId]?.proxyGateway;
+
+    if (!proxyGatewayConfig) return "";
+    const url = new URL(proxyGatewayConfig.url);
+
+    return await sshConnect(url.hostname, "root", logger, async (ssh) => {
+      const resp = await loggedExec(ssh, logger, false, "ping", ["-c 1", "-W 1", hostName]);
+      if (resp.code !== 0) {
+        logger.error(
+          "Ping %s returned code %d. %s might not be reachable from %s", hostName, resp.code, hostName, url.hostname,
+        );
+        return "";
+      }
+      const ip = parseIp(resp.stdout);
+      return ip;
+    }).catch((e) => {
+      logger.error(
+        e,
+        "Error occurred during get ip of host %s from proxy gateway %s for cluster %s", hostName, url.host, clusterId,
+      );
+      return "";
+    });
+  };

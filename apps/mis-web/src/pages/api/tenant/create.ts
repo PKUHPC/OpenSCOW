@@ -10,50 +10,58 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { route } from "@ddadaal/next-typed-api-routes-runtime";
+import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { status } from "@grpc/grpc-js";
 import { TenantServiceClient } from "@scow/protos/build/server/tenant";
+import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { PlatformRole } from "src/models/User";
 import { getClient } from "src/utils/client";
 import { publicConfig } from "src/utils/config";
 import { getUserIdRule } from "src/utils/createUser";
 import { handlegRPCError } from "src/utils/server";
-export interface CreateTenantSchema {
-  method: "POST";
 
-  body: {
-    tenantName: string;
-    userId: string,
-    userName: string,
-    userEmail: string,
-    userPassword: string,
-  }
+export const CreateTenantSchema = typeboxRouteSchema({
+  method: "POST",
 
-    responses: {
-      200: {
-        createdInAuth: boolean;
-      };
+  body: Type.Object({
+    tenantName: Type.String(),
+    userId: Type.String(),
+    userName: Type.String(),
+    userEmail: Type.String(),
+    userPassword: Type.String(),
+  }),
 
-      400: {
-        code: "PASSWORD_NOT_VALID" | "USERID_NOT_VALID";
-        message: string | undefined;
-      }
+  responses: {
+    200: Type.Object({
+      createdInAuth: Type.Boolean(),
+    }),
+
+    400: Type.Object({
+      code: Type.Union([
+        Type.Literal("PASSWORD_NOT_VALID"),
+        Type.Literal("USERID_NOT_VALID"),
+      ]),
+      message: Type.Union([Type.String(), Type.Undefined()]),
+    }),
 
     /** 租户已经存在 */
-      409: {
-        code: "TENANT_ALREADY_EXISTS" | "USER_ALREADY_EXISTS",
-        message: string;
-      };
+    409: Type.Object({
+      code: Type.Union([
+        Type.Literal("TENANT_ALREADY_EXISTS"),
+        Type.Literal("USER_ALREADY_EXISTS"),
+      ]),
+      message: Type.String(),
+    }),
 
-      500: null;
-  }
-}
+    500: Type.Null(),
+  },
+});
 
 const passwordPattern = publicConfig.PASSWORD_PATTERN && new RegExp(publicConfig.PASSWORD_PATTERN);
 
-export default /* #__PURE__*/route<CreateTenantSchema>("CreateTenantSchema", async (req, res) => {
+export default /* #__PURE__*/typeboxRoute(CreateTenantSchema, async (req, res) => {
 
   const { tenantName, userId, userName, userEmail, userPassword } = req.body;
 
@@ -67,11 +75,11 @@ export default /* #__PURE__*/route<CreateTenantSchema>("CreateTenantSchema", asy
   if (!info) { return; }
 
   if (userIdRule && !userIdRule.pattern.test(userId)) {
-    return { 400: { code: "USERID_NOT_VALID", message: userIdRule.message } };
+    return { 400: { code: "USERID_NOT_VALID" as const, message: userIdRule.message } };
   }
 
   if (passwordPattern && !passwordPattern.test(userPassword)) {
-    return { 400: { code: "PASSWORD_NOT_VALID", message: publicConfig.PASSWORD_PATTERN_MESSAGE } };
+    return { 400: { code: "PASSWORD_NOT_VALID" as const, message: publicConfig.PASSWORD_PATTERN_MESSAGE } };
   }
 
   // create tenant on server

@@ -10,29 +10,30 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { route } from "@ddadaal/next-typed-api-routes-runtime";
+import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { UserServiceClient } from "@scow/protos/build/server/user";
+import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { getClient } from "src/utils/client";
 
-export interface QueryStorageUsageSchema {
-  method: "GET";
+export const QueryStorageUsageSchema = typeboxRouteSchema({
+  method: "GET",
 
-  query: {
-    cluster: string;
-  }
+  query: Type.Object({
+    cluster: Type.String(),
+  }),
 
   responses: {
-    200: {
-      result: number;
-    };
+    200: Type.Object({
+      result: Type.Number(),
+    }),
 
-    404: null;
-  }
-}
+    404: Type.Null(),
+  },
+});
 
-export default route<QueryStorageUsageSchema>("QueryStorageUsageSchema", async (req, res) => {
+export default typeboxRoute(QueryStorageUsageSchema, async (req, res) => {
 
   const auth = authenticate(() => true);
 

@@ -10,39 +10,48 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { route } from "@ddadaal/next-typed-api-routes-runtime";
+import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
-import { GetAllUsersResponse, UserServiceClient } from "@scow/protos/build/server/user";
+import { UserServiceClient } from "@scow/protos/build/server/user";
+import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { PlatformRole } from "src/models/User";
+import { PlatformUserInfo } from "src/models/UserSchemaModel";
 import { getClient } from "src/utils/client";
 
-export interface GetAllUsersSchema {
-    method: "GET";
+// Cannot use GetAllUsersResponse from protos
+export const GetAllUsersResponse = Type.Object({
+  totalCount: Type.Number(),
+  platformUsers: Type.Array(PlatformUserInfo),
+});
+export type GetAllUsersResponse = Static<typeof GetAllUsersResponse>;
 
-    query: {
-      /**
-       * @minimum 1
-       * @type integer
-       */
-      page?: number;
+export const GetAllUsersSchema = typeboxRouteSchema({
+  method: "GET",
 
-      /**
-       * @type integer
-       */
-      pageSize?: number;
+  query: Type.Object({
+    /**
+     * @minimum 1
+     * @type integer
+     */
+    page: Type.Optional(Type.Integer({ minimum: 1 })),
 
-      idOrName?: string;
-    };
+    /**
+     * @type integer
+     */
+    pageSize: Type.Optional(Type.Integer()),
 
-    responses: {
-        200: GetAllUsersResponse;
-    }
-}
+    idOrName: Type.Optional(Type.String()),
+  }),
+
+  responses: {
+    200: GetAllUsersResponse,
+  },
+});
 
 const auth = authenticate((info) => info.platformRoles.includes(PlatformRole.PLATFORM_ADMIN));
 
-export default route<GetAllUsersSchema>("GetAllUsersSchema",
+export default typeboxRoute(GetAllUsersSchema,
   async (req, res) => {
 
     const info = await auth(req, res);

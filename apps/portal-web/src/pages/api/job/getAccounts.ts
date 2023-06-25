@@ -10,30 +10,30 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { JobServiceClient } from "@scow/protos/build/portal/job";
+import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
 
-export interface GetAccountsSchema {
+export const GetAccountsSchema = typeboxRouteSchema({
+  method: "GET",
 
-  method: "GET";
-
-  query: {
-    cluster: string;
-  }
+  query: Type.Object({
+    cluster: Type.String(),
+  }),
 
   responses: {
-    200: {
-      accounts: string[];
-    }
-  }
-}
-
+    200: Type.Object({
+      accounts: Type.Array(Type.String()),
+    }),
+  },
+});
 const auth = authenticate(() => true);
 
-export default route<GetAccountsSchema>("GetAccountsSchema", async (req, res) => {
+export default route(GetAccountsSchema, async (req, res) => {
 
 
   const info = await auth(req, res);

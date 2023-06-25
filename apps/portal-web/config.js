@@ -11,7 +11,6 @@
  */
 
 // @ts-check
-/* eslint-disable @typescript-eslint/no-var-requires */
 
 const { envConfig, str, bool, parseKeyValue } = require("@scow/lib-config");
 const { join } = require("path");
@@ -81,7 +80,6 @@ const buildRuntimeConfig = async (phase, basePath) => {
 
   const building = phase === PHASE_PRODUCTION_BUILD;
   const dev = phase === PHASE_DEVELOPMENT_SERVER;
-  const production = phase === PHASE_PRODUCTION_SERVER;
   const testenv = phase === PHASE_TEST;
 
   // load .env.build if in build
@@ -159,6 +157,8 @@ const buildRuntimeConfig = async (phase, basePath) => {
     CLIENT_MAX_BODY_SIZE: config.CLIENT_MAX_BODY_SIZE,
 
     PUBLIC_PATH: config.PUBLIC_PATH,
+
+    NAV_LINKS: portalConfig.navLinks,
 
     VERSION_TAG: versionTag,
   };

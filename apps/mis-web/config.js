@@ -10,9 +10,6 @@
  * See the Mulan PSL v2 for more details.
  */
 
-// @ts-check
-/* eslint-disable @typescript-eslint/no-var-requires */
-
 const { envConfig, str, bool } = require("@scow/lib-config");
 const { getClusterConfigs } = require("@scow/config/build/cluster");
 const { getMisConfig } = require("@scow/config/build/mis");
@@ -67,7 +64,7 @@ const buildRuntimeConfig = async (phase, basePath) => {
 
   const building = phase === PHASE_PRODUCTION_BUILD;
   const dev = phase === PHASE_DEVELOPMENT_SERVER;
-  const production = phase === PHASE_PRODUCTION_SERVER;
+  // const production = phase === PHASE_PRODUCTION_SERVER;
 
   if (building) {
     return { serverRuntimeConfig: {}, publicRuntimeConfig: {} };
@@ -134,6 +131,8 @@ const buildRuntimeConfig = async (phase, basePath) => {
     PASSWORD_PATTERN_MESSAGE: commonConfig.passwordPattern?.errorMessage,
 
     BASE_PATH: basePath,
+
+    NAV_LINKS: misConfig.navLinks,
 
     VERSION_TAG: versionTag,
   };

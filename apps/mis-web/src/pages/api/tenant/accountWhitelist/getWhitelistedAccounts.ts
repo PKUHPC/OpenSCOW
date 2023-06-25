@@ -10,26 +10,28 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { route } from "@ddadaal/next-typed-api-routes-runtime";
+import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
-import { AccountServiceClient, WhitelistedAccount } from "@scow/protos/build/server/account";
+import { AccountServiceClient } from "@scow/protos/build/server/account";
+import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { TenantRole } from "src/models/User";
+import { WhitelistedAccount } from "src/models/UserSchemaModel";
 import { getClient } from "src/utils/client";
 
-export interface GetWhitelistedAccountsSchema {
-  method: "GET";
+export const GetWhitelistedAccountsSchema = typeboxRouteSchema({
+  method: "GET",
 
-  responses: {
-    200: {
-      results: WhitelistedAccount[];
-    }
-  }
-}
+  responses:{
+    200: Type.Object({
+      results: Type.Array(WhitelistedAccount),
+    }),
+  },
+});
 
 const auth = authenticate((info) => info.tenantRoles.includes(TenantRole.TENANT_ADMIN));
 
-export default route<GetWhitelistedAccountsSchema>("GetWhitelistedAccountsSchema",
+export default typeboxRoute(GetWhitelistedAccountsSchema,
   async (req, res) => {
 
     const info = await auth(req, res);

@@ -99,9 +99,6 @@ export const appServiceServer = plugin((server) => {
       const { account, appId, cluster, coreCount, nodeCount, gpuCount, memory, maxTime, proxyBasePath,
         partition, qos, userId, customAttributes } = request;
 
-
-
-
       const app = apps[appId];
       if (!app) {
         throw <ServiceError> { code: Status.NOT_FOUND, message: `app id ${appId} is not found` };
@@ -251,7 +248,6 @@ export const appServiceServer = plugin((server) => {
         lastSubmissionInfo: reply.lastSubmissionInfo,
       }];
     },
-
   });
 
 });

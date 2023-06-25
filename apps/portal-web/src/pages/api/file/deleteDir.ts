@@ -10,31 +10,33 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { status } from "@grpc/grpc-js";
 import { FileServiceClient } from "@scow/protos/build/portal/file";
+import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
 import { handlegRPCError } from "src/utils/server";
 
-export interface DeleteDirSchema {
-  method: "DELETE";
+export const DeleteDirSchema = typeboxRouteSchema({
+  method: "DELETE",
 
-  query: {
-    cluster: string;
-    path: string;
-  }
+  query: Type.Object({
+    cluster: Type.String(),
+    path: Type.String(),
+  }),
 
   responses: {
-    204: null;
-    400: { code: "INVALID_CLUSTER" };
-  }
-}
+    204: Type.Null(),
+    400: Type.Object({ code: Type.Literal("INVALID_CLUSTER") }),
+  },
+});
 
 const auth = authenticate(() => true);
 
-export default route<DeleteDirSchema>("DeleteDirSchema", async (req, res) => {
+export default route(DeleteDirSchema, async (req, res) => {
 
 
 

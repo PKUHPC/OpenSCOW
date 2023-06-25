@@ -10,8 +10,10 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncReplyStreamCall, asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { FileServiceClient } from "@scow/protos/build/portal/file";
+import { Type } from "@sinclair/typebox";
 import { contentType } from "mime-types";
 import { basename } from "path";
 import { authenticate } from "src/auth/server";
@@ -19,28 +21,28 @@ import { getClient } from "src/utils/client";
 import { pipeline } from "src/utils/pipeline";
 import { route } from "src/utils/route";
 
-export interface DownloadFileSchema {
-  method: "GET";
+export const DownloadFileSchema = typeboxRouteSchema({
+  method: "GET",
 
-  query: {
-    cluster: string;
-    path: string;
+  query: Type.Object({
+    cluster: Type.String(),
+    path: Type.String(),
     /**
      * 文件应该被下载
      * 如果为false，则设置Content-Disposition为inline，且body返回文件内容。
      * 否则为attachment; filename=\"\"",
      */
-    download?: boolean;
-  }
+    download: Type.Optional(Type.Boolean()),
+  }),
 
-  responses: {
-    200: any;
+  responses:{
+    200: Type.Any(),
 
-    400: { code: "INVALID_CLUSTER" }
+    400: Type.Object({ code: Type.Literal("INVALID_CLUSTER") }),
 
-    404: { code: "NOT_EXISTS" }
-  }
-}
+    404: Type.Object({ code: Type.Literal("NOT_EXISTS") }),
+  },
+});
 
 // if the contentType is one of these, they can be previewed
 // return as text/plain
@@ -62,7 +64,7 @@ function getContentType(filename: string, defaultValue: string) {
 
 const auth = authenticate(() => true);
 
-export default route<DownloadFileSchema>("DownloadFileSchema", async (req, res) => {
+export default route(DownloadFileSchema, async (req, res) => {
   const info = await auth(req, res);
 
   if (!info) { return; }

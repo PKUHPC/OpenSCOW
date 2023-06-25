@@ -1,0 +1,15 @@
+version: v1
+plugins:
+  - name: ts-proto
+    path: node_modules/ts-proto/protoc-gen-ts_proto
+    strategy: all
+
+    out: src/generated
+    opt:
+      - unrecognizedEnum=false
+      - useDate=string
+      - oneof=unions
+      - esModuleInterop=true
+      - useOptionals=messages
+      - outputServices=grpc-js
+      - outputTypeRegistry=true

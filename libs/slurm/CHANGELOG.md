@@ -1,5 +1,11 @@
 # @scow/lib-slurm
 
+## 0.1.5
+
+### Patch Changes
+
+- @scow/protos@0.2.3
+
 ## 0.1.4
 
 ### Patch Changes

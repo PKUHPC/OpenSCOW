@@ -5,9 +5,24 @@
       "persistent": true,
       "cache": false
     },
+    "generate": {
+      "dependsOn": [
+        "^generate"
+      ],
+      "inputs": [
+        "node_modules/@scow/grpc-api/**/*.proto",
+        "protos/**/*.proto",
+        "buf.gen.yaml"
+      ],
+      "outputs": [
+        "generated",
+        "src/generated"
+      ]
+    },
     "build": {
       "dependsOn": [
-        "^build"
+        "^build",
+        "generate"
       ],
       "outputs": [
         ".next/**",
@@ -19,7 +34,6 @@
         "^@scow/protos#build"
       ],
       "outputs": [
-        "api-routes-schemas.json",
         "src/generated"
       ],
       "inputs": [
@@ -33,26 +47,6 @@
         "src/**/*.ts",
         "test/**/*.ts",
         "test/**/*.tsx"
-      ]
-    },
-    "@scow/protos#generate": {
-      "inputs": [
-        "node_modules/@scow/grpc-api/**/*.proto",
-        "buf.gen.yaml"
-      ],
-      "outputs": [
-        "generated/**"
-      ]
-    },
-    "@scow/protos#build": {
-      "dependsOn": [
-        "^@scow/protos#generate"
-      ],
-      "inputs": [
-        "generated/**"
-      ],
-      "outputs": [
-        "build/**"
       ]
     },
     "//#lint:ts": {

@@ -1,5 +1,18 @@
 # @scow/docs
 
+## 0.5.0
+
+### Minor Changes
+
+- 548bce714: 支持 CLI 插件
+
+### Patch Changes
+
+- 0d9e3c051: 添加以下交互式应用示例配置：baltamatica、emacs、igv、jupyterlab、octave、rstudio、xfce
+- 0f64e5404: 获取桌面和应用列表时，不再解析节点域名到 IP
+- 4bfd80986: 认证系统增加管理用户账户关系相关 API
+- 81895f4be: mis.yaml 和 portal.yaml 中支持增加导航链接
+
 ## 0.4.0
 
 ### Minor Changes

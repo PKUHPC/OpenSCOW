@@ -10,36 +10,40 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { route } from "@ddadaal/next-typed-api-routes-runtime";
+import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { InitServiceClient } from "@scow/protos/build/server/init";
+import { Type } from "@sinclair/typebox";
 import { getClient } from "src/utils/client";
 import { getUserIdRule } from "src/utils/createUser";
 import { queryIfInitialized } from "src/utils/init";
 import { handlegRPCError } from "src/utils/server";
 
-export interface CreateInitAdminSchema {
-  method: "POST";
+export const CreateInitAdminSchema = typeboxRouteSchema({
+  method: "POST",
 
-  body: {
-    identityId: string;
-    name: string;
-    email: string;
-    password: string;
-  };
+  body: Type.Object({
+    identityId: Type.String(),
+    name: Type.String(),
+    email: Type.String(),
+    password: Type.String(),
+  }),
 
   responses: {
-    200: {
-      createdInAuth: boolean;
-    };
-    400: { code: "USER_ID_NOT_VALID" };
+    200: Type.Object({
+      createdInAuth: Type.Boolean(),
+    }),
+    400: Type.Object({ code: Type.Literal("USER_ID_NOT_VALID") }),
 
-    409: { code: "ALREADY_INITIALIZED" | "ALREADY_EXISTS_IN_SCOW" };
-  }
-}
+    409: Type.Object({ code: Type.Union([
+      Type.Literal("ALREADY_INITIALIZED"),
+      Type.Literal("ALREADY_EXISTS_IN_SCOW"),
+    ]) }),
+  },
+});
 
-export default route<CreateInitAdminSchema>("CreateInitAdminSchema", async (req) => {
+export default typeboxRoute(CreateInitAdminSchema, async (req) => {
   const result = await queryIfInitialized();
 
   if (result) { return { 409: { code: "ALREADY_INITIALIZED" as const } }; }
@@ -50,7 +54,7 @@ export default route<CreateInitAdminSchema>("CreateInitAdminSchema", async (req)
 
   if (userIdRule && !userIdRule.pattern.test(identityId)) {
     return { 400: {
-      code: "USER_ID_NOT_VALID",
+      code: "USER_ID_NOT_VALID" as const,
       message: userIdRule.message,
     } };
   }

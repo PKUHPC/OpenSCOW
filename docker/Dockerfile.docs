@@ -9,7 +9,7 @@
 # See the Mulan PSL v2 for more details.
 
 
-FROM node:hydrogen-alpine@sha256:f41850f74ff16a33daff988e2ea06ef8f5daeb6fb84913c7df09552a98caba09 AS base
+FROM node:hydrogen-alpine@sha256:9036ddb8252ba7089c2c83eb2b0dcaf74ff1069e8ddf86fe2bd6dc5fecc9492d AS base
 
 RUN apk update && apk add libc6-compat python3 make gcc g++ git
 
@@ -34,13 +34,13 @@ COPY --from=pruner /app/out/json/ .
 RUN pnpm i --offline --frozen-lockfile
 
 COPY --from=pruner /app/out/full/ .
-COPY tsconfig.json .eslintrc.json turbo.json ./
+COPY tsconfig.json .eslintrc.js turbo.json ./
 COPY libs/tsconfig.json ./libs/
 COPY protos ./protos
 
 RUN pnpm build
 
-FROM nginx:alpine@sha256:2e776a66a3556f001aba13431b26e448fe8acba277bf93d2ab1a785571a46d90 as runner
+FROM nginx:alpine@sha256:2d194184b067db3598771b4cf326cfe6ad5051937ba1132b8b7d4b0184e0d0a6 as runner
 
 COPY docs/nginx.conf /etc/nginx/templates/default.conf.template
 COPY --from=builder --chown=nginx:nginx /app/docs/build /etc/nginx/html/
