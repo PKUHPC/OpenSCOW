@@ -20,7 +20,7 @@ import path, { join } from "path";
 import { rootKeyPair } from "src/config/env";
 import { SFTPWrapper } from "ssh2";
 
-const target = "localhost:22222";
+export const target = "localhost:22222";
 export const userId = "test";
 export const cluster = "hpc01";
 
