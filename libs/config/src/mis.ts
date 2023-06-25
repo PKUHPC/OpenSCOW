@@ -79,10 +79,10 @@ export const MisConfigSchema = Type.Object({
 
   fetchJobs: Type.Object({
     startDate: Type.Optional(Type.String({ description: "从哪个时间点开始获取结束作业信息(ISO 8601)", format: "date-time" })),
-    // timeSliceMinutes: Type.Integer({
-    //   description: "为了防止一次性获取太多数据占用过多内存，将会把一个时间段的时间拆分成多个时间片，连续多次获取。单位分钟",
-    //   default: 10,
-    // }),
+    batchSize: Type.Integer({
+      description: "为了防止一次性获取太多数据占用过多内存，将会限制一次获取的作业数量",
+      default: 1000,
+    }),
 
     periodicFetch: Type.Object({
       enabled: Type.Boolean({ description:"是否默认打开", default: true }),
