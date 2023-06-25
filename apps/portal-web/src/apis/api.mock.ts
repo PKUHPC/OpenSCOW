@@ -182,8 +182,10 @@ export const mockApi: MockApi<typeof api> = {
   launchDesktop: async () => ({ host: "login01", password: "123", port: 1234 }),
 
   listDesktops: async () => ({
-    host: "login01",
-    displayId: [1, 2, 3],
+    userDesktops: [{
+      host: "login01",
+      displayId: [1, 2, 3],
+    }],
   }),
 
   createDesktop: async () => (

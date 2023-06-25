@@ -30,7 +30,7 @@ import { join } from "path";
 import { User } from "src/stores/UserStore";
 import { Cluster, publicConfig } from "src/utils/config";
 export const userRoutes: (
-  user: User | undefined, defaultCluster: Cluster, apps: App[], LoginNodes: string[]
+  user: User | undefined, defaultCluster: Cluster, apps: App[], LoginNodes: Record<string, string[]>
 ) => NavItemProps[] = (user, defaultCluster, apps, loginNodes) => {
 
   if (!user) { return []; }
