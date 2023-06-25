@@ -19,6 +19,7 @@ import { rootKeyPair } from "src/config/env";
 import { scowErrorMetadata } from "src/utils/error";
 import { Logger } from "ts-log";
 
+import { clusterNotFound, loginNodeNotFound } from "./errors";
 
 export function getClusterLoginNode(cluster: string): string | undefined {
 
@@ -70,4 +71,17 @@ export async function checkClustersRootUserLogin(logger: Logger) {
       logger.info("Root can login to %s by login node %s", displayName, node);
     }
   }));
+}
+
+/**
+ * Check whether login node is in current cluster
+ */
+export async function checkLoginNodeInCluster(cluster: string, loginNode: string) {
+  const loginNodes = clusters[cluster]?.slurm?.loginNodes;
+  if (!loginNodes) {
+    throw clusterNotFound(cluster);
+  }
+  if (!loginNodes.includes(loginNode)) {
+    throw loginNodeNotFound(loginNode);
+  }
 }

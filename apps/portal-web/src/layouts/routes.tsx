@@ -29,10 +29,9 @@ import { App } from "@scow/protos/build/portal/app";
 import { join } from "path";
 import { User } from "src/stores/UserStore";
 import { Cluster, publicConfig } from "src/utils/config";
-
 export const userRoutes: (
-  user: User | undefined, defaultCluster: Cluster, apps: App[],
-) => NavItemProps[] = (user, defaultCluster, apps) => {
+  user: User | undefined, defaultCluster: Cluster, apps: App[], LoginNodes: string[]
+) => NavItemProps[] = (user, defaultCluster, apps, loginNodes) => {
 
   if (!user) { return []; }
 
@@ -82,6 +81,12 @@ export const userRoutes: (
         Icon: CloudServerOutlined,
         text: name,
         path: `/shell/${id}`,
+        children: loginNodes[id]?.map((loginNode) => ({
+          openInNewPage: true,
+          Icon: CloudServerOutlined,
+          text: loginNode,
+          path: `/shell/${id}/${loginNode}`,
+        })),
       } as NavItemProps)),
     } as NavItemProps] : []),
     ...(publicConfig.ENABLE_LOGIN_DESKTOP ? [{

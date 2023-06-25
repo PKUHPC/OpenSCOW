@@ -24,6 +24,7 @@ import { WebSocketServer } from "ws";
 
 export type ShellQuery = {
   cluster: string;
+  loginNode: string;
   path?: string;
 
   cols?: string;
@@ -64,9 +65,15 @@ wss.on("connection", async (ws, req) => {
   const query = new URLSearchParams(parse(req.url!).query!);
 
   const cluster = query.get("cluster");
+  const loginNode = query.get("loginNode");
 
   if (!cluster || !runtimeConfig.CLUSTERS_CONFIG[cluster]) {
     throw new Error(`Unknown cluster ${cluster}`);
+  }
+
+  // unknown login node
+  if (!loginNode || !runtimeConfig.CLUSTERS_CONFIG[cluster].slurm.loginNodes.includes(loginNode)) {
+    throw new Error(`Unknown login node ${loginNode}`);
   }
 
   const path = query.get("path") ?? undefined;
@@ -78,7 +85,7 @@ wss.on("connection", async (ws, req) => {
   const stream = asyncDuplexStreamCall(client, "shell");
 
   await stream.writeAsync({ message: { $case: "connect", connect: {
-    cluster, userId: user.identityId,
+    cluster, loginNode, userId: user.identityId,
     cols: queryToIntOrDefault(cols, 80),
     rows: queryToIntOrDefault(rows, 30),
     path,

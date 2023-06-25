@@ -22,15 +22,17 @@ export interface Props {
   onClose: () => void;
   reload: () => void;
   cluster: Cluster;
+  loginNodes: string[];
 }
 
 interface FormInfo {
+  loginNode: string;
   wm: string;
 }
 
 const promiseFn = async () => api.listAvailableWms({ query: {} });
 
-export const NewDesktopTableModal: React.FC<Props> = ({ open, onClose, reload, cluster }) => {
+export const NewDesktopTableModal: React.FC<Props> = ({ open, onClose, reload, cluster, loginNodes }) => {
 
   const [form] = Form.useForm<FormInfo>();
 
@@ -39,6 +41,7 @@ export const NewDesktopTableModal: React.FC<Props> = ({ open, onClose, reload, c
     onResolve({ wms }) {
       if (wms.length > 0) {
         form.setFieldValue("wm", wms[0].wm);
+        form.setFieldValue("loginNode", loginNodes[0]);
       }
     },
   });
@@ -54,7 +57,7 @@ export const NewDesktopTableModal: React.FC<Props> = ({ open, onClose, reload, c
     setSubmitting(true);
 
     // Create new desktop
-    await api.createDesktop({ body: { cluster: cluster.id, wm: values.wm } })
+    await api.createDesktop({ body: { cluster: cluster.id, loginNode: values.loginNode, wm: values.wm } })
       .httpError(409, (e) => {
         const { code } = e;
         if (code === "TOO_MANY_DESKTOPS") {
@@ -82,7 +85,20 @@ export const NewDesktopTableModal: React.FC<Props> = ({ open, onClose, reload, c
       confirmLoading={submitting}
       onCancel={onClose}
     >
-      <Form form={form} onFinish={onOk}>
+      <Form
+        form={form}
+        onFinish={onOk}
+        wrapperCol={{ span: 20 }}
+        labelCol={{ span: 4 }}
+      >
+        <Form.Item label="登录节点" name="loginNode" required>
+          <Select
+            options={loginNodes.map((loginNode) => ({
+              label: loginNode, value: loginNode,
+            }))}
+          >
+          </Select>
+        </Form.Item>
         <Form.Item label="桌面" name="wm" required>
           <Select
             loading={isLoading}
