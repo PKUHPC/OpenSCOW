@@ -109,7 +109,7 @@ export const Shell: React.FC<Props> = ({ user, cluster, path }) => {
 
             if (result.includes(OPEN_EXPLORER_PREFIX)) {
               window.open(join(publicConfig.BASE_PATH, "/files", cluster, path));
-            } else {
+            } else if (result.includes(DOWNLOAD_FILE_PREFIX)) {
               const fileStartIndex = result.search(DOWNLOAD_FILE_PREFIX);
               const fileEndIndex = result.search(DOWNLOAD_FILE_SUFFIX);
               const file = result.substring(fileStartIndex + DOWNLOAD_FILE_PREFIX.length, fileEndIndex);
