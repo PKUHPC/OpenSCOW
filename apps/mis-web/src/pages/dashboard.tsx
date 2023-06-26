@@ -15,6 +15,8 @@ import { AccountStatus } from "@scow/protos/build/server/user";
 import { Divider } from "antd";
 import { GetServerSideProps, NextPage } from "next";
 import { useRouter } from "next/router";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { parseCookies } from "nookies";
 import { useEffect } from "react";
 import { useStore } from "simstate";
 import { MOCK_USER_STATUS } from "src/apis/api.mock";
@@ -107,10 +109,14 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ req }) => 
     return prev;
   }, {} as Record<string, AccountInfo>);
 
+  const cookies = parseCookies({ req });
+  const locale = cookies.language || "zh_cn";
+
   return {
     props: {
       accounts,
       storageQuotas: status.storageQuotas,
+      ...(await serverSideTranslations(locale ?? "zh_cn")),
     },
   };
 };

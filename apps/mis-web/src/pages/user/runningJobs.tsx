@@ -10,18 +10,26 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { NextPage } from "next";
+import { GetServerSideProps, NextPage } from "next";
+import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { parseCookies } from "nookies";
 import { requireAuth } from "src/auth/requireAuth";
+import { SSRProps } from "src/auth/server";
 import { PageTitle } from "src/components/PageTitle";
 import { RunningJobQueryTable } from "src/pageComponents/job/RunningJobTable";
 import { Head } from "src/utils/head";
 
+type Props = SSRProps<{}>;
+
 export const RunningJobsPage: NextPage = requireAuth((u) => u.accountAffiliations.length > 0)(
   ({ userStore }) => {
+
+    const { t } = useTranslation("translations");
     return (
       <div>
-        <Head title="未结束的作业" />
-        <PageTitle titleText={"本用户未结束的作业"} />
+        <Head title={t("running-job.title")} />
+        <PageTitle titleText={t("running-job.title")} />
         <RunningJobQueryTable
           userId={userStore.user.identityId}
           accountNames={userStore.user.accountAffiliations.map((x) => x.accountName)}
@@ -33,5 +41,15 @@ export const RunningJobsPage: NextPage = requireAuth((u) => u.accountAffiliation
     );
 
   });
+
+export const getServerSideProps: GetServerSideProps<Props> = async ({ req }) => {
+  const cookies = parseCookies({ req });
+  const locale = cookies.language || "zh_cn";
+  return {
+    props: {
+      ...(await serverSideTranslations(locale ?? "zh_cn")),
+    },
+  };
+};
 
 export default RunningJobsPage;

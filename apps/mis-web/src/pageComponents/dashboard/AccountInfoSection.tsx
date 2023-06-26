@@ -13,6 +13,10 @@
 import { LockOutlined, UnlockOutlined } from "@ant-design/icons";
 import { moneyToNumber } from "@scow/lib-decimal";
 import { Alert, Col, Row, Statistic, StatisticProps } from "antd";
+import { useTranslation } from "next-i18next";
+import nextI18nextConfig from "next-i18next.config";
+// import { tsTranslations as enTranslations } from "public/locales/en/tsTranslations";
+// import { tsTranslations as cnTranslations } from "public/locales/zh_cn/tsTranslations";
 import React from "react";
 import { Section } from "src/components/Section";
 import { StatCard } from "src/components/StatCard";
@@ -20,11 +24,12 @@ import { UserStatus } from "src/models/User";
 import type { AccountInfo } from "src/pages/dashboard";
 import styled from "styled-components";
 
-const statusTexts = {
-  blocked: ["封锁", "red", LockOutlined],
-  normal: ["正常", "green", UnlockOutlined],
 
-} as const;
+// const statusTexts = {
+//   blocked: ["封锁", "red", LockOutlined],
+//   normal: ["正常", "green", UnlockOutlined],
+
+// } as const;
 
 interface Props {
   info: Record<string, AccountInfo>;
@@ -52,11 +57,29 @@ export const AccountInfoSection: React.FC<Props> = ({ info }) => {
 
   const accounts = Object.entries(info);
 
+
+  const { t, i18n } = useTranslation("translations");
+
+  const statusTexts = {
+    blocked: [t("dashboard.account.status.blocked"), "red", LockOutlined],
+    normal: [t("dashboard.account.status.normal"), "green", UnlockOutlined],
+
+  } as const;
+
+  console.log("【useTranslation】", t);
+  console.log("language", i18n.language);
+  console.log("config", nextI18nextConfig);
+  // debugger;
+  console.log("翻译文本", t("dashboard.account.status.normal"));
+
+
   return (
-    <Section title="账户信息">
+    // <Section title="账户信息">
+    <Section title={t("dashboard.account.title")}>
       {
         accounts.length === 0 ? (
-          <Alert message="您不属于任何一个账户。" type="warning" showIcon />
+          // <Alert message="您不属于任何一个账户。" type="warning" showIcon />
+          <Alert message={t("dashboard.account.alert")} type="warning" showIcon />
         ) : (
           <Container>
             {
@@ -80,13 +103,15 @@ export const AccountInfoSection: React.FC<Props> = ({ info }) => {
                     <StatCard title={`${accountName}`}>
                       <Row style={{ flex: 1, width: "100%" }}>
                         <Info
-                          title="状态"
+                          // title="状态"
+                          title={t("dashboard.account.state")}
                           valueStyle={{ color: textColor }}
                           prefix={<Icon />}
                           value={text}
                         />
                         <Info
-                          title={"可用余额"}
+                          // title={"可用余额"}
+                          title={t("dashboard.account.balance")}
                           valueStyle={{ color: minOne < 0 ? "red" : undefined }}
                           prefix={"￥"}
                           value={minOne.toFixed(3)}
@@ -105,3 +130,4 @@ export const AccountInfoSection: React.FC<Props> = ({ info }) => {
   );
 
 };
+

@@ -1,0 +1,68 @@
+{
+  "dashboard": {
+    "account": {
+      "title": "账户信息",
+      "state": "状态",
+      "balance": "可用余额",
+      "status": {
+        "blocked": "封锁",
+        "normal": "正常"
+      },
+      "alert": "您不属于任何一个账户。"
+    },
+
+    "job": {
+      "title": "未结束作业列表",
+      "extra": "查看所有未结束作业",
+      "job-table": {
+        "cluster": "集群",
+        "jobId": "作业ID",
+        "account": "账户",
+        "name": "作业名",
+        "partition": "分区",
+        "qos": "QOS",
+        "nodes": "节点数",
+        "cores": "核心数",
+        "state": "状态",
+        "time": "运行/排队时间",
+        "reason": "说明",
+        "limit": "作业时间限制",
+        "others": "更多"
+      },
+      "none": "暂无数据"
+    }
+  },
+
+  "footer": "Powered by SCOW",
+
+  "running-job": {
+    "title": "本用户未结束的作业",
+    "search": {
+      "batch": "批量搜索",
+      "precision": "精确搜索",
+      "cluster": "集群",
+      "account": "账户",
+      "button": {
+        "search": "搜索",
+        "refresh": "刷新",
+        "changeLimit": "延长所选作业时间限制"
+      }
+    },
+    "job-table": {
+      "cluster": "集群",
+      "jobId": "作业",
+      "account": "账户",
+      "name": "作业名",
+      "partition": "分区",
+      "qos": "QOS",
+      "nodes": "节点数",
+      "cores": "核心数",
+      "state": "状态",
+      "time": "运行/排队时间",
+      "reason": "说明",
+      "limit": "作业时间限制",
+      "others": "更多"
+    }
+  }
+}
+

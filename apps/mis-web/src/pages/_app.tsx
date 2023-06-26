@@ -25,6 +25,7 @@ import type { AppContext, AppProps } from "next/app";
 import App from "next/app";
 import dynamic from "next/dynamic";
 import Head from "next/head";
+import { appWithTranslation } from "next-i18next";
 import { join } from "path";
 import { useEffect, useRef } from "react";
 import { createStore, StoreProvider, useStore } from "simstate";
@@ -38,6 +39,8 @@ import {
   User, UserStore,
 } from "src/stores/UserStore";
 import { publicConfig, runtimeConfig } from "src/utils/config";
+
+import nextI18nextConfig from "../../next-i18next.config.js";
 
 
 const FailEventHandler: React.FC = () => {
@@ -88,6 +91,7 @@ interface ExtraProps {
 
 type Props = AppProps & { extra: ExtraProps };
 
+// function MyApp({ Component, pageProps, extra }: Props & WithTranslation) {
 function MyApp({ Component, pageProps, extra }: Props) {
 
   // remembers extra props from first load
@@ -189,4 +193,4 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
   return { ...appProps, extra } as Props;
 };
 
-export default MyApp;
+export default appWithTranslation(MyApp, nextI18nextConfig);

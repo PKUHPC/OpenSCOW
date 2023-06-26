@@ -22,6 +22,9 @@ export default class MyDocument extends Document {
 
     const antdCache = createCache();
 
+
+    // current loacele
+
     try {
       ctx.renderPage = () =>
         originalRenderPage({
