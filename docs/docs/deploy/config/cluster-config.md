@@ -13,48 +13,12 @@ title: 集群配置文件
 # 集群显示名称
 displayName: hpc01Name
 
-# 指定slurm配置
-slurm:
-  # 各个登录节点的IP或者域名
-  # 如果设置的是域名，请确认此节点的/etc/hosts中包含了域名到IP的解析信息
-  loginNodes:
-    - login01
-    - login02
+# 调度器适配器地址(ip地址:端口号)
+adapterUrl: localhost:8972
 
-  # 集群的分区信息，结构为一个列表
-  partitions:
-    # 分区1的名字, 不能包含空格
-    - name: compute
-      # 分区内节点数
-      nodes: 28
-      # 单节点内存数量，单位M
-      mem: 7500
-      # 核心数
-      cores: 2
-      # GPU卡数
-      gpus: 0
-      # QOS
-      qos:
-        - low
-        - normal
-        - high
-      # 这个分区的备注信息
-      comment: ""
-
-    - name: GPU
-      nodes: 1
-      mem: 262144
-      cores: 48
-      gpus: 8
-      qos:
-        - low
-        - normal
-        - high
-      comment: ""
+# 各个登录节点的IP或者域名
+# 如果设置的是域名，请确认此节点的/etc/hosts中包含了域名到IP的解析信息
+loginNodes:
+  - login01
+  - login02
 ```
-
-:::caution
-
-集群的分区名，即`slurm.partitions[].name`不能包含空格，否则系统将启动失败
-
-:::
