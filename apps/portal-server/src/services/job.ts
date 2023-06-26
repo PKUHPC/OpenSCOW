@@ -15,7 +15,7 @@ import { ServiceError } from "@ddadaal/tsgrpc-common";
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { jobInfoToPortalJobInfo, jobInfoToRunningjob } from "@scow/lib-scheduler-adapter";
-import { sftpExists, sftpMkdir } from "@scow/lib-ssh";
+import { createDirectoriesRecursively } from "@scow/lib-ssh";
 import { JobServiceServer, JobServiceService } from "@scow/protos/build/portal/job";
 import { parseErrorDetails } from "@scow/rich-error-model";
 import { getClusterOps } from "src/clusterops";
@@ -140,12 +140,8 @@ export const jobServiceServer = plugin((server) => {
       const host = getClusterLoginNode(cluster);
       if (!host) { throw clusterNotFound(cluster); }
       await sshConnect(host, userId, logger, async (ssh) => {
-
         const sftp = await ssh.requestSFTP();
-
-        if (!(await sftpExists(sftp, workingDirectory))) {
-          await sftpMkdir(sftp)(workingDirectory);
-        }
+        await createDirectoriesRecursively(sftp, workingDirectory);
       });
 
       const reply = await asyncClientCall(client.job, "submitJob", {

@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { dirname } from "path";
 import { SFTPWrapper } from "ssh2";
 import { promisify } from "util";
 
@@ -71,5 +72,18 @@ export const sftpMkdir = (sftp: SFTPWrapper) =>
 
 export const sftpAppendFile = (sftp: SFTPWrapper) =>
   handleSftpError(promisify(sftp.appendFile.bind(sftp) as typeof sftp["appendFile"]));
+
+
+export const createDirectoriesRecursively = async (sftp: SFTPWrapper, directory: string) => {
+  const parentDirectory = dirname(directory);
+  if (parentDirectory && parentDirectory !== directory) {
+    if (!(await sftpExists(sftp, parentDirectory))) {
+      await createDirectoriesRecursively(sftp, parentDirectory);
+    }
+  }
+  if (!(await sftpExists(sftp, directory))) {
+    await sftpMkdir(sftp)(directory);
+  }
+};
 
 
