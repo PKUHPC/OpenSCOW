@@ -89,7 +89,7 @@ export const ShellPage: NextPage = requireAuth(() => true)(({ userStore }) => {
       <Head title={`${cluster}的终端`} />
       <Header ref={headerRef}>
         <h2>
-          以ID: {userStore.user.identityId} 连接到集群 {clusterName} 的登录节点 {loginNode}
+          以ID: {userStore.user.identityId} 连接到集群 {clusterName} 的 {loginNode} 节点
         </h2>
         <Space wrap>
           <Button onClick={() => Router.reload()}>
