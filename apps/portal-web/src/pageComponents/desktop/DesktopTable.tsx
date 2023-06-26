@@ -97,13 +97,13 @@ export const DesktopTable: React.FC<Props> = () => {
               }}
             />
           </Form.Item>
-          <Form.Item label="登录节点" name="loginNode">
+          <Form.Item label="登录节点">
             <Select
               allowClear
               style={{ minWidth: 100 }}
               value={loginNode}
               onChange={(x) => {
-                router.push({ query: { cluster: cluster.id, loginNode: x } });
+                router.push({ query: x ? { cluster: cluster.id, loginNode: x } : { cluster : cluster.id } });
               }}
               options={loginNodes[cluster.id].map((loginNode) => ({
                 label: loginNode, value: loginNode,

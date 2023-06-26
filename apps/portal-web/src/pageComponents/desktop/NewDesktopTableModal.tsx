@@ -11,7 +11,7 @@
  */
 
 import { App, Form, Modal, Select } from "antd";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { Cluster } from "src/utils/config";
@@ -41,7 +41,6 @@ export const NewDesktopTableModal: React.FC<Props> = ({ open, onClose, reload, c
     onResolve({ wms }) {
       if (wms.length > 0) {
         form.setFieldValue("wm", wms[0].wm);
-        form.setFieldValue("loginNode", loginNodes[0]);
       }
     },
   });
@@ -51,9 +50,7 @@ export const NewDesktopTableModal: React.FC<Props> = ({ open, onClose, reload, c
   const [submitting, setSubmitting] = useState(false);
 
   const onOk = async () => {
-
     const values = await form.validateFields();
-
     setSubmitting(true);
 
     // Create new desktop
@@ -77,6 +74,10 @@ export const NewDesktopTableModal: React.FC<Props> = ({ open, onClose, reload, c
       .finally(() => { setSubmitting(false); });
   };
 
+  useEffect(() => {
+    form.setFieldValue("loginNode", loginNodes[0]);
+  }, [loginNodes]);
+
   return (
     <Modal
       title="新建桌面"
@@ -84,6 +85,7 @@ export const NewDesktopTableModal: React.FC<Props> = ({ open, onClose, reload, c
       onOk={form.submit}
       confirmLoading={submitting}
       onCancel={onClose}
+      destroyOnClose
     >
       <Form
         form={form}
@@ -91,7 +93,7 @@ export const NewDesktopTableModal: React.FC<Props> = ({ open, onClose, reload, c
         wrapperCol={{ span: 20 }}
         labelCol={{ span: 4 }}
       >
-        <Form.Item label="登录节点" name="loginNode" required>
+        <Form.Item label="登录节点" name="loginNode" rules={[{ required: true }]}>
           <Select
             options={loginNodes.map((loginNode) => ({
               label: loginNode, value: loginNode,
