@@ -57,6 +57,7 @@ message ConnectToDesktopResponse {
 message ListUserDesktopsRequest {
   string user_id = 1;
   string cluster = 2;
+  // 不指定login_node则返回该集群下所有login_node的desktop
   optional string login_node = 3;
 }
 
