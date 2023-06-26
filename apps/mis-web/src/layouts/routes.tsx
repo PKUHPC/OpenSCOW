@@ -135,7 +135,7 @@ export const tenantRoutes: (tenantRoles: TenantRole[], token: string) => NavItem
         },
         {
           Icon: BookOutlined,
-          text: "运行中的作业",
+          text: "未结束的作业",
           path: "/tenant/runningJobs",
         },
         {

@@ -216,6 +216,7 @@ export const mockApi: MockApi<typeof api> = {
       account: "a_aaaaaa",
       partition: "compute",
       qos: "high",
+      nodeCount: 1,
       coreCount: 2,
       maxTime: 10,
       submitTime: "2021-12-22T16:16:02",

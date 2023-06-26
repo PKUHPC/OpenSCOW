@@ -71,8 +71,10 @@ export const appOps = (cluster: string): AppOps => {
     createApp: async (request, logger) => {
       const apps = getAppConfigs();
 
-      const { appId, userId, account, coreCount, maxTime, proxyBasePath,
+      const { appId, userId, account, coreCount, nodeCount, gpuCount, memory, maxTime, proxyBasePath,
         partition, qos, customAttributes } = request;
+
+      const memoryMb = memory ? Number(memory.slice(0, -2)) : undefined;
 
 
       const userSbatchOptions = customAttributes["sbatchOptions"]
@@ -148,8 +150,10 @@ export const appOps = (cluster: string): AppOps => {
             account: request.account,
             partition: request.partition,
             qos: request.qos,
+            nodeCount: request.nodeCount,
             coreCount: request.coreCount,
             maxTime: request.timeLimitMinutes!,
+            gpuCount: request.gpuCount,
             submitTime: new Date().toISOString(),
             customAttributes: customAttributes,
           };
@@ -191,7 +195,7 @@ export const appOps = (cluster: string): AppOps => {
           const envVariables = getEnvVariables({ SERVER_SESSION_INFO });
 
           return await submitAndWriteMetadata({
-            userId, jobName, account, partition: partition!, qos, nodeCount: 1, gpuCount: 0,
+            userId, jobName, account, partition: partition!, qos, nodeCount, gpuCount: gpuCount ?? 0, memoryMb,
             coreCount, timeLimitMinutes: maxTime, script: envVariables + SERVER_ENTRY_COMMAND,
             workingDirectory, extraOptions,
           });
@@ -211,7 +215,7 @@ export const appOps = (cluster: string): AppOps => {
           const envVariables = getEnvVariables({ VNC_SESSION_INFO, VNCSERVER_BIN_PATH });
 
           return await submitAndWriteMetadata({
-            userId, jobName, account, partition: partition!, qos, nodeCount: 1, gpuCount: 0,
+            userId, jobName, account, partition: partition!, qos, nodeCount, gpuCount: gpuCount ?? 0, memoryMb,
             coreCount, timeLimitMinutes: maxTime, script: envVariables + VNC_ENTRY_COMMAND,
             workingDirectory, stdout: VNC_OUTPUT_FILE, extraOptions,
           });

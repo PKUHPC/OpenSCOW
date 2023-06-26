@@ -88,7 +88,7 @@ export const appServiceServer = plugin((server) => {
     createAppSession: async ({ request, logger }) => {
       const apps = getAppConfigs();
 
-      const { account, appId, cluster, coreCount, maxTime, proxyBasePath,
+      const { account, appId, cluster, coreCount, nodeCount, gpuCount, memory, maxTime, proxyBasePath,
         partition, qos, userId, customAttributes } = request;
 
       const app = apps[appId];
@@ -148,6 +148,9 @@ export const appServiceServer = plugin((server) => {
         appId,
         userId,
         coreCount,
+        nodeCount,
+        gpuCount,
+        memory,
         account,
         maxTime,
         partition,
