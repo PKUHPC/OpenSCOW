@@ -11,6 +11,7 @@
  */
 
 import { Select } from "antd";
+import { useRouter } from "next/router";
 import { useTranslation } from "next-i18next";
 import { parseCookies, setCookie } from "nookies";
 import { useEffect, useState } from "react";
@@ -26,6 +27,7 @@ export const LanguageSwitcher = () => {
   const [selectedLanguage, setSelectedLanguage] = useState("");
   const { i18n } = useTranslation("translations");
 
+  const router = useRouter();
 
   useEffect(() => {
     const cookies = parseCookies();
@@ -39,27 +41,26 @@ export const LanguageSwitcher = () => {
       setLanguageCookie(defaultLanguage);
       changeLng(defaultLanguage);
     }
-  }, []);
+  }, [router]);
 
-  const setLanguage = (newLocale: string) => {
-    console.log("【切换语言】", newLocale);
+  const setLanguage = async (newLocale: string) => {
     setSelectedLanguage(newLocale);
     setLanguageCookie(newLocale);
-    changeLng(newLocale);
+    await changeLng(newLocale);
   };
 
-  const changeLng = (newLocale: string) => {
-    return i18n.changeLanguage(newLocale, () => {
-      i18n.reloadResources();
+  const changeLng = async (newLocale: string) => {
+    return await i18n.changeLanguage(newLocale, async () => {
+      await i18n.reloadResources();
     });
   };
 
   const setLanguageCookie = (newLocale: string) => {
-    console.log("【切换语言后setCookie】", newLocale);
-    return setCookie(null, "language", newLocale, {
+    setCookie(null, "language", newLocale, {
       maxAge: 30 * 24 * 60 * 60,
       path: "/",
     });
+    router.replace(router.asPath);
   };
 
   return (
@@ -71,4 +72,5 @@ export const LanguageSwitcher = () => {
     </Container>
   );
 };
+
 

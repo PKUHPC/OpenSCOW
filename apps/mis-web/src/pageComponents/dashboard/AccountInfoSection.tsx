@@ -14,7 +14,6 @@ import { LockOutlined, UnlockOutlined } from "@ant-design/icons";
 import { moneyToNumber } from "@scow/lib-decimal";
 import { Alert, Col, Row, Statistic, StatisticProps } from "antd";
 import { useTranslation } from "next-i18next";
-import nextI18nextConfig from "next-i18next.config";
 // import { tsTranslations as enTranslations } from "public/locales/en/tsTranslations";
 // import { tsTranslations as cnTranslations } from "public/locales/zh_cn/tsTranslations";
 import React from "react";
@@ -58,19 +57,13 @@ export const AccountInfoSection: React.FC<Props> = ({ info }) => {
   const accounts = Object.entries(info);
 
 
-  const { t, i18n } = useTranslation("translations");
+  const { t } = useTranslation("translations");
 
   const statusTexts = {
     blocked: [t("dashboard.account.status.blocked"), "red", LockOutlined],
     normal: [t("dashboard.account.status.normal"), "green", UnlockOutlined],
 
   } as const;
-
-  console.log("【useTranslation】", t);
-  console.log("language", i18n.language);
-  console.log("config", nextI18nextConfig);
-  // debugger;
-  console.log("翻译文本", t("dashboard.account.status.normal"));
 
 
   return (

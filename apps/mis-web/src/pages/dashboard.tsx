@@ -71,6 +71,7 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)((props: Pr
 
 
 export const getServerSideProps: GetServerSideProps<Props> = async ({ req }) => {
+
   const auth = ssrAuthenticate(() => true);
 
   // Cannot directly call api routes here, so mock is not available directly.
@@ -111,12 +112,13 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ req }) => 
 
   const cookies = parseCookies({ req });
   const locale = cookies.language || "zh_cn";
-
+  const lngProps = await serverSideTranslations(locale ?? "zh_cn");
+  console.log("check cookie: ", cookies, lngProps);
   return {
     props: {
       accounts,
       storageQuotas: status.storageQuotas,
-      ...(await serverSideTranslations(locale ?? "zh_cn")),
+      ...lngProps,
     },
   };
 };

@@ -42,12 +42,15 @@ export const RunningJobsPage: NextPage = requireAuth((u) => u.accountAffiliation
 
   });
 
-export const getServerSideProps: GetServerSideProps<Props> = async ({ req }) => {
+export const getServerSideProps: GetServerSideProps<Props> = async ({ req, res }) => {
+
   const cookies = parseCookies({ req });
   const locale = cookies.language || "zh_cn";
+  const lngProps = await serverSideTranslations(locale ?? "zh_cn");
+  console.log("check cookie: ", cookies, lngProps);
   return {
     props: {
-      ...(await serverSideTranslations(locale ?? "zh_cn")),
+      ...lngProps,
     },
   };
 };
