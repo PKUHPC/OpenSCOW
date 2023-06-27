@@ -14,6 +14,7 @@ concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 env:
   GITHUB_CR: ghcr.io
+  PKU_CR: mirrors.eecser.com
   # ALIYUN_CR: registry.cn-hangzhou.aliyuncs.com
   # ALIYUN_PROJECT_NAME: scow
 
@@ -158,12 +159,20 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Log in to the PKU registry
+        uses: docker/login-action@465a07811f14bebb1938fbed4728c6a1ff8901fc
+        with:
+          registry: ${{ env.PKU_CR }}
+          username: ${{ secrets.PKUREGISTRY_USERNAME }}
+          password: ${{ secrets.PKUREGISTRY_PASSWORD }}
+
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v4
         with:
           images: |
             ${{ env.GITHUB_CR }}/${{ github.repository }}/${{ matrix.name }}
+            ${{ env.PKU_CR }}/${{ matrix.name }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v4
