@@ -1,5 +1,28 @@
 # @scow/mis-server
 
+## 0.7.0
+
+### Patch Changes
+
+- 7df3b5e61: scow hook 中 accountBlocked、accountUnblocked 事件增加参数 tenantName
+- b8b343894: 修复导入账户勾选加入白名单账户依然封锁问题
+- d00ae0da3: 新增创建租户页面，同时创建该租户的管理员用户
+- 17d8bcd31: 增加仅在 scow 数据库新增用户的 API
+- 20a8d8925: 修改当从白名单移除账户时如果账户余额为 0 元则封锁账户
+- 4bfd80986: 认证系统增加管理用户账户关系相关 API
+- 487839e16: 租户信息管理员 id 展示 userId 修复
+- 9e79e2a9f: 管理平台新增平台信息页面
+- 81895f4be: mis.yaml 和 portal.yaml 中支持增加导航链接
+- Updated dependencies [0f64e5404]
+- Updated dependencies [4bfd80986]
+- Updated dependencies [81895f4be]
+  - @scow/config@0.3.1
+  - @scow/lib-auth@0.2.1
+  - @scow/protos@0.2.3
+  - @scow/lib-hook@0.2.2
+  - @scow/lib-server@0.2.0
+  - @scow/lib-slurm@0.1.5
+
 ## 0.6.0
 
 ### Minor Changes

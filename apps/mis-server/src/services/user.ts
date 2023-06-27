@@ -13,7 +13,7 @@
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
-import { createUser, getUser } from "@scow/lib-auth";
+import { addUserToAccount, createUser, getUser, removeUserFromAccount } from "@scow/lib-auth";
 import { decimalToMoney } from "@scow/lib-decimal";
 import {
   AccountStatus,
@@ -168,6 +168,10 @@ export const userServiceServer = plugin((server) => {
 
       await em.persistAndFlush([account, user, newUserAccount]);
 
+      if (server.ext.capabilities.accountUserRelation) {
+        await addUserToAccount(misConfig.authUrl, { accountName, userId }, logger);
+      }
+
       return [{}];
     },
 
@@ -197,6 +201,10 @@ export const userServiceServer = plugin((server) => {
       );
 
       await em.removeAndFlush(userAccount);
+
+      if (server.ext.capabilities.accountUserRelation) {
+        await removeUserFromAccount(misConfig.authUrl, { accountName, userId }, logger);
+      }
 
       return [{}];
 
@@ -312,6 +320,10 @@ export const userServiceServer = plugin((server) => {
       return [{}];
     },
 
+    /**
+     * 新增用户，在数据库中增加用户后调用auth服务在ldap中增加该用户，
+     * 并将公钥插入用户的authorized_keys
+     */
     createUser: async ({ request, em, logger }) => {
       const { name, tenantName, email, identityId, password } = request;
       const user = await createUserInDatabase(identityId, name, email, tenantName, server.logger, em)
@@ -356,6 +368,33 @@ export const userServiceServer = plugin((server) => {
 
       return [{
         createdInAuth: createdInAuth,
+        id: user.id,
+      }];
+    },
+
+    /**
+     * 仅在数据库中增加用户数据，用于结合自定义认证系统新增用户，
+     * 与createUser的区别在于不需要password，不调用auth服务，暂不将公钥插入用户authorized_keys
+     */
+    addUser: async ({ request, em, logger }) => {
+      const { name, tenantName, email, identityId } = request;
+      const user = await createUserInDatabase(identityId, name, email, tenantName, server.logger, em)
+        .catch((e) => {
+          if (e.code === Status.ALREADY_EXISTS) {
+            throw <ServiceError> {
+              code: Status.ALREADY_EXISTS,
+              message: `User with userId ${identityId} already exists in scow.`,
+              details: "EXISTS_IN_SCOW",
+            };
+          }
+          throw <ServiceError> {
+            code: Status.INTERNAL,
+            message: `Error creating user with userId ${identityId} in database.` };
+        });
+
+      await callHook("userAdded", { tenantName, userId: user.userId }, logger);
+
+      return [{
         id: user.id,
       }];
     },

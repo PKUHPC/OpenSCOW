@@ -10,11 +10,11 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { route as rawRoute } from "@ddadaal/next-typed-api-routes-runtime";
+import { typeboxRoute } from "@ddadaal/next-typed-api-routes-runtime";
 import { Metadata } from "@grpc/grpc-js";
 
-export const route: typeof rawRoute = (schemaName, handler) => {
-  return rawRoute(schemaName, async (req, res) => {
+export const route: typeof typeboxRoute = (schema, handler) => {
+  return typeboxRoute(schema, async (req, res) => {
     const response = handler(req, res);
     if (response instanceof Promise) {
       return response.catch((e) => {
@@ -25,7 +25,7 @@ export const route: typeof rawRoute = (schemaName, handler) => {
 
         const code = e.metadata.get("SCOW_ERROR_CODE")[0].toString();
         const details = e.details;
-        return { 500: { code, details } };
+        return { 500: { code, details } } as any;
       });
     }
   });

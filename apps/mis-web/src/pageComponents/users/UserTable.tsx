@@ -12,6 +12,7 @@
 
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import type { AccountUserInfo } from "@scow/protos/build/server/user";
+import { Static } from "@sinclair/typebox";
 import { App, Divider, Space, Table, Tag } from "antd";
 import { LinkProps } from "next/link";
 import React from "react";
@@ -23,7 +24,7 @@ import { GetAccountUsersSchema } from "src/pages/api/users";
 import { moneyToString } from "src/utils/money";
 
 interface Props {
-  data: GetAccountUsersSchema["responses"]["200"] | undefined;
+  data: Static<typeof GetAccountUsersSchema["responses"]["200"]> | undefined;
   isLoading: boolean;
   reload: () => void;
   accountName: string;

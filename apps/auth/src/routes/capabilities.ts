@@ -14,9 +14,10 @@ import { Static, Type } from "@sinclair/typebox";
 import fp from "fastify-plugin";
 
 const CapabilitiesSchema = Type.Object({
-  createUser: Type.Boolean({ description: "是否可以创建用户" }),
-  changePassword: Type.Boolean({ description: "是否可以修改密码" }),
-  getUser: Type.Boolean({ description: "是否可以查询用户" }),
+  createUser: Type.Optional(Type.Boolean({ description: "是否可以创建用户" })),
+  changePassword: Type.Optional(Type.Boolean({ description: "是否可以修改密码" })),
+  getUser: Type.Optional(Type.Boolean({ description: "是否可以查询用户" })),
+  accountUserRelation: Type.Optional(Type.Boolean({ description: "是否可以管理账户用户关系" })),
 });
 
 export type Capabilities = Static<typeof CapabilitiesSchema>;
@@ -45,6 +46,7 @@ export const getCapabilitiesRoute = fp(async (f) => {
         createUser: provider.createUser !== undefined,
         changePassword: provider.changePassword !== undefined,
         getUser: provider.getUser !== undefined,
+        accountUserRelation: false,
       };
     },
   );

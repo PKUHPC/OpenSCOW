@@ -10,30 +10,51 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
-import { AppServiceClient, SubmissionInfo } from "@scow/protos/build/portal/app";
+import { AppServiceClient } from "@scow/protos/build/portal/app";
+import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { getClient } from "src/utils/client";
-import { route } from "src/utils/route";
 
-export interface GetAppLastSubmissionSchema {
-  method: "GET";
+// Cannot use SubmissionInfo from protos
+export const SubmissionInfo = Type.Object({
+  userId: Type.String(),
+  cluster: Type.String(),
+  appId: Type.String(),
+  appName: Type.String(),
+  account: Type.String(),
+  partition: Type.Optional(Type.Union([Type.String(), Type.Undefined()])),
+  qos: Type.Optional(Type.Union([Type.String(), Type.Undefined()])),
+  nodeCount: Type.Number(),
+  coreCount: Type.Number(),
+  gpuCount: Type.Optional(Type.Number()),
+  maxTime: Type.Number(),
+  submitTime: Type.Optional(Type.String()),
+  customAttributes: Type.Record(Type.String(), Type.String()),
+});
 
-  query: {
-    cluster: string;
-    appId: string;
-  }
+export type SubmissionInfo = Static<typeof SubmissionInfo>;
+
+
+export const GetAppLastSubmissionSchema = typeboxRouteSchema({
+  method: "GET",
+
+  query: Type.Object({
+    cluster: Type.String(),
+    appId: Type.String(),
+  }),
 
   responses: {
-    200: {
-      lastSubmissionInfo?: SubmissionInfo;
-    };
-  }
-}
+    200: Type.Object({
+      lastSubmissionInfo: Type.Optional(SubmissionInfo),
+    }),
+  },
+});
 
 const auth = authenticate(() => true);
 
-export default /* #__PURE__*/route<GetAppLastSubmissionSchema>("GetAppLastSubmissionSchema", async (req, res) => {
+export default /* #__PURE__*/typeboxRoute(GetAppLastSubmissionSchema, async (req, res) => {
 
   const info = await auth(req, res);
 

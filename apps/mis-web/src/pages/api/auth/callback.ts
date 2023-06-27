@@ -10,27 +10,27 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { route } from "@ddadaal/next-typed-api-routes-runtime";
+import { Type, typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { setTokenCookie } from "src/auth/cookie";
 import { validateToken } from "src/auth/token";
 import { publicConfig } from "src/utils/config";
 
-export interface AuthCallbackSchema {
-  method: "GET";
+export const AuthCallbackSchema = typeboxRouteSchema({
+  method: "GET",
 
-  query: {
-    token: string;
-  }
+  query: Type.Object({
+    token: Type.String(),
+  }),
 
   responses: {
-    200: null;
+    200: Type.Null(),
     /** the token is invalid */
-    403: null;
-  }
-}
+    403: Type.Null(),
+  },
+});
 
 
-export default route<AuthCallbackSchema>("AuthCallbackSchema", async (req, res) => {
+export default typeboxRoute(AuthCallbackSchema, async (req, res) => {
 
   const { token } = req.query;
 

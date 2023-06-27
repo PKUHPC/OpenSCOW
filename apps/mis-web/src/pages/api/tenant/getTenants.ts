@@ -10,27 +10,28 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { route } from "@ddadaal/next-typed-api-routes-runtime";
+import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { TenantServiceClient } from "@scow/protos/build/server/tenant";
+import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { PlatformRole } from "src/models/User";
 import { getClient } from "src/utils/client";
 
-export interface GetTenantsSchema {
-  method: "GET";
+export const GetTenantsSchema = typeboxRouteSchema({
+  method: "GET",
 
   responses: {
-    200: {
-      names: string[];
-    }
-  }
-}
+    200: Type.Object({
+      names: Type.Array(Type.String()),
+    }),
+  },
+});
 
 const auth = authenticate((info) => info.platformRoles.includes(PlatformRole.PLATFORM_ADMIN)
   || info.platformRoles.includes(PlatformRole.PLATFORM_FINANCE));
 
-export default route<GetTenantsSchema>("GetTenantsSchema",
+export default typeboxRoute(GetTenantsSchema,
   async (req, res) => {
 
     const info = await auth(req, res);

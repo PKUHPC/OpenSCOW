@@ -15,7 +15,8 @@
 const { envConfig, str, bool, parseKeyValue } = require("@scow/lib-config");
 const { join } = require("path");
 const { homedir } = require("os");
-const { PHASE_DEVELOPMENT_SERVER, PHASE_PRODUCTION_BUILD, PHASE_PRODUCTION_SERVER, PHASE_TEST } = require("next/constants");
+const { PHASE_DEVELOPMENT_SERVER, PHASE_PRODUCTION_BUILD,
+  PHASE_PRODUCTION_SERVER, PHASE_TEST } = require("next/constants");
 
 const { readVersionFile } = require("@scow/utils/build/version");
 const { getCapabilities } = require("@scow/lib-auth");
@@ -60,6 +61,8 @@ const specs = {
   NOVNC_CLIENT_URL: str({ desc: "novnc客户端的URL。如果和本系统域名相同，可以只写完整路径", default: "/vnc" }),
 
   CLIENT_MAX_BODY_SIZE: str({ desc: "限制整个系统上传（请求）文件的大小，可接受的格式为nginx的client_max_body_size可接受的值", default: "1G" }),
+
+  PUBLIC_PATH: str({ desc: "SCOW公共文件的路径，需已包含SCOW的base path", default: "/public/" }),
 };
 
 const mockEnv = process.env.NEXT_PUBLIC_USE_MOCK === "1";
@@ -77,7 +80,6 @@ const buildRuntimeConfig = async (phase, basePath) => {
 
   const building = phase === PHASE_PRODUCTION_BUILD;
   const dev = phase === PHASE_DEVELOPMENT_SERVER;
-  const production = phase === PHASE_PRODUCTION_SERVER;
   const testenv = phase === PHASE_TEST;
 
   // load .env.build if in build
@@ -99,6 +101,8 @@ const buildRuntimeConfig = async (phase, basePath) => {
   const uiConfig = getUiConfig(configPath, console);
   const portalConfig = getPortalConfig(configPath, console);
   const commonConfig = getCommonConfig(configPath, console);
+
+  const versionTag = readVersionFile()?.tag;
 
   /**
    * @type {import("./src/utils/config").ServerRuntimeConfig}
@@ -151,6 +155,12 @@ const buildRuntimeConfig = async (phase, basePath) => {
     BASE_PATH: basePath,
 
     CLIENT_MAX_BODY_SIZE: config.CLIENT_MAX_BODY_SIZE,
+
+    PUBLIC_PATH: config.PUBLIC_PATH,
+
+    NAV_LINKS: portalConfig.navLinks,
+
+    VERSION_TAG: versionTag,
   };
 
   if (!building && !testenv) {
@@ -160,21 +170,7 @@ const buildRuntimeConfig = async (phase, basePath) => {
     console.log("Public Runtime Config", publicRuntimeConfig);
   }
 
-  if (!testenv) {
 
-    // HACK
-    // call /api/setup after 3 seconds to init the proxy and shell server
-    setTimeout(() => {
-      const url = `http://localhost:${process.env.PORT || 3000}${basePath === "/" ? "" : basePath}/api/setup`;
-      console.log("Calling setup url to initialize proxy and shell server", url);
-      fetch(url).then(async (res) => {
-        console.log("Call completed. Response: ", await res.text());
-      }).catch((e) => {
-        console.error("Error when calling proxy url to initialize ws proxy server", e);
-      });
-    }, 3000);
-
-  }
 
   return {
     serverRuntimeConfig,

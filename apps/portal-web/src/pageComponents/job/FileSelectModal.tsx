@@ -66,26 +66,18 @@ export const FileSelectModal: React.FC<Props> = ({ cluster, onSubmit }) => {
   const [path, setPath] = useState<string>("/");
   const [selectedKeys, setSelectedKeys] = useState<Key[]>([]);
 
-
   const prevPathRef = useRef<string>(path);
-
 
   const fileFilter = (files: FileInfo[]): FileInfo[] => {
     return files.filter(
       (file) => file.type === "DIR" && !file.name.startsWith("."));
   };
 
-  const { data: homePath, isLoading: isHomePathLoading } = useAsync({
-    promiseFn: useCallback(async () => cluster
-      ? api.getHomeDirectory({ query: { cluster: cluster.id } }) : { path: "" }, [cluster.id]),
-  });
-
-
   const listFilePromiseFn = useCallback(async () => {
-    return visible && homePath
-      ? await api.listFile({ query: { cluster: cluster.id, path: join(homePath.path, path) } })
+    return visible
+      ? await api.listFile({ query: { cluster: cluster.id, path: join("/", path) } })
       : { items: []};
-  }, [path, cluster, visible, homePath]);
+  }, [path, cluster, visible]);
 
   const { data, isLoading: isFileLoading, reload } = useAsync({
     promiseFn: listFilePromiseFn,
@@ -107,8 +99,7 @@ export const FileSelectModal: React.FC<Props> = ({ cluster, onSubmit }) => {
 
   const onOkClick = () => {
     const submitPath = selectedKeys.length > 0 ? selectedKeys[0].toString() : path;
-    // 将/xxx/xx都转为xxx/xx传参
-    onSubmit(submitPath.startsWith("/") ? submitPath.slice(1) : submitPath);
+    onSubmit(submitPath);
     closeModal();
   };
 
@@ -119,7 +110,7 @@ export const FileSelectModal: React.FC<Props> = ({ cluster, onSubmit }) => {
     setSelectedKeys([]);
   };
 
-  const isLoading = isHomePathLoading || isFileLoading;
+  const isLoading = isFileLoading;
 
   return (
     <>
@@ -133,7 +124,7 @@ export const FileSelectModal: React.FC<Props> = ({ cluster, onSubmit }) => {
           <MkdirButton
             key="new"
             cluster={cluster.id}
-            path={join(homePath?.path || "/", path)}
+            path={join("/", path)}
             reload={reload}
           >
             新目录
@@ -147,9 +138,8 @@ export const FileSelectModal: React.FC<Props> = ({ cluster, onSubmit }) => {
             <PathBar
               path={formatPath(path)}
               loading={isLoading}
-              prefix="~"
               onPathChange={(curPath) => {
-                curPath === path ? reload() : setPath(curPath);
+                curPath === path ? reload() : setPath(join("/", curPath));
               }}
               breadcrumbItemRender={(segment, index, curPath) =>
                 index === 0
@@ -157,7 +147,7 @@ export const FileSelectModal: React.FC<Props> = ({ cluster, onSubmit }) => {
                     <Link
                       href=""
                       onClick={(e) => onClickLink(e, "/")}
-                    ><DatabaseOutlined /> ~ </Link>
+                    ><DatabaseOutlined /></Link>
                   )
                   : (
                     <Link
@@ -174,6 +164,7 @@ export const FileSelectModal: React.FC<Props> = ({ cluster, onSubmit }) => {
             style={{ width: "100%" }}
             files={data?.items || []}
             filesFilter={fileFilter}
+            fileNameRender={(fileName: string) => <Button type="link">{fileName}</Button>}
             hiddenColumns={["size", "mode"]}
             loading={isLoading}
             rowKey={(r: FileInfo): React.Key => join(path, r.name)}
@@ -190,6 +181,7 @@ export const FileSelectModal: React.FC<Props> = ({ cluster, onSubmit }) => {
               selectedRowKeys: selectedKeys,
               onChange: setSelectedKeys,
             }}
+            scroll={{ x: true, y: 500 }}
           />
         </ModalContainer>
       </Modal>

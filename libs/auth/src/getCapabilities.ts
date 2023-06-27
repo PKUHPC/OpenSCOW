@@ -13,9 +13,10 @@
 import { join } from "path";
 
 export interface Capabilities {
-  createUser: boolean;
-  changePassword: boolean;
-  getUser: boolean;
+  createUser?: boolean;
+  changePassword?: boolean;
+  getUser?: boolean;
+  accountUserRelation?: boolean;
 }
 
 

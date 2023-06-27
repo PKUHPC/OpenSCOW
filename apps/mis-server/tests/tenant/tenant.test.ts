@@ -48,7 +48,7 @@ it("gets tenant info", async () => {
     accountCount: 2,
     userCount: 2,
     balance: decimalToMoney(data.tenant.balance),
-    admins: [data.userA].map((x) => ({ userId: x.id + "", userName: x.name })),
+    admins: [data.userA].map((x) => ({ userId: x.userId, userName: x.name })),
   } as GetTenantInfoResponse);
 });
 

@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e" scale="2" border="0">
     <diagram id="Pjbi3EagdmSRB1L1AeHt" name="Page-1">
-        <mxGraphModel dx="738" dy="521" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+        <mxGraphModel dx="494" dy="365" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -10,55 +10,61 @@
                 <mxCell id="2" value="登录节点" style="rounded=0;whiteSpace=wrap;fillColor=none;verticalAlign=top;spacing=0;labelBackgroundColor=none;" parent="1" vertex="1">
                     <mxGeometry x="550" y="650" width="120" height="70" as="geometry"/>
                 </mxCell>
-                <mxCell id="97" value="" style="edgeStyle=none;exitX=0.5;exitY=1;exitDx=0;exitDy=0;spacing=0;labelBackgroundColor=none;" parent="1" source="3" target="15" edge="1">
+                <mxCell id="97" value="" style="edgeStyle=none;exitX=0.5;exitY=1;exitDx=0;exitDy=0;spacing=0;labelBackgroundColor=none;fillColor=#0050ef;strokeColor=#001DBC;shadow=0;" parent="1" source="3" target="15" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="110" value="HTTP" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="97">
+                <mxCell id="110" value="HTTP" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontColor=#001DBC;labelBackgroundColor=none;" parent="97" vertex="1" connectable="0">
                     <mxGeometry x="-0.1579" y="2" relative="1" as="geometry">
                         <mxPoint as="offset"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="108" style="edgeStyle=none;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.428;entryY=0.025;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="3" target="107">
+                <mxCell id="108" style="edgeStyle=none;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.428;entryY=0.025;entryDx=0;entryDy=0;entryPerimeter=0;strokeColor=#001DBC;" parent="1" source="3" target="107" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="109" value="WebSocket" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="108">
+                <mxCell id="109" value="WebSocket" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontColor=#001DBC;labelBackgroundColor=none;" parent="108" vertex="1" connectable="0">
                     <mxGeometry x="-0.2543" y="-1" relative="1" as="geometry">
-                        <mxPoint as="offset"/>
+                        <mxPoint x="-12" y="4" as="offset"/>
                     </mxGeometry>
+                </mxCell>
+                <mxCell id="121" style="edgeStyle=none;html=1;exitX=0.75;exitY=1;exitDx=0;exitDy=0;entryX=0.794;entryY=0.047;entryDx=0;entryDy=0;entryPerimeter=0;shadow=0;labelBackgroundColor=none;strokeColor=#FF0000;fontColor=#001DBC;" edge="1" parent="1" source="3" target="15">
+                    <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
                 <mxCell id="3" value="客户端浏览器" style="whiteSpace=wrap;fillColor=none;spacing=0;labelBackgroundColor=none;" parent="1" vertex="1">
                     <mxGeometry x="475" y="460" width="90" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="73" value="" style="edgeStyle=none;exitX=0.5;exitY=1;exitDx=0;exitDy=0;startArrow=none;entryX=0.5;entryY=0;entryDx=0;entryDy=0;spacing=0;labelBackgroundColor=none;" parent="1" source="107" target="77" edge="1">
+                <mxCell id="73" value="" style="edgeStyle=none;exitX=0.428;exitY=1.024;exitDx=0;exitDy=0;startArrow=none;spacing=0;labelBackgroundColor=none;entryX=0.25;entryY=0;entryDx=0;entryDy=0;fillColor=#0050ef;strokeColor=#001DBC;exitPerimeter=0;" parent="1" source="15" target="77" edge="1">
                     <mxGeometry relative="1" as="geometry">
                         <mxPoint x="417.51" y="582.0374999999999" as="sourcePoint"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="83" value="HTTP/WebSocket&#10;连接到作业监听的端口" style="edgeLabel;align=center;verticalAlign=middle;resizable=0;points=[];spacing=0;labelBackgroundColor=none;" parent="73" vertex="1" connectable="0">
+                <mxCell id="83" value="HTTP/WebSocket&#10;连接到作业监听的端口" style="edgeLabel;align=center;verticalAlign=middle;resizable=0;points=[];spacing=0;labelBackgroundColor=none;fontColor=#001dbc;" parent="73" vertex="1" connectable="0">
                     <mxGeometry x="0.2536" y="-2" relative="1" as="geometry">
-                        <mxPoint x="-13" y="-24" as="offset"/>
+                        <mxPoint x="-18" y="-23" as="offset"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="111" style="edgeStyle=none;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="15" target="58">
+                <mxCell id="111" style="edgeStyle=none;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.998;entryY=0.323;entryDx=0;entryDy=0;entryPerimeter=0;fillColor=#0050ef;strokeColor=#001DBC;" parent="1" source="117" target="58" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="113" value="获取/刷新密码" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="111">
+                <mxCell id="113" value="获取/刷新密码" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontColor=#001DBC;labelBackgroundColor=none;" parent="111" vertex="1" connectable="0">
                     <mxGeometry x="0.1845" y="-3" relative="1" as="geometry">
                         <mxPoint as="offset"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="15" value="portal-web" style="rounded=0;whiteSpace=wrap;fillColor=none;spacing=0;labelBackgroundColor=none;" parent="1" vertex="1">
-                    <mxGeometry x="550" y="558.75" width="80" height="22.5" as="geometry"/>
+                <mxCell id="119" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontColor=#c43131;strokeColor=#FF0000;" edge="1" parent="1" source="15" target="117">
+                    <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="72" value="" style="edgeStyle=none;exitX=0.5;exitY=1;exitDx=0;exitDy=0;spacing=0;labelBackgroundColor=none;" parent="1" source="15" edge="1">
+                <mxCell id="15" value="portal-web" style="rounded=0;whiteSpace=wrap;fillColor=none;spacing=0;labelBackgroundColor=none;" parent="1" vertex="1">
+                    <mxGeometry x="480" y="562" width="80" height="22.5" as="geometry"/>
+                </mxCell>
+                <mxCell id="72" value="" style="edgeStyle=none;exitX=0.5;exitY=1;exitDx=0;exitDy=0;spacing=0;labelBackgroundColor=none;entryX=0.549;entryY=-0.039;entryDx=0;entryDy=0;entryPerimeter=0;fontColor=#FF0000;strokeColor=#FF0000;" parent="1" source="117" edge="1" target="74">
                     <mxGeometry relative="1" as="geometry">
                         <mxPoint x="642" y="590.9090000000001" as="sourcePoint"/>
                         <mxPoint x="600" y="680" as="targetPoint"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="75" value="SSH到登录节点&#10;并提交作业" style="edgeLabel;align=center;verticalAlign=middle;resizable=0;points=[];spacing=0;labelBackgroundColor=none;" parent="72" vertex="1" connectable="0">
+                <mxCell id="75" value="SSH到登录节点&#10;并提交作业" style="edgeLabel;align=center;verticalAlign=middle;resizable=0;points=[];spacing=0;labelBackgroundColor=none;fontColor=#FF0000;" parent="72" vertex="1" connectable="0">
                     <mxGeometry x="-0.1546" y="-2" relative="1" as="geometry">
-                        <mxPoint x="18" y="-4" as="offset"/>
+                        <mxPoint x="42" y="-4" as="offset"/>
                     </mxGeometry>
                 </mxCell>
                 <mxCell id="74" value="调度器" style="rounded=0;whiteSpace=wrap;spacing=0;labelBackgroundColor=none;fillColor=none;" parent="1" vertex="1">
@@ -67,12 +73,12 @@
                 <mxCell id="58" value="计算节点" style="rounded=0;whiteSpace=wrap;fillColor=none;verticalAlign=top;spacing=0;labelBackgroundColor=none;" parent="1" vertex="1">
                     <mxGeometry x="370" y="650" width="120" height="70" as="geometry"/>
                 </mxCell>
-                <mxCell id="76" value="" style="edgeStyle=none;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;spacing=0;labelBackgroundColor=none;" parent="1" source="74" target="77" edge="1">
+                <mxCell id="76" value="" style="edgeStyle=none;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;spacing=0;labelBackgroundColor=none;fontColor=#ff0000;strokeColor=#FF0000;" parent="1" source="74" target="77" edge="1">
                     <mxGeometry relative="1" as="geometry">
                         <mxPoint x="568.75" y="330" as="targetPoint"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="79" value="调度作业" style="edgeLabel;align=center;verticalAlign=middle;resizable=0;points=[];spacing=0;labelBackgroundColor=none;" parent="76" vertex="1" connectable="0">
+                <mxCell id="79" value="调度作业" style="edgeLabel;align=center;verticalAlign=middle;resizable=0;points=[];spacing=0;labelBackgroundColor=none;fontColor=#ff0000;" parent="76" vertex="1" connectable="0">
                     <mxGeometry x="-0.0982" y="1" relative="1" as="geometry">
                         <mxPoint x="-4" y="-11" as="offset"/>
                     </mxGeometry>
@@ -80,7 +86,7 @@
                 <mxCell id="77" value="作业" style="rounded=0;whiteSpace=wrap;spacing=0;labelBackgroundColor=none;fillColor=none;" parent="1" vertex="1">
                     <mxGeometry x="389.25" y="680" width="79" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="102" value="" style="endArrow=classic;html=1;" parent="1" edge="1">
+                <mxCell id="102" value="" style="endArrow=classic;html=1;fillColor=#a20025;strokeColor=#001DBC;" parent="1" edge="1">
                     <mxGeometry width="50" height="50" relative="1" as="geometry">
                         <mxPoint x="440" y="470" as="sourcePoint"/>
                         <mxPoint x="330" y="700" as="targetPoint"/>
@@ -89,12 +95,12 @@
                         </Array>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="103" value="连接到作业" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontColor=default;labelBackgroundColor=none;" parent="102" vertex="1" connectable="0">
+                <mxCell id="103" value="连接到作业" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontColor=#001DBC;labelBackgroundColor=none;" parent="102" vertex="1" connectable="0">
                     <mxGeometry x="0.0854" y="1" relative="1" as="geometry">
                         <mxPoint as="offset"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="104" value="" style="endArrow=classic;html=1;" parent="1" edge="1">
+                <mxCell id="104" value="" style="endArrow=classic;html=1;strokeColor=#FF0000;" parent="1" edge="1">
                     <mxGeometry width="50" height="50" relative="1" as="geometry">
                         <mxPoint x="620" y="470" as="sourcePoint"/>
                         <mxPoint x="710" y="700" as="targetPoint"/>
@@ -103,13 +109,21 @@
                         </Array>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="105" value="提交作业" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];labelBackgroundColor=none;" parent="104" vertex="1" connectable="0">
+                <mxCell id="105" value="提交作业" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];labelBackgroundColor=none;fontColor=#FF0000;" parent="104" vertex="1" connectable="0">
                     <mxGeometry x="0.0001" relative="1" as="geometry">
                         <mxPoint as="offset"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="107" value="novnc-client" style="rounded=0;whiteSpace=wrap;fillColor=none;spacing=0;labelBackgroundColor=none;" vertex="1" parent="1">
-                    <mxGeometry x="388.25" y="562" width="80" height="22.5" as="geometry"/>
+                <mxCell id="115" style="edgeStyle=none;html=1;fillColor=#0050ef;strokeColor=#001DBC;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="107" target="15">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="540" y="570" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="107" value="novnc-client" style="rounded=0;whiteSpace=wrap;fillColor=none;spacing=0;labelBackgroundColor=none;" parent="1" vertex="1">
+                    <mxGeometry x="380" y="562" width="80" height="22.5" as="geometry"/>
+                </mxCell>
+                <mxCell id="117" value="portal-server" style="rounded=0;whiteSpace=wrap;fillColor=none;spacing=0;labelBackgroundColor=none;" vertex="1" parent="1">
+                    <mxGeometry x="575" y="562" width="80" height="22.5" as="geometry"/>
                 </mxCell>
             </root>
         </mxGraphModel>

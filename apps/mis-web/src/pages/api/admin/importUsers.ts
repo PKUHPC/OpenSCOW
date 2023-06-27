@@ -10,33 +10,35 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { route } from "@ddadaal/next-typed-api-routes-runtime";
+import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Status } from "@grpc/grpc-js/build/src/constants";
-import { AdminServiceClient, ImportUsersData } from "@scow/protos/build/server/admin";
+import { AdminServiceClient } from "@scow/protos/build/server/admin";
+import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { PlatformRole } from "src/models/User";
+import { ImportUsersData } from "src/models/UserSchemaModel";
 import { getClient } from "src/utils/client";
 import { queryIfInitialized } from "src/utils/init";
 import { handlegRPCError } from "src/utils/server";
 
-export interface ImportUsersSchema {
-  method: "POST";
+export const ImportUsersSchema = typeboxRouteSchema({
+  method: "POST",
 
-  body: {
-    data: ImportUsersData;
-    whitelist: boolean;
-  }
+  body: Type.Object({
+    data: ImportUsersData,
+    whitelist: Type.Boolean(),
+  }),
 
   responses: {
-    204: null;
-    400: { code: "INVALID_DATA" };
-  }
-}
+    204: Type.Null(),
+    400: Type.Object({ code: Type.Literal("INVALID_DATA") }),
+  },
+});
 
 const auth = authenticate((info) => info.platformRoles.includes(PlatformRole.PLATFORM_ADMIN));
 
-export default route<ImportUsersSchema>("ImportUsersSchema",
+export default typeboxRoute(ImportUsersSchema,
   async (req, res) => {
 
     // if not initialized, every one can import users

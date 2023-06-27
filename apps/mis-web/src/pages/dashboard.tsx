@@ -36,7 +36,7 @@ export type AccountInfo = Omit<AccountStatus, "balance"> & {
 type Props = {
   error: AuthResultError;
 } | {
-  storageQuotas: GetUserStatusSchema["responses"]["200"]["storageQuotas"],
+  storageQuotas: typeof GetUserStatusSchema["responses"]["200"]["storageQuotas"],
   accounts: Record<string, AccountInfo>;
 };
 
@@ -54,6 +54,7 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)((props: Pr
   }
 
   const { accounts } = props;
+  const noAccounts = Object.keys(accounts).length === 0;
 
   return (
     <div>
@@ -62,7 +63,7 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)((props: Pr
       {/* <Divider /> */}
       {/* <StorageSection storageQuotas={storageQuotas} /> */}
       <Divider />
-      <JobsSection user={userStore.user!} />
+      {noAccounts ? null : <JobsSection user={userStore.user!} />}
     </div>
   );
 });

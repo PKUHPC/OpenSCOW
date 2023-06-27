@@ -10,26 +10,27 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { route } from "@ddadaal/next-typed-api-routes-runtime";
+import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { InitServiceClient } from "@scow/protos/build/server/init";
+import { Type } from "@sinclair/typebox";
 import { getClient } from "src/utils/client";
 import { queryIfInitialized } from "src/utils/init";
 
-export interface CompleteInitSchema {
-  method: "POST";
+export const CompleteInitSchema = typeboxRouteSchema({
+  method: "POST",
 
   responses: {
-    204: null;
+    204: Type.Null(),
 
-    409: { code: "ALREADY_INITIALIZED"; }
-  }
-}
+    409: Type.Object({ code: Type.Literal("ALREADY_INITIALIZED") }),
+  },
+});
 
-export default route<CompleteInitSchema>("CompleteInitSchema", async () => {
+export default typeboxRoute(CompleteInitSchema, async () => {
   const result = await queryIfInitialized();
 
-  if (result) { return { 409: { code: "ALREADY_INITIALIZED" } }; }
+  if (result) { return { 409: { code: "ALREADY_INITIALIZED" as const } }; }
 
   const client = getClient(InitServiceClient);
 

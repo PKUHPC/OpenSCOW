@@ -13,7 +13,7 @@
 import "nprogress/nprogress.css";
 import "antd/dist/reset.css";
 
-import { failEvent, fromApi } from "@ddadaal/next-typed-api-routes-runtime/lib/client";
+import { failEvent } from "@ddadaal/next-typed-api-routes-runtime/lib/client";
 import { AntdConfigProvider } from "@scow/lib-web/build/layouts/AntdConfigProvider";
 import { DarkModeCookie, DarkModeProvider, getDarkModeCookieValue } from "@scow/lib-web/build/layouts/darkMode";
 import { GlobalStyle } from "@scow/lib-web/build/layouts/globalStyle";
@@ -29,12 +29,11 @@ import Head from "next/head";
 import { join } from "path";
 import { useEffect, useRef } from "react";
 import { createStore, StoreProvider, useStore } from "simstate";
+import { api } from "src/apis";
 import { USE_MOCK } from "src/apis/useMock";
 import { getTokenFromCookie } from "src/auth/cookie";
 import { BaseLayout } from "src/layouts/BaseLayout";
 import { FloatButtons } from "src/layouts/FloatButtons";
-import { ListAvailableAppsSchema } from "src/pages/api/app/listAvailableApps";
-import { ValidateTokenSchema } from "src/pages/api/auth/validateToken";
 import { AppsStore } from "src/stores/AppsStore";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import {
@@ -138,7 +137,7 @@ function MyApp({ Component, pageProps, extra }: Props) {
             <GlobalStyle />
             <FailEventHandler />
             <TopProgressBar />
-            <BaseLayout footerText={footerText}>
+            <BaseLayout footerText={footerText} versionTag={publicConfig.VERSION_TAG}>
               <Component {...pageProps} />
             </BaseLayout>
           </AntdConfigProvider>
@@ -172,19 +171,7 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
       // validateToken depends on ioredis, which cannot be brought into frontend.
       // dynamic import also doesn't work.
 
-      // Why not use api object directly?
-      // fetch in server (node-fetch per se) only supports absolute url
-      // but next-typed-api-routes's object has only pathname
-
-      const basePrefix = join(
-        `http://localhost:${process.env.PORT ?? 3000}`,
-        publicConfig.BASE_PATH,
-      );
-
-      const userInfo = await fromApi<ValidateTokenSchema>(
-        "GET",
-        join(basePrefix, "/api/auth/validateToken"),
-      )({ query: { token } }).catch(() => undefined);
+      const userInfo = await api.validateToken({ query: { token } }).catch(() => undefined);
 
       if (userInfo) {
         extra.userInfo = {
@@ -192,15 +179,11 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
           token: token,
         };
 
-        const apps = USE_MOCK
-          ? [{ id: "vscode", name: "VSCode" }, { id: "emacs", name: "Emacs" }]
-          : await fromApi<ListAvailableAppsSchema>(
-            "GET",
-            join(basePrefix, "/api/app/listAvailableApps"),
-          )({ query: { token } }).then((x) => x.apps);
-
+        const apps = await api.listAvailableApps({ query: { token } }).then((x) => x.apps).catch(() => []);
         extra.apps = apps;
+
       }
+
     }
 
     const hostname = getHostname(appContext.ctx.req);

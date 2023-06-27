@@ -13,11 +13,10 @@
 import { NextApiRequest } from "next";
 import { setupWssProxy } from "src/pages/api/proxy/[clusterId]/[type]/[node]/[port]/[[...path]]";
 import { setupShellServer } from "src/pages/api/shell";
-import { AugmentedNextApiResponse } from "src/types/next";
 
 let setup = false;
 
-export default async (req: NextApiRequest, res: AugmentedNextApiResponse) => {
+export default async (req: NextApiRequest, res) => {
   if (setup) {
     res.send("Already setup");
     return;

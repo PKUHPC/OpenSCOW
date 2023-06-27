@@ -1,5 +1,11 @@
 # @scow/demo-vagrant
 
+## 1.1.1
+
+### Patch Changes
+
+- 6f024239c: vagrant 升级至 cli，交互式应用增加 jupyter
+
 ## 1.1.0
 
 ### Minor Changes

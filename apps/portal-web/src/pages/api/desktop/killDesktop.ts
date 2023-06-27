@@ -10,31 +10,33 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { DesktopServiceClient } from "@scow/protos/build/portal/desktop";
+import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { getClient } from "src/utils/client";
 import { publicConfig } from "src/utils/config";
-import { route } from "src/utils/route";
 
-export interface KillDesktopSchema {
-  method: "POST";
+export const KillDesktopSchema = typeboxRouteSchema({
+  method: "POST",
 
-  body: {
-    displayId: number;
-    cluster: string;
-  }
+  body: Type.Object({
+    displayId: Type.Number(),
+    cluster: Type.String(),
+  }),
 
   responses: {
-    204: null;
+    204: Type.Null(),
     // 功能没有启用
-    501: null;
-  }
-}
+    501: Type.Null(),
+  },
+
+});
 
 const auth = authenticate(() => true);
 
-export default /* #__PURE__*/route<KillDesktopSchema>("KillDesktopSchema", async (req, res) => {
+export default /* #__PURE__*/typeboxRoute(KillDesktopSchema, async (req, res) => {
 
   if (!publicConfig.ENABLE_LOGIN_DESKTOP) {
     return { 501: null };

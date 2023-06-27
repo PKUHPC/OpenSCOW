@@ -13,6 +13,7 @@
 import { formatDateTime } from "@scow/lib-web/build/utils/datetime";
 import { Money } from "@scow/protos/build/common/money";
 import { PlatformTenantsInfo } from "@scow/protos/build/server/tenant";
+import { Static } from "@sinclair/typebox";
 import { Table } from "antd";
 import { ColumnsType } from "antd/es/table";
 import React, { useCallback } from "react";
@@ -39,7 +40,7 @@ export const AllTenantsTable: React.FC<Props> = ({ refreshToken }) => {
   );
 };
 interface TenantInfoTableProps {
-  data: GetAllTenantsSchema["responses"]["200"] | undefined;
+  data: Static<typeof GetAllTenantsSchema["responses"]["200"]> | undefined;
   isLoading: boolean;
   reload: () => void;
 }
@@ -50,10 +51,6 @@ const TenantInfoTable: React.FC<TenantInfoTableProps> = ({
 }) => {
 
   const columns: ColumnsType<PlatformTenantsInfo> = [
-    {
-      dataIndex: "tenantId",
-      title: "租户ID",
-    },
     {
       dataIndex: "tenantId",
       title: "租户ID",

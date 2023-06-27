@@ -23,6 +23,9 @@ export interface CreateAppRequest {
   maxTime: number;
   customAttributes: { [key: string]: string };
   proxyBasePath: string;
+  nodeCount: number;
+  gpuCount?: number;
+  memory?: string;
 }
 
 export type CreateAppReply = {
@@ -71,7 +74,9 @@ export interface SubmissionInfo {
   account: string;
   partition?: string;
   qos?: string;
+  nodeCount: number;
   coreCount: number;
+  gpuCount?: number;
   maxTime: number;
   submitTime?: string;
   customAttributes: { [key: string]: string };

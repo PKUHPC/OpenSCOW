@@ -10,31 +10,60 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { route } from "@ddadaal/next-typed-api-routes-runtime";
+import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { JobBillingItem } from "@scow/protos/build/server/job";
+import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
-import { JobBillingTableItem } from "src/components/JobBillingTable";
 import { PlatformRole } from "src/models/User";
 import { getBillingItems } from "src/pages/api/job/getBillingItems";
 import { publicConfig, runtimeConfig } from "src/utils/config";
 import { moneyToString } from "src/utils/money";
 
-export interface GetBillingTableSchema {
-  method: "GET";
+// Cannot use JobBillingTableItem from /components/JobBillingTable
+export const JobBillingTableItem = Type.Object({
+  index: Type.Number(),
 
-  query: {
+  cluster: Type.String(),
+  clusterItemIndex: Type.Number(),
+  priceItem: Type.Optional(Type.Object({
+    itemId: Type.String(),
+    price: Type.String(),
+    amount: Type.String(),
+  })),
+
+  partition: Type.String(),
+  partitionCount: Type.Number(),
+
+  partitionItemIndex: Type.Number(),
+
+  qos: Type.String(),
+  qosCount: Type.Number(),
+  nodes: Type.Number(),
+  mem: Type.Number(),
+  cores: Type.Number(),
+  gpus: Type.Number(),
+  path: Type.String(),
+  comment: Type.Optional(Type.String()),
+
+});
+export type JobBillingTableItem = Static<typeof JobBillingTableItem>;
+
+export const GetBillingTableSchema = typeboxRouteSchema({
+  method: "GET",
+
+  query: Type.Object({
     /**
      * Platform admin can query any tenant
      * Not login user can only query platform default (by not setting the tenant field)
      * Login user can only query the platform default and tenant the user belongs to
      */
-    tenant?: string;
-  }
+    tenant: Type.Optional(Type.String()),
+  }),
 
   responses: {
-    200: { items: JobBillingTableItem[];};
-  }
-}
+    200: Type.Object({ items: Type.Array(JobBillingTableItem) }),
+  },
+});
 
 
 export async function getBillingTableItems(tenantName: string | undefined) {
@@ -90,7 +119,7 @@ export async function getBillingTableItems(tenantName: string | undefined) {
 
 }
 
-export default /* #__PURE__*/route<GetBillingTableSchema>("GetBillingTableSchema", async (req, res) => {
+export default /* #__PURE__*/typeboxRoute(GetBillingTableSchema, async (req, res) => {
   const { tenant } = req.query;
 
   if (tenant) {

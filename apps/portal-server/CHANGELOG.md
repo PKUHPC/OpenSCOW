@@ -1,5 +1,17 @@
 # @scow/portal-server
 
+## 0.7.0
+
+### Patch Changes
+
+- 0f64e5404: 获取桌面和应用列表时，不再解析节点域名到 IP
+- Updated dependencies [0f64e5404]
+- Updated dependencies [81895f4be]
+  - @scow/config@0.3.1
+  - @scow/protos@0.2.3
+  - @scow/lib-server@0.2.0
+  - @scow/lib-slurm@0.1.5
+
 ## 0.6.0
 
 ### Patch Changes

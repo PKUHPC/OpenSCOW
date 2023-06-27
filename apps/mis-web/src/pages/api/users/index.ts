@@ -10,29 +10,30 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { route } from "@ddadaal/next-typed-api-routes-runtime";
+import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
-import type { AccountUserInfo } from "@scow/protos/build/server/user";
 import { UserServiceClient } from "@scow/protos/build/server/user";
+import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { PlatformRole, UserRole } from "src/models/User";
+import { AccountUserInfo } from "src/models/UserSchemaModel";
 import { getClient } from "src/utils/client";
 
-export interface GetAccountUsersSchema {
-  method: "GET";
+export const GetAccountUsersSchema = typeboxRouteSchema({
+  method: "GET",
 
-  query: {
-    accountName: string;
-  }
+  query: Type.Object({
+    accountName: Type.String(),
+  }),
 
   responses: {
-    200: {
-      results: AccountUserInfo[];
-    }
-  }
-}
+    200: Type.Object({
+      results: Type.Array(AccountUserInfo),
+    }),
+  },
+});
 
-export default route<GetAccountUsersSchema>("GetAccountUsersSchema", async (req, res) => {
+export default typeboxRoute(GetAccountUsersSchema, async (req, res) => {
 
   const { accountName } = req.query;
 
