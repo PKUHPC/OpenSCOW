@@ -32,6 +32,7 @@ import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { publicConfig } from "src/utils/config";
 
 interface Props {
+
 }
 
 export const AppSessionsTable: React.FC<Props> = () => {

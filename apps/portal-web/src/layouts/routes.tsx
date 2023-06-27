@@ -87,30 +87,39 @@ export const userRoutes: (
       text: "桌面",
       path: "/desktop",
     }] : []),
-    ...(publicConfig.ENABLE_APPS ? [{
+    ...(publicConfig.ENABLE_APPS && publicConfig.CLUSTERS.length > 0 ? [{
       Icon: EyeOutlined,
       text: "交互式应用",
       path: "/apps",
-      clickToPath: "/apps/sessions",
-      children: [
-        {
-          Icon: Loading3QuartersOutlined,
-          text: "已创建的应用",
-          path: "/apps/sessions",
-        },
-        ...(apps.length > 0 ? [
+      // clickToPath: "/apps/sessions",
+      clickToPath: `/apps/${defaultCluster.id}/`,
+      clickable: false,
+      children: publicConfig.CLUSTERS.map((cluster) => ({
+        Icon: FolderOutlined,
+        text: cluster.name,
+        path: `/apps/${cluster.id}`,
+        clickToPath: `/apps/${cluster.id}/`,
+        children: [
           {
-            Icon: PlusOutlined,
-            text: "创建应用",
-            clickable: false,
-            path: "/apps/create",
-            children: apps.map(({ id, name }) => ({
-              Icon: DesktopOutlined,
-              text: name,
-              path: `/apps/create/${id}`,
-            })),
-          }] : []),
-      ],
+            Icon: Loading3QuartersOutlined,
+            text: "已创建的应用",
+            path: `/apps/${cluster.id}/sessions`,
+          },
+          // 确定四级导航还要不要？？？？
+          ...(apps.length > 0 ? [
+            {
+              Icon: PlusOutlined,
+              text: "创建应用",
+              clickable: false,
+              path: `/apps/${cluster.id}/create`,
+              children: apps.map(({ id, name }) => ({
+                Icon: DesktopOutlined,
+                text: name,
+                path: `/apps/${cluster.id}/create/${id}`,
+              })),
+            }] : []),
+        ],
+      })),
     }] : []),
     ...(publicConfig.CLUSTERS.length > 0 ? [{
       Icon: FolderOutlined,

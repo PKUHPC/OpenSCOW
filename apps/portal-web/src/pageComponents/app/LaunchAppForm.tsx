@@ -78,7 +78,7 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
     } })
       .then(() => {
         message.success("创建成功！");
-        Router.push("/apps/sessions");
+        Router.push("./apps/sessions");
       }).finally(() => {
         setLoading(false);
       });

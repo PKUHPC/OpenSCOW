@@ -21,6 +21,7 @@ import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
 import { LaunchAppForm } from "src/pageComponents/app/LaunchAppForm";
+import { publicConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
 
 
@@ -28,6 +29,9 @@ export const AppIndexPage: NextPage = requireAuth(() => true)(() => {
 
   const router = useRouter();
   const appId = queryToString(router.query.app);
+  const cluster = queryToString(router.query.clusterId);
+  const clusterName = publicConfig.CLUSTERS.find((x) => x.id === cluster)?.name || cluster;
+
   const { message } = App.useApp();
 
   const { data, isLoading } = useAsync({
@@ -45,7 +49,7 @@ export const AppIndexPage: NextPage = requireAuth(() => true)(() => {
   return (
     <div>
       <Head title={`启动${data.appName}`} />
-      <PageTitle titleText={`启动${data.appName}`} />
+      <PageTitle titleText={`启动集群${clusterName}的${data.appName}`} />
       <LaunchAppForm appName={data.appName} attributes={data.appCustomFormAttributes} appId={appId} />
     </div>
   );
