@@ -198,7 +198,7 @@ export async function fetchJobs(
           fields,
           filter: {
             users: [], accounts: [], states: [],
-            endTime: { startTime: startFetchDate?.toISOString(), endTime: endFetchDate.toISOString() },
+            endTime: { startTime: startDate?.toISOString(), endTime: endDate.toISOString() },
           },
           pageInfo: { page: 1, pageSize: 1 },
         }),
@@ -219,7 +219,7 @@ export async function fetchJobs(
             fields,
             filter: {
               users: [], accounts: [], states: [],
-              endTime: { startTime: startFetchDate?.toISOString(), endTime: endFetchDate.toISOString() },
+              endTime: { startTime: startDate?.toISOString(), endTime: endDate.toISOString() },
             },
           }),
         ).then(processGetJobsResult)));
