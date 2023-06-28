@@ -124,6 +124,18 @@ jobs:
           name: scow-cli-arm64
           path: apps/cli/exe/cli-arm64
 
+  curl:
+    needs: test-version-packages
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Run Curl
+        run: curl ${{ env.PKU_CR }}
+       - name: Display Curl Result
+        run: |
+          echo "Curl Result:"
+          echo "${{ steps.run-ping.outputs.stdout }}"
+
   build-images:
     needs: test-version-packages
     runs-on: ubuntu-latest
