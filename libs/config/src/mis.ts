@@ -14,19 +14,6 @@ import { GetConfigFn, getConfigFromFile } from "@scow/lib-config";
 import { Static, Type } from "@sinclair/typebox";
 import { DEFAULT_CONFIG_BASE_PATH } from "src/constants";
 
-// export const SlurmMisConfigSchema = Type.Object({
-//   managerUrl: Type.String({ description: "slurm manager节点的URL" }),
-//   dbHost: Type.String({ description: "slurmdbd的数据库地址", default: "localhost" }),
-//   dbPort: Type.Integer({ description: "slurmdbd的数据库端口", default: 3306 }),
-//   dbUser: Type.String({ description: "slurmdbd的数据库的用户名", default: "root" }),
-//   dbPassword: Type.String({ description: "slurmdbd的数据库密码" }),
-//   slurmAcctDbName: Type.String({ description: "slurm accounting database的数据库名", default: "slurm_acct_db" }),
-//   clusterName: Type.String({ description: "这个集群在slurm中的集群名字" }),
-//   scriptPath: Type.String({ description: "slurm.sh绝对路径" }),
-// }, { description: "slurm的MIS配置" });
-
-// export type SlurmMisConfigSchema = Static<typeof SlurmMisConfigSchema>;
-
 export enum JobTableType {
   mariadb = "mariadb",
   mysql = "mysql",

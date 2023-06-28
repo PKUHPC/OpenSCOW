@@ -16,7 +16,6 @@ import { MySqlDriver, SqlEntityManager } from "@mikro-orm/mysql";
 import { Decimal } from "@scow/lib-decimal";
 import { createServer } from "src/app";
 import { setJobCharge } from "src/bl/charging";
-// import { clusterNameToScowClusterId } from "src/config/clusters";
 import { JobInfo } from "src/entities/JobInfo";
 import { UserStatus } from "src/entities/UserAccount";
 import { createPriceItems } from "src/tasks/createBillingItems";
