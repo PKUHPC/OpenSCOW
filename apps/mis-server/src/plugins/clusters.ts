@@ -43,11 +43,6 @@ export type ClusterPlugin = {
   }
 }
 
-
-// const clusterOpsMaps = {
-//   "slurm": createSlurmOps,
-// } as const;
-
 export const CLUSTEROPS_ERROR_CODE = "CLUSTEROPS_ERROR";
 
 export const clustersPlugin = plugin(async (f) => {
