@@ -15,7 +15,7 @@ import path from "path";
 import { LoggingOption, ServiceSpec } from "src/compose/spec";
 import { InstallConfigSchema } from "src/config/install";
 
-const IMAGE: string = "mirrors.pku.edu.cn/pkuhpc-icode";
+const IMAGE: string = "mirrors.pku.edu.cn/pkuhpc-icode/scow";
 
 function checkPathFormat(configKey: string, value: string) {
   if (value !== "/" && value.endsWith("/")) {
