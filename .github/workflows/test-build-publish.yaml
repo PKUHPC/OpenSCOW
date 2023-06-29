@@ -14,7 +14,8 @@ concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 env:
   GITHUB_CR: ghcr.io
-  PKU_CR: mirrors6.eecser.com
+  PKU_CR: mirrors.eecser.com
+  PKU_PROJECT_NAME: pkuhpc-icode
   # ALIYUN_CR: registry.cn-hangzhou.aliyuncs.com
   # ALIYUN_PROJECT_NAME: scow
 
@@ -124,17 +125,6 @@ jobs:
           name: scow-cli-arm64
           path: apps/cli/exe/cli-arm64
 
-  curl:
-    needs: test-version-packages
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Run Curl
-        run: curl ${{ env.PKU_CR }}
-      - name: Display Curl Result
-        run: |
-          echo "Curl Result:"
-          echo "${{ steps.run-ping.outputs.stdout }}"
 
   build-images:
     needs: test-version-packages
@@ -184,7 +174,7 @@ jobs:
         with:
           images: |
             ${{ env.GITHUB_CR }}/${{ github.repository }}/${{ matrix.name }}
-            ${{ env.PKU_CR }}/${{ matrix.name }}
+            ${{ env.PKU_CR }}/${{ env.PKU_PROJECT_NAME }}/${{ matrix.name }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v4
