@@ -18,7 +18,6 @@ import { logger } from "src/log";
 export const InstallConfigSchema = Type.Object({
   port: Type.Integer({ description: "端口号", default: 80 }),
   basePath: Type.String({ description: "整个系统的部署路径", default: "/" }),
-  image: Type.String({ description: "镜像", default: "ghcr.io/pkuhpc/scow/scow" }),
   imageTag: Type.String({ description: "镜像tag", default: "master" }),
 
   log: Type.Object({

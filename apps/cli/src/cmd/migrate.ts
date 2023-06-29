@@ -60,7 +60,6 @@ export const migrateFromScowDeployment = (options: Props) => {
   const config: DeepPartial<InstallConfigSchema> = {
     port: common.PORT,
     basePath: common.BASE_PATH,
-    image: common.IMAGE,
     imageTag: common.IMAGE_TAG,
 
     gateway: gateway ? {
