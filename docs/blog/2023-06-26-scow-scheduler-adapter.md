@@ -47,7 +47,7 @@ scow只会调用这套接口来实现调度器功能。
 
 - 首先修改[集群配置文件](%DOCS_URL%%BASE_PATH%docs/deploy/config/cluster-config)
 
-  主要变化为删除`slurm`配置项, 将`loginNodes`配置项。新增`adapterUrl`配置项，标识适配器地址
+  主要变化为删除`slurm`配置项, 将`loginNodes`配置项作为独立的一项配置。新增`adapterUrl`配置项，标识适配器地址
 
 - 修改[管理系统配置文件](%DOCS_URL%%BASE_PATH%docs/deploy/config/mis/intro)
 
