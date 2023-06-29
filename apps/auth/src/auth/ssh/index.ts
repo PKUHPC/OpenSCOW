@@ -29,7 +29,7 @@ function checkLoginNode(sshConfig: SshConfigSchema) {
       throw new Error("No cluster has been set in clusters config");
     }
     const clusterConfig = Object.values(clusters)[0];
-    loginNode = clusterConfig.slurm.loginNodes[0];
+    loginNode = clusterConfig.slurm.loginNodes[0].address;
 
     if (!loginNode) {
       throw new Error(`Cluster ${clusterConfig.displayName} has no login node.`);

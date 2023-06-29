@@ -25,7 +25,11 @@ export const ClusterConfigSchema = Type.Object({
     autoSetupNginx: Type.Boolean({ description: "是否自动配置nginx", default: false }),
   })),
   slurm: Type.Object({
-    loginNodes: Type.Array(Type.String(), { description: "集群的登录节点地址", default: []}),
+    loginNodes: Type.Array(Type.Object(
+      {
+        name: Type.String({ description: "登录节点名" }), address: Type.String({ description: "登录节点IP地址" }),
+      },
+    )),
     partitions: Type.Array(
       Type.Object(
         {

@@ -1,7 +1,8 @@
 displayName: hpc01Name
 slurm:
-  loginNodes: 
-    - localhost:22222
+  loginNodes:
+    - name: loginNode01
+      address: localhost:22222
   partitions:
       - name: compute
         nodes: 3

@@ -61,15 +61,15 @@ export async function insertKeyToNewUser(userId: string, password: string, logge
     await Promise.all(Object.values(clusters).map(async ({ displayName, slurm, misIgnore }) => {
       if (misIgnore) { return; }
       const node = slurm.loginNodes[0];
-      logger.info("Checking if user can login to %s by login node %s", displayName, node);
+      logger.info("Checking if user can login to %s by login node %s", displayName, node.name);
 
-      const error = await insertKeyAsUser(node, userId, password, rootKeyPair, logger).catch((e) => e);
+      const error = await insertKeyAsUser(node.address, userId, password, rootKeyPair, logger).catch((e) => e);
       if (error) {
         logger
-          .info("user %s cannot login to %s by login node %s. err: %o", userId, displayName, node, error);
+          .info("user %s cannot login to %s by login node %s. err: %o", userId, displayName, node.name, error);
         throw error;
       } else {
-        logger.info("user %s login to %s by login node %s", userId, displayName, node);
+        logger.info("user %s login to %s by login node %s", userId, displayName, node.name);
       }
     }));
   }

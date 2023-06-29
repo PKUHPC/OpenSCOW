@@ -54,9 +54,10 @@ export const clustersPlugin = plugin(async (f) => {
 
   if (process.env.NODE_ENV === "production") {
     await Promise.all(Object.values(clusters).map(async ({ displayName, slurm: { loginNodes } }) => {
-      const node = loginNodes[0];
+      const address = loginNodes[0]?.address;
+      const node = loginNodes[0]?.name;
       f.logger.info("Checking if root can login to %s by login node %s", displayName, node);
-      const error = await testRootUserSshLogin(node, rootKeyPair, f.logger);
+      const error = await testRootUserSshLogin(address, rootKeyPair, f.logger);
       if (error) {
         f.logger.info("Root cannot login to %s by login node %s. err: %o", displayName, node, error);
         throw error;
