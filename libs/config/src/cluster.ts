@@ -27,7 +27,7 @@ export const ClusterConfigSchema = Type.Object({
   slurm: Type.Object({
     loginNodes: Type.Array(Type.Object(
       {
-        name: Type.String({ description: "登录节点名" }), address: Type.String({ description: "登录节点IP地址" }),
+        name: Type.String({ description: "登录节点展示名" }), address: Type.String({ description: "集群的登录节点地址" }),
       },
     )),
     partitions: Type.Array(
