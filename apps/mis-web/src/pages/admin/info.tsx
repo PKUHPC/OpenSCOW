@@ -65,13 +65,12 @@ export const PlatformInfoPage: NextPage<Props> = (props) => {
 };
 
 export const getServerSideProps: GetServerSideProps<Props> = async (ctx) => {
-
   const auth = ssrAuthenticate(
-    (i) => i.platformRoles.includes(PlatformRole.PLATFORM_ADMIN || PlatformRole.PLATFORM_FINANCE),
+    (i) => i.platformRoles.includes(PlatformRole.PLATFORM_FINANCE)
+    || i.platformRoles.includes(PlatformRole.PLATFORM_ADMIN),
   );
 
   const info = await auth(ctx.req);
-
   if (typeof info === "number") {
     return { props: { error: info } };
   }
