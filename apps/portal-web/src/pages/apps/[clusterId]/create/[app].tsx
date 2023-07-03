@@ -21,7 +21,6 @@ import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
 import { LaunchAppForm } from "src/pageComponents/app/LaunchAppForm";
-import { publicConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
 
 

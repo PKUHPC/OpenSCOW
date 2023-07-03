@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { DEFAULT_CONFIG_BASE_PATH } from "@scow/config/src/constants";
+import { DEFAULT_CONFIG_BASE_PATH } from "@scow/config/build/constants";
 import { join } from "path";
 import { getAppConfigs } from "src/config/apps";
 

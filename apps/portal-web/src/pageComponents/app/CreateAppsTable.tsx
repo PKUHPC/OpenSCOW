@@ -44,17 +44,20 @@ interface Props {
   clusterId: string;
 }
 
+interface ImageErrorMap {
+  [appId: string]: boolean;
+}
+
 export const CreateAppsTable: React.FC<Props> = ({ clusterId }) => {
 
   const { data, isLoading } = useAsync({ promiseFn: useCallback(async () => {
     return await api.listAvailableApps({ query: { cluster: clusterId } });
   }, []) });
 
-  const [imageError, setImageError] = useState(false);
+  const [imageErrorMap, setImageErrorMap] = useState<ImageErrorMap>({});
 
-  const handleImageError = () => {
-    setImageError(true);
-    return false;
+  const handleImageError = (appId: string) => {
+    setImageErrorMap((prevMap) => ({ ...prevMap, [appId]: true }));
   };
 
   if (!isLoading && data?.clusterApps.length === 0) {
@@ -77,19 +80,32 @@ export const CreateAppsTable: React.FC<Props> = ({ clusterId }) => {
                 <Tooltip title={`创建${app.name}`} placement="bottom">
                   <Link href={`/apps/${clusterId}/create/${app.id}`}>
                     <AvatarContainer>
-                      <Avatar
-                        style={{
-                          objectFit: "cover",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                        }}
-                        size={150}
-                        src={(app.logoPath && !imageError) ? join(publicConfig.PUBLIC_PATH, app.logoPath) : undefined}
-                        icon={(!app.logoPath || imageError) ? <PictureOutlined /> : undefined}
-                        onError={handleImageError}
-                      >
-                      </Avatar>
+                      {
+                        (app.logoPath && imageErrorMap[app.id] !== true) ? (
+                          <img
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              width: "150px",
+                              height: "150px",
+                              borderRadius: "50%",
+                            }}
+                            src={join(publicConfig.PUBLIC_PATH, app.logoPath)}
+                            onError={() => handleImageError(app.id)}
+                          />
+                        ) : (
+                          <Avatar
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                            }}
+                            size={150}
+                            icon={<PictureOutlined />}
+                          />
+                        )
+                      }
                     </AvatarContainer>
                     <NameContainer>{app.name}</NameContainer>
                   </Link>

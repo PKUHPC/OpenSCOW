@@ -15,7 +15,6 @@ import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { status } from "@grpc/grpc-js";
 import { AppServiceClient } from "@scow/protos/build/portal/app";
 import { Type } from "@sinclair/typebox";
-import dayjs from "dayjs";
 import { join } from "path";
 import { authenticate } from "src/auth/server";
 import { getClient } from "src/utils/client";

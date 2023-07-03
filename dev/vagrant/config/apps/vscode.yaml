@@ -1,0 +1,47 @@
+# 这个应用的ID
+id: vscode
+
+# 这个应用的名字
+name: VSCode
+
+# 这个应用的图标文件在公共文件下的路径
+# logoPath: /test.svg
+
+# 指定应用类型为web
+type: web
+
+web:
+  # 准备脚本
+  beforeScript: |
+    export PORT=$(get_port)
+    export PASSWORD=$(get_password 12)
+  # 运行任务的脚本。可以使用准备脚本定义的
+  script: |
+    PASSWORD=$PASSWORD /data/software/code-server/bin/code-server -vvv --bind-addr 0.0.0.0:$PORT --auth password
+  proxyType: relative
+  # 如何连接应用
+  connect:
+    method: POST
+    path: /login
+    formData:
+      password: "{{ PASSWORD }}"
+
+
+# 配置HTML表单，用户可以指定code-server版本
+attributes:
+  - type: select
+    name: selectVersion
+    label: 选择版本
+    required: true  # 用户必须选择一个版本
+    placeholder: 选择code-server的版本  # 提示信息
+    select:
+      - value: code-server/4.8.0
+        label: version 4.8.0
+      - value: code-server/4.9.0
+        label: version 4.9.0
+
+  - type: text
+    name: sbatchOptions
+    label: 其他sbatch参数
+    required: false
+    placeholder: "比如：--gpus gres:2 --time 10"
