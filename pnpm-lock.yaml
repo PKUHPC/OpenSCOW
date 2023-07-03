@@ -835,8 +835,8 @@ importers:
         specifier: 0.28.15
         version: 0.28.15
       '@tsconfig/docusaurus':
-        specifier: 1.0.7
-        version: 1.0.7
+        specifier: 2.0.0
+        version: 2.0.0
       '@types/react':
         specifier: 18.0.18
         version: 18.0.18
@@ -5966,8 +5966,8 @@ packages:
     engines: {node: '>=10.13.0'}
     dev: false
 
-  /@tsconfig/docusaurus@1.0.7:
-    resolution: {integrity: sha512-ffTXxGIP/IRMCjuzHd6M4/HdIrw1bMfC7Bv8hMkTadnePkpe0lG0oDSdbRpSDZb2rQMAgpbWiR10BvxvNYwYrg==}
+  /@tsconfig/docusaurus@2.0.0:
+    resolution: {integrity: sha512-X5wptT7pXA/46/IRFTW76oR5GNjoy9qjNM/1JGhFV4QAsmLh3YUpJJA+Vpx7Ds6eEBxSxz1QrgoNEBy6rLVs8w==}
     dev: true
 
   /@tsconfig/node10@1.0.9:
