@@ -46,7 +46,7 @@ PubkeyAcceptedKeyTypes=+ssh-rsa
 
 针对不同种类的调度器，需要在集群上部署对应的适配器
 
-- slurm
+- [slurm](https://github.com/PKUHPC/scow-slurm-adapter)
 
 ## 下载scow-cli
 

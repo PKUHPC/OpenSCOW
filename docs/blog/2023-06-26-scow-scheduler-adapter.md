@@ -37,7 +37,7 @@ scow只会调用这套接口来实现调度器功能。
 
 部署适配器可参考文档：
 
-- slurm
+- [slurm](https://github.com/PKUHPC/scow-slurm-adapter)
 
 ### 2. 修改SCOW配置文件
 
