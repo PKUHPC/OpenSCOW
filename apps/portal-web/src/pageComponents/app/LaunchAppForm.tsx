@@ -326,13 +326,13 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
                 {
                   required: true,
                   type: "integer",
-                  max: currentPartitionInfo?.gpus,
+                  max: currentPartitionInfo?.gpus / currentPartitionInfo.nodes,
                 },
               ]}
             >
               <InputNumber
                 min={1}
-                max={currentPartitionInfo?.gpus}
+                max={currentPartitionInfo?.gpus / currentPartitionInfo.nodes}
                 {...inputNumberFloorConfig}
               />
             </Form.Item>
@@ -342,12 +342,16 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
               name="coreCount"
               dependencies={["cluster", "partition"]}
               rules={[
-                { required: true, type: "integer", max: currentPartitionInfo?.cores },
+                { required: true,
+                  type: "integer",
+                  max: currentPartitionInfo ?
+                    currentPartitionInfo.cores / currentPartitionInfo.nodes : undefined },
               ]}
             >
               <InputNumber
                 min={1}
-                max={currentPartitionInfo?.cores}
+                max={currentPartitionInfo ?
+                  currentPartitionInfo.cores / currentPartitionInfo.nodes : undefined }
                 {...inputNumberFloorConfig}
               />
             </Form.Item>
