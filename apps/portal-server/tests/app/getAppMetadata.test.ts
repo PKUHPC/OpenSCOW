@@ -52,8 +52,9 @@ afterEach(async () => {
 
 it("get app metadata", async () => {
   const appId = "vscode";
+  const cluster = "hpc01";
 
-  const reply = await asyncUnaryCall(client, "getAppMetadata", { appId });
+  const reply = await asyncUnaryCall(client, "getAppMetadata", { appId, cluster });
 
   const attributes: AppCustomAttribute[] = reply.attributes.map((item) => ({
     type: appCustomAttribute_AttributeTypeToJSON(item.type) as AppCustomAttribute["type"],

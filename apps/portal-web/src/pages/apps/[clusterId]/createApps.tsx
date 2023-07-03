@@ -10,54 +10,39 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { LoadingOutlined } from "@ant-design/icons";
 import { queryToString } from "@scow/lib-web/build/utils/querystring";
-import { App } from "antd";
+import { Result } from "antd";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
-import { useCallback } from "react";
-import { useAsync } from "react-async";
-import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
-import { LaunchAppForm } from "src/pageComponents/app/LaunchAppForm";
+import { CreateAppsTable } from "src/pageComponents/app/CreateAppsTable";
 import { publicConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
 
-
-export const AppIndexPage: NextPage = requireAuth(() => true)(() => {
+export const CreatAppsIndexPage: NextPage = requireAuth(() => true)(() => {
 
   const router = useRouter();
-  const appId = queryToString(router.query.app);
   const clusterId = queryToString(router.query.clusterId);
+  const cluster = publicConfig.CLUSTERS.find((x) => x.id === clusterId);
 
-  const { message } = App.useApp();
-
-  const { data, isLoading } = useAsync({
-    promiseFn: useCallback(async () => {
-      return await api.getAppMetadata({ query: { appId, cluster: clusterId } })
-        .httpError(404, () => { message.error("此应用不存在"); })
-        .then((res) => res);
-    }, [appId]),
-  });
-
-  if (isLoading || !data) {
-    return <LoadingOutlined />;
+  if (!cluster) {
+    return (
+      <Result
+        status="404"
+        title={"404"}
+        subTitle={"您所请求的集群不存在。"}
+      />
+    );
   }
 
   return (
     <div>
-      <Head title={`创建${data.appName}`} />
-      <PageTitle titleText={`创建${data.appName}`} />
-      <LaunchAppForm
-        appName={data.appName}
-        attributes={data.appCustomFormAttributes}
-        appId={appId}
-        clusterId={clusterId}
-      />
+      <Head title="创建应用" />
+      <PageTitle titleText={`集群${cluster.name}可创建的应用`} />
+      <CreateAppsTable clusterId={clusterId} />
     </div>
   );
 });
 
-export default AppIndexPage;
-
+export default CreatAppsIndexPage;

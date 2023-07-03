@@ -81,10 +81,17 @@ export const mockApi: MockApi<typeof api> = {
 
   getAllJobs: async () => ({ results: [job]}),
 
-  listAvailableApps: async () => ({ apps: [
-    { id: "vscode", name: "VSCode" },
-    { id: "emacs", name: "Emacs" },
-  ]}),
+  listAvailableApps: async () => ({
+    apps: [
+      { id: "vscode", name: "VSCode", logoPath:"/apps/VSCode.svg" },
+      { id: "emacs", name: "Emacs" },
+    ],
+    clusterApps: [
+      { id: "vscode", name: "VSCode", logoPath:"/apps/VSCode.svg" },
+      { id: "emacs", name: "Emacs" },
+      { id: "jupyter", name: "jupyter", logoPath:"/apps/jupyter.svg" },
+    ],
+  }),
 
   listFile: null,
 
@@ -110,13 +117,13 @@ export const mockApi: MockApi<typeof api> = {
   }),
 
   getAppSessions: async () => ({ sessions: [
-    { jobId: 100, sessionId: "123", appId: "vscode", state: "PENDING", reason: "resource",
+    { jobId: 100, sessionId: "123", appId: "vscode", appName:"vscode", state: "PENDING", reason: "resource",
       submitTime: new Date().toISOString(), host: "192.168.88.100", port: 1000, dataPath: "/test",
       timeLimit: "01:00:00", runningTime: "" },
-    { jobId: 101, sessionId: "124", appId: "vscode", state: "RUNNING",
+    { jobId: 101, sessionId: "124", appId: "vscode", appName:"vscode", state: "RUNNING",
       submitTime: new Date().toISOString(), dataPath: "/test",
       timeLimit: "1-01:00:00", runningTime: "01:50" },
-    { jobId: 102, sessionId: "125", appId: "vscode", state: "RUNNING",
+    { jobId: 102, sessionId: "125", appId: "vscode", appName:"vscode", state: "RUNNING",
       submitTime: new Date().toISOString(), host: "192.168.88.100", port: 10000, dataPath: "/test",
       timeLimit: "INVALID", runningTime: "01:55" },
   ]}),

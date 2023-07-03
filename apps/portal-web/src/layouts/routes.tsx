@@ -25,14 +25,13 @@ import {
   SaveOutlined } from "@ant-design/icons";
 import { NavItemProps } from "@scow/lib-web/build/layouts/base/types";
 import { NavIcon } from "@scow/lib-web/build/layouts/icon";
-import { App } from "@scow/protos/build/portal/app";
 import { join } from "path";
 import { User } from "src/stores/UserStore";
 import { Cluster, publicConfig } from "src/utils/config";
 
 export const userRoutes: (
-  user: User | undefined, defaultCluster: Cluster, apps: App[],
-) => NavItemProps[] = (user, defaultCluster, apps) => {
+  user: User | undefined, defaultCluster: Cluster,
+) => NavItemProps[] = (user, defaultCluster) => {
 
   if (!user) { return []; }
 
@@ -93,36 +92,28 @@ export const userRoutes: (
       Icon: EyeOutlined,
       text: "交互式应用",
       path: "/apps",
-      // clickToPath: "/apps/sessions",
-      clickToPath: `/apps/${defaultCluster.id}/`,
-      clickable: false,
+      clickToPath: `/apps/${defaultCluster.id}/sessions`,
+      clickable: true,
       children: publicConfig.CLUSTERS.map((cluster) => ({
         Icon: FolderOutlined,
         text: cluster.name,
         path: `/apps/${cluster.id}`,
-        clickToPath: `/apps/${cluster.id}/`,
+        clickToPath: `/apps/${cluster.id}/sessions`,
         children: [
           {
             Icon: Loading3QuartersOutlined,
             text: "已创建的应用",
             path: `/apps/${cluster.id}/sessions`,
           },
-          // 确定四级导航还要不要？？？？
-          ...(apps.length > 0 ? [
-            {
-              Icon: PlusOutlined,
-              text: "创建应用",
-              clickable: false,
-              path: `/apps/${cluster.id}/create`,
-              children: apps.map(({ id, name }) => ({
-                Icon: DesktopOutlined,
-                text: name,
-                path: `/apps/${cluster.id}/create/${id}`,
-              })),
-            }] : []),
+          {
+            Icon: PlusOutlined,
+            text: "创建应用",
+            clickable: false,
+            path: `/apps/${cluster.id}/createApps`,
+          },
         ],
-      })),
-    }] : []),
+      } as NavItemProps)),
+    } as NavItemProps] : []),
     ...(publicConfig.CLUSTERS.length > 0 ? [{
       Icon: FolderOutlined,
       text: "文件管理",

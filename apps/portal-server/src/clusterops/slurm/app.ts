@@ -14,16 +14,14 @@ import { getPlaceholderKeys } from "@scow/lib-config/build/parse";
 import { getUserHomedir,
   loggedExec, sftpChmod, sftpExists, sftpReaddir, sftpReadFile, sftpRealPath, sftpWriteFile } from "@scow/lib-ssh";
 import { RunningJob } from "@scow/protos/build/common/job";
-import { randomUUID } from "crypto";
 import fs from "fs";
 import { join } from "path";
 import { quote } from "shell-quote";
 import { AppOps, AppSession, SubmissionInfo } from "src/clusterops/api/app";
 import { displayIdToPort } from "src/clusterops/slurm/bl/port";
-import { getAppConfigs } from "src/config/apps";
 import { clusters } from "src/config/clusters";
 import { portalConfig } from "src/config/portal";
-import { splitSbatchArgs } from "src/utils/app";
+import { getClusterAppConfigs, splitSbatchArgs } from "src/utils/app";
 import { getIpFromProxyGateway } from "src/utils/proxy";
 import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
 import { parseDisplayId, refreshPassword, refreshPasswordByProxyGateway, VNCSERVER_BIN_PATH } from "src/utils/turbovnc";
@@ -66,10 +64,10 @@ export const slurmAppOps = (cluster: string): AppOps => {
 
   return {
     createApp: async (request, logger) => {
-      const apps = getAppConfigs();
+      const apps = getClusterAppConfigs(cluster).clusterApps;
 
       const { appId, userId, account, coreCount, nodeCount, gpuCount, memory, maxTime, proxyBasePath,
-        partition, qos, customAttributes } = request;
+        partition, qos, customAttributes, appJobName } = request;
 
 
       const userSbatchOptions = customAttributes["sbatchOptions"]
@@ -81,7 +79,7 @@ export const slurmAppOps = (cluster: string): AppOps => {
 
       if (!appConfig) { return { code: "APP_NOT_FOUND" }; }
 
-      const jobName = randomUUID();
+      const jobName = appJobName;
 
       const workingDirectory = join(portalConfig.appJobsDir, jobName);
 
@@ -240,7 +238,8 @@ export const slurmAppOps = (cluster: string): AppOps => {
     },
 
     listAppSessions: async (request, logger) => {
-      const apps = getAppConfigs();
+
+      const apps = getClusterAppConfigs(cluster).clusterApps;
 
       const { userId } = request;
 
@@ -326,6 +325,7 @@ export const slurmAppOps = (cluster: string): AppOps => {
           sessions.push({
             jobId: sessionMetadata.jobId,
             appId: sessionMetadata.appId,
+            appName: apps[sessionMetadata.appId]?.name,
             sessionId: sessionMetadata.sessionId,
             submitTime: new Date(sessionMetadata.submitTime),
             state: runningJobInfo?.state ?? "ENDED",
@@ -344,7 +344,7 @@ export const slurmAppOps = (cluster: string): AppOps => {
     },
 
     connectToApp: async (request, logger) => {
-      const apps = getAppConfigs();
+      const apps = getClusterAppConfigs(cluster).clusterApps;
 
       const { sessionId, userId } = request;
 

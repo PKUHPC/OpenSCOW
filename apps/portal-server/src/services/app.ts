@@ -24,16 +24,17 @@ import {
 } from "@scow/protos/build/portal/app";
 import { getClusterOps } from "src/clusterops";
 import { getAppConfigs } from "src/config/apps";
+import { getClusterAppConfigs } from "src/utils/app";
 import { clusterNotFound } from "src/utils/errors";
 
 export const appServiceServer = plugin((server) => {
 
   server.addService<AppServiceServer>(AppServiceService, {
     connectToApp: async ({ request, logger }) => {
-      const apps = getAppConfigs();
-
 
       const { cluster, sessionId, userId } = request;
+
+      const apps = getClusterAppConfigs(cluster).clusterApps;
 
       const clusterOps = getClusterOps(cluster);
 
@@ -94,10 +95,11 @@ export const appServiceServer = plugin((server) => {
     },
 
     createAppSession: async ({ request, logger }) => {
-      const apps = getAppConfigs();
 
-      const { account, appId, cluster, coreCount, nodeCount, gpuCount, memory, maxTime, proxyBasePath,
-        partition, qos, userId, customAttributes } = request;
+      const { account, appId, appJobName, cluster, coreCount, nodeCount, gpuCount, memory, maxTime,
+        proxyBasePath, partition, qos, userId, customAttributes } = request;
+
+      const apps = getClusterAppConfigs(cluster).clusterApps;
 
       const app = apps[appId];
       if (!app) {
@@ -154,6 +156,7 @@ export const appServiceServer = plugin((server) => {
 
       const reply = await clusterops.app.createApp({
         appId,
+        appJobName,
         userId,
         coreCount,
         nodeCount,
@@ -192,9 +195,9 @@ export const appServiceServer = plugin((server) => {
     },
 
     getAppMetadata: async ({ request }) => {
-      const apps = getAppConfigs();
 
-      const { appId } = request;
+      const { appId, cluster } = request;
+      const apps = getClusterAppConfigs(cluster).clusterApps;
       const app = apps[appId];
 
       if (!app) {
@@ -227,10 +230,19 @@ export const appServiceServer = plugin((server) => {
       return [{ appName: app.name, attributes: attributes }];
     },
 
-    listAvailableApps: async ({}) => {
-      const apps = getAppConfigs();
+    listAvailableApps: async ({ request }) => {
 
-      return [{ apps: Object.keys(apps).map((x) => ({ id: x, name: apps[x].name })) }];
+      const { cluster } = request;
+
+      const apps = getAppConfigs();
+      const clusterApps = getClusterAppConfigs(cluster).clusterApps;
+
+      return [{
+        apps: Object.keys(apps)
+          .map((x) => ({ id: x, name: apps[x].name, logoPath: apps[x].logoPath || undefined })),
+        clusterApps: Object.keys(clusterApps)
+          .map((x) => ({ id: x, name: clusterApps[x].name, logoPath: clusterApps[x].logoPath || undefined })),
+      }];
     },
 
     getAppLastSubmission: async ({ request, logger }) => {
