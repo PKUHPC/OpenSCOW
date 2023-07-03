@@ -63,7 +63,7 @@
     "react-dom": "18.2.0",
     "react-is": "18.2.0",
     "simstate": "3.0.1",
-    "styled-components": "5.3.11",
+    "styled-components": "6.0.2",
     "tslib": "2.5.3",
     "typescript": "5.1.3",
     "ws": "8.13.0",
