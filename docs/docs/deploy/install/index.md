@@ -42,6 +42,12 @@ PubkeyAcceptedKeyTypes=+ssh-rsa
 - `docker`（[安装docker的官方文档](https://docs.docker.com/engine/install/)）
 - `docker compose`（[安装docker compose的官方文档](https://docs.docker.com/compose/install/)）。
 
+## 部署SCOW调度器适配器
+
+针对不同种类的调度器，需要在集群上部署对应的适配器
+
+- slurm
+
 ## 下载scow-cli
 
 `scow-cli`是我们官方维护的SCOW部署和运维工具，能够帮助您快速部署、管理和维护SCOW集群。
