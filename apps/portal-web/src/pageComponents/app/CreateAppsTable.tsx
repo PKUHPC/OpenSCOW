@@ -60,7 +60,7 @@ export const CreateAppsTable: React.FC<Props> = ({ clusterId }) => {
     setImageErrorMap((prevMap) => ({ ...prevMap, [appId]: true }));
   };
 
-  if (!isLoading && data?.clusterApps.length === 0) {
+  if (!isLoading && data?.apps.length === 0) {
     return (
       <Result
         status="404"
@@ -74,7 +74,7 @@ export const CreateAppsTable: React.FC<Props> = ({ clusterId }) => {
     <Spin spinning={isLoading} tip={isLoading ? "正在加载可创建的交互式应用" : ""} style={{ marginTop: "150px" }}>
       <CardContainer>
         <Row gutter={16} style={{ flex: 1, width: "100%" }}>
-          {data?.clusterApps.map((app) => (
+          {data?.apps.map((app) => (
             <Col xs={24} sm={12} md={8} lg={6} xl={4} xxl={4} key={app.id} style={{ marginBottom: "16px" }}>
               <Card bodyStyle={{ display: "flex", flexDirection: "column", flex: 1 }}>
                 <Tooltip title={`创建${app.name}`} placement="bottom">

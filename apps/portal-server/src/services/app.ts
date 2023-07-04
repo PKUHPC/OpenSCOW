@@ -23,7 +23,6 @@ import {
   WebAppProps_ProxyType,
 } from "@scow/protos/build/portal/app";
 import { getClusterOps } from "src/clusterops";
-import { getAppConfigs } from "src/config/apps";
 import { getClusterAppConfigs } from "src/utils/app";
 import { clusterNotFound } from "src/utils/errors";
 
@@ -34,7 +33,7 @@ export const appServiceServer = plugin((server) => {
 
       const { cluster, sessionId, userId } = request;
 
-      const apps = getClusterAppConfigs(cluster).clusterApps;
+      const apps = getClusterAppConfigs(cluster);
 
       const clusterOps = getClusterOps(cluster);
 
@@ -99,7 +98,7 @@ export const appServiceServer = plugin((server) => {
       const { account, appId, appJobName, cluster, coreCount, nodeCount, gpuCount, memory, maxTime,
         proxyBasePath, partition, qos, userId, customAttributes } = request;
 
-      const apps = getClusterAppConfigs(cluster).clusterApps;
+      const apps = getClusterAppConfigs(cluster);
 
       const app = apps[appId];
       if (!app) {
@@ -197,7 +196,7 @@ export const appServiceServer = plugin((server) => {
     getAppMetadata: async ({ request }) => {
 
       const { appId, cluster } = request;
-      const apps = getClusterAppConfigs(cluster).clusterApps;
+      const apps = getClusterAppConfigs(cluster);
       const app = apps[appId];
 
       if (!app) {
@@ -234,14 +233,11 @@ export const appServiceServer = plugin((server) => {
 
       const { cluster } = request;
 
-      const apps = getAppConfigs();
-      const clusterApps = getClusterAppConfigs(cluster).clusterApps;
+      const apps = getClusterAppConfigs(cluster);
 
       return [{
         apps: Object.keys(apps)
           .map((x) => ({ id: x, name: apps[x].name, logoPath: apps[x].logoPath || undefined })),
-        clusterApps: Object.keys(clusterApps)
-          .map((x) => ({ id: x, name: clusterApps[x].name, logoPath: clusterApps[x].logoPath || undefined })),
       }];
     },
 

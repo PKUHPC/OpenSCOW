@@ -25,22 +25,20 @@ export function splitSbatchArgs(sbatchArgs: string) {
 
 export const getClusterAppConfigs = (cluster: string) => {
 
-  const apps = getAppConfigs();
+  const commonApps = getAppConfigs();
 
   const clusterAppsConfigs = getAppConfigs(join(DEFAULT_CONFIG_BASE_PATH, "clusters/", cluster));
 
-  const clusterApps = {};
+  const apps = {};
+
+  for (const [key, value] of Object.entries(commonApps)) {
+    apps[key] = value;
+  }
 
   for (const [key, value] of Object.entries(clusterAppsConfigs)) {
-    clusterApps[key] = value;
+    apps[key] = value;
   }
 
-  for (const [key, value] of Object.entries(apps)) {
-    if (!(key in clusterApps)) {
-      clusterApps[key] = value;
-    }
-  }
-
-  return { apps, clusterApps };
+  return apps;
 
 };

@@ -261,7 +261,7 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
       }}
     >
       <Spin spinning={loading} tip={isSubmitting ? "" : "查询上次提交记录中"}>
-        <Form.Item name="appJobName" label="应用名" rules={[{ required: true }]}>
+        <Form.Item name="appJobName" label="作业名" rules={[{ required: true }]}>
           <Input />
         </Form.Item>
         <Form.Item

@@ -2,4 +2,4 @@
 "@scow/grpc-api": patch
 ---
 
-为了实现按集群读取 AppConfigs 以及创建应用时填写应用名等功能，修改了交互式应用部分 proto
+修改了GetAppMetadata，ListAvailableApps，CreateAppSession及ListAppSessions以满足增加集群查询参数，作业名，应用名及应用图标配置路径

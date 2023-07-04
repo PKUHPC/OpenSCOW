@@ -85,10 +85,6 @@ export const mockApi: MockApi<typeof api> = {
     apps: [
       { id: "vscode", name: "VSCode", logoPath:"/apps/VSCode.svg" },
       { id: "emacs", name: "Emacs" },
-    ],
-    clusterApps: [
-      { id: "vscode", name: "VSCode", logoPath:"/apps/VSCode.svg" },
-      { id: "emacs", name: "Emacs", logoPath:"" },
       { id: "jupyter", name: "jupyter" },
     ],
   }),

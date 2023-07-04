@@ -39,7 +39,7 @@ export const CreatAppsIndexPage: NextPage = requireAuth(() => true)(() => {
   return (
     <div>
       <Head title="创建应用" />
-      <PageTitle titleText={`集群${cluster.name}可创建的应用`} />
+      <PageTitle titleText={`在${cluster.name}集群创建应用`} />
       <CreateAppsTable clusterId={clusterId} />
     </div>
   );

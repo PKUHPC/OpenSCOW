@@ -64,7 +64,7 @@ export const slurmAppOps = (cluster: string): AppOps => {
 
   return {
     createApp: async (request, logger) => {
-      const apps = getClusterAppConfigs(cluster).clusterApps;
+      const apps = getClusterAppConfigs(cluster);
 
       const { appId, userId, account, coreCount, nodeCount, gpuCount, memory, maxTime, proxyBasePath,
         partition, qos, customAttributes, appJobName } = request;
@@ -239,7 +239,7 @@ export const slurmAppOps = (cluster: string): AppOps => {
 
     listAppSessions: async (request, logger) => {
 
-      const apps = getClusterAppConfigs(cluster).clusterApps;
+      const apps = getClusterAppConfigs(cluster);
 
       const { userId } = request;
 
@@ -344,7 +344,7 @@ export const slurmAppOps = (cluster: string): AppOps => {
     },
 
     connectToApp: async (request, logger) => {
-      const apps = getClusterAppConfigs(cluster).clusterApps;
+      const apps = getClusterAppConfigs(cluster);
 
       const { sessionId, userId } = request;
 

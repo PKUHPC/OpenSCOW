@@ -77,7 +77,7 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster }) => {
 
   const columns: TableColumnsType<AppSession> = [
     {
-      title: "应用名",
+      title: "作业名",
       dataIndex: "sessionId",
     },
     {

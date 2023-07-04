@@ -86,6 +86,7 @@ message AppSession {
   uint32 job_id = 2;
   google.protobuf.Timestamp submit_time = 3;
   string app_id = 4;
+  // Undefined: apps[app.id]？.name is not found
   optional string app_name = 5;
   string state = 6;
   string data_path = 7;
@@ -146,7 +147,6 @@ message App {
 
 message ListAvailableAppsResponse {
   repeated App apps = 1;
-  repeated App cluster_apps = 2;
 }
 
 message SubmissionInfo {

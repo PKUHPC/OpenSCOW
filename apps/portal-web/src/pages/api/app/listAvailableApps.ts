@@ -33,10 +33,10 @@ export const ListAvailableAppsSchema = typeboxRouteSchema({
 
   responses: {
     200: Type.Object({
-      // config/apps下的交互式应用
+      // 公共配置config/apps
+      // 与集群配置下config/clusters/[clusterId]/apps下的交互式应用
+      // 如果app.id重复，则按照集群配置下读取
       apps: Type.Array(App),
-      // clusters/[clusterId]/apps下的交互式应用
-      clusterApps: Type.Array(App),
     }),
 
     403: Type.Null(),
@@ -59,7 +59,7 @@ export default /* #__PURE__*/typeboxRoute(ListAvailableAppsSchema, async (req) =
   const client = getClient(AppServiceClient);
 
   return asyncUnaryCall(client, "listAvailableApps", { cluster }).then((reply) => {
-    return { 200: { apps: reply.apps, clusterApps: reply.clusterApps } };
+    return { 200: { apps: reply.apps } };
   });
 
 });
