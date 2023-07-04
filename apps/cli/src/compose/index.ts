@@ -15,6 +15,8 @@ import path from "path";
 import { LoggingOption, ServiceSpec } from "src/compose/spec";
 import { InstallConfigSchema } from "src/config/install";
 
+const IMAGE: string = "mirrors.pku.edu.cn/pkuhpc-icode/scow";
+
 function checkPathFormat(configKey: string, value: string) {
   if (value !== "/" && value.endsWith("/")) {
     throw new Error(`Invalid config: ${configKey} should not end with '/'`);
@@ -30,7 +32,8 @@ function join(...segments: string[]) {
 }
 
 export const createComposeSpec = (config: InstallConfigSchema) => {
-  const scowImage = `${config.image}:${config.imageTag}`;
+  // 如果install.yaml没有配置image则使用默认image
+  const scowImage = `${config.image || IMAGE}:${config.imageTag}`;
 
   const BASE_PATH = config.basePath;
   checkPathFormat("basePath", BASE_PATH);
