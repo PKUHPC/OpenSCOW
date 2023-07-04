@@ -26,6 +26,11 @@ const LoginNodeConfigSchema =
 
 export type LoginNodeConfigSchema = Static<typeof LoginNodeConfigSchema>;
 
+export const getLoginNode =
+  (loginNode: string | LoginNodeConfigSchema): LoginNodeConfigSchema => {
+    return typeof loginNode === "string" ? { name: loginNode, address: loginNode } : loginNode;
+  };
+
 export const ClusterConfigSchema = Type.Object({
   displayName: Type.String({ description: "集群的显示名称" }),
   scheduler: Type.Enum({ slurm: "slurm" }, { description: "集群所使用的调度器，目前只支持slurm", default: "slurm" }),
@@ -63,13 +68,7 @@ export const ClusterConfigSchema = Type.Object({
 
 export type ClusterConfigSchema = Static<typeof ClusterConfigSchema>;
 
-type CompatibilityClusterConfigSchema = Omit<ClusterConfigSchema, "slurm"> & {
-  slurm: Omit<ClusterConfigSchema["slurm"], "loginNodes"> & {
-    loginNodes: LoginNodeConfigSchema[];
-  };
-};
-
-export const getClusterConfigs: GetConfigFn<Record<string, CompatibilityClusterConfigSchema>> =
+export const getClusterConfigs: GetConfigFn<Record<string, ClusterConfigSchema>> =
   (baseConfigPath, logger) => {
     const config = getDirConfig(
       ClusterConfigSchema,
@@ -82,14 +81,7 @@ export const getClusterConfigs: GetConfigFn<Record<string, CompatibilityClusterC
       if (!c[c.scheduler]) {
         throw new Error(`App ${id} is of scheduler ${c.scheduler} but config.${c.scheduler} is not set`);
       }
-      // 兼容loginNodes配置
-      c.slurm.loginNodes = c.slurm.loginNodes.map((node: string | LoginNodeConfigSchema) => {
-        if (typeof node === "string") {
-          return { name: node, address: node } as LoginNodeConfigSchema;
-        }
-        return node;
-      });
     });
 
-    return config as Record<string, CompatibilityClusterConfigSchema>;
+    return config;
   };
