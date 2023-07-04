@@ -129,8 +129,8 @@ importers:
         specifier: 6.10.2
         version: 6.10.2
       '@fastify/view':
-        specifier: 7.4.1
-        version: 7.4.1
+        specifier: 8.0.0
+        version: 8.0.0
       '@scow/config':
         specifier: workspace:*
         version: link:../../libs/config
@@ -5265,8 +5265,8 @@ packages:
       readable-stream: 4.3.0
     dev: false
 
-  /@fastify/view@7.4.1:
-    resolution: {integrity: sha512-ahmRmSbNVM8bIoz0BAFnY0jNigom+xbPQ9Q1ZjmNOtGVVT3nYXCxw2OMkTr9iXwrJ4Le3EtWDHlFkZ2fCQ2hJA==}
+  /@fastify/view@8.0.0:
+    resolution: {integrity: sha512-XfAffgqRj+AtEtkZeAAkMwTtu32Ve6xWkhxWQ9JOwXm2qQM6Fj+xphxnLvqpvQ0hJAYFYGiTOpB5ZS2VI5u00Q==}
     dependencies:
       fastify-plugin: 4.5.0
       hashlru: 2.3.0
