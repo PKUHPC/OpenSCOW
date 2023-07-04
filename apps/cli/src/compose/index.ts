@@ -32,7 +32,8 @@ function join(...segments: string[]) {
 }
 
 export const createComposeSpec = (config: InstallConfigSchema) => {
-  const scowImage = `${IMAGE}:${config.imageTag}`;
+  // 如果install.yaml没有配置image则使用默认image
+  const scowImage = `${config.image || IMAGE}:${config.imageTag}`;
 
   const BASE_PATH = config.basePath;
   checkPathFormat("basePath", BASE_PATH);
