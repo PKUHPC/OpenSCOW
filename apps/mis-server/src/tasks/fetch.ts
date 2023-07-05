@@ -83,7 +83,7 @@ export async function fetchJobs(
     return await em.transactional(async (em) => {
       // Calculate prices for new info and persist
       const pricedJobs = [] as JobInfo[];
-      jobs.forEach((job) => {
+      for (const job of jobs) {
         const tenant = accountTenantMap.get(job.account);
 
         if (!tenant) {
@@ -108,12 +108,13 @@ export async function fetchJobs(
           const pricedJob = new JobInfo(job, tenant, price);
 
           em.persist(pricedJob);
+          await em.flush();
 
           pricedJobs.push(pricedJob);
         } catch (error) {
-          logger.warn("invalid job. cluster: %s, jobId: %s", job.cluster, job.jobId, error);
+          logger.warn("invalid job. cluster: %s, jobId: %s, error: %s", job.cluster, job.jobId, error);
         }
-      });
+      }
 
       // add job charge for user account
       for (const x of pricedJobs) {
