@@ -1,7 +1,7 @@
 ---
 slug: update-portal-app
 title: 交互式应用配置更新
-authors: [sunyixin]
+authors: []
 tags: [scow, scow-portal-apps, scow-apps]
 
 ---
