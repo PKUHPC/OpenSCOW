@@ -68,7 +68,7 @@ export const MisConfigSchema = Type.Object({
     startDate: Type.Optional(Type.String({ description: "从哪个时间点开始获取结束作业信息(ISO 8601)", format: "date-time" })),
     batchSize: Type.Integer({
       description: "为了防止一次性获取太多数据占用过多内存，将会限制一次获取的作业数量",
-      default: 1000,
+      default: 10000,
     }),
 
     periodicFetch: Type.Object({

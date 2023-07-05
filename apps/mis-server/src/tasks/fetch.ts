@@ -80,37 +80,40 @@ export async function fetchJobs(
   const priceMap = await pricePlugin.price.createPriceMap();
 
   const persistJobAndCharge = async (jobs: ({ cluster: string } & ClusterJobInfo)[]) => {
-    await em.transactional(async (em) => {
+    return await em.transactional(async (em) => {
       // Calculate prices for new info and persist
-      const pricedJobs = jobs.map((job) => {
-
+      const pricedJobs = [] as JobInfo[];
+      jobs.forEach((job) => {
         const tenant = accountTenantMap.get(job.account);
 
         if (!tenant) {
           logger.warn("Account %s doesn't exist. Doesn't charge the job.", job.account);
         }
 
-        const price = tenant ? priceMap.calculatePrice({
-          jobId: job.jobId,
-          cluster: job.cluster,
-          cpusAlloc: job.cpusAlloc!,
-          gpu: job.gpusAlloc!,
-          memAlloc: job.memAllocMb!,
-          memReq: job.memReqMb,
-          partition: job.partition,
-          qos: job.qos,
-          timeUsed: job.elapsedSeconds!,
-          account: job.account,
-          tenant,
-        }) : emptyJobPriceInfo();
+        try {
+          const price = tenant ? priceMap.calculatePrice({
+            jobId: job.jobId,
+            cluster: job.cluster,
+            cpusAlloc: job.cpusAlloc!,
+            gpu: job.gpusAlloc!,
+            memAlloc: job.memAllocMb!,
+            memReq: job.memReqMb,
+            partition: job.partition,
+            qos: job.qos,
+            timeUsed: job.elapsedSeconds!,
+            account: job.account,
+            tenant,
+          }) : emptyJobPriceInfo();
 
-        const pricedJob = new JobInfo(job, tenant, price);
+          const pricedJob = new JobInfo(job, tenant, price);
 
-        em.persist(pricedJob);
+          em.persist(pricedJob);
 
-        return pricedJob;
+          pricedJobs.push(pricedJob);
+        } catch (error) {
+          logger.warn("invalid job. cluster: %s, jobId: %s", job.cluster, job.jobId, error);
+        }
       });
-
 
       // add job charge for user account
       for (const x of pricedJobs) {
@@ -151,6 +154,8 @@ export async function fetchJobs(
         }
       }
 
+      return pricedJobs.length;
+
     });
 
   };
@@ -166,8 +171,8 @@ export async function fetchJobs(
       };
     }));
 
-    await persistJobAndCharge(jobsInfo);
-    logger.info(`Completed. Saved ${jobsInfo.length} new info.`);
+    const savedJobsCount = await persistJobAndCharge(jobsInfo);
+    logger.info(`Completed. Saved ${savedJobsCount} new info.`);
     lastFetched = new Date();
     return { newJobsCount: jobsInfo.length };
   }
@@ -226,12 +231,13 @@ export async function fetchJobs(
 
         let currentJobsGroup: ({ cluster: string } & ClusterJobInfo)[] = [];
         let previousDate: string | null = null;
+        let savedJobsCount = 0;
 
         for (const job of jobsInfo) {
           if (job.endTime! === previousDate) {
             currentJobsGroup.push(job);
           } else {
-            await persistJobAndCharge(currentJobsGroup);
+            savedJobsCount += await persistJobAndCharge(currentJobsGroup);
             currentJobsGroup = [job];
           }
           previousDate = job.endTime!;
@@ -239,12 +245,12 @@ export async function fetchJobs(
 
         // process last group
         if (currentJobsGroup.length > 0) {
-          await persistJobAndCharge(currentJobsGroup);
+          savedJobsCount += await persistJobAndCharge(currentJobsGroup);
         }
 
-        logger.info(`Completed. Saved ${jobsInfo.length} new info.`);
+        logger.info(`Completed. Saved ${savedJobsCount} new info.`);
         lastFetched = new Date();
-        return jobsInfo.length;
+        return savedJobsCount;
 
       } else {
         const midDate = new Date((startDate.getTime() + endDate.getTime()) / 2);
