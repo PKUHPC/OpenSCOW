@@ -57,6 +57,7 @@ const SERVER_SESSION_INFO = "server_session_info.json";
 const VNC_SESSION_INFO = "VNC_SESSION_INFO";
 
 const APP_LAST_SUBMISSION_INFO = "last_submission.json";
+const BIN_BASH_SCRIPT_HEADER = "#!/bin/bash -l\n";
 
 export const slurmAppOps = (cluster: string): AppOps => {
 
@@ -155,7 +156,6 @@ export const slurmAppOps = (cluster: string): AppOps => {
           customAttributesExport = customAttributesExport + envItem + "\n";
         }
 
-        const binBashScript = "#!/bin/bash -l\n";
         if (appConfig.type === "web") {
           let customForm = String.raw`\"HOST\":\"$HOST\",\"PORT\":$PORT`;
           for (const key in appConfig.web!.connect.formData) {
@@ -171,7 +171,7 @@ export const slurmAppOps = (cluster: string): AppOps => {
           const beforeScript = runtimeVariables + customAttributesExport + appConfig.web!.beforeScript + sessionInfo;
           await sftpWriteFile(sftp)(join(workingDirectory, "before.sh"), beforeScript);
 
-          const webScript = binBashScript + appConfig.web!.script;
+          const webScript = BIN_BASH_SCRIPT_HEADER + appConfig.web!.script;
           const scriptPath = join(workingDirectory, "script.sh");
           await sftpWriteFile(sftp)(scriptPath, webScript);
           await sftpChmod(sftp)(scriptPath, "755");
@@ -200,7 +200,7 @@ export const slurmAppOps = (cluster: string): AppOps => {
           await sftpWriteFile(sftp)(join(workingDirectory, "before.sh"), beforeScript);
 
           const xstartupPath = join(workingDirectory, "xstartup");
-          const xstartupScript = binBashScript + appConfig.vnc!.xstartup;
+          const xstartupScript = BIN_BASH_SCRIPT_HEADER + appConfig.vnc!.xstartup;
           await sftpWriteFile(sftp)(xstartupPath, xstartupScript);
           await sftpChmod(sftp)(xstartupPath, "755");
 
