@@ -18,7 +18,11 @@ import { DesktopServiceServer, DesktopServiceService } from "@scow/protos/build/
 import { displayIdToPort } from "src/clusterops/slurm/bl/port";
 import { clusters } from "src/config/clusters";
 import { portalConfig } from "src/config/portal";
-import { listUserDesktopsFromHost } from "src/utils/desktops";
+import {
+  addDesktopToFile,
+  listDesktopsFromHost,
+  removeDesktopFromFile,
+} from "src/utils/desktops";
 import { clusterNotFound } from "src/utils/errors";
 import { checkLoginNodeInCluster, sshConnect } from "src/utils/ssh";
 import { parseDisplayId, parseListOutput, parseOtp, refreshPassword, VNCSERVER_BIN_PATH } from "src/utils/turbovnc";
@@ -33,7 +37,7 @@ export const desktopServiceServer = plugin((server) => {
 
   server.addService<DesktopServiceServer>(DesktopServiceService, {
     createDesktop: async ({ request, logger }) => {
-      const { cluster, loginNode: host, wm, userId } = request;
+      const { cluster, loginNode: host, wm, userId, desktopName } = request;
 
       ensureEnabled();
 
@@ -52,7 +56,7 @@ export const desktopServiceServer = plugin((server) => {
         const ids = parseListOutput(resp.stdout);
 
         if (ids.length >= portalConfig.loginDesktop.maxDesktops) {
-          throw <ServiceError> { code: Status.RESOURCE_EXHAUSTED, message: "Too many desktops" };
+          throw <ServiceError>{ code: Status.RESOURCE_EXHAUSTED, message: "Too many desktops" };
         }
 
         // start a session
@@ -65,6 +69,11 @@ export const desktopServiceServer = plugin((server) => {
           params.push(wm);
         }
 
+        if (desktopName) {
+          params.push("-name");
+          params.push(desktopName);
+        }
+
         resp = await executeAsUser(ssh, userId, logger, true, VNCSERVER_BIN_PATH, params);
 
         // parse the OTP from output. the output was in stderr
@@ -73,6 +82,15 @@ export const desktopServiceServer = plugin((server) => {
         const displayId = parseDisplayId(resp.stderr);
 
         const port = displayIdToPort(displayId);
+
+        const desktopInfo = {
+          displayId,
+          desktopName,
+          wm,
+          createTime: new Date().toISOString(),
+        };
+
+        await addDesktopToFile(ssh, userId, desktopInfo, logger);
 
         return [{ host, password, port }];
 
@@ -90,6 +108,8 @@ export const desktopServiceServer = plugin((server) => {
 
         // kill specific desktop
         await executeAsUser(ssh, userId, logger, true, VNCSERVER_BIN_PATH, ["-kill", ":" + displayId]);
+
+        await removeDesktopFromFile(ssh, userId, displayId, logger);
 
         return [{}];
       });
@@ -121,7 +141,7 @@ export const desktopServiceServer = plugin((server) => {
 
       if (host) {
         checkLoginNodeInCluster(cluster, host);
-        const userDesktops = await listUserDesktopsFromHost(host, userId, logger);
+        const userDesktops = await listDesktopsFromHost(host, userId, logger);
         return [{ userDesktops: [userDesktops]}];
       }
 
@@ -131,13 +151,13 @@ export const desktopServiceServer = plugin((server) => {
       }
       // 请求集群的所有登录节点
       return await Promise.all(loginNodes.map(async (loginNode) => {
-        return await listUserDesktopsFromHost(loginNode.address, userId, logger);
+        return await listDesktopsFromHost(loginNode.address, userId, logger);
       })).then((response) => {
         return [{ userDesktops: response }];
       });
     },
 
-    listAvailableWms: async ({}) => {
+    listAvailableWms: async ({ }) => {
       ensureEnabled();
 
       const result = portalConfig.loginDesktop.wms;

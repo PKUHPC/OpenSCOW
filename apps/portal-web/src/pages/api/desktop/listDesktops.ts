@@ -30,7 +30,12 @@ export const ListDesktopsSchema = typeboxRouteSchema({
     200: Type.Object({
       userDesktops: Type.Array(Type.Object({
         host: Type.String(),
-        displayId: Type.Array(Type.Number()),
+        desktops: Type.Array(Type.Object({
+          displayId: Type.Number(),
+          desktopName: Type.String(),
+          wm: Type.String(),
+          createTime: Type.Optional(Type.String()),
+        })),
       })),
     }),
 
@@ -59,8 +64,7 @@ export default /* #__PURE__*/typeboxRoute(ListDesktopsSchema, async (req, res) =
     cluster, loginNode, userId: info.identityId,
   }).then(async ({ userDesktops }) => ({
     200: {
-      userDesktops:
-        userDesktops.map((userDesktop) => ({ host: userDesktop.host, displayId: userDesktop.displayIds })),
+      userDesktops,
     },
   }));
 
