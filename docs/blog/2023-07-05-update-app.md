@@ -15,4 +15,4 @@ tags: [scow, scow-portal-apps, scow-apps]
 - 同时有效兼容旧版本`config/apps`下所有集群均可以使用的交互式应用配置
 - 交互式应用配置增加可选自定义图标配置，在创建应用页面实现交互式应用图标可视化管理
 
-详细说明可参考SCOW`部署和配置`下的[多集群下的应用配置](../docs/deploy/config/portal/apps/configure-cluster-apps.md)。
+详细说明可参考SCOW`部署和配置`下的[多集群下的应用配置](%DOCS_URL%%BASE_PATH%docs/deploy/config/portal/apps/configure-cluster-apps.md)。
