@@ -131,7 +131,7 @@ export const desktopServiceServer = plugin((server) => {
       }
       // 请求集群的所有登录节点
       return await Promise.all(loginNodes.map(async (loginNode) => {
-        return await listUserDesktopsFromHost(loginNode, userId, logger);
+        return await listUserDesktopsFromHost(loginNode.address, userId, logger);
       })).then((response) => {
         return [{ userDesktops: response }];
       });

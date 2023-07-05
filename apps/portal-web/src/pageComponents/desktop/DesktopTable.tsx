@@ -49,12 +49,14 @@ export const DesktopTable: React.FC<Props> = () => {
   const clusterQuery = queryToString(router.query.cluster);
   const loginQuery = queryToString(router.query.loginNode);
   const cluster = publicConfig.CLUSTERS.find((x) => x.id === clusterQuery) ?? defaultClusterStore.cluster;
-  const loginNode = loginNodes[cluster.id].find((x) => x === loginQuery) ?? undefined;
+  const loginNode = loginNodes[cluster.id].find((x) => x.name === loginQuery) ?? undefined;
 
   const { data, isLoading, reload } = useAsync({
     promiseFn: useCallback(async () => {
       // List all desktop
-      const { userDesktops } = await api.listDesktops({ query: { cluster: cluster.id, loginNode: loginNode } });
+      const { userDesktops } = await api.listDesktops({
+        query: { cluster: cluster.id, loginNode: loginNode?.address },
+      });
       return userDesktops.map(
         (userDesktop) => userDesktop.displayId.map(
           (x) => ({ desktopId: x, addr: userDesktop.host }),
@@ -75,6 +77,9 @@ export const DesktopTable: React.FC<Props> = () => {
       dataIndex: "addr",
       key: "addr",
       width: "30%",
+      render: (addr: string) => {
+        return loginNodes[cluster.id].find((x) => x.address === addr)?.name || addr;
+      },
     },
     {
       title: "操作",
@@ -101,12 +106,20 @@ export const DesktopTable: React.FC<Props> = () => {
             <Select
               allowClear
               style={{ minWidth: 100 }}
-              value={loginNode}
+              value={loginNode?.name}
               onChange={(x) => {
-                router.push({ query: x ? { cluster: cluster.id, loginNode: x } : { cluster : cluster.id } });
+                const nextLoginQuery = x
+                  ? loginNodes[cluster.id].find((loginNode) => loginNode.address === x)?.name
+                  : undefined;
+                router.push({ query: nextLoginQuery
+                  ? {
+                    cluster: cluster.id,
+                    loginNode: nextLoginQuery,
+                  }
+                  : { cluster : cluster.id } });
               }}
               options={loginNodes[cluster.id].map((loginNode) => ({
-                label: loginNode, value: loginNode,
+                label: loginNode.name, value: loginNode.address,
               }))}
             >
             </Select>

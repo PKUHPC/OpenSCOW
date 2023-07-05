@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-export function LoginNodeStore(loginNodes: Record<string, string[]>) {
+import { LoginNode } from "src/utils/config";
+export function LoginNodeStore(loginNodes: Record<string, LoginNode[]>) {
   return loginNodes;
 }

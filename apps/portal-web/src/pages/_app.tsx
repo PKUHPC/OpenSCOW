@@ -40,7 +40,7 @@ import { LoginNodeStore } from "src/stores/LoginNodeStore";
 import {
   User, UserStore,
 } from "src/stores/UserStore";
-import { publicConfig, runtimeConfig } from "src/utils/config";
+import { LoginNode, publicConfig, runtimeConfig } from "src/utils/config";
 
 
 const FailEventHandler: React.FC = () => {
@@ -87,7 +87,7 @@ interface ExtraProps {
   primaryColor: string;
   footerText: string;
   apps: App[];
-  loginNodes: Record<string, string[]>;
+  loginNodes: Record<string, LoginNode[]>;
   darkModeCookieValue: DarkModeCookie | undefined;
 }
 

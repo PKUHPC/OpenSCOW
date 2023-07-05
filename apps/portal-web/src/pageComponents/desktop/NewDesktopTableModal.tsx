@@ -14,7 +14,7 @@ import { App, Form, Modal, Select } from "antd";
 import React, { useEffect, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
-import { Cluster } from "src/utils/config";
+import { Cluster, LoginNode } from "src/utils/config";
 import { openDesktop } from "src/utils/vnc";
 
 export interface Props {
@@ -22,7 +22,7 @@ export interface Props {
   onClose: () => void;
   reload: () => void;
   cluster: Cluster;
-  loginNodes: string[];
+  loginNodes: LoginNode[];
 }
 
 interface FormInfo {
@@ -75,7 +75,7 @@ export const NewDesktopTableModal: React.FC<Props> = ({ open, onClose, reload, c
   };
 
   useEffect(() => {
-    form.setFieldValue("loginNode", loginNodes[0]);
+    form.setFieldValue("loginNode", loginNodes[0].address);
   }, [loginNodes]);
 
   return (
@@ -96,7 +96,7 @@ export const NewDesktopTableModal: React.FC<Props> = ({ open, onClose, reload, c
         <Form.Item label="登录节点" name="loginNode" rules={[{ required: true }]}>
           <Select
             options={loginNodes.map((loginNode) => ({
-              label: loginNode, value: loginNode,
+              label: loginNode.name, value: loginNode.address,
             }))}
           >
           </Select>
