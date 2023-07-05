@@ -16,9 +16,11 @@ import { Status } from "@grpc/grpc-js/build/src/constants";
 import { executeAsUser } from "@scow/lib-ssh";
 import { DesktopServiceServer, DesktopServiceService } from "@scow/protos/build/portal/desktop";
 import { displayIdToPort } from "src/clusterops/slurm/bl/port";
+import { clusters } from "src/config/clusters";
 import { portalConfig } from "src/config/portal";
+import { listUserDesktopsFromHost } from "src/utils/desktops";
 import { clusterNotFound } from "src/utils/errors";
-import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
+import { checkLoginNodeInCluster, sshConnect } from "src/utils/ssh";
 import { parseDisplayId, parseListOutput, parseOtp, refreshPassword, VNCSERVER_BIN_PATH } from "src/utils/turbovnc";
 
 function ensureEnabled() {
@@ -31,7 +33,7 @@ export const desktopServiceServer = plugin((server) => {
 
   server.addService<DesktopServiceServer>(DesktopServiceService, {
     createDesktop: async ({ request, logger }) => {
-      const { cluster, wm, userId } = request;
+      const { cluster, loginNode: host, wm, userId } = request;
 
       ensureEnabled();
 
@@ -39,9 +41,7 @@ export const desktopServiceServer = plugin((server) => {
         throw <ServiceError>{ code: Status.INVALID_ARGUMENT, message: `${wm} is not a acceptable wm.` };
       }
 
-      const host = getClusterLoginNode(cluster);
-
-      if (!host) { throw clusterNotFound(cluster); }
+      checkLoginNodeInCluster(cluster, host);
 
       return await sshConnect(host, "root", logger, async (ssh) => {
         // find if the user has running session
@@ -82,11 +82,9 @@ export const desktopServiceServer = plugin((server) => {
     killDesktop: async ({ request, logger }) => {
       ensureEnabled();
 
-      const { cluster, displayId, userId } = request;
+      const { cluster, loginNode: host, displayId, userId } = request;
 
-      const host = getClusterLoginNode(cluster);
-
-      if (!host) { throw clusterNotFound(cluster); }
+      checkLoginNodeInCluster(cluster, host);
 
       return await sshConnect(host, "root", logger, async (ssh) => {
 
@@ -102,12 +100,9 @@ export const desktopServiceServer = plugin((server) => {
 
       ensureEnabled();
 
-      const { cluster, displayId, userId } = request;
+      const { cluster, loginNode: host, displayId, userId } = request;
 
-
-      const host = getClusterLoginNode(cluster);
-
-      if (!host) { throw clusterNotFound(cluster); }
+      checkLoginNodeInCluster(cluster, host);
 
       return await sshConnect(host, "root", logger, async (ssh) => {
 
@@ -122,27 +117,24 @@ export const desktopServiceServer = plugin((server) => {
 
       ensureEnabled();
 
-      const { cluster, userId } = request;
+      const { cluster, loginNode: host, userId } = request;
 
-      const host = getClusterLoginNode(cluster);
+      if (host) {
+        checkLoginNodeInCluster(cluster, host);
+        const userDesktops = await listUserDesktopsFromHost(host, userId, logger);
+        return [{ userDesktops: [userDesktops]}];
+      }
 
-      if (!host) { throw clusterNotFound(cluster); }
-
-      return await sshConnect(host, "root", logger, async (ssh) => {
-
-        // list all running session
-        const resp = await executeAsUser(ssh, userId, logger, true,
-          VNCSERVER_BIN_PATH, ["-list"],
-        );
-
-        const ids = parseListOutput(resp.stdout);
-
-        return [{
-          host,
-          displayIds: ids,
-        }];
+      const loginNodes = clusters[cluster]?.slurm?.loginNodes;
+      if (!loginNodes) {
+        throw clusterNotFound(cluster);
+      }
+      // 请求集群的所有登录节点
+      return await Promise.all(loginNodes.map(async (loginNode) => {
+        return await listUserDesktopsFromHost(loginNode.address, userId, logger);
+      })).then((response) => {
+        return [{ userDesktops: response }];
       });
-
     },
 
     listAvailableWms: async ({}) => {

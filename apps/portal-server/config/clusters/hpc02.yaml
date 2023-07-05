@@ -1,7 +1,8 @@
 displayName: hpc02Name
 slurm:
   loginNodes:
-    - localhost:22
+    - name: login
+      address: localhost:22
   partitions:
       - name: GPU
         nodes: 2

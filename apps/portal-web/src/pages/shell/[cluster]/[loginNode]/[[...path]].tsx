@@ -76,18 +76,20 @@ export const ShellPage: NextPage = requireAuth(() => true)(({ userStore }) => {
   const router = useRouter();
 
   const cluster = router.query.cluster as string;
+  const loginNode = router.query.loginNode as string;
   const paths = router.query.path as (string[] | undefined);
 
   const headerRef = useRef<HTMLDivElement>(null);
 
   const clusterName = publicConfig.CLUSTERS.find((x) => x.id === cluster)?.name || cluster;
 
+
   return (
     <Container>
       <Head title={`${cluster}的终端`} />
       <Header ref={headerRef}>
         <h2>
-          以ID: {userStore.user.identityId} 连接到集群 {clusterName}
+          以ID: {userStore.user.identityId} 连接到集群 {clusterName} 的 {loginNode} 节点
         </h2>
         <Space wrap>
           <Button onClick={() => Router.reload()}>
@@ -121,6 +123,7 @@ export const ShellPage: NextPage = requireAuth(() => true)(({ userStore }) => {
           path={paths ? ("/" + paths.join("/")) : ""}
           user={userStore.user}
           cluster={cluster}
+          loginNode={loginNode}
         />
       </TerminalContainer>
     </Container>

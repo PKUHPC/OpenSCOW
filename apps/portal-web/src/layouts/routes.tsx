@@ -28,11 +28,10 @@ import { NavIcon } from "@scow/lib-web/build/layouts/icon";
 import { App } from "@scow/protos/build/portal/app";
 import { join } from "path";
 import { User } from "src/stores/UserStore";
-import { Cluster, publicConfig } from "src/utils/config";
-
+import { Cluster, LoginNode, publicConfig } from "src/utils/config";
 export const userRoutes: (
-  user: User | undefined, defaultCluster: Cluster, apps: App[],
-) => NavItemProps[] = (user, defaultCluster, apps) => {
+  user: User | undefined, defaultCluster: Cluster, apps: App[], LoginNodes: Record<string, LoginNode[]>
+) => NavItemProps[] = (user, defaultCluster, apps, loginNodes) => {
 
   if (!user) { return []; }
 
@@ -82,6 +81,12 @@ export const userRoutes: (
         Icon: CloudServerOutlined,
         text: name,
         path: `/shell/${id}`,
+        children: loginNodes[id]?.map((loginNode) => ({
+          openInNewPage: true,
+          Icon: CloudServerOutlined,
+          text: loginNode.name,
+          path: `/shell/${id}/${loginNode.name}`,
+        })),
       } as NavItemProps)),
     } as NavItemProps] : []),
     ...(publicConfig.ENABLE_LOGIN_DESKTOP ? [{

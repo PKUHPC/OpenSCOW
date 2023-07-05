@@ -14,12 +14,16 @@ title: 集群配置文件
 displayName: hpc01Name
 
 # 指定slurm配置
-slurm:
-  # 各个登录节点的IP或者域名
-  # 如果设置的是域名，请确认此节点的/etc/hosts中包含了域名到IP的解析信息
+slurm: 
+
   loginNodes:
-    - login01
-    - login02
+    # 登录节点展示名称
+    - name: login01
+      # 登录节点的IP或者域名
+      # 如果设置的是域名，请确认此节点的/etc/hosts中包含了域名到IP的解析信息
+      address: 192.168.88.102
+    - name: login02
+      address: 192.168.88.103
 
   # 集群的分区信息，结构为一个列表
   partitions:
