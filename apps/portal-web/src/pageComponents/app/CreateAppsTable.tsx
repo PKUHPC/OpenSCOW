@@ -52,7 +52,7 @@ export const CreateAppsTable: React.FC<Props> = ({ clusterId }) => {
 
   const { data, isLoading } = useAsync({ promiseFn: useCallback(async () => {
     return await api.listAvailableApps({ query: { cluster: clusterId } });
-  }, []) });
+  }, [clusterId]) });
 
   const [imageErrorMap, setImageErrorMap] = useState<ImageErrorMap>({});
 

@@ -60,7 +60,7 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster }) => {
         remainingTime: x.state === "RUNNING" ? calculateAppRemainingTime(x.runningTime, x.timeLimit) : x.timeLimit,
       }));
 
-    }, []),
+    }, [cluster]),
   });
 
   const filteredData = useMemo(() => {
@@ -205,10 +205,6 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster }) => {
     }
   }, [reload, checked]);
 
-  useEffect(() => {
-    reloadTable();
-  }, [query]);
-
   return (
     <div>
       <FilterFormContainer>
@@ -220,10 +216,9 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster }) => {
             setQuery({
               ...(await form.validateFields()),
             });
-            reload();
           }}
         >
-          <Form.Item label="应用名" name="appJobName">
+          <Form.Item label="作业名" name="appJobName">
             <Input style={{ minWidth: "160px" }} />
           </Form.Item>
           <Form.Item>
