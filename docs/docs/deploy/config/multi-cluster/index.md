@@ -69,10 +69,13 @@ displayName: hpc01
 
 # 指定slurm配置
 slurm:
-  # 各个登录节点的IP或者域名，服务节点必须可访问
   loginNodes:
-    - login01
-
+    # 登录节点展示名称
+    - name: login01
+      # 登录节点的IP或者域名
+      # 如果设置的是域名，请确认此节点的/etc/hosts中包含了域名到IP的解析信息
+      address: 192.168.88.102
+      
   # 集群的分区信息
   partitions:
     # 分区1的名字, 不能包含空格

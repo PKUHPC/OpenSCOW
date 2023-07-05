@@ -37,6 +37,7 @@ it("create app with wrong argument", async () => {
     appId: "vscode",
     cluster: "hpc01",
     userId: "123",
+    nodeCount: 1,
     coreCount: 2,
     account: "b",
     maxTime: 60,

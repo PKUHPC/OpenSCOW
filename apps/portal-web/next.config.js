@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-/* esslint-disable @typescript-eslint/no-var-requires */
+/* eslint-disable @typescript-eslint/no-var-requires */
 
 // @ts-check
 

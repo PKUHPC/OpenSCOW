@@ -32,11 +32,12 @@ export const CreateAppSessionSchema = typeboxRouteSchema({
     partition: Type.Optional(Type.String()),
     qos: Type.Optional(Type.String()),
     coreCount: Type.Number(),
+    nodeCount: Type.Number(),
+    gpuCount: Type.Optional(Type.Number()),
+    memory: Type.Optional(Type.String()),
     maxTime: Type.Number(),
     customAttributes: Type.Record(Type.String(), Type.String()),
   }),
-
-
 
   responses: {
     200: Type.Object({
@@ -70,7 +71,9 @@ export default /* #__PURE__*/route(CreateAppSessionSchema, async (req, res) => {
 
   if (!info) { return; }
 
-  const { appId, cluster, coreCount, partition, qos, account, maxTime, customAttributes } = req.body;
+  const {
+    appId, cluster, coreCount, nodeCount, gpuCount, memory, partition, qos, account, maxTime, customAttributes,
+  } = req.body;
 
   const client = getClient(AppServiceClient);
 
@@ -81,6 +84,9 @@ export default /* #__PURE__*/route(CreateAppSessionSchema, async (req, res) => {
     cluster,
     userId: info.identityId,
     coreCount,
+    nodeCount,
+    gpuCount,
+    memory,
     account,
     maxTime,
     partition,
