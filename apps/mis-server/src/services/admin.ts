@@ -190,7 +190,7 @@ export const adminServiceServer = plugin((server) => {
     fetchJobs: async () => {
       const reply = await server.ext.fetch.fetch();
 
-      return [reply];
+      return [reply ? reply : { newJobsCount: 0 }];
     },
 
     updateBlockStatus: async ({ em, logger }) => {
