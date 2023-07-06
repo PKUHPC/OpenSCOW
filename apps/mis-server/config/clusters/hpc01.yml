@@ -7,7 +7,8 @@ slurm:
     clusterName: pkuhpc1
     scriptPath: /slurmshTest/slurm.sh
   loginNodes:
-    - localhost:22222
+    - name: login
+      address: localhost:22222
   partitions:
     - name: compute
       nodes: 198

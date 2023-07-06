@@ -13,6 +13,7 @@
 import { ServiceError } from "@ddadaal/tsgrpc-common";
 import { Logger, plugin } from "@ddadaal/tsgrpc-server";
 import { status } from "@grpc/grpc-js";
+import { getLoginNode } from "@scow/config/build/cluster";
 import { testRootUserSshLogin } from "@scow/lib-ssh";
 import { ClusterOps } from "src/clusterops/api";
 import { createSlurmOps } from "src/clusterops/slurm";
@@ -54,9 +55,11 @@ export const clustersPlugin = plugin(async (f) => {
 
   if (process.env.NODE_ENV === "production") {
     await Promise.all(Object.values(clusters).map(async ({ displayName, slurm: { loginNodes } }) => {
-      const node = loginNodes[0];
+      const loginNode = getLoginNode(loginNodes[0]);
+      const address = loginNode.address;
+      const node = loginNode.name;
       f.logger.info("Checking if root can login to %s by login node %s", displayName, node);
-      const error = await testRootUserSshLogin(node, rootKeyPair, f.logger);
+      const error = await testRootUserSshLogin(address, rootKeyPair, f.logger);
       if (error) {
         f.logger.info("Root cannot login to %s by login node %s. err: %o", displayName, node, error);
         throw error;
