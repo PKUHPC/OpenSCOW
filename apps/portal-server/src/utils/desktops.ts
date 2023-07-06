@@ -19,6 +19,8 @@ import { sshConnect } from "src/utils/ssh";
 import { parseListOutput, VNCSERVER_BIN_PATH } from "src/utils/turbovnc";
 import { Logger } from "ts-log";
 
+export type DesktopInfo = Desktop & { host: string };
+
 /**
  * Get desktops file path of user
  * @param ssh ssh object connected as root
@@ -37,16 +39,14 @@ export async function getUserDesktopsFilePath(ssh: NodeSSH, userId: string, logg
 /**
  * Read desktops file of user
  * @param ssh ssh object connected as root
- * @param userId user id
- * @param logger logger
+ * @param desktopFilePath
  * @returns desktops
  */
-async function readDesktopsFile(ssh: NodeSSH, userId: string, logger: Logger): Promise<Desktop[]> {
-  const desktopFilePath = await getUserDesktopsFilePath(ssh, userId, logger);
+async function readDesktopsFile(ssh: NodeSSH, desktopFilePath: string): Promise<DesktopInfo[]> {
   const sftp = await ssh.requestSFTP();
   if (await sftpExists(sftp, desktopFilePath)) {
     const content = await sftpReadFile(sftp)(desktopFilePath);
-    return JSON.parse(content.toString()) as Desktop[];
+    return JSON.parse(content.toString()) as DesktopInfo[];
   }
   return [];
 }
@@ -54,12 +54,14 @@ async function readDesktopsFile(ssh: NodeSSH, userId: string, logger: Logger): P
 /**
  * Wire desktops file of user
  * @param ssh ssh object connected as root
- * @param userId user id
+ * @param desktopFilePath
  * @param desktops desktops
- * @param logger logger
  */
-async function writeDesktopsFile(ssh: NodeSSH, userId: string, desktops: Desktop[], logger: Logger): Promise<void> {
-  const desktopFilePath = await getUserDesktopsFilePath(ssh, userId, logger);
+async function writeDesktopsFile(
+  ssh: NodeSSH,
+  desktopFilePath: string,
+  desktops: DesktopInfo[],
+): Promise<void> {
   const sftp = await ssh.requestSFTP();
   await sftpWriteFile(sftp)(desktopFilePath, JSON.stringify(desktops));
 }
@@ -81,10 +83,12 @@ export async function listDesktopsFromHost(host: string, userId: string, logger:
 
     const ids = parseListOutput(resp.stdout);
 
-    const desktops = await readDesktopsFile(ssh, userId, logger);
+    const desktopFilePath = await getUserDesktopsFilePath(ssh, userId, logger);
+
+    const desktops = await readDesktopsFile(ssh, desktopFilePath);
 
     const runningDesktops: Desktop[] = ids.map((id) => {
-      const desktop = desktops.find((x) => x.displayId === id);
+      const desktop = desktops.filter((x) => x.host === host).find((x) => x.displayId === id);
       return {
         displayId: id,
         desktopName: desktop ? desktop.desktopName : "",
@@ -109,15 +113,17 @@ export async function listDesktopsFromHost(host: string, userId: string, logger:
 export async function addDesktopToFile(
   ssh: NodeSSH,
   userId: string,
-  deskTopInfo: Desktop,
+  deskTopInfo: DesktopInfo,
   logger: Logger,
 ): Promise<void> {
 
-  const desktops = await readDesktopsFile(ssh, userId, logger);
 
+  const desktopFilePath = await getUserDesktopsFilePath(ssh, userId, logger);
+
+  const desktops = await readDesktopsFile(ssh, desktopFilePath);
   desktops.push(deskTopInfo);
 
-  await writeDesktopsFile(ssh, userId, desktops, logger);
+  await writeDesktopsFile(ssh, desktopFilePath, desktops);
   logger.info(`Desktop ${deskTopInfo.desktopName} added`);
 }
 
@@ -130,17 +136,23 @@ export async function addDesktopToFile(
 export async function removeDesktopFromFile(
   ssh: NodeSSH,
   userId: string,
+  host: string,
   displayId: number,
   logger: Logger,
 ): Promise<void> {
 
-  const desktops = await readDesktopsFile(ssh, userId, logger);
+  const desktopFilePath = await getUserDesktopsFilePath(ssh, userId, logger);
 
-  const index = desktops.findIndex((desktop) => desktop.displayId === displayId);
+  const desktops = await readDesktopsFile(ssh, desktopFilePath);
+
+  const index = desktops.findIndex(
+    (desktop) => desktop.host === host && desktop.displayId === displayId,
+  );
+
   if (index !== -1) {
     const removedDesktop = desktops[index];
     desktops.splice(index, 1);
-    await writeDesktopsFile(ssh, userId, desktops, logger);
+    await writeDesktopsFile(ssh, desktopFilePath, desktops);
     logger.info(`Desktop ${removedDesktop.desktopName} removed`);
   }
 }

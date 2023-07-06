@@ -84,6 +84,7 @@ export const desktopServiceServer = plugin((server) => {
         const port = displayIdToPort(displayId);
 
         const desktopInfo = {
+          host,
           displayId,
           desktopName,
           wm,
@@ -109,7 +110,7 @@ export const desktopServiceServer = plugin((server) => {
         // kill specific desktop
         await executeAsUser(ssh, userId, logger, true, VNCSERVER_BIN_PATH, ["-kill", ":" + displayId]);
 
-        await removeDesktopFromFile(ssh, userId, displayId, logger);
+        await removeDesktopFromFile(ssh, userId, host, displayId, logger);
 
         return [{}];
       });
