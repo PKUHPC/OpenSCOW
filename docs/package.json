@@ -33,7 +33,7 @@
     "@docusaurus/module-type-aliases": "2.4.1",
     "@scow/config": "workspace:*",
     "@sinclair/typebox": "0.28.15",
-    "@tsconfig/docusaurus": "1.0.7",
+    "@tsconfig/docusaurus": "2.0.0",
     "@docusaurus/types": "2.4.1",
     "@types/react": "18.0.18",
     "typescript": "5.1.3",

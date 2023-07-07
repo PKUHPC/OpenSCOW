@@ -24,7 +24,7 @@
     "@fastify/error": "3.2.1",
     "@fastify/formbody": "7.4.0",
     "@fastify/static": "6.10.2",
-    "@fastify/view": "7.4.1",
+    "@fastify/view": "8.0.0",
     "liquidjs": "10.8.3",
     "@scow/config": "workspace:*",
     "@scow/lib-config": "workspace:*",
