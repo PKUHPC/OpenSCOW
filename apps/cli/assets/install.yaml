@@ -4,9 +4,6 @@
 # 整个系统的部署路径。默认/
 # basePath: /
 
-# SCOW的镜像。默认: ghcr.io/pkuhpc/scow/scow
-# image: ghcr.io/pkuhpc/scow/scow
-
 # SCOW的镜像的tag。默认：master
 # imageTag: master
 

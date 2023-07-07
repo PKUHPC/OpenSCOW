@@ -293,13 +293,13 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
                 {
                   required: true,
                   type: "integer",
-                  max: currentPartitionInfo?.gpus,
+                  max: currentPartitionInfo?.gpus / currentPartitionInfo.nodes,
                 },
               ]}
             >
               <InputNumber
                 min={1}
-                max={currentPartitionInfo?.gpus}
+                max={currentPartitionInfo?.gpus / currentPartitionInfo.nodes}
                 {...inputNumberFloorConfig}
               />
             </Form.Item>
@@ -312,13 +312,13 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
                 {
                   required: true,
                   type: "integer",
-                  max: currentPartitionInfo?.cores,
+                  max: currentPartitionInfo ? currentPartitionInfo.cores / currentPartitionInfo.nodes : undefined,
                 },
               ]}
             >
               <InputNumber
                 min={1}
-                max={currentPartitionInfo?.cores}
+                max={currentPartitionInfo ? currentPartitionInfo.cores / currentPartitionInfo.nodes : undefined}
                 {...inputNumberFloorConfig}
               />
             </Form.Item>
