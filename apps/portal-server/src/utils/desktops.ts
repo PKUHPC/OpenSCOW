@@ -42,7 +42,7 @@ export async function getUserDesktopsFilePath(ssh: NodeSSH, userId: string, logg
  * @param desktopFilePath
  * @returns desktops
  */
-async function readDesktopsFile(ssh: NodeSSH, desktopFilePath: string): Promise<DesktopInfo[]> {
+export async function readDesktopsFile(ssh: NodeSSH, desktopFilePath: string): Promise<DesktopInfo[]> {
   const sftp = await ssh.requestSFTP();
   if (await sftpExists(sftp, desktopFilePath)) {
     const content = await sftpReadFile(sftp)(desktopFilePath);
@@ -57,7 +57,7 @@ async function readDesktopsFile(ssh: NodeSSH, desktopFilePath: string): Promise<
  * @param desktopFilePath
  * @param desktops desktops
  */
-async function writeDesktopsFile(
+export async function writeDesktopsFile(
   ssh: NodeSSH,
   desktopFilePath: string,
   desktops: DesktopInfo[],
