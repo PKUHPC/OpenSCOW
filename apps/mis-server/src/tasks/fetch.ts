@@ -80,7 +80,7 @@ export async function fetchJobs(
   const priceMap = await pricePlugin.price.createPriceMap();
 
   const persistJobAndCharge = async (jobs: ({ cluster: string } & ClusterJobInfo)[]) => {
-    return await em.transactional(async (em) => {
+    const result = await em.transactional(async (em) => {
       // Calculate prices for new info and persist
       const pricedJobs = [] as JobInfo[];
       for (const job of jobs) {
@@ -159,6 +159,9 @@ export async function fetchJobs(
 
     });
 
+    em.clear();
+
+    return result;
   };
 
   if (!process.env.SCOW_CONFIG_PATH && process.env.NODE_ENV !== "production") {
