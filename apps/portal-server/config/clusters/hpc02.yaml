@@ -1,7 +1,8 @@
 displayName: hpc02Name
 adapterUrl: 0.0.0.0:6000
 loginNodes:
-  - localhost:22
+  - name: login
+    address: localhost:22
 # slurm:
 #   partitions:
 #       - name: GPU

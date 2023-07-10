@@ -16,6 +16,20 @@ import { DEFAULT_CONFIG_BASE_PATH } from "src/constants";
 
 const CLUSTER_CONFIG_BASE_PATH = "clusters";
 
+const LoginNodeConfigSchema =
+  Type.Object(
+    {
+      name: Type.String({ description: "登录节点展示名" }), address: Type.String({ description: "集群的登录节点地址" }),
+    },
+  );
+
+export type LoginNodeConfigSchema = Static<typeof LoginNodeConfigSchema>;
+
+export const getLoginNode =
+  (loginNode: string | LoginNodeConfigSchema): LoginNodeConfigSchema => {
+    return typeof loginNode === "string" ? { name: loginNode, address: loginNode } : loginNode;
+  };
+
 export const ClusterConfigSchema = Type.Object({
   displayName: Type.String({ description: "集群的显示名称" }),
   adapterUrl: Type.String({ description: "调度器适配器服务地址" }),
@@ -23,20 +37,24 @@ export const ClusterConfigSchema = Type.Object({
     url: Type.String({ description: "代理网关节点监听URL" }),
     autoSetupNginx: Type.Boolean({ description: "是否自动配置nginx", default: false }),
   })),
-  loginNodes: Type.Array(Type.String(), { description: "集群的登录节点地址", default: []}),
+  loginNodes: Type.Union([
+    Type.Array(LoginNodeConfigSchema),
+    Type.Array(Type.String(), { description: "集群的登录节点地址", default: []}),
+  ]),
 });
+
 
 export type ClusterConfigSchema = Static<typeof ClusterConfigSchema>;
 
+export const getClusterConfigs: GetConfigFn<Record<string, ClusterConfigSchema>> =
+  (baseConfigPath, logger) => {
 
-export const getClusterConfigs: GetConfigFn<Record<string, ClusterConfigSchema>> = (baseConfigPath, logger) => {
+    const config = getDirConfig(
+      ClusterConfigSchema,
+      CLUSTER_CONFIG_BASE_PATH,
+      baseConfigPath ?? DEFAULT_CONFIG_BASE_PATH,
+      logger,
+    );
 
-  const config = getDirConfig(
-    ClusterConfigSchema,
-    CLUSTER_CONFIG_BASE_PATH,
-    baseConfigPath ?? DEFAULT_CONFIG_BASE_PATH,
-    logger,
-  );
-
-  return config;
-};
+    return config;
+  };

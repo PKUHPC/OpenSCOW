@@ -159,6 +159,8 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
                 if (attribute.name in lastSubmitAttributes) {
                   switch (attribute.type) {
                   case "NUMBER":
+                    attributesObj[attribute.name] = parseInt(lastSubmitAttributes[attribute.name]);
+                    break;
                   case "TEXT":
                     attributesObj[attribute.name] = lastSubmitAttributes[attribute.name];
                     break;

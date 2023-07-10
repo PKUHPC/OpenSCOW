@@ -16,9 +16,12 @@ displayName: hpc01Name
 # 调度器适配器地址(ip地址:端口号)
 adapterUrl: localhost:8972
 
-# 各个登录节点的IP或者域名
-# 如果设置的是域名，请确认此节点的/etc/hosts中包含了域名到IP的解析信息
 loginNodes:
-  - login01
-  - login02
+    # 登录节点展示名称
+  - name: login01
+    # 各个登录节点的IP或者域名
+    # 如果设置的是域名，请确认此节点的/etc/hosts中包含了域名到IP的解析信息
+    address: 192.168.88.102
+  - name: login02
+    address: 192.168.88.103
 ```
