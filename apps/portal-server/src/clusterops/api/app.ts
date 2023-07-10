@@ -14,6 +14,7 @@ import { Logger } from "ts-log";
 
 export interface CreateAppRequest {
   appId: string;
+  appJobName: string;
   userId: string;
   account: string;
   partition?: string;
@@ -42,6 +43,7 @@ export interface AppSession {
   jobId: number;
   submitTime: Date;
   appId: string;
+  appName: string | undefined;
   state: string;
   dataPath: string;
   runningTime: string;

@@ -13,40 +13,38 @@
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { compareDateTime, formatDateTime } from "@scow/lib-web/build/utils/datetime";
 import { compareNumber } from "@scow/lib-web/build/utils/math";
-import { queryToString } from "@scow/lib-web/build/utils/querystring";
 import type { AppSession } from "@scow/protos/build/portal/app";
-import { App, Button, Checkbox, Form, Popconfirm, Space, Table, TableColumnsType, Tooltip } from "antd";
+import { App, Button, Checkbox, Form, Input, Popconfirm, Space, Table, TableColumnsType, Tooltip } from "antd";
 import type { CheckboxChangeEvent } from "antd/es/checkbox";
 import { useRouter } from "next/router";
 import { join } from "path";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useAsync } from "react-async";
-import { useStore } from "simstate";
 import { api } from "src/apis";
-import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { calculateAppRemainingTime, compareState } from "src/models/job";
 import { ConnectTopAppLink } from "src/pageComponents/app/ConnectToAppLink";
-import { AppsStore } from "src/stores/AppsStore";
-import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
-import { publicConfig } from "src/utils/config";
+import { Cluster } from "src/utils/config";
 
-interface Props {
+interface FilterForm {
+ appJobName: string | undefined
 }
 
-export const AppSessionsTable: React.FC<Props> = () => {
+interface Props {
+  cluster: Cluster;
+}
 
-  const apps = useStore(AppsStore);
+export const AppSessionsTable: React.FC<Props> = ({ cluster }) => {
+
+  const [query, setQuery] = useState<FilterForm>(() => {
+    return { appJobName: undefined };
+  });
+  const [form] = Form.useForm<FilterForm>();
+
 
   const { message } = App.useApp();
 
   const router = useRouter();
-
-  const clusterQuery = queryToString(router.query.cluster);
-
-  const defaultClusterStore = useStore(DefaultClusterStore);
-
-  const cluster = publicConfig.CLUSTERS.find((x) => x.id === clusterQuery) ?? defaultClusterStore.cluster;
 
   const [connectivityRefreshToken, setConnectivityRefreshToken] = useState(false);
 
@@ -65,9 +63,21 @@ export const AppSessionsTable: React.FC<Props> = () => {
     }, [cluster]),
   });
 
+  const filteredData = useMemo(() => {
+    if (!data) { return undefined; }
+
+    let filtered = data;
+    if (query.appJobName) {
+      filtered = filtered.filter((x) => x.sessionId.toLowerCase().includes(query.appJobName!.toLowerCase()));
+    }
+
+    return filtered;
+  }, [data, query.appJobName]);
+
+
   const columns: TableColumnsType<AppSession> = [
     {
-      title: "会话ID",
+      title: "作业名",
       dataIndex: "sessionId",
     },
     {
@@ -78,7 +88,7 @@ export const AppSessionsTable: React.FC<Props> = () => {
     {
       title: "应用",
       dataIndex: "appId",
-      render: (appId: string) => apps.find((x) => x.id === appId)?.name ?? appId,
+      render: (appId: string, record) => record.appName ?? appId,
       sorter: (a, b) => (!a.submitTime || !b.submitTime) ? -1 : compareDateTime(a.submitTime, b.submitTime),
     },
     {
@@ -198,14 +208,23 @@ export const AppSessionsTable: React.FC<Props> = () => {
   return (
     <div>
       <FilterFormContainer>
-        <Form layout="inline">
-          <Form.Item label="集群">
-            <SingleClusterSelector
-              value={cluster}
-              onChange={(cluster) => {
-                router.push({ pathname: router.pathname, query: { cluster: cluster.id } });
-              }}
-            />
+        <Form<FilterForm>
+          layout="inline"
+          form={form}
+          initialValues={query}
+          onFinish={async () => {
+            setQuery({
+              ...(await form.validateFields()),
+            });
+          }}
+        >
+          <Form.Item label="作业名" name="appJobName">
+            <Input style={{ minWidth: "160px" }} />
+          </Form.Item>
+          <Form.Item>
+            <Space>
+              <Button type="primary" htmlType="submit">搜索</Button>
+            </Space>
           </Form.Item>
           <Form.Item>
             <Space>
@@ -232,10 +251,10 @@ export const AppSessionsTable: React.FC<Props> = () => {
         </Form>
       </FilterFormContainer>
       <Table
-        dataSource={onlyNotEnded ? data?.filter((x) => x.state !== "ENDED") : data}
+        dataSource={onlyNotEnded ? filteredData?.filter((x) => x.state !== "ENDED") : filteredData}
         columns={columns}
         rowKey={(record) => record.sessionId}
-        loading={!data && isLoading}
+        loading={!filteredData && isLoading}
       />
     </div>
   );

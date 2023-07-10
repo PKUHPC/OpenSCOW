@@ -12,27 +12,25 @@
 
 import { App, Button, Col, Form, Input, InputNumber, Row, Select, Spin } from "antd";
 import { Rule } from "antd/es/form";
+import dayjs from "dayjs";
 import Router from "next/router";
 import { useCallback, useState } from "react";
 import { useAsync } from "react-async";
-import { useStore } from "simstate";
 import { api } from "src/apis";
-import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { AccountSelector } from "src/pageComponents/job/AccountSelector";
 import { AppCustomAttribute } from "src/pages/api/app/getAppMetadata";
 import { Partition } from "src/pages/api/cluster";
-import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
-import { Cluster } from "src/utils/config";
 import { formatSize } from "src/utils/format";
 
 interface Props {
   appId: string;
+  clusterId: string;
   appName: string;
   attributes: AppCustomAttribute[];
 }
 
 interface FormFields {
-  cluster: Cluster;
+  appJobName: string;
   partition: string | undefined;
   qos: string | undefined;
   nodeCount: number;
@@ -41,6 +39,11 @@ interface FormFields {
   account: string;
   maxTime: number;
 }
+
+// 生成默认应用名称，命名规则为"当前应用名-年月日-时分秒"
+const genAppJobName = (appName: string): string => {
+  return `${appName}-${dayjs().format("YYYYMMDD-HHmmss")}`;
+};
 
 const initialValues = {
   nodeCount: 1,
@@ -54,7 +57,7 @@ const inputNumberFloorConfig = {
   parser: (value: string) => Math.floor(+value),
 };
 
-export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
+export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, appName }) => {
 
   const { message } = App.useApp();
 
@@ -65,7 +68,7 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
 
   const onSubmit = async () => {
     const allFormFields = await form.validateFields();
-    const { cluster, nodeCount, coreCount, gpuCount, partition, qos, account, maxTime } = allFormFields;
+    const { appJobName, nodeCount, coreCount, gpuCount, partition, qos, account, maxTime } = allFormFields;
 
     const customFormKeyValue: {[key: string]: string} = {};
     attributes.forEach((customFormAttribute) => {
@@ -76,8 +79,9 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
     setLoading(true);
     setIsSubmitting(true);
     await api.createAppSession({ body: {
-      cluster: cluster.id,
+      cluster: clusterId,
       appId,
+      appJobName: appJobName,
       nodeCount: nodeCount,
       coreCount: gpuCount ? gpuCount * Math.floor(currentPartitionInfo!.cores / currentPartitionInfo!.gpus) : coreCount,
       gpuCount,
@@ -90,26 +94,25 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
     } })
       .then(() => {
         message.success("创建成功！");
-        Router.push("/apps/sessions");
+        Router.push(`/apps/${clusterId}/sessions`);
       }).finally(() => {
         setLoading(false);
       });
   };
 
-  const cluster = Form.useWatch("cluster", form) as Cluster | undefined;
   const [currentPartitionInfo, setCurrentPartitionInfo] = useState<Partition | undefined>();
 
   const clusterInfoQuery = useAsync({
-    promiseFn: useCallback(async () => cluster
-      ? api.getClusterInfo({ query: { cluster:  cluster?.id } }) : undefined, [cluster]),
+    promiseFn: useCallback(async () => clusterId
+      ? api.getClusterInfo({ query: { cluster:  clusterId } }) : undefined, []),
     onResolve: async (data) => {
       if (data) {
-
         setLoading(true);
-        const clusterPartition = data.clusterInfo.scheduler.partitions[0];
-        setCurrentPartitionInfo(clusterPartition);
+        form.setFieldValue("appJobName", genAppJobName(appName));
 
-        if (cluster) { await api.getAppLastSubmission({ query: { cluster: cluster?.id, appId } })
+        setCurrentPartitionInfo(data.clusterInfo.scheduler.partitions[0]);
+
+        await api.getAppLastSubmission({ query: { cluster: clusterId, appId } })
           .then((lastSubmitData) => {
             const lastSubmitPartition = lastSubmitData?.lastSubmissionInfo?.partition;
             const lastSubmitQos = lastSubmitData?.lastSubmissionInfo?.qos;
@@ -186,7 +189,6 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
           }).finally(() => {
             setLoading(false);
           });
-        }
       }
     },
   });
@@ -234,8 +236,6 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
     );
   });
 
-  const defaultClusterStore = useStore(DefaultClusterStore);
-
   const nodeCount = Form.useWatch("nodeCount", form) as number;
 
   const coreCount = Form.useWatch("coreCount", form) as number;
@@ -259,28 +259,24 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
       form={form}
       onFinish={onSubmit}
       initialValues={{
-        cluster: defaultClusterStore.cluster, ... initialValues,
+        ... initialValues,
       }}
     >
-      <Form.Item name="cluster" label="集群" rules={[{ required: true }]}>
-        <SingleClusterSelector />
-      </Form.Item>
-
       <Spin spinning={loading} tip={isSubmitting ? "" : "查询上次提交记录中"}>
-
+        <Form.Item name="appJobName" label="作业名" rules={[{ required: true }]}>
+          <Input />
+        </Form.Item>
         <Form.Item
           label="账户"
           name="account"
           rules={[{ required: true }]}
-          dependencies={["cluster"]}
         >
-          <AccountSelector cluster={cluster?.id} />
+          <AccountSelector cluster={clusterId} />
         </Form.Item>
 
         <Form.Item
           label="分区"
           name="partition"
-          dependencies={["cluster"]}
           rules={[{ required: true }]}
         >
           <Select
@@ -297,7 +293,6 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
         <Form.Item
           label="QOS"
           name="qos"
-          dependencies={["cluster"]}
           rules={[{ required: true }]}
         >
           <Select
@@ -308,7 +303,7 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
         <Form.Item
           label="节点数"
           name="nodeCount"
-          dependencies={["cluster", "partition"]}
+          dependencies={["partition"]}
           rules={[
             { required: true, type: "integer", max: currentPartitionInfo?.nodes },
           ]}
@@ -324,7 +319,7 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
             <Form.Item
               label="单节点GPU卡数"
               name="gpuCount"
-              dependencies={["cluster", "partition"]}
+              dependencies={["partition"]}
               rules={[
                 {
                   required: true,
@@ -343,7 +338,7 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
             <Form.Item
               label="单节点CPU核心数"
               name="coreCount"
-              dependencies={["cluster", "partition"]}
+              dependencies={["partition"]}
               rules={[
                 { required: true,
                   type: "integer",
@@ -391,6 +386,12 @@ export const LaunchAppForm: React.FC<Props> = ({ appId, attributes }) => {
       </Spin>
 
       <Form.Item>
+        <Button
+          onClick={() => Router.push(`/apps/${clusterId}/createApps`)}
+          style={{ marginRight: "10px" }}
+        >
+          取消
+        </Button>
         <Button type="primary" htmlType="submit" loading={loading}>
           提交
         </Button>

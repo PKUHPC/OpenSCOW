@@ -19,15 +19,13 @@ import { getUserHomedir,
   sftpChmod, sftpExists, sftpReaddir, sftpReadFile, sftpRealPath, sftpWriteFile } from "@scow/lib-ssh";
 import { parseErrorDetails } from "@scow/rich-error-model";
 import { JobInfo, SubmitJobRequest } from "@scow/scheduler-adapter-protos/build/protos/job";
-import { randomUUID } from "crypto";
 import fs from "fs";
 import { join } from "path";
 import { quote } from "shell-quote";
 import { AppOps, AppSession, SubmissionInfo } from "src/clusterops/api/app";
-import { getAppConfigs } from "src/config/apps";
 import { clusters } from "src/config/clusters";
 import { portalConfig } from "src/config/portal";
-import { splitSbatchArgs } from "src/utils/app";
+import { getClusterAppConfigs, splitSbatchArgs } from "src/utils/app";
 import { getAdapterClient } from "src/utils/clusters";
 import { getIpFromProxyGateway } from "src/utils/proxy";
 import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
@@ -69,10 +67,10 @@ export const appOps = (cluster: string): AppOps => {
 
   return {
     createApp: async (request, logger) => {
-      const apps = getAppConfigs();
+      const apps = getClusterAppConfigs(cluster);
 
       const { appId, userId, account, coreCount, nodeCount, gpuCount, memory, maxTime, proxyBasePath,
-        partition, qos, customAttributes } = request;
+        partition, qos, customAttributes, appJobName } = request;
 
       const memoryMb = memory ? Number(memory.slice(0, -2)) : undefined;
 
@@ -88,7 +86,7 @@ export const appOps = (cluster: string): AppOps => {
         throw <ServiceError> { code: Status.NOT_FOUND, message: `app id ${appId} is not found` };
       }
 
-      const jobName = randomUUID();
+      const jobName = appJobName;
 
       const workingDirectory = join(portalConfig.appJobsDir, jobName);
 
@@ -242,7 +240,8 @@ export const appOps = (cluster: string): AppOps => {
     },
 
     listAppSessions: async (request, logger) => {
-      const apps = getAppConfigs();
+
+      const apps = getClusterAppConfigs(cluster);
 
       const { userId } = request;
 
@@ -336,6 +335,7 @@ export const appOps = (cluster: string): AppOps => {
           sessions.push({
             jobId: sessionMetadata.jobId,
             appId: sessionMetadata.appId,
+            appName: apps[sessionMetadata.appId]?.name,
             sessionId: sessionMetadata.sessionId,
             submitTime: new Date(sessionMetadata.submitTime),
             state: runningJobInfo?.state ?? "ENDED",
@@ -354,7 +354,7 @@ export const appOps = (cluster: string): AppOps => {
     },
 
     connectToApp: async (request, logger) => {
-      const apps = getAppConfigs();
+      const apps = getClusterAppConfigs(cluster);
 
       const { sessionId, userId } = request;
 
