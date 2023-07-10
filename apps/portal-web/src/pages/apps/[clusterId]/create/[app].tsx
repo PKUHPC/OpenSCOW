@@ -28,11 +28,13 @@ export const AppIndexPage: NextPage = requireAuth(() => true)(() => {
 
   const router = useRouter();
   const appId = queryToString(router.query.app);
+  const clusterId = queryToString(router.query.clusterId);
+
   const { message } = App.useApp();
 
   const { data, isLoading } = useAsync({
     promiseFn: useCallback(async () => {
-      return await api.getAppMetadata({ query: { appId } })
+      return await api.getAppMetadata({ query: { appId, cluster: clusterId } })
         .httpError(404, () => { message.error("此应用不存在"); })
         .then((res) => res);
     }, [appId]),
@@ -44,9 +46,14 @@ export const AppIndexPage: NextPage = requireAuth(() => true)(() => {
 
   return (
     <div>
-      <Head title={`启动${data.appName}`} />
-      <PageTitle titleText={`启动${data.appName}`} />
-      <LaunchAppForm appName={data.appName} attributes={data.appCustomFormAttributes} appId={appId} />
+      <Head title={`创建${data.appName}`} />
+      <PageTitle titleText={`创建${data.appName}`} />
+      <LaunchAppForm
+        appName={data.appName}
+        attributes={data.appCustomFormAttributes}
+        appId={appId}
+        clusterId={clusterId}
+      />
     </div>
   );
 });

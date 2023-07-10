@@ -65,6 +65,7 @@ message CreateAppSessionRequest {
   uint32 node_count  = 11;
   optional uint32 gpu_count = 12;
   optional string memory = 13;
+  string app_job_name = 14;
 }
 
 // NOT_FOUND: app is not found
@@ -85,14 +86,16 @@ message AppSession {
   uint32 job_id = 2;
   google.protobuf.Timestamp submit_time = 3;
   string app_id = 4;
-  string state = 5;
-  string data_path = 6;
-  string running_time = 7;
-  string time_limit = 8;
-  optional string reason = 9;
+  // Undefined: apps[app.id]？.name is not found
+  optional string app_name = 5;
+  string state = 6;
+  string data_path = 7;
+  string running_time = 8;
+  string time_limit = 9;
+  optional string reason = 10;
 
-  optional string host = 10;
-  optional uint32 port = 11;
+  optional string host = 11;
+  optional uint32 port = 12;
 }
 
 message ListAppSessionsResponse {
@@ -101,6 +104,7 @@ message ListAppSessionsResponse {
 
 message GetAppMetadataRequest {
   string app_id = 1;
+  string cluster = 2;
 }
 
 message SelectOption {
@@ -131,11 +135,14 @@ message GetAppMetadataResponse {
   repeated AppCustomAttribute attributes = 2;
 }
 
-message ListAvailableAppsRequest {}
+message ListAvailableAppsRequest {
+  string cluster = 1;
+}
 
 message App {
   string id = 1;
   string name = 2;
+  optional string logo_path = 3;
 }
 
 message ListAvailableAppsResponse {
