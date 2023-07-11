@@ -23,17 +23,17 @@ import {
   WebAppProps_ProxyType,
 } from "@scow/protos/build/portal/app";
 import { getClusterOps } from "src/clusterops";
-import { getAppConfigs } from "src/config/apps";
+import { getClusterAppConfigs } from "src/utils/app";
 import { clusterNotFound } from "src/utils/errors";
 
 export const appServiceServer = plugin((server) => {
 
   server.addService<AppServiceServer>(AppServiceService, {
     connectToApp: async ({ request, logger }) => {
-      const apps = getAppConfigs();
-
 
       const { cluster, sessionId, userId } = request;
+
+      const apps = getClusterAppConfigs(cluster);
 
       const clusterOps = getClusterOps(cluster);
 
@@ -42,14 +42,6 @@ export const appServiceServer = plugin((server) => {
       const reply = await clusterOps.app.connectToApp({
         sessionId, userId,
       }, logger);
-
-      if (reply.code === "NOT_FOUND") {
-        throw <ServiceError>{ code: Status.NOT_FOUND, message: `session id ${sessionId} is not found` };
-      }
-
-      if (reply.code === "UNAVAILABLE") {
-        throw <ServiceError>{ code: Status.UNAVAILABLE, message: `session id ${sessionId} cannot be connected` };
-      }
 
       const app = apps[reply.appId];
 
@@ -94,10 +86,11 @@ export const appServiceServer = plugin((server) => {
     },
 
     createAppSession: async ({ request, logger }) => {
-      const apps = getAppConfigs();
 
-      const { account, appId, cluster, coreCount, nodeCount, gpuCount, memory, maxTime, proxyBasePath,
-        partition, qos, userId, customAttributes } = request;
+      const { account, appId, appJobName, cluster, coreCount, nodeCount, gpuCount, memory, maxTime,
+        proxyBasePath, partition, qos, userId, customAttributes } = request;
+
+      const apps = getClusterAppConfigs(cluster);
 
       const app = apps[appId];
       if (!app) {
@@ -154,6 +147,7 @@ export const appServiceServer = plugin((server) => {
 
       const reply = await clusterops.app.createApp({
         appId,
+        appJobName,
         userId,
         coreCount,
         nodeCount,
@@ -166,14 +160,6 @@ export const appServiceServer = plugin((server) => {
         customAttributes,
         proxyBasePath,
       }, logger);
-
-      if (reply.code === "SBATCH_FAILED") {
-        throw <ServiceError> { code: Status.INTERNAL, message: "sbatch failed", details: reply.message };
-      }
-
-      if (reply.code === "APP_NOT_FOUND") {
-        throw <ServiceError> { code: Status.NOT_FOUND, message: `app id ${appId} is not found` };
-      }
 
       return [{ jobId: reply.jobId, sessionId: reply.sessionId }];
 
@@ -192,9 +178,9 @@ export const appServiceServer = plugin((server) => {
     },
 
     getAppMetadata: async ({ request }) => {
-      const apps = getAppConfigs();
 
-      const { appId } = request;
+      const { appId, cluster } = request;
+      const apps = getClusterAppConfigs(cluster);
       const app = apps[appId];
 
       if (!app) {
@@ -227,10 +213,16 @@ export const appServiceServer = plugin((server) => {
       return [{ appName: app.name, attributes: attributes }];
     },
 
-    listAvailableApps: async ({}) => {
-      const apps = getAppConfigs();
+    listAvailableApps: async ({ request }) => {
 
-      return [{ apps: Object.keys(apps).map((x) => ({ id: x, name: apps[x].name })) }];
+      const { cluster } = request;
+
+      const apps = getClusterAppConfigs(cluster);
+
+      return [{
+        apps: Object.keys(apps)
+          .map((x) => ({ id: x, name: apps[x].name, logoPath: apps[x].logoPath || undefined })),
+      }];
     },
 
     getAppLastSubmission: async ({ request, logger }) => {

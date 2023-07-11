@@ -34,7 +34,6 @@ export const runningJob: RunningJob = {
   name: "123",
   nodes: "123",
   nodesOrReason: "!23",
-  nodesToBeUsed: "123",
   partition: "123",
   qos: "123",
   runningTime: "123",
@@ -65,12 +64,13 @@ export const mockApi: MockApi<typeof api> = {
 
   getClusterInfo: async ({ query: { cluster } }) => ({ clusterInfo: {
     submitJobDirTemplate: "/home/ddadaal/Code/{{ name }}",
-    slurm: {
+    scheduler: {
+      name: "slurm",
       partitions: [
-        { cores: 123, name: "123", nodes: 123, qos: ["123"], gpus: 10, mem: 1000 },
-        { cores: 1234, name: cluster, nodes: 1234, qos: ["1234"], gpus: 10, mem: 1000 },
-        { name : "compute", mem: 2048, cores:2, gpus:0, nodes: 1, qos: ["normal"], comment: "两个计算节点分区" },
-        { name : "GPU", mem: 2048, cores:2, gpus:2, nodes: 1, qos: ["normal"], comment: "GPU" },
+        { cores: 123, name: "123", nodes: 123, qos: ["123"], gpus: 10, memMb: 1000 },
+        { cores: 1234, name: cluster, nodes: 1234, qos: ["1234"], gpus: 10, memMb: 1000 },
+        { name : "compute", memMb: 2048, cores:2, gpus:0, nodes: 1, qos: ["normal"], comment: "两个计算节点分区" },
+        { name : "GPU", memMb: 2048, cores:2, gpus:2, nodes: 1, qos: ["normal"], comment: "GPU" },
       ],
     },
   } }),
@@ -81,10 +81,13 @@ export const mockApi: MockApi<typeof api> = {
 
   getAllJobs: async () => ({ results: [job]}),
 
-  listAvailableApps: async () => ({ apps: [
-    { id: "vscode", name: "VSCode" },
-    { id: "emacs", name: "Emacs" },
-  ]}),
+  listAvailableApps: async () => ({
+    apps: [
+      { id: "vscode", name: "VSCode", logoPath:"/apps/VSCode.svg" },
+      { id: "emacs", name: "Emacs" },
+      { id: "jupyter", name: "jupyter" },
+    ],
+  }),
 
   listFile: null,
 
@@ -110,13 +113,13 @@ export const mockApi: MockApi<typeof api> = {
   }),
 
   getAppSessions: async () => ({ sessions: [
-    { jobId: 100, sessionId: "123", appId: "vscode", state: "PENDING", reason: "resource",
+    { jobId: 100, sessionId: "123", appId: "vscode", appName:"vscode", state: "PENDING", reason: "resource",
       submitTime: new Date().toISOString(), host: "192.168.88.100", port: 1000, dataPath: "/test",
       timeLimit: "01:00:00", runningTime: "" },
-    { jobId: 101, sessionId: "124", appId: "vscode", state: "RUNNING",
+    { jobId: 101, sessionId: "124", appId: "vscode", appName:"vscode", state: "RUNNING",
       submitTime: new Date().toISOString(), dataPath: "/test",
       timeLimit: "1-01:00:00", runningTime: "01:50" },
-    { jobId: 102, sessionId: "125", appId: "vscode", state: "RUNNING",
+    { jobId: 102, sessionId: "125", appId: "vscode", appName:"vscode", state: "RUNNING",
       submitTime: new Date().toISOString(), host: "192.168.88.100", port: 10000, dataPath: "/test",
       timeLimit: "INVALID", runningTime: "01:55" },
   ]}),

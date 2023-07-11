@@ -11,8 +11,9 @@
  */
 
 import { DeleteOutlined, InboxOutlined } from "@ant-design/icons";
-import { App, Button, Modal, Upload } from "antd";
+import { App, Button, Modal, Upload, UploadFile } from "antd";
 import { join } from "path";
+import { useState } from "react";
 import { api } from "src/apis";
 import { urlToUpload } from "src/pageComponents/filemanager/api";
 import { publicConfig } from "src/utils/config";
@@ -28,16 +29,22 @@ interface Props {
 export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, cluster }) => {
 
   const { message, modal } = App.useApp();
+  const [ uploadFileList, setUploadFileList ] = useState<UploadFile[]>([]);
+
+  const onModalClose = () => {
+    setUploadFileList([]);
+    onClose();
+  };
 
   return (
     <Modal
       open={open}
       title="上传文件"
-      onCancel={onClose}
-      destroyOnClose
+      onCancel={onModalClose}
+      destroyOnClose={true}
       maskClosable={false}
       footer={[
-        <Button key="close" onClick={onClose}>
+        <Button key="close" onClick={onModalClose}>
           关闭
         </Button>,
       ]}
@@ -60,7 +67,11 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
             );
           },
         }}
-        onChange={({ file }) => {
+        onChange={({ file, fileList }) => {
+
+          const updatedFileList = [...fileList.filter((f) => f.status)];
+          setUploadFileList(updatedFileList);
+
           if (file.status === "done") {
             message.success(`${file.name}上传成功`);
             reload();
@@ -89,6 +100,7 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
             }
           });
         }}
+        fileList={uploadFileList}
       >
         <p className="ant-upload-drag-icon">
           <InboxOutlined />

@@ -129,8 +129,8 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
       if (data) {
         // 如果是从模板导入，则判断当前选中的分区中是否仍有模板中的partition，若有，则将默认值设为模板值；
         const setValueFromTemplate = initial.partition &&
-          data.clusterInfo.slurm.partitions.some((item) => { return item.name === initial.partition; });
-        const partition = data.clusterInfo.slurm.partitions[0];
+          data.clusterInfo.scheduler.partitions.some((item) => { return item.name === initial.partition; });
+        const partition = data.clusterInfo.scheduler.partitions[0];
         const setInitialValues = setValueFromTemplate ? {
           partition: initial.partition,
           qos: initial.qos,
@@ -164,7 +164,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
 
   const currentPartitionInfo = useMemo(() =>
     clusterInfoQuery.data
-      ? clusterInfoQuery.data.clusterInfo.slurm.partitions.find((x) => x.name === partition)
+      ? clusterInfoQuery.data.clusterInfo.scheduler.partitions.find((x) => x.name === partition)
       : undefined,
   [clusterInfoQuery.data, partition],
   );
@@ -184,8 +184,8 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
   const memorySize = (currentPartitionInfo ?
     currentPartitionInfo.gpus ? nodeCount * gpuCount
     * Math.floor(currentPartitionInfo.cores / currentPartitionInfo.gpus)
-    * Math.floor(currentPartitionInfo.mem / currentPartitionInfo.cores) :
-      nodeCount * coreCount * Math.floor(currentPartitionInfo.mem / currentPartitionInfo.cores) : 0);
+    * Math.floor(currentPartitionInfo.memMb / currentPartitionInfo.cores) :
+      nodeCount * coreCount * Math.floor(currentPartitionInfo.memMb / currentPartitionInfo.cores) : 0);
   const memory = memorySize + "MB";
   const memoryDisplay = formatSize(memorySize, ["MB", "GB", "TB"]);
 
@@ -247,7 +247,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
               loading={clusterInfoQuery.isLoading}
               disabled={!currentPartitionInfo}
               options={clusterInfoQuery.data
-                ? clusterInfoQuery.data.clusterInfo.slurm.partitions
+                ? clusterInfoQuery.data.clusterInfo.scheduler.partitions
                   .map((x) => ({ label: x.name, value: x.name }))
                 : []
               }
@@ -293,13 +293,13 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
                 {
                   required: true,
                   type: "integer",
-                  max: currentPartitionInfo?.gpus,
+                  max: currentPartitionInfo?.gpus / currentPartitionInfo.nodes,
                 },
               ]}
             >
               <InputNumber
                 min={1}
-                max={currentPartitionInfo?.gpus}
+                max={currentPartitionInfo?.gpus / currentPartitionInfo.nodes}
                 {...inputNumberFloorConfig}
               />
             </Form.Item>
@@ -312,13 +312,13 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
                 {
                   required: true,
                   type: "integer",
-                  max: currentPartitionInfo?.cores,
+                  max: currentPartitionInfo ? currentPartitionInfo.cores / currentPartitionInfo.nodes : undefined,
                 },
               ]}
             >
               <InputNumber
                 min={1}
-                max={currentPartitionInfo?.cores}
+                max={currentPartitionInfo ? currentPartitionInfo.cores / currentPartitionInfo.nodes : undefined}
                 {...inputNumberFloorConfig}
               />
             </Form.Item>

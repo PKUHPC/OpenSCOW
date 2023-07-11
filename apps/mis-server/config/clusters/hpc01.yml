@@ -1,29 +1,33 @@
 displayName: hpc01
-misIgnore: true
-slurm:
-  mis:
-    managerUrl: localhost:22222
-    dbPassword: password
-    clusterName: pkuhpc1
-    scriptPath: /slurmshTest/slurm.sh
-  loginNodes:
-    - localhost:22222
-  partitions:
-    - name: compute
-      nodes: 198
-      mem: 63000
-      cores: 28
-      gpus: 0
-      qos:
-        - low
-        - normal
-        - high
-    - name: gpu
-      nodes: 1
-      mem: 386000
-      cores: 48
-      gpus: 8
-      qos:
-        - low
-        - normal
-        - high
+adapterUrl: 0.0.0.0:6000
+loginNodes:
+  - name: login
+    address: localhost:22222
+# misIgnore: true
+# slurm:
+#   mis:
+#     managerUrl: localhost:22222
+#     dbPassword: password
+#     clusterName: pkuhpc1
+#     scriptPath: /slurmshTest/slurm.sh
+#   loginNodes:
+#     - localhost:22222
+#   partitions:
+#     - name: compute
+#       nodes: 198
+#       mem: 63000
+#       cores: 28
+#       gpus: 0
+#       qos:
+#         - low
+#         - normal
+#         - high
+#     - name: gpu
+#       nodes: 1
+#       mem: 386000
+#       cores: 48
+#       gpus: 8
+#       qos:
+#         - low
+#         - normal
+#         - high
