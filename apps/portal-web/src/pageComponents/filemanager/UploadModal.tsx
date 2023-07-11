@@ -81,7 +81,15 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
         }}
         beforeUpload={(file) => {
           return new Promise(async (resolve, reject) => {
+            const fileMaxSize = parseInt(publicConfig.CLIENT_MAX_BODY_SIZE.slice(0, -1)) * (1024 ** 3);
+
+            if (file.size > fileMaxSize) {
+              reject(file);
+              message.error(`${file.name}上传失败,文件大小超过${publicConfig.CLIENT_MAX_BODY_SIZE}`);
+            }
+
             const exists = await api.fileExist({ query:{ cluster: cluster, path: join(path, file.name) } });
+            
             if (exists.result) {
               modal.confirm({
                 title: "文件/目录已存在",
@@ -98,6 +106,7 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
             } else {
               resolve(file);
             }
+
           });
         }}
         fileList={uploadFileList}
