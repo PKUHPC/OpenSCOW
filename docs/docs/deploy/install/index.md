@@ -44,9 +44,17 @@ PubkeyAcceptedKeyTypes=+ssh-rsa
 
 ## 部署SCOW调度器适配器
 
-针对不同种类的调度器，需要在集群上部署对应的适配器
+针对不同种类的调度器，需要在集群上部署对应的适配器。适配器是在SCOW和底层调度器之间的中间层，向SCOW提供一组[接口](https://github.com/PKUHPC/scow-scheduler-adapter-interface)，SCOW通过这组接口调用适配器功能。理论上，只要适配器实现了接口所定义的功能，SCOW就能方便地部署在对应集群上。
+
+适配器本质上是一个gRPC服务器，我们已经实现了部分调度器对应的适配器，可以参考下列文档部署适配器
 
 - [slurm](https://github.com/PKUHPC/scow-slurm-adapter)
+
+:::note
+
+适配器将会暴露一个端口来提供服务，SCOW将通过`ip地址+端口号`访问适配器，调用接口。请记录下适配器的地址信息，用于后续部署。
+
+:::
 
 ## 下载scow-cli
 
