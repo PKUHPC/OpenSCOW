@@ -114,6 +114,9 @@ predefinedChargingTypes:
   # 链接地址
   # url: ""
 
+  # 是否打开新的页面，可选填，默认值为false
+  # openInNewPage: true
+
   # 自定义图标地址,可选填
   # iconPath: ""
 
@@ -126,6 +129,7 @@ predefinedChargingTypes:
     # 二级导航相关配置，与一级导航相同，但是不允许再设置children
     # text: ""
     # url: ""
+    # openInNewPage: true
     # iconPath: ""
     # allowedRoles: []
 ```

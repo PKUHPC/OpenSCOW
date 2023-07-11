@@ -85,6 +85,7 @@ export type Cluster = { id: string; name: string; }
 export type NavLink = {
   text: string;
   url: string;
+  openInNewPage?: boolean;
   iconPath?: string;
   children?: Omit<NavLink, "children">[];
 }

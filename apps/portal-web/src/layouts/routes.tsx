@@ -135,9 +135,11 @@ export const userRoutes: (
           />
         ),
         text: link.text,
-        path: `${link.url}?token=${user.token}`,
+        path: link.url ? `${link.url}?token=${user.token}`
+          : link.children?.length && link.children?.length > 0
+            ? `${link.children[0].url}?token=${user.token}` : "",
         clickable: true,
-        openInNewPage: true,
+        openInNewPage: link.openInNewPage,
         children: link.children?.length ? link.children?.map((childLink) => ({
           Icon: !childLink.iconPath ? LinkOutlined : (
             <NavIcon
@@ -147,7 +149,7 @@ export const userRoutes: (
           text: childLink.text,
           path: `${childLink.url}?token=${user.token}`,
           clickable: true,
-          openInNewPage: true,
+          openInNewPage: childLink.openInNewPage,
         } as NavItemProps)) : [],
       }) as NavItemProps) : []),
   ];
