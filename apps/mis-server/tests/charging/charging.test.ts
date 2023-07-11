@@ -76,6 +76,28 @@ it("pays account", async () => {
   expect(account.balance.toNumber()).toBe(10);
 });
 
+it ("pays account with negative amount", async () => {
+  const amount = numberToMoney(-10);
+  const client = new ChargingServiceClient(server.serverAddress, ChannelCredentials.createInsecure());
+
+  const reply = await asyncClientCall(client, "pay", {
+    tenantName: account.tenant.getProperty("name"),
+    accountName: account.accountName,
+    amount: amount,
+    comment: "comment",
+    operatorId: "tester",
+    ipAddress: "127.0.0.1",
+    type: "test",
+  });
+
+  expect(moneyToNumber(reply.previousBalance!)).toBe(0);
+  expect(moneyToNumber(reply.currentBalance!)).toBe(-10);
+
+  await reloadEntity(em, account);
+
+  expect(account.balance.toNumber()).toBe(-10);
+});
+
 it("concurrently pays", async () => {
   const amount = numberToMoney(10);
 
@@ -220,7 +242,7 @@ it("returns payment records", async () => {
 
   await reloadEntity(em, account);
   await reloadEntity(em, account.tenant.getEntity());
-  
+
   expect(account.balance.toNumber()).toBe(10);
   expect(account.tenant.getProperty("balance").toNumber()).toBe(20);
 
