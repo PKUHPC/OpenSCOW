@@ -73,7 +73,8 @@ export const userRoutes: (
       Icon: MacCommandOutlined,
       text: "Shell",
       path: "/shell",
-      clickToPath: join(publicConfig.BASE_PATH, "shell", defaultCluster.id),
+      clickToPath:
+        join(publicConfig.BASE_PATH, "shell", defaultCluster.id, loginNodes[defaultCluster.id]?.[0]?.name),
       openInNewPage: true,
       clickable: true,
       children: publicConfig.CLUSTERS.map(({ name, id }) => ({
@@ -81,6 +82,7 @@ export const userRoutes: (
         Icon: CloudServerOutlined,
         text: name,
         path: `/shell/${id}`,
+        clickToPath: join(publicConfig.BASE_PATH, "shell", id, loginNodes[id]?.[0]?.name),
         children: loginNodes[id]?.map((loginNode) => ({
           openInNewPage: true,
           Icon: CloudServerOutlined,
