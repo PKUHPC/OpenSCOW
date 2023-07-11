@@ -75,6 +75,13 @@ services:
       PHPLDAPADMIN_LDAP_HOSTS: ldap://scow-dev:389
       PHPLDAPADMIN_HTTPS: false
 
+  test-adapter:
+    image: test-adapter
+    build:
+      context: ..
+      dockerfile: dev/test-adapter/Dockerfile
+    network_mode: service:scow-dev
+
 volumes:
   db:
   ldap:

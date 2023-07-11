@@ -110,7 +110,7 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
         setLoading(true);
         form.setFieldValue("appJobName", genAppJobName(appName));
 
-        setCurrentPartitionInfo(data.clusterInfo.slurm.partitions[0]);
+        setCurrentPartitionInfo(data.clusterInfo.scheduler.partitions[0]);
 
         await api.getAppLastSubmission({ query: { cluster: clusterId, appId } })
           .then((lastSubmitData) => {
@@ -122,11 +122,11 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
 
             // 如果存在上一次提交信息，且上一次提交信息中的分区，qos，cpu核心数满足当前集群配置，则填入上一次提交信息中的相应值
             const setSubmitPartition = lastSubmitPartition &&
-            data.clusterInfo.slurm.partitions.some((item) => { return item.name === lastSubmitPartition; });
+            data.clusterInfo.scheduler.partitions.some((item) => { return item.name === lastSubmitPartition; });
 
             const clusterPartition = setSubmitPartition
-              ? data.clusterInfo.slurm.partitions.filter((item) => { return item.name === lastSubmitPartition; })[0]
-              : data.clusterInfo.slurm.partitions[0];
+              ? data.clusterInfo.scheduler.partitions.filter((item) => { return item.name === lastSubmitPartition; })[0]
+              : data.clusterInfo.scheduler.partitions[0];
             setCurrentPartitionInfo(clusterPartition);
 
             const clusterPartitionCoreCount = clusterPartition.cores;
@@ -195,7 +195,7 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
 
   const handlePartitionChange = (partition: string) => {
     const partitionInfo = clusterInfoQuery.data
-      ? clusterInfoQuery.data.clusterInfo.slurm.partitions.find((x) => x.name === partition)
+      ? clusterInfoQuery.data.clusterInfo.scheduler.partitions.find((x) => x.name === partition)
       : undefined;
     form.setFieldValue("qos", partitionInfo?.qos?.[0]);
     if (!!partitionInfo?.gpus) {
@@ -245,8 +245,8 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
   const memorySize = (currentPartitionInfo ?
     currentPartitionInfo.gpus ? nodeCount * gpuCount
     * Math.floor(currentPartitionInfo.cores / currentPartitionInfo.gpus)
-    * Math.floor(currentPartitionInfo.mem / currentPartitionInfo.cores) :
-      nodeCount * coreCount * Math.floor(currentPartitionInfo.mem / currentPartitionInfo.cores) : 0);
+    * Math.floor(currentPartitionInfo.memMb / currentPartitionInfo.cores) :
+      nodeCount * coreCount * Math.floor(currentPartitionInfo.memMb / currentPartitionInfo.cores) : 0);
   const memory = memorySize + "MB";
   const memoryDisplay = formatSize(memorySize, ["MB", "GB", "TB"]);
 
@@ -282,7 +282,7 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
           <Select
             disabled={!currentPartitionInfo}
             options={clusterInfoQuery.data
-              ? clusterInfoQuery.data.clusterInfo.slurm.partitions
+              ? clusterInfoQuery.data.clusterInfo.scheduler.partitions
                 .map((x) => ({ label: x.name, value: x.name }))
               : []
             }
