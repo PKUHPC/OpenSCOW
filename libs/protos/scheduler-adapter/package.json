@@ -17,6 +17,9 @@
     "long": "5.2.3",
     "protobufjs": "7.2.3"
   },
+  "devDependencies": {
+    "ts-proto": "1.149.0"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC"
