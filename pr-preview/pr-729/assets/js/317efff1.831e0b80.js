@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk_scow_docs=self.webpackChunk_scow_docs||[]).push([[2545],{25600:e=>{e.exports=JSON.parse('{"label":"scow-scheduler-adapter","permalink":"/SCOW/pr-preview/pr-729/blog/tags/scow-scheduler-adapter","allTagsPath":"/SCOW/pr-preview/pr-729/blog/tags","count":1}')}}]);
