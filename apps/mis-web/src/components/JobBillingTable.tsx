@@ -75,15 +75,15 @@ export const JobBillingTable: React.FC<Props> = ({ data, loading }) => {
       props: { rowSpan: r.partitionItemIndex === 0 ? r.qosCount : 0 },
     }) },
     { dataIndex: "cores", title: "单节点核心数", key: "index", render: (_, r) => ({
-      children: r.cores,
+      children: r.cores / r.nodes,
       props: { rowSpan: r.partitionItemIndex === 0 ? r.qosCount : 0 },
     }) },
     { dataIndex: "gpus", title: "单节点GPU数", key: "index", render: (_, r) => ({
-      children: r.gpus,
+      children: r.gpus / r.nodes,
       props: { rowSpan: r.partitionItemIndex === 0 ? r.qosCount : 0 },
     }) },
     { dataIndex: "mem", title: "单节点内存（MB）", key: "index", render: (_, r) => ({
-      children: r.mem,
+      children: r.mem / r.nodes,
       props: { rowSpan: r.partitionItemIndex === 0 ? r.qosCount : 0 },
     }) },
     { dataIndex: "qos", title: "QOS", key: "index", render: (_, r) => ({
