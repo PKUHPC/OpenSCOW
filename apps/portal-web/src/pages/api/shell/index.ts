@@ -99,7 +99,7 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
     throw new Error(`Unknown cluster ${cluster}`);
   }
 
-  const loginNode = runtimeConfig.CLUSTERS_CONFIG[cluster].slurm.loginNodes.map(getLoginNode).find(
+  const loginNode = runtimeConfig.CLUSTERS_CONFIG[cluster].loginNodes.map(getLoginNode).find(
     (x) => x.name === loginNodeName,
   );
 

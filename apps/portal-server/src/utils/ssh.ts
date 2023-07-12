@@ -78,7 +78,7 @@ export async function checkClustersRootUserLogin(logger: Logger) {
  * Check whether login node is in current cluster
  */
 export async function checkLoginNodeInCluster(cluster: string, loginNode: string) {
-  const loginNodes = clusters[cluster]?.slurm?.loginNodes.map(getLoginNode);
+  const loginNodes = clusters[cluster]?.loginNodes.map(getLoginNode);
   if (!loginNodes) {
     throw clusterNotFound(cluster);
   }

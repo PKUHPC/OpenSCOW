@@ -189,7 +189,7 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
       ?? runtimeConfig.UI_CONFIG?.footer?.defaultText ?? "";
 
     extra.loginNodes = Object.keys(runtimeConfig.CLUSTERS_CONFIG).reduce((acc, cluster) => {
-      acc[cluster] = runtimeConfig.CLUSTERS_CONFIG[cluster].slurm.loginNodes;
+      acc[cluster] = runtimeConfig.CLUSTERS_CONFIG[cluster].loginNodes;
       return acc;
     }, {});
   }
