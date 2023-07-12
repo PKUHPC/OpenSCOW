@@ -125,6 +125,7 @@ pnpm build
     - 具有两个用户：root用户`root`（密码`root`）和普通用户`test`（密码`test`）
     - **本地开发**：可以直接使用本地的`~/.ssh/id_rsa.pub`登录`root`和`test`用户
     - **Dev Container**：见下文
+- 可以通过`6000`端口访问的调度器适配器（`test-adapter`），接口返回固定值，仅用于测试环境
 
 ### Dev Container环境
 
