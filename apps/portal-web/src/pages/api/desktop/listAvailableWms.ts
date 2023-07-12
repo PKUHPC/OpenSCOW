@@ -28,7 +28,9 @@ export type AvailableWm = Static<typeof AvailableWm>;
 export const ListAvailableWmsSchema = typeboxRouteSchema({
   method: "GET",
 
-  query: Type.Object({}),
+  query: Type.Object({
+    cluster: Type.String(),
+  }),
 
   responses: {
     200: Type.Object({
@@ -54,7 +56,9 @@ export default /* #__PURE__*/typeboxRoute(ListAvailableWmsSchema, async (req, re
 
   if (!info) { return; }
 
+  const { cluster } = req.query;
+
   const client = getClient(DesktopServiceClient);
 
-  return await asyncUnaryCall(client, "listAvailableWms", {}).then(({ wms }) => ({ 200: { wms } }));
+  return await asyncUnaryCall(client, "listAvailableWms", { cluster }).then(({ wms }) => ({ 200: { wms } }));
 });

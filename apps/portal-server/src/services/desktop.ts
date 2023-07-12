@@ -16,16 +16,13 @@ import { Status } from "@grpc/grpc-js/build/src/constants";
 import { executeAsUser } from "@scow/lib-ssh";
 import { DesktopServiceServer, DesktopServiceService } from "@scow/protos/build/portal/desktop";
 import { portalConfig } from "src/config/portal";
+import { ensureEnabled, getAvailableWms } from "src/utils/desktop";
 import { clusterNotFound } from "src/utils/errors";
 import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
 import { displayIdToPort,
-  parseDisplayId, parseListOutput, parseOtp, refreshPassword, VNCSERVER_BIN_PATH } from "src/utils/turbovnc";
+  getVNCPath,
+  parseDisplayId, parseListOutput, parseOtp, refreshPassword } from "src/utils/turbovnc";
 
-function ensureEnabled() {
-  if (!portalConfig.loginDesktop.enabled) {
-    throw <ServiceError>{ code: Status.UNAVAILABLE, message: "Login deskto is not enabled" };
-  }
-}
 
 export const desktopServiceServer = plugin((server) => {
 
@@ -33,7 +30,7 @@ export const desktopServiceServer = plugin((server) => {
     createDesktop: async ({ request, logger }) => {
       const { cluster, wm, userId } = request;
 
-      ensureEnabled();
+      ensureEnabled(cluster);
 
       if (portalConfig.loginDesktop.wms.find((x) => x.wm === wm) === undefined) {
         throw <ServiceError>{ code: Status.INVALID_ARGUMENT, message: `${wm} is not a acceptable wm.` };
@@ -43,10 +40,13 @@ export const desktopServiceServer = plugin((server) => {
 
       if (!host) { throw clusterNotFound(cluster); }
 
+      const vncserverBinPath = getVNCPath(cluster, "vncserver");
+
       return await sshConnect(host, "root", logger, async (ssh) => {
+
         // find if the user has running session
         let resp = await executeAsUser(ssh, userId, logger, true,
-          VNCSERVER_BIN_PATH, ["-list"],
+          vncserverBinPath, ["-list"],
         );
 
         const ids = parseListOutput(resp.stdout);
@@ -65,7 +65,7 @@ export const desktopServiceServer = plugin((server) => {
           params.push(wm);
         }
 
-        resp = await executeAsUser(ssh, userId, logger, true, VNCSERVER_BIN_PATH, params);
+        resp = await executeAsUser(ssh, userId, logger, true, vncserverBinPath, params);
 
         // parse the OTP from output. the output was in stderr
         const password = parseOtp(resp.stderr);
@@ -80,18 +80,21 @@ export const desktopServiceServer = plugin((server) => {
     },
 
     killDesktop: async ({ request, logger }) => {
-      ensureEnabled();
 
       const { cluster, displayId, userId } = request;
+
+      ensureEnabled(cluster);
 
       const host = getClusterLoginNode(cluster);
 
       if (!host) { throw clusterNotFound(cluster); }
 
+      const vncserverBinPath = getVNCPath(cluster, "vncserver");
+
       return await sshConnect(host, "root", logger, async (ssh) => {
 
         // kill specific desktop
-        await executeAsUser(ssh, userId, logger, true, VNCSERVER_BIN_PATH, ["-kill", ":" + displayId]);
+        await executeAsUser(ssh, userId, logger, true, vncserverBinPath, ["-kill", ":" + displayId]);
 
         return [{}];
       });
@@ -100,10 +103,9 @@ export const desktopServiceServer = plugin((server) => {
 
     connectToDesktop: async ({ request, logger }) => {
 
-      ensureEnabled();
-
       const { cluster, displayId, userId } = request;
 
+      ensureEnabled(cluster);
 
       const host = getClusterLoginNode(cluster);
 
@@ -120,19 +122,21 @@ export const desktopServiceServer = plugin((server) => {
 
     listUserDesktops: async ({ request, logger }) => {
 
-      ensureEnabled();
-
       const { cluster, userId } = request;
+
+      ensureEnabled(cluster);
 
       const host = getClusterLoginNode(cluster);
 
       if (!host) { throw clusterNotFound(cluster); }
 
+      const vncserverBinPath = getVNCPath(cluster, "vncserver");
+
       return await sshConnect(host, "root", logger, async (ssh) => {
 
         // list all running session
         const resp = await executeAsUser(ssh, userId, logger, true,
-          VNCSERVER_BIN_PATH, ["-list"],
+          vncserverBinPath, ["-list"],
         );
 
         const ids = parseListOutput(resp.stdout);
@@ -145,10 +149,14 @@ export const desktopServiceServer = plugin((server) => {
 
     },
 
-    listAvailableWms: async ({}) => {
-      ensureEnabled();
+    listAvailableWms: async ({ request }) => {
 
-      const result = portalConfig.loginDesktop.wms;
+      const { cluster } = request;
+
+      ensureEnabled(cluster);
+
+      const result = getAvailableWms(cluster);
+
 
       return [{ wms: result }];
     },

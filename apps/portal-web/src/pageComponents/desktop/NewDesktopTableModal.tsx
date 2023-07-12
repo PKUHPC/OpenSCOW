@@ -11,7 +11,7 @@
  */
 
 import { App, Form, Modal, Select } from "antd";
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { Cluster } from "src/utils/config";
@@ -28,14 +28,14 @@ interface FormInfo {
   wm: string;
 }
 
-const promiseFn = async () => api.listAvailableWms({ query: {} });
 
 export const NewDesktopTableModal: React.FC<Props> = ({ open, onClose, reload, cluster }) => {
 
   const [form] = Form.useForm<FormInfo>();
 
+
   const { data, isLoading } = useAsync({
-    promiseFn,
+    promiseFn: useCallback(async () => api.listAvailableWms({ query: { cluster: cluster.id } }), [cluster.id]),
     onResolve({ wms }) {
       if (wms.length > 0) {
         form.setFieldValue("wm", wms[0].wm);

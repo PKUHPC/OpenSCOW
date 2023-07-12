@@ -10,6 +10,8 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { getClusterConfigs } from "@scow/config/build/cluster";
+import { getPortalConfig } from "@scow/config/build/portal";
 import { executeAsUser, loggedExec } from "@scow/lib-ssh";
 import { NodeSSH } from "node-ssh";
 import { join } from "path";
@@ -17,7 +19,23 @@ import { portalConfig } from "src/config/portal";
 import { parseIp } from "src/utils/proxy";
 import { Logger } from "ts-log";
 
-export const VNCSERVER_BIN_PATH = join(portalConfig.turboVNCPath, "bin", "vncserver");
+export function getTurboVNCPath(cluster: string) {
+
+  const commonTurboVNCPath = getPortalConfig().turboVNCPath;
+
+  const clusterTurboVNCPath = getClusterConfigs()[cluster].turboVNCPath;
+
+  return clusterTurboVNCPath || commonTurboVNCPath;
+
+}
+
+export function getVNCPath(cluster: string, cmd: string) {
+
+  const turboVNCPath = getTurboVNCPath(cluster);
+
+  return join(turboVNCPath, "bin", cmd);
+}
+
 const DISPLAY_ID_PORT_DELTA = 5900;
 
 export function parseListOutput(output: string): number[] {

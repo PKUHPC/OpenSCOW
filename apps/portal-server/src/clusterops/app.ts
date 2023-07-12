@@ -29,8 +29,8 @@ import { getClusterAppConfigs, splitSbatchArgs } from "src/utils/app";
 import { getAdapterClient } from "src/utils/clusters";
 import { getIpFromProxyGateway } from "src/utils/proxy";
 import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
-import { displayIdToPort, parseDisplayId,
-  refreshPassword, refreshPasswordByProxyGateway, VNCSERVER_BIN_PATH } from "src/utils/turbovnc";
+import { displayIdToPort, getVNCPath, parseDisplayId,
+  refreshPassword, refreshPasswordByProxyGateway } from "src/utils/turbovnc";
 
 interface SessionMetadata {
   sessionId: string;
@@ -215,7 +215,9 @@ export const appOps = (cluster: string): AppOps => {
 
           const extraOptions = configSlurmOptions.concat(userSbatchOptions);
 
-          const envVariables = getEnvVariables({ VNC_SESSION_INFO, VNCSERVER_BIN_PATH });
+          const vncserverBinPath = getVNCPath(cluster, "vncserver");
+
+          const envVariables = getEnvVariables({ VNC_SESSION_INFO, VNCSERVER_BIN_PATH: vncserverBinPath });
 
           return await submitAndWriteMetadata({
             userId, jobName, account, partition: partition!, qos, nodeCount, gpuCount: gpuCount ?? 0, memoryMb,

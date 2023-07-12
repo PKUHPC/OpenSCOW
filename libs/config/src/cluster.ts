@@ -30,6 +30,17 @@ export const getLoginNode =
     return typeof loginNode === "string" ? { name: loginNode, address: loginNode } : loginNode;
   };
 
+const LoginDeskopConfigSchema = Type.Object({
+  enabled: Type.Boolean({ description: "是否启动登录节点上的桌面功能" }),
+  wms: Type.Array(
+    Type.Object({ name: Type.String({ description: "名称" }), wm: Type.String({ description: "wm值" }) })),
+  maxDesktops: Type.Integer({ description: "每个登录节点上最多创建多少个桌面" }),
+});
+
+const TurboVncConfigSchema = Type.String({ description: "TurboVNC的安装路径" });
+
+type LoginDeskopConfigSchema = Static<typeof LoginDeskopConfigSchema>;
+type TurboVncConfigSchema = Static<typeof TurboVncConfigSchema>;
 export const ClusterConfigSchema = Type.Object({
   displayName: Type.String({ description: "集群的显示名称" }),
   adapterUrl: Type.String({ description: "调度器适配器服务地址" }),
@@ -41,6 +52,8 @@ export const ClusterConfigSchema = Type.Object({
     Type.Array(LoginNodeConfigSchema),
     Type.Array(Type.String(), { description: "集群的登录节点地址", default: []}),
   ]),
+  loginDesktop: Type.Optional(LoginDeskopConfigSchema),
+  turboVNCPath: Type.Optional(TurboVncConfigSchema),
 });
 
 
