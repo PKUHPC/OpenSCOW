@@ -22,7 +22,7 @@ title: 自定义导航链接
 navLinks:
   # 链接名称
   - text: ""
-    # 链接地址
+    # 链接地址，一级导航链接地址为可选填，二级导航链接地址为必填
     url: ""
     # 是否打开新的页面，可选填，默认值为false
     # openInNewPage: true
@@ -30,7 +30,7 @@ navLinks:
     iconPath: ""
     # 二级导航,可选填
     children:
-      # 二级导航相关配置，与一级导航相同，但是不允许再设置children
+      # 二级导航相关配置，与一级导航相同，但是url为必填配置，同时不允许再设置children
       - text: ""
         url: ""
         iconPath: ""
@@ -45,7 +45,7 @@ navLinks:
 navLinks:
   # 链接名称
   - text: ""
-    # 链接地址
+    # 链接地址，一级导航链接地址为可选填，二级导航链接地址为必填
     url: ""
     # 是否打开新的页面，可选填，默认值为false
     # openInNewPage: true
@@ -56,7 +56,7 @@ navLinks:
     allowedRoles: []
     # 二级导航,可选填
     children:
-      # 二级导航相关配置，与一级导航相同，但是不允许再设置children
+      # 二级导航相关配置，与一级导航相同，但是url为必填配置，同时不允许再设置children
       - text: ""
         url: ""
         openInNewPage:
@@ -71,7 +71,6 @@ navLinks:
 ```yaml title="config/portal.yaml"
 navLinks:
   - text: "一级导航1"
-    url: ""
     iconPath: "/desktop.jpg"
     children:
       - text: "二级导航1"
@@ -102,7 +101,6 @@ navLinks:
 ```yaml title="config/mis.yaml"
 navLinks:
   - text: "一级导航1"
-    url: ""
     iconPath: "/icon-test.png"
     children:
       - text: "二级导航1"
@@ -130,11 +128,11 @@ navLinks:
 | ------------------------- | -------------------- | ------------------ | ---------- | ---------------------------------------------------------------------------------------- |
 | `navLinks`                | /                    | /                 |/           |/                                                                                          |
 | `text`                    | 字符串                | `portal`，`mis`    | 是         | 链接名称，SCOW导航栏上显示的名称                                                            |
-| `url`                     | 字符串                | `portal`，`mis`    | 是         | 链接地址，自定义导航链接地址，跳转时会在后面加入查询参数`?token={用来跟踪登录用户的状态的token}`。一级导航链接地址设置为空字符串时，将自动跳转至次级导航栏的第一项导航的链接地址。  |
+| `url`                     | 字符串                | `portal`，`mis`    |  在二级导航中为必填    | 链接地址，自定义导航链接地址，一级导航链接地址为可选填，二级导航链接地址为必填。跳转时会在后面加入查询参数`?token={用来跟踪登录用户的状态的token}`。如没有配置一级导航的链接地址，点击该导航栏时将自动跳转至次级导航栏的第一项导航的链接地址。  |
 | `openInNewPage`           | 布尔类型               | `portal`，`mis`    | 否         | 可以选填。如不设置，默认值为`false`，不打开新的页面。如果设置为`true`，则会在新的页面打开该导航链接。  |
 | `iconPath`                     | 字符串           | `portal`，`mis`    | 否         | 图标路径，用户上传到[公共文件](./public-files.md)下的自定义导航链接图标路径。可选填，如未填写则显示系统默认导航链接图标。  |
 | `allowedRoles`            |  用户角色字符串列表    | `mis`             |否           | 管理系统指定可以看到该导航链接的角色列表，用户角色类型包括  `user`, `accountUser`, `accountAdmin`, `accountOwner`, `tenantFinance`, `tenantAdmin`, `platformAdmin`, `platformFinance` （用户角色详解请看下方角色配置说明）。如果没有指定，则不再限定用户角色，即所有用户都可以看到该导航链接。  |
-| `children`                |  导航内容的列表    | `portal`，`mis`   | 否          | 二级导航列表，内容包括该系统下一级导航的所有内容，内容类型以及是否必填与一级导航内容完全相同，但是不允许再继续设置chilidren，不允许继续添加三级导航。如果没有指定，则没有可以显示的二级导航链接。    |
+| `children`                |  导航内容的列表    | `portal`，`mis`   | 否          | 二级导航列表，内容包括该系统下一级导航的所有内容，除`url`以外，内容类型以及是否必填与一级导航内容完全相同，但是不允许再继续设置chilidren，不允许继续添加三级导航。如果没有指定，则没有可以显示的二级导航链接。    |
 
 ### 自定义图标配置说明
 
