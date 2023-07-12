@@ -32,7 +32,6 @@ export const RunningJob = Type.Object({
   cores: Type.String(),
   qos: Type.String(),
   submissionTime: Type.String(),
-  nodesToBeUsed: Type.String(),
   /**
    * days-hours:minutes:seconds.
    * The value may be  "NOT_SET"  if not yet established or "UNLIMITED" for no

@@ -66,6 +66,14 @@ services:
       PHPLDAPADMIN_LDAP_HOSTS: ldap://localhost:389
       PHPLDAPADMIN_HTTPS: false
 
+  test-adapter:
+    image: test-adapter
+    build:
+      context: ..
+      dockerfile: dev/test-adapter/Dockerfile
+    ports:
+      - 6000:6000
+
 networks:
   default:
     name: scow

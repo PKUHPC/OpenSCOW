@@ -25,7 +25,7 @@ export const pricePlugin = plugin(async (s) => {
   const logger = s.logger.child({ plugin: "price" });
 
   // check price item completeness
-  const priceMap = await createPriceMap(s.ext.orm.em.fork(), logger);
+  const priceMap = await createPriceMap(s.ext.orm.em.fork(), s.ext.clusters, logger);
   const missingItems = priceMap.getMissingDefaultPriceItems();
   if (missingItems.length > 0) {
     logger.warn(`
@@ -37,7 +37,7 @@ export const pricePlugin = plugin(async (s) => {
   }
 
   s.addExtension("price", <PricePlugin["price"]>{
-    createPriceMap: () => createPriceMap(s.ext.orm.em.fork(), logger),
+    createPriceMap: () => createPriceMap(s.ext.orm.em.fork(), s.ext.clusters, logger),
   });
 
 });

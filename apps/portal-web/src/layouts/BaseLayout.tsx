@@ -17,7 +17,6 @@ import { PropsWithChildren, useMemo } from "react";
 import { useStore } from "simstate";
 import { DefaultClusterSelector } from "src/layouts/DefaultClusterSelector";
 import { userRoutes } from "src/layouts/routes";
-import { AppsStore } from "src/stores/AppsStore";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { LoginNodeStore } from "src/stores/LoginNodeStore";
 import { UserStore } from "src/stores/UserStore";
@@ -32,12 +31,11 @@ export const BaseLayout = ({ footerText, versionTag, children }: PropsWithChildr
 
   const userStore = useStore(UserStore);
   const defaultClusterStore = useStore(DefaultClusterStore);
-  const apps = useStore(AppsStore);
   const loginNodes = useStore(LoginNodeStore);
 
   const routes = useMemo(() => userRoutes(
-    userStore.user, defaultClusterStore.cluster, apps, loginNodes,
-  ), [userStore.user, defaultClusterStore.cluster, apps]);
+    userStore.user, defaultClusterStore.cluster, loginNodes,
+  ), [userStore.user, defaultClusterStore.cluster]);
 
   return (
     <LibBaseLayout

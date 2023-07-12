@@ -17,6 +17,7 @@ import { clusters } from "src/config/clusters";
 import { config } from "src/config/env";
 import { plugins } from "src/plugins";
 import { appServiceServer } from "src/services/app";
+import { configServiceServer } from "src/services/config";
 import { desktopServiceServer } from "src/services/desktop";
 import { fileServiceServer } from "src/services/file";
 import { jobServiceServer } from "src/services/job";
@@ -46,6 +47,7 @@ export async function createServer() {
   await server.register(jobServiceServer);
   await server.register(fileServiceServer);
   await server.register(shellServiceServer);
+  await server.register(configServiceServer);
 
   if (process.env.NODE_ENV === "production") {
     await checkClustersRootUserLogin(server.logger);

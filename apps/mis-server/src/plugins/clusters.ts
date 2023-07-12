@@ -14,9 +14,8 @@ import { ServiceError } from "@ddadaal/tsgrpc-common";
 import { Logger, plugin } from "@ddadaal/tsgrpc-server";
 import { status } from "@grpc/grpc-js";
 import { getLoginNode } from "@scow/config/build/cluster";
+import { getSchedulerAdapterClient, SchedulerAdapterClient } from "@scow/lib-scheduler-adapter";
 import { testRootUserSshLogin } from "@scow/lib-ssh";
-import { ClusterOps } from "src/clusterops/api";
-import { createSlurmOps } from "src/clusterops/slurm";
 import { clusters } from "src/config/clusters";
 import { rootKeyPair } from "src/config/env";
 import { scowErrorMetadata } from "src/utils/error";
@@ -29,13 +28,13 @@ type CallOnAllResult<T> = ({ cluster: string; } & (
 // Throw ServiceError if failed.
 type CallOnAll = <T>(
   logger: Logger,
-  call: (ops: ClusterOps) => Promise<T>,
+  call: (client: SchedulerAdapterClient) => Promise<T>,
 ) => Promise<CallOnAllResult<T>>;
 
 type CallOnOne = <T>(
   cluster: string,
   logger: Logger,
-  call: (ops: ClusterOps) => Promise<T>,
+  call: (client: SchedulerAdapterClient) => Promise<T>,
 ) => Promise<T>;
 
 export type ClusterPlugin = {
@@ -45,16 +44,12 @@ export type ClusterPlugin = {
   }
 }
 
-const clusterOpsMaps = {
-  "slurm": createSlurmOps,
-} as const;
-
 export const CLUSTEROPS_ERROR_CODE = "CLUSTEROPS_ERROR";
 
 export const clustersPlugin = plugin(async (f) => {
 
   if (process.env.NODE_ENV === "production") {
-    await Promise.all(Object.values(clusters).map(async ({ displayName, slurm: { loginNodes } }) => {
+    await Promise.all(Object.values(clusters).map(async ({ displayName, loginNodes }) => {
       const loginNode = getLoginNode(loginNodes[0]);
       const address = loginNode.address;
       const node = loginNode.name;
@@ -69,46 +64,37 @@ export const clustersPlugin = plugin(async (f) => {
     }));
   }
 
-  const opsForClusters = Object.entries(clusters).reduce((prev, [cluster, c]) => {
-    const ops = clusterOpsMaps[(c.scheduler as keyof typeof clusterOpsMaps)](cluster, f.logger);
+  const adapterClientForClusters = Object.entries(clusters).reduce((prev, [cluster, c]) => {
+    const client = getSchedulerAdapterClient(c.adapterUrl);
 
-    if (ops) {
-      prev[cluster] = { ops, ignore: c.misIgnore };
-    }
+    prev[cluster] = client;
 
     return prev;
-  }, {} as Record<string, { ops: ClusterOps, ignore: boolean } >);
+  }, {} as Record<string, SchedulerAdapterClient>);
 
-  for (const ops of Object.values(opsForClusters).filter((x) => !x.ignore).map((x) => x.ops)) {
-    await ops.onStartup();
-  }
-
-  const getClusterOps = (cluster: string) => {
-    return opsForClusters[cluster];
+  const getAdapterClient = (cluster: string) => {
+    return adapterClientForClusters[cluster];
   };
 
   const clustersPlugin = {
 
     callOnOne: <CallOnOne>(async (cluster, logger, call) => {
-      const ops = getClusterOps(cluster);
+      const client = getAdapterClient(cluster);
 
-      if (!ops) {
+      if (!client) {
         throw new Error("Calling actions on non-existing cluster " + cluster);
       }
 
-      if (ops.ignore) {
-        throw new Error("Call specific actions on ignored cluster " + cluster);
-      }
-      return await call(ops.ops);
+      logger.info("Calling actions on cluster " + cluster);
+      return await call(client);
     }),
 
     // throws error if failed.
     callOnAll: <CallOnAll>(async (logger, call) => {
 
-      const results = await Promise.all(Object.entries(opsForClusters)
-        .filter(([_, c]) => !c.ignore)
-        .map(async ([cluster, ops]) => {
-          return call(ops.ops).then((result) => {
+      const results = await Promise.all(Object.entries(adapterClientForClusters)
+        .map(async ([cluster, client]) => {
+          return call(client).then((result) => {
             logger.info("Executing on %s success", cluster);
             return { cluster, success: true, result };
           }).catch((e) => {

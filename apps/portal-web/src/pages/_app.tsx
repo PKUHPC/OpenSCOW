@@ -20,7 +20,6 @@ import { GlobalStyle } from "@scow/lib-web/build/layouts/globalStyle";
 import { getHostname } from "@scow/lib-web/build/utils/getHostname";
 import { useConstant } from "@scow/lib-web/build/utils/hooks";
 import { isServer } from "@scow/lib-web/build/utils/isServer";
-import { App } from "@scow/protos/build/portal/app";
 import { App as AntdApp } from "antd";
 import type { AppContext, AppProps } from "next/app";
 import NextApp from "next/app";
@@ -34,7 +33,6 @@ import { USE_MOCK } from "src/apis/useMock";
 import { getTokenFromCookie } from "src/auth/cookie";
 import { BaseLayout } from "src/layouts/BaseLayout";
 import { FloatButtons } from "src/layouts/FloatButtons";
-import { AppsStore } from "src/stores/AppsStore";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { LoginNodeStore } from "src/stores/LoginNodeStore";
 import {
@@ -86,7 +84,6 @@ interface ExtraProps {
   userInfo: User | undefined;
   primaryColor: string;
   footerText: string;
-  apps: App[];
   loginNodes: Record<string, LoginNode[]>;
   darkModeCookieValue: DarkModeCookie | undefined;
 }
@@ -106,8 +103,6 @@ function MyApp({ Component, pageProps, extra }: Props) {
   const defaultClusterStore = useConstant(() => {
     return createStore(DefaultClusterStore, publicConfig.CLUSTERS[0]);
   });
-
-  const appsStore = useConstant(() => createStore(AppsStore, extra.apps));
 
   const loginNodeStore = useConstant(() => createStore(LoginNodeStore, extra.loginNodes));
 
@@ -134,7 +129,7 @@ function MyApp({ Component, pageProps, extra }: Props) {
           }}
         />
       </Head>
-      <StoreProvider stores={[userStore, defaultClusterStore, appsStore, loginNodeStore]}>
+      <StoreProvider stores={[userStore, defaultClusterStore, loginNodeStore]}>
         <DarkModeProvider initial={extra.darkModeCookieValue}>
           <AntdConfigProvider color={primaryColor}>
             <FloatButtons />
@@ -158,7 +153,6 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
     userInfo: undefined,
     footerText: "",
     primaryColor: "",
-    apps: [],
     darkModeCookieValue: getDarkModeCookieValue(appContext.ctx.req),
     loginNodes: {},
   };
@@ -168,14 +162,14 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
   // so only execute on server
   // Also, validateToken relies on redis, which is not available in client bundle
   if (isServer()) {
+
     const token = USE_MOCK ? "123" : getTokenFromCookie(appContext.ctx);
     if (token) {
-      // Why not directly call validateToken but create an api?
-      // Because this method will (in next.js's perspective) be called both in client and server,
-      // so next.js will import validateToken into the client bundle
-      // validateToken depends on ioredis, which cannot be brought into frontend.
-      // dynamic import also doesn't work.
-
+    // Why not directly call validateToken but create an api?
+    // Because this method will (in next.js's perspective) be called both in client and server,
+    // so next.js will import validateToken into the client bundle
+    // validateToken depends on ioredis, which cannot be brought into frontend.
+    // dynamic import also doesn't work.
       const userInfo = await api.validateToken({ query: { token } }).catch(() => undefined);
 
       if (userInfo) {
@@ -183,10 +177,6 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
           ...userInfo,
           token: token,
         };
-
-        const apps = await api.listAvailableApps({ query: { token } }).then((x) => x.apps).catch(() => []);
-        extra.apps = apps;
-
       }
 
     }

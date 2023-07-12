@@ -25,13 +25,12 @@ import {
   SaveOutlined } from "@ant-design/icons";
 import { NavItemProps } from "@scow/lib-web/build/layouts/base/types";
 import { NavIcon } from "@scow/lib-web/build/layouts/icon";
-import { App } from "@scow/protos/build/portal/app";
 import { join } from "path";
 import { User } from "src/stores/UserStore";
 import { Cluster, LoginNode, publicConfig } from "src/utils/config";
 export const userRoutes: (
-  user: User | undefined, defaultCluster: Cluster, apps: App[], LoginNodes: Record<string, LoginNode[]>
-) => NavItemProps[] = (user, defaultCluster, apps, loginNodes) => {
+  user: User | undefined, defaultCluster: Cluster, LoginNodes: Record<string, LoginNode[]>
+) => NavItemProps[] = (user, defaultCluster, loginNodes) => {
 
   if (!user) { return []; }
 
@@ -96,31 +95,32 @@ export const userRoutes: (
       text: "桌面",
       path: "/desktop",
     }] : []),
-    ...(publicConfig.ENABLE_APPS ? [{
+    ...(publicConfig.ENABLE_APPS && publicConfig.CLUSTERS.length > 0 ? [{
       Icon: EyeOutlined,
       text: "交互式应用",
       path: "/apps",
-      clickToPath: "/apps/sessions",
-      children: [
-        {
-          Icon: Loading3QuartersOutlined,
-          text: "已创建的应用",
-          path: "/apps/sessions",
-        },
-        ...(apps.length > 0 ? [
+      clickToPath: `/apps/${defaultCluster.id}/sessions`,
+      clickable: true,
+      children: publicConfig.CLUSTERS.map((cluster) => ({
+        Icon: FolderOutlined,
+        text: cluster.name,
+        path: `/apps/${cluster.id}`,
+        clickToPath: `/apps/${cluster.id}/sessions`,
+        children: [
+          {
+            Icon: Loading3QuartersOutlined,
+            text: "已创建的应用",
+            path: `/apps/${cluster.id}/sessions`,
+          },
           {
             Icon: PlusOutlined,
             text: "创建应用",
             clickable: false,
-            path: "/apps/create",
-            children: apps.map(({ id, name }) => ({
-              Icon: DesktopOutlined,
-              text: name,
-              path: `/apps/create/${id}`,
-            })),
-          }] : []),
-      ],
-    }] : []),
+            path: `/apps/${cluster.id}/createApps`,
+          },
+        ],
+      } as NavItemProps)),
+    } as NavItemProps] : []),
     ...(publicConfig.CLUSTERS.length > 0 ? [{
       Icon: FolderOutlined,
       text: "文件管理",
