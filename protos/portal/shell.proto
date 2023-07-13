@@ -18,10 +18,11 @@ message ShellRequest {
 
   message Connect {
     string cluster = 1;
-    string user_id = 2;
-    optional uint32 cols = 3;
-    optional uint32 rows = 4;
-    optional string path = 5;
+    string login_node = 2;
+    string user_id = 3;
+    optional uint32 cols = 4;
+    optional uint32 rows = 5;
+    optional string path = 6;
   }
 
   message Resize {

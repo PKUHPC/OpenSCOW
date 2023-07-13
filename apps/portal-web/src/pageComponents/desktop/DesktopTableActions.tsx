@@ -37,6 +37,7 @@ export const DesktopTableActions: React.FC<Props> = ({ cluster, reload, record }
             const resp = await api.launchDesktop({
               body: {
                 cluster: cluster.id,
+                loginNode: record.addr,
                 displayId: record.desktopId,
               },
             });
@@ -57,6 +58,7 @@ export const DesktopTableActions: React.FC<Props> = ({ cluster, reload, record }
             await api.killDesktop({
               body: {
                 cluster: cluster.id,
+                loginNode: record.addr,
                 displayId: record.desktopId,
               },
             });

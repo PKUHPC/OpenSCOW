@@ -17,7 +17,7 @@ import { ShellServiceServer, ShellServiceService } from "@scow/protos/build/port
 import { quote } from "shell-quote";
 import { clusterNotFound } from "src/utils/errors";
 import { pipeline } from "src/utils/pipeline";
-import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
+import { sshConnect } from "src/utils/ssh";
 
 export const shellServiceServer = plugin((server) => {
 
@@ -39,9 +39,7 @@ export const shellServiceServer = plugin((server) => {
 
       logger.info("Received shell connection");
 
-      const { cluster, userId, rows, cols, path } = connect;
-
-      const loginNode = getClusterLoginNode(cluster);
+      const { cluster, loginNode, userId, rows, cols, path } = connect;
 
       if (!loginNode) { throw clusterNotFound(cluster); }
 

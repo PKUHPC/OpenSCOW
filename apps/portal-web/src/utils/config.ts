@@ -89,3 +89,4 @@ export type NavLink = {
   children?: Omit<NavLink, "children">[];
 }
 
+export type LoginNode = { name: string, address: string }

@@ -18,6 +18,7 @@ import { useStore } from "simstate";
 import { DefaultClusterSelector } from "src/layouts/DefaultClusterSelector";
 import { userRoutes } from "src/layouts/routes";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
+import { LoginNodeStore } from "src/stores/LoginNodeStore";
 import { UserStore } from "src/stores/UserStore";
 import { publicConfig } from "src/utils/config";
 
@@ -30,9 +31,10 @@ export const BaseLayout = ({ footerText, versionTag, children }: PropsWithChildr
 
   const userStore = useStore(UserStore);
   const defaultClusterStore = useStore(DefaultClusterStore);
+  const loginNodes = useStore(LoginNodeStore);
 
   const routes = useMemo(() => userRoutes(
-    userStore.user, defaultClusterStore.cluster,
+    userStore.user, defaultClusterStore.cluster, loginNodes,
   ), [userStore.user, defaultClusterStore.cluster]);
 
   return (
