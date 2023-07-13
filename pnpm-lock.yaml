@@ -20192,7 +20192,3 @@ packages:
     name: tiny-inflate
     version: 1.0.3
     dev: false
-
-settings:
-  autoInstallPeers: true
-  excludeLinksFromLockfile: false

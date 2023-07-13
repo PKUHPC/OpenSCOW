@@ -83,8 +83,6 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
 
     setLoading(true);
     setIsSubmitting(true);
-
-    debugger;
     await api.createAppSession({ body: {
       cluster: clusterId,
       appId,
