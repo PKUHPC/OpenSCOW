@@ -15,7 +15,6 @@ import { getPortalConfig } from "@scow/config/build/portal";
 import { executeAsUser, loggedExec } from "@scow/lib-ssh";
 import { NodeSSH } from "node-ssh";
 import { join } from "path";
-import { portalConfig } from "src/config/portal";
 import { parseIp } from "src/utils/proxy";
 import { Logger } from "ts-log";
 
@@ -29,7 +28,7 @@ export function getTurboVNCPath(cluster: string) {
 
 }
 
-export function getVNCPath(cluster: string, cmd: string) {
+export function getVNCCMDPath(cluster: string, cmd: string) {
 
   const turboVNCPath = getTurboVNCPath(cluster);
 
@@ -104,7 +103,7 @@ export const refreshPassword = async (
 
   const params = ["-o", "-display", ":" + displayId];
 
-  const vncPasswdPath = getVNCPath(cluster, "vncpasswd");
+  const vncPasswdPath = getVNCCMDPath(cluster, "vncpasswd");
 
   const resp = runAsUserId
     ? await executeAsUser(ssh, runAsUserId, logger, true, vncPasswdPath, params)
@@ -127,7 +126,7 @@ export const refreshPasswordByProxyGateway = async (
   proxyGatewaySsh: NodeSSH, cluster: string, computeNode: string, user: string, logger: Logger, displayId: number,
 ) => {
 
-  const vncPasswdPath = getVNCPath(cluster, "vncpasswd");
+  const vncPasswdPath = getVNCCMDPath(cluster, "vncpasswd");
   const params = [computeNode, "sudo", "-u", user, "-s", vncPasswdPath, "-o", "-display", ":" + displayId];
   const [passwordResp, ipResp] =
     await Promise.all([

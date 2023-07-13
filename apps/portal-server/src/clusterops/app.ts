@@ -29,7 +29,7 @@ import { getClusterAppConfigs, splitSbatchArgs } from "src/utils/app";
 import { getAdapterClient } from "src/utils/clusters";
 import { getIpFromProxyGateway } from "src/utils/proxy";
 import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
-import { displayIdToPort, getVNCPath, parseDisplayId,
+import { displayIdToPort, getVNCCMDPath, parseDisplayId,
   refreshPassword, refreshPasswordByProxyGateway } from "src/utils/turbovnc";
 
 interface SessionMetadata {
@@ -215,7 +215,7 @@ export const appOps = (cluster: string): AppOps => {
 
           const extraOptions = configSlurmOptions.concat(userSbatchOptions);
 
-          const vncserverBinPath = getVNCPath(cluster, "vncserver");
+          const vncserverBinPath = getVNCCMDPath(cluster, "vncserver");
 
           const envVariables = getEnvVariables({ VNC_SESSION_INFO, VNCSERVER_BIN_PATH: vncserverBinPath });
 

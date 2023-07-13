@@ -33,3 +33,11 @@ export function ensureEnabled(cluster: string) {
     throw <ServiceError>{ code: Status.UNAVAILABLE, message: "Login deskto is not enabled" };
   }
 }
+
+export function getMaxDesktops(cluster: string) {
+  const commonMaxDesktops = getPortalConfig().loginDesktop.maxDesktops;
+
+  const clusterMaxDesktops = getClusterConfigs()[cluster].loginDesktop?.maxDesktops;
+
+  return clusterMaxDesktops === undefined ? commonMaxDesktops : clusterMaxDesktops;
+}

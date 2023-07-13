@@ -16,11 +16,11 @@ import { Status } from "@grpc/grpc-js/build/src/constants";
 import { executeAsUser } from "@scow/lib-ssh";
 import { DesktopServiceServer, DesktopServiceService } from "@scow/protos/build/portal/desktop";
 import { portalConfig } from "src/config/portal";
-import { ensureEnabled, getAvailableWms } from "src/utils/desktop";
+import { ensureEnabled, getAvailableWms, getMaxDesktops } from "src/utils/desktop";
 import { clusterNotFound } from "src/utils/errors";
 import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
 import { displayIdToPort,
-  getVNCPath,
+  getVNCCMDPath,
   parseDisplayId, parseListOutput, parseOtp, refreshPassword } from "src/utils/turbovnc";
 
 
@@ -40,7 +40,8 @@ export const desktopServiceServer = plugin((server) => {
 
       if (!host) { throw clusterNotFound(cluster); }
 
-      const vncserverBinPath = getVNCPath(cluster, "vncserver");
+      const vncserverBinPath = getVNCCMDPath(cluster, "vncserver");
+      const maxDesktops = getMaxDesktops(cluster);
 
       return await sshConnect(host, "root", logger, async (ssh) => {
 
@@ -51,7 +52,7 @@ export const desktopServiceServer = plugin((server) => {
 
         const ids = parseListOutput(resp.stdout);
 
-        if (ids.length >= portalConfig.loginDesktop.maxDesktops) {
+        if (ids.length >= maxDesktops) {
           throw <ServiceError> { code: Status.RESOURCE_EXHAUSTED, message: "Too many desktops" };
         }
 
@@ -89,7 +90,7 @@ export const desktopServiceServer = plugin((server) => {
 
       if (!host) { throw clusterNotFound(cluster); }
 
-      const vncserverBinPath = getVNCPath(cluster, "vncserver");
+      const vncserverBinPath = getVNCCMDPath(cluster, "vncserver");
 
       return await sshConnect(host, "root", logger, async (ssh) => {
 
@@ -130,7 +131,7 @@ export const desktopServiceServer = plugin((server) => {
 
       if (!host) { throw clusterNotFound(cluster); }
 
-      const vncserverBinPath = getVNCPath(cluster, "vncserver");
+      const vncserverBinPath = getVNCCMDPath(cluster, "vncserver");
 
       return await sshConnect(host, "root", logger, async (ssh) => {
 
