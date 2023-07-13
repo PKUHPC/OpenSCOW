@@ -11,6 +11,7 @@
  */
 
 import { asyncDuplexStreamCall } from "@ddadaal/tsgrpc-client";
+import { getLoginNode } from "@scow/config/build/cluster";
 import { queryToIntOrDefault } from "@scow/lib-web/build/utils/querystring";
 import { ShellResponse, ShellServiceClient } from "@scow/protos/build/portal/shell";
 import { normalizePathnameWithQuery } from "@scow/utils";
@@ -24,6 +25,7 @@ import { WebSocket, WebSocketServer } from "ws";
 
 export type ShellQuery = {
   cluster: string;
+  loginNode: string;
   path?: string;
 
   cols?: string;
@@ -91,9 +93,19 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
   const query = new URLSearchParams(parse(req.url!).query!);
 
   const cluster = query.get("cluster");
+  const loginNodeName = query.get("loginNode");
 
   if (!cluster || !runtimeConfig.CLUSTERS_CONFIG[cluster]) {
     throw new Error(`Unknown cluster ${cluster}`);
+  }
+
+  const loginNode = runtimeConfig.CLUSTERS_CONFIG[cluster].loginNodes.map(getLoginNode).find(
+    (x) => x.name === loginNodeName,
+  );
+
+  // unknown login node
+  if (!loginNode) {
+    throw new Error(`Unknown login node ${loginNodeName}`);
   }
 
   const path = query.get("path") ?? undefined;
@@ -105,7 +117,7 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
   const stream = asyncDuplexStreamCall(client, "shell");
 
   await stream.writeAsync({ message: { $case: "connect", connect: {
-    cluster, userId: user.identityId,
+    cluster, loginNode: loginNode.address, userId: user.identityId,
     cols: queryToIntOrDefault(cols, 80),
     rows: queryToIntOrDefault(rows, 30),
     path,
