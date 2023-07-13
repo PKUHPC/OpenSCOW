@@ -89,19 +89,22 @@ export function portToDisplayId(port: number): number {
   return port - DISPLAY_ID_PORT_DELTA;
 }
 
-const vncPasswdPath = join(portalConfig.turboVNCPath, "bin", "vncpasswd");
-
 /**
  * Refresh VNC session's OTP
  * @param ssh SSH connection
+ * @param cluster cluster ID
  * @param runAsUserId the user id to run as. If null, run as SSH connection user
  * @param logger logger
  * @param displayId displayId
  * @returns new OTP
  */
-export const refreshPassword = async (ssh: NodeSSH, runAsUserId: string | null, logger: Logger, displayId: number) => {
+export const refreshPassword = async (
+  ssh: NodeSSH, cluster: string, runAsUserId: string | null, logger: Logger, displayId: number,
+) => {
 
   const params = ["-o", "-display", ":" + displayId];
+
+  const vncPasswdPath = getVNCPath(cluster, "vncpasswd");
 
   const resp = runAsUserId
     ? await executeAsUser(ssh, runAsUserId, logger, true, vncPasswdPath, params)
@@ -113,6 +116,7 @@ export const refreshPassword = async (ssh: NodeSSH, runAsUserId: string | null, 
 /**
  * Refresh VNC session's OTP and get ip of compute node by proxy gateway
  * @param proxyGatewaySsh SSH connection to proxy gateway
+ * @param cluster cluster ID
  * @param computeNode compute node
  * @param user the user id to run as.
  * @param logger logger
@@ -120,8 +124,10 @@ export const refreshPassword = async (ssh: NodeSSH, runAsUserId: string | null, 
  * @returns new OTP and compute node IP
  */
 export const refreshPasswordByProxyGateway = async (
-  proxyGatewaySsh: NodeSSH, computeNode: string, user: string, logger: Logger, displayId: number,
+  proxyGatewaySsh: NodeSSH, cluster: string, computeNode: string, user: string, logger: Logger, displayId: number,
 ) => {
+
+  const vncPasswdPath = getVNCPath(cluster, "vncpasswd");
   const params = [computeNode, "sudo", "-u", user, "-s", vncPasswdPath, "-o", "-display", ":" + displayId];
   const [passwordResp, ipResp] =
     await Promise.all([

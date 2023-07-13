@@ -430,7 +430,7 @@ export const appOps = (cluster: string): AppOps => {
                   return await sshConnect(url.hostname, "root", logger, async (proxyGatewaySsh) => {
                     logger.info(`Connecting to compute node ${host} via proxy gateway ${url.hostname}`);
                     const { password, ip } =
-                      await refreshPasswordByProxyGateway(proxyGatewaySsh, host, userId, logger, displayId!);
+                      await refreshPasswordByProxyGateway(proxyGatewaySsh, cluster, host, userId, logger, displayId!);
                     return {
                       code: "OK",
                       appId: sessionMetadata.appId,
@@ -445,7 +445,7 @@ export const appOps = (cluster: string): AppOps => {
                 // connect as user so that
                 // the service node doesn't need to be able to connect to compute nodes with public key
                 return await sshConnect(host, userId, logger, async (computeNodeSsh) => {
-                  const password = await refreshPassword(computeNodeSsh, null, logger, displayId!);
+                  const password = await refreshPassword(computeNodeSsh, cluster, null, logger, displayId!);
                   return {
                     appId: sessionMetadata.appId,
                     host,

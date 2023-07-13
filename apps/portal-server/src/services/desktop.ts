@@ -113,7 +113,7 @@ export const desktopServiceServer = plugin((server) => {
 
       return await sshConnect(host, "root", logger, async (ssh) => {
 
-        const password = await refreshPassword(ssh, userId, logger, displayId);
+        const password = await refreshPassword(ssh, cluster, userId, logger, displayId);
 
         return [{ host, port: displayIdToPort(displayId), password }];
       });
