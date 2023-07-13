@@ -152,7 +152,7 @@ export const desktopServiceServer = plugin((server) => {
         return [{ userDesktops: [userDesktops]}];
       }
 
-      const loginNodes = clusters[cluster]?.slurm?.loginNodes;
+      const loginNodes = clusters[cluster]?.loginNodes;
       if (!loginNodes) {
         throw clusterNotFound(cluster);
       }
