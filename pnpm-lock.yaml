@@ -659,6 +659,9 @@ importers:
       '@scow/protos':
         specifier: workspace:*
         version: link:../../libs/protos/scow
+      '@scow/rich-error-model':
+        specifier: workspace:*
+        version: link:../../libs/rich-error-model
       '@scow/utils':
         specifier: workspace:*
         version: link:../../libs/utils
@@ -20189,3 +20192,7 @@ packages:
     name: tiny-inflate
     version: 1.0.3
     dev: false
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false

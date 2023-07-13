@@ -59,12 +59,17 @@ const inputNumberFloorConfig = {
 
 export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, appName }) => {
 
-  const { message } = App.useApp();
+  const { message, modal } = App.useApp();
 
   const [form] = Form.useForm<FormFields>();
   const [loading, setLoading] = useState(false);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const createErrorModal = (message: string) => modal.error({
+    title: "创建应用失败",
+    content: message,
+  });
 
   const onSubmit = async () => {
     const allFormFields = await form.validateFields();
@@ -78,6 +83,8 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
 
     setLoading(true);
     setIsSubmitting(true);
+
+    debugger;
     await api.createAppSession({ body: {
       cluster: clusterId,
       appId,
@@ -92,6 +99,15 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
       maxTime,
       customAttributes: customFormKeyValue,
     } })
+      .httpError(409, (e) => {
+        e.code === "SBATCH_FAILED" ? createErrorModal(e.message) : (() => { throw e; })();
+      })
+      .httpError(404, (e) => {
+        e.code === "APP_NOT_FOUND" ? createErrorModal(e.message) : (() => { throw e; })();
+      })
+      .httpError(400, (e) => {
+        e.code === "INVALID_INPUT" ? createErrorModal(e.message) : (() => { throw e; })();
+      })
       .then(() => {
         message.success("创建成功！");
         Router.push(`/apps/${clusterId}/sessions`);
