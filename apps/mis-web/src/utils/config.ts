@@ -41,6 +41,8 @@ export interface PublicRuntimeConfig {
   },
   ENABLE_CHANGE_PASSWORD: boolean | undefined;
 
+  ENABLE_CHANGE_EMAIL: boolean | undefined;
+
   ACCOUNT_NAME_PATTERN: string | undefined;
   ACCOUNT_NAME_PATTERN_MESSAGE: string | undefined;
 

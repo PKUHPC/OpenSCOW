@@ -15,6 +15,7 @@ import { NextPage } from "next";
 import { requireAuth } from "src/auth/requireAuth";
 import { Section } from "src/components/Section";
 import { PlatformRoleTexts, TenantRoleTexts } from "src/models/User";
+import { ChangeEmailForm } from "src/pageComponents/profile/ChangeEmailForm";
 import { ChangePasswordForm } from "src/pageComponents/profile/ChangePasswordForm";
 import { publicConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
@@ -37,40 +38,52 @@ const Part = styled(Section)`
 export const ProfilePage: NextPage = requireAuth(() => true)(({ userStore: { user } }) => {
 
   return (
-    <Container>
-      <Head title="账号信息" />
-      <Part title="当前登录信息">
-        <Descriptions bordered column={1}>
-          <Descriptions.Item label="用户ID">
-            {user.identityId}
-          </Descriptions.Item>
-          <Descriptions.Item label="用户姓名">
-            {user.name}
-          </Descriptions.Item>
-          {
-            user.tenantRoles.length > 0 ? (
-              <Descriptions.Item label="租户角色">
-                {user.tenantRoles.map((x) => <Tag key={x}>{TenantRoleTexts[x]}</Tag>)}
-              </Descriptions.Item>
-            ) : undefined
-          }
-          {
-            user.platformRoles.length > 0 ? (
-              <Descriptions.Item label="平台角色">
-                {user.platformRoles.map((x) => <Tag key={x}>{PlatformRoleTexts[x]}</Tag>)}
-              </Descriptions.Item>
-            ) : undefined
-          }
-        </Descriptions>
-      </Part>
-      {
-        publicConfig.ENABLE_CHANGE_PASSWORD ? (
-          <Part title="修改密码">
-            <ChangePasswordForm />
-          </Part>
-        ) : undefined
-      }
-    </Container>
+    <>
+      <Container>
+        <Head title="账号信息" />
+        <Part title="当前登录信息">
+          <Descriptions bordered column={1}>
+            <Descriptions.Item label="用户ID">
+              {user.identityId}
+            </Descriptions.Item>
+            <Descriptions.Item label="用户姓名">
+              {user.name}
+            </Descriptions.Item>
+            {
+              user.tenantRoles.length > 0 ? (
+                <Descriptions.Item label="租户角色">
+                  {user.tenantRoles.map((x) => <Tag key={x}>{TenantRoleTexts[x]}</Tag>)}
+                </Descriptions.Item>
+              ) : undefined
+            }
+            {
+              user.platformRoles.length > 0 ? (
+                <Descriptions.Item label="平台角色">
+                  {user.platformRoles.map((x) => <Tag key={x}>{PlatformRoleTexts[x]}</Tag>)}
+                </Descriptions.Item>
+              ) : undefined
+            }
+          </Descriptions>
+        </Part>
+        {
+          publicConfig.ENABLE_CHANGE_PASSWORD ? (
+            <Part title="修改密码">
+              <ChangePasswordForm />
+            </Part>
+          ) : undefined
+        }
+      </Container>
+      <Container>
+        {
+          true ? (
+            <Part title="修改邮箱">
+              <ChangeEmailForm />
+            </Part>
+          ) : undefined
+        }
+      </Container>
+    </>
+    
   );
 });
 

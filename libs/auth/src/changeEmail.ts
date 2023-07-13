@@ -10,12 +10,22 @@
  * See the Mulan PSL v2 for more details.
  */
 
-export * from "./accountUserRelation";
-export { changeEmail } from "./changeEmail";
-export { changePassword } from "./changePassword";
-export { createUser } from "./createUser";
-export { deleteToken } from "./deleteToken";
-export type { Capabilities } from "./getCapabilities";
-export { getCapabilities } from "./getCapabilities";
-export { getUser } from "./getUser";
-export { validateToken } from "./validateToken";
+import { applicationJsonHeaders, logHttpErrorAndThrow } from "src/utils";
+import { Logger } from "ts-log";
+
+export async function changeEmail(
+  authUrl: string,
+  params: { identityId: string, newEmail: string },
+  logger?: Logger,
+) {
+
+  const resp = await fetch(authUrl + "/email", {
+    method: "PATCH",
+    body: JSON.stringify(params),
+    headers: applicationJsonHeaders,
+  });
+
+  if (resp.status !== 204) {
+    logHttpErrorAndThrow(resp, logger);
+  }
+}

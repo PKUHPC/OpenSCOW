@@ -56,6 +56,8 @@ import type { GetMissingDefaultPriceItemsSchema } from "src/pages/api/job/getMis
 import type { GetJobInfoSchema } from "src/pages/api/job/jobInfo";
 import type { QueryJobTimeLimitSchema } from "src/pages/api/job/queryJobTimeLimit";
 import type { GetRunningJobsSchema } from "src/pages/api/job/runningJobs";
+import type { ChangeDBEmailSchema } from "src/pages/api/profile/changeDBEmail";
+import type { ChangeEmailSchema } from "src/pages/api/profile/changeEmail";
 import type { ChangePasswordSchema } from "src/pages/api/profile/changePassword";
 import type { DewhitelistAccountSchema } from "src/pages/api/tenant/accountWhitelist/dewhitelistAccount";
 import type { GetWhitelistedAccountsSchema } from "src/pages/api/tenant/accountWhitelist/getWhitelistedAccounts";
@@ -123,6 +125,8 @@ export const api = {
   queryJobTimeLimit: apiClient.fromTypeboxRoute<typeof QueryJobTimeLimitSchema>("GET", "/api/job/queryJobTimeLimit"),
   getRunningJobs: apiClient.fromTypeboxRoute<typeof GetRunningJobsSchema>("GET", "/api/job/runningJobs"),
   changePassword: apiClient.fromTypeboxRoute<typeof ChangePasswordSchema>("PATCH", "/api/profile/changePassword"),
+  changeEmail: apiClient.fromTypeboxRoute<typeof ChangeEmailSchema>("PATCH", "/api/profile/changeEmail"),
+  changeDBEmail: apiClient.fromTypeboxRoute<typeof ChangeDBEmailSchema>("PATCH", "/api/profile/changeDBEmail"),
   dewhitelistAccount: apiClient.fromTypeboxRoute<typeof DewhitelistAccountSchema>("DELETE", "/api/tenant/accountWhitelist/dewhitelistAccount"),
   getWhitelistedAccounts: apiClient.fromTypeboxRoute<typeof GetWhitelistedAccountsSchema>("GET", "/api/tenant/accountWhitelist/getWhitelistedAccounts"),
   whitelistAccount: apiClient.fromTypeboxRoute<typeof WhitelistAccountSchema>("PUT", "/api/tenant/accountWhitelist/whitelistAccount"),

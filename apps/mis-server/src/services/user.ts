@@ -479,8 +479,7 @@ export const userServiceServer = plugin((server) => {
 
       const user = await em.findOne(User, {
         userId,
-      }, { populate: ["accounts", "accounts.account", "tenant"]});
-
+      }, { populate: ["accounts", "accounts.account", "tenant", "email"]});
       if (!user) {
         throw <ServiceError>{ code: Status.NOT_FOUND, message:`User ${userId} is not found.` };
       }
@@ -492,6 +491,7 @@ export const userServiceServer = plugin((server) => {
         })),
         tenantName: user.tenant.$.name,
         name: user.name,
+        email: user.email,
         tenantRoles: user.tenantRoles.map(tenantRoleFromJSON),
         platformRoles: user.platformRoles.map(platformRoleFromJSON),
       }];
@@ -621,6 +621,21 @@ export const userServiceServer = plugin((server) => {
 
       user.tenantRoles = user.tenantRoles.filter((item) =>
         item !== dbRoleType);
+      await em.flush();
+      return [{}];
+
+    },
+    changeDbEmail: async ({ request, em }) => {
+      const { userId, newEmail } = request;
+
+      const user = await em.findOne(User, { userId: userId });
+
+      if (!user) {
+        throw <ServiceError>{
+          code: Status.NOT_FOUND, message: `User ${userId} is not found.`,
+        };
+      }
+      user.email = newEmail;
       await em.flush();
 
       return [{}];
