@@ -48,7 +48,7 @@ web:
     EOL
     )
     jupyter notebook --config=${CONFIG_FILE} --notebook-dir=$HOME
-   
+
   proxyType: absolute
   # 如何连接应用
   connect:

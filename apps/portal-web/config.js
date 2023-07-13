@@ -98,7 +98,7 @@ const buildRuntimeConfig = async (phase, basePath) => {
 
   const clusters = getClusterConfigs(configPath, console);
 
-  Object.keys(clusters).map((id) => clusters[id].slurm.loginNodes = clusters[id].slurm.loginNodes.map(getLoginNode));
+  Object.keys(clusters).map((id) => clusters[id].loginNodes = clusters[id].loginNodes.map(getLoginNode));
 
   const uiConfig = getUiConfig(configPath, console);
   const portalConfig = getPortalConfig(configPath, console);

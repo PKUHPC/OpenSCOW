@@ -16,7 +16,9 @@ title: 使用
 
 ### 1. 集群一键部署命令
 
+把[scow-vagrant](https://github.com/PKUHPC/scow-vagrant)项目clone下来，在这个项目根目录下执行以下命令：
 ```shell
+git clone https://github.com/PKUHPC/scow-vagrant.git
 vagrant up
 ```
 

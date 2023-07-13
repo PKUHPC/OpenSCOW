@@ -24,6 +24,7 @@
   "dependencies": {
     "@ddadaal/tsgrpc-common": "0.2.3",
     "@ddadaal/tsgrpc-server": "0.19.2",
+    "@ddadaal/tsgrpc-client": "0.17.5",
     "@grpc/grpc-js": "1.8.15",
     "@mikro-orm/cli": "5.7.12",
     "@mikro-orm/core": "5.7.12",
@@ -40,6 +41,8 @@
     "@scow/lib-slurm": "workspace:*",
     "@scow/lib-ssh": "workspace:*",
     "@scow/protos": "workspace:*",
+    "@scow/scheduler-adapter-protos": "workspace:*",
+    "@scow/lib-scheduler-adapter": "workspace:*",
     "@scow/utils": "workspace:*",
     "@sinclair/typebox": "0.28.15",
     "dotenv": "16.3.1",
@@ -50,7 +53,6 @@
     "wait-on": "7.0.1"
   },
   "devDependencies": {
-    "@ddadaal/tsgrpc-client": "0.17.5",
     "@types/google-protobuf": "3.15.6",
     "@types/node-cron": "3.0.7",
     "@types/wait-on": "5.3.1"

@@ -7,16 +7,6 @@ db:
 
 # 获取作业相关配置
 fetchJobs:
-  # 源作业信息数据库的数据库信息
-  db:
-    host: 192.168.88.100
-    port: 3306
-    user: root
-    password: "aUTx373~5pU@!&^6"
-    dbName: hpc
-    tableName: job_table
-    type: mysql
-
   # 周期性获取数据
   periodicFetch:
     # 是否开启

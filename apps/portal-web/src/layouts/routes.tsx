@@ -25,13 +25,12 @@ import {
   SaveOutlined } from "@ant-design/icons";
 import { NavItemProps } from "@scow/lib-web/build/layouts/base/types";
 import { NavIcon } from "@scow/lib-web/build/layouts/icon";
-import { App } from "@scow/protos/build/portal/app";
 import { join } from "path";
 import { User } from "src/stores/UserStore";
 import { Cluster, LoginNode, publicConfig } from "src/utils/config";
 export const userRoutes: (
-  user: User | undefined, defaultCluster: Cluster, apps: App[], LoginNodes: Record<string, LoginNode[]>
-) => NavItemProps[] = (user, defaultCluster, apps, loginNodes) => {
+  user: User | undefined, defaultCluster: Cluster, LoginNodes: Record<string, LoginNode[]>
+) => NavItemProps[] = (user, defaultCluster, loginNodes) => {
 
   if (!user) { return []; }
 
@@ -73,7 +72,8 @@ export const userRoutes: (
       Icon: MacCommandOutlined,
       text: "Shell",
       path: "/shell",
-      clickToPath: join(publicConfig.BASE_PATH, "shell", defaultCluster.id),
+      clickToPath:
+        join(publicConfig.BASE_PATH, "shell", defaultCluster.id, loginNodes[defaultCluster.id]?.[0]?.name),
       openInNewPage: true,
       clickable: true,
       children: publicConfig.CLUSTERS.map(({ name, id }) => ({
@@ -81,6 +81,7 @@ export const userRoutes: (
         Icon: CloudServerOutlined,
         text: name,
         path: `/shell/${id}`,
+        clickToPath: join(publicConfig.BASE_PATH, "shell", id, loginNodes[id]?.[0]?.name),
         children: loginNodes[id]?.map((loginNode) => ({
           openInNewPage: true,
           Icon: CloudServerOutlined,
@@ -94,31 +95,32 @@ export const userRoutes: (
       text: "桌面",
       path: "/desktop",
     }] : []),
-    ...(publicConfig.ENABLE_APPS ? [{
+    ...(publicConfig.ENABLE_APPS && publicConfig.CLUSTERS.length > 0 ? [{
       Icon: EyeOutlined,
       text: "交互式应用",
       path: "/apps",
-      clickToPath: "/apps/sessions",
-      children: [
-        {
-          Icon: Loading3QuartersOutlined,
-          text: "已创建的应用",
-          path: "/apps/sessions",
-        },
-        ...(apps.length > 0 ? [
+      clickToPath: `/apps/${defaultCluster.id}/sessions`,
+      clickable: true,
+      children: publicConfig.CLUSTERS.map((cluster) => ({
+        Icon: FolderOutlined,
+        text: cluster.name,
+        path: `/apps/${cluster.id}`,
+        clickToPath: `/apps/${cluster.id}/sessions`,
+        children: [
+          {
+            Icon: Loading3QuartersOutlined,
+            text: "已创建的应用",
+            path: `/apps/${cluster.id}/sessions`,
+          },
           {
             Icon: PlusOutlined,
             text: "创建应用",
             clickable: false,
-            path: "/apps/create",
-            children: apps.map(({ id, name }) => ({
-              Icon: DesktopOutlined,
-              text: name,
-              path: `/apps/create/${id}`,
-            })),
-          }] : []),
-      ],
-    }] : []),
+            path: `/apps/${cluster.id}/createApps`,
+          },
+        ],
+      } as NavItemProps)),
+    } as NavItemProps] : []),
     ...(publicConfig.CLUSTERS.length > 0 ? [{
       Icon: FolderOutlined,
       text: "文件管理",

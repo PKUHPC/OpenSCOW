@@ -59,9 +59,8 @@ export async function createUserInDatabase(
 export async function insertKeyToNewUser(userId: string, password: string, logger: Logger) {
   // Making an ssh Request to the login node as the user created.
   if (process.env.NODE_ENV === "production") {
-    await Promise.all(Object.values(clusters).map(async ({ displayName, slurm, misIgnore }) => {
-      if (misIgnore) { return; }
-      const node = getLoginNode(slurm.loginNodes[0]);
+    await Promise.all(Object.values(clusters).map(async ({ displayName, loginNodes }) => {
+      const node = getLoginNode(loginNodes[0]);
       logger.info("Checking if user can login to %s by login node %s", displayName, node.name);
 
       const error = await insertKeyAsUser(node.address, userId, password, rootKeyPair, logger).catch((e) => e);

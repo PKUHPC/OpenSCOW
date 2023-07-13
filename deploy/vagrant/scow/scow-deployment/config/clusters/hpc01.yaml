@@ -1,41 +1,12 @@
 # 集群显示名称
 displayName: hpc01
 
-# 指定slurm配置
-slurm:
-  loginNodes:
-    # 登录节点展示名称
-    - name: login
-      # 登录节点的IP或者域名
-      # 如果设置的是域名，请确认此节点的/etc/hosts中包含了域名到IP的解析信息
-      address: login
+# 适配器地址(ip地址:端口号)
+adapterUrl: localhost:8972
 
-  # 集群的分区信息
-  partitions:
-    # 分区1的名字, 不能包含空格
-    - name: compute
-      # 分区内节点数
-      nodes: 1
-      # 单节点内存数量，单位M
-      mem: 2048
-      # 核心数
-      cores: 2
-      # GPU卡数
-      gpus: 0
-      # QOS
-      qos:
-        - normal
-      # 这个分区的备注信息
-      comment: "两个计算节点分区"
-
-  # 如果这个集群要部署管理系统，请增加以下配置
-  # 如果不需要，将整个mis块注释掉
-  mis:
-    # 部署slurm.sh的机器的地址
-    managerUrl: 192.168.88.101
-    # slurm.sh在机器中的绝对地址
-    scriptPath: /test/slurm.sh
-    # slurmdbd的数据库密码
-    dbPassword: 81SLURM@@rabGTjN7
-    # 这个集群在slurm中的集群名字
-    clusterName: hpc01
+loginNodes:
+  # 登录节点展示名称
+  - name: login
+    # 登录节点的IP或者域名
+    # 如果设置的是域名，请确认此节点的/etc/hosts中包含了域名到IP的解析信息
+    address: login

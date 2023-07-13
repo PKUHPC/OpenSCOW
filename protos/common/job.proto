@@ -27,14 +27,13 @@ message RunningJob {
   string cores = 10;
   string qos = 11;
   string submission_time = 12;
-  string nodes_to_be_used = 13;
 
   /**
   days-hours:minutes:seconds.
   The value may be  "NOT_SET"  if not yet established or "UNLIMITED" for no
   limit.  (Valid for jobs and job steps)
    */
-  string time_limit = 14;
+  string time_limit = 13;
 
-  string working_dir = 15;
+  string working_dir = 14;
 }

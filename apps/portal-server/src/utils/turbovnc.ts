@@ -18,6 +18,7 @@ import { parseIp } from "src/utils/proxy";
 import { Logger } from "ts-log";
 
 export const VNCSERVER_BIN_PATH = join(portalConfig.turboVNCPath, "bin", "vncserver");
+const DISPLAY_ID_PORT_DELTA = 5900;
 
 export function parseListOutput(output: string): number[] {
   const ids = [] as number[];
@@ -59,6 +60,15 @@ export function parseDisplayId(stdout: string): number {
 
   // logger.error("Error parsing display id from %s", stdout);
   throw new Error("Error parsing display id");
+}
+
+
+export function displayIdToPort(displayId: number): number {
+  return DISPLAY_ID_PORT_DELTA + displayId;
+}
+
+export function portToDisplayId(port: number): number {
+  return port - DISPLAY_ID_PORT_DELTA;
 }
 
 const vncPasswdPath = join(portalConfig.turboVNCPath, "bin", "vncpasswd");

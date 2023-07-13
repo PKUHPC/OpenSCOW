@@ -19,8 +19,7 @@ import { MySqlDriver } from "@mikro-orm/mysql";
 import { AdminServiceClient } from "@scow/protos/build/server/admin";
 import { createServer } from "src/app";
 import { misConfig } from "src/config/mis";
-import { createSourceDbOrm } from "src/tasks/fetch";
-import { clearAndClose, dropDatabase } from "tests/data/helpers";
+import { dropDatabase } from "tests/data/helpers";
 
 let server: Server;
 let orm: MikroORM<MySqlDriver>;
@@ -67,21 +66,11 @@ it("starts and stops fetch", async () => {
 });
 
 it("triggers fetch and updates last updated", async () => {
+  let info = await asyncClientCall(client, "getFetchInfo", {});
+  expect(info.lastFetchTime).toBeUndefined();
 
-  const jobTableOrm = await createSourceDbOrm(server.logger);
+  await asyncClientCall(client, "fetchJobs", {});
 
-  try {
-    await jobTableOrm.dbConnection.getSchemaGenerator().ensureDatabase();
-    await jobTableOrm.dbConnection.getSchemaGenerator().createSchema();
-
-    let info = await asyncClientCall(client, "getFetchInfo", {});
-    expect(info.lastFetchTime).toBeUndefined();
-
-    await asyncClientCall(client, "fetchJobs", {});
-
-    info = await asyncClientCall(client, "getFetchInfo", {});
-    expect(info.lastFetchTime).not.toBeUndefined();
-  } finally {
-    await clearAndClose(jobTableOrm.dbConnection);
-  }
+  info = await asyncClientCall(client, "getFetchInfo", {});
+  expect(info.lastFetchTime).not.toBeUndefined();
 });

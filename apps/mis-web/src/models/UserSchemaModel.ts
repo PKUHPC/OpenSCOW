@@ -47,7 +47,7 @@ export type PlatformUserInfo = Static<typeof PlatformUserInfo>;
 export const UserInAccount = Type.Object({
   userId: Type.String(),
   userName: Type.String(),
-  state: Type.String(),
+  blocked: Type.Boolean(),
 });
 export type UserInAccount = Static<typeof UserInAccount>;
 

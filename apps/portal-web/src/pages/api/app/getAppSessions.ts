@@ -23,6 +23,7 @@ export const AppSession = Type.Object({
   jobId: Type.Number(),
   submitTime: Type.Optional(Type.String()),
   appId: Type.String(),
+  appName: Type.Optional(Type.String()),
   state: Type.String(),
   dataPath: Type.String(),
   runningTime: Type.String(),

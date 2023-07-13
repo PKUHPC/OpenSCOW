@@ -11,15 +11,15 @@
  */
 
 import { ClusterOps } from "src/clusterops/api";
-import { createSlurmClusterOps } from "src/clusterops/slurm";
+import { appOps } from "src/clusterops/app";
+import { jobOps } from "src/clusterops/job";
 import { clusters } from "src/config/clusters";
 
-const clusterOpsMaps = {
-  "slurm": createSlurmClusterOps,
-} as const;
-
-const opsForClusters = Object.entries(clusters).reduce((prev, [cluster, c]) => {
-  prev[cluster] = clusterOpsMaps[c.scheduler](cluster);
+const opsForClusters = Object.entries(clusters).reduce((prev, [cluster]) => {
+  prev[cluster] = {
+    app: appOps(cluster),
+    job: jobOps(cluster),
+  } as ClusterOps;
   return prev;
 }, {} as Record<string, ClusterOps>);
 
