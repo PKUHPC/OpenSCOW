@@ -72,7 +72,7 @@ export const PortalConfigSchema = Type.Object({
     }),
   )),
 
-  desktopsDir: Type.String({ description: "将创建的桌面信息的保存到什么位置。相对于用户的家目录", default: "scow/desktops" }),
+  desktopsDir: Type.String({ description: "将创建的登录节点桌面信息的保存到什么位置。相对于用户的家目录", default: "scow/desktops" }),
 
 });
 

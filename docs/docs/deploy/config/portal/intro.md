@@ -100,6 +100,9 @@ shell: true
     # text: ""
     # url: ""
     # iconPath: ""
+
+# 将创建的登录节点桌面信息的保存到什么位置。相对于用户的家目录
+# desktopsDir
 ```
 
 ## 更多配置
