@@ -1,8 +1,15 @@
 displayName: hpc01
-adapterUrl: 0.0.0.0:6000
+# adapterUrl: 0.0.0.0:6000
+adapterUrl: "192.168.88.101:8972"
+# loginNodes:
+#   - name: login
+#     address: localhost:22222
 loginNodes:
+  # 登录节点展示名称
   - name: login
-    address: localhost:22222
+    # 登录节点的IP或者域名
+    # 如果设置的是域名，请确认此节点的/etc/hosts中包含了域名到IP的解析信息
+    address: 192.168.88.102
 # misIgnore: true
 # slurm:
 #   mis:
