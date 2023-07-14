@@ -166,6 +166,11 @@ export const RunningJobInfoTable: React.FC<JobInfoTableProps> = ({
         <Table.Column<RunningJobInfo> dataIndex="qos" title="QOS" />
         <Table.Column<RunningJobInfo> dataIndex="nodes" title="节点数" />
         <Table.Column<RunningJobInfo> dataIndex="cores" title="核心数" />
+        <Table.Column<RunningJobInfo>
+          dataIndex="gpus"
+          title="GPU卡数"
+          render={(d) => d || "--"}
+        />
         <Table.Column<RunningJobInfo> dataIndex="state" title="状态" />
         <Table.Column
           dataIndex="runningOrQueueTime"

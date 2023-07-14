@@ -25,15 +25,16 @@ message RunningJob {
   string nodes_or_reason = 8;
   string account = 9;
   string cores = 10;
-  string qos = 11;
-  string submission_time = 12;
+  string gpus = 11;
+  string qos = 12;
+  string submission_time = 13;
 
   /**
   days-hours:minutes:seconds.
   The value may be  "NOT_SET"  if not yet established or "UNLIMITED" for no
   limit.  (Valid for jobs and job steps)
    */
-  string time_limit = 13;
+  string time_limit = 14;
 
-  string working_dir = 14;
+  string working_dir = 15;
 }

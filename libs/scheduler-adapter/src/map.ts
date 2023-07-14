@@ -28,6 +28,7 @@ export const jobInfoToRunningjob = (jobInfo: JobInfo) => {
     nodesOrReason: jobInfo.state === "RUNNING" ? jobInfo.nodeList! : jobInfo.reason,
     account: jobInfo.account!,
     cores: jobInfo.cpusAlloc!.toString(),
+    gpus: jobInfo.gpusAlloc!.toString(),
     qos: jobInfo.qos!,
     submissionTime: jobInfo.submitTime!,
     timeLimit: jobInfo.timeLimitMinutes ? formatTime(jobInfo.timeLimitMinutes * 60 * 1000) : "",
