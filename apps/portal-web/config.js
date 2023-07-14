@@ -22,7 +22,7 @@ const { readVersionFile } = require("@scow/utils/build/version");
 const { getCapabilities } = require("@scow/lib-auth");
 const { DEFAULT_PRIMARY_COLOR, getUiConfig } = require("@scow/config/build/ui");
 const { getPortalConfig } = require("@scow/config/build/portal");
-const { getClusterConfigs } = require("@scow/config/build/cluster");
+const { getClusterConfigs, getLoginNode } = require("@scow/config/build/cluster");
 const { getCommonConfig } = require("@scow/config/build/common");
 
 /**
@@ -97,6 +97,8 @@ const buildRuntimeConfig = async (phase, basePath) => {
   const configPath = mockEnv ? join(__dirname, "config") : undefined;
 
   const clusters = getClusterConfigs(configPath, console);
+
+  Object.keys(clusters).map((id) => clusters[id].loginNodes = clusters[id].loginNodes.map(getLoginNode));
 
   const uiConfig = getUiConfig(configPath, console);
   const portalConfig = getPortalConfig(configPath, console);

@@ -113,7 +113,8 @@ export const appOps = (cluster: string): AppOps => {
           const reply = await asyncClientCall(client.job, "submitJob", request).catch((e) => {
             const ex = e as ServiceError;
             const errors = parseErrorDetails(ex.metadata);
-            if (errors[0] && errors[0].$type === "google.rpc.ErrorInfo" && errors[0].reason === "SBATCH_FAILED") {
+            if (errors[0] && errors[0].$type === "google.rpc.ErrorInfo"
+              && errors[0].reason === "SBATCH_FAILED" && Array.isArray(e.details)) {
               throw <ServiceError> {
                 code: Status.INTERNAL,
                 message: "sbatch failed",
