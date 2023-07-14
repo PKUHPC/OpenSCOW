@@ -55,7 +55,7 @@ export const DesktopTable: React.FC<Props> = ({ loginDesktopEnabledClusters }) =
     ? defaultClusterStore.cluster
     : loginDesktopEnabledClusters[0];
   const cluster = publicConfig.CLUSTERS.find((x) => x.id === clusterQuery) ?? defaultCluster;
-  
+
   const loginNode = loginNodes[cluster.id].find((x) => x.name === loginQuery) ?? undefined;
 
 
@@ -73,7 +73,6 @@ export const DesktopTable: React.FC<Props> = ({ loginDesktopEnabledClusters }) =
     }, [cluster, loginNode]),
   });
 
-  console.log("loginDesktopEnabledClusters: ", loginDesktopEnabledClusters);
 
   const columns: ColumnsType<DesktopItem> = [
     {
