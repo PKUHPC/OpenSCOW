@@ -97,3 +97,5 @@ export const getLoginDesktopEnabled = (cluster: string): boolean => {
 
   return clusterLoginDesktopEnabled === undefined ? commonLogindesktopEnabled : clusterLoginDesktopEnabled;
 };
+
+export type LoginNode = { name: string, address: string }

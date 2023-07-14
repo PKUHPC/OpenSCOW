@@ -34,10 +34,11 @@ import { getTokenFromCookie } from "src/auth/cookie";
 import { BaseLayout } from "src/layouts/BaseLayout";
 import { FloatButtons } from "src/layouts/FloatButtons";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
+import { LoginNodeStore } from "src/stores/LoginNodeStore";
 import {
   User, UserStore,
 } from "src/stores/UserStore";
-import { publicConfig, runtimeConfig } from "src/utils/config";
+import { LoginNode, publicConfig, runtimeConfig } from "src/utils/config";
 
 
 const FailEventHandler: React.FC = () => {
@@ -83,6 +84,7 @@ interface ExtraProps {
   userInfo: User | undefined;
   primaryColor: string;
   footerText: string;
+  loginNodes: Record<string, LoginNode[]>;
   darkModeCookieValue: DarkModeCookie | undefined;
 }
 
@@ -101,6 +103,8 @@ function MyApp({ Component, pageProps, extra }: Props) {
   const defaultClusterStore = useConstant(() => {
     return createStore(DefaultClusterStore, publicConfig.CLUSTERS[0]);
   });
+
+  const loginNodeStore = useConstant(() => createStore(LoginNodeStore, extra.loginNodes));
 
   // Use the layout defined at the page level, if available
   return (
@@ -125,7 +129,7 @@ function MyApp({ Component, pageProps, extra }: Props) {
           }}
         />
       </Head>
-      <StoreProvider stores={[userStore, defaultClusterStore]}>
+      <StoreProvider stores={[userStore, defaultClusterStore, loginNodeStore]}>
         <DarkModeProvider initial={extra.darkModeCookieValue}>
           <AntdConfigProvider color={primaryColor}>
             <FloatButtons />
@@ -150,6 +154,7 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
     footerText: "",
     primaryColor: "",
     darkModeCookieValue: getDarkModeCookieValue(appContext.ctx.req),
+    loginNodes: {},
   };
 
   // This is called on server on first load, and on client on every page transition
@@ -182,6 +187,11 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
       ?? runtimeConfig.UI_CONFIG?.primaryColor?.defaultColor ?? runtimeConfig.DEFAULT_PRIMARY_COLOR;
     extra.footerText = (hostname && runtimeConfig.UI_CONFIG?.footer?.hostnameTextMap?.[hostname])
       ?? runtimeConfig.UI_CONFIG?.footer?.defaultText ?? "";
+
+    extra.loginNodes = Object.keys(runtimeConfig.CLUSTERS_CONFIG).reduce((acc, cluster) => {
+      acc[cluster] = runtimeConfig.CLUSTERS_CONFIG[cluster].loginNodes;
+      return acc;
+    }, {});
   }
 
   const appProps = await NextApp.getInitialProps(appContext);

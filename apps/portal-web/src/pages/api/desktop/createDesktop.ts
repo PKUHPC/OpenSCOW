@@ -25,6 +25,7 @@ export const CreateDesktopSchema = typeboxRouteSchema({
 
   body: Type.Object({
     cluster: Type.String(),
+    loginNode: Type.String(),
 
     // the name of the wm
     wm: Type.String(),
@@ -54,7 +55,7 @@ const auth = authenticate(() => true);
 
 export default /* #__PURE__*/typeboxRoute(CreateDesktopSchema, async (req, res) => {
 
-  const { cluster, wm } = req.body;
+  const { cluster, loginNode, wm } = req.body;
 
   const loginDesktopEnabled = getLoginDesktopEnabled(cluster);
 
@@ -65,11 +66,10 @@ export default /* #__PURE__*/typeboxRoute(CreateDesktopSchema, async (req, res) 
 
   if (!info) { return; }
 
-
   const client = getClient(DesktopServiceClient);
 
   return await asyncUnaryCall(client, "createDesktop", {
-    cluster, userId: info.identityId, wm,
+    cluster, loginNode, userId: info.identityId, wm,
   }).then(
     async ({ host, password, port }) => ({
       200: { host, password, port },

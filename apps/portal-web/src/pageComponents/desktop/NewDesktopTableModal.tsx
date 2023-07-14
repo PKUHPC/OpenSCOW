@@ -11,10 +11,10 @@
  */
 
 import { App, Form, Modal, Select } from "antd";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
-import { Cluster } from "src/utils/config";
+import { Cluster, LoginNode } from "src/utils/config";
 import { openDesktop } from "src/utils/vnc";
 
 export interface Props {
@@ -22,14 +22,16 @@ export interface Props {
   onClose: () => void;
   reload: () => void;
   cluster: Cluster;
+  loginNodes: LoginNode[];
 }
 
 interface FormInfo {
+  loginNode: string;
   wm: string;
 }
 
 
-export const NewDesktopTableModal: React.FC<Props> = ({ open, onClose, reload, cluster }) => {
+export const NewDesktopTableModal: React.FC<Props> = ({ open, onClose, reload, cluster, loginNodes }) => {
 
   const [form] = Form.useForm<FormInfo>();
 
@@ -48,13 +50,11 @@ export const NewDesktopTableModal: React.FC<Props> = ({ open, onClose, reload, c
   const [submitting, setSubmitting] = useState(false);
 
   const onOk = async () => {
-
     const values = await form.validateFields();
-
     setSubmitting(true);
 
     // Create new desktop
-    await api.createDesktop({ body: { cluster: cluster.id, wm: values.wm } })
+    await api.createDesktop({ body: { cluster: cluster.id, loginNode: values.loginNode, wm: values.wm } })
       .httpError(409, (e) => {
         const { code } = e;
         if (code === "TOO_MANY_DESKTOPS") {
@@ -74,6 +74,10 @@ export const NewDesktopTableModal: React.FC<Props> = ({ open, onClose, reload, c
       .finally(() => { setSubmitting(false); });
   };
 
+  useEffect(() => {
+    form.setFieldValue("loginNode", loginNodes[0].address);
+  }, [loginNodes]);
+
   return (
     <Modal
       title="新建桌面"
@@ -81,8 +85,22 @@ export const NewDesktopTableModal: React.FC<Props> = ({ open, onClose, reload, c
       onOk={form.submit}
       confirmLoading={submitting}
       onCancel={onClose}
+      destroyOnClose
     >
-      <Form form={form} onFinish={onOk}>
+      <Form
+        form={form}
+        onFinish={onOk}
+        wrapperCol={{ span: 20 }}
+        labelCol={{ span: 4 }}
+      >
+        <Form.Item label="登录节点" name="loginNode" rules={[{ required: true }]}>
+          <Select
+            options={loginNodes.map((loginNode) => ({
+              label: loginNode.name, value: loginNode.address,
+            }))}
+          >
+          </Select>
+        </Form.Item>
         <Form.Item label="桌面" name="wm" required>
           <Select
             loading={isLoading}

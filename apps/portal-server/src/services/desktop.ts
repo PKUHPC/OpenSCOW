@@ -15,20 +15,20 @@ import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { executeAsUser } from "@scow/lib-ssh";
 import { DesktopServiceServer, DesktopServiceService } from "@scow/protos/build/portal/desktop";
-import { portalConfig } from "src/config/portal";
+import { clusters } from "src/config/clusters";
 import { ensureEnabled, getAvailableWms, getMaxDesktops } from "src/utils/desktop";
+import { listUserDesktopsFromHost } from "src/utils/desktops";
 import { clusterNotFound } from "src/utils/errors";
-import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
+import { checkLoginNodeInCluster, sshConnect } from "src/utils/ssh";
 import { displayIdToPort,
   getVNCCMDPath,
   parseDisplayId, parseListOutput, parseOtp, refreshPassword } from "src/utils/turbovnc";
-
 
 export const desktopServiceServer = plugin((server) => {
 
   server.addService<DesktopServiceServer>(DesktopServiceService, {
     createDesktop: async ({ request, logger }) => {
-      const { cluster, wm, userId } = request;
+      const { cluster, loginNode: host, wm, userId } = request;
 
       ensureEnabled(cluster);
 
@@ -38,9 +38,7 @@ export const desktopServiceServer = plugin((server) => {
         throw <ServiceError>{ code: Status.INVALID_ARGUMENT, message: `${wm} is not a acceptable wm.` };
       }
 
-      const host = getClusterLoginNode(cluster);
-
-      if (!host) { throw clusterNotFound(cluster); }
+      checkLoginNodeInCluster(cluster, host);
 
       const vncserverBinPath = getVNCCMDPath(cluster, "vncserver");
       const maxDesktops = getMaxDesktops(cluster);
@@ -84,13 +82,11 @@ export const desktopServiceServer = plugin((server) => {
 
     killDesktop: async ({ request, logger }) => {
 
-      const { cluster, displayId, userId } = request;
+      const { cluster, loginNode: host, displayId, userId } = request;
 
       ensureEnabled(cluster);
 
-      const host = getClusterLoginNode(cluster);
-
-      if (!host) { throw clusterNotFound(cluster); }
+      checkLoginNodeInCluster(cluster, host);
 
       const vncserverBinPath = getVNCCMDPath(cluster, "vncserver");
 
@@ -106,13 +102,11 @@ export const desktopServiceServer = plugin((server) => {
 
     connectToDesktop: async ({ request, logger }) => {
 
-      const { cluster, displayId, userId } = request;
+      const { cluster, loginNode: host, displayId, userId } = request;
 
       ensureEnabled(cluster);
 
-      const host = getClusterLoginNode(cluster);
-
-      if (!host) { throw clusterNotFound(cluster); }
+      checkLoginNodeInCluster(cluster, host);
 
       return await sshConnect(host, "root", logger, async (ssh) => {
 
@@ -125,31 +119,27 @@ export const desktopServiceServer = plugin((server) => {
 
     listUserDesktops: async ({ request, logger }) => {
 
-      const { cluster, userId } = request;
+      const { cluster, loginNode: host, userId } = request;
 
       ensureEnabled(cluster);
 
-      const host = getClusterLoginNode(cluster);
 
-      if (!host) { throw clusterNotFound(cluster); }
+      if (host) {
+        checkLoginNodeInCluster(cluster, host);
+        const userDesktops = await listUserDesktopsFromHost(host, cluster, userId, logger);
+        return [{ userDesktops: [userDesktops]}];
+      }
 
-      const vncserverBinPath = getVNCCMDPath(cluster, "vncserver");
-
-      return await sshConnect(host, "root", logger, async (ssh) => {
-
-        // list all running session
-        const resp = await executeAsUser(ssh, userId, logger, true,
-          vncserverBinPath, ["-list"],
-        );
-
-        const ids = parseListOutput(resp.stdout);
-
-        return [{
-          host,
-          displayIds: ids,
-        }];
+      const loginNodes = clusters[cluster]?.loginNodes;
+      if (!loginNodes) {
+        throw clusterNotFound(cluster);
+      }
+      // 请求集群的所有登录节点
+      return await Promise.all(loginNodes.map(async (loginNode) => {
+        return await listUserDesktopsFromHost(loginNode.address, cluster, userId, logger);
+      })).then((response) => {
+        return [{ userDesktops: response }];
       });
-
     },
 
     listAvailableWms: async ({ request }) => {
