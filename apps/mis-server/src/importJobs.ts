@@ -102,19 +102,28 @@ async function importJobs(
         if (!tenant) {
           logger.warn("Account %s doesn't exist. Doesn't charge the job.", job.account);
         }
-        const price = tenant ? priceMap.calculatePrice({
-          jobId: job.jobId,
-          cluster,
-          cpusAlloc: job.cpusAlloc!,
-          gpu: job.gpusAlloc!,
-          memAlloc: job.memAllocMb!,
-          memReq: job.memReqMb,
-          partition: job.partition,
-          qos: job.qos,
-          timeUsed: job.elapsedSeconds!,
-          account: job.account,
-          tenant,
-        }) : emptyJobPriceInfo();
+        const price = tenant ?
+          (() => {
+            try {
+              return priceMap.calculatePrice({
+                jobId: job.jobId,
+                cluster,
+                cpusAlloc: job.cpusAlloc!,
+                gpu: job.gpusAlloc!,
+                memAlloc: job.memAllocMb!,
+                memReq: job.memReqMb,
+                partition: job.partition,
+                qos: job.qos,
+                timeUsed: job.elapsedSeconds!,
+                account: job.account,
+                tenant,
+              });
+            } catch (e) {
+              logger.warn(`error when calculate price. job id: ${job.jobId}. Doesn't calculate price`);
+              return emptyJobPriceInfo();
+            }
+          }) ()
+          : emptyJobPriceInfo();
 
         const pricedJob = new JobInfo({ cluster, ...job }, tenant, price);
 
