@@ -47,7 +47,7 @@ function parseProxyTarget(url: string, urlIncludesBasePath: boolean): string | E
   const fullUri = `${(urlIncludesBasePath || basePath === "/") ? "" : basePath}${url}`;
 
   const proxyGateway = runtimeConfig.CLUSTERS_CONFIG[clusterId].proxyGateway;
-  const loginNodes = runtimeConfig.CLUSTERS_CONFIG[clusterId].slurm.loginNodes.map((x) => getLoginNode(x).address);
+  const loginNodes = runtimeConfig.CLUSTERS_CONFIG[clusterId].loginNodes.map((x) => getLoginNode(x).address);
 
   // if node is login node, not proxy to proxy gateway node
   if (proxyGateway && !loginNodes.includes(node)) {

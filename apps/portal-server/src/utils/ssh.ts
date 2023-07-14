@@ -20,9 +20,10 @@ import { rootKeyPair } from "src/config/env";
 import { scowErrorMetadata } from "src/utils/error";
 import { Logger } from "ts-log";
 
+import { clusterNotFound, loginNodeNotFound } from "./errors";
 
 export function getClusterLoginNode(cluster: string): string | undefined {
-  const loginNode = getLoginNode(clusters[cluster]?.slurm?.loginNodes?.[0]);
+  const loginNode = getLoginNode(clusters[cluster]?.loginNodes?.[0]);
   return loginNode?.address;
 }
 
@@ -60,7 +61,7 @@ export async function sshConnect<T>(
  * Check whether all clusters can be logged in as root user
  */
 export async function checkClustersRootUserLogin(logger: Logger) {
-  await Promise.all(Object.values(clusters).map(async ({ displayName, slurm: { loginNodes } }) => {
+  await Promise.all(Object.values(clusters).map(async ({ displayName, loginNodes }) => {
     const node = getLoginNode(loginNodes[0]);
     logger.info("Checking if root can login to %s by login node %s", displayName, node.name);
     const error = await testRootUserSshLogin(node.address, rootKeyPair, console);
@@ -71,4 +72,17 @@ export async function checkClustersRootUserLogin(logger: Logger) {
       logger.info("Root can login to %s by login node %s", displayName, node.name);
     }
   }));
+}
+
+/**
+ * Check whether login node is in current cluster
+ */
+export async function checkLoginNodeInCluster(cluster: string, loginNode: string) {
+  const loginNodes = clusters[cluster]?.loginNodes.map(getLoginNode);
+  if (!loginNodes) {
+    throw clusterNotFound(cluster);
+  }
+  if (!loginNodes.map((x) => x.address).includes(loginNode)) {
+    throw loginNodeNotFound(loginNode);
+  }
 }

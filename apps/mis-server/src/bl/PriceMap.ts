@@ -10,15 +10,19 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Logger } from "@ddadaal/tsgrpc-server";
 import { MySqlDriver, SqlEntityManager } from "@mikro-orm/mysql";
+import { Partition } from "@scow/scheduler-adapter-protos/build/protos/config";
 import { calculateJobPrice } from "src/bl/jobPrice";
 import { clusters } from "src/config/clusters";
 import { JobPriceInfo } from "src/entities/JobInfo";
 import { JobPriceItem } from "src/entities/JobPriceItem";
+import { ClusterPlugin } from "src/plugins/clusters";
 
 export interface JobInfo {
-  biJobIndex: number;
+  // cluster job id
+  jobId: number;
   // scow cluster id
   cluster: string;
   partition: string;
@@ -43,7 +47,11 @@ export interface PriceMap {
 }
 
 
-export async function createPriceMap(em: SqlEntityManager<MySqlDriver>, logger: Logger): Promise<PriceMap> {
+export async function createPriceMap(
+  em: SqlEntityManager<MySqlDriver>,
+  clusterPlugin: ClusterPlugin["clusters"],
+  logger: Logger,
+): Promise<PriceMap> {
   // get all billing items
   // order by ASC so that items added later overrides items added before.
   const billingItems = await em.find(JobPriceItem, {}, {
@@ -77,16 +85,46 @@ export async function createPriceMap(em: SqlEntityManager<MySqlDriver>, logger: 
     return price;
   };
 
+  // partitions info for all clusters
+  const partitionsForClusters: Record<string, Partition[]> = {};
+  if (!process.env.SCOW_CONFIG_PATH && process.env.NODE_ENV !== "production") {
+    // data for test
+    partitionsForClusters["hpc00"] = [
+      { name: "C032M0128G", memMb: 131072, cores: 32, nodes: 32, gpus: 0, qos: ["low", "normal", "high", "cryoem"]},
+      { name: "GPU", memMb: 262144, cores: 28, nodes: 32, gpus: 4, qos: ["low", "normal", "high", "cryoem"]},
+      { name: "life", memMb: 262144, cores: 28, nodes: 32, gpus: 4, qos: []},
+    ];
+    partitionsForClusters["hpc01"] = [
+      { name: "compute", nodes: 198, memMb: 63000, cores: 28, gpus: 0, qos: ["low", "normal", "high"]},
+      { name: "gpu", nodes: 1, memMb: 386000, cores: 48, gpus: 8, qos: ["low", "normal", "high"]},
+    ];
+    partitionsForClusters["hpc02"] = [
+      { name: "compute", nodes: 198, memMb: 63000, cores: 28, gpus: 0, qos: ["low", "normal", "high"]},
+      { name: "gpu", nodes: 1, memMb: 386000, cores: 48, gpus: 8, qos: ["low", "normal", "high"]},
+    ];
+
+  } else {
+    const reply = await clusterPlugin.callOnAll(
+      logger,
+      async (client) => await asyncClientCall(client.config, "getClusterConfig", {}),
+    );
+    reply.forEach((x) => {
+      if (x.success) {
+        partitionsForClusters[x.cluster] = x.result.partitions;
+      }
+    });
+  }
+
   return {
 
-    calculatePrice: (info) => calculateJobPrice(info, getPriceItem, logger),
+    calculatePrice: (info) => calculateJobPrice(partitionsForClusters, info, getPriceItem, logger),
 
     getMissingDefaultPriceItems: () => {
 
       const missingPaths = [] as string[];
 
       for (const cluster in clusters) {
-        for (const partition of clusters[cluster].slurm.partitions) {
+        for (const partition of partitionsForClusters[cluster]) {
           const path = [cluster, partition.name];
 
           const { qos } = partition;

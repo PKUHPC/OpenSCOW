@@ -11,11 +11,14 @@
  */
 
 import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
+import { asyncClientCall } from "@ddadaal/tsgrpc-client";
+import { ConfigServiceClient } from "@scow/protos/build/common/config";
 import { JobBillingItem } from "@scow/protos/build/server/job";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { PlatformRole } from "src/models/User";
 import { getBillingItems } from "src/pages/api/job/getBillingItems";
+import { getClient } from "src/utils/client";
 import { publicConfig, runtimeConfig } from "src/utils/config";
 import { moneyToString } from "src/utils/money";
 
@@ -78,7 +81,10 @@ export async function getBillingTableItems(tenantName: string | undefined) {
   const tableItems: JobBillingTableItem[] = [];
   const clusters = runtimeConfig.CLUSTERS_CONFIG;
 
-  for (const [cluster, { slurm: { partitions } }] of Object.entries(clusters)) {
+  for (const [cluster] of Object.entries(clusters)) {
+    const client = getClient(ConfigServiceClient);
+    const partitions = await asyncClientCall(client, "getClusterConfig", { cluster }).then((resp) => resp.partitions);
+
     const partitionCount = partitions.length;
     let clusterItemIndex = 0;
     for (const partition of partitions) {
@@ -97,7 +103,7 @@ export async function getBillingTableItems(tenantName: string | undefined) {
           cluster: publicConfig.CLUSTERS[cluster]?.name ?? cluster,
           cores: partition.cores,
           gpus: partition.gpus,
-          mem: partition.mem,
+          mem: partition.memMb,
           nodes: partition.nodes,
           partition: partition.name,
           partitionCount,

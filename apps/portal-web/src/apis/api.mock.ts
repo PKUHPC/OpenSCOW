@@ -34,7 +34,6 @@ export const runningJob: RunningJob = {
   name: "123",
   nodes: "123",
   nodesOrReason: "!23",
-  nodesToBeUsed: "123",
   partition: "123",
   qos: "123",
   runningTime: "123",
@@ -65,12 +64,13 @@ export const mockApi: MockApi<typeof api> = {
 
   getClusterInfo: async ({ query: { cluster } }) => ({ clusterInfo: {
     submitJobDirTemplate: "/home/ddadaal/Code/{{ name }}",
-    slurm: {
+    scheduler: {
+      name: "slurm",
       partitions: [
-        { cores: 123, name: "123", nodes: 123, qos: ["123"], gpus: 10, mem: 1000 },
-        { cores: 1234, name: cluster, nodes: 1234, qos: ["1234"], gpus: 10, mem: 1000 },
-        { name : "compute", mem: 2048, cores:2, gpus:0, nodes: 1, qos: ["normal"], comment: "两个计算节点分区" },
-        { name : "GPU", mem: 2048, cores:2, gpus:2, nodes: 1, qos: ["normal"], comment: "GPU" },
+        { cores: 123, name: "123", nodes: 123, qos: ["123"], gpus: 10, memMb: 1000 },
+        { cores: 1234, name: cluster, nodes: 1234, qos: ["1234"], gpus: 10, memMb: 1000 },
+        { name : "compute", memMb: 2048, cores:2, gpus:0, nodes: 1, qos: ["normal"], comment: "两个计算节点分区" },
+        { name : "GPU", memMb: 2048, cores:2, gpus:2, nodes: 1, qos: ["normal"], comment: "GPU" },
       ],
     },
   } }),
@@ -185,8 +185,10 @@ export const mockApi: MockApi<typeof api> = {
   launchDesktop: async () => ({ host: "login01", password: "123", port: 1234 }),
 
   listDesktops: async () => ({
-    host: "login01",
-    displayId: [1, 2, 3],
+    userDesktops: [{
+      host: "login01",
+      displayId: [1, 2, 3],
+    }],
   }),
 
   createDesktop: async () => (

@@ -16,21 +16,18 @@ import { MySqlDriver, SqlEntityManager } from "@mikro-orm/mysql";
 import { Decimal } from "@scow/lib-decimal";
 import { createServer } from "src/app";
 import { setJobCharge } from "src/bl/charging";
-import { clusterNameToScowClusterId } from "src/config/clusters";
 import { JobInfo } from "src/entities/JobInfo";
-import { OriginalJob } from "src/entities/OriginalJob";
 import { UserStatus } from "src/entities/UserAccount";
 import { createPriceItems } from "src/tasks/createBillingItems";
-import { createSourceDbOrm, fetchJobs } from "src/tasks/fetch";
+import { fetchJobs } from "src/tasks/fetch";
+import testData from "src/testData.json";
 import { reloadEntities } from "src/utils/orm";
 import { InitialData, insertInitialData } from "tests/data/data";
-import { clearAndClose, dropDatabase } from "tests/data/helpers";
+import { dropDatabase } from "tests/data/helpers";
 
-import testData from "./testData.json";
 
 let data: InitialData;
 let server: Server;
-let jobTableOrm: Awaited<ReturnType<typeof createSourceDbOrm>>;
 
 let initialEm: SqlEntityManager<MySqlDriver>;
 
@@ -44,22 +41,9 @@ beforeEach(async () => {
 
   data = await insertInitialData(initialEm);
 
-  // insert raw job table info data
-  jobTableOrm = await createSourceDbOrm(server.logger);
-  const jobsData = testData.map(({ tenantPrice, accountPrice, tenant, ...rest }) => {
-    const job = new OriginalJob();
-    Object.assign(job, rest);
-    return job;
-  });
-
-  await jobTableOrm.dbConnection.getSchemaGenerator().ensureDatabase();
-  await jobTableOrm.dbConnection.getSchemaGenerator().createSchema();
-
-  await jobTableOrm.getEm().persistAndFlush(jobsData);
 });
 
 afterEach(async () => {
-  await clearAndClose(jobTableOrm.dbConnection);
   await dropDatabase(server.ext.orm);
   await server.close();
 });
@@ -79,25 +63,12 @@ it("fetches the data", async () => {
 
   expect(jobs).toBeArrayOfSize(testData.length);
 
-  // check the cluster is mapped to scow cluster id
-  const testDataJobToCluster = testData.reduce((acc, x) => {
-    acc[x.biJobIndex] = x.cluster;
-    return acc;
-  }, {} as Record<string, string>);
-
-  jobs.forEach((x) => {
-    expect(x.cluster).toBe(clusterNameToScowClusterId(testDataJobToCluster[x.biJobIndex]));
-  });
-
-  jobs.sort((a, b) => a.biJobIndex - b.biJobIndex);
-
-  const wrongPrices = [] as { biJobIndex: number; tenantPrice: { expected: number; actual: number }; accountPrice: { expected: number; actual: number } }[];
+  const wrongPrices = [] as { tenantPrice: { expected: number; actual: number }; accountPrice: { expected: number; actual: number } }[];
 
   testData.forEach((t) => {
-    const job = jobs.find((x) => x.biJobIndex === t.biJobIndex) ?? { biJobIndex: t.biJobIndex, accountPrice: new Decimal(-1), tenantPrice: new Decimal(-1) };
+    const job = jobs.find((x) => x.cluster === t.cluster && x.idJob === t.jobId) ?? { accountPrice: new Decimal(-1), tenantPrice: new Decimal(-1) };
     if (job.tenantPrice.toNumber() !== t.tenantPrice || job.accountPrice.toNumber() !== t.accountPrice) {
       wrongPrices.push({
-        biJobIndex: t.biJobIndex,
         tenantPrice: { expected: t.tenantPrice, actual: job.tenantPrice.toNumber() },
         accountPrice: { expected: t.accountPrice, actual: job.accountPrice.toNumber() },
       });
