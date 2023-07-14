@@ -87,7 +87,7 @@ export const jobServiceServer = plugin((server) => {
 
     },
 
-    listRunningJobs: async ({ request }) => {
+    listRunningJobs: async ({ request, logger }) => {
 
       const { cluster, userId } = request;
 
