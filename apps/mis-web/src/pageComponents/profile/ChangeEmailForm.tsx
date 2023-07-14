@@ -77,13 +77,6 @@ export const ChangeEmailForm: React.FC = () => {
         >
           <Input placeholder={emailRule.message} />
         </Form.Item>
-        <Form.Item
-          rules={[{ required: true }]}
-          label="验证码"
-          name="validateCode"
-        >
-          <Input placeholder={"请输入验证码"} />
-        </Form.Item>
         <Form.Item>
           <Button type="primary" htmlType="submit">
             提交
