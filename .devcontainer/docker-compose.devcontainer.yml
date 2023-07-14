@@ -37,15 +37,6 @@ services:
     image: redis:alpine
     network_mode: service:scow-dev
 
-  jobTableDb:
-    image: mariadb:5.5
-    command: mysqld --port 3307
-    environment:
-      MYSQL_ROOT_PASSWORD: jobtablepassword
-    volumes:
-      - jobtabledb:/var/lib/mysql
-    network_mode: service:scow-dev
-
   ssh-server:
     image: alpine-ssh
     build:
@@ -75,14 +66,36 @@ services:
       PHPLDAPADMIN_LDAP_HOSTS: ldap://scow-dev:389
       PHPLDAPADMIN_HTTPS: false
 
-  test-adapter:
+  test-adapter-hpc00:
     image: test-adapter
     build:
       context: ..
       dockerfile: dev/test-adapter/Dockerfile
     network_mode: service:scow-dev
+    environment:
+      CLUSTER_ID: hpc00
+      PORT: 6000
+
+  test-adapter-hpc01:
+    image: test-adapter
+    build:
+      context: ..
+      dockerfile: dev/test-adapter/Dockerfile
+    network_mode: service:scow-dev
+    environment:
+      CLUSTER_ID: hpc01
+      PORT: 6001
+
+  test-adapter-hpc02:
+    image: test-adapter
+    build:
+      context: ..
+      dockerfile: dev/test-adapter/Dockerfile
+    network_mode: service:scow-dev
+    environment:
+      CLUSTER_ID: hpc02
+      PORT: 6002
 
 volumes:
   db:
   ldap:
-  jobtabledb:
