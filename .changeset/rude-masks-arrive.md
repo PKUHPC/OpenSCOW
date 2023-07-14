@@ -1,11 +1,11 @@
 ---
-"@scow/lib-scheduler-adapter": major
-"@scow/portal-server": major
-"@scow/mis-server": major
-"@scow/portal-web": major
-"@scow/mis-web": major
-"@scow/lib-slurm": major
-"@scow/grpc-api": major
+"@scow/lib-scheduler-adapter": patch
+"@scow/portal-server": patch
+"@scow/mis-server": patch
+"@scow/portal-web": patch
+"@scow/mis-web": patch
+"@scow/lib-slurm": patch
+"@scow/grpc-api": patch
 ---
 
 增加作业列表中 GPU 卡数的展示
