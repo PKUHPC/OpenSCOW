@@ -32,7 +32,9 @@ export const desktopServiceServer = plugin((server) => {
 
       ensureEnabled(cluster);
 
-      if (portalConfig.loginDesktop.wms.find((x) => x.wm === wm) === undefined) {
+      const availableWms = getAvailableWms(cluster);
+
+      if (availableWms.find((x) => x.wm === wm) === undefined) {
         throw <ServiceError>{ code: Status.INVALID_ARGUMENT, message: `${wm} is not a acceptable wm.` };
       }
 

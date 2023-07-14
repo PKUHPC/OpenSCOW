@@ -30,7 +30,7 @@ export function ensureEnabled(cluster: string) {
   const clusterEnabled = getClusterConfigs()[cluster].loginDesktop?.enabled;
 
   if (clusterEnabled === false || clusterEnabled === undefined && commonEnabled === false) {
-    throw <ServiceError>{ code: Status.UNAVAILABLE, message: "Login deskto is not enabled" };
+    throw <ServiceError>{ code: Status.UNAVAILABLE, message: "Login desktop is not enabled" };
   }
 }
 

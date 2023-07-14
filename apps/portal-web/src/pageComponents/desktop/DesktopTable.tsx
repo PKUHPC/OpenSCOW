@@ -25,11 +25,12 @@ import { ModalButton } from "src/components/ModalLink";
 import { DesktopTableActions } from "src/pageComponents/desktop/DesktopTableActions";
 import { NewDesktopTableModal } from "src/pageComponents/desktop/NewDesktopTableModal";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
-import { publicConfig } from "src/utils/config";
+import { Cluster, publicConfig } from "src/utils/config";
 
 const NewDesktopTableModalButton = ModalButton(NewDesktopTableModal, { type: "primary", icon: <PlusOutlined /> });
 
 interface Props {
+  loginDesktopEnabledClusters: Cluster[]
 }
 
 export type DesktopItem = {
@@ -37,15 +38,20 @@ export type DesktopItem = {
   addr: string,
 }
 
-export const DesktopTable: React.FC<Props> = () => {
+export const DesktopTable: React.FC<Props> = ({ loginDesktopEnabledClusters }) => {
 
   const router = useRouter();
 
   const defaultClusterStore = useStore(DefaultClusterStore);
 
   const clusterQuery = queryToString(router.query.cluster);
-  const cluster = publicConfig.CLUSTERS.find((x) => x.id === clusterQuery) ?? defaultClusterStore.cluster;
 
+  // 如果默认集群没开启登录节点桌面功能，则取开启此功能的某一集群为默认集群。
+  const defaultCluster = loginDesktopEnabledClusters.includes(defaultClusterStore.cluster)
+    ? defaultClusterStore.cluster
+    : loginDesktopEnabledClusters[0];
+  const cluster = publicConfig.CLUSTERS.find((x) => x.id === clusterQuery) ?? defaultCluster;
+  
   const { data, isLoading, reload } = useAsync({
     promiseFn: useCallback(async () => {
       // List all desktop
@@ -55,6 +61,8 @@ export const DesktopTable: React.FC<Props> = () => {
 
     }, [cluster]),
   });
+
+  console.log("loginDesktopEnabledClusters: ", loginDesktopEnabledClusters);
 
   const columns: ColumnsType<DesktopItem> = [
     {
@@ -78,6 +86,7 @@ export const DesktopTable: React.FC<Props> = () => {
       ),
     },
   ];
+
   return (
     <div>
       <FilterFormContainer>
@@ -88,6 +97,7 @@ export const DesktopTable: React.FC<Props> = () => {
               onChange={(x) => {
                 router.push({ query: { cluster: x.id } });
               }}
+              clusters={loginDesktopEnabledClusters}
             />
           </Form.Item>
           <Form.Item>

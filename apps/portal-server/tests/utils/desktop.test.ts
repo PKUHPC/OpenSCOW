@@ -50,7 +50,7 @@ it("return cluster logindesktop enabled when setting enabled both in portal and 
     expect("").fail("not enabled");
   } catch (e: any) {
     expect(e.code).toBe(Status.UNAVAILABLE);
-    expect(e.message).toContain("Login deskto is not enabled");
+    expect(e.message).toContain("Login desktop is not enabled");
   }
 });
 
