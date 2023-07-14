@@ -39,17 +39,16 @@ export const ChangeEmailForm: React.FC = () => {
     const { newEmail } = await form.validateFields();
     setLoading(true);
 
-    // LDap改邮箱的结果
-    const LDapRes = await api.changeEmail({ body: { newEmail } });
 
     // database改邮箱的结果
-    const DBRes = await api.changeDBEmail({ body: { userId:userStore.user?.identityId as string, newEmail } });
-
-    Promise.allSettled([LDapRes, DBRes]).then(() => {
-      form.resetFields();
-      form.setFieldValue("oldEmail", newEmail);
-      message.success("邮箱更改成功！");
-    })
+    // const DBRes = await api.changeDBEmail({ body: { userId:userStore.user?.identityId as string, newEmail } });
+    await api.changeEmail({ body: { userId:userStore.user?.identityId as string, newEmail } })
+      .httpError(500, () => { message.error("修改邮箱失败"); })
+      .then(() => {
+        form.resetFields();
+        form.setFieldValue("oldEmail", newEmail);
+        message.success("邮箱更改成功！");
+      })
       .finally(() => {
         setLoading(false);
       });

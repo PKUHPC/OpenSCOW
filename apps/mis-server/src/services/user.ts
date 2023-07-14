@@ -14,7 +14,8 @@ import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
-import { addUserToAccount, createUser, getUser, removeUserFromAccount } from "@scow/lib-auth";
+import { addUserToAccount, changeEmail as libChangeEmail, createUser, getUser, removeUserFromAccount } 
+  from "@scow/lib-auth";
 import { decimalToMoney } from "@scow/lib-decimal";
 import {
   AccountStatus,
@@ -35,6 +36,7 @@ import { UserAccount, UserRole, UserStatus } from "src/entities/UserAccount";
 import { callHook } from "src/plugins/hookClient";
 import { createUserInDatabase, insertKeyToNewUser } from "src/utils/createUser";
 import { paginationProps } from "src/utils/orm";
+
 
 export const userServiceServer = plugin((server) => {
 
@@ -626,18 +628,34 @@ export const userServiceServer = plugin((server) => {
       return [{}];
 
     },
-    changeDbEmail: async ({ request, em }) => {
+    changeEmail: async ({ request, em }) => {
       const { userId, newEmail } = request;
 
       const user = await em.findOne(User, { userId: userId });
+      const oldEmail = user?.email;
 
       if (!user) {
         throw <ServiceError>{
           code: Status.NOT_FOUND, message: `User ${userId} is not found.`,
         };
       }
+        
       user.email = newEmail;
-      await em.flush();
+
+      await libChangeEmail(misConfig.authUrl, {
+        identityId: userId,
+        newEmail,
+      }, console)
+        .catch(async () => {
+          // 如果LADP修改失败，则数据库里的修改退回去
+          user.email = oldEmail as string;
+      
+          throw <ServiceError> {
+            code: Status.UNKNOWN, message: "LDAP failed to change email",
+          };
+        }).finally(async () => {
+          await em.flush();
+        });
 
       return [{}];
     },

@@ -319,12 +319,12 @@ message CheckUserNameMatchResponse {
   bool match = 1;
 }
 
-message ChangeDBEmailRequest {
+message ChangeEmailRequest {
   string user_id = 1;
   string new_email = 2;
 }
 
-message ChangeDBEmailResponse {
+message ChangeEmailResponse {
 }
 
 
@@ -367,5 +367,5 @@ service UserService {
   rpc UnsetTenantRole(UnsetTenantRoleRequest) returns (UnsetTenantRoleResponse);
 
   rpc CheckUserNameMatch (CheckUserNameMatchRequest) returns (CheckUserNameMatchResponse);
-  rpc ChangeDBEmail (ChangeDBEmailRequest) returns (ChangeDBEmailResponse);
+  rpc ChangeEmail (ChangeEmailRequest) returns (ChangeEmailResponse);
 }
