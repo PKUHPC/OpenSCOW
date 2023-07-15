@@ -71,7 +71,9 @@ message ListUserDesktopsResponse {
   repeated UserDesktops user_desktops = 1;
 }
 
-message ListAvailableWmsRequest {}
+message ListAvailableWmsRequest {
+  string cluster = 1;
+}
 
 message AvailableWm {
   string name = 1;
