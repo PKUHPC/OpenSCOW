@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { getTurboVNCPath, getVNCCMDPath } from "src/utils/turbovnc";
+import { getTurboVNCBinPath, getTurboVNCPath } from "src/utils/turbovnc";
 
 jest.mock("@scow/config/build/cluster", () => {
   return {
@@ -34,8 +34,8 @@ it.each([
   ["testCluster", "vncpasswd"],
 ])("should return right VNCCMDPath", async (cluster: string, cmd: string) => {
   if (cmd === "vncserver") {
-    expect(getVNCCMDPath(cluster, cmd)).toBe("/opt1/TurboVNC/bin/vncserver");
+    expect(getTurboVNCBinPath(cluster, cmd)).toBe("/opt1/TurboVNC/bin/vncserver");
   } else {
-    expect(getVNCCMDPath(cluster, cmd)).toBe("/opt1/TurboVNC/bin/vncpasswd");
+    expect(getTurboVNCBinPath(cluster, cmd)).toBe("/opt1/TurboVNC/bin/vncpasswd");
   }
 });

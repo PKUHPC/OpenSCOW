@@ -28,7 +28,7 @@ export function getTurboVNCPath(cluster: string) {
 
 }
 
-export function getVNCCMDPath(cluster: string, cmd: string) {
+export function getTurboVNCBinPath(cluster: string, cmd: string) {
 
   const turboVNCPath = getTurboVNCPath(cluster);
 
@@ -103,7 +103,7 @@ export const refreshPassword = async (
 
   const params = ["-o", "-display", ":" + displayId];
 
-  const vncPasswdPath = getVNCCMDPath(cluster, "vncpasswd");
+  const vncPasswdPath = getTurboVNCBinPath(cluster, "vncpasswd");
 
   const resp = runAsUserId
     ? await executeAsUser(ssh, runAsUserId, logger, true, vncPasswdPath, params)
@@ -126,7 +126,7 @@ export const refreshPasswordByProxyGateway = async (
   proxyGatewaySsh: NodeSSH, cluster: string, computeNode: string, user: string, logger: Logger, displayId: number,
 ) => {
 
-  const vncPasswdPath = getVNCCMDPath(cluster, "vncpasswd");
+  const vncPasswdPath = getTurboVNCBinPath(cluster, "vncpasswd");
   const params = [computeNode, "sudo", "-u", user, "-s", vncPasswdPath, "-o", "-display", ":" + displayId];
   const [passwordResp, ipResp] =
     await Promise.all([

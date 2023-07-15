@@ -16,12 +16,12 @@ import { Status } from "@grpc/grpc-js/build/src/constants";
 import { executeAsUser } from "@scow/lib-ssh";
 import { DesktopServiceServer, DesktopServiceService } from "@scow/protos/build/portal/desktop";
 import { clusters } from "src/config/clusters";
-import { ensureEnabled, getAvailableWms, getMaxDesktops } from "src/utils/desktop";
+import { ensureEnabled, getDesktopConfig } from "src/utils/desktop";
 import { listUserDesktopsFromHost } from "src/utils/desktops";
 import { clusterNotFound } from "src/utils/errors";
 import { checkLoginNodeInCluster, sshConnect } from "src/utils/ssh";
 import { displayIdToPort,
-  getVNCCMDPath,
+  getTurboVNCBinPath,
   parseDisplayId, parseListOutput, parseOtp, refreshPassword } from "src/utils/turbovnc";
 
 export const desktopServiceServer = plugin((server) => {
@@ -32,7 +32,7 @@ export const desktopServiceServer = plugin((server) => {
 
       ensureEnabled(cluster);
 
-      const availableWms = getAvailableWms(cluster);
+      const availableWms = getDesktopConfig(cluster, "wms");
 
       if (availableWms.find((x) => x.wm === wm) === undefined) {
         throw <ServiceError>{ code: Status.INVALID_ARGUMENT, message: `${wm} is not a acceptable wm.` };
@@ -40,8 +40,9 @@ export const desktopServiceServer = plugin((server) => {
 
       checkLoginNodeInCluster(cluster, host);
 
-      const vncserverBinPath = getVNCCMDPath(cluster, "vncserver");
-      const maxDesktops = getMaxDesktops(cluster);
+      const vncserverBinPath = getTurboVNCBinPath(cluster, "vncserver");
+      const maxDesktops = getDesktopConfig(cluster, "maxDesktops");
+
 
       return await sshConnect(host, "root", logger, async (ssh) => {
 
@@ -88,7 +89,7 @@ export const desktopServiceServer = plugin((server) => {
 
       checkLoginNodeInCluster(cluster, host);
 
-      const vncserverBinPath = getVNCCMDPath(cluster, "vncserver");
+      const vncserverBinPath = getTurboVNCBinPath(cluster, "vncserver");
 
       return await sshConnect(host, "root", logger, async (ssh) => {
 
@@ -148,7 +149,7 @@ export const desktopServiceServer = plugin((server) => {
 
       ensureEnabled(cluster);
 
-      const result = getAvailableWms(cluster);
+      const result = getDesktopConfig(cluster, "wms");
 
 
       return [{ wms: result }];

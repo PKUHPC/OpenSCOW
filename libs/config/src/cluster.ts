@@ -30,7 +30,7 @@ export const getLoginNode =
     return typeof loginNode === "string" ? { name: loginNode, address: loginNode } : loginNode;
   };
 
-const LoginDeskopConfigSchema = Type.Object({
+export const LoginDeskopConfigSchema = Type.Object({
   enabled: Type.Boolean({ description: "是否启动登录节点上的桌面功能" }),
   wms: Type.Array(
     Type.Object({ name: Type.String({ description: "名称" }), wm: Type.String({ description: "wm值" }) })),
@@ -39,7 +39,7 @@ const LoginDeskopConfigSchema = Type.Object({
 
 const TurboVncConfigSchema = Type.String({ description: "TurboVNC的安装路径" });
 
-type LoginDeskopConfigSchema = Static<typeof LoginDeskopConfigSchema>;
+export type LoginDeskopConfigSchema = Static<typeof LoginDeskopConfigSchema>;
 type TurboVncConfigSchema = Static<typeof TurboVncConfigSchema>;
 export const ClusterConfigSchema = Type.Object({
   displayName: Type.String({ description: "集群的显示名称" }),

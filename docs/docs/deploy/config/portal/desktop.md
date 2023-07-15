@@ -21,7 +21,7 @@ title: 登录节点桌面功能
 
 在`config/portal.yml`文件的`loginDesktop.wms`部分可以配置支持的桌面, 也可以在`config/clusters`下的集群配置文件内分集群配置支持的桌面，`config/clusters`配置文件下的配置优先级高于`config/portal.yml`文件。
 
-```yaml title="config/portal.yaml 或 config/clusters/hpc01/config.yml"
+```yaml title="config/portal.yaml 或 config/clusters/[集群ID]/config.yml"
 loginDesktop:
   wms: 
     - name: Xfce

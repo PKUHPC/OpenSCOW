@@ -11,7 +11,7 @@
  */
 
 import { Status } from "@grpc/grpc-js/build/src/constants";
-import { ensureEnabled, getAvailableWms, getMaxDesktops } from "src/utils/desktop";
+import { ensureEnabled, getDesktopConfig } from "src/utils/desktop";
 
 jest.mock("@scow/config/build/cluster", () => {
   return {
@@ -41,7 +41,7 @@ jest.mock("@scow/config/build/portal", () => {
 });
 
 it("return cluster wms when setting wms both in portal and cluster", async () => {
-  expect(getAvailableWms("testCluster")).toStrictEqual(["wm1", "wm2"]);
+  expect(getDesktopConfig("testCluster", "wms")).toStrictEqual(["wm1", "wm2"]);
 });
 
 it("return cluster logindesktop enabled when setting enabled both in portal and cluster", async () => {
@@ -55,8 +55,5 @@ it("return cluster logindesktop enabled when setting enabled both in portal and 
 });
 
 it("return cluster maxDesktops when setting maxDesktops both in portal and cluster", async () => {
-  expect(getMaxDesktops("testCluster")).toBe(5);
+  expect(getDesktopConfig("testCluster", "maxDesktops")).toBe(5);
 });
-
-
-

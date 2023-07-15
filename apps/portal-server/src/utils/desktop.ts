@@ -12,32 +12,24 @@
 
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
-import { getClusterConfigs } from "@scow/config/build/cluster";
+import { getClusterConfigs, LoginDeskopConfigSchema } from "@scow/config/build/cluster";
 import { getPortalConfig } from "@scow/config/build/portal";
 
-export function getAvailableWms(cluster: string) {
+type ConfigKey = keyof LoginDeskopConfigSchema;
 
-  const commonAvailableWms = getPortalConfig().loginDesktop.wms;
+export function getDesktopConfig<T extends ConfigKey>(cluster: string, configKey: T): LoginDeskopConfigSchema[T] {
 
-  const clusterAvailableWms = getClusterConfigs()[cluster].loginDesktop?.wms;
+  const commonDesktopConfig = getPortalConfig().loginDesktop[configKey];
 
-  return clusterAvailableWms || commonAvailableWms;
+  const clusterDesktopConfig = getClusterConfigs()[cluster].loginDesktop?.[configKey];
+
+  return clusterDesktopConfig === undefined ? commonDesktopConfig : clusterDesktopConfig;
 }
 
 export function ensureEnabled(cluster: string) {
-  const commonEnabled = getPortalConfig().loginDesktop.enabled;
+  const enabled = getDesktopConfig(cluster, "enabled");
 
-  const clusterEnabled = getClusterConfigs()[cluster].loginDesktop?.enabled;
-
-  if (clusterEnabled === false || clusterEnabled === undefined && commonEnabled === false) {
+  if (!enabled) {
     throw <ServiceError>{ code: Status.UNAVAILABLE, message: "Login desktop is not enabled" };
   }
-}
-
-export function getMaxDesktops(cluster: string) {
-  const commonMaxDesktops = getPortalConfig().loginDesktop.maxDesktops;
-
-  const clusterMaxDesktops = getClusterConfigs()[cluster].loginDesktop?.maxDesktops;
-
-  return clusterMaxDesktops === undefined ? commonMaxDesktops : clusterMaxDesktops;
 }
