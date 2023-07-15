@@ -15,19 +15,13 @@ import { Status } from "@grpc/grpc-js/build/src/constants";
 import { getClusterConfigs, LoginDeskopConfigSchema } from "@scow/config/build/cluster";
 import { getPortalConfig } from "@scow/config/build/portal";
 
-type ConfigKey = keyof LoginDeskopConfigSchema;
+export function getDesktopConfig(cluster: string): LoginDeskopConfigSchema {
 
-export function getDesktopConfig<T extends ConfigKey>(cluster: string, configKey: T): LoginDeskopConfigSchema[T] {
-
-  const commonDesktopConfig = getPortalConfig().loginDesktop[configKey];
-
-  const clusterDesktopConfig = getClusterConfigs()[cluster].loginDesktop?.[configKey];
-
-  return clusterDesktopConfig === undefined ? commonDesktopConfig : clusterDesktopConfig;
+  return { ...getPortalConfig().loginDesktop, ...getClusterConfigs()[cluster].loginDesktop };
 }
 
 export function ensureEnabled(cluster: string) {
-  const enabled = getDesktopConfig(cluster, "enabled");
+  const enabled = getDesktopConfig(cluster).enabled;
 
   if (!enabled) {
     throw <ServiceError>{ code: Status.UNAVAILABLE, message: "Login desktop is not enabled" };

@@ -32,7 +32,7 @@ export const desktopServiceServer = plugin((server) => {
 
       ensureEnabled(cluster);
 
-      const availableWms = getDesktopConfig(cluster, "wms");
+      const availableWms = getDesktopConfig(cluster).wms;
 
       if (availableWms.find((x) => x.wm === wm) === undefined) {
         throw <ServiceError>{ code: Status.INVALID_ARGUMENT, message: `${wm} is not a acceptable wm.` };
@@ -41,7 +41,7 @@ export const desktopServiceServer = plugin((server) => {
       checkLoginNodeInCluster(cluster, host);
 
       const vncserverBinPath = getTurboVNCBinPath(cluster, "vncserver");
-      const maxDesktops = getDesktopConfig(cluster, "maxDesktops");
+      const maxDesktops = getDesktopConfig(cluster).maxDesktops;
 
 
       return await sshConnect(host, "root", logger, async (ssh) => {
@@ -149,7 +149,7 @@ export const desktopServiceServer = plugin((server) => {
 
       ensureEnabled(cluster);
 
-      const result = getDesktopConfig(cluster, "wms");
+      const result = getDesktopConfig(cluster).wms;
 
 
       return [{ wms: result }];
