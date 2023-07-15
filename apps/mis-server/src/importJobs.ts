@@ -210,7 +210,8 @@ async function importJobs(
           },
         }),
       ).then((value) => {
-        return value.jobs.filter((x) => x.startTime && new Date(x.startTime) <= new Date(x.endTime!));
+        return value.jobs.filter((x) => x.startTime &&
+          new Date(x.submitTime!) <= new Date(x.startTime) && new Date(x.startTime) <= new Date(x.endTime!));
       })));
 
       const savedJobsCount = await persistJobAndCharge(jobsInfo);
