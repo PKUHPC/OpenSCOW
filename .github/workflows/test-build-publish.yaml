@@ -71,7 +71,7 @@ jobs:
         with:
           log: true
           verbose: true
-          resource: "tcp:localhost:3306 tcp:localhost:6379 tcp:localhost:389"
+          resource: "tcp:localhost:3306 tcp:localhost:6379 tcp:localhost:389 tcp:localhost:6000 tcp:localhost:6001 tcp:localhost:6002"
 
       - name: Run tests
         run: pnpm test:ci
