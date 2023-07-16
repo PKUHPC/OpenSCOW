@@ -13,22 +13,26 @@
 import { executeAsUser } from "@scow/lib-ssh";
 import { UserDesktops } from "@scow/protos/build/portal/desktop";
 import { sshConnect } from "src/utils/ssh";
-import { parseListOutput, VNCSERVER_BIN_PATH } from "src/utils/turbovnc";
+import { getTurboVNCBinPath, parseListOutput } from "src/utils/turbovnc";
 import { Logger } from "ts-log";
 
 /**
  *
  * @param host loginode
  * @param userId user id
+ * @param cluster cluster id
  * @param logger logger
  * @returns userDesktops
  */
-export async function listUserDesktopsFromHost(host: string, userId: string, logger: Logger) {
+export async function listUserDesktopsFromHost(host: string, cluster: string, userId: string, logger: Logger) {
+
+  const vncserverBinPath = getTurboVNCBinPath(cluster, "vncserver");
+
   return await sshConnect(host, "root", logger, async (ssh) => {
 
     // list all running session
     const resp = await executeAsUser(ssh, userId, logger, true,
-      VNCSERVER_BIN_PATH, ["-list"],
+      vncserverBinPath, ["-list"],
     );
 
     const ids = parseListOutput(resp.stdout);

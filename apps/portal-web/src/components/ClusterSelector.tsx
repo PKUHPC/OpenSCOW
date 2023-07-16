@@ -36,9 +36,15 @@ interface SingleSelectionProps {
   value?: Cluster;
   onChange?: (cluster: Cluster) => void;
   label?: string;
+  clusters?: Cluster[];
 }
 
-export const SingleClusterSelector: React.FC<SingleSelectionProps> = ({ value, onChange, label }) => {
+export const SingleClusterSelector: React.FC<SingleSelectionProps> = ({
+  value,
+  onChange,
+  label,
+  clusters,
+}) => {
   return (
     <Select
       labelInValue
@@ -47,9 +53,9 @@ export const SingleClusterSelector: React.FC<SingleSelectionProps> = ({ value, o
       onChange={({ value, label }) => onChange?.({ id: value, name: label })}
       options={
         (label ? [{ value: label, label, disabled: true }] : [])
-          .concat(publicConfig.CLUSTERS.map((x) => ({ value: x.id, label: x.name, disabled: false })))
+          .concat((clusters || publicConfig.CLUSTERS).map((x) => ({ value: x.id, label: x.name, disabled: false })))
       }
-      dropdownMatchSelectWidth={false}
+      popupMatchSelectWidth={false}
     />
   );
 };

@@ -45,7 +45,7 @@ loginDesktop:
     - name: Xfce
       wm: xfce
 
-  # 最多启动多少个桌面节点
+  # 单个登录节点最多启动多少个桌面节点
   maxDesktops: 3
 
 # 是否启用交互式任务功能
