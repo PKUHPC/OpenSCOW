@@ -13,6 +13,7 @@
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
+import { getLoginNode } from "@scow/config/build/cluster";
 import { executeAsUser } from "@scow/lib-ssh";
 import { DesktopServiceServer, DesktopServiceService } from "@scow/protos/build/portal/desktop";
 import { clusters } from "src/config/clusters";
@@ -131,7 +132,7 @@ export const desktopServiceServer = plugin((server) => {
         return [{ userDesktops: [userDesktops]}];
       }
 
-      const loginNodes = clusters[cluster]?.loginNodes;
+      const loginNodes = clusters[cluster]?.loginNodes.map(getLoginNode);
       if (!loginNodes) {
         throw clusterNotFound(cluster);
       }
