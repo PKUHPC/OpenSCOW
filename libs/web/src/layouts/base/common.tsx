@@ -75,7 +75,7 @@ export function calcSelectedKeys(links: NavItemProps[], pathname: string) {
     }
     if (
       (curr.path === "/" && pathname === "/") ||
-        (curr.path !== "/" && match(curr, pathname))
+        (curr.path !== "/" && curr.path !== "" && match(curr, pathname))
     ) {
       prev.push(curr.path);
     }

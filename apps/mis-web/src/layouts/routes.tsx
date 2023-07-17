@@ -356,9 +356,12 @@ export const getAvailableRoutes = (user: User | undefined): NavItemProps[] => {
             ),
             text: childLink.text,
             path: `${childLink.url}?token=${user.token}`,
-            clickable: childLink.openInNewPage,
+            clickToPath: `${childLink.url}?token=${user.token}`,
             openInNewPage: link.openInNewPage,
           }) as NavItemProps);
+
+        const parentNavPath = link.url ? `${link.url}?token=${user.token}`
+          : (childrenLinks && childrenLinks.length > 0 ? childrenLinks[0].path : "");
 
         return {
           Icon: !link.iconPath ? LinkOutlined : (
@@ -367,9 +370,8 @@ export const getAvailableRoutes = (user: User | undefined): NavItemProps[] => {
             />
           ),
           text: link.text,
-          path: link.url ? `${link.url}?token=${user.token}`
-            : childrenLinks && childrenLinks.length > 0 ? childrenLinks[0].path : "",
-          clickable: true,
+          path: parentNavPath,
+          clickToPath: parentNavPath,
           openInNewPage: link.openInNewPage,
           children: childrenLinks,
         };
