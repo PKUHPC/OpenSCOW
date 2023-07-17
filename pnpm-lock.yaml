@@ -600,8 +600,8 @@ importers:
         specifier: 1.7.1
         version: 1.7.1
       '@types/ssh2':
-        specifier: 1.11.11
-        version: 1.11.11
+        specifier: 1.11.13
+        version: 1.11.13
       '@types/wait-on':
         specifier: 5.3.1
         version: 5.3.1
@@ -1074,8 +1074,8 @@ importers:
         specifier: 1.7.1
         version: 1.7.1
       '@types/ssh2':
-        specifier: 1.11.11
-        version: 1.11.11
+        specifier: 1.11.13
+        version: 1.11.13
       ts-log:
         specifier: 2.2.5
         version: 2.2.5
@@ -7573,8 +7573,8 @@ packages:
       '@types/node': 18.16.14
     dev: true
 
-  /@types/ssh2@1.11.11:
-    resolution: {integrity: sha512-LdnE7UBpvHCgUznvn2fwLt2hkaENcKPFqOyXGkvyTLfxCXBN6roc1RmECNYuzzbHePzD3PaAov5rri9hehzx9Q==}
+  /@types/ssh2@1.11.13:
+    resolution: {integrity: sha512-08WbG68HvQ2YVi74n2iSUnYHYpUdFc/s2IsI0BHBdJwaqYJpWlVv9elL0tYShTv60yr0ObdxJR5NrCRiGJ/0CQ==}
     dependencies:
       '@types/node': 18.16.18
 
@@ -14754,7 +14754,7 @@ packages:
     resolution: {integrity: sha512-GLcw49yFd9+rUpP+FgX6wrF/N90cmuDl2n0i8d3L828b6riRjkb9w3SS+XvviRWbrAhLxuMKywFqxvQDZQ1bug==}
     engines: {node: '>= 10'}
     dependencies:
-      '@types/ssh2': 1.11.11
+      '@types/ssh2': 1.11.13
       is-stream: 2.0.1
       make-dir: 3.1.0
       sb-promise-queue: 2.1.0
