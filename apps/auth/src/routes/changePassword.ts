@@ -16,14 +16,12 @@ import { ChangePasswordResult } from "src/auth/AuthProvider";
 
 const BodySchema = Type.Object({
   identityId: Type.String({ description: "用户ID" }),
-  oldPassword: Type.String({ description: "原密码" }),
   newPassword: Type.String({ description: "新密码" }),
 });
 
 const ResponsesSchema = Type.Object({
   204: Type.Null({ description: "修改完成" }),
   404: Type.Null({ description: "用户未找到" }),
-  412: Type.Null({ description: "原密码不正确" }),
   501: Type.Null({ description: "当前配置不支持修改密码" }),
 });
 
