@@ -39,6 +39,9 @@ loginDesktop:
   # 单个登录节点最多启动多少个桌面节点
   maxDesktops: 3
 
+  # 将创建的登录节点桌面信息的保存到什么位置。相对于用户的家目录
+  desktopsDir: scow/desktops
+
 # TurboVNC的安装路径
 turboVNCPath: /opt/TurboVNC
 ```
