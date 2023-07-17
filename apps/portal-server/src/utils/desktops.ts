@@ -18,7 +18,6 @@ import { executeAsUser, getUserHomedir, sftpExists, sftpReadFile, sftpWriteFile 
 import { Desktop } from "@scow/protos/build/portal/desktop";
 import { NodeSSH } from "node-ssh";
 import { join } from "path";
-import { portalConfig } from "src/config/portal";
 import { sshConnect } from "src/utils/ssh";
 import { getTurboVNCBinPath, parseListOutput } from "src/utils/turbovnc";
 import { Logger } from "ts-log";
@@ -42,13 +41,20 @@ export type DesktopInfo = Desktop & { host: string };
 /**
  * Get desktops file path of user
  * @param ssh ssh object connected as root
+ * @param cluster cluster id
  * @param userId  user id
  * @param logger  logger
  * @returns desktops file path
  */
-export async function getUserDesktopsFilePath(ssh: NodeSSH, userId: string, logger: Logger): Promise<string> {
+export async function getUserDesktopsFilePath(
+  ssh: NodeSSH,
+  cluser: string,
+  userId: string,
+  logger: Logger,
+): Promise<string> {
   const userHomeDir = await getUserHomedir(ssh, userId, logger);
-  const userDesktopDir = join(userHomeDir, portalConfig.desktopsDir);
+  const desktopDir = getDesktopConfig(cluser).desktopsDir;
+  const userDesktopDir = join(userHomeDir, desktopDir);
   // make sure desktopsDir exists
   await ssh.mkdir(userDesktopDir);
   return join(userDesktopDir, "desktops.json");
@@ -105,7 +111,7 @@ export async function listUserDesktopsFromHost(host: string, cluster: string, us
 
     const ids = parseListOutput(resp.stdout);
 
-    const desktopFilePath = await getUserDesktopsFilePath(ssh, userId, logger);
+    const desktopFilePath = await getUserDesktopsFilePath(ssh, cluster, userId, logger);
 
     const desktops = await readDesktopsFile(ssh, desktopFilePath);
 
@@ -128,19 +134,21 @@ export async function listUserDesktopsFromHost(host: string, cluster: string, us
 
 /**
  * @param ssh ssh object connected as root
+ * @param cluster cluster id
  * @param userId user id
  * @param deskTopInfo desktop info to add
  * @param logger logger
  */
 export async function addDesktopToFile(
   ssh: NodeSSH,
+  cluster: string,
   userId: string,
   deskTopInfo: DesktopInfo,
   logger: Logger,
 ): Promise<void> {
 
 
-  const desktopFilePath = await getUserDesktopsFilePath(ssh, userId, logger);
+  const desktopFilePath = await getUserDesktopsFilePath(ssh, cluster, userId, logger);
 
   const desktops = await readDesktopsFile(ssh, desktopFilePath);
   desktops.push(deskTopInfo);
@@ -157,13 +165,14 @@ export async function addDesktopToFile(
  */
 export async function removeDesktopFromFile(
   ssh: NodeSSH,
+  cluster: string,
   userId: string,
   host: string,
   displayId: number,
   logger: Logger,
 ): Promise<void> {
 
-  const desktopFilePath = await getUserDesktopsFilePath(ssh, userId, logger);
+  const desktopFilePath = await getUserDesktopsFilePath(ssh, cluster, userId, logger);
 
   const desktops = await readDesktopsFile(ssh, desktopFilePath);
 

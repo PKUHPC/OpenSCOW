@@ -13,7 +13,6 @@
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { executeAsUser, getUserHomedir, sshRmrf } from "@scow/lib-ssh";
 import { dirname, join } from "path";
-import { portalConfig } from "src/config/portal";
 import {
   addDesktopToFile,
   DesktopInfo,
@@ -41,6 +40,7 @@ import {
 
 let testServer: TestSshServer;
 
+const testCluster = "testCluster";
 const listOutput = `
 TurboVNC sessions:
 
@@ -80,6 +80,7 @@ jest.mock("@scow/config/build/cluster", () => {
           wms: ["wm1", "wm2"],
           enabled: false,
           maxDesktops: 5,
+          desktopsDir: "scow/desktops",
         },
       },
     }),
@@ -111,18 +112,20 @@ afterEach(async () => {
 });
 
 
+const desktopDir = getDesktopConfig(testCluster).desktopsDir;
+
 it.each([
-  [rootUserId, join("/root", portalConfig.desktopsDir, "desktops.json")],
-  [userId, join("/home/test", portalConfig.desktopsDir, "desktops.json")],
+  [rootUserId, join("/root", desktopDir, "desktops.json")],
+  [userId, join("/home/test", desktopDir, "desktops.json")],
 ])("should return the correct desktops file path of user %p to %p", async (user, expected) => {
   const userHomeDir = user === rootUserId ? "/root" : "/home/test";
   (getUserHomedir as jest.Mock).mockImplementation(() => {
     return Promise.resolve(userHomeDir);
   });
-  expect(await getUserDesktopsFilePath(testServer.ssh, user, console)).toBe(expected);
+  expect(await getUserDesktopsFilePath(testServer.ssh, testCluster, user, console)).toBe(expected);
 
   // clear dir of /scow/desktops
-  await sshRmrf(testServer.ssh, dirname(join(userHomeDir, portalConfig.desktopsDir)));
+  await sshRmrf(testServer.ssh, dirname(join(userHomeDir, desktopDir)));
 });
 
 it("should return correct desktops if desktop.json exist", async () => {
@@ -150,7 +153,7 @@ it("should return an array of desktops from host", async () => {
   (executeAsUser as jest.Mock).mockReturnValue(mockExecuteAsUserReturn);
   (getUserHomedir as jest.Mock).mockReturnValue(join("/home/test", desktopTestsFolder()));
 
-  const desktops = await listUserDesktopsFromHost(target, "testCluster", userId, console);
+  const desktops = await listUserDesktopsFromHost(target, testCluster, userId, console);
   expect(executeAsUser).toHaveBeenCalledOnce();
   expect(desktops).toEqual(
     {
@@ -168,7 +171,7 @@ it("should return an array of desktops from host", async () => {
 it("should add a correct desktop to desktops.json", async () => {
 
   (getUserHomedir as jest.Mock).mockReturnValue(join("/home/test", desktopTestsFolder()));
-  await addDesktopToFile(testServer.ssh, userId, addedDesktopInfo, console);
+  await addDesktopToFile(testServer.ssh, testCluster, userId, addedDesktopInfo, console);
 
   const desktops = await readDesktopsFile(testServer.ssh, testDesktopsFilePath);
   expect(desktops).toStrictEqual([
@@ -183,7 +186,7 @@ it("should add a correct desktop to desktops.json", async () => {
 it("should remove a corrrect desktop from desktops.json", async () => {
 
   (getUserHomedir as jest.Mock).mockReturnValue(join("/home/test", desktopTestsFolder()));
-  await removeDesktopFromFile(testServer.ssh, userId, target, addedDesktopInfo.displayId, console);
+  await removeDesktopFromFile(testServer.ssh, testCluster, userId, target, addedDesktopInfo.displayId, console);
 
   const desktops = await readDesktopsFile(testServer.ssh, testDesktopsFilePath);
   expect(desktops).toStrictEqual([
@@ -193,12 +196,12 @@ it("should remove a corrrect desktop from desktops.json", async () => {
 });
 
 it("return cluster wms when setting wms both in portal and cluster", async () => {
-  expect(getDesktopConfig("testCluster").wms).toStrictEqual(["wm1", "wm2"]);
+  expect(getDesktopConfig(testCluster).wms).toStrictEqual(["wm1", "wm2"]);
 });
 
 it("return cluster logindesktop enabled when setting enabled both in portal and cluster", async () => {
   try {
-    ensureEnabled("testCluster");
+    ensureEnabled(testCluster);
     expect("").fail("not enabled");
   } catch (e: any) {
     expect(e.code).toBe(Status.UNAVAILABLE);
@@ -207,5 +210,5 @@ it("return cluster logindesktop enabled when setting enabled both in portal and 
 });
 
 it("return cluster maxDesktops when setting maxDesktops both in portal and cluster", async () => {
-  expect(getDesktopConfig("testCluster").maxDesktops).toBe(5);
+  expect(getDesktopConfig(testCluster).maxDesktops).toBe(5);
 });

@@ -13,6 +13,7 @@
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
+import { getLoginNode } from "@scow/config/build/cluster";
 import { executeAsUser } from "@scow/lib-ssh";
 import { DesktopServiceServer, DesktopServiceService } from "@scow/protos/build/portal/desktop";
 import { clusters } from "src/config/clusters";
@@ -94,7 +95,7 @@ export const desktopServiceServer = plugin((server) => {
           createTime: new Date().toISOString(),
         };
 
-        await addDesktopToFile(ssh, userId, desktopInfo, logger);
+        await addDesktopToFile(ssh, cluster, userId, desktopInfo, logger);
 
         return [{ host, password, port }];
 
@@ -116,7 +117,7 @@ export const desktopServiceServer = plugin((server) => {
         // kill specific desktop
         await executeAsUser(ssh, userId, logger, true, vncserverBinPath, ["-kill", ":" + displayId]);
 
-        await removeDesktopFromFile(ssh, userId, host, displayId, logger);
+        await removeDesktopFromFile(ssh, cluster, userId, host, displayId, logger);
 
         return [{}];
       });
@@ -153,7 +154,7 @@ export const desktopServiceServer = plugin((server) => {
         return [{ userDesktops: [userDesktops]}];
       }
 
-      const loginNodes = clusters[cluster]?.loginNodes;
+      const loginNodes = clusters[cluster]?.loginNodes?.map(getLoginNode);
       if (!loginNodes) {
         throw clusterNotFound(cluster);
       }
