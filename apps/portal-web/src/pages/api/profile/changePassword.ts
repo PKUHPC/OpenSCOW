@@ -60,7 +60,7 @@ export default typeboxRoute(ChangePasswordSchema, async (req, res) => {
 
   if (!info) { return; }
 
-  const { newPassword, oldPassword } = req.body;
+  const { newPassword } = req.body;
 
   if (passwordPattern && !passwordPattern.test(newPassword)) {
     return { 400: { code: "PASSWORD_NOT_VALID" as const, message: publicConfig.PASSWORD_PATTERN_MESSAGE } };
