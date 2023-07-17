@@ -25,16 +25,6 @@ services:
     ports:
       - 6379:6379
 
-
-  jobTableDb:
-    image: mariadb:5.5
-    environment:
-      MYSQL_ROOT_PASSWORD: ${JOB_TABLE_PASSWORD}
-    volumes:
-      - jobtabledb:/var/lib/mysql
-    ports:
-      - 3307:3306
-
   ssh-server:
     image: alpine-ssh
     build:
@@ -66,13 +56,38 @@ services:
       PHPLDAPADMIN_LDAP_HOSTS: ldap://localhost:389
       PHPLDAPADMIN_HTTPS: false
 
-  test-adapter:
+  test-adapter-hpc00:
     image: test-adapter
     build:
       context: ..
       dockerfile: dev/test-adapter/Dockerfile
     ports:
       - 6000:6000
+    environment:
+      CLUSTER_ID: hpc00
+      PORT: 6000
+
+  test-adapter-hpc01:
+    image: test-adapter
+    build:
+      context: ..
+      dockerfile: dev/test-adapter/Dockerfile
+    ports:
+      - 6001:6001
+    environment:
+      CLUSTER_ID: hpc01
+      PORT: 6001
+
+  test-adapter-hpc02:
+    image: test-adapter
+    build:
+      context: ..
+      dockerfile: dev/test-adapter/Dockerfile
+    ports:
+      - 6002:6002
+    environment:
+      CLUSTER_ID: hpc02
+      PORT: 6002
 
 networks:
   default:
@@ -81,4 +96,3 @@ networks:
 volumes:
   db:
   ldap:
-  jobtabledb:

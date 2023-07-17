@@ -242,7 +242,7 @@ it("calculates price", async () => {
 
 
   // obtain test data by running the following data in db
-  const testData = (await import("src/testData.json")).default;
+  const testData = (await import("./testData.json")).default;
 
   const wrongPrices = [] as {
     tenantPrice: { expected: number; actual: number | undefined };
