@@ -49,9 +49,9 @@ export const checkPasswordRoute = fp(async (f) => {
       const result = await f.auth.checkPassword(identityId, password, req);
 
       if (result === "Match") {
-        return { result: true };
+        return { success: true };
       } else if (result === "NotMatch") {
-        return { result: false };
+        return { success: false };
       } else if (result === "NotFound") {
         await rep.status(404).send({ code: "USER_NOT_FOUND" });
         return;
