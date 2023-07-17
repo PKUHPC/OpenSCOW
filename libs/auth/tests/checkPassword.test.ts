@@ -11,6 +11,7 @@
  */
 
 import { checkPassword } from "src/checkPassword";
+import { applicationJsonHeaders } from "src/utils";
 import { mockFetch } from "tests/utils";
 
 const authUrl = "auth:5000";
@@ -20,23 +21,27 @@ const identityId = "123";
 const password = "123456";
 
 mockFetch((input) => {
-  const testUrl = new URL(input as string);
-  if (testUrl.pathname !== "/checkPassword" || testUrl.searchParams.get("identityId") !== identityId) {
+  const query = new URL(input as string).searchParams;
+  const urlIdentityId = query.get("identityId");
+  const urlPassword = query.get("password");
+  if (urlIdentityId !== identityId) {
     return { status: 404, json: ({}) };
   }
-  else if (testUrl.searchParams.get("password") === password) {
+  else if (urlPassword === password) {
     return { status: 200, json: ({ success: true }) };
   } else {
     return { status: 200, json: ({ success: false }) };
   }
 });
 
-it("raises correct request", async () => {
-  await checkPassword(authUrl, { identityId, password });
-
+it("raises correct request for checking password", async () => {
+  await checkPassword(authUrl, { identityId: identityId, password: password });
   expect(fetch).toHaveBeenCalledWith(
     authUrl + "/checkPassword?identityId=" + identityId + "&password=" + password,
-    { method: "GET" },
+    {
+      headers: applicationJsonHeaders,
+      method: "GET",
+    },
   );
 });
 

@@ -60,7 +60,7 @@ export default /* #__PURE__*/typeboxRoute(
       return { 501: null };
     }
 
-    const { identityId, newPassword, oldPassword } = req.body;
+    const { identityId, newPassword } = req.body;
 
     const client = getClient(UserServiceClient);
     const userInfo: GetUserInfoResponse = await asyncClientCall(client, "getUserInfo", {
@@ -78,7 +78,7 @@ export default /* #__PURE__*/typeboxRoute(
       return;
     }
 
-    return await libChangePassword(runtimeConfig.AUTH_INTERNAL_URL, { identityId, newPassword, oldPassword }, console)
+    return await libChangePassword(runtimeConfig.AUTH_INTERNAL_URL, { identityId, newPassword }, console)
       .then(() => ({ 204: null }))
       .catch((e) => ({ [e.status]: null }));
   });

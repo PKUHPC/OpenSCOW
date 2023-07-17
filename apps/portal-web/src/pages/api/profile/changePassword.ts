@@ -69,15 +69,12 @@ export default typeboxRoute(ChangePasswordSchema, async (req, res) => {
   return await libChangePassword(runtimeConfig.AUTH_INTERNAL_URL, {
     identityId: info.identityId,
     newPassword,
-    oldPassword,
   }, console)
     .then(() => ({ 204: null }))
     .catch((e) => {
       switch (e.status) {
       case "NOT_FOUND":
         return { 404: null };
-      case "WRONG_PASSWORD":
-        return { 412: null };
       case "NOT_SUPPORTED":
         return { 501: null };
       default:

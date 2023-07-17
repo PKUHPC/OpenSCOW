@@ -11,9 +11,8 @@
  */
 
 import { join } from "path";
+import { applicationJsonHeaders, logHttpErrorAndThrow } from "src/utils";
 import { Logger } from "ts-log";
-
-import { applicationJsonHeaders, logHttpErrorAndThrow } from "./utils";
 
 /**
  * Check the password is correct
@@ -29,13 +28,14 @@ export async function checkPassword(
 
   const query = new URLSearchParams([["identityId", params.identityId], ["password", params.password]]);
   const url = join(authUrl, "/checkPassword") + "?" + query.toString();
+
   const resp = await fetch(url, {
     method: "GET",
     headers: applicationJsonHeaders,
   });
 
   if (resp.status === 200) {
-    return { success: (await resp.json()).result };
+    return { success: (await resp.json()).success };
   } else if (resp.status === 404) {
     const json = await resp.json().catch(() => undefined);
     if (json?.code === "USER_NOT_FOUND") {

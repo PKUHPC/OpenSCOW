@@ -63,9 +63,9 @@ export default /* #__PURE__*/typeboxRoute(
 
     if (!info) { return; }
 
-    const { identityId, newPassword, oldPassword } = req.body;
+    const { identityId, newPassword } = req.body;
 
-    return await libChangePassword(runtimeConfig.AUTH_INTERNAL_URL, { identityId, newPassword, oldPassword }, console)
+    return await libChangePassword(runtimeConfig.AUTH_INTERNAL_URL, { identityId, newPassword }, console)
       .then(() => ({ 204: null }))
       .catch((e) => ({ [e.status]: null }));
 
