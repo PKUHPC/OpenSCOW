@@ -1,5 +1,5 @@
 displayName: hpc00
-adapterUrl: 0.0.0.0:6000
+adapterUrl: localhost:6000
 loginNodes:
   - name: login
     address: localhost:22222
