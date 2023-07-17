@@ -10,14 +10,17 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { Status } from "@grpc/grpc-js/build/src/constants";
 import { executeAsUser, getUserHomedir, sshRmrf } from "@scow/lib-ssh";
 import { dirname, join } from "path";
 import { portalConfig } from "src/config/portal";
 import {
   addDesktopToFile,
   DesktopInfo,
+  ensureEnabled,
+  getDesktopConfig,
   getUserDesktopsFilePath,
-  listDesktopsFromHost,
+  listUserDesktopsFromHost,
   readDesktopsFile,
   removeDesktopFromFile,
 } from "src/utils/desktops";
@@ -34,7 +37,6 @@ import {
   TestSshServer,
   userId,
 } from "tests/file/utils";
-
 
 
 let testServer: TestSshServer;
@@ -70,6 +72,34 @@ jest.mock("@scow/lib-ssh", () => {
   };
 });
 
+jest.mock("@scow/config/build/cluster", () => {
+  return {
+    getClusterConfigs: jest.fn().mockReturnValue({
+      testCluster: {
+        loginDesktop:{
+          wms: ["wm1", "wm2"],
+          enabled: false,
+          maxDesktops: 5,
+        },
+      },
+    }),
+  };
+});
+
+jest.mock("@scow/config/build/portal", () => {
+  return {
+    getPortalConfig:
+    jest.fn().mockReturnValue({
+      loginDesktop: {
+        wms: ["wm3", "wm4"],
+        enabled: true,
+        maxDesktops: 2,
+      },
+      desktopsDir: "scow/desktops",
+      turboVNCPath: "/opt/TurboVNC",
+    }),
+  };
+});
 
 beforeEach(async () => {
   testServer = await connectToTestServerAsRoot();
@@ -114,15 +144,14 @@ it("should return an empty array if desktop.json does not exist", async () => {
 });
 
 
-// test listDesktopsFromHost
+// // test listDesktopsFromHost
 it("should return an array of desktops from host", async () => {
 
   (executeAsUser as jest.Mock).mockReturnValue(mockExecuteAsUserReturn);
   (getUserHomedir as jest.Mock).mockReturnValue(join("/home/test", desktopTestsFolder()));
 
-  const desktops = await listDesktopsFromHost(target, userId, console);
+  const desktops = await listUserDesktopsFromHost(target, "testCluster", userId, console);
   expect(executeAsUser).toHaveBeenCalledOnce();
-
   expect(desktops).toEqual(
     {
       host: target,
@@ -135,7 +164,7 @@ it("should return an array of desktops from host", async () => {
   );
 });
 
-// test addDesktopToFile
+// // test addDesktopToFile
 it("should add a correct desktop to desktops.json", async () => {
 
   (getUserHomedir as jest.Mock).mockReturnValue(join("/home/test", desktopTestsFolder()));
@@ -150,7 +179,7 @@ it("should add a correct desktop to desktops.json", async () => {
 },
 );
 
-// test removeDesktopFromFile
+// // test removeDesktopFromFile
 it("should remove a corrrect desktop from desktops.json", async () => {
 
   (getUserHomedir as jest.Mock).mockReturnValue(join("/home/test", desktopTestsFolder()));
@@ -163,3 +192,20 @@ it("should remove a corrrect desktop from desktops.json", async () => {
   ]);
 });
 
+it("return cluster wms when setting wms both in portal and cluster", async () => {
+  expect(getDesktopConfig("testCluster").wms).toStrictEqual(["wm1", "wm2"]);
+});
+
+it("return cluster logindesktop enabled when setting enabled both in portal and cluster", async () => {
+  try {
+    ensureEnabled("testCluster");
+    expect("").fail("not enabled");
+  } catch (e: any) {
+    expect(e.code).toBe(Status.UNAVAILABLE);
+    expect(e.message).toContain("Login desktop is not enabled");
+  }
+});
+
+it("return cluster maxDesktops when setting maxDesktops both in portal and cluster", async () => {
+  expect(getDesktopConfig("testCluster").maxDesktops).toBe(5);
+});

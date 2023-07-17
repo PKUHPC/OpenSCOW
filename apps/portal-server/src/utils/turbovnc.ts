@@ -10,14 +10,31 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { getClusterConfigs } from "@scow/config/build/cluster";
+import { getPortalConfig } from "@scow/config/build/portal";
 import { executeAsUser, loggedExec } from "@scow/lib-ssh";
 import { NodeSSH } from "node-ssh";
 import { join } from "path";
-import { portalConfig } from "src/config/portal";
 import { parseIp } from "src/utils/proxy";
 import { Logger } from "ts-log";
 
-export const VNCSERVER_BIN_PATH = join(portalConfig.turboVNCPath, "bin", "vncserver");
+export function getTurboVNCPath(cluster: string) {
+
+  const commonTurboVNCPath = getPortalConfig().turboVNCPath;
+
+  const clusterTurboVNCPath = getClusterConfigs()[cluster].turboVNCPath;
+
+  return clusterTurboVNCPath || commonTurboVNCPath;
+
+}
+
+export function getTurboVNCBinPath(cluster: string, cmd: string) {
+
+  const turboVNCPath = getTurboVNCPath(cluster);
+
+  return join(turboVNCPath, "bin", cmd);
+}
+
 const DISPLAY_ID_PORT_DELTA = 5900;
 
 export function parseListOutput(output: string): number[] {
@@ -71,19 +88,22 @@ export function portToDisplayId(port: number): number {
   return port - DISPLAY_ID_PORT_DELTA;
 }
 
-const vncPasswdPath = join(portalConfig.turboVNCPath, "bin", "vncpasswd");
-
 /**
  * Refresh VNC session's OTP
  * @param ssh SSH connection
+ * @param cluster cluster ID
  * @param runAsUserId the user id to run as. If null, run as SSH connection user
  * @param logger logger
  * @param displayId displayId
  * @returns new OTP
  */
-export const refreshPassword = async (ssh: NodeSSH, runAsUserId: string | null, logger: Logger, displayId: number) => {
+export const refreshPassword = async (
+  ssh: NodeSSH, cluster: string, runAsUserId: string | null, logger: Logger, displayId: number,
+) => {
 
   const params = ["-o", "-display", ":" + displayId];
+
+  const vncPasswdPath = getTurboVNCBinPath(cluster, "vncpasswd");
 
   const resp = runAsUserId
     ? await executeAsUser(ssh, runAsUserId, logger, true, vncPasswdPath, params)
@@ -95,6 +115,7 @@ export const refreshPassword = async (ssh: NodeSSH, runAsUserId: string | null, 
 /**
  * Refresh VNC session's OTP and get ip of compute node by proxy gateway
  * @param proxyGatewaySsh SSH connection to proxy gateway
+ * @param cluster cluster ID
  * @param computeNode compute node
  * @param user the user id to run as.
  * @param logger logger
@@ -102,8 +123,10 @@ export const refreshPassword = async (ssh: NodeSSH, runAsUserId: string | null, 
  * @returns new OTP and compute node IP
  */
 export const refreshPasswordByProxyGateway = async (
-  proxyGatewaySsh: NodeSSH, computeNode: string, user: string, logger: Logger, displayId: number,
+  proxyGatewaySsh: NodeSSH, cluster: string, computeNode: string, user: string, logger: Logger, displayId: number,
 ) => {
+
+  const vncPasswdPath = getTurboVNCBinPath(cluster, "vncpasswd");
   const params = [computeNode, "sudo", "-u", user, "-s", vncPasswdPath, "-o", "-display", ":" + displayId];
   const [passwordResp, ipResp] =
     await Promise.all([

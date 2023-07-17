@@ -89,4 +89,13 @@ export type NavLink = {
   children?: Omit<NavLink, "children">[];
 }
 
+export const getLoginDesktopEnabled = (cluster: string): boolean => {
+
+  const clusterLoginDesktopEnabled = runtimeConfig.CLUSTERS_CONFIG[cluster]?.loginDesktop?.enabled;
+
+  const commonLogindesktopEnabled = runtimeConfig.PORTAL_CONFIG.loginDesktop.enabled;
+
+  return clusterLoginDesktopEnabled === undefined ? commonLogindesktopEnabled : clusterLoginDesktopEnabled;
+};
+
 export type LoginNode = { name: string, address: string }

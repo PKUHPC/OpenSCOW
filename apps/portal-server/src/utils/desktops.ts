@@ -10,14 +10,32 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { ServiceError } from "@grpc/grpc-js";
+import { Status } from "@grpc/grpc-js/build/src/constants";
+import { getClusterConfigs, LoginDeskopConfigSchema } from "@scow/config/build/cluster";
+import { getPortalConfig } from "@scow/config/build/portal";
 import { executeAsUser, getUserHomedir, sftpExists, sftpReadFile, sftpWriteFile } from "@scow/lib-ssh";
 import { Desktop } from "@scow/protos/build/portal/desktop";
 import { NodeSSH } from "node-ssh";
 import { join } from "path";
 import { portalConfig } from "src/config/portal";
 import { sshConnect } from "src/utils/ssh";
-import { parseListOutput, VNCSERVER_BIN_PATH } from "src/utils/turbovnc";
+import { getTurboVNCBinPath, parseListOutput } from "src/utils/turbovnc";
 import { Logger } from "ts-log";
+
+export function getDesktopConfig(cluster: string): LoginDeskopConfigSchema {
+
+  return { ...getPortalConfig().loginDesktop, ...getClusterConfigs()[cluster].loginDesktop };
+}
+
+export function ensureEnabled(cluster: string) {
+  const enabled = getDesktopConfig(cluster).enabled;
+
+  if (!enabled) {
+    throw <ServiceError>{ code: Status.UNAVAILABLE, message: "Login desktop is not enabled" };
+  }
+}
+
 
 export type DesktopInfo = Desktop & { host: string };
 
@@ -70,15 +88,19 @@ export async function writeDesktopsFile(
  *
  * @param host loginode
  * @param userId user id
+ * @param cluster cluster id
  * @param logger logger
  * @returns userDesktops
  */
-export async function listDesktopsFromHost(host: string, userId: string, logger: Logger) {
+export async function listUserDesktopsFromHost(host: string, cluster: string, userId: string, logger: Logger) {
+
+  const vncserverBinPath = getTurboVNCBinPath(cluster, "vncserver");
+
   return await sshConnect(host, "root", logger, async (ssh) => {
 
     // list all running session
     const resp = await executeAsUser(ssh, userId, logger, true,
-      VNCSERVER_BIN_PATH, ["-list"],
+      vncserverBinPath, ["-list"],
     );
 
     const ids = parseListOutput(resp.stdout);

@@ -16,7 +16,7 @@ import { DesktopServiceClient } from "@scow/protos/build/portal/desktop";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { getClient } from "src/utils/client";
-import { publicConfig } from "src/utils/config";
+import { getLoginDesktopEnabled } from "src/utils/config";
 
 export const ListDesktopsSchema = typeboxRouteSchema({
   method: "GET",
@@ -40,7 +40,7 @@ export const ListDesktopsSchema = typeboxRouteSchema({
     }),
 
     // 功能没有启用
-    501: Type.Null(),
+    501: Type.Object({ code: Type.Literal("CLUSTER_LOGIN_DESKTOP_NOT_ENABLED") }),
   },
 });
 
@@ -48,15 +48,16 @@ const auth = authenticate(() => true);
 
 export default /* #__PURE__*/typeboxRoute(ListDesktopsSchema, async (req, res) => {
 
-  if (!publicConfig.ENABLE_LOGIN_DESKTOP) {
-    return { 501: null };
+  const { cluster, loginNode } = req.query;
+
+  const loginDesktopEnabled = getLoginDesktopEnabled(cluster);
+  if (!loginDesktopEnabled) {
+    return { 501: { code: "CLUSTER_LOGIN_DESKTOP_NOT_ENABLED" as const } };
   }
 
   const info = await auth(req, res);
 
   if (!info) { return; }
-
-  const { cluster, loginNode } = req.query;
 
   const client = getClient(DesktopServiceClient);
 

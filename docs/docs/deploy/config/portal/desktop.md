@@ -9,7 +9,7 @@ title: 登录节点桌面功能
 
 ## 前提条件
 
-目前，桌面功能仅支持登录到单个**登录节点**。在计算节点上启动桌面可借助[交互式任务](./apps/configure-vnc-app.md)实现。
+目前，桌面功能仅支持登录到**登录节点**。在计算节点上启动桌面可借助[交互式任务](./apps/configure-vnc-app.md)实现。
 
 下文中将启动桌面的节点称为**桌面节点**。
 
@@ -19,9 +19,9 @@ title: 登录节点桌面功能
 
 ## 支持的桌面
 
-在`config/portal.yml`文件的`loginDesktop.wms`部分可以配置支持的桌面。
+在`config/portal.yml`文件的`loginDesktop.wms`部分可以配置支持的桌面, 也可以在`config/clusters`下的集群配置文件内分集群配置支持的桌面，`config/clusters`配置文件下的配置优先级高于`config/portal.yml`文件。
 
-```yaml title="config/portal.yaml"
+```yaml title="config/portal.yaml 或 config/clusters/[集群ID]/config.yml"
 loginDesktop:
   wms: 
     - name: Xfce
