@@ -14,19 +14,6 @@ import { GetConfigFn, getConfigFromFile } from "@scow/lib-config";
 import { Static, Type } from "@sinclair/typebox";
 import { DEFAULT_CONFIG_BASE_PATH } from "src/constants";
 
-export const SlurmMisConfigSchema = Type.Object({
-  managerUrl: Type.String({ description: "slurm manager节点的URL" }),
-  dbHost: Type.String({ description: "slurmdbd的数据库地址", default: "localhost" }),
-  dbPort: Type.Integer({ description: "slurmdbd的数据库端口", default: 3306 }),
-  dbUser: Type.String({ description: "slurmdbd的数据库的用户名", default: "root" }),
-  dbPassword: Type.String({ description: "slurmdbd的数据库密码" }),
-  slurmAcctDbName: Type.String({ description: "slurm accounting database的数据库名", default: "slurm_acct_db" }),
-  clusterName: Type.String({ description: "这个集群在slurm中的集群名字" }),
-  scriptPath: Type.String({ description: "slurm.sh绝对路径" }),
-}, { description: "slurm的MIS配置" });
-
-export type SlurmMisConfigSchema = Static<typeof SlurmMisConfigSchema>;
-
 export enum JobTableType {
   mariadb = "mariadb",
   mysql = "mysql",
@@ -78,27 +65,17 @@ export const MisConfigSchema = Type.Object({
   }, { default: {}, description: "SCOW的创建用户相关配置" }),
 
   fetchJobs: Type.Object({
-    db: Type.Object({
-      host: Type.String({ description: "job_table数据库地址" }),
-      port: Type.Integer({ description: "job_table数据库端口" }),
-      user: Type.String({ description: "job_table数据库用户名" }),
-      password: Type.String({ description: "job_table数据库密码" }),
-      dbName: Type.String({ description: "job_table数据库名" }),
-      tableName: Type.String({ description: "job_table中源数据所在的表名" }),
-      type: Type.Enum(JobTableType, { description: "job_table数据库类型", default: JobTableType.mariadb }),
-    }),
-
-    startIndex: Type.Integer({ description: "从哪个biJobIndex开始获取数据", default: 0 }),
+    startDate: Type.Optional(Type.String({ description: "从哪个时间点开始获取结束作业信息(ISO 8601)", format: "date-time" })),
     batchSize: Type.Integer({
-      description: "为了防止一次性获取太多数据占用过多内存，每次获取的任务信息数量。如果一次需要获取的信息超过这个数字，那么将会连续多次获取",
-      default: 100_000,
+      description: "为了防止一次性获取太多数据占用过多内存，将会限制一次获取的作业数量",
+      default: 10000,
     }),
 
     periodicFetch: Type.Object({
       enabled: Type.Boolean({ description:"是否默认打开", default: true }),
       cron: Type.String({ description: "获取信息的周期的cron表达式", default: "* * 1 * * *" }),
     }, { default: {} }),
-  }),
+  }, { default: {}, description: "获取作业功能的相关配置" }),
 
 
   jobChargeType: Type.String({ description: "对作业计费时，计费费用的的付款类型", default: "作业费用" }),

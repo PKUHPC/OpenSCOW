@@ -46,33 +46,33 @@ afterEach(async () => {
 });
 
 const mockOriginalJobData = (
-  biJobIndex: number, ua: UserAccount,
+  ua: UserAccount,
   tenantPrice: Decimal, accountPrice: Decimal,
-) => new JobInfo({
-  biJobIndex,
-  "idJob": 5119061,
+) => new JobInfo({ cluster: "pkuhpc", ...{
+  "jobId": 5119061,
   "account": ua.account.getProperty("accountName"),
   user: ua.user.getProperty("userId"),
   "partition": "C032M0128G",
-  "nodelist": "a5u15n01",
-  "jobName": "CoW",
-  "cluster": "pkuhpc",
-  "timeSubmit": new Date("2020-04-23T22:23:00.000Z"),
-  "timeStart": new Date("2020-04-23T22:25:12.000Z"),
-  "timeEnd": new Date("2020-04-23T23:18:02.000Z"),
-  "gpu": 0,
+  "nodeList": "a5u15n01",
+  "name": "CoW",
+  "state": "COMPLETED",
+  "workingDirectory": "",
+  "submitTime": "2020-04-23T22:23:00.000Z",
+  "startTime": "2020-04-23T22:25:12.000Z",
+  "endTime": "2020-04-23T23:18:02.000Z",
+  "gpusAlloc": 0,
   "cpusReq": 32,
-  "memReq": 124000,
+  "memReqMb": 124000,
   "nodesReq": 1,
   "cpusAlloc": 32,
-  "memAlloc": 124000,
+  "memAllocMb": 124000,
   "nodesAlloc": 1,
-  "timelimit": 7200,
-  "timeUsed": 3170,
+  "timeLimitMinutes": 7200,
+  "elapsedSeconds": 3170,
   "timeWait": 132,
   "qos": "normal",
   "recordTime": new Date("2020-04-23T23:49:50.000Z"),
-}, data.tenant.name, {
+} }, data.tenant.name, {
   tenant: { billingItemId: "", price: tenantPrice },
   account: { billingItemId: "", price: accountPrice },
 });
@@ -84,9 +84,9 @@ function createClient() {
 it("changes job prices", async () => {
   // insert jobs
   const jobs = [
-    mockOriginalJobData(1, data.uaAB, new Decimal(1), new Decimal(2)),
-    mockOriginalJobData(2, data.uaBB, new Decimal(2), new Decimal(4)),
-    mockOriginalJobData(3, data.uaAA, new Decimal(4), new Decimal(8)),
+    mockOriginalJobData(data.uaAB, new Decimal(1), new Decimal(2)),
+    mockOriginalJobData(data.uaBB, new Decimal(2), new Decimal(4)),
+    mockOriginalJobData(data.uaAA, new Decimal(4), new Decimal(8)),
   ];
 
   data.accountA.balance = new Decimal(100);
@@ -143,8 +143,8 @@ it("returns 10 jobs if pageSize is undefined or 0", async () => {
 
   const em = server.ext.orm.em.fork();
 
-  await em.persistAndFlush(range(1, 20).map((x) =>
-    mockOriginalJobData(x, data.uaAA, new Decimal(20), new Decimal(10))));
+  await em.persistAndFlush(range(1, 20).map((_) =>
+    mockOriginalJobData(data.uaAA, new Decimal(20), new Decimal(10))));
 
   const test = async (pageSize?: number) => {
     const client = createClient();
@@ -167,14 +167,14 @@ it("returns 10 jobs if pageSize is undefined or 0", async () => {
 it("returns jobs starting from start_bi_job_index", async () => {
   const em = server.ext.orm.em.fork();
 
-  await em.persistAndFlush(range(1, 20).map((x) =>
-    mockOriginalJobData(x, data.uaAA, new Decimal(20), new Decimal(10))));
+  await em.persistAndFlush(range(1, 20).map((_) =>
+    mockOriginalJobData(data.uaAA, new Decimal(20), new Decimal(10))));
 
-  await em.persistAndFlush(range(20, 40).map((x) =>
-    mockOriginalJobData(x, data.uaCC, new Decimal(20), new Decimal(10))));
+  await em.persistAndFlush(range(20, 40).map((_) =>
+    mockOriginalJobData(data.uaCC, new Decimal(20), new Decimal(10))));
 
-  await em.persistAndFlush(range(40, 60).map((x) =>
-    mockOriginalJobData(x, data.uaAB, new Decimal(20), new Decimal(10))));
+  await em.persistAndFlush(range(40, 60).map((_) =>
+    mockOriginalJobData(data.uaAB, new Decimal(20), new Decimal(10))));
 
   const client = createClient();
 
@@ -196,8 +196,8 @@ it("returns jobs starting from start_bi_job_index", async () => {
 it("returns 0 job if Accout not exist or is not in scope of permissions", async () => {
   const em = server.ext.orm.em.fork();
 
-  await em.persistAndFlush(range(1, 20).map((x) =>
-    mockOriginalJobData(x, data.uaAA, new Decimal(20), new Decimal(10))));
+  await em.persistAndFlush(range(1, 20).map((_) =>
+    mockOriginalJobData(data.uaAA, new Decimal(20), new Decimal(10))));
 
   const test = async (filter: JobFilter) => {
     const client = createClient();

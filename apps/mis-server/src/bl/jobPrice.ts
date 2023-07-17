@@ -11,14 +11,15 @@
  */
 
 import { Logger } from "@ddadaal/tsgrpc-server";
-import { ClusterConfigSchema } from "@scow/config/build/cluster";
+// import { ClusterConfigSchema } from "@scow/config/build/cluster";
 import { Decimal } from "@scow/lib-decimal";
+import { Partition } from "@scow/scheduler-adapter-protos/build/protos/config";
 import { JobInfo, PriceMap } from "src/bl/PriceMap";
 import { clusters } from "src/config/clusters";
 import { JobPriceInfo } from "src/entities/JobInfo";
 import { AmountStrategy, JobPriceItem } from "src/entities/JobPriceItem";
 
-type Partition = ClusterConfigSchema["slurm"]["partitions"][number];
+// type Partition = ClusterConfigSchema["slurm"]["partitions"][number];
 
 type AmountStrategyFunc = (info: JobInfo, partition: Partition) => Decimal;
 
@@ -37,14 +38,14 @@ const amountStrategyFuncs: Record<AmountStrategy, AmountStrategyFunc> = {
   },
   [AmountStrategy.MAX_CPUSALLOC_MEM]: (info, partition) => {
 
-    const { mem, cores } = partition;
+    const { memMb, cores } = partition;
     return Decimal.max(
       // 核心数
       info.cpusAlloc,
 
       // 申请内存总数/(分区内容/分区核心数)
       new Decimal(info.memReq).div(
-        new Decimal(mem).div(cores),
+        new Decimal(memMb).div(cores),
       ).integerValue(Decimal.ROUND_CEIL),
     );
   },
@@ -53,10 +54,11 @@ const amountStrategyFuncs: Record<AmountStrategy, AmountStrategyFunc> = {
 
 
 export function calculateJobPrice(
+  partitionsForClusters: Record<string, Partition[]>,
   info: JobInfo, getPriceItem: PriceMap["getPriceItem"],
   logger: Logger): JobPriceInfo {
 
-  logger.trace(`Calculating price for job ${info.biJobIndex}`);
+  logger.trace(`Calculating price for job ${info.jobId} in cluster ${info.cluster}`);
 
   const clusterInfo = clusters[info.cluster];
 
@@ -65,7 +67,7 @@ export function calculateJobPrice(
     return emptyJobPriceInfo();
   }
 
-  const partitionInfo = clusterInfo.slurm.partitions.find((x) => x.name === info.partition);
+  const partitionInfo = partitionsForClusters[info.cluster].find((x) => x.name === info.partition);
   if (!partitionInfo) {
     logger.warn(`Unknown partition ${info.partition} of cluster ${info.cluster}`);
     return emptyJobPriceInfo();

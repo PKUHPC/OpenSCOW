@@ -18,9 +18,7 @@ import { MySqlDriver } from "@mikro-orm/mysql";
 import { Decimal, decimalToMoney, numberToMoney } from "@scow/lib-decimal";
 import { AddBillingItemRequest, JobBillingItem, JobServiceClient } from "@scow/protos/build/server/job";
 import { createServer } from "src/app";
-import { calculateJobPrice } from "src/bl/jobPrice";
 import { createPriceMap } from "src/bl/PriceMap";
-import { clusterNameToScowClusterId } from "src/config/clusters";
 import { AmountStrategy, JobPriceItem } from "src/entities/JobPriceItem";
 import { Tenant } from "src/entities/Tenant";
 import { createPriceItems } from "src/tasks/createBillingItems";
@@ -240,28 +238,33 @@ it("adds billing item to another tenant", async () => {
 
 it("calculates price", async () => {
 
-  const priceMap = await createPriceMap(orm.em.fork(), server.logger);
+  const priceMap = await createPriceMap(orm.em.fork(), server.ext.clusters, server.logger);
 
 
   // obtain test data by running the following data in db
-  // eslint-disable-next-line
-  // select json_object('biJobIndex', bi_job_index, 'cluster', cluster, 'partition', `partition`, 'qos', qos, 'timeUsed', time_used, 'cpusAlloc', cpus_alloc, 'gpu', gpu, 'memReq', mem_req, 'memAlloc', mem_alloc, 'price', price) from job_info where cluster="未名生科一号" limit 20;
-  const testData = (await import("./testData.json")).default;
+  const testData = (await import("src/testData.json")).default;
 
   const wrongPrices = [] as {
-    biJobIndex: number;
     tenantPrice: { expected: number; actual: number | undefined };
     accountPrice: { expected: number; actual: number | undefined }
   }[];
 
   testData.forEach((t) => {
-    const price = calculateJobPrice({
-      ...t,
-      cluster: clusterNameToScowClusterId(t.cluster),
-    }, priceMap.getPriceItem, server.logger);
+    const price = priceMap.calculatePrice({
+      jobId: t.jobId,
+      cluster: t.cluster,
+      cpusAlloc: t.cpusAlloc,
+      gpu: t.gpusAlloc,
+      memAlloc: t.memAllocMb,
+      memReq: t.memReqMb,
+      partition: t.partition,
+      qos: t.qos,
+      timeUsed: t.elapsedSeconds,
+      account: t.account,
+      tenant: t.tenant,
+    });
     if (price.tenant?.price.toNumber() !== t.tenantPrice || price.account?.price.toNumber() !== t.accountPrice) {
       wrongPrices.push({
-        biJobIndex: t.biJobIndex,
         tenantPrice: { expected: t.tenantPrice, actual: price.tenant?.price.toNumber() },
         accountPrice: { expected: t.accountPrice, actual: price.account?.price.toNumber() },
       });
@@ -274,7 +277,7 @@ it("calculates price", async () => {
 
 it("gets missing price items in platform scope", async () => {
   {
-    const priceMap = await createPriceMap(orm.em.fork(), server.logger);
+    const priceMap = await createPriceMap(orm.em.fork(), server.ext.clusters, server.logger);
     expect(priceMap.getMissingDefaultPriceItems()).toBeArrayOfSize(0);
   }
 
@@ -288,7 +291,7 @@ it("gets missing price items in platform scope", async () => {
   }
 
   {
-    const priceMap = await createPriceMap(em.fork(), server.logger);
+    const priceMap = await createPriceMap(em.fork(), server.ext.clusters, server.logger);
     expect(priceMap.getMissingDefaultPriceItems())
       .toIncludeSameMembers(priceItemsToBeDeleted.map((x) => x.path.join(".")));
   }

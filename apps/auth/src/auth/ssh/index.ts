@@ -31,7 +31,7 @@ function checkLoginNode(sshConfig: SshConfigSchema) {
     }
     const clusterConfig = Object.values(clusters)[0];
 
-    loginNode = getLoginNode(clusterConfig.slurm.loginNodes[0]).address;
+    loginNode = getLoginNode(clusterConfig.loginNodes[0]).address;
 
     if (!loginNode) {
       throw new Error(`Cluster ${clusterConfig.displayName} has no login node.`);

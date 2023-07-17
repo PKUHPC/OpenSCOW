@@ -5,23 +5,6 @@ db:
   password: mysqlrootpassword
   dbName: scow_server_${JEST_WORKER_ID}
 
-fetchJobs:
-  db:
-    host: 127.0.0.1
-    port: 3307
-    user: root
-    password: jobtablepassword
-    dbName: jobs
-    tableName: jobs
-
-clusters:
-  hpc01:
-    ignore: true
-    slurm:
-      managerUrl: haha
-      dbPassword: password
-      associationTableName: user_association
-      scriptPath: /test/slurm.sh
 
 createUser:
   type: external
