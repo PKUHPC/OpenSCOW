@@ -20,7 +20,7 @@ const QuerystringSchema = Type.Object({
 
 const ResponsesSchema = Type.Object({
   200: Type.Object({
-    result: Type.Boolean({ description: "验证结果，ID和密码是否匹配" }),
+    success: Type.Boolean({ description: "验证结果，ID和密码是否匹配" }),
   }),
   404: Type.Null({ description: "用户ID不存在" }),
   501: Type.Null({ description: "此功能在当前服务器配置下不可用" }),
