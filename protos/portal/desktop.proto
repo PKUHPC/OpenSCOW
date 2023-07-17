@@ -17,7 +17,8 @@ package scow.portal;
 message CreateDesktopRequest {
   string user_id = 1;
   string cluster = 2;
-  string wm = 3;
+  string login_node = 3;
+  string wm = 4;
 }
 
 // NOT_FOUND: cluster is not found
@@ -32,7 +33,8 @@ message CreateDesktopResponse {
 message KillDesktopRequest {
   string user_id = 1;
   string cluster = 2;
-  uint32 display_id = 3;
+  string login_node = 3;
+  uint32 display_id = 4;
 }
 
 // NOT_FOUND: cluster is not found
@@ -41,7 +43,8 @@ message KillDesktopResponse {}
 message ConnectToDesktopRequest {
   string user_id = 1;
   string cluster = 2;
-  uint32 display_id = 3;
+  string login_node = 3;
+  uint32 display_id = 4;
 }
 
 // NOT_FOUND: cluster is not found
@@ -54,15 +57,23 @@ message ConnectToDesktopResponse {
 message ListUserDesktopsRequest {
   string user_id = 1;
   string cluster = 2;
+  // 不指定login_node则返回该集群下所有login_node的desktop
+  optional string login_node = 3;
 }
 
-// NOT_FOUND: cluster is not found
-message ListUserDesktopsResponse {
+message UserDesktops {
   string host = 1;
   repeated uint32 display_ids = 2;
 }
 
-message ListAvailableWmsRequest {}
+// NOT_FOUND: cluster is not found
+message ListUserDesktopsResponse {
+  repeated UserDesktops user_desktops = 1;
+}
+
+message ListAvailableWmsRequest {
+  string cluster = 1;
+}
 
 message AvailableWm {
   string name = 1;

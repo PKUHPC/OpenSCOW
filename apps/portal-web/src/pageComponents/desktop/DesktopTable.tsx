@@ -12,7 +12,7 @@
 
 import { PlusOutlined } from "@ant-design/icons";
 import { queryToString } from "@scow/lib-web/build/utils/querystring";
-import { Button, Form, Table } from "antd";
+import { Button, Form, Select, Table } from "antd";
 import { ColumnsType } from "antd/es/table";
 import { useRouter } from "next/router";
 import React, { useCallback } from "react";
@@ -25,11 +25,13 @@ import { ModalButton } from "src/components/ModalLink";
 import { DesktopTableActions } from "src/pageComponents/desktop/DesktopTableActions";
 import { NewDesktopTableModal } from "src/pageComponents/desktop/NewDesktopTableModal";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
-import { publicConfig } from "src/utils/config";
+import { LoginNodeStore } from "src/stores/LoginNodeStore";
+import { Cluster, publicConfig } from "src/utils/config";
 
 const NewDesktopTableModalButton = ModalButton(NewDesktopTableModal, { type: "primary", icon: <PlusOutlined /> });
 
 interface Props {
+  loginDesktopEnabledClusters: Cluster[]
 }
 
 export type DesktopItem = {
@@ -37,24 +39,40 @@ export type DesktopItem = {
   addr: string,
 }
 
-export const DesktopTable: React.FC<Props> = () => {
+export const DesktopTable: React.FC<Props> = ({ loginDesktopEnabledClusters }) => {
 
   const router = useRouter();
 
   const defaultClusterStore = useStore(DefaultClusterStore);
 
+  const loginNodes = useStore(LoginNodeStore);
+
   const clusterQuery = queryToString(router.query.cluster);
-  const cluster = publicConfig.CLUSTERS.find((x) => x.id === clusterQuery) ?? defaultClusterStore.cluster;
+  const loginQuery = queryToString(router.query.loginNode);
+
+  // 如果默认集群没开启登录节点桌面功能，则取开启此功能的某一集群为默认集群。
+  const defaultCluster = loginDesktopEnabledClusters.includes(defaultClusterStore.cluster)
+    ? defaultClusterStore.cluster
+    : loginDesktopEnabledClusters[0];
+  const cluster = publicConfig.CLUSTERS.find((x) => x.id === clusterQuery) ?? defaultCluster;
+
+  const loginNode = loginNodes[cluster.id].find((x) => x.name === loginQuery) ?? undefined;
+
 
   const { data, isLoading, reload } = useAsync({
     promiseFn: useCallback(async () => {
       // List all desktop
-      const result = await api.listDesktops({ query: { cluster: cluster.id } });
-
-      return result.displayId.map((x) => ({ desktopId: x, addr: result.host }));
-
-    }, [cluster]),
+      const { userDesktops } = await api.listDesktops({
+        query: { cluster: cluster.id, loginNode: loginNode?.address },
+      });
+      return userDesktops.map(
+        (userDesktop) => userDesktop.displayId.map(
+          (x) => ({ desktopId: x, addr: userDesktop.host }),
+        ),
+      ).flat();
+    }, [cluster, loginNode]),
   });
+
 
   const columns: ColumnsType<DesktopItem> = [
     {
@@ -68,6 +86,9 @@ export const DesktopTable: React.FC<Props> = () => {
       dataIndex: "addr",
       key: "addr",
       width: "30%",
+      render: (addr: string) => {
+        return loginNodes[cluster.id].find((x) => x.address === addr)?.name || addr;
+      },
     },
     {
       title: "操作",
@@ -78,6 +99,7 @@ export const DesktopTable: React.FC<Props> = () => {
       ),
     },
   ];
+
   return (
     <div>
       <FilterFormContainer>
@@ -88,7 +110,30 @@ export const DesktopTable: React.FC<Props> = () => {
               onChange={(x) => {
                 router.push({ query: { cluster: x.id } });
               }}
+              clusters={loginDesktopEnabledClusters}
             />
+          </Form.Item>
+          <Form.Item label="登录节点">
+            <Select
+              allowClear
+              style={{ minWidth: 100 }}
+              value={loginNode?.name}
+              onChange={(x) => {
+                const nextLoginQuery = x
+                  ? loginNodes[cluster.id].find((loginNode) => loginNode.address === x)?.name
+                  : undefined;
+                router.push({ query: nextLoginQuery
+                  ? {
+                    cluster: cluster.id,
+                    loginNode: nextLoginQuery,
+                  }
+                  : { cluster : cluster.id } });
+              }}
+              options={loginNodes[cluster.id].map((loginNode) => ({
+                label: loginNode.name, value: loginNode.address,
+              }))}
+            >
+            </Select>
           </Form.Item>
           <Form.Item>
             <Button onClick={reload} loading={isLoading}>
@@ -96,7 +141,7 @@ export const DesktopTable: React.FC<Props> = () => {
             </Button>
           </Form.Item>
           <Form.Item>
-            <NewDesktopTableModalButton reload={reload} cluster={cluster}>
+            <NewDesktopTableModalButton reload={reload} cluster={cluster} loginNodes={loginNodes[cluster.id]}>
               新建桌面
             </NewDesktopTableModalButton>
           </Form.Item>

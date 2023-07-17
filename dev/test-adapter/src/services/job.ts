@@ -12,11 +12,24 @@
 
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { JobServiceServer, JobServiceService } from "@scow/scheduler-adapter-protos/build/protos/job";
+import { clusterId } from "src/config/cluster";
+import testData from "src/testData.json";
 
 export const jobServiceServer = plugin((server) => {
   server.addService<JobServiceServer>(JobServiceService, {
     getJobs: async () => {
-      return [{ jobs: []}];
+      return [{
+        jobs: testData.filter((x) => x.cluster === clusterId)
+          .map(({ tenant, tenantPrice, accountPrice, cluster, ...rest }) => {
+            return {
+              ...rest,
+              state: "COMPLETED",
+              workingDirectory: "",
+            };
+          }),
+        // set this field for test
+        totalCount : 20,
+      }];
     },
 
     getJobById: async () => {

@@ -27,11 +27,10 @@ import { NavItemProps } from "@scow/lib-web/build/layouts/base/types";
 import { NavIcon } from "@scow/lib-web/build/layouts/icon";
 import { join } from "path";
 import { User } from "src/stores/UserStore";
-import { Cluster, publicConfig } from "src/utils/config";
-
+import { Cluster, LoginNode, publicConfig } from "src/utils/config";
 export const userRoutes: (
-  user: User | undefined, defaultCluster: Cluster,
-) => NavItemProps[] = (user, defaultCluster) => {
+  user: User | undefined, defaultCluster: Cluster, LoginNodes: Record<string, LoginNode[]>
+) => NavItemProps[] = (user, defaultCluster, loginNodes) => {
 
   if (!user) { return []; }
 
@@ -73,7 +72,8 @@ export const userRoutes: (
       Icon: MacCommandOutlined,
       text: "Shell",
       path: "/shell",
-      clickToPath: join(publicConfig.BASE_PATH, "shell", defaultCluster.id),
+      clickToPath:
+        join(publicConfig.BASE_PATH, "shell", defaultCluster.id, loginNodes[defaultCluster.id]?.[0]?.name),
       openInNewPage: true,
       clickable: true,
       children: publicConfig.CLUSTERS.map(({ name, id }) => ({
@@ -81,6 +81,13 @@ export const userRoutes: (
         Icon: CloudServerOutlined,
         text: name,
         path: `/shell/${id}`,
+        clickToPath: join(publicConfig.BASE_PATH, "shell", id, loginNodes[id]?.[0]?.name),
+        children: loginNodes[id]?.map((loginNode) => ({
+          openInNewPage: true,
+          Icon: CloudServerOutlined,
+          text: loginNode.name,
+          path: `/shell/${id}/${loginNode.name}`,
+        })),
       } as NavItemProps)),
     } as NavItemProps] : []),
     ...(publicConfig.ENABLE_LOGIN_DESKTOP ? [{

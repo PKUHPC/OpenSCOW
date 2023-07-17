@@ -24,7 +24,7 @@ export function validatePayload <TSchema extends ZodRawShape>(
 
   const parsed = schema.safeParse(payload);
   if (!parsed.success) {
-    res.status(400).send(parsed.error.message);
+    res.status(400).send("Invalid requeset value");
     return undefined;
   }
   return parsed.data;
