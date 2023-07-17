@@ -14,7 +14,7 @@ import { FastifyInstance } from "fastify";
 import { AuthProvider } from "src/auth/AuthProvider";
 import { createUser } from "src/auth/ldap/createUser";
 import { findUser, useLdap } from "src/auth/ldap/helpers";
-import { modifyPasswordAsSelf } from "src/auth/ldap/password";
+import { checkPasswordForAnyone, modifyPasswordForAnyone } from "src/auth/ldap/password";
 import { registerPostHandler } from "src/auth/ldap/postHandler";
 import { serveLoginHtml } from "src/auth/loginHtml";
 import { registerOtpBindPostHandler } from "src/auth/otp";
@@ -37,15 +37,24 @@ export const createLdapAuthProvider = (f: FastifyInstance) => {
     createUser: ldap.addUser ? async (info, req) => {
       return createUser(info, req, ldap as RequiredBy<LdapConfigSchema, "addUser">);
     } : undefined,
-    changePassword: async (id, oldPassword, newPassword, req) => {
+    checkPassword: async (id, password, req) => {
       return useLdap(req.log, ldap)(async (client) => {
         const user = await findUser(req.log, ldap, client, id);
         if (!user) {
           return "NotFound";
         }
-
-        const result = await modifyPasswordAsSelf(req.log, ldap, user.dn, oldPassword, newPassword);
-        return result ? "OK" : "WrongOldPassword";
+        const result = await checkPasswordForAnyone(req.log, ldap, user.dn, password);
+        return result ? "Match" : "NotMatch";
+      });
+    },
+    changePassword: async (id, newPassword, req) => {
+      return useLdap(req.log, ldap)(async (client) => {
+        const user = await findUser(req.log, ldap, client, id);
+        if (!user) {
+          return "NotFound";
+        }
+        await modifyPasswordForAnyone(req.log, ldap, user.dn, newPassword);
+        return "OK";
       });
     },
   };
