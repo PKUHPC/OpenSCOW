@@ -24,7 +24,6 @@ import { JobInfo } from "src/entities/JobInfo";
 import { UserAccount } from "src/entities/UserAccount";
 import { ClusterPlugin } from "src/plugins/clusters";
 import { PricePlugin } from "src/plugins/price";
-import testData from "src/testData.json";
 
 async function getLatestDate(em: SqlEntityManager, logger: Logger) {
 
@@ -163,24 +162,6 @@ export async function fetchJobs(
 
     return result;
   };
-
-  if (!process.env.SCOW_CONFIG_PATH && process.env.NODE_ENV !== "production") {
-    const jobsInfo: ({cluster: string} & ClusterJobInfo)[] = [];
-    // data for test
-    jobsInfo.push(...testData.map(({ tenant, accountPrice, tenantPrice, ...rest }) => {
-      return {
-        ...rest,
-        state: "COMPLETED",
-        workingDirectory: "",
-      };
-    }));
-
-    const savedJobsCount = await persistJobAndCharge(jobsInfo);
-    logger.info(`Completed. Saved ${savedJobsCount} new info.`);
-    lastFetched = new Date();
-    return { newJobsCount: jobsInfo.length };
-  }
-
 
   try {
     const latestDate = await getLatestDate(em, logger);
