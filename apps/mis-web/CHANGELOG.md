@@ -1,5 +1,29 @@
 # @scow/mis-web
 
+## 0.8.0
+
+### Minor Changes
+
+- 5b7f0e88f: 重构 scow，对接调度器适配器接口
+
+### Patch Changes
+
+- 9da6fb5bc: 修复账户管理租户管理未结束作业查询结果不正确的问题，修复未结束作业批量搜索账户条件带入精确搜索中的问题
+- bbbb040c9: 用户不属于任何一个账户时仪表盘不展示未完成作业列表
+- 4c71a2a4b: 账户充值和租户充值允许负数
+- d668f50ff: 租户管理历史作业页面打开时作业结束时间的查询时分秒修改为 00:00:00-23:59:59
+- 7d2ac2666: 修复平台信息页面角色权限校验错误问题
+- 7a9973aa0: 修改 HTTP API 定义方式，去除生成 api-routes-schemas.json 步骤
+- 4a7229dbd: 修复集群和分区信息展示界面中核心数、gpu 数、内存量展示为分区总数的问题
+- Updated dependencies [5b7f0e88f]
+- Updated dependencies [62083044e]
+- Updated dependencies [a90e34b30]
+- Updated dependencies [5c3c63657]
+- Updated dependencies [e97eb22fd]
+  - @scow/protos@0.3.0
+  - @scow/config@0.4.0
+  - @scow/lib-web@0.3.4
+
 ## 0.7.0
 
 ### Patch Changes

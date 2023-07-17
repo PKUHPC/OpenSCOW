@@ -1,5 +1,13 @@
 # @scow/lib-slurm
 
+## 0.1.6
+
+### Patch Changes
+
+- Updated dependencies [5b7f0e88f]
+  - @scow/protos@0.3.0
+  - @scow/lib-ssh@0.4.0
+
 ## 0.1.5
 
 ### Patch Changes
