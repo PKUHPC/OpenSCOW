@@ -20,7 +20,6 @@ export const ChangePasswordSchema = typeboxRouteSchema({
   method: "PATCH",
 
   body: Type.Object({
-    oldPassword: Type.String(),
     newPassword: Type.String(),
   }),
 
@@ -36,9 +35,6 @@ export const ChangePasswordSchema = typeboxRouteSchema({
 
     /** 用户未找到 */
     404: Type.Null(),
-
-    /** 密码不正确 */
-    412: Type.Null(),
 
     /** 本功能在当前配置下不可用。 */
     501: Type.Null(),
