@@ -3,6 +3,7 @@
   "version": "1.0.1",
   "description": "",
   "main": "build/index.js",
+  "private": true,
   "scripts": {
     "generate": "rimraf generated && buf generate --template buf.gen.yaml https://github.com/googleapis/googleapis.git#subdir=google/rpc",
     "build": "rimraf build && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
