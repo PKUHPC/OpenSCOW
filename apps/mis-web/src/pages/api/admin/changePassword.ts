@@ -25,7 +25,6 @@ export const ChangePasswordAsPlatformAdminSchema = typeboxRouteSchema({
 
   body: Type.Object({
     identityId: Type.String(),
-    oldPassword: Type.String(),
     /**
      * @pattern ^(?=.*\d)(?=.*[a-zA-Z])(?=.*[`~!@#\$%^&*()_+\-[\];',./{}|:"<>?]).{8,}$
      */
@@ -40,9 +39,6 @@ export const ChangePasswordAsPlatformAdminSchema = typeboxRouteSchema({
 
     /** 用户未找到 */
     404: Type.Null(),
-
-    /** 密码不正确 */
-    412: Type.Null(),
 
     /** 本功能在当前配置下不可用。 */
     501: Type.Null(),
