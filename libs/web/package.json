@@ -21,14 +21,18 @@
     "nookies": "2.5.2"
   },
   "peerDependencies": {
-    "antd": "5.6.4",
+    "antd": "5.7.0",
     "next": "13.4.10",
     "styled-components": "6.0.4",
     "@ant-design/icons": "5.1.4",
-    "dayjs": "1.11.9"
+    "dayjs": "1.11.9",
+    "react": ">=18.2.0",
+    "react-dom": ">=18.2.0",
+    "react-is": "18.2.0",
+    "nookies": "2.5.2"
   },
   "devDependencies": {
-    "antd": "5.6.4",
+    "antd": "5.7.0",
     "next": "13.4.10",
     "styled-components": "6.0.4",
     "@grpc/grpc-js": "1.8.18",

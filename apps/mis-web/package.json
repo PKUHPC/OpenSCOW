@@ -36,7 +36,7 @@
     "@scow/lib-web": "workspace:*",
     "@scow/utils": "workspace:*",
     "@sinclair/typebox": "0.29.4",
-    "antd": "5.6.4",
+    "antd": "5.7.0",
     "dayjs": "1.11.9",
     "google-protobuf": "3.21.2",
     "less": "4.1.3",

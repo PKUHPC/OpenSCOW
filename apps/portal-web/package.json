@@ -47,7 +47,7 @@
     "@ant-design/cssinjs": "1.11.2",
     "@uiw/codemirror-theme-github": "4.21.7",
     "@uiw/react-codemirror": "4.21.7",
-    "antd": "5.6.4",
+    "antd": "5.7.0",
     "busboy": "1.6.0",
     "dayjs": "1.11.9",
     "google-protobuf": "3.21.2",
