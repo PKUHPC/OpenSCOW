@@ -14,7 +14,7 @@ import { FastifyInstance } from "fastify";
 import { AuthProvider } from "src/auth/AuthProvider";
 import { createUser } from "src/auth/ldap/createUser";
 import { findUser, useLdap } from "src/auth/ldap/helpers";
-import { checkPasswordForAnyone, modifyPasswordForAnyone } from "src/auth/ldap/password";
+import { checkPassword, modifyPassword } from "src/auth/ldap/password";
 import { registerPostHandler } from "src/auth/ldap/postHandler";
 import { serveLoginHtml } from "src/auth/loginHtml";
 import { registerOtpBindPostHandler } from "src/auth/otp";
@@ -43,7 +43,7 @@ export const createLdapAuthProvider = (f: FastifyInstance) => {
         if (!user) {
           return "NotFound";
         }
-        const result = await checkPasswordForAnyone(req.log, ldap, user.dn, password);
+        const result = await checkPassword(req.log, ldap, user.dn, password);
         return result ? "Match" : "NotMatch";
       });
     },
@@ -53,7 +53,7 @@ export const createLdapAuthProvider = (f: FastifyInstance) => {
         if (!user) {
           return "NotFound";
         }
-        await modifyPasswordForAnyone(req.log, ldap, user.dn, newPassword);
+        await modifyPassword(req.log, ldap, user.dn, newPassword);
         return "OK";
       });
     },
