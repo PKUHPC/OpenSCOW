@@ -1,5 +1,5 @@
 ---
-"@scow/lib-auth": major
+"@scow/lib-auth": minor
 "@scow/auth": minor
 "@scow/docs": minor
 ---
