@@ -1,5 +1,22 @@
 # @scow/auth
 
+## 0.8.0
+
+### Minor Changes
+
+- 5b7f0e88f: 重构 scow，对接调度器适配器接口
+
+### Patch Changes
+
+- e97eb22fd: 集群配置登录节点新增节点展示名
+- 7a9973aa0: 修改 HTTP API 定义方式，去除生成 api-routes-schemas.json 步骤
+- Updated dependencies [5b7f0e88f]
+- Updated dependencies [62083044e]
+- Updated dependencies [5c3c63657]
+- Updated dependencies [e97eb22fd]
+  - @scow/config@0.4.0
+  - @scow/lib-ssh@0.4.0
+
 ## 0.7.0
 
 ### Patch Changes
