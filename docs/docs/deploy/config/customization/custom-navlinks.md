@@ -134,6 +134,36 @@ navLinks:
 | `allowedRoles`            |  用户角色字符串列表    | `mis`             |否           | 管理系统指定可以看到该导航链接的角色列表，用户角色类型包括  `user`, `accountUser`, `accountAdmin`, `accountOwner`, `tenantFinance`, `tenantAdmin`, `platformAdmin`, `platformFinance` （用户角色详解请看下方角色配置说明）。如果没有指定，则不再限定用户角色，即所有用户都可以看到该导航链接。  |
 | `children`                |  导航内容的列表    | `portal`，`mis`   | 否          | 二级导航列表，内容包括该系统下一级导航的所有内容，除`url`以外，内容类型以及是否必填与一级导航内容完全相同，但是不允许再继续设置chilidren，不允许继续添加三级导航。如果没有指定，则没有可以显示的二级导航链接。    |
 
+:::note
+
+关于导航链接地址`url`的配置，与`HTML`标签的默认行为一致，以`http://`或者`https://`开头的`url`会自动被识别为外部路径。点击该导航栏时，会按照与`url`中填写的完全一致的路径进行跳转。
+
+如果`url`中配置的链接地址是以`/`开头，或者没有以`http://`，`https://`开头，则会被系统识别为内部路径。这时点击该导航栏跳转时，将根据已配置的[自定义相对路径](./basepath.md)自动添加相对路径前缀。
+
+示例：
+
+```yaml title="config/portal.yaml"
+  navLinks:
+  - text: "导航测试"
+    children:
+      - text: "子导航1"
+        url: "http://www.navtest1.com"
+      - text: "子导航2"
+        url: "www.navtest2.com"
+      - text: "子导航3"
+        url: "/www.navtest3.com"
+```
+
+假设我们的系统部署在`https://scowtest.com`下,管理员配置的相对路径为`/scow`。
+
+那么按照上述自定义导航配置示例，点击`导航测试`时，会按照次级导航的第一个链接`http://www.navtest1.com?token={用来跟踪登录用户的状态的token}`进行跳转。与点击`子导航1`的跳转动作一致。
+
+点击`子导航2`时，`url`会被识别为内部路径，将会拼接相对路径前缀和`/`，按照`https://scowtest.com/scow/www.navtest2.com?token={用来跟踪登录用户的状态的token}`进行跳转。
+
+点击`子导航3`时，`url`同样会被识别为内部路径，将会拼接相对路径前缀，按照`https://scowtest.com/scow/www.navtest3.com?token={用来跟踪登录用户的状态的token}`进行跳转。
+
+:::
+
 ### 自定义图标配置说明
 
 系统支持自定义导航链接的灵活图标配置。
