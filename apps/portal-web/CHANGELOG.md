@@ -1,5 +1,13 @@
 # @scow/portal-web
 
+## 0.8.1
+
+### Patch Changes
+
+- a978233fe: 修复 antd 主题没有应用完全的问题
+- Updated dependencies [a978233fe]
+  - @scow/lib-web@0.3.5
+
 ## 0.8.0
 
 ### Minor Changes

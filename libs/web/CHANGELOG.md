@@ -1,5 +1,11 @@
 # @scow/lib-web
 
+## 0.3.5
+
+### Patch Changes
+
+- a978233fe: 修复 antd 主题没有应用完全的问题
+
 ## 0.3.4
 
 ### Patch Changes
