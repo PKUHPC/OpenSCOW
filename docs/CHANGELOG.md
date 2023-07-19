@@ -1,5 +1,20 @@
 # @scow/docs
 
+## 0.6.0
+
+### Minor Changes
+
+- 5b7f0e88f: 重构 scow，对接调度器适配器接口
+- 5c3c63657: 实现登录节点桌面功能以及 TurboVNC 的安装路径在每个集群中单独配置
+
+### Patch Changes
+
+- b6a02e4ae: 补充 vagrant 初始化部署的文档
+- 6b6f08ac7: 修正文档部分交互式应用配置更新内的关联链接错误
+- 1840515c3: 暴露 gateway 的环境变量 extra，可增加 nginx 的 server 配置
+- e97eb22fd: 集群配置登录节点新增节点展示名
+- 7a9973aa0: 修改 HTTP API 定义方式，去除生成 api-routes-schemas.json 步骤
+
 ## 0.5.0
 
 ### Minor Changes

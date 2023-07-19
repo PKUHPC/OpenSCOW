@@ -1,5 +1,18 @@
 # @scow/grpc-api
 
+## 0.5.0
+
+### Minor Changes
+
+- 5b7f0e88f: 重构 scow，对接调度器适配器接口
+- 5c3c63657: ListAvailableWms 新增传参集群 ID
+- 6853606f8: shell 和桌面相关接口增加 login_node 参数
+
+### Patch Changes
+
+- 99e2b08e1: 创建交互式应用, 新增节点数，gpu 卡数及总内存传参
+- 62083044e: 修改了 GetAppMetadata，ListAvailableApps，CreateAppSession 及 ListAppSessions 以满足增加集群查询参数，作业名，应用名及应用图标配置路径
+
 ## 0.4.1
 
 ### Patch Changes
