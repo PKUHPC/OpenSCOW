@@ -27,7 +27,7 @@ import { TableTitle } from "src/components/TableTitle";
 import { HistoryJobDrawer } from "src/pageComponents/job/HistoryJobDrawer";
 import type { GetJobInfoSchema } from "src/pages/api/job/jobInfo";
 import type { Cluster } from "src/utils/config";
-import { publicConfig } from "src/utils/config";
+import { getClusterName, publicConfig } from "src/utils/config";
 import { moneyToString, nullableMoneyToString } from "src/utils/money";
 
 interface FilterForm {
@@ -285,7 +285,11 @@ export const JobInfoTable: React.FC<JobInfoTableProps> = ({
             <Table.Column<JobInfo> dataIndex="user" title="用户" />
           ) : undefined
         }
-        <Table.Column<JobInfo> dataIndex="cluster" title="集群名" />
+        <Table.Column<JobInfo>
+          dataIndex="cluster"
+          title="集群名"
+          render={getClusterName}
+        />
         <Table.Column<JobInfo> dataIndex="partition" title="分区" />
         <Table.Column<JobInfo> dataIndex="qos" title="QOS" />
         <Table.Column<JobInfo> dataIndex="jobName" title="作业名" />

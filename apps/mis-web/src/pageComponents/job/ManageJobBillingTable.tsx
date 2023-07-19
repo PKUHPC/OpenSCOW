@@ -20,6 +20,7 @@ import { CommonModalProps, ModalLink } from "src/components/ModalLink";
 import { AmountStrategy, AmountStrategyAlgorithmDescriptions,
   AmountStrategyDescription,
   AmountStrategyDescriptions, AmountStrategyText } from "src/models/job";
+import { getClusterName } from "src/utils/config";
 import { moneyToString } from "src/utils/money";
 
 interface Props {
@@ -106,7 +107,7 @@ export const ManageJobBillingTable: React.FC<Props> = ({ data, loading, tenant, 
         </Space>
       )}
       >
-        <Table.Column title="集群" dataIndex={"cluster"} />
+        <Table.Column title="集群" dataIndex={"cluster"} render={getClusterName} />
         <Table.Column title="分区" dataIndex={"partition"} />
         <Table.Column title="QOS" dataIndex={"qos"} />
       </Table.ColumnGroup>
@@ -217,7 +218,7 @@ const EditPriceModal: React.FC<CommonModalProps & {
           <strong>{tenant ? ("租户" + tenant) : "平台"}</strong>
         </Form.Item>
         <Form.Item label="计费项">
-          集群 <strong>{cluster}</strong>，分区 <strong>{partition}</strong>，QOS <strong>{qos}</strong>
+          集群 <strong>{getClusterName(cluster)}</strong>，分区 <strong>{partition}</strong>，QOS <strong>{qos}</strong>
         </Form.Item>
         <Form.Item label="新计费价格编号">
           <strong>{nextId}</strong>
