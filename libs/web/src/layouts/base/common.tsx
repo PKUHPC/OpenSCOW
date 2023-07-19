@@ -24,6 +24,7 @@ export const iconToNode = (Icon: any) => {
     : <Icon />;
 };
 
+const EXTERNAL_URL_PREFIX = ["http://", "https://"];
 
 export function createMenuItems(
   routes: NavItemProps[],
@@ -43,7 +44,8 @@ export function createMenuItems(
             if (route.openInNewPage) {
               window.open(target);
             } else {
-              Router.push(target);
+              EXTERNAL_URL_PREFIX.some((pref) => target.startsWith(pref))
+                ? window.open(target) : Router.push(target);
             }
           }
           : undefined,
