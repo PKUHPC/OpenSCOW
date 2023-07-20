@@ -1,6 +1,6 @@
 {
   "name": "@scow/lib-ssh",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "",
   "main": "build/index.js",
   "private": true,
@@ -19,7 +19,7 @@
   },
   "devDependencies": {
     "@types/shell-quote": "1.7.1",
-    "@types/ssh2": "1.11.11",
+    "@types/ssh2": "1.11.13",
     "ts-log": "2.2.5"
   },
   "author": "PKUHPC (https://github.com/PKUHPC)",

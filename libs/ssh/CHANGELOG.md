@@ -1,5 +1,11 @@
 # @scow/lib-ssh
 
+## 0.4.0
+
+### Minor Changes
+
+- 5b7f0e88f: 重构 scow，对接调度器适配器接口
+
 ## 0.3.0
 
 ### Minor Changes
