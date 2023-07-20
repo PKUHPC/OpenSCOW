@@ -15,6 +15,7 @@ import { Logger } from "@ddadaal/tsgrpc-server";
 import { QueryOrder } from "@mikro-orm/core";
 import { SqlEntityManager } from "@mikro-orm/mysql";
 import { parsePlaceholder } from "@scow/lib-config";
+import { decimalToMoney } from "@scow/lib-decimal";
 import { GetJobsResponse, JobInfo as ClusterJobInfo } from "@scow/scheduler-adapter-protos/build/protos/job";
 import { addJobCharge, charge } from "src/bl/charging";
 import { emptyJobPriceInfo } from "src/bl/jobPrice";
@@ -23,6 +24,7 @@ import { Account } from "src/entities/Account";
 import { JobInfo } from "src/entities/JobInfo";
 import { UserAccount } from "src/entities/UserAccount";
 import { ClusterPlugin } from "src/plugins/clusters";
+import { callHook } from "src/plugins/hookClient";
 import { PricePlugin } from "src/plugins/price";
 
 async function getLatestDate(em: SqlEntityManager, logger: Logger) {
@@ -151,6 +153,13 @@ export async function fetchJobs(
           }, em, logger, clusterPlugin);
 
           await addJobCharge(ua, x.accountPrice, clusterPlugin, logger);
+          await callHook("jobPaid", {
+            ...x,
+            tenant: accountTenantMap.get(x.account),
+            accountPrice: decimalToMoney(x.accountPrice),
+            tenantPrice: decimalToMoney(x.tenantPrice),
+            comment,
+          }, logger);
         }
       }
 
