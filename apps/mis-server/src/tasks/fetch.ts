@@ -159,6 +159,7 @@ export async function fetchJobs(
             accountPrice: decimalToMoney(x.accountPrice),
             tenantPrice: decimalToMoney(x.tenantPrice),
             comment,
+            jobId: x.idJob,
           }, logger);
         }
       }
