@@ -27,7 +27,6 @@
     "@scow/config": "workspace:*",
     "@scow/lib-config": "workspace:*",
     "@scow/lib-server": "workspace:*",
-    "@scow/lib-slurm": "workspace:*",
     "@scow/lib-ssh": "workspace:*",
     "@scow/protos": "workspace:*",
     "@scow/scheduler-adapter-protos": "workspace:*",

@@ -30,6 +30,7 @@ export const RunningJob = Type.Object({
   nodesOrReason: Type.String(),
   account: Type.String(),
   cores: Type.String(),
+  gpus: Type.String(),
   qos: Type.String(),
   submissionTime: Type.String(),
   /**
