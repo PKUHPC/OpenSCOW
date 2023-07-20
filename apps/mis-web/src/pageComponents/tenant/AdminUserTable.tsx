@@ -16,9 +16,9 @@ import { App, Button, Divider, Form, Input, Space, Table } from "antd";
 import React, { useMemo, useState } from "react";
 import { api } from "src/apis";
 import { ChangePasswordModalLink } from "src/components/ChangePasswordModal";
-import { FilterFormContainer } from "src/components/FilterFormContainer";
+import { FilterFormContainer, FilterFormTabs } from "src/components/FilterFormContainer";
 import { TenantRoleSelector } from "src/components/TenantRoleSelector";
-import { FullUserInfo } from "src/models/User";
+import { FullUserInfo, TenantRole } from "src/models/User";
 import { GetTenantUsersSchema } from "src/pages/api/admin/getTenantUsers";
 import { User } from "src/stores/UserStore";
 
@@ -33,13 +33,11 @@ interface FilterForm {
   idOrName: string | undefined;
 }
 
-
 export const AdminUserTable: React.FC<Props> = ({
   data, isLoading, reload, user,
 }) => {
 
   const { message } = App.useApp();
-
   const [form] = Form.useForm<FilterForm>();
 
   const [query, setQuery] = useState<FilterForm>({
@@ -50,9 +48,36 @@ export const AdminUserTable: React.FC<Props> = ({
     (!query.idOrName || x.id.includes(query.idOrName) || x.name.includes(query.idOrName))
   )) : undefined, [data, query]);
 
+  const [rangeSearchRole, setRangeSearchRole] = useState<string>("ALL_USERS");
+
+  const allUsersCounts = data ? data.results.length : 0;
+  const tenantAdminCounts = data ?
+    data.results.filter(
+      (user) => user.tenantRoles.includes(TenantRole.TENANT_ADMIN)).length : 0;
+  const tenantFinanceCounts = data ?
+    data.results.filter(
+      (user) => user.tenantRoles.includes(TenantRole.TENANT_FINANCE)).length : 0;
+
+  const setFilteredData = (rangeSearchRole) => {
+    if (filteredData) {
+      switch (rangeSearchRole) {
+      case "ALL_USERS":
+        return filteredData;
+      case "TENANT_ADMIN":
+        return filteredData.filter((user) =>
+          user.tenantRoles.includes(TenantRole.TENANT_ADMIN));
+      case "TENANT_FINANCE":
+        return filteredData.filter((user) =>
+          user.tenantRoles.includes(TenantRole.TENANT_FINANCE));
+      default:
+        return filteredData;
+      }
+    }
+  };
+
   return (
     <div>
-      <FilterFormContainer>
+      <FilterFormContainer style={{ display: "flex", justifyContent: "space-between" }}>
         <Form<FilterForm>
           layout="inline"
           form={form}
@@ -68,10 +93,18 @@ export const AdminUserTable: React.FC<Props> = ({
             <Button type="primary" htmlType="submit">搜索</Button>
           </Form.Item>
         </Form>
+        <FilterFormTabs
+          tabs={[
+            { title: `所有用户(${allUsersCounts})`, key: "All_USERS" },
+            { title: `租户管理员(${tenantAdminCounts})`, key: "TENANT_ADMIN" },
+            { title: `财务人员(${tenantFinanceCounts})`, key: "TENANT_FINANCE" },
+          ]}
+          onChange={(value) => setRangeSearchRole(value)}
+        />
       </FilterFormContainer>
 
       <Table
-        dataSource={filteredData}
+        dataSource={rangeSearchRole ? setFilteredData(rangeSearchRole) : filteredData}
         loading={isLoading}
         pagination={{ showSizeChanger: true }}
         rowKey="id"

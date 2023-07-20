@@ -45,13 +45,13 @@ export const platformAdminRoutes: (platformRoles: PlatformRole[]) => NavItemProp
         },
         {
           Icon: CloudServerOutlined,
-          text: "平台租户管理",
+          text: "租户管理",
           path: "/admin/tenants",
           clickToPath: "/admin/tenants/list",
           children: [
             {
               Icon: UserOutlined,
-              text: "平台租户列表",
+              text: "租户列表",
               path: "/admin/tenants/list",
             },
             {
@@ -63,7 +63,7 @@ export const platformAdminRoutes: (platformRoles: PlatformRole[]) => NavItemProp
         },
         {
           Icon: UserOutlined,
-          text: "平台用户列表",
+          text: "用户列表",
           path: "/admin/users",
         },
         {

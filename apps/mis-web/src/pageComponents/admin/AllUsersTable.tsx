@@ -10,16 +10,17 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { formatDateTime } from "@scow/lib-web/build/utils/datetime";
-import { PlatformUserInfo } from "@scow/protos/build/server/user";
+import { compareDateTime, formatDateTime } from "@scow/lib-web/build/utils/datetime";
+import { GetAllUsersResponse, PlatformUserInfo } from "@scow/protos/build/server/user";
 import { Static } from "@sinclair/typebox";
 import { App, Button, Divider, Form, Input, Space, Table } from "antd";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { ChangePasswordModalLink } from "src/components/ChangePasswordModal";
-import { FilterFormContainer } from "src/components/FilterFormContainer";
+import { FilterFormContainer, FilterFormTabs } from "src/components/FilterFormContainer";
 import { PlatformRoleSelector } from "src/components/PlatformRoleSelector";
+import { PlatformRole } from "src/models/User";
 import { GetAllUsersSchema } from "src/pages/api/admin/getAllUsers";
 import { User } from "src/stores/UserStore";
 
@@ -47,6 +48,9 @@ export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
 
   const [pageInfo, setPageInfo] = useState<PageInfo>({ page: 1, pageSize: 10 });
 
+  const [rangeSearchRole, setRangeSearchRole] = useState<string>("ALL_USERS");
+  const [dataFetched, setDataFetched] = useState<boolean>(false);
+
   const promiseFn = useCallback(async () => {
     return await api.getAllUsers({ query: {
       page: pageInfo.page,
@@ -56,9 +60,48 @@ export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
   }, [query, pageInfo]);
   const { data, isLoading, reload } = useAsync({ promiseFn, watch: refreshToken });
 
+  const initialDataRef = useRef<GetAllUsersResponse | undefined>(undefined);
+  useEffect(() => {
+    if (data && !initialDataRef.current) {
+      initialDataRef.current = data;
+      setDataFetched(true);
+    }
+  }, [data]);
+
+  const allUsersCounts = dataFetched ? initialDataRef.current?.totalCount : 0;
+  const platformAdminCounts = dataFetched ?
+    initialDataRef.current?.platformUsers.filter(
+      (user) => user.platformRoles.includes(PlatformRole.PLATFORM_ADMIN)).length : 0;
+  const platformFinanceCounts = dataFetched ?
+    initialDataRef.current?.platformUsers.filter(
+      (user) => user.platformRoles.includes(PlatformRole.PLATFORM_FINANCE)).length : 0;
+
+  const setFilteredData = (rangeSearchRole) => {
+    if (data) {
+      switch (rangeSearchRole) {
+      case "ALL_USERS":
+        return data;
+      case "PLATFORM_ADMIN":
+        return {
+          totalCount: platformAdminCounts ?? 0,
+          platformUsers: data?.platformUsers.filter((user) =>
+            user.platformRoles.includes(PlatformRole.PLATFORM_ADMIN)),
+        };
+      case "PLATFORM_FINANCE":
+        return {
+          totalCount: platformFinanceCounts ?? 0,
+          platformUsers: data?.platformUsers.filter((user) =>
+            user.platformRoles.includes(PlatformRole.PLATFORM_FINANCE)),
+        };
+      default:
+        return data;
+      }
+    }
+  };
+
   return (
     <div>
-      <FilterFormContainer>
+      <FilterFormContainer style={{ display: "flex", justifyContent: "space-between" }}>
         <Form<FilterForm>
           layout="inline"
           form={form}
@@ -76,9 +119,17 @@ export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
             <Button type="primary" htmlType="submit">搜索</Button>
           </Form.Item>
         </Form>
+        <FilterFormTabs
+          tabs={[
+            { title: `所有用户(${allUsersCounts})`, key: "All_USERS" },
+            { title: `平台管理员(${platformAdminCounts})`, key: "PLATFORM_ADMIN" },
+            { title: `财务人员(${platformFinanceCounts})`, key: "PLATFORM_FINANCE" },
+          ]}
+          onChange={(value) => setRangeSearchRole(value)}
+        />
       </FilterFormContainer>
       <UserInfoTable
-        data={data}
+        data={rangeSearchRole ? setFilteredData(rangeSearchRole) : data}
         pageInfo={pageInfo}
         setPageInfo={setPageInfo}
         isLoading={isLoading}
@@ -119,8 +170,18 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
         } : false}
         scroll={{ x: true }}
       >
-        <Table.Column<PlatformUserInfo> dataIndex="userId" title="用户ID" />
-        <Table.Column<PlatformUserInfo> dataIndex="name" title="姓名" />
+        <Table.Column<PlatformUserInfo>
+          dataIndex="userId"
+          title="用户ID"
+          sorter={(a, b) => a.userId.localeCompare(b.userId)}
+          sortDirections={["ascend", "descend"]}
+        />
+        <Table.Column<PlatformUserInfo>
+          dataIndex="name"
+          title="姓名"
+          sorter={(a, b) => a.name.localeCompare(b.name)}
+          sortDirections={["ascend", "descend"]}
+        />
         <Table.Column<PlatformUserInfo> dataIndex="tenantName" title="所属租户" />
         <Table.Column<PlatformUserInfo>
           dataIndex="availableAccounts"
@@ -130,6 +191,8 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
         <Table.Column<PlatformUserInfo>
           dataIndex="createTime"
           title="创建时间"
+          sorter={(a, b) => compareDateTime(a.createTime ?? "", b.createTime ?? "")}
+          sortDirections={["ascend", "descend"]}
           render={(time: string) => formatDateTime(time)}
         />
         <Table.Column<PlatformUserInfo>

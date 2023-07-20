@@ -19,18 +19,18 @@ import { AllUsersTable } from "src/pageComponents/admin/AllUsersTable";
 import { Head } from "src/utils/head";
 
 
-export const ShowUsersPage: NextPage = 
+export const ShowUsersPage: NextPage =
   requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))(({ userStore: { user } }) => {
-    
+
     const [refreshToken, update] = useRefreshToken();
 
     return (
       <div>
-        <Head title="平台用户列表" />
-        <PageTitle titleText={"平台用户列表"}>
+        <Head title="用户列表" />
+        <PageTitle titleText={"用户列表"}>
           <RefreshLink refresh={update} />
         </PageTitle>
-        <AllUsersTable 
+        <AllUsersTable
           refreshToken={refreshToken}
           user={user}
         />
