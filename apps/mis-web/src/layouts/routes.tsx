@@ -357,7 +357,7 @@ export const getAvailableRoutes = (user: User | undefined): NavItemProps[] => {
             text: childLink.text,
             path: `${childLink.url}?token=${user.token}`,
             clickToPath: `${childLink.url}?token=${user.token}`,
-            openInNewPage: link.openInNewPage,
+            openInNewPage: childLink.openInNewPage,
           }) as NavItemProps);
 
         const parentNavPath = link.url ? `${link.url}?token=${user.token}`

@@ -45,7 +45,7 @@ export function createMenuItems(
               window.open(target);
             } else {
               EXTERNAL_URL_PREFIX.some((pref) => target.startsWith(pref))
-                ? window.open(target) : Router.push(target);
+                ? window.location.href = target : Router.push(target);
             }
           }
           : undefined,
