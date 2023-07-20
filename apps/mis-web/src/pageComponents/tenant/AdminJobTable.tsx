@@ -26,7 +26,7 @@ import { HistoryJobDrawer } from "src/pageComponents/job/HistoryJobDrawer";
 import { JobPriceChangeModal } from "src/pageComponents/tenant/JobPriceChangeModal";
 import type { GetJobFilter, GetJobInfoSchema } from "src/pages/api/job/jobInfo";
 import type { Cluster } from "src/utils/config";
-import { publicConfig } from "src/utils/config";
+import { getClusterName, publicConfig } from "src/utils/config";
 import { moneyToString, nullableMoneyToString } from "src/utils/money";
 
 interface PageInfo {
@@ -250,7 +250,7 @@ const JobInfoTable: React.FC<JobInfoTableProps> = ({
         <Table.Column<JobInfo> dataIndex="idJob" title="集群作业ID" />
         <Table.Column<JobInfo> dataIndex="account" title="账户" />
         <Table.Column<JobInfo> dataIndex="user" title="用户" />
-        <Table.Column<JobInfo> dataIndex="cluster" title="集群名" />
+        <Table.Column<JobInfo> dataIndex="cluster" title="集群名" render={ getClusterName } />
         <Table.Column<JobInfo> dataIndex="partition" title="分区" />
         <Table.Column<JobInfo> dataIndex="qos" title="QOS" />
         <Table.Column<JobInfo> dataIndex="jobName" title="作业名" />
