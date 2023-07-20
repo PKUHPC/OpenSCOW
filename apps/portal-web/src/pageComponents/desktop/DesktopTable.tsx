@@ -193,7 +193,7 @@ export const DesktopTable: React.FC<Props> = ({ loginDesktopEnabledClusters }) =
       <Table
         dataSource={data}
         columns={columns}
-        rowKey={(record) => record.desktopId}
+        rowKey={(record) => `${record.addr}:${record.desktopId}`}
         loading={isLoading || isWmLoading}
         pagination={false}
       />
