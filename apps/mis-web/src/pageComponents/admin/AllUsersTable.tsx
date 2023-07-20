@@ -38,6 +38,10 @@ interface Props {
   user: User;
 }
 
+const filterUsersByPlatformRole = (dataToFilter: PlatformUserInfo[] | undefined, role: PlatformRole) => {
+  return dataToFilter ? dataToFilter.filter((user) => user.platformRoles.includes(role)) : [];
+};
+
 export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
 
   const [ query, setQuery ] = useState<FilterForm>(() => {
@@ -68,13 +72,14 @@ export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
     }
   }, [data]);
 
+  const initialPlatformUsers = initialDataRef.current?.platformUsers;
+
+  // 保存各角色所有用户数
   const allUsersCounts = dataFetched ? initialDataRef.current?.totalCount : 0;
-  const platformAdminCounts = dataFetched ?
-    initialDataRef.current?.platformUsers.filter(
-      (user) => user.platformRoles.includes(PlatformRole.PLATFORM_ADMIN)).length : 0;
-  const platformFinanceCounts = dataFetched ?
-    initialDataRef.current?.platformUsers.filter(
-      (user) => user.platformRoles.includes(PlatformRole.PLATFORM_FINANCE)).length : 0;
+  const platformAdminCounts = dataFetched && initialDataRef.current?.platformUsers ?
+    filterUsersByPlatformRole(initialPlatformUsers, PlatformRole.PLATFORM_ADMIN).length : 0;
+  const platformFinanceCounts = dataFetched && initialDataRef.current?.platformUsers ?
+    filterUsersByPlatformRole(initialPlatformUsers, PlatformRole.PLATFORM_FINANCE).length : 0;
 
   const setFilteredData = (rangeSearchRole) => {
     if (data) {
@@ -84,14 +89,12 @@ export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
       case "PLATFORM_ADMIN":
         return {
           totalCount: platformAdminCounts ?? 0,
-          platformUsers: data?.platformUsers.filter((user) =>
-            user.platformRoles.includes(PlatformRole.PLATFORM_ADMIN)),
+          platformUsers: filterUsersByPlatformRole(data?.platformUsers, PlatformRole.PLATFORM_ADMIN),
         };
       case "PLATFORM_FINANCE":
         return {
           totalCount: platformFinanceCounts ?? 0,
-          platformUsers: data?.platformUsers.filter((user) =>
-            user.platformRoles.includes(PlatformRole.PLATFORM_FINANCE)),
+          platformUsers: filterUsersByPlatformRole(data?.platformUsers, PlatformRole.PLATFORM_FINANCE),
         };
       default:
         return data;
@@ -119,14 +122,17 @@ export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
             <Button type="primary" htmlType="submit">搜索</Button>
           </Form.Item>
         </Form>
-        <FilterFormTabs
-          tabs={[
-            { title: `所有用户(${allUsersCounts})`, key: "All_USERS" },
-            { title: `平台管理员(${platformAdminCounts})`, key: "PLATFORM_ADMIN" },
-            { title: `财务人员(${platformFinanceCounts})`, key: "PLATFORM_FINANCE" },
-          ]}
-          onChange={(value) => setRangeSearchRole(value)}
-        />
+        <Space style={{ marginBottom: "-16px" }}>
+          <FilterFormTabs
+            tabs={[
+              { title: `所有用户(${allUsersCounts})`, key: "All_USERS" },
+              { title: `平台管理员(${platformAdminCounts})`, key: "PLATFORM_ADMIN" },
+              { title: `财务人员(${platformFinanceCounts})`, key: "PLATFORM_FINANCE" },
+            ]}
+            onChange={(value) => setRangeSearchRole(value)}
+          />
+        </Space>
+
       </FilterFormContainer>
       <UserInfoTable
         data={rangeSearchRole ? setFilteredData(rangeSearchRole) : data}
