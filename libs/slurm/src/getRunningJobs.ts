@@ -31,7 +31,7 @@ export async function querySqueue(ssh: NodeSSH, username: string, filterOptions:
     "squeue",
     [
       "-o",
-      ["%A", "%P", "%j", "%u", "%T", "%M", "%D", "%R", "%a", "%C", "%q", "%V", "%Y", "%l", "%Z"].join(SEPARATOR),
+      ["%A", "%P", "%j", "%u", "%T", "%M", "%D", "%R", "%a", "%C", "%q", "%V", "%Y", "%l", "%Z", "%g"].join(SEPARATOR),
       "--noheader",
       ...userId ? ["-u", userId] : [],
       ...accountNames ? (accountNames.length > 0 ? ["-A", accountNames.join(",")] : []) : [],
@@ -44,13 +44,13 @@ export async function querySqueue(ssh: NodeSSH, username: string, filterOptions:
       jobId,
       partition, name, user, state, runningTime,
       nodes, nodesOrReason, account, cores,
-      qos, submissionTime, nodesToBeUsed, timeLimit, workingDir,
+      qos, submissionTime, nodesToBeUsed, timeLimit, workingDir, gpus,
     ] = x.split(SEPARATOR);
 
     return {
       jobId,
       partition, name, user, state, runningTime,
-      nodes, nodesOrReason, account, cores,
+      nodes, nodesOrReason, account, cores, gpus,
       qos, submissionTime, nodesToBeUsed, timeLimit,
       workingDir,
     } as RunningJob;
@@ -70,7 +70,7 @@ export async function querySacct(ssh: NodeSSH, username: string, filterOptions: 
       `--delimiter=${SEPARATOR}`,
       "-o",
       "JobID,Partition,JobName,User,State,Elapsed,AllocNodes,NodeList,"
-      + "Account,AllocCPUs,QOS,Submit,NodeList,Timelimit,WorkDir",
+      + "Account,AllocCPUs,AllocGPUs,QOS,Submit,NodeList,Timelimit,WorkDir",
       // replace %Y with NodeList temporarily
       ...userId ? ["-u", userId] : [],
       ...accountNames ? (accountNames.length > 0 ? ["-A", accountNames.join(",")] : []) : [],
@@ -82,19 +82,19 @@ export async function querySacct(ssh: NodeSSH, username: string, filterOptions: 
     const [
       jobId,
       partition, name, user, state, runningTime,
-      nodes, nodesOrReason, account, cores,
+      nodes, nodesOrReason, account, cores, gpus,
       qos, submissionTime, nodesToBeUsed, timeLimit, workingDir,
     ] = x.split(SEPARATOR);
 
     return {
       jobId,
       partition, name, user, state, runningTime,
-      nodes, nodesOrReason, account, cores,
+      nodes, nodesOrReason, account, cores, gpus,
       qos, submissionTime, nodesToBeUsed, timeLimit,
       workingDir,
     } as RunningJob;
   });
 
   return jobs;
-  
+
 }
