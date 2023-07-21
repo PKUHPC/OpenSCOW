@@ -68,3 +68,7 @@ export type NavLink = {
   children?: Omit<NavLink, "children">[];
 }
 
+
+export const getClusterName = (clusterId: string) => {
+  return publicConfig.CLUSTERS[clusterId]?.name || clusterId;
+};
