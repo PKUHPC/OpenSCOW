@@ -4,7 +4,6 @@
 "@scow/mis-server": patch
 "@scow/portal-web": patch
 "@scow/mis-web": patch
-"@scow/lib-slurm": patch
 "@scow/grpc-api": patch
 ---
 
