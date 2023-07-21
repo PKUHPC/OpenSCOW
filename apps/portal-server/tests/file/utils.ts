@@ -18,9 +18,11 @@ import FormData from "form-data";
 import { NodeSSH } from "node-ssh";
 import path, { join } from "path";
 import { rootKeyPair } from "src/config/env";
+import { DesktopInfo } from "src/utils/desktops";
 import { SFTPWrapper } from "ssh2";
 
 export const target = "localhost:22222";
+export const rootUserId = "root";
 export const userId = "test";
 export const cluster = "hpc01";
 
@@ -47,6 +49,20 @@ export const connectToTestServer = async () => {
   return { ssh, sftp: await ssh.requestSFTP() } as TestSshServer;
 };
 
+export const connectToTestServerAsRoot = async () => {
+
+  const ssh = await sshRawConnect(target, rootUserId, rootKeyPair, console);
+
+  return { ssh, sftp: await ssh.requestSFTP() } as TestSshServer;
+};
+
+// connect as root and reset the test folders of user test
+export const resetTestServerAsRoot = async (server: TestSshServer) => {
+  const base = join("/home/test", path.dirname(desktopTestsFolder()));
+  await sshRmrf(server.ssh, base);
+  server.ssh.dispose();
+};
+
 export const resetTestServer = async (server: TestSshServer) => {
   const base = baseFolder();
 
@@ -58,10 +74,12 @@ export async function createFile(sftp: SFTPWrapper, filePath: string) {
   await sftpWriteFile(sftp)(filePath, randomBytes(10));
 }
 
-const baseFolder = () => `tests/testFolder${process.env.JEST_WORKER_ID}/${userId}`;
+export const baseFolder = () => `tests/testFolder${process.env.JEST_WORKER_ID}/${userId}`;
 
-export function actualPath(filename: string) {
-  return path.join(baseFolder(), filename);
+export const desktopTestsFolder = () => `desktopTests/desktopsTestFolder${process.env.JEST_WORKER_ID}/${userId}`;
+
+export function actualPath(filename: string, basefn: () => string = baseFolder) {
+  return path.join(basefn(), filename);
 }
 
 // returns base folder
@@ -120,4 +138,26 @@ export async function createTestLastSubmissionForVscode({ sftp, ssh }: TestSshSe
   await createVscodeLastSubmitFile(sftp, appId1);
 
   return base;
+}
+
+export const testDesktopInfo: DesktopInfo = {
+  host: target,
+  displayId: 1,
+  desktopName: "desktop-test11",
+  wm: "wm-test",
+};
+
+export const anotherHostDesktopInfo: DesktopInfo = {
+  host: "anotherHost",
+  displayId: 2,
+  desktopName: "desktop-test11",
+  wm: "wm-test",
+};
+
+export const testDesktopDirPath = join("/home/test", actualPath("/scow/desktops", desktopTestsFolder));
+export const testDesktopsFilePath = join(testDesktopDirPath, "desktops.json");
+
+export async function createDesktopsFile({ sftp, ssh }: TestSshServer) {
+  await ssh.mkdir(testDesktopDirPath, undefined, sftp);
+  await sftpWriteFile(sftp)(testDesktopsFilePath, JSON.stringify([testDesktopInfo, anotherHostDesktopInfo]));
 }

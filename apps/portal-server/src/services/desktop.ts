@@ -17,8 +17,13 @@ import { getLoginNode } from "@scow/config/build/cluster";
 import { executeAsUser } from "@scow/lib-ssh";
 import { DesktopServiceServer, DesktopServiceService } from "@scow/protos/build/portal/desktop";
 import { clusters } from "src/config/clusters";
-import { ensureEnabled, getDesktopConfig } from "src/utils/desktop";
-import { listUserDesktopsFromHost } from "src/utils/desktops";
+import {
+  addDesktopToFile,
+  ensureEnabled,
+  getDesktopConfig,
+  listUserDesktopsFromHost,
+  removeDesktopFromFile,
+} from "src/utils/desktops";
 import { clusterNotFound } from "src/utils/errors";
 import { checkLoginNodeInCluster, sshConnect } from "src/utils/ssh";
 import { displayIdToPort,
@@ -29,7 +34,7 @@ export const desktopServiceServer = plugin((server) => {
 
   server.addService<DesktopServiceServer>(DesktopServiceService, {
     createDesktop: async ({ request, logger }) => {
-      const { cluster, loginNode: host, wm, userId } = request;
+      const { cluster, loginNode: host, wm, userId, desktopName } = request;
 
       ensureEnabled(cluster);
 
@@ -68,6 +73,11 @@ export const desktopServiceServer = plugin((server) => {
           params.push(wm);
         }
 
+        if (desktopName) {
+          params.push("-name");
+          params.push(desktopName);
+        }
+
         resp = await executeAsUser(ssh, userId, logger, true, vncserverBinPath, params);
 
         // parse the OTP from output. the output was in stderr
@@ -76,6 +86,16 @@ export const desktopServiceServer = plugin((server) => {
         const displayId = parseDisplayId(resp.stderr);
 
         const port = displayIdToPort(displayId);
+
+        const desktopInfo = {
+          host,
+          displayId,
+          desktopName,
+          wm,
+          createTime: new Date().toISOString(),
+        };
+
+        await addDesktopToFile(ssh, cluster, userId, desktopInfo, logger);
 
         return [{ host, password, port }];
 
@@ -96,6 +116,8 @@ export const desktopServiceServer = plugin((server) => {
 
         // kill specific desktop
         await executeAsUser(ssh, userId, logger, true, vncserverBinPath, ["-kill", ":" + displayId]);
+
+        await removeDesktopFromFile(ssh, cluster, userId, host, displayId, logger);
 
         return [{}];
       });
@@ -132,7 +154,7 @@ export const desktopServiceServer = plugin((server) => {
         return [{ userDesktops: [userDesktops]}];
       }
 
-      const loginNodes = clusters[cluster]?.loginNodes.map(getLoginNode);
+      const loginNodes = clusters[cluster]?.loginNodes?.map(getLoginNode);
       if (!loginNodes) {
         throw clusterNotFound(cluster);
       }
