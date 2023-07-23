@@ -109,9 +109,19 @@ export async function fetchJobs(
           const pricedJob = new JobInfo(job, tenant, price);
 
           em.persist(pricedJob);
+
+          // 通过em.flush()判断一下作业是否能够导入, 如果不能导入, 就在log中提示, 然后跳过这条作业
           await em.flush();
 
           pricedJobs.push(pricedJob);
+
+          await callHook("jobSaved", {
+            ...pricedJob,
+            tenant: accountTenantMap.get(pricedJob.account),
+            accountPrice: decimalToMoney(pricedJob.accountPrice),
+            tenantPrice: decimalToMoney(pricedJob.tenantPrice),
+            jobId: pricedJob.idJob,
+          }, logger);
         } catch (error) {
           logger.warn("invalid job. cluster: %s, jobId: %s, error: %s", job.cluster, job.jobId, error);
         }
@@ -153,14 +163,7 @@ export async function fetchJobs(
           }, em, logger, clusterPlugin);
 
           await addJobCharge(ua, x.accountPrice, clusterPlugin, logger);
-          await callHook("jobPaid", {
-            ...x,
-            tenant: accountTenantMap.get(x.account),
-            accountPrice: decimalToMoney(x.accountPrice),
-            tenantPrice: decimalToMoney(x.tenantPrice),
-            comment,
-            jobId: x.idJob,
-          }, logger);
+
         }
       }
 

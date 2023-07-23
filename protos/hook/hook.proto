@@ -64,7 +64,7 @@ message TenantPaid {
   common.Money amount = 2;
 }
 
-message JobPaid {
+message JobSaved {
   uint32 job_id = 1;
   string job_name = 2;
   string account = 3;
@@ -101,7 +101,6 @@ message JobPaid {
   optional string tenant = 22;
   common.Money account_price = 23;
   common.Money tenant_price = 24;
-  string comment = 25;
 }
 
 message OnEventRequest {
@@ -121,7 +120,7 @@ message OnEventRequest {
     UserAdded user_added = 8;
     AccountPaid account_paid = 9;
     TenantPaid tenant_paid = 10;
-    JobPaid job_paid = 11;
+    JobSaved job_saved = 11;
   }
 }
 message OnEventResponse {
