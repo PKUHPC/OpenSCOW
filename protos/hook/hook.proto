@@ -101,6 +101,7 @@ message JobSaved {
   optional string tenant = 22;
   common.Money account_price = 23;
   common.Money tenant_price = 24;
+  string cluster = 25;
 }
 
 message OnEventRequest {
