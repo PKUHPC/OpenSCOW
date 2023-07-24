@@ -268,6 +268,22 @@ message GetAllUsersResponse {
   repeated PlatformUserInfo platform_users = 2;
 }
 
+message GetPlatformRoleUsersRequest {
+  uint32 page = 1;
+  optional uint64 page_size = 2;
+  optional string id_or_name = 3;
+}
+
+message GetPlatformRoleUsersResponse {
+  uint64 total_count = 1;
+  uint64 total_admin_count = 2;
+  uint64 total_finance_count = 3;
+  uint64 query_admin_count = 4;
+  repeated PlatformUserInfo platform_admin_users = 5;
+  uint64 query_finance_count = 6;
+  repeated PlatformUserInfo platform_finance_users = 7;
+}
+
 message SetPlatformRoleRequest {
   string user_id = 1;
   PlatformRole role_type = 2;
@@ -326,6 +342,7 @@ service UserService {
   rpc GetUserInfo(GetUserInfoRequest) returns (GetUserInfoResponse);
 
   rpc GetAllUsers(GetAllUsersRequest) returns (GetAllUsersResponse);
+  rpc GetPlatformRoleUsers(GetPlatformRoleUsersRequest) returns (GetPlatformRoleUsersResponse);
 
   rpc GetAccountUsers(GetAccountUsersRequest) returns (GetAccountUsersResponse);
   rpc QueryIsUserInAccount(QueryIsUserInAccountRequest)

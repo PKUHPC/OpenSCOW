@@ -15,7 +15,7 @@ import { Server } from "@ddadaal/tsgrpc-server";
 import { ChannelCredentials } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { createUser } from "@scow/lib-auth";
-import { PlatformRole, TenantRole, UserServiceClient } from "@scow/protos/build/server/user";
+import { PlatformRole, platformRoleFromJSON, TenantRole, UserServiceClient } from "@scow/protos/build/server/user";
 import { createServer } from "src/app";
 import { misConfig } from "src/config/mis";
 import { Tenant } from "src/entities/Tenant";
@@ -371,4 +371,138 @@ it("manage tenant role", async () => {
 
   const unsetUser = await em.findOne(User, { userId: data.userA.userId });
   expect(unsetUser?.tenantRoles.includes(tRole["TENANT_ADMIN"])).toBe(false);
+});
+
+
+it("get platform role users", async () => {
+
+  const em = server.ext.orm.em.fork();
+  const data = await insertInitialData(em);
+
+  await asyncClientCall(client, "setPlatformRole", {
+    userId: data.userA.userId,
+    roleType: PlatformRole.PLATFORM_ADMIN,
+  });
+  await asyncClientCall(client, "setPlatformRole", {
+    userId: data.userB.userId,
+    roleType: PlatformRole.PLATFORM_FINANCE,
+  });
+
+  const users = await asyncClientCall(client, "getPlatformRoleUsers", {
+    page: 1,
+    pageSize: 10,
+  });
+
+  expect(users.totalCount).toBe(3);
+  expect(users.totalAdminCount).toBe(1);
+  expect(users.totalFinanceCount).toBe(1);
+  expect(users.queryAdminCount).toBe(1);
+  expect(users.queryFinanceCount).toBe(1);
+  expect(users.platformAdminUsers.map((x) => ({
+    userId: x.userId,
+    name: x.name,
+    availableAccounts: x.availableAccounts,
+    tenantName: x.tenantName,
+    createTime: x.createTime,
+    platformRoles: x.platformRoles,
+  }))).toIncludeSameMembers([
+    {
+      userId: data.userA.userId,
+      name: data.userA.name,
+      availableAccounts: [data.accountA.accountName],
+      tenantName: data.userA.tenant.getProperty("name"),
+      createTime: data.userA.createTime.toISOString(),
+      platformRoles: [platformRoleFromJSON(PlatformRole.PLATFORM_ADMIN)],
+    },
+  ]);
+  expect(users.platformFinanceUsers.map((x) => ({
+    userId: x.userId,
+    name: x.name,
+    availableAccounts: x.availableAccounts,
+    tenantName: x.tenantName,
+    createTime: x.createTime,
+    platformRoles: x.platformRoles,
+  }))).toIncludeSameMembers([
+    {
+      userId: data.userB.userId,
+      name: data.userB.name,
+      availableAccounts: [data.accountA.accountName, data.accountB.accountName],
+      tenantName: data.userB.tenant.getProperty("name"),
+      createTime: data.userB.createTime.toISOString(),
+      platformRoles: [platformRoleFromJSON(PlatformRole.PLATFORM_FINANCE)],
+    },
+  ]);
+
+  await asyncClientCall(client, "unsetPlatformRole", {
+    userId: data.userA.userId,
+    roleType: PlatformRole.PLATFORM_ADMIN,
+  });
+  await asyncClientCall(client, "unsetPlatformRole", {
+    userId: data.userB.userId,
+    roleType: PlatformRole.PLATFORM_FINANCE,
+  });
+
+  em.clear();
+});
+
+it("get platform role users with idOrName", async () => {
+  const em = server.ext.orm.em.fork();
+  const data = await insertInitialData(em);
+
+  await asyncClientCall(client, "setPlatformRole", {
+    userId: data.userA.userId,
+    roleType: PlatformRole.PLATFORM_ADMIN,
+  });
+  await asyncClientCall(client, "setPlatformRole", {
+    userId: data.userB.userId,
+    roleType: PlatformRole.PLATFORM_FINANCE,
+  });
+
+  const users = await asyncClientCall(client, "getPlatformRoleUsers", {
+    page:1,
+    pageSize:10,
+    idOrName: "b",
+  });
+
+  expect(users.totalCount).toBe(3);
+  expect(users.totalAdminCount).toBe(1);
+  expect(users.totalFinanceCount).toBe(1);
+  expect(users.queryAdminCount).toBe(0);
+  expect(users.queryFinanceCount).toBe(1);
+  expect(users.platformAdminUsers.map((x) => ({
+    userId: x.userId,
+    name: x.name,
+    availableAccounts: x.availableAccounts,
+    tenantName: x.tenantName,
+    createTime: x.createTime,
+    platformRoles: x.platformRoles,
+  }))).toIncludeSameMembers([]);
+  expect(users.platformFinanceUsers.map((x) => ({
+    userId: x.userId,
+    name: x.name,
+    availableAccounts: x.availableAccounts,
+    tenantName: x.tenantName,
+    createTime: x.createTime,
+    platformRoles: x.platformRoles,
+  }))).toIncludeSameMembers([
+    {
+      userId: data.userB.userId,
+      name: data.userB.name,
+      availableAccounts: [data.accountA.accountName, data.accountB.accountName],
+      tenantName: data.userB.tenant.getProperty("name"),
+      createTime: data.userB.createTime.toISOString(),
+      platformRoles: [platformRoleFromJSON(PlatformRole.PLATFORM_FINANCE)],
+    },
+  ]);
+
+  await asyncClientCall(client, "unsetPlatformRole", {
+    userId: data.userA.userId,
+    roleType: PlatformRole.PLATFORM_ADMIN,
+  });
+  await asyncClientCall(client, "unsetPlatformRole", {
+    userId: data.userB.userId,
+    roleType: PlatformRole.PLATFORM_FINANCE,
+  });
+
+  em.clear();
 });

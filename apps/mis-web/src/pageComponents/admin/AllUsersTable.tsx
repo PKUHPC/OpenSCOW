@@ -11,17 +11,17 @@
  */
 
 import { compareDateTime, formatDateTime } from "@scow/lib-web/build/utils/datetime";
-import { GetAllUsersResponse, PlatformUserInfo } from "@scow/protos/build/server/user";
+import { PlatformUserInfo } from "@scow/protos/build/server/user";
 import { Static } from "@sinclair/typebox";
 import { App, Button, Divider, Form, Input, Space, Table } from "antd";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { ChangePasswordModalLink } from "src/components/ChangePasswordModal";
 import { FilterFormContainer, FilterFormTabs } from "src/components/FilterFormContainer";
 import { PlatformRoleSelector } from "src/components/PlatformRoleSelector";
-import { PlatformRole } from "src/models/User";
 import { GetAllUsersSchema } from "src/pages/api/admin/getAllUsers";
+import { GetPlatformRoleUsersSchema } from "src/pages/api/admin/getPlatformRoleUsers";
 import { User } from "src/stores/UserStore";
 
 interface FilterForm {
@@ -38,10 +38,6 @@ interface Props {
   user: User;
 }
 
-const filterUsersByPlatformRole = (dataToFilter: PlatformUserInfo[] | undefined, role: PlatformRole) => {
-  return dataToFilter ? dataToFilter.filter((user) => user.platformRoles.includes(role)) : [];
-};
-
 export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
 
   const [ query, setQuery ] = useState<FilterForm>(() => {
@@ -52,55 +48,23 @@ export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
 
   const [pageInfo, setPageInfo] = useState<PageInfo>({ page: 1, pageSize: 10 });
 
-  const [rangeSearchRole, setRangeSearchRole] = useState<string>("ALL_USERS");
-  const [dataFetched, setDataFetched] = useState<boolean>(false);
-
   const promiseFn = useCallback(async () => {
-    return await api.getAllUsers({ query: {
-      page: pageInfo.page,
-      pageSize: pageInfo.pageSize,
-      idOrName: query.idOrName,
-    } });
+    return await Promise.all([
+      api.getAllUsers({ query: {
+        page: pageInfo.page,
+        pageSize: pageInfo.pageSize,
+        idOrName: query.idOrName,
+      } }),
+      api.getPlatformRoleUsers({ query: {
+        page: pageInfo.page,
+        pageSize: pageInfo.pageSize,
+        idOrName: query.idOrName,
+      } }),
+    ]);
   }, [query, pageInfo]);
   const { data, isLoading, reload } = useAsync({ promiseFn, watch: refreshToken });
 
-  const initialDataRef = useRef<GetAllUsersResponse | undefined>(undefined);
-  useEffect(() => {
-    if (data && !initialDataRef.current) {
-      initialDataRef.current = data;
-      setDataFetched(true);
-    }
-  }, [data]);
-
-  const initialPlatformUsers = initialDataRef.current?.platformUsers;
-
-  // 保存各角色所有用户数
-  const allUsersCounts = dataFetched ? initialDataRef.current?.totalCount : 0;
-  const platformAdminCounts = dataFetched && initialDataRef.current?.platformUsers ?
-    filterUsersByPlatformRole(initialPlatformUsers, PlatformRole.PLATFORM_ADMIN).length : 0;
-  const platformFinanceCounts = dataFetched && initialDataRef.current?.platformUsers ?
-    filterUsersByPlatformRole(initialPlatformUsers, PlatformRole.PLATFORM_FINANCE).length : 0;
-
-  const setFilteredData = (rangeSearchRole) => {
-    if (data) {
-      switch (rangeSearchRole) {
-      case "ALL_USERS":
-        return data;
-      case "PLATFORM_ADMIN":
-        return {
-          totalCount: platformAdminCounts ?? 0,
-          platformUsers: filterUsersByPlatformRole(data?.platformUsers, PlatformRole.PLATFORM_ADMIN),
-        };
-      case "PLATFORM_FINANCE":
-        return {
-          totalCount: platformFinanceCounts ?? 0,
-          platformUsers: filterUsersByPlatformRole(data?.platformUsers, PlatformRole.PLATFORM_FINANCE),
-        };
-      default:
-        return data;
-      }
-    }
-  };
+  const [rangeSearchRole, setRangeSearchRole] = useState<string>("ALL_USERS");
 
   return (
     <div>
@@ -125,9 +89,9 @@ export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
         <Space style={{ marginBottom: "-16px" }}>
           <FilterFormTabs
             tabs={[
-              { title: `所有用户(${allUsersCounts})`, key: "All_USERS" },
-              { title: `平台管理员(${platformAdminCounts})`, key: "PLATFORM_ADMIN" },
-              { title: `财务人员(${platformFinanceCounts})`, key: "PLATFORM_FINANCE" },
+              { title: `所有用户(${data?.[1].totalCount ?? 0})`, key: "All_USERS" },
+              { title: `平台管理员(${data?.[1].totalAdminCount ?? 0})`, key: "PLATFORM_ADMIN" },
+              { title: `财务人员(${data?.[1].totalFinanceCount ?? 0})`, key: "PLATFORM_FINANCE" },
             ]}
             onChange={(value) => setRangeSearchRole(value)}
           />
@@ -135,43 +99,68 @@ export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
 
       </FilterFormContainer>
       <UserInfoTable
-        data={rangeSearchRole ? setFilteredData(rangeSearchRole) : data}
+        data={data}
         pageInfo={pageInfo}
         setPageInfo={setPageInfo}
         isLoading={isLoading}
         reload={reload}
         user={user}
+        rangeSearchRole={rangeSearchRole}
       />
     </div>
   );
 };
 
 interface UserInfoTableProps {
-  data: Static<typeof GetAllUsersSchema["responses"]["200"]> | undefined;
+  data: [ Static<typeof GetAllUsersSchema["responses"]["200"]>
+    , Static<typeof GetPlatformRoleUsersSchema["responses"]["200"]>
+  ] | undefined;
   pageInfo: PageInfo;
   setPageInfo?: (info: PageInfo) => void;
   isLoading: boolean;
   reload: () => void;
   user: User;
+  rangeSearchRole: string;
 }
 
 const UserInfoTable: React.FC<UserInfoTableProps> = ({
-  data, pageInfo, setPageInfo, isLoading, reload, user,
+  data, pageInfo, setPageInfo, isLoading, reload, user, rangeSearchRole,
 }) => {
 
   const { message } = App.useApp();
 
+  const { filteredData, totalCount } = (() => {
+    switch (rangeSearchRole) {
+    case "PLATFORM_ADMIN":
+      return {
+        filteredData: data?.[1].platformAdminUsers,
+        totalCount: data?.[1].queryAdminCount,
+      };
+    case "PLATFORM_FINANCE":
+      return {
+        filteredData: data?.[1].platformFinanceUsers,
+        totalCount: data?.[1].queryFinanceCount,
+      };
+    case "ALL_USERS":
+    default:
+      return {
+        filteredData: data?.[0].platformUsers,
+        totalCount: data?.[0].totalCount,
+      };
+    }
+  })();
+
   return (
     <>
       <Table
-        dataSource={data?.platformUsers}
+        dataSource={filteredData}
         loading={isLoading}
         pagination={setPageInfo ? {
           current: pageInfo.page,
           defaultPageSize: 10,
           pageSize: pageInfo.pageSize,
           showSizeChanger: true,
-          total: data?.totalCount,
+          total: totalCount,
           onChange: (page, pageSize) => setPageInfo({ page, pageSize }),
         } : false}
         scroll={{ x: true }}

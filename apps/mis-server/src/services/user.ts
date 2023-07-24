@@ -35,6 +35,7 @@ import { UserAccount, UserRole, UserStatus } from "src/entities/UserAccount";
 import { callHook } from "src/plugins/hookClient";
 import { createUserInDatabase, insertKeyToNewUser } from "src/utils/createUser";
 import { paginationProps } from "src/utils/orm";
+import { generateRoleQuery, setPlatformUsers } from "src/utils/users";
 
 export const userServiceServer = plugin((server) => {
 
@@ -526,6 +527,39 @@ export const userServiceServer = plugin((server) => {
           createTime: x.createTime.toISOString(),
           platformRoles: x.platformRoles.map(platformRoleFromJSON),
         })),
+      }];
+    },
+
+    getPlatformRoleUsers: async ({ request, em }) => {
+
+      const { page, pageSize, idOrName } = request;
+
+      // get the full users count with platform role
+      const totalCount = await em.count(User);
+      const totalAdminCount = await em.count(User, generateRoleQuery(undefined, PlatformRole.PLATFORM_ADMIN));
+      const totalFinanceCount = await em.count(User, generateRoleQuery(undefined, PlatformRole.PLATFORM_FINANCE));
+
+      // query with platform role, query words and page info
+      const [adminUsers, queryAdminCount] = await em.findAndCount(User,
+        generateRoleQuery(idOrName, PlatformRole.PLATFORM_ADMIN), {
+          ...paginationProps(page, pageSize || 10),
+          populate: ["tenant", "accounts", "accounts.account"],
+        });
+
+      const [financeUsers, queryFinanceCount] = await em.findAndCount(User,
+        generateRoleQuery(idOrName, PlatformRole.PLATFORM_FINANCE), {
+          ...paginationProps(page, pageSize || 10),
+          populate: ["tenant", "accounts", "accounts.account"],
+        });
+
+      return [{
+        totalCount: totalCount,
+        totalAdminCount: totalAdminCount,
+        totalFinanceCount: totalFinanceCount,
+        queryAdminCount: queryAdminCount,
+        platformAdminUsers: setPlatformUsers(adminUsers),
+        queryFinanceCount: queryFinanceCount,
+        platformFinanceUsers: setPlatformUsers(financeUsers),
       }];
     },
 

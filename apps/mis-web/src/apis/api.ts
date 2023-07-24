@@ -24,6 +24,7 @@ import type { GetTenantPaymentsSchema } from "src/pages/api/admin/finance/paymen
 import type { GetAllTenantsSchema } from "src/pages/api/admin/getAllTenants";
 import type { GetAllUsersSchema } from "src/pages/api/admin/getAllUsers";
 import type { GetClusterUsersSchema } from "src/pages/api/admin/getClusterUsers";
+import type { GetPlatformRoleUsersSchema } from "src/pages/api/admin/getPlatformRoleUsers";
 import type { GetTenantUsersSchema } from "src/pages/api/admin/getTenantUsers";
 import type { ImportUsersSchema } from "src/pages/api/admin/importUsers";
 import type { QueryStorageQuotaSchema } from "src/pages/api/admin/queryStorageQuota";
@@ -87,6 +88,7 @@ export const api = {
   setFetchState: apiClient.fromTypeboxRoute<typeof SetFetchStateSchema>("POST", "/api/admin/fetchJobs/setFetchState"),
   tenantFinancePay: apiClient.fromTypeboxRoute<typeof TenantFinancePaySchema>("POST", "/api/admin/finance/pay"),
   getTenantPayments: apiClient.fromTypeboxRoute<typeof GetTenantPaymentsSchema>("GET", "/api/admin/finance/payments"),
+  getPlatformRoleUsers: apiClient.fromTypeboxRoute<typeof GetPlatformRoleUsersSchema>("GET", "/api/admin/getPlatformRoleUsers"),
   getAllTenants: apiClient.fromTypeboxRoute<typeof GetAllTenantsSchema>("GET", "/api/admin/getAllTenants"),
   getAllUsers: apiClient.fromTypeboxRoute<typeof GetAllUsersSchema>("GET", "/api/admin/getAllUsers"),
   getClusterUsers: apiClient.fromTypeboxRoute<typeof GetClusterUsersSchema>("GET", "/api/admin/getClusterUsers"),

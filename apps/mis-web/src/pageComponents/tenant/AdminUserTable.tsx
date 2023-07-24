@@ -33,9 +33,14 @@ interface FilterForm {
   idOrName: string | undefined;
 }
 
-const filterUsersByTenantRole = (dataToFilter: FullUserInfo[] | undefined, role: TenantRole) => {
-  return dataToFilter
-    ? dataToFilter.filter((user) => user.tenantRoles.includes(role)) : [];
+const filterUsersByTenantRole = (dataToFilter: FullUserInfo[] | undefined) => {
+  return {
+    allUsers: dataToFilter ?? [],
+    adminUsers: dataToFilter ?
+      dataToFilter.filter((user) => user.tenantRoles.includes(TenantRole.TENANT_ADMIN)) : [],
+    financeUsers: dataToFilter ?
+      dataToFilter.filter((user) => user.tenantRoles.includes(TenantRole.TENANT_FINANCE)) : [],
+  };
 };
 
 export const AdminUserTable: React.FC<Props> = ({
@@ -57,21 +62,18 @@ export const AdminUserTable: React.FC<Props> = ({
 
   // 保存各角色所有用户数
   const allUsersCounts = data ? data.results.length : 0;
-  const tenantAdminCounts = filterUsersByTenantRole(data?.results, TenantRole.TENANT_ADMIN).length;
-  const tenantFinanceCounts = filterUsersByTenantRole(data?.results, TenantRole.TENANT_FINANCE).length;
+  const tenantAdminCounts = filterUsersByTenantRole(data?.results).adminUsers.length;
+  const tenantFinanceCounts = filterUsersByTenantRole(data?.results).financeUsers.length;
 
   const setFilteredData = (rangeSearchRole) => {
-    if (filteredData) {
-      switch (rangeSearchRole) {
-      case "ALL_USERS":
-        return filteredData;
-      case "TENANT_ADMIN":
-        return filterUsersByTenantRole(filteredData, TenantRole.TENANT_ADMIN);
-      case "TENANT_FINANCE":
-        return filterUsersByTenantRole(filteredData, TenantRole.TENANT_FINANCE);
-      default:
-        return filteredData;
-      }
+    switch (rangeSearchRole) {
+    case "TENANT_ADMIN":
+      return filterUsersByTenantRole(filteredData).adminUsers;
+    case "TENANT_FINANCE":
+      return filterUsersByTenantRole(filteredData).financeUsers;
+    case "ALL_USERS":
+    default:
+      return filteredData;
     }
   };
 
