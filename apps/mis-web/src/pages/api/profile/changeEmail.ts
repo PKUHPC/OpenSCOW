@@ -41,18 +41,10 @@ export const ChangeEmailSchema = typeboxRouteSchema({
 
     /** 修改失败 */
     500: Type.Null(),
-
-    /** 本功能在当前配置下不可用。 */
-    501: Type.Null(),
   },
 });
 
 export default /* #__PURE__*/typeboxRoute(ChangeEmailSchema, async (req, res) => {
-
-  if (!publicConfig.ENABLE_CHANGE_EMAIL) {
-    return { 501: null };
-  }
-
   const auth = authenticate(() => true);
 
   const info = await auth(req, res);

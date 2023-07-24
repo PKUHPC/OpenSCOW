@@ -75,11 +75,9 @@ export const ProfilePage: NextPage = requireAuth(() => true)(({ userStore: { use
       </Container>
       <Container>
         {
-          true ? (
-            <Part title="修改邮箱">
-              <ChangeEmailForm />
-            </Part>
-          ) : undefined
+          <Part title="修改邮箱">
+            <ChangeEmailForm />
+          </Part>
         }
       </Container>
     </>

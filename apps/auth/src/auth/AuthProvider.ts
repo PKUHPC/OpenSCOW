@@ -25,7 +25,7 @@ export interface CreateUserInfo {
 export type ValidateNameResult = "NotFound" | "Match" | "NotMatch";
 export type CreateUserResult = "AlreadyExists" | "OK";
 export type ChangePasswordResult = "NotFound" | "WrongOldPassword" | "OK";
-export type ChangeEmailResult = "NotFound" | "OK" | "Wrong";
+export type ChangeEmailResult = "NotFound" | "OK";
 
 export interface UserInfo {
   identityId: string;

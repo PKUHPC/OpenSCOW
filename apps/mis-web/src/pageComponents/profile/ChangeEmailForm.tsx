@@ -40,8 +40,6 @@ export const ChangeEmailForm: React.FC = () => {
     setLoading(true);
 
 
-    // database改邮箱的结果
-    // const DBRes = await api.changeDBEmail({ body: { userId:userStore.user?.identityId as string, newEmail } });
     await api.changeEmail({ body: { userId:userStore.user?.identityId as string, newEmail } })
       .httpError(500, () => { message.error("修改邮箱失败"); })
       .then(() => {

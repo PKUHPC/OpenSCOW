@@ -19,7 +19,7 @@ export async function changeEmail(
   logger?: Logger,
 ) {
 
-  const resp = await fetch(authUrl + "/email", {
+  const resp = await fetch(authUrl + "/user/email", {
     method: "PATCH",
     body: JSON.stringify(params),
     headers: applicationJsonHeaders,

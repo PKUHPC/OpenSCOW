@@ -22,14 +22,12 @@ const BodySchema = Type.Object({
 const ResponsesSchema = Type.Object({
   204: Type.Null({ description: "修改完成" }),
   404: Type.Null({ description: "用户未找到" }),
-  412: Type.Null({ description: "修改失败" }),
-  501: Type.Null({ description: "当前配置不支持修改邮箱" }),
+  501: Type.Null({ description: "不支持修改邮箱功能" }),
 });
 
 const codes: Record<ChangeEmailResult, number> = {
   NotFound: 404,
   OK: 204,
-  Wrong: 412,
 };
 
 /**
@@ -40,7 +38,7 @@ export const changeEmailRoute = fp(async (f) => {
     Body: Static<typeof BodySchema>
     Responses: Static<typeof ResponsesSchema>,
   }>(
-    "/email",
+    "/user/email",
     {
       schema: {
         body: BodySchema,
