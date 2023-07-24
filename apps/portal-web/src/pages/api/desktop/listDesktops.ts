@@ -16,7 +16,7 @@ import { DesktopServiceClient } from "@scow/protos/build/portal/desktop";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { getClient } from "src/utils/client";
-import { publicConfig } from "src/utils/config";
+import { getLoginDesktopEnabled } from "src/utils/config";
 
 export const ListDesktopsSchema = typeboxRouteSchema({
   method: "GET",
@@ -30,12 +30,17 @@ export const ListDesktopsSchema = typeboxRouteSchema({
     200: Type.Object({
       userDesktops: Type.Array(Type.Object({
         host: Type.String(),
-        displayId: Type.Array(Type.Number()),
+        desktops: Type.Array(Type.Object({
+          displayId: Type.Number(),
+          desktopName: Type.String(),
+          wm: Type.String(),
+          createTime: Type.Optional(Type.String()),
+        })),
       })),
     }),
 
     // 功能没有启用
-    501: Type.Null(),
+    501: Type.Object({ code: Type.Literal("CLUSTER_LOGIN_DESKTOP_NOT_ENABLED") }),
   },
 });
 
@@ -43,15 +48,16 @@ const auth = authenticate(() => true);
 
 export default /* #__PURE__*/typeboxRoute(ListDesktopsSchema, async (req, res) => {
 
-  if (!publicConfig.ENABLE_LOGIN_DESKTOP) {
-    return { 501: null };
+  const { cluster, loginNode } = req.query;
+
+  const loginDesktopEnabled = getLoginDesktopEnabled(cluster);
+  if (!loginDesktopEnabled) {
+    return { 501: { code: "CLUSTER_LOGIN_DESKTOP_NOT_ENABLED" as const } };
   }
 
   const info = await auth(req, res);
 
   if (!info) { return; }
-
-  const { cluster, loginNode } = req.query;
 
   const client = getClient(DesktopServiceClient);
 
@@ -59,8 +65,7 @@ export default /* #__PURE__*/typeboxRoute(ListDesktopsSchema, async (req, res) =
     cluster, loginNode, userId: info.identityId,
   }).then(async ({ userDesktops }) => ({
     200: {
-      userDesktops:
-        userDesktops.map((userDesktop) => ({ host: userDesktop.host, displayId: userDesktop.displayIds })),
+      userDesktops,
     },
   }));
 

@@ -45,8 +45,11 @@ loginDesktop:
     - name: Xfce
       wm: xfce
 
-  # 最多启动多少个桌面节点
+  # 单个登录节点最多启动多少个桌面节点
   maxDesktops: 3
+
+  # 将创建的登录节点桌面信息的保存到什么位置。相对于用户的家目录
+  desktopsDir: scow/desktops
 
 # 是否启用交互式任务功能
 apps: true
@@ -100,6 +103,8 @@ shell: true
     # text: ""
     # url: ""
     # iconPath: ""
+
+
 ```
 
 ## 更多配置

@@ -1,5 +1,20 @@
 # @scow/protos
 
+## 0.3.0
+
+### Minor Changes
+
+- 5b7f0e88f: 重构 scow，对接调度器适配器接口
+
+### Patch Changes
+
+- Updated dependencies [5b7f0e88f]
+- Updated dependencies [99e2b08e1]
+- Updated dependencies [5c3c63657]
+- Updated dependencies [6853606f8]
+- Updated dependencies [62083044e]
+  - @scow/grpc-api@0.5.0
+
 ## 0.2.3
 
 ### Patch Changes

@@ -31,6 +31,7 @@ const drawerItems = [
   ["QOS", "qos"],
   ["节点数", "nodes"],
   ["核心数", "cores"],
+  ["GPU卡数", "gpus"],
   ["状态", "state"],
   ["说明", "nodesOrReason"],
   ["运行/排队时间", "runningOrQueueTime"],
@@ -56,11 +57,11 @@ export const RunningJobDrawer: React.FC<Props> = ({
             bordered
             size="small"
           >
-            {drawerItems.map((([label, key, format]) => (
+            {drawerItems.map(([label, key, format]) => (
               <Descriptions.Item key={item.jobId} label={label}>
                 {format ? format(item[key], item) : item[key] as string}
               </Descriptions.Item>
-            )))}
+            ))}
           </Descriptions>
         ) : undefined }
     </Drawer>

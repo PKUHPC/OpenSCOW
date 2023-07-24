@@ -14,11 +14,14 @@ syntax = "proto3";
 
 package scow.portal;
 
+import "google/protobuf/timestamp.proto";
+
 message CreateDesktopRequest {
   string user_id = 1;
   string cluster = 2;
   string login_node = 3;
   string wm = 4;
+  string desktop_name = 5;
 }
 
 // NOT_FOUND: cluster is not found
@@ -61,9 +64,16 @@ message ListUserDesktopsRequest {
   optional string login_node = 3;
 }
 
+message Desktop {
+  uint32 display_id = 1;
+  string desktop_name = 2;
+  string wm = 3;
+  google.protobuf.Timestamp create_time = 4;
+}
+
 message UserDesktops {
   string host = 1;
-  repeated uint32 display_ids = 2;
+  repeated Desktop desktops = 2;
 }
 
 // NOT_FOUND: cluster is not found
@@ -71,7 +81,9 @@ message ListUserDesktopsResponse {
   repeated UserDesktops user_desktops = 1;
 }
 
-message ListAvailableWmsRequest {}
+message ListAvailableWmsRequest {
+  string cluster = 1;
+}
 
 message AvailableWm {
   string name = 1;

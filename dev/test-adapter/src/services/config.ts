@@ -12,17 +12,40 @@
 
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { ConfigServiceServer, ConfigServiceService } from "@scow/scheduler-adapter-protos/build/protos/config";
+import { clusterId } from "src/config/cluster";
 
 export const configServiceServer = plugin((server) => {
   server.addService<ConfigServiceServer>(ConfigServiceService, {
     getClusterConfig: async () => {
-      return [{
-        partitions: [
-          { name: "compute", nodes: 198, memMb: 63000, cores: 28, gpus: 0, qos: ["low", "normal", "high"]},
-          { name: "gpu", nodes: 1, memMb: 386000, cores: 48, gpus: 8, qos: ["low", "normal", "high"]},
-        ],
-        schedulerName: "slurm",
-      }];
+      if (clusterId === "hpc00") {
+        return [{
+          partitions: [
+            { name: "C032M0128G", memMb: 131072, cores: 32, nodes: 32, gpus: 0,
+              qos: ["low", "normal", "high", "cryoem"]},
+            { name: "GPU", memMb: 262144, cores: 28, nodes: 32, gpus: 4,
+              qos: ["low", "normal", "high", "cryoem"]},
+            { name: "life", memMb: 262144, cores: 28, nodes: 32, gpus: 4,
+              qos: []},
+          ],
+          schedulerName: "slurm",
+        }];
+      } else if (clusterId === "hpc01") {
+        return [{
+          partitions: [
+            { name: "compute", nodes: 198, memMb: 63000, cores: 28, gpus: 0, qos: ["low", "normal", "high"]},
+            { name: "gpu", nodes: 1, memMb: 386000, cores: 48, gpus: 8, qos: ["low", "normal", "high"]},
+          ],
+          schedulerName: "slurm",
+        }];
+      } else if (clusterId === "hpc02") {
+        return [{
+          partitions: [
+            { name: "compute", nodes: 198, memMb: 63000, cores: 28, gpus: 0, qos: ["low", "normal", "high"]},
+            { name: "gpu", nodes: 1, memMb: 386000, cores: 48, gpus: 8, qos: ["low", "normal", "high"]},
+          ],
+          schedulerName: "slurm",
+        }];
+      }
     },
 
     getAvailablePartitions: async () => {

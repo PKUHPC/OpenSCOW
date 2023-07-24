@@ -1,8 +1,9 @@
 {
   "name": "@scow/lib-scheduler-adapter",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "",
   "main": "build/index.js",
+  "private": true,
   "scripts": {
     "dev": "tsc -p tsconfig.build.json && (concurrently \"tsc -p tsconfig.build.json -w\" \"tsc-alias -p tsconfig.build.json -w\")",
     "build": "rimraf build && tsc -p tsconfig.build.json"
@@ -15,7 +16,7 @@
   "license": "Mulan PSL v2",
   "repository": "https://github.com/PKUHPC/SCOW",
   "dependencies": {
-    "@grpc/grpc-js": "1.8.15",
+    "@grpc/grpc-js": "1.8.18",
     "@scow/protos": "workspace:*",
     "@scow/scheduler-adapter-protos": "workspace:*"
   },
