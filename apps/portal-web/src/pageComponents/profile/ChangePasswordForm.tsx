@@ -34,22 +34,19 @@ export const ChangePasswordForm: React.FC = () => {
     api.checkPassword({ query: { password: oldPassword } })
       .then((result) => {
         if (result.success) {
-          return api.changePassword({ body: { newPassword } });
+          return api.changePassword({ body: { newPassword } })
+            .then(() => {
+              form.resetFields();
+              message.success("密码更改成功！");
+            });
         }
         else {
           message.error("原密码错误！");
         }
       })
-      .then((result) => {
-        if (result.success) {
-          form.resetFields();
-          message.success("密码更改成功！");   
-        }
-      })
       .finally(() => {
         setLoading(false);
-      })
-    ;
+      });
   };
 
   return (
