@@ -159,6 +159,7 @@ export async function fetchJobs(
   };
 
   try {
+    let newJobsCount = 0;
     for (const cluster of Object.keys(clusters)) {
       logger.info(`fetch jobs from cluster ${cluster}`);
 
@@ -236,14 +237,15 @@ export async function fetchJobs(
 
       };
 
-      const newJobsCount = await fetchWithinTimeRange(
+      newJobsCount += await fetchWithinTimeRange(
         startFetchDate ?? new Date(0),
         endFetchDate,
         misConfig.fetchJobs.batchSize,
       );
-      return { newJobsCount };
 
     }
+
+    return { newJobsCount };
   } catch (e) {
     logger.error("Error when fetching jobs. %o", e);
     throw e;
