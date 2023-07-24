@@ -83,7 +83,8 @@ export async function fetchJobs(
   const persistJobAndCharge = async (jobs: ({ cluster: string } & ClusterJobInfo)[]) => {
     const result = await em.transactional(async (em) => {
       // Calculate prices for new info and persist
-      const pricedJobs = [] as JobInfo[];
+      let pricedJob: JobInfo;
+      let count = 0;
       for (const job of jobs) {
         const tenant = accountTenantMap.get(job.account);
 
@@ -106,49 +107,37 @@ export async function fetchJobs(
             tenant,
           }) : emptyJobPriceInfo();
 
-          const pricedJob = new JobInfo(job, tenant, price);
+          pricedJob = new JobInfo(job, tenant, price);
 
           em.persist(pricedJob);
 
-          // 通过em.flush()判断一下作业是否能够导入, 如果不能导入, 就在log中提示, 然后跳过这条作业
+          // Determine whether the job can be inserted into the database. If not, skip the job
           await em.flush();
 
-          pricedJobs.push(pricedJob);
-
-          await callHook("jobSaved", {
-            ...pricedJob,
-            tenant: accountTenantMap.get(pricedJob.account),
-            accountPrice: decimalToMoney(pricedJob.accountPrice),
-            tenantPrice: decimalToMoney(pricedJob.tenantPrice),
-            jobId: pricedJob.idJob,
-          }, logger);
         } catch (error) {
           logger.warn("invalid job. cluster: %s, jobId: %s, error: %s", job.cluster, job.jobId, error);
+          continue;
         }
-      }
 
-      // add job charge for user account
-      for (const x of pricedJobs) {
-
-        // add job charge for the user
+        // add job charge for user account
         const ua = await em.findOne(UserAccount, {
-          account: { accountName: x.account },
-          user: { userId: x.user },
+          account: { accountName: pricedJob.account },
+          user: { userId: pricedJob.user },
         }, {
           populate: ["user", "account", "account.tenant"],
         });
 
         if (!ua) {
-          logger.warn({ biJobIndex: x.biJobIndex },
-            "User %s in account %s is not found. Don't charge the job.", x.user, x.account);
+          logger.warn({ biJobIndex: pricedJob.biJobIndex },
+            "User %s in account %s is not found. Don't charge the job.", pricedJob.user, pricedJob.account);
         }
 
-        const comment = parsePlaceholder(misConfig.jobChargeComment, x);
+        const comment = parsePlaceholder(misConfig.jobChargeComment, pricedJob);
 
         if (ua) {
           // charge account
           await charge({
-            amount: x.accountPrice,
+            amount: pricedJob.accountPrice,
             type: misConfig.jobChargeType,
             comment,
             target: ua.account.$,
@@ -156,19 +145,25 @@ export async function fetchJobs(
 
           // charge tenant
           await charge({
-            amount: x.tenantPrice,
+            amount: pricedJob.tenantPrice,
             type: misConfig.jobChargeType,
             comment,
             target: ua.account.$.tenant.getEntity(),
           }, em, logger, clusterPlugin);
 
-          await addJobCharge(ua, x.accountPrice, clusterPlugin, logger);
-
+          await addJobCharge(ua, pricedJob.accountPrice, clusterPlugin, logger);
         }
+
+        await callHook("jobSaved", {
+          ...pricedJob,
+          accountPrice: decimalToMoney(pricedJob.accountPrice),
+          tenantPrice: decimalToMoney(pricedJob.tenantPrice),
+          jobId: pricedJob.idJob,
+        }, logger);
+
+        count++;
       }
-
-      return pricedJobs.length;
-
+      return count;
     });
 
     em.clear();
