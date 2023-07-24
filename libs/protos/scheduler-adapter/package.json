@@ -1,6 +1,6 @@
 {
   "name": "@scow/scheduler-adapter-protos",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "",
   "main": "build/index.js",
   "private": true,
@@ -13,12 +13,12 @@
     "!**/*.map"
   ],
   "dependencies": {
-    "@grpc/grpc-js": "1.8.15",
+    "@grpc/grpc-js": "1.8.18",
     "long": "5.2.3",
-    "protobufjs": "7.2.3"
+    "protobufjs": "7.2.4"
   },
   "devDependencies": {
-    "ts-proto": "1.149.0"
+    "ts-proto": "1.155.1"
   },
   "keywords": [],
   "author": "",

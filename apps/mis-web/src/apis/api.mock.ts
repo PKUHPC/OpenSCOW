@@ -67,6 +67,7 @@ export const runningJob: RunningJob = {
   jobId: "123",
   account: "123",
   cores: "123",
+  gpus: "123",
   name: "123",
   nodes: "123",
   nodesOrReason: "!23",

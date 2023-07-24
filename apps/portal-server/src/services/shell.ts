@@ -90,7 +90,8 @@ export const shellServiceServer = plugin((server) => {
                 }
 
                 if (req.message.$case === "resize") {
-                  channel.setWindow(req.message.resize.rows + "", req.message.resize.cols + "", "", "");
+                  // 640 and 480 are default values
+                  channel.setWindow(req.message.resize.rows, req.message.resize.cols, 480, 640);
                   return;
                 }
 

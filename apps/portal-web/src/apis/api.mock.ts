@@ -31,6 +31,7 @@ export const runningJob: RunningJob = {
   jobId: "123",
   account: "123",
   cores: "123",
+  gpus: "123",
   name: "123",
   nodes: "123",
   nodesOrReason: "!23",
@@ -187,7 +188,11 @@ export const mockApi: MockApi<typeof api> = {
   listDesktops: async () => ({
     userDesktops: [{
       host: "login01",
-      displayId: [1, 2, 3],
+      desktops: [
+        { displayId: 1, desktopName: "111", wm: "", createTime: "" },
+        { displayId: 222, desktopName: "222", wm: "", createTime: "" },
+        { displayId: 1, desktopName: "333", wm: "", createTime: "" },
+      ],
     }],
   }),
 

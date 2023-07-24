@@ -29,8 +29,8 @@ import { getClusterAppConfigs, splitSbatchArgs } from "src/utils/app";
 import { getAdapterClient } from "src/utils/clusters";
 import { getIpFromProxyGateway } from "src/utils/proxy";
 import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
-import { displayIdToPort, parseDisplayId,
-  refreshPassword, refreshPasswordByProxyGateway, VNCSERVER_BIN_PATH } from "src/utils/turbovnc";
+import { displayIdToPort, getTurboVNCBinPath, parseDisplayId,
+  refreshPassword, refreshPasswordByProxyGateway } from "src/utils/turbovnc";
 
 interface SessionMetadata {
   sessionId: string;
@@ -113,7 +113,8 @@ export const appOps = (cluster: string): AppOps => {
           const reply = await asyncClientCall(client.job, "submitJob", request).catch((e) => {
             const ex = e as ServiceError;
             const errors = parseErrorDetails(ex.metadata);
-            if (errors[0] && errors[0].$type === "google.rpc.ErrorInfo" && errors[0].reason === "SBATCH_FAILED") {
+            if (errors[0] && errors[0].$type === "google.rpc.ErrorInfo"
+              && errors[0].reason === "SBATCH_FAILED" && Array.isArray(e.details)) {
               throw <ServiceError> {
                 code: Status.INTERNAL,
                 message: "sbatch failed",
@@ -215,7 +216,9 @@ export const appOps = (cluster: string): AppOps => {
 
           const extraOptions = configSlurmOptions.concat(userSbatchOptions);
 
-          const envVariables = getEnvVariables({ VNC_SESSION_INFO, VNCSERVER_BIN_PATH });
+          const vncserverBinPath = getTurboVNCBinPath(cluster, "vncserver");
+
+          const envVariables = getEnvVariables({ VNC_SESSION_INFO, VNCSERVER_BIN_PATH: vncserverBinPath });
 
           return await submitAndWriteMetadata({
             userId, jobName, account, partition: partition!, qos, nodeCount, gpuCount: gpuCount ?? 0, memoryMb,
@@ -428,7 +431,7 @@ export const appOps = (cluster: string): AppOps => {
                   return await sshConnect(url.hostname, "root", logger, async (proxyGatewaySsh) => {
                     logger.info(`Connecting to compute node ${host} via proxy gateway ${url.hostname}`);
                     const { password, ip } =
-                      await refreshPasswordByProxyGateway(proxyGatewaySsh, host, userId, logger, displayId!);
+                      await refreshPasswordByProxyGateway(proxyGatewaySsh, cluster, host, userId, logger, displayId!);
                     return {
                       code: "OK",
                       appId: sessionMetadata.appId,
@@ -443,7 +446,7 @@ export const appOps = (cluster: string): AppOps => {
                 // connect as user so that
                 // the service node doesn't need to be able to connect to compute nodes with public key
                 return await sshConnect(host, userId, logger, async (computeNodeSsh) => {
-                  const password = await refreshPassword(computeNodeSsh, null, logger, displayId!);
+                  const password = await refreshPassword(computeNodeSsh, cluster, null, logger, displayId!);
                   return {
                     appId: sessionMetadata.appId,
                     host,

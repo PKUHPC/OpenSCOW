@@ -24,7 +24,6 @@ import { JobInfo } from "src/entities/JobInfo";
 import { UserAccount } from "src/entities/UserAccount";
 import { ClusterPlugin } from "src/plugins/clusters";
 import { PricePlugin } from "src/plugins/price";
-import testData from "src/testData.json";
 
 async function getLatestDate(em: SqlEntityManager, logger: Logger) {
 
@@ -82,7 +81,8 @@ export async function fetchJobs(
   const persistJobAndCharge = async (jobs: ({ cluster: string } & ClusterJobInfo)[]) => {
     const result = await em.transactional(async (em) => {
       // Calculate prices for new info and persist
-      const pricedJobs = [] as JobInfo[];
+      let pricedJob: JobInfo;
+      let count = 0;
       for (const job of jobs) {
         const tenant = accountTenantMap.get(job.account);
 
@@ -105,39 +105,36 @@ export async function fetchJobs(
             tenant,
           }) : emptyJobPriceInfo();
 
-          const pricedJob = new JobInfo(job, tenant, price);
+          pricedJob = new JobInfo(job, tenant, price);
 
           em.persist(pricedJob);
-          await em.flush();
 
-          pricedJobs.push(pricedJob);
+          // Determine whether the job can be inserted into the database. If not, skip the job
+          await em.flush();
         } catch (error) {
           logger.warn("invalid job. cluster: %s, jobId: %s, error: %s", job.cluster, job.jobId, error);
+          continue;
         }
-      }
 
-      // add job charge for user account
-      for (const x of pricedJobs) {
-
-        // add job charge for the user
+        // add job charge for user account
         const ua = await em.findOne(UserAccount, {
-          account: { accountName: x.account },
-          user: { userId: x.user },
+          account: { accountName: pricedJob.account },
+          user: { userId: pricedJob.user },
         }, {
           populate: ["user", "account", "account.tenant"],
         });
 
         if (!ua) {
-          logger.warn({ biJobIndex: x.biJobIndex },
-            "User %s in account %s is not found. Don't charge the job.", x.user, x.account);
+          logger.warn({ biJobIndex: pricedJob.biJobIndex },
+            "User %s in account %s is not found. Don't charge the job.", pricedJob.user, pricedJob.account);
         }
 
-        const comment = parsePlaceholder(misConfig.jobChargeComment, x);
+        const comment = parsePlaceholder(misConfig.jobChargeComment, pricedJob);
 
         if (ua) {
           // charge account
           await charge({
-            amount: x.accountPrice,
+            amount: pricedJob.accountPrice,
             type: misConfig.jobChargeType,
             comment,
             target: ua.account.$,
@@ -145,42 +142,24 @@ export async function fetchJobs(
 
           // charge tenant
           await charge({
-            amount: x.tenantPrice,
+            amount: pricedJob.tenantPrice,
             type: misConfig.jobChargeType,
             comment,
             target: ua.account.$.tenant.getEntity(),
           }, em, logger, clusterPlugin);
 
-          await addJobCharge(ua, x.accountPrice, clusterPlugin, logger);
+          await addJobCharge(ua, pricedJob.accountPrice, clusterPlugin, logger);
         }
+
+        count++;
       }
-
-      return pricedJobs.length;
-
+      return count;
     });
 
     em.clear();
 
     return result;
   };
-
-  if (!process.env.SCOW_CONFIG_PATH && process.env.NODE_ENV !== "production") {
-    const jobsInfo: ({cluster: string} & ClusterJobInfo)[] = [];
-    // data for test
-    jobsInfo.push(...testData.map(({ tenant, accountPrice, tenantPrice, ...rest }) => {
-      return {
-        ...rest,
-        state: "COMPLETED",
-        workingDirectory: "",
-      };
-    }));
-
-    const savedJobsCount = await persistJobAndCharge(jobsInfo);
-    logger.info(`Completed. Saved ${savedJobsCount} new info.`);
-    lastFetched = new Date();
-    return { newJobsCount: jobsInfo.length };
-  }
-
 
   try {
     const latestDate = await getLatestDate(em, logger);

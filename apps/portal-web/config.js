@@ -40,6 +40,28 @@ async function queryCapabilities(authUrl, phase) {
   }
 }
 
+
+/**
+ * 当所有集群下都关闭桌面登录功能时，才关闭。
+ * @param {Record<String, import("@scow/config/build/cluster").ClusterConfigSchema>} clusters
+ * @param {import("@scow/config/build/portal").PortalConfigSchema} portalConfig
+ * @returns {boolean} desktop login enable
+ */
+function getDesktopEnabled(clusters, portalConfig) {
+  const clusterDesktopEnabled = Object.keys(clusters).reduce(
+    ((pre, cur) => {
+
+      const curClusterDesktopEnabled = clusters?.[cur]?.loginDesktop?.enabled !== undefined
+        ? !!clusters[cur]?.loginDesktop?.enabled
+        : portalConfig.loginDesktop.enabled;
+
+      return pre || curClusterDesktopEnabled;
+    }), false,
+  );
+
+  return clusterDesktopEnabled;
+}
+
 const specs = {
 
   AUTH_EXTERNAL_URL: str({ desc: "认证系统的URL。如果和本系统域名相同，可以只写完整路径", default: "/auth" }),
@@ -130,6 +152,8 @@ const buildRuntimeConfig = async (phase, basePath) => {
   // query auth capabilities to set optional auth features
   const capabilities = await queryCapabilities(config.AUTH_INTERNAL_URL, phase);
 
+  const enableLoginDesktop = getDesktopEnabled(clusters, portalConfig);
+
   /**
    * @type {import("./src/utils/config").PublicRuntimeConfig}
    */
@@ -141,7 +165,7 @@ const buildRuntimeConfig = async (phase, basePath) => {
 
     ENABLE_JOB_MANAGEMENT: portalConfig.jobManagement,
 
-    ENABLE_LOGIN_DESKTOP: portalConfig.loginDesktop.enabled,
+    ENABLE_LOGIN_DESKTOP: enableLoginDesktop,
 
     ENABLE_APPS: portalConfig.apps,
 

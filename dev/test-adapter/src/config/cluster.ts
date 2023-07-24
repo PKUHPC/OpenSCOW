@@ -10,4 +10,4 @@
  * See the Mulan PSL v2 for more details.
  */
 
-export { getRunningJobs } from "./getRunningJobs";
+export const clusterId = process.env.CLUSTER_ID;

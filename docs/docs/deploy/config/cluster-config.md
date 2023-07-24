@@ -24,4 +24,27 @@ loginNodes:
     address: 192.168.88.102
   - name: login02
     address: 192.168.88.103
+
+# 登录节点桌面功能
+loginDesktop:
+  # 是否启用桌面功能
+  enabled: true
+
+  # 桌面
+  wms: 
+    # 桌面名和对应的wm值。见文档
+    - name: Xfce
+      wm: xfce
+
+  # 单个登录节点最多启动多少个桌面节点
+  maxDesktops: 3
+
+  # 将创建的登录节点桌面信息的保存到什么位置。相对于用户的家目录
+  desktopsDir: scow/desktops
+
+# TurboVNC的安装路径
+turboVNCPath: /opt/TurboVNC
 ```
+
+## 注意
+集群配置里的登录节点桌面功能和TurboVNC的安装路径配置为该集群特有，如不需要特殊配置该集群的这些功能，可在[门户系统](./portal/intro.md)进行统一配置；若在集群下配置以上功能，在该集群内将会覆盖门户系统下的配置。
