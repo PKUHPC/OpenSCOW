@@ -40,9 +40,11 @@ export const ChangePasswordForm: React.FC = () => {
           message.error("原密码错误！");
         }
       })
-      .then(() => {
-        form.resetFields();
-        message.success("密码更改成功！");
+      .then((result) => {
+        if (result.success) {
+          form.resetFields();
+          message.success("密码更改成功！");   
+        }
       })
       .finally(() => {
         setLoading(false);
