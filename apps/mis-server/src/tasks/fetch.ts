@@ -16,6 +16,7 @@ import { QueryOrder } from "@mikro-orm/core";
 import { SqlEntityManager } from "@mikro-orm/mysql";
 import { parsePlaceholder } from "@scow/lib-config";
 import { decimalToMoney } from "@scow/lib-decimal";
+import { HookJobInfo } from "@scow/protos/build/hook/hook";
 import { GetJobsResponse, JobInfo as ClusterJobInfo } from "@scow/scheduler-adapter-protos/build/protos/job";
 import { addJobCharge, charge } from "src/bl/charging";
 import { emptyJobPriceInfo } from "src/bl/jobPrice";
@@ -83,8 +84,8 @@ export async function fetchJobs(
   const persistJobAndCharge = async (jobs: ({ cluster: string } & ClusterJobInfo)[]) => {
     const result = await em.transactional(async (em) => {
       // Calculate prices for new info and persist
+      const pricedJobs: HookJobInfo[] = [];
       let pricedJob: JobInfo;
-      let count = 0;
       for (const job of jobs) {
         const tenant = accountTenantMap.get(job.account);
 
@@ -154,21 +155,23 @@ export async function fetchJobs(
           await addJobCharge(ua, pricedJob.accountPrice, clusterPlugin, logger);
         }
 
-        await callHook("jobSaved", {
+        pricedJobs.push({
           ...pricedJob,
           accountPrice: decimalToMoney(pricedJob.accountPrice),
           tenantPrice: decimalToMoney(pricedJob.tenantPrice),
           jobId: pricedJob.idJob,
-        }, logger);
-
-        count++;
+        });
       }
-      return count;
+      return pricedJobs;
     });
 
     em.clear();
 
-    return result;
+    await callHook("jobSaved", {
+      jobs: result,
+    }, logger);
+
+    return result.length;
   };
 
   try {
