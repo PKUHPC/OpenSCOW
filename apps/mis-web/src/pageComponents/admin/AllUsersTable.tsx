@@ -38,6 +38,8 @@ interface Props {
   user: User;
 }
 
+type FilteredRole = "PLATFORM_ADMIN" | "PLATFORM_FINANCE" | "ALL_USERS";
+
 export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
 
   const [ query, setQuery ] = useState<FilterForm>(() => {
@@ -64,7 +66,7 @@ export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
   }, [query, pageInfo]);
   const { data, isLoading, reload } = useAsync({ promiseFn, watch: refreshToken });
 
-  const [rangeSearchRole, setRangeSearchRole] = useState<string>("ALL_USERS");
+  const [rangeSearchRole, setRangeSearchRole] = useState<FilteredRole>("ALL_USERS");
 
   return (
     <div>
@@ -93,7 +95,7 @@ export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
               { title: `平台管理员(${data?.[1].totalAdminCount ?? 0})`, key: "PLATFORM_ADMIN" },
               { title: `财务人员(${data?.[1].totalFinanceCount ?? 0})`, key: "PLATFORM_FINANCE" },
             ]}
-            onChange={(value) => setRangeSearchRole(value)}
+            onChange={(value) => setRangeSearchRole(value as FilteredRole)}
           />
         </Space>
 
@@ -120,7 +122,7 @@ interface UserInfoTableProps {
   isLoading: boolean;
   reload: () => void;
   user: User;
-  rangeSearchRole: string;
+  rangeSearchRole: FilteredRole;
 }
 
 const UserInfoTable: React.FC<UserInfoTableProps> = ({

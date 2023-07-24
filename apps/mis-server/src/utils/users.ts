@@ -10,8 +10,9 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { platformRoleFromJSON } from "@scow/protos/build/server/user";
-import { PlatformRole } from "src/entities/User";
+import { Loaded } from "@mikro-orm/core";
+import { platformRoleFromJSON, PlatformUserInfo } from "@scow/protos/build/server/user";
+import { PlatformRole, User } from "src/entities/User";
 import { UserStatus } from "src/entities/UserAccount";
 
 // generate platform role query
@@ -37,18 +38,19 @@ export const generateRoleQuery = (idOrName: string | undefined, role: PlatformRo
   }
 };
 
-// set platform users detail from db
-export const setPlatformUsers = (users) => {
-  return users.map((x) => ({
-    userId: x.userId,
-    name: x.name,
-    availableAccounts: x.accounts.getItems()
-      .filter((ua) => ua.status === UserStatus.UNBLOCKED)
-      .map((ua) => {
-        return ua.account.getProperty("accountName");
-      }),
-    tenantName: x.tenant.$.name,
-    createTime: x.createTime.toISOString(),
-    platformRoles: x.platformRoles.map(platformRoleFromJSON),
-  }));
-};
+// map platform users info details from User entity with "tenant" | "accounts" | "accounts.account" relations
+export const mapToPlatformUserInfoList =
+  (users: Loaded<User, "tenant" | "accounts" | "accounts.account">[]): PlatformUserInfo[] => {
+    return users.map((x) => ({
+      userId: x.userId,
+      name: x.name,
+      availableAccounts: x.accounts.getItems()
+        .filter((ua) => ua.status === UserStatus.UNBLOCKED)
+        .map((ua) => {
+          return ua.account.getProperty("accountName");
+        }),
+      tenantName: x.tenant.$.name,
+      createTime: x.createTime.toISOString(),
+      platformRoles: x.platformRoles.map(platformRoleFromJSON),
+    }));
+  };

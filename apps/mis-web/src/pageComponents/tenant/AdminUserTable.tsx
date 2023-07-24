@@ -33,6 +33,8 @@ interface FilterForm {
   idOrName: string | undefined;
 }
 
+type FilteredRole = "TENANT_ADMIN" | "TENANT_FINANCE" | "ALL_USERS";
+
 const filterUsersByTenantRole = (dataToFilter: FullUserInfo[] | undefined) => {
   return {
     allUsers: dataToFilter ?? [],
@@ -58,14 +60,14 @@ export const AdminUserTable: React.FC<Props> = ({
     (!query.idOrName || x.id.includes(query.idOrName) || x.name.includes(query.idOrName))
   )) : undefined, [data, query]);
 
-  const [rangeSearchRole, setRangeSearchRole] = useState<string>("ALL_USERS");
+  const [rangeSearchRole, setRangeSearchRole] = useState<FilteredRole>("ALL_USERS");
 
   // 保存各角色所有用户数
   const allUsersCounts = data ? data.results.length : 0;
   const tenantAdminCounts = filterUsersByTenantRole(data?.results).adminUsers.length;
   const tenantFinanceCounts = filterUsersByTenantRole(data?.results).financeUsers.length;
 
-  const setFilteredData = (rangeSearchRole) => {
+  const setFilteredData = (rangeSearchRole: FilteredRole) => {
     switch (rangeSearchRole) {
     case "TENANT_ADMIN":
       return filterUsersByTenantRole(filteredData).adminUsers;
@@ -102,7 +104,7 @@ export const AdminUserTable: React.FC<Props> = ({
               { title: `租户管理员(${tenantAdminCounts})`, key: "TENANT_ADMIN" },
               { title: `财务人员(${tenantFinanceCounts})`, key: "TENANT_FINANCE" },
             ]}
-            onChange={(value) => setRangeSearchRole(value)}
+            onChange={(value) => setRangeSearchRole(value as FilteredRole)}
           />
         </Space>
       </FilterFormContainer>

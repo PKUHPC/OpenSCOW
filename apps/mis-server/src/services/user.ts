@@ -35,7 +35,7 @@ import { UserAccount, UserRole, UserStatus } from "src/entities/UserAccount";
 import { callHook } from "src/plugins/hookClient";
 import { createUserInDatabase, insertKeyToNewUser } from "src/utils/createUser";
 import { paginationProps } from "src/utils/orm";
-import { generateRoleQuery, setPlatformUsers } from "src/utils/users";
+import { generateRoleQuery, mapToPlatformUserInfoList } from "src/utils/users";
 
 export const userServiceServer = plugin((server) => {
 
@@ -557,9 +557,9 @@ export const userServiceServer = plugin((server) => {
         totalAdminCount: totalAdminCount,
         totalFinanceCount: totalFinanceCount,
         queryAdminCount: queryAdminCount,
-        platformAdminUsers: setPlatformUsers(adminUsers),
+        platformAdminUsers: mapToPlatformUserInfoList(adminUsers),
         queryFinanceCount: queryFinanceCount,
-        platformFinanceUsers: setPlatformUsers(financeUsers),
+        platformFinanceUsers: mapToPlatformUserInfoList(financeUsers),
       }];
     },
 
