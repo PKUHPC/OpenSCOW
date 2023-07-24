@@ -17,7 +17,6 @@ import { UserServiceClient } from "@scow/protos/build/server/user";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { getClient } from "src/utils/client";
-import { publicConfig } from "src/utils/config";
 import { handlegRPCError } from "src/utils/server";
 
 

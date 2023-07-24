@@ -14,7 +14,8 @@ import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
-import { addUserToAccount, changeEmail as libChangeEmail, createUser, getUser, removeUserFromAccount } 
+import { addUserToAccount, changeEmail as libChangeEmail, createUser, getCapabilities, getUser, removeUserFromAccount,
+} 
   from "@scow/lib-auth";
 import { decimalToMoney } from "@scow/lib-decimal";
 import {
@@ -628,11 +629,10 @@ export const userServiceServer = plugin((server) => {
       return [{}];
 
     },
-    changeEmail: async ({ request, em }) => {
+    changeEmail: async ({ request, em, logger }) => {
       const { userId, newEmail } = request;
 
       const user = await em.findOne(User, { userId: userId });
-      const oldEmail = user?.email;
 
       if (!user) {
         throw <ServiceError>{
@@ -641,21 +641,22 @@ export const userServiceServer = plugin((server) => {
       }
         
       user.email = newEmail;
+      await em.flush();
 
-      await libChangeEmail(misConfig.authUrl, {
-        identityId: userId,
-        newEmail,
-      }, console)
-        .catch(async () => {
-          // 如果LADP修改失败，则数据库里的修改退回去
-          user.email = oldEmail as string;
-      
-          throw <ServiceError> {
-            code: Status.UNKNOWN, message: "LDAP failed to change email",
-          };
-        }).finally(async () => {
-          await em.flush();
-        });
+      const LdapCapabilities = await getCapabilities(misConfig.authUrl);
+
+      // 看LDAP是否有修改邮箱的权限
+      if (LdapCapabilities.changeEmail) {
+        await libChangeEmail(misConfig.authUrl, {
+          identityId: userId,
+          newEmail,
+        }, logger)
+          .catch(async () => {
+            throw <ServiceError> {
+              code: Status.UNKNOWN, message: "LDAP failed to change email",
+            };
+          });
+      }
 
       return [{}];
     },
