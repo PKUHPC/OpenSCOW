@@ -167,7 +167,7 @@ export async function fetchJobs(
 
     em.clear();
 
-    await callHook("jobSaved", {
+    await callHook("jobsSaved", {
       jobs: result,
     }, logger);
 

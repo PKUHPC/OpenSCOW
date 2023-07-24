@@ -105,7 +105,7 @@ message TenantPaid {
   common.Money amount = 2;
 }
 
-message JobSaved {
+message JobsSaved {
   repeated HookJobInfo jobs = 1;
 }
 
@@ -126,7 +126,7 @@ message OnEventRequest {
     UserAdded user_added = 8;
     AccountPaid account_paid = 9;
     TenantPaid tenant_paid = 10;
-    JobSaved job_saved = 11;
+    JobsSaved jobs_saved = 11;
   }
 }
 message OnEventResponse {
