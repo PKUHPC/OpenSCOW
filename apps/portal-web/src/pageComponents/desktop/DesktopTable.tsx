@@ -14,6 +14,7 @@ import { PlusOutlined } from "@ant-design/icons";
 import { queryToString } from "@scow/lib-web/build/utils/querystring";
 import { Button, Form, Select, Table } from "antd";
 import { ColumnsType } from "antd/es/table";
+import dayjs from "dayjs";
 import { useRouter } from "next/router";
 import React, { useCallback } from "react";
 import { useAsync } from "react-async";
@@ -36,6 +37,9 @@ interface Props {
 
 export type DesktopItem = {
   desktopId: number,
+  desktopName: string,
+  wm: string,
+  createTime: string,
   addr: string,
 }
 
@@ -66,34 +70,66 @@ export const DesktopTable: React.FC<Props> = ({ loginDesktopEnabledClusters }) =
         query: { cluster: cluster.id, loginNode: loginNode?.address },
       });
       return userDesktops.map(
-        (userDesktop) => userDesktop.displayId.map(
-          (x) => ({ desktopId: x, addr: userDesktop.host }),
+        (userDesktop) => userDesktop.desktops.map(
+          (x) => ({
+            desktopId: x.displayId,
+            desktopName: x.desktopName,
+            createTime: x.createTime,
+            addr: userDesktop.host,
+            wm: x.wm,
+          }),
         ),
       ).flat();
     }, [cluster, loginNode]),
   });
 
+  const { data: availableWms, isLoading: isWmLoading } = useAsync({
+    promiseFn: useCallback(async () => api.listAvailableWms({ query: { cluster: cluster.id } }), [cluster.id]),
+  });
 
   const columns: ColumnsType<DesktopItem> = [
     {
       title: "桌面ID",
       dataIndex: "desktopId",
       key: "desktopId",
-      width: "30%",
+      width: "10%",
+    },
+    {
+      title: "桌面名称",
+      dataIndex: "desktopName",
+      key: "desktopName",
+    },
+    {
+      title: "桌面类型",
+      dataIndex: "wm",
+      key: "wm",
+      width: "20%",
+      render: (wm) => {
+        return availableWms?.wms.find((x) => x.wm === wm)?.name || wm;
+      },
     },
     {
       title: "地址",
       dataIndex: "addr",
       key: "addr",
-      width: "30%",
+      width: "20%",
       render: (addr: string) => {
         return loginNodes[cluster.id].find((x) => x.address === addr)?.name || addr;
       },
     },
     {
+      title: "创建时间",
+      dataIndex: "createTime",
+      key: "createTime",
+      width: "15%",
+      render: (createTime) => {
+        return createTime ? dayjs(createTime).format("YYYY-MM-DD[T]HH:mm:ss") : "";
+      },
+    },
+    {
       title: "操作",
       key: "action",
-      width: "20%",
+      width: "15%",
       render: (_, record) => (
         <DesktopTableActions cluster={cluster} reload={reload} record={record} />
       ),
@@ -122,12 +158,14 @@ export const DesktopTable: React.FC<Props> = ({ loginDesktopEnabledClusters }) =
                 const nextLoginQuery = x
                   ? loginNodes[cluster.id].find((loginNode) => loginNode.address === x)?.name
                   : undefined;
-                router.push({ query: nextLoginQuery
-                  ? {
-                    cluster: cluster.id,
-                    loginNode: nextLoginQuery,
-                  }
-                  : { cluster : cluster.id } });
+                router.push({
+                  query: nextLoginQuery
+                    ? {
+                      cluster: cluster.id,
+                      loginNode: nextLoginQuery,
+                    }
+                    : { cluster: cluster.id },
+                });
               }}
               options={loginNodes[cluster.id].map((loginNode) => ({
                 label: loginNode.name, value: loginNode.address,
@@ -141,7 +179,12 @@ export const DesktopTable: React.FC<Props> = ({ loginDesktopEnabledClusters }) =
             </Button>
           </Form.Item>
           <Form.Item>
-            <NewDesktopTableModalButton reload={reload} cluster={cluster} loginNodes={loginNodes[cluster.id]}>
+            <NewDesktopTableModalButton
+              reload={reload}
+              cluster={cluster}
+              loginNodes={loginNodes[cluster.id]}
+              availableWms={availableWms?.wms ?? []}
+            >
               新建桌面
             </NewDesktopTableModalButton>
           </Form.Item>
@@ -150,8 +193,8 @@ export const DesktopTable: React.FC<Props> = ({ loginDesktopEnabledClusters }) =
       <Table
         dataSource={data}
         columns={columns}
-        rowKey={(record) => record.desktopId}
-        loading={isLoading}
+        rowKey={(record) => `${record.addr}:${record.desktopId}`}
+        loading={isLoading || isWmLoading}
         pagination={false}
       />
     </div>

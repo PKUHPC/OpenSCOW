@@ -188,7 +188,11 @@ export const mockApi: MockApi<typeof api> = {
   listDesktops: async () => ({
     userDesktops: [{
       host: "login01",
-      displayId: [1, 2, 3],
+      desktops: [
+        { displayId: 1, desktopName: "111", wm: "", createTime: "" },
+        { displayId: 222, desktopName: "222", wm: "", createTime: "" },
+        { displayId: 1, desktopName: "333", wm: "", createTime: "" },
+      ],
     }],
   }),
 
