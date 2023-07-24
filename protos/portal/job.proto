@@ -113,6 +113,26 @@ message GetJobTemplateRequest {
 message GetJobTemplateResponse {
   JobTemplate template = 1;
 }
+
+message DeleteTemplateRequest {
+  string user_id = 1;
+  string cluster = 2;
+  string template_id = 3;
+}
+
+message RenameTemplateResponse {
+}
+
+message RenameTemplateRequest {
+  string user_id = 1;
+  string cluster = 2;
+  string template_id = 3;
+  string job_name =4 ;
+}
+
+message DeleteTemplateResponse {
+}
+
 message SubmitJobRequest {
   string user_id = 1;
   string cluster = 2;
@@ -151,6 +171,10 @@ service JobService {
   rpc ListJobTemplates(ListJobTemplatesRequest) returns (ListJobTemplatesResponse);
 
   rpc GetJobTemplate(GetJobTemplateRequest) returns (GetJobTemplateResponse);
+
+  rpc DeleteTemplate(DeleteTemplateRequest) returns (DeleteTemplateResponse);
+
+  rpc RenameTemplate(RenameTemplateRequest) returns (RenameTemplateResponse);
 
   rpc SubmitJob(SubmitJobRequest) returns (SubmitJobResponse);
 }

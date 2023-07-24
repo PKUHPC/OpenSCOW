@@ -87,6 +87,14 @@ export const jobServiceServer = plugin((server) => {
 
     },
 
+    deleteTemplate: async ({ request, logger }) => {
+      return [{}];
+    },
+
+    renameTemplate: async ({ request, logger }) => {
+      return [{}];
+    },
+
     listRunningJobs: async ({ request, logger }) => {
 
       const { cluster, userId } = request;
