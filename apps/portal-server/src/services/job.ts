@@ -88,10 +88,28 @@ export const jobServiceServer = plugin((server) => {
     },
 
     deleteTemplate: async ({ request, logger }) => {
+      const { cluster, templateId, userId } = request;
+      const clusterops = getClusterOps(cluster);
+
+      if (!clusterops) { throw clusterNotFound(cluster); }
+
+      await clusterops.job.deleteJobTemplate({
+        id: templateId, userId,
+      }, logger);
+
       return [{}];
     },
 
     renameTemplate: async ({ request, logger }) => {
+      const { cluster, templateId, userId, jobName } = request;
+      const clusterops = getClusterOps(cluster);
+
+      if (!clusterops) { throw clusterNotFound(cluster); }
+
+      await clusterops.job.renameJobTemplate({
+        id: templateId, userId, jobName,
+      }, logger);
+
       return [{}];
     },
 
