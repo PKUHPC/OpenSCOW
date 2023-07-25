@@ -37,8 +37,9 @@ export const TenantInfoPage: NextPage<Props> = (props) => {
     return <UnifiedErrorPage code={props.error} />;
   }
 
-  const { balance, accountCount, admins, userCount, tenantName } = ensureNotUndefined(props, ["balance"]);
-
+  const { balance, accountCount, admins, 
+    userCount, tenantName, financialStaff } = ensureNotUndefined(props, ["balance"]);
+  console.log(ensureNotUndefined(props, ["balance"]));
   return (
     <div>
       <Head title="租户信息" />
@@ -50,6 +51,15 @@ export const TenantInfoPage: NextPage<Props> = (props) => {
         <Descriptions.Item label="管理员">
           {
             admins.map(({ userId, userName }) => (
+              <Tag key={userId}>
+                {userName} (ID: {userId})
+              </Tag>
+            ))
+          }
+        </Descriptions.Item>
+        <Descriptions.Item label="租户财务人员">
+          {
+            financialStaff.map(({ userId, userName }) => (
               <Tag key={userId}>
                 {userName} (ID: {userId})
               </Tag>
@@ -81,18 +91,24 @@ export const getServerSideProps: GetServerSideProps<Props> = async (ctx) => {
   }
 
   if (USE_MOCK) {
-    return { props: {
-      accountCount: 10,
-      admins: [{ userId: "123", userName: "1234" }, { userId: "1234", userName: "12345" }],
-      userCount: 100,
-      balance: numberToMoney(100),
-      tenantName: info.tenant,
-    } };
+    return {
+      props: {
+        accountCount: 10,
+        admins: [{ userId: "123", userName: "1234" }, { userId: "1234", userName: "12345" }],
+        financialStaff: [{ userId: "123", userName: "1234" }, { userId: "1234", userName: "12345" }],
+        userCount: 100,
+        balance: numberToMoney(100),
+        tenantName: info.tenant,
+      },
+    };
   }
 
   const client = getClient(TenantServiceClient);
   return await asyncClientCall(client, "getTenantInfo", { tenantName: info.tenant })
-    .then((r) => ({ props: { ...r, tenantName: info.tenant } }))
+    .then((r) => {
+      console.log("apps/mis-web/src/pages/tenant/info.tsx", r);
+      return ({ props: { ...r, tenantName: info.tenant } });
+    })
     .catch(handlegRPCError({ [status.NOT_FOUND]: () => ({ props: { error: 404 as const } }) }));
 };
 
