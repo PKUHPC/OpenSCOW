@@ -277,3 +277,29 @@ it("returns 404 if user doesn't exist", async () => {
   expect(resp.statusCode).toBe(404);
   expect(resp.json()).toEqual({ code: "USER_NOT_FOUND" });
 });
+
+it("change user email", async () => {
+
+  await createUser();
+
+  const newEmail = "test@123.com";
+  const changeEmaiResp = await server.inject({
+    method: "PATCH",
+    url: "/user/email",
+    payload: { identityId:user.identityId, newEmail },
+  });
+
+
+  const GetUserResp = await server.inject({
+    method: "GET",
+    url: "/user",
+    query: { identityId: user.identityId },
+  });
+
+  expect(changeEmaiResp.statusCode).toBe(204);
+  expect(changeEmaiResp.json()).toBe(null);
+
+  expect(GetUserResp.statusCode).toBe(200);
+  expect(GetUserResp.json().user.mail).toEqual(newEmail);
+
+});
