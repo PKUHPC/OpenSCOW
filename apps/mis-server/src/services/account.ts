@@ -300,6 +300,36 @@ export const accountServiceServer = plugin((server) => {
 
       return [{ executed: true }];
     },
+    getAllAccounts: async ({ em }) => {
+
+      const results = await em.find(Account, {}, { populate: ["users", "users.user", "tenant"]});
+
+      return [{
+        results: results.map((x) => {
+
+          const owner = x.users.getItems().find((x) => x.role === EntityUserRole.OWNER);
+
+          if (!owner) {
+            throw <ServiceError>{
+              code: Status.INTERNAL, message: `Account ${x.accountName} does not have an owner`,
+            };
+          }
+
+          const ownerUser = owner.user.getEntity();
+
+          return {
+            accountName: x.accountName,
+            tenantName: x.tenant.$.name,
+            userCount: x.users.count(),
+            blocked: x.blocked,
+            ownerId: ownerUser.userId,
+            ownerName: ownerUser.name,
+            comment: x.comment,
+            balance: decimalToMoney(x.balance),
+          };
+        }),
+      }];
+    },
 
   });
 

@@ -114,10 +114,19 @@ message GetAccountsResponse {
   repeated Account results = 1;
 }
 
+message GetAllAccountsRequest {
+}
+
+message GetAllAccountsResponse {
+  repeated Account results = 1;
+}
+
 service AccountService {
 
   rpc CreateAccount(CreateAccountRequest) returns (CreateAccountResponse);
   rpc GetAccounts(GetAccountsRequest) returns (GetAccountsResponse);
+
+  rpc GetAllAccounts(GetAllAccountsRequest) returns (GetAllAccountsResponse);
 
   rpc BlockAccount(BlockAccountRequest) returns (BlockAccountResponse);
   rpc UnblockAccount(UnblockAccountRequest) returns (UnblockAccountResponse);
