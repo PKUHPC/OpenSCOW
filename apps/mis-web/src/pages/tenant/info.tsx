@@ -39,7 +39,7 @@ export const TenantInfoPage: NextPage<Props> = (props) => {
 
   const { balance, accountCount, admins, 
     userCount, tenantName, financialStaff } = ensureNotUndefined(props, ["balance"]);
-  console.log(ensureNotUndefined(props, ["balance"]));
+    
   return (
     <div>
       <Head title="租户信息" />
@@ -105,10 +105,8 @@ export const getServerSideProps: GetServerSideProps<Props> = async (ctx) => {
 
   const client = getClient(TenantServiceClient);
   return await asyncClientCall(client, "getTenantInfo", { tenantName: info.tenant })
-    .then((r) => {
-      console.log("apps/mis-web/src/pages/tenant/info.tsx", r);
-      return ({ props: { ...r, tenantName: info.tenant } });
-    })
+    .then((r) => ({ props: { ...r, tenantName: info.tenant } }),
+    )
     .catch(handlegRPCError({ [status.NOT_FOUND]: () => ({ props: { error: 404 as const } }) }));
 };
 
