@@ -135,28 +135,37 @@ export const userRoutes: (
       } as NavItemProps)),
     }] : []),
     ...(publicConfig.NAV_LINKS && publicConfig.NAV_LINKS.length > 0
-      ? publicConfig.NAV_LINKS.map((link) => ({
-        Icon: !link.iconPath ? LinkOutlined : (
-          <NavIcon
-            src={join(publicConfig.PUBLIC_PATH, link.iconPath)}
-          />
-        ),
-        text: link.text,
-        path: `${link.url}?token=${user.token}`,
-        clickable: true,
-        openInNewPage: true,
-        children: link.children?.length ? link.children?.map((childLink) => ({
-          Icon: !childLink.iconPath ? LinkOutlined : (
+      ? publicConfig.NAV_LINKS.map((link) => {
+
+        const parentNavPath = link.url ? `${link.url}?token=${user.token}`
+          : link.children?.length && link.children?.length > 0
+            ? `${link.children[0].url}?token=${user.token}` : "";
+
+        return {
+          Icon: !link.iconPath ? LinkOutlined : (
             <NavIcon
-              src={join(publicConfig.PUBLIC_PATH, childLink.iconPath)}
+              src={join(publicConfig.PUBLIC_PATH, link.iconPath)}
             />
           ),
-          text: childLink.text,
-          path: `${childLink.url}?token=${user.token}`,
+          text: link.text,
+          path: parentNavPath,
+          clickToPath: parentNavPath,
           clickable: true,
-          openInNewPage: true,
-        } as NavItemProps)) : [],
-      }) as NavItemProps) : []),
+          openInNewPage: link.openInNewPage,
+          children: link.children?.length ? link.children?.map((childLink) => ({
+            Icon: !childLink.iconPath ? LinkOutlined : (
+              <NavIcon
+                src={join(publicConfig.PUBLIC_PATH, childLink.iconPath)}
+              />
+            ),
+            text: childLink.text,
+            path: `${childLink.url}?token=${user.token}`,
+            clickToPath: `${childLink.url}?token=${user.token}`,
+            clickable: true,
+            openInNewPage: childLink.openInNewPage,
+          } as NavItemProps)) : [],
+        } as NavItemProps;
+      }) : []),
   ];
 };
 
