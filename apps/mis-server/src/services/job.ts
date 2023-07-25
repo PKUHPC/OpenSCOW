@@ -17,7 +17,6 @@ import { Status } from "@grpc/grpc-js/build/src/constants";
 import { FilterQuery, QueryOrder, UniqueConstraintViolationException } from "@mikro-orm/core";
 import { Decimal, decimalToMoney, moneyToNumber } from "@scow/lib-decimal";
 import { jobInfoToRunningjob } from "@scow/lib-scheduler-adapter";
-import { JobInfo } from "@scow/protos/build/common/ended_job";
 import {
   GetJobsResponse,
   JobBillingItem,
