@@ -181,9 +181,9 @@ export const mockApi: MockApi<typeof api> = {
     jobName: "sample-apple",
   }]}),
 
-  deleteTemplate: async () => null,
+  deleteJobTemplate: async () => null,
 
-  renameTemplate: async () => null,
+  renameJobTemplate: async () => null,
 
   getAccounts: async () => ({ accounts: ["hpc01", "hpc02"]}),
 

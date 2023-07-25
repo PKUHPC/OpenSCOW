@@ -107,7 +107,7 @@ const NewTemplateNameModal: React.FC<ModalProps> = ({
     const { jobName } = await form.validateFields();
     setLoading(true);
 
-    await api.renameTemplate({ body: {
+    await api.renameJobTemplate({ body: {
       cluster,
       templateId,
       jobName,
@@ -184,7 +184,7 @@ const InfoTable: React.FC<InfoTableProps> = ({
           <Popconfirm
             title="确定删除这个模板吗？"
             onConfirm={async () =>
-              api.deleteTemplate({
+              api.deleteJobTemplate({
                 query: {
                   cluster: cluster.id,
                   templateId: r.id,

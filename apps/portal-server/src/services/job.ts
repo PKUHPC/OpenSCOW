@@ -87,7 +87,7 @@ export const jobServiceServer = plugin((server) => {
 
     },
 
-    deleteTemplate: async ({ request, logger }) => {
+    deleteJobTemplate: async ({ request, logger }) => {
       const { cluster, templateId, userId } = request;
       const clusterops = getClusterOps(cluster);
 
@@ -100,7 +100,7 @@ export const jobServiceServer = plugin((server) => {
       return [{}];
     },
 
-    renameTemplate: async ({ request, logger }) => {
+    renameJobTemplate: async ({ request, logger }) => {
       const { cluster, templateId, userId, jobName } = request;
       const clusterops = getClusterOps(cluster);
 

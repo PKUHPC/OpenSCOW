@@ -20,12 +20,13 @@ import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
 import { handlegRPCError } from "src/utils/server";
 
-export const DeleteTemplateSchema = typeboxRouteSchema({
-  method: "DELETE",
+export const RenameJobTemplateSchema = typeboxRouteSchema({
+  method: "POST",
 
-  query: Type.Object({
+  body: Type.Object({
     cluster: Type.String(),
     templateId: Type.String(),
+    jobName: Type.String(),
   }),
 
   responses: {
@@ -36,18 +37,18 @@ export const DeleteTemplateSchema = typeboxRouteSchema({
 
 const auth = authenticate(() => true);
 
-export default /* #__PURE__*/route(DeleteTemplateSchema, async (req, res) => {
+export default /* #__PURE__*/route(RenameJobTemplateSchema, async (req, res) => {
 
   const info = await auth(req, res);
 
   if (!info) { return; }
 
-  const { cluster, templateId } = req.query;
+  const { cluster, templateId, jobName } = req.body;
 
   const client = getClient(JobServiceClient);
 
-  return asyncUnaryCall(client, "deleteTemplate", {
-    templateId, userId: info.identityId, cluster,
+  return asyncUnaryCall(client, "renameJobTemplate", {
+    templateId, userId: info.identityId, cluster, jobName,
   }).then(() => ({ 204: null }), handlegRPCError({
     [status.NOT_FOUND]: () => ({ 404: { code: "TEMPLATE_NOT_FOUND" } } as const),
   }));
