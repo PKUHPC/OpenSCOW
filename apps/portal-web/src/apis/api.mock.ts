@@ -211,6 +211,8 @@ export const mockApi: MockApi<typeof api> = {
 
   changePassword: async () => null,
 
+  checkPassword: null,
+
   validateToken: null,
 
   getRunningJobs: async () => ({ results: [runningJob]}),
