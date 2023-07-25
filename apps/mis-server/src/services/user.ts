@@ -643,10 +643,10 @@ export const userServiceServer = plugin((server) => {
       user.email = newEmail;
       await em.flush();
 
-      const LdapCapabilities = await getCapabilities(misConfig.authUrl);
+      const ldapCapabilities = await getCapabilities(misConfig.authUrl);
 
       // 看LDAP是否有修改邮箱的权限
-      if (LdapCapabilities.changeEmail) {
+      if (ldapCapabilities.changeEmail) {
         await libChangeEmail(misConfig.authUrl, {
           identityId: userId,
           newEmail,

@@ -290,7 +290,7 @@ it("change user email", async () => {
   });
 
 
-  const GetUserResp = await server.inject({
+  const getUserResp = await server.inject({
     method: "GET",
     url: "/user",
     query: { identityId: user.identityId },
@@ -299,7 +299,7 @@ it("change user email", async () => {
   expect(changeEmaiResp.statusCode).toBe(204);
   expect(changeEmaiResp.json()).toBe(null);
 
-  expect(GetUserResp.statusCode).toBe(200);
-  expect(GetUserResp.json().user.mail).toEqual(newEmail);
+  expect(getUserResp.statusCode).toBe(200);
+  expect(getUserResp.json().user.mail).toEqual(newEmail);
 
 });
