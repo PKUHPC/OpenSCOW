@@ -154,12 +154,6 @@ export async function fetchJobs(
           await addJobCharge(ua, pricedJob.accountPrice, clusterPlugin, logger);
         }
 
-        // pricedJobs.push({
-        //   ...pricedJob,
-        //   accountPrice: decimalToMoney(pricedJob.accountPrice),
-        //   tenantPrice: decimalToMoney(pricedJob.tenantPrice),
-        //   jobId: pricedJob.idJob,
-        // });
         pricedJobs.push(pricedJob);
       }
       return pricedJobs.map(toGrpc);
