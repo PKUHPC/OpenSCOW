@@ -13,8 +13,8 @@
 import { HttpError } from "@ddadaal/next-typed-api-routes-runtime";
 import { defaultPresets, formatDateTime } from "@scow/lib-web/build/utils/datetime";
 import { useDidUpdateEffect } from "@scow/lib-web/build/utils/hooks";
+import { JobInfo } from "@scow/protos/build/common/ended_job";
 import { Money } from "@scow/protos/build/common/money";
-import { JobInfo } from "@scow/protos/build/server/job";
 import { Static } from "@sinclair/typebox";
 import { App, Button, DatePicker, Divider, Form, Input, InputNumber, Select, Space, Table } from "antd";
 import dayjs from "dayjs";

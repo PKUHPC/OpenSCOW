@@ -3,4 +3,4 @@
 "@scow/grpc-api": patch
 ---
 
-增加 hook：jobPaid，此 hook 在作业付费后立即调用
+增加hook：jobsSaved，此hook在作业信息持久化到scow数据库后调用
