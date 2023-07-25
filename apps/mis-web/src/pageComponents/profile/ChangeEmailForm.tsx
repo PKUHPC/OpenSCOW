@@ -72,7 +72,7 @@ export const ChangeEmailForm: React.FC = () => {
           label="新邮箱"
           name="newEmail"
         >
-          <Input placeholder={emailRule.message} />
+          <Input placeholder="请输入新邮箱" />
         </Form.Item>
         <Form.Item>
           <Button type="primary" htmlType="submit">
