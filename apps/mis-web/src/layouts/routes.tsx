@@ -344,17 +344,8 @@ export const getAvailableRoutes = (user: User | undefined): NavItemProps[] => {
     const mappedNavLinkItems = publicConfig.NAV_LINKS
       .filter((link) => !link.allowedRoles
         || (link.allowedRoles.length && link.allowedRoles.some((role) => userCurrentRoles[role])))
-      .map((link) => ({
-        Icon: !link.iconPath ? LinkOutlined : (
-          <NavIcon
-            src={join(publicConfig.PUBLIC_PATH, link.iconPath)}
-          />
-        ),
-        text: link.text,
-        path: `${link.url}?token=${user.token}`,
-        clickable: true,
-        openInNewPage: true,
-        children: link.children?.filter((childLink) => !childLink.allowedRoles
+      .map((link) => {
+        const childrenLinks = link.children?.filter((childLink) => !childLink.allowedRoles
           || (childLink.allowedRoles.length &&
             childLink.allowedRoles.some((role) => userCurrentRoles[role])))
           .map((childLink) => ({
@@ -365,10 +356,27 @@ export const getAvailableRoutes = (user: User | undefined): NavItemProps[] => {
             ),
             text: childLink.text,
             path: `${childLink.url}?token=${user.token}`,
-            clickable: true,
-            openInNewPage: true,
-          }) as NavItemProps),
-      }) as NavItemProps);
+            clickToPath: `${childLink.url}?token=${user.token}`,
+            openInNewPage: childLink.openInNewPage,
+          }) as NavItemProps);
+
+        const parentNavPath = link.url ? `${link.url}?token=${user.token}`
+          : (childrenLinks && childrenLinks.length > 0 ? childrenLinks[0].path : "");
+
+        return {
+          Icon: !link.iconPath ? LinkOutlined : (
+            <NavIcon
+              src={join(publicConfig.PUBLIC_PATH, link.iconPath)}
+            />
+          ),
+          text: link.text,
+          path: parentNavPath,
+          clickToPath: parentNavPath,
+          openInNewPage: link.openInNewPage,
+          children: childrenLinks,
+        };
+      }) as NavItemProps[];
+
 
     routes.push(...customNavLinkRoutes(mappedNavLinkItems));
   }
