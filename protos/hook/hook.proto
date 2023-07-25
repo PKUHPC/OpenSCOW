@@ -15,48 +15,8 @@ syntax = "proto3";
 package scow.server.hook;
 
 import "common/money.proto";
+import "common/ended_job.proto";
 import "google/protobuf/timestamp.proto";
-
-message HookJobInfo {
-  uint32 job_id = 1;
-  string job_name = 2;
-  string account = 3;
-  string user = 4;
-  string partition = 5;
-  string qos = 6;
-
-  // the number of CPUs requested by job
-  int32 cpus_req = 7;
-  // memory requested by job
-  int64 mem_req = 8;
-  // the number of nodes requested by job
-  int32 nodes_req = 9;
-  google.protobuf.Timestamp submit_time = 10;
-  // name of the file that stdout outputs to, relative to the working directory.
-  optional string stdout_path = 11;
-  // name of the file that stderr outputs to, relative to the working directory.
-  optional string stderr_path = 12;
-  optional google.protobuf.Timestamp start_time = 13;
-  optional int64 elapsed_seconds = 14;
-  // indicates why is the job in this state
-  optional string reason = 15;
-  optional string node_list = 16;
-  // the number of GPUs used by job
-  optional int32 gpus_alloc = 17;
-  // the number of CPUs used by job
-  optional int32 cpus_alloc = 18;
-  // memory used by job
-  optional int64 mem_alloc_mb = 19;
-  // the number of nodes used by job
-  optional int32 nodes_alloc = 20;
-  optional google.protobuf.Timestamp end_time = 21;
-
-  optional string tenant = 22;
-  common.Money account_price = 23;
-  common.Money tenant_price = 24;
-  string cluster = 25;
-}
-
 
 message AccountBlocked {
   string account_name = 1;
@@ -106,7 +66,7 @@ message TenantPaid {
 }
 
 message JobsSaved {
-  repeated HookJobInfo jobs = 1;
+  repeated common.JobInfo jobs = 1;
 }
 
 message OnEventRequest {

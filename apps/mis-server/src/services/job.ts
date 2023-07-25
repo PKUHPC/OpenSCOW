@@ -17,11 +17,12 @@ import { Status } from "@grpc/grpc-js/build/src/constants";
 import { FilterQuery, QueryOrder, UniqueConstraintViolationException } from "@mikro-orm/core";
 import { Decimal, decimalToMoney, moneyToNumber } from "@scow/lib-decimal";
 import { jobInfoToRunningjob } from "@scow/lib-scheduler-adapter";
+import { JobInfo } from "@scow/protos/build/common/ended_job";
 import {
   GetJobsResponse,
   JobBillingItem,
   JobFilter,
-  JobInfo, JobServiceServer, JobServiceService,
+  JobServiceServer, JobServiceService,
 } from "@scow/protos/build/server/job";
 import { JobInfo as AdapterJobInfo } from "@scow/scheduler-adapter-protos/build/protos/job";
 import { charge, pay } from "src/bl/charging";
@@ -32,37 +33,8 @@ import { JobInfo as JobInfoEntity } from "src/entities/JobInfo";
 import { JobPriceChange } from "src/entities/JobPriceChange";
 import { AmountStrategy, JobPriceItem } from "src/entities/JobPriceItem";
 import { Tenant } from "src/entities/Tenant";
+import { toGrpc } from "src/utils/job";
 import { paginationProps } from "src/utils/orm";
-
-function toGrpc(x: JobInfoEntity) {
-  return <JobInfo>{
-    account: x.account,
-    biJobIndex: x.biJobIndex,
-    cluster: x.cluster,
-    cpusAlloc: x.cpusAlloc,
-    cpusReq: x.cpusReq,
-    gpu: x.gpu,
-    idJob: x.idJob,
-    jobName: x.jobName,
-    memAlloc: x.memAlloc,
-    memReq: x.memReq,
-    nodelist: x.nodelist,
-    nodesAlloc: x.nodesAlloc,
-    nodesReq: x.nodesReq,
-    partition: x.partition,
-    qos: x.qos,
-    recordTime: x.recordTime.toISOString(),
-    timeEnd: x.timeEnd.toISOString(),
-    timeStart: x.timeStart.toISOString(),
-    timeSubmit: x.timeSubmit.toISOString(),
-    timeUsed: x.timeUsed,
-    timeWait: x.timeWait,
-    timelimit: x.timelimit,
-    user: x.user,
-    tenantPrice: decimalToMoney(x.tenantPrice),
-    accountPrice: decimalToMoney(x.accountPrice),
-  };
-}
 
 function filterJobs({
   clusters, accountName, jobEndTimeEnd, tenantName,
