@@ -209,6 +209,7 @@ export const jobServiceServer = plugin((server) => {
         const clusterOps = getClusterOps(cluster);
         if (!clusterOps) { throw clusterNotFound(cluster); }
 
+        logger.info("jobInfo: %o", jobInfo);
         await clusterOps.job.saveJobTemplate({
           userId, jobId: reply.jobId, jobInfo,
         }, logger);
