@@ -371,6 +371,7 @@ export const mockApi: MockApi<typeof api> = {
   changeStorageQuota: async () => ({ currentQuota: 10 }),
   queryStorageQuota: async () => ({ currentQuota: 10 }),
   getAccounts: async () => ({ totalCount: mockAccounts.length, results: mockAccounts }),
+  getAllAccounts: async () => ({ results: mockAccounts }),
   changeJobTimeLimit: async () => null,
   queryJobTimeLimit: async () => ({ result: 10 }),
   createAccount: async () => { return {}; },
