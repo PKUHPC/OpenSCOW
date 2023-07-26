@@ -12,9 +12,9 @@
 
 import { HttpError, JsonFetchResultPromiseLike } from "@ddadaal/next-typed-api-routes-runtime/lib/client";
 import { numberToMoney } from "@scow/lib-decimal";
+import { JobInfo } from "@scow/protos/build/common/ended_job";
 import type { RunningJob } from "@scow/protos/build/common/job";
 import type { Account } from "@scow/protos/build/server/account";
-import { JobInfo } from "@scow/protos/build/server/job";
 import type { AccountUserInfo, GetUserStatusResponse } from "@scow/protos/build/server/user";
 import { api } from "src/apis/api";
 import { ClusterAccountInfo_ImportStatus, PlatformRole,
@@ -441,6 +441,7 @@ export const mockApi: MockApi<typeof api> = {
   changePassword: async () => null,
   changePasswordAsPlatformAdmin: async () => null,
   changePasswordAsTenantAdmin: async () => null,
+  checkPassword: null,
   createUser: async () => (
     { id: 1,
       createdInAuth: false,

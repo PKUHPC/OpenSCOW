@@ -35,6 +35,7 @@ export const LoginDeskopConfigSchema = Type.Object({
   wms: Type.Array(
     Type.Object({ name: Type.String({ description: "名称" }), wm: Type.String({ description: "wm值" }) })),
   maxDesktops: Type.Integer({ description: "每个登录节点上最多创建多少个桌面" }),
+  desktopsDir: Type.String({ description: "将创建的登录节点桌面信息的保存到什么位置。相对于用户的家目录" }),
 });
 
 const TurboVncConfigSchema = Type.String({ description: "TurboVNC的安装路径" });

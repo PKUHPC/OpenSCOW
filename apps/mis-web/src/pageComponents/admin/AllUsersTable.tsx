@@ -234,14 +234,12 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
               <ChangePasswordModalLink
                 userId={r.userId}
                 name={r.name}
-                onComplete={async (oldPassword, newPassword) => {
+                onComplete={async (newPassword) => {
                   await api.changePasswordAsPlatformAdmin({ body:{
                     identityId: r.userId,
-                    oldPassword: oldPassword,
                     newPassword: newPassword,
                   } })
                     .httpError(404, () => { message.error("用户不存在"); })
-                    .httpError(412, () => { message.error("原密码错误"); })
                     .httpError(501, () => { message.error("本功能在当前配置下不可用"); })
                     .then(() => { message.success("修改成功"); })
                     .catch(() => { message.error("修改失败"); });

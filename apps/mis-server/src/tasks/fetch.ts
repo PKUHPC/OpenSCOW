@@ -23,7 +23,9 @@ import { Account } from "src/entities/Account";
 import { JobInfo } from "src/entities/JobInfo";
 import { UserAccount } from "src/entities/UserAccount";
 import { ClusterPlugin } from "src/plugins/clusters";
+import { callHook } from "src/plugins/hookClient";
 import { PricePlugin } from "src/plugins/price";
+import { toGrpc } from "src/utils/job";
 
 async function getLatestDate(em: SqlEntityManager, logger: Logger) {
 
@@ -81,7 +83,8 @@ export async function fetchJobs(
   const persistJobAndCharge = async (jobs: ({ cluster: string } & ClusterJobInfo)[]) => {
     const result = await em.transactional(async (em) => {
       // Calculate prices for new info and persist
-      const pricedJobs = [] as JobInfo[];
+      const pricedJobs: JobInfo[] = [];
+      let pricedJob: JobInfo;
       for (const job of jobs) {
         const tenant = accountTenantMap.get(job.account);
 
@@ -104,39 +107,37 @@ export async function fetchJobs(
             tenant,
           }) : emptyJobPriceInfo();
 
-          const pricedJob = new JobInfo(job, tenant, price);
+          pricedJob = new JobInfo(job, tenant, price);
 
           em.persist(pricedJob);
+
+          // Determine whether the job can be inserted into the database. If not, skip the job
           await em.flush();
 
-          pricedJobs.push(pricedJob);
         } catch (error) {
           logger.warn("invalid job. cluster: %s, jobId: %s, error: %s", job.cluster, job.jobId, error);
+          continue;
         }
-      }
 
-      // add job charge for user account
-      for (const x of pricedJobs) {
-
-        // add job charge for the user
+        // add job charge for user account
         const ua = await em.findOne(UserAccount, {
-          account: { accountName: x.account },
-          user: { userId: x.user },
+          account: { accountName: pricedJob.account },
+          user: { userId: pricedJob.user },
         }, {
           populate: ["user", "account", "account.tenant"],
         });
 
         if (!ua) {
-          logger.warn({ biJobIndex: x.biJobIndex },
-            "User %s in account %s is not found. Don't charge the job.", x.user, x.account);
+          logger.warn({ biJobIndex: pricedJob.biJobIndex },
+            "User %s in account %s is not found. Don't charge the job.", pricedJob.user, pricedJob.account);
         }
 
-        const comment = parsePlaceholder(misConfig.jobChargeComment, x);
+        const comment = parsePlaceholder(misConfig.jobChargeComment, pricedJob);
 
         if (ua) {
           // charge account
           await charge({
-            amount: x.accountPrice,
+            amount: pricedJob.accountPrice,
             type: misConfig.jobChargeType,
             comment,
             target: ua.account.$,
@@ -144,23 +145,27 @@ export async function fetchJobs(
 
           // charge tenant
           await charge({
-            amount: x.tenantPrice,
+            amount: pricedJob.tenantPrice,
             type: misConfig.jobChargeType,
             comment,
             target: ua.account.$.tenant.getEntity(),
           }, em, logger, clusterPlugin);
 
-          await addJobCharge(ua, x.accountPrice, clusterPlugin, logger);
+          await addJobCharge(ua, pricedJob.accountPrice, clusterPlugin, logger);
         }
+
+        pricedJobs.push(pricedJob);
       }
-
-      return pricedJobs.length;
-
+      return pricedJobs.map(toGrpc);
     });
 
     em.clear();
 
-    return result;
+    await callHook("jobsSaved", {
+      jobs: result,
+    }, logger);
+
+    return result.length;
   };
 
   try {

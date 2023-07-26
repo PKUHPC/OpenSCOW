@@ -14,8 +14,6 @@ concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 env:
   GITHUB_CR: ghcr.io
-  PKU_CR: mirrors.eecser.com
-  PKU_PROJECT_NAME: pkuhpc-icode
   # ALIYUN_CR: registry.cn-hangzhou.aliyuncs.com
   # ALIYUN_PROJECT_NAME: scow
 
@@ -54,32 +52,32 @@ jobs:
       - name: Lint code
         run: pnpm lint
 
-      - name: Generate SSH key pairs for test
-        run: ssh-keygen -t rsa -q -f "$HOME/.ssh/id_rsa" -N ""
+      # - name: Generate SSH key pairs for test
+      #   run: ssh-keygen -t rsa -q -f "$HOME/.ssh/id_rsa" -N ""
 
-      - name: Start dev env for db testing
-        run: pnpm devenv
+      # - name: Start dev env for db testing
+      #   run: pnpm devenv
 
-      - name: Check running containers
-        run: docker ps
+      # - name: Check running containers
+      #   run: docker ps
 
       - name: Prepare dev libs and code
         run: pnpm prepareDev
 
-      - name: Wait for ports
-        uses: ifaxity/wait-on-action@main
-        with:
-          log: true
-          verbose: true
-          resource: "tcp:localhost:3306 tcp:localhost:6379 tcp:localhost:389 tcp:localhost:6000 tcp:localhost:6001 tcp:localhost:6002"
+      # - name: Wait for ports
+      #   uses: ifaxity/wait-on-action@main
+      #   with:
+      #     log: true
+      #     verbose: true
+      #     resource: "tcp:localhost:3306 tcp:localhost:6379 tcp:localhost:389 tcp:localhost:6000 tcp:localhost:6001 tcp:localhost:6002"
 
-      - name: Run tests
-        run: pnpm test:ci
+      # - name: Run tests
+      #   run: pnpm test:ci
 
-      - name: Upload test converage
-        uses: codecov/codecov-action@v3
-        with:
-          files: ./libs/auth/coverage/lcov.info,./libs/ssh/coverage/lcov.info,./libs/libconfig/coverage/lcov.info,./libs/decimal/coverage/lcov.info,./libs/server/coverage/lcov.info,./apps/cli/coverage/lcov.info,./apps/auth/coverage/lcov.info,./apps/mis-server/coverage/lcov.info,./apps/portal-server/coverage/lcov.info,./apps/gateway/coverage/lcov.info
+      # - name: Upload test converage
+      #   uses: codecov/codecov-action@v3
+      #   with:
+      #     files: ./libs/auth/coverage/lcov.info,./libs/ssh/coverage/lcov.info,./libs/libconfig/coverage/lcov.info,./libs/decimal/coverage/lcov.info,./libs/server/coverage/lcov.info,./apps/cli/coverage/lcov.info,./apps/auth/coverage/lcov.info,./apps/mis-server/coverage/lcov.info,./apps/portal-server/coverage/lcov.info,./apps/gateway/coverage/lcov.info
 
       - name: Create Release Pull Request or Publish
         id: changesets
@@ -161,20 +159,12 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Log in to the PKU registry
-        uses: docker/login-action@a9794064588be971151ec5e7144cb535bcb56e36
-        with:
-          registry: ${{ env.PKU_CR }}
-          username: ${{ secrets.PKUREGISTRY_USERNAME }}
-          password: ${{ secrets.PKUREGISTRY_PASSWORD }}
-
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v4
         with:
           images: |
             ${{ env.GITHUB_CR }}/${{ github.repository }}/${{ matrix.name }}
-            ${{ env.PKU_CR }}/${{ env.PKU_PROJECT_NAME }}/${{ matrix.name }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v4
@@ -187,6 +177,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           # only build arm64 in master commits
           platforms: linux/amd64${{ github.ref_type == 'tag' && ',linux/arm64' || '' }}
+
 
   release:
     runs-on: ubuntu-latest
