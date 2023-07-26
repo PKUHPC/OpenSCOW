@@ -56,7 +56,8 @@ jobs:
         run: ssh-keygen -t rsa -q -f "$HOME/.ssh/id_rsa" -N ""
 
       - name: Start dev env for db testing
-        run: docker compose --env-file dev/.env.dev -f dev/docker-compose.dev.yml up -d
+        working-directory: dev
+        run: docker compose --env-file .env.dev -f docker-compose.dev.yml up -d
 
       - name: Check running containers
         run: docker ps
