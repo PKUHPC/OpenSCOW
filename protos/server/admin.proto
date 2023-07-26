@@ -27,6 +27,11 @@ message PlatFormAdminInfo {
   string user_name = 2;
 }
 
+message PlatFormFinancialStaffInfo {
+  string user_id = 1;
+  string user_name = 2;
+}
+
 message ChangeStorageQuotaRequest {
   string user_id = 1;
   string cluster = 2;
@@ -135,6 +140,7 @@ message GetAdminInfoResponse {
   uint64 tenant_count = 2;
   uint64 account_count = 3;
   uint64 user_count = 4;
+  repeated PlatFormFinancialStaffInfo platform_financial_staff = 5;
 }
 
 service AdminService {
