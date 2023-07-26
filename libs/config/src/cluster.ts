@@ -30,6 +30,29 @@ export const getLoginNode =
     return typeof loginNode === "string" ? { name: loginNode, address: loginNode } : loginNode;
   };
 
+export type Cluster = {
+  id: string
+  name: string
+}
+
+export const getSortedClusters = (clusters: Record<string, ClusterConfigSchema>): Cluster[] => {
+  return Object.keys(clusters)
+    .sort(
+      (a, b) => {
+        if (clusters[a].priority === clusters[b].priority) {
+          return (
+            clusters[a].displayName > clusters[b].displayName
+              ? 1
+              : clusters[a].displayName === clusters[a].displayName
+                ? 0
+                : -1
+          );
+        }
+        return clusters[a].priority - clusters[b].priority;
+      },
+    ).map((id) => ({ id, name: clusters[id].displayName }));
+};
+
 export const LoginDeskopConfigSchema = Type.Object({
   enabled: Type.Boolean({ description: "是否启动登录节点上的桌面功能" }),
   wms: Type.Array(
@@ -44,6 +67,7 @@ export type LoginDeskopConfigSchema = Static<typeof LoginDeskopConfigSchema>;
 type TurboVncConfigSchema = Static<typeof TurboVncConfigSchema>;
 export const ClusterConfigSchema = Type.Object({
   displayName: Type.String({ description: "集群的显示名称" }),
+  priority: Type.Number({ description: "集群使用的优先级, 数字越小越先展示", default: Number.MAX_SAFE_INTEGER }),
   adapterUrl: Type.String({ description: "调度器适配器服务地址" }),
   proxyGateway: Type.Optional(Type.Object({
     url: Type.String({ description: "代理网关节点监听URL" }),
