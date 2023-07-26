@@ -19,6 +19,7 @@ const CapabilitiesSchema = Type.Object({
   changeEmail: Type.Optional(Type.Boolean({ description: "是否可以修改邮箱" })),
   getUser: Type.Optional(Type.Boolean({ description: "是否可以查询用户" })),
   accountUserRelation: Type.Optional(Type.Boolean({ description: "是否可以管理账户用户关系" })),
+  checkPassword: Type.Optional(Type.Boolean({ description: "是否可以验证密码" })),
 });
 
 export type Capabilities = Static<typeof CapabilitiesSchema>;
@@ -45,6 +46,7 @@ export const getCapabilitiesRoute = fp(async (f) => {
 
       return {
         createUser: provider.createUser !== undefined,
+        checkPassword: provider.checkPassword !== undefined,
         changePassword: provider.changePassword !== undefined,
         changeEmail: provider.changeEmail !== undefined,
         getUser: provider.getUser !== undefined,

@@ -58,6 +58,7 @@ import type { QueryJobTimeLimitSchema } from "src/pages/api/job/queryJobTimeLimi
 import type { GetRunningJobsSchema } from "src/pages/api/job/runningJobs";
 import type { ChangeEmailSchema } from "src/pages/api/profile/changeEmail";
 import type { ChangePasswordSchema } from "src/pages/api/profile/changePassword";
+import checkPassword, { CheckPasswordSchema } from "src/pages/api/profile/checkPassword";
 import type { DewhitelistAccountSchema } from "src/pages/api/tenant/accountWhitelist/dewhitelistAccount";
 import type { GetWhitelistedAccountsSchema } from "src/pages/api/tenant/accountWhitelist/getWhitelistedAccounts";
 import type { WhitelistAccountSchema } from "src/pages/api/tenant/accountWhitelist/whitelistAccount";
@@ -144,4 +145,5 @@ export const api = {
   queryStorageUsage: apiClient.fromTypeboxRoute<typeof QueryStorageUsageSchema>("GET", "/api/users/storageUsage"),
   unblockUserInAccount: apiClient.fromTypeboxRoute<typeof UnblockUserInAccountSchema>("PUT", "/api/users/unblockInAccount"),
   unsetAdmin: apiClient.fromTypeboxRoute<typeof UnsetAdminSchema>("PUT", "/api/users/unsetAdmin"),
+  checkPassword: apiClient.fromTypeboxRoute<typeof CheckPasswordSchema>("GET", "/api/profile/checkPassword"),
 };

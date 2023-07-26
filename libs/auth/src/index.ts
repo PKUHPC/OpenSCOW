@@ -13,6 +13,7 @@
 export * from "./accountUserRelation";
 export { changeEmail } from "./changeEmail";
 export { changePassword } from "./changePassword";
+export { checkPassword } from "./checkPassword";
 export { createUser } from "./createUser";
 export { deleteToken } from "./deleteToken";
 export type { Capabilities } from "./getCapabilities";

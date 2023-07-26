@@ -11,8 +11,8 @@
  */
 
 import { defaultPresets, formatDateTime } from "@scow/lib-web/build/utils/datetime";
+import { JobInfo } from "@scow/protos/build/common/ended_job";
 import { Money } from "@scow/protos/build/common/money";
-import { JobInfo } from "@scow/protos/build/server/job";
 import { Static } from "@sinclair/typebox";
 import { Button, DatePicker, Divider, Form, Input, InputNumber, Space, Table } from "antd";
 import dayjs from "dayjs";
