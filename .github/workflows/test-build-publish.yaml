@@ -61,8 +61,8 @@ jobs:
       # - name: Check running containers
       #   run: docker ps
 
-      # - name: Prepare dev libs and code
-      #   run: pnpm prepareDev
+      - name: Prepare dev libs and code
+        run: pnpm prepareDev
 
       # - name: Wait for ports
       #   uses: ifaxity/wait-on-action@main
