@@ -19,12 +19,11 @@ interface Props {
     name: string;
     userId: string;
     onClose: () => void;
-    onComplete: (oldPassword: string, newPassword: string) => Promise<void>;
+    onComplete: (newPassword: string) => Promise<void>;
     open: boolean;
 }
 
 interface FormProps {
-    oldPassword: string;
     newPassword: string;
     confirm: string;
 }
@@ -34,9 +33,9 @@ const ChangePasswordModal: React.FC<Props> = ({ name, userId, onClose, onComplet
   const [loading, setLoading] = useState(false);
 
   const onOK = async () => {
-    const { oldPassword, newPassword } = await form.validateFields();
+    const { newPassword } = await form.validateFields();
     setLoading(true);
-    await onComplete(oldPassword, newPassword)
+    await onComplete(newPassword)
       .then(() => {
         form.resetFields();
         onClose();
@@ -58,13 +57,6 @@ const ChangePasswordModal: React.FC<Props> = ({ name, userId, onClose, onComplet
         initialValues={undefined}
         preserve={false}
       >
-        <Form.Item
-          rules={[{ required: true, message: "请输入原密码" }]}
-          label="原密码"
-          name="oldPassword"
-        >
-          <Input.Password />
-        </Form.Item>
         <Form.Item
           rules={[{ required: true, message: "请输入新密码" }, passwordRule]}
           label="新密码"

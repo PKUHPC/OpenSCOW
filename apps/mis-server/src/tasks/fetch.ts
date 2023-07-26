@@ -24,7 +24,9 @@ import { Account } from "src/entities/Account";
 import { JobInfo } from "src/entities/JobInfo";
 import { UserAccount } from "src/entities/UserAccount";
 import { ClusterPlugin } from "src/plugins/clusters";
+import { callHook } from "src/plugins/hookClient";
 import { PricePlugin } from "src/plugins/price";
+import { toGrpc } from "src/utils/job";
 
 async function getClusterLatestDate(em: SqlEntityManager, cluster: string, logger: Logger) {
 
@@ -78,8 +80,8 @@ export async function fetchJobs(
   const persistJobAndCharge = async (jobs: ({ cluster: string } & ClusterJobInfo)[]) => {
     const result = await em.transactional(async (em) => {
       // Calculate prices for new info and persist
+      const pricedJobs: JobInfo[] = [];
       let pricedJob: JobInfo;
-      let count = 0;
       for (const job of jobs) {
         const tenant = accountTenantMap.get(job.account);
 
@@ -108,6 +110,7 @@ export async function fetchJobs(
 
           // Determine whether the job can be inserted into the database. If not, skip the job
           await em.flush();
+
         } catch (error) {
           logger.warn("invalid job. cluster: %s, jobId: %s, error: %s", job.cluster, job.jobId, error);
           continue;
@@ -148,14 +151,18 @@ export async function fetchJobs(
           await addJobCharge(ua, pricedJob.accountPrice, clusterPlugin, logger);
         }
 
-        count++;
+        pricedJobs.push(pricedJob);
       }
-      return count;
+      return pricedJobs.map(toGrpc);
     });
 
     em.clear();
 
-    return result;
+    await callHook("jobsSaved", {
+      jobs: result,
+    }, logger);
+
+    return result.length;
   };
 
   try {

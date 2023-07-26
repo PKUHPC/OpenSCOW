@@ -11,72 +11,55 @@
  */
 
 import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
-import { changePassword as libChangePassword } from "@scow/lib-auth";
+import { checkPassword as libCheckPassword } from "@scow/lib-auth";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
-import { publicConfig, runtimeConfig } from "src/utils/config";
+import { runtimeConfig } from "src/utils/config";
+export const CheckPasswordSchema = typeboxRouteSchema({
+  method: "GET",
 
-// 此API用于用户修改自己的密码。
-export const ChangePasswordSchema = typeboxRouteSchema({
-
-  method: "PATCH",
-
-  body: Type.Object({
-    newPassword: Type.String(),
-  }),
+  query: Type.Object({ password: Type.String() }),
 
   responses: {
-    /** 更改成功 */
-    204: Type.Null(),
-
-    400: Type.Object({
-      code: Type.Literal("PASSWORD_NOT_VALID"),
-      message: Type.Union([Type.String(), Type.Undefined()]),
+    /** 返回检查的结果 */
+    200: Type.Object({
+      success: Type.Boolean(),
     }),
-
-    /** 用户未找到 */
+    /** 用户不存在 */
     404: Type.Null(),
-
     /** 本功能在当前配置下不可用。 */
     501: Type.Null(),
   },
+
 });
 
-const passwordPattern = publicConfig.PASSWORD_PATTERN && new RegExp(publicConfig.PASSWORD_PATTERN);
-
-export default /* #__PURE__*/typeboxRoute(ChangePasswordSchema, async (req, res) => {
-
-  if (!publicConfig.ENABLE_CHANGE_PASSWORD) {
-    return { 501: null };
-  }
-
+export default typeboxRoute(CheckPasswordSchema, async (req, res) => {
   const auth = authenticate(() => true);
 
   const info = await auth(req, res);
 
   if (!info) { return; }
 
-  const { newPassword } = req.body;
+  const { password } = req.query;
 
-  if (passwordPattern && !passwordPattern.test(newPassword)) {
-    return { 400: { code: "PASSWORD_NOT_VALID" as const, message: publicConfig.PASSWORD_PATTERN_MESSAGE } };
-  }
-
-  return await libChangePassword(runtimeConfig.AUTH_INTERNAL_URL, {
+  return await libCheckPassword(runtimeConfig.AUTH_INTERNAL_URL, {
     identityId: info.identityId,
-    newPassword,
+    password: password,
   }, console)
-    .then(() => ({ 204: null }))
+    .then((result) => {
+      if (!result) {
+        return { 404: null };
+      }
+      else {
+        return { 200: { success: result.success } };
+      }
+    })
     .catch((e) => {
       switch (e.status) {
-      case "NOT_FOUND":
-        return { 404: null };
       case "NOT_SUPPORTED":
         return { 501: null };
       default:
         throw e;
       }
     });
-
-
 });

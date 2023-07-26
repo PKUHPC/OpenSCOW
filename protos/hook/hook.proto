@@ -15,6 +15,7 @@ syntax = "proto3";
 package scow.server.hook;
 
 import "common/money.proto";
+import "common/ended_job.proto";
 import "google/protobuf/timestamp.proto";
 
 message AccountBlocked {
@@ -64,6 +65,10 @@ message TenantPaid {
   common.Money amount = 2;
 }
 
+message JobsSaved {
+  repeated common.JobInfo jobs = 1;
+}
+
 message OnEventRequest {
   message Metadata {
     google.protobuf.Timestamp time = 1;
@@ -81,6 +86,7 @@ message OnEventRequest {
     UserAdded user_added = 8;
     AccountPaid account_paid = 9;
     TenantPaid tenant_paid = 10;
+    JobsSaved jobs_saved = 11;
   }
 }
 message OnEventResponse {
