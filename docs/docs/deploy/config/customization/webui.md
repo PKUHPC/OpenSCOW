@@ -9,7 +9,7 @@ title: 自定义前端项目主题
 
 ## 自定义favicon
 
-favicon文件应取名为`favicon.ico`，放到`config/icon`下。
+favicon文件应取名为`favicon.ico`，放到`config/icons`下。
 
 系统支持根据不同的来访域名显示不同的LOGO。将需要在某个域名下显示的LOGO文件放到`config/logo/{域名}`下即可。`config/logo`下的文件为对所有其他域名的LOGO图片。
 
