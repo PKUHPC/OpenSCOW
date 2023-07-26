@@ -11,7 +11,7 @@
  */
 
 import { formatDateTime } from "@scow/lib-web/build/utils/datetime";
-import { JobInfo } from "@scow/protos/build/server/job";
+import { JobInfo } from "@scow/protos/build/common/ended_job";
 import { Descriptions, Drawer } from "antd";
 import { RunningJobInfo } from "src/models/job";
 
