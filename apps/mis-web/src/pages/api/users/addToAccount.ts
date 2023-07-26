@@ -16,7 +16,7 @@ import { Status } from "@grpc/grpc-js/build/src/constants";
 import { UserServiceClient } from "@scow/protos/build/server/user";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
-import { PlatformRole, UserRole } from "src/models/User";
+import { PlatformRole, TenantRole, UserRole } from "src/models/User";
 import { checkNameMatch } from "src/server/checkIdNameMatch";
 import { getClient } from "src/utils/client";
 import { handlegRPCError } from "src/utils/server";
@@ -55,7 +55,8 @@ export default /* #__PURE__*/typeboxRoute(AddUserToAccountSchema, async (req, re
 
   const auth = authenticate((u) =>
     u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ||
-    u.accountAffiliations.find((x) => x.accountName === accountName)?.role !== UserRole.USER);
+    u.accountAffiliations.find((x) => x.accountName === accountName)?.role !== UserRole.USER ||
+    u.tenantRoles.includes(TenantRole.TENANT_ADMIN));
 
   const info = await auth(req, res);
 

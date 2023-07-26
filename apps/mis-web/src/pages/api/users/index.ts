@@ -15,7 +15,7 @@ import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { UserServiceClient } from "@scow/protos/build/server/user";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
-import { PlatformRole, UserRole } from "src/models/User";
+import { PlatformRole, TenantRole, UserRole } from "src/models/User";
 import { AccountUserInfo } from "src/models/UserSchemaModel";
 import { getClient } from "src/utils/client";
 
@@ -37,9 +37,11 @@ export default typeboxRoute(GetAccountUsersSchema, async (req, res) => {
 
   const { accountName } = req.query;
 
-  const auth = authenticate((u) =>
-    u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ||
-    u.accountAffiliations.find((x) => x.accountName === accountName)?.role !== UserRole.USER);
+  const auth = authenticate((u) => {
+    return u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ||
+    u.accountAffiliations.find((x) => x.accountName === accountName)?.role !== UserRole.USER ||
+    u.tenantRoles.includes(TenantRole.TENANT_ADMIN);
+  });
 
   const info = await auth(req, res);
 

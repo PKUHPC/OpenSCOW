@@ -16,7 +16,7 @@ import { Status } from "@grpc/grpc-js/build/src/constants";
 import { JobChargeLimitServiceClient } from "@scow/protos/build/server/job_charge_limit";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
-import { UserRole } from "src/models/User";
+import { TenantRole, UserRole } from "src/models/User";
 import { getClient } from "src/utils/client";
 import { handlegRPCError } from "src/utils/server";
 
@@ -40,7 +40,8 @@ export default typeboxRoute(CancelJobChargeLimitSchema, async (req, res) => {
   const { accountName, userId } = req.query;
 
   const auth = authenticate((u) => u.accountAffiliations.some((x) =>
-    x.accountName === accountName && x.role !== UserRole.USER));
+    x.accountName === accountName && x.role !== UserRole.USER) || 
+    u.tenantRoles.includes(TenantRole.TENANT_ADMIN));
 
   const info = await auth(req, res);
 
