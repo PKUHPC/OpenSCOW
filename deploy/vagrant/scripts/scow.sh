@@ -3,6 +3,8 @@
 
 docker stop sourcedb && docker rm  sourcedb
 
+rm -rf /root/scow/export-jobs/
+
 rm -rf /root/.docker/config.json
 
 cd /root/scow/scow-deployment/
