@@ -13,6 +13,7 @@
 /* eslint-disable max-len */
 
 import { apiClient } from "src/apis/client";
+import type { GetAvailablePartitionsSchema } from "src/pages/api//getAvailablePartitions";
 import type { ChangeJobPriceSchema } from "src/pages/api/admin/changeJobPrice";
 import type { ChangePasswordAsPlatformAdminSchema } from "src/pages/api/admin/changePassword";
 import type { ChangeStorageQuotaSchema } from "src/pages/api/admin/changeStorage";
@@ -106,6 +107,7 @@ export const api = {
   getUsedPayTypes: apiClient.fromTypeboxRoute<typeof GetUsedPayTypesSchema>("GET", "/api/finance/getUsedPayTypes"),
   financePay: apiClient.fromTypeboxRoute<typeof FinancePaySchema>("POST", "/api/finance/pay"),
   getPayments: apiClient.fromTypeboxRoute<typeof GetPaymentsSchema>("GET", "/api/finance/payments"),
+  getAvailablePartitions: apiClient.fromTypeboxRoute<typeof GetAvailablePartitionsSchema>("GET", "/api//getAvailablePartitions"),
   completeInit: apiClient.fromTypeboxRoute<typeof CompleteInitSchema>("POST", "/api/init/completeInit"),
   createInitAdmin: apiClient.fromTypeboxRoute<typeof CreateInitAdminSchema>("POST", "/api/init/createInitAdmin"),
   initGetAccounts: apiClient.fromTypeboxRoute<typeof InitGetAccountsSchema>("GET", "/api/init/getAccounts"),

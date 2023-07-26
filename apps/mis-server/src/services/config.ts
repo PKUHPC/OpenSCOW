@@ -12,7 +12,7 @@
 
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { plugin } from "@ddadaal/tsgrpc-server";
-import { ConfigServiceServer, ConfigServiceService } from "@scow/protos/build/common/config";
+import { ConfigServiceServer, ConfigServiceService, Partition } from "@scow/protos/build/common/config";
 
 export const configServiceServer = plugin((server) => {
   server.addService<ConfigServiceServer>(ConfigServiceService, {
@@ -23,6 +23,18 @@ export const configServiceServer = plugin((server) => {
         cluster,
         logger,
         async (client) => await asyncClientCall(client.config, "getClusterConfig", {}),
+      );
+
+      return [reply];
+    },
+
+    getAvailablePartitions: async ({ request, logger }) => {
+      const { cluster, accountName, userId } = request;
+
+      const reply = await server.ext.clusters.callOnOne(
+        cluster,
+        logger,
+        async (client) => await asyncClientCall(client.config, "getAvailablePartitions", { accountName, userId }),
       );
 
       return [reply];

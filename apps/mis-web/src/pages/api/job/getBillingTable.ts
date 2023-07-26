@@ -16,7 +16,7 @@ import { ConfigServiceClient } from "@scow/protos/build/common/config";
 import { JobBillingItem } from "@scow/protos/build/server/job";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
-import { PlatformRole } from "src/models/User";
+import { PlatformRole, UserInfo } from "src/models/User";
 import { getBillingItems } from "src/pages/api/job/getBillingItems";
 import { getClient } from "src/utils/client";
 import { publicConfig, runtimeConfig } from "src/utils/config";
@@ -67,6 +67,76 @@ export const GetBillingTableSchema = typeboxRouteSchema({
     200: Type.Object({ items: Type.Array(JobBillingTableItem) }),
   },
 });
+
+
+export async function getAvailableBillingTableItems(user: UserInfo | undefined) {
+
+  if (!user) { return []; }
+  const items = (await getBillingItems(user.tenant, true)).activeItems;
+
+  const pathItemMap = items.reduce((prev, curr) => {
+    prev[curr.path] = curr;
+    return prev;
+  }, {} as Record<string, JobBillingItem>);
+
+  let count = 0;
+  const tableItems: JobBillingTableItem[] = [];
+  const clusters = runtimeConfig.CLUSTERS_CONFIG;
+
+  const client = getClient(ConfigServiceClient);
+
+  const accountNames = user.accountAffiliations.map((u) => u.accountName);
+
+  for (const [cluster] of Object.entries(clusters)) {
+
+    let partitions;
+    for (const accountName of accountNames) {
+      partitions =
+      await asyncClientCall(client, "getAvailablePartitions",
+        { cluster: cluster, accountName: accountName, userId: user.identityId }).then((resp) => {
+        return resp.partitions;
+      });
+    }
+
+    const partitionCount = partitions.length;
+    let clusterItemIndex = 0;
+    for (const partition of partitions) {
+      const qosCount = partition.qos?.length ?? 1;
+      let partitionItemIndex = 0;
+      for (const qos of partition.qos ?? [""]) {
+
+        const path = [cluster, partition.name, qos].filter((x) => x).join(".");
+
+        const item = pathItemMap[path];
+
+        tableItems.push({
+          index: count++,
+          clusterItemIndex: clusterItemIndex++,
+          partitionItemIndex: partitionItemIndex++,
+          cluster: publicConfig.CLUSTERS[cluster]?.name ?? cluster,
+          cores: partition.cores,
+          gpus: partition.gpus,
+          mem: partition.memMb,
+          nodes: partition.nodes,
+          partition: partition.name,
+          partitionCount,
+          qosCount,
+          qos,
+          priceItem: item ? {
+            amount: item.amountStrategy,
+            itemId: item.id,
+            price: moneyToString(item.price!),
+          } : undefined,
+          path,
+          comment: partition.comment,
+        });
+      }
+    }
+  }
+
+  return tableItems;
+
+};
 
 
 export async function getBillingTableItems(tenantName: string | undefined) {
@@ -129,10 +199,20 @@ export default /* #__PURE__*/typeboxRoute(GetBillingTableSchema, async (req, res
   const { tenant } = req.query;
 
   if (tenant) {
+
+    // 当前逻辑：如果用户属于当前租户或者用户为管理员
     const auth = authenticate((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN) || (u.tenant === tenant));
     const info = await auth(req, res);
     if (!info) { return; }
   }
+
+  // // 新增逻辑
+  // const userAuth = authenticate((u) => u.accountAffiliations.length > 0);
+  // const userInfo = await userAuth(req, res);
+  // if (!userInfo) { return; }
+
+  // debugger;
+  // const availableItems = await getAvailableBillingTableItems(userInfo);
 
   const items = await getBillingTableItems(tenant);
 
