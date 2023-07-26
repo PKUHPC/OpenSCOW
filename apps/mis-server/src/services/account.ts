@@ -307,7 +307,7 @@ export const accountServiceServer = plugin((server) => {
       return [{
         results: results.map((x) => {
 
-          const owner = x.users.getItems().find((x) => x.role === EntityUserRole.OWNER);
+          const owner = [...x.users.$].find((x) => x.role === EntityUserRole.OWNER);
 
           if (!owner) {
             throw <ServiceError>{
@@ -315,7 +315,7 @@ export const accountServiceServer = plugin((server) => {
             };
           }
 
-          const ownerUser = owner.user.getEntity();
+          const ownerUser = owner.user.$;
 
           return {
             accountName: x.accountName,

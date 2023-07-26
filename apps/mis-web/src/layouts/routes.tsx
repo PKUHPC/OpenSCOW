@@ -69,7 +69,7 @@ export const platformAdminRoutes: (platformRoles: PlatformRole[]) => NavItemProp
         {
           Icon: AccountBookOutlined,
           text: "账户列表",
-          path: "/admin/accountList",
+          path: "/admin/accounts",
         },
         {
           Icon: MoneyCollectOutlined,
