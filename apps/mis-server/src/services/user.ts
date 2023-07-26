@@ -34,8 +34,7 @@ import { PlatformRole, TenantRole, User } from "src/entities/User";
 import { UserAccount, UserRole, UserStatus } from "src/entities/UserAccount";
 import { callHook } from "src/plugins/hookClient";
 import { createUserInDatabase, insertKeyToNewUser } from "src/utils/createUser";
-import { paginationProps } from "src/utils/orm";
-import { generateRoleQuery, mapToPlatformUserInfoList } from "src/utils/users";
+import { generateAllUserQueryOptions, generateRoleQuery, mapToPlatformUserInfoList } from "src/utils/users";
 
 export const userServiceServer = plugin((server) => {
 
@@ -501,7 +500,7 @@ export const userServiceServer = plugin((server) => {
 
     getAllUsers: async ({ request, em }) => {
 
-      const { page, pageSize, idOrName } = request;
+      const { page, pageSize, sortField, sortOrder, idOrName } = request;
 
       const [users, count] = await em.findAndCount(User, idOrName ? {
         $or: [
@@ -509,30 +508,19 @@ export const userServiceServer = plugin((server) => {
           { name: { $like: `%${idOrName}%` } },
         ],
       } : {}, {
-        ...paginationProps(page, pageSize || 10),
+        ...generateAllUserQueryOptions(page, pageSize, sortField, sortOrder),
         populate: ["tenant", "accounts", "accounts.account"],
       });
 
       return [{
         totalCount: count,
-        platformUsers: users.map((x) => ({
-          userId: x.userId,
-          name: x.name,
-          availableAccounts: x.accounts.getItems()
-            .filter((ua) => ua.status === UserStatus.UNBLOCKED)
-            .map((ua) => {
-              return ua.account.getProperty("accountName");
-            }),
-          tenantName: x.tenant.$.name,
-          createTime: x.createTime.toISOString(),
-          platformRoles: x.platformRoles.map(platformRoleFromJSON),
-        })),
+        platformUsers: mapToPlatformUserInfoList(users),
       }];
     },
 
     getPlatformRoleUsers: async ({ request, em }) => {
 
-      const { page, pageSize, idOrName } = request;
+      const { page, pageSize, sortField, sortOrder, idOrName } = request;
 
       // get the full users count with platform role
       const totalCount = await em.count(User);
@@ -542,13 +530,13 @@ export const userServiceServer = plugin((server) => {
       // query with platform role, query words and page info
       const [adminUsers, queryAdminCount] = await em.findAndCount(User,
         generateRoleQuery(idOrName, PlatformRole.PLATFORM_ADMIN), {
-          ...paginationProps(page, pageSize || 10),
+          ...generateAllUserQueryOptions(page, pageSize, sortField, sortOrder),
           populate: ["tenant", "accounts", "accounts.account"],
         });
 
       const [financeUsers, queryFinanceCount] = await em.findAndCount(User,
         generateRoleQuery(idOrName, PlatformRole.PLATFORM_FINANCE), {
-          ...paginationProps(page, pageSize || 10),
+          ...generateAllUserQueryOptions(page, pageSize, sortField, sortOrder),
           populate: ["tenant", "accounts", "accounts.account"],
         });
 

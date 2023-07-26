@@ -331,6 +331,52 @@ it("get all users with idOrName", async () => {
   ]);
 });
 
+it("get all users with sorter", async () => {
+  const data = await insertInitialData(server.ext.orm.em.fork());
+
+  const users = await asyncClientCall(client, "getAllUsers", {
+    page: 1,
+    pageSize: 10,
+    sortField: "userId",
+    sortOrder: "descend",
+  });
+
+  expect(users.totalCount).toBe(3);
+  expect(users.platformUsers.map((x) => ({
+    userId: x.userId,
+    name: x.name,
+    availableAccounts: x.availableAccounts,
+    tenantName: x.tenantName,
+    createTime: x.createTime,
+    platformRoles: x.platformRoles,
+  }))).toIncludeSameMembers([
+    {
+      userId: data.userC.userId,
+      name: data.userC.name,
+      availableAccounts: [],
+      tenantName: data.userC.tenant.getProperty("name"),
+      createTime: data.userC.createTime.toISOString(),
+      platformRoles: data.userC.platformRoles,
+    },
+    {
+      userId: data.userB.userId,
+      name: data.userB.name,
+      availableAccounts: [data.accountA.accountName, data.accountB.accountName],
+      tenantName: data.userB.tenant.getProperty("name"),
+      createTime: data.userB.createTime.toISOString(),
+      platformRoles: data.userB.platformRoles,
+    },
+    {
+      userId: data.userA.userId,
+      name: data.userA.name,
+      availableAccounts: [data.accountA.accountName],
+      tenantName: data.userA.tenant.getProperty("name"),
+      createTime: data.userA.createTime.toISOString(),
+      platformRoles: data.userA.platformRoles,
+    },
+  ]);
+});
+
 it("manage platform role", async () => {
   const em = server.ext.orm.em.fork();
   const data = await insertInitialData(em);
@@ -502,6 +548,79 @@ it("get platform role users with idOrName", async () => {
   await asyncClientCall(client, "unsetPlatformRole", {
     userId: data.userB.userId,
     roleType: PlatformRole.PLATFORM_FINANCE,
+  });
+
+  em.clear();
+});
+
+
+it("get platform role users with sorter", async () => {
+
+  const em = server.ext.orm.em.fork();
+  const data = await insertInitialData(em);
+
+  await asyncClientCall(client, "setPlatformRole", {
+    userId: data.userA.userId,
+    roleType: PlatformRole.PLATFORM_ADMIN,
+  });
+  await asyncClientCall(client, "setPlatformRole", {
+    userId: data.userB.userId,
+    roleType: PlatformRole.PLATFORM_ADMIN,
+  });
+
+  const users = await asyncClientCall(client, "getPlatformRoleUsers", {
+    page: 1,
+    pageSize: 10,
+    sortField: "name",
+    sortOrder: "descend",
+  });
+
+  expect(users.totalCount).toBe(3);
+  expect(users.totalAdminCount).toBe(2);
+  expect(users.totalFinanceCount).toBe(0);
+  expect(users.queryAdminCount).toBe(2);
+  expect(users.queryFinanceCount).toBe(0);
+  expect(users.platformAdminUsers.map((x) => ({
+    userId: x.userId,
+    name: x.name,
+    availableAccounts: x.availableAccounts,
+    tenantName: x.tenantName,
+    createTime: x.createTime,
+    platformRoles: x.platformRoles,
+  }))).toIncludeSameMembers([
+    {
+      userId: data.userB.userId,
+      name: data.userB.name,
+      availableAccounts: [data.accountA.accountName, data.accountB.accountName],
+      tenantName: data.userB.tenant.getProperty("name"),
+      createTime: data.userB.createTime.toISOString(),
+      platformRoles: [platformRoleFromJSON(PlatformRole.PLATFORM_ADMIN)],
+    },
+    {
+      userId: data.userA.userId,
+      name: data.userA.name,
+      availableAccounts: [data.accountA.accountName],
+      tenantName: data.userA.tenant.getProperty("name"),
+      createTime: data.userA.createTime.toISOString(),
+      platformRoles: [platformRoleFromJSON(PlatformRole.PLATFORM_ADMIN)],
+    },
+  ]);
+  expect(users.platformFinanceUsers.map((x) => ({
+    userId: x.userId,
+    name: x.name,
+    availableAccounts: x.availableAccounts,
+    tenantName: x.tenantName,
+    createTime: x.createTime,
+    platformRoles: x.platformRoles,
+  }))).toIncludeSameMembers([]);
+
+  await asyncClientCall(client, "unsetPlatformRole", {
+    userId: data.userA.userId,
+    roleType: PlatformRole.PLATFORM_ADMIN,
+  });
+  await asyncClientCall(client, "unsetPlatformRole", {
+    userId: data.userB.userId,
+    roleType: PlatformRole.PLATFORM_ADMIN,
   });
 
   em.clear();

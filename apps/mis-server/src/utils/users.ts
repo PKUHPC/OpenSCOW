@@ -15,6 +15,8 @@ import { platformRoleFromJSON, PlatformUserInfo } from "@scow/protos/build/serve
 import { PlatformRole, User } from "src/entities/User";
 import { UserStatus } from "src/entities/UserAccount";
 
+import { paginationProps } from "./orm";
+
 // generate platform role query
 export const generateRoleQuery = (idOrName: string | undefined, role: PlatformRole) => {
   const baseQuery = {
@@ -36,6 +38,19 @@ export const generateRoleQuery = (idOrName: string | undefined, role: PlatformRo
   } else {
     return baseQuery;
   }
+};
+
+// generate query options of all users
+// with options: paginationProps, orderBy
+export const generateAllUserQueryOptions = (
+  page: number,
+  pageSize?: number,
+  sortField?: string,
+  sortOrder?: string) => {
+  return {
+    ...paginationProps(page, pageSize || 10),
+    orderBy: (sortField && sortOrder) ? { [sortField]: sortOrder === "ascend" ? "ASC" : "DESC" } : undefined,
+  };
 };
 
 // map platform users info details from User entity with "tenant" | "accounts" | "accounts.account" relations

@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { compareDateTime, formatDateTime } from "@scow/lib-web/build/utils/datetime";
+import { formatDateTime } from "@scow/lib-web/build/utils/datetime";
 import { PlatformUserInfo } from "@scow/protos/build/server/user";
 import { Static } from "@sinclair/typebox";
 import { App, Button, Divider, Form, Input, Space, Table } from "antd";
@@ -33,10 +33,17 @@ interface PageInfo {
     pageSize?: number;
 }
 
+interface SortInfo {
+    sortField?: string;
+    sortOrder?: SortDirection;
+};
+
 interface Props {
   refreshToken: boolean;
   user: User;
 }
+
+type SortDirection = "ascend" | "descend";
 
 type FilteredRole = "PLATFORM_ADMIN" | "PLATFORM_FINANCE" | "ALL_USERS";
 
@@ -49,21 +56,26 @@ export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
   const [form] = Form.useForm<FilterForm>();
 
   const [pageInfo, setPageInfo] = useState<PageInfo>({ page: 1, pageSize: 10 });
+  const [sortInfo, setSortInfo] = useState<SortInfo>({ sortField: undefined, sortOrder: undefined });
 
   const promiseFn = useCallback(async () => {
     return await Promise.all([
       api.getAllUsers({ query: {
         page: pageInfo.page,
         pageSize: pageInfo.pageSize,
+        sortField: sortInfo.sortField,
+        sortOrder: sortInfo.sortOrder,
         idOrName: query.idOrName,
       } }),
       api.getPlatformRoleUsers({ query: {
         page: pageInfo.page,
         pageSize: pageInfo.pageSize,
+        sortField: sortInfo.sortField,
+        sortOrder: sortInfo.sortOrder,
         idOrName: query.idOrName,
       } }),
     ]);
-  }, [query, pageInfo]);
+  }, [query, pageInfo, sortInfo]);
   const { data, isLoading, reload } = useAsync({ promiseFn, watch: refreshToken });
 
   const [rangeSearchRole, setRangeSearchRole] = useState<FilteredRole>("ALL_USERS");
@@ -104,6 +116,8 @@ export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
         data={data}
         pageInfo={pageInfo}
         setPageInfo={setPageInfo}
+        sortInfo={sortInfo}
+        setSortInfo={setSortInfo}
         isLoading={isLoading}
         reload={reload}
         user={user}
@@ -119,14 +133,17 @@ interface UserInfoTableProps {
   ] | undefined;
   pageInfo: PageInfo;
   setPageInfo?: (info: PageInfo) => void;
+  sortInfo: SortInfo;
+  setSortInfo?: (info: SortInfo) => void;
   isLoading: boolean;
   reload: () => void;
   user: User;
   rangeSearchRole: FilteredRole;
 }
 
+
 const UserInfoTable: React.FC<UserInfoTableProps> = ({
-  data, pageInfo, setPageInfo, isLoading, reload, user, rangeSearchRole,
+  data, pageInfo, setPageInfo, setSortInfo, isLoading, reload, user, rangeSearchRole,
 }) => {
 
   const { message } = App.useApp();
@@ -152,6 +169,15 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
     }
   })();
 
+  const handleTableChange = (_, __, sorter) => {
+    if (setSortInfo) {
+      setSortInfo({
+        sortField: sorter.field,
+        sortOrder: sorter.order,
+      });
+    }
+  };
+
   return (
     <>
       <Table
@@ -166,17 +192,18 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
           onChange: (page, pageSize) => setPageInfo({ page, pageSize }),
         } : false}
         scroll={{ x: true }}
+        onChange={handleTableChange}
       >
         <Table.Column<PlatformUserInfo>
           dataIndex="userId"
           title="用户ID"
-          sorter={(a, b) => a.userId.localeCompare(b.userId)}
+          sorter={true}
           sortDirections={["ascend", "descend"]}
         />
         <Table.Column<PlatformUserInfo>
           dataIndex="name"
           title="姓名"
-          sorter={(a, b) => a.name.localeCompare(b.name)}
+          sorter={true}
           sortDirections={["ascend", "descend"]}
         />
         <Table.Column<PlatformUserInfo> dataIndex="tenantName" title="所属租户" />
@@ -188,7 +215,7 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
         <Table.Column<PlatformUserInfo>
           dataIndex="createTime"
           title="创建时间"
-          sorter={(a, b) => compareDateTime(a.createTime ?? "", b.createTime ?? "")}
+          sorter={true}
           sortDirections={["ascend", "descend"]}
           render={(time: string) => formatDateTime(time)}
         />

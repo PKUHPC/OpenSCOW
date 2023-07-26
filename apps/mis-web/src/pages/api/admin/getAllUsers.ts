@@ -41,6 +41,10 @@ export const GetAllUsersSchema = typeboxRouteSchema({
      */
     pageSize: Type.Optional(Type.Integer()),
 
+    sortField: Type.Optional(Type.String()),
+
+    sortOrder: Type.Optional(Type.String()),
+
     idOrName: Type.Optional(Type.String()),
   }),
 
@@ -59,12 +63,14 @@ export default typeboxRoute(GetAllUsersSchema,
       return;
     }
 
-    const { page = 1, pageSize, idOrName } = req.query;
+    const { page = 1, pageSize, sortField, sortOrder, idOrName } = req.query;
 
     const client = getClient(UserServiceClient);
     const result = await asyncClientCall(client, "getAllUsers", {
       page,
       pageSize,
+      sortField,
+      sortOrder,
       idOrName,
     });
 
