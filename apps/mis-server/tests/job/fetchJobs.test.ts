@@ -16,6 +16,7 @@ import { MySqlDriver, SqlEntityManager } from "@mikro-orm/mysql";
 import { Decimal } from "@scow/lib-decimal";
 import { createServer } from "src/app";
 import { setJobCharge } from "src/bl/charging";
+import { emptyJobPriceInfo } from "src/bl/jobPrice";
 import { JobInfo } from "src/entities/JobInfo";
 import { UserStatus } from "src/entities/UserAccount";
 import { createPriceItems } from "src/tasks/createBillingItems";
@@ -104,4 +105,41 @@ it("fetches the data", async () => {
   expect(data.uaBB.usedJobCharge?.toNumber()).toBe(accountBCharges.toNumber());
   expect(data.uaBB.status).toBe(UserStatus.BLOCKED);
   expect(data.uaAA.usedJobCharge).toBeUndefined();
+});
+
+it("jobs can be imported when jobs from other clusters already exist in the database", async () => {
+  const existedJob = new JobInfo({
+    cluster: "hpc02",
+    jobId: 1,
+    account: "",
+    user: "",
+    partition: "",
+    nodeList: "",
+    name: "",
+    gpusAlloc: 0,
+    cpusReq: 0,
+    memReqMb: 0,
+    nodesReq: 0,
+    cpusAlloc: 0,
+    memAllocMb: 0,
+    nodesAlloc: 0,
+    timeLimitMinutes: 0,
+    elapsedSeconds: 0,
+    qos: "",
+    submitTime: "2022-01-13T03:20:26.715Z",
+    startTime: "2022-01-13T03:20:26.715Z",
+    endTime: "2022-01-13T03:20:26.715Z",
+    state: "COMPLETED",
+    workingDirectory: "",
+  }, undefined, emptyJobPriceInfo());
+
+  const em = server.ext.orm.em.fork();
+
+  await em.persistAndFlush(existedJob);
+
+  await fetchJobs(server.ext.orm.em.fork(), server.logger, server.ext, server.ext);
+
+  const jobs = await em.find(JobInfo, {});
+
+  expect(jobs).toBeArrayOfSize(testData.length + 1);
 });
