@@ -94,7 +94,7 @@ message CreateAccountResponse {
 }
 
 message GetAccountsRequest {
-  string tenant_name = 1;
+  optional string tenant_name = 1;
   // returns all accounts if not set
   optional string account_name = 2;
 }
@@ -114,19 +114,10 @@ message GetAccountsResponse {
   repeated Account results = 1;
 }
 
-message GetAllAccountsRequest {
-}
-
-message GetAllAccountsResponse {
-  repeated Account results = 1;
-}
-
 service AccountService {
 
   rpc CreateAccount(CreateAccountRequest) returns (CreateAccountResponse);
   rpc GetAccounts(GetAccountsRequest) returns (GetAccountsResponse);
-
-  rpc GetAllAccounts(GetAllAccountsRequest) returns (GetAllAccountsResponse);
 
   rpc BlockAccount(BlockAccountRequest) returns (BlockAccountResponse);
   rpc UnblockAccount(UnblockAccountRequest) returns (UnblockAccountResponse);
