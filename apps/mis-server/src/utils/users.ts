@@ -11,7 +11,7 @@
  */
 
 import { Loaded } from "@mikro-orm/core";
-import { platformRoleFromJSON, PlatformUserInfo } from "@scow/protos/build/server/user";
+import { platformRoleFromJSON, PlatformUserInfo, SortDirection, UsersSortField } from "@scow/protos/build/server/user";
 import { PlatformRole, User } from "src/entities/User";
 import { UserStatus } from "src/entities/UserAccount";
 
@@ -45,11 +45,12 @@ export const generateRoleQuery = (idOrName: string | undefined, role: PlatformRo
 export const generateAllUserQueryOptions = (
   page: number,
   pageSize?: number,
-  sortField?: string,
-  sortOrder?: string) => {
+  sortField?: UsersSortField,
+  sortOrder?: SortDirection) => {
   return {
     ...paginationProps(page, pageSize || 10),
-    orderBy: (sortField && sortOrder) ? { [sortField]: sortOrder === "ascend" ? "ASC" : "DESC" } : undefined,
+    orderBy: (sortField && sortOrder !== undefined) ?
+      { [sortField]: sortOrder === SortDirection.ASC ? "ASC" : "DESC" } : undefined,
   };
 };
 

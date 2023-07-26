@@ -1,5 +1,6 @@
 ---
 "@scow/mis-web": patch
+"@scow/mis-server": patch
 "@scow/lib-web": patch
 ---
 

@@ -257,11 +257,24 @@ message PlatformUserInfo {
   repeated PlatformRole platform_roles = 6;
 }
 
+enum SortDirection {
+  ASC = 0;
+  DESC = 1;
+}
+
+// sort fields
+// for mis pageComponent AllUsersTable
+enum UsersSortField {
+  USER_ID = 0;
+  NAME = 1;
+  CREATE_TIME = 2;
+}
+
 message GetAllUsersRequest {
   uint32 page = 1;
   optional uint64 page_size = 2;
-  optional string sort_field = 3;
-  optional string sort_order = 4;
+  optional UsersSortField sort_field = 3;
+  optional SortDirection sort_order = 4;
   optional string id_or_name = 5;
 }
 
@@ -273,8 +286,8 @@ message GetAllUsersResponse {
 message GetPlatformRoleUsersRequest {
   uint32 page = 1;
   optional uint64 page_size = 2;
-  optional string sort_field = 3;
-  optional string sort_order = 4;
+  optional UsersSortField sort_field = 3;
+  optional SortDirection sort_order = 4;
   optional string id_or_name = 5;
 }
 

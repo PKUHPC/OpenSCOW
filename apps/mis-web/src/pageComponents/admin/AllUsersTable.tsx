@@ -20,6 +20,7 @@ import { api } from "src/apis";
 import { ChangePasswordModalLink } from "src/components/ChangePasswordModal";
 import { FilterFormContainer, FilterFormTabs } from "src/components/FilterFormContainer";
 import { PlatformRoleSelector } from "src/components/PlatformRoleSelector";
+import { SortDirectionType, UsersSortFieldType } from "src/models/User";
 import { GetAllUsersSchema } from "src/pages/api/admin/getAllUsers";
 import { GetPlatformRoleUsersSchema } from "src/pages/api/admin/getPlatformRoleUsers";
 import { User } from "src/stores/UserStore";
@@ -34,16 +35,14 @@ interface PageInfo {
 }
 
 interface SortInfo {
-    sortField?: string;
-    sortOrder?: SortDirection;
+  sortField?: UsersSortFieldType;
+  sortOrder?: SortDirectionType;
 };
 
 interface Props {
   refreshToken: boolean;
   user: User;
 }
-
-type SortDirection = "ascend" | "descend";
 
 type FilteredRole = "PLATFORM_ADMIN" | "PLATFORM_FINANCE" | "ALL_USERS";
 

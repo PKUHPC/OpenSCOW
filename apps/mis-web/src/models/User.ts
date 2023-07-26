@@ -92,3 +92,19 @@ export const FullUserInfo = Type.Object({
 });
 export type FullUserInfo = Static<typeof FullUserInfo>;
 
+export const SortDirectionType = Type.Union([
+  Type.Literal("ascend"),
+  Type.Literal("descend"),
+]);
+export type SortDirectionType = Static<typeof SortDirectionType>;
+
+// sort fields
+// for pageComponent AllUsersTable
+export const UsersSortFieldType = Type.Union([
+  Type.Literal("userId"),
+  Type.Literal("name"),
+  Type.Literal("createTime"),
+]);
+export type UsersSortFieldType = Static<typeof UsersSortFieldType>;
+
+

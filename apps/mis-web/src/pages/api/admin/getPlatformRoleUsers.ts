@@ -15,9 +15,11 @@ import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { UserServiceClient } from "@scow/protos/build/server/user";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
-import { PlatformRole } from "src/models/User";
+import { PlatformRole, SortDirectionType, UsersSortFieldType } from "src/models/User";
 import { PlatformUserInfo } from "src/models/UserSchemaModel";
 import { getClient } from "src/utils/client";
+
+import { mapSortDirectionType, mapUsersSortFieldType } from "./getAllUsers";
 
 export const GetPlatformRoleUsersResponse = Type.Object({
   totalCount: Type.Number(),
@@ -45,9 +47,9 @@ export const GetPlatformRoleUsersSchema = typeboxRouteSchema({
      */
     pageSize: Type.Optional(Type.Integer()),
 
-    sortField: Type.Optional(Type.String()),
+    sortField: Type.Optional(UsersSortFieldType),
 
-    sortOrder: Type.Optional(Type.String()),
+    sortOrder: Type.Optional(SortDirectionType),
 
     idOrName: Type.Optional(Type.String()),
 
@@ -71,11 +73,15 @@ export default typeboxRoute(GetPlatformRoleUsersSchema,
     const { page = 1, pageSize, sortField, sortOrder, idOrName } = req.query;
 
     const client = getClient(UserServiceClient);
+
+    const mappedSortField = sortField ? mapUsersSortFieldType[sortField] : undefined;
+    const mappedSortOrder = sortOrder ? mapSortDirectionType[sortOrder] : undefined;
+
     const result = await asyncClientCall(client, "getPlatformRoleUsers", {
       page,
       pageSize,
-      sortField,
-      sortOrder,
+      sortField: mappedSortField,
+      sortOrder: mappedSortOrder,
       idOrName,
     });
 
