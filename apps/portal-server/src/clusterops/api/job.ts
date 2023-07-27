@@ -65,8 +65,30 @@ export interface SaveJobTemplateReply {
 
 }
 
+export interface DeleteJobTemplateRequest {
+  userId: string;
+  id: string;
+}
+
+export interface DeleteJobTemplateReply {
+
+}
+
+
+export interface RenameJobTemplateRequest {
+  userId: string;
+  id: string;
+  jobName: string;
+}
+
+export interface RenameJobTemplateReply {
+
+}
+
 export interface JobOps {
   listJobTemplates(req: ListJobTemplatesRequest, logger: Logger): Promise<ListJobTemplatesReply>;
   getJobTemplate(req: GetJobTemplateRequest, logger: Logger): Promise<GetJobTemplateReply>;
   saveJobTemplate(req: SaveJobTemplateRequest, logger: Logger): Promise<SaveJobTemplateReply>;
+  deleteJobTemplate(req: DeleteJobTemplateRequest, logger: Logger): Promise<DeleteJobTemplateReply>;
+  renameJobTemplate(req: RenameJobTemplateRequest, logger: Logger): Promise<RenameJobTemplateReply>;
 }
