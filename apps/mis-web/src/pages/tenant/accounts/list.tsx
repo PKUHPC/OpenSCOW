@@ -25,7 +25,7 @@ export const AdminAccountsPage: NextPage = requireAuth((u) => u.tenantRoles.incl
   () => {
 
     const promiseFn = useCallback(async () => {
-      return await api.getAccounts({ query:{ getAllAccounts:false } });
+      return await api.getAccounts({});
     }, []);
 
     const [refreshToken, update] = useRefreshToken();

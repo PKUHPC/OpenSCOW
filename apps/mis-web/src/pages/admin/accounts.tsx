@@ -26,7 +26,7 @@ export const AccountListPage: NextPage =
   requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))(() => {
     
     const promiseFn = useCallback(async () => {
-      return await api.getAccounts({ query:{ getAllAccounts:true } });
+      return await api.getAllAccounts({});
     }, []);
 
     const [refreshToken, update] = useRefreshToken();
