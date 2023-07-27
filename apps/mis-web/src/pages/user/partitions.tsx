@@ -16,7 +16,7 @@ import { GetServerSideProps, NextPage } from "next";
 import { checkCookie } from "src/auth/server";
 import { JobBillingTable, JobBillingTableItem } from "src/components/JobBillingTable";
 import { PageTitle } from "src/components/PageTitle";
-import { getAvailableBillingTableItems } from "src/pages/api/job/getBillingTable";
+import { getBillingTableItems } from "src/pages/api/job/getBillingTable";
 import { runtimeConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
 import styled from "styled-components";
@@ -71,7 +71,10 @@ export const getServerSideProps: GetServerSideProps<Props> = async (ctx) => {
   const user = await checkCookie(() => true, ctx.req);
 
   // 显示用户可见的分区信息
-  const items = await getAvailableBillingTableItems(typeof user === "number" ? undefined : user);
+  const items = await getBillingTableItems(
+    typeof user === "number" ? undefined : user.tenant,
+    typeof user === "number" ? undefined : user,
+  );
 
   const clusterTexts = runtimeConfig.CLUSTER_TEXTS_CONFIG;
 

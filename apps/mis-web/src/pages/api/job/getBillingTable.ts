@@ -22,6 +22,8 @@ import { getClient } from "src/utils/client";
 import { publicConfig, runtimeConfig } from "src/utils/config";
 import { moneyToString } from "src/utils/money";
 
+import { Partition } from "../getAvailablePartitions";
+
 // Cannot use JobBillingTableItem from /components/JobBillingTable
 export const JobBillingTableItem = Type.Object({
   index: Type.Number(),
@@ -68,11 +70,30 @@ export const GetBillingTableSchema = typeboxRouteSchema({
   },
 });
 
+async function getAvailablePartitionForItems(
+  client: ConfigServiceClient, cluster: string, user: UserInfo): Promise<Partition[]> {
 
-export async function getAvailableBillingTableItems(user: UserInfo | undefined) {
+  const accountNames = user.accountAffiliations.map((u) => u.accountName);
 
-  if (!user) { return []; }
-  const items = (await getBillingItems(user.tenant, true)).activeItems;
+  const allPartitionsSet = new Set<string>();
+
+  for (const accountName of accountNames) {
+    const availablePartitions = await asyncClientCall(client, "getAvailablePartitions",
+      { cluster: cluster, accountName: accountName, userId: user.identityId }).then((resp) => {
+      return resp.partitions;
+    });
+    availablePartitions.forEach((partition) => {
+      // 利用new Set()对对象数组转化后的字符串去重
+      const partitionStr = JSON.stringify(partition);
+      allPartitionsSet.add(partitionStr);
+    });
+  }
+
+  return Array.from(allPartitionsSet).map((partition) => JSON.parse(partition) as Partition);
+};
+
+export async function getBillingTableItems(tenantName: string | undefined, user?: UserInfo | undefined) {
+  const items = (await getBillingItems(tenantName, true)).activeItems;
 
   const pathItemMap = items.reduce((prev, curr) => {
     prev[curr.path] = curr;
@@ -85,75 +106,10 @@ export async function getAvailableBillingTableItems(user: UserInfo | undefined) 
 
   const client = getClient(ConfigServiceClient);
 
-  const accountNames = user.accountAffiliations.map((u) => u.accountName);
-
   for (const [cluster] of Object.entries(clusters)) {
 
-    let partitions;
-    for (const accountName of accountNames) {
-      partitions =
-      await asyncClientCall(client, "getAvailablePartitions",
-        { cluster: cluster, accountName: accountName, userId: user.identityId }).then((resp) => {
-        return resp.partitions;
-      });
-    }
-
-    const partitionCount = partitions.length;
-    let clusterItemIndex = 0;
-    for (const partition of partitions) {
-      const qosCount = partition.qos?.length ?? 1;
-      let partitionItemIndex = 0;
-      for (const qos of partition.qos ?? [""]) {
-
-        const path = [cluster, partition.name, qos].filter((x) => x).join(".");
-
-        const item = pathItemMap[path];
-
-        tableItems.push({
-          index: count++,
-          clusterItemIndex: clusterItemIndex++,
-          partitionItemIndex: partitionItemIndex++,
-          cluster: publicConfig.CLUSTERS[cluster]?.name ?? cluster,
-          cores: partition.cores,
-          gpus: partition.gpus,
-          mem: partition.memMb,
-          nodes: partition.nodes,
-          partition: partition.name,
-          partitionCount,
-          qosCount,
-          qos,
-          priceItem: item ? {
-            amount: item.amountStrategy,
-            itemId: item.id,
-            price: moneyToString(item.price!),
-          } : undefined,
-          path,
-          comment: partition.comment,
-        });
-      }
-    }
-  }
-
-  return tableItems;
-
-};
-
-
-export async function getBillingTableItems(tenantName: string | undefined) {
-  const items = (await getBillingItems(tenantName, true)).activeItems;
-
-  const pathItemMap = items.reduce((prev, curr) => {
-    prev[curr.path] = curr;
-    return prev;
-  }, {} as Record<string, JobBillingItem>);
-
-  let count = 0;
-  const tableItems: JobBillingTableItem[] = [];
-  const clusters = runtimeConfig.CLUSTERS_CONFIG;
-
-  for (const [cluster] of Object.entries(clusters)) {
-    const client = getClient(ConfigServiceClient);
-    const partitions = await asyncClientCall(client, "getClusterConfig", { cluster }).then((resp) => resp.partitions);
+    const partitions = user ? await getAvailablePartitionForItems(client, cluster, user)
+      : await asyncClientCall(client, "getClusterConfig", { cluster }).then((resp) => resp.partitions);
 
     const partitionCount = partitions.length;
     let clusterItemIndex = 0;
@@ -199,20 +155,10 @@ export default /* #__PURE__*/typeboxRoute(GetBillingTableSchema, async (req, res
   const { tenant } = req.query;
 
   if (tenant) {
-
-    // 当前逻辑：如果用户属于当前租户或者用户为管理员
     const auth = authenticate((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN) || (u.tenant === tenant));
     const info = await auth(req, res);
     if (!info) { return; }
   }
-
-  // // 新增逻辑
-  // const userAuth = authenticate((u) => u.accountAffiliations.length > 0);
-  // const userInfo = await userAuth(req, res);
-  // if (!userInfo) { return; }
-
-  // debugger;
-  // const availableItems = await getAvailableBillingTableItems(userInfo);
 
   const items = await getBillingTableItems(tenant);
 
