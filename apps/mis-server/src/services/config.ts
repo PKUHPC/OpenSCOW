@@ -12,10 +12,7 @@
 
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { plugin } from "@ddadaal/tsgrpc-server";
-import { ServiceError } from "@grpc/grpc-js";
-import { Status } from "@grpc/grpc-js/build/src/constants";
 import { ConfigServiceServer, ConfigServiceService } from "@scow/protos/build/common/config";
-import { parseErrorDetails } from "@scow/rich-error-model";
 
 export const configServiceServer = plugin((server) => {
   server.addService<ConfigServiceServer>(ConfigServiceService, {
@@ -39,19 +36,6 @@ export const configServiceServer = plugin((server) => {
         logger,
         async (client) => await asyncClientCall(client.config, "getAvailablePartitions", {
           accountName, userId,
-        }).catch((e) => {
-          const ex = e as ServiceError;
-          const errors = parseErrorDetails(ex.metadata);
-          if (errors[0] && errors[0].$type === "google.rpc.ErrorInfo"
-          && errors[0].reason === "USER_ACCOUNT_NOT_FOUND") {
-            throw <ServiceError> {
-              code: Status.NOT_FOUND,
-              message: "assocation not exist",
-              details: e.details,
-            };
-          } else {
-            throw e;
-          }
         }),
       );
       return [reply];
