@@ -140,6 +140,7 @@ export const userRoutes: (
         text: cluster.name,
         path: `/files/${cluster.id}`,
         clickToPath: `/files/${cluster.id}/~`,
+        handleClick: () => { setDefaultCluster(cluster); },
       } as NavItemProps)),
     }] : []),
     ...(publicConfig.NAV_LINKS && publicConfig.NAV_LINKS.length > 0
