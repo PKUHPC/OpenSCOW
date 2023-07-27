@@ -22,6 +22,7 @@ import { getClient } from "src/utils/client";
 import { publicConfig, runtimeConfig } from "src/utils/config";
 import { moneyToString } from "src/utils/money";
 
+import { getUserStatus } from "../dashboard/status";
 import { Partition } from "../getAvailablePartitions";
 
 // Cannot use JobBillingTableItem from /components/JobBillingTable
@@ -73,7 +74,11 @@ export const GetBillingTableSchema = typeboxRouteSchema({
 async function getAvailablePartitionForItems(
   client: ConfigServiceClient, cluster: string, user: UserInfo): Promise<Partition[]> {
 
-  const accountNames = user.accountAffiliations.map((u) => u.accountName);
+  const statuses = await getUserStatus(user.identityId, user.tenant);
+  const accountNames = Object.keys(statuses.accountStatuses).filter(
+    (key) => !statuses.accountStatuses[key].accountBlocked);
+
+  if (!accountNames) { return []; }
 
   const allPartitionsSet = new Set<string>();
 
