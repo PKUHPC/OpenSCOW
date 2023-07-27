@@ -29,8 +29,11 @@ import { join } from "path";
 import { User } from "src/stores/UserStore";
 import { Cluster, LoginNode, publicConfig } from "src/utils/config";
 export const userRoutes: (
-  user: User | undefined, defaultCluster: Cluster, LoginNodes: Record<string, LoginNode[]>
-) => NavItemProps[] = (user, defaultCluster, loginNodes) => {
+  user: User | undefined,
+  defaultCluster: Cluster,
+  LoginNodes: Record<string, LoginNode[]>,
+  setDefaultCluster: (cluster: Cluster) => void,
+) => NavItemProps[] = (user, defaultCluster, loginNodes, setDefaultCluster) => {
 
   if (!user) { return []; }
 
@@ -82,11 +85,13 @@ export const userRoutes: (
         text: name,
         path: `/shell/${id}`,
         clickToPath: join(publicConfig.BASE_PATH, "shell", id, loginNodes[id]?.[0]?.name),
+        handleClick: () => { setDefaultCluster({ name, id }); },
         children: loginNodes[id]?.map((loginNode) => ({
           openInNewPage: true,
           Icon: CloudServerOutlined,
           text: loginNode.name,
           path: `/shell/${id}/${loginNode.name}`,
+          handleClick: () => { setDefaultCluster({ name, id }); },
         })),
       } as NavItemProps)),
     } as NavItemProps] : []),
@@ -106,17 +111,20 @@ export const userRoutes: (
         text: cluster.name,
         path: `/apps/${cluster.id}`,
         clickToPath: `/apps/${cluster.id}/sessions`,
+        handleClick: () => { setDefaultCluster(cluster); },
         children: [
           {
             Icon: Loading3QuartersOutlined,
             text: "已创建的应用",
             path: `/apps/${cluster.id}/sessions`,
+            handleClick: () => { setDefaultCluster(cluster); },
           },
           {
             Icon: PlusOutlined,
             text: "创建应用",
             clickable: false,
             path: `/apps/${cluster.id}/createApps`,
+            handleClick: () => { setDefaultCluster(cluster); },
           },
         ],
       } as NavItemProps)),

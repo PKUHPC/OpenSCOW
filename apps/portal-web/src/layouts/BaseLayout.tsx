@@ -30,11 +30,11 @@ export const BaseLayout = ({ footerText, versionTag, children }: PropsWithChildr
 
   const userStore = useStore(UserStore);
   const loginNodes = useStore(LoginNodeStore);
-  const { defaultCluster, removeDefaultCluster } = useDefaultCluster();
+  const { defaultCluster, setDefaultCluster, removeDefaultCluster } = useDefaultCluster();
 
   const routes = useMemo(() => userRoutes(
-    userStore.user, defaultCluster, loginNodes,
-  ), [userStore.user, defaultCluster]);
+    userStore.user, defaultCluster, loginNodes, setDefaultCluster,
+  ), [userStore.user, defaultCluster, setDefaultCluster]);
 
   const logout = () => {
     removeDefaultCluster();

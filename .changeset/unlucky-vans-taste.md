@@ -1,5 +1,6 @@
 ---
 "@scow/portal-web": patch
+"@scow/lib-web": patch
 "@scow/docs": patch
 ---
 
