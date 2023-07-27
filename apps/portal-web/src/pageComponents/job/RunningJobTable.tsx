@@ -15,15 +15,12 @@ import Router from "next/router";
 import { join } from "path";
 import React, { useCallback, useMemo, useState } from "react";
 import { useAsync } from "react-async";
-import { useStore } from "simstate";
 import { api } from "src/apis";
-import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
+import { SingleClusterSelector, useDefaultCluster } from "src/layouts/DefaultCluster";
 import { runningJobId, RunningJobInfo } from "src/models/job";
 import { RunningJobDrawer } from "src/pageComponents/job/RunningJobDrawer";
-import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { Cluster } from "src/utils/config";
-
 interface FilterForm {
   jobId: number | undefined;
   cluster: Cluster;
@@ -34,18 +31,16 @@ interface Props {
 }
 
 
-
-
 export const RunningJobQueryTable: React.FC<Props> = ({
   userId,
 }) => {
 
-  const defaultClusterStore = useStore(DefaultClusterStore);
+  const { defaultCluster } = useDefaultCluster();
 
   const [query, setQuery] = useState<FilterForm>(() => {
     return {
       jobId: undefined,
-      cluster: defaultClusterStore.cluster,
+      cluster: defaultCluster,
     };
   });
 

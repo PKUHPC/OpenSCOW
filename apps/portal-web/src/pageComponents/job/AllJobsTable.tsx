@@ -20,11 +20,10 @@ import Router from "next/router";
 import { join } from "path";
 import React, { useCallback, useMemo, useState } from "react";
 import { useAsync } from "react-async";
-import { useStore } from "simstate";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
-import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
+import { useDefaultCluster } from "src/layouts/DefaultCluster";
 import { Cluster } from "src/utils/config";
 
 interface FilterForm {
@@ -41,14 +40,14 @@ export const AllJobQueryTable: React.FC<Props> = ({
   userId,
 }) => {
 
-  const defaultClusterStore = useStore(DefaultClusterStore);
+  const { defaultCluster } = useDefaultCluster();
 
   const [query, setQuery] = useState<FilterForm>(() => {
     const now = dayjs();
     return {
       time: [now.subtract(1, "week").startOf("day"), now.endOf("day")],
       jobId: undefined,
-      cluster: defaultClusterStore.cluster,
+      cluster: defaultCluster,
     };
   });
 

@@ -20,12 +20,11 @@ import React, { useCallback } from "react";
 import { useAsync } from "react-async";
 import { useStore } from "simstate";
 import { api } from "src/apis";
-import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { ModalButton } from "src/components/ModalLink";
+import { SingleClusterSelector, useDefaultCluster } from "src/layouts/DefaultCluster";
 import { DesktopTableActions } from "src/pageComponents/desktop/DesktopTableActions";
 import { NewDesktopTableModal } from "src/pageComponents/desktop/NewDesktopTableModal";
-import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { LoginNodeStore } from "src/stores/LoginNodeStore";
 import { Cluster, publicConfig } from "src/utils/config";
 
@@ -47,18 +46,17 @@ export const DesktopTable: React.FC<Props> = ({ loginDesktopEnabledClusters }) =
 
   const router = useRouter();
 
-  const defaultClusterStore = useStore(DefaultClusterStore);
+  const { defaultCluster } = useDefaultCluster();
 
   const loginNodes = useStore(LoginNodeStore);
 
   const clusterQuery = queryToString(router.query.cluster);
   const loginQuery = queryToString(router.query.loginNode);
-
   // 如果默认集群没开启登录节点桌面功能，则取开启此功能的某一集群为默认集群。
-  const defaultCluster = loginDesktopEnabledClusters.includes(defaultClusterStore.cluster)
-    ? defaultClusterStore.cluster
+  const enabledDefaultCluster = loginDesktopEnabledClusters.includes(defaultCluster)
+    ? defaultCluster
     : loginDesktopEnabledClusters[0];
-  const cluster = publicConfig.CLUSTERS.find((x) => x.id === clusterQuery) ?? defaultCluster;
+  const cluster = publicConfig.CLUSTERS.find((x) => x.id === clusterQuery) ?? enabledDefaultCluster;
 
   const loginNode = loginNodes[cluster.id].find((x) => x.name === loginQuery) ?? undefined;
 

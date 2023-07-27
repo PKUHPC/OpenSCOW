@@ -13,7 +13,6 @@
 import { Select } from "antd";
 import { Cluster, publicConfig } from "src/utils/config";
 
-
 interface Props {
   value?: Cluster[];
   onChange?: (clusters: Cluster[]) => void;
@@ -32,30 +31,3 @@ export const ClusterSelector: React.FC<Props> = ({ value, onChange }) => {
   );
 };
 
-interface SingleSelectionProps {
-  value?: Cluster;
-  onChange?: (cluster: Cluster) => void;
-  label?: string;
-  clusters?: Cluster[];
-}
-
-export const SingleClusterSelector: React.FC<SingleSelectionProps> = ({
-  value,
-  onChange,
-  label,
-  clusters,
-}) => {
-  return (
-    <Select
-      labelInValue
-      placeholder="请选择集群"
-      value={value ? ({ value: value.id, label: value.name }) : undefined}
-      onChange={({ value, label }) => onChange?.({ id: value, name: label })}
-      options={
-        (label ? [{ value: label, label, disabled: true }] : [])
-          .concat((clusters || publicConfig.CLUSTERS).map((x) => ({ value: x.id, label: x.name, disabled: false })))
-      }
-      popupMatchSelectWidth={false}
-    />
-  );
-};

@@ -32,8 +32,8 @@ import { USE_MOCK } from "src/apis/useMock";
 import { getTokenFromCookie } from "src/auth/cookie";
 import { AntdConfigProvider } from "src/layouts/AntdConfigProvider";
 import { BaseLayout } from "src/layouts/BaseLayout";
+import { DefaultClusterProvider } from "src/layouts/DefaultCluster";
 import { FloatButtons } from "src/layouts/FloatButtons";
-import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { LoginNodeStore } from "src/stores/LoginNodeStore";
 import {
   User, UserStore,
@@ -100,9 +100,6 @@ function MyApp({ Component, pageProps, extra }: Props) {
     return store;
   });
 
-  const defaultClusterStore = useConstant(() => {
-    return createStore(DefaultClusterStore, publicConfig.CLUSTERS[0]);
-  });
 
   const loginNodeStore = useConstant(() => createStore(LoginNodeStore, extra.loginNodes));
 
@@ -129,16 +126,18 @@ function MyApp({ Component, pageProps, extra }: Props) {
           }}
         />
       </Head>
-      <StoreProvider stores={[userStore, defaultClusterStore, loginNodeStore]}>
+      <StoreProvider stores={[userStore, loginNodeStore]}>
         <DarkModeProvider initial={extra.darkModeCookieValue}>
           <AntdConfigProvider color={primaryColor}>
             <FloatButtons />
             <GlobalStyle />
             <FailEventHandler />
             <TopProgressBar />
-            <BaseLayout footerText={footerText} versionTag={publicConfig.VERSION_TAG}>
-              <Component {...pageProps} />
-            </BaseLayout>
+            <DefaultClusterProvider>
+              <BaseLayout footerText={footerText} versionTag={publicConfig.VERSION_TAG}>
+                <Component {...pageProps} />
+              </BaseLayout>
+            </DefaultClusterProvider>
           </AntdConfigProvider>
         </DarkModeProvider>
       </StoreProvider>
