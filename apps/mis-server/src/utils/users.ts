@@ -17,6 +17,13 @@ import { UserStatus } from "src/entities/UserAccount";
 
 import { paginationProps } from "./orm";
 
+// sort fields' text for mis pageComponent AllUsersTable
+export const mapUsersSortField = {
+  [UsersSortField.USER_ID]: "userId",
+  [UsersSortField.NAME]: "name",
+  [UsersSortField.CREATE_TIME]: "createTime",
+};
+
 // generate platform role query
 export const generateRoleQuery = (idOrName: string | undefined, role: PlatformRole) => {
   const baseQuery = {
@@ -49,8 +56,8 @@ export const generateAllUserQueryOptions = (
   sortOrder?: SortDirection) => {
   return {
     ...paginationProps(page, pageSize || 10),
-    orderBy: (sortField && sortOrder !== undefined) ?
-      { [sortField]: sortOrder === SortDirection.ASC ? "ASC" : "DESC" } : undefined,
+    orderBy: (sortField !== undefined && sortOrder !== undefined) ?
+      { [mapUsersSortField[sortField]]: sortOrder === SortDirection.ASC ? "ASC" : "DESC" } : undefined,
   };
 };
 

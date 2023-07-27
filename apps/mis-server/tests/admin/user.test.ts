@@ -15,7 +15,8 @@ import { Server } from "@ddadaal/tsgrpc-server";
 import { ChannelCredentials } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { createUser } from "@scow/lib-auth";
-import { PlatformRole, platformRoleFromJSON, TenantRole, UserServiceClient } from "@scow/protos/build/server/user";
+import { PlatformRole, platformRoleFromJSON,
+  SortDirection, TenantRole, UserServiceClient, UsersSortField } from "@scow/protos/build/server/user";
 import { createServer } from "src/app";
 import { misConfig } from "src/config/mis";
 import { Tenant } from "src/entities/Tenant";
@@ -337,8 +338,8 @@ it("get all users with sorter", async () => {
   const users = await asyncClientCall(client, "getAllUsers", {
     page: 1,
     pageSize: 10,
-    sortField: "userId",
-    sortOrder: "descend",
+    sortField: UsersSortField.USER_ID,
+    sortOrder: SortDirection.DESC,
   });
 
   expect(users.totalCount).toBe(3);
@@ -571,8 +572,8 @@ it("get platform role users with sorter", async () => {
   const users = await asyncClientCall(client, "getPlatformRoleUsers", {
     page: 1,
     pageSize: 10,
-    sortField: "name",
-    sortOrder: "descend",
+    sortField: UsersSortField.NAME,
+    sortOrder: SortDirection.DESC,
   });
 
   expect(users.totalCount).toBe(3);
