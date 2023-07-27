@@ -17,9 +17,16 @@ import testData from "src/testData.json";
 
 export const jobServiceServer = plugin((server) => {
   server.addService<JobServiceServer>(JobServiceService, {
-    getJobs: async () => {
+    getJobs: async ({ request }) => {
+      const endTimeRange = request.filter?.endTime;
       return [{
-        jobs: testData.filter((x) => x.cluster === clusterId)
+        jobs: testData.filter((x) =>
+          x.cluster === clusterId &&
+          (endTimeRange ?
+            new Date(x.endTime) >= new Date(endTimeRange.startTime ?? 0) &&
+            new Date(x.endTime) <= new Date(endTimeRange.endTime ?? 0)
+            : true
+          ))
           .map(({ tenant, tenantPrice, accountPrice, cluster, ...rest }) => {
             return {
               ...rest,
@@ -28,7 +35,7 @@ export const jobServiceServer = plugin((server) => {
             };
           }),
         // set this field for test
-        totalCount : 20,
+        totalCount: 20,
       }];
     },
 
