@@ -18,7 +18,7 @@ import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { SingleClusterSelector, useDefaultCluster } from "src/layouts/DefaultCluster";
-import { type Cluster } from "src/utils/config";
+import type { Cluster } from "src/utils/config";
 
 interface Props {}
 
