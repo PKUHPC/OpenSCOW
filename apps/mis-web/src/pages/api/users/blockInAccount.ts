@@ -40,12 +40,15 @@ export const BlockUserInAccountSchema = typeboxRouteSchema({
 export default /* #__PURE__*/route(BlockUserInAccountSchema, async (req, res) => {
   const { identityId, accountName } = req.body;
 
-  const auth = authenticate((u) => {
-    return u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ||
-    u.accountAffiliations.find((x) => x.accountName === accountName)?.role !== UserRole.USER ||
-    u.tenantRoles.includes(TenantRole.TENANT_ADMIN);
-  });
 
+  const auth = authenticate((u) => {
+    const acccountBelonged = u.accountAffiliations.find((x) => x.accountName === accountName);
+
+    return u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ||
+          (acccountBelonged && acccountBelonged.role !== UserRole.USER) || 
+          u.tenantRoles.includes(TenantRole.TENANT_ADMIN);
+  });
+  
   const info = await auth(req, res);
 
   if (!info) { return; }

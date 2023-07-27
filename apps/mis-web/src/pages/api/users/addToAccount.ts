@@ -53,10 +53,14 @@ export const AddUserToAccountSchema = typeboxRouteSchema({
 export default /* #__PURE__*/typeboxRoute(AddUserToAccountSchema, async (req, res) => {
   const { identityId, accountName, name } = req.body;
 
-  const auth = authenticate((u) =>
-    u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ||
-    u.accountAffiliations.find((x) => x.accountName === accountName)?.role !== UserRole.USER ||
-    u.tenantRoles.includes(TenantRole.TENANT_ADMIN));
+  const auth = authenticate((u) => {
+    const acccountBelonged = u.accountAffiliations.find((x) => x.accountName === accountName);
+
+    return u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ||
+          (acccountBelonged && acccountBelonged.role !== UserRole.USER) || 
+          u.tenantRoles.includes(TenantRole.TENANT_ADMIN);
+  });
+
 
   const info = await auth(req, res);
 

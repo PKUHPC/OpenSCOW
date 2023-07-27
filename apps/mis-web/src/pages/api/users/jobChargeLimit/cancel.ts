@@ -39,9 +39,12 @@ export default typeboxRoute(CancelJobChargeLimitSchema, async (req, res) => {
 
   const { accountName, userId } = req.query;
 
-  const auth = authenticate((u) => u.accountAffiliations.some((x) =>
-    x.accountName === accountName && x.role !== UserRole.USER) || 
-    u.tenantRoles.includes(TenantRole.TENANT_ADMIN));
+  const auth = authenticate((u) => {
+    const acccountBelonged = u.accountAffiliations.find((x) => x.accountName === accountName);
+
+    return (acccountBelonged && acccountBelonged.role !== UserRole.USER) || 
+          u.tenantRoles.includes(TenantRole.TENANT_ADMIN);
+  });
 
   const info = await auth(req, res);
 
