@@ -21,9 +21,8 @@ import { join } from "path";
 import React, { useCallback, useMemo, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
-import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
-import { useDefaultCluster } from "src/layouts/DefaultCluster";
+import { SingleClusterSelector, useDefaultCluster } from "src/layouts/DefaultCluster";
 import { Cluster } from "src/utils/config";
 
 interface FilterForm {
