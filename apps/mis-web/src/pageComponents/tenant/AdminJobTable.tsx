@@ -234,7 +234,7 @@ const JobInfoTable: React.FC<JobInfoTableProps> = ({
         </Space>
       </TableTitle>
       <Table
-        rowKey={(i) => i.idJob}
+        rowKey={(i) => i.cluster + i.biJobIndex + i.idJob}
         dataSource={data?.jobs}
         loading={isLoading}
         pagination={setPageInfo ? {
