@@ -1357,6 +1357,15 @@
           "nullable": false,
           "mappedType": "integer"
         },
+        "operation_type": {
+          "name": "operation_type",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "integer"
+        },
         "operation_content": {
           "name": "operation_content",
           "type": "text",

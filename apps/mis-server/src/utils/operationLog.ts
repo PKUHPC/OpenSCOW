@@ -12,7 +12,7 @@
 
 import { Logger } from "@ddadaal/tsgrpc-server";
 import { MySqlDriver, SqlEntityManager } from "@mikro-orm/mysql";
-import { OperationCode } from "@scow/protos/build/server/operation_log";
+import { OperationCode, OperationType } from "@scow/protos/build/server/operation_log";
 import { OperationLog, OperationResult } from "src/entities/OperationLog";
 import { User } from "src/entities/User";
 
@@ -20,13 +20,13 @@ export async function logOperation(
   operatorId: string,
   operatorIp: string,
   operationCode: OperationCode,
+  operationType: OperationType,
   operationContent: string,
   operationResult: OperationResult,
   em: SqlEntityManager<MySqlDriver>,
   logger: Logger,
 ): Promise<void> {
   try {
-    await new Promise((resolve) => setTimeout(resolve, 10000));
     const user = await em.findOne(User, { userId: operatorId });
     if (!user) {
       throw new Error("User not found");
@@ -35,6 +35,7 @@ export async function logOperation(
       operator: user,
       operatorIp,
       operationCode,
+      operationType,
       operationContent,
       operationResult,
     });

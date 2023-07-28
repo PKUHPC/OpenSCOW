@@ -18,12 +18,15 @@ export const operationLogServiceServer = plugin((server) => {
 
   server.addService<OperationLogServiceServer>(OperationLogServiceService, {
 
-    createLogOperation: async ({ request, em, logger }) => {
-      const { operatorId, operatorIp, operationCode, operationContent, operationResult } = request;
+    createOperationLog: async ({ request, em, logger }) => {
+      const { operatorId, operatorIp, operationCode, operationType, operationContent, operationResult } = request;
 
-      await logOperation(operatorId, operatorIp, operationCode, operationContent, operationResult, em, logger);
+      await logOperation(
+        operatorId, operatorIp, operationCode, operationType, operationContent, operationResult, em, logger,
+      );
 
     },
+
   });
 
 });

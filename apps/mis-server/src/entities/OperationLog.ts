@@ -37,6 +37,9 @@ export class OperationLog {
   @Property()
     operationCode!: number;
 
+  @Property()
+    operationType!: number;
+
   @Property({ columnType: "text" })
     operationContent!: string;
 
@@ -49,6 +52,7 @@ export class OperationLog {
       operatorIp: string;
       operationTime?: Date;
       operationCode: number;
+      operationType: number;
       operationContent: string;
       operationResult: OperationResult
     }) {
@@ -58,6 +62,7 @@ export class OperationLog {
       this.operationTime = init.operationTime;
     }
     this.operationCode = init.operationCode;
+    this.operationType = init.operationType;
     this.operationContent = init.operationContent;
     this.operationResult = init.operationResult;
   }

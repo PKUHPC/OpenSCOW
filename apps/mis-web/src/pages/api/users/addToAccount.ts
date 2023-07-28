@@ -13,13 +13,15 @@
 import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Status } from "@grpc/grpc-js/build/src/constants";
+import { OperationCode, OperationType } from "@scow/protos/build/server/operation_log";
 import { UserServiceClient } from "@scow/protos/build/server/user";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { PlatformRole, UserRole } from "src/models/User";
 import { checkNameMatch } from "src/server/checkIdNameMatch";
 import { getClient } from "src/utils/client";
-import { handlegRPCError } from "src/utils/server";
+import { logOperation } from "src/utils/logOperation";
+import { handlegRPCError, parseIp } from "src/utils/server";
 
 export const AddUserToAccountSchema = typeboxRouteSchema({
   method: "POST",
@@ -71,6 +73,14 @@ export default /* #__PURE__*/typeboxRoute(AddUserToAccountSchema, async (req, re
     return { 400: { code: "ID_NAME_NOT_MATCH" as const } };
   }
 
+  const logInfo = {
+    operatorId: info.identityId,
+    operatorIp: parseIp(req) || "",
+    operationCode: OperationCode.ACCOUNT_ADD_USER,
+    operationType: OperationType.ADD_USER,
+    operationContent: `将用户${name}添加到账户${accountName}中`,
+  };
+
   // call ua service to add user
   const client = getClient(UserServiceClient);
 
@@ -78,9 +88,14 @@ export default /* #__PURE__*/typeboxRoute(AddUserToAccountSchema, async (req, re
     tenantName: info.tenant,
     accountName,
     userId: identityId,
-  }).then(() => ({ 204: null }))
-    .catch(handlegRPCError({
-      [Status.ALREADY_EXISTS]: () => ({ 409: null }),
-      [Status.NOT_FOUND]: () => ({ 404: { code: "ACCOUNT_NOT_FOUND" as const } }),
-    }));
+  }).then(() =>
+  {
+    logOperation(logInfo, true);
+    return { 204: null };
+  }).catch(handlegRPCError({
+    [Status.ALREADY_EXISTS]: () => ({ 409: null }),
+    [Status.NOT_FOUND]: () => ({ 404: { code: "ACCOUNT_NOT_FOUND" as const } }),
+  },
+  () => logOperation(logInfo, false),
+  ));
 });

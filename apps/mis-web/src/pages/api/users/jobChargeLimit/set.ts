@@ -15,11 +15,13 @@ import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { numberToMoney } from "@scow/lib-decimal";
 import { JobChargeLimitServiceClient } from "@scow/protos/build/server/job_charge_limit";
+import { OperationCode, OperationType } from "@scow/protos/build/server/operation_log";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { UserRole } from "src/models/User";
 import { getClient } from "src/utils/client";
-import { handlegRPCError } from "src/utils/server";
+import { logOperation } from "src/utils/logOperation";
+import { handlegRPCError, parseIp } from "src/utils/server";
 
 export const SetJobChargeLimitSchema = typeboxRouteSchema({
   method: "PUT",
@@ -50,12 +52,26 @@ export default typeboxRoute(SetJobChargeLimitSchema, async (req, res) => {
 
   const client = getClient(JobChargeLimitServiceClient);
 
+  const logInfo = {
+    operatorId: info.identityId,
+    operatorIp: parseIp(req) || "",
+    operationCode: OperationCode.ACCOUNT_SET_CHARGE_LIMIT,
+    operationType: OperationType.SET_CHARGE_LIMIT,
+    operationContent: `在账户${accountName}中设置用户${userId}的限额为${limit}元`,
+  };
+
   return await asyncClientCall(client, "setJobChargeLimit", {
     tenantName: info.tenant,
     accountName, userId, limit: numberToMoney(limit),
   })
-    .then(() => ({ 204: null }))
+    .then(() => {
+      logOperation(logInfo, true);
+      return { 204: null };
+    })
     .catch(handlegRPCError({
       [Status.NOT_FOUND]: () => ({ 404: null }),
+    }, () => {
+      logOperation(logInfo, false);
     }));
+
 });

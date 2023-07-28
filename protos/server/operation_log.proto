@@ -18,74 +18,285 @@ package scow.server;
 import "google/protobuf/timestamp.proto";
 
 
+enum OperationType {
+  // 用户登录
+  LOGIN = 0;
+  // 退出登录
+  LOGOUT = 1;
+  // 提交作业
+  SUBMIT_JOB = 2;
+  // 结束作业
+  END_JOB = 3;
+  // 设置作业时限
+  SET_JOB_TIME_LIMIT = 4;
+  // 批量设置作业时限
+  BATCH_SET_JOB_TIME_LIMIT = 5;
+  // 保存作业模板
+  SAVE_JOB_TEMPLATE = 6;
+  // 删除作业模板
+  DELETE_JOB_TEMPLATE = 7;
+  // 设置作业模板
+  UPDATE_JOB_TEMPLATE = 8;
+  // SHELL登录
+  SHELL_LOGIN = 9;
+  // 新建桌面
+  CREATE_DESKTOP = 10;
+  // 删除桌面
+  DELETE_DESKTOP = 11;
+  // 创建应用
+  CREATE_APPLICATION = 12;
+  // 结束应用
+  END_APPLICATION = 13;
+  // 新建文件
+  CREATE_FILE = 14;
+  // 新建文件夹
+  CREATE_FOLDER = 15;
+  // 上传文件
+  UPLOAD_FILE = 16;
+  // 删除文件
+  DELETE_FILE = 17;
+  // 删除文件夹
+  DELETE_FOLDER = 18;
+  // 重命名文件
+  RENAME_FILE = 19;
+  // 重命名文件夹
+  RENAME_FOLDER = 20;
+  // 移动文件
+  MOVE_FILE = 21;
+  // 移动文件夹
+  MOVE_FOLDER = 22;
+  // 复制文件
+  COPY_FILE = 23;
+  // 复制文件夹
+  COPY_FOLDER = 24;
+
+  // 创建并添加用户至账户
+  CREATE_AND_ADD_USER = 25;
+  // 创建用户
+  CREATE_USER = 26;
+  // 添加用户
+  ADD_USER = 27;
+  // 移出用户
+  REMOVE_USER = 28;
+  // 设为账户管理员
+  SET_ACCOUNT_ADMIN = 29;
+  // 取消账户管理员
+  UNSET_ACCOUNT_ADMIN = 30;
+  // 封锁用户
+  BLOCK_USER = 31;
+  // 解封用户
+  UNBLOCK_USER = 32;
+  // 设置限额
+  SET_CHARGE_LIMIT = 33;
+  // 修改作业租户计费
+  UPDATE_TENANT_BILLING = 34;
+
+  // 设置租户管理员
+  SET_TENANT_ADMIN = 35;
+  // 取消租户管理员
+  UNSET_TENANT_ADMIN = 36;
+  // 设置租户财务人员
+  SET_TENANT_FINANCIAL = 37;
+  // 取消租户财务人员
+  UNSET_TENANT_FINANCIAL = 38;
+  // 重置用户密码
+  RESET_USER_PASSWORD = 39;
+  // 创建账户
+  CREATE_ACCOUNT = 40;
+  // 添加白名单账户
+  ADD_ACCOUNT_TO_WHITELIST = 41;
+  // 移出白名单
+  REMOVE_ACCOUNT_FROM_WHITELIST = 42;
+  // 账户充值
+  ACCOUNT_PAY = 43;
+  // 导入用户
+  IMPORT_USER = 44;
+  // 设置平台管理员
+  SET_PLATFORM_ADMIN = 45;
+  // 取消平台管理员
+  UNSET_PLATFORM_ADMIN = 46;
+  // 设置平台财务人员
+  SET_PLATFORM_FINANCIAL = 47;
+  // 取消平台财务人员
+  UNSET_PLATFORM_FINANCIAL = 48;
+  // 设置平台作业计费
+  UPDATE_PLATFORM_BILLING = 49;
+  // 创建租户
+  CREATE_TENANT = 50;
+  // 租户充值
+  TENANT_PAY = 51;
+}
+
 enum OperationCode {
   CODE_UNKNOWN = 0;
+  // 用户登录
+  USER_LOGIN = 100001;
+  // 用户登出
+  USER_LOGOUT = 100002;
+  // 普通用户操作 - 提交作业
+  USER_SUBMIT_JOB = 200101;
+  // 普通用户操作 - 结束作业
+  USER_END_JOB = 200102;
+  // 普通用户操作 - 设置作业时限
+  USER_SET_JOB_TIME_LIMIT = 200103;
+  // 普通用户操作 - 保存作业模板
+  USER_ADD_JOB_TEMPLATE = 200104;
+  // 普通用户操作 - 删除作业模板
+  USER_DELETE_JOB_TEMPLATE = 200105;
+  // 普通用户操作 - 修改作业模板
+  USER_SET_JOB_TEMPLATE = 200106;
+  // 普通用户操作 - SHELL登录
+  USER_SHELL_LOGIN = 200201;
+  // 普通用户操作 - 新建桌面
+  USER_CREATE_DESKTOP = 200301;
+  // 普通用户操作 - 删除桌面
+  USER_DELETE_DESKTOP = 200302;
+  // 普通用户操作 - 创建应用
+  USER_CREATE_APPLICATION = 200401;
+  // 普通用户操作 - 结束应用
+  USER_END_APPLICATION = 200402;
+  // 普通用户操作 - 新建文件
+  USER_CREATE_FILE = 200501;
+  // 普通用户操作 - 新建文件夹
+  USER_CREATE_FOLDER = 200502;
+  // 普通用户操作 - 上传文件
+  USER_UPLOAD_FILE = 200503;
+  // 普通用户操作 - 删除文件
+  USER_DELETE_FILE = 200504;
+  // 普通用户操作 - 删除文件夹
+  USER_DELETE_FOLDER = 200505;
+  // 普通用户操作 - 重命名文件
+  USER_RENAME_FILE = 200506;
+  // 普通用户操作 - 重命名文件夹
+  USER_RENAME_FOLDER = 200507;
+  // 普通用户操作 - 移动文件
+  USER_MOVE_FILE = 200508;
+  // 普通用户操作 - 移动文件夹
+  USER_MOVE_FOLDER = 200509;
+  // 普通用户操作 - 复制文件
+  USER_COPY_FILE = 200510;
+  // 普通用户操作 - 复制文件夹
+  USER_COPY_FOLDER = 200511;
 
-  // 账户管理员操作
-  SET_JOB_TIME_LIMIT = 20101; // 修改作业时限
-  BATCH_SET_JOB_TIME_LIMIT = 20102; // 批量修改作业时限
-  CREATE_AND_ADD_USER = 20201; // 创建并添加用户
-  ADD_USER = 20202; // 添加用户
-  REMOVE_USER = 20203; // 移出用户
-  SET_ADMIN = 20204; // 设为管理员
-  UNSET_ADMIN = 20205; // 取消管理员
-  BLOCK_USER = 20206; // 封锁用户
-  UNBLOCK_USER = 20207; // 解封用户
-  SET_JOB_CHARGE_LIMIT = 20208; // 设置限额
+  // 账户管理员操作 - 设置作业时限
+  ACCOUNT_SET_JOB_TIME_LIMIT = 300101;
+  // 账户管理员操作 - 批量设置作业时限
+  ACCOUNT_BATCH_SET_JOB_TIME_LIMIT = 300102;
+  // 账户管理员操作 - 创建并添加用户
+  ACCOUNT_CREATE_AND_ADD_USER = 300201;
+  // 账户管理员操作 - 添加用户
+  ACCOUNT_ADD_USER = 300202;
+  // 账户管理员操作 - 移出用户
+  ACCOUNT_REMOVE_USER = 300203;
+  // 账户管理员操作 - 设为管理员
+  ACCOUNT_SET_ACCOUNT_ADMIN = 300204;
+  // 账户管理员操作 - 取消管理员
+  ACCOUNT_UNSET_ACCOUNT_ADMIN = 300205;
+  // 账户管理员操作 - 封锁用户
+  ACCOUNT_BLOCK_USER = 300206;
+  // 账户管理员操作 - 解封用户
+  ACCOUNT_UNBLOCK_USER = 300207;
+  // 账户管理员操作 - 设置限额
+  ACCOUNT_SET_CHARGE_LIMIT = 300208;
 
-  // 租户管理员操作
-  MODIFY_JOB_DEADLINE_2 = 30101; // 修改作业时限
-  BATCH_MODIFY_JOB_DEADLINE_2 = 30102; // 批量修改作业时限
-  SET_JOB_TENANT_BILLING = 30103; // 修改作业租户计费
-  CREATE_USER = 30201; // 创建用户
-  SET_TENANT_ADMIN = 30202; // 设为租户管理员
-  REMOVE_TENANT_ADMIN = 30203; // 取消租户管理员
-  SET_FINANCE_STAFF = 30204; // 设为财务人员
-  REMOVE_FINANCE_STAFF = 30205; // 取消财务人员
-  RESET_PASSWORD = 30206; // 重置密码
-  CREATE_ACCOUNT = 30301; // 创建账户
-  ADD_WHITELIST_ACCOUNT = 30302; // 添加白名单账户
-  REMOVE_WHITELIST = 30303; // 移出白名单
-  ACCOUNT_RECHARGE = 30304; // 账户充值
 
-  // 平台管理员操作
-  IMPORT_USER = 40401; // 导入用户
-  SET_PLATFORM_ADMIN = 40201; // 设置平台管理员
-  REMOVE_PLATFORM_ADMIN = 40202; // 取消平台管理员
-  SET_PLATFORM_FINANCE_STAFF = 40203; // 设置平台财务人员
-  REMOVE_PLATFORM_FINANCE_STAFF = 40204; // 取消平台财务人员
-  RESET_PLATFORM_PASSWORD = 40205; // 重置密码
-  SET_PLATFORM_JOB_BILLING = 40206; // 设置平台作业计费
-  CREATE_TENANT = 40301; // 创建租户
-  SET_TENANT_JOB_BILLING = 40302; // 设置租户作业计费
-  TENANT_RECHARGE = 40303; // 租户充值
+  // 租户管理员操作 - 设置作业时限
+  TENANT_SET_JOB_TIME_LIMIT = 400101;
+  // 租户管理员操作 - 批量设置作业时限
+  TENANT_BATCH_SET_JOB_TIME_LIMIT = 400102;
+   // 租户管理员操作 - 设置作业租户计费
+  TENANT_SET_TENANT_BILLING = 400103;
+  // 租户管理员操作 - 创建用户
+  TENANT_CREATE_USER = 400201;
+  // 租户管理员操作 - 设置租户管理员
+  TENANT_SET_TENANT_ADMIN = 400202;
+  // 租户管理员操作 - 取消租户管理员
+  TENANT_UNSET_TENANT_ADMIN = 400203;
+  // 租户管理员操作 - 设置租户财务人员
+  TENANT_SET_TENANT_FINANCIAL = 400204;
+  // 租户管理员操作 - 取消租户财务人员
+  TENANT_UNSET_TENANT_FINANCIAL = 400205;
+  // 租户管理员操作 - 重置用户密码
+  TENANT_RESET_USER_PASSWORD = 400206;
+  // 租户管理员操作 - 创建账户
+  TENANT_CREATE_ACCOUNT = 400301;
+  // 租户管理员操作 - 添加白名单账户
+  TENANT_ADD_ACCOUNT_TO_WHITELIST = 400302;
+  // 租户管理员操作 - 移出白名单
+  TENANT_REMOVE_ACCOUNT_FROM_WHITELIST = 400303;
+  // 租户管理员操作 - 账户充值
+  TENANT_ACCOUNT_PAY = 400304;
+
+  // 平台管理员操作- 导入用户
+  PLATFORM_IMPORT_USER = 500101;
+  // 平台管理员操作 - 设置平台管理员
+  PLATFORM_SET_PLATFORM_ADMIN = 500201;
+  // 平台管理员操作 - 取消平台管理员
+  PLATFORM_UNSET_PLATFORM_ADMIN = 500202;
+  // 平台管理员操作 - 设置平台财务人员
+  PLATFORM_SET_PLATFORM_FINANCIAL = 500203;
+  // 平台管理员操作 - 取消平台财务人员
+  PLATFORM_UNSET_PLATFORM_FINANCIAL = 500204;
+  // 平台管理员操作 - 重置密码
+  PLATFORM_RESET_PASSWORD = 500205;
+  // 平台管理员操作 - 设置平台作业计费
+  PLATFORM_SET_PLATFORM_BILLING = 500206;
+  // 平台管理员操作 - 创建租户
+  PLATFORM_CREATE_TENANT = 500301;
+  // 平台管理员操作 - 设置租户作业计费
+  PLATFORM_SET_TENANT_BILLING = 500302;
+  // 平台管理员操作 - 租户充值
+  PLATFORM_TENANT_PAY = 500303;
 }
+
 enum OperationResult {
   UNKNOWN = 0;
   SUCCESS = 1;
   FAIL = 2;
 }
 
-message LogOperation {
+message OperationLog {
   string operator_id = 1;
   string operator_ip = 2;
   google.protobuf.Timestamp operation_time = 3;
   OperationCode operation_code = 4;
+  OperationType operation_type = 5;
+  string operation_content = 6;
+  OperationResult operation_result = 7;
+}
+
+message CreateOperationLogRequest {
+  string operator_id = 1;
+  string operator_ip = 2;
+  OperationCode operation_code = 3;
+  OperationType operation_type = 4;
   string operation_content = 5;
   OperationResult operation_result = 6;
 }
 
-message CreateLogOperationRequest {
-  string operator_id = 1;
-  string operator_ip = 2;
-  OperationCode operation_code = 3;
-  string operation_content = 4;
-  OperationResult operation_result = 5;
+message CreateOperationLogResponse {
 }
 
-message CreateLogOperationResponse {
+message GetOperationLogsRequest {
+  uint32 page = 1;
+  uint64 page_size = 2;
+  google.protobuf.Timestamp start_time = 3;
+  google.protobuf.Timestamp end_time = 4;
+  optional string operator_id = 5;
+  optional OperationCode operation_code = 6;
+  optional OperationType operation_type = 7;
+  optional OperationResult operation_result = 8;
 }
+
+message GetOperationLogsResponse {
+  repeated OperationLog result1 = 1;
+  uint32 total = 2;
+}
+
+
 
 service OperationLogService {
-  rpc CreateLogOperation(CreateLogOperationRequest) returns (CreateLogOperationResponse);
+  rpc CreateOperationLog(CreateOperationLogRequest) returns (CreateOperationLogResponse);
+  // rpc GetOperationLogs(GetOperationLogsRequest) returns (GetOperationLogsResponse);
+
 }
