@@ -190,7 +190,8 @@
           "primary": false,
           "nullable": false,
           "length": 255,
-          "comment": "分区"
+          "comment": "分区",
+          "mappedType": "unknown"
         },
         "nodelist": {
           "name": "nodelist",
@@ -210,7 +211,8 @@
           "primary": false,
           "nullable": false,
           "length": 255,
-          "comment": "作业名"
+          "comment": "作业名",
+          "mappedType": "unknown"
         },
         "cluster": {
           "name": "cluster",
@@ -1302,6 +1304,112 @@
           ],
           "referencedTableName": "user",
           "deleteRule": "CASCADE",
+          "updateRule": "cascade"
+        }
+      }
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "mappedType": "integer"
+        },
+        "operator_id": {
+          "name": "operator_id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "integer"
+        },
+        "operator_ip": {
+          "name": "operator_ip",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "string"
+        },
+        "operation_time": {
+          "name": "operation_time",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 0,
+          "default": "current_timestamp(0)",
+          "mappedType": "datetime"
+        },
+        "operation_code": {
+          "name": "operation_code",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "integer"
+        },
+        "operation_content": {
+          "name": "operation_content",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "text"
+        },
+        "operation_result": {
+          "name": "operation_result",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "default": "UNKNOWN",
+          "mappedType": "string"
+        }
+      },
+      "name": "operation_log",
+      "indexes": [
+        {
+          "columnNames": [
+            "operator_id"
+          ],
+          "composite": false,
+          "keyName": "operation_log_operator_id_index",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "keyName": "PRIMARY",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "operation_log_operator_id_foreign": {
+          "constraintName": "operation_log_operator_id_foreign",
+          "columnNames": [
+            "operator_id"
+          ],
+          "localTableName": "operation_log",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "user",
           "updateRule": "cascade"
         }
       }

@@ -16,6 +16,7 @@ import { ChargeRecord } from "src/entities/ChargeRecord";
 import { JobInfo } from "src/entities/JobInfo";
 import { JobPriceChange } from "src/entities/JobPriceChange";
 import { JobPriceItem } from "src/entities/JobPriceItem";
+import { OperationLog } from "src/entities/OperationLog";
 import { PayRecord } from "src/entities/PayRecord";
 import { StorageQuota } from "src/entities/StorageQuota";
 import { SystemState } from "src/entities/SystemState";
@@ -36,4 +37,5 @@ export const entities = [
   PayRecord,
   ChargeRecord,
   SystemState,
+  OperationLog,
 ];

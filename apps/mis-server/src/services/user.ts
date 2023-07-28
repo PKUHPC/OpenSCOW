@@ -317,7 +317,6 @@ export const userServiceServer = plugin((server) => {
 
       user.role = UserRole.USER;
       await em.flush();
-
       return [{}];
     },
 

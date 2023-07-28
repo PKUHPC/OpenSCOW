@@ -1,0 +1,91 @@
+/**
+   * Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
+   * SCOW is licensed under Mulan PSL v2.
+   * You can use this software according to the terms and conditions of the Mulan PSL v2.
+   * You may obtain a copy of Mulan PSL v2 at:
+   *          http://license.coscl.org.cn/MulanPSL2
+   * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+   * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+   * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+   * See the Mulan PSL v2 for more details.
+*/
+
+
+syntax = "proto3";
+
+package scow.server;
+
+import "google/protobuf/timestamp.proto";
+
+
+enum OperationCode {
+  CODE_UNKNOWN = 0;
+
+  // 账户管理员操作
+  SET_JOB_TIME_LIMIT = 20101; // 修改作业时限
+  BATCH_SET_JOB_TIME_LIMIT = 20102; // 批量修改作业时限
+  CREATE_AND_ADD_USER = 20201; // 创建并添加用户
+  ADD_USER = 20202; // 添加用户
+  REMOVE_USER = 20203; // 移出用户
+  SET_ADMIN = 20204; // 设为管理员
+  UNSET_ADMIN = 20205; // 取消管理员
+  BLOCK_USER = 20206; // 封锁用户
+  UNBLOCK_USER = 20207; // 解封用户
+  SET_JOB_CHARGE_LIMIT = 20208; // 设置限额
+
+  // 租户管理员操作
+  MODIFY_JOB_DEADLINE_2 = 30101; // 修改作业时限
+  BATCH_MODIFY_JOB_DEADLINE_2 = 30102; // 批量修改作业时限
+  SET_JOB_TENANT_BILLING = 30103; // 修改作业租户计费
+  CREATE_USER = 30201; // 创建用户
+  SET_TENANT_ADMIN = 30202; // 设为租户管理员
+  REMOVE_TENANT_ADMIN = 30203; // 取消租户管理员
+  SET_FINANCE_STAFF = 30204; // 设为财务人员
+  REMOVE_FINANCE_STAFF = 30205; // 取消财务人员
+  RESET_PASSWORD = 30206; // 重置密码
+  CREATE_ACCOUNT = 30301; // 创建账户
+  ADD_WHITELIST_ACCOUNT = 30302; // 添加白名单账户
+  REMOVE_WHITELIST = 30303; // 移出白名单
+  ACCOUNT_RECHARGE = 30304; // 账户充值
+
+  // 平台管理员操作
+  IMPORT_USER = 40401; // 导入用户
+  SET_PLATFORM_ADMIN = 40201; // 设置平台管理员
+  REMOVE_PLATFORM_ADMIN = 40202; // 取消平台管理员
+  SET_PLATFORM_FINANCE_STAFF = 40203; // 设置平台财务人员
+  REMOVE_PLATFORM_FINANCE_STAFF = 40204; // 取消平台财务人员
+  RESET_PLATFORM_PASSWORD = 40205; // 重置密码
+  SET_PLATFORM_JOB_BILLING = 40206; // 设置平台作业计费
+  CREATE_TENANT = 40301; // 创建租户
+  SET_TENANT_JOB_BILLING = 40302; // 设置租户作业计费
+  TENANT_RECHARGE = 40303; // 租户充值
+}
+enum OperationResult {
+  UNKNOWN = 0;
+  SUCCESS = 1;
+  FAIL = 2;
+}
+
+message LogOperation {
+  string operator_id = 1;
+  string operator_ip = 2;
+  google.protobuf.Timestamp operation_time = 3;
+  OperationCode operation_code = 4;
+  string operation_content = 5;
+  OperationResult operation_result = 6;
+}
+
+message CreateLogOperationRequest {
+  string operator_id = 1;
+  string operator_ip = 2;
+  OperationCode operation_code = 3;
+  string operation_content = 4;
+  OperationResult operation_result = 5;
+}
+
+message CreateLogOperationResponse {
+}
+
+service OperationLogService {
+  rpc CreateLogOperation(CreateLogOperationRequest) returns (CreateLogOperationResponse);
+}
