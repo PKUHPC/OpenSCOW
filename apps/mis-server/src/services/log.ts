@@ -12,16 +12,16 @@
 
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { OperationLogServiceServer, OperationLogServiceService } from "@scow/protos/build/server/operation_log";
-import { logOpertaion } from "src/utils/operationLog";
+import { logOperation } from "src/utils/operationLog";
 
 export const operationLogServiceServer = plugin((server) => {
 
   server.addService<OperationLogServiceServer>(OperationLogServiceService, {
 
     createLogOperation: async ({ request, em, logger }) => {
-      const { operatorId, operatorIp, operationCode, opertionContent, operationResult } = request;
+      const { operatorId, operatorIp, operationCode, operationContent, operationResult } = request;
 
-      await logOpertaion(operatorId, operatorIp, operationCode, opertionContent, operationResult, em, logger);
+      await logOperation(operatorId, operatorIp, operationCode, operationContent, operationResult, em, logger);
 
     },
   });
