@@ -242,6 +242,7 @@ message GetUserInfoResponse {
   repeated TenantRole tenant_roles = 3;
   string name = 4;
   string tenant_name = 5;
+  string email = 6;
 }
 
 message GetUsersResponse {
@@ -318,6 +319,14 @@ message CheckUserNameMatchResponse {
   bool match = 1;
 }
 
+message ChangeEmailRequest {
+  string user_id = 1;
+  string new_email = 2;
+}
+
+message ChangeEmailResponse {
+}
+
 
 service UserService {
 
@@ -358,4 +367,5 @@ service UserService {
   rpc UnsetTenantRole(UnsetTenantRoleRequest) returns (UnsetTenantRoleResponse);
 
   rpc CheckUserNameMatch (CheckUserNameMatchRequest) returns (CheckUserNameMatchResponse);
+  rpc ChangeEmail (ChangeEmailRequest) returns (ChangeEmailResponse);
 }

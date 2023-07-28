@@ -14,7 +14,9 @@ import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
-import { addUserToAccount, createUser, getUser, removeUserFromAccount } from "@scow/lib-auth";
+import { addUserToAccount, changeEmail as libChangeEmail, createUser, getCapabilities, getUser, removeUserFromAccount,
+} 
+  from "@scow/lib-auth";
 import { decimalToMoney } from "@scow/lib-decimal";
 import {
   AccountStatus,
@@ -35,6 +37,7 @@ import { UserAccount, UserRole, UserStatus } from "src/entities/UserAccount";
 import { callHook } from "src/plugins/hookClient";
 import { createUserInDatabase, insertKeyToNewUser } from "src/utils/createUser";
 import { paginationProps } from "src/utils/orm";
+
 
 export const userServiceServer = plugin((server) => {
 
@@ -480,8 +483,7 @@ export const userServiceServer = plugin((server) => {
 
       const user = await em.findOne(User, {
         userId,
-      }, { populate: ["accounts", "accounts.account", "tenant"]});
-
+      }, { populate: ["accounts", "accounts.account", "tenant", "email"]});
       if (!user) {
         throw <ServiceError>{ code: Status.NOT_FOUND, message:`User ${userId} is not found.` };
       }
@@ -493,6 +495,7 @@ export const userServiceServer = plugin((server) => {
         })),
         tenantName: user.tenant.$.name,
         name: user.name,
+        email: user.email,
         tenantRoles: user.tenantRoles.map(tenantRoleFromJSON),
         platformRoles: user.platformRoles.map(platformRoleFromJSON),
       }];
@@ -623,6 +626,37 @@ export const userServiceServer = plugin((server) => {
       user.tenantRoles = user.tenantRoles.filter((item) =>
         item !== dbRoleType);
       await em.flush();
+      return [{}];
+
+    },
+    changeEmail: async ({ request, em, logger }) => {
+      const { userId, newEmail } = request;
+
+      const user = await em.findOne(User, { userId: userId });
+
+      if (!user) {
+        throw <ServiceError>{
+          code: Status.NOT_FOUND, message: `User ${userId} is not found.`,
+        };
+      }
+        
+      user.email = newEmail;
+      await em.flush();
+
+      const ldapCapabilities = await getCapabilities(misConfig.authUrl);
+
+      // 看LDAP是否有修改邮箱的权限
+      if (ldapCapabilities.changeEmail) {
+        await libChangeEmail(misConfig.authUrl, {
+          identityId: userId,
+          newEmail,
+        }, logger)
+          .catch(async () => {
+            throw <ServiceError> {
+              code: Status.UNKNOWN, message: "LDAP failed to change email",
+            };
+          });
+      }
 
       return [{}];
     },
