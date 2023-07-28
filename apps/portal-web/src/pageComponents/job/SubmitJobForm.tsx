@@ -17,11 +17,13 @@ import Router from "next/router";
 import { join } from "path";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useAsync } from "react-async";
+import { useStore } from "simstate";
 import { api } from "src/apis";
+import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { CodeEditor } from "src/components/CodeEditor";
-import { SingleClusterSelector, useDefaultCluster } from "src/layouts/DefaultCluster";
 import { AccountSelector } from "src/pageComponents/job/AccountSelector";
 import { FileSelectModal } from "src/pageComponents/job/FileSelectModal";
+import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { Cluster, publicConfig } from "src/utils/config";
 import { formatSize } from "src/utils/format";
 
@@ -175,7 +177,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
     }
   }, [currentPartitionInfo]);
 
-  const { defaultCluster: currentDefaultCluster } = useDefaultCluster();
+  const { defaultCluster: currentDefaultCluster } = useStore(DefaultClusterStore);
   // 判断是使用template中的cluster还是系统默认cluster，防止系统配置文件更改时仍选改动前的cluster
   const defaultCluster = publicConfig.CLUSTERS.find((x) => x.id === initial.cluster?.id) ?? currentDefaultCluster;
 

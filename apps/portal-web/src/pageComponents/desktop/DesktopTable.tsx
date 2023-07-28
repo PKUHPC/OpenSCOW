@@ -20,11 +20,12 @@ import React, { useCallback } from "react";
 import { useAsync } from "react-async";
 import { useStore } from "simstate";
 import { api } from "src/apis";
+import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { ModalButton } from "src/components/ModalLink";
-import { SingleClusterSelector, useDefaultCluster } from "src/layouts/DefaultCluster";
 import { DesktopTableActions } from "src/pageComponents/desktop/DesktopTableActions";
 import { NewDesktopTableModal } from "src/pageComponents/desktop/NewDesktopTableModal";
+import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { LoginNodeStore } from "src/stores/LoginNodeStore";
 import { Cluster, publicConfig } from "src/utils/config";
 
@@ -46,8 +47,7 @@ export const DesktopTable: React.FC<Props> = ({ loginDesktopEnabledClusters }) =
 
   const router = useRouter();
 
-  const { defaultCluster } = useDefaultCluster();
-
+  const { defaultCluster } = useStore(DefaultClusterStore);
   const loginNodes = useStore(LoginNodeStore);
 
   const clusterQuery = queryToString(router.query.cluster);
