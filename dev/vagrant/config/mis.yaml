@@ -41,8 +41,10 @@ createUser:
 # navLinks:
 #   # 链接名
 #   - text: "一级导航1"
-#     # 链接地址
-#     url: "https://hahahaha1.com/"
+#     # 链接地址，一级导航链接地址为可选填，二级导航链接地址为必填
+#     # url: ""
+#     # 是否打开新的页面，可选填，默认值为false
+#     # openInNewPage: true
 #     # 图标路径，可选填
 #     iconPath: ""
 #     # 可以看到这个链接的用户,可选填
@@ -50,25 +52,36 @@ createUser:
 #     # allowedRoles: []
 #     # 二级导航,可选填
 #     children:
-#       # 二级导航相关配置，与一级导航相同，但是不允许再设置children
+#       # 二级导航相关配置，与一级导航相同，但是url为必填配置，同时不允许再设置children
 #       - text: "二级导航1"
 #         url: "https://hahahaha1.1.com"
+#         # openInNewPage: true
 #         iconPath: ""
 #         # allowedRoles: [tenantFinance]
 #       - text: "二级导航2"
 #         url: "https://hahahaha1.2.com"
+#         # openInNewPage: true
 #         iconPath: ""
 #         # allowedRoles: [tenantAdmin, platformAdmin]
+#       - text: "二级导航3"
+#         url: "https://hahahaha1.3.com"
+#         # openInNewPage: true
+#         iconPath: ""
+#         allowedRoles: [user]
+#         # allowedRoles: [tenantAdmin, platformAdmin]
 #   - text: "一级导航2"
-#     url: "https://hahahaha2.com"
+#     url: ""
+#     # openInNewPage: true
 #     iconPath: ""
 #     allowedRoles: [user]
 #     children: []
 #   - text: "一级导航3"
 #     url: "https://hahahaha3.com"
+#     # openInNewPage: true
 #     iconPath: ""
 #     #allowedRoles: [user]
 #     children:
 #       - text: "三级导航1"
 #         url: "https://hahahaha3.1.com"
+#         # openInNewPage: true
 #         iconPath: ""

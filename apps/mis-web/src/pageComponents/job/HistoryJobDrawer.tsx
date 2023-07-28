@@ -11,7 +11,7 @@
  */
 
 import { formatDateTime } from "@scow/lib-web/build/utils/datetime";
-import { JobInfo } from "@scow/protos/build/server/job";
+import { JobInfo } from "@scow/protos/build/common/ended_job";
 import { Descriptions, Drawer } from "antd";
 import { getClusterName } from "src/utils/config";
 import { moneyToString } from "src/utils/money";
@@ -33,9 +33,9 @@ const drawerItems = [
   ["分配的内存MB", "memAlloc"],
   ["申请节点数", "nodesReq"],
   ["分配节点数", "nodesAlloc"],
-  ["作业时间限制", "timelimit"],
-  ["作业执行时间", "timeUsed"],
-  ["作业等待时间", "timeWait"],
+  ["作业时间限制（分钟）", "timelimit"],
+  ["作业执行时间（秒）", "timeUsed"],
+  ["作业等待时间（秒）", "timeWait"],
   ["QOS", "qos"],
   ["记录时间", "recordTime", formatDateTime],
   [

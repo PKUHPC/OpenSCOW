@@ -2,7 +2,7 @@
 displayName: hpc01
 
 # 适配器地址(ip地址:端口号)
-adapterUrl: localhost:8972
+adapterUrl: 192.168.88.101:8999
 
 loginNodes:
   # 登录节点展示名称

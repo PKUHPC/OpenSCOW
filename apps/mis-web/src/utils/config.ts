@@ -62,10 +62,11 @@ export const publicConfig: PublicRuntimeConfig = getConfig().publicRuntimeConfig
 export type Cluster = { id: string; name: string; }
 export type NavLink = {
   text: string;
-  url: string;
+  url?: string;
+  openInNewPage?: boolean;
   iconPath?: string;
   allowedRoles?: string[];
-  children?: Omit<NavLink, "children">[];
+  children?: (Omit<NavLink, "children" | "url"> & { url: string })[];
 }
 
 
