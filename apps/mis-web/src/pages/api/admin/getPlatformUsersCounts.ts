@@ -18,24 +18,24 @@ import { authenticate } from "src/auth/server";
 import { PlatformRole } from "src/models/User";
 import { getClient } from "src/utils/client";
 
-export const GetPlatformRoleUsersCountResponse = Type.Object({
+export const GetPlatformUsersCountsResponse = Type.Object({
   totalCount: Type.Number(),
   totalAdminCount: Type.Number(),
   totalFinanceCount: Type.Number(),
 });
-export type GetPlatformRoleUsersCountResponse = Static<typeof GetPlatformRoleUsersCountResponse>;
+export type GetPlatformUsersCountsResponse = Static<typeof GetPlatformUsersCountsResponse>;
 
-export const GetPlatformRoleUsersCountSchema = typeboxRouteSchema({
+export const GetPlatformUsersCountsSchema = typeboxRouteSchema({
   method: "GET",
 
   responses: {
-    200: GetPlatformRoleUsersCountResponse,
+    200: GetPlatformUsersCountsResponse,
   },
 });
 
 const auth = authenticate((info) => info.platformRoles.includes(PlatformRole.PLATFORM_ADMIN));
 
-export default typeboxRoute(GetPlatformRoleUsersCountSchema,
+export default typeboxRoute(GetPlatformUsersCountsSchema,
   async (req, res) => {
 
     const info = await auth(req, res);
@@ -45,7 +45,7 @@ export default typeboxRoute(GetPlatformRoleUsersCountSchema,
 
     const client = getClient(UserServiceClient);
 
-    const result = await asyncClientCall(client, "getPlatformRoleUsersCount", {});
+    const result = await asyncClientCall(client, "getPlatformUsersCounts", {});
 
     return {
       200: result,

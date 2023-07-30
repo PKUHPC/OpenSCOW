@@ -538,7 +538,7 @@ export const userServiceServer = plugin((server) => {
       }];
     },
 
-    getPlatformRoleUsersCount: async ({ em }) => {
+    getPlatformUsersCounts: async ({ em }) => {
 
       const totalCount = await em.count(User);
       const totalAdminCount = await em.count(User,

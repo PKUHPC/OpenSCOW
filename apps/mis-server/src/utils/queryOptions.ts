@@ -10,15 +10,15 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { SortDirection, UsersSortField } from "@scow/protos/build/server/user";
+import { GetAllUsersRequest_UsersSortField, SortDirection } from "@scow/protos/build/server/user";
 
 import { paginationProps } from "./orm";
 
 // sort fields' text for mis pageComponent AllUsersTable
 export const mapUsersSortField = {
-  [UsersSortField.USER_ID]: "userId",
-  [UsersSortField.NAME]: "name",
-  [UsersSortField.CREATE_TIME]: "createTime",
+  [GetAllUsersRequest_UsersSortField.USER_ID]: "userId",
+  [GetAllUsersRequest_UsersSortField.NAME]: "name",
+  [GetAllUsersRequest_UsersSortField.CREATE_TIME]: "createTime",
 };
 
 // generate query options of all users
@@ -26,7 +26,7 @@ export const mapUsersSortField = {
 export const generateAllUsersQueryOptions = (
   page: number,
   pageSize?: number,
-  sortField?: UsersSortField,
+  sortField?: GetAllUsersRequest_UsersSortField,
   sortOrder?: SortDirection) => {
   return {
     ...paginationProps(page, pageSize || 10),

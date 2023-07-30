@@ -12,7 +12,7 @@
 
 import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
-import { SortDirection, UserServiceClient, UsersSortField } from "@scow/protos/build/server/user";
+import { GetAllUsersRequest_UsersSortField, SortDirection, UserServiceClient } from "@scow/protos/build/server/user";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { PlatformRole, SortDirectionType, UsersSortFieldType } from "src/models/User";
@@ -32,10 +32,10 @@ export const mapSortDirectionType = {
 } as { [key: string]: SortDirection };
 
 export const mapUsersSortFieldType = {
-  "userId": UsersSortField.USER_ID,
-  "name": UsersSortField.NAME,
-  "createTime": UsersSortField.CREATE_TIME,
-} as { [key: string]: UsersSortField };
+  "userId": GetAllUsersRequest_UsersSortField.USER_ID,
+  "name": GetAllUsersRequest_UsersSortField.NAME,
+  "createTime": GetAllUsersRequest_UsersSortField.CREATE_TIME,
+} as { [key: string]: GetAllUsersRequest_UsersSortField };
 
 
 export const GetAllUsersSchema = typeboxRouteSchema({
