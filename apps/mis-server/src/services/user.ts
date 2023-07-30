@@ -34,7 +34,7 @@ import { PlatformRole, TenantRole, User } from "src/entities/User";
 import { UserAccount, UserRole, UserStatus } from "src/entities/UserAccount";
 import { callHook } from "src/plugins/hookClient";
 import { createUserInDatabase, insertKeyToNewUser } from "src/utils/createUser";
-import { generateAllUserQueryOptions, generateRoleQuery, mapToPlatformUserInfoList } from "src/utils/users";
+import { generateAllUsersQueryOptions } from "src/utils/queryOptions";
 
 export const userServiceServer = plugin((server) => {
 
@@ -500,54 +500,56 @@ export const userServiceServer = plugin((server) => {
 
     getAllUsers: async ({ request, em }) => {
 
-      const { page, pageSize, sortField, sortOrder, idOrName } = request;
+      const { page, pageSize, sortField, sortOrder, idOrName, platformRole } = request;
+
+      const roleQuery = platformRole !== undefined ? {
+        platformRoles: { $like: `%${platformRoleToJSON(platformRole)}%` },
+      } : {};
 
       const [users, count] = await em.findAndCount(User, idOrName ? {
-        $or: [
-          { userId: { $like: `%${idOrName}%` } },
-          { name: { $like: `%${idOrName}%` } },
+        $and: [
+          {
+            $or: [
+              { userId: { $like: `%${idOrName}%` } },
+              { name: { $like: `%${idOrName}%` } },
+            ],
+          },
+          roleQuery,
         ],
-      } : {}, {
-        ...generateAllUserQueryOptions(page, pageSize, sortField, sortOrder),
+      } : roleQuery, {
+        ...generateAllUsersQueryOptions(page, pageSize, sortField, sortOrder),
         populate: ["tenant", "accounts", "accounts.account"],
       });
 
       return [{
         totalCount: count,
-        platformUsers: mapToPlatformUserInfoList(users),
+        platformUsers: users.map((x) => ({
+          userId: x.userId,
+          name: x.name,
+          availableAccounts: x.accounts.getItems()
+            .filter((ua) => ua.status === UserStatus.UNBLOCKED)
+            .map((ua) => {
+              return ua.account.getProperty("accountName");
+            }),
+          tenantName: x.tenant.$.name,
+          createTime: x.createTime.toISOString(),
+          platformRoles: x.platformRoles.map(platformRoleFromJSON),
+        })),
       }];
     },
 
-    getPlatformRoleUsers: async ({ request, em }) => {
+    getPlatformRoleUsersCount: async ({ em }) => {
 
-      const { page, pageSize, sortField, sortOrder, idOrName } = request;
-
-      // get the full users count with platform role
       const totalCount = await em.count(User);
-      const totalAdminCount = await em.count(User, generateRoleQuery(undefined, PlatformRole.PLATFORM_ADMIN));
-      const totalFinanceCount = await em.count(User, generateRoleQuery(undefined, PlatformRole.PLATFORM_FINANCE));
-
-      // query with platform role, query words and page info
-      const [adminUsers, queryAdminCount] = await em.findAndCount(User,
-        generateRoleQuery(idOrName, PlatformRole.PLATFORM_ADMIN), {
-          ...generateAllUserQueryOptions(page, pageSize, sortField, sortOrder),
-          populate: ["tenant", "accounts", "accounts.account"],
-        });
-
-      const [financeUsers, queryFinanceCount] = await em.findAndCount(User,
-        generateRoleQuery(idOrName, PlatformRole.PLATFORM_FINANCE), {
-          ...generateAllUserQueryOptions(page, pageSize, sortField, sortOrder),
-          populate: ["tenant", "accounts", "accounts.account"],
-        });
+      const totalAdminCount = await em.count(User,
+        { platformRoles: { $like: `%${PlatformRole.PLATFORM_ADMIN}%` } });
+      const totalFinanceCount = await em.count(User,
+        { platformRoles: { $like: `%${PlatformRole.PLATFORM_FINANCE}%` } });
 
       return [{
         totalCount: totalCount,
         totalAdminCount: totalAdminCount,
         totalFinanceCount: totalFinanceCount,
-        queryAdminCount: queryAdminCount,
-        platformAdminUsers: mapToPlatformUserInfoList(adminUsers),
-        queryFinanceCount: queryFinanceCount,
-        platformFinanceUsers: mapToPlatformUserInfoList(financeUsers),
       }];
     },
 

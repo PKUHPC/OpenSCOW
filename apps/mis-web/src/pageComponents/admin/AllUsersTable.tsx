@@ -14,15 +14,14 @@ import { formatDateTime } from "@scow/lib-web/build/utils/datetime";
 import { PlatformUserInfo } from "@scow/protos/build/server/user";
 import { Static } from "@sinclair/typebox";
 import { App, Button, Divider, Form, Input, Space, Table } from "antd";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { ChangePasswordModalLink } from "src/components/ChangePasswordModal";
 import { FilterFormContainer, FilterFormTabs } from "src/components/FilterFormContainer";
 import { PlatformRoleSelector } from "src/components/PlatformRoleSelector";
-import { SortDirectionType, UsersSortFieldType } from "src/models/User";
+import { PlatformRole, SortDirectionType, UsersSortFieldType } from "src/models/User";
 import { GetAllUsersSchema } from "src/pages/api/admin/getAllUsers";
-import { GetPlatformRoleUsersSchema } from "src/pages/api/admin/getPlatformRoleUsers";
 import { User } from "src/stores/UserStore";
 
 interface FilterForm {
@@ -44,7 +43,13 @@ interface Props {
   user: User;
 }
 
-type FilteredRole = "PLATFORM_ADMIN" | "PLATFORM_FINANCE" | "ALL_USERS";
+const filteredRoles = {
+  "ALL_USERS": "所有用户",
+  "PLATFORM_ADMIN": "平台管理员",
+  "PLATFORM_FINANCE": "财务人员",
+};
+type FilteredRole = keyof typeof filteredRoles;
+
 
 export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
 
@@ -56,28 +61,53 @@ export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
 
   const [pageInfo, setPageInfo] = useState<PageInfo>({ page: 1, pageSize: 10 });
   const [sortInfo, setSortInfo] = useState<SortInfo>({ sortField: undefined, sortOrder: undefined });
+  const [currentPlatformRole, setCurrentPlatformRole] = useState<PlatformRole | undefined>(undefined);
 
   const promiseFn = useCallback(async () => {
-    return await Promise.all([
-      api.getAllUsers({ query: {
-        page: pageInfo.page,
-        pageSize: pageInfo.pageSize,
-        sortField: sortInfo.sortField,
-        sortOrder: sortInfo.sortOrder,
-        idOrName: query.idOrName,
-      } }),
-      api.getPlatformRoleUsers({ query: {
-        page: pageInfo.page,
-        pageSize: pageInfo.pageSize,
-        sortField: sortInfo.sortField,
-        sortOrder: sortInfo.sortOrder,
-        idOrName: query.idOrName,
-      } }),
-    ]);
-  }, [query, pageInfo, sortInfo]);
-  const { data, isLoading, reload } = useAsync({ promiseFn, watch: refreshToken });
 
-  const [rangeSearchRole, setRangeSearchRole] = useState<FilteredRole>("ALL_USERS");
+    return await api.getAllUsers({ query: {
+      page: pageInfo.page,
+      pageSize: pageInfo.pageSize,
+      sortField: sortInfo.sortField,
+      sortOrder: sortInfo.sortOrder,
+      idOrName: query.idOrName,
+      platformRole: currentPlatformRole,
+    } });
+  }, [query, pageInfo, sortInfo, currentPlatformRole]);
+  const { data, isLoading, reload: allUsersReload } = useAsync({ promiseFn, watch: refreshToken });
+
+  const { data: platformUsersCount, isLoading: isCountLoading, reload: countReload } = useAsync({
+    promiseFn: useCallback(async () => await api.getPlatformRoleUsersCount({}), []),
+  });
+
+  const getUsersRoleCount = (role: FilteredRole): number => {
+    switch (role) {
+    case "PLATFORM_ADMIN":
+      return platformUsersCount?.totalAdminCount ?? 0;
+    case "PLATFORM_FINANCE":
+      return platformUsersCount?.totalFinanceCount ?? 0;
+    case "ALL_USERS":
+    default:
+      return platformUsersCount?.totalCount ?? 0;
+    }
+  };
+
+  const handleFilterRoleChange = (role: FilteredRole) => {
+    role !== "ALL_USERS" ? (role === "PLATFORM_ADMIN"
+      ? setCurrentPlatformRole(PlatformRole.PLATFORM_ADMIN) : setCurrentPlatformRole(PlatformRole.PLATFORM_FINANCE)
+    ) : setCurrentPlatformRole(undefined);
+    setPageInfo({ page: 1, pageSize: pageInfo.pageSize });
+    setSortInfo({ sortField: undefined, sortOrder: undefined });
+  };
+
+  const reload = () => {
+    allUsersReload();
+    countReload();
+  };
+
+  useEffect(() => {
+    reload();
+  }, []);
 
   return (
     <div>
@@ -90,6 +120,7 @@ export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
             const { idOrName } = await form.validateFields();
             setQuery({ idOrName: idOrName === "" ? undefined : idOrName });
             setPageInfo({ page: 1, pageSize: pageInfo.pageSize });
+            setSortInfo({ sortField: undefined, sortOrder: undefined });
           }}
         >
           <Form.Item label="用户ID或者姓名" name="idOrName">
@@ -101,12 +132,11 @@ export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
         </Form>
         <Space style={{ marginBottom: "-16px" }}>
           <FilterFormTabs
-            tabs={[
-              { title: `所有用户(${data?.[1].totalCount ?? 0})`, key: "All_USERS" },
-              { title: `平台管理员(${data?.[1].totalAdminCount ?? 0})`, key: "PLATFORM_ADMIN" },
-              { title: `财务人员(${data?.[1].totalFinanceCount ?? 0})`, key: "PLATFORM_FINANCE" },
-            ]}
-            onChange={(value) => setRangeSearchRole(value as FilteredRole)}
+            tabs={Object.keys(filteredRoles).map((role) => ({
+              title: `${filteredRoles[role]}(${getUsersRoleCount(role as FilteredRole)})`,
+              key: role,
+            }))}
+            onChange={(value) => handleFilterRoleChange(value as FilteredRole)}
           />
         </Space>
 
@@ -117,19 +147,16 @@ export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
         setPageInfo={setPageInfo}
         sortInfo={sortInfo}
         setSortInfo={setSortInfo}
-        isLoading={isLoading}
+        isLoading={isLoading && isCountLoading}
         reload={reload}
         user={user}
-        rangeSearchRole={rangeSearchRole}
       />
     </div>
   );
 };
 
 interface UserInfoTableProps {
-  data: [ Static<typeof GetAllUsersSchema["responses"]["200"]>
-    , Static<typeof GetPlatformRoleUsersSchema["responses"]["200"]>
-  ] | undefined;
+  data: Static<typeof GetAllUsersSchema["responses"]["200"]> | undefined;
   pageInfo: PageInfo;
   setPageInfo?: (info: PageInfo) => void;
   sortInfo: SortInfo;
@@ -137,36 +164,14 @@ interface UserInfoTableProps {
   isLoading: boolean;
   reload: () => void;
   user: User;
-  rangeSearchRole: FilteredRole;
 }
 
 
 const UserInfoTable: React.FC<UserInfoTableProps> = ({
-  data, pageInfo, setPageInfo, setSortInfo, isLoading, reload, user, rangeSearchRole,
+  data, pageInfo, setPageInfo, sortInfo, setSortInfo, isLoading, reload, user,
 }) => {
 
   const { message } = App.useApp();
-
-  const { filteredData, totalCount } = (() => {
-    switch (rangeSearchRole) {
-    case "PLATFORM_ADMIN":
-      return {
-        filteredData: data?.[1].platformAdminUsers,
-        totalCount: data?.[1].queryAdminCount,
-      };
-    case "PLATFORM_FINANCE":
-      return {
-        filteredData: data?.[1].platformFinanceUsers,
-        totalCount: data?.[1].queryFinanceCount,
-      };
-    case "ALL_USERS":
-    default:
-      return {
-        filteredData: data?.[0].platformUsers,
-        totalCount: data?.[0].totalCount,
-      };
-    }
-  })();
 
   const handleTableChange = (_, __, sorter) => {
     if (setSortInfo) {
@@ -180,14 +185,14 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
   return (
     <>
       <Table
-        dataSource={filteredData}
+        dataSource={data?.platformUsers}
         loading={isLoading}
         pagination={setPageInfo ? {
           current: pageInfo.page,
           defaultPageSize: 10,
           pageSize: pageInfo.pageSize,
           showSizeChanger: true,
-          total: totalCount,
+          total: data?.totalCount,
           onChange: (page, pageSize) => setPageInfo({ page, pageSize }),
         } : false}
         scroll={{ x: true }}
@@ -198,12 +203,14 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
           title="用户ID"
           sorter={true}
           sortDirections={["ascend", "descend"]}
+          sortOrder={sortInfo.sortField === "userId" ? sortInfo.sortOrder : null}
         />
         <Table.Column<PlatformUserInfo>
           dataIndex="name"
           title="姓名"
           sorter={true}
           sortDirections={["ascend", "descend"]}
+          sortOrder={sortInfo.sortField === "name" ? sortInfo.sortOrder : null}
         />
         <Table.Column<PlatformUserInfo> dataIndex="tenantName" title="所属租户" />
         <Table.Column<PlatformUserInfo>
@@ -216,6 +223,7 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
           title="创建时间"
           sorter={true}
           sortDirections={["ascend", "descend"]}
+          sortOrder={sortInfo.sortField === "createTime" ? sortInfo.sortOrder : null}
           render={(time: string) => formatDateTime(time)}
         />
         <Table.Column<PlatformUserInfo>

@@ -182,56 +182,10 @@ export const mockApi: MockApi<typeof api> = {
 
   }),
 
-  getPlatformRoleUsers: async () => ({
+  getPlatformRoleUsersCount: async () => ({
     totalCount: 4,
     totalAdminCount: 2,
     totalFinanceCount: 3,
-    queryAdminCount: 2,
-    platformAdminUsers: [
-      {
-        userId: "123",
-        name: "testuser",
-        availableAccounts: ["a_123"],
-        tenantName: "tenant1",
-        createTime: "2022-10-05T23:49:50.000Z",
-        platformRoles: [PlatformRole.PLATFORM_FINANCE, PlatformRole.PLATFORM_ADMIN],
-      },
-      {
-        userId: "test01",
-        name: "test01",
-        availableAccounts: ["a_test", "a_test01"],
-        tenantName: "tenant2",
-        createTime: "2022-10-05T23:49:50.000Z",
-        platformRoles: [PlatformRole.PLATFORM_FINANCE, PlatformRole.PLATFORM_ADMIN],
-      },
-    ],
-    queryFinanceCount: 3,
-    platformFinanceUsers: [
-      {
-        userId: "123",
-        name: "testuser",
-        availableAccounts: ["a_123"],
-        tenantName: "tenant1",
-        createTime: "2022-10-05T23:49:50.000Z",
-        platformRoles: [PlatformRole.PLATFORM_FINANCE, PlatformRole.PLATFORM_ADMIN],
-      },
-      {
-        userId: "test01",
-        name: "test01",
-        availableAccounts: ["a_test", "a_test01"],
-        tenantName: "tenant2",
-        createTime: "2022-10-05T23:49:50.000Z",
-        platformRoles: [PlatformRole.PLATFORM_FINANCE, PlatformRole.PLATFORM_ADMIN],
-      },
-      {
-        userId: "test02",
-        name: "test02",
-        availableAccounts: ["a_test", "a_test02"],
-        tenantName: "tenant2",
-        createTime: "2022-10-05T23:49:50.000Z",
-        platformRoles: [PlatformRole.PLATFORM_FINANCE],
-      },
-    ],
   }),
 
   userExists: async () => ({

@@ -276,6 +276,7 @@ message GetAllUsersRequest {
   optional UsersSortField sort_field = 3;
   optional SortDirection sort_order = 4;
   optional string id_or_name = 5;
+  optional PlatformRole platform_role = 6;
 }
 
 message GetAllUsersResponse {
@@ -283,22 +284,13 @@ message GetAllUsersResponse {
   repeated PlatformUserInfo platform_users = 2;
 }
 
-message GetPlatformRoleUsersRequest {
-  uint32 page = 1;
-  optional uint64 page_size = 2;
-  optional UsersSortField sort_field = 3;
-  optional SortDirection sort_order = 4;
-  optional string id_or_name = 5;
+message GetPlatformRoleUsersCountRequest {
 }
 
-message GetPlatformRoleUsersResponse {
+message GetPlatformRoleUsersCountResponse {
   uint64 total_count = 1;
   uint64 total_admin_count = 2;
   uint64 total_finance_count = 3;
-  uint64 query_admin_count = 4;
-  repeated PlatformUserInfo platform_admin_users = 5;
-  uint64 query_finance_count = 6;
-  repeated PlatformUserInfo platform_finance_users = 7;
 }
 
 message SetPlatformRoleRequest {
@@ -359,7 +351,7 @@ service UserService {
   rpc GetUserInfo(GetUserInfoRequest) returns (GetUserInfoResponse);
 
   rpc GetAllUsers(GetAllUsersRequest) returns (GetAllUsersResponse);
-  rpc GetPlatformRoleUsers(GetPlatformRoleUsersRequest) returns (GetPlatformRoleUsersResponse);
+  rpc GetPlatformRoleUsersCount(GetPlatformRoleUsersCountRequest) returns (GetPlatformRoleUsersCountResponse);
 
   rpc GetAccountUsers(GetAccountUsersRequest) returns (GetAccountUsersResponse);
   rpc QueryIsUserInAccount(QueryIsUserInAccountRequest)

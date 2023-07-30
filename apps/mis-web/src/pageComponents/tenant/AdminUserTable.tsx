@@ -13,6 +13,7 @@
 import { compareDateTime, formatDateTime } from "@scow/lib-web/build/utils/datetime";
 import { Static } from "@sinclair/typebox";
 import { App, Button, Divider, Form, Input, Space, Table } from "antd";
+import { SortOrder } from "antd/es/table/interface";
 import React, { useMemo, useState } from "react";
 import { api } from "src/apis";
 import { ChangePasswordModalLink } from "src/components/ChangePasswordModal";
@@ -33,17 +34,12 @@ interface FilterForm {
   idOrName: string | undefined;
 }
 
-type FilteredRole = "TENANT_ADMIN" | "TENANT_FINANCE" | "ALL_USERS";
-
-const filterUsersByTenantRole = (dataToFilter: FullUserInfo[] | undefined) => {
-  return {
-    allUsers: dataToFilter ?? [],
-    adminUsers: dataToFilter ?
-      dataToFilter.filter((user) => user.tenantRoles.includes(TenantRole.TENANT_ADMIN)) : [],
-    financeUsers: dataToFilter ?
-      dataToFilter.filter((user) => user.tenantRoles.includes(TenantRole.TENANT_FINANCE)) : [],
-  };
+const filteredRoles = {
+  "ALL_USERS": "所有用户",
+  "TENANT_ADMIN": "租户管理员",
+  "TENANT_FINANCE": "财务人员",
 };
+type FilteredRole = keyof typeof filteredRoles;
 
 export const AdminUserTable: React.FC<Props> = ({
   data, isLoading, reload, user,
@@ -56,27 +52,39 @@ export const AdminUserTable: React.FC<Props> = ({
     idOrName: undefined,
   });
 
+  const [rangeSearchRole, setRangeSearchRole] = useState<FilteredRole>("ALL_USERS");
+  const [currentPageNum, setCurrentPageNum] = useState<number>(1);
+  const [currentSortInfo, setCurrentSortInfo] =
+    useState<{ field: string | null | undefined, order: SortOrder }>({ field: null, order: null });
+
   const filteredData = useMemo(() => data ? data.results.filter((x) => (
     (!query.idOrName || x.id.includes(query.idOrName) || x.name.includes(query.idOrName))
-  )) : undefined, [data, query]);
+      && (rangeSearchRole === "ALL_USERS" || x.tenantRoles.includes(
+        rangeSearchRole === "TENANT_ADMIN" ? TenantRole.TENANT_ADMIN : TenantRole.TENANT_FINANCE))
+  )) : undefined, [data, query, rangeSearchRole]);
 
-  const [rangeSearchRole, setRangeSearchRole] = useState<FilteredRole>("ALL_USERS");
+  const getUsersRoleCount = (role: FilteredRole): number => {
 
-  // 保存各角色所有用户数
-  const allUsersCounts = data ? data.results.length : 0;
-  const tenantAdminCounts = filterUsersByTenantRole(data?.results).adminUsers.length;
-  const tenantFinanceCounts = filterUsersByTenantRole(data?.results).financeUsers.length;
-
-  const setFilteredData = (rangeSearchRole: FilteredRole) => {
-    switch (rangeSearchRole) {
+    switch (role) {
     case "TENANT_ADMIN":
-      return filterUsersByTenantRole(filteredData).adminUsers;
+      return data ? data.results.filter((user) => user.tenantRoles.includes(TenantRole.TENANT_ADMIN)).length : 0;
     case "TENANT_FINANCE":
-      return filterUsersByTenantRole(filteredData).financeUsers;
+      return data ? data.results.filter((user) => user.tenantRoles.includes(TenantRole.TENANT_FINANCE)).length : 0;
     case "ALL_USERS":
     default:
-      return filteredData;
+      return data ? data.results.length : 0;
     }
+  };
+
+  const handleTableChange = (_, __, sortInfo) => {
+    setCurrentSortInfo({ field: sortInfo.field, order: sortInfo.order });
+  };
+
+  // 切换用户角色时重置页码到首页，重置排序信息
+  const handleFilterRoleChange = (role: FilteredRole) => {
+    setRangeSearchRole(role);
+    setCurrentPageNum(1);
+    setCurrentSortInfo({ field: null, order: null });
   };
 
   return (
@@ -86,8 +94,11 @@ export const AdminUserTable: React.FC<Props> = ({
           layout="inline"
           form={form}
           initialValues={query}
+          // 搜索结束时重置页码到首页，重置排序信息
           onFinish={async () => {
             setQuery(await form.validateFields());
+            setCurrentPageNum(1);
+            setCurrentSortInfo({ field: null, order: null });
           }}
         >
           <Form.Item label="用户ID或者姓名" name="idOrName">
@@ -99,40 +110,47 @@ export const AdminUserTable: React.FC<Props> = ({
         </Form>
         <Space style={{ marginBottom: "-16px" }}>
           <FilterFormTabs
-            tabs={[
-              { title: `所有用户(${allUsersCounts})`, key: "All_USERS" },
-              { title: `租户管理员(${tenantAdminCounts})`, key: "TENANT_ADMIN" },
-              { title: `财务人员(${tenantFinanceCounts})`, key: "TENANT_FINANCE" },
-            ]}
-            onChange={(value) => setRangeSearchRole(value as FilteredRole)}
+            tabs={Object.keys(filteredRoles).map((role) => ({
+              title: `${filteredRoles[role]}(${getUsersRoleCount(role as FilteredRole)})`,
+              key: role,
+            }))}
+            onChange={(value) => handleFilterRoleChange(value as FilteredRole)}
           />
         </Space>
       </FilterFormContainer>
 
       <Table
-        dataSource={rangeSearchRole ? setFilteredData(rangeSearchRole) : filteredData}
+        dataSource={filteredData}
         loading={isLoading}
-        pagination={{ showSizeChanger: true }}
+        pagination={{
+          showSizeChanger: true,
+          current: currentPageNum,
+          onChange: (page) => setCurrentPageNum(page),
+        }}
         rowKey="id"
         scroll={{ x: true }}
+        onChange={handleTableChange}
       >
         <Table.Column<FullUserInfo>
           dataIndex="id"
           title="用户ID"
           sorter={(a, b) => a.id.localeCompare(b.id)}
           sortDirections={["ascend", "descend"]}
+          sortOrder={currentSortInfo.field === "id" ? currentSortInfo.order : null}
         />
         <Table.Column<FullUserInfo>
           dataIndex="name"
           title="姓名"
           sorter={(a, b) => a.name.localeCompare(b.name)}
           sortDirections={["ascend", "descend"]}
+          sortOrder={currentSortInfo.field === "name" ? currentSortInfo.order : null}
         />
         <Table.Column<FullUserInfo>
           dataIndex="email"
           title="邮箱"
           sorter={(a, b) => a.email.localeCompare(b.email)}
           sortDirections={["ascend", "descend"]}
+          sortOrder={currentSortInfo.field === "email" ? currentSortInfo.order : null}
         />
         <Table.Column<FullUserInfo>
           dataIndex="tenantRoles"
@@ -146,6 +164,7 @@ export const AdminUserTable: React.FC<Props> = ({
           title="创建时间"
           sorter={(a, b) => compareDateTime(a.createTime, b.createTime)}
           sortDirections={["ascend", "descend"]}
+          sortOrder={currentSortInfo.field === "createTime" ? currentSortInfo.order : null}
           render={(d) => formatDateTime(d)}
         />
         <Table.Column<FullUserInfo>

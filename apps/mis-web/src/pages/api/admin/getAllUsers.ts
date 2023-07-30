@@ -58,6 +58,9 @@ export const GetAllUsersSchema = typeboxRouteSchema({
     sortOrder: Type.Optional(SortDirectionType),
 
     idOrName: Type.Optional(Type.String()),
+
+    platformRole: Type.Optional(Type.Enum(PlatformRole)),
+
   }),
 
   responses: {
@@ -75,7 +78,7 @@ export default typeboxRoute(GetAllUsersSchema,
       return;
     }
 
-    const { page = 1, pageSize, sortField, sortOrder, idOrName } = req.query;
+    const { page = 1, pageSize, sortField, sortOrder, idOrName, platformRole } = req.query;
 
     const client = getClient(UserServiceClient);
 
@@ -88,6 +91,7 @@ export default typeboxRoute(GetAllUsersSchema,
       sortField: mappedSortField,
       sortOrder: mappedSortOrder,
       idOrName,
+      platformRole,
     });
 
     return {
