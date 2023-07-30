@@ -76,6 +76,7 @@ export const UserInfoSchema = Type.Object({
   accountAffiliations: Type.Array(AccountAffiliationSchema),
   tenantRoles: Type.Array(Type.Enum(TenantRole)),
   platformRoles: Type.Array(Type.Enum(PlatformRole)),
+  email: Type.Optional(Type.String()),
 });
 
 export type UserInfo = Static<typeof UserInfoSchema>;

@@ -13,6 +13,7 @@
 import { FastifyInstance } from "fastify";
 import { AuthProvider } from "src/auth/AuthProvider";
 import { createUser } from "src/auth/ldap/createUser";
+import { modifyEmailAsSelf } from "src/auth/ldap/email";
 import { findUser, useLdap } from "src/auth/ldap/helpers";
 import { checkPassword, modifyPassword } from "src/auth/ldap/password";
 import { registerPostHandler } from "src/auth/ldap/postHandler";
@@ -55,6 +56,18 @@ export const createLdapAuthProvider = (f: FastifyInstance) => {
         }
         await modifyPassword(req.log, ldap, user.dn, newPassword);
         return "OK";
+      });
+    },
+    changeEmail: async (id, newEmail, req) => {
+      return useLdap(req.log, ldap)(async (client) => {
+        const user = await findUser(req.log, ldap, client, id);
+        if (!user) {
+          return "NotFound";
+        }
+
+        const result = await modifyEmailAsSelf(req.log, ldap, user.dn, newEmail);
+
+        return result ? "OK" : "Wrong";
       });
     },
   };

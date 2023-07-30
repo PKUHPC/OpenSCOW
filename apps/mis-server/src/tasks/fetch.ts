@@ -18,6 +18,7 @@ import { parsePlaceholder } from "@scow/lib-config";
 import { GetJobsResponse, JobInfo as ClusterJobInfo } from "@scow/scheduler-adapter-protos/build/protos/job";
 import { addJobCharge, charge } from "src/bl/charging";
 import { emptyJobPriceInfo } from "src/bl/jobPrice";
+import { clusters } from "src/config/clusters";
 import { misConfig } from "src/config/mis";
 import { Account } from "src/entities/Account";
 import { JobInfo } from "src/entities/JobInfo";
@@ -27,10 +28,11 @@ import { callHook } from "src/plugins/hookClient";
 import { PricePlugin } from "src/plugins/price";
 import { toGrpc } from "src/utils/job";
 
-async function getLatestDate(em: SqlEntityManager, logger: Logger) {
+async function getClusterLatestDate(em: SqlEntityManager, cluster: string, logger: Logger) {
 
   const query = em.fork().createQueryBuilder(JobInfo)
     .select("timeEnd")
+    .where({ cluster })
     .orderBy({ timeEnd: QueryOrder.DESC });
 
   const { timeEnd = undefined } = (await query.execute("get")) ?? {};
@@ -40,15 +42,10 @@ async function getLatestDate(em: SqlEntityManager, logger: Logger) {
   return timeEnd;
 }
 
-const processGetJobsResult = (result: ({ cluster: string; } & (
-  | { success: true; result: GetJobsResponse }
-  | { success: false; error: any }
-))[]) => {
+const processGetJobsResult = (cluster: string, result: GetJobsResponse) => {
   const jobs: ({cluster: string} & ClusterJobInfo)[] = [];
-  result.forEach((clusterResp) => {
-    if (clusterResp.success) {
-      jobs.push(...clusterResp.result.jobs.map((job) => ({ cluster: clusterResp.cluster, ...job })));
-    }
+  result.jobs.forEach((job) => {
+    jobs.push({ cluster, ...job });
   });
 
   // sort by end time
@@ -169,93 +166,92 @@ export async function fetchJobs(
   };
 
   try {
-    const latestDate = await getLatestDate(em, logger);
-    const nextDate = latestDate && new Date(latestDate.getTime() + 1000);
-    const configDate: Date | undefined =
+    let newJobsCount = 0;
+    for (const cluster of Object.keys(clusters)) {
+      logger.info(`fetch jobs from cluster ${cluster}`);
+
+      const latestDate = await getClusterLatestDate(em, cluster, logger);
+      const nextDate = latestDate && new Date(latestDate.getTime() + 1000);
+      const configDate: Date | undefined =
       (misConfig.fetchJobs.startDate && new Date(misConfig.fetchJobs.startDate)) as Date | undefined;
 
-    const startFetchDate = (nextDate && configDate)
-      ? (nextDate > configDate ? nextDate : configDate)
-      : (nextDate || configDate);
-    const endFetchDate = new Date();
-    logger.info(`Fetching new info which end_time is from ${startFetchDate} to ${endFetchDate}`);
+      const startFetchDate = (nextDate && configDate)
+        ? (nextDate > configDate ? nextDate : configDate)
+        : (nextDate || configDate);
+      const endFetchDate = new Date();
+      logger.info(`Fetching new info which end_time is from ${startFetchDate} to ${endFetchDate}`);
 
-    const fields: string[] = [
-      "job_id", "name", "user", "account", "cpus_alloc", "gpus_alloc", "mem_alloc_mb", "mem_req_mb",
-      "partition", "qos", "elapsed_seconds", "node_list", "nodes_req", "nodes_alloc", "time_limit_minutes",
-      "submit_time", "start_time", "end_time",
-    ];
-    const fetchWithinTimeRange = async (startDate: Date, endDate: Date, batchSize: number) => {
+      const fields: string[] = [
+        "job_id", "name", "user", "account", "cpus_alloc", "gpus_alloc", "mem_alloc_mb", "mem_req_mb",
+        "partition", "qos", "elapsed_seconds", "node_list", "nodes_req", "nodes_alloc", "time_limit_minutes",
+        "submit_time", "start_time", "end_time",
+      ];
+      const fetchWithinTimeRange = async (startDate: Date, endDate: Date, batchSize: number) => {
 
-      // calculate totalCount between startDate and endDate
-      const totalCount = await clusterPlugin.clusters.callOnAll(logger, async (client) =>
-        await asyncClientCall(client.job, "getJobs", {
-          fields,
-          filter: {
-            users: [], accounts: [], states: [],
-            endTime: { startTime: startDate?.toISOString(), endTime: endDate.toISOString() },
-          },
-          pageInfo: { page: 1, pageSize: 1 },
-        }),
-      ).then((result) => {
-        let totalCount = 0;
-        result.forEach((clusterResp) => {
-          if (clusterResp.success) {
-            totalCount += clusterResp.result.totalCount!;
-          }
-        });
-        return totalCount;
-      });
-
-      if (totalCount <= batchSize) {
-        const jobsInfo: ({cluster: string} & ClusterJobInfo)[] = [];
-        jobsInfo.push(...(await clusterPlugin.clusters.callOnAll(logger, async (client) =>
+        // calculate totalCount between startDate and endDate
+        const totalCount = await clusterPlugin.clusters.callOnOne(cluster, logger, async (client) =>
           await asyncClientCall(client.job, "getJobs", {
             fields,
             filter: {
               users: [], accounts: [], states: [],
               endTime: { startTime: startDate?.toISOString(), endTime: endDate.toISOString() },
             },
+            pageInfo: { page: 1, pageSize: 1 },
           }),
-        ).then(processGetJobsResult)));
+        ).then((result) => result.totalCount!);
 
-        let currentJobsGroup: ({ cluster: string } & ClusterJobInfo)[] = [];
-        let previousDate: string | null = null;
-        let savedJobsCount = 0;
+        if (totalCount <= batchSize) {
+          const jobsInfo = await clusterPlugin.clusters.callOnOne(cluster, logger, async (client) =>
+            await asyncClientCall(client.job, "getJobs", {
+              fields,
+              filter: {
+                users: [], accounts: [], states: [],
+                endTime: { startTime: startDate?.toISOString(), endTime: endDate.toISOString() },
+              },
+            }),
+          ).then((result) => processGetJobsResult(cluster, result));
 
-        for (const job of jobsInfo) {
-          if (job.endTime! === previousDate) {
-            currentJobsGroup.push(job);
-          } else {
-            savedJobsCount += await persistJobAndCharge(currentJobsGroup);
-            currentJobsGroup = [job];
+          let currentJobsGroup: ({ cluster: string } & ClusterJobInfo)[] = [];
+          let previousDate: string | null = null;
+          let savedJobsCount = 0;
+
+          for (const job of jobsInfo) {
+            if (job.endTime! === previousDate) {
+              currentJobsGroup.push(job);
+            } else {
+              savedJobsCount += await persistJobAndCharge(currentJobsGroup);
+              currentJobsGroup = [job];
+            }
+            previousDate = job.endTime!;
           }
-          previousDate = job.endTime!;
+
+          // process last group
+          if (currentJobsGroup.length > 0) {
+            savedJobsCount += await persistJobAndCharge(currentJobsGroup);
+          }
+
+          logger.info(`Completed. Saved ${savedJobsCount} new info.`);
+          lastFetched = new Date();
+          return savedJobsCount;
+
+        } else {
+          const midDate = new Date((startDate.getTime() + endDate.getTime()) / 2);
+          const firstHalfJobsCount = await fetchWithinTimeRange(startDate, midDate, batchSize);
+          const secondHalfJobsCount = await fetchWithinTimeRange(
+            new Date(midDate.getTime() + 1000), endDate, batchSize);
+          return firstHalfJobsCount + secondHalfJobsCount;
         }
 
-        // process last group
-        if (currentJobsGroup.length > 0) {
-          savedJobsCount += await persistJobAndCharge(currentJobsGroup);
-        }
+      };
 
-        logger.info(`Completed. Saved ${savedJobsCount} new info.`);
-        lastFetched = new Date();
-        return savedJobsCount;
+      newJobsCount += await fetchWithinTimeRange(
+        startFetchDate ?? new Date(0),
+        endFetchDate,
+        misConfig.fetchJobs.batchSize,
+      );
 
-      } else {
-        const midDate = new Date((startDate.getTime() + endDate.getTime()) / 2);
-        const firstHalfJobsCount = await fetchWithinTimeRange(startDate, midDate, batchSize);
-        const secondHalfJobsCount = await fetchWithinTimeRange(new Date(midDate.getTime() + 1000), endDate, batchSize);
-        return firstHalfJobsCount + secondHalfJobsCount;
-      }
+    }
 
-    };
-
-    const newJobsCount = await fetchWithinTimeRange(
-      startFetchDate ?? new Date(0),
-      endFetchDate,
-      misConfig.fetchJobs.batchSize,
-    );
     return { newJobsCount };
   } catch (e) {
     logger.error("Error when fetching jobs. %o", e);
