@@ -240,10 +240,11 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
      
     if (item.name === "selectVersion") {
       const preValue = form.getFieldValue("selectVersion");
-
-      // 切换分区后看之前的版本是否还存在，若不存在，则选择版本的select的值置空
-      const optionsContained = selectOptions.find((i) => i.value === preValue);
-      if (!optionsContained) form.setFieldValue("selectVersion", null);
+      if (preValue) {
+        // 切换分区后看之前的版本是否还存在，若不存在，则选择版本的select的值置空
+        const optionsContained = selectOptions.find((i) => i.value === preValue);
+        if (!optionsContained) form.setFieldValue("selectVersion", null);
+      }
     }
     return (
       <Form.Item
