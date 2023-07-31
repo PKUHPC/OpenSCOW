@@ -17,15 +17,16 @@ import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
-import { TenantRole } from "src/models/User";
-import { AccountTable } from "src/pageComponents/tenant/AccountTable";
+import { PlatformRole } from "src/models/User";
+import { AccountTable } from "src/pageComponents/admin/AccountTable";
 import { Head } from "src/utils/head";
 
-export const AdminAccountsPage: NextPage = requireAuth((u) => u.tenantRoles.includes(TenantRole.TENANT_ADMIN))(
-  () => {
 
+export const AccountListPage: NextPage = 
+  requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))(() => {
+    
     const promiseFn = useCallback(async () => {
-      return await api.getAccounts({});
+      return await api.getAllAccounts({});
     }, []);
 
     const [refreshToken, update] = useRefreshToken();
@@ -48,4 +49,4 @@ export const AdminAccountsPage: NextPage = requireAuth((u) => u.tenantRoles.incl
 
   });
 
-export default AdminAccountsPage;
+export default AccountListPage;

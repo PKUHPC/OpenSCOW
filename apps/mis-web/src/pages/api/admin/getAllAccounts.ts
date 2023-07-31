@@ -32,7 +32,7 @@ export const AdminAccountInfo = Type.Object({
 });
 export type AdminAccountInfo = Static<typeof AdminAccountInfo>;
 
-export const GetAccountsSchema = typeboxRouteSchema({
+export const GetAllAccountsSchema = typeboxRouteSchema({
   method: "GET",
   responses: {
     200: Type.Object({
@@ -41,7 +41,7 @@ export const GetAccountsSchema = typeboxRouteSchema({
   },
 });
 
-export async function getAccounts(req: GetAccountsRequest) {
+export async function getAllAccounts(req: GetAccountsRequest) {
   const uaClient = getClient(AccountServiceClient);
 
   const { results } = await asyncClientCall(uaClient, "getAccounts", req);
@@ -52,14 +52,14 @@ export async function getAccounts(req: GetAccountsRequest) {
 const auth = authenticate((info) => info.tenantRoles.includes(TenantRole.TENANT_ADMIN)
   || info.tenantRoles.includes(TenantRole.TENANT_FINANCE));
 
-export default typeboxRoute(GetAccountsSchema,
+export default typeboxRoute(GetAllAccountsSchema,
   async (req, res) => {
 
     const info = await auth(req, res);
     if (!info) {
       return;
     }
-    const results = await getAccounts({ tenantName: info.tenant });
+    const results = await getAllAccounts({});
 
     return { 200: { results } };
   });

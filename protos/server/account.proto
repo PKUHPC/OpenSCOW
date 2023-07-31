@@ -94,7 +94,7 @@ message CreateAccountResponse {
 }
 
 message GetAccountsRequest {
-  string tenant_name = 1;
+  optional string tenant_name = 1;
   // returns all accounts if not set
   optional string account_name = 2;
 }

@@ -94,7 +94,7 @@ export const accountServiceServer = plugin((server) => {
       const { accountName, tenantName } = request;
 
       const results = await em.find(Account, {
-        tenant: { name: tenantName },
+        ...tenantName !== undefined ? { tenant: { name: tenantName } } : undefined,
         ...accountName !== undefined ? { accountName } : undefined,
       }, { populate: ["users", "users.user", "tenant"]});
 
@@ -300,7 +300,6 @@ export const accountServiceServer = plugin((server) => {
 
       return [{ executed: true }];
     },
-
   });
 
 });
