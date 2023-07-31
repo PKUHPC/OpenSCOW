@@ -79,6 +79,7 @@ export const AppConfigSchema = Type.Object({
           Type.Object({
             value: Type.String({ description: "表单选项key，编程中使用" }),
             label: Type.String({ description: "表单选项展示给用户的文本" }),
+            gpuVersion: Type.Optional(Type.Boolean({ description: "表单选项是否只在分区为gpu时展示" })),
           }), { description:"表单选项" },
         )),
     }),

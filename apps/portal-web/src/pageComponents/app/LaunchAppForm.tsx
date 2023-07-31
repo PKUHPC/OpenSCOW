@@ -14,7 +14,7 @@ import { App, Button, Col, Form, Input, InputNumber, Row, Select, Spin } from "a
 import { Rule } from "antd/es/form";
 import dayjs from "dayjs";
 import Router from "next/router";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { AccountSelector } from "src/pageComponents/job/AccountSelector";
@@ -219,19 +219,19 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
     }
     setCurrentPartitionInfo(partitionInfo);
   };
-
-  const customFormItems = attributes.map((item, index) => {
-
+  const customFormItems = useMemo(() => attributes.map((item, index) => {
     const rules: Rule[] = item.type === "NUMBER"
       ? [{ type: "integer" }, { required: item.required }]
       : [{ required: item.required }];
 
     const placeholder = item.placeholder ?? "";
+    const selectOptions = item.select.filter((x) => !x.gpuVersion || (x.gpuVersion && currentPartitionInfo?.gpus));
+    
     const inputItem = item.type === "NUMBER" ? (<InputNumber placeholder={placeholder} />)
       : item.type === "TEXT" ? (<Input placeholder={placeholder} />)
         : (
           <Select
-            options={item.select.map((x) => ({ label: x.label, value: x.value }))}
+            options={selectOptions.map((x) => ({ label: x.label, value: x.value }))}
             placeholder={placeholder}
           />
         );
@@ -248,7 +248,7 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
         {inputItem}
       </Form.Item>
     );
-  });
+  }), [attributes, currentPartitionInfo]);
 
   const nodeCount = Form.useWatch("nodeCount", form) as number;
 
