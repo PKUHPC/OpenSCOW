@@ -11,11 +11,13 @@
  */
 
 import { ExclamationCircleOutlined } from "@ant-design/icons";
+import { moneyToNumber } from "@scow/lib-decimal";
 import { FilterFormContainer } from "@scow/lib-web/build/components/FilterFormContainer";
 import { formatDateTime } from "@scow/lib-web/build/utils/datetime";
 import { WhitelistedAccount } from "@scow/protos/build/server/account";
 import { Static } from "@sinclair/typebox";
 import { App, Button, Divider, Form, Input, Space, Table } from "antd";
+import { SortOrder } from "antd/lib/table/interface";
 import React, { useMemo, useState } from "react";
 import { api } from "src/apis";
 import { TableTitle } from "src/components/TableTitle";
@@ -45,6 +47,8 @@ export const AccountWhitelistTable: React.FC<Props> = ({
     accountName: undefined,
   });
   const [currentPageNum, setCurrentPageNum] = useState<number>(1);
+  const [currentSortInfo, setCurrentSortInfo] =
+    useState<{ field: string | null | undefined, order: SortOrder }>({ field: null, order: null });
 
   const filteredData = useMemo(() => data ? data.results.filter((x) => (
     (!query.accountName || x.accountName.includes(query.accountName))
@@ -54,11 +58,15 @@ export const AccountWhitelistTable: React.FC<Props> = ({
     (data: Static<typeof GetWhitelistedAccountsSchema["responses"]["200"]> | undefined): number => {
       const sum = data?.results.filter((acct) => !acct.balance?.positive)
         .reduce((acc, acct) => {
-          const debtAmount = acct.balance ? moneyToString(acct.balance) : "0.000";
-          return acc + parseFloat(debtAmount);
+          const debtAmount = acct.balance ? moneyToNumber(acct.balance) : 0;
+          return acc + debtAmount;
         }, 0);
-      return sum ?? 0;
+      return sum ? Math.abs(sum) : 0;
     };
+
+  const handleTableChange = (_, __, sortInfo) => {
+    setCurrentSortInfo({ field: sortInfo.field, order: sortInfo.order });
+  };
 
   return (
     <div>
@@ -70,6 +78,7 @@ export const AccountWhitelistTable: React.FC<Props> = ({
           onFinish={async () => {
             setQuery(await form.validateFields());
             setCurrentPageNum(1);
+            setCurrentSortInfo({ field: null, order: null });
           }}
         >
           <Form.Item label="账户" name="accountName">
@@ -91,7 +100,7 @@ export const AccountWhitelistTable: React.FC<Props> = ({
                 <>
                   <Divider type="vertical" />
                   <span>
-                    白名单欠费合计：<strong>{getTotalDebtAmount(data).toFixed(2)} 元</strong>
+                    白名单欠费合计：<strong>{getTotalDebtAmount(data).toFixed(3)} 元</strong>
                   </span>
                 </>
               </div>
@@ -108,8 +117,15 @@ export const AccountWhitelistTable: React.FC<Props> = ({
             current: currentPageNum,
             onChange: (page) => setCurrentPageNum(page),
           }}
+          onChange={handleTableChange}
         >
-          <Table.Column<WhitelistedAccount> dataIndex="accountName" title="账户名" />
+          <Table.Column<WhitelistedAccount>
+            dataIndex="accountName"
+            title="账户名"
+            sorter={(a, b) => a.accountName.localeCompare(b.accountName)}
+            sortDirections={["ascend", "descend"]}
+            sortOrder={currentSortInfo.field === "accountName" ? currentSortInfo.order : null}
+          />
           <Table.Column<WhitelistedAccount>
             dataIndex="ownerId"
             title="拥有者"
@@ -118,6 +134,9 @@ export const AccountWhitelistTable: React.FC<Props> = ({
           <Table.Column<WhitelistedAccount>
             dataIndex="balance"
             title="余额"
+            sorter={(a, b) => (a.balance ? moneyToNumber(a.balance) : 0) - (b.balance ? moneyToNumber(b.balance) : 0)}
+            sortDirections={["ascend", "descend"]}
+            sortOrder={currentSortInfo.field === "balance" ? currentSortInfo.order : null}
             render={(b: Money) => moneyToString(b) + " 元" }
           />
           <Table.Column

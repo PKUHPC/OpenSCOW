@@ -58,17 +58,15 @@ export const AccountTable: React.FC<Props> = ({
       && (rangeSearchStatus === "ALL" || (rangeSearchStatus === "BLOCKED" ? x.blocked : !x.balance.positive))
   )) : undefined, [data, query, rangeSearchStatus]);
 
-  const getUsersStatusCount = (status: FilteredStatus): number => {
-    switch (status) {
-    case "BLOCKED":
-      return data ? data.results.filter((user) => user.blocked).length : 0;
-    case "DEBT":
-      return data ? data.results.filter((user) => !user.balance.positive).length : 0;
-    case "ALL":
-    default:
-      return data ? data.results.length : 0;
-    }
-  };
+  const usersStatusCount = useMemo(() => {
+    if (!data || !data.results) return { BLOCKED : 0, DEBT : 0, ALL : 0 };
+    const counts = {
+      BLOCKED: data.results.filter((user) => user.blocked).length,
+      DEBT: data.results.filter((user) => !user.balance.positive).length,
+      ALL: data.results.length,
+    };
+    return counts;
+  }, [data]);
 
   const handleTableChange = (_, __, sortInfo) => {
     setCurrentSortInfo({ field: sortInfo.field, order: sortInfo.order });
@@ -103,7 +101,7 @@ export const AccountTable: React.FC<Props> = ({
         <Space style={{ marginBottom: "-16px" }}>
           <FilterFormTabs
             tabs={Object.keys(filteredStatuses).map((status) => ({
-              title: `${filteredStatuses[status]}(${getUsersStatusCount(status as FilteredStatus)})`,
+              title: `${filteredStatuses[status]}(${usersStatusCount[status as FilteredStatus]})`,
               key: status,
             }))}
             onChange={(value) => handleFilterStatusChange(value as FilteredStatus)}
