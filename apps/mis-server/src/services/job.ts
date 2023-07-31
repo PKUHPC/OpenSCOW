@@ -33,6 +33,7 @@ import { JobPriceChange } from "src/entities/JobPriceChange";
 import { AmountStrategy, JobPriceItem } from "src/entities/JobPriceItem";
 import { Tenant } from "src/entities/Tenant";
 import { toGrpc } from "src/utils/job";
+import { logger } from "src/utils/logger";
 import { paginationProps } from "src/utils/orm";
 
 function filterJobs({
@@ -298,7 +299,7 @@ export const jobServiceServer = plugin((server) => {
           populate: ["tenant"],
           orderBy: { createTime: "ASC" },
         });
-
+      logger.info("billingItems ：%o", billingItems);
       const priceItemToGrpc = (item: JobPriceItem) => <JobBillingItem>({
         id: item.itemId,
         path: item.path.join("."),
@@ -344,7 +345,8 @@ export const jobServiceServer = plugin((server) => {
         }
       }
 
-      if (!(Object.values(AmountStrategy) as string[]).includes(amountStrategy)) {
+      const customAmountStrategies = misConfig.customAmountStrategies?.map((i) => i.id) || [];
+      if (![...(Object.values(AmountStrategy) as string[]), ...customAmountStrategies].includes(amountStrategy)) {
         throw <ServiceError>{
           code: status.INVALID_ARGUMENT,
           message: `Amount strategy ${amountStrategy} is not valid.`,
@@ -352,7 +354,7 @@ export const jobServiceServer = plugin((server) => {
       }
 
       const item = new JobPriceItem({
-        amount: amountStrategy as AmountStrategy,
+        amount: amountStrategy,
         itemId,
         price: new Decimal(moneyToNumber(price)),
         description: description ?? "",

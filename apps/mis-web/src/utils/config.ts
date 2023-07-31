@@ -53,6 +53,8 @@ export interface PublicRuntimeConfig {
 
   NAV_LINKS?: NavLink[];
 
+  CUSTOM_AMOUNT_STRATEGIES?: CustomAmountStrategy[];
+
   VERSION_TAG: string | undefined;
 }
 
@@ -67,6 +69,13 @@ export type NavLink = {
   iconPath?: string;
   allowedRoles?: string[];
   children?: (Omit<NavLink, "children" | "url"> & { url: string })[];
+}
+
+export type CustomAmountStrategy = {
+  id: string;
+  script: string;
+  name?: string | undefined;
+  comment?: string | undefined;
 }
 
 

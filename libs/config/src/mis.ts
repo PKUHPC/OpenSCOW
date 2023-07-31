@@ -103,6 +103,15 @@ export const MisConfigSchema = Type.Object({
     })),
   ),
 
+  customAmountStrategies: Type.Optional(Type.Array(
+    Type.Object({
+      id:  Type.String({ description: "自定义计量方式，与max-cpusAlloc-mem、max-gpu-cpusAlloc、gpu、cpusAlloc平级，会存到数据库里" }),
+      name:  Type.Optional(Type.String({ description: "计量方式名，与CPU和内存分配量、GPU和CPU分配量、GPU分配量、CPU分配量平级" })),
+      comment:  Type.Optional(Type.String({ description: "计量方式描述" })),
+      script: Type.String({
+        description: "脚本文件路径，不包含config/scripts前缀，如my-strategy.js即等于config/scripts/my-strategy.js" }),
+    }),
+  )),
 });
 
 const MIS_CONFIG_NAME = "mis";

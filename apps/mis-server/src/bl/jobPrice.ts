@@ -11,17 +11,49 @@
  */
 
 import { Logger } from "@ddadaal/tsgrpc-server";
+import { DEFAULT_CONFIG_BASE_PATH } from "@scow/config/build/constants";
 // import { ClusterConfigSchema } from "@scow/config/build/cluster";
 import { Decimal } from "@scow/lib-decimal";
 import { Partition } from "@scow/scheduler-adapter-protos/build/protos/config";
+import { join } from "path";
 import { JobInfo, PriceMap } from "src/bl/PriceMap";
 import { clusters } from "src/config/clusters";
+import { misConfig } from "src/config/mis";
 import { JobPriceInfo } from "src/entities/JobInfo";
 import { AmountStrategy, JobPriceItem } from "src/entities/JobPriceItem";
+import { logger } from "src/utils/logger";
+
+// import { } from "../../../../dev/vagrant/config/scripts/my-strategy.js";
 
 // type Partition = ClusterConfigSchema["slurm"]["partitions"][number];
 
 type AmountStrategyFunc = (info: JobInfo, partition: Partition) => Decimal;
+type CustomAmountStrategyFunc = (info: JobInfo) => number;
+const customAmountStrategyFuncs: Record<string, CustomAmountStrategyFunc> = {};
+logger.info("customAmountStrategyFuncs %o", customAmountStrategyFuncs);
+if (Array.isArray(misConfig.customAmountStrategies)) {
+  try {
+    for (const item of misConfig.customAmountStrategies) {
+      customAmountStrategyFuncs[item.id] = require(join("../../", DEFAULT_CONFIG_BASE_PATH, "scripts", item.script));
+      logger.info("customAmountStrategyFuncs %s", customAmountStrategyFuncs[item.id]({
+        timeUsed: 200,
+        jobId: 0,
+        cluster: "",
+        partition: "",
+        qos: "",
+        cpusAlloc: 0,
+        gpu: 0,
+        memReq: 0,
+        memAlloc: 0,
+        account: "",
+        tenant: "",
+      }));
+    }
+
+  } catch (error) {
+    logger.error(error);
+  }
+}
 
 const amountStrategyFuncs: Record<AmountStrategy, AmountStrategyFunc> = {
   [AmountStrategy.GPU]: (info) => new Decimal(info.gpu),
@@ -78,7 +110,7 @@ export function calculateJobPrice(
   function calculatePrice(priceItem: JobPriceItem, partition: Partition) {
     const time = new Decimal(info.timeUsed).div(3600); // 秒到小时
 
-    const amountFn = amountStrategyFuncs[priceItem.amount];
+    const amountFn = amountStrategyFuncs[priceItem.amount] || customAmountStrategyFuncs[priceItem.amount];
 
     let amount = amountFn ? amountFn(info, partition) : new Decimal(0);
 

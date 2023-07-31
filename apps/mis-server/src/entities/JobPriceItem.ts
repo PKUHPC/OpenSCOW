@@ -44,7 +44,7 @@ export class JobPriceItem {
     price: Decimal;
 
   @Property({ comment: Object.values(AmountStrategy).join(", ") })
-    amount: AmountStrategy;
+    amount: string;
 
   @Property({ columnType: DATETIME_TYPE })
     createTime: Date;
@@ -53,7 +53,7 @@ export class JobPriceItem {
     itemId: string;
     path: string[];
     price: Decimal;
-    amount: AmountStrategy;
+    amount: string;
     description?: string;
     tenant?: EntityOrRef<Tenant>;
   }) {

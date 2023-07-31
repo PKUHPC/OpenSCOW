@@ -20,6 +20,7 @@ import { AmountStrategy } from "src/models/job";
 import { PlatformRole, TenantRole } from "src/models/User";
 import { Money } from "src/models/UserSchemaModel";
 import { getClient } from "src/utils/client";
+import { publicConfig } from "src/utils/config";
 import { queryIfInitialized } from "src/utils/init";
 import { handlegRPCError } from "src/utils/server";
 
@@ -60,7 +61,8 @@ export default /* #__PURE__*/typeboxRoute(AddBillingItemSchema, async (req, res)
     if (!info) { return; }
   }
 
-  if (!(Object.values(AmountStrategy) as string[]).includes(amount)) {
+  const customAmountStrategies = publicConfig.CUSTOM_AMOUNT_STRATEGIES?.map((i) => i.id) || [];
+  if (![...(Object.values(AmountStrategy) as string[]), ...customAmountStrategies].includes(amount)) {
     return { 400: { code: "INVALID_AMOUNT" } as const };
   }
 
