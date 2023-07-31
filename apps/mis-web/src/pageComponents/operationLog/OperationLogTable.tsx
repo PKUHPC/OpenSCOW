@@ -40,11 +40,12 @@ interface Props {
   user: User;
   queryType: OperationLogQueryType;
   accountName?: string
+  tenantName?: string;
 }
 
 const today = dayjs().endOf("day");
 
-export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountName }) => {
+export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountName, tenantName }) => {
 
   const [ query, setQuery ] = useState<FilterForm>(() => {
     return {
@@ -71,16 +72,17 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
     return await api.getOperationLogs({ query: {
       type: queryType,
       operatorUserIds: getOperatorUserIds().join(","),
-      operationCode: query.operationCode,
+      operationCode: query.operationCode || undefined,
       operationType: query.operationType,
       operationResult: query.operationResult,
       startTime: query.operationTime?.[0].toISOString(),
       endTime: query.operationTime?.[1].toISOString(),
       operationTargetAccountName: accountName,
+      operationTargetTenantName: tenantName,
       page: pageInfo.page,
       pageSize: pageInfo.pageSize,
     } });
-  }, [query, pageInfo, queryType, accountName]);
+  }, [query, pageInfo, queryType, accountName, tenantName]);
 
   const { data, isLoading } = useAsync({ promiseFn });
 

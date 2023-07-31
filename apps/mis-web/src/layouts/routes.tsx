@@ -89,6 +89,12 @@ export const platformAdminRoutes: (platformRoles: PlatformRole[]) => NavItemProp
           ],
         },
       ] : []),
+      ...(platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ?
+        [{
+          Icon: BookOutlined,
+          text: "操作日志",
+          path: "/admin/operationLogs",
+        }] : []),
       {
         Icon: ToolOutlined,
         text: "平台调试",
@@ -225,6 +231,13 @@ export const tenantRoutes: (tenantRoles: TenantRole[], token: string) => NavItem
               path: "/tenant/finance/payments",
             },
           ],
+        },
+      ] : []),
+      ...(tenantRoles.includes(TenantRole.TENANT_ADMIN) ? [
+        {
+          Icon: BookOutlined,
+          text: "操作日志",
+          path: "/tenant/operationLogs",
         },
       ] : []),
     ],
