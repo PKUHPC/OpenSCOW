@@ -372,3 +372,33 @@ it("manage tenant role", async () => {
   const unsetUser = await em.findOne(User, { userId: data.userA.userId });
   expect(unsetUser?.tenantRoles.includes(tRole["TENANT_ADMIN"])).toBe(false);
 });
+
+it("change user email", async () => {
+  const name = "test";
+  const userId = "test";
+  const email = "test@test.com";
+  const newEmail = "test@123.com";
+
+  const user = new User({ name, userId, email, tenant });
+  await server.ext.orm.em.fork().persistAndFlush(user);
+
+  await asyncClientCall(client, "changeEmail", {
+    userId: "test",
+    newEmail:newEmail,
+  });
+  const em = server.ext.orm.em.fork();
+
+  const newUser = await em.findOne(User, { userId: "test" });
+  expect(newUser?.email).toBe(newEmail);
+});
+
+it("change an inexistent user email", async () => {
+  const newEmail = "test@123.com";
+
+  const reply = await asyncClientCall(client, "changeEmail", {
+    userId: "test",
+    newEmail:newEmail,
+  }).catch((e) => e);
+
+  expect(reply.code).toBe(Status.NOT_FOUND);
+});
