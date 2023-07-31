@@ -32,8 +32,8 @@ const TabFormContainer = styled.div`
 `;
 
 interface TabbedFilterFormProps {
-  button: JSX.Element;
-  tabs: { title: string; key?: string; node: JSX.Element; }[];
+  button?: JSX.Element;
+  tabs: { title: string; key?: string; node?: JSX.Element; }[];
   onChange?: (activeKey: string) => void;
 }
 

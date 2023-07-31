@@ -36,7 +36,7 @@ import { PlatformRole, TenantRole, User } from "src/entities/User";
 import { UserAccount, UserRole, UserStatus } from "src/entities/UserAccount";
 import { callHook } from "src/plugins/hookClient";
 import { createUserInDatabase, insertKeyToNewUser } from "src/utils/createUser";
-import { paginationProps } from "src/utils/orm";
+import { generateAllUsersQueryOptions } from "src/utils/queryOptions";
 
 
 export const userServiceServer = plugin((server) => {
@@ -503,15 +503,24 @@ export const userServiceServer = plugin((server) => {
 
     getAllUsers: async ({ request, em }) => {
 
-      const { page, pageSize, idOrName } = request;
+      const { page, pageSize, sortField, sortOrder, idOrName, platformRole } = request;
+
+      const roleQuery = platformRole !== undefined ? {
+        platformRoles: { $like: `%${platformRoleToJSON(platformRole)}%` },
+      } : {};
 
       const [users, count] = await em.findAndCount(User, idOrName ? {
-        $or: [
-          { userId: { $like: `%${idOrName}%` } },
-          { name: { $like: `%${idOrName}%` } },
+        $and: [
+          {
+            $or: [
+              { userId: { $like: `%${idOrName}%` } },
+              { name: { $like: `%${idOrName}%` } },
+            ],
+          },
+          roleQuery,
         ],
-      } : {}, {
-        ...paginationProps(page, pageSize || 10),
+      } : roleQuery, {
+        ...generateAllUsersQueryOptions(page, pageSize, sortField, sortOrder),
         populate: ["tenant", "accounts", "accounts.account"],
       });
 
@@ -529,6 +538,21 @@ export const userServiceServer = plugin((server) => {
           createTime: x.createTime.toISOString(),
           platformRoles: x.platformRoles.map(platformRoleFromJSON),
         })),
+      }];
+    },
+
+    getPlatformUsersCounts: async ({ em }) => {
+
+      const totalCount = await em.count(User);
+      const totalAdminCount = await em.count(User,
+        { platformRoles: { $like: `%${PlatformRole.PLATFORM_ADMIN}%` } });
+      const totalFinanceCount = await em.count(User,
+        { platformRoles: { $like: `%${PlatformRole.PLATFORM_FINANCE}%` } });
+
+      return [{
+        totalCount: totalCount,
+        totalAdminCount: totalAdminCount,
+        totalFinanceCount: totalFinanceCount,
       }];
     },
 

@@ -179,6 +179,13 @@ export const mockApi: MockApi<typeof api> = {
         platformRoles: [],
       },
     ],
+
+  }),
+
+  getPlatformUsersCounts: async () => ({
+    totalCount: 4,
+    totalAdminCount: 2,
+    totalFinanceCount: 3,
   }),
 
   userExists: async () => ({
