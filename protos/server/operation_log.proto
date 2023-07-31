@@ -256,7 +256,7 @@ enum OperationResult {
 }
 
 message OperationLog {
-  string operator_id = 1;
+  string operator_user_id = 1;
   string operator_ip = 2;
   google.protobuf.Timestamp operation_time = 3;
   OperationCode operation_code = 4;
@@ -265,38 +265,53 @@ message OperationLog {
   OperationResult operation_result = 7;
 }
 
+
 message CreateOperationLogRequest {
-  string operator_id = 1;
+  string operator_user_id = 1;
   string operator_ip = 2;
   OperationCode operation_code = 3;
   OperationType operation_type = 4;
   string operation_content = 5;
   OperationResult operation_result = 6;
+  optional string operation_target_account_name = 7;
 }
 
 message CreateOperationLogResponse {
 }
 
-message GetOperationLogsRequest {
-  uint32 page = 1;
-  uint64 page_size = 2;
-  google.protobuf.Timestamp start_time = 3;
-  google.protobuf.Timestamp end_time = 4;
-  optional string operator_id = 5;
+message OperationLogFilter {
+  // if length === 0, get from all operators
+  repeated string operator_user_ids = 1;
+  // 如果两者都不存在，则筛选特定用户的操作日志
+  // 如果存在，则表示筛选特定账户的操作日志
+  optional string operation_target_account_name = 2;
+  // 如果存在，则表示筛选特定租户的操作日志
+  optional string opertaion_target_teanant_name = 3;
+
+  // 筛选项如果为空，则返回所有
+  optional google.protobuf.Timestamp start_time = 4;
+  optional google.protobuf.Timestamp end_time = 5;
   optional OperationCode operation_code = 6;
   optional OperationType operation_type = 7;
   optional OperationResult operation_result = 8;
 }
 
+message GetOperationLogsRequest {
+  OperationLogFilter filter = 1;
+  uint32 page = 2;
+  // if undefined or 0, page_size is 10
+  optional uint64 page_size = 3;
+}
+
 message GetOperationLogsResponse {
-  repeated OperationLog result1 = 1;
-  uint32 total = 2;
+  repeated OperationLog results = 1;
+  uint32 total_count = 2;
 }
 
 
 
 service OperationLogService {
   rpc CreateOperationLog(CreateOperationLogRequest) returns (CreateOperationLogResponse);
-  // rpc GetOperationLogs(GetOperationLogsRequest) returns (GetOperationLogsResponse);
+  rpc GetOperationLogs(GetOperationLogsRequest) returns (GetOperationLogsResponse);
 
 }

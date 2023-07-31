@@ -23,7 +23,7 @@ import { configServiceServer } from "src/services/config";
 import { initServiceServer } from "src/services/init";
 import { jobServiceServer } from "src/services/job";
 import { jobChargeLimitServer } from "src/services/jobChargeLimit";
-import { operationLogServiceServer } from "src/services/log";
+import { operationLogServiceServer } from "src/services/operationLog";
 import { tenantServiceServer } from "src/services/tenant";
 import { userServiceServer } from "src/services/user";
 import { logger } from "src/utils/logger";

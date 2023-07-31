@@ -1375,6 +1375,15 @@
           "nullable": false,
           "mappedType": "text"
         },
+        "operation_target_account_id": {
+          "name": "operation_target_account_id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "integer"
+        },
         "operation_result": {
           "name": "operation_result",
           "type": "varchar(255)",
@@ -1394,6 +1403,15 @@
           ],
           "composite": false,
           "keyName": "operation_log_operator_id_index",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "operation_target_account_id"
+          ],
+          "composite": false,
+          "keyName": "operation_log_operation_target_account_id_index",
           "primary": false,
           "unique": false
         },
@@ -1419,6 +1437,19 @@
             "id"
           ],
           "referencedTableName": "user",
+          "updateRule": "cascade"
+        },
+        "operation_log_operation_target_account_id_foreign": {
+          "constraintName": "operation_log_operation_target_account_id_foreign",
+          "columnNames": [
+            "operation_target_account_id"
+          ],
+          "localTableName": "operation_log",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "account",
+          "deleteRule": "set null",
           "updateRule": "cascade"
         }
       }

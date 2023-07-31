@@ -74,11 +74,12 @@ export default /* #__PURE__*/typeboxRoute(AddUserToAccountSchema, async (req, re
   }
 
   const logInfo = {
-    operatorId: info.identityId,
+    operatorUserId: info.identityId,
     operatorIp: parseIp(req) || "",
     operationCode: OperationCode.ACCOUNT_ADD_USER,
     operationType: OperationType.ADD_USER,
     operationContent: `将用户${name}添加到账户${accountName}中`,
+    operationTargetAccountName: accountName,
   };
 
   // call ua service to add user

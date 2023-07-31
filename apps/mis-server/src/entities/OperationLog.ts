@@ -11,6 +11,7 @@
  */
 
 import { Entity, ManyToOne, PrimaryKey, Property, Ref } from "@mikro-orm/core";
+import { Account } from "src/entities/Account";
 import { User } from "src/entities/User";
 import { CURRENT_TIMESTAMP, EntityOrRef, toRef } from "src/utils/orm";
 
@@ -43,6 +44,10 @@ export class OperationLog {
   @Property({ columnType: "text" })
     operationContent!: string;
 
+  // 操作行为针对的账户，如果操作行为不涉及账户则为 null
+  @ManyToOne(() => Account, { wrappedReference: true, nullable: true })
+    operationTargetAccount!: Ref<Account>;
+
   @Property({ defaultRaw: OperationResult.UNKNOWN })
     operationResult!: OperationResult;
 
@@ -54,12 +59,16 @@ export class OperationLog {
       operationCode: number;
       operationType: number;
       operationContent: string;
+      operationTargetAccount?: EntityOrRef<Account>;
       operationResult: OperationResult
     }) {
     this.operator = toRef(init.operator);
     this.operatorIp = init.operatorIp;
     if (init.operationTime) {
       this.operationTime = init.operationTime;
+    }
+    if (init.operationTargetAccount) {
+      this.operationTargetAccount = toRef(init.operationTargetAccount);
     }
     this.operationCode = init.operationCode;
     this.operationType = init.operationType;

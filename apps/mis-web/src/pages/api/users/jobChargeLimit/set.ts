@@ -53,11 +53,12 @@ export default typeboxRoute(SetJobChargeLimitSchema, async (req, res) => {
   const client = getClient(JobChargeLimitServiceClient);
 
   const logInfo = {
-    operatorId: info.identityId,
+    operatorUserId: info.identityId,
     operatorIp: parseIp(req) || "",
     operationCode: OperationCode.ACCOUNT_SET_CHARGE_LIMIT,
     operationType: OperationType.SET_CHARGE_LIMIT,
     operationContent: `在账户${accountName}中设置用户${userId}的限额为${limit}元`,
+    operationTargetAccountName: accountName,
   };
 
   return await asyncClientCall(client, "setJobChargeLimit", {
