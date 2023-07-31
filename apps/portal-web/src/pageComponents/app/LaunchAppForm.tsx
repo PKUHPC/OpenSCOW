@@ -218,6 +218,7 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
       form.setFieldValue("coreCount", 1);
     }
     setCurrentPartitionInfo(partitionInfo);
+
   };
   const customFormItems = useMemo(() => attributes.map((item, index) => {
     const rules: Rule[] = item.type === "NUMBER"
@@ -226,6 +227,7 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
 
     const placeholder = item.placeholder ?? "";
     const selectOptions = item.select.filter((x) => !x.gpuVersion || (x.gpuVersion && currentPartitionInfo?.gpus));
+    const initialValue = item.type === "SELECT" ? (item.defaultValue ?? selectOptions[0].value) : item.defaultValue;
     
     const inputItem = item.type === "NUMBER" ? (<InputNumber placeholder={placeholder} />)
       : item.type === "TEXT" ? (<Input placeholder={placeholder} />)
@@ -235,8 +237,14 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
             placeholder={placeholder}
           />
         );
-    const initialValue = item.type === "SELECT" ? (item.defaultValue ?? item.select[0].value) : item.defaultValue;
+     
+    if (item.name === "selectVersion") {
+      const preValue = form.getFieldValue("selectVersion");
 
+      // 切换分区后看之前的版本是否还存在，若不存在，则选择版本的select的值置空
+      const optionsContained = selectOptions.find((i) => i.value === preValue);
+      if (!optionsContained) form.setFieldValue("selectVersion", null);
+    }
     return (
       <Form.Item
         key={`${item.name}+${index}`}
