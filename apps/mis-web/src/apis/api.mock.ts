@@ -17,6 +17,7 @@ import type { RunningJob } from "@scow/protos/build/common/job";
 import type { Account } from "@scow/protos/build/server/account";
 import type { AccountUserInfo, GetUserStatusResponse } from "@scow/protos/build/server/user";
 import { api } from "src/apis/api";
+import { OperationCode, OperationResult, OperationType } from "src/models/operationLogModal";
 import { ClusterAccountInfo_ImportStatus, PlatformRole,
   TenantRole, UserInfo, UserRole, UserStatus } from "src/models/User";
 import { DEFAULT_TENANT_NAME } from "src/utils/constants";
@@ -396,6 +397,21 @@ export const mockApi: MockApi<typeof api> = {
     }),
   createTenant: async () => ({ createdInAuth: true }),
   validateToken: async () => MOCK_USER_INFO,
+
+  getOperationLogs: async () => ({
+    results:
+    [{
+      operatorUserId: "testUser",
+      operationCode: OperationCode.ACCOUNT_ADD_USER,
+      operationType: OperationType.ADD_USER,
+      operationContent: "testUser add user testUser to account testAccount",
+      operationTime: "2020-04-23T23:49:50.000Z",
+      operationResult: OperationResult.SUCCESS,
+      operatorIp: "192.168.0.1",
+
+    }],
+    totalCount: 1,
+  }),
 };
 
 export const MOCK_USER_INFO = {
