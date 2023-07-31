@@ -53,6 +53,7 @@ message WhitelistedAccount {
   google.protobuf.Timestamp add_time = 4;
   string operator_id = 5;
   string comment = 6;
+  common.Money balance = 7;
 }
 
 message GetWhitelistedAccountsResponse {
