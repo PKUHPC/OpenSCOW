@@ -10,12 +10,11 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { DEFAULT_PRIMARY_COLOR } from "@scow/config/build/ui";
 import { FastifyReply, FastifyRequest } from "fastify";
 import { join } from "path";
 import { createCaptcha } from "src/auth/captcha";
 import { authConfig, OtpStatusOptions } from "src/config/auth";
-import { config, FAVICON_URL, LOGO_URL } from "src/config/env";
+import { config, FAVICON_URL } from "src/config/env";
 import { uiConfig } from "src/config/ui";
 
 function parseHostname(req: FastifyRequest): string | undefined {
@@ -53,10 +52,16 @@ export async function serveLoginHtml(
   return rep.status(
     verifyCaptchaFail ? 400 : err ? 401 : 200).view("login.liquid", {
     cssUrl: join(config.BASE_PATH, config.AUTH_BASE_PATH, "/public/assets/tailwind.min.css"),
+    backgroundImage: join(config.BASE_PATH, config.AUTH_BASE_PATH,
+      uiConfig?.auth?.backgroundImage || "/public/assets/background.png"),
+    backgroundColor: uiConfig?.auth?.backgroundColor || "#9a0000",
     faviconUrl: join(config.BASE_PATH, FAVICON_URL),
-    logoUrl: join(config.BASE_PATH, LOGO_URL),
-    backgroundColor: uiConfig.primaryColor?.defaultColor ?? DEFAULT_PRIMARY_COLOR,
+    logoUrl: join(config.BASE_PATH, config.AUTH_BASE_PATH,
+      uiConfig?.auth?.logo || "/public/assets/logos/logo.dark.svg"),
     callbackUrl,
+    sloganColor: uiConfig?.auth?.sloganColor || "white",
+    sloganTitle: uiConfig?.auth?.sloganTitle,
+    sloganContentArr: uiConfig?.auth?.sloganContentArr,
     footerText: (hostname && uiConfig?.footer?.hostnameTextMap?.[hostname]) ?? uiConfig?.footer?.defaultText ?? "",
     err,
     ...captchaInfo,
