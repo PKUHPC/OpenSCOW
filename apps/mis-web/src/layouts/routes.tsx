@@ -311,6 +311,11 @@ export const accountAdminRoutes: (adminAccounts: AccountAffiliation[]) => NavIte
           text: "消费记录",
           path: `/accounts/${x.accountName}/charges`,
         },
+        {
+          Icon: BookOutlined,
+          text: "操作日志",
+          path: `/accounts/${x.accountName}/operationLogs`,
+        },
       ],
 
     })),

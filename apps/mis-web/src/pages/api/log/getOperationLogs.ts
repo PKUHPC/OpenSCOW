@@ -127,10 +127,13 @@ export default typeboxRoute(GetOperationLogsSchema, async (req, res) => {
     if (!filter.operationTargetAccountName) {
       return { 400: null };
     }
-    // 确认用户是账户管理员
-    if (!info.accountAffiliations.includes({
-      accountName: filter.operationTargetAccountName, role: UserRole.ADMIN,
-    })) {
+
+    // 确认用户是账户管理员或者拥有者
+    if (
+      !info.accountAffiliations
+        .find((au) => au.accountName === filter.operationTargetAccountName
+      && (au.role === UserRole.ADMIN || au.role === UserRole.OWNER))
+    ) {
       return { 403: null };
     }
   };

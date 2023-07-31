@@ -39,11 +39,12 @@ interface PageInfo {
 interface Props {
   user: User;
   queryType: OperationLogQueryType;
+  accountName?: string
 }
 
 const today = dayjs().endOf("day");
 
-export const OperationLogTable: React.FC<Props> = ({ user, queryType }) => {
+export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountName }) => {
 
   const [ query, setQuery ] = useState<FilterForm>(() => {
     return {
@@ -59,19 +60,27 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType }) => {
 
   const [pageInfo, setPageInfo] = useState<PageInfo>({ page: 1, pageSize: 10 });
 
+  const getOperatorUserIds = () => {
+    if (queryType === OperationLogQueryType.USER) {
+      return [user.identityId];
+    }
+    return query.operatorUserId ? [query.operatorUserId] : [];
+  };
+
   const promiseFn = useCallback(async () => {
     return await api.getOperationLogs({ query: {
       type: queryType,
-      operatorUserIds: [user.identityId].join(","),
+      operatorUserIds: getOperatorUserIds().join(","),
       operationCode: query.operationCode,
       operationType: query.operationType,
       operationResult: query.operationResult,
       startTime: query.operationTime?.[0].toISOString(),
       endTime: query.operationTime?.[1].toISOString(),
+      operationTargetAccountName: accountName,
       page: pageInfo.page,
       pageSize: pageInfo.pageSize,
     } });
-  }, [query, pageInfo]);
+  }, [query, pageInfo, queryType, accountName]);
 
   const { data, isLoading } = useAsync({ promiseFn });
 
@@ -114,7 +123,7 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType }) => {
           </Form.Item>
           {queryType !== OperationLogQueryType.USER && (
             <Form.Item label="操作员" name="operationCode">
-              <Input />
+              <Input style={{ width: 150 }} />
             </Form.Item>
           )}
           <Form.Item label="操作时间" name="operationTime">

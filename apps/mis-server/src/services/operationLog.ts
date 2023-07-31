@@ -16,6 +16,7 @@ import {
   OperationLogServiceServer,
   OperationLogServiceService,
 } from "@scow/protos/build/server/operation_log";
+import { Account } from "src/entities/Account";
 import { OperationLog as OperationLogEntity } from "src/entities/OperationLog";
 import { Tenant } from "src/entities/Tenant";
 import { User } from "src/entities/User";
@@ -49,11 +50,20 @@ export const operationLogServiceServer = plugin((server) => {
       const { filter, page, pageSize } = ensureNotUndefined(request, ["filter"]);
 
       // 如果有特定tenant，只能查看该tenant的日志。获取该tenant下的所有用户userId作为operatorUserIds
-      const { operatorUserIds, operationTargetTenantName } = filter;
+      const { operatorUserIds, operationTargetTenantName, operationTargetAccountName } = filter;
       const operators = await em.find(User, { userId: { $in: operatorUserIds } });
 
       const newFilter = { ...filter, operatorIds: operators.map((x) => x.id) } as NewOperationLogFilter;
       let sqlFilter: FilterQuery<OperationLogEntity>;
+
+      if (operationTargetAccountName) {
+        const account = await em.findOne(Account, { accountName: operationTargetAccountName });
+        if (!account) {
+          throw new Error(`account ${operationTargetAccountName} not found`);
+        }
+        newFilter.operationTargetAccountId = account.id;
+      }
+
       if (operationTargetTenantName) {
 
         const tenant = await em.findOne(Tenant, { name: operationTargetTenantName });
