@@ -28,8 +28,8 @@ auth:
   backgroundImage: "/public/assets/background.png"
   # 登陆界面背景色，当背景图无法加载时，背景色起效
   backgroundColor: "#9a0000"
-  # 登陆界面 logo 图, logo.svg, logo.dark.svg 可选
-  logo: "/public/assets/logos/logo.dark.svg"
+  # 登陆界面 logo 图, false: logo.svg（彩图）, true: logo.dark.svg(白色)
+  logoType: "true"
 
   # 登录界面 slogan 配置
   # 登录界面 slogan 文字颜色

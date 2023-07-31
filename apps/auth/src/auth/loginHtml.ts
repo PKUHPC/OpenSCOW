@@ -14,7 +14,7 @@ import { FastifyReply, FastifyRequest } from "fastify";
 import { join } from "path";
 import { createCaptcha } from "src/auth/captcha";
 import { authConfig, OtpStatusOptions } from "src/config/auth";
-import { config, FAVICON_URL } from "src/config/env";
+import { config, FAVICON_URL, LOGO_URL } from "src/config/env";
 import { uiConfig } from "src/config/ui";
 
 function parseHostname(req: FastifyRequest): string | undefined {
@@ -56,8 +56,7 @@ export async function serveLoginHtml(
       uiConfig?.auth?.backgroundImage || "/public/assets/background.png"),
     backgroundColor: uiConfig?.auth?.backgroundColor || "#9a0000",
     faviconUrl: join(config.BASE_PATH, FAVICON_URL),
-    logoUrl: join(config.BASE_PATH, config.AUTH_BASE_PATH,
-      uiConfig?.auth?.logo || "/public/assets/logos/logo.dark.svg"),
+    logoUrl: join(config.BASE_PATH, LOGO_URL + uiConfig?.auth?.logoType || "true"),
     callbackUrl,
     sloganColor: uiConfig?.auth?.sloganColor || "white",
     sloganTitle: uiConfig?.auth?.sloganTitle,

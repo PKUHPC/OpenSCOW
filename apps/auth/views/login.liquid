@@ -137,6 +137,7 @@
       const passwordInput = document.getElementById('password');
       const eyeElem = document.getElementById('eye-elem');
       eyeElem.style.backgroundImage =  "url('" + encodeURI(eyeCloseImg.src) + "')"
+      eyeElem.style.cursor = "pointer"
       eyeElem.addEventListener("click", function() {
         if (passwordInput.type === "password") {
           passwordInput.setAttribute("type", "text");

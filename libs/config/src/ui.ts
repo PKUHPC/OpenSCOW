@@ -32,7 +32,7 @@ export const UiConfigSchema = Type.Object({
   auth: Type.Optional(Type.Object({
     backgroundImage: Type.Optional(Type.String({ description: "默认背景图片" })),
     backgroundColor: Type.Optional(Type.String({ description: "默认背景颜色" })),
-    logo: Type.Optional(Type.String({ description: "默认图标" })),
+    logoType: Type.Optional(Type.String({ description: "默认图标类型" })),
     sloganColor: Type.Optional(Type.String({ description: "默认标语文字颜色" })),
     sloganTitle: Type.Optional(Type.String({ description: "默认背景颜色" })),
     sloganContentArr: Type.Optional(Type.Array(Type.String(), { description: "默认 slogan 内容数组" })),
