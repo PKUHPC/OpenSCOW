@@ -260,6 +260,11 @@ export const userRoutes: (accounts: AccountAffiliation[]) => NavItemProps[] = (a
         text: "集群和分区信息",
         path: "/user/partitions",
       },
+      {
+        Icon: BookOutlined,
+        text: "操作日志",
+        path: "/user/operationLogs",
+      },
     ],
 
   },

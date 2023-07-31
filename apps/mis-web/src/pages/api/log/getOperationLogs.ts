@@ -15,14 +15,14 @@ import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { GetOperationLogsRequest, OperationLogServiceClient } from "@scow/protos/build/server/operation_log";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
-import { OperationLogQueryType } from "src/models/OperationLogModal";
+import { OperationCode, OperationLogQueryType, OperationResult, OperationType } from "src/models/operationLogModal";
 import { PlatformRole, TenantRole, UserRole } from "src/models/User";
 import { getClient } from "src/utils/client";
 
 
 export const GetOperationLogFilter = Type.Object({
 
-  operatorUserIds: Type.Array(Type.String()),
+  operatorUserIds: Type.String(),
 
   /**
    * @format date-time
@@ -34,22 +34,24 @@ export const GetOperationLogFilter = Type.Object({
    */
   endTime: Type.Optional(Type.String({ format: "date-time" })),
 
-  operationCode: Type.Optional(Type.Integer()),
-  operationType: Type.Optional(Type.Integer()),
-  operationResult: Type.Optional(Type.Integer()),
+  operationCode: Type.Optional(Type.Enum(OperationCode)),
+  operationType: Type.Optional(Type.Enum(OperationType)),
+  operationResult: Type.Optional(Type.Enum(OperationResult)),
 
   operationTargetAccountName: Type.Optional(Type.String()),
   operationTargetTenantName: Type.Optional(Type.String()),
 });
 
+export type GetOperationLogFilter = Static<typeof GetOperationLogFilter>;
+
 // Cannot use OperationLog from protos
 export const OperationLog = Type.Object({
   operatorUserId: Type.String(),
   operatorIp: Type.String(),
-  operationCode: Type.Integer(),
-  operationType: Type.Integer(),
+  operationCode: Type.Enum(OperationCode),
+  operationType: Type.Enum(OperationType),
   operationContent: Type.String(),
-  operationResult: Type.Integer(),
+  operationResult: Type.Enum(OperationResult),
   operationTime: Type.Optional(Type.String()),
 
 });
@@ -63,7 +65,7 @@ export const GetOperationLogsSchema = typeboxRouteSchema({
 
     type: Type.Enum(OperationLogQueryType),
 
-    filter: Type.Object({ ...GetOperationLogFilter.properties }),
+    ...GetOperationLogFilter.properties,
     /**
      * @minimum 1
      * @type integer
@@ -104,8 +106,18 @@ export default typeboxRoute(GetOperationLogsSchema, async (req, res) => {
 
   if (!info) { return; }
 
-  const { type, filter, page, pageSize } = req.query;
+  const {
+    type, operatorUserIds, startTime, endTime, operationCode,
+    operationType, operationResult, operationTargetAccountName,
+    operationTargetTenantName, page, pageSize } = req.query;
 
+  const filter = {
+    operatorUserIds: operatorUserIds.split(","),
+    startTime, endTime,
+    operationCode, operationType,
+    operationResult, operationTargetAccountName,
+    operationTargetTenantName,
+  };
   // 用户请求
   if (type === OperationLogQueryType.USER) {
     filter.operatorUserIds = [info.identityId];
@@ -135,6 +147,7 @@ export default typeboxRoute(GetOperationLogsSchema, async (req, res) => {
       return { 403: null };
     }
   }
+
   const results = await getOperationLogs({ filter, page, pageSize });
 
   return {

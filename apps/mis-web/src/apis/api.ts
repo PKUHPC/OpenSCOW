@@ -56,6 +56,7 @@ import type { GetMissingDefaultPriceItemsSchema } from "src/pages/api/job/getMis
 import type { GetJobInfoSchema } from "src/pages/api/job/jobInfo";
 import type { QueryJobTimeLimitSchema } from "src/pages/api/job/queryJobTimeLimit";
 import type { GetRunningJobsSchema } from "src/pages/api/job/runningJobs";
+import type { GetOperationLogsSchema } from "src/pages/api/log/getOperationLogs";
 import type { ChangePasswordSchema } from "src/pages/api/profile/changePassword";
 import { CheckPasswordSchema } from "src/pages/api/profile/checkPassword";
 import type { DewhitelistAccountSchema } from "src/pages/api/tenant/accountWhitelist/dewhitelistAccount";
@@ -144,4 +145,5 @@ export const api = {
   unblockUserInAccount: apiClient.fromTypeboxRoute<typeof UnblockUserInAccountSchema>("PUT", "/api/users/unblockInAccount"),
   unsetAdmin: apiClient.fromTypeboxRoute<typeof UnsetAdminSchema>("PUT", "/api/users/unsetAdmin"),
   checkPassword: apiClient.fromTypeboxRoute<typeof CheckPasswordSchema>("GET", "/api/profile/checkPassword"),
+  getOperationLogs: apiClient.fromTypeboxRoute<typeof GetOperationLogsSchema>("GET", "/api/log/getOperationLogs"),
 };

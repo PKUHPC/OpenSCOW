@@ -19,7 +19,7 @@ import {
 import { OperationLog as OperationLogEntity } from "src/entities/OperationLog";
 import { Tenant } from "src/entities/Tenant";
 import { User } from "src/entities/User";
-import { filterOperationLogs, logOperation, toGrpcOperationLog } from "src/utils/operationLog";
+import { filterOperationLogs, logOperation, NewOperationLogFilter, toGrpcOperationLog } from "src/utils/operationLog";
 import { paginationProps } from "src/utils/orm";
 
 
@@ -50,6 +50,9 @@ export const operationLogServiceServer = plugin((server) => {
 
       // 如果有特定tenant，只能查看该tenant的日志。获取该tenant下的所有用户userId作为operatorUserIds
       const { operatorUserIds, operationTargetTenantName } = filter;
+      const operators = await em.find(User, { userId: { $in: operatorUserIds } });
+
+      const newFilter = { ...filter, operatorIds: operators.map((x) => x.id) } as NewOperationLogFilter;
       let sqlFilter: FilterQuery<OperationLogEntity>;
       if (operationTargetTenantName) {
 
@@ -61,13 +64,13 @@ export const operationLogServiceServer = plugin((server) => {
         const users = await em.find(User, { tenant });
         if (operatorUserIds.length > 0) {
           users.filter((x) => operatorUserIds.includes(x.userId));
-          sqlFilter = filterOperationLogs({ ...filter, operatorUserIds: users.map((x) => x.userId) });
+          sqlFilter = filterOperationLogs({ ...filter, operatorIds: users.map((x) => x.id) });
         } else {
           // 如果没有传特定操作者，就默认是该tenant下的所有用户
-          sqlFilter = filterOperationLogs({ ...filter, operatorUserIds: users.map((x) => x.userId) });
+          sqlFilter = filterOperationLogs({ ...filter, operatorIds: users.map((x) => x.id) });
         }
       }
-      sqlFilter = filterOperationLogs(filter);
+      sqlFilter = filterOperationLogs(newFilter);
 
       logger.info("getOperationLogs sqlFilter %s", JSON.stringify(sqlFilter));
 

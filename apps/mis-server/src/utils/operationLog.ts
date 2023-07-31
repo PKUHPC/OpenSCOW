@@ -23,17 +23,21 @@ import { Account } from "src/entities/Account";
 import { OperationLog as OperationLogEntity, OperationResult } from "src/entities/OperationLog";
 import { User } from "src/entities/User";
 
+export interface NewOperationLogFilter extends Omit<OperationLogFilter, "operatorUserIds"> {
+  operatorIds: number[];
+}
+
 export function filterOperationLogs({
-  operatorUserIds,
+  operatorIds,
   startTime,
   endTime,
   operationCode,
   operationType,
   operationResult,
   operationTargetAccountName,
-}: OperationLogFilter) {
+}: NewOperationLogFilter) {
   const sqlFilter: FilterQuery<OperationLogEntity> = {
-    ...(operatorUserIds.length > 0 ? { operator_user_id: { $in: operatorUserIds } } : {}),
+    ...(operatorIds.length > 0 ? { operator_id: { $in: operatorIds } } : {}),
     ...(operationTargetAccountName ? { operation_target_account_name: operationTargetAccountName } : {}),
     $and: [
       ...(startTime ? [{ operationTime: { $gte: startTime } }] : []),
