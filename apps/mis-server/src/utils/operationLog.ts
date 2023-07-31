@@ -30,9 +30,11 @@ export function filterOperationLogs({
   operationCode,
   operationType,
   operationResult,
+  operationTargetAccountName,
 }: OperationLogFilter) {
   const sqlFilter: FilterQuery<OperationLogEntity> = {
     ...(operatorUserIds.length > 0 ? { operator_user_id: { $in: operatorUserIds } } : {}),
+    ...(operationTargetAccountName ? { operation_target_account_name: operationTargetAccountName } : {}),
     $and: [
       ...(startTime ? [{ operationTime: { $gte: startTime } }] : []),
       ...(endTime ? [{ operationTime: { $lte: endTime } }] : []),

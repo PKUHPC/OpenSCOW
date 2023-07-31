@@ -286,7 +286,7 @@ message OperationLogFilter {
   // 如果存在，则表示筛选特定账户的操作日志
   optional string operation_target_account_name = 2;
   // 如果存在，则表示筛选特定租户的操作日志
-  optional string opertaion_target_teanant_name = 3;
+  optional string operation_target_tenant_name = 3;
 
   // 筛选项如果为空，则返回所有
   optional google.protobuf.Timestamp start_time = 4;
