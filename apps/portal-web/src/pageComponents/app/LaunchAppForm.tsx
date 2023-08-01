@@ -238,8 +238,8 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
           />
         );
     
-    const configRequireGPU = item.select.find((i) => i.requireGPU !== undefined);
-    if (item.type === "SELECT" && configRequireGPU) {
+    const RequireGPUconfiged = item.select.find((i) => i.requireGPU !== undefined);
+    if (item.type === "SELECT" && RequireGPUconfiged) {
       const preValue = form.getFieldValue(item.name);
 
       if (preValue) {
