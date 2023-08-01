@@ -41,7 +41,7 @@ interface SingleSelectionProps {
   clusters?: Cluster[];
 }
 
-const SingleClusterSelectorUseDefault: React.FC<SingleSelectionProps> = ({
+export const SingleClusterSelector: React.FC<SingleSelectionProps> = ({
   value,
   onChange,
   label,
@@ -68,5 +68,3 @@ const SingleClusterSelectorUseDefault: React.FC<SingleSelectionProps> = ({
     />
   );
 };
-
-export const SingleClusterSelector = dynamic(() => Promise.resolve(SingleClusterSelectorUseDefault), { ssr: false });
