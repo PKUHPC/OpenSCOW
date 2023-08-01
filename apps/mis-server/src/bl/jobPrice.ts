@@ -34,7 +34,7 @@ logger.info("customAmountStrategyFuncs %o", customAmountStrategyFuncs);
 if (Array.isArray(misConfig.customAmountStrategies)) {
   try {
     for (const item of misConfig.customAmountStrategies) {
-      customAmountStrategyFuncs[item.id] = require(join("../../", DEFAULT_CONFIG_BASE_PATH, "scripts", item.script));
+      customAmountStrategyFuncs[item.id] = require(join(DEFAULT_CONFIG_BASE_PATH, "scripts", item.script));
       logger.info("customAmountStrategyFuncs %s", customAmountStrategyFuncs[item.id]({
         timeUsed: 200,
         jobId: 0,
