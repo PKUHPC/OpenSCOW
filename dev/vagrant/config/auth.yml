@@ -149,9 +149,9 @@ ldap:
 ui:
   # 登录界面背景图
   backgroundImagePath: "/__public__/assets/background.png"
-  # 登陆界面背景色，当背景图无法加载时，背景色起效
+  # 登录界面背景色，当背景图无法加载时，背景色起效
   backgroundFallbackColor: "#9a0000"
-  # 登陆界面 logo 图, light: 亮色模式下的 logo, dark: 黑暗模式下的 logo
+  # 登录界面 logo 图, light: 亮色模式下的 logo, dark: 黑暗模式下的 logo
   logoType: "dark"
 
   # 登录界面 slogan 配置

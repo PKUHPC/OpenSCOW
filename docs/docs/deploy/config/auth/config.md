@@ -8,16 +8,15 @@ title: 内置认证系统配置
 ## UI 配置
 认证系统支持对登录界面部分 UI 进行修改
 
-在`auth.yaml`配置中，可以配置关于登录界面 UI 的部分内容
+在`auth.yaml`配置中，可以配置关于登录界面 UI 的部分内容。其中关于背景图片的设置可以参考[公共文件](https://pkuhpc.github.io/SCOW/docs/deploy/config/customization/public-files)进行配置。
 ```yaml
 # auth 界面 ui 配置
 ui:
   # 登录界面背景图
-  # 图片参考进行配置：https://pkuhpc.github.io/SCOW/docs/deploy/config/customization/public-files
   backgroundImagePath: "/assets/background.png"
-  # 登陆界面背景色，当背景图无法加载时，背景色起效
+  # 登录界面背景色，当背景图无法加载时，背景色起效
   backgroundFallbackColor: "#9a0000"
-  # 登陆界面 logo 图, light: 亮色模式下的 logo, dark: 黑暗模式下的 logo
+  # 登录界面 logo 图, light: 亮色模式下的 logo, dark: 黑暗模式下的 logo
   logoType: "dark"
 
   # 登录界面 slogan 配置

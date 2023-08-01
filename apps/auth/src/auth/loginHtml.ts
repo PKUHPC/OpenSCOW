@@ -53,8 +53,7 @@ export async function serveLoginHtml(
   return rep.status(
     verifyCaptchaFail ? 400 : err ? 401 : 200).view("login.liquid", {
     cssUrl: join(config.BASE_PATH, config.AUTH_BASE_PATH, "/public/assets/tailwind.min.css"),
-    backgroundImagePath: join(config.BASE_PATH, config.AUTH_BASE_PATH,
-      authConfig?.ui?.backgroundImagePath || ""),
+    backgroundImagePath: authConfig?.ui?.backgroundImagePath || "",
     backgroundFallbackColor: authConfig?.ui?.backgroundFallbackColor || "",
     faviconUrl: join(config.BASE_PATH, FAVICON_URL),
     logoUrl: join(config.BASE_PATH, LOGO_URL + logoPreferDarkParam),
