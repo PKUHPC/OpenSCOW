@@ -227,6 +227,7 @@ export const accountServiceServer = plugin((server) => {
             addTime: x.time.toISOString(),
             ownerId: accountOwner.id + "",
             ownerName: accountOwner.name,
+            balance: decimalToMoney(x.account.$.balance),
           };
 
         }),

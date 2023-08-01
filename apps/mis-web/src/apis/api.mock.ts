@@ -391,6 +391,7 @@ export const mockApi: MockApi<typeof api> = {
     operatorId: "123",
     ownerId: "123",
     ownerName: "123",
+    balance: numberToMoney(10.5),
   }], totalCount: 1 }),
 
   changePassword: async () => null,
