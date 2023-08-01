@@ -50,11 +50,11 @@ attributes:
       - value: relion/3.1.3_openmpi_3.1.6
         label: relion/3.1.3_openmpi_3.1.6
         # 可选配置，若需要区分CPU和GPU的版本
-        # 将gpuVersion设为true，此时该版本会出现在有GPU的分区
-        # gpuVersion: true
+        # 将requireGPU设为true，此时该版本会出现在有GPU的分区
+        # requireGPU: true
       - value: relion/4.0_openmpi_3.1.6
         label: relion/4.0_openmpi_3.1.6
-        # gpuVersion: false
+        # requireGPU: false
   - type: text
     name: sbatchOptions
     label: 其他sbatch参数

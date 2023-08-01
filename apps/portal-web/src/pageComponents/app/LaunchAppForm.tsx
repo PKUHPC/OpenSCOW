@@ -226,7 +226,7 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
       : [{ required: item.required }];
 
     const placeholder = item.placeholder ?? "";
-    const selectOptions = item.select.filter((x) => !x.gpuVersion || (x.gpuVersion && currentPartitionInfo?.gpus));
+    const selectOptions = item.select.filter((x) => !x.requireGPU || (x.requireGPU && currentPartitionInfo?.gpus));
     const initialValue = item.type === "SELECT" ? (item.defaultValue ?? selectOptions[0].value) : item.defaultValue;
     
     const inputItem = item.type === "NUMBER" ? (<InputNumber placeholder={placeholder} />)
@@ -237,13 +237,15 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
             placeholder={placeholder}
           />
         );
-     
-    if (item.name === "selectVersion") {
-      const preValue = form.getFieldValue("selectVersion");
+    
+    const configRequireGPU = item.select.find((i) => i.requireGPU !== undefined);
+    if (item.type === "SELECT" && configRequireGPU) {
+      const preValue = form.getFieldValue(item.name);
+
       if (preValue) {
         // 切换分区后看之前的版本是否还存在，若不存在，则选择版本的select的值置空
         const optionsContained = selectOptions.find((i) => i.value === preValue);
-        if (!optionsContained) form.setFieldValue("selectVersion", null);
+        if (!optionsContained) form.setFieldValue(item.name, null);
       }
     }
     return (
