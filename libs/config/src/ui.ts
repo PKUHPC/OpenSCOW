@@ -28,15 +28,6 @@ export const UiConfigSchema = Type.Object({
     hostnameMap: Type.Optional(Type.Record(Type.String(), Type.String(),
       { description: "根据域名（hostname，不包括port）不同，应用的主题色" })),
   })),
-
-  auth: Type.Optional(Type.Object({
-    backgroundImage: Type.Optional(Type.String({ description: "默认背景图片" })),
-    backgroundColor: Type.Optional(Type.String({ description: "默认背景颜色" })),
-    logoType: Type.Optional(Type.String({ description: "默认图标类型" })),
-    sloganColor: Type.Optional(Type.String({ description: "默认标语文字颜色" })),
-    sloganTitle: Type.Optional(Type.String({ description: "默认背景颜色" })),
-    sloganContentArr: Type.Optional(Type.Array(Type.String(), { description: "默认 slogan 内容数组" })),
-  })),
 });
 
 const UI_CONFIG_NAME = "ui";

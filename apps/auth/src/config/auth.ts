@@ -151,6 +151,17 @@ export const OtpLdapSchema = Type.Object({
   }, { description: "发送绑定链接相关配置" }),
 }, { description: "将otp密钥存在ldap需要配置信息" });
 
+export const UiConfigSchema = Type.Object({
+  backgroundImagePath: Type.String({ description: "默认背景图片", default: "/assets/background.png" }),
+  backgroundFallbackColor: Type.String({ description: "默认背景颜色", default: "#9a0000" }),
+  logoType: Type.String({ description: "默认图标类型", default: "dark" }),
+  slogan: Type.Object({
+    color: Type.String({ description: "默认标语文字颜色", default: "white" }),
+    title: Type.String({ description: "默认标语标题", default: "" }),
+    texts: Type.Array(Type.String(), { description: "默认 slogan 正文数组", default: []}),
+  }),
+});
+
 export const OtpConfigSchema = Type.Object({
   enabled: Type.Boolean({ description: "是否启用otp", default: false }),
   type: Type.Optional(Type.Enum(OtpStatusOptions, { description: "otp功能状态" })),
@@ -164,6 +175,7 @@ export const OtpConfigSchema = Type.Object({
 export type SshConfigSchema = Static<typeof SshConfigSchema>;
 export type OtpLdapSchema = Static<typeof OtpLdapSchema>;
 export type OtpConfigSchema = Static<typeof OtpConfigSchema>;
+export type UiConfigSchema = Static<typeof UiConfigSchema>;
 
 export const AuthConfigSchema = Type.Object({
   redisUrl: Type.String({ description: "存放token的redis地址", default: "redis:6379" }),
@@ -180,6 +192,7 @@ export const AuthConfigSchema = Type.Object({
     enabled: Type.Boolean({ description: "验证码功能是否启用", default: false }),
   }, { default: {} }),
   otp: Type.Optional(OtpConfigSchema),
+  ui: Type.Optional(UiConfigSchema),
 });
 
 export type AuthConfigSchema = Static<typeof AuthConfigSchema>;

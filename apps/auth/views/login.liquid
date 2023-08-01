@@ -13,13 +13,12 @@
         overflow-y: hidden;
     }
     body {
-      background-image: url("{{ backgroundImage }}");
+      background-image: url("{{ backgroundImagePath }}");
       background-repeat: no-repeat;
-      background-color: {{ backgroundColor }};
+      background-color: {{ backgroundFallbackColor }};
     }
     .button-primary {
-        background-color: {{ backgroundColor }}
-    }
+        background-color: #9a0000;
     svg {
       height: 100%;
       width: 100%;
@@ -119,8 +118,8 @@
       </div>
       <div class="w-1/2 h-screen pl-48 pb-28 flex justify-center flex-col" style="color: {{ sloganColor }}">
           <div class="text-white text-4xl font-semibold mb-12">{{ sloganTitle }}</div>
-          {% for sloganContent in sloganContentArr %}
-            <div class="text-white text-2xl mb-8">{{ sloganContent }}</div>
+          {% for sloganText in sloganTextArr %}
+            <div class="text-white text-2xl mb-8">{{ sloganText }}</div>
           {% endfor %}
       </div>
     </div>

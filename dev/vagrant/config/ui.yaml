@@ -22,25 +22,3 @@ primaryColor:
     # 从a.com的访问的主题色为#000000
     # a.com: "#000000"
 
-# auth 界面 ui 配置
-auth:
-  # 登录界面背景图
-  backgroundImage: "/public/assets/background.png"
-  # 登陆界面背景色，当背景图无法加载时，背景色起效
-  backgroundColor: "#9a0000"
-  # 登陆界面 logo 图, false: logo.svg（彩图）, true: logo.dark.svg(白色)
-  logoType: "true"
-
-  # 登录界面 slogan 配置
-  # 登录界面 slogan 文字颜色
-  sloganColor: "white"
-  # 登录界面 slogan title
-  sloganTitle: "开源算力中心门户和管理平台"
-  # 多条 slogan 文本
-  sloganContentArr:
-    - "图形化界面，使用方便"
-    - "功能丰富，管理简单"
-    - "一体化部署，开箱即用"
-    - "标准化平台，支持算力融合"
-    - "开源中立，独立自主"
-
