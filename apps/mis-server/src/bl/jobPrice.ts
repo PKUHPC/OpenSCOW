@@ -112,7 +112,7 @@ export function calculateJobPrice(
 
     const amountFn = amountStrategyFuncs[priceItem.amount] || customAmountStrategyFuncs[priceItem.amount];
 
-    let amount = amountFn ? amountFn(info, partition) : new Decimal(0);
+    let amount = amountFn ? new Decimal(amountFn(info, partition)) : new Decimal(0);
 
     if (!amountFn) {
       logger.warn("Unknown AmountStrategy %s. Count as 0.", priceItem.amount);
