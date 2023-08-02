@@ -10,9 +10,11 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Table } from "antd";
+import { QuestionCircleOutlined } from "@ant-design/icons";
+import { Popover, Space, Table } from "antd";
 import { ColumnsType } from "antd/es/table";
-import { AmountStrategyText } from "src/models/job";
+import { AmountStrategyAlgorithmDescriptions,
+  AmountStrategyDescription, AmountStrategyDescriptions, AmountStrategyText } from "src/models/job";
 import { publicConfig } from "src/utils/config";
 
 export interface JobBillingTableItem {
@@ -92,9 +94,43 @@ export const JobBillingTable: React.FC<Props> = ({ data, loading }) => {
     { dataIndex: "price", title: "单价（元）", key: "index", render: (_, r) => ({
       children: r.priceItem?.price ?? "未定义",
     }) },
-    { dataIndex: "amount", title: AmountStrategyText, key: "index", render: (_, r) => ({
-      children: r.priceItem?.amount ?? "未定义",
-    }) },
+    {
+      dataIndex: "amount",
+      title: (
+        <Space>
+          {AmountStrategyText}
+          <Popover
+            title={AmountStrategyDescription}
+            content={(
+              <div>
+                <p>
+                  {Object.entries(AmountStrategyDescriptions)
+                    .map((value) => <p key={value[0]}>{`${value[1]}(${value[0]})`}</p>)}
+                </p>
+                <a href="https://pkuhpc.github.io/SCOW/docs/info/mis/business/billing">{"细节请查阅文档"}</a>
+              </div>
+            )}
+          >
+            <QuestionCircleOutlined />
+          </Popover>
+        </Space>
+      ),
+      key: "index",
+      render: (_, r) => ({
+        children: (
+          r.priceItem?.amount ? (
+            <>
+              {AmountStrategyDescriptions[r.priceItem?.amount]}
+              <Popover
+                title={`${AmountStrategyAlgorithmDescriptions[r.priceItem?.amount]}`}
+              >
+                <QuestionCircleOutlined />
+              </Popover>
+            </>
+          ) : "未定义"
+        ),
+      }),
+    },
     { dataIndex: "comment", title: "说明", key: "index", render: (_, r) => ({
       children: r.comment,
       props: { rowSpan: r.partitionItemIndex === 0 ? r.qosCount : 0 },
