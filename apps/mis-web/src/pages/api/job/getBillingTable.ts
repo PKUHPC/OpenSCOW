@@ -86,11 +86,6 @@ export const GetBillingTableSchema = typeboxRouteSchema({
   method: "GET",
 
   query: Type.Object({
-    /**
-     * Platform admin can query any tenant
-     * Not login user can only query platform default (by not setting the tenant field)
-     * Login user can only query the platform default and tenant the user belongs to
-     */
     tenant: Type.Optional(Type.String()),
     userId: Type.Optional(Type.String()),
   }),
@@ -224,8 +219,7 @@ export default /* #__PURE__*/typeboxRoute(GetBillingTableSchema, async (req, res
   const clusterTexts = runtimeConfig.CLUSTER_TEXTS_CONFIG;
   const text = clusterTexts && tenant ? (clusterTexts[tenant] ?? clusterTexts.default) : undefined;
 
-  const items = info.platformRoles.includes(PlatformRole.PLATFORM_ADMIN)
-    ? await getBillingTableItems(tenant) : await getBillingTableItems(tenant, userId);
+  const items = await getBillingTableItems(tenant, userId);
 
   return { 200: { items, text } };
 });
