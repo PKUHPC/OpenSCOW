@@ -18,13 +18,13 @@ import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
 import { PlatformRole } from "src/models/User";
-import { AccountTable } from "src/pageComponents/admin/AccountTable";
+import { AccountTable } from "src/pageComponents/accounts/AccountTable";
 import { Head } from "src/utils/head";
 
 
-export const AccountListPage: NextPage = 
+export const AccountListPage: NextPage =
   requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))(() => {
-    
+
     const promiseFn = useCallback(async () => {
       return await api.getAllAccounts({});
     }, []);
@@ -43,6 +43,7 @@ export const AccountListPage: NextPage =
           data={data}
           isLoading={isLoading}
           reload={reload}
+          showedTab={"PLATFORM"}
         />
       </div>
     );

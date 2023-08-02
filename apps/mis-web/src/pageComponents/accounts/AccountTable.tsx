@@ -21,10 +21,12 @@ import { FilterFormContainer, FilterFormTabs } from "src/components/FilterFormCo
 import type { AdminAccountInfo, GetAccountsSchema } from "src/pages/api/tenant/getAccounts";
 import { moneyToString } from "src/utils/money";
 
+type ShowedTab = "PLATFORM" | "TENANT";
 interface Props {
   data: Static<typeof GetAccountsSchema["responses"]["200"]> | undefined;
   isLoading: boolean;
   reload: () => void;
+  showedTab: ShowedTab;
 }
 
 interface FilterForm {
@@ -39,7 +41,7 @@ const filteredStatuses = {
 type FilteredStatus = keyof typeof filteredStatuses;
 
 export const AccountTable: React.FC<Props> = ({
-  data, isLoading,
+  data, isLoading, showedTab,
 }) => {
 
   const [form] = Form.useForm<FilterForm>();
@@ -137,6 +139,13 @@ export const AccountTable: React.FC<Props> = ({
           dataIndex="userCount"
           title="用户数量"
         />
+        {/* 只在平台管理下的账户列表中显示 */}
+        {showedTab === "PLATFORM" && (
+          <Table.Column<AdminAccountInfo>
+            dataIndex="tenantName"
+            title="租户"
+          />
+        )}
         <Table.Column<AdminAccountInfo>
           dataIndex="comment"
           title="备注"
@@ -157,16 +166,19 @@ export const AccountTable: React.FC<Props> = ({
           sortOrder={currentSortInfo.field === "blocked" ? currentSortInfo.order : null}
           render={(blocked) => blocked ? <Tag color="red">封锁</Tag> : <Tag color="green">正常</Tag>}
         />
-        <Table.Column<AdminAccountInfo>
-          title="操作"
-          render={(_, r) => (
-            <Space split={<Divider type="vertical" />}>
-              <Link href={{ pathname: `/tenant/accounts/${r.accountName}/users` }}>
-              管理成员
-              </Link>
-            </Space>
-          )}
-        />
+        {/* 只在租户管理下的账户列表中显示 */}
+        {showedTab === "TENANT" && (
+          <Table.Column<AdminAccountInfo>
+            title="操作"
+            render={(_, r) => (
+              <Space split={<Divider type="vertical" />}>
+                <Link href={{ pathname: `/tenant/accounts/${r.accountName}/users` }}>
+                管理成员
+                </Link>
+              </Space>
+            )}
+          />
+        )}
       </Table>
     </div>
   );
