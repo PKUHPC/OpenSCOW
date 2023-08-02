@@ -28,7 +28,7 @@ services:
   ssh-server:
     image: alpine-ssh
     build:
-      context: dev/ssh-server
+      context: ssh-server
     ports:
       - 22222:22
     volumes:
