@@ -44,9 +44,9 @@ export const PartitionsPage: NextPage = requireAuth(
 
     return (
       <div>
+        <Head title="分区信息" />
+        <PageTitle titleText="分区信息" />
         <Spin spinning={isLoading}>
-          <Head title="分区信息" />
-          <PageTitle titleText="分区信息" />
           <JobBillingTable data={data?.items} />
           {
             data?.text?.clusterComment ? (
