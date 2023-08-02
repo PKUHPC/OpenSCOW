@@ -32,7 +32,7 @@ async function queryCapabilities(authUrl, phase) {
     // @ts-ignore
     return await getCapabilities(authUrl);
   } else {
-    return { changePassword: true, createUser: true, validateName: true };
+    return { changePassword: true, createUser: true, validateName: true, changeEmail:true };
   }
 }
 
@@ -113,6 +113,7 @@ const buildRuntimeConfig = async (phase, basePath) => {
       authSupportsCreateUser: capabilities.createUser,
     },
     ENABLE_CHANGE_PASSWORD: capabilities.changePassword,
+    ENABLE_CHANGE_EMAIL: capabilities.changeEmail,
     PREDEFINED_CHARGING_TYPES: misConfig.predefinedChargingTypes,
 
     PUBLIC_PATH: config.PUBLIC_PATH,

@@ -14,9 +14,11 @@ import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
-import { AdminServiceServer, AdminServiceService,
+import {
+  AdminServiceServer, AdminServiceService,
   ClusterAccountInfo,
-  ClusterAccountInfo_ImportStatus } from "@scow/protos/build/server/admin";
+  ClusterAccountInfo_ImportStatus,
+} from "@scow/protos/build/server/admin";
 import { updateBlockStatusInSlurm } from "src/bl/block";
 import { importUsers, ImportUsersData } from "src/bl/importUsers";
 import { Account } from "src/entities/Account";
@@ -28,7 +30,7 @@ import { UserAccount, UserRole } from "src/entities/UserAccount";
 export const adminServiceServer = plugin((server) => {
 
   server.addService<AdminServiceServer>(AdminServiceService, {
-    changeStorageQuota: async ({}) => {
+    changeStorageQuota: async ({ }) => {
       // const { cluster, mode, userId, value } = request;
 
       // const quota = await em.findOne(StorageQuota, {
@@ -77,7 +79,7 @@ export const adminServiceServer = plugin((server) => {
 
       if (!quota) {
         throw <ServiceError>{
-          code: Status.NOT_FOUND, message:  `User ${userId} or cluster ${cluster} is not found`,
+          code: Status.NOT_FOUND, message: `User ${userId} or cluster ${cluster} is not found`,
         };
       }
 
@@ -88,14 +90,14 @@ export const adminServiceServer = plugin((server) => {
       const { data, whitelist } = request;
 
       if (!data) {
-        throw <ServiceError> {
+        throw <ServiceError>{
           code: Status.INVALID_ARGUMENT, message: "Submitted data is empty",
         };
       }
 
       const ownerNotInAccount = data.accounts.find((x) => x.owner && !x.users.find((user) => user.userId === x.owner));
       if (ownerNotInAccount) {
-        throw <ServiceError> {
+        throw <ServiceError>{
           code: Status.INVALID_ARGUMENT,
           message: `Owner ${ownerNotInAccount.owner} is not in ${ownerNotInAccount.accountName}`,
         };
@@ -203,9 +205,12 @@ export const adminServiceServer = plugin((server) => {
       const accountCount = await em.count(Account, {});
       const tenantCount = await em.count(Tenant, {});
       const platformAdmins = await em.find(User, { platformRoles: { $like: `%${PlatformRole.PLATFORM_ADMIN}%` } });
+      const platformFinancialStaff = await em.find(User,
+        { platformRoles: { $like: `%${PlatformRole.PLATFORM_FINANCE}%` } });
 
       return [{
         platformAdmins: platformAdmins.map((x) => ({ userId: x.userId, userName: x.name })),
+        platformFinancialStaff: platformFinancialStaff.map((x) => ({ userId: x.userId, userName: x.name })),
         tenantCount,
         accountCount,
         userCount,

@@ -74,6 +74,8 @@ export const createSshAuthProvider = (f: FastifyInstance) => {
     },
     createUser: undefined,
     changePassword: undefined,
+    checkPassword: undefined,
+    changeEmail: undefined,
   } satisfies AuthProvider;
 
 };

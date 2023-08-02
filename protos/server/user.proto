@@ -242,6 +242,7 @@ message GetUserInfoResponse {
   repeated TenantRole tenant_roles = 3;
   string name = 4;
   string tenant_name = 5;
+  string email = 6;
 }
 
 message GetUsersResponse {
@@ -257,15 +258,39 @@ message PlatformUserInfo {
   repeated PlatformRole platform_roles = 6;
 }
 
+enum SortDirection {
+  ASC = 0;
+  DESC = 1;
+}
+
 message GetAllUsersRequest {
+  // sort fields
+  // for mis pageComponent AllUsersTable
+  enum UsersSortField {
+    USER_ID = 0;
+    NAME = 1;
+    CREATE_TIME = 2;
+  }
   uint32 page = 1;
   optional uint64 page_size = 2;
-  optional string id_or_name = 3;
+  optional UsersSortField sort_field = 3;
+  optional SortDirection sort_order = 4;
+  optional string id_or_name = 5;
+  optional PlatformRole platform_role = 6;
 }
 
 message GetAllUsersResponse {
   uint64 total_count = 1;
   repeated PlatformUserInfo platform_users = 2;
+}
+
+message GetPlatformUsersCountsRequest {
+}
+
+message GetPlatformUsersCountsResponse {
+  uint64 total_count = 1;
+  uint64 total_admin_count = 2;
+  uint64 total_finance_count = 3;
 }
 
 message SetPlatformRoleRequest {
@@ -318,6 +343,14 @@ message CheckUserNameMatchResponse {
   bool match = 1;
 }
 
+message ChangeEmailRequest {
+  string user_id = 1;
+  string new_email = 2;
+}
+
+message ChangeEmailResponse {
+}
+
 
 service UserService {
 
@@ -326,6 +359,7 @@ service UserService {
   rpc GetUserInfo(GetUserInfoRequest) returns (GetUserInfoResponse);
 
   rpc GetAllUsers(GetAllUsersRequest) returns (GetAllUsersResponse);
+  rpc GetPlatformUsersCounts(GetPlatformUsersCountsRequest) returns (GetPlatformUsersCountsResponse);
 
   rpc GetAccountUsers(GetAccountUsersRequest) returns (GetAccountUsersResponse);
   rpc QueryIsUserInAccount(QueryIsUserInAccountRequest)
@@ -358,4 +392,5 @@ service UserService {
   rpc UnsetTenantRole(UnsetTenantRoleRequest) returns (UnsetTenantRoleResponse);
 
   rpc CheckUserNameMatch (CheckUserNameMatchRequest) returns (CheckUserNameMatchResponse);
+  rpc ChangeEmail (ChangeEmailRequest) returns (ChangeEmailResponse);
 }

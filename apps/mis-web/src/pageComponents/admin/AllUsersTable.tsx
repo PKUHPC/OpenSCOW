@@ -18,8 +18,9 @@ import React, { useCallback, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { ChangePasswordModalLink } from "src/components/ChangePasswordModal";
-import { FilterFormContainer } from "src/components/FilterFormContainer";
+import { FilterFormContainer, FilterFormTabs } from "src/components/FilterFormContainer";
 import { PlatformRoleSelector } from "src/components/PlatformRoleSelector";
+import { PlatformRole, SortDirectionType, UsersSortFieldType } from "src/models/User";
 import { GetAllUsersSchema } from "src/pages/api/admin/getAllUsers";
 import { User } from "src/stores/UserStore";
 
@@ -32,10 +33,22 @@ interface PageInfo {
     pageSize?: number;
 }
 
+interface SortInfo {
+  sortField?: UsersSortFieldType;
+  sortOrder?: SortDirectionType;
+};
+
 interface Props {
   refreshToken: boolean;
   user: User;
 }
+
+const filteredRoles = {
+  "ALL_USERS": "所有用户",
+  "PLATFORM_ADMIN": "平台管理员",
+  "PLATFORM_FINANCE": "财务人员",
+};
+type FilteredRole = keyof typeof filteredRoles;
 
 export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
 
@@ -46,19 +59,59 @@ export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
   const [form] = Form.useForm<FilterForm>();
 
   const [pageInfo, setPageInfo] = useState<PageInfo>({ page: 1, pageSize: 10 });
+  const [sortInfo, setSortInfo] = useState<SortInfo>({ sortField: undefined, sortOrder: undefined });
+  const [currentPlatformRole, setCurrentPlatformRole] = useState<PlatformRole | undefined>(undefined);
 
   const promiseFn = useCallback(async () => {
+
     return await api.getAllUsers({ query: {
       page: pageInfo.page,
       pageSize: pageInfo.pageSize,
+      sortField: sortInfo.sortField,
+      sortOrder: sortInfo.sortOrder,
       idOrName: query.idOrName,
+      platformRole: currentPlatformRole,
     } });
-  }, [query, pageInfo]);
-  const { data, isLoading, reload } = useAsync({ promiseFn, watch: refreshToken });
+  }, [query, pageInfo, sortInfo, currentPlatformRole]);
+  const { data, isLoading, reload: reloadAllUsers } = useAsync({ promiseFn, watch: refreshToken });
+
+  const { data: platformUsersCounts, isLoading: isCountLoading, reload: reloadUsersCounts } = useAsync({
+    promiseFn: useCallback(async () => await api.getPlatformUsersCounts({}), [refreshToken]),
+  });
+
+  const roleChangedHandlers = {
+    "ALL_USERS": {
+      setCurrentPlatformRole: () => setCurrentPlatformRole(undefined),
+      getCount: () => platformUsersCounts?.totalCount ?? 0,
+    },
+    "PLATFORM_ADMIN": {
+      setCurrentPlatformRole: () => setCurrentPlatformRole(PlatformRole.PLATFORM_ADMIN),
+      getCount: () => platformUsersCounts?.totalAdminCount ?? 0,
+    },
+    "PLATFORM_FINANCE": {
+      setCurrentPlatformRole: () => setCurrentPlatformRole(PlatformRole.PLATFORM_FINANCE),
+      getCount: () => platformUsersCounts?.totalFinanceCount ?? 0,
+    },
+  };
+
+  const getUsersRoleCount = (role: FilteredRole): number => {
+    return roleChangedHandlers[role].getCount();
+  };
+
+  const handleFilterRoleChange = (role: FilteredRole) => {
+    roleChangedHandlers[role].setCurrentPlatformRole();
+    setPageInfo({ page: 1, pageSize: pageInfo.pageSize });
+    setSortInfo({ sortField: undefined, sortOrder: undefined });
+  };
+
+  const reload = () => {
+    reloadAllUsers();
+    reloadUsersCounts();
+  };
 
   return (
     <div>
-      <FilterFormContainer>
+      <FilterFormContainer style={{ display: "flex", justifyContent: "space-between" }}>
         <Form<FilterForm>
           layout="inline"
           form={form}
@@ -67,6 +120,7 @@ export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
             const { idOrName } = await form.validateFields();
             setQuery({ idOrName: idOrName === "" ? undefined : idOrName });
             setPageInfo({ page: 1, pageSize: pageInfo.pageSize });
+            setSortInfo({ sortField: undefined, sortOrder: undefined });
           }}
         >
           <Form.Item label="用户ID或者姓名" name="idOrName">
@@ -76,12 +130,24 @@ export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
             <Button type="primary" htmlType="submit">搜索</Button>
           </Form.Item>
         </Form>
+        <Space style={{ marginBottom: "-16px" }}>
+          <FilterFormTabs
+            tabs={Object.keys(filteredRoles).map((role) => ({
+              title: `${filteredRoles[role]}(${getUsersRoleCount(role as FilteredRole)})`,
+              key: role,
+            }))}
+            onChange={(value) => handleFilterRoleChange(value as FilteredRole)}
+          />
+        </Space>
+
       </FilterFormContainer>
       <UserInfoTable
         data={data}
         pageInfo={pageInfo}
         setPageInfo={setPageInfo}
-        isLoading={isLoading}
+        sortInfo={sortInfo}
+        setSortInfo={setSortInfo}
+        isLoading={isLoading && isCountLoading}
         reload={reload}
         user={user}
       />
@@ -93,16 +159,27 @@ interface UserInfoTableProps {
   data: Static<typeof GetAllUsersSchema["responses"]["200"]> | undefined;
   pageInfo: PageInfo;
   setPageInfo?: (info: PageInfo) => void;
+  sortInfo: SortInfo;
+  setSortInfo?: (info: SortInfo) => void;
   isLoading: boolean;
   reload: () => void;
   user: User;
 }
 
 const UserInfoTable: React.FC<UserInfoTableProps> = ({
-  data, pageInfo, setPageInfo, isLoading, reload, user,
+  data, pageInfo, setPageInfo, sortInfo, setSortInfo, isLoading, reload, user,
 }) => {
 
   const { message } = App.useApp();
+
+  const handleTableChange = (_, __, sorter) => {
+    if (setSortInfo) {
+      setSortInfo({
+        sortField: sorter.field,
+        sortOrder: sorter.order,
+      });
+    }
+  };
 
   return (
     <>
@@ -118,9 +195,22 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
           onChange: (page, pageSize) => setPageInfo({ page, pageSize }),
         } : false}
         scroll={{ x: true }}
+        onChange={handleTableChange}
       >
-        <Table.Column<PlatformUserInfo> dataIndex="userId" title="用户ID" />
-        <Table.Column<PlatformUserInfo> dataIndex="name" title="姓名" />
+        <Table.Column<PlatformUserInfo>
+          dataIndex="userId"
+          title="用户ID"
+          sorter={true}
+          sortDirections={["ascend", "descend"]}
+          sortOrder={sortInfo.sortField === "userId" ? sortInfo.sortOrder : null}
+        />
+        <Table.Column<PlatformUserInfo>
+          dataIndex="name"
+          title="姓名"
+          sorter={true}
+          sortDirections={["ascend", "descend"]}
+          sortOrder={sortInfo.sortField === "name" ? sortInfo.sortOrder : null}
+        />
         <Table.Column<PlatformUserInfo> dataIndex="tenantName" title="所属租户" />
         <Table.Column<PlatformUserInfo>
           dataIndex="availableAccounts"
@@ -130,6 +220,9 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
         <Table.Column<PlatformUserInfo>
           dataIndex="createTime"
           title="创建时间"
+          sorter={true}
+          sortDirections={["ascend", "descend"]}
+          sortOrder={sortInfo.sortField === "createTime" ? sortInfo.sortOrder : null}
           render={(time: string) => formatDateTime(time)}
         />
         <Table.Column<PlatformUserInfo>
@@ -148,14 +241,12 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
               <ChangePasswordModalLink
                 userId={r.userId}
                 name={r.name}
-                onComplete={async (oldPassword, newPassword) => {
+                onComplete={async (newPassword) => {
                   await api.changePasswordAsPlatformAdmin({ body:{
                     identityId: r.userId,
-                    oldPassword: oldPassword,
                     newPassword: newPassword,
                   } })
                     .httpError(404, () => { message.error("用户不存在"); })
-                    .httpError(412, () => { message.error("原密码错误"); })
                     .httpError(501, () => { message.error("本功能在当前配置下不可用"); })
                     .then(() => { message.success("修改成功"); })
                     .catch(() => { message.error("修改失败"); });

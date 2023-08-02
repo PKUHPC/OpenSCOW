@@ -49,15 +49,21 @@ it("get admin info", async () => {
     name: "admin", userId: "admin_user", email: "admin@admin.com", tenant,
     platformRoles: [PlatformRole.PLATFORM_ADMIN],
   });
+  const financeUser = new User({
+    name: "finance", userId: "finance_user", email: "finance@finance.com", tenant,
+    platformRoles: [PlatformRole.PLATFORM_FINANCE],
+  });
   await em.persistAndFlush(adminUser);
+  await em.persistAndFlush(financeUser);
 
   const info = await asyncClientCall(client, "getAdminInfo", {});
 
   expect(info).toEqual({
     platformAdmins: [adminUser].map((x) => ({ userId: x.userId, userName: x.name })),
+    platformFinancialStaff: [financeUser].map((x) => ({ userId: x.userId, userName: x.name })),
     tenantCount: 2,
     accountCount: 3,
-    userCount: 4,
+    userCount: 5,
   } as GetAdminInfoResponse);
 
 });

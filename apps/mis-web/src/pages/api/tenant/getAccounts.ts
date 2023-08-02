@@ -34,7 +34,6 @@ export type AdminAccountInfo = Static<typeof AdminAccountInfo>;
 
 export const GetAccountsSchema = typeboxRouteSchema({
   method: "GET",
-
   responses: {
     200: Type.Object({
       results: Type.Array(AdminAccountInfo),
@@ -60,7 +59,6 @@ export default typeboxRoute(GetAccountsSchema,
     if (!info) {
       return;
     }
-
     const results = await getAccounts({ tenantName: info.tenant });
 
     return { 200: { results } };

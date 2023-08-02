@@ -36,3 +36,8 @@ systemctl status slurmctld
 sleep 5s
 sacctmgr -i create qos name=low
 sacctmgr -i create qos name=high
+
+
+# 安装适配器
+cp -r /vagrant/adapter /
+cd /adapter && nohup /adapter/scow-slurm-adapter-amd64 > /adapter/server.log 2>&1 &

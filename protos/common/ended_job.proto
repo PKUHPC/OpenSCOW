@@ -1,0 +1,46 @@
+/**
+ * Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
+ * SCOW is licensed under Mulan PSL v2.
+ * You can use this software according to the terms and conditions of the Mulan PSL v2.
+ * You may obtain a copy of Mulan PSL v2 at:
+ *          http://license.coscl.org.cn/MulanPSL2
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+ * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+ * See the Mulan PSL v2 for more details.
+ */
+
+syntax = "proto3";
+
+package scow.common;
+
+import "common/money.proto";
+import "google/protobuf/timestamp.proto";
+
+message JobInfo {
+  uint64 bi_job_index = 1;
+  uint32 id_job = 2;
+  string account = 3;
+  string user = 4;
+  string partition = 5;
+  string nodelist = 6;
+  string job_name = 7;
+  string cluster = 8;
+  google.protobuf.Timestamp time_submit = 9;
+  google.protobuf.Timestamp time_start = 10;
+  google.protobuf.Timestamp time_end = 11;
+  int32 gpu = 12;
+  uint32 cpus_req = 13;
+  uint32 mem_req = 14;
+  uint32 nodes_req = 15;
+  uint32 cpus_alloc = 16;
+  uint32 mem_alloc = 17;
+  uint32 nodes_alloc = 18;
+  uint32 timelimit = 19;
+  uint64 time_used = 20;
+  uint64 time_wait = 21;
+  string qos = 22;
+  google.protobuf.Timestamp record_time = 23;
+  common.Money account_price = 24;
+  common.Money tenant_price = 25;
+}

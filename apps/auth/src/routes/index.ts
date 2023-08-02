@@ -11,7 +11,9 @@
  */
 
 import { getCapabilitiesRoute } from "src/routes/capabilities";
+import { changeEmailRoute } from "src/routes/changeEmail";
 import { changePasswordRoute } from "src/routes/changePassword";
+import { checkPasswordRoute } from "src/routes/checkPassword";
 import { createUserRoute } from "src/routes/createUser";
 import { getUserRoute } from "src/routes/getUser";
 import { logoutRoute } from "src/routes/logout";
@@ -29,4 +31,6 @@ export const routes = [
   logoutRoute,
   getCapabilitiesRoute,
   getUserRoute,
+  changeEmailRoute,
+  checkPasswordRoute,
 ];

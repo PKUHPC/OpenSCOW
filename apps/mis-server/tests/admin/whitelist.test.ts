@@ -15,7 +15,7 @@ import { Server } from "@ddadaal/tsgrpc-server";
 import { ChannelCredentials } from "@grpc/grpc-js";
 import { Loaded } from "@mikro-orm/core";
 import { SqlEntityManager } from "@mikro-orm/mysql";
-import { Decimal } from "@scow/lib-decimal";
+import { Decimal, decimalToMoney } from "@scow/lib-decimal";
 import { AccountServiceClient } from "@scow/protos/build/server/account";
 import { createServer } from "src/app";
 import { charge } from "src/bl/charging";
@@ -152,8 +152,40 @@ it("charges user but don't block account if account is whitelist", async () => {
 
   expect(a.blocked).toBeFalse();
 
-
-
-
 });
 
+it("get whitelisted accounts", async () => {
+
+  const whitelist = new AccountWhitelist({
+    account: a,
+    comment: "",
+    operatorId: "123",
+    time: new Date("2023-01-01T00:00:00.000Z"),
+  });
+
+  await em.persistAndFlush(whitelist);
+
+  a.balance = new Decimal(0);
+  a.whitelist = toRef(whitelist);
+
+  await em.flush();
+
+  const resp = await asyncClientCall(client, "getWhitelistedAccounts", {
+    tenantName: a.tenant.getProperty("name"),
+  });
+
+  expect(resp.accounts).toIncludeSameMembers([
+    {
+      "accountName": "hpca",
+      "ownerId": "1",
+      "ownerName": "AName",
+      "operatorId": "123",
+      "comment": "",
+      "addTime": "2023-01-01T00:00:00.000Z",
+      balance: decimalToMoney(data.accountA.balance),
+    },
+  ]);
+
+  em.clear();
+
+});
