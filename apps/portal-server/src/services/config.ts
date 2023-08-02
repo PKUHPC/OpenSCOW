@@ -29,9 +29,5 @@ export const configServiceServer = plugin((server) => {
       return [reply];
     },
 
-    // TODO after getAvailablePartitions is made in portal, now ignore portal-server build error
-    getAvailablePartitions: async () => {
-      return [];
-    },
   });
 });

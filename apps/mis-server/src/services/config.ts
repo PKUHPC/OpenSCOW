@@ -28,17 +28,5 @@ export const configServiceServer = plugin((server) => {
       return [reply];
     },
 
-    getAvailablePartitions: async ({ request, logger }) => {
-      const { cluster, accountName, userId } = request;
-
-      const reply = await server.ext.clusters.callOnOne(
-        cluster,
-        logger,
-        async (client) => await asyncClientCall(client.config, "getAvailablePartitions", {
-          accountName, userId,
-        }),
-      );
-      return [reply];
-    },
   });
 });

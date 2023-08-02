@@ -394,14 +394,6 @@ export const mockApi: MockApi<typeof api> = {
     }),
   createTenant: async () => ({ createdInAuth: true }),
   validateToken: async () => MOCK_USER_INFO,
-  getAvailablePartitions: async () => ({
-    partitions: [
-      { cores: 123, name: "123", nodes: 123, qos: ["123"], gpus: 10, memMb: 1000 },
-      { cores: 1234, name: "1234", nodes: 1234, qos: ["1234"], gpus: 10, memMb: 1000 },
-      { name : "compute", memMb: 2048, cores:2, gpus:0, nodes: 1, qos: ["normal"], comment: "两个计算节点分区" },
-      { name : "GPU", memMb: 2048, cores:2, gpus:2, nodes: 1, qos: ["normal"], comment: "GPU" },
-    ],
-  }),
 };
 
 export const MOCK_USER_INFO = {

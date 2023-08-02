@@ -344,6 +344,9 @@ importers:
       '@scow/utils':
         specifier: workspace:*
         version: link:../../libs/utils
+      '@scow/rich-error-model':
+        specifier: workspace:*
+        version: link:../../libs/rich-error-model
       '@sinclair/typebox':
         specifier: 0.29.4
         version: 0.29.4

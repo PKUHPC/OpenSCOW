@@ -12,10 +12,11 @@
 
 syntax = "proto3";
 
-package scow.common;
+package scow.server;
 
-message GetClusterConfigRequest {
-  string cluster = 1;
+message GetAvailablePartitionsRequest {
+  string account_name = 1;
+  string user_id = 2;
 }
 
 message Partition {
@@ -34,11 +35,15 @@ message Partition {
   optional string comment = 7;
 }
 
-message GetClusterConfigResponse {
-  repeated Partition partitions = 1;
-  string scheduler_name = 2;
+message ClusterPartitions {
+  string cluster = 1;
+  repeated Partition partitions = 2;
+}
+
+message GetAvailablePartitionsResponse {
+  repeated ClusterPartitions cluster_partitions = 1;
 }
 
 service ConfigService {
-  rpc GetClusterConfig(GetClusterConfigRequest) returns (GetClusterConfigResponse);
+  rpc GetAvailablePartitions(GetAvailablePartitionsRequest) returns (GetAvailablePartitionsResponse);
 }

@@ -13,17 +13,17 @@
 import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { ConfigServiceClient } from "@scow/protos/build/common/config";
+import { ConfigServiceClient as MisConfigServerClient } from "@scow/protos/build/server/config";
 import { JobBillingItem } from "@scow/protos/build/server/job";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
-import { PlatformRole, UserInfo } from "src/models/User";
+import { PlatformRole } from "src/models/User";
 import { getBillingItems } from "src/pages/api/job/getBillingItems";
 import { getClient } from "src/utils/client";
 import { publicConfig, runtimeConfig } from "src/utils/config";
 import { moneyToString } from "src/utils/money";
 
 import { getUserStatus } from "../dashboard/status";
-import { Partition } from "../getAvailablePartitions";
 
 // Cannot use JobBillingTableItem from /components/JobBillingTable
 export const JobBillingTableItem = Type.Object({
@@ -54,6 +54,34 @@ export const JobBillingTableItem = Type.Object({
 });
 export type JobBillingTableItem = Static<typeof JobBillingTableItem>;
 
+export const Partition = Type.Object({
+  name: Type.String(),
+  memMb: Type.Number(),
+  cores: Type.Number(),
+  gpus: Type.Number(),
+  nodes: Type.Number(),
+  qos: Type.Optional(Type.Array(Type.String())),
+  comment: Type.Optional(Type.String()),
+});
+export type Partition = Static<typeof Partition>;
+
+export const ClusterPartitions = Type.Object({
+  cluster: Type.String(),
+  partitions: Type.Array(Partition),
+});
+export type ClusterPartitions = Static<typeof ClusterPartitions>;
+
+
+// get type from value of libs/config/src/clusterTexts.ts/ClusterTextsConfigSchema
+export const ClusterText = Type.Object({
+  clusterComment:Type.Optional(Type.String()),
+  extras: Type.Optional(Type.Array(Type.Object({
+    title: Type.String(),
+    content: Type.String(),
+  }))),
+});
+export type ClusterText = Static<typeof ClusterText>;
+
 export const GetBillingTableSchema = typeboxRouteSchema({
   method: "GET",
 
@@ -64,40 +92,68 @@ export const GetBillingTableSchema = typeboxRouteSchema({
      * Login user can only query the platform default and tenant the user belongs to
      */
     tenant: Type.Optional(Type.String()),
+    userId: Type.Optional(Type.String()),
   }),
 
   responses: {
-    200: Type.Object({ items: Type.Array(JobBillingTableItem) }),
+    200: Type.Object({
+      items: Type.Array(JobBillingTableItem),
+      text: Type.Optional(ClusterText),
+    }),
   },
 });
 
-async function getAvailablePartitionForItems(
-  client: ConfigServiceClient, cluster: string, user: UserInfo): Promise<Partition[]> {
+export async function getAvailablePartitionForItems(
+  userId: string, tenantName: string): Promise<{[cluster: string]: Partition[]}> {
 
-  const statuses = await getUserStatus(user.identityId, user.tenant);
+  const client = getClient(MisConfigServerClient);
+
+  const statuses = await getUserStatus(userId, tenantName);
   const accountNames = Object.keys(statuses.accountStatuses).filter(
     (key) => !statuses.accountStatuses[key].accountBlocked);
 
-  if (!accountNames) { return []; }
+  if (!accountNames) { return {}; }
 
-  const allPartitionsSet = new Set<string>();
-
+  const clusterPartitionsMap: { [cluster: string]: Partition[] } = {};
   for (const accountName of accountNames) {
-    const availablePartitions = await asyncClientCall(client, "getAvailablePartitions",
-      { cluster: cluster, accountName: accountName, userId: user.identityId }).then((resp) => {
-      return resp.partitions;
+
+    const availableCPs = await asyncClientCall(client, "getAvailablePartitions",
+      { accountName: accountName, userId: userId }).then((resp) => {
+      return resp.clusterPartitions;
     });
-    availablePartitions.forEach((partition) => {
-      // 利用new Set()对对象数组转化后的字符串去重
-      const partitionStr = JSON.stringify(partition);
-      allPartitionsSet.add(partitionStr);
+    availableCPs.forEach((cp) => {
+
+      const cluster = cp.cluster;
+      if (!(cluster in clusterPartitionsMap)) {
+        clusterPartitionsMap[cluster] = [];
+      };
+      if (cp.partitions) {
+        clusterPartitionsMap[cluster] = clusterPartitionsMap[cluster].concat(cp.partitions);
+      }
     });
   }
 
-  return Array.from(allPartitionsSet).map((partition) => JSON.parse(partition) as Partition);
+  for (const cluster of Object.keys(clusterPartitionsMap)) {
+    clusterPartitionsMap[cluster] = removeDuplicatesByPName(clusterPartitionsMap[cluster]);
+  }
+
+  return clusterPartitionsMap;
 };
 
-export async function getBillingTableItems(tenantName: string | undefined, user?: UserInfo | undefined) {
+const removeDuplicatesByPName = (partitions: Partition[]): Partition[] => {
+  const uniquePartitions: Partition[] = [];
+  const partitionNames = new Set();
+  partitions.forEach((partition) => {
+    if (!partitionNames.has(partition?.name)) {
+      uniquePartitions.push(partition);
+      partitionNames.add(partition?.name);
+    }
+  });
+  return uniquePartitions;
+};
+
+export async function getBillingTableItems(
+  tenantName: string | undefined, userId?: string | undefined): Promise<JobBillingTableItem[]> {
   const items = (await getBillingItems(tenantName, true)).activeItems;
 
   const pathItemMap = items.reduce((prev, curr) => {
@@ -111,9 +167,11 @@ export async function getBillingTableItems(tenantName: string | undefined, user?
 
   const client = getClient(ConfigServiceClient);
 
+  const clusterPartitions = userId && tenantName ? await getAvailablePartitionForItems(userId, tenantName) : {};
+
   for (const [cluster] of Object.entries(clusters)) {
 
-    const partitions = user ? await getAvailablePartitionForItems(client, cluster, user)
+    const partitions = userId ? clusterPartitions[cluster] ?? []
       : await asyncClientCall(client, "getClusterConfig", { cluster }).then((resp) => resp.partitions);
 
     const partitionCount = partitions.length;
@@ -157,15 +215,17 @@ export async function getBillingTableItems(tenantName: string | undefined, user?
 }
 
 export default /* #__PURE__*/typeboxRoute(GetBillingTableSchema, async (req, res) => {
-  const { tenant } = req.query;
+  const { tenant, userId } = req.query;
 
-  if (tenant) {
-    const auth = authenticate((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN) || (u.tenant === tenant));
-    const info = await auth(req, res);
-    if (!info) { return; }
-  }
+  const auth = authenticate(() => true);
+  const info = await auth(req, res);
+  if (!info) { return; }
 
-  const items = await getBillingTableItems(tenant);
+  const clusterTexts = runtimeConfig.CLUSTER_TEXTS_CONFIG;
+  const text = clusterTexts && tenant ? (clusterTexts[tenant] ?? clusterTexts.default) : undefined;
 
-  return { 200: { items } };
+  const items = info.platformRoles.includes(PlatformRole.PLATFORM_ADMIN)
+    ? await getBillingTableItems(tenant) : await getBillingTableItems(tenant, userId);
+
+  return { 200: { items, text } };
 });
