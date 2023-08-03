@@ -18,7 +18,8 @@ import { TenantPaymentTable } from "src/pageComponents/admin/TenantPaymentTable"
 import { Head } from "src/utils/head";
 
 export const TenantPaymentsPage: NextPage = requireAuth((i) => 
-  i.platformRoles.includes(PlatformRole.PLATFORM_FINANCE),
+  i.platformRoles.includes(PlatformRole.PLATFORM_FINANCE) || 
+  i.platformRoles.includes(PlatformRole.PLATFORM_ADMIN),
 )(() => {
   return (
     <div>
