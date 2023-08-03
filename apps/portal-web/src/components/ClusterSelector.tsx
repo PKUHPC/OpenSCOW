@@ -38,14 +38,14 @@ interface SingleSelectionProps {
   value?: Cluster;
   onChange?: (cluster: Cluster) => void;
   label?: string;
-  clusters?: Cluster[];
+  clusterIds?: string[];
 }
 
 export const SingleClusterSelector: React.FC<SingleSelectionProps> = ({
   value,
   onChange,
   label,
-  clusters,
+  clusterIds,
 }) => {
 
   const { setDefaultCluster } = useStore(DefaultClusterStore);
@@ -62,7 +62,8 @@ export const SingleClusterSelector: React.FC<SingleSelectionProps> = ({
       }
       options={
         (label ? [{ value: label, label, disabled: true }] : [])
-          .concat((clusters || publicConfig.CLUSTERS).map((x) => ({ value: x.id, label: x.name, disabled: false })))
+          .concat((publicConfig.CLUSTERS.filter((x) => clusterIds?.includes(x.id) ?? true))
+            .map((x) => ({ value: x.id, label: x.name, disabled: false })))
       }
       popupMatchSelectWidth={false}
     />

@@ -94,9 +94,9 @@ export const getLoginDesktopEnabled = (cluster: string): boolean => {
 
   const clusterLoginDesktopEnabled = runtimeConfig.CLUSTERS_CONFIG[cluster]?.loginDesktop?.enabled;
 
-  const commonLogindesktopEnabled = runtimeConfig.PORTAL_CONFIG.loginDesktop.enabled;
+  const commonLoginDesktopEnabled = runtimeConfig.PORTAL_CONFIG.loginDesktop.enabled;
 
-  return clusterLoginDesktopEnabled === undefined ? commonLogindesktopEnabled : clusterLoginDesktopEnabled;
+  return clusterLoginDesktopEnabled === undefined ? commonLoginDesktopEnabled : clusterLoginDesktopEnabled;
 };
 
 export type LoginNode = { name: string, address: string }

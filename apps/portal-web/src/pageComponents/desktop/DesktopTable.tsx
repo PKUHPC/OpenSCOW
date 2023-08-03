@@ -144,7 +144,7 @@ export const DesktopTable: React.FC<Props> = ({ loginDesktopEnabledClusters }) =
               onChange={(x) => {
                 router.push({ query: { cluster: x.id } });
               }}
-              clusters={loginDesktopEnabledClusters}
+              clusterIds={loginDesktopEnabledClusters.map((x) => x.id)}
             />
           </Form.Item>
           <Form.Item label="登录节点">
