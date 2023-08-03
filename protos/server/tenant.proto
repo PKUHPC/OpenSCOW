@@ -33,6 +33,13 @@ message GetTenantInfoResponse {
   }
 
   repeated AdminInfo admins = 4;
+
+  message FinancialStaffInfo {
+    string user_id = 1;
+    string user_name = 2;
+  }
+  repeated FinancialStaffInfo financial_staff = 5;
+
 }
 
 message GetTenantsRequest {

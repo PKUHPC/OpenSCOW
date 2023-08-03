@@ -179,6 +179,13 @@ export const mockApi: MockApi<typeof api> = {
         platformRoles: [],
       },
     ],
+
+  }),
+
+  getPlatformUsersCounts: async () => ({
+    totalCount: 4,
+    totalAdminCount: 2,
+    totalFinanceCount: 3,
   }),
 
   userExists: async () => ({
@@ -371,6 +378,7 @@ export const mockApi: MockApi<typeof api> = {
   changeStorageQuota: async () => ({ currentQuota: 10 }),
   queryStorageQuota: async () => ({ currentQuota: 10 }),
   getAccounts: async () => ({ totalCount: mockAccounts.length, results: mockAccounts }),
+  getAllAccounts: async () => ({ totalCount: mockAccounts.length, results: mockAccounts }),
   changeJobTimeLimit: async () => null,
   queryJobTimeLimit: async () => ({ result: 10 }),
   createAccount: async () => { return {}; },
@@ -383,9 +391,11 @@ export const mockApi: MockApi<typeof api> = {
     operatorId: "123",
     ownerId: "123",
     ownerName: "123",
+    balance: numberToMoney(10.5),
   }], totalCount: 1 }),
 
   changePassword: async () => null,
+  changeEmail: async () => null,
   changePasswordAsPlatformAdmin: async () => null,
   changePasswordAsTenantAdmin: async () => null,
   checkPassword: null,

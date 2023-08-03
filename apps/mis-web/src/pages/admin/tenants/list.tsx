@@ -26,8 +26,8 @@ export const showAllTenants: NextPage =
     const [refreshToken, update] = useRefreshToken();
     return (
       <div>
-        <Head title="平台租户列表" />
-        <PageTitle titleText={"平台租户列表"}>
+        <Head title="租户列表" />
+        <PageTitle titleText={"租户列表"}>
           <Space split={<Divider type="vertical" />}>
             <RefreshLink refresh={update} />
           </Space>

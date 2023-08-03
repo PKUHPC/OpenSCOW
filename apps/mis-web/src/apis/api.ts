@@ -21,9 +21,11 @@ import type { GetFetchJobInfoSchema } from "src/pages/api/admin/fetchJobs/getFet
 import type { SetFetchStateSchema } from "src/pages/api/admin/fetchJobs/setFetchState";
 import type { TenantFinancePaySchema } from "src/pages/api/admin/finance/pay";
 import type { GetTenantPaymentsSchema } from "src/pages/api/admin/finance/payments";
+import type { GetAllAccountsSchema } from "src/pages/api/admin/getAllAccounts";
 import type { GetAllTenantsSchema } from "src/pages/api/admin/getAllTenants";
 import type { GetAllUsersSchema } from "src/pages/api/admin/getAllUsers";
 import type { GetClusterUsersSchema } from "src/pages/api/admin/getClusterUsers";
+import type { GetPlatformUsersCountsSchema } from "src/pages/api/admin/getPlatformUsersCounts";
 import type { GetTenantUsersSchema } from "src/pages/api/admin/getTenantUsers";
 import type { ImportUsersSchema } from "src/pages/api/admin/importUsers";
 import type { QueryStorageQuotaSchema } from "src/pages/api/admin/queryStorageQuota";
@@ -56,6 +58,7 @@ import type { GetMissingDefaultPriceItemsSchema } from "src/pages/api/job/getMis
 import type { GetJobInfoSchema } from "src/pages/api/job/jobInfo";
 import type { QueryJobTimeLimitSchema } from "src/pages/api/job/queryJobTimeLimit";
 import type { GetRunningJobsSchema } from "src/pages/api/job/runningJobs";
+import type { ChangeEmailSchema } from "src/pages/api/profile/changeEmail";
 import type { ChangePasswordSchema } from "src/pages/api/profile/changePassword";
 import checkPassword, { CheckPasswordSchema } from "src/pages/api/profile/checkPassword";
 import type { DewhitelistAccountSchema } from "src/pages/api/tenant/accountWhitelist/dewhitelistAccount";
@@ -88,8 +91,10 @@ export const api = {
   setFetchState: apiClient.fromTypeboxRoute<typeof SetFetchStateSchema>("POST", "/api/admin/fetchJobs/setFetchState"),
   tenantFinancePay: apiClient.fromTypeboxRoute<typeof TenantFinancePaySchema>("POST", "/api/admin/finance/pay"),
   getTenantPayments: apiClient.fromTypeboxRoute<typeof GetTenantPaymentsSchema>("GET", "/api/admin/finance/payments"),
+  getPlatformUsersCounts: apiClient.fromTypeboxRoute<typeof GetPlatformUsersCountsSchema>("GET", "/api/admin/getPlatformUsersCounts"),
   getAllTenants: apiClient.fromTypeboxRoute<typeof GetAllTenantsSchema>("GET", "/api/admin/getAllTenants"),
   getAllUsers: apiClient.fromTypeboxRoute<typeof GetAllUsersSchema>("GET", "/api/admin/getAllUsers"),
+  getAllAccounts: apiClient.fromTypeboxRoute<typeof GetAllAccountsSchema>("GET", "/api/admin/getAllAccounts"),
   getClusterUsers: apiClient.fromTypeboxRoute<typeof GetClusterUsersSchema>("GET", "/api/admin/getClusterUsers"),
   getTenantUsers: apiClient.fromTypeboxRoute<typeof GetTenantUsersSchema>("GET", "/api/admin/getTenantUsers"),
   importUsers: apiClient.fromTypeboxRoute<typeof ImportUsersSchema>("POST", "/api/admin/importUsers"),
@@ -124,6 +129,7 @@ export const api = {
   queryJobTimeLimit: apiClient.fromTypeboxRoute<typeof QueryJobTimeLimitSchema>("GET", "/api/job/queryJobTimeLimit"),
   getRunningJobs: apiClient.fromTypeboxRoute<typeof GetRunningJobsSchema>("GET", "/api/job/runningJobs"),
   changePassword: apiClient.fromTypeboxRoute<typeof ChangePasswordSchema>("PATCH", "/api/profile/changePassword"),
+  changeEmail: apiClient.fromTypeboxRoute<typeof ChangeEmailSchema>("PATCH", "/api/profile/changeEmail"),
   dewhitelistAccount: apiClient.fromTypeboxRoute<typeof DewhitelistAccountSchema>("DELETE", "/api/tenant/accountWhitelist/dewhitelistAccount"),
   getWhitelistedAccounts: apiClient.fromTypeboxRoute<typeof GetWhitelistedAccountsSchema>("GET", "/api/tenant/accountWhitelist/getWhitelistedAccounts"),
   whitelistAccount: apiClient.fromTypeboxRoute<typeof WhitelistAccountSchema>("PUT", "/api/tenant/accountWhitelist/whitelistAccount"),

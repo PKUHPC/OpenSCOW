@@ -33,7 +33,7 @@ export const PlatformInfoPage: NextPage<Props> = (props) => {
     return <UnifiedErrorPage code={props.error} />;
   }
 
-  const { platformAdmins, tenantCount, accountCount, userCount } = props;
+  const { platformAdmins, tenantCount, accountCount, userCount, platformFinancialStaff } = props;
 
 
   return (
@@ -44,6 +44,15 @@ export const PlatformInfoPage: NextPage<Props> = (props) => {
         <Descriptions.Item label="平台管理员">
           {
             platformAdmins.map(({ userId, userName }) => (
+              <Tag key={userId}>
+                {userName} (ID: {userId})
+              </Tag>
+            ))
+          }
+        </Descriptions.Item>
+        <Descriptions.Item label="平台财务人员">
+          {
+            platformFinancialStaff.map(({ userId, userName }) => (
               <Tag key={userId}>
                 {userName} (ID: {userId})
               </Tag>
@@ -67,7 +76,7 @@ export const PlatformInfoPage: NextPage<Props> = (props) => {
 export const getServerSideProps: GetServerSideProps<Props> = async (ctx) => {
   const auth = ssrAuthenticate(
     (i) => i.platformRoles.includes(PlatformRole.PLATFORM_FINANCE)
-    || i.platformRoles.includes(PlatformRole.PLATFORM_ADMIN),
+      || i.platformRoles.includes(PlatformRole.PLATFORM_ADMIN),
   );
 
   const info = await auth(ctx.req);
@@ -76,12 +85,15 @@ export const getServerSideProps: GetServerSideProps<Props> = async (ctx) => {
   }
 
   if (USE_MOCK) {
-    return { props: {
-      platformAdmins: [{ userId: "demo_admin", userName: "demo_admin" }],
-      tenantCount: 10,
-      accountCount: 20,
-      userCount: 100,
-    } };
+    return {
+      props: {
+        platformAdmins: [{ userId: "demo_admin", userName: "demo_admin" }],
+        platformFinancialStaff: [{ userId: "demo_admin", userName: "demo_admin" }],
+        tenantCount: 10,
+        accountCount: 20,
+        userCount: 100,
+      },
+    };
   }
 
   const client = getClient(AdminServiceClient);

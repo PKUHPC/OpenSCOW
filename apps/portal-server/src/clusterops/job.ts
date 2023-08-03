@@ -12,7 +12,7 @@
 
 import { ServiceError } from "@ddadaal/tsgrpc-common";
 import { Status } from "@grpc/grpc-js/build/src/constants";
-import { sftpExists, sftpReaddir, sftpReadFile, sftpWriteFile } from "@scow/lib-ssh";
+import { sftpExists, sftpReaddir, sftpReadFile, sftpUnlink, sftpWriteFile } from "@scow/lib-ssh";
 import { join } from "path";
 import { JobOps, JobTemplateInfo } from "src/clusterops/api/job";
 import { portalConfig } from "src/config/portal";
@@ -110,5 +110,45 @@ export const jobOps = (cluster: string): JobOps => {
 
     },
 
+    deleteJobTemplate: async (request, logger) => {
+      const { id, userId } = request;
+
+      return await sshConnect(host, userId, logger, async (ssh) => {
+        const sftp = await ssh.requestSFTP();
+
+        const file = join(portalConfig.savedJobsDir, id);
+
+        if (!await sftpExists(sftp, file)) {
+          throw <ServiceError> { code: Status.NOT_FOUND, message: `Job template id ${id} is not found.` };
+        }
+
+        await sftpUnlink(sftp)(file);
+
+        return {};
+      });
+
+    },
+
+    renameJobTemplate: async (request, logger) => {
+      const { id, userId, jobName } = request;
+
+      return await sshConnect(host, userId, logger, async (ssh) => {
+        const sftp = await ssh.requestSFTP();
+
+        const file = join(portalConfig.savedJobsDir, id);
+
+        if (!await sftpExists(sftp, file)) {
+          throw <ServiceError> { code: Status.NOT_FOUND, message: `Job template id ${id} is not found.` };
+        }
+
+        const content = await sftpReadFile(sftp)(file);
+        const data = JSON.parse(content.toString()) as JobMetadata;
+        data.jobName = jobName;
+
+        await sftpWriteFile(sftp)(file, JSON.stringify(data));
+        return {};
+      });
+
+    },
   };
 };
