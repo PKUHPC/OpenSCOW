@@ -128,7 +128,7 @@ export const ManageJobBillingTable: React.FC<Props> = ({ data, loading, tenant, 
               content={(
                 <div>
                   <p>
-                    {Object.entries(AmountStrategyDescriptions)
+                    {Object.entries({ ...AmountStrategyDescriptions, ...customAmountStrategiesIdToName })
                       .map((value) => <p key={value[0]}>{`${value[1]}(${value[0]})`}</p>)}
                   </p>
                   <a href="https://pkuhpc.github.io/SCOW/docs/info/mis/business/billing">{"细节请查阅文档"}</a>

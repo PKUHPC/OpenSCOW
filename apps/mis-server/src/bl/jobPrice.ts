@@ -12,7 +12,6 @@
 
 import { Logger } from "@ddadaal/tsgrpc-server";
 import { DEFAULT_CONFIG_BASE_PATH } from "@scow/config/build/constants";
-// import { ClusterConfigSchema } from "@scow/config/build/cluster";
 import { Decimal } from "@scow/lib-decimal";
 import { Partition } from "@scow/scheduler-adapter-protos/build/protos/config";
 import { join } from "path";
@@ -21,7 +20,6 @@ import { clusters } from "src/config/clusters";
 import { misConfig } from "src/config/mis";
 import { JobPriceInfo } from "src/entities/JobInfo";
 import { AmountStrategy, JobPriceItem } from "src/entities/JobPriceItem";
-// import { logger } from "src/utils/logger";
 
 
 type AmountStrategyFunc = (info: JobInfo, partition: Partition) => Decimal;

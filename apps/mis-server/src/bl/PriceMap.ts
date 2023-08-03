@@ -13,9 +13,7 @@
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Logger } from "@ddadaal/tsgrpc-server";
 import { MySqlDriver, SqlEntityManager } from "@mikro-orm/mysql";
-import { DEFAULT_CONFIG_BASE_PATH } from "@scow/config/build/constants";
 import { Partition } from "@scow/scheduler-adapter-protos/build/protos/config";
-import { join } from "path";
 import { calculateJobPrice } from "src/bl/jobPrice";
 import { clusters } from "src/config/clusters";
 import { misConfig } from "src/config/mis";
