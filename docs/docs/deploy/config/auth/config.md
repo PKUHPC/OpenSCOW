@@ -8,24 +8,33 @@ title: 内置认证系统配置
 ## UI 配置
 认证系统支持对登录界面部分 UI 进行修改
 
-在`auth.yaml`配置中，可以配置关于登录界面 UI 的部分内容。其中关于背景图片的设置可以参考[公共文件](https://pkuhpc.github.io/SCOW/docs/deploy/config/customization/public-files)进行配置。
+在`auth.yaml`配置中，可以配置关于登录界面 UI 的部分内容。
+
+其中关于背景图片路径的设置可以参考[公共文件](https://pkuhpc.github.io/SCOW/docs/deploy/config/customization/public-files)进行配置。需要强调的是该路径是相对于公共文件的路径。
 ```yaml
 # auth 界面 ui 配置
 ui:
-  # 登录界面背景图
-  backgroundImagePath: "/assets/background.png"
-  # 登录界面背景色，当背景图无法加载时，背景色起效
+  # 登录界面背景图，设置为""(空字符串)则无背景图
+  # 可选配置，默认加载 install.yml 同级的 /public/assets 目录下的 background.png 作为背景图
+  backgroundImagePath: "/__public__/assets/background.png"
+  # 登录界面背景色，当背景图无法加载或者没有时，背景色起效
+  # 可选配置，默认为 #9a0000
   backgroundFallbackColor: "#9a0000"
   # 登录界面 logo 图, light: 亮色模式下的 logo, dark: 黑暗模式下的 logo
+  # 可选配置，默认为黑暗模式 logo
   logoType: "dark"
 
   # 登录界面 slogan 配置
+  # 可选配置，默认右侧无 slogan
   slogan:
     # 登录界面 slogan 文字颜色
+    # 可选配置，默认为白色字体
     color: "white"
-    # 登录界面 slogan title
+    # 登录界面 slogan 标题
+    # 可选配置，默认无 slogan 标题
     title: "开源算力中心门户和管理平台"
     # 多条 slogan 文本
+    # 可选配置，默认 slogan 为空数组
     texts:
       - "图形化界面，使用方便"
       - "功能丰富，管理简单"
