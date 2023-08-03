@@ -159,7 +159,7 @@ export const UiConfigSchema = Type.Object({
     color: Type.String({ description: "默认标语文字颜色", default: "white" }),
     title: Type.String({ description: "默认标语标题", default: "" }),
     texts: Type.Array(Type.String(), { description: "默认 slogan 正文数组", default: []}),
-  }),
+  }, { default: {} }),
 });
 
 export const OtpConfigSchema = Type.Object({
