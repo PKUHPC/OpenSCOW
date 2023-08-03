@@ -16,7 +16,7 @@ import { Status } from "@grpc/grpc-js/build/src/constants";
 import { UserServiceClient } from "@scow/protos/build/server/user";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
-import { PlatformRole, UserRole } from "src/models/User";
+import { PlatformRole, TenantRole, UserRole } from "src/models/User";
 import { getClient } from "src/utils/client";
 import { handlegRPCError } from "src/utils/server";
 
@@ -39,9 +39,13 @@ export const UnsetAdminSchema = typeboxRouteSchema({
 export default typeboxRoute(UnsetAdminSchema, async (req, res) => {
   const { identityId, accountName } = req.body;
 
-  const auth = authenticate((u) =>
-    u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ||
-    u.accountAffiliations.find((x) => x.accountName === accountName)?.role === UserRole.OWNER);
+  const auth = authenticate((u) => {
+    const acccountBelonged = u.accountAffiliations.find((x) => x.accountName === accountName);
+
+    return u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ||
+          (acccountBelonged && acccountBelonged.role !== UserRole.USER) || 
+          u.tenantRoles.includes(TenantRole.TENANT_ADMIN);
+  });
 
   const info = await auth(req, res);
 

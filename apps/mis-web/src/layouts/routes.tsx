@@ -68,6 +68,11 @@ export const platformAdminRoutes: (platformRoles: PlatformRole[]) => NavItemProp
           text: "用户列表",
           path: "/admin/users",
         },
+        {
+          Icon: AccountBookOutlined,
+          text: "账户列表",
+          path: "/admin/accounts",
+        },
       ] : []),
       ...(platformRoles.includes(PlatformRole.PLATFORM_FINANCE) ? [
         {

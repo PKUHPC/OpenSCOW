@@ -121,6 +121,7 @@ export const WhitelistedAccount = Type.Object({
   addTime: Type.Optional(Type.String()),
   operatorId: Type.String(),
   comment: Type.String(),
+  balance: Type.Optional(Money),
 });
 export type WhitelistedAccount = Static<typeof WhitelistedAccount>;
 

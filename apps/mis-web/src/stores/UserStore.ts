@@ -23,6 +23,7 @@ export interface User {
   tenantRoles: TenantRole[];
   platformRoles: PlatformRole[];
   accountAffiliations: AccountAffiliation[];
+  email?: string;
 }
 
 export function UserStore(initialUser: User | undefined = undefined) {

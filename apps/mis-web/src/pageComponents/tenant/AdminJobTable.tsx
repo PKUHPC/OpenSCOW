@@ -49,10 +49,10 @@ interface Props {
 const filterFormToQuery = (query: FilterForm, rangeSearch: boolean): GetJobFilter => {
   return {
     userId: rangeSearch ? (query.userId || undefined) : undefined,
-    accountName: query.accountName || undefined,
-    jobEndTimeStart: query.jobEndTime[0].toISOString(),
-    jobEndTimeEnd: query.jobEndTime[1].toISOString(),
-    jobId: rangeSearch ? undefined : query.jobId,
+    accountName: rangeSearch ? (query.accountName || undefined) : undefined,
+    jobEndTimeStart: rangeSearch ? (query.jobEndTime[0].toISOString()) : undefined,
+    jobEndTimeEnd: rangeSearch ? (query.jobEndTime[1].toISOString()) : undefined,
+    jobId:  !rangeSearch ? (query.jobId || undefined) : undefined,
     clusters: query.clusters?.map((x) => x.id),
   };
 };
@@ -234,7 +234,7 @@ const JobInfoTable: React.FC<JobInfoTableProps> = ({
         </Space>
       </TableTitle>
       <Table
-        rowKey={(i) => i.idJob}
+        rowKey={(i) => i.cluster + i.biJobIndex + i.idJob}
         dataSource={data?.jobs}
         loading={isLoading}
         pagination={setPageInfo ? {
