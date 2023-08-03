@@ -74,27 +74,24 @@ export const platformAdminRoutes: (platformRoles: PlatformRole[]) => NavItemProp
           path: "/admin/accounts",
         },
       ] : []),
-      ...(platformRoles.includes(PlatformRole.PLATFORM_FINANCE) || 
-      platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ? [
+      {
+        Icon: MoneyCollectOutlined,
+        text: "财务管理",
+        path: "/admin/finance",
+        clickable: false,
+        children: [
           {
-            Icon: MoneyCollectOutlined,
-            text: "财务管理",
-            path: "/admin/finance",
-            clickable: false,
-            children: [
-              {
-                Icon: PlusSquareOutlined,
-                text: "租户充值",
-                path: "/admin/finance/pay",
-              },
-              {
-                Icon: BookOutlined,
-                text: "充值记录",
-                path: "/admin/finance/payments",
-              },
-            ],
+            Icon: PlusSquareOutlined,
+            text: "租户充值",
+            path: "/admin/finance/pay",
           },
-        ] : []),
+          {
+            Icon: BookOutlined,
+            text: "充值记录",
+            path: "/admin/finance/payments",
+          },
+        ],
+      },
       {
         Icon: ToolOutlined,
         text: "平台调试",
