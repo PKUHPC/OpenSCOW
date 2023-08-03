@@ -14,7 +14,7 @@ import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
-import { ConfigServiceServer, ConfigServiceService } from "@scow/protos/build/server/config";
+import { ClusterPartitions, ConfigServiceServer, ConfigServiceService } from "@scow/protos/build/server/config";
 import { parseErrorDetails } from "@scow/rich-error-model";
 
 export const misConfigServiceServer = plugin((server) => {
@@ -46,8 +46,9 @@ export const misConfigServiceServer = plugin((server) => {
         if (x.success) {
           return { cluster: x.cluster, partitions: x.result.partitions };
         }
-      });
-      return [{ clusterPartitions: wrappedResult } as any];
+      }) as ClusterPartitions[];
+
+      return [{ clusterPartitions: wrappedResult } ];
     },
   });
 });
