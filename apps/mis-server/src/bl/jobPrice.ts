@@ -21,37 +21,20 @@ import { clusters } from "src/config/clusters";
 import { misConfig } from "src/config/mis";
 import { JobPriceInfo } from "src/entities/JobInfo";
 import { AmountStrategy, JobPriceItem } from "src/entities/JobPriceItem";
-import { logger } from "src/utils/logger";
+// import { logger } from "src/utils/logger";
 
-// import { } from "../../../../dev/vagrant/config/scripts/my-strategy.js";
-
-// type Partition = ClusterConfigSchema["slurm"]["partitions"][number];
 
 type AmountStrategyFunc = (info: JobInfo, partition: Partition) => Decimal;
 type CustomAmountStrategyFunc = (info: JobInfo) => number;
-const customAmountStrategyFuncs: Record<string, CustomAmountStrategyFunc> = {};
-logger.info("customAmountStrategyFuncs %o", customAmountStrategyFuncs);
-if (Array.isArray(misConfig.customAmountStrategies)) {
-  try {
-    for (const item of misConfig.customAmountStrategies) {
-      customAmountStrategyFuncs[item.id] = require(join(DEFAULT_CONFIG_BASE_PATH, "scripts", item.script));
-      logger.info("customAmountStrategyFuncs %s", customAmountStrategyFuncs[item.id]({
-        timeUsed: 200,
-        jobId: 0,
-        cluster: "",
-        partition: "",
-        qos: "",
-        cpusAlloc: 0,
-        gpu: 0,
-        memReq: 0,
-        memAlloc: 0,
-        account: "",
-        tenant: "",
-      }));
-    }
 
-  } catch (error) {
-    logger.error(error);
+const customAmountStrategyFuncs: Record<string, CustomAmountStrategyFunc> = {};
+if (Array.isArray(misConfig.customAmountStrategies)) {
+  for (const item of misConfig.customAmountStrategies) {
+    // 这里不try catch，如有错误，抛出错误并中止服务
+    customAmountStrategyFuncs[item.id] = require(join(DEFAULT_CONFIG_BASE_PATH, "scripts", item.script));
+    if (typeof customAmountStrategyFuncs[item.id] !== "function") {
+      throw new Error(`Custom strategy with id ${item.id} is not a function`);
+    }
   }
 }
 
@@ -112,11 +95,14 @@ export function calculateJobPrice(
 
     const amountFn = amountStrategyFuncs[priceItem.amount] || customAmountStrategyFuncs[priceItem.amount];
 
-    let amount = amountFn ? new Decimal(amountFn(info, partition)) : new Decimal(0);
+    let amount = amountFn ? amountFn(info, partition) : new Decimal(0);
 
-    if (!amountFn) {
-      logger.warn("Unknown AmountStrategy %s. Count as 0.", priceItem.amount);
+    if (!amountFn || isNaN(amount)) {
+      logger.warn("Unknown AmountStrategy %s. Count as 0. Please checkout your custom strategy", priceItem.amount);
     }
+
+    // 对于自定义收费策略返回的值，需要进行类型转换
+    amount = new Decimal(amount);
 
     amount = amount.multipliedBy(time);
 
