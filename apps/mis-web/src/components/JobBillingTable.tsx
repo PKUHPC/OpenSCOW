@@ -10,12 +10,11 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { QuestionCircleOutlined } from "@ant-design/icons";
-import { Popover, Space, Table } from "antd";
+import { Table } from "antd";
 import { ColumnsType } from "antd/es/table";
-import { AmountStrategyAlgorithmDescriptions,
-  AmountStrategyDescription, AmountStrategyDescriptions, AmountStrategyText } from "src/models/job";
 import { publicConfig } from "src/utils/config";
+
+import { AmountStrategyDescriptionsItem } from "./AmonutStrategyDescriptionsItem";
 
 export interface JobBillingTableItem {
   index: number;
@@ -97,36 +96,13 @@ export const JobBillingTable: React.FC<Props> = ({ data, loading }) => {
     {
       dataIndex: "amount",
       title: (
-        <Space>
-          {AmountStrategyText}
-          <Popover
-            title={AmountStrategyDescription}
-            content={(
-              <div>
-                <p>
-                  {Object.entries(AmountStrategyDescriptions)
-                    .map((value) => <p key={value[0]}>{`${value[1]}(${value[0]})`}</p>)}
-                </p>
-                <a href="https://pkuhpc.github.io/SCOW/docs/info/mis/business/billing">{"细节请查阅文档"}</a>
-              </div>
-            )}
-          >
-            <QuestionCircleOutlined />
-          </Popover>
-        </Space>
+        <AmountStrategyDescriptionsItem isColTitle={true} />
       ),
       key: "index",
       render: (_, r) => ({
         children: (
           r.priceItem?.amount ? (
-            <>
-              {AmountStrategyDescriptions[r.priceItem?.amount]}
-              <Popover
-                title={`${AmountStrategyAlgorithmDescriptions[r.priceItem?.amount]}`}
-              >
-                <QuestionCircleOutlined />
-              </Popover>
-            </>
+            <AmountStrategyDescriptionsItem isColContent={true} amount={r.priceItem?.amount} />
           ) : "未定义"
         ),
       }),
