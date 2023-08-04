@@ -11,22 +11,74 @@ title: 通过代码自定义收费规则
 增加配置目录：`config/scripts`，放置您编写计费规则函数的js文件，这些js文件可以是commonjs或者esm的。SCOW通过require("路径")的方式读取这些脚本文件，并在计费的时候调用这个函数。例如，可以增加一个名为my-strategy.js的文件。文件应当默认导出一个如下的函数，返回一个数值：
 
 ```js title="config/scripts/my-strategy.js"
-//  JobInfo为apps/mis-server/src/bl/PriceMap.ts中的JobInfo类型，提供作业的用量信息
-// type MyStrategy = (jobInfo: JobInfo) => number | Promise<number>;
 // 系统自带的计费规则请参考 apps/mis-server/src/bl/jobPrice.ts 文件中的 amountStrategyFuncs
-// 本函数的计费模式：如果作业运行时间小于180s，则不扣费，如果使用了gpu，按照gpu分配量计费，其余的按照cpu分配量计费
+// 本函数的计费模式：如果作业运行时间小于180s，则不扣费，如果使用了gpu，按照gpu分配量计费，
+// 如果otherAsyncRules为true，返回10，其余的按照cpu分配量计费
 function myStrategy(jobInfo) {
-
+  const otherAsyncRules = false;
   if (jobInfo.timeUsed < 180) {
     return 0;
   } else if (info.gpu) {
     return info.gpu;
+  } else if (otherAsyncRules) {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(10);
+      }, 1000); // 模拟异步操作，在 1 秒后返回数值 10
+    });
   }
 
   return info.cpusAlloc;
 }
 
 module.exports = myStrategy;
+```
+
+上述js文件对应的ts类型如下：
+```ts my-strategy.ts"
+
+// 作业的用量信息
+export interface JobInfo {
+  // 集群作业id
+  jobId: number;
+  // scow中的集群id
+  cluster: string;
+  // 分区
+  partition: string;
+  qos: string;
+  // 作业运行时间
+  timeUsed: number;
+  // 分配CPU数tres_alloc
+  cpusAlloc: number;
+  // 使用GPU数。来自gres_req字段
+  gpu: number;
+  // 申请的内存，来自tres_req
+  memReq: number;
+  // 分配的内存,来自tres_alloc
+  memAlloc: number;
+  // 账户
+  account: string;
+  // 租户
+  tenant: string;
+}
+
+export function myStrategy(jobInfo: JobInfo): number | Promise<number> {
+  const otherAsyncRules = false;
+  if (jobInfo.timeUsed < 180) {
+    return 0;
+  } else if (jobInfo.gpu) {
+    return jobInfo.gpu;
+  } else if (otherAsyncRules) {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(10);
+      }, 1000); // 模拟异步操作，在 1 秒后返回数值 10
+    });
+  }
+
+  return jobInfo.cpusAlloc;
+}
+
 ```
 
 ## mis.yaml增加可选配置
@@ -46,7 +98,7 @@ customAmountStrategies:
       # 脚本文件路径，不包含config/scripts前缀，如my-strategy.js即等于config/scripts/my-strategy.js
       # 支持commonjs或者esm，内容不支持动态修改，修改后需重启系统
       # 自定义计量方式的文件应该默认导出一个如下签名的函数:
-      # type CustomAmountStrategyFunction = (jobInfo: JobInfo) => number | Promise<number>;
+      # type MyStrategy = (jobInfo: JobInfo) => number | Promise<number>;
       # JobInfo为apps/mis-server/src/bl/PriceMap.ts中的JobInfo类型，提供作业的用量信息
     script: "my-strategy.js"
 ```
