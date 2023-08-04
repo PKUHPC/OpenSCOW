@@ -26,6 +26,8 @@ type AmountStrategyFunc = (info: JobInfo, partition: Partition) => Decimal;
 type CustomAmountStrategyFunc = (info: JobInfo) => number;
 
 const customAmountStrategyFuncs: Record<string, CustomAmountStrategyFunc> = {};
+console.log("misConfig.customAmountStrategies");
+console.log(misConfig.customAmountStrategies);
 if (Array.isArray(misConfig.customAmountStrategies)) {
   for (const item of misConfig.customAmountStrategies) {
     // 这里不try catch，如有错误，抛出错误并中止服务
@@ -66,10 +68,10 @@ const amountStrategyFuncs: Record<AmountStrategy, AmountStrategyFunc> = {
 };
 
 
-export function calculateJobPrice(
+export async function calculateJobPrice(
   partitionsForClusters: Record<string, Partition[]>,
   info: JobInfo, getPriceItem: PriceMap["getPriceItem"],
-  logger: Logger): JobPriceInfo {
+  logger: Logger): Promise<JobPriceInfo> {
 
   logger.trace(`Calculating price for job ${info.jobId} in cluster ${info.cluster}`);
 
@@ -88,12 +90,12 @@ export function calculateJobPrice(
 
   const path = [info.cluster, info.partition, info.qos] as [string, string, string];
 
-  function calculatePrice(priceItem: JobPriceItem, partition: Partition) {
+  async function calculatePrice(priceItem: JobPriceItem, partition: Partition) {
     const time = new Decimal(info.timeUsed).div(3600); // 秒到小时
 
     const amountFn = amountStrategyFuncs[priceItem.amount] || customAmountStrategyFuncs[priceItem.amount];
 
-    let amount = amountFn ? amountFn(info, partition) : new Decimal(0);
+    let amount = amountFn ? await amountFn(info, partition) : new Decimal(0);
 
     if (!amountFn || isNaN(amount)) {
       logger.warn("Unknown AmountStrategy %s. Count as 0. Please checkout your custom strategy", priceItem.amount);
@@ -111,8 +113,8 @@ export function calculateJobPrice(
   const accountBase = getPriceItem(path, info.tenant);
   const tenantBase = getPriceItem(path);
 
-  const accountPrice = calculatePrice(accountBase, partitionInfo);
-  const tenantPrice = calculatePrice(tenantBase, partitionInfo);
+  const accountPrice = await calculatePrice(accountBase, partitionInfo);
+  const tenantPrice = await calculatePrice(tenantBase, partitionInfo);
 
   return {
     tenant: { billingItemId: tenantBase.itemId, price: tenantPrice },

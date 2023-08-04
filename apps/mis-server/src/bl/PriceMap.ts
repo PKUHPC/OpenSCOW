@@ -42,7 +42,7 @@ export interface PriceMap {
   getPriceItem(path: [string, string, string], tenantName?: string): JobPriceItem;
   getPriceMap(tenantName?: string): Record<string, JobPriceItem>;
 
-  calculatePrice(info: JobInfo): JobPriceInfo;
+  calculatePrice(info: JobInfo): Promise<JobPriceInfo>;
 
   getMissingDefaultPriceItems(): string[];
 }
