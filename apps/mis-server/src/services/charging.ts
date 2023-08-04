@@ -141,13 +141,33 @@ export const chargingServiceServer = plugin((server) => {
 
       return [{ types: result.map((x) => x.type) }];
     },
-
+    /**
+     * 
+     * @param  tenantName
+     * @param  accountName
+     * 不传 allAccounts的情况：
+     * case 1:tenantName为空，accountName为空；此时返回该所有租户充值记录
+     * case 2:tenantName为空，accountName有值；不存在
+     * case 3:tenantName有值，accountName为空；此时返回这个租户（tenantName）的充值记录
+     * case 4:tenantName有值，accountName有值；此时返回该这个租户（tenantName）下这个账户（accountName）的充值记录
+     * 
+     * 传 allAccounts的情况（只存在于tenantName有值的情况）：
+     * case 5:tenantName有值，accountName为空；此时返回这个租户（tenantName）下所有账户的充值记录
+     * case 6:tenantName有值，accountName有值；同case 4
+     * @returns 
+     */
     getPaymentRecords: async ({ request, em }) => {
 
-      const { tenantName, accountName, endTime, startTime } = ensureNotUndefined(request, ["startTime", "endTime"]);
-
+      const { tenantName, accountName, endTime, startTime, allAccount } = 
+      ensureNotUndefined(request, ["startTime", "endTime"]);
       const records = await em.find(PayRecord, {
-        time: { $gte: startTime, $lte: endTime }, accountName,
+        time: { $gte: startTime, $lte: endTime }, 
+        /**
+         * allAccount有值，说明可以获取某个租户下所有账户的记录
+         * 此时accountName若有值，则是获取某个租户下特定账户的记录
+         * accountName若没值，则是获取某个租户下所有账户的记录
+         */
+        ...(allAccount && !accountName) ? { accountName:{ $ne:null } } : { accountName },
         ...tenantName !== undefined ? { tenantName } : {},
       }, { orderBy: { time: QueryOrder.DESC } });
 

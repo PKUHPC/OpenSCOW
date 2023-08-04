@@ -47,6 +47,7 @@ export const GetPaymentsSchema = typeboxRouteSchema({
     endTime: Type.String({ format: "date-time" }),
 
     accountName: Type.Optional(Type.String()),
+    allAccount:Type.Optional(Type.Boolean()),
   }),
 
   responses: {
@@ -59,7 +60,7 @@ export const GetPaymentsSchema = typeboxRouteSchema({
 
 export default typeboxRoute(GetPaymentsSchema, async (req, res) => {
 
-  const { endTime, startTime, accountName } = req.query;
+  const { endTime, startTime, accountName, allAccount } = req.query;
 
   const client = getClient(ChargingServiceClient);
 
@@ -86,6 +87,7 @@ export default typeboxRoute(GetPaymentsSchema, async (req, res) => {
     accountName,
     startTime,
     endTime,
+    allAccount,
   }), ["total"]);
 
   const returnAuditInfo = user.tenantRoles.includes(TenantRole.TENANT_FINANCE) || 

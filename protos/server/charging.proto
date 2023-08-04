@@ -101,6 +101,7 @@ message GetPaymentRecordsRequest {
   google.protobuf.Timestamp end_time = 2;
   optional string tenant_name = 3;
   optional string account_name = 4;
+  optional bool all_account = 5;
 }
 
 message GetPaymentRecordsResponse {

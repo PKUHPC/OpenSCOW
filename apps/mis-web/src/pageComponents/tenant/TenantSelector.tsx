@@ -66,6 +66,7 @@ export const TenantSelector: React.FC<Props> = ({
         disabled={disabled}
         style={{ width: "calc(100% - 32px)", minWidth: "200px" }}
         onChange={(v) => onChange?.(v)}
+        allowClear
       />
       <Tooltip title="刷新租户列表">
         <Button icon={<ReloadOutlined spin={isLoading} />} disabled={disabled} onClick={reload} loading={isLoading} />
