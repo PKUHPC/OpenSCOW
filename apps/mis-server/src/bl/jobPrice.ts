@@ -26,8 +26,7 @@ type AmountStrategyFunc = (info: JobInfo, partition: Partition) => Decimal;
 type CustomAmountStrategyFunc = (info: JobInfo) => number;
 
 const customAmountStrategyFuncs: Record<string, CustomAmountStrategyFunc> = {};
-console.log("misConfig.customAmountStrategies");
-console.log(misConfig.customAmountStrategies);
+
 if (Array.isArray(misConfig.customAmountStrategies)) {
   for (const item of misConfig.customAmountStrategies) {
     // 这里不try catch，如有错误，抛出错误并中止服务
