@@ -110,7 +110,7 @@ message GetAppMetadataRequest {
 message SelectOption {
   string value = 1;
   string label = 2;
-  optional bool require_g_p_u = 3;
+  optional bool require_gpu = 3;
 }
 
 message AppCustomAttribute {

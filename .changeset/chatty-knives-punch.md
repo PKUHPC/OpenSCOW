@@ -3,4 +3,4 @@
 "@scow/grpc-api": patch
 ---
 
-增加 requireGPU 配置项
+增加 requireGpu 配置项

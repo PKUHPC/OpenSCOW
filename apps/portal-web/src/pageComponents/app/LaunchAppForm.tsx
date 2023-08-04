@@ -227,8 +227,8 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
 
     const placeholder = item.placeholder ?? "";
 
-    // 筛选选项：若没有配置requireGPU直接使用，配置了requireGPU项使用与否则看改分区有无GPU
-    const selectOptions = item.select.filter((x) => !x.requireGPU || (x.requireGPU && currentPartitionInfo?.gpus));
+    // 筛选选项：若没有配置requireGpu直接使用，配置了requireGpu项使用与否则看改分区有无GPU
+    const selectOptions = item.select.filter((x) => !x.requireGpu || (x.requireGpu && currentPartitionInfo?.gpus));
     const initialValue = item.type === "SELECT" ? (item.defaultValue ?? selectOptions[0].value) : item.defaultValue;
     
     const inputItem = item.type === "NUMBER" ? (<InputNumber placeholder={placeholder} />)
@@ -240,8 +240,8 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
           />
         );
     
-    // 判断是否配置了RequireGPU选项
-    if (item.type === "SELECT" && item.select.find((i) => i.requireGPU !== undefined)) {
+    // 判断是否配置了requireGpu选项
+    if (item.type === "SELECT" && item.select.find((i) => i.requireGpu !== undefined)) {
       const preValue = form.getFieldValue(item.name);
 
       if (preValue) {
