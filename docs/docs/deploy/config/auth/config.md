@@ -16,7 +16,7 @@ title: 内置认证系统配置
 ui:
   # 登录界面背景图，设置为""(空字符串)则无背景图
   # 可选配置，默认加载 install.yml 同级的 /public/assets 目录下的 background.png 作为背景图
-  backgroundImagePath: "/__public__/assets/background.png"
+  backgroundImagePath: "./assets/background.png"
   # 登录界面背景色，当背景图无法加载或者没有时，背景色起效
   # 可选配置，默认为 #9a0000
   backgroundFallbackColor: "#9a0000"

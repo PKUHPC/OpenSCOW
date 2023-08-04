@@ -152,7 +152,7 @@ export const OtpLdapSchema = Type.Object({
 }, { description: "将otp密钥存在ldap需要配置信息" });
 
 export const UiConfigSchema = Type.Object({
-  backgroundImagePath: Type.String({ description: "默认背景图片", default: "/__public__/assets/background.png" }),
+  backgroundImagePath: Type.String({ description: "默认背景图片", default: "./assets/background.png" }),
   backgroundFallbackColor: Type.String({ description: "默认背景颜色", default: "#9a0000" }),
   logoType: Type.String({ description: "默认图标类型", default: "dark" }),
   slogan: Type.Object({

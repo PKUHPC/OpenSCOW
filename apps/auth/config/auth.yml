@@ -85,7 +85,7 @@ ssh:
 # auth 界面 ui 配置
 ui:
   # 登录界面背景图
-  backgroundImagePath: "/__public__/assets/background.png"
+  backgroundImagePath: "./assets/background.png"
   # 登录界面背景色，当背景图无法加载时，背景色起效
   backgroundFallbackColor: "#9a0000"
   # 登录界面 logo 图, light: 亮色模式下的 logo, dark: 黑暗模式下的 logo
