@@ -25,6 +25,10 @@ export const ScowHookConfigSchema = Type.Object({
   url: Type.String({ description: "SCOW Hook的URL" }),
 }, { description: "SCOW Hook配置" });
 
+export const OperationLogConfigSchema = Type.Object({
+  url: Type.String({ description: "SCOW Operation Log的URL" }),
+});
+
 export const CommonConfigSchema = Type.Object({
   passwordPattern: Type.Object({
     regex: Type.String({
@@ -39,12 +43,14 @@ export const CommonConfigSchema = Type.Object({
 
   scowHook: Type.Optional(ScowHookConfigSchema),
   scowApi: Type.Optional(ScowApiConfigSchema),
+  scowOperationLog: Type.Optional(OperationLogConfigSchema),
 });
 
 const COMMON_CONFIG_NAME = "common";
 
 export type ScowHookConfigSchema = Static<typeof ScowHookConfigSchema>;
 export type ScowApiConfigSchema = Static<typeof ScowApiConfigSchema>;
+export type OperationLogConfigSchema = Static<typeof OperationLogConfigSchema>;
 export type CommonConfigSchema = Static<typeof CommonConfigSchema>;
 
 export const getCommonConfig: GetConfigFn<CommonConfigSchema> = (baseConfigPath) =>

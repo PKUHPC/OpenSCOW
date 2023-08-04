@@ -1,9 +1,5 @@
 lockfileVersion: '6.0'
 
-settings:
-  autoInstallPeers: true
-  excludeLinksFromLockfile: false
-
 importers:
 
   .:
@@ -408,6 +404,9 @@ importers:
       '@scow/lib-decimal':
         specifier: workspace:*
         version: link:../../libs/decimal
+      '@scow/lib-operation-log':
+        specifier: workspace:*
+        version: link:../../libs/operation-log
       '@scow/lib-web':
         specifier: workspace:*
         version: link:../../libs/web
@@ -511,6 +510,55 @@ importers:
       webpack:
         specifier: 5.88.1
         version: 5.88.1
+
+  apps/operation-log:
+    dependencies:
+      '@ddadaal/tsgrpc-common':
+        specifier: 0.2.3
+        version: 0.2.3
+      '@ddadaal/tsgrpc-server':
+        specifier: 0.19.2
+        version: 0.19.2(@grpc/grpc-js@1.8.18)
+      '@grpc/grpc-js':
+        specifier: 1.8.18
+        version: 1.8.18
+      '@mikro-orm/cli':
+        specifier: 5.7.13
+        version: 5.7.13(@mikro-orm/mariadb@5.7.13)(@mikro-orm/migrations@5.7.13)(@mikro-orm/mysql@5.7.13)(@mikro-orm/seeder@5.7.13)
+      '@mikro-orm/core':
+        specifier: 5.7.13
+        version: 5.7.13(@mikro-orm/mariadb@5.7.13)(@mikro-orm/migrations@5.7.13)(@mikro-orm/mysql@5.7.13)(@mikro-orm/seeder@5.7.13)
+      '@mikro-orm/migrations':
+        specifier: 5.7.13
+        version: 5.7.13(@mikro-orm/core@5.7.13)
+      '@mikro-orm/mysql':
+        specifier: 5.7.13
+        version: 5.7.13(@mikro-orm/core@5.7.13)(@mikro-orm/migrations@5.7.13)(@mikro-orm/seeder@5.7.13)
+      '@scow/config':
+        specifier: workspace:*
+        version: link:../../libs/config
+      '@scow/lib-config':
+        specifier: workspace:*
+        version: link:../../libs/libconfig
+      '@scow/lib-decimal':
+        specifier: workspace:*
+        version: link:../../libs/decimal
+      '@scow/protos':
+        specifier: workspace:*
+        version: link:../../libs/protos/scow
+      '@scow/utils':
+        specifier: workspace:*
+        version: link:../../libs/utils
+      pino:
+        specifier: 8.14.1
+        version: 8.14.1
+      pino-pretty:
+        specifier: 10.0.1
+        version: 10.0.1
+    devDependencies:
+      '@types/google-protobuf':
+        specifier: 3.15.6
+        version: 3.15.6
 
   apps/portal-server:
     dependencies:
@@ -938,6 +986,28 @@ importers:
       '@types/js-yaml':
         specifier: 4.0.5
         version: 4.0.5
+      ts-log:
+        specifier: 2.2.5
+        version: 2.2.5
+
+  libs/operation-log:
+    dependencies:
+      '@ddadaal/tsgrpc-client':
+        specifier: 0.17.5
+        version: 0.17.5(@grpc/grpc-js@1.8.18)
+      '@grpc/grpc-js':
+        specifier: 1.8.18
+        version: 1.8.18
+      '@scow/protos':
+        specifier: workspace:*
+        version: link:../protos/scow
+      bignumber.js:
+        specifier: 9.1.1
+        version: 9.1.1
+    devDependencies:
+      '@scow/config':
+        specifier: workspace:*
+        version: link:../config
       ts-log:
         specifier: 2.2.5
         version: 2.2.5
@@ -7904,7 +7974,7 @@ packages:
   /acorn-globals@7.0.1:
     resolution: {integrity: sha512-umOSDSDrfHbTNPuNpC2NSnnA3LUrqpevPb4T9jRx4MagXNS0rs+gwiTcAvqCRmsD6utzsrzNt+ebm00SNWiC3Q==}
     dependencies:
-      acorn: 8.8.1
+      acorn: 8.10.0
       acorn-walk: 8.2.0
     dev: true
 
@@ -7926,7 +7996,7 @@ packages:
     resolution: {integrity: sha512-75lAs9H19ldmW+fAbyqHdjgdCrz0pWGXKmnqFoh8PyVd1L2RIb4RzYrSjmopeqv3E1G3/Pimu6GgLlrGbrkF7w==}
     engines: {node: '>=0.4.0'}
     dependencies:
-      acorn: 8.8.1
+      acorn: 8.10.0
     dev: false
 
   /acorn-walk@8.2.0:
@@ -9413,7 +9483,7 @@ packages:
     peerDependencies:
       webpack: ^5.1.0
     dependencies:
-      fast-glob: 3.2.12
+      fast-glob: 3.3.0
       glob-parent: 6.0.2
       globby: 13.2.2
       normalize-path: 3.0.0
@@ -18510,7 +18580,7 @@ packages:
     hasBin: true
     dependencies:
       '@jridgewell/source-map': 0.3.2
-      acorn: 8.8.1
+      acorn: 8.10.0
       commander: 2.20.3
       source-map-support: 0.5.21
 
@@ -19508,7 +19578,7 @@ packages:
     engines: {node: '>=6.0'}
     hasBin: true
     dependencies:
-      acorn: 8.8.1
+      acorn: 8.10.0
       acorn-walk: 8.2.0
     dev: true
 
@@ -20182,3 +20252,7 @@ packages:
     name: tiny-inflate
     version: 1.0.3
     dev: false
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false

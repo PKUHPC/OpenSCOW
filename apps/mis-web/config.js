@@ -14,6 +14,7 @@ const { envConfig, str, bool } = require("@scow/lib-config");
 const { getClusterConfigs } = require("@scow/config/build/cluster");
 const { getMisConfig } = require("@scow/config/build/mis");
 const { getCommonConfig } = require("@scow/config/build/common");
+const { getOperationLogConfig } = require("@scow/config/build/operationLog");
 const { getClusterTextsConfig } = require("@scow/config/build/clusterTexts");
 const { DEFAULT_PRIMARY_COLOR, getUiConfig } = require("@scow/config/build/ui");
 const { PHASE_DEVELOPMENT_SERVER, PHASE_PRODUCTION_BUILD, PHASE_PRODUCTION_SERVER } = require("next/constants");
@@ -87,6 +88,7 @@ const buildRuntimeConfig = async (phase, basePath) => {
   const misConfig = getMisConfig(configBasePath, console);
 
   const commonConfig = getCommonConfig(configBasePath, console);
+  const operationLog = getOperationLogConfig(configBasePath, console);
 
   const versionTag = readVersionFile()?.tag;
 
@@ -102,6 +104,7 @@ const buildRuntimeConfig = async (phase, basePath) => {
     DEFAULT_PRIMARY_COLOR,
     SERVER_URL: config.SERVER_URL,
     SCOW_API_AUTH_TOKEN: commonConfig.scowApi?.auth?.token,
+    OPERATION_LOG_CONFIG: operationLog,
   };
 
   /**

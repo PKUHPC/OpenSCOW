@@ -12,6 +12,7 @@
 
 import type { ClusterConfigSchema } from "@scow/config/build/cluster";
 import type { ClusterTextsConfigSchema } from "@scow/config/build/clusterTexts";
+import { OperationLogConfigSchema } from "@scow/config/build/common";
 import type { MisConfigSchema } from "@scow/config/build/mis";
 import type { UiConfigSchema } from "@scow/config/build/ui";
 import getConfig from "next/config";
@@ -29,6 +30,8 @@ export interface ServerRuntimeConfig {
   CLUSTER_TEXTS_CONFIG: ClusterTextsConfigSchema;
 
   SCOW_API_AUTH_TOKEN?: string;
+
+  OPERATION_LOG_CONFIG: OperationLogConfigSchema | undefined;
 }
 
 export interface PublicRuntimeConfig {

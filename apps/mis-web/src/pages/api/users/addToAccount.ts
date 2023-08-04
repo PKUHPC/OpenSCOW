@@ -18,6 +18,7 @@ import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { PlatformRole, TenantRole, UserRole } from "src/models/User";
 import { checkNameMatch } from "src/server/checkIdNameMatch";
+import { createOperationLog } from "src/server/operationLog";
 import { getClient } from "src/utils/client";
 import { handlegRPCError } from "src/utils/server";
 
@@ -57,7 +58,7 @@ export default /* #__PURE__*/typeboxRoute(AddUserToAccountSchema, async (req, re
     const acccountBelonged = u.accountAffiliations.find((x) => x.accountName === accountName);
 
     return u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ||
-          (acccountBelonged && acccountBelonged.role !== UserRole.USER) || 
+          (acccountBelonged && acccountBelonged.role !== UserRole.USER) ||
           u.tenantRoles.includes(TenantRole.TENANT_ADMIN);
   });
 
@@ -79,11 +80,14 @@ export default /* #__PURE__*/typeboxRoute(AddUserToAccountSchema, async (req, re
   // call ua service to add user
   const client = getClient(UserServiceClient);
 
+
   return await asyncClientCall(client, "addUserToAccount", {
     tenantName: info.tenant,
     accountName,
     userId: identityId,
-  }).then(() => ({ 204: null }))
+  }).then(() => {
+    return { 204: null };
+  })
     .catch(handlegRPCError({
       [Status.ALREADY_EXISTS]: () => ({ 409: null }),
       [Status.NOT_FOUND]: () => ({ 404: { code: "ACCOUNT_NOT_FOUND" as const } }),
