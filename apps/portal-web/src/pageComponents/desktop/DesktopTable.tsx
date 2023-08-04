@@ -53,7 +53,7 @@ export const DesktopTable: React.FC<Props> = ({ loginDesktopEnabledClusters }) =
   const clusterQuery = queryToString(router.query.cluster);
   const loginQuery = queryToString(router.query.loginNode);
   // 如果默认集群没开启登录节点桌面功能，则取开启此功能的某一集群为默认集群。
-  const enabledDefaultCluster = loginDesktopEnabledClusters.includes(defaultCluster)
+  const enabledDefaultCluster = loginDesktopEnabledClusters.find((x) => x.id === defaultCluster.id)
     ? defaultCluster
     : loginDesktopEnabledClusters[0];
   const cluster = publicConfig.CLUSTERS.find((x) => x.id === clusterQuery) ?? enabledDefaultCluster;
