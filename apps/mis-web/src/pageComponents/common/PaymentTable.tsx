@@ -19,7 +19,9 @@ import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { AccountSelector } from "src/pageComponents/finance/AccountSelector";
-import { TenantSelector } from "src/pageComponents/tenant/TenantSelector";
+import { TenantSelector } from "src/pageComponents/tenant/TenantSelector"; 
+import { PaymentInfo } from "src/pages/api/finance/payments"; ;
+import { TenantPaymentInfo } from "src/pages/api/admin/finance/payments"; ;
 
 export enum nameType {
     account = "账户",
@@ -80,9 +82,7 @@ export const PaymentTable: React.FC<Props> = ({
             query: { ...param, accountName:query.name || undefined },
           });
         }
-
       }
-
     }, [query]),
   });
 
@@ -148,12 +148,12 @@ export const PaymentTable: React.FC<Props> = ({
       >
         {
           showAccountName ? (
-            <Table.Column dataIndex="accountName" title="账户" />
+            <Table.Column<PaymentInfo> dataIndex="accountName" title="账户" />
           ) : undefined
         }
         {
           showTenantName ? (
-            <Table.Column dataIndex="tenantName" title="租户" />
+            <Table.Column<TenantPaymentInfo> dataIndex="tenantName" title="租户" />
           ) : undefined
         }
         <Table.Column dataIndex="time" title="交费日期" render={(v) => formatDateTime(v)} />
