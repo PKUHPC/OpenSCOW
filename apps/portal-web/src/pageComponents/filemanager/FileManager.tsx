@@ -100,7 +100,6 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
 
   const loginNodes = useStore(LoginNodeStore);
   const loginNode = loginNodes[cluster.id][0].name;
-  // const filePath = path.split("/").slice(2).join("/");
 
   const reload = async (signal?: AbortSignal) => {
     setLoading(true);
