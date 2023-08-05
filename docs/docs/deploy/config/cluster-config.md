@@ -13,6 +13,9 @@ title: 集群配置文件
 # 集群显示名称
 displayName: hpc01Name
 
+# 集群选择时排序的优先级，数字越小优先级越高，默认优先级最低
+priority: 0
+
 # 调度器适配器地址(ip地址:端口号)
 adapterUrl: localhost:8972
 

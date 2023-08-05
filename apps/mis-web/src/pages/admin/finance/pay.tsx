@@ -19,7 +19,8 @@ import { TenantChargeForm } from "src/pageComponents/admin/TenantChargeForm";
 import { Head } from "src/utils/head";
 
 export const TenantFinancePayPage: NextPage = requireAuth(
-  (i) => i.platformRoles.includes(PlatformRole.PLATFORM_FINANCE))(
+  (i) => i.platformRoles.includes(PlatformRole.PLATFORM_FINANCE) || 
+      i.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))(
   () => {
     return (
       <div>

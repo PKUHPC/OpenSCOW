@@ -41,6 +41,7 @@ export function createMenuItems(
         onTitleClick:(route.clickable ?? parentClickable)
           ? () => {
             const target = route.clickToPath ?? route.path;
+            route.handleClick?.();
             if (route.openInNewPage) {
               window.open(target);
             } else {
@@ -61,6 +62,9 @@ export function createMenuItems(
           {route.text}
         </Link>
       ),
+      onClick: () => {
+        route.handleClick?.();
+      },
     } as ItemType;
   }
 

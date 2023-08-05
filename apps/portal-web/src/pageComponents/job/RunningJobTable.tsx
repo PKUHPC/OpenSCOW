@@ -23,7 +23,6 @@ import { runningJobId, RunningJobInfo } from "src/models/job";
 import { RunningJobDrawer } from "src/pageComponents/job/RunningJobDrawer";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { Cluster } from "src/utils/config";
-
 interface FilterForm {
   jobId: number | undefined;
   cluster: Cluster;
@@ -34,18 +33,16 @@ interface Props {
 }
 
 
-
-
 export const RunningJobQueryTable: React.FC<Props> = ({
   userId,
 }) => {
 
-  const defaultClusterStore = useStore(DefaultClusterStore);
+  const { defaultCluster } = useStore(DefaultClusterStore);
 
   const [query, setQuery] = useState<FilterForm>(() => {
     return {
       jobId: undefined,
-      cluster: defaultClusterStore.cluster,
+      cluster: defaultCluster,
     };
   });
 

@@ -16,6 +16,7 @@ import { Money } from "@scow/protos/build/common/money";
 import { App, Form, Input, InputNumber, Modal, Popover, Select, Space, Table, Tooltip } from "antd";
 import React, { useState } from "react";
 import { api } from "src/apis";
+import { AmountStrategyDescriptionsItem } from "src/components/AmonutStrategyDescriptionsItem";
 import { CommonModalProps, ModalLink } from "src/components/ModalLink";
 import { AmountStrategy, AmountStrategyAlgorithmDescriptions,
   AmountStrategyDescription,
@@ -78,12 +79,7 @@ export const ManageJobBillingTable: React.FC<Props> = ({ data, loading, tenant, 
               dataIndex={["priceItem", "amountStrategy"]}
               render={(value) => {
                 return (
-                  <Space>
-                    {AmountStrategyDescriptions[value]}
-                    <Popover title={`${AmountStrategyAlgorithmDescriptions[value]}`}>
-                      <QuestionCircleOutlined />
-                    </Popover>
-                  </Space>
+                  <AmountStrategyDescriptionsItem isColContent={true} amount={value} />
                 );
               }}
             />
@@ -121,37 +117,14 @@ export const ManageJobBillingTable: React.FC<Props> = ({ data, loading, tenant, 
       <Table.Column title="计费价格编号" dataIndex={["priceItem", "itemId"]} />
       <Table.Column
         title={(
-          <Space>
-            {AmountStrategyText}
-            <Popover
-              title={AmountStrategyDescription}
-              content={(
-                <div>
-                  <p>
-                    {Object.entries({ ...AmountStrategyDescriptions, ...customAmountStrategiesIdToName })
-                      .map((value) => <p key={value[0]}>{`${value[1]}(${value[0]})`}</p>)}
-                  </p>
-                  <a href="https://pkuhpc.github.io/SCOW/docs/info/mis/business/billing">{"细节请查阅文档"}</a>
-                </div>
-              )}
-            >
-              <QuestionCircleOutlined />
-            </Popover>
-          </Space>
+          <AmountStrategyDescriptionsItem isColTitle={true} />
         )}
         dataIndex={["priceItem", "amountStrategy"]}
         render={(value) => {
           return (
             value ?
               (
-                <Space>
-                  { { ...AmountStrategyDescriptions, ...customAmountStrategiesIdToName }[value]}
-                  <Popover title={`${{ ...AmountStrategyAlgorithmDescriptions,
-                    ...customAmountStrategiesIdToDescription }[value]}`}
-                  >
-                    <QuestionCircleOutlined />
-                  </Popover>
-                </Space>
+                <AmountStrategyDescriptionsItem isColContent={true} amount={value} />
               ) : undefined
           );
         }}

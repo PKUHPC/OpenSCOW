@@ -11,8 +11,10 @@
  */
 
 import { Select } from "antd";
+import dynamic from "next/dynamic";
+import { useStore } from "simstate";
+import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { Cluster, publicConfig } from "src/utils/config";
-
 
 interface Props {
   value?: Cluster[];
@@ -36,24 +38,32 @@ interface SingleSelectionProps {
   value?: Cluster;
   onChange?: (cluster: Cluster) => void;
   label?: string;
-  clusters?: Cluster[];
+  clusterIds?: string[];
 }
 
 export const SingleClusterSelector: React.FC<SingleSelectionProps> = ({
   value,
   onChange,
   label,
-  clusters,
+  clusterIds,
 }) => {
+
+  const { setDefaultCluster } = useStore(DefaultClusterStore);
+
   return (
     <Select
       labelInValue
       placeholder="请选择集群"
       value={value ? ({ value: value.id, label: value.name }) : undefined}
-      onChange={({ value, label }) => onChange?.({ id: value, name: label })}
+      onChange={({ value, label }) => {
+        onChange?.({ id: value, name: label });
+        setDefaultCluster({ id: value, name: label });
+      }
+      }
       options={
         (label ? [{ value: label, label, disabled: true }] : [])
-          .concat((clusters || publicConfig.CLUSTERS).map((x) => ({ value: x.id, label: x.name, disabled: false })))
+          .concat((publicConfig.CLUSTERS.filter((x) => clusterIds?.includes(x.id) ?? true))
+            .map((x) => ({ value: x.id, label: x.name, disabled: false })))
       }
       popupMatchSelectWidth={false}
     />
