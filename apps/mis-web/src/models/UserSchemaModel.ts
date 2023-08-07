@@ -78,8 +78,8 @@ export type ImportUsersData = Static<typeof ImportUsersData>;
 export const AccountStatus = Type.Object({
   userStatus: Type.Enum(UserStatus),
   accountBlocked: Type.Boolean(),
-  jobChargeLimit: Type.Optional(Type.Union([Money, Type.Undefined()])),
-  usedJobCharge: Type.Optional(Type.Union([Money, Type.Undefined()])),
+  jobChargeLimit: Type.Optional(Money),
+  usedJobCharge: Type.Optional(Money),
   balance: Type.Optional(Money),
 });
 export type AccountStatus = Static<typeof AccountStatus>;

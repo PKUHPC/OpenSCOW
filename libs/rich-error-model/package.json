@@ -20,7 +20,7 @@
   },
   "devDependencies": {
     "ts-proto": "1.156.2",
-    "@ddadaal/tsgrpc-server": "0.19.3",
+    "@ddadaal/tsgrpc-server": "0.19.4",
     "@ddadaal/tsgrpc-common": "0.2.4",
     "@ddadaal/tsgrpc-client": "0.17.6",
     "@scow/protos": "workspace:*"

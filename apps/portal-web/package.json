@@ -30,7 +30,7 @@
     "@codemirror/language": "6.8.0",
     "@codemirror/legacy-modes": "6.3.3",
     "@codemirror/view": "6.16.0",
-    "@ddadaal/next-typed-api-routes-runtime": "0.8.1",
+    "@ddadaal/next-typed-api-routes-runtime": "0.8.2",
     "@ddadaal/tsgrpc-client": "0.17.6",
     "@ddadaal/tsgrpc-common": "0.2.4",
     "@grpc/grpc-js": "1.9.0",
@@ -72,7 +72,7 @@
     "xterm-addon-fit": "0.7.0"
   },
   "devDependencies": {
-    "@ddadaal/next-typed-api-routes-cli": "0.9.0",
+    "@ddadaal/next-typed-api-routes-cli": "0.9.1",
     "@next/bundle-analyzer": "13.4.13",
     "@testing-library/jest-dom": "5.17.0",
     "@testing-library/react": "14.0.0",

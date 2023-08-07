@@ -288,8 +288,8 @@ importers:
         specifier: 0.2.4
         version: 0.2.4
       '@ddadaal/tsgrpc-server':
-        specifier: 0.19.3
-        version: 0.19.3(@grpc/grpc-js@1.9.0)
+        specifier: 0.19.4
+        version: 0.19.4(@grpc/grpc-js@1.9.0)
       '@grpc/grpc-js':
         specifier: 1.9.0
         version: 1.9.0
@@ -385,8 +385,8 @@ importers:
         specifier: 5.2.5
         version: 5.2.5(react-dom@18.2.0)(react@18.2.0)
       '@ddadaal/next-typed-api-routes-runtime':
-        specifier: 0.8.1
-        version: 0.8.1(@sinclair/typebox@0.30.4)(next@13.4.13)(zod@3.21.4)
+        specifier: 0.8.2
+        version: 0.8.2(@sinclair/typebox@0.30.4)(next@13.4.13)(zod@3.21.4)
       '@ddadaal/tsgrpc-client':
         specifier: 0.17.6
         version: 0.17.6(@grpc/grpc-js@1.9.0)
@@ -476,8 +476,8 @@ importers:
         version: 5.1.6
     devDependencies:
       '@ddadaal/next-typed-api-routes-cli':
-        specifier: 0.9.0
-        version: 0.9.0
+        specifier: 0.9.1
+        version: 0.9.1
       '@next/bundle-analyzer':
         specifier: 13.4.13
         version: 13.4.13
@@ -521,8 +521,8 @@ importers:
         specifier: 0.2.4
         version: 0.2.4
       '@ddadaal/tsgrpc-server':
-        specifier: 0.19.3
-        version: 0.19.3(@grpc/grpc-js@1.9.0)
+        specifier: 0.19.4
+        version: 0.19.4(@grpc/grpc-js@1.9.0)
       '@grpc/grpc-js':
         specifier: 1.9.0
         version: 1.9.0
@@ -621,8 +621,8 @@ importers:
         specifier: 6.16.0
         version: 6.16.0
       '@ddadaal/next-typed-api-routes-runtime':
-        specifier: 0.8.1
-        version: 0.8.1(@sinclair/typebox@0.30.4)(next@13.4.13)(zod@3.21.4)
+        specifier: 0.8.2
+        version: 0.8.2(@sinclair/typebox@0.30.4)(next@13.4.13)(zod@3.21.4)
       '@ddadaal/tsgrpc-client':
         specifier: 0.17.6
         version: 0.17.6(@grpc/grpc-js@1.9.0)
@@ -739,8 +739,8 @@ importers:
         version: 0.7.0(xterm@5.2.1)
     devDependencies:
       '@ddadaal/next-typed-api-routes-cli':
-        specifier: 0.9.0
-        version: 0.9.0
+        specifier: 0.9.1
+        version: 0.9.1
       '@next/bundle-analyzer':
         specifier: 13.4.13
         version: 13.4.13
@@ -804,8 +804,8 @@ importers:
         specifier: 0.2.4
         version: 0.2.4
       '@ddadaal/tsgrpc-server':
-        specifier: 0.19.3
-        version: 0.19.3(@grpc/grpc-js@1.9.0)
+        specifier: 0.19.4
+        version: 0.19.4(@grpc/grpc-js@1.9.0)
       '@grpc/grpc-js':
         specifier: 1.9.0
         version: 1.9.0
@@ -996,8 +996,8 @@ importers:
         specifier: 0.2.4
         version: 0.2.4
       '@ddadaal/tsgrpc-server':
-        specifier: 0.19.3
-        version: 0.19.3(@grpc/grpc-js@1.9.0)
+        specifier: 0.19.4
+        version: 0.19.4(@grpc/grpc-js@1.9.0)
       '@scow/protos':
         specifier: workspace:*
         version: link:../protos/scow
@@ -1030,8 +1030,8 @@ importers:
         specifier: 0.17.6
         version: 0.17.6(@grpc/grpc-js@1.9.0)
       '@ddadaal/tsgrpc-server':
-        specifier: 0.19.3
-        version: 0.19.3(@grpc/grpc-js@1.9.0)
+        specifier: 0.19.4
+        version: 0.19.4(@grpc/grpc-js@1.9.0)
       '@scow/config':
         specifier: workspace:*
         version: link:../config
@@ -4286,18 +4286,18 @@ packages:
       - typescript
     dev: true
 
-  /@ddadaal/next-typed-api-routes-cli@0.9.0:
-    resolution: {integrity: sha512-ymUbdDn3b1RSrHYryDT8EJ4iZByHsQ6mdWHucKL2fVVymYuMJ7QpYPPSjz/7HvWZ8FC7T759CVhrXEEckcf41g==}
+  /@ddadaal/next-typed-api-routes-cli@0.9.1:
+    resolution: {integrity: sha512-BrSB5edjR5wy5CCbxHd4ulNFNoT8OrOccNWOuEDvpKnTUpJuxiylyut5xZBvYhW9cg35CEZUQ9N6E0DhsTjdrQ==}
     hasBin: true
     dependencies:
       ts-json-schema-generator: 1.2.0
       tslib: 2.6.1
-      typescript: 4.9.3
+      typescript: 4.9.5
       yargs: 17.7.2
     dev: true
 
-  /@ddadaal/next-typed-api-routes-runtime@0.8.1(@sinclair/typebox@0.30.4)(next@13.4.13)(zod@3.21.4):
-    resolution: {integrity: sha512-lfFNaCuvx/9UogzwJ6FyJsWr+275y6BR5Old9eoDTJMeb2hlacTKUnSfzt3ItOsjwlAOzfKFkO0yldBaqEHCtg==}
+  /@ddadaal/next-typed-api-routes-runtime@0.8.2(@sinclair/typebox@0.30.4)(next@13.4.13)(zod@3.21.4):
+    resolution: {integrity: sha512-Z0NQqVvrj//1TvLGDezJv+xDIYNo06PdNK15PU3r6MIqiIcDZ5TRlna9d8xeY7cBUKyjrXV6o3DHH5kALG+2LA==}
     peerDependencies:
       '@sinclair/typebox': '>=0.28.13'
       next: '>=11.x'
@@ -4307,9 +4307,9 @@ packages:
       ajv: 8.12.0
       ajv-formats: 2.1.1(ajv@8.12.0)
       ajv-formats-draft2019: 1.6.1(ajv@8.12.0)
-      fast-json-stringify: 5.7.0
+      fast-json-stringify: 5.8.0
       next: 13.4.13(@babel/core@7.22.5)(react-dom@18.2.0)(react@18.2.0)
-      tslib: 2.5.2
+      tslib: 2.6.1
       zod: 3.21.4
     dev: false
 
@@ -4327,14 +4327,14 @@ packages:
     dependencies:
       tslib: 2.6.1
 
-  /@ddadaal/tsgrpc-server@0.19.3(@grpc/grpc-js@1.9.0):
-    resolution: {integrity: sha512-P4xDylCNHnGZdKAsM/4jyzUCWTQlqIqS20ci1YE34AThAih7CKjNrZpZ5uiMg0J35PCuT1H5gzhJYiqn2SqG9A==}
+  /@ddadaal/tsgrpc-server@0.19.4(@grpc/grpc-js@1.9.0):
+    resolution: {integrity: sha512-o3qPM7S5+CNzyhlIY8x38qR+54IoTdYbIEii76fOuUpMUl6jsyPXebELaME4Szui1mpGfmqZb3vEE87BxBGHAA==}
     peerDependencies:
       '@grpc/grpc-js': '>=1.7.0'
     dependencies:
       '@ddadaal/tsgrpc-common': 0.2.4
       '@grpc/grpc-js': 1.9.0
-      pino: 8.14.2
+      pino: 8.15.0
       tslib: 2.6.1
 
   /@docsearch/css@3.3.0:
@@ -7151,7 +7151,7 @@ packages:
     resolution: {integrity: sha512-Sl/HOqN8NKPmhWo2VBEPm0nvHnu2LL3v9vKo8MEq0EtbJ4eVzGPl41VNPvn5E1i5poMk4/XD8UriLHpJvEP/Nw==}
     dependencies:
       '@types/estree': 1.0.0
-      '@types/json-schema': 7.0.11
+      '@types/json-schema': 7.0.12
 
   /@types/estree@1.0.0:
     resolution: {integrity: sha512-WulqXMDUTYAXCjZnk6JtIHPigp55cVtDgDrO2gHRwhyJto21+1zbVCtOYB2L1F9w4qCQ0rOGWBnBe0FNTiEJIQ==}
@@ -7256,7 +7256,6 @@ packages:
 
   /@types/json-schema@7.0.12:
     resolution: {integrity: sha512-Hr5Jfhc9eYOQNPYO5WLDq/n4jqijdHNlDXjuAQkkt+mWdQR+XJToOHrsD4cPaMXpn6KO7y2+wM8AZEs8VpBLVA==}
-    dev: true
 
   /@types/json5@0.0.29:
     resolution: {integrity: sha512-dRLjCWHYg4oaA77cxO64oO+7JwCwnIzkZPdrrC71jQmQtlhM556pwKo5bUzqvZndkVbeFLIIi+9TC40JNF5hNQ==}
@@ -11057,6 +11056,17 @@ packages:
       rfdc: 1.3.0
     dev: false
 
+  /fast-json-stringify@5.8.0:
+    resolution: {integrity: sha512-VVwK8CFMSALIvt14U8AvrSzQAwN/0vaVRiFFUVlpnXSnDGrSkOAO5MtzyN8oQNjLd5AqTW5OZRgyjoNuAuR3jQ==}
+    dependencies:
+      '@fastify/deepmerge': 1.1.0
+      ajv: 8.12.0
+      ajv-formats: 2.1.1(ajv@8.12.0)
+      fast-deep-equal: 3.1.3
+      fast-uri: 2.1.0
+      rfdc: 1.3.0
+    dev: false
+
   /fast-levenshtein@2.0.6:
     resolution: {integrity: sha512-DCXu6Ifhqcks7TZKY3Hxp3y6qphY5SJZmrWMDrKcERSOXWQdMhU9Ig/PYrzyw/ul9jOIyh0N4M0tbC5hodg8dw==}
 
@@ -11389,7 +11399,7 @@ packages:
         optional: true
     dependencies:
       '@babel/code-frame': 7.22.5
-      '@types/json-schema': 7.0.11
+      '@types/json-schema': 7.0.12
       chalk: 4.1.2
       chokidar: 3.5.3
       cosmiconfig: 6.0.0
@@ -15512,22 +15522,6 @@ packages:
   /pino-std-serializers@6.0.0:
     resolution: {integrity: sha512-mMMOwSKrmyl+Y12Ri2xhH1lbzQxwwpuru9VjyJpgFIH4asSj88F2csdMwN6+M5g1Ll4rmsYghHLQJw81tgZ7LQ==}
 
-  /pino@8.14.2:
-    resolution: {integrity: sha512-zKu9aWeSWTy1JgvxIpZveJKKsAr4+6uNMZ0Vf0KRwzl/UNZA3XjHiIl/0WwqLMkDwuHuDkT5xAgPA2jpKq4whA==}
-    hasBin: true
-    dependencies:
-      atomic-sleep: 1.0.0
-      fast-redact: 3.1.2
-      on-exit-leak-free: 2.1.0
-      pino-abstract-transport: 1.0.0
-      pino-std-serializers: 6.0.0
-      process-warning: 2.2.0
-      quick-format-unescaped: 4.0.4
-      real-require: 0.2.0
-      safe-stable-stringify: 2.4.1
-      sonic-boom: 3.2.0
-      thread-stream: 2.2.0
-
   /pino@8.15.0:
     resolution: {integrity: sha512-olUADJByk4twxccmAxb1RiGKOSvddHugCV3wkqjyv+3Sooa2KLrmXrKEWOKi0XPCLasRR5jBXxioE1jxUa4KzQ==}
     hasBin: true
@@ -15543,7 +15537,6 @@ packages:
       safe-stable-stringify: 2.4.1
       sonic-boom: 3.2.0
       thread-stream: 2.2.0
-    dev: false
 
   /pirates@4.0.5:
     resolution: {integrity: sha512-8V9+HQPupnaXMA23c5hvl69zXvTwTzyAYasnkb0Tts4XvO4CliqONMOnvlq26rkhLC3nWDFBJf73LU1e1VZLaQ==}
@@ -17818,7 +17811,7 @@ packages:
     resolution: {integrity: sha512-0ilKFI6QQF5nxDZLFn2dMjvc4hjg/Wkg7rHd3jK6/A4a1Hl9VFdQWvgB1UMGoU94pad1P/8N7fMcEnLnSiju8A==}
     engines: {node: '>= 8.9.0'}
     dependencies:
-      '@types/json-schema': 7.0.11
+      '@types/json-schema': 7.0.12
       ajv: 6.12.6
       ajv-keywords: 3.5.2(ajv@6.12.6)
     dev: false
@@ -17827,7 +17820,7 @@ packages:
     resolution: {integrity: sha512-SHiNtMOUGWBQJwzISiVYKu82GiV4QYGePp3odlY1tuKO7gPtphAT5R/py0fA6xtbgLL/RvtJZnU9b8s0F1q0Xg==}
     engines: {node: '>= 8.9.0'}
     dependencies:
-      '@types/json-schema': 7.0.11
+      '@types/json-schema': 7.0.12
       ajv: 6.12.6
       ajv-keywords: 3.5.2(ajv@6.12.6)
     dev: false
@@ -17844,7 +17837,7 @@ packages:
     resolution: {integrity: sha512-1edyXKgh6XnJsJSQ8mKWXnN/BVaIbFMLpouRUrXgVq7WYne5kw3MW7UPhO44uRXQSIpTSXoJbmrR2X0w9kUTyg==}
     engines: {node: '>= 12.13.0'}
     dependencies:
-      '@types/json-schema': 7.0.11
+      '@types/json-schema': 7.0.12
       ajv: 8.12.0
       ajv-formats: 2.1.1(ajv@8.12.0)
       ajv-keywords: 5.1.0(ajv@8.12.0)
@@ -18958,7 +18951,7 @@ packages:
     engines: {node: '>=10.0.0'}
     hasBin: true
     dependencies:
-      '@types/json-schema': 7.0.11
+      '@types/json-schema': 7.0.12
       commander: 9.4.1
       glob: 8.0.3
       json5: 2.2.3
@@ -19095,10 +19088,6 @@ packages:
 
   /tslib@2.3.1:
     resolution: {integrity: sha512-77EbyPPpMz+FRFRuAFlWMtmgUWGe9UOG2Z25NqCwiIjRhOf5iKGuzSe5P2w1laq+FkRy4p+PCuVkJSGkzTEKVw==}
-    dev: false
-
-  /tslib@2.5.2:
-    resolution: {integrity: sha512-5svOrSA2w3iGFDs1HibEVBGbDrAY82bFQ3HZ3ixB+88nsbsWQoKqDRb5UBYAUPEzbBn6dAp5gRNXglySbx1MlA==}
     dev: false
 
   /tslib@2.6.1:
@@ -19299,12 +19288,6 @@ packages:
     dependencies:
       is-typedarray: 1.0.0
     dev: false
-
-  /typescript@4.9.3:
-    resolution: {integrity: sha512-CIfGzTelbKNEnLpLdGFgdyKhG23CKdKgQPOBc+OUNrkJ2vr+KSzsSV5kq5iWhEQbok+quxgGzrAtGWCyU7tHnA==}
-    engines: {node: '>=4.2.0'}
-    hasBin: true
-    dev: true
 
   /typescript@4.9.5:
     resolution: {integrity: sha512-1FXk9E2Hm+QzZQ7z+McJiHL4NW1F2EzMu9Nq9i3zAaGqibafqYwCVU6WyWAuyQRRzOlxou8xZSyXLEN8oKj24g==}
