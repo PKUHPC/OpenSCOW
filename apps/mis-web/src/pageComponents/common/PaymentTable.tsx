@@ -14,7 +14,7 @@ import { defaultPresets, formatDateTime } from "@scow/lib-web/build/utils/dateti
 import { useDidUpdateEffect } from "@scow/lib-web/build/utils/hooks";
 import { Button, DatePicker, Form, Table } from "antd";
 import dayjs from "dayjs";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
@@ -89,6 +89,18 @@ export const PaymentTable: React.FC<Props> = ({
   useDidUpdateEffect(() => {
     setQuery((q) => ({ ...q, accountName: accountName }));
   }, [accountName]);
+
+  const accountNameColumn = useMemo(() => {
+    if (data && "accountName" in data?.results[0] && showAccountName) {
+      return <Table.Column dataIndex="accountName" title="账户" />;
+    }
+  }, [data, showAccountName]);
+
+  const tenantNameColumn = useMemo(() => {
+    if (data && "tenantName" in data?.results[0] && showTenantName) {
+      return <Table.Column dataIndex="tenantName" title="租户" />;
+    }
+  }, [data, showTenantName]);
   return (
     <div>
       <FilterFormContainer>
@@ -146,16 +158,10 @@ export const PaymentTable: React.FC<Props> = ({
         scroll={{ x: true }}
         pagination={{ showSizeChanger: true }}
       >
-        {
-          showAccountName ? (
-            <Table.Column<PaymentInfo> dataIndex="accountName" title="账户" />
-          ) : undefined
-        }
-        {
-          showTenantName ? (
-            <Table.Column<TenantPaymentInfo> dataIndex="tenantName" title="租户" />
-          ) : undefined
-        }
+        
+        {accountNameColumn}
+        {tenantNameColumn}
+
         <Table.Column dataIndex="time" title="交费日期" render={(v) => formatDateTime(v)} />
         <Table.Column dataIndex="amount" title="交费金额" render={(v) => v.toFixed(3)} />
         <Table.Column dataIndex="type" title="类型" />
