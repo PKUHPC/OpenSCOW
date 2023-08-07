@@ -143,32 +143,40 @@ export const chargingServiceServer = plugin((server) => {
     },
     /**
      * 
-     * @param  tenantName
-     * @param  accountName
-     * 不传 allAccounts的情况：
-     * case 1:tenantName为空，accountName为空；此时返回该所有租户充值记录
-     * case 2:tenantName为空，accountName有值；不存在
-     * case 3:tenantName有值，accountName为空；此时返回这个租户（tenantName）的充值记录
-     * case 4:tenantName有值，accountName有值；此时返回该这个租户（tenantName）下这个账户（accountName）的充值记录
+     * case tenant:返回这个租户（tenantName）的充值记录
+     * case allTenants: 返回该所有租户充值记录
+     * case accountOfTenant: 返回该这个租户（tenantName）下这个账户（accountName）的充值记录
+     * case accountsOfTenant: 返回这个租户（tenantName）下所有账户的充值记录
      * 
-     * 传 allAccounts的情况（只存在于tenantName有值的情况）：
-     * case 5:tenantName有值，accountName为空；此时返回这个租户（tenantName）下所有账户的充值记录
-     * case 6:tenantName有值，accountName有值；同case 4
      * @returns 
      */
     getPaymentRecords: async ({ request, em }) => {
 
-      const { tenantName, accountName, endTime, startTime, allAccount } = 
+      const { endTime, startTime, target } = 
       ensureNotUndefined(request, ["startTime", "endTime"]);
+
+      let searchParam = {};
+      switch (target?.$case)
+      {
+      case "tenant":
+        searchParam = { tenantName: target[target.$case].tenantName };
+        break;
+      case "allTenants":
+        searchParam = {};
+        break;
+      case "accountOfTenant":
+        searchParam = { tenantName: target[target.$case].tenantName, accountName:target[target.$case].accountName };
+        break;
+      case "accountsOfTenant":
+        searchParam = { tenantName: target[target.$case].tenantName, accountName:{ $ne:null } };
+        break;
+      default:
+        searchParam = {};
+      }
+
       const records = await em.find(PayRecord, {
         time: { $gte: startTime, $lte: endTime }, 
-        /**
-         * allAccount有值，说明可以获取某个租户下所有账户的记录
-         * 此时accountName若有值，则是获取某个租户下特定账户的记录
-         * accountName若没值，则是获取某个租户下所有账户的记录
-         */
-        ...(allAccount && !accountName) ? { accountName:{ $ne:null } } : { accountName },
-        ...tenantName !== undefined ? { tenantName } : {},
+        ...searchParam,
       }, { orderBy: { time: QueryOrder.DESC } });
 
       return [{

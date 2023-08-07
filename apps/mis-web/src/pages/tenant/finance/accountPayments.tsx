@@ -14,7 +14,7 @@ import { NextPage } from "next";
 import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
 import { TenantRole } from "src/models/User";
-import { nameType, PaymentTable } from "src/pageComponents/common/PaymentTable";
+import { PaymentTable, SearchType } from "src/pageComponents/common/PaymentTable";
 import { Head } from "src/utils/head";
 
 export const PaymentsPage: NextPage = requireAuth((i) =>
@@ -25,8 +25,7 @@ export const PaymentsPage: NextPage = requireAuth((i) =>
       <Head title="账户充值记录" />
       <PageTitle titleText="账户充值记录" />
       <PaymentTable
-        adminData={false}
-        showNameSearch={nameType.account}
+        whichSelect={SearchType.account}
         showAccountName={true}
         showAuditInfo={true}
       />

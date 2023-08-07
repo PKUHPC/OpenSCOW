@@ -14,27 +14,25 @@ import { defaultPresets, formatDateTime } from "@scow/lib-web/build/utils/dateti
 import { useDidUpdateEffect } from "@scow/lib-web/build/utils/hooks";
 import { Button, DatePicker, Form, Table } from "antd";
 import dayjs from "dayjs";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { AccountSelector } from "src/pageComponents/finance/AccountSelector";
 import { TenantSelector } from "src/pageComponents/tenant/TenantSelector"; 
-import { PaymentInfo } from "src/pages/api/finance/payments"; ;
-import { TenantPaymentInfo } from "src/pages/api/admin/finance/payments"; ;
 
-export enum nameType {
-    account = "账户",
-    tenant = "租户",
+export enum SearchType {
+    account = "account",
+    tenant = "tenant",
 }
 
 interface Props {
   // 账户充值记录专用项
   accountName?: string;
-  // 是否展示租户或账户搜索条件
-  showNameSearch?: nameType;
-  // 是否是平台管理获取数据
-  adminData: boolean;
+  // 是否为平台管理中的页面
+  isPlatform?: boolean;
+  // 展示账户或租户下拉搜索，不传就不展示
+  whichSelect?: SearchType;
   // 列表中是否展示账户 
   showAccountName?: boolean;
   // 列表中是否展示租户 
@@ -43,6 +41,7 @@ interface Props {
   showAuditInfo?: boolean;
 }
 
+// 表格展示的数据
 interface TableProps {
   time: string;
   amount: number;
@@ -64,8 +63,8 @@ interface FilterForm {
 const today = dayjs().endOf("day");
 
 export const PaymentTable: React.FC<Props> = ({
-  accountName, showNameSearch, adminData, showAccountName = false,
-  showTenantName = false, showAuditInfo = false,
+  accountName, isPlatform, whichSelect, showAccountName,
+  showTenantName, showAuditInfo,
 }) => {
 
   const [form] = Form.useForm<FilterForm>();
@@ -82,18 +81,21 @@ export const PaymentTable: React.FC<Props> = ({
         endTime: query.time[1].clone().endOf("day").toISOString(),
       };
 
-      if (adminData) {
-        return api.getTenantPayments({ query: { ...param, tenantName:query.name || undefined } });
+      if (isPlatform) {
+        return api.getTenantPayments({ query: { ...param, tenantName:query.name } });
       } else {
-        if (showNameSearch === nameType.account) {
+        // 展示账户名时，是在搜索账户的记录
+        if (showAccountName) {
           return api.getPayments({
-            query: { ...param, accountName:query.name || undefined, allAccount:true },
-          });
-        } else {
-          return api.getPayments({
-            query: { ...param, accountName:query.name || undefined },
+            query: { ...param, accountName:query.name },
           });
         }
+        else {
+          return api.getPayments({
+            query: { ...param, accountName:query.name, searchTenant:true },
+          });
+        }
+
       }
     }, [query]),
   });
@@ -102,17 +104,6 @@ export const PaymentTable: React.FC<Props> = ({
     setQuery((q) => ({ ...q, accountName: accountName }));
   }, [accountName]);
 
-  const accountNameColumn = useMemo(() => {
-    if (data && "accountName" in data?.results[0] && showAccountName) {
-      return <Table.Column dataIndex="accountName" title="账户" />;
-    }
-  }, [data, showAccountName]);
-
-  const tenantNameColumn = useMemo(() => {
-    if (data && "tenantName" in data?.results[0] && showTenantName) {
-      return <Table.Column dataIndex="tenantName" title="租户" />;
-    }
-  }, [data, showTenantName]);
   return (
     <div>
       <FilterFormContainer>
@@ -125,9 +116,9 @@ export const PaymentTable: React.FC<Props> = ({
             setQuery({ name: accountName ?? name, time });
           }}
         >
-          {showNameSearch ? (
-            <Form.Item label={showNameSearch} name="name">
-              {showNameSearch === nameType.account ? (
+          {whichSelect ? (
+            <Form.Item label={whichSelect === SearchType.account ? "账户" : "租户" } name="name">
+              {whichSelect === SearchType.account ? (
                 <AccountSelector
                   onChange={(item) => {
                     setQuery({ ...query, name:item });
@@ -165,15 +156,17 @@ export const PaymentTable: React.FC<Props> = ({
         </Form>
       </FilterFormContainer>
       <Table
-        dataSource={data?.results as Array<TableProps> }
+        dataSource={data?.results as Array<TableProps>}
         loading={isLoading}
         scroll={{ x: true }}
         pagination={{ showSizeChanger: true }}
       >
-
-        {accountNameColumn}
-        {tenantNameColumn}
-
+        {
+          showAccountName ? <Table.Column dataIndex="accountName" title="账户" /> : undefined
+        }
+        {
+          showTenantName ? <Table.Column dataIndex="tenantName" title="租户" /> : undefined
+        }
         <Table.Column dataIndex="time" title="交费日期" render={(v) => formatDateTime(v)} />
         <Table.Column dataIndex="amount" title="交费金额" render={(v) => v.toFixed(3)} />
         <Table.Column dataIndex="type" title="类型" />

@@ -34,7 +34,6 @@ export const PaymentsPage: NextPage = requireAuth(
       <PageTitle titleText={title} />
       <PaymentTable
         accountName={accountName}
-        adminData={false}
       />
     </div>
   );

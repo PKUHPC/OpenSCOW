@@ -1,5 +1,5 @@
 ---
-"@scow/grpc-api": patch
+"@scow/grpc-api": minor
 ---
 
-GetPaymentRecords 增加可选参数 allAccount
+GetPaymentRecords因情况太多，改用oneOf的写法拆分参数

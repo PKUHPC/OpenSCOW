@@ -93,17 +93,37 @@ message PaymentRecord {
   string operator_id = 9;
 }
 
-// If account_name is set, return records of the account, ignoring tenant_name.
-// If account_name is not set and tenant_name is set, return records of this tenant.
-// If none is set, return records of all tenants.
 message GetPaymentRecordsRequest {
   google.protobuf.Timestamp start_time = 1;
   google.protobuf.Timestamp end_time = 2;
-  optional string tenant_name = 3;
-  optional string account_name = 4;
-  optional bool all_account = 5;
-}
+  
+  message AccountOfTenant {
+    string account_name = 1;
+    string tenant_name = 2;
+  }
 
+  message AccountsOfTenant {
+    string tenant_name = 1;
+  }
+
+  message Tenant {
+    string tenant_name = 1;
+  }
+
+  message AllTenants { 
+  }
+
+  oneof target { 
+    // 返回该这个租户（tenantName）下这个账户（accountName）的充值记录
+    AccountOfTenant account_of_tenant = 3;
+    // 返回这个租户（tenantName）下所有账户的充值记录
+    AccountsOfTenant accounts_of_tenant = 4;
+    // 返回这个租户（tenantName）的充值记录
+    Tenant tenant = 5;
+    // 返回该所有租户充值记录
+    AllTenants all_tenants = 6;
+  }
+}
 message GetPaymentRecordsResponse {
   repeated PaymentRecord results = 1;
   optional common.Money total = 2;
