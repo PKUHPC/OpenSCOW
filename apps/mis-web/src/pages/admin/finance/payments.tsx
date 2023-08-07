@@ -27,7 +27,7 @@ export const TenantPaymentsPage: NextPage = requireAuth((i) =>
       <PageTitle titleText="充值记录" />
       <PaymentTable 
         isPlatform={true}
-        whichSelect={SearchType.tenant}
+        searchType={SearchType.tenant}
         showTenantName={true}
         showAuditInfo={true}
       />

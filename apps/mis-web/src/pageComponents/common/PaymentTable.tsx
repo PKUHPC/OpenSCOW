@@ -32,7 +32,7 @@ interface Props {
   // 是否为平台管理中的页面
   isPlatform?: boolean;
   // 展示账户或租户下拉搜索，不传就不展示
-  whichSelect?: SearchType;
+  searchType?: SearchType;
   // 列表中是否展示账户 
   showAccountName?: boolean;
   // 列表中是否展示租户 
@@ -63,14 +63,14 @@ interface FilterForm {
 const today = dayjs().endOf("day");
 
 export const PaymentTable: React.FC<Props> = ({
-  accountName, isPlatform, whichSelect, showAccountName,
+  accountName, isPlatform, searchType, showAccountName,
   showTenantName, showAuditInfo,
 }) => {
 
   const [form] = Form.useForm<FilterForm>();
 
   const [query, setQuery] = useState(() => ({
-    name: accountName ?? undefined,
+    name: accountName,
     time: [today.subtract(1, "year"), today],
   }));
 
@@ -116,9 +116,9 @@ export const PaymentTable: React.FC<Props> = ({
             setQuery({ name: accountName ?? name, time });
           }}
         >
-          {whichSelect ? (
-            <Form.Item label={whichSelect === SearchType.account ? "账户" : "租户" } name="name">
-              {whichSelect === SearchType.account ? (
+          {searchType ? (
+            <Form.Item label={searchType === SearchType.account ? "账户" : "租户" } name="name">
+              {searchType === SearchType.account ? (
                 <AccountSelector
                   onChange={(item) => {
                     setQuery({ ...query, name:item });

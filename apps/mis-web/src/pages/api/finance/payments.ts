@@ -88,7 +88,7 @@ export default typeboxRoute(GetPaymentsSchema, async (req, res) => {
   
   const reply = ensureNotUndefined(await asyncClientCall(client, "getPaymentRecords", {
     target:accountName ? 
-      { $case:"accountOfTenant", accountOfTenant:{ tenantName:user.tenant, accountName:accountName as string } } : 
+      { $case:"accountOfTenant", accountOfTenant:{ tenantName:user.tenant, accountName:accountName } } : 
       searchTenant ? { $case:"tenant", tenant:{ tenantName:user.tenant } } :
         { $case:"accountsOfTenant", accountsOfTenant:{ tenantName:user.tenant } },
     startTime,

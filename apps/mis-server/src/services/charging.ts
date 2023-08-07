@@ -158,10 +158,10 @@ export const chargingServiceServer = plugin((server) => {
       switch (target?.$case)
       {
       case "tenant":
-        searchParam = { tenantName: target[target.$case].tenantName };
+        searchParam = { tenantName: target[target.$case].tenantName, accountName:undefined };
         break;
       case "allTenants":
-        searchParam = {};
+        searchParam = { accountName:undefined };
         break;
       case "accountOfTenant":
         searchParam = { tenantName: target[target.$case].tenantName, accountName:target[target.$case].accountName };

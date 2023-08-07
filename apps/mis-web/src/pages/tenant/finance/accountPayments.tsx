@@ -25,7 +25,7 @@ export const PaymentsPage: NextPage = requireAuth((i) =>
       <Head title="账户充值记录" />
       <PageTitle titleText="账户充值记录" />
       <PaymentTable
-        whichSelect={SearchType.account}
+        searchType={SearchType.account}
         showAccountName={true}
         showAuditInfo={true}
       />
