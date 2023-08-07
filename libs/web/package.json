@@ -21,10 +21,10 @@
     "nookies": "2.5.2"
   },
   "peerDependencies": {
-    "antd": "5.7.0",
-    "next": "13.4.10",
-    "styled-components": "6.0.4",
-    "@ant-design/icons": "5.1.4",
+    "antd": "5.8.2",
+    "next": "13.4.13",
+    "styled-components": "6.0.7",
+    "@ant-design/icons": "5.2.5",
     "dayjs": "1.11.9",
     "react": ">=18.2.0",
     "react-dom": ">=18.2.0",
@@ -32,17 +32,17 @@
     "nookies": "2.5.2"
   },
   "devDependencies": {
-    "antd": "5.7.0",
-    "next": "13.4.10",
-    "styled-components": "6.0.4",
-    "@grpc/grpc-js": "1.8.18",
+    "antd": "5.8.2",
+    "next": "13.4.13",
+    "styled-components": "6.0.7",
+    "@grpc/grpc-js": "1.9.0",
     "@types/mime-types": "2.1.1",
     "react": "18.2.0",
-    "@types/react": "18.2.15",
+    "@types/react": "18.2.18",
     "react-dom": "18.2.0",
     "@types/react-dom": "18.2.7",
     "react-is": "18.2.0",
-    "@ant-design/icons": "5.1.4",
+    "@ant-design/icons": "5.2.5",
     "dayjs": "1.11.9",
     "@types/styled-components": "5.1.26"
   },
