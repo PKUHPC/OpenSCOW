@@ -153,8 +153,7 @@ export const chargingServiceServer = plugin((server) => {
     getPaymentRecords: async ({ request, em }) => {
 
       const { endTime, startTime, target } = 
-      ensureNotUndefined(request, ["startTime", "endTime"]);
-
+      ensureNotUndefined(request, ["startTime", "endTime", "target"]);
       let searchParam = {};
       switch (target?.$case)
       {
