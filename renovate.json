@@ -24,6 +24,12 @@
       "groupSlug": "all-minor-patch"
     },
     {
+      "matchPackagePatterns": [
+        "@grpc/grpc-js"
+      ],
+      "enabled": false
+    },
+    {
       "matchFiles": [
         "docs/package.json"
       ],

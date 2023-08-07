@@ -27,7 +27,7 @@
     "@ddadaal/next-typed-api-routes-runtime": "0.8.2",
     "@ddadaal/tsgrpc-client": "0.17.6",
     "@ddadaal/tsgrpc-common": "0.2.4",
-    "@grpc/grpc-js": "1.9.0",
+    "@grpc/grpc-js": "1.8.21",
     "@scow/config": "workspace:*",
     "@scow/lib-auth": "workspace:*",
     "@scow/lib-config": "workspace:*",
