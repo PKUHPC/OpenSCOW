@@ -47,18 +47,16 @@ export const DesktopTable: React.FC<Props> = ({ loginDesktopEnabledClusters }) =
 
   const router = useRouter();
 
-  const defaultClusterStore = useStore(DefaultClusterStore);
-
+  const { defaultCluster } = useStore(DefaultClusterStore);
   const loginNodes = useStore(LoginNodeStore);
 
   const clusterQuery = queryToString(router.query.cluster);
   const loginQuery = queryToString(router.query.loginNode);
-
   // 如果默认集群没开启登录节点桌面功能，则取开启此功能的某一集群为默认集群。
-  const defaultCluster = loginDesktopEnabledClusters.includes(defaultClusterStore.cluster)
-    ? defaultClusterStore.cluster
+  const enabledDefaultCluster = loginDesktopEnabledClusters.find((x) => x.id === defaultCluster.id)
+    ? defaultCluster
     : loginDesktopEnabledClusters[0];
-  const cluster = publicConfig.CLUSTERS.find((x) => x.id === clusterQuery) ?? defaultCluster;
+  const cluster = publicConfig.CLUSTERS.find((x) => x.id === clusterQuery) ?? enabledDefaultCluster;
 
   const loginNode = loginNodes[cluster.id].find((x) => x.name === loginQuery) ?? undefined;
 
@@ -146,7 +144,7 @@ export const DesktopTable: React.FC<Props> = ({ loginDesktopEnabledClusters }) =
               onChange={(x) => {
                 router.push({ query: { cluster: x.id } });
               }}
-              clusters={loginDesktopEnabledClusters}
+              clusterIds={loginDesktopEnabledClusters.map((x) => x.id)}
             />
           </Form.Item>
           <Form.Item label="登录节点">

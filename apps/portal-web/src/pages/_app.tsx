@@ -100,11 +100,10 @@ function MyApp({ Component, pageProps, extra }: Props) {
     return store;
   });
 
-  const defaultClusterStore = useConstant(() => {
-    return createStore(DefaultClusterStore, publicConfig.CLUSTERS[0]);
-  });
 
   const loginNodeStore = useConstant(() => createStore(LoginNodeStore, extra.loginNodes));
+
+  const defaultClusterStore = useConstant(() => createStore(DefaultClusterStore));
 
   // Use the layout defined at the page level, if available
   return (

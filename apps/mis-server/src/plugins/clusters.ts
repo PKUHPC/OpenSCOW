@@ -20,10 +20,10 @@ import { clusters } from "src/config/clusters";
 import { rootKeyPair } from "src/config/env";
 import { scowErrorMetadata } from "src/utils/error";
 
-type CallOnAllResult<T> = ({ cluster: string; } & (
-  | { success: true; result: T }
-  | { success: false; error: any }
-))[];
+type CallOnAllResult<T> = {
+  cluster: string;
+  result: T
+}[]
 
 // Throw ServiceError if failed.
 type CallOnAll = <T>(
@@ -92,7 +92,7 @@ export const clustersPlugin = plugin(async (f) => {
     // throws error if failed.
     callOnAll: <CallOnAll>(async (logger, call) => {
 
-      const results = await Promise.all(Object.entries(adapterClientForClusters)
+      const responses = await Promise.all(Object.entries(adapterClientForClusters)
         .map(async ([cluster, client]) => {
           return call(client).then((result) => {
             logger.info("Executing on %s success", cluster);
@@ -103,8 +103,19 @@ export const clustersPlugin = plugin(async (f) => {
           });
         }));
 
-      // errors if any fails
-      const failed = results.filter((x) => !x.success);
+      type SuccessResponse<T> = { cluster: string; success: boolean; result: T; };
+      type ErrorResponse = { cluster: string; success: boolean; error: any; };
+
+      function isSuccessResponse<T>(response: SuccessResponse<T> | ErrorResponse): response is SuccessResponse<T> {
+        return response.success === true;
+      }
+
+      function isErrorResponse(response: SuccessResponse<any> | ErrorResponse): response is ErrorResponse {
+        return response.success === false;
+      }
+
+      const results = responses.filter(isSuccessResponse).map(({ cluster, result }) => ({ cluster, result }));
+      const failed = responses.filter(isErrorResponse).map(({ cluster, error }) => ({ cluster, error }));
 
       if (failed.length > 0) {
         logger.error("Cluster ops fails at clusters %o", failed);

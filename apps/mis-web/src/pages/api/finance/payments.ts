@@ -68,13 +68,15 @@ export default typeboxRoute(GetPaymentsSchema, async (req, res) => {
   // check whether the user can access the account
   if (accountName) {
     user = await authenticate((i) =>
-      i.tenantRoles.includes(TenantRole.TENANT_FINANCE)
-      || i.accountAffiliations.some((x) => x.accountName === accountName && x.role !== UserRole.USER),
+      i.tenantRoles.includes(TenantRole.TENANT_FINANCE) || 
+      i.tenantRoles.includes(TenantRole.TENANT_ADMIN) || 
+      i.accountAffiliations.some((x) => x.accountName === accountName && x.role !== UserRole.USER),
     )(req, res);
     if (!user) { return; }
   } else {
     user = await authenticate((i) =>
-      i.tenantRoles.includes(TenantRole.TENANT_FINANCE),
+      i.tenantRoles.includes(TenantRole.TENANT_FINANCE) || 
+      i.tenantRoles.includes(TenantRole.TENANT_ADMIN),
     )(req, res);
     if (!user) { return; }
   }
@@ -86,7 +88,8 @@ export default typeboxRoute(GetPaymentsSchema, async (req, res) => {
     endTime,
   }), ["total"]);
 
-  const returnAuditInfo = user.tenantRoles.includes(TenantRole.TENANT_FINANCE);
+  const returnAuditInfo = user.tenantRoles.includes(TenantRole.TENANT_FINANCE) || 
+          user.tenantRoles.includes(TenantRole.TENANT_ADMIN);
 
   const records = reply.results.map((x) => {
     const obj = ensureNotUndefined(x, ["time", "amount"]);

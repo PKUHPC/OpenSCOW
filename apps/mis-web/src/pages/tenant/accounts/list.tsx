@@ -18,7 +18,7 @@ import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
 import { TenantRole } from "src/models/User";
-import { AccountTable } from "src/pageComponents/tenant/AccountTable";
+import { AccountTable } from "src/pageComponents/accounts/AccountTable";
 import { Head } from "src/utils/head";
 
 export const AdminAccountsPage: NextPage = requireAuth((u) => u.tenantRoles.includes(TenantRole.TENANT_ADMIN))(
@@ -42,6 +42,7 @@ export const AdminAccountsPage: NextPage = requireAuth((u) => u.tenantRoles.incl
           data={data}
           isLoading={isLoading}
           reload={reload}
+          showedTab={"TENANT"}
         />
       </div>
     );

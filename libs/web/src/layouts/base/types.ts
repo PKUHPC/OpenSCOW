@@ -25,4 +25,5 @@ export interface NavItemProps {
   children?: NavItemProps[];
   clickable?: boolean
   openInNewPage?: boolean;
+  handleClick?: () => void
 }

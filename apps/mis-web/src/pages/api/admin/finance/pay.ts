@@ -44,7 +44,9 @@ export const TenantFinancePaySchema = typeboxRouteSchema({
   },
 });
 
-const auth = authenticate((info) => info.platformRoles.includes(PlatformRole.PLATFORM_FINANCE));
+const auth = authenticate((info) => 
+  info.platformRoles.includes(PlatformRole.PLATFORM_FINANCE) || 
+  info.platformRoles.includes(PlatformRole.PLATFORM_ADMIN));
 
 export default route(TenantFinancePaySchema,
   async (req, res) => {

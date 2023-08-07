@@ -177,9 +177,9 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
     }
   }, [currentPartitionInfo]);
 
-  const defaultClusterStore = useStore(DefaultClusterStore);
+  const { defaultCluster: currentDefaultCluster } = useStore(DefaultClusterStore);
   // 判断是使用template中的cluster还是系统默认cluster，防止系统配置文件更改时仍选改动前的cluster
-  const defaultCluster = publicConfig.CLUSTERS.find((x) => x.id === initial.cluster?.id) ?? defaultClusterStore.cluster;
+  const defaultCluster = publicConfig.CLUSTERS.find((x) => x.id === initial.cluster?.id) ?? currentDefaultCluster;
 
   const memorySize = (currentPartitionInfo ?
     currentPartitionInfo.gpus ? nodeCount * gpuCount
