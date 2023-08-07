@@ -1023,15 +1023,15 @@ importers:
         specifier: 0.2.4
         version: 0.2.4
       '@grpc/grpc-js':
-        specifier: 1.9.0
-        version: 1.9.0
+        specifier: 1.8.21
+        version: 1.8.21
     devDependencies:
       '@ddadaal/tsgrpc-client':
         specifier: 0.17.6
-        version: 0.17.6(@grpc/grpc-js@1.9.0)
+        version: 0.17.6(@grpc/grpc-js@1.8.21)
       '@ddadaal/tsgrpc-server':
         specifier: 0.19.4
-        version: 0.19.4(@grpc/grpc-js@1.9.0)
+        version: 0.19.4(@grpc/grpc-js@1.8.21)
       '@scow/config':
         specifier: workspace:*
         version: link:../config
@@ -4322,16 +4322,6 @@ packages:
       '@grpc/grpc-js': 1.8.21
       tslib: 2.6.1
 
-  /@ddadaal/tsgrpc-client@0.17.6(@grpc/grpc-js@1.9.0):
-    resolution: {integrity: sha512-nOmaVcZbK8ZaCIUtjOaedqFgmE72m1GHVn6vXqw4y91TDLI5haKSNTaXVZGaF/sbVCXUxT3WXHlM3v8PKsTdmw==}
-    peerDependencies:
-      '@grpc/grpc-js': '>=1.7.0'
-    dependencies:
-      '@ddadaal/tsgrpc-common': 0.2.4
-      '@grpc/grpc-js': 1.9.0
-      tslib: 2.6.1
-    dev: true
-
   /@ddadaal/tsgrpc-common@0.2.4:
     resolution: {integrity: sha512-vL5/eQmekPz72+LtIVxiXmejmRN0s6lwrZapwfxh6PtQHtWe+fsi+pnxMz5sb0S1PbmWQL0zcXaCVP90XwNn7g==}
     dependencies:
@@ -4346,17 +4336,6 @@ packages:
       '@grpc/grpc-js': 1.8.21
       pino: 8.15.0
       tslib: 2.6.1
-
-  /@ddadaal/tsgrpc-server@0.19.4(@grpc/grpc-js@1.9.0):
-    resolution: {integrity: sha512-o3qPM7S5+CNzyhlIY8x38qR+54IoTdYbIEii76fOuUpMUl6jsyPXebELaME4Szui1mpGfmqZb3vEE87BxBGHAA==}
-    peerDependencies:
-      '@grpc/grpc-js': '>=1.7.0'
-    dependencies:
-      '@ddadaal/tsgrpc-common': 0.2.4
-      '@grpc/grpc-js': 1.9.0
-      pino: 8.15.0
-      tslib: 2.6.1
-    dev: true
 
   /@docsearch/css@3.3.0:
     resolution: {integrity: sha512-rODCdDtGyudLj+Va8b6w6Y85KE85bXRsps/R4Yjwt5vueXKXZQKYw0aA9knxLBT6a/bI/GMrAcmCR75KYOM6hg==}
@@ -5261,13 +5240,6 @@ packages:
 
   /@grpc/grpc-js@1.8.21:
     resolution: {integrity: sha512-KeyQeZpxeEBSqFVTi3q2K7PiPXmgBfECc4updA1ejCLjYmoAlvvM3ZMp5ztTDUCUQmoY3CpDxvchjO1+rFkoHg==}
-    engines: {node: ^8.13.0 || >=10.10.0}
-    dependencies:
-      '@grpc/proto-loader': 0.7.3
-      '@types/node': 18.17.3
-
-  /@grpc/grpc-js@1.9.0:
-    resolution: {integrity: sha512-H8+iZh+kCE6VR/Krj6W28Y/ZlxoZ1fOzsNt77nrdE3knkbSelW1Uus192xOFCxHyeszLj8i4APQkSIXjAoOxXg==}
     engines: {node: ^8.13.0 || >=10.10.0}
     dependencies:
       '@grpc/proto-loader': 0.7.3
