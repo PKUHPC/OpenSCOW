@@ -25,7 +25,7 @@ export class OperationLog {
     operatorIp!: string;
 
   @Property({ defaultRaw: CURRENT_TIMESTAMP })
-    operationTime!: Date;
+    operationTime?: Date;
 
   @Property()
     operationResult!: number;
@@ -37,7 +37,7 @@ export class OperationLog {
       operatorUserId: string;
       operatorIp: string;
       operationTime?: Date;
-      tenantName?: string;
+      operationResult: number;
       metaData: Map<string, any> | undefined;
     }) {
     this.operatorUserId = init.operatorUserId;
@@ -45,6 +45,7 @@ export class OperationLog {
     if (init.operationTime) {
       this.operationTime = init.operationTime;
     }
+    this.operationResult = init.operationResult;
     this.metaData = init.metaData;
   }
 
