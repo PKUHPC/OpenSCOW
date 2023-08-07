@@ -1,5 +1,5 @@
 db:
-  host: db
+  host: operation-db
   port: 3306
   user: root
   dbName: operation_log

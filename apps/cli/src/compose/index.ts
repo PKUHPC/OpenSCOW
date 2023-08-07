@@ -269,7 +269,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
 
   // OPERATION-LOG
   if (config.operationLog) {
-    addService("mis-server", {
+    addService("operation-log", {
       image: scowImage,
       ports: config.operationLog.portMappings?.operationLog
         ? { [config.operationLog.portMappings.operationLog]: 5000 }
