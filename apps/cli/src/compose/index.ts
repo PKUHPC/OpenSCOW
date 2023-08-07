@@ -267,5 +267,37 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
     });
   }
 
+  // OPERATION-LOG
+  if (config.operationLog) {
+    addService("mis-server", {
+      image: scowImage,
+      ports: config.operationLog.portMappings?.operationLog
+        ? { [config.operationLog.portMappings.operationLog]: 5000 }
+        : {},
+      environment: {
+        "SCOW_LAUNCH_APP": "operation-log",
+        "DB_PASSWORD": config.operationLog.dbPassword,
+        ...serviceLogEnv,
+      },
+      volumes: {
+        "/etc/hosts": "/etc/hosts",
+        "./config": "/etc/scow",
+        "~/.ssh": "/root/.ssh",
+      },
+    });
+
+    composeSpec.volumes["operation_db_data"] = {};
+
+    addService("operation-db", {
+      image: config.operationLog.mysqlImage,
+      volumes: {
+        "operation_db_data": "/var/lib/mysql",
+      },
+      environment: {
+        "MYSQL_ROOT_PASSWORD": config.operationLog.dbPassword,
+      },
+      ports: config.operationLog.portMappings?.db ? { [config.operationLog.portMappings?.db]: 3306 } : {},
+    });
+  }
   return composeSpec;
 };

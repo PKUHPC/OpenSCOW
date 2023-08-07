@@ -103,6 +103,19 @@ module.exports = {
       },
     },
     {
+      name: "operation-log",
+      script: "src/index.ts",
+      cwd: "./apps/operation-log",
+      watch: "./apps/operation-log",
+      interpreter,
+      interpreter_args,
+      env: {
+        PORT: "5005",
+        ...PRODUCTION_ENV,
+        ...SCOW_CONFIG_PATH_ENV,
+      },
+    },
+    {
       name: "dev:libs",
       cwd: ".",
       script: "npm",

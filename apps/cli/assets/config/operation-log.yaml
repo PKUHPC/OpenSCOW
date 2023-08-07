@@ -1,8 +1,5 @@
 db:
-  host: localhost
+  host: db
   port: 3306
   user: root
-  password: mysqlrootpassword
   dbName: operation_log
-
-
