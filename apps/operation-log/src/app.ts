@@ -15,6 +15,7 @@ import { omitConfigSpec } from "@scow/lib-config";
 import { readVersionFile } from "@scow/utils/build/version";
 import { config } from "src/config/env";
 import { plugins } from "src/plugins";
+import { operationLogServiceServer } from "src/services/operationLog";
 import { logger } from "src/utils/logger";
 
 export async function createServer() {
@@ -32,7 +33,7 @@ export async function createServer() {
   for (const plugin of plugins) {
     await server.register(plugin);
   }
-
+  await server.register(operationLogServiceServer);
 
   return server;
 }

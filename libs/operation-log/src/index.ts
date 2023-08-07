@@ -39,12 +39,15 @@ export const createOperationLogClient = (
 
   return {
     callLog: async <TName extends OperationEvent["$case"]>(
-      operationUserId: string,
-      operationIp: string,
-      operationResult: OperationResult,
       operationTypeName: TName,
       // @ts-ignore
-      operationTypePayload: (OperationEvent & { $case: TName })[TName],
+      operationTypePayload: (OperationEvent & { $case: TName })[TName]
+      &
+      {
+        operatorUserId: string,
+        operatorIp: string,
+        operationResult: OperationResult,
+      },
       logger: Logger,
     ) => {
 
@@ -55,15 +58,20 @@ export const createOperationLogClient = (
 
       logger.info("Calling log %s with %o", operationTypeName, operationTypePayload);
 
+      const { operatorUserId, operatorIp, operationResult, ...rest } = operationTypePayload;
+
+
       return await asyncUnaryCall(client, "createOperationLog", {
-        operationUserId,
-        operationIp,
+        operatorUserId,
+        operatorIp,
         operationResult,
         // @ts-ignore
-        operationEvent: { $case: eventName, [eventName]: eventPayload },
+        operationEvent: { $case: operationTypeName, [operationTypeName]: { ...rest } },
       }).then(
         () => { logger.debug("Operation Log call completed"); },
-        (e) => { logger.error(e, "Error when calling Operation Log"); },
+        (e) => {
+          logger.error(e, "Error when calling Operation Log");
+        },
       );
     },
   };

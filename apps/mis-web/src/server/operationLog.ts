@@ -15,21 +15,21 @@ import { OperationResult } from "@scow/protos/build/operation-log/operation_log"
 import { runtimeConfig } from "src/utils/config";
 
 export const createOperationLog = (
-  operationUserId: string,
-  operationIp: string,
-  operationResult: OperationResult,
   operationTypeName: OperationEvent["$case"],
   // @ts-ignore
-  operationTypePayload: (OperationEvent & { $case: OperationEvent["$case"] })[OperationEvent["$case"]],
+  operationTypePayload: (OperationEvent & { $case: OperationEvent["$case"] })[OperationEvent["$case"]]
+  &
+  {
+    operationUserId: string,
+    operationIp: string,
+    operationResult: OperationResult,
+  },
   logger: Console,
 ) => {
 
   const { callLog } = createOperationLogClient(runtimeConfig.OPERATION_LOG_CONFIG, console);
 
   callLog(
-    operationUserId,
-    operationIp,
-    operationResult,
     operationTypeName,
     operationTypePayload,
     logger,
