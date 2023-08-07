@@ -22,7 +22,7 @@ const { readVersionFile } = require("@scow/utils/build/version");
 const { getCapabilities } = require("@scow/lib-auth");
 const { DEFAULT_PRIMARY_COLOR, getUiConfig } = require("@scow/config/build/ui");
 const { getPortalConfig } = require("@scow/config/build/portal");
-const { getClusterConfigs, getLoginNode } = require("@scow/config/build/cluster");
+const { getClusterConfigs, getLoginNode, getSortedClusters } = require("@scow/config/build/cluster");
 const { getCommonConfig } = require("@scow/config/build/common");
 
 /**
@@ -171,7 +171,7 @@ const buildRuntimeConfig = async (phase, basePath) => {
 
     MIS_URL: config.MIS_DEPLOYED ? (config.MIS_URL || portalConfig.misUrl) : undefined,
 
-    CLUSTERS: Object.entries(clusters).map(([id, { displayName }]) => ({ id, name: displayName })),
+    CLUSTERS: getSortedClusters(clusters),
 
     NOVNC_CLIENT_URL: config.NOVNC_CLIENT_URL,
 

@@ -10,12 +10,30 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { useState } from "react";
-import { Cluster } from "src/utils/config";
+import { useLocalStorage } from "@scow/lib-web/build/utils/hooks";
+import { Cluster, publicConfig } from "src/utils/config";
+
+const SCOW_DEFAULT_CLUSTER_ID = "SCOW_DEFAULT_CLUSTER_ID";
 
 
-export function DefaultClusterStore(defaultCluster: Cluster) {
-  const [cluster, setCluster] = useState<Cluster>(defaultCluster);
-  
-  return { cluster, setCluster };
+
+export function DefaultClusterStore() {
+  const [clusterId, setClusterId] = useLocalStorage<String>(
+    SCOW_DEFAULT_CLUSTER_ID,
+    publicConfig.CLUSTERS[0].id,
+  );
+
+  const defaultCluster = publicConfig.CLUSTERS.find((cluster) => cluster.id === clusterId) || {} as Cluster;
+
+  const setDefaultCluster = (cluster: Cluster) => {
+    setClusterId(cluster.id);
+  };
+
+  const removeDefaultCluster = () => {
+    if (typeof window !== "undefined") {
+      window.localStorage.removeItem(SCOW_DEFAULT_CLUSTER_ID);
+    }
+  };
+
+  return { defaultCluster, setDefaultCluster, removeDefaultCluster };
 }

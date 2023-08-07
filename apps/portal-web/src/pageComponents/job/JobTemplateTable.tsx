@@ -43,11 +43,11 @@ interface ModalProps {
 
 export const JobTemplateTable: React.FC<Props> = () => {
 
-  const defaultClusterStore = useStore(DefaultClusterStore);
+  const { defaultCluster } = useStore(DefaultClusterStore);
 
   const [query, setQuery] = useState<FilterForm>(() => {
     return {
-      cluster: defaultClusterStore.cluster,
+      cluster: defaultCluster,
     };
   });
 
