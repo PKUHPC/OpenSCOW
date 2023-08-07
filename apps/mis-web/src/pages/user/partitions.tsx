@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Divider, Spin, Typography } from "antd";
+import { App, Divider, Spin, Typography } from "antd";
 import { NextPage } from "next";
 import { useCallback } from "react";
 import { useAsync } from "react-async";
@@ -37,9 +37,11 @@ export const PartitionsPage: NextPage = requireAuth(
   ({ userStore }) => {
 
     const user = userStore.user;
+    const { message } = App.useApp();
 
     const { data, isLoading } = useAsync({ promiseFn: useCallback(async () => {
-      return await api.getBillingTable({ query: { tenant: user.tenant, userId: user.identityId } });
+      return await api.getBillingTable({ query: { tenant: user.tenant, userId: user.identityId } })
+        .httpError(500, () => { message.error("集群和分区信息获取失败，请联系管理员。"); });
     }, [userStore.user]) });
 
     return (
