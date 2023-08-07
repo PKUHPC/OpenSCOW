@@ -43,6 +43,18 @@ interface Props {
   showAuditInfo?: boolean;
 }
 
+interface TableProps {
+  time: string;
+  amount: number;
+  comment: string;
+  type: string;
+  index: number;
+  ipAddress: string;
+  operatorId: string;
+  tenantName?: string;
+  accountName?: string;
+}
+
 interface FilterForm {
   // 账户名或租户名
   name?: string;
@@ -153,12 +165,12 @@ export const PaymentTable: React.FC<Props> = ({
         </Form>
       </FilterFormContainer>
       <Table
-        dataSource={data?.results}
+        dataSource={data?.results as Array<TableProps> }
         loading={isLoading}
         scroll={{ x: true }}
         pagination={{ showSizeChanger: true }}
       >
-        
+
         {accountNameColumn}
         {tenantNameColumn}
 
