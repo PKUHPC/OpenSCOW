@@ -10,20 +10,25 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { getHostname } from "@scow/lib-web/build/utils/getHostname";
 import { queryToString, useQuerystring } from "@scow/lib-web/build/utils/querystring";
 import { Spin } from "antd";
-import { NextPage } from "next";
+import { GetServerSideProps, NextPage } from "next";
 import { useCallback } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
 import { SubmitJobForm } from "src/pageComponents/job/SubmitJobForm";
-import { publicConfig } from "src/utils/config";
+import { publicConfig, runtimeConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
 
-export const SubmitJobPage: NextPage = requireAuth(() => true)(
-  () => {
+interface Props {
+  submitPromptText: string;
+}
+
+export const SubmitJobPage: NextPage<Props> = requireAuth(() => true)(
+  (props: Props) => {
 
     const query = useQuerystring();
 
@@ -68,12 +73,26 @@ export const SubmitJobPage: NextPage = requireAuth(() => true)(
           isLoading ? (
             <Spin tip="正在加载作业模板" />
           ) : (
-            <SubmitJobForm initial={data} />
+            <SubmitJobForm initial={data} submitPromptText={props.submitPromptText} />
           )
         }
       </div>
     );
 
   });
+
+export const getServerSideProps: GetServerSideProps<Props> = async ({ req }) => {
+
+  const hostname = getHostname(req);
+
+  const submitPromptText = (hostname && runtimeConfig.SUBMIT_PROMPT_TEXT[hostname]) ?? 
+  runtimeConfig.DEFAULT_SUBMIT_PROMPT_TEXT;
+
+  return {
+    props: {
+      submitPromptText,
+    },
+  };
+};
 
 export default SubmitJobPage;
