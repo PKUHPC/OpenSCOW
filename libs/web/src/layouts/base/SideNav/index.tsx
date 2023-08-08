@@ -14,7 +14,7 @@
 
 import { arrayContainsElement } from "@scow/utils";
 import { Layout, Menu } from "antd";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { calcSelectedKeys, createMenuItems } from "src/layouts/base/common";
 import { antdBreakpoints } from "src/layouts/base/constants";
 import { NavItemProps } from "src/layouts/base/types";
@@ -85,9 +85,18 @@ export const SideNav: React.FC<Props> = ({
   const parentKeys = useMemo(() => getAllParentKeys(routes), [routes]);
 
   const [openKeys, setOpenKeys] = useState(parentKeys);
+  const menuFocusedRef = useRef(false);
 
   useDidUpdateEffect(() => {
-    setOpenKeys(parentKeys);
+    /**
+     * 点击菜单，收起其他展开的所有菜单，保持菜单聚焦简洁。
+     * 仅在账户管理页面有效，且用户管理的账户数量超过三个
+     */
+    // 
+    menuFocusedRef.current = parentKeys.length > 3 && /^\/accounts/.test(parentKeys[0]);
+    
+    if (menuFocusedRef.current) setOpenKeys([parentKeys[0]]);
+    else setOpenKeys(parentKeys);
   }, [parentKeys]);
 
   const onBreakpoint = useCallback((broken: boolean) => {
@@ -95,6 +104,20 @@ export const SideNav: React.FC<Props> = ({
     // if not, small to big, expand the sidebar
     setCollapsed(broken);
   }, [setCollapsed]);
+
+  const onOpenChange = useCallback((keys) => {
+    if (menuFocusedRef.current) {
+      const latestOpenKey = keys.find((key) => openKeys.indexOf(key) === -1);
+
+      if (parentKeys.indexOf(latestOpenKey!) === -1) {
+        setOpenKeys(keys);
+      } else {
+        setOpenKeys(latestOpenKey ? [latestOpenKey] : []);
+      }
+    } 
+    else setOpenKeys(keys);
+
+  }, [openKeys, parentKeys]); 
 
   const selectedKeys = useMemo(() => calcSelectedKeys(routes, pathname), [routes, pathname]);
 
@@ -129,8 +152,7 @@ export const SideNav: React.FC<Props> = ({
               ? undefined
               : { openKeys }
           }
-          onOpenChange={setOpenKeys}
-          // defaultOpenKeys={parentKeys}
+          onOpenChange={onOpenChange}
           items={createMenuItems(routes, false)}
         >
         </Menu>
