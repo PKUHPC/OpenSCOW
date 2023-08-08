@@ -10,7 +10,6 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { getHostname } from "@scow/lib-web/build/utils/getHostname";
 import { queryToString, useQuerystring } from "@scow/lib-web/build/utils/querystring";
 import { Spin } from "antd";
 import { GetServerSideProps, NextPage } from "next";
@@ -81,12 +80,9 @@ export const SubmitJobPage: NextPage<Props> = requireAuth(() => true)(
 
   });
 
-export const getServerSideProps: GetServerSideProps<Props> = async ({ req }) => {
+export const getServerSideProps: GetServerSideProps = async () => {
 
-  const hostname = getHostname(req);
-
-  const submitPromptText = (hostname && runtimeConfig.SUBMIT_PROMPT_TEXT[hostname]) ?? 
-  runtimeConfig.DEFAULT_SUBMIT_PROMPT_TEXT;
+  const submitPromptText = runtimeConfig.SUBMIT_PROMPT_TEXT;
 
   return {
     props: {

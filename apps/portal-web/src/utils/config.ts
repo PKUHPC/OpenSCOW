@@ -41,8 +41,7 @@ export interface ServerRuntimeConfig {
   DEFAULT_HOME_TITLE: string;
   HOME_TITLES: {[hostname: string]: string };
 
-  DEFAULT_SUBMIT_PROMPT_TEXT: string;
-  SUBMIT_PROMPT_TEXT: {[hostname: string]: string };
+  SUBMIT_PROMPT_TEXT?: string;
 
   SUBMIT_JOB_WORKING_DIR: string;
 
