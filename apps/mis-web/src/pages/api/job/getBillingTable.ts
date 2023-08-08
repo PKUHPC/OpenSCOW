@@ -15,9 +15,9 @@ import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { ConfigServiceClient } from "@scow/protos/build/common/config";
 import { ConfigServiceClient as MisConfigServerClient } from "@scow/protos/build/server/config";
 import { JobBillingItem } from "@scow/protos/build/server/job";
+import { UserStatus } from "@scow/protos/build/server/user";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
-import { PlatformRole } from "src/models/User";
 import { getBillingItems } from "src/pages/api/job/getBillingItems";
 import { getClient } from "src/utils/client";
 import { publicConfig, runtimeConfig } from "src/utils/config";
@@ -104,8 +104,11 @@ export async function getAvailablePartitionForItems(
   const client = getClient(MisConfigServerClient);
 
   const statuses = await getUserStatus(userId, tenantName);
+  console.log("761test", statuses);
   const accountNames = Object.keys(statuses.accountStatuses).filter(
-    (key) => !statuses.accountStatuses[key].accountBlocked);
+    (key) => (!statuses.accountStatuses[key].accountBlocked
+      && statuses.accountStatuses[key].userStatus !== UserStatus.BLOCKED));
+  console.log("761test", accountNames);
 
   if (!accountNames) { return {}; }
 
@@ -121,7 +124,7 @@ export async function getAvailablePartitionForItems(
       const cluster = cp.cluster;
       if (!(cluster in clusterPartitionsMap)) {
         clusterPartitionsMap[cluster] = [];
-      };
+      }
       if (cp.partitions) {
         clusterPartitionsMap[cluster] = clusterPartitionsMap[cluster].concat(cp.partitions);
       }
@@ -132,8 +135,9 @@ export async function getAvailablePartitionForItems(
     clusterPartitionsMap[cluster] = removeDuplicatesByPName(clusterPartitionsMap[cluster]);
   }
 
+  console.log("761test", clusterPartitionsMap);
   return clusterPartitionsMap;
-};
+}
 
 const removeDuplicatesByPName = (partitions: Partition[]): Partition[] => {
   const uniquePartitions: Partition[] = [];
@@ -164,9 +168,11 @@ export async function getBillingTableItems(
 
   const clusterPartitions = userId && tenantName ? await getAvailablePartitionForItems(userId, tenantName) : {};
 
+  console.log("761test", userId);
+  console.log("761test", clusterPartitions);
   for (const [cluster] of Object.entries(clusters)) {
 
-    const partitions = userId ? clusterPartitions[cluster] ?? []
+    const partitions = userId ? (clusterPartitions[cluster] ?? [])
       : await asyncClientCall(client, "getClusterConfig", { cluster }).then((resp) => resp.partitions);
 
     const partitionCount = partitions.length;
