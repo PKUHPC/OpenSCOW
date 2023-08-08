@@ -61,10 +61,10 @@ vagrant destroy
 
 ###  更多文档
 
-- [vagrant环境搭建](https://pkuhpc.github.io/SCOW/docs/deploy/vagrant/vagrant-env)
-- [自定义部署](https://pkuhpc.github.io/SCOW/docs/deploy/vagrant/customization)
-- [vagrant镜像制作](https://pkuhpc.github.io/SCOW/docs/deploy/vagrant/images)
-- [FAQ](https://pkuhpc.github.io/SCOW/docs/deploy/vagrant/faq)
+- [vagrant环境搭建](https://pkuhpc.github.io/SCOW/docs/deploy/get-started/vagrant/vagrant-env)
+- [自定义部署](https://pkuhpc.github.io/SCOW/docs/deploy/get-started/vagrant/customization)
+- [vagrant镜像制作](https://pkuhpc.github.io/SCOW/docs/deploy/get-started/vagrant/vagrant-env)
+- [FAQ](https://pkuhpc.github.io/SCOW/docs/deploy/get-started/vagrant/faq)
 
 ## 授权协议
 
