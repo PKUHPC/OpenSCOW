@@ -104,11 +104,10 @@ export async function getAvailablePartitionForItems(
   const client = getClient(MisConfigServerClient);
 
   const statuses = await getUserStatus(userId, tenantName);
-  console.log("761test", statuses);
+
   const accountNames = Object.keys(statuses.accountStatuses).filter(
     (key) => (!statuses.accountStatuses[key].accountBlocked
       && statuses.accountStatuses[key].userStatus !== UserStatus.BLOCKED));
-  console.log("761test", accountNames);
 
   if (!accountNames) { return {}; }
 
@@ -135,7 +134,6 @@ export async function getAvailablePartitionForItems(
     clusterPartitionsMap[cluster] = removeDuplicatesByPName(clusterPartitionsMap[cluster]);
   }
 
-  console.log("761test", clusterPartitionsMap);
   return clusterPartitionsMap;
 }
 
@@ -168,8 +166,6 @@ export async function getBillingTableItems(
 
   const clusterPartitions = userId && tenantName ? await getAvailablePartitionForItems(userId, tenantName) : {};
 
-  console.log("761test", userId);
-  console.log("761test", clusterPartitions);
   for (const [cluster] of Object.entries(clusters)) {
 
     const partitions = userId ? (clusterPartitions[cluster] ?? [])
