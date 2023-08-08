@@ -135,6 +135,8 @@ const buildRuntimeConfig = async (phase, basePath) => {
 
     NAV_LINKS: misConfig.navLinks,
 
+    USER_LINKS: commonConfig.userLinks,
+
     VERSION_TAG: versionTag,
   };
 

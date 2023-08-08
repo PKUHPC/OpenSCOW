@@ -27,3 +27,9 @@ export interface NavItemProps {
   openInNewPage?: boolean;
   handleClick?: () => void
 }
+
+export interface UserLink {
+  text: string;
+  url: string;
+  openInNewPage?: boolean;
+}

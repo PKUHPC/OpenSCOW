@@ -186,6 +186,8 @@ const buildRuntimeConfig = async (phase, basePath) => {
 
     NAV_LINKS: portalConfig.navLinks,
 
+    USER_LINKS: commonConfig.userLinks,
+
     VERSION_TAG: versionTag,
   };
 

@@ -11,18 +11,19 @@
  */
 
 import { DownOutlined, UserOutlined } from "@ant-design/icons";
-import { Dropdown } from "antd";
+import { Dropdown, Typography } from "antd";
 import Link from "next/link";
 import React from "react";
 import { ClickableA } from "src/components/ClickableA";
 import { antdBreakpoints } from "src/layouts/base/constants";
 import styled from "styled-components";
 
-import { UserInfo } from "../types";
+import { UserInfo, UserLink } from "../types";
 
 interface Props {
   user: UserInfo | undefined;
   logout: (() => void) | undefined;
+  userLinks?: UserLink[];
 }
 
 const Container = styled.div`
@@ -36,7 +37,7 @@ const HiddenOnSmallScreen = styled.span`
 `;
 
 export const UserIndicator: React.FC<Props> = ({
-  user, logout,
+  user, logout, userLinks,
 }) => {
 
   return (
@@ -50,6 +51,15 @@ export const UserIndicator: React.FC<Props> = ({
                 ...user.name ? [{ key: "username", disabled: true, label: `用户姓名：${user.name}` }] : [],
                 { key: "userid", disabled: true, label: `用户ID：${user.identityId}` },
                 { key: "profileLink", label: <Link href="/profile">个人信息</Link> },
+                ...userLinks ? userLinks.map((link) => {
+                  return ({
+                    key: link.text,
+                    label: <Typography.Link
+                      href={link.url}
+                      target={link.openInNewPage ? "_blank" : "_self"}
+                    >{link.text}</Typography.Link>,
+                  });
+                }) : [],
                 { key: "logout", onClick: logout, label: "退出登录" },
               ],
             }}
