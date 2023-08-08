@@ -29,9 +29,7 @@ export enum SearchType {
 interface Props {
   // 账户充值记录专用项
   accountName?: string;
-  // 是否为平台管理中的页面
-  isPlatform?: boolean;
-  // 展示账户或租户下拉搜索，不传就不展示
+  // 展示账户或租户下拉搜索，不传就不展示,同时区分后端接口，值为tenant时，获取租户的记录
   searchType?: SearchType;
   // 列表中是否展示账户 
   showAccountName?: boolean;
@@ -63,7 +61,7 @@ interface FilterForm {
 const today = dayjs().endOf("day");
 
 export const PaymentTable: React.FC<Props> = ({
-  accountName, isPlatform, searchType, showAccountName,
+  accountName, searchType, showAccountName,
   showTenantName, showAuditInfo,
 }) => {
 
@@ -81,7 +79,7 @@ export const PaymentTable: React.FC<Props> = ({
         endTime: query.time[1].clone().endOf("day").toISOString(),
       };
 
-      if (isPlatform) {
+      if (searchType === SearchType.tenant) {
         return api.getTenantPayments({ query: { ...param, tenantName:query.name } });
       } else {
         // 展示账户名时，是在搜索账户的记录
