@@ -30,15 +30,15 @@ export class OperationLog {
   @Property()
     operationResult!: number;
 
-  @Property()
-    metaData?: Map<string, string | number>;
+  @Property({ type: "json", nullable: true })
+    metaData?: { [key: string]: any; };
 
   constructor(init: {
       operatorUserId: string;
       operatorIp: string;
       operationTime?: Date;
       operationResult: number;
-      metaData: Map<string, any> | undefined;
+      metaData: { [key: string]: any };
     }) {
     this.operatorUserId = init.operatorUserId;
     this.operatorIp = init.operatorIp;

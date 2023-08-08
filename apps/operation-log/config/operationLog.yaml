@@ -3,6 +3,6 @@ db:
   port: 3306
   user: root
   password: mysqlrootpassword
-  dbName: scow_log
+  dbName: operation_log
 
 

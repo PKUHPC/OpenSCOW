@@ -40,18 +40,136 @@ message EndJob {
   string job_id = 2;
 }
 
+message UserSetJobTimeLimit {
+  string account_name = 1;
+  string job_id = 2;
+  common.Money limit_amount = 3;
+}
 
+message AddJobTemplate {
+  string job_template_id = 1;
+}
+
+message DeleteJobTemplate {
+  string job_template_id = 1;
+}
+
+message UpdateJobTemplate {
+  string job_template_id = 1;
+}
+
+message ShellLogin {
+  string cluster_id = 1;
+  string login_node = 2;
+}
+
+message CreateDesktop {
+  string desktop_id = 1;
+  string wm = 2;
+}
+
+message DeleteDesktop {
+  string desktop_id = 1;
+  string wm = 2;
+}
+
+message CreateApp {
+  string job_id = 1;
+}
+
+message EndApp {
+  string job_id = 1;
+}
+
+message CreateFile {
+  string cluster_id = 1;
+  string path = 2;
+}
+
+message DeleteFile {
+  string cluster_id = 1;
+  string path = 2;
+}
+
+message UploadFile {
+  string cluster_id = 1;
+  string path = 2;
+}
+
+message CreateDirectory {
+  string cluster_id = 1;
+  string path = 2;
+}
+
+message DeleteDirectory {
+  string cluster_id = 1;
+  string path = 2;
+}
+
+message RenameFile {
+  string cluster_id = 1;
+  string from_path = 2;
+  string to_path = 3;
+}
+
+message RenameDirectory {
+  string cluster_id = 1;
+  string from_path = 2;
+  string to_path = 3;
+}
+
+message MoveFile {
+  string cluster_id = 1;
+  string from_path = 2;
+  string to_path = 3;
+}
+
+message MoveDirectory {
+  string cluster_id = 1;
+  string from_path = 2;
+  string to_path = 3;
+}
+
+message CopyFile {
+  string cluster_id = 1;
+  string from_path = 2;
+  string to_path = 3;
+}
+
+message CopyDirectory {
+  string cluster_id = 1;
+  string from_path = 2;
+  string to_path = 3;
+}
+
+message AccountSetJobTimeLimit {
+  string account_name = 1;
+  string job_id = 2;
+  common.Money limit_amount = 3;
+}
+
+message CreateUser {
+  string user_id = 2;
+}
 
 message AddUserToAccount {
   string account_name = 1;
   string user_id = 2;
 }
 
+message RemoveUserFromAccount {
+  string account_name = 1;
+  string user_id = 2;
+}
+
+
+
 message AccountSetChargeLimit {
   string account_name = 1;
   string user_id = 2;
   common.Money limit_amount = 3;
 }
+
 
 
 message CreateOperationLogRequest {
@@ -64,8 +182,9 @@ message CreateOperationLogRequest {
     Logout logout = 5;
     EndJob end_job = 6;
     AddUserToAccount  add_user_to_account = 7;
-    SubmitJob submit_job = 8;
-    AccountSetChargeLimit account_set_charge_limit = 9;
+    RemoveUserFromAccount remove_user_from_account = 8;
+    // SubmitJob submit_job = 8;
+    // AccountSetChargeLimit account_set_charge_limit = 9;
 
     // TODO
   }
@@ -83,8 +202,9 @@ message OperationLog {
     Logout logout = 6;
     EndJob end_job = 7;
     AddUserToAccount  add_user_to_account = 8;
-    SubmitJob submit_job = 9;
-    AccountSetChargeLimit account_set_charge_limit = 10;
+    RemoveUserFromAccount remove_user_from_account = 9;
+    // SubmitJob submit_job = 9;
+    // AccountSetChargeLimit account_set_charge_limit = 10;
     // TODO
   }
 

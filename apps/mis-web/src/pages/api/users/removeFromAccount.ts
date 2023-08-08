@@ -13,13 +13,15 @@
 import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Status } from "@grpc/grpc-js/build/src/constants";
+import { OperationResult } from "@scow/protos/build/operation-log/operation_log";
 import { UserServiceClient } from "@scow/protos/build/server/user";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { PlatformRole, TenantRole, UserRole } from "src/models/User";
+import { createOperationLog } from "src/server/operationLog";
 import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
-import { handlegRPCError } from "src/utils/server";
+import { handlegRPCError, parseIp } from "src/utils/server";
 
 export const RemoveUserFromAccountSchema = typeboxRouteSchema({
   method: "DELETE",
@@ -47,10 +49,10 @@ export default /* #__PURE__*/route(RemoveUserFromAccountSchema, async (req, res)
     const acccountBelonged = u.accountAffiliations.find((x) => x.accountName === accountName);
 
     return u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ||
-          (acccountBelonged && acccountBelonged.role !== UserRole.USER) || 
+          (acccountBelonged && acccountBelonged.role !== UserRole.USER) ||
           u.tenantRoles.includes(TenantRole.TENANT_ADMIN);
   });
-  
+
   const info = await auth(req, res);
 
   if (!info) { return; }
@@ -63,7 +65,19 @@ export default /* #__PURE__*/route(RemoveUserFromAccountSchema, async (req, res)
     accountName,
     userId: identityId,
   })
-    .then(() => ({ 204: null }))
+    .then(() => {
+      createOperationLog(
+        "removeUserFromAccount",
+        {
+          operatorUserId: info.identityId,
+          operatorIp: parseIp(req) ?? "",
+          operationResult: OperationResult.SUCCESS,
+          accountName, userId: identityId,
+        },
+        console,
+      );
+      return { 204: null };
+    })
     .catch(handlegRPCError({
       [Status.NOT_FOUND]: () => ({ 404: null }),
       [Status.OUT_OF_RANGE]: () => ({ 406: null }),

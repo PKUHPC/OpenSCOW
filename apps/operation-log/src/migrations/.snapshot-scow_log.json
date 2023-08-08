@@ -52,12 +52,12 @@
         },
         "meta_data": {
           "name": "meta_data",
-          "type": "varchar(255)",
+          "type": "json",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": false,
-          "mappedType": "string"
+          "nullable": true,
+          "mappedType": "json"
         }
       },
       "name": "operation_log",

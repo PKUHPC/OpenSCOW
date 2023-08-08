@@ -30,7 +30,8 @@ export const operationLogServiceServer = plugin((server) => {
         operationEvent,
       } = request;
 
-      const metaData = operationEvent ? operationEvent[operationEvent["$case"]] : null;
+      const eventName = operationEvent ? operationEvent["$case"] : null;
+      const metaData = eventName ? { [eventName]: operationEvent?.[eventName] || {} } : {};
 
       await logOperation(
         operatorUserId, operatorIp,

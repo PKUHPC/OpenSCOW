@@ -19,7 +19,7 @@ export async function logOperation(
   operatorUserId: string,
   operatorIp: string,
   operationResult: OperationResult,
-  metaData: Map<string, any> | undefined,
+  metaData: { [key: string]: any },
   em: SqlEntityManager<MySqlDriver>,
   logger: Logger,
 ): Promise<void> {
@@ -28,7 +28,7 @@ export async function logOperation(
       operatorUserId: string,
       operatorIp: string;
       operationResult: OperationResult;
-      metaData: Map<string, any> | undefined;
+      metaData: { [key: string]: any };
     } = {
       operatorUserId,
       operatorIp,

@@ -280,9 +280,6 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
         ...serviceLogEnv,
       },
       volumes: {
-        "/etc/hosts": "/etc/hosts",
-        "./config": "/etc/scow",
-        "~/.ssh": "/root/.ssh",
       },
     });
 
