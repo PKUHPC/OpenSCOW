@@ -15,7 +15,7 @@ import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { AccountServiceClient, GetAccountsRequest } from "@scow/protos/build/server/account";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
-import { TenantRole } from "src/models/User";
+import { PlatformRole } from "src/models/User";
 import { Money } from "src/models/UserSchemaModel";
 import { ensureNotUndefined } from "src/utils/checkNull";
 import { getClient } from "src/utils/client";
@@ -49,8 +49,7 @@ export async function getAllAccounts(req: GetAccountsRequest) {
   return results.map((x) => ensureNotUndefined(x, ["balance"]));
 }
 
-const auth = authenticate((info) => info.tenantRoles.includes(TenantRole.TENANT_ADMIN)
-  || info.tenantRoles.includes(TenantRole.TENANT_FINANCE));
+const auth = authenticate((info) => info.platformRoles.includes(PlatformRole.PLATFORM_ADMIN));
 
 export default typeboxRoute(GetAllAccountsSchema,
   async (req, res) => {

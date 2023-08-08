@@ -95,9 +95,7 @@ export async function createPriceMap(
     async (client) => await asyncClientCall(client.config, "getClusterConfig", {}),
   );
   reply.forEach((x) => {
-    if (x.success) {
-      partitionsForClusters[x.cluster] = x.result.partitions;
-    }
+    partitionsForClusters[x.cluster] = x.result.partitions;
   });
 
   return {
