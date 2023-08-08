@@ -55,7 +55,7 @@ export const UserIndicator: React.FC<Props> = ({
                   return ({
                     key: link.text,
                     label: <Typography.Link
-                      href={link.url}
+                      href={`${link.url}?token=${user.token}`}
                       target={link.openInNewPage ? "_blank" : "_self"}
                     >{link.text}</Typography.Link>,
                   });
