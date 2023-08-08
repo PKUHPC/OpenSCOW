@@ -280,6 +280,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
         ...serviceLogEnv,
       },
       volumes: {
+        "./config": "/etc/scow",
       },
     });
 
