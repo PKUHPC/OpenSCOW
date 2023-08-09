@@ -10,12 +10,15 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { plugin } from "@ddadaal/tsgrpc-server";
+import { ensureNotUndefined, plugin } from "@ddadaal/tsgrpc-server";
+import { QueryOrder } from "@mikro-orm/core";
 import {
   OperationLogServiceServer,
   OperationLogServiceService,
 } from "@scow/protos/build/operation-log/operation_log";
-import { logOperation } from "src/utils/operationLogs";
+import { OperationLog } from "src/entities/OperationLog";
+import { filterOperationLogs, logOperation, toGrpcOperationLog } from "src/utils/operationLogs";
+import { paginationProps } from "src/utils/orm";
 
 
 export const operationLogServiceServer = plugin((server) => {
@@ -30,9 +33,7 @@ export const operationLogServiceServer = plugin((server) => {
         operationEvent,
       } = request;
 
-      const eventName = operationEvent ? operationEvent["$case"] : null;
-      const metaData = eventName ? { [eventName]: operationEvent?.[eventName] || {} } : {};
-
+      const metaData = operationEvent || {};
       await logOperation(
         operatorUserId, operatorIp,
         operationResult, metaData, em, logger,
@@ -40,27 +41,22 @@ export const operationLogServiceServer = plugin((server) => {
       return [];
     },
 
-    getOperationLogs: async ({}) => {
-      // const { filter, page, pageSize } = ensureNotUndefined(request, ["filter"]);
+    getOperationLogs: async ({ request, em, logger }) => {
+      const { filter, page, pageSize } = ensureNotUndefined(request, ["filter", "page"]);
 
-      // const newFilter = { ...filter, operatorIds: operators.map((x) => x.id) } as NewOperationLogFilter;
-      // let sqlFilter: FilterQuery<OperationLog>;
+      const sqlFilter = await filterOperationLogs(filter);
 
+      logger.info("getOperationLogs sqlFilter %s", JSON.stringify(sqlFilter));
 
-      // sqlFilter = filterOperationLogs(newFilter);
+      const [operationLogs, count] = await em.findAndCount(OperationLog, sqlFilter, {
+        ...paginationProps(page, pageSize || 10),
+        orderBy: { operationTime: QueryOrder.DESC },
+      });
 
-      // logger.info("getOperationLogs sqlFilter %s", JSON.stringify(sqlFilter));
-
-      // const [operationLogs, count] = await em.findAndCount(OperationLog, sqlFilter, {
-      //   ...paginationProps(page, pageSize || 10),
-      //   orderBy: { operationTime: QueryOrder.DESC },
-      // });
-
-      // return [{
-      //   results: operationLogs.map(toGrpcOperationLog),
-      //   totalCount: count,
-      // }];
-      return [];
+      return [{
+        results: operationLogs.map(toGrpcOperationLog),
+        totalCount: count,
+      }];
     },
 
   });

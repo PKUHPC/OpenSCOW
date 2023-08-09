@@ -444,16 +444,14 @@ message CreateOperationLogResponse {
 message OperationLogFilter {
   // if length === 0, get from all operators
   repeated string operator_user_ids = 1;
-  // 如果两者都不存在，则筛选特定用户的操作日志
   // 如果存在，则表示筛选特定账户的操作日志
   optional string operation_target_account_name = 2;
-  // 如果存在，则表示筛选特定租户的操作日志
-  optional string operation_target_tenant_name = 3;
 
   // 筛选项如果为空，则返回所有
+  optional string operation_type = 3;
   optional google.protobuf.Timestamp start_time = 4;
   optional google.protobuf.Timestamp end_time = 5;
-  optional OperationResult operation_result = 7;
+  optional OperationResult operation_result = 6;
 }
 
 message GetOperationLogsRequest {

@@ -22,6 +22,7 @@ import { Logger } from "ts-log";
 
 export type OperationEvent = Exclude<CreateOperationLogRequest["operationEvent"], undefined>;
 
+export type OperationType = OperationEvent["$case"];
 
 export const createOperationLogClient = (
   config: OperationLogConfigSchema | undefined,
@@ -78,3 +79,4 @@ export const createOperationLogClient = (
 };
 
 
+export * from "./constant";
