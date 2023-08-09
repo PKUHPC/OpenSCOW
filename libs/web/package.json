@@ -22,7 +22,7 @@
   },
   "peerDependencies": {
     "antd": "5.8.2",
-    "next": "13.4.13",
+    "next": "13.4.10",
     "styled-components": "6.0.7",
     "@ant-design/icons": "5.2.5",
     "dayjs": "1.11.9",
@@ -33,7 +33,7 @@
   },
   "devDependencies": {
     "antd": "5.8.2",
-    "next": "13.4.13",
+    "next": "13.4.10",
     "styled-components": "6.0.7",
     "@grpc/grpc-js": "1.8.21",
     "@types/mime-types": "2.1.1",
