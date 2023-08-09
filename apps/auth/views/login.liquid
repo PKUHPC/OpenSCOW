@@ -116,10 +116,10 @@
           {% endif %}
         </div>
       </div>
-      <div class="w-1/2 h-screen pl-48 pb-28 flex justify-center flex-col" style="color: {{ sloganColor }}">
-          <div class="text-white text-4xl font-semibold mb-12">{{ sloganTitle }}</div>
+      <div class="w-1/2 h-screen pl-48 pb-28 flex justify-center flex-col">
+          <div class="text-4xl font-semibold mb-12"  style="color: {{ sloganColor }}">{{ sloganTitle }}</div>
           {% for sloganText in sloganTextArr %}
-            <div class="text-white text-2xl mb-8">{{ sloganText }}</div>
+            <div class="text-2xl mb-8"  style="color: {{ sloganColor }}">{{ sloganText }}</div>
           {% endfor %}
       </div>
     </div>
