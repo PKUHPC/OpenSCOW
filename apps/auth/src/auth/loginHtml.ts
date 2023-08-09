@@ -53,6 +53,8 @@ export async function serveLoginHtml(
   return rep.status(
     verifyCaptchaFail ? 400 : err ? 401 : 200).view("login.liquid", {
     cssUrl: join(config.BASE_PATH, config.AUTH_BASE_PATH, "/public/assets/tailwind.min.css"),
+    eyeImagePath: join(config.BASE_PATH, config.AUTH_BASE_PATH, "/public/assets/icons/eye.png"),
+    eyeCloseImagePath: join(config.BASE_PATH, config.AUTH_BASE_PATH, "/public/assets/icons/eye-close.png"),
     backgroundImagePath: join(config.BASE_PATH, config.PUBLIC_PATH,
       authConfig.ui?.backgroundImagePath ?? "./assets/background.png"),
     backgroundFallbackColor: authConfig.ui?.backgroundFallbackColor || "#9a0000",

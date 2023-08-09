@@ -128,10 +128,10 @@
     </p>
     <script>
       // 图片预加载
-      const eyeImg = new Image()
-      eyeImg.src = "/public/assets/icons/eye.png"
-      const eyeCloseImg = new Image()
-      eyeCloseImg.src = "/public/assets/icons/eye-close.png"
+      const eyeImg = new Image();
+      eyeImg.src = "{{ eyeImagePath }}";
+      const eyeCloseImg = new Image();
+      eyeCloseImg.src = "{{ eyeCloseImagePath }}";
 
       const passwordInput = document.getElementById('password');
       const eyeElem = document.getElementById('eye-elem');
