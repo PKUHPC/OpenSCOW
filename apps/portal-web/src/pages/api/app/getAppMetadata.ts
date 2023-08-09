@@ -36,11 +36,11 @@ export const AppCustomAttribute = Type.Object({
   name: Type.String(),
   required: Type.Boolean(),
   placeholder: Type.Optional(Type.String()),
-  defaultValue: Type.Union([
+  defaultValue: Type.Optional(Type.Union([
     Type.String(),
     Type.Number(),
     Type.Undefined(),
-  ]),
+  ])),
   select: Type.Array(SelectOption),
 });
 export type AppCustomAttribute = Static<typeof AppCustomAttribute>;
