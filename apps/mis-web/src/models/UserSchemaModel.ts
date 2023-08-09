@@ -54,7 +54,7 @@ export type UserInAccount = Static<typeof UserInAccount>;
 export const ClusterAccountInfo = Type.Object({
   accountName: Type.String(),
   users: Type.Array(UserInAccount),
-  owner: Type.Optional(Type.Union([Type.String(), Type.Undefined()])),
+  owner: Type.Optional(Type.String()),
   importStatus: Type.Enum(ClusterAccountInfo_ImportStatus),
   blocked: Type.Boolean(),
 });
@@ -133,8 +133,8 @@ export const AccountUserInfo = Type.Object({
   role: Type.Enum(UserRole),
   /** cluster and quota */
   storageQuotas: Type.Record(Type.String(), Type.Number()),
-  jobChargeLimit:Type.Optional(Type.Union([Money, Type.Undefined()])),
-  usedJobChargeLimit: Type.Optional(Type.Union([Money, Type.Undefined()])),
+  jobChargeLimit:Type.Optional(Money),
+  usedJobChargeLimit: Type.Optional(Money),
 });
 export type AccountUserInfo = Static<typeof AccountUserInfo>;
 
