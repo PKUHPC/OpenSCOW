@@ -104,14 +104,16 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ req }) => 
   const accounts = Object.entries(status.accountStatuses).reduce((prev, [accountName, info]) => {
 
     const { balance, ...validated } = ensureNotUndefined(info, ["balance"]);
+
     prev[accountName] = {
       ...validated,
       balance: moneyToNumber(balance),
+      
       // 不能使用undefined，NextJs中：`undefined` cannot be serialized as JSON
       jobChargeLimit: validated.jobChargeLimit ?? null,
       usedJobCharge: validated.usedJobCharge ?? null,
     };
-    console.log("prev", prev);
+
     return prev;
   }, {} as Record<string, AccountInfo>);
   return {
