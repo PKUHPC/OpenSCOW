@@ -24,8 +24,8 @@ import { handlegRPCError } from "src/utils/server";
 export const JobTemplate = Type.Object({
   jobName: Type.String(),
   account: Type.String(),
-  partition: Type.Optional(Type.Union([Type.String(), Type.Undefined()])),
-  qos: Type.Optional(Type.Union([Type.String(), Type.Undefined()])),
+  partition: Type.Optional(Type.String()),
+  qos: Type.Optional(Type.String()),
   nodeCount: Type.Number(),
   coreCount: Type.Number(),
   gpuCount: Type.Optional(Type.Number()),
@@ -33,9 +33,9 @@ export const JobTemplate = Type.Object({
   maxTime: Type.Number(),
   command: Type.String(),
   workingDirectory: Type.String(),
-  output: Type.Optional(Type.Union([Type.String(), Type.Undefined()])),
-  errorOutput: Type.Optional(Type.Union([Type.String(), Type.Undefined()])),
-  comment: Type.Optional(Type.Union([Type.String(), Type.Undefined()])),
+  output: Type.Optional(Type.String()),
+  errorOutput: Type.Optional(Type.String()),
+  comment: Type.Optional(Type.String()),
 });
 export type JobTemplate = Static<typeof JobTemplate>;
 
