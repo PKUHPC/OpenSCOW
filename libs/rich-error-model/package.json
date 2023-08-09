@@ -14,15 +14,15 @@
     "!**/*.map"
   ],
   "dependencies": {
-    "@grpc/grpc-js": "1.8.18",
+    "@grpc/grpc-js": "1.8.21",
     "long": "5.2.3",
     "protobufjs": "7.2.4"
   },
   "devDependencies": {
-    "ts-proto": "1.155.1",
-    "@ddadaal/tsgrpc-server": "0.19.2",
-    "@ddadaal/tsgrpc-common": "0.2.3",
-    "@ddadaal/tsgrpc-client": "0.17.5",
+    "ts-proto": "1.156.2",
+    "@ddadaal/tsgrpc-server": "0.19.4",
+    "@ddadaal/tsgrpc-common": "0.2.4",
+    "@ddadaal/tsgrpc-client": "0.17.6",
     "@scow/protos": "workspace:*"
   },
   "keywords": [],

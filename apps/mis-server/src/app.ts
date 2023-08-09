@@ -33,7 +33,6 @@ export async function createServer() {
   const server = new Server({
     host: config.HOST,
     port: config.PORT,
-
     logger,
   });
 
