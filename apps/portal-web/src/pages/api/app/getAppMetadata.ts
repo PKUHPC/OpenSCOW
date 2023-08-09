@@ -39,7 +39,7 @@ export const AppCustomAttribute = Type.Object({
   defaultValue: Type.Optional(Type.Union([
     Type.String(),
     Type.Number(),
-    Type.Undefined(),
+    // Type.Undefined(),
   ])),
   select: Type.Array(SelectOption),
 });
