@@ -11,6 +11,7 @@
  */
 
 import { moneyToNumber } from "@scow/lib-decimal";
+import { Money } from "@scow/protos/build/common/money";
 import { AccountStatus } from "@scow/protos/build/server/user";
 import { Divider } from "antd";
 import { GetServerSideProps, NextPage } from "next";
@@ -29,8 +30,11 @@ import { UserStore } from "src/stores/UserStore";
 import { ensureNotUndefined } from "src/utils/checkNull";
 import { Head } from "src/utils/head";
 
-export type AccountInfo = Omit<AccountStatus, "balance"> & {
+
+export type AccountInfo = Omit<AccountStatus, "balance" | "jobChargeLimit" | "usedJobCharge"> & {
   balance: number;
+  jobChargeLimit: Money | null;
+  usedJobCharge: Money | null;
 }
 
 type Props = {
@@ -100,14 +104,16 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ req }) => 
   const accounts = Object.entries(status.accountStatuses).reduce((prev, [accountName, info]) => {
 
     const { balance, ...validated } = ensureNotUndefined(info, ["balance"]);
-
     prev[accountName] = {
       ...validated,
       balance: moneyToNumber(balance),
+      // 不能使用undefined，NextJs中：`undefined` cannot be serialized as JSON
+      jobChargeLimit: validated.jobChargeLimit ?? null,
+      usedJobCharge: validated.usedJobCharge ?? null,
     };
+    console.log("prev", prev);
     return prev;
   }, {} as Record<string, AccountInfo>);
-
   return {
     props: {
       accounts,
