@@ -15,6 +15,8 @@ import { ChannelCredentials } from "@grpc/grpc-js";
 import { OperationLogConfigSchema } from "@scow/config/build/common";
 import {
   CreateOperationLogRequest,
+  GetOperationLogsRequest,
+  GetOperationLogsResponse,
   OperationLogServiceClient,
   OperationResult,
 } from "@scow/protos/build/operation-log/operation_log";
@@ -39,6 +41,15 @@ export const createOperationLogClient = (
   }
 
   return {
+    getLog: async (request: GetOperationLogsRequest): Promise<GetOperationLogsResponse> => {
+
+      if (!client) {
+        logger.debug("Attempt to get Log with %o", request);
+        return { results: [], totalCount: 0 };
+      }
+
+      return await asyncUnaryCall(client, "getOperationLogs", request);
+    },
     callLog: async <TName extends OperationEvent["$case"]>(
       operationTypeName: TName,
       // @ts-ignore

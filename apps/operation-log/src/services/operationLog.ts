@@ -53,8 +53,10 @@ export const operationLogServiceServer = plugin((server) => {
         orderBy: { operationTime: QueryOrder.DESC },
       });
 
+      const res = operationLogs.map(toGrpcOperationLog);
+
       return [{
-        results: operationLogs.map(toGrpcOperationLog),
+        results: res,
         totalCount: count,
       }];
     },

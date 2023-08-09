@@ -43,12 +43,18 @@
         },
         "operation_result": {
           "name": "operation_result",
-          "type": "int",
+          "type": "text",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "mappedType": "integer"
+          "enumItems": [
+            "UNKNOWN",
+            "SUCCESS",
+            "FAIL"
+          ],
+          "comment": "UNKNOWN, SUCCESS, FAIL",
+          "mappedType": "text"
         },
         "meta_data": {
           "name": "meta_data",

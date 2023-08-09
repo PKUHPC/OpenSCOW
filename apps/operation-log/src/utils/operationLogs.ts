@@ -58,14 +58,14 @@ export async function filterOperationLogs(
   }: OperationLogFilter,
 ) {
   const sqlFilter: FilterQuery<OperationLogEntity> = {
-    ...(operatorUserIds.length > 0 ? { operator_id: { $in: operatorUserIds } } : {}),
+    ...(operatorUserIds.length > 0 ? { operatorUserId: { $in: operatorUserIds } } : {}),
     $and: [
       ...(startTime ? [{ operationTime: { $gte: startTime } }] : []),
       ...(endTime ? [{ operationTime: { $lte: endTime } }] : []),
     ],
     ...(operationType
       ? (operationTargetAccountName
-        ? { "metaData.$case": operationType, "metaData.${operationType}.account_name": operationTargetAccountName }
+        ? { "metaData.$case": operationType, "metaData.${operationType}.accountName": operationTargetAccountName }
         : { "metaData.$case": operationType })
       : {}),
     ...(operationResult ? { operation_result: operationResult } : {}),
@@ -84,11 +84,13 @@ export function toGrpcOperationLog(x: OperationLogEntity): OperationLog {
   };
 
   if (x.metaData && x.metaData.$case) {
+    // @ts-ignore
     grpcOperationLog.operationEvent = {
       $case: x.metaData.$case,
-      ...x.metaData[x.metaData.$case],
+      [x.metaData.$case]: x.metaData[x.metaData.$case],
     };
-  }
 
+  }
   return grpcOperationLog;
+
 }

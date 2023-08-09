@@ -10,8 +10,14 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Entity, PrimaryKey, Property } from "@mikro-orm/core";
+import { Entity, Enum, PrimaryKey, Property } from "@mikro-orm/core";
 import { CURRENT_TIMESTAMP } from "src/utils/orm";
+
+export enum OperationResult {
+  UNKNOWN = "UNKNOWN",
+  SUCCESS = "SUCCESS",
+  FAIL = "FAIL",
+}
 
 @Entity()
 export class OperationLog {
@@ -27,8 +33,8 @@ export class OperationLog {
   @Property({ defaultRaw: CURRENT_TIMESTAMP })
     operationTime?: Date;
 
-  @Property()
-    operationResult!: number;
+  @Enum({ items: () => OperationResult, array: true, comment: Object.values(OperationResult).join(", ") })
+    operationResult: OperationResult;
 
   @Property({ type: "json", nullable: true })
     metaData?: { [key: string]: any; };
@@ -37,7 +43,7 @@ export class OperationLog {
       operatorUserId: string;
       operatorIp: string;
       operationTime?: Date;
-      operationResult: number;
+      operationResult: OperationResult;
       metaData: { [key: string]: any };
     }) {
     this.operatorUserId = init.operatorUserId;
