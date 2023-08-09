@@ -69,10 +69,10 @@ const initialValues = {
 
 interface Props {
   initial?: typeof initialValues;
-  submitPromptText: string;
+  submitJobPromptText: string;
 }
 
-export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submitPromptText }) => {
+export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submitJobPromptText }) => {
   const { message, modal } = App.useApp();
 
   const [form] = Form.useForm<JobForm>();
@@ -222,7 +222,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
       >
         <CodeEditor
           height="50vh"
-          placeholder={submitPromptText}
+          placeholder={submitJobPromptText}
         />
       </Form.Item>
       <Row gutter={4}>

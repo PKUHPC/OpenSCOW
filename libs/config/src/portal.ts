@@ -44,7 +44,7 @@ export const PortalConfigSchema = Type.Object({
     ),
   }),
 
-  submitPromptText: 
+  submitJobPromptText: 
   Type.Optional(Type.String({ description: "提交作业命令框中的提示语", default: "#此处参数设置的优先级高于页面其它地方，两者冲突时以此处为准" })),
 
   misUrl: Type.Optional(Type.String({ description: "管理系统的部署URL或者路径" })),

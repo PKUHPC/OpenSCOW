@@ -23,7 +23,7 @@ import { publicConfig, runtimeConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
 
 interface Props {
-  submitPromptText: string;
+  submitJobPromptText: string;
 }
 
 export const SubmitJobPage: NextPage<Props> = requireAuth(() => true)(
@@ -72,7 +72,7 @@ export const SubmitJobPage: NextPage<Props> = requireAuth(() => true)(
           isLoading ? (
             <Spin tip="正在加载作业模板" />
           ) : (
-            <SubmitJobForm initial={data} submitPromptText={props.submitPromptText} />
+            <SubmitJobForm initial={data} submitJobPromptText={props.submitJobPromptText} />
           )
         }
       </div>
@@ -82,11 +82,11 @@ export const SubmitJobPage: NextPage<Props> = requireAuth(() => true)(
 
 export const getServerSideProps: GetServerSideProps = async () => {
 
-  const submitPromptText = runtimeConfig.SUBMIT_PROMPT_TEXT;
+  const submitJobPromptText = runtimeConfig.SUBMIT_JOB_PROMPT_TEXT;
 
   return {
     props: {
-      submitPromptText,
+      submitJobPromptText,
     },
   };
 };
