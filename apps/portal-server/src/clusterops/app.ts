@@ -121,16 +121,16 @@ export const appOps = (cluster: string): AppOps => {
             const ex = e as ServiceError;
             const errors = parseErrorDetails(ex.metadata);
             if (errors[0] && errors[0].$type === "google.rpc.ErrorInfo"
-              && errors[0].reason === "SBATCH_FAILED" && Array.isArray(e.details)) {
-              throw <ServiceError> {
+              && errors[0].reason === "SBATCH_FAILED") {
+              throw new DetailedError({
                 code: Status.INTERNAL,
-                message: "sbatch failed",
-                details: e.details,
-              };
+                message: e.details,
+                details: [errorInfo("SBATCH_FAILED")],
+              });
             }
             else {
               throw new DetailedError({
-                code: Status.INVALID_ARGUMENT,
+                code: e.code,
                 message: e.details,
                 details: [errorInfo("SBATCH_FAILED")],
               });
