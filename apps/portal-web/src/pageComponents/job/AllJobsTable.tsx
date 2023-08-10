@@ -41,14 +41,14 @@ export const AllJobQueryTable: React.FC<Props> = ({
   userId,
 }) => {
 
-  const defaultClusterStore = useStore(DefaultClusterStore);
+  const { defaultCluster } = useStore(DefaultClusterStore);
 
   const [query, setQuery] = useState<FilterForm>(() => {
     const now = dayjs();
     return {
       time: [now.subtract(1, "week").startOf("day"), now.endOf("day")],
       jobId: undefined,
-      cluster: defaultClusterStore.cluster,
+      cluster: defaultCluster,
     };
   });
 

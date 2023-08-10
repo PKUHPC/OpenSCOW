@@ -69,9 +69,10 @@ const initialValues = {
 
 interface Props {
   initial?: typeof initialValues;
+  submitJobPromptText: string;
 }
 
-export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
+export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submitJobPromptText }) => {
   const { message, modal } = App.useApp();
 
   const [form] = Form.useForm<JobForm>();
@@ -177,9 +178,9 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
     }
   }, [currentPartitionInfo]);
 
-  const defaultClusterStore = useStore(DefaultClusterStore);
+  const { defaultCluster: currentDefaultCluster } = useStore(DefaultClusterStore);
   // 判断是使用template中的cluster还是系统默认cluster，防止系统配置文件更改时仍选改动前的cluster
-  const defaultCluster = publicConfig.CLUSTERS.find((x) => x.id === initial.cluster?.id) ?? defaultClusterStore.cluster;
+  const defaultCluster = publicConfig.CLUSTERS.find((x) => x.id === initial.cluster?.id) ?? currentDefaultCluster;
 
   const memorySize = (currentPartitionInfo ?
     currentPartitionInfo.gpus ? nodeCount * gpuCount
@@ -221,7 +222,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues }) => {
       >
         <CodeEditor
           height="50vh"
-          placeholder="#此处参数设置的优先级高于页面其它地方，两者冲突时以此处为准"
+          placeholder={submitJobPromptText}
         />
       </Form.Item>
       <Row gutter={4}>

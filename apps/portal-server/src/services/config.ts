@@ -17,7 +17,7 @@ import { getAdapterClient } from "src/utils/clusters";
 import { clusterNotFound } from "src/utils/errors";
 
 export const configServiceServer = plugin((server) => {
-  server.addService<ConfigServiceServer>(ConfigServiceService, {
+  return server.addService<ConfigServiceServer>(ConfigServiceService, {
     getClusterConfig: async ({ request }) => {
       const { cluster } = request;
 
@@ -28,5 +28,6 @@ export const configServiceServer = plugin((server) => {
 
       return [reply];
     },
+
   });
 });

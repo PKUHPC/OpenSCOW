@@ -70,6 +70,9 @@ homeText:
   hostnameMap: 
     a.com: "a.com's SCOW"
 
+# 提交作业命令框中的提示语，可选配置
+submitJobPromptText: "#此处参数设置的优先级高于页面其它地方，两者冲突时以此处为准"
+
 # 是否启用终端功能
 shell: true
 

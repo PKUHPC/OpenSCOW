@@ -41,6 +41,8 @@ export interface ServerRuntimeConfig {
   DEFAULT_HOME_TITLE: string;
   HOME_TITLES: {[hostname: string]: string };
 
+  SUBMIT_JOB_PROMPT_TEXT?: string;
+
   SUBMIT_JOB_WORKING_DIR: string;
 
   SCOW_API_AUTH_TOKEN?: string;
@@ -94,9 +96,9 @@ export const getLoginDesktopEnabled = (cluster: string): boolean => {
 
   const clusterLoginDesktopEnabled = runtimeConfig.CLUSTERS_CONFIG[cluster]?.loginDesktop?.enabled;
 
-  const commonLogindesktopEnabled = runtimeConfig.PORTAL_CONFIG.loginDesktop.enabled;
+  const commonLoginDesktopEnabled = runtimeConfig.PORTAL_CONFIG.loginDesktop.enabled;
 
-  return clusterLoginDesktopEnabled === undefined ? commonLogindesktopEnabled : clusterLoginDesktopEnabled;
+  return clusterLoginDesktopEnabled === undefined ? commonLoginDesktopEnabled : clusterLoginDesktopEnabled;
 };
 
 export type LoginNode = { name: string, address: string }
