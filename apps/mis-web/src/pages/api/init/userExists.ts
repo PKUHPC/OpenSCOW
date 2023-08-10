@@ -26,7 +26,7 @@ export const UserExistsSchema = typeboxRouteSchema({
   responses: {
     200: Type.Object({
       existsInScow: Type.Boolean(),
-      existsInAuth: Type.Union([Type.Boolean(), Type.Undefined()]),
+      existsInAuth: Type.Optional(Type.Boolean()),
     }),
 
     // 204: null;

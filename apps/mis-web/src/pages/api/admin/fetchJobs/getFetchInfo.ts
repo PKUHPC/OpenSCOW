@@ -22,7 +22,7 @@ import { getClient } from "src/utils/client";
 export const GetFetchInfoResponse = Type.Object({
   fetchStarted: Type.Boolean(),
   schedule: Type.String(),
-  lastFetchTime: Type.Optional(Type.Union([Type.String(), Type.Undefined()])),
+  lastFetchTime: Type.Optional(Type.String()),
 });
 
 export type GetFetchInfoResponse = Static<typeof GetFetchInfoResponse>;

@@ -31,8 +31,8 @@ export const JobInfo = Type.Object({
   elapsed: Type.String(),
   timeLimit: Type.String(),
   submitTime: Type.String(),
-  startTime: Type.Optional(Type.Union([Type.String(), Type.Undefined()])),
-  endTime: Type.Optional(Type.Union([Type.String(), Type.Undefined()])),
+  startTime: Type.Optional(Type.String()),
+  endTime: Type.Optional(Type.String()),
 });
 
 export type JobInfo = Static<typeof JobInfo>;

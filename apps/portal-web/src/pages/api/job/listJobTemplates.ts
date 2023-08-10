@@ -23,7 +23,7 @@ export const JobTemplateInfo = Type.Object({
   id: Type.String(),
   jobName: Type.String(),
   submitTime: Type.Optional(Type.String()),
-  comment: Type.Optional(Type.Union([Type.String(), Type.Undefined()])),
+  comment: Type.Optional(Type.String()),
 });
 
 export type JobTemplateInfo = Static<typeof JobTemplateInfo>;
