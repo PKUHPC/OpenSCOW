@@ -17,7 +17,7 @@ import { getPlaceholderKeys } from "@scow/lib-config/build/parse";
 import { formatTime } from "@scow/lib-scheduler-adapter";
 import { getUserHomedir,
   sftpChmod, sftpExists, sftpReaddir, sftpReadFile, sftpRealPath, sftpWriteFile } from "@scow/lib-ssh";
-import { parseErrorDetails } from "@scow/rich-error-model";
+import { DetailedError, ErrorInfo, parseErrorDetails } from "@scow/rich-error-model";
 import { JobInfo, SubmitJobRequest } from "@scow/scheduler-adapter-protos/build/protos/job";
 import fs from "fs";
 import { join } from "path";
@@ -60,6 +60,9 @@ const VNC_SESSION_INFO = "VNC_SESSION_INFO";
 const APP_LAST_SUBMISSION_INFO = "last_submission.json";
 const BIN_BASH_SCRIPT_HEADER = "#!/bin/bash -l\n";
 
+const errorInfo = (reason: string) =>
+  ErrorInfo.create({ domain: "", reason: reason, metadata: {} });
+
 export const appOps = (cluster: string): AppOps => {
 
   const host = getClusterLoginNode(cluster);
@@ -84,7 +87,11 @@ export const appOps = (cluster: string): AppOps => {
       const appConfig = apps[appId];
 
       if (!appConfig) {
-        throw <ServiceError> { code: Status.NOT_FOUND, message: `app id ${appId} is not found` };
+        throw new DetailedError({
+          code: Status.NOT_FOUND,
+          message: `app id ${appId} is not found`,
+          details: [errorInfo("NOT FOUND")],
+        });
       }
 
       const jobName = appJobName;
@@ -122,7 +129,11 @@ export const appOps = (cluster: string): AppOps => {
               };
             }
             else {
-              throw e;
+              throw new DetailedError({
+                code: Status.INVALID_ARGUMENT,
+                message: e.details,
+                details: [errorInfo("SBATCH_FAILED")],
+              });
             }
           });
 

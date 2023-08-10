@@ -114,7 +114,7 @@ export default /* #__PURE__*/route(CreateAppSessionSchema, async (req, res) => {
         return e;
       }
     } else {
-      throw e;
+      return { 409: { code: "SBATCH_FAILED" as const, message: ex.details } };
     }
   });
 });
