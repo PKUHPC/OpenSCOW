@@ -20,7 +20,7 @@ import { Footer } from "src/layouts/base/Footer";
 import { Header } from "src/layouts/base/header";
 import { match } from "src/layouts/base/matchers";
 import { SideNav } from "src/layouts/base/SideNav";
-import { NavItemProps, UserInfo } from "src/layouts/base/types";
+import { NavItemProps, UserInfo, UserLink } from "src/layouts/base/types";
 import styled from "styled-components";
 // import logo from "src/assets/logo-no-text.svg";
 const { useBreakpoint } = Grid;
@@ -58,11 +58,12 @@ type Props = PropsWithChildren<{
   user: UserInfo | undefined;
   headerRightContent?: React.ReactNode;
   basePath: string;
+  userLinks?: UserLink[];
 }>;
 
 export const BaseLayout: React.FC<PropsWithChildren<Props>> = ({
   children, footerText, versionTag, routes, user, logout,
-  headerRightContent, basePath,
+  headerRightContent, basePath, userLinks,
 }) => {
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
@@ -90,6 +91,7 @@ export const BaseLayout: React.FC<PropsWithChildren<Props>> = ({
         logout={logout}
         right={headerRightContent}
         basePath={basePath}
+        userLinks={userLinks}
       />
       <StyledLayout>
         {
