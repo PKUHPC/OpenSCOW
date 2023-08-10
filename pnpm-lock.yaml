@@ -1,5 +1,9 @@
 lockfileVersion: '6.0'
 
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
 importers:
 
   .:
@@ -514,26 +518,26 @@ importers:
   apps/operation-log:
     dependencies:
       '@ddadaal/tsgrpc-common':
-        specifier: 0.2.3
-        version: 0.2.3
+        specifier: 0.2.4
+        version: 0.2.4
       '@ddadaal/tsgrpc-server':
-        specifier: 0.19.2
-        version: 0.19.2(@grpc/grpc-js@1.8.18)
+        specifier: 0.19.4
+        version: 0.19.4(@grpc/grpc-js@1.8.21)
       '@grpc/grpc-js':
-        specifier: 1.8.18
-        version: 1.8.18
+        specifier: 1.8.21
+        version: 1.8.21
       '@mikro-orm/cli':
-        specifier: 5.7.13
-        version: 5.7.13(@mikro-orm/mariadb@5.7.13)(@mikro-orm/migrations@5.7.13)(@mikro-orm/mysql@5.7.13)(@mikro-orm/seeder@5.7.13)
+        specifier: 5.7.14
+        version: 5.7.14(@mikro-orm/mariadb@5.7.14)(@mikro-orm/migrations@5.7.14)(@mikro-orm/mysql@5.7.14)(@mikro-orm/seeder@5.7.14)
       '@mikro-orm/core':
-        specifier: 5.7.13
-        version: 5.7.13(@mikro-orm/mariadb@5.7.13)(@mikro-orm/migrations@5.7.13)(@mikro-orm/mysql@5.7.13)(@mikro-orm/seeder@5.7.13)
+        specifier: 5.7.14
+        version: 5.7.14(@mikro-orm/mariadb@5.7.14)(@mikro-orm/migrations@5.7.14)(@mikro-orm/mysql@5.7.14)(@mikro-orm/seeder@5.7.14)
       '@mikro-orm/migrations':
-        specifier: 5.7.13
-        version: 5.7.13(@mikro-orm/core@5.7.13)
+        specifier: 5.7.14
+        version: 5.7.14(@mikro-orm/core@5.7.14)
       '@mikro-orm/mysql':
-        specifier: 5.7.13
-        version: 5.7.13(@mikro-orm/core@5.7.13)(@mikro-orm/migrations@5.7.13)(@mikro-orm/seeder@5.7.13)
+        specifier: 5.7.14
+        version: 5.7.14(@mikro-orm/core@5.7.14)(@mikro-orm/migrations@5.7.14)(@mikro-orm/seeder@5.7.14)
       '@scow/config':
         specifier: workspace:*
         version: link:../../libs/config
@@ -550,11 +554,11 @@ importers:
         specifier: workspace:*
         version: link:../../libs/utils
       pino:
-        specifier: 8.14.1
-        version: 8.14.1
+        specifier: 8.15.0
+        version: 8.15.0
       pino-pretty:
-        specifier: 10.0.1
-        version: 10.0.1
+        specifier: 10.2.0
+        version: 10.2.0
     devDependencies:
       '@types/google-protobuf':
         specifier: 3.15.6
@@ -993,17 +997,14 @@ importers:
   libs/operation-log:
     dependencies:
       '@ddadaal/tsgrpc-client':
-        specifier: 0.17.5
-        version: 0.17.5(@grpc/grpc-js@1.8.18)
+        specifier: 0.17.6
+        version: 0.17.6(@grpc/grpc-js@1.8.21)
       '@grpc/grpc-js':
-        specifier: 1.8.18
-        version: 1.8.18
+        specifier: 1.8.21
+        version: 1.8.21
       '@scow/protos':
         specifier: workspace:*
         version: link:../protos/scow
-      bignumber.js:
-        specifier: 9.1.1
-        version: 9.1.1
     devDependencies:
       '@scow/config':
         specifier: workspace:*
@@ -20507,7 +20508,3 @@ packages:
     name: tiny-inflate
     version: 1.0.3
     dev: false
-
-settings:
-  autoInstallPeers: true
-  excludeLinksFromLockfile: false
