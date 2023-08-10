@@ -45,6 +45,7 @@ export const OperationType = {
   MOVE_DIRECTORY: "moveDirectory",
   COPY_FILE: "copyFile",
   COPY_DIRECTORY: "copyDirectory",
+  // MIS
   ACCOUNT_SET_JOB_TIME_LIMIT: "accountSetJobTimeLimit",
   CREATE_USER: "createUser",
   ADD_USER_TO_ACCOUNT: "addUserToAccount",
