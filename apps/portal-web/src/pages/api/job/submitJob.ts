@@ -16,9 +16,11 @@ import { status } from "@grpc/grpc-js";
 import { JobServiceClient } from "@scow/protos/build/portal/job";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
+import { OperationResult, OperationType } from "src/models/operationLog";
+import { callLog } from "src/server/operationLog";
 import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
-import { handlegRPCError } from "src/utils/server";
+import { handlegRPCError, parseIp } from "src/utils/server";
 
 export const SubmitJobInfo = Type.Object({
   cluster: Type.String(),
@@ -75,6 +77,15 @@ export default route(SubmitJobSchema, async (req, res) => {
 
   const client = getClient(JobServiceClient);
 
+  const logInfo = {
+    operatorUserId: info.identityId,
+    operatorIp: parseIp(req) ?? "",
+    operationTypeName: OperationType.SUBMIT_JOB,
+    operationTypePayload:{
+      accountName: account,
+    },
+  };
+
   return await asyncUnaryCall(client, "submitJob", {
     cluster, userId: info.identityId,
     jobName,
@@ -93,8 +104,18 @@ export default route(SubmitJobSchema, async (req, res) => {
     errorOutput,
     saveAsTemplate: save,
   })
-    .then(({ jobId }) => ({ 201: { jobId } } as const))
+    .then(({ jobId }) => {
+      callLog(
+        { ...logInfo, operationTypePayload: { ... logInfo.operationTypePayload, jobId } },
+        OperationResult.SUCCESS,
+      );
+      return { 201: { jobId } } as const;
+    })
     .catch(handlegRPCError({
       [status.INTERNAL]: (err) => ({ 500: { code: "SCHEDULER_FAILED", message: err.details } } as const),
-    }));
+    },
+    () => callLog(
+      { ...logInfo, operationTypePayload: { ... logInfo.operationTypePayload, jobId: 0 } },
+      OperationResult.FAIL,
+    )));
 });

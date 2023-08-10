@@ -11,6 +11,7 @@
  */
 
 import type { ClusterConfigSchema } from "@scow/config/build/cluster";
+import { OperationLogConfigSchema } from "@scow/config/build/common";
 import type { PortalConfigSchema } from "@scow/config/build/portal";
 import type { UiConfigSchema } from "@scow/config/build/ui";
 import getConfig from "next/config";
@@ -46,6 +47,8 @@ export interface ServerRuntimeConfig {
   SUBMIT_JOB_WORKING_DIR: string;
 
   SCOW_API_AUTH_TOKEN?: string;
+
+  OPERATION_LOG_CONFIG: OperationLogConfigSchema | undefined;
 }
 
 export interface PublicRuntimeConfig {

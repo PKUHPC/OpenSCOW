@@ -696,6 +696,9 @@ importers:
       '@scow/lib-decimal':
         specifier: workspace:*
         version: link:../../libs/decimal
+      '@scow/lib-operation-log':
+        specifier: workspace:*
+        version: link:../../libs/operation-log
       '@scow/lib-ssh':
         specifier: workspace:*
         version: link:../../libs/ssh

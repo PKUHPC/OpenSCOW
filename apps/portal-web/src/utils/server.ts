@@ -18,8 +18,10 @@ type ValueOf<T> = T[keyof T];
 
 export const handlegRPCError = <THandlers extends Partial<Record<Status, (e: ServiceError) => unknown>>>(
   handlers: THandlers,
+  logHandle?: () => void,
   // @ts-ignore
 ) => (e: ServiceError): ReturnType<ValueOf<THandlers>> => {
+    logHandle?.();
     const handler = handlers[e.code];
     if (handler) {
       // @ts-ignore
