@@ -35,22 +35,14 @@ export async function filterOperationLogs(
       ...(startTime ? [{ operationTime: { $gte: startTime } }] : []),
       ...(endTime ? [{ operationTime: { $lte: endTime } }] : []),
     ],
-    ...(operationType
-      ? (operationTargetAccountName
-        ? {
-          metaData: {
-            $case: operationType, [operationType]: { accountName: operationTargetAccountName },
-          },
-        }
-        : {
-          metaData: {
-            $case: operationType,
-          },
-        })
-      : {}),
+    ...(operationType || operationTargetAccountName ? {
+      metaData: {
+        ...((operationType) ? { $case: operationType } : {}),
+        ...((operationTargetAccountName) ? { targetAccountName: operationTargetAccountName } : {}),
+      },
+    } : {}),
     ...(operationResult ? { operation_result: operationResultToJSON(operationResult) } : {}),
   };
-
   return sqlFilter;
 }
 

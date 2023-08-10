@@ -236,6 +236,13 @@ export const tenantRoutes: (tenantRoles: TenantRole[], token: string) => NavItem
             ],
           },
         ] : []),
+      ...(tenantRoles.includes(TenantRole.TENANT_ADMIN) ? [
+        {
+          Icon: BookOutlined,
+          text: "操作日志",
+          path: "/tenant/operationLogs",
+        },
+      ] : []),
     ],
   },
 ];
@@ -268,6 +275,11 @@ export const userRoutes: (accounts: AccountAffiliation[]) => NavItemProps[] = (a
         Icon: PartitionOutlined,
         text: "集群和分区信息",
         path: "/user/partitions",
+      },
+      {
+        Icon: BookOutlined,
+        text: "操作日志",
+        path: "/user/operationLogs",
       },
     ],
 
@@ -314,6 +326,11 @@ export const accountAdminRoutes: (adminAccounts: AccountAffiliation[]) => NavIte
           Icon: BookOutlined,
           text: "消费记录",
           path: `/accounts/${x.accountName}/charges`,
+        },
+        {
+          Icon: BookOutlined,
+          text: "操作日志",
+          path: `/accounts/${x.accountName}/operationLogs`,
         },
       ],
 

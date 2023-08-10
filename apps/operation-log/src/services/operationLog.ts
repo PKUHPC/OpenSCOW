@@ -26,7 +26,7 @@ export const operationLogServiceServer = plugin((server) => {
 
   server.addService<OperationLogServiceServer>(OperationLogServiceService, {
 
-    createOperationLog: async ({ request, em, logger }) => {
+    createOperationLog: async ({ request, em }) => {
       const {
         operatorUserId,
         operatorIp,
@@ -35,6 +35,10 @@ export const operationLogServiceServer = plugin((server) => {
       } = request;
 
       const metaData = operationEvent || {};
+      const operationType = operationEvent?.$case;
+      const targetAccountName = (operationEvent && operationType)
+        ? operationEvent[operationType].accountName
+        : undefined;
 
       const dbOperationResult: OperationResult = OperationResult[operationResultToJSON(operationResult)];
 
@@ -42,7 +46,7 @@ export const operationLogServiceServer = plugin((server) => {
         operatorUserId,
         operatorIp,
         operationResult: dbOperationResult,
-        metaData,
+        metaData: { ...metaData, targetAccountName },
       });
       await em.persistAndFlush(operationLog);
       return [];
