@@ -24,6 +24,7 @@ import styled from "styled-components";
 const Container = styled.div`
   display: flex;
   flex-wrap: wrap;
+  flex-direction: column;
 `;
 
 const Part = styled(Section)`
@@ -72,13 +73,9 @@ export const ProfilePage: NextPage = requireAuth(() => true)(({ userStore: { use
             </Part>
           ) : undefined
         }
-      </Container>
-      <Container>
-        {
-          <Part title="修改邮箱">
-            <ChangeEmailForm />
-          </Part>
-        }
+        <Part title="修改邮箱">
+          <ChangeEmailForm />
+        </Part>
       </Container>
     </>
     
