@@ -13,13 +13,13 @@
 import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Status } from "@grpc/grpc-js/build/src/constants";
-import { OperationResult } from "@scow/protos/build/operation-log/operation_log";
 import { UserServiceClient } from "@scow/protos/build/server/user";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
+import { OperationResult, OperationType } from "src/models/operationLog";
 import { PlatformRole, TenantRole, UserRole } from "src/models/User";
 import { checkNameMatch } from "src/server/checkIdNameMatch";
-import { createOperationLog } from "src/server/operationLog";
+import { callLog } from "src/server/operationLog";
 import { getClient } from "src/utils/client";
 import { handlegRPCError, parseIp } from "src/utils/server";
 
@@ -81,26 +81,27 @@ export default /* #__PURE__*/typeboxRoute(AddUserToAccountSchema, async (req, re
   // call ua service to add user
   const client = getClient(UserServiceClient);
 
+  const logInfo = {
+    operatorUserId: info.identityId,
+    operatorIp: parseIp(req) ?? "",
+    operationTypeName: OperationType.ADD_USER_TO_ACCOUNT,
+    operationTypePayload:{
+      accountName, userId: identityId,
+    },
+  };
 
   return await asyncClientCall(client, "addUserToAccount", {
     tenantName: info.tenant,
     accountName,
     userId: identityId,
   }).then(() => {
-    createOperationLog(
-      "addUserToAccount",
-      {
-        operatorUserId: info.identityId,
-        operatorIp: parseIp(req) ?? "",
-        operationResult: OperationResult.SUCCESS,
-        accountName, userId: identityId,
-      },
-      console,
-    );
+    callLog(logInfo, OperationResult.SUCCESS);
     return { 204: null };
   })
     .catch(handlegRPCError({
       [Status.ALREADY_EXISTS]: () => ({ 409: null }),
       [Status.NOT_FOUND]: () => ({ 404: { code: "ACCOUNT_NOT_FOUND" as const } }),
-    }));
+    },
+    () => callLog(logInfo, OperationResult.FAIL),
+    ));
 });

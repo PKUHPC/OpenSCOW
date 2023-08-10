@@ -10,41 +10,12 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Logger } from "@ddadaal/tsgrpc-server";
 import { FilterQuery } from "@mikro-orm/core";
-import { MySqlDriver, SqlEntityManager } from "@mikro-orm/mysql";
-import { OperationLog, OperationLogFilter, OperationResult } from "@scow/protos/build/operation-log/operation_log";
+import {
+  OperationLog,
+  OperationLogFilter,
+  operationResultFromJSON, operationResultToJSON } from "@scow/protos/build/operation-log/operation_log";
 import { OperationLog as OperationLogEntity } from "src/entities/OperationLog";
-
-export async function logOperation(
-  operatorUserId: string,
-  operatorIp: string,
-  operationResult: OperationResult,
-  metaData: { [key: string]: any },
-  em: SqlEntityManager<MySqlDriver>,
-  logger: Logger,
-): Promise<void> {
-  try {
-    const operationLogInfo: {
-      operatorUserId: string,
-      operatorIp: string;
-      operationResult: OperationResult;
-      metaData: { [key: string]: any };
-    } = {
-      operatorUserId,
-      operatorIp,
-      operationResult,
-      metaData,
-    };
-
-    const operationLog = new OperationLogEntity({
-      ...operationLogInfo,
-    });
-    await em.persistAndFlush(operationLog);
-  } catch (e) {
-    logger.error(e, "Failed to log operation");
-  }
-}
 
 
 export async function filterOperationLogs(
@@ -57,6 +28,7 @@ export async function filterOperationLogs(
     operationTargetAccountName,
   }: OperationLogFilter,
 ) {
+
   const sqlFilter: FilterQuery<OperationLogEntity> = {
     ...(operatorUserIds.length > 0 ? { operatorUserId: { $in: operatorUserIds } } : {}),
     $and: [
@@ -65,10 +37,18 @@ export async function filterOperationLogs(
     ],
     ...(operationType
       ? (operationTargetAccountName
-        ? { "metaData.$case": operationType, "metaData.${operationType}.accountName": operationTargetAccountName }
-        : { "metaData.$case": operationType })
+        ? {
+          metaData: {
+            $case: operationType, [operationType]: { accountName: operationTargetAccountName },
+          },
+        }
+        : {
+          metaData: {
+            $case: operationType,
+          },
+        })
       : {}),
-    ...(operationResult ? { operation_result: operationResult } : {}),
+    ...(operationResult ? { operation_result: operationResultToJSON(operationResult) } : {}),
   };
 
   return sqlFilter;
@@ -76,13 +56,12 @@ export async function filterOperationLogs(
 
 export function toGrpcOperationLog(x: OperationLogEntity): OperationLog {
 
-  const grpcOperationLog: OperationLog = {
+  const grpcOperationLog = {
     operatorUserId: x.operatorUserId,
     operatorIp: x.operatorIp,
     operationTime: x.operationTime?.toISOString(),
-    operationResult: x.operationResult,
+    operationResult: operationResultFromJSON(x.operationResult),
   };
-
   if (x.metaData && x.metaData.$case) {
     // @ts-ignore
     grpcOperationLog.operationEvent = {
@@ -91,6 +70,6 @@ export function toGrpcOperationLog(x: OperationLogEntity): OperationLog {
     };
 
   }
-  return grpcOperationLog;
 
+  return grpcOperationLog;
 }

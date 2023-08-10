@@ -18,8 +18,10 @@ type ValueOf<T> = T[keyof T];
 
 export const handlegRPCError = <THandlers extends Partial<Record<Status, (e: ServiceError) => unknown>>>(
   handlers: THandlers,
+  logHandle?: () => void,
   // @ts-ignore
 ) => (e: ServiceError): ReturnType<ValueOf<THandlers>> => {
+    logHandle?.();
     const handler = handlers[e.code];
     if (handler) {
       // @ts-ignore
@@ -28,7 +30,6 @@ export const handlegRPCError = <THandlers extends Partial<Record<Status, (e: Ser
       throw e;
     }
   };
-
 export const parseIp = (req: NextApiRequest): string | undefined => {
 
   let forwardedFor = req.headers["x-forwarded-for"];

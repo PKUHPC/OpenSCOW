@@ -10,29 +10,33 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { createOperationLogClient, OperationEvent } from "@scow/lib-operation-log";
-import { OperationResult } from "@scow/protos/build/operation-log/operation_log";
+import { createOperationLogClient, LogCallParams, OperationEvent, OperationResult } from "@scow/lib-operation-log";
 import { runtimeConfig } from "src/utils/config";
 
-export const createOperationLog = (
-  operationTypeName: OperationEvent["$case"],
-  // @ts-ignore
-  operationTypePayload: (OperationEvent & { $case: OperationEvent["$case"] })[OperationEvent["$case"]]
-  &
+interface PartialLogCallParams<TName extends OperationEvent["$case"]>
+ extends Omit<LogCallParams<TName>, "operationResult" | "logger"> {}
+
+export const callLog = <TName extends OperationEvent["$case"]>(
   {
-    operationUserId: string,
-    operationIp: string,
-    operationResult: OperationResult,
-  },
-  logger: Console,
+    operatorUserId,
+    operatorIp,
+    operationTypeName,
+    operationTypePayload,
+  }: PartialLogCallParams<TName>,
+  operationResult: OperationResult,
 ) => {
 
   const { callLog } = createOperationLogClient(runtimeConfig.OPERATION_LOG_CONFIG, console);
 
   callLog(
-    operationTypeName,
-    operationTypePayload,
-    logger,
+    {
+      operatorUserId,
+      operatorIp,
+      operationTypeName,
+      operationTypePayload,
+      operationResult,
+      logger: console,
+    },
   );
 };
 

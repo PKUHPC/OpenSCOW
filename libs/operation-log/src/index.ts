@@ -18,13 +18,22 @@ import {
   GetOperationLogsRequest,
   GetOperationLogsResponse,
   OperationLogServiceClient,
-  OperationResult,
 } from "@scow/protos/build/operation-log/operation_log";
 import { Logger } from "ts-log";
 
+import { OperationResult } from "./constant";
+
 export type OperationEvent = Exclude<CreateOperationLogRequest["operationEvent"], undefined>;
 
-export type OperationType = OperationEvent["$case"];
+export interface LogCallParams<TName extends OperationEvent["$case"]> {
+  operatorUserId: string;
+  operatorIp: string;
+  operationTypeName: TName;
+  // @ts-ignore
+  operationTypePayload: (OperationEvent & { $case: TName })[TName];
+  operationResult: OperationResult;
+  logger: Logger;
+}
 
 export const createOperationLogClient = (
   config: OperationLogConfigSchema | undefined,
@@ -50,35 +59,26 @@ export const createOperationLogClient = (
 
       return await asyncUnaryCall(client, "getOperationLogs", request);
     },
-    callLog: async <TName extends OperationEvent["$case"]>(
-      operationTypeName: TName,
-      // @ts-ignore
-      operationTypePayload: (OperationEvent & { $case: TName })[TName]
-      &
-      {
-        operatorUserId: string,
-        operatorIp: string,
-        operationResult: OperationResult,
-      },
-      logger: Logger,
-    ) => {
+    callLog: async <TName extends OperationEvent["$case"]>({
+      operatorUserId,
+      operatorIp,
+      operationTypeName,
+      operationTypePayload,
+      operationResult,
+      logger,
+    }: LogCallParams<TName>) => {
 
       if (!client) {
         logger.debug("Attempt to call Log %s with %o", operationTypeName, operationTypePayload);
         return;
       }
 
-      logger.info("Calling log %s with %o", operationTypeName, operationTypePayload);
-
-      const { operatorUserId, operatorIp, operationResult, ...rest } = operationTypePayload;
-
-
       return await asyncUnaryCall(client, "createOperationLog", {
         operatorUserId,
         operatorIp,
         operationResult,
         // @ts-ignore
-        operationEvent: { $case: operationTypeName, [operationTypeName]: { ...rest } },
+        operationEvent: { $case: operationTypeName, [operationTypeName]: { ...operationTypePayload } },
       }).then(
         () => { logger.debug("Operation Log call completed"); },
         (e) => {

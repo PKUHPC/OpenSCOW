@@ -10,7 +10,6 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { OperationType } from "@scow/lib-operation-log/build/constant";
 import { defaultPresets } from "@scow/lib-web/build/utils/datetime";
 import { OperationLog } from "@scow/protos/build/operation-log/operation_log";
 import { Button, DatePicker, Form, Input, Select, Table } from "antd";
@@ -20,9 +19,11 @@ import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import {
-  OperationLogQueryType, OperationResult,
-  OperationResultTexts, OperationTypeTexts,
-} from "src/models/operationLog";
+  OperationLogQueryType,
+  OperationResult,
+  OperationResultTexts,
+  OperationType,
+  OperationTypeTexts } from "src/models/operationLog";
 import { User } from "src/stores/UserStore";
 
 interface FilterForm {
@@ -65,7 +66,8 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
     if (queryType === OperationLogQueryType.USER) {
       return [user.identityId];
     }
-    return query.operatorUserId ? [query.operatorUserId] : [];
+    const operatorUserId = query.operatorUserId?.trim();
+    return operatorUserId ? [operatorUserId] : [];
   };
 
   const promiseFn = useCallback(async () => {
@@ -98,13 +100,14 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
             setPageInfo({ page: 1, pageSize: pageInfo.pageSize });
           }}
         >
-          <Form.Item label="操作码" name="operationCode">
-            <Input style={{ width: 100 }} />
-          </Form.Item>
           <Form.Item label="操作行为" name="operationType">
             <Select
+              showSearch
               options={
                 Object.keys(OperationTypeTexts).map((key) => ({ value: key, label: OperationTypeTexts[key] }))
+              }
+              filterOption={(input, option) =>
+                (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
               }
               allowClear
               style={{ width: 180 }}
@@ -121,7 +124,7 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
             />
           </Form.Item>
           {queryType !== OperationLogQueryType.USER && (
-            <Form.Item label="操作员" name="operationCode">
+            <Form.Item label="操作员" name="operatorUserId">
               <Input style={{ width: 150 }} />
             </Form.Item>
           )}
@@ -136,6 +139,13 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
       <Table
         dataSource={data?.results}
         loading={isLoading}
+        pagination={{
+          current: pageInfo.page,
+          pageSize: pageInfo.pageSize,
+          defaultPageSize: 10,
+          total: data?.totalCount,
+          onChange: (page, pageSize) => setPageInfo({ page, pageSize }),
+        }}
       >
         <Table.Column<OperationLog> dataIndex="operationCode" title="操作码" />
         <Table.Column<OperationLog>

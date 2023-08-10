@@ -13,12 +13,12 @@
 import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Status } from "@grpc/grpc-js/build/src/constants";
-import { OperationResult } from "@scow/protos/build/operation-log/operation_log";
 import { UserServiceClient } from "@scow/protos/build/server/user";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
+import { OperationResult, OperationType } from "src/models/operationLog";
 import { PlatformRole, TenantRole, UserRole } from "src/models/User";
-import { createOperationLog } from "src/server/operationLog";
+import { callLog } from "src/server/operationLog";
 import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
 import { handlegRPCError, parseIp } from "src/utils/server";
@@ -60,26 +60,28 @@ export default /* #__PURE__*/route(RemoveUserFromAccountSchema, async (req, res)
   // call ua service to add user
   const client = getClient(UserServiceClient);
 
+  const logInfo = {
+    operatorUserId: info.identityId,
+    operatorIp: parseIp(req) ?? "",
+    operationTypeName: OperationType.REMOVE_USER_FROM_ACCOUNT,
+    operationTypePayload:{
+      accountName, userId: identityId,
+    },
+  };
+
   return await asyncClientCall(client, "removeUserFromAccount", {
     tenantName: info.tenant,
     accountName,
     userId: identityId,
   })
     .then(() => {
-      createOperationLog(
-        "removeUserFromAccount",
-        {
-          operatorUserId: info.identityId,
-          operatorIp: parseIp(req) ?? "",
-          operationResult: OperationResult.SUCCESS,
-          accountName, userId: identityId,
-        },
-        console,
-      );
+      callLog(logInfo, OperationResult.SUCCESS);
       return { 204: null };
     })
     .catch(handlegRPCError({
       [Status.NOT_FOUND]: () => ({ 404: null }),
       [Status.OUT_OF_RANGE]: () => ({ 406: null }),
-    }));
+    },
+    () => callLog(logInfo, OperationResult.FAIL),
+    ));
 });

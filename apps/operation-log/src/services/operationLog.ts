@@ -15,9 +15,10 @@ import { QueryOrder } from "@mikro-orm/core";
 import {
   OperationLogServiceServer,
   OperationLogServiceService,
+  operationResultToJSON,
 } from "@scow/protos/build/operation-log/operation_log";
-import { OperationLog } from "src/entities/OperationLog";
-import { filterOperationLogs, logOperation, toGrpcOperationLog } from "src/utils/operationLogs";
+import { OperationLog, OperationResult } from "src/entities/OperationLog";
+import { filterOperationLogs, toGrpcOperationLog } from "src/utils/operationLogs";
 import { paginationProps } from "src/utils/orm";
 
 
@@ -34,10 +35,16 @@ export const operationLogServiceServer = plugin((server) => {
       } = request;
 
       const metaData = operationEvent || {};
-      await logOperation(
-        operatorUserId, operatorIp,
-        operationResult, metaData, em, logger,
-      );
+
+      const dbOperationResult: OperationResult = OperationResult[operationResultToJSON(operationResult)];
+
+      const operationLog = new OperationLog({
+        operatorUserId,
+        operatorIp,
+        operationResult: dbOperationResult,
+        metaData,
+      });
+      await em.persistAndFlush(operationLog);
       return [];
     },
 

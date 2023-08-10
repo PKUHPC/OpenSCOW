@@ -33,7 +33,7 @@ export class OperationLog {
   @Property({ defaultRaw: CURRENT_TIMESTAMP })
     operationTime?: Date;
 
-  @Enum({ items: () => OperationResult, array: true, comment: Object.values(OperationResult).join(", ") })
+  @Enum({ items: () => OperationResult, comment: Object.values(OperationResult).join(", ") })
     operationResult: OperationResult;
 
   @Property({ type: "json", nullable: true })

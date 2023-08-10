@@ -13,11 +13,11 @@
 import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { createOperationLogClient } from "@scow/lib-operation-log";
-import { OperationCodeMap, OperationType } from "@scow/lib-operation-log/build/constant";
 import { UserServiceClient } from "@scow/protos/build/server/user";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
-import { OperationLogQueryType, OperationResult } from "src/models/operationLog";
+import { OperationCodeMap, OperationLogQueryType, OperationResult,
+  OperationType } from "src/models/operationLog";
 import { PlatformRole, TenantRole, UserRole } from "src/models/User";
 import { getClient } from "src/utils/client";
 import { runtimeConfig } from "src/utils/config";
@@ -101,7 +101,7 @@ export default typeboxRoute(GetOperationLogsSchema, async (req, res) => {
     operationType, operationResult, operationTargetAccountName, page, pageSize } = req.query;
 
   const filter = {
-    operatorUserIds: operatorUserIds.split(","),
+    operatorUserIds: operatorUserIds ? operatorUserIds.split(",") : [],
     startTime, endTime, operationType,
     operationResult, operationTargetAccountName,
   };
