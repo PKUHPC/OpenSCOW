@@ -24,7 +24,7 @@ export const iconToNode = (Icon: any) => {
     : <Icon />;
 };
 
-const EXTERNAL_URL_PREFIX = ["http://", "https://"];
+export const EXTERNAL_URL_PREFIX = ["http://", "https://"];
 
 export function createMenuItems(
   routes: NavItemProps[],

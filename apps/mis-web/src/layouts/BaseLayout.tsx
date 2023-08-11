@@ -38,6 +38,7 @@ export const BaseLayout = ({ footerText, versionTag, children }: PropsWithChildr
       footerText={footerText}
       versionTag={versionTag}
       basePath={publicConfig.BASE_PATH}
+      userLinks={publicConfig.USER_LINKS}
       headerRightContent={(
         <>
           <JumpToAnotherLink

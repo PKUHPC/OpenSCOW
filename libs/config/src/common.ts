@@ -44,6 +44,13 @@ export const CommonConfigSchema = Type.Object({
   scowHook: Type.Optional(ScowHookConfigSchema),
   scowApi: Type.Optional(ScowApiConfigSchema),
   scowOperationLog: Type.Optional(OperationLogConfigSchema),
+  userLinks: Type.Optional(Type.Array(
+    Type.Object({
+      text: Type.String({ description: "链接名称" }),
+      url: Type.String({ description: "链接地址" }),
+      openInNewPage: Type.Optional(Type.Boolean({ description:"一级导航是否默认在新页面打开", default: false })),
+    }),
+  )),
 });
 
 const COMMON_CONFIG_NAME = "common";

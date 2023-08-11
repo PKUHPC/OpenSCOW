@@ -14,6 +14,7 @@ import type { ClusterConfigSchema } from "@scow/config/build/cluster";
 import { OperationLogConfigSchema } from "@scow/config/build/common";
 import type { PortalConfigSchema } from "@scow/config/build/portal";
 import type { UiConfigSchema } from "@scow/config/build/ui";
+import { UserLink } from "@scow/lib-web/build/layouts/base/types";
 import getConfig from "next/config";
 
 export interface ServerRuntimeConfig {
@@ -78,6 +79,8 @@ export interface PublicRuntimeConfig {
   PUBLIC_PATH: string;
 
   NAV_LINKS?: NavLink[];
+
+  USER_LINKS?: UserLink[];
 
   VERSION_TAG: string | undefined;
 

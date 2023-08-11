@@ -6,5 +6,15 @@ passwordPattern:
   # 出错时的消息。下面为默认值
   errorMessage: 必须包含字母、数字和符号，长度大于等于8位
 
+# 操作日志服务地址
 scowOperationLog:
   url: localhost:5005
+
+# # 在导航栏右侧用户下拉菜单中增加链接相关配置
+# userLinks:
+#   # 链接名称，必填
+#   - text: "百度搜索"
+#     # 链接地址，必填
+#     url: "https://www.baidu.com"
+#     # 是否打开新的页面，可选填，默认值为false
+#     openInNewPage: true
