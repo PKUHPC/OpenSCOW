@@ -30,7 +30,7 @@ export interface LogCallParams<TName extends OperationEvent["$case"]> {
   operatorIp: string;
   operationTypeName: TName;
   // @ts-ignore
-  operationTypePayload: (OperationEvent & { $case: TName })[TName];
+  operationTypePayload?: (OperationEvent & { $case: TName })[TName];
   operationResult: OperationResult;
   logger: Logger;
 }

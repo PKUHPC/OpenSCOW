@@ -80,7 +80,6 @@ export default route(SubmitJobSchema, async (req, res) => {
   const logInfo = {
     operatorUserId: info.identityId,
     operatorIp: parseIp(req) ?? "",
-    operationTypeName: OperationType.SUBMIT_JOB,
     operationTypePayload:{
       accountName: account,
     },
@@ -106,16 +105,31 @@ export default route(SubmitJobSchema, async (req, res) => {
   })
     .then(({ jobId }) => {
       callLog(
-        { ...logInfo, operationTypePayload: { ... logInfo.operationTypePayload, jobId } },
+        { ...logInfo,
+          operationTypeName: OperationType.SUBMIT_JOB,
+          operationTypePayload: { ... logInfo.operationTypePayload, jobId } },
         OperationResult.SUCCESS,
       );
+      if (save) {
+        callLog(
+          {
+            ...logInfo,
+            operationTypeName: OperationType.ADD_JOB_TEMPLATE,
+            operationTypePayload: { ... logInfo.operationTypePayload, jobTemplateId: `${jobName}-${jobId}` },
+          },
+          OperationResult.SUCCESS,
+        );
+      }
       return { 201: { jobId } } as const;
     })
     .catch(handlegRPCError({
       [status.INTERNAL]: (err) => ({ 500: { code: "SCHEDULER_FAILED", message: err.details } } as const),
     },
     () => callLog(
-      { ...logInfo, operationTypePayload: { ... logInfo.operationTypePayload, jobId: 0 } },
+      { ...logInfo,
+        operationTypeName: OperationType.SUBMIT_JOB,
+        operationTypePayload: { ... logInfo.operationTypePayload, jobId: -1 },
+      },
       OperationResult.FAIL,
     )));
 });

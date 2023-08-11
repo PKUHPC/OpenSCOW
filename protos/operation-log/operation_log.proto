@@ -36,8 +36,7 @@ message SubmitJob {
 }
 
 message EndJob {
-  string account_name = 1;
-  uint32 job_id = 2;
+  uint32 job_id = 1;
 }
 
 message UserSetJobTimeLimit {
@@ -56,6 +55,7 @@ message DeleteJobTemplate {
 
 message UpdateJobTemplate {
   string job_template_id = 1;
+  string new_job_template_id = 2;
 }
 
 message ShellLogin {
@@ -64,21 +64,18 @@ message ShellLogin {
 }
 
 message CreateDesktop {
-  string desktop_id = 1;
+  string desktop_name = 1;
   string wm = 2;
 }
 
 message DeleteDesktop {
-  string desktop_id = 1;
-  string wm = 2;
+  uint32 desktop_id = 1;
+  string login_node = 2;
 }
 
 message CreateApp {
-  uint32 job_id = 1;
-}
-
-message EndApp {
-  uint32 job_id = 1;
+  string account_name = 1;
+  uint32 job_id = 2;
 }
 
 message CreateFile {
@@ -106,37 +103,15 @@ message DeleteDirectory {
   string path = 2;
 }
 
-message RenameFile {
+
+message MoveFileItem {
   string cluster_id = 1;
   string from_path = 2;
   string to_path = 3;
 }
 
-message RenameDirectory {
-  string cluster_id = 1;
-  string from_path = 2;
-  string to_path = 3;
-}
 
-message MoveFile {
-  string cluster_id = 1;
-  string from_path = 2;
-  string to_path = 3;
-}
-
-message MoveDirectory {
-  string cluster_id = 1;
-  string from_path = 2;
-  string to_path = 3;
-}
-
-message CopyFile {
-  string cluster_id = 1;
-  string from_path = 2;
-  string to_path = 3;
-}
-
-message CopyDirectory {
+message CopyFileItem {
   string cluster_id = 1;
   string from_path = 2;
   string to_path = 3;
@@ -328,48 +303,43 @@ message CreateOperationLogRequest {
     CreateDesktop create_desktop = 13;
     DeleteDesktop delete_desktop = 14;
     CreateApp create_app = 15;
-    EndApp end_app = 16;
-    CreateFile create_file = 17;
-    DeleteFile delete_file = 18;
-    UploadFile upload_file = 19;
-    CreateDirectory create_directory = 20;
-    DeleteDirectory delete_directory = 21;
-    RenameFile rename_file = 22;
-    RenameDirectory rename_directory = 23;
-    MoveFile move_file = 24;
-    MoveDirectory move_directory = 25;
-    CopyFile copy_file = 26;
-    CopyDirectory copy_directory = 27;
-    AccountSetJobTimeLimit account_set_job_time_limit = 28;
-    CreateUser create_user = 29;
-    AddUserToAccount add_user_to_account = 30;
-    RemoveUserFromAccount remove_user_from_account = 31;
-    SetAccountAdmin set_account_admin = 32;
-    UnsetAccountAdmin unset_account_admin = 33;
-    BlockUser block_user = 34;
-    UnblockUser unblock_user = 35;
-    AccountSetChargeLimit account_set_charge_limit = 36;
-    TenantSetJobTimeLimit tenant_set_job_time_limit = 37;
-    SetTenantBilling set_tenant_billing = 38;
-    SetTenantAdmin set_tenant_admin = 39;
-    UnsetTenantAdmin unset_tenant_admin = 40;
-    SetTenantFinance set_tenant_finance = 41;
-    UnsetTenantFinance unset_tenant_finance = 42;
-    TenantChangePassword tenant_change_password = 43;
-    CreateAccount create_account = 44;
-    AddAccountToWhitelist add_account_to_whitelist = 45;
-    RemoveAccountFromWhitelist remove_account_from_whitelist = 46;
-    AccountPay account_pay = 47;
-    ImportUsers import_users = 48;
-    SetPlatformAdmin set_platform_admin = 49;
-    UnsetPlatformAdmin unset_platform_admin = 50;
-    SetPlatformFinance set_platform_finance = 51;
-    UnsetPlatformFinance unset_platform_finance = 52;
-    PlatformChangePassword platform_change_password = 53;
-    SetPlatformBilling set_platform_billing = 54;
-    CreateTenant create_tenant = 55;
-    PlatformSetTenantBilling platform_set_tenant_billing = 56;
-    TenantPay tenant_pay = 57;
+    CreateFile create_file = 16;
+    DeleteFile delete_file = 17;
+    UploadFile upload_file = 18;
+    CreateDirectory create_directory = 19;
+    DeleteDirectory delete_directory = 20;
+    MoveFileItem move_file_item = 21;
+    CopyFileItem copy_file_item = 22;
+    AccountSetJobTimeLimit account_set_job_time_limit = 23;
+    CreateUser create_user = 24;
+    AddUserToAccount add_user_to_account = 25;
+    RemoveUserFromAccount remove_user_from_account = 26;
+    SetAccountAdmin set_account_admin = 27;
+    UnsetAccountAdmin unset_account_admin = 28;
+    BlockUser block_user = 29;
+    UnblockUser unblock_user = 30;
+    AccountSetChargeLimit account_set_charge_limit = 31;
+    TenantSetJobTimeLimit tenant_set_job_time_limit = 32;
+    SetTenantBilling set_tenant_billing = 33;
+    SetTenantAdmin set_tenant_admin = 34;
+    UnsetTenantAdmin unset_tenant_admin = 35;
+    SetTenantFinance set_tenant_finance = 36;
+    UnsetTenantFinance unset_tenant_finance = 37;
+    TenantChangePassword tenant_change_password = 38;
+    CreateAccount create_account = 39;
+    AddAccountToWhitelist add_account_to_whitelist = 40;
+    RemoveAccountFromWhitelist remove_account_from_whitelist = 41;
+    AccountPay account_pay = 42;
+    ImportUsers import_users = 43;
+    SetPlatformAdmin set_platform_admin = 44;
+    UnsetPlatformAdmin unset_platform_admin = 45;
+    SetPlatformFinance set_platform_finance = 46;
+    UnsetPlatformFinance unset_platform_finance = 47;
+    PlatformChangePassword platform_change_password = 48;
+    SetPlatformBilling set_platform_billing = 49;
+    CreateTenant create_tenant = 50;
+    PlatformSetTenantBilling platform_set_tenant_billing = 51;
+    TenantPay tenant_pay = 52;
   }
 }
 
@@ -392,18 +362,13 @@ message OperationLog {
     CreateDesktop create_desktop = 14;
     DeleteDesktop delete_desktop = 15;
     CreateApp create_app = 16;
-    EndApp end_app = 17;
-    CreateFile create_file = 18;
-    DeleteFile delete_file = 19;
-    UploadFile upload_file = 20;
-    CreateDirectory create_directory = 21;
-    DeleteDirectory delete_directory = 22;
-    RenameFile rename_file = 23;
-    RenameDirectory rename_directory = 24;
-    MoveFile move_file = 25;
-    MoveDirectory move_directory = 26;
-    CopyFile copy_file = 27;
-    CopyDirectory copy_directory = 28;
+    CreateFile create_file = 17;
+    DeleteFile delete_file = 18;
+    UploadFile upload_file = 19;
+    CreateDirectory create_directory = 20;
+    DeleteDirectory delete_directory = 21;
+    MoveFileItem move_file_item = 24;
+    CopyFileItem copy_file_item = 27;
     AccountSetJobTimeLimit account_set_job_time_limit = 29;
     CreateUser create_user = 30;
     AddUserToAccount add_user_to_account = 31;

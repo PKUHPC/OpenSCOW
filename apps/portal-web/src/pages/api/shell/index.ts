@@ -12,14 +12,18 @@
 
 import { asyncDuplexStreamCall } from "@ddadaal/tsgrpc-client";
 import { getLoginNode } from "@scow/config/build/cluster";
+import { OperationResult } from "@scow/lib-operation-log";
 import { queryToIntOrDefault } from "@scow/lib-web/build/utils/querystring";
 import { ShellResponse, ShellServiceClient } from "@scow/protos/build/portal/shell";
 import { normalizePathnameWithQuery } from "@scow/utils";
 import { NextApiRequest, NextApiResponse } from "next";
 import { join } from "path";
 import { checkCookie } from "src/auth/server";
+import { OperationType } from "src/models/operationLog";
+import { callLog } from "src/server/operationLog";
 import { getClient } from "src/utils/client";
 import { publicConfig, runtimeConfig } from "src/utils/config";
+import { parseIp } from "src/utils/server";
 import { parse } from "url";
 import { WebSocket, WebSocketServer } from "ws";
 
@@ -125,6 +129,15 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
 
   log("Connected to shell");
 
+  callLog({
+    operatorUserId: user.identityId,
+    operatorIp: parseIp(req) ?? "",
+    operationTypeName: OperationType.SHELL_LOGIN,
+    operationTypePayload: {
+      clusterId: cluster, loginNode: loginNode.address,
+    },
+  }, OperationResult.SUCCESS);
+
   const send = (data: ShellOutputData) => {
     ws.send(JSON.stringify(data));
   };
@@ -148,6 +161,14 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
 
   ws.on("error", (err) => {
     log("Error occurred from client. Disconnect.", err);
+    callLog({
+      operatorUserId: user.identityId,
+      operatorIp: parseIp(req) ?? "",
+      operationTypeName: OperationType.SHELL_LOGIN,
+      operationTypePayload: {
+        clusterId: cluster, loginNode: loginNode.address,
+      },
+    }, OperationResult.FAIL);
     stream.write({ message: { $case: "disconnect", disconnect: {} } });
     stream.end();
   });
@@ -187,5 +208,7 @@ export const setupShellServer = (req: NextApiRequest) => {
 };
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
+  console.log("=====================================");
+  console.log("登录！！！！！");
   res.end();
 };

@@ -12,6 +12,7 @@
 
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
+import { IncomingMessage } from "http";
 import { NextApiRequest } from "next";
 
 type ValueOf<T> = T[keyof T];
@@ -31,7 +32,7 @@ export const handlegRPCError = <THandlers extends Partial<Record<Status, (e: Ser
     }
   };
 
-export const parseIp = (req: NextApiRequest): string | undefined => {
+export const parseIp = (req: NextApiRequest | IncomingMessage): string | undefined => {
 
   let forwardedFor = req.headers["x-forwarded-for"];
 

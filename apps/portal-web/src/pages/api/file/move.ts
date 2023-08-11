@@ -15,9 +15,11 @@ import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { status } from "@grpc/grpc-js";
 import { FileServiceClient } from "@scow/protos/build/portal/file";
 import { authenticate } from "src/auth/server";
+import { OperationResult, OperationType } from "src/models/operationLog";
+import { callLog } from "src/server/operationLog";
 import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
-import { handlegRPCError } from "src/utils/server";
+import { handlegRPCError, parseIp } from "src/utils/server";
 
 export const MoveFileItemSchema = typeboxRouteSchema({
   method: "PATCH",
@@ -47,11 +49,25 @@ export default route(MoveFileItemSchema, async (req, res) => {
 
   const client = getClient(FileServiceClient);
 
+  const logInfo = {
+    operatorUserId: info.identityId,
+    operatorIp: parseIp(req) ?? "",
+    operationTypeName: OperationType.MOVE_FILE_ITEM,
+    operationTypePayload:{
+      clusterId: cluster, fromPath, toPath,
+    },
+  };
+
   return asyncUnaryCall(client, "move", {
     cluster, fromPath, toPath, userId: info.identityId,
-  }).then(() => ({ 204: null }), handlegRPCError({
+  }).then(() => {
+    callLog(logInfo, OperationResult.SUCCESS);
+    return { 204: null };
+  }, handlegRPCError({
     [status.INTERNAL]: (e) => ({ 415: { code: "RENAME_FAILED" as const, error: e.details } }),
     [status.NOT_FOUND]: () => ({ 400: { code: "INVALID_CLUSTER" as const } }),
-  }));
+  },
+  () => callLog(logInfo, OperationResult.FAIL),
+  ));
 
 });

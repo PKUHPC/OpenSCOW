@@ -18,9 +18,12 @@ import { parseErrorDetails } from "@scow/rich-error-model";
 import { Type } from "@sinclair/typebox";
 import { join } from "path";
 import { authenticate } from "src/auth/server";
+import { OperationResult, OperationType } from "src/models/operationLog";
+import { callLog } from "src/server/operationLog";
 import { getClient } from "src/utils/client";
 import { publicConfig } from "src/utils/config";
 import { route } from "src/utils/route";
+import { parseIp } from "src/utils/server";
 
 export const CreateAppSessionSchema = typeboxRouteSchema({
   method: "POST",
@@ -82,6 +85,15 @@ export default /* #__PURE__*/route(CreateAppSessionSchema, async (req, res) => {
 
   const proxyBasePath = join(publicConfig.BASE_PATH, "/api/proxy", cluster);
 
+  const logInfo = {
+    operatorUserId: info.identityId,
+    operatorIp: parseIp(req) ?? "",
+    operationTypeName: OperationType.CREATE_APP,
+    operationTypePayload:{
+      accountName: account,
+    },
+  };
+
   return await asyncUnaryCall(client, "createAppSession", {
     appId,
     appJobName,
@@ -98,8 +110,16 @@ export default /* #__PURE__*/route(CreateAppSessionSchema, async (req, res) => {
     proxyBasePath,
     customAttributes,
   }).then((reply) => {
+    callLog({
+      ...logInfo,
+      operationTypePayload: { ... logInfo.operationTypePayload, jobId: reply.jobId },
+    }, OperationResult.SUCCESS);
     return { 200: { jobId: reply.jobId, sessionId: reply.sessionId } };
   }).catch((e) => {
+    callLog({
+      ...logInfo,
+      operationTypePayload: { ... logInfo.operationTypePayload, jobId: -1 },
+    }, OperationResult.FAIL);
     const ex = e as ServiceError;
     const errors = parseErrorDetails(ex.metadata);
     if (errors[0] && errors[0].$type === "google.rpc.ErrorInfo") {

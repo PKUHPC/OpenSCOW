@@ -15,8 +15,11 @@ import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { DesktopServiceClient } from "@scow/protos/build/portal/desktop";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
+import { OperationResult, OperationType } from "src/models/operationLog";
+import { callLog } from "src/server/operationLog";
 import { getClient } from "src/utils/client";
 import { getLoginDesktopEnabled } from "src/utils/config";
+import { parseIp } from "src/utils/server";
 
 export const KillDesktopSchema = typeboxRouteSchema({
   method: "POST",
@@ -53,8 +56,24 @@ export default /* #__PURE__*/typeboxRoute(KillDesktopSchema, async (req, res) =>
 
   const client = getClient(DesktopServiceClient);
 
+  const logInfo = {
+    operatorUserId: info.identityId,
+    operatorIp: parseIp(req) ?? "",
+    operationTypeName: OperationType.DELETE_DESKTOP,
+    operationTypePayload:{
+      desktopId: displayId,
+      loginNode: loginNode,
+    },
+  };
+
   return await asyncUnaryCall(client, "killDesktop", {
     cluster, loginNode, displayId, userId: info.identityId,
-  }).then(() => ({ 204: null }));
+  }).then(() => {
+    callLog(logInfo, OperationResult.SUCCESS);
+    return { 204: null };
+  }).catch((e) => {
+    callLog(logInfo, OperationResult.FAIL);
+    throw e;
+  });
 
 });
