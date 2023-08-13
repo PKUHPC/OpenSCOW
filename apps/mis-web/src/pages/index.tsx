@@ -10,12 +10,20 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { NextPage } from "next";
+import { GetServerSideProps, NextPage } from "next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { parseCookies } from "nookies";
 import { useStore } from "simstate";
+import { SSRProps } from "src/auth/server";
 import { Redirect } from "src/components/Redirect";
 import { UserStore } from "src/stores/UserStore";
 
+import { loadAppCustomTranslation } from "./_app";
+
+type Props = SSRProps<{}>;
+
 export const IndexPage: NextPage = () => {
+
   const userStore = useStore(UserStore);
 
   if (userStore.user) {
@@ -34,5 +42,18 @@ export const IndexPage: NextPage = () => {
 
 };
 
+export const getServerSideProps: GetServerSideProps<Props> = async ({ req }) => {
+
+  const cookies = parseCookies({ req });
+  const locale = cookies.language || "zh_cn";
+
+  // serverSideTranslation加入用户配置文本,可以为当前页使用的单独文本
+  const lngProps = await serverSideTranslations(locale ?? "zh_cn");
+  return {
+    props: {
+      ...lngProps,
+    },
+  };
+};
 
 export default IndexPage;

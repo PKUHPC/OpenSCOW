@@ -25,13 +25,15 @@ module.exports = {
     locales: ["zh_cn", "en"],
 
     localePath: path.resolve("./public/locales"),
+    addPath: path.resolve("./public/locales"),
     defaultNs: "translations",
     ns: ["translations"],
     reloadOnPrerender: true,
     localeDetection: false,
     keySeparator: ".",
     fallbackLng: "zh_cn",
-
+    lng: process.env.NODE_ENV === "development" ? "en" : "zh_cn",
+    serverLanguageDetection: true,
   },
 
 };

@@ -43,10 +43,11 @@
       "precision": "Precision Search",
       "cluster": "Cluster",
       "account": "Account",
+      "cluster-job-id": "Cluster Job ID",
       "button": {
         "search": "Search",
         "refresh": "Refresh",
-        "changeLimit": "Extend Time Limit of Selected Jobs"
+        "change-limit": "Extend Time Limit of Selected Jobs"
       }
     },
     "job-table": {
@@ -62,7 +63,10 @@
       "time": "Runtime/Queue Time",
       "reason": "Reason",
       "limit": "Job Time Limit",
-      "others": "Others"
+      "others": "Others",
+      "user": "User",
+      "details": "Details",
+      "change-limit": "Change Job Time Limit"
     }
   }
 }

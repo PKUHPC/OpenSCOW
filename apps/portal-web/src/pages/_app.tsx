@@ -27,6 +27,7 @@ import NextApp from "next/app";
 import dynamic from "next/dynamic";
 import Head from "next/head";
 import { appWithTranslation, WithTranslation } from "next-i18next";
+import { parseCookies } from "nookies";
 import { join } from "path";
 import { useEffect, useRef } from "react";
 import { createStore, StoreProvider, useStore } from "simstate";
@@ -107,6 +108,8 @@ function MyApp({ Component, pageProps, extra }: Props & WithTranslation) {
     return createStore(DefaultClusterStore, publicConfig.CLUSTERS[0]);
   });
 
+  const cookies = parseCookies();
+  const locale = cookies.language || "zh_cn";
   const appsStore = useConstant(() => createStore(AppsStore, extra.apps));
 
   // Use the layout defined at the page level, if available
@@ -134,7 +137,7 @@ function MyApp({ Component, pageProps, extra }: Props & WithTranslation) {
       </Head>
       <StoreProvider stores={[userStore, defaultClusterStore, appsStore]}>
         <DarkModeProvider initial={extra.darkModeCookieValue}>
-          <AntdConfigProvider color={primaryColor}>
+          <AntdConfigProvider color={primaryColor} locale={locale}>
             <FloatButtons />
             <GlobalStyle />
             <FailEventHandler />

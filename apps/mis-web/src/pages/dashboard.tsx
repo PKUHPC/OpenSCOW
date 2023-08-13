@@ -31,6 +31,8 @@ import { UserStore } from "src/stores/UserStore";
 import { ensureNotUndefined } from "src/utils/checkNull";
 import { Head } from "src/utils/head";
 
+import { loadAppCustomTranslation } from "./_app";
+
 export type AccountInfo = Omit<AccountStatus, "balance"> & {
   balance: number;
 }
@@ -74,6 +76,11 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ req }) => 
 
   const auth = ssrAuthenticate(() => true);
 
+  const cookies = parseCookies({ req });
+  const locale = cookies.language || "zh_cn";
+  // await loadAppCustomTranslation();
+  const lngProps = await serverSideTranslations(locale ?? "zh_cn");
+
   // Cannot directly call api routes here, so mock is not available directly.
   // manually call mock
   if (USE_MOCK) {
@@ -89,6 +96,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ req }) => 
       props: {
         accounts: accountInfo,
         storageQuotas: status.storageQuotas,
+        ...lngProps,
       },
     };
   }
@@ -110,10 +118,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ req }) => 
     return prev;
   }, {} as Record<string, AccountInfo>);
 
-  const cookies = parseCookies({ req });
-  const locale = cookies.language || "zh_cn";
-  const lngProps = await serverSideTranslations(locale ?? "zh_cn");
-  console.log("check cookie: ", cookies, lngProps);
+
   return {
     props: {
       accounts,
@@ -121,6 +126,8 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ req }) => 
       ...lngProps,
     },
   };
+
+
 };
 
 export default DashboardPage;

@@ -17,7 +17,7 @@ import resources from "./resources.ts";
 
 declare module "i18next" {
   interface CustomTypeOptions {
-    defaultNS: "translations"
-    resources: typeof resources
+    defaultNS: "translations",
+    resources: typeof resources,
   }
 }

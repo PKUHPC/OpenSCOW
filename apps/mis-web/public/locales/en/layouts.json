@@ -1,0 +1,56 @@
+{
+  "route": {
+    "nav-link-text": "PORTAL",
+    "dashboard": "Dashboard",
+    "user": {
+      "first-nav": "User",
+      "running-jobs": "Runing Jobs",
+      "finished-jobs": "Finished Jobs",
+      "cluster-partitions": "Cluster and Partition Info"
+    },
+    "platform-management": {
+      "fist-nav": "Platform Management",
+      "info": "Platform Info",
+      "import-users": "Import Users",
+      "tenants-management":"Tenant Management",
+      "tenants-list": "Tenant List",
+      "create-tenant": "Create Tenant",
+      "users-list": "User List",
+      "job-billing-table": "Job Billing Table",
+      "finance-management": "Finance Management",
+      "tenant-pay": "Tenant Top Up",
+      "payments": "Tenant Top Up History",
+      "system-debug": "System Debug",
+      "status-synchronization": "Status Synchronization",
+      "jobs-synchronization": "Jobs Synchronization"
+    },
+    "tenant-management": {
+      "first-nav": "Tenant Management",
+      "info": "Tenant Info",
+      "manage-job-price": "Job Price Management",
+      "running-jobs": "Runing Jobs",
+      "finished-jobs": "Finished Jobs",
+      "user-management": "User Management",
+      "user-list": "User List",
+      "create-user": "Create Users",
+      "job-timelimit": "Change Job Time Limit",
+      "storage": "Change User Storage",
+      "account-management": "Account Management",
+      "account-list": "Account List",
+      "create-account": "Create Account",
+      "whitelist": "Account Whitelist",
+      "finance-management": "Finance Management",
+      "account-pay": "Account Top Up",
+      "account-payments": "Account Top Up History"
+    },
+    "account-management": {
+      "first-nav":"Account Management",
+      "info": "Account Info",
+      "running-jobs": "Runing Jobs",
+      "finished-jobs": "Finished Jobs",
+      "user-management": "User Management",
+      "pay": "User Top Up History",
+      "cost": "User Cost List"
+    }
+  }
+}

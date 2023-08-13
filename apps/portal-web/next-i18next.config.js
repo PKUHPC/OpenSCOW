@@ -31,7 +31,8 @@ module.exports = {
     localeDetection: false,
     keySeparator: ".",
     fallbackLng: "zh_cn",
-
+    // 开发环境
+    lng: process.env.NODE_ENV === "development" ? "en" : "zh_cn",
   },
 
 };

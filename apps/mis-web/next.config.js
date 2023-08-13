@@ -24,6 +24,8 @@ const { i18n } = require("./next-i18next.config.js");
 
 const BASE_PATH = process.env.BASE_PATH || "/";
 
+
+
 module.exports = async (phase) => {
 
   global.__CONFIG__ = {
@@ -38,6 +40,7 @@ module.exports = async (phase) => {
   const config = {
     ...runtimeConfig,
     i18n,
+    // customTranslationJson: customTransJson,
     basePath: BASE_PATH === "/" ? undefined : BASE_PATH,
     assetPrefix: BASE_PATH === "/" ? undefined : BASE_PATH,
     webpack(config, options) {
@@ -52,6 +55,7 @@ module.exports = async (phase) => {
       return config;
     },
   };
+
 
   return withPlugins([
     analyze ? [require("@next/bundle-analyzer")()] : undefined,

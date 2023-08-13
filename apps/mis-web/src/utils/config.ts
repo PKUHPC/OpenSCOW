@@ -54,6 +54,9 @@ export interface PublicRuntimeConfig {
   NAV_LINKS?: NavLink[];
 
   VERSION_TAG: string | undefined;
+
+  CUSTOM_TRANSLATION_JSON?: CustomTranslation;
+
 }
 
 export const runtimeConfig: ServerRuntimeConfig = getConfig().serverRuntimeConfig;
@@ -66,5 +69,14 @@ export type NavLink = {
   iconPath?: string;
   allowedRoles?: string[];
   children?: Omit<NavLink, "children">[];
+}
+
+export type TranslationRecord = {
+  [key: string]: string | TranslationRecord;
+}
+export type CustomTranslation = {
+  "custom-translation": boolean;
+  "en"?: TranslationRecord;
+  "zh_cn"?: TranslationRecord;
 }
 

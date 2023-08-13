@@ -11,11 +11,16 @@
  */
 
 import common from "../public/locales/en/common.json";
+import custom from "../public/locales/en/custom.json";
+import layouts from "../public/locales/en/layouts.json";
 import translations from "../public/locales/en/translations.json";
 
 const resources = {
   common,
   translations,
+  layouts,
+  // 定义一个预存用户自定义翻译文本的resource
+  custom,
 } as const;
 
 export default resources;

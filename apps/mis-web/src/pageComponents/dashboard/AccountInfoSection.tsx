@@ -13,10 +13,8 @@
 import { LockOutlined, UnlockOutlined } from "@ant-design/icons";
 import { moneyToNumber } from "@scow/lib-decimal";
 import { Alert, Col, Row, Statistic, StatisticProps } from "antd";
-import { useTranslation } from "next-i18next";
-// import { tsTranslations as enTranslations } from "public/locales/en/tsTranslations";
-// import { tsTranslations as cnTranslations } from "public/locales/zh_cn/tsTranslations";
-import React from "react";
+import { i18n, useTranslation } from "next-i18next";
+import React, { useEffect } from "react";
 import { Section } from "src/components/Section";
 import { StatCard } from "src/components/StatCard";
 import { UserStatus } from "src/models/User";
@@ -51,13 +49,11 @@ const Info: React.FC<StatisticProps> = (props) => (
   </Col>
 );
 
-
 export const AccountInfoSection: React.FC<Props> = ({ info }) => {
 
   const accounts = Object.entries(info);
 
-
-  const { t } = useTranslation("translations");
+  const { t } = useTranslation(["translations", "custom"]);
 
   const statusTexts = {
     blocked: [t("dashboard.account.status.blocked"), "red", LockOutlined],
@@ -69,6 +65,19 @@ export const AccountInfoSection: React.FC<Props> = ({ info }) => {
   return (
     // <Section title="账户信息">
     <Section title={t("dashboard.account.title")}>
+
+      {/* 用户自定义翻译文本TEST 开始 */}
+      <div>
+        custom-translation-test
+      </div>
+      <div>
+        {t("custom:hpc01-text" as any)}
+      </div>
+      <div>
+        {t("custom:apps.app1-text" as any)}
+      </div>
+      {/* 用户自定义翻译文本TEST 结束 */}
+
       {
         accounts.length === 0 ? (
           // <Alert message="您不属于任何一个账户。" type="warning" showIcon />

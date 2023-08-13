@@ -14,6 +14,7 @@ import { arrayContainsElement } from "@scow/utils";
 import { ItemType } from "antd/es/menu/hooks/useItems";
 import Link from "next/link";
 import Router from "next/router";
+import { useTranslation } from "next-i18next";
 import React from "react";
 import { match } from "src/layouts/base/matchers";
 import { NavItemProps } from "src/layouts/base/types";
@@ -31,14 +32,16 @@ export function createMenuItems(
 ) {
 
   function createMenuItem(route: NavItemProps): ItemType {
+    const { t } = useTranslation();
     if (arrayContainsElement(route.children)) {
       return {
         icon: iconToNode(route.Icon),
         key: route.path,
-        title: route.text,
-        label: route.text,
+        title: t(route.text as any),
+        label: t(route.text as any),
         onTitleClick:(route.clickable ?? parentClickable)
           ? () => {
+            // const { t } = useTranslation();
             const target = route.clickToPath ?? route.path;
             if (route.openInNewPage) {
               window.open(target);
