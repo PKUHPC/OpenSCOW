@@ -23,7 +23,6 @@ import { publicConfig } from "src/utils/config";
 interface Props {
   footerText: string;
   versionTag: string | undefined;
-  // locale?: string;
 }
 
 // 导航文字翻译

@@ -23,7 +23,6 @@ module.exports = {
   i18n: {
     defaultLocale: "zh_cn",
     locales: ["zh_cn", "en"],
-
     localePath: path.resolve("./public/locales"),
     addPath: path.resolve("./public/locales"),
     defaultNs: "translations",
@@ -32,7 +31,7 @@ module.exports = {
     localeDetection: false,
     keySeparator: ".",
     fallbackLng: "zh_cn",
-    lng: process.env.NODE_ENV === "development" ? "en" : "zh_cn",
+    lng: process.env.NODE_ENV === "development" ? "zh_cn" : "en",
     serverLanguageDetection: true,
   },
 

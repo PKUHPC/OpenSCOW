@@ -41,7 +41,6 @@ export function createMenuItems(
         label: t(route.text as any),
         onTitleClick:(route.clickable ?? parentClickable)
           ? () => {
-            // const { t } = useTranslation();
             const target = route.clickToPath ?? route.path;
             if (route.openInNewPage) {
               window.open(target);

@@ -10,19 +10,11 @@
  * See the Mulan PSL v2 for more details.
  */
 
-export type TranslationRecord = {
-  [key: string]: string | TranslationRecord;
-}
-export type CustomTranslation = {
-  "custom-translation": boolean;
-  "en"?: TranslationRecord;
-  "zh_cn"?: TranslationRecord;
-}
-
 // 加载用户自定义的翻译 JSON 文件
 export const getCustomTranslationJson = () => {
   let customTransJson;
   try {
+    // 自定义翻译文本路径
     customTransJson = require("../../../apps/mis-web/public/custom-translation.json");
     if (customTransJson["custom-translation"] === true) {
       return customTransJson;
