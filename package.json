@@ -23,17 +23,17 @@
   "devDependencies": {
     "turbo": "1.10.12",
     "@ddadaal/eslint-config": "1.9.0",
-    "@commitlint/config-conventional": "17.6.7",
+    "@commitlint/config-conventional": "17.7.0",
     "@types/jest": "29.5.3",
-    "@types/node": "18.17.3",
-    "@typescript-eslint/eslint-plugin": "6.2.1",
-    "@typescript-eslint/parser": "6.2.1",
+    "@types/node": "18.17.5",
+    "@typescript-eslint/eslint-plugin": "6.3.0",
+    "@typescript-eslint/parser": "6.3.0",
     "cross-env": "7.0.3",
     "cz-conventional-changelog": "3.3.0",
     "dotenv": "16.3.1",
     "dotenv-cli": "7.2.1",
-    "eslint": "8.46.0",
-    "eslint-import-resolver-typescript": "3.5.5",
+    "eslint": "8.47.0",
+    "eslint-import-resolver-typescript": "3.6.0",
     "eslint-plugin-import": "2.28.0",
     "eslint-plugin-simple-import-sort": "10.0.0",
     "eslint-plugin-license-header": "0.6.0",
@@ -56,10 +56,10 @@
     "globby": "13.2.2",
     "@changesets/cli": "2.26.2",
     "front-matter": "4.0.2",
-    "@bufbuild/buf": "1.25.1"
+    "@bufbuild/buf": "1.26.1"
   },
   "volta": {
-    "node": "18.17.0"
+    "node": "18.17.1"
   },
   "packageManager": "pnpm@8.6.12"
 }
