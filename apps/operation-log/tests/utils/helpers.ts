@@ -10,7 +10,8 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import "jest-extended";
-module.exports = async () => {
+import { MikroORM } from "@mikro-orm/core";
 
-};
+export async function dropDatabase(orm: MikroORM) {
+  await orm.getSchemaGenerator().dropDatabase(orm.config.get("dbName"));
+}

@@ -32,5 +32,4 @@ module.exports = {
   testTimeout: 30000,
   coverageReporters: ["lcov"],
   setupFilesAfterEnv: ["jest-extended/all"],
-  setupFiles: ["./tests/setup.ts"],
 };
