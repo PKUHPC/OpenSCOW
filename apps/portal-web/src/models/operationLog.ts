@@ -50,6 +50,7 @@ export const OperationType = {
   BLOCK_USER: "blockUser",
   UNBLOCK_USER: "unblockUser",
   ACCOUNT_SET_CHARGE_LIMIT: "accountSetChargeLimit",
+  ACCOUNT_UNSET_CHARGE_LIMIT: "accountUnsetChargeLimit",
   TENANT_SET_JOB_TIME_LIMIT: "tenantSetJobTimeLimit",
   SET_TENANT_BILLING: "setTenantBilling",
   SET_TENANT_ADMIN: "setTenantAdmin",

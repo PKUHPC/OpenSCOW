@@ -16,9 +16,12 @@ import { changePassword as libChangePassword } from "@scow/lib-auth";
 import { GetUserInfoResponse, UserServiceClient } from "@scow/protos/build/server/user";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
+import { OperationResult, OperationType } from "src/models/operationLog";
 import { TenantRole } from "src/models/User";
+import { callLog } from "src/server/operationLog";
 import { getClient } from "src/utils/client";
 import { publicConfig, runtimeConfig } from "src/utils/config";
+import { parseIp } from "src/utils/server";
 
 // 此API用于租户管理员修改自己租户的用户密码
 // 没有权限返回undefined
@@ -74,7 +77,22 @@ export default /* #__PURE__*/typeboxRoute(
       return;
     }
 
+    const logInfo = {
+      operatorUserId: info.identityId,
+      operatorIp: parseIp(req) ?? "",
+      operationTypeName: OperationType.TENANT_CHANGE_PASSWORD,
+      operationTypePayload:{
+        tenantName: info.tenant, userId: identityId,
+      },
+    };
+
     return await libChangePassword(runtimeConfig.AUTH_INTERNAL_URL, { identityId, newPassword }, console)
-      .then(() => ({ 204: null }))
-      .catch((e) => ({ [e.status]: null }));
+      .then(() => {
+        callLog(logInfo, OperationResult.SUCCESS);
+        return { 204: null };
+      })
+      .catch((e) => {
+        callLog(logInfo, OperationResult.FAIL);
+        return { [e.status]: null };
+      });
   });

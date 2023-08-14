@@ -16,10 +16,13 @@ import { Status } from "@grpc/grpc-js/build/src/constants";
 import { UserServiceClient } from "@scow/protos/build/server/user";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
+import { OperationResult, OperationType } from "src/models/operationLog";
 import { PlatformRole } from "src/models/User";
+import { callLog } from "src/server/operationLog";
 import { getClient } from "src/utils/client";
+import { DEFAULT_INIT_USER_ID } from "src/utils/constants";
 import { queryIfInitialized } from "src/utils/init";
-import { handlegRPCError } from "src/utils/server";
+import { handlegRPCError, parseIp } from "src/utils/server";
 
 
 export const SetPlatformRoleSchema = typeboxRouteSchema({
@@ -41,12 +44,28 @@ export const SetPlatformRoleSchema = typeboxRouteSchema({
 export default typeboxRoute(SetPlatformRoleSchema, async (req, res) => {
   const { userId, roleType } = req.body;
 
+  const logInfo = {
+    operatorUserId: DEFAULT_INIT_USER_ID,
+    operatorIp: parseIp(req) ?? "",
+    operationTypeName: roleType === PlatformRole.PLATFORM_ADMIN
+      ? OperationType.SET_PLATFORM_ADMIN
+      : OperationType.SET_PLATFORM_FINANCE,
+    operationTypePayload:{
+      userId,
+    },
+  };
+
   if (await queryIfInitialized()) {
     const auth = authenticate((u) =>
       u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN));
     const info = await auth(req, res);
-    if (!info) { return; }
+    if (info) {
+      logInfo.operatorUserId = info.identityId;
+    } else {
+      return;
+    }
   }
+
 
   const client = getClient(UserServiceClient);
 
@@ -54,9 +73,14 @@ export default typeboxRoute(SetPlatformRoleSchema, async (req, res) => {
     userId,
     roleType,
   })
-    .then(() => ({ 200: { executed: true } }))
+    .then(() => {
+      callLog(logInfo, OperationResult.SUCCESS);
+      return { 200: { executed: true } };
+    })
     .catch(handlegRPCError({
       [Status.NOT_FOUND]: () => ({ 404: null }),
       [Status.FAILED_PRECONDITION]: () => ({ 200: { executed: false } }),
-    }));
+    },
+    () => callLog(logInfo, OperationResult.FAIL),
+    ));
 });

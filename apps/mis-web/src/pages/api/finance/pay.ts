@@ -17,7 +17,9 @@ import { moneyToNumber, numberToMoney } from "@scow/lib-decimal";
 import { ChargingServiceClient } from "@scow/protos/build/server/charging";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
+import { OperationResult, OperationType } from "src/models/operationLog";
 import { TenantRole } from "src/models/User";
+import { callLog } from "src/server/operationLog";
 import { ensureNotUndefined } from "src/utils/checkNull";
 import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
@@ -43,7 +45,7 @@ export const FinancePaySchema = typeboxRouteSchema({
   },
 });
 
-const auth = authenticate((info) => info.tenantRoles.includes(TenantRole.TENANT_FINANCE) || 
+const auth = authenticate((info) => info.tenantRoles.includes(TenantRole.TENANT_FINANCE) ||
           info.tenantRoles.includes(TenantRole.TENANT_ADMIN));
 
 export default route(FinancePaySchema,
@@ -52,22 +54,37 @@ export default route(FinancePaySchema,
     const info = await auth(req, res);
     if (!info) { return; }
 
+    const { accountName, comment, amount, type } = req.body;
+
+    const logInfo = {
+      operatorUserId: info.identityId,
+      operatorIp: parseIp(req) ?? "",
+      operationTypeName: OperationType.ACCOUNT_PAY,
+      operationTypePayload:{
+        tenantName: info.tenant,
+        accountName,
+        amount: numberToMoney(amount),
+      },
+    };
+
     const client = getClient(ChargingServiceClient);
 
     return await asyncClientCall(client, "pay", {
-      accountName: req.body.accountName,
+      accountName: accountName,
       tenantName: info.tenant,
-      comment: req.body.comment ?? "",
-      amount: numberToMoney(req.body.amount),
+      comment: comment ?? "",
+      amount: numberToMoney(amount),
       operatorId: info.identityId,
       ipAddress: parseIp(req) ?? "",
-      type: req.body.type,
+      type: type,
     }).then((reply) => {
       const replyObj = ensureNotUndefined(reply, ["currentBalance"]);
-
+      callLog(logInfo, OperationResult.SUCCESS);
       return { 200: { balance: moneyToNumber(replyObj.currentBalance) } };
     }).catch(handlegRPCError({
       [Status.NOT_FOUND]: () => ({ 404: null }),
-    }));
+    },
+    () => callLog(logInfo, OperationResult.FAIL),
+    ));
 
   });

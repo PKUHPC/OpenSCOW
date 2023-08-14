@@ -20,7 +20,7 @@ import { OperationResult, OperationType } from "src/models/operationLog";
 import { TenantRole } from "src/models/User";
 import { callLog } from "src/server/operationLog";
 import { getClient } from "src/utils/client";
-import { DEFAULT_TENANT_NAME } from "src/utils/constants";
+import { DEFAULT_INIT_USER_ID, DEFAULT_TENANT_NAME } from "src/utils/constants";
 import { queryIfInitialized } from "src/utils/init";
 import { handlegRPCError, parseIp } from "src/utils/server";
 
@@ -44,19 +44,29 @@ export const SetTenantRoleSchema = typeboxRouteSchema({
 export default typeboxRoute(SetTenantRoleSchema, async (req, res) => {
   const { userId, roleType } = req.body;
 
-  const isInitialized = await queryIfInitialized();
-  const auth = authenticate((u) => u.tenantRoles.includes(TenantRole.TENANT_ADMIN));
-  const info = await auth(req, res);
-  if (!info && !isInitialized) { return; }
-
   const logInfo = {
-    operatorUserId: info?.identityId || "init",
+    operatorUserId: DEFAULT_INIT_USER_ID,
     operatorIp: parseIp(req) ?? "",
-    operationTypeName: OperationType.SET_TENANT_ADMIN,
+    operationTypeName: roleType === TenantRole.TENANT_ADMIN
+      ? OperationType.SET_TENANT_ADMIN
+      : OperationType.SET_TENANT_FINANCE,
     operationTypePayload:{
-      tenantName: info?.tenant || DEFAULT_TENANT_NAME, userId,
+      tenantName: DEFAULT_TENANT_NAME, userId,
     },
   };
+
+  if (await queryIfInitialized()) {
+    const auth = authenticate((u) => u.tenantRoles.includes(TenantRole.TENANT_ADMIN));
+    const info = await auth(req, res);
+    if (info) {
+      logInfo.operatorUserId = info.identityId;
+      logInfo.operationTypePayload.tenantName = info.tenant;
+    } else {
+      return;
+    }
+  }
+
+
 
   const client = getClient(UserServiceClient);
 

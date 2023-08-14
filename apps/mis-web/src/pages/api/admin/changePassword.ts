@@ -14,8 +14,11 @@ import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes
 import { changePassword as libChangePassword } from "@scow/lib-auth";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
+import { OperationResult, OperationType } from "src/models/operationLog";
 import { PlatformRole } from "src/models/User";
+import { callLog } from "src/server/operationLog";
 import { publicConfig, runtimeConfig } from "src/utils/config";
+import { parseIp } from "src/utils/server";
 
 // 此API用于账户管理员修改其他任意用户的密码。
 // 没有权限返回undefined
@@ -61,8 +64,23 @@ export default /* #__PURE__*/typeboxRoute(
 
     const { identityId, newPassword } = req.body;
 
+    const logInfo = {
+      operatorUserId: info.identityId,
+      operatorIp: parseIp(req) ?? "",
+      operationTypeName: OperationType.PLATFORM_CHANGE_PASSWORD,
+      operationTypePayload:{
+        userId: identityId,
+      },
+    };
+
     return await libChangePassword(runtimeConfig.AUTH_INTERNAL_URL, { identityId, newPassword }, console)
-      .then(() => ({ 204: null }))
-      .catch((e) => ({ [e.status]: null }));
+      .then(() => {
+        callLog(logInfo, OperationResult.SUCCESS);
+        return { 204: null };
+      })
+      .catch((e) => {
+        callLog(logInfo, OperationResult.FAIL);
+        return { [e.status]: null };
+      });
 
   });
