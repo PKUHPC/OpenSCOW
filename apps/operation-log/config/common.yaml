@@ -5,3 +5,7 @@ passwordPattern:
 
   # 出错时的消息。下面为默认值
   errorMessage: 必须包含字母、数字和符号，长度大于等于8位
+
+# 操作日志服务地址
+scowOperationLog:
+  url: localhost:5005
