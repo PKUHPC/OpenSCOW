@@ -49,7 +49,7 @@ export const CreateUserSchema = typeboxRouteSchema({
         Type.Literal("PASSWORD_NOT_VALID"),
         Type.Literal("USERID_NOT_VALID"),
       ]),
-      message: Type.Union([Type.String(), Type.Undefined()]),
+      message: Type.Optional(Type.String()),
     }),
 
     /** 用户已经存在 */

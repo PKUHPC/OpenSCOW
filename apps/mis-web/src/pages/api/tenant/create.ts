@@ -43,7 +43,7 @@ export const CreateTenantSchema = typeboxRouteSchema({
         Type.Literal("PASSWORD_NOT_VALID"),
         Type.Literal("USERID_NOT_VALID"),
       ]),
-      message: Type.Union([Type.String(), Type.Undefined()]),
+      message: Type.Optional(Type.String()),
     }),
 
     /** 租户已经存在 */
