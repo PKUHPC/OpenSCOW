@@ -14,13 +14,13 @@ import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { AppServiceClient } from "@scow/protos/build/portal/app";
 import { Static, Type } from "@sinclair/typebox";
-import { validateToken } from "src/auth/token";
 import { getClient } from "src/utils/client";
 
 // Cannot use App from protos
 export const App = Type.Object({
   id: Type.String(),
   name: Type.String(),
+  logoPath: Type.Optional(Type.String()),
 });
 export type App = Static<typeof App>;
 
@@ -28,11 +28,14 @@ export const ListAvailableAppsSchema = typeboxRouteSchema({
   method: "GET",
 
   query: Type.Object({
-    token: Type.String(),
+    cluster: Type.String(),
   }),
 
   responses: {
     200: Type.Object({
+      // 公共配置config/apps
+      // 与集群配置下config/clusters/[clusterId]/apps下的交互式应用
+      // 如果app.id重复，则按照集群配置下读取
       apps: Type.Array(App),
     }),
 
@@ -51,15 +54,11 @@ export const ListAvailableAppsSchema = typeboxRouteSchema({
 // and authenticate manually
 export default /* #__PURE__*/typeboxRoute(ListAvailableAppsSchema, async (req) => {
 
-  const { token } = req.query;
-
-  const info = await validateToken(token);
-
-  if (!info) { return { 403: null }; }
+  const { cluster } = req.query;
 
   const client = getClient(AppServiceClient);
 
-  return asyncUnaryCall(client, "listAvailableApps", {}).then((reply) => {
+  return asyncUnaryCall(client, "listAvailableApps", { cluster }).then((reply) => {
     return { 200: { apps: reply.apps } };
   });
 

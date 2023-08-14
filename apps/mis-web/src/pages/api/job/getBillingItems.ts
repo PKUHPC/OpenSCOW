@@ -13,6 +13,7 @@
 import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { numberToMoney } from "@scow/lib-decimal";
+import { ConfigServiceClient } from "@scow/protos/build/common/config";
 import { GetBillingItemsResponse, JobBillingItem, JobServiceClient } from "@scow/protos/build/server/job";
 import { Static, Type } from "@sinclair/typebox";
 import { USE_MOCK } from "src/apis/useMock";
@@ -144,7 +145,9 @@ export default /* #__PURE__*/typeboxRoute(GetBillingItemsSchema, async (req, res
 
   const result = { activeItems: [] as BillingItemType[], historyItems: [] as BillingItemType[], nextId };
 
-  for (const [cluster, { slurm: { partitions } }] of Object.entries(runtimeConfig.CLUSTERS_CONFIG)) {
+  for (const [cluster] of Object.entries(runtimeConfig.CLUSTERS_CONFIG)) {
+    const client = getClient(ConfigServiceClient);
+    const partitions = await asyncClientCall(client, "getClusterConfig", { cluster }).then((resp) => resp.partitions);
     for (const partition of partitions) {
       for (const qos of partition.qos ?? [""]) {
         const path = [cluster, partition.name, qos].filter((x) => x).join(".");

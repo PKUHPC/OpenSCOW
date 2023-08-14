@@ -18,7 +18,8 @@ import { TenantRole } from "src/models/User";
 import { ChargeForm } from "src/pageComponents/finance/ChargeForm";
 import { Head } from "src/utils/head";
 
-export const FinancePayPage: NextPage = requireAuth((i) => i.tenantRoles.includes(TenantRole.TENANT_FINANCE))(
+export const FinancePayPage: NextPage = requireAuth((i) => i.tenantRoles.includes(TenantRole.TENANT_FINANCE) || 
+  i.tenantRoles.includes(TenantRole.TENANT_ADMIN))(
   () => {
     return (
       <div>

@@ -1,0 +1,8 @@
+{
+  "label": "网关",
+  "position": 5,
+  "link": {
+    "type": "generated-index",
+    "description": "关于gateway配置的文档"
+  }
+}

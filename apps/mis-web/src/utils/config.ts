@@ -14,6 +14,7 @@ import type { ClusterConfigSchema } from "@scow/config/build/cluster";
 import type { ClusterTextsConfigSchema } from "@scow/config/build/clusterTexts";
 import type { MisConfigSchema } from "@scow/config/build/mis";
 import type { UiConfigSchema } from "@scow/config/build/ui";
+import { UserLink } from "@scow/lib-web/build/layouts/base/types";
 import getConfig from "next/config";
 
 export interface ServerRuntimeConfig {
@@ -53,6 +54,8 @@ export interface PublicRuntimeConfig {
 
   NAV_LINKS?: NavLink[];
 
+  USER_LINKS?: UserLink[];
+
   VERSION_TAG: string | undefined;
 
   CUSTOM_TRANSLATION_JSON?: CustomTranslation;
@@ -65,10 +68,11 @@ export const publicConfig: PublicRuntimeConfig = getConfig().publicRuntimeConfig
 export type Cluster = { id: string; name: string; }
 export type NavLink = {
   text: string;
-  url: string;
+  url?: string;
+  openInNewPage?: boolean;
   iconPath?: string;
   allowedRoles?: string[];
-  children?: Omit<NavLink, "children">[];
+  children?: (Omit<NavLink, "children" | "url"> & { url: string })[];
 }
 
 export type TranslationRecord = {
@@ -80,3 +84,6 @@ export type CustomTranslation = {
   "zh_cn"?: TranslationRecord;
 }
 
+export const getClusterName = (clusterId: string) => {
+  return publicConfig.CLUSTERS[clusterId]?.name || clusterId;
+};

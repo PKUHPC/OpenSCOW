@@ -19,9 +19,11 @@ import { plugins } from "src/plugins";
 import { accountServiceServer } from "src/services/account";
 import { adminServiceServer } from "src/services/admin";
 import { chargingServiceServer } from "src/services/charging";
+import { configServiceServer } from "src/services/config";
 import { initServiceServer } from "src/services/init";
 import { jobServiceServer } from "src/services/job";
 import { jobChargeLimitServer } from "src/services/jobChargeLimit";
+import { misConfigServiceServer } from "src/services/misConfig";
 import { tenantServiceServer } from "src/services/tenant";
 import { userServiceServer } from "src/services/user";
 import { logger } from "src/utils/logger";
@@ -31,7 +33,6 @@ export async function createServer() {
   const server = new Server({
     host: config.HOST,
     port: config.PORT,
-
     logger,
   });
 
@@ -49,6 +50,8 @@ export async function createServer() {
   await server.register(jobServiceServer);
   await server.register(chargingServiceServer);
   await server.register(tenantServiceServer);
+  await server.register(configServiceServer);
+  await server.register(misConfigServiceServer);
 
   const em = server.ext.orm.em.fork();
   await updateBlockStatusInSlurm(em, server.ext.clusters, server.logger);

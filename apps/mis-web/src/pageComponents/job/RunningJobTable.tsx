@@ -70,10 +70,17 @@ export const RunningJobQueryTable: React.FC<Props> = ({
   const [form] = Form.useForm<FilterForm>();
 
   const promiseFn = useCallback(async () => {
+
+    const diffAccountNameQuery = searchType.current === "precision" ? {
+      accountName : Array.isArray(accountNames) ? undefined : accountNames,
+    } : {
+      accountName: query.accountName || undefined,
+    };
+
     return await api.getRunningJobs({ query: {
       userId: userId || undefined,
       cluster: query.cluster.id,
-      accountName: searchType.current === "precision" ? undefined : (query.accountName || undefined),
+      ...diffAccountNameQuery,
     } });
   }, [userId, searchType.current, query.cluster, query.accountName, query.jobId]);
 
@@ -278,6 +285,8 @@ export const RunningJobInfoTable: React.FC<JobInfoTableProps> = ({
         <Table.Column<RunningJobInfo> dataIndex="nodes" title={t("nodes")} />
         <Table.Column<RunningJobInfo> dataIndex="cores" title={t("cores")} />
         <Table.Column<RunningJobInfo> dataIndex="state" title={t("state")} />
+        <Table.Column<RunningJobInfo> dataIndex="gpus" title="GPU卡数" />
+        <Table.Column<RunningJobInfo> dataIndex="state" title="状态" />
         <Table.Column
           dataIndex="runningOrQueueTime"
           title={t("time")}

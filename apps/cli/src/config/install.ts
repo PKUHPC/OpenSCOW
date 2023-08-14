@@ -18,7 +18,7 @@ import { logger } from "src/log";
 export const InstallConfigSchema = Type.Object({
   port: Type.Integer({ description: "端口号", default: 80 }),
   basePath: Type.String({ description: "整个系统的部署路径", default: "/" }),
-  image: Type.String({ description: "镜像", default: "ghcr.io/pkuhpc/scow/scow" }),
+  image: Type.Optional(Type.String({ description: "镜像", default: "mirrors.pku.edu.cn/pkuhpc-icode/scow" })),
   imageTag: Type.String({ description: "镜像tag", default: "master" }),
 
   log: Type.Object({
@@ -39,6 +39,11 @@ export const InstallConfigSchema = Type.Object({
     proxyReadTimeout: Type.String({
       description: "限制后端服务发出响应的超时时间，可接受的格式为nginx的proxy_read_timeout可接受的值",
       default: "60s",
+    }),
+
+    extra: Type.String({
+      description: "更多nginx配置，可接受的格式为nginx的server可接受的属性配置，可增加在当前系统nginx端口（默认80）的服务等",
+      default: "",
     }),
   }, { default: {} }),
 

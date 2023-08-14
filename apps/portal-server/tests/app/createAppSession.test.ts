@@ -35,8 +35,10 @@ afterEach(async () => {
 it("create app with wrong argument", async () => {
   const reply = await asyncUnaryCall(client, "createAppSession", {
     appId: "vscode",
+    appJobName: "vscode-20220101-080000",
     cluster: "hpc01",
     userId: "123",
+    nodeCount: 1,
     coreCount: 2,
     account: "b",
     maxTime: 60,

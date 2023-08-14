@@ -11,7 +11,6 @@
  */
 
 // @ts-check
-/* eslint-disable @typescript-eslint/no-var-requires */
 
 const { envConfig, str, bool, parseKeyValue } = require("@scow/lib-config");
 const { join } = require("path");
@@ -23,7 +22,7 @@ const { readVersionFile } = require("@scow/utils/build/version");
 const { getCapabilities } = require("@scow/lib-auth");
 const { DEFAULT_PRIMARY_COLOR, getUiConfig } = require("@scow/config/build/ui");
 const { getPortalConfig } = require("@scow/config/build/portal");
-const { getClusterConfigs } = require("@scow/config/build/cluster");
+const { getClusterConfigs, getLoginNode, getSortedClusters } = require("@scow/config/build/cluster");
 const { getCommonConfig } = require("@scow/config/build/common");
 
 /**
@@ -39,6 +38,28 @@ async function queryCapabilities(authUrl, phase) {
   } else {
     return { changePassword: true, createUser: true, validateName: true };
   }
+}
+
+
+/**
+ * 当所有集群下都关闭桌面登录功能时，才关闭。
+ * @param {Record<String, import("@scow/config/build/cluster").ClusterConfigSchema>} clusters
+ * @param {import("@scow/config/build/portal").PortalConfigSchema} portalConfig
+ * @returns {boolean} desktop login enable
+ */
+function getDesktopEnabled(clusters, portalConfig) {
+  const clusterDesktopEnabled = Object.keys(clusters).reduce(
+    ((pre, cur) => {
+
+      const curClusterDesktopEnabled = clusters?.[cur]?.loginDesktop?.enabled !== undefined
+        ? !!clusters[cur]?.loginDesktop?.enabled
+        : portalConfig.loginDesktop.enabled;
+
+      return pre || curClusterDesktopEnabled;
+    }), false,
+  );
+
+  return clusterDesktopEnabled;
 }
 
 const specs = {
@@ -81,7 +102,6 @@ const buildRuntimeConfig = async (phase, basePath) => {
 
   const building = phase === PHASE_PRODUCTION_BUILD;
   const dev = phase === PHASE_DEVELOPMENT_SERVER;
-  const production = phase === PHASE_PRODUCTION_SERVER;
   const testenv = phase === PHASE_TEST;
 
   // load .env.build if in build
@@ -99,6 +119,8 @@ const buildRuntimeConfig = async (phase, basePath) => {
   const configPath = mockEnv ? join(__dirname, "config") : undefined;
 
   const clusters = getClusterConfigs(configPath, console);
+
+  Object.keys(clusters).map((id) => clusters[id].loginNodes = clusters[id].loginNodes.map(getLoginNode));
 
   const uiConfig = getUiConfig(configPath, console);
   const portalConfig = getPortalConfig(configPath, console);
@@ -125,10 +147,13 @@ const buildRuntimeConfig = async (phase, basePath) => {
     HOME_TITLES: portalConfig.homeTitle.hostnameMap,
     SUBMIT_JOB_WORKING_DIR: portalConfig.submitJobDefaultPwd,
     SCOW_API_AUTH_TOKEN: commonConfig.scowApi?.auth?.token,
+    SUBMIT_JOB_PROMPT_TEXT:portalConfig.submitJobPromptText,
   };
 
   // query auth capabilities to set optional auth features
   const capabilities = await queryCapabilities(config.AUTH_INTERNAL_URL, phase);
+
+  const enableLoginDesktop = getDesktopEnabled(clusters, portalConfig);
 
   /**
    * @type {import("./src/utils/config").PublicRuntimeConfig}
@@ -141,13 +166,13 @@ const buildRuntimeConfig = async (phase, basePath) => {
 
     ENABLE_JOB_MANAGEMENT: portalConfig.jobManagement,
 
-    ENABLE_LOGIN_DESKTOP: portalConfig.loginDesktop.enabled,
+    ENABLE_LOGIN_DESKTOP: enableLoginDesktop,
 
     ENABLE_APPS: portalConfig.apps,
 
     MIS_URL: config.MIS_DEPLOYED ? (config.MIS_URL || portalConfig.misUrl) : undefined,
 
-    CLUSTERS: Object.entries(clusters).map(([id, { displayName }]) => ({ id, name: displayName })),
+    CLUSTERS: getSortedClusters(clusters),
 
     NOVNC_CLIENT_URL: config.NOVNC_CLIENT_URL,
 
@@ -161,6 +186,8 @@ const buildRuntimeConfig = async (phase, basePath) => {
     PUBLIC_PATH: config.PUBLIC_PATH,
 
     NAV_LINKS: portalConfig.navLinks,
+
+    USER_LINKS: commonConfig.userLinks,
 
     VERSION_TAG: versionTag,
   };

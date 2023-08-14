@@ -277,3 +277,105 @@ it("returns 404 if user doesn't exist", async () => {
   expect(resp.statusCode).toBe(404);
   expect(resp.json()).toEqual({ code: "USER_NOT_FOUND" });
 });
+
+it("change user email", async () => {
+
+  await createUser();
+
+  const newEmail = "test@123.com";
+  const changeEmaiResp = await server.inject({
+    method: "PATCH",
+    url: "/user/email",
+    payload: { identityId:user.identityId, newEmail },
+  });
+
+
+  const getUserResp = await server.inject({
+    method: "GET",
+    url: "/user",
+    query: { identityId: user.identityId },
+  });
+
+  expect(changeEmaiResp.statusCode).toBe(204);
+  expect(changeEmaiResp.json()).toBe(null);
+
+  expect(getUserResp.statusCode).toBe(200);
+  expect(getUserResp.json().user.mail).toEqual(newEmail);
+
+});
+it("check password", async () => {
+  await createUser();
+
+  const correctPassword = user.password;
+  const wrongPassword = user.password + "123";
+  const notExistedIdentityId = user.identityId + "123";
+
+  // wrong password
+  const wrongResp = await server.inject({
+    method: "GET",
+    url: "/checkPassword",
+    query: { identityId: user.identityId, password: wrongPassword },
+  });
+  expect(wrongResp.statusCode).toBe(200);
+  expect(wrongResp.json()).toEqual({ success: false });
+
+  // correct password
+  const correctResp = await server.inject({
+    method: "GET",
+    url: "/checkPassword",
+    query: { identityId: user.identityId, password: correctPassword },
+  });
+  expect(correctResp.statusCode).toBe(200);
+  expect(correctResp.json()).toEqual({ success: true });
+
+  // not existed
+  const notExistedResp = await server.inject({
+    method: "GET",
+    url: "/checkPassword",
+    query: { identityId: notExistedIdentityId, password: correctPassword },
+  });
+  expect(notExistedResp.statusCode).toBe(404);
+  expect(notExistedResp.json()).toBe(null);
+});
+
+it("change password", async () => {
+  await createUser();
+
+  const oldPassword = user.password;
+  const newPassword = user.password + "123";
+  const notExistedIdentityId = user.identityId + "123";
+
+  // change password
+  const changePasswordResp = await server.inject({
+    method: "PATCH",
+    url: "password",
+    body: { identityId: user.identityId, newPassword: newPassword },
+  });
+  expect(changePasswordResp.statusCode).toBe(204);
+  expect(changePasswordResp.json()).toBe(null);
+
+  // check password
+  const oldPasswordResp = await server.inject({
+    method: "GET",
+    url: "/checkPassword",
+    query: { identityId: user.identityId, password: oldPassword },
+  });
+  expect(oldPasswordResp.statusCode).toBe(200);
+  expect(oldPasswordResp.json()).toEqual({ success: false });
+  const newPasswordResp = await server.inject({
+    method: "GET",
+    url: "/checkPassword",
+    query: { identityId: user.identityId, password: newPassword },
+  });
+  expect(newPasswordResp.statusCode).toBe(200);
+  expect(newPasswordResp.json()).toEqual({ success: true });
+
+  // not existed
+  const notExistedResp = await server.inject({
+    method: "PATCH",
+    url: "password",
+    body: { identityId: notExistedIdentityId, newPassword: newPassword },
+  });
+  expect(notExistedResp.statusCode).toBe(404);
+  expect(notExistedResp.json()).toBe(null);
+});

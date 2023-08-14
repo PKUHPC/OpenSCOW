@@ -31,7 +31,7 @@ function handleIfInvalidCredentials(e: any) {
   }
 }
 
-export async function modifyPassword(
+export async function modifyPasswordBase(
   userId: string, oldPassword: string | undefined, newPassword: string, client: ldapjs.Client,
 ): Promise<boolean> {
   /** Must bind as the user whose password is to be changed and then password can be changed */
@@ -54,17 +54,34 @@ export async function modifyPassword(
 
 }
 
-export async function modifyPasswordAsSelf(
+export async function checkPassword(
   log: FastifyBaseLogger,
   ldap: LdapConfigSchema,
-  userDn: string, oldPassword: string, newPassword: string,
+  userDn: string,
+  password: string,
 ): Promise<boolean> {
   try {
-    return await useLdap(log, ldap, { dn: userDn, password: oldPassword })(async (client) => {
-      await modifyPassword(userDn, oldPassword, newPassword, client);
+    return await useLdap(log, ldap, { dn: userDn, password })(async () => {
       return true;
     });
   } catch (e: any) {
     return handleIfInvalidCredentials(e);
+  }
+}
+
+// Login as self and modify anyone's password
+export async function modifyPassword(
+  log: FastifyBaseLogger,
+  ldap: LdapConfigSchema,
+  userDn: string,
+  newPassword: string,
+): Promise<boolean> {
+  try {
+    return await useLdap(log, ldap, { dn: ldap.bindDN, password: ldap.bindPassword })(async (client) => {
+      await modifyPasswordBase(userDn, undefined, newPassword, client);
+      return true;
+    });
+  } catch (e: any) {
+    throw e;
   }
 }

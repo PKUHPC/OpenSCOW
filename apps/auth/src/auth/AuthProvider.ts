@@ -24,7 +24,9 @@ export interface CreateUserInfo {
 
 export type ValidateNameResult = "NotFound" | "Match" | "NotMatch";
 export type CreateUserResult = "AlreadyExists" | "OK";
-export type ChangePasswordResult = "NotFound" | "WrongOldPassword" | "OK";
+export type ChangePasswordResult = "NotFound" | "OK";
+export type CheckPasswordResult = "NotFound" | "Match" | "NotMatch";
+export type ChangeEmailResult = "NotFound" | "OK";
 
 export interface UserInfo {
   identityId: string;
@@ -32,11 +34,16 @@ export interface UserInfo {
   mail?: string;
 }
 
+
+
 export interface AuthProvider {
   serveLoginHtml: (callbackUrl: string, req: FastifyRequest, rep: FastifyReply) => Promise<void>;
   fetchAuthTokenInfo: (token: string, req: FastifyRequest) => Promise<string | undefined>;
   getUser: undefined | ((identityId: string, req: FastifyRequest) => Promise<UserInfo | undefined>);
   createUser: undefined | ((info: CreateUserInfo, req: FastifyRequest) => Promise<CreateUserResult>);
-  changePassword: undefined | ((id: string, oldPassword: string, newPassword: string,
-    req: FastifyRequest) => Promise<ChangePasswordResult>);
+  changePassword: undefined | ((id: string, newPassword: string, req: FastifyRequest) => Promise<ChangePasswordResult>);
+  checkPassword: undefined | ((identityId: string, password: string, req: FastifyRequest)
+    => Promise<CheckPasswordResult>);
+  changeEmail: undefined | ((id: string, newEmail: string,
+    req: FastifyRequest) => Promise<ChangeEmailResult>);
 }

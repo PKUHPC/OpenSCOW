@@ -13,6 +13,7 @@
 import type { ClusterConfigSchema } from "@scow/config/build/cluster";
 import type { PortalConfigSchema } from "@scow/config/build/portal";
 import type { UiConfigSchema } from "@scow/config/build/ui";
+import { UserLink } from "@scow/lib-web/build/layouts/base/types";
 import getConfig from "next/config";
 
 export interface ServerRuntimeConfig {
@@ -40,6 +41,8 @@ export interface ServerRuntimeConfig {
 
   DEFAULT_HOME_TITLE: string;
   HOME_TITLES: {[hostname: string]: string };
+
+  SUBMIT_JOB_PROMPT_TEXT?: string;
 
   SUBMIT_JOB_WORKING_DIR: string;
 
@@ -74,6 +77,8 @@ export interface PublicRuntimeConfig {
 
   NAV_LINKS?: NavLink[];
 
+  USER_LINKS?: UserLink[];
+
   VERSION_TAG: string | undefined;
 
 }
@@ -84,8 +89,19 @@ export const publicConfig: PublicRuntimeConfig = getConfig().publicRuntimeConfig
 export type Cluster = { id: string; name: string; }
 export type NavLink = {
   text: string;
-  url: string;
+  url?: string;
+  openInNewPage?: boolean;
   iconPath?: string;
-  children?: Omit<NavLink, "children">[];
+  children?: (Omit<NavLink, "children" | "url"> & { url: string })[];
 }
 
+export const getLoginDesktopEnabled = (cluster: string): boolean => {
+
+  const clusterLoginDesktopEnabled = runtimeConfig.CLUSTERS_CONFIG[cluster]?.loginDesktop?.enabled;
+
+  const commonLoginDesktopEnabled = runtimeConfig.PORTAL_CONFIG.loginDesktop.enabled;
+
+  return clusterLoginDesktopEnabled === undefined ? commonLoginDesktopEnabled : clusterLoginDesktopEnabled;
+};
+
+export type LoginNode = { name: string, address: string }

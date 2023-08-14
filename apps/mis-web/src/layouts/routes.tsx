@@ -14,7 +14,8 @@ import {
   AccountBookOutlined, BookOutlined, CloudServerOutlined,
   DashboardOutlined,
   InfoOutlined, LinkOutlined, LockOutlined, MoneyCollectOutlined, PartitionOutlined,
-  PlusOutlined, PlusSquareOutlined, StarOutlined, ToolOutlined, UserAddOutlined,
+  PlusOutlined, PlusSquareOutlined, ProfileOutlined,
+  StarOutlined, ToolOutlined, UserAddOutlined,
   UserOutlined } from "@ant-design/icons";
 import { NavItemProps } from "@scow/lib-web/build/layouts/base/types";
 import { NavIcon } from "@scow/lib-web/build/layouts/icon";
@@ -39,23 +40,24 @@ export const platformAdminRoutes: (platformRoles: PlatformRole[]) => NavItemProp
         text: "route.platform-management.info",
         path: "/admin/info",
       },
+      ...(platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ? [{
+        Icon: MoneyCollectOutlined,
+        // text: "作业价格表",
+        text: "route.platform-management.job-billing-table",
+        path: "/admin/jobBilling",
+      }] : [])
+      ,
       ...(platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ? [
         {
-          Icon: UserOutlined,
-          // text: "导入用户",
-          text: "route.platform-management.import-users",
-          path: "/admin/importUsers",
-        },
-        {
           Icon: CloudServerOutlined,
-          // text: "平台租户管理",
+          // text: "租户管理",
           text: "route.platform-management.tenants-management",
           path: "/admin/tenants",
           clickToPath: "/admin/tenants/list",
           children: [
             {
               Icon: UserOutlined,
-              // text: "平台租户列表",
+              // text: "租户列表",
               text: "route.platform-management.tenants-list",
               path: "/admin/tenants/list",
             },
@@ -69,15 +71,15 @@ export const platformAdminRoutes: (platformRoles: PlatformRole[]) => NavItemProp
         },
         {
           Icon: UserOutlined,
-          // text: "平台用户列表",
+          // text: "用户列表",
           text: "route.platform-management.users-list",
           path: "/admin/users",
         },
         {
-          Icon: MoneyCollectOutlined,
-          // text: "作业计费价格表",
-          text: "route.platform-management.job-billing-table",
-          path: "/admin/jobBilling",
+          Icon: AccountBookOutlined,
+          // text: "账户列表",
+          text: "route.tenant-management.account-list",
+          path: "/admin/accounts",
         },
       ] : []),
       ...(platformRoles.includes(PlatformRole.PLATFORM_FINANCE) ? [
@@ -110,6 +112,13 @@ export const platformAdminRoutes: (platformRoles: PlatformRole[]) => NavItemProp
         path: "/admin/systemDebug",
         clickable: false,
         children: [
+          ...(platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ?
+            [{
+              Icon: UserOutlined,
+              // text: "导入用户",
+              text: "route.platform-management.import-user",
+              path: "/admin/importUsers",
+            }] : []),
           {
             Icon: LockOutlined,
             // text: "封锁状态同步",
@@ -146,13 +155,13 @@ export const tenantRoutes: (tenantRoles: TenantRole[], token: string) => NavItem
         },
         {
           Icon: MoneyCollectOutlined,
-          // text: "管理作业价格表",
+          // text: "作业价格表",
           text: "route.tenant-management.manage-job-price",
           path: "/tenant/jobBillingTable",
         },
         {
           Icon: BookOutlined,
-          // text: "运行中的作业",
+          // text: "未结束的作业",
           text: "route.tenant-management.running-jobs",
           path: "/tenant/runningJobs",
         },
@@ -169,12 +178,6 @@ export const tenantRoutes: (tenantRoles: TenantRole[], token: string) => NavItem
           path: "/tenant/users",
           clickToPath: "/tenant/users/list",
           children: [
-            {
-              Icon: UserOutlined,
-              // text: "用户列表",
-              text: "route.tenant-management.user-list",
-              path: "/tenant/users/list",
-            },
             ...(useBuiltinCreateUser() ? [{
               Icon: UserAddOutlined,
               // text: "创建用户",
@@ -191,6 +194,12 @@ export const tenantRoutes: (tenantRoles: TenantRole[], token: string) => NavItem
                 path: publicConfig.CREATE_USER_CONFIG.misConfig.external!.url + "?" + createUserParams(token),
                 openInNewPage: true,
               }] : []),
+            {
+              Icon: UserOutlined,
+              // text: "用户列表",
+              text: "route.tenant-management.user-list",
+              path: "/tenant/users/list",
+            },
           ],
         },
         // {
@@ -211,16 +220,16 @@ export const tenantRoutes: (tenantRoles: TenantRole[], token: string) => NavItem
           clickToPath: "/tenant/accounts/list",
           children: [
             {
-              Icon: AccountBookOutlined,
-              // text: "账户列表",
-              text: "route.tenant-management.account-list",
-              path: "/tenant/accounts/list",
-            },
-            {
               Icon: PlusOutlined,
               // text: "创建账户",
               text: "route.tenant-management.create-account",
               path: "/tenant/accounts/create",
+            },
+            {
+              Icon: AccountBookOutlined,
+              // text: "账户列表",
+              text: "route.tenant-management.account-list",
+              path: "/tenant/accounts/list",
             },
             {
               Icon: StarOutlined,
@@ -246,9 +255,15 @@ export const tenantRoutes: (tenantRoles: TenantRole[], token: string) => NavItem
               path: "/tenant/finance/payAccount",
             },
             {
+              Icon: ProfileOutlined,
+              // text: "账户充值记录",
+              text: "route.tenant-management.account-payments",
+              path: "/tenant/finance/accountPayments",
+            },
+            {
               Icon: BookOutlined,
               // text: "充值记录",
-              text: "route.tenant-management.account-payments",
+              text: "route.tenant-management.finance-payments",
               path: "/tenant/finance/payments",
             },
           ],
@@ -389,17 +404,8 @@ export const getAvailableRoutes = (user: User | undefined): NavItemProps[] => {
     const mappedNavLinkItems = publicConfig.NAV_LINKS
       .filter((link) => !link.allowedRoles
         || (link.allowedRoles.length && link.allowedRoles.some((role) => userCurrentRoles[role])))
-      .map((link) => ({
-        Icon: !link.iconPath ? LinkOutlined : (
-          <NavIcon
-            src={join(publicConfig.PUBLIC_PATH, link.iconPath)}
-          />
-        ),
-        text: link.text,
-        path: `${link.url}?token=${user.token}`,
-        clickable: true,
-        openInNewPage: true,
-        children: link.children?.filter((childLink) => !childLink.allowedRoles
+      .map((link) => {
+        const childrenLinks = link.children?.filter((childLink) => !childLink.allowedRoles
           || (childLink.allowedRoles.length &&
             childLink.allowedRoles.some((role) => userCurrentRoles[role])))
           .map((childLink) => ({
@@ -410,10 +416,27 @@ export const getAvailableRoutes = (user: User | undefined): NavItemProps[] => {
             ),
             text: childLink.text,
             path: `${childLink.url}?token=${user.token}`,
-            clickable: true,
-            openInNewPage: true,
-          }) as NavItemProps),
-      }) as NavItemProps);
+            clickToPath: `${childLink.url}?token=${user.token}`,
+            openInNewPage: childLink.openInNewPage,
+          }) as NavItemProps);
+
+        const parentNavPath = link.url ? `${link.url}?token=${user.token}`
+          : (childrenLinks && childrenLinks.length > 0 ? childrenLinks[0].path : "");
+
+        return {
+          Icon: !link.iconPath ? LinkOutlined : (
+            <NavIcon
+              src={join(publicConfig.PUBLIC_PATH, link.iconPath)}
+            />
+          ),
+          text: link.text,
+          path: parentNavPath,
+          clickToPath: parentNavPath,
+          openInNewPage: link.openInNewPage,
+          children: childrenLinks,
+        };
+      }) as NavItemProps[];
+
 
     routes.push(...customNavLinkRoutes(mappedNavLinkItems));
   }

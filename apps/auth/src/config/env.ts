@@ -19,7 +19,7 @@ import { AuthType } from "./AuthType";
 
 export const FAVICON_URL = "/api/icon?type=favicon";
 
-export const LOGO_URL = "/api/logo?type=logo&preferDark=false";
+export const LOGO_URL = "/api/logo?type=logo&preferDark=";
 
 export const config = envConfig({
   HOST: host({ default: "0.0.0.0", desc: "监听地址" }),
@@ -45,6 +45,7 @@ export const config = envConfig({
 
   EXTRA_ALLOWED_CALLBACK_HOSTNAMES: str({ desc: "额外的信任回调域名，以逗号分隔", default: "" }),
 
+  PUBLIC_PATH: str({ desc: "静态文件路径前缀。以/开头，以/结尾", default: "/__public__/" }),
 });
 
 export const rootKeyPair = getKeyPair(config.SSH_PRIVATE_KEY_PATH, config.SSH_PUBLIC_KEY_PATH);

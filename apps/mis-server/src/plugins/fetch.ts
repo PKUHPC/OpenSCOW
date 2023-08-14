@@ -29,10 +29,16 @@ export interface FetchPlugin {
 export const fetchPlugin = plugin(async (f) => {
 
   let fetchStarted = !!misConfig.fetchJobs.periodicFetch;
+  let fetchIsRunning = false;
 
   const logger = f.logger.child({ plugin: "fetch" });
 
-  const trigger = () => fetchJobs(f.ext.orm.em.fork(), logger, f.ext, f.ext);
+  const trigger = () => {
+    if (fetchIsRunning) return;
+
+    fetchIsRunning = true;
+    return fetchJobs(f.ext.orm.em.fork(), logger, f.ext, f.ext).finally(() => { fetchIsRunning = false; });
+  };
 
   const task = cron.schedule(
     misConfig.fetchJobs.periodicFetch.cron,

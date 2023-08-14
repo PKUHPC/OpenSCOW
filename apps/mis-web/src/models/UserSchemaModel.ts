@@ -47,14 +47,14 @@ export type PlatformUserInfo = Static<typeof PlatformUserInfo>;
 export const UserInAccount = Type.Object({
   userId: Type.String(),
   userName: Type.String(),
-  state: Type.String(),
+  blocked: Type.Boolean(),
 });
 export type UserInAccount = Static<typeof UserInAccount>;
 
 export const ClusterAccountInfo = Type.Object({
   accountName: Type.String(),
   users: Type.Array(UserInAccount),
-  owner: Type.Optional(Type.Union([Type.String(), Type.Undefined()])),
+  owner: Type.Optional(Type.String()),
   importStatus: Type.Enum(ClusterAccountInfo_ImportStatus),
   blocked: Type.Boolean(),
 });
@@ -78,8 +78,8 @@ export type ImportUsersData = Static<typeof ImportUsersData>;
 export const AccountStatus = Type.Object({
   userStatus: Type.Enum(UserStatus),
   accountBlocked: Type.Boolean(),
-  jobChargeLimit: Type.Optional(Type.Union([Money, Type.Undefined()])),
-  usedJobCharge: Type.Optional(Type.Union([Money, Type.Undefined()])),
+  jobChargeLimit: Type.Optional(Money),
+  usedJobCharge: Type.Optional(Money),
   balance: Type.Optional(Money),
 });
 export type AccountStatus = Static<typeof AccountStatus>;
@@ -121,6 +121,7 @@ export const WhitelistedAccount = Type.Object({
   addTime: Type.Optional(Type.String()),
   operatorId: Type.String(),
   comment: Type.String(),
+  balance: Type.Optional(Money),
 });
 export type WhitelistedAccount = Static<typeof WhitelistedAccount>;
 
@@ -132,8 +133,8 @@ export const AccountUserInfo = Type.Object({
   role: Type.Enum(UserRole),
   /** cluster and quota */
   storageQuotas: Type.Record(Type.String(), Type.Number()),
-  jobChargeLimit:Type.Optional(Type.Union([Money, Type.Undefined()])),
-  usedJobChargeLimit: Type.Optional(Type.Union([Money, Type.Undefined()])),
+  jobChargeLimit:Type.Optional(Money),
+  usedJobChargeLimit: Type.Optional(Money),
 });
 export type AccountUserInfo = Static<typeof AccountUserInfo>;
 

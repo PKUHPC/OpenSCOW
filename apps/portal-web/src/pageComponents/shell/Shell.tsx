@@ -31,6 +31,7 @@ const TerminalContainer = styled.div`
 interface Props {
   user: User;
   cluster: string;
+  loginNode: string
   path: string;
 }
 
@@ -39,7 +40,7 @@ const OPEN_EXPLORER_PREFIX = "SCOW is opening the file system";
 const DOWNLOAD_FILE_PREFIX = "SCOW is downloading file ";
 const DOWNLOAD_FILE_SUFFIX = " in directory ";
 
-export const Shell: React.FC<Props> = ({ user, cluster, path }) => {
+export const Shell: React.FC<Props> = ({ user, cluster, loginNode, path }) => {
 
   const container = useRef<HTMLDivElement>(null);
 
@@ -56,6 +57,7 @@ export const Shell: React.FC<Props> = ({ user, cluster, path }) => {
 
       const payload = {
         cluster,
+        loginNode,
         path,
         cols: term.cols + "",
         rows: term.rows + "",
@@ -109,7 +111,7 @@ export const Shell: React.FC<Props> = ({ user, cluster, path }) => {
 
             if (result.includes(OPEN_EXPLORER_PREFIX)) {
               window.open(join(publicConfig.BASE_PATH, "/files", cluster, path));
-            } else {
+            } else if (result.includes(DOWNLOAD_FILE_PREFIX)) {
               const fileStartIndex = result.search(DOWNLOAD_FILE_PREFIX);
               const fileEndIndex = result.search(DOWNLOAD_FILE_SUFFIX);
               const file = result.substring(fileStartIndex + DOWNLOAD_FILE_PREFIX.length, fileEndIndex);

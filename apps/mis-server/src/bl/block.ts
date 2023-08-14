@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Logger } from "@ddadaal/tsgrpc-server";
 import { Loaded } from "@mikro-orm/core";
 import { MySqlDriver, SqlEntityManager } from "@mikro-orm/mysql";
@@ -34,23 +35,23 @@ export async function updateBlockStatusInSlurm(
     if (account.whitelist) {
       continue;
     }
-    await clusterPlugin.callOnAll(logger, async (ops) => await ops.account.blockAccount({
-      request: { accountName: account.accountName },
-      logger,
-    }));
+    await clusterPlugin.callOnAll(logger, async (client) =>
+      await asyncClientCall(client.account, "blockAccount", {
+        accountName: account.accountName,
+      }),
+    );
   }
 
   const userAccounts = await em.find(UserAccount, {
     status: UserStatus.BLOCKED,
   }, { populate: ["user", "account"]});
   for (const ua of userAccounts) {
-    await clusterPlugin.callOnAll(logger, async (ops) => ops.user.blockUserInAccount({
-      request: {
+    await clusterPlugin.callOnAll(logger, async (client) =>
+      await asyncClientCall(client.user, "blockUserInAccount", {
         accountName: ua.account.getProperty("accountName"),
         userId: ua.user.getProperty("userId"),
-      },
-      logger,
-    }));
+      }),
+    );
   }
   const updateBlockTime = await em.upsert(SystemState, {
     key: SystemState.KEYS.UPDATE_SLURM_BLOCK_STATUS,
@@ -86,14 +87,10 @@ export async function blockAccount(
     return "Whitelisted";
   }
 
-  await clusterPlugin.callOnAll(logger, async (ops) => {
-    const resp = await ops.account.blockAccount({
-      request: { accountName: account.accountName },
-      logger,
+  await clusterPlugin.callOnAll(logger, async (client) => {
+    await asyncClientCall(client.account, "blockAccount", {
+      accountName: account.accountName,
     });
-    if (resp.code === "NOT_FOUND") {
-      throw new Error(`Account ${account.accountName} not found`);
-    }
   });
 
   account.blocked = true;
@@ -116,15 +113,10 @@ export async function unblockAccount(
 
   if (!account.blocked) { return "ALREADY_UNBLOCKED"; }
 
-  await clusterPlugin.callOnAll(logger, async (ops) => {
-    const resp = await ops.account.unblockAccount({
-      request: { accountName: account.accountName },
-      logger,
+  await clusterPlugin.callOnAll(logger, async (client) => {
+    await asyncClientCall(client.account, "unblockAccount", {
+      accountName: account.accountName,
     });
-
-    if (resp.code === "NOT_FOUND") {
-      throw new Error(`Account ${account.accountName} not found`);
-    }
   });
 
   account.blocked = false;
@@ -148,13 +140,12 @@ export async function blockUserInAccount(
   const accountName = ua.account.$.accountName;
   const userId = ua.user.$.userId;
 
-  await clusterPlugin.clusters.callOnAll(logger, async (ops) => ops.user.blockUserInAccount({
-    request: {
+  await clusterPlugin.clusters.callOnAll(logger, async (client) =>
+    await asyncClientCall(client.user, "blockUserInAccount", {
       accountName,
       userId,
-    },
-    logger,
-  }));
+    }),
+  );
 
   ua.status = UserStatus.BLOCKED;
 
@@ -178,10 +169,12 @@ export async function unblockUserInAccount(
   const accountName = ua.account.getProperty("accountName");
   const userId = ua.user.getProperty("userId");
 
-  await clusterPlugin.clusters.callOnAll(logger, async (ops) => ops.user.unblockUserInAccount({
-    request: { accountName, userId },
-    logger,
-  }));
+  await clusterPlugin.clusters.callOnAll(logger, async (client) =>
+    await asyncClientCall(client.user, "unblockUserInAccount", {
+      accountName,
+      userId,
+    }),
+  );
 
   ua.status = UserStatus.UNBLOCKED;
 

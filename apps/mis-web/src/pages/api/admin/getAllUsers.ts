@@ -12,10 +12,10 @@
 
 import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
-import { UserServiceClient } from "@scow/protos/build/server/user";
+import { GetAllUsersRequest_UsersSortField, SortDirection, UserServiceClient } from "@scow/protos/build/server/user";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
-import { PlatformRole } from "src/models/User";
+import { PlatformRole, SortDirectionType, UsersSortFieldType } from "src/models/User";
 import { PlatformUserInfo } from "src/models/UserSchemaModel";
 import { getClient } from "src/utils/client";
 
@@ -25,6 +25,18 @@ export const GetAllUsersResponse = Type.Object({
   platformUsers: Type.Array(PlatformUserInfo),
 });
 export type GetAllUsersResponse = Static<typeof GetAllUsersResponse>;
+
+export const mapSortDirectionType = {
+  "ascend": SortDirection.ASC,
+  "descend": SortDirection.DESC,
+} as { [key: string]: SortDirection };
+
+export const mapUsersSortFieldType = {
+  "userId": GetAllUsersRequest_UsersSortField.USER_ID,
+  "name": GetAllUsersRequest_UsersSortField.NAME,
+  "createTime": GetAllUsersRequest_UsersSortField.CREATE_TIME,
+} as { [key: string]: GetAllUsersRequest_UsersSortField };
+
 
 export const GetAllUsersSchema = typeboxRouteSchema({
   method: "GET",
@@ -41,7 +53,14 @@ export const GetAllUsersSchema = typeboxRouteSchema({
      */
     pageSize: Type.Optional(Type.Integer()),
 
+    sortField: Type.Optional(UsersSortFieldType),
+
+    sortOrder: Type.Optional(SortDirectionType),
+
     idOrName: Type.Optional(Type.String()),
+
+    platformRole: Type.Optional(Type.Enum(PlatformRole)),
+
   }),
 
   responses: {
@@ -59,13 +78,20 @@ export default typeboxRoute(GetAllUsersSchema,
       return;
     }
 
-    const { page = 1, pageSize, idOrName } = req.query;
+    const { page = 1, pageSize, sortField, sortOrder, idOrName, platformRole } = req.query;
 
     const client = getClient(UserServiceClient);
+
+    const mappedSortField = sortField ? mapUsersSortFieldType[sortField] : undefined;
+    const mappedSortOrder = sortOrder ? mapSortDirectionType[sortOrder] : undefined;
+
     const result = await asyncClientCall(client, "getAllUsers", {
       page,
       pageSize,
+      sortField: mappedSortField,
+      sortOrder: mappedSortOrder,
       idOrName,
+      platformRole,
     });
 
     return {

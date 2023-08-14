@@ -39,7 +39,6 @@ export async function validateToken(token: string): Promise<UserInfo | undefined
   const userInfo: GetUserInfoResponse = await asyncClientCall(client, "getUserInfo", {
     userId: resp.identityId,
   });
-
   return {
     accountAffiliations: userInfo.affiliations,
     identityId: resp.identityId,
@@ -47,6 +46,7 @@ export async function validateToken(token: string): Promise<UserInfo | undefined
     platformRoles: userInfo.platformRoles,
     tenant: userInfo.tenantName,
     tenantRoles: userInfo.tenantRoles,
+    email:userInfo.email,
   };
 
 }

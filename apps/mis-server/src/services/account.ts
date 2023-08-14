@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
@@ -93,7 +94,7 @@ export const accountServiceServer = plugin((server) => {
       const { accountName, tenantName } = request;
 
       const results = await em.find(Account, {
-        tenant: { name: tenantName },
+        ...tenantName !== undefined ? { tenant: { name: tenantName } } : undefined,
         ...accountName !== undefined ? { accountName } : undefined,
       }, { populate: ["users", "users.user", "tenant"]});
 
@@ -167,29 +168,23 @@ export const accountServiceServer = plugin((server) => {
       logger.info("Creating account in cluster.");
       await server.ext.clusters.callOnAll(
         logger,
-        async (ops) => {
-          const resp = await ops.account.createAccount({
-            request: { accountName, ownerId },
-            logger,
+        async (client) => {
+          await asyncClientCall(client.account, "createAccount", {
+            accountName, ownerUserId: ownerId,
           });
 
-          if (resp.code === "ALREADY_EXISTS") {
-            // the account is already exists. add the owner to the account manually
-            await ops.user.addUserToAccount({
-              request: { accountName, userId: user.userId },
-              logger,
-            });
-          }
-
-          const blockResp = await ops.account.blockAccount({
-            request: { accountName },
-            logger,
+          await asyncClientCall(client.account, "blockAccount", {
+            accountName,
+          }).catch((e) => {
+            if (e.code === Status.NOT_FOUND) {
+              throw <ServiceError>{
+                code: Status.INTERNAL, message: `Account ${accountName} hasn't been created. block failed`,
+              };
+            } else {
+              throw e;
+            }
           });
-          if (blockResp.code === "NOT_FOUND") {
-            throw <ServiceError>{
-              code: Status.INTERNAL, message: `Account ${accountName} hasn't been created. block failed`,
-            };
-          }
+
         },
       ).catch(async (e) => {
         await rollback(e);
@@ -232,6 +227,7 @@ export const accountServiceServer = plugin((server) => {
             addTime: x.time.toISOString(),
             ownerId: accountOwner.id + "",
             ownerName: accountOwner.name,
+            balance: decimalToMoney(x.account.$.balance),
           };
 
         }),
@@ -305,7 +301,6 @@ export const accountServiceServer = plugin((server) => {
 
       return [{ executed: true }];
     },
-
   });
 
 });

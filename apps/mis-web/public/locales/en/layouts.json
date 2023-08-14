@@ -41,6 +41,7 @@
       "whitelist": "Account Whitelist",
       "finance-management": "Finance Management",
       "account-pay": "Account Top Up",
+      "finance-payments": "Top Up History",
       "account-payments": "Account Top Up History"
     },
     "account-management": {

@@ -18,7 +18,7 @@ import { BigScreenMenu } from "src/layouts/base/header/BigScreenMenu";
 import { HeaderItem } from "src/layouts/base/header/components";
 import { Logo } from "src/layouts/base/header/Logo";
 import { UserIndicator } from "src/layouts/base/header/UserIndicator";
-import { NavItemProps, UserInfo } from "src/layouts/base/types";
+import { NavItemProps, UserInfo, UserLink } from "src/layouts/base/types";
 import styled from "styled-components";
 
 import { LanguageSwitcher } from "./LanguageSwitcher";
@@ -68,6 +68,7 @@ interface Props {
   pathname: string;
   right?: React.ReactNode;
   basePath: string;
+  userLinks?: UserLink[];
 }
 
 // const [language, setLanguage] = useState<string>("zh_cn");
@@ -76,7 +77,7 @@ export const Header: React.FC<Props> = ({
   hasSidebar, routes,
   setSidebarCollapsed, sidebarCollapsed,
   pathname, user, logout,
-  right, basePath,
+  right, basePath, userLinks,
 }) => {
   return (
     <Container>
@@ -105,7 +106,7 @@ export const Header: React.FC<Props> = ({
       <LanguageSwitcher />
       {/* </LanguageContext.Provider> */}
       <IndicatorPart>
-        <UserIndicator user={user} logout={logout} />
+        <UserIndicator user={user} logout={logout} userLinks={userLinks}/>
       </IndicatorPart>
     </Container>
   );

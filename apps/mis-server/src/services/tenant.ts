@@ -35,10 +35,12 @@ export const tenantServiceServer = plugin((server) => {
       if (!tenant) {
         throw <ServiceError>{ code: status.NOT_FOUND, message: `Tenant ${tenantName} is not found.` };
       }
-
       const accountCount = await em.count(Account, { tenant });
       const userCount = await em.count(User, { tenant });
       const admins = await em.find(User, { tenant, tenantRoles: { $like: `%${TenantRole.TENANT_ADMIN}%` } }, {
+        fields: ["userId", "name"],
+      });
+      const financialStaff = await em.find(User, { tenant, tenantRoles: { $like: `%${TenantRole.TENANT_FINANCE}%` } }, {
         fields: ["userId", "name"],
       });
 
@@ -47,6 +49,7 @@ export const tenantServiceServer = plugin((server) => {
         admins: admins.map((a) => ({ userId: a.userId, userName: a.name })),
         userCount,
         balance: decimalToMoney(tenant.balance),
+        financialStaff: financialStaff.map((f) => ({ userId: f.userId, userName: f.name })),
       }];
     },
 
@@ -80,12 +83,12 @@ export const tenantServiceServer = plugin((server) => {
         {
           totalCount: tenants.length,
           platformTenants: tenants.map((x) => ({
-            tenantId:x.id,
+            tenantId: x.id,
             tenantName: x.name,
             // 初始创建租户时，其中无账户和用户,
             userCount: userCount[`${x.id}`] ?? 0,
             accountCount: accountCount[`${x.id}`] ?? 0,
-            balance:decimalToMoney(x.balance),
+            balance: decimalToMoney(x.balance),
             createTime: x.createTime.toISOString(),
           })),
         }];

@@ -16,7 +16,7 @@ import { DesktopServiceClient } from "@scow/protos/build/portal/desktop";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { getClient } from "src/utils/client";
-import { publicConfig } from "src/utils/config";
+import { getLoginDesktopEnabled } from "src/utils/config";
 
 // Cannot use AvailableWm from protos
 export const AvailableWm = Type.Object({
@@ -28,7 +28,9 @@ export type AvailableWm = Static<typeof AvailableWm>;
 export const ListAvailableWmsSchema = typeboxRouteSchema({
   method: "GET",
 
-  query: Type.Object({}),
+  query: Type.Object({
+    cluster: Type.String(),
+  }),
 
   responses: {
     200: Type.Object({
@@ -36,7 +38,7 @@ export const ListAvailableWmsSchema = typeboxRouteSchema({
     }),
 
     // 功能没有启用
-    501: Type.Null(),
+    501: Type.Object({ code: Type.Literal("CLUSTER_LOGIN_DESKTOP_NOT_ENABLED") }),
   },
 });
 
@@ -45,16 +47,20 @@ const auth = authenticate(() => true);
 export default /* #__PURE__*/typeboxRoute(ListAvailableWmsSchema, async (req, res) => {
 
 
+  const { cluster } = req.query;
 
-  if (!publicConfig.ENABLE_LOGIN_DESKTOP) {
-    return { 501: null };
+  const loginDesktopEnabled = getLoginDesktopEnabled(cluster);
+
+  if (!loginDesktopEnabled) {
+    return { 501: { code: "CLUSTER_LOGIN_DESKTOP_NOT_ENABLED" as const } };
   }
 
   const info = await auth(req, res);
 
   if (!info) { return; }
 
+
   const client = getClient(DesktopServiceClient);
 
-  return await asyncUnaryCall(client, "listAvailableWms", {}).then(({ wms }) => ({ 200: { wms } }));
+  return await asyncUnaryCall(client, "listAvailableWms", { cluster }).then(({ wms }) => ({ 200: { wms } }));
 });

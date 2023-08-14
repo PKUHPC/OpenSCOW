@@ -16,7 +16,7 @@ import { DesktopServiceClient } from "@scow/protos/build/portal/desktop";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { getClient } from "src/utils/client";
-import { publicConfig } from "src/utils/config";
+import { getLoginDesktopEnabled } from "src/utils/config";
 
 export const KillDesktopSchema = typeboxRouteSchema({
   method: "POST",
@@ -24,12 +24,13 @@ export const KillDesktopSchema = typeboxRouteSchema({
   body: Type.Object({
     displayId: Type.Number(),
     cluster: Type.String(),
+    loginNode: Type.String(),
   }),
 
   responses: {
     204: Type.Null(),
     // 功能没有启用
-    501: Type.Null(),
+    501: Type.Object({ code: Type.Literal("CLUSTER_LOGIN_DESKTOP_NOT_ENABLED") }),
   },
 
 });
@@ -38,20 +39,22 @@ const auth = authenticate(() => true);
 
 export default /* #__PURE__*/typeboxRoute(KillDesktopSchema, async (req, res) => {
 
-  if (!publicConfig.ENABLE_LOGIN_DESKTOP) {
-    return { 501: null };
+  const { cluster, loginNode, displayId } = req.body;
+
+  const loginDesktopEnabled = getLoginDesktopEnabled(cluster);
+
+  if (!loginDesktopEnabled) {
+    return { 501: { code: "CLUSTER_LOGIN_DESKTOP_NOT_ENABLED" as const } };
   }
 
   const info = await auth(req, res);
 
   if (!info) { return; }
 
-  const { cluster, displayId } = req.body;
-
   const client = getClient(DesktopServiceClient);
 
   return await asyncUnaryCall(client, "killDesktop", {
-    cluster, displayId, userId: info.identityId,
+    cluster, loginNode, displayId, userId: info.identityId,
   }).then(() => ({ 204: null }));
 
 });

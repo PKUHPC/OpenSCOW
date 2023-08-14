@@ -16,10 +16,12 @@ import { Money } from "@scow/protos/build/common/money";
 import { App, Form, Input, InputNumber, Modal, Popover, Select, Space, Table, Tooltip } from "antd";
 import React, { useState } from "react";
 import { api } from "src/apis";
+import { AmountStrategyDescriptionsItem } from "src/components/AmonutStrategyDescriptionsItem";
 import { CommonModalProps, ModalLink } from "src/components/ModalLink";
 import { AmountStrategy, AmountStrategyAlgorithmDescriptions,
   AmountStrategyDescription,
   AmountStrategyDescriptions, AmountStrategyText } from "src/models/job";
+import { getClusterName } from "src/utils/config";
 import { moneyToString } from "src/utils/money";
 
 interface Props {
@@ -70,12 +72,7 @@ export const ManageJobBillingTable: React.FC<Props> = ({ data, loading, tenant, 
               dataIndex={["priceItem", "amountStrategy"]}
               render={(value) => {
                 return (
-                  <Space>
-                    {AmountStrategyDescriptions[value]}
-                    <Popover title={`${AmountStrategyAlgorithmDescriptions[value]}`}>
-                      <QuestionCircleOutlined />
-                    </Popover>
-                  </Space>
+                  <AmountStrategyDescriptionsItem isColContent={true} amount={value} />
                 );
               }}
             />
@@ -106,42 +103,21 @@ export const ManageJobBillingTable: React.FC<Props> = ({ data, loading, tenant, 
         </Space>
       )}
       >
-        <Table.Column title="集群" dataIndex={"cluster"} />
+        <Table.Column title="集群" dataIndex={"cluster"} render={getClusterName} />
         <Table.Column title="分区" dataIndex={"partition"} />
         <Table.Column title="QOS" dataIndex={"qos"} />
       </Table.ColumnGroup>
       <Table.Column title="计费价格编号" dataIndex={["priceItem", "itemId"]} />
       <Table.Column
         title={(
-          <Space>
-            {AmountStrategyText}
-            <Popover
-              title={AmountStrategyDescription}
-              content={(
-                <div>
-                  <p>
-                    {Object.entries(AmountStrategyDescriptions)
-                      .map((value) => <p key={value[0]}>{`${value[1]}(${value[0]})`}</p>)}
-                  </p>
-                  <a href="https://pkuhpc.github.io/SCOW/docs/info/mis/business/billing">{"细节请查阅文档"}</a>
-                </div>
-              )}
-            >
-              <QuestionCircleOutlined />
-            </Popover>
-          </Space>
+          <AmountStrategyDescriptionsItem isColTitle={true} />
         )}
         dataIndex={["priceItem", "amountStrategy"]}
         render={(value) => {
           return (
             value ?
               (
-                <Space>
-                  {AmountStrategyDescriptions[value]}
-                  <Popover title={`${AmountStrategyAlgorithmDescriptions[value]}`}>
-                    <QuestionCircleOutlined />
-                  </Popover>
-                </Space>
+                <AmountStrategyDescriptionsItem isColContent={true} amount={value} />
               ) : undefined
           );
         }}
@@ -217,7 +193,7 @@ const EditPriceModal: React.FC<CommonModalProps & {
           <strong>{tenant ? ("租户" + tenant) : "平台"}</strong>
         </Form.Item>
         <Form.Item label="计费项">
-          集群 <strong>{cluster}</strong>，分区 <strong>{partition}</strong>，QOS <strong>{qos}</strong>
+          集群 <strong>{getClusterName(cluster)}</strong>，分区 <strong>{partition}</strong>，QOS <strong>{qos}</strong>
         </Form.Item>
         <Form.Item label="新计费价格编号">
           <strong>{nextId}</strong>

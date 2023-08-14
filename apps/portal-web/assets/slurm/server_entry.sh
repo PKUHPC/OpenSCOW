@@ -12,4 +12,4 @@ export HOST=$(hostname)
 
 source before.sh
 
-source script.sh
+bash -l script.sh

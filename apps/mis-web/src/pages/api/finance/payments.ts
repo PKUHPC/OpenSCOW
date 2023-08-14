@@ -47,6 +47,11 @@ export const GetPaymentsSchema = typeboxRouteSchema({
     endTime: Type.String({ format: "date-time" }),
 
     accountName: Type.Optional(Type.String()),
+    /**
+     * 是否为搜索租户的记录，因getPaymentRecords这个API中有两种情况均是只传了tenantName参数
+     * 加入searchTenant区分是搜索账户还是租户的记录
+     */
+    searchTenant:Type.Optional(Type.Boolean()),
   }),
 
   responses: {
@@ -59,7 +64,7 @@ export const GetPaymentsSchema = typeboxRouteSchema({
 
 export default typeboxRoute(GetPaymentsSchema, async (req, res) => {
 
-  const { endTime, startTime, accountName } = req.query;
+  const { endTime, startTime, accountName, searchTenant } = req.query;
 
   const client = getClient(ChargingServiceClient);
 
@@ -68,25 +73,30 @@ export default typeboxRoute(GetPaymentsSchema, async (req, res) => {
   // check whether the user can access the account
   if (accountName) {
     user = await authenticate((i) =>
-      i.tenantRoles.includes(TenantRole.TENANT_FINANCE)
-      || i.accountAffiliations.some((x) => x.accountName === accountName && x.role !== UserRole.USER),
+      i.tenantRoles.includes(TenantRole.TENANT_FINANCE) || 
+      i.tenantRoles.includes(TenantRole.TENANT_ADMIN) || 
+      i.accountAffiliations.some((x) => x.accountName === accountName && x.role !== UserRole.USER),
     )(req, res);
     if (!user) { return; }
   } else {
     user = await authenticate((i) =>
-      i.tenantRoles.includes(TenantRole.TENANT_FINANCE),
+      i.tenantRoles.includes(TenantRole.TENANT_FINANCE) || 
+      i.tenantRoles.includes(TenantRole.TENANT_ADMIN),
     )(req, res);
     if (!user) { return; }
   }
-
+  
   const reply = ensureNotUndefined(await asyncClientCall(client, "getPaymentRecords", {
-    tenantName: user.tenant,
-    accountName,
+    target:accountName ? 
+      { $case:"accountOfTenant", accountOfTenant:{ tenantName:user.tenant, accountName:accountName } } : 
+      searchTenant ? { $case:"tenant", tenant:{ tenantName:user.tenant } } :
+        { $case:"accountsOfTenant", accountsOfTenant:{ tenantName:user.tenant } },
     startTime,
     endTime,
   }), ["total"]);
 
-  const returnAuditInfo = user.tenantRoles.includes(TenantRole.TENANT_FINANCE);
+  const returnAuditInfo = user.tenantRoles.includes(TenantRole.TENANT_FINANCE) || 
+          user.tenantRoles.includes(TenantRole.TENANT_ADMIN);
 
   const records = reply.results.map((x) => {
     const obj = ensureNotUndefined(x, ["time", "amount"]);

@@ -15,10 +15,9 @@ import { BaseLayout as LibBaseLayout } from "@scow/lib-web/build/layouts/base/Ba
 import { JumpToAnotherLink } from "@scow/lib-web/build/layouts/base/header/components";
 import { PropsWithChildren, useMemo } from "react";
 import { useStore } from "simstate";
-import { DefaultClusterSelector } from "src/layouts/DefaultClusterSelector";
 import { userRoutes } from "src/layouts/routes";
-import { AppsStore } from "src/stores/AppsStore";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
+import { LoginNodeStore } from "src/stores/LoginNodeStore";
 import { UserStore } from "src/stores/UserStore";
 import { publicConfig } from "src/utils/config";
 
@@ -30,24 +29,29 @@ interface Props {
 export const BaseLayout = ({ footerText, versionTag, children }: PropsWithChildren<Props>) => {
 
   const userStore = useStore(UserStore);
-  const defaultClusterStore = useStore(DefaultClusterStore);
-  const apps = useStore(AppsStore);
+  const loginNodes = useStore(LoginNodeStore);
+  const { defaultCluster, setDefaultCluster, removeDefaultCluster } = useStore(DefaultClusterStore);
 
   const routes = useMemo(() => userRoutes(
-    userStore.user, defaultClusterStore.cluster, apps,
-  ), [userStore.user, defaultClusterStore.cluster, apps]);
+    userStore.user, defaultCluster, loginNodes, setDefaultCluster,
+  ), [userStore.user, defaultCluster, setDefaultCluster]);
+
+  const logout = () => {
+    removeDefaultCluster();
+    userStore.logout();
+  };
 
   return (
     <LibBaseLayout
-      logout={userStore.logout}
+      logout={logout}
       user={userStore.user}
       routes={routes}
       footerText={footerText}
       versionTag={versionTag}
       basePath={publicConfig.BASE_PATH}
+      userLinks={publicConfig.USER_LINKS}
       headerRightContent={(
         <>
-          <DefaultClusterSelector />
           <JumpToAnotherLink
             user={userStore.user}
             icon={<DatabaseOutlined style={{ paddingRight: 2 }} />}

@@ -1,5 +1,32 @@
 # @scow/mis-server
 
+## 0.8.1
+
+## 0.8.0
+
+### Minor Changes
+
+- 5b7f0e88f: 重构 scow，对接调度器适配器接口
+
+### Patch Changes
+
+- 9da6fb5bc: 修复账户管理租户管理未结束作业查询结果不正确的问题，修复未结束作业批量搜索账户条件带入精确搜索中的问题
+- 3f7afe8cb: 完善 mis-server 中针对 fetchJob 和 price 功能的测试，增大测试覆盖率
+- e97eb22fd: 集群配置登录节点新增节点展示名
+- 7a9973aa0: 修改 HTTP API 定义方式，去除生成 api-routes-schemas.json 步骤
+- Updated dependencies [5b7f0e88f]
+- Updated dependencies [62083044e]
+- Updated dependencies [5c3c63657]
+- Updated dependencies [e97eb22fd]
+  - @scow/scheduler-adapter-protos@0.2.0
+  - @scow/lib-scheduler-adapter@0.2.0
+  - @scow/protos@0.3.0
+  - @scow/config@0.4.0
+  - @scow/lib-ssh@0.4.0
+  - @scow/lib-hook@0.2.3
+  - @scow/lib-server@0.2.0
+  - @scow/lib-slurm@0.1.6
+
 ## 0.7.0
 
 ### Patch Changes

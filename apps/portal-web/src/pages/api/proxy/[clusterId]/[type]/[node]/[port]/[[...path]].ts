@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { getLoginNode } from "@scow/config/build/cluster";
 import { normalizePathnameWithQuery } from "@scow/utils";
 import httpProxy from "http-proxy";
 import { NextApiRequest, NextApiResponse } from "next";
@@ -46,7 +47,7 @@ function parseProxyTarget(url: string, urlIncludesBasePath: boolean): string | E
   const fullUri = `${(urlIncludesBasePath || basePath === "/") ? "" : basePath}${url}`;
 
   const proxyGateway = runtimeConfig.CLUSTERS_CONFIG[clusterId].proxyGateway;
-  const loginNodes = runtimeConfig.CLUSTERS_CONFIG[clusterId].slurm.loginNodes;
+  const loginNodes = runtimeConfig.CLUSTERS_CONFIG[clusterId].loginNodes.map((x) => getLoginNode(x).address);
 
   // if node is login node, not proxy to proxy gateway node
   if (proxyGateway && !loginNodes.includes(node)) {

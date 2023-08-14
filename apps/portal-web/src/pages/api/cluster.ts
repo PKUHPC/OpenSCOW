@@ -11,14 +11,17 @@
  */
 
 import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
+import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
+import { ConfigServiceClient } from "@scow/protos/build/common/config";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
+import { getClient } from "src/utils/client";
 import { runtimeConfig } from "src/utils/config";
 import { route } from "src/utils/route";
 
 export const Partition = Type.Object({
   name: Type.String(),
-  mem: Type.Number(),
+  memMb: Type.Number(),
   cores: Type.Number(),
   gpus: Type.Number(),
   nodes: Type.Number(),
@@ -30,7 +33,10 @@ export type Partition = Static<typeof Partition>;
 
 export const PublicClusterConfig = Type.Object({
   submitJobDirTemplate: Type.String(),
-  slurm: Type.Object({ partitions: Type.Array(Partition) }),
+  scheduler: Type.Object({
+    name: Type.String(),
+    partitions: Type.Array(Partition),
+  }),
 });
 
 export type PublicClusterConfig = Static<typeof PublicClusterConfig>;
@@ -61,11 +67,18 @@ export default route(GetClusterInfoSchema, async (req, res) => {
 
   const { cluster } = req.query;
 
-  const clusterInfo = runtimeConfig.CLUSTERS_CONFIG[cluster];
+  const client = getClient(ConfigServiceClient);
+
+  const reply = await asyncUnaryCall(client, "getClusterConfig", {
+    cluster,
+  });
 
   return { 200: { clusterInfo: {
     submitJobDirTemplate: runtimeConfig.SUBMIT_JOB_WORKING_DIR,
-    slurm: { partitions: clusterInfo.slurm.partitions },
+    scheduler: {
+      name: reply.schedulerName,
+      partitions: reply.partitions,
+    },
   } } };
 
 });

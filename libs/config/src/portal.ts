@@ -23,6 +23,7 @@ export const PortalConfigSchema = Type.Object({
       Type.Object({ name: Type.String({ description: "名称" }), wm: Type.String({ description: "wm值" }) }),
       { default: [{ name: "xfce", wm: "xfce" }]}),
     maxDesktops: Type.Integer({ description: "最多创建多少个桌面", default: 3 }),
+    desktopsDir: Type.String({ description: "将创建的登录节点桌面信息的保存到什么位置。相对于用户的家目录", default: "scow/desktops" }),
   }),
 
   apps: Type.Boolean({ description: "是否启用交互式任务功能", default: true }),
@@ -43,6 +44,9 @@ export const PortalConfigSchema = Type.Object({
     ),
   }),
 
+  submitJobPromptText: 
+  Type.Optional(Type.String({ description: "提交作业命令框中的提示语", default: "#此处参数设置的优先级高于页面其它地方，两者冲突时以此处为准" })),
+
   misUrl: Type.Optional(Type.String({ description: "管理系统的部署URL或者路径" })),
 
   shell: Type.Boolean({ description: "是否启用终端功能", default: true }),
@@ -62,15 +66,18 @@ export const PortalConfigSchema = Type.Object({
   navLinks: Type.Optional(Type.Array(
     Type.Object({
       text: Type.String({ description: "一级导航名称" }),
-      url: Type.String({ description: "一级导航链接" }),
+      url: Type.Optional(Type.String({ description: "一级导航链接" })),
+      openInNewPage: Type.Optional(Type.Boolean({ description:"一级导航是否默认在新页面打开", default: false })),
       iconPath: Type.Optional(Type.String({ description: "一级导航链接显示图标路径" })),
       children: Type.Optional(Type.Array(Type.Object({
         text: Type.String({ description: "二级导航名称" }),
         url: Type.String({ description: "二级导航链接" }),
+        openInNewPage: Type.Optional(Type.Boolean({ description:"二级导航是否默认在新页面打开", default: false })),
         iconPath: Type.Optional(Type.String({ description: "二级导航链接显示图标路径" })),
       }))),
     }),
   )),
+
 
 });
 

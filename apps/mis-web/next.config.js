@@ -46,9 +46,9 @@ module.exports = async (phase) => {
     webpack(config, options) {
       config.plugins.forEach((i) => {
         if (i instanceof options.webpack.DefinePlugin) {
-          if (i.definitions['process.env.__NEXT_ROUTER_BASEPATH']) {
-            i.definitions['process.env.__NEXT_ROUTER_BASEPATH'] =
-              '(typeof window === "undefined" ? global : window).__CONFIG__?.BASE_PATH';
+          if (i.definitions["process.env.__NEXT_ROUTER_BASEPATH"]) {
+            i.definitions["process.env.__NEXT_ROUTER_BASEPATH"] =
+              "(typeof window === \"undefined\" ? global : window).__CONFIG__?.BASE_PATH";
           }
         }
       });

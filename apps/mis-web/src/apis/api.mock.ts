@@ -12,9 +12,9 @@
 
 import { HttpError, JsonFetchResultPromiseLike } from "@ddadaal/next-typed-api-routes-runtime/lib/client";
 import { numberToMoney } from "@scow/lib-decimal";
+import { JobInfo } from "@scow/protos/build/common/ended_job";
 import type { RunningJob } from "@scow/protos/build/common/job";
 import type { Account } from "@scow/protos/build/server/account";
-import { JobInfo } from "@scow/protos/build/server/job";
 import type { AccountUserInfo, GetUserStatusResponse } from "@scow/protos/build/server/user";
 import { api } from "src/apis/api";
 import { ClusterAccountInfo_ImportStatus, PlatformRole,
@@ -67,10 +67,10 @@ export const runningJob: RunningJob = {
   jobId: "123",
   account: "123",
   cores: "123",
+  gpus: "123",
   name: "123",
   nodes: "123",
   nodesOrReason: "!23",
-  nodesToBeUsed: "123",
   partition: "123",
   qos: "123",
   runningTime: "123",
@@ -179,6 +179,13 @@ export const mockApi: MockApi<typeof api> = {
         platformRoles: [],
       },
     ],
+
+  }),
+
+  getPlatformUsersCounts: async () => ({
+    totalCount: 4,
+    totalAdminCount: 2,
+    totalFinanceCount: 3,
   }),
 
   userExists: async () => ({
@@ -241,8 +248,8 @@ export const mockApi: MockApi<typeof api> = {
         {
           accountName: "a_user1",
           users: [
-            { userId: "user1", userName: "user1", state: "allowed!" },
-            { userId: "user2", userName: "user2", state: "allowed!" },
+            { userId: "user1", userName: "user1", blocked: false },
+            { userId: "user2", userName: "user2", blocked: false },
           ],
           owner: "user1",
           importStatus: ClusterAccountInfo_ImportStatus.NOT_EXISTING,
@@ -251,15 +258,15 @@ export const mockApi: MockApi<typeof api> = {
         {
           accountName: "account2",
           users: [
-            { userId: "user2", userName: "user2", state: "allowed!" },
-            { userId: "user3", userName: "user3", state: "allowed!" },
+            { userId: "user2", userName: "user2", blocked: false },
+            { userId: "user3", userName: "user3", blocked: false },
           ],
           importStatus: ClusterAccountInfo_ImportStatus.HAS_NEW_USERS,
           blocked: false,
         },
         {
           accountName: "a_user4",
-          users: [{ userId: "user4", userName: "user4", state: "allowed!" }],
+          users: [{ userId: "user4", userName: "user4", blocked: false }],
           importStatus: ClusterAccountInfo_ImportStatus.EXISTING,
           blocked: false,
         },
@@ -371,6 +378,7 @@ export const mockApi: MockApi<typeof api> = {
   changeStorageQuota: async () => ({ currentQuota: 10 }),
   queryStorageQuota: async () => ({ currentQuota: 10 }),
   getAccounts: async () => ({ totalCount: mockAccounts.length, results: mockAccounts }),
+  getAllAccounts: async () => ({ totalCount: mockAccounts.length, results: mockAccounts }),
   changeJobTimeLimit: async () => null,
   queryJobTimeLimit: async () => ({ result: 10 }),
   createAccount: async () => { return {}; },
@@ -383,11 +391,14 @@ export const mockApi: MockApi<typeof api> = {
     operatorId: "123",
     ownerId: "123",
     ownerName: "123",
+    balance: numberToMoney(10.5),
   }], totalCount: 1 }),
 
   changePassword: async () => null,
+  changeEmail: async () => null,
   changePasswordAsPlatformAdmin: async () => null,
   changePasswordAsTenantAdmin: async () => null,
+  checkPassword: null,
   createUser: async () => (
     { id: 1,
       createdInAuth: false,

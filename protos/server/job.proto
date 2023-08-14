@@ -16,35 +16,8 @@ package scow.server;
 
 import "common/job.proto";
 import "common/money.proto";
+import "common/ended_job.proto";
 import "google/protobuf/timestamp.proto";
-
-message JobInfo {
-  uint64 bi_job_index = 1;
-  uint32 id_job = 2;
-  string account = 3;
-  string user = 4;
-  string partition = 5;
-  string nodelist = 6;
-  string job_name = 7;
-  string cluster = 8;
-  google.protobuf.Timestamp time_submit = 9;
-  google.protobuf.Timestamp time_start = 10;
-  google.protobuf.Timestamp time_end = 11;
-  int32 gpu = 12;
-  uint32 cpus_req = 13;
-  uint32 mem_req = 14;
-  uint32 nodes_req = 15;
-  uint32 cpus_alloc = 16;
-  uint32 mem_alloc = 17;
-  uint32 nodes_alloc = 18;
-  uint32 timelimit = 19;
-  uint64 time_used = 20;
-  uint64 time_wait = 21;
-  string qos = 22;
-  google.protobuf.Timestamp record_time = 23;
-  common.Money account_price = 24;
-  common.Money tenant_price = 25;
-}
 
 message JobFilter {
   // if neither account_name and user_id is set, query the account from tenant
@@ -68,7 +41,7 @@ message GetJobsRequest {
 
 message GetJobsResponse {
   uint64 total_count = 1;
-  repeated JobInfo jobs = 2;
+  repeated common.JobInfo jobs = 2;
   common.Money total_account_price = 3;
   common.Money total_tenant_price = 4;
 }
@@ -93,7 +66,7 @@ message GetJobByBiJobIndexRequest {
 
 // NOT_FOUND: job is not found
 message GetJobByBiJobIndexResponse {
-  JobInfo info = 1;
+  common.JobInfo info = 1;
 }
 
 message GetRunningJobsRequest {

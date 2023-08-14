@@ -11,6 +11,7 @@
  */
 
 import { asyncDuplexStreamCall } from "@ddadaal/tsgrpc-client";
+import { getLoginNode } from "@scow/config/build/cluster";
 import { queryToIntOrDefault } from "@scow/lib-web/build/utils/querystring";
 import { ShellResponse, ShellServiceClient } from "@scow/protos/build/portal/shell";
 import { normalizePathnameWithQuery } from "@scow/utils";
@@ -20,10 +21,11 @@ import { checkCookie } from "src/auth/server";
 import { getClient } from "src/utils/client";
 import { publicConfig, runtimeConfig } from "src/utils/config";
 import { parse } from "url";
-import { WebSocketServer } from "ws";
+import { WebSocket, WebSocketServer } from "ws";
 
 export type ShellQuery = {
   cluster: string;
+  loginNode: string;
   path?: string;
 
   cols?: string;
@@ -47,7 +49,34 @@ export const config = {
 
 const wss = new WebSocketServer({ noServer: true });
 
-wss.on("connection", async (ws, req) => {
+// https://github.com/websockets/ws#how-to-detect-and-close-broken-connections
+type AliveCheckedWebSocket = WebSocket & { isAlive: boolean };
+
+function heartbeat(this: AliveCheckedWebSocket) {
+  this.isAlive = true;
+}
+
+// ping every clients every 30s
+const pingInterval = setInterval(function ping() {
+  wss.clients.forEach(function each(ws: AliveCheckedWebSocket) {
+    if (ws.isAlive === false) {
+      return ws.terminate();
+    }
+
+    ws.isAlive = false;
+    ws.ping();
+  });
+}, 30000);
+
+wss.on("close", function close() {
+  clearInterval(pingInterval);
+});
+
+wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
+
+  ws.isAlive = true;
+  ws.on("pong", heartbeat);
+
   const user = await checkCookie(() => true, req);
 
   if (typeof user === "number") {
@@ -64,9 +93,19 @@ wss.on("connection", async (ws, req) => {
   const query = new URLSearchParams(parse(req.url!).query!);
 
   const cluster = query.get("cluster");
+  const loginNodeName = query.get("loginNode");
 
   if (!cluster || !runtimeConfig.CLUSTERS_CONFIG[cluster]) {
     throw new Error(`Unknown cluster ${cluster}`);
+  }
+
+  const loginNode = runtimeConfig.CLUSTERS_CONFIG[cluster].loginNodes.map(getLoginNode).find(
+    (x) => x.name === loginNodeName,
+  );
+
+  // unknown login node
+  if (!loginNode) {
+    throw new Error(`Unknown login node ${loginNodeName}`);
   }
 
   const path = query.get("path") ?? undefined;
@@ -78,7 +117,7 @@ wss.on("connection", async (ws, req) => {
   const stream = asyncDuplexStreamCall(client, "shell");
 
   await stream.writeAsync({ message: { $case: "connect", connect: {
-    cluster, userId: user.identityId,
+    cluster, loginNode: loginNode.address, userId: user.identityId,
     cols: queryToIntOrDefault(cols, 80),
     rows: queryToIntOrDefault(rows, 30),
     path,

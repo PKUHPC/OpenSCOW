@@ -8,18 +8,6 @@ db:
 
 # 获取作业相关配置
 fetchJobs:
-  # 源作业信息数据库的数据库信息
-  db:
-    host: sourcedb
-    port: 3307
-    user: root
-    password: jobtablepassword
-    dbName: jobs
-    tableName: jobs
-    # 数据库类型，可选mariadb或者mysql
-    # 默认为mariadb
-    # type: mariadb
-
   # 周期性获取数据
   periodicFetch:
     # 是否开启
@@ -71,8 +59,11 @@ predefinedChargingTypes:
   # 链接名
   # text: ""
 
-  # 链接地址
+  # 链接地址，一级导航链接地址为可选填，二级导航链接地址为必填
   # url: ""
+
+  # 是否打开新的页面，可选填，默认值为false
+  # openInNewPage: true
 
   # 自定义图标地址,可选填
   # iconPath: ""
@@ -83,8 +74,9 @@ predefinedChargingTypes:
 
   # 二级导航,可选填
   # children:
-    # 二级导航相关配置，与一级导航相同，但是不允许再设置children
+    # 二级导航相关配置，与一级导航相同，但是url为必填配置，同时不允许再设置children
     # text: ""
     # url: ""
+    # openInNewPage: true
     # iconPath: ""
     # allowedRoles: []

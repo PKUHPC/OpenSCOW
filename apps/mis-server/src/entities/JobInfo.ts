@@ -12,8 +12,7 @@
 
 import { Entity, Index, PrimaryKey, Property } from "@mikro-orm/core";
 import { Decimal } from "@scow/lib-decimal";
-import { clusterNameToScowClusterId } from "src/config/clusters";
-import type { OriginalJob } from "src/entities/OriginalJob";
+import { JobInfo as ClusterJobInfo } from "@scow/scheduler-adapter-protos/build/protos/job";
 import { DECIMAL_DEFAULT_RAW, DecimalType } from "src/utils/decimal";
 
 const UNKNOWN_PRICE_ITEM = "UNKNOWN";
@@ -118,31 +117,30 @@ export class JobInfo {
 
 
   constructor(
-    job: OriginalJob,
+    job: {cluster: string} & ClusterJobInfo,
     tenant: string | undefined,
     jobPriceInfo: JobPriceInfo,
   ) {
-    this.biJobIndex = job.biJobIndex;
-    this.idJob = job.idJob;
+    this.idJob = job.jobId;
 
     this.account = job.account;
     this.tenant = tenant ?? "";
 
     this.user = job.user;
     this.partition = job.partition;
-    this.nodelist = job.nodelist;
-    this.jobName = job.jobName;
-    this.cluster = clusterNameToScowClusterId(job.cluster);
-    this.gpu = job.gpu;
+    this.nodelist = job.nodeList!;
+    this.jobName = job.name;
+    this.cluster = job.cluster;
+    this.gpu = job.gpusAlloc!;
     this.cpusReq = job.cpusReq;
-    this.memReq = job.memReq;
+    this.memReq = job.memReqMb;
     this.nodesReq = job.nodesReq;
-    this.cpusAlloc = job.cpusAlloc;
-    this.memAlloc = job.memAlloc;
-    this.nodesAlloc = job.nodesAlloc;
-    this.timelimit = job.timelimit;
-    this.timeUsed = job.timeUsed;
-    this.timeWait = job.timeWait;
+    this.cpusAlloc = job.cpusAlloc!;
+    this.memAlloc = job.memAllocMb!;
+    this.nodesAlloc = job.nodesAlloc!;
+    this.timelimit = job.timeLimitMinutes;
+    this.timeUsed = job.elapsedSeconds!;
+    this.timeWait = ((new Date(job.startTime!)).getTime() - (new Date(job.submitTime!)).getTime()) / 1000;
     this.qos = job.qos;
 
     this.tenantPrice = jobPriceInfo.tenant?.price ?? new Decimal(0);
@@ -150,9 +148,8 @@ export class JobInfo {
     this.accountPrice = jobPriceInfo.account?.price ?? new Decimal(0);
     this.accountBillingItemId = jobPriceInfo.tenant?.billingItemId ?? UNKNOWN_PRICE_ITEM;
 
-    this.recordTime = job.recordTime;
-    this.timeSubmit = job.timeSubmit;
-    this.timeStart = job.timeStart;
-    this.timeEnd = job.timeEnd;
+    this.timeSubmit = new Date(job.submitTime!);
+    this.timeStart = new Date(job.startTime!);
+    this.timeEnd = new Date(job.endTime!);
   }
 }

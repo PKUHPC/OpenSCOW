@@ -42,13 +42,16 @@ import type { MkdirSchema } from "src/pages/api/file/mkdir";
 import type { MoveFileItemSchema } from "src/pages/api/file/move";
 import type { UploadFileSchema } from "src/pages/api/file/upload";
 import type { CancelJobSchema } from "src/pages/api/job/cancelJob";
+import type { DeleteJobTemplateSchema } from "src/pages/api/job/deleteJobTemplate";
 import type { GetAccountsSchema } from "src/pages/api/job/getAccounts";
 import type { GetAllJobsSchema } from "src/pages/api/job/getAllJobs";
 import type { GetJobTemplateSchema } from "src/pages/api/job/getJobTemplate";
 import type { GetRunningJobsSchema } from "src/pages/api/job/getRunningJobs";
 import type { ListJobTemplatesSchema } from "src/pages/api/job/listJobTemplates";
+import type { RenameJobTemplateSchema } from "src/pages/api/job/renameJobTemplate";
 import type { SubmitJobSchema } from "src/pages/api/job/submitJob";
 import type { ChangePasswordSchema } from "src/pages/api/profile/changePassword";
+import type { CheckPasswordSchema } from "src/pages/api/profile/checkPassword";
 
 
 export const api = {
@@ -81,11 +84,14 @@ export const api = {
   moveFileItem: apiClient.fromTypeboxRoute<typeof MoveFileItemSchema>("PATCH", "/api/file/move"),
   uploadFile: apiClient.fromTypeboxRoute<typeof UploadFileSchema>("POST", "/api/file/upload"),
   cancelJob: apiClient.fromTypeboxRoute<typeof CancelJobSchema>("DELETE", "/api/job/cancelJob"),
+  deleteJobTemplate: apiClient.fromTypeboxRoute<typeof DeleteJobTemplateSchema>("DELETE", "/api/job/deleteJobTemplate"),
   getAccounts: apiClient.fromTypeboxRoute<typeof GetAccountsSchema>("GET", "/api/job/getAccounts"),
   getAllJobs: apiClient.fromTypeboxRoute<typeof GetAllJobsSchema>("GET", "/api/job/getAllJobs"),
   getJobTemplate: apiClient.fromTypeboxRoute<typeof GetJobTemplateSchema>("GET", "/api/job/getJobTemplate"),
   getRunningJobs: apiClient.fromTypeboxRoute<typeof GetRunningJobsSchema>("GET", "/api/job/getRunningJobs"),
   listJobTemplates: apiClient.fromTypeboxRoute<typeof ListJobTemplatesSchema>("GET", "/api/job/listJobTemplates"),
+  renameJobTemplate: apiClient.fromTypeboxRoute<typeof RenameJobTemplateSchema>("POST", "/api/job/renameJobTemplate"),
   submitJob: apiClient.fromTypeboxRoute<typeof SubmitJobSchema>("POST", "/api/job/submitJob"),
   changePassword: apiClient.fromTypeboxRoute<typeof ChangePasswordSchema>("PATCH", "/api/profile/changePassword"),
+  checkPassword: apiClient.fromTypeboxRoute<typeof CheckPasswordSchema>("GET", "/api/profile/checkPassword"),
 };

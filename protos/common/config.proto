@@ -1,0 +1,44 @@
+/**
+ * Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
+ * SCOW is licensed under Mulan PSL v2.
+ * You can use this software according to the terms and conditions of the Mulan PSL v2.
+ * You may obtain a copy of Mulan PSL v2 at:
+ *          http://license.coscl.org.cn/MulanPSL2
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+ * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+ * See the Mulan PSL v2 for more details.
+ */
+
+syntax = "proto3";
+
+package scow.common;
+
+message GetClusterConfigRequest {
+  string cluster = 1;
+}
+
+message Partition {
+  string name = 1;
+  // mem: memory size in M
+  uint64 mem_mb = 2;
+  // cores: number of cores
+  uint32 cores = 3;
+  // gpus: number of gpu
+  uint32 gpus = 4;
+  // nodes: number of nodes
+  uint32 nodes = 5;
+  // list that stores qos. the list can be empty.
+  repeated string qos = 6;
+  // price item description
+  optional string comment = 7;
+}
+
+message GetClusterConfigResponse {
+  repeated Partition partitions = 1;
+  string scheduler_name = 2;
+}
+
+service ConfigService {
+  rpc GetClusterConfig(GetClusterConfigRequest) returns (GetClusterConfigResponse);
+}

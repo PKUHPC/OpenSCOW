@@ -16,21 +16,18 @@ import { ChangePasswordResult } from "src/auth/AuthProvider";
 
 const BodySchema = Type.Object({
   identityId: Type.String({ description: "用户ID" }),
-  oldPassword: Type.String({ description: "原密码" }),
   newPassword: Type.String({ description: "新密码" }),
 });
 
 const ResponsesSchema = Type.Object({
   204: Type.Null({ description: "修改完成" }),
   404: Type.Null({ description: "用户未找到" }),
-  412: Type.Null({ description: "原密码不正确" }),
   501: Type.Null({ description: "当前配置不支持修改密码" }),
 });
 
 const codes: Record<ChangePasswordResult, number> = {
   NotFound: 404,
   OK: 204,
-  WrongOldPassword: 412,
 };
 
 /**
@@ -54,9 +51,9 @@ export const changePasswordRoute = fp(async (f) => {
         return await rep.code(501).send(null);
       }
 
-      const { identityId, newPassword, oldPassword } = req.body;
+      const { identityId, newPassword } = req.body;
 
-      const result = await f.auth.changePassword(identityId, oldPassword, newPassword, req);
+      const result = await f.auth.changePassword(identityId, newPassword, req);
 
       await rep.code(codes[result]).send(null);
     },

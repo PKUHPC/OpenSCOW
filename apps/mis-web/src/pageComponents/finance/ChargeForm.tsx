@@ -101,7 +101,7 @@ export const ChargeForm: React.FC = () => {
         <Input />
       </Form.Item>
       <Form.Item name="amount" label="金额" rules={[{ required: true }]}>
-        <InputNumber min={0} step={0.01} addonAfter="元" />
+        <InputNumber step={0.01} addonAfter="元" />
       </Form.Item>
       <Form.Item
         name="type"

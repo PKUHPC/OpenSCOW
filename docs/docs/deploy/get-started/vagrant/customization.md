@@ -69,8 +69,9 @@ PartitionName=compute Nodes=cn0[1-2] Default=YES MaxTime=INFINITE State=UP
 # ...
 slurm:
   loginNodes:
-    - login
- 
+    - name: login
+      address: 192.168.88.102
+
   partitions:
     - name: compute
       # 分区内节点数修改为2

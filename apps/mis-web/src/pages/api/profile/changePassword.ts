@@ -22,7 +22,6 @@ export const ChangePasswordSchema = typeboxRouteSchema({
   method: "PATCH",
 
   body: Type.Object({
-    oldPassword: Type.String(),
     newPassword: Type.String(),
   }),
 
@@ -37,9 +36,6 @@ export const ChangePasswordSchema = typeboxRouteSchema({
 
     /** 用户未找到 */
     404: Type.Null(),
-
-    /** 密码不正确 */
-    412: Type.Null(),
 
     /** 本功能在当前配置下不可用。 */
     501: Type.Null(),
@@ -60,7 +56,7 @@ export default /* #__PURE__*/typeboxRoute(ChangePasswordSchema, async (req, res)
 
   if (!info) { return; }
 
-  const { newPassword, oldPassword } = req.body;
+  const { newPassword } = req.body;
 
   if (passwordPattern && !passwordPattern.test(newPassword)) {
     return { 400: { code: "PASSWORD_NOT_VALID" as const, message: publicConfig.PASSWORD_PATTERN_MESSAGE } };
@@ -69,15 +65,12 @@ export default /* #__PURE__*/typeboxRoute(ChangePasswordSchema, async (req, res)
   return await libChangePassword(runtimeConfig.AUTH_INTERNAL_URL, {
     identityId: info.identityId,
     newPassword,
-    oldPassword,
   }, console)
     .then(() => ({ 204: null }))
     .catch((e) => {
       switch (e.status) {
       case "NOT_FOUND":
         return { 404: null };
-      case "WRONG_PASSWORD":
-        return { 412: null };
       case "NOT_SUPPORTED":
         return { 501: null };
       default:

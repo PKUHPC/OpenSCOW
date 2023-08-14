@@ -34,7 +34,7 @@ export const TenantAdminJobBillingTablePage: NextPage = requireAuth(
     return (
       <div>
         <Head title="管理本租户作业价格表" />
-        <PageTitle titleText={`管理租户${tenant}作业价格表`} reload={reload} />
+        <PageTitle titleText={`租户${tenant}作业价格表`} reload={reload} />
         <ManageJobBillingTable tenant={tenant} reload={reload} data={data} loading={isLoading} />
       </div>
     );

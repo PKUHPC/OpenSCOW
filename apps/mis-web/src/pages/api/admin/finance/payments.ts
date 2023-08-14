@@ -63,11 +63,14 @@ export default typeboxRoute(GetTenantPaymentsSchema, async (req, res) => {
 
   const client = getClient(ChargingServiceClient);
 
-  const user = await authenticate((i) => i.platformRoles.includes(PlatformRole.PLATFORM_FINANCE))(req, res);
+  const user = await authenticate((i) => i.platformRoles.includes(PlatformRole.PLATFORM_FINANCE) || 
+      i.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))(req, res);
   if (!user) { return; }
 
   const reply = ensureNotUndefined(await asyncClientCall(client, "getPaymentRecords", {
-    tenantName,
+    target:tenantName ? 
+      { $case:"tenant", tenant:{ tenantName:tenantName } } : 
+      { $case:"allTenants", allTenants:{ } },
     startTime,
     endTime,
   }), ["total"]);

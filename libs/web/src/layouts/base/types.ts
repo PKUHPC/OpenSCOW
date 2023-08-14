@@ -25,4 +25,11 @@ export interface NavItemProps {
   children?: NavItemProps[];
   clickable?: boolean
   openInNewPage?: boolean;
+  handleClick?: () => void
+}
+
+export interface UserLink {
+  text: string;
+  url: string;
+  openInNewPage?: boolean;
 }

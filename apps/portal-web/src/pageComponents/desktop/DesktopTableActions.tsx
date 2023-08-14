@@ -37,6 +37,7 @@ export const DesktopTableActions: React.FC<Props> = ({ cluster, reload, record }
             const resp = await api.launchDesktop({
               body: {
                 cluster: cluster.id,
+                loginNode: record.addr,
                 displayId: record.desktopId,
               },
             });
@@ -51,15 +52,16 @@ export const DesktopTableActions: React.FC<Props> = ({ cluster, reload, record }
           title="删除后不可恢复，你确定要删除吗?"
           open={isPopconfirmVisible}
           onConfirm={async () => {
-            setIsPopconfirmVisible(false);
 
             // kill desktop
             await api.killDesktop({
               body: {
                 cluster: cluster.id,
+                loginNode: record.addr,
                 displayId: record.desktopId,
               },
             });
+            setIsPopconfirmVisible(false);
 
             reload();
 

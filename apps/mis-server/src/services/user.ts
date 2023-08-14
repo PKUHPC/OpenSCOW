@@ -10,10 +10,13 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
-import { addUserToAccount, createUser, getUser, removeUserFromAccount } from "@scow/lib-auth";
+import { addUserToAccount, changeEmail as libChangeEmail, createUser, getCapabilities, getUser, removeUserFromAccount,
+} 
+  from "@scow/lib-auth";
 import { decimalToMoney } from "@scow/lib-decimal";
 import {
   AccountStatus,
@@ -33,7 +36,8 @@ import { PlatformRole, TenantRole, User } from "src/entities/User";
 import { UserAccount, UserRole, UserStatus } from "src/entities/UserAccount";
 import { callHook } from "src/plugins/hookClient";
 import { createUserInDatabase, insertKeyToNewUser } from "src/utils/createUser";
-import { paginationProps } from "src/utils/orm";
+import { generateAllUsersQueryOptions } from "src/utils/queryOptions";
+
 
 export const userServiceServer = plugin((server) => {
 
@@ -107,25 +111,25 @@ export const userServiceServer = plugin((server) => {
       }];
     },
 
-    queryUsedStorageQuota: async ({ request, logger }) => {
-      const { cluster, userId } = request;
+    queryUsedStorageQuota: async ({}) => {
+      // const { cluster, userId } = request;
 
-      const reply = await server.ext.clusters.callOnOne(
-        cluster,
-        logger,
-        async (ops) => ops.storage.queryUsedStorageQuota({
-          request: { userId }, logger,
-        }),
-      );
+      // const reply = await server.ext.clusters.callOnOne(
+      //   cluster,
+      //   logger,
+      //   async (ops) => ops.storage.queryUsedStorageQuota({
+      //     request: { userId }, logger,
+      //   }),
+      // );
 
-      if (reply.code === "NOT_FOUND") {
-        throw <ServiceError>{
-          code: Status.NOT_FOUND, message: `User ${userId}  is not found.`,
-        };
-      }
+      // if (reply.code === "NOT_FOUND") {
+      //   throw <ServiceError>{
+      //     code: Status.NOT_FOUND, message: `User ${userId}  is not found.`,
+      //   };
+      // }
 
       return [{
-        used: reply.used,
+        used: 10,
       }];
     },
 
@@ -153,8 +157,8 @@ export const userServiceServer = plugin((server) => {
         };
       }
 
-      await server.ext.clusters.callOnAll(logger, async (ops) => {
-        return await ops.user.addUserToAccount({ request: { accountName, userId }, logger });
+      await server.ext.clusters.callOnAll(logger, async (client) => {
+        return await asyncClientCall(client.user, "addUserToAccount", { userId, accountName });
       });
 
       const newUserAccount = new UserAccount({
@@ -196,9 +200,9 @@ export const userServiceServer = plugin((server) => {
         };
       }
 
-      await server.ext.clusters.callOnAll(logger,
-        async (ops) => ops.user.removeUser({ request: { accountName, userId }, logger }),
-      );
+      await server.ext.clusters.callOnAll(logger, async (client) => {
+        return await asyncClientCall(client.user, "removeUserFromAccount", { userId, accountName });
+      });
 
       await em.removeAndFlush(userAccount);
 
@@ -479,8 +483,7 @@ export const userServiceServer = plugin((server) => {
 
       const user = await em.findOne(User, {
         userId,
-      }, { populate: ["accounts", "accounts.account", "tenant"]});
-
+      }, { populate: ["accounts", "accounts.account", "tenant", "email"]});
       if (!user) {
         throw <ServiceError>{ code: Status.NOT_FOUND, message:`User ${userId} is not found.` };
       }
@@ -492,6 +495,7 @@ export const userServiceServer = plugin((server) => {
         })),
         tenantName: user.tenant.$.name,
         name: user.name,
+        email: user.email,
         tenantRoles: user.tenantRoles.map(tenantRoleFromJSON),
         platformRoles: user.platformRoles.map(platformRoleFromJSON),
       }];
@@ -499,15 +503,24 @@ export const userServiceServer = plugin((server) => {
 
     getAllUsers: async ({ request, em }) => {
 
-      const { page, pageSize, idOrName } = request;
+      const { page, pageSize, sortField, sortOrder, idOrName, platformRole } = request;
+
+      const roleQuery = platformRole !== undefined ? {
+        platformRoles: { $like: `%${platformRoleToJSON(platformRole)}%` },
+      } : {};
 
       const [users, count] = await em.findAndCount(User, idOrName ? {
-        $or: [
-          { userId: { $like: `%${idOrName}%` } },
-          { name: { $like: `%${idOrName}%` } },
+        $and: [
+          {
+            $or: [
+              { userId: { $like: `%${idOrName}%` } },
+              { name: { $like: `%${idOrName}%` } },
+            ],
+          },
+          roleQuery,
         ],
-      } : {}, {
-        ...paginationProps(page, pageSize || 10),
+      } : roleQuery, {
+        ...generateAllUsersQueryOptions(page, pageSize, sortField, sortOrder),
         populate: ["tenant", "accounts", "accounts.account"],
       });
 
@@ -525,6 +538,21 @@ export const userServiceServer = plugin((server) => {
           createTime: x.createTime.toISOString(),
           platformRoles: x.platformRoles.map(platformRoleFromJSON),
         })),
+      }];
+    },
+
+    getPlatformUsersCounts: async ({ em }) => {
+
+      const totalCount = await em.count(User);
+      const totalAdminCount = await em.count(User,
+        { platformRoles: { $like: `%${PlatformRole.PLATFORM_ADMIN}%` } });
+      const totalFinanceCount = await em.count(User,
+        { platformRoles: { $like: `%${PlatformRole.PLATFORM_FINANCE}%` } });
+
+      return [{
+        totalCount: totalCount,
+        totalAdminCount: totalAdminCount,
+        totalFinanceCount: totalFinanceCount,
       }];
     },
 
@@ -622,6 +650,37 @@ export const userServiceServer = plugin((server) => {
       user.tenantRoles = user.tenantRoles.filter((item) =>
         item !== dbRoleType);
       await em.flush();
+      return [{}];
+
+    },
+    changeEmail: async ({ request, em, logger }) => {
+      const { userId, newEmail } = request;
+
+      const user = await em.findOne(User, { userId: userId });
+
+      if (!user) {
+        throw <ServiceError>{
+          code: Status.NOT_FOUND, message: `User ${userId} is not found.`,
+        };
+      }
+        
+      user.email = newEmail;
+      await em.flush();
+
+      const ldapCapabilities = await getCapabilities(misConfig.authUrl);
+
+      // 看LDAP是否有修改邮箱的权限
+      if (ldapCapabilities.changeEmail) {
+        await libChangeEmail(misConfig.authUrl, {
+          identityId: userId,
+          newEmail,
+        }, logger)
+          .catch(async () => {
+            throw <ServiceError> {
+              code: Status.UNKNOWN, message: "LDAP failed to change email",
+            };
+          });
+      }
 
       return [{}];
     },

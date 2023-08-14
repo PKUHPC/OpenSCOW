@@ -22,18 +22,22 @@ import {
   ConnectToAppResponse,
   WebAppProps_ProxyType,
 } from "@scow/protos/build/portal/app";
+import { DetailedError, ErrorInfo } from "@scow/rich-error-model";
 import { getClusterOps } from "src/clusterops";
-import { getAppConfigs } from "src/config/apps";
+import { getClusterAppConfigs } from "src/utils/app";
 import { clusterNotFound } from "src/utils/errors";
+
+const errorInfo = (reason: string) =>
+  ErrorInfo.create({ domain: "", reason: reason, metadata: {} });
 
 export const appServiceServer = plugin((server) => {
 
   server.addService<AppServiceServer>(AppServiceService, {
     connectToApp: async ({ request, logger }) => {
-      const apps = getAppConfigs();
-
 
       const { cluster, sessionId, userId } = request;
+
+      const apps = getClusterAppConfigs(cluster);
 
       const clusterOps = getClusterOps(cluster);
 
@@ -42,14 +46,6 @@ export const appServiceServer = plugin((server) => {
       const reply = await clusterOps.app.connectToApp({
         sessionId, userId,
       }, logger);
-
-      if (reply.code === "NOT_FOUND") {
-        throw <ServiceError>{ code: Status.NOT_FOUND, message: `session id ${sessionId} is not found` };
-      }
-
-      if (reply.code === "UNAVAILABLE") {
-        throw <ServiceError>{ code: Status.UNAVAILABLE, message: `session id ${sessionId} cannot be connected` };
-      }
 
       const app = apps[reply.appId];
 
@@ -94,33 +90,40 @@ export const appServiceServer = plugin((server) => {
     },
 
     createAppSession: async ({ request, logger }) => {
-      const apps = getAppConfigs();
 
-      const { account, appId, cluster, coreCount, maxTime, proxyBasePath,
-        partition, qos, userId, customAttributes } = request;
+      const { account, appId, appJobName, cluster, coreCount, nodeCount, gpuCount, memory, maxTime,
+        proxyBasePath, partition, qos, userId, customAttributes } = request;
+
+      const apps = getClusterAppConfigs(cluster);
 
       const app = apps[appId];
       if (!app) {
-        throw <ServiceError> { code: Status.NOT_FOUND, message: `app id ${appId} is not found` };
+        throw new DetailedError({
+          code: Status.NOT_FOUND,
+          message: `app id ${appId} is not found`,
+          details: [errorInfo("NOT FOUND")],
+        });
       }
       const attributesConfig = app.attributes;
       attributesConfig?.forEach((attribute) => {
         if (attribute.required && !(attribute.name in customAttributes) && attribute.name !== "sbatchOptions") {
-          throw <ServiceError> {
+          throw new DetailedError({
             code: Status.INVALID_ARGUMENT,
             message: `custom form attribute ${attribute.name} is required but not found`,
-          };
+            details: [errorInfo("INVALID ARGUMENT")],
+          });
         }
 
         switch (attribute.type) {
         case "number":
           if (customAttributes[attribute.name] && Number.isNaN(Number(customAttributes[attribute.name]))) {
-            throw <ServiceError> {
+            throw new DetailedError({
               code: Status.INVALID_ARGUMENT,
               message: `
-              custom form attribute ${attribute.name} should be of type number,
-              but of type ${typeof customAttributes[attribute.name]}`,
-            };
+                custom form attribute ${attribute.name} should be of type number,
+                but of type ${typeof customAttributes[attribute.name]}`,
+              details: [errorInfo("INVALID ARGUMENT")],
+            });
           }
           break;
 
@@ -131,13 +134,14 @@ export const appServiceServer = plugin((server) => {
           // check the option selected by user is in select attributes as the config defined
           if (customAttributes[attribute.name]
             && !(attribute.select!.some((optionItem) => optionItem.value === customAttributes[attribute.name]))) {
-            throw <ServiceError> {
+            throw new DetailedError({
               code: Status.INVALID_ARGUMENT,
               message: `
-              the option value of ${attribute.name} selected by user should be
-              one of select attributes as the ${appId} config defined,
-              but is ${customAttributes[attribute.name]}`,
-            };
+                the option value of ${attribute.name} selected by user should be
+                one of select attributes as the ${appId} config defined,
+                but is ${customAttributes[attribute.name]}`,
+              details: [errorInfo("INVALID ARGUMENT")],
+            });
           }
           break;
 
@@ -154,8 +158,12 @@ export const appServiceServer = plugin((server) => {
 
       const reply = await clusterops.app.createApp({
         appId,
+        appJobName,
         userId,
         coreCount,
+        nodeCount,
+        gpuCount,
+        memory,
         account,
         maxTime,
         partition,
@@ -163,14 +171,6 @@ export const appServiceServer = plugin((server) => {
         customAttributes,
         proxyBasePath,
       }, logger);
-
-      if (reply.code === "SBATCH_FAILED") {
-        throw <ServiceError> { code: Status.INTERNAL, message: "sbatch failed", details: reply.message };
-      }
-
-      if (reply.code === "APP_NOT_FOUND") {
-        throw <ServiceError> { code: Status.NOT_FOUND, message: `app id ${appId} is not found` };
-      }
 
       return [{ jobId: reply.jobId, sessionId: reply.sessionId }];
 
@@ -189,9 +189,9 @@ export const appServiceServer = plugin((server) => {
     },
 
     getAppMetadata: async ({ request }) => {
-      const apps = getAppConfigs();
 
-      const { appId } = request;
+      const { appId, cluster } = request;
+      const apps = getClusterAppConfigs(cluster);
       const app = apps[appId];
 
       if (!app) {
@@ -224,10 +224,16 @@ export const appServiceServer = plugin((server) => {
       return [{ appName: app.name, attributes: attributes }];
     },
 
-    listAvailableApps: async ({}) => {
-      const apps = getAppConfigs();
+    listAvailableApps: async ({ request }) => {
 
-      return [{ apps: Object.keys(apps).map((x) => ({ id: x, name: apps[x].name })) }];
+      const { cluster } = request;
+
+      const apps = getClusterAppConfigs(cluster);
+
+      return [{
+        apps: Object.keys(apps)
+          .map((x) => ({ id: x, name: apps[x].name, logoPath: apps[x].logoPath || undefined })),
+      }];
     },
 
     getAppLastSubmission: async ({ request, logger }) => {

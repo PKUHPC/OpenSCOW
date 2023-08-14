@@ -11,6 +11,7 @@
  */
 
 import { moneyToNumber } from "@scow/lib-decimal";
+import { Money } from "@scow/protos/build/common/money";
 import { AccountStatus } from "@scow/protos/build/server/user";
 import { Divider } from "antd";
 import { GetServerSideProps, NextPage } from "next";
@@ -33,8 +34,10 @@ import { Head } from "src/utils/head";
 
 import { loadAppCustomTranslation } from "./_app";
 
-export type AccountInfo = Omit<AccountStatus, "balance"> & {
+export type AccountInfo = Omit<AccountStatus, "balance" | "jobChargeLimit" | "usedJobCharge"> & {
   balance: number;
+  jobChargeLimit: Money | null;
+  usedJobCharge: Money | null;
 }
 
 type Props = {
@@ -58,6 +61,7 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)((props: Pr
   }
 
   const { accounts } = props;
+  const noAccounts = Object.keys(accounts).length === 0;
 
   return (
     <div>
@@ -66,7 +70,7 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)((props: Pr
       {/* <Divider /> */}
       {/* <StorageSection storageQuotas={storageQuotas} /> */}
       <Divider />
-      <JobsSection user={userStore.user!} />
+      {noAccounts ? null : <JobsSection user={userStore.user!} />}
     </div>
   );
 });
@@ -114,11 +118,14 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ req }) => 
     prev[accountName] = {
       ...validated,
       balance: moneyToNumber(balance),
+
+      // 不能使用undefined，NextJs中：`undefined` cannot be serialized as JSON
+      jobChargeLimit: validated.jobChargeLimit ?? null,
+      usedJobCharge: validated.usedJobCharge ?? null,
     };
+
     return prev;
   }, {} as Record<string, AccountInfo>);
-
-
   return {
     props: {
       accounts,

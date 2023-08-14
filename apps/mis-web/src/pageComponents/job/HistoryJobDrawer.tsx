@@ -11,8 +11,9 @@
  */
 
 import { formatDateTime } from "@scow/lib-web/build/utils/datetime";
-import { JobInfo } from "@scow/protos/build/server/job";
+import { JobInfo } from "@scow/protos/build/common/ended_job";
 import { Descriptions, Drawer } from "antd";
+import { getClusterName } from "src/utils/config";
 import { moneyToString } from "src/utils/money";
 
 const drawerItems = [
@@ -21,7 +22,7 @@ const drawerItems = [
   ["分区", "partition"],
   ["使用节点列表", "nodelist"],
   ["作业名", "jobName"],
-  ["集群名", "cluster"],
+  ["集群名", "cluster", getClusterName],
   ["提交时间", "timeSubmit", formatDateTime],
   ["开始时间", "timeStart", formatDateTime],
   ["结束时间", "timeEnd", formatDateTime],
@@ -32,9 +33,9 @@ const drawerItems = [
   ["分配的内存MB", "memAlloc"],
   ["申请节点数", "nodesReq"],
   ["分配节点数", "nodesAlloc"],
-  ["作业时间限制", "timelimit"],
-  ["作业执行时间", "timeUsed"],
-  ["作业等待时间", "timeWait"],
+  ["作业时间限制（分钟）", "timelimit"],
+  ["作业执行时间（秒）", "timeUsed"],
+  ["作业等待时间（秒）", "timeWait"],
   ["QOS", "qos"],
   ["记录时间", "recordTime", formatDateTime],
   [

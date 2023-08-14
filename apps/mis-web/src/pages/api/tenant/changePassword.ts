@@ -28,7 +28,6 @@ export const ChangePasswordAsTenantAdminSchema = typeboxRouteSchema({
 
   body: Type.Object({
     identityId: Type.String(),
-    oldPassword: Type.String(),
     /**
      * @pattern ^(?=.*\d)(?=.*[a-zA-Z])(?=.*[`~!@#\$%^&*()_+\-[\];',./{}|:"<>?]).{8,}$
      */
@@ -44,9 +43,6 @@ export const ChangePasswordAsTenantAdminSchema = typeboxRouteSchema({
     /** 用户未找到 */
     404: Type.Null(),
 
-    /** 密码不正确 */
-    412: Type.Null(),
-
     /** 本功能在当前配置下不可用。 */
     501: Type.Null(),
   },
@@ -60,7 +56,7 @@ export default /* #__PURE__*/typeboxRoute(
       return { 501: null };
     }
 
-    const { identityId, newPassword, oldPassword } = req.body;
+    const { identityId, newPassword } = req.body;
 
     const client = getClient(UserServiceClient);
     const userInfo: GetUserInfoResponse = await asyncClientCall(client, "getUserInfo", {
@@ -78,7 +74,7 @@ export default /* #__PURE__*/typeboxRoute(
       return;
     }
 
-    return await libChangePassword(runtimeConfig.AUTH_INTERNAL_URL, { identityId, newPassword, oldPassword }, console)
+    return await libChangePassword(runtimeConfig.AUTH_INTERNAL_URL, { identityId, newPassword }, console)
       .then(() => ({ 204: null }))
       .catch((e) => ({ [e.status]: null }));
   });

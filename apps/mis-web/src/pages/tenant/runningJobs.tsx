@@ -21,8 +21,8 @@ export const RunningJobsPage: NextPage = requireAuth((u) => u.tenantRoles.includ
   () => {
     return (
       <div>
-        <Head title="运行中的作业" />
-        <PageTitle titleText={"运行中的作业"} />
+        <Head title="未结束的作业" />
+        <PageTitle titleText={"未结束的作业"} />
         <RunningJobQueryTable
           showUser={true}
           showAccount={true}

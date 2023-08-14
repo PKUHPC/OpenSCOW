@@ -15,7 +15,7 @@ import { Logger } from "ts-log";
 
 export async function changePassword(
   authUrl: string,
-  params: { identityId: string, oldPassword: string, newPassword: string },
+  params: { identityId: string, newPassword: string },
   logger?: Logger,
 ) {
   const resp = await fetch(authUrl + "/password", {

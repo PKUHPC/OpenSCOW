@@ -10,15 +10,19 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Logger } from "@ddadaal/tsgrpc-server";
 import { MySqlDriver, SqlEntityManager } from "@mikro-orm/mysql";
+import { Partition } from "@scow/scheduler-adapter-protos/build/protos/config";
 import { calculateJobPrice } from "src/bl/jobPrice";
 import { clusters } from "src/config/clusters";
 import { JobPriceInfo } from "src/entities/JobInfo";
 import { JobPriceItem } from "src/entities/JobPriceItem";
+import { ClusterPlugin } from "src/plugins/clusters";
 
 export interface JobInfo {
-  biJobIndex: number;
+  // cluster job id
+  jobId: number;
   // scow cluster id
   cluster: string;
   partition: string;
@@ -43,7 +47,11 @@ export interface PriceMap {
 }
 
 
-export async function createPriceMap(em: SqlEntityManager<MySqlDriver>, logger: Logger): Promise<PriceMap> {
+export async function createPriceMap(
+  em: SqlEntityManager<MySqlDriver>,
+  clusterPlugin: ClusterPlugin["clusters"],
+  logger: Logger,
+): Promise<PriceMap> {
   // get all billing items
   // order by ASC so that items added later overrides items added before.
   const billingItems = await em.find(JobPriceItem, {}, {
@@ -77,16 +85,26 @@ export async function createPriceMap(em: SqlEntityManager<MySqlDriver>, logger: 
     return price;
   };
 
+  // partitions info for all clusters
+  const partitionsForClusters: Record<string, Partition[]> = {};
+  const reply = await clusterPlugin.callOnAll(
+    logger,
+    async (client) => await asyncClientCall(client.config, "getClusterConfig", {}),
+  );
+  reply.forEach((x) => {
+    partitionsForClusters[x.cluster] = x.result.partitions;
+  });
+
   return {
 
-    calculatePrice: (info) => calculateJobPrice(info, getPriceItem, logger),
+    calculatePrice: (info) => calculateJobPrice(partitionsForClusters, info, getPriceItem, logger),
 
     getMissingDefaultPriceItems: () => {
 
       const missingPaths = [] as string[];
 
       for (const cluster in clusters) {
-        for (const partition of clusters[cluster].slurm.partitions) {
+        for (const partition of partitionsForClusters[cluster]) {
           const path = [cluster, partition.name];
 
           const { qos } = partition;

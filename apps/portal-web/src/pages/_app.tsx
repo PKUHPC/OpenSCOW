@@ -14,13 +14,11 @@ import "nprogress/nprogress.css";
 import "antd/dist/reset.css";
 
 import { failEvent } from "@ddadaal/next-typed-api-routes-runtime/lib/client";
-import { AntdConfigProvider } from "@scow/lib-web/build/layouts/AntdConfigProvider";
 import { DarkModeCookie, DarkModeProvider, getDarkModeCookieValue } from "@scow/lib-web/build/layouts/darkMode";
 import { GlobalStyle } from "@scow/lib-web/build/layouts/globalStyle";
 import { getHostname } from "@scow/lib-web/build/utils/getHostname";
 import { useConstant } from "@scow/lib-web/build/utils/hooks";
 import { isServer } from "@scow/lib-web/build/utils/isServer";
-import { App } from "@scow/protos/build/portal/app";
 import { App as AntdApp } from "antd";
 import type { AppContext, AppProps } from "next/app";
 import NextApp from "next/app";
@@ -34,14 +32,15 @@ import { createStore, StoreProvider, useStore } from "simstate";
 import { api } from "src/apis";
 import { USE_MOCK } from "src/apis/useMock";
 import { getTokenFromCookie } from "src/auth/cookie";
+import { AntdConfigProvider } from "src/layouts/AntdConfigProvider";
 import { BaseLayout } from "src/layouts/BaseLayout";
 import { FloatButtons } from "src/layouts/FloatButtons";
-import { AppsStore } from "src/stores/AppsStore";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
+import { LoginNodeStore } from "src/stores/LoginNodeStore";
 import {
   User, UserStore,
 } from "src/stores/UserStore";
-import { publicConfig, runtimeConfig } from "src/utils/config";
+import { LoginNode, publicConfig, runtimeConfig } from "src/utils/config";
 
 import nextI18nextConfig from "../../next-i18next.config.js";
 
@@ -88,7 +87,7 @@ interface ExtraProps {
   userInfo: User | undefined;
   primaryColor: string;
   footerText: string;
-  apps: App[];
+  loginNodes: Record<string, LoginNode[]>;
   darkModeCookieValue: DarkModeCookie | undefined;
 }
 
@@ -104,13 +103,12 @@ function MyApp({ Component, pageProps, extra }: Props & WithTranslation) {
     return store;
   });
 
-  const defaultClusterStore = useConstant(() => {
-    return createStore(DefaultClusterStore, publicConfig.CLUSTERS[0]);
-  });
 
   const cookies = parseCookies();
   const locale = cookies.language || "zh_cn";
-  const appsStore = useConstant(() => createStore(AppsStore, extra.apps));
+  const loginNodeStore = useConstant(() => createStore(LoginNodeStore, extra.loginNodes));
+
+  const defaultClusterStore = useConstant(() => createStore(DefaultClusterStore));
 
   // Use the layout defined at the page level, if available
   return (
@@ -135,7 +133,7 @@ function MyApp({ Component, pageProps, extra }: Props & WithTranslation) {
           }}
         />
       </Head>
-      <StoreProvider stores={[userStore, defaultClusterStore, appsStore]}>
+      <StoreProvider stores={[userStore, defaultClusterStore, loginNodeStore]}>
         <DarkModeProvider initial={extra.darkModeCookieValue}>
           <AntdConfigProvider color={primaryColor} locale={locale}>
             <FloatButtons />
@@ -159,8 +157,8 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
     userInfo: undefined,
     footerText: "",
     primaryColor: "",
-    apps: [],
     darkModeCookieValue: getDarkModeCookieValue(appContext.ctx.req),
+    loginNodes: {},
   };
 
   // This is called on server on first load, and on client on every page transition
@@ -168,14 +166,14 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
   // so only execute on server
   // Also, validateToken relies on redis, which is not available in client bundle
   if (isServer()) {
+
     const token = USE_MOCK ? "123" : getTokenFromCookie(appContext.ctx);
     if (token) {
-      // Why not directly call validateToken but create an api?
-      // Because this method will (in next.js's perspective) be called both in client and server,
-      // so next.js will import validateToken into the client bundle
-      // validateToken depends on ioredis, which cannot be brought into frontend.
-      // dynamic import also doesn't work.
-
+    // Why not directly call validateToken but create an api?
+    // Because this method will (in next.js's perspective) be called both in client and server,
+    // so next.js will import validateToken into the client bundle
+    // validateToken depends on ioredis, which cannot be brought into frontend.
+    // dynamic import also doesn't work.
       const userInfo = await api.validateToken({ query: { token } }).catch(() => undefined);
 
       if (userInfo) {
@@ -183,10 +181,6 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
           ...userInfo,
           token: token,
         };
-
-        const apps = await api.listAvailableApps({ query: { token } }).then((x) => x.apps).catch(() => []);
-        extra.apps = apps;
-
       }
 
     }
@@ -197,6 +191,11 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
       ?? runtimeConfig.UI_CONFIG?.primaryColor?.defaultColor ?? runtimeConfig.DEFAULT_PRIMARY_COLOR;
     extra.footerText = (hostname && runtimeConfig.UI_CONFIG?.footer?.hostnameTextMap?.[hostname])
       ?? runtimeConfig.UI_CONFIG?.footer?.defaultText ?? "";
+
+    extra.loginNodes = Object.keys(runtimeConfig.CLUSTERS_CONFIG).reduce((acc, cluster) => {
+      acc[cluster] = runtimeConfig.CLUSTERS_CONFIG[cluster].loginNodes;
+      return acc;
+    }, {});
   }
 
   const appProps = await NextApp.getInitialProps(appContext);

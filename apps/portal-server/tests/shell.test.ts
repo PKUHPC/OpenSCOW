@@ -16,7 +16,8 @@ import { credentials } from "@grpc/grpc-js";
 import { ShellResponse, ShellServiceClient } from "@scow/protos/build/portal/shell";
 import { createServer } from "src/app";
 import { cluster, collectInfo, connectToTestServer,
-  createTestItems, resetTestServer, TestSshServer, userId } from "tests/file/utils";
+  createTestItems, resetTestServer, target, TestSshServer, userId,
+} from "tests/file/utils";
 
 let ssh: TestSshServer;
 let server: Server;
@@ -41,7 +42,7 @@ afterEach(async () => {
 it.skip("tests shell interaction", async () => {
   const stream = asyncDuplexStreamCall(client, "shell");
 
-  await stream.writeAsync({ message: { $case: "connect", connect: { cluster, userId } } });
+  await stream.writeAsync({ message: { $case: "connect", connect: { cluster, loginNode: target, userId } } });
 
   // types commands
   const type = "echo 123\nexit\n";

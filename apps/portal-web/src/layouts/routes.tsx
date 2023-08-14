@@ -25,14 +25,15 @@ import {
   SaveOutlined } from "@ant-design/icons";
 import { NavItemProps } from "@scow/lib-web/build/layouts/base/types";
 import { NavIcon } from "@scow/lib-web/build/layouts/icon";
-import { App } from "@scow/protos/build/portal/app";
 import { join } from "path";
 import { User } from "src/stores/UserStore";
-import { Cluster, publicConfig } from "src/utils/config";
-
+import { Cluster, LoginNode, publicConfig } from "src/utils/config";
 export const userRoutes: (
-  user: User | undefined, defaultCluster: Cluster, apps: App[],
-) => NavItemProps[] = (user, defaultCluster, apps) => {
+  user: User | undefined,
+  defaultCluster: Cluster,
+  LoginNodes: Record<string, LoginNode[]>,
+  setDefaultCluster: (cluster: Cluster) => void,
+) => NavItemProps[] = (user, defaultCluster, loginNodes, setDefaultCluster) => {
 
   if (!user) { return []; }
 
@@ -74,7 +75,8 @@ export const userRoutes: (
       Icon: MacCommandOutlined,
       text: "Shell",
       path: "/shell",
-      clickToPath: join(publicConfig.BASE_PATH, "shell", defaultCluster.id),
+      clickToPath:
+        join(publicConfig.BASE_PATH, "shell", defaultCluster.id, loginNodes[defaultCluster.id]?.[0]?.name),
       openInNewPage: true,
       clickable: true,
       children: publicConfig.CLUSTERS.map(({ name, id }) => ({
@@ -82,6 +84,15 @@ export const userRoutes: (
         Icon: CloudServerOutlined,
         text: name,
         path: `/shell/${id}`,
+        clickToPath: join(publicConfig.BASE_PATH, "shell", id, loginNodes[id]?.[0]?.name),
+        handleClick: () => { setDefaultCluster({ name, id }); },
+        children: loginNodes[id]?.map((loginNode) => ({
+          openInNewPage: true,
+          Icon: CloudServerOutlined,
+          text: loginNode.name,
+          path: `/shell/${id}/${loginNode.name}`,
+          handleClick: () => { setDefaultCluster({ name, id }); },
+        })),
       } as NavItemProps)),
     } as NavItemProps] : []),
     ...(publicConfig.ENABLE_LOGIN_DESKTOP ? [{
@@ -89,31 +100,35 @@ export const userRoutes: (
       text: "桌面",
       path: "/desktop",
     }] : []),
-    ...(publicConfig.ENABLE_APPS ? [{
+    ...(publicConfig.ENABLE_APPS && publicConfig.CLUSTERS.length > 0 ? [{
       Icon: EyeOutlined,
       text: "交互式应用",
       path: "/apps",
-      clickToPath: "/apps/sessions",
-      children: [
-        {
-          Icon: Loading3QuartersOutlined,
-          text: "已创建的应用",
-          path: "/apps/sessions",
-        },
-        ...(apps.length > 0 ? [
+      clickToPath: `/apps/${defaultCluster.id}/sessions`,
+      clickable: true,
+      children: publicConfig.CLUSTERS.map((cluster) => ({
+        Icon: FolderOutlined,
+        text: cluster.name,
+        path: `/apps/${cluster.id}`,
+        clickToPath: `/apps/${cluster.id}/sessions`,
+        handleClick: () => { setDefaultCluster(cluster); },
+        children: [
+          {
+            Icon: Loading3QuartersOutlined,
+            text: "已创建的应用",
+            path: `/apps/${cluster.id}/sessions`,
+            handleClick: () => { setDefaultCluster(cluster); },
+          },
           {
             Icon: PlusOutlined,
             text: "创建应用",
             clickable: false,
-            path: "/apps/create",
-            children: apps.map(({ id, name }) => ({
-              Icon: DesktopOutlined,
-              text: name,
-              path: `/apps/create/${id}`,
-            })),
-          }] : []),
-      ],
-    }] : []),
+            path: `/apps/${cluster.id}/createApps`,
+            handleClick: () => { setDefaultCluster(cluster); },
+          },
+        ],
+      } as NavItemProps)),
+    } as NavItemProps] : []),
     ...(publicConfig.CLUSTERS.length > 0 ? [{
       Icon: FolderOutlined,
       text: "文件管理",
@@ -125,31 +140,41 @@ export const userRoutes: (
         text: cluster.name,
         path: `/files/${cluster.id}`,
         clickToPath: `/files/${cluster.id}/~`,
+        handleClick: () => { setDefaultCluster(cluster); },
       } as NavItemProps)),
     }] : []),
     ...(publicConfig.NAV_LINKS && publicConfig.NAV_LINKS.length > 0
-      ? publicConfig.NAV_LINKS.map((link) => ({
-        Icon: !link.iconPath ? LinkOutlined : (
-          <NavIcon
-            src={join(publicConfig.PUBLIC_PATH, link.iconPath)}
-          />
-        ),
-        text: link.text,
-        path: `${link.url}?token=${user.token}`,
-        clickable: true,
-        openInNewPage: true,
-        children: link.children?.length ? link.children?.map((childLink) => ({
-          Icon: !childLink.iconPath ? LinkOutlined : (
+      ? publicConfig.NAV_LINKS.map((link) => {
+
+        const parentNavPath = link.url ? `${link.url}?token=${user.token}`
+          : link.children?.length && link.children?.length > 0
+            ? `${link.children[0].url}?token=${user.token}` : "";
+
+        return {
+          Icon: !link.iconPath ? LinkOutlined : (
             <NavIcon
-              src={join(publicConfig.PUBLIC_PATH, childLink.iconPath)}
+              src={join(publicConfig.PUBLIC_PATH, link.iconPath)}
             />
           ),
-          text: childLink.text,
-          path: `${childLink.url}?token=${user.token}`,
+          text: link.text,
+          path: parentNavPath,
+          clickToPath: parentNavPath,
           clickable: true,
-          openInNewPage: true,
-        } as NavItemProps)) : [],
-      }) as NavItemProps) : []),
+          openInNewPage: link.openInNewPage,
+          children: link.children?.length ? link.children?.map((childLink) => ({
+            Icon: !childLink.iconPath ? LinkOutlined : (
+              <NavIcon
+                src={join(publicConfig.PUBLIC_PATH, childLink.iconPath)}
+              />
+            ),
+            text: childLink.text,
+            path: `${childLink.url}?token=${user.token}`,
+            clickToPath: `${childLink.url}?token=${user.token}`,
+            clickable: true,
+            openInNewPage: childLink.openInNewPage,
+          } as NavItemProps)) : [],
+        } as NavItemProps;
+      }) : []),
   ];
 };
 

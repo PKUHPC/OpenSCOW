@@ -23,7 +23,6 @@ import { runningJobId, RunningJobInfo } from "src/models/job";
 import { RunningJobDrawer } from "src/pageComponents/job/RunningJobDrawer";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { Cluster } from "src/utils/config";
-
 interface FilterForm {
   jobId: number | undefined;
   cluster: Cluster;
@@ -34,18 +33,16 @@ interface Props {
 }
 
 
-
-
 export const RunningJobQueryTable: React.FC<Props> = ({
   userId,
 }) => {
 
-  const defaultClusterStore = useStore(DefaultClusterStore);
+  const { defaultCluster } = useStore(DefaultClusterStore);
 
   const [query, setQuery] = useState<FilterForm>(() => {
     return {
       jobId: undefined,
-      cluster: defaultClusterStore.cluster,
+      cluster: defaultCluster,
     };
   });
 
@@ -166,6 +163,7 @@ export const RunningJobInfoTable: React.FC<JobInfoTableProps> = ({
         <Table.Column<RunningJobInfo> dataIndex="qos" title="QOS" />
         <Table.Column<RunningJobInfo> dataIndex="nodes" title="节点数" />
         <Table.Column<RunningJobInfo> dataIndex="cores" title="核心数" />
+        <Table.Column<RunningJobInfo> dataIndex="gpus" title="GPU卡数" />
         <Table.Column<RunningJobInfo> dataIndex="state" title="状态" />
         <Table.Column
           dataIndex="runningOrQueueTime"

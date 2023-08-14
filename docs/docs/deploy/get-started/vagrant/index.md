@@ -9,14 +9,16 @@ title: 使用
 
 | 节点名称/角色 |                           主要服务                            |     私网IP     | 配置  |
 | :-----------: | :-----------------------------------------------------------: | :------------: | :---: |
-|     scow      |         scow：portal、mis、auth、gateway、export job          | 192.168.88.100 | 4C4G  |
+|     scow      |         scow：portal、mis、auth、gateway                     | 192.168.88.100 | 4C4G  |
 |     slurm     | slurmdbd、slurmctld、slurmd、mariadb、nfs-server、slapd、sssd | 192.168.88.101 | 2C2G  |
 |     login     |         slurmd、sssd、nfs、Xfce、KDE、MATE、cinnamon          | 192.168.88.102 | 2C2G  |
 |     cn01      |         slurmd、sssd、nfs、Xfce、KDE、MATE、cinnamon          | 192.168.88.103 | 2C2G  |
 
 ### 1. 集群一键部署命令
 
+把[scow-vagrant](https://github.com/PKUHPC/scow-vagrant)项目clone下来，在这个项目根目录下执行以下命令：
 ```shell
+git clone https://github.com/PKUHPC/scow-vagrant.git
 vagrant up
 ```
 

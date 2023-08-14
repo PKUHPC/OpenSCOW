@@ -5,12 +5,4 @@ db:
   password: mysqlrootpassword
   dbName: scow_server_${JEST_WORKER_ID}
 
-fetchJobs:
-  db:
-    host: 127.0.0.1
-    port: 3307
-    user: root
-    password: jobtablepassword
-    dbName: jobs
-    tableName: jobs
 

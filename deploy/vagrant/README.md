@@ -8,12 +8,12 @@
 
 本项目面向<font color=red size=5>**开发**</font>和<font color='red' size=5>**测试**</font>人员，基于Vagrant，采用VirtualBox作为Provider，提供slurm+SCOW集群一键部署方案，极大简化了部署流程和部署门槛。部署slurm+SCOW四节点集群，节点角色及默认配置如下表所示：
 
-| 节点名称/角色 |                           主要服务                            |     私网IP     | 配置  |
-| :-----------: | :-----------------------------------------------------------: | :------------: | :---: |
-|     scow      |         scow：portal、mis、auth、gateway、export job          | 192.168.88.100 | 4C4G  |
-|     slurm     | slurmdbd、slurmctld、slurmd、mariadb、nfs-server、slapd、sssd | 192.168.88.101 | 2C2G  |
-|     login     |         slurmd、sssd、nfs、Xfce、KDE、MATE、cinnamon          | 192.168.88.102 | 2C2G  |
-|     cn01      |         slurmd、sssd、nfs、Xfce、KDE、MATE、cinnamon          | 192.168.88.103 | 2C2G  |
+| 节点名称/角色 |                           主要服务                           |     私网IP     | 配置 |
+| :-----------: | :----------------------------------------------------------: | :------------: | :--: |
+|     scow      |               scow：portal、mis、auth、gateway               | 192.168.88.100 | 4C4G |
+|     slurm     | slurmdbd、slurmctld、slurmd、mariadb、nfs-server、slapd、sssd | 192.168.88.101 | 2C2G |
+|     login     |         slurmd、sssd、nfs、Xfce、KDE、MATE、cinnamon         | 192.168.88.102 | 2C2G |
+|     cn01      |         slurmd、sssd、nfs、Xfce、KDE、MATE、cinnamon         | 192.168.88.103 | 2C2G |
 
 ## 使用
 
@@ -61,10 +61,10 @@ vagrant destroy
 
 ###  更多文档
 
-- [vagrant环境搭建](https://pkuhpc.github.io/SCOW/docs/deploy/vagrant/vagrant-env)
-- [自定义部署](https://pkuhpc.github.io/SCOW/docs/deploy/vagrant/customization)
-- [vagrant镜像制作](https://pkuhpc.github.io/SCOW/docs/deploy/vagrant/images)
-- [FAQ](https://pkuhpc.github.io/SCOW/docs/deploy/vagrant/faq)
+- [vagrant环境搭建](https://pkuhpc.github.io/SCOW/docs/deploy/get-started/vagrant/vagrant-env)
+- [自定义部署](https://pkuhpc.github.io/SCOW/docs/deploy/get-started/vagrant/customization)
+- [vagrant镜像制作](https://pkuhpc.github.io/SCOW/docs/deploy/get-started/vagrant/vagrant-env)
+- [FAQ](https://pkuhpc.github.io/SCOW/docs/deploy/get-started/vagrant/faq)
 
 ## 授权协议
 

@@ -61,6 +61,7 @@ export type SlurmConfigSchema = Static<typeof SlurmConfigSchema>;
 
 export const AppConfigSchema = Type.Object({
   name: Type.String({ description: "App名" }),
+  logoPath: Type.Optional(Type.String({ description: "App应用图标的图片源路径" })),
   type: Type.Enum(AppType, { description: "应用类型" }),
   slurm: Type.Optional(SlurmConfigSchema),
   web: Type.Optional(WebAppConfigSchema),

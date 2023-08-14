@@ -4,6 +4,9 @@ id: emacs
 # 这个应用的名字
 name: emacs
 
+# 这个应用的图标文件在公共文件下的路径
+# logoPath: /test.svg
+
 # 指定应用类型，vnc或者web
 type: vnc
 

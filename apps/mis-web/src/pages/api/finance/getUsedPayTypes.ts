@@ -30,7 +30,9 @@ export const GetUsedPayTypesSchema = typeboxRouteSchema({
 
 const auth = authenticate((u) =>
   u.tenantRoles.includes(TenantRole.TENANT_FINANCE) ||
-  u.platformRoles.includes(PlatformRole.PLATFORM_FINANCE),
+  u.platformRoles.includes(PlatformRole.PLATFORM_FINANCE) || 
+  u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN) || 
+  u.tenantRoles.includes(TenantRole.TENANT_ADMIN),
 );
 
 export default typeboxRoute(GetUsedPayTypesSchema,

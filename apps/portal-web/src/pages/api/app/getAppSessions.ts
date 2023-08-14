@@ -23,13 +23,14 @@ export const AppSession = Type.Object({
   jobId: Type.Number(),
   submitTime: Type.Optional(Type.String()),
   appId: Type.String(),
+  appName: Type.Optional(Type.String()),
   state: Type.String(),
   dataPath: Type.String(),
   runningTime: Type.String(),
   timeLimit: Type.String(),
-  reason: Type.Optional(Type.Union([Type.String(), Type.Undefined()])),
-  host: Type.Optional(Type.Union([Type.String(), Type.Undefined()])),
-  port: Type.Optional(Type.Union([Type.Number(), Type.Undefined()])),
+  reason: Type.Optional(Type.String()),
+  host: Type.Optional(Type.String()),
+  port: Type.Optional(Type.Number()),
 });
 export type AppSession = Static<typeof AppSession>
 

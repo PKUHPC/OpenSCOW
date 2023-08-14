@@ -1,3 +1,15 @@
+/**
+ * Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
+ * SCOW is licensed under Mulan PSL v2.
+ * You can use this software according to the terms and conditions of the Mulan PSL v2.
+ * You may obtain a copy of Mulan PSL v2 at:
+ *          http://license.coscl.org.cn/MulanPSL2
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+ * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+ * See the Mulan PSL v2 for more details.
+ */
+
 const interpreter = "node";
 const interpreter_args = [
   "--watch",
@@ -7,11 +19,11 @@ const interpreter_args = [
 
 const PRODUCTION_ENV = {
   NODE_ENV: "production",
-}
+};
 
 const SCOW_CONFIG_PATH_ENV = {
   SCOW_CONFIG_PATH: "../../dev/vagrant/config",
-}
+};
 
 module.exports = {
   apps: [
@@ -27,7 +39,7 @@ module.exports = {
         AUTH_BASE_PATH: "/",
         ...PRODUCTION_ENV,
         ...SCOW_CONFIG_PATH_ENV,
-      }
+      },
     },
     {
       name: "portal-web",
@@ -45,7 +57,7 @@ module.exports = {
         MIS_URL: "localhost:5003",
         NOVNC_CLIENT_URL: "http://localhost:6080",
         ...SCOW_CONFIG_PATH_ENV,
-      }
+      },
     },
     {
       name: "portal-server",
@@ -58,7 +70,7 @@ module.exports = {
         PORT: "5002",
         ...PRODUCTION_ENV,
         ...SCOW_CONFIG_PATH_ENV,
-      }
+      },
     },
     {
       name: "mis-web",
@@ -75,7 +87,7 @@ module.exports = {
         PORTAL_DEPLOYED: 1,
         PORTAL_URL: "localhost:5001",
         ...SCOW_CONFIG_PATH_ENV,
-      }
+      },
     },
     {
       name: "mis-server",
@@ -88,15 +100,15 @@ module.exports = {
         PORT: "5004",
         ...PRODUCTION_ENV,
         ...SCOW_CONFIG_PATH_ENV,
-      }
+      },
     },
     {
       name: "dev:libs",
       cwd: ".",
       script: "npm",
       args: "run dev:libs",
-      interpreter: "pnpm"
-    }
+      interpreter: "pnpm",
+    },
   ],
 
 };

@@ -13,48 +13,41 @@ title: 集群配置文件
 # 集群显示名称
 displayName: hpc01Name
 
-# 指定slurm配置
-slurm:
-  # 各个登录节点的IP或者域名
-  # 如果设置的是域名，请确认此节点的/etc/hosts中包含了域名到IP的解析信息
-  loginNodes:
-    - login01
-    - login02
+# 集群选择时排序的优先级，数字越小优先级越高，默认优先级最低
+priority: 0
 
-  # 集群的分区信息，结构为一个列表
-  partitions:
-    # 分区1的名字, 不能包含空格
-    - name: compute
-      # 分区内节点数
-      nodes: 28
-      # 单节点内存数量，单位M
-      mem: 7500
-      # 核心数
-      cores: 2
-      # GPU卡数
-      gpus: 0
-      # QOS
-      qos:
-        - low
-        - normal
-        - high
-      # 这个分区的备注信息
-      comment: ""
+# 调度器适配器地址(ip地址:端口号)
+adapterUrl: localhost:8972
 
-    - name: GPU
-      nodes: 1
-      mem: 262144
-      cores: 48
-      gpus: 8
-      qos:
-        - low
-        - normal
-        - high
-      comment: ""
+loginNodes:
+    # 登录节点展示名称
+  - name: login01
+    # 各个登录节点的IP或者域名
+    # 如果设置的是域名，请确认此节点的/etc/hosts中包含了域名到IP的解析信息
+    address: 192.168.88.102
+  - name: login02
+    address: 192.168.88.103
+
+# 登录节点桌面功能
+loginDesktop:
+  # 是否启用桌面功能
+  enabled: true
+
+  # 桌面
+  wms: 
+    # 桌面名和对应的wm值。见文档
+    - name: Xfce
+      wm: xfce
+
+  # 单个登录节点最多启动多少个桌面节点
+  maxDesktops: 3
+
+  # 将创建的登录节点桌面信息的保存到什么位置。相对于用户的家目录
+  desktopsDir: scow/desktops
+
+# TurboVNC的安装路径
+turboVNCPath: /opt/TurboVNC
 ```
 
-:::caution
-
-集群的分区名，即`slurm.partitions[].name`不能包含空格，否则系统将启动失败
-
-:::
+## 注意
+集群配置里的登录节点桌面功能和TurboVNC的安装路径配置为该集群特有，如不需要特殊配置该集群的这些功能，可在[门户系统](./portal/intro.md)进行统一配置；若在集群下配置以上功能，在该集群内将会覆盖门户系统下的配置。

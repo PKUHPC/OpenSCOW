@@ -67,6 +67,12 @@ export async function pay(
     await unblockAccount(target, clusterPlugin.clusters, logger);
   }
 
+  // 充值为负数时，要考虑封锁账户
+  if (target instanceof Account && prevBalance.gt(0) && target.balance.lte(0)) {
+    logger.info("Block account %s", target.accountName);
+    await blockAccount(target, clusterPlugin.clusters, logger);
+  }
+
   return {
     currentBalance: target.balance,
     previousBalance: prevBalance,

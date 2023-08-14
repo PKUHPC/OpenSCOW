@@ -13,58 +13,86 @@
 import { GetConfigFn, getDirConfig } from "@scow/lib-config";
 import { Static, Type } from "@sinclair/typebox";
 import { DEFAULT_CONFIG_BASE_PATH } from "src/constants";
-import { SlurmMisConfigSchema } from "src/mis";
 
 const CLUSTER_CONFIG_BASE_PATH = "clusters";
 
+const LoginNodeConfigSchema =
+  Type.Object(
+    {
+      name: Type.String({ description: "登录节点展示名" }), address: Type.String({ description: "集群的登录节点地址" }),
+    },
+  );
+
+export type LoginNodeConfigSchema = Static<typeof LoginNodeConfigSchema>;
+
+export const getLoginNode =
+  (loginNode: string | LoginNodeConfigSchema): LoginNodeConfigSchema => {
+    return typeof loginNode === "string" ? { name: loginNode, address: loginNode } : loginNode;
+  };
+
+export type Cluster = {
+  id: string
+  name: string
+}
+
+export const getSortedClusters = (clusters: Record<string, ClusterConfigSchema>): Cluster[] => {
+  return Object.keys(clusters)
+    .sort(
+      (a, b) => {
+        if (clusters[a].priority === clusters[b].priority) {
+          return (
+            clusters[a].displayName > clusters[b].displayName
+              ? 1
+              : clusters[a].displayName === clusters[a].displayName
+                ? 0
+                : -1
+          );
+        }
+        return clusters[a].priority - clusters[b].priority;
+      },
+    ).map((id) => ({ id, name: clusters[id].displayName }));
+};
+
+export const LoginDeskopConfigSchema = Type.Object({
+  enabled: Type.Boolean({ description: "是否启动登录节点上的桌面功能" }),
+  wms: Type.Array(
+    Type.Object({ name: Type.String({ description: "名称" }), wm: Type.String({ description: "wm值" }) })),
+  maxDesktops: Type.Integer({ description: "每个登录节点上最多创建多少个桌面" }),
+  desktopsDir: Type.String({ description: "将创建的登录节点桌面信息的保存到什么位置。相对于用户的家目录" }),
+});
+
+const TurboVncConfigSchema = Type.String({ description: "TurboVNC的安装路径" });
+
+export type LoginDeskopConfigSchema = Static<typeof LoginDeskopConfigSchema>;
+type TurboVncConfigSchema = Static<typeof TurboVncConfigSchema>;
 export const ClusterConfigSchema = Type.Object({
   displayName: Type.String({ description: "集群的显示名称" }),
-  scheduler: Type.Enum({ slurm: "slurm" }, { description: "集群所使用的调度器，目前只支持slurm", default: "slurm" }),
+  priority: Type.Number({ description: "集群使用的优先级, 数字越小越先展示", default: Number.MAX_SAFE_INTEGER }),
+  adapterUrl: Type.String({ description: "调度器适配器服务地址" }),
   proxyGateway: Type.Optional(Type.Object({
     url: Type.String({ description: "代理网关节点监听URL" }),
     autoSetupNginx: Type.Boolean({ description: "是否自动配置nginx", default: false }),
   })),
-  slurm: Type.Object({
-    loginNodes: Type.Array(Type.String(), { description: "集群的登录节点地址", default: []}),
-    partitions: Type.Array(
-      Type.Object(
-        {
-          name: Type.String({ description: "分区名", pattern: "^[^ ]+$" }),
-          mem: Type.Integer({ description: "内存，单位M" }),
-          cores: Type.Integer({ description: "核心数" }),
-          gpus: Type.Integer({ description: "GPU卡数" }),
-          nodes: Type.Integer({ description: "节点数" }),
-          qos: Type.Optional(Type.Array(Type.String({ description: "QOS" }))),
-          comment: Type.Optional(Type.String({ description: "计费项说明" })),
-        },
-      ),
-      {
-        description: "分区信息，分区名、内存、核心数、GPU卡数、节点数、QOS、计费项说明",
-        default: [],
-      },
-    ),
-    mis: Type.Optional(SlurmMisConfigSchema),
-  }),
-  misIgnore: Type.Boolean({ description: "在实际进行MIS操作时忽略这个集群", default: false }),
+  loginNodes: Type.Union([
+    Type.Array(LoginNodeConfigSchema),
+    Type.Array(Type.String(), { description: "集群的登录节点地址", default: []}),
+  ]),
+  loginDesktop: Type.Optional(LoginDeskopConfigSchema),
+  turboVNCPath: Type.Optional(TurboVncConfigSchema),
 });
+
 
 export type ClusterConfigSchema = Static<typeof ClusterConfigSchema>;
 
+export const getClusterConfigs: GetConfigFn<Record<string, ClusterConfigSchema>> =
+  (baseConfigPath, logger) => {
 
-export const getClusterConfigs: GetConfigFn<Record<string, ClusterConfigSchema>> = (baseConfigPath, logger) => {
+    const config = getDirConfig(
+      ClusterConfigSchema,
+      CLUSTER_CONFIG_BASE_PATH,
+      baseConfigPath ?? DEFAULT_CONFIG_BASE_PATH,
+      logger,
+    );
 
-  const config = getDirConfig(
-    ClusterConfigSchema,
-    CLUSTER_CONFIG_BASE_PATH,
-    baseConfigPath ?? DEFAULT_CONFIG_BASE_PATH,
-    logger,
-  );
-
-  Object.entries(config).forEach(([id, c]) => {
-    if (!c[c.scheduler]) {
-      throw new Error(`App ${id} is of scheduler ${c.scheduler} but config.${c.scheduler} is not set`);
-    }
-  });
-
-  return config;
-};
+    return config;
+  };

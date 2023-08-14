@@ -6,56 +6,17 @@ description: 使用slurm的集群的配置
 
 # 配置使用slurm的集群
 
-## 选定slurm节点和部署slurm.sh
+## 选定slurm节点和部署slurm适配器
 
-在集群中选定一个节点作为**slurm节点**。此节点需要满足以下条件：
-
-- **服务节点**可以以root用户SSH免密登录到此节点
-- 此节点上安装并配置好了slurm的客户端程序，如`sacctmgr`、`squeue`等
-- 此节点上安装有`mysql`客户端，可以通过`mysql`直接执行
-- 此节点上运行有slurm的mysql数据库，或者可以连接到运行在其他机器上的数据库
-
-我们建议在slurm集群的manager节点上同时配置客户端程序，并使用此节点为**slurm节点**。
-在项目启动后，系统将自动给slurm节点上传一个slurm.sh脚本，用于进行一些slurm操作。具体上传的位置可以在集群配置中进行配置。
+在集群中选定一个节点作为**slurm节点**。此节点需要部署slurm适配器并保证正确运行。
 
 ## 修改集群配置
 
-在`config/clusters/{使用slurm的集群的ID}.yml`中，修改配置
+在`config/clusters/{使用slurm的集群的ID}.yml`中，修改配置(使用适配器的ip地址和端口号)
 
 ```yaml title="config/clusters/{使用slurm的集群的集群ID}.yml"
 # ...
-slurm:
-  #....
-  mis:
-    # 部署slurm.sh的机器的地址
-    managerUrl: haha
-    # slurm.sh在机器中的绝对地址
-    scriptPath: /test/slurm.sh
-
-    # 部署slurm.sh的机器通过什么地址访问slurm的数据库
-    # 不填写为下面的默认值
-    # dbHost: localhost
-
-    # 部署slurm.sh的机器通过什么端口访问slurm的数据库
-    # 不填写为下面的默认值
-    # dbPort: 3306
-
-    # slurm数据库的用户名
-    # 参考slurmdbd.conf的StorageUser配置
-    # 不填写为下面的默认值
-    # dbUser: root
-
-    # slurmdbd的数据库用户的密码
-    # 参考slurmdbd.conf的StoragePass配置
-    dbPassword: password
-
-    # slurm accounting数据库的数据库名
-    # 参考slurmdbd.conf的StorageLoc配置
-    # 不填写为下面的默认值
-    # slurmAcctDbName: "slurm_acct_db"
-
-    # 这个集群在slurm中的集群名字
-    clusterName: pkuhpc
+adapterUrl: localhost:8972
 ```
 
 ## 导入已有用户信息

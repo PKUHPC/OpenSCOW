@@ -10,9 +10,6 @@
  * See the Mulan PSL v2 for more details.
  */
 
-// @ts-check
-/* eslint-disable @typescript-eslint/no-var-requires */
-
 const { envConfig, str, bool } = require("@scow/lib-config");
 const { getClusterConfigs } = require("@scow/config/build/cluster");
 const { getMisConfig } = require("@scow/config/build/mis");
@@ -36,7 +33,7 @@ async function queryCapabilities(authUrl, phase) {
     // @ts-ignore
     return await getCapabilities(authUrl);
   } else {
-    return { changePassword: true, createUser: true, validateName: true };
+    return { changePassword: true, createUser: true, validateName: true, changeEmail:true };
   }
 }
 
@@ -68,7 +65,7 @@ const buildRuntimeConfig = async (phase, basePath) => {
 
   const building = phase === PHASE_PRODUCTION_BUILD;
   const dev = phase === PHASE_DEVELOPMENT_SERVER;
-  const production = phase === PHASE_PRODUCTION_SERVER;
+  // const production = phase === PHASE_PRODUCTION_SERVER;
 
   if (building) {
     return { serverRuntimeConfig: {}, publicRuntimeConfig: {} };
@@ -119,6 +116,7 @@ const buildRuntimeConfig = async (phase, basePath) => {
       authSupportsCreateUser: capabilities.createUser,
     },
     ENABLE_CHANGE_PASSWORD: capabilities.changePassword,
+    ENABLE_CHANGE_EMAIL: capabilities.changeEmail,
     PREDEFINED_CHARGING_TYPES: misConfig.predefinedChargingTypes,
 
     PUBLIC_PATH: config.PUBLIC_PATH,
@@ -138,6 +136,8 @@ const buildRuntimeConfig = async (phase, basePath) => {
     BASE_PATH: basePath,
 
     NAV_LINKS: misConfig.navLinks,
+
+    USER_LINKS: commonConfig.userLinks,
 
     VERSION_TAG: versionTag,
     CUSTOM_TRANSLATION_JSON: translationJson,

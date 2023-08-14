@@ -1,5 +1,17 @@
 # @scow/lib-web
 
+## 0.3.5
+
+### Patch Changes
+
+- a978233fe: 修复 antd 主题没有应用完全的问题
+
+## 0.3.4
+
+### Patch Changes
+
+- a90e34b30: 修改 favicon 和 logo 访问时错误参属下返回的报错信息为固定文字“Invalid request Value”
+
 ## 0.3.3
 
 ### Patch Changes

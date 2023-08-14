@@ -15,7 +15,7 @@ import { FastifyRequest } from "fastify";
 import ldapjs, { EntryAlreadyExistsError } from "ldapjs";
 import { CreateUserInfo, CreateUserResult } from "src/auth/AuthProvider";
 import { searchOne, useLdap } from "src/auth/ldap/helpers";
-import { modifyPassword } from "src/auth/ldap/password";
+import { modifyPasswordBase } from "src/auth/ldap/password";
 import { LdapConfigSchema, NewUserGroupStrategy } from "src/config/auth";
 import { RequiredBy } from "src/utils/validations";
 import { promisify } from "util";
@@ -130,7 +130,7 @@ export async function createUser(
     }
 
     // set password as admin user
-    await modifyPassword(userDn, undefined, info.password, client);
+    await modifyPasswordBase(userDn, undefined, info.password, client);
 
     // Add user to ldap group
     const addUserToLdapGroup = ldap.addUser.addUserToLdapGroup;

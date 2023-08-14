@@ -5,3 +5,4 @@ packages:
   - "!**/.next"
   - protos
   - deploy/**
+  - dev/**

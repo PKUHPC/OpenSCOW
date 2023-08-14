@@ -23,6 +23,7 @@ import Link from "next/link";
 import Router from "next/router";
 import { join } from "path";
 import React, { useEffect, useRef, useState } from "react";
+import { useStore } from "simstate";
 import { api } from "src/apis/api";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { ModalButton, ModalLink } from "src/components/ModalLink";
@@ -36,6 +37,7 @@ import { PathBar } from "src/pageComponents/filemanager/PathBar";
 import { RenameModal } from "src/pageComponents/filemanager/RenameModal";
 import { UploadModal } from "src/pageComponents/filemanager/UploadModal";
 import { FileInfo } from "src/pages/api/file/list";
+import { LoginNodeStore } from "src/stores/LoginNodeStore";
 import { Cluster, publicConfig } from "src/utils/config";
 import styled from "styled-components";
 
@@ -95,6 +97,9 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
 
   const [operation, setOperation] = useState<Operation | undefined>(undefined);
   const [showHiddenFile, setShowHiddenFile] = useState(false);
+
+  const loginNodes = useStore(LoginNodeStore);
+  const loginNode = loginNodes[cluster.id][0].name;
 
   const reload = async (signal?: AbortSignal) => {
     setLoading(true);
@@ -389,7 +394,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
           </Button>
           {
             publicConfig.ENABLE_SHELL ? (
-              <Link href={`/shell/${cluster.id}${path}`} target="_blank" legacyBehavior>
+              <Link href={`/shell/${cluster.id}/${loginNode}${path}`} target="_blank" legacyBehavior>
                 <Button icon={<MacCommandOutlined />}>
                   在终端中打开
                 </Button>

@@ -11,7 +11,7 @@
  */
 
 import { formatDateTime } from "@scow/lib-web/build/utils/datetime";
-import { JobInfo } from "@scow/protos/build/server/job";
+import { JobInfo } from "@scow/protos/build/common/ended_job";
 import { Descriptions, Drawer } from "antd";
 import { RunningJobInfo } from "src/models/job";
 
@@ -31,6 +31,7 @@ const drawerItems = [
   ["QOS", "qos"],
   ["节点数", "nodes"],
   ["核心数", "cores"],
+  ["GPU卡数", "gpus"],
   ["状态", "state"],
   ["说明", "nodesOrReason"],
   ["运行/排队时间", "runningOrQueueTime"],

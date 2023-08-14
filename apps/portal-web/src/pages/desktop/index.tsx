@@ -10,15 +10,18 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { NextPage } from "next";
-import { requireAuth } from "src/auth/requireAuth";
+import { GetServerSideProps, NextPage } from "next";
 import { NotFoundPage } from "src/components/errorPages/NotFoundPage";
 import { PageTitle } from "src/components/PageTitle";
 import { DesktopTable } from "src/pageComponents/desktop/DesktopTable";
-import { publicConfig } from "src/utils/config";
+import { Cluster, getLoginDesktopEnabled, publicConfig, runtimeConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
 
-export const DesktopIndexPage: NextPage = requireAuth(() => true)(() => {
+type Props = {
+  loginDesktopEnabledClusters: Cluster[];
+};
+
+export const DesktopIndexPage: NextPage<Props> = (props: Props) => {
 
   if (!publicConfig.ENABLE_LOGIN_DESKTOP) {
     return <NotFoundPage />;
@@ -28,9 +31,23 @@ export const DesktopIndexPage: NextPage = requireAuth(() => true)(() => {
     <div>
       <Head title="桌面" />
       <PageTitle titleText="登录节点上的桌面" />
-      <DesktopTable />
+      <DesktopTable loginDesktopEnabledClusters={props.loginDesktopEnabledClusters} />
     </div>
   );
-});
+};
+
+
+export const getServerSideProps: GetServerSideProps<Props> = async () => {
+
+  const loginDesktopEnabledClusters = Object.keys(runtimeConfig.CLUSTERS_CONFIG)
+    .filter((clusterId) => getLoginDesktopEnabled(clusterId))
+    .map((clusterId) => ({ id: clusterId, name: runtimeConfig.CLUSTERS_CONFIG[clusterId].displayName } as Cluster));
+
+  return {
+    props: {
+      loginDesktopEnabledClusters,
+    },
+  };
+};
 
 export default DesktopIndexPage;

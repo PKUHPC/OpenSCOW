@@ -31,16 +31,22 @@ export const ChangePasswordForm: React.FC = () => {
   const onFinish = async () => {
     const { oldPassword, newPassword } = await form.validateFields();
     setLoading(true);
-    api.changePassword({ body: { newPassword, oldPassword } })
-      .httpError(412, () => { message.error("原密码不正确"); })
-      .then(() => {
-        form.resetFields();
-        message.success("密码更改成功！");
+    api.checkPassword({ query: { password: oldPassword } })
+      .then((result) => {
+        if (result.success) {
+          return api.changePassword({ body: { newPassword } })
+            .then(() => {
+              form.resetFields();
+              message.success("密码更改成功！");
+            });
+        }
+        else {
+          message.error("原密码错误！");
+        }
       })
       .finally(() => {
         setLoading(false);
-      })
-    ;
+      });
   };
 
   return (
@@ -55,6 +61,7 @@ export const ChangePasswordForm: React.FC = () => {
           rules={[{ required: true }]}
           label="原密码"
           name="oldPassword"
+
         >
           <Input.Password />
         </Form.Item>

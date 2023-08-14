@@ -1,5 +1,17 @@
 # @scow/config
 
+## 0.4.0
+
+### Minor Changes
+
+- 5b7f0e88f: 重构 scow，对接调度器适配器接口
+- 5c3c63657: 集群配置文件增加登录节点桌面功能配置，TurboVNC 的安装路径配置，实现集群单独配置。
+
+### Patch Changes
+
+- 62083044e: 增加交互式应用配置文件中 logoPath 参数，实现用户自定义配置应用图标功能
+- e97eb22fd: 集群配置登录节点新增节点展示名
+
 ## 0.3.1
 
 ### Patch Changes

@@ -1,5 +1,15 @@
 # @scow/demo-vagrant
 
+## 1.2.0
+
+### Minor Changes
+
+- 5b7f0e88f: 重构 scow，对接调度器适配器接口
+
+### Patch Changes
+
+- e97eb22fd: 集群配置登录节点新增节点展示名
+
 ## 1.1.1
 
 ### Patch Changes

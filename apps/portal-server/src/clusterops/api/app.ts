@@ -14,6 +14,7 @@ import { Logger } from "ts-log";
 
 export interface CreateAppRequest {
   appId: string;
+  appJobName: string;
   userId: string;
   account: string;
   partition?: string;
@@ -23,17 +24,14 @@ export interface CreateAppRequest {
   maxTime: number;
   customAttributes: { [key: string]: string };
   proxyBasePath: string;
+  nodeCount: number;
+  gpuCount?: number;
+  memory?: string;
 }
 
 export type CreateAppReply = {
-  code: "OK";
   sessionId: string;
   jobId: number;
-} | {
-  code: "SBATCH_FAILED",
-  message: string;
-} | {
-  code: "APP_NOT_FOUND";
 }
 
 export interface GetAppSessionsRequest {
@@ -45,6 +43,7 @@ export interface AppSession {
   jobId: number;
   submitTime: Date;
   appId: string;
+  appName: string | undefined;
   state: string;
   dataPath: string;
   runningTime: string;
@@ -63,6 +62,14 @@ export interface ConnectToAppRequest {
   sessionId: string;
 }
 
+export type ConnectToAppReply = {
+  appId: string;
+  host: string;
+  port: number;
+  password: string;
+  customFormData?: {[key: string]: string};
+};
+
 export interface SubmissionInfo {
   userId: string;
   cluster: string;
@@ -71,7 +78,9 @@ export interface SubmissionInfo {
   account: string;
   partition?: string;
   qos?: string;
+  nodeCount: number;
   coreCount: number;
+  gpuCount?: number;
   maxTime: number;
   submitTime?: string;
   customAttributes: { [key: string]: string };
@@ -85,17 +94,6 @@ export interface GetAppLastSubmissionRequest {
 export type GetAppLastSubmissionReply = {
   lastSubmissionInfo?: SubmissionInfo;
 }
-
-export type ConnectToAppReply =
-  | { code: "NOT_FOUND" } // sessionId is not found
-  | { code: "UNAVAILABLE" } // the app is not available to connect yet
-  | { code: "OK",
-      appId: string;
-      host: string;
-      port: number;
-      password: string;
-      customFormData?: {[key: string]: string};
-};
 
 export interface AppOps {
   createApp(req: CreateAppRequest, logger: Logger): Promise<CreateAppReply>;

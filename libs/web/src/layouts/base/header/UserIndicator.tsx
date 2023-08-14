@@ -11,22 +11,29 @@
  */
 
 import { DownOutlined, UserOutlined } from "@ant-design/icons";
-import { Dropdown } from "antd";
+import { Dropdown, Typography } from "antd";
 import Link from "next/link";
 import React from "react";
-import { ClickableA } from "src/components/ClickableA";
 import { antdBreakpoints } from "src/layouts/base/constants";
 import styled from "styled-components";
 
-import { UserInfo } from "../types";
+import { EXTERNAL_URL_PREFIX } from "../common";
+import { UserInfo, UserLink } from "../types";
 
 interface Props {
   user: UserInfo | undefined;
   logout: (() => void) | undefined;
+  userLinks?: UserLink[];
 }
 
 const Container = styled.div`
   white-space: nowrap;
+`;
+
+const InlineBlockA = styled.a`
+  cursor: pointer;
+  line-height: 45px;
+  display: inline-block;
 `;
 
 const HiddenOnSmallScreen = styled.span`
@@ -36,7 +43,7 @@ const HiddenOnSmallScreen = styled.span`
 `;
 
 export const UserIndicator: React.FC<Props> = ({
-  user, logout,
+  user, logout, userLinks,
 }) => {
 
   return (
@@ -50,17 +57,29 @@ export const UserIndicator: React.FC<Props> = ({
                 ...user.name ? [{ key: "username", disabled: true, label: `用户姓名：${user.name}` }] : [],
                 { key: "userid", disabled: true, label: `用户ID：${user.identityId}` },
                 { key: "profileLink", label: <Link href="/profile">个人信息</Link> },
+                ...userLinks ? userLinks.map((link) => {
+                  return ({
+                    key: link.text,
+                    label: EXTERNAL_URL_PREFIX.some((pref) => link.url.startsWith(pref)) ? <Typography.Link
+                      href={`${link.url}?token=${user.token}`}
+                      target={link.openInNewPage ? "_blank" : "_self"}
+                    >{link.text}</Typography.Link> : <Link
+                      href={`${link.url}?token=${user.token}`}
+                      target={link.openInNewPage ? "_blank" : "_self"}
+                    >{link.text}</Link>,
+                  });
+                }) : [],
                 { key: "logout", onClick: logout, label: "退出登录" },
               ],
             }}
           >
-            <ClickableA>
+            <InlineBlockA>
               <UserOutlined />
               <HiddenOnSmallScreen>
                 {user.name ?? user.identityId}
               </HiddenOnSmallScreen>
               <DownOutlined />
-            </ClickableA>
+            </InlineBlockA>
           </Dropdown>
         ) : (
           <Link href="/api/auth">

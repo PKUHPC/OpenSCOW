@@ -25,9 +25,9 @@ message RunningJob {
   string nodes_or_reason = 8;
   string account = 9;
   string cores = 10;
-  string qos = 11;
-  string submission_time = 12;
-  string nodes_to_be_used = 13;
+  string gpus = 11;
+  string qos = 12;
+  string submission_time = 13;
 
   /**
   days-hours:minutes:seconds.

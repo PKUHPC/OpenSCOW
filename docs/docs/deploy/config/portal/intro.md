@@ -45,8 +45,11 @@ loginDesktop:
     - name: Xfce
       wm: xfce
 
-  # 最多启动多少个桌面节点
+  # 单个登录节点最多启动多少个桌面节点
   maxDesktops: 3
+
+  # 将创建的登录节点桌面信息的保存到什么位置。相对于用户的家目录
+  desktopsDir: scow/desktops
 
 # 是否启用交互式任务功能
 apps: true
@@ -66,6 +69,9 @@ homeText:
   # 从不同域名访问，显示的不同的文本
   hostnameMap: 
     a.com: "a.com's SCOW"
+
+# 提交作业命令框中的提示语，可选配置
+submitJobPromptText: "#此处参数设置的优先级高于页面其它地方，两者冲突时以此处为准"
 
 # 是否启用终端功能
 shell: true
@@ -88,18 +94,24 @@ shell: true
   # 链接名
   # text: ""
 
-  # 链接地址
+  # 链接地址，一级导航链接地址为可选填，二级导航链接地址为必填
   # url: ""
+
+  # 是否打开新的页面，可选填，默认值为false
+  # openInNewPage: true
 
   # 自定义图标地址,可选填
   # iconPath: ""
 
   # 二级导航,可选填
   # children:
-    # 二级导航相关配置，与一级导航相同，但是不允许再设置children
+    # 二级导航相关配置，与一级导航相同，但是url为必填配置，同时不允许再设置children
     # text: ""
     # url: ""
+    # openInNewPage: true
     # iconPath: ""
+
+
 ```
 
 ## 更多配置

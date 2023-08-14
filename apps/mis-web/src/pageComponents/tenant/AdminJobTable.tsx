@@ -11,8 +11,8 @@
  */
 
 import { defaultPresets, formatDateTime } from "@scow/lib-web/build/utils/datetime";
+import { JobInfo } from "@scow/protos/build/common/ended_job";
 import { Money } from "@scow/protos/build/common/money";
-import { JobInfo } from "@scow/protos/build/server/job";
 import { Static } from "@sinclair/typebox";
 import { Button, DatePicker, Divider, Form, Input, InputNumber, Space, Table } from "antd";
 import dayjs from "dayjs";
@@ -26,7 +26,7 @@ import { HistoryJobDrawer } from "src/pageComponents/job/HistoryJobDrawer";
 import { JobPriceChangeModal } from "src/pageComponents/tenant/JobPriceChangeModal";
 import type { GetJobFilter, GetJobInfoSchema } from "src/pages/api/job/jobInfo";
 import type { Cluster } from "src/utils/config";
-import { publicConfig } from "src/utils/config";
+import { getClusterName, publicConfig } from "src/utils/config";
 import { moneyToString, nullableMoneyToString } from "src/utils/money";
 
 interface PageInfo {
@@ -49,10 +49,10 @@ interface Props {
 const filterFormToQuery = (query: FilterForm, rangeSearch: boolean): GetJobFilter => {
   return {
     userId: rangeSearch ? (query.userId || undefined) : undefined,
-    accountName: query.accountName || undefined,
-    jobEndTimeStart: query.jobEndTime[0].toISOString(),
-    jobEndTimeEnd: query.jobEndTime[1].toISOString(),
-    jobId: rangeSearch ? undefined : query.jobId,
+    accountName: rangeSearch ? (query.accountName || undefined) : undefined,
+    jobEndTimeStart: rangeSearch ? (query.jobEndTime[0].toISOString()) : undefined,
+    jobEndTimeEnd: rangeSearch ? (query.jobEndTime[1].toISOString()) : undefined,
+    jobId:  !rangeSearch ? (query.jobId || undefined) : undefined,
     clusters: query.clusters?.map((x) => x.id),
   };
 };
@@ -234,7 +234,7 @@ const JobInfoTable: React.FC<JobInfoTableProps> = ({
         </Space>
       </TableTitle>
       <Table
-        rowKey={(i) => i.idJob}
+        rowKey={(i) => i.cluster + i.biJobIndex + i.idJob}
         dataSource={data?.jobs}
         loading={isLoading}
         pagination={setPageInfo ? {
@@ -250,7 +250,7 @@ const JobInfoTable: React.FC<JobInfoTableProps> = ({
         <Table.Column<JobInfo> dataIndex="idJob" title="集群作业ID" />
         <Table.Column<JobInfo> dataIndex="account" title="账户" />
         <Table.Column<JobInfo> dataIndex="user" title="用户" />
-        <Table.Column<JobInfo> dataIndex="cluster" title="集群名" />
+        <Table.Column<JobInfo> dataIndex="cluster" title="集群名" render={ getClusterName } />
         <Table.Column<JobInfo> dataIndex="partition" title="分区" />
         <Table.Column<JobInfo> dataIndex="qos" title="QOS" />
         <Table.Column<JobInfo> dataIndex="jobName" title="作业名" />

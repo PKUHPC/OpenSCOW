@@ -1,5 +1,40 @@
 # @scow/portal-server
 
+## 0.8.1
+
+## 0.8.0
+
+### Minor Changes
+
+- 5b7f0e88f: 重构 scow，对接调度器适配器接口
+- 5c3c63657: 实现登录节点桌面功能以及 TurboVNC 的安装路径在每个集群中单独配置
+
+### Patch Changes
+
+- 5c764a826: 通过代理网关节点解析主机名连接交互式应用，以及刷新 vnc 密码
+- 4ad46057e: 修改交互式脚本执行 scirpt.sh 和 xstartup 问题，增加#!/bin/bash -l，增加 script.sh 可执行权限
+- e78e56619: 利用 grpc rich-error-model 重构创建交互式应用错误处理，并添加错误信息展示窗口
+- 99e2b08e1: 交互式应用提交作业页面，增加选择 GPU 及节点数的选项
+- 62083044e: 实现各交互式应用在每个集群中单独配置，增加创建集群应用页面，增加创建时填写应用名和按应用名搜索已创建应用功能
+- f4c64b51e: 修复多集群登录节点时，查看桌面信息里缺失对旧配置的兼容问题
+- e97eb22fd: 集群配置登录节点新增节点展示名
+- 7a9973aa0: 修改 HTTP API 定义方式，去除生成 api-routes-schemas.json 步骤
+- 6853606f8: 门户系统 shell 和桌面功能允许用户选择登录节点
+- Updated dependencies [5b7f0e88f]
+- Updated dependencies [62083044e]
+- Updated dependencies [7d47155d9]
+- Updated dependencies [5c3c63657]
+- Updated dependencies [e97eb22fd]
+- Updated dependencies [ca6205f4e]
+  - @scow/scheduler-adapter-protos@0.2.0
+  - @scow/lib-scheduler-adapter@0.2.0
+  - @scow/protos@0.3.0
+  - @scow/config@0.4.0
+  - @scow/lib-ssh@0.4.0
+  - @scow/rich-error-model@1.0.1
+  - @scow/lib-server@0.2.0
+  - @scow/lib-slurm@0.1.6
+
 ## 0.7.0
 
 ### Patch Changes
