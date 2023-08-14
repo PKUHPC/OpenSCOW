@@ -22,6 +22,7 @@ import { handlegRPCError } from "src/utils/server";
 export const SelectOption = Type.Object({
   value: Type.String(),
   label: Type.String(),
+  requireGpu: Type.Optional(Type.Boolean()),
 });
 export type SelectOption = Static<typeof SelectOption>;
 

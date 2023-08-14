@@ -141,14 +141,41 @@ export const chargingServiceServer = plugin((server) => {
 
       return [{ types: result.map((x) => x.type) }];
     },
-
+    /**
+     * 
+     * case tenant:返回这个租户（tenantName）的充值记录
+     * case allTenants: 返回该所有租户充值记录
+     * case accountOfTenant: 返回该这个租户（tenantName）下这个账户（accountName）的充值记录
+     * case accountsOfTenant: 返回这个租户（tenantName）下所有账户的充值记录
+     * 
+     * @returns 
+     */
     getPaymentRecords: async ({ request, em }) => {
 
-      const { tenantName, accountName, endTime, startTime } = ensureNotUndefined(request, ["startTime", "endTime"]);
+      const { endTime, startTime, target } = 
+      ensureNotUndefined(request, ["startTime", "endTime", "target"]);
+      let searchParam = {};
+      switch (target?.$case)
+      {
+      case "tenant":
+        searchParam = { tenantName: target[target.$case].tenantName, accountName:undefined };
+        break;
+      case "allTenants":
+        searchParam = { accountName:undefined };
+        break;
+      case "accountOfTenant":
+        searchParam = { tenantName: target[target.$case].tenantName, accountName:target[target.$case].accountName };
+        break;
+      case "accountsOfTenant":
+        searchParam = { tenantName: target[target.$case].tenantName, accountName:{ $ne:null } };
+        break;
+      default:
+        searchParam = {};
+      }
 
       const records = await em.find(PayRecord, {
-        time: { $gte: startTime, $lte: endTime }, accountName,
-        ...tenantName !== undefined ? { tenantName } : {},
+        time: { $gte: startTime, $lte: endTime }, 
+        ...searchParam,
       }, { orderBy: { time: QueryOrder.DESC } });
 
       return [{

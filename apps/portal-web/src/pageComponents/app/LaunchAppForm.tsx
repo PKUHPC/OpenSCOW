@@ -14,7 +14,7 @@ import { App, Button, Col, Form, Input, InputNumber, Row, Select, Spin } from "a
 import { Rule } from "antd/es/form";
 import dayjs from "dayjs";
 import Router from "next/router";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { AccountSelector } from "src/pageComponents/job/AccountSelector";
@@ -182,10 +182,26 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
                     attributesObj[attribute.name] = lastSubmitAttributes[attribute.name];
                     break;
                   case "SELECT":
-                    if (attribute.select!.some((optionItem) =>
-                      optionItem.value === lastSubmitAttributes[attribute.name])) {
-                      attributesObj[attribute.name] = lastSubmitAttributes[attribute.name];
+                    // 区分是否有GPU，防止没有GPU的分区获取到GPU版本的选项
+                    if (!clusterPartitionGpuCount) {
+                      // 筛选选项：若没有配置requireGpu直接使用，配置了requireGpu项使用与否则看改分区有无GPU
+                      const selectOptions = 
+                      attribute.select.filter((x) => !x.requireGpu || (x.requireGpu && clusterPartitionGpuCount));
+                      
+                      if (selectOptions.some((optionItem) =>
+                        optionItem.value === lastSubmitAttributes[attribute.name])) 
+                      {
+                        attributesObj[attribute.name] = lastSubmitAttributes[attribute.name];
+                      }
+                    } 
+                    else {
+                      if (attribute.select!.some((optionItem) =>
+                        optionItem.value === lastSubmitAttributes[attribute.name])) 
+                      {
+                        attributesObj[attribute.name] = lastSubmitAttributes[attribute.name];
+                      }
                     }
+
                     break;
                   default:
                     break;
@@ -218,25 +234,38 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
       form.setFieldValue("coreCount", 1);
     }
     setCurrentPartitionInfo(partitionInfo);
+
   };
-
-  const customFormItems = attributes.map((item, index) => {
-
+  const customFormItems = useMemo(() => attributes.map((item, index) => {
     const rules: Rule[] = item.type === "NUMBER"
       ? [{ type: "integer" }, { required: item.required }]
       : [{ required: item.required }];
 
     const placeholder = item.placeholder ?? "";
+
+    // 筛选选项：若没有配置requireGpu直接使用，配置了requireGpu项使用与否则看改分区有无GPU
+    const selectOptions = item.select.filter((x) => !x.requireGpu || (x.requireGpu && currentPartitionInfo?.gpus));
+    const initialValue = item.type === "SELECT" ? (item.defaultValue ?? selectOptions[0].value) : item.defaultValue;
+    if (item.type === "SELECT") console.log(item.defaultValue, selectOptions[0].value);
     const inputItem = item.type === "NUMBER" ? (<InputNumber placeholder={placeholder} />)
       : item.type === "TEXT" ? (<Input placeholder={placeholder} />)
         : (
           <Select
-            options={item.select.map((x) => ({ label: x.label, value: x.value }))}
+            options={selectOptions.map((x) => ({ label: x.label, value: x.value }))}
             placeholder={placeholder}
           />
         );
-    const initialValue = item.type === "SELECT" ? (item.defaultValue ?? item.select[0].value) : item.defaultValue;
+    
+    // 判断是否配置了requireGpu选项
+    if (item.type === "SELECT" && item.select.find((i) => i.requireGpu !== undefined)) {
+      const preValue = form.getFieldValue(item.name);
 
+      if (preValue) {
+        // 切换分区后看之前的版本是否还存在，若不存在，则选择版本的select的值置空
+        const optionsContained = selectOptions.find((i) => i.value === preValue);
+        if (!optionsContained) form.setFieldValue(item.name, null);
+      }
+    }
     return (
       <Form.Item
         key={`${item.name}+${index}`}
@@ -248,7 +277,7 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
         {inputItem}
       </Form.Item>
     );
-  });
+  }), [attributes, currentPartitionInfo]);
 
   const nodeCount = Form.useWatch("nodeCount", form) as number;
 

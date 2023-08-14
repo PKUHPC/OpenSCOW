@@ -14,9 +14,9 @@ import {
   AccountBookOutlined, BookOutlined, CloudServerOutlined,
   DashboardOutlined,
   InfoOutlined, LinkOutlined, LockOutlined, MoneyCollectOutlined, PartitionOutlined,
-  PlusOutlined, PlusSquareOutlined, StarOutlined, ToolOutlined, UserAddOutlined,
-  UserOutlined,
-} from "@ant-design/icons";
+  PlusOutlined, PlusSquareOutlined, ProfileOutlined,
+  StarOutlined, ToolOutlined, UserAddOutlined,
+  UserOutlined } from "@ant-design/icons";
 import { NavItemProps } from "@scow/lib-web/build/layouts/base/types";
 import { NavIcon } from "@scow/lib-web/build/layouts/icon";
 import { AccountAffiliation } from "@scow/protos/build/server/user";
@@ -227,6 +227,11 @@ export const tenantRoutes: (tenantRoles: TenantRole[], token: string) => NavItem
                 Icon: PlusSquareOutlined,
                 text: "账户充值",
                 path: "/tenant/finance/payAccount",
+              },
+              {
+                Icon: ProfileOutlined,
+                text: "账户充值记录",
+                path: "/tenant/finance/accountPayments",
               },
               {
                 Icon: BookOutlined,

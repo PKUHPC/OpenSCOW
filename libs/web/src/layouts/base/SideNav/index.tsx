@@ -87,7 +87,7 @@ export const SideNav: React.FC<Props> = ({
   const [openKeys, setOpenKeys] = useState(parentKeys);
   const menuFocusedRef = useRef(false);
 
-  useDidUpdateEffect(() => {
+  useEffect(() => {
     /**
      * 点击菜单，收起其他展开的所有菜单，保持菜单聚焦简洁。
      * 仅在账户管理页面有效，且用户管理的账户数量超过三个
@@ -120,6 +120,13 @@ export const SideNav: React.FC<Props> = ({
   }, [openKeys, parentKeys]); 
 
   const selectedKeys = useMemo(() => calcSelectedKeys(routes, pathname), [routes, pathname]);
+  
+  // 账户管理页面，联动横向菜单栏展开相应的侧面菜单栏
+  useEffect(() => {
+    if (menuFocusedRef.current) {
+      setOpenKeys([selectedKeys[1]]);
+    }
+  }, [selectedKeys]);
 
   useEffect(() => {
     if (window.innerWidth <= antdBreakpoints[breakpoint]) {

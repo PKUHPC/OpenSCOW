@@ -21,7 +21,7 @@
     "nookies": "2.5.2"
   },
   "peerDependencies": {
-    "antd": "5.8.2",
+    "antd": "5.8.3",
     "next": "13.4.10",
     "styled-components": "6.0.7",
     "@ant-design/icons": "5.2.5",
@@ -32,13 +32,13 @@
     "nookies": "2.5.2"
   },
   "devDependencies": {
-    "antd": "5.8.2",
+    "antd": "5.8.3",
     "next": "13.4.10",
     "styled-components": "6.0.7",
     "@grpc/grpc-js": "1.8.21",
     "@types/mime-types": "2.1.1",
     "react": "18.2.0",
-    "@types/react": "18.2.18",
+    "@types/react": "18.2.20",
     "react-dom": "18.2.0",
     "@types/react-dom": "18.2.7",
     "react-is": "18.2.0",
