@@ -517,6 +517,9 @@ importers:
 
   apps/operation-log:
     dependencies:
+      '@ddadaal/tsgrpc-client':
+        specifier: 0.17.6
+        version: 0.17.6(@grpc/grpc-js@1.8.21)
       '@ddadaal/tsgrpc-common':
         specifier: 0.2.4
         version: 0.2.4
