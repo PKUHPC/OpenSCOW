@@ -87,9 +87,9 @@ export const CreateAppsTable: React.FC<Props> = ({ clusterId }) => {
                               display: "flex",
                               alignItems: "center",
                               justifyContent: "center",
+                              objectFit: "contain",
                               width: "150px",
                               height: "150px",
-                              borderRadius: "50%",
                             }}
                             src={join(publicConfig.PUBLIC_PATH, app.logoPath)}
                             onError={() => handleImageError(app.id)}
@@ -100,6 +100,7 @@ export const CreateAppsTable: React.FC<Props> = ({ clusterId }) => {
                               display: "flex",
                               alignItems: "center",
                               justifyContent: "center",
+                              borderRadius: "0",
                             }}
                             size={150}
                             icon={<PictureOutlined />}

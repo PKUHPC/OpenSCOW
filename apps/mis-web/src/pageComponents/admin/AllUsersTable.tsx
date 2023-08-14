@@ -36,7 +36,7 @@ interface PageInfo {
 interface SortInfo {
   sortField?: UsersSortFieldType;
   sortOrder?: SortDirectionType;
-};
+}
 
 interface Props {
   refreshToken: boolean;
