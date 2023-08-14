@@ -19,7 +19,7 @@
     "protobufjs": "7.2.4"
   },
   "devDependencies": {
-    "ts-proto": "1.156.2",
+    "ts-proto": "1.156.3",
     "@ddadaal/tsgrpc-server": "0.19.4",
     "@ddadaal/tsgrpc-common": "0.2.4",
     "@ddadaal/tsgrpc-client": "0.17.6",

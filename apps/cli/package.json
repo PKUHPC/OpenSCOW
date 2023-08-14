@@ -15,7 +15,7 @@
     "pkg": "5.8.1",
     "yargs": "17.7.2",
     "prompts": "2.4.2",
-    "@sinclair/typebox": "0.30.4",
+    "@sinclair/typebox": "0.31.1",
     "js-yaml": "4.1.0",
     "pino": "8.15.0",
     "pino-pretty": "10.2.0",
