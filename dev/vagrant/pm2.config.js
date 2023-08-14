@@ -85,6 +85,7 @@ module.exports = {
         NEXT_PUBLIC_USE_MOCK: 0,
         SERVER_URL: "localhost:5004",
         PORTAL_DEPLOYED: 1,
+        OPERATION_LOG_DEPLOYED: 1,
         PORTAL_URL: "localhost:5001",
         ...SCOW_CONFIG_PATH_ENV,
       },

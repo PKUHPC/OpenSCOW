@@ -48,6 +48,8 @@ const specs = {
   PORTAL_URL: str({ desc: "如果部署了门户系统，门户系统的URL。如果和本系统域名相同，可以只写完整路径。将会覆盖配置文件。空字符串等价于未部署门户系统", default: "" }),
 
   PUBLIC_PATH: str({ desc: "SCOW公共文件的路径，需已包含SCOW的base path", default: "/public/" }),
+
+  OPERATION_LOG_DEPLOYED: bool({ desc: "是否部署了操作日志系统", default: false }),
 };
 
 const mockEnv = process.env.NEXT_PUBLIC_USE_MOCK === "1";
@@ -102,7 +104,7 @@ const buildRuntimeConfig = async (phase, basePath) => {
     DEFAULT_PRIMARY_COLOR,
     SERVER_URL: config.SERVER_URL,
     SCOW_API_AUTH_TOKEN: commonConfig.scowApi?.auth?.token,
-    OPERATION_LOG_CONFIG: commonConfig.scowOperationLog,
+    OPERATION_LOG_CONFIG: OPERATION_LOG_CONFIG ? commonConfig.scowOperationLog : undefined,
   };
 
   /**

@@ -246,6 +246,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
         "PORTAL_DEPLOYED": config.portal ? "true" : "false",
         "AUTH_EXTERNAL_URL": join(BASE_PATH, "/auth"),
         "PUBLIC_PATH": join(BASE_PATH, publicPath),
+        "OPERATION_LOG_DEPLOYED": config.operationLog ? "true" : "false",
       },
       ports: {},
       volumes: {
