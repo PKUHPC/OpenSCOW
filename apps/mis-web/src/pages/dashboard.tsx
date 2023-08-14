@@ -78,7 +78,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ req }) => 
 
   const cookies = parseCookies({ req });
   const locale = cookies.language || "zh_cn";
-  // await loadAppCustomTranslation();
+  await loadAppCustomTranslation();
   const lngProps = await serverSideTranslations(locale ?? "zh_cn");
 
   // Cannot directly call api routes here, so mock is not available directly.
