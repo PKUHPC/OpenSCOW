@@ -93,3 +93,14 @@ describe("sets custom auth environment", () => {
       .toInclude("CUSTOM_AUTH_KEY=CUSTOM_AUTH_VALUE");
   });
 });
+
+
+it("deploy operation-log", async () => {
+  const config = getInstallConfig(configPath);
+  config.operationLog = { dbPassword: "must!chang3this", mysqlImage: "" };
+  config.mis = { basePath: "/mis", dbPassword: "must!chang3this", mysqlImage: "" };
+
+  const composeConfig = createComposeSpec(config);
+
+  expect(composeConfig.services["mis-web"].environment).toContain("OPERATION_LOG_DEPLOYED=true");
+});
