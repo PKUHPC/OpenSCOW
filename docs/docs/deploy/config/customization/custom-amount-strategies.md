@@ -18,8 +18,8 @@ function myStrategy(jobInfo) {
   const otherAsyncRules = false;
   if (jobInfo.timeUsed < 180) {
     return 0;
-  } else if (info.gpu) {
-    return info.gpu;
+  } else if (jobInfo.gpu) {
+    return jobInfo.gpu;
   } else if (otherAsyncRules) {
     return new Promise((resolve) => {
       setTimeout(() => {
@@ -28,7 +28,7 @@ function myStrategy(jobInfo) {
     });
   }
 
-  return info.cpusAlloc;
+  return jobInfo.cpusAlloc;
 }
 
 module.exports = myStrategy;
