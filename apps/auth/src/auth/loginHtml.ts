@@ -10,7 +10,6 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { DEFAULT_PRIMARY_COLOR } from "@scow/config/build/ui";
 import { FastifyReply, FastifyRequest } from "fastify";
 import { join } from "path";
 import { createCaptcha } from "src/auth/captcha";
@@ -42,6 +41,7 @@ export async function serveLoginHtml(
   const hostname = parseHostname(req);
   const enableCaptcha = authConfig.captcha.enabled;
   const enableTotp = authConfig.otp?.enabled;
+  const logoPreferDarkParam = authConfig.ui?.logoType === "light" ? "false" : "true";
 
   // 显示绑定otp按钮：otp.enabled为true && (密钥存于ldap时 || (otp.type===remote && 配置了otp.remote.redirectUrl))
   const showBindOtpButton = authConfig.otp?.enabled && (authConfig.otp?.type === OtpStatusOptions.ldap
@@ -53,10 +53,17 @@ export async function serveLoginHtml(
   return rep.status(
     verifyCaptchaFail ? 400 : err ? 401 : 200).view("login.liquid", {
     cssUrl: join(config.BASE_PATH, config.AUTH_BASE_PATH, "/public/assets/tailwind.min.css"),
+    eyeImagePath: join(config.BASE_PATH, config.AUTH_BASE_PATH, "/public/assets/icons/eye.png"),
+    eyeCloseImagePath: join(config.BASE_PATH, config.AUTH_BASE_PATH, "/public/assets/icons/eye-close.png"),
+    backgroundImagePath: join(config.BASE_PATH, config.PUBLIC_PATH,
+      authConfig.ui?.backgroundImagePath ?? "./assets/background.png"),
+    backgroundFallbackColor: authConfig.ui?.backgroundFallbackColor || "#9a0000",
     faviconUrl: join(config.BASE_PATH, FAVICON_URL),
-    logoUrl: join(config.BASE_PATH, LOGO_URL),
-    backgroundColor: uiConfig.primaryColor?.defaultColor ?? DEFAULT_PRIMARY_COLOR,
+    logoUrl: join(config.BASE_PATH, LOGO_URL + logoPreferDarkParam),
     callbackUrl,
+    sloganColor:  authConfig.ui?.slogan.color || "white",
+    sloganTitle:  authConfig.ui?.slogan.title || "",
+    sloganTextArr: authConfig.ui?.slogan.texts || [],
     footerText: (hostname && uiConfig?.footer?.hostnameTextMap?.[hostname]) ?? uiConfig?.footer?.defaultText ?? "",
     err,
     ...captchaInfo,

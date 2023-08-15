@@ -13,6 +13,7 @@
 import type { ClusterConfigSchema } from "@scow/config/build/cluster";
 import type { PortalConfigSchema } from "@scow/config/build/portal";
 import type { UiConfigSchema } from "@scow/config/build/ui";
+import { UserLink } from "@scow/lib-web/build/layouts/base/types";
 import getConfig from "next/config";
 
 export interface ServerRuntimeConfig {
@@ -40,6 +41,8 @@ export interface ServerRuntimeConfig {
 
   DEFAULT_HOME_TITLE: string;
   HOME_TITLES: {[hostname: string]: string };
+
+  SUBMIT_JOB_PROMPT_TEXT?: string;
 
   SUBMIT_JOB_WORKING_DIR: string;
 
@@ -73,6 +76,8 @@ export interface PublicRuntimeConfig {
   PUBLIC_PATH: string;
 
   NAV_LINKS?: NavLink[];
+
+  USER_LINKS?: UserLink[];
 
   VERSION_TAG: string | undefined;
 

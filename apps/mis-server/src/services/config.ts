@@ -27,5 +27,6 @@ export const configServiceServer = plugin((server) => {
 
       return [reply];
     },
+
   });
 });

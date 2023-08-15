@@ -14,6 +14,7 @@ import type { ClusterConfigSchema } from "@scow/config/build/cluster";
 import type { ClusterTextsConfigSchema } from "@scow/config/build/clusterTexts";
 import type { MisConfigSchema } from "@scow/config/build/mis";
 import type { UiConfigSchema } from "@scow/config/build/ui";
+import { UserLink } from "@scow/lib-web/build/layouts/base/types";
 import getConfig from "next/config";
 
 export interface ServerRuntimeConfig {
@@ -54,6 +55,8 @@ export interface PublicRuntimeConfig {
   NAV_LINKS?: NavLink[];
 
   CUSTOM_AMOUNT_STRATEGIES?: CustomAmountStrategy[];
+
+  USER_LINKS?: UserLink[];
 
   VERSION_TAG: string | undefined;
 }

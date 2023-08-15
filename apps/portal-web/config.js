@@ -147,6 +147,7 @@ const buildRuntimeConfig = async (phase, basePath) => {
     HOME_TITLES: portalConfig.homeTitle.hostnameMap,
     SUBMIT_JOB_WORKING_DIR: portalConfig.submitJobDefaultPwd,
     SCOW_API_AUTH_TOKEN: commonConfig.scowApi?.auth?.token,
+    SUBMIT_JOB_PROMPT_TEXT:portalConfig.submitJobPromptText,
   };
 
   // query auth capabilities to set optional auth features
@@ -185,6 +186,8 @@ const buildRuntimeConfig = async (phase, basePath) => {
     PUBLIC_PATH: config.PUBLIC_PATH,
 
     NAV_LINKS: portalConfig.navLinks,
+
+    USER_LINKS: commonConfig.userLinks,
 
     VERSION_TAG: versionTag,
   };

@@ -31,7 +31,7 @@ export const ChangePasswordSchema = typeboxRouteSchema({
 
     400: Type.Object({
       code: Type.Literal("PASSWORD_NOT_VALID"),
-      message: Type.Union([Type.String(), Type.Undefined()]),
+      message: Type.Optional(Type.String()),
     }),
 
     /** 用户未找到 */

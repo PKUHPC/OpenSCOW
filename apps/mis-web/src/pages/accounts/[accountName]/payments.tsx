@@ -17,7 +17,7 @@ import { UserRole } from "src/models/User";
 import {
   checkQueryAccountNameIsAdmin,
   useAccountPagesAccountName } from "src/pageComponents/accounts/checkQueryAccountNameIsAdmin";
-import { PaymentTable } from "src/pageComponents/finance/PaymentTable";
+import { PaymentTable } from "src/pageComponents/common/PaymentTable";
 import { Head } from "src/utils/head";
 
 export const PaymentsPage: NextPage = requireAuth(
@@ -33,9 +33,7 @@ export const PaymentsPage: NextPage = requireAuth(
       <Head title={title} />
       <PageTitle titleText={title} />
       <PaymentTable
-        accountNames={[accountName]}
-        showAccountName={false}
-        showAuditInfo={false}
+        accountName={accountName}
       />
     </div>
   );
