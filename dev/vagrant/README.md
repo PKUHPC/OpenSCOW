@@ -17,7 +17,7 @@ ssh-copy-id root@192.168.88.102
 ssh-copy-id root@192.168.88.103
 ```
 
-3. 打开redis和数据库的端口映射，使得本机可以访问这两个服务
+3. 打开redis和两个数据库的端口映射，使得本机可以访问这三个服务
 
 给vagrant集群的`install.yaml`中增加以下部分，并运行`./cli compose up -d`重启服务。
 
@@ -30,6 +30,10 @@ mis:
 auth:
   portMappings:
     redis: 6379
+
+mis:
+  portMappings:
+    db: 3306
 ```
 
 4. 在仓库根目录下，运行`npx pm2 start dev/vagrant/pm2.config.js`启动各个服务
@@ -42,6 +46,7 @@ auth:
 | http://localhost:5002 | 门户后端                         | gRPC |
 | http://localhost:5003 | 管理前端（无/mis前缀）           | HTTP |
 | http://localhost:5004 | 管理后端                         | gRPC |
+| http://localhost:5005 | 操作日志后端                     | gRPC |
 | http://localhost:3890 | 一个phpLDAPadmin，可用于管理LDAP | HTTP |
 
 使用[pm2](https://pm2.keymetrics.io/)在本地启动多个开发用进程，可直接像`pnpm dev`一样，在本地修改文件后，对应系统自动更新。
