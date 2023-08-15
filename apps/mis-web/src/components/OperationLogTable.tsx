@@ -11,7 +11,6 @@
  */
 
 import { defaultPresets } from "@scow/lib-web/build/utils/datetime";
-import { OperationLog } from "@scow/protos/build/operation-log/operation_log";
 import { Button, DatePicker, Form, Input, Select, Table } from "antd";
 import dayjs from "dayjs";
 import { useCallback, useState } from "react";
@@ -19,6 +18,7 @@ import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import {
+  OperationLog,
   OperationLogQueryType,
   OperationResult,
   OperationResultTexts,
@@ -153,7 +153,10 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
           title="操作行为"
           render={(operationType) => OperationTypeTexts[operationType] }
         />
-        <Table.Column<OperationLog> dataIndex="operationContent" title="操作内容" />
+        <Table.Column<OperationLog>
+          dataIndex="operationDetail"
+          title="操作内容"
+        />
         <Table.Column<OperationLog>
           dataIndex="operationResult"
           title="操作结果"

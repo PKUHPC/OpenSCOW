@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { Static, Type } from "@sinclair/typebox";
 import { ValueOf } from "next/dist/shared/lib/constants";
 
 export const OperationResult = {
@@ -75,6 +76,17 @@ export const OperationType = {
 } as const;
 
 export type OperationType = ValueOf<typeof OperationType>
+
+export const OperationLog = Type.Object({
+  operatorUserId: Type.String(),
+  operatorIp: Type.String(),
+  operationCode: Type.String(),
+  operationType: Type.Enum(OperationType),
+  operationResult: Type.Enum(OperationResult),
+  operationTime: Type.Optional(Type.String()),
+  operationDetail: Type.String(),
+});
+export type OperationLog = Static<typeof OperationLog>;
 
 export enum OperationLogQueryType {
   USER = 0,

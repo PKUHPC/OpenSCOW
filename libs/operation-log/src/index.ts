@@ -43,10 +43,8 @@ export const createOperationLogClient = (
     ? new OperationLogServiceClient(config.url, ChannelCredentials.createInsecure())
     : undefined;
 
-  if (config && client) {
-    logger.info("Operation Log Server configured to %s", config.url);
-  } else {
-    logger.info("Operation Log Server disabled");
+  if (!config || !client) {
+    logger.debug("Operation Log Server disabled");
   }
 
   return {

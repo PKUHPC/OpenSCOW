@@ -1,6 +1,5 @@
 # 操作日志服务url
-url:
-  operation-log:5000
+url: operation-log:5000
 
 # 操作日志数据库的信息
 db:
