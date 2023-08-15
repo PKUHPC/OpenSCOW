@@ -414,6 +414,7 @@ export const mockApi: MockApi<typeof api> = {
     operationType: OperationType.LOGIN,
     operationResult: OperationResult.SUCCESS,
     operationTime: "2020-04-23T23:49:50.000Z",
+    operationDetail:"用户登录",
   }], totalCount: 1 }),
 };
 
