@@ -90,7 +90,7 @@ export async function fetchJobs(
         }
 
         try {
-          const price = tenant ? priceMap.calculatePrice({
+          const price = tenant ? await priceMap.calculatePrice({
             jobId: job.jobId,
             cluster: job.cluster,
             cpusAlloc: job.cpusAlloc!,

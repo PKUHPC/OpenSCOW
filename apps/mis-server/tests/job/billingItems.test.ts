@@ -249,8 +249,8 @@ it("calculates price", async () => {
     accountPrice: { expected: number; actual: number | undefined }
   }[];
 
-  testData.forEach((t) => {
-    const price = priceMap.calculatePrice({
+  testData.forEach(async (t) => {
+    const price = await priceMap.calculatePrice({
       jobId: t.jobId,
       cluster: t.cluster,
       cpusAlloc: t.cpusAlloc,

@@ -15,6 +15,7 @@ import { Popover, Space } from "antd";
 import React from "react";
 import { AmountStrategyAlgorithmDescriptions,
   AmountStrategyDescription, AmountStrategyDescriptions, AmountStrategyText } from "src/models/job";
+import { publicConfig } from "src/utils/config";
 
 
 interface Props {
@@ -23,6 +24,13 @@ interface Props {
   isColTitle?: boolean;
 }
 
+const customAmountStrategiesIdToName = {};
+const customAmountStrategiesIdToDescription = {};
+publicConfig.CUSTOM_AMOUNT_STRATEGIES?.forEach((i) => {
+  customAmountStrategiesIdToName[i.id] = i.name || i.id;
+  customAmountStrategiesIdToDescription[i.id] = i.comment || i.id;
+});
+
 export const AmountStrategyDescriptionsItem: React.FC<Props> = ({
   amount, isColTitle, isColContent,
 }) => {
@@ -30,9 +38,11 @@ export const AmountStrategyDescriptionsItem: React.FC<Props> = ({
   if (isColContent && amount) {
     return (
       <Space>
-        {AmountStrategyDescriptions[amount]}
-        <Popover
-          title={`${AmountStrategyAlgorithmDescriptions[amount]}`}
+        {{ ...AmountStrategyDescriptions, ...customAmountStrategiesIdToName }[amount]}
+        <Popover title={`${{
+          ...AmountStrategyAlgorithmDescriptions,
+          ...customAmountStrategiesIdToDescription,
+        }[amount]}`}
         >
           <QuestionCircleOutlined />
         </Popover>
@@ -48,7 +58,7 @@ export const AmountStrategyDescriptionsItem: React.FC<Props> = ({
           content={(
             <div>
               <p>
-                {Object.entries(AmountStrategyDescriptions)
+                {Object.entries({ ...AmountStrategyDescriptions, ...customAmountStrategiesIdToName })
                   .map((value) => <p key={value[0]}>{`${value[1]}(${value[0]})`}</p>)}
               </p>
               <a href="https://pkuhpc.github.io/SCOW/docs/info/mis/business/billing">{"细节请查阅文档"}</a>

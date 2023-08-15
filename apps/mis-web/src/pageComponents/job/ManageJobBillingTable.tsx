@@ -21,7 +21,7 @@ import { CommonModalProps, ModalLink } from "src/components/ModalLink";
 import { AmountStrategy, AmountStrategyAlgorithmDescriptions,
   AmountStrategyDescription,
   AmountStrategyDescriptions, AmountStrategyText } from "src/models/job";
-import { getClusterName } from "src/utils/config";
+import { getClusterName, publicConfig } from "src/utils/config";
 import { moneyToString } from "src/utils/money";
 
 interface Props {
@@ -47,6 +47,13 @@ export interface BillingItemType {
     amountStrategy: string,
   }
 }
+
+const customAmountStrategiesIdToName = {};
+const customAmountStrategiesIdToDescription = {};
+publicConfig.CUSTOM_AMOUNT_STRATEGIES?.forEach((i) => {
+  customAmountStrategiesIdToName[i.id] = i.name || i.id;
+  customAmountStrategiesIdToDescription[i.id] = i.comment || i.id;
+});
 
 export const ManageJobBillingTable: React.FC<Props> = ({ data, loading, tenant, reload }) => {
 
@@ -220,8 +227,10 @@ const EditPriceModal: React.FC<CommonModalProps & {
         >
           <Select
             options={
-              Object.values(AmountStrategy)
-                .map((x) => ({ label: AmountStrategyDescriptions[x], value: x }))}
+              [...Object.values(AmountStrategy)
+                .map((x) => ({ label: AmountStrategyDescriptions[x], value: x })),
+              ...(publicConfig.CUSTOM_AMOUNT_STRATEGIES || [])?.map((i) => ({ label: i.name || i.id, value: i.id })),
+              ]}
             dropdownMatchSelectWidth={false}
 
           />

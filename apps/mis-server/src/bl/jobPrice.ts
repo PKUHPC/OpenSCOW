@@ -11,17 +11,31 @@
  */
 
 import { Logger } from "@ddadaal/tsgrpc-server";
-// import { ClusterConfigSchema } from "@scow/config/build/cluster";
+import { DEFAULT_CONFIG_BASE_PATH } from "@scow/config/build/constants";
 import { Decimal } from "@scow/lib-decimal";
 import { Partition } from "@scow/scheduler-adapter-protos/build/protos/config";
+import { join } from "path";
 import { JobInfo, PriceMap } from "src/bl/PriceMap";
 import { clusters } from "src/config/clusters";
+import { misConfig } from "src/config/mis";
 import { JobPriceInfo } from "src/entities/JobInfo";
 import { AmountStrategy, JobPriceItem } from "src/entities/JobPriceItem";
 
-// type Partition = ClusterConfigSchema["slurm"]["partitions"][number];
 
 type AmountStrategyFunc = (info: JobInfo, partition: Partition) => Decimal;
+type CustomAmountStrategyFunc = (info: JobInfo) => number;
+
+const customAmountStrategyFuncs: Record<string, CustomAmountStrategyFunc> = {};
+
+if (Array.isArray(misConfig.customAmountStrategies)) {
+  for (const item of misConfig.customAmountStrategies) {
+    // 这里不try catch，如有错误，抛出错误并中止服务
+    customAmountStrategyFuncs[item.id] = require(join(DEFAULT_CONFIG_BASE_PATH, "scripts", item.script));
+    if (typeof customAmountStrategyFuncs[item.id] !== "function") {
+      throw new Error(`Custom strategy with id ${item.id} is not a function`);
+    }
+  }
+}
 
 const amountStrategyFuncs: Record<AmountStrategy, AmountStrategyFunc> = {
   [AmountStrategy.GPU]: (info) => new Decimal(info.gpu),
@@ -53,10 +67,10 @@ const amountStrategyFuncs: Record<AmountStrategy, AmountStrategyFunc> = {
 };
 
 
-export function calculateJobPrice(
+export async function calculateJobPrice(
   partitionsForClusters: Record<string, Partition[]>,
   info: JobInfo, getPriceItem: PriceMap["getPriceItem"],
-  logger: Logger): JobPriceInfo {
+  logger: Logger): Promise<JobPriceInfo> {
 
   logger.trace(`Calculating price for job ${info.jobId} in cluster ${info.cluster}`);
 
@@ -75,16 +89,19 @@ export function calculateJobPrice(
 
   const path = [info.cluster, info.partition, info.qos] as [string, string, string];
 
-  function calculatePrice(priceItem: JobPriceItem, partition: Partition) {
+  async function calculatePrice(priceItem: JobPriceItem, partition: Partition) {
     const time = new Decimal(info.timeUsed).div(3600); // 秒到小时
 
-    const amountFn = amountStrategyFuncs[priceItem.amount];
+    const amountFn = amountStrategyFuncs[priceItem.amount] || customAmountStrategyFuncs[priceItem.amount];
 
-    let amount = amountFn ? amountFn(info, partition) : new Decimal(0);
+    let amount = amountFn ? await amountFn(info, partition) : new Decimal(0);
 
-    if (!amountFn) {
-      logger.warn("Unknown AmountStrategy %s. Count as 0.", priceItem.amount);
+    if (!amountFn || isNaN(amount)) {
+      logger.warn("Unknown AmountStrategy %s. Count as 0. Please checkout your custom strategy", priceItem.amount);
     }
+
+    // 对于自定义收费策略返回的值，需要进行类型转换
+    amount = new Decimal(amount);
 
     amount = amount.multipliedBy(time);
 
@@ -95,8 +112,8 @@ export function calculateJobPrice(
   const accountBase = getPriceItem(path, info.tenant);
   const tenantBase = getPriceItem(path);
 
-  const accountPrice = calculatePrice(accountBase, partitionInfo);
-  const tenantPrice = calculatePrice(tenantBase, partitionInfo);
+  const accountPrice = await calculatePrice(accountBase, partitionInfo);
+  const tenantPrice = await calculatePrice(tenantBase, partitionInfo);
 
   return {
     tenant: { billingItemId: tenantBase.itemId, price: tenantPrice },

@@ -16,8 +16,9 @@ import { MySqlDriver, SqlEntityManager } from "@mikro-orm/mysql";
 import { Partition } from "@scow/scheduler-adapter-protos/build/protos/config";
 import { calculateJobPrice } from "src/bl/jobPrice";
 import { clusters } from "src/config/clusters";
+import { misConfig } from "src/config/mis";
 import { JobPriceInfo } from "src/entities/JobInfo";
-import { JobPriceItem } from "src/entities/JobPriceItem";
+import { AmountStrategy, JobPriceItem } from "src/entities/JobPriceItem";
 import { ClusterPlugin } from "src/plugins/clusters";
 
 export interface JobInfo {
@@ -41,7 +42,7 @@ export interface PriceMap {
   getPriceItem(path: [string, string, string], tenantName?: string): JobPriceItem;
   getPriceMap(tenantName?: string): Record<string, JobPriceItem>;
 
-  calculatePrice(info: JobInfo): JobPriceInfo;
+  calculatePrice(info: JobInfo): Promise<JobPriceInfo>;
 
   getMissingDefaultPriceItems(): string[];
 }
@@ -64,6 +65,8 @@ export async function createPriceMap(
   logger.info("Default Price Map: %o", defaultPrices);
   logger.info("Tenant specific prices %o", tenantSpecificPrices);
 
+  checkCustomAmountStrategy(defaultPrices, tenantSpecificPrices);
+
   const getPriceItem = (path: [string, string, string], tenantName?: string) => {
 
     const [cluster, partition, qos] = path;
@@ -76,7 +79,7 @@ export async function createPriceMap(
     }
 
     const price = defaultPrices[[cluster, partition, qos].join(".")] ||
-        defaultPrices[[cluster, partition].join(".")];
+      defaultPrices[[cluster, partition].join(".")];
 
     if (!price) {
       throw new Error(`Unknown cluster ${cluster} partition ${partition} qos ${qos}`);
@@ -161,3 +164,43 @@ export function getActiveBillingItems(items: JobPriceItem[]) {
   return { defaultPrices, tenantSpecificPrices };
 }
 
+// 检查用户使用的自定义计费id是否还存在配置文件中，对应的js文件是否能正常加载，如果不能，抛出异常并停止服务
+export function checkCustomAmountStrategy(defaultPrices: Record<string, JobPriceItem>,
+  tenantSpecificPrices: Record<string, Record<string, JobPriceItem>>) {
+
+  let activeCustomAmountStrategyNames: string[] = [];
+  const amountStrategies: string[] = Object.values(AmountStrategy);
+
+  // 统计平台使用中的自定义计费项
+  for (const priceItem of Object.values(defaultPrices)) {
+    if (!amountStrategies.includes(priceItem.amount)) {
+      activeCustomAmountStrategyNames.push(priceItem.amount);
+    }
+  }
+
+  // 统计各租户使用中的自定义计费项
+  for (const tenantPricesItem of Object.values(tenantSpecificPrices)) {
+    for (const priceItem of Object.values(tenantPricesItem)) {
+      if (!amountStrategies.includes(priceItem.amount)) {
+        activeCustomAmountStrategyNames.push(priceItem.amount);
+      }
+    }
+  }
+
+  // 无使用中的自定义计费项，直接返回
+  if (!activeCustomAmountStrategyNames.length) {
+    return;
+  }
+
+  activeCustomAmountStrategyNames = Array.from(new Set(activeCustomAmountStrategyNames));
+
+  if (Array.isArray(misConfig.customAmountStrategies)) {
+    const customAmountStrategyNames = misConfig.customAmountStrategies.map((i) => i.id);
+    // 如有任意一个使用中的自定义计费id不在配置中，也将直接抛出错误
+    if (activeCustomAmountStrategyNames.every((i) => customAmountStrategyNames.includes(i))) {
+      return;
+    }
+  }
+
+  throw new Error(`Some custom strategies are not found : ${activeCustomAmountStrategyNames.join()}`);
+}
