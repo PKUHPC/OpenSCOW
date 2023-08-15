@@ -78,6 +78,8 @@
 
 # 操作日志系统相关配置。默认不部署
 # operationLog:
+#   # 操作日志服务url，默认operation-log:5000
+#   # url: operation-log:5000
 #   # mysql数据库的镜像地址。默认为mysql:8
 #   # mysqlImage: "mysql:8"
 #   # 操作日志系统数据库的密码。如果部署操作日志系统，则必须配置

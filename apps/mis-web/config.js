@@ -16,6 +16,7 @@ const { getMisConfig } = require("@scow/config/build/mis");
 const { getCommonConfig } = require("@scow/config/build/common");
 const { getClusterTextsConfig } = require("@scow/config/build/clusterTexts");
 const { DEFAULT_PRIMARY_COLOR, getUiConfig } = require("@scow/config/build/ui");
+const { getOperationLogConfig } = require("@scow/config/build/operationLog");
 const { PHASE_DEVELOPMENT_SERVER, PHASE_PRODUCTION_BUILD, PHASE_PRODUCTION_SERVER } = require("next/constants");
 const { join } = require("path");
 const { getCapabilities } = require("@scow/lib-auth");
@@ -89,6 +90,7 @@ const buildRuntimeConfig = async (phase, basePath) => {
   const misConfig = getMisConfig(configBasePath, console);
 
   const commonConfig = getCommonConfig(configBasePath, console);
+  const operationLogConfig = getOperationLogConfig(configBasePath, console);
 
   const versionTag = readVersionFile()?.tag;
 
@@ -104,7 +106,7 @@ const buildRuntimeConfig = async (phase, basePath) => {
     DEFAULT_PRIMARY_COLOR,
     SERVER_URL: config.SERVER_URL,
     SCOW_API_AUTH_TOKEN: commonConfig.scowApi?.auth?.token,
-    OPERATION_LOG_CONFIG: OPERATION_LOG_CONFIG ? commonConfig.scowOperationLog : undefined,
+    OPERATION_LOG_CONFIG: config.OPERATION_LOG_DEPLOYED ? operationLogConfig : undefined,
   };
 
   /**
@@ -141,6 +143,8 @@ const buildRuntimeConfig = async (phase, basePath) => {
     USER_LINKS: commonConfig.userLinks,
 
     VERSION_TAG: versionTag,
+
+    OPERATION_LOG_DEPLOYED:  config.OPERATION_LOG_DEPLOYED,
   };
 
   if (!building) {

@@ -12,7 +12,7 @@
 
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { ChannelCredentials } from "@grpc/grpc-js";
-import { OperationLogConfigSchema } from "@scow/config/build/common";
+import { OperationLogConfigSchema } from "@scow/config/build/operationLog";
 import {
   CreateOperationLogRequest,
   GetOperationLogsRequest,

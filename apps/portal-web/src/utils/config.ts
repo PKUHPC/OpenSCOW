@@ -11,7 +11,7 @@
  */
 
 import type { ClusterConfigSchema } from "@scow/config/build/cluster";
-import { OperationLogConfigSchema } from "@scow/config/build/common";
+import { OperationLogConfigSchema } from "@scow/config/build/operationLog";
 import type { PortalConfigSchema } from "@scow/config/build/portal";
 import type { UiConfigSchema } from "@scow/config/build/ui";
 import { UserLink } from "@scow/lib-web/build/layouts/base/types";

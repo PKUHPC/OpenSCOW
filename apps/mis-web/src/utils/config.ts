@@ -12,8 +12,8 @@
 
 import type { ClusterConfigSchema } from "@scow/config/build/cluster";
 import type { ClusterTextsConfigSchema } from "@scow/config/build/clusterTexts";
-import { OperationLogConfigSchema } from "@scow/config/build/common";
 import type { MisConfigSchema } from "@scow/config/build/mis";
+import { OperationLogConfigSchema } from "@scow/config/build/operationLog";
 import type { UiConfigSchema } from "@scow/config/build/ui";
 import { UserLink } from "@scow/lib-web/build/layouts/base/types";
 import getConfig from "next/config";
@@ -60,6 +60,8 @@ export interface PublicRuntimeConfig {
   USER_LINKS?: UserLink[];
 
   VERSION_TAG: string | undefined;
+
+  OPERATION_LOG_DEPLOYED: boolean;
 }
 
 export const runtimeConfig: ServerRuntimeConfig = getConfig().serverRuntimeConfig;

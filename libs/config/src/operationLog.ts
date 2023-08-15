@@ -16,6 +16,9 @@ import { DEFAULT_CONFIG_BASE_PATH } from "src/constants";
 
 
 export const OperationLogConfigSchema = Type.Object({
+
+  url: Type.String({ description: "Operation Log的URL, 默认为operation-log:5000", default: "operation-log:5000" }),
+
   db: Type.Object({
     host: Type.String({ description: "数据库地址" }),
     port: Type.Integer({ description: "数据库端口" }),
@@ -24,6 +27,7 @@ export const OperationLogConfigSchema = Type.Object({
     dbName: Type.String({ description: "数据库数据库名" }),
     debug: Type.Boolean({ description: "打开ORM的debug模式", default: false }),
   }),
+
 
 });
 

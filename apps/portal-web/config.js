@@ -24,6 +24,7 @@ const { DEFAULT_PRIMARY_COLOR, getUiConfig } = require("@scow/config/build/ui");
 const { getPortalConfig } = require("@scow/config/build/portal");
 const { getClusterConfigs, getLoginNode, getSortedClusters } = require("@scow/config/build/cluster");
 const { getCommonConfig } = require("@scow/config/build/common");
+const { getOperationLogConfig } = require("@scow/config/build/operationLog");
 
 /**
  * Get auth capabilities
@@ -125,6 +126,7 @@ const buildRuntimeConfig = async (phase, basePath) => {
   const uiConfig = getUiConfig(configPath, console);
   const portalConfig = getPortalConfig(configPath, console);
   const commonConfig = getCommonConfig(configPath, console);
+  const operationLogConfig = getOperationLogConfig(configPath, console);
 
   const versionTag = readVersionFile()?.tag;
 
@@ -148,7 +150,7 @@ const buildRuntimeConfig = async (phase, basePath) => {
     SUBMIT_JOB_WORKING_DIR: portalConfig.submitJobDefaultPwd,
     SCOW_API_AUTH_TOKEN: commonConfig.scowApi?.auth?.token,
     SUBMIT_JOB_PROMPT_TEXT:portalConfig.submitJobPromptText,
-    OPERATION_LOG_CONFIG: commonConfig.scowOperationLog,
+    OPERATION_LOG_CONFIG: operationLogConfig,
   };
 
   // query auth capabilities to set optional auth features
