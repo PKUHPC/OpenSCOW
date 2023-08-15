@@ -17,11 +17,14 @@ import { JobServiceClient } from "@scow/protos/build/server/job";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { AmountStrategy } from "src/models/job";
+import { OperationResult, OperationType } from "src/models/operationLog";
 import { PlatformRole, TenantRole } from "src/models/User";
 import { Money } from "src/models/UserSchemaModel";
+import { callLog } from "src/server/operationLog";
 import { getClient } from "src/utils/client";
+import { DEFAULT_INIT_USER_ID } from "src/utils/constants";
 import { queryIfInitialized } from "src/utils/init";
-import { handlegRPCError } from "src/utils/server";
+import { handlegRPCError, parseIp } from "src/utils/server";
 
 export const AddBillingItemSchema = typeboxRouteSchema({
   method: "POST",
@@ -48,6 +51,15 @@ export const AddBillingItemSchema = typeboxRouteSchema({
 export default /* #__PURE__*/typeboxRoute(AddBillingItemSchema, async (req, res) => {
   const { tenant, amount, itemId, path, price, description } = req.body;
 
+  const logInfo = {
+    operatorUserId: DEFAULT_INIT_USER_ID,
+    operatorIp: parseIp(req) ?? "",
+    operationTypeName: tenant ? OperationType.SET_TENANT_BILLING : OperationType.SET_PLATFORM_BILLING,
+    operationTypePayload:{
+      tenantName: tenant, path, amount, price,
+    },
+  };
+
   if (await queryIfInitialized()) {
     // Platform admin can add to every tenant
     // only tenant admin can add to its own tenant
@@ -57,7 +69,11 @@ export default /* #__PURE__*/typeboxRoute(AddBillingItemSchema, async (req, res)
        || (u.tenant === tenant && u.tenantRoles.includes(TenantRole.TENANT_ADMIN)),
     );
     const info = await auth(req, res);
-    if (!info) { return; }
+    if (info) {
+      logInfo.operatorUserId = info.identityId;
+    } else {
+      return;
+    }
   }
 
   if (!(Object.values(AmountStrategy) as string[]).includes(amount)) {
@@ -69,9 +85,14 @@ export default /* #__PURE__*/typeboxRoute(AddBillingItemSchema, async (req, res)
   return await asyncClientCall(client, "addBillingItem", {
     tenantName: tenant, amountStrategy: amount, itemId, path, description, price,
   })
-    .then(() => ({ 204: null }))
+    .then(() => {
+      callLog(logInfo, OperationResult.SUCCESS);
+      return { 204: null };
+    })
     .catch(handlegRPCError({
       [status.ALREADY_EXISTS]: () => ({ 409: { code: "ITEM_ID_EXISTS" } } as const),
       [status.NOT_FOUND]: () => ({ 404: { code: "TENANT_NOT_FOUND" } } as const),
-    }));
+    },
+    () => callLog(logInfo, OperationResult.FAIL),
+    ));
 });

@@ -16,9 +16,11 @@ import { Status } from "@grpc/grpc-js/build/src/constants";
 import { JobServiceClient } from "@scow/protos/build/server/job";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
+import { OperationResult, OperationType } from "src/models/operationLog";
 import { checkJobAccessible } from "src/server/jobAccessible";
+import { callLog } from "src/server/operationLog";
 import { getClient } from "src/utils/client";
-import { handlegRPCError } from "src/utils/server";
+import { handlegRPCError, parseIp } from "src/utils/server";
 
 export type ChangeMode =
   | "INCREASE"
@@ -63,7 +65,7 @@ export default typeboxRoute(ChangeJobTimeLimitSchema,
 
     // check if the user can change the job time limit
 
-    const jobAccessible = await checkJobAccessible(jobId, cluster, info);
+    const { job, jobAccessible } = await checkJobAccessible(jobId, cluster, info);
 
     if (jobAccessible === "NotAllowed") {
       return { 403: null };
@@ -71,13 +73,26 @@ export default typeboxRoute(ChangeJobTimeLimitSchema,
       return { 404: null };
     }
 
+    const logInfo = {
+      operatorUserId: info.identityId,
+      operatorIp: parseIp(req) ?? "",
+      operationTypeName: OperationType.SET_JOB_TIME_LIMIT,
+      operationTypePayload:{
+        jobId: +jobId, accountName: job.account, delta,
+      },
+    };
     return await asyncClientCall(client, "changeJobTimeLimit", {
       cluster,
       delta,
       jobId,
     })
-      .then(() => ({ 204: null }))
+      .then(() => {
+        callLog(logInfo, OperationResult.SUCCESS);
+        return { 204: null };
+      })
       .catch(handlegRPCError({
         [Status.NOT_FOUND]: () => ({ 404: null }),
-      }));
+      },
+      () => callLog(logInfo, OperationResult.FAIL),
+      ));
   });

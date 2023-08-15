@@ -123,6 +123,14 @@ const getOperationDetail = (operationLog: OperationLogProto) => {
       return `创建租户${logPayload.tenantName}, 租户管理员为: ${logPayload.tenantAdmin}`;
     case OperationType.TENANT_PAY:
       return `为租户${logPayload.tenantName}充值${moneyToString(logPayload.amount)}`;
+    case OperationType.CREATE_USER:
+      return `创建用户${logPayload.userId}`;
+    case OperationType.SET_JOB_TIME_LIMIT:
+      return `${logPayload.delta > 0 ? "增加" : "减少"}作业(ID: ${logPayload.jobId})时限 ${Math.abs(logPayload.delta)} 分钟`;
+    case OperationType.SET_TENANT_BILLING:
+      return `设置租户${logPayload.tenantName}的计费项${logPayload.path}价格为${moneyToString(logPayload.price)}元`;
+    case OperationType.SET_PLATFORM_BILLING:
+      return `设置平台的计费项${logPayload.path}价格为${moneyToString(logPayload.price)}元`;
     default:
       return "-";
     }
