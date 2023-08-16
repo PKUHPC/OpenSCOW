@@ -11,17 +11,18 @@
  */
 
 import { GetServerSideProps, NextPage } from "next";
+import { requireAuth } from "src/auth/requireAuth";
 import { NotFoundPage } from "src/components/errorPages/NotFoundPage";
 import { PageTitle } from "src/components/PageTitle";
 import { DesktopTable } from "src/pageComponents/desktop/DesktopTable";
 import { Cluster, getLoginDesktopEnabled, publicConfig, runtimeConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
-
 type Props = {
   loginDesktopEnabledClusters: Cluster[];
 };
 
-export const DesktopIndexPage: NextPage<Props> = (props: Props) => {
+export const DesktopIndexPage: NextPage<Props> = requireAuth(() => true)
+((props: Props) => {
 
   if (!publicConfig.ENABLE_LOGIN_DESKTOP) {
     return <NotFoundPage />;
@@ -34,7 +35,7 @@ export const DesktopIndexPage: NextPage<Props> = (props: Props) => {
       <DesktopTable loginDesktopEnabledClusters={props.loginDesktopEnabledClusters} />
     </div>
   );
-};
+});
 
 
 export const getServerSideProps: GetServerSideProps<Props> = async () => {
