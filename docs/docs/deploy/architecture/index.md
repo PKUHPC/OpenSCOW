@@ -7,15 +7,5 @@ sidebar_position: 2
 
 ![架构](./architecture.png)
 
-本系统大部分组件可部署在超算集群之外。下文称部署这些组件的节点为**服务节点**。
+SCOW由多个容器模块组成，包括gateway、auth、audit等基本模块，作为门户系统的novnc-client、portal-web、portal-server模块，作为管理系统的mis-web、mis-server模块，执行SCOW与计算集群交互的App Proxy、Adapter模块，以及作为部署工具的cli模块。
 
-图中白色的组件为通用组件，必须部署。蓝色部分为门户系统的组成部分，红色部分为管理系统的组成部分，可根据需要部署。
-
-| 组件          | 作用                                 |
-| ------------- | ------------------------------------ |
-| gateway       | 系统的总网关，是用户访问本系统的入口 |
-| auth          | 认证系统，与外界认证系统对接         |
-| mis-web       | 管理系统的前端项目                   |
-| mis-server    | 管理系统的服务端                     |
-| portal-web    | 门户部分的前端项目                   |
-| portal-server | 门户部分的服务端                     |
