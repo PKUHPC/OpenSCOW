@@ -18,20 +18,6 @@ import { authConfig, OtpStatusOptions } from "src/config/auth";
 import { config, FAVICON_URL, LOGO_URL } from "src/config/env";
 import { uiConfig } from "src/config/ui";
 
-function parseHostname(req: FastifyRequest): string | undefined {
-
-  if (!req.headers.referer) {
-    return undefined;
-  }
-
-  try {
-    const url = new URL(req.headers.referer);
-    return url.hostname;
-  } catch {
-    return undefined;
-  }
-}
-
 
 export async function serveLoginHtml(
   err: boolean, callbackUrl: string, req: FastifyRequest, rep: FastifyReply,
@@ -41,7 +27,7 @@ export async function serveLoginHtml(
 
   const enableCaptcha = authConfig.captcha.enabled;
   const enableTotp = authConfig.otp?.enabled;
-  const logoPreferDarkParam = authConfig.ui?.logo.type === "light" ? "false" : "true";
+  const logoPreferDarkParam = authConfig.ui?.logo.scowLogoType === "light" ? "false" : "true";
 
   // 显示绑定otp按钮：otp.enabled为true && (密钥存于ldap时 || (otp.type===remote && 配置了otp.remote.redirectUrl))
   const showBindOtpButton = authConfig.otp?.enabled && (authConfig.otp?.type === OtpStatusOptions.ldap
@@ -62,10 +48,10 @@ export async function serveLoginHtml(
     logoUrl: authConfig.ui?.logo.customLogoPath === "" ?
       join(config.BASE_PATH, LOGO_URL + logoPreferDarkParam) : authConfig.ui?.logo.customLogoPath,
     logoLink: authConfig.ui?.logo.customLogoLink === "" ?
-      "javascript:void(0);": authConfig.ui?.logo.customLogoLink,
+      "javascript:void(0);" : authConfig.ui?.logo.customLogoLink,
     callbackUrl,
-    sloganColor:  authConfig.ui?.slogan.color || "white",
-    sloganTitle:  authConfig.ui?.slogan.title || "",
+    sloganColor: authConfig.ui?.slogan.color || "white",
+    sloganTitle: authConfig.ui?.slogan.title || "",
     sloganTextArr: authConfig.ui?.slogan.texts || [],
     footerTextColor: authConfig.ui?.footerTextColor || "white",
     themeColor: uiConfig.primaryColor?.defaultColor ?? DEFAULT_PRIMARY_COLOR,

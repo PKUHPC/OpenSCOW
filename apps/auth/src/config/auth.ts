@@ -155,7 +155,7 @@ export const UiConfigSchema = Type.Object({
   backgroundImagePath: Type.String({ description: "默认背景图片", default: "./assets/background.png" }),
   backgroundFallbackColor: Type.String({ description: "默认背景颜色", default: "#9a0000" }),
   logo: Type.Object({
-    type: Type.String({ description: "默认图标类型", default: "dark" }),
+    scowLogoType: Type.String({ description: "默认图标类型", default: "dark" }),
     customLogoPath: Type.String({ description: "用户自定义 logo 图片", default: "" }),
     customLogoLink: Type.String({ description: "用户自定义点击 logo 跳转链接", default: "" }),
   }),
