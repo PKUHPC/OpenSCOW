@@ -40,12 +40,16 @@ export class OperationLog {
     metaData?: { [key: string]: any; };
 
   constructor(init: {
+      operationLogId?: number;
       operatorUserId: string;
       operatorIp: string;
       operationTime?: Date;
       operationResult: OperationResult;
       metaData: { [key: string]: any };
     }) {
+    if (init.operationLogId) {
+      this.id = init.operationLogId;
+    }
     this.operatorUserId = init.operatorUserId;
     this.operatorIp = init.operatorIp;
     if (init.operationTime) {

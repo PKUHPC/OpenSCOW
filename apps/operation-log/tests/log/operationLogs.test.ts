@@ -65,6 +65,7 @@ it("create operation log", async () => {
 it("get operation logs", async () => {
 
   const operationLog1 = new OperationLog({
+    operationLogId: 1,
     operatorUserId: operationLog.operatorUserId,
     operatorIp: operationLog.operatorIp,
     operationResult: operationLog.operationResult,
@@ -73,6 +74,7 @@ it("get operation logs", async () => {
   });
 
   const operationLog2 = new OperationLog({
+    operationLogId: 2,
     operatorUserId: operationLog.operatorUserId,
     operatorIp: operationLog.operatorIp,
     operationResult: operationLog.operationResult,
@@ -96,6 +98,7 @@ it("get operation logs", async () => {
 
   expect(resp.results).toIncludeSameMembers([
     {
+      operationLogId: 1,
       operatorUserId: operationLog.operatorUserId,
       operatorIp: operationLog.operatorIp,
       operationResult: operationResultFromJSON(operationLog.operationResult),
@@ -103,6 +106,7 @@ it("get operation logs", async () => {
       operationEvent: operationLog.operationEvent,
     },
     {
+      operationLogId: 2,
       operatorUserId: operationLog.operatorUserId,
       operatorIp: operationLog.operatorIp,
       operationResult:  operationResultFromJSON(operationLog.operationResult),
