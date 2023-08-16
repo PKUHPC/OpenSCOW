@@ -13,7 +13,7 @@
 import React from "react";
 import { useStore } from "simstate";
 import { ForbiddenPage } from "src/components/errorPages/ForbiddenPage";
-import { NotAuthorizedPage } from "src/components/errorPages/NotAuthorizedPage";
+import { Redirect } from "src/components/Redirect";
 import type { UserInfo } from "src/models/User";
 import { User, UserStore } from "src/stores/UserStore";
 
@@ -35,7 +35,7 @@ export const requireAuth = (
     const userStore = useStore(UserStore);
 
     if (!userStore.user) {
-      return <NotAuthorizedPage />;
+      return <Redirect url="/api/auth" />;
     }
 
     if (!check(userStore.user)) {
