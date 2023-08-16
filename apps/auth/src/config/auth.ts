@@ -154,12 +154,17 @@ export const OtpLdapSchema = Type.Object({
 export const UiConfigSchema = Type.Object({
   backgroundImagePath: Type.String({ description: "默认背景图片", default: "./assets/background.png" }),
   backgroundFallbackColor: Type.String({ description: "默认背景颜色", default: "#9a0000" }),
-  logoType: Type.String({ description: "默认图标类型", default: "dark" }),
+  logo: Type.Object({
+    type: Type.String({ description: "默认图标类型", default: "dark" }),
+    customLogoPath: Type.String({ description: "用户自定义 logo 图片", default: "" }),
+    customLogoLink: Type.String({ description: "用户自定义点击 logo 跳转链接", default: "" }),
+  }),
   slogan: Type.Object({
     color: Type.String({ description: "默认标语文字颜色", default: "white" }),
     title: Type.String({ description: "默认标语标题", default: "" }),
     texts: Type.Array(Type.String(), { description: "默认 slogan 正文数组", default: []}),
   }, { default: {} }),
+  footerTextColor: Type.String({ description: "默认 footer 文字颜色", default: "white" }),
 });
 
 export const OtpConfigSchema = Type.Object({

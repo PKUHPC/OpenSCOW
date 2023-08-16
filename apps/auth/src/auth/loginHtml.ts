@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { DEFAULT_PRIMARY_COLOR } from "@scow/config/build/ui";
 import { FastifyReply, FastifyRequest } from "fastify";
 import { join } from "path";
 import { createCaptcha } from "src/auth/captcha";
@@ -38,10 +39,9 @@ export async function serveLoginHtml(
   verifyOtpFail?: boolean,
 ) {
 
-  const hostname = parseHostname(req);
   const enableCaptcha = authConfig.captcha.enabled;
   const enableTotp = authConfig.otp?.enabled;
-  const logoPreferDarkParam = authConfig.ui?.logoType === "light" ? "false" : "true";
+  const logoPreferDarkParam = authConfig.ui?.logo.type === "light" ? "false" : "true";
 
   // 显示绑定otp按钮：otp.enabled为true && (密钥存于ldap时 || (otp.type===remote && 配置了otp.remote.redirectUrl))
   const showBindOtpButton = authConfig.otp?.enabled && (authConfig.otp?.type === OtpStatusOptions.ldap
@@ -57,14 +57,18 @@ export async function serveLoginHtml(
     eyeCloseImagePath: join(config.BASE_PATH, config.AUTH_BASE_PATH, "/public/assets/icons/eye-close.png"),
     backgroundImagePath: join(config.BASE_PATH, config.PUBLIC_PATH,
       authConfig.ui?.backgroundImagePath ?? "./assets/background.png"),
-    backgroundFallbackColor: authConfig.ui?.backgroundFallbackColor || "#9a0000",
+    backgroundFallbackColor: authConfig.ui?.backgroundFallbackColor || "#8c8c8c",
     faviconUrl: join(config.BASE_PATH, FAVICON_URL),
-    logoUrl: join(config.BASE_PATH, LOGO_URL + logoPreferDarkParam),
+    logoUrl: authConfig.ui?.logo.customLogoPath === "" ?
+      join(config.BASE_PATH, LOGO_URL + logoPreferDarkParam) : authConfig.ui?.logo.customLogoPath,
+    logoLink: authConfig.ui?.logo.customLogoLink === "" ?
+      "javascript:void(0);": authConfig.ui?.logo.customLogoLink,
     callbackUrl,
     sloganColor:  authConfig.ui?.slogan.color || "white",
     sloganTitle:  authConfig.ui?.slogan.title || "",
     sloganTextArr: authConfig.ui?.slogan.texts || [],
-    footerText: (hostname && uiConfig?.footer?.hostnameTextMap?.[hostname]) ?? uiConfig?.footer?.defaultText ?? "",
+    footerTextColor: authConfig.ui?.footerTextColor || "white",
+    themeColor: uiConfig.primaryColor?.defaultColor ?? DEFAULT_PRIMARY_COLOR,
     err,
     ...captchaInfo,
     verifyCaptchaFail,

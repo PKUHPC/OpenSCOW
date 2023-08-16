@@ -7,11 +7,6 @@
   <link rel="icon" type="image/x-icon" href="{{ faviconUrl }}"></link>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    html {
-        min-width: max-content;
-        overflow-x: auto;
-        overflow-y: hidden;
-    }
     body {
       background-image: url("{{ backgroundImagePath }}");
       background-repeat: no-repeat;
@@ -19,17 +14,23 @@
       background-size: cover;
     }
     .button-primary {
-        background-color: #9a0000;
+        background-color: {{ themeColor }};
+    }
     svg {
       height: 100%;
       width: 100%;
+    }
+    @media screen and (max-width: 1200px) {
+      .hidden-xs{
+          display: none;
+      }
     }
   </style>
 </head>
 
 <body style="font-family:Roboto">
     <div class="fixed top-6 left-24">
-      <a href="https://icode.pku.edu.cn/SCOW/">
+      <a href="{{ logoLink }}">
         <img class="w-40" src="{{ logoUrl }}" alt="logo">
       </a>
     </div>
@@ -117,15 +118,15 @@
           {% endif %}
         </div>
       </div>
-      <div class="w-1/2 h-screen pl-48 pb-28 flex justify-center flex-col">
+      <div class="w-1/2 h-screen pl-48 pb-28 flex justify-center flex-col hidden-xs">
           <div class="text-4xl font-semibold mb-12"  style="color: {{ sloganColor }}">{{ sloganTitle }}</div>
           {% for sloganText in sloganTextArr %}
             <div class="text-2xl mb-8"  style="color: {{ sloganColor }}">{{ sloganText }}</div>
           {% endfor %}
       </div>
     </div>
-    <p class="absolute bottom-0 w-full pl-24 my-4 text-white text-xs">
-      Powered by SCOW
+    <p class="absolute bottom-0 w-full pl-24 my-4 text-white text-xs" style="color: {{ footerTextColor }}">
+      Powered by <a href="https://github.com/PKUHPC/SCOW" target="_blank">SCOW</a>
     </p>
     <script>
       // 图片预加载
