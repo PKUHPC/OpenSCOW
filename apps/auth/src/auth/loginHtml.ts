@@ -46,7 +46,7 @@ export async function serveLoginHtml(
     backgroundFallbackColor: authConfig.ui?.backgroundFallbackColor || "#8c8c8c",
     faviconUrl: join(config.BASE_PATH, FAVICON_URL),
     logoUrl: !!authConfig.ui?.logo.customLogoPath === false ? join(config.BASE_PATH, LOGO_URL + logoPreferDarkParam)
-    : join(config.BASE_PATH, config.AUTH_BASE_PATH, authConfig.ui?.logo.customLogoPath!),
+      : join(config.BASE_PATH, config.AUTH_BASE_PATH, authConfig.ui?.logo.customLogoPath ?? ""),
     logoLink: authConfig.ui?.logo.customLogoLink === "" ?
       "javascript:void(0);" : authConfig.ui?.logo.customLogoLink,
     callbackUrl,
