@@ -130,7 +130,7 @@ export const OperationTypeTexts = {
   [OperationType.UNBLOCK_USER]: "解封用户",
   [OperationType.ACCOUNT_SET_CHARGE_LIMIT]: "账户设置限额",
   [OperationType.ACCOUNT_UNSET_CHARGE_LIMIT]: "账户取消设置限额",
-  [OperationType.SET_TENANT_BILLING]: "修改作业租户计费",
+  [OperationType.SET_TENANT_BILLING]: "设置作业租户计费",
   [OperationType.SET_TENANT_ADMIN]: "设置租户管理员",
   [OperationType.UNSET_TENANT_ADMIN]: "取消租户管理员",
   [OperationType.SET_TENANT_FINANCE]: "设置租户财务人员",
