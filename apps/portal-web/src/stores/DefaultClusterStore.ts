@@ -23,7 +23,8 @@ export function DefaultClusterStore() {
     publicConfig.CLUSTERS[0].id,
   );
 
-  const defaultCluster = publicConfig.CLUSTERS.find((cluster) => cluster.id === clusterId) || {} as Cluster;
+  const defaultCluster = publicConfig.CLUSTERS.find((cluster) => cluster.id === clusterId)
+    || publicConfig.CLUSTERS[0] as Cluster;
 
   const setDefaultCluster = (cluster: Cluster) => {
     setClusterId(cluster.id);
