@@ -155,7 +155,7 @@ ui:
   logo:
     # 如果没有配置自定义 logo, 则使用 type 选择 SCOW Logo
     # light: 亮色模式下的 logo, dark: 黑暗模式下的 logo
-    scowLogoType: "light"
+    scowLogoType: "dark"
     # 自定义 logo, 默认为空
     customLogoPath: ""
     # 自定义点击 logo 跳转地址
