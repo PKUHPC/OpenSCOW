@@ -68,7 +68,6 @@ export const OperationType = {
   PLATFORM_CHANGE_PASSWORD: "platformChangePassword",
   SET_PLATFORM_BILLING: "setPlatformBilling",
   CREATE_TENANT: "createTenant",
-  PLATFORM_SET_TENANT_BILLING: "platformSetTenantBilling",
   TENANT_PAY: "tenantPay",
 } as const;
 

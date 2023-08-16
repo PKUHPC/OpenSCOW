@@ -71,7 +71,6 @@ export const OperationType = {
   PLATFORM_CHANGE_PASSWORD: "platformChangePassword",
   SET_PLATFORM_BILLING: "setPlatformBilling",
   CREATE_TENANT: "createTenant",
-  PLATFORM_SET_TENANT_BILLING: "platformSetTenantBilling",
   TENANT_PAY: "tenantPay",
 } as const;
 
@@ -149,7 +148,6 @@ export const OperationTypeTexts = {
   [OperationType.PLATFORM_CHANGE_PASSWORD]: "平台重置用户密码",
   [OperationType.SET_PLATFORM_BILLING]: "设置平台作业计费",
   [OperationType.CREATE_TENANT]: "创建租户",
-  [OperationType.PLATFORM_SET_TENANT_BILLING]: "平台设置租户计费",
   [OperationType.TENANT_PAY]: "租户充值",
 };
 
@@ -158,9 +156,9 @@ export const OperationCodeMap = {
   [OperationType.LOGOUT]: "000002",
   [OperationType.SUBMIT_JOB]: "010101",
   [OperationType.END_JOB]: "010102",
-  [OperationType.ADD_JOB_TEMPLATE]: "010104",
-  [OperationType.DELETE_JOB_TEMPLATE]: "010105",
-  [OperationType.UPDATE_JOB_TEMPLATE]: "010106",
+  [OperationType.ADD_JOB_TEMPLATE]: "010103",
+  [OperationType.DELETE_JOB_TEMPLATE]: "010104",
+  [OperationType.UPDATE_JOB_TEMPLATE]: "010105",
   [OperationType.SHELL_LOGIN]: "010201",
   [OperationType.CREATE_DESKTOP]: "010301",
   [OperationType.DELETE_DESKTOP]: "010302",
@@ -170,8 +168,8 @@ export const OperationCodeMap = {
   [OperationType.UPLOAD_FILE]: "010503",
   [OperationType.DELETE_FILE]: "010504",
   [OperationType.DELETE_DIRECTORY]: "010505",
-  [OperationType.MOVE_FILE_ITEM]: "010508",
-  [OperationType.COPY_FILE_ITEM]: "010510",
+  [OperationType.MOVE_FILE_ITEM]: "010506",
+  [OperationType.COPY_FILE_ITEM]: "010507",
   [OperationType.SET_JOB_TIME_LIMIT]: "010601",
   [OperationType.CREATE_USER]: "020201",
   [OperationType.ADD_USER_TO_ACCOUNT]: "020202",
@@ -182,7 +180,7 @@ export const OperationCodeMap = {
   [OperationType.UNBLOCK_USER]: "020207",
   [OperationType.ACCOUNT_SET_CHARGE_LIMIT]: "020208",
   [OperationType.ACCOUNT_UNSET_CHARGE_LIMIT]: "020209",
-  [OperationType.SET_TENANT_BILLING]: "030102",
+  [OperationType.SET_TENANT_BILLING]: "030101",
   [OperationType.SET_TENANT_ADMIN]: "030202",
   [OperationType.UNSET_TENANT_ADMIN]: "030203",
   [OperationType.SET_TENANT_FINANCE]: "030204",
@@ -200,8 +198,7 @@ export const OperationCodeMap = {
   [OperationType.PLATFORM_CHANGE_PASSWORD]: "040205",
   [OperationType.SET_PLATFORM_BILLING]: "040206",
   [OperationType.CREATE_TENANT]: "040301",
-  [OperationType.PLATFORM_SET_TENANT_BILLING]: "040302",
-  [OperationType.TENANT_PAY]: "040303",
+  [OperationType.TENANT_PAY]: "040302",
 };
 
 export const getOperationDetail = (operationLog: OperationLogProto) => {
@@ -221,7 +218,7 @@ export const getOperationDetail = (operationLog: OperationLogProto) => {
     case OperationType.SUBMIT_JOB:
       return `在账户${logPayload.accountName}下提交作业(ID: ${logPayload.jobId})`;
     case OperationType.END_JOB:
-      return `结束作业(ID: ${logPayload.jobId}`;
+      return `结束作业(ID: ${logPayload.jobId})`;
     case OperationType.ADD_JOB_TEMPLATE:
       return `保存作业模板(模板名: ${logPayload.jobTemplateId})`;
     case OperationType.DELETE_JOB_TEMPLATE:

@@ -262,15 +262,6 @@ message CreateTenant {
   string tenant_admin = 2;
 }
 
-message PlatformSetTenantBilling {
-  string tenant_name = 1;
-  // 集群_分区_QOS
-  string path = 2;
-  // 计量方式
-  string amount = 3;
-  common.Money price = 4;
-}
-
 message TenantPay {
   string tenant_name = 1;
   common.Money amount = 2;
@@ -328,8 +319,7 @@ message CreateOperationLogRequest {
     PlatformChangePassword platform_change_password = 47;
     SetPlatformBilling set_platform_billing = 48;
     CreateTenant create_tenant = 49;
-    PlatformSetTenantBilling platform_set_tenant_billing = 50;
-    TenantPay tenant_pay = 51;
+    TenantPay tenant_pay = 50;
   }
 }
 
@@ -387,8 +377,7 @@ message OperationLog {
     PlatformChangePassword platform_change_password = 49;
     SetPlatformBilling set_platform_billing = 50;
     CreateTenant create_tenant = 51;
-    PlatformSetTenantBilling platform_set_tenant_billing = 52;
-    TenantPay tenant_pay = 53;
+    TenantPay tenant_pay = 52;
   }
 }
 
