@@ -237,7 +237,7 @@ export const jobServiceServer = plugin((server) => {
           ];
           if (jobIdList.length > 0) {
             const jobInfoList: AdapterJobInfo[] = [];
-            for (const jobId in jobIdList) {
+            for (const jobId of jobIdList) {
               const jobInfo = await asyncClientCall(client.job, "getJobById", { fields, jobId: Number(jobId) });
               if (jobInfo.job) jobInfoList.push(jobInfo.job);
             }

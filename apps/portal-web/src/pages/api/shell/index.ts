@@ -208,7 +208,5 @@ export const setupShellServer = (req: NextApiRequest) => {
 };
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
-  console.log("=====================================");
-  console.log("登录！！！！！");
   res.end();
 };
