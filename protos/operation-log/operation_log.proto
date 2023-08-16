@@ -114,7 +114,7 @@ message CopyFileItem {
 message SetJobTimeLimit {
   string account_name = 1;
   uint32 job_id = 2;
-  uint64 delta = 3;
+  int64 delta = 3;
 }
 
 message CreateUser {
@@ -335,61 +335,61 @@ message CreateOperationLogRequest {
 
 
 message OperationLog {
-  string operator_user_id = 1;
-  string operator_ip = 2;
-  google.protobuf.Timestamp operation_time = 3;
-  OperationResult operation_result = 4;
+  uint64 operation_log_id = 1;
+  string operator_user_id = 2;
+  string operator_ip = 3;
+  google.protobuf.Timestamp operation_time = 4;
+  OperationResult operation_result = 5;
   oneof operation_event {
-    Login login = 5;
-    Logout logout = 6;
-    SubmitJob submit_job = 7;
-    EndJob end_job = 8;
-    AddJobTemplate add_job_template = 9;
-    DeleteJobTemplate delete_job_template = 10;
-    UpdateJobTemplate update_job_template = 11;
-    ShellLogin shell_login = 12;
-    CreateDesktop create_desktop = 13;
-    DeleteDesktop delete_desktop = 14;
-    CreateApp create_app = 15;
-    CreateFile create_file = 16;
-    DeleteFile delete_file = 17;
-    UploadFile upload_file = 18;
-    CreateDirectory create_directory = 19;
-    DeleteDirectory delete_directory = 20;
-    MoveFileItem move_file_item = 21;
-    CopyFileItem copy_file_item = 22;
-    SetJobTimeLimit set_job_time_limit = 23;
-    CreateUser create_user = 24;
-    AddUserToAccount add_user_to_account = 25;
-    RemoveUserFromAccount remove_user_from_account = 26;
-    SetAccountAdmin set_account_admin = 27;
-    UnsetAccountAdmin unset_account_admin = 28;
-    BlockUser block_user = 29;
-    UnblockUser unblock_user = 30;
-    AccountSetChargeLimit account_set_charge_limit = 31;
-    AccountUnsetChargeLimit account_unset_charge_limit = 32;
-    SetTenantBilling set_tenant_billing = 33;
-    SetTenantAdmin set_tenant_admin = 34;
-    UnsetTenantAdmin unset_tenant_admin = 35;
-    SetTenantFinance set_tenant_finance = 36;
-    UnsetTenantFinance unset_tenant_finance = 37;
-    TenantChangePassword tenant_change_password = 38;
-    CreateAccount create_account = 39;
-    AddAccountToWhitelist add_account_to_whitelist = 40;
-    RemoveAccountFromWhitelist remove_account_from_whitelist = 41;
-    AccountPay account_pay = 42;
-    ImportUsers import_users = 43;
-    SetPlatformAdmin set_platform_admin = 44;
-    UnsetPlatformAdmin unset_platform_admin = 45;
-    SetPlatformFinance set_platform_finance = 46;
-    UnsetPlatformFinance unset_platform_finance = 47;
-    PlatformChangePassword platform_change_password = 48;
-    SetPlatformBilling set_platform_billing = 49;
-    CreateTenant create_tenant = 50;
-    PlatformSetTenantBilling platform_set_tenant_billing = 51;
-    TenantPay tenant_pay = 52;
+    Login login = 6;
+    Logout logout = 7;
+    SubmitJob submit_job = 8;
+    EndJob end_job = 9;
+    AddJobTemplate add_job_template = 10;
+    DeleteJobTemplate delete_job_template = 11;
+    UpdateJobTemplate update_job_template = 12;
+    ShellLogin shell_login = 13;
+    CreateDesktop create_desktop = 14;
+    DeleteDesktop delete_desktop = 15;
+    CreateApp create_app = 16;
+    CreateFile create_file = 17;
+    DeleteFile delete_file = 18;
+    UploadFile upload_file = 19;
+    CreateDirectory create_directory = 20;
+    DeleteDirectory delete_directory = 21;
+    MoveFileItem move_file_item = 22;
+    CopyFileItem copy_file_item = 23;
+    SetJobTimeLimit set_job_time_limit = 24;
+    CreateUser create_user = 25;
+    AddUserToAccount add_user_to_account = 26;
+    RemoveUserFromAccount remove_user_from_account = 27;
+    SetAccountAdmin set_account_admin = 28;
+    UnsetAccountAdmin unset_account_admin = 29;
+    BlockUser block_user = 30;
+    UnblockUser unblock_user = 31;
+    AccountSetChargeLimit account_set_charge_limit = 32;
+    AccountUnsetChargeLimit account_unset_charge_limit = 33;
+    SetTenantBilling set_tenant_billing = 34;
+    SetTenantAdmin set_tenant_admin = 35;
+    UnsetTenantAdmin unset_tenant_admin = 36;
+    SetTenantFinance set_tenant_finance = 37;
+    UnsetTenantFinance unset_tenant_finance = 38;
+    TenantChangePassword tenant_change_password = 39;
+    CreateAccount create_account = 40;
+    AddAccountToWhitelist add_account_to_whitelist = 41;
+    RemoveAccountFromWhitelist remove_account_from_whitelist = 42;
+    AccountPay account_pay = 43;
+    ImportUsers import_users = 44;
+    SetPlatformAdmin set_platform_admin = 45;
+    UnsetPlatformAdmin unset_platform_admin = 46;
+    SetPlatformFinance set_platform_finance = 47;
+    UnsetPlatformFinance unset_platform_finance = 48;
+    PlatformChangePassword platform_change_password = 49;
+    SetPlatformBilling set_platform_billing = 50;
+    CreateTenant create_tenant = 51;
+    PlatformSetTenantBilling platform_set_tenant_billing = 52;
+    TenantPay tenant_pay = 53;
   }
-
 }
 
 message CreateOperationLogResponse {

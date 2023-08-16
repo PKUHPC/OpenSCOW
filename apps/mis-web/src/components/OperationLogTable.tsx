@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { defaultPresets } from "@scow/lib-web/build/utils/datetime";
+import { defaultPresets, formatDateTime } from "@scow/lib-web/build/utils/datetime";
 import { Button, DatePicker, Form, Input, Select, Table } from "antd";
 import dayjs from "dayjs";
 import { useCallback, useState } from "react";
@@ -147,6 +147,7 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
           onChange: (page, pageSize) => setPageInfo({ page, pageSize }),
         }}
       >
+        <Table.Column<OperationLog> dataIndex="operationLogId" title="ID" />
         <Table.Column<OperationLog> dataIndex="operationCode" title="操作码" />
         <Table.Column<OperationLog>
           dataIndex="operationType"
@@ -162,7 +163,11 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
           title="操作结果"
           render={(operationResult) => OperationResultTexts[operationResult] }
         />
-        <Table.Column<OperationLog> dataIndex="operationTime" title="操作时间" />
+        <Table.Column<OperationLog>
+          dataIndex="operationTime"
+          title="操作时间"
+          render={formatDateTime} 
+        />
         <Table.Column<OperationLog> dataIndex="operatorUserId" title="操作员" />
         <Table.Column<OperationLog> dataIndex="operatorIp" title="操作IP" />
       </Table>

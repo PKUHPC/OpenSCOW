@@ -49,6 +49,7 @@ export async function filterOperationLogs(
 export function toGrpcOperationLog(x: OperationLogEntity): OperationLog {
 
   const grpcOperationLog = {
+    operationLogId: x.id,
     operatorUserId: x.operatorUserId,
     operatorIp: x.operatorIp,
     operationTime: x.operationTime?.toISOString(),
