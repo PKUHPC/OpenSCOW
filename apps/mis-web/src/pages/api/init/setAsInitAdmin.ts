@@ -17,10 +17,10 @@ import { Type } from "@sinclair/typebox";
 import { getClient } from "src/utils/client";
 import { queryIfInitialized } from "src/utils/init";
 
-export const UnsetInitAdminSchema = typeboxRouteSchema({
-  method: "DELETE",
+export const SetAsInitAdminSchema = typeboxRouteSchema({
+  method: "PATCH",
 
-  query: Type.Object({
+  body: Type.Object({
     userId: Type.String(),
   }),
 
@@ -32,16 +32,16 @@ export const UnsetInitAdminSchema = typeboxRouteSchema({
   },
 });
 
-export default typeboxRoute(UnsetInitAdminSchema, async (req) => {
+export default typeboxRoute(SetAsInitAdminSchema, async (req) => {
   const result = await queryIfInitialized();
 
   if (result) { return { 409: { code: "ALREADY_INITIALIZED" as const } }; }
 
-  const { userId } = req.query;
+  const { userId } = req.body;
 
   const client = getClient(InitServiceClient);
 
-  await asyncClientCall(client, "unsetInitAdmin", {
+  await asyncClientCall(client, "setAsInitAdmin", {
     userId,
   });
 
