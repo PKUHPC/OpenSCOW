@@ -140,6 +140,8 @@ const buildRuntimeConfig = async (phase, basePath) => {
 
     NAV_LINKS: misConfig.navLinks,
 
+    CUSTOM_AMOUNT_STRATEGIES: misConfig.customAmountStrategies,
+
     USER_LINKS: commonConfig.userLinks,
 
     VERSION_TAG: versionTag,

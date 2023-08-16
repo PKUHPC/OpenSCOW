@@ -57,6 +57,8 @@ export interface PublicRuntimeConfig {
 
   NAV_LINKS?: NavLink[];
 
+  CUSTOM_AMOUNT_STRATEGIES?: CustomAmountStrategy[];
+
   USER_LINKS?: UserLink[];
 
   VERSION_TAG: string | undefined;
@@ -76,6 +78,14 @@ export type NavLink = {
   allowedRoles?: string[];
   children?: (Omit<NavLink, "children" | "url"> & { url: string })[];
 }
+
+export type CustomAmountStrategy = {
+  id: string;
+  script: string;
+  name?: string | undefined;
+  comment?: string | undefined;
+}
+
 
 export const getClusterName = (clusterId: string) => {
   return publicConfig.CLUSTERS[clusterId]?.name || clusterId;
