@@ -46,8 +46,8 @@ import type { CompleteInitSchema } from "src/pages/api/init/completeInit";
 import type { CreateInitAdminSchema } from "src/pages/api/init/createInitAdmin";
 import type { InitGetAccountsSchema } from "src/pages/api/init/getAccounts";
 import type { InitGetUsersSchema } from "src/pages/api/init/getUsers";
-import type { UnsetInitAdminSchema } from "src/pages/api/init/setAsInitAdmin";
-import type { SetAsInitAdminSchema } from "src/pages/api/init/setAsInitAdmin copy";
+import type { SetAsInitAdminSchema } from "src/pages/api/init/setAsInitAdmin";
+import type { UnsetInitAdminSchema } from "src/pages/api/init/unsetInitAdmin";
 import type { UserExistsSchema } from "src/pages/api/init/userExists";
 import type { AddBillingItemSchema } from "src/pages/api/job/addBillingItem";
 import type { ChangeJobTimeLimitSchema } from "src/pages/api/job/changeJobTimeLimit";
@@ -60,7 +60,7 @@ import type { QueryJobTimeLimitSchema } from "src/pages/api/job/queryJobTimeLimi
 import type { GetRunningJobsSchema } from "src/pages/api/job/runningJobs";
 import type { ChangeEmailSchema } from "src/pages/api/profile/changeEmail";
 import type { ChangePasswordSchema } from "src/pages/api/profile/changePassword";
-import checkPassword, { CheckPasswordSchema } from "src/pages/api/profile/checkPassword";
+import { CheckPasswordSchema } from "src/pages/api/profile/checkPassword";
 import type { DewhitelistAccountSchema } from "src/pages/api/tenant/accountWhitelist/dewhitelistAccount";
 import type { GetWhitelistedAccountsSchema } from "src/pages/api/tenant/accountWhitelist/getWhitelistedAccounts";
 import type { WhitelistAccountSchema } from "src/pages/api/tenant/accountWhitelist/whitelistAccount";
@@ -116,8 +116,8 @@ export const api = {
   createInitAdmin: apiClient.fromTypeboxRoute<typeof CreateInitAdminSchema>("POST", "/api/init/createInitAdmin"),
   initGetAccounts: apiClient.fromTypeboxRoute<typeof InitGetAccountsSchema>("GET", "/api/init/getAccounts"),
   initGetUsers: apiClient.fromTypeboxRoute<typeof InitGetUsersSchema>("GET", "/api/init/getUsers"),
-  setAsInitAdmin: apiClient.fromTypeboxRoute<typeof SetAsInitAdminSchema>("PATCH", "/api/init/setAsInitAdmin copy"),
-  unsetInitAdmin: apiClient.fromTypeboxRoute<typeof UnsetInitAdminSchema>("DELETE", "/api/init/setAsInitAdmin"),
+  setAsInitAdmin: apiClient.fromTypeboxRoute<typeof SetAsInitAdminSchema>("PATCH", "/api/init/setAsInitAdmin"),
+  unsetInitAdmin: apiClient.fromTypeboxRoute<typeof UnsetInitAdminSchema>("DELETE", "/api/init/unsetInitAdmin"),
   userExists: apiClient.fromTypeboxRoute<typeof UserExistsSchema>("POST", "/api/init/userExists"),
   addBillingItem: apiClient.fromTypeboxRoute<typeof AddBillingItemSchema>("POST", "/api/job/addBillingItem"),
   changeJobTimeLimit: apiClient.fromTypeboxRoute<typeof ChangeJobTimeLimitSchema>("PATCH", "/api/job/changeJobTimeLimit"),
