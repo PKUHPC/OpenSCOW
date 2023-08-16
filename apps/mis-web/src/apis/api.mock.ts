@@ -408,6 +408,7 @@ export const mockApi: MockApi<typeof api> = {
   validateToken: async () => MOCK_USER_INFO,
 
   getOperationLog: async () => ({ results: [{
+    operationLogId: 99,
     operatorUserId: "testUser",
     operatorIp: "localhost",
     operationCode: "000000",
