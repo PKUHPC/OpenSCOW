@@ -11,7 +11,7 @@
  */
 
 import { Entity, Enum, PrimaryKey, Property } from "@mikro-orm/core";
-import { CURRENT_TIMESTAMP } from "src/utils/orm";
+import { CURRENT_TIMESTAMP, DATETIME_TYPE } from "src/utils/orm";
 
 export enum OperationResult {
   UNKNOWN = "UNKNOWN",
@@ -30,7 +30,7 @@ export class OperationLog {
   @Property()
     operatorIp!: string;
 
-  @Property({ defaultRaw: CURRENT_TIMESTAMP })
+  @Property({ columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP })
     operationTime?: Date;
 
   @Enum({ items: () => OperationResult, comment: Object.values(OperationResult).join(", ") })

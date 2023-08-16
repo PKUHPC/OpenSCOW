@@ -32,7 +32,7 @@
         },
         "operation_time": {
           "name": "operation_time",
-          "type": "datetime",
+          "type": "DATETIME(6)",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -43,7 +43,7 @@
         },
         "operation_result": {
           "name": "operation_result",
-          "type": "text",
+          "type": "enum('UNKNOWN', 'SUCCESS', 'FAIL')",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -54,7 +54,7 @@
             "FAIL"
           ],
           "comment": "UNKNOWN, SUCCESS, FAIL",
-          "mappedType": "text"
+          "mappedType": "enum"
         },
         "meta_data": {
           "name": "meta_data",
