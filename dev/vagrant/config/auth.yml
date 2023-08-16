@@ -63,7 +63,7 @@ otp:
 # 在此部分输入LDAP的配置
 ldap:
   # LDAP服务器地址。必填
-  url: ldap://192.168.88.101
+  url: ldap://172.16.20.125
 
   # 进行LDAP操作的用户DN。默认为空
   bindDN: cn=Manager,ou=hpc,o=pku
@@ -150,9 +150,16 @@ ui:
   # 登录界面背景图
   backgroundImagePath: "./assets/background.png"
   # 登录界面背景色，当背景图无法加载时，背景色起效
-  backgroundFallbackColor: "#9a0000"
-  # 登录界面 logo 图, light: 亮色模式下的 logo, dark: 黑暗模式下的 logo
-  logoType: "dark"
+  backgroundFallbackColor: "#8c8c8c"
+  # 登录界面 logo 图,
+  logo:
+    # 如果没有配置自定义 logo, 则使用 type 选择 SCOW Logo
+    # light: 亮色模式下的 logo, dark: 黑暗模式下的 logo
+    scowLogoType: "light"
+    # 自定义 logo, 默认为空
+    customLogoPath: ""
+    # 自定义点击 logo 跳转地址
+    customLogoLink: "https://icode.pku.edu.cn/SCOW/"
 
   # 登录界面 slogan 配置
   slogan:
@@ -167,3 +174,6 @@ ui:
       - "一体化部署，开箱即用"
       - "标准化平台，支持算力融合"
       - "开源中立，独立自主"
+
+  # 登陆界面底部 Power By 字体颜色配置
+  footerTextColor: "white"
