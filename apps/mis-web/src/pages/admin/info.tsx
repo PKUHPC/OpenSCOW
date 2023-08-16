@@ -16,6 +16,7 @@ import { AdminServiceClient } from "@scow/protos/build/server/admin";
 import { Descriptions, Tag } from "antd";
 import { GetServerSideProps, NextPage } from "next";
 import { USE_MOCK } from "src/apis/useMock";
+import { requireAuth } from "src/auth/requireAuth";
 import { ssrAuthenticate, SSRProps } from "src/auth/server";
 import { UnifiedErrorPage } from "src/components/errorPages/UnifiedErrorPage";
 import { PageTitle } from "src/components/PageTitle";
@@ -27,7 +28,9 @@ type Info = GetAdminInfoResponse
 
 type Props = SSRProps<Info, 500>
 
-export const PlatformInfoPage: NextPage<Props> = (props) => {
+export const PlatformInfoPage: NextPage<Props> = 
+requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
+((props: Props) => {
 
   if ("error" in props) {
     return <UnifiedErrorPage code={props.error} />;
@@ -71,7 +74,7 @@ export const PlatformInfoPage: NextPage<Props> = (props) => {
       </Descriptions>
     </div>
   );
-};
+});
 
 export const getServerSideProps: GetServerSideProps<Props> = async (ctx) => {
   const auth = ssrAuthenticate(

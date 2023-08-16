@@ -18,6 +18,7 @@ import { TenantServiceClient } from "@scow/protos/build/server/tenant";
 import { Descriptions, Tag } from "antd";
 import { GetServerSideProps, NextPage } from "next";
 import { USE_MOCK } from "src/apis/useMock";
+import { requireAuth } from "src/auth/requireAuth";
 import { ssrAuthenticate, SSRProps } from "src/auth/server";
 import { UnifiedErrorPage } from "src/components/errorPages/UnifiedErrorPage";
 import { PageTitle } from "src/components/PageTitle";
@@ -31,7 +32,8 @@ type Info = GetTenantInfoResponse & { tenantName: string };
 
 type Props = SSRProps<Info, 404>
 
-export const TenantInfoPage: NextPage<Props> = (props) => {
+export const TenantInfoPage: NextPage<Props> = requireAuth((u) => u.tenantRoles.includes(TenantRole.TENANT_ADMIN))
+((props: Props) => {
 
   if ("error" in props) {
     return <UnifiedErrorPage code={props.error} />;
@@ -78,7 +80,7 @@ export const TenantInfoPage: NextPage<Props> = (props) => {
       </Descriptions>
     </div>
   );
-};
+});
 
 export const getServerSideProps: GetServerSideProps<Props> = async (ctx) => {
 
