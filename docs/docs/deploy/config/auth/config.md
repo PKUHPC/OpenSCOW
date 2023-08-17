@@ -22,10 +22,11 @@ ui:
   backgroundFallbackColor: "#8c8c8c"
   # 登录界面 logo，可选配置
   logo:
-    # 没有自定义 logo 时，默认使用 SCOW Logo。light: 亮色模式下的 logo, dark: 黑暗模式下的 logo
+    # 未配置自定义 logo（customLogoPath） 时，默认使用 SCOW Logo
+    # light: 亮色模式下的 logo, dark: 黑暗模式下的 logo
     # 可选配置，默认为黑暗模式 logo
     scowLogoType: "dark"
-    # 可选配置，自定义 logo 的路径。与背景图一致，路径时相对于公共文件的路径
+    # 可选配置，自定义 logo 的图片路径。与背景图一致，路径时相对于公共文件的路径
     customLogoPath: ""
     # 可选配置，自定义点击 logo 跳转地址
     customLogoLink: "https://icode.pku.edu.cn/SCOW/"

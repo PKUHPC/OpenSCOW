@@ -26,6 +26,11 @@ export enum OtpStatusOptions {
   "remote" = "remote",
 }
 
+export enum scowLogo {
+  "dark" = "dark",
+  "light" = "light",
+}
+
 export const LdapConfigSchema = Type.Object({
   url: Type.String({ description: "LDAP地址" }),
   searchBase: Type.String({ description: "从哪个节点搜索登录用户对应的LDAP节点" }),
@@ -155,7 +160,7 @@ export const UiConfigSchema = Type.Object({
   backgroundImagePath: Type.String({ description: "默认背景图片", default: "./assets/background.png" }),
   backgroundFallbackColor: Type.String({ description: "默认背景颜色", default: "#9a0000" }),
   logo: Type.Object({
-    scowLogoType: Type.String({ description: "默认图标类型", default: "dark" }),
+    scowLogoType: Type.Enum(scowLogo, { description: "scow logo 类型", default: scowLogo.dark }),
     customLogoPath: Type.Optional(Type.String({ description: "用户自定义 logo 图片" })),
     customLogoLink: Type.Optional(Type.String({ description: "用户自定义点击 logo 跳转链接" })),
   }, { default: {} }),

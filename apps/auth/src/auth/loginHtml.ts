@@ -14,7 +14,7 @@ import { DEFAULT_PRIMARY_COLOR } from "@scow/config/build/ui";
 import { FastifyReply, FastifyRequest } from "fastify";
 import { join } from "path";
 import { createCaptcha } from "src/auth/captcha";
-import { authConfig, OtpStatusOptions } from "src/config/auth";
+import { authConfig, OtpStatusOptions, scowLogo } from "src/config/auth";
 import { config, FAVICON_URL, LOGO_URL } from "src/config/env";
 import { uiConfig } from "src/config/ui";
 
@@ -27,7 +27,7 @@ export async function serveLoginHtml(
 
   const enableCaptcha = authConfig.captcha.enabled;
   const enableTotp = authConfig.otp?.enabled;
-  const logoPreferDarkParam = authConfig.ui?.logo.scowLogoType === "light" ? "false" : "true";
+  const logoPreferDarkParam = authConfig.ui?.logo.scowLogoType === scowLogo.light ? "false" : "true";
 
   // 显示绑定otp按钮：otp.enabled为true && (密钥存于ldap时 || (otp.type===remote && 配置了otp.remote.redirectUrl))
   const showBindOtpButton = authConfig.otp?.enabled && (authConfig.otp?.type === OtpStatusOptions.ldap
