@@ -10,8 +10,8 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { AuditConfigSchema } from "@scow/config/build/audit";
 import type { ClusterConfigSchema } from "@scow/config/build/cluster";
-import { OperationLogConfigSchema } from "@scow/config/build/operationLog";
 import type { PortalConfigSchema } from "@scow/config/build/portal";
 import type { UiConfigSchema } from "@scow/config/build/ui";
 import { UserLink } from "@scow/lib-web/build/layouts/base/types";
@@ -49,7 +49,7 @@ export interface ServerRuntimeConfig {
 
   SCOW_API_AUTH_TOKEN?: string;
 
-  OPERATION_LOG_CONFIG: OperationLogConfigSchema | undefined;
+  AUDIT_CONFIG: AuditConfigSchema | undefined;
 }
 
 export interface PublicRuntimeConfig {

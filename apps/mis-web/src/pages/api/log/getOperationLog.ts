@@ -136,7 +136,7 @@ export default typeboxRoute(GetOperationLogsSchema, async (req, res) => {
       return { 403: null };
     }
   }
-  const { getLog } = createOperationLogClient(runtimeConfig.OPERATION_LOG_CONFIG, console);
+  const { getLog } = createOperationLogClient(runtimeConfig.AUDIT_CONFIG, console);
   const resp = await getLog({ filter, page, pageSize });
 
   const { results, totalCount } = resp;

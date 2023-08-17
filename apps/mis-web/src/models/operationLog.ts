@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { OperationLog as OperationLogProto } from "@scow/protos/build/operation-log/operation_log";
+import { OperationLog as OperationLogProto } from "@scow/protos/build/audit/operation_log";
 import { Static, Type } from "@sinclair/typebox";
 import { ValueOf } from "next/dist/shared/lib/constants";
 import { moneyToString } from "src/utils/money";

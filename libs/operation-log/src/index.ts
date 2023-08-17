@@ -12,13 +12,13 @@
 
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { ChannelCredentials } from "@grpc/grpc-js";
-import { OperationLogConfigSchema } from "@scow/config/build/operationLog";
+import { AuditConfigSchema } from "@scow/config/build/audit";
 import {
   CreateOperationLogRequest,
   GetOperationLogsRequest,
   GetOperationLogsResponse,
   OperationLogServiceClient,
-} from "@scow/protos/build/operation-log/operation_log";
+} from "@scow/protos/build/audit/operation_log";
 import { Logger } from "ts-log";
 
 import { OperationResult } from "./constant";
@@ -36,7 +36,7 @@ export interface LogCallParams<TName extends OperationEvent["$case"]> {
 }
 
 export const createOperationLogClient = (
-  config: OperationLogConfigSchema | undefined,
+  config: AuditConfigSchema | undefined,
   logger: Logger | Console,
 ) => {
   const client = config && config.url

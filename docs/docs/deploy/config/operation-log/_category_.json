@@ -1,8 +1,0 @@
-{
-  "label": "操作日志",
-  "position": 5,
-  "link": {
-    "type": "generated-index",
-    "description": "关于操作日志服务的部署和配置"
-  }
-}

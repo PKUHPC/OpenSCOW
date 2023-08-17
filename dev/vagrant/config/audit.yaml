@@ -1,0 +1,8 @@
+db:
+  host: 172.16.20.121
+  port: 3306
+  user: root
+  password: must!chang3this
+  dbName: scow_audit
+
+url: localhost:5005

@@ -117,6 +117,58 @@ importers:
         specifier: 5.1.6
         version: 5.1.6
 
+  apps/audit-server:
+    dependencies:
+      '@ddadaal/tsgrpc-client':
+        specifier: 0.17.6
+        version: 0.17.6(@grpc/grpc-js@1.8.21)
+      '@ddadaal/tsgrpc-common':
+        specifier: 0.2.4
+        version: 0.2.4
+      '@ddadaal/tsgrpc-server':
+        specifier: 0.19.4
+        version: 0.19.4(@grpc/grpc-js@1.8.21)
+      '@grpc/grpc-js':
+        specifier: 1.8.21
+        version: 1.8.21
+      '@mikro-orm/cli':
+        specifier: 5.7.14
+        version: 5.7.14(@mikro-orm/mariadb@5.7.14)(@mikro-orm/migrations@5.7.14)(@mikro-orm/mysql@5.7.14)(@mikro-orm/seeder@5.7.14)
+      '@mikro-orm/core':
+        specifier: 5.7.14
+        version: 5.7.14(@mikro-orm/mariadb@5.7.14)(@mikro-orm/migrations@5.7.14)(@mikro-orm/mysql@5.7.14)(@mikro-orm/seeder@5.7.14)
+      '@mikro-orm/migrations':
+        specifier: 5.7.14
+        version: 5.7.14(@mikro-orm/core@5.7.14)
+      '@mikro-orm/mysql':
+        specifier: 5.7.14
+        version: 5.7.14(@mikro-orm/core@5.7.14)(@mikro-orm/migrations@5.7.14)(@mikro-orm/seeder@5.7.14)
+      '@scow/config':
+        specifier: workspace:*
+        version: link:../../libs/config
+      '@scow/lib-config':
+        specifier: workspace:*
+        version: link:../../libs/libconfig
+      '@scow/lib-decimal':
+        specifier: workspace:*
+        version: link:../../libs/decimal
+      '@scow/protos':
+        specifier: workspace:*
+        version: link:../../libs/protos/scow
+      '@scow/utils':
+        specifier: workspace:*
+        version: link:../../libs/utils
+      pino:
+        specifier: 8.15.0
+        version: 8.15.0
+      pino-pretty:
+        specifier: 10.2.0
+        version: 10.2.0
+    devDependencies:
+      '@types/google-protobuf':
+        specifier: 3.15.6
+        version: 3.15.6
+
   apps/auth:
     dependencies:
       '@fastify/error':
@@ -514,58 +566,6 @@ importers:
       webpack:
         specifier: 5.88.2
         version: 5.88.2
-
-  apps/operation-log:
-    dependencies:
-      '@ddadaal/tsgrpc-client':
-        specifier: 0.17.6
-        version: 0.17.6(@grpc/grpc-js@1.8.21)
-      '@ddadaal/tsgrpc-common':
-        specifier: 0.2.4
-        version: 0.2.4
-      '@ddadaal/tsgrpc-server':
-        specifier: 0.19.4
-        version: 0.19.4(@grpc/grpc-js@1.8.21)
-      '@grpc/grpc-js':
-        specifier: 1.8.21
-        version: 1.8.21
-      '@mikro-orm/cli':
-        specifier: 5.7.14
-        version: 5.7.14(@mikro-orm/mariadb@5.7.14)(@mikro-orm/migrations@5.7.14)(@mikro-orm/mysql@5.7.14)(@mikro-orm/seeder@5.7.14)
-      '@mikro-orm/core':
-        specifier: 5.7.14
-        version: 5.7.14(@mikro-orm/mariadb@5.7.14)(@mikro-orm/migrations@5.7.14)(@mikro-orm/mysql@5.7.14)(@mikro-orm/seeder@5.7.14)
-      '@mikro-orm/migrations':
-        specifier: 5.7.14
-        version: 5.7.14(@mikro-orm/core@5.7.14)
-      '@mikro-orm/mysql':
-        specifier: 5.7.14
-        version: 5.7.14(@mikro-orm/core@5.7.14)(@mikro-orm/migrations@5.7.14)(@mikro-orm/seeder@5.7.14)
-      '@scow/config':
-        specifier: workspace:*
-        version: link:../../libs/config
-      '@scow/lib-config':
-        specifier: workspace:*
-        version: link:../../libs/libconfig
-      '@scow/lib-decimal':
-        specifier: workspace:*
-        version: link:../../libs/decimal
-      '@scow/protos':
-        specifier: workspace:*
-        version: link:../../libs/protos/scow
-      '@scow/utils':
-        specifier: workspace:*
-        version: link:../../libs/utils
-      pino:
-        specifier: 8.15.0
-        version: 8.15.0
-      pino-pretty:
-        specifier: 10.2.0
-        version: 10.2.0
-    devDependencies:
-      '@types/google-protobuf':
-        specifier: 3.15.6
-        version: 3.15.6
 
   apps/portal-server:
     dependencies:
@@ -5315,7 +5315,7 @@ packages:
     engines: {node: ^8.13.0 || >=10.10.0}
     dependencies:
       '@grpc/proto-loader': 0.7.3
-      '@types/node': 18.17.3
+      '@types/node': 18.17.5
 
   /@grpc/proto-loader@0.7.3:
     resolution: {integrity: sha512-5dAvoZwna2Py3Ef96Ux9jIkp3iZ62TUsV00p3wVBPNX5K178UbNi8Q7gQVqwXT1Yq9RejIGG9G2IPEo93T6RcA==}
@@ -7392,6 +7392,7 @@ packages:
 
   /@types/node@18.17.3:
     resolution: {integrity: sha512-2x8HWtFk0S99zqVQABU9wTpr8wPoaDHZUcAkoTKH+nL7kPv3WUI9cRi/Kk5Mz4xdqXSqTkKP7IWNoQQYCnDsTA==}
+    dev: true
 
   /@types/node@18.17.5:
     resolution: {integrity: sha512-xNbS75FxH6P4UXTPUJp/zNPq6/xsfdJKussCWNOnz4aULWIRwMgP1LgaB5RiBnMX1DPCYenuqGZfnIAx5mbFLA==}
@@ -9482,7 +9483,7 @@ packages:
     peerDependencies:
       webpack: ^5.1.0
     dependencies:
-      fast-glob: 3.3.0
+      fast-glob: 3.3.1
       glob-parent: 6.0.2
       globby: 13.2.2
       normalize-path: 3.0.0
@@ -11072,7 +11073,6 @@ packages:
       glob-parent: 5.1.2
       merge2: 1.4.1
       micromatch: 4.0.5
-    dev: true
 
   /fast-json-patch@3.1.1:
     resolution: {integrity: sha512-vf6IHUX2SBcA+5/+4883dsIjpBTqmfBjmYiWK1savxQmFk4JfBMLa7ynTYOs1Rolp/T1betJxHiGD3g1Mn8lUQ==}

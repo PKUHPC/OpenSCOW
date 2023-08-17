@@ -1,9 +1,0 @@
-# 操作日志服务url
-url: operation-log:5000
-
-# 操作日志数据库的信息
-db:
-  host: operation-db
-  port: 3306
-  user: root
-  dbName: operation_log

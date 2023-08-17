@@ -10,7 +10,7 @@
 
 | 节点名称/角色 |                           主要服务                           |     私网IP     | 配置 |
 | :-----------: | :----------------------------------------------------------: | :------------: | :--: |
-|     scow      |         scow：portal、mis、auth、gateway，operation-log       | 192.168.88.100 | 4C4G |
+|     scow      |         scow：portal、mis、auth、gateway，audit               | 192.168.88.100 | 4C4G |
 |     slurm     | slurmdbd、slurmctld、slurmd、mariadb、nfs-server、slapd、sssd | 192.168.88.101 | 2C2G |
 |     login     |         slurmd、sssd、nfs、Xfce、KDE、MATE、cinnamon         | 192.168.88.102 | 2C2G |
 |     cn01      |         slurmd、sssd、nfs、Xfce、KDE、MATE、cinnamon         | 192.168.88.103 | 2C2G |

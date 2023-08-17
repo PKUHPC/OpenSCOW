@@ -204,6 +204,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
         "NOVNC_CLIENT_URL": join(BASE_PATH, "/vnc"),
         "CLIENT_MAX_BODY_SIZE": config.gateway.uploadFileSizeLimit,
         "PUBLIC_PATH": join(BASE_PATH, publicPath),
+        "AUDIT_DEPLOYED": config.audit ? "true" : "false",
       },
       ports: {},
       volumes: {
@@ -246,7 +247,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
         "PORTAL_DEPLOYED": config.portal ? "true" : "false",
         "AUTH_EXTERNAL_URL": join(BASE_PATH, "/auth"),
         "PUBLIC_PATH": join(BASE_PATH, publicPath),
-        "OPERATION_LOG_DEPLOYED": config.operationLog ? "true" : "false",
+        "AUDIT_DEPLOYED": config.audit ? "true" : "false",
       },
       ports: {},
       volumes: {
@@ -268,16 +269,16 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
     });
   }
 
-  // OPERATION-LOG
-  if (config.operationLog) {
-    addService("operation-log", {
+  // AUDIT
+  if (config.audit) {
+    addService("audit-server", {
       image: scowImage,
-      ports: config.operationLog.portMappings?.operationLog
-        ? { [config.operationLog.portMappings.operationLog]: 5000 }
+      ports: config.audit.portMappings?.auditServer
+        ? { [config.audit.portMappings.auditServer]: 5000 }
         : {},
       environment: {
-        "SCOW_LAUNCH_APP": "operation-log",
-        "DB_PASSWORD": config.operationLog.dbPassword,
+        "SCOW_LAUNCH_APP": "audit-server",
+        "DB_PASSWORD": config.audit.dbPassword,
         ...serviceLogEnv,
       },
       volumes: {
@@ -285,17 +286,17 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
       },
     });
 
-    composeSpec.volumes["operation_db_data"] = {};
+    composeSpec.volumes["audit_db_data"] = {};
 
-    addService("operation-db", {
-      image: config.operationLog.mysqlImage,
+    addService("audit-db", {
+      image: config.audit.mysqlImage,
       volumes: {
-        "operation_db_data": "/var/lib/mysql",
+        "audit_db_data": "/var/lib/mysql",
       },
       environment: {
-        "MYSQL_ROOT_PASSWORD": config.operationLog.dbPassword,
+        "MYSQL_ROOT_PASSWORD": config.audit.dbPassword,
       },
-      ports: config.operationLog.portMappings?.db ? { [config.operationLog.portMappings?.db]: 3306 } : {},
+      ports: config.audit.portMappings?.db ? { [config.audit.portMappings?.db]: 3306 } : {},
     });
   }
   return composeSpec;

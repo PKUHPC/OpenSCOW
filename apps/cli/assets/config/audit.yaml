@@ -1,0 +1,9 @@
+# 审计系统服务端url
+url: audit-server:5000
+
+# 审计系统数据库的信息
+db:
+  host: audit-db
+  port: 3306
+  user: root
+  dbName: scow_audit

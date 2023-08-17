@@ -13,6 +13,6 @@ log:
     logDir: /var/log/fluentd
 auth:
   portMappings: {}
-operationLog:
+audit:
   dbPassword: must!chang3this
   portMappings: {}

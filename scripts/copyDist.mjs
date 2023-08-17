@@ -42,7 +42,7 @@ if (!lockFile) { throw new Error("No lockfile found"); }
 let appDirs = process.argv.slice(2);
 
 if (appDirs.length === 0) {
-  appDirs = ["portal-web", "portal-server", "auth", "mis-web", "mis-server", "gateway", "operation-log"]
+  appDirs = ["portal-web", "portal-server", "auth", "mis-web", "mis-server", "gateway", "audit-server"]
     .map((x) => join(APPS_BASE_PATH, x));
 }
 

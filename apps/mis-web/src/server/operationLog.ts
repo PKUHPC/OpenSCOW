@@ -26,7 +26,7 @@ export const callLog = <TName extends OperationEvent["$case"]>(
   operationResult: OperationResult,
 ) => {
 
-  const { callLog } = createOperationLogClient(runtimeConfig.OPERATION_LOG_CONFIG, console);
+  const { callLog } = createOperationLogClient(runtimeConfig.AUDIT_CONFIG, console);
 
   callLog(
     {

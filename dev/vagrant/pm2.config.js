@@ -104,10 +104,10 @@ module.exports = {
       },
     },
     {
-      name: "operation-log",
+      name: "audit-server",
       script: "src/index.ts",
-      cwd: "./apps/operation-log",
-      watch: "./apps/operation-log",
+      cwd: "./apps/audit-server",
+      watch: "./apps/audit-server",
       interpreter,
       interpreter_args,
       env: {
