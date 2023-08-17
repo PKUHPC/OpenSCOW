@@ -35,10 +35,10 @@ export const ChangeJobTimeLimitSchema = typeboxRouteSchema({
     jobId: Type.String(),
 
     /**
-     * 时间变化，单位分钟
+     * 新的作业运行时限
      * @type integer
      */
-    delta: Type.Integer(),
+    limit: Type.Integer(),
   }),
 
   responses: {
@@ -47,6 +47,8 @@ export const ChangeJobTimeLimitSchema = typeboxRouteSchema({
     403: Type.Null(),
     /** 作业未找到 */
     404: Type.Null(),
+    /** 用户设置的时限错误 */
+    400: Type.Object({ code: Type.Literal("TIME_LIME_NOT_VALID") }),
   },
 });
 
@@ -57,23 +59,30 @@ export default typeboxRoute(ChangeJobTimeLimitSchema,
     const info = await auth(req, res);
     if (!info) { return; }
 
-    const { cluster, delta, jobId } = req.body;
+    const { cluster, limit, jobId } = req.body;
 
     const client = getClient(JobServiceClient);
 
     // check if the user can change the job time limit
 
-    const jobAccessible = await checkJobAccessible(jobId, cluster, info);
+    const jobAccessible = await checkJobAccessible(jobId, cluster, info, limit);
 
     if (jobAccessible === "NotAllowed") {
       return { 403: null };
     } else if (jobAccessible === "NotFound") {
       return { 404: null };
+    } else if (jobAccessible === "LimitNotValid") {
+      return {
+        400: {
+          code: "TIME_LIME_NOT_VALID" as const,
+          message: "time limit should be longer than job's running time.",
+        },
+      };
     }
-
+    
     return await asyncClientCall(client, "changeJobTimeLimit", {
       cluster,
-      delta,
+      limit,
       jobId,
     })
       .then(() => ({ 204: null }))

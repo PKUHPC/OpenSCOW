@@ -11,11 +11,10 @@
  */
 
 import { arrayContainsElement } from "@scow/lib-web/build/utils/array";
-import { App, Divider, Form, Input, InputNumber, Modal, Progress, Select } from "antd";
+import { App, Divider, Form, InputNumber, Modal, Progress } from "antd";
 import { useRef, useState } from "react";
 import { api } from "src/apis";
 import { RunningJobInfo } from "src/models/job";
-import { ChangeStorageMode } from "src/pages/api/admin/changeStorage";
 import type { Cluster } from "src/utils/config";
 
 interface Props {
@@ -26,14 +25,8 @@ interface Props {
   data: RunningJobInfo[];
 }
 
-const changeModeText = {
-  INCREASE: "增加",
-  DECREASE: "减少",
-};
-
 interface FormProps {
-  mode: ChangeStorageMode;
-  value: number;
+  limit: number;
 }
 
 interface CompletionStatus {
@@ -74,15 +67,13 @@ export const ChangeJobTimeLimitModal: React.FC<Props> = ({ open, onClose, data, 
       confirmLoading={loading}
       destroyOnClose
       onOk={async () => {
-        const { mode, value } = await form.validateFields();
+        const { limit } = await form.validateFields();
         setLoading(true);
-
-        const delta = mode === "DECREASE" ? -value : value;
 
         completionStatus.current = { total: data.length, success: 0, failed: []};
 
         await Promise.all(data.map(async (r) => {
-          await api.changeJobTimeLimit({ body: { cluster: r.cluster.id, delta, jobId: r.jobId } })
+          await api.changeJobTimeLimit({ body: { cluster: r.cluster.id, limit, jobId: r.jobId } })
             .then(() => {
               if (completionStatus.current) {
                 completionStatus.current.success++;
@@ -107,10 +98,9 @@ export const ChangeJobTimeLimitModal: React.FC<Props> = ({ open, onClose, data, 
           })
           .finally(() => setLoading(false));
 
-
       }}
     >
-      <Form form={form} initialValues={{ mode: "INCREASE", value: 1 }}>
+      <Form form={form} initialValues={{ limit: 1 }}>
         {
           Array.from(dataGroupedByCluster.entries()).map(([cluster, data]) => (
             <>
@@ -124,19 +114,10 @@ export const ChangeJobTimeLimitModal: React.FC<Props> = ({ open, onClose, data, 
             </>
           ))
         }
-        <Form.Item<FormProps> label="时间变化" rules={[{ required: true }]}>
-          <Input.Group compact>
-            <Form.Item name="mode" noStyle>
-              <Select placeholder="选择设置为">
-                {Object.entries(changeModeText).map(([key, value]) => (
-                  <Select.Option value={key} key={key}>{value}</Select.Option>
-                ))}
-              </Select>
-            </Form.Item>
-            <Form.Item name="value" noStyle>
-              <InputNumber min={1} step={1} addonAfter={"分钟"} />
-            </Form.Item>
-          </Input.Group>
+        <Form.Item<FormProps> label="设置作业时限" rules={[{ required: true }]}>
+          <Form.Item name="limit" noStyle>
+            <InputNumber min={1} step={1} addonAfter={"分钟"} />
+          </Form.Item>
         </Form.Item>
       </Form>
       {

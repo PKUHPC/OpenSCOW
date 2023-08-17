@@ -260,13 +260,13 @@ export const jobServiceServer = plugin((server) => {
     },
 
     changeJobTimeLimit: async ({ request, logger }) => {
-      const { cluster, delta, jobId } = request;
+      const { cluster, limit, jobId } = request;
 
       await server.ext.clusters.callOnOne(
         cluster,
         logger,
         async (client) => await asyncClientCall(client.job, "changeJobTimeLimit", {
-          jobId: Number(jobId), deltaMinutes: delta,
+          jobId: Number(jobId), deltaMinutes: limit,
         }),
       );
 

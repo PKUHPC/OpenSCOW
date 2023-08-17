@@ -86,7 +86,7 @@ message GetRunningJobsResponse {
 message ChangeJobTimeLimitRequest {
   string cluster = 1;
   string job_id = 2;
-  int64 delta = 3;
+  int64 limit = 3;
 }
 
 // NOT_FOUND: cluster or job_id is not found.
