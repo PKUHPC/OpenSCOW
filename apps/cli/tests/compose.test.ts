@@ -98,6 +98,7 @@ describe("sets custom auth environment", () => {
 it("deploy audit", async () => {
   const config = getInstallConfig(configPath);
   config.audit = { dbPassword: "must!chang3this", mysqlImage: "" };
+  config.portal = { basePath: "/", novncClientImage: "" };
   config.mis = { basePath: "/mis", dbPassword: "must!chang3this", mysqlImage: "" };
 
   const composeConfig = createComposeSpec(config);
