@@ -30,9 +30,13 @@
 
 <body style="font-family:Roboto">
     <div class="fixed top-6 left-24">
-      <a href="{{ logoLink }}" target="_blank" onclick="return false;">
+      {% if logoLink == "" %}
+      <img class="w-40" src="{{ logoUrl }}" alt="logo">
+      {% else %}
+      <a href="{{ logoLink }}" target="_blank">
         <img class="w-40" src="{{ logoUrl }}" alt="logo">
       </a>
+      {% endif %}
     </div>
     <div class="w-full h-screen flex">
       <div class="w-1/2 h-screen ml-20 flex items-center justify-center">
