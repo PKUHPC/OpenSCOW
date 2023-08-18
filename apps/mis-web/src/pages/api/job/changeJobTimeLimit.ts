@@ -48,7 +48,9 @@ export const ChangeJobTimeLimitSchema = typeboxRouteSchema({
     /** 作业未找到 */
     404: Type.Null(),
     /** 用户设置的时限错误 */
-    400: Type.Object({ code: Type.Literal("TIME_LIME_NOT_VALID") }),
+    400: Type.Object({ code: Type.Literal("TIME_LIME_NOT_VALID"),
+      message: Type.String(),
+    }),
   },
 });
 
@@ -75,11 +77,11 @@ export default typeboxRoute(ChangeJobTimeLimitSchema,
       return {
         400: {
           code: "TIME_LIME_NOT_VALID" as const,
-          message: "time limit should be longer than job's running time.",
+          message: "设置作业时限需要大于该作业的运行时长",
         },
       };
     }
-    
+
     return await asyncClientCall(client, "changeJobTimeLimit", {
       cluster,
       limit,

@@ -37,7 +37,7 @@ export async function checkJobAccessible(
 
   const job = reply.jobs[0];
 
-  // 如果设置的作业时限比该作业运行时间小， 则改作业不可以修改作业时限
+  // 如果设置的作业时限比该作业运行时间小， 则该作业不可以修改作业时限
   if (!!limit && (limit) * 60 * 1000 < parseTime(job.runningTime)) {
     return "LimitNotValid";
   }
