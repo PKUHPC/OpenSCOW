@@ -77,7 +77,7 @@ export default typeboxRoute(ChangeJobTimeLimitSchema,
       return {
         400: {
           code: "TIME_LIME_NOT_VALID" as const,
-          message: "设置作业时限需要大于该作业的运行时长",
+          message: "设置作业时限需要大于该作业的运行时长。",
         },
       };
     }
