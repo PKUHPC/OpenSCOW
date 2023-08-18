@@ -10,24 +10,31 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { App, Button, Form, Input, Spin } from "antd";
+import { App, Form, Input, Modal } from "antd";
 import React, { useState } from "react";
 import { api } from "src/apis";
 import { confirmPasswordFormItemProps, passwordRule } from "src/utils/form";
 
-interface FormProps {
-  oldPassword: string;
-  newPassword: string;
-  confirm: string;
+export interface Props {
+  open: boolean;
+  onClose: () => void;
 }
 
-export const ChangePasswordForm: React.FC = () => {
+interface FormInfo {
+  oldPassword: string;
+  newPassword: string;
+}
+
+
+export const ChangePasswordModal: React.FC<Props> = ({
+  open,
+  onClose,
+}) => {
+
+  const [form] = Form.useForm<FormInfo>();
   const { message } = App.useApp();
-
-  const [form] = Form.useForm<FormProps>();
-
   const [loading, setLoading] = useState(false);
-
+  
   const onFinish = async () => {
     const { oldPassword, newPassword } = await form.validateFields();
     setLoading(true);
@@ -50,26 +57,29 @@ export const ChangePasswordForm: React.FC = () => {
   };
 
   return (
-    <Spin spinning={loading}>
+    <Modal
+      title="修改密码"
+      open={open}
+      onOk={form.submit}
+      confirmLoading={loading}
+      onCancel={onClose}
+      destroyOnClose
+    >
       <Form
-        initialValues={undefined}
-        layout="vertical"
         form={form}
         onFinish={onFinish}
+        wrapperCol={{ span: 20 }}
+        labelCol={{ span: 4 }}
       >
         <Form.Item
           rules={[{ required: true }]}
           label="原密码"
           name="oldPassword"
-
         >
           <Input.Password />
         </Form.Item>
         <Form.Item
-          rules={[
-            { required: true },
-            passwordRule,
-          ]}
+          rules={[{ required: true }, passwordRule]}
           label="新密码"
           name="newPassword"
         >
@@ -83,12 +93,9 @@ export const ChangePasswordForm: React.FC = () => {
         >
           <Input.Password />
         </Form.Item>
-        <Form.Item>
-          <Button type="primary" htmlType="submit">
-            提交
-          </Button>
-        </Form.Item>
       </Form>
-    </Spin>
+    </Modal>
   );
 };
+
+
