@@ -171,8 +171,6 @@ message SetTenantBilling {
   common.Money price = 4;
 }
 
-//TODO: 租户创建用户和账户创建用户需不需要区分
-
 message SetTenantAdmin {
   string tenant_name = 1;
   string user_id = 2;
