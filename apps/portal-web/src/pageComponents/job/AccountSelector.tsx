@@ -11,7 +11,7 @@
  */
 
 import { ReloadOutlined } from "@ant-design/icons";
-import { Button, Input, Select, Tooltip } from "antd";
+import { App, Button, Input, Select, Tooltip } from "antd";
 import { useCallback, useEffect } from "react";
 import { useAsync } from "react-async";
 import { useStore } from "simstate";
@@ -26,9 +26,11 @@ interface Props {
 
 export const AccountSelector: React.FC<Props> = ({ cluster, onChange, value }) => {
   const userStore = useStore(UserStore);
+  const { message } = App.useApp();
 
   const promiseFn = useCallback(async () => {
-    return cluster ? api.getAccounts({ query: { cluster } }) : { accounts: [] as string[] };
+    return cluster ? api.getAccounts({ query: { cluster } })
+      .httpError(404, (error) => { message.error(error.message); }) : { accounts: [] as string[] };
   }, [cluster, userStore.user]);
 
   const { data, isLoading, reload } = useAsync({

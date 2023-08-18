@@ -12,11 +12,13 @@
 
 import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
+import { status } from "@grpc/grpc-js";
 import { JobServiceClient } from "@scow/protos/build/portal/job";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
+import { handlegRPCError } from "src/utils/server";
 
 export const GetAccountsSchema = typeboxRouteSchema({
   method: "GET",
@@ -28,6 +30,10 @@ export const GetAccountsSchema = typeboxRouteSchema({
   responses: {
     200: Type.Object({
       accounts: Type.Array(Type.String()),
+    }),
+    404: Type.Object({
+      code: Type.Literal("ACCOUNT_NOT_FOUND"),
+      message: Type.String(),
     }),
   },
 });
@@ -46,6 +52,9 @@ export default route(GetAccountsSchema, async (req, res) => {
 
   return asyncUnaryCall(client, "listAccounts", {
     cluster, userId: info.identityId,
-  }).then(({ accounts }) => ({ 200: { accounts } }));
+  }).then(({ accounts }) => ({ 200: { accounts } }), handlegRPCError({
+    [status.NOT_FOUND]: (err) => ({ 404: { code: "ACCOUNT_NOT_FOUND", message: err.details } } as const),
+    [status.INTERNAL]: (err) => ({ 404: { code: "ACCOUNT_NOT_FOUND", message: err.details } } as const),
+  }));
 
 });
