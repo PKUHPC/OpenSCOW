@@ -26,7 +26,7 @@ export enum OtpStatusOptions {
   "remote" = "remote",
 }
 
-export enum scowLogoType {
+export enum ScowLogoType {
   "dark" = "dark",
   "light" = "light",
 }
@@ -160,7 +160,7 @@ export const UiConfigSchema = Type.Object({
   backgroundImagePath: Type.String({ description: "默认背景图片", default: "./assets/background.png" }),
   backgroundFallbackColor: Type.String({ description: "默认背景颜色", default: "#9a0000" }),
   logo: Type.Object({
-    scowLogoType: Type.Enum(scowLogoType, { description: "scow logo 类型", default: scowLogoType.dark }),
+    scowLogoType: Type.Enum(ScowLogoType, { description: "scow logo 类型", default: ScowLogoType.dark }),
     customLogoPath: Type.Optional(Type.String({ description: "用户自定义 logo 图片" })),
     customLogoLink: Type.Optional(Type.String({ description: "用户自定义点击 logo 跳转链接" })),
   }, { default: {} }),
