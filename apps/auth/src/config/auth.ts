@@ -158,7 +158,7 @@ export const OtpLdapSchema = Type.Object({
 
 export const UiConfigSchema = Type.Object({
   backgroundImagePath: Type.String({ description: "默认背景图片", default: "./assets/background.png" }),
-  backgroundFallbackColor: Type.String({ description: "默认背景颜色", default: "#9a0000" }),
+  backgroundFallbackColor: Type.String({ description: "默认背景颜色", default: "#8c8c8c" }),
   logo: Type.Object({
     scowLogoType: Type.Enum(ScowLogoType, { description: "scow logo 类型", default: ScowLogoType.dark }),
     customLogoPath: Type.Optional(Type.String({ description: "用户自定义 logo 图片" })),
