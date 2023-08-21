@@ -61,7 +61,7 @@ const ChangeEmailModalButton = ModalButton(ChangeEmailModal, { type: "link" });
 export const ProfilePage: NextPage = requireAuth(() => true)(({ userStore: { user } }) => {
 
   const [email, setEmail] = useState(user.email);
-  console.log("user", user);
+
   return (
     <>
       <Container>
@@ -102,7 +102,7 @@ export const ProfilePage: NextPage = requireAuth(() => true)(({ userStore: { use
               ) : undefined
             }
             <Descriptions.Item label="创建时间">
-              {formatDateTime(user.createTime)}
+              {formatDateTime(user.createTime || "")}
             </Descriptions.Item>
           </Descriptions>
         </Part>
