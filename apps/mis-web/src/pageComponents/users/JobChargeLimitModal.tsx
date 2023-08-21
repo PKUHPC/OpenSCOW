@@ -12,10 +12,11 @@
 
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import type { Money } from "@scow/protos/build/common/money";
-import { App, Form, InputNumber, Modal, Space } from "antd";
+import { App, Checkbox, Form, InputNumber, Modal, Space } from "antd";
 import { useState } from "react";
 import { api } from "src/apis";
 import { ModalLink } from "src/components/ModalLink";
+import { UserStatus } from "src/models/User";
 import { moneyToString } from "src/utils/money";
 
 interface Props {
@@ -25,6 +26,7 @@ interface Props {
   currentLimit?: Money;
   currentUsed?: Money;
   open: boolean;
+  status: UserStatus;
   onClose: () => void;
   reload: () => void;
 }
@@ -33,10 +35,15 @@ interface FormFields {
   limit: number;
 }
 
+interface FormFieldsConfirm {
+  unblock: Boolean;
+}
+
 export const JobChargeLimitModal: React.FC<Props> = ({
-  accountName, onClose, reload, userId, open, username, currentLimit, currentUsed,
+  accountName, onClose, reload, userId, open, username, currentLimit, currentUsed, status,
 }) => {
   const [form] = Form.useForm<FormFields>();
+  const [confirmForm] = Form.useForm<FormFieldsConfirm>();
   const [loading, setLoading] = useState(false);
 
   const { message, modal } = App.useApp();
@@ -84,9 +91,24 @@ export const JobChargeLimitModal: React.FC<Props> = ({
                   modal.confirm({
                     title: "取消作业费用限额",
                     icon: <ExclamationCircleOutlined />,
-                    content: "确认要取消此用户在此账户中的限额吗？",
+                    content: <div>
+                      <p>确认要取消此用户在此账户中的限额吗？</p>
+                      {status === UserStatus.BLOCKED && (
+                        <Form
+                          form={confirmForm}
+                        >
+                          <Form.Item name="unblock" initialValue={true} valuePropName="checked">
+                            <Checkbox>取消限额的同时解除封锁</Checkbox>
+                          </Form.Item>
+                        </Form>
+                      )}
+                    </div>,
                     onOk: async () => {
-                      await api.cancelJobChargeLimit({ query: { accountName, userId } })
+                      let unblock: boolean | undefined;
+                      if (status === UserStatus.BLOCKED) {
+                        unblock = confirmForm.getFieldValue("unblock");
+                      }
+                      await api.cancelJobChargeLimit({ query: { accountName, userId, unblock } })
                         .then(() => {
                           message.success("取消成功！");
                           onClose();

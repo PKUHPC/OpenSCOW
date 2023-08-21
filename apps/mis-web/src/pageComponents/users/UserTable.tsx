@@ -101,6 +101,7 @@ export const UserTable: React.FC<Props> = ({
               username={r.name}
               currentLimit={r.jobChargeLimit}
               currentUsed={r.usedJobChargeLimit}
+              status={r.status}
             >
               限额管理
             </SetJobChargeLimitLink>

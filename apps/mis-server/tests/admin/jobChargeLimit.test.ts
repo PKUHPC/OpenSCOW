@@ -111,6 +111,27 @@ it("cancels job charge limit", async () => {
   expect(ua1.usedJobCharge).toBeUndefined();
 });
 
+it("unlocking user while cancels job charge limit", async () => {
+  const limit = new Decimal(100);
+
+  ua.jobChargeLimit = limit;
+  ua.status = UserStatus.BLOCKED;
+  await em.flush();
+
+  expectDecimalEqual(ua.jobChargeLimit, limit);
+
+  await asyncClientCall(client, "cancelJobChargeLimit", { ...params(ua), unblock: true });
+
+  const ua1 = await em.fork().findOneOrFail(UserAccount, {
+    account: ua.account,
+    user: ua.user,
+  }, { populate: ["user", "account"]});
+
+  expect(ua1.jobChargeLimit).toBeUndefined();
+  expect(ua1.usedJobCharge).toBeUndefined();
+  expect(ua1.status).toBe(UserStatus.UNBLOCKED);
+});
+
 it("adds job charge", async () => {
   const limit = new Decimal(100);
   ua.jobChargeLimit = limit;
