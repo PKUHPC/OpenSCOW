@@ -14,7 +14,7 @@ import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes
 import { changePassword as libChangePassword } from "@scow/lib-auth";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
-import { OperationResult } from "src/models/operationLog";
+import { OperationResult, OperationType } from "src/models/operationLog";
 import { PlatformRole } from "src/models/User";
 import { callLog } from "src/server/operationLog";
 import { publicConfig, runtimeConfig } from "src/utils/config";
@@ -67,7 +67,7 @@ export default /* #__PURE__*/typeboxRoute(
     const logInfo = {
       operatorUserId: info.identityId,
       operatorIp: parseIp(req) ?? "",
-      operationTypeName: "platformChangePassword" as const,
+      operationTypeName: OperationType.platformChangePassword,
       operationTypePayload:{
         userId: identityId,
       },
