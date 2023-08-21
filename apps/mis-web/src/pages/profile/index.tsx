@@ -10,8 +10,8 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { formatDateTime } from "@scow/lib-web/build/utils/datetime";
 import { Descriptions, Tag, Typography } from "antd";
-import dayjs from "dayjs";
 import { NextPage } from "next";
 import { useState } from "react";
 import { requireAuth } from "src/auth/requireAuth";
@@ -23,7 +23,7 @@ import { ChangePasswordModal } from "src/pageComponents/profile/ChangePasswordMo
 import { antdBreakpoints } from "src/styles/constants";
 import { publicConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
-import styled from "styled-components"; ;
+import styled from "styled-components";
 
 const Container = styled.div`
   display: flex;
@@ -102,7 +102,7 @@ export const ProfilePage: NextPage = requireAuth(() => true)(({ userStore: { use
               ) : undefined
             }
             <Descriptions.Item label="创建时间">
-              {dayjs(user.createTime).format("YYYY年MM月DD日") }
+              {formatDateTime(user.createTime)}
             </Descriptions.Item>
           </Descriptions>
         </Part>

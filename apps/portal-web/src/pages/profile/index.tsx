@@ -55,7 +55,7 @@ const ChangePasswordModalButton = ModalButton(ChangePasswordModal, { type: "link
 
 
 export const ProfilePage: NextPage = requireAuth(() => true)(({ userStore: { user } }) => {
-  console.log("user", user);
+
   return (
     <Container>
       <Head title="账号信息" />

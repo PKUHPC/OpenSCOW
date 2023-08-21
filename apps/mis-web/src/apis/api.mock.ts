@@ -420,7 +420,7 @@ export const MOCK_USER_INFO = {
     { accountName: "hpc2001213077", role: UserRole.ADMIN },
     { accountName: "hpc2001213075", role: UserRole.USER },
   ],
-  createTime:"2023年01月01日",
+  createTime:"2023-08-03T03:47:23.485Z",
 } as UserInfo;
 
 export const MOCK_USER_STATUS: GetUserStatusResponse = {
