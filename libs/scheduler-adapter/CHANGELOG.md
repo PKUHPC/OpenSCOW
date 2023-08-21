@@ -1,5 +1,12 @@
 # @scow/lib-scheduler-adapter
 
+## 0.2.1
+
+### Patch Changes
+
+- 8dcfc3f1a: 增加作业列表中 GPU 卡数的展示
+  - @scow/protos@0.3.1
+
 ## 0.2.0
 
 ### Minor Changes

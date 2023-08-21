@@ -1,5 +1,15 @@
 # @scow/lib-auth
 
+## 0.3.0
+
+### Minor Changes
+
+- 113e1e4ea: 在 auth 中添加了一个新的 capability 叫 checkPassword，用于检验密码。原先的修改密码 changePassword 不再需要旧密码
+
+### Patch Changes
+
+- 572530a01: mis-web 用户修改邮箱,用户原邮箱直接展示且不可修改，用户填写符合规则的新邮箱后即可直接修改邮箱。
+
 ## 0.2.1
 
 ### Patch Changes

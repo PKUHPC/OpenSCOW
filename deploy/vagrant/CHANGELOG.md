@@ -1,5 +1,12 @@
 # @scow/demo-vagrant
 
+## 1.2.1
+
+### Patch Changes
+
+- eabb00659: vagrant 集群升级至支持适配器版本
+- defb92de7: 修正 readme 下更多文档的 url
+
 ## 1.2.0
 
 ### Minor Changes

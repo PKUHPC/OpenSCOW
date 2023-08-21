@@ -1,5 +1,25 @@
 # @scow/protos
 
+## 0.3.1
+
+### Patch Changes
+
+- Updated dependencies [1c668544f]
+- Updated dependencies [67911fd92]
+- Updated dependencies [6f278a7b9]
+- Updated dependencies [59cb5a418]
+- Updated dependencies [572530a01]
+- Updated dependencies [75951b5bb]
+- Updated dependencies [291f1d471]
+- Updated dependencies [d49a34986]
+- Updated dependencies [cce9d6c92]
+- Updated dependencies [1c5e3a307]
+- Updated dependencies [6522b47cf]
+- Updated dependencies [f9fbd4cd2]
+- Updated dependencies [8dcfc3f1a]
+- Updated dependencies [da5edd22c]
+  - @scow/grpc-api@0.6.0
+
 ## 0.3.0
 
 ### Minor Changes
