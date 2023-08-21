@@ -133,7 +133,7 @@ export const AccountTable: React.FC<Props> = ({
         <Table.Column<AdminAccountInfo>
           dataIndex="ownerName"
           title="拥有者"
-          render={(_, r) => `${r.ownerName}（${r.ownerId}）`}
+          render={(_, r) => `${r.ownerName}（ID:${r.ownerId}）`}
         />
         <Table.Column<AdminAccountInfo>
           dataIndex="userCount"

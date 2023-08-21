@@ -225,7 +225,7 @@ export const accountServiceServer = plugin((server) => {
             comment: x.comment,
             operatorId: x.operatorId,
             addTime: x.time.toISOString(),
-            ownerId: accountOwner.id + "",
+            ownerId: accountOwner.userId + "",
             ownerName: accountOwner.name,
             balance: decimalToMoney(x.account.$.balance),
           };

@@ -29,6 +29,7 @@ export const AllTenantsTable: React.FC<Props> = ({ refreshToken }) => {
   const promiseFn = useCallback(async () => {
     return await api.getAllTenants({}); }, []);
   const { data, isLoading, reload } = useAsync({ promiseFn, watch: refreshToken });
+
   return (
     <div>
       <TenantInfoTable
