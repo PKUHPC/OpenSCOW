@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { parseTime } from "@scow/lib-web/build/utils/datetime";
 import type { RunningJob } from "@scow/protos/build/common/job";
 import dayjs from "dayjs";
 import type { Cluster } from "src/utils/config";
@@ -77,19 +78,6 @@ export function formatTime(milliseconds: number) {
   text += pad(secModulo);
 
   return text;
-}
-
-// Parse the given string in [{days}-][{Hours}:]{MM}:{SS} format and return number of milliseconds
-export function parseTime(time: string) {
-  const list = time.split(/[:-]/).map((x) => +x);
-
-  const seconds = list.at(-1);
-  const minutes = list.at(-2);
-  const hours = list.at(-3) ?? 0;
-  const days = list.at(-4) ?? 0;
-
-  return seconds! * 1000 + minutes! * 60000 + (hours * 3600000) + days * 86400000;
-
 }
 
 
