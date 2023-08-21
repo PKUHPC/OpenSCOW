@@ -412,7 +412,7 @@ export const mockApi: MockApi<typeof api> = {
     operatorUserId: "testUser",
     operatorIp: "localhost",
     operationCode: "000000",
-    operationType: OperationType.LOGIN,
+    operationType: OperationType.login,
     operationResult: OperationResult.SUCCESS,
     operationTime: "2020-04-23T23:49:50.000Z",
     operationDetail:"用户登录",

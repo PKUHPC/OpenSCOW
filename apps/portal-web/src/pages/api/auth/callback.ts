@@ -47,7 +47,7 @@ export default route(AuthCallbackSchema, async (req, res) => {
     const logInfo = {
       operatorUserId: info.identityId,
       operatorIp: parseIp(req) ?? "",
-      operationTypeName: OperationType.LOGIN,
+      operationTypeName: OperationType.login,
     };
     callLog(logInfo, OperationResult.SUCCESS);
     res.redirect(publicConfig.BASE_PATH);

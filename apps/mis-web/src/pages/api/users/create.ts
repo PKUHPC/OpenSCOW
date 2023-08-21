@@ -94,7 +94,7 @@ export default /* #__PURE__*/typeboxRoute(CreateUserSchema, async (req, res) => 
   const logInfo = {
     operatorUserId: info.identityId,
     operatorIp: parseIp(req) ?? "",
-    operationTypeName: OperationType.CREATE_USER,
+    operationTypeName: OperationType.createUser,
     operationTypePayload:{
       userId: identityId,
     },

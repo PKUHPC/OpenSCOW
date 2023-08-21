@@ -51,7 +51,7 @@ export default route(DeleteDirSchema, async (req, res) => {
   const logInfo = {
     operatorUserId: info.identityId,
     operatorIp: parseIp(req) ?? "",
-    operationTypeName: OperationType.DELETE_DIRECTORY,
+    operationTypeName: OperationType.deleteDirectory,
     operationTypePayload:{
       clusterId: cluster, path,
     },

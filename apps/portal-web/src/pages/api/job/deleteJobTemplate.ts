@@ -51,7 +51,7 @@ export default /* #__PURE__*/route(DeleteJobTemplateSchema, async (req, res) => 
   const logInfo = {
     operatorUserId: info.identityId,
     operatorIp: parseIp(req) ?? "",
-    operationTypeName: OperationType.DELETE_JOB_TEMPLATE,
+    operationTypeName: OperationType.deleteJobTemplate,
     operationTypePayload:{
       jobTemplateId: templateId,
     },

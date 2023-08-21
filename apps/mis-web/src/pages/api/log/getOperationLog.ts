@@ -16,8 +16,8 @@ import { createOperationLogClient } from "@scow/lib-operation-log";
 import { UserServiceClient } from "@scow/protos/build/server/user";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
-import { getOperationDetail, OperationCodeMap, OperationLog, OperationLogQueryType, OperationResult,
-  OperationType } from "src/models/operationLog";
+import { getOperationDetail, OperationCodeMap, OperationLog, OperationLogQueryType,
+  OperationResult, OperationType } from "src/models/operationLog";
 import { PlatformRole, TenantRole, UserRole } from "src/models/User";
 import { getClient } from "src/utils/client";
 import { runtimeConfig } from "src/utils/config";

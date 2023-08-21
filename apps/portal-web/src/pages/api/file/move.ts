@@ -52,7 +52,7 @@ export default route(MoveFileItemSchema, async (req, res) => {
   const logInfo = {
     operatorUserId: info.identityId,
     operatorIp: parseIp(req) ?? "",
-    operationTypeName: OperationType.MOVE_FILE_ITEM,
+    operationTypeName: OperationType.moveFileItem,
     operationTypePayload:{
       clusterId: cluster, fromPath, toPath,
     },

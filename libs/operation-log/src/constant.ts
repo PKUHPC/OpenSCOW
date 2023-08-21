@@ -10,8 +10,16 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { OperationLog } from "@scow/protos/build/audit/operation_log";
+
 export enum OperationResult {
   UNKNOWN = 0,
   SUCCESS = 1,
   FAIL = 2,
 };
+
+type ExtractCases<T> = T extends { $case: infer U } ? U : never;
+
+export type OperationType = ExtractCases<OperationLog["operationEvent"]>;
+
+export type OperationTypeEnum = { [K in OperationType]: K };

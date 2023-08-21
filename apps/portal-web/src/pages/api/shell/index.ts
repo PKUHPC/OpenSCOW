@@ -131,7 +131,7 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
   callLog({
     operatorUserId: user.identityId,
     operatorIp: parseIp(req) ?? "",
-    operationTypeName: OperationType.SHELL_LOGIN,
+    operationTypeName: OperationType.shellLogin,
     operationTypePayload: {
       clusterId: cluster, loginNode: loginNode.address,
     },
@@ -163,7 +163,7 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
     callLog({
       operatorUserId: user.identityId,
       operatorIp: parseIp(req) ?? "",
-      operationTypeName: OperationType.SHELL_LOGIN,
+      operationTypeName: OperationType.shellLogin,
       operationTypePayload: {
         clusterId: cluster, loginNode: loginNode.address,
       },

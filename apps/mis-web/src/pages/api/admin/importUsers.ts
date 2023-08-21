@@ -49,8 +49,8 @@ export default typeboxRoute(ImportUsersSchema,
     const logInfo = {
       operatorUserId: DEFAULT_INIT_USER_ID,
       operatorIp: parseIp(req) ?? "",
-      operationTypeName: OperationType.IMPORT_USERS,
-      operationTypePayload:{
+      operationTypeName: OperationType.importUsers,
+      operationTypePayload: {
         tenantName: DEFAULT_TENANT_NAME,
         importAccounts: data.accounts.map((account) => ({
           accountName: account.accountName,

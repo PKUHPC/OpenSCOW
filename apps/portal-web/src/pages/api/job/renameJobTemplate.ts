@@ -52,7 +52,7 @@ export default /* #__PURE__*/route(RenameJobTemplateSchema, async (req, res) => 
   const logInfo = {
     operatorUserId: info.identityId,
     operatorIp: parseIp(req) ?? "",
-    operationTypeName: OperationType.UPDATE_JOB_TEMPLATE,
+    operationTypeName: OperationType.updateJobTemplate,
     operationTypePayload:{
       jobTemplateId: templateId,
       newJobTemplateId: jobName,

@@ -80,7 +80,7 @@ export default /* #__PURE__*/typeboxRoute(
     const logInfo = {
       operatorUserId: info.identityId,
       operatorIp: parseIp(req) ?? "",
-      operationTypeName: OperationType.TENANT_CHANGE_PASSWORD,
+      operationTypeName: OperationType.tenantChangePassword,
       operationTypePayload:{
         tenantName: info.tenant, userId: identityId,
       },

@@ -59,7 +59,7 @@ export default typeboxRoute(SetJobChargeLimitSchema, async (req, res) => {
   const logInfo = {
     operatorUserId: info.identityId,
     operatorIp: parseIp(req) ?? "",
-    operationTypeName: OperationType.ACCOUNT_SET_CHARGE_LIMIT,
+    operationTypeName: OperationType.accountSetChargeLimit,
     operationTypePayload:{
       accountName, userId, limit: numberToMoney(limit),
     },

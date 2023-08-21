@@ -76,7 +76,7 @@ export default typeboxRoute(ChangeJobTimeLimitSchema,
     const logInfo = {
       operatorUserId: info.identityId,
       operatorIp: parseIp(req) ?? "",
-      operationTypeName: OperationType.SET_JOB_TIME_LIMIT,
+      operationTypeName: OperationType.setJobTimeLimit,
       operationTypePayload:{
         jobId: +jobId, accountName: job.account, delta,
       },

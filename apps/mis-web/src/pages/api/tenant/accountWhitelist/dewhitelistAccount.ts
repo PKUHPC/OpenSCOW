@@ -49,7 +49,7 @@ export default route(DewhitelistAccountSchema,
     const logInfo = {
       operatorUserId: info.identityId,
       operatorIp: parseIp(req) ?? "",
-      operationTypeName: OperationType.REMOVE_ACCOUNT_FROM_WHITELIST,
+      operationTypeName: OperationType.removeAccountFromWhitelist,
       operationTypePayload:{
         tenantName: info.tenant, accountName,
       },

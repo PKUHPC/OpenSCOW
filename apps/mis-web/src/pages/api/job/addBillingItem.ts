@@ -55,7 +55,7 @@ export default /* #__PURE__*/typeboxRoute(AddBillingItemSchema, async (req, res)
   const logInfo = {
     operatorUserId: DEFAULT_INIT_USER_ID,
     operatorIp: parseIp(req) ?? "",
-    operationTypeName: tenant ? OperationType.SET_TENANT_BILLING : OperationType.SET_PLATFORM_BILLING,
+    operationTypeName: tenant ? OperationType.setTenantBilling : OperationType.setPlatformBilling,
     operationTypePayload:{
       tenantName: tenant, path, amount, price,
     },

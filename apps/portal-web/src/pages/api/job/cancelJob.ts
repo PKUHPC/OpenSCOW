@@ -51,7 +51,7 @@ export default /* #__PURE__*/route(CancelJobSchema, async (req, res) => {
   const logInfo = {
     operatorUserId: info.identityId,
     operatorIp: parseIp(req) ?? "",
-    operationTypeName: OperationType.END_JOB,
+    operationTypeName: OperationType.endJob,
     operationTypePayload: { jobId },
   };
 

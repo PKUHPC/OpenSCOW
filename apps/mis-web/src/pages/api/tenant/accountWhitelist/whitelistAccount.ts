@@ -52,7 +52,7 @@ export default route(WhitelistAccountSchema,
     const logInfo = {
       operatorUserId: info.identityId,
       operatorIp: parseIp(req) ?? "",
-      operationTypeName: OperationType.ADD_ACCOUNT_TO_WHITELIST,
+      operationTypeName: OperationType.addAccountToWhitelist,
       operationTypePayload:{
         tenantName: info.tenant, accountName,
       },

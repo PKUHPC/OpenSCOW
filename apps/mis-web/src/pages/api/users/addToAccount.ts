@@ -84,7 +84,7 @@ export default /* #__PURE__*/typeboxRoute(AddUserToAccountSchema, async (req, re
   const logInfo = {
     operatorUserId: info.identityId,
     operatorIp: parseIp(req) ?? "",
-    operationTypeName: OperationType.ADD_USER_TO_ACCOUNT,
+    operationTypeName: OperationType.addUserToAccount,
     operationTypePayload:{
       accountName, userId: identityId,
     },

@@ -106,7 +106,7 @@ export default route(SubmitJobSchema, async (req, res) => {
     .then(({ jobId }) => {
       callLog(
         { ...logInfo,
-          operationTypeName: OperationType.SUBMIT_JOB,
+          operationTypeName: OperationType.submitJob,
           operationTypePayload: { ... logInfo.operationTypePayload, jobId } },
         OperationResult.SUCCESS,
       );
@@ -114,7 +114,7 @@ export default route(SubmitJobSchema, async (req, res) => {
         callLog(
           {
             ...logInfo,
-            operationTypeName: OperationType.ADD_JOB_TEMPLATE,
+            operationTypeName: OperationType.addJobTemplate,
             operationTypePayload: { ... logInfo.operationTypePayload, jobTemplateId: `${jobName}-${jobId}` },
           },
           OperationResult.SUCCESS,
@@ -127,7 +127,7 @@ export default route(SubmitJobSchema, async (req, res) => {
     },
     () => callLog(
       { ...logInfo,
-        operationTypeName: OperationType.SUBMIT_JOB,
+        operationTypeName: OperationType.submitJob,
         operationTypePayload: { ... logInfo.operationTypePayload, jobId: -1 },
       },
       OperationResult.FAIL,

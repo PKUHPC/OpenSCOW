@@ -57,7 +57,7 @@ export default typeboxRoute(CancelJobChargeLimitSchema, async (req, res) => {
   const logInfo = {
     operatorUserId: info.identityId,
     operatorIp: parseIp(req) ?? "",
-    operationTypeName: OperationType.ACCOUNT_UNSET_CHARGE_LIMIT,
+    operationTypeName: OperationType.accountUnsetChargeLimit,
     operationTypePayload:{
       accountName, userId,
     },

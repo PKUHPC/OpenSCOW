@@ -59,7 +59,7 @@ export default /* #__PURE__*/typeboxRoute(KillDesktopSchema, async (req, res) =>
   const logInfo = {
     operatorUserId: info.identityId,
     operatorIp: parseIp(req) ?? "",
-    operationTypeName: OperationType.DELETE_DESKTOP,
+    operationTypeName: OperationType.deleteDesktop,
     operationTypePayload:{
       desktopId: displayId,
       loginNode: loginNode,

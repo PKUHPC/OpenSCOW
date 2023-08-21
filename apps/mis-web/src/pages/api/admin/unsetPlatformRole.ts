@@ -48,8 +48,8 @@ export default typeboxRoute(UnsetPlatformRoleSchema, async (req, res) => {
     operatorUserId: DEFAULT_INIT_USER_ID,
     operatorIp: parseIp(req) ?? "",
     operationTypeName: roleType === PlatformRole.PLATFORM_ADMIN
-      ? OperationType.UNSET_PLATFORM_ADMIN
-      : OperationType.UNSET_PLATFORM_FINANCE,
+      ? OperationType.unsetPlatformAdmin
+      : OperationType.unsetPlatformFinance,
     operationTypePayload:{
       userId,
     },

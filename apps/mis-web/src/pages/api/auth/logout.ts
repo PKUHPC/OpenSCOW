@@ -39,7 +39,7 @@ export default typeboxRoute(LogoutSchema, async (req) => {
       const logInfo = {
         operatorUserId: info.identityId,
         operatorIp: parseIp(req) ?? "",
-        operationTypeName: OperationType.LOGOUT,
+        operationTypeName: OperationType.logout,
       };
       callLog(logInfo, OperationResult.SUCCESS);
     }

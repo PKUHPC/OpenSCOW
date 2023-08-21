@@ -48,8 +48,8 @@ export default typeboxRoute(SetTenantRoleSchema, async (req, res) => {
     operatorUserId: DEFAULT_INIT_USER_ID,
     operatorIp: parseIp(req) ?? "",
     operationTypeName: roleType === TenantRole.TENANT_ADMIN
-      ? OperationType.SET_TENANT_ADMIN
-      : OperationType.SET_TENANT_FINANCE,
+      ? OperationType.setTenantAdmin
+      : OperationType.setTenantFinance,
     operationTypePayload:{
       tenantName: DEFAULT_TENANT_NAME, userId,
     },

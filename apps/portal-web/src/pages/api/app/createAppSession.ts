@@ -88,7 +88,7 @@ export default /* #__PURE__*/route(CreateAppSessionSchema, async (req, res) => {
   const logInfo = {
     operatorUserId: info.identityId,
     operatorIp: parseIp(req) ?? "",
-    operationTypeName: OperationType.CREATE_APP,
+    operationTypeName: OperationType.createApp,
     operationTypePayload:{
       accountName: account,
     },

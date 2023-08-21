@@ -76,7 +76,7 @@ export default /* #__PURE__*/typeboxRoute(CreateDesktopSchema, async (req, res) 
   const logInfo = {
     operatorUserId: info.identityId,
     operatorIp: parseIp(req) ?? "",
-    operationTypeName: OperationType.CREATE_DESKTOP,
+    operationTypeName: OperationType.createDesktop,
     operationTypePayload:{
       desktopName, wm,
     },

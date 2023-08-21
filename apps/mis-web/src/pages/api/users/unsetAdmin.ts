@@ -58,7 +58,7 @@ export default typeboxRoute(UnsetAdminSchema, async (req, res) => {
   const logInfo = {
     operatorUserId: info.identityId,
     operatorIp: parseIp(req) ?? "",
-    operationTypeName: OperationType.UNSET_ACCOUNT_ADMIN,
+    operationTypeName: OperationType.unsetAccountAdmin,
     operationTypePayload:{
       accountName, userId: identityId,
     },

@@ -15,7 +15,6 @@ import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { status } from "@grpc/grpc-js";
 import { FileServiceClient } from "@scow/protos/build/portal/file";
 import { Type } from "@sinclair/typebox";
-import { log } from "console";
 import { authenticate } from "src/auth/server";
 import { OperationResult, OperationType } from "src/models/operationLog";
 import { callLog } from "src/server/operationLog";
@@ -53,7 +52,7 @@ export default route(CreateFileSchema, async (req, res) => {
   const logInfo = {
     operatorUserId: info.identityId,
     operatorIp: parseIp(req) ?? "",
-    operationTypeName: OperationType.CREATE_FILE,
+    operationTypeName: OperationType.createFile,
     operationTypePayload:{
       clusterId: cluster, path,
     },

@@ -59,7 +59,7 @@ export default route(FinancePaySchema,
     const logInfo = {
       operatorUserId: info.identityId,
       operatorIp: parseIp(req) ?? "",
-      operationTypeName: OperationType.ACCOUNT_PAY,
+      operationTypeName: OperationType.accountPay,
       operationTypePayload:{
         tenantName: info.tenant,
         accountName,

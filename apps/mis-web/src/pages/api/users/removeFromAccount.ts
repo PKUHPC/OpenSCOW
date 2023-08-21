@@ -63,7 +63,7 @@ export default /* #__PURE__*/route(RemoveUserFromAccountSchema, async (req, res)
   const logInfo = {
     operatorUserId: info.identityId,
     operatorIp: parseIp(req) ?? "",
-    operationTypeName: OperationType.REMOVE_USER_FROM_ACCOUNT,
+    operationTypeName: OperationType.removeUserFromAccount,
     operationTypePayload:{
       accountName, userId: identityId,
     },

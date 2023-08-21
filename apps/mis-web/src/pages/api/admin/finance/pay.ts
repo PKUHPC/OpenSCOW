@@ -62,7 +62,7 @@ export default route(TenantFinancePaySchema,
     const logInfo = {
       operatorUserId: info.identityId,
       operatorIp: parseIp(req) ?? "",
-      operationTypeName: OperationType.TENANT_PAY,
+      operationTypeName: OperationType.tenantPay,
       operationTypePayload:{
         tenantName: info.tenant,
         amount: numberToMoney(amount),

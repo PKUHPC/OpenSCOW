@@ -87,7 +87,7 @@ export default /* #__PURE__*/typeboxRoute(CreateTenantSchema, async (req, res) =
   const logInfo = {
     operatorUserId: info.identityId,
     operatorIp: parseIp(req) ?? "",
-    operationTypeName: OperationType.CREATE_TENANT,
+    operationTypeName: OperationType.createTenant,
     operationTypePayload:{
       tenantName, tenantAdmin: userId,
     },

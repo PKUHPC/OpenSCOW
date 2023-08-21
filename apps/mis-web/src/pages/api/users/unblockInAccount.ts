@@ -60,7 +60,7 @@ export default /* #__PURE__*/route(UnblockUserInAccountSchema, async (req, res) 
   const logInfo = {
     operatorUserId: info.identityId,
     operatorIp: parseIp(req) ?? "",
-    operationTypeName: OperationType.UNBLOCK_USER,
+    operationTypeName: OperationType.unblockUser,
     operationTypePayload:{
       accountName, userId: identityId,
     },

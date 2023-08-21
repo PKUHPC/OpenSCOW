@@ -58,7 +58,7 @@ export default /* #__PURE__*/typeboxRoute(SetAdminSchema, async (req, res) => {
   const logInfo = {
     operatorUserId: info.identityId,
     operatorIp: parseIp(req) ?? "",
-    operationTypeName: OperationType.SET_ACCOUNT_ADMIN,
+    operationTypeName: OperationType.setAccountAdmin,
     operationTypePayload:{
       accountName, userId: identityId,
     },

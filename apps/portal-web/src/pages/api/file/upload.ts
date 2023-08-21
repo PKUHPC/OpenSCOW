@@ -56,7 +56,7 @@ export default route(UploadFileSchema, async (req, res) => {
   const logInfo = {
     operatorUserId: info.identityId,
     operatorIp: parseIp(req) ?? "",
-    operationTypeName: OperationType.UPLOAD_FILE,
+    operationTypeName: OperationType.uploadFile,
     operationTypePayload:{
       clusterId: cluster, path,
     },

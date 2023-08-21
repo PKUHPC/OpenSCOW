@@ -55,7 +55,7 @@ export default route(CopyFileItemSchema, async (req, res) => {
   const logInfo = {
     operatorUserId: info.identityId,
     operatorIp: parseIp(req) ?? "",
-    operationTypeName: OperationType.COPY_FILE_ITEM,
+    operationTypeName: OperationType.copyFileItem,
     operationTypePayload:{
       clusterId: cluster, fromPath, toPath,
     },

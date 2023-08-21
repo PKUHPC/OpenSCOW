@@ -53,7 +53,7 @@ export default route(MkdirSchema, async (req, res) => {
   const logInfo = {
     operatorUserId: info.identityId,
     operatorIp: parseIp(req) ?? "",
-    operationTypeName: OperationType.CREATE_DIRECTORY,
+    operationTypeName: OperationType.createDirectory,
     operationTypePayload:{
       clusterId: cluster, path,
     },

@@ -91,7 +91,7 @@ export default route(CreateAccountSchema,
     const logInfo = {
       operatorUserId: info.identityId,
       operatorIp: parseIp(req) ?? "",
-      operationTypeName: OperationType.CREATE_ACCOUNT,
+      operationTypeName: OperationType.createAccount,
       operationTypePayload:{
         tenantName: info.tenant, accountName, accountOwner: ownerId,
       },
