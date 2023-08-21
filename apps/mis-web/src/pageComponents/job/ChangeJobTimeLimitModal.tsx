@@ -26,7 +26,7 @@ interface Props {
 }
 
 interface FormProps {
-  limit: number;
+  limitMinutes: number;
 }
 
 interface CompletionStatus {
@@ -67,13 +67,13 @@ export const ChangeJobTimeLimitModal: React.FC<Props> = ({ open, onClose, data, 
       confirmLoading={loading}
       destroyOnClose
       onOk={async () => {
-        const { limit } = await form.validateFields();
+        const { limitMinutes } = await form.validateFields();
         setLoading(true);
 
         completionStatus.current = { total: data.length, success: 0, failed: []};
 
         await Promise.all(data.map(async (r) => {
-          await api.changeJobTimeLimit({ body: { cluster: r.cluster.id, limit, jobId: r.jobId } })
+          await api.changeJobTimeLimit({ body: { cluster: r.cluster.id, limitMinutes, jobId: r.jobId } })
             .httpError(400, (e) => {
               if (e.code === "TIME_LIME_NOT_VALID") {
                 message.error(e.message);
@@ -106,7 +106,7 @@ export const ChangeJobTimeLimitModal: React.FC<Props> = ({ open, onClose, data, 
 
       }}
     >
-      <Form form={form} initialValues={{ limit: 1 }}>
+      <Form form={form} initialValues={{ limitMinutes: 1 }}>
         {
           Array.from(dataGroupedByCluster.entries()).map(([cluster, data]) => (
             <>
@@ -121,7 +121,7 @@ export const ChangeJobTimeLimitModal: React.FC<Props> = ({ open, onClose, data, 
           ))
         }
         <Form.Item<FormProps> label="设置作业时限" rules={[{ required: true }]}>
-          <Form.Item name="limit" noStyle>
+          <Form.Item name="limitMinutes" noStyle>
             <InputNumber min={1} step={1} addonAfter={"分钟"} />
           </Form.Item>
         </Form.Item>
