@@ -17,19 +17,20 @@ import { LockMode } from "@mikro-orm/core";
 import { Decimal } from "@scow/lib-decimal";
 import { moneyToNumber } from "@scow/lib-decimal/build/convertion";
 import { JobChargeLimitServiceServer, JobChargeLimitServiceService } from "@scow/protos/build/server/job_charge_limit";
+import { unblockUserInAccount } from "src/bl/block";
 import { setJobCharge } from "src/bl/charging";
-import { UserAccount } from "src/entities/UserAccount";
+import { UserAccount, UserStatus } from "src/entities/UserAccount";
 
 export const jobChargeLimitServer = plugin((server) => {
   server.addService<JobChargeLimitServiceServer>(JobChargeLimitServiceService, {
     cancelJobChargeLimit: async ({ request, em, logger }) => {
-      const { accountName, userId, tenantName } = request;
+      const { accountName, userId, tenantName, unblock } = request;
 
       await em.transactional(async (em) => {
         const userAccount = await em.findOne(UserAccount, {
           user: { userId, tenant: { name: tenantName } },
           account: { accountName, tenant: { name: tenantName } },
-        });
+        }, { populate: ["user", "account"]});
 
         if (!userAccount) {
           throw <ServiceError>{
@@ -54,6 +55,12 @@ export const jobChargeLimitServer = plugin((server) => {
 
         userAccount.jobChargeLimit = undefined;
         userAccount.usedJobCharge = undefined;
+
+        if (UserStatus.BLOCKED && unblock) {
+          await unblockUserInAccount(userAccount, server.ext, logger);
+          userAccount.status = UserStatus.UNBLOCKED;
+        }
+
       });
 
       return [{}];
