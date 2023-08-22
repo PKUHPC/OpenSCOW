@@ -59,6 +59,7 @@ const fn2 = (args: any) => {
     return fn(args);
   } catch (error) {
     console.log(error);
+    return fn(args);
   }
 };
 
