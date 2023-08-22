@@ -13,7 +13,20 @@
 import { createApiClient } from "@ddadaal/next-typed-api-routes-runtime/lib/client";
 import { publicConfig } from "src/utils/config";
 
-export const apiClient = createApiClient({
-  baseUrl: ((typeof window === "undefined") ? `http://localhost:${process.env.PORT ?? 3000}` : "")
-   + (publicConfig.BASE_PATH === "/" ? "" : publicConfig.BASE_PATH),
-});
+export const apiClient1 = () => {
+  try {
+    return createApiClient({
+      baseUrl: ((typeof window === "undefined") ? `http://localhost:${process.env.PORT ?? 3000}` : "")
+       + (publicConfig.BASE_PATH === "/" ? "" : publicConfig.BASE_PATH),
+    });
+  } catch (e) {
+    console.log("apps/portal-web/src/apis/client.ts", e);
+    return createApiClient({
+      baseUrl: ((typeof window === "undefined") ? `http://localhost:${process.env.PORT ?? 3000}` : "")
+       + (publicConfig.BASE_PATH === "/" ? "" : publicConfig.BASE_PATH),
+    });
+  }
+};
+
+
+export const apiClient = apiClient1();
