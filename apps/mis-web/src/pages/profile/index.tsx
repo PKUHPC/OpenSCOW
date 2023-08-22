@@ -102,7 +102,7 @@ export const ProfilePage: NextPage = requireAuth(() => true)(({ userStore: { use
               ) : undefined
             }
             <Descriptions.Item label="创建时间">
-              {formatDateTime(user.createTime || "")}
+              {user.createTime ? formatDateTime(user.createTime) : ""}
             </Descriptions.Item>
           </Descriptions>
         </Part>
