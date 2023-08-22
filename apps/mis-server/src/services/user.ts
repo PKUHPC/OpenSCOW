@@ -484,6 +484,7 @@ export const userServiceServer = plugin((server) => {
       const user = await em.findOne(User, {
         userId,
       }, { populate: ["accounts", "accounts.account", "tenant", "email"]});
+
       if (!user) {
         throw <ServiceError>{ code: Status.NOT_FOUND, message:`User ${userId} is not found.` };
       }
@@ -498,6 +499,7 @@ export const userServiceServer = plugin((server) => {
         email: user.email,
         tenantRoles: user.tenantRoles.map(tenantRoleFromJSON),
         platformRoles: user.platformRoles.map(platformRoleFromJSON),
+        createTime:user.createTime.toISOString(),
       }];
     },
 

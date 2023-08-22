@@ -243,6 +243,8 @@ message GetUserInfoResponse {
   string name = 4;
   string tenant_name = 5;
   string email = 6;
+  google.protobuf.Timestamp create_time = 7;
+  
 }
 
 message GetUsersResponse {
