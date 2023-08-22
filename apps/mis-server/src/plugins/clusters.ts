@@ -119,11 +119,11 @@ export const clustersPlugin = plugin(async (f) => {
 
       if (failed.length > 0) {
         logger.error("Cluster ops fails at clusters %o", failed);
+        const reason = failed.map((x) => clusters[x.cluster].displayName + ": " + x.error).join("; ");
         throw new ServiceError({
           code: status.INTERNAL,
-          details: failed.map((x) => x.cluster).join(","),
+          details: reason,
           metadata: scowErrorMetadata(CLUSTEROPS_ERROR_CODE),
-          // metadata: scowErrorMetadata(CLUSTEROPS_ERROR_CODE, {failedClusters: failed.join(",")})
         });
       }
 
