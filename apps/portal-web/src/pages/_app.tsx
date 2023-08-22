@@ -171,10 +171,7 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
     // so next.js will import validateToken into the client bundle
     // validateToken depends on ioredis, which cannot be brought into frontend.
     // dynamic import also doesn't work.
-      const userInfo = await api.validateToken({ query: { token } }).catch((e) =>
-      {
-        console.log("============_app.tsx: 3", e);
-        return undefined; });
+      const userInfo = await api.validateToken({ query: { token } });
 
       console.log("============_app.tsx: 2", userInfo);
 

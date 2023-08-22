@@ -35,10 +35,12 @@ export const ValidateTokenSchema = typeboxRouteSchema({
 });
 
 export default route(ValidateTokenSchema, async (req) => {
-
   const { token } = req.query;
+  console.log("apps/portal-web/src/pages/api/auth/validateToken.ts 1", token);
 
   const info = await validateToken(token);
+
+  console.log("apps/portal-web/src/pages/api/auth/validateToken.ts 2", info);
 
   if (!info) { return { 403: null }; }
 

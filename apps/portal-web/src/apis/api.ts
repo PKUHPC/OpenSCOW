@@ -53,6 +53,14 @@ import type { SubmitJobSchema } from "src/pages/api/job/submitJob";
 import type { ChangePasswordSchema } from "src/pages/api/profile/changePassword";
 import type { CheckPasswordSchema } from "src/pages/api/profile/checkPassword";
 
+const fn = apiClient.fromTypeboxRoute<typeof ValidateTokenSchema>("GET", "/api/auth/validateToken");
+const fn2 = (args: any) => {
+  try {
+    return fn(args);
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 export const api = {
   checkAppConnectivity: apiClient.fromTypeboxRoute<typeof CheckAppConnectivitySchema>("GET", "/api/app/checkConnectivity"),
@@ -64,7 +72,7 @@ export const api = {
   listAvailableApps: apiClient.fromTypeboxRoute<typeof ListAvailableAppsSchema>("GET", "/api/app/listAvailableApps"),
   authCallback: apiClient.fromTypeboxRoute<typeof AuthCallbackSchema>("GET", "/api/auth/callback"),
   logout: apiClient.fromTypeboxRoute<typeof LogoutSchema>("DELETE", "/api/auth/logout"),
-  validateToken: apiClient.fromTypeboxRoute<typeof ValidateTokenSchema>("GET", "/api/auth/validateToken"),
+  validateToken: fn2,
   getClusterInfo: apiClient.fromTypeboxRoute<typeof GetClusterInfoSchema>("GET", "/api//cluster"),
   createDesktop: apiClient.fromTypeboxRoute<typeof CreateDesktopSchema>("POST", "/api/desktop/createDesktop"),
   killDesktop: apiClient.fromTypeboxRoute<typeof KillDesktopSchema>("POST", "/api/desktop/killDesktop"),
