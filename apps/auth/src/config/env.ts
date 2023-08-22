@@ -31,6 +31,7 @@ export const config = envConfig({
   LOG_PRETTY: bool({ desc: "以可读的方式输出log", default: false }),
 
   BASE_PATH: str({ desc: "整个系统的base path", default: "/" }),
+  PORTAL_BASE_PATH: str({ desc: "门户系统的 base path", default: "/" }),
 
   AUTH_BASE_PATH: str({ desc: "认证系统相对于整个系统的base path", default: "/auth" }),
 

@@ -161,11 +161,14 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
       volumes: authVolumes,
     });
   } else {
+    const portalBasePath = join(BASE_PATH, PORTAL_PATH);
+
     addService("auth", {
       image: scowImage,
       environment: {
         "SCOW_LAUNCH_APP": "auth",
         "BASE_PATH": BASE_PATH,
+        "PORTAL_BASE_PATH": portalBasePath,
         ...serviceLogEnv,
       },
       ports: config.auth.portMappings?.auth ? { [config.auth.portMappings?.auth]: 5000 } : {},

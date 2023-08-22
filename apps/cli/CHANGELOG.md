@@ -1,5 +1,19 @@
 # @scow/cli
 
+## 0.9.0
+
+### Patch Changes
+
+- 785a14bf5: 修复 auth logo 在修改系统相对路径后无法显示的问题
+- Updated dependencies [67911fd92]
+- Updated dependencies [b96e5c4b2]
+- Updated dependencies [31dc79055]
+- Updated dependencies [9f70e2121]
+- Updated dependencies [6f278a7b9]
+- Updated dependencies [1407743ad]
+- Updated dependencies [f3dd67ecb]
+  - @scow/config@0.5.0
+
 ## 0.8.1
 
 ## 0.8.0

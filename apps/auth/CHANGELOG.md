@@ -1,5 +1,26 @@
 # @scow/auth
 
+## 0.9.0
+
+### Minor Changes
+
+- 113e1e4ea: 在 auth 中添加了一个新的 capability 叫 checkPassword，用于检验密码。原先的修改密码 changePassword 不再需要旧密码
+
+### Patch Changes
+
+- 572530a01: mis-web 用户修改邮箱,用户原邮箱直接展示且不可修改，用户填写符合规则的新邮箱后即可直接修改邮箱。
+- 785a14bf5: 修复 auth logo 在修改系统相对路径后无法显示的问题
+- 72875e722: 新增 auth 登录界面可配置项
+- b2a52c546: 全新 SCOW 登录界面
+- Updated dependencies [67911fd92]
+- Updated dependencies [b96e5c4b2]
+- Updated dependencies [31dc79055]
+- Updated dependencies [9f70e2121]
+- Updated dependencies [6f278a7b9]
+- Updated dependencies [1407743ad]
+- Updated dependencies [f3dd67ecb]
+  - @scow/config@0.5.0
+
 ## 0.8.1
 
 ## 0.8.0

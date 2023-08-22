@@ -28,6 +28,7 @@ export const CancelJobChargeLimitSchema = typeboxRouteSchema({
   query: Type.Object({
     accountName: Type.String(),
     userId: Type.String(),
+    unblock: Type.Optional(Type.Boolean()),
   }),
 
   responses: {
@@ -39,7 +40,7 @@ export const CancelJobChargeLimitSchema = typeboxRouteSchema({
 
 export default typeboxRoute(CancelJobChargeLimitSchema, async (req, res) => {
 
-  const { accountName, userId } = req.query;
+  const { accountName, userId, unblock } = req.query;
 
   const auth = authenticate((u) => {
     const acccountBelonged = u.accountAffiliations.find((x) => x.accountName === accountName);
@@ -66,6 +67,7 @@ export default typeboxRoute(CancelJobChargeLimitSchema, async (req, res) => {
   return await asyncClientCall(client, "cancelJobChargeLimit", {
     tenantName: info.tenant,
     accountName, userId,
+    unblock,
   })
     .then(async () => {
       await callLog(logInfo, OperationResult.SUCCESS);

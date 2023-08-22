@@ -1,5 +1,60 @@
 # @scow/mis-web
 
+## 0.9.0
+
+### Minor Changes
+
+- 1c5e3a307: 平台管理中增加租户列表显示
+- b96e5c4b2: 支持在导航栏右侧的用户下拉菜单中增加自定义链接
+- 113e1e4ea: 管理系统中，租户/平台管理员修改自己管理的用户密码时无需原密码
+- f3dd67ecb: 增加用户通过代码自定义收费规则的功能
+
+### Patch Changes
+
+- 75951b5bb: 租户管理下账户列表，白名单账户显示优化；增加账户统计信息，用户数量显示等功能。
+- 31dc79055: 增加是否打开新的页面配置项，默认为 false,所有导航点击时不打开新的页面；修改一级导航 url 配置项为可选，没有配置时 则默认跳转次级第一个导航的 url
+- f9fbd4cd2: 租户管理中拆分租户和账户充值记录查询，平台管理中租户查询充值记录时可以下拉选择租户
+- 666567732: 之前历史作业批量搜索和精确搜索的条件分割有误，精确搜索会带上批量搜索的一些条件，现在各自搜索只会带上自己的条件
+- d49a34986: 优化租户管理和平台管理的用户列表，增加各角色用户总数显示，优化显示文字及列表结果排序
+- 9fd95a97a: 为作业详情页的作业执行时间，作业等待时间，作业时间限制添加单位说明
+- 572530a01: mis-web 用户修改邮箱,用户原邮箱直接展示且不可修改，用户填写符合规则的新邮箱后即可直接修改邮箱。
+- da5edd22c: 在集群与分区信息页面，实现仅显示用户有使用权限的分区信息
+- 6e0d03044: 解决开发环境下 mis-web 进入 dashboard 页面报错的问题
+- 12ecb668e: 修复多次点击用户空间-已结束作业列表，接口会自动加上账户筛选条件的问题
+- 143c9732e: 之前：退出登录或登陆过期时跳转到需要登录页面，现在：直接跳转到登录页面
+- 291f1d471: mis-web 管理系统 UI 文字和栏目优化。mis-server 返回租户信息中增加租户财务人员，返回平台信息中增加平台财务人员。
+- 2f3b9e98d: 管理系统集群名展示改为集群的 displayName
+- 0f8ade56c: 租户管理员增加账户管理员的所有权限，比如添加用户、限额、封锁、设为管理员和移除用户。
+- 01559259c: 修复 setAsInitAdmin.ts 和 unsetInitAdmin.ts 文件命名错误
+- 6522b47cf: 修改作业时限优化，将增加减少时限改为直接设置作业时限，并且检查是否大于作业的运行时间
+- 8dcfc3f1a: 增加作业列表中 GPU 卡数的展示
+- 5362b438c: 修改平台管理获取账户列表的权限
+- 4b12bed3f: 修改管理系统用户空间集群分区的计量方式显示，修改为与作业价格表中显示方式一致
+- cce9d6c92: 取消用户限额时可选择是否同时解除对用户的封锁
+- f3d9849ce: 复用账户列表组件，除个别特殊显示外实现平台管理下的账户列表与租户管理下的账户列表功能统一
+- ba67cac99: 修复 Schema 中使用 Type.Union([Type.String(), Type.Undefined()])错误，改为 Type.Optional(Type.String())
+- 1c668544f: 增加 hook：jobsSaved，此 hook 在作业信息持久化到 scow 数据库后调用
+- c84ff2eb8: 为租户管理员增加租户财务人员权限和平台管理员增加平台财务人员权限
+- Updated dependencies [75951b5bb]
+- Updated dependencies [67911fd92]
+- Updated dependencies [113e1e4ea]
+- Updated dependencies [1c74443b6]
+- Updated dependencies [b96e5c4b2]
+- Updated dependencies [d49a34986]
+- Updated dependencies [31dc79055]
+- Updated dependencies [572530a01]
+- Updated dependencies [9f70e2121]
+- Updated dependencies [6f278a7b9]
+- Updated dependencies [6522b47cf]
+- Updated dependencies [1407743ad]
+- Updated dependencies [53e596584]
+- Updated dependencies [f3dd67ecb]
+- Updated dependencies [9f70e2121]
+  - @scow/lib-web@0.4.0
+  - @scow/config@0.5.0
+  - @scow/lib-auth@0.3.0
+  - @scow/protos@0.3.1
+
 ## 0.8.1
 
 ### Patch Changes
