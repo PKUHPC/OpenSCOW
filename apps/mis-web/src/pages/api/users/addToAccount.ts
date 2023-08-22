@@ -39,7 +39,8 @@ export const AddUserToAccountSchema = typeboxRouteSchema({
 
     404: Type.Object({
       code: Type.Union([
-        Type.Literal("ACCOUNT_NOT_FOUND"),
+        Type.Literal("ACCOUNT_OR_TENANT_NOT_FOUND"),
+        Type.Literal("USER_ALREADY_EXIST_IN_OTHER_TENANT"),
         Type.Literal("USER_NOT_FOUND"),
       ]),
     }),
@@ -86,6 +87,16 @@ export default /* #__PURE__*/typeboxRoute(AddUserToAccountSchema, async (req, re
   }).then(() => ({ 204: null }))
     .catch(handlegRPCError({
       [Status.ALREADY_EXISTS]: () => ({ 409: null }),
-      [Status.NOT_FOUND]: () => ({ 404: { code: "ACCOUNT_NOT_FOUND" as const } }),
+      [Status.NOT_FOUND]: (e) => { 
+        console.log("e", e.details);
+        if (e.details === "USER_OR_TENANT_NOT_FOUND") {
+
+          return { 404: { code: "USER_ALREADY_EXIST_IN_OTHER_TENANT" as const } };
+        } else {
+          
+          return { 404: { code: "ACCOUNT_OR_TENANT_NOT_FOUND" as const } }; 
+        }
+      }
+      ,
     }));
 });

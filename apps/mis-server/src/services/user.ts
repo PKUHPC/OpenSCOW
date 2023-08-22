@@ -144,10 +144,19 @@ export const userServiceServer = plugin((server) => {
         userId, tenant: { name: tenantName },
       });
 
-      if (!account || !user) {
+      if (!user) {
         throw <ServiceError>{
           code: Status.NOT_FOUND,
-          message: `Account ${accountName} or user ${userId}, tenant ${tenantName} is not found.`,
+          message: `User ${userId} or tenant ${tenantName} is not found.`,
+          details:"USER_OR_TENANT_NOT_FOUND",
+        };
+      }
+
+      if (!account) {
+        throw <ServiceError>{
+          code: Status.NOT_FOUND,
+          message: `Account ${accountName} or tenant ${tenantName} is not found.`,
+          details:"ACCOUNT_OR_TENANT_NOT_FOUND",
         };
       }
 
