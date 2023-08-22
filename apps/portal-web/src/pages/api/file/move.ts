@@ -60,14 +60,14 @@ export default route(MoveFileItemSchema, async (req, res) => {
 
   return asyncUnaryCall(client, "move", {
     cluster, fromPath, toPath, userId: info.identityId,
-  }).then(() => {
-    callLog(logInfo, OperationResult.SUCCESS);
+  }).then(async () => {
+    await callLog(logInfo, OperationResult.SUCCESS);
     return { 204: null };
   }, handlegRPCError({
     [status.INTERNAL]: (e) => ({ 415: { code: "RENAME_FAILED" as const, error: e.details } }),
     [status.NOT_FOUND]: () => ({ 400: { code: "INVALID_CLUSTER" as const } }),
   },
-  () => callLog(logInfo, OperationResult.FAIL),
+  async () => await callLog(logInfo, OperationResult.FAIL),
   ));
 
 });

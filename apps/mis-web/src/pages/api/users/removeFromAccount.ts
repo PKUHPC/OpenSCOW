@@ -74,14 +74,14 @@ export default /* #__PURE__*/route(RemoveUserFromAccountSchema, async (req, res)
     accountName,
     userId: identityId,
   })
-    .then(() => {
-      callLog(logInfo, OperationResult.SUCCESS);
+    .then(async () => {
+      await callLog(logInfo, OperationResult.SUCCESS);
       return { 204: null };
     })
     .catch(handlegRPCError({
       [Status.NOT_FOUND]: () => ({ 404: null }),
       [Status.OUT_OF_RANGE]: () => ({ 406: null }),
     },
-    () => callLog(logInfo, OperationResult.FAIL),
+    async () => await callLog(logInfo, OperationResult.FAIL),
     ));
 });

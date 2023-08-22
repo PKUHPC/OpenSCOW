@@ -87,14 +87,14 @@ export default /* #__PURE__*/typeboxRoute(AddBillingItemSchema, async (req, res)
   return await asyncClientCall(client, "addBillingItem", {
     tenantName: tenant, amountStrategy: amount, itemId, path, description, price,
   })
-    .then(() => {
-      callLog(logInfo, OperationResult.SUCCESS);
+    .then(async () => {
+      await callLog(logInfo, OperationResult.SUCCESS);
       return { 204: null };
     })
     .catch(handlegRPCError({
       [status.ALREADY_EXISTS]: () => ({ 409: { code: "ITEM_ID_EXISTS" } } as const),
       [status.NOT_FOUND]: () => ({ 404: { code: "TENANT_NOT_FOUND" } } as const),
     },
-    () => callLog(logInfo, OperationResult.FAIL),
+    async () => await callLog(logInfo, OperationResult.FAIL),
     ));
 });

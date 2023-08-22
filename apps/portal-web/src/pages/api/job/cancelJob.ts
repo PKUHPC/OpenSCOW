@@ -58,11 +58,11 @@ export default /* #__PURE__*/route(CancelJobSchema, async (req, res) => {
   return asyncUnaryCall(client, "cancelJob", {
     jobId, userId: info.identityId, cluster,
   }).then(async () => {
-    callLog(logInfo, OperationResult.SUCCESS);
+    await callLog(logInfo, OperationResult.SUCCESS);
     return { 204: null };
   }, handlegRPCError({
     [status.NOT_FOUND]: () => ({ 404: { code: "JOB_NOT_FOUND" } } as const),
   },
-  () => callLog(logInfo, OperationResult.FAIL),
+  async () => await callLog(logInfo, OperationResult.FAIL),
   ));
 });

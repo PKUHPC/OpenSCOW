@@ -63,13 +63,13 @@ export default route(CopyFileItemSchema, async (req, res) => {
 
   return asyncUnaryCall(client, "copy", {
     cluster, fromPath, toPath, userId: info.identityId,
-  }).then(() => {
-    callLog(logInfo, OperationResult.SUCCESS);
+  }).then(async () => {
+    await callLog(logInfo, OperationResult.SUCCESS);
     return { 204: null };
   }, handlegRPCError({
     [status.INTERNAL]: (e) => ({ 415: { code: "CP_CMD_FAILED" as const, error: e.details } }),
     [status.NOT_FOUND]: () => ({ 400: { code: "INVALID_CLUSTER" as const } }),
   },
-  () => callLog(logInfo, OperationResult.FAIL),
+  async () => await callLog(logInfo, OperationResult.FAIL),
   ));
 });

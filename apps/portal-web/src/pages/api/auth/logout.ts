@@ -42,7 +42,7 @@ export default route(LogoutSchema, async (req) => {
         operatorIp: parseIp(req) ?? "",
         operationTypeName: OperationType.logout,
       };
-      callLog(logInfo, OperationResult.SUCCESS);
+      await callLog(logInfo, OperationResult.SUCCESS);
     }
     await deleteToken(token, runtimeConfig.AUTH_INTERNAL_URL);
   }

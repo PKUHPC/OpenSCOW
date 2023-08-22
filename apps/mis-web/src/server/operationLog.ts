@@ -10,13 +10,14 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { createOperationLogClient, LogCallParams, OperationEvent, OperationResult } from "@scow/lib-operation-log";
+import { createOperationLogClient,
+  LogCallParams, OperationEvent, OperationResult } from "@scow/lib-operation-log/build/index";
 import { runtimeConfig } from "src/utils/config";
 
 interface PartialLogCallParams<TName extends OperationEvent["$case"]>
  extends Omit<LogCallParams<TName>, "operationResult" | "logger"> {}
 
-export const callLog = <TName extends OperationEvent["$case"]>(
+export const callLog = async <TName extends OperationEvent["$case"]>(
   {
     operatorUserId,
     operatorIp,
@@ -28,7 +29,7 @@ export const callLog = <TName extends OperationEvent["$case"]>(
 
   const { callLog } = createOperationLogClient(runtimeConfig.AUDIT_CONFIG, console);
 
-  callLog(
+  await callLog(
     {
       operatorUserId,
       operatorIp,

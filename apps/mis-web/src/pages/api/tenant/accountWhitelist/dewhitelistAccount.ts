@@ -62,13 +62,13 @@ export default route(DewhitelistAccountSchema,
       tenantName: info.tenant,
       accountName,
     })
-      .then(() => {
-        callLog(logInfo, OperationResult.SUCCESS);
+      .then(async () => {
+        await callLog(logInfo, OperationResult.SUCCESS);
         return { 204: null };
       })
       .catch(handlegRPCError({
         [Status.NOT_FOUND]: () => ({ 404: null }),
       },
-      () => callLog(logInfo, OperationResult.FAIL),
+      async () => await callLog(logInfo, OperationResult.FAIL),
       ));
   });

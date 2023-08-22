@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { OperationType } from "@scow/lib-operation-log";
+import { OperationType } from "@scow/lib-operation-log/build/index";
 import { defaultPresets, formatDateTime } from "@scow/lib-web/build/utils/datetime";
 import { Button, DatePicker, Form, Input, Select, Table } from "antd";
 import dayjs from "dayjs";

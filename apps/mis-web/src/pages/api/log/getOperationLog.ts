@@ -12,7 +12,7 @@
 
 import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
-import { createOperationLogClient } from "@scow/lib-operation-log";
+import { createOperationLogClient } from "@scow/lib-operation-log/build/index";
 import { UserServiceClient } from "@scow/protos/build/server/user";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";

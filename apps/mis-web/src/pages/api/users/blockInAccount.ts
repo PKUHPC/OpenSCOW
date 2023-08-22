@@ -72,14 +72,14 @@ export default /* #__PURE__*/route(BlockUserInAccountSchema, async (req, res) =>
     accountName,
     userId: identityId,
   })
-    .then(() => {
-      callLog(logInfo, OperationResult.SUCCESS);
+    .then(async () => {
+      await callLog(logInfo, OperationResult.SUCCESS);
       return { 200: { executed: true } };
     })
     .catch(handlegRPCError({
       [Status.NOT_FOUND]: () => ({ 404: null }),
       [Status.FAILED_PRECONDITION]: () => ({ 200: { executed: false } }),
     },
-    () => callLog(logInfo, OperationResult.FAIL),
+    async () => await callLog(logInfo, OperationResult.FAIL),
     ));
 });

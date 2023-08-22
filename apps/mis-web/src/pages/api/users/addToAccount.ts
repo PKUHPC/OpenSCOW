@@ -94,14 +94,14 @@ export default /* #__PURE__*/typeboxRoute(AddUserToAccountSchema, async (req, re
     tenantName: info.tenant,
     accountName,
     userId: identityId,
-  }).then(() => {
-    callLog(logInfo, OperationResult.SUCCESS);
+  }).then(async () => {
+    await callLog(logInfo, OperationResult.SUCCESS);
     return { 204: null };
   })
     .catch(handlegRPCError({
       [Status.ALREADY_EXISTS]: () => ({ 409: null }),
       [Status.NOT_FOUND]: () => ({ 404: { code: "ACCOUNT_NOT_FOUND" as const } }),
     },
-    () => callLog(logInfo, OperationResult.FAIL),
+    async () => await callLog(logInfo, OperationResult.FAIL),
     ));
 });

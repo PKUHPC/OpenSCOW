@@ -86,7 +86,7 @@ export default /* #__PURE__*/typeboxRoute(CreateDesktopSchema, async (req, res) 
     cluster, loginNode, userId: info.identityId, wm, desktopName,
   }).then(
     async ({ host, password, port }) => {
-      callLog(logInfo, OperationResult.SUCCESS);
+      await callLog(logInfo, OperationResult.SUCCESS);
       return { 200: { host, password, port } };
     },
     handlegRPCError({
@@ -94,7 +94,7 @@ export default /* #__PURE__*/typeboxRoute(CreateDesktopSchema, async (req, res) 
       [status.INVALID_ARGUMENT]: () => ({ 400: { code: "INVALID_WM" as const } }),
       [status.RESOURCE_EXHAUSTED]: () => ({ 409: { code: "TOO_MANY_DESKTOPS" as const } }),
     },
-    () => callLog(logInfo, OperationResult.FAIL),
+    async () => await callLog(logInfo, OperationResult.FAIL),
     ));
 
 });

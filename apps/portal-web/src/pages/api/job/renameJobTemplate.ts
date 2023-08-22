@@ -61,10 +61,12 @@ export default /* #__PURE__*/route(RenameJobTemplateSchema, async (req, res) => 
 
   return asyncUnaryCall(client, "renameJobTemplate", {
     templateId, userId: info.identityId, cluster, jobName,
-  }).then(() => {
-    callLog({ ...logInfo }, OperationResult.SUCCESS);
+  }).then(async () => {
+    await callLog({ ...logInfo }, OperationResult.SUCCESS);
     return { 204: null };
   }, handlegRPCError({
     [status.NOT_FOUND]: () => ({ 404: { code: "TEMPLATE_NOT_FOUND" } } as const),
-  }));
+  },
+  async () => await callLog({ ...logInfo }, OperationResult.FAIL),
+  ));
 });

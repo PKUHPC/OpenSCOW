@@ -10,8 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import type { OperationType as LibOperationType } from "@scow/lib-operation-log";
-import { OperationTypeEnum } from "@scow/lib-operation-log";
+import { OperationType as LibOperationType, OperationTypeEnum } from "@scow/lib-operation-log";
 import { OperationLog as OperationLogProto } from "@scow/protos/build/audit/operation_log";
 import { Static, Type } from "@sinclair/typebox";
 import { ValueOf } from "next/dist/shared/lib/constants";

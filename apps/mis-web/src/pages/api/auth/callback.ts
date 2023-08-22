@@ -47,7 +47,7 @@ export default typeboxRoute(AuthCallbackSchema, async (req, res) => {
       operatorIp: parseIp(req) ?? "",
       operationTypeName: OperationType.login,
     };
-    callLog(logInfo, OperationResult.SUCCESS);
+    await callLog(logInfo, OperationResult.SUCCESS);
     res.redirect(publicConfig.BASE_PATH);
   } else {
     return { 403: null };

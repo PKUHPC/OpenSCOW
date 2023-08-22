@@ -68,11 +68,11 @@ export default /* #__PURE__*/typeboxRoute(KillDesktopSchema, async (req, res) =>
 
   return await asyncUnaryCall(client, "killDesktop", {
     cluster, loginNode, displayId, userId: info.identityId,
-  }).then(() => {
-    callLog(logInfo, OperationResult.SUCCESS);
+  }).then(async () => {
+    await callLog(logInfo, OperationResult.SUCCESS);
     return { 204: null };
-  }).catch((e) => {
-    callLog(logInfo, OperationResult.FAIL);
+  }).catch(async (e) => {
+    await callLog(logInfo, OperationResult.FAIL);
     throw e;
   });
 

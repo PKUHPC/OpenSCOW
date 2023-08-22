@@ -59,12 +59,12 @@ export default /* #__PURE__*/route(DeleteJobTemplateSchema, async (req, res) => 
 
   return asyncUnaryCall(client, "deleteJobTemplate", {
     templateId, userId: info.identityId, cluster,
-  }).then(() => {
-    callLog({ ...logInfo }, OperationResult.SUCCESS);
+  }).then(async () => {
+    await callLog({ ...logInfo }, OperationResult.SUCCESS);
     return { 204: null };
   }, handlegRPCError({
     [status.NOT_FOUND]: () => ({ 404: { code: "TEMPLATE_NOT_FOUND" } } as const),
   },
-  () => callLog({ ...logInfo }, OperationResult.FAIL),
+  async () => await callLog({ ...logInfo }, OperationResult.FAIL),
   ));
 });

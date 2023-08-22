@@ -128,7 +128,7 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
 
   log("Connected to shell");
 
-  callLog({
+  await callLog({
     operatorUserId: user.identityId,
     operatorIp: parseIp(req) ?? "",
     operationTypeName: OperationType.shellLogin,
@@ -158,9 +158,9 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
     }
   });
 
-  ws.on("error", (err) => {
+  ws.on("error", async (err) => {
     log("Error occurred from client. Disconnect.", err);
-    callLog({
+    await callLog({
       operatorUserId: user.identityId,
       operatorIp: parseIp(req) ?? "",
       operationTypeName: OperationType.shellLogin,

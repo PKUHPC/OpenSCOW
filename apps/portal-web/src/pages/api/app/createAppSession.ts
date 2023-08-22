@@ -109,14 +109,14 @@ export default /* #__PURE__*/route(CreateAppSessionSchema, async (req, res) => {
     qos,
     proxyBasePath,
     customAttributes,
-  }).then((reply) => {
-    callLog({
+  }).then(async (reply) => {
+    await callLog({
       ...logInfo,
       operationTypePayload: { ... logInfo.operationTypePayload, jobId: reply.jobId },
     }, OperationResult.SUCCESS);
     return { 200: { jobId: reply.jobId, sessionId: reply.sessionId } };
-  }).catch((e) => {
-    callLog({
+  }).catch(async (e) => {
+    await callLog({
       ...logInfo,
       operationTypePayload: { ... logInfo.operationTypePayload, jobId: -1 },
     }, OperationResult.FAIL);

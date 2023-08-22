@@ -64,8 +64,8 @@ export default route(UploadFileSchema, async (req, res) => {
 
   pipelineStream(req, bb);
 
-  const [_name, file] = (await once(bb, "file").catch((e) => {
-    callLog(logInfo, OperationResult.FAIL);
+  const [_name, file] = (await once(bb, "file").catch(async (e) => {
+    await callLog(logInfo, OperationResult.FAIL);
     throw new Error("Error when waiting for file upload", { cause: e });
   })) as Parameters<BusboyEvents["file"]>;
 
@@ -76,13 +76,13 @@ export default route(UploadFileSchema, async (req, res) => {
       file,
       (chunk) => ({ message: { $case: "chunk" as const, chunk } }),
       stream,
-    ).catch((e) => {
-      callLog(logInfo, OperationResult.FAIL);
+    ).catch(async (e) => {
+      await callLog(logInfo, OperationResult.FAIL);
       throw new Error("Error when writing stream", { cause: e });
     });
 
-  }).then(() => {
-    callLog(logInfo, OperationResult.SUCCESS);
+  }).then(async () => {
+    await callLog(logInfo, OperationResult.SUCCESS);
     return { 204: null };
   }).finally(() => {
     bb.end();

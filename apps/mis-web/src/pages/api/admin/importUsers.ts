@@ -74,13 +74,13 @@ export default typeboxRoute(ImportUsersSchema,
     return await asyncClientCall(client, "importUsers", {
       data, whitelist,
     })
-      .then(() => {
-        callLog(logInfo, OperationResult.SUCCESS);
+      .then(async () => {
+        await callLog(logInfo, OperationResult.SUCCESS);
         return { 204: null };
       })
       .catch(handlegRPCError({
         [Status.INVALID_ARGUMENT]: () => ({ 400: { code: "INVALID_DATA" } } as const),
       },
-      () => callLog(logInfo, OperationResult.FAIL),
+      async () => await callLog(logInfo, OperationResult.FAIL),
       ));
   });

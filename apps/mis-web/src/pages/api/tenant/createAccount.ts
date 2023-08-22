@@ -102,14 +102,14 @@ export default route(CreateAccountSchema,
     return await asyncClientCall(client, "createAccount", {
       accountName, ownerId, comment, tenantName: info.tenant,
     })
-      .then((x) => {
-        callLog(logInfo, OperationResult.SUCCESS);
+      .then(async (x) => {
+        await callLog(logInfo, OperationResult.SUCCESS);
         return { 200: x };
       })
       .catch(handlegRPCError({
         [Status.ALREADY_EXISTS]: () => ({ 409: null }),
         [Status.NOT_FOUND]: () => ({ 404: null }),
       },
-      () => callLog(logInfo, OperationResult.FAIL),
+      async () => await callLog(logInfo, OperationResult.FAIL),
       ));
   });

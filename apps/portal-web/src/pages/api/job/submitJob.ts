@@ -103,15 +103,15 @@ export default route(SubmitJobSchema, async (req, res) => {
     errorOutput,
     saveAsTemplate: save,
   })
-    .then(({ jobId }) => {
-      callLog(
+    .then(async ({ jobId }) => {
+      await callLog(
         { ...logInfo,
           operationTypeName: OperationType.submitJob,
           operationTypePayload: { ... logInfo.operationTypePayload, jobId } },
         OperationResult.SUCCESS,
       );
       if (save) {
-        callLog(
+        await callLog(
           {
             ...logInfo,
             operationTypeName: OperationType.addJobTemplate,
@@ -125,7 +125,7 @@ export default route(SubmitJobSchema, async (req, res) => {
     .catch(handlegRPCError({
       [status.INTERNAL]: (err) => ({ 500: { code: "SCHEDULER_FAILED", message: err.details } } as const),
     },
-    () => callLog(
+    async () => await callLog(
       { ...logInfo,
         operationTypeName: OperationType.submitJob,
         operationTypePayload: { ... logInfo.operationTypePayload, jobId: -1 },

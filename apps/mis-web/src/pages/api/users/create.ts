@@ -110,13 +110,13 @@ export default /* #__PURE__*/typeboxRoute(CreateUserSchema, async (req, res) => 
     password,
     tenantName: info.tenant,
   })
-    .then((res) => {
-      callLog(logInfo, OperationResult.SUCCESS);
+    .then(async (res) => {
+      await callLog(logInfo, OperationResult.SUCCESS);
       return { 200: { createdInAuth: res.createdInAuth } };
     })
     .catch(handlegRPCError({
       [status.ALREADY_EXISTS]: () => ({ 409: null }),
     },
-    () => callLog(logInfo, OperationResult.FAIL),
+    async () => await callLog(logInfo, OperationResult.FAIL),
     ));
 });

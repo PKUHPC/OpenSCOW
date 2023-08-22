@@ -77,14 +77,14 @@ export default route(FinancePaySchema,
       operatorId: info.identityId,
       ipAddress: parseIp(req) ?? "",
       type: type,
-    }).then((reply) => {
+    }).then(async (reply) => {
       const replyObj = ensureNotUndefined(reply, ["currentBalance"]);
-      callLog(logInfo, OperationResult.SUCCESS);
+      await callLog(logInfo, OperationResult.SUCCESS);
       return { 200: { balance: moneyToNumber(replyObj.currentBalance) } };
     }).catch(handlegRPCError({
       [Status.NOT_FOUND]: () => ({ 404: null }),
     },
-    () => callLog(logInfo, OperationResult.FAIL),
+    async () => await callLog(logInfo, OperationResult.FAIL),
     ));
 
   });

@@ -87,12 +87,12 @@ export default /* #__PURE__*/typeboxRoute(
     };
 
     return await libChangePassword(runtimeConfig.AUTH_INTERNAL_URL, { identityId, newPassword }, console)
-      .then(() => {
-        callLog(logInfo, OperationResult.SUCCESS);
+      .then(async () => {
+        await callLog(logInfo, OperationResult.SUCCESS);
         return { 204: null };
       })
-      .catch((e) => {
-        callLog(logInfo, OperationResult.FAIL);
+      .catch(async (e) => {
+        await callLog(logInfo, OperationResult.FAIL);
         return { [e.status]: null };
       });
   });

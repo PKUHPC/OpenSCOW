@@ -59,13 +59,13 @@ export default route(DeleteDirSchema, async (req, res) => {
 
   return asyncUnaryCall(client, "deleteDirectory", {
     cluster, path, userId: info.identityId,
-  }).then(() => {
-    callLog(logInfo, OperationResult.SUCCESS);
+  }).then(async () => {
+    await callLog(logInfo, OperationResult.SUCCESS);
     return { 204: null };
   }, handlegRPCError({
     [status.NOT_FOUND]: () => ({ 400: { code: "INVALID_CLUSTER" as const } }),
   },
-  () => callLog(logInfo, OperationResult.FAIL),
+  async () => await callLog(logInfo, OperationResult.FAIL),
   ));
 
 });

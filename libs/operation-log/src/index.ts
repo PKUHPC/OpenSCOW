@@ -57,7 +57,7 @@ export const createOperationLogClient = (
 
       return await asyncUnaryCall(client, "getOperationLogs", request);
     },
-    callLog: <TName extends OperationEvent["$case"]>({
+    callLog: async <TName extends OperationEvent["$case"]>({
       operatorUserId,
       operatorIp,
       operationTypeName,
@@ -71,7 +71,7 @@ export const createOperationLogClient = (
         return;
       }
 
-      asyncUnaryCall(client, "createOperationLog", {
+      return await asyncUnaryCall(client, "createOperationLog", {
         operatorUserId,
         operatorIp,
         operationResult,

@@ -103,8 +103,8 @@ export default /* #__PURE__*/typeboxRoute(CreateTenantSchema, async (req, res) =
     userEmail: userEmail,
     userPassword: userPassword,
   })
-    .then((res) => {
-      callLog(logInfo, OperationResult.SUCCESS);
+    .then(async (res) => {
+      await callLog(logInfo, OperationResult.SUCCESS);
       return { 200: { createdInAuth: res.createdInAuth } };
     })
     .catch(handlegRPCError({
@@ -119,6 +119,6 @@ export default /* #__PURE__*/typeboxRoute(CreateTenantSchema, async (req, res) =
         };
       },
     },
-    () => callLog(logInfo, OperationResult.FAIL),
+    async () => await callLog(logInfo, OperationResult.FAIL),
     ));
 });
