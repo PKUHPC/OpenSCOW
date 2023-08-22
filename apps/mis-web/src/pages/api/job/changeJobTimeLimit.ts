@@ -89,7 +89,7 @@ export default typeboxRoute(ChangeJobTimeLimitSchema,
       operatorIp: parseIp(req) ?? "",
       operationTypeName: OperationType.setJobTimeLimit,
       operationTypePayload:{
-        jobId: +jobId, accountName: job.account, delta,
+        jobId: +jobId, accountName: job.account, limitMinutes,
       },
     };
     return await asyncClientCall(client, "changeJobTimeLimit", {

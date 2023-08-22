@@ -114,7 +114,7 @@ message CopyFileItem {
 message SetJobTimeLimit {
   string account_name = 1;
   uint32 job_id = 2;
-  int64 delta = 3;
+  int64 limit_minutes = 3;
 }
 
 message CreateUser {

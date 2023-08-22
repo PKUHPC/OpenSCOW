@@ -246,7 +246,7 @@ export const getOperationDetail = (operationLog: OperationLogProto) => {
     case "copyFileItem":
       return `复制文件/文件夹：${logPayload.fromPath}至${logPayload.toPath}`;
     case "setJobTimeLimit":
-      return `${logPayload.delta > 0 ? "增加" : "减少"}作业(ID: ${logPayload.jobId})时限 ${Math.abs(logPayload.delta)} 分钟`;
+      return `设置作业(ID: ${logPayload.jobId})时限 ${Math.abs(logPayload.limit_minutes)} 分钟`;
     case "createUser":
       return `创建用户${logPayload.userId}`;
     case "addUserToAccount":
