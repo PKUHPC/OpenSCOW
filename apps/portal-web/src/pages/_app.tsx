@@ -163,13 +163,20 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
   if (isServer()) {
 
     const token = USE_MOCK ? "123" : getTokenFromCookie(appContext.ctx);
+
+    console.log("============_app.tsx: 1", token);
     if (token) {
     // Why not directly call validateToken but create an api?
     // Because this method will (in next.js's perspective) be called both in client and server,
     // so next.js will import validateToken into the client bundle
     // validateToken depends on ioredis, which cannot be brought into frontend.
     // dynamic import also doesn't work.
-      const userInfo = await api.validateToken({ query: { token } }).catch(() => undefined);
+      const userInfo = await api.validateToken({ query: { token } }).catch((e) =>
+      {
+        console.log("============_app.tsx: 3", e);
+        return undefined; });
+
+      console.log("============_app.tsx: 2", userInfo);
 
       if (userInfo) {
         extra.userInfo = {
