@@ -24,17 +24,32 @@ export async function validateToken(token: string | undefined): Promise<UserInfo
     return { identityId: runtimeConfig.MOCK_USER_ID, name: runtimeConfig.MOCK_USER_ID };
   }
 
+  console.log("/src/auth/token.ts=====validateToken: ", token);
+
   if (!token) { return undefined; }
 
-  const resp = await authValidateToken(runtimeConfig.AUTH_INTERNAL_URL, token).catch(() => undefined);
+  const resp = await authValidateToken(runtimeConfig.AUTH_INTERNAL_URL, token).catch((e) =>
+  {
+    console.log("/src/auth/token.ts=====validateToken3: ", e);
+    return undefined;
+  },
+
+  );
+
+  console.log("/src/auth/token.ts=====validateToken2: ", resp);
 
   if (!resp) {
     return undefined;
   }
 
   const userInfo = await getUser(runtimeConfig.AUTH_INTERNAL_URL, { identityId: resp.identityId })
-    .catch(() => undefined);
+    .catch((e) =>
+    {
+      console.log("/src/auth/token.ts=====validateToken4: ", e);
+      return undefined;
+    });
 
+  console.log("/src/auth/token.ts=====validateToken5: ", userInfo);
   return {
     identityId: resp.identityId,
     name: userInfo?.name,

@@ -36,12 +36,17 @@ export default route(AuthCallbackSchema, async (req, res) => {
   const { token } = req.query;
 
   // query the token and get the username
+
+  console.log("=================");
+  console.log("=====token: ", token);
   const info = await validateToken(token);
 
   if (info) {
     // set token cache
     setTokenCookie({ res }, token);
+    console.log("=====info: ", info);
 
+    console.log("======basePath: ", publicConfig.BASE_PATH);
     res.redirect(publicConfig.BASE_PATH);
   } else {
     return { 403: null };

@@ -18,6 +18,8 @@ import { UserStore } from "src/stores/UserStore";
 export const IndexPage: NextPage = () => {
   const userStore = useStore(UserStore);
 
+  console.log("+++++++++++", userStore.user);
+
   if (userStore.user) {
     return <Redirect url="/dashboard" />;
   } else {
