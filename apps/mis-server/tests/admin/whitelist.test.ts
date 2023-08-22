@@ -177,7 +177,7 @@ it("get whitelisted accounts", async () => {
   expect(resp.accounts).toIncludeSameMembers([
     {
       "accountName": "hpca",
-      "ownerId": "1",
+      "ownerId": "a",
       "ownerName": "AName",
       "operatorId": "123",
       "comment": "",
