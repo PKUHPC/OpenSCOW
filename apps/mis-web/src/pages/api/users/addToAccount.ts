@@ -88,7 +88,7 @@ export default /* #__PURE__*/typeboxRoute(AddUserToAccountSchema, async (req, re
     .catch(handlegRPCError({
       [Status.ALREADY_EXISTS]: () => ({ 409: null }),
       [Status.NOT_FOUND]: (e) => { 
-        console.log("e", e.details);
+
         if (e.details === "USER_OR_TENANT_NOT_FOUND") {
 
           return { 404: { code: "USER_ALREADY_EXIST_IN_OTHER_TENANT" as const } };
