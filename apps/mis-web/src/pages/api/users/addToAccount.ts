@@ -48,9 +48,9 @@ export const AddUserToAccountSchema = typeboxRouteSchema({
       ]),
     }),
 
-    /** 用户已经存在 */
+    /** 用户或账户存在问题 */
     409: Type.Object({
-      code: Type.Literal("ACCOUT_OR_USER_ERROR"),
+      code: Type.Literal("ACCOUNT_OR_USER_ERROR"),
       message: Type.Optional(Type.String()),
     }),
 
@@ -92,8 +92,8 @@ export default /* #__PURE__*/typeboxRoute(AddUserToAccountSchema, async (req, re
     userId: identityId,
   }).then(() => ({ 204: null }))
     .catch(handlegRPCError({
-      [Status.ALREADY_EXISTS]: () => ({ 409: { code: "ACCOUT_OR_USER_ERROR" as const, message:"用户已经存在于此账户中！" } }),
+      [Status.ALREADY_EXISTS]: () => ({ 409: { code: "ACCOUNT_OR_USER_ERROR" as const, message:"用户已经存在于此账户中！" } }),
       [Status.NOT_FOUND]: () => ({ 404: { code: "ACCOUNT_NOT_FOUND" as const } }),
-      [Status.INTERNAL]: (e) => { return ({ 409: { code: "ACCOUT_OR_USER_ERROR" as const, message: e.details } }); },
+      [Status.INTERNAL]: (e) => { return ({ 409: { code: "ACCOUNT_OR_USER_ERROR" as const, message: e.details } }); },
     }));
 });
