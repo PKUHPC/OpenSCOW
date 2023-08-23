@@ -91,6 +91,12 @@ export default /* #__PURE__*/typeboxRoute(AddUserToAccountSchema, async (req, re
 
         if (e.details === "USER_OR_TENANT_NOT_FOUND") {
 
+          /**
+           * 后端接口addUserToAccount返回USER_OR_TENANT_NOT_FOUND
+           * 说明操作者的租户下的不存在要添加的这个用户
+           * 该用户存不存在于scow系统中在上面的checkNameMatch函数中已通过检查
+           * */ 
+
           return { 404: { code: "USER_ALREADY_EXIST_IN_OTHER_TENANT" as const } };
         } else {
           
