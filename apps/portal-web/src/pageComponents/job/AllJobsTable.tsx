@@ -110,7 +110,7 @@ export const AllJobQueryTable: React.FC<Props> = ({
               allowClear={false}
             />
           </Form.Item>
-          <Form.Item label="集群作业ID" name="jobId">
+          <Form.Item label="作业ID" name="jobId">
             <InputNumber style={{ minWidth: "160px" }} min={1} />
           </Form.Item>
           <Form.Item>
