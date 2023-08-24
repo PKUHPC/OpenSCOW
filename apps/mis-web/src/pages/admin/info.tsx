@@ -10,10 +10,13 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { MoneyCollectOutlined, PlayCircleOutlined, ProjectOutlined,
+  TeamOutlined, UserOutlined, WalletOutlined } from "@ant-design/icons";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
+import { defaultPresets } from "@scow/lib-web/build/utils/datetime";
 import type { GetAdminInfoResponse } from "@scow/protos/build/server/admin";
 import { AdminServiceClient } from "@scow/protos/build/server/admin";
-import { Descriptions, Tag } from "antd";
+import { Card, Col, DatePicker, Row, Space } from "antd";
 import { GetServerSideProps, NextPage } from "next";
 import { USE_MOCK } from "src/apis/useMock";
 import { requireAuth } from "src/auth/requireAuth";
@@ -21,14 +24,54 @@ import { ssrAuthenticate, SSRProps } from "src/auth/server";
 import { UnifiedErrorPage } from "src/components/errorPages/UnifiedErrorPage";
 import { PageTitle } from "src/components/PageTitle";
 import { PlatformRole } from "src/models/User";
+import { DataBarChart } from "src/pageComponents/admin/DataBarChart";
+import { DataLineChart } from "src/pageComponents/admin/DataLineChart";
+import StatisticCard from "src/pageComponents/admin/StatisticCard";
 import { getClient } from "src/utils/client";
 import { Head } from "src/utils/head";
+import { styled } from "styled-components";
+
+const data = [
+  {
+    "x": "a_admin",
+    "y": 102,
+  },
+  {
+    "x": "b_admin",
+    "y": 32,
+  },
+  {
+    "x": "c_admin",
+    "y": 401,
+  },
+  {
+    "x": "d_admin",
+    "y": 678,
+  },
+  {
+    "x": "e_admin",
+    "y": 190,
+  },
+  {
+    "x": "f_admin",
+    "y": 12,
+  },
+  {
+    "x": "g_admin",
+    "y": 8,
+  },
+];
+
+const TitleText = styled.span`
+  font-size: 24px;
+  font-weight: bold;
+`;
 
 type Info = GetAdminInfoResponse
 
 type Props = SSRProps<Info, 500>
 
-export const PlatformInfoPage: NextPage<Props> = 
+export const PlatformInfoPage: NextPage<Props> =
 requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
 ((props: Props) => {
 
@@ -36,43 +79,125 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
     return <UnifiedErrorPage code={props.error} />;
   }
 
-  const { platformAdmins, tenantCount, accountCount, userCount, platformFinancialStaff } = props;
+  const { tenantCount, accountCount, userCount } = props;
 
 
   return (
-    <div>
+    <>
       <Head title="平台信息" />
-      <PageTitle titleText={"平台信息"} />
-      <Descriptions bordered column={1}>
-        <Descriptions.Item label="平台管理员">
-          {
-            platformAdmins.map(({ userId, userName }) => (
-              <Tag key={userId}>
-                {userName} (ID: {userId})
-              </Tag>
-            ))
-          }
-        </Descriptions.Item>
-        <Descriptions.Item label="平台财务人员">
-          {
-            platformFinancialStaff.map(({ userId, userName }) => (
-              <Tag key={userId}>
-                {userName} (ID: {userId})
-              </Tag>
-            ))
-          }
-        </Descriptions.Item>
-        <Descriptions.Item label="租户数量">
-          {tenantCount}
-        </Descriptions.Item>
-        <Descriptions.Item label="账户数量">
-          {accountCount}
-        </Descriptions.Item>
-        <Descriptions.Item label="用户数量">
-          {userCount}
-        </Descriptions.Item>
-      </Descriptions>
-    </div>
+      <PageTitle titleText={"数据总览"} />
+      <Row gutter={[16, 16]}>
+        <Col span={24} style={{ textAlign: "right" }}>
+          <span>日期筛选：</span>
+          <DatePicker.RangePicker allowClear={false} presets={defaultPresets} />
+        </Col>
+        <Col flex={4}>
+          <StatisticCard
+            title="用户"
+            newAddValue={99}
+            totalValue={userCount}
+            icon={UserOutlined}
+            iconColor="red"
+          />
+        </Col>
+        <Col flex={4}>
+          <StatisticCard
+            title="账户"
+            newAddValue={99}
+            totalValue={accountCount}
+            icon={WalletOutlined}
+            iconColor="blue"
+          />
+        </Col>
+        <Col flex={4}>
+          <StatisticCard
+            title="租户"
+            newAddValue={99}
+            totalValue={tenantCount}
+            icon={TeamOutlined}
+            iconColor="green"
+          />
+        </Col>
+        <Col flex={4}>
+          <StatisticCard
+            title="作业"
+            newAddValue={99}
+            totalValue={999}
+            icon={ProjectOutlined}
+            iconColor="greyBlue"
+          />
+        </Col>
+        <Col flex={4}>
+          <StatisticCard
+            title="消费"
+            newAddValue={99}
+            totalValue={999}
+            icon={MoneyCollectOutlined}
+            iconColor="yellow"
+          />
+        </Col>
+        <Col span={24}>
+          <Card
+            title={(
+              <Space>
+                <UserOutlined style={{ fontSize: "24px", color: "red" }} />
+                <TitleText>用户数量</TitleText>
+              </Space>
+            )}
+            bordered={false}
+            bodyStyle={{ display: "flex", flexDirection: "row" }}
+          >
+            <DataLineChart data={data} title="新增用户数"></DataLineChart>
+            <DataLineChart data={data} title="活跃用户数"></DataLineChart>
+          </Card>
+        </Col>
+        <Col span={24}>
+          <Card
+            title={(
+              <Space>
+                <MoneyCollectOutlined style={{ fontSize: "24px", color: "yellow" }} />
+                <TitleText>消费/充值金额</TitleText>
+              </Space>
+            )}
+            bordered={false}
+            bodyStyle={{ display: "flex", flexDirection: "row" }}
+          >
+            <DataBarChart data={data} title="消费账户TOP10"></DataBarChart>
+            <DataLineChart data={data} title="消费金额"></DataLineChart>
+          </Card>
+        </Col>
+        <Col span={24}>
+          <Card
+            title={(
+              <Space>
+                <ProjectOutlined style={{ fontSize: "24px", color: "blue" }} />
+                <TitleText>作业</TitleText>
+              </Space>
+            )}
+            bordered={false}
+            bodyStyle={{ display: "flex", flexDirection: "row" }}
+          >
+            <DataBarChart data={data} title="作业提交用户TOP10"></DataBarChart>
+            <DataLineChart data={data} title="新增作业数量"></DataLineChart>
+          </Card>
+        </Col>
+        <Col span={24}>
+          <Card
+            title={(
+              <Space>
+                <PlayCircleOutlined style={{ fontSize: "24px", color: "black" }} />
+                <TitleText>系统功能使用统计</TitleText>
+              </Space>
+            )}
+            bordered={false}
+            bodyStyle={{ display: "flex", flexDirection: "row" }}
+          >
+            <DataBarChart data={data} title="门户系统使用功能次数"></DataBarChart>
+            <DataBarChart data={data} title="管理系统使用功能次数"></DataBarChart>
+          </Card>
+        </Col>
+      </Row>
+    </>
   );
 });
 
