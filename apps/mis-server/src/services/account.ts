@@ -127,11 +127,11 @@ export const accountServiceServer = plugin((server) => {
 
     createAccount: async ({ request, em, logger }) => {
       const { accountName, tenantName, ownerId, comment } = request;
-      const user = await em.findOne(User, { userId: ownerId });
+      const user = await em.findOne(User, { userId: ownerId, tenant: { name: tenantName } });
 
       if (!user) {
         throw <ServiceError> {
-          code: Status.NOT_FOUND, message: `User ${ownerId} is not found`,
+          code: Status.NOT_FOUND, message: `User ${user} under tenant ${tenantName} does not exist`,
         };
       }
 
@@ -225,7 +225,7 @@ export const accountServiceServer = plugin((server) => {
             comment: x.comment,
             operatorId: x.operatorId,
             addTime: x.time.toISOString(),
-            ownerId: accountOwner.id + "",
+            ownerId: accountOwner.userId + "",
             ownerName: accountOwner.name,
             balance: decimalToMoney(x.account.$.balance),
           };

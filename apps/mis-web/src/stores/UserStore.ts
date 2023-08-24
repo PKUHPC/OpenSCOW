@@ -24,6 +24,7 @@ export interface User {
   platformRoles: PlatformRole[];
   accountAffiliations: AccountAffiliation[];
   email?: string;
+  createTime?: string
 }
 
 export function UserStore(initialUser: User | undefined = undefined) {

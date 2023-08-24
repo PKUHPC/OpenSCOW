@@ -129,8 +129,8 @@ export const AddUserButton: React.FC<Props> = ({ refresh, accountName, token }) 
           }
         }
       })
-      .httpError(409, () => {
-        message.error("用户已经存在于此账户中！");
+      .httpError(409, (e) => {
+        message.error(e.message);
       })
       .then(() => {
         message.success("添加成功！");

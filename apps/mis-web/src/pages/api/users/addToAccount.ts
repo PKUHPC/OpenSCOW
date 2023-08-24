@@ -37,6 +37,10 @@ export const AddUserToAccountSchema = typeboxRouteSchema({
       code: Type.Literal("ID_NAME_NOT_MATCH"),
     }),
 
+    401: Type.Object({
+      code: Type.Literal("ID_NAME_NOT_MATCH"),
+    }),
+
     404: Type.Object({
       code: Type.Union([
         Type.Literal("ACCOUNT_OR_TENANT_NOT_FOUND"),
@@ -45,8 +49,11 @@ export const AddUserToAccountSchema = typeboxRouteSchema({
       ]),
     }),
 
-    /** 用户已经存在 */
-    409: Type.Null(),
+    /** 用户或账户存在问题 */
+    409: Type.Object({
+      code: Type.Literal("ACCOUNT_OR_USER_ERROR"),
+      message: Type.Optional(Type.String()),
+    }),
 
   },
 });
@@ -58,7 +65,7 @@ export default /* #__PURE__*/typeboxRoute(AddUserToAccountSchema, async (req, re
     const acccountBelonged = u.accountAffiliations.find((x) => x.accountName === accountName);
 
     return u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ||
-          (acccountBelonged && acccountBelonged.role !== UserRole.USER) || 
+          (acccountBelonged && acccountBelonged.role !== UserRole.USER) ||
           u.tenantRoles.includes(TenantRole.TENANT_ADMIN);
   });
 
@@ -86,7 +93,8 @@ export default /* #__PURE__*/typeboxRoute(AddUserToAccountSchema, async (req, re
     userId: identityId,
   }).then(() => ({ 204: null }))
     .catch(handlegRPCError({
-      [Status.ALREADY_EXISTS]: () => ({ 409: null }),
+      [Status.ALREADY_EXISTS]: () => ({ 409: { code: "ACCOUNT_OR_USER_ERROR" as const, message:"用户已经存在于此账户中！" } }),
+      [Status.INTERNAL]: (e) => { return ({ 409: { code: "ACCOUNT_OR_USER_ERROR" as const, message: e.details } }); },
       [Status.NOT_FOUND]: (e) => { 
 
         if (e.details === "USER_OR_TENANT_NOT_FOUND") {
