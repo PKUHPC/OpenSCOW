@@ -10,41 +10,48 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { App, Button, Form, Input, Spin } from "antd";
+import { App, Form, Input, Modal } from "antd";
 import React, { useState } from "react";
 import { useStore } from "simstate";
 import { api } from "src/apis";
 import { UserStore } from "src/stores/UserStore";
 import { emailRule } from "src/utils/form";
 
-
-interface FormProps {
-  newEmail: string;
-  confirm: string;
+export interface Props {
+  open: boolean;
+  onClose: () => void;
+  setEmail: (email: string) => void;
 }
 
-export const ChangeEmailForm: React.FC = () => {
+interface FormInfo {
+  newEmail: string;
+  oldEmail: string;
+  
+}
+
+
+export const ChangeEmailModal: React.FC<Props> = ({
+  open,
+  onClose,
+  setEmail,
+}) => {
+
+  const [form] = Form.useForm<FormInfo>();
   const { message } = App.useApp();
-
-
-  const [form] = Form.useForm<FormProps>();
-
   const [loading, setLoading] = useState(false);
 
-  // 拿到用户信息以获取用户原邮箱
   const userStore = useStore(UserStore);
-
-
+  
   const onFinish = async () => {
     const { newEmail } = await form.validateFields();
     setLoading(true);
-
 
     await api.changeEmail({ body: { userId:userStore.user?.identityId as string, newEmail } })
       .httpError(500, () => { message.error("修改邮箱失败"); })
       .then(() => {
         form.resetFields();
         form.setFieldValue("oldEmail", newEmail);
+        setEmail(newEmail);
         message.success("邮箱更改成功！");
       })
       .finally(() => {
@@ -53,7 +60,14 @@ export const ChangeEmailForm: React.FC = () => {
   };
 
   return (
-    <Spin spinning={loading}>
+    <Modal
+      title="修改邮箱"
+      open={open}
+      onOk={form.submit}
+      confirmLoading={loading}
+      onCancel={onClose}
+      destroyOnClose
+    >
       <Form
         initialValues={undefined}
         layout="vertical"
@@ -74,12 +88,9 @@ export const ChangeEmailForm: React.FC = () => {
         >
           <Input placeholder="请输入新邮箱" />
         </Form.Item>
-        <Form.Item>
-          <Button type="primary" htmlType="submit">
-            提交
-          </Button>
-        </Form.Item>
       </Form>
-    </Spin>
+    </Modal>
   );
 };
+
+

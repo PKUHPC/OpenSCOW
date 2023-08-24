@@ -52,13 +52,13 @@ const FailEventHandler: React.FC = () => {
         userStore.logout();
         return;
       }
-
+      console.log(e);
       if (e.data?.code === "CLUSTEROPS_ERROR") {
         modal.error({
           title: "操作失败",
           content: `多集群操作出现错误，部分集群未同步修改(${
-            e.data.details?.split(",").map((x) => publicConfig.CLUSTERS[x].name)
-          }), 请联系管理员!`,
+            e.data.details
+          })`,
         });
         return;
       }
@@ -92,7 +92,6 @@ function MyApp({ Component, pageProps, extra }: Props) {
 
   // remembers extra props from first load
   const { current: { userInfo, primaryColor, footerText } } = useRef(extra);
-
   const userStore = useConstant(() => {
     const store = createStore(UserStore, userInfo);
     return store;

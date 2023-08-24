@@ -84,7 +84,7 @@ export const RunningJobQueryTable: React.FC<Props> = ({
           <Form.Item label="集群" name="cluster">
             <SingleClusterSelector />
           </Form.Item>
-          <Form.Item label="集群作业ID" name="jobId">
+          <Form.Item label="作业ID" name="jobId">
             <InputNumber style={{ minWidth: "160px" }} min={1} />
           </Form.Item>
           <Form.Item>

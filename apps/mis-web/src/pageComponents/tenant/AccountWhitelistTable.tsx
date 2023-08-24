@@ -129,7 +129,7 @@ export const AccountWhitelistTable: React.FC<Props> = ({
           <Table.Column<WhitelistedAccount>
             dataIndex="ownerId"
             title="拥有者"
-            render={(_, r) => `${r.ownerName} (id: ${r.ownerId})`}
+            render={(_, r) => `${r.ownerName} (ID: ${r.ownerId})`}
           />
           <Table.Column<WhitelistedAccount>
             dataIndex="balance"

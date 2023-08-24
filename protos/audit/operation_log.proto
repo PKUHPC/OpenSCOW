@@ -11,7 +11,7 @@
 */
 syntax = "proto3";
 
-package scow.operationlog;
+package scow.audit;
 
 import "google/protobuf/timestamp.proto";
 import "common/money.proto";

@@ -29,8 +29,12 @@ interface FormProps {
   comment?: string;
 }
 
+interface CreateAccountFormProps {
+  tenantName: string;
+}
 
-const CreateAccountForm: React.FC = () => {
+
+const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ tenantName }) => {
 
   const [form] = Form.useForm<FormProps>();
 
@@ -43,7 +47,7 @@ const CreateAccountForm: React.FC = () => {
     setLoading(true);
 
     await api.createAccount({ body: { accountName, ownerId, ownerName, comment } })
-      .httpError(404, () => { message.error(`用户${ownerId}不存在。`); })
+      .httpError(404, () => { message.error(`租户 ${tenantName} 下不存在用户 ${ownerId}。`); })
       .httpError(409, () => { message.error("账户名已经被占用"); })
       .httpError(400, () => { message.error("用户ID和名字不匹配。"); })
       .then(() => {
@@ -105,13 +109,13 @@ const CreateAccountForm: React.FC = () => {
 };
 
 export const CreateAccountPage: NextPage = requireAuth((i) => i.tenantRoles.includes(TenantRole.TENANT_ADMIN))(
-  () => {
+  ({ userStore }) => {
     return (
       <div>
         <Head title="创建账户" />
         <PageTitle titleText="创建账户" />
         <FormLayout>
-          <CreateAccountForm />
+          <CreateAccountForm tenantName={userStore.user.tenant} />
         </FormLayout>
       </div>
     );
