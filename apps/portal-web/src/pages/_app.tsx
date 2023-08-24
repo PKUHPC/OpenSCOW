@@ -24,6 +24,8 @@ import type { AppContext, AppProps } from "next/app";
 import NextApp from "next/app";
 import dynamic from "next/dynamic";
 import Head from "next/head";
+import { appWithTranslation, WithTranslation } from "next-i18next";
+import { parseCookies } from "nookies";
 import { join } from "path";
 import { useEffect, useRef } from "react";
 import { createStore, StoreProvider, useStore } from "simstate";
@@ -40,6 +42,7 @@ import {
 } from "src/stores/UserStore";
 import { LoginNode, publicConfig, runtimeConfig } from "src/utils/config";
 
+import nextI18nextConfig from "../../next-i18next.config.js";
 
 const FailEventHandler: React.FC = () => {
   const { message } = AntdApp.useApp();
@@ -90,7 +93,7 @@ interface ExtraProps {
 
 type Props = AppProps & { extra: ExtraProps };
 
-function MyApp({ Component, pageProps, extra }: Props) {
+function MyApp({ Component, pageProps, extra }: Props & WithTranslation) {
 
   // remembers extra props from first load
   const { current: { userInfo, primaryColor, footerText } } = useRef(extra);
@@ -101,6 +104,8 @@ function MyApp({ Component, pageProps, extra }: Props) {
   });
 
 
+  const cookies = parseCookies();
+  const locale = cookies.language || "zh_cn";
   const loginNodeStore = useConstant(() => createStore(LoginNodeStore, extra.loginNodes));
 
   const defaultClusterStore = useConstant(() => createStore(DefaultClusterStore));
@@ -130,7 +135,7 @@ function MyApp({ Component, pageProps, extra }: Props) {
       </Head>
       <StoreProvider stores={[userStore, defaultClusterStore, loginNodeStore]}>
         <DarkModeProvider initial={extra.darkModeCookieValue}>
-          <AntdConfigProvider color={primaryColor}>
+          <AntdConfigProvider color={primaryColor} locale={locale}>
             <FloatButtons />
             <GlobalStyle />
             <FailEventHandler />
@@ -200,4 +205,4 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
   return { ...appProps, extra } as Props;
 };
 
-export default MyApp;
+export default appWithTranslation(MyApp, nextI18nextConfig);

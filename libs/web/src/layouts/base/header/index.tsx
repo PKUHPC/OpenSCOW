@@ -21,6 +21,10 @@ import { UserIndicator } from "src/layouts/base/header/UserIndicator";
 import { NavItemProps, UserInfo, UserLink } from "src/layouts/base/types";
 import styled from "styled-components";
 
+import { LanguageSwitcher } from "./LanguageSwitcher";
+
+// import { LanguageContext, LanguageSwitcher } from "./LanguageSwitcher";
+
 interface ComponentProps {
   homepage?: boolean;
 }
@@ -67,6 +71,8 @@ interface Props {
   userLinks?: UserLink[];
 }
 
+// const [language, setLanguage] = useState<string>("zh_cn");
+
 export const Header: React.FC<Props> = ({
   hasSidebar, routes,
   setSidebarCollapsed, sidebarCollapsed,
@@ -96,9 +102,13 @@ export const Header: React.FC<Props> = ({
         <MenuPartPlaceholder />
       </MenuPart>
       {right}
+      {/* <LanguageContext.Provider value={{ language, setLanguage }}> */}
+      <LanguageSwitcher />
+      {/* </LanguageContext.Provider> */}
       <IndicatorPart>
         <UserIndicator user={user} logout={logout} userLinks={userLinks}/>
       </IndicatorPart>
     </Container>
   );
 };
+

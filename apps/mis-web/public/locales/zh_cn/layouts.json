@@ -1,0 +1,57 @@
+{
+  "route": {
+    "nav-link-text": "门户",
+    "dashboard": "仪表盘",
+    "user": {
+      "first-nav": "用户空间",
+      "running-jobs": "未结束的作业",
+      "finished-jobs": "已结束的作业",
+      "cluster-partitions": "集群和分区信息"
+    },
+    "platform-management": {
+      "fist-nav": "平台管理",
+      "info": "平台信息",
+      "import-users": "导入用户",
+      "tenants-management":"租户管理",
+      "tenants-list": "租户列表",
+      "create-tenant": "创建租户",
+      "users-list": "用户列表",
+      "job-billing-table": "作业价格表",
+      "finance-management": "财务管理",
+      "tenant-pay": "租户充值",
+      "payments": "充值记录",
+      "system-debug": "平台调试",
+      "status-synchronization": "封锁状态同步",
+      "jobs-synchronization": "作业信息同步"
+    },
+    "tenant-management": {
+      "first-nav": "租户管理",
+      "info": "租户信息",
+      "manage-job-price": "作业价格表",
+      "running-jobs": "未结束的作业",
+      "finished-jobs": "已结束的作业",
+      "user-management": "用户管理",
+      "user-list": "用户列表",
+      "create-user": "创建用户",
+      "job-timelimit": "调整作业时间限制",
+      "storage": "调整用户存储空间",
+      "account-management": "账户管理",
+      "account-list": "账户列表",
+      "create-account": "创建账户",
+      "whitelist": "账户白名单",
+      "finance-management": "财务管理",
+      "account-pay": "账户充值",
+      "finance-payments": "充值记录",
+      "account-payments": "账户充值记录"
+    },
+    "account-management": {
+      "first-nav":"账户管理",
+      "info": "账户信息",
+      "running-jobs": "未结束的作业",
+      "finished-jobs": "已结束的作业",
+      "user-management": "用户管理",
+      "pay": "充值记录",
+      "cost": "消费记录"
+    }
+  }
+}

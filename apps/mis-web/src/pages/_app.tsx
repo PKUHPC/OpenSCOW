@@ -24,6 +24,8 @@ import type { AppContext, AppProps } from "next/app";
 import App from "next/app";
 import dynamic from "next/dynamic";
 import Head from "next/head";
+import { appWithTranslation, i18n } from "next-i18next";
+import { parseCookies } from "nookies";
 import { join } from "path";
 import { useEffect, useRef } from "react";
 import { createStore, StoreProvider, useStore } from "simstate";
@@ -38,6 +40,9 @@ import {
   User, UserStore,
 } from "src/stores/UserStore";
 import { publicConfig, runtimeConfig } from "src/utils/config";
+import { loadCustomTranslations } from "src/utils/loadCustomTranslations";
+
+import nextI18nextConfig from "../../next-i18next.config.js";
 
 
 const FailEventHandler: React.FC = () => {
@@ -71,6 +76,10 @@ const FailEventHandler: React.FC = () => {
   return <></>;
 };
 
+export const loadAppCustomTranslation = async () => {
+  await loadCustomTranslations();
+  i18n?.reloadResources();
+};
 
 const TopProgressBar = dynamic(
   () => {
@@ -88,6 +97,7 @@ interface ExtraProps {
 
 type Props = AppProps & { extra: ExtraProps };
 
+// function MyApp({ Component, pageProps, extra }: Props & WithTranslation) {
 function MyApp({ Component, pageProps, extra }: Props) {
 
   // remembers extra props from first load
@@ -97,12 +107,19 @@ function MyApp({ Component, pageProps, extra }: Props) {
     return store;
   });
 
+  const cookies = parseCookies();
+  const locale = cookies && cookies.language ? cookies.language : "zh_cn";
+
+  useEffect(() => {
+    loadAppCustomTranslation();
+  }, []);
+
+
   const defaultClusterStore = useConstant(() => {
     const store = createStore(DefaultClusterStore, Object.values(publicConfig.CLUSTERS)[0]);
     return store;
   });
 
-  // Use the layout defined at the page level, if available
   return (
     <>
       <Head>
@@ -127,12 +144,15 @@ function MyApp({ Component, pageProps, extra }: Props) {
       </Head>
       <StoreProvider stores={[userStore, defaultClusterStore]}>
         <DarkModeProvider initial={extra.darkModeCookieValue}>
-          <AntdConfigProvider color={primaryColor}>
+          <AntdConfigProvider color={primaryColor} locale={locale}>
             <FloatButtons />
             <GlobalStyle />
             <FailEventHandler />
             <TopProgressBar />
-            <BaseLayout footerText={footerText} versionTag={publicConfig.VERSION_TAG}>
+            <BaseLayout
+              footerText={footerText}
+              versionTag={publicConfig.VERSION_TAG}
+            >
               <Component {...pageProps} />
             </BaseLayout>
           </AntdConfigProvider>
@@ -188,4 +208,4 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
   return { ...appProps, extra } as Props;
 };
 
-export default MyApp;
+export default appWithTranslation(MyApp, nextI18nextConfig);

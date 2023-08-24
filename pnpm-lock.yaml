@@ -1,12 +1,15 @@
 lockfileVersion: '6.0'
 
-settings:
-  autoInstallPeers: true
-  excludeLinksFromLockfile: false
-
 importers:
 
   .:
+    dependencies:
+      i18next:
+        specifier: ^23.1.0
+        version: 23.1.0
+      next-i18next:
+        specifier: ^14.0.0
+        version: 14.0.0(i18next@23.1.0)(next@13.4.10)(react-i18next@13.0.0)(react@18.2.0)
     devDependencies:
       '@bufbuild/buf':
         specifier: 1.26.1
@@ -7199,7 +7202,6 @@ packages:
     dependencies:
       '@types/react': 18.2.20
       hoist-non-react-statics: 3.3.2
-    dev: true
 
   /@types/html-minifier-terser@6.1.0:
     resolution: {integrity: sha512-oh/6byDPnL1zeNXFrDXFLyZjkr1MsBG667IM792caf1L2UPOOMf65NFzjUH/ltyfwjAGfs1rsX1eftK0jC/KIg==}
@@ -11994,6 +11996,12 @@ packages:
       terser: 5.16.9
     dev: false
 
+  /html-parse-stringify@3.0.1:
+    resolution: {integrity: sha512-KknJ50kTInJ7qIScF3jeaFRpMpE8/lfiTdzf/twXyPBLAGrLRTmkz3AdTnKeh40X8k9L2fdYwEp/42WGXIRGcg==}
+    dependencies:
+      void-elements: 3.1.0
+    dev: false
+
   /html-tags@3.2.0:
     resolution: {integrity: sha512-vy7ClnArOZwCnqZgvv+ddgHgJiAFXe3Ge9ML5/mBctVJoUoYPCdxVucOywjDARn6CVoh3dRSFdPHy2sX80L0Wg==}
     engines: {node: '>=8'}
@@ -12151,6 +12159,16 @@ packages:
     engines: {node: '>=14'}
     hasBin: true
     dev: true
+
+  /i18next-fs-backend@2.1.5:
+    resolution: {integrity: sha512-7fgSH8nVhXSBYPHR/W3tEXXhcnwHwNiND4Dfx9knzPzdsWTUTL/TdDVV+DY0dL0asHKLbdoJaXS4LdVW6R8MVQ==}
+    dev: false
+
+  /i18next@23.1.0:
+    resolution: {integrity: sha512-CObNPofJpw7zGVGYLd58mtMZUF+NZQl9czYMihbJkStjX+Nlu9kC3PHiC6uE1niP3qxP/3ocLXIBc2zqbAb1dg==}
+    dependencies:
+      '@babel/runtime': 7.22.6
+    dev: false
 
   /iconv-lite@0.4.24:
     resolution: {integrity: sha512-v3MXnZAcvnywkTUEZomIActle7RXXeedOR31wwl7VlyoXO4Qi9arvSenNQWne1TcRwhCL1HwLI21bEqdpj8/rA==}
@@ -14678,6 +14696,26 @@ packages:
     resolution: {integrity: sha512-OjJ+fV15FXO2uQXQagLD4C0abYErBjyjE0I0FHpOEIB8upw0hg1ldFP6cqHTJBH1cZqy96OeR3u1dJ+Ez2D4Bg==}
     dev: false
 
+  /next-i18next@14.0.0(i18next@23.1.0)(next@13.4.10)(react-i18next@13.0.0)(react@18.2.0):
+    resolution: {integrity: sha512-umv8hOZoSoAA+td3ErfemyO/5Ib2pnYCdQ8/Oy+fncS2skFIL3hHKRer3Oa3Nfm4Xbv5p6DHWzm3NhT1j4tWwg==}
+    engines: {node: '>=14'}
+    peerDependencies:
+      i18next: ^23.0.1
+      next: '>= 12.0.0'
+      react: '>= 17.0.2'
+      react-i18next: ^13.0.0
+    dependencies:
+      '@babel/runtime': 7.22.6
+      '@types/hoist-non-react-statics': 3.3.1
+      core-js: 3.26.1
+      hoist-non-react-statics: 3.3.2
+      i18next: 23.1.0
+      i18next-fs-backend: 2.1.5
+      next: 13.4.10(@babel/core@7.22.5)(react-dom@18.2.0)(react@18.2.0)
+      react: 18.2.0
+      react-i18next: 13.0.0(i18next@23.1.0)(react-dom@18.2.0)(react@18.2.0)
+    dev: false
+
   /next-transpile-modules@10.0.1:
     resolution: {integrity: sha512-4VX/LCMofxIYAVV58UmD+kr8jQflpLWvas/BQ4Co0qWLWzVh06FoZkECkrX5eEZT6oJFqie6+kfbTA3EZCVtdQ==}
     dependencies:
@@ -16986,6 +17024,26 @@ packages:
       react-dom: 17.0.2(react@17.0.2)
       react-fast-compare: 3.2.0
       shallowequal: 1.1.0
+
+  /react-i18next@13.0.0(i18next@23.1.0)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-qRFbrSgynsBSjfnSTb/Um3mw9uPjOfDi4Iq2rMCuzfsRsYGdkEdyCr0i+T0bR0bG6xwULvK4k1oRVLLd7ZDBVw==}
+    peerDependencies:
+      i18next: '>= 23.0.1'
+      react: '>= 16.8.0'
+      react-dom: '*'
+      react-native: '*'
+    peerDependenciesMeta:
+      react-dom:
+        optional: true
+      react-native:
+        optional: true
+    dependencies:
+      '@babel/runtime': 7.22.6
+      html-parse-stringify: 3.0.1
+      i18next: 23.1.0
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+    dev: false
 
   /react-is@16.13.1:
     resolution: {integrity: sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==}
@@ -19648,6 +19706,11 @@ packages:
       acorn-walk: 8.2.0
     dev: true
 
+  /void-elements@3.1.0:
+    resolution: {integrity: sha512-Dhxzh5HZuiHQhbvTW9AMetFfBHDMYpo23Uo9btPXgdYP+3T5S+p+jgNy7spra+veYhBP2dCSgxR/i2Y02h5/6w==}
+    engines: {node: '>=0.10.0'}
+    dev: false
+
   /w3c-keyname@2.2.6:
     resolution: {integrity: sha512-f+fciywl1SJEniZHD6H+kUO8gOnwIr7f4ijKA6+ZvJFjeGi1r4PDLl53Ayud9O/rk64RqgoQine0feoeOU0kXg==}
     dev: false
@@ -20318,3 +20381,7 @@ packages:
     name: tiny-inflate
     version: 1.0.3
     dev: false
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false

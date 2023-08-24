@@ -1,0 +1,19 @@
+{
+  "custom-translation": true,
+  "en": {
+    "hpc01-text": "hpc01",
+    "hpc02-text": "hpc02",
+    "apps": {
+      "app1-text": "app1",
+      "app2-text": "app2"
+    }
+  },
+  "zh_cn": {
+    "hpc01-text": "集群1",
+    "hpc02-text": "集群2",
+    "apps": {
+      "app1-text": "交互式应用1",
+      "app2-text": "交互式应用2"
+    }
+  }
+}

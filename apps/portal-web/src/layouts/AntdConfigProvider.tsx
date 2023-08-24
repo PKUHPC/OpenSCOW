@@ -15,12 +15,14 @@ import "dayjs/locale/zh-cn";
 import { AntdConfigProvider as LibAntdConfigProvider } from "@scow/lib-web/build/layouts/AntdConfigProvider";
 import { useDarkMode } from "@scow/lib-web/build/layouts/darkMode";
 import { App, ConfigProvider, theme } from "antd";
+import enUSlocale from "antd/locale/en_US";
 import zhCNlocale from "antd/locale/zh_CN";
 import React from "react";
 import { ThemeProvider } from "styled-components";
 
 type Props = React.PropsWithChildren<{
   color: string;
+  locale: string;
 }>;
 
 const StyledComponentsThemeProvider: React.FC<Props> = ({ children }) => {
@@ -33,17 +35,18 @@ const StyledComponentsThemeProvider: React.FC<Props> = ({ children }) => {
   );
 };
 
-export const AntdConfigProvider: React.FC<Props> = ({ children, color }) => {
+export const AntdConfigProvider: React.FC<Props> = ({ children, color, locale }) => {
 
   const { dark } = useDarkMode();
 
   return (
-    <LibAntdConfigProvider color={color}>
+    <LibAntdConfigProvider color={color} locale={locale}>
       <ConfigProvider
-        locale={zhCNlocale}
+        // locale={zhCNlocale}
+        locale={locale === "zh_cn" ? zhCNlocale : enUSlocale}
         theme={{ token: { colorPrimary: color, colorInfo: color }, algorithm: dark ? theme.darkAlgorithm : undefined }}
       >
-        <StyledComponentsThemeProvider color={color}>
+        <StyledComponentsThemeProvider color={color} locale={locale}>
           <App>
             {children}
           </App>

@@ -59,6 +59,9 @@ export interface PublicRuntimeConfig {
   USER_LINKS?: UserLink[];
 
   VERSION_TAG: string | undefined;
+
+  CUSTOM_TRANSLATION_JSON?: CustomTranslation;
+
 }
 
 export const runtimeConfig: ServerRuntimeConfig = getConfig().serverRuntimeConfig;
@@ -81,6 +84,15 @@ export type CustomAmountStrategy = {
   comment?: string | undefined;
 }
 
+
+export type TranslationRecord = {
+  [key: string]: string | TranslationRecord;
+}
+export type CustomTranslation = {
+  "custom-translation": boolean;
+  "en"?: TranslationRecord;
+  "zh_cn"?: TranslationRecord;
+}
 
 export const getClusterName = (clusterId: string) => {
   return publicConfig.CLUSTERS[clusterId]?.name || clusterId;

@@ -1,0 +1,74 @@
+{
+  "dashboard": {
+    "account": {
+      "title": "Account Information",
+      "state": "State",
+      "balance": "Available Balance",
+      "status": {
+        "blocked": "Blocked",
+        "normal": "Normal"
+      },
+      "alert": "You don't belong to any account."
+    },
+
+    "job": {
+      "title": "Unfinished Job List",
+      "extra": "View All Unfinished Jobs",
+      "job-table": {
+        "cluster": "Cluster",
+        "jobId": "Job ID",
+        "account": "Account",
+        "name": "Job Name",
+        "partition": "Partition",
+        "qos": "QoS",
+        "nodes": "Nodes",
+        "cores": "Cores",
+        "state": "State",
+        "time": "Runtime/Queue Time",
+        "reason": "Reason",
+        "limit": "Job Time Limit",
+        "others": "Others"
+      },
+      "none": "No data available"
+    }
+  },
+
+  "footer": "Powered by SCOW",
+
+
+  "running-job": {
+    "title": "Your Unfinished Jobs",
+    "search": {
+      "batch": "Batch Search",
+      "precision": "Precision Search",
+      "cluster": "Cluster",
+      "account": "Account",
+      "cluster-job-id": "Cluster Job ID",
+      "button": {
+        "search": "Search",
+        "refresh": "Refresh",
+        "change-limit": "Extend Time Limit of Selected Jobs"
+      }
+    },
+    "job-table": {
+      "cluster": "Cluster",
+      "jobId": "Job",
+      "account": "Account",
+      "name": "Job Name",
+      "partition": "Partition",
+      "qos": "QoS",
+      "nodes": "Nodes",
+      "cores": "Cores",
+      "state": "State",
+      "time": "Runtime/Queue Time",
+      "reason": "Reason",
+      "limit": "Job Time Limit",
+      "others": "Others",
+      "user": "User",
+      "details": "Details",
+      "change-limit": "Change Job Time Limit"
+    }
+  }
+}
+
+

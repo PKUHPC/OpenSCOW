@@ -15,6 +15,7 @@ const { getClusterConfigs } = require("@scow/config/build/cluster");
 const { getMisConfig } = require("@scow/config/build/mis");
 const { getCommonConfig } = require("@scow/config/build/common");
 const { getClusterTextsConfig } = require("@scow/config/build/clusterTexts");
+const { getCustomTranslationJson } = require("@scow/config/build/translation");
 const { DEFAULT_PRIMARY_COLOR, getUiConfig } = require("@scow/config/build/ui");
 const { PHASE_DEVELOPMENT_SERVER, PHASE_PRODUCTION_BUILD, PHASE_PRODUCTION_SERVER } = require("next/constants");
 const { join } = require("path");
@@ -90,6 +91,8 @@ const buildRuntimeConfig = async (phase, basePath) => {
 
   const versionTag = readVersionFile()?.tag;
 
+  const translationJson = getCustomTranslationJson();
+
   /**
    * @type {import ("./src/utils/config").ServerRuntimeConfig}
    */
@@ -117,7 +120,6 @@ const buildRuntimeConfig = async (phase, basePath) => {
     PREDEFINED_CHARGING_TYPES: misConfig.predefinedChargingTypes,
 
     PUBLIC_PATH: config.PUBLIC_PATH,
-
     CLUSTERS: Object.keys(clusters).reduce((prev, curr) => {
       prev[curr] = { id: curr, name: clusters[curr].displayName };
       return prev;
@@ -140,6 +142,7 @@ const buildRuntimeConfig = async (phase, basePath) => {
     USER_LINKS: commonConfig.userLinks,
 
     VERSION_TAG: versionTag,
+    CUSTOM_TRANSLATION_JSON: translationJson,
   };
 
   if (!building) {

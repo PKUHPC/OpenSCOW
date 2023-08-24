@@ -29,89 +29,106 @@ import { createUserParams, useBuiltinCreateUser } from "src/utils/createUser";
 export const platformAdminRoutes: (platformRoles: PlatformRole[]) => NavItemProps[] = (platformRoles) => [
   {
     Icon: UserOutlined,
-    text: "平台管理",
+    // text: "平台管理",
+    text: "route.platform-management.fist-nav",
     path: "/admin",
     clickToPath: "/admin/info",
     children: [
       {
         Icon: InfoOutlined,
-        text: "平台信息",
+        // text: "平台信息",
+        text: "route.platform-management.info",
         path: "/admin/info",
       },
       ...(platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ? [{
         Icon: MoneyCollectOutlined,
-        text: "作业价格表",
+        // text: "作业价格表",
+        text: "route.platform-management.job-billing-table",
         path: "/admin/jobBilling",
       }] : [])
       ,
       ...(platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ? [
         {
           Icon: CloudServerOutlined,
-          text: "租户管理",
+          // text: "租户管理",
+          text: "route.platform-management.tenants-management",
           path: "/admin/tenants",
           clickToPath: "/admin/tenants/list",
           children: [
             {
               Icon: UserOutlined,
-              text: "租户列表",
+              // text: "租户列表",
+              text: "route.platform-management.tenants-list",
               path: "/admin/tenants/list",
             },
             {
               Icon: PlusOutlined,
-              text: "创建租户",
+              // text: "创建租户",
+              text: "route.platform-management.create-tenant",
               path: "/admin/tenants/create",
             },
           ],
         },
         {
           Icon: UserOutlined,
-          text: "用户列表",
+          // text: "用户列表",
+          text: "route.platform-management.users-list",
           path: "/admin/users",
         },
         {
           Icon: AccountBookOutlined,
-          text: "账户列表",
+          // text: "账户列表",
+          text: "route.tenant-management.account-list",
           path: "/admin/accounts",
         },
       ] : []),
-      {
-        Icon: MoneyCollectOutlined,
-        text: "财务管理",
-        path: "/admin/finance",
-        clickable: false,
-        children: [
-          {
-            Icon: PlusSquareOutlined,
-            text: "租户充值",
-            path: "/admin/finance/pay",
-          },
-          {
-            Icon: BookOutlined,
-            text: "充值记录",
-            path: "/admin/finance/payments",
-          },
-        ],
-      },
+      ...(platformRoles.includes(PlatformRole.PLATFORM_FINANCE) ? [
+        {
+          Icon: MoneyCollectOutlined,
+          // text: "财务管理",
+          text: "route.platform-management.finance-management",
+          path: "/admin/finance",
+          clickable: false,
+          children: [
+            {
+              Icon: PlusSquareOutlined,
+              // text: "租户充值",
+              text: "route.platform-management.tenant-pay",
+              path: "/admin/finance/pay",
+            },
+            {
+              Icon: BookOutlined,
+              // text: "充值记录",
+              text: "route.platform-management.payments",
+              path: "/admin/finance/payments",
+            },
+          ],
+        },
+      ] : []),
       {
         Icon: ToolOutlined,
-        text: "平台调试",
+        // text: "平台调试",
+        text: "route.platform-management.system-debug",
         path: "/admin/systemDebug",
         clickable: false,
         children: [
           ...(platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ?
             [{
               Icon: UserOutlined,
-              text: "导入用户",
+              // text: "导入用户",
+              text: "route.platform-management.import-user",
               path: "/admin/importUsers",
             }] : []),
           {
             Icon: LockOutlined,
-            text: "封锁状态同步",
+            // text: "封锁状态同步",
+            text: "route.platform-management.status-synchronization",
             path: "/admin/systemDebug/slurmBlockStatus",
           },
           {
             Icon: BookOutlined,
-            text: "作业信息同步",
+            // text: "作业信息同步",
+            text: "route.platform-management.jobs-synchronization",
             path: "/admin/systemDebug/fetchJobs",
           },
         ],
@@ -124,40 +141,47 @@ export const platformAdminRoutes: (platformRoles: PlatformRole[]) => NavItemProp
 export const tenantRoutes: (tenantRoles: TenantRole[], token: string) => NavItemProps[] = (tenantRoles, token) => [
   {
     Icon: CloudServerOutlined,
-    text: "租户管理",
+    // text: "租户管理",
+    text: "route.tenant-management.first-nav",
     path: "/tenant",
     clickToPath: tenantRoles.includes(TenantRole.TENANT_ADMIN) ? "/tenant/info" : "/tenant/finance/payAccount",
     children: [
       ...(tenantRoles.includes(TenantRole.TENANT_ADMIN) ? [
         {
           Icon: InfoOutlined,
-          text: "租户信息",
+          // text: "租户信息",
+          text: "route.tenant-management.info",
           path: "/tenant/info",
         },
         {
           Icon: MoneyCollectOutlined,
-          text: "作业价格表",
+          // text: "作业价格表",
+          text: "route.tenant-management.manage-job-price",
           path: "/tenant/jobBillingTable",
         },
         {
           Icon: BookOutlined,
-          text: "未结束的作业",
+          // text: "未结束的作业",
+          text: "route.tenant-management.running-jobs",
           path: "/tenant/runningJobs",
         },
         {
           Icon: BookOutlined,
-          text: "已结束的作业",
+          // text: "已结束的作业",
+          text: "route.tenant-management.finished-jobs",
           path: "/tenant/historyJobs",
         },
         {
           Icon: UserOutlined,
-          text: "用户管理",
+          // text: "用户管理",
+          text: "route.tenant-management.user-management",
           path: "/tenant/users",
           clickToPath: "/tenant/users/list",
           children: [
             ...(useBuiltinCreateUser() ? [{
               Icon: UserAddOutlined,
-              text: "创建用户",
+              // text: "创建用户",
+              text: "route.tenant-management.create-user",
               path: "/tenant/users/create",
             }] : []),
             ...((
@@ -165,13 +189,15 @@ export const tenantRoutes: (tenantRoles: TenantRole[], token: string) => NavItem
               publicConfig.CREATE_USER_CONFIG.misConfig.type === "external"
             ) ? [{
                 Icon: UserAddOutlined,
-                text: "创建用户",
+                // text: "创建用户",
+                text: "route.tenant-management.create-user",
                 path: publicConfig.CREATE_USER_CONFIG.misConfig.external!.url + "?" + createUserParams(token),
                 openInNewPage: true,
               }] : []),
             {
               Icon: UserOutlined,
-              text: "用户列表",
+              // text: "用户列表",
+              text: "route.tenant-management.user-list",
               path: "/tenant/users/list",
             },
           ],
@@ -188,96 +214,112 @@ export const tenantRoutes: (tenantRoles: TenantRole[], token: string) => NavItem
         // },
         {
           Icon: AccountBookOutlined,
-          text: "账户管理",
+          // text: "账户管理",
+          text: "route.tenant-management.account-management",
           path: "/tenant/accounts",
           clickToPath: "/tenant/accounts/list",
           children: [
             {
               Icon: PlusOutlined,
-              text: "创建账户",
+              // text: "创建账户",
+              text: "route.tenant-management.create-account",
               path: "/tenant/accounts/create",
             },
             {
               Icon: AccountBookOutlined,
-              text: "账户列表",
+              // text: "账户列表",
+              text: "route.tenant-management.account-list",
               path: "/tenant/accounts/list",
             },
             {
               Icon: StarOutlined,
-              text: "账户白名单",
+              // text: "账户白名单",
+              text: "route.tenant-management.whitelist",
               path: "/tenant/accounts/whitelist",
             },
           ],
         },
       ] : []),
-      ...(tenantRoles.includes(TenantRole.TENANT_FINANCE) || 
-          tenantRoles.includes(TenantRole.TENANT_ADMIN) ? [
-          {
-            Icon: MoneyCollectOutlined,
-            text: "财务管理",
-            path: "/tenant/finance",
-            clickable: false,
-            children: [
-              {
-                Icon: PlusSquareOutlined,
-                text: "账户充值",
-                path: "/tenant/finance/payAccount",
-              },
-              {
-                Icon: ProfileOutlined,
-                text: "账户充值记录",
-                path: "/tenant/finance/accountPayments",
-              },
-              {
-                Icon: BookOutlined,
-                text: "充值记录",
-                path: "/tenant/finance/payments",
-              },
-            ],
-          },
-        ] : []),
-    ],
-  },
-];
-
-export const userRoutes: (accounts: AccountAffiliation[]) => NavItemProps[] = (accounts) => [
-  {
-    Icon: DashboardOutlined,
-    text: "仪表盘",
-    path: "/dashboard",
-  },
-  {
-    Icon: BookOutlined,
-    text: "用户空间",
-    path: "/user",
-    clickToPath: accounts.length > 0 ? "/user/runningJobs" : "/user/partitions",
-    children: [
-      ...(accounts.length > 0 ? [
+      ...(tenantRoles.includes(TenantRole.TENANT_FINANCE) ? [
         {
-          Icon: BookOutlined,
-          text: "未结束的作业",
-          path: "/user/runningJobs",
-        },
-        {
-          Icon: BookOutlined,
-          text: "已结束的作业",
-          path: "/user/historyJobs",
+          Icon: MoneyCollectOutlined,
+          // text: "财务管理",
+          text: "route.tenant-management.finance-management",
+          path: "/tenant/finance",
+          clickable: false,
+          children: [
+            {
+              Icon: PlusSquareOutlined,
+              // text: "账户充值",
+              text: "route.tenant-management.account-pay",
+              path: "/tenant/finance/payAccount",
+            },
+            {
+              Icon: ProfileOutlined,
+              // text: "账户充值记录",
+              text: "route.tenant-management.account-payments",
+              path: "/tenant/finance/accountPayments",
+            },
+            {
+              Icon: BookOutlined,
+              // text: "充值记录",
+              text: "route.tenant-management.finance-payments",
+              path: "/tenant/finance/payments",
+            },
+          ],
         },
       ] : []),
-      {
-        Icon: PartitionOutlined,
-        text: "集群和分区信息",
-        path: "/user/partitions",
-      },
     ],
-
   },
 ];
+
+export const userRoutes: (accounts: AccountAffiliation[]) => NavItemProps[] = (accounts) => {
+  // const { t } = useTranslation("layouts");
+  return [
+    {
+      Icon: DashboardOutlined,
+      // text: "仪表盘",
+      text: "route.dashboard",
+      path: "/dashboard",
+    },
+    {
+      Icon: BookOutlined,
+      // text: "用户空间",
+      text: "route.user.first-nav",
+      path: "/user",
+      clickToPath: accounts.length > 0 ? "/user/runningJobs" : "/user/partitions",
+      children: [
+        ...(accounts.length > 0 ? [
+          {
+            Icon: BookOutlined,
+            // text: "未结束的作业",
+            text: "route.user.running-jobs",
+            path: "/user/runningJobs",
+          },
+          {
+            Icon: BookOutlined,
+            // text: "已结束的作业",
+            text: "route.user.finished-jobs",
+            path: "/user/historyJobs",
+          },
+        ] : []),
+        {
+          Icon: PartitionOutlined,
+          // text: "集群和分区信息",
+          text: "route.user.cluster-partitions",
+          path: "/user/partitions",
+        },
+      ],
+
+    },
+  ];
+};
 
 export const accountAdminRoutes: (adminAccounts: AccountAffiliation[]) => NavItemProps[] = (accounts) => [
   {
     Icon: UserOutlined,
-    text: "账户管理",
+    // text: "账户管理",
+    text: "route.account-management.first-nav",
     path: "/accounts",
     children: accounts.map((x) => ({
       Icon: AccountBookOutlined,
@@ -287,32 +329,38 @@ export const accountAdminRoutes: (adminAccounts: AccountAffiliation[]) => NavIte
       children: [
         {
           Icon: InfoOutlined,
-          text: "账户信息",
+          // text: "账户信息",
+          text: "route.account-management.info",
           path: `/accounts/${x.accountName}/info`,
         },
         {
           Icon: BookOutlined,
-          text: "未结束的作业",
+          // text: "未结束的作业",
+          text: "route.account-management.running-jobs",
           path: `/accounts/${x.accountName}/runningJobs`,
         },
         {
           Icon: BookOutlined,
-          text: "已结束的作业",
+          // text: "已结束的作业",
+          text: "route.account-management.finished-jobs",
           path: `/accounts/${x.accountName}/historyJobs`,
         },
         {
           Icon: UserOutlined,
-          text: "用户管理",
+          // text: "用户管理",
+          text: "route.account-management.user-management",
           path: `/accounts/${x.accountName}/users`,
         },
         {
           Icon: BookOutlined,
-          text: "充值记录",
+          // text: "充值记录",
+          text: "route.account-management.pay",
           path: `/accounts/${x.accountName}/payments`,
         },
         {
           Icon: BookOutlined,
-          text: "消费记录",
+          // text: "消费记录",
+          text: "route.account-management.cost",
           path: `/accounts/${x.accountName}/charges`,
         },
       ],

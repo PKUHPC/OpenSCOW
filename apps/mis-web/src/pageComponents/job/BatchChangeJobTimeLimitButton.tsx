@@ -11,6 +11,7 @@
  */
 
 import { Button } from "antd";
+import { useTranslation } from "next-i18next";
 import { useState } from "react";
 import { RunningJobInfo } from "src/models/job";
 import { ChangeJobTimeLimitModal } from "src/pageComponents/job/ChangeJobTimeLimitModal";
@@ -26,10 +27,13 @@ export const BatchChangeJobTimeLimitButton: React.FC<ChangeJobTimeLimitButtonPro
 }) => {
   const [open, setOpen] = useState(false);
 
+  const { t } = useTranslation("translations", { keyPrefix: "running-job" });
+
   return (
     <>
       <Button disabled={disabled} onClick={() => setOpen(true)}>
-        延长所选作业时间限制
+        {/* 延长所选作业时间限制 */}
+        {t("search.button.change-limit")}
       </Button>
       <ChangeJobTimeLimitModal
         reload={reload}

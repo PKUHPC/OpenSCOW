@@ -11,6 +11,7 @@
  */
 
 import Link from "next/link";
+import { useTranslation } from "next-i18next";
 import React, { useCallback } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
@@ -25,6 +26,8 @@ interface Props {
 }
 
 export const JobsSection: React.FC<Props> = ({ user }) => {
+
+  const { t } = useTranslation("translations", { keyPrefix: "dashboard.job" });
 
   const promiseFn = useCallback(() => {
     return Promise.all(Object.values(publicConfig.CLUSTERS).map(async ({ id, name }) => {
@@ -43,10 +46,12 @@ export const JobsSection: React.FC<Props> = ({ user }) => {
 
   return (
     <Section
-      title="未结束作业列表"
+      // title="未结束作业列表"
+      title={t("title")}
       extra={(
         <Link href="/user/runningJobs">
-        查看所有未结束作业
+          {/* 查看所有未结束作业 */}
+          {t("extra")}
         </Link>
       )}
     >
