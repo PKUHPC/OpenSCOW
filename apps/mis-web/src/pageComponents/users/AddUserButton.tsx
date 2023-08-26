@@ -95,9 +95,13 @@ export const AddUserButton: React.FC<Props> = ({ refresh, accountName, token }) 
         }
       })
       .httpError(404, ({ code }) => {
-        if (code === "ACCOUNT_NOT_FOUND") {
-          message.error("账户不存在");
-        } else if (code === "USER_NOT_FOUND") {
+        if (code === "USER_ALREADY_EXIST_IN_OTHER_TENANT") {
+          message.error(`用户${name}已属于其他租户`);
+        }
+        else if (code === "ACCOUNT_OR_TENANT_NOT_FOUND") {
+          message.error("租户或账户不存在");
+        } 
+        else if (code === "USER_NOT_FOUND") {
           if (useBuiltinCreateUser()) {
             setModalShow(false);
             setNewUserInfo({ identityId, name });
