@@ -29,14 +29,14 @@ const drawerItems = [
   ["作业名", "name"],
   ["分区", "partition"],
   ["QOS", "qos"],
-  ["节点数", "nodes"],
-  ["核心数", "cores"],
-  ["GPU卡数", "gpus"],
+  ["节点数（个）", "nodes"],
+  ["核心数（个）", "cores"],
+  ["GPU卡数（个）", "gpus"],
   ["状态", "state"],
   ["说明", "nodesOrReason"],
   ["运行/排队时间", "runningOrQueueTime"],
   ["提交时间", "submissionTime", formatDateTime],
-  ["作业时限", "timeLimit"],
+  ["作业时限（分钟）", "timeLimit"],
 ] as ([string, keyof RunningJobInfo] | [string, keyof RunningJobInfo, (v: any, r: RunningJobInfo) => string])[];
 
 export const RunningJobDrawer: React.FC<Props> = ({
