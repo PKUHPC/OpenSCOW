@@ -16,8 +16,6 @@ import { AccountStatus } from "@scow/protos/build/server/user";
 import { Divider } from "antd";
 import { GetServerSideProps, NextPage } from "next";
 import { useRouter } from "next/router";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { parseCookies } from "nookies";
 import { useEffect } from "react";
 import { useStore } from "simstate";
 import { MOCK_USER_STATUS } from "src/apis/api.mock";
@@ -31,8 +29,6 @@ import { getUserStatus, GetUserStatusSchema } from "src/pages/api/dashboard/stat
 import { UserStore } from "src/stores/UserStore";
 import { ensureNotUndefined } from "src/utils/checkNull";
 import { Head } from "src/utils/head";
-
-import { loadAppCustomTranslation } from "./_app";
 
 export type AccountInfo = Omit<AccountStatus, "balance" | "jobChargeLimit" | "usedJobCharge"> & {
   balance: number;
@@ -80,11 +76,6 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ req }) => 
 
   const auth = ssrAuthenticate(() => true);
 
-  const cookies = parseCookies({ req });
-  const locale = cookies.language || "zh_cn";
-  await loadAppCustomTranslation();
-  const lngProps = await serverSideTranslations(locale ?? "zh_cn");
-
   // Cannot directly call api routes here, so mock is not available directly.
   // manually call mock
   if (USE_MOCK) {
@@ -100,7 +91,6 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ req }) => 
       props: {
         accounts: accountInfo,
         storageQuotas: status.storageQuotas,
-        ...lngProps,
       },
     };
   }
@@ -130,7 +120,6 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ req }) => 
     props: {
       accounts,
       storageQuotas: status.storageQuotas,
-      ...lngProps,
     },
   };
 

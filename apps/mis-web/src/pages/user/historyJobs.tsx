@@ -10,17 +10,12 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { GetServerSideProps, NextPage } from "next";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { parseCookies } from "nookies";
+import { NextPage } from "next";
 import { useMemo } from "react";
 import { requireAuth } from "src/auth/requireAuth";
-import { SSRProps } from "src/auth/server";
 import { PageTitle } from "src/components/PageTitle";
 import { JobTable } from "src/pageComponents/job/HistoryJobTable";
 import { Head } from "src/utils/head";
-
-type Props = SSRProps<{}>;
 
 export const JobsPage: NextPage = requireAuth((u) => u.accountAffiliations.length > 0)(
   ({ userStore }) => {
@@ -46,17 +41,3 @@ export const JobsPage: NextPage = requireAuth((u) => u.accountAffiliations.lengt
     );
 
   });
-
-export const getServerSideProps: GetServerSideProps<Props> = async ({ req }) => {
-
-  const cookies = parseCookies({ req });
-  const locale = cookies.language || "zh_cn";
-  const lngProps = await serverSideTranslations(locale ?? "zh_cn");
-  return {
-    props: {
-      ...lngProps,
-    },
-  };
-};
-
-export default JobsPage;

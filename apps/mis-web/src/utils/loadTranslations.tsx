@@ -12,14 +12,20 @@
 
 import { i18n } from "next-i18next";
 
+import * as EnCommon from "../../public/locales/en/common.json";
+import * as EnLayouts from "../../public/locales/en/layouts.json";
+import * as EnTranslations from "../../public/locales/en/translations.json";
+import * as CnCommon from "../../public/locales/zh_cn/common.json";
+import * as CnLayouts from "../../public/locales/zh_cn/layouts.json";
+import * as CnTranslations from "../../public/locales/zh_cn/translations.json";
 import { publicConfig } from "./config";
 
 
 
-export async function loadCustomTranslations() {
+export function loadTranslations() {
 
-  // 加载用户自定义的翻译 JSON 文件
   const customTranslation = publicConfig.CUSTOM_TRANSLATION_JSON;
+
   if (customTranslation) {
     Object.keys(customTranslation).filter((key) => key !== "custom-translation").forEach((locale) => {
       i18n?.addResource(locale, "custom",
@@ -28,6 +34,14 @@ export async function loadCustomTranslations() {
     i18n?.addResourceBundle("en", "custom", customTranslation.en, true, true);
     i18n?.addResourceBundle("zh_cn", "custom", customTranslation.zh_cn, true, true);
   }
+
+  // add othersTranslations
+  i18n?.addResourceBundle("en", "common", EnCommon, true, true);
+  i18n?.addResourceBundle("zh_cn", "common", CnCommon, true, true);
+  i18n?.addResourceBundle("en", "layouts", EnLayouts, true, true);
+  i18n?.addResourceBundle("zh_cn", "layouts", CnLayouts, true, true);
+  i18n?.addResourceBundle("en", "translations", EnTranslations, true, true);
+  i18n?.addResourceBundle("zh_cn", "translations", CnTranslations, true, true);
 
 }
 

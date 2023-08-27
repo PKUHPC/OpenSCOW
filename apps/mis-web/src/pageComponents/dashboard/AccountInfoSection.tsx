@@ -13,7 +13,7 @@
 import { LockOutlined, UnlockOutlined } from "@ant-design/icons";
 import { moneyToNumber } from "@scow/lib-decimal";
 import { Alert, Col, Row, Statistic, StatisticProps } from "antd";
-import { i18n, useTranslation } from "next-i18next";
+import { i18n, I18nContext, useTranslation } from "next-i18next";
 import React, { useEffect } from "react";
 import { Section } from "src/components/Section";
 import { StatCard } from "src/components/StatCard";
@@ -54,6 +54,9 @@ export const AccountInfoSection: React.FC<Props> = ({ info }) => {
   const accounts = Object.entries(info);
 
   const { t } = useTranslation(["translations", "custom"]);
+
+  console.log("【dashboard web", i18n?.store.data);
+  // console.log("【dashboard web t】", t, i18n, I18nContext);
 
   const statusTexts = {
     blocked: [t("dashboard.account.status.blocked"), "red", LockOutlined],

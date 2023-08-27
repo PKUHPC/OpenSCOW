@@ -40,7 +40,7 @@ import {
   User, UserStore,
 } from "src/stores/UserStore";
 import { publicConfig, runtimeConfig } from "src/utils/config";
-import { loadCustomTranslations } from "src/utils/loadCustomTranslations";
+import { loadTranslations } from "src/utils/loadTranslations";
 
 import nextI18nextConfig from "../../next-i18next.config.js";
 
@@ -76,8 +76,8 @@ const FailEventHandler: React.FC = () => {
   return <></>;
 };
 
-export const loadAppCustomTranslation = async () => {
-  await loadCustomTranslations();
+export const loadAppTranslation = () => {
+  loadTranslations();
   i18n?.reloadResources();
 };
 
@@ -100,6 +100,13 @@ type Props = AppProps & { extra: ExtraProps };
 // function MyApp({ Component, pageProps, extra }: Props & WithTranslation) {
 function MyApp({ Component, pageProps, extra }: Props) {
 
+  // useEffect(() => {
+  //   i18n?.init();
+  //   loadAppTranslation();
+  // }, []);
+  i18n?.init();
+  loadAppTranslation();
+
   // remembers extra props from first load
   const { current: { userInfo, primaryColor, footerText } } = useRef(extra);
   const userStore = useConstant(() => {
@@ -109,11 +116,6 @@ function MyApp({ Component, pageProps, extra }: Props) {
 
   const cookies = parseCookies();
   const locale = cookies && cookies.language ? cookies.language : "zh_cn";
-
-  useEffect(() => {
-    loadAppCustomTranslation();
-  }, []);
-
 
   const defaultClusterStore = useConstant(() => {
     const store = createStore(DefaultClusterStore, Object.values(publicConfig.CLUSTERS)[0]);
@@ -203,7 +205,6 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
   }
 
   const appProps = await App.getInitialProps(appContext);
-
 
   return { ...appProps, extra } as Props;
 };
