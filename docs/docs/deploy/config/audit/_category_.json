@@ -1,0 +1,8 @@
+{
+  "label": "审计系统",
+  "position": 5,
+  "link": {
+    "type": "generated-index",
+    "description": "关于审计系统的部署和配置"
+  }
+}

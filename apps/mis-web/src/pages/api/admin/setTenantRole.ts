@@ -16,10 +16,13 @@ import { Status } from "@grpc/grpc-js/build/src/constants";
 import { UserServiceClient } from "@scow/protos/build/server/user";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
+import { OperationResult, OperationType } from "src/models/operationLog";
 import { TenantRole } from "src/models/User";
+import { callLog } from "src/server/operationLog";
 import { getClient } from "src/utils/client";
+import { DEFAULT_INIT_USER_ID, DEFAULT_TENANT_NAME } from "src/utils/constants";
 import { queryIfInitialized } from "src/utils/init";
-import { handlegRPCError } from "src/utils/server";
+import { handlegRPCError, parseIp } from "src/utils/server";
 
 
 export const SetTenantRoleSchema = typeboxRouteSchema({
@@ -41,12 +44,28 @@ export const SetTenantRoleSchema = typeboxRouteSchema({
 export default typeboxRoute(SetTenantRoleSchema, async (req, res) => {
   const { userId, roleType } = req.body;
 
+  const logInfo = {
+    operatorUserId: DEFAULT_INIT_USER_ID,
+    operatorIp: parseIp(req) ?? "",
+    operationTypeName: roleType === TenantRole.TENANT_ADMIN
+      ? OperationType.setTenantAdmin
+      : OperationType.setTenantFinance,
+    operationTypePayload:{
+      tenantName: DEFAULT_TENANT_NAME, userId,
+    },
+  };
+
   if (await queryIfInitialized()) {
-    const auth = authenticate((u) =>
-      u.tenantRoles.includes(TenantRole.TENANT_ADMIN));
+    const auth = authenticate((u) => u.tenantRoles.includes(TenantRole.TENANT_ADMIN));
     const info = await auth(req, res);
-    if (!info) { return; }
+    if (info) {
+      logInfo.operatorUserId = info.identityId;
+      logInfo.operationTypePayload.tenantName = info.tenant;
+    } else {
+      return;
+    }
   }
+
 
 
   const client = getClient(UserServiceClient);
@@ -55,9 +74,14 @@ export default typeboxRoute(SetTenantRoleSchema, async (req, res) => {
     userId,
     roleType,
   })
-    .then(() => ({ 200: { executed: true } }))
+    .then(async () => {
+      await callLog(logInfo, OperationResult.SUCCESS);
+      return { 200: { executed: true } };
+    })
     .catch(handlegRPCError({
       [Status.NOT_FOUND]: () => ({ 404: null }),
       [Status.FAILED_PRECONDITION]: () => ({ 200: { executed: false } }),
-    }));
+    },
+    async () => await callLog(logInfo, OperationResult.FAIL),
+    ));
 });

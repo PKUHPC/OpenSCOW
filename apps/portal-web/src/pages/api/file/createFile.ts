@@ -16,9 +16,11 @@ import { status } from "@grpc/grpc-js";
 import { FileServiceClient } from "@scow/protos/build/portal/file";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
+import { OperationResult, OperationType } from "src/models/operationLog";
+import { callLog } from "src/server/operationLog";
 import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
-import { handlegRPCError } from "src/utils/server";
+import { handlegRPCError, parseIp } from "src/utils/server";
 
 export const CreateFileSchema = typeboxRouteSchema({
   method: "POST",
@@ -47,11 +49,25 @@ export default route(CreateFileSchema, async (req, res) => {
 
   const client = getClient(FileServiceClient);
 
+  const logInfo = {
+    operatorUserId: info.identityId,
+    operatorIp: parseIp(req) ?? "",
+    operationTypeName: OperationType.createFile,
+    operationTypePayload:{
+      clusterId: cluster, path,
+    },
+  };
+
   return asyncUnaryCall(client, "createFile", {
     cluster, path, userId: info.identityId,
-  }).then(() => ({ 204: null }), handlegRPCError({
+  }).then(async () => {
+    await callLog(logInfo, OperationResult.SUCCESS);
+    return { 204: null };
+  }, handlegRPCError({
     [status.NOT_FOUND]: () => ({ 400: { code: "INVALID_CLUSTER" as const } }),
     [status.ALREADY_EXISTS]: () => ({ 409: { code: "ALREADY_EXISTS" as const } }),
-  }));
+  },
+  async () => await callLog(logInfo, OperationResult.FAIL),
+  ));
 
 });

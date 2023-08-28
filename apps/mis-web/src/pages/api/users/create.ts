@@ -16,11 +16,13 @@ import { status } from "@grpc/grpc-js";
 import { UserServiceClient } from "@scow/protos/build/server/user";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
+import { OperationResult, OperationType } from "src/models/operationLog";
 import { PlatformRole, TenantRole, UserRole } from "src/models/User";
+import { callLog } from "src/server/operationLog";
 import { getClient } from "src/utils/client";
 import { publicConfig } from "src/utils/config";
 import { getUserIdRule, useBuiltinCreateUser } from "src/utils/createUser";
-import { handlegRPCError } from "src/utils/server";
+import { handlegRPCError, parseIp } from "src/utils/server";
 
 export const CreateUserSchema = typeboxRouteSchema({
   method: "POST",
@@ -89,6 +91,15 @@ export default /* #__PURE__*/typeboxRoute(CreateUserSchema, async (req, res) => 
     return { 400: { code: "PASSWORD_NOT_VALID" as const, message: publicConfig.PASSWORD_PATTERN_MESSAGE } };
   }
 
+  const logInfo = {
+    operatorUserId: info.identityId,
+    operatorIp: parseIp(req) ?? "",
+    operationTypeName: OperationType.createUser,
+    operationTypePayload:{
+      userId: identityId,
+    },
+  };
+
   // create user on server
   const client = getClient(UserServiceClient);
 
@@ -99,8 +110,13 @@ export default /* #__PURE__*/typeboxRoute(CreateUserSchema, async (req, res) => 
     password,
     tenantName: info.tenant,
   })
-    .then((res) => ({ 200: { createdInAuth: res.createdInAuth } }))
+    .then(async (res) => {
+      await callLog(logInfo, OperationResult.SUCCESS);
+      return { 200: { createdInAuth: res.createdInAuth } };
+    })
     .catch(handlegRPCError({
       [status.ALREADY_EXISTS]: () => ({ 409: null }),
-    }));
+    },
+    async () => await callLog(logInfo, OperationResult.FAIL),
+    ));
 });

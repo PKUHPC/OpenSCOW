@@ -1,0 +1,85 @@
+{
+  "namespaces": [],
+  "tables": [
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "mappedType": "integer"
+        },
+        "operator_user_id": {
+          "name": "operator_user_id",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "string"
+        },
+        "operator_ip": {
+          "name": "operator_ip",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "string"
+        },
+        "operation_time": {
+          "name": "operation_time",
+          "type": "DATETIME(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 0,
+          "default": "current_timestamp(0)",
+          "mappedType": "datetime"
+        },
+        "operation_result": {
+          "name": "operation_result",
+          "type": "enum('UNKNOWN', 'SUCCESS', 'FAIL')",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "enumItems": [
+            "UNKNOWN",
+            "SUCCESS",
+            "FAIL"
+          ],
+          "comment": "UNKNOWN, SUCCESS, FAIL",
+          "mappedType": "enum"
+        },
+        "meta_data": {
+          "name": "meta_data",
+          "type": "json",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "json"
+        }
+      },
+      "name": "operation_log",
+      "indexes": [
+        {
+          "keyName": "PRIMARY",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {}
+    }
+  ]
+}

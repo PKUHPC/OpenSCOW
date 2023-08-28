@@ -1,6 +1,5 @@
 port: 80
 basePath: /
-#image: ghcr.io/pkuhpc/scow/scow
 image: mirrors.pku.edu.cn/pkuhpc/scow/scow
 imageTag: master
 portal:
@@ -13,4 +12,7 @@ log:
   fluentd:
     logDir: /var/log/fluentd
 auth:
+  portMappings: {}
+audit:
+  dbPassword: must!chang3this
   portMappings: {}

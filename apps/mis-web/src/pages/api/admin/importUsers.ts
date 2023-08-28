@@ -16,11 +16,14 @@ import { Status } from "@grpc/grpc-js/build/src/constants";
 import { AdminServiceClient } from "@scow/protos/build/server/admin";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
+import { OperationResult, OperationType } from "src/models/operationLog";
 import { PlatformRole } from "src/models/User";
 import { ImportUsersData } from "src/models/UserSchemaModel";
+import { callLog } from "src/server/operationLog";
 import { getClient } from "src/utils/client";
+import { DEFAULT_INIT_USER_ID, DEFAULT_TENANT_NAME } from "src/utils/constants";
 import { queryIfInitialized } from "src/utils/init";
-import { handlegRPCError } from "src/utils/server";
+import { handlegRPCError, parseIp } from "src/utils/server";
 
 export const ImportUsersSchema = typeboxRouteSchema({
   method: "POST",
@@ -41,21 +44,43 @@ const auth = authenticate((info) => info.platformRoles.includes(PlatformRole.PLA
 export default typeboxRoute(ImportUsersSchema,
   async (req, res) => {
 
+    const { data, whitelist } = req.body;
+
+    const logInfo = {
+      operatorUserId: DEFAULT_INIT_USER_ID,
+      operatorIp: parseIp(req) ?? "",
+      operationTypeName: OperationType.importUsers,
+      operationTypePayload: {
+        tenantName: DEFAULT_TENANT_NAME,
+        importAccounts: data.accounts.map((account) => ({
+          accountName: account.accountName,
+          userIds: account.users.map((user) => user.userId),
+        })),
+      },
+    };
+
     // if not initialized, every one can import users
     if (await queryIfInitialized()) {
       const info = await auth(req, res);
-      if (!info) { return; }
+      if (info) {
+        logInfo.operatorUserId = info.identityId;
+      } else {
+        return;
+      }
     }
-
-    const { data, whitelist } = req.body;
 
     const client = getClient(AdminServiceClient);
 
     return await asyncClientCall(client, "importUsers", {
       data, whitelist,
     })
-      .then(() => ({ 204: null }))
+      .then(async () => {
+        await callLog(logInfo, OperationResult.SUCCESS);
+        return { 204: null };
+      })
       .catch(handlegRPCError({
         [Status.INVALID_ARGUMENT]: () => ({ 400: { code: "INVALID_DATA" } } as const),
-      }));
+      },
+      async () => await callLog(logInfo, OperationResult.FAIL),
+      ));
   });

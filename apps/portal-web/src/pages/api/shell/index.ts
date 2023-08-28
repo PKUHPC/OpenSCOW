@@ -18,8 +18,11 @@ import { normalizePathnameWithQuery } from "@scow/utils";
 import { NextApiRequest, NextApiResponse } from "next";
 import { join } from "path";
 import { checkCookie } from "src/auth/server";
+import { OperationResult, OperationType } from "src/models/operationLog";
+import { callLog } from "src/server/operationLog";
 import { getClient } from "src/utils/client";
 import { publicConfig, runtimeConfig } from "src/utils/config";
+import { parseIp } from "src/utils/server";
 import { parse } from "url";
 import { WebSocket, WebSocketServer } from "ws";
 
@@ -125,6 +128,15 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
 
   log("Connected to shell");
 
+  await callLog({
+    operatorUserId: user.identityId,
+    operatorIp: parseIp(req) ?? "",
+    operationTypeName: OperationType.shellLogin,
+    operationTypePayload: {
+      clusterId: cluster, loginNode: loginNode.address,
+    },
+  }, OperationResult.SUCCESS);
+
   const send = (data: ShellOutputData) => {
     ws.send(JSON.stringify(data));
   };
@@ -146,8 +158,16 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
     }
   });
 
-  ws.on("error", (err) => {
+  ws.on("error", async (err) => {
     log("Error occurred from client. Disconnect.", err);
+    await callLog({
+      operatorUserId: user.identityId,
+      operatorIp: parseIp(req) ?? "",
+      operationTypeName: OperationType.shellLogin,
+      operationTypePayload: {
+        clusterId: cluster, loginNode: loginNode.address,
+      },
+    }, OperationResult.FAIL);
     stream.write({ message: { $case: "disconnect", disconnect: {} } });
     stream.end();
   });
