@@ -109,7 +109,7 @@ export default /* #__PURE__*/typeboxRoute(AddUserToAccountSchema, async (req, re
     .catch(handlegRPCError({
       [Status.ALREADY_EXISTS]: () => ({ 409: { code: "ACCOUNT_OR_USER_ERROR" as const, message:"用户已经存在于此账户中！" } }),
       [Status.INTERNAL]: (e) => { return ({ 409: { code: "ACCOUNT_OR_USER_ERROR" as const, message: e.details } }); },
-      [Status.NOT_FOUND]: (e) => { 
+      [Status.NOT_FOUND]: (e) => {
 
         if (e.details === "USER_OR_TENANT_NOT_FOUND") {
 
@@ -117,16 +117,15 @@ export default /* #__PURE__*/typeboxRoute(AddUserToAccountSchema, async (req, re
            * 后端接口addUserToAccount返回USER_OR_TENANT_NOT_FOUND
            * 说明操作者的租户下的不存在要添加的这个用户
            * 该用户存不存在于scow系统中在上面的checkNameMatch函数中已通过检查
-           * */ 
+           * */
 
           return { 404: { code: "USER_ALREADY_EXIST_IN_OTHER_TENANT" as const } };
         } else {
-          
-          return { 404: { code: "ACCOUNT_OR_TENANT_NOT_FOUND" as const } }; 
+
+          return { 404: { code: "ACCOUNT_OR_TENANT_NOT_FOUND" as const } };
         }
-      }
-      ,
+      },
     },
-    async () => await callLog(logInfo, OperationResult.FAIL),  
+    async () => await callLog(logInfo, OperationResult.FAIL),
     ));
 });
