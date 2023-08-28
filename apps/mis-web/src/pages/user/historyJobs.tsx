@@ -41,3 +41,5 @@ export const JobsPage: NextPage = requireAuth((u) => u.accountAffiliations.lengt
     );
 
   });
+
+export default JobsPage;
