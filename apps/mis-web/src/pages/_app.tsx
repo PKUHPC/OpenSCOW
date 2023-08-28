@@ -100,10 +100,6 @@ type Props = AppProps & { extra: ExtraProps };
 // function MyApp({ Component, pageProps, extra }: Props & WithTranslation) {
 function MyApp({ Component, pageProps, extra }: Props) {
 
-  // useEffect(() => {
-  //   i18n?.init();
-  //   loadAppTranslation();
-  // }, []);
   i18n?.init();
   loadAppTranslation();
 
