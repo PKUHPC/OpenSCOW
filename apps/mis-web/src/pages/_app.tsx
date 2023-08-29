@@ -93,6 +93,7 @@ interface ExtraProps {
   primaryColor: string;
   footerText: string;
   darkModeCookieValue: DarkModeCookie | undefined;
+  locale: string;
 }
 
 type Props = AppProps & { extra: ExtraProps };
@@ -109,9 +110,6 @@ function MyApp({ Component, pageProps, extra }: Props) {
     const store = createStore(UserStore, userInfo);
     return store;
   });
-
-  const cookies = parseCookies();
-  const locale = cookies && cookies.language ? cookies.language : "zh_cn";
 
   const defaultClusterStore = useConstant(() => {
     const store = createStore(DefaultClusterStore, Object.values(publicConfig.CLUSTERS)[0]);
@@ -142,7 +140,7 @@ function MyApp({ Component, pageProps, extra }: Props) {
       </Head>
       <StoreProvider stores={[userStore, defaultClusterStore]}>
         <DarkModeProvider initial={extra.darkModeCookieValue}>
-          <AntdConfigProvider color={primaryColor} locale={locale}>
+          <AntdConfigProvider color={primaryColor} locale={extra.locale}>
             <FloatButtons />
             <GlobalStyle />
             <FailEventHandler />
@@ -166,6 +164,7 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
     footerText: "",
     primaryColor: "",
     darkModeCookieValue: getDarkModeCookieValue(appContext.ctx.req),
+    locale: "",
   };
 
   // This is called on server on first load, and on client on every page transition
@@ -198,6 +197,13 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
     ?? runtimeConfig.UI_CONFIG?.primaryColor?.defaultColor ?? runtimeConfig.DEFAULT_PRIMARY_COLOR;
     extra.footerText = (hostname && runtimeConfig.UI_CONFIG?.footer?.hostnameTextMap?.[hostname])
     ?? runtimeConfig.UI_CONFIG?.footer?.defaultText ?? "";
+
+
+    const cookies = parseCookies();
+    extra.locale = cookies && cookies.language ? cookies.language : "zh_cn";
+
+    console.log(extra.locale);
+
   }
 
   const appProps = await App.getInitialProps(appContext);

@@ -16,6 +16,7 @@
     ".next",
     "public",
     "next.config.js",
+    "next-i18next.config.js",
     "config.js",
     "assets",
     "api-routes-schemas.json",
