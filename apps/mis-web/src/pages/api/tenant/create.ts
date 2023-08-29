@@ -16,11 +16,13 @@ import { status } from "@grpc/grpc-js";
 import { TenantServiceClient } from "@scow/protos/build/server/tenant";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
+import { OperationResult, OperationType } from "src/models/operationLog";
 import { PlatformRole } from "src/models/User";
+import { callLog } from "src/server/operationLog";
 import { getClient } from "src/utils/client";
 import { publicConfig } from "src/utils/config";
 import { getUserIdRule } from "src/utils/createUser";
-import { handlegRPCError } from "src/utils/server";
+import { handlegRPCError, parseIp } from "src/utils/server";
 
 export const CreateTenantSchema = typeboxRouteSchema({
   method: "POST",
@@ -82,9 +84,18 @@ export default /* #__PURE__*/typeboxRoute(CreateTenantSchema, async (req, res) =
     return { 400: { code: "PASSWORD_NOT_VALID" as const, message: publicConfig.PASSWORD_PATTERN_MESSAGE } };
   }
 
+  const logInfo = {
+    operatorUserId: info.identityId,
+    operatorIp: parseIp(req) ?? "",
+    operationTypeName: OperationType.createTenant,
+    operationTypePayload:{
+      tenantName, tenantAdmin: userId,
+    },
+  };
+
+
   // create tenant on server
   const client = getClient(TenantServiceClient);
-
   return await asyncClientCall(client, "createTenant", {
     tenantName: tenantName,
     userId: userId,
@@ -92,7 +103,10 @@ export default /* #__PURE__*/typeboxRoute(CreateTenantSchema, async (req, res) =
     userEmail: userEmail,
     userPassword: userPassword,
   })
-    .then((res) => ({ 200: { createdInAuth: res.createdInAuth } }))
+    .then(async (res) => {
+      await callLog(logInfo, OperationResult.SUCCESS);
+      return { 200: { createdInAuth: res.createdInAuth } };
+    })
     .catch(handlegRPCError({
       [status.ALREADY_EXISTS]: (e) => {
         return {
@@ -104,5 +118,7 @@ export default /* #__PURE__*/typeboxRoute(CreateTenantSchema, async (req, res) =
             : { code: "USER_ALREADY_EXISTS" as const, message: `User with userId ${userId} already exists` },
         };
       },
-    }));
+    },
+    async () => await callLog(logInfo, OperationResult.FAIL),
+    ));
 });

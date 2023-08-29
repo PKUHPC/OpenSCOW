@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { AuditConfigSchema } from "@scow/config/build/audit";
 import type { ClusterConfigSchema } from "@scow/config/build/cluster";
 import type { ClusterTextsConfigSchema } from "@scow/config/build/clusterTexts";
 import type { MisConfigSchema } from "@scow/config/build/mis";
@@ -30,6 +31,8 @@ export interface ServerRuntimeConfig {
   CLUSTER_TEXTS_CONFIG: ClusterTextsConfigSchema;
 
   SCOW_API_AUTH_TOKEN?: string;
+
+  AUDIT_CONFIG: AuditConfigSchema | undefined;
 }
 
 export interface PublicRuntimeConfig {
@@ -62,6 +65,7 @@ export interface PublicRuntimeConfig {
 
   CUSTOM_TRANSLATION_JSON?: CustomTranslation;
 
+  AUDIT_DEPLOYED: boolean;
 }
 
 export const runtimeConfig: ServerRuntimeConfig = getConfig().serverRuntimeConfig;

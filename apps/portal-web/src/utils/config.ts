@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { AuditConfigSchema } from "@scow/config/build/audit";
 import type { ClusterConfigSchema } from "@scow/config/build/cluster";
 import type { PortalConfigSchema } from "@scow/config/build/portal";
 import type { UiConfigSchema } from "@scow/config/build/ui";
@@ -47,6 +48,8 @@ export interface ServerRuntimeConfig {
   SUBMIT_JOB_WORKING_DIR: string;
 
   SCOW_API_AUTH_TOKEN?: string;
+
+  AUDIT_CONFIG: AuditConfigSchema | undefined;
 }
 
 export interface PublicRuntimeConfig {

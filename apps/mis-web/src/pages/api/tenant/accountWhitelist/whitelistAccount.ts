@@ -16,10 +16,12 @@ import { Status } from "@grpc/grpc-js/build/src/constants";
 import { AccountServiceClient } from "@scow/protos/build/server/account";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
+import { OperationResult, OperationType } from "src/models/operationLog";
 import { TenantRole } from "src/models/User";
+import { callLog } from "src/server/operationLog";
 import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
-import { handlegRPCError } from "src/utils/server";
+import { handlegRPCError, parseIp } from "src/utils/server";
 
 export const WhitelistAccountSchema = typeboxRouteSchema({
   method: "PUT",
@@ -47,6 +49,15 @@ export default route(WhitelistAccountSchema,
 
     const { accountName, comment } = req.body;
 
+    const logInfo = {
+      operatorUserId: info.identityId,
+      operatorIp: parseIp(req) ?? "",
+      operationTypeName: OperationType.addAccountToWhitelist,
+      operationTypePayload:{
+        tenantName: info.tenant, accountName,
+      },
+    };
+
     const client = getClient(AccountServiceClient);
 
     return await asyncClientCall(client, "whitelistAccount", {
@@ -55,8 +66,13 @@ export default route(WhitelistAccountSchema,
       operatorId: info.identityId,
       comment,
     })
-      .then(() => ({ 204: null }))
+      .then(async () => {
+        await callLog(logInfo, OperationResult.SUCCESS);
+        return { 204: null };
+      })
       .catch(handlegRPCError({
         [Status.NOT_FOUND]: () => ({ 404: null }),
-      }));
+      },
+      async () => await callLog(logInfo, OperationResult.FAIL),
+      ));
   });

@@ -133,7 +133,12 @@ export const platformAdminRoutes: (platformRoles: PlatformRole[]) => NavItemProp
           },
         ],
       },
-
+      ...(publicConfig.AUDIT_DEPLOYED && platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ?
+        [{
+          Icon: BookOutlined,
+          text: "操作日志",
+          path: "/admin/operationLogs",
+        }] : []),
     ],
   },
 ];
@@ -240,33 +245,41 @@ export const tenantRoutes: (tenantRoles: TenantRole[], token: string) => NavItem
           ],
         },
       ] : []),
-      ...(tenantRoles.includes(TenantRole.TENANT_FINANCE) ? [
+      ...(tenantRoles.includes(TenantRole.TENANT_FINANCE) ||
+          tenantRoles.includes(TenantRole.TENANT_ADMIN) ? [
+          {
+            Icon: MoneyCollectOutlined,
+            // text: "财务管理",
+            text: "route.tenant-management.finance-management",
+            path: "/tenant/finance",
+            clickable: false,
+            children: [
+              {
+                Icon: PlusSquareOutlined,
+                // text: "账户充值",
+                text: "route.tenant-management.account-pay",
+                path: "/tenant/finance/payAccount",
+              },
+              {
+                Icon: ProfileOutlined,
+                // text: "账户充值记录",
+                text: "route.tenant-management.account-payments",
+                path: "/tenant/finance/accountPayments",
+              },
+              {
+                Icon: BookOutlined,
+                // text: "充值记录",
+                text: "route.tenant-management.finance-payments",
+                path: "/tenant/finance/payments",
+              },
+            ],
+          },
+        ] : []),
+      ...(publicConfig.AUDIT_DEPLOYED && tenantRoles.includes(TenantRole.TENANT_ADMIN) ? [
         {
-          Icon: MoneyCollectOutlined,
-          // text: "财务管理",
-          text: "route.tenant-management.finance-management",
-          path: "/tenant/finance",
-          clickable: false,
-          children: [
-            {
-              Icon: PlusSquareOutlined,
-              // text: "账户充值",
-              text: "route.tenant-management.account-pay",
-              path: "/tenant/finance/payAccount",
-            },
-            {
-              Icon: ProfileOutlined,
-              // text: "账户充值记录",
-              text: "route.tenant-management.account-payments",
-              path: "/tenant/finance/accountPayments",
-            },
-            {
-              Icon: BookOutlined,
-              // text: "充值记录",
-              text: "route.tenant-management.finance-payments",
-              path: "/tenant/finance/payments",
-            },
-          ],
+          Icon: BookOutlined,
+          text: "操作日志",
+          path: "/tenant/operationLogs",
         },
       ] : []),
     ],
@@ -309,6 +322,13 @@ export const userRoutes: (accounts: AccountAffiliation[]) => NavItemProps[] = (a
           text: "route.user.cluster-partitions",
           path: "/user/partitions",
         },
+        ...(publicConfig.AUDIT_DEPLOYED
+          ? [{
+            Icon: BookOutlined,
+            text: "操作日志",
+            path: "/user/operationLogs",
+          }]
+          : []),
       ],
 
     },
@@ -363,6 +383,13 @@ export const accountAdminRoutes: (adminAccounts: AccountAffiliation[]) => NavIte
           text: "route.account-management.cost",
           path: `/accounts/${x.accountName}/charges`,
         },
+        ...(publicConfig.AUDIT_DEPLOYED
+          ? [{
+            Icon: BookOutlined,
+            text: "操作日志",
+            path: `/accounts/${x.accountName}/operationLogs`,
+          }]
+          : []),
       ],
 
     })),

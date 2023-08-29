@@ -24,6 +24,7 @@ const { DEFAULT_PRIMARY_COLOR, getUiConfig } = require("@scow/config/build/ui");
 const { getPortalConfig } = require("@scow/config/build/portal");
 const { getClusterConfigs, getLoginNode, getSortedClusters } = require("@scow/config/build/cluster");
 const { getCommonConfig } = require("@scow/config/build/common");
+const { getAuditConfig } = require("@scow/config/build/audit");
 
 /**
  * Get auth capabilities
@@ -85,6 +86,8 @@ const specs = {
   CLIENT_MAX_BODY_SIZE: str({ desc: "限制整个系统上传（请求）文件的大小，可接受的格式为nginx的client_max_body_size可接受的值", default: "1G" }),
 
   PUBLIC_PATH: str({ desc: "SCOW公共文件的路径，需已包含SCOW的base path", default: "/public/" }),
+
+  AUDIT_DEPLOYED: bool({ desc: "是否部署了审计系统", default: false }),
 };
 
 const mockEnv = process.env.NEXT_PUBLIC_USE_MOCK === "1";
@@ -125,6 +128,7 @@ const buildRuntimeConfig = async (phase, basePath) => {
   const uiConfig = getUiConfig(configPath, console);
   const portalConfig = getPortalConfig(configPath, console);
   const commonConfig = getCommonConfig(configPath, console);
+  const auditConfig = getAuditConfig(configPath, console);
 
   const versionTag = readVersionFile()?.tag;
 
@@ -148,6 +152,7 @@ const buildRuntimeConfig = async (phase, basePath) => {
     SUBMIT_JOB_WORKING_DIR: portalConfig.submitJobDefaultPwd,
     SCOW_API_AUTH_TOKEN: commonConfig.scowApi?.auth?.token,
     SUBMIT_JOB_PROMPT_TEXT:portalConfig.submitJobPromptText,
+    AUDIT_CONFIG: config.AUDIT_DEPLOYED ? auditConfig : undefined,
   };
 
   // query auth capabilities to set optional auth features

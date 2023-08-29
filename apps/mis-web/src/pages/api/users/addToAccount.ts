@@ -16,10 +16,12 @@ import { Status } from "@grpc/grpc-js/build/src/constants";
 import { UserServiceClient } from "@scow/protos/build/server/user";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
+import { OperationResult, OperationType } from "src/models/operationLog";
 import { PlatformRole, TenantRole, UserRole } from "src/models/User";
 import { checkNameMatch } from "src/server/checkIdNameMatch";
+import { callLog } from "src/server/operationLog";
 import { getClient } from "src/utils/client";
-import { handlegRPCError } from "src/utils/server";
+import { handlegRPCError, parseIp } from "src/utils/server";
 
 export const AddUserToAccountSchema = typeboxRouteSchema({
   method: "POST",
@@ -43,7 +45,8 @@ export const AddUserToAccountSchema = typeboxRouteSchema({
 
     404: Type.Object({
       code: Type.Union([
-        Type.Literal("ACCOUNT_NOT_FOUND"),
+        Type.Literal("ACCOUNT_OR_TENANT_NOT_FOUND"),
+        Type.Literal("USER_ALREADY_EXIST_IN_OTHER_TENANT"),
         Type.Literal("USER_NOT_FOUND"),
       ]),
     }),
@@ -86,14 +89,43 @@ export default /* #__PURE__*/typeboxRoute(AddUserToAccountSchema, async (req, re
   // call ua service to add user
   const client = getClient(UserServiceClient);
 
+  const logInfo = {
+    operatorUserId: info.identityId,
+    operatorIp: parseIp(req) ?? "",
+    operationTypeName: OperationType.addUserToAccount,
+    operationTypePayload:{
+      accountName, userId: identityId,
+    },
+  };
+
   return await asyncClientCall(client, "addUserToAccount", {
     tenantName: info.tenant,
     accountName,
     userId: identityId,
-  }).then(() => ({ 204: null }))
+  }).then(async () => {
+    await callLog(logInfo, OperationResult.SUCCESS);
+    return { 204: null };
+  })
     .catch(handlegRPCError({
       [Status.ALREADY_EXISTS]: () => ({ 409: { code: "ACCOUNT_OR_USER_ERROR" as const, message:"用户已经存在于此账户中！" } }),
-      [Status.NOT_FOUND]: () => ({ 404: { code: "ACCOUNT_NOT_FOUND" as const } }),
       [Status.INTERNAL]: (e) => { return ({ 409: { code: "ACCOUNT_OR_USER_ERROR" as const, message: e.details } }); },
-    }));
+      [Status.NOT_FOUND]: (e) => {
+
+        if (e.details === "USER_OR_TENANT_NOT_FOUND") {
+
+          /**
+           * 后端接口addUserToAccount返回USER_OR_TENANT_NOT_FOUND
+           * 说明操作者的租户下的不存在要添加的这个用户
+           * 该用户存不存在于scow系统中在上面的checkNameMatch函数中已通过检查
+           * */
+
+          return { 404: { code: "USER_ALREADY_EXIST_IN_OTHER_TENANT" as const } };
+        } else {
+
+          return { 404: { code: "ACCOUNT_OR_TENANT_NOT_FOUND" as const } };
+        }
+      },
+    },
+    async () => await callLog(logInfo, OperationResult.FAIL),
+    ));
 });

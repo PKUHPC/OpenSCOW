@@ -161,7 +161,7 @@ attributes:
     placeholder: "比如：--gpus gres:2 --time 10"
 ```
 
-### 2、RStudio Server 1.4.1103及之后版本
+### 2、RStudio Server 1.4.1103及之后版本（源码安装R）
 
 ```yaml title="config/apps/rstudio.yml"
 # 这个应用的ID
@@ -280,6 +280,148 @@ attributes:
     placeholder: "比如：--gpus gres:2 --time 10"
 ```
 
+### 3、RStudio Server 1.4.1103及之后版本（Conda环境安装R）
+
+```yaml title="config/apps/rstudio.yml"
+# 这个应用的ID
+id: rstudio
+
+# 这个应用的名字
+name: RStudio
+
+# 指定应用类型为web
+type: web
+
+# Web应用的配置
+web:
+  # 指定反向代理类型
+  proxyType: relative
+  # 准备脚本
+  beforeScript: |
+    export PORT=$(get_port)
+    export PASSWORD=$(get_password 12)
+    export SLURM_COMPUTE_NODE_NAME=$(hostname)
+    export APPURI="${PROXY_BASE_PATH}/${SLURM_COMPUTE_NODE_NAME}/${PORT}/"
+    export USER=${USER}
+    export SINGULARITY_VERSION="singularity/3.9.2"
+    export SHELL_NAME=$(echo ${SHELL} | awk -F'/' '{print $NF}')
+    export CONDA_VERSION="anaconda/3-2023.03"
+
+  # 运行任务的脚本。可以使用准备脚本定义的变量
+  script: |
+    setup_env () {
+        # Additional environment which could be moved into a module
+        export RSTUDIO_PASSWORD=${PASSWORD}
+        # Change these to suit
+        export RSTUDIO_SERVER_IMAGE="/data/software/rstudio-server/rstudio.sif"
+
+        # 容器中rstudio的路径
+        export RSTUDIO_HOME=/usr/lib/rstudio-server
+        export RSTUDIO_BIN_PATH=${RSTUDIO_HOME}/bin
+        export RSTUDIO_RSERVER=${RSTUDIO_BIN_PATH}/rserver
+        export RSTUDIO_RSESSION=${RSTUDIO_BIN_PATH}/rsession
+
+        export RSTUDIO_AUTH="/data/software/rstudio-server/auth"
+        export RSESSION_WRAPPER_FILE="${PWD}/rsession.sh"
+        export DB_CONF_FILE="${PWD}/database.conf"
+        export WHICHR=/data/software/R/${r_version}/bin/R
+    }
+    setup_env
+    module switch ${SINGULARITY_VERSION}
+
+    for m in ${textModuleName}; do module switch ${m}; done
+
+    conda -V &> /dev/null
+    if [ $? -ne 0 ]; then
+      module switch ${CONDA_VERSION}
+    fi
+    # init conda
+    eval "$($(which conda) shell.${SHELL_NAME} hook)"
+
+    conda activate ${r_version}
+    if [ $? -ne 0 ]; then
+      echo "${r_version}不存在，请输入正确的R版本！"
+      exit 2
+    fi
+
+    (
+    umask 077
+    sed 's/^ \{2\}//' > "${RSESSION_WRAPPER_FILE}" << EOL
+    #!/usr/bin/env bash
+    # Log all output from this script
+    export RSESSION_LOG_FILE="${PWD}/rsession.log"
+    exec &>>"\${RSESSION_LOG_FILE}"
+    # Launch the original command
+    echo "Launching rsession..."
+    set -x
+    exec ${RSTUDIO_RSESSION} --r-libs-user "${R_LIBS_USER}" "\${@}"
+    EOL
+    )
+
+    chmod 700 "${RSESSION_WRAPPER_FILE}"
+    cd "${HOME}"
+    export TMPDIR="$(mktemp -d)"
+    mkdir -p "$TMPDIR/rstudio-server"
+    python -c 'from uuid import uuid4; print(uuid4())' > "$TMPDIR/rstudio-server/secure-cookie-key"
+    chmod 0600 "$TMPDIR/rstudio-server/secure-cookie-key"
+
+    (
+    umask 177
+    cat > "${DB_CONF_FILE}" << EOL
+    provider=sqlite
+    directory=${HOME}/.local/share/rstudio/database
+    EOL
+    )
+
+    set -x
+    # Launch the RStudio Server
+    echo "Starting up rserver..."
+    # RStudio Server 1.4.1103之前版本不需要--database-config-file，之后版本需要增加此配置
+    singularity run -B "/tmp:/tmp","/data:/data" "$RSTUDIO_SERVER_IMAGE" ${RSTUDIO_RSERVER} \
+      --www-port "${PORT}" \
+      --auth-none 1 \
+      --auth-pam-helper-path "${RSTUDIO_AUTH}" \
+      --auth-encrypt-password 0 \
+      --rsession-path "${RSESSION_WRAPPER_FILE}" \
+      --server-data-dir "${TMPDIR}" \
+      --server-user ${USER} \
+      --secure-cookie-key-file "${TMPDIR}/rstudio-server/secure-cookie-key" \
+      --database-config-file "${DB_CONF_FILE}"
+      # --rsession-which-r ${WHICHR}
+
+      echo 'Singularity as exited...'
+
+  # 如何连接应用
+  connect:
+    method: POST
+    path: /auth-do-sign-in
+    formData:
+      password: "{{ PASSWORD }}"
+      username: "{{ USER }}"
+      appUri: "{{ APPURI }}"
+
+# 配置HTML表单   
+attributes:
+  - type: select
+    name: r_version
+    label: 请选择R版本
+    select:
+      - value: R-3.6.0
+        label: 3.6.0
+      - value: R-4.2.3
+        label: 4.2.3
+  - type: text
+    name: textModuleName
+    label: Modules
+    required: false  # 输入需要额外加载的环境模块列表
+    placeholder: 输入需要额外加载的环境模块列表，模块之间用空格分开（比如：python/2.7.5 code-server/4.9.1）  # 提示信息
+  - type: text
+    name: sbatchOptions
+    label: 其他sbatch参数
+    required: false
+    placeholder: "比如：--gpus gres:2 --time 10"
+```
+
 增加了此文件后，刷新WEB浏览器即可。
 
 对于RStudio，export以下变量的含义是：
@@ -340,6 +482,7 @@ Singularity用于构建和运行RStudio Server容器镜像，建议安装在共�
     wget https://github.com/sylabs/singularity/releases/download/v${VERSION}/singularity-ce-${VERSION}.tar.gz
     tar -xzf singularity-ce-${VERSION}.tar.gz
     cd singularity-ce-${VERSION}
+    module load go/1.20.3
     ./mconfig --prefix=/data/software/singularity/${VERSION}
     cd builddir/
     make -j && make install
@@ -367,6 +510,8 @@ Singularity用于构建和运行RStudio Server容器镜像，建议安装在共�
     ```
 
 ### 2、R安装
+
+#### 2.1、源码安装R
 
 - 安装R的依赖包:
 
@@ -406,6 +551,33 @@ Singularity用于构建和运行RStudio Server容器镜像，建议安装在共�
     prepend-path    PATH                    "/data/software/R/R-4.2.3/bin"
     EOF
     ```
+
+#### 2.2、在Conda环境安装R
+
+```bash
+# 载入conda到系统环境中，并初始化conda环境
+module load anaconda/3-2023.03
+eval "$($(which conda) shell.bash hook)"
+
+# 添加北大镜像源，查找相应版本的R进行安装
+conda config --add channels https://mirrors.pku.edu.cn/anaconda/pkgs/free/
+conda config --add channels https://mirrors.pku.edu.cn/anaconda/pkgs/main/
+conda config --add channels https://mirrors.pku.edu.cn/anaconda/cloud/conda-forge/
+conda search R
+
+
+# 根据查找到的R版本，创建Conda虚拟环境，并在创建的时候指定需要安装的R版本，这里选择安装R-3.6.0版本;
+conda create -n R-3.6.0 r=3.6.0 -y
+
+# 进入上一步创建好的虚拟环境；
+conda activate R-3.6.0
+
+# 安装R语言库，比如stringi
+conda install r-stringi -y
+
+# 安装完后就可以用R语言环境了，如果要退出当前环境则执行以下指令；
+conda deactivate
+```
 
 ### 3、构建RStudio Server镜像
 

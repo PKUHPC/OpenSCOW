@@ -36,6 +36,7 @@
     "@scow/protos": "workspace:*",
     "@scow/lib-web": "workspace:*",
     "@scow/utils": "workspace:*",
+    "@scow/lib-operation-log": "workspace:*",
     "@sinclair/typebox": "0.31.1",
     "antd": "5.8.4",
     "dayjs": "1.11.9",

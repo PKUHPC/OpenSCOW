@@ -13,3 +13,5 @@
 export const DEFAULT_TENANT_NAME = "default";
 
 export const UNKNOWN_PRICE_ITEM = "UNKNOWN";
+
+export const DEFAULT_INIT_USER_ID = "init_user";

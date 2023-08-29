@@ -16,9 +16,11 @@ import { Status } from "@grpc/grpc-js/build/src/constants";
 import { JobChargeLimitServiceClient } from "@scow/protos/build/server/job_charge_limit";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
+import { OperationResult, OperationType } from "src/models/operationLog";
 import { TenantRole, UserRole } from "src/models/User";
+import { callLog } from "src/server/operationLog";
 import { getClient } from "src/utils/client";
-import { handlegRPCError } from "src/utils/server";
+import { handlegRPCError, parseIp } from "src/utils/server";
 
 export const CancelJobChargeLimitSchema = typeboxRouteSchema({
   method: "DELETE",
@@ -53,13 +55,27 @@ export default typeboxRoute(CancelJobChargeLimitSchema, async (req, res) => {
 
   const client = getClient(JobChargeLimitServiceClient);
 
+  const logInfo = {
+    operatorUserId: info.identityId,
+    operatorIp: parseIp(req) ?? "",
+    operationTypeName: OperationType.accountUnsetChargeLimit,
+    operationTypePayload:{
+      accountName, userId,
+    },
+  };
+
   return await asyncClientCall(client, "cancelJobChargeLimit", {
     tenantName: info.tenant,
     accountName, userId,
     unblock,
   })
-    .then(() => ({ 204: null }))
+    .then(async () => {
+      await callLog(logInfo, OperationResult.SUCCESS);
+      return { 204: null };
+    })
     .catch(handlegRPCError({
       [Status.NOT_FOUND]: () => ({ 404: null }),
-    }));
+    },
+    async () => await callLog(logInfo, OperationResult.FAIL),
+    ));
 });

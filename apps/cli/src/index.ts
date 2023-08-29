@@ -18,6 +18,7 @@ import { join } from "path";
 import { checkConfig } from "src/cmd/checkConfig";
 import { runCompose } from "src/cmd/compose";
 import { enterDb } from "src/cmd/db";
+import { enterAuditDb } from "src/cmd/enterAuditDb";
 import { generateDockerComposeYml } from "src/cmd/generate";
 import { init } from "src/cmd/init";
 import { migrateFromScowDeployment } from "src/cmd/migrate";
@@ -127,6 +128,9 @@ yargs(hideBin(process.argv))
   })
   .command("db", "Enter mis db", (y) => y, (argv) => {
     enterDb(argv);
+  })
+  .command("audit-db", "Enter audit db", (y) => y, (argv) => {
+    enterAuditDb(argv);
   })
   .command("compose", "Run  arbitrary compose commands", (y) => {
     return y.strict(false).parserConfiguration({ "unknown-options-as-args": true });
