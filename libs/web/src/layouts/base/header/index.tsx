@@ -13,6 +13,7 @@
 import { MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
 import { Space } from "antd";
 import React from "react";
+import { useI18nContext } from "react-typed-i18n";
 import { antdBreakpoints } from "src/layouts/base/constants";
 import { BigScreenMenu } from "src/layouts/base/header/BigScreenMenu";
 import { HeaderItem } from "src/layouts/base/header/components";
@@ -73,6 +74,7 @@ export const Header: React.FC<Props> = ({
   pathname, user, logout,
   right, basePath, userLinks,
 }) => {
+
   return (
     <Container>
       <HeaderItem>

@@ -130,7 +130,7 @@ function MyApp({ Component, pageProps, extra }: Props) {
       </Head>
       <StoreProvider stores={[userStore, defaultClusterStore, loginNodeStore]}>
         <DarkModeProvider initial={extra.darkModeCookieValue}>
-          <AntdConfigProvider color={primaryColor}>
+          <AntdConfigProvider color={primaryColor} locale="zh_cn">
             <FloatButtons />
             <GlobalStyle />
             <FailEventHandler />

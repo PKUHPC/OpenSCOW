@@ -21,97 +21,105 @@ import { NavItemProps } from "@scow/lib-web/build/layouts/base/types";
 import { NavIcon } from "@scow/lib-web/build/layouts/icon";
 import { AccountAffiliation } from "@scow/protos/build/server/user";
 import { join } from "path";
+import { Lang } from "react-typed-i18n";
+import { prefix, useI18n } from "src/i18n";
+import en from "src/i18n/en";
 import { PlatformRole, TenantRole, UserRole } from "src/models/User";
 import { User } from "src/stores/UserStore";
 import { publicConfig } from "src/utils/config";
 import { createUserParams, useBuiltinCreateUser } from "src/utils/createUser";
+import useI18nTranslateToString from "src/utils/useI18nTranslateToString";
 
-export const platformAdminRoutes: (platformRoles: PlatformRole[]) => NavItemProps[] = (platformRoles) => [
+type TransType = (id: Lang<typeof en>, args?: React.ReactNode[]) => string;
+const pPlatform = prefix("layouts.route.platformManagement.");
+
+export const platformAdminRoutes: (platformRoles: PlatformRole[], t: TransType) => NavItemProps[]
+= (platformRoles, t) => [
   {
     Icon: UserOutlined,
-    text: "平台管理",
+    text: t("layouts.route.platformManagement.fistNav"),
     path: "/admin",
     clickToPath: "/admin/info",
     children: [
       {
         Icon: InfoOutlined,
-        text: "平台信息",
+        text: t(pPlatform("info")),
         path: "/admin/info",
       },
       ...(platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ? [{
         Icon: MoneyCollectOutlined,
-        text: "作业价格表",
+        text: t(pPlatform("jobBillingTable")),
         path: "/admin/jobBilling",
       }] : [])
       ,
       ...(platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ? [
         {
           Icon: CloudServerOutlined,
-          text: "租户管理",
+          text: t(pPlatform("tenantsManagement")),
           path: "/admin/tenants",
           clickToPath: "/admin/tenants/list",
           children: [
             {
               Icon: UserOutlined,
-              text: "租户列表",
+              text: t(pPlatform("tenantsList")),
               path: "/admin/tenants/list",
             },
             {
               Icon: PlusOutlined,
-              text: "创建租户",
+              text: t(pPlatform("createTenant")),
               path: "/admin/tenants/create",
             },
           ],
         },
         {
           Icon: UserOutlined,
-          text: "用户列表",
+          text: t(pPlatform("usersList")),
           path: "/admin/users",
         },
         {
           Icon: AccountBookOutlined,
-          text: "账户列表",
+          text: t(pPlatform("accountList")),
           path: "/admin/accounts",
         },
       ] : []),
       {
         Icon: MoneyCollectOutlined,
-        text: "财务管理",
+        text: t(pPlatform("financeManagement")),
         path: "/admin/finance",
         clickable: false,
         children: [
           {
             Icon: PlusSquareOutlined,
-            text: "租户充值",
+            text: t(pPlatform("tenantPay")),
             path: "/admin/finance/pay",
           },
           {
             Icon: BookOutlined,
-            text: "充值记录",
+            text: t(pPlatform("payments")),
             path: "/admin/finance/payments",
           },
         ],
       },
       {
         Icon: ToolOutlined,
-        text: "平台调试",
+        text: t(pPlatform("systemDebug")),
         path: "/admin/systemDebug",
         clickable: false,
         children: [
           ...(platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ?
             [{
               Icon: UserOutlined,
-              text: "导入用户",
+              text: t(pPlatform("importUsers")),
               path: "/admin/importUsers",
             }] : []),
           {
             Icon: LockOutlined,
-            text: "封锁状态同步",
+            text: t(pPlatform("statusSynchronization")),
             path: "/admin/systemDebug/slurmBlockStatus",
           },
           {
             Icon: BookOutlined,
-            text: "作业信息同步",
+            text: t(pPlatform("jobSynchronization")),
             path: "/admin/systemDebug/fetchJobs",
           },
         ],
@@ -210,7 +218,7 @@ export const tenantRoutes: (tenantRoles: TenantRole[], token: string) => NavItem
           ],
         },
       ] : []),
-      ...(tenantRoles.includes(TenantRole.TENANT_FINANCE) || 
+      ...(tenantRoles.includes(TenantRole.TENANT_FINANCE) ||
           tenantRoles.includes(TenantRole.TENANT_ADMIN) ? [
           {
             Icon: MoneyCollectOutlined,
@@ -326,7 +334,7 @@ export const customNavLinkRoutes = (navLinkItems: NavItemProps[]): NavItemProps[
   return navLinkItems;
 };
 
-export const getAvailableRoutes = (user: User | undefined): NavItemProps[] => {
+export const getAvailableRoutes = (user: User | undefined, t: TransType): NavItemProps[] => {
 
   if (!user) { return []; }
 
@@ -344,7 +352,7 @@ export const getAvailableRoutes = (user: User | undefined): NavItemProps[] => {
   }
 
   if (user.platformRoles.length !== 0) {
-    routes.push(...platformAdminRoutes(user.platformRoles));
+    routes.push(...platformAdminRoutes(user.platformRoles, t));
   }
 
   // 获取当前用户角色

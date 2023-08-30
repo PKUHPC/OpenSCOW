@@ -29,7 +29,7 @@ import { getUserStatus, GetUserStatusSchema } from "src/pages/api/dashboard/stat
 import { UserStore } from "src/stores/UserStore";
 import { ensureNotUndefined } from "src/utils/checkNull";
 import { Head } from "src/utils/head";
-
+import useI18nTranslateToString from "src/utils/useI18nTranslateToString";
 
 export type AccountInfo = Omit<AccountStatus, "balance" | "jobChargeLimit" | "usedJobCharge"> & {
   balance: number;
@@ -60,9 +60,11 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)((props: Pr
   const { accounts } = props;
   const noAccounts = Object.keys(accounts).length === 0;
 
+  const { t } = useI18nTranslateToString();
+
   return (
     <div>
-      <Head title="仪表盘" />
+      <Head title={t("dashboard.title")} />
       <AccountInfoSection info={accounts} />
       {/* <Divider /> */}
       {/* <StorageSection storageQuotas={storageQuotas} /> */}
@@ -108,7 +110,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ req }) => 
     prev[accountName] = {
       ...validated,
       balance: moneyToNumber(balance),
-      
+
       // 不能使用undefined，NextJs中：`undefined` cannot be serialized as JSON
       jobChargeLimit: validated.jobChargeLimit ?? null,
       usedJobCharge: validated.usedJobCharge ?? null,

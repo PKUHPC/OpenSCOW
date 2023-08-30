@@ -17,6 +17,7 @@ import { failEvent } from "@ddadaal/next-typed-api-routes-runtime/lib/client";
 import { DarkModeCookie, DarkModeProvider, getDarkModeCookieValue } from "@scow/lib-web/build/layouts/darkMode";
 import { GlobalStyle } from "@scow/lib-web/build/layouts/globalStyle";
 import { getHostname } from "@scow/lib-web/build/utils/getHostname";
+import { getLanguageCookie } from "@scow/lib-web/build/utils/getLanguageCookie";
 import { useConstant } from "@scow/lib-web/build/utils/hooks";
 import { isServer } from "@scow/lib-web/build/utils/isServer";
 import { App as AntdApp } from "antd";
@@ -24,12 +25,16 @@ import type { AppContext, AppProps } from "next/app";
 import App from "next/app";
 import dynamic from "next/dynamic";
 import Head from "next/head";
+import { parseCookies } from "nookies";
 import { join } from "path";
 import { useEffect, useRef } from "react";
 import { createStore, StoreProvider, useStore } from "simstate";
 import { api } from "src/apis";
 import { USE_MOCK } from "src/apis/useMock";
 import { getTokenFromCookie } from "src/auth/cookie";
+import { Provider } from "src/i18n";
+import en from "src/i18n/en";
+import zh_cn from "src/i18n/zh_cn";
 import { AntdConfigProvider } from "src/layouts/AntdConfigProvider";
 import { BaseLayout } from "src/layouts/BaseLayout";
 import { FloatButtons } from "src/layouts/FloatButtons";
@@ -84,6 +89,7 @@ interface ExtraProps {
   primaryColor: string;
   footerText: string;
   darkModeCookieValue: DarkModeCookie | undefined;
+  languageId: string;
 }
 
 type Props = AppProps & { extra: ExtraProps };
@@ -102,7 +108,6 @@ function MyApp({ Component, pageProps, extra }: Props) {
     return store;
   });
 
-  // Use the layout defined at the page level, if available
   return (
     <>
       <Head>
@@ -125,19 +130,25 @@ function MyApp({ Component, pageProps, extra }: Props) {
           }}
         />
       </Head>
-      <StoreProvider stores={[userStore, defaultClusterStore]}>
-        <DarkModeProvider initial={extra.darkModeCookieValue}>
-          <AntdConfigProvider color={primaryColor}>
-            <FloatButtons />
-            <GlobalStyle />
-            <FailEventHandler />
-            <TopProgressBar />
-            <BaseLayout footerText={footerText} versionTag={publicConfig.VERSION_TAG}>
-              <Component {...pageProps} />
-            </BaseLayout>
-          </AntdConfigProvider>
-        </DarkModeProvider>
-      </StoreProvider>
+      <Provider initialLanguage={{
+        id: extra.languageId,
+        definitions: extra.languageId === "en" ? en : zh_cn,
+      }}
+      >
+        <StoreProvider stores={[userStore, defaultClusterStore]}>
+          <DarkModeProvider initial={extra.darkModeCookieValue}>
+            <AntdConfigProvider color={primaryColor} locale={extra.languageId}>
+              <FloatButtons />
+              <GlobalStyle />
+              <FailEventHandler />
+              <TopProgressBar />
+              <BaseLayout footerText={footerText} versionTag={publicConfig.VERSION_TAG}>
+                <Component {...pageProps} />
+              </BaseLayout>
+            </AntdConfigProvider>
+          </DarkModeProvider>
+        </StoreProvider>
+      </Provider>
     </>
   );
 }
@@ -148,6 +159,7 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
     footerText: "",
     primaryColor: "",
     darkModeCookieValue: getDarkModeCookieValue(appContext.ctx.req),
+    languageId: "",
   };
 
   // This is called on server on first load, and on client on every page transition
@@ -180,10 +192,12 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
     ?? runtimeConfig.UI_CONFIG?.primaryColor?.defaultColor ?? runtimeConfig.DEFAULT_PRIMARY_COLOR;
     extra.footerText = (hostname && runtimeConfig.UI_CONFIG?.footer?.hostnameTextMap?.[hostname])
     ?? runtimeConfig.UI_CONFIG?.footer?.defaultText ?? "";
+
+    extra.languageId = getLanguageCookie(appContext.ctx.req);
+
   }
 
   const appProps = await App.getInitialProps(appContext);
-
 
   return { ...appProps, extra } as Props;
 };

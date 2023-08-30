@@ -20,12 +20,14 @@ import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer, FilterFormTabs } from "src/components/FilterFormContainer";
 import { ModalLink } from "src/components/ModalLink";
 import { TableTitle } from "src/components/TableTitle";
+import { prefix } from "src/i18n";
 import { runningJobId, RunningJobInfo } from "src/models/job";
 import { BatchChangeJobTimeLimitButton } from "src/pageComponents/job/BatchChangeJobTimeLimitButton";
 import { ChangeJobTimeLimitModal } from "src/pageComponents/job/ChangeJobTimeLimitModal";
 import { RunningJobDrawer } from "src/pageComponents/job/RunningJobDrawer";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { Cluster, publicConfig } from "src/utils/config";
+import useI18nTranslateToString from "src/utils/useI18nTranslateToString";
 
 interface FilterForm {
   jobId: number | undefined;
@@ -98,6 +100,9 @@ export const RunningJobQueryTable: React.FC<Props> = ({
     return filtered.map((x) => RunningJobInfo.fromGrpc(x, publicConfig.CLUSTERS[query.cluster.id]));
   }, [data, query.jobId]);
 
+  const { t } = useI18nTranslateToString();
+  const p = prefix("runningJob.search.");
+
   return (
     <div>
       <FilterFormContainer>
@@ -117,24 +122,24 @@ export const RunningJobQueryTable: React.FC<Props> = ({
             }}
             button={(
               <Space>
-                <Button type="primary" htmlType="submit">搜索</Button>
-                <Button onClick={reload} loading={isLoading}>刷新</Button>
+                <Button type="primary" htmlType="submit">{t(p("button.search"))}</Button>
+                <Button onClick={reload} loading={isLoading}>{t(p("button.refresh"))}</Button>
               </Space>
             )}
             tabs={[
               {
-                title: "批量搜索",
+                title: t(p("batch")),
                 key: "range",
                 node: (
                   <>
-                    <Form.Item label="集群" name="cluster">
+                    <Form.Item label={t(p("cluster"))} name="cluster">
                       <SingleClusterSelector />
                     </Form.Item>
                     {
                       filterAccountName
                         ? accountNames
                           ? (
-                            <Form.Item label="账户" name="accountName">
+                            <Form.Item label={t(p("account"))} name="accountName">
                               <Select style={{ minWidth: 96 }} allowClear>
                                 {(Array.isArray(accountNames) ? accountNames : [accountNames]).map((x) => (
                                   <Select.Option key={x} value={x}>{x}</Select.Option>
@@ -142,7 +147,7 @@ export const RunningJobQueryTable: React.FC<Props> = ({
                               </Select>
                             </Form.Item>
                           ) : (
-                            <Form.Item label="账户" name="accountName">
+                            <Form.Item label={t(p("account"))} name="accountName">
                               <Input />
                             </Form.Item>
                           )
@@ -153,14 +158,14 @@ export const RunningJobQueryTable: React.FC<Props> = ({
 
               },
               {
-                title: "精确搜索",
+                title: t(p("precision")),
                 key: "precision",
                 node: (
                   <>
-                    <Form.Item label="集群" name="cluster">
+                    <Form.Item label={t(p("cluster"))} name="cluster">
                       <SingleClusterSelector />
                     </Form.Item>
-                    <Form.Item label="作业ID" name="jobId">
+                    <Form.Item label={t(p("clusterJobId"))} name="jobId">
                       <InputNumber style={{ minWidth: "160px" }} min={1} />
                     </Form.Item>
                   </>
@@ -209,6 +214,9 @@ export const RunningJobInfoTable: React.FC<JobInfoTableProps> = ({
 
   const [previewItem, setPreviewItem] = useState<RunningJobInfo | undefined>(undefined);
 
+  const { t } = useI18nTranslateToString();
+  const p = prefix("runningJob.jobTable.");
+
   return (
     <>
       {selection ? (
@@ -245,50 +253,50 @@ export const RunningJobInfoTable: React.FC<JobInfoTableProps> = ({
           showCluster && (
             <Table.Column<RunningJobInfo>
               dataIndex="cluster"
-              title="集群"
+              title={t(p("cluster"))}
               render={(_, r) => r.cluster.name}
             />
           )
         }
-        <Table.Column<RunningJobInfo> dataIndex="jobId" title="作业ID" />
+        <Table.Column<RunningJobInfo> dataIndex="jobId" title={t(p("jobId"))} />
         {
           showUser && (
-            <Table.Column<RunningJobInfo> dataIndex="user" title="用户" />
+            <Table.Column<RunningJobInfo> dataIndex="user" title={t(p("user"))} />
           )
         }
         {
           showAccount && (
-            <Table.Column<RunningJobInfo> dataIndex="account" title="账户" />
+            <Table.Column<RunningJobInfo> dataIndex="account" title={t(p("account"))} />
           )
         }
-        <Table.Column<RunningJobInfo> dataIndex="name" title="作业名" />
-        <Table.Column<RunningJobInfo> dataIndex="partition" title="分区" />
-        <Table.Column<RunningJobInfo> dataIndex="qos" title="QOS" />
-        <Table.Column<RunningJobInfo> dataIndex="nodes" title="节点数" />
-        <Table.Column<RunningJobInfo> dataIndex="cores" title="核心数" />
+        <Table.Column<RunningJobInfo> dataIndex="name" title={t(p("name"))} />
+        <Table.Column<RunningJobInfo> dataIndex="partition" title={t(p("partition"))} />
+        <Table.Column<RunningJobInfo> dataIndex="qos" title={t(p("qos"))} />
+        <Table.Column<RunningJobInfo> dataIndex="nodes" title={t(p("nodes"))} />
+        <Table.Column<RunningJobInfo> dataIndex="cores" title={t(p("cores"))} />
         <Table.Column<RunningJobInfo> dataIndex="gpus" title="GPU卡数" />
         <Table.Column<RunningJobInfo> dataIndex="state" title="状态" />
         <Table.Column
           dataIndex="runningOrQueueTime"
-          title="运行/排队时间"
+          title={t(p("time"))}
         />
         <Table.Column
           dataIndex="nodesOrReason"
-          title="说明"
+          title={t(p("reason"))}
           render={(d: string) => d.startsWith("(") && d.endsWith(")") ? d.substring(1, d.length - 1) : d}
         />
-        <Table.Column<RunningJobInfo> dataIndex="timeLimit" title="作业时间限制" />
+        <Table.Column<RunningJobInfo> dataIndex="timeLimit" title={t(p("limit"))} />
 
         <Table.Column<RunningJobInfo>
-          title="更多"
+          title={t(p("others"))}
           render={(_, r) => (
             <Space>
-              <a onClick={() => setPreviewItem(r)}>详情</a>
+              <a onClick={() => setPreviewItem(r)}>{t(p("details"))}</a>
               <ChangeJobTimeLimitModalLink
                 reload={reload}
                 data={[r]}
               >
-                修改作业时限
+                {t(p("changeLimit"))}
               </ChangeJobTimeLimitModalLink>
             </Space>
           )}

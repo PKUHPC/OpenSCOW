@@ -1,12 +1,12 @@
 lockfileVersion: '6.0'
 
-settings:
-  autoInstallPeers: true
-  excludeLinksFromLockfile: false
-
 importers:
 
   .:
+    dependencies:
+      react-typed-i18n:
+        specifier: ^2.3.0
+        version: 2.3.0(react@18.2.0)
     devDependencies:
       '@bufbuild/buf':
         specifier: 1.26.1
@@ -17087,6 +17087,14 @@ packages:
       - '@types/react'
     dev: false
 
+  /react-typed-i18n@2.3.0(react@18.2.0):
+    resolution: {integrity: sha512-ap0/WlMz4iFwxha2nLPn3mWiUNO/f4PagXIbTznnpCzSTWOk4ifkWyI/iC4LiA7rF49aBsMqAUAmk65mzfWPkA==}
+    peerDependencies:
+      react: '>=16.8.0'
+    dependencies:
+      react: 18.2.0
+    dev: false
+
   /react@17.0.2:
     resolution: {integrity: sha512-gnhPt75i/dq/z3/6q/0asP78D0u592D5L1pd7M8P+dck6Fu/jJeL6iVVK23fptSUZj8Vjf++7wXA8UNclGQcbA==}
     engines: {node: '>=0.10.0'}
@@ -20318,3 +20326,7 @@ packages:
     name: tiny-inflate
     version: 1.0.3
     dev: false
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
