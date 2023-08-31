@@ -7,6 +7,7 @@ plugins:
     opt:
       - unrecognizedEnum=false
       - useDate=string
+      - useExactTypes=false
       - oneof=unions
       - esModuleInterop=true
       - useOptionals=messages

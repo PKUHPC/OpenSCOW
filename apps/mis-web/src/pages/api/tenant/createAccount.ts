@@ -16,12 +16,14 @@ import { Status } from "@grpc/grpc-js/build/src/constants";
 import { AccountServiceClient } from "@scow/protos/build/server/account";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
+import { OperationResult, OperationType } from "src/models/operationLog";
 import { TenantRole } from "src/models/User";
 import { checkNameMatch } from "src/server/checkIdNameMatch";
+import { callLog } from "src/server/operationLog";
 import { getClient } from "src/utils/client";
 import { publicConfig } from "src/utils/config";
 import { route } from "src/utils/route";
-import { handlegRPCError } from "src/utils/server";
+import { handlegRPCError, parseIp } from "src/utils/server";
 
 // Cannot use CreateAccountResponse from protos
 export const CreateAccountResponse = Type.Object({});
@@ -86,14 +88,28 @@ export default route(CreateAccountSchema,
       return { 400: { code: "ID_NAME_NOT_MATCH" as const } };
     }
 
+    const logInfo = {
+      operatorUserId: info.identityId,
+      operatorIp: parseIp(req) ?? "",
+      operationTypeName: OperationType.createAccount,
+      operationTypePayload:{
+        tenantName: info.tenant, accountName, accountOwner: ownerId,
+      },
+    };
+
     const client = getClient(AccountServiceClient);
 
     return await asyncClientCall(client, "createAccount", {
       accountName, ownerId, comment, tenantName: info.tenant,
     })
-      .then((x) => ({ 200: x }))
+      .then(async (x) => {
+        await callLog(logInfo, OperationResult.SUCCESS);
+        return { 200: x };
+      })
       .catch(handlegRPCError({
         [Status.ALREADY_EXISTS]: () => ({ 409: null }),
         [Status.NOT_FOUND]: () => ({ 404: null }),
-      }));
+      },
+      async () => await callLog(logInfo, OperationResult.FAIL),
+      ));
   });

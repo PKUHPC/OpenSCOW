@@ -16,9 +16,11 @@ import { Status } from "@grpc/grpc-js/build/src/constants";
 import { UserServiceClient } from "@scow/protos/build/server/user";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
+import { OperationResult, OperationType } from "src/models/operationLog";
 import { PlatformRole, TenantRole, UserRole } from "src/models/User";
+import { callLog } from "src/server/operationLog";
 import { getClient } from "src/utils/client";
-import { handlegRPCError } from "src/utils/server";
+import { handlegRPCError, parseIp } from "src/utils/server";
 
 export const SetAdminSchema = typeboxRouteSchema({
   method: "PUT",
@@ -43,7 +45,7 @@ export default /* #__PURE__*/typeboxRoute(SetAdminSchema, async (req, res) => {
     const acccountBelonged = u.accountAffiliations.find((x) => x.accountName === accountName);
 
     return u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ||
-          (acccountBelonged && acccountBelonged.role !== UserRole.USER) || 
+          (acccountBelonged && acccountBelonged.role !== UserRole.USER) ||
           u.tenantRoles.includes(TenantRole.TENANT_ADMIN);
   });
 
@@ -53,14 +55,28 @@ export default /* #__PURE__*/typeboxRoute(SetAdminSchema, async (req, res) => {
 
   const client = getClient(UserServiceClient);
 
+  const logInfo = {
+    operatorUserId: info.identityId,
+    operatorIp: parseIp(req) ?? "",
+    operationTypeName: OperationType.setAccountAdmin,
+    operationTypePayload:{
+      accountName, userId: identityId,
+    },
+  };
+
   return await asyncClientCall(client, "setAsAdmin", {
     tenantName: info.tenant,
     accountName,
     userId: identityId,
   })
-    .then(() => ({ 200: { executed: true } }))
+    .then(async () => {
+      await callLog(logInfo, OperationResult.SUCCESS);
+      return { 200: { executed: true } };
+    })
     .catch(handlegRPCError({
       [Status.NOT_FOUND]: () => ({ 404: null }),
       [Status.FAILED_PRECONDITION]: () => ({ 200: { executed: false } }),
-    }));
+    },
+    async () => await callLog(logInfo, OperationResult.FAIL),
+    ));
 });

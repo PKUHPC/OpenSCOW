@@ -16,9 +16,11 @@ import { status } from "@grpc/grpc-js";
 import { DesktopServiceClient } from "@scow/protos/build/portal/desktop";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
+import { OperationResult, OperationType } from "src/models/operationLog";
+import { callLog } from "src/server/operationLog";
 import { getClient } from "src/utils/client";
 import { getLoginDesktopEnabled } from "src/utils/config";
-import { handlegRPCError } from "src/utils/server";
+import { handlegRPCError, parseIp } from "src/utils/server";
 
 export const CreateDesktopSchema = typeboxRouteSchema({
   method: "POST",
@@ -71,17 +73,28 @@ export default /* #__PURE__*/typeboxRoute(CreateDesktopSchema, async (req, res) 
 
   const client = getClient(DesktopServiceClient);
 
+  const logInfo = {
+    operatorUserId: info.identityId,
+    operatorIp: parseIp(req) ?? "",
+    operationTypeName: OperationType.createDesktop,
+    operationTypePayload:{
+      desktopName, wm,
+    },
+  };
+
   return await asyncUnaryCall(client, "createDesktop", {
     cluster, loginNode, userId: info.identityId, wm, desktopName,
   }).then(
-    async ({ host, password, port }) => ({
-      200: { host, password, port },
-    }),
+    async ({ host, password, port }) => {
+      await callLog(logInfo, OperationResult.SUCCESS);
+      return { 200: { host, password, port } };
+    },
     handlegRPCError({
       [status.NOT_FOUND]: () => ({ 400: { code: "INVALID_CLUSTER" as const } }),
       [status.INVALID_ARGUMENT]: () => ({ 400: { code: "INVALID_WM" as const } }),
       [status.RESOURCE_EXHAUSTED]: () => ({ 409: { code: "TOO_MANY_DESKTOPS" as const } }),
-    }));
-
+    },
+    async () => await callLog(logInfo, OperationResult.FAIL),
+    ));
 
 });

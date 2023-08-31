@@ -124,7 +124,12 @@ export const platformAdminRoutes: (platformRoles: PlatformRole[], t: TransType) 
           },
         ],
       },
-
+      ...(publicConfig.AUDIT_DEPLOYED && platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ?
+        [{
+          Icon: BookOutlined,
+          text: "操作日志",
+          path: "/admin/operationLogs",
+        }] : []),
     ],
   },
 ];
@@ -244,6 +249,13 @@ export const tenantRoutes: (tenantRoles: TenantRole[], token: string) => NavItem
             ],
           },
         ] : []),
+      ...(publicConfig.AUDIT_DEPLOYED && tenantRoles.includes(TenantRole.TENANT_ADMIN) ? [
+        {
+          Icon: BookOutlined,
+          text: "操作日志",
+          path: "/tenant/operationLogs",
+        },
+      ] : []),
     ],
   },
 ];
@@ -277,6 +289,13 @@ export const userRoutes: (accounts: AccountAffiliation[]) => NavItemProps[] = (a
         text: "集群和分区信息",
         path: "/user/partitions",
       },
+      ...(publicConfig.AUDIT_DEPLOYED
+        ? [{
+          Icon: BookOutlined,
+          text: "操作日志",
+          path: "/user/operationLogs",
+        }]
+        : []),
     ],
 
   },
@@ -323,6 +342,13 @@ export const accountAdminRoutes: (adminAccounts: AccountAffiliation[]) => NavIte
           text: "消费记录",
           path: `/accounts/${x.accountName}/charges`,
         },
+        ...(publicConfig.AUDIT_DEPLOYED
+          ? [{
+            Icon: BookOutlined,
+            text: "操作日志",
+            path: `/accounts/${x.accountName}/operationLogs`,
+          }]
+          : []),
       ],
 
     })),

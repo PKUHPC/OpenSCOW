@@ -112,23 +112,24 @@ export async function getAvailablePartitionForItems(
   if (!accountNames) { return {}; }
 
   const clusterPartitionsMap: { [cluster: string]: Partition[] } = {};
-  for (const accountName of accountNames) {
 
-    const availableCPs = await asyncClientCall(client, "getAvailablePartitions",
-      { accountName: accountName, userId: userId }).then((resp) => {
-      return resp.clusterPartitions;
-    });
-    availableCPs.forEach((cp) => {
+  await Promise.all(accountNames
+    .map(async (accountName) => {
+      const availableCPs = await asyncClientCall(client, "getAvailablePartitions",
+        { accountName: accountName, userId: userId }).then((resp) => {
+        return resp.clusterPartitions;
+      });
+      availableCPs.forEach((cp) => {
 
-      const cluster = cp.cluster;
-      if (!(cluster in clusterPartitionsMap)) {
-        clusterPartitionsMap[cluster] = [];
-      }
-      if (cp.partitions) {
-        clusterPartitionsMap[cluster] = clusterPartitionsMap[cluster].concat(cp.partitions);
-      }
-    });
-  }
+        const cluster = cp.cluster;
+        if (!(cluster in clusterPartitionsMap)) {
+          clusterPartitionsMap[cluster] = [];
+        }
+        if (cp.partitions) {
+          clusterPartitionsMap[cluster] = clusterPartitionsMap[cluster].concat(cp.partitions);
+        }
+      });
+    }));
 
   for (const cluster of Object.keys(clusterPartitionsMap)) {
     clusterPartitionsMap[cluster] = removeDuplicatesByPName(clusterPartitionsMap[cluster]);
