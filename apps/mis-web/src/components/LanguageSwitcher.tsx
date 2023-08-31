@@ -42,17 +42,11 @@ export const LanguageSwitcher = () => {
     }
   }, [router]);
 
-  const setLanguage = async (newLocale: string) => {
+  const setLanguage = (newLocale: string) => {
     setSelectedLanguage(newLocale);
     setLanguageCookie(newLocale);
-    await i18n.setLanguageById(newLocale);
+    i18n.setLanguageById(newLocale);
   };
-
-  // const changeLng = async (newLocale: string) => {
-  //   return await i18n.changeLanguage(newLocale, async () => {
-  //     await i18n.reloadResources();
-  //   });
-  // };
 
   const setLanguageCookie = (newLocale: string) => {
     setCookie(null, "language", newLocale, {

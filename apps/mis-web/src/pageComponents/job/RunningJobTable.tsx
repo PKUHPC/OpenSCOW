@@ -274,8 +274,8 @@ export const RunningJobInfoTable: React.FC<JobInfoTableProps> = ({
         <Table.Column<RunningJobInfo> dataIndex="qos" title={t(p("qos"))} />
         <Table.Column<RunningJobInfo> dataIndex="nodes" title={t(p("nodes"))} />
         <Table.Column<RunningJobInfo> dataIndex="cores" title={t(p("cores"))} />
-        <Table.Column<RunningJobInfo> dataIndex="gpus" title="GPU卡数" />
-        <Table.Column<RunningJobInfo> dataIndex="state" title="状态" />
+        <Table.Column<RunningJobInfo> dataIndex="gpus" title={t(p("gpus"))} />
+        <Table.Column<RunningJobInfo> dataIndex="state" title={t(p("state"))} />
         <Table.Column
           dataIndex="runningOrQueueTime"
           title={t(p("time"))}

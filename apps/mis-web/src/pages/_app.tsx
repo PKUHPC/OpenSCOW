@@ -25,7 +25,6 @@ import type { AppContext, AppProps } from "next/app";
 import App from "next/app";
 import dynamic from "next/dynamic";
 import Head from "next/head";
-import { parseCookies } from "nookies";
 import { join } from "path";
 import { useEffect, useRef } from "react";
 import { createStore, StoreProvider, useStore } from "simstate";
@@ -193,6 +192,7 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
     extra.footerText = (hostname && runtimeConfig.UI_CONFIG?.footer?.hostnameTextMap?.[hostname])
     ?? runtimeConfig.UI_CONFIG?.footer?.defaultText ?? "";
 
+    // 如果不存在则默认“zh_cn”
     extra.languageId = getLanguageCookie(appContext.ctx.req);
 
   }

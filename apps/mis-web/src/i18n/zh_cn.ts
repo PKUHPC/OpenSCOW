@@ -79,6 +79,7 @@ export default {
       user: "用户",
       details: "详情",
       changeLimit: "修改作业时限",
+      gpus: "GPU卡数",
     },
   },
   layouts: {

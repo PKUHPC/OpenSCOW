@@ -22,13 +22,12 @@ import { NavIcon } from "@scow/lib-web/build/layouts/icon";
 import { AccountAffiliation } from "@scow/protos/build/server/user";
 import { join } from "path";
 import { Lang } from "react-typed-i18n";
-import { prefix, useI18n } from "src/i18n";
+import { prefix } from "src/i18n";
 import en from "src/i18n/en";
 import { PlatformRole, TenantRole, UserRole } from "src/models/User";
 import { User } from "src/stores/UserStore";
 import { publicConfig } from "src/utils/config";
 import { createUserParams, useBuiltinCreateUser } from "src/utils/createUser";
-import useI18nTranslateToString from "src/utils/useI18nTranslateToString";
 
 type TransType = (id: Lang<typeof en>, args?: React.ReactNode[]) => string;
 const pPlatform = prefix("layouts.route.platformManagement.");

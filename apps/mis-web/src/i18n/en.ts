@@ -77,6 +77,7 @@ export default {
       user: "User",
       details: "Details",
       changeLimit: "Change Job Time Limit",
+      gpus: "GPUS",
     },
   },
   layouts: {
