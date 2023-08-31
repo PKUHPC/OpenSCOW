@@ -1,5 +1,6 @@
 {
   "dashboard": {
+    "title": "Dashboard",
     "account": {
       "title": "Account Information",
       "state": "State",
@@ -66,7 +67,8 @@
       "others": "Others",
       "user": "User",
       "details": "Details",
-      "change-limit": "Change Job Time Limit"
+      "change-limit": "Change Job Time Limit",
+      "gpus": "GPUs"
     }
   }
 }

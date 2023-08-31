@@ -4,7 +4,7 @@
     "dashboard": "Dashboard",
     "user": {
       "first-nav": "User",
-      "running-jobs": "Runing Jobs",
+      "running-jobs": "Running Jobs",
       "finished-jobs": "Finished Jobs",
       "cluster-partitions": "Cluster and Partition Info"
     },
@@ -28,7 +28,7 @@
       "first-nav": "Tenant Management",
       "info": "Tenant Info",
       "manage-job-price": "Job Price Management",
-      "running-jobs": "Runing Jobs",
+      "running-jobs": "Running Jobs",
       "finished-jobs": "Finished Jobs",
       "user-management": "User Management",
       "user-list": "User List",
@@ -47,7 +47,7 @@
     "account-management": {
       "first-nav":"Account Management",
       "info": "Account Info",
-      "running-jobs": "Runing Jobs",
+      "running-jobs": "Running Jobs",
       "finished-jobs": "Finished Jobs",
       "user-management": "User Management",
       "pay": "User Top Up History",

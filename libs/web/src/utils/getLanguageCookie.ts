@@ -10,14 +10,10 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import common from "../public/locales/en/common.json";
-import layouts from "../public/locales/en/layouts.json";
-import translations from "../public/locales/en/translations.json";
+import { IncomingMessage } from "http";
+import { parseCookies } from "nookies";
 
-const resources = {
-  common,
-  translations,
-  layouts,
-} as const;
-
-export default resources;
+export function getLanguageCookie(req: IncomingMessage | undefined): string {
+  const cookies = parseCookies({ req });
+  return cookies && cookies.language ? cookies.language : "zh_cn";
+}

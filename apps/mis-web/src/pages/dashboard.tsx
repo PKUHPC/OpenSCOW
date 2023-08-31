@@ -16,6 +16,7 @@ import { AccountStatus } from "@scow/protos/build/server/user";
 import { Divider } from "antd";
 import { GetServerSideProps, NextPage } from "next";
 import { useRouter } from "next/router";
+import { useTranslation } from "next-i18next";
 import { useEffect } from "react";
 import { useStore } from "simstate";
 import { MOCK_USER_STATUS } from "src/apis/api.mock";
@@ -59,9 +60,11 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)((props: Pr
   const { accounts } = props;
   const noAccounts = Object.keys(accounts).length === 0;
 
+  const { t } = useTranslation("translations");
+
   return (
     <div>
-      <Head title="仪表盘" />
+      <Head title={t("dashboard.title")} />
       <AccountInfoSection info={accounts} />
       {/* <Divider /> */}
       {/* <StorageSection storageQuotas={storageQuotas} /> */}

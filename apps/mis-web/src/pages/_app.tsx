@@ -17,6 +17,7 @@ import { failEvent } from "@ddadaal/next-typed-api-routes-runtime/lib/client";
 import { DarkModeCookie, DarkModeProvider, getDarkModeCookieValue } from "@scow/lib-web/build/layouts/darkMode";
 import { GlobalStyle } from "@scow/lib-web/build/layouts/globalStyle";
 import { getHostname } from "@scow/lib-web/build/utils/getHostname";
+import { getLanguageCookie } from "@scow/lib-web/build/utils/getLanguageCookie";
 import { useConstant } from "@scow/lib-web/build/utils/hooks";
 import { isServer } from "@scow/lib-web/build/utils/isServer";
 import { App as AntdApp } from "antd";
@@ -25,7 +26,6 @@ import App from "next/app";
 import dynamic from "next/dynamic";
 import Head from "next/head";
 import { appWithTranslation, i18n } from "next-i18next";
-import { parseCookies } from "nookies";
 import { join } from "path";
 import { useEffect, useRef } from "react";
 import { createStore, StoreProvider, useStore } from "simstate";
@@ -98,11 +98,7 @@ interface ExtraProps {
 
 type Props = AppProps & { extra: ExtraProps };
 
-// function MyApp({ Component, pageProps, extra }: Props & WithTranslation) {
 function MyApp({ Component, pageProps, extra }: Props) {
-
-  i18n?.init();
-  loadAppTranslation();
 
   // remembers extra props from first load
   const { current: { userInfo, primaryColor, footerText } } = useRef(extra);
@@ -115,6 +111,10 @@ function MyApp({ Component, pageProps, extra }: Props) {
     const store = createStore(DefaultClusterStore, Object.values(publicConfig.CLUSTERS)[0]);
     return store;
   });
+
+  useEffect(() => {
+    loadAppTranslation();
+  }, []);
 
   return (
     <>
@@ -198,11 +198,10 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
     extra.footerText = (hostname && runtimeConfig.UI_CONFIG?.footer?.hostnameTextMap?.[hostname])
     ?? runtimeConfig.UI_CONFIG?.footer?.defaultText ?? "";
 
+    // 如果不存在则默认“zh_cn”
+    extra.locale = getLanguageCookie(appContext.ctx.req);
+    i18n?.changeLanguage(extra.locale);
 
-    const cookies = parseCookies();
-    extra.locale = cookies && cookies.language ? cookies.language : "zh_cn";
-
-    console.log(extra.locale);
 
   }
 

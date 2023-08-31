@@ -39,8 +39,6 @@ module.exports = async (phase) => {
    */
   const config = {
     ...runtimeConfig,
-    i18n,
-    // customTranslationJson: customTransJson,
     basePath: BASE_PATH === "/" ? undefined : BASE_PATH,
     assetPrefix: BASE_PATH === "/" ? undefined : BASE_PATH,
     webpack(config, options) {

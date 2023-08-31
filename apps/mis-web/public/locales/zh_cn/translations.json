@@ -1,5 +1,6 @@
 {
   "dashboard": {
+    "title": "仪表盘",
     "account": {
       "title": "账户信息",
       "state": "状态",
@@ -65,7 +66,8 @@
       "others": "更多",
       "user": "用户",
       "details": "详情",
-      "change-limit": "修改作业时限"
+      "change-limit": "修改作业时限",
+      "gpus": "GPU卡数"
     }
   }
 }

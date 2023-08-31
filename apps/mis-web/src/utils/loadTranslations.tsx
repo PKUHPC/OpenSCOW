@@ -18,22 +18,8 @@ import * as EnTranslations from "../../public/locales/en/translations.json";
 import * as CnCommon from "../../public/locales/zh_cn/common.json";
 import * as CnLayouts from "../../public/locales/zh_cn/layouts.json";
 import * as CnTranslations from "../../public/locales/zh_cn/translations.json";
-import { publicConfig } from "./config";
-
-
 
 export function loadTranslations() {
-
-  const customTranslation = publicConfig.CUSTOM_TRANSLATION_JSON;
-
-  if (customTranslation) {
-    Object.keys(customTranslation).filter((key) => key !== "custom-translation").forEach((locale) => {
-      i18n?.addResource(locale, "custom",
-        customTranslation[locale].key, customTranslation[locale].value, { keySeparator: ".", silent: false });
-    });
-    i18n?.addResourceBundle("en", "custom", customTranslation.en, true, true);
-    i18n?.addResourceBundle("zh_cn", "custom", customTranslation.zh_cn, true, true);
-  }
 
   // add othersTranslations
   i18n?.addResourceBundle("en", "common", EnCommon, true, true);
@@ -43,6 +29,9 @@ export function loadTranslations() {
   i18n?.addResourceBundle("en", "translations", EnTranslations, true, true);
   i18n?.addResourceBundle("zh_cn", "translations", CnTranslations, true, true);
 
+  i18n?.reloadResources();
+
+  console.log("【addResource后的i18n】", i18n?.options.resources, i18n);
 }
 
 

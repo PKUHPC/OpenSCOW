@@ -18,21 +18,20 @@ const path = require("path");
  * @type {import('next-i18next').UserConfig}
  */
 module.exports = {
-  // // https://www.i18next.com/overview/configuration-options#logging
-  // debug: process.env.NODE_ENV === 'development',
+  // https://www.i18next.com/overview/configuration-options#logging
+  debug: process.env.NODE_ENV === "development",
   i18n: {
     defaultLocale: "zh_cn",
     locales: ["zh_cn", "en"],
-    localePath: path.resolve("./public/locales"),
-    addPath: path.resolve("./public/locales"),
-    defaultNs: "translations",
-    ns: ["translations"],
-    reloadOnPrerender: true,
-    localeDetection: false,
-    keySeparator: ".",
-    fallbackLng: "zh_cn",
-    lng: process.env.NODE_ENV === "development" ? "zh_cn" : "en",
-    serverLanguageDetection: true,
   },
-
+  localePath: path.resolve("./public/locales"),
+  addPath: path.resolve("./public/locales"),
+  defaultNs: "translations",
+  ns: ["translations"],
+  reloadOnPrerender: true,
+  localeDetection: false,
+  keySeparator: ".",
+  fallbackLng: "zh_cn",
+  lng: process.env.NODE_ENV === "development" ? "zh_cn" : "en",
+  serverLanguageDetection: true,
 };

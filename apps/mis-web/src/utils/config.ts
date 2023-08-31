@@ -63,8 +63,6 @@ export interface PublicRuntimeConfig {
 
   VERSION_TAG: string | undefined;
 
-  CUSTOM_TRANSLATION_JSON?: CustomTranslation;
-
   AUDIT_DEPLOYED: boolean;
 }
 
@@ -86,16 +84,6 @@ export type CustomAmountStrategy = {
   script: string;
   name?: string | undefined;
   comment?: string | undefined;
-}
-
-
-export type TranslationRecord = {
-  [key: string]: string | TranslationRecord;
-}
-export type CustomTranslation = {
-  "custom-translation": boolean;
-  "en"?: TranslationRecord;
-  "zh_cn"?: TranslationRecord;
 }
 
 export const getClusterName = (clusterId: string) => {
