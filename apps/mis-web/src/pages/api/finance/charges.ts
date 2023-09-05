@@ -16,7 +16,7 @@ import { moneyToNumber } from "@scow/lib-decimal";
 import { ChargingServiceClient } from "@scow/protos/build/server/charging";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
-import { UserRole } from "src/models/User";
+import { PlatformRole, TenantRole, UserRole } from "src/models/User";
 import { ensureNotUndefined } from "src/utils/checkNull";
 import { getClient } from "src/utils/client";
 
@@ -27,6 +27,7 @@ export const ChargeInfo = Type.Object({
   type: Type.String(),
   amount: Type.Number(),
   comment: Type.String(),
+  tenantName: Type.String(),
 });
 export type ChargeInfo = Static<typeof ChargeInfo>;
 
@@ -44,7 +45,9 @@ export const GetChargesSchema = typeboxRouteSchema({
      */
     endTime: Type.String({ format: "date-time" }),
 
-    accountName: Type.String(),
+    accountName: Type.Optional(Type.String()),
+
+    tenantName: Type.Optional(Type.String()),
   }),
 
   responses: {
@@ -56,10 +59,15 @@ export const GetChargesSchema = typeboxRouteSchema({
 });
 
 export default typeboxRoute(GetChargesSchema, async (req, res) => {
-  const { endTime, startTime, accountName } = req.query;
+  const { endTime, startTime, accountName, tenantName } = req.query;
 
   const auth = authenticate((i) =>
-    i.accountAffiliations.some((x) => x.accountName === accountName && x.role !== UserRole.USER));
+    (i.accountAffiliations.some((x) => x.accountName === accountName && x.role !== UserRole.USER)
+      ||
+      (i.platformRoles.includes(PlatformRole.PLATFORM_ADMIN) || i.platformRoles.includes(PlatformRole.PLATFORM_FINANCE))
+      ||
+      (i.tenantRoles.includes(TenantRole.TENANT_ADMIN) || i.tenantRoles.includes(TenantRole.TENANT_FINANCE))
+    ));
 
   const info = await auth(req, res);
 
@@ -71,7 +79,10 @@ export default typeboxRoute(GetChargesSchema, async (req, res) => {
     accountName,
     startTime,
     endTime,
-    tenantName: info.tenant,
+    // 如果账户不为undefined则查询租户下该账户的消费记录
+    // 如果账户为undefined，租户不为undefined则查询租户下所有账户消费记录
+    // 如果账户和租户均为undefined,则查询所有租户下账户的消费记录
+    tenantName: accountName ? info.tenant : tenantName,
   }), ["total"]);
 
   const accounts = reply.results.map((x) => {

@@ -13,30 +13,27 @@
 import { NextPage } from "next";
 import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
-import { UserRole } from "src/models/User";
-import {
-  checkQueryAccountNameIsAdmin,
-  useAccountPagesAccountName } from "src/pageComponents/accounts/checkQueryAccountNameIsAdmin";
+import { TenantRole } from "src/models/User";
 import { ChargeTable } from "src/pageComponents/finance/ChargeTable";
 import { Head } from "src/utils/head";
 
-export const ChargesPage: NextPage = requireAuth(
-  (i) => i.accountAffiliations.some((x) => x.role !== UserRole.USER),
-  checkQueryAccountNameIsAdmin,
-)(() => {
+export const TenantAccountsExpencesPage: NextPage = requireAuth(
+  (u) => u.tenantRoles.includes(TenantRole.TENANT_FINANCE) ||
+      u.tenantRoles.includes(TenantRole.TENANT_ADMIN))(
+  ({ userStore }) => {
 
-  const accountName = useAccountPagesAccountName();
+    const tenantName = userStore.user.tenant;
 
-  const title = `账户${accountName}扣费记录`;
+    const title = "账户消费记录";
 
-  return (
-    <div>
-      <Head title={title} />
-      <PageTitle titleText={title}>
-      </PageTitle>
-      <ChargeTable showAccountName={false} showTenantName={false} accountName={accountName} />
-    </div>
-  );
-});
+    return (
+      <div>
+        <Head title={title} />
+        <PageTitle titleText={title}>
+        </PageTitle>
+        <ChargeTable showAccountName={true} showTenantName={false} tenantName={tenantName} />
+      </div>
+    );
+  });
 
-export default ChargesPage;
+export default TenantAccountsExpencesPage;

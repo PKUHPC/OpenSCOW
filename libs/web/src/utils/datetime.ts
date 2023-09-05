@@ -24,6 +24,7 @@ export const defaultPresets: TimeRangePickerProps["presets"] = (() => {
 
   return [
     { label: "今天", value: [now.startOf("day"), end]},
+    { label: "本周", value: [now.startOf("week"), end]},
     { label: "本月", value: [now.startOf("month"), end]},
     { label: "今年", value: [now.startOf("year"), end]},
     { label: "3个月", value: [now.subtract(3, "month").startOf("day"), end]},

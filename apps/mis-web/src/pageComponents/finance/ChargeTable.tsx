@@ -20,31 +20,37 @@ import { api } from "src/apis";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 
 interface Props {
-  accountName: string;
+  accountName?: string;
+  tenantName?: string;
   showAccountName: boolean;
+  showTenantName: boolean;
 }
 
 interface FilterForm {
   time: [dayjs.Dayjs, dayjs.Dayjs];
 }
 
-const today = dayjs().endOf("day");
+const now = dayjs();
 
-export const ChargeTable: React.FC<Props> = ({ accountName, showAccountName }) => {
+export const ChargeTable: React.FC<Props> = ({
+  accountName, tenantName, showAccountName, showTenantName }) => {
 
   const [form] = Form.useForm<FilterForm>();
 
   const [query, setQuery] = useState({
-    time: [today.clone().subtract(1, "year"), today],
+    time: [now.subtract(1, "week").startOf("day"), now.endOf("day")],
   });
 
   const { data, isLoading } = useAsync({
     promiseFn: useCallback(async () => {
+
       return api.getCharges({ query: {
         accountName,
-        startTime: query.time[0].clone().startOf("day").toISOString(),
-        endTime: query.time[1].clone().endOf("day").toISOString(),
+        tenantName,
+        startTime: query.time[0].toISOString(),
+        endTime: query.time[1].toISOString(),
       } });
+
     }, [query]),
   });
 
@@ -91,6 +97,11 @@ export const ChargeTable: React.FC<Props> = ({ accountName, showAccountName }) =
         {
           showAccountName && (
             <Table.Column dataIndex="accountName" title="账户" />
+          )
+        }
+        {
+          showTenantName && (
+            <Table.Column dataIndex="tenantName" title="租户" />
           )
         }
         <Table.Column dataIndex="time" title="扣费日期" render={(v) => formatDateTime(v)} />

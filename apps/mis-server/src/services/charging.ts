@@ -142,17 +142,17 @@ export const chargingServiceServer = plugin((server) => {
       return [{ types: result.map((x) => x.type) }];
     },
     /**
-     * 
+     *
      * case tenant:返回这个租户（tenantName）的充值记录
      * case allTenants: 返回该所有租户充值记录
      * case accountOfTenant: 返回该这个租户（tenantName）下这个账户（accountName）的充值记录
      * case accountsOfTenant: 返回这个租户（tenantName）下所有账户的充值记录
-     * 
-     * @returns 
+     *
+     * @returns
      */
     getPaymentRecords: async ({ request, em }) => {
 
-      const { endTime, startTime, target } = 
+      const { endTime, startTime, target } =
       ensureNotUndefined(request, ["startTime", "endTime", "target"]);
       let searchParam = {};
       switch (target?.$case)
@@ -174,7 +174,7 @@ export const chargingServiceServer = plugin((server) => {
       }
 
       const records = await em.find(PayRecord, {
-        time: { $gte: startTime, $lte: endTime }, 
+        time: { $gte: startTime, $lte: endTime },
         ...searchParam,
       }, { orderBy: { time: QueryOrder.DESC } });
 
@@ -204,7 +204,7 @@ export const chargingServiceServer = plugin((server) => {
       }, { orderBy: { time: QueryOrder.DESC } });
 
       return [{
-        results: records.map((x) => ({
+        results: records.filter((x) => x.accountName).map((x) => ({
           tenantName: x.tenantName,
           accountName: x.accountName,
           amount: decimalToMoney(x.amount),
