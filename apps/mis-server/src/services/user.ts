@@ -443,6 +443,7 @@ export const userServiceServer = plugin((server) => {
       const { userId, name } = request;
 
       // query auth
+      let authMatch: boolean = true;
       if (server.ext.capabilities.getUser) {
         const authUser = await getUser(misConfig.authUrl, { identityId: userId }, server.logger);
 
@@ -451,7 +452,7 @@ export const userServiceServer = plugin((server) => {
         }
 
         if (authUser.name !== undefined) {
-          return [{ match: authUser.name === name }];
+          authMatch = authUser.name === name;
         }
       }
 
@@ -463,7 +464,7 @@ export const userServiceServer = plugin((server) => {
         throw <ServiceError> { code: Status.NOT_FOUND, message:`User ${userId} is not found in mis db` };
       }
 
-      return [{ match: user.name === name }];
+      return [{ match: authMatch && user.name === name }];
     },
 
     getUsers: async ({ request, em }) => {
