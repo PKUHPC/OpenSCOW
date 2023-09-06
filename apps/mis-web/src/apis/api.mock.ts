@@ -410,6 +410,7 @@ export const mockApi: MockApi<typeof api> = {
   getOperationLog: async () => ({ results: [{
     operationLogId: 99,
     operatorUserId: "testUser",
+    operatorUserName: "testUser",
     operatorIp: "localhost",
     operationCode: "000000",
     operationType: OperationType.login,
