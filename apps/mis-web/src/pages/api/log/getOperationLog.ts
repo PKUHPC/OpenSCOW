@@ -141,10 +141,20 @@ export default typeboxRoute(GetOperationLogsSchema, async (req, res) => {
 
   const { results, totalCount } = resp;
 
+  const userIds = Array.from(new Set(results.map((x) => x.operatorUserId)));
+
+  const client = getClient(UserServiceClient);
+  const { users } = await asyncClientCall(client, "getUsersByIds", {
+    userIds,
+  });
+
+  const userMap = new Map(users.map((x) => [x.userId, x.userName]));
+
   const operationLogs = results.map((x) => {
     return {
       operationLogId: x.operationLogId,
       operatorUserId: x.operatorUserId,
+      operatorUserName: userMap.get(x.operatorUserId),
       operatorIp: x.operatorIp,
       operationResult: x.operationResult,
       operationTime: x.operationTime,
