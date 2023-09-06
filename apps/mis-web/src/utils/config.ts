@@ -64,6 +64,8 @@ export interface PublicRuntimeConfig {
   VERSION_TAG: string | undefined;
 
   AUDIT_DEPLOYED: boolean;
+
+  CHARGE_TYPE_LIST: string[];
 }
 
 export const runtimeConfig: ServerRuntimeConfig = getConfig().serverRuntimeConfig;

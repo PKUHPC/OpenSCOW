@@ -12,34 +12,45 @@
 
 import { defaultPresets, formatDateTime } from "@scow/lib-web/build/utils/datetime";
 import { useDidUpdateEffect } from "@scow/lib-web/build/utils/hooks";
-import { Button, DatePicker, Form, Table } from "antd";
+import { Button, DatePicker, Form, Select, Table } from "antd";
 import dayjs from "dayjs";
 import { useCallback, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
+import { publicConfig } from "src/utils/config";
+import { CHARGE_TYPE_OTHERS } from "src/utils/constants";
+
+import { AccountSelector } from "./AccountSelector";
 
 interface Props {
   accountName?: string;
   tenantName?: string;
   showAccountName: boolean;
   showTenantName: boolean;
+  isPlatformRecords?: boolean;
 }
 
 interface FilterForm {
+  name?: string;
   time: [dayjs.Dayjs, dayjs.Dayjs];
 }
 
 const now = dayjs();
 
 export const ChargeTable: React.FC<Props> = ({
-  accountName, tenantName, showAccountName, showTenantName }) => {
+  accountName, tenantName, showAccountName, showTenantName, isPlatformRecords }) => {
 
   const [form] = Form.useForm<FilterForm>();
 
   const [query, setQuery] = useState({
+    name: accountName,
     time: [now.subtract(1, "week").startOf("day"), now.endOf("day")],
   });
+
+  const filteredTypes = [...publicConfig.CHARGE_TYPE_LIST, CHARGE_TYPE_OTHERS];
+
+  const [filteredType, setFilteredType] = useState<string>();
 
   const { data, isLoading } = useAsync({
     promiseFn: useCallback(async () => {
@@ -49,6 +60,7 @@ export const ChargeTable: React.FC<Props> = ({
         tenantName,
         startTime: query.time[0].toISOString(),
         endTime: query.time[1].toISOString(),
+        isPlatformRecords,
       } });
 
     }, [query]),
@@ -66,12 +78,40 @@ export const ChargeTable: React.FC<Props> = ({
           form={form}
           initialValues={query}
           onFinish={async () => {
-            const { time } = await form.validateFields();
-            setQuery({ time });
+            const { name, time } = await form.validateFields();
+            setQuery({ name: accountName ?? name, time });
           }}
         >
+          {
+            showAccountName && (
+              <Form.Item label="账户" name="accountName">
+                <AccountSelector
+                  onChange={(value) => {
+                    setQuery({ ...query, name: value });
+                  }}
+                  placeholder="请选择账户"
+                  fromAllTenants={showTenantName ? true : false}
+                />
+              </Form.Item>
+            )
+          }
           <Form.Item label="时间" name="time">
             <DatePicker.RangePicker allowClear={false} presets={defaultPresets} />
+          </Form.Item>
+          <Form.Item label="类型">
+            <Select
+              style={{ minWidth: "100px" }}
+              value={filteredType}
+              allowClear
+              onChange={(value) => setFilteredType(value)}
+              placeholder="请选择类型"
+            >
+              {(filteredTypes).map((x) => (
+                <Select.Option key={x} value={x}>
+                  {x}
+                </Select.Option>
+              ))}
+            </Select>
           </Form.Item>
           <Form.Item label="总数">
             <strong>
@@ -89,7 +129,7 @@ export const ChargeTable: React.FC<Props> = ({
         </Form>
       </FilterFormContainer>
       <Table
-        dataSource={data?.results}
+        dataSource={filteredType ? data?.results.filter((x) => x.type === filteredType) : data?.results}
         loading={isLoading}
         scroll={{ x: true }}
         pagination={{ showSizeChanger: true }}

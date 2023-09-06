@@ -29,7 +29,7 @@ export const PlatformAccountsExpencesPage: NextPage = requireAuth(
         <Head title={title} />
         <PageTitle titleText={title}>
         </PageTitle>
-        <ChargeTable showAccountName={true} showTenantName={true} />
+        <ChargeTable showAccountName={true} showTenantName={true} isPlatformRecords={true} />
       </div>
     );
   });

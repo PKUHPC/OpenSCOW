@@ -195,7 +195,8 @@ export const chargingServiceServer = plugin((server) => {
     },
 
     getChargeRecords: async ({ request, em }) => {
-      const { tenantName, accountName, endTime, startTime } = ensureNotUndefined(request, ["startTime", "endTime"]);
+      const { tenantName, accountName, endTime, startTime, isPlatformRecords }
+        = ensureNotUndefined(request, ["startTime", "endTime"]);
 
       const records = await em.find(ChargeRecord, {
         time: { $gte: startTime, $lte: endTime },
@@ -203,8 +204,10 @@ export const chargingServiceServer = plugin((server) => {
         ...tenantName !== undefined ? { tenantName } : {},
       }, { orderBy: { time: QueryOrder.DESC } });
 
+      const reply = isPlatformRecords ? records.filter((x) => x.accountName) : records;
+
       return [{
-        results: records.filter((x) => x.accountName).map((x) => ({
+        results: reply.map((x) => ({
           tenantName: x.tenantName,
           accountName: x.accountName,
           amount: decimalToMoney(x.amount),

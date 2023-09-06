@@ -19,7 +19,7 @@ import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { AccountSelector } from "src/pageComponents/finance/AccountSelector";
-import { TenantSelector } from "src/pageComponents/tenant/TenantSelector"; 
+import { TenantSelector } from "src/pageComponents/tenant/TenantSelector";
 
 export enum SearchType {
     account = "account",
@@ -31,11 +31,11 @@ interface Props {
   accountName?: string;
   // 展示账户或租户下拉搜索，不传就不展示,同时区分后端接口，值为tenant时，获取租户的记录
   searchType?: SearchType;
-  // 列表中是否展示账户 
+  // 列表中是否展示账户
   showAccountName?: boolean;
-  // 列表中是否展示租户 
+  // 列表中是否展示租户
   showTenantName?: boolean;
-  // 列表中是否展示IP地址和操作者ID 
+  // 列表中是否展示IP地址和操作者ID
   showAuditInfo?: boolean;
 }
 
