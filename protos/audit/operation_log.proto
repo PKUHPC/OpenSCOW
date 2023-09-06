@@ -265,6 +265,15 @@ message TenantPay {
   common.Money amount = 2;
 }
 
+message BlockAccount {
+  string account_name = 1;
+  string user_id = 2;
+}
+
+message UnblockAccount {
+  string account_name = 1;
+  string user_id = 2;
+}
 
 message CreateOperationLogRequest {
   string operator_user_id = 1;
@@ -318,6 +327,8 @@ message CreateOperationLogRequest {
     SetPlatformBilling set_platform_billing = 48;
     CreateTenant create_tenant = 49;
     TenantPay tenant_pay = 50;
+    BlockAccount block_account = 51;
+    UnblockAccount unblock_account = 52;
   }
 }
 
@@ -376,6 +387,8 @@ message OperationLog {
     SetPlatformBilling set_platform_billing = 50;
     CreateTenant create_tenant = 51;
     TenantPay tenant_pay = 52;
+    BlockAccount block_account = 53;
+    UnblockAccount unblock_account = 54;
   }
 }
 

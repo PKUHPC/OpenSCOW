@@ -61,15 +61,17 @@ import type { GetRunningJobsSchema } from "src/pages/api/job/runningJobs";
 import type { GetOperationLogsSchema } from "src/pages/api/log/getOperationLog";
 import type { ChangeEmailSchema } from "src/pages/api/profile/changeEmail";
 import type { ChangePasswordSchema } from "src/pages/api/profile/changePassword";
-import { CheckPasswordSchema } from "src/pages/api/profile/checkPassword";
+import type { CheckPasswordSchema } from "src/pages/api/profile/checkPassword";
 import type { DewhitelistAccountSchema } from "src/pages/api/tenant/accountWhitelist/dewhitelistAccount";
 import type { GetWhitelistedAccountsSchema } from "src/pages/api/tenant/accountWhitelist/getWhitelistedAccounts";
 import type { WhitelistAccountSchema } from "src/pages/api/tenant/accountWhitelist/whitelistAccount";
+import type { BlockAccountSchema } from "src/pages/api/tenant/blockAccount";
 import type { ChangePasswordAsTenantAdminSchema } from "src/pages/api/tenant/changePassword";
 import type { CreateTenantSchema } from "src/pages/api/tenant/create";
 import type { CreateAccountSchema } from "src/pages/api/tenant/createAccount";
 import type { GetAccountsSchema } from "src/pages/api/tenant/getAccounts";
 import type { GetTenantsSchema } from "src/pages/api/tenant/getTenants";
+import type { UnblockAccountSchema } from "src/pages/api/tenant/unblockAccount";
 import type { AddUserToAccountSchema } from "src/pages/api/users/addToAccount";
 import type { BlockUserInAccountSchema } from "src/pages/api/users/blockInAccount";
 import type { CreateUserSchema } from "src/pages/api/users/create";
@@ -92,11 +94,11 @@ export const api = {
   setFetchState: apiClient.fromTypeboxRoute<typeof SetFetchStateSchema>("POST", "/api/admin/fetchJobs/setFetchState"),
   tenantFinancePay: apiClient.fromTypeboxRoute<typeof TenantFinancePaySchema>("POST", "/api/admin/finance/pay"),
   getTenantPayments: apiClient.fromTypeboxRoute<typeof GetTenantPaymentsSchema>("GET", "/api/admin/finance/payments"),
-  getPlatformUsersCounts: apiClient.fromTypeboxRoute<typeof GetPlatformUsersCountsSchema>("GET", "/api/admin/getPlatformUsersCounts"),
+  getAllAccounts: apiClient.fromTypeboxRoute<typeof GetAllAccountsSchema>("GET", "/api/admin/getAllAccounts"),
   getAllTenants: apiClient.fromTypeboxRoute<typeof GetAllTenantsSchema>("GET", "/api/admin/getAllTenants"),
   getAllUsers: apiClient.fromTypeboxRoute<typeof GetAllUsersSchema>("GET", "/api/admin/getAllUsers"),
-  getAllAccounts: apiClient.fromTypeboxRoute<typeof GetAllAccountsSchema>("GET", "/api/admin/getAllAccounts"),
   getClusterUsers: apiClient.fromTypeboxRoute<typeof GetClusterUsersSchema>("GET", "/api/admin/getClusterUsers"),
+  getPlatformUsersCounts: apiClient.fromTypeboxRoute<typeof GetPlatformUsersCountsSchema>("GET", "/api/admin/getPlatformUsersCounts"),
   getTenantUsers: apiClient.fromTypeboxRoute<typeof GetTenantUsersSchema>("GET", "/api/admin/getTenantUsers"),
   importUsers: apiClient.fromTypeboxRoute<typeof ImportUsersSchema>("POST", "/api/admin/importUsers"),
   queryStorageQuota: apiClient.fromTypeboxRoute<typeof QueryStorageQuotaSchema>("GET", "/api/admin/queryStorageQuota"),
@@ -129,16 +131,20 @@ export const api = {
   getJobInfo: apiClient.fromTypeboxRoute<typeof GetJobInfoSchema>("GET", "/api/job/jobInfo"),
   queryJobTimeLimit: apiClient.fromTypeboxRoute<typeof QueryJobTimeLimitSchema>("GET", "/api/job/queryJobTimeLimit"),
   getRunningJobs: apiClient.fromTypeboxRoute<typeof GetRunningJobsSchema>("GET", "/api/job/runningJobs"),
-  changePassword: apiClient.fromTypeboxRoute<typeof ChangePasswordSchema>("PATCH", "/api/profile/changePassword"),
+  getOperationLogs: apiClient.fromTypeboxRoute<typeof GetOperationLogsSchema>("GET", "/api/log/getOperationLog"),
   changeEmail: apiClient.fromTypeboxRoute<typeof ChangeEmailSchema>("PATCH", "/api/profile/changeEmail"),
+  changePassword: apiClient.fromTypeboxRoute<typeof ChangePasswordSchema>("PATCH", "/api/profile/changePassword"),
+  checkPassword: apiClient.fromTypeboxRoute<typeof CheckPasswordSchema>("GET", "/api/profile/checkPassword"),
   dewhitelistAccount: apiClient.fromTypeboxRoute<typeof DewhitelistAccountSchema>("DELETE", "/api/tenant/accountWhitelist/dewhitelistAccount"),
   getWhitelistedAccounts: apiClient.fromTypeboxRoute<typeof GetWhitelistedAccountsSchema>("GET", "/api/tenant/accountWhitelist/getWhitelistedAccounts"),
   whitelistAccount: apiClient.fromTypeboxRoute<typeof WhitelistAccountSchema>("PUT", "/api/tenant/accountWhitelist/whitelistAccount"),
+  blockAccount: apiClient.fromTypeboxRoute<typeof BlockAccountSchema>("PUT", "/api/tenant/blockAccount"),
   changePasswordAsTenantAdmin: apiClient.fromTypeboxRoute<typeof ChangePasswordAsTenantAdminSchema>("PATCH", "/api/tenant/changePassword"),
   createTenant: apiClient.fromTypeboxRoute<typeof CreateTenantSchema>("POST", "/api/tenant/create"),
   createAccount: apiClient.fromTypeboxRoute<typeof CreateAccountSchema>("POST", "/api/tenant/createAccount"),
   getAccounts: apiClient.fromTypeboxRoute<typeof GetAccountsSchema>("GET", "/api/tenant/getAccounts"),
   getTenants: apiClient.fromTypeboxRoute<typeof GetTenantsSchema>("GET", "/api/tenant/getTenants"),
+  unblockAccount: apiClient.fromTypeboxRoute<typeof UnblockAccountSchema>("PUT", "/api/tenant/unblockAccount"),
   addUserToAccount: apiClient.fromTypeboxRoute<typeof AddUserToAccountSchema>("POST", "/api/users/addToAccount"),
   blockUserInAccount: apiClient.fromTypeboxRoute<typeof BlockUserInAccountSchema>("PUT", "/api/users/blockInAccount"),
   createUser: apiClient.fromTypeboxRoute<typeof CreateUserSchema>("POST", "/api/users/create"),
@@ -150,6 +156,4 @@ export const api = {
   queryStorageUsage: apiClient.fromTypeboxRoute<typeof QueryStorageUsageSchema>("GET", "/api/users/storageUsage"),
   unblockUserInAccount: apiClient.fromTypeboxRoute<typeof UnblockUserInAccountSchema>("PUT", "/api/users/unblockInAccount"),
   unsetAdmin: apiClient.fromTypeboxRoute<typeof UnsetAdminSchema>("PUT", "/api/users/unsetAdmin"),
-  checkPassword: apiClient.fromTypeboxRoute<typeof CheckPasswordSchema>("GET", "/api/profile/checkPassword"),
-  getOperationLog: apiClient.fromTypeboxRoute<typeof GetOperationLogsSchema>("GET", "/api/log/getOperationLog"),
 };

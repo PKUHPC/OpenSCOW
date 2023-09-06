@@ -72,6 +72,8 @@ export const OperationType: OperationTypeEnum = {
   setPlatformBilling: "setPlatformBilling",
   createTenant: "createTenant",
   tenantPay: "tenantPay",
+  blockAccount: "blockAccount",
+  unblockAccount: "unblockAccount",
 };
 
 export const OperationLog = Type.Object({
@@ -147,6 +149,8 @@ export const OperationTypeTexts: { [key in LibOperationType]: string } = {
   setPlatformBilling: "设置平台作业计费",
   createTenant: "创建租户",
   tenantPay: "租户充值",
+  blockAccount: "封锁帐户",
+  unblockAccount: "解封帐户",
 };
 
 export const OperationCodeMap: { [key in LibOperationType]: string } = {
@@ -197,6 +201,8 @@ export const OperationCodeMap: { [key in LibOperationType]: string } = {
   setPlatformBilling: "040206",
   createTenant: "040301",
   tenantPay: "040302",
+  blockAccount: "040303",
+  unblockAccount: "040304",
 };
 
 export const getOperationDetail = (operationLog: OperationLogProto) => {
@@ -306,6 +312,10 @@ export const getOperationDetail = (operationLog: OperationLogProto) => {
       return `为租户${logPayload.tenantName}充值${moneyToString(logPayload.amount)}`;
     case "setPlatformBilling":
       return `设置平台的计费项${logPayload.path}价格为${moneyToString(logPayload.price)}元`;
+    case "blockAccount":
+      return `在租户${logPayload.tenantName}中封锁账户${logPayload.accountName}`;
+    case "unblockAccount":
+      return `在租户${logPayload.tenantName}中解封帐户${logPayload.accountName}`;
     default:
       return "-";
     }

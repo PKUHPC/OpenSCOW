@@ -10,13 +10,15 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { moneyToNumber } from "@scow/lib-decimal";
 import { Money } from "@scow/protos/build/common/money";
 import { Static } from "@sinclair/typebox";
-import { Button, Divider, Form, Input, Space, Table, Tag } from "antd";
+import { App, Button, Divider, Form, Input, Space, Table, Tag } from "antd";
 import { SortOrder } from "antd/es/table/interface";
 import Link from "next/link";
 import React, { useMemo, useState } from "react";
+import { api } from "src/apis";
 import { FilterFormContainer, FilterFormTabs } from "src/components/FilterFormContainer";
 import type { AdminAccountInfo, GetAccountsSchema } from "src/pages/api/tenant/getAccounts";
 import { moneyToString } from "src/utils/money";
@@ -41,9 +43,10 @@ const filteredStatuses = {
 type FilteredStatus = keyof typeof filteredStatuses;
 
 export const AccountTable: React.FC<Props> = ({
-  data, isLoading, showedTab,
+  data, isLoading, showedTab, reload,
 }) => {
 
+  const { message, modal } = App.useApp();
   const [form] = Form.useForm<FilterForm>();
 
   const [rangeSearchStatus, setRangeSearchStatus] = useState<FilteredStatus>("ALL");
@@ -175,6 +178,56 @@ export const AccountTable: React.FC<Props> = ({
                 <Link href={{ pathname: `/tenant/accounts/${r.accountName}/users` }}>
                 管理成员
                 </Link>
+                {
+                  r.blocked
+                    ? (
+                      <a onClick={() => {
+                        modal.confirm({
+                          title: "确认解除用户封锁？",
+                          icon: <ExclamationCircleOutlined />,
+                          content: `确认要在租户中${r.tenantName}解除账户${r.accountName}的封锁？`,
+                          onOk: async () => {
+                            await api.unblockAccount({
+                              body: {
+                                tenantName: r.tenantName,
+                                accountName: r.accountName,
+                              },
+                            })
+                              .then(() => {
+                                message.success("解封账户成功！");
+                                reload();
+                              });
+                          },
+                        });
+                      }}
+                      >
+                        解除封锁
+                      </a>
+                    ) : (
+                      <a onClick={() => {
+                        modal.confirm({
+                          title: "确认封锁用户？",
+                          icon: <ExclamationCircleOutlined />,
+                          content: `确认要在租户中${r.tenantName}封锁账户${r.accountName}？`,
+                          onOk: async () => {
+                            await api.blockAccount({
+                              body: {
+                                tenantName: r.tenantName,
+                                accountName: r.accountName,
+                              },
+                            })
+                              .then(() => {
+                                message.success("封锁帐户成功！");
+                                reload();
+                              });
+                          },
+                        });
+                      }}
+                      >
+                        封锁
+                      </a>
+                    )
+                }
               </Space>
             )}
           />
