@@ -56,7 +56,7 @@ export async function getUserDesktopsFilePath(
   const desktopDir = getDesktopConfig(cluser).desktopsDir;
   const userDesktopDir = join(userHomeDir, desktopDir);
   // make sure desktopsDir exists
-  await ssh.mkdir(userDesktopDir);
+  await executeAsUser(ssh, userId, logger, true, "mkdir", ["-p", userDesktopDir]);
   return join(userDesktopDir, "desktops.json");
 }
 
