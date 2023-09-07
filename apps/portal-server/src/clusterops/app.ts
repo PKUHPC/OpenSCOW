@@ -393,11 +393,22 @@ export const appOps = (cluster: string): AppOps => {
 
         const app = apps[sessionMetadata.appId];
 
+        // get connection config
+        // for apps running in containers, it can provide real ip and port info
+        const client = getAdapterClient(cluster);
+        const connectionConfig = await asyncClientCall(client.app, "getConnectionConfig", {
+          jobId: sessionMetadata.jobId,
+        });
+
         if (app.type === "web") {
           const infoFilePath = join(jobDir, SERVER_SESSION_INFO);
           if (await sftpExists(sftp, infoFilePath)) {
             const content = await sftpReadFile(sftp)(infoFilePath);
             const serverSessionInfo = JSON.parse(content.toString()) as ServerSessionInfoData;
+
+            serverSessionInfo.HOST = connectionConfig.host ?? serverSessionInfo.HOST;
+            serverSessionInfo.PORT = connectionConfig.port ?? serverSessionInfo.PORT;
+            serverSessionInfo.PASSWORD = connectionConfig.password ?? serverSessionInfo.PASSWORD;
 
             const { HOST, PORT, PASSWORD, ...rest } = serverSessionInfo;
             const customFormData = rest as {[key: string]: string};
@@ -418,7 +429,7 @@ export const appOps = (cluster: string): AppOps => {
           // try to read the host info
           if (await sftpExists(sftp, vncSessionInfoPath)) {
 
-            const host = (await sftpReadFile(sftp)(vncSessionInfoPath)).toString().trim();
+            const host = connectionConfig.host ?? (await sftpReadFile(sftp)(vncSessionInfoPath)).toString().trim();
 
             const outputFilePath = join(jobDir, VNC_OUTPUT_FILE);
             if (await sftpExists(sftp, outputFilePath)) {
@@ -447,8 +458,8 @@ export const appOps = (cluster: string): AppOps => {
                       code: "OK",
                       appId: sessionMetadata.appId,
                       host: ip || host,
-                      port: displayIdToPort(displayId!),
-                      password,
+                      port: connectionConfig.port ?? displayIdToPort(displayId!),
+                      password: connectionConfig.password ?? password,
                     };
                   });
                 }
@@ -461,8 +472,8 @@ export const appOps = (cluster: string): AppOps => {
                   return {
                     appId: sessionMetadata.appId,
                     host,
-                    port: displayIdToPort(displayId!),
-                    password,
+                    port: connectionConfig.port ?? displayIdToPort(displayId!),
+                    password: connectionConfig.password ?? password,
                   };
                 });
               }
