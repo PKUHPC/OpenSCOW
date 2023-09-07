@@ -309,6 +309,12 @@ export const appOps = (cluster: string): AppOps => {
 
           const app = apps[sessionMetadata.appId];
 
+          // get connection config
+          // for apps running in containers, it can provide real ip and port info
+          const connectionConfig = await asyncClientCall(client.app, "getConnectionConfig", {
+            jobId: sessionMetadata.jobId,
+          });
+
           let host: string | undefined = undefined;
           let port: number | undefined = undefined;
 
@@ -322,16 +328,14 @@ export const appOps = (cluster: string): AppOps => {
                 const content = await sftpReadFile(sftp)(infoFilePath);
                 const serverSessionInfo = JSON.parse(content.toString()) as ServerSessionInfoData;
 
-                host = serverSessionInfo.HOST;
-                port = serverSessionInfo.PORT;
+                host = connectionConfig.host ?? serverSessionInfo.HOST;
+                port = connectionConfig.port ?? serverSessionInfo.PORT;
               }
             } else {
             // for vnc apps,
             // try to find the output file and try to parse the display number
               const vncSessionInfoPath = join(jobDir, VNC_SESSION_INFO);
               if (await sftpExists(sftp, vncSessionInfoPath)) {
-                host = (await sftpReadFile(sftp)(vncSessionInfoPath)).toString().trim();
-
                 const outputFilePath = join(jobDir, VNC_OUTPUT_FILE);
                 if (await sftpExists(sftp, outputFilePath)) {
                   const content = (await sftpReadFile(sftp)(outputFilePath)).toString();
@@ -342,6 +346,9 @@ export const appOps = (cluster: string): AppOps => {
                   // ignored if displayId cannot be parsed
                   }
                 }
+
+                host = connectionConfig.host ?? (await sftpReadFile(sftp)(vncSessionInfoPath)).toString().trim();
+                port = connectionConfig.port ?? port;
               }
             }
           }
