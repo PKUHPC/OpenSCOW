@@ -77,7 +77,8 @@ export default /* #__PURE__*/typeboxRoute(AddUserToAccountSchema, async (req, re
   if (!info) { return; }
 
   const result = await checkNameMatch(identityId, name);
-
+  console.log("checkNameMatch result:", result);
+  console.log("checkNameMatch result:", JSON.stringify(result));
   if (result === "NotFound") {
     return { 404: { code: "USER_NOT_FOUND" as const } };
   }

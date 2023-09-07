@@ -90,17 +90,19 @@ export const AddUserButton: React.FC<Props> = ({ refresh, accountName, token }) 
   const onAddUser = async (identityId: string, name: string) => {
     await api.addUserToAccount({ body: { identityId, name, accountName } })
       .httpError(400, ({ code }) => {
+        console.log(code);
         if (code === "ID_NAME_NOT_MATCH") {
           message.error("您输入的用户ID和姓名不匹配。");
         }
       })
       .httpError(404, ({ code }) => {
+        console.log("apps/mis-web/src/pageComponents/users/AddUserButton.tsx code:", code);
         if (code === "USER_ALREADY_EXIST_IN_OTHER_TENANT") {
           message.error(`用户${name}已属于其他租户`);
         }
         else if (code === "ACCOUNT_OR_TENANT_NOT_FOUND") {
           message.error("租户或账户不存在");
-        } 
+        }
         else if (code === "USER_NOT_FOUND") {
           if (useBuiltinCreateUser()) {
             setModalShow(false);

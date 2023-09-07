@@ -25,6 +25,7 @@ export async function checkNameMatch(identityId: string, name: string): Promise<
   return await asyncUnaryCall(client, "checkUserNameMatch", {
     name, userId: identityId,
   }).then(({ match }) => {
+    console.log("checkNameMatch match:", match);
     return match ? "OK" : "NotMatch" as const;
   }).catch(handlegRPCError({
     [status.NOT_FOUND]: () => "NotFound" as const,
