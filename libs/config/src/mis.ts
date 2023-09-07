@@ -114,7 +114,7 @@ export const MisConfigSchema = Type.Object({
   )),
 
   customChargeTypes: Type.Optional(Type.Array(
-    Type.String(), { description: "用户自定义消费类型列表" },
+    Type.String(), { description: "用户自定义可查询的消费类型列表" },
   )),
 });
 

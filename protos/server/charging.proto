@@ -66,40 +66,36 @@ message ChargeRecord {
   string comment = 7;
 }
 
-message AccountOfTenant {
+// 充值记录及消费记录请求target
+message AccountOfTenantTarget {
   string account_name = 1;
   string tenant_name = 2;
 }
-
-message AccountsOfTenant {
+message AccountsOfTenantTarget {
   string tenant_name = 1;
 }
-
-message Tenant {
+message TenantTarget {
   string tenant_name = 1;
 }
-
-message AllTenants {
+message AllTenantsTarget {
 }
-
-message AccountsOfAllTenants {
-
+message AccountsOfAllTenantsTarget {
 }
 
 message GetChargeRecordsRequest {
   google.protobuf.Timestamp start_time = 1;
   google.protobuf.Timestamp end_time = 2;
   oneof target {
-    // 返回该这个租户（tenantName）下这个账户（accountName）的消费记录
-    AccountOfTenant account_of_tenant = 3;
+    // 返回这个租户（tenantName）下这个账户（accountName）的消费记录
+    AccountOfTenantTarget account_of_tenant = 3;
     // 返回这个租户（tenantName）下所有账户的消费记录
-    AccountsOfTenant accounts_of_tenant = 4;
+    AccountsOfTenantTarget accounts_of_tenant = 4;
     // 返回所有租户下所有账户的消费记录
-    AccountsOfAllTenants accounts_of_all_tenants = 5;
+    AccountsOfAllTenantsTarget accounts_of_all_tenants = 5;
     // 返回这个租户（tenantName）的租户消费记录
-    Tenant tenant = 6;
+    TenantTarget tenant = 6;
     // 返回所有租户的租户消费记录
-    AllTenants all_tenants = 7;
+    AllTenantsTarget all_tenants = 7;
   }
 }
 
@@ -125,16 +121,17 @@ message GetPaymentRecordsRequest {
   google.protobuf.Timestamp end_time = 2;
 
   oneof target {
-    // 返回该这个租户（tenantName）下这个账户（accountName）的充值记录
-    AccountOfTenant account_of_tenant = 3;
+    // 返回这个租户（tenantName）下这个账户（accountName）的充值记录
+    AccountOfTenantTarget account_of_tenant = 3;
     // 返回这个租户（tenantName）下所有账户的充值记录
-    AccountsOfTenant accounts_of_tenant = 4;
+    AccountsOfTenantTarget accounts_of_tenant = 4;
     // 返回这个租户（tenantName）的充值记录
-    Tenant tenant = 5;
-    // 返回该所有租户充值记录
-    AllTenants all_tenants = 6;
+    TenantTarget tenant = 5;
+    // 返回所有租户充值记录
+    AllTenantsTarget all_tenants = 6;
   }
 }
+
 message GetPaymentRecordsResponse {
   repeated PaymentRecord results = 1;
   optional common.Money total = 2;
