@@ -66,6 +66,26 @@ message ChargeRecord {
   string comment = 7;
 }
 
+message AccountOfTenant {
+  string account_name = 1;
+  string tenant_name = 2;
+}
+
+message AccountsOfTenant {
+  string tenant_name = 1;
+}
+
+message Tenant {
+  string tenant_name = 1;
+}
+
+message AllTenants {
+}
+
+message AccountsOfAllTenants {
+
+}
+
 // If account_name is set, return records of the account, ignoring tenant_name.
 // If account_name is not set and tenant_name is set, return records of the
 // tenant. If none is set, return all
@@ -73,9 +93,21 @@ message ChargeRecord {
 message GetChargeRecordsRequest {
   google.protobuf.Timestamp start_time = 1;
   google.protobuf.Timestamp end_time = 2;
-  optional string tenant_name = 3;
-  optional string account_name = 4;
-  optional bool is_platform_records = 5;
+  // optional string tenant_name = 3;
+  // optional string account_name = 4;
+  // optional bool is_platform_records = 5;
+  oneof target {
+    // 返回该这个租户（tenantName）下这个账户（accountName）的消费记录
+    AccountOfTenant account_of_tenant = 3;
+    // 返回这个租户（tenantName）下所有账户的消费记录
+    AccountsOfTenant accounts_of_tenant = 4;
+    // 返回所有租户下所有账户的消费记录
+    AccountsOfAllTenants accounts_of_all_tenants = 5;
+    // 返回这个租户（tenantName）的租户消费记录
+    Tenant tenant = 6;
+    // 返回所有租户的租户消费记录
+    AllTenants all_tenants = 7;
+  }
 }
 
 message GetChargeRecordsResponse {
@@ -98,22 +130,6 @@ message PaymentRecord {
 message GetPaymentRecordsRequest {
   google.protobuf.Timestamp start_time = 1;
   google.protobuf.Timestamp end_time = 2;
-
-  message AccountOfTenant {
-    string account_name = 1;
-    string tenant_name = 2;
-  }
-
-  message AccountsOfTenant {
-    string tenant_name = 1;
-  }
-
-  message Tenant {
-    string tenant_name = 1;
-  }
-
-  message AllTenants {
-  }
 
   oneof target {
     // 返回该这个租户（tenantName）下这个账户（accountName）的充值记录

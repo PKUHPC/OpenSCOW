@@ -18,6 +18,7 @@ import { useCallback, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
+import { SearchType } from "src/models/User";
 import { publicConfig } from "src/utils/config";
 import { CHARGE_TYPE_OTHERS } from "src/utils/constants";
 
@@ -25,10 +26,10 @@ import { AccountSelector } from "./AccountSelector";
 
 interface Props {
   accountName?: string;
-  tenantName?: string;
   showAccountName: boolean;
   showTenantName: boolean;
   isPlatformRecords?: boolean;
+  searchType?: SearchType;
 }
 
 interface FilterForm {
@@ -39,7 +40,7 @@ interface FilterForm {
 const now = dayjs();
 
 export const ChargeTable: React.FC<Props> = ({
-  accountName, tenantName, showAccountName, showTenantName, isPlatformRecords }) => {
+  accountName, showAccountName, showTenantName, isPlatformRecords, searchType }) => {
 
   const [form] = Form.useForm<FilterForm>();
 
@@ -57,10 +58,10 @@ export const ChargeTable: React.FC<Props> = ({
 
       return api.getCharges({ query: {
         accountName,
-        tenantName,
         startTime: query.time[0].toISOString(),
         endTime: query.time[1].toISOString(),
         isPlatformRecords,
+        searchType,
       } });
 
     }, [query]),

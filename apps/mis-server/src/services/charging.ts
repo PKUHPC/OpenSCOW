@@ -193,21 +193,54 @@ export const chargingServiceServer = plugin((server) => {
         total: decimalToMoney(records.reduce((prev, curr) => prev.plus(curr.amount), new Decimal(0))),
       }];
     },
-
+    /**
+     *
+     * case tenant:返回这个租户（tenantName）的消费记录
+     * case allTenants: 返回所有租户消费记录
+     * case accountOfTenant: 返回该这个租户（tenantName）下这个账户（accountName）的消费记录
+     * case accountsOfTenant: 返回这个租户（tenantName）下所有账户的消费记录
+     * case accountsOfAllTenants: 返回所有租户下所有账户的消费记录
+     *
+     * @returns
+     */
     getChargeRecords: async ({ request, em }) => {
-      const { tenantName, accountName, endTime, startTime, isPlatformRecords }
+      const { startTime, endTime, target }
         = ensureNotUndefined(request, ["startTime", "endTime"]);
+
+      let searchParam = {};
+      switch (target?.$case)
+      {
+      // 当前租户的租户消费记录
+      case "tenant":
+        searchParam = { tenantName: target[target.$case].tenantName, accountName: undefined };
+        break;
+        // 所有租户的租户消费记录
+      case "allTenants":
+        searchParam = { accountName: undefined };
+        break;
+        // 当前租户下当前账户的消费记录
+      case "accountOfTenant":
+        searchParam = { tenantName: target[target.$case].tenantName, accountName: target[target.$case].accountName };
+        break;
+        // 当前租户下所有账户的消费记录
+      case "accountsOfTenant":
+        searchParam = { tenantName: target[target.$case].tenantName, accountName: { $ne:null } };
+        break;
+        // 所有租户下所有账户的消费记录
+      case "accountsOfAllTenants":
+        searchParam = { accountName: { $ne:null } };
+        break;
+      default:
+        searchParam = {};
+      }
 
       const records = await em.find(ChargeRecord, {
         time: { $gte: startTime, $lte: endTime },
-        ...accountName !== undefined ? { accountName } : {},
-        ...tenantName !== undefined ? { tenantName } : {},
+        ...searchParam,
       }, { orderBy: { time: QueryOrder.DESC } });
 
-      const reply = isPlatformRecords ? records.filter((x) => x.accountName) : records;
-
       return [{
-        results: reply.map((x) => ({
+        results: records.map((x) => ({
           tenantName: x.tenantName,
           accountName: x.accountName,
           amount: decimalToMoney(x.amount),

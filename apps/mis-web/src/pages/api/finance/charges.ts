@@ -16,7 +16,7 @@ import { moneyToNumber } from "@scow/lib-decimal";
 import { ChargingServiceClient } from "@scow/protos/build/server/charging";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
-import { PlatformRole, TenantRole, UserRole } from "src/models/User";
+import { PlatformRole, SearchType, TenantRole, UserInfo, UserRole } from "src/models/User";
 import { ensureNotUndefined } from "src/utils/checkNull";
 import { getClient } from "src/utils/client";
 
@@ -30,6 +30,7 @@ export const ChargeInfo = Type.Object({
   tenantName: Type.String(),
 });
 export type ChargeInfo = Static<typeof ChargeInfo>;
+
 
 export const GetChargesSchema = typeboxRouteSchema({
   method: "GET",
@@ -47,10 +48,11 @@ export const GetChargesSchema = typeboxRouteSchema({
 
     accountName: Type.Optional(Type.String()),
 
-    tenantName: Type.Optional(Type.String()),
-
-    // 如果isPlatformRecords为true,则只查询租户下的平台账户消费记录
+    // 是否为平台管理下的记录：如果是则需查询所有租户，如果不是只查询当前租户
     isPlatformRecords: Type.Optional(Type.Boolean()),
+
+    // 查询消费记录种类：平台账户消费记录或租户消费记录
+    searchType: Type.Optional(Type.Enum(SearchType)),
   }),
 
   responses: {
@@ -62,36 +64,75 @@ export const GetChargesSchema = typeboxRouteSchema({
 });
 
 export default typeboxRoute(GetChargesSchema, async (req, res) => {
-  const { endTime, startTime, accountName, tenantName, isPlatformRecords } = req.query;
+  const { endTime, startTime, accountName, isPlatformRecords, searchType } = req.query;
 
-  const auth = authenticate((i) =>
-    (i.accountAffiliations.some((x) => x.accountName === accountName && x.role !== UserRole.USER)
-      || i.platformRoles.includes(PlatformRole.PLATFORM_ADMIN)
-      || i.platformRoles.includes(PlatformRole.PLATFORM_FINANCE)
-      || i.tenantRoles.includes(TenantRole.TENANT_ADMIN)
-      || i.tenantRoles.includes(TenantRole.TENANT_FINANCE)
-    ));
-
-  const info = await auth(req, res);
-
-  if (!info) { return; }
+  let info: UserInfo | undefined;
+  // check whether the user can access the account
+  if (accountName) {
+    // 如果账户名存在，则查询的是账户管理下的账户消费记录。只有账户管理员或拥有者可以查看该账户消费记录
+    info = await authenticate((i) =>
+      i.accountAffiliations.some((x) => x.accountName === accountName && x.role !== UserRole.USER),
+    )(req, res);
+    if (!info) { return; }
+  } else {
+    info = await authenticate((i) =>
+      i.platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ||
+      i.platformRoles.includes(PlatformRole.PLATFORM_FINANCE) ||
+      i.tenantRoles.includes(TenantRole.TENANT_FINANCE) ||
+      i.tenantRoles.includes(TenantRole.TENANT_ADMIN),
+    )(req, res);
+    if (!info) { return; }
+  }
 
   const client = getClient(ChargingServiceClient);
 
   const reply = ensureNotUndefined(await asyncClientCall(client, "getChargeRecords", {
-    accountName,
     startTime,
     endTime,
-    // 如果账户不为undefined则查询租户下该账户的消费记录
-    // 如果账户为undefined，租户不为undefined则查询租户下所有消费记录
-    // 如果账户和租户均为undefined,则查询所有租户下的消费记录
-    tenantName: accountName ? info.tenant : tenantName,
-    isPlatformRecords,
+    target: (() => {
+      if (accountName) {
+        // 如果 accountName 不为 undefined，则查询当前租户下该账户的消费记录
+        return {
+          $case: "accountOfTenant" as const,
+          accountOfTenant: { tenantName: info.tenant, accountName: accountName },
+        };
+      } else {
+        if (searchType === SearchType.ACCOUNT) {
+          if (isPlatformRecords) {
+            // 查询平台下所有租户的账户消费记录
+            return {
+              $case: "accountsOfAllTenants" as const,
+              accountsOfAllTenants: { },
+            };
+          } else {
+            // 查询当前租户的账户消费记录
+            return {
+              $case: "accountsOfTenant" as const,
+              accountsOfTenant: { tenantName: info.tenant },
+            };
+          }
+        } else {
+          if (isPlatformRecords) {
+            // 查询平台下所有租户的租户消费记录
+            return {
+              $case: "allTenants" as const,
+              allTenants: { },
+            };
+          } else {
+            // 查询当前租户的租户消费记录
+            return {
+              $case: "tenant" as const,
+              tenant: { tenantName: info.tenant },
+            };
+          }
+        }
+      }
+    })(),
   }), ["total"]);
 
   const accounts = reply.results.map((x) => {
     // 如果是查询平台账户消费记录或者查询账户下的消费记录时，确保accuntName存在
-    const obj = (isPlatformRecords || accountName) ?
+    const obj = (searchType === SearchType.ACCOUNT || accountName) ?
       ensureNotUndefined(x, ["time", "amount", "accountName"]) : ensureNotUndefined(x, ["time", "amount"]);
 
     return {

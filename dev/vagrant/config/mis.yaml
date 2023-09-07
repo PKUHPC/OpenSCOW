@@ -103,3 +103,6 @@ createUser:
 #       # type CustomAmountStrategyFunction = (jobInfo: JobInfo) => number | Promise<number>;
 #       # JobInfo为apps/mis-server/src/bl/PriceMap.ts中的JobInfo类型，提供作业的用量信息
 #     script: "my-strategy.js"
+
+# 自定义可查询消费类型
+# customChargeTypes: ["月租", "存储费"]

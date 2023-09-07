@@ -13,11 +13,11 @@
 import { NextPage } from "next";
 import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
-import { PlatformRole } from "src/models/User";
+import { PlatformRole, SearchType } from "src/models/User";
 import { ChargeTable } from "src/pageComponents/finance/ChargeTable";
 import { Head } from "src/utils/head";
 
-export const PlatformAccountsExpencesPage: NextPage = requireAuth(
+export const PlatformAccountsChargesPage: NextPage = requireAuth(
   (u) => u.platformRoles.includes(PlatformRole.PLATFORM_FINANCE) ||
       u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))(
   () => {
@@ -29,9 +29,14 @@ export const PlatformAccountsExpencesPage: NextPage = requireAuth(
         <Head title={title} />
         <PageTitle titleText={title}>
         </PageTitle>
-        <ChargeTable showAccountName={true} showTenantName={true} isPlatformRecords={true} />
+        <ChargeTable
+          showAccountName={true}
+          showTenantName={true}
+          isPlatformRecords={true}
+          searchType={SearchType.ACCOUNT}
+        />
       </div>
     );
   });
 
-export default PlatformAccountsExpencesPage;
+export default PlatformAccountsChargesPage;

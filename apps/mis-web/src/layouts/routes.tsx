@@ -93,7 +93,7 @@ export const platformAdminRoutes: (platformRoles: PlatformRole[]) => NavItemProp
           {
             Icon: BookOutlined,
             text: "账户消费记录",
-            path: "/admin/finance/accountExpenceRecords",
+            path: "/admin/finance/accountChargeRecords",
           },
         ],
       },
@@ -246,7 +246,7 @@ export const tenantRoutes: (tenantRoles: TenantRole[], token: string) => NavItem
               {
                 Icon: BookOutlined,
                 text: "账户消费记录",
-                path: "/tenant/finance/accountExpenceRecords",
+                path: "/tenant/finance/accountChargeRecords",
               },
             ],
           },
