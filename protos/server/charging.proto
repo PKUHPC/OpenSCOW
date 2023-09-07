@@ -86,16 +86,9 @@ message AccountsOfAllTenants {
 
 }
 
-// If account_name is set, return records of the account, ignoring tenant_name.
-// If account_name is not set and tenant_name is set, return records of the
-// tenant. If none is set, return all
-// If isPlatformRecords is true, return platform accounts charge records.
 message GetChargeRecordsRequest {
   google.protobuf.Timestamp start_time = 1;
   google.protobuf.Timestamp end_time = 2;
-  // optional string tenant_name = 3;
-  // optional string account_name = 4;
-  // optional bool is_platform_records = 5;
   oneof target {
     // 返回该这个租户（tenantName）下这个账户（accountName）的消费记录
     AccountOfTenant account_of_tenant = 3;
