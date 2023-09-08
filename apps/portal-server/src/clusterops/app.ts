@@ -309,17 +309,17 @@ export const appOps = (cluster: string): AppOps => {
 
           const app = apps[sessionMetadata.appId];
 
-          // get connection config
-          // for apps running in containers, it can provide real ip and port info
-          const connectionConfig = await asyncClientCall(client.app, "getConnectionConfig", {
-            jobId: sessionMetadata.jobId,
-          });
-
           let host: string | undefined = undefined;
           let port: number | undefined = undefined;
 
           // judge whether the app is ready
           if (runningJobInfo && runningJobInfo.state === "RUNNING") {
+            // get connection config
+            // for apps running in containers, it can provide real ip and port info
+            const connectionConfig = await asyncClientCall(client.app, "getConnectionConfig", {
+              jobId: sessionMetadata.jobId,
+            });
+
             if (app.type === "web") {
             // for server apps,
             // try to read the SESSION_INFO file to get port and password
