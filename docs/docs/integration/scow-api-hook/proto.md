@@ -11,11 +11,12 @@ SCOW API和Hook的数据结构和服务都通过[Protocol Buffer](https://protob
 
 我们将SCOW API和Hook的proto文件放到了代码仓库中，您可以直接从代码仓库中获取。代码仓库中`protos`目录下则为proto文件：[master分支protos目录链接](%REPO_FILE_URL%/protos)
 
-proto文件分为`common`, `portal`，`server`和`hook`。其中，
+proto文件分为`common`, `portal`, `server`, `audit`和`hook`。其中，
 
 - `common`中定义了公用的数据结构
 - `portal`定义了门户系统的SCOW API。`portal-server`门户系统后端实现了`portal`中定义的服务，您可以通过`portal`下的文件与`portal-server`交互
 - `server`定义了管理系统的SCOW API。`mis-server`管理系统后端实现了`server`中定义的服务，您可以通过`server`下的文件与`mis-server`交互
+- `audit`定义了审计系统的SCOW API。`audit-server`审计系统系统后端实现了`audit`中定义的服务，您可以通过`audit`下的文件与`audit-server`交互
 - `hook`定义了SCOW Hook的事件和服务。`portal-server`和`mis-server`将会通过`hook`下的文件与您配置的SCOW Hook服务器交互
 
 除了直接从代码仓库中获取，我们更推荐使用工具获取Protobuf文件。您可以通过以下方式获取到SCOW的Protobuf文件

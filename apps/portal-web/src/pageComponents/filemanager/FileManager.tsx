@@ -394,7 +394,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
           </Button>
           {
             publicConfig.ENABLE_SHELL ? (
-              <Link href={`/shell/${cluster.id}/${loginNode}${path}`} target="_blank" legacyBehavior>
+              <Link href={`/shell/${cluster.id}/${loginNode}${path}`} target="_blank">
                 <Button icon={<MacCommandOutlined />}>
                   在终端中打开
                 </Button>

@@ -154,7 +154,7 @@ it("should return an array of desktops from host", async () => {
   (getUserHomedir as jest.Mock).mockReturnValue(join("/home/test", desktopTestsFolder()));
 
   const desktops = await listUserDesktopsFromHost(target, testCluster, userId, console);
-  expect(executeAsUser).toHaveBeenCalledOnce();
+  expect(executeAsUser).toHaveBeenCalledTimes(4);
   expect(desktops).toEqual(
     {
       host: target,

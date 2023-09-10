@@ -16,7 +16,7 @@ jobs:
     name: Update scow-vagrant
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Create version file for tag commit
         if: github.ref_type == 'tag'
