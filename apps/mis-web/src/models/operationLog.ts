@@ -79,6 +79,7 @@ export const OperationType: OperationTypeEnum = {
 export const OperationLog = Type.Object({
   operationLogId: Type.Number(),
   operatorUserId: Type.String(),
+  operatorUserName: Type.String(),
   operatorIp: Type.String(),
   operationCode: Type.String(),
   operationType: Type.Enum(OperationType),

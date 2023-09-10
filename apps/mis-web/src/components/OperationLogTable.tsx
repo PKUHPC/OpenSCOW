@@ -60,7 +60,7 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
 
   const [form] = Form.useForm<FilterForm>();
 
-  const [pageInfo, setPageInfo] = useState<PageInfo>({ page: 1, pageSize: 10 });
+  const [pageInfo, setPageInfo] = useState<PageInfo>({ page: 1, pageSize: 50 });
 
   const getOperatorUserIds = () => {
     if (queryType === OperationLogQueryType.USER) {
@@ -76,8 +76,8 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
       operatorUserIds: getOperatorUserIds().join(","),
       operationType: query.operationType,
       operationResult: query.operationResult,
-      startTime: query.operationTime?.[0].startOf("day").toISOString(),
-      endTime: query.operationTime?.[1].endOf("day").toISOString(),
+      startTime: query.operationTime?.[0].toISOString(),
+      endTime: query.operationTime?.[1].toISOString(),
       operationTargetAccountName: accountName,
       page: pageInfo.page,
       pageSize: pageInfo.pageSize,
@@ -129,7 +129,7 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
             </Form.Item>
           )}
           <Form.Item label="操作时间" name="operationTime">
-            <DatePicker.RangePicker allowClear={false} presets={defaultPresets} />
+            <DatePicker.RangePicker showTime allowClear={false} presets={defaultPresets} />
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit">搜索</Button>
@@ -168,7 +168,11 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
           title="操作时间"
           render={formatDateTime}
         />
-        <Table.Column<OperationLog> dataIndex="operatorUserId" title="操作员" />
+        <Table.Column<OperationLog>
+          dataIndex="operatorUserId"
+          title="操作员"
+          render={(_, r) => (`${r.operatorUserId} (${r.operatorUserName})`)}
+        />
         <Table.Column<OperationLog> dataIndex="operatorIp" title="操作IP" />
       </Table>
     </div>

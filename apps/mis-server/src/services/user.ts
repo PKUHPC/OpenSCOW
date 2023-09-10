@@ -554,6 +554,19 @@ export const userServiceServer = plugin((server) => {
       }];
     },
 
+    getUsersByIds: async ({ request, em }) => {
+      const { userIds } = request;
+
+      const users = await em.find(User, { userId: { $in: userIds } });
+
+      return [{
+        users: users.map((x) => ({
+          userId: x.userId,
+          userName: x.name,
+        })),
+      }];
+    },
+
     getPlatformUsersCounts: async ({ em }) => {
 
       const totalCount = await em.count(User);
