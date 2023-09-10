@@ -15,12 +15,12 @@ import React, { useCallback } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { Section } from "src/components/Section";
-import { Localized } from "src/i18n";
+import { Localized, useI18nTranslateToString } from "src/i18n";
 import { RunningJobInfo } from "src/models/job";
 import { RunningJobInfoTable } from "src/pageComponents/job/RunningJobTable";
 import { User } from "src/stores/UserStore";
 import { publicConfig } from "src/utils/config";
-import useI18nTranslateToString from "src/utils/useI18nTranslateToString";
+
 
 interface Props {
   user: User;

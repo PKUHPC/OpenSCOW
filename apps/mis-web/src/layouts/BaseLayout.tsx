@@ -16,10 +16,11 @@ import { JumpToAnotherLink } from "@scow/lib-web/build/layouts/base/header/compo
 import { PropsWithChildren, useMemo } from "react";
 import { useStore } from "simstate";
 import { LanguageSwitcher } from "src/components/LanguageSwitcher";
+import { useI18nTranslateToString } from "src/i18n";
 import { getAvailableRoutes } from "src/layouts/routes";
 import { UserStore } from "src/stores/UserStore";
 import { publicConfig } from "src/utils/config";
-import useI18nTranslateToString from "src/utils/useI18nTranslateToString";
+
 
 interface Props {
   footerText: string;

@@ -23,13 +23,14 @@ import { USE_MOCK } from "src/apis/useMock";
 import { requireAuth } from "src/auth/requireAuth";
 import { AuthResultError, ssrAuthenticate } from "src/auth/server";
 import { UnifiedErrorPage } from "src/components/errorPages/UnifiedErrorPage";
+import { useI18nTranslateToString } from "src/i18n";
 import { AccountInfoSection } from "src/pageComponents/dashboard/AccountInfoSection";
 import { JobsSection } from "src/pageComponents/dashboard/JobsSection";
 import { getUserStatus, GetUserStatusSchema } from "src/pages/api/dashboard/status";
 import { UserStore } from "src/stores/UserStore";
 import { ensureNotUndefined } from "src/utils/checkNull";
 import { Head } from "src/utils/head";
-import useI18nTranslateToString from "src/utils/useI18nTranslateToString";
+
 
 export type AccountInfo = Omit<AccountStatus, "balance" | "jobChargeLimit" | "usedJobCharge"> & {
   balance: number;

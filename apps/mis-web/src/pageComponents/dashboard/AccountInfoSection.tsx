@@ -16,9 +16,9 @@ import { Alert, Col, Row, Statistic, StatisticProps } from "antd";
 import React from "react";
 import { Section } from "src/components/Section";
 import { StatCard } from "src/components/StatCard";
+import { useI18nTranslateToString } from "src/i18n";
 import { UserStatus } from "src/models/User";
 import type { AccountInfo } from "src/pages/dashboard";
-import useI18nTranslateToString from "src/utils/useI18nTranslateToString";
 import styled from "styled-components";
 
 
