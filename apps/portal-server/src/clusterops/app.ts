@@ -320,6 +320,10 @@ export const appOps = (cluster: string): AppOps => {
               jobId: sessionMetadata.jobId,
             });
 
+            // 对于k8s这种通过容器运行作业的集群，当把容器中的作业工作目录挂载到宿主机中时，目录中新生成的文件不会马上反映到宿主机中，
+            // 具体体现为sftpExists无法找到新生成的SERVER_SESSION_INFO和VNC_SESSION_INFO文件，必须实际读取一次目录，才能识别到它们
+            await sftpReaddir(sftp)(jobDir);
+
             if (app.type === "web") {
             // for server apps,
             // try to read the SESSION_INFO file to get port and password
