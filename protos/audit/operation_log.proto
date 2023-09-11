@@ -268,11 +268,13 @@ message TenantPay {
 message BlockAccount {
   string account_name = 1;
   string user_id = 2;
+  string tenant_name =3;
 }
 
 message UnblockAccount {
   string account_name = 1;
   string user_id = 2;
+  string tenant_name =3;
 }
 
 message CreateOperationLogRequest {

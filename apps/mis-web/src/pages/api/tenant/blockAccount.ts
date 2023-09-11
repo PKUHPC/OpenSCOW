@@ -86,7 +86,6 @@ export default /* #__PURE__*/route(BlockAccountSchema, async (req, res) => {
         } };
       } else {
         await callLog(logInfo, OperationResult.FAIL);
-        console.log(BlockAccountTexts[res.result]);
         return { 200: {
           executed: false,
           reason: BlockAccountTexts[res.result],
