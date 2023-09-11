@@ -64,6 +64,10 @@ export interface PublicRuntimeConfig {
   VERSION_TAG: string | undefined;
 
   AUDIT_DEPLOYED: boolean;
+
+  CUSTOM_I18N_CONFIG: {
+    COMMON_PASSWORD_PATTERN_MESSAGE: I18nType | undefined;
+  },
 }
 
 export const runtimeConfig: ServerRuntimeConfig = getConfig().serverRuntimeConfig;
@@ -86,7 +90,14 @@ export type CustomAmountStrategy = {
   comment?: string | undefined;
 }
 
-
 export const getClusterName = (clusterId: string) => {
   return publicConfig.CLUSTERS[clusterId]?.name || clusterId;
 };
+
+export type I18nType = {
+  i18n: {
+    default: string,
+    zh_cn: string,
+    en: string,
+  }
+}

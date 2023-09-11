@@ -14,6 +14,8 @@ import { GetConfigFn, getConfigFromFile } from "@scow/lib-config";
 import { Static, Type } from "@sinclair/typebox";
 import { DEFAULT_CONFIG_BASE_PATH } from "src/constants";
 
+import { I18nTypeSchema } from "./type";
+
 export const ScowApiConfigSchema = Type.Object({
   auth: Type.Optional(Type.Object({
     token: Type.Optional(Type.String({ description: "允许使用Token认证，token的值" })),
@@ -31,10 +33,14 @@ export const CommonConfigSchema = Type.Object({
       description: "用户密码的正则规则",
       default: "^(?=.*\d)(?=.*[a-zA-Z])(?=.*[`~!@#\$%^&*()_+\-[\];',./{}|:\"<>?]).{8,}$",
     }),
-    errorMessage: Type.String({
-      description: "如果密码不符合规则显示什么",
-      default: "必须包含字母、数字和符号，长度大于等于8位",
-    }),
+    errorMessage: Type.Union([
+      Type.String({
+        description: "如果密码不符合规则显示什么",
+        default: "必须包含字母、数字和符号，长度大于等于8位",
+      }),
+      Type.Object({ i18n: I18nTypeSchema }, { description: "系统内展示文本是否采用国际化类型" }),
+    ]),
+
   }, { description: "创建用户、修改密码时的密码的规则" }),
 
   scowHook: Type.Optional(ScowHookConfigSchema),

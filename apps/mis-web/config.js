@@ -134,7 +134,10 @@ const buildRuntimeConfig = async (phase, basePath) => {
     PORTAL_URL: config.PORTAL_DEPLOYED ? (config.PORTAL_URL || misConfig.portalUrl || "") : undefined,
 
     PASSWORD_PATTERN: commonConfig.passwordPattern?.regex,
-    PASSWORD_PATTERN_MESSAGE: commonConfig.passwordPattern?.errorMessage,
+
+    // 兼容原有系统的字符串形式的配置项
+    PASSWORD_PATTERN_MESSAGE: typeof commonConfig.passwordPattern?.errorMessage === "string"
+      ? commonConfig.passwordPattern?.errorMessage : commonConfig.passwordPattern?.errorMessage.i18n.default,
 
     BASE_PATH: basePath,
 
@@ -147,6 +150,12 @@ const buildRuntimeConfig = async (phase, basePath) => {
     VERSION_TAG: versionTag,
 
     AUDIT_DEPLOYED:  config.AUDIT_DEPLOYED,
+
+    CUSTOM_I18N_CONFIG: {
+      // 只记录i18n类型的配置项
+      COMMON_PASSWORD_PATTERN_MESSAGE: typeof commonConfig.passwordPattern?.errorMessage === "string"
+        ? undefined : commonConfig.passwordPattern?.errorMessage,
+    },
   };
 
   if (!building) {
