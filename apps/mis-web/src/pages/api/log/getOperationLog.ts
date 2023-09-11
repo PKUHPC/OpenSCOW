@@ -154,7 +154,7 @@ export default typeboxRoute(GetOperationLogsSchema, async (req, res) => {
     return {
       operationLogId: x.operationLogId,
       operatorUserId: x.operatorUserId,
-      operatorUserName: userMap.get(x.operatorUserId),
+      operatorUserName: userMap.get(x.operatorUserId) || "",
       operatorIp: x.operatorIp,
       operationResult: x.operationResult,
       operationTime: x.operationTime,
