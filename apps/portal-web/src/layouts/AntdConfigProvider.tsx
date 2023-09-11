@@ -15,9 +15,11 @@ import "dayjs/locale/zh-cn";
 import { AntdConfigProvider as LibAntdConfigProvider } from "@scow/lib-web/build/layouts/AntdConfigProvider";
 import { useDarkMode } from "@scow/lib-web/build/layouts/darkMode";
 import { App, ConfigProvider, theme } from "antd";
+import { Locale } from "antd/lib/locale";
 import enUSlocale from "antd/locale/en_US";
 import zhCNlocale from "antd/locale/zh_CN";
 import React from "react";
+import { useI18n } from "src/i18n";
 import { ThemeProvider } from "styled-components";
 
 type Props = React.PropsWithChildren<{
@@ -39,10 +41,13 @@ export const AntdConfigProvider: React.FC<Props> = ({ children, color, locale })
 
   const { dark } = useDarkMode();
 
+  const currentLangId = useI18n().currentLanguage.id;
+  const localizedLang = locale ? getAntdLocale(locale) : getAntdLocale(currentLangId);
+
   return (
     <LibAntdConfigProvider color={color} locale={locale}>
       <ConfigProvider
-        locale={locale === "zh_cn" ? zhCNlocale : enUSlocale}
+        locale={localizedLang}
         theme={{ token: { colorPrimary: color, colorInfo: color }, algorithm: dark ? theme.darkAlgorithm : undefined }}
       >
         <StyledComponentsThemeProvider color={color} locale={locale}>
@@ -54,3 +59,13 @@ export const AntdConfigProvider: React.FC<Props> = ({ children, color, locale })
     </LibAntdConfigProvider>
   );
 };
+
+function getAntdLocale(langId: string): Locale {
+  switch (langId) {
+  case "zh_cn":
+    return zhCNlocale;
+  case "en":
+  default:
+    return enUSlocale;
+  }
+}
