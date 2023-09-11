@@ -57,7 +57,7 @@ export const ChargeTable: React.FC<Props> = ({
     promiseFn: useCallback(async () => {
 
       return api.getCharges({ query: {
-        accountName,
+        accountName: query.name,
         startTime: query.time[0].toISOString(),
         endTime: query.time[1].toISOString(),
         isPlatformRecords,
@@ -130,7 +130,13 @@ export const ChargeTable: React.FC<Props> = ({
         </Form>
       </FilterFormContainer>
       <Table
-        dataSource={filteredType ? data?.results.filter((x) => x.type === filteredType) : data?.results}
+        dataSource={
+          !filteredType
+            ? data?.results
+            : (filteredType !== CHARGE_TYPE_OTHERS
+              ? data?.results.filter((x) => x.type === filteredType)
+              : data?.results.filter((x) => !publicConfig.CHARGE_TYPE_LIST.includes(x.type)))
+        }
         loading={isLoading}
         scroll={{ x: true }}
         pagination={{ showSizeChanger: true }}
