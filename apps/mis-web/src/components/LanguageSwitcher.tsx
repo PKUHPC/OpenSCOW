@@ -12,7 +12,7 @@
 
 import { Select } from "antd";
 import { useRouter } from "next/router";
-import { parseCookies, setCookie } from "nookies";
+import { setCookie } from "nookies";
 import { useEffect, useState } from "react";
 import { languageInfo, useI18n } from "src/i18n";
 import styled from "styled-components";
@@ -31,8 +31,7 @@ export const LanguageSwitcher = () => {
   const router = useRouter();
 
   useEffect(() => {
-    const cookies = parseCookies();
-    const initialLanguage = cookies.language;
+    const initialLanguage = i18n.currentLanguage.id;
     if (initialLanguage) {
       setSelectedLanguage(initialLanguage);
     } else {
@@ -59,10 +58,8 @@ export const LanguageSwitcher = () => {
   return (
     <Container>
       <Select
-        // value={i18n.currentLanguage.id}
         value={selectedLanguage}
         onChange={(value) => {
-          // i18n.setLanguageById(value);
           setLanguage(value);
         }}
       >

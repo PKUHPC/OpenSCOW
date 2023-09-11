@@ -192,9 +192,8 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
     extra.footerText = (hostname && runtimeConfig.UI_CONFIG?.footer?.hostnameTextMap?.[hostname])
     ?? runtimeConfig.UI_CONFIG?.footer?.defaultText ?? "";
 
-    // 如果不存在则默认“zh_cn”
+    // 从Cookies或header中获取语言id
     extra.languageId = getLanguageCookie(appContext.ctx.req);
-
   }
 
   const appProps = await App.getInitialProps(appContext);
