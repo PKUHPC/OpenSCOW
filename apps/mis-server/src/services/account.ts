@@ -46,6 +46,26 @@ export const accountServiceServer = plugin((server) => {
           };
         }
 
+        const jobs = await server.ext.clusters.callOnAll(
+          logger,
+          async (client) => {
+            const fields = [
+              "job_id", "user", "state", "account",
+            ];
+
+            return await asyncClientCall(client.job, "getJobs", {
+              fields,
+              filter: { users: [], accounts: [accountName], states: ["RUNNING", "PENDING"]},
+            });
+          },
+        );
+
+        if (jobs.filter((i) => i.result.jobs.length > 0).length > 0) {
+          throw <ServiceError>{
+            code: Status.INTERNAL, message: `Account ${accountName}  has jobs running and cannot be blocked. `,
+          };
+        }
+
         const result = await blockAccount(account, server.ext.clusters, logger);
 
         if (result === "AlreadyBlocked") {
@@ -76,13 +96,12 @@ export const accountServiceServer = plugin((server) => {
         }
 
         if (!account.blocked) {
-          return [{ executed: false }];
+          throw <ServiceError>{
+            code: Status.INVALID_ARGUMENT, message: `Account ${accountName} is unblocked`,
+          };
         }
 
-        const result = await unblockAccount(account, server.ext.clusters, logger);
-        if (result === "ALREADY_UNBLOCKED") {
-          return [{ executed: false }];
-        }
+        await unblockAccount(account, server.ext.clusters, logger);
 
         return [{ executed: true }];
 

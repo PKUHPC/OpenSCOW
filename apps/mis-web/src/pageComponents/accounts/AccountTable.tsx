@@ -169,69 +169,81 @@ export const AccountTable: React.FC<Props> = ({
           sortOrder={currentSortInfo.field === "blocked" ? currentSortInfo.order : null}
           render={(blocked) => blocked ? <Tag color="red">封锁</Tag> : <Tag color="green">正常</Tag>}
         />
-        {/* 只在租户管理下的账户列表中显示 */}
-        {showedTab === "TENANT" && (
-          <Table.Column<AdminAccountInfo>
-            title="操作"
-            render={(_, r) => (
-              <Space split={<Divider type="vertical" />}>
+        <Table.Column<AdminAccountInfo>
+          title="操作"
+          render={(_, r) => (
+            <Space split={<Divider type="vertical" />}>
+              {/* 只在租户管理下的账户列表中显示管理成员 */}
+              {showedTab === "TENANT" && (
                 <Link href={{ pathname: `/tenant/accounts/${r.accountName}/users` }}>
-                管理成员
+                  管理成员
                 </Link>
-                {
-                  r.blocked
-                    ? (
-                      <a onClick={() => {
-                        modal.confirm({
-                          title: "确认解除用户封锁？",
-                          icon: <ExclamationCircleOutlined />,
-                          content: `确认要在租户中${r.tenantName}解除账户${r.accountName}的封锁？`,
-                          onOk: async () => {
-                            await api.unblockAccount({
-                              body: {
-                                tenantName: r.tenantName,
-                                accountName: r.accountName,
-                              },
-                            })
-                              .then(() => {
+              )}
+              {
+                r.blocked
+                  ? (
+                    <a onClick={() => {
+                      if (moneyToNumber(r.balance) < 0) {
+                        message.error(`账户${r.accountName}已欠费，您可以将其加入白名单或充值解封`);
+                        return;
+                      }
+                      modal.confirm({
+                        title: "确认解除用户封锁？",
+                        icon: <ExclamationCircleOutlined />,
+                        content: `确认要在租户${r.tenantName}中解除账户${r.accountName}的封锁？`,
+                        onOk: async () => {
+                          await api.unblockAccount({
+                            body: {
+                              tenantName: r.tenantName,
+                              accountName: r.accountName,
+                            },
+                          })
+                            .then((res) => {
+                              if (res.executed) {
                                 message.success("解封账户成功！");
                                 reload();
-                              });
-                          },
-                        });
-                      }}
-                      >
-                        解除封锁
-                      </a>
-                    ) : (
-                      <a onClick={() => {
-                        modal.confirm({
-                          title: "确认封锁用户？",
-                          icon: <ExclamationCircleOutlined />,
-                          content: `确认要在租户中${r.tenantName}封锁账户${r.accountName}？`,
-                          onOk: async () => {
-                            await api.blockAccount({
-                              body: {
-                                tenantName: r.tenantName,
-                                accountName: r.accountName,
-                              },
-                            })
-                              .then(() => {
+                              } else {
+                                message.error(res.reason || "解封账户失败！");
+                              }
+                            });
+                        },
+                      });
+                    }}
+                    >
+                      解除封锁
+                    </a>
+                  ) : (
+                    <a onClick={() => {
+                      modal.confirm({
+                        title: "确认封锁账户？",
+                        icon: <ExclamationCircleOutlined />,
+                        content: `确认要在租户${r.tenantName}中封锁账户${r.accountName}？`,
+                        onOk: async () => {
+                          await api.blockAccount({
+                            body: {
+                              tenantName: r.tenantName,
+                              accountName: r.accountName,
+                            },
+                          })
+                            .then((res) => {
+                              if (res.executed) {
                                 message.success("封锁帐户成功！");
                                 reload();
-                              });
-                          },
-                        });
-                      }}
-                      >
-                        封锁
-                      </a>
-                    )
-                }
-              </Space>
-            )}
-          />
-        )}
+                              } else {
+                                message.error(res.reason || "封锁帐户失败！");
+                              }
+                            });
+                        },
+                      });
+                    }}
+                    >
+                      封锁
+                    </a>
+                  )
+              }
+            </Space>
+          )}
+        />
       </Table>
     </div>
   );

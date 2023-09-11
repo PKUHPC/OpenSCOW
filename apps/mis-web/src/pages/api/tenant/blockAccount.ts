@@ -13,7 +13,7 @@
 import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Status } from "@grpc/grpc-js/build/src/constants";
-import { AccountServiceClient } from "@scow/protos/build/server/account";
+import { AccountServiceClient, BlockAccountResponse_Result } from "@scow/protos/build/server/account";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { OperationResult, OperationType } from "src/models/operationLog";
@@ -22,6 +22,12 @@ import { callLog } from "src/server/operationLog";
 import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
 import { handlegRPCError, parseIp } from "src/utils/server";
+
+
+export const BlockAccountTexts = {
+  1: "账户已经被封锁",
+  2: "账户在白名单内，请移出白名单后再封锁",
+};
 
 export const BlockAccountSchema = typeboxRouteSchema({
   method: "PUT",
@@ -32,10 +38,11 @@ export const BlockAccountSchema = typeboxRouteSchema({
   }),
 
   responses: {
-    // 如果用户已经block，那么executed为false
-    200: Type.Object({ executed: Type.Boolean() }),
-    // 用户不存在
-    404: Type.Null(),
+    // 如果账户已经block，那么executed为false
+    200: Type.Object({
+      executed: Type.Boolean(),
+      reason: Type.Optional(Type.String()),
+    }),
   },
 });
 
@@ -71,13 +78,25 @@ export default /* #__PURE__*/route(BlockAccountSchema, async (req, res) => {
     tenantName,
     accountName,
   })
-    .then(async () => {
-      await callLog(logInfo, OperationResult.SUCCESS);
-      return { 200: { executed: true } };
+    .then(async (res) => {
+      if (res.result === BlockAccountResponse_Result.OK) {
+        await callLog(logInfo, OperationResult.SUCCESS);
+        return { 200: {
+          executed: true,
+        } };
+      } else {
+        await callLog(logInfo, OperationResult.FAIL);
+        console.log(BlockAccountTexts[res.result]);
+        return { 200: {
+          executed: false,
+          reason: BlockAccountTexts[res.result],
+        } };
+      }
+
     })
     .catch(handlegRPCError({
-      [Status.NOT_FOUND]: () => ({ 404: null }),
-      [Status.FAILED_PRECONDITION]: () => ({ 200: { executed: false } }),
+      [Status.NOT_FOUND]: (e) => ({ 200: { executed: false, reason: e.details } }),
+      [Status.INTERNAL]: (e) => ({ 200: { executed: false, reason: e.details } }),
     },
     async () => await callLog(logInfo, OperationResult.FAIL),
     ));

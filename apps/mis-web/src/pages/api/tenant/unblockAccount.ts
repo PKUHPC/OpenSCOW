@@ -32,10 +32,11 @@ export const UnblockAccountSchema = typeboxRouteSchema({
   }),
 
   responses: {
-    // 如果用户已经block，那么executed为false
-    200: Type.Object({ executed: Type.Boolean() }),
-    // 用户不存在
-    404: Type.Null(),
+    // 如果账户封锁失败，那么executed为false
+    200: Type.Object({
+      executed: Type.Boolean(),
+      reason: Type.Optional(Type.String()),
+    }),
   },
 });
 
@@ -67,7 +68,7 @@ export default /* #__PURE__*/route(UnblockAccountSchema, async (req, res) => {
     },
   };
 
-  return await asyncClientCall(client, "blockAccount", {
+  return await asyncClientCall(client, "unblockAccount", {
     tenantName,
     accountName,
   })
@@ -76,8 +77,8 @@ export default /* #__PURE__*/route(UnblockAccountSchema, async (req, res) => {
       return { 200: { executed: true } };
     })
     .catch(handlegRPCError({
-      [Status.NOT_FOUND]: () => ({ 404: null }),
-      [Status.FAILED_PRECONDITION]: () => ({ 200: { executed: false } }),
+      [Status.NOT_FOUND]: (e) => ({ 200: { executed: false, reason: e.details } }),
+      [Status.INVALID_ARGUMENT]: (e) => ({ 200: { executed: false, reason: e.details } }),
     },
     async () => await callLog(logInfo, OperationResult.FAIL),
     ));
