@@ -68,7 +68,7 @@ export const ChargeTable: React.FC<Props> = ({
   });
 
   useDidUpdateEffect(() => {
-    setQuery((q) => ({ ...q, accountName }));
+    setQuery((q) => ({ ...q, accountName: accountName }));
   }, [accountName]);
 
   return (
@@ -85,7 +85,7 @@ export const ChargeTable: React.FC<Props> = ({
         >
           {
             showAccountName && (
-              <Form.Item label="账户" name="accountName">
+              <Form.Item label="账户" name="name">
                 <AccountSelector
                   onChange={(value) => {
                     setQuery({ ...query, name: value });
