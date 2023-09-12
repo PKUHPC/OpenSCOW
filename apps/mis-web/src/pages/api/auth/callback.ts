@@ -23,7 +23,6 @@ export const AuthCallbackSchema = typeboxRouteSchema({
 
   query: Type.Object({
     token: Type.String(),
-    isFromLogin: Type.Optional(Type.Boolean()),
   }),
 
   responses: {
@@ -36,10 +35,9 @@ export const AuthCallbackSchema = typeboxRouteSchema({
 
 export default typeboxRoute(AuthCallbackSchema, async (req, res) => {
 
-  const { token, isFromLogin } = req.query;
+  const { token } = req.query;
 
-  console.log("=================", req.headers.referer, "=====================");
-
+  const isFromLogin = req.headers?.referer?.indexOf("/public/auth") !== -1;
   const info = await validateToken(token);
 
   if (info) {
