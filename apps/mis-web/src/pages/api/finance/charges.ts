@@ -69,8 +69,11 @@ export default typeboxRoute(GetChargesSchema, async (req, res) => {
   let info: UserInfo | undefined;
   // check whether the user can access the account
   if (accountName) {
-    // 如果账户名存在，则查询的是账户管理下的账户消费记录。只有账户管理员或拥有者可以查看该账户消费记录
     info = await authenticate((i) =>
+      i.platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ||
+      i.platformRoles.includes(PlatformRole.PLATFORM_FINANCE) ||
+      i.tenantRoles.includes(TenantRole.TENANT_FINANCE) ||
+      i.tenantRoles.includes(TenantRole.TENANT_ADMIN) ||
       i.accountAffiliations.some((x) => x.accountName === accountName && x.role !== UserRole.USER),
     )(req, res);
     if (!info) { return; }
