@@ -13,6 +13,7 @@
 import { Form, Input, Modal } from "antd";
 import { useState } from "react";
 import { ModalLink } from "src/components/ModalLink";
+import { useI18n } from "src/i18n";
 import { confirmPasswordFormItemProps, passwordRule } from "src/utils/form";
 
 interface Props {
@@ -43,6 +44,8 @@ const ChangePasswordModal: React.FC<Props> = ({ name, userId, onClose, onComplet
       .finally(() => setLoading(false));
   };
 
+  const languageId = useI18n().currentLanguage.id;
+
   return (
     <Modal
       title={`修改用户${name}（ID：${userId}）的密码`}
@@ -58,11 +61,11 @@ const ChangePasswordModal: React.FC<Props> = ({ name, userId, onClose, onComplet
         preserve={false}
       >
         <Form.Item
-          rules={[{ required: true, message: "请输入新密码" }, passwordRule]}
+          rules={[{ required: true, message: "请输入新密码" }, passwordRule(languageId)]}
           label="新密码"
           name="newPassword"
         >
-          <Input.Password placeholder={passwordRule.message} />
+          <Input.Password placeholder={passwordRule(languageId).message} />
         </Form.Item>
         <Form.Item
           name="confirm"
