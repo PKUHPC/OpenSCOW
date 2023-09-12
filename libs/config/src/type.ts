@@ -10,19 +10,18 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Static, Type } from "@sinclair/typebox";
+import { Type } from "@sinclair/typebox";
 
-export type I18nType = {
-  i18n: {
-    default: string,
-    zh_cn: string,
-    en: string,
-  }
-}
-export const I18nTypeSchema = Type.Object({
-  default: Type.String({ description: "国际化类型默认值" }),
-  en: Type.String({ description: "国际化类型英文值" }),
-  zh_cn: Type.String({ description: "国际化类型简体中文值" }),
-});
-
-export type I18nTypeSchema = Static<typeof I18nTypeSchema>;
+// 创建配置文件中显示文字项的配置类型
+export const createI18nStringSchema = (description: string, defaultValue?: string) => {
+  return Type.Union([
+    Type.String(),
+    Type.Object({
+      i18n: Type.Object({
+        default: Type.String({ description: "国际化类型默认值" }),
+        en: Type.String({ description: "国际化类型英文值" }),
+        zh_cn: Type.String({ description: "国际化类型简体中文值" }),
+      }),
+    }),
+  ], { description, default: defaultValue });
+};

@@ -13,7 +13,8 @@
 import { Type, typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { changePassword as libChangePassword } from "@scow/lib-auth";
 import { authenticate } from "src/auth/server";
-import { publicConfig, runtimeConfig } from "src/utils/config";
+import { useI18n } from "src/i18n";
+import { getRuntimeI18nConfigText, publicConfig, runtimeConfig } from "src/utils/config";
 
 export const ChangePasswordSchema = typeboxRouteSchema({
 
@@ -58,8 +59,13 @@ export default typeboxRoute(ChangePasswordSchema, async (req, res) => {
 
   const { newPassword } = req.body;
 
+  const languageId = useI18n().currentLanguage.id;
+  console.log("语言ID", languageId);
+
   if (passwordPattern && !passwordPattern.test(newPassword)) {
-    return { 400: { code: "PASSWORD_NOT_VALID" as const, message: publicConfig.PASSWORD_PATTERN_MESSAGE } };
+    return { 400: {
+      code: "PASSWORD_NOT_VALID" as const,
+      message: getRuntimeI18nConfigText(languageId, "passwordPatternMessage") } };
   }
 
   return await libChangePassword(runtimeConfig.AUTH_INTERNAL_URL, {

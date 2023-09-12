@@ -15,6 +15,7 @@ import type { ClusterConfigSchema } from "@scow/config/build/cluster";
 import type { PortalConfigSchema } from "@scow/config/build/portal";
 import type { UiConfigSchema } from "@scow/config/build/ui";
 import { UserLink } from "@scow/lib-web/build/layouts/base/types";
+import { getI18nConfigCurrentText, I18nStringType } from "@scow/lib-web/build/utils/i18n";
 import getConfig from "next/config";
 
 export interface ServerRuntimeConfig {
@@ -37,19 +38,21 @@ export interface ServerRuntimeConfig {
 
   SERVER_URL: string;
 
-  DEFAULT_HOME_TEXT: string;
   HOME_TEXTS: {[hostname: string]: string };
 
-  DEFAULT_HOME_TITLE: string;
   HOME_TITLES: {[hostname: string]: string };
-
-  SUBMIT_JOB_PROMPT_TEXT?: string;
 
   SUBMIT_JOB_WORKING_DIR: string;
 
   SCOW_API_AUTH_TOKEN?: string;
 
   AUDIT_CONFIG: AuditConfigSchema | undefined;
+
+  SERVER_I18N_CONFIG_TEXTS: {
+    defaultHomeTitle: I18nStringType,
+    defaultHomeText: I18nStringType,
+    submitJopPromptText?: I18nStringType,
+  }
 }
 
 export interface PublicRuntimeConfig {
@@ -70,7 +73,6 @@ export interface PublicRuntimeConfig {
   NOVNC_CLIENT_URL: string;
 
   PASSWORD_PATTERN: string | undefined;
-  PASSWORD_PATTERN_MESSAGE: string | undefined;
 
   BASE_PATH: string;
   // 上传（请求）文件的大小限制
@@ -83,6 +85,10 @@ export interface PublicRuntimeConfig {
   USER_LINKS?: UserLink[];
 
   VERSION_TAG: string | undefined;
+
+  RUNTIME_I18N_CONFIG_TEXTS: {
+    passwordPatternMessage: I18nStringType | undefined,
+  }
 
 }
 
@@ -108,3 +114,24 @@ export const getLoginDesktopEnabled = (cluster: string): boolean => {
 };
 
 export type LoginNode = { name: string, address: string }
+
+
+type ServerI18nConfigKeys = keyof typeof runtimeConfig.SERVER_I18N_CONFIG_TEXTS;
+type RuntimeI18nConfigKeys = keyof typeof publicConfig.RUNTIME_I18N_CONFIG_TEXTS;
+// 获取ServerConfig中相关字符串配置的对应语言的字符串
+export const getSeverI18nConfigText = (languageId: string, key: ServerI18nConfigKeys): string => {
+  const i18nConfigText = runtimeConfig.SERVER_I18N_CONFIG_TEXTS[key];
+
+  if (!i18nConfigText) return "";
+  return getI18nConfigCurrentText(i18nConfigText, languageId);
+
+};
+
+// 获取RuntimeConfig中相关字符串配置的对应语言的字符串
+export const getRuntimeI18nConfigText = (languageId: string, key: RuntimeI18nConfigKeys): string => {
+
+  const i18nConfigText = publicConfig.RUNTIME_I18N_CONFIG_TEXTS[key];
+
+  if (!i18nConfigText) return "";
+  return getI18nConfigCurrentText(i18nConfigText, languageId);
+};

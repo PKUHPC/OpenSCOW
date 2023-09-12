@@ -12,6 +12,7 @@
 
 import { Form, Input } from "antd";
 import React from "react";
+import { useI18n } from "src/i18n";
 import { getUserIdRule, useBuiltinCreateUser } from "src/utils/createUser";
 import { confirmPasswordFormItemProps, emailRule, passwordRule } from "src/utils/form";
 export interface CreateUserFormFields {
@@ -29,6 +30,8 @@ export const CreateUserForm: React.FC = () => {
   const form = Form.useFormInstance<CreateUserFormFields>();
 
   const userIdRule = getUserIdRule();
+
+  const languageId = useI18n().currentLanguage.id;
 
   return (
     <>
@@ -56,9 +59,9 @@ export const CreateUserForm: React.FC = () => {
       <Form.Item
         label="用户密码"
         name="password"
-        rules={[{ required:true }, passwordRule]}
+        rules={[{ required:true }, passwordRule(languageId)]}
       >
-        <Input.Password placeholder={passwordRule.message} />
+        <Input.Password placeholder={passwordRule(languageId).message} />
       </Form.Item>
       {
         useBuiltinCreateUser() ? (
@@ -69,7 +72,7 @@ export const CreateUserForm: React.FC = () => {
               hasFeedback
               {...confirmPasswordFormItemProps(form, "password")}
             >
-              <Input.Password placeholder={passwordRule.message} />
+              <Input.Password placeholder={passwordRule(languageId).message} />
             </Form.Item>
           </>
         ) : undefined

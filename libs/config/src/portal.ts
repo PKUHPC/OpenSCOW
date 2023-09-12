@@ -13,6 +13,7 @@
 import { GetConfigFn, getConfigFromFile } from "@scow/lib-config";
 import { Static, Type } from "@sinclair/typebox";
 import { DEFAULT_CONFIG_BASE_PATH } from "src/constants";
+import { createI18nStringSchema } from "src/type";
 
 export const PortalConfigSchema = Type.Object({
   jobManagement: Type.Boolean({ description: "是否启动作业管理功能", default: true }),
@@ -37,16 +38,17 @@ export const PortalConfigSchema = Type.Object({
   }),
 
   homeTitle: Type.Object({
-    defaultText: Type.String({ description: "默认主页标题", default: "SCOW" }),
+    // defaultText: Type.String({ description: "默认主页标题", default: "SCOW" }),
+    defaultText: createI18nStringSchema("默认主页标题", "SCOW"),
     hostnameMap: Type.Record(
       Type.String(), Type.String(),
       { description: "根据域名(hostname，不包括port)不同，显示在主页上的标题", default: {} },
     ),
   }),
 
-  submitJobPromptText: 
-  Type.Optional(Type.String({ description: "提交作业命令框中的提示语", default: "#此处参数设置的优先级高于页面其它地方，两者冲突时以此处为准" })),
-
+  submitJobPromptText:
+  // Type.Optional(Type.String({ description: "提交作业命令框中的提示语", default: "#此处参数设置的优先级高于页面其它地方，两者冲突时以此处为准" })),
+  Type.Optional(createI18nStringSchema("提交作业命令框中的提示语", "#此处参数设置的优先级高于页面其它地方，两者冲突时以此处为准")),
   misUrl: Type.Optional(Type.String({ description: "管理系统的部署URL或者路径" })),
 
   shell: Type.Boolean({ description: "是否启用终端功能", default: true }),

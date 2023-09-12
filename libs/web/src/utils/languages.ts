@@ -73,3 +73,4 @@ export function getLanguageCookie(req: IncomingMessage | undefined): string {
   // 系统默认语言
   return SYSTEM_DEFAULT_LANGUAGE;
 }
+

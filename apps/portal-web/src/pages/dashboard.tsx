@@ -16,9 +16,11 @@ import { useRouter } from "next/router";
 import { useEffect } from "react";
 import { useStore } from "simstate";
 import { requireAuth } from "src/auth/requireAuth";
+import { useI18n } from "src/i18n";
 import { CustomizableLogoAndText } from "src/pageComponents/dashboard/CustomizableLogoAndText";
 import { UserStore } from "src/stores/UserStore";
-import { runtimeConfig } from "src/utils/config";
+import { getSeverI18nConfigText, runtimeConfig } from "src/utils/config";
+import { DEFAULT_HOME_TEXT, DEFAULT_HOME_TITLE } from "src/utils/constants";
 import { Head } from "src/utils/head";
 
 interface Props {
@@ -47,8 +49,13 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ req }) => 
 
   const hostname = getHostname(req);
 
-  const homeTitle = (hostname && runtimeConfig.HOME_TITLES[hostname]) ?? runtimeConfig.DEFAULT_HOME_TITLE;
-  const homeText = (hostname && runtimeConfig.HOME_TEXTS[hostname]) ?? runtimeConfig.DEFAULT_HOME_TEXT;
+  const languageId = useI18n().currentLanguage.id;
+  console.log("当前语言id", languageId);
+
+  const homeTitle = (hostname && runtimeConfig.HOME_TITLES[hostname])
+    ?? getSeverI18nConfigText(languageId, DEFAULT_HOME_TITLE);
+  const homeText = (hostname && runtimeConfig.HOME_TEXTS[hostname])
+    ?? getSeverI18nConfigText(languageId, DEFAULT_HOME_TEXT);
 
   return {
     props: {

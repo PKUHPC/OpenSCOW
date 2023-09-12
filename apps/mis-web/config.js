@@ -135,10 +135,6 @@ const buildRuntimeConfig = async (phase, basePath) => {
 
     PASSWORD_PATTERN: commonConfig.passwordPattern?.regex,
 
-    // 兼容原有系统的字符串形式的配置项
-    PASSWORD_PATTERN_MESSAGE: typeof commonConfig.passwordPattern?.errorMessage === "string"
-      ? commonConfig.passwordPattern?.errorMessage : commonConfig.passwordPattern?.errorMessage.i18n.default,
-
     BASE_PATH: basePath,
 
     NAV_LINKS: misConfig.navLinks,
@@ -151,11 +147,10 @@ const buildRuntimeConfig = async (phase, basePath) => {
 
     AUDIT_DEPLOYED:  config.AUDIT_DEPLOYED,
 
-    CUSTOM_I18N_CONFIG: {
-      // 只记录i18n类型的配置项
-      COMMON_PASSWORD_PATTERN_MESSAGE: typeof commonConfig.passwordPattern?.errorMessage === "string"
-        ? undefined : commonConfig.passwordPattern?.errorMessage,
+    RUNTIME_I18N_CONFIG_TEXTS: {
+      passwordPatternMessage: commonConfig.passwordPattern?.errorMessage,
     },
+
   };
 
   if (!building) {

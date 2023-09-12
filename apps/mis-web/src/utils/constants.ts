@@ -15,3 +15,9 @@ export const DEFAULT_TENANT_NAME = "default";
 export const UNKNOWN_PRICE_ITEM = "UNKNOWN";
 
 export const DEFAULT_INIT_USER_ID = "init_user";
+
+
+// 定义配置文件中i18n复合类型文字的Key值
+// common.yml
+export const PASSWORD_PATTERN_MESSAGE = "passwordPatternMessage";
+

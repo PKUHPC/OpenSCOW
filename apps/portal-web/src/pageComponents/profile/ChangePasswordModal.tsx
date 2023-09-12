@@ -13,6 +13,7 @@
 import { App, Form, Input, Modal } from "antd";
 import React, { useState } from "react";
 import { api } from "src/apis";
+import { useI18n } from "src/i18n";
 import { confirmPasswordFormItemProps, passwordRule } from "src/utils/form";
 
 export interface Props {
@@ -34,7 +35,9 @@ export const ChangePasswordModal: React.FC<Props> = ({
   const [form] = Form.useForm<FormInfo>();
   const { message } = App.useApp();
   const [loading, setLoading] = useState(false);
-  
+
+  const languageId = useI18n().currentLanguage.id;
+
   const onFinish = async () => {
     const { oldPassword, newPassword } = await form.validateFields();
     setLoading(true);
@@ -79,11 +82,11 @@ export const ChangePasswordModal: React.FC<Props> = ({
           <Input.Password />
         </Form.Item>
         <Form.Item
-          rules={[{ required: true }, passwordRule]}
+          rules={[{ required: true }, passwordRule(languageId)]}
           label="新密码"
           name="newPassword"
         >
-          <Input.Password placeholder={passwordRule.message} />
+          <Input.Password placeholder={passwordRule(languageId).message} />
         </Form.Item>
         <Form.Item
           name="confirm"

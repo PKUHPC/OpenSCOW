@@ -16,6 +16,7 @@ import type { ClusterTextsConfigSchema } from "@scow/config/build/clusterTexts";
 import type { MisConfigSchema } from "@scow/config/build/mis";
 import type { UiConfigSchema } from "@scow/config/build/ui";
 import { UserLink } from "@scow/lib-web/build/layouts/base/types";
+import { getI18nConfigCurrentText, I18nStringType } from "@scow/lib-web/build/utils/i18n";
 import getConfig from "next/config";
 
 export interface ServerRuntimeConfig {
@@ -49,7 +50,6 @@ export interface PublicRuntimeConfig {
   ACCOUNT_NAME_PATTERN_MESSAGE: string | undefined;
 
   PASSWORD_PATTERN: string | undefined;
-  PASSWORD_PATTERN_MESSAGE: string | undefined;
 
   PORTAL_URL: string | undefined;
 
@@ -65,9 +65,9 @@ export interface PublicRuntimeConfig {
 
   AUDIT_DEPLOYED: boolean;
 
-  CUSTOM_I18N_CONFIG: {
-    COMMON_PASSWORD_PATTERN_MESSAGE: I18nType | undefined;
-  },
+  RUNTIME_I18N_CONFIG_TEXTS: {
+    passwordPatternMessage: I18nStringType | undefined,
+  }
 }
 
 export const runtimeConfig: ServerRuntimeConfig = getConfig().serverRuntimeConfig;
@@ -94,10 +94,24 @@ export const getClusterName = (clusterId: string) => {
   return publicConfig.CLUSTERS[clusterId]?.name || clusterId;
 };
 
-export type I18nType = {
-  i18n: {
-    default: string,
-    zh_cn: string,
-    en: string,
-  }
-}
+
+// type ServerI18nConfigKeys = keyof typeof runtimeConfig.SERVER_I18N_CONFIG_TEXTS;
+type RuntimeI18nConfigKeys = keyof typeof publicConfig.RUNTIME_I18N_CONFIG_TEXTS;
+
+// // 获取ServerConfig中相关字符串配置的对应语言的字符串
+// export const getSeverI18nConfigText = (languageId: string, key: string): string => {
+//   const i18nConfigText = runtimeConfig.SERVER_I18N_CONFIG_TEXTS[key];
+//   // TODO
+//   if (!i18nConfigText) return "";
+//   return getI18nConfigCurrentText(i18nConfigText, languageId);
+
+// };
+
+// 获取RuntimeConfig中相关字符串配置的对应语言的字符串
+export const getRuntimeI18nConfigText = (languageId: string, key: RuntimeI18nConfigKeys): string => {
+
+  const i18nConfigText = publicConfig.RUNTIME_I18N_CONFIG_TEXTS[key];
+
+  if (!i18nConfigText) return "";
+  return getI18nConfigCurrentText(i18nConfigText, languageId);
+};

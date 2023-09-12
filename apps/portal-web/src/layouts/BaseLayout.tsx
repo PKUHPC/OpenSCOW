@@ -15,6 +15,7 @@ import { BaseLayout as LibBaseLayout } from "@scow/lib-web/build/layouts/base/Ba
 import { JumpToAnotherLink } from "@scow/lib-web/build/layouts/base/header/components";
 import { PropsWithChildren, useMemo } from "react";
 import { useStore } from "simstate";
+import { LanguageSwitcher } from "src/components/LanguageSwitcher";
 import { userRoutes } from "src/layouts/routes";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { LoginNodeStore } from "src/stores/LoginNodeStore";
@@ -58,6 +59,7 @@ export const BaseLayout = ({ footerText, versionTag, children }: PropsWithChildr
             link={publicConfig.MIS_URL}
             linkText="管理系统"
           />
+          <LanguageSwitcher />
         </>
       )}
     >

@@ -3,10 +3,6 @@ lockfileVersion: '6.0'
 importers:
 
   .:
-    dependencies:
-      react-typed-i18n:
-        specifier: ^2.3.0
-        version: 2.3.0(react@18.2.0)
     devDependencies:
       '@bufbuild/buf':
         specifier: 1.26.1
@@ -517,6 +513,9 @@ importers:
       react-is:
         specifier: 18.2.0
         version: 18.2.0
+      react-typed-i18n:
+        specifier: ^2.3.0
+        version: 2.3.0(react@18.2.0)
       simstate:
         specifier: 3.0.1
         version: 3.0.1(react@18.2.0)
@@ -774,6 +773,9 @@ importers:
       react-is:
         specifier: 18.2.0
         version: 18.2.0
+      react-typed-i18n:
+        specifier: ^2.3.0
+        version: 2.3.0(react@18.2.0)
       simstate:
         specifier: 3.0.1
         version: 3.0.1(react@18.2.0)

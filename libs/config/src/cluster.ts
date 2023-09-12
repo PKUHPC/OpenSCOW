@@ -13,7 +13,6 @@
 import { GetConfigFn, getDirConfig } from "@scow/lib-config";
 import { Static, Type } from "@sinclair/typebox";
 import { DEFAULT_CONFIG_BASE_PATH } from "src/constants";
-import { I18nTypeSchema } from "src/type";
 
 const CLUSTER_CONFIG_BASE_PATH = "clusters";
 
@@ -69,10 +68,6 @@ type TurboVncConfigSchema = Static<typeof TurboVncConfigSchema>;
 
 export const ClusterConfigSchema = Type.Object({
   displayName: Type.String({ description: "集群的显示名称" }),
-  // displayName: Type.Union([
-  //   Type.String({ description: "集群的显示名称" }),
-  //   I18nTypeSchema,
-  // ]),
   priority: Type.Number({ description: "集群使用的优先级, 数字越小越先展示", default: Number.MAX_SAFE_INTEGER }),
   adapterUrl: Type.String({ description: "调度器适配器服务地址" }),
   proxyGateway: Type.Optional(Type.Object({

@@ -10,22 +10,10 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { I18nType } from "./config";
-
-export function checkI18nValue(value: string | I18nType, langId: string): string {
-
-  console.log(typeof value);
-
-  if (typeof value === "string") {
-    return value;
-  } else {
-    switch (langId) {
-    case "zh_cn":
-      return value.i18n.zh_cn;
-    case "en":
-      return value.i18n.en;
-    default:
-      return value.i18n.default;
-    }
-  }
-}
+// 定义配置文件中i18n复合类型文字的Key值
+// common.yml
+export const PASSWORD_PATTERN_MESSAGE = "passwordPatternMessage";
+// portal.yaml
+export const DEFAULT_HOME_TEXT = "defaultHomeText";
+export const DEFAULT_HOME_TITLE = "defaultHomeText";
+export const SUBMIT_JOB_PROMPT_TEXT = "submitJopPromptText";
