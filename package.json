@@ -61,6 +61,10 @@
   "volta": {
     "node": "18.17.1"
   },
-  "packageManager": "pnpm@8.6.12"
-
+  "packageManager": "pnpm@8.6.12",
+  "pnpm": {
+    "patchedDependencies": {
+      "react-typed-i18n@2.3.0": "patches/react-typed-i18n@2.3.0.patch"
+    }
+  }
 }
