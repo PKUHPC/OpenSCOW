@@ -15,6 +15,7 @@ import React, { useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { ClickableA } from "src/components/ClickableA";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { publicConfig } from "src/utils/config";
 
 import { TenantSelector } from "../tenant/TenantSelector";
@@ -26,9 +27,15 @@ interface ChargeFields {
   type: string;
 }
 
+const p = prefix("pageComp.admin.tenantChargeForm.");
+const pCommon = prefix("pageComp.common.");
+
 const getTypes = async () => api.getUsedPayTypes({});
 
 const UsedType: React.FC<{ onClick: (type: string) => void }> = ({ onClick }) => {
+
+  const { t } = useI18nTranslateToString();
+
   const { isLoading, data } = useAsync({ promiseFn: getTypes });
 
   const createTag = (x: string) => (
@@ -43,7 +50,7 @@ const UsedType: React.FC<{ onClick: (type: string) => void }> = ({ onClick }) =>
         publicConfig.PREDEFINED_CHARGING_TYPES.map(createTag)
       }
       {isLoading
-        ? "正在加载使用过的类型……"
+        ? t(p("loadType"))
         : (data ? data.types.filter((x) => x && !publicConfig.PREDEFINED_CHARGING_TYPES.includes(x)) : [])
           .map(createTag)
       }
@@ -53,6 +60,9 @@ const UsedType: React.FC<{ onClick: (type: string) => void }> = ({ onClick }) =>
 };
 
 export const TenantChargeForm: React.FC = () => {
+
+  const { t } = useI18nTranslateToString();
+
   const { message } = App.useApp();
   const [form] = Form.useForm<ChargeFields>();
 
@@ -63,7 +73,7 @@ export const TenantChargeForm: React.FC = () => {
 
     setLoading(true);
 
-    const hide = message.loading("充值中……", 0);
+    const hide = message.loading(t(p("charging")), 0);
 
     // 2. upload the rest
     await api.tenantFinancePay({
@@ -75,10 +85,10 @@ export const TenantChargeForm: React.FC = () => {
       },
     })
       .httpError(404, () => {
-        message.error("账户未找到");
+        message.error(t(p("accountNotFound")));
       })
       .then(() => {
-        message.success("充值完成！");
+        message.success(t(p("chargeFinish")));
       })
       .finally(() => {
         setLoading(false);
@@ -97,21 +107,21 @@ export const TenantChargeForm: React.FC = () => {
     >
       <Form.Item
         name="tenantName"
-        label="租户"
+        label={t(pCommon("tenantName"))}
         rules={[{ required: true }]}
       >
         <TenantSelector
-          placeholder="选择租户"
+          placeholder={t(pCommon("selectTenant"))}
           autoSelect
           // onChange={(tenantName) => form.setFieldValue("tenantName", tenantName)}
         />
       </Form.Item>
-      <Form.Item name="amount" label="金额" rules={[{ required: true }]}>
+      <Form.Item name="amount" label={t(pCommon("amount"))} rules={[{ required: true }]}>
         <InputNumber step={0.01} addonAfter="元" precision={2} />
       </Form.Item>
       <Form.Item
         name="type"
-        label="类型"
+        label={t(pCommon("type"))}
         required
         extra={(
           <div style={{ margin: "8px 0" }}>
@@ -123,12 +133,12 @@ export const TenantChargeForm: React.FC = () => {
       >
         <Input />
       </Form.Item>
-      <Form.Item name="comment" label="备注">
+      <Form.Item name="comment" label={t(pCommon("comment"))}>
         <Input.TextArea />
       </Form.Item>
       <Form.Item wrapperCol={{ span: 6, offset: 4 }}>
         <Button type="primary" htmlType="submit" loading={loading}>
-          提交
+          {t(pCommon("submit"))}
         </Button>
       </Form.Item>
     </Form>

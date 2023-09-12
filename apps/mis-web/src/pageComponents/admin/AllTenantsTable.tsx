@@ -19,12 +19,16 @@ import { ColumnsType } from "antd/es/table";
 import React, { useCallback } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { GetAllTenantsSchema } from "src/pages/api/admin/getAllTenants";
 import { moneyToString } from "src/utils/money";
 
 interface Props {
   refreshToken: boolean;
 }
+const p = prefix("pageComp.admin.allTenantsTable.");
+const pCommon = prefix("pageComp.common.");
+
 export const AllTenantsTable: React.FC<Props> = ({ refreshToken }) => {
   const promiseFn = useCallback(async () => {
     return await api.getAllTenants({}); }, []);
@@ -51,28 +55,30 @@ const TenantInfoTable: React.FC<TenantInfoTableProps> = ({
   data, isLoading,
 }) => {
 
+  const { t } = useI18nTranslateToString();
+
   const columns: ColumnsType<PlatformTenantsInfo> = [
     {
       dataIndex: "tenantName",
-      title: "租户名称",
+      title: t(p("tenantName")),
     },
     {
       dataIndex: "userCount",
-      title: "用户数量",
+      title: t(pCommon("userCount")),
     },
     {
       dataIndex: "accountCount",
-      title: "账户数量",
+      title: t(p("accountCount")),
     },
     {
       dataIndex: "balance",
-      title: "余额",
+      title: t(pCommon("balance")),
       render: (balance: Money) => moneyToString(balance),
 
     },
     {
       dataIndex: "createTime",
-      title: "创建时间",
+      title: t(pCommon("createTime")),
       render: (time: string) => formatDateTime(time),
     },
   ];

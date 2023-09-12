@@ -31,6 +31,9 @@ import { createUserParams, useBuiltinCreateUser } from "src/utils/createUser";
 
 type TransType = (id: Lang<typeof en>, args?: React.ReactNode[]) => string;
 const pPlatform = prefix("layouts.route.platformManagement.");
+const pTenant = prefix("layouts.route.tenantManagement.");
+const pUserSpace = prefix("layouts.route.user.");
+const pAccount = prefix("layouts.route.accountManagement.");
 
 export const platformAdminRoutes: (platformRoles: PlatformRole[], t: TransType) => NavItemProps[]
 = (platformRoles, t) => [
@@ -126,50 +129,51 @@ export const platformAdminRoutes: (platformRoles: PlatformRole[], t: TransType) 
       ...(publicConfig.AUDIT_DEPLOYED && platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ?
         [{
           Icon: BookOutlined,
-          text: "操作日志",
+          text: t("layouts.route.common.operationLog"),
           path: "/admin/operationLogs",
         }] : []),
     ],
   },
 ];
 
-export const tenantRoutes: (tenantRoles: TenantRole[], token: string) => NavItemProps[] = (tenantRoles, token) => [
+export const tenantRoutes: (tenantRoles: TenantRole[], token: string, t: TransType) => NavItemProps[]
+= (tenantRoles, token, t) => [
   {
     Icon: CloudServerOutlined,
-    text: "租户管理",
+    text: t(pTenant("firstNav")),
     path: "/tenant",
     clickToPath: tenantRoles.includes(TenantRole.TENANT_ADMIN) ? "/tenant/info" : "/tenant/finance/payAccount",
     children: [
       ...(tenantRoles.includes(TenantRole.TENANT_ADMIN) ? [
         {
           Icon: InfoOutlined,
-          text: "租户信息",
+          text: t(pTenant("info")),
           path: "/tenant/info",
         },
         {
           Icon: MoneyCollectOutlined,
-          text: "作业价格表",
+          text: t(pTenant("manageJobPrice")),
           path: "/tenant/jobBillingTable",
         },
         {
           Icon: BookOutlined,
-          text: "未结束的作业",
+          text: t(pTenant("runningJobs")),
           path: "/tenant/runningJobs",
         },
         {
           Icon: BookOutlined,
-          text: "已结束的作业",
+          text: t(pTenant("finishedJobs")),
           path: "/tenant/historyJobs",
         },
         {
           Icon: UserOutlined,
-          text: "用户管理",
+          text: t(pTenant("userManagement")),
           path: "/tenant/users",
           clickToPath: "/tenant/users/list",
           children: [
             ...(useBuiltinCreateUser() ? [{
               Icon: UserAddOutlined,
-              text: "创建用户",
+              text: t(pTenant("createUser")),
               path: "/tenant/users/create",
             }] : []),
             ...((
@@ -177,46 +181,46 @@ export const tenantRoutes: (tenantRoles: TenantRole[], token: string) => NavItem
               publicConfig.CREATE_USER_CONFIG.misConfig.type === "external"
             ) ? [{
                 Icon: UserAddOutlined,
-                text: "创建用户",
+                text: t(pTenant("createUser")),
                 path: publicConfig.CREATE_USER_CONFIG.misConfig.external!.url + "?" + createUserParams(token),
                 openInNewPage: true,
               }] : []),
             {
               Icon: UserOutlined,
-              text: "用户列表",
+              text: t(pTenant("userList")),
               path: "/tenant/users/list",
             },
           ],
         },
         // {
         //   Icon: ClockCircleOutlined,
-        //   text: "调整作业时间限制",
+        //   text: t(pTenant("jobTimeLimit")),
         //   path: "/tenant/jobTimeLimit",
         // },
         // {
         //   Icon: CloudOutlined,
-        //   text: "调整用户存储空间",
+        //   text: t(pTenant("storage")),
         //   path: "/tenant/storage",
         // },
         {
           Icon: AccountBookOutlined,
-          text: "账户管理",
+          text: t(pTenant("accountManagement")),
           path: "/tenant/accounts",
           clickToPath: "/tenant/accounts/list",
           children: [
             {
               Icon: PlusOutlined,
-              text: "创建账户",
+              text: t(pTenant("createAccount")),
               path: "/tenant/accounts/create",
             },
             {
               Icon: AccountBookOutlined,
-              text: "账户列表",
+              text: t(pTenant("accountList")),
               path: "/tenant/accounts/list",
             },
             {
               Icon: StarOutlined,
-              text: "账户白名单",
+              text: t(pTenant("whitelist")),
               path: "/tenant/accounts/whitelist",
             },
           ],
@@ -226,23 +230,23 @@ export const tenantRoutes: (tenantRoles: TenantRole[], token: string) => NavItem
           tenantRoles.includes(TenantRole.TENANT_ADMIN) ? [
           {
             Icon: MoneyCollectOutlined,
-            text: "财务管理",
+            text: t(pTenant("financeManagement")),
             path: "/tenant/finance",
             clickable: false,
             children: [
               {
                 Icon: PlusSquareOutlined,
-                text: "账户充值",
+                text: t(pTenant("accountPay")),
                 path: "/tenant/finance/payAccount",
               },
               {
                 Icon: ProfileOutlined,
-                text: "账户充值记录",
+                text: t(pTenant("accountPayments")),
                 path: "/tenant/finance/accountPayments",
               },
               {
                 Icon: BookOutlined,
-                text: "充值记录",
+                text: t(pTenant("financePayments")),
                 path: "/tenant/finance/payments",
               },
             ],
@@ -251,7 +255,7 @@ export const tenantRoutes: (tenantRoles: TenantRole[], token: string) => NavItem
       ...(publicConfig.AUDIT_DEPLOYED && tenantRoles.includes(TenantRole.TENANT_ADMIN) ? [
         {
           Icon: BookOutlined,
-          text: "操作日志",
+          text: t("layouts.route.common.operationLog"),
           path: "/tenant/operationLogs",
         },
       ] : []),
@@ -259,39 +263,39 @@ export const tenantRoutes: (tenantRoles: TenantRole[], token: string) => NavItem
   },
 ];
 
-export const userRoutes: (accounts: AccountAffiliation[]) => NavItemProps[] = (accounts) => [
+export const userRoutes: (accounts: AccountAffiliation[], t: TransType) => NavItemProps[] = (accounts, t) => [
   {
     Icon: DashboardOutlined,
-    text: "仪表盘",
+    text: t("layouts.route.dashboard"),
     path: "/dashboard",
   },
   {
     Icon: BookOutlined,
-    text: "用户空间",
+    text: t(pUserSpace("firstNav")),
     path: "/user",
     clickToPath: accounts.length > 0 ? "/user/runningJobs" : "/user/partitions",
     children: [
       ...(accounts.length > 0 ? [
         {
           Icon: BookOutlined,
-          text: "未结束的作业",
+          text: t(pUserSpace("runningJobs")),
           path: "/user/runningJobs",
         },
         {
           Icon: BookOutlined,
-          text: "已结束的作业",
+          text: t(pUserSpace("finishedJobs")),
           path: "/user/historyJobs",
         },
       ] : []),
       {
         Icon: PartitionOutlined,
-        text: "集群和分区信息",
+        text: t(pUserSpace("clusterPartitions")),
         path: "/user/partitions",
       },
       ...(publicConfig.AUDIT_DEPLOYED
         ? [{
           Icon: BookOutlined,
-          text: "操作日志",
+          text: t("layouts.route.common.operationLog"),
           path: "/user/operationLogs",
         }]
         : []),
@@ -300,10 +304,11 @@ export const userRoutes: (accounts: AccountAffiliation[]) => NavItemProps[] = (a
   },
 ];
 
-export const accountAdminRoutes: (adminAccounts: AccountAffiliation[]) => NavItemProps[] = (accounts) => [
+export const accountAdminRoutes: (adminAccounts: AccountAffiliation[], t: TransType) => NavItemProps[]
+= (accounts, t) => [
   {
     Icon: UserOutlined,
-    text: "账户管理",
+    text: t(pAccount("firstNav")),
     path: "/accounts",
     children: accounts.map((x) => ({
       Icon: AccountBookOutlined,
@@ -313,38 +318,38 @@ export const accountAdminRoutes: (adminAccounts: AccountAffiliation[]) => NavIte
       children: [
         {
           Icon: InfoOutlined,
-          text: "账户信息",
+          text: t(pAccount("info")),
           path: `/accounts/${x.accountName}/info`,
         },
         {
           Icon: BookOutlined,
-          text: "未结束的作业",
+          text: t(pAccount("runningJobs")),
           path: `/accounts/${x.accountName}/runningJobs`,
         },
         {
           Icon: BookOutlined,
-          text: "已结束的作业",
+          text: t(pAccount("finishedJobs")),
           path: `/accounts/${x.accountName}/historyJobs`,
         },
         {
           Icon: UserOutlined,
-          text: "用户管理",
+          text: t(pAccount("userManagement")),
           path: `/accounts/${x.accountName}/users`,
         },
         {
           Icon: BookOutlined,
-          text: "充值记录",
+          text: t(pAccount("pay")),
           path: `/accounts/${x.accountName}/payments`,
         },
         {
           Icon: BookOutlined,
-          text: "消费记录",
+          text: t(pAccount("cost")),
           path: `/accounts/${x.accountName}/charges`,
         },
         ...(publicConfig.AUDIT_DEPLOYED
           ? [{
             Icon: BookOutlined,
-            text: "操作日志",
+            text: t("layouts.route.common.operationLog"),
             path: `/accounts/${x.accountName}/operationLogs`,
           }]
           : []),
@@ -365,15 +370,15 @@ export const getAvailableRoutes = (user: User | undefined, t: TransType): NavIte
 
   const routes = [] as NavItemProps[];
 
-  routes.push(...userRoutes(user.accountAffiliations));
+  routes.push(...userRoutes(user.accountAffiliations, t));
 
   const adminAccounts = user.accountAffiliations.filter((x) => x.role !== UserRole.USER);
   if (adminAccounts.length > 0) {
-    routes.push(...accountAdminRoutes(adminAccounts));
+    routes.push(...accountAdminRoutes(adminAccounts, t));
   }
 
   if (user.tenantRoles.length !== 0) {
-    routes.push(...tenantRoutes(user.tenantRoles, user.token));
+    routes.push(...tenantRoutes(user.tenantRoles, user.token, t));
   }
 
   if (user.platformRoles.length !== 0) {
