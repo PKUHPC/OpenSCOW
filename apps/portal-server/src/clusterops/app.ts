@@ -410,17 +410,20 @@ export const appOps = (cluster: string): AppOps => {
         const connectionConfig = await asyncClientCall(client.app, "getConnectionConfig", {
           jobId: sessionMetadata.jobId,
         });
+        if (connectionConfig.host && connectionConfig.port && connectionConfig.password) {
+          return {
+            appId: sessionMetadata.appId,
+            host: connectionConfig.host,
+            port: connectionConfig.port,
+            password: connectionConfig.password,
+          };
+        }
 
         if (app.type === "web") {
           const infoFilePath = join(jobDir, SERVER_SESSION_INFO);
           if (await sftpExists(sftp, infoFilePath)) {
             const content = await sftpReadFile(sftp)(infoFilePath);
             const serverSessionInfo = JSON.parse(content.toString()) as ServerSessionInfoData;
-
-            serverSessionInfo.HOST = connectionConfig.host ?? serverSessionInfo.HOST;
-            serverSessionInfo.PORT = connectionConfig.port ?? serverSessionInfo.PORT;
-            serverSessionInfo.PASSWORD = connectionConfig.password ?? serverSessionInfo.PASSWORD;
-
             const { HOST, PORT, PASSWORD, ...rest } = serverSessionInfo;
             const customFormData = rest as {[key: string]: string};
             const ip = await getIpFromProxyGateway(cluster, HOST, logger);
@@ -433,6 +436,7 @@ export const appOps = (cluster: string): AppOps => {
             };
           }
         } else {
+
           // for vnc apps,
           // try to find the output file and try to parse the display number
           const vncSessionInfoPath = join(jobDir, VNC_SESSION_INFO);
@@ -440,7 +444,7 @@ export const appOps = (cluster: string): AppOps => {
           // try to read the host info
           if (await sftpExists(sftp, vncSessionInfoPath)) {
 
-            const host = connectionConfig.host ?? (await sftpReadFile(sftp)(vncSessionInfoPath)).toString().trim();
+            const host = (await sftpReadFile(sftp)(vncSessionInfoPath)).toString().trim();
 
             const outputFilePath = join(jobDir, VNC_OUTPUT_FILE);
             if (await sftpExists(sftp, outputFilePath)) {
@@ -466,11 +470,10 @@ export const appOps = (cluster: string): AppOps => {
                     const { password, ip } =
                       await refreshPasswordByProxyGateway(proxyGatewaySsh, cluster, host, userId, logger, displayId!);
                     return {
-                      code: "OK",
                       appId: sessionMetadata.appId,
                       host: ip || host,
-                      port: connectionConfig.port ?? displayIdToPort(displayId!),
-                      password: connectionConfig.password ?? password,
+                      port: displayIdToPort(displayId!),
+                      password,
                     };
                   });
                 }
@@ -483,8 +486,8 @@ export const appOps = (cluster: string): AppOps => {
                   return {
                     appId: sessionMetadata.appId,
                     host,
-                    port: connectionConfig.port ?? displayIdToPort(displayId!),
-                    password: connectionConfig.password ?? password,
+                    port: displayIdToPort(displayId!),
+                    password,
                   };
                 });
               }
