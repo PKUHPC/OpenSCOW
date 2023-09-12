@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { SYSTEM_DEFAULT_LANGUAGE } from "@scow/lib-web/build/utils/languages";
 import { Select } from "antd";
 import { useRouter } from "next/router";
 import { setCookie } from "nookies";
@@ -35,7 +36,7 @@ export const LanguageSwitcher = () => {
     if (initialLanguage) {
       setSelectedLanguage(initialLanguage);
     } else {
-      const defaultLanguage = "zh_cn";
+      const defaultLanguage = SYSTEM_DEFAULT_LANGUAGE;
       setSelectedLanguage(defaultLanguage);
       setLanguageCookie(defaultLanguage);
     }

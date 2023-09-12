@@ -14,6 +14,7 @@ import "dayjs/locale/zh-cn";
 
 import { AntdConfigProvider as LibAntdConfigProvider } from "@scow/lib-web/build/layouts/AntdConfigProvider";
 import { useDarkMode } from "@scow/lib-web/build/layouts/darkMode";
+import { SYSTEM_VALID_LANGUAGES } from "@scow/lib-web/build/utils/languages";
 import { App, ConfigProvider, theme } from "antd";
 import { Locale } from "antd/lib/locale";
 import enUSlocale from "antd/locale/en_US";
@@ -62,9 +63,9 @@ export const AntdConfigProvider: React.FC<Props> = ({ children, color, locale })
 
 function getAntdLocale(langId: string): Locale {
   switch (langId) {
-  case "zh_cn":
+  case SYSTEM_VALID_LANGUAGES.ZH_CN:
     return zhCNlocale;
-  case "en":
+  case SYSTEM_VALID_LANGUAGES.EN:
   default:
     return enUSlocale;
   }

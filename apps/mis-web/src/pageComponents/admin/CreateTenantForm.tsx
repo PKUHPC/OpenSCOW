@@ -31,11 +31,12 @@ export const CreateTenantForm: React.FC = () => {
   const form = Form.useFormInstance<CreateTenantFormFields>();
 
   const userIdRule = getUserIdRule();
-
+  // TODO 修改
   const passwordRuleI18nMessage = publicConfig.CUSTOM_I18N_CONFIG.COMMON_PASSWORD_PATTERN_MESSAGE;
   const langId = useI18n().currentLanguage.id;
   const [passwordRuleMessage, setPasswordRuleMessage] = useState("");
 
+  // TODO 修改
   useEffect(() => {
     // 如果i18n类型值存在，则按国际化逻辑显示
     if (passwordRuleI18nMessage) {
