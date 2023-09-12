@@ -63,6 +63,8 @@ export const OperationType: OperationTypeEnum = {
   addAccountToWhitelist: "addAccountToWhitelist",
   removeAccountFromWhitelist: "removeAccountFromWhitelist",
   accountPay: "accountPay",
+  blockAccount: "blockAccount",
+  unblockAccount: "unblockAccount",
   importUsers: "importUsers",
   setPlatformAdmin: "setPlatformAdmin",
   unsetPlatformAdmin: "unsetPlatformAdmin",
@@ -72,8 +74,6 @@ export const OperationType: OperationTypeEnum = {
   setPlatformBilling: "setPlatformBilling",
   createTenant: "createTenant",
   tenantPay: "tenantPay",
-  blockAccount: "blockAccount",
-  unblockAccount: "unblockAccount",
 };
 
 export const OperationLog = Type.Object({
@@ -141,6 +141,8 @@ export const OperationTypeTexts: { [key in LibOperationType]: string } = {
   addAccountToWhitelist: "添加白名单账户",
   removeAccountFromWhitelist: "移出白名单",
   accountPay: "账户充值",
+  blockAccount: "封锁帐户",
+  unblockAccount: "解封帐户",
   importUsers: "导入用户",
   setPlatformAdmin: "设置平台管理员",
   unsetPlatformAdmin: "取消平台管理员",
@@ -150,8 +152,6 @@ export const OperationTypeTexts: { [key in LibOperationType]: string } = {
   setPlatformBilling: "设置平台作业计费",
   createTenant: "创建租户",
   tenantPay: "租户充值",
-  blockAccount: "封锁帐户",
-  unblockAccount: "解封帐户",
 };
 
 export const OperationCodeMap: { [key in LibOperationType]: string } = {
@@ -193,6 +193,8 @@ export const OperationCodeMap: { [key in LibOperationType]: string } = {
   addAccountToWhitelist: "030302",
   removeAccountFromWhitelist: "030303",
   accountPay: "030304",
+  blockAccount: "030305",
+  unblockAccount: "030306",
   importUsers: "040101",
   setPlatformAdmin: "040201",
   unsetPlatformAdmin: "040202",
@@ -202,8 +204,6 @@ export const OperationCodeMap: { [key in LibOperationType]: string } = {
   setPlatformBilling: "040206",
   createTenant: "040301",
   tenantPay: "040302",
-  blockAccount: "040303",
-  unblockAccount: "040304",
 };
 
 export const getOperationDetail = (operationLog: OperationLogProto) => {
@@ -292,6 +292,10 @@ export const getOperationDetail = (operationLog: OperationLogProto) => {
       return `将账户${logPayload.accountName}从租户${logPayload.tenantName}的白名单中移出`;
     case "accountPay":
       return `为账户${logPayload.accountName}充值${moneyToString(logPayload.amount)}元`;
+    case "blockAccount":
+      return `在租户${logPayload.tenantName}中封锁账户${logPayload.accountName}`;
+    case "unblockAccount":
+      return `在租户${logPayload.tenantName}中解封帐户${logPayload.accountName}`;
     case "importUsers":
       return `给租户${logPayload.tenantName}导入用户, ${logPayload.importAccounts.map(
         (account: { accountName: string; userIds: string[];}) =>
@@ -313,10 +317,6 @@ export const getOperationDetail = (operationLog: OperationLogProto) => {
       return `为租户${logPayload.tenantName}充值${moneyToString(logPayload.amount)}`;
     case "setPlatformBilling":
       return `设置平台的计费项${logPayload.path}价格为${moneyToString(logPayload.price)}元`;
-    case "blockAccount":
-      return `在租户${logPayload.tenantName}中封锁账户${logPayload.accountName}`;
-    case "unblockAccount":
-      return `在租户${logPayload.tenantName}中解封帐户${logPayload.accountName}`;
     default:
       return "-";
     }

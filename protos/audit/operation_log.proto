@@ -218,6 +218,18 @@ message AccountPay {
   common.Money amount = 3;
 }
 
+message BlockAccount {
+  string account_name = 1;
+  string user_id = 2;
+  string tenant_name =3;
+}
+
+message UnblockAccount {
+  string account_name = 1;
+  string user_id = 2;
+  string tenant_name =3;
+}
+
 message ImportUsers {
   string tenant_name = 1;
   message ImportAccount {
@@ -265,18 +277,6 @@ message TenantPay {
   common.Money amount = 2;
 }
 
-message BlockAccount {
-  string account_name = 1;
-  string user_id = 2;
-  string tenant_name =3;
-}
-
-message UnblockAccount {
-  string account_name = 1;
-  string user_id = 2;
-  string tenant_name =3;
-}
-
 message CreateOperationLogRequest {
   string operator_user_id = 1;
   string operator_ip = 2;
@@ -320,17 +320,17 @@ message CreateOperationLogRequest {
     AddAccountToWhitelist add_account_to_whitelist = 39;
     RemoveAccountFromWhitelist remove_account_from_whitelist = 40;
     AccountPay account_pay = 41;
-    ImportUsers import_users = 42;
-    SetPlatformAdmin set_platform_admin = 43;
-    UnsetPlatformAdmin unset_platform_admin = 44;
-    SetPlatformFinance set_platform_finance = 45;
-    UnsetPlatformFinance unset_platform_finance = 46;
-    PlatformChangePassword platform_change_password = 47;
-    SetPlatformBilling set_platform_billing = 48;
-    CreateTenant create_tenant = 49;
-    TenantPay tenant_pay = 50;
-    BlockAccount block_account = 51;
-    UnblockAccount unblock_account = 52;
+    BlockAccount block_account = 42;
+    UnblockAccount unblock_account = 43;
+    ImportUsers import_users = 44;
+    SetPlatformAdmin set_platform_admin = 45;
+    UnsetPlatformAdmin unset_platform_admin = 46;
+    SetPlatformFinance set_platform_finance = 47;
+    UnsetPlatformFinance unset_platform_finance = 48;
+    PlatformChangePassword platform_change_password = 49;
+    SetPlatformBilling set_platform_billing = 50;
+    CreateTenant create_tenant = 51;
+    TenantPay tenant_pay = 52;
   }
 }
 
@@ -380,17 +380,17 @@ message OperationLog {
     AddAccountToWhitelist add_account_to_whitelist = 41;
     RemoveAccountFromWhitelist remove_account_from_whitelist = 42;
     AccountPay account_pay = 43;
-    ImportUsers import_users = 44;
-    SetPlatformAdmin set_platform_admin = 45;
-    UnsetPlatformAdmin unset_platform_admin = 46;
-    SetPlatformFinance set_platform_finance = 47;
-    UnsetPlatformFinance unset_platform_finance = 48;
-    PlatformChangePassword platform_change_password = 49;
-    SetPlatformBilling set_platform_billing = 50;
-    CreateTenant create_tenant = 51;
-    TenantPay tenant_pay = 52;
-    BlockAccount block_account = 53;
-    UnblockAccount unblock_account = 54;
+    BlockAccount block_account = 44;
+    UnblockAccount unblock_account = 45;
+    ImportUsers import_users = 46;
+    SetPlatformAdmin set_platform_admin = 47;
+    UnsetPlatformAdmin unset_platform_admin = 48;
+    SetPlatformFinance set_platform_finance = 49;
+    UnsetPlatformFinance unset_platform_finance = 50;
+    PlatformChangePassword platform_change_password = 51;
+    SetPlatformBilling set_platform_billing = 52;
+    CreateTenant create_tenant = 53;
+    TenantPay tenant_pay = 54;
   }
 }
 
