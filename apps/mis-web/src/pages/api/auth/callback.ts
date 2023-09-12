@@ -38,6 +38,8 @@ export default typeboxRoute(AuthCallbackSchema, async (req, res) => {
 
   const { token, isFromLogin } = req.query;
 
+  console.log("=================", req.headers.referer, "=====================");
+
   const info = await validateToken(token);
 
   if (info) {
