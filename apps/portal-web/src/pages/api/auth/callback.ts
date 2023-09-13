@@ -16,14 +16,16 @@ import { setTokenCookie } from "src/auth/cookie";
 import { validateToken } from "src/auth/token";
 import { OperationResult, OperationType } from "src/models/operationLog";
 import { callLog } from "src/server/operationLog";
-import { publicConfig } from "src/utils/config";
+import { publicConfig, runtimeConfig } from "src/utils/config";
 import { route } from "src/utils/route";
 import { parseIp } from "src/utils/server";
 
 export const AuthCallbackSchema = typeboxRouteSchema({
   method: "GET",
 
-  query: Type.Object({ token: Type.String() }),
+  query: Type.Object({
+    token: Type.String(),
+  }),
 
   responses: {
     200: Type.Null(),
@@ -38,18 +40,22 @@ export default route(AuthCallbackSchema, async (req, res) => {
 
   const { token } = req.query;
 
+  const isFromLogin = req.headers?.referer?.includes(runtimeConfig.AUTH_EXTERNAL_URL + "/public/auth");
+
   // query the token and get the username
   const info = await validateToken(token);
 
   if (info) {
     // set token cache
     setTokenCookie({ res }, token);
-    const logInfo = {
-      operatorUserId: info.identityId,
-      operatorIp: parseIp(req) ?? "",
-      operationTypeName: OperationType.login,
-    };
-    await callLog(logInfo, OperationResult.SUCCESS);
+    if (isFromLogin) {
+      const logInfo = {
+        operatorUserId: info.identityId,
+        operatorIp: parseIp(req) ?? "",
+        operationTypeName: OperationType.login,
+      };
+      await callLog(logInfo, OperationResult.SUCCESS);
+    }
     res.redirect(publicConfig.BASE_PATH);
   } else {
     return { 403: null };

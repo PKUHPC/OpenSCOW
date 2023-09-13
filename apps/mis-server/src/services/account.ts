@@ -62,19 +62,25 @@ export const accountServiceServer = plugin((server) => {
 
         if (jobs.filter((i) => i.result.jobs.length > 0).length > 0) {
           throw <ServiceError>{
-            code: Status.INTERNAL, message: `Account ${accountName}  has jobs running and cannot be blocked. `,
+            code: Status.FAILED_PRECONDITION,
+            message: `Account ${accountName}  has jobs running and cannot be blocked. `,
           };
         }
 
         const result = await blockAccount(account, server.ext.clusters, logger);
 
         if (result === "AlreadyBlocked") {
-          return [{ result: BlockAccountResponse_Result.ALREADY_BLOCKED }];
+          throw <ServiceError>{
+            code: Status.FAILED_PRECONDITION,
+            message: `Account ${accountName} has been blocked. `,
+          };
         }
 
         if (result === "Whitelisted") {
-          logger.warn("Trying to block a whitelisted account %s", accountName);
-          return [{ result: BlockAccountResponse_Result.WHITELISTED }];
+          throw <ServiceError>{
+            code: Status.FAILED_PRECONDITION,
+            message: `The account ${accountName} has been added to the whitelist. `,
+          };
         }
 
         return [{ result: BlockAccountResponse_Result.OK }];

@@ -75,24 +75,15 @@ export default /* #__PURE__*/route(BlockAccountSchema, async (req, res) => {
     tenantName,
     accountName,
   })
-    .then(async (res) => {
-      if (res.result === BlockAccountResponse_Result.OK) {
-        await callLog(logInfo, OperationResult.SUCCESS);
-        return { 200: {
-          executed: true,
-        } };
-      } else {
-        await callLog(logInfo, OperationResult.FAIL);
-        return { 200: {
-          executed: false,
-          reason: BlockAccountTexts[res.result],
-        } };
-      }
-
+    .then(async () => {
+      await callLog(logInfo, OperationResult.SUCCESS);
+      return { 200: {
+        executed: true,
+      } };
     })
     .catch(handlegRPCError({
       [Status.NOT_FOUND]: (e) => ({ 200: { executed: false, reason: e.details } }),
-      [Status.INTERNAL]: (e) => ({ 200: { executed: false, reason: e.details } }),
+      [Status.FAILED_PRECONDITION]: (e) => ({ 200: { executed: false, reason: e.details } }),
     },
     async () => await callLog(logInfo, OperationResult.FAIL),
     ));
