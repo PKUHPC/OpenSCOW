@@ -207,7 +207,6 @@ export const AccountTable: React.FC<Props> = ({
                         });
                       } else {
                         message.error(`账户${r.accountName}余额不足，您可以将其加入白名单或充值解封`);
-                        return;
                       }
                       
                     }}
