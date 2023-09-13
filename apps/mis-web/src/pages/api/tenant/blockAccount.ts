@@ -13,11 +13,11 @@
 import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Status } from "@grpc/grpc-js/build/src/constants";
-import { AccountServiceClient, BlockAccountResponse_Result } from "@scow/protos/build/server/account";
+import { AccountServiceClient } from "@scow/protos/build/server/account";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { OperationResult, OperationType } from "src/models/operationLog";
-import { PlatformRole, TenantRole, UserRole } from "src/models/User";
+import { PlatformRole, TenantRole } from "src/models/User";
 import { callLog } from "src/server/operationLog";
 import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";

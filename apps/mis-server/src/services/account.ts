@@ -103,13 +103,13 @@ export const accountServiceServer = plugin((server) => {
 
         if (!account.blocked) {
           throw <ServiceError>{
-            code: Status.INVALID_ARGUMENT, message: `Account ${accountName} is unblocked`,
+            code: Status.FAILED_PRECONDITION, message: `Account ${accountName} is unblocked`,
           };
         }
 
         if (account.balance.lte(0)) {
           throw <ServiceError>{
-            code: Status.INVALID_ARGUMENT,
+            code: Status.FAILED_PRECONDITION,
             message: `The account ${accountName} balance is insufficient, please pay or add to the whitelist`,
           };
         }

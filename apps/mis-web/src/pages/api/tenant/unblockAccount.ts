@@ -17,7 +17,7 @@ import { AccountServiceClient } from "@scow/protos/build/server/account";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { OperationResult, OperationType } from "src/models/operationLog";
-import { PlatformRole, TenantRole, UserRole } from "src/models/User";
+import { PlatformRole, TenantRole } from "src/models/User";
 import { callLog } from "src/server/operationLog";
 import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
@@ -74,7 +74,7 @@ export default /* #__PURE__*/route(UnblockAccountSchema, async (req, res) => {
     })
     .catch(handlegRPCError({
       [Status.NOT_FOUND]: (e) => ({ 200: { executed: false, reason: e.details } }),
-      [Status.INVALID_ARGUMENT]: (e) => ({ 200: { executed: false, reason: e.details } }),
+      [Status.FAILED_PRECONDITION]: (e) => ({ 200: { executed: false, reason: e.details } }),
     },
     async () => await callLog(logInfo, OperationResult.FAIL),
     ));
