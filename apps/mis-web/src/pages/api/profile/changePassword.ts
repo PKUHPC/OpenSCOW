@@ -12,6 +12,7 @@
 
 import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { changePassword as libChangePassword } from "@scow/lib-auth";
+import { getLanguageCookie } from "@scow/lib-web/build/utils/languages";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { getRuntimeI18nConfigText, publicConfig, runtimeConfig } from "src/utils/config";
@@ -58,8 +59,8 @@ export default /* #__PURE__*/typeboxRoute(ChangePasswordSchema, async (req, res)
 
   const { newPassword } = req.body;
 
-  // TODO
-  const languageId = "zh_cn";
+  const languageId = getLanguageCookie(req);
+
   if (passwordPattern && !passwordPattern.test(newPassword)) {
     return { 400: {
       code: "PASSWORD_NOT_VALID" as const,

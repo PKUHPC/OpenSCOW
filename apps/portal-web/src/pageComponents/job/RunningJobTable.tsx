@@ -19,6 +19,7 @@ import { useStore } from "simstate";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
+import { useI18nTranslateToString } from "src/i18n";
 import { runningJobId, RunningJobInfo } from "src/models/job";
 import { RunningJobDrawer } from "src/pageComponents/job/RunningJobDrawer";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
@@ -68,6 +69,8 @@ export const RunningJobQueryTable: React.FC<Props> = ({
     return filtered.map((x) => RunningJobInfo.fromGrpc(x, query.cluster));
   }, [data, query.jobId]);
 
+  const { t } = useI18nTranslateToString();
+
   return (
     <div>
       <FilterFormContainer>
@@ -88,10 +91,10 @@ export const RunningJobQueryTable: React.FC<Props> = ({
             <InputNumber style={{ minWidth: "160px" }} min={1} />
           </Form.Item>
           <Form.Item>
-            <Button type="primary" htmlType="submit">搜索</Button>
+            <Button type="primary" htmlType="submit">{t("button.searchButton")}</Button>
           </Form.Item>
           <Form.Item>
-            <Button loading={isLoading} onClick={reload}>刷新</Button>
+            <Button loading={isLoading} onClick={reload}>{t("button.refreshButton")}</Button>
           </Form.Item>
         </Form>
       </FilterFormContainer>
@@ -121,7 +124,7 @@ export const RunningJobInfoTable: React.FC<JobInfoTableProps> = ({
 }) => {
 
   const { message } = App.useApp();
-
+  const { t } = useI18nTranslateToString();
 
   const [previewItem, setPreviewItem] = useState<RunningJobInfo | undefined>(undefined);
 
@@ -182,7 +185,7 @@ export const RunningJobInfoTable: React.FC<JobInfoTableProps> = ({
               <a onClick={() => Router.push(join("/files", r.cluster.id, r.workingDir))}>
                 进入目录
               </a>
-              <a onClick={() => setPreviewItem(r)}>详情</a>
+              <a onClick={() => setPreviewItem(r)}>{t("button.detailButton")}</a>
               <Popconfirm
                 title="确定结束这个任务吗？"
                 onConfirm={async () =>
@@ -196,7 +199,7 @@ export const RunningJobInfoTable: React.FC<JobInfoTableProps> = ({
                     })
                 }
               >
-                <a>结束</a>
+                <a>{t("button.finishButton")}</a>
               </Popconfirm>
             </Space>
           )}

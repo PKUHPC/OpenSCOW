@@ -16,6 +16,7 @@ import { JumpToAnotherLink } from "@scow/lib-web/build/layouts/base/header/compo
 import { PropsWithChildren, useMemo } from "react";
 import { useStore } from "simstate";
 import { LanguageSwitcher } from "src/components/LanguageSwitcher";
+import { useI18nTranslateToString } from "src/i18n";
 import { userRoutes } from "src/layouts/routes";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { LoginNodeStore } from "src/stores/LoginNodeStore";
@@ -32,6 +33,8 @@ export const BaseLayout = ({ footerText, versionTag, children }: PropsWithChildr
   const userStore = useStore(UserStore);
   const loginNodes = useStore(LoginNodeStore);
   const { defaultCluster, setDefaultCluster, removeDefaultCluster } = useStore(DefaultClusterStore);
+
+  const { t } = useI18nTranslateToString();
 
   const routes = useMemo(() => userRoutes(
     userStore.user, defaultCluster, loginNodes, setDefaultCluster,
@@ -57,7 +60,7 @@ export const BaseLayout = ({ footerText, versionTag, children }: PropsWithChildr
             user={userStore.user}
             icon={<DatabaseOutlined style={{ paddingRight: 2 }} />}
             link={publicConfig.MIS_URL}
-            linkText="管理系统"
+            linkText={t("baseLayout.linkText")}
           />
           <LanguageSwitcher />
         </>

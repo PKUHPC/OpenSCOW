@@ -24,6 +24,7 @@ import { useStore } from "simstate";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { Cluster } from "src/utils/config";
 
@@ -75,6 +76,9 @@ export const AllJobQueryTable: React.FC<Props> = ({
     return filtered;
   }, [data, query.jobId]);
 
+  const { t } = useI18nTranslateToString();
+  const p = prefix("pageComp.job.allJobsTable.searchForm.");
+
   return (
     <div>
       <FilterFormContainer>
@@ -88,15 +92,15 @@ export const AllJobQueryTable: React.FC<Props> = ({
             });
           }}
         >
-          <Form.Item label="集群" name="cluster">
+          <Form.Item label={t(p("clusterLable"))} name="cluster">
             <SingleClusterSelector />
           </Form.Item>
           <Form.Item
             label={(
               <Space>
-                时间
+                {t(p("time"))}
                 <Popover
-                  title="查询该时间区域内所有有活动（如作业提交、等待中、开始、运行、失败、完成）的作业"
+                  title={t(p("popoverTitle"))}
                 >
                   <QuestionCircleOutlined />
                 </Popover>
@@ -110,14 +114,14 @@ export const AllJobQueryTable: React.FC<Props> = ({
               allowClear={false}
             />
           </Form.Item>
-          <Form.Item label="作业ID" name="jobId">
+          <Form.Item label={t(p("jobId"))} name="jobId">
             <InputNumber style={{ minWidth: "160px" }} min={1} />
           </Form.Item>
           <Form.Item>
-            <Button type="primary" htmlType="submit">搜索</Button>
+            <Button type="primary" htmlType="submit">{t("button.searchButton")}</Button>
           </Form.Item>
           <Form.Item>
-            <Button loading={isLoading} onClick={reload}>刷新</Button>
+            <Button loading={isLoading} onClick={reload}>{t("button.refreshButton")}</Button>
           </Form.Item>
         </Form>
       </FilterFormContainer>
@@ -141,6 +145,8 @@ type JobInfoTableProps = {
 export const JobInfoTable: React.FC<JobInfoTableProps> = ({
   data, isLoading, cluster,
 }) => {
+  const { t } = useI18nTranslateToString();
+  const p = prefix("pageComp.job.allJobsTable.tableInfo.");
 
   return (
     <Table
@@ -152,46 +158,46 @@ export const JobInfoTable: React.FC<JobInfoTableProps> = ({
     >
       <Table.Column<JobInfo>
         dataIndex="jobId"
-        title="作业ID"
+        title={t(p("jobId"))}
         sorter={(a, b) => compareNumber(+a.jobId, +b.jobId)}
         defaultSortOrder="descend"
       />
-      <Table.Column<JobInfo> dataIndex="name" title="作业名" />
-      <Table.Column<JobInfo> dataIndex="account" title="账户" />
-      <Table.Column<JobInfo> dataIndex="partition" title="分区" />
-      <Table.Column<JobInfo> dataIndex="qos" title="QOS" />
-      <Table.Column<JobInfo> dataIndex="state" title="状态" />
+      <Table.Column<JobInfo> dataIndex="name" title={t(p("jobName"))} />
+      <Table.Column<JobInfo> dataIndex="account" title={t(p("account"))} />
+      <Table.Column<JobInfo> dataIndex="partition" title={t(p("partition"))} />
+      <Table.Column<JobInfo> dataIndex="qos" title={t(p("qos"))} />
+      <Table.Column<JobInfo> dataIndex="state" title={t(p("state"))} />
       <Table.Column<JobInfo>
         dataIndex="submitTime"
-        title="提交时间"
+        title={t(p("submitTime"))}
         render={(t) => formatDateTime(t)}
       />
       <Table.Column<JobInfo>
         dataIndex="startTime"
-        title="开始时间"
+        title={t(p("startTime"))}
         render={(t) => formatDateTime(t)}
       />
       <Table.Column<JobInfo>
         dataIndex="endTime"
-        title="结束时间"
+        title={t(p("endTime"))}
         render={(t) => formatDateTime(t)}
       />
       <Table.Column<JobInfo>
         dataIndex="elapsed"
-        title="运行时间"
+        title={t(p("elapsed"))}
       />
-      <Table.Column<JobInfo> dataIndex="timeLimit" title="作业时间限制" />
+      <Table.Column<JobInfo> dataIndex="timeLimit" title={t(p("timeLimit"))} />
       <Table.Column<JobInfo>
         dataIndex="reason"
-        title="说明"
+        title={t(p("reason"))}
         render={(d: string) => d.startsWith("(") && d.endsWith(")") ? d.substring(1, d.length - 1) : d}
       />
       <Table.Column<JobInfo>
-        title="更多"
+        title={t(p("more"))}
         render={(_, r) => (
           <Space>
             <a onClick={() => Router.push(join("/files", cluster.id, r.workingDirectory))}>
-                进入目录
+              {t(p("linkToPath"))}
             </a>
           </Space>
         )}

@@ -16,6 +16,7 @@ import { useCallback, useEffect } from "react";
 import { useAsync } from "react-async";
 import { useStore } from "simstate";
 import { api } from "src/apis";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { UserStore } from "src/stores/UserStore";
 
 interface Props {
@@ -47,17 +48,20 @@ export const AccountSelector: React.FC<Props> = ({ cluster, onChange, value }) =
     }
   }, [data, value]);
 
+  const { t } = useI18nTranslateToString();
+  const p = prefix("pageComp.job.accountSelector.");
+
   return (
     <Input.Group compact>
       <Select
         loading={isLoading}
         options={data ? data.accounts.map((x) => ({ label: x, value: x })) : []}
-        placeholder={"请选择账户"}
+        placeholder={t(p("selectAccountPlaceholder"))}
         value={value}
         style={{ width: "calc(100% - 32px)" }}
         onChange={(v) => onChange?.(v)}
       />
-      <Tooltip title="刷新账户列表">
+      <Tooltip title={t(p("refreshAccountList"))}>
         <Button icon={<ReloadOutlined spin={isLoading} />} onClick={reload} loading={isLoading} />
       </Tooltip>
     </Input.Group>

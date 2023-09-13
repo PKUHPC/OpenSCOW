@@ -20,6 +20,7 @@ import { useStore } from "simstate";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import type { Cluster } from "src/utils/config";
 
@@ -41,6 +42,8 @@ interface ModalProps {
   reload: () => void;
 }
 
+const p = prefix("pageComp.job.jobTemplateModal.");
+
 export const JobTemplateTable: React.FC<Props> = () => {
 
   const { defaultCluster } = useStore(DefaultClusterStore);
@@ -61,6 +64,8 @@ export const JobTemplateTable: React.FC<Props> = () => {
 
   const { data, isLoading, reload } = useAsync({ promiseFn });
 
+  const { t } = useI18nTranslateToString();
+
   return (
     <div>
       <FilterFormContainer>
@@ -74,13 +79,13 @@ export const JobTemplateTable: React.FC<Props> = () => {
             });
           }}
         >
-          <Form.Item label="集群" name="cluster">
+          <Form.Item label={t(p("clusterLabel"))} name="cluster">
             <SingleClusterSelector />
           </Form.Item>
           <Form.Item>
             <Space>
-              <Button type="primary" htmlType="submit">搜索</Button>
-              <Button loading={isLoading} onClick={reload}>刷新</Button>
+              <Button type="primary" htmlType="submit">{t("button.searchButton")}</Button>
+              <Button loading={isLoading} onClick={reload}>{t("button.refreshButton")}</Button>
             </Space>
           </Form.Item>
         </Form>
@@ -99,6 +104,8 @@ const NewTemplateNameModal: React.FC<ModalProps> = ({
   open, close, reload, cluster, templateId,
 }) => {
 
+  const { t } = useI18nTranslateToString();
+
   const { message } = App.useApp();
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm<FormProps>();
@@ -113,10 +120,10 @@ const NewTemplateNameModal: React.FC<ModalProps> = ({
       jobName,
     } })
       .httpError(404, () => {
-        message.error("模板不存在！");
+        message.error(t(p("errorMessage")));
       })
       .then(() => {
-        message.success("修改成功！");
+        message.success(t(p("changeSuccessMessage")));
         reload();
         close();
       })
@@ -127,14 +134,14 @@ const NewTemplateNameModal: React.FC<ModalProps> = ({
 
   return (
     <Modal
-      title="修改模板名字"
+      title={t(p("changTemplateName"))}
       open={open}
       onCancel={close}
       onOk={onOk}
       confirmLoading={loading}
     >
       <Form form={form}>
-        <Form.Item name="jobName" rules={[{ required: true }]} label="新模板名">
+        <Form.Item name="jobName" rules={[{ required: true }]} label={t(p("newTemplateName"))}>
           <Input />
         </Form.Item>
       </Form>
@@ -157,18 +164,20 @@ const InfoTable: React.FC<InfoTableProps> = ({
   const [modalShow, setModalShow] = useState(false);
   const [templateId, setTemplateId] = useState("");
 
+  const { t } = useI18nTranslateToString();
+
   const columns: ColumnsType<JobTemplateInfo> = [
     {
       dataIndex: "jobName",
-      title: "模板名",
+      title: t(p("templateName")),
     },
     {
       dataIndex: "comment",
-      title: "备注",
+      title: t(p("comment")),
     },
     {
       dataIndex: "action",
-      title: "操作",
+      title: t("button.actionButton"),
       render:(_, r) => (
         <Space>
           <Link href={{
@@ -179,10 +188,10 @@ const InfoTable: React.FC<InfoTableProps> = ({
             },
           }}
           >
-            使用模板
+            {t(p("useTemplate"))}
           </Link>
           <Popconfirm
-            title="确定删除这个模板吗？"
+            title={t(p("popConfirm"))}
             onConfirm={async () =>
               api.deleteJobTemplate({
                 query: {
@@ -191,17 +200,17 @@ const InfoTable: React.FC<InfoTableProps> = ({
                 },
               })
                 .httpError(404, () => {
-                  message.error("模板不存在！");
+                  message.error(t(p("errorMessage")));
                 })
                 .then(() => {
-                  message.success("模板已删除！");
+                  message.success(t(p("deleteSuccessMessage")));
                   reload();
                 })
             }
           >
-            <a>删除</a>
+            <a>{t("button.deleteButton")}</a>
           </Popconfirm>
-          <a onClick={() => { setTemplateId(r.id); setModalShow(true); }}>重命名</a>
+          <a onClick={() => { setTemplateId(r.id); setModalShow(true); }}>{t("button.renameButton")}</a>
         </Space>
       ),
     },

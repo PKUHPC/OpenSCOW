@@ -26,6 +26,7 @@ import {
 import { NavItemProps } from "@scow/lib-web/build/layouts/base/types";
 import { NavIcon } from "@scow/lib-web/build/layouts/icon";
 import { join } from "path";
+import { useI18nTranslateToString } from "src/i18n";
 import { User } from "src/stores/UserStore";
 import { Cluster, LoginNode, publicConfig } from "src/utils/config";
 export const userRoutes: (
@@ -36,37 +37,38 @@ export const userRoutes: (
 ) => NavItemProps[] = (user, defaultCluster, loginNodes, setDefaultCluster) => {
 
   if (!user) { return []; }
+  const { t } = useI18nTranslateToString();
 
   return [
     {
       Icon: DashboardOutlined,
-      text: "仪表盘",
+      text: t("routes.dashboard"),
       path: "/dashboard",
     },
     ...(publicConfig.ENABLE_JOB_MANAGEMENT ? [{
       Icon: BookOutlined,
-      text: "作业",
+      text: t("routes.job.title"),
       path: "/jobs",
       clickToPath: "/jobs/runningJobs",
       children: [
         {
           Icon: BookOutlined,
-          text: "未结束的作业",
+          text: t("routes.job.runningJobs"),
           path: "/jobs/runningJobs",
         },
         {
           Icon: BookOutlined,
-          text: "所有作业",
+          text: t("routes.job.allJobs"),
           path: "/jobs/allJobs",
         },
         {
           Icon: PlusCircleOutlined,
-          text: "提交作业",
+          text: t("routes.job.submitJob"),
           path: "/jobs/submit",
         },
         {
           Icon: SaveOutlined,
-          text: "作业模板",
+          text: t("routes.job.jobTemplates"),
           path: "/jobs/savedJobs",
         },
       ],
@@ -97,12 +99,12 @@ export const userRoutes: (
     } as NavItemProps] : []),
     ...(publicConfig.ENABLE_LOGIN_DESKTOP ? [{
       Icon: DesktopOutlined,
-      text: "桌面",
+      text: t("routes.desktop"),
       path: "/desktop",
     }] : []),
     ...(publicConfig.ENABLE_APPS && publicConfig.CLUSTERS.length > 0 ? [{
       Icon: EyeOutlined,
-      text: "交互式应用",
+      text: t("routes.apps.title"),
       path: "/apps",
       clickToPath: `/apps/${defaultCluster.id}/sessions`,
       clickable: true,
@@ -115,13 +117,13 @@ export const userRoutes: (
         children: [
           {
             Icon: Loading3QuartersOutlined,
-            text: "已创建的应用",
+            text: t("routes.apps.appSessions"),
             path: `/apps/${cluster.id}/sessions`,
             handleClick: () => { setDefaultCluster(cluster); },
           },
           {
             Icon: PlusOutlined,
-            text: "创建应用",
+            text: t("routes.apps.createApp"),
             clickable: false,
             path: `/apps/${cluster.id}/createApps`,
             handleClick: () => { setDefaultCluster(cluster); },
@@ -131,7 +133,7 @@ export const userRoutes: (
     } as NavItemProps] : []),
     ...(publicConfig.CLUSTERS.length > 0 ? [{
       Icon: FolderOutlined,
-      text: "文件管理",
+      text: t("routes.file"),
       path: "/files",
       clickToPath: `/files/${defaultCluster.id}/~`,
       clickable: true,
