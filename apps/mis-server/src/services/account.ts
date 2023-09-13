@@ -101,6 +101,13 @@ export const accountServiceServer = plugin((server) => {
           };
         }
 
+        if (account.balance.lte(0)) {
+          throw <ServiceError>{
+            code: Status.INVALID_ARGUMENT,
+            message: `The account ${accountName} balance is insufficient, please pay or add to the whitelist`,
+          };
+        }
+
         await unblockAccount(account, server.ext.clusters, logger);
 
         return [{ executed: true }];
