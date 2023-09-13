@@ -183,31 +183,33 @@ export const AccountTable: React.FC<Props> = ({
                 r.blocked
                   ? (
                     <a onClick={() => {
-                      if (moneyToNumber(r.balance) < 0) {
-                        message.error(`账户${r.accountName}已欠费，您可以将其加入白名单或充值解封`);
+                      if (moneyToNumber(r.balance) > 0) {
+                        modal.confirm({
+                          title: "确认解除用户封锁？",
+                          icon: <ExclamationCircleOutlined />,
+                          content: `确认要在租户${r.tenantName}中解除账户${r.accountName}的封锁？`,
+                          onOk: async () => {
+                            await api.unblockAccount({
+                              body: {
+                                tenantName: r.tenantName,
+                                accountName: r.accountName,
+                              },
+                            })
+                              .then((res) => {
+                                if (res.executed) {
+                                  message.success("解封账户成功！");
+                                  reload();
+                                } else {
+                                  message.error(res.reason || "解封账户失败！");
+                                }
+                              });
+                          },
+                        });
+                      } else {
+                        message.error(`账户${r.accountName}余额不足，您可以将其加入白名单或充值解封`);
                         return;
                       }
-                      modal.confirm({
-                        title: "确认解除用户封锁？",
-                        icon: <ExclamationCircleOutlined />,
-                        content: `确认要在租户${r.tenantName}中解除账户${r.accountName}的封锁？`,
-                        onOk: async () => {
-                          await api.unblockAccount({
-                            body: {
-                              tenantName: r.tenantName,
-                              accountName: r.accountName,
-                            },
-                          })
-                            .then((res) => {
-                              if (res.executed) {
-                                message.success("解封账户成功！");
-                                reload();
-                              } else {
-                                message.error(res.reason || "解封账户失败！");
-                              }
-                            });
-                        },
-                      });
+                      
                     }}
                     >
                       解除封锁
