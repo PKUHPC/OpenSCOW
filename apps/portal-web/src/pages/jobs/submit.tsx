@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { getLanguageCookie } from "@scow/lib-web/build/utils/languages";
 import { queryToString, useQuerystring } from "@scow/lib-web/build/utils/querystring";
 import { Spin } from "antd";
 import { GetServerSideProps, NextPage } from "next";
@@ -82,10 +83,9 @@ export const SubmitJobPage: NextPage<Props> = requireAuth(() => true)(
 
   });
 
-export const getServerSideProps: GetServerSideProps = async () => {
+export const getServerSideProps: GetServerSideProps = async ({ req }) => {
 
-  const languageId = useI18n().currentLanguage.id;
-  console.log("语言id", languageId);
+  const languageId = getLanguageCookie(req);
   const submitJobPromptText = getSeverI18nConfigText(languageId, SUBMIT_JOB_PROMPT_TEXT);
 
   return {

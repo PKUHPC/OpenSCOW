@@ -11,12 +11,12 @@
  */
 
 import { getHostname } from "@scow/lib-web/build/utils/getHostname";
+import { getLanguageCookie } from "@scow/lib-web/build/utils/languages";
 import { GetServerSideProps, NextPage } from "next";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 import { useStore } from "simstate";
 import { requireAuth } from "src/auth/requireAuth";
-import { useI18n } from "src/i18n";
 import { CustomizableLogoAndText } from "src/pageComponents/dashboard/CustomizableLogoAndText";
 import { UserStore } from "src/stores/UserStore";
 import { getSeverI18nConfigText, runtimeConfig } from "src/utils/config";
@@ -49,8 +49,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ req }) => 
 
   const hostname = getHostname(req);
 
-  const languageId = useI18n().currentLanguage.id;
-  console.log("当前语言id", languageId);
+  const languageId = getLanguageCookie(req);
 
   const homeTitle = (hostname && runtimeConfig.HOME_TITLES[hostname])
     ?? getSeverI18nConfigText(languageId, DEFAULT_HOME_TITLE);

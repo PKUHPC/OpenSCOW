@@ -13,7 +13,6 @@
 import { Type, typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { changePassword as libChangePassword } from "@scow/lib-auth";
 import { authenticate } from "src/auth/server";
-import { useI18n } from "src/i18n";
 import { getRuntimeI18nConfigText, publicConfig, runtimeConfig } from "src/utils/config";
 
 export const ChangePasswordSchema = typeboxRouteSchema({
@@ -59,8 +58,9 @@ export default typeboxRoute(ChangePasswordSchema, async (req, res) => {
 
   const { newPassword } = req.body;
 
-  const languageId = useI18n().currentLanguage.id;
-  console.log("语言ID", languageId);
+  // TODO
+  // shcemaErrorMessage i18n
+  const languageId = "zh_cn";
 
   if (passwordPattern && !passwordPattern.test(newPassword)) {
     return { 400: {
