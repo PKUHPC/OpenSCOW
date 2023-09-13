@@ -14,7 +14,7 @@ import { OperationType as LibOperationType, OperationTypeEnum } from "@scow/lib-
 import { OperationLog as OperationLogProto } from "@scow/protos/build/audit/operation_log";
 import { Static, Type } from "@sinclair/typebox";
 import { ValueOf } from "next/dist/shared/lib/constants";
-import { moneyToString } from "src/utils/money";
+import { nullableMoneyToString } from "src/utils/money";
 
 export const OperationResult = {
   UNKNOWN: 0,
@@ -208,105 +208,106 @@ export const getOperationDetail = (operationLog: OperationLogProto) => {
       return "";
     }
     const logEvent = operationEvent.$case;
-    const logPayload = operationEvent[logEvent];
     switch (logEvent) {
     case "login":
       return "用户登录";
     case "logout":
       return "用户退出登录";
     case "submitJob":
-      return `在账户${logPayload.accountName}下提交作业(ID: ${logPayload.jobId})`;
+      return `在账户${operationEvent[logEvent].accountName}下提交作业(ID: ${operationEvent[logEvent].jobId})`;
     case "endJob":
-      return `结束作业(ID: ${logPayload.jobId})`;
+      return `结束作业(ID: ${operationEvent[logEvent].jobId})`;
     case "addJobTemplate":
-      return `保存作业模板(模板名: ${logPayload.jobTemplateId})`;
+      return `保存作业模板(模板名: ${operationEvent[logEvent].jobTemplateId})`;
     case "deleteJobTemplate":
-      return `删除作业模板(模板名：${logPayload.jobTemplateId})`;
+      return `删除作业模板(模板名：${operationEvent[logEvent].jobTemplateId})`;
     case "updateJobTemplate":
-      return `更新作业模板(旧模板名：${logPayload.jobTemplateId}，新模板名：${logPayload.newJobTemplateId})`;
+      return `更新作业模板(旧模板名：${operationEvent[logEvent].jobTemplateId}，新模板名：${operationEvent[logEvent].newJobTemplateId})`;
     case "shellLogin":
-      return `登录${logPayload.clusterId}集群的${logPayload.loginNode}节点`;
+      return `登录${operationEvent[logEvent].clusterId}集群的${operationEvent[logEvent].loginNode}节点`;
     case "createDesktop":
-      return `新建桌面(桌面名：${logPayload.desktopName}, 桌面类型: ${logPayload.wm})`;
+      return `新建桌面(桌面名：${operationEvent[logEvent].desktopName}, 桌面类型: ${operationEvent[logEvent].wm})`;
     case "deleteDesktop":
-      return `删除桌面(桌面ID: ${logPayload.loginNode}:${logPayload.desktopId})`;
+      return `删除桌面(桌面ID: ${operationEvent[logEvent].loginNode}:${operationEvent[logEvent].desktopId})`;
     case "createApp":
-      return `在账户${logPayload.accountName}下创建应用(ID: ${logPayload.jobId})`;
+      return `在账户${operationEvent[logEvent].accountName}下创建应用(ID: ${operationEvent[logEvent].jobId})`;
     case "createFile":
-      return `新建文件：${logPayload.path}`;
+      return `新建文件：${operationEvent[logEvent].path}`;
     case "deleteFile":
-      return `删除文件：${logPayload.path}`;
+      return `删除文件：${operationEvent[logEvent].path}`;
     case "uploadFile":
-      return `上传文件：${logPayload.path}`;
+      return `上传文件：${operationEvent[logEvent].path}`;
     case "createDirectory":
-      return `新建文件夹：${logPayload.path}`;
+      return `新建文件夹：${operationEvent[logEvent].path}`;
     case "deleteDirectory":
-      return `删除文件夹：${logPayload.path}`;
+      return `删除文件夹：${operationEvent[logEvent].path}`;
     case "moveFileItem":
-      return `移动文件/文件夹：${logPayload.fromPath}至${logPayload.toPath}`;
+      return `移动文件/文件夹：${operationEvent[logEvent].fromPath}至${operationEvent[logEvent].toPath}`;
     case "copyFileItem":
-      return `复制文件/文件夹：${logPayload.fromPath}至${logPayload.toPath}`;
+      return `复制文件/文件夹：${operationEvent[logEvent].fromPath}至${operationEvent[logEvent].toPath}`;
     case "setJobTimeLimit":
-      return `设置作业(ID: ${logPayload.jobId})时限 ${Math.abs(logPayload.limitMinutes)} 分钟`;
+      return `设置作业(ID: ${operationEvent[logEvent].jobId})时限 ${Math.abs(operationEvent[logEvent].limitMinutes)} 分钟`;
     case "createUser":
-      return `创建用户${logPayload.userId}`;
+      return `创建用户${operationEvent[logEvent].userId}`;
     case "addUserToAccount":
-      return `将用户${logPayload.userId}添加到账户${logPayload.accountName}中`;
+      return `将用户${operationEvent[logEvent].userId}添加到账户${operationEvent[logEvent].accountName}中`;
     case "removeUserFromAccount":
-      return `将用户${logPayload.userId}从账户${logPayload.accountName}中移除`;
+      return `将用户${operationEvent[logEvent].userId}从账户${operationEvent[logEvent].accountName}中移除`;
     case "setAccountAdmin":
-      return `设置用户${logPayload.userId}为账户${logPayload.accountName}的管理员`;
+      return `设置用户${operationEvent[logEvent].userId}为账户${operationEvent[logEvent].accountName}的管理员`;
     case "unsetAccountAdmin":
-      return `取消用户${logPayload.userId}为账户${logPayload.accountName}的管理员`;
+      return `取消用户${operationEvent[logEvent].userId}为账户${operationEvent[logEvent].accountName}的管理员`;
     case "blockUser":
-      return `在账户${logPayload.accountName}中封锁用户${logPayload.userId}`;
+      return `在账户${operationEvent[logEvent].accountName}中封锁用户${operationEvent[logEvent].userId}`;
     case "unblockUser":
-      return `在账户${logPayload.accountName}中解封用户${logPayload.userId}`;
+      return `在账户${operationEvent[logEvent].accountName}中解封用户${operationEvent[logEvent].userId}`;
     case "accountSetChargeLimit":
-      return `在账户${logPayload.accountName}中设置用户${logPayload.userId}限额为${moneyToString(logPayload.limit)}元`;
+      return `在账户${operationEvent[logEvent].accountName}中设置用户${
+        operationEvent[logEvent].userId}限额为${nullableMoneyToString(operationEvent[logEvent].limit)}元`;
     case "accountUnsetChargeLimit":
-      return `在账户${logPayload.accountName}中取消用户${logPayload.userId}限额`;
+      return `在账户${operationEvent[logEvent].accountName}中取消用户${operationEvent[logEvent].userId}限额`;
     case "setTenantBilling":
-      return `设置租户${logPayload.tenantName}的计费项${logPayload.path}价格为${moneyToString(logPayload.price)}元`;
+      return `设置租户${operationEvent[logEvent].tenantName}的计费项${
+        operationEvent[logEvent].path}价格为${nullableMoneyToString(operationEvent[logEvent].price)}元`;
     case "setTenantAdmin":
-      return `设置用户${logPayload.userId}为租户${logPayload.tenantName}的管理员`;
+      return `设置用户${operationEvent[logEvent].userId}为租户${operationEvent[logEvent].tenantName}的管理员`;
     case "unsetTenantAdmin":
-      return `取消用户${logPayload.userId}为租户${logPayload.tenantName}的管理员`;
+      return `取消用户${operationEvent[logEvent].userId}为租户${operationEvent[logEvent].tenantName}的管理员`;
     case "setTenantFinance":
-      return `设置用户${logPayload.userId}为租户${logPayload.tenantName}的财务人员`;
+      return `设置用户${operationEvent[logEvent].userId}为租户${operationEvent[logEvent].tenantName}的财务人员`;
     case "unsetTenantFinance":
-      return `取消用户${logPayload.userId}为租户${logPayload.tenantName}的财务人员`;
+      return `取消用户${operationEvent[logEvent].userId}为租户${operationEvent[logEvent].tenantName}的财务人员`;
     case "tenantChangePassword":
-      return `重置用户${logPayload.userId}的登录密码`;
+      return `重置用户${operationEvent[logEvent].userId}的登录密码`;
     case "createAccount":
-      return `创建账户${logPayload.accountName}, 拥有者为${logPayload.accountOwner}`;
+      return `创建账户${operationEvent[logEvent].accountName}, 拥有者为${operationEvent[logEvent].accountOwner}`;
     case "addAccountToWhitelist":
-      return `将账户${logPayload.accountName}添加到租户${logPayload.tenantName}的白名单中`;
+      return `将账户${operationEvent[logEvent].accountName}添加到租户${operationEvent[logEvent].tenantName}的白名单中`;
     case "removeAccountFromWhitelist":
-      return `将账户${logPayload.accountName}从租户${logPayload.tenantName}的白名单中移出`;
+      return `将账户${operationEvent[logEvent].accountName}从租户${operationEvent[logEvent].tenantName}的白名单中移出`;
     case "accountPay":
-      return `为账户${logPayload.accountName}充值${moneyToString(logPayload.amount)}元`;
+      return `为账户${operationEvent[logEvent].accountName}充值${nullableMoneyToString(operationEvent[logEvent].amount)}元`;
     case "importUsers":
-      return `给租户${logPayload.tenantName}导入用户, ${logPayload.importAccounts.map(
+      return `给租户${operationEvent[logEvent].tenantName}导入用户, ${operationEvent[logEvent].importAccounts.map(
         (account: { accountName: string; userIds: string[];}) =>
           (`在账户${account.accountName}下导入用户${account.userIds.join("、")}`),
       ).join(", ")}`;
     case "setPlatformAdmin":
-      return `设置用户${logPayload.userId}为平台管理员`;
+      return `设置用户${operationEvent[logEvent].userId}为平台管理员`;
     case "unsetPlatformAdmin":
-      return `取消用户${logPayload.userId}为平台管理员`;
+      return `取消用户${operationEvent[logEvent].userId}为平台管理员`;
     case "setPlatformFinance":
-      return `设置用户${logPayload.userId}为平台财务人员`;
+      return `设置用户${operationEvent[logEvent].userId}为平台财务人员`;
     case "unsetPlatformFinance":
-      return `取消用户${logPayload.userId}为平台财务人员`;
+      return `取消用户${operationEvent[logEvent].userId}为平台财务人员`;
     case "platformChangePassword":
-      return `重置用户${logPayload.userId}的登录密码`;
+      return `重置用户${operationEvent[logEvent].userId}的登录密码`;
     case "createTenant":
-      return `创建租户${logPayload.tenantName}, 租户管理员为: ${logPayload.tenantAdmin}`;
+      return `创建租户${operationEvent[logEvent].tenantName}, 租户管理员为: ${operationEvent[logEvent].tenantAdmin}`;
     case "tenantPay":
-      return `为租户${logPayload.tenantName}充值${moneyToString(logPayload.amount)}`;
+      return `为租户${operationEvent[logEvent].tenantName}充值${nullableMoneyToString(operationEvent[logEvent].amount)}元`;
     case "setPlatformBilling":
-      return `设置平台的计费项${logPayload.path}价格为${moneyToString(logPayload.price)}元`;
+      return `设置平台的计费项${operationEvent[logEvent].path}价格为${nullableMoneyToString(operationEvent[logEvent].price)}元`;
     default:
       return "-";
     }
