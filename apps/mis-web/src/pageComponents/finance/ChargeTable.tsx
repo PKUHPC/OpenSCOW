@@ -35,6 +35,7 @@ interface Props {
 interface FilterForm {
   name?: string;
   time: [dayjs.Dayjs, dayjs.Dayjs];
+  type?: string;
 }
 
 const now = dayjs();
@@ -44,14 +45,13 @@ export const ChargeTable: React.FC<Props> = ({
 
   const [form] = Form.useForm<FilterForm>();
 
-  const [query, setQuery] = useState({
+  const [query, setQuery] = useState<{name: string | undefined, time: dayjs.Dayjs[], type: string | undefined}>({
     name: accountName,
     time: [now.subtract(1, "week").startOf("day"), now.endOf("day")],
+    type: undefined,
   });
 
   const filteredTypes = [...publicConfig.CHARGE_TYPE_LIST, CHARGE_TYPE_OTHERS];
-
-  const [filteredType, setFilteredType] = useState<string>();
 
   const { data, isLoading } = useAsync({
     promiseFn: useCallback(async () => {
@@ -60,6 +60,7 @@ export const ChargeTable: React.FC<Props> = ({
         accountName: query.name,
         startTime: query.time[0].toISOString(),
         endTime: query.time[1].toISOString(),
+        type: query.type,
         isPlatformRecords,
         searchType,
       } });
@@ -79,8 +80,8 @@ export const ChargeTable: React.FC<Props> = ({
           form={form}
           initialValues={query}
           onFinish={async () => {
-            const { name, time } = await form.validateFields();
-            setQuery({ name: accountName ?? name, time });
+            const { name, time, type } = await form.validateFields();
+            setQuery({ name: accountName ?? name, time, type: type });
           }}
         >
           {
@@ -99,12 +100,13 @@ export const ChargeTable: React.FC<Props> = ({
           <Form.Item label="时间" name="time">
             <DatePicker.RangePicker allowClear={false} presets={defaultPresets} />
           </Form.Item>
-          <Form.Item label="类型">
+          <Form.Item label="类型" name="type">
             <Select
               style={{ minWidth: "100px" }}
-              value={filteredType}
               allowClear
-              onChange={(value) => setFilteredType(value)}
+              onChange={(value) => {
+                setQuery({ ...query, type: value });
+              }}
               placeholder="请选择类型"
             >
               {(filteredTypes).map((x) => (
@@ -130,13 +132,7 @@ export const ChargeTable: React.FC<Props> = ({
         </Form>
       </FilterFormContainer>
       <Table
-        dataSource={
-          !filteredType
-            ? data?.results
-            : (filteredType !== CHARGE_TYPE_OTHERS
-              ? data?.results.filter((x) => x.type === filteredType)
-              : data?.results.filter((x) => !publicConfig.CHARGE_TYPE_LIST.includes(x.type)))
-        }
+        dataSource={data?.results}
         loading={isLoading}
         scroll={{ x: true }}
         pagination={{ showSizeChanger: true }}

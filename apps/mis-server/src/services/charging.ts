@@ -16,10 +16,12 @@ import { LockMode, QueryOrder } from "@mikro-orm/core";
 import { Decimal, decimalToMoney, moneyToNumber } from "@scow/lib-decimal";
 import { ChargingServiceServer, ChargingServiceService } from "@scow/protos/build/server/charging";
 import { charge, pay } from "src/bl/charging";
+import { misConfig } from "src/config/mis";
 import { Account } from "src/entities/Account";
 import { ChargeRecord } from "src/entities/ChargeRecord";
 import { PayRecord } from "src/entities/PayRecord";
 import { Tenant } from "src/entities/Tenant";
+import { CHARGE_TYPE_OTHERS } from "src/utils/constants";
 
 
 export const chargingServiceServer = plugin((server) => {
@@ -204,7 +206,7 @@ export const chargingServiceServer = plugin((server) => {
      * @returns
      */
     getChargeRecords: async ({ request, em }) => {
-      const { startTime, endTime, target }
+      const { startTime, endTime, type, target }
         = ensureNotUndefined(request, ["startTime", "endTime"]);
 
       let searchParam: { tenantName?: string, accountName?: string | { $ne: null } } = {};
@@ -234,8 +236,30 @@ export const chargingServiceServer = plugin((server) => {
         searchParam = {};
       }
 
+      // 可查询的types类型
+      const typesToSearch = misConfig.customChargeTypes && misConfig.customChargeTypes.length > 0 ? [
+        misConfig.jobChargeType,
+        misConfig.changeJobPriceType,
+        ...misConfig.customChargeTypes,
+      ] : [
+        misConfig.jobChargeType,
+        misConfig.changeJobPriceType,
+      ];
+
+      let searchType = {};
+      if (!type) {
+        searchType = { type: { $ne: null } };
+      } else {
+        if (type === CHARGE_TYPE_OTHERS) {
+          searchType = { type: { $nin: typesToSearch } };
+        } else {
+          searchType = { type: type };
+        }
+      }
+
       const records = await em.find(ChargeRecord, {
         time: { $gte: startTime, $lte: endTime },
+        ...searchType,
         ...searchParam,
       }, { orderBy: { time: QueryOrder.DESC } });
 

@@ -85,17 +85,18 @@ message AccountsOfAllTenantsTarget {
 message GetChargeRecordsRequest {
   google.protobuf.Timestamp start_time = 1;
   google.protobuf.Timestamp end_time = 2;
+  optional string type = 3;
   oneof target {
     // 返回这个租户（tenantName）下这个账户（accountName）的消费记录
-    AccountOfTenantTarget account_of_tenant = 3;
+    AccountOfTenantTarget account_of_tenant = 4;
     // 返回这个租户（tenantName）下所有账户的消费记录
-    AccountsOfTenantTarget accounts_of_tenant = 4;
+    AccountsOfTenantTarget accounts_of_tenant = 5;
     // 返回所有租户下所有账户的消费记录
-    AccountsOfAllTenantsTarget accounts_of_all_tenants = 5;
+    AccountsOfAllTenantsTarget accounts_of_all_tenants = 6;
     // 返回这个租户（tenantName）的租户消费记录
-    TenantTarget tenant = 6;
+    TenantTarget tenant = 7;
     // 返回所有租户的租户消费记录
-    AllTenantsTarget all_tenants = 7;
+    AllTenantsTarget all_tenants = 8;
   }
 }
 

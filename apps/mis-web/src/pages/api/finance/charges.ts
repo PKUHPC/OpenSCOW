@@ -46,6 +46,9 @@ export const GetChargesSchema = typeboxRouteSchema({
      */
     endTime: Type.String({ format: "date-time" }),
 
+    // 消费类型
+    type: Type.Optional(Type.String()),
+
     accountName: Type.Optional(Type.String()),
 
     // 是否为平台管理下的记录：如果是则需查询所有租户，如果不是只查询当前租户
@@ -64,7 +67,7 @@ export const GetChargesSchema = typeboxRouteSchema({
 });
 
 export default typeboxRoute(GetChargesSchema, async (req, res) => {
-  const { endTime, startTime, accountName, isPlatformRecords, searchType } = req.query;
+  const { endTime, startTime, accountName, isPlatformRecords, searchType, type } = req.query;
 
   let info: UserInfo | undefined;
   // check whether the user can access the account
@@ -92,6 +95,7 @@ export default typeboxRoute(GetChargesSchema, async (req, res) => {
   const reply = ensureNotUndefined(await asyncClientCall(client, "getChargeRecords", {
     startTime,
     endTime,
+    type,
     target: (() => {
       if (accountName) {
         // 如果 accountName 不为 undefined，则查询当前租户下该账户的消费记录
