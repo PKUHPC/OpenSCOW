@@ -77,7 +77,7 @@ export const createOperationLogClient = (
         operationResult,
         // @ts-ignore
         operationEvent: { $case: operationTypeName, [operationTypeName]: { ...operationTypePayload } },
-      }).then(
+      }).catch(
         (e) => {
           logger.error(e, "Error when calling Operation Log");
         },
