@@ -43,10 +43,7 @@ export const UnblockAccountSchema = typeboxRouteSchema({
 export default /* #__PURE__*/route(UnblockAccountSchema, async (req, res) => {
   const { tenantName, accountName } = req.body;
 
-
   const auth = authenticate((u) => {
-    const acccountBelonged = u.accountAffiliations.find((x) => x.accountName === accountName);
-
     return u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ||
           u.tenantRoles.includes(TenantRole.TENANT_ADMIN);
   });
