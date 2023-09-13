@@ -19,7 +19,9 @@ import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { PlatformRoleSelector } from "src/components/PlatformRoleSelector";
 import { TenantRoleSelector } from "src/components/TenantRoleSelector";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { UserRole, UserRoleTexts } from "src/models/User";
+
 
 interface DataTableProps<T> {
   data: T[] | undefined;
@@ -27,7 +29,13 @@ interface DataTableProps<T> {
   reload: () => void;
 }
 
+const p = prefix("pageComp.init.initUsersAndAccountsTable.");
+const pCommon = prefix("pageComp.common.");
+
 const UserTable: React.FC<DataTableProps<User>> = ({ data, loading, reload }) => {
+
+  const { t } = useI18nTranslateToString();
+
   return (
     <Table
       loading={loading}
@@ -36,11 +44,11 @@ const UserTable: React.FC<DataTableProps<User>> = ({ data, loading, reload }) =>
       bordered
       rowKey="userId"
     >
-      <Table.Column<User> dataIndex="userId" title="用户ID" />
-      <Table.Column<User> dataIndex="name" title="姓名" />
+      <Table.Column<User> dataIndex="userId" title={t(pCommon("userId"))} />
+      <Table.Column<User> dataIndex="name" title={t(pCommon("name"))} />
       <Table.Column<User>
         dataIndex="platformRoles"
-        title="平台角色"
+        title={t(p("platformRole"))}
         width={200}
         render={(_, r) => (
           <PlatformRoleSelector roles={r.platformRoles} userId={r.userId} reload={reload} />
@@ -48,7 +56,7 @@ const UserTable: React.FC<DataTableProps<User>> = ({ data, loading, reload }) =>
       />
       <Table.Column<User>
         dataIndex="tenantRoles"
-        title="租户角色"
+        title={t(p("tenantRole"))}
         width={200}
         render={(_, r) => (
           <TenantRoleSelector roles={r.tenantRoles} userId={r.userId} reload={reload} />
@@ -56,7 +64,7 @@ const UserTable: React.FC<DataTableProps<User>> = ({ data, loading, reload }) =>
       />
       <Table.Column
         dataIndex="accountAffiliations"
-        title="所属账户"
+        title={t(p("accountAffiliation"))}
         render={(accounts: AccountAffiliation[]) => accounts
           .map((x) =>
             x.accountName +
@@ -68,6 +76,9 @@ const UserTable: React.FC<DataTableProps<User>> = ({ data, loading, reload }) =>
 };
 
 const AccountTable: React.FC<DataTableProps<Account>> = ({ data, loading }) => {
+
+  const { t } = useI18nTranslateToString();
+
   return (
     <Table
       loading={loading}
@@ -77,10 +88,10 @@ const AccountTable: React.FC<DataTableProps<Account>> = ({ data, loading }) => {
       rowKey="accountName"
       bordered
     >
-      <Table.Column<Account> dataIndex="accountName" title="账户名" />
+      <Table.Column<Account> dataIndex="accountName" title={t(pCommon("accountName"))} />
       <Table.Column<Account>
         dataIndex="ownerName"
-        title="拥有者"
+        title={t(pCommon("owner"))}
         render={(_, r) => `${r.ownerName} (id: ${r.ownerId})`}
       />
     </Table>
@@ -91,6 +102,8 @@ const usersPromiseFn = async () => (await api.initGetUsers({})).users;
 const accountsPromiseFn = async () => (await api.initGetAccounts({})).accounts;
 
 export const InitUsersAndAccountsTable: React.FC = () => {
+
+  const { t } = useI18nTranslateToString();
 
   const { data: usersData, isLoading: usersLoading, reload: usersReload } = useAsync({ promiseFn: usersPromiseFn });
   const {
@@ -110,16 +123,16 @@ export const InitUsersAndAccountsTable: React.FC = () => {
     <div>
       <FormLayout maxWidth={800}>
         <Typography.Paragraph>
-          您可以在这里管理当前系统中默认租户下的用户和账户，以及设置某个用户为<strong>初始管理员</strong>。
+          {t(p("defaultTenant"))}<strong>{t(p("initAdmin"))}</strong>。
         </Typography.Paragraph>
         <Typography.Paragraph>
-          <strong>初始管理员</strong>指同时为租户管理员和平台管理员的用户。
+          <strong>{t(p("initAdmin"))}</strong>{t(p("set"))}
         </Typography.Paragraph>
-        <Tabs defaultActiveKey="user" tabBarExtraContent={<a onClick={reload}>刷新</a>}>
-          <Tabs.TabPane tab="用户" key="user">
+        <Tabs defaultActiveKey="user" tabBarExtraContent={<a onClick={reload}>{t(pCommon("fresh"))}</a>}>
+          <Tabs.TabPane tab={t(pCommon("user"))} key="user">
             <UserTable data={usersData} loading={usersLoading} reload={usersReload} />
           </Tabs.TabPane>
-          <Tabs.TabPane tab="账户" key="account">
+          <Tabs.TabPane tab={t(pCommon("account"))} key="account">
             <AccountTable data={accountsData} loading={accountsLoading} reload={accountsReload} />
           </Tabs.TabPane>
         </Tabs>

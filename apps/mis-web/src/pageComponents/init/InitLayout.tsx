@@ -16,6 +16,7 @@ import Router, { useRouter } from "next/router";
 import React from "react";
 import { api } from "src/apis";
 import { Centered } from "src/components/layouts";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { Head } from "src/utils/head";
 import styled from "styled-components";
 
@@ -33,11 +34,11 @@ const CompleteButtonContainer = styled.div`
 `;
 
 const TabItems = [
-  { label: "导入用户", href: "/init/importUsers" },
-  { label: "用户账户管理", href: "/init/users" },
-  { label: "创建初始管理员用户", href: "/init/createInitAdmin" },
-  { label: "编辑作业价格表", href: "/init/jobPriceTable" },
-];
+  { label: "pageComp.init.initLayout.importUser", href: "/init/importUsers" },
+  { label: "pageComp.init.initLayout.userManager", href: "/init/users" },
+  { label: "pageComp.init.initLayout.create", href: "/init/createInitAdmin" },
+  { label: "pageComp.init.initLayout.edit", href: "/init/jobPriceTable" },
+] as const;
 
 const TabsContainer = styled.div`
   .ant-tabs-tab:not(.ant-tabs-tab-active) a {
@@ -54,8 +55,11 @@ const ContentInside = styled.div`
   max-width: 1400px;
 `;
 
+const p = prefix("pageComp.init.initLayout.");
 
 export const InitTab: React.FC = () => {
+
+  const { t } = useI18nTranslateToString();
 
   const router = useRouter();
 
@@ -64,7 +68,7 @@ export const InitTab: React.FC = () => {
       <Tabs
         centered
         items={TabItems.map(({ label, href }) => (
-          { key: href, label: <Link href={href}>{label}</Link> }
+          { key: href, label: <Link href={href}>{t(label)}</Link> }
         ))}
         activeKey={router.asPath}
       />
@@ -73,6 +77,8 @@ export const InitTab: React.FC = () => {
 };
 
 export const InitDrawer: React.FC<DrawerProps> = ({ children }) => {
+
+  const { t } = useI18nTranslateToString();
 
   const { modal } = App.useApp();
 
@@ -83,19 +89,19 @@ export const InitDrawer: React.FC<DrawerProps> = ({ children }) => {
 
     if (missingPriceItems.items.length > 0) {
       modal.error({
-        title: "价格表不完整",
-        content: "请对每个作业计费项确定价格后再完成初始化。",
+        title: t(p("Incomplete")),
+        content: t(p("set")),
       });
       return;
     }
 
     modal.confirm({
-      title: "确认完成初始化",
-      content: "一旦完成初始化，您将无法进入此页面重新初始化。",
+      title: t(p("confirm")),
+      content: t(p("confirmText")),
       onOk: () => api.completeInit({}).then(() => {
         modal.success({
-          title: "初始化完成！",
-          content: "点击确认前往登录",
+          title: t(p("finish")),
+          content: t(p("goLogin")),
           closable: false,
           maskClosable: false,
           onOk: () => Router.push("/api/auth"),
@@ -106,16 +112,16 @@ export const InitDrawer: React.FC<DrawerProps> = ({ children }) => {
 
   return (
     <div>
-      <Head title="系统初始化" />
+      <Head title={t(p("init"))} />
       <Title>
         <span />
-        <Typography.Title>系统初始化</Typography.Title>
+        <Typography.Title>{t(p("init"))}</Typography.Title>
         <CompleteButtonContainer>
           <Button
             type="primary"
             onClick={onOk}
           >
-            完成初始化
+            {t(p("complete"))}
           </Button>
         </CompleteButtonContainer>
       </Title>

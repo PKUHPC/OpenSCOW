@@ -15,6 +15,7 @@ import React, { useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { ClickableA } from "src/components/ClickableA";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { publicConfig } from "src/utils/config";
 
 interface ChargeFields {
@@ -26,7 +27,13 @@ interface ChargeFields {
 
 const getTypes = async () => api.getUsedPayTypes({});
 
+const p = prefix("pageComp.finance.chargeForm.");
+const pCommon = prefix("pageComp.common.");
+
 const UsedType: React.FC<{ onClick: (type: string) => void }> = ({ onClick }) => {
+
+  const { t } = useI18nTranslateToString();
+
   const { isLoading, data } = useAsync({ promiseFn: getTypes });
 
   const createTag = (x: string) => (
@@ -41,7 +48,7 @@ const UsedType: React.FC<{ onClick: (type: string) => void }> = ({ onClick }) =>
         publicConfig.PREDEFINED_CHARGING_TYPES.map(createTag)
       }
       {isLoading
-        ? "正在加载使用过的类型……"
+        ? t(p("loadType"))
         : (data ? data.types.filter((x) => x && !publicConfig.PREDEFINED_CHARGING_TYPES.includes(x)) : [])
           .map(createTag)
       }
@@ -51,6 +58,9 @@ const UsedType: React.FC<{ onClick: (type: string) => void }> = ({ onClick }) =>
 };
 
 export const ChargeForm: React.FC = () => {
+
+  const { t } = useI18nTranslateToString();
+
   const { message } = App.useApp();
   const [form] = Form.useForm<ChargeFields>();
 
@@ -61,7 +71,7 @@ export const ChargeForm: React.FC = () => {
 
     setLoading(true);
 
-    const hide = message.loading("充值中……", 0);
+    const hide = message.loading(t(p("charging")), 0);
 
     // 2. upload the rest
     await api.financePay({
@@ -73,10 +83,10 @@ export const ChargeForm: React.FC = () => {
       },
     })
       .httpError(404, () => {
-        message.error("账户未找到");
+        message.error(t(p("notFound")));
       })
       .then(() => {
-        message.success("充值完成！");
+        message.success(t(p("chargeFinished")));
       })
       .finally(() => {
         setLoading(false);
@@ -95,17 +105,17 @@ export const ChargeForm: React.FC = () => {
     >
       <Form.Item
         name="accountName"
-        label="账户"
+        label={t(pCommon("account"))}
         rules={[{ required: true }]}
       >
         <Input />
       </Form.Item>
-      <Form.Item name="amount" label="金额" rules={[{ required: true }]}>
-        <InputNumber step={0.01} addonAfter="元" />
+      <Form.Item name="amount" label={t(pCommon("amount"))} rules={[{ required: true }]}>
+        <InputNumber step={0.01} addonAfter={t(pCommon("unit"))} />
       </Form.Item>
       <Form.Item
         name="type"
-        label="类型"
+        label={t(pCommon("type"))}
         required
         extra={(
           <div style={{ margin: "8px 0" }}>
@@ -117,12 +127,12 @@ export const ChargeForm: React.FC = () => {
       >
         <Input />
       </Form.Item>
-      <Form.Item name="comment" label="备注">
+      <Form.Item name="comment" label={t(pCommon("comment"))}>
         <Input.TextArea />
       </Form.Item>
       <Form.Item wrapperCol={{ span: 6, offset: 4 }}>
         <Button type="primary" htmlType="submit" loading={loading}>
-          提交
+          {t(pCommon("submit"))}
         </Button>
       </Form.Item>
     </Form>

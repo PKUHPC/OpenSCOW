@@ -14,9 +14,16 @@ import { Typography } from "antd";
 import { useCallback } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { ManageJobBillingTable } from "src/pageComponents/job/ManageJobBillingTable";
 
+const p = prefix("pageComp.init.initJobBillingTable.");
+const pCommon = prefix("pageComp.common.");
+
 export const InitJobBillingTable: React.FC = () => {
+
+  const { t } = useI18nTranslateToString();
+
   const { data, isLoading, reload } = useAsync({ promiseFn: useCallback(async () => {
     return await api.getBillingItems({
       query: { tenant: undefined, activeOnly: false },
@@ -26,8 +33,8 @@ export const InitJobBillingTable: React.FC = () => {
   return (
     <div>
       <Typography.Paragraph>
-          您可以在这里设置默认作业价格表。您必须全部设置完全部价格才能完成初始化。
-        <a onClick={reload}>刷新</a>
+        {t(p("set"))}
+        <a onClick={reload}>{t(pCommon("fresh"))}</a>
       </Typography.Paragraph>
       <ManageJobBillingTable
         data={data}
