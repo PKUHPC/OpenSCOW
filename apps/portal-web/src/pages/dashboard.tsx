@@ -20,7 +20,6 @@ import { requireAuth } from "src/auth/requireAuth";
 import { CustomizableLogoAndText } from "src/pageComponents/dashboard/CustomizableLogoAndText";
 import { UserStore } from "src/stores/UserStore";
 import { getSeverI18nConfigText, runtimeConfig } from "src/utils/config";
-import { DEFAULT_HOME_TEXT, DEFAULT_HOME_TITLE } from "src/utils/constants";
 import { Head } from "src/utils/head";
 
 interface Props {
@@ -52,9 +51,9 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ req }) => 
   const languageId = getLanguageCookie(req);
 
   const homeTitle = (hostname && runtimeConfig.HOME_TITLES[hostname])
-    ?? getSeverI18nConfigText(languageId, DEFAULT_HOME_TITLE);
+    ?? getSeverI18nConfigText(languageId, "defaultHomeTitle");
   const homeText = (hostname && runtimeConfig.HOME_TEXTS[hostname])
-    ?? getSeverI18nConfigText(languageId, DEFAULT_HOME_TEXT);
+    ?? getSeverI18nConfigText(languageId, "defaultHomeText");
 
   return {
     props: {

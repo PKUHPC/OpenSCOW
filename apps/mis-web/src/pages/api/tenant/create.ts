@@ -20,7 +20,7 @@ import { OperationResult, OperationType } from "src/models/operationLog";
 import { PlatformRole } from "src/models/User";
 import { callLog } from "src/server/operationLog";
 import { getClient } from "src/utils/client";
-import { publicConfig } from "src/utils/config";
+import { getRuntimeI18nConfigText, publicConfig } from "src/utils/config";
 import { getUserIdRule } from "src/utils/createUser";
 import { handlegRPCError, parseIp } from "src/utils/server";
 
@@ -80,8 +80,13 @@ export default /* #__PURE__*/typeboxRoute(CreateTenantSchema, async (req, res) =
     return { 400: { code: "USERID_NOT_VALID" as const, message: userIdRule.message } };
   }
 
+  // TODO
+  // shcemaErrorMessage i18n
+  const languageId = "zh_cn";
+
   if (passwordPattern && !passwordPattern.test(userPassword)) {
-    return { 400: { code: "PASSWORD_NOT_VALID" as const, message: publicConfig.PASSWORD_PATTERN_MESSAGE } };
+    return { 400: { code: "PASSWORD_NOT_VALID" as const,
+      message: getRuntimeI18nConfigText(languageId, "passwordPatternMessage") } };
   }
 
   const logInfo = {

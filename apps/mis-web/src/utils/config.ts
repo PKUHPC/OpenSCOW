@@ -97,21 +97,29 @@ export const getClusterName = (clusterId: string) => {
 
 // type ServerI18nConfigKeys = keyof typeof runtimeConfig.SERVER_I18N_CONFIG_TEXTS;
 type RuntimeI18nConfigKeys = keyof typeof publicConfig.RUNTIME_I18N_CONFIG_TEXTS;
+// 获取ServerConfig中相关字符串配置的对应语言的字符串
+// export const getSeverI18nConfigText = <TKey extends ServerI18nConfigKeys>
+//   (languageId: string, key: TKey): ((typeof runtimeConfig.SERVER_I18N_CONFIG_TEXTS)[TKey]) extends (I18nStringType)
+//   ? (string) : string | undefined => {
 
-// // 获取ServerConfig中相关字符串配置的对应语言的字符串
-// export const getSeverI18nConfigText = (languageId: string, key: string): string => {
 //   const i18nConfigText = runtimeConfig.SERVER_I18N_CONFIG_TEXTS[key];
-//   // TODO
-//   if (!i18nConfigText) return "";
+
+//   if (!i18nConfigText) {
+//     return undefined as any;
+//   };
 //   return getI18nConfigCurrentText(i18nConfigText, languageId);
 
 // };
 
 // 获取RuntimeConfig中相关字符串配置的对应语言的字符串
-export const getRuntimeI18nConfigText = (languageId: string, key: RuntimeI18nConfigKeys): string => {
+export const getRuntimeI18nConfigText = <TKey extends RuntimeI18nConfigKeys>
+  (languageId: string, key: TKey): ((typeof publicConfig.RUNTIME_I18N_CONFIG_TEXTS)[TKey]) extends (I18nStringType)
+  ? (string) : string | undefined => {
 
   const i18nConfigText = publicConfig.RUNTIME_I18N_CONFIG_TEXTS[key];
-
-  if (!i18nConfigText) return "";
+  if (!i18nConfigText) {
+    return undefined as any;
+  };
   return getI18nConfigCurrentText(i18nConfigText, languageId);
+
 };

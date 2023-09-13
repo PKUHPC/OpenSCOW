@@ -12,12 +12,10 @@
 
 import { getRuntimeI18nConfigText, publicConfig } from "src/utils/config";
 
-import { PASSWORD_PATTERN_MESSAGE } from "./constants";
-
 export const passwordRule = (languageId: string) => {
   return {
     pattern: publicConfig.PASSWORD_PATTERN ? new RegExp(publicConfig.PASSWORD_PATTERN) : undefined,
-    message: getRuntimeI18nConfigText(languageId, PASSWORD_PATTERN_MESSAGE),
+    message: getRuntimeI18nConfigText(languageId, "passwordPatternMessage"),
   };
 };
 

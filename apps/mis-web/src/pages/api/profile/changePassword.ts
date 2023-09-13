@@ -14,7 +14,7 @@ import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes
 import { changePassword as libChangePassword } from "@scow/lib-auth";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
-import { publicConfig, runtimeConfig } from "src/utils/config";
+import { getRuntimeI18nConfigText, publicConfig, runtimeConfig } from "src/utils/config";
 
 // 此API用于用户修改自己的密码。
 export const ChangePasswordSchema = typeboxRouteSchema({
@@ -58,8 +58,12 @@ export default /* #__PURE__*/typeboxRoute(ChangePasswordSchema, async (req, res)
 
   const { newPassword } = req.body;
 
+  // TODO
+  const languageId = "zh_cn";
   if (passwordPattern && !passwordPattern.test(newPassword)) {
-    return { 400: { code: "PASSWORD_NOT_VALID" as const, message: publicConfig.PASSWORD_PATTERN_MESSAGE } };
+    return { 400: {
+      code: "PASSWORD_NOT_VALID" as const,
+      message: getRuntimeI18nConfigText(languageId, "passwordPatternMessage") } };
   }
 
   return await libChangePassword(runtimeConfig.AUTH_INTERNAL_URL, {
