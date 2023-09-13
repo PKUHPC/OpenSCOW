@@ -40,7 +40,7 @@ export default route(AuthCallbackSchema, async (req, res) => {
 
   const { token } = req.query;
 
-  const isFromLogin = req.headers?.referer?.indexOf(runtimeConfig.AUTH_EXTERNAL_URL + "/public/auth") !== -1;
+  const isFromLogin = req.headers?.referer?.includes(runtimeConfig.AUTH_EXTERNAL_URL + "/public/auth");
 
   // query the token and get the username
   const info = await validateToken(token);
