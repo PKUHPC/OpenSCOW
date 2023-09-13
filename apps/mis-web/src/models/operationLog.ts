@@ -63,6 +63,8 @@ export const OperationType: OperationTypeEnum = {
   addAccountToWhitelist: "addAccountToWhitelist",
   removeAccountFromWhitelist: "removeAccountFromWhitelist",
   accountPay: "accountPay",
+  blockAccount: "blockAccount",
+  unblockAccount: "unblockAccount",
   importUsers: "importUsers",
   setPlatformAdmin: "setPlatformAdmin",
   unsetPlatformAdmin: "unsetPlatformAdmin",
@@ -139,6 +141,8 @@ export const OperationTypeTexts: { [key in LibOperationType]: string } = {
   addAccountToWhitelist: "添加白名单账户",
   removeAccountFromWhitelist: "移出白名单",
   accountPay: "账户充值",
+  blockAccount: "封锁帐户",
+  unblockAccount: "解封帐户",
   importUsers: "导入用户",
   setPlatformAdmin: "设置平台管理员",
   unsetPlatformAdmin: "取消平台管理员",
@@ -189,6 +193,8 @@ export const OperationCodeMap: { [key in LibOperationType]: string } = {
   addAccountToWhitelist: "030302",
   removeAccountFromWhitelist: "030303",
   accountPay: "030304",
+  blockAccount: "030305",
+  unblockAccount: "030306",
   importUsers: "040101",
   setPlatformAdmin: "040201",
   unsetPlatformAdmin: "040202",
@@ -287,6 +293,10 @@ export const getOperationDetail = (operationLog: OperationLogProto) => {
       return `将账户${operationEvent[logEvent].accountName}从租户${operationEvent[logEvent].tenantName}的白名单中移出`;
     case "accountPay":
       return `为账户${operationEvent[logEvent].accountName}充值${nullableMoneyToString(operationEvent[logEvent].amount)}元`;
+    case "blockAccount":
+      return `在租户${operationEvent[logEvent].tenantName}中封锁账户${operationEvent[logEvent].accountName}`;
+    case "unblockAccount":
+      return `在租户${operationEvent[logEvent].tenantName}中解封帐户${operationEvent[logEvent].accountName}`;
     case "importUsers":
       return `给租户${operationEvent[logEvent].tenantName}导入用户, ${operationEvent[logEvent].importAccounts.map(
         (account: { accountName: string; userIds: string[];}) =>

@@ -371,6 +371,8 @@ export const mockApi: MockApi<typeof api> = {
   },
   blockUserInAccount: async () => ({ executed: true }),
   unblockUserInAccount: async () => ({ executed: true }),
+  blockAccount: async () => ({ executed: true }),
+  unblockAccount: async () => ({ executed: true }),
   updateBlockStatus: async () => null,
   removeUserFromAccount: async () => null,
   setAdmin: async () => ({ executed: true }),
@@ -407,7 +409,7 @@ export const mockApi: MockApi<typeof api> = {
   createTenant: async () => ({ createdInAuth: true }),
   validateToken: async () => MOCK_USER_INFO,
 
-  getOperationLog: async () => ({ results: [{
+  getOperationLogs: async () => ({ results: [{
     operationLogId: 99,
     operatorUserId: "testUser",
     operatorUserName: "testUser",
