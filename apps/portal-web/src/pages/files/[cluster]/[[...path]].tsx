@@ -16,7 +16,7 @@ import { Result } from "antd";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { requireAuth } from "src/auth/requireAuth";
-import { useI18n } from "src/i18n";
+import { useI18n, useI18nTranslateToString } from "src/i18n";
 import { FileManager } from "src/pageComponents/filemanager/FileManager";
 import { publicConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
@@ -30,6 +30,8 @@ export const FileManagerPage: NextPage = requireAuth(() => true)(() => {
 
   const cluster = queryToString(router.query.cluster);
 
+  const { t } = useI18nTranslateToString();
+
   const clusterObj = publicConfig.CLUSTERS.find((x) => x.id === cluster);
 
   const fullPath = "/" + pathParts?.join("/") ?? "";
@@ -39,7 +41,7 @@ export const FileManagerPage: NextPage = requireAuth(() => true)(() => {
       <Result
         status="404"
         title={"404"}
-        subTitle={"您所请求的集群不存在。"}
+        subTitle={t("pages.files.path.title")}
       />
     );
   }
@@ -47,7 +49,7 @@ export const FileManagerPage: NextPage = requireAuth(() => true)(() => {
 
   return (
     <>
-      <Head title={`${getI18nConfigCurrentText(clusterObj.name, languageId)}文件管理`} />
+      <Head title={`${getI18nConfigCurrentText(clusterObj.name, languageId)}${t("pages.files.path.title")}`} />
       <FileManager
         cluster={clusterObj}
         path={fullPath}

@@ -13,15 +13,19 @@
 import { NextPage } from "next";
 import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
+import { useI18nTranslateToString } from "src/i18n";
 import { RunningJobQueryTable } from "src/pageComponents/job/RunningJobTable";
 import { Head } from "src/utils/head";
 
 export const RunningJobsPage: NextPage = requireAuth(() => true)(
   ({ userStore }) => {
+
+    const { t } = useI18nTranslateToString();
+
     return (
       <div>
-        <Head title="未结束的作业" />
-        <PageTitle titleText={"本用户未结束的作业"} />
+        <Head title={t("pages.jobs.runningJobs.title")} />
+        <PageTitle titleText={t("pages.jobs.runningJobs.pageTitle")} />
         <RunningJobQueryTable
           userId={userStore.user.identityId}
         />

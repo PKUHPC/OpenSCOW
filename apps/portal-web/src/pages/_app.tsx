@@ -32,6 +32,7 @@ import { api } from "src/apis";
 import { USE_MOCK } from "src/apis/useMock";
 import { getTokenFromCookie } from "src/auth/cookie";
 import { Provider } from "src/i18n";
+import { useI18nTranslateToString } from "src/i18n";
 import en from "src/i18n/en";
 import zh_cn from "src/i18n/zh_cn";
 import { AntdConfigProvider } from "src/layouts/AntdConfigProvider";
@@ -48,6 +49,7 @@ import { LoginNode, publicConfig, runtimeConfig } from "src/utils/config";
 const FailEventHandler: React.FC = () => {
   const { message } = AntdApp.useApp();
   const userStore = useStore(UserStore);
+  const { t } = useI18nTranslateToString();
 
   // 登出过程需要调用的几个方法（logout, useState等）都是immutable的
   // 所以不需要每次userStore变化时来重新注册handler
@@ -59,17 +61,17 @@ const FailEventHandler: React.FC = () => {
       }
 
       if (e.data?.code === "SSH_ERROR") {
-        message.error("无法以用户身份连接到登录节点。请确认您的家目录的权限为700、750或者755");
+        message.error(t("pages._app.sshError"));
         return;
       }
 
       if (e.data?.code === "SFTP_ERROR") {
         message.error(e.data?.details.length > 150 ? e.data?.details.substring(0, 150) + "..." :
-          e.data?.details || "SFTP操作失败，请确认您是否有操作的权限");
+          e.data?.details || t("pages._app.sftpError"));
         return;
       }
 
-      message.error(`服务器出错啦！(${e.status}, ${e.data?.code}))`);
+      message.error(`${t("pages._app.otherError")}(${e.status}, ${e.data?.code}))`);
     });
   }, []);
 

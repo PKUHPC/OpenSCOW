@@ -187,4 +187,89 @@ export default {
     },
 
   },
+  pages: {
+    apps: {
+      create: {
+        title: "创建",
+        error404: "此应用不存在",
+      },
+      createApps: {
+        subTitle: "您所请求的集群不存在",
+        title: "创建应用",
+        pageTitle: "在{}集群创建应用",
+      },
+      sessions: {
+        subTitle: "您所请求的集群不存在",
+        title: "交互式应用",
+        pageTitle: "集群{}交互式应用",
+      },
+    },
+    desktop: {
+      title: "桌面",
+      pageTitle: "登录节点上的桌面",
+    },
+    files: {
+      path: {
+        subTitle: "您所请求的集群不存在",
+        title: "文件管理",
+      },
+    },
+    jobs: {
+      allJobs: {
+        title: "历史作业",
+        pageTitle: "本用户所有历史作业",
+      },
+      runningJobs: {
+        title: "未结束的作业",
+        pageTitle: "本用户未结束的作业",
+      },
+      savedJobs: {
+        title: "作业模板",
+        pageTitle: "作业模板列表",
+      },
+      submit: {
+        title: "提交作业",
+        pageTitle: "提交作业",
+        spin: "正在加载作业模板",
+      },
+    },
+    profile: {
+      title: "账号信息",
+      userInfo: "用户信息",
+      identityId: "用户ID",
+      name: "用户姓名",
+      changePassword: "修改密码",
+      loginPassword: "登录密码",
+    },
+    shell: {
+      loginNode: {
+        title: "的终端",
+        content: "以ID: {} 连接到集群 {} 的 {} 节点",
+        reloadButton: "刷新并重新连接",
+        popoverTitle: "命令",
+        popoverContent1: "跳转到文件系统",
+        popoverContent2: "，输入该命令后会跳转到文件系统，您可以进行文件的上传和下载",
+        popoverContent3: "文件下载",
+        popoverContentFile:"文件名",
+        popoverContent4: "，输入",
+        popoverContent5: "，您当前路径下的该文件会被下载到本地，目前不支持输入相对路径，",
+        popoverContent6: "如果需要下载其他目录下的文件请使用",
+        popoverContent7: "命令跳转到文件系统。",
+        popoverContent8: "使用示例：",
+        command:"命令",
+      },
+      index: {
+        title: "终端",
+        content: "启动以下集群的终端：",
+      },
+    },
+    _app: {
+      sshError:"无法以用户身份连接到登录节点。请确认您的家目录的权限为700、750或者755",
+      sftpError:"SFTP操作失败，请确认您是否有操作的权限",
+      otherError:"服务器出错啦！",
+    },
+    dashboard: {
+      title: "仪表盘",
+    },
+  },
 };

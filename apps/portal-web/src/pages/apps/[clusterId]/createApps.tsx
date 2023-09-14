@@ -17,7 +17,7 @@ import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
-import { useI18n } from "src/i18n";
+import { useI18n, useI18nTranslate, useI18nTranslateToString } from "src/i18n";
 import { CreateAppsTable } from "src/pageComponents/app/CreateAppsTable";
 import { publicConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
@@ -30,20 +30,25 @@ export const CreatAppsIndexPage: NextPage = requireAuth(() => true)(() => {
   const clusterId = queryToString(router.query.clusterId);
   const cluster = publicConfig.CLUSTERS.find((x) => x.id === clusterId);
 
+  const { tArgs } = useI18nTranslate();
+  const { t } = useI18nTranslateToString();
+
   if (!cluster) {
     return (
       <Result
         status="404"
         title={"404"}
-        subTitle={"您所请求的集群不存在。"}
+        subTitle={t("pages.apps.createApps.subTitle")}
       />
     );
   }
 
   return (
     <div>
-      <Head title="创建应用" />
-      <PageTitle titleText={`在${getI18nConfigCurrentText(cluster.name, languageId)}集群创建应用`} />
+      <Head title={t("pages.apps.createApps.title")} />
+      <PageTitle
+        titleText={tArgs("pages.apps.createApps.pageTitle", [getI18nConfigCurrentText(cluster.name, languageId)])}
+      />
       <CreateAppsTable clusterId={clusterId} />
     </div>
   );

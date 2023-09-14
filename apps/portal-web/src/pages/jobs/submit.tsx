@@ -19,6 +19,7 @@ import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
+import { useI18nTranslateToString } from "src/i18n";
 import { SubmitJobForm } from "src/pageComponents/job/SubmitJobForm";
 import { getSeverI18nConfigText, publicConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
@@ -65,13 +66,15 @@ export const SubmitJobPage: NextPage<Props> = requireAuth(() => true)(
       [cluster, jobTemplateId]),
     });
 
+    const { t } = useI18nTranslateToString();
+
     return (
       <div>
-        <Head title="提交作业" />
-        <PageTitle titleText={"提交作业"} />
+        <Head title={t("pages.jobs.submit.title")} />
+        <PageTitle titleText={t("pages.jobs.submit.pageTitle")} />
         {
           isLoading ? (
-            <Spin tip="正在加载作业模板" />
+            <Spin tip={t("pages.jobs.submit.spin")} />
           ) : (
             <SubmitJobForm initial={data} submitJobPromptText={props.submitJobPromptText} />
           )

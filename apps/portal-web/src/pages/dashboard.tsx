@@ -17,6 +17,7 @@ import { useRouter } from "next/router";
 import { useEffect } from "react";
 import { useStore } from "simstate";
 import { requireAuth } from "src/auth/requireAuth";
+import { useI18nTranslateToString } from "src/i18n";
 import { CustomizableLogoAndText } from "src/pageComponents/dashboard/CustomizableLogoAndText";
 import { UserStore } from "src/stores/UserStore";
 import { getSeverI18nConfigText, runtimeConfig } from "src/utils/config";
@@ -36,9 +37,11 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)((props: Pr
     router.replace(router.asPath);
   }, [userStore.user]);
 
+  const { t } = useI18nTranslateToString();
+
   return (
     <div>
-      <Head title="仪表盘" />
+      <Head title={t("pages.dashboard.title")} />
       <CustomizableLogoAndText homeText={props.homeText} homeTitle={props.homeTitle} />
     </div>
   );

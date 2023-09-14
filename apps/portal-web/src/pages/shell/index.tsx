@@ -14,19 +14,20 @@ import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/i18n";
 import { Button } from "antd";
 import { NextPage } from "next";
 import { requireAuth } from "src/auth/requireAuth";
-import { useI18n } from "src/i18n";
+import { Localized, useI18n, useI18nTranslateToString } from "src/i18n";
 import { publicConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
 
 export const ShellIndexPage: NextPage = requireAuth(() => true)(() => {
 
   const languageId = useI18n().currentLanguage.id;
+  const { t } = useI18nTranslateToString();
 
   return (
     <div>
-      <Head title="终端" />
+      <Head title={t("pages.shell.index.title")} />
       <h1>
-        启动以下集群的终端：
+        <Localized id="pages.shell.index.content"></Localized>
       </h1>
       {publicConfig.CLUSTERS.map(({ id, name }) => (
         <a key={id} href={`/shell/${id}`} target="__blank">

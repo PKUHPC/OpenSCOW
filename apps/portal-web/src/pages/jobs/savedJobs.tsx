@@ -13,15 +13,19 @@
 import { NextPage } from "next";
 import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
+import { useI18nTranslateToString } from "src/i18n";
 import { JobTemplateTable } from "src/pageComponents/job/JobTemplateTable";
 import { Head } from "src/utils/head";
 
 export const SavedJobsPage: NextPage = requireAuth(() => true)(
   () => {
+
+    const { t } = useI18nTranslateToString();
+
     return (
       <div>
-        <Head title="作业模板" />
-        <PageTitle titleText={"作业模板列表"} />
+        <Head title={t("pages.jobs.savedJobs.title")} />
+        <PageTitle titleText={t("pages.jobs.savedJobs.pageTitle")} />
         <JobTemplateTable />
       </div>
     );
