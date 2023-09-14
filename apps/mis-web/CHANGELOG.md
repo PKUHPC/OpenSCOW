@@ -1,5 +1,46 @@
 # @scow/mis-web
 
+## 1.0.0
+
+### Major Changes
+
+- 11f94f716: 发布 1.0
+
+### Minor Changes
+
+- ee89b11b9: 新增审计系统服务，记录门户系统及管理系统操作日志及展示
+
+### Patch Changes
+
+- cb1e3500d: 增加租户管理下和平台管理下的账户消费列表页面，优化账户消费列表显示
+- 1fc3688b8: 暴露操作集群时后端返回的错误信息
+- dfee2d354: 修复操作日志记录查不到用户信息报错问题
+- d96e8ad91: auth 登录跳转回 web 页面时，判断 referer 是否包含 AUTH_EXTERNAL_URL + '/public/auth'以区分用户登录操作和切换门户/管理系统
+- 8f0e51b3f: 管理系统用户可见分区查询时账户遍历时更改为 Promise.All()节省查询时间
+- 946b1782a: 修改作业时限操作日志内容展示修复及创建操作日志错误捕获 bug 修复
+- ffefb17b8: 修复账户添加用户提示语
+- 3610e95da: portal-web 和 mis-web 的个人信息页面调整
+- f784837d3: 增加租户管理、平台管理的账户列表封锁账户的功能
+- 945bbb5ec: 作业详情数据添加单位
+- 1bdccd827: 限制创建账户时的拥有者仅为当前租户下的用户
+- 0fbba98dd: 用户、账户、作业称呼统一
+- 1269e3cef: 操作日志搜索时间精度到秒，展示操作者姓名以及每页默认展示 50 条记录
+- Updated dependencies [cb1e3500d]
+- Updated dependencies [ee89b11b9]
+- Updated dependencies [ee89b11b9]
+- Updated dependencies [946b1782a]
+- Updated dependencies [a8034f395]
+- Updated dependencies [cb1e3500d]
+- Updated dependencies [11f94f716]
+  - @scow/lib-web@1.0.0
+  - @scow/config@1.0.0
+  - @scow/lib-operation-log@2.0.0
+  - @scow/protos@1.0.0
+  - @scow/lib-auth@1.0.0
+  - @scow/lib-decimal@1.0.0
+  - @scow/lib-config@1.0.0
+  - @scow/utils@1.0.0
+
 ## 0.9.0
 
 ### Minor Changes

@@ -1,5 +1,17 @@
 # @scow/lib-web
 
+## 1.0.0
+
+### Major Changes
+
+- 11f94f716: 发布 1.0
+
+### Patch Changes
+
+- cb1e3500d: 增加租户管理下和平台管理下的账户消费列表页面，优化账户消费列表显示
+- Updated dependencies [11f94f716]
+  - @scow/utils@1.0.0
+
 ## 0.4.0
 
 ### Minor Changes
