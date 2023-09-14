@@ -292,6 +292,7 @@ export const mockApi: MockApi<typeof api> = {
   logout: async () => null,
 
   getCharges: async () => ({ results: [{
+    tenantName: "tenant",
     amount: 10,
     comment: "123",
     index: 1,

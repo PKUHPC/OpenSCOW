@@ -90,6 +90,11 @@ export const platformAdminRoutes: (platformRoles: PlatformRole[]) => NavItemProp
             text: "充值记录",
             path: "/admin/finance/payments",
           },
+          {
+            Icon: BookOutlined,
+            text: "账户消费记录",
+            path: "/admin/finance/accountChargeRecords",
+          },
         ],
       },
       {
@@ -237,6 +242,11 @@ export const tenantRoutes: (tenantRoles: TenantRole[], token: string) => NavItem
                 Icon: BookOutlined,
                 text: "充值记录",
                 path: "/tenant/finance/payments",
+              },
+              {
+                Icon: BookOutlined,
+                text: "账户消费记录",
+                path: "/tenant/finance/accountChargeRecords",
               },
             ],
           },

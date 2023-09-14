@@ -147,6 +147,13 @@ const buildRuntimeConfig = async (phase, basePath) => {
     VERSION_TAG: versionTag,
 
     AUDIT_DEPLOYED:  config.AUDIT_DEPLOYED,
+
+    CHARGE_TYPE_LIST: [
+      misConfig.jobChargeType,
+      misConfig.changeJobPriceType,
+      ...(misConfig.customChargeTypes || []),
+    ],
+
   };
 
   if (!building) {
