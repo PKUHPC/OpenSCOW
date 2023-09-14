@@ -18,6 +18,7 @@ import React, { useState } from "react";
 import { api } from "src/apis";
 import { AmountStrategyDescriptionsItem } from "src/components/AmonutStrategyDescriptionsItem";
 import { CommonModalProps, ModalLink } from "src/components/ModalLink";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { AmountStrategy, AmountStrategyAlgorithmDescriptions,
   AmountStrategyDescription,
   AmountStrategyDescriptions, AmountStrategyText } from "src/models/job";
@@ -54,6 +55,7 @@ publicConfig.CUSTOM_AMOUNT_STRATEGIES?.forEach((i) => {
   customAmountStrategiesIdToName[i.id] = i.name || i.id;
   customAmountStrategiesIdToDescription[i.id] = i.comment || i.id;
 });
+
 
 export const ManageJobBillingTable: React.FC<Props> = ({ data, loading, tenant, reload }) => {
 

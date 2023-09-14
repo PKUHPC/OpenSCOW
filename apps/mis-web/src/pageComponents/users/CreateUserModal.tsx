@@ -13,6 +13,7 @@
 import { App, Form, Input, Modal } from "antd";
 import React, { useEffect, useState } from "react";
 import { api } from "src/apis";
+import { useI18n } from "src/i18n";
 import { CreateUserFormFields } from "src/pageComponents/users/CreateUserForm";
 import { getUserIdRule } from "src/utils/createUser";
 import { confirmPasswordFormItemProps, emailRule, passwordRule } from "src/utils/form";
@@ -57,6 +58,7 @@ export const CreateUserModal: React.FC<Props> = ({
   }, [newUserInfo]);
 
   const userIdRule = getUserIdRule();
+  const languageId = useI18n().currentLanguage.id;
 
   return (
     <Modal
@@ -91,9 +93,9 @@ export const CreateUserModal: React.FC<Props> = ({
         <Form.Item
           label="用户密码"
           name="password"
-          rules={[{ required: true }, passwordRule]}
+          rules={[{ required: true }, passwordRule(languageId)]}
         >
-          <Input.Password placeholder={passwordRule.message} />
+          <Input.Password placeholder={passwordRule(languageId).message} />
         </Form.Item>
         <Form.Item
           label="确认密码"
@@ -101,7 +103,7 @@ export const CreateUserModal: React.FC<Props> = ({
           hasFeedback
           {...confirmPasswordFormItemProps(form, "password")}
         >
-          <Input.Password placeholder={passwordRule.message} />
+          <Input.Password placeholder={passwordRule(languageId).message} />
         </Form.Item>
       </Form>
     </Modal>

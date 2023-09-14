@@ -13,6 +13,7 @@
 import { compareDateTime, formatDateTime } from "@scow/lib-web/build/utils/datetime";
 import { JobBillingItem } from "@scow/protos/build/server/job";
 import { Table } from "antd";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { moneyToString } from "src/utils/money";
 
 interface Props {
@@ -20,14 +21,20 @@ interface Props {
   loading: boolean;
 }
 
+const p = prefix("pageComp.job.jobBillingManagementTable.");
+const pCommon = prefix("pageComp.common.");
+
 export const JobBillingManagementTable: React.FC<Props> = ({ data, loading }) => {
+
+  const { t } = useI18nTranslateToString();
+
   return (
     <Table dataSource={data} loading={loading} rowKey="id">
-      <Table.Column title="计费项ID" dataIndex={"id"} />
-      <Table.Column<JobBillingItem> title="计费路径" dataIndex={"path"} />
-      <Table.Column<JobBillingItem> title="所属租户" dataIndex={"tenant"} />
+      <Table.Column title={t(p("priceId"))} dataIndex={"id"} />
+      <Table.Column<JobBillingItem> title={t(p("path"))} dataIndex={"path"} />
+      <Table.Column<JobBillingItem> title={t(p("tenant"))} dataIndex={"tenant"} />
       <Table.Column<JobBillingItem>
-        title="创建时间"
+        title={t(pCommon("createTime"))}
         dataIndex={"createTime"}
         sortDirections={["ascend", "descend"]}
         sorter={(a, b) => compareDateTime(a.createTime!, b.createTime!)}
@@ -35,7 +42,7 @@ export const JobBillingManagementTable: React.FC<Props> = ({ data, loading }) =>
         render={(t) => formatDateTime(t)}
       />
       <Table.Column<JobBillingItem>
-        title="价格"
+        title={t(pCommon("price"))}
         dataIndex={"price"}
         render={(_, r) => r.price ? moneyToString(r.price) : ""}
       />
