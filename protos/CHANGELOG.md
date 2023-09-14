@@ -1,5 +1,22 @@
 # @scow/grpc-api
 
+## 1.0.0
+
+### Major Changes
+
+- 11f94f716: 发布 1.0
+
+### Minor Changes
+
+- ee89b11b9: 新增审计系统，增加 CreateOperationLog 和 GetOperationLogs 接口定义
+- cb1e3500d: GetChargeRecords 改用 oneOf 拆分成查询账户消费记录或租户消费记录的各种情况,增加消费类型 type 的查询参数
+
+### Patch Changes
+
+- 3610e95da: 获取用户信息接口 GetUserInfoResponse 增加用户创建时间
+- f784837d3: 增加租户管理、平台管理的账户列表封锁账户的功能
+- 1269e3cef: 新增 getUsersByIds 接口以供操作日志查询操作者姓名
+
 ## 0.6.0
 
 ### Minor Changes

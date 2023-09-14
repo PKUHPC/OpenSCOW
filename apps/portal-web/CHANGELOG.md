@@ -1,5 +1,40 @@
 # @scow/portal-web
 
+## 1.0.0
+
+### Major Changes
+
+- 11f94f716: 发布 1.0
+
+### Minor Changes
+
+- ee89b11b9: 新增审计系统服务，记录门户系统及管理系统操作日志及展示
+
+### Patch Changes
+
+- d96e8ad91: auth 登录跳转回 web 页面时，判断 referer 是否包含 AUTH_EXTERNAL_URL + '/public/auth'以区分用户登录操作和切换门户/管理系统
+- 3610e95da: portal-web 和 mis-web 的个人信息页面调整
+- 945bbb5ec: 作业详情数据添加单位
+- 0fbba98dd: 用户、账户、作业称呼统一
+- 154f5a84a: 去掉 legacyBehavior，会影响 target=\_blank 在新窗口或标签中打开链接的效果
+- Updated dependencies [cb1e3500d]
+- Updated dependencies [ee89b11b9]
+- Updated dependencies [ee89b11b9]
+- Updated dependencies [946b1782a]
+- Updated dependencies [a8034f395]
+- Updated dependencies [cb1e3500d]
+- Updated dependencies [11f94f716]
+  - @scow/lib-web@1.0.0
+  - @scow/config@1.0.0
+  - @scow/lib-operation-log@2.0.0
+  - @scow/protos@1.0.0
+  - @scow/lib-auth@1.0.0
+  - @scow/lib-decimal@1.0.0
+  - @scow/lib-config@1.0.0
+  - @scow/rich-error-model@2.0.0
+  - @scow/lib-ssh@1.0.0
+  - @scow/utils@1.0.0
+
 ## 0.9.0
 
 ### Minor Changes

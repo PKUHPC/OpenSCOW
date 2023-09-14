@@ -1,5 +1,21 @@
 # @scow/config
 
+## 1.0.0
+
+### Major Changes
+
+- 11f94f716: 发布 1.0
+
+### Minor Changes
+
+- ee89b11b9: 新增审计系统配置文件
+
+### Patch Changes
+
+- cb1e3500d: 在 mis.yaml 中增加可选填的自定义可查询消费类型 customChargeTypes
+- Updated dependencies [11f94f716]
+  - @scow/lib-config@1.0.0
+
 ## 0.5.0
 
 ### Minor Changes

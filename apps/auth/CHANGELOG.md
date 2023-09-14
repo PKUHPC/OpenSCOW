@@ -1,5 +1,22 @@
 # @scow/auth
 
+## 1.0.0
+
+### Major Changes
+
+- 11f94f716: 发布 1.0
+
+### Patch Changes
+
+- d96e8ad91: auth 登录跳转回 web 页面时，判断 referer 是否包含 AUTH_EXTERNAL_URL + '/public/auth'以区分用户登录操作和切换门户/管理系统
+- Updated dependencies [ee89b11b9]
+- Updated dependencies [cb1e3500d]
+- Updated dependencies [11f94f716]
+  - @scow/config@1.0.0
+  - @scow/lib-config@1.0.0
+  - @scow/lib-ssh@1.0.0
+  - @scow/utils@1.0.0
+
 ## 0.9.0
 
 ### Minor Changes
