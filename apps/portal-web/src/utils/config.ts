@@ -144,3 +144,27 @@ export const getRuntimeI18nConfigText = <TKey extends RuntimeI18nConfigKeys>
   return getI18nConfigCurrentText(i18nConfigText, languageId);
 
 };
+
+
+/**
+ *
+ * 当具有嵌套结构的obj中有实现i18n需求的文字时，用此方法。、
+ * 为没有经过是否一定具有i18n类型的校验，只当嵌套类型中出现I18nStringType时采用此方法。
+ * @param obj
+ * 如果是多层嵌套，传递最终实现i18n文本的外层obj
+ * @param key
+ * 获取最终对应i18n文本字段的key
+ * @param languageId
+ * 当前语言id
+ * @returns string | undefined
+ * i18n语言文本
+ */
+export const getI18nText = <TObject extends Object, TKey extends keyof TObject>(
+  obj: TObject, key: TKey, languageId: string,
+): (TObject[TKey] extends I18nStringType ? string : (string | undefined)) => {
+  const value = obj[key];
+
+  if (!value) { return undefined as any; }
+
+  return getI18nConfigCurrentText(value as any, languageId);
+};

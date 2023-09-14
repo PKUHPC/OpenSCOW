@@ -96,7 +96,6 @@ export const getClusterName = (clusterId: string) => {
 
 
 // type ServerI18nConfigKeys = keyof typeof runtimeConfig.SERVER_I18N_CONFIG_TEXTS;
-type RuntimeI18nConfigKeys = keyof typeof publicConfig.RUNTIME_I18N_CONFIG_TEXTS;
 // 获取ServerConfig中相关字符串配置的对应语言的字符串
 // export const getSeverI18nConfigText = <TKey extends ServerI18nConfigKeys>
 //   (languageId: string, key: TKey): ((typeof runtimeConfig.SERVER_I18N_CONFIG_TEXTS)[TKey]) extends (I18nStringType)
@@ -111,6 +110,7 @@ type RuntimeI18nConfigKeys = keyof typeof publicConfig.RUNTIME_I18N_CONFIG_TEXTS
 
 // };
 
+type RuntimeI18nConfigKeys = keyof typeof publicConfig.RUNTIME_I18N_CONFIG_TEXTS;
 // 获取RuntimeConfig中相关字符串配置的对应语言的字符串
 export const getRuntimeI18nConfigText = <TKey extends RuntimeI18nConfigKeys>
   (languageId: string, key: TKey): ((typeof publicConfig.RUNTIME_I18N_CONFIG_TEXTS)[TKey]) extends (I18nStringType)
@@ -122,4 +122,27 @@ export const getRuntimeI18nConfigText = <TKey extends RuntimeI18nConfigKeys>
   };
   return getI18nConfigCurrentText(i18nConfigText, languageId);
 
+};
+
+/**
+ *
+ * 当具有嵌套结构的obj中有实现i18n需求的文字时，用此方法。
+ * 因为没有经过是否一定具有i18n类型的校验，只当嵌套类型中出现I18nStringType时采用此方法。
+ * @param obj
+ * 如果是多层嵌套，传递最终实现i18n文本的外层obj
+ * @param key
+ * 获取最终对应i18n文本字段的key
+ * @param languageId
+ * 当前语言id
+ * @returns string | undefined
+ * i18n语言文本
+ */
+export const getI18nText = <TObject extends Object, TKey extends keyof TObject>(
+  obj: TObject, key: TKey, languageId: string,
+): (TObject[TKey] extends I18nStringType ? string : (string | undefined)) => {
+  const value = obj[key];
+
+  if (!value) { return undefined as any; }
+
+  return getI18nConfigCurrentText(value as any, languageId);
 };
