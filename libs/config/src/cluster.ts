@@ -13,13 +13,14 @@
 import { GetConfigFn, getDirConfig } from "@scow/lib-config";
 import { Static, Type } from "@sinclair/typebox";
 import { DEFAULT_CONFIG_BASE_PATH } from "src/constants";
+import { createI18nStringSchema } from "src/type";
 
 const CLUSTER_CONFIG_BASE_PATH = "clusters";
 
 const LoginNodeConfigSchema =
   Type.Object(
     {
-      name: Type.String({ description: "登录节点展示名" }), address: Type.String({ description: "集群的登录节点地址" }),
+      name: createI18nStringSchema("登录节点展示名"), address: Type.String({ description: "集群的登录节点地址" }),
     },
   );
 
@@ -32,25 +33,26 @@ export const getLoginNode =
 
 export type Cluster = {
   id: string
-  name: string
-}
+} & ClusterConfigSchema
 
 export const getSortedClusters = (clusters: Record<string, ClusterConfigSchema>): Cluster[] => {
   return Object.keys(clusters)
     .sort(
       (a, b) => {
+        const aName = JSON.stringify(clusters[a].displayName);
+        const bName = JSON.stringify(clusters[b].displayName);
         if (clusters[a].priority === clusters[b].priority) {
           return (
-            clusters[a].displayName > clusters[b].displayName
+            aName > bName
               ? 1
-              : clusters[a].displayName === clusters[a].displayName
+              : aName === bName
                 ? 0
                 : -1
           );
         }
         return clusters[a].priority - clusters[b].priority;
       },
-    ).map((id) => ({ id, name: clusters[id].displayName }));
+    ).map((id) => ({ id, ...clusters[id] }));
 };
 
 export const LoginDeskopConfigSchema = Type.Object({
@@ -67,7 +69,7 @@ export type LoginDeskopConfigSchema = Static<typeof LoginDeskopConfigSchema>;
 type TurboVncConfigSchema = Static<typeof TurboVncConfigSchema>;
 
 export const ClusterConfigSchema = Type.Object({
-  displayName: Type.String({ description: "集群的显示名称" }),
+  displayName: createI18nStringSchema("集群的显示名称"),
   priority: Type.Number({ description: "集群使用的优先级, 数字越小越先展示", default: Number.MAX_SAFE_INTEGER }),
   adapterUrl: Type.String({ description: "调度器适配器服务地址" }),
   proxyGateway: Type.Optional(Type.Object({

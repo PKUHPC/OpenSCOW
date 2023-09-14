@@ -10,9 +10,10 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/i18n";
 import { Table } from "antd";
 import { ColumnsType } from "antd/es/table";
-import { prefix, useI18nTranslateToString } from "src/i18n";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { publicConfig } from "src/utils/config";
 
 import { AmountStrategyDescriptionsItem } from "./AmonutStrategyDescriptionsItem";
@@ -56,6 +57,7 @@ const pCommon = prefix("common.");
 export const JobBillingTable: React.FC<Props> = ({ data, loading }) => {
 
   const { t } = useI18nTranslateToString();
+  const languageId = useI18n().currentLanguage.id;
 
   const clusterTotalQosCounts = data && data.length ?
     data.reduce((totalQosCounts: { [cluster: string]: number }, item) => {
@@ -70,7 +72,7 @@ export const JobBillingTable: React.FC<Props> = ({ data, loading }) => {
 
   const columns: ColumnsType<JobBillingTableItem> = [
     { dataIndex: "cluster", title: t(pCommon("cluster")), key: "index", render: (_, r) => ({
-      children: publicConfig.CLUSTERS[r.cluster]?.name ?? r.cluster,
+      children: getI18nConfigCurrentText(publicConfig.CLUSTERS[r.cluster]?.name, languageId) ?? r.cluster,
       props: { rowSpan: r.clusterItemIndex === 0 && clusterTotalQosCounts ? clusterTotalQosCounts[r.cluster] : 0 },
     }) },
     { dataIndex: "partition", title: t(pCommon("partition")), key: "index", render: (_, r) => ({

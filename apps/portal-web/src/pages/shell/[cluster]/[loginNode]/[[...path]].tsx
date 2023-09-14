@@ -12,6 +12,7 @@
 
 import "xterm/css/xterm.css";
 
+import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/i18n";
 import { Button, Popover, Space, Typography } from "antd";
 import { NextPage } from "next";
 import dynamic from "next/dynamic";
@@ -19,6 +20,7 @@ import Router, { useRouter } from "next/router";
 import { useRef } from "react";
 import { requireAuth } from "src/auth/requireAuth";
 import { NotFoundPage } from "src/components/errorPages/NotFoundPage";
+import { useI18n } from "src/i18n";
 import { publicConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
 import styled from "styled-components";
@@ -73,6 +75,8 @@ export const ShellPage: NextPage = requireAuth(() => true)(({ userStore }) => {
     return <NotFoundPage />;
   }
 
+  const languageId = useI18n().currentLanguage.id;
+
   const router = useRouter();
 
   const cluster = router.query.cluster as string;
@@ -81,7 +85,8 @@ export const ShellPage: NextPage = requireAuth(() => true)(({ userStore }) => {
 
   const headerRef = useRef<HTMLDivElement>(null);
 
-  const clusterName = publicConfig.CLUSTERS.find((x) => x.id === cluster)?.name || cluster;
+  const clusterName =
+    getI18nConfigCurrentText(publicConfig.CLUSTERS.find((x) => x.id === cluster)?.name || cluster, languageId);
 
 
   return (

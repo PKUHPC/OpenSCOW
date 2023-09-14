@@ -105,6 +105,7 @@ message ListAppSessionsResponse {
 message GetAppMetadataRequest {
   string app_id = 1;
   string cluster = 2;
+  string language = 3;
 }
 
 message SelectOption {

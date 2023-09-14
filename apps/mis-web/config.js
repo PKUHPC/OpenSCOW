@@ -129,7 +129,6 @@ const buildRuntimeConfig = async (phase, basePath) => {
     }, {}),
 
     ACCOUNT_NAME_PATTERN: misConfig.accountNamePattern?.regex,
-    ACCOUNT_NAME_PATTERN_MESSAGE: misConfig.accountNamePattern?.errorMessage,
 
     PORTAL_URL: config.PORTAL_DEPLOYED ? (config.PORTAL_URL || misConfig.portalUrl || "") : undefined,
 
@@ -148,7 +147,10 @@ const buildRuntimeConfig = async (phase, basePath) => {
     AUDIT_DEPLOYED:  config.AUDIT_DEPLOYED,
 
     RUNTIME_I18N_CONFIG_TEXTS: {
+      accountNamePatternMessage: misConfig.accountNamePattern?.errorMessage,
       passwordPatternMessage: commonConfig.passwordPattern?.errorMessage,
+      createUserBuiltinErrorMessage: misConfig.createUser?.userIdPattern?.errorMessage,
+      createUserErrorMessage: misConfig.createUser?.builtin?.userIdPattern?.errorMessage,
     },
 
   };

@@ -12,6 +12,8 @@
 
 import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
+import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/i18n";
+import { getLanguageCookie } from "@scow/lib-web/build/utils/languages";
 import { ConfigServiceClient } from "@scow/protos/build/common/config";
 import { ConfigServiceClient as MisConfigServerClient } from "@scow/protos/build/server/config";
 import { JobBillingItem } from "@scow/protos/build/server/job";
@@ -151,7 +153,7 @@ const removeDuplicatesByPName = (partitions: Partition[]): Partition[] => {
 };
 
 export async function getBillingTableItems(
-  tenantName: string | undefined, userId?: string | undefined): Promise<JobBillingTableItem[]> {
+  tenantName: string | undefined, languageId: string, userId?: string | undefined): Promise<JobBillingTableItem[]> {
   const items = (await getBillingItems(tenantName, true)).activeItems;
 
   const pathItemMap = items.reduce((prev, curr) => {
@@ -182,12 +184,12 @@ export async function getBillingTableItems(
         const path = [cluster, partition.name, qos].filter((x) => x).join(".");
 
         const item = pathItemMap[path];
-
+        const clusterName = getI18nConfigCurrentText(publicConfig.CLUSTERS[cluster].name, languageId);
         tableItems.push({
           index: count++,
           clusterItemIndex: clusterItemIndex++,
           partitionItemIndex: partitionItemIndex++,
-          cluster: publicConfig.CLUSTERS[cluster]?.name ?? cluster,
+          cluster: clusterName ?? cluster,
           cores: partition.cores,
           gpus: partition.gpus,
           mem: partition.memMb,
@@ -214,7 +216,7 @@ export async function getBillingTableItems(
 
 export default /* #__PURE__*/typeboxRoute(GetBillingTableSchema, async (req, res) => {
   const { tenant, userId } = req.query;
-
+  const languageId = getLanguageCookie(req);
   const auth = authenticate(() => true);
   const info = await auth(req, res);
   if (!info) { return; }
@@ -222,7 +224,13 @@ export default /* #__PURE__*/typeboxRoute(GetBillingTableSchema, async (req, res
   const clusterTexts = runtimeConfig.CLUSTER_TEXTS_CONFIG;
   const text = clusterTexts && tenant ? (clusterTexts[tenant] ?? clusterTexts.default) : undefined;
 
-  const items = await getBillingTableItems(tenant, userId);
+  const items = await getBillingTableItems(tenant, languageId, userId);
 
-  return { 200: { items, text } };
+  return { 200: { items, text: text ? {
+    clusterComment: getI18nConfigCurrentText(text.clusterComment, languageId),
+    extras: text.extras?.map((extra) => ({
+      title: getI18nConfigCurrentText(extra.title, languageId),
+      content: getI18nConfigCurrentText(extra.content, languageId),
+    })),
+  } : text } };
 });

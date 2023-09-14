@@ -52,6 +52,7 @@ export const GetAppMetadataSchema = typeboxRouteSchema({
   query: Type.Object({
     cluster: Type.String(),
     appId: Type.String(),
+    languageId: Type.String(),
   }),
 
   responses: {
@@ -74,11 +75,11 @@ export default /* #__PURE__*/typeboxRoute(GetAppMetadataSchema, async (req, res)
 
   if (!info) { return; }
 
-  const { appId, cluster } = req.query;
+  const { appId, cluster, languageId } = req.query;
 
   const client = getClient(AppServiceClient);
 
-  return asyncUnaryCall(client, "getAppMetadata", { appId, cluster }).then((reply) => {
+  return asyncUnaryCall(client, "getAppMetadata", { appId, cluster, language: languageId }).then((reply) => {
     const attributes: AppCustomAttribute[] = reply.attributes.map((item) => ({
       type: appCustomAttribute_AttributeTypeToJSON(item.type) as AppCustomAttribute["type"],
       label: item.label,

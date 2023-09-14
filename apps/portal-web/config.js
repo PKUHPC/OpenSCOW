@@ -180,7 +180,7 @@ const buildRuntimeConfig = async (phase, basePath) => {
 
     MIS_URL: config.MIS_DEPLOYED ? (config.MIS_URL || portalConfig.misUrl) : undefined,
 
-    CLUSTERS: getSortedClusters(clusters),
+    CLUSTERS: getSortedClusters(clusters).map((cluster) => ({ id: cluster.id, name: cluster.displayName })),
 
     NOVNC_CLIENT_URL: config.NOVNC_CLIENT_URL,
 

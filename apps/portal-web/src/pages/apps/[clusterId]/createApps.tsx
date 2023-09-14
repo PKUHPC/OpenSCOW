@@ -10,17 +10,21 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/i18n";
 import { queryToString } from "@scow/lib-web/build/utils/querystring";
 import { Result } from "antd";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
+import { useI18n } from "src/i18n";
 import { CreateAppsTable } from "src/pageComponents/app/CreateAppsTable";
 import { publicConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
 
 export const CreatAppsIndexPage: NextPage = requireAuth(() => true)(() => {
+
+  const languageId = useI18n().currentLanguage.id;
 
   const router = useRouter();
   const clusterId = queryToString(router.query.clusterId);
@@ -39,7 +43,7 @@ export const CreatAppsIndexPage: NextPage = requireAuth(() => true)(() => {
   return (
     <div>
       <Head title="创建应用" />
-      <PageTitle titleText={`在${cluster.name}集群创建应用`} />
+      <PageTitle titleText={`在${getI18nConfigCurrentText(cluster.name, languageId)}集群创建应用`} />
       <CreateAppsTable clusterId={clusterId} />
     </div>
   );

@@ -10,6 +10,8 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/i18n";
+import { getLanguageCookie } from "@scow/lib-web/build/utils/languages";
 import { GetServerSideProps, NextPage } from "next";
 import { requireAuth } from "src/auth/requireAuth";
 import { NotFoundPage } from "src/components/errorPages/NotFoundPage";
@@ -38,11 +40,15 @@ export const DesktopIndexPage: NextPage<Props> = requireAuth(() => true)
 });
 
 
-export const getServerSideProps: GetServerSideProps<Props> = async () => {
+export const getServerSideProps: GetServerSideProps<Props> = async ({ req }) => {
+
+  const languageId = getLanguageCookie(req);
 
   const loginDesktopEnabledClusters = Object.keys(runtimeConfig.CLUSTERS_CONFIG)
     .filter((clusterId) => getLoginDesktopEnabled(clusterId))
-    .map((clusterId) => ({ id: clusterId, name: runtimeConfig.CLUSTERS_CONFIG[clusterId].displayName } as Cluster));
+    .map((clusterId) => ({
+      id: clusterId,
+      name: getI18nConfigCurrentText(runtimeConfig.CLUSTERS_CONFIG[clusterId].displayName, languageId) } as Cluster));
 
   return {
     props: {

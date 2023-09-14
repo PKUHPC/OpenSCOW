@@ -17,8 +17,9 @@ import React, { useState } from "react";
 import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
+import { useI18n } from "src/i18n";
 import { TenantRole } from "src/models/User";
-import { publicConfig } from "src/utils/config";
+import { getRuntimeI18nConfigText, publicConfig } from "src/utils/config";
 import { getUserIdRule } from "src/utils/createUser";
 import { Head } from "src/utils/head";
 
@@ -35,6 +36,8 @@ interface CreateAccountFormProps {
 
 
 const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ tenantName }) => {
+
+  const languageId = useI18n().currentLanguage.id;
 
   const [form] = Form.useForm<FormProps>();
 
@@ -56,7 +59,8 @@ const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ tenantName }) => 
       .finally(() => setLoading(false));
   };
 
-  const userIdRule = getUserIdRule();
+
+  const userIdRule = getUserIdRule(languageId);
 
   return (
     <Form
@@ -73,7 +77,7 @@ const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ tenantName }) => 
           { required: true },
           ...(publicConfig.ACCOUNT_NAME_PATTERN ? [{
             pattern: new RegExp(publicConfig.ACCOUNT_NAME_PATTERN),
-            message: publicConfig.ACCOUNT_NAME_PATTERN_MESSAGE }] : []),
+            message:getRuntimeI18nConfigText(languageId, "accountNamePatternMessage") }] : []),
         ]}
       >
         <Input />

@@ -10,9 +10,10 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/i18n";
 import { Select } from "antd";
-import dynamic from "next/dynamic";
 import { useStore } from "simstate";
+import { useI18n } from "src/i18n";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { Cluster, publicConfig } from "src/utils/config";
 
@@ -22,6 +23,9 @@ interface Props {
 }
 
 export const ClusterSelector: React.FC<Props> = ({ value, onChange }) => {
+
+  const languageId = useI18n().currentLanguage.id;
+
   return (
     <Select
       mode="multiple"
@@ -29,7 +33,8 @@ export const ClusterSelector: React.FC<Props> = ({ value, onChange }) => {
       placeholder="请选择集群"
       value={value ? value.map((v) => ({ value: v.id, label: v.name })) : undefined}
       onChange={(values) => onChange?.(values.map((x) => ({ id: x.value, name: x.label })))}
-      options={publicConfig.CLUSTERS.map((x) => ({ value: x.id, label: x.name }))}
+      options={Object.values(publicConfig.CLUSTERS).map((x) => ({ value: x.id, label:
+        getI18nConfigCurrentText(x.name, languageId) }))}
     />
   );
 };
@@ -50,6 +55,8 @@ export const SingleClusterSelector: React.FC<SingleSelectionProps> = ({
 
   const { setDefaultCluster } = useStore(DefaultClusterStore);
 
+  const languageId = useI18n().currentLanguage.id;
+
   return (
     <Select
       labelInValue
@@ -63,7 +70,11 @@ export const SingleClusterSelector: React.FC<SingleSelectionProps> = ({
       options={
         (label ? [{ value: label, label, disabled: true }] : [])
           .concat((publicConfig.CLUSTERS.filter((x) => clusterIds?.includes(x.id) ?? true))
-            .map((x) => ({ value: x.id, label: x.name, disabled: false })))
+            .map((x) => ({
+              value: x.id,
+              label:  getI18nConfigCurrentText(x.name, languageId),
+              disabled: false,
+            })))
       }
       popupMatchSelectWidth={false}
     />

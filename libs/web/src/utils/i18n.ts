@@ -20,7 +20,11 @@ export type I18nStringType = string | {
   }
 }
 
-export const getI18nConfigCurrentText = (i18nConfigText: I18nStringType, languageId: string | undefined): string => {
+export const getI18nConfigCurrentText =
+(i18nConfigText: I18nStringType | undefined, languageId: string | undefined): string => {
+  if (!i18nConfigText) {
+    return "";
+  }
   if (typeof i18nConfigText === "string") {
     return i18nConfigText;
   } else {

@@ -14,6 +14,7 @@ import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { AppType } from "@scow/config/build/app";
+import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/i18n";
 import {
   AppCustomAttribute,
   appCustomAttribute_AttributeTypeFromJSON,
@@ -190,7 +191,7 @@ export const appServiceServer = plugin((server) => {
 
     getAppMetadata: async ({ request }) => {
 
-      const { appId, cluster } = request;
+      const { appId, cluster, language } = request;
       const apps = getClusterAppConfigs(cluster);
       const app = apps[appId];
 
@@ -211,16 +212,16 @@ export const appServiceServer = plugin((server) => {
 
           attributes.push({
             type: appCustomAttribute_AttributeTypeFromJSON(attributeType),
-            label: item.label,
-            name: item.name,
+            label: getI18nConfigCurrentText(item.label, language),
+            name: getI18nConfigCurrentText(item.name, language),
             required: item.required,
             defaultInput: defaultInput,
-            placeholder: item.placeholder,
-            options: item.select ?? [],
+            placeholder: getI18nConfigCurrentText(item.placeholder, language),
+            options: item.select?.map((x) => ({ ...x, label: getI18nConfigCurrentText(x.label, language) })) ?? [],
           });
         });
       }
-
+      console.log("attributes: ", attributes);
       return [{ appName: app.name, attributes: attributes }];
     },
 

@@ -13,6 +13,7 @@
 import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { status } from "@grpc/grpc-js";
+import { getLanguageCookie } from "@scow/lib-web/build/utils/languages";
 import { UserServiceClient } from "@scow/protos/build/server/user";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
@@ -80,16 +81,13 @@ export default /* #__PURE__*/typeboxRoute(CreateUserSchema, async (req, res) => 
 
   if (!info) { return; }
 
-  const userIdRule = getUserIdRule();
+  const languageId = getLanguageCookie(req);
+  const userIdRule = getUserIdRule(languageId);
 
 
   if (userIdRule && !userIdRule.pattern.test(identityId)) {
     return { 400: { code: "USERID_NOT_VALID" as const, message: userIdRule.message } };
   }
-
-  // TODO
-  // shcemaErrorMessage i18n
-  const languageId = "zh_cn";
 
   if (passwordPattern && !passwordPattern.test(password)) {
     return { 400: { code: "PASSWORD_NOT_VALID" as const,

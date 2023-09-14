@@ -34,6 +34,9 @@ export interface ServerRuntimeConfig {
   SCOW_API_AUTH_TOKEN?: string;
 
   AUDIT_CONFIG: AuditConfigSchema | undefined;
+
+  SERVER_I18N_CONFIG_TEXTS: {
+  };
 }
 
 export interface PublicRuntimeConfig {
@@ -47,7 +50,6 @@ export interface PublicRuntimeConfig {
   ENABLE_CHANGE_PASSWORD: boolean | undefined;
 
   ACCOUNT_NAME_PATTERN: string | undefined;
-  ACCOUNT_NAME_PATTERN_MESSAGE: string | undefined;
 
   PASSWORD_PATTERN: string | undefined;
 
@@ -67,13 +69,17 @@ export interface PublicRuntimeConfig {
 
   RUNTIME_I18N_CONFIG_TEXTS: {
     passwordPatternMessage: I18nStringType | undefined,
+    accountNamePatternMessage: I18nStringType | undefined,
+    createUserBuiltinErrorMessage: I18nStringType | undefined,
+    createUserErrorMessage: I18nStringType | undefined,
+
   }
 }
 
 export const runtimeConfig: ServerRuntimeConfig = getConfig().serverRuntimeConfig;
 export const publicConfig: PublicRuntimeConfig = getConfig().publicRuntimeConfig;
 
-export type Cluster = { id: string; name: string; }
+export type Cluster = { id: string; name: I18nStringType; }
 export type NavLink = {
   text: string;
   url?: string;
@@ -90,25 +96,25 @@ export type CustomAmountStrategy = {
   comment?: string | undefined;
 }
 
-export const getClusterName = (clusterId: string) => {
-  return publicConfig.CLUSTERS[clusterId]?.name || clusterId;
+export const getClusterName = (clusterId: string, languageId: string) => {
+  return getI18nConfigCurrentText(publicConfig.CLUSTERS[clusterId]?.name, languageId) || clusterId;
 };
 
 
-// type ServerI18nConfigKeys = keyof typeof runtimeConfig.SERVER_I18N_CONFIG_TEXTS;
+type ServerI18nConfigKeys = keyof typeof runtimeConfig.SERVER_I18N_CONFIG_TEXTS;
 // 获取ServerConfig中相关字符串配置的对应语言的字符串
-// export const getSeverI18nConfigText = <TKey extends ServerI18nConfigKeys>
-//   (languageId: string, key: TKey): ((typeof runtimeConfig.SERVER_I18N_CONFIG_TEXTS)[TKey]) extends (I18nStringType)
-//   ? (string) : string | undefined => {
+export const getSeverI18nConfigText = <TKey extends ServerI18nConfigKeys>
+  (languageId: string, key: TKey): ((typeof runtimeConfig.SERVER_I18N_CONFIG_TEXTS)[TKey]) extends (I18nStringType)
+  ? (string) : string | undefined => {
 
-//   const i18nConfigText = runtimeConfig.SERVER_I18N_CONFIG_TEXTS[key];
+  const i18nConfigText = runtimeConfig.SERVER_I18N_CONFIG_TEXTS[key];
 
-//   if (!i18nConfigText) {
-//     return undefined as any;
-//   };
-//   return getI18nConfigCurrentText(i18nConfigText, languageId);
+  if (!i18nConfigText) {
+    return undefined as any;
+  };
+  return getI18nConfigCurrentText(i18nConfigText, languageId);
 
-// };
+};
 
 type RuntimeI18nConfigKeys = keyof typeof publicConfig.RUNTIME_I18N_CONFIG_TEXTS;
 // 获取RuntimeConfig中相关字符串配置的对应语言的字符串
@@ -137,9 +143,11 @@ export const getRuntimeI18nConfigText = <TKey extends RuntimeI18nConfigKeys>
  * @returns string | undefined
  * i18n语言文本
  */
-export const getI18nText = <TObject extends Object, TKey extends keyof TObject>(
-  obj: TObject, key: TKey, languageId: string,
+export const getI18nText = <TObject extends object, TKey extends keyof TObject>(
+  obj: TObject | undefined, key: TKey, languageId: string,
 ): (TObject[TKey] extends I18nStringType ? string : (string | undefined)) => {
+
+  if (!obj) { return undefined as any; }
   const value = obj[key];
 
   if (!value) { return undefined as any; }

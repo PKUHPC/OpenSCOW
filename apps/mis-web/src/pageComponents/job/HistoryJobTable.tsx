@@ -24,7 +24,7 @@ import { api } from "src/apis";
 import { ClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer, FilterFormTabs } from "src/components/FilterFormContainer";
 import { TableTitle } from "src/components/TableTitle";
-import { prefix, useI18nTranslateToString } from "src/i18n";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { HistoryJobDrawer } from "src/pageComponents/job/HistoryJobDrawer";
 import type { GetJobInfoSchema } from "src/pages/api/job/jobInfo";
 import type { Cluster } from "src/utils/config";
@@ -226,6 +226,7 @@ export const JobInfoTable: React.FC<JobInfoTableProps> = ({
 }) => {
 
   const { t } = useI18nTranslateToString();
+  const languageId = useI18n().currentLanguage.id;
 
   const [previewItem, setPreviewItem] = useState<JobInfo | undefined>(undefined);
 
@@ -297,7 +298,7 @@ export const JobInfoTable: React.FC<JobInfoTableProps> = ({
         <Table.Column<JobInfo>
           dataIndex="cluster"
           title={t(pCommon("cluster"))}
-          render={getClusterName}
+          render={(cluster) => getClusterName(cluster, languageId)}
         />
         <Table.Column<JobInfo> dataIndex="partition" title={t(pCommon("partition"))} />
         <Table.Column<JobInfo> dataIndex="qos" title="QOS" />

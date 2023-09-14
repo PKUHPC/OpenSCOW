@@ -15,7 +15,7 @@ import { App, Button, Form, Input, Modal } from "antd";
 import React, { useState } from "react";
 import { api } from "src/apis";
 import { CountdownText } from "src/components/CountdownText";
-import { prefix, useI18nTranslateToString } from "src/i18n";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { CreateUserModal } from "src/pageComponents/users/CreateUserModal";
 import { publicConfig } from "src/utils/config";
 import { addUserToAccountParams, getUserIdRule, useBuiltinCreateUser } from "src/utils/createUser";
@@ -44,8 +44,8 @@ const NewUserModal: React.FC<ModalProps> = ({
 
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm<FormProps>();
-
-  const userIdRule = getUserIdRule();
+  const languageId = useI18n().currentLanguage.id;
+  const userIdRule = getUserIdRule(languageId);
 
   return (
     <Modal

@@ -68,7 +68,8 @@ export default /* #__PURE__*/typeboxRoute(CreateTenantSchema, async (req, res) =
 
   const { tenantName, userId, userName, userEmail, userPassword } = req.body;
 
-  const userIdRule = getUserIdRule();
+  const languageId = getLanguageCookie(req);
+  const userIdRule = getUserIdRule(languageId);
 
   const auth = authenticate((u) =>
     u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN));
@@ -80,8 +81,6 @@ export default /* #__PURE__*/typeboxRoute(CreateTenantSchema, async (req, res) =
   if (userIdRule && !userIdRule.pattern.test(userId)) {
     return { 400: { code: "USERID_NOT_VALID" as const, message: userIdRule.message } };
   }
-
-  const languageId = getLanguageCookie(req);
 
   if (passwordPattern && !passwordPattern.test(userPassword)) {
     return { 400: { code: "PASSWORD_NOT_VALID" as const,

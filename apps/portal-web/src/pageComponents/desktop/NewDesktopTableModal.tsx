@@ -43,6 +43,7 @@ export const NewDesktopTableModal: React.FC<Props> = ({
   availableWms = [],
 }) => {
 
+
   const [form] = Form.useForm<FormInfo>();
 
   const { modal } = App.useApp();

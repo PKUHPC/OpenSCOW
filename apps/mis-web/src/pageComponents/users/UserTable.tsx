@@ -75,13 +75,6 @@ export const UserTable: React.FC<Props> = ({
         title={t(pCommon("status"))}
         render={(s) => statusTexts[s]}
       />
-      {/* {
-        Object.entries(publicConfig.CLUSTERS.map(({ id, name }) => (
-          <Table.Column<AccountUserInfo> key={id} dataIndex="storageQuota" title={`${name}存储`}
-            render={(_, r) => `${r.storageQuotas[id]} TB`}
-          />
-        )))
-      } */}
       <Table.Column<AccountUserInfo>
         dataIndex="jobChargeLimit"
         title={t(p("alreadyUsed"))}
@@ -89,13 +82,6 @@ export const UserTable: React.FC<Props> = ({
           ? `${moneyToString(r.usedJobChargeLimit)} / ${moneyToString(r.jobChargeLimit)} ${t(pCommon("unit"))}`
           : t(p("none"))}
       />
-      {/* <Table.Column<AccountUserInfo> dataIndex="storageQuota" title="作业信息"
-        render={(_, r) => (
-          <Link href={getJobsPageUrl(r.userId)}>
-              查看
-          </Link>
-        )}
-      /> */}
       <Table.Column<AccountUserInfo>
         title={t(pCommon("operation"))}
         render={(_, r) => (

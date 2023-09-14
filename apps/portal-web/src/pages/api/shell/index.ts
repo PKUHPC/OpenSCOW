@@ -12,6 +12,8 @@
 
 import { asyncDuplexStreamCall } from "@ddadaal/tsgrpc-client";
 import { getLoginNode } from "@scow/config/build/cluster";
+import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/i18n";
+import { getLanguageCookie } from "@scow/lib-web/build/utils/languages";
 import { queryToIntOrDefault } from "@scow/lib-web/build/utils/querystring";
 import { ShellResponse, ShellServiceClient } from "@scow/protos/build/portal/shell";
 import { normalizePathnameWithQuery } from "@scow/utils";
@@ -102,8 +104,10 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
     throw new Error(`Unknown cluster ${cluster}`);
   }
 
+  const languageId = getLanguageCookie(req);
+
   const loginNode = runtimeConfig.CLUSTERS_CONFIG[cluster].loginNodes.map(getLoginNode).find(
-    (x) => x.name === loginNodeName,
+    (x) => getI18nConfigCurrentText(x.name, languageId) === loginNodeName,
   );
 
   // unknown login node

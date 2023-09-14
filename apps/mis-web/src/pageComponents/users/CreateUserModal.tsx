@@ -62,8 +62,8 @@ export const CreateUserModal: React.FC<Props> = ({
     }
   }, [newUserInfo]);
 
-  const userIdRule = getUserIdRule();
   const languageId = useI18n().currentLanguage.id;
+  const userIdRule = getUserIdRule(languageId);
 
   return (
     <Modal

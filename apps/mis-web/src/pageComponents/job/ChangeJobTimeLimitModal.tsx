@@ -11,10 +11,11 @@
  */
 
 import { arrayContainsElement } from "@scow/lib-web/build/utils/array";
+import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/i18n";
 import { App, Divider, Form, InputNumber, Modal, Progress } from "antd";
 import { useRef, useState } from "react";
 import { api } from "src/apis";
-import { prefix, useI18nTranslateToString } from "src/i18n";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { RunningJobInfo } from "src/models/job";
 import type { Cluster } from "src/utils/config";
 
@@ -43,6 +44,8 @@ const pCommon = prefix("common.");
 export const ChangeJobTimeLimitModal: React.FC<Props> = ({ open, onClose, data, reload }) => {
 
   const { t } = useI18nTranslateToString();
+
+  const languageId = useI18n().currentLanguage.id;
 
   const { message } = App.useApp();
 
@@ -118,7 +121,7 @@ export const ChangeJobTimeLimitModal: React.FC<Props> = ({ open, onClose, data, 
           Array.from(dataGroupedByCluster.entries()).map(([cluster, data]) => (
             <>
               <Form.Item label={t(pCommon("cluster"))}>
-                <strong>{cluster.name}</strong>
+                <strong>{getI18nConfigCurrentText(cluster.name, languageId)}</strong>
               </Form.Item>
               <Form.Item label={t(pCommon("userId"))}>
                 <strong>{data.map((x) => x.jobId).join(", ")}</strong>

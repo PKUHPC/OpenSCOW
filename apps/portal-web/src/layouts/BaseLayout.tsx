@@ -31,7 +31,7 @@ interface Props {
 export const BaseLayout = ({ footerText, versionTag, children }: PropsWithChildren<Props>) => {
 
   const userStore = useStore(UserStore);
-  const loginNodes = useStore(LoginNodeStore);
+  const { loginNodes } = useStore(LoginNodeStore);
   const { defaultCluster, setDefaultCluster, removeDefaultCluster } = useStore(DefaultClusterStore);
 
   const { t } = useI18nTranslateToString();

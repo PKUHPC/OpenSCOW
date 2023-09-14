@@ -98,15 +98,14 @@ type Props = AppProps & { extra: ExtraProps };
 function MyApp({ Component, pageProps, extra }: Props) {
 
   // remembers extra props from first load
-  const { current: { userInfo, primaryColor, footerText } } = useRef(extra);
+  const { current: { userInfo, primaryColor, footerText, loginNodes, languageId } } = useRef(extra);
 
   const userStore = useConstant(() => {
     const store = createStore(UserStore, userInfo);
     return store;
   });
 
-
-  const loginNodeStore = useConstant(() => createStore(LoginNodeStore, extra.loginNodes));
+  const loginNodeStore = useConstant(() => createStore(LoginNodeStore, loginNodes, languageId));
 
   const defaultClusterStore = useConstant(() => createStore(DefaultClusterStore));
 

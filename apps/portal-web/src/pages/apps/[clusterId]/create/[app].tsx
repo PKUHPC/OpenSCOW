@@ -20,6 +20,7 @@ import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
+import { useI18n } from "src/i18n";
 import { LaunchAppForm } from "src/pageComponents/app/LaunchAppForm";
 import { Head } from "src/utils/head";
 
@@ -32,12 +33,14 @@ export const AppIndexPage: NextPage = requireAuth(() => true)(() => {
 
   const { message } = App.useApp();
 
+  const languageId = useI18n().currentLanguage.id;
+
   const { data, isLoading } = useAsync({
     promiseFn: useCallback(async () => {
-      return await api.getAppMetadata({ query: { appId, cluster: clusterId } })
+      return await api.getAppMetadata({ query: { appId, cluster: clusterId, languageId } })
         .httpError(404, () => { message.error("此应用不存在"); })
         .then((res) => res);
-    }, [appId]),
+    }, [appId, languageId]),
   });
 
   if (isLoading || !data) {

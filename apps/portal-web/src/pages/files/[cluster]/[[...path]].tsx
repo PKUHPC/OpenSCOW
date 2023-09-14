@@ -10,16 +10,20 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/i18n";
 import { queryToArray, queryToString } from "@scow/lib-web/build/utils/querystring";
 import { Result } from "antd";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { requireAuth } from "src/auth/requireAuth";
+import { useI18n } from "src/i18n";
 import { FileManager } from "src/pageComponents/filemanager/FileManager";
 import { publicConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
 
 export const FileManagerPage: NextPage = requireAuth(() => true)(() => {
+
+  const languageId = useI18n().currentLanguage.id;
 
   const router = useRouter();
   const pathParts = queryToArray(router.query.path);
@@ -43,7 +47,7 @@ export const FileManagerPage: NextPage = requireAuth(() => true)(() => {
 
   return (
     <>
-      <Head title={`${clusterObj.name}文件管理`} />
+      <Head title={`${getI18nConfigCurrentText(clusterObj.name, languageId)}文件管理`} />
       <FileManager
         cluster={clusterObj}
         path={fullPath}

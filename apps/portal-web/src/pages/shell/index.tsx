@@ -10,13 +10,18 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/i18n";
 import { Button } from "antd";
 import { NextPage } from "next";
 import { requireAuth } from "src/auth/requireAuth";
+import { useI18n } from "src/i18n";
 import { publicConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
 
 export const ShellIndexPage: NextPage = requireAuth(() => true)(() => {
+
+  const languageId = useI18n().currentLanguage.id;
+
   return (
     <div>
       <Head title="终端" />
@@ -26,7 +31,7 @@ export const ShellIndexPage: NextPage = requireAuth(() => true)(() => {
       {publicConfig.CLUSTERS.map(({ id, name }) => (
         <a key={id} href={`/shell/${id}`} target="__blank">
           <Button>
-            {name}
+            {getI18nConfigCurrentText(name, languageId)}
           </Button>
         </a>
       ))}

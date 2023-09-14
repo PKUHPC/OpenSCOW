@@ -33,9 +33,9 @@ export const CreateTenantForm: React.FC = () => {
 
   const form = Form.useFormInstance<CreateTenantFormFields>();
 
-  const userIdRule = getUserIdRule();
-
   const languageId = useI18n().currentLanguage.id;
+  const userIdRule = getUserIdRule(languageId);
+
 
   return (
     <>

@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/i18n";
 import { App, Button, Form, InputNumber, Popconfirm, Space, Table } from "antd";
 import Router from "next/router";
 import { join } from "path";
@@ -19,7 +20,7 @@ import { useStore } from "simstate";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
-import { useI18nTranslateToString } from "src/i18n";
+import { useI18n, useI18nTranslateToString } from "src/i18n";
 import { runningJobId, RunningJobInfo } from "src/models/job";
 import { RunningJobDrawer } from "src/pageComponents/job/RunningJobDrawer";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
@@ -126,6 +127,8 @@ export const RunningJobInfoTable: React.FC<JobInfoTableProps> = ({
   const { message } = App.useApp();
   const { t } = useI18nTranslateToString();
 
+  const languageId = useI18n().currentLanguage.id;
+
   const [previewItem, setPreviewItem] = useState<RunningJobInfo | undefined>(undefined);
 
   return (
@@ -142,7 +145,7 @@ export const RunningJobInfoTable: React.FC<JobInfoTableProps> = ({
             <Table.Column<RunningJobInfo>
               dataIndex="cluster"
               title="集群"
-              render={(_, r) => r.cluster.name}
+              render={(_, r) => getI18nConfigCurrentText(r.cluster.name, languageId)}
             />
           )
         }

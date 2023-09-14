@@ -18,7 +18,7 @@ import React, { useState } from "react";
 import { api } from "src/apis";
 import { AmountStrategyDescriptionsItem } from "src/components/AmonutStrategyDescriptionsItem";
 import { CommonModalProps, ModalLink } from "src/components/ModalLink";
-import { prefix, useI18nTranslateToString } from "src/i18n";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { AmountStrategy, AmountStrategyAlgorithmDescriptions,
   AmountStrategyDescription,
   AmountStrategyDescriptions, AmountStrategyText } from "src/models/job";
@@ -63,6 +63,7 @@ const pCommon = prefix("common.");
 export const ManageJobBillingTable: React.FC<Props> = ({ data, loading, tenant, reload }) => {
 
   const { t } = useI18nTranslateToString();
+  const languageId = useI18n().currentLanguage.id;
 
   return (
     <Table
@@ -124,7 +125,11 @@ export const ManageJobBillingTable: React.FC<Props> = ({ data, loading, tenant, 
         </Space>
       )}
       >
-        <Table.Column title={t(pCommon("cluster"))} dataIndex={"cluster"} render={getClusterName} />
+        <Table.Column
+          title={t(pCommon("cluster"))}
+          dataIndex={"cluster"}
+          render={(cluster) => getClusterName(cluster, languageId)}
+        />
         <Table.Column title={t(pCommon("partition"))} dataIndex={"partition"} />
         <Table.Column title="QOS" dataIndex={"qos"} />
       </Table.ColumnGroup>
@@ -190,6 +195,8 @@ const EditPriceModal: React.FC<CommonModalProps & {
 
   const { message } = App.useApp();
 
+  const languageId = useI18n().currentLanguage.id;
+
   const [form] = Form.useForm<{ price: number; amount: string; description: string }>();
   const [loading, setLoading] = useState(false);
 
@@ -220,7 +227,7 @@ const EditPriceModal: React.FC<CommonModalProps & {
           <strong>{tenant ? (t(pCommon("tenant")) + tenant) : t(pCommon("platform"))}</strong>
         </Form.Item>
         <Form.Item label={t(p("priceItem"))}>
-          {t(pCommon("cluster"))} <strong>{getClusterName(cluster)}</strong>，
+          {t(pCommon("cluster"))} <strong>{getClusterName(cluster, languageId)}</strong>，
           {t(pCommon("partition"))} <strong>{partition}</strong>，QOS <strong>{qos}</strong>
         </Form.Item>
         <Form.Item label={t(p("newItemId"))}>

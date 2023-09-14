@@ -32,9 +32,8 @@ export const CreateUserForm: React.FC = () => {
 
   const form = Form.useFormInstance<CreateUserFormFields>();
 
-  const userIdRule = getUserIdRule();
-
   const languageId = useI18n().currentLanguage.id;
+  const userIdRule = getUserIdRule(languageId);
 
   return (
     <>

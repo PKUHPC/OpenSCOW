@@ -11,6 +11,7 @@
  */
 
 import { useDidUpdateEffect } from "@scow/lib-web/build/utils/hooks";
+import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/i18n";
 import { Button, Form, Input, InputNumber, Select, Space, Table } from "antd";
 import React, { useCallback, useMemo, useRef, useState } from "react";
 import { useAsync } from "react-async";
@@ -20,7 +21,7 @@ import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer, FilterFormTabs } from "src/components/FilterFormContainer";
 import { ModalLink } from "src/components/ModalLink";
 import { TableTitle } from "src/components/TableTitle";
-import { prefix, useI18nTranslateToString } from "src/i18n";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { runningJobId, RunningJobInfo } from "src/models/job";
 import { BatchChangeJobTimeLimitButton } from "src/pageComponents/job/BatchChangeJobTimeLimitButton";
 import { ChangeJobTimeLimitModal } from "src/pageComponents/job/ChangeJobTimeLimitModal";
@@ -219,6 +220,7 @@ export const RunningJobInfoTable: React.FC<JobInfoTableProps> = ({
   const [previewItem, setPreviewItem] = useState<RunningJobInfo | undefined>(undefined);
 
   const { t } = useI18nTranslateToString();
+  const languageId = useI18n().currentLanguage.id;
 
   return (
     <>
@@ -257,7 +259,7 @@ export const RunningJobInfoTable: React.FC<JobInfoTableProps> = ({
             <Table.Column<RunningJobInfo>
               dataIndex="cluster"
               title={t(pCommon("cluster"))}
-              render={(_, r) => r.cluster.name}
+              render={(_, r) => getI18nConfigCurrentText(r.cluster.name, languageId)}
             />
           )
         }

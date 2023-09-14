@@ -48,7 +48,8 @@ export const DesktopTable: React.FC<Props> = ({ loginDesktopEnabledClusters }) =
   const router = useRouter();
 
   const { defaultCluster } = useStore(DefaultClusterStore);
-  const loginNodes = useStore(LoginNodeStore);
+
+  const { loginNodes } = useStore(LoginNodeStore);
 
   const clusterQuery = queryToString(router.query.cluster);
   const loginQuery = queryToString(router.query.loginNode);

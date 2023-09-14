@@ -22,7 +22,7 @@ import { api } from "src/apis";
 import { ClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer, FilterFormTabs } from "src/components/FilterFormContainer";
 import { TableTitle } from "src/components/TableTitle";
-import { prefix, useI18nTranslateToString } from "src/i18n";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { HistoryJobDrawer } from "src/pageComponents/job/HistoryJobDrawer";
 import { JobPriceChangeModal } from "src/pageComponents/tenant/JobPriceChangeModal";
 import type { GetJobFilter, GetJobInfoSchema } from "src/pages/api/job/jobInfo";
@@ -211,6 +211,7 @@ const JobInfoTable: React.FC<JobInfoTableProps> = ({
 }) => {
 
   const { t } = useI18nTranslateToString();
+  const languageId = useI18n().currentLanguage.id;
 
   const [previewItem, setPreviewItem] = useState<JobInfo | undefined>(undefined);
 
@@ -259,10 +260,14 @@ const JobInfoTable: React.FC<JobInfoTableProps> = ({
         } : false}
         scroll={{ x: true }}
       >
-        <Table.Column<JobInfo> dataIndex="idJob" title={t(pCommon("clusterWorkId"))} />
-        <Table.Column<JobInfo> dataIndex="account" title={t(pCommon("account"))} />
-        <Table.Column<JobInfo> dataIndex="user" title={t(pCommon("user"))} />
-        <Table.Column<JobInfo> dataIndex="cluster" title={t(pCommon("cluster"))} render={ getClusterName } />
+        <Table.Column<JobInfo> dataIndex="idJob" title="集群作业ID" />
+        <Table.Column<JobInfo> dataIndex="account" title="账户" />
+        <Table.Column<JobInfo> dataIndex="user" title="用户" />
+        <Table.Column<JobInfo>
+          dataIndex="cluster"
+          title={t(pCommon("cluster"))}
+          render={(cluster) => getClusterName(cluster, languageId)}
+        />
         <Table.Column<JobInfo> dataIndex="partition" title={t(pCommon("partition"))} />
         <Table.Column<JobInfo> dataIndex="qos" title="QOS" />
         <Table.Column<JobInfo> dataIndex="jobName" title={t(pCommon("workName"))} />

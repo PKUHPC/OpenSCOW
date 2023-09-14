@@ -18,6 +18,7 @@ import {
   HomeOutlined, LeftOutlined, MacCommandOutlined, RightOutlined,
   ScissorOutlined, SnippetsOutlined, UploadOutlined, UpOutlined,
 } from "@ant-design/icons";
+import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/i18n";
 import { App, Button, Divider, Space } from "antd";
 import Link from "next/link";
 import Router from "next/router";
@@ -29,6 +30,7 @@ import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { ModalButton, ModalLink } from "src/components/ModalLink";
 import { TitleText } from "src/components/PageTitle";
 import { TableTitle } from "src/components/TableTitle";
+import { useI18n } from "src/i18n";
 import { urlToDownload } from "src/pageComponents/filemanager/api";
 import { CreateFileModal } from "src/pageComponents/filemanager/CreateFileModal";
 import { FileTable } from "src/pageComponents/filemanager/FileTable";
@@ -89,6 +91,8 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
 
   const { message, modal } = App.useApp();
 
+  const languageId = useI18n().currentLanguage.id;
+
   const prevPathRef = useRef<string>(path);
 
   const [files, setFiles] = useState<FileInfo[]>([]);
@@ -98,7 +102,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
   const [operation, setOperation] = useState<Operation | undefined>(undefined);
   const [showHiddenFile, setShowHiddenFile] = useState(false);
 
-  const loginNodes = useStore(LoginNodeStore);
+  const { loginNodes } = useStore(LoginNodeStore);
   const loginNode = loginNodes[cluster.id][0].name;
 
   const reload = async (signal?: AbortSignal) => {
@@ -292,7 +296,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
     <div>
       <TitleText>
         <span>
-          集群{cluster.name}文件管理
+          集群{getI18nConfigCurrentText(cluster.name, languageId)}文件管理
         </span>
       </TitleText>
       <TopBar>

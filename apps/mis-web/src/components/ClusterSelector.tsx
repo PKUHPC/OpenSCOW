@@ -10,8 +10,9 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/i18n";
 import { Select } from "antd";
-import { prefix, useI18nTranslateToString } from "src/i18n";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { Cluster, publicConfig } from "src/utils/config";
 
 
@@ -25,6 +26,7 @@ const p = prefix("component.others.");
 export const ClusterSelector: React.FC<Props> = ({ value, onChange }) => {
 
   const { t } = useI18nTranslateToString();
+  const languageId = useI18n().currentLanguage.id;
 
   return (
     <Select
@@ -33,7 +35,8 @@ export const ClusterSelector: React.FC<Props> = ({ value, onChange }) => {
       placeholder={t(p("selectCluster"))}
       value={value ? value.map((v) => ({ value: v.id, label: v.name })) : undefined}
       onChange={(values) => onChange?.(values.map((x) => ({ id: x.value, name: x.label })))}
-      options={Object.values(publicConfig.CLUSTERS).map((x) => ({ value: x.id, label: x.name }))}
+      options={Object.values(publicConfig.CLUSTERS).map((x) => ({ value: x.id, label:
+        getI18nConfigCurrentText(x.name, languageId) }))}
       style={{ minWidth: "96px" }}
     />
   );
@@ -48,7 +51,8 @@ interface SingleSelectionProps {
 export const SingleClusterSelector: React.FC<SingleSelectionProps> = ({ value, onChange, label }) => {
 
   const { t } = useI18nTranslateToString();
-  
+
+  const languageId = useI18n().currentLanguage.id;
   return (
     <Select
       labelInValue
@@ -57,7 +61,11 @@ export const SingleClusterSelector: React.FC<SingleSelectionProps> = ({ value, o
       onChange={({ value, label }) => onChange?.({ id: value, name: label })}
       options={
         (label ? [{ value: label, label, disabled: true }] : [])
-          .concat(Object.values(publicConfig.CLUSTERS).map((x) => ({ value: x.id, label: x.name, disabled: false })))
+          .concat(Object.values(publicConfig.CLUSTERS).map((x) => ({
+            value: x.id,
+            label:  getI18nConfigCurrentText(x.name, languageId),
+            disabled: false,
+          })))
       }
       dropdownMatchSelectWidth={false}
     />
