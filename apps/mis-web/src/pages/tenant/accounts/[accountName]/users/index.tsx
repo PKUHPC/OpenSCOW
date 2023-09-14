@@ -21,15 +21,19 @@ import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { BackButton } from "src/components/BackButton";
 import { PageTitle } from "src/components/PageTitle";
+import { prefix, useI18nTranslate } from "src/i18n";
 import { TenantRole } from "src/models/User";
 import { AddUserButton } from "src/pageComponents/users/AddUserButton";
 import { UserTable } from "src/pageComponents/users/UserTable";
 import { Head } from "src/utils/head";
 
+const p = prefix("page.tenant.accounts.accountName.users.index.");
+
 export const AccountUsersPage: NextPage = requireAuth(
   (i) => i.tenantRoles.includes(TenantRole.TENANT_ADMIN),
 )(
   ({ userStore }) => {
+    const { tArgs } = useI18nTranslate();
 
     const { message } = App.useApp();
 
@@ -43,7 +47,7 @@ export const AccountUsersPage: NextPage = requireAuth(
         accountName,
       } })
         .httpError(403, () => {
-          message.error(`您不能管理账户${accountName}的用户。`);
+          message.error(tArgs(p("cannotManageUser"), [accountName]));
           return undefined;
         });
     }, [userStore.user]);
@@ -52,7 +56,7 @@ export const AccountUsersPage: NextPage = requireAuth(
 
     const { data, isLoading, reload } = useAsync({ promiseFn, watch: refreshToken });
 
-    const title = `账户${accountName}的用户`;
+    const title = tArgs(p("userInAccount"), [accountName]);
 
     return (
       <div>

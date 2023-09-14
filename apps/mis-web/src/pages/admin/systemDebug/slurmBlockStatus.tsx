@@ -18,13 +18,18 @@ import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { DisabledA } from "src/components/DisabledA";
 import { PageTitle } from "src/components/PageTitle";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { PlatformRole } from "src/models/User";
 import { Head } from "src/utils/head";
 
 const { Panel } = Collapse;
 
+const p = prefix("page.admin.systemDebug.slurmBlockStatus.");
+
 export const SlurmBlockStatusPage: NextPage = requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))(
   () => {
+
+    const { t } = useI18nTranslateToString();
 
     const isLoading = false;
     const reload = () => {};
@@ -36,8 +41,8 @@ export const SlurmBlockStatusPage: NextPage = requireAuth((u) => u.platformRoles
 
     return (
       <div>
-        <Head title="用户账户封锁状态同步" />
-        <PageTitle titleText={"用户账户封锁状态同步"} isLoading={isLoading} reload={reload} />
+        <Head title={t(p("syncUserAccountBlockingStatus"))} />
+        <PageTitle titleText={t(p("syncUserAccountBlockingStatus"))} isLoading={isLoading} reload={reload} />
 
         <Alert
           type="info"
@@ -45,23 +50,22 @@ export const SlurmBlockStatusPage: NextPage = requireAuth((u) => u.platformRoles
           showIcon
           message={(
             <div>
-                在调度器重新启动后，集群与SCOW中用户的封锁状态可能出现不同步的情况，您可以点击刷新调度器用户封锁状态，手动刷新同步所有用户状态。
+              {t(p("alertInfo"))}
             </div>
           )}
         />
 
         <Collapse defaultActiveKey={["1"]}>
-          <Panel header="slurm调度器" key="1">
+          <Panel header={t(p("slurmScheduler"))} key="1">
             <p>
-              如果您使用的是slurm调度器，由于技术限制，当您运行slurm.sh节点和slurm管理节点并非同一节点时，已封锁的用户、账户和用户账户将会在slurm集群重启后被解封。<br />
-              SCOW在启动时将会自动刷新一次slurm封锁状态，但是slurm集群可能在SCOW运行时重启，SCOW暂时不能对这种情况做出反应。<br />
-              所以，如果您运行slurm.sh节点和slurm管理节点并非同一节点时，您需要在slurm集群重启后手动执行一下本页面的刷新调度器用户封锁状态的功能。
-              如果slurm.sh节点和slurm管理节点为同一节点，您可以忽略本功能。
+              {t(p("slurmSchedulerMessage1"))}<br />
+              {t(p("slurmSchedulerMessage2"))}<br />
+              {t(p("slurmSchedulerMessage3"))}
             </p>
           </Panel>
-          <Panel header="其他调度器" key="2">
+          <Panel header={t(p("otherScheduler"))} key="2">
             <p>
-              如果您使用的是slurm之外的调度器，在调度器和SCOW间用户封锁状态不同步时，可以手动执行一下本页面的刷新调度器用户封锁状态的功能。
+              {t(p("otherSchedulerMessage"))}
             </p>
           </Panel>
 
@@ -71,24 +75,24 @@ export const SlurmBlockStatusPage: NextPage = requireAuth((u) => u.platformRoles
           {
             data ? (
               <Descriptions bordered column={1}>
-                <Descriptions.Item label="上次运行时间">
+                <Descriptions.Item label={t(p("lastRunTime"))}>
                   <Space>
                     <span>
-                      {data.lastRun ? formatDateTime(data.lastRun) : "未封锁过"}
+                      {data.lastRun ? formatDateTime(data.lastRun) : t(p("notBlocked"))}
                     </span>
                     <DisabledA
                       onClick={async () => {
                         setRunning(true);
                         await api.updateBlockStatus({})
                           .then(() => {
-                            message.success("刷新成功");
+                            message.success(t(p("refreshSuccess")));
                           })
                           .finally(() => setRunning(false));
                         setRunning(false);
                       }}
                       disabled={running}
                     >
-                    刷新调度器用户封锁状态
+                      {t(p("refreshSchedulerUserBlockingStatus"))}
                     </DisabledA>
                   </Space>
                 </Descriptions.Item>

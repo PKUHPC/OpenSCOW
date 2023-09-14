@@ -20,22 +20,26 @@ import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { PageTitle } from "src/components/PageTitle";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { PlatformRole } from "src/models/User";
 import { ManageJobBillingTable } from "src/pageComponents/job/ManageJobBillingTable";
 import { PlatformOrTenantRadio } from "src/pageComponents/job/PlatformOrTenantRadio";
 import { Head } from "src/utils/head";
 
+const p = prefix("page.admin.jobBilling.");
+
 export const AdminJobBillingTablePage: NextPage =
   requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))(
     () => {
       const query = useQuerystring();
+      const { t } = useI18nTranslateToString();
 
       const tenant = queryToString(query.tenant) || undefined;
 
       return (
         <div>
-          <Head title="作业计费价格表" />
-          <PageTitle titleText={"作业计费价格表"} />
+          <Head title={t(p("jobBillingPriceTable"))} />
+          <PageTitle titleText={t(p("jobBillingPriceTable"))} />
           <AdminJobBillingTable tenant={tenant} />
         </div>
       );

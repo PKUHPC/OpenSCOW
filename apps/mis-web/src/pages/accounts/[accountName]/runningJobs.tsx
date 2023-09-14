@@ -13,20 +13,24 @@
 import { NextPage } from "next";
 import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
+import { prefix, useI18nTranslate } from "src/i18n";
 import {
   checkQueryAccountNameIsAdmin,
   useAccountPagesAccountName } from "src/pageComponents/accounts/checkQueryAccountNameIsAdmin";
 import { RunningJobQueryTable } from "src/pageComponents/job/RunningJobTable";
 import { Head } from "src/utils/head";
 
+const p = prefix("page.accounts.accountName.runningJobs.");
+
 export const RunningJobsPage: NextPage = requireAuth(
   (u) => u.accountAffiliations.length > 0,
   checkQueryAccountNameIsAdmin,
 )(
   () => {
+    const { tArgs } = useI18nTranslate();
 
     const accountName = useAccountPagesAccountName();
-    const title = `账户${accountName}未结束的作业`;
+    const title = tArgs(p("title"), [accountName]);
 
     return (
       <div>

@@ -16,9 +16,12 @@ import { useRouter } from "next/router";
 import { requireAuth } from "src/auth/requireAuth";
 import { BackButton } from "src/components/BackButton";
 import { PageTitle } from "src/components/PageTitle";
+import { prefix, useI18nTranslate, useI18nTranslateToString } from "src/i18n";
 import { UserRole } from "src/models/User";
 import { JobTable } from "src/pageComponents/job/HistoryJobTable";
 import { Head } from "src/utils/head";
+
+const p = prefix("page.accounts.accountName.userJob.");
 
 export const UserJobsPage: NextPage = requireAuth(
   (i) => i.accountAffiliations.some((x) => x.role !== UserRole.USER),
@@ -26,11 +29,13 @@ export const UserJobsPage: NextPage = requireAuth(
   () => {
 
     const router = useRouter();
+    const { tArgs } = useI18nTranslate();
+    const { t } = useI18nTranslateToString();
 
     const userId = queryToString(router.query.userId) || undefined;
     const accountName = queryToString(router.query.accountName) || "";
 
-    const title = `用户${userId}在账户${accountName}下运行的作业`;
+    const title = tArgs(p("title"), [userId, accountName]);
 
     return (
       <div>
@@ -47,7 +52,7 @@ export const UserJobsPage: NextPage = requireAuth(
           showAccount={false}
           showUser={false}
           showedPrices={["account"]}
-          priceTexts={{ account: "作业计费" }}
+          priceTexts={{ account: t("common.jobBilling") }}
         />
       </div>
     );

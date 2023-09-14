@@ -35,12 +35,12 @@ export type TextId = TextIdFromLangDict<typeof languages>;
 export function useI18nTranslate() {
   const i18n = useI18n();
 
-  const t = (id: Lang<LangType>, args: React.ReactNode[] = []): string | React.ReactNode => {
+  const tArgs = (id: Lang<LangType>, args: React.ReactNode[] = []): string | React.ReactNode => {
     return i18n.translate(id, args);
   };
 
   return {
-    t,
+    tArgs,
   };
 }
 

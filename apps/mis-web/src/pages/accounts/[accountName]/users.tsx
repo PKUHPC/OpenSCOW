@@ -18,11 +18,14 @@ import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
+import { prefix, useI18nTranslate } from "src/i18n";
 import { UserRole } from "src/models/User";
 import { useAccountPagesAccountName } from "src/pageComponents/accounts/checkQueryAccountNameIsAdmin";
 import { AddUserButton } from "src/pageComponents/users/AddUserButton";
 import { UserTable } from "src/pageComponents/users/UserTable";
 import { Head } from "src/utils/head";
+
+const p = prefix("page.accounts.accountName.users.");
 
 export const UsersPage: NextPage = requireAuth(
   (i) => i.accountAffiliations.some((x) => x.role !== UserRole.USER),
@@ -30,6 +33,7 @@ export const UsersPage: NextPage = requireAuth(
   ({ userStore }) => {
 
     const accountName = useAccountPagesAccountName();
+    const { tArgs } = useI18nTranslate();
 
     const account = userStore.user.accountAffiliations.find((x) => x.accountName === accountName)!;
 
@@ -43,7 +47,7 @@ export const UsersPage: NextPage = requireAuth(
 
     const { data, isLoading, reload } = useAsync({ promiseFn, watch: refreshToken });
 
-    const title = `账户${accountName}用户管理`;
+    const title = tArgs(p("title"), [accountName]);
 
     return (
       <div>

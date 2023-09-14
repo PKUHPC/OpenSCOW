@@ -19,18 +19,22 @@ import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { DisabledA } from "src/components/DisabledA";
 import { PageTitle } from "src/components/PageTitle";
+import { prefix, useI18nTranslate, useI18nTranslateToString } from "src/i18n";
 import { PlatformRole } from "src/models/User";
 import { Head } from "src/utils/head";
 
-
-
 const promiseFn = async () => api.getFetchJobInfo({});
+
+const p = prefix("page.admin.systemDebug.fetchJobs.");
 
 export const FetchJobsInfoPage: NextPage = requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))(
   () => {
     const { isLoading, data, reload } = useAsync({
       promiseFn,
     });
+
+    const { tArgs } = useI18nTranslate();
+    const { t } = useI18nTranslateToString();
 
     const { message } = App.useApp();
 
@@ -39,15 +43,15 @@ export const FetchJobsInfoPage: NextPage = requireAuth((u) => u.platformRoles.in
 
     return (
       <div>
-        <Head title="作业信息同步" />
-        <PageTitle titleText={"作业信息同步"} isLoading={isLoading} reload={reload} />
+        <Head title={t(p("jobInfoSync"))} />
+        <PageTitle titleText={t(p("jobInfoSync"))} isLoading={isLoading} reload={reload} />
         <Alert
           type="info"
           style={{ marginBottom: "4px" }}
           showIcon
           message={(
             <div>
-                SCOW会定时从集群同步作业信息，您可以点击立刻同步执行一次手动同步。
+              {t(p("alertMessage"))}
             </div>
           )}
         />
@@ -55,11 +59,11 @@ export const FetchJobsInfoPage: NextPage = requireAuth((u) => u.platformRoles.in
           {
             data ? (
               <Descriptions bordered column={1}>
-                <Descriptions.Item label="周期性同步作业信息">
+                <Descriptions.Item label={t(p("peridoicSyncJobInfo"))}>
                   <Space>
                     {data.fetchStarted
-                      ? <Badge status="success" text="已开启" />
-                      : <Badge status="error" text="已暂停" />
+                      ? <Badge status="success" text={t(p("turnedOn"))} />
+                      : <Badge status="error" text={t(p("paused"))} />
                     }
                     <DisabledA
                       onClick={() => {
@@ -70,31 +74,31 @@ export const FetchJobsInfoPage: NextPage = requireAuth((u) => u.platformRoles.in
                       }}
                       disabled={changingState}
                     >
-                      {data.fetchStarted ? "停止同步" : "开始同步"}
+                      {data.fetchStarted ? t(p("stopSync")) : t(p("startSync"))}
                     </DisabledA>
                   </Space>
                 </Descriptions.Item>
-                <Descriptions.Item label="作业同步周期">
+                <Descriptions.Item label={t(p("jobSyncCycle"))}>
                   {data.schedule}
                 </Descriptions.Item>
-                <Descriptions.Item label="上次同步时间">
+                <Descriptions.Item label={t(p("lastSyncTime"))}>
                   <Space>
                     <span>
-                      {data.lastFetchTime ? formatDateTime(data.lastFetchTime) : "未同步过"}
+                      {data.lastFetchTime ? formatDateTime(data.lastFetchTime) : t(p("notSynced"))}
                     </span>
                     <DisabledA
                       onClick={() => {
                         setFetching(true);
                         api.fetchJobs({})
                           .then(({ newJobsCount }) => {
-                            message.success(`作业同步完成，同步到${newJobsCount}条新纪录。`);
+                            message.success(tArgs(p("jobSyncSuccessMessage"), [newJobsCount]));
                             reload();
                           })
                           .finally(() => setFetching(false));
                       }}
                       disabled={fetching}
                     >
-                    立刻同步作业
+                      {t(p("syncJobNow"))}
                     </DisabledA>
                   </Space>
                 </Descriptions.Item>

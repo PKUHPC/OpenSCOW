@@ -20,6 +20,7 @@ import { requireAuth } from "src/auth/requireAuth";
 import { ssrAuthenticate, SSRProps } from "src/auth/server";
 import { UnifiedErrorPage } from "src/components/errorPages/UnifiedErrorPage";
 import { PageTitle } from "src/components/PageTitle";
+import { useI18nTranslateToString } from "src/i18n";
 import { PlatformRole } from "src/models/User";
 import { getClient } from "src/utils/client";
 import { Head } from "src/utils/head";
@@ -28,9 +29,11 @@ type Info = GetAdminInfoResponse
 
 type Props = SSRProps<Info, 500>
 
-export const PlatformInfoPage: NextPage<Props> = 
+export const PlatformInfoPage: NextPage<Props> =
 requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
 ((props: Props) => {
+
+  const { t } = useI18nTranslateToString();
 
   if ("error" in props) {
     return <UnifiedErrorPage code={props.error} />;
@@ -41,10 +44,10 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
 
   return (
     <div>
-      <Head title="平台信息" />
-      <PageTitle titleText={"平台信息"} />
+      <Head title={t("common.platformInfo")} />
+      <PageTitle titleText={t("common.platformInfo")} />
       <Descriptions bordered column={1}>
-        <Descriptions.Item label="平台管理员">
+        <Descriptions.Item label={t("common.platformAdmin")}>
           {
             platformAdmins.map(({ userId, userName }) => (
               <Tag key={userId}>
@@ -53,7 +56,7 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
             ))
           }
         </Descriptions.Item>
-        <Descriptions.Item label="平台财务人员">
+        <Descriptions.Item label={t("common.platformFinancialStaff")}>
           {
             platformFinancialStaff.map(({ userId, userName }) => (
               <Tag key={userId}>
@@ -62,13 +65,13 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
             ))
           }
         </Descriptions.Item>
-        <Descriptions.Item label="租户数量">
+        <Descriptions.Item label={t("common.tenantCount")}>
           {tenantCount}
         </Descriptions.Item>
-        <Descriptions.Item label="账户数量">
+        <Descriptions.Item label={t("common.accountCount")}>
           {accountCount}
         </Descriptions.Item>
-        <Descriptions.Item label="用户数量">
+        <Descriptions.Item label={t("common.userCount")}>
           {userCount}
         </Descriptions.Item>
       </Descriptions>

@@ -14,17 +14,22 @@ import { FormLayout } from "@scow/lib-web/build/layouts/FormLayout";
 import { NextPage } from "next";
 import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { TenantRole } from "src/models/User";
 import { ChargeForm } from "src/pageComponents/finance/ChargeForm";
 import { Head } from "src/utils/head";
 
-export const FinancePayPage: NextPage = requireAuth((i) => i.tenantRoles.includes(TenantRole.TENANT_FINANCE) || 
+const p = prefix("page.tenant.finance.payAccount.");
+
+export const FinancePayPage: NextPage = requireAuth((i) => i.tenantRoles.includes(TenantRole.TENANT_FINANCE) ||
   i.tenantRoles.includes(TenantRole.TENANT_ADMIN))(
   () => {
+    const { t } = useI18nTranslateToString();
+
     return (
       <div>
-        <Head title="账户充值" />
-        <PageTitle titleText="账户充值" />
+        <Head title={t(p("title"))} />
+        <PageTitle titleText={t(p("title"))} />
         <FormLayout>
           <ChargeForm />
         </FormLayout>

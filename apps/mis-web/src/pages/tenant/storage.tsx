@@ -20,16 +20,19 @@ import { requireAuth } from "src/auth/requireAuth";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { DisabledA } from "src/components/DisabledA";
 import { PageTitle } from "src/components/PageTitle";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { TenantRole } from "src/models/User";
 import type { ChangeStorageMode } from "src/pages/api/admin/changeStorage";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { Cluster } from "src/utils/config";
 import { Head } from "src/utils/head";
 
+const p = prefix("page.tenant.storage.");
+
 const changeModeText = {
-  INCREASE: "增加",
-  DECREASE: "减少",
-  SET: "设置为",
+  INCREASE: p("increase"),
+  DECREASE: p("decrease"),
+  SET: p("set"),
 };
 
 interface FormProps {
@@ -50,6 +53,8 @@ const StorageForm: React.FC = () => {
 
   const defaultClusterStore = useStore(DefaultClusterStore);
 
+  const { t } = useI18nTranslateToString();
+
   const { message } = App.useApp();
 
   const submit = async () => {
@@ -57,10 +62,10 @@ const StorageForm: React.FC = () => {
     setLoading(true);
 
     await api.changeStorageQuota({ body: { value, userId, cluster: cluster.id, mode } })
-      .httpError(404, () => { message.error("用户未找到"); })
-      .httpError(400, () => { message.error("余额变化不合法。"); })
+      .httpError(404, () => { message.error(t(p("userNotFound"))); })
+      .httpError(400, () => { message.error(t(p("balanceChangeIllegal"))); })
       .then(({ currentQuota }) => {
-        message.success("修改成功！");
+        message.success(t(p("editSuccess")));
         setCurent(currentQuota);
       })
       .finally(() => setLoading(false));
@@ -70,12 +75,12 @@ const StorageForm: React.FC = () => {
     const cluster = form.getFieldValue("cluster") as Cluster;
     const userId = form.getFieldValue("userId");
     if (!cluster || !userId) {
-      message.error("请输入用户ID和集群");
+      message.error(t(p("inputUserIdAndCluster")));
       return;
     }
     setCurrentLoading(true);
     await api.queryStorageQuota({ query: { cluster: cluster.id, userId } })
-      .httpError(404, () => { message.error("用户未找到"); })
+      .httpError(404, () => { message.error(t(p("userNotFound"))); })
       .then(({ currentQuota }) => {
         setCurent(currentQuota);
       })
@@ -93,36 +98,36 @@ const StorageForm: React.FC = () => {
     >
       <Form.Item
         name="userId"
-        label="用户ID"
+        label={t("common.userId")}
         rules={[{ required: true }]}
       >
         <Input />
       </Form.Item>
       <Form.Item
         name="cluster"
-        label="集群"
+        label={t("common.cluster")}
         rules={[{ required: true }]}
         initialValue={defaultClusterStore.cluster}
       >
         <SingleClusterSelector />
       </Form.Item>
-      <Form.Item label="当前空间">
+      <Form.Item label={t(p("currentSpace"))}>
         <DisabledA onClick={queryCurrent} disabled={currentLoading}>
           {
             currentLoading
-              ? "查询中……"
+              ? t(p("searching"))
               : current === undefined
-                ? "请点击查询"
+                ? t(p("clickSearch"))
                 : `${current} TB`
           }
         </DisabledA>
       </Form.Item>
-      <Form.Item<FormProps> label="存储变化" rules={[{ required: true }]}>
+      <Form.Item<FormProps> label={t(p("storageChange"))} rules={[{ required: true }]}>
         <Input.Group compact>
           <Form.Item name="mode" noStyle>
-            <Select placeholder="选择设置为">
+            <Select placeholder={t(p("selectSetTo"))}>
               {Object.entries(changeModeText).map(([key, value]) => (
-                <Select.Option value={key} key={key}>{value}</Select.Option>
+                <Select.Option value={key} key={key}>{t(value)}</Select.Option>
               ))}
             </Select>
           </Form.Item>
@@ -133,7 +138,7 @@ const StorageForm: React.FC = () => {
       </Form.Item>
       <Form.Item wrapperCol={{ span: 6, offset: 4 }}>
         <Button type="primary" htmlType="submit" loading={loading}>
-          提交
+          {t("common.submit")}
         </Button>
       </Form.Item>
     </Form>
@@ -142,10 +147,12 @@ const StorageForm: React.FC = () => {
 
 export const AdminStoragePage: NextPage = requireAuth((i) => i.tenantRoles.includes(TenantRole.TENANT_ADMIN))(
   () => {
+    const { t } = useI18nTranslateToString();
+
     return (
       <div>
-        <Head title="调整用户存储空间" />
-        <PageTitle titleText="调整用户存储空间" />
+        <Head title={t(p("adjustUserStorageSpace"))} />
+        <PageTitle titleText={t(p("adjustUserStorageSpace"))} />
         <FormLayout>
           <StorageForm />
         </FormLayout>

@@ -31,7 +31,7 @@ import { createStore, StoreProvider, useStore } from "simstate";
 import { api } from "src/apis";
 import { USE_MOCK } from "src/apis/useMock";
 import { getTokenFromCookie } from "src/auth/cookie";
-import { Provider } from "src/i18n";
+import { Provider, useI18nTranslateToString } from "src/i18n";
 import en from "src/i18n/en";
 import zh_cn from "src/i18n/zh_cn";
 import { AntdConfigProvider } from "src/layouts/AntdConfigProvider";
@@ -44,9 +44,12 @@ import {
 import { publicConfig, runtimeConfig } from "src/utils/config";
 
 
+
 const FailEventHandler: React.FC = () => {
   const { message, modal } = AntdApp.useApp();
   const userStore = useStore(UserStore);
+
+  const { t } = useI18nTranslateToString();
 
   // 登出过程需要调用的几个方法（logout, useState等）都是immutable的
   // 所以不需要每次userStore变化时来重新注册handler
@@ -59,15 +62,15 @@ const FailEventHandler: React.FC = () => {
       console.log(e);
       if (e.data?.code === "CLUSTEROPS_ERROR") {
         modal.error({
-          title: "操作失败",
-          content: `多集群操作出现错误，部分集群未同步修改(${
+          title: t("page._app.clusterOpErrorTitle"),
+          content: `${t("page._app.clusterOpErrorContent")}(${
             e.data.details
           })`,
         });
         return;
       }
 
-      message.error(`服务器出错啦！(${e.status}, ${e.data?.code}))`);
+      message.error(`${t("page._app.effectErrorMessage")}(${e.status}, ${e.data?.code}))`);
 
     });
   }, []);

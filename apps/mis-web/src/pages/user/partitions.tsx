@@ -18,6 +18,7 @@ import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { JobBillingTable } from "src/components/JobBillingTable";
 import { PageTitle } from "src/components/PageTitle";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { Head } from "src/utils/head";
 import styled from "styled-components";
 
@@ -31,6 +32,8 @@ const ContentContainer = styled(Typography.Paragraph)`
   white-space: pre-line;
 `;
 
+const p = prefix("page.user.partitions.");
+
 export const PartitionsPage: NextPage = requireAuth(
   () => true,
 )(
@@ -39,21 +42,23 @@ export const PartitionsPage: NextPage = requireAuth(
     const user = userStore.user;
     const { message } = App.useApp();
 
+    const { t } = useI18nTranslateToString();
+
     const { data, isLoading } = useAsync({ promiseFn: useCallback(async () => {
       return await api.getBillingTable({ query: { tenant: user.tenant, userId: user.identityId } })
-        .httpError(500, () => { message.error("集群和分区信息获取失败，请联系管理员。"); });
+        .httpError(500, () => { message.error(t(p("getBillingTableErrorMessage"))); });
     }, [userStore.user]) });
 
     return (
       <div>
-        <Head title="分区信息" />
-        <PageTitle titleText="分区信息" />
+        <Head title={t(p("partitionInfo"))} />
+        <PageTitle titleText={t(p("partitionInfo"))} />
         <Spin spinning={isLoading}>
           <JobBillingTable data={data?.items} />
           {
             data?.text?.clusterComment ? (
               <div>
-                <ClusterCommentTitle level={2}>说明</ClusterCommentTitle>
+                <ClusterCommentTitle level={2}>{t("common.illustrate")}</ClusterCommentTitle>
                 <ContentContainer>
                   {data?.text?.clusterComment}
                 </ContentContainer>

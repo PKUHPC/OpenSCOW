@@ -16,9 +16,12 @@ import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { TenantRole } from "src/models/User";
 import { ManageJobBillingTable } from "src/pageComponents/job/ManageJobBillingTable";
 import { Head } from "src/utils/head";
+
+const p = prefix("page.tenant.jobBillingTable.");
 
 export const TenantAdminJobBillingTablePage: NextPage = requireAuth(
   (x) => x.tenantRoles.includes(TenantRole.TENANT_ADMIN),
@@ -27,14 +30,16 @@ export const TenantAdminJobBillingTablePage: NextPage = requireAuth(
 
     const tenant = userStore.user.tenant;
 
+    const { t } = useI18nTranslateToString();
+
     const { data, isLoading, reload } = useAsync({ promiseFn: useCallback(async () => {
       return await api.getBillingItems({ query: { tenant: tenant, activeOnly: false } });
     }, [userStore.user]) });
 
     return (
       <div>
-        <Head title="管理本租户作业价格表" />
-        <PageTitle titleText={`租户${tenant}作业价格表`} reload={reload} />
+        <Head title={t(p("manageTenantJobPriceTable"))} />
+        <PageTitle titleText={`${t("common.tenant")}${tenant}${t("common.jobBillingTable")}`} reload={reload} />
         <ManageJobBillingTable tenant={tenant} reload={reload} data={data} loading={isLoading} />
       </div>
     );

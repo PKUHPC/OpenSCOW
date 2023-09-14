@@ -23,6 +23,7 @@ export default {
     operation:"操作",
     tenant:"租户",
     tenantName:"租户名",
+    tenantRole: "用户角色",
     user:"用户",
     userId:"用户Id",
     userName:"用户名",
@@ -61,6 +62,36 @@ export default {
     detail:"详情",
     price:"价格",
     status:"状态",
+    changePassword: "修改密码",
+    changeEmail: "修改邮箱",
+    email: "邮箱",
+    platformRole: "平台角色",
+    illustrate: "说明",
+    userInfo: "用户信息",
+    loginPassword: "登录密码",
+    historyJob: "历史作业",
+    tenantInfo: "租户信息",
+    admin: "管理员",
+    accountCount: "账户数量",
+    tenantBalance: "租户余额",
+    jobBillingTable: "作业价格表",
+    operationLog: "操作日志",
+    unfinishedJob: "未结束的作业",
+    userList: "用户列表",
+    platformInfo: "平台信息",
+    platformAdmin: "平台管理员",
+    platformFinancialStaff: "平台财务员工",
+    tenantCount: "租户数量",
+    accountList: "账户列表",
+    tenantList: "租户列表",
+    addFail: "添加失败",
+    addSuccess: "添加成功",
+    jobBilling: "作业计费",
+    accountOwner: "账户拥有者",
+    accountStatus: "账户状态",
+    block: "封锁",
+    accountBalance: "账户余额",
+    normal: "正常",
   },
   dashboard: {
     title: "Dashboard",
@@ -605,6 +636,204 @@ export default {
       cannotCancel:"不能取消自己的平台管理员角色",
       alreadyNot:"用户已经不是该角色",
       selectRole:"选择角色",
+    },
+  },
+  page: {
+    noAccount: {
+      resultTitle: "没有可以管理的账户",
+    },
+    _app: {
+      clusterOpErrorTitle: "操作失败",
+      clusterOpErrorContent: "多集群操作出现错误，部分集群未同步修改",
+      effectErrorMessage: "服务器出错啦！",
+    },
+    profile: {
+      index: {
+        accountInfo: "账号信息",
+      },
+    },
+    user: {
+      partitions: {
+        getBillingTableErrorMessage: "集群和分区信息获取失败，请联系管理员。",
+        partitionInfo: "分区信息",
+      },
+      operationLogs: {
+        userOperationLog: "本用户操作日志",
+      },
+      historyJobs: {
+        userCompletedJob: "本用户已结束的作业",
+      },
+    },
+    tenant: {
+      info: {
+        tenantFinaceOfficer: "租户财务人员",
+      },
+      jobBillingTable: {
+        manageTenantJobPriceTable: "管理本租户作业价格表",
+      },
+      storage: {
+        increase: "增加",
+        decrease: "减少",
+        set: "设置为",
+        userNotFound: "用户未找到",
+        balanceChangeIllegal: "余额变化不合法",
+        editSuccess: "修改成功！",
+        inputUserIdAndCluster: "请输入用户ID和集群",
+        currentSpace: "当前空间",
+        searching: "查询中...",
+        clickSearch: "请点击查询",
+        storageChange: "存储变化",
+        selectSetTo: "选择设置为",
+        adjustUserStorageSpace: "调整用户存储空间",
+      },
+      users: {
+        list: {
+          title: "用户列表",
+        },
+        create: {
+          userExist: "用户已存在",
+          userExistMessage: "用户已存在于SCOW数据库，无法再添加此用户",
+          userExistAuth: "用户已存在于认证系统",
+          userNotExistAuth: "用户未存在于认证系统",
+          unableDetermineUserExistAuth: "无法确定用户是否存在于认证系统",
+          userExistAuthMessage: "用户已经在认证系统中存在，您此处输入的密码将会不起作用，新用户的密码将是认证系统中的已有用户的当前密码。点击“确认”将会将此用户直接添加到SCOW数据库。",
+          userNotExistAuthMessage: "点击“确认”将会同时在SCOW数据库和认证系统创建此用户",
+          userExistInSCOWDatabaseMessage: "此用户存在于scow数据库",
+          userExistAndAddToSCOWDatabaseMessage: "此用户存在于认证系统中，已成功添加到SCOW数据库",
+          createUserFail: "创建用户失败",
+          addCompeleted: "添加完成！",
+          crateUser: "创建用户",
+        },
+      },
+      finance: {
+        payments: {
+          title: "充值记录",
+        },
+        payAccount: {
+          title: "账户充值",
+        },
+        accountPayments: {
+          title: "账户充值记录",
+        },
+      },
+      accounts: {
+        whitelist: {
+          title: "白名单账户",
+          whitelistAccountList: "白名单账户列表",
+        },
+        list: {
+          title: "账户列表",
+        },
+        create: {
+          tenantNotExistUser: "租户 {} 下不存在用户 {}。",
+          accountNameOccupied: "账户名已经被占用",
+          userIdAndNameNotMatch: "用户ID和名字不匹配。",
+          createSuccess: "创建成功！",
+          ownerUserId: "拥有者用户ID",
+          ownerName: "拥有着姓名",
+          remark: "备注",
+          createAccount: "创建账户",
+        },
+      },
+    },
+    init: {
+      systemInitialized: "系统已初始化",
+      unableReinitialize: "系统已经初始化完成，无法重新初始化！",
+    },
+    admin: {
+      operationLogs: {
+        platformOperationLog: "平台操作日志",
+      },
+      jobBilling: {
+        jobBillingPriceTable: "作业计费价格表",
+      },
+      importUsers: {
+        importUserInfo: "导入用户信息",
+      },
+      tenants: {
+        create: {
+          adminExist: "管理员用户已存在",
+          adminExistMessage: "管理员用户已存在于SCOW数据库，无法再添加此用户",
+          adminNotExistAuth: "管理员用户不存在于认证系统",
+          adminNotExistAuthMessage: "管理员用户不存在，请确认管理员用户ID是否正确",
+          adminExistAuthMessage: "管理员用户已经在认证系统中存在，您此处输入的密码将会不起作用，新用户的密码将是认证系统中的已有用户的当前密码。确认添加为新建租户管理员？",
+          adminNotExistAuthAndComfirmCreateMessage: "管理员用户不存在于认证系统，是否确认创建此用户并添加为新建租户管理员？",
+          unableComfirmAdminExistInAuthMessage: "无法确认管理员用户是否在认证系统中存在，将会尝试在认证系统中创建。"
+          + "如果用户已经在认证系统中存在，您此处输入的密码将会不起作用，新用户的密码将是认证系统中的已有用户的当前密码",
+          unableComfirmAdminExistInAuthAndUnableCreateMessage: "无法确认管理员用户是否在认证系统中存在，并且当前认证系统不支持创建用户，"
+          + "请您确认此用户已经在认证系统中存在，确认将会直接加入到数据库中, 并且您此处输入的密码将不会起作用，新用户的密码将是认证系统中的已有用户的当前密码。",
+          existInSCOWDatabase: "此{}已存在于scow数据库",
+          createTenantSuccessMessage: "租户创建成功，且管理员用户存在于认证系统中，已成功添加到SCOW数据库",
+          addCompleted: "添加完成！",
+          createTenantFailMessage: "创建租户失败",
+          createTenant: "创建租户",
+        },
+      },
+      systemDebug: {
+        slurmBlockStatus: {
+          syncUserAccountBlockingStatus: "用户账户封锁状态同步",
+          alertInfo: "在调度器重新启动后，集群与SCOW中用户的封锁状态可能出现不同步的情况，您可以点击刷新调度器用户封锁状态，手动刷新同步所有用户状态。",
+          slurmScheduler: "slurm调度器",
+          slurmSchedulerMessage1: "如果您使用的是slurm调度器，由于技术限制，当您运行slurm.sh节点和slurm管理节点并非同一节点时，" +
+          "已封锁的用户、账户和用户账户将会在slurm集群重启后被解封。",
+          slurmSchedulerMessage2: "SCOW在启动时将会自动刷新一次slurm封锁状态，但是slurm集群可能在SCOW运行时重启，SCOW暂时不能对这种情况做出反应。",
+          slurmSchedulerMessage3: "所以，如果您运行slurm.sh节点和slurm管理节点并非同一节点时，您需要在slurm集群重启后手动执行一下本页面的刷新调度器用户封锁状态的功能。" +
+          "如果slurm.sh节点和slurm管理节点为同一节点，您可以忽略本功能。",
+          otherScheduler: "其他调度器",
+          otherSchedulerMessage: "如果您使用的是slurm之外的调度器，在调度器和SCOW间用户封锁状态不同步时，可以手动执行一下本页面的刷新调度器用户封锁状态的功能。",
+          lastRunTime: "上次运行时间",
+          notBlocked: "未封锁过",
+          refreshSuccess: "刷新成功",
+          refreshSchedulerUserBlockingStatus: "刷新调度器用户封锁状态",
+        },
+        fetchJobs: {
+          jobInfoSync: "作业信息同步",
+          alertMessage: "SCOW会定时从集群同步作业信息，您可以点击立刻同步执行一次手动同步。",
+          peridoicSyncJobInfo: "周期性同步作业信息",
+          turnedOn: "已开启",
+          paused: "已暂停",
+          stopSync: "停止同步",
+          startSync: "开始同步",
+          jobSyncCycle: "作业同步周期",
+          lastSyncTime: "上次同步时间",
+          notSynced: "未同步过",
+          jobSyncSuccessMessage: "作业同步完成，同步到{}条新纪录。",
+          syncJobNow: "立刻同步作业",
+        },
+      },
+      finance: {
+        pay: {
+          tenantCharge: "租户充值",
+        },
+        payments: {
+          chargeRecord: "充值记录",
+        },
+      },
+    },
+    accounts: {
+      accountName: {
+        users: {
+          title: "账户{}用户管理",
+        },
+        userJob: {
+          title: "用户{}在账户{}下运行的作业",
+        },
+        runningJobs: {
+          title: "账户{}未结束的作业",
+        },
+        payments: {
+          title: "账户{}充值记录",
+        },
+        operationLog: {
+          title: "账户{}操作日志",
+        },
+        historyJobs: {
+          title: "账户{}已结束的作业",
+        },
+        charges: {
+          title: "账户{}扣费记录",
+        },
+      },
     },
   },
 };

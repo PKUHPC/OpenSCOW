@@ -17,6 +17,7 @@ import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
+import { useI18nTranslateToString } from "src/i18n";
 import { PlatformRole } from "src/models/User";
 import { AccountTable } from "src/pageComponents/accounts/AccountTable";
 import { Head } from "src/utils/head";
@@ -24,6 +25,8 @@ import { Head } from "src/utils/head";
 
 export const AccountListPage: NextPage =
   requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))(() => {
+
+    const { t } = useI18nTranslateToString();
 
     const promiseFn = useCallback(async () => {
       return await api.getAllAccounts({});
@@ -35,8 +38,8 @@ export const AccountListPage: NextPage =
 
     return (
       <div>
-        <Head title="账户列表" />
-        <PageTitle titleText={"账户列表"}>
+        <Head title={t("common.accountList")} />
+        <PageTitle titleText={t("common.accountList")}>
           <RefreshLink refresh={update} />
         </PageTitle>
         <AccountTable

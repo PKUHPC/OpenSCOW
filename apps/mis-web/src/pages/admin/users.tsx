@@ -14,6 +14,7 @@ import { RefreshLink, useRefreshToken } from "@scow/lib-web/build/utils/refreshT
 import { NextPage } from "next";
 import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
+import { useI18nTranslateToString } from "src/i18n";
 import { PlatformRole } from "src/models/User";
 import { AllUsersTable } from "src/pageComponents/admin/AllUsersTable";
 import { Head } from "src/utils/head";
@@ -23,12 +24,13 @@ import { Head } from "src/utils/head";
 export const ShowUsersPage: NextPage =
   requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))(({ userStore: { user } }) => {
 
+    const { t } = useI18nTranslateToString();
     const [refreshToken, update] = useRefreshToken();
 
     return (
       <div>
-        <Head title="用户列表" />
-        <PageTitle titleText={"用户列表"}>
+        <Head title={t("common.userList")} />
+        <PageTitle titleText={t("common.userList")}>
           <RefreshLink refresh={update} />
         </PageTitle>
         <AllUsersTable
