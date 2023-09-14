@@ -45,21 +45,23 @@ export const ChargeTable: React.FC<Props> = ({
 
   const [form] = Form.useForm<FilterForm>();
 
-  const [query, setQuery] = useState<{name: string | undefined, time: dayjs.Dayjs[], type: string | undefined}>({
-    name: accountName,
-    time: [now.subtract(1, "week").startOf("day"), now.endOf("day")],
-    type: undefined,
-  });
+  const [query, setQuery] = useState<{
+    name: string | undefined,
+    time: [ dayjs.Dayjs, dayjs.Dayjs ]
+    type: string | undefined}>({
+      name: accountName,
+      time: [now.subtract(1, "week").startOf("day"), now.endOf("day")],
+      type: undefined,
+    });
 
   const filteredTypes = [...publicConfig.CHARGE_TYPE_LIST, CHARGE_TYPE_OTHERS];
 
   const { data, isLoading } = useAsync({
     promiseFn: useCallback(async () => {
-
       return api.getCharges({ query: {
         accountName: query.name,
-        startTime: query.time[0].toISOString(),
-        endTime: query.time[1].toISOString(),
+        startTime: query.time[0].clone().startOf("day").toISOString(),
+        endTime: query.time[1].clone().endOf("day").toISOString(),
         type: query.type,
         isPlatformRecords,
         searchType,
@@ -81,7 +83,7 @@ export const ChargeTable: React.FC<Props> = ({
           initialValues={query}
           onFinish={async () => {
             const { name, time, type } = await form.validateFields();
-            setQuery({ name: accountName ?? name, time, type: type });
+            setQuery({ name: accountName ?? name, time, type });
           }}
         >
           {

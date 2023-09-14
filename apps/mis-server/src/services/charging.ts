@@ -237,13 +237,10 @@ export const chargingServiceServer = plugin((server) => {
       }
 
       // 可查询的types类型
-      const typesToSearch = misConfig.customChargeTypes && misConfig.customChargeTypes.length > 0 ? [
+      const typesToSearch = [
         misConfig.jobChargeType,
         misConfig.changeJobPriceType,
-        ...misConfig.customChargeTypes,
-      ] : [
-        misConfig.jobChargeType,
-        misConfig.changeJobPriceType,
+        ...(misConfig.customChargeTypes || []),
       ];
 
       let searchType = {};

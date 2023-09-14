@@ -148,14 +148,12 @@ const buildRuntimeConfig = async (phase, basePath) => {
 
     AUDIT_DEPLOYED:  config.AUDIT_DEPLOYED,
 
-    CHARGE_TYPE_LIST: misConfig.customChargeTypes && misConfig.customChargeTypes.length > 0 ? [
+    CHARGE_TYPE_LIST: [
       misConfig.jobChargeType,
       misConfig.changeJobPriceType,
-      ...misConfig.customChargeTypes,
-    ] : [
-      misConfig.jobChargeType,
-      misConfig.changeJobPriceType,
+      ...(misConfig.customChargeTypes || []),
     ],
+
   };
 
   if (!building) {
