@@ -30,7 +30,7 @@ interface DataTableProps<T> {
 }
 
 const p = prefix("pageComp.init.initUsersAndAccountsTable.");
-const pCommon = prefix("pageComp.common.");
+const pCommon = prefix("common.");
 
 const UserTable: React.FC<DataTableProps<User>> = ({ data, loading, reload }) => {
 

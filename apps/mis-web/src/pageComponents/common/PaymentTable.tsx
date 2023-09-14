@@ -62,7 +62,7 @@ interface FilterForm {
 const today = dayjs().endOf("day");
 
 const p = prefix("pageComp.commonComponent.paymentTable.");
-const pCommon = prefix("pageComp.common.");
+const pCommon = prefix("common.");
 
 export const PaymentTable: React.FC<Props> = ({
   accountName, searchType, showAccountName,

@@ -27,7 +27,7 @@ interface Props {
 }
 
 const p = prefix("pageComp.job.historyJobDrawer.");
-const pCommon = prefix("pageComp.common.");
+const pCommon = prefix("common.");
 
 export const HistoryJobDrawer: React.FC<Props> = (props) => {
 

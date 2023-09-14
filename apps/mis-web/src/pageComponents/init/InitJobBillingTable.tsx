@@ -18,7 +18,7 @@ import { prefix, useI18nTranslateToString } from "src/i18n";
 import { ManageJobBillingTable } from "src/pageComponents/job/ManageJobBillingTable";
 
 const p = prefix("pageComp.init.initJobBillingTable.");
-const pCommon = prefix("pageComp.common.");
+const pCommon = prefix("common.");
 
 export const InitJobBillingTable: React.FC = () => {
 

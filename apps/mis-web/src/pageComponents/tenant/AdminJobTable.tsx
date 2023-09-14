@@ -22,6 +22,7 @@ import { api } from "src/apis";
 import { ClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer, FilterFormTabs } from "src/components/FilterFormContainer";
 import { TableTitle } from "src/components/TableTitle";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { HistoryJobDrawer } from "src/pageComponents/job/HistoryJobDrawer";
 import { JobPriceChangeModal } from "src/pageComponents/tenant/JobPriceChangeModal";
 import type { GetJobFilter, GetJobInfoSchema } from "src/pages/api/job/jobInfo";
@@ -46,6 +47,9 @@ interface Props {
 
 }
 
+const p = prefix("pageComp.tenant.adminJobTable.");
+const pCommon = prefix("common.");
+
 const filterFormToQuery = (query: FilterForm, rangeSearch: boolean): GetJobFilter => {
   return {
     userId: rangeSearch ? (query.userId || undefined) : undefined,
@@ -58,6 +62,8 @@ const filterFormToQuery = (query: FilterForm, rangeSearch: boolean): GetJobFilte
 };
 
 export const AdminJobTable: React.FC<Props> = () => {
+
+  const { t } = useI18nTranslateToString();
 
   const rangeSearch = useRef(true);
 
@@ -100,36 +106,36 @@ export const AdminJobTable: React.FC<Props> = () => {
           <FilterFormTabs
             button={(
               <Form.Item>
-                <Button type="primary" htmlType="submit">搜索</Button>
+                <Button type="primary" htmlType="submit">{t(pCommon("search"))}</Button>
               </Form.Item>
             )}
             onChange={(a) => rangeSearch.current = a === "range"}
             tabs={[
               {
-                title: "批量搜索", key: "range", node: (
+                title: t(p("batch")), key: "range", node: (
                   <>
-                    <Form.Item label="集群" name="clusters">
+                    <Form.Item label={t(pCommon("cluster"))} name="clusters">
                       <ClusterSelector />
                     </Form.Item>
-                    <Form.Item label="用户ID" name="userId">
+                    <Form.Item label={t(pCommon("userId"))} name="userId">
                       <Input />
                     </Form.Item>
-                    <Form.Item label="账户" name="accountName">
+                    <Form.Item label={t(pCommon("account"))} name="accountName">
                       <Input />
                     </Form.Item>
-                    <Form.Item label="作业结束时间" name="jobEndTime">
+                    <Form.Item label={t(pCommon("timeEnd"))} name="jobEndTime">
                       <DatePicker.RangePicker showTime allowClear={false} presets={defaultPresets} />
                     </Form.Item>
                   </>
                 ),
               },
               {
-                title: "精确搜索", key: "precision", node: (
+                title: t(p("precise")), key: "precision", node: (
                   <>
-                    <Form.Item label="集群" name="clusters">
+                    <Form.Item label={t(pCommon("cluster"))} name="clusters">
                       <ClusterSelector />
                     </Form.Item>
-                    <Form.Item label="集群作业ID" name="jobId">
+                    <Form.Item label={t(pCommon("clusterWorkId"))} name="jobId">
                       <InputNumber min={1} style={{ minWidth: "160px" }} />
                     </Form.Item>
                   </>
@@ -163,12 +169,14 @@ const ChangePriceButton: React.FC<{
   reload: () => void;
 }> = ({ filter, count, target, reload }) => {
 
+  const { t } = useI18nTranslateToString();
+
   const [open, setOpen] = useState(false);
 
   return (
     <>
       <Button onClick={() => setOpen(true)}>
-        调整搜索结果所有作业{target === "account" ? "租户计费" : "平台计费"}
+        {t(p("adjust"))}{target === "account" ? t(p("tenantPrice")) : t(p("platformPrice"))}
       </Button>
       <JobPriceChangeModal
         target={target}
@@ -202,6 +210,8 @@ const JobInfoTable: React.FC<JobInfoTableProps> = ({
   rangeSearch,
 }) => {
 
+  const { t } = useI18nTranslateToString();
+
   const [previewItem, setPreviewItem] = useState<JobInfo | undefined>(undefined);
 
   return (
@@ -211,15 +221,17 @@ const JobInfoTable: React.FC<JobInfoTableProps> = ({
           data ? (
             <div>
               <span>
-            作业数量：<strong>{data.totalCount}</strong>
+                {t(p("jobNumber"))}<strong>{data.totalCount}</strong>
               </span>
               <Divider type="vertical" />
               <span>
-            租户计费合计：<strong>{nullableMoneyToString(data.totalAccountPrice)} 元</strong>
+                {t(p("tenantPriceSum"))}
+                <strong>{nullableMoneyToString(data.totalAccountPrice)} {t(pCommon("unit"))}</strong>
               </span>
               <Divider type="vertical" />
               <span>
-            平台计费合计：<strong>{nullableMoneyToString(data.totalTenantPrice)} 元</strong>
+                {t(p("platformPriceSum"))}
+                <strong>{nullableMoneyToString(data.totalTenantPrice)} {t(pCommon("unit"))}</strong>
               </span>
             </div>
           ) : undefined
@@ -247,36 +259,36 @@ const JobInfoTable: React.FC<JobInfoTableProps> = ({
         } : false}
         scroll={{ x: true }}
       >
-        <Table.Column<JobInfo> dataIndex="idJob" title="集群作业ID" />
-        <Table.Column<JobInfo> dataIndex="account" title="账户" />
-        <Table.Column<JobInfo> dataIndex="user" title="用户" />
-        <Table.Column<JobInfo> dataIndex="cluster" title="集群名" render={ getClusterName } />
-        <Table.Column<JobInfo> dataIndex="partition" title="分区" />
+        <Table.Column<JobInfo> dataIndex="idJob" title={t(pCommon("clusterWorkId"))} />
+        <Table.Column<JobInfo> dataIndex="account" title={t(pCommon("account"))} />
+        <Table.Column<JobInfo> dataIndex="user" title={t(pCommon("user"))} />
+        <Table.Column<JobInfo> dataIndex="cluster" title={t(pCommon("cluster"))} render={ getClusterName } />
+        <Table.Column<JobInfo> dataIndex="partition" title={t(pCommon("partition"))} />
         <Table.Column<JobInfo> dataIndex="qos" title="QOS" />
-        <Table.Column<JobInfo> dataIndex="jobName" title="作业名" />
+        <Table.Column<JobInfo> dataIndex="jobName" title={t(pCommon("workName"))} />
         <Table.Column<JobInfo>
           dataIndex="timeSubmit"
-          title="提交时间"
+          title={t(pCommon("timeSubmit"))}
           render={(time: string) => formatDateTime(time)}
         />
         <Table.Column<JobInfo>
           dataIndex="timeEnd"
-          title="结束时间"
+          title={t(pCommon("timeEnd"))}
           render={(time: string) => formatDateTime(time)}
         />
         <Table.Column<JobInfo>
           dataIndex="accountPrice"
-          title="租户计费"
+          title={t(p("tenantPrice"))}
           render={(price: Money) => moneyToString(price)}
         />
         <Table.Column<JobInfo>
           dataIndex="tenantPrice"
-          title="平台计费"
+          title={t(p("platformPrice"))}
           render={(price: Money) => moneyToString(price)}
         />
         <Table.Column<JobInfo>
-          title="更多"
-          render={(_, r) => <a onClick={() => setPreviewItem(r)}>详情</a>}
+          title={t(pCommon("more"))}
+          render={(_, r) => <a onClick={() => setPreviewItem(r)}>{t(pCommon("detail"))}</a>}
         />
       </Table>
       <HistoryJobDrawer

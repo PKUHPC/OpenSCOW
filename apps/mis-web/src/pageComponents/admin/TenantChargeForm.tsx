@@ -28,7 +28,7 @@ interface ChargeFields {
 }
 
 const p = prefix("pageComp.admin.tenantChargeForm.");
-const pCommon = prefix("pageComp.common.");
+const pCommon = prefix("common.");
 
 const getTypes = async () => api.getUsedPayTypes({});
 

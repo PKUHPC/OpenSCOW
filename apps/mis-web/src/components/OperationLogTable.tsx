@@ -18,6 +18,7 @@ import { useCallback, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import {
   OperationLog,
   OperationLogQueryType,
@@ -47,7 +48,12 @@ interface Props {
 
 const today = dayjs().endOf("day");
 
+const p = prefix("component.others.");
+const pCommon = prefix("common.");
+
 export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountName, tenantName }) => {
+
+  const { t } = useI18nTranslateToString();
 
   const [ query, setQuery ] = useState<FilterForm>(() => {
     return {
@@ -100,7 +106,7 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
             setPageInfo({ page: 1, pageSize: pageInfo.pageSize });
           }}
         >
-          <Form.Item label="操作行为" name="operationType">
+          <Form.Item label={t(p("operationType"))} name="operationType">
             <Select
               showSearch
               options={
@@ -113,7 +119,7 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
               style={{ width: 180 }}
             />
           </Form.Item>
-          <Form.Item label="操作结果" name="operationResult">
+          <Form.Item label={t(p("operationResult"))} name="operationResult">
             <Select
               options={
                 Object.keys(OperationResultTexts)
@@ -124,15 +130,15 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
             />
           </Form.Item>
           {queryType !== OperationLogQueryType.USER && (
-            <Form.Item label="操作员" name="operatorUserId">
+            <Form.Item label={t(p("operatorUserId"))} name="operatorUserId">
               <Input style={{ width: 150 }} />
             </Form.Item>
           )}
-          <Form.Item label="操作时间" name="operationTime">
+          <Form.Item label={t(p("operationTime"))} name="operationTime">
             <DatePicker.RangePicker showTime allowClear={false} presets={defaultPresets} />
           </Form.Item>
           <Form.Item>
-            <Button type="primary" htmlType="submit">搜索</Button>
+            <Button type="primary" htmlType="submit">{t(pCommon("search"))}</Button>
           </Form.Item>
         </Form>
       </FilterFormContainer>
@@ -148,32 +154,32 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
         }}
       >
         <Table.Column<OperationLog> dataIndex="operationLogId" title="ID" />
-        <Table.Column<OperationLog> dataIndex="operationCode" title="操作码" />
+        <Table.Column<OperationLog> dataIndex="operationCode" title={t(p("operationCode"))} />
         <Table.Column<OperationLog>
           dataIndex="operationType"
-          title="操作行为"
+          title={t(p("operationType"))}
           render={(operationType) => OperationTypeTexts[operationType] }
         />
         <Table.Column<OperationLog>
           dataIndex="operationDetail"
-          title="操作内容"
+          title={t(p("operationDetail"))}
         />
         <Table.Column<OperationLog>
           dataIndex="operationResult"
-          title="操作结果"
+          title={t(p("operationResult"))}
           render={(operationResult) => OperationResultTexts[operationResult] }
         />
         <Table.Column<OperationLog>
           dataIndex="operationTime"
-          title="操作时间"
+          title={t(p("operationTime"))}
           render={formatDateTime}
         />
         <Table.Column<OperationLog>
           dataIndex="operatorUserId"
-          title="操作员"
+          title={t(p("operatorUserId"))}
           render={(_, r) => (`${r.operatorUserId} (${r.operatorUserName})`)}
         />
-        <Table.Column<OperationLog> dataIndex="operatorIp" title="操作IP" />
+        <Table.Column<OperationLog> dataIndex="operatorIp" title={t(p("operatorIp"))} />
       </Table>
     </div>
   );

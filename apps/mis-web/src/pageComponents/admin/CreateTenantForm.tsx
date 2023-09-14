@@ -25,7 +25,7 @@ export interface CreateTenantFormFields {
 }
 
 const p = prefix("pageComp.admin.createTenantForm.");
-const pCommon = prefix("pageComp.common.");
+const pCommon = prefix("common.");
 
 export const CreateTenantForm: React.FC = () => {
 

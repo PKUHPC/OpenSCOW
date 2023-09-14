@@ -52,7 +52,7 @@ const filteredRoles = {
 type FilteredRole = keyof typeof filteredRoles;
 
 const p = prefix("pageComp.admin.allUserTable.");
-const pCommon = prefix("pageComp.common.");
+const pCommon = prefix("common.");
 
 export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
 

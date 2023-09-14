@@ -26,7 +26,7 @@ import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { publicConfig } from "src/utils/config";
 
 const p = prefix("pageComp.admin.ImportUsersTable.");
-const pCommon = prefix("pageComp.common.");
+const pCommon = prefix("common.");
 
 export const ImportUsersTable: React.FC = () => {
 

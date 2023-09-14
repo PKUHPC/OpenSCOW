@@ -12,6 +12,7 @@
 
 import { Radio, Space } from "antd";
 import React, { useRef } from "react";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 
 import { TenantSelector } from "../tenant/TenantSelector";
 
@@ -20,7 +21,12 @@ type Props = {
   onChange?: (value: string | null) => void;
 }
 
+const pCommon = prefix("common.");
+
+
 export const PlatformOrTenantRadio: React.FC<Props> = ({ value, onChange }) => {
+
+  const { t } = useI18nTranslateToString();
 
   // 临时保存所有租户，用于切换到租户时选择默认租户
   const allTenantsRef = useRef<string[]>([]);
@@ -34,10 +40,10 @@ export const PlatformOrTenantRadio: React.FC<Props> = ({ value, onChange }) => {
       }}
       value={isPlatform}
     >
-      <Radio value={true}>{"平台"}</Radio>
+      <Radio value={true}>{t(pCommon("platform"))}</Radio>
       {/* TenantSelector如果放在Radio里将会无法点击 */}
       <Space size="small">
-        <Radio value={false}>租户</Radio>
+        <Radio value={false}>{t(pCommon("tenant"))}</Radio>
         <TenantSelector
           onTenantsFetched={(tenants) => { allTenantsRef.current = tenants; }}
           disabled={isPlatform}

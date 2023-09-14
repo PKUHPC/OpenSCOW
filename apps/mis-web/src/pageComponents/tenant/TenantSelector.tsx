@@ -16,6 +16,7 @@ import { useCallback } from "react";
 import { useAsync } from "react-async";
 import { useStore } from "simstate";
 import { api } from "src/apis";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { UserStore } from "src/stores/UserStore";
 
 type Props = {
@@ -34,10 +35,13 @@ type Props = {
    */
   onTenantsFetched?: (tenants: string[]) => void;
 }
+const p = prefix("pageComp.tenant.tenantSelector.");
 
 export const TenantSelector: React.FC<Props> = ({
   onChange, value, placeholder, disabled, autoSelect, onTenantsFetched,
 }) => {
+
+  const { t } = useI18nTranslateToString();
 
   const userStore = useStore(UserStore);
 
@@ -68,7 +72,7 @@ export const TenantSelector: React.FC<Props> = ({
         onChange={(v) => onChange?.(v)}
         allowClear
       />
-      <Tooltip title="刷新租户列表">
+      <Tooltip title={t(p("fresh"))}>
         <Button icon={<ReloadOutlined spin={isLoading} />} disabled={disabled} onClick={reload} loading={isLoading} />
       </Tooltip>
     </Input.Group>

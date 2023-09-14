@@ -13,7 +13,7 @@
 import { App, Form, Input, Modal } from "antd";
 import React, { useState } from "react";
 import { api } from "src/apis";
-import { useI18n } from "src/i18n";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { confirmPasswordFormItemProps, passwordRule } from "src/utils/form";
 
 export interface Props {
@@ -26,11 +26,14 @@ interface FormInfo {
   newPassword: string;
 }
 
+const p = prefix("pageComp.profile.");
 
 export const ChangePasswordModal: React.FC<Props> = ({
   open,
   onClose,
 }) => {
+
+  const { t } = useI18nTranslateToString();
 
   const [form] = Form.useForm<FormInfo>();
   const { message } = App.useApp();
@@ -46,11 +49,11 @@ export const ChangePasswordModal: React.FC<Props> = ({
           return api.changePassword({ body: { newPassword } })
             .then(() => {
               form.resetFields();
-              message.success("密码更改成功！");
+              message.success(t(p("changePasswordSuccess")));
             });
         }
         else {
-          message.error("原密码错误！");
+          message.error(t(p("oldPasswordWrong")));
         }
       })
       .finally(() => {
@@ -60,7 +63,7 @@ export const ChangePasswordModal: React.FC<Props> = ({
 
   return (
     <Modal
-      title="修改密码"
+      title={t(p("changePassword"))}
       open={open}
       onOk={form.submit}
       confirmLoading={loading}
@@ -75,21 +78,21 @@ export const ChangePasswordModal: React.FC<Props> = ({
       >
         <Form.Item
           rules={[{ required: true }]}
-          label="原密码"
+          label={t(p("oldPassword"))}
           name="oldPassword"
         >
           <Input.Password />
         </Form.Item>
         <Form.Item
           rules={[{ required: true }, passwordRule(languageId)]}
-          label="新密码"
+          label={t(p("newPassword"))}
           name="newPassword"
         >
           <Input.Password placeholder={passwordRule(languageId).message} />
         </Form.Item>
         <Form.Item
           name="confirm"
-          label="确认密码"
+          label={t(p("confirmPassword"))}
           hasFeedback
           {...confirmPasswordFormItemProps(form, "newPassword")}
         >

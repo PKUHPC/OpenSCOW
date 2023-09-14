@@ -22,7 +22,7 @@ interface Props {
 }
 
 const p = prefix("pageComp.job.jobBillingManagementTable.");
-const pCommon = prefix("pageComp.common.");
+const pCommon = prefix("common.");
 
 export const JobBillingManagementTable: React.FC<Props> = ({ data, loading }) => {
 

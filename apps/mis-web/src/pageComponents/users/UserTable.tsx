@@ -18,6 +18,7 @@ import { LinkProps } from "next/link";
 import React from "react";
 import { api } from "src/apis";
 import { DisabledA } from "src/components/DisabledA";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { UserRole, UserStatus } from "src/models/User";
 import { SetJobChargeLimitLink } from "src/pageComponents/users/JobChargeLimitModal";
 import { GetAccountUsersSchema } from "src/pages/api/users";
@@ -32,20 +33,25 @@ interface Props {
   getJobsPageUrl: (userId: string) => LinkProps["href"];
 }
 
-const statusTexts = {
-  [UserStatus.BLOCKED]: <Tag color="error">封锁</Tag>,
-  [UserStatus.UNBLOCKED]: <Tag color="success">正常</Tag>,
-};
-
-const roleTags = {
-  [UserRole.OWNER]: <Tag color="gold">拥有者</Tag>,
-  [UserRole.ADMIN]: <Tag color="blue">管理员</Tag>,
-  [UserRole.USER]: <Tag>普通用户</Tag>,
-};
+const p = prefix("pageComp.user.userTable.");
+const pCommon = prefix("common.");
 
 export const UserTable: React.FC<Props> = ({
   data, isLoading, reload, accountName, canSetAdmin,
 }) => {
+
+  const { t } = useI18nTranslateToString();
+
+  const statusTexts = {
+    [UserStatus.BLOCKED]: <Tag color="error">{t(p("block"))}</Tag>,
+    [UserStatus.UNBLOCKED]: <Tag color="success">{t(p("normal"))}</Tag>,
+  };
+
+  const roleTags = {
+    [UserRole.OWNER]: <Tag color="gold">{t(pCommon("owner"))}</Tag>,
+    [UserRole.ADMIN]: <Tag color="blue">{t(p("admin"))}</Tag>,
+    [UserRole.USER]: <Tag>{t(p("user"))}</Tag>,
+  };
 
   const { message, modal } = App.useApp();
 
@@ -57,16 +63,16 @@ export const UserTable: React.FC<Props> = ({
       scroll={{ x: true }}
       pagination={{ showSizeChanger: true }}
     >
-      <Table.Column<AccountUserInfo> dataIndex="userId" title="用户ID" />
-      <Table.Column<AccountUserInfo> dataIndex="name" title="姓名" />
+      <Table.Column<AccountUserInfo> dataIndex="userId" title={t(pCommon("userId"))} />
+      <Table.Column<AccountUserInfo> dataIndex="name" title={t(pCommon("userName"))} />
       <Table.Column<AccountUserInfo>
         dataIndex="role"
-        title="角色"
+        title={t(p("role"))}
         render={(r: UserRole) => roleTags[r]}
       />
       <Table.Column<AccountUserInfo>
         dataIndex="status"
-        title="状态"
+        title={t(pCommon("status"))}
         render={(s) => statusTexts[s]}
       />
       {/* {
@@ -78,10 +84,10 @@ export const UserTable: React.FC<Props> = ({
       } */}
       <Table.Column<AccountUserInfo>
         dataIndex="jobChargeLimit"
-        title="已用额度/用户限额"
+        title={t(p("alreadyUsed"))}
         render={(_, r) => r.jobChargeLimit && r.usedJobChargeLimit
-          ? `${moneyToString(r.usedJobChargeLimit)} / ${moneyToString(r.jobChargeLimit)} 元`
-          : "无"}
+          ? `${moneyToString(r.usedJobChargeLimit)} / ${moneyToString(r.jobChargeLimit)} ${t(pCommon("unit"))}`
+          : t(p("none"))}
       />
       {/* <Table.Column<AccountUserInfo> dataIndex="storageQuota" title="作业信息"
         render={(_, r) => (
@@ -91,7 +97,7 @@ export const UserTable: React.FC<Props> = ({
         )}
       /> */}
       <Table.Column<AccountUserInfo>
-        title="操作"
+        title={t(pCommon("operation"))}
         render={(_, r) => (
           <Space split={<Divider type="vertical" />}>
             <SetJobChargeLimitLink
@@ -103,51 +109,53 @@ export const UserTable: React.FC<Props> = ({
               currentUsed={r.usedJobChargeLimit}
               status={r.status}
             >
-              限额管理
+              {t(p("limitManage"))}
             </SetJobChargeLimitLink>
             {
               r.status === UserStatus.BLOCKED
                 ? (
                   <a onClick={() => {
                     modal.confirm({
-                      title: "确认解除用户封锁？",
+                      title: t(p("confirmNotBlock")),
                       icon: <ExclamationCircleOutlined />,
-                      content: `确认要从账户${accountName}解除用户${r.name}（ID：${r.userId}）的封锁？`,
+                      content: `${t(p("confirmUnsealText1"))}${accountName}
+                      ${t(p("confirmUnsealText2"))}${r.name}（ID：${r.userId}${t(p("confirmUnsealText3"))}`,
                       onOk: async () => {
                         await api.unblockUserInAccount({ body: {
                           identityId: r.userId,
                           accountName: accountName,
                         } })
                           .then(() => {
-                            message.success("解封用户成功！");
+                            message.success(t(p("unsealSuccess")));
                             reload();
                           });
                       },
                     });
                   }}
                   >
-                  解除封锁
+                    {t(p("unseal"))}
                   </a>
                 ) : (
                   <a onClick={() => {
                     modal.confirm({
-                      title: "确认封锁用户？",
+                      title: t(p("confirmBlock")),
                       icon: <ExclamationCircleOutlined />,
-                      content: `确认要从账户${accountName}封锁用户${r.name}（ID：${r.userId}）？`,
+                      content: `${t(p("confirmBlockText1"))}${accountName}
+                      ${t(p("confirmBlockText2"))}${r.name}（ID：${r.userId}）？`,
                       onOk: async () => {
                         await api.blockUserInAccount({ body: {
                           identityId: r.userId,
                           accountName: accountName,
                         } })
                           .then(() => {
-                            message.success("封锁用户成功！");
+                            message.success(t(p("blockSuccess")));
                             reload();
                           });
                       },
                     });
                   }}
                   >
-                    封锁
+                    {t(p("block"))}
                   </a>
                 )
             }
@@ -157,70 +165,73 @@ export const UserTable: React.FC<Props> = ({
                   ? (
                     <a onClick={() => {
                       modal.confirm({
-                        title: "确认取消管理员权限",
+                        title: t(p("confirmCancelAdmin")),
                         icon: <ExclamationCircleOutlined />,
-                        content: `确认取消用户${r.name} （ID：${r.userId}）在账户${accountName}的管理员权限吗？`,
+                        content: `${t(p("confirmCancelAdminText1"))}${r.name} （ID：${r.userId}）
+                        ${t(p("confirmCancelAdminText2"))}${accountName}${t(p("confirmCancelAdminText3"))}`,
                         onOk: async () => {
                           await api.unsetAdmin({ body: {
                             identityId: r.userId,
                             accountName: accountName,
                           } })
                             .then(() => {
-                              message.success("操作成功！");
+                              message.success(t(p("operateSuccess")));
                               reload();
                             });
                         },
                       });
                     }}
                     >
-                    取消管理员权限
+                      {t(p("cancelAdmin"))}
                     </a>
                   ) : r.role === UserRole.USER ? (
                     <a onClick={() => {
                       modal.confirm({
-                        title: "给予管理员权限",
+                        title: t(p("confirmGrantAdmin")),
                         icon: <ExclamationCircleOutlined />,
-                        content: `确认给予用户${r.name} （ID：${r.userId}）在账户${accountName}的管理员权限吗？`,
+                        content: ` ${t(p("confirmGrantAdminText1"))}${r.name} （ID：${r.userId}）
+                        ${t(p("confirmGrantAdminText2"))}${accountName}${t(p("confirmCancelAdminText3"))}`,
                         onOk: async () => {
                           await api.setAdmin({ body: {
                             identityId: r.userId,
                             accountName: accountName,
                           } })
                             .then(() => {
-                              message.success("操作成功！");
+                              message.success(t(p("operateSuccess")));
                               reload();
                             });
                         },
                       });
                     }}
                     >
-                    设为管理员
+                      {t(p("grantAdmin"))}
                     </a>
                   ) : undefined
               ) : undefined
             }
             <DisabledA
               disabled={r.role === UserRole.OWNER}
-              message="不能移出账户拥有者"
+              message={t(p("cannotRemove"))}
               onClick={() => {
                 modal.confirm({
-                  title: "确认移出用户",
+                  title: t(p("confirmRemove")),
                   icon: <ExclamationCircleOutlined />,
-                  content: `确认要从账户${accountName}移出用户${r.name}（ID：${r.userId}）？`,
+                  content: `${t(p("confirmRemoveText"))}${accountName}${t(p("removerUser"))}
+                  ${r.name}（ID：${r.userId}）？`,
                   onOk: async () => {
                     await api.removeUserFromAccount({ query: {
                       identityId: r.userId,
                       accountName: accountName,
                     } })
                       .then(() => {
-                        message.success("移出用户成功！");
+                        message.success(t(p("removeSuccess")));
                         reload();
                       });
                   },
                 });
               }}
             >
-              移出用户
+              {t(p("removerUser"))}
             </DisabledA>
           </Space>
         )}

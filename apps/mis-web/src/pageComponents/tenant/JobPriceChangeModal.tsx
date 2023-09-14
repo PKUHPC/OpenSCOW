@@ -13,6 +13,7 @@
 import { App, Form, Input, InputNumber, Modal } from "antd";
 import { useState } from "react";
 import { api } from "src/apis";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import type { GetJobFilter } from "src/pages/api/job/jobInfo";
 
 interface Props {
@@ -29,12 +30,18 @@ interface FormProps {
   reason: string;
 }
 
+const p = prefix("pageComp.tenant.jobPriceChangeModal.");
+const pCommon = prefix("common.");
+
 const text = {
-  "account": "租户计费",
-  "tenant": "平台计费",
+  "account": "tenantPrice",
+  "tenant": "platformPrice",
 };
 
 export const JobPriceChangeModal: React.FC<Props> = ({ open, onClose, jobCount, filter, target, reload }) => {
+
+  const { t } = useI18nTranslateToString();
+
   const [form] = Form.useForm<FormProps>();
   const [loading, setLoading] = useState(false);
 
@@ -43,9 +50,9 @@ export const JobPriceChangeModal: React.FC<Props> = ({ open, onClose, jobCount, 
   return (
     <Modal
       open={open}
-      title={`修改作业${text[target]}`}
-      okText={`修改${text[target]}`}
-      cancelText="取消"
+      title={`${t(p("changeJob"))}${text[target]}`}
+      okText={`${t(pCommon("modify"))}${text[target]}`}
+      cancelText={t(pCommon("cancel"))}
       onCancel={onClose}
       confirmLoading={loading}
       onOk={async () => {
@@ -54,7 +61,7 @@ export const JobPriceChangeModal: React.FC<Props> = ({ open, onClose, jobCount, 
         setLoading(true);
         await api.changeJobPrice({ body: { ...filter, price, reason, target } })
           .then(() => {
-            message.success("修改成功");
+            message.success(t(pCommon("changeSuccess")));
             reload();
             onClose();
           })
@@ -63,13 +70,13 @@ export const JobPriceChangeModal: React.FC<Props> = ({ open, onClose, jobCount, 
       }}
     >
       <Form form={form}>
-        <Form.Item label="作业数量">
+        <Form.Item label={t(p("jobNumber"))}>
           <strong>{jobCount}</strong>
         </Form.Item>
-        <Form.Item<FormProps> label={`新作业${text[target]}`} name="price" rules={[{ required: true }]}>
-          <InputNumber min={0} step={0.01} addonAfter={"元"} />
+        <Form.Item<FormProps> label={`${t(p("newJob"))}${text[target]}`} name="price" rules={[{ required: true }]}>
+          <InputNumber min={0} step={0.01} addonAfter={t(pCommon("unit"))} />
         </Form.Item>
-        <Form.Item<FormProps> name="reason" label="修改原因" rules={[{ required: true }]}>
+        <Form.Item<FormProps> name="reason" label={t(p("reason"))} rules={[{ required: true }]}>
           <Input.TextArea />
         </Form.Item>
       </Form>

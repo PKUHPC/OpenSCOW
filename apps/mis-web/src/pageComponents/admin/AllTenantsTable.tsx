@@ -27,7 +27,7 @@ interface Props {
   refreshToken: boolean;
 }
 const p = prefix("pageComp.admin.allTenantsTable.");
-const pCommon = prefix("pageComp.common.");
+const pCommon = prefix("common.");
 
 export const AllTenantsTable: React.FC<Props> = ({ refreshToken }) => {
   const promiseFn = useCallback(async () => {

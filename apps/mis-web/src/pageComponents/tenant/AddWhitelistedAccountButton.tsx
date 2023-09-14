@@ -14,6 +14,7 @@ import { PlusOutlined } from "@ant-design/icons";
 import { App, Button, Form, Input, Modal } from "antd";
 import React, { useState } from "react";
 import { api } from "src/apis";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 
 interface FormProps {
   accountName: string;
@@ -26,9 +27,14 @@ interface ModalProps {
   refresh: () => void;
 }
 
+const p = prefix("pageComp.tenant.addWhitelistedAccountButton.");
+const pCommon = prefix("common.");
+
 const NewAccountModal: React.FC<ModalProps> = ({
   open, close, refresh,
 }) => {
+
+  const { t } = useI18nTranslateToString();
 
   const { message } = App.useApp();
   const [loading, setLoading] = useState(false);
@@ -40,10 +46,10 @@ const NewAccountModal: React.FC<ModalProps> = ({
 
     await api.whitelistAccount({ body: { accountName, comment } })
       .httpError(404, () => {
-        message.error("账户不存在！");
+        message.error(t(p("notExist")));
       })
       .then(() => {
-        message.success("添加成功！");
+        message.success(t(p("addSuccess")));
         refresh();
         close();
       })
@@ -54,17 +60,17 @@ const NewAccountModal: React.FC<ModalProps> = ({
 
   return (
     <Modal
-      title="添加白名单账户"
+      title={t(p("addWhiteList"))}
       open={open}
       onCancel={close}
       onOk={onOk}
       confirmLoading={loading}
     >
       <Form form={form}>
-        <Form.Item name="accountName" rules={[{ required: true }]} label="账户名">
+        <Form.Item name="accountName" rules={[{ required: true }]} label={t(pCommon("accountName"))}>
           <Input />
         </Form.Item>
-        <Form.Item name="comment" rules={[{ required: true }]} label="备注">
+        <Form.Item name="comment" rules={[{ required: true }]} label={t(pCommon("comment"))}>
           <Input.TextArea />
         </Form.Item>
       </Form>
@@ -80,11 +86,13 @@ export const AddWhitelistedAccountButton: React.FC<Props> = ({ refresh }) => {
 
   const [modalShow, setModalShow] = useState(false);
 
+  const { t } = useI18nTranslateToString();
+
   return (
     <>
       <NewAccountModal close={() => setModalShow(false)} open={modalShow} refresh={refresh} />
       <Button type="primary" icon={<PlusOutlined />} onClick={() => setModalShow(true)}>
-      添加白名单账户
+        {t(p("addWhiteList"))}
       </Button>
     </>
   );

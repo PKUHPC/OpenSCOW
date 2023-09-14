@@ -27,7 +27,7 @@ const AlertContainer = styled.div`
 `;
 
 const p = prefix("pageComp.init.initAdminForm.");
-const pCommon = prefix("pageComp.common.");
+const pCommon = prefix("common.");
 
 export const InitAdminForm: React.FC = () => {
 

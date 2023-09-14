@@ -38,7 +38,7 @@ interface CompletionStatus {
 }
 
 const p = prefix("pageComp.job.ChangeJobTimeLimitModal.");
-const pCommon = prefix("pageComp.common.");
+const pCommon = prefix("common.");
 
 export const ChangeJobTimeLimitModal: React.FC<Props> = ({ open, onClose, data, reload }) => {
 

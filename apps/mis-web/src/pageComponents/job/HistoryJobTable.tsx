@@ -51,7 +51,7 @@ interface Props {
 }
 
 const p = prefix("pageComp.job.historyJobTable.");
-const pCommon = prefix("pageComp.common.");
+const pCommon = prefix("common.");
 
 export const JobTable: React.FC<Props> = ({
   userId, accountNames, filterAccountName = true, filterUser = true,

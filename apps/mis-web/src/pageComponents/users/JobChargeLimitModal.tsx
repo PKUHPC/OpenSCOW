@@ -16,6 +16,7 @@ import { App, Checkbox, Form, InputNumber, Modal, Space } from "antd";
 import { useState } from "react";
 import { api } from "src/apis";
 import { ModalLink } from "src/components/ModalLink";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { UserStatus } from "src/models/User";
 import { moneyToString } from "src/utils/money";
 
@@ -39,9 +40,15 @@ interface FormFieldsConfirm {
   unblock: Boolean;
 }
 
+const p = prefix("pageComp.user.jobChargeLimitModal.");
+const pCommon = prefix("common.");
+
 export const JobChargeLimitModal: React.FC<Props> = ({
   accountName, onClose, reload, userId, open, username, currentLimit, currentUsed, status,
 }) => {
+
+  const { t } = useI18nTranslateToString();
+
   const [form] = Form.useForm<FormFields>();
   const [confirmForm] = Form.useForm<FormFieldsConfirm>();
   const [loading, setLoading] = useState(false);
@@ -53,7 +60,7 @@ export const JobChargeLimitModal: React.FC<Props> = ({
     setLoading(true);
     await api.setJobChargeLimit({ body: { userId, accountName, limit } })
       .then(() => {
-        message.success("设置成功");
+        message.success(t(p("setSuccess")));
         reload();
         onClose();
       })
@@ -62,7 +69,7 @@ export const JobChargeLimitModal: React.FC<Props> = ({
 
   return (
     <Modal
-      title={`${currentLimit === undefined ? "设置" : "修改"}用户作业费用限额`}
+      title={`${currentLimit === undefined ? t(pCommon("set")) : t(pCommon("modify"))}${t(p("priceLimited"))}`}
       open={open}
       onCancel={onClose}
       confirmLoading={loading}
@@ -72,13 +79,13 @@ export const JobChargeLimitModal: React.FC<Props> = ({
         form={form}
         initialValues={{ limit: 0 }}
       >
-        <Form.Item label="用户">
+        <Form.Item label={t(pCommon("user"))}>
           <strong>{username} (ID: {userId})</strong>
         </Form.Item>
-        <Form.Item label="账户名">
+        <Form.Item label={t(pCommon("accountName"))}>
           <strong>{accountName}</strong>
         </Form.Item>
-        <Form.Item label="当前已使用/总限额">
+        <Form.Item label={t(p("alreadyUsed"))}>
           {currentLimit && currentUsed
             ? (
               <Space>
@@ -89,16 +96,16 @@ export const JobChargeLimitModal: React.FC<Props> = ({
                 </span>
                 <a onClick={() => {
                   modal.confirm({
-                    title: "取消作业费用限额",
+                    title: t(p("cancelPriceLimited")),
                     icon: <ExclamationCircleOutlined />,
                     content: <div>
-                      <p>确认要取消此用户在此账户中的限额吗？</p>
+                      <p>{t(p("confirmCancelLimited"))}</p>
                       {status === UserStatus.BLOCKED && (
                         <Form
                           form={confirmForm}
                         >
                           <Form.Item name="unblock" initialValue={true} valuePropName="checked">
-                            <Checkbox>取消限额的同时解除封锁</Checkbox>
+                            <Checkbox>{t(p("cancelAndNotBlock"))}</Checkbox>
                           </Form.Item>
                         </Form>
                       )}
@@ -110,7 +117,7 @@ export const JobChargeLimitModal: React.FC<Props> = ({
                       }
                       await api.cancelJobChargeLimit({ query: { accountName, userId, unblock } })
                         .then(() => {
-                          message.success("取消成功！");
+                          message.success(t(p("cancelSuccess")));
                           onClose();
                           reload();
                         });
@@ -118,13 +125,13 @@ export const JobChargeLimitModal: React.FC<Props> = ({
                   });
                 }}
                 >
-                  取消限额
+                  {t(p("cancelLimited"))}
                 </a>
               </Space>
             )
-            : "未设置" }
+            : t(p("unset")) }
         </Form.Item>
-        <Form.Item name="limit" label={currentLimit ? "修改限额至" : "设置限额"} required>
+        <Form.Item name="limit" label={currentLimit ? t(p("changeLimited")) : t(p("setLimited"))} required>
           <InputNumber precision={2} />
         </Form.Item>
       </Form>

@@ -12,26 +12,31 @@
 
 import { Result } from "antd";
 import React from "react";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { Head } from "src/utils/head";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 
 interface Props {
-  title?: React.ReactNode;
-  subTitle?: React.ReactNode;
+  title?: "notAllowedPage";
+  subTitle?: "systemNotAllowed";
 }
+const p = prefix("component.errorPages.");
 
 export const ForbiddenPage: React.FC<Props> = ({
-  title = "不允许访问此页面",
-  subTitle = "系统不允许您访问此页面。",
+  title = "notAllowedPage",
+  subTitle = "systemNotAllowed",
 }) => {
+
+  const { t } = useI18nTranslateToString();
+
   return (
     <>
-      <Head title="不允许访问" />
+      <Head title={t(p("notAllowed"))} />
       <Result
         status="403"
-        title={title}
-        subTitle={subTitle}
+        title={t(p(title))}
+        subTitle={t(p(subTitle))}
       />
     </>
   );

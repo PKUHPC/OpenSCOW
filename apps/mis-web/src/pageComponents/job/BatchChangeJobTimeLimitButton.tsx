@@ -30,7 +30,7 @@ export const BatchChangeJobTimeLimitButton: React.FC<ChangeJobTimeLimitButtonPro
   return (
     <>
       <Button disabled={disabled} onClick={() => setOpen(true)}>
-        <Localized id={"runningJob.search.button.changeLimit"}></Localized>
+        <Localized id={"pageComp.job.runningJobTable.extendLimit"}></Localized>
       </Button>
       <ChangeJobTimeLimitModal
         reload={reload}

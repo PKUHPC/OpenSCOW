@@ -22,7 +22,7 @@ import { AmountStrategy } from "src/models/job";
 import { publicConfig } from "src/utils/config";
 
 const p = prefix("pageComp.job.editableJobBillingTable.");
-const pCommon = prefix("pageComp.common.");
+const pCommon = prefix("common.");
 
 const EditPriceModal: React.FC<CommonModalProps & {
   current: JobBillingTableItem["priceItem"]; path: string; tenant?: string; reload: () => void

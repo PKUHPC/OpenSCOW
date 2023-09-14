@@ -43,9 +43,16 @@ interface Props {
   showUser: boolean;
 }
 
+
+const p = prefix("pageComp.job.runningJobTable.");
+const pCommon = prefix("common.");
+
 export const RunningJobQueryTable: React.FC<Props> = ({
   userId, accountNames, showUser, showAccount, filterAccountName = true,
 }) => {
+
+  const { t } = useI18nTranslateToString();
+
 
   const searchType = useRef<"precision" | "range">("range");
 
@@ -100,9 +107,6 @@ export const RunningJobQueryTable: React.FC<Props> = ({
     return filtered.map((x) => RunningJobInfo.fromGrpc(x, publicConfig.CLUSTERS[query.cluster.id]));
   }, [data, query.jobId]);
 
-  const { t } = useI18nTranslateToString();
-  const p = prefix("runningJob.search.");
-
   return (
     <div>
       <FilterFormContainer>
@@ -122,8 +126,8 @@ export const RunningJobQueryTable: React.FC<Props> = ({
             }}
             button={(
               <Space>
-                <Button type="primary" htmlType="submit">{t(p("button.search"))}</Button>
-                <Button onClick={reload} loading={isLoading}>{t(p("button.refresh"))}</Button>
+                <Button type="primary" htmlType="submit">{t(pCommon("search"))}</Button>
+                <Button onClick={reload} loading={isLoading}>{t(pCommon("fresh"))}</Button>
               </Space>
             )}
             tabs={[
@@ -132,14 +136,14 @@ export const RunningJobQueryTable: React.FC<Props> = ({
                 key: "range",
                 node: (
                   <>
-                    <Form.Item label={t(p("cluster"))} name="cluster">
+                    <Form.Item label={t(pCommon("cluster"))} name="cluster">
                       <SingleClusterSelector />
                     </Form.Item>
                     {
                       filterAccountName
                         ? accountNames
                           ? (
-                            <Form.Item label={t(p("account"))} name="accountName">
+                            <Form.Item label={t(pCommon("account"))} name="accountName">
                               <Select style={{ minWidth: 96 }} allowClear>
                                 {(Array.isArray(accountNames) ? accountNames : [accountNames]).map((x) => (
                                   <Select.Option key={x} value={x}>{x}</Select.Option>
@@ -147,7 +151,7 @@ export const RunningJobQueryTable: React.FC<Props> = ({
                               </Select>
                             </Form.Item>
                           ) : (
-                            <Form.Item label={t(p("account"))} name="accountName">
+                            <Form.Item label={t(pCommon("account"))} name="accountName">
                               <Input />
                             </Form.Item>
                           )
@@ -162,10 +166,10 @@ export const RunningJobQueryTable: React.FC<Props> = ({
                 key: "precision",
                 node: (
                   <>
-                    <Form.Item label={t(p("cluster"))} name="cluster">
+                    <Form.Item label={t(pCommon("cluster"))} name="cluster">
                       <SingleClusterSelector />
                     </Form.Item>
-                    <Form.Item label={t(p("clusterJobId"))} name="jobId">
+                    <Form.Item label={t(pCommon("clusterWorkId"))} name="jobId">
                       <InputNumber style={{ minWidth: "160px" }} min={1} />
                     </Form.Item>
                   </>
@@ -215,7 +219,6 @@ export const RunningJobInfoTable: React.FC<JobInfoTableProps> = ({
   const [previewItem, setPreviewItem] = useState<RunningJobInfo | undefined>(undefined);
 
   const { t } = useI18nTranslateToString();
-  const p = prefix("runningJob.jobTable.");
 
   return (
     <>
@@ -253,29 +256,29 @@ export const RunningJobInfoTable: React.FC<JobInfoTableProps> = ({
           showCluster && (
             <Table.Column<RunningJobInfo>
               dataIndex="cluster"
-              title={t(p("cluster"))}
+              title={t(pCommon("cluster"))}
               render={(_, r) => r.cluster.name}
             />
           )
         }
-        <Table.Column<RunningJobInfo> dataIndex="jobId" title={t(p("jobId"))} />
+        <Table.Column<RunningJobInfo> dataIndex="jobId" title={t(pCommon("workId"))} />
         {
           showUser && (
-            <Table.Column<RunningJobInfo> dataIndex="user" title={t(p("user"))} />
+            <Table.Column<RunningJobInfo> dataIndex="user" title={t(pCommon("user"))} />
           )
         }
         {
           showAccount && (
-            <Table.Column<RunningJobInfo> dataIndex="account" title={t(p("account"))} />
+            <Table.Column<RunningJobInfo> dataIndex="account" title={t(pCommon("account"))} />
           )
         }
-        <Table.Column<RunningJobInfo> dataIndex="name" title={t(p("name"))} />
-        <Table.Column<RunningJobInfo> dataIndex="partition" title={t(p("partition"))} />
-        <Table.Column<RunningJobInfo> dataIndex="qos" title={t(p("qos"))} />
+        <Table.Column<RunningJobInfo> dataIndex="name" title={t(pCommon("workName"))} />
+        <Table.Column<RunningJobInfo> dataIndex="partition" title={t(pCommon("partition"))} />
+        <Table.Column<RunningJobInfo> dataIndex="qos" title="QOS" />
         <Table.Column<RunningJobInfo> dataIndex="nodes" title={t(p("nodes"))} />
         <Table.Column<RunningJobInfo> dataIndex="cores" title={t(p("cores"))} />
         <Table.Column<RunningJobInfo> dataIndex="gpus" title={t(p("gpus"))} />
-        <Table.Column<RunningJobInfo> dataIndex="state" title={t(p("state"))} />
+        <Table.Column<RunningJobInfo> dataIndex="state" title={t(pCommon("status"))} />
         <Table.Column
           dataIndex="runningOrQueueTime"
           title={t(p("time"))}
@@ -288,10 +291,10 @@ export const RunningJobInfoTable: React.FC<JobInfoTableProps> = ({
         <Table.Column<RunningJobInfo> dataIndex="timeLimit" title={t(p("limit"))} />
 
         <Table.Column<RunningJobInfo>
-          title={t(p("others"))}
+          title={t(pCommon("more"))}
           render={(_, r) => (
             <Space>
-              <a onClick={() => setPreviewItem(r)}>{t(p("details"))}</a>
+              <a onClick={() => setPreviewItem(r)}>{t(pCommon("detail"))}</a>
               <ChangeJobTimeLimitModalLink
                 reload={reload}
                 data={[r]}

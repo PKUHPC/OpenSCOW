@@ -12,7 +12,7 @@
 
 import { Form, Input } from "antd";
 import React from "react";
-import { useI18n } from "src/i18n";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { getUserIdRule, useBuiltinCreateUser } from "src/utils/createUser";
 import { confirmPasswordFormItemProps, emailRule, passwordRule } from "src/utils/form";
 export interface CreateUserFormFields {
@@ -23,9 +23,12 @@ export interface CreateUserFormFields {
   confirmPassword: string;
 }
 
-
+const p = prefix("pageComp.user.createUserForm.");
+const pCommon = prefix("common.");
 
 export const CreateUserForm: React.FC = () => {
+
+  const { t } = useI18nTranslateToString();
 
   const form = Form.useFormInstance<CreateUserFormFields>();
 
@@ -36,7 +39,7 @@ export const CreateUserForm: React.FC = () => {
   return (
     <>
       <Form.Item
-        label="用户ID"
+        label={t(pCommon("userId"))}
         name="identityId"
         rules={[
           { required: true },
@@ -46,18 +49,18 @@ export const CreateUserForm: React.FC = () => {
       >
         <Input placeholder={userIdRule?.message} />
       </Form.Item>
-      <Form.Item label="用户姓名" name="name" rules={[{ required: true }]}>
+      <Form.Item label={t(pCommon("userName"))} name="name" rules={[{ required: true }]}>
         <Input />
       </Form.Item>
       <Form.Item
-        label="用户邮箱"
+        label={t(p("email"))}
         name="email"
         rules={[{ required: true }, emailRule]}
       >
         <Input />
       </Form.Item>
       <Form.Item
-        label="用户密码"
+        label={t(p("password"))}
         name="password"
         rules={[{ required:true }, passwordRule(languageId)]}
       >
@@ -67,7 +70,7 @@ export const CreateUserForm: React.FC = () => {
         useBuiltinCreateUser() ? (
           <>
             <Form.Item
-              label="确认密码"
+              label={t(p("confirm"))}
               name="confirmPassword"
               hasFeedback
               {...confirmPasswordFormItemProps(form, "password")}

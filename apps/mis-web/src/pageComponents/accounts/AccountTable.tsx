@@ -42,7 +42,7 @@ const filteredStatuses = {
 type FilteredStatus = keyof typeof filteredStatuses;
 
 const p = prefix("pageComp.accounts.accountTable.");
-const pCommon = prefix("pageComp.common.");
+const pCommon = prefix("common.");
 
 export const AccountTable: React.FC<Props> = ({
   data, isLoading, showedTab,

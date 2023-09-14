@@ -13,7 +13,7 @@
 import { Form, Input, Modal } from "antd";
 import { useState } from "react";
 import { ModalLink } from "src/components/ModalLink";
-import { useI18n } from "src/i18n";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { confirmPasswordFormItemProps, passwordRule } from "src/utils/form";
 
 interface Props {
@@ -28,8 +28,12 @@ interface FormProps {
     newPassword: string;
     confirm: string;
 }
+const p = prefix("component.others.");
 
 const ChangePasswordModal: React.FC<Props> = ({ name, userId, onClose, onComplete, open }) => {
+
+  const { t } = useI18nTranslateToString();
+
   const [form] = Form.useForm<FormProps>();
   const [loading, setLoading] = useState(false);
 
@@ -48,7 +52,7 @@ const ChangePasswordModal: React.FC<Props> = ({ name, userId, onClose, onComplet
 
   return (
     <Modal
-      title={`修改用户${name}（ID：${userId}）的密码`}
+      title={`${t(p("modifyUser"))}${name}（ID：${userId}）${t(p("password"))}`}
       open={open}
       onOk={onOK}
       confirmLoading={loading}
@@ -61,15 +65,15 @@ const ChangePasswordModal: React.FC<Props> = ({ name, userId, onClose, onComplet
         preserve={false}
       >
         <Form.Item
-          rules={[{ required: true, message: "请输入新密码" }, passwordRule(languageId)]}
-          label="新密码"
+          rules={[{ required: true, message: t(p("inputNewPassword")) }, passwordRule(languageId)]}
+          label={t(p("newPassword"))}
           name="newPassword"
         >
           <Input.Password placeholder={passwordRule(languageId).message} />
         </Form.Item>
         <Form.Item
           name="confirm"
-          label="确认密码"
+          label={t(p("confirmPassword"))}
           hasFeedback
           {...confirmPasswordFormItemProps(form, "newPassword")}
         >
