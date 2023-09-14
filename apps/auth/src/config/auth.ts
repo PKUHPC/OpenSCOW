@@ -31,6 +31,21 @@ export enum ScowLogoType {
   "light" = "light",
 }
 
+// 创建配置文件中显示文字项的配置类型
+export const createI18nStringSchema = (description: string, defaultValue?: string) => {
+  return Type.Union([
+    Type.String(),
+    Type.Object({
+      i18n: Type.Object({
+        default: Type.String({ description: "国际化类型默认值" }),
+        en: Type.String({ description: "国际化类型英文值" }),
+        zh_cn: Type.String({ description: "国际化类型简体中文值" }),
+      }),
+    }),
+  ], { description, default: defaultValue });
+};
+
+
 export const LdapConfigSchema = Type.Object({
   url: Type.String({ description: "LDAP地址" }),
   searchBase: Type.String({ description: "从哪个节点搜索登录用户对应的LDAP节点" }),
@@ -166,8 +181,8 @@ export const UiConfigSchema = Type.Object({
   }, { default: {} }),
   slogan: Type.Object({
     color: Type.String({ description: "默认标语文字颜色", default: "white" }),
-    title: Type.String({ description: "默认标语标题", default: "" }),
-    texts: Type.Array(Type.String(), { description: "默认 slogan 正文数组", default: []}),
+    title: createI18nStringSchema("默认标语标题", ""),
+    texts: Type.Array(createI18nStringSchema(""), { description: "默认 slogan 正文数组", default: []}),
   }, { default: {} }),
   footerTextColor: Type.String({ description: "默认 footer 文字颜色", default: "white" }),
 });

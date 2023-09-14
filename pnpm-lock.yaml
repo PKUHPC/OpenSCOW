@@ -1,8 +1,5 @@
 lockfileVersion: '6.0'
 
-settings:
-  autoInstallPeers: true
-  excludeLinksFromLockfile: false
 patchedDependencies:
   react-typed-i18n@2.3.0:
     hash: eybujl4up7xenffji6zpg43f3u
@@ -229,6 +226,9 @@ importers:
       nodemailer:
         specifier: 6.9.4
         version: 6.9.4
+      nookies:
+        specifier: 2.5.2
+        version: 2.5.2
       pino:
         specifier: 8.15.0
         version: 8.15.0
@@ -238,6 +238,9 @@ importers:
       qrcode:
         specifier: 1.5.3
         version: 1.5.3
+      react-typed-i18n:
+        specifier: ^2.3.0
+        version: 2.3.0(patch_hash=eybujl4up7xenffji6zpg43f3u)(react@18.2.0)
       speakeasy:
         specifier: 2.0.0
         version: 2.0.0
@@ -20417,3 +20420,7 @@ packages:
     name: tiny-inflate
     version: 1.0.3
     dev: false
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false

@@ -43,7 +43,9 @@
     "pino": "8.15.0",
     "nodemailer": "6.9.4",
     "qrcode": "1.5.3",
-    "speakeasy": "2.0.0"
+    "speakeasy": "2.0.0",
+    "react-typed-i18n": "^2.3.0",
+    "nookies": "2.5.2"
   },
   "devDependencies": {
     "@types/asn1": "0.2.1",
