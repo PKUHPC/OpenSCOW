@@ -18,7 +18,7 @@ import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
-import { prefix, useI18nTranslateToString } from "src/i18n";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { TenantRole } from "src/models/User";
 import { AccountWhitelistTable } from "src/pageComponents/tenant/AccountWhitelistTable";
 import { AddWhitelistedAccountButton } from "src/pageComponents/tenant/AddWhitelistedAccountButton";
@@ -30,6 +30,7 @@ export const AccountWhitelistPage: NextPage = requireAuth((u) => u.tenantRoles.i
   () => {
 
     const { t } = useI18nTranslateToString();
+    const languageId = useI18n().currentLanguage.id;
 
     const promiseFn = useCallback(async () => {
       return await api.getWhitelistedAccounts({});
@@ -45,7 +46,7 @@ export const AccountWhitelistPage: NextPage = requireAuth((u) => u.tenantRoles.i
         <PageTitle titleText={t(p("whitelistAccountList"))}>
           <Space split={<Divider type="vertical" />}>
             <AddWhitelistedAccountButton refresh={reload} />
-            <RefreshLink refresh={update} />
+            <RefreshLink refresh={update} languageId={languageId} />
           </Space>
         </PageTitle>
         <AccountWhitelistTable

@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { defaultPresets, formatDateTime } from "@scow/lib-web/build/utils/datetime";
+import { formatDateTime, getDefaultPresets } from "@scow/lib-web/build/utils/datetime";
 import { useDidUpdateEffect } from "@scow/lib-web/build/utils/hooks";
 import { Button, DatePicker, Form, Select, Table } from "antd";
 import dayjs from "dayjs";
@@ -18,7 +18,7 @@ import { useCallback, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
-import { prefix, useI18nTranslateToString } from "src/i18n";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { SearchType } from "src/models/User";
 import { publicConfig } from "src/utils/config";
 import { CHARGE_TYPE_OTHERS } from "src/utils/constants";
@@ -50,6 +50,7 @@ export const ChargeTable: React.FC<Props> = ({
   accountName, showAccountName, showTenantName, isPlatformRecords, searchType }) => {
 
   const { t } = useI18nTranslateToString();
+  const languageId = useI18n().currentLanguage.id;
 
   const [form] = Form.useForm<FilterForm>();
 
@@ -108,7 +109,7 @@ export const ChargeTable: React.FC<Props> = ({
             )
           }
           <Form.Item label={t(pCommon("time"))} name="time">
-            <DatePicker.RangePicker allowClear={false} presets={defaultPresets} />
+            <DatePicker.RangePicker allowClear={false} presets={getDefaultPresets(languageId)} />
           </Form.Item>
           <Form.Item label="类型" name="type">
             <Select

@@ -10,7 +10,6 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { RefreshLink, useRefreshToken } from "@scow/lib-web/build/utils/refreshToken";
 import { Divider, Space } from "antd";
 import { NextPage } from "next";
 import { useCallback } from "react";
@@ -18,12 +17,14 @@ import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
-import { prefix, useI18nTranslate } from "src/i18n";
+import { prefix, useI18n, useI18nTranslate } from "src/i18n";
 import { UserRole } from "src/models/User";
 import { useAccountPagesAccountName } from "src/pageComponents/accounts/checkQueryAccountNameIsAdmin";
 import { AddUserButton } from "src/pageComponents/users/AddUserButton";
 import { UserTable } from "src/pageComponents/users/UserTable";
 import { Head } from "src/utils/head";
+
+import { RefreshLink, useRefreshToken } from "../../../../../../libs/web/src/utils/refreshToken";
 
 const p = prefix("page.accounts.accountName.users.");
 
@@ -34,6 +35,7 @@ export const UsersPage: NextPage = requireAuth(
 
     const accountName = useAccountPagesAccountName();
     const { tArgs } = useI18nTranslate();
+    const languageId = useI18n().currentLanguage.id;
 
     const account = userStore.user.accountAffiliations.find((x) => x.accountName === accountName)!;
 
@@ -57,7 +59,7 @@ export const UsersPage: NextPage = requireAuth(
         >
           <Space split={<Divider type="vertical" />}>
             <AddUserButton refresh={reload} accountName={account.accountName} token={userStore.user.token} />
-            <RefreshLink refresh={update} />
+            <RefreshLink refresh={update} languageId={languageId} />
           </Space>
         </PageTitle>
         <UserTable

@@ -16,10 +16,11 @@ import sun from "@scow/lib-web/icons/sun.svg";
 import sunMoon from "@scow/lib-web/icons/sun-moon.svg";
 import { publicConfig } from "src/utils/config";
 
-export const FloatButtons = () => {
+export const FloatButtons = ({ languageId }) => {
   return (
     <AppFloatButtons darkModeButtonProps={{
       dark: moon, light: sun, system: sunMoon,
+      languageId,
       basePath: publicConfig.BASE_PATH,
     }}
     />

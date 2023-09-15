@@ -16,7 +16,7 @@ import { api } from "src/apis";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { CreateUserFormFields } from "src/pageComponents/users/CreateUserForm";
 import { getUserIdRule } from "src/utils/createUser";
-import { confirmPasswordFormItemProps, emailRule, passwordRule } from "src/utils/form";
+import { confirmPasswordFormItemProps, getEmailRule, passwordRule } from "src/utils/form";
 
 export interface NewUserInfo {
   identityId: string;
@@ -91,7 +91,7 @@ export const CreateUserModal: React.FC<Props> = ({
         <Form.Item
           label={t(p("email"))}
           name="email"
-          rules={[{ required: true }, emailRule]}
+          rules={[{ required: true }, getEmailRule(languageId)]}
         >
           <Input />
         </Form.Item>
@@ -106,7 +106,7 @@ export const CreateUserModal: React.FC<Props> = ({
           label={t(p("confirm"))}
           name="confirmPassword"
           hasFeedback
-          {...confirmPasswordFormItemProps(form, "password")}
+          {...confirmPasswordFormItemProps(form, "password", languageId)}
         >
           <Input.Password placeholder={passwordRule(languageId).message} />
         </Form.Item>

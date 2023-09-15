@@ -17,6 +17,7 @@ import Image from "next/image";
 import { parseCookies, setCookie } from "nookies";
 import React, { PropsWithChildren, useEffect, useState } from "react";
 import { addBasePathToImage } from "src/utils/image";
+import { getCurrentLangLibWebText } from "src/utils/libWebI18nTexts";
 
 const modes = ["system", "dark", "light"] as const;
 
@@ -36,16 +37,21 @@ export interface DarkModeButtonProps {
   light: any;
   system: any;
   dark: any;
+  languageId: string;
   basePath?: string;
 }
 
-const DarkModeButtonInternal = ({ dark, light, system, basePath = "" }: DarkModeButtonProps) => {
+const DarkModeButtonInternal = ({ dark, light, system, languageId, basePath = "" }: DarkModeButtonProps) => {
   const { mode, setMode } = useDarkMode();
 
+  const systemColor = getCurrentLangLibWebText(languageId, "layouts.darkMode.system");
+  const lightColor = getCurrentLangLibWebText(languageId, "layouts.darkMode.lights");
+  const darkColor = getCurrentLangLibWebText(languageId, "layouts.darkMode.dark");
+
   const icons = {
-    system: [system, "system", "跟随系统"],
-    light: [light, "light", "亮色"],
-    dark: [dark, "dark", "暗色"],
+    system: [system, "system", systemColor],
+    light: [light, "light", lightColor],
+    dark: [dark, "dark", darkColor],
   };
 
   const [icon, alt, label] = icons[mode];

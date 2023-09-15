@@ -20,4 +20,4 @@ export const passwordRule = (languageId: string) => {
 };
 
 
-export { confirmPasswordFormItemProps, emailRule } from "@scow/lib-web/build/utils/form";
+export { confirmPasswordFormItemProps, getEmailRule } from "@scow/lib-web/build/utils/form";

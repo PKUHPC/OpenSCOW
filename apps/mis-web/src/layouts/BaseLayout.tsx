@@ -16,7 +16,7 @@ import { JumpToAnotherLink } from "@scow/lib-web/build/layouts/base/header/compo
 import { PropsWithChildren, useMemo } from "react";
 import { useStore } from "simstate";
 import { LanguageSwitcher } from "src/components/LanguageSwitcher";
-import { useI18nTranslateToString } from "src/i18n";
+import { useI18n, useI18nTranslateToString } from "src/i18n";
 import { getAvailableRoutes } from "src/layouts/routes";
 import { UserStore } from "src/stores/UserStore";
 import { publicConfig } from "src/utils/config";
@@ -32,6 +32,9 @@ export const BaseLayout = ({ footerText, versionTag, children }: PropsWithChildr
   const userStore = useStore(UserStore);
 
   const { t } = useI18nTranslateToString();
+  const languageId = useI18n().currentLanguage.id;
+
+  console.log("web-baselayout-language", languageId);
 
   const routes = useMemo(() => getAvailableRoutes(userStore.user, t), [userStore.user, t]);
 
@@ -44,6 +47,7 @@ export const BaseLayout = ({ footerText, versionTag, children }: PropsWithChildr
       versionTag={versionTag}
       basePath={publicConfig.BASE_PATH}
       userLinks={publicConfig.USER_LINKS}
+      languageId={languageId}
       headerRightContent={(
         <>
           <JumpToAnotherLink

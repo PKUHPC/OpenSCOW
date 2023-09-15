@@ -21,7 +21,7 @@ import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { BackButton } from "src/components/BackButton";
 import { PageTitle } from "src/components/PageTitle";
-import { prefix, useI18nTranslate } from "src/i18n";
+import { prefix, useI18n, useI18nTranslate } from "src/i18n";
 import { TenantRole } from "src/models/User";
 import { AddUserButton } from "src/pageComponents/users/AddUserButton";
 import { UserTable } from "src/pageComponents/users/UserTable";
@@ -34,6 +34,7 @@ export const AccountUsersPage: NextPage = requireAuth(
 )(
   ({ userStore }) => {
     const { tArgs } = useI18nTranslate();
+    const languageId = useI18n().currentLanguage.id;
 
     const { message } = App.useApp();
 
@@ -69,7 +70,7 @@ export const AccountUsersPage: NextPage = requireAuth(
         >
           <Space split={<Divider type="vertical" />}>
             <AddUserButton refresh={reload} accountName={accountName} token={userStore.user.token} />
-            <RefreshLink refresh={update} />
+            <RefreshLink refresh={update} languageId={languageId} />
           </Space>
         </PageTitle>
         <UserTable

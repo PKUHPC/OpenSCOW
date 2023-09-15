@@ -59,11 +59,12 @@ type Props = PropsWithChildren<{
   headerRightContent?: React.ReactNode;
   basePath: string;
   userLinks?: UserLink[];
+  languageId: string,
 }>;
 
 export const BaseLayout: React.FC<PropsWithChildren<Props>> = ({
   children, footerText, versionTag, routes, user, logout,
-  headerRightContent, basePath, userLinks,
+  headerRightContent, basePath, userLinks, languageId,
 }) => {
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
@@ -92,6 +93,7 @@ export const BaseLayout: React.FC<PropsWithChildren<Props>> = ({
         right={headerRightContent}
         basePath={basePath}
         userLinks={userLinks}
+        languageId={languageId}
       />
       <StyledLayout>
         {

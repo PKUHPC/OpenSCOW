@@ -10,13 +10,14 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { getEmailRule } from "@scow/lib-web/build/utils/form";
 import { App, Form, Input, Modal } from "antd";
 import React, { useState } from "react";
 import { useStore } from "simstate";
 import { api } from "src/apis";
-import { prefix, useI18nTranslateToString } from "src/i18n";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { UserStore } from "src/stores/UserStore";
-import { emailRule } from "src/utils/form";
+
 
 export interface Props {
   open: boolean;
@@ -39,6 +40,7 @@ export const ChangeEmailModal: React.FC<Props> = ({
 }) => {
 
   const { t } = useI18nTranslateToString();
+  const languageId = useI18n().currentLanguage.id;
 
   const [form] = Form.useForm<FormInfo>();
   const { message } = App.useApp();
@@ -86,7 +88,7 @@ export const ChangeEmailModal: React.FC<Props> = ({
           <Input disabled />
         </Form.Item>
         <Form.Item
-          rules={[{ required: true }, emailRule]}
+          rules={[{ required: true }, getEmailRule(languageId)]}
           label={t(p("newEmail"))}
           name="newEmail"
         >

@@ -11,7 +11,7 @@
  */
 
 import { QuestionCircleOutlined } from "@ant-design/icons";
-import { defaultPresets, formatDateTime } from "@scow/lib-web/build/utils/datetime";
+import { formatDateTime, getDefaultPresets } from "@scow/lib-web/build/utils/datetime";
 import { compareNumber } from "@scow/lib-web/build/utils/math";
 import { JobInfo } from "@scow/protos/build/portal/job";
 import { Button, DatePicker, Form, InputNumber, Popover, Space, Table } from "antd";
@@ -24,7 +24,7 @@ import { useStore } from "simstate";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
-import { prefix, useI18nTranslateToString } from "src/i18n";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { Cluster } from "src/utils/config";
 
@@ -54,6 +54,8 @@ export const AllJobQueryTable: React.FC<Props> = ({
   });
 
   const [form] = Form.useForm<FilterForm>();
+
+  const languageId = useI18n().currentLanguage.id;
 
   const promiseFn = useCallback(async () => {
     return await api.getAllJobs({ query: {
@@ -110,7 +112,7 @@ export const AllJobQueryTable: React.FC<Props> = ({
           >
             <DatePicker.RangePicker
               showTime
-              presets={defaultPresets}
+              presets={getDefaultPresets(languageId)}
               allowClear={false}
             />
           </Form.Item>

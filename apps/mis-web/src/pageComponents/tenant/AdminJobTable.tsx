@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { defaultPresets, formatDateTime } from "@scow/lib-web/build/utils/datetime";
+import { formatDateTime, getDefaultPresets } from "@scow/lib-web/build/utils/datetime";
 import { JobInfo } from "@scow/protos/build/common/ended_job";
 import { Money } from "@scow/protos/build/common/money";
 import { Static } from "@sinclair/typebox";
@@ -64,6 +64,7 @@ const filterFormToQuery = (query: FilterForm, rangeSearch: boolean): GetJobFilte
 export const AdminJobTable: React.FC<Props> = () => {
 
   const { t } = useI18nTranslateToString();
+  const languageId = useI18n().currentLanguage.id;
 
   const rangeSearch = useRef(true);
 
@@ -124,7 +125,7 @@ export const AdminJobTable: React.FC<Props> = () => {
                       <Input />
                     </Form.Item>
                     <Form.Item label={t(pCommon("timeEnd"))} name="jobEndTime">
-                      <DatePicker.RangePicker showTime allowClear={false} presets={defaultPresets} />
+                      <DatePicker.RangePicker showTime allowClear={false} presets={getDefaultPresets(languageId)} />
                     </Form.Item>
                   </>
                 ),

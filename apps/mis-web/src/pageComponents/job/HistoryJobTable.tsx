@@ -11,7 +11,7 @@
  */
 
 import { HttpError } from "@ddadaal/next-typed-api-routes-runtime";
-import { defaultPresets, formatDateTime } from "@scow/lib-web/build/utils/datetime";
+import { formatDateTime, getDefaultPresets } from "@scow/lib-web/build/utils/datetime";
 import { useDidUpdateEffect } from "@scow/lib-web/build/utils/hooks";
 import { JobInfo } from "@scow/protos/build/common/ended_job";
 import { Money } from "@scow/protos/build/common/money";
@@ -59,6 +59,7 @@ export const JobTable: React.FC<Props> = ({
 }) => {
 
   const { t } = useI18nTranslateToString();
+  const languageId = useI18n().currentLanguage.id;
 
   const { message } = App.useApp();
 
@@ -165,7 +166,7 @@ export const JobTable: React.FC<Props> = ({
                   <Form.Item label={t(p("jobEndTime"))} name="jobEndTime">
                     <DatePicker.RangePicker
                       showTime
-                      presets={defaultPresets}
+                      presets={getDefaultPresets(languageId)}
                       allowClear={false}
                     />
                   </Form.Item>

@@ -12,24 +12,26 @@
 
 import { FormInstance } from "antd";
 
+import { getCurrentLangLibWebText } from "./libWebI18nTexts";
+
 
 
 export const confirmPasswordFormItemProps = <
   PasswordFieldName extends string,
   T extends { [key in PasswordFieldName]: string }
->(form: FormInstance<T>, passwordFieldName: PasswordFieldName) => {
+>(form: FormInstance<T>, passwordFieldName: PasswordFieldName, languageId: string) => {
   return {
     dependencies: [passwordFieldName],
     validateFirst: true,
     rules: [
       {
         required: true,
-        message: "请确认密码",
+        message: getCurrentLangLibWebText(languageId, "form.confirmPasswordForm.message"),
       },
       {
         validator: async (_, value) => {
           if (value && form.getFieldValue(passwordFieldName) !== value) {
-            throw new Error("两次密码输入不一致，请重新输入");
+            throw new Error(getCurrentLangLibWebText(languageId, "form.confirmPasswordForm.notEqualError"));
           }
         },
       },
@@ -37,7 +39,7 @@ export const confirmPasswordFormItemProps = <
   };
 };
 
-export const emailRule = ({
+export const getEmailRule = (languageId: string) => ({
   type: "email",
-  message: "邮箱格式不正确，请重新输入",
+  message: getCurrentLangLibWebText(languageId, "form.confirmPasswordForm.message"),
 }) as const;

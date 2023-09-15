@@ -11,14 +11,14 @@
  */
 
 import { OperationType } from "@scow/lib-operation-log/build/index";
-import { defaultPresets, formatDateTime } from "@scow/lib-web/build/utils/datetime";
+import { formatDateTime, getDefaultPresets } from "@scow/lib-web/build/utils/datetime";
 import { Button, DatePicker, Form, Input, Select, Table } from "antd";
 import dayjs from "dayjs";
 import { useCallback, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
-import { prefix, useI18nTranslateToString } from "src/i18n";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import {
   OperationLog,
   OperationLogQueryType,
@@ -54,6 +54,7 @@ const pCommon = prefix("common.");
 export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountName, tenantName }) => {
 
   const { t } = useI18nTranslateToString();
+  const languageId = useI18n().currentLanguage.id;
 
   const [ query, setQuery ] = useState<FilterForm>(() => {
     return {
@@ -135,7 +136,7 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
             </Form.Item>
           )}
           <Form.Item label={t(p("operationTime"))} name="operationTime">
-            <DatePicker.RangePicker showTime allowClear={false} presets={defaultPresets} />
+            <DatePicker.RangePicker showTime allowClear={false} presets={getDefaultPresets(languageId)} />
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit">{t(pCommon("search"))}</Button>

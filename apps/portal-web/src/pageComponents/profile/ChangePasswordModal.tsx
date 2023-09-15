@@ -95,7 +95,7 @@ export const ChangePasswordModal: React.FC<Props> = ({
           name="confirm"
           label={t(p("confirm"))}
           hasFeedback
-          {...confirmPasswordFormItemProps(form, "newPassword")}
+          {...confirmPasswordFormItemProps(form, "newPassword", languageId)}
         >
           <Input.Password />
         </Form.Item>

@@ -140,7 +140,7 @@ function MyApp({ Component, pageProps, extra }: Props) {
         <StoreProvider stores={[userStore, defaultClusterStore]}>
           <DarkModeProvider initial={extra.darkModeCookieValue}>
             <AntdConfigProvider color={primaryColor} locale={extra.languageId}>
-              <FloatButtons />
+              <FloatButtons languageId={extra.languageId} />
               <GlobalStyle />
               <FailEventHandler />
               <TopProgressBar />

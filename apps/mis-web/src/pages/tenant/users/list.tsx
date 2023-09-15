@@ -17,7 +17,7 @@ import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
-import { prefix, useI18nTranslateToString } from "src/i18n";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { TenantRole } from "src/models/User";
 import { AdminUserTable } from "src/pageComponents/tenant/AdminUserTable";
 import { Head } from "src/utils/head";
@@ -28,6 +28,7 @@ export const AdminUsersPage: NextPage = requireAuth((u) => u.tenantRoles.include
   ({ userStore: { user } }) => {
 
     const { t } = useI18nTranslateToString();
+    const languageId = useI18n().currentLanguage.id;
 
     const promiseFn = useCallback(async () => {
       return await api.getTenantUsers({ });
@@ -41,7 +42,7 @@ export const AdminUsersPage: NextPage = requireAuth((u) => u.tenantRoles.include
       <div>
         <Head title={t(p("title"))} />
         <PageTitle titleText={t(p("title"))}>
-          <RefreshLink refresh={update} />
+          <RefreshLink refresh={update} languageId={languageId} />
         </PageTitle>
         <AdminUserTable
           data={data}

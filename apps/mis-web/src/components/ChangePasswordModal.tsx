@@ -75,7 +75,7 @@ const ChangePasswordModal: React.FC<Props> = ({ name, userId, onClose, onComplet
           name="confirm"
           label={t(p("confirmPassword"))}
           hasFeedback
-          {...confirmPasswordFormItemProps(form, "newPassword")}
+          {...confirmPasswordFormItemProps(form, "newPassword", languageId)}
         >
           <Input.Password />
         </Form.Item>

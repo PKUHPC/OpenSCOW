@@ -65,6 +65,7 @@ interface Props {
   right?: React.ReactNode;
   basePath: string;
   userLinks?: UserLink[];
+  languageId: string;
 }
 
 export const Header: React.FC<Props> = ({
@@ -72,6 +73,7 @@ export const Header: React.FC<Props> = ({
   setSidebarCollapsed, sidebarCollapsed,
   pathname, user, logout,
   right, basePath, userLinks,
+  languageId,
 }) => {
 
   return (
@@ -98,7 +100,7 @@ export const Header: React.FC<Props> = ({
       </MenuPart>
       {right}
       <IndicatorPart>
-        <UserIndicator user={user} logout={logout} userLinks={userLinks} />
+        <UserIndicator user={user} logout={logout} userLinks={userLinks} languageId={languageId}/>
       </IndicatorPart>
     </Container>
   );

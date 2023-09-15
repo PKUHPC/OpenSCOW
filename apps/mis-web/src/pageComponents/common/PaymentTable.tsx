@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { defaultPresets, formatDateTime } from "@scow/lib-web/build/utils/datetime";
+import { formatDateTime, getDefaultPresets } from "@scow/lib-web/build/utils/datetime";
 import { useDidUpdateEffect } from "@scow/lib-web/build/utils/hooks";
 import { Button, DatePicker, Form, Table } from "antd";
 import dayjs from "dayjs";
@@ -18,7 +18,7 @@ import { useCallback, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
-import { prefix, useI18nTranslateToString } from "src/i18n";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { AccountSelector } from "src/pageComponents/finance/AccountSelector";
 import { TenantSelector } from "src/pageComponents/tenant/TenantSelector";
 
@@ -70,6 +70,7 @@ export const PaymentTable: React.FC<Props> = ({
 }) => {
 
   const { t } = useI18nTranslateToString();
+  const languageId = useI18n().currentLanguage.id;
 
   const [form] = Form.useForm<FilterForm>();
 
@@ -146,7 +147,7 @@ export const PaymentTable: React.FC<Props> = ({
           )
             : undefined}
           <Form.Item label={t(pCommon("time"))} name="time">
-            <DatePicker.RangePicker allowClear={false} presets={defaultPresets} />
+            <DatePicker.RangePicker allowClear={false} presets={getDefaultPresets(languageId)} />
           </Form.Item>
           <Form.Item label={t(p("total"))}>
             <strong>

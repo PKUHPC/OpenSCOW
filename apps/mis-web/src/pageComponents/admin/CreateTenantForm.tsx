@@ -14,7 +14,7 @@ import { Divider, Form, Input } from "antd";
 import React from "react";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { getUserIdRule, useBuiltinCreateUser } from "src/utils/createUser";
-import { confirmPasswordFormItemProps, emailRule, passwordRule } from "src/utils/form";
+import { confirmPasswordFormItemProps, getEmailRule, passwordRule } from "src/utils/form";
 export interface CreateTenantFormFields {
   tenantName: string;
   userId: string;
@@ -71,7 +71,7 @@ export const CreateTenantForm: React.FC = () => {
       <Form.Item
         label={t(p("userEmail"))}
         name="userEmail"
-        rules={[{ required: true }, emailRule]}
+        rules={[{ required: true }, getEmailRule(languageId)]}
       >
         <Input />
       </Form.Item>
@@ -89,7 +89,7 @@ export const CreateTenantForm: React.FC = () => {
               label={t(p("confirmPassword"))}
               name="confirmPassword"
               hasFeedback
-              {...confirmPasswordFormItemProps(form, "userPassword")}
+              {...confirmPasswordFormItemProps(form, "userPassword", languageId)}
             >
               <Input.Password placeholder={passwordRule(languageId).message} />
             </Form.Item>

@@ -146,7 +146,7 @@ export const getRuntimeI18nConfigText = <TKey extends RuntimeI18nConfigKeys>
  * @returns string | undefined
  * i18n语言文本
  */
-export const getI18nText = <TObject extends object, TKey extends keyof TObject>(
+export const getI18nText = <TObject extends Object, TKey extends keyof TObject>(
   obj: TObject | undefined, key: TKey, languageId: string,
 ): (TObject[TKey] extends I18nStringType ? string : (string | undefined)) => {
 
