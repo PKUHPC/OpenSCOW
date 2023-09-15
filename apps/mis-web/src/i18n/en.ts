@@ -733,6 +733,19 @@ export default {
           remark: "备注",
           createAccount: "创建账户",
         },
+        accountName: {
+          users: {
+            userId: {
+              jobs: {
+                userExecJobList: "{}在{}中执行过的作业列表",
+              },
+            },
+            index: {
+              cannotManageUser: "您不能管理账户{}的用户。",
+              userInAccount: "账户{}的用户",
+            },
+          },
+        },
       },
     },
     init: {
