@@ -59,7 +59,7 @@ export const FetchJobsInfoPage: NextPage = requireAuth((u) => u.platformRoles.in
           {
             data ? (
               <Descriptions bordered column={1}>
-                <Descriptions.Item label={t(p("peridoicSyncJobInfo"))}>
+                <Descriptions.Item label={t(p("periodicSyncJobInfo"))}>
                   <Space>
                     {data.fetchStarted
                       ? <Badge status="success" text={t(p("turnedOn"))} />

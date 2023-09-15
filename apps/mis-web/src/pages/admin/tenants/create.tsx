@@ -67,11 +67,11 @@ const CreateTenantPageForm: React.FC = () => {
         content: result.existsInAuth !== undefined ?
           // 认证系统支持查询
           result.existsInAuth ? t(p("adminExistAuthMessage"))
-            : t(p("adminNotExistAuthAndComfirmCreateMessage"))
+            : t(p("adminNotExistAuthAndConfirmCreateMessage"))
           : // 认证系统不支持查询
           useBuiltinCreateUser() ?
-            t(p("unableComfirmAdminExistInAuthMessage"))
-            : t(p("unableComfirmAdminExistInAuthAndUnableCreateMessage")),
+            t(p("unableConfirmAdminExistInAuthMessage"))
+            : t(p("unableConfirmAdminExistInAuthAndUnableCreateMessage")),
 
         okText: t("common.ok"),
         onOk: async () => {

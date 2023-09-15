@@ -73,7 +73,7 @@ const CreateUserPageForm: React.FC = () => {
                   content: t(p("userExistAndAddToSCOWDatabaseMessage")),
                   okText: t("common.ok"),
                 })
-                : message.success(t(p("addCompeleted"))); })
+                : message.success(t(p("addCompleted"))); })
             .catch(() => {
               modal.error({
                 title: t("common.addFail"),

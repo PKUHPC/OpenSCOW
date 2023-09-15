@@ -92,7 +92,7 @@ export const AllJobQueryTable: React.FC<Props> = ({
             });
           }}
         >
-          <Form.Item label={t(p("clusterLable"))} name="cluster">
+          <Form.Item label={t(p("clusterLabel"))} name="cluster">
             <SingleClusterSelector />
           </Form.Item>
           <Form.Item

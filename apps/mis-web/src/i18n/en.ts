@@ -700,7 +700,7 @@ export default {
           userExistInSCOWDatabaseMessage: "此用户存在于scow数据库",
           userExistAndAddToSCOWDatabaseMessage: "此用户存在于认证系统中，已成功添加到SCOW数据库",
           createUserFail: "创建用户失败",
-          addCompeleted: "添加完成！",
+          addCompleted: "添加完成！",
           crateUser: "创建用户",
         },
       },
@@ -769,10 +769,10 @@ export default {
           adminNotExistAuth: "管理员用户不存在于认证系统",
           adminNotExistAuthMessage: "管理员用户不存在，请确认管理员用户ID是否正确",
           adminExistAuthMessage: "管理员用户已经在认证系统中存在，您此处输入的密码将会不起作用，新用户的密码将是认证系统中的已有用户的当前密码。确认添加为新建租户管理员？",
-          adminNotExistAuthAndComfirmCreateMessage: "管理员用户不存在于认证系统，是否确认创建此用户并添加为新建租户管理员？",
-          unableComfirmAdminExistInAuthMessage: "无法确认管理员用户是否在认证系统中存在，将会尝试在认证系统中创建。"
+          adminNotExistAuthAndConfirmCreateMessage: "管理员用户不存在于认证系统，是否确认创建此用户并添加为新建租户管理员？",
+          unableConfirmAdminExistInAuthMessage: "无法确认管理员用户是否在认证系统中存在，将会尝试在认证系统中创建。"
           + "如果用户已经在认证系统中存在，您此处输入的密码将会不起作用，新用户的密码将是认证系统中的已有用户的当前密码",
-          unableComfirmAdminExistInAuthAndUnableCreateMessage: "无法确认管理员用户是否在认证系统中存在，并且当前认证系统不支持创建用户，"
+          unableConfirmAdminExistInAuthAndUnableCreateMessage: "无法确认管理员用户是否在认证系统中存在，并且当前认证系统不支持创建用户，"
           + "请您确认此用户已经在认证系统中存在，确认将会直接加入到数据库中, 并且您此处输入的密码将不会起作用，新用户的密码将是认证系统中的已有用户的当前密码。",
           existInSCOWDatabase: "此{}已存在于scow数据库",
           createTenantSuccessMessage: "租户创建成功，且管理员用户存在于认证系统中，已成功添加到SCOW数据库",
@@ -801,7 +801,7 @@ export default {
         fetchJobs: {
           jobInfoSync: "作业信息同步",
           alertMessage: "SCOW会定时从集群同步作业信息，您可以点击立刻同步执行一次手动同步。",
-          peridoicSyncJobInfo: "周期性同步作业信息",
+          periodicSyncJobInfo: "周期性同步作业信息",
           turnedOn: "已开启",
           paused: "已暂停",
           stopSync: "停止同步",

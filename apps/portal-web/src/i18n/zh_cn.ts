@@ -69,7 +69,7 @@ export default {
       },
       allJobsTable: {
         searchForm: {
-          clusterLable: "集群",
+          clusterLabel: "集群",
           time: "时间",
           popoverTitle: "查询该时间区域内所有有活动（如作业提交、等待中、开始、运行、失败、完成）的作业",
           jobId: "作业ID",
