@@ -17,6 +17,7 @@ RUN corepack enable
 
 WORKDIR /app
 COPY pnpm-lock.yaml .
+COPY patches ./patches
 
 RUN pnpm fetch
 
