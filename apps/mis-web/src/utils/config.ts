@@ -74,6 +74,9 @@ export interface PublicRuntimeConfig {
     createUserErrorMessage: I18nStringType | undefined,
 
   }
+
+  CHARGE_TYPE_LIST: string[];
+
 }
 
 export const runtimeConfig: ServerRuntimeConfig = getConfig().serverRuntimeConfig;

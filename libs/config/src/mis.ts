@@ -113,6 +113,10 @@ export const MisConfigSchema = Type.Object({
         description: "脚本文件路径，不包含config/scripts前缀，如my-strategy.js即等于config/scripts/my-strategy.js" }),
     }),
   )),
+
+  customChargeTypes: Type.Optional(Type.Array(
+    Type.String(), { description: "用户自定义可查询的消费类型列表" },
+  )),
 });
 
 const MIS_CONFIG_NAME = "mis";

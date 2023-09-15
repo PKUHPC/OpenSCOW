@@ -77,7 +77,7 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
   };
 
   const promiseFn = useCallback(async () => {
-    return await api.getOperationLog({ query: {
+    return await api.getOperationLogs({ query: {
       type: queryType,
       operatorUserIds: getOperatorUserIds().join(","),
       operationType: query.operationType,

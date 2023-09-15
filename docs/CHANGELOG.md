@@ -1,5 +1,20 @@
 # @scow/docs
 
+## 1.0.0
+
+### Major Changes
+
+- 11f94f716: 发布 1.0
+
+### Minor Changes
+
+- ee89b11b9: 新增审计系统服务，记录门户系统及管理系统操作日志及展示
+
+### Patch Changes
+
+- ae114aaec: 增加 SCOW API 中 audit-server 部分文档
+- 3446787cf: relion、rstudio 和 vscode 等交互式应用示例文档更新
+
 ## 0.7.0
 
 ### Minor Changes

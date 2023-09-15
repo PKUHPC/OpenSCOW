@@ -10,13 +10,15 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { moneyToNumber } from "@scow/lib-decimal";
 import { Money } from "@scow/protos/build/common/money";
 import { Static } from "@sinclair/typebox";
-import { Button, Divider, Form, Input, Space, Table, Tag } from "antd";
+import { App, Button, Divider, Form, Input, Space, Table, Tag } from "antd";
 import { SortOrder } from "antd/es/table/interface";
 import Link from "next/link";
 import React, { useMemo, useState } from "react";
+import { api } from "src/apis";
 import { FilterFormContainer, FilterFormTabs } from "src/components/FilterFormContainer";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 import type { AdminAccountInfo, GetAccountsSchema } from "src/pages/api/tenant/getAccounts";
@@ -45,9 +47,10 @@ const p = prefix("pageComp.accounts.accountTable.");
 const pCommon = prefix("common.");
 
 export const AccountTable: React.FC<Props> = ({
-  data, isLoading, showedTab,
+  data, isLoading, showedTab, reload,
 }) => {
 
+  const { message, modal } = App.useApp();
   const [form] = Form.useForm<FilterForm>();
 
   const { t } = useI18nTranslateToString();
@@ -173,19 +176,82 @@ export const AccountTable: React.FC<Props> = ({
           render={(blocked) => blocked ? <Tag color="red">{t(p("block"))}</Tag> :
             <Tag color="green">{t(p("normal"))}</Tag>}
         />
-        {/* 只在租户管理下的账户列表中显示 */}
-        {showedTab === "TENANT" && (
-          <Table.Column<AdminAccountInfo>
-            title={t(pCommon("operation"))}
-            render={(_, r) => (
-              <Space split={<Divider type="vertical" />}>
+        <Table.Column<AdminAccountInfo>
+          title={t(pCommon("operation"))}
+          render={(_, r) => (
+            <Space split={<Divider type="vertical" />}>
+              {/* 只在租户管理下的账户列表中显示管理成员 */}
+              {showedTab === "TENANT" && (
                 <Link href={{ pathname: `/tenant/accounts/${r.accountName}/users` }}>
                   {t(p("mangerMember"))}
                 </Link>
-              </Space>
-            )}
-          />
-        )}
+              )}
+              {
+                r.blocked
+                  ? (
+                    <a onClick={() => {
+                      if (moneyToNumber(r.balance) > 0) {
+                        modal.confirm({
+                          title: "确认解除用户封锁？",
+                          icon: <ExclamationCircleOutlined />,
+                          content: `确认要在租户${r.tenantName}中解除账户${r.accountName}的封锁？`,
+                          onOk: async () => {
+                            await api.unblockAccount({
+                              body: {
+                                tenantName: r.tenantName,
+                                accountName: r.accountName,
+                              },
+                            })
+                              .then((res) => {
+                                if (res.executed) {
+                                  message.success("解封账户成功！");
+                                  reload();
+                                } else {
+                                  message.error(res.reason || "解封账户失败！");
+                                }
+                              });
+                          },
+                        });
+                      } else {
+                        message.error(`账户${r.accountName}余额不足，您可以将其加入白名单或充值解封`);
+                      }
+                      
+                    }}
+                    >
+                      解除封锁
+                    </a>
+                  ) : (
+                    <a onClick={() => {
+                      modal.confirm({
+                        title: "确认封锁账户？",
+                        icon: <ExclamationCircleOutlined />,
+                        content: `确认要在租户${r.tenantName}中封锁账户${r.accountName}？`,
+                        onOk: async () => {
+                          await api.blockAccount({
+                            body: {
+                              tenantName: r.tenantName,
+                              accountName: r.accountName,
+                            },
+                          })
+                            .then((res) => {
+                              if (res.executed) {
+                                message.success("封锁帐户成功！");
+                                reload();
+                              } else {
+                                message.error(res.reason || "封锁帐户失败！");
+                              }
+                            });
+                        },
+                      });
+                    }}
+                    >
+                      封锁
+                    </a>
+                  )
+              }
+            </Space>
+          )}
+        />
       </Table>
     </div>
   );

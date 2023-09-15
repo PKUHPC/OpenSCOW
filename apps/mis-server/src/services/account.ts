@@ -46,15 +46,41 @@ export const accountServiceServer = plugin((server) => {
           };
         }
 
+        const jobs = await server.ext.clusters.callOnAll(
+          logger,
+          async (client) => {
+            const fields = [
+              "job_id", "user", "state", "account",
+            ];
+
+            return await asyncClientCall(client.job, "getJobs", {
+              fields,
+              filter: { users: [], accounts: [accountName], states: ["RUNNING", "PENDING"]},
+            });
+          },
+        );
+
+        if (jobs.filter((i) => i.result.jobs.length > 0).length > 0) {
+          throw <ServiceError>{
+            code: Status.FAILED_PRECONDITION,
+            message: `Account ${accountName}  has jobs running and cannot be blocked. `,
+          };
+        }
+
         const result = await blockAccount(account, server.ext.clusters, logger);
 
         if (result === "AlreadyBlocked") {
-          return [{ result: BlockAccountResponse_Result.ALREADY_BLOCKED }];
+          throw <ServiceError>{
+            code: Status.FAILED_PRECONDITION,
+            message: `Account ${accountName} has been blocked. `,
+          };
         }
 
         if (result === "Whitelisted") {
-          logger.warn("Trying to block a whitelisted account %s", accountName);
-          return [{ result: BlockAccountResponse_Result.WHITELISTED }];
+          throw <ServiceError>{
+            code: Status.FAILED_PRECONDITION,
+            message: `The account ${accountName} has been added to the whitelist. `,
+          };
         }
 
         return [{ result: BlockAccountResponse_Result.OK }];
@@ -76,13 +102,19 @@ export const accountServiceServer = plugin((server) => {
         }
 
         if (!account.blocked) {
-          return [{ executed: false }];
+          throw <ServiceError>{
+            code: Status.FAILED_PRECONDITION, message: `Account ${accountName} is unblocked`,
+          };
         }
 
-        const result = await unblockAccount(account, server.ext.clusters, logger);
-        if (result === "ALREADY_UNBLOCKED") {
-          return [{ executed: false }];
+        if (account.balance.lte(0)) {
+          throw <ServiceError>{
+            code: Status.FAILED_PRECONDITION,
+            message: `The account ${accountName} balance is insufficient, please pay or add to the whitelist`,
+          };
         }
+
+        await unblockAccount(account, server.ext.clusters, logger);
 
         return [{ executed: true }];
 

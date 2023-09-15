@@ -69,4 +69,6 @@ export const OperationType: OperationTypeEnum = {
   setPlatformBilling: "setPlatformBilling",
   createTenant: "createTenant",
   tenantPay: "tenantPay",
+  blockAccount: "blockAccount",
+  unblockAccount: "unblockAccount",
 };

@@ -153,6 +153,12 @@ const buildRuntimeConfig = async (phase, basePath) => {
       createUserErrorMessage: misConfig.createUser?.builtin?.userIdPattern?.errorMessage,
     },
 
+    CHARGE_TYPE_LIST: [
+      misConfig.jobChargeType,
+      misConfig.changeJobPriceType,
+      ...(misConfig.customChargeTypes || []),
+    ],
+
   };
 
   if (!building) {

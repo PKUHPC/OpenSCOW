@@ -12,50 +12,73 @@
 
 import { defaultPresets, formatDateTime } from "@scow/lib-web/build/utils/datetime";
 import { useDidUpdateEffect } from "@scow/lib-web/build/utils/hooks";
-import { Button, DatePicker, Form, Table } from "antd";
+import { Button, DatePicker, Form, Select, Table } from "antd";
 import dayjs from "dayjs";
 import { useCallback, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { prefix, useI18nTranslateToString } from "src/i18n";
+import { SearchType } from "src/models/User";
+import { publicConfig } from "src/utils/config";
+import { CHARGE_TYPE_OTHERS } from "src/utils/constants";
+import { AccountSelector } from "./AccountSelector";
+
 
 interface Props {
-  accountName: string;
+  accountName?: string;
   showAccountName: boolean;
+  showTenantName: boolean;
+  isPlatformRecords?: boolean;
+  searchType?: SearchType;
 }
 
 interface FilterForm {
+  name?: string;
   time: [dayjs.Dayjs, dayjs.Dayjs];
+  type?: string;
 }
 
-const today = dayjs().endOf("day");
+const now = dayjs();
+
 
 const p = prefix("pageComp.finance.chargeTable.");
 const pCommon = prefix("common.");
 
-export const ChargeTable: React.FC<Props> = ({ accountName, showAccountName }) => {
+export const ChargeTable: React.FC<Props> = ({
+  accountName, showAccountName, showTenantName, isPlatformRecords, searchType }) => {
 
   const { t } = useI18nTranslateToString();
 
   const [form] = Form.useForm<FilterForm>();
 
-  const [query, setQuery] = useState({
-    time: [today.clone().subtract(1, "year"), today],
-  });
+  const [query, setQuery] = useState<{
+    name: string | undefined,
+    time: [ dayjs.Dayjs, dayjs.Dayjs ]
+    type: string | undefined}>({
+      name: accountName,
+      time: [now.subtract(1, "week").startOf("day"), now.endOf("day")],
+      type: undefined,
+    });
+
+  const filteredTypes = [...publicConfig.CHARGE_TYPE_LIST, CHARGE_TYPE_OTHERS];
 
   const { data, isLoading } = useAsync({
     promiseFn: useCallback(async () => {
       return api.getCharges({ query: {
-        accountName,
+        accountName: query.name,
         startTime: query.time[0].clone().startOf("day").toISOString(),
         endTime: query.time[1].clone().endOf("day").toISOString(),
+        type: query.type,
+        isPlatformRecords,
+        searchType,
       } });
+
     }, [query]),
   });
 
   useDidUpdateEffect(() => {
-    setQuery((q) => ({ ...q, accountName }));
+    setQuery((q) => ({ ...q, name: accountName }));
   }, [accountName]);
 
   return (
@@ -66,14 +89,43 @@ export const ChargeTable: React.FC<Props> = ({ accountName, showAccountName }) =
           form={form}
           initialValues={query}
           onFinish={async () => {
-            const { time } = await form.validateFields();
-            setQuery({ time });
+            const { name, time, type } = await form.validateFields();
+            setQuery({ name: accountName ?? name, time, type });
           }}
         >
+          {
+            showAccountName && (
+              <Form.Item label="账户" name="name">
+                <AccountSelector
+                  onChange={(value) => {
+                    setQuery({ ...query, name: value });
+                  }}
+                  placeholder="请选择账户"
+                  fromAllTenants={showTenantName ? true : false}
+                />
+              </Form.Item>
+            )
+          }
           <Form.Item label={t(pCommon("time"))} name="time">
             <DatePicker.RangePicker allowClear={false} presets={defaultPresets} />
           </Form.Item>
-          <Form.Item label={t(pCommon("total"))}>
+          <Form.Item label="类型" name="type">
+            <Select
+              style={{ minWidth: "100px" }}
+              allowClear
+              onChange={(value) => {
+                setQuery({ ...query, type: value });
+              }}
+              placeholder="请选择类型"
+            >
+              {(filteredTypes).map((x) => (
+                <Select.Option key={x} value={x}>
+                  {x}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+          <Form.Item label="总数">
             <strong>
               {data ? data.results.length : 0}
             </strong>
@@ -97,6 +149,11 @@ export const ChargeTable: React.FC<Props> = ({ accountName, showAccountName }) =
         {
           showAccountName && (
             <Table.Column dataIndex="accountName" title={t(pCommon("account"))} />
+          )
+        }
+        {
+          showTenantName && (
+            <Table.Column dataIndex="tenantName" title="租户" />
           )
         }
         <Table.Column dataIndex="time" title={t(p("time"))} render={(v) => formatDateTime(v)} />
