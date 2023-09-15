@@ -14,6 +14,7 @@ import { App, Form, Input, Modal } from "antd";
 import { dirname, join } from "path";
 import { useState } from "react";
 import { api } from "src/apis";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 
 interface Props {
   open: boolean;
@@ -27,6 +28,8 @@ interface FormProps {
   newFileName: string;
 }
 
+const p = prefix("pageComp.fileManagerComp.renameModal.");
+
 export const RenameModal: React.FC<Props> = ({ open, onClose, path, reload, cluster }) => {
 
   const { message } = App.useApp();
@@ -34,12 +37,14 @@ export const RenameModal: React.FC<Props> = ({ open, onClose, path, reload, clus
   const [form] = Form.useForm<FormProps>();
   const [loading, setLoading] = useState(false);
 
+  const { t } = useI18nTranslateToString();
+
   const onSubmit = async () => {
     const { newFileName } = await form.validateFields();
     setLoading(true);
     await api.moveFileItem({ body: { cluster, fromPath: path, toPath: join(dirname(path), newFileName) } })
       .then(() => {
-        message.success("修改成功");
+        message.success(t(p("successMessage")));
         reload();
         onClose();
         form.resetFields();
@@ -51,19 +56,19 @@ export const RenameModal: React.FC<Props> = ({ open, onClose, path, reload, clus
   return (
     <Modal
       open={open}
-      title="重命名文件"
-      okText={"确认"}
-      cancelText="取消"
+      title={t(p("title"))}
+      okText={t("button.confirmButton")}
+      cancelText={t("button.cancelButton")}
       onCancel={onClose}
       confirmLoading={loading}
       destroyOnClose
       onOk={form.submit}
     >
       <Form form={form} onFinish={onSubmit}>
-        <Form.Item label="要重命名的文件">
+        <Form.Item label={t(p("renameLabel"))}>
           <strong>{path}</strong>
         </Form.Item>
-        <Form.Item<FormProps> label="新文件名" name="newFileName" rules={[{ required: true }]}>
+        <Form.Item<FormProps> label={t(p("newFileName"))} name="newFileName" rules={[{ required: true }]}>
           <Input />
         </Form.Item>
       </Form>

@@ -20,7 +20,7 @@ import { useStore } from "simstate";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
-import { useI18n, useI18nTranslateToString } from "src/i18n";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { runningJobId, RunningJobInfo } from "src/models/job";
 import { RunningJobDrawer } from "src/pageComponents/job/RunningJobDrawer";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
@@ -34,6 +34,7 @@ interface Props {
   userId: string;
 }
 
+const p = prefix("pageComp.job.runningJobTable.");
 
 export const RunningJobQueryTable: React.FC<Props> = ({
   userId,
@@ -85,10 +86,10 @@ export const RunningJobQueryTable: React.FC<Props> = ({
             });
           }}
         >
-          <Form.Item label="集群" name="cluster">
+          <Form.Item label={t(p("filterForm.cluster"))} name="cluster">
             <SingleClusterSelector />
           </Form.Item>
-          <Form.Item label="作业ID" name="jobId">
+          <Form.Item label={t(p("filterForm.jobId"))} name="jobId">
             <InputNumber style={{ minWidth: "160px" }} min={1} />
           </Form.Item>
           <Form.Item>
@@ -144,60 +145,60 @@ export const RunningJobInfoTable: React.FC<JobInfoTableProps> = ({
           showCluster && (
             <Table.Column<RunningJobInfo>
               dataIndex="cluster"
-              title="集群"
+              title={t(p("jobInfoTable.cluster"))}
               render={(_, r) => getI18nConfigCurrentText(r.cluster.name, languageId)}
             />
           )
         }
         <Table.Column<RunningJobInfo>
           dataIndex="jobId"
-          title="作业ID"
+          title={t(p("jobInfoTable.jobId"))}
           sorter={(a, b) => a.jobId.localeCompare(b.jobId)}
         />
         {
           showUser && (
-            <Table.Column<RunningJobInfo> dataIndex="user" title="用户" />
+            <Table.Column<RunningJobInfo> dataIndex="user" title={t(p("jobInfoTable.user"))} />
           )
         }
         {
           showAccount && (
-            <Table.Column<RunningJobInfo> dataIndex="account" title="账户" />
+            <Table.Column<RunningJobInfo> dataIndex="account" title={t(p("jobInfoTable.account"))} />
           )
         }
-        <Table.Column<RunningJobInfo> dataIndex="name" title="作业名" />
-        <Table.Column<RunningJobInfo> dataIndex="partition" title="分区" />
-        <Table.Column<RunningJobInfo> dataIndex="qos" title="QOS" />
-        <Table.Column<RunningJobInfo> dataIndex="nodes" title="节点数" />
-        <Table.Column<RunningJobInfo> dataIndex="cores" title="核心数" />
-        <Table.Column<RunningJobInfo> dataIndex="gpus" title="GPU卡数" />
-        <Table.Column<RunningJobInfo> dataIndex="state" title="状态" />
+        <Table.Column<RunningJobInfo> dataIndex="name" title={t(p("jobInfoTable.name"))} />
+        <Table.Column<RunningJobInfo> dataIndex="partition" title={t(p("jobInfoTable.partition"))} />
+        <Table.Column<RunningJobInfo> dataIndex="qos" title={t(p("jobInfoTable.qos"))} />
+        <Table.Column<RunningJobInfo> dataIndex="nodes" title={t(p("jobInfoTable.nodes"))} />
+        <Table.Column<RunningJobInfo> dataIndex="cores" title={t(p("jobInfoTable.cores"))} />
+        <Table.Column<RunningJobInfo> dataIndex="gpus" title={t(p("jobInfoTable.gpus"))} />
+        <Table.Column<RunningJobInfo> dataIndex="state" title={t(p("jobInfoTable.state"))} />
         <Table.Column
           dataIndex="runningOrQueueTime"
-          title="运行/排队时间"
+          title={t(p("jobInfoTable.runningOrQueueTime"))}
         />
         <Table.Column<RunningJobInfo>
           dataIndex="nodesOrReason"
-          title="说明"
+          title={t(p("jobInfoTable.nodesOrReason"))}
           render={(d: string) => d.startsWith("(") && d.endsWith(")") ? d.substring(1, d.length - 1) : d}
         />
-        <Table.Column<RunningJobInfo> dataIndex="timeLimit" title="作业时间限制" />
+        <Table.Column<RunningJobInfo> dataIndex="timeLimit" title={t(p("jobInfoTable.timeLimit"))} />
         <Table.Column<RunningJobInfo>
-          title="更多"
+          title={t(p("jobInfoTable.more"))}
           render={(_, r) => (
             <Space>
               <a onClick={() => Router.push(join("/files", r.cluster.id, r.workingDir))}>
-                进入目录
+                {t(p("jobInfoTable.linkToPath"))}
               </a>
               <a onClick={() => setPreviewItem(r)}>{t("button.detailButton")}</a>
               <Popconfirm
-                title="确定结束这个任务吗？"
+                title={t(p("jobInfoTable.popConfirm"))}
                 onConfirm={async () =>
                   api.cancelJob({ query: {
                     cluster: r.cluster.id,
                     jobId: +r.jobId,
                   } })
                     .then(() => {
-                      message.success("任务结束请求已经提交！");
+                      message.success(t(p("jobInfoTable.successMessage")));
                       reload();
                     })
                 }

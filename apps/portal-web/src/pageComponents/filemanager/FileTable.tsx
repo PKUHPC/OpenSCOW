@@ -16,6 +16,7 @@ import { compareNumber } from "@scow/lib-web/build/utils/math";
 import { Table, TableProps, Tooltip } from "antd";
 import { ColumnsType } from "antd/es/table";
 import React from "react";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { FileInfo, FileType } from "src/pages/api/file/list";
 import { formatSize } from "src/utils/format";
 
@@ -46,6 +47,8 @@ const fileTypeIcons = {
   "ERROR": CloseOutlined,
 } as Record<FileType, React.ComponentType>;
 
+const p = prefix("pageComp.fileManagerComp.fileTable.");
+
 export const FileTable: React.FC<Props> = (
   {
     files,
@@ -56,6 +59,8 @@ export const FileTable: React.FC<Props> = (
     ...otherProps
   },
 ) => {
+
+  const { t } = useI18nTranslateToString();
 
   const columns: ColumnsType<FileInfo> = [
     {
@@ -68,7 +73,7 @@ export const FileTable: React.FC<Props> = (
     {
       key: "name",
       dataIndex: "name",
-      title: "文件名",
+      title: t(p("fileName")),
       defaultSortOrder: "ascend",
       sorter: (a, b) => a.type.localeCompare(b.type) === 0
         ? a.name.localeCompare(b.name)
@@ -79,7 +84,7 @@ export const FileTable: React.FC<Props> = (
     {
       key: "mtime",
       dataIndex: "mtime",
-      title: "修改日期",
+      title: t(p("changeTime")),
       render: (mtime: string | undefined) => mtime ? formatDateTime(mtime) : "",
       sorter: (a, b) => a.type.localeCompare(b.type) === 0
         ? compareDateTime(a.mtime, b.mtime) === 0
@@ -90,7 +95,7 @@ export const FileTable: React.FC<Props> = (
     {
       key: "size",
       dataIndex: "size",
-      title: "大小",
+      title: t(p("size")),
       render: (size: number | undefined, file: FileInfo) => (size === undefined || file.type === "DIR")
         ? ""
         : (
@@ -109,13 +114,13 @@ export const FileTable: React.FC<Props> = (
     {
       key: "mode",
       dataIndex: "mode",
-      title: "权限",
+      title: t(p("mode")),
       render: (mode: number | undefined) => mode === undefined ? "" : nodeModeToString(mode),
     },
     ...(actionRender ? [{
       key: "action",
       dataIndex: "action",
-      title: "操作",
+      title: t(p("action")),
       render: actionRender,
     }] : []),
   ];

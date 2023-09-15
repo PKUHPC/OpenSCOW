@@ -98,7 +98,7 @@ export const Header: React.FC<Props> = ({
       </MenuPart>
       {right}
       <IndicatorPart>
-        <UserIndicator user={user} logout={logout} userLinks={userLinks}/>
+        <UserIndicator user={user} logout={logout} userLinks={userLinks} />
       </IndicatorPart>
     </Container>
   );
