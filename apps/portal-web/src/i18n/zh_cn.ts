@@ -72,6 +72,7 @@ export default {
           clusterLabel: "集群",
           time: "时间",
           popoverTitle: "查询该时间区域内所有有活动（如作业提交、等待中、开始、运行、失败、完成）的作业",
+
           jobId: "作业ID",
         },
         tableInfo: {
@@ -171,7 +172,9 @@ export default {
         minute: "分钟",
         workingDirectory: "工作目录",
         wdTooltip1: "1. 请填写绝对路径，如填写相对路径，则相对于该用户家目录；",
+
         wdTooltip2: "2. 填写目录不可访问或者不可操作时，提交作业或者作业运行将失败；",
+
         output: "标准输出文件",
         errorOutput: "错误输出文件",
         totalNodeCount: "总节点数：",
@@ -270,7 +273,6 @@ export default {
         hintText: "支持上传单个或者多个文件",
       },
     },
-
   },
   pages: {
     apps: {
@@ -334,10 +336,12 @@ export default {
         popoverTitle: "命令",
         popoverContent1: "跳转到文件系统",
         popoverContent2: "，输入该命令后会跳转到文件系统，您可以进行文件的上传和下载",
+
         popoverContent3: "文件下载",
         popoverContentFile:"文件名",
         popoverContent4: "，输入",
         popoverContent5: "，您当前路径下的该文件会被下载到本地，目前不支持输入相对路径，",
+
         popoverContent6: "如果需要下载其他目录下的文件请使用",
         popoverContent7: "命令跳转到文件系统。",
         popoverContent8: "使用示例：",
@@ -350,61 +354,12 @@ export default {
     },
     _app: {
       sshError:"无法以用户身份连接到登录节点。请确认您的家目录的权限为700、750或者755",
+
       sftpError:"SFTP操作失败，请确认您是否有操作的权限",
       otherError:"服务器出错啦！",
     },
     dashboard: {
       title: "仪表盘",
-    },
-  },
-  libWeb: {
-    comp: {
-      clusterSelector: {
-        placeholder: "请选择集群",
-      },
-    },
-    layouts: {
-      smallScreenMenu: {
-        welcome: "欢迎",
-        logout: "退出登录",
-      },
-      userIndicator: {
-        userName: "用户姓名",
-        userId: "用户ID",
-        personalInfo: "个人信息",
-        logout: "退出登录",
-        login: "登录",
-      },
-      darkMode: {
-        system: "跟随系统",
-        light: "亮色",
-        dark: "暗色",
-      },
-      defaultClusterSelector: {
-        title: "需要选择集群的功能将会默认选择默认集群",
-        label: "选择默认集群",
-      },
-    },
-    utils: {
-      dateTime: {
-        today: "今天",
-        tWeek: "本周",
-        tMonth: "本月",
-        tYear: "今年",
-        threeMonths: "3个月",
-        sixMonths: "6个月",
-        oneYear: "一年",
-      },
-      form: {
-        confirmPasswordForm: {
-          message: "请确认密码",
-          notEqualError: "两次密码输入不一致，请重新输入",
-          emailError: "邮箱格式不正确，请重新输入",
-        },
-      },
-      refreshToken: {
-        refreshButton: "刷新",
-      },
     },
   },
 };
