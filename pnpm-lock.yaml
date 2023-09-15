@@ -190,6 +190,9 @@ importers:
       '@scow/lib-config':
         specifier: workspace:*
         version: link:../../libs/libconfig
+      '@scow/lib-server':
+        specifier: workspace:*
+        version: link:../../libs/server
       '@scow/lib-ssh':
         specifier: workspace:*
         version: link:../../libs/ssh
@@ -226,9 +229,6 @@ importers:
       nodemailer:
         specifier: 6.9.4
         version: 6.9.4
-      nookies:
-        specifier: 2.5.2
-        version: 2.5.2
       pino:
         specifier: 8.15.0
         version: 8.15.0
@@ -1115,6 +1115,9 @@ importers:
       '@grpc/grpc-js':
         specifier: 1.8.21
         version: 1.8.21
+      nookies:
+        specifier: 2.5.2
+        version: 2.5.2
     devDependencies:
       '@ddadaal/tsgrpc-client':
         specifier: 0.17.6

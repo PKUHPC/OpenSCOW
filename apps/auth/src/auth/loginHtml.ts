@@ -11,13 +11,13 @@
  */
 
 import { DEFAULT_PRIMARY_COLOR } from "@scow/config/build/ui";
+import { getI18nConfigCurrentText, getLanguageCookie, SYSTEM_VALID_LANGUAGES } from "@scow/lib-server/build/i18n";
 import { FastifyReply, FastifyRequest } from "fastify";
 import { join } from "path";
 import { createCaptcha } from "src/auth/captcha";
 import { authConfig, OtpStatusOptions, ScowLogoType } from "src/config/auth";
 import { config, FAVICON_URL, LOGO_URL } from "src/config/env";
 import { uiConfig } from "src/config/ui";
-import { getI18nConfigCurrentText, getLanguageCookie, SYSTEM_VALID_LANGUAGES } from "src/utils/i18n";
 import { cnTexts, enTexts, LoginTextsType } from "src/utils/loginI18nTexts";
 
 
@@ -39,7 +39,10 @@ export async function serveLoginHtml(
     : undefined;
 
   // 获取当前语言ID
-  const languageId = getLanguageCookie(req);
+  const languageId = getLanguageCookie(req.raw);
+
+  console.log("languageId", languageId);
+
   let loginTexts: LoginTextsType;
   switch (languageId) {
   case SYSTEM_VALID_LANGUAGES.ZH_CN:
