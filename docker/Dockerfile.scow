@@ -22,8 +22,6 @@ RUN corepack enable
 WORKDIR /app
 COPY pnpm-lock.yaml .
 
-COPY patches ./patches
-
 RUN pnpm fetch
 
 COPY . .
@@ -37,6 +35,8 @@ RUN pnpm build --filter="!docs"
 RUN node scripts/copyDist.mjs
 
 WORKDIR /app/dist
+
+COPY patches ./patches
 
 RUN pnpm i --offline --prod --frozen-lockfile
 
