@@ -19,9 +19,9 @@ WORKDIR /app
 
 COPY pnpm-lock.yaml .
 
-RUN pnpm fetch
-
 COPY patches ./patches
+
+RUN pnpm fetch
 
 FROM base as pruner
 
