@@ -91,7 +91,6 @@ export default {
     block: "封锁",
     accountBalance: "账户余额",
     normal: "正常",
-
   },
   dashboard: {
     title: "仪表盘",
@@ -105,7 +104,6 @@ export default {
       },
       alert: "您不属于任何一个账户。",
     },
-
     job: {
       title: "未结束作业列表",
       extra: "查看所有未结束作业",
@@ -307,10 +305,19 @@ export default {
         notExist:"用户不存在于认证系统",
         confirm:"用户不存在，请确认用户ID是否正确",
         existText:"用户已经在认证系统中存在，您此处输入的密码将会不起作用，新用户的密码将是认证系统中的已有用户的当前密码。确认添加为初始管理员？",
+
+
         notExistText:"用户不存在于认证系统，是否确认创建此用户并添加为初始管理员？",
+
         cannotConfirmText1:"无法确认用户是否在认证系统中存在， 将会尝试在认证系统中创建。如果用户已经在认证系统中存在，您此处输入的密码将会不起作用，新用户的密码将是认证系统中的已有用户的当前密码",
+
+
+
         cannotConfirmText2:`无法确认用户是否在认证系统中存在，并且当前认证系统不支持创建用户，请您确认此用户已经在认证系统中存在，
                             确认将会直接加入到数据库中, 并且您此处输入的密码将不会起作用，新用户的密码将是认证系统中的已有用户的当前密码。`,
+
+
+
         addFail:"添加失败",
         userExist:"此用户存在于scow数据库",
         addSuccess:"添加成功",
@@ -319,20 +326,28 @@ export default {
         createFail:"创建用户失败",
         initAdmin:"您可以在此创建初始管理员用户。",
         addAdmin:"这里添加的用户为初始管理员，位于默认租户中，将会自动拥有",
+
         platFormAdmin:"平台管理员",
         and:"和",
         defaultTenant:"默认租户的租户管理员",
         createText1:"当前认证系统支持创建用户，您可以选择加入一个已存在于认证系统的用户，或者创建一个全新的用户。系统将会在认证系统中创建此用户",
+
+
         createText2:"当前认证系统不支持创建用户，请确认要添加的用户必须已经存在于认证系统，且用户的ID必须和认证系统中的用户ID保持一致",
+
+
       },
       initImportUsersTable:{
         importUser:"您可以在此导入已有用户。 查看",
         document:"此文档",
         learn:"了解系统用户模型以及如何导入用户信息。",
         useMore:"如果您使用SCOW管理多个集群，SCOW系统要求多个集群具有完全相同的用户账户信息，您只需要从一个集群中导入已有用户信息即可。",
+
+
       },
       initJobBillingTable:{
         set:"您可以在这里设置默认作业价格表。您必须全部设置完全部价格才能完成初始化。",
+
       },
       initLayout:{
         importUser:"导入用户",
@@ -353,6 +368,7 @@ export default {
         tenantRole:"租户角色",
         accountAffiliation:"所属账户",
         defaultTenant:"您可以在这里管理当前系统中默认租户下的用户和账户，以及设置某个用户为",
+
         initAdmin:"初始管理员",
         set:"指同时为租户管理员和平台管理员的用户。",
       },
@@ -425,13 +441,13 @@ export default {
         expanded:"展开历史计费项",
         priceItem:"计费项",
         text:"集群, 分区, QOS共同组成一个计费项。对计费项可以设定计费方式和单价",
+
         executing:"执行中",
         unset:"未设置",
         alreadyUsed:"此ID已经被使用！",
         addSuccess:"添加成功！",
         setPrice:"设置计费价格",
         object:"对象",
-
         newItemId:"新计费价格编号",
       },
       runningJobDrawer:{
@@ -542,6 +558,7 @@ export default {
         alreadyExist:"此用户ID已经存在！",
         createUser:"创建用户",
         notExist:"用户不存在，请输入新用户信息以创建用户并添加进账户",
+
         email:"用户邮箱",
         password:"用户密码",
         confirm:"确认密码",
@@ -647,6 +664,7 @@ export default {
     _app: {
       clusterOpErrorTitle: "操作失败",
       clusterOpErrorContent: "多集群操作出现错误，部分集群未同步修改",
+
       effectErrorMessage: "服务器出错啦！",
     },
     profile: {
@@ -657,6 +675,7 @@ export default {
     user: {
       partitions: {
         getBillingTableErrorMessage: "集群和分区信息获取失败，请联系管理员。",
+
         partitionInfo: "分区信息",
       },
       operationLogs: {
@@ -668,7 +687,7 @@ export default {
     },
     tenant: {
       info: {
-        tenantFinaceOfficer: "租户财务人员",
+        tenantFinanceOfficer: "租户财务人员",
       },
       jobBillingTable: {
         manageTenantJobPriceTable: "管理本租户作业价格表",
@@ -699,9 +718,14 @@ export default {
           userNotExistAuth: "用户未存在于认证系统",
           unableDetermineUserExistAuth: "无法确定用户是否存在于认证系统",
           userExistAuthMessage: "用户已经在认证系统中存在，您此处输入的密码将会不起作用，新用户的密码将是认证系统中的已有用户的当前密码。点击“确认”将会将此用户直接添加到SCOW数据库。",
+
+
+
           userNotExistAuthMessage: "点击“确认”将会同时在SCOW数据库和认证系统创建此用户",
+
           userExistInSCOWDatabaseMessage: "此用户存在于scow数据库",
           userExistAndAddToSCOWDatabaseMessage: "此用户存在于认证系统中，已成功添加到SCOW数据库",
+
           createUserFail: "创建用户失败",
           addCompleted: "添加完成！",
           crateUser: "创建用户",
@@ -772,13 +796,23 @@ export default {
           adminNotExistAuth: "管理员用户不存在于认证系统",
           adminNotExistAuthMessage: "管理员用户不存在，请确认管理员用户ID是否正确",
           adminExistAuthMessage: "管理员用户已经在认证系统中存在，您此处输入的密码将会不起作用，新用户的密码将是认证系统中的已有用户的当前密码。确认添加为新建租户管理员？",
+
+
           adminNotExistAuthAndConfirmCreateMessage: "管理员用户不存在于认证系统，是否确认创建此用户并添加为新建租户管理员？",
+
           unableConfirmAdminExistInAuthMessage: "无法确认管理员用户是否在认证系统中存在，将会尝试在认证系统中创建。"
           + "如果用户已经在认证系统中存在，您此处输入的密码将会不起作用，新用户的密码将是认证系统中的已有用户的当前密码",
+
+
+
           unableConfirmAdminExistInAuthAndUnableCreateMessage: "无法确认管理员用户是否在认证系统中存在，并且当前认证系统不支持创建用户，"
           + "请您确认此用户已经在认证系统中存在，确认将会直接加入到数据库中, 并且您此处输入的密码将不会起作用，新用户的密码将是认证系统中的已有用户的当前密码。",
+
+
+
           existInSCOWDatabase: "此{}已存在于scow数据库",
           createTenantSuccessMessage: "租户创建成功，且管理员用户存在于认证系统中，已成功添加到SCOW数据库",
+
           addCompleted: "添加完成！",
           createTenantFailMessage: "创建租户失败",
           createTenant: "创建租户",
@@ -788,14 +822,23 @@ export default {
         slurmBlockStatus: {
           syncUserAccountBlockingStatus: "用户账户封锁状态同步",
           alertInfo: "在调度器重新启动后，集群与SCOW中用户的封锁状态可能出现不同步的情况，您可以点击刷新调度器用户封锁状态，手动刷新同步所有用户状态。",
+
+
           slurmScheduler: "slurm调度器",
           slurmSchedulerMessage1: "如果您使用的是slurm调度器，由于技术限制，当您运行slurm.sh节点和slurm管理节点并非同一节点时，" +
           "已封锁的用户、账户和用户账户将会在slurm集群重启后被解封。",
+
           slurmSchedulerMessage2: "SCOW在启动时将会自动刷新一次slurm封锁状态，但是slurm集群可能在SCOW运行时重启，SCOW暂时不能对这种情况做出反应。",
+
+
           slurmSchedulerMessage3: "所以，如果您运行slurm.sh节点和slurm管理节点并非同一节点时，您需要在slurm集群重启后手动执行一下本页面的刷新调度器用户封锁状态的功能。" +
           "如果slurm.sh节点和slurm管理节点为同一节点，您可以忽略本功能。",
+
+
           otherScheduler: "其他调度器",
           otherSchedulerMessage: "如果您使用的是slurm之外的调度器，在调度器和SCOW间用户封锁状态不同步时，可以手动执行一下本页面的刷新调度器用户封锁状态的功能。",
+
+
           lastRunTime: "上次运行时间",
           notBlocked: "未封锁过",
           refreshSuccess: "刷新成功",
@@ -804,6 +847,7 @@ export default {
         fetchJobs: {
           jobInfoSync: "作业信息同步",
           alertMessage: "SCOW会定时从集群同步作业信息，您可以点击立刻同步执行一次手动同步。",
+
           periodicSyncJobInfo: "周期性同步作业信息",
           turnedOn: "已开启",
           paused: "已暂停",
@@ -848,56 +892,6 @@ export default {
         charges: {
           title: "账户{}扣费记录",
         },
-      },
-    },
-  },
-  libWeb: {
-    comp: {
-      clusterSelector: {
-        placeholder: "请选择集群",
-      },
-    },
-    layouts: {
-      smallScreenMenu: {
-        welcome: "欢迎",
-        logout: "退出登录",
-      },
-      userIndicator: {
-        userName: "用户姓名",
-        userId: "用户ID",
-        personalInfo: "个人信息",
-        logout: "退出登录",
-        login: "登录",
-      },
-      darkMode: {
-        system: "跟随系统",
-        light: "亮色",
-        dark: "暗色",
-      },
-      defaultClusterSelector: {
-        title: "需要选择集群的功能将会默认选择默认集群",
-        label: "选择默认集群",
-      },
-    },
-    utils: {
-      dateTime: {
-        today: "今天",
-        tWeek: "本周",
-        tMonth: "本月",
-        tYear: "今年",
-        threeMonths: "3个月",
-        sixMonths: "6个月",
-        oneYear: "一年",
-      },
-      form: {
-        confirmPasswordForm: {
-          message: "请确认密码",
-          notEqualError: "两次密码输入不一致，请重新输入",
-          emailError: "邮箱格式不正确，请重新输入",
-        },
-      },
-      refreshToken: {
-        refreshButton: "刷新",
       },
     },
   },

@@ -64,7 +64,7 @@ export const TenantInfoPage: NextPage<Props> = requireAuth((u) => u.tenantRoles.
             ))
           }
         </Descriptions.Item>
-        <Descriptions.Item label={t(p("tenantFinaceOfficer"))}>
+        <Descriptions.Item label={t(p("tenantFinanceOfficer"))}>
           {
             financialStaff.map(({ userId, userName }) => (
               <Tag key={userId}>
