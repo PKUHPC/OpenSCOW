@@ -54,7 +54,7 @@ it("get app metadata", async () => {
   const appId = "vscode";
   const cluster = "hpc01";
 
-  const reply = await asyncUnaryCall(client, "getAppMetadata", { appId, cluster });
+  const reply = await asyncUnaryCall(client, "getAppMetadata", { appId, cluster, language: "zh_cn" });
 
   const attributes: AppCustomAttribute[] = reply.attributes.map((item) => ({
     type: appCustomAttribute_AttributeTypeToJSON(item.type) as AppCustomAttribute["type"],
@@ -85,7 +85,7 @@ it("get app metadata", async () => {
       select: [],
       required: false,
       default: 123,
-      placeholder: undefined,
+      placeholder: "",
     },
     {
       type: "NUMBER",
@@ -94,7 +94,7 @@ it("get app metadata", async () => {
       select: [],
       required: false,
       default: 456,
-      placeholder: undefined,
+      placeholder: "",
     },
     {
       type: "NUMBER",
@@ -103,7 +103,7 @@ it("get app metadata", async () => {
       select: [],
       required: false,
       default: undefined,
-      placeholder: undefined,
+      placeholder: "",
     },
     {
       type: "SELECT",
@@ -118,7 +118,7 @@ it("get app metadata", async () => {
       }],
       required: true,
       default: undefined,
-      placeholder: undefined,
+      placeholder: "",
     },
   ]);
 

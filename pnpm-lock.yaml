@@ -606,9 +606,6 @@ importers:
       '@scow/lib-ssh':
         specifier: workspace:*
         version: link:../../libs/ssh
-      '@scow/lib-web':
-        specifier: workspace:*
-        version: link:../../libs/web
       '@scow/protos':
         specifier: workspace:*
         version: link:../../libs/protos/scow

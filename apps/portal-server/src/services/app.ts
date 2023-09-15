@@ -14,7 +14,7 @@ import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { AppType } from "@scow/config/build/app";
-import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/i18n";
+import { getI18nConfigCurrentText } from "@scow/lib-server/build/i18n";
 import {
   AppCustomAttribute,
   appCustomAttribute_AttributeTypeFromJSON,
@@ -221,7 +221,6 @@ export const appServiceServer = plugin((server) => {
           });
         });
       }
-      console.log("attributes: ", attributes);
       return [{ appName: app.name, attributes: attributes }];
     },
 

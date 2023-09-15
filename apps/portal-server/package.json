@@ -26,7 +26,6 @@
     "@grpc/grpc-js": "1.8.21",
     "@scow/config": "workspace:*",
     "@scow/lib-config": "workspace:*",
-    "@scow/lib-web": "workspace:*",
     "@scow/lib-server": "workspace:*",
     "@scow/lib-ssh": "workspace:*",
     "@scow/protos": "workspace:*",
