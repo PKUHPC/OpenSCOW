@@ -16,9 +16,12 @@ RUN apk update && apk add libc6-compat python3 make gcc g++ git
 RUN corepack enable
 
 WORKDIR /app
+
 COPY pnpm-lock.yaml .
 
 RUN pnpm fetch
+
+COPY patches ./patches
 
 FROM base as pruner
 
