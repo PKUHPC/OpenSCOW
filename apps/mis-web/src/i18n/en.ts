@@ -156,6 +156,7 @@ export default {
         financeManagement: "Finance Management",
         tenantPay: "Tenant Recharge",
         payments: "Recharge Records",
+        accountChargeRecords: "Account Consumption Records",
         systemDebug: "Platform Debug",
         statusSynchronization: "Block Status Synchronization",
         jobSynchronization: "Job Information Synchronization",
@@ -180,6 +181,7 @@ export default {
         accountPay: "Account Recharge",
         financePayments: "Recharge Records",
         accountPayments: "Account Recharge Records",
+        accountChargeRecords: "Account Consumption Records",
       },
       accountManagement: {
         firstNav: "Account Management",

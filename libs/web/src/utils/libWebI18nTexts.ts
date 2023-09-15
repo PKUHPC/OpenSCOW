@@ -75,8 +75,8 @@ export const libWebEn = {
       logout: "Logout",
     },
     userIndicator: {
-      userName: "User Name",
-      userId: "User ID",
+      userName: "User Name: ",
+      userId: "User ID: ",
       personalInfo: "Personal Information",
       logout: "Logout",
       login: "Login",
@@ -118,17 +118,21 @@ export type LibWebTextsType = typeof libWebEn;
 
 export const getCurrentLangLibWebText = (languageId: string, key: string): string | undefined => {
 
-  let currentLangText: LibWebTextsType;
+  let currentLangTexts: LibWebTextsType;
   switch (languageId) {
   case SYSTEM_VALID_LANGUAGES.ZH_CN:
   default:
-    currentLangText = libWebZhCn;
+    currentLangTexts = libWebZhCn;
+    break;
   case SYSTEM_VALID_LANGUAGES.EN:
-    currentLangText = libWebEn;
+    currentLangTexts = libWebEn;
+    break;
   }
 
+  console.log(currentLangTexts);
+
   const keys = key.split(".");
-  let value: any = currentLangText;
+  let value: any = currentLangTexts;
 
   for (const k of keys) {
     value = value[k];

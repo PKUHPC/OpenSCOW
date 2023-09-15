@@ -41,8 +41,6 @@ export async function serveLoginHtml(
   // 获取当前语言ID
   const languageId = getLanguageCookie(req.raw);
 
-  console.log("languageId", languageId);
-
   let loginTexts: LoginTextsType;
   switch (languageId) {
   case SYSTEM_VALID_LANGUAGES.ZH_CN:

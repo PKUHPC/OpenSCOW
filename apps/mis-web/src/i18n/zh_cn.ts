@@ -156,6 +156,7 @@ export default {
         financeManagement: "财务管理",
         tenantPay: "租户充值",
         payments: "充值记录",
+        accountChargeRecords: "账户消费记录",
         systemDebug: "平台调试",
         statusSynchronization: "封锁状态同步",
         jobSynchronization: "作业信息同步",
@@ -180,6 +181,7 @@ export default {
         accountPay: "账户充值",
         financePayments: "充值记录",
         accountPayments: "账户充值记录",
+        accountChargeRecords: "账户消费记录",
       },
       accountManagement: {
         firstNav:"账户管理",

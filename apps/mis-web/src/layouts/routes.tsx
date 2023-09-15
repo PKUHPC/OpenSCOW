@@ -102,7 +102,7 @@ export const platformAdminRoutes: (platformRoles: PlatformRole[], t: TransType) 
           },
           {
             Icon: BookOutlined,
-            text: "账户消费记录",
+            text: t(pPlatform("accountChargeRecords")),
             path: "/admin/finance/accountChargeRecords",
           },
         ],
@@ -256,7 +256,7 @@ export const tenantRoutes: (tenantRoles: TenantRole[], token: string, t: TransTy
               },
               {
                 Icon: BookOutlined,
-                text: "账户消费记录",
+                text: t(pTenant("accountChargeRecords")),
                 path: "/tenant/finance/accountChargeRecords",
               },
             ],

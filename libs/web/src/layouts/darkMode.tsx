@@ -45,7 +45,7 @@ const DarkModeButtonInternal = ({ dark, light, system, languageId, basePath = ""
   const { mode, setMode } = useDarkMode();
 
   const systemColor = getCurrentLangLibWebText(languageId, "layouts.darkMode.system");
-  const lightColor = getCurrentLangLibWebText(languageId, "layouts.darkMode.lights");
+  const lightColor = getCurrentLangLibWebText(languageId, "layouts.darkMode.light");
   const darkColor = getCurrentLangLibWebText(languageId, "layouts.darkMode.dark");
 
   const icons = {
