@@ -21,7 +21,7 @@ import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { BackButton } from "src/components/BackButton";
 import { PageTitle } from "src/components/PageTitle";
-import { prefix, useI18n, useI18nTranslate } from "src/i18n";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { TenantRole } from "src/models/User";
 import { AddUserButton } from "src/pageComponents/users/AddUserButton";
 import { UserTable } from "src/pageComponents/users/UserTable";
@@ -33,7 +33,7 @@ export const AccountUsersPage: NextPage = requireAuth(
   (i) => i.tenantRoles.includes(TenantRole.TENANT_ADMIN),
 )(
   ({ userStore }) => {
-    const { tArgs } = useI18nTranslate();
+    const { t } = useI18nTranslateToString();
     const languageId = useI18n().currentLanguage.id;
 
     const { message } = App.useApp();
@@ -48,7 +48,7 @@ export const AccountUsersPage: NextPage = requireAuth(
         accountName,
       } })
         .httpError(403, () => {
-          message.error(tArgs(p("cannotManageUser"), [accountName]));
+          message.error(t(p("cannotManageUser"), [accountName]));
           return undefined;
         });
     }, [userStore.user]);
@@ -57,7 +57,7 @@ export const AccountUsersPage: NextPage = requireAuth(
 
     const { data, isLoading, reload } = useAsync({ promiseFn, watch: refreshToken });
 
-    const title = tArgs(p("userInAccount"), [accountName]);
+    const title = t(p("userInAccount"), [accountName]);
 
     return (
       <div>

@@ -17,7 +17,7 @@ import React, { useState } from "react";
 import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
-import { prefix, useI18n, useI18nTranslate, useI18nTranslateToString } from "src/i18n";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { TenantRole } from "src/models/User";
 import { getRuntimeI18nConfigText, publicConfig } from "src/utils/config";
 import { getUserIdRule } from "src/utils/createUser";
@@ -40,7 +40,6 @@ const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ tenantName }) => 
 
   const languageId = useI18n().currentLanguage.id;
   const { t } = useI18nTranslateToString();
-  const { tArgs } = useI18nTranslate();
 
   const [form] = Form.useForm<FormProps>();
 
@@ -53,7 +52,7 @@ const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ tenantName }) => 
     setLoading(true);
 
     await api.createAccount({ body: { accountName, ownerId, ownerName, comment } })
-      .httpError(404, () => { message.error(tArgs(p("tenantNotExistUser"), [tenantName, ownerId])); })
+      .httpError(404, () => { message.error(t(p("tenantNotExistUser"), [tenantName, ownerId])); })
       .httpError(409, () => { message.error(t(p("accountNameOccupied"))); })
       .httpError(400, () => { message.error(t(p("userIdAndNameNotMatch"))); })
       .then(() => {

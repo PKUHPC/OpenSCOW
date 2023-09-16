@@ -30,7 +30,7 @@ import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { ModalButton, ModalLink } from "src/components/ModalLink";
 import { TitleText } from "src/components/PageTitle";
 import { TableTitle } from "src/components/TableTitle";
-import { prefix, useI18n, useI18nTranslate, useI18nTranslateToString } from "src/i18n";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { urlToDownload } from "src/pageComponents/filemanager/api";
 import { CreateFileModal } from "src/pageComponents/filemanager/CreateFileModal";
 import { FileTable } from "src/pageComponents/filemanager/FileTable";
@@ -88,7 +88,6 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
 
 
   const { t } = useI18nTranslateToString();
-  const { tArgs } = useI18nTranslate();
 
   const operationTexts = {
     copy: t(p("moveCopy.copy")),
@@ -181,7 +180,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
       await operationApi({ body: { cluster: cluster.id, fromPath, toPath } })
         .httpError(415, ({ error }) => {
           modal.error({
-            title: tArgs(p("moveCopy.modalErrorTitle"), [file.name, operationText]),
+            title: t(p("moveCopy.modalErrorTitle"), [file.name, operationText]),
             content: error,
           });
           throw error;
@@ -205,7 +204,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
           await new Promise<void>(async (res) => {
             modal.confirm({
               title: t(p("moveCopy.existModalTitle")),
-              content: tArgs(p("moveCopy.existModalContent"), [x.name]),
+              content: t(p("moveCopy.existModalContent"), [x.name]),
               okText: t(p("moveCopy.existModalOk")),
               onOk: async () => {
                 const fileType = await api.getFileType({ query: { cluster: cluster.id, path: join(path, x.name) } });
@@ -237,15 +236,12 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
 
     if (allCount - successfulCount - abandonCount) {
       message.error(
-        // `${operationText}错误！总计${allCount}项文件/目录，其中成功${successfulCount}项，放弃${abandonCount}项，` +
-        // `失败${allCount - successfulCount - abandonCount}项`,
-        tArgs(p("moveCopy.errorMessage"),
+        t(p("moveCopy.errorMessage"),
           [operationText, allCount, successfulCount, abandonCount, (allCount - successfulCount - abandonCount)]),
       );
     } else {
       message.success(
-        // `${operationText}成功！总计${allCount}项文件/目录，其中成功${successfulCount}项，放弃${abandonCount}项`,
-        tArgs(p("moveCopy.successMessage"), [operationText, allCount, successfulCount, abandonCount]),
+        t(p("moveCopy.successMessage"), [operationText, allCount, successfulCount, abandonCount]),
       );
     }
 
@@ -258,7 +254,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
     modal.confirm({
       title: t(p("delete.confirmTitle")),
       okText: t(p("delete.confirmOk")),
-      content: tArgs(p("delete.confirmContent"), [files.length]),
+      content: t(p("delete.confirmContent"), [files.length]),
       onOk: async () => {
         await Promise.allSettled(files.map(async (x) => {
           return (x.type === "FILE" ? api.deleteFile : api.deleteDir)({
@@ -273,11 +269,11 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
               (!x || x.status === "rejected" || !x.value)).length;
             const allCount = files.length;
             if (failedCount === 0) {
-              message.success(tArgs(p("delete.successMessage"), [allCount]));
+              message.success(t(p("delete.successMessage"), [allCount]));
               resetSelectedAndOperation();
             } else {
               // message.error(`删除成功${allCount - failedCount}项，失败${failedCount}项`);
-              message.error(tArgs(p("delete.errorMessage"), [(allCount - failedCount), failedCount])),
+              message.error(t(p("delete.errorMessage"), [(allCount - failedCount), failedCount])),
               setOperation((o) => o && ({ ...o, started: false }));
             }
           }).catch((e) => {
@@ -306,8 +302,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
     <div>
       <TitleText>
         <span>
-          {/* 集群{getI18nConfigCurrentText(cluster.name, languageId)}文件管理 */}
-          {tArgs(p("tableInfo.title"), [getI18nConfigCurrentText(cluster.name, languageId)])}
+          {t(p("tableInfo.title"), [getI18nConfigCurrentText(cluster.name, languageId)])}
         </span>
       </TitleText>
       <TopBar>
@@ -387,15 +382,12 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
             operation ? (
               operation.started ? (
                 <span>
-                  {/* {`正在${operationTexts[operation.op]}，` +
-                    `已完成：${operation.completed.length} / ${operation.selected.length}`} */}
-                  {tArgs(p("tableInfo.operationStarted"), [operationTexts[operation.op]])} +
+                  {t(p("tableInfo.operationStarted"), [operationTexts[operation.op]])} +
                   {`${operation.completed.length} / ${operation.selected.length}`}
                 </span>
               ) : (
                 <span>
-                  {/* {`已选择${operationTexts[operation.op]}${operation.selected.length}个项`} */}
-                  {tArgs(p("tableInfo.operationNotStarted"), [operationTexts[operation.op], operation.selected.length])}
+                  {t(p("tableInfo.operationNotStarted"), [operationTexts[operation.op], operation.selected.length])}
                   <a onClick={() => setOperation(undefined)} style={{ marginLeft: "4px" }}>
                     {t("button.cancelButton")}
                   </a>
@@ -494,7 +486,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
               modal.confirm({
                 title: t(p("tableInfo.deleteConfirmTitle")),
                 // icon: < />,
-                content: tArgs(p("tableInfo.deleteConfirmContent"), [fullPath]),
+                content: t(p("tableInfo.deleteConfirmContent"), [fullPath]),
                 okText: t(p("tableInfo.deleteConfirmOk")),
                 onOk: async () => {
                   await (i.type === "FILE" ? api.deleteFile : api.deleteDir)({

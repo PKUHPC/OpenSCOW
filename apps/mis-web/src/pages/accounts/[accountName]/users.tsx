@@ -18,7 +18,7 @@ import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
-import { prefix, useI18n, useI18nTranslate } from "src/i18n";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { UserRole } from "src/models/User";
 import { useAccountPagesAccountName } from "src/pageComponents/accounts/checkQueryAccountNameIsAdmin";
 import { AddUserButton } from "src/pageComponents/users/AddUserButton";
@@ -33,7 +33,7 @@ export const UsersPage: NextPage = requireAuth(
   ({ userStore }) => {
 
     const accountName = useAccountPagesAccountName();
-    const { tArgs } = useI18nTranslate();
+    const { t } = useI18nTranslateToString();
     const languageId = useI18n().currentLanguage.id;
 
     const account = userStore.user.accountAffiliations.find((x) => x.accountName === accountName)!;
@@ -48,7 +48,7 @@ export const UsersPage: NextPage = requireAuth(
 
     const { data, isLoading, reload } = useAsync({ promiseFn, watch: refreshToken });
 
-    const title = tArgs(p("title"), [accountName]);
+    const title = t(p("title"), [accountName]);
 
     return (
       <div>

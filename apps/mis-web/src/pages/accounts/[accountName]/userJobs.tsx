@@ -16,7 +16,7 @@ import { useRouter } from "next/router";
 import { requireAuth } from "src/auth/requireAuth";
 import { BackButton } from "src/components/BackButton";
 import { PageTitle } from "src/components/PageTitle";
-import { prefix, useI18nTranslate, useI18nTranslateToString } from "src/i18n";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { UserRole } from "src/models/User";
 import { JobTable } from "src/pageComponents/job/HistoryJobTable";
 import { Head } from "src/utils/head";
@@ -29,13 +29,12 @@ export const UserJobsPage: NextPage = requireAuth(
   () => {
 
     const router = useRouter();
-    const { tArgs } = useI18nTranslate();
     const { t } = useI18nTranslateToString();
 
     const userId = queryToString(router.query.userId) || undefined;
     const accountName = queryToString(router.query.accountName) || "";
 
-    const title = tArgs(p("title"), [userId, accountName]);
+    const title = t(p("title"), [userId, accountName]);
 
     return (
       <div>

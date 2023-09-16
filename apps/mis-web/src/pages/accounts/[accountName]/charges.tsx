@@ -13,7 +13,7 @@
 import { NextPage } from "next";
 import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
-import { prefix, useI18nTranslate } from "src/i18n";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { UserRole } from "src/models/User";
 import {
   checkQueryAccountNameIsAdmin,
@@ -27,11 +27,11 @@ export const ChargesPage: NextPage = requireAuth(
   (i) => i.accountAffiliations.some((x) => x.role !== UserRole.USER),
   checkQueryAccountNameIsAdmin,
 )(() => {
-  const { tArgs } = useI18nTranslate();
+  const { t } = useI18nTranslateToString();
 
   const accountName = useAccountPagesAccountName();
 
-  const title = tArgs(p("title"), [accountName]);
+  const title = t(p("title"), [accountName]);
 
   return (
     <div>

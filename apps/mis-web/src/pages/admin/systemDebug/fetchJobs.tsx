@@ -19,7 +19,7 @@ import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { DisabledA } from "src/components/DisabledA";
 import { PageTitle } from "src/components/PageTitle";
-import { prefix, useI18nTranslate, useI18nTranslateToString } from "src/i18n";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { PlatformRole } from "src/models/User";
 import { Head } from "src/utils/head";
 
@@ -33,7 +33,6 @@ export const FetchJobsInfoPage: NextPage = requireAuth((u) => u.platformRoles.in
       promiseFn,
     });
 
-    const { tArgs } = useI18nTranslate();
     const { t } = useI18nTranslateToString();
 
     const { message } = App.useApp();
@@ -91,7 +90,7 @@ export const FetchJobsInfoPage: NextPage = requireAuth((u) => u.platformRoles.in
                         setFetching(true);
                         api.fetchJobs({})
                           .then(({ newJobsCount }) => {
-                            message.success(tArgs(p("jobSyncSuccessMessage"), [newJobsCount]));
+                            message.success(t(p("jobSyncSuccessMessage"), [newJobsCount]));
                             reload();
                           })
                           .finally(() => setFetching(false));

@@ -15,7 +15,7 @@ import { App, Button, Modal, Upload, UploadFile } from "antd";
 import { join } from "path";
 import { useState } from "react";
 import { api } from "src/apis";
-import { prefix, useI18nTranslate, useI18nTranslateToString } from "src/i18n";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { urlToUpload } from "src/pageComponents/filemanager/api";
 import { publicConfig } from "src/utils/config";
 
@@ -35,7 +35,6 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
   const [ uploadFileList, setUploadFileList ] = useState<UploadFile[]>([]);
 
   const { t } = useI18nTranslateToString();
-  const { tArgs } = useI18nTranslate();
 
   const onModalClose = () => {
     setUploadFileList([]);
@@ -91,8 +90,7 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
           const fileMaxSize = parseInt(publicConfig.CLIENT_MAX_BODY_SIZE.slice(0, -1)) * (1024 ** 3);
 
           if (file.size > fileMaxSize) {
-            // message.error(`${file.name}上传失败,文件大小超过${publicConfig.CLIENT_MAX_BODY_SIZE}`);
-            message.error(tArgs(p("maxSizeErrorMessage"), [file.name, publicConfig.CLIENT_MAX_BODY_SIZE]));
+            message.error(t(p("maxSizeErrorMessage"), [file.name, publicConfig.CLIENT_MAX_BODY_SIZE]));
             return Upload.LIST_IGNORE;
           }
 
@@ -103,7 +101,7 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
             if (exists.result) {
               modal.confirm({
                 title: t(p("existedModalTitle")),
-                content: tArgs(p("existedModalContent"), [file.name]),
+                content: t(p("existedModalContent"), [file.name]),
                 okText: t(p("existedModalOk")),
                 onOk: async () => {
                   const fileType = await api.getFileType({ query:{ cluster: cluster, path: join(path, file.name) } });

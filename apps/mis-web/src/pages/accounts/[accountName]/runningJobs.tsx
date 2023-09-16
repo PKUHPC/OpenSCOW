@@ -13,7 +13,7 @@
 import { NextPage } from "next";
 import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
-import { prefix, useI18nTranslate } from "src/i18n";
+import { prefix, useI18nTranslate, useI18nTranslateToString } from "src/i18n";
 import {
   checkQueryAccountNameIsAdmin,
   useAccountPagesAccountName } from "src/pageComponents/accounts/checkQueryAccountNameIsAdmin";
@@ -27,15 +27,17 @@ export const RunningJobsPage: NextPage = requireAuth(
   checkQueryAccountNameIsAdmin,
 )(
   () => {
+    const { t } = useI18nTranslateToString();
     const { tArgs } = useI18nTranslate();
 
     const accountName = useAccountPagesAccountName();
-    const title = tArgs(p("title"), [accountName]);
+    const title = t(p("title"), [accountName]);
+    const pageTitle = tArgs(p("title"), [accountName]);
 
     return (
       <div>
         <Head title={title} />
-        <PageTitle titleText={title} />
+        <PageTitle titleText={pageTitle} />
         <RunningJobQueryTable
           accountNames={accountName}
           showAccount={false}
