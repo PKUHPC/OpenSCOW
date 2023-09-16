@@ -34,8 +34,6 @@ export const BaseLayout = ({ footerText, versionTag, children }: PropsWithChildr
   const { t } = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
 
-  console.log("web-baselayout-language", languageId);
-
   const routes = useMemo(() => getAvailableRoutes(userStore.user, t), [userStore.user, t]);
 
   return (

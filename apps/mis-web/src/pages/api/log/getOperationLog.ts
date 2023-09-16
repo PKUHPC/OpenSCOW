@@ -150,6 +150,8 @@ export default typeboxRoute(GetOperationLogsSchema, async (req, res) => {
 
   const userMap = new Map(users.map((x) => [x.userId, x.userName]));
 
+
+
   const operationLogs = results.map((x) => {
     return {
       operationLogId: x.operationLogId,
@@ -161,9 +163,12 @@ export default typeboxRoute(GetOperationLogsSchema, async (req, res) => {
       operationType: x.operationEvent?.["$case"] || "unknown",
       operationCode: x.operationEvent?.["$case"] ? OperationCodeMap[x.operationEvent?.["$case"]] : "000000",
       operationDetail: getOperationDetail(x),
+      operationEvent: x.operationEvent,
     };
   });
+
   return {
-    200: { results: operationLogs as OperationLog[], totalCount },
+    // 200: { results: operationLogs as OperationLog[], totalCount },
+    200: { results: operationLogs as any, totalCount },
   };
 });

@@ -129,8 +129,6 @@ export const getCurrentLangLibWebText = (languageId: string, key: string): strin
     break;
   }
 
-  console.log(currentLangTexts);
-
   const keys = key.split(".");
   let value: any = currentLangTexts;
 

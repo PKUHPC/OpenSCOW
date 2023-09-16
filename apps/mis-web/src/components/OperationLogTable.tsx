@@ -14,17 +14,17 @@ import { OperationType } from "@scow/lib-operation-log/build/index";
 import { formatDateTime, getDefaultPresets } from "@scow/lib-web/build/utils/datetime";
 import { Button, DatePicker, Form, Input, Select, Table } from "antd";
 import dayjs from "dayjs";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
-import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
+import { prefix, useI18n, useI18nTranslate, useI18nTranslateToString } from "src/i18n";
 import {
-  OperationLog,
+  getOperationDetail,
+  getOperationResultTexts,
+  getOperationTypeTexts, OperationLog,
   OperationLogQueryType,
-  OperationResult,
-  OperationResultTexts,
-  OperationTypeTexts } from "src/models/operationLog";
+  OperationResult } from "src/models/operationLog";
 import { User } from "src/stores/UserStore";
 
 interface FilterForm {
@@ -54,7 +54,11 @@ const pCommon = prefix("common.");
 export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountName, tenantName }) => {
 
   const { t } = useI18nTranslateToString();
+  const { tArgs } = useI18nTranslate();
   const languageId = useI18n().currentLanguage.id;
+
+  const OperationResultTexts = getOperationResultTexts(t);
+  const OperationTypeTexts = getOperationTypeTexts(t);
 
   const [ query, setQuery ] = useState<FilterForm>(() => {
     return {
@@ -92,6 +96,17 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
   }, [query, pageInfo, queryType, accountName, tenantName]);
 
   const { data, isLoading } = useAsync({ promiseFn });
+
+  const formattedData = useMemo(() => {
+    return data?.results.map((result) => {
+      const translatedOperationDetail = getOperationDetail(result, t, tArgs);
+      return {
+        ...result,
+        operationDetail: translatedOperationDetail,
+      };
+    });
+  }, [data, t]);
+
 
   return (
     <div>
@@ -144,7 +159,7 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
         </Form>
       </FilterFormContainer>
       <Table
-        dataSource={data?.results}
+        dataSource={formattedData}
         loading={isLoading}
         pagination={{
           current: pageInfo.page,
