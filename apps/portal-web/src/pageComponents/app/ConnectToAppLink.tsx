@@ -18,6 +18,7 @@ import { useCallback } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { DisabledA } from "src/components/DisabledA";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { Cluster, publicConfig } from "src/utils/config";
 import { openDesktop } from "src/utils/vnc";
 
@@ -27,11 +28,15 @@ export interface Props {
   refreshToken: boolean;
 }
 
+const p = prefix("pageComp.app.connectToAppLink.");
+
 export const ConnectTopAppLink: React.FC<Props> = ({
   session, cluster, refreshToken,
 }) => {
 
   const { message } = App.useApp();
+
+  const { t } = useI18nTranslateToString();
 
   const checkConnectivityPromiseFn = useCallback(async () => {
     if (!session.host || !session.port) { return false; }
@@ -43,8 +48,8 @@ export const ConnectTopAppLink: React.FC<Props> = ({
 
   const onClick = async () => {
     const reply = await api.connectToApp({ body: { cluster: cluster.id, sessionId: session.sessionId } })
-      .httpError(404, () => { message.error("此应用会话不存在"); })
-      .httpError(409, () => { message.error("此应用目前无法连接"); });
+      .httpError(404, () => { message.error(t(p("notFoundMessage"))); })
+      .httpError(409, () => { message.error(t(p("notConnectableMessage"))); });
 
     if (reply.type === "web") {
       const { connect, host, password, port, proxyType, customFormData } = reply;
@@ -95,7 +100,7 @@ export const ConnectTopAppLink: React.FC<Props> = ({
   };
 
   return (
-    <DisabledA disabled={!data} onClick={onClick} message="应用还未准备好">连接</DisabledA>
+    <DisabledA disabled={!data} onClick={onClick} message={t(p("notReady"))}>{t(p("connect"))}</DisabledA>
   );
 
 

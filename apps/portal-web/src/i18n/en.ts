@@ -273,6 +273,107 @@ export default {
         hintText: "Supports uploading single or multiple files",
       },
     },
+    // desktop
+    desktop: {
+      desktopTable: {
+        tableItem: {
+          title: "Desktop ID",
+          desktopName: "Desktop Name",
+          wm: "Desktop Type",
+          addr: "Address",
+          createTime: "Creation Time",
+        },
+        filterForm: {
+          cluster: "Cluster",
+          loginNode: "Login Node",
+          createNewDesktop: "Create New Desktop",
+        },
+      },
+      desktopTableActions: {
+        popConfirmTitle: "This action is irreversible. Are you sure you want to delete?",
+      },
+      newDesktopModal: {
+        error: {
+          tooManyTitle: "Failed to Create Desktop",
+          tooManyContent: "The number of desktops in this cluster has reached its maximum limit.",
+        },
+        modal: {
+          createNewDesktop: "Create New Desktop",
+          loginNode: "Login Node",
+          wm: "Desktop",
+          desktopName: "Desktop Name",
+        },
+      },
+    },
+    // app
+    app: {
+      appSessionTable: {
+        table: {
+          sessionId: "Job Name",
+          jobId: "Job ID",
+          appId: "Application",
+          submitTime: "Submission Time",
+          state: "Status",
+          remainingTime: "Remaining Time",
+          popFinishConfirmTitle: "Are you sure you want to end this task?",
+          popFinishConfirmMessage: "Task termination request has been submitted.",
+          popCancelConfirmTitle: "Are you sure you want to cancel this task?",
+          popCancelConfirmMessage: "Task cancellation request has been submitted.",
+          linkToPath: "Enter Directory",
+        },
+        filterForm: {
+          appJobName: "Job Name",
+          autoRefresh: "Auto-refresh every 10s",
+          onlyNotEnded: "Show only unended tasks",
+        },
+      },
+      connectToAppLink: {
+        notFoundMessage: "This application session does not exist.",
+        notConnectableMessage: "This application cannot be connected at the moment.",
+        notReady: "Application is not ready yet.",
+        connect: "Connect",
+      },
+      createApps: {
+        notFoundMessage: "No interactive application available for creation.",
+        loading: "Loading available interactive applications...",
+        create: "Create",
+      },
+      launchAppForm: {
+        errorMessage: "Failed to create application.",
+        successMessage: "Successfully created.",
+        loading: "Retrieving last submission records...",
+        appJobName: "Job Name",
+        account: "Account",
+        partition: "Partition",
+        qos: "QOS",
+        nodeCount: "Node Count",
+        gpuCount: "GPU Cards per Node",
+        coreCount: "CPU Cores per Node",
+        maxTime: "Maximum Running Time",
+        minute: "Minutes",
+        totalGpuCount: "Total GPU Cards",
+        totalCpuCount: "Total CPU Cores",
+        totalMemory: "Total Memory Capacity",
+      },
+    },
+  },
+  component: {
+    errorPages: {
+      notAllowedPage: "Access to this page is not allowed.",
+      systemNotAllowed: "The system does not allow access to this page.",
+      notAllowed: "Access Denied",
+      needLogin: "Login Required",
+      notLogin: "You are either not logged in or your login session has expired. "
+      + "You need to login to access this page.",
+      login: "Login",
+      notExist: "Does Not Exist",
+      pageNotExist: "The page you requested does not exist.",
+      serverWrong: "Server Error",
+      sorry: "Sorry, there was a server error. Please refresh and try again.",
+    },
+    others: {
+      clusterSelector: "Please select a cluster.",
+    },
   },
   pages: {
     apps: {

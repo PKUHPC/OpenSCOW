@@ -12,22 +12,25 @@
 
 import { Button, Result } from "antd";
 import Link from "next/link";
+import { useI18nTranslateToString } from "src/i18n";
 import { Head } from "src/utils/head";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const NotAuthorizedPage = () => {
 
+  const { t } = useI18nTranslateToString();
+
   return (
     <>
-      <Head title="需要登录" />
+      <Head title={t("component.errorPages.needLogin")} />
       <Result
         status="403"
-        title="需要登录"
-        subTitle="您未登录或者登录状态已经过期。您需要登录才能访问此页面。"
+        title={t("component.errorPages.needLogin")}
+        subTitle={t("component.errorPages.notLogin")}
         extra={(
           <Link href={"/api/auth"}>
             <Button type="primary">
-              登录
+              {t("component.errorPages.login")}
             </Button>
           </Link>
         )}

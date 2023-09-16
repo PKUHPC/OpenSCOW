@@ -22,6 +22,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { calculateAppRemainingTime, compareState } from "src/models/job";
 import { ConnectTopAppLink } from "src/pageComponents/app/ConnectToAppLink";
 import { Cluster } from "src/utils/config";
@@ -34,6 +35,8 @@ interface Props {
   cluster: Cluster;
 }
 
+const p = prefix("pageComp.app.appSessionTable.");
+
 export const AppSessionsTable: React.FC<Props> = ({ cluster }) => {
 
   const [query, setQuery] = useState<FilterForm>(() => {
@@ -41,6 +44,7 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster }) => {
   });
   const [form] = Form.useForm<FilterForm>();
 
+  const { t } = useI18nTranslateToString();
 
   const { message } = App.useApp();
 
@@ -77,27 +81,27 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster }) => {
 
   const columns: TableColumnsType<AppSession> = [
     {
-      title: "作业名",
+      title: t(p("table.sessionId")),
       dataIndex: "sessionId",
     },
     {
-      title: "作业ID",
+      title: t(p("table.jobId")),
       dataIndex: "jobId",
       sorter: (a, b) => compareNumber(a.jobId, b.jobId),
     },
     {
-      title: "应用",
+      title: t(p("table.appId")),
       dataIndex: "appId",
       render: (appId: string, record) => record.appName ?? appId,
       sorter: (a, b) => (!a.submitTime || !b.submitTime) ? -1 : compareDateTime(a.submitTime, b.submitTime),
     },
     {
-      title: "提交时间",
+      title: t(p("table.submitTime")),
       dataIndex: "submitTime",
       render: (_, record) => record.submitTime ? formatDateTime(record.submitTime) : "",
     },
     {
-      title: "状态",
+      title: t(p("table.state")),
       dataIndex: "state",
       render: (_, record) => (
         record.reason ? (
@@ -118,12 +122,12 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster }) => {
 
     },
     {
-      title: "剩余时间",
+      title: t(p("table.remainingTime")),
       dataIndex: "remainingTime",
     },
 
     {
-      title: "操作",
+      title: t("button.actionButton"),
       key: "action",
       width: "20%",
       render: (_, record) => (
@@ -137,19 +141,19 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster }) => {
                   refreshToken={connectivityRefreshToken}
                 />
                 <Popconfirm
-                  title="确定结束这个任务吗？"
+                  title={t(p("table.popFinishConfirmTitle"))}
                   onConfirm={async () =>
                     api.cancelJob({ query: {
                       cluster: cluster.id,
                       jobId: record.jobId,
                     } })
                       .then(() => {
-                        message.success("任务结束请求已经提交！");
+                        message.success(t(p("table.popFinishConfirmMessage")));
                         reload();
                       })
                   }
                 >
-                  <a>结束</a>
+                  <a>{t("button.finishButton")}</a>
                 </Popconfirm>
               </>
             ) : undefined
@@ -157,19 +161,19 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster }) => {
           {
             (record.state === "PENDING" || record.state === "SUSPENDED") ? (
               <Popconfirm
-                title="确定取消这个任务吗？"
+                title={t(p("table.popCancelConfirmTitle"))}
                 onConfirm={async () =>
                   api.cancelJob({ query: {
                     cluster: cluster.id,
                     jobId: record.jobId,
                   } })
                     .then(() => {
-                      message.success("任务取消请求已经提交！");
+                      message.success(t(p("table.popCancelConfirmMessage")));
                       reload();
                     })
                 }
               >
-                <a>取消</a>
+                <a>{t("button.cancelButton")}</a>
               </Popconfirm>
             ) : undefined
           }
@@ -177,7 +181,7 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster }) => {
             router.push(join("/files", cluster.id, record.dataPath));
           }}
           >
-            进入目录
+            {t(p("table.linkToPath"))}
           </a>
         </Space>
       ),
@@ -218,17 +222,17 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster }) => {
             });
           }}
         >
-          <Form.Item label="作业名" name="appJobName">
+          <Form.Item label={t(p("filterForm.appJobName"))} name="appJobName">
             <Input style={{ minWidth: "160px" }} />
           </Form.Item>
           <Form.Item>
             <Space>
-              <Button type="primary" htmlType="submit">搜索</Button>
+              <Button type="primary" htmlType="submit">{t("button.searchButton")}</Button>
             </Space>
           </Form.Item>
           <Form.Item>
             <Space>
-              <Button loading={isLoading} onClick={reload}>刷新</Button>
+              <Button loading={isLoading} onClick={reload}>{t("button.refreshButton")}</Button>
             </Space>
           </Form.Item>
           <Form.Item>
@@ -237,7 +241,7 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster }) => {
               disabled={disabled}
               onChange={onChange}
             >
-              10s自动刷新
+              {t(p("filterForm.autoRefresh"))}
             </Checkbox>
           </Form.Item>
           <Form.Item>
@@ -245,7 +249,7 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster }) => {
               checked={onlyNotEnded}
               onChange={(e) => setOnlyNotEnded(e.target.checked)}
             >
-              只展示未结束的作业
+              {t(p("filterForm.onlyNotEnded"))}
             </Checkbox>
           </Form.Item>
         </Form>

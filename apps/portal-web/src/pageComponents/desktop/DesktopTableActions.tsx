@@ -13,6 +13,7 @@
 import { Popconfirm, Space } from "antd";
 import React, { useState } from "react";
 import { api } from "src/apis";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import type { DesktopItem } from "src/pageComponents/desktop/DesktopTable";
 import { Cluster } from "src/utils/config";
 import { openDesktop } from "src/utils/vnc";
@@ -23,10 +24,15 @@ interface Props {
   record: DesktopItem;
 }
 
+const p = prefix("pageComp.desktop.desktopTableActions.");
+
 export const DesktopTableActions: React.FC<Props> = ({ cluster, reload, record }) => {
 
   // Is the popconfirm visible
   const [isPopconfirmVisible, setIsPopconfirmVisible] = useState(false);
+
+  const { t } = useI18nTranslateToString();
+
   return (
     <div>
       <Space size="middle">
@@ -49,7 +55,7 @@ export const DesktopTableActions: React.FC<Props> = ({ cluster, reload, record }
         </a>
 
         <Popconfirm
-          title="删除后不可恢复，你确定要删除吗?"
+          title={t(p("popConfirmTitle"))}
           open={isPopconfirmVisible}
           onConfirm={async () => {
 
@@ -76,7 +82,7 @@ export const DesktopTableActions: React.FC<Props> = ({ cluster, reload, record }
               setIsPopconfirmVisible(true);
             }}
           >
-            删除
+            {t("button.deleteButton")}
           </a>
         </Popconfirm>
       </Space>

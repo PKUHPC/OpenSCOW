@@ -17,6 +17,7 @@ import Router from "next/router";
 import { useCallback, useMemo, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { AccountSelector } from "src/pageComponents/job/AccountSelector";
 import { AppCustomAttribute } from "src/pages/api/app/getAppMetadata";
 import { Partition } from "src/pages/api/cluster";
@@ -57,9 +58,13 @@ const inputNumberFloorConfig = {
   parser: (value: string) => Math.floor(+value),
 };
 
+const p = prefix("pageComp.app.launchAppForm.");
+
 export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, appName }) => {
 
   const { message, modal } = App.useApp();
+
+  const { t } = useI18nTranslateToString();
 
   const [form] = Form.useForm<FormFields>();
   const [loading, setLoading] = useState(false);
@@ -67,7 +72,7 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const createErrorModal = (message: string) => modal.error({
-    title: "创建应用失败",
+    title: t(p("errorMessage")),
     content: message,
   });
 
@@ -107,7 +112,7 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
         e.code === "INVALID_INPUT" ? createErrorModal(e.message) : (() => { throw e; })();
       })
       .then(() => {
-        message.success("创建成功！");
+        message.success(t(p("successMessage")));
         Router.push(`/apps/${clusterId}/sessions`);
       }).finally(() => {
         setLoading(false);
@@ -185,18 +190,18 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
                     // 区分是否有GPU，防止没有GPU的分区获取到GPU版本的选项
                     if (!clusterPartitionGpuCount) {
                       // 筛选选项：若没有配置requireGpu直接使用，配置了requireGpu项使用与否则看改分区有无GPU
-                      const selectOptions = 
+                      const selectOptions =
                       attribute.select.filter((x) => !x.requireGpu || (x.requireGpu && clusterPartitionGpuCount));
-                      
+
                       if (selectOptions.some((optionItem) =>
-                        optionItem.value === lastSubmitAttributes[attribute.name])) 
+                        optionItem.value === lastSubmitAttributes[attribute.name]))
                       {
                         attributesObj[attribute.name] = lastSubmitAttributes[attribute.name];
                       }
-                    } 
+                    }
                     else {
                       if (attribute.select!.some((optionItem) =>
-                        optionItem.value === lastSubmitAttributes[attribute.name])) 
+                        optionItem.value === lastSubmitAttributes[attribute.name]))
                       {
                         attributesObj[attribute.name] = lastSubmitAttributes[attribute.name];
                       }
@@ -255,7 +260,7 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
             placeholder={placeholder}
           />
         );
-    
+
     // 判断是否配置了requireGpu选项
     if (item.type === "SELECT" && item.select.find((i) => i.requireGpu !== undefined)) {
       const preValue = form.getFieldValue(item.name);
@@ -305,20 +310,20 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
         ... initialValues,
       }}
     >
-      <Spin spinning={loading} tip={isSubmitting ? "" : "查询上次提交记录中"}>
-        <Form.Item name="appJobName" label="作业名" rules={[{ required: true }]}>
+      <Spin spinning={loading} tip={isSubmitting ? "" : t(p("loading"))}>
+        <Form.Item name="appJobName" label={t(p("appJobName"))} rules={[{ required: true }]}>
           <Input />
         </Form.Item>
         <Form.Item
           label="账户"
-          name="account"
+          name={t(p("account"))}
           rules={[{ required: true }]}
         >
           <AccountSelector cluster={clusterId} />
         </Form.Item>
 
         <Form.Item
-          label="分区"
+          label={t(p("partition"))}
           name="partition"
           rules={[{ required: true }]}
         >
@@ -334,7 +339,7 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
         </Form.Item>
 
         <Form.Item
-          label="QOS"
+          label={t(p("qos"))}
           name="qos"
           rules={[{ required: true }]}
         >
@@ -344,7 +349,7 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
           />
         </Form.Item>
         <Form.Item
-          label="节点数"
+          label={t(p("nodeCount"))}
           name="nodeCount"
           dependencies={["partition"]}
           rules={[
@@ -360,7 +365,7 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
         {
           currentPartitionInfo?.gpus ? (
             <Form.Item
-              label="单节点GPU卡数"
+              label={t(p("gpuCount"))}
               name="gpuCount"
               dependencies={["partition"]}
               rules={[
@@ -379,7 +384,7 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
             </Form.Item>
           ) : (
             <Form.Item
-              label="单节点CPU核心数"
+              label={t(p("coreCount"))}
               name="coreCount"
               dependencies={["partition"]}
               rules={[
@@ -398,8 +403,8 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
             </Form.Item>
           )
         }
-        <Form.Item label="最长运行时间" name="maxTime" rules={[{ required: true }]}>
-          <InputNumber min={1} step={1} addonAfter={"分钟"} />
+        <Form.Item label={t(p("maxTime"))} name="maxTime" rules={[{ required: true }]}>
+          <InputNumber min={1} step={1} addonAfter={t(p("minute"))} />
         </Form.Item>
 
         {customFormItems}
@@ -409,19 +414,19 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
               ?
               (
                 <Col span={12} sm={6}>
-                  <Form.Item label="总GPU卡数">
+                  <Form.Item label={t(p("totalGpuCount"))}>
                     {nodeCount * gpuCount}
                   </Form.Item>
                 </Col>
               ) : null
           }
           <Col span={12} sm={6}>
-            <Form.Item label="总CPU核心数">
+            <Form.Item label={t(p("totalCpuCount"))}>
               {coreCountSum}
             </Form.Item>
           </Col>
           <Col span={12} sm={6}>
-            <Form.Item label="总内存容量">
+            <Form.Item label={t(p("totalMemory"))}>
               {memoryDisplay}
             </Form.Item>
           </Col>
@@ -433,10 +438,10 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
           onClick={() => Router.push(`/apps/${clusterId}/createApps`)}
           style={{ marginRight: "10px" }}
         >
-          取消
+          {t("button.cancelButton")}
         </Button>
         <Button type="primary" htmlType="submit" loading={loading}>
-          提交
+          {t("button.submitButton")}
         </Button>
       </Form.Item>
     </Form>

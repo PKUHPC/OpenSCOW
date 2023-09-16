@@ -13,7 +13,7 @@
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/i18n";
 import { Select } from "antd";
 import { useStore } from "simstate";
-import { useI18n } from "src/i18n";
+import { useI18n, useI18nTranslateToString } from "src/i18n";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { Cluster, publicConfig } from "src/utils/config";
 
@@ -25,12 +25,13 @@ interface Props {
 export const ClusterSelector: React.FC<Props> = ({ value, onChange }) => {
 
   const languageId = useI18n().currentLanguage.id;
+  const { t } = useI18nTranslateToString();
 
   return (
     <Select
       mode="multiple"
       labelInValue
-      placeholder="请选择集群"
+      placeholder={t("component.others.clusterSelector")}
       value={value ? value.map((v) => ({ value: v.id, label: v.name })) : undefined}
       onChange={(values) => onChange?.(values.map((x) => ({ id: x.value, name: x.label })))}
       options={Object.values(publicConfig.CLUSTERS).map((x) => ({ value: x.id, label:
@@ -55,12 +56,13 @@ export const SingleClusterSelector: React.FC<SingleSelectionProps> = ({
 
   const { setDefaultCluster } = useStore(DefaultClusterStore);
 
+  const { t } = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
 
   return (
     <Select
       labelInValue
-      placeholder="请选择集群"
+      placeholder={t("component.others.clusterSelector")}
       value={value ? ({ value: value.id, label: value.name }) : undefined}
       onChange={({ value, label }) => {
         onChange?.({ id: value, name: label });

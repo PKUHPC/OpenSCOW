@@ -23,6 +23,7 @@ import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { ModalButton } from "src/components/ModalLink";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { DesktopTableActions } from "src/pageComponents/desktop/DesktopTableActions";
 import { NewDesktopTableModal } from "src/pageComponents/desktop/NewDesktopTableModal";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
@@ -43,9 +44,13 @@ export type DesktopItem = {
   addr: string,
 }
 
+const p = prefix("pageComp.desktop.desktopTable.");
+
 export const DesktopTable: React.FC<Props> = ({ loginDesktopEnabledClusters }) => {
 
   const router = useRouter();
+
+  const { t } = useI18nTranslateToString();
 
   const { defaultCluster } = useStore(DefaultClusterStore);
 
@@ -64,6 +69,7 @@ export const DesktopTable: React.FC<Props> = ({ loginDesktopEnabledClusters }) =
 
   const { data, isLoading, reload } = useAsync({
     promiseFn: useCallback(async () => {
+
       // List all desktop
       const { userDesktops } = await api.listDesktops({
         query: { cluster: cluster.id, loginNode: loginNode?.address },
@@ -88,18 +94,18 @@ export const DesktopTable: React.FC<Props> = ({ loginDesktopEnabledClusters }) =
 
   const columns: ColumnsType<DesktopItem> = [
     {
-      title: "桌面ID",
+      title: t(p("tableItem.title")),
       dataIndex: "desktopId",
       key: "desktopId",
       width: "10%",
     },
     {
-      title: "桌面名称",
+      title: t(p("tableItem.desktopName")),
       dataIndex: "desktopName",
       key: "desktopName",
     },
     {
-      title: "桌面类型",
+      title: t(p("tableItem.wm")),
       dataIndex: "wm",
       key: "wm",
       width: "20%",
@@ -108,7 +114,7 @@ export const DesktopTable: React.FC<Props> = ({ loginDesktopEnabledClusters }) =
       },
     },
     {
-      title: "地址",
+      title: t(p("tableItem.addr")),
       dataIndex: "addr",
       key: "addr",
       width: "20%",
@@ -117,7 +123,7 @@ export const DesktopTable: React.FC<Props> = ({ loginDesktopEnabledClusters }) =
       },
     },
     {
-      title: "创建时间",
+      title: t(p("tableItem.createTime")),
       dataIndex: "createTime",
       key: "createTime",
       width: "15%",
@@ -126,7 +132,7 @@ export const DesktopTable: React.FC<Props> = ({ loginDesktopEnabledClusters }) =
       },
     },
     {
-      title: "操作",
+      title: t("button.actionButton"),
       key: "action",
       width: "15%",
       render: (_, record) => (
@@ -139,7 +145,7 @@ export const DesktopTable: React.FC<Props> = ({ loginDesktopEnabledClusters }) =
     <div>
       <FilterFormContainer>
         <Form layout="inline">
-          <Form.Item label="集群">
+          <Form.Item label={t(p("filterForm.cluster"))}>
             <SingleClusterSelector
               value={cluster}
               onChange={(x) => {
@@ -148,7 +154,7 @@ export const DesktopTable: React.FC<Props> = ({ loginDesktopEnabledClusters }) =
               clusterIds={loginDesktopEnabledClusters.map((x) => x.id)}
             />
           </Form.Item>
-          <Form.Item label="登录节点">
+          <Form.Item label={t(p("filterForm.loginNode"))}>
             <Select
               allowClear
               style={{ minWidth: 100 }}
@@ -174,7 +180,7 @@ export const DesktopTable: React.FC<Props> = ({ loginDesktopEnabledClusters }) =
           </Form.Item>
           <Form.Item>
             <Button onClick={reload} loading={isLoading}>
-              刷新
+              {t("button.refreshButton")}
             </Button>
           </Form.Item>
           <Form.Item>
@@ -184,7 +190,7 @@ export const DesktopTable: React.FC<Props> = ({ loginDesktopEnabledClusters }) =
               loginNodes={loginNodes[cluster.id]}
               availableWms={availableWms?.wms ?? []}
             >
-              新建桌面
+              {t(p("filterForm.createNewDesktop"))}
             </NewDesktopTableModalButton>
           </Form.Item>
         </Form>

@@ -15,6 +15,7 @@ import { App, Form, Input, Modal, Select } from "antd";
 import dayjs from "dayjs";
 import React, { useEffect, useState } from "react";
 import { api } from "src/apis";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { Cluster, LoginNode } from "src/utils/config";
 import { openDesktop } from "src/utils/vnc";
 
@@ -33,6 +34,7 @@ interface FormInfo {
   desktopName: string;
 }
 
+const p = prefix("pageComp.desktop.newDesktopModal.");
 
 export const NewDesktopTableModal: React.FC<Props> = ({
   open,
@@ -43,6 +45,7 @@ export const NewDesktopTableModal: React.FC<Props> = ({
   availableWms = [],
 }) => {
 
+  const { t } = useI18nTranslateToString();
 
   const [form] = Form.useForm<FormInfo>();
 
@@ -62,8 +65,8 @@ export const NewDesktopTableModal: React.FC<Props> = ({
       const { code } = e;
       if (code === "TOO_MANY_DESKTOPS") {
         modal.error({
-          title: "新建桌面失败",
-          content: "该集群桌面数目达到最大限制",
+          title: t(p("error.tooManyTitle")),
+          content: t(p("error.tooManyContent")),
         });
       } else {
         throw e;
@@ -89,7 +92,7 @@ export const NewDesktopTableModal: React.FC<Props> = ({
 
   return (
     <Modal
-      title="新建桌面"
+      title={t(p("modal.createNewDesktop"))}
       open={open}
       onOk={form.submit}
       confirmLoading={submitting}
@@ -102,7 +105,7 @@ export const NewDesktopTableModal: React.FC<Props> = ({
         wrapperCol={{ span: 20 }}
         labelCol={{ span: 4 }}
       >
-        <Form.Item label="登录节点" name="loginNode" rules={[{ required: true }]}>
+        <Form.Item label={t(p("modal.loginNode"))} name="loginNode" rules={[{ required: true }]}>
           <Select
             options={loginNodes.map((loginNode) => ({
               label: loginNode.name, value: loginNode.address,
@@ -110,13 +113,13 @@ export const NewDesktopTableModal: React.FC<Props> = ({
           >
           </Select>
         </Form.Item>
-        <Form.Item label="桌面" name="wm" required>
+        <Form.Item label={t(p("modal.wm"))} name="wm" required>
           <Select
             options={availableWms?.map(({ name, wm }) =>
               ({ label: name, value: wm }))}
           />
         </Form.Item>
-        <Form.Item label="桌面名" name="desktopName" required>
+        <Form.Item label={t(p("modal.desktopName"))} name="desktopName" required>
           <Input />
         </Form.Item>
       </Form>

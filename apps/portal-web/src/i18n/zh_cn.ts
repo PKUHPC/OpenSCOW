@@ -273,6 +273,107 @@ export default {
         hintText: "支持上传单个或者多个文件",
       },
     },
+    // desktop
+    desktop: {
+      desktopTable: {
+        tableItem: {
+          title: "桌面ID",
+          desktopName: "桌面名称",
+          wm: "桌面类型",
+          addr: "地址",
+          createTime: "创建时间",
+        },
+        filterForm: {
+          cluster: "集群",
+          loginNode: "登录节点",
+          createNewDesktop: "新建桌面",
+        },
+      },
+      desktopTableActions: {
+        popConfirmTitle: "删除后不可恢复，你确定要删除吗?",
+      },
+      newDesktopModal: {
+        error: {
+          tooManyTitle: "新建桌面失败",
+          tooManyContent: "该集群桌面数目达到最大限制",
+        },
+        modal: {
+          createNewDesktop: "新建桌面",
+          loginNode: "登录节点",
+          wm: "桌面",
+          desktopName: "桌面名",
+        },
+      },
+    },
+    // app
+    app: {
+      appSessionTable: {
+        table: {
+          sessionId: "作业名",
+          jobId: "作业Id",
+          appId: "应用",
+          submitTime: "提交时间",
+          state: "状态",
+          remainingTime: "剩余时间",
+          popFinishConfirmTitle: "确定结束这个任务吗",
+          popFinishConfirmMessage: "任务结束请求已经提交",
+          popCancelConfirmTitle: "确定取消这个任务吗",
+          popCancelConfirmMessage: "任务取消请求已经提交",
+          linkToPath: "进入目录",
+        },
+        filterForm: {
+          appJobName: "作业名",
+          autoRefresh: "10s自动刷新",
+          onlyNotEnded: "只展示未结束的作业",
+        },
+      },
+      connectToAppLink: {
+        notFoundMessage: "此应用会话不存在",
+        notConnectableMessage: "此应用目前无法连接",
+        notReady: "应用还未准备好",
+        connect: "连接",
+      },
+      createApps: {
+        notFoundMessage: "没有可以创建的交互式应用",
+        loading: "正在加载可创建的交互式应用",
+        create: "创建",
+      },
+      launchAppForm: {
+        errorMessage: "创建应用失败",
+        successMessage: "创建成功",
+        loading: "查询上次提交记录中",
+        appJobName: "作业名",
+        account: "账户",
+        partition: "分区",
+        qos: "QOS",
+        nodeCount: "节点数",
+        gpuCount: "单节点GPU卡数",
+        coreCount: "单节点CPU核心数",
+        maxTime: "最长运行时间",
+        minute: "分钟",
+        totalGpuCount: "总GPU卡数",
+        totalCpuCount: "总CPU核心数",
+        totalMemory: "总内存容量",
+      },
+    },
+  },
+  component:{
+    errorPages:{
+      notAllowedPage:"不允许访问此页面",
+      systemNotAllowed:"系统不允许您访问此页面。",
+      notAllowed:"不允许访问",
+      needLogin:"需要登录",
+      notLogin:"您未登录或者登录状态已经过期。您需要登录才能访问此页面。",
+
+      login:"登录",
+      notExist:"不存在",
+      pageNotExist:"您所请求的页面不存在。",
+      serverWrong:"服务器出错",
+      sorry:"对不起，服务器出错。请刷新重试。",
+    },
+    others:{
+      clusterSelector: "请选择集群",
+    },
   },
   pages: {
     apps: {
