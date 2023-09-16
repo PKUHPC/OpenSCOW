@@ -33,7 +33,10 @@ export const ClusterSelector: React.FC<Props> = ({ value, onChange }) => {
       mode="multiple"
       labelInValue
       placeholder={t(p("selectCluster"))}
-      value={value ? value.map((v) => ({ value: v.id, label: v.name })) : undefined}
+      value={value ? value.map((v) => ({
+        value: v.id,
+        label: getI18nConfigCurrentText(v.name, languageId),
+      })) : undefined}
       onChange={(values) => onChange?.(values.map((x) => ({ id: x.value, name: x.label })))}
       options={Object.values(publicConfig.CLUSTERS).map((x) => ({ value: x.id, label:
         getI18nConfigCurrentText(x.name, languageId) }))}
@@ -57,7 +60,7 @@ export const SingleClusterSelector: React.FC<SingleSelectionProps> = ({ value, o
     <Select
       labelInValue
       placeholder={t(p("selectCluster"))}
-      value={value ? ({ value: value.id, label: value.name }) : undefined}
+      value={value ? ({ value: value.id, label: getI18nConfigCurrentText(value.name, languageId) }) : undefined}
       onChange={({ value, label }) => onChange?.({ id: value, name: label })}
       options={
         (label ? [{ value: label, label, disabled: true }] : [])
