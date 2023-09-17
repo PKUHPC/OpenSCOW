@@ -78,7 +78,7 @@ export const AllJobQueryTable: React.FC<Props> = ({
     return filtered;
   }, [data, query.jobId]);
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
   const p = prefix("pageComp.job.allJobsTable.searchForm.");
 
   return (
@@ -147,7 +147,7 @@ type JobInfoTableProps = {
 export const JobInfoTable: React.FC<JobInfoTableProps> = ({
   data, isLoading, cluster,
 }) => {
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
   const p = prefix("pageComp.job.allJobsTable.tableInfo.");
 
   return (

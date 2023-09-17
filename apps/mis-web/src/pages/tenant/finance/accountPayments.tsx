@@ -24,7 +24,7 @@ export const PaymentsPage: NextPage = requireAuth((i) =>
   i.tenantRoles.includes(TenantRole.TENANT_FINANCE),
 )(() => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   return (
     <div>

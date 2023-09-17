@@ -32,7 +32,7 @@ const pCommon = prefix("common.");
 
 const UsedType: React.FC<{ onClick: (type: string) => void }> = ({ onClick }) => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   const { isLoading, data } = useAsync({ promiseFn: getTypes });
 
@@ -59,7 +59,7 @@ const UsedType: React.FC<{ onClick: (type: string) => void }> = ({ onClick }) =>
 
 export const ChargeForm: React.FC = () => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   const { message } = App.useApp();
   const [form] = Form.useForm<ChargeFields>();

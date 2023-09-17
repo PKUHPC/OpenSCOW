@@ -27,11 +27,11 @@ export const OperationLogPage: NextPage = requireAuth(
   (u) => u.accountAffiliations.length > 0,
   checkQueryAccountNameIsAdmin)(
   ({ userStore }) => {
-    const { tArgs } = useI18nTranslate();
+    const tArgs = useI18nTranslate();
 
     const accountName = useAccountPagesAccountName();
 
-    const { t } = useI18nTranslateToString();
+    const t = useI18nTranslateToString();
 
     const title = tArgs(p("title"), [accountName]);
     return (

@@ -51,7 +51,7 @@ export const AdminUserTable: React.FC<Props> = ({
   data, isLoading, reload, user,
 }) => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   const { message } = App.useApp();
   const [form] = Form.useForm<FilterForm>();

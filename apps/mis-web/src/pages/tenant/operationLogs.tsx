@@ -24,7 +24,7 @@ export const OperationLogPage: NextPage = requireAuth(
 )(
   ({ userStore }) => {
 
-    const { t } = useI18nTranslateToString();
+    const t = useI18nTranslateToString();
 
     const tenant = userStore.user.tenant;
     const title = `${t("common.tenant")}${tenant}${t("common.operationLog")}`;

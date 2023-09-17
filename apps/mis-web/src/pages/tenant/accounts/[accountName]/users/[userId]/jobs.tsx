@@ -25,7 +25,7 @@ const p = prefix("page.tenant.accounts.accountName.users.userId.jobs.");
 
 export const JobsPage: NextPage = requireAuth((u) => u.tenantRoles.includes(TenantRole.TENANT_ADMIN))(
   () => {
-    const { t } = useI18nTranslateToString();
+    const t = useI18nTranslateToString();
 
     const router = useRouter();
 

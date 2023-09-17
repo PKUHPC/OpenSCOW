@@ -27,7 +27,7 @@ export const PaymentsPage: NextPage = requireAuth(
   (i) => i.accountAffiliations.some((x) => x.role !== UserRole.USER),
   checkQueryAccountNameIsAdmin,
 )(() => {
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   const accountName = useAccountPagesAccountName();
   const title = t(p("title"), [accountName]);

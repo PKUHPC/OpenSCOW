@@ -61,7 +61,7 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)((props: Pr
   const { accounts } = props;
   const noAccounts = Object.keys(accounts).length === 0;
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   return (
     <div>

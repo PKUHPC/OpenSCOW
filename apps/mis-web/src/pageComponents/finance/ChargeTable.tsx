@@ -49,7 +49,7 @@ const pCommon = prefix("common.");
 export const ChargeTable: React.FC<Props> = ({
   accountName, showAccountName, showTenantName, isPlatformRecords, searchType }) => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
 
   const [form] = Form.useForm<FilterForm>();

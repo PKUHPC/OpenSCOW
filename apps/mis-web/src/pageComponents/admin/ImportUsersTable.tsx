@@ -30,7 +30,7 @@ const pCommon = prefix("common.");
 
 export const ImportUsersTable: React.FC = () => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   const { message } = App.useApp();
 

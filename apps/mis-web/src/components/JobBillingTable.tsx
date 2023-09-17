@@ -56,7 +56,7 @@ const pCommon = prefix("common.");
 
 export const JobBillingTable: React.FC<Props> = ({ data, loading }) => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
 
   const clusterTotalQosCounts = data && data.length ?

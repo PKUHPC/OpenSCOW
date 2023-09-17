@@ -33,7 +33,7 @@ export const FetchJobsInfoPage: NextPage = requireAuth((u) => u.platformRoles.in
       promiseFn,
     });
 
-    const { t } = useI18nTranslateToString();
+    const t = useI18nTranslateToString();
 
     const { message } = App.useApp();
 

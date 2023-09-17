@@ -37,7 +37,7 @@ export const CreateFileModal: React.FC<Props> = ({ open, onClose, path, reload, 
   const [form] = Form.useForm<FormProps>();
   const [loading, setLoading] = useState(false);
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   const onSubmit = async () => {
     const { newFileName } = await form.validateFields();

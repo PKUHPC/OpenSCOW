@@ -43,7 +43,7 @@ export const JobsSection: React.FC<Props> = ({ user }) => {
 
   const { data, isLoading, reload } = useAsync({ promiseFn });
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   return (
     <Section

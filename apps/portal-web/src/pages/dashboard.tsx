@@ -37,7 +37,7 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)((props: Pr
     router.replace(router.asPath);
   }, [userStore.user]);
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   return (
     <div>

@@ -29,7 +29,7 @@ export const UserJobsPage: NextPage = requireAuth(
   () => {
 
     const router = useRouter();
-    const { t } = useI18nTranslateToString();
+    const t = useI18nTranslateToString();
 
     const userId = queryToString(router.query.userId) || undefined;
     const accountName = queryToString(router.query.accountName) || "";

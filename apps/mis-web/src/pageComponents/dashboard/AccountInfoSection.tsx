@@ -49,7 +49,7 @@ export const AccountInfoSection: React.FC<Props> = ({ info }) => {
 
   const accounts = Object.entries(info);
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   const statusTexts = {
     blocked: [t("dashboard.account.status.blocked"), "red", LockOutlined],

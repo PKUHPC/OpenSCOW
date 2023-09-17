@@ -60,7 +60,7 @@ export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
     return { idOrName: undefined };
   });
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   const [form] = Form.useForm<FilterForm>();
 
@@ -176,7 +176,7 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
   data, pageInfo, setPageInfo, sortInfo, setSortInfo, isLoading, reload, user,
 }) => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   const { message } = App.useApp();
 

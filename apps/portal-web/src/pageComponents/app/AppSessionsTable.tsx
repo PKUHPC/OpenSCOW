@@ -44,7 +44,7 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster }) => {
   });
   const [form] = Form.useForm<FilterForm>();
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   const { message } = App.useApp();
 

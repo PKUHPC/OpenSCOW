@@ -32,7 +32,7 @@ export const AppIndexPage: NextPage = requireAuth(() => true)(() => {
   const clusterId = queryToString(router.query.clusterId);
 
   const { message } = App.useApp();
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   const languageId = useI18n().currentLanguage.id;
 

@@ -32,7 +32,7 @@ export const AdminJobBillingTablePage: NextPage =
   requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))(
     () => {
       const query = useQuerystring();
-      const { t } = useI18nTranslateToString();
+      const t = useI18nTranslateToString();
 
       const tenant = queryToString(query.tenant) || undefined;
 
@@ -48,7 +48,7 @@ export const AdminJobBillingTablePage: NextPage =
 
 export const AdminJobBillingTable: React.FC<{ tenant?: string }> = ({ tenant }) => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
   const { data, isLoading, reload } = useAsync({ promiseFn: useCallback(async () => {
     return await api.getBillingItems({ query: { tenant, activeOnly: false } });
   }, [tenant]) });

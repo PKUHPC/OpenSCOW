@@ -20,7 +20,7 @@ import { Head } from "src/utils/head";
 
 export const RunningJobsPage: NextPage = requireAuth((u) => u.accountAffiliations.length > 0)(
   ({ userStore }) => {
-    const { t } = useI18nTranslateToString();
+    const t = useI18nTranslateToString();
     return (
       <div>
         <Head title={t("runningJob.title")} />

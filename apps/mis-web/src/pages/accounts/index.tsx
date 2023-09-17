@@ -25,7 +25,7 @@ type Props = {
 
 export const FinanceIndexPage: NextPage<Props> = ({ error, adminAccounts }) => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   if (error) {
     return <UnifiedErrorPage code={error} />;

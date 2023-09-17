@@ -26,7 +26,7 @@ const pCommon = prefix("common.");
 
 export const JobBillingManagementTable: React.FC<Props> = ({ data, loading }) => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   return (
     <Table dataSource={data} loading={loading} rowKey="id">

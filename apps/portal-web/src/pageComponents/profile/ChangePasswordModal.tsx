@@ -38,7 +38,7 @@ export const ChangePasswordModal: React.FC<Props> = ({
 
   const languageId = useI18n().currentLanguage.id;
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
   const p = prefix("pageComp.profile.changPasswordModal.");
 
   const onFinish = async () => {

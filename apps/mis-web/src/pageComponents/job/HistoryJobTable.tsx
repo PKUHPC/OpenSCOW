@@ -58,7 +58,7 @@ export const JobTable: React.FC<Props> = ({
   showAccount, showUser, showedPrices, priceTexts,
 }) => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
 
   const { message } = App.useApp();
@@ -226,7 +226,7 @@ export const JobInfoTable: React.FC<JobInfoTableProps> = ({
   showAccount, showUser, showedPrices, priceTexts,
 }) => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
 
   const [previewItem, setPreviewItem] = useState<JobInfo | undefined>(undefined);

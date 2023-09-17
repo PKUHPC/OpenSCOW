@@ -34,7 +34,7 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
   const { message, modal } = App.useApp();
   const [ uploadFileList, setUploadFileList ] = useState<UploadFile[]>([]);
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   const onModalClose = () => {
     setUploadFileList([]);

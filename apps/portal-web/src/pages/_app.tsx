@@ -48,7 +48,7 @@ import { LoginNode, publicConfig, runtimeConfig } from "src/utils/config";
 const FailEventHandler: React.FC = () => {
   const { message } = AntdApp.useApp();
   const userStore = useStore(UserStore);
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   // 登出过程需要调用的几个方法（logout, useState等）都是immutable的
   // 所以不需要每次userStore变化时来重新注册handler

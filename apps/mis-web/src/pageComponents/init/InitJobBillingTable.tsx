@@ -22,7 +22,7 @@ const pCommon = prefix("common.");
 
 export const InitJobBillingTable: React.FC = () => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   const { data, isLoading, reload } = useAsync({ promiseFn: useCallback(async () => {
     return await api.getBillingItems({

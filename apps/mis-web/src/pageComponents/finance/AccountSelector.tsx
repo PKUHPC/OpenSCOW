@@ -48,7 +48,7 @@ export const AccountSelector: React.FC<Props> = ({
   onChange, value, placeholder, disabled, autoSelect, onAccountsFetched, fromAllTenants,
 }) => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   const userStore = useStore(UserStore);
 

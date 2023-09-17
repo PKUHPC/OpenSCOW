@@ -52,7 +52,7 @@ export const RunningJobQueryTable: React.FC<Props> = ({
   userId, accountNames, showUser, showAccount, filterAccountName = true,
 }) => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
 
   const searchType = useRef<"precision" | "range">("range");
@@ -219,7 +219,7 @@ export const RunningJobInfoTable: React.FC<JobInfoTableProps> = ({
 
   const [previewItem, setPreviewItem] = useState<RunningJobInfo | undefined>(undefined);
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
 
   return (

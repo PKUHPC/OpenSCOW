@@ -28,7 +28,7 @@ const p = prefix("component.others.");
 
 export const PlatformRoleSelector: React.FC<Props> = ({ roles, userId, reload, currentUser }) => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   const { message } = App.useApp();
 

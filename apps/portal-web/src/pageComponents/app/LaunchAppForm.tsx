@@ -64,7 +64,7 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
 
   const { message, modal } = App.useApp();
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   const [form] = Form.useForm<FormFields>();
   const [loading, setLoading] = useState(false);

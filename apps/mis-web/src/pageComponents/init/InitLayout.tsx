@@ -59,7 +59,7 @@ const p = prefix("pageComp.init.initLayout.");
 
 export const InitTab: React.FC = () => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   const router = useRouter();
 
@@ -78,7 +78,7 @@ export const InitTab: React.FC = () => {
 
 export const InitDrawer: React.FC<DrawerProps> = ({ children }) => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   const { modal } = App.useApp();
 

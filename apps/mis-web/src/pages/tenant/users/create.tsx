@@ -28,7 +28,7 @@ const p = prefix("page.tenant.users.create.");
 
 const CreateUserPageForm: React.FC = () => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
   const [form] = Form.useForm<CreateUserFormFields>();
   const { message, modal } = App.useApp();
 
@@ -113,7 +113,7 @@ const CreateUserPageForm: React.FC = () => {
 export const CreateUserPage: NextPage = requireAuth((i) => i.tenantRoles.includes(TenantRole.TENANT_ADMIN))(
   () => {
 
-    const { t } = useI18nTranslateToString();
+    const t = useI18nTranslateToString();
 
     if (!useBuiltinCreateUser()) {
       return <NotFoundPage />;

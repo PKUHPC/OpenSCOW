@@ -42,7 +42,7 @@ export const PartitionsPage: NextPage = requireAuth(
     const user = userStore.user;
     const { message } = App.useApp();
 
-    const { t } = useI18nTranslateToString();
+    const t = useI18nTranslateToString();
 
     const { data, isLoading } = useAsync({ promiseFn: useCallback(async () => {
       return await api.getBillingTable({ query: { tenant: user.tenant, userId: user.identityId } })

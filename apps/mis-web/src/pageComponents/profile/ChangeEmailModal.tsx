@@ -39,7 +39,7 @@ export const ChangeEmailModal: React.FC<Props> = ({
   setEmail,
 }) => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
 
   const [form] = Form.useForm<FormInfo>();

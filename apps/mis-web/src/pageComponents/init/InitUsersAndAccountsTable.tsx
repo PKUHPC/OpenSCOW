@@ -34,7 +34,7 @@ const pCommon = prefix("common.");
 
 const UserTable: React.FC<DataTableProps<User>> = ({ data, loading, reload }) => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   return (
     <Table
@@ -77,7 +77,7 @@ const UserTable: React.FC<DataTableProps<User>> = ({ data, loading, reload }) =>
 
 const AccountTable: React.FC<DataTableProps<Account>> = ({ data, loading }) => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   return (
     <Table
@@ -103,7 +103,7 @@ const accountsPromiseFn = async () => (await api.initGetAccounts({})).accounts;
 
 export const InitUsersAndAccountsTable: React.FC = () => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   const { data: usersData, isLoading: usersLoading, reload: usersReload } = useAsync({ promiseFn: usersPromiseFn });
   const {

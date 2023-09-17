@@ -53,7 +53,7 @@ export const AccountTable: React.FC<Props> = ({
   const { message, modal } = App.useApp();
   const [form] = Form.useForm<FilterForm>();
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   const [rangeSearchStatus, setRangeSearchStatus] = useState<FilteredStatus>("ALL");
   const [currentPageNum, setCurrentPageNum] = useState<number>(1);

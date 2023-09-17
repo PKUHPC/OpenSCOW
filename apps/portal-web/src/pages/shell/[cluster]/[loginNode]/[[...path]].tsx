@@ -88,7 +88,7 @@ export const ShellPage: NextPage = requireAuth(() => true)(({ userStore }) => {
   const clusterName =
     getI18nConfigCurrentText(publicConfig.CLUSTERS.find((x) => x.id === cluster)?.name || cluster, languageId);
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   return (
     <Container>

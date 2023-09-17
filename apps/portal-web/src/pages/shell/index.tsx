@@ -21,7 +21,7 @@ import { Head } from "src/utils/head";
 export const ShellIndexPage: NextPage = requireAuth(() => true)(() => {
 
   const languageId = useI18n().currentLanguage.id;
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   return (
     <div>

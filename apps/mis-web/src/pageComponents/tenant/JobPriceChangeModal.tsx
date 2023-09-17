@@ -40,7 +40,7 @@ const text = {
 
 export const JobPriceChangeModal: React.FC<Props> = ({ open, onClose, jobCount, filter, target, reload }) => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   const [form] = Form.useForm<FormProps>();
   const [loading, setLoading] = useState(false);

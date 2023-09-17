@@ -29,7 +29,7 @@ const p = prefix("page.tenant.accounts.whitelist.");
 export const AccountWhitelistPage: NextPage = requireAuth((u) => u.tenantRoles.includes(TenantRole.TENANT_ADMIN))(
   () => {
 
-    const { t } = useI18nTranslateToString();
+    const t = useI18nTranslateToString();
     const languageId = useI18n().currentLanguage.id;
 
     const promiseFn = useCallback(async () => {

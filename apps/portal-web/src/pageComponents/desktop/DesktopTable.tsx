@@ -50,7 +50,7 @@ export const DesktopTable: React.FC<Props> = ({ loginDesktopEnabledClusters }) =
 
   const router = useRouter();
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   const { defaultCluster } = useStore(DefaultClusterStore);
 

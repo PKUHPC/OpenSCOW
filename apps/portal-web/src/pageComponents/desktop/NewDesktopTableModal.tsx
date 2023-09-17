@@ -45,7 +45,7 @@ export const NewDesktopTableModal: React.FC<Props> = ({
   availableWms = [],
 }) => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   const [form] = Form.useForm<FormInfo>();
 

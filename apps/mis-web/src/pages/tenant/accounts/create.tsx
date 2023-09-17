@@ -39,7 +39,7 @@ const p = prefix("page.tenant.accounts.create.");
 const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ tenantName }) => {
 
   const languageId = useI18n().currentLanguage.id;
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   const [form] = Form.useForm<FormProps>();
 
@@ -116,7 +116,7 @@ const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ tenantName }) => 
 
 export const CreateAccountPage: NextPage = requireAuth((i) => i.tenantRoles.includes(TenantRole.TENANT_ADMIN))(
   ({ userStore }) => {
-    const { t } = useI18nTranslateToString();
+    const t = useI18nTranslateToString();
 
     return (
       <div>

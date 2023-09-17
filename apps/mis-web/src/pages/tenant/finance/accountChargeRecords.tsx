@@ -23,7 +23,7 @@ export const TenantAccountsChargesPage: NextPage = requireAuth(
       u.tenantRoles.includes(TenantRole.TENANT_ADMIN))(
   () => {
 
-    const { t } = useI18nTranslateToString();
+    const t = useI18nTranslateToString();
     const title = t("page.tenant.finance.accountChargeRecords.title");
 
     return (

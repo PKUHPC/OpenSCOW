@@ -53,7 +53,7 @@ const p = prefix("pageComp.app.createApps.");
 
 export const CreateAppsTable: React.FC<Props> = ({ clusterId }) => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   const { data, isLoading } = useAsync({ promiseFn: useCallback(async () => {
     return await api.listAvailableApps({ query: { cluster: clusterId } });

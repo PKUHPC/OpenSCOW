@@ -65,7 +65,7 @@ export const ProfilePage: NextPage = requireAuth(() => true)(({ userStore: { use
 
   const [email, setEmail] = useState(user.email);
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   return (
     <>

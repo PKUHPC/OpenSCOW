@@ -24,7 +24,7 @@ export const TenantPaymentsPage: NextPage = requireAuth((i) =>
   i.platformRoles.includes(PlatformRole.PLATFORM_FINANCE) ||
   i.platformRoles.includes(PlatformRole.PLATFORM_ADMIN),
 )(() => {
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   return (
     <div>

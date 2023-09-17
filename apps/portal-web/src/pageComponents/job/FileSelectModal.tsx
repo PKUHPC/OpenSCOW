@@ -113,7 +113,7 @@ export const FileSelectModal: React.FC<Props> = ({ cluster, onSubmit }) => {
 
   const isLoading = isFileLoading;
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
   const p = prefix("pageComp.job.fileSelectModal.");
 
   return (

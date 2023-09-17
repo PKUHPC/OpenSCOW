@@ -34,7 +34,7 @@ export const BaseLayout = ({ footerText, versionTag, children }: PropsWithChildr
   const { loginNodes } = useStore(LoginNodeStore);
   const { defaultCluster, setDefaultCluster, removeDefaultCluster } = useStore(DefaultClusterStore);
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
 
   console.log("web-baselayout-language", languageId);

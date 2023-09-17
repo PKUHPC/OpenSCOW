@@ -28,7 +28,7 @@ export const ForbiddenPage: React.FC<Props> = ({
   subTitle = "systemNotAllowed",
 }) => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   return (
     <>

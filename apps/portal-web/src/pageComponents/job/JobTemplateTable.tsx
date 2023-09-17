@@ -64,7 +64,7 @@ export const JobTemplateTable: React.FC<Props> = () => {
 
   const { data, isLoading, reload } = useAsync({ promiseFn });
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   return (
     <div>
@@ -104,7 +104,7 @@ const NewTemplateNameModal: React.FC<ModalProps> = ({
   open, close, reload, cluster, templateId,
 }) => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   const { message } = App.useApp();
   const [loading, setLoading] = useState(false);
@@ -164,7 +164,7 @@ const InfoTable: React.FC<InfoTableProps> = ({
   const [modalShow, setModalShow] = useState(false);
   const [templateId, setTemplateId] = useState("");
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   const columns: ColumnsType<JobTemplateInfo> = [
     {

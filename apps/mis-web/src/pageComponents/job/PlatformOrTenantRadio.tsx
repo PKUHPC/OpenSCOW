@@ -26,7 +26,7 @@ const pCommon = prefix("common.");
 
 export const PlatformOrTenantRadio: React.FC<Props> = ({ value, onChange }) => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   // 临时保存所有租户，用于切换到租户时选择默认租户
   const allTenantsRef = useRef<string[]>([]);

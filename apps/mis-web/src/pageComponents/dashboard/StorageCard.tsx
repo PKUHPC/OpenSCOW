@@ -56,7 +56,7 @@ export const StorageCard: React.FC<Props> = ({
   cluster, quota,
 }) => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
 
   const { data, isLoading, run } = useAsync({

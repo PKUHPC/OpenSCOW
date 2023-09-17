@@ -24,7 +24,7 @@ type Props = SSRProps<{}>;
 const p = prefix("page.init.");
 
 export const ImportUsersPage: NextPage<Props> = (props) => {
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   if ("error" in props) {
     return (

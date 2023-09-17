@@ -20,7 +20,7 @@ const p = prefix("component.errorPages.");
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const NotAuthorizedPage = () => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   return (
     <>

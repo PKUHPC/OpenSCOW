@@ -31,7 +31,7 @@ const EditPriceModal: React.FC<CommonModalProps & {
   current, onClose, path, open, tenant, reload,
 }) => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   const { message } = App.useApp();
 
@@ -100,7 +100,7 @@ interface Props {
 
 export const EditableJobBillingTable: React.FC<Props> = ({ data, loading, tenant, reload }) => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
 
   const clusterTotalQosCounts = data && data.length ?

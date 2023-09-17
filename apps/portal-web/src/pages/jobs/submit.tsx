@@ -66,7 +66,7 @@ export const SubmitJobPage: NextPage<Props> = requireAuth(() => true)(
       [cluster, jobTemplateId]),
     });
 
-    const { t } = useI18nTranslateToString();
+    const t = useI18nTranslateToString();
 
     return (
       <div>

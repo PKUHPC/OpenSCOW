@@ -27,7 +27,7 @@ export const HistoryJobsPage: NextPage = requireAuth(
   checkQueryAccountNameIsAdmin,
 )(
   () => {
-    const { t } = useI18nTranslateToString();
+    const t = useI18nTranslateToString();
     const accountName = useAccountPagesAccountName();
 
     const title = t(p("title"), [accountName]);

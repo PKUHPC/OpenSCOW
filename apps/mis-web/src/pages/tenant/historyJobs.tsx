@@ -21,7 +21,7 @@ import { Head } from "src/utils/head";
 export const AdminJobsPage: NextPage = requireAuth((u) => u.tenantRoles.includes(TenantRole.TENANT_ADMIN))(
   () => {
 
-    const { t } = useI18nTranslateToString();
+    const t = useI18nTranslateToString();
 
     return (
       <div>

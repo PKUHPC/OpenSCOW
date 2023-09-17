@@ -23,7 +23,7 @@ export const PlatformAccountsChargesPage: NextPage = requireAuth(
       u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))(
   () => {
 
-    const { t } = useI18nTranslateToString();
+    const t = useI18nTranslateToString();
 
     const title = t("page.admin.finance.accountChargeRecords.title");
 

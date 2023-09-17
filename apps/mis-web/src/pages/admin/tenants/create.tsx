@@ -31,8 +31,8 @@ const CreateTenantPageForm: React.FC = () => {
   const { message, modal } = App.useApp();
 
   const [loading, setLoading] = useState(false);
-  const { t } = useI18nTranslateToString();
-  const { tArgs } = useI18nTranslate();
+  const t = useI18nTranslateToString();
+  const tArgs = useI18nTranslate();
 
   const onOk = async () => {
     const { tenantName, userId, userName, userEmail, userPassword } = await form.validateFields();
@@ -138,7 +138,7 @@ const CreateTenantPageForm: React.FC = () => {
 
 export const CreateTenantPage: NextPage = requireAuth((i) => i.tenantRoles.includes(PlatformRole.PLATFORM_ADMIN))(
   () => {
-    const { t } = useI18nTranslateToString();
+    const t = useI18nTranslateToString();
 
     return (
       <div>

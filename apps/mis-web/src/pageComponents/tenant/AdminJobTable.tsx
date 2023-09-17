@@ -63,7 +63,7 @@ const filterFormToQuery = (query: FilterForm, rangeSearch: boolean): GetJobFilte
 
 export const AdminJobTable: React.FC<Props> = () => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
 
   const rangeSearch = useRef(true);
@@ -170,7 +170,7 @@ const ChangePriceButton: React.FC<{
   reload: () => void;
 }> = ({ filter, count, target, reload }) => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   const [open, setOpen] = useState(false);
 
@@ -211,7 +211,7 @@ const JobInfoTable: React.FC<JobInfoTableProps> = ({
   rangeSearch,
 }) => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
 
   const [previewItem, setPreviewItem] = useState<JobInfo | undefined>(undefined);

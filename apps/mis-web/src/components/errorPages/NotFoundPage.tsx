@@ -18,7 +18,7 @@ const p = prefix("component.errorPages.");
 
 export const NotFoundPage = () => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   return (
     <>

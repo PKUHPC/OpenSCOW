@@ -25,7 +25,7 @@ const p = prefix("component.others.");
 
 export const ClusterSelector: React.FC<Props> = ({ value, onChange }) => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
 
   return (
@@ -53,7 +53,7 @@ interface SingleSelectionProps {
 
 export const SingleClusterSelector: React.FC<SingleSelectionProps> = ({ value, onChange, label }) => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   const languageId = useI18n().currentLanguage.id;
   return (

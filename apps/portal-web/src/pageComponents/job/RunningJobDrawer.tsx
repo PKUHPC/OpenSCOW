@@ -29,7 +29,7 @@ export const RunningJobDrawer: React.FC<Props> = ({
   item, onClose, open,
 }) => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   const drawerItems = [
     [t(p("cluster")), "cluster", (v: Cluster) => v.name],

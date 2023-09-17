@@ -32,7 +32,7 @@ export const TenantRoleSelector: React.FC<Props> = ({ roles, userId, reload, cur
 
   const [loading, setLoading] = useState(false);
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   const TenantRoleI18nTexts = {
     [TenantRole.TENANT_FINANCE]: t("userRoles.tenantFinance"),

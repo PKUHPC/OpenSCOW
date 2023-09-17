@@ -25,8 +25,8 @@ interface Props {
 export const ForbiddenPage: React.FC<Props> = ({
 }) => {
 
-  const { tArgs } = useI18nTranslate();
-  const { t } = useI18nTranslateToString();
+  const tArgs = useI18nTranslate();
+  const t = useI18nTranslateToString();
 
   const titleText = tArgs("component.errorPages.notAllowedPage");
   const subTitleText = tArgs("component.errorPages.systemNotAllowed");

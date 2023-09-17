@@ -28,7 +28,7 @@ const pCommon = prefix("common.");
 
 export const CreateUserForm: React.FC = () => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   const form = Form.useFormInstance<CreateUserFormFields>();
 

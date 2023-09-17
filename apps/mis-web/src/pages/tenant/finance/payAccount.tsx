@@ -24,7 +24,7 @@ const p = prefix("page.tenant.finance.payAccount.");
 export const FinancePayPage: NextPage = requireAuth((i) => i.tenantRoles.includes(TenantRole.TENANT_FINANCE) ||
   i.tenantRoles.includes(TenantRole.TENANT_ADMIN))(
   () => {
-    const { t } = useI18nTranslateToString();
+    const t = useI18nTranslateToString();
 
     return (
       <div>

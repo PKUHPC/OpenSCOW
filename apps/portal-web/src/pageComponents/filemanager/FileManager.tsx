@@ -87,7 +87,7 @@ const p = prefix("pageComp.fileManagerComp.fileManager.");
 export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
 
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   const operationTexts = {
     copy: t(p("moveCopy.copy")),

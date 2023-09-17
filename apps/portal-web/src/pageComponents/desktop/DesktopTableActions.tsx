@@ -31,7 +31,7 @@ export const DesktopTableActions: React.FC<Props> = ({ cluster, reload, record }
   // Is the popconfirm visible
   const [isPopconfirmVisible, setIsPopconfirmVisible] = useState(false);
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   return (
     <div>

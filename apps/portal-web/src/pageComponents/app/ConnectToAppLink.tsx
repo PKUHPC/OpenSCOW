@@ -36,7 +36,7 @@ export const ConnectTopAppLink: React.FC<Props> = ({
 
   const { message } = App.useApp();
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   const checkConnectivityPromiseFn = useCallback(async () => {
     if (!session.host || !session.port) { return false; }

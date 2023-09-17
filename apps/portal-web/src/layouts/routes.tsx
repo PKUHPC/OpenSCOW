@@ -38,7 +38,7 @@ export const userRoutes: (
 ) => NavItemProps[] = (user, defaultCluster, loginNodes, setDefaultCluster) => {
 
   if (!user) { return []; }
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   const languageId = useI18n().currentLanguage.id;
 

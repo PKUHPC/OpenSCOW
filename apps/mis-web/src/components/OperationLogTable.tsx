@@ -53,8 +53,8 @@ const pCommon = prefix("common.");
 
 export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountName, tenantName }) => {
 
-  const { t } = useI18nTranslateToString();
-  const { tArgs } = useI18nTranslate();
+  const t = useI18nTranslateToString();
+  const tArgs = useI18nTranslate();
   const languageId = useI18n().currentLanguage.id;
 
   const OperationResultTexts = getOperationResultTexts(t);

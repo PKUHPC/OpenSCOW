@@ -39,7 +39,7 @@ export const AccountInfoPage: NextPage<Props> = requireAuth(
   checkQueryAccountNameIsAdmin,
 )((props: Props) => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   if ("error" in props) {
     return <UnifiedErrorPage code={props.error} />;

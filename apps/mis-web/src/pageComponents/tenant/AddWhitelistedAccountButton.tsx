@@ -34,7 +34,7 @@ const NewAccountModal: React.FC<ModalProps> = ({
   open, close, refresh,
 }) => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   const { message } = App.useApp();
   const [loading, setLoading] = useState(false);
@@ -86,7 +86,7 @@ export const AddWhitelistedAccountButton: React.FC<Props> = ({ refresh }) => {
 
   const [modalShow, setModalShow] = useState(false);
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   return (
     <>

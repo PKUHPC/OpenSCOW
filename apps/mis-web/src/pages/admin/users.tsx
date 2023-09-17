@@ -24,7 +24,7 @@ import { Head } from "src/utils/head";
 export const ShowUsersPage: NextPage =
   requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))(({ userStore: { user } }) => {
 
-    const { t } = useI18nTranslateToString();
+    const t = useI18nTranslateToString();
     const languageId = useI18n().currentLanguage.id;
     const [refreshToken, update] = useRefreshToken();
 

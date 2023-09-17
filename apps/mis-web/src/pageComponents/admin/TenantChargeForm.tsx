@@ -34,7 +34,7 @@ const getTypes = async () => api.getUsedPayTypes({});
 
 const UsedType: React.FC<{ onClick: (type: string) => void }> = ({ onClick }) => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   const { isLoading, data } = useAsync({ promiseFn: getTypes });
 
@@ -61,7 +61,7 @@ const UsedType: React.FC<{ onClick: (type: string) => void }> = ({ onClick }) =>
 
 export const TenantChargeForm: React.FC = () => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   const { message } = App.useApp();
   const [form] = Form.useForm<ChargeFields>();

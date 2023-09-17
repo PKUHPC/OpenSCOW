@@ -25,7 +25,7 @@ const p = prefix("pageComp.init.initImportUsersTable.");
 
 export const InitImportUsersTable: React.FC = () => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   return (
     <div>

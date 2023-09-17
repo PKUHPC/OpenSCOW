@@ -43,7 +43,7 @@ export const AccountWhitelistTable: React.FC<Props> = ({
   data, isLoading, reload,
 }) => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   const { message, modal } = App.useApp();
 

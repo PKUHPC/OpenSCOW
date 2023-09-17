@@ -39,9 +39,7 @@ export function useI18nTranslate() {
     return i18n.translate(id, args);
   };
 
-  return {
-    tArgs,
-  };
+  return tArgs;
 }
 
 export function useI18nTranslateToString() {
@@ -51,9 +49,7 @@ export function useI18nTranslateToString() {
     return i18n.translateToString(id, args);
   };
 
-  return {
-    t,
-  };
+  return t;
 }
 
 export type TransType = (id: Lang<typeof en>, args?: React.ReactNode[]) => string;

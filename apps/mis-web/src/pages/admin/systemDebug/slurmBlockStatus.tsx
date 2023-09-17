@@ -29,7 +29,7 @@ const p = prefix("page.admin.systemDebug.slurmBlockStatus.");
 export const SlurmBlockStatusPage: NextPage = requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))(
   () => {
 
-    const { t } = useI18nTranslateToString();
+    const t = useI18nTranslateToString();
 
     const isLoading = false;
     const reload = () => {};

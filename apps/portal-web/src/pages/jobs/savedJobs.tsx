@@ -20,7 +20,7 @@ import { Head } from "src/utils/head";
 export const SavedJobsPage: NextPage = requireAuth(() => true)(
   () => {
 
-    const { t } = useI18nTranslateToString();
+    const t = useI18nTranslateToString();
 
     return (
       <div>

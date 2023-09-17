@@ -33,7 +33,7 @@ export const PlatformInfoPage: NextPage<Props> =
 requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
 ((props: Props) => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   if ("error" in props) {
     return <UnifiedErrorPage code={props.error} />;

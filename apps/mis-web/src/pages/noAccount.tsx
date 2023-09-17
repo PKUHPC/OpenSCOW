@@ -16,7 +16,7 @@ import { useI18nTranslateToString } from "src/i18n";
 
 export const NoAccountPage: NextPage = () => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   return (
     <Result

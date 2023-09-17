@@ -81,7 +81,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
   const [form] = Form.useForm<JobForm>();
   const [loading, setLoading] = useState(false);
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   const submit = async () => {
     const { cluster, command, jobName, coreCount, gpuCount, workingDirectory, output, errorOutput, save,

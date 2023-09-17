@@ -22,7 +22,7 @@ const p = prefix("page.admin.importUsers.");
 
 export const ImportUsersPage: NextPage = requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))(
   () => {
-    const { t } = useI18nTranslateToString();
+    const t = useI18nTranslateToString();
     return (
       <div>
         <Head title={t(p("importUserInfo"))} />

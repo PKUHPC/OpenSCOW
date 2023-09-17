@@ -31,7 +31,7 @@ export const BaseLayout = ({ footerText, versionTag, children }: PropsWithChildr
 
   const userStore = useStore(UserStore);
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
 
   const routes = useMemo(() => getAvailableRoutes(userStore.user, t), [userStore.user, t]);

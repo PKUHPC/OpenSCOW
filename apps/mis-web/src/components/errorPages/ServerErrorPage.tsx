@@ -19,7 +19,7 @@ const p = prefix("component.errorPages.");
 
 export const ServerErrorPage: React.FC = () => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   return (
     <>

@@ -32,7 +32,7 @@ const p = prefix("component.others.");
 
 const ChangePasswordModal: React.FC<Props> = ({ name, userId, onClose, onComplete, open }) => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   const [form] = Form.useForm<FormProps>();
   const [loading, setLoading] = useState(false);

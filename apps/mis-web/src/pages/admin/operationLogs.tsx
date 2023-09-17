@@ -25,7 +25,7 @@ export const OperationLogPage: NextPage = requireAuth(
   (u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN),
 )(
   ({ userStore }) => {
-    const { t } = useI18nTranslateToString();
+    const t = useI18nTranslateToString();
     const title = t(p("platformOperationLog"));
     return (
       <div>

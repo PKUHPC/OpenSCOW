@@ -31,7 +31,7 @@ const pCommon = prefix("common.");
 
 export const HistoryJobDrawer: React.FC<Props> = (props) => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   const drawerItems = [
     [t(pCommon("workId")), "biJobIndex"],

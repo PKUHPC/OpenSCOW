@@ -43,7 +43,7 @@ const pCommon = prefix("common.");
 
 export const ChangeJobTimeLimitModal: React.FC<Props> = ({ open, onClose, data, reload }) => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   const languageId = useI18n().currentLanguage.id;
 

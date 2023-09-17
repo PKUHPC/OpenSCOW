@@ -40,7 +40,7 @@ const NewUserModal: React.FC<ModalProps> = ({
   open, close, onAddUser: onAddingUser,
 }) => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm<FormProps>();
@@ -86,7 +86,7 @@ interface Props {
 
 export const AddUserButton: React.FC<Props> = ({ refresh, accountName, token }) => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   const { message } = App.useApp();
 

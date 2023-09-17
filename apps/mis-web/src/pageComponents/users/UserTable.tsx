@@ -40,7 +40,7 @@ export const UserTable: React.FC<Props> = ({
   data, isLoading, reload, accountName, canSetAdmin,
 }) => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   const statusTexts = {
     [UserStatus.BLOCKED]: <Tag color="error">{t(p("block"))}</Tag>,

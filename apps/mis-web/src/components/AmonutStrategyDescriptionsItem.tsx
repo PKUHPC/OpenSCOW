@@ -38,7 +38,7 @@ export const AmountStrategyDescriptionsItem: React.FC<Props> = ({
   amount, isColTitle, isColContent,
 }) => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
   const AmountStrategyDescriptions = getAmountStrategyDescriptions(t);
   const AmountStrategyAlgorithmDescriptions = getAmountStrategyAlgorithmDescriptions(t);
   const AmountStrategyText = getAmountStrategyText(t);

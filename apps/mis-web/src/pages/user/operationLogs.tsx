@@ -23,7 +23,7 @@ const p = prefix("page.user.operationLogs.");
 export const OperationLogPage: NextPage = requireAuth(() => true)(
   ({ userStore }) => {
 
-    const { t } = useI18nTranslateToString();
+    const t = useI18nTranslateToString();
     return (
       <div>
         <Head title={t("common.operationLog")} />

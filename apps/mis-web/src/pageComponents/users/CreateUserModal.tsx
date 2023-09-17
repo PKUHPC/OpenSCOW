@@ -37,7 +37,7 @@ export const CreateUserModal: React.FC<Props> = ({
   onCreated, onClose, open, newUserInfo, accountName,
 }) => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   const [form] = Form.useForm<CreateUserFormFields>();
   const [loading, setLoading] = useState(false);

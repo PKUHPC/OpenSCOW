@@ -18,7 +18,7 @@ import { userRoutes } from "src/layouts/routes";
 
 export const IndexPage: NextPage = requireAuth(() => true)(({ userStore }) => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   return (
     <Redirect url={userRoutes(userStore.user.accountAffiliations, t)[2].children![0].path} />

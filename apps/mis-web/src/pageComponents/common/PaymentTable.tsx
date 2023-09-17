@@ -69,7 +69,7 @@ export const PaymentTable: React.FC<Props> = ({
   showTenantName, showAuditInfo,
 }) => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
 
   const [form] = Form.useForm<FilterForm>();

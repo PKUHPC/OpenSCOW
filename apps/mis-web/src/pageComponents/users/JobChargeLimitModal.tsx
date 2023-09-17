@@ -47,7 +47,7 @@ export const JobChargeLimitModal: React.FC<Props> = ({
   accountName, onClose, reload, userId, open, username, currentLimit, currentUsed, status,
 }) => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   const [form] = Form.useForm<FormFields>();
   const [confirmForm] = Form.useForm<FormFieldsConfirm>();

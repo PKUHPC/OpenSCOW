@@ -57,7 +57,7 @@ const ChangePasswordModalButton = ModalButton(ChangePasswordModal, { type: "link
 
 export const ProfilePage: NextPage = requireAuth(() => true)(({ userStore: { user } }) => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   return (
     <Container>

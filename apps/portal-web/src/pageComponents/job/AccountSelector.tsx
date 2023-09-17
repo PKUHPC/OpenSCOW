@@ -48,7 +48,7 @@ export const AccountSelector: React.FC<Props> = ({ cluster, onChange, value }) =
     }
   }, [data, value]);
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
   const p = prefix("pageComp.job.accountSelector.");
 
   return (

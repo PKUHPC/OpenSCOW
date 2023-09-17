@@ -33,7 +33,7 @@ export const AccountUsersPage: NextPage = requireAuth(
   (i) => i.tenantRoles.includes(TenantRole.TENANT_ADMIN),
 )(
   ({ userStore }) => {
-    const { t } = useI18nTranslateToString();
+    const t = useI18nTranslateToString();
     const languageId = useI18n().currentLanguage.id;
 
     const { message } = App.useApp();

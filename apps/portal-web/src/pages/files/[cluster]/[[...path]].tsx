@@ -30,7 +30,7 @@ export const FileManagerPage: NextPage = requireAuth(() => true)(() => {
 
   const cluster = queryToString(router.query.cluster);
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   const clusterObj = publicConfig.CLUSTERS.find((x) => x.id === cluster);
 

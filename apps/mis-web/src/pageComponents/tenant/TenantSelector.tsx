@@ -41,7 +41,7 @@ export const TenantSelector: React.FC<Props> = ({
   onChange, value, placeholder, disabled, autoSelect, onTenantsFetched,
 }) => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   const userStore = useStore(UserStore);
 

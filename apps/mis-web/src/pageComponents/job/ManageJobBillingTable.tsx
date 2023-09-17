@@ -62,7 +62,7 @@ const pCommon = prefix("common.");
 
 export const ManageJobBillingTable: React.FC<Props> = ({ data, loading, tenant, reload }) => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   const AmountStrategyText = getAmountStrategyText(t);
   const languageId = useI18n().currentLanguage.id;
@@ -75,7 +75,7 @@ export const ManageJobBillingTable: React.FC<Props> = ({ data, loading, tenant, 
       rowKey={(record) => [record.cluster, record.partition, record.qos].join(".")}
       expandable={{ expandedRowRender: (record) => {
 
-        const { t } = useI18nTranslateToString();
+        const t = useI18nTranslateToString();
 
         return (
           <Table
@@ -193,7 +193,7 @@ const EditPriceModal: React.FC<CommonModalProps & {
   onClose, nextId, cluster, partition, qos, open, tenant, reload,
 }) => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
   const AmountStrategyDescriptions = getAmountStrategyDescriptions(t);
   const AmountStrategyAlgorithmDescriptions = getAmountStrategyAlgorithmDescriptions(t);
   const AmountStrategyText = getAmountStrategyText(t);

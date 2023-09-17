@@ -27,7 +27,7 @@ const p = prefix("page.tenant.users.list.");
 export const AdminUsersPage: NextPage = requireAuth((u) => u.tenantRoles.includes(TenantRole.TENANT_ADMIN))(
   ({ userStore: { user } }) => {
 
-    const { t } = useI18nTranslateToString();
+    const t = useI18nTranslateToString();
     const languageId = useI18n().currentLanguage.id;
 
     const promiseFn = useCallback(async () => {

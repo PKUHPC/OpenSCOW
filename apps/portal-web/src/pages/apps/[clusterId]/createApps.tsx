@@ -30,8 +30,8 @@ export const CreatAppsIndexPage: NextPage = requireAuth(() => true)(() => {
   const clusterId = queryToString(router.query.clusterId);
   const cluster = publicConfig.CLUSTERS.find((x) => x.id === clusterId);
 
-  const { tArgs } = useI18nTranslate();
-  const { t } = useI18nTranslateToString();
+  const tArgs = useI18nTranslate();
+  const t = useI18nTranslateToString();
 
   if (!cluster) {
     return (

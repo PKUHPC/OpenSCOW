@@ -35,7 +35,7 @@ const p = prefix("pageComp.dashboard.storageSection.");
 
 export const StorageSection: React.FC<Props> = ({ storageQuotas }) => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   return (
     <Section title={t(p("storageStatus"))}>

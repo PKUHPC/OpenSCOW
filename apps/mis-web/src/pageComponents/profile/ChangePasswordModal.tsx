@@ -33,7 +33,7 @@ export const ChangePasswordModal: React.FC<Props> = ({
   onClose,
 }) => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   const [form] = Form.useForm<FormInfo>();
   const { message } = App.useApp();

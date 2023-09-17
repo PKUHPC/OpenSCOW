@@ -55,7 +55,7 @@ const TenantInfoTable: React.FC<TenantInfoTableProps> = ({
   data, isLoading,
 }) => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   const columns: ColumnsType<PlatformTenantsInfo> = [
     {

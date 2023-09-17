@@ -17,7 +17,7 @@ import { Head } from "src/utils/head";
 
 export const ServerErrorPage: React.FC = () => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   return (
     <>

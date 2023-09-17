@@ -60,7 +60,7 @@ export const FileTable: React.FC<Props> = (
   },
 ) => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   const columns: ColumnsType<FileInfo> = [
     {

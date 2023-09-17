@@ -53,7 +53,7 @@ const StorageForm: React.FC = () => {
 
   const defaultClusterStore = useStore(DefaultClusterStore);
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   const { message } = App.useApp();
 
@@ -147,7 +147,7 @@ const StorageForm: React.FC = () => {
 
 export const AdminStoragePage: NextPage = requireAuth((i) => i.tenantRoles.includes(TenantRole.TENANT_ADMIN))(
   () => {
-    const { t } = useI18nTranslateToString();
+    const t = useI18nTranslateToString();
 
     return (
       <div>

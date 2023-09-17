@@ -31,7 +31,7 @@ export const DesktopIndexPage: NextPage<Props> = requireAuth(() => true)
     return <NotFoundPage />;
   }
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   return (
     <div>

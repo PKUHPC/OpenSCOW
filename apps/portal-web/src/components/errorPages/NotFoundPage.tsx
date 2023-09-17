@@ -16,7 +16,7 @@ import { Head } from "src/utils/head";
 
 export const NotFoundPage = () => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   return (
     <>

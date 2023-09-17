@@ -71,7 +71,7 @@ export const RunningJobQueryTable: React.FC<Props> = ({
     return filtered.map((x) => RunningJobInfo.fromGrpc(x, query.cluster));
   }, [data, query.jobId]);
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   return (
     <div>
@@ -126,7 +126,7 @@ export const RunningJobInfoTable: React.FC<JobInfoTableProps> = ({
 }) => {
 
   const { message } = App.useApp();
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   const languageId = useI18n().currentLanguage.id;
 

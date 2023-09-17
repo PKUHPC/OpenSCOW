@@ -33,7 +33,7 @@ export const UsersPage: NextPage = requireAuth(
   ({ userStore }) => {
 
     const accountName = useAccountPagesAccountName();
-    const { t } = useI18nTranslateToString();
+    const t = useI18nTranslateToString();
     const languageId = useI18n().currentLanguage.id;
 
     const account = userStore.user.accountAffiliations.find((x) => x.accountName === accountName)!;

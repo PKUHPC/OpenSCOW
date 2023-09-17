@@ -38,7 +38,7 @@ const p = prefix("page.tenant.info.");
 export const TenantInfoPage: NextPage<Props> = requireAuth((u) => u.tenantRoles.includes(TenantRole.TENANT_ADMIN))
 ((props: Props) => {
 
-  const { t } = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   if ("error" in props) {
     return <UnifiedErrorPage code={props.error} />;
