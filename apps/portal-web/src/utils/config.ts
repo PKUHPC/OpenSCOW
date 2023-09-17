@@ -115,6 +115,10 @@ export const getLoginDesktopEnabled = (cluster: string): boolean => {
 
 export type LoginNode = { name: string, address: string }
 
+export const getClusterName = (clusterId: string, languageId: string) => {
+  return getI18nConfigCurrentText(publicConfig.CLUSTERS.find((cluster) => cluster.id === clusterId)?.name, languageId)
+   || clusterId;
+};
 
 type ServerI18nConfigKeys = keyof typeof runtimeConfig.SERVER_I18N_CONFIG_TEXTS;
 type RuntimeI18nConfigKeys = keyof typeof publicConfig.RUNTIME_I18N_CONFIG_TEXTS;

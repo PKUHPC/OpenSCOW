@@ -103,7 +103,6 @@ export const getClusterName = (clusterId: string, languageId: string) => {
   return getI18nConfigCurrentText(publicConfig.CLUSTERS[clusterId]?.name, languageId) || clusterId;
 };
 
-
 type ServerI18nConfigKeys = keyof typeof runtimeConfig.SERVER_I18N_CONFIG_TEXTS;
 // 获取ServerConfig中相关字符串配置的对应语言的字符串
 export const getSeverI18nConfigText = <TKey extends ServerI18nConfigKeys>

@@ -804,7 +804,7 @@ export default {
       },
       jobBilling: {
         jobBillingPriceTable: "Job Billing Price Table",
-        managementObject: "管理对象",
+        managementObject: "Management Object",
       },
       importUsers: {
         importUserInfo: "Import User Information",
