@@ -40,6 +40,7 @@ export default {
     submit: "Submit",
     time: "Time",
     type: "Type",
+    selectType: "Please Select a Type",
     total: "Total",
     sum: "Sum",
     ok: "Confirm",
@@ -91,6 +92,7 @@ export default {
     block: "Blocked",
     accountBalance: "Account Balance",
     normal: "Normal",
+    view: "View",
   },
   dashboard: {
     title: "Dashboard",
@@ -210,6 +212,17 @@ export default {
         block: "Blocked",
         normal: "Normal",
         unit: "CNY",
+        unblockConfirmTitle: "Confirm Unblock of User?",
+        unblockConfirmContent: "Do you wish to unblock account {} within tenant {}?",
+        unblockSuccess: "Account unblocking successful!",
+        unblockFail: "Account unblocking failed!",
+        unblockError: "Account ${r.accountName} has insufficient balance. "
+        + "You can add it to the whitelist or unblock by adding funds.",
+        unblock: "Unblock",
+        blockConfirmTitle: "Confirm Account Block?",
+        blockConfirmContent: "Do you wish to block account {} within tenant {}?",
+        blockSuccess: "Account blocking successful!",
+        blockFail: "Account blocking failed!",
       },
     },
     admin: {
@@ -662,6 +675,7 @@ export default {
   page: {
     noAccount: {
       resultTitle: "No Manageable Accounts",
+      extraMessage: "Please visit http://hpc.pku.edu.cn/guide.html for account opening instructions.",
     },
     _app: {
       clusterOpErrorTitle: "Operation Failed",
@@ -743,6 +757,9 @@ export default {
         accountPayments: {
           title: "Account Payment Records",
         },
+        accountChargeRecords: {
+          title: "Account Consumption Records",
+        },
       },
       accounts: {
         whitelist: {
@@ -787,6 +804,7 @@ export default {
       },
       jobBilling: {
         jobBillingPriceTable: "Job Billing Price Table",
+        managementObject: "管理对象",
       },
       importUsers: {
         importUserInfo: "Import User Information",
@@ -868,6 +886,9 @@ export default {
         },
         payments: {
           chargeRecord: "Charge Record",
+        },
+        accountChargeRecords: {
+          title: "Account Consumption Records",
         },
       },
     },
@@ -1006,5 +1027,23 @@ export default {
       tenantPay: "Recharge tenant {} by {} yuan",
       setPlatformBilling: "Set platform billing item {} price to {} yuan",
     },
+  },
+  userRoles: {
+    platformAdmin: "Platform Administrator",
+    platformFinance: "Platform Financial Personnel",
+    tenantAdmin: "Tenant Administrator",
+    tenantFinance: "Financial Personnel",
+  },
+  AmountStrategy: {
+    text: "Measurement Method",
+    description: "Method to determine the job usage",
+    descriptionMaxCpusMem: "Allocation of CPU and Memory",
+    descriptionMaxGpuCpus: "Allocation of GPU and CPU",
+    descriptionGpu: "GPU Allocation",
+    descriptionCpus: "CPU Allocation",
+    algorithmMaxCpusMem: "max(cpusAlloc, ceil(memReq / (partitionMemory/partitionCores)))",
+    algorithmMaxGpuCpus: "max(gpu, ceil(cpusAlloc / (partitionCores/partitionGPUs)))",
+    algorithmGpu: "gpu",
+    algorithmCpus: "cpusAlloc",
   },
 };

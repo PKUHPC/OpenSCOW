@@ -48,6 +48,7 @@ export const AdminJobBillingTablePage: NextPage =
 
 export const AdminJobBillingTable: React.FC<{ tenant?: string }> = ({ tenant }) => {
 
+  const { t } = useI18nTranslateToString();
   const { data, isLoading, reload } = useAsync({ promiseFn: useCallback(async () => {
     return await api.getBillingItems({ query: { tenant, activeOnly: false } });
   }, [tenant]) });
@@ -56,7 +57,7 @@ export const AdminJobBillingTable: React.FC<{ tenant?: string }> = ({ tenant }) 
     <div>
       <FilterFormContainer>
         <Form layout="inline">
-          <Form.Item label="管理对象">
+          <Form.Item label={t(p("managementObject"))}>
             <PlatformOrTenantRadio
               value={tenant || null}
               onChange={(tenant) => Router.push({
@@ -65,7 +66,7 @@ export const AdminJobBillingTable: React.FC<{ tenant?: string }> = ({ tenant }) 
           </Form.Item>
           <Form.Item>
             <Space>
-              <Button loading={isLoading} onClick={reload}>刷新</Button>
+              <Button loading={isLoading} onClick={reload}>{t("common.fresh")}</Button>
             </Space>
           </Form.Item>
         </Form>

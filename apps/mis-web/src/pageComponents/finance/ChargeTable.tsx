@@ -97,12 +97,12 @@ export const ChargeTable: React.FC<Props> = ({
         >
           {
             showAccountName && (
-              <Form.Item label="账户" name="name">
+              <Form.Item label={t("common.account")} name="name">
                 <AccountSelector
                   onChange={(value) => {
                     setQuery({ ...query, name: value });
                   }}
-                  placeholder="请选择账户"
+                  placeholder={t("common.selectAccount")}
                   fromAllTenants={showTenantName ? true : false}
                 />
               </Form.Item>
@@ -111,14 +111,14 @@ export const ChargeTable: React.FC<Props> = ({
           <Form.Item label={t(pCommon("time"))} name="time">
             <DatePicker.RangePicker allowClear={false} presets={getDefaultPresets(languageId)} />
           </Form.Item>
-          <Form.Item label="类型" name="type">
+          <Form.Item label={t("common.type")} name="type">
             <Select
               style={{ minWidth: "100px" }}
               allowClear
               onChange={(value) => {
                 setQuery({ ...query, type: value });
               }}
-              placeholder="请选择类型"
+              placeholder={t("common.selectType")}
             >
               {(filteredTypes).map((x) => (
                 <Select.Option key={x} value={x}>
@@ -127,7 +127,7 @@ export const ChargeTable: React.FC<Props> = ({
               ))}
             </Select>
           </Form.Item>
-          <Form.Item label="总数">
+          <Form.Item label={t("common.total")}>
             <strong>
               {data ? data.results.length : 0}
             </strong>
@@ -155,7 +155,7 @@ export const ChargeTable: React.FC<Props> = ({
         }
         {
           showTenantName && (
-            <Table.Column dataIndex="tenantName" title="租户" />
+            <Table.Column dataIndex="tenantName" title={t("common.tenant")} />
           )
         }
         <Table.Column dataIndex="time" title={t(p("time"))} render={(v) => formatDateTime(v)} />

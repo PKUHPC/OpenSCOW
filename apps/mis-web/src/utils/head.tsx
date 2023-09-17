@@ -11,7 +11,6 @@
  */
 
 import NextHead from "next/head";
-import React, { ReactNode } from "react";
 
 type Props = React.PropsWithChildren<{
   title: string;

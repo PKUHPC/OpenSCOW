@@ -47,6 +47,7 @@ export default {
     detailButton: "详情",
     submitButton: "提交",
     closeButton: "关闭",
+    startButton: "启动",
   },
   // pageComp
   pageComp: {

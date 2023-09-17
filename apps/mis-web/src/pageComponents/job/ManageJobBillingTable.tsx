@@ -19,9 +19,9 @@ import { api } from "src/apis";
 import { AmountStrategyDescriptionsItem } from "src/components/AmonutStrategyDescriptionsItem";
 import { CommonModalProps, ModalLink } from "src/components/ModalLink";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
-import { AmountStrategy, AmountStrategyAlgorithmDescriptions,
-  AmountStrategyDescription,
-  AmountStrategyDescriptions, AmountStrategyText } from "src/models/job";
+import { AmountStrategy, getAmountStrategyAlgorithmDescriptions,
+  getAmountStrategyDescription,
+  getAmountStrategyDescriptions, getAmountStrategyText } from "src/models/job";
 import { getClusterName, publicConfig } from "src/utils/config";
 import { moneyToString } from "src/utils/money";
 
@@ -63,6 +63,8 @@ const pCommon = prefix("common.");
 export const ManageJobBillingTable: React.FC<Props> = ({ data, loading, tenant, reload }) => {
 
   const { t } = useI18nTranslateToString();
+
+  const AmountStrategyText = getAmountStrategyText(t);
   const languageId = useI18n().currentLanguage.id;
 
   return (
@@ -192,6 +194,10 @@ const EditPriceModal: React.FC<CommonModalProps & {
 }) => {
 
   const { t } = useI18nTranslateToString();
+  const AmountStrategyDescriptions = getAmountStrategyDescriptions(t);
+  const AmountStrategyAlgorithmDescriptions = getAmountStrategyAlgorithmDescriptions(t);
+  const AmountStrategyText = getAmountStrategyText(t);
+  const AmountStrategyDescription = getAmountStrategyDescription(t);
 
   const { message } = App.useApp();
 

@@ -14,7 +14,7 @@ import { App, Select } from "antd";
 import { useState } from "react";
 import { api } from "src/apis";
 import { prefix, useI18nTranslateToString } from "src/i18n";
-import { PlatformRole, PlatformRoleTexts } from "src/models/User";
+import { PlatformRole } from "src/models/User";
 import { User } from "src/stores/UserStore";
 
 interface Props {
@@ -34,12 +34,17 @@ export const PlatformRoleSelector: React.FC<Props> = ({ roles, userId, reload, c
 
   const [loading, setLoading] = useState(false);
 
+  const PlatformRoleI18nTexts = {
+    [PlatformRole.PLATFORM_FINANCE]: t("userRoles.platformFinance"),
+    [PlatformRole.PLATFORM_ADMIN]: t("userRoles.platformAdmin"),
+  };
+
   return (
     <Select
       disabled={loading}
       value={roles}
       style={{ width: "100%" }}
-      options={Object.values(PlatformRole).map((x) => ({ label: PlatformRoleTexts[x], value: x }))}
+      options={Object.values(PlatformRole).map((x) => ({ label: PlatformRoleI18nTexts[x], value: x }))}
       onSelect={
         async (value) => {
           setLoading(true);

@@ -206,7 +206,7 @@ export const ImportUsersTable: React.FC = () => {
             dataIndex="users"
             title={t(p("userList"))}
             render={(_, r) => (
-              <a onClick={() => setusersList(r.users)}>查看</a>
+              <a onClick={() => setusersList(r.users)}>{t("common.view")}</a>
             )}
           />
         </Table>

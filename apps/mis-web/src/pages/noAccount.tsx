@@ -25,7 +25,7 @@ export const NoAccountPage: NextPage = () => {
       subTitle=""
       extra={(
         <p>
-          请访问 http://hpc.pku.edu.cn/guide.html 查看如何开户。
+          {t("page.noAccount.extraMessage")}
         </p>
       )}
     />

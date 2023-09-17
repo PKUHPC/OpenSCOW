@@ -14,8 +14,8 @@ import { QuestionCircleOutlined } from "@ant-design/icons";
 import { Popover, Space } from "antd";
 import React from "react";
 import { prefix, useI18nTranslateToString } from "src/i18n";
-import { AmountStrategyAlgorithmDescriptions,
-  AmountStrategyDescription, AmountStrategyDescriptions, AmountStrategyText } from "src/models/job";
+import { getAmountStrategyAlgorithmDescriptions,
+  getAmountStrategyDescription, getAmountStrategyDescriptions, getAmountStrategyText } from "src/models/job";
 import { publicConfig } from "src/utils/config";
 
 
@@ -39,6 +39,10 @@ export const AmountStrategyDescriptionsItem: React.FC<Props> = ({
 }) => {
 
   const { t } = useI18nTranslateToString();
+  const AmountStrategyDescriptions = getAmountStrategyDescriptions(t);
+  const AmountStrategyAlgorithmDescriptions = getAmountStrategyAlgorithmDescriptions(t);
+  const AmountStrategyText = getAmountStrategyText(t);
+  const AmountStrategyDescription = getAmountStrategyDescription(t);
 
   if (isColContent && amount) {
     return (

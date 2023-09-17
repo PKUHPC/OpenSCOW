@@ -51,7 +51,7 @@ export const DesktopTableActions: React.FC<Props> = ({ cluster, reload, record }
             openDesktop(cluster.id, resp.host, resp.port, resp.password);
           }}
         >
-          启动
+          {t("button.startButton")}
         </a>
 
         <Popconfirm

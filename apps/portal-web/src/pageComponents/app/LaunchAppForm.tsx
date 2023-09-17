@@ -315,8 +315,8 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
           <Input />
         </Form.Item>
         <Form.Item
-          label="账户"
-          name={t(p("account"))}
+          label={t(p("account"))}
+          name="account"
           rules={[{ required: true }]}
         >
           <AccountSelector cluster={clusterId} />

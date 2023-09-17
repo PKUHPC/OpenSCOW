@@ -30,7 +30,7 @@ export const PortalConfigSchema = Type.Object({
   apps: Type.Boolean({ description: "是否启用交互式任务功能", default: true }),
 
   homeText: Type.Object({
-    defaultText: Type.String({ description: "默认主页文本", default: "Super Computing on Web" }),
+    defaultText: createI18nStringSchema("默认主页文本", "Super Computing on Web"),
     hostnameMap: Type.Record(
       Type.String(), Type.String(),
       { description: "根据域名(hostname，不包括port)不同，显示在主页上的文本", default: {} },

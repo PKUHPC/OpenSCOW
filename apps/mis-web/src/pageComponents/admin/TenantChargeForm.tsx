@@ -117,7 +117,7 @@ export const TenantChargeForm: React.FC = () => {
         />
       </Form.Item>
       <Form.Item name="amount" label={t(pCommon("amount"))} rules={[{ required: true }]}>
-        <InputNumber step={0.01} addonAfter="元" precision={2} />
+        <InputNumber step={0.01} addonAfter={t(pCommon("unit"))} precision={2} />
       </Form.Item>
       <Form.Item
         name="type"

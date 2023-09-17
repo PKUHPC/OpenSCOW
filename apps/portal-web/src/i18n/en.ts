@@ -47,6 +47,7 @@ export default {
     detailButton: "Details",
     submitButton: "Submit",
     closeButton: "Close",
+    startButton: "Start",
   },
   // pageComp
   pageComp: {

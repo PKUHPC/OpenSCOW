@@ -35,6 +35,11 @@ homeTitle:
 homeText:
   # 默认文本
   defaultText: "SCOW"
+  # defaultText:
+  #   i18n:
+  #     default: "<p style='font-size: 16px;'>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;SCOW是由北京大学和北京大学长沙计算与数字经济研究院共同维护的开源项目，提供了面向算力中心的门户和管理系统。项目通过简化集群软件的部署流程、统一平台管理模式、降低用户使用门槛，解决算力网络中计算资源管理难、使用难的问题。用户无需了解和配置SSH、VNC、命令行等，只需要一个浏览器就可以方便的使用集群算力资源。</p>"
+  #     en: "<p style='font-size: 16px;'>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;SCOW is an open-source project jointly maintained by Peking University and the Changsha Institute of Computing and Digital Economics at Peking University. It provides a portal and management system tailored for computing centers. The project aims to simplify the deployment process of cluster software, unify platform management patterns, and reduce user barriers, addressing challenges in managing and utilizing computing resources within the computational network. Users do not need to understand or configure SSH, VNC, command lines, etc.; only a browser is required for convenient access to cluster computing resources.</p>"
+  #     zh_cn: "<p style='font-size: 16px;'>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;SCOW是由北京大学和北京大学长沙计算与数字经济研究院共同维护的开源项目，提供了面向算力中心的门户和管理系统。项目通过简化集群软件的部署流程、统一平台管理模式、降低用户使用门槛，解决算力网络中计算资源管理难、使用难的问题。用户无需了解和配置SSH、VNC、命令行等，只需要一个浏览器就可以方便的使用集群算力资源。</p>"
   # 从不同域名访问，显示的不同的文本
   # hostnameMap:
   #   a.com: "a.com's SCOW"

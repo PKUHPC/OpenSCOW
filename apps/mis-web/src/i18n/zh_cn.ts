@@ -40,6 +40,7 @@ export default {
     submit:"提交",
     time:"时间",
     type:"类型",
+    selectType: "请选择类型",
     total:"总数",
     sum:"合计",
     ok:"确认",
@@ -91,6 +92,7 @@ export default {
     block: "封锁",
     accountBalance: "账户余额",
     normal: "正常",
+    view: "查看",
   },
   dashboard: {
     title: "仪表盘",
@@ -210,6 +212,17 @@ export default {
         block:"封锁",
         normal:"正常",
         unit:" 元",
+        unblockConfirmTitle: "确认解除用户封锁？",
+        unblockConfirmContent: "确认要在租户{}中解除账户{}的封锁？",
+        unblockSuccess: "解封账户成功！",
+        unblockFail: "解封账户失败！",
+        unblockError: "账户${r.accountName}余额不足，您可以将其加入白名单或充值解封",
+
+        unblock: "解除封锁",
+        blockConfirmTitle: "确认封锁账户？",
+        blockConfirmContent: "确认要在租户{}中封锁账户{}",
+        blockSuccess: "封锁帐户成功！",
+        blockFail: "封锁帐户失败！",
       },
     },
     admin:{
@@ -662,6 +675,7 @@ export default {
   page: {
     noAccount: {
       resultTitle: "没有可以管理的账户",
+      extraMessage: "请访问 http://hpc.pku.edu.cn/guide.html 查看如何开户。",
     },
     _app: {
       clusterOpErrorTitle: "操作失败",
@@ -743,6 +757,9 @@ export default {
         accountPayments: {
           title: "账户充值记录",
         },
+        accountChargeRecords: {
+          title: "账户消费记录",
+        },
       },
       accounts: {
         whitelist: {
@@ -787,6 +804,7 @@ export default {
       },
       jobBilling: {
         jobBillingPriceTable: "作业计费价格表",
+        managementObject: "管理对象",
       },
       importUsers: {
         importUserInfo: "导入用户信息",
@@ -868,6 +886,9 @@ export default {
         },
         payments: {
           chargeRecord: "充值记录",
+        },
+        accountChargeRecords: {
+          title: "账户消费记录",
         },
       },
     },
@@ -1006,5 +1027,23 @@ export default {
       tenantPay: "为租户{}充值{}元",
       setPlatformBilling: "设置平台的计费项{}价格为{}元",
     },
+  },
+  userRoles: {
+    platformAdmin: "平台管理员",
+    platformFinance: "平台财务人员",
+    tenantAdmin: "租户管理员",
+    tenantFinance: "财务人员",
+  },
+  AmountStrategy: {
+    text: "计量方式",
+    description: "确定作业的用量的方式",
+    descriptionMaxCpusMem: "CPU和内存分配量",
+    descriptionMaxGpuCpus: "GPU和CPU分配量",
+    descriptionGpu: "GPU分配量",
+    descriptionCpus: "CPU分配量",
+    algorithmMaxCpusMem: "max(cpusAlloc, 向上取整(memReq / (分区内存量/分区核心数)))",
+    algorithmMaxGpuCpus: "max(gpu, 向上取整(cpusAlloc / (分区核心数/分区gpu数)))",
+    algorithmGpu: "gpu",
+    algorithmCpus: "cpusAlloc",
   },
 };

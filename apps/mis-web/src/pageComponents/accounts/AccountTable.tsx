@@ -192,9 +192,9 @@ export const AccountTable: React.FC<Props> = ({
                     <a onClick={() => {
                       if (moneyToNumber(r.balance) > 0) {
                         modal.confirm({
-                          title: "确认解除用户封锁？",
+                          title: t(p("unblockConfirmTitle")),
                           icon: <ExclamationCircleOutlined />,
-                          content: `确认要在租户${r.tenantName}中解除账户${r.accountName}的封锁？`,
+                          content: t(p("unblockConfirmContent"), [r.tenantName, r.accountName]),
                           onOk: async () => {
                             await api.unblockAccount({
                               body: {
@@ -204,28 +204,28 @@ export const AccountTable: React.FC<Props> = ({
                             })
                               .then((res) => {
                                 if (res.executed) {
-                                  message.success("解封账户成功！");
+                                  message.success(t(p("unblockSuccess")));
                                   reload();
                                 } else {
-                                  message.error(res.reason || "解封账户失败！");
+                                  message.error(res.reason || t(p("unblockFail")));
                                 }
                               });
                           },
                         });
                       } else {
-                        message.error(`账户${r.accountName}余额不足，您可以将其加入白名单或充值解封`);
+                        message.error(t(p("unblockError"), [r.accountName]));
                       }
-                      
+
                     }}
                     >
-                      解除封锁
+                      {t(p("unblock"))}
                     </a>
                   ) : (
                     <a onClick={() => {
                       modal.confirm({
-                        title: "确认封锁账户？",
+                        title: t(p("blockConfirmTitle")),
                         icon: <ExclamationCircleOutlined />,
-                        content: `确认要在租户${r.tenantName}中封锁账户${r.accountName}？`,
+                        content: t(p("blockConfirmContent"), [r.tenantName, r.accountName]),
                         onOk: async () => {
                           await api.blockAccount({
                             body: {
@@ -235,17 +235,17 @@ export const AccountTable: React.FC<Props> = ({
                           })
                             .then((res) => {
                               if (res.executed) {
-                                message.success("封锁帐户成功！");
+                                message.success(t(p("blockSuccess")));
                                 reload();
                               } else {
-                                message.error(res.reason || "封锁帐户失败！");
+                                message.error(res.reason || t(p("blockFail")));
                               }
                             });
                         },
                       });
                     }}
                     >
-                      封锁
+                      {t(p("block"))}
                     </a>
                   )
               }
