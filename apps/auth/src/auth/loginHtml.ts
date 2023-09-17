@@ -11,14 +11,14 @@
  */
 
 import { DEFAULT_PRIMARY_COLOR } from "@scow/config/build/ui";
-import { getI18nConfigCurrentText, getLanguageCookie, SYSTEM_VALID_LANGUAGES } from "@scow/lib-server/build/i18n";
+import { getI18nConfigCurrentText, getLanguageCookie } from "@scow/lib-server/build/i18n";
 import { FastifyReply, FastifyRequest } from "fastify";
 import { join } from "path";
 import { createCaptcha } from "src/auth/captcha";
 import { authConfig, OtpStatusOptions, ScowLogoType } from "src/config/auth";
 import { config, FAVICON_URL, LOGO_URL } from "src/config/env";
 import { uiConfig } from "src/config/ui";
-import { cnTexts, enTexts, LoginTextsType } from "src/utils/loginI18nTexts";
+import { languages, LoginTextsType } from "src/i18n";
 
 
 export async function serveLoginHtml(
@@ -40,17 +40,7 @@ export async function serveLoginHtml(
 
   // 获取当前语言ID
   const languageId = getLanguageCookie(req.raw);
-
-  let loginTexts: LoginTextsType;
-  switch (languageId) {
-  case SYSTEM_VALID_LANGUAGES.ZH_CN:
-  default:
-    loginTexts = cnTexts;
-    break;
-  case SYSTEM_VALID_LANGUAGES.EN:
-    loginTexts = enTexts;
-    break;
-  }
+  const loginTexts: LoginTextsType = languages[languageId];
 
   // 获取sloganI18nText
   const sloganTitle = getI18nConfigCurrentText(authConfig.ui?.slogan.title, languageId);

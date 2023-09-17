@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-export const cnTexts: LoginTextsType = {
+export default {
   login: "登录",
   accountPasswordLogin: "账号密码登录",
   username: "用户名",
@@ -23,32 +23,3 @@ export const cnTexts: LoginTextsType = {
   invalidOtp: "OTP验证码无效，请重新输入。",
   bindOtp: "绑定otp",
 };
-
-export const enTexts: LoginTextsType = {
-  login: "Log In",
-  accountPasswordLogin: "Account Password Login",
-  username: "Username",
-  password: "Password",
-  otpVCode: "OTP Verification Code",
-  inputVCode: "Please enter the verification code",
-  refreshError: "Refresh failed, please click to retry.",
-  invalidVCode: "Invalid verification code, please re-enter.",
-  invalidInput: "Invalid username / password, please check.",
-  invalidOtp: "Invalid OTP Verification Code, please re-enter.",
-  bindOtp: "Bind OTP",
-};
-
-export type LoginTextsType = {
-  login: string,
-  accountPasswordLogin: string,
-  username: string,
-  password: string,
-  otpVCode: string,
-  inputVCode: string,
-  refreshError: string,
-  invalidVCode: string,
-  invalidInput: string,
-  invalidOtp: string,
-  bindOtp: string,
-};
-

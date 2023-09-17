@@ -17,7 +17,7 @@ import { ItemType } from "antd/es/menu/hooks/useItems";
 import Link from "next/link";
 import React from "react";
 import { createMenuItems } from "src/layouts/base/common";
-import { getCurrentLangLibWebText } from "src/utils/libWebI18nTexts";
+import { getCurrentLangLibWebText } from "src/utils/libWebI18n/libI18n";
 import styled from "styled-components";
 
 import { NavItemProps, UserInfo } from "../types";
@@ -54,10 +54,10 @@ export const SmallScreenMenu: React.FC<Props> = ({
   items.push({ disabled: true,
     key: "user-info",
     label:
-    `${getCurrentLangLibWebText(languageId, "layouts.smallScreenMenu.welcome")}${user.name}` });
+    `${getCurrentLangLibWebText(languageId, "smallScreenMenuWelcome")}${user.name}` });
   items.push({ key: "logout", label: (
     <Link href="/" onClick={logout}>
-      {getCurrentLangLibWebText(languageId, "layouts.smallScreenMenu.logout")}
+      {getCurrentLangLibWebText(languageId, "smallScreenMenuLogout")}
     </Link>
   ) });
 

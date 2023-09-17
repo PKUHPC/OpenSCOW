@@ -10,20 +10,16 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { AppFloatButtons } from "@scow/lib-web/build/layouts/AppFloatButtons";
-import moon from "@scow/lib-web/icons/moon.svg";
-import sun from "@scow/lib-web/icons/sun.svg";
-import sunMoon from "@scow/lib-web/icons/sun-moon.svg";
-import { publicConfig } from "src/utils/config";
+import { languageDictionary } from "react-typed-i18n";
 
-export const FloatButtons = ({ languageId }) => {
 
-  return (
-    <AppFloatButtons darkModeButtonProps={{
-      dark: moon, light: sun, system: sunMoon,
-      languageId,
-      basePath: publicConfig.BASE_PATH,
-    }}
-    />
-  );
-};
+const zh_cn = () => import("./zh_cn").then((x) => x.default);
+const en = () => import("./en").then((x) => x.default);
+
+// return language type
+export type LoginTextsType = Awaited<ReturnType<typeof zh_cn>>;
+
+export const languages = languageDictionary({
+  zh_cn,
+  en,
+});

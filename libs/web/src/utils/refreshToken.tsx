@@ -13,7 +13,11 @@
 import React, { useCallback, useState } from "react";
 import { ClickableA } from "src/components/ClickableA";
 
-import { getCurrentLangLibWebText } from "./libWebI18nTexts";
+import { getCurrentLangLibWebText } from "./libWebI18n/libI18n";
+
+
+
+
 
 export function useRefreshToken() {
   const [refreshToken, setRefreshToken] = useState(false);
@@ -35,6 +39,6 @@ interface RefreshLinkProps {
 
 export const RefreshLink: React.FC<RefreshLinkProps> = ({ refresh, languageId }) => (
   <ClickableA onClick={refresh}>
-    {getCurrentLangLibWebText(languageId, "refreshToken.refreshButton")}
+    {getCurrentLangLibWebText(languageId, "refreshButton")}
   </ClickableA>
 );

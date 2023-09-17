@@ -11,10 +11,7 @@
  */
 
 import { Select } from "antd";
-import { getCurrentLangLibWebText } from "src/utils/libWebI18nTexts";
-
-
-
+import { getCurrentLangLibWebText } from "src/utils/libWebI18n/libI18n";
 export interface Cluster {
   id: string;
   name: string;
@@ -33,7 +30,7 @@ export const ClusterSelector: React.FC<Props> = ({ clusters, value, onChange, la
     <Select
       mode="multiple"
       labelInValue
-      placeholder={getCurrentLangLibWebText(languageId, "comp.clusterSelector.placeholder")}
+      placeholder={getCurrentLangLibWebText(languageId, "clusterSelectorPlaceholder")}
       value={value ? value.map((v) => ({ value: v.id, label: v.name })) : undefined}
       onChange={(values) => onChange?.(values.map((x) => ({ id: x.value, name: x.label })))}
       options={clusters.map((x) => ({ value: x.id, label: x.name }))}
@@ -55,7 +52,7 @@ export const SingleClusterSelector: React.FC<SingleSelectionProps> =
   return (
     <Select
       labelInValue
-      placeholder={getCurrentLangLibWebText(languageId, "comp.clusterSelector.placeholder")}
+      placeholder={getCurrentLangLibWebText(languageId, "clusterSelectorPlaceholder")}
       value={value ? ({ value: value.id, label: value.name }) : undefined}
       onChange={({ value, label }) => onChange?.({ id: value, name: label })}
       options={

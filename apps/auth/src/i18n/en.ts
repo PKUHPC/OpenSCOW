@@ -10,20 +10,15 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { AppFloatButtons } from "@scow/lib-web/build/layouts/AppFloatButtons";
-import moon from "@scow/lib-web/icons/moon.svg";
-import sun from "@scow/lib-web/icons/sun.svg";
-import sunMoon from "@scow/lib-web/icons/sun-moon.svg";
-import { publicConfig } from "src/utils/config";
-
-export const FloatButtons = ({ languageId }) => {
-
-  return (
-    <AppFloatButtons darkModeButtonProps={{
-      dark: moon, light: sun, system: sunMoon,
-      languageId,
-      basePath: publicConfig.BASE_PATH,
-    }}
-    />
-  );
+export default {
+  login: "Log In",
+  accountPasswordLogin: "Account Password Login",
+  username: "Username",
+  password: "Password",
+  otpVCode: "OTP Verification Code",
+  inputVCode: "Please enter the verification code",
+  refreshError: "Refresh failed, please click to retry.",
+  invalidVCode: "Invalid verification code, please re-enter.",
+  invalidInput: "Invalid username / password, please check.",
+  invalidOtp: "Invalid OTP Verification Code, please re-enter.",
 };

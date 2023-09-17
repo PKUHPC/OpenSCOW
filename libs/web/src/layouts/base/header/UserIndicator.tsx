@@ -15,7 +15,7 @@ import { Dropdown, Typography } from "antd";
 import Link from "next/link";
 import React from "react";
 import { antdBreakpoints } from "src/layouts/base/constants";
-import { getCurrentLangLibWebText } from "src/utils/libWebI18nTexts";
+import { getCurrentLangLibWebText } from "src/utils/libWebI18n/libI18n";
 import styled from "styled-components";
 
 import { EXTERNAL_URL_PREFIX } from "../common";
@@ -60,13 +60,13 @@ export const UserIndicator: React.FC<Props> = ({
                   key: "username",
                   disabled: true,
                   label:
-                  `${getCurrentLangLibWebText(languageId, "layouts.userIndicator.userName")}${user.name}` }] : [],
+                  `${getCurrentLangLibWebText(languageId, "userIndicatorName")}${user.name}` }] : [],
                 { key: "userid",
                   disabled: true,
                   label:
-                  `${getCurrentLangLibWebText(languageId, "layouts.userIndicator.userId")}${user.identityId}` },
+                  `${getCurrentLangLibWebText(languageId, "userIndicatorId")}${user.identityId}` },
                 { key: "profileLink", label: <Link href="/profile">
-                  {getCurrentLangLibWebText(languageId, "layouts.userIndicator.personalInfo")}
+                  {getCurrentLangLibWebText(languageId, "userIndicatorInfo")}
                 </Link> },
                 ...userLinks ? userLinks.map((link) => {
                   return ({
@@ -82,7 +82,7 @@ export const UserIndicator: React.FC<Props> = ({
                 }) : [],
                 { key: "logout",
                   onClick: logout,
-                  label: getCurrentLangLibWebText(languageId, "layouts.userIndicator.logout") },
+                  label: getCurrentLangLibWebText(languageId, "userIndicatorLogout") },
               ],
             }}
           >
@@ -96,7 +96,7 @@ export const UserIndicator: React.FC<Props> = ({
           </Dropdown>
         ) : (
           <Link href="/api/auth">
-            {getCurrentLangLibWebText(languageId, "layouts.userIndicator.login")}
+            {getCurrentLangLibWebText(languageId, "userIndicatorLogin")}
           </Link>
         )
       }

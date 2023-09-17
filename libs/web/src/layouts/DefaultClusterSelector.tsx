@@ -13,7 +13,7 @@
 import { ClusterOutlined } from "@ant-design/icons";
 import { Space, Tooltip } from "antd";
 import React from "react";
-import { getCurrentLangLibWebText } from "src/utils/libWebI18nTexts";
+import { getCurrentLangLibWebText } from "src/utils/libWebI18n/libI18n";
 import { useTheme } from "styled-components";
 
 import { Cluster, SingleClusterSelector } from "../components/ClusterSelector";
@@ -38,7 +38,7 @@ export const DefaultClusterSelector: React.FC<Props> = ({ clusters, cluster, set
 
   return (
     <Space>
-      <Tooltip title={getCurrentLangLibWebText(languageId, "layouts.defaultClusterSelector.title")}>
+      <Tooltip title={getCurrentLangLibWebText(languageId, "defaultClusterSelectorTitle")}>
         <ThemeClusterOutlined />
       </Tooltip>
       <SingleClusterSelector
@@ -48,7 +48,7 @@ export const DefaultClusterSelector: React.FC<Props> = ({ clusters, cluster, set
         onChange={(cluster) => {
           setCluster(cluster);
         }}
-        label={getCurrentLangLibWebText(languageId, "layouts.defaultClusterSelector.label")}
+        label={getCurrentLangLibWebText(languageId, "defaultClusterSelectorLabel")}
       />
     </Space>
   );
