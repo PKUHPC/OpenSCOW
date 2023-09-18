@@ -20,7 +20,7 @@ import { requireAuth } from "src/auth/requireAuth";
 import { useI18nTranslateToString } from "src/i18n";
 import { CustomizableLogoAndText } from "src/pageComponents/dashboard/CustomizableLogoAndText";
 import { UserStore } from "src/stores/UserStore";
-import { getSeverI18nConfigText, runtimeConfig } from "src/utils/config";
+import { getServerI18nConfigText, runtimeConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
 
 interface Props {
@@ -54,9 +54,9 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ req }) => 
   const languageId = getLanguageCookie(req);
 
   const homeTitle = (hostname && runtimeConfig.HOME_TITLES[hostname])
-    ?? getSeverI18nConfigText(languageId, "defaultHomeTitle");
+    ?? getServerI18nConfigText(languageId, "defaultHomeTitle");
   const homeText = (hostname && runtimeConfig.HOME_TEXTS[hostname])
-    ?? getSeverI18nConfigText(languageId, "defaultHomeText");
+    ?? getServerI18nConfigText(languageId, "defaultHomeText");
 
   return {
     props: {

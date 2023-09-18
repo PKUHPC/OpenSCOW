@@ -21,7 +21,7 @@ import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
 import { useI18nTranslateToString } from "src/i18n";
 import { SubmitJobForm } from "src/pageComponents/job/SubmitJobForm";
-import { getSeverI18nConfigText, publicConfig } from "src/utils/config";
+import { getServerI18nConfigText, publicConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
 
 interface Props {
@@ -87,7 +87,7 @@ export const SubmitJobPage: NextPage<Props> = requireAuth(() => true)(
 export const getServerSideProps: GetServerSideProps = async ({ req }) => {
 
   const languageId = getLanguageCookie(req);
-  const submitJobPromptText = getSeverI18nConfigText(languageId, "submitJopPromptText");
+  const submitJobPromptText = getServerI18nConfigText(languageId, "submitJopPromptText");
 
   return {
     props: {
