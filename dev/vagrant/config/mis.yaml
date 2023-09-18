@@ -36,6 +36,11 @@ createUser:
     regex: "^[a-zA-Z0-9_]+$"
     # 出错时的消息
     errorMessage: "只能由字母、下划线、数字组成"
+    # errorMessage:
+    #   i18n:
+    #     default: "只能由字母、下划线、数字组成"
+    #     en: "Must consist of characters, including numbers, letters, and underscores."
+    #     zh_cn: "只能由字母、下划线、数字组成"
 
 # # 新增导航链接相关配置
 # navLinks:
@@ -85,24 +90,3 @@ createUser:
 #         url: "https://hahahaha3.1.com"
 #         # openInNewPage: true
 #         iconPath: ""
-
-# # 新增自定义收费规则
-# customAmountStrategies:
-#   # 计费方式id，请勿重复，重复的话后面的计费方式将会覆盖前面的，
-#   # 定义后不能更改，自定义计费项会记录所使用的计费方式id，并存储到数据库里，
-#   # 其作用与"max-cpusAlloc-mem", "max-gpu-cpusAlloc", "gpu", "cpusAlloc"等同，
-#   # 若当前生效的自定义计费项使用了某自定义计费方式id，你不能删除它，否则系统将无法启动，如要删除，请先使该计费项失效
-#   - id: "strategy1"
-#       # 可选，新的计量方式的显示名称，如不填写将使用id的内容
-#     name: "自定义收费计算方式1"
-#       # 可选，计量方式描述
-#     comment: "自定义收费计算方式1，运行时间低于3分钟以下的作业不计费，大于或等于3分钟的按照gpu或cpu用量计算"
-#       # 脚本文件路径，不包含config/scripts前缀，如my-strategy.js即等于config/scripts/my-strategy.js
-#       # 支持commonjs或者esm，内容不支持动态修改，修改后需重启系统
-#       # 自定义计量方式的文件应该默认导出一个如下签名的函数:
-#       # type CustomAmountStrategyFunction = (jobInfo: JobInfo) => number | Promise<number>;
-#       # JobInfo为apps/mis-server/src/bl/PriceMap.ts中的JobInfo类型，提供作业的用量信息
-#     script: "my-strategy.js"
-
-# 自定义可查询消费类型
-# customChargeTypes: ["月租", "存储费"]

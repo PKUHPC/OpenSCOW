@@ -27,6 +27,11 @@ apps: true
 homeTitle:
   # 默认文本
   defaultText: "Super Computing on Web"
+  # defaultText:
+  #   i18n:
+  #     default: "超算平台"
+  #     en: "Super Computing on Web"
+  #     zh_cn: "超算平台"
   # 从不同域名访问，显示的不同的文本
   # hostnameMap:
   #   a.com: "a.com's SCOW Deployment"
@@ -37,15 +42,20 @@ homeText:
   defaultText: "SCOW"
   # defaultText:
   #   i18n:
-  #     default: "<p style='font-size: 16px;'>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;SCOW是由北京大学和北京大学长沙计算与数字经济研究院共同维护的开源项目，提供了面向算力中心的门户和管理系统。项目通过简化集群软件的部署流程、统一平台管理模式、降低用户使用门槛，解决算力网络中计算资源管理难、使用难的问题。用户无需了解和配置SSH、VNC、命令行等，只需要一个浏览器就可以方便的使用集群算力资源。</p>"
-  #     en: "<p style='font-size: 16px;'>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;SCOW is an open-source project jointly maintained by Peking University and the Changsha Institute of Computing and Digital Economics at Peking University. It provides a portal and management system tailored for computing centers. The project aims to simplify the deployment process of cluster software, unify platform management patterns, and reduce user barriers, addressing challenges in managing and utilizing computing resources within the computational network. Users do not need to understand or configure SSH, VNC, command lines, etc.; only a browser is required for convenient access to cluster computing resources.</p>"
-  #     zh_cn: "<p style='font-size: 16px;'>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;SCOW是由北京大学和北京大学长沙计算与数字经济研究院共同维护的开源项目，提供了面向算力中心的门户和管理系统。项目通过简化集群软件的部署流程、统一平台管理模式、降低用户使用门槛，解决算力网络中计算资源管理难、使用难的问题。用户无需了解和配置SSH、VNC、命令行等，只需要一个浏览器就可以方便的使用集群算力资源。</p>"
+  #     default: "<p style='font-size: 16px;'>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;项目通过简化集群软件的部署流程、统一平台管理模式、降低用户使用门槛，解决算力网络中计算资源管理难、使用难的问题。用户无需了解和配置SSH、VNC、命令行等，只需要一个浏览器就可以方便的使用集群算力资源。</p>"
+  #     en: "<p style='font-size: 16px;'>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;The project aims to simplify the deployment process of cluster software, unify platform management patterns, and reduce user barriers, addressing challenges in managing and utilizing computing resources within the computational network. Users do not need to understand or configure SSH, VNC, command lines, etc.; only a browser is required for convenient access to cluster computing resources.</p>"
+  #     zh_cn: "<p style='font-size: 16px;'>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;项目通过简化集群软件的部署流程、统一平台管理模式、降低用户使用门槛，解决算力网络中计算资源管理难、使用难的问题。用户无需了解和配置SSH、VNC、命令行等，只需要一个浏览器就可以方便的使用集群算力资源。</p>"
   # 从不同域名访问，显示的不同的文本
   # hostnameMap:
   #   a.com: "a.com's SCOW"
 
 # 提交作业命令框中的提示语
 # submitJobPromptText: "#此处参数设置的优先级高于页面其它地方，两者冲突时以此处为准"
+# submitJobPromptText:
+#   i18n:
+#     default: 此处参数设置的优先级高于页面其它地方，两者冲突时以此处为准
+#     en: The priority of the parameter settings here supersedes that of other areas on the page. In the event of a conflict, the settings here will prevail.
+#     zh_cn: 此处参数设置的优先级高于页面其它地方，两者冲突时以此处为准
 
 # 是否启用终端功能
 shell: true

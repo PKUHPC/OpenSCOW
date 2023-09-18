@@ -12,8 +12,6 @@
 
 import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
-import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/i18n";
-import { getLanguageCookie } from "@scow/lib-web/build/utils/languages";
 import { ConfigServiceClient } from "@scow/protos/build/common/config";
 import { ConfigServiceClient as MisConfigServerClient } from "@scow/protos/build/server/config";
 import { JobBillingItem } from "@scow/protos/build/server/job";
@@ -22,7 +20,7 @@ import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { getBillingItems } from "src/pages/api/job/getBillingItems";
 import { getClient } from "src/utils/client";
-import { publicConfig, runtimeConfig } from "src/utils/config";
+import { runtimeConfig } from "src/utils/config";
 import { moneyToString } from "src/utils/money";
 
 import { getUserStatus } from "../dashboard/status";
@@ -73,17 +71,6 @@ export const ClusterPartitions = Type.Object({
 });
 export type ClusterPartitions = Static<typeof ClusterPartitions>;
 
-
-// // get type from value of libs/config/src/clusterTexts.ts/ClusterTextsConfigSchema
-// export const ClusterText = Type.Object({
-//   clusterComment:Type.Optional(Type.String()),
-//   extras: Type.Optional(Type.Array(Type.Object({
-//     title: Type.String(),
-//     content: Type.String(),
-//   }))),
-// });
-// export type ClusterText = Static<typeof ClusterText>;
-
 export const GetBillingTableSchema = typeboxRouteSchema({
   method: "GET",
 
@@ -95,7 +82,6 @@ export const GetBillingTableSchema = typeboxRouteSchema({
   responses: {
     200: Type.Object({
       items: Type.Array(JobBillingTableItem),
-      // text: Type.Optional(ClusterText),
     }),
   },
 });
