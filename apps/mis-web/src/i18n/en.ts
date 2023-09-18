@@ -91,7 +91,7 @@ export default {
     accountStatus: "Account Status",
     block: "Blocked",
     accountBalance: "Account Balance",
-    normal: "Normal",
+    normal: "Available",
     view: "View",
   },
   dashboard: {
@@ -102,7 +102,7 @@ export default {
       balance: "Available Balance",
       status: {
         blocked: "Blocked",
-        normal: "Normal",
+        normal: "Available",
       },
       alert: "You do not belong to any account.",
     },
@@ -210,7 +210,7 @@ export default {
         status: "Status",
         mangerMember: "Manage Members",
         block: "Blocked",
-        normal: "Normal",
+        normal: "Available",
         unit: "CNY",
         unblockConfirmTitle: "Confirm Unblock of User?",
         unblockConfirmContent: "Do you wish to unblock account {} within tenant {}?",
@@ -593,7 +593,7 @@ export default {
       },
       userTable: {
         block: "Block",
-        normal: "Normal",
+        normal: "Available",
         admin: "Admin",
         user: "Regular User",
         role: "Role",

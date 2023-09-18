@@ -18,7 +18,7 @@ import { requireAuth } from "src/auth/requireAuth";
 import { ModalButton } from "src/components/ModalLink";
 import { Section } from "src/components/Section";
 import { prefix, useI18nTranslateToString } from "src/i18n";
-import { PlatformRoleTexts, TenantRoleTexts } from "src/models/User";
+import { PlatformRole, TenantRole } from "src/models/User";
 import { ChangeEmailModal } from "src/pageComponents/profile/ChangeEmailModal";
 import { ChangePasswordModal } from "src/pageComponents/profile/ChangePasswordModal";
 import { antdBreakpoints } from "src/styles/constants";
@@ -67,6 +67,15 @@ export const ProfilePage: NextPage = requireAuth(() => true)(({ userStore: { use
 
   const t = useI18nTranslateToString();
 
+  const PlatformRoleI18nTexts = {
+    [PlatformRole.PLATFORM_FINANCE]: t("userRoles.platformFinance"),
+    [PlatformRole.PLATFORM_ADMIN]: t("userRoles.platformAdmin"),
+  };
+  const TenantRoleI18nTexts = {
+    [TenantRole.TENANT_FINANCE]: t("userRoles.tenantFinance"),
+    [TenantRole.TENANT_ADMIN]: t("userRoles.tenantAdmin"),
+  };
+
   return (
     <>
       <Container>
@@ -90,7 +99,7 @@ export const ProfilePage: NextPage = requireAuth(() => true)(({ userStore: { use
                   {user.tenantRoles.map((x) => (
                     <Tag
                       key={x}
-                    >{TenantRoleTexts[x]}</Tag>
+                    >{TenantRoleI18nTexts[x]}</Tag>
                   ))}
                 </Descriptions.Item>
               ) : undefined
@@ -101,7 +110,7 @@ export const ProfilePage: NextPage = requireAuth(() => true)(({ userStore: { use
                   {user.platformRoles.map((x) => (
                     <Tag
                       key={x}
-                    >{PlatformRoleTexts[x]}</Tag>
+                    >{PlatformRoleI18nTexts[x]}</Tag>
                   ))}
                 </Descriptions.Item>
               ) : undefined
