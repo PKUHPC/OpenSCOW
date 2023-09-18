@@ -10,15 +10,21 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { ClusterTextsConfigSchema } from "@scow/config/build/clusterTexts";
+import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/i18n";
 import { App, Divider, Spin, Typography } from "antd";
-import { NextPage } from "next";
+import { GetServerSideProps, NextPage } from "next";
 import { useCallback } from "react";
 import { useAsync } from "react-async";
+import { useStore } from "simstate";
 import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
+import { checkCookie } from "src/auth/server";
 import { JobBillingTable } from "src/components/JobBillingTable";
 import { PageTitle } from "src/components/PageTitle";
-import { prefix, useI18nTranslateToString } from "src/i18n";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
+import { UserStore } from "src/stores/UserStore";
+import { runtimeConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
 import styled from "styled-components";
 
@@ -32,51 +38,75 @@ const ContentContainer = styled(Typography.Paragraph)`
   white-space: pre-line;
 `;
 
+type ValueOf<T> = T[keyof T];
+
+interface Props {
+  text: ValueOf<ClusterTextsConfigSchema> | undefined;
+}
+
 const p = prefix("page.user.partitions.");
 
-export const PartitionsPage: NextPage = requireAuth(
-  () => true,
-)(
-  ({ userStore }) => {
+export const PartitionsPage: NextPage<Props> = requireAuth(() => true)((props: Props) => {
 
-    const user = userStore.user;
-    const { message } = App.useApp();
+  const userStore = useStore(UserStore);
+  const user = userStore.user;
+  const { message } = App.useApp();
 
-    const t = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
+  const languageId = useI18n().currentLanguage.id;
+  const { text } = props;
 
-    const { data, isLoading } = useAsync({ promiseFn: useCallback(async () => {
-      return await api.getBillingTable({ query: { tenant: user.tenant, userId: user.identityId } })
-        .httpError(500, () => { message.error(t(p("getBillingTableErrorMessage"))); });
-    }, [userStore.user]) });
+  const { data, isLoading } = useAsync({ promiseFn: useCallback(async () => {
+    return await api.getBillingTable({ query: { tenant: user?.tenant, userId: user?.identityId } })
+      .httpError(500, () => { message.error(t(p("getBillingTableErrorMessage"))); });
+  }, [userStore.user]) });
 
-    return (
-      <div>
-        <Head title={t(p("partitionInfo"))} />
-        <PageTitle titleText={t(p("partitionInfo"))} />
-        <Spin spinning={isLoading}>
-          <JobBillingTable data={data?.items} />
-          {
-            data?.text?.clusterComment ? (
-              <div>
-                <ClusterCommentTitle level={2}>{t("common.illustrate")}</ClusterCommentTitle>
-                <ContentContainer>
-                  {data?.text?.clusterComment}
-                </ContentContainer>
-              </div>
-            ) : undefined
-          }
-          {
-            data?.text?.extras?.map(({ title, content }, i) => (
-              <div key={i}>
-                <Divider />
-                <PageTitle titleText={title} />
-                <ContentContainer>{content}</ContentContainer>
-              </div>
-            ))
-          }
-        </Spin>
-      </div>
-    );
-  });
+  return (
+    <div>
+      <Head title={t(p("partitionInfo"))} />
+      <PageTitle titleText={t(p("partitionInfo"))} />
+      <Spin spinning={isLoading}>
+        <JobBillingTable data={data?.items} />
+        {
+          text?.clusterComment ? (
+            <div>
+              <ClusterCommentTitle level={2}>{t("common.illustrate")}</ClusterCommentTitle>
+              <ContentContainer>
+                {getI18nConfigCurrentText(text?.clusterComment, languageId)}
+              </ContentContainer>
+            </div>
+          ) : undefined
+        }
+        {
+          text?.extras?.map(({ title, content }, i) => (
+            <div key={i}>
+              <Divider />
+              <PageTitle titleText={getI18nConfigCurrentText(title, languageId)} />
+              <ContentContainer>{getI18nConfigCurrentText(content, languageId)}</ContentContainer>
+            </div>
+          ))
+        }
+      </Spin>
+    </div>
+  );
+});
+
+
+export const getServerSideProps: GetServerSideProps<Props> = async (ctx) => {
+
+  const user = await checkCookie(() => true, ctx.req);
+
+  const clusterTexts = runtimeConfig.CLUSTER_TEXTS_CONFIG;
+
+  // find the applicable text
+  const applicableTexts = clusterTexts ? (
+    typeof user === "number"
+      ? clusterTexts
+      : (clusterTexts[user.tenant] ?? clusterTexts.default)
+  ) : undefined;
+
+  return { props: { text: applicableTexts } };
+};
+
 
 export default PartitionsPage;

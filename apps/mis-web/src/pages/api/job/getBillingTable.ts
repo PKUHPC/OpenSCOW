@@ -74,15 +74,15 @@ export const ClusterPartitions = Type.Object({
 export type ClusterPartitions = Static<typeof ClusterPartitions>;
 
 
-// get type from value of libs/config/src/clusterTexts.ts/ClusterTextsConfigSchema
-export const ClusterText = Type.Object({
-  clusterComment:Type.Optional(Type.String()),
-  extras: Type.Optional(Type.Array(Type.Object({
-    title: Type.String(),
-    content: Type.String(),
-  }))),
-});
-export type ClusterText = Static<typeof ClusterText>;
+// // get type from value of libs/config/src/clusterTexts.ts/ClusterTextsConfigSchema
+// export const ClusterText = Type.Object({
+//   clusterComment:Type.Optional(Type.String()),
+//   extras: Type.Optional(Type.Array(Type.Object({
+//     title: Type.String(),
+//     content: Type.String(),
+//   }))),
+// });
+// export type ClusterText = Static<typeof ClusterText>;
 
 export const GetBillingTableSchema = typeboxRouteSchema({
   method: "GET",
@@ -95,7 +95,7 @@ export const GetBillingTableSchema = typeboxRouteSchema({
   responses: {
     200: Type.Object({
       items: Type.Array(JobBillingTableItem),
-      text: Type.Optional(ClusterText),
+      // text: Type.Optional(ClusterText),
     }),
   },
 });
@@ -153,7 +153,7 @@ const removeDuplicatesByPName = (partitions: Partition[]): Partition[] => {
 };
 
 export async function getBillingTableItems(
-  tenantName: string | undefined, languageId: string, userId?: string | undefined): Promise<JobBillingTableItem[]> {
+  tenantName: string | undefined, userId?: string | undefined): Promise<JobBillingTableItem[]> {
   const items = (await getBillingItems(tenantName, true)).activeItems;
 
   const pathItemMap = items.reduce((prev, curr) => {
@@ -184,12 +184,12 @@ export async function getBillingTableItems(
         const path = [cluster, partition.name, qos].filter((x) => x).join(".");
 
         const item = pathItemMap[path];
-        const clusterName = getI18nConfigCurrentText(publicConfig.CLUSTERS[cluster].name, languageId);
+
         tableItems.push({
           index: count++,
           clusterItemIndex: clusterItemIndex++,
           partitionItemIndex: partitionItemIndex++,
-          cluster: clusterName ?? cluster,
+          cluster: cluster,
           cores: partition.cores,
           gpus: partition.gpus,
           mem: partition.memMb,
@@ -216,21 +216,11 @@ export async function getBillingTableItems(
 
 export default /* #__PURE__*/typeboxRoute(GetBillingTableSchema, async (req, res) => {
   const { tenant, userId } = req.query;
-  const languageId = getLanguageCookie(req);
   const auth = authenticate(() => true);
   const info = await auth(req, res);
   if (!info) { return; }
 
-  const clusterTexts = runtimeConfig.CLUSTER_TEXTS_CONFIG;
-  const text = clusterTexts && tenant ? (clusterTexts[tenant] ?? clusterTexts.default) : undefined;
+  const items = await getBillingTableItems(tenant, userId);
 
-  const items = await getBillingTableItems(tenant, languageId, userId);
-
-  return { 200: { items, text: text ? {
-    clusterComment: getI18nConfigCurrentText(text.clusterComment, languageId),
-    extras: text.extras?.map((extra) => ({
-      title: getI18nConfigCurrentText(extra.title, languageId),
-      content: getI18nConfigCurrentText(extra.content, languageId),
-    })),
-  } : text } };
+  return { 200: { items } };
 });
