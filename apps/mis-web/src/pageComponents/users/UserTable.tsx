@@ -208,11 +208,13 @@ export const UserTable: React.FC<Props> = ({
                   icon: <ExclamationCircleOutlined />,
                   content: `确认要从账户${accountName}移出用户${r.name}（ID：${r.userId}）？`,
                   onOk: async () => {
+                    message.open({ type: "loading", content: "操作所需时间较长，请耐心等待", duration: 0 });
                     await api.removeUserFromAccount({ query: {
                       identityId: r.userId,
                       accountName: accountName,
                     } })
                       .then(() => {
+                        message.destroy();
                         message.success("移出用户成功！");
                         reload();
                       });
