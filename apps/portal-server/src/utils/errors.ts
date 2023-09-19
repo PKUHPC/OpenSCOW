@@ -24,3 +24,13 @@ export const jobNotFound = (jobId: number) => {
 export const loginNodeNotFound = (loginNode: string) => {
   return <ServiceError>{ code: Status.NOT_FOUND, message: `login node ${loginNode} is not found` };
 };
+
+export const transferNotEnabled = (cluster: string) => {
+  return <ServiceError> {
+    code: Status.INTERNAL, message: `the transmission function is not enabled for the cluster ${cluster}`,
+  };
+};
+
+export const transferNodeNotFound = (cluster: string) => {
+  return <ServiceError> { code: Status.NOT_FOUND, message: `transfer node of cluster ${cluster} is not found` };
+};
