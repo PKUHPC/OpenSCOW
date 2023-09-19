@@ -21,4 +21,5 @@ export default {
   invalidVCode: "Invalid verification code, please re-enter.",
   invalidInput: "Invalid username / password, please check.",
   invalidOtp: "Invalid OTP Verification Code, please re-enter.",
+  bindOtp: "Bind OTP",
 };
