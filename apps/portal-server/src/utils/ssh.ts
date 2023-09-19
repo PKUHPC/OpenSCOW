@@ -14,17 +14,65 @@ import { ServiceError } from "@ddadaal/tsgrpc-common";
 import { status } from "@grpc/grpc-js";
 import { getLoginNode } from "@scow/config/build/cluster";
 import { SftpError, sshConnect as libConnect, SshConnectError, testRootUserSshLogin } from "@scow/lib-ssh";
-import type { NodeSSH } from "node-ssh";
+import { NodeSSH } from "node-ssh";
 import { clusters } from "src/config/clusters";
 import { rootKeyPair } from "src/config/env";
 import { scowErrorMetadata } from "src/utils/error";
 import { Logger } from "ts-log";
 
-import { clusterNotFound, loginNodeNotFound } from "./errors";
+import { clusterNotFound, loginNodeNotFound, transferNodeNotFound, transferNotEnabled } from "./errors";
+
+interface NodeNetInfo {
+  address: string,
+  host: string,
+  port: number,
+}
 
 export function getClusterLoginNode(cluster: string): string | undefined {
   const loginNode = getLoginNode(clusters[cluster]?.loginNodes?.[0]);
   return loginNode?.address;
+}
+
+export function getClusterTransferNode(cluster: string): NodeNetInfo {
+  const enabled = clusters[cluster]?.crossClusterFilesTransfer?.enabled;
+  const transferNode = clusters[cluster]?.crossClusterFilesTransfer?.transferNode;
+  if (!enabled) {
+    throw transferNotEnabled(cluster);
+  }
+  else if (!transferNode) {
+    throw transferNodeNotFound(cluster);
+  }
+  // 解析为host, port
+  const [host, port] = transferNode.indexOf(":") > 0 ?
+    [transferNode.split(":")[0], parseInt(transferNode.split(":")[1])] :
+    [transferNode, 22];
+  const address = `${host}:${port}`;
+  return {
+    address: address,
+    host: host,
+    port: port,
+  };
+}
+
+export function tryGetClusterTransferNode(cluster: string): NodeNetInfo | undefined {
+  const enabled = clusters[cluster]?.crossClusterFilesTransfer?.enabled;
+  const transferNode = clusters[cluster]?.crossClusterFilesTransfer?.transferNode;
+  if (!enabled) {
+    return undefined;
+  }
+  else if (!transferNode) {
+    return undefined;
+  }
+  // 解析为host, port
+  const [host, port] = transferNode.indexOf(":") > 0 ?
+    [transferNode.split(":")[0], parseInt(transferNode.split(":")[1])] :
+    [transferNode, 22];
+  const address = `${host}:${port}`;
+  return {
+    address: address,
+    host: host,
+    port: port,
+  };
 }
 
 export const SSH_ERROR_CODE = "SSH_ERROR";
