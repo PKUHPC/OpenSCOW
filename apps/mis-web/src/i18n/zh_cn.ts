@@ -1033,6 +1033,9 @@ export default {
     platformFinance: "平台财务人员",
     tenantAdmin: "租户管理员",
     tenantFinance: "财务人员",
+    user: "用户",
+    owner: "拥有者",
+    admin: "管理员",
   },
   AmountStrategy: {
     text: "计量方式",

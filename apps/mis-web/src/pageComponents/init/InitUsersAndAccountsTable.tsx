@@ -20,7 +20,7 @@ import { api } from "src/apis";
 import { PlatformRoleSelector } from "src/components/PlatformRoleSelector";
 import { TenantRoleSelector } from "src/components/TenantRoleSelector";
 import { prefix, useI18nTranslateToString } from "src/i18n";
-import { UserRole, UserRoleTexts } from "src/models/User";
+import { UserRole } from "src/models/User";
 
 
 interface DataTableProps<T> {
@@ -35,6 +35,12 @@ const pCommon = prefix("common.");
 const UserTable: React.FC<DataTableProps<User>> = ({ data, loading, reload }) => {
 
   const t = useI18nTranslateToString();
+
+  const UserRoleI18nTexts = {
+    [UserRole.USER]: t("userRoles.user"),
+    [UserRole.OWNER]: t("userRoles.owner"),
+    [UserRole.ADMIN]: t("userRoles.admin"),
+  };
 
   return (
     <Table
@@ -68,7 +74,7 @@ const UserTable: React.FC<DataTableProps<User>> = ({ data, loading, reload }) =>
         render={(accounts: AccountAffiliation[]) => accounts
           .map((x) =>
             x.accountName +
-              (x.role !== UserRole.USER ? `(${UserRoleTexts[x.role]})` : ""),
+              (x.role !== UserRole.USER ? `(${UserRoleI18nTexts[x.role]})` : ""),
           ).join(", ")}
       />
     </Table>
