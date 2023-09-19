@@ -11,10 +11,12 @@
  */
 
 import { DEFAULT_PRIMARY_COLOR } from "@scow/config/build/ui";
+import { getLanguageCookie } from "@scow/lib-server";
 import { FastifyReply, FastifyRequest } from "fastify";
 import { join } from "path";
 import { config, FAVICON_URL } from "src/config/env";
 import { uiConfig } from "src/config/ui";
+import { AuthTextsType, languages } from "src/i18n";
 
 
 function parseHostname(req: FastifyRequest): string | undefined {
@@ -48,7 +50,12 @@ export async function renderBindOtpHtml(
 
   const hostname = parseHostname(req);
 
+  // 获取当前语言ID及对应的绑定OTP页面文本
+  const languageId = getLanguageCookie(req.raw);
+  const authTexts: AuthTextsType = languages[languageId];
+
   return rep.status(err ? 401 : 200).view("/otp/bindOtp.liquid", {
+    bindOtpTexts: authTexts,
     cssUrl: join(config.BASE_PATH, config.AUTH_BASE_PATH, "/public/assets/tailwind.min.css"),
     faviconUrl: join(config.BASE_PATH, FAVICON_URL),
     backgroundColor: uiConfig.primaryColor?.defaultColor ?? DEFAULT_PRIMARY_COLOR,

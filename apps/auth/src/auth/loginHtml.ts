@@ -18,7 +18,7 @@ import { createCaptcha } from "src/auth/captcha";
 import { authConfig, OtpStatusOptions, ScowLogoType } from "src/config/auth";
 import { config, FAVICON_URL, LOGO_URL } from "src/config/env";
 import { uiConfig } from "src/config/ui";
-import { languages, LoginTextsType } from "src/i18n";
+import { AuthTextsType, languages } from "src/i18n";
 
 
 export async function serveLoginHtml(
@@ -38,9 +38,9 @@ export async function serveLoginHtml(
     ? await createCaptcha(req.server)
     : undefined;
 
-  // 获取当前语言ID
+  // 获取当前语言ID及对应的登录页面文本
   const languageId = getLanguageCookie(req.raw);
-  const loginTexts: LoginTextsType = languages[languageId];
+  const authTexts: AuthTextsType = languages[languageId];
 
   // 获取sloganI18nText
   const sloganTitle = getI18nConfigCurrentText(authConfig.ui?.slogan.title, languageId);
@@ -50,7 +50,7 @@ export async function serveLoginHtml(
 
   return rep.status(
     verifyCaptchaFail ? 400 : err ? 401 : 200).view("login.liquid", {
-    loginTexts: loginTexts,
+    loginTexts: authTexts,
     cssUrl: join(config.BASE_PATH, config.AUTH_BASE_PATH, "/public/assets/tailwind.min.css"),
     eyeImagePath: join(config.BASE_PATH, config.AUTH_BASE_PATH, "/public/assets/icons/eye.png"),
     eyeCloseImagePath: join(config.BASE_PATH, config.AUTH_BASE_PATH, "/public/assets/icons/eye-close.png"),
