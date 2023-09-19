@@ -162,7 +162,58 @@ message ExistsRequest {
 }
 
 message ExistsResponse {
-  bool exists = 1; 
+  bool exists = 1;
+}
+
+message StartFilesTransferRequest {
+  string from_cluster = 1;
+  string to_cluster = 2;
+  string user_id = 3;
+  string from_path = 4;
+  string to_path = 5;
+}
+
+message StartFilesTransferResponse {
+
+}
+
+message QueryFilesTransferRequest {
+  string cluster = 1;
+  string user_id = 2;
+}
+
+message TransferInfo {
+  string to_cluster = 1;
+  string file_path = 2;
+  uint64 transfer_size_kb = 3; // 单位为KB，B：Byte
+  uint32 progress = 4;
+  float speed_k_bps = 5;
+  uint64 remaining_time_seconds = 6;
+}
+
+message QueryFilesTransferResponse {
+  repeated TransferInfo transfer_infos = 1;
+}
+
+message TerminateFilesTransferRequest {
+  string from_cluster = 1;
+  string to_cluster = 2;
+  string user_id = 3;
+  string from_path = 4;
+}
+
+message TerminateFilesTransferResponse {
+
+}
+
+message CheckTransferKeyRequest {
+  string from_cluster = 1;
+  string to_cluster = 2;
+  string user_id = 3;
+}
+
+message CheckTransferKeyResponse {
+
 }
 
 service FileService {
@@ -184,4 +235,12 @@ service FileService {
   rpc GetFileMetadata(GetFileMetadataRequest) returns (GetFileMetadataResponse);
 
   rpc Exists(ExistsRequest) returns (ExistsResponse);
+
+  rpc StartFilesTransfer(StartFilesTransferRequest) returns (StartFilesTransferResponse);
+
+  rpc QueryFilesTransfer(QueryFilesTransferRequest) returns (QueryFilesTransferResponse);
+
+  rpc TerminateFilesTransfer(TerminateFilesTransferRequest) returns (TerminateFilesTransferResponse);
+
+  rpc CheckTransferKey(CheckTransferKeyRequest) returns (CheckTransferKeyResponse);
 }
