@@ -19,6 +19,7 @@ import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import {
+  getOperationDetail, OperationCodeMap,
   OperationLog,
   OperationLogQueryType,
   OperationResult,
@@ -86,6 +87,20 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
 
   const { data, isLoading } = useAsync({ promiseFn });
 
+  const getformatData = (results: OperationLog[] | undefined) => {
+    if (!results) {
+      return [];
+    }
+    return results.map((data) => {
+      return {
+        ...data,
+        operationCode: data.operationEvent?.["$case"] ? OperationCodeMap[data.operationEvent?.["$case"]] : "000000",
+        operationType: data.operationEvent?.["$case"] || "unknown",
+        operationDetail: getOperationDetail(data.operationEvent),
+      };
+    });
+  };
+
   return (
     <div>
       <FilterFormContainer>
@@ -137,7 +152,7 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
         </Form>
       </FilterFormContainer>
       <Table
-        dataSource={data?.results}
+        dataSource={getformatData(data?.results)}
         loading={isLoading}
         pagination={{
           current: pageInfo.page,
@@ -148,13 +163,16 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
         }}
       >
         <Table.Column<OperationLog> dataIndex="operationLogId" title="ID" />
-        <Table.Column<OperationLog> dataIndex="operationCode" title="操作码" />
-        <Table.Column<OperationLog>
+        <Table.Column
+          dataIndex="operationCode"
+          title="操作码"
+        />
+        <Table.Column
           dataIndex="operationType"
           title="操作行为"
-          render={(operationType) => OperationTypeTexts[operationType] }
+          render={(operationType) => OperationTypeTexts[operationType]}
         />
-        <Table.Column<OperationLog>
+        <Table.Column
           dataIndex="operationDetail"
           title="操作内容"
         />
