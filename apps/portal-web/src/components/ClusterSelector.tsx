@@ -61,6 +61,7 @@ export const SingleClusterSelector: React.FC<SingleSelectionProps> = ({
 
   return (
     <Select
+      labelInValue
       placeholder={t("component.others.clusterSelector")}
       value={value ? ({ value: value.id, label: getI18nConfigCurrentText(value.name, languageId) }) : undefined}
       onChange={({ value, label }) => {
