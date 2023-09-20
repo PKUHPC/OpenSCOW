@@ -155,32 +155,30 @@ export const DesktopTable: React.FC<Props> = ({ loginDesktopEnabledClusters }) =
             />
           </Form.Item>
           <Form.Item label={t(p("filterForm.loginNode"))}>
-            <div key={loginNode?.address}>
-              <Select
-                allowClear
-                style={{ minWidth: 100 }}
-                value={selectedLoginNodeAddress ?
-                  loginNodes[cluster.id].find((loginNode) => loginNode.address === selectedLoginNodeAddress)?.name : ""}
-                onChange={(x) => {
-                  const nextLoginQuery = x
-                    ? loginNodes[cluster.id].find((loginNode) => loginNode.address === x)?.name
-                    : undefined;
-                  router.push({
-                    query: nextLoginQuery
-                      ? {
-                        cluster: cluster.id,
-                        loginNode: nextLoginQuery,
-                      }
-                      : { cluster: cluster.id },
-                  });
-                  setSelectedLoginNodeAddress(x);
-                }}
-                options={loginNodes[cluster.id].map((loginNode) => ({
-                  label: loginNode.name, value: loginNode.address,
-                }))}
-              >
-              </Select>
-            </div>
+            <Select
+              allowClear
+              style={{ minWidth: 100 }}
+              value={selectedLoginNodeAddress ?
+                loginNodes[cluster.id].find((loginNode) => loginNode.address === selectedLoginNodeAddress)?.name : ""}
+              onChange={(x) => {
+                const nextLoginQuery = x
+                  ? loginNodes[cluster.id].find((loginNode) => loginNode.address === x)?.name
+                  : undefined;
+                router.push({
+                  query: nextLoginQuery
+                    ? {
+                      cluster: cluster.id,
+                      loginNode: nextLoginQuery,
+                    }
+                    : { cluster: cluster.id },
+                });
+                setSelectedLoginNodeAddress(x);
+              }}
+              options={loginNodes[cluster.id].map((loginNode) => ({
+                label: loginNode.name, value: loginNode.address,
+              }))}
+            >
+            </Select>
           </Form.Item>
           <Form.Item>
             <Button onClick={reload} loading={isLoading}>

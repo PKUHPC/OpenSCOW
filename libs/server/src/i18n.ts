@@ -52,7 +52,7 @@ export const getI18nConfigCurrentText =
     case SYSTEM_VALID_LANGUAGES.EN:
       return i18nConfigText.i18n.en || i18nConfigText.i18n.default;
     case SYSTEM_VALID_LANGUAGES.ZH_CN:
-      return i18nConfigText.i18n.en || i18nConfigText.i18n.default;
+      return i18nConfigText.i18n.zh_cn || i18nConfigText.i18n.default;
     default:
       return i18nConfigText.i18n.default;
     }
