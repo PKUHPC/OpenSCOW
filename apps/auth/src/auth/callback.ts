@@ -59,7 +59,7 @@ export async function validateCallbackHostname(callbackUrl: string, req: Fastify
 
 export async function redirectToWeb(callbackUrl: string, token: string, rep: FastifyReply) {
 
-  const searchParams = new URLSearchParams({ token });
+  const searchParams = new URLSearchParams({ token, fromAuth: "true" });
 
   await rep.redirect(302, `${callbackUrl}?${searchParams.toString()}`);
 }

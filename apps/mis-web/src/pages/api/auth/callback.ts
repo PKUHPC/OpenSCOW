@@ -15,7 +15,7 @@ import { setTokenCookie } from "src/auth/cookie";
 import { validateToken } from "src/auth/token";
 import { OperationResult, OperationType } from "src/models/operationLog";
 import { callLog } from "src/server/operationLog";
-import { publicConfig, runtimeConfig } from "src/utils/config";
+import { publicConfig } from "src/utils/config";
 import { parseIp } from "src/utils/server";
 
 export const AuthCallbackSchema = typeboxRouteSchema({
@@ -23,6 +23,7 @@ export const AuthCallbackSchema = typeboxRouteSchema({
 
   query: Type.Object({
     token: Type.String(),
+    fromAuth: Type.Optional(Type.Boolean()),
   }),
 
   responses: {
@@ -35,15 +36,14 @@ export const AuthCallbackSchema = typeboxRouteSchema({
 
 export default typeboxRoute(AuthCallbackSchema, async (req, res) => {
 
-  const { token } = req.query;
+  const { token, fromAuth = false } = req.query;
 
-  const isFromLogin = req.headers?.referer?.includes(runtimeConfig.AUTH_EXTERNAL_URL + "/public/auth");
   const info = await validateToken(token);
 
   if (info) {
     // set token cache
     setTokenCookie({ res }, token);
-    if (isFromLogin) {
+    if (fromAuth) {
       const logInfo = {
         operatorUserId: info.identityId,
         operatorIp: parseIp(req) ?? "",
