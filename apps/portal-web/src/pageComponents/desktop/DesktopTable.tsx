@@ -16,7 +16,7 @@ import { Button, Form, Select, Table } from "antd";
 import { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
 import { useRouter } from "next/router";
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import { useAsync } from "react-async";
 import { useStore } from "simstate";
 import { api } from "src/apis";
@@ -51,6 +51,7 @@ export const DesktopTable: React.FC<Props> = ({ loginDesktopEnabledClusters }) =
   const router = useRouter();
 
   const t = useI18nTranslateToString();
+  const [selectedLoginNodeAddress, setSelectedLoginNodeAddress] = useState("");
 
   const { defaultCluster } = useStore(DefaultClusterStore);
 
@@ -65,7 +66,6 @@ export const DesktopTable: React.FC<Props> = ({ loginDesktopEnabledClusters }) =
   const cluster = publicConfig.CLUSTERS.find((x) => x.id === clusterQuery) ?? enabledDefaultCluster;
 
   const loginNode = loginNodes[cluster.id].find((x) => x.name === loginQuery) ?? undefined;
-
 
   const { data, isLoading, reload } = useAsync({
     promiseFn: useCallback(async () => {
@@ -155,28 +155,32 @@ export const DesktopTable: React.FC<Props> = ({ loginDesktopEnabledClusters }) =
             />
           </Form.Item>
           <Form.Item label={t(p("filterForm.loginNode"))}>
-            <Select
-              allowClear
-              style={{ minWidth: 100 }}
-              value={loginNode?.name}
-              onChange={(x) => {
-                const nextLoginQuery = x
-                  ? loginNodes[cluster.id].find((loginNode) => loginNode.address === x)?.name
-                  : undefined;
-                router.push({
-                  query: nextLoginQuery
-                    ? {
-                      cluster: cluster.id,
-                      loginNode: nextLoginQuery,
-                    }
-                    : { cluster: cluster.id },
-                });
-              }}
-              options={loginNodes[cluster.id].map((loginNode) => ({
-                label: loginNode.name, value: loginNode.address,
-              }))}
-            >
-            </Select>
+            <div key={loginNode?.address}>
+              <Select
+                allowClear
+                style={{ minWidth: 100 }}
+                value={selectedLoginNodeAddress ?
+                  loginNodes[cluster.id].find((loginNode) => loginNode.address === selectedLoginNodeAddress)?.name : ""}
+                onChange={(x) => {
+                  const nextLoginQuery = x
+                    ? loginNodes[cluster.id].find((loginNode) => loginNode.address === x)?.name
+                    : undefined;
+                  router.push({
+                    query: nextLoginQuery
+                      ? {
+                        cluster: cluster.id,
+                        loginNode: nextLoginQuery,
+                      }
+                      : { cluster: cluster.id },
+                  });
+                  setSelectedLoginNodeAddress(x);
+                }}
+                options={loginNodes[cluster.id].map((loginNode) => ({
+                  label: loginNode.name, value: loginNode.address,
+                }))}
+              >
+              </Select>
+            </div>
           </Form.Item>
           <Form.Item>
             <Button onClick={reload} loading={isLoading}>
