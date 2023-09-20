@@ -10,8 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { OperationType as LibOperationType, OperationTypeEnum } from "@scow/lib-operation-log";
-import { OperationLog as OperationLogProto } from "@scow/protos/build/audit/operation_log";
+import { OperationEvent, OperationType as LibOperationType, OperationTypeEnum } from "@scow/lib-operation-log";
 import { Static, Type } from "@sinclair/typebox";
 import { ValueOf } from "next/dist/shared/lib/constants";
 import { nullableMoneyToString } from "src/utils/money";
@@ -81,11 +80,9 @@ export const OperationLog = Type.Object({
   operatorUserId: Type.String(),
   operatorUserName: Type.String(),
   operatorIp: Type.String(),
-  operationCode: Type.String(),
-  operationType: Type.Enum(OperationType),
   operationResult: Type.Enum(OperationResult),
   operationTime: Type.Optional(Type.String()),
-  operationDetail: Type.String(),
+  operationEvent: Type.Any(),
 });
 export type OperationLog = Static<typeof OperationLog>;
 
@@ -206,10 +203,9 @@ export const OperationCodeMap: { [key in LibOperationType]: string } = {
   tenantPay: "040302",
 };
 
-export const getOperationDetail = (operationLog: OperationLogProto) => {
+export const getOperationDetail = (operationEvent: OperationEvent) => {
 
   try {
-    const { operationEvent } = operationLog;
     if (!operationEvent) {
       return "";
     }

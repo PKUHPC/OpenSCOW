@@ -16,7 +16,7 @@ import { createOperationLogClient } from "@scow/lib-operation-log/build/index";
 import { UserServiceClient } from "@scow/protos/build/server/user";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
-import { getOperationDetail, OperationCodeMap, OperationLog, OperationLogQueryType,
+import { OperationLog, OperationLogQueryType,
   OperationResult, OperationType } from "src/models/operationLog";
 import { PlatformRole, TenantRole, UserRole } from "src/models/User";
 import { getClient } from "src/utils/client";
@@ -158,12 +158,10 @@ export default typeboxRoute(GetOperationLogsSchema, async (req, res) => {
       operatorIp: x.operatorIp,
       operationResult: x.operationResult,
       operationTime: x.operationTime,
-      operationType: x.operationEvent?.["$case"] || "unknown",
-      operationCode: x.operationEvent?.["$case"] ? OperationCodeMap[x.operationEvent?.["$case"]] : "000000",
-      operationDetail: getOperationDetail(x),
+      operationEvent: x.operationEvent,
     };
   });
   return {
-    200: { results: operationLogs as OperationLog[], totalCount },
+    200: { results: operationLogs as any as OperationLog[], totalCount },
   };
 });
