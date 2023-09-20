@@ -13,6 +13,7 @@
 import {
   BookOutlined,
   CloudServerOutlined,
+  CloudSyncOutlined,
   DashboardOutlined,
   DesktopOutlined,
   EyeOutlined,
@@ -141,7 +142,18 @@ export const userRoutes: (
         path: `/files/${cluster.id}`,
         clickToPath: `/files/${cluster.id}/~`,
         handleClick: () => { setDefaultCluster(cluster); },
-      } as NavItemProps)),
+      } as NavItemProps)).concat(publicConfig.CROSS_CLUSTER_FILE_TRANSFER_ENABLED ? [
+        {
+          Icon: CloudSyncOutlined,
+          text: "文件传输",
+          path: "/files/fileTransfer",
+        },
+        {
+          Icon: CloudServerOutlined,
+          text: "传输进度",
+          path: "/files/currentTransferInfo",
+        },
+      ] : []),
     }] : []),
     ...(publicConfig.NAV_LINKS && publicConfig.NAV_LINKS.length > 0
       ? publicConfig.NAV_LINKS.map((link) => {

@@ -84,6 +84,7 @@ export interface PublicRuntimeConfig {
 
   VERSION_TAG: string | undefined;
 
+  CROSS_CLUSTER_FILE_TRANSFER_ENABLED: boolean;
 }
 
 export const runtimeConfig: ServerRuntimeConfig = getConfig().serverRuntimeConfig;
