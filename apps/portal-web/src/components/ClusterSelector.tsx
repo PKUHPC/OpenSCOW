@@ -62,10 +62,10 @@ export const SingleClusterSelector: React.FC<SingleSelectionProps> = ({
   return (
     <Select
       placeholder={t("component.others.clusterSelector")}
-      value={value?.id}
-      onChange={(value) => {
-        onChange?.({ id: value, name: publicConfig.CLUSTERS[value].name });
-        setDefaultCluster({ id: value, name: publicConfig.CLUSTERS[value].name });
+      value={value ? ({ value: value.id, label: getI18nConfigCurrentText(value.name, languageId) }) : undefined}
+      onChange={({ value, label }) => {
+        onChange?.({ id: value, name: label });
+        setDefaultCluster({ id: value, name: label });
       }
       }
       options={
