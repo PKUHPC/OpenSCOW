@@ -16,7 +16,7 @@ import { Button, Form, Select, Table } from "antd";
 import { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
 import { useRouter } from "next/router";
-import React, { useCallback, useState } from "react";
+import React, { useCallback } from "react";
 import { useAsync } from "react-async";
 import { useStore } from "simstate";
 import { api } from "src/apis";
@@ -51,7 +51,6 @@ export const DesktopTable: React.FC<Props> = ({ loginDesktopEnabledClusters }) =
   const router = useRouter();
 
   const t = useI18nTranslateToString();
-  const [selectedLoginNodeAddress, setSelectedLoginNodeAddress] = useState("");
 
   const { defaultCluster } = useStore(DefaultClusterStore);
 
@@ -158,8 +157,7 @@ export const DesktopTable: React.FC<Props> = ({ loginDesktopEnabledClusters }) =
             <Select
               allowClear
               style={{ minWidth: 100 }}
-              value={selectedLoginNodeAddress ?
-                loginNodes[cluster.id].find((loginNode) => loginNode.address === selectedLoginNodeAddress)?.name : ""}
+              value={loginNode?.name}
               onChange={(x) => {
                 const nextLoginQuery = x
                   ? loginNodes[cluster.id].find((loginNode) => loginNode.address === x)?.name
@@ -172,7 +170,6 @@ export const DesktopTable: React.FC<Props> = ({ loginDesktopEnabledClusters }) =
                     }
                     : { cluster: cluster.id },
                 });
-                setSelectedLoginNodeAddress(x);
               }}
               options={loginNodes[cluster.id].map((loginNode) => ({
                 label: loginNode.name, value: loginNode.address,
