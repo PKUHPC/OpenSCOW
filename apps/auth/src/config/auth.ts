@@ -38,13 +38,12 @@ export const createI18nStringSchema = (description: string, defaultValue?: strin
     Type.Object({
       i18n: Type.Object({
         default: Type.String({ description: "国际化类型默认值" }),
-        en: Type.String({ description: "国际化类型英文值" }),
-        zh_cn: Type.String({ description: "国际化类型简体中文值" }),
+        en: Type.Optional(Type.String({ description: "国际化类型英文值" })),
+        zh_cn: Type.Optional(Type.String({ description: "国际化类型简体中文值" })),
       }),
     }),
   ], { description, default: defaultValue });
 };
-
 
 export const LdapConfigSchema = Type.Object({
   url: Type.String({ description: "LDAP地址" }),

@@ -15,8 +15,8 @@ import { SYSTEM_VALID_LANGUAGES } from "./languages";
 export type I18nStringType = string | {
   i18n: {
     default: string,
-    zh_cn: string,
-    en: string,
+    en?: string,
+    zh_cn?: string,
   }
 }
 
@@ -29,12 +29,13 @@ export const getI18nConfigCurrentText =
     return i18nConfigText;
   } else {
 
+    // 当语言id或者对应的配置文本中某种语言不存在时，显示default的值
     if (!languageId) return i18nConfigText.i18n.default;
     switch (languageId) {
     case SYSTEM_VALID_LANGUAGES.EN:
-      return i18nConfigText.i18n.en;
+      return i18nConfigText.i18n.en || i18nConfigText.i18n.default;
     case SYSTEM_VALID_LANGUAGES.ZH_CN:
-      return i18nConfigText.i18n.zh_cn;
+      return i18nConfigText.i18n.zh_cn || i18nConfigText.i18n.default;
     default:
       return i18nConfigText.i18n.default;
     }
