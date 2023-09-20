@@ -65,7 +65,7 @@ export const SingleClusterSelector: React.FC<SingleSelectionProps> = ({ value, o
             disabled: false,
           })))
       }
-      dropdownMatchSelectWidth={false}
+      popupMatchSelectWidth={false}
     />
   );
 };

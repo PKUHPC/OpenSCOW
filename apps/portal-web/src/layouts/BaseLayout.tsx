@@ -37,8 +37,6 @@ export const BaseLayout = ({ footerText, versionTag, children }: PropsWithChildr
   const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
 
-  console.log("web-baselayout-language", languageId);
-
   const routes = useMemo(() => userRoutes(
     userStore.user, defaultCluster, loginNodes, setDefaultCluster,
   ), [userStore.user, defaultCluster, setDefaultCluster]);

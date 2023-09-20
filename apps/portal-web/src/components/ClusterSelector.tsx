@@ -32,7 +32,9 @@ export const ClusterSelector: React.FC<Props> = ({ value, onChange }) => {
       mode="multiple"
       placeholder={t("component.others.clusterSelector")}
       value={value?.map((v) => v.id)}
-      onChange={(values) => onChange?.(values.map((x) => ({ id: x, name: publicConfig.CLUSTERS[x].name })))}
+      onChange={(values) => onChange?.(values.map((x) => ({
+        id: x,
+        name: publicConfig.CLUSTERS.find((cluster) => cluster.id === x)?.name ?? x })))}
       options={Object.values(publicConfig.CLUSTERS).map((x) => ({ value: x.id, label:
         getI18nConfigCurrentText(x.name, languageId) }))}
       key={languageId}
@@ -61,12 +63,15 @@ export const SingleClusterSelector: React.FC<SingleSelectionProps> = ({
 
   return (
     <Select
-      labelInValue
       placeholder={t("component.others.clusterSelector")}
-      value={value ? ({ value: value.id, label: getI18nConfigCurrentText(value.name, languageId) }) : undefined}
-      onChange={({ value, label }) => {
-        onChange?.({ id: value, name: label });
-        setDefaultCluster({ id: value, name: label });
+      value={value?.id}
+      onChange={(value) => {
+        onChange?.({
+          id: value,
+          name: publicConfig.CLUSTERS.find((cluster) => cluster.id === value)?.name ?? value });
+        setDefaultCluster({
+          id: value,
+          name: publicConfig.CLUSTERS.find((cluster) => cluster.id === value)?.name ?? value });
       }
       }
       options={
