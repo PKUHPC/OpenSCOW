@@ -45,7 +45,7 @@ const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ tenantName }) => 
   const submit = async () => {
     const { accountName, ownerId, ownerName, comment } = await form.validateFields();
     setLoading(true);
-    message.open({ type: "loading", content: "操作所需时间较长，请耐心等待", duration: 0 });
+    message.open({ type: "loading", content: "操作所需时间较长，请耐心等待", duration: 0, key: "createAccount" });
     await api.createAccount({ body: { accountName, ownerId, ownerName, comment } })
       .httpError(404, () => { message.error(`租户 ${tenantName} 下不存在用户 ${ownerId}。`); })
       .httpError(409, () => { message.error("账户名已经被占用"); })
@@ -54,7 +54,7 @@ const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ tenantName }) => 
         message.success("创建成功！");
       })
       .finally(() => {
-        message.destroy();
+        message.destroy("createAccount");
         setLoading(false);
       });
   };
