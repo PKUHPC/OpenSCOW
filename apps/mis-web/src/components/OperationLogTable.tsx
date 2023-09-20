@@ -175,11 +175,11 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
         <Table.Column<OperationLog> dataIndex="operationLogId" title="ID" />
         <Table.Column
           dataIndex="operationCode"
-          title="操作码"
+          title={t(p("operationCode"))}
         />
         <Table.Column
           dataIndex="operationType"
-          title="操作行为"
+          title={t(p("operationType"))}
           render={(operationType) => OperationTypeTexts[operationType]}
         />
         <Table.Column

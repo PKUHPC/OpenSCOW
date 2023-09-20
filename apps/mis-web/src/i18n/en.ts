@@ -382,10 +382,10 @@ export default {
         platformRole: "Platform Role",
         tenantRole: "Tenant Role",
         accountAffiliation: "Affiliated Account",
-        defaultTenant: "You can manage users and accounts under the default tenant in the current system here,"
-        + "and set a user as",
+        defaultTenant: "You can manage users and accounts under the default tenant in the current system here, "
+        + "and set a user as ",
         initAdmin: "Initial Administrator",
-        set: "who serves as both a tenant administrator and a platform administrator.",
+        set: " who serves as both a tenant administrator and a platform administrator.",
       },
     },
     job: {
@@ -846,7 +846,7 @@ export default {
           + "manually refresh and synchronize all user statuses.",
           slurmScheduler: "Slurm Scheduler",
           slurmSchedulerMessage1: "If you are using the Slurm scheduler, due to technical limitations, "
-          + "when you run slurm.sh nodes and the slurm management node are not on the same node,"
+          + "when you run slurm.sh nodes and the slurm management node are not on the same node, "
           + " blocked users, accounts, and user accounts will be unblocked after the slurm cluster restarts.",
           slurmSchedulerMessage2: "SCOW will automatically refresh the slurm blocking status once "
           + "when starting, but the slurm cluster may restart during SCOW operation, and SCOW cannot react "
