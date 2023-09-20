@@ -205,11 +205,17 @@ export const UserTable: React.FC<Props> = ({
                   content: `${t(p("confirmRemoveText"))}${accountName}${t(p("removerUser"))}
                   ${r.name}（ID：${r.userId}）？`,
                   onOk: async () => {
+                    message.open({
+                      type: "loading",
+                      content: t("common.waitingMessage"),
+                      duration: 0,
+                      key: "removeUser" });
                     await api.removeUserFromAccount({ query: {
                       identityId: r.userId,
                       accountName: accountName,
                     } })
                       .then(() => {
+                        message.destroy("removeUser");
                         message.success(t(p("removeSuccess")));
                         reload();
                       });

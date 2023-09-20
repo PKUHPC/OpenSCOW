@@ -93,6 +93,7 @@ export default {
     accountBalance: "账户余额",
     normal: "正常",
     view: "查看",
+    waitingMessage: "操作所需时间较长，请耐心等待",
   },
   dashboard: {
     title: "仪表盘",

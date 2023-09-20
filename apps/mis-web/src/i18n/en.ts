@@ -93,6 +93,7 @@ export default {
     accountBalance: "Account Balance",
     normal: "Available",
     view: "View",
+    waitingMessage: "The operation may take some time. Your patience is appreciated.",
   },
   dashboard: {
     title: "Dashboard",
