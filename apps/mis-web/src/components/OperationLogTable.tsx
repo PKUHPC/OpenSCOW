@@ -14,7 +14,7 @@ import { OperationType } from "@scow/lib-operation-log/build/index";
 import { formatDateTime, getDefaultPresets } from "@scow/lib-web/build/utils/datetime";
 import { Button, DatePicker, Form, Input, Select, Table } from "antd";
 import dayjs from "dayjs";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
@@ -22,7 +22,7 @@ import { prefix, useI18n, useI18nTranslate, useI18nTranslateToString } from "src
 import {
   getOperationDetail,
   getOperationResultTexts,
-  getOperationTypeTexts, OperationLog,
+  getOperationTypeTexts, OperationCodeMap, OperationLog,
   OperationLogQueryType,
   OperationResult } from "src/models/operationLog";
 import { User } from "src/stores/UserStore";
@@ -97,16 +97,19 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
 
   const { data, isLoading } = useAsync({ promiseFn });
 
-  const formattedData = useMemo(() => {
-    return data?.results.map((result) => {
-      const translatedOperationDetail = getOperationDetail(result, t, tArgs);
+  const getformatData = (results: OperationLog[] | undefined) => {
+    if (!results) {
+      return [];
+    }
+    return results.map((data) => {
       return {
-        ...result,
-        operationDetail: translatedOperationDetail,
+        ...data,
+        operationCode: data.operationEvent?.["$case"] ? OperationCodeMap[data.operationEvent?.["$case"]] : "000000",
+        operationType: data.operationEvent?.["$case"] || "unknown",
+        operationDetail: getOperationDetail(data.operationEvent, t, tArgs),
       };
     });
-  }, [data, t]);
-
+  };
 
   return (
     <div>
@@ -159,7 +162,7 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
         </Form>
       </FilterFormContainer>
       <Table
-        dataSource={formattedData}
+        dataSource={getformatData(data?.results)}
         loading={isLoading}
         pagination={{
           current: pageInfo.page,
@@ -170,13 +173,16 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
         }}
       >
         <Table.Column<OperationLog> dataIndex="operationLogId" title="ID" />
-        <Table.Column<OperationLog> dataIndex="operationCode" title={t(p("operationCode"))} />
-        <Table.Column<OperationLog>
-          dataIndex="operationType"
-          title={t(p("operationType"))}
-          render={(operationType) => OperationTypeTexts[operationType] }
+        <Table.Column
+          dataIndex="operationCode"
+          title="操作码"
         />
-        <Table.Column<OperationLog>
+        <Table.Column
+          dataIndex="operationType"
+          title="操作行为"
+          render={(operationType) => OperationTypeTexts[operationType]}
+        />
+        <Table.Column
           dataIndex="operationDetail"
           title={t(p("operationDetail"))}
         />
