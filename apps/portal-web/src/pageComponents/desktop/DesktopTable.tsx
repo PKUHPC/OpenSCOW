@@ -16,7 +16,7 @@ import { Button, Form, Select, Table } from "antd";
 import { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
 import { useRouter } from "next/router";
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import { useAsync } from "react-async";
 import { useStore } from "simstate";
 import { api } from "src/apis";
@@ -58,13 +58,15 @@ export const DesktopTable: React.FC<Props> = ({ loginDesktopEnabledClusters }) =
 
   const clusterQuery = queryToString(router.query.cluster);
   const loginQuery = queryToString(router.query.loginNode);
+
+  const [selectedLoginNodeAddress, setSelectedLoginNodeAddress] = useState("");
   // 如果默认集群没开启登录节点桌面功能，则取开启此功能的某一集群为默认集群。
   const enabledDefaultCluster = loginDesktopEnabledClusters.find((x) => x.id === defaultCluster.id)
     ? defaultCluster
     : loginDesktopEnabledClusters[0];
   const cluster = publicConfig.CLUSTERS.find((x) => x.id === clusterQuery) ?? enabledDefaultCluster;
 
-  const loginNode = loginNodes[cluster.id].find((x) => x.name === loginQuery) ?? undefined;
+  const loginNode = loginNodes[cluster.id].find((x) => x.address === loginQuery) ?? undefined;
 
   const { data, isLoading, reload } = useAsync({
     promiseFn: useCallback(async () => {
@@ -84,7 +86,7 @@ export const DesktopTable: React.FC<Props> = ({ loginDesktopEnabledClusters }) =
           }),
         ),
       ).flat();
-    }, [cluster, loginNode]),
+    }, [cluster, loginNode?.address]),
   });
 
   const { data: availableWms, isLoading: isWmLoading } = useAsync({
@@ -157,10 +159,11 @@ export const DesktopTable: React.FC<Props> = ({ loginDesktopEnabledClusters }) =
             <Select
               allowClear
               style={{ minWidth: 100 }}
-              value={loginNode?.name}
+              value={selectedLoginNodeAddress ?
+                loginNodes[cluster.id].find((loginNode) => loginNode.address === selectedLoginNodeAddress)?.name : ""}
               onChange={(x) => {
                 const nextLoginQuery = x
-                  ? loginNodes[cluster.id].find((loginNode) => loginNode.address === x)?.name
+                  ? loginNodes[cluster.id].find((loginNode) => loginNode.address === x)?.address
                   : undefined;
                 router.push({
                   query: nextLoginQuery
@@ -170,6 +173,7 @@ export const DesktopTable: React.FC<Props> = ({ loginDesktopEnabledClusters }) =
                     }
                     : { cluster: cluster.id },
                 });
+                setSelectedLoginNodeAddress(x);
               }}
               options={loginNodes[cluster.id].map((loginNode) => ({
                 label: loginNode.name, value: loginNode.address,
