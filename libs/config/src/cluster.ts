@@ -75,7 +75,7 @@ export const ClusterConfigSchema = Type.Object({
   })),
   loginNodes: Type.Union([
     Type.Array(LoginNodeConfigSchema),
-    Type.Array(Type.String(), { description: "集群的登录节点地址", default: [], uniqueItems: true }),
+    Type.Array(Type.String(), { description: "集群的登录节点地址", default: []}),
   ]),
   loginDesktop: Type.Optional(LoginDeskopConfigSchema),
   turboVNCPath: Type.Optional(TurboVncConfigSchema),
@@ -94,24 +94,29 @@ export const getClusterConfigs: GetConfigFn<Record<string, ClusterConfigSchema>>
       logger,
     );
 
-    // 如果cluster中配置了多个登录节点，检查每个节点的地址是否唯一
-    // 如果loinNodes类型为Type.Array(Type.String()),利用JsonSchema的uniqueItems进行检查
-    // 如果loginNodes的类型为Type.Array(LoginNodeConfigSchema),检查address元素的值是否唯一
+    // 检查所有集群配置下的登陆节点地址是否重复，如果重复扔出错误
+    const uniqueAddressesList = new Set();
+    const allAddressesList: string[] = [];
     for (const cluster in config) {
       if (Object.hasOwnProperty.call(config, cluster)) {
         const clusterInfo = config[cluster];
+        if (clusterInfo && clusterInfo.loginNodes.length > 0) {
 
-        if (clusterInfo && clusterInfo.loginNodes.length > 1 &&
-          typeof clusterInfo.loginNodes[0] !== "string") {
-
-          const addressList = clusterInfo.loginNodes.map((item) => item.address);
-          const isUnique = new Set(addressList).size === addressList.length;
-
-          if (!isUnique) {
-            throw new Error(`loginNodes in ${cluster} must NOT have duplicate addresses`);
-          }
+          clusterInfo.loginNodes.map((ln) => {
+            if (typeof ln === "string") {
+              uniqueAddressesList.add(ln);
+              allAddressesList.push(ln);
+            } else {
+              uniqueAddressesList.add(ln.address);
+              allAddressesList.push(ln.address);
+            }
+          });
         }
       }
+    }
+    const isUnique = uniqueAddressesList.size === allAddressesList.length;
+    if (!isUnique) {
+      throw new Error("loginNodes must NOT have duplicate addresses");
     }
 
     return config;
