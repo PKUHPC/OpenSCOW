@@ -29,8 +29,9 @@ export async function initShellFile(cluster: string, logger: Logger) {
     // make sure directory /etc/profile.d exists.
     await ssh.mkdir(PROFILE_DIRECTORY);
     const sftp = await ssh.requestSFTP();
-
+    logger.info(cluster, "before ssh.putFile ======================");
     await ssh.putFile(SHELL_FILE_LOCAL, SHELL_FILE_REMOTE);
+    logger.info(cluster, "ssh.putFile done ========================");
     await sftpChmod(sftp)(SHELL_FILE_REMOTE, "755");
     logger.info(`Copy scow-shell-file.sh to the ${SHELL_FILE_REMOTE} of the login node of cluster ${cluster}.`);
   });

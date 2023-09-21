@@ -52,7 +52,11 @@ export async function createServer() {
   if (process.env.NODE_ENV === "production") {
     await checkClustersRootUserLogin(server.logger);
     await Promise.all(Object.entries(clusters).map(async ([id]) => {
-      await initShellFile(id, server.logger);
+      try {
+        await initShellFile(id, server.logger);
+      } catch (e) {
+        server.logger.error(e, `Failed to init shell file for cluster ${id}`);
+      }
     }));
     await setupProxyGateway(server.logger);
   }
