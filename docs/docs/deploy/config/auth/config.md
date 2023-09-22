@@ -10,19 +10,26 @@ title: 内置认证系统配置
 
 在`auth.yaml`配置中，可以配置关于登录界面 UI 的部分内容。
 
-其中关于背景图片路径的设置可以参考[公共文件](https://pkuhpc.github.io/SCOW/docs/deploy/config/customization/public-files)进行配置。需要强调的是该路径是相对于公共文件的路径。
+其中关于背景图片路径和自定义 logo 图片路径的设置可以参考[公共文件](https://pkuhpc.github.io/SCOW/docs/deploy/config/customization/public-files)进行配置。需要强调的是该路径是相对于公共文件的路径。
 ```yaml
 # auth 界面 ui 配置
 ui:
   # 登录界面背景图，设置为""(空字符串)则无背景图
   # 可选配置，默认加载 install.yml 同级的 /public/assets 目录下的 background.png 作为背景图
   backgroundImagePath: "./assets/background.png"
-  # 登录界面背景色，当背景图无法加载或者没有时，背景色起效
-  # 可选配置，默认为 #9a0000
-  backgroundFallbackColor: "#9a0000"
-  # 登录界面 logo 图, light: 亮色模式下的 logo, dark: 黑暗模式下的 logo
-  # 可选配置，默认为黑暗模式 logo
-  logoType: "dark"
+  # 登录界面背景色，当背景图无法加载时，背景色起效
+  # 可选配置，默认为 #8c8c8c
+  backgroundFallbackColor: "#8c8c8c"
+  # 登录界面 logo，可选配置
+  logo:
+    # 未配置自定义 logo（customLogoPath） 时，默认使用 SCOW Logo
+    # light: 亮色模式下的 logo, dark: 黑暗模式下的 logo
+    # 可选配置，默认为黑暗模式 logo
+    scowLogoType: "dark"
+    # 可选配置，自定义 logo 的图片路径。与背景图一致，路径时相对于公共文件的路径
+    customLogoPath: ""
+    # 可选配置，自定义点击 logo 跳转地址
+    customLogoLink: "https://icode.pku.edu.cn/SCOW/"
 
   # 登录界面 slogan 配置
   # 可选配置，默认右侧无 slogan
@@ -30,7 +37,7 @@ ui:
     # 登录界面 slogan 文字颜色
     # 可选配置，默认为白色字体
     color: "white"
-    # 登录界面 slogan 标题
+    # 登录界面 slogan title
     # 可选配置，默认无 slogan 标题
     title: "开源算力中心门户和管理平台"
     # 多条 slogan 文本
@@ -41,6 +48,10 @@ ui:
       - "一体化部署，开箱即用"
       - "标准化平台，支持算力融合"
       - "开源中立，独立自主"
+
+  # 登陆界面底部 Power By 字体颜色配置
+  # 可选配置，默认为白色字体
+  footerTextColor: "white"
 ```
 
 ## 允许回调主机名

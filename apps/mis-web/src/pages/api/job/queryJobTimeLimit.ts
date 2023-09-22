@@ -54,7 +54,7 @@ export default typeboxRoute(QueryJobTimeLimitSchema,
 
     const { cluster, jobId } = req.query;
 
-    const jobAccessible = await checkJobAccessible(jobId, cluster, info);
+    const { jobAccessible } = await checkJobAccessible(jobId, cluster, info);
 
     if (jobAccessible === "NotAllowed") {
       return { 403: null };

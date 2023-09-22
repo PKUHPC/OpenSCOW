@@ -34,16 +34,21 @@ type Props = {
    * @param accounts all accounts
    */
   onAccountsFetched?: (accounts: AdminAccountInfo[]) => void;
+
+  /**
+   * 如果为真，则从所有租户下获取账户
+   */
+  fromAllTenants?: boolean;
 }
 
 export const AccountSelector: React.FC<Props> = ({
-  onChange, value, placeholder, disabled, autoSelect, onAccountsFetched,
+  onChange, value, placeholder, disabled, autoSelect, onAccountsFetched, fromAllTenants,
 }) => {
 
   const userStore = useStore(UserStore);
 
   const promiseFn = useCallback(async () => {
-    return api.getAccounts({ query: { } });
+    return fromAllTenants ? api.getAllAccounts({ query: { } }) : api.getAccounts({ query: { } });
   }, [userStore.user]);
 
   const { data, isLoading, reload } = useAsync({

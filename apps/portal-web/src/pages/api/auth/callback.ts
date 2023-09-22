@@ -14,13 +14,19 @@ import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { Type } from "@sinclair/typebox";
 import { setTokenCookie } from "src/auth/cookie";
 import { validateToken } from "src/auth/token";
+import { OperationResult, OperationType } from "src/models/operationLog";
+import { callLog } from "src/server/operationLog";
 import { publicConfig } from "src/utils/config";
 import { route } from "src/utils/route";
+import { parseIp } from "src/utils/server";
 
 export const AuthCallbackSchema = typeboxRouteSchema({
   method: "GET",
 
-  query: Type.Object({ token: Type.String() }),
+  query: Type.Object({
+    token: Type.String(),
+    fromAuth: Type.Optional(Type.Boolean()),
+  }),
 
   responses: {
     200: Type.Null(),
@@ -33,7 +39,7 @@ export const AuthCallbackSchema = typeboxRouteSchema({
 
 export default route(AuthCallbackSchema, async (req, res) => {
 
-  const { token } = req.query;
+  const { token, fromAuth = false } = req.query;
 
   // query the token and get the username
   const info = await validateToken(token);
@@ -41,7 +47,14 @@ export default route(AuthCallbackSchema, async (req, res) => {
   if (info) {
     // set token cache
     setTokenCookie({ res }, token);
-
+    if (fromAuth) {
+      const logInfo = {
+        operatorUserId: info.identityId,
+        operatorIp: parseIp(req) ?? "",
+        operationTypeName: OperationType.login,
+      };
+      await callLog(logInfo, OperationResult.SUCCESS);
+    }
     res.redirect(publicConfig.BASE_PATH);
   } else {
     return { 403: null };

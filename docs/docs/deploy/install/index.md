@@ -89,6 +89,7 @@ chmod +x scow-cli
 2. [配置认证系统](../config/auth/intro.md)
 3. （可选）[配置门户系统](../config/portal/intro.md)
 4. （可选）[配置管理系统](../config/mis/intro.md)
+5. （可选）[配置审计系统](../config/audit/intro.md)
 
 部署完成后，运行以下命令启动系统。
 

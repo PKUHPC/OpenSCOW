@@ -90,6 +90,11 @@ export const platformAdminRoutes: (platformRoles: PlatformRole[]) => NavItemProp
             text: "充值记录",
             path: "/admin/finance/payments",
           },
+          {
+            Icon: BookOutlined,
+            text: "账户消费记录",
+            path: "/admin/finance/accountChargeRecords",
+          },
         ],
       },
       {
@@ -116,7 +121,12 @@ export const platformAdminRoutes: (platformRoles: PlatformRole[]) => NavItemProp
           },
         ],
       },
-
+      ...(publicConfig.AUDIT_DEPLOYED && platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ?
+        [{
+          Icon: BookOutlined,
+          text: "操作日志",
+          path: "/admin/operationLogs",
+        }] : []),
     ],
   },
 ];
@@ -210,7 +220,7 @@ export const tenantRoutes: (tenantRoles: TenantRole[], token: string) => NavItem
           ],
         },
       ] : []),
-      ...(tenantRoles.includes(TenantRole.TENANT_FINANCE) || 
+      ...(tenantRoles.includes(TenantRole.TENANT_FINANCE) ||
           tenantRoles.includes(TenantRole.TENANT_ADMIN) ? [
           {
             Icon: MoneyCollectOutlined,
@@ -233,9 +243,21 @@ export const tenantRoutes: (tenantRoles: TenantRole[], token: string) => NavItem
                 text: "充值记录",
                 path: "/tenant/finance/payments",
               },
+              {
+                Icon: BookOutlined,
+                text: "账户消费记录",
+                path: "/tenant/finance/accountChargeRecords",
+              },
             ],
           },
         ] : []),
+      ...(publicConfig.AUDIT_DEPLOYED && tenantRoles.includes(TenantRole.TENANT_ADMIN) ? [
+        {
+          Icon: BookOutlined,
+          text: "操作日志",
+          path: "/tenant/operationLogs",
+        },
+      ] : []),
     ],
   },
 ];
@@ -269,6 +291,13 @@ export const userRoutes: (accounts: AccountAffiliation[]) => NavItemProps[] = (a
         text: "集群和分区信息",
         path: "/user/partitions",
       },
+      ...(publicConfig.AUDIT_DEPLOYED
+        ? [{
+          Icon: BookOutlined,
+          text: "操作日志",
+          path: "/user/operationLogs",
+        }]
+        : []),
     ],
 
   },
@@ -315,6 +344,13 @@ export const accountAdminRoutes: (adminAccounts: AccountAffiliation[]) => NavIte
           text: "消费记录",
           path: `/accounts/${x.accountName}/charges`,
         },
+        ...(publicConfig.AUDIT_DEPLOYED
+          ? [{
+            Icon: BookOutlined,
+            text: "操作日志",
+            path: `/accounts/${x.accountName}/operationLogs`,
+          }]
+          : []),
       ],
 
     })),

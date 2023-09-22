@@ -10,11 +10,13 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Descriptions } from "antd";
+import { Descriptions, Typography } from "antd";
 import { NextPage } from "next";
 import { requireAuth } from "src/auth/requireAuth";
+import { ModalButton } from "src/components/ModalLink";
 import { Section } from "src/components/Section";
-import { ChangePasswordForm } from "src/pageComponents/profile/ChangePasswordForm";
+import { ChangePasswordModal } from "src/pageComponents/profile/ChangePasswordModal";
+import { antdBreakpoints } from "src/styles/constants";
 import { publicConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
 import styled from "styled-components";
@@ -22,15 +24,34 @@ import styled from "styled-components";
 const Container = styled.div`
   display: flex;
   flex-wrap: wrap;
+  flex-direction: column;
 `;
 
 const Part = styled(Section)`
-  min-width: 350px;
+  min-width: 400px;
   max-width: 600px;
   flex: 1;
-  margin: 0 16px 32px 0;
+  margin: 0 8px 16px 0;
+  @media (min-width: ${antdBreakpoints.md}px) {
+    margin: 0 16px 32px 0;
+  }
 `;
 
+const TitleText = styled(Typography.Title)`
+&& {
+  width: 100vw;
+  font-weight: 700;
+  font-size: 24px;
+  padding: 0 0 10px 20px;
+  margin-left: -25px;
+  border-bottom: 1px solid #ccc;
+  @media (min-width: ${antdBreakpoints.md}px) {
+    padding: 0 0 20px 30px;
+  }
+}
+`;
+
+const ChangePasswordModalButton = ModalButton(ChangePasswordModal, { type: "link" });
 
 
 export const ProfilePage: NextPage = requireAuth(() => true)(({ userStore: { user } }) => {
@@ -38,18 +59,38 @@ export const ProfilePage: NextPage = requireAuth(() => true)(({ userStore: { use
   return (
     <Container>
       <Head title="账号信息" />
-      <Part title="当前登录信息">
-        <Descriptions bordered column={1}>
+      <TitleText>用户信息</TitleText>
+      <Part title>
+        <Descriptions
+          column={1} 
+          labelStyle={{ paddingLeft:"10px", marginBottom:"10px" }}
+          contentStyle={{ paddingLeft:"10px" }}
+        >
           <Descriptions.Item label="用户ID">
             {user.identityId}
+          </Descriptions.Item>
+          <Descriptions.Item label="用户姓名">
+            {user.name}
           </Descriptions.Item>
         </Descriptions>
       </Part>
       {
         publicConfig.ENABLE_CHANGE_PASSWORD ? (
-          <Part title="修改密码">
-            <ChangePasswordForm />
-          </Part>
+          <>            
+            <TitleText>修改密码</TitleText>
+            <Part title>
+              <Descriptions
+                column={1} 
+                labelStyle={{ paddingLeft:"10px", paddingTop:"5px" }}
+                contentStyle={{ paddingLeft:"10px" }}
+              >
+                <Descriptions.Item label="登录密码">
+                  <span style={{ width:"200px" }}>********</span>
+                  <ChangePasswordModalButton>修改密码</ChangePasswordModalButton>
+                </Descriptions.Item>
+              </Descriptions>
+            </Part>
+          </>
         ) : undefined
       }
     </Container>

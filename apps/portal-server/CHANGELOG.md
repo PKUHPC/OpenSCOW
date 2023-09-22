@@ -1,5 +1,52 @@
 # @scow/portal-server
 
+## 1.0.0
+
+### Major Changes
+
+- 11f94f716: 发布 1.0
+
+### Patch Changes
+
+- 11922d134: 修复桌面功能以 root 创建文件夹导致工作目录权限错误问题
+- Updated dependencies [ee89b11b9]
+- Updated dependencies [ee89b11b9]
+- Updated dependencies [cb1e3500d]
+- Updated dependencies [11f94f716]
+  - @scow/config@1.0.0
+  - @scow/protos@1.0.0
+  - @scow/lib-config@1.0.0
+  - @scow/scheduler-adapter-protos@1.0.0
+  - @scow/rich-error-model@2.0.0
+  - @scow/lib-scheduler-adapter@1.0.0
+  - @scow/lib-server@1.0.0
+  - @scow/lib-ssh@1.0.0
+  - @scow/utils@1.0.0
+
+## 0.9.0
+
+### Patch Changes
+
+- 6f278a7b9: 门户系统桌面页面新增桌面信息，包括桌面名，桌面类型，创建时间。
+- d0a71ff79: 删除不用的 lib-slurm 库
+- 9edc86930: 解决使用 crane 提交交互式应用任务失败提示信息不完全
+- da5edd22c: 在集群与分区信息页面，实现仅显示用户有使用权限的分区信息
+- 8dcfc3f1a: 增加作业列表中 GPU 卡数的展示
+- 59cb5a418: 作业模版增加删除、重命名功能
+- Updated dependencies [67911fd92]
+- Updated dependencies [b96e5c4b2]
+- Updated dependencies [31dc79055]
+- Updated dependencies [9f70e2121]
+- Updated dependencies [6f278a7b9]
+- Updated dependencies [8dcfc3f1a]
+- Updated dependencies [1407743ad]
+- Updated dependencies [f3dd67ecb]
+  - @scow/config@0.5.0
+  - @scow/lib-scheduler-adapter@0.2.1
+  - @scow/protos@0.3.1
+  - @scow/lib-server@0.2.0
+  - @scow/rich-error-model@1.0.1
+
 ## 0.8.1
 
 ## 0.8.0

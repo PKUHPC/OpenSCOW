@@ -161,11 +161,14 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
       volumes: authVolumes,
     });
   } else {
+    const portalBasePath = join(BASE_PATH, PORTAL_PATH);
+
     addService("auth", {
       image: scowImage,
       environment: {
         "SCOW_LAUNCH_APP": "auth",
         "BASE_PATH": BASE_PATH,
+        "PORTAL_BASE_PATH": portalBasePath,
         ...serviceLogEnv,
       },
       ports: config.auth.portMappings?.auth ? { [config.auth.portMappings?.auth]: 5000 } : {},
@@ -204,6 +207,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
         "NOVNC_CLIENT_URL": join(BASE_PATH, "/vnc"),
         "CLIENT_MAX_BODY_SIZE": config.gateway.uploadFileSizeLimit,
         "PUBLIC_PATH": join(BASE_PATH, publicPath),
+        "AUDIT_DEPLOYED": config.audit ? "true" : "false",
       },
       ports: {},
       volumes: {
@@ -246,6 +250,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
         "PORTAL_DEPLOYED": config.portal ? "true" : "false",
         "AUTH_EXTERNAL_URL": join(BASE_PATH, "/auth"),
         "PUBLIC_PATH": join(BASE_PATH, publicPath),
+        "AUDIT_DEPLOYED": config.audit ? "true" : "false",
       },
       ports: {},
       volumes: {
@@ -267,5 +272,35 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
     });
   }
 
+  // AUDIT
+  if (config.audit) {
+    addService("audit-server", {
+      image: scowImage,
+      ports: config.audit.portMappings?.auditServer
+        ? { [config.audit.portMappings.auditServer]: 5000 }
+        : {},
+      environment: {
+        "SCOW_LAUNCH_APP": "audit-server",
+        "DB_PASSWORD": config.audit.dbPassword,
+        ...serviceLogEnv,
+      },
+      volumes: {
+        "./config": "/etc/scow",
+      },
+    });
+
+    composeSpec.volumes["audit_db_data"] = {};
+
+    addService("audit-db", {
+      image: config.audit.mysqlImage,
+      volumes: {
+        "audit_db_data": "/var/lib/mysql",
+      },
+      environment: {
+        "MYSQL_ROOT_PASSWORD": config.audit.dbPassword,
+      },
+      ports: config.audit.portMappings?.db ? { [config.audit.portMappings?.db]: 3306 } : {},
+    });
+  }
   return composeSpec;
 };

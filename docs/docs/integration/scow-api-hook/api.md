@@ -10,13 +10,13 @@ SCOW系统总体来说分为前端和后端部分（[架构](../../deploy/archit
 要使用SCOW API，您需要
 
 1. [获取SCOW Protobuf文件](./proto.md)并生成相关代码
-2. 编写程序，调用gRPC API与SCOW的后端部分组件`mis-server`, `portal-server`交互
+2. 编写程序，调用gRPC API与SCOW的后端部分组件`mis-server`, `portal-server`, `audit-server`交互
 
 ## 打开后端服务网络接口
 
-部署好的系统的后端服务容器`mis-server`, `portal-server`位于docker compose创建的网络中，从外界无法直接访问`mis-server`和`portal-server`两个服务。
+部署好的系统的后端服务容器`mis-server`, `portal-server`, `audit-server`位于docker compose创建的网络中，从外界无法直接访问`mis-server`, `portal-server`和`audit-server`服务。
 
-要想访问这两个服务，您需要通过`install.yaml`将主机上的端口映射到`mis-server`和`portal-server`服务的5000端口中。配置完成后，您可以从部署SCOW的机器上通过定义的IP和端口与对应的服务交互。
+要想访问这些服务，您需要通过`install.yaml`将主机上的端口映射到`mis-server`, `portal-server`和`audit-server`服务的5000端口中。配置完成后，您可以从部署SCOW的机器上通过定义的IP和端口与对应的服务交互。
 
 ```yaml title=install.yaml
 
@@ -28,6 +28,10 @@ mis:
   portMappings:
     # mis-server的5000端口映射到127.0.0.1:7571
     misServer: "127.0.0.1:7571"
+audit:
+  portMappings:
+    # audit-server的5000端口映射到127.0.0.1:7573
+    auditServer: "127.0.0.1:7573"
 ```
 
 ## API认证

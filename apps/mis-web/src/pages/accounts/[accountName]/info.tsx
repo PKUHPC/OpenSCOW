@@ -15,10 +15,13 @@ import { queryToString } from "@scow/lib-web/build/utils/querystring";
 import { Descriptions, Tag } from "antd";
 import { GetServerSideProps, NextPage } from "next";
 import { USE_MOCK } from "src/apis/useMock";
+import { requireAuth } from "src/auth/requireAuth";
 import { ssrAuthenticate, SSRProps } from "src/auth/server";
 import { UnifiedErrorPage } from "src/components/errorPages/UnifiedErrorPage";
 import { PageTitle } from "src/components/PageTitle";
 import { UserRole } from "src/models/User";
+import {
+  checkQueryAccountNameIsAdmin } from "src/pageComponents/accounts/checkQueryAccountNameIsAdmin";
 import { getAccounts } from "src/pages/api/tenant/getAccounts";
 import { Head } from "src/utils/head";
 
@@ -30,7 +33,10 @@ type Props = SSRProps<{
   blocked: boolean;
 }, 404>
 
-export const AccountInfoPage: NextPage<Props> = (props) => {
+export const AccountInfoPage: NextPage<Props> = requireAuth(
+  (u) => u.accountAffiliations.length > 0,
+  checkQueryAccountNameIsAdmin,
+)((props: Props) => {
 
   if ("error" in props) {
     return <UnifiedErrorPage code={props.error} />;
@@ -59,7 +65,8 @@ export const AccountInfoPage: NextPage<Props> = (props) => {
       </Descriptions>
     </div>
   );
-};
+});
+
 
 export const getServerSideProps: GetServerSideProps<Props> = async (ctx) => {
 

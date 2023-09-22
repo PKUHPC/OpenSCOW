@@ -1,5 +1,19 @@
 # @scow/gateway
 
+## 1.0.0
+
+### Major Changes
+
+- 11f94f716: 发布 1.0
+
+### Patch Changes
+
+- Updated dependencies [11f94f716]
+  - @scow/lib-config@1.0.0
+  - @scow/utils@1.0.0
+
+## 0.9.0
+
 ## 0.8.1
 
 ## 0.8.0

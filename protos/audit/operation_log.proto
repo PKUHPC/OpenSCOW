@@ -1,0 +1,430 @@
+/**
+   * Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
+   * SCOW is licensed under Mulan PSL v2.
+   * You can use this software according to the terms and conditions of the Mulan PSL v2.
+   * You may obtain a copy of Mulan PSL v2 at:
+   *          http://license.coscl.org.cn/MulanPSL2
+   * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+   * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+   * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+   * See the Mulan PSL v2 for more details.
+*/
+syntax = "proto3";
+
+package scow.audit;
+
+import "google/protobuf/timestamp.proto";
+import "common/money.proto";
+
+
+enum OperationResult {
+  UNKNOWN = 0;
+  SUCCESS = 1;
+  FAIL = 2;
+}
+
+message Login {
+
+}
+message Logout {
+
+}
+
+message SubmitJob {
+  string account_name = 1;
+  uint32 job_id = 2;
+}
+
+message EndJob {
+  uint32 job_id = 1;
+}
+
+message AddJobTemplate {
+  string job_template_id = 1;
+}
+
+message DeleteJobTemplate {
+  string job_template_id = 1;
+}
+
+message UpdateJobTemplate {
+  string job_template_id = 1;
+  string new_job_template_id = 2;
+}
+
+message ShellLogin {
+  string cluster_id = 1;
+  string login_node = 2;
+}
+
+message CreateDesktop {
+  string desktop_name = 1;
+  string wm = 2;
+}
+
+message DeleteDesktop {
+  uint32 desktop_id = 1;
+  string login_node = 2;
+}
+
+message CreateApp {
+  string account_name = 1;
+  uint32 job_id = 2;
+}
+
+message CreateFile {
+  string cluster_id = 1;
+  string path = 2;
+}
+
+message DeleteFile {
+  string cluster_id = 1;
+  string path = 2;
+}
+
+message UploadFile {
+  string cluster_id = 1;
+  string path = 2;
+}
+
+message CreateDirectory {
+  string cluster_id = 1;
+  string path = 2;
+}
+
+message DeleteDirectory {
+  string cluster_id = 1;
+  string path = 2;
+}
+
+
+message MoveFileItem {
+  string cluster_id = 1;
+  string from_path = 2;
+  string to_path = 3;
+}
+
+
+message CopyFileItem {
+  string cluster_id = 1;
+  string from_path = 2;
+  string to_path = 3;
+}
+
+message SetJobTimeLimit {
+  string account_name = 1;
+  uint32 job_id = 2;
+  int64 limit_minutes = 3;
+}
+
+message CreateUser {
+  string user_id = 1;
+}
+
+message AddUserToAccount {
+  string account_name = 1;
+  string user_id = 2;
+}
+
+message RemoveUserFromAccount {
+  string account_name = 1;
+  string user_id = 2;
+}
+
+message SetAccountAdmin {
+  string account_name = 1;
+  string user_id = 2;
+}
+
+message UnsetAccountAdmin {
+  string account_name = 1;
+  string user_id = 2;
+}
+
+message BlockUser {
+  string account_name = 1;
+  string user_id = 2;
+}
+
+message UnblockUser {
+  string account_name = 1;
+  string user_id = 2;
+}
+
+message AccountSetChargeLimit {
+  string account_name = 1;
+  string user_id = 2;
+  common.Money limit = 3;
+}
+
+message AccountUnsetChargeLimit {
+  string account_name = 1;
+  string user_id = 2;
+}
+
+message SetTenantBilling {
+  string tenant_name = 1;
+  // 集群_分区_QOS
+  string path = 2;
+  // 计量方式
+  string amount = 3;
+  common.Money price = 4;
+}
+
+message SetTenantAdmin {
+  string tenant_name = 1;
+  string user_id = 2;
+}
+
+message UnsetTenantAdmin {
+  string tenant_name = 1;
+  string user_id = 2;
+}
+
+message SetTenantFinance {
+  string tenant_name = 1;
+  string user_id = 2;
+}
+
+message UnsetTenantFinance {
+  string tenant_name = 1;
+  string user_id = 2;
+}
+
+message TenantChangePassword {
+  string tenant_name = 1;
+  string user_id = 2;
+}
+
+message CreateAccount {
+  string tenant_name = 1;
+  string account_name = 2;
+  string account_owner = 3;
+}
+
+message AddAccountToWhitelist {
+  string tenant_name = 1;
+  string account_name = 2;
+}
+
+message RemoveAccountFromWhitelist {
+  string tenant_name = 1;
+  string account_name = 2;
+}
+
+message AccountPay {
+  string tenant_name = 1;
+  string account_name = 2;
+  common.Money amount = 3;
+}
+
+message BlockAccount {
+  string account_name = 1;
+  string user_id = 2;
+  string tenant_name =3;
+}
+
+message UnblockAccount {
+  string account_name = 1;
+  string user_id = 2;
+  string tenant_name =3;
+}
+
+message ImportUsers {
+  string tenant_name = 1;
+  message ImportAccount {
+    string account_name = 1;
+    repeated string user_ids = 2;
+  }
+  repeated ImportAccount import_accounts = 2;
+}
+
+message SetPlatformAdmin {
+  string user_id = 1;
+}
+
+message UnsetPlatformAdmin {
+  string user_id = 1;
+}
+
+message SetPlatformFinance {
+  string user_id = 1;
+}
+
+message UnsetPlatformFinance {
+  string user_id = 1;
+}
+
+message PlatformChangePassword {
+  string user_id = 2;
+}
+
+message SetPlatformBilling {
+  // 集群_分区_QOS
+  string path = 1;
+  // 计量方式
+  string amount = 2;
+  common.Money price = 3;
+}
+
+message CreateTenant {
+  string tenant_name = 1;
+  string tenant_admin = 2;
+}
+
+message TenantPay {
+  string tenant_name = 1;
+  common.Money amount = 2;
+}
+
+message CreateOperationLogRequest {
+  string operator_user_id = 1;
+  string operator_ip = 2;
+  OperationResult operation_result = 3;
+  oneof operation_event {
+    Login login = 4;
+    Logout logout = 5;
+    SubmitJob submit_job = 6;
+    EndJob end_job = 7;
+    AddJobTemplate add_job_template = 8;
+    DeleteJobTemplate delete_job_template = 9;
+    UpdateJobTemplate update_job_template = 10;
+    ShellLogin shell_login = 11;
+    CreateDesktop create_desktop = 12;
+    DeleteDesktop delete_desktop = 13;
+    CreateApp create_app = 14;
+    CreateFile create_file = 15;
+    DeleteFile delete_file = 16;
+    UploadFile upload_file = 17;
+    CreateDirectory create_directory = 18;
+    DeleteDirectory delete_directory = 19;
+    MoveFileItem move_file_item = 20;
+    CopyFileItem copy_file_item = 21;
+    SetJobTimeLimit set_job_time_limit = 22;
+    CreateUser create_user = 23;
+    AddUserToAccount add_user_to_account = 24;
+    RemoveUserFromAccount remove_user_from_account = 25;
+    SetAccountAdmin set_account_admin = 26;
+    UnsetAccountAdmin unset_account_admin = 27;
+    BlockUser block_user = 28;
+    UnblockUser unblock_user = 29;
+    AccountSetChargeLimit account_set_charge_limit = 30;
+    AccountUnsetChargeLimit account_unset_charge_limit = 31;
+    SetTenantBilling set_tenant_billing = 32;
+    SetTenantAdmin set_tenant_admin = 33;
+    UnsetTenantAdmin unset_tenant_admin = 34;
+    SetTenantFinance set_tenant_finance = 35;
+    UnsetTenantFinance unset_tenant_finance = 36;
+    TenantChangePassword tenant_change_password = 37;
+    CreateAccount create_account = 38;
+    AddAccountToWhitelist add_account_to_whitelist = 39;
+    RemoveAccountFromWhitelist remove_account_from_whitelist = 40;
+    AccountPay account_pay = 41;
+    BlockAccount block_account = 42;
+    UnblockAccount unblock_account = 43;
+    ImportUsers import_users = 44;
+    SetPlatformAdmin set_platform_admin = 45;
+    UnsetPlatformAdmin unset_platform_admin = 46;
+    SetPlatformFinance set_platform_finance = 47;
+    UnsetPlatformFinance unset_platform_finance = 48;
+    PlatformChangePassword platform_change_password = 49;
+    SetPlatformBilling set_platform_billing = 50;
+    CreateTenant create_tenant = 51;
+    TenantPay tenant_pay = 52;
+  }
+}
+
+
+message OperationLog {
+  uint64 operation_log_id = 1;
+  string operator_user_id = 2;
+  string operator_ip = 3;
+  google.protobuf.Timestamp operation_time = 4;
+  OperationResult operation_result = 5;
+  oneof operation_event {
+    Login login = 6;
+    Logout logout = 7;
+    SubmitJob submit_job = 8;
+    EndJob end_job = 9;
+    AddJobTemplate add_job_template = 10;
+    DeleteJobTemplate delete_job_template = 11;
+    UpdateJobTemplate update_job_template = 12;
+    ShellLogin shell_login = 13;
+    CreateDesktop create_desktop = 14;
+    DeleteDesktop delete_desktop = 15;
+    CreateApp create_app = 16;
+    CreateFile create_file = 17;
+    DeleteFile delete_file = 18;
+    UploadFile upload_file = 19;
+    CreateDirectory create_directory = 20;
+    DeleteDirectory delete_directory = 21;
+    MoveFileItem move_file_item = 22;
+    CopyFileItem copy_file_item = 23;
+    SetJobTimeLimit set_job_time_limit = 24;
+    CreateUser create_user = 25;
+    AddUserToAccount add_user_to_account = 26;
+    RemoveUserFromAccount remove_user_from_account = 27;
+    SetAccountAdmin set_account_admin = 28;
+    UnsetAccountAdmin unset_account_admin = 29;
+    BlockUser block_user = 30;
+    UnblockUser unblock_user = 31;
+    AccountSetChargeLimit account_set_charge_limit = 32;
+    AccountUnsetChargeLimit account_unset_charge_limit = 33;
+    SetTenantBilling set_tenant_billing = 34;
+    SetTenantAdmin set_tenant_admin = 35;
+    UnsetTenantAdmin unset_tenant_admin = 36;
+    SetTenantFinance set_tenant_finance = 37;
+    UnsetTenantFinance unset_tenant_finance = 38;
+    TenantChangePassword tenant_change_password = 39;
+    CreateAccount create_account = 40;
+    AddAccountToWhitelist add_account_to_whitelist = 41;
+    RemoveAccountFromWhitelist remove_account_from_whitelist = 42;
+    AccountPay account_pay = 43;
+    BlockAccount block_account = 44;
+    UnblockAccount unblock_account = 45;
+    ImportUsers import_users = 46;
+    SetPlatformAdmin set_platform_admin = 47;
+    UnsetPlatformAdmin unset_platform_admin = 48;
+    SetPlatformFinance set_platform_finance = 49;
+    UnsetPlatformFinance unset_platform_finance = 50;
+    PlatformChangePassword platform_change_password = 51;
+    SetPlatformBilling set_platform_billing = 52;
+    CreateTenant create_tenant = 53;
+    TenantPay tenant_pay = 54;
+  }
+}
+
+message CreateOperationLogResponse {
+}
+
+message OperationLogFilter {
+  // if length === 0, get from all operators
+  repeated string operator_user_ids = 1;
+  // 如果存在，则表示筛选特定账户的操作日志
+  optional string operation_target_account_name = 2;
+
+  // 筛选项如果为空，则返回所有
+  optional string operation_type = 3;
+  optional google.protobuf.Timestamp start_time = 4;
+  optional google.protobuf.Timestamp end_time = 5;
+  optional OperationResult operation_result = 6;
+}
+
+message GetOperationLogsRequest {
+  OperationLogFilter filter = 1;
+  uint32 page = 2;
+  // if undefined or 0, page_size is 10
+  optional uint64 page_size = 3;
+}
+
+message GetOperationLogsResponse {
+  repeated OperationLog results = 1;
+  uint32 total_count = 2;
+}
+
+
+service OperationLogService {
+  rpc CreateOperationLog(CreateOperationLogRequest) returns (CreateOperationLogResponse);
+  rpc GetOperationLogs(GetOperationLogsRequest) returns (GetOperationLogsResponse);
+
+}

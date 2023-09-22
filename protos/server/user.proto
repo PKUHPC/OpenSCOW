@@ -243,6 +243,8 @@ message GetUserInfoResponse {
   string name = 4;
   string tenant_name = 5;
   string email = 6;
+  google.protobuf.Timestamp create_time = 7;
+
 }
 
 message GetUsersResponse {
@@ -282,6 +284,20 @@ message GetAllUsersRequest {
 message GetAllUsersResponse {
   uint64 total_count = 1;
   repeated PlatformUserInfo platform_users = 2;
+}
+
+message GetUsersByIdsRequest {
+  repeated string user_ids = 1;
+}
+
+message GetUsersByIdsResponse {
+
+  message UserInfo {
+    string user_id = 1;
+    string user_name = 2;
+  }
+
+  repeated UserInfo users = 1;
 }
 
 message GetPlatformUsersCountsRequest {
@@ -352,6 +368,7 @@ message ChangeEmailResponse {
 }
 
 
+
 service UserService {
 
   rpc GetUsers(GetUsersRequest) returns (GetUsersResponse);
@@ -367,6 +384,8 @@ service UserService {
   rpc GetUserStatus(GetUserStatusRequest) returns (GetUserStatusResponse);
   rpc QueryUsedStorageQuota(QueryUsedStorageQuotaRequest)
       returns (QueryUsedStorageQuotaResponse);
+
+  rpc GetUsersByIds(GetUsersByIdsRequest) returns (GetUsersByIdsResponse);
 
   //新增用户，在数据库中增加用户，然后调用auth服务在ldap中增加该用户，
   //并将公钥插入用户的authorized_keys

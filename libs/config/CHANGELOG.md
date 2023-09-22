@@ -1,5 +1,36 @@
 # @scow/config
 
+## 1.0.0
+
+### Major Changes
+
+- 11f94f716: 发布 1.0
+
+### Minor Changes
+
+- ee89b11b9: 新增审计系统配置文件
+
+### Patch Changes
+
+- cb1e3500d: 在 mis.yaml 中增加可选填的自定义可查询消费类型 customChargeTypes
+- Updated dependencies [11f94f716]
+  - @scow/lib-config@1.0.0
+
+## 0.5.0
+
+### Minor Changes
+
+- b96e5c4b2: 支持在导航栏右侧的用户下拉菜单中增加自定义链接
+- f3dd67ecb: 增加用户通过代码自定义收费规则的功能
+
+### Patch Changes
+
+- 67911fd92: 增加 requireGpu 配置项
+- 31dc79055: 在 mis.yaml 和 portal.yaml 下的 navLinks 中增加 openInNewPage 可选配置，默认为 false。修改一级导航配置项 url 变更为可选配置。
+- 9f70e2121: 集群配置文件新增 priority，提供集群显示排序功能
+- 6f278a7b9: portal 配置新增 desktopsDir, 保存登录节点桌面信息
+- 1407743ad: 增加提交作业的命令框中的提示语句可配置
+
 ## 0.4.0
 
 ### Minor Changes

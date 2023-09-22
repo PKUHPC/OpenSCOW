@@ -1,5 +1,77 @@
 # @scow/mis-server
 
+## 1.0.0
+
+### Major Changes
+
+- 11f94f716: 发布 1.0
+
+### Patch Changes
+
+- cb1e3500d: 增加租户管理下和平台管理下的账户消费列表页面，优化账户消费列表显示
+- 1fc3688b8: 暴露操作集群时后端返回的错误信息
+- ffefb17b8: 修复账户添加用户提示语
+- 3610e95da: portal-web 和 mis-web 的个人信息页面调整
+- 1bdccd827: 限制创建账户时的拥有者仅为当前租户下的用户
+- 0fbba98dd: 用户、账户、作业称呼统一
+- 1269e3cef: 操作日志搜索时间精度到秒，展示操作者姓名以及每页默认展示 50 条记录
+- Updated dependencies [ee89b11b9]
+- Updated dependencies [ee89b11b9]
+- Updated dependencies [cb1e3500d]
+- Updated dependencies [11f94f716]
+  - @scow/config@1.0.0
+  - @scow/protos@1.0.0
+  - @scow/lib-auth@1.0.0
+  - @scow/lib-decimal@1.0.0
+  - @scow/lib-hook@1.0.0
+  - @scow/lib-config@1.0.0
+  - @scow/scheduler-adapter-protos@1.0.0
+  - @scow/lib-scheduler-adapter@1.0.0
+  - @scow/lib-server@1.0.0
+  - @scow/lib-ssh@1.0.0
+  - @scow/utils@1.0.0
+
+## 0.9.0
+
+### Minor Changes
+
+- f9c2080b9: fetchJob 功能支持分集群获取作业，从而可以自动导入新增集群的历史作业
+- 1c5e3a307: 平台管理中增加租户列表显示
+- f3dd67ecb: 增加用户通过代码自定义收费规则的功能
+
+### Patch Changes
+
+- 75951b5bb: 租户管理下账户列表，白名单账户显示优化；增加账户统计信息，用户数量显示等功能。
+- d0a71ff79: 删除不用的 lib-slurm 库
+- c7d5e50ef: 调整 CallOnAll 的返回类型
+- f9fbd4cd2: 租户管理中拆分租户和账户充值记录查询，平台管理中租户查询充值记录时可以下拉选择租户
+- 0be4c9ecf: 调整导入作业流程
+- d49a34986: 优化租户管理和平台管理的用户列表，增加各角色用户总数显示，优化显示文字及列表结果排序
+- 572530a01: mis-web 用户修改邮箱,用户原邮箱直接展示且不可修改，用户填写符合规则的新邮箱后即可直接修改邮箱。
+- da5edd22c: 在集群与分区信息页面，实现仅显示用户有使用权限的分区信息
+- 291f1d471: mis-web 管理系统 UI 文字和栏目优化。mis-server 返回租户信息中增加租户财务人员，返回平台信息中增加平台财务人员。
+- 6522b47cf: 修改作业时限优化，将增加减少时限改为直接设置作业时限，并且检查是否大于作业的运行时间
+- 8dcfc3f1a: 增加作业列表中 GPU 卡数的展示
+- cce9d6c92: 取消用户限额时可选择是否同时解除对用户的封锁
+- e87b2ce5f: 修复调用适配器 getJobById 时，循环 jobIdList 获取 jobId 问题
+- 1c668544f: 增加 hook：jobsSaved，此 hook 在作业信息持久化到 scow 数据库后调用
+- Updated dependencies [67911fd92]
+- Updated dependencies [113e1e4ea]
+- Updated dependencies [b96e5c4b2]
+- Updated dependencies [31dc79055]
+- Updated dependencies [572530a01]
+- Updated dependencies [9f70e2121]
+- Updated dependencies [6f278a7b9]
+- Updated dependencies [8dcfc3f1a]
+- Updated dependencies [1407743ad]
+- Updated dependencies [f3dd67ecb]
+  - @scow/config@0.5.0
+  - @scow/lib-auth@0.3.0
+  - @scow/lib-scheduler-adapter@0.2.1
+  - @scow/protos@0.3.1
+  - @scow/lib-hook@0.2.4
+  - @scow/lib-server@0.2.0
+
 ## 0.8.1
 
 ## 0.8.0

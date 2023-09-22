@@ -17,6 +17,7 @@ import type { RunningJob } from "@scow/protos/build/common/job";
 import type { Account } from "@scow/protos/build/server/account";
 import type { AccountUserInfo, GetUserStatusResponse } from "@scow/protos/build/server/user";
 import { api } from "src/apis/api";
+import { OperationResult } from "src/models/operationLog";
 import { ClusterAccountInfo_ImportStatus, PlatformRole,
   TenantRole, UserInfo, UserRole, UserStatus } from "src/models/User";
 import { DEFAULT_TENANT_NAME } from "src/utils/constants";
@@ -291,6 +292,7 @@ export const mockApi: MockApi<typeof api> = {
   logout: async () => null,
 
   getCharges: async () => ({ results: [{
+    tenantName: "tenant",
     amount: 10,
     comment: "123",
     index: 1,
@@ -370,6 +372,8 @@ export const mockApi: MockApi<typeof api> = {
   },
   blockUserInAccount: async () => ({ executed: true }),
   unblockUserInAccount: async () => ({ executed: true }),
+  blockAccount: async () => ({ executed: true }),
+  unblockAccount: async () => ({ executed: true }),
   updateBlockStatus: async () => null,
   removeUserFromAccount: async () => null,
   setAdmin: async () => ({ executed: true }),
@@ -405,6 +409,16 @@ export const mockApi: MockApi<typeof api> = {
     }),
   createTenant: async () => ({ createdInAuth: true }),
   validateToken: async () => MOCK_USER_INFO,
+
+  getOperationLogs: async () => ({ results: [{
+    operationLogId: 99,
+    operatorUserId: "testUser",
+    operatorUserName: "testUser",
+    operatorIp: "localhost",
+    operationResult: OperationResult.SUCCESS,
+    operationTime: "2020-04-23T23:49:50.000Z",
+    operationEvent: { $case: "login", login: {} },
+  }], totalCount: 1 }),
 };
 
 export const MOCK_USER_INFO = {
@@ -420,6 +434,7 @@ export const MOCK_USER_INFO = {
     { accountName: "hpc2001213077", role: UserRole.ADMIN },
     { accountName: "hpc2001213075", role: UserRole.USER },
   ],
+  createTime:"2023-08-03T03:47:23.485Z",
 } as UserInfo;
 
 export const MOCK_USER_STATUS: GetUserStatusResponse = {

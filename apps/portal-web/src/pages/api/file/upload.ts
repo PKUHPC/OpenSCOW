@@ -17,9 +17,12 @@ import { Type } from "@sinclair/typebox";
 import busboy, { BusboyEvents } from "busboy";
 import { once } from "events";
 import { authenticate } from "src/auth/server";
+import { OperationResult, OperationType } from "src/models/operationLog";
+import { callLog } from "src/server/operationLog";
 import { getClient } from "src/utils/client";
 import { pipeline } from "src/utils/pipeline";
 import { route } from "src/utils/route";
+import { parseIp } from "src/utils/server";
 import { pipeline as pipelineStream } from "stream/promises";
 
 export const UploadFileSchema = typeboxRouteSchema({
@@ -50,9 +53,19 @@ export default route(UploadFileSchema, async (req, res) => {
 
   const client = getClient(FileServiceClient);
 
+  const logInfo = {
+    operatorUserId: info.identityId,
+    operatorIp: parseIp(req) ?? "",
+    operationTypeName: OperationType.uploadFile,
+    operationTypePayload:{
+      clusterId: cluster, path,
+    },
+  };
+
   pipelineStream(req, bb);
 
-  const [_name, file] = (await once(bb, "file").catch((e) => {
+  const [_name, file] = (await once(bb, "file").catch(async (e) => {
+    await callLog(logInfo, OperationResult.FAIL);
     throw new Error("Error when waiting for file upload", { cause: e });
   })) as Parameters<BusboyEvents["file"]>;
 
@@ -63,11 +76,15 @@ export default route(UploadFileSchema, async (req, res) => {
       file,
       (chunk) => ({ message: { $case: "chunk" as const, chunk } }),
       stream,
-    ).catch((e) => {
+    ).catch(async (e) => {
+      await callLog(logInfo, OperationResult.FAIL);
       throw new Error("Error when writing stream", { cause: e });
     });
 
-  }).then(() => ({ 204: null })).finally(() => {
+  }).then(async () => {
+    await callLog(logInfo, OperationResult.SUCCESS);
+    return { 204: null };
+  }).finally(() => {
     bb.end();
   });
 });

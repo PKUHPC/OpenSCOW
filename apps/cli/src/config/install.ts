@@ -100,7 +100,19 @@ export const InstallConfigSchema = Type.Object({
     enabledPlugins: Type.Optional(Type.Array(Type.String(), { description: "启用的插件列表" })),
     pluginsDir: Type.String({ description: "插件目录", default: "./plugins" }),
   }, { default: {} }),
-});
+
+  audit:  Type.Optional(Type.Object({
+    mysqlImage: Type.String({ description: "审计系统数据库镜像", default: "mysql:8" }),
+    dbPassword: Type.String({ description: "审计系统数据库密码", default: "must!chang3this" }),
+
+    portMappings: Type.Optional(Type.Object({
+      db: Type.Optional(Type.Union([Type.String(), Type.Integer()], { description: "数据库映射出来的端口" })),
+      auditServer: Type.Optional(Type.Union([Type.String(), Type.Integer()], {
+        description: "audit-server映射出来的端口",
+      })),
+    })),
+  })),
+}, { description: "审计系统部署选项，如果不设置，则不部署审计系统" });
 
 export type InstallConfigSchema = Static<typeof InstallConfigSchema>;
 

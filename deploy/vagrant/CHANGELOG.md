@@ -1,5 +1,22 @@
 # @scow/demo-vagrant
 
+## 2.0.0
+
+### Major Changes
+
+- 11f94f716: 发布 1.0
+
+### Minor Changes
+
+- ee89b11b9: 新增审计系统服务，记录门户系统及管理系统操作日志及展示
+
+## 1.2.1
+
+### Patch Changes
+
+- eabb00659: vagrant 集群升级至支持适配器版本
+- defb92de7: 修正 readme 下更多文档的 url
+
 ## 1.2.0
 
 ### Minor Changes

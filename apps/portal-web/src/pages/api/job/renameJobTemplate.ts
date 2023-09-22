@@ -16,9 +16,11 @@ import { status } from "@grpc/grpc-js";
 import { JobServiceClient } from "@scow/protos/build/portal/job";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
+import { OperationResult, OperationType } from "src/models/operationLog";
+import { callLog } from "src/server/operationLog";
 import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
-import { handlegRPCError } from "src/utils/server";
+import { handlegRPCError, parseIp } from "src/utils/server";
 
 export const RenameJobTemplateSchema = typeboxRouteSchema({
   method: "POST",
@@ -47,9 +49,24 @@ export default /* #__PURE__*/route(RenameJobTemplateSchema, async (req, res) => 
 
   const client = getClient(JobServiceClient);
 
+  const logInfo = {
+    operatorUserId: info.identityId,
+    operatorIp: parseIp(req) ?? "",
+    operationTypeName: OperationType.updateJobTemplate,
+    operationTypePayload:{
+      jobTemplateId: templateId,
+      newJobTemplateId: jobName,
+    },
+  };
+
   return asyncUnaryCall(client, "renameJobTemplate", {
     templateId, userId: info.identityId, cluster, jobName,
-  }).then(() => ({ 204: null }), handlegRPCError({
+  }).then(async () => {
+    await callLog({ ...logInfo }, OperationResult.SUCCESS);
+    return { 204: null };
+  }, handlegRPCError({
     [status.NOT_FOUND]: () => ({ 404: { code: "TEMPLATE_NOT_FOUND" } } as const),
-  }));
+  },
+  async () => await callLog({ ...logInfo }, OperationResult.FAIL),
+  ));
 });

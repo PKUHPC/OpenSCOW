@@ -24,6 +24,7 @@ export const defaultPresets: TimeRangePickerProps["presets"] = (() => {
 
   return [
     { label: "今天", value: [now.startOf("day"), end]},
+    { label: "本周", value: [now.startOf("week"), end]},
     { label: "本月", value: [now.startOf("month"), end]},
     { label: "今年", value: [now.startOf("year"), end]},
     { label: "3个月", value: [now.subtract(3, "month").startOf("day"), end]},
@@ -39,5 +40,18 @@ export function compareDateTime(a: string, b: string): number {
   if (aMoment.isSame(bMoment)) { return 0; }
   if (aMoment.isBefore(bMoment)) { return -1; }
   return 1;
+
+}
+
+// Parse the given string in [{days}-][{Hours}:]{MM}:{SS} format and return number of milliseconds
+export function parseTime(time: string) {
+  const list = time.split(/[:-]/).map((x) => +x);
+
+  const seconds = list.at(-1);
+  const minutes = list.at(-2);
+  const hours = list.at(-3) ?? 0;
+  const days = list.at(-4) ?? 0;
+
+  return seconds! * 1000 + minutes! * 60000 + (hours * 3600000) + days * 86400000;
 
 }

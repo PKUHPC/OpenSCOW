@@ -1,5 +1,84 @@
 # @scow/portal-web
 
+## 1.0.0
+
+### Major Changes
+
+- 11f94f716: 发布 1.0
+
+### Minor Changes
+
+- ee89b11b9: 新增审计系统服务，记录门户系统及管理系统操作日志及展示
+
+### Patch Changes
+
+- d96e8ad91: auth 登录跳转回 web 页面时，判断 referer 是否包含 AUTH_EXTERNAL_URL + '/public/auth'以区分用户登录操作和切换门户/管理系统
+- 3610e95da: portal-web 和 mis-web 的个人信息页面调整
+- 945bbb5ec: 作业详情数据添加单位
+- 0fbba98dd: 用户、账户、作业称呼统一
+- 154f5a84a: 去掉 legacyBehavior，会影响 target=\_blank 在新窗口或标签中打开链接的效果
+- Updated dependencies [cb1e3500d]
+- Updated dependencies [ee89b11b9]
+- Updated dependencies [ee89b11b9]
+- Updated dependencies [946b1782a]
+- Updated dependencies [a8034f395]
+- Updated dependencies [cb1e3500d]
+- Updated dependencies [11f94f716]
+  - @scow/lib-web@1.0.0
+  - @scow/config@1.0.0
+  - @scow/lib-operation-log@2.0.0
+  - @scow/protos@1.0.0
+  - @scow/lib-auth@1.0.0
+  - @scow/lib-decimal@1.0.0
+  - @scow/lib-config@1.0.0
+  - @scow/rich-error-model@2.0.0
+  - @scow/lib-ssh@1.0.0
+  - @scow/utils@1.0.0
+
+## 0.9.0
+
+### Minor Changes
+
+- b96e5c4b2: 支持在导航栏右侧的用户下拉菜单中增加自定义链接
+- 113e1e4ea: 管理系统中，租户/平台管理员修改自己管理的用户密码时无需原密码
+
+### Patch Changes
+
+- 31dc79055: 增加是否打开新的页面配置项，默认为 false,所有导航点击时不打开新的页面；修改一级导航 url 配置项为可选，没有配置时 则默认跳转次级第一个导航的 url
+- 6f278a7b9: 门户系统桌面页面新增桌面信息，包括桌面名，桌面类型，创建时间。
+- 9edc86930: 解决使用 crane 提交交互式应用任务失败提示信息不完全
+- b76c4a122: 前端展示获取账户信息失败时后端返回的错误信息
+- c09807f02: 修复文件管理无法打开终端的问题
+- 143c9732e: 之前：退出登录或登陆过期时跳转到需要登录页面，现在：直接跳转到登录页面
+- 6522b47cf: 修改作业时限优化，将增加减少时限改为直接设置作业时限，并且检查是否大于作业的运行时间
+- 8dcfc3f1a: 增加作业列表中 GPU 卡数的展示
+- 67911fd92: 交互式应用增加计算分区和软件应用版本的联动选择
+- 1407743ad: 增加提交作业的命令框中的提示语句可配置
+- 59cb5a418: 作业模版增加删除、重命名功能
+- b79019ce1: 修复 storage 设置了默认集群但默认集群在 scow 上不存在导致网站无法加载的问题
+- 638c18b29: 修改创建交互式应用页面应用图标展示形状为方形展示
+- 9f70e2121: 门户系统去除默认集群选择功能，新增集群选择排序以及记录上次选择集群功能
+- Updated dependencies [75951b5bb]
+- Updated dependencies [67911fd92]
+- Updated dependencies [113e1e4ea]
+- Updated dependencies [1c74443b6]
+- Updated dependencies [b96e5c4b2]
+- Updated dependencies [d49a34986]
+- Updated dependencies [31dc79055]
+- Updated dependencies [572530a01]
+- Updated dependencies [9f70e2121]
+- Updated dependencies [6f278a7b9]
+- Updated dependencies [6522b47cf]
+- Updated dependencies [1407743ad]
+- Updated dependencies [53e596584]
+- Updated dependencies [f3dd67ecb]
+- Updated dependencies [9f70e2121]
+  - @scow/lib-web@0.4.0
+  - @scow/config@0.5.0
+  - @scow/lib-auth@0.3.0
+  - @scow/protos@0.3.1
+  - @scow/rich-error-model@1.0.1
+
 ## 0.8.1
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 {
   "name": "@scow/rich-error-model",
-  "version": "1.0.1",
+  "version": "2.0.0",
   "description": "",
   "main": "build/index.js",
   "private": true,
@@ -19,7 +19,7 @@
     "protobufjs": "7.2.4"
   },
   "devDependencies": {
-    "ts-proto": "1.156.3",
+    "ts-proto": "1.156.7",
     "@ddadaal/tsgrpc-server": "0.19.4",
     "@ddadaal/tsgrpc-common": "0.2.4",
     "@ddadaal/tsgrpc-client": "0.17.6",

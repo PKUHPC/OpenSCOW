@@ -76,6 +76,22 @@
 #     # environment:
 #     #   - DEBUG=log
 
+# 审计系统相关配置。默认不部署
+# audit:
+#   # 审计系统服务url，默认audit-server:5000
+#   # url: audit-server:5000
+#   # mysql数据库的镜像地址。默认为mysql:8
+#   # mysqlImage: "mysql:8"
+#   # 审计系统数据库的密码。如果部署审计系统，则必须配置
+#   # 第一次启动审计系统时会使用此密码初始化审计系统数据库，之后如需修改需要手动在数据库中修改
+#   # dbPassword: must!chang3this
+#   # 端口映射。如果不进行二次开发，请勿开放
+#   # portMappings:
+#   #   # 数据库的3306端口映射。不填写则不映射
+#   #   db: 127:0.0.1:3306
+#   #   # audit-server的5000端口映射到。不填写则不映射
+#   #   audit-server: 127.0.0.1:7573
+
 # 日志相关配置
 # log:
 #   # 日志级别。默认info

@@ -1,5 +1,41 @@
 # @scow/docs
 
+## 1.0.0
+
+### Major Changes
+
+- 11f94f716: 发布 1.0
+
+### Minor Changes
+
+- ee89b11b9: 新增审计系统服务，记录门户系统及管理系统操作日志及展示
+
+### Patch Changes
+
+- ae114aaec: 增加 SCOW API 中 audit-server 部分文档
+- 3446787cf: relion、rstudio 和 vscode 等交互式应用示例文档更新
+
+## 0.7.0
+
+### Minor Changes
+
+- 113e1e4ea: 在 auth 中添加了一个新的 capability 叫 checkPassword，用于检验密码。原先的修改密码 changePassword 不再需要旧密码
+- b96e5c4b2: 支持在导航栏右侧的用户下拉菜单中增加自定义链接
+
+### Patch Changes
+
+- 31dc79055: 增加是否打开新的页面配置项，默认为 false,所有导航点击时不打开新的页面；修改一级导航 url 配置项为可选，没有配置时 则默认跳转次级第一个导航的 url
+- 6f278a7b9: 门户系统桌面页面新增桌面信息，包括桌面名，桌面类型，创建时间。
+- cb9b8708d: 修改自定义 favicon 文档中的错误信息
+- bc7e40ca0: 修改文档网站架构图和说明
+- defb92de7: 修改 vagrant 项目 faq 和多集群管理配置
+- 72875e722: 新增 auth 登录界面可配置项
+- 1407743ad: 增加提交作业的命令框中的提示语句可配置
+- eabb00659: 修改 vagrant 集群说明，计费项未设置警告说明
+- 9f70e2121: 门户系统去除默认集群选择功能，新增集群选择排序以及记录上次选择集群功能
+- b2a52c546: 全新 SCOW 登录界面
+- 01f244950: 增加用户密码正则配置的文档
+
 ## 0.6.0
 
 ### Minor Changes

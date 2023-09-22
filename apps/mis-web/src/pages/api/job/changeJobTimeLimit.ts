@@ -16,9 +16,11 @@ import { Status } from "@grpc/grpc-js/build/src/constants";
 import { JobServiceClient } from "@scow/protos/build/server/job";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
+import { OperationResult, OperationType } from "src/models/operationLog";
 import { checkJobAccessible } from "src/server/jobAccessible";
+import { callLog } from "src/server/operationLog";
 import { getClient } from "src/utils/client";
-import { handlegRPCError } from "src/utils/server";
+import { handlegRPCError, parseIp } from "src/utils/server";
 
 export type ChangeMode =
   | "INCREASE"
@@ -35,10 +37,10 @@ export const ChangeJobTimeLimitSchema = typeboxRouteSchema({
     jobId: Type.String(),
 
     /**
-     * 时间变化，单位分钟
+     * 新的作业运行时限
      * @type integer
      */
-    delta: Type.Integer(),
+    limitMinutes: Type.Integer(),
   }),
 
   responses: {
@@ -47,6 +49,10 @@ export const ChangeJobTimeLimitSchema = typeboxRouteSchema({
     403: Type.Null(),
     /** 作业未找到 */
     404: Type.Null(),
+    /** 用户设置的时限错误 */
+    400: Type.Object({ code: Type.Literal("TIME_LIME_NOT_VALID"),
+      message: Type.String(),
+    }),
   },
 });
 
@@ -57,27 +63,47 @@ export default typeboxRoute(ChangeJobTimeLimitSchema,
     const info = await auth(req, res);
     if (!info) { return; }
 
-    const { cluster, delta, jobId } = req.body;
+    const { cluster, limitMinutes, jobId } = req.body;
 
     const client = getClient(JobServiceClient);
 
     // check if the user can change the job time limit
 
-    const jobAccessible = await checkJobAccessible(jobId, cluster, info);
+    const { job, jobAccessible } = await checkJobAccessible(jobId, cluster, info);
 
     if (jobAccessible === "NotAllowed") {
       return { 403: null };
     } else if (jobAccessible === "NotFound") {
       return { 404: null };
+    } else if (jobAccessible === "LimitNotValid") {
+      return {
+        400: {
+          code: "TIME_LIME_NOT_VALID" as const,
+          message: "设置作业时限需要大于该作业的运行时长。",
+        },
+      };
     }
 
+    const logInfo = {
+      operatorUserId: info.identityId,
+      operatorIp: parseIp(req) ?? "",
+      operationTypeName: OperationType.setJobTimeLimit,
+      operationTypePayload:{
+        jobId: +jobId, accountName: job.account, limitMinutes,
+      },
+    };
     return await asyncClientCall(client, "changeJobTimeLimit", {
       cluster,
-      delta,
+      limitMinutes,
       jobId,
     })
-      .then(() => ({ 204: null }))
+      .then(async () => {
+        await callLog(logInfo, OperationResult.SUCCESS);
+        return { 204: null };
+      })
       .catch(handlegRPCError({
         [Status.NOT_FOUND]: () => ({ 404: null }),
-      }));
+      },
+      async () => await callLog(logInfo, OperationResult.FAIL),
+      ));
   });

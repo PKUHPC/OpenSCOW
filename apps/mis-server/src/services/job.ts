@@ -237,8 +237,12 @@ export const jobServiceServer = plugin((server) => {
           ];
           if (jobIdList.length > 0) {
             const jobInfoList: AdapterJobInfo[] = [];
-            for (const jobId in jobIdList) {
-              const jobInfo = await asyncClientCall(client.job, "getJobById", { fields, jobId: Number(jobId) });
+            for (const jobId of jobIdList) {
+              const jobInfo = await asyncClientCall(client.job, "getJobById", { fields, jobId: Number(jobId) })
+                .catch((e) => {
+                  logger.info("GetJobById with JobId: %s failed", jobId, e);
+                  return { job: undefined };
+                });
               if (jobInfo.job) jobInfoList.push(jobInfo.job);
             }
             return jobInfoList;
@@ -256,14 +260,17 @@ export const jobServiceServer = plugin((server) => {
     },
 
     changeJobTimeLimit: async ({ request, logger }) => {
-      const { cluster, delta, jobId } = request;
+      const { cluster, limitMinutes, jobId } = request;
 
       await server.ext.clusters.callOnOne(
         cluster,
         logger,
-        async (client) => await asyncClientCall(client.job, "changeJobTimeLimit", {
-          jobId: Number(jobId), deltaMinutes: delta,
-        }),
+        async (client) => {
+          const { timeLimitMinutes } = await asyncClientCall(client.job, "queryJobTimeLimit", { jobId: Number(jobId) });
+          await asyncClientCall(client.job, "changeJobTimeLimit", {
+            jobId: Number(jobId), deltaMinutes: limitMinutes - timeLimitMinutes,
+          });
+        },
       );
 
       return [{}];

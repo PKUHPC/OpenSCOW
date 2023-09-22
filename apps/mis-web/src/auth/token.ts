@@ -47,6 +47,7 @@ export async function validateToken(token: string): Promise<UserInfo | undefined
     tenant: userInfo.tenantName,
     tenantRoles: userInfo.tenantRoles,
     email:userInfo.email,
+    createTime:userInfo.createTime,
   };
 
 }

@@ -1,5 +1,37 @@
 # @scow/cli
 
+## 1.0.0
+
+### Major Changes
+
+- 11f94f716: 发布 1.0
+
+### Minor Changes
+
+- ee89b11b9: 新增审计系统服务，记录门户系统及管理系统操作日志及展示
+
+### Patch Changes
+
+- Updated dependencies [ee89b11b9]
+- Updated dependencies [cb1e3500d]
+- Updated dependencies [11f94f716]
+  - @scow/config@1.0.0
+  - @scow/lib-config@1.0.0
+
+## 0.9.0
+
+### Patch Changes
+
+- 785a14bf5: 修复 auth logo 在修改系统相对路径后无法显示的问题
+- Updated dependencies [67911fd92]
+- Updated dependencies [b96e5c4b2]
+- Updated dependencies [31dc79055]
+- Updated dependencies [9f70e2121]
+- Updated dependencies [6f278a7b9]
+- Updated dependencies [1407743ad]
+- Updated dependencies [f3dd67ecb]
+  - @scow/config@0.5.0
+
 ## 0.8.1
 
 ## 0.8.0

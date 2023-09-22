@@ -1,5 +1,45 @@
 # @scow/protos
 
+## 1.0.0
+
+### Major Changes
+
+- 11f94f716: 发布 1.0
+
+### Minor Changes
+
+- ee89b11b9: 新增审计系统服务，记录门户系统及管理系统操作日志及展示
+
+### Patch Changes
+
+- Updated dependencies [ee89b11b9]
+- Updated dependencies [3610e95da]
+- Updated dependencies [cb1e3500d]
+- Updated dependencies [f784837d3]
+- Updated dependencies [1269e3cef]
+- Updated dependencies [11f94f716]
+  - @scow/grpc-api@1.0.0
+
+## 0.3.1
+
+### Patch Changes
+
+- Updated dependencies [1c668544f]
+- Updated dependencies [67911fd92]
+- Updated dependencies [6f278a7b9]
+- Updated dependencies [59cb5a418]
+- Updated dependencies [572530a01]
+- Updated dependencies [75951b5bb]
+- Updated dependencies [291f1d471]
+- Updated dependencies [d49a34986]
+- Updated dependencies [cce9d6c92]
+- Updated dependencies [1c5e3a307]
+- Updated dependencies [6522b47cf]
+- Updated dependencies [f9fbd4cd2]
+- Updated dependencies [8dcfc3f1a]
+- Updated dependencies [da5edd22c]
+  - @scow/grpc-api@0.6.0
+
 ## 0.3.0
 
 ### Minor Changes

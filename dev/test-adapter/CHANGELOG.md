@@ -1,5 +1,17 @@
 # @scow/test-adapter
 
+## 1.0.0
+
+### Major Changes
+
+- 11f94f716: 发布 1.0
+
+### Patch Changes
+
+- Updated dependencies [11f94f716]
+  - @scow/lib-config@1.0.0
+  - @scow/scheduler-adapter-protos@1.0.0
+
 ## 0.2.0
 
 ### Minor Changes

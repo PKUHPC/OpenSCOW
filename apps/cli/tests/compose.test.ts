@@ -93,3 +93,16 @@ describe("sets custom auth environment", () => {
       .toInclude("CUSTOM_AUTH_KEY=CUSTOM_AUTH_VALUE");
   });
 });
+
+
+it("deploy audit", async () => {
+  const config = getInstallConfig(configPath);
+  config.audit = { dbPassword: "must!chang3this", mysqlImage: "" };
+  config.portal = { basePath: "/", novncClientImage: "" };
+  config.mis = { basePath: "/mis", dbPassword: "must!chang3this", mysqlImage: "" };
+
+  const composeConfig = createComposeSpec(config);
+
+  expect(composeConfig.services["mis-web"].environment).toContain("AUDIT_DEPLOYED=true");
+  expect(composeConfig.services["portal-web"].environment).toContain("AUDIT_DEPLOYED=true");
+});

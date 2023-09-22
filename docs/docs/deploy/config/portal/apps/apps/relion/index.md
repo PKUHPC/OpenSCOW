@@ -36,8 +36,9 @@ type: vnc
 vnc:
   # 此X Session的xstartup脚本
   xstartup: |
+    module purge
     module load ${relion_version}
-    relion
+    echo y | relion
       
 # 配置HTML表单
 attributes:

@@ -16,6 +16,7 @@ const { getMisConfig } = require("@scow/config/build/mis");
 const { getCommonConfig } = require("@scow/config/build/common");
 const { getClusterTextsConfig } = require("@scow/config/build/clusterTexts");
 const { DEFAULT_PRIMARY_COLOR, getUiConfig } = require("@scow/config/build/ui");
+const { getAuditConfig } = require("@scow/config/build/audit");
 const { PHASE_DEVELOPMENT_SERVER, PHASE_PRODUCTION_BUILD, PHASE_PRODUCTION_SERVER } = require("next/constants");
 const { join } = require("path");
 const { getCapabilities } = require("@scow/lib-auth");
@@ -48,6 +49,8 @@ const specs = {
   PORTAL_URL: str({ desc: "如果部署了门户系统，门户系统的URL。如果和本系统域名相同，可以只写完整路径。将会覆盖配置文件。空字符串等价于未部署门户系统", default: "" }),
 
   PUBLIC_PATH: str({ desc: "SCOW公共文件的路径，需已包含SCOW的base path", default: "/public/" }),
+
+  AUDIT_DEPLOYED: bool({ desc: "是否部署了审计系统", default: false }),
 };
 
 const mockEnv = process.env.NEXT_PUBLIC_USE_MOCK === "1";
@@ -87,6 +90,7 @@ const buildRuntimeConfig = async (phase, basePath) => {
   const misConfig = getMisConfig(configBasePath, console);
 
   const commonConfig = getCommonConfig(configBasePath, console);
+  const auditConfig = getAuditConfig(configBasePath, console);
 
   const versionTag = readVersionFile()?.tag;
 
@@ -102,6 +106,7 @@ const buildRuntimeConfig = async (phase, basePath) => {
     DEFAULT_PRIMARY_COLOR,
     SERVER_URL: config.SERVER_URL,
     SCOW_API_AUTH_TOKEN: commonConfig.scowApi?.auth?.token,
+    AUDIT_CONFIG: config.AUDIT_DEPLOYED ? auditConfig : undefined,
   };
 
   /**
@@ -140,6 +145,15 @@ const buildRuntimeConfig = async (phase, basePath) => {
     USER_LINKS: commonConfig.userLinks,
 
     VERSION_TAG: versionTag,
+
+    AUDIT_DEPLOYED:  config.AUDIT_DEPLOYED,
+
+    CHARGE_TYPE_LIST: [
+      misConfig.jobChargeType,
+      misConfig.changeJobPriceType,
+      ...(misConfig.customChargeTypes || []),
+    ],
+
   };
 
   if (!building) {

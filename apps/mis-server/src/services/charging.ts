@@ -16,10 +16,12 @@ import { LockMode, QueryOrder } from "@mikro-orm/core";
 import { Decimal, decimalToMoney, moneyToNumber } from "@scow/lib-decimal";
 import { ChargingServiceServer, ChargingServiceService } from "@scow/protos/build/server/charging";
 import { charge, pay } from "src/bl/charging";
+import { misConfig } from "src/config/mis";
 import { Account } from "src/entities/Account";
 import { ChargeRecord } from "src/entities/ChargeRecord";
 import { PayRecord } from "src/entities/PayRecord";
 import { Tenant } from "src/entities/Tenant";
+import { CHARGE_TYPE_OTHERS } from "src/utils/constants";
 
 
 export const chargingServiceServer = plugin((server) => {
@@ -142,17 +144,17 @@ export const chargingServiceServer = plugin((server) => {
       return [{ types: result.map((x) => x.type) }];
     },
     /**
-     * 
+     *
      * case tenant:返回这个租户（tenantName）的充值记录
      * case allTenants: 返回该所有租户充值记录
      * case accountOfTenant: 返回该这个租户（tenantName）下这个账户（accountName）的充值记录
      * case accountsOfTenant: 返回这个租户（tenantName）下所有账户的充值记录
-     * 
-     * @returns 
+     *
+     * @returns
      */
     getPaymentRecords: async ({ request, em }) => {
 
-      const { endTime, startTime, target } = 
+      const { endTime, startTime, target } =
       ensureNotUndefined(request, ["startTime", "endTime", "target"]);
       let searchParam = {};
       switch (target?.$case)
@@ -174,7 +176,7 @@ export const chargingServiceServer = plugin((server) => {
       }
 
       const records = await em.find(PayRecord, {
-        time: { $gte: startTime, $lte: endTime }, 
+        time: { $gte: startTime, $lte: endTime },
         ...searchParam,
       }, { orderBy: { time: QueryOrder.DESC } });
 
@@ -193,14 +195,69 @@ export const chargingServiceServer = plugin((server) => {
         total: decimalToMoney(records.reduce((prev, curr) => prev.plus(curr.amount), new Decimal(0))),
       }];
     },
-
+    /**
+     *
+     * case tenant:返回这个租户（tenantName）的消费记录
+     * case allTenants: 返回所有租户消费记录
+     * case accountOfTenant: 返回这个租户（tenantName）下这个账户（accountName）的消费记录
+     * case accountsOfTenant: 返回这个租户（tenantName）下所有账户的消费记录
+     * case accountsOfAllTenants: 返回所有租户下所有账户的消费记录
+     *
+     * @returns
+     */
     getChargeRecords: async ({ request, em }) => {
-      const { tenantName, accountName, endTime, startTime } = ensureNotUndefined(request, ["startTime", "endTime"]);
+      const { startTime, endTime, type, target }
+        = ensureNotUndefined(request, ["startTime", "endTime"]);
+
+      let searchParam: { tenantName?: string, accountName?: string | { $ne: null } } = {};
+      switch (target?.$case)
+      {
+      // 当前租户的租户消费记录
+      case "tenant":
+        searchParam = { tenantName: target[target.$case].tenantName, accountName: undefined };
+        break;
+        // 所有租户的租户消费记录
+      case "allTenants":
+        searchParam = { accountName: undefined };
+        break;
+        // 当前租户下当前账户的消费记录
+      case "accountOfTenant":
+        searchParam = { tenantName: target[target.$case].tenantName, accountName: target[target.$case].accountName };
+        break;
+        // 当前租户下所有账户的消费记录
+      case "accountsOfTenant":
+        searchParam = { tenantName: target[target.$case].tenantName, accountName: { $ne:null } };
+        break;
+        // 所有租户下所有账户的消费记录
+      case "accountsOfAllTenants":
+        searchParam = { accountName: { $ne:null } };
+        break;
+      default:
+        searchParam = {};
+      }
+
+      // 可查询的types类型
+      const typesToSearch = [
+        misConfig.jobChargeType,
+        misConfig.changeJobPriceType,
+        ...(misConfig.customChargeTypes || []),
+      ];
+
+      let searchType = {};
+      if (!type) {
+        searchType = { type: { $ne: null } };
+      } else {
+        if (type === CHARGE_TYPE_OTHERS) {
+          searchType = { type: { $nin: typesToSearch } };
+        } else {
+          searchType = { type: type };
+        }
+      }
 
       const records = await em.find(ChargeRecord, {
         time: { $gte: startTime, $lte: endTime },
-        ...accountName !== undefined ? { accountName } : {},
-        ...tenantName !== undefined ? { tenantName } : {},
+        ...searchType,
+        ...searchParam,
       }, { orderBy: { time: QueryOrder.DESC } });
 
       return [{
