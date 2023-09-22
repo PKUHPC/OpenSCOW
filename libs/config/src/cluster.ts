@@ -94,5 +94,30 @@ export const getClusterConfigs: GetConfigFn<Record<string, ClusterConfigSchema>>
       logger,
     );
 
+    // 检查所有集群配置下的登陆节点地址是否重复，如果重复扔出错误
+    const uniqueAddressesList = new Set();
+    const allAddressesList: string[] = [];
+    for (const cluster in config) {
+      if (Object.hasOwnProperty.call(config, cluster)) {
+        const clusterInfo = config[cluster];
+        if (clusterInfo && clusterInfo.loginNodes.length > 0) {
+
+          clusterInfo.loginNodes.map((ln) => {
+            if (typeof ln === "string") {
+              uniqueAddressesList.add(ln);
+              allAddressesList.push(ln);
+            } else {
+              uniqueAddressesList.add(ln.address);
+              allAddressesList.push(ln.address);
+            }
+          });
+        }
+      }
+    }
+    const isUnique = uniqueAddressesList.size === allAddressesList.length;
+    if (!isUnique) {
+      throw new Error("login node address must be unique across all clusters and all login nodes.");
+    }
+
     return config;
   };
