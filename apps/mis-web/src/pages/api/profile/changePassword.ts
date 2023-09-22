@@ -12,10 +12,9 @@
 
 import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { changePassword as libChangePassword } from "@scow/lib-auth";
-import { getLanguageCookie } from "@scow/lib-web/build/utils/languages";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
-import { getRuntimeI18nConfigText, publicConfig, runtimeConfig } from "src/utils/config";
+import { publicConfig, runtimeConfig } from "src/utils/config";
 
 // 此API用于用户修改自己的密码。
 export const ChangePasswordSchema = typeboxRouteSchema({
@@ -32,7 +31,6 @@ export const ChangePasswordSchema = typeboxRouteSchema({
 
     400: Type.Object({
       code: Type.Literal("PASSWORD_NOT_VALID"),
-      message: Type.Optional(Type.String()),
     }),
 
     /** 用户未找到 */
@@ -59,12 +57,10 @@ export default /* #__PURE__*/typeboxRoute(ChangePasswordSchema, async (req, res)
 
   const { newPassword } = req.body;
 
-  const languageId = getLanguageCookie(req);
-
   if (passwordPattern && !passwordPattern.test(newPassword)) {
     return { 400: {
       code: "PASSWORD_NOT_VALID" as const,
-      message: getRuntimeI18nConfigText(languageId, "passwordPatternMessage") } };
+    } };
   }
 
   return await libChangePassword(runtimeConfig.AUTH_INTERNAL_URL, {

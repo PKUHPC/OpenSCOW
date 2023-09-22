@@ -396,6 +396,7 @@ export default {
         fail: "Some modifications to job time limits failed.",
         setLimit: "Set Job Time Limit",
         modifyWork: "Failed Job Modifications",
+        timeLimeError: "The job time limit must exceed the job's actual runtime.",
       },
       editableJobBillingTable: {
         alreadyUsed: "This ID has already been used.",

@@ -21,7 +21,7 @@ import { OperationResult, OperationType } from "src/models/operationLog";
 import { PlatformRole, TenantRole, UserRole } from "src/models/User";
 import { callLog } from "src/server/operationLog";
 import { getClient } from "src/utils/client";
-import { getRuntimeI18nConfigText, publicConfig } from "src/utils/config";
+import { publicConfig } from "src/utils/config";
 import { getUserIdRule, useBuiltinCreateUser } from "src/utils/createUser";
 import { handlegRPCError, parseIp } from "src/utils/server";
 
@@ -52,7 +52,6 @@ export const CreateUserSchema = typeboxRouteSchema({
         Type.Literal("PASSWORD_NOT_VALID"),
         Type.Literal("USERID_NOT_VALID"),
       ]),
-      message: Type.Optional(Type.String()),
     }),
 
     /** 用户已经存在 */
@@ -86,13 +85,11 @@ export default /* #__PURE__*/typeboxRoute(CreateUserSchema, async (req, res) => 
 
 
   if (userIdRule && !userIdRule.pattern.test(identityId)) {
-    return { 400: { code: "USERID_NOT_VALID" as const, message: userIdRule.message } };
+    return { 400: { code: "USERID_NOT_VALID" as const } };
   }
 
   if (passwordPattern && !passwordPattern.test(password)) {
-    return { 400: { code: "PASSWORD_NOT_VALID" as const,
-      message: getRuntimeI18nConfigText(languageId, "passwordPatternMessage"),
-    } };
+    return { 400: { code: "PASSWORD_NOT_VALID" as const } };
   }
 
   const logInfo = {

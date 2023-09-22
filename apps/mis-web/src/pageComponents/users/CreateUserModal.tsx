@@ -15,6 +15,7 @@ import React, { useEffect, useState } from "react";
 import { api } from "src/apis";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { CreateUserFormFields } from "src/pageComponents/users/CreateUserForm";
+import { getRuntimeI18nConfigText } from "src/utils/config";
 import { getUserIdRule } from "src/utils/createUser";
 import { confirmPasswordFormItemProps, getEmailRule, passwordRule } from "src/utils/form";
 
@@ -49,6 +50,15 @@ export const CreateUserModal: React.FC<Props> = ({
     setLoading(true);
     await api.createUser({ body: { email, identityId, name, password } })
       .httpError(409, () => { message.error(t(p("alreadyExist"))); })
+      .httpError(400, (e) => {
+        if (e.code === "USERID_NOT_VALID") {
+          message.error(userIdRule?.message);
+        };
+        if (e.code === "PASSWORD_NOT_VALID") {
+          message.error(getRuntimeI18nConfigText(languageId, "passwordPatternMessage"));
+        };
+        throw e;
+      })
       .then(() => {
         return onCreated({ identityId, name });
       })

@@ -18,10 +18,11 @@ import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { NotFoundPage } from "src/components/errorPages/NotFoundPage";
 import { PageTitle } from "src/components/PageTitle";
-import { prefix, useI18nTranslateToString } from "src/i18n";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { TenantRole } from "src/models/User";
 import { CreateUserForm, CreateUserFormFields } from "src/pageComponents/users/CreateUserForm";
-import { useBuiltinCreateUser } from "src/utils/createUser";
+import { getRuntimeI18nConfigText } from "src/utils/config";
+import { getUserIdRule, useBuiltinCreateUser } from "src/utils/createUser";
 import { Head } from "src/utils/head";
 
 const p = prefix("page.tenant.users.create.");
@@ -29,6 +30,9 @@ const p = prefix("page.tenant.users.create.");
 const CreateUserPageForm: React.FC = () => {
 
   const t = useI18nTranslateToString();
+  const languageId = useI18n().currentLanguage.id;
+  const userIdRule = getUserIdRule(languageId);
+
   const [form] = Form.useForm<CreateUserFormFields>();
   const { message, modal } = App.useApp();
 
@@ -65,6 +69,15 @@ const CreateUserPageForm: React.FC = () => {
                 content: t(p("userExistInSCOWDatabaseMessage")),
                 okText: t("common.ok"),
               });
+            })
+            .httpError(400, (e) => {
+              if (e.code === "USERID_NOT_VALID") {
+                message.error(userIdRule?.message);
+              };
+              if (e.code === "PASSWORD_NOT_VALID") {
+                message.error(getRuntimeI18nConfigText(languageId, "passwordPatternMessage"));
+              };
+              throw e;
             })
             .then((createdInAuth) => {
               !createdInAuth.createdInAuth ?

@@ -86,7 +86,7 @@ export const ChangeJobTimeLimitModal: React.FC<Props> = ({ open, onClose, data, 
           await api.changeJobTimeLimit({ body: { cluster: r.cluster.id, limitMinutes, jobId: r.jobId } })
             .httpError(400, (e) => {
               if (e.code === "TIME_LIME_NOT_VALID") {
-                message.error(e.message);
+                message.error(t(p("timeLimeError")));
               };
               throw e;
             })

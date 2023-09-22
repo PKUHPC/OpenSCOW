@@ -14,6 +14,7 @@ import { App, Form, Input, Modal } from "antd";
 import React, { useState } from "react";
 import { api } from "src/apis";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
+import { getRuntimeI18nConfigText } from "src/utils/config";
 import { confirmPasswordFormItemProps, passwordRule } from "src/utils/form";
 
 export interface Props {
@@ -48,6 +49,12 @@ export const ChangePasswordModal: React.FC<Props> = ({
       .then((result) => {
         if (result.success) {
           return api.changePassword({ body: { newPassword } })
+            .httpError(400, (e) => {
+              if (e.code === "PASSWORD_NOT_VALID") {
+                message.error(getRuntimeI18nConfigText(languageId, "passwordPatternMessage"));
+              };
+              throw e;
+            })
             .then(() => {
               form.resetFields();
               message.success(t(p("successMessage")));

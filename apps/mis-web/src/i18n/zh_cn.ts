@@ -396,6 +396,7 @@ export default {
         fail:"部分作业修改时限失败。",
         setLimit:"设置作业时限",
         modifyWork:"修改失败的作业",
+        timeLimeError: "设置作业时限需要大于该作业的运行时长。",
       },
       editableJobBillingTable:{
         alreadyUsed:"此Id已经被使用",

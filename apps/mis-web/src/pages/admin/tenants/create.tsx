@@ -17,10 +17,11 @@ import React, { useState } from "react";
 import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
-import { prefix, useI18nTranslate, useI18nTranslateToString } from "src/i18n";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { PlatformRole } from "src/models/User";
 import { CreateTenantForm, CreateTenantFormFields } from "src/pageComponents/admin/CreateTenantForm";
-import { useBuiltinCreateUser } from "src/utils/createUser";
+import { getRuntimeI18nConfigText } from "src/utils/config";
+import { getUserIdRule, useBuiltinCreateUser } from "src/utils/createUser";
 import { Head } from "src/utils/head";
 
 const p = prefix("page.admin.tenants.create.");
@@ -32,7 +33,8 @@ const CreateTenantPageForm: React.FC = () => {
 
   const [loading, setLoading] = useState(false);
   const t = useI18nTranslateToString();
-  const tArgs = useI18nTranslate();
+  const languageId = useI18n().currentLanguage.id;
+  const userIdRule = getUserIdRule(languageId);
 
   const onOk = async () => {
     const { tenantName, userId, userName, userEmail, userPassword } = await form.validateFields();
@@ -86,10 +88,18 @@ const CreateTenantPageForm: React.FC = () => {
           }).httpError(409, (e) => {
             modal.error({
               title: t("common.addFail"),
-              content: tArgs(p("existInSCOWDatabase"),
+              content: t(p("existInSCOWDatabase"),
                 [e.code === "TENANT_ALREADY_EXISTS" ? t("common.tenant") : t("common.user")]),
               okText: t("common.ok"),
             });
+          }).httpError(400, (e) => {
+            if (e.code === "USERID_NOT_VALID") {
+              message.error(userIdRule?.message);
+            };
+            if (e.code === "PASSWORD_NOT_VALID") {
+              message.error(getRuntimeI18nConfigText(languageId, "passwordPatternMessage"));
+            };
+            throw e;
           })
             .then((createdInAuth) => {
               !createdInAuth.createdInAuth ?
