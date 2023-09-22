@@ -116,7 +116,7 @@ export const getClusterConfigs: GetConfigFn<Record<string, ClusterConfigSchema>>
     }
     const isUnique = uniqueAddressesList.size === allAddressesList.length;
     if (!isUnique) {
-      throw new Error("loginNodes must NOT have duplicate addresses");
+      throw new Error("login node address must be unique across all clusters and all login nodes.");
     }
 
     return config;
