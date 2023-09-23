@@ -2,7 +2,7 @@ displayName: hpc02
 adapterUrl: localhost:6002
 loginNodes:
   - name: login
-    address: localhost:22222
+    address: login02
 crossClusterFilesTransfer:
   enabled: false
 # slurm:

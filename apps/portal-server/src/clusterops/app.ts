@@ -359,7 +359,8 @@ export const appOps = (cluster: string): AppOps => {
             submitTime: new Date(sessionMetadata.submitTime),
             state: runningJobInfo?.state ?? "ENDED",
             dataPath: await sftpRealPath(sftp)(jobDir),
-            runningTime: runningJobInfo?.elapsedSeconds ? formatTime(runningJobInfo.elapsedSeconds * 1000) : "",
+            runningTime: runningJobInfo?.elapsedSeconds !== undefined
+              ? formatTime(runningJobInfo.elapsedSeconds * 1000) : "",
             timeLimit: runningJobInfo?.timeLimitMinutes ? formatTime(runningJobInfo.timeLimitMinutes * 60 * 1000) : "",
             reason: isPendingOrTerminated ? (runningJobInfo?.reason ?? "") : undefined,
             host,

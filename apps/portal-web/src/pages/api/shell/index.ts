@@ -96,19 +96,19 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
   const query = new URLSearchParams(parse(req.url!).query!);
 
   const cluster = query.get("cluster");
-  const loginNodeName = query.get("loginNode");
+  const loginNodeAddress = query.get("loginNode");
 
   if (!cluster || !runtimeConfig.CLUSTERS_CONFIG[cluster]) {
     throw new Error(`Unknown cluster ${cluster}`);
   }
 
   const loginNode = runtimeConfig.CLUSTERS_CONFIG[cluster].loginNodes.map(getLoginNode).find(
-    (x) => x.name === loginNodeName,
+    (x) => x.address === loginNodeAddress,
   );
 
   // unknown login node
   if (!loginNode) {
-    throw new Error(`Unknown login node ${loginNodeName}`);
+    throw new Error(`Unknown login node ${loginNodeAddress}`);
   }
 
   const path = query.get("path") ?? undefined;

@@ -2,7 +2,7 @@ displayName: hpc01
 adapterUrl: localhost:6001
 loginNodes:
   - name: login
-    address: localhost:22222
+    address: login01
 crossClusterFilesTransfer:
   enabled: true
   transferNode: localhost:22222
