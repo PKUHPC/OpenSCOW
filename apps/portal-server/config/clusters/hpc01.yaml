@@ -3,7 +3,7 @@ adapterUrl: 0.0.0.0:6000
 loginNodes:
   - name: login
     address: localhost:22222
-crossClusterFilesTransfer:
+crossClusterFileTransfer:
   enabled: true
   transferNode: localhost:22222
 # slurm:

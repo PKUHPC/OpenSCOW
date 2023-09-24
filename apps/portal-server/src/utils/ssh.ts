@@ -34,8 +34,8 @@ export function getClusterLoginNode(cluster: string): string | undefined {
 }
 
 export function getClusterTransferNode(cluster: string): NodeNetInfo {
-  const enabled = clusters[cluster]?.crossClusterFilesTransfer?.enabled;
-  const transferNode = clusters[cluster]?.crossClusterFilesTransfer?.transferNode;
+  const enabled = clusters[cluster]?.crossClusterFileTransfer?.enabled;
+  const transferNode = clusters[cluster]?.crossClusterFileTransfer?.transferNode;
   if (!enabled) {
     throw transferNotEnabled(cluster);
   }
@@ -55,8 +55,8 @@ export function getClusterTransferNode(cluster: string): NodeNetInfo {
 }
 
 export function tryGetClusterTransferNode(cluster: string): NodeNetInfo | undefined {
-  const enabled = clusters[cluster]?.crossClusterFilesTransfer?.enabled;
-  const transferNode = clusters[cluster]?.crossClusterFilesTransfer?.transferNode;
+  const enabled = clusters[cluster]?.crossClusterFileTransfer?.enabled;
+  const transferNode = clusters[cluster]?.crossClusterFileTransfer?.transferNode;
   if (!enabled) {
     return undefined;
   }

@@ -22,7 +22,7 @@ title: 跨集群文件传输功能（可选）
 
 2. 传输节点能够访问文件系统，且挂载目录路径和登录节点访问文件系统的路径相同。出于安全性的考虑，传输节点最好不具备访问作业权限（例如，设置与slurm管理节点网络不通）
 
-3. 准备好传输节点后，需要将其接入到scow集群中。接下来需要修改集群配置文件`config/clusters/xxx.yaml`，在yaml文件末尾添加crossClusterFilesTransfer模块，添加enabled和transferNode属性。如果enabled为true表示开启该功能需要配置transferNode，为false表示不开启该功能无需配置transferNode。transferNode配置格式为ip:port，如果不配置port默认为22端口。
+3. 准备好传输节点后，需要将其接入到scow集群中。接下来需要修改集群配置文件`config/clusters/xxx.yaml`，在yaml文件末尾添加crossClusterFileTransfer模块，添加enabled和transferNode属性。如果enabled为true表示开启该功能需要配置transferNode，为false表示不开启该功能无需配置transferNode。transferNode配置格式为ip:port，如果不配置port默认为22端口。
 
 ```yaml title="config/clusters/hpc01.yaml"
 displayName: hpc01Name
@@ -30,7 +30,7 @@ adapterUrl: 0.0.0.0:6000
 loginNodes:
   - name: loginNode01
     address: localhost:22222
-crossClusterFilesTransfer:
+crossClusterFileTransfer:
   enabled: true
   transferNode: localhost:22222
 ```

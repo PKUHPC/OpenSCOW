@@ -190,7 +190,7 @@ const buildRuntimeConfig = async (phase, basePath) => {
 
     CROSS_CLUSTER_FILE_TRANSFER_ENABLED:
       Object.values(clusters).filter(
-        (cluster) => cluster.crossClusterFilesTransfer.enabled).length > 1,
+        (cluster) => cluster.crossClusterFileTransfer.enabled).length > 1,
 
     PUBLIC_PATH: config.PUBLIC_PATH,
 
