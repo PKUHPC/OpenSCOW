@@ -567,8 +567,8 @@ export const fileServiceServer = plugin((server) => {
 
       // 如果没有配置免密，则生成密钥并配置免密
       if (!keyConfiged) {
-        // 随机生成密钥
-        const publicKey = await sshConnect(fromTransferNodeAddress, userId, logger, async (ssh) => {
+        // 随机生成密钥并复制公钥
+        await sshConnect(fromTransferNodeAddress, userId, logger, async (ssh) => {
           const sftp = await ssh.requestSFTP();
 
           if (!await sftpExists(sftp, scowDir)) {
@@ -580,20 +580,9 @@ export const fileServiceServer = plugin((server) => {
           await sftpMkdir(sftp)(keyDir);
           const genKeyCmd = `ssh-keygen -t rsa -b 4096 -C "for scow-sync" -f ${privateKeyPath} -N ""`;
           await loggedExec(ssh, logger, true, genKeyCmd, []);
-
-          // 读公钥
-          const fileData = await sftpReadFile(sftp)(`${privateKeyPath}.pub`);
-          return fileData.toString();
-
-        });
-
-        // 配置fromTransferNode -> toTransferNode的免密登录
-        await sshConnect(toTransferNodeAddress, userId, logger, async (ssh) => {
-          const sftp = await ssh.requestSFTP();
-          const homePath = await sftpRealPath(sftp)(".");
-          // 将公钥写入到authorized_keys中
-          const authorizedKeysPath = `${homePath}/.ssh/authorized_keys`;
-          await sftpAppendFile(sftp)(authorizedKeysPath, `\n${publicKey}\n`);
+          const copyKeyCmd = `ssh-copy-id -i ${privateKeyPath} -p ${toTransferNodePort}
+            -o StrictHostKeyChecking=no ${toTransferNodeHost}`;
+          await loggedExec(ssh, logger, true, copyKeyCmd, []);
         });
       }
       return [{}];
