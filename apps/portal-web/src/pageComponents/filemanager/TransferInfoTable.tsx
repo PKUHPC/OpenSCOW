@@ -31,7 +31,7 @@ export const TransferInfoTable: React.FC = () => {
       const listClustersResponse = await api.listAvailableTransferClusters({ query: {} });
       const clusterList: Cluster[] = listClustersResponse.clusterList;
       await Promise.all(clusterList.map(async (cluster) => {
-        const response = await api.queryFilesTransferProgress({ query: { cluster: cluster.id } });
+        const response = await api.queryFileTransferProgress({ query: { cluster: cluster.id } });
         newTransferData.push({
           cluster: cluster.id,
           files: response.result,
@@ -94,7 +94,7 @@ export const TransferInfoTable: React.FC = () => {
               content: `确认取消${row.cluster} -> ${row.toCluster}的文件${row.filePath}的传输吗？`,
               okText: "确认",
               onOk: async () => {
-                await api.terminateFilesTransfer({ body: {
+                await api.terminateFileTransfer({ body: {
                   fromCluster: row.cluster,
                   toCluster: row.toCluster,
                   fromPath: row.filePath,

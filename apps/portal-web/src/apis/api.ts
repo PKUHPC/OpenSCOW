@@ -42,9 +42,9 @@ import type { ListFileSchema } from "src/pages/api/file/list";
 import type { ListAvailableTransferClustersSchema } from "src/pages/api/file/listAvailableTransferClusters";
 import type { MkdirSchema } from "src/pages/api/file/mkdir";
 import type { MoveFileItemSchema } from "src/pages/api/file/move";
-import type { QueryFilesTransferProgressSchema } from "src/pages/api/file/queryFilesTransferProgress";
-import type { StartFilesTransferSchema } from "src/pages/api/file/startFilesTransfer";
-import type { TerminateFilesTransferSchema } from "src/pages/api/file/terminateFilesTransfer";
+import type { QueryFileTransferProgressSchema } from "src/pages/api/file/queryFileTransferProgress";
+import type { StartFileTransferSchema } from "src/pages/api/file/startFileTransfer";
+import type { TerminateFileTransferSchema } from "src/pages/api/file/terminateFileTransfer";
 import type { UploadFileSchema } from "src/pages/api/file/upload";
 import type { CancelJobSchema } from "src/pages/api/job/cancelJob";
 import type { DeleteJobTemplateSchema } from "src/pages/api/job/deleteJobTemplate";
@@ -99,9 +99,9 @@ export const api = {
   submitJob: apiClient.fromTypeboxRoute<typeof SubmitJobSchema>("POST", "/api/job/submitJob"),
   changePassword: apiClient.fromTypeboxRoute<typeof ChangePasswordSchema>("PATCH", "/api/profile/changePassword"),
   checkPassword: apiClient.fromTypeboxRoute<typeof CheckPasswordSchema>("GET", "/api/profile/checkPassword"),
-  startFilesTransfer: apiClient.fromTypeboxRoute<typeof StartFilesTransferSchema>("PATCH", "/api/file/startFilesTransfer"),
-  queryFilesTransferProgress: apiClient.fromTypeboxRoute<typeof QueryFilesTransferProgressSchema>("GET", "/api/file/queryFilesTransferProgress"),
-  terminateFilesTransfer: apiClient.fromTypeboxRoute<typeof TerminateFilesTransferSchema>("POST", "/api/file/terminateFilesTransfer"),
+  startFileTransfer: apiClient.fromTypeboxRoute<typeof StartFileTransferSchema>("PATCH", "/api/file/startFileTransfer"),
+  queryFileTransferProgress: apiClient.fromTypeboxRoute<typeof QueryFileTransferProgressSchema>("GET", "/api/file/queryFileTransferProgress"),
+  terminateFileTransfer: apiClient.fromTypeboxRoute<typeof TerminateFileTransferSchema>("POST", "/api/file/terminateFileTransfer"),
   listAvailableTransferClusters: apiClient.fromTypeboxRoute<typeof ListAvailableTransferClustersSchema>("GET", "/api/file/listAvailableTransferClusters"),
   checkTransferKey: apiClient.fromTypeboxRoute<typeof CheckTransferKeySchema>("POST", "/api/file/checkTransferKey"),
 };

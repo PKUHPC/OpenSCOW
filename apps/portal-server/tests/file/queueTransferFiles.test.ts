@@ -37,7 +37,7 @@ const progress = "42%";
 const speed = "1.74KB/s";
 const leftTime = "0:00:33";
 
-// queryFilesTransfer应该返回的结果
+// queryFileTransfer应该返回的结果
 const filePath = path.join(fatherPath, fileName);
 const transferSizeKb = 1024;
 const progressInt = 42;
@@ -92,7 +92,7 @@ afterEach(async () => {
 
 
 it.skip("query the transfer information of scow-sync", async () => {
-  const result = await asyncUnaryCall(client, "queryFilesTransfer", {
+  const result = await asyncUnaryCall(client, "queryFileTransfer", {
     cluster, userId,
   });
 

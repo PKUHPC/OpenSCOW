@@ -363,7 +363,7 @@ export const fileServiceServer = plugin((server) => {
       });
     },
 
-    startFilesTransfer: async ({ request, logger }) => {
+    startFileTransfer: async ({ request, logger }) => {
 
       const { fromCluster, toCluster, userId, fromPath, toPath } = request;
       const fromTransferNodeAddress = getClusterTransferNode(fromCluster).address;
@@ -402,7 +402,7 @@ export const fileServiceServer = plugin((server) => {
       });
     },
 
-    queryFilesTransfer: async ({ request, logger }) => {
+    queryFileTransfer: async ({ request, logger }) => {
 
       const { cluster, userId } = request;
 
@@ -486,7 +486,7 @@ export const fileServiceServer = plugin((server) => {
       });
     },
 
-    terminateFilesTransfer: async ({ request, logger }) => {
+    terminateFileTransfer: async ({ request, logger }) => {
       const { fromCluster, toCluster, userId, fromPath } = request;
       const fromTransferNodeAddress = getClusterTransferNode(fromCluster).address;
       const toTransferNodeHost = getClusterTransferNode(toCluster).host;

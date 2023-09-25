@@ -20,7 +20,7 @@ import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
 import { handlegRPCError } from "src/utils/server";
 
-export const StartFilesTransferSchema = typeboxRouteSchema({
+export const StartFileTransferSchema = typeboxRouteSchema({
   method: "POST",
 
   body: Type.Object({
@@ -43,7 +43,7 @@ export const StartFilesTransferSchema = typeboxRouteSchema({
 
 const auth = authenticate(() => true);
 
-export default route(StartFilesTransferSchema, async (req, res) => {
+export default route(StartFileTransferSchema, async (req, res) => {
 
   const info = await auth(req, res);
 
@@ -53,7 +53,7 @@ export default route(StartFilesTransferSchema, async (req, res) => {
 
   const client = getClient(FileServiceClient);
 
-  return asyncUnaryCall(client, "startFilesTransfer", {
+  return asyncUnaryCall(client, "startFileTransfer", {
     userId: info.identityId,
     fromCluster: fromCluster,
     toCluster: toCluster,

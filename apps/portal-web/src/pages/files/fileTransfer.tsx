@@ -51,7 +51,7 @@ const OperationButton: React.FC<ButtonProps> = (props) => {
             onOk: async () => {
               await api.checkTransferKey({ body: { fromCluster:srcCluster.id, toCluster: dstCluster.id } });
               Promise.all(selectedKeys.map(async (key) => {
-                await api.startFilesTransfer({ body: {
+                await api.startFileTransfer({ body: {
                   fromCluster: srcCluster.id,
                   toCluster: dstCluster.id,
                   fromPath: String(key),

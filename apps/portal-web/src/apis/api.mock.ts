@@ -230,9 +230,9 @@ export const mockApi: MockApi<typeof api> = {
     },
   }),
 
-  startFilesTransfer: null,
-  queryFilesTransferProgress: null,
-  terminateFilesTransfer: null,
+  startFileTransfer: null,
+  queryFileTransferProgress: null,
+  terminateFileTransfer: null,
   checkTransferKey: null,
 
 };
