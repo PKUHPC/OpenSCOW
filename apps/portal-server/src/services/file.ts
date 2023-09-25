@@ -602,6 +602,20 @@ export const fileServiceServer = plugin((server) => {
           const authorizedKeysPath = `${homePath}/.ssh/authorized_keys`;
           await sftpAppendFile(sftp)(authorizedKeysPath, `\n${publicKey}\n`);
         });
+
+        // 尽管copy了公钥，但第一次ssh连接时，会默认需要输入“yes”。以避免潜在的中间人攻击，但是这导致无法自动化，所以这里需要以非交互的方式ssh短连接一次。
+        await sshConnect(fromTransferNodeAddress, userId, logger, async (ssh) => {
+          const firstSshArgs = [
+            "-i", privateKeyPath,
+            "-o", "StrictHostKeyChecking=no",
+            "-p", toTransferNodePort.toString(),
+            toTransferNodeHost,
+            ":",
+          ];
+          const firstSshCmd = "ssh";
+          await loggedExec(ssh, logger, true, firstSshCmd, firstSshArgs);
+        });
+
       }
       return [{}];
     },
