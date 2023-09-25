@@ -593,7 +593,7 @@ export const fileServiceServer = plugin((server) => {
             "-i", privateKeyPath,
             "-p", toTransferNodePort.toString(),
             "-o", "StrictHostKeyChecking=no",
-            `${userId}@${toTransferNodeHost}`,
+            userId.toString(), "@", toTransferNodeAddress.toString(),
           ];
           const copyKeyCmd = "ssh-copy-id";
           await loggedExec(ssh, logger, true, copyKeyCmd, copyKeyArgs);
