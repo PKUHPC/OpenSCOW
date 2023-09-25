@@ -554,8 +554,8 @@ export const fileServiceServer = plugin((server) => {
               details: resp.stderr,
             };
           }
-
-          const keyConfiged = resp.stdout === "true";
+          const lines = resp.stdout.trim().split("\n");
+          const keyConfiged = lines[lines.length - 1] === "true";
 
           return {
             keyConfiged: keyConfiged,
