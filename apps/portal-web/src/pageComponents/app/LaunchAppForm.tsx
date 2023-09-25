@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/i18n";
 import { App, Button, Col, Form, Input, InputNumber, Row, Select, Spin } from "antd";
 import { Rule } from "antd/es/form";
 import dayjs from "dayjs";
@@ -17,7 +18,7 @@ import Router from "next/router";
 import { useCallback, useMemo, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
-import { prefix, useI18nTranslateToString } from "src/i18n";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { AccountSelector } from "src/pageComponents/job/AccountSelector";
 import { AppCustomAttribute } from "src/pages/api/app/getAppMetadata";
 import { Partition } from "src/pages/api/cluster";
@@ -65,6 +66,7 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
   const { message, modal } = App.useApp();
 
   const t = useI18nTranslateToString();
+  const languageId = useI18n().currentLanguage.id;
 
   const [form] = Form.useForm<FormFields>();
   const [loading, setLoading] = useState(false);
@@ -252,12 +254,14 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
     const selectOptions = item.select.filter((x) => !x.requireGpu || (x.requireGpu && currentPartitionInfo?.gpus));
     const initialValue = item.type === "SELECT" ? (item.defaultValue ?? selectOptions[0].value) : item.defaultValue;
     if (item.type === "SELECT") console.log(item.defaultValue, selectOptions[0].value);
-    const inputItem = item.type === "NUMBER" ? (<InputNumber placeholder={placeholder} />)
-      : item.type === "TEXT" ? (<Input placeholder={placeholder} />)
+    const inputItem = item.type === "NUMBER" ?
+      (<InputNumber placeholder={getI18nConfigCurrentText(placeholder, languageId)} />)
+      : item.type === "TEXT" ? (<Input placeholder={getI18nConfigCurrentText(placeholder, languageId)} />)
         : (
           <Select
-            options={selectOptions.map((x) => ({ label: x.label, value: x.value }))}
-            placeholder={placeholder}
+            options={selectOptions.map((x) => ({
+              label: getI18nConfigCurrentText(x.label, languageId), value: x.value }))}
+            placeholder={getI18nConfigCurrentText(placeholder, languageId)}
           />
         );
 
@@ -274,7 +278,7 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
     return (
       <Form.Item
         key={`${item.name}+${index}`}
-        label={item.label}
+        label={getI18nConfigCurrentText(item.label, languageId) ?? undefined}
         name={item.name}
         rules={rules}
         initialValue={initialValue}
@@ -282,7 +286,7 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
         {inputItem}
       </Form.Item>
     );
-  }), [attributes, currentPartitionInfo]);
+  }), [attributes, currentPartitionInfo, languageId]);
 
   const nodeCount = Form.useWatch("nodeCount", form) as number;
 

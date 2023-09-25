@@ -14,13 +14,14 @@ import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { AppType } from "@scow/config/build/app";
-import { getI18nConfigCurrentText } from "@scow/lib-server/build/i18n";
+import { I18nStringType } from "@scow/lib-server";
 import {
   AppCustomAttribute,
   appCustomAttribute_AttributeTypeFromJSON,
   AppServiceServer,
   AppServiceService,
   ConnectToAppResponse,
+  I18nStringProtoType,
   WebAppProps_ProxyType,
 } from "@scow/protos/build/portal/app";
 import { DetailedError, ErrorInfo } from "@scow/rich-error-model";
@@ -191,7 +192,7 @@ export const appServiceServer = plugin((server) => {
 
     getAppMetadata: async ({ request }) => {
 
-      const { appId, cluster, language } = request;
+      const { appId, cluster } = request;
       const apps = getClusterAppConfigs(cluster);
       const app = apps[appId];
 
@@ -199,6 +200,19 @@ export const appServiceServer = plugin((server) => {
         throw <ServiceError> { code: Status.NOT_FOUND, message: `app id ${appId} is not found` };
       }
       const attributes: AppCustomAttribute[] = [];
+
+      // config中的文本映射到protobuf中定义的grpc返回值的类型
+      const getI18nSeverTypeFormat = (i18nConfig: I18nStringType): I18nStringProtoType | undefined => {
+
+        if (!i18nConfig) return undefined;
+
+        if (typeof i18nConfig === "string") {
+          return { value: { $case: "directString", directString: i18nConfig } };
+        } else {
+          return { value: { $case: "i18nObject", i18nObject: i18nConfig } };
+        }
+      };
+
       if (app.attributes) {
         app.attributes.forEach((item) => {
           const attributeType = item.type.toUpperCase();
@@ -212,15 +226,22 @@ export const appServiceServer = plugin((server) => {
 
           attributes.push({
             type: appCustomAttribute_AttributeTypeFromJSON(attributeType),
-            label: getI18nConfigCurrentText(item.label, language),
-            name: getI18nConfigCurrentText(item.name, language),
+            label: getI18nSeverTypeFormat(item.label),
+            name: item.name,
             required: item.required,
             defaultInput: defaultInput,
-            placeholder: getI18nConfigCurrentText(item.placeholder, language),
-            options: item.select?.map((x) => ({ ...x, label: getI18nConfigCurrentText(x.label, language) })) ?? [],
+            placeholder: getI18nSeverTypeFormat(item.placeholder),
+            options: item.select?.map((x) => {
+              return {
+                value: x.value,
+                label: getI18nSeverTypeFormat(x.label),
+                requireGpu: x.requireGpu,
+              };
+            }) ?? [],
           });
         });
       }
+
       return [{ appName: app.name, attributes: attributes }];
     },
 

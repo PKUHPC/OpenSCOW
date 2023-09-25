@@ -20,7 +20,7 @@ import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
-import { useI18n, useI18nTranslateToString } from "src/i18n";
+import { useI18nTranslateToString } from "src/i18n";
 import { LaunchAppForm } from "src/pageComponents/app/LaunchAppForm";
 import { Head } from "src/utils/head";
 
@@ -34,13 +34,11 @@ export const AppIndexPage: NextPage = requireAuth(() => true)(() => {
   const { message } = App.useApp();
   const t = useI18nTranslateToString();
 
-  const languageId = useI18n().currentLanguage.id;
-
   const { data, isLoading } = useAsync({
     promiseFn: useCallback(async () => {
-      return await api.getAppMetadata({ query: { appId, cluster: clusterId, languageId } })
+      return await api.getAppMetadata({ query: { appId, cluster: clusterId } })
         .httpError(404, () => { message.error(t("pages.apps.create.error404")); });
-    }, [appId, languageId]),
+    }, [appId]),
   });
 
   if (isLoading || !data) {

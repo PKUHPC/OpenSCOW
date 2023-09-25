@@ -105,12 +105,27 @@ message ListAppSessionsResponse {
 message GetAppMetadataRequest {
   string app_id = 1;
   string cluster = 2;
-  string language = 3;
+}
+
+message I18nStringProtoType {
+  oneof value {
+    string direct_string = 1;
+    I18nObject i18n_object = 2;
+  }
+}
+
+message I18nObject {
+  message I18n {
+    string default = 1;
+    optional string en = 2;
+    optional string zh_cn = 3;
+  }
+  I18n i18n = 1;
 }
 
 message SelectOption {
   string value = 1;
-  string label = 2;
+  I18nStringProtoType label = 2;
   optional bool require_gpu = 3;
 }
 
@@ -121,7 +136,7 @@ message AppCustomAttribute {
     SELECT = 2;
   }
   AttributeType type = 1;
-  string label = 2;
+  I18nStringProtoType label = 2;
   string name = 3;
   repeated SelectOption options = 4;
   bool required =5;
@@ -129,7 +144,7 @@ message AppCustomAttribute {
     string text = 6;
     uint32 number = 7;
   }
-  optional string placeholder = 8;
+  optional I18nStringProtoType placeholder = 8;
 }
 
 message GetAppMetadataResponse {

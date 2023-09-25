@@ -13,20 +13,22 @@
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { Server } from "@ddadaal/tsgrpc-server";
 import { credentials } from "@grpc/grpc-js";
+import { I18nStringType } from "@scow/lib-server";
 import { appCustomAttribute_AttributeTypeToJSON, AppServiceClient } from "@scow/protos/build/portal/app";
 import { createServer } from "src/app";
+import { getI18nTypeFormat } from "tests/file/utils";
 
 export interface SelectOption {
     value: string;
-    label: string;
+    label: I18nStringType;
 }
 
 interface AppCustomAttribute {
     type: "NUMBER" | "SELECT" | "TEXT";
-    label: string;
+    label: I18nStringType;
     name: string;
     required: boolean;
-    placeholder?: string | undefined;
+    placeholder?: I18nStringType | undefined;
     default?: string | number | undefined;
     select: SelectOption[];
   }
@@ -54,18 +56,24 @@ it("get app metadata", async () => {
   const appId = "vscode";
   const cluster = "hpc01";
 
-  const reply = await asyncUnaryCall(client, "getAppMetadata", { appId, cluster, language: "zh_cn" });
+  const reply = await asyncUnaryCall(client, "getAppMetadata", { appId, cluster });
 
   const attributes: AppCustomAttribute[] = reply.attributes.map((item) => ({
     type: appCustomAttribute_AttributeTypeToJSON(item.type) as AppCustomAttribute["type"],
-    label: item.label,
+    label: getI18nTypeFormat(item.label),
     name: item.name,
-    select: item.options,
+    select: item.options?.map((option) => {
+      return {
+        value: option.value,
+        label: getI18nTypeFormat(option.label),
+        requireGpu: option.requireGpu,
+      };
+    }),
     required: item.required,
     default: item.defaultInput
       ? (item.defaultInput?.$case === "text" ? item.defaultInput.text : item.defaultInput.number)
       : undefined,
-    placeholder: item.placeholder,
+    placeholder: getI18nTypeFormat(item.placeholder),
   }));
 
   expect(attributes).toEqual([
