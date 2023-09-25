@@ -55,7 +55,7 @@ export async function renderBindOtpHtml(
   const authTexts: AuthTextsType = languages[languageId];
 
   return rep.status(err ? 401 : 200).view("/otp/bindOtp.liquid", {
-    bindOtpTexts: authTexts,
+    authTexts: authTexts,
     cssUrl: join(config.BASE_PATH, config.AUTH_BASE_PATH, "/public/assets/tailwind.min.css"),
     faviconUrl: join(config.BASE_PATH, FAVICON_URL),
     backgroundColor: uiConfig.primaryColor?.defaultColor ?? DEFAULT_PRIMARY_COLOR,

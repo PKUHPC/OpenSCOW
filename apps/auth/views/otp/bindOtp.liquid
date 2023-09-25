@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>{{ bindOtpTexts.bindOtp.bindOtp }}</title>
+    <title>{{ authTexts.bindOtp.bindOtp }}</title>
     <link href="{{ cssUrl }}" rel="stylesheet">
     <link rel="icon" type="image/x-icon" href="{{ faviconUrl }}"></link>
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -17,11 +17,11 @@
         <div class="w-full md:w-1/3 bg-white rounded-lg py-4">
           <div class="flex mb-4 ml-8 justify-between">
             <h2 class="border-b-2 border-red-300 text-2xl text-center text-red-700">
-              {{ bindOtpTexts.bindOtp.bindOtp }}
+              {{ authTexts.bindOtp.bindOtp }}
             </h2>
             <form action="{{ otpBasePath }}/bind" method="get">
               <button type="submit" name="action" value="backToLoginUI" class="text-x text-gray-500 mr-4">
-                {{ bindOtpTexts.bindOtp.returnLogin }}
+                {{ authTexts.bindOtp.returnLogin }}
               </button>
               <input type="hidden" name="callbackUrl" value="{{ callbackUrl }}">
             </form>
@@ -31,26 +31,26 @@
           <div class="px-8">
             <div class="w-full mb-4">
               <div class="flex items-center">
-                <input type='text' name="username" placeholder="{{ bindOtpTexts.bindOtp.userName }}" required
+                <input type='text' name="username" placeholder="{{ authTexts.bindOtp.userName }}" required
                     class="-mx-2 px-8  w-full border rounded py-2 text-gray-700 focus:outline-none" />
               </div>
             </div>
             <div class="w-full mb-4">
               <div class="flex items-center">
-                <input name="password" placeholder="{{ bindOtpTexts.bindOtp.password }}" type="password" required
+                <input name="password" placeholder="{{ authTexts.bindOtp.password }}" type="password" required
                     class="-mx-2 px-8 w-full border rounded px-3 py-2 text-gray-700 focus:outline-none" />
               </div>
             </div>
           </div>
           {% if err %}
           <div>
-            <p class="my-4 text-center text-red-600">{{ bindOtpTexts.bindOtp.invalidUserNamePassword }}</p>
+            <p class="my-4 text-center text-red-600">{{ authTexts.bindOtp.invalidUserNamePassword }}</p>
           </div>
           {% endif %}
           <div class="flex justify-center">
             <button type="submit" name="action" value=""
               class="w-1/3 py-2 rounded-full button-primary text-gray-100 focus:outline-none">
-                {{ bindOtpTexts.bindOtp.confirm }}
+                {{ authTexts.bindOtp.confirm }}
             </button>
           </div>
           <input type="hidden" name="callbackUrl" value="{{ callbackUrl }}">
@@ -59,37 +59,37 @@
         {%  else %}
         {% if tokenNotFound %}
         <div class="w-full mt-8 mb-8 justify-center items-center">
-          <p class="text-center text-xl text-red-700"> {{ bindOtpTexts.bindOtp.expiredUserInfo }} </p>
+          <p class="text-center text-xl text-red-700"> {{ authTexts.bindOtp.expiredUserInfo }} </p>
         </div>
         {% else %}
 
         <form class="w-full flex flex-wrap" method="post" action="{{ otpBasePath }}/sendEmail">
           <div class="w-full mb-8 ml-8 justify-between">
-            <p class="mt-1">{{ bindOtpTexts.bindOtp.bindLimit1 }}{{ bindLimitMinutes }}{{ bindOtpTexts.bindOtp.bindLimit2 }}</p>
+            <p class="mt-1">{{ authTexts.bindOtp.bindLimit1 }}{{ bindLimitMinutes }}{{ authTexts.bindOtp.bindLimit2 }}</p>
           </div>
           <div class="w-full overflow-x-scroll">
             <div class="flex w-full mb-4 items-center justify-between">
               <div class="flex-grow">
-                <p class="border-b-2 ml-8">{{ bindOtpTexts.bindOtp.email }}({{ emailAddress }})</p>
+                <p class="border-b-2 ml-8">{{ authTexts.bindOtp.email }}({{ emailAddress }})</p>
               </div>
               <div>
                 <button type="submit" name="action" value="requestValidationMessage"
                   class="mr-1 text-sm py-1 px-1 rounded-full button-primary text-gray-100 focus:outline-none">
-                  {{ bindOtpTexts.bindOtp.getBindLink }}
+                  {{ authTexts.bindOtp.getBindLink }}
                 </button>
               </div>
             </div>
             {% if sendSucceeded == true%}
             <div class="flex items-center justify-between mb-4 mt-6">
-            <p class="ml-8"> {{ bindOtpTexts.bindOtp.bindLinkSended }} </p>
+            <p class="ml-8"> {{ authTexts.bindOtp.bindLinkSended }} </p>
             </div>
             {% elsif sendSucceeded == false%}
             <div class="flex items-center justify-between mb-4 mt-6">
-              <p class="ml-8" id="countdown"> {{ bindOtpTexts.bindOtp.bindLinkFailed1 }}{{ timeDiffNotEnough }}{{ bindOtpTexts.bindOtp.bindLinkFailed2 }} </p>
+              <p class="ml-8" id="countdown"> {{ authTexts.bindOtp.bindLinkFailed1 }}{{ timeDiffNotEnough }}{{ authTexts.bindOtp.bindLinkFailed2 }} </p>
             </div>
             {% elsif timeDiffNotEnough %}
               <div class="flex items-center justify-between mb-4 mt-6">
-              <p class="ml-8 text-red" id="countdown"> {{ bindOtpTexts.bindOtp.bindRequestError1 }}{{ timeDiffNotEnough }}{{ bindOtpTexts.bindOtp.bindRequestError2 }} </p>
+              <p class="ml-8 text-red" id="countdown"> {{ authTexts.bindOtp.bindRequestError1 }}{{ timeDiffNotEnough }}{{ authTexts.bindOtp.bindRequestError2 }} </p>
               </div>
             {% endif %}
             {% endif %}
@@ -102,7 +102,7 @@
                   count--;
                   if (count < 0.5) {
                     clearInterval(countdown);
-                    countDownElement.innerHTML = "{{ bindOtpTexts.bindOtp.reRequestLink }}";
+                    countDownElement.innerHTML = "{{ authTexts.bindOtp.reRequestLink }}";
                   } else {
                     countDownElement.innerHTML = countDownElement.innerText.replace(/\d+/, count);
                   }

@@ -50,7 +50,7 @@ export async function serveLoginHtml(
 
   return rep.status(
     verifyCaptchaFail ? 400 : err ? 401 : 200).view("login.liquid", {
-    loginTexts: authTexts,
+    authTexts: authTexts,
     cssUrl: join(config.BASE_PATH, config.AUTH_BASE_PATH, "/public/assets/tailwind.min.css"),
     eyeImagePath: join(config.BASE_PATH, config.AUTH_BASE_PATH, "/public/assets/icons/eye.png"),
     eyeCloseImagePath: join(config.BASE_PATH, config.AUTH_BASE_PATH, "/public/assets/icons/eye-close.png"),

@@ -166,11 +166,11 @@ ui:
     # 登录界面 slogan 文字颜色
     color: "white"
     # 登录界面 slogan title
-    # title: "开源算力中心门户和管理平台"
-    title:
-      i18n:
-        default: "开源算力中心门户和管理平台"
-        zh_cn: "开源算力中心门户和管理平台"
+    title: "开源算力中心门户和管理平台"
+    # title:
+    #   i18n:
+    #     default: "开源算力中心门户和管理平台"
+    #     zh_cn: "开源算力中心门户和管理平台"
     # 多条 slogan 文本
     texts:
       - "图形化界面，使用方便"

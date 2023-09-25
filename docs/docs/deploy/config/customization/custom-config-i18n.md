@@ -57,6 +57,7 @@ homeTitle:
 | `mis.yaml`           | `createUser：userIdPattern:` **errorMessage**             |
 | `portal.yaml`        | `homeTitle：`**defaultText**                              |
 | `portal.yaml`        | `homeText:` **defaultText**                               |
+| `portal.yaml`        | **submitJobPromptText**                                   |
 | `{cluster}.yaml`     | **displayName**                                           |
 | `{cluster}.yaml`     | `loginNodes:` **name**                                    |
 | `{app}.yaml`         | `attributes:` **label**                                    |
