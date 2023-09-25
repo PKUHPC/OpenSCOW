@@ -527,7 +527,7 @@ export const fileServiceServer = plugin((server) => {
       } = getClusterTransferNode(toCluster);
 
       // 检查fromTransferNode -> toTransferNode是否已经免密
-      const { keyConfiged, scowDir, keyDir, privateKeyPath } = await sshConnect(
+      const { keyConfigured, scowDir, keyDir, privateKeyPath } = await sshConnect(
         fromTransferNodeAddress, userId, logger, async (ssh) => {
           // 获取密钥路径
           const sftp = await ssh.requestSFTP();
@@ -555,10 +555,10 @@ export const fileServiceServer = plugin((server) => {
             };
           }
           const lines = resp.stdout.trim().split("\n");
-          const keyConfiged = lines[lines.length - 1] === "true";
+          const keyConfigured = lines[lines.length - 1] === "true";
 
           return {
-            keyConfiged: keyConfiged,
+            keyConfigured: keyConfigured,
             scowDir: scowDir,
             keyDir: keyDir,
             privateKeyPath: privateKeyPath,
@@ -566,7 +566,7 @@ export const fileServiceServer = plugin((server) => {
         });
 
       // 如果没有配置免密，则生成密钥并配置免密
-      if (!keyConfiged) {
+      if (!keyConfigured) {
         // 随机生成密钥并复制公钥
         await sshConnect(fromTransferNodeAddress, userId, logger, async (ssh) => {
           const sftp = await ssh.requestSFTP();
@@ -578,11 +578,25 @@ export const fileServiceServer = plugin((server) => {
             await sshRmrf(ssh, keyDir);
           }
           await sftpMkdir(sftp)(keyDir);
-          const genKeyCmd = `ssh-keygen -t rsa -b 4096 -C "for scow-sync" -f ${privateKeyPath} -N ""`;
-          await loggedExec(ssh, logger, true, genKeyCmd, []);
-          const copyKeyCmd = `ssh-copy-id -i ${privateKeyPath} -p ${toTransferNodePort}
-            -o StrictHostKeyChecking=no ${toTransferNodeHost}`;
-          await loggedExec(ssh, logger, true, copyKeyCmd, []);
+
+          const genKeyArgs = [
+            "-t", "rsa",
+            "-b", "4096",
+            "-C", "for scow-sync",
+            "-f", privateKeyPath,
+            "-N", "",
+          ];
+          const genKeyCmd = "ssh-keygen";
+          await loggedExec(ssh, logger, true, genKeyCmd, genKeyArgs);
+
+          const copyKeyArgs = [
+            "-i", privateKeyPath,
+            "-p", toTransferNodePort.toString(),
+            "-o", "StrictHostKeyChecking=no",
+            `${userId}@${toTransferNodeHost}`,
+          ];
+          const copyKeyCmd = "ssh-copy-id";
+          await loggedExec(ssh, logger, true, copyKeyCmd, copyKeyArgs);
         });
       }
       return [{}];
