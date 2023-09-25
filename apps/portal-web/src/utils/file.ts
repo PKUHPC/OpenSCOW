@@ -11,6 +11,7 @@
  */
 
 import { CloseOutlined, FileOutlined, FolderOutlined } from "@ant-design/icons";
+import { NextRouter } from "next/router";
 import { join } from "path";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { FileInfo, FileType } from "src/pages/api/file/list";
@@ -51,7 +52,7 @@ export const openPreviewLink = (href: string) => {
   window.open(href, "ViewFile", "location=yes,resizable=yes,scrollbars=yes,status=yes");
 };
 
-export const redirectToDashboard = (router) => {
+export const redirectToDashboard = (router: NextRouter) => {
   if (typeof window !== "undefined") {
     router.push("/dashboard");
   }
