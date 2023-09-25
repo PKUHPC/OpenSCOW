@@ -36,31 +36,47 @@ jobs:
           # to track each changelog file to its submission commit
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.sha }}
+          trigger: '#test'
 
       - uses: pnpm/action-setup@v2.4.0
+        with:
+          trigger: '#test'      
 
       - uses: actions/setup-node@v3
         with:
           node-version: 18.x
           cache: pnpm
+          trigger: '#test'
 
       - name: Install dependencies
         run: pnpm i --frozen-lockfile
+        with:
+          trigger: '#test'         
 
       - name: Lint code
         run: pnpm lint
+        with:
+          trigger: '#test' 
 
       - name: Generate SSH key pairs for test
         run: ssh-keygen -t rsa -q -f "$HOME/.ssh/id_rsa" -N ""
+        with:
+          trigger: '#test' 
 
       - name: Start dev env for db testing
         run: pnpm devenv
+        with:
+          trigger: '#test' 
 
       - name: Check running containers
         run: docker ps
+        with:
+          trigger: '#test'
 
       - name: Prepare dev libs and code
         run: pnpm prepareDev
+        with:
+          trigger: '#test' 
 
       - name: Wait for ports
         uses: ifaxity/wait-on-action@main
@@ -68,13 +84,17 @@ jobs:
           log: true
           verbose: true
           resource: "tcp:localhost:3306 tcp:localhost:6379 tcp:localhost:389 tcp:localhost:6000 tcp:localhost:6001 tcp:localhost:6002"
+          trigger: '#test'
 
       - name: Run tests
         run: pnpm test:ci
+        with:
+          trigger: '#test' 
 
       - name: Upload test converage
         uses: codecov/codecov-action@v3
         with:
+          trigger: '#test'
           files: ./libs/auth/coverage/lcov.info,./libs/ssh/coverage/lcov.info,./libs/libconfig/coverage/lcov.info,./libs/decimal/coverage/lcov.info,./libs/server/coverage/lcov.info,./apps/cli/coverage/lcov.info,./apps/auth/coverage/lcov.info,./apps/mis-server/coverage/lcov.info,./apps/portal-server/coverage/lcov.info,./apps/gateway/coverage/lcov.info,./apps/audit-server/coverage/lcov.info
 
       - name: Create Release Pull Request or Publish
@@ -84,6 +104,7 @@ jobs:
         with:
           version: pnpm ci:version
           publish: pnpm ci:publish
+          trigger: '#test'
           createGithubReleases: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -95,31 +116,42 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          trigger: '#cli'
 
       - uses: pnpm/action-setup@v2.4.0
+        with:
+          trigger: '#cli'
 
       - uses: actions/setup-node@v3
         with:
           node-version: 18.x
           cache: pnpm
+          trigger: '#cli'
 
       - name: Install dependencies for scow-cli
         run: pnpm i --frozen-lockfile --filter @scow/cli...
+        with:
+          trigger: '#cli'
 
       - name: Build scow-cli
         run: pnpm build "--filter=@scow/cli"
+        with:
+          trigger: '#cli'
 
       - name: Archive scow-cli-x64
         uses: actions/upload-artifact@v3
         with:
           name: scow-cli-x64
           path: apps/cli/exe/cli-x64
+          trigger: '#cli'
 
       - name: Archive scow-cli-arm64
         uses: actions/upload-artifact@v3
         with:
           name: scow-cli-arm64
           path: apps/cli/exe/cli-arm64
+          trigger: '#cli'
 
 
   build-images:
@@ -143,12 +175,17 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-
+        with:
+          trigger: '#bulid-images'
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
+        with:
+          trigger: '#bulid-images'
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+        with:
+          trigger: '#bulid-images'
 
       - name: Log in to the GitHub Container registry
         uses: docker/login-action@b4bedf8053341df3b5a9f9e0f2cf4e79e27360c6
@@ -156,6 +193,7 @@ jobs:
           registry: ${{ env.GITHUB_CR }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+          trigger: '#bulid-images'
 
       - name: Docker meta
         id: meta
@@ -163,6 +201,7 @@ jobs:
         with:
           images: |
             ${{ env.GITHUB_CR }}/${{ github.repository }}/${{ matrix.name }}
+          trigger: '#bulid-images'
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
@@ -175,6 +214,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           # only build arm64 in master commits
           platforms: linux/amd64${{ github.ref_type == 'tag' && ',linux/arm64' || '' }}
+          trigger: '#bulid-images'
 
 
   release:
@@ -190,22 +230,28 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          trigger: '#release version'
 
       - name: Download cli-x64
         uses: actions/download-artifact@v3
         with:
           name: scow-cli-x64
           path: release/scow-cli
+          trigger: '#release version'
 
       - name: Download cli-arm64
         uses: actions/download-artifact@v3
         with:
           name: scow-cli-arm64
           path: release/scow-cli
+          trigger: '#release version'
 
       - name: Display structure of downloaded files
         run: ls -R
         working-directory: release
+        with:
+          trigger: '#release version'
 
       - name: Create release
         uses: softprops/action-gh-release@v1
@@ -216,3 +262,5 @@ jobs:
           files: |
             release/scow-cli/cli-x64
             release/scow-cli/cli-arm64
+          trigger: '#release version'
+
