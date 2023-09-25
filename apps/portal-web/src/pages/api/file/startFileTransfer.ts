@@ -62,7 +62,7 @@ export default route(StartFileTransferSchema, async (req, res) => {
   }).then(
     () => ({ 204: null }),
     handlegRPCError({
-      [status.INTERNAL]: (e) => ({ 415: { code: "SCOW-SYNC-START_CMD_FAILED" as const, error: e.details } }),
+      [status.INTERNAL]: (e) => ({ 415: { code: "SCOW_SYNC_START_CMD_FAILED" as const, error: e.details } }),
       [status.NOT_FOUND]: () => ({ 400: { code: "INVALID_CLUSTER" as const } }),
     }));
 });

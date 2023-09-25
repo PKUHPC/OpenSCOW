@@ -11,7 +11,6 @@
  */
 
 import { CloseOutlined, FileOutlined, FolderOutlined } from "@ant-design/icons";
-import { NextRouter } from "next/router";
 import { join } from "path";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { FileInfo, FileType } from "src/pages/api/file/list";

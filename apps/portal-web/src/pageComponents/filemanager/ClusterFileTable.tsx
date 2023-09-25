@@ -98,7 +98,7 @@ export const ClusterFileTable: React.FC<Props> = ({
         <Button disabled={!selectedCluster} onClick={toHome} icon={<HomeOutlined />} shape="circle" />
         <Button disabled={!selectedCluster} onClick={up} icon={<UpOutlined />} shape="circle" />
         <PathBar
-          path={path ? path : ""}
+          path={path ?? ""}
           loading={loading}
           onPathChange={(curPath) => { curPath === path ? reload() : setNewPath(curPath); }}
           breadcrumbItemRender={(pathSegment, index) =>
