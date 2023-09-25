@@ -51,9 +51,3 @@ export const nodeModeToString = (mode: number) => {
 export const openPreviewLink = (href: string) => {
   window.open(href, "ViewFile", "location=yes,resizable=yes,scrollbars=yes,status=yes");
 };
-
-export const redirectToDashboard = (router: NextRouter) => {
-  if (typeof window !== "undefined") {
-    router.push("/dashboard");
-  }
-};

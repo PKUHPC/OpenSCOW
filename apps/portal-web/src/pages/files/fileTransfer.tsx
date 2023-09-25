@@ -13,14 +13,13 @@
 import { ArrowLeftOutlined, ArrowRightOutlined } from "@ant-design/icons";
 import { App, Button, Col, Row } from "antd";
 import { NextPage } from "next";
-import { useRouter } from "next/router";
 import { useState } from "react";
 import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
+import { Redirect } from "src/components/Redirect";
 import { ClusterFileTable } from "src/pageComponents/filemanager/ClusterFileTable";
 import { Cluster, publicConfig } from "src/utils/config";
-import { redirectToDashboard } from "src/utils/file";
 
 type FileInfoKey = React.Key;
 
@@ -73,9 +72,8 @@ const OperationButton: React.FC<ButtonProps> = (props) => {
 
 export const FileTransferPage: NextPage = requireAuth(() => true)(() => {
 
-  const router = useRouter();
   if (!publicConfig.CROSS_CLUSTER_FILE_TRANSFER_ENABLED) {
-    redirectToDashboard(router);
+    return <Redirect url="/dashboard" />;
   }
 
   const [clusterLeft, setClusterLeft] = useState<Cluster>();
