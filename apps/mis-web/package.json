@@ -56,7 +56,7 @@
     "tslib": "2.6.2",
     "typescript": "5.1.6",
     "@ant-design/cssinjs": "1.16.2",
-    "react-typed-i18n": "^2.3.0"
+    "react-typed-i18n": "2.3.0"
   },
   "devDependencies": {
     "@ddadaal/next-typed-api-routes-cli": "0.9.1",

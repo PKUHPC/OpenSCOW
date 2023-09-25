@@ -239,7 +239,7 @@ importers:
         specifier: 1.5.3
         version: 1.5.3
       react-typed-i18n:
-        specifier: ^2.3.0
+        specifier: 2.3.0
         version: 2.3.0(patch_hash=eybujl4up7xenffji6zpg43f3u)(react@18.2.0)
       speakeasy:
         specifier: 2.0.0
@@ -525,7 +525,7 @@ importers:
         specifier: 18.2.0
         version: 18.2.0
       react-typed-i18n:
-        specifier: ^2.3.0
+        specifier: 2.3.0
         version: 2.3.0(patch_hash=eybujl4up7xenffji6zpg43f3u)(react@18.2.0)
       simstate:
         specifier: 3.0.1
@@ -785,7 +785,7 @@ importers:
         specifier: 18.2.0
         version: 18.2.0
       react-typed-i18n:
-        specifier: ^2.3.0
+        specifier: 2.3.0
         version: 2.3.0(patch_hash=eybujl4up7xenffji6zpg43f3u)(react@18.2.0)
       simstate:
         specifier: 3.0.1
