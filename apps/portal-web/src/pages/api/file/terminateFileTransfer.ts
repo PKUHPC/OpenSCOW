@@ -32,7 +32,7 @@ export const TerminateFileTransferSchema = typeboxRouteSchema({
   responses: {
     204: Type.Null(),
     415: Type.Object({
-      code: Type.Literal("SCOW-SYNC-TERMINATE_CMD_FAILED"),
+      code: Type.Literal("SCOW_SYNC_TERMINATE_CMD_FAILED"),
       // stderr of the scow-sync command
       error: Type.String(),
     }),
@@ -58,7 +58,7 @@ export default route(TerminateFileTransferSchema, async (req, res) => {
     toCluster: toCluster,
     fromPath: fromPath,
   }).then(() => ({ 204: null }), handlegRPCError({
-    [status.INTERNAL]: (e) => ({ 415: { code: "SCOW-SYNC-TERMINATE_CMD_FAILED" as const, error: e.details } }),
+    [status.INTERNAL]: (e) => ({ 415: { code: "SCOW_SYNC_TERMINATE_CMD_FAILED" as const, error: e.details } }),
     [status.NOT_FOUND]: () => ({ 400: { code: "INVALID_CLUSTER" as const } }),
   }));
 });

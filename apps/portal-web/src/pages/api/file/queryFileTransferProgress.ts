@@ -40,7 +40,7 @@ export const QueryFileTransferProgressSchema = typeboxRouteSchema({
   responses: {
     200: Type.Object({ result: Type.Array(TransferInfo) }),
     400: Type.Object({ code: Type.Literal("INVALID_CLUSTER") }),
-    415: Type.Object({ code: Type.Literal("SCOW-SYNC-QUERY_CMD_FAILED") }),
+    415: Type.Object({ code: Type.Literal("SCOW_SYNC_QUERY_CMD_FAILED") }),
   },
 });
 
@@ -59,6 +59,6 @@ export default route(QueryFileTransferProgressSchema, async (req, res) => {
     cluster, userId: info.identityId,
   }).then((results) => ({ 200: { result: results.transferInfos } }), handlegRPCError({
     [status.NOT_FOUND]: () => ({ 400: { code: "INVALID_CLUSTER" as const } }),
-    [status.INTERNAL]: () => ({ 415: { code: "SCOW-SYNC-QUERY_CMD_FAILED" as const } }),
+    [status.INTERNAL]: () => ({ 415: { code: "SCOW_SYNC_QUERY_CMD_FAILED" as const } }),
   }));
 });

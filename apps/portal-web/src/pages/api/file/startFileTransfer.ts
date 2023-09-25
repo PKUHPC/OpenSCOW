@@ -33,7 +33,7 @@ export const StartFileTransferSchema = typeboxRouteSchema({
   responses: {
     204: Type.Null(),
     415: Type.Object({
-      code: Type.Literal("SCOW-SYNC-START_CMD_FAILED"),
+      code: Type.Literal("SCOW_SYNC_START_CMD_FAILED"),
       // stderr of the scow-sync command
       error: Type.String(),
     }),
