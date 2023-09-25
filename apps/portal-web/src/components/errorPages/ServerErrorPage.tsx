@@ -12,16 +12,20 @@
 
 import { Result } from "antd";
 import React from "react";
+import { useI18nTranslateToString } from "src/i18n";
 import { Head } from "src/utils/head";
 
 export const ServerErrorPage: React.FC = () => {
+
+  const t = useI18nTranslateToString();
+
   return (
     <>
-      <Head title="服务器出错" />
+      <Head title={t("component.errorPages.serverWrong")} />
       <Result
         status="500"
         title="500"
-        subTitle="对不起，服务器出错。请刷新重试。"
+        subTitle={t("component.errorPages.sorry")}
       />
     </>
   );

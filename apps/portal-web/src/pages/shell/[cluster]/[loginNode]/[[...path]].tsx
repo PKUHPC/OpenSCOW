@@ -12,6 +12,7 @@
 
 import "xterm/css/xterm.css";
 
+import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/i18n";
 import { Button, Popover, Space, Typography } from "antd";
 import { NextPage } from "next";
 import dynamic from "next/dynamic";
@@ -19,6 +20,7 @@ import Router, { useRouter } from "next/router";
 import { useRef } from "react";
 import { requireAuth } from "src/auth/requireAuth";
 import { NotFoundPage } from "src/components/errorPages/NotFoundPage";
+import { Localized, useI18n, useI18nTranslate, useI18nTranslateToString } from "src/i18n";
 import { publicConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
 import styled from "styled-components";
@@ -73,6 +75,8 @@ export const ShellPage: NextPage = requireAuth(() => true)(({ userStore }) => {
     return <NotFoundPage />;
   }
 
+  const languageId = useI18n().currentLanguage.id;
+
   const router = useRouter();
 
   const cluster = router.query.cluster as string;
@@ -81,38 +85,51 @@ export const ShellPage: NextPage = requireAuth(() => true)(({ userStore }) => {
 
   const headerRef = useRef<HTMLDivElement>(null);
 
-  const clusterName = publicConfig.CLUSTERS.find((x) => x.id === cluster)?.name || cluster;
+  const clusterName =
+    getI18nConfigCurrentText(publicConfig.CLUSTERS.find((x) => x.id === cluster)?.name || cluster, languageId);
 
+  const t = useI18nTranslateToString();
 
   return (
     <Container>
-      <Head title={`${cluster}的终端`} />
+      <Head title={`${cluster}${t("pages.shell.loginNode.title")}`} />
       <Header ref={headerRef}>
         <h2>
-          以ID: {userStore.user.identityId} 连接到集群 {clusterName} 的 {loginNode} 节点
+          <Localized
+            id="pages.shell.loginNode.content"
+            args={[userStore.user.identityId, clusterName, loginNode]}
+          />
         </h2>
         <Space wrap>
           <Button onClick={() => Router.reload()}>
-          刷新并重新连接
+            {t("pages.shell.loginNode.reloadButton")}
           </Button>
           <Popover
-            title="命令"
+            title={t("pages.shell.loginNode.popoverTitle")}
             trigger="hover"
             placement="bottom"
             zIndex={2000}
             getPopupContainer={() => headerRef.current || document.body}
             content={() => (
               <div>
-                <p><b>跳转到文件系统</b>：<Text code>sopen</Text>，输入该命令后会跳转到文件系统，您可以进行文件的上传和下载</p>
-                <p><b>文件下载</b>：<Text code>sdown [文件名]</Text>，输入<Text code>sdown [文件名]</Text>，
-                您当前路径下的该文件会被下载到本地，目前不支持输入相对路径，<br />
-                如果需要下载其他目录下的文件请使用<Text code>sopen</Text>命令跳转到文件系统。<br />
-                使用示例：<Text code>sdown hello.txt</Text></p>
-
+                {/* {t("pages.shell.loginNode.popoverContent1")} */}
+                <p><b>{t("pages.shell.loginNode.popoverContent1")}</b>：
+                  <Text code>sopen</Text>{t("pages.shell.loginNode.popoverContent2")}
+                </p>
+                <p><b>{t("pages.shell.loginNode.popoverContent3")}</b>：
+                  <Text code>sdown [{t("pages.shell.loginNode.popoverContentFile")}]</Text>
+                  {t("pages.shell.loginNode.popoverContent4")}
+                  <Text code>sdown [{t("pages.shell.loginNode.popoverContentFile")}]</Text>
+                  {t("pages.shell.loginNode.popoverContent5")}<br />
+                  {t("pages.shell.loginNode.popoverContent6")}<Text code>sopen</Text>
+                  {t("pages.shell.loginNode.popoverContent7")}<br />
+                  {t("pages.shell.loginNode.popoverContent8")}<Text code>sdown hello.txt</Text></p>
               </div>
             )}
           >
-            <Button>命令</Button>
+            <Button>
+              {t("pages.shell.loginNode.command")}
+            </Button>
           </Popover>
         </Space>
 

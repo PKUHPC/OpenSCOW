@@ -21,6 +21,7 @@ import { useStore } from "simstate";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { CodeEditor } from "src/components/CodeEditor";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { AccountSelector } from "src/pageComponents/job/AccountSelector";
 import { FileSelectModal } from "src/pageComponents/job/FileSelectModal";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
@@ -72,11 +73,15 @@ interface Props {
   submitJobPromptText: string;
 }
 
+const p = prefix("pageComp.job.submitJobForm.");
+
 export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submitJobPromptText }) => {
   const { message, modal } = App.useApp();
 
   const [form] = Form.useForm<JobForm>();
   const [loading, setLoading] = useState(false);
+
+  const t = useI18nTranslateToString();
 
   const submit = async () => {
     const { cluster, command, jobName, coreCount, gpuCount, workingDirectory, output, errorOutput, save,
@@ -94,7 +99,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
       .httpError(500, (e) => {
         if (e.code === "SCHEDULER_FAILED") {
           modal.error({
-            title: "提交作业失败",
+            title: t(p("errorMessage")),
             content: e.message,
           });
         } else {
@@ -102,7 +107,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
         }
       })
       .then(({ jobId }) => {
-        message.success("提交成功！您的新作业ID为：" + jobId);
+        message.success(t(p("successMessage")) + jobId);
         Router.push("/jobs/runningJobs");
       })
       .finally(() => setLoading(false));
@@ -205,18 +210,18 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
     >
       <Row gutter={4}>
         <Col span={24} sm={12}>
-          <Form.Item<JobForm> label="集群" name="cluster" rules={[{ required: true }]}>
+          <Form.Item<JobForm> label={t(p("cluster"))} name="cluster" rules={[{ required: true }]}>
             <SingleClusterSelector />
           </Form.Item>
         </Col>
         <Col span={24} sm={12}>
-          <Form.Item<JobForm> label="作业名" name="jobName" rules={[{ required: true }]}>
+          <Form.Item<JobForm> label={t(p("jobName"))} name="jobName" rules={[{ required: true }]}>
             <Input />
           </Form.Item>
         </Col>
       </Row>
       <Form.Item<JobForm>
-        label="命令"
+        label={t(p("command"))}
         name="command"
         rules={[{ required: true }]}
       >
@@ -228,7 +233,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
       <Row gutter={4}>
         <Col span={24} sm={12}>
           <Form.Item
-            label="账户"
+            label={t(p("account"))}
             name="account"
             rules={[{ required: true }]}
             dependencies={["cluster"]}
@@ -239,7 +244,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
         </Col>
         <Col span={24} sm={6}>
           <Form.Item
-            label="分区"
+            label={t(p("partition"))}
             name="partition"
             dependencies={["cluster"]}
             rules={[{ required: true }]}
@@ -257,7 +262,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
         </Col>
         <Col span={24} sm={6}>
           <Form.Item
-            label="QOS"
+            label={t(p("qos"))}
             name="qos"
             dependencies={["cluster", "partition"]}
             rules={[{ required: true }]}
@@ -270,7 +275,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
         </Col>
         <Col span={12} sm={6}>
           <Form.Item
-            label="节点数"
+            label={t(p("nodeCount"))}
             name="nodeCount"
             dependencies={["cluster", "partition"]}
             rules={[
@@ -287,7 +292,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
         <Col span={12} sm={6}>
           {currentPartitionInfo?.gpus ? (
             <Form.Item
-              label="单节点GPU卡数"
+              label={t(p("gpuCount"))}
               name="gpuCount"
               dependencies={["cluster", "partition"]}
               rules={[
@@ -306,7 +311,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
             </Form.Item>
           ) : (
             <Form.Item
-              label="单节点核心数"
+              label={t(p("gpuCount"))}
               name="coreCount"
               dependencies={["cluster", "partition"]}
               rules={[
@@ -326,20 +331,20 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
           )}
         </Col>
         <Col span={24} sm={12}>
-          <Form.Item label="最长运行时间" name="maxTime" rules={[{ required: true }]}>
-            <InputNumber min={1} step={1} addonAfter={"分钟"} />
+          <Form.Item label={t(p("maxTime"))} name="maxTime" rules={[{ required: true }]}>
+            <InputNumber min={1} step={1} addonAfter={t(p("minute"))} />
           </Form.Item>
         </Col>
         <Col span={24} sm={10}>
           <Form.Item<JobForm>
-            label="工作目录"
+            label={t(p("workingDirectory"))}
             name="workingDirectory"
             rules={[{ required: true }]}
             tooltip={(
               <>
-                <span>1. 请填写绝对路径，如填写相对路径，则相对于该用户家目录；</span>
+                <span>{t(p("wdTooltip1"))}</span>
                 <br />
-                <span>2. 填写目录不可访问或者不可操作时，提交作业或者作业运行将失败；</span>
+                <span>{t(p("wdTooltip2"))}</span>
               </>
             )}
           >
@@ -359,42 +364,42 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
           </Form.Item>
         </Col>
         <Col span={24} sm={7}>
-          <Form.Item<JobForm> label="标准输出文件" name="output" rules={[{ required: true }]}>
+          <Form.Item<JobForm> label={t(p("output"))} name="output" rules={[{ required: true }]}>
             <Input />
           </Form.Item>
         </Col>
         <Col span={24} sm={7}>
-          <Form.Item<JobForm> label="错误输出文件" name="errorOutput" rules={[{ required: true }]}>
+          <Form.Item<JobForm> label={t(p("errorOutput"))} name="errorOutput" rules={[{ required: true }]}>
             <Input />
           </Form.Item>
         </Col>
         <Col className="ant-form-item" span={12} sm={6}>
-          总节点数：{nodeCount}
+          {t(p("totalNodeCount"))}{nodeCount}
         </Col>
 
         {currentPartitionInfo?.gpus ? (
           <Col className="ant-form-item" span={12} sm={6}>
-            总GPU卡数：{nodeCount * gpuCount}
+            {t(p("totalGpuCount"))}{nodeCount * gpuCount}
           </Col>
         ) : (
           ""
         )}
 
         <Col className="ant-form-item" span={12} sm={6}>
-          总CPU核心数：{coreCountSum}
+          {t(p("totalCoreCount"))}{coreCountSum}
         </Col>
         <Col className="ant-form-item" span={12} sm={6}>
-          总内存容量：{memoryDisplay}
+          {t(p("totalMemory"))}{memoryDisplay}
         </Col>
       </Row>
-      <Form.Item label="备注" name="comment">
+      <Form.Item label={t(p("comment"))} name="comment">
         <Input.TextArea />
       </Form.Item>
       <Form.Item name="save" valuePropName="checked">
-        <Checkbox>保存为模板</Checkbox>
+        <Checkbox>{t(p("saveToTemplate"))}</Checkbox>
       </Form.Item>
       <Button type="primary" htmlType="submit" loading={loading || isHomePathLoading}>
-          提交
+        {t("button.submitButton")}
       </Button>
     </Form>
   );

@@ -11,12 +11,14 @@
  */
 
 import { ReloadOutlined } from "@ant-design/icons";
+import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/i18n";
 import { Progress, Space } from "antd";
 import React, { useCallback } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { DisabledA } from "src/components/DisabledA";
 import { StatCard } from "src/components/StatCard";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { publicConfig } from "src/utils/config";
 import styled from "styled-components";
 
@@ -48,9 +50,14 @@ function byteToBiggestUnit(quota: number) {
   return toString(val, units.length - 1);
 }
 
+const p = prefix("pageComp.dashboard.storageCard.");
+
 export const StorageCard: React.FC<Props> = ({
   cluster, quota,
 }) => {
+
+  const t = useI18nTranslateToString();
+  const languageId = useI18n().currentLanguage.id;
 
   const { data, isLoading, run } = useAsync({
     deferFn: useCallback(async () => api.queryStorageUsage({ query: { cluster } }), [cluster]),
@@ -58,7 +65,8 @@ export const StorageCard: React.FC<Props> = ({
 
   return (
     <StatCard
-      title={`${publicConfig.CLUSTERS[cluster]?.name ?? cluster} 存储${data ? "已使用/" : ""}总限额`}
+      title={`${getI18nConfigCurrentText(publicConfig.CLUSTERS[cluster]?.name, languageId) ?? cluster}
+      ${t(p("storage"))}${data ? t(p("storage")) + "/" : ""}${t(p("totalLimited"))}`}
     >
       <Container>
         <span style={{ fontSize: "24px" }}>
@@ -70,7 +78,7 @@ export const StorageCard: React.FC<Props> = ({
         />
         <DisabledA disabled={isLoading} onClick={run}>
           <Space>
-            <ReloadOutlined spin={isLoading} />获取当前使用量
+            <ReloadOutlined spin={isLoading} />{t(p("nowUsed"))}
           </Space>
         </DisabledA>
       </Container>

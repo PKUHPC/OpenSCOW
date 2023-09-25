@@ -14,13 +14,18 @@ import "dayjs/locale/zh-cn";
 
 import { AntdConfigProvider as LibAntdConfigProvider } from "@scow/lib-web/build/layouts/AntdConfigProvider";
 import { useDarkMode } from "@scow/lib-web/build/layouts/darkMode";
+import { SYSTEM_VALID_LANGUAGES } from "@scow/lib-web/build/utils/languages";
 import { App, ConfigProvider, theme } from "antd";
+import { Locale } from "antd/lib/locale";
+import enUSlocale from "antd/locale/en_US";
 import zhCNlocale from "antd/locale/zh_CN";
 import React from "react";
+import { useI18n } from "src/i18n";
 import { ThemeProvider } from "styled-components";
 
 type Props = React.PropsWithChildren<{
   color: string;
+  locale: string;
 }>;
 
 const StyledComponentsThemeProvider: React.FC<Props> = ({ children }) => {
@@ -33,17 +38,20 @@ const StyledComponentsThemeProvider: React.FC<Props> = ({ children }) => {
   );
 };
 
-export const AntdConfigProvider: React.FC<Props> = ({ children, color }) => {
+export const AntdConfigProvider: React.FC<Props> = ({ children, color, locale }) => {
 
   const { dark } = useDarkMode();
 
+  const currentLangId = useI18n().currentLanguage.id;
+  const localizedLang = locale ? getAntdLocale(locale) : getAntdLocale(currentLangId);
+
   return (
-    <LibAntdConfigProvider color={color}>
+    <LibAntdConfigProvider color={color} locale={locale}>
       <ConfigProvider
-        locale={zhCNlocale}
+        locale={localizedLang}
         theme={{ token: { colorPrimary: color, colorInfo: color }, algorithm: dark ? theme.darkAlgorithm : undefined }}
       >
-        <StyledComponentsThemeProvider color={color}>
+        <StyledComponentsThemeProvider color={color} locale={locale}>
           <App>
             {children}
           </App>
@@ -52,3 +60,13 @@ export const AntdConfigProvider: React.FC<Props> = ({ children, color }) => {
     </LibAntdConfigProvider>
   );
 };
+
+function getAntdLocale(langId: string): Locale {
+  switch (langId) {
+  case SYSTEM_VALID_LANGUAGES.ZH_CN:
+    return zhCNlocale;
+  case SYSTEM_VALID_LANGUAGES.EN:
+  default:
+    return enUSlocale;
+  }
+}

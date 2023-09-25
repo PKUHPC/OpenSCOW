@@ -10,8 +10,10 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/i18n";
 import { Table } from "antd";
 import { ColumnsType } from "antd/es/table";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { publicConfig } from "src/utils/config";
 
 import { AmountStrategyDescriptionsItem } from "./AmonutStrategyDescriptionsItem";
@@ -49,7 +51,13 @@ interface Props {
   loading?: boolean;
 }
 
+const p = prefix("component.others.");
+const pCommon = prefix("common.");
+
 export const JobBillingTable: React.FC<Props> = ({ data, loading }) => {
+
+  const t = useI18nTranslateToString();
+  const languageId = useI18n().currentLanguage.id;
 
   const clusterTotalQosCounts = data && data.length ?
     data.reduce((totalQosCounts: { [cluster: string]: number }, item) => {
@@ -63,35 +71,35 @@ export const JobBillingTable: React.FC<Props> = ({ data, loading }) => {
     }, {}) : {};
 
   const columns: ColumnsType<JobBillingTableItem> = [
-    { dataIndex: "cluster", title: "集群", key: "index", render: (_, r) => ({
-      children: publicConfig.CLUSTERS[r.cluster]?.name ?? r.cluster,
+    { dataIndex: "cluster", title: t(pCommon("cluster")), key: "index", render: (_, r) => ({
+      children: getI18nConfigCurrentText(publicConfig.CLUSTERS[r.cluster]?.name, languageId) ?? r.cluster,
       props: { rowSpan: r.clusterItemIndex === 0 && clusterTotalQosCounts ? clusterTotalQosCounts[r.cluster] : 0 },
     }) },
-    { dataIndex: "partition", title: "分区全名", key: "index", render: (_, r) => ({
+    { dataIndex: "partition", title: t(pCommon("partition")), key: "index", render: (_, r) => ({
       children: r.partition,
       props: { rowSpan: r.partitionItemIndex === 0 ? r.qosCount : 0 },
     }) },
-    { dataIndex: "nodes", title: "分区节点数", key: "index", render: (_, r) => ({
+    { dataIndex: "nodes", title: t(p("nodes")), key: "index", render: (_, r) => ({
       children: r.nodes,
       props: { rowSpan: r.partitionItemIndex === 0 ? r.qosCount : 0 },
     }) },
-    { dataIndex: "cores", title: "单节点核心数", key: "index", render: (_, r) => ({
+    { dataIndex: "cores", title: t(p("cores")), key: "index", render: (_, r) => ({
       children: r.cores / r.nodes,
       props: { rowSpan: r.partitionItemIndex === 0 ? r.qosCount : 0 },
     }) },
-    { dataIndex: "gpus", title: "单节点GPU数", key: "index", render: (_, r) => ({
+    { dataIndex: "gpus", title: t(p("gpus")), key: "index", render: (_, r) => ({
       children: r.gpus / r.nodes,
       props: { rowSpan: r.partitionItemIndex === 0 ? r.qosCount : 0 },
     }) },
-    { dataIndex: "mem", title: "单节点内存（MB）", key: "index", render: (_, r) => ({
+    { dataIndex: "mem", title: t(p("mem")), key: "index", render: (_, r) => ({
       children: r.mem / r.nodes,
       props: { rowSpan: r.partitionItemIndex === 0 ? r.qosCount : 0 },
     }) },
     { dataIndex: "qos", title: "QOS", key: "index", render: (_, r) => ({
       children: r.qos,
     }) },
-    { dataIndex: "price", title: "单价（元）", key: "index", render: (_, r) => ({
-      children: r.priceItem?.price ?? "未定义",
+    { dataIndex: "price", title: t(p("price")), key: "index", render: (_, r) => ({
+      children: r.priceItem?.price ?? t(p("notDefined")),
     }) },
     {
       dataIndex: "amount",
@@ -103,11 +111,11 @@ export const JobBillingTable: React.FC<Props> = ({ data, loading }) => {
         children: (
           r.priceItem?.amount ? (
             <AmountStrategyDescriptionsItem isColContent={true} amount={r.priceItem?.amount} />
-          ) : "未定义"
+          ) : t(p("notDefined"))
         ),
       }),
     },
-    { dataIndex: "comment", title: "说明", key: "index", render: (_, r) => ({
+    { dataIndex: "comment", title: t(p("description")), key: "index", render: (_, r) => ({
       children: r.comment,
       props: { rowSpan: r.partitionItemIndex === 0 ? r.qosCount : 0 },
     }) },

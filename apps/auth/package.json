@@ -28,6 +28,7 @@
     "liquidjs": "10.8.4",
     "@scow/config": "workspace:*",
     "@scow/lib-config": "workspace:*",
+    "@scow/lib-server": "workspace:*",
     "@scow/lib-ssh": "workspace:*",
     "@scow/utils": "workspace:*",
     "@sinclair/typebox": "0.31.1",
@@ -43,7 +44,8 @@
     "pino": "8.15.0",
     "nodemailer": "6.9.4",
     "qrcode": "1.5.3",
-    "speakeasy": "2.0.0"
+    "speakeasy": "2.0.0",
+    "react-typed-i18n": "2.3.0"
   },
   "devDependencies": {
     "@types/asn1": "0.2.1",

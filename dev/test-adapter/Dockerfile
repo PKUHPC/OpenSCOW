@@ -16,7 +16,10 @@ RUN apk update && apk add libc6-compat python3 make gcc g++ git
 RUN corepack enable
 
 WORKDIR /app
+
 COPY pnpm-lock.yaml .
+
+COPY patches ./patches
 
 RUN pnpm fetch
 

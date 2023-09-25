@@ -18,9 +18,10 @@ import React, { useState } from "react";
 import { api } from "src/apis";
 import { AmountStrategyDescriptionsItem } from "src/components/AmonutStrategyDescriptionsItem";
 import { CommonModalProps, ModalLink } from "src/components/ModalLink";
-import { AmountStrategy, AmountStrategyAlgorithmDescriptions,
-  AmountStrategyDescription,
-  AmountStrategyDescriptions, AmountStrategyText } from "src/models/job";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
+import { AmountStrategy, getAmountStrategyAlgorithmDescriptions,
+  getAmountStrategyDescription,
+  getAmountStrategyDescriptions, getAmountStrategyText } from "src/models/job";
 import { getClusterName, publicConfig } from "src/utils/config";
 import { moneyToString } from "src/utils/money";
 
@@ -55,7 +56,16 @@ publicConfig.CUSTOM_AMOUNT_STRATEGIES?.forEach((i) => {
   customAmountStrategiesIdToDescription[i.id] = i.comment || i.id;
 });
 
+
+const p = prefix("pageComp.job.manageJobBillingTable.");
+const pCommon = prefix("common.");
+
 export const ManageJobBillingTable: React.FC<Props> = ({ data, loading, tenant, reload }) => {
+
+  const t = useI18nTranslateToString();
+
+  const AmountStrategyText = getAmountStrategyText(t);
+  const languageId = useI18n().currentLanguage.id;
 
   return (
     <Table
@@ -64,6 +74,9 @@ export const ManageJobBillingTable: React.FC<Props> = ({ data, loading, tenant, 
       loading={loading}
       rowKey={(record) => [record.cluster, record.partition, record.qos].join(".")}
       expandable={{ expandedRowRender: (record) => {
+
+        const t = useI18nTranslateToString();
+
         return (
           <Table
             dataSource={
@@ -73,7 +86,7 @@ export const ManageJobBillingTable: React.FC<Props> = ({ data, loading, tenant, 
             }
             pagination={{ hideOnSinglePage: true }}
           >
-            <Table.Column title="计费价格编号" dataIndex={["priceItem", "itemId"]} />
+            <Table.Column title={t(p("itemId"))} dataIndex={["priceItem", "itemId"]} />
             <Table.Column
               title={AmountStrategyText}
               dataIndex={["priceItem", "amountStrategy"]}
@@ -83,19 +96,23 @@ export const ManageJobBillingTable: React.FC<Props> = ({ data, loading, tenant, 
                 );
               }}
             />
-            <Table.Column title="单价（元）" dataIndex={["priceItem", "price"]} render={(value) => moneyToString(value)} />
-            <Table.Column title="状态" render={(_) => "已作废"} />
+            <Table.Column
+              title={t(p("price"))}
+              dataIndex={["priceItem", "price"]}
+              render={(value) => moneyToString(value)}
+            />
+            <Table.Column title={t(pCommon("status"))} render={(_) => t(p("abandon"))} />
           </Table>
         );
       },
       showExpandColumn:true,
       expandIcon: ({ expanded, onExpand, record }) =>
         expanded ? (
-          <Tooltip title="收起历史计费项">
+          <Tooltip title={t(p("notExpanded"))}>
             <MinusCircleOutlined onClick={(e) => onExpand(record, e)} />
           </Tooltip>
         ) : (
-          <Tooltip title="展开历史计费项">
+          <Tooltip title={t(p("expanded"))}>
             <PlusCircleOutlined onClick={(e) => onExpand(record, e)} />
           </Tooltip>
         ),
@@ -103,18 +120,22 @@ export const ManageJobBillingTable: React.FC<Props> = ({ data, loading, tenant, 
     >
       <Table.ColumnGroup title={(
         <Space>
-          {"计费项"}
-          <Popover title="集群, 分区, QOS共同组成一个计费项。对计费项可以设定计费方式和单价">
+          {t(p("priceItem"))}
+          <Popover title={t(p("text"))}>
             <QuestionCircleOutlined />
           </Popover>
         </Space>
       )}
       >
-        <Table.Column title="集群" dataIndex={"cluster"} render={getClusterName} />
-        <Table.Column title="分区" dataIndex={"partition"} />
+        <Table.Column
+          title={t(pCommon("cluster"))}
+          dataIndex={"cluster"}
+          render={(cluster) => getClusterName(cluster, languageId)}
+        />
+        <Table.Column title={t(pCommon("partition"))} dataIndex={"partition"} />
         <Table.Column title="QOS" dataIndex={"qos"} />
       </Table.ColumnGroup>
-      <Table.Column title="计费价格编号" dataIndex={["priceItem", "itemId"]} />
+      <Table.Column title={t(p("itemId"))} dataIndex={["priceItem", "itemId"]} />
       <Table.Column
         title={(
           <AmountStrategyDescriptionsItem isColTitle={true} />
@@ -130,13 +151,17 @@ export const ManageJobBillingTable: React.FC<Props> = ({ data, loading, tenant, 
         }}
       />
       <Table.Column
-        title="单价（元）"
+        title={t(pCommon("price"))}
         dataIndex={["priceItem", "price"]}
         render={(value) => value ? moneyToString(value) : undefined}
       />
-      <Table.Column title="状态" render={(record) => record.priceItem ? "执行中" : "未设置"} />
+      <Table.Column
+        title={t(pCommon("status"))}
+        render={(record) =>
+          record.priceItem ? t(p("executing")) : t(p("unset"))}
+      />
       <Table.Column<BillingItemType>
-        title="设置"
+        title={t(pCommon("set"))}
         render={(_, r) => {
           return {
             children: (
@@ -149,7 +174,7 @@ export const ManageJobBillingTable: React.FC<Props> = ({ data, loading, tenant, 
                   reload={reload}
                   tenant={tenant}
                 >
-                  设置
+                  {t(pCommon("set"))}
                 </EditPriceModalLink>
               </Space>
             ),
@@ -168,7 +193,15 @@ const EditPriceModal: React.FC<CommonModalProps & {
   onClose, nextId, cluster, partition, qos, open, tenant, reload,
 }) => {
 
+  const t = useI18nTranslateToString();
+  const AmountStrategyDescriptions = getAmountStrategyDescriptions(t);
+  const AmountStrategyAlgorithmDescriptions = getAmountStrategyAlgorithmDescriptions(t);
+  const AmountStrategyText = getAmountStrategyText(t);
+  const AmountStrategyDescription = getAmountStrategyDescription(t);
+
   const { message } = App.useApp();
+
+  const languageId = useI18n().currentLanguage.id;
 
   const [form] = Form.useForm<{ price: number; amount: string; description: string }>();
   const [loading, setLoading] = useState(false);
@@ -182,9 +215,9 @@ const EditPriceModal: React.FC<CommonModalProps & {
       amount, itemId: nextId, path: [cluster, partition, qos].join("."),
       price: numberToMoney(price), description, tenant,
     } })
-      .httpError(409, () => { message.error("此ID已经被使用！"); })
+      .httpError(409, () => { message.error(t(p("alreadyUsed"))); })
       .then(() => {
-        message.success("添加成功！");
+        message.success(t(p("addSuccess")));
         reload();
         onClose();
       })
@@ -192,17 +225,18 @@ const EditPriceModal: React.FC<CommonModalProps & {
   };
 
   return (
-    <Modal title="设置计费价格" open={open} onCancel={onClose} onOk={onOk} destroyOnClose confirmLoading={loading}>
+    <Modal title={t(p("setPrice"))} open={open} onCancel={onClose} onOk={onOk} destroyOnClose confirmLoading={loading}>
       <Form
         form={form}
       >
-        <Form.Item label="对象">
-          <strong>{tenant ? ("租户" + tenant) : "平台"}</strong>
+        <Form.Item label={t(p("object"))}>
+          <strong>{tenant ? (t(pCommon("tenant")) + tenant) : t(pCommon("platform"))}</strong>
         </Form.Item>
-        <Form.Item label="计费项">
-          集群 <strong>{getClusterName(cluster)}</strong>，分区 <strong>{partition}</strong>，QOS <strong>{qos}</strong>
+        <Form.Item label={t(p("priceItem"))}>
+          {t(pCommon("cluster"))} <strong>{getClusterName(cluster, languageId)}</strong>，
+          {t(pCommon("partition"))} <strong>{partition}</strong>，QOS <strong>{qos}</strong>
         </Form.Item>
-        <Form.Item label="新计费价格编号">
+        <Form.Item label={t(p("newItemId"))}>
           <strong>{nextId}</strong>
         </Form.Item>
         <Form.Item
@@ -235,10 +269,10 @@ const EditPriceModal: React.FC<CommonModalProps & {
 
           />
         </Form.Item>
-        <Form.Item label="价格（元）" name="price" initialValue={0} rules={[{ required: true }]}>
+        <Form.Item label={t(p("price"))} name="price" initialValue={0} rules={[{ required: true }]}>
           <InputNumber precision={3} min={0} />
         </Form.Item>
-        <Form.Item label="备注" name="description">
+        <Form.Item label={t(pCommon("comment"))} name="description">
           <Input />
         </Form.Item>
       </Form>

@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { publicConfig } from "src/utils/config";
+import { getRuntimeI18nConfigText, publicConfig } from "src/utils/config";
 
 export const useBuiltinCreateUser = () => {
   return (
@@ -20,16 +20,21 @@ export const useBuiltinCreateUser = () => {
   );
 };
 
-export const getUserIdRule = () => {
+export const getUserIdRule = (languageId: string) => {
   if (!useBuiltinCreateUser()) { return undefined; }
+
 
   const pattern = publicConfig.CREATE_USER_CONFIG.misConfig.builtin?.userIdPattern
     ?? publicConfig.CREATE_USER_CONFIG.misConfig.userIdPattern;
 
+  const errorMessage = publicConfig.CREATE_USER_CONFIG.misConfig.builtin?.userIdPattern
+    ? getRuntimeI18nConfigText(languageId, "createUserBuiltinErrorMessage")
+    : getRuntimeI18nConfigText(languageId, "createUserErrorMessage");
+
   if (pattern) {
     return {
       pattern: new RegExp(pattern.regex),
-      message: pattern.errorMessage,
+      message: errorMessage,
     };
   } else {
     return undefined;

@@ -20,6 +20,7 @@ import { api } from "src/apis";
 import { ChangePasswordModalLink } from "src/components/ChangePasswordModal";
 import { FilterFormContainer, FilterFormTabs } from "src/components/FilterFormContainer";
 import { PlatformRoleSelector } from "src/components/PlatformRoleSelector";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { PlatformRole, SortDirectionType, UsersSortFieldType } from "src/models/User";
 import { GetAllUsersSchema } from "src/pages/api/admin/getAllUsers";
 import { User } from "src/stores/UserStore";
@@ -44,17 +45,22 @@ interface Props {
 }
 
 const filteredRoles = {
-  "ALL_USERS": "所有用户",
-  "PLATFORM_ADMIN": "平台管理员",
-  "PLATFORM_FINANCE": "财务人员",
+  "ALL_USERS": "pageComp.admin.allUserTable.allUsers",
+  "PLATFORM_ADMIN": "pageComp.admin.allUserTable.platformAdmin",
+  "PLATFORM_FINANCE": "pageComp.admin.allUserTable.platformFinance",
 };
 type FilteredRole = keyof typeof filteredRoles;
+
+const p = prefix("pageComp.admin.allUserTable.");
+const pCommon = prefix("common.");
 
 export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
 
   const [ query, setQuery ] = useState<FilterForm>(() => {
     return { idOrName: undefined };
   });
+
+  const t = useI18nTranslateToString();
 
   const [form] = Form.useForm<FilterForm>();
 
@@ -123,17 +129,17 @@ export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
             setSortInfo({ sortField: undefined, sortOrder: undefined });
           }}
         >
-          <Form.Item label="用户ID或者姓名" name="idOrName">
+          <Form.Item label={t(p("idOrName"))} name="idOrName">
             <Input />
           </Form.Item>
           <Form.Item>
-            <Button type="primary" htmlType="submit">搜索</Button>
+            <Button type="primary" htmlType="submit">{t(pCommon("search"))}</Button>
           </Form.Item>
         </Form>
         <Space style={{ marginBottom: "-16px" }}>
           <FilterFormTabs
             tabs={Object.keys(filteredRoles).map((role) => ({
-              title: `${filteredRoles[role]}(${getUsersRoleCount(role as FilteredRole)})`,
+              title: `${t(filteredRoles[role])}(${getUsersRoleCount(role as FilteredRole)})`,
               key: role,
             }))}
             onChange={(value) => handleFilterRoleChange(value as FilteredRole)}
@@ -170,6 +176,8 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
   data, pageInfo, setPageInfo, sortInfo, setSortInfo, isLoading, reload, user,
 }) => {
 
+  const t = useI18nTranslateToString();
+
   const { message } = App.useApp();
 
   const handleTableChange = (_, __, sorter) => {
@@ -199,27 +207,27 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
       >
         <Table.Column<PlatformUserInfo>
           dataIndex="userId"
-          title="用户ID"
+          title={t(p("userId"))}
           sorter={true}
           sortDirections={["ascend", "descend"]}
           sortOrder={sortInfo.sortField === "userId" ? sortInfo.sortOrder : null}
         />
         <Table.Column<PlatformUserInfo>
           dataIndex="name"
-          title="姓名"
+          title={t(p("name"))}
           sorter={true}
           sortDirections={["ascend", "descend"]}
           sortOrder={sortInfo.sortField === "name" ? sortInfo.sortOrder : null}
         />
-        <Table.Column<PlatformUserInfo> dataIndex="tenantName" title="所属租户" />
+        <Table.Column<PlatformUserInfo> dataIndex="tenantName" title={t(p("tenant"))} />
         <Table.Column<PlatformUserInfo>
           dataIndex="availableAccounts"
-          title="可用账户"
+          title={t(p("availableAccounts"))}
           render={(accounts) => accounts.join(",")}
         />
         <Table.Column<PlatformUserInfo>
           dataIndex="createTime"
-          title="创建时间"
+          title={t(pCommon("createTime"))}
           sorter={true}
           sortDirections={["ascend", "descend"]}
           sortOrder={sortInfo.sortField === "createTime" ? sortInfo.sortOrder : null}
@@ -227,7 +235,7 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
         />
         <Table.Column<PlatformUserInfo>
           dataIndex="roles"
-          title="平台角色"
+          title={t(p("roles"))}
           render={(_, r) => (
             <PlatformRoleSelector reload={reload} roles={r.platformRoles} userId={r.userId} currentUser={user} />
           )}
@@ -235,7 +243,7 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
 
         <Table.Column<PlatformUserInfo>
           dataIndex="changePassword"
-          title="操作"
+          title={t(pCommon("operation"))}
           render={(_, r) => (
             <Space split={<Divider type="vertical" />}>
               <ChangePasswordModalLink
@@ -246,13 +254,13 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
                     identityId: r.userId,
                     newPassword: newPassword,
                   } })
-                    .httpError(404, () => { message.error("用户不存在"); })
-                    .httpError(501, () => { message.error("本功能在当前配置下不可用"); })
-                    .then(() => { message.success("修改成功"); })
-                    .catch(() => { message.error("修改失败"); });
+                    .httpError(404, () => { message.error(t(p("notExist"))); })
+                    .httpError(501, () => { message.error(t(p("notAvailable"))); })
+                    .then(() => { message.success(t(p("success"))); })
+                    .catch(() => { message.error(t(p("fail"))); });
                 }}
               >
-                修改密码
+                {t(p("changePassword"))}
               </ChangePasswordModalLink>
             </Space>
           )}

@@ -15,6 +15,7 @@ import type { ClusterConfigSchema } from "@scow/config/build/cluster";
 import type { PortalConfigSchema } from "@scow/config/build/portal";
 import type { UiConfigSchema } from "@scow/config/build/ui";
 import { UserLink } from "@scow/lib-web/build/layouts/base/types";
+import { getI18nConfigCurrentText, I18nStringType } from "@scow/lib-web/build/utils/i18n";
 import getConfig from "next/config";
 
 export interface ServerRuntimeConfig {
@@ -37,19 +38,21 @@ export interface ServerRuntimeConfig {
 
   SERVER_URL: string;
 
-  DEFAULT_HOME_TEXT: string;
   HOME_TEXTS: {[hostname: string]: string };
 
-  DEFAULT_HOME_TITLE: string;
   HOME_TITLES: {[hostname: string]: string };
-
-  SUBMIT_JOB_PROMPT_TEXT?: string;
 
   SUBMIT_JOB_WORKING_DIR: string;
 
   SCOW_API_AUTH_TOKEN?: string;
 
   AUDIT_CONFIG: AuditConfigSchema | undefined;
+
+  SERVER_I18N_CONFIG_TEXTS: {
+    defaultHomeTitle: I18nStringType,
+    defaultHomeText: I18nStringType,
+    submitJopPromptText?: I18nStringType,
+  }
 }
 
 export interface PublicRuntimeConfig {
@@ -70,7 +73,6 @@ export interface PublicRuntimeConfig {
   NOVNC_CLIENT_URL: string;
 
   PASSWORD_PATTERN: string | undefined;
-  PASSWORD_PATTERN_MESSAGE: string | undefined;
 
   BASE_PATH: string;
   // 上传（请求）文件的大小限制
@@ -84,12 +86,16 @@ export interface PublicRuntimeConfig {
 
   VERSION_TAG: string | undefined;
 
+  RUNTIME_I18N_CONFIG_TEXTS: {
+    passwordPatternMessage: I18nStringType | undefined,
+  }
+
 }
 
 export const runtimeConfig: ServerRuntimeConfig = getConfig().serverRuntimeConfig;
 export const publicConfig: PublicRuntimeConfig = getConfig().publicRuntimeConfig;
 
-export type Cluster = { id: string; name: string; }
+export type Cluster = { id: string; name: I18nStringType; }
 export type NavLink = {
   text: string;
   url?: string;
@@ -108,3 +114,50 @@ export const getLoginDesktopEnabled = (cluster: string): boolean => {
 };
 
 export type LoginNode = { name: string, address: string }
+
+export const getClusterName = (clusterId: string, languageId: string) => {
+  return getI18nConfigCurrentText(publicConfig.CLUSTERS.find((cluster) => cluster.id === clusterId)?.name, languageId)
+   || clusterId;
+};
+
+type ServerI18nConfigKeys = keyof typeof runtimeConfig.SERVER_I18N_CONFIG_TEXTS;
+// 获取ServerConfig中相关字符串配置的对应语言的字符串
+export const getServerI18nConfigText = <TKey extends ServerI18nConfigKeys>(
+  languageId: string,
+  key: TKey,
+) => {
+  return getI18nText(runtimeConfig.SERVER_I18N_CONFIG_TEXTS, key, languageId);
+};
+
+type RuntimeI18nConfigKeys = keyof typeof publicConfig.RUNTIME_I18N_CONFIG_TEXTS;
+// 获取RuntimeConfig中相关字符串配置的对应语言的字符串
+export const getRuntimeI18nConfigText = <TKey extends RuntimeI18nConfigKeys>(
+  languageId: string,
+  key: TKey,
+) => {
+  return getI18nText(publicConfig.RUNTIME_I18N_CONFIG_TEXTS, key, languageId);
+};
+
+
+/**
+ *
+ * 当具有嵌套结构的obj中有实现i18n需求的文字时，用此方法。、
+ * 为没有经过是否一定具有i18n类型的校验，只当嵌套类型中出现I18nStringType时采用此方法。
+ * @param obj
+ * 如果是多层嵌套，传递最终实现i18n文本的外层obj
+ * @param key
+ * 获取最终对应i18n文本字段的key
+ * @param languageId
+ * 当前语言id
+ * @returns string | undefined
+ * i18n语言文本
+ */
+export const getI18nText = <TObject extends Object, TKey extends keyof TObject>(
+  obj: TObject, key: TKey, languageId: string,
+): (TObject[TKey] extends I18nStringType ? string : (string | undefined)) => {
+  const value = obj[key];
+
+  if (!value) { return undefined as any; }
+
+  return getI18nConfigCurrentText(value as any, languageId);
+};

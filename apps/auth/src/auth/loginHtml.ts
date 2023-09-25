@@ -11,12 +11,14 @@
  */
 
 import { DEFAULT_PRIMARY_COLOR } from "@scow/config/build/ui";
+import { getI18nConfigCurrentText, getLanguageCookie } from "@scow/lib-server/build/i18n";
 import { FastifyReply, FastifyRequest } from "fastify";
 import { join } from "path";
 import { createCaptcha } from "src/auth/captcha";
 import { authConfig, OtpStatusOptions, ScowLogoType } from "src/config/auth";
 import { config, FAVICON_URL, LOGO_URL } from "src/config/env";
 import { uiConfig } from "src/config/ui";
+import { AuthTextsType, languages } from "src/i18n";
 
 
 export async function serveLoginHtml(
@@ -36,8 +38,19 @@ export async function serveLoginHtml(
     ? await createCaptcha(req.server)
     : undefined;
 
+  // 获取当前语言ID及对应的登录页面文本
+  const languageId = getLanguageCookie(req.raw);
+  const authTexts: AuthTextsType = languages[languageId];
+
+  // 获取sloganI18nText
+  const sloganTitle = getI18nConfigCurrentText(authConfig.ui?.slogan.title, languageId);
+  const sloganTextArr = authConfig.ui?.slogan.texts.map((text) => {
+    return getI18nConfigCurrentText(text, languageId);
+  });
+
   return rep.status(
     verifyCaptchaFail ? 400 : err ? 401 : 200).view("login.liquid", {
+    authTexts: authTexts,
     cssUrl: join(config.BASE_PATH, config.AUTH_BASE_PATH, "/public/assets/tailwind.min.css"),
     eyeImagePath: join(config.BASE_PATH, config.AUTH_BASE_PATH, "/public/assets/icons/eye.png"),
     eyeCloseImagePath: join(config.BASE_PATH, config.AUTH_BASE_PATH, "/public/assets/icons/eye-close.png"),
@@ -51,8 +64,8 @@ export async function serveLoginHtml(
     logoLink: authConfig.ui?.logo.customLogoLink ?? "",
     callbackUrl,
     sloganColor: authConfig.ui?.slogan.color || "white",
-    sloganTitle: authConfig.ui?.slogan.title || "",
-    sloganTextArr: authConfig.ui?.slogan.texts || [],
+    sloganTitle: sloganTitle || "",
+    sloganTextArr: sloganTextArr || [],
     footerTextColor: authConfig.ui?.footerTextColor || "white",
     themeColor: uiConfig.primaryColor?.defaultColor ?? DEFAULT_PRIMARY_COLOR,
     err,

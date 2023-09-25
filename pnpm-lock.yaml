@@ -1,8 +1,10 @@
 lockfileVersion: '6.0'
 
-settings:
-  autoInstallPeers: true
-  excludeLinksFromLockfile: false
+patchedDependencies:
+  react-typed-i18n@2.3.0:
+    hash: eybujl4up7xenffji6zpg43f3u
+    path: patches/react-typed-i18n@2.3.0.patch
+
 importers:
 
   .:
@@ -188,6 +190,9 @@ importers:
       '@scow/lib-config':
         specifier: workspace:*
         version: link:../../libs/libconfig
+      '@scow/lib-server':
+        specifier: workspace:*
+        version: link:../../libs/server
       '@scow/lib-ssh':
         specifier: workspace:*
         version: link:../../libs/ssh
@@ -233,6 +238,9 @@ importers:
       qrcode:
         specifier: 1.5.3
         version: 1.5.3
+      react-typed-i18n:
+        specifier: 2.3.0
+        version: 2.3.0(patch_hash=eybujl4up7xenffji6zpg43f3u)(react@18.2.0)
       speakeasy:
         specifier: 2.0.0
         version: 2.0.0
@@ -516,6 +524,9 @@ importers:
       react-is:
         specifier: 18.2.0
         version: 18.2.0
+      react-typed-i18n:
+        specifier: 2.3.0
+        version: 2.3.0(patch_hash=eybujl4up7xenffji6zpg43f3u)(react@18.2.0)
       simstate:
         specifier: 3.0.1
         version: 3.0.1(react@18.2.0)
@@ -773,6 +784,9 @@ importers:
       react-is:
         specifier: 18.2.0
         version: 18.2.0
+      react-typed-i18n:
+        specifier: 2.3.0
+        version: 2.3.0(patch_hash=eybujl4up7xenffji6zpg43f3u)(react@18.2.0)
       simstate:
         specifier: 3.0.1
         version: 3.0.1(react@18.2.0)
@@ -1101,6 +1115,9 @@ importers:
       '@grpc/grpc-js':
         specifier: 1.8.21
         version: 1.8.21
+      nookies:
+        specifier: 2.5.2
+        version: 2.5.2
     devDependencies:
       '@ddadaal/tsgrpc-client':
         specifier: 0.17.6
@@ -17163,6 +17180,15 @@ packages:
       - '@types/react'
     dev: false
 
+  /react-typed-i18n@2.3.0(patch_hash=eybujl4up7xenffji6zpg43f3u)(react@18.2.0):
+    resolution: {integrity: sha512-ap0/WlMz4iFwxha2nLPn3mWiUNO/f4PagXIbTznnpCzSTWOk4ifkWyI/iC4LiA7rF49aBsMqAUAmk65mzfWPkA==}
+    peerDependencies:
+      react: '>=16.8.0'
+    dependencies:
+      react: 18.2.0
+    dev: false
+    patched: true
+
   /react@17.0.2:
     resolution: {integrity: sha512-gnhPt75i/dq/z3/6q/0asP78D0u592D5L1pd7M8P+dck6Fu/jJeL6iVVK23fptSUZj8Vjf++7wXA8UNclGQcbA==}
     engines: {node: '>=0.10.0'}
@@ -20394,3 +20420,7 @@ packages:
     name: tiny-inflate
     version: 1.0.3
     dev: false
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false

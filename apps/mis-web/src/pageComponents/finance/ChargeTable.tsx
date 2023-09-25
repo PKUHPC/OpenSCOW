@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { defaultPresets, formatDateTime } from "@scow/lib-web/build/utils/datetime";
+import { formatDateTime, getDefaultPresets } from "@scow/lib-web/build/utils/datetime";
 import { useDidUpdateEffect } from "@scow/lib-web/build/utils/hooks";
 import { Button, DatePicker, Form, Select, Table } from "antd";
 import dayjs from "dayjs";
@@ -18,11 +18,13 @@ import { useCallback, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { SearchType } from "src/models/User";
 import { publicConfig } from "src/utils/config";
 import { CHARGE_TYPE_OTHERS } from "src/utils/constants";
 
 import { AccountSelector } from "./AccountSelector";
+
 
 interface Props {
   accountName?: string;
@@ -40,8 +42,15 @@ interface FilterForm {
 
 const now = dayjs();
 
+
+const p = prefix("pageComp.finance.chargeTable.");
+const pCommon = prefix("common.");
+
 export const ChargeTable: React.FC<Props> = ({
   accountName, showAccountName, showTenantName, isPlatformRecords, searchType }) => {
+
+  const t = useI18nTranslateToString();
+  const languageId = useI18n().currentLanguage.id;
 
   const [form] = Form.useForm<FilterForm>();
 
@@ -88,28 +97,28 @@ export const ChargeTable: React.FC<Props> = ({
         >
           {
             showAccountName && (
-              <Form.Item label="账户" name="name">
+              <Form.Item label={t("common.account")} name="name">
                 <AccountSelector
                   onChange={(value) => {
                     setQuery({ ...query, name: value });
                   }}
-                  placeholder="请选择账户"
+                  placeholder={t("common.selectAccount")}
                   fromAllTenants={showTenantName ? true : false}
                 />
               </Form.Item>
             )
           }
-          <Form.Item label="时间" name="time">
-            <DatePicker.RangePicker allowClear={false} presets={defaultPresets} />
+          <Form.Item label={t(pCommon("time"))} name="time">
+            <DatePicker.RangePicker allowClear={false} presets={getDefaultPresets(languageId)} />
           </Form.Item>
-          <Form.Item label="类型" name="type">
+          <Form.Item label={t("common.type")} name="type">
             <Select
               style={{ minWidth: "100px" }}
               allowClear
               onChange={(value) => {
                 setQuery({ ...query, type: value });
               }}
-              placeholder="请选择类型"
+              placeholder={t("common.selectType")}
             >
               {(filteredTypes).map((x) => (
                 <Select.Option key={x} value={x}>
@@ -118,18 +127,18 @@ export const ChargeTable: React.FC<Props> = ({
               ))}
             </Select>
           </Form.Item>
-          <Form.Item label="总数">
+          <Form.Item label={t("common.total")}>
             <strong>
               {data ? data.results.length : 0}
             </strong>
           </Form.Item>
-          <Form.Item label="合计">
+          <Form.Item label={t(pCommon("sum"))}>
             <strong>
               {data ? data.total.toFixed(3) : 0}
             </strong>
           </Form.Item>
           <Form.Item>
-            <Button type="primary" htmlType="submit">搜索</Button>
+            <Button type="primary" htmlType="submit">{t(pCommon("search"))}</Button>
           </Form.Item>
         </Form>
       </FilterFormContainer>
@@ -141,18 +150,18 @@ export const ChargeTable: React.FC<Props> = ({
       >
         {
           showAccountName && (
-            <Table.Column dataIndex="accountName" title="账户" />
+            <Table.Column dataIndex="accountName" title={t(pCommon("account"))} />
           )
         }
         {
           showTenantName && (
-            <Table.Column dataIndex="tenantName" title="租户" />
+            <Table.Column dataIndex="tenantName" title={t("common.tenant")} />
           )
         }
-        <Table.Column dataIndex="time" title="扣费日期" render={(v) => formatDateTime(v)} />
-        <Table.Column dataIndex="amount" title="扣费金额" render={(v) => v.toFixed(3)} />
-        <Table.Column dataIndex="type" title="类型" />
-        <Table.Column dataIndex="comment" title="备注" />
+        <Table.Column dataIndex="time" title={t(p("time"))} render={(v) => formatDateTime(v)} />
+        <Table.Column dataIndex="amount" title={t(p("amount"))} render={(v) => v.toFixed(3)} />
+        <Table.Column dataIndex="type" title={t(pCommon("type"))} />
+        <Table.Column dataIndex="comment" title={t(pCommon("comment"))} />
       </Table>
     </div>
 

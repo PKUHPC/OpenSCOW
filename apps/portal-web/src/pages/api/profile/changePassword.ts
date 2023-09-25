@@ -30,7 +30,6 @@ export const ChangePasswordSchema = typeboxRouteSchema({
     400: Type.Object({
       // 密码不合规则
       code: Type.Literal("PASSWORD_NOT_VALID"),
-      message: Type.Optional(Type.String()),
     }),
 
     /** 用户未找到 */
@@ -59,7 +58,9 @@ export default typeboxRoute(ChangePasswordSchema, async (req, res) => {
   const { newPassword } = req.body;
 
   if (passwordPattern && !passwordPattern.test(newPassword)) {
-    return { 400: { code: "PASSWORD_NOT_VALID" as const, message: publicConfig.PASSWORD_PATTERN_MESSAGE } };
+    return { 400: {
+      code: "PASSWORD_NOT_VALID" as const,
+    } };
   }
 
   return await libChangePassword(runtimeConfig.AUTH_INTERNAL_URL, {

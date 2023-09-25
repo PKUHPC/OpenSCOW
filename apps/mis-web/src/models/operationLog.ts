@@ -13,6 +13,9 @@
 import { OperationEvent, OperationType as LibOperationType, OperationTypeEnum } from "@scow/lib-operation-log";
 import { Static, Type } from "@sinclair/typebox";
 import { ValueOf } from "next/dist/shared/lib/constants";
+import { Lang } from "react-typed-i18n";
+import { prefix } from "src/i18n";
+import en from "src/i18n/en";
 import { nullableMoneyToString } from "src/utils/money";
 
 export const OperationResult = {
@@ -93,62 +96,75 @@ export enum OperationLogQueryType {
   PLATFORM = 3,
 };
 
-export const OperationResultTexts = {
-  [OperationResult.UNKNOWN]: "未知",
-  [OperationResult.SUCCESS]: "成功",
-  [OperationResult.FAIL]: "失败",
+type OperationTextsTransType = (id: Lang<typeof en>, args?: React.ReactNode[]) => string;
+const pRes = prefix("operationLog.resultTexts.");
+const pTypes = prefix("operationLog.operationTypeTexts.");
+const pDetails = prefix("operationLog.operationDetails.");
+
+export const getOperationResultTexts = (t: OperationTextsTransType) => {
+
+  return {
+    [OperationResult.UNKNOWN]: t(pRes("unknown")),
+    [OperationResult.SUCCESS]: t(pRes("success")),
+    [OperationResult.FAIL]: t(pRes("fail")),
+  };
+
 };
 
-export const OperationTypeTexts: { [key in LibOperationType]: string } = {
-  login: "用户登录",
-  logout: "用户登出",
-  submitJob: "提交作业",
-  endJob: "结束作业",
-  addJobTemplate: "保存作业模板",
-  deleteJobTemplate: "删除作业模板",
-  updateJobTemplate: "更新作业模板",
-  shellLogin: "SHELL登录",
-  createDesktop: "新建桌面",
-  deleteDesktop: "删除桌面",
-  createApp: "创建应用",
-  createFile: "新建文件",
-  deleteFile: "删除文件",
-  uploadFile: "上传文件",
-  createDirectory: "新建文件夹",
-  deleteDirectory: "删除文件夹",
-  moveFileItem: "移动文件/文件夹",
-  copyFileItem: "复制文件/文件夹",
-  setJobTimeLimit: "设置作业时限",
-  createUser: "创建用户",
-  addUserToAccount: "添加用户至账户",
-  removeUserFromAccount: "从账户移出用户",
-  setAccountAdmin: "设置账户管理员",
-  unsetAccountAdmin: "取消账户管理员",
-  blockUser: "封锁用户",
-  unblockUser: "解封用户",
-  accountSetChargeLimit: "账户设置限额",
-  accountUnsetChargeLimit: "账户取消设置限额",
-  setTenantBilling: "设置作业租户计费",
-  setTenantAdmin: "设置租户管理员",
-  unsetTenantAdmin: "取消租户管理员",
-  setTenantFinance: "设置租户财务人员",
-  unsetTenantFinance: "取消租户财务人员",
-  tenantChangePassword: "租户重置用户密码",
-  createAccount: "创建账户",
-  addAccountToWhitelist: "添加白名单账户",
-  removeAccountFromWhitelist: "移出白名单",
-  accountPay: "账户充值",
-  blockAccount: "封锁帐户",
-  unblockAccount: "解封帐户",
-  importUsers: "导入用户",
-  setPlatformAdmin: "设置平台管理员",
-  unsetPlatformAdmin: "取消平台管理员",
-  setPlatformFinance: "设置平台财务人员",
-  unsetPlatformFinance: "取消平台财务人员",
-  platformChangePassword: "平台重置用户密码",
-  setPlatformBilling: "设置平台作业计费",
-  createTenant: "创建租户",
-  tenantPay: "租户充值",
+export const getOperationTypeTexts = (t: OperationTextsTransType): { [key in LibOperationType]: string } => {
+
+  return {
+    login: t(pTypes("login")),
+    logout: t(pTypes("logout")),
+    submitJob: t(pTypes("submitJob")),
+    endJob: t(pTypes("endJob")),
+    addJobTemplate: t(pTypes("addJobTemplate")),
+    deleteJobTemplate: t(pTypes("deleteJobTemplate")),
+    updateJobTemplate: t(pTypes("updateJobTemplate")),
+    shellLogin: t(pTypes("shellLogin")),
+    createDesktop: t(pTypes("createDesktop")),
+    deleteDesktop: t(pTypes("deleteDesktop")),
+    createApp: t(pTypes("createApp")),
+    createFile: t(pTypes("createFile")),
+    deleteFile: t(pTypes("deleteFile")),
+    uploadFile: t(pTypes("uploadFile")),
+    createDirectory: t(pTypes("createDirectory")),
+    deleteDirectory: t(pTypes("deleteDirectory")),
+    moveFileItem: t(pTypes("moveFileItem")),
+    copyFileItem: t(pTypes("copyFileItem")),
+    setJobTimeLimit: t(pTypes("setJobTimeLimit")),
+    createUser: t(pTypes("createUser")),
+    addUserToAccount: t(pTypes("addUserToAccount")),
+    removeUserFromAccount: t(pTypes("removeUserFromAccount")),
+    setAccountAdmin: t(pTypes("setAccountAdmin")),
+    unsetAccountAdmin: t(pTypes("unsetAccountAdmin")),
+    blockUser: t(pTypes("blockUser")),
+    unblockUser: t(pTypes("unblockUser")),
+    accountSetChargeLimit: t(pTypes("accountSetChargeLimit")),
+    accountUnsetChargeLimit: t(pTypes("accountUnsetChargeLimit")),
+    setTenantBilling: t(pTypes("setTenantBilling")),
+    setTenantAdmin: t(pTypes("setTenantAdmin")),
+    unsetTenantAdmin: t(pTypes("unsetTenantAdmin")),
+    setTenantFinance: t(pTypes("setTenantFinance")),
+    unsetTenantFinance: t(pTypes("unsetTenantFinance")),
+    tenantChangePassword: t(pTypes("tenantChangePassword")),
+    createAccount: t(pTypes("createAccount")),
+    addAccountToWhitelist: t(pTypes("addAccountToWhitelist")),
+    removeAccountFromWhitelist: t(pTypes("removeAccountFromWhitelist")),
+    accountPay: t(pTypes("accountPay")),
+    blockAccount: t(pTypes("blockAccount")),
+    unblockAccount: t(pTypes("unblockAccount")),
+    importUsers: t(pTypes("importUsers")),
+    setPlatformAdmin: t(pTypes("setPlatformAdmin")),
+    unsetPlatformAdmin: t(pTypes("unsetPlatformAdmin")),
+    setPlatformFinance: t(pTypes("setPlatformFinance")),
+    unsetPlatformFinance: t(pTypes("unsetPlatformFinance")),
+    platformChangePassword: t(pTypes("platformChangePassword")),
+    setPlatformBilling: t(pTypes("setPlatformBilling")),
+    createTenant: t(pTypes("createTenant")),
+    tenantPay: t(pTypes("tenantPay")),
+  };
+
 };
 
 export const OperationCodeMap: { [key in LibOperationType]: string } = {
@@ -203,117 +219,150 @@ export const OperationCodeMap: { [key in LibOperationType]: string } = {
   tenantPay: "040302",
 };
 
-export const getOperationDetail = (operationEvent: OperationEvent) => {
+type OperationTextsArgsTransType = (id: Lang<typeof en>, args?: React.ReactNode[]) => string | React.ReactNode;
+
+export const getOperationDetail = (
+  operationEvent: OperationEvent,
+  t: OperationTextsTransType,
+  tArgs: OperationTextsArgsTransType,
+) => {
 
   try {
     if (!operationEvent) {
       return "";
     }
+
     const logEvent = operationEvent.$case;
+
     switch (logEvent) {
     case "login":
-      return "用户登录";
+      return t(pDetails("login"));
     case "logout":
-      return "用户退出登录";
+      return t(pDetails("logout"));
     case "submitJob":
-      return `在账户${operationEvent[logEvent].accountName}下提交作业(ID: ${operationEvent[logEvent].jobId})`;
+      return t(pDetails("submitJob"), [operationEvent[logEvent].accountName, operationEvent[logEvent].jobId]);
     case "endJob":
-      return `结束作业(ID: ${operationEvent[logEvent].jobId})`;
+      return t(pDetails("endJob"), [operationEvent[logEvent].jobId]);
     case "addJobTemplate":
-      return `保存作业模板(模板名: ${operationEvent[logEvent].jobTemplateId})`;
+      return t(pDetails("addJobTemplate"), [operationEvent[logEvent].jobTemplateId]);
     case "deleteJobTemplate":
-      return `删除作业模板(模板名：${operationEvent[logEvent].jobTemplateId})`;
+      return t(pDetails("deleteJobTemplate"), [operationEvent[logEvent].jobTemplateId]);
     case "updateJobTemplate":
-      return `更新作业模板(旧模板名：${operationEvent[logEvent].jobTemplateId}，新模板名：${operationEvent[logEvent].newJobTemplateId})`;
+      return t(pDetails("updateJobTemplate"),
+        [operationEvent[logEvent].jobTemplateId, operationEvent[logEvent].newJobTemplateId]);
     case "shellLogin":
-      return `登录${operationEvent[logEvent].clusterId}集群的${operationEvent[logEvent].loginNode}节点`;
+      return t(pDetails("shellLogin"), [operationEvent[logEvent].clusterId, operationEvent[logEvent].loginNode]);
     case "createDesktop":
-      return `新建桌面(桌面名：${operationEvent[logEvent].desktopName}, 桌面类型: ${operationEvent[logEvent].wm})`;
+      return t(pDetails("createDesktop"), [operationEvent[logEvent].desktopName, operationEvent[logEvent].wm]);
     case "deleteDesktop":
-      return `删除桌面(桌面ID: ${operationEvent[logEvent].loginNode}:${operationEvent[logEvent].desktopId})`;
+      return t(pDetails("deleteDesktop"),
+        [operationEvent[logEvent].loginNode, operationEvent[logEvent].desktopId]);
     case "createApp":
-      return `在账户${operationEvent[logEvent].accountName}下创建应用(ID: ${operationEvent[logEvent].jobId})`;
+      return t(pDetails("createApp"), [operationEvent[logEvent].accountName, operationEvent[logEvent].jobId]);
     case "createFile":
-      return `新建文件：${operationEvent[logEvent].path}`;
+      return t(pDetails("createFile"), [operationEvent[logEvent].path]);
     case "deleteFile":
-      return `删除文件：${operationEvent[logEvent].path}`;
+      return t(pDetails("deleteFile"), [operationEvent[logEvent].path]);
     case "uploadFile":
-      return `上传文件：${operationEvent[logEvent].path}`;
+      return t(pDetails("uploadFile"), [operationEvent[logEvent].path]);
     case "createDirectory":
-      return `新建文件夹：${operationEvent[logEvent].path}`;
+      return t(pDetails("createDirectory"), [operationEvent[logEvent].path]);
     case "deleteDirectory":
-      return `删除文件夹：${operationEvent[logEvent].path}`;
+      return t(pDetails("deleteDirectory"), [operationEvent[logEvent].path]);
     case "moveFileItem":
-      return `移动文件/文件夹：${operationEvent[logEvent].fromPath}至${operationEvent[logEvent].toPath}`;
+      return t(pDetails("moveFileItem"), [operationEvent[logEvent].fromPath, operationEvent[logEvent].toPath]);
     case "copyFileItem":
-      return `复制文件/文件夹：${operationEvent[logEvent].fromPath}至${operationEvent[logEvent].toPath}`;
+      return t(pDetails("copyFileItem"), [operationEvent[logEvent].fromPath, operationEvent[logEvent].toPath]);
     case "setJobTimeLimit":
-      return `设置作业(ID: ${operationEvent[logEvent].jobId})时限 ${Math.abs(operationEvent[logEvent].limitMinutes)} 分钟`;
+      return t(pDetails("setJobTimeLimit"),
+        [operationEvent[logEvent].jobId, Math.abs(operationEvent[logEvent].limitMinutes)]);
     case "createUser":
-      return `创建用户${operationEvent[logEvent].userId}`;
+      return t(pDetails("createUser"), [operationEvent[logEvent].userId]);
     case "addUserToAccount":
-      return `将用户${operationEvent[logEvent].userId}添加到账户${operationEvent[logEvent].accountName}中`;
+      return t(pDetails("addUserToAccount"),
+        [operationEvent[logEvent].userId, operationEvent[logEvent].accountName]);
     case "removeUserFromAccount":
-      return `将用户${operationEvent[logEvent].userId}从账户${operationEvent[logEvent].accountName}中移除`;
+      return t(pDetails("removeUserFromAccount"),
+        [operationEvent[logEvent].userId, operationEvent[logEvent].accountName]);
     case "setAccountAdmin":
-      return `设置用户${operationEvent[logEvent].userId}为账户${operationEvent[logEvent].accountName}的管理员`;
+      return t(pDetails("setAccountAdmin"),
+        [operationEvent[logEvent].userId, operationEvent[logEvent].accountName]);
     case "unsetAccountAdmin":
-      return `取消用户${operationEvent[logEvent].userId}为账户${operationEvent[logEvent].accountName}的管理员`;
+      return t(pDetails("unsetAccountAdmin"),
+        [operationEvent[logEvent].userId, operationEvent[logEvent].accountName]);
     case "blockUser":
-      return `在账户${operationEvent[logEvent].accountName}中封锁用户${operationEvent[logEvent].userId}`;
+      return t(pDetails("blockUser"), [operationEvent[logEvent].accountName, operationEvent[logEvent].userId]);
     case "unblockUser":
-      return `在账户${operationEvent[logEvent].accountName}中解封用户${operationEvent[logEvent].userId}`;
+      return t(pDetails("unblockUser"), [operationEvent[logEvent].accountName, operationEvent[logEvent].userId]);
     case "accountSetChargeLimit":
-      return `在账户${operationEvent[logEvent].accountName}中设置用户${
-        operationEvent[logEvent].userId}限额为${nullableMoneyToString(operationEvent[logEvent].limit)}元`;
+      return t(pDetails("accountSetChargeLimit"),
+        [operationEvent[logEvent].accountName,
+          operationEvent[logEvent].userId,
+          nullableMoneyToString(operationEvent[logEvent].limit)]);
     case "accountUnsetChargeLimit":
-      return `在账户${operationEvent[logEvent].accountName}中取消用户${operationEvent[logEvent].userId}限额`;
+      return t(pDetails("accountUnsetChargeLimit"),
+        [operationEvent[logEvent].accountName, operationEvent[logEvent].userId]);
     case "setTenantBilling":
-      return `设置租户${operationEvent[logEvent].tenantName}的计费项${
-        operationEvent[logEvent].path}价格为${nullableMoneyToString(operationEvent[logEvent].price)}元`;
+      return t(pDetails("setTenantBilling"),
+        [operationEvent[logEvent].tenantName,
+          operationEvent[logEvent].path,
+          nullableMoneyToString(operationEvent[logEvent].price)]);
     case "setTenantAdmin":
-      return `设置用户${operationEvent[logEvent].userId}为租户${operationEvent[logEvent].tenantName}的管理员`;
+      return t(pDetails("setTenantAdmin"), [operationEvent[logEvent].userId, operationEvent[logEvent].tenantName]);
     case "unsetTenantAdmin":
-      return `取消用户${operationEvent[logEvent].userId}为租户${operationEvent[logEvent].tenantName}的管理员`;
+      return t(pDetails("unsetTenantAdmin"),
+        [operationEvent[logEvent].userId, operationEvent[logEvent].tenantName]);
     case "setTenantFinance":
-      return `设置用户${operationEvent[logEvent].userId}为租户${operationEvent[logEvent].tenantName}的财务人员`;
+      return t(pDetails("setTenantFinance"),
+        [operationEvent[logEvent].userId, operationEvent[logEvent].tenantName]);
     case "unsetTenantFinance":
-      return `取消用户${operationEvent[logEvent].userId}为租户${operationEvent[logEvent].tenantName}的财务人员`;
+      return t(pDetails("unsetTenantFinance"),
+        [operationEvent[logEvent].userId, operationEvent[logEvent].tenantName]);
     case "tenantChangePassword":
-      return `重置用户${operationEvent[logEvent].userId}的登录密码`;
+      return t(pDetails("tenantChangePassword"), [operationEvent[logEvent].userId]);
     case "createAccount":
-      return `创建账户${operationEvent[logEvent].accountName}, 拥有者为${operationEvent[logEvent].accountOwner}`;
+      return t(pDetails("createAccount"),
+        [operationEvent[logEvent].accountName, operationEvent[logEvent].accountOwner]);
     case "addAccountToWhitelist":
-      return `将账户${operationEvent[logEvent].accountName}添加到租户${operationEvent[logEvent].tenantName}的白名单中`;
+      return t(pDetails("addAccountToWhitelist"),
+        [operationEvent[logEvent].accountName, operationEvent[logEvent].tenantName]);
     case "removeAccountFromWhitelist":
-      return `将账户${operationEvent[logEvent].accountName}从租户${operationEvent[logEvent].tenantName}的白名单中移出`;
+      return t(pDetails("removeAccountFromWhitelist"),
+        [operationEvent[logEvent].accountName, operationEvent[logEvent].tenantName]);
     case "accountPay":
-      return `为账户${operationEvent[logEvent].accountName}充值${nullableMoneyToString(operationEvent[logEvent].amount)}元`;
+      return t(pDetails("accountPay"),
+        [operationEvent[logEvent].accountName, nullableMoneyToString(operationEvent[logEvent].amount)]);
     case "blockAccount":
-      return `在租户${operationEvent[logEvent].tenantName}中封锁账户${operationEvent[logEvent].accountName}`;
+      return t(pDetails("blockAccount"),
+        [operationEvent[logEvent].tenantName, operationEvent[logEvent].accountName]);
     case "unblockAccount":
-      return `在租户${operationEvent[logEvent].tenantName}中解封帐户${operationEvent[logEvent].accountName}`;
+      return t(pDetails("unblockAccount"),
+        [operationEvent[logEvent].tenantName, operationEvent[logEvent].accountName]);
     case "importUsers":
-      return `给租户${operationEvent[logEvent].tenantName}导入用户, ${operationEvent[logEvent].importAccounts.map(
-        (account: { accountName: string; userIds: string[];}) =>
-          (`在账户${account.accountName}下导入用户${account.userIds.join("、")}`),
-      ).join(", ")}`;
+      return `${t(pDetails("importUsers1"), [operationEvent[logEvent].tenantName])}${
+        operationEvent[logEvent].importAccounts.map(
+          (account: { accountName: string; userIds: string[];}) =>
+            (tArgs(pDetails("importUsers2"), [account.accountName, account.userIds.join("、")])),
+        ).join(", ")}`;
     case "setPlatformAdmin":
-      return `设置用户${operationEvent[logEvent].userId}为平台管理员`;
+      return t(pDetails("setPlatformAdmin"), [operationEvent[logEvent].userId]);
     case "unsetPlatformAdmin":
-      return `取消用户${operationEvent[logEvent].userId}为平台管理员`;
+      return t(pDetails("unsetPlatformAdmin"), [operationEvent[logEvent].userId]);
     case "setPlatformFinance":
-      return `设置用户${operationEvent[logEvent].userId}为平台财务人员`;
+      return t(pDetails("setPlatformFinance"), [operationEvent[logEvent].userId]);
     case "unsetPlatformFinance":
-      return `取消用户${operationEvent[logEvent].userId}为平台财务人员`;
+      return t(pDetails("unsetPlatformFinance"), [operationEvent[logEvent].userId]);
     case "platformChangePassword":
-      return `重置用户${operationEvent[logEvent].userId}的登录密码`;
+      return t(pDetails("platformChangePassword"), [operationEvent[logEvent].userId]);
     case "createTenant":
-      return `创建租户${operationEvent[logEvent].tenantName}, 租户管理员为: ${operationEvent[logEvent].tenantAdmin}`;
+      return t(pDetails("createTenant"),
+        [operationEvent[logEvent].tenantName, operationEvent[logEvent].tenantAdmin]);
     case "tenantPay":
-      return `为租户${operationEvent[logEvent].tenantName}充值${nullableMoneyToString(operationEvent[logEvent].amount)}元`;
+      return t(pDetails("tenantPay"),
+        [operationEvent[logEvent].tenantName, nullableMoneyToString(operationEvent[logEvent].amount)]);
     case "setPlatformBilling":
-      return `设置平台的计费项${operationEvent[logEvent].path}价格为${nullableMoneyToString(operationEvent[logEvent].price)}元`;
+      return t(pDetails("setPlatformBilling"),
+        [operationEvent[logEvent].path, nullableMoneyToString(operationEvent[logEvent].price)]);
     default:
       return "-";
     }

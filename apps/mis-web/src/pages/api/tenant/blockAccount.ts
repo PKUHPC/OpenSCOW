@@ -23,12 +23,6 @@ import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
 import { handlegRPCError, parseIp } from "src/utils/server";
 
-
-export const BlockAccountTexts = {
-  1: "账户已经被封锁",
-  2: "账户在白名单内，请移出白名单后再封锁",
-};
-
 export const BlockAccountSchema = typeboxRouteSchema({
   method: "PUT",
 

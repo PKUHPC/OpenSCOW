@@ -17,6 +17,7 @@ import { ItemType } from "antd/es/menu/hooks/useItems";
 import Link from "next/link";
 import React from "react";
 import { createMenuItems } from "src/layouts/base/common";
+import { getCurrentLangLibWebText } from "src/utils/libWebI18n/libI18n";
 import styled from "styled-components";
 
 import { NavItemProps, UserInfo } from "../types";
@@ -26,6 +27,7 @@ interface Props {
   routes?: NavItemProps[];
   user: UserInfo;
   logout: () => void;
+  languageId: string;
 }
 
 const Container = styled.div`
@@ -39,6 +41,7 @@ export const SmallScreenMenu: React.FC<Props> = ({
   pathname,
   routes,
   user, logout,
+  languageId,
 }) => {
 
   const items = [] as ItemType[];
@@ -48,10 +51,13 @@ export const SmallScreenMenu: React.FC<Props> = ({
     items.push({ type: "divider" });
   }
 
-  items.push({ disabled: true, key: "user-info", label: `欢迎，${user.name}` });
+  items.push({ disabled: true,
+    key: "user-info",
+    label:
+    `${getCurrentLangLibWebText(languageId, "smallScreenMenuWelcome")}${user.name}` });
   items.push({ key: "logout", label: (
     <Link href="/" onClick={logout}>
-      退出登录
+      {getCurrentLangLibWebText(languageId, "smallScreenMenuLogout")}
     </Link>
   ) });
 

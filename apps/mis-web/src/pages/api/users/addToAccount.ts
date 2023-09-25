@@ -107,7 +107,7 @@ export default /* #__PURE__*/typeboxRoute(AddUserToAccountSchema, async (req, re
     return { 204: null };
   })
     .catch(handlegRPCError({
-      [Status.ALREADY_EXISTS]: () => ({ 409: { code: "ACCOUNT_OR_USER_ERROR" as const, message:"用户已经存在于此账户中！" } }),
+      [Status.ALREADY_EXISTS]: (e) => ({ 409: { code: "ACCOUNT_OR_USER_ERROR" as const, message: e.details } }),
       [Status.INTERNAL]: (e) => { return ({ 409: { code: "ACCOUNT_OR_USER_ERROR" as const, message: e.details } }); },
       [Status.NOT_FOUND]: (e) => {
 

@@ -17,7 +17,8 @@ import { useState } from "react";
 import { requireAuth } from "src/auth/requireAuth";
 import { ModalButton } from "src/components/ModalLink";
 import { Section } from "src/components/Section";
-import { PlatformRoleTexts, TenantRoleTexts } from "src/models/User";
+import { prefix, useI18nTranslateToString } from "src/i18n";
+import { PlatformRole, TenantRole } from "src/models/User";
 import { ChangeEmailModal } from "src/pageComponents/profile/ChangeEmailModal";
 import { ChangePasswordModal } from "src/pageComponents/profile/ChangePasswordModal";
 import { antdBreakpoints } from "src/styles/constants";
@@ -58,90 +59,103 @@ const TitleText = styled(Typography.Title)`
 const ChangePasswordModalButton = ModalButton(ChangePasswordModal, { type: "link" });
 const ChangeEmailModalButton = ModalButton(ChangeEmailModal, { type: "link" });
 
+const p = prefix("page.profile.index.");
+
 export const ProfilePage: NextPage = requireAuth(() => true)(({ userStore: { user } }) => {
 
   const [email, setEmail] = useState(user.email);
 
+  const t = useI18nTranslateToString();
+
+  const PlatformRoleI18nTexts = {
+    [PlatformRole.PLATFORM_FINANCE]: t("userRoles.platformFinance"),
+    [PlatformRole.PLATFORM_ADMIN]: t("userRoles.platformAdmin"),
+  };
+  const TenantRoleI18nTexts = {
+    [TenantRole.TENANT_FINANCE]: t("userRoles.tenantFinance"),
+    [TenantRole.TENANT_ADMIN]: t("userRoles.tenantAdmin"),
+  };
+
   return (
     <>
       <Container>
-        <Head title="账号信息" />
-        <TitleText>用户信息</TitleText>
+        <Head title={t(p("accountInfo"))} />
+        <TitleText>{t("common.userInfo")}</TitleText>
         <Part title>
           <Descriptions
-            column={1} 
+            column={1}
             labelStyle={{ paddingLeft:"10px", marginBottom:"10px" }}
             contentStyle={{ paddingLeft:"10px" }}
           >
-            <Descriptions.Item label="用户ID">
+            <Descriptions.Item label={t("common.userId")}>
               {user.identityId}
             </Descriptions.Item>
-            <Descriptions.Item label="用户姓名">
+            <Descriptions.Item label={t("common.userName")}>
               {user.name}
             </Descriptions.Item>
             {
               user.tenantRoles.length > 0 ? (
-                <Descriptions.Item label="租户角色">
+                <Descriptions.Item label={t("common.tenantRole")}>
                   {user.tenantRoles.map((x) => (
                     <Tag
                       key={x}
-                    >{TenantRoleTexts[x]}</Tag>
+                    >{TenantRoleI18nTexts[x]}</Tag>
                   ))}
                 </Descriptions.Item>
               ) : undefined
             }
             {
               user.platformRoles.length > 0 ? (
-                <Descriptions.Item label="平台角色">
+                <Descriptions.Item label={t("common.platformRole")}>
                   {user.platformRoles.map((x) => (
                     <Tag
                       key={x}
-                    >{PlatformRoleTexts[x]}</Tag>
+                    >{PlatformRoleI18nTexts[x]}</Tag>
                   ))}
                 </Descriptions.Item>
               ) : undefined
             }
-            <Descriptions.Item label="创建时间">
+            <Descriptions.Item label={t("common.createTime")}>
               {user.createTime ? formatDateTime(user.createTime) : ""}
             </Descriptions.Item>
           </Descriptions>
         </Part>
         {
           publicConfig.ENABLE_CHANGE_PASSWORD ? (
-            <>            
-              <TitleText>修改密码</TitleText>
+            <>
+              <TitleText>{t("common.changePassword")}</TitleText>
               <Part title>
                 <Descriptions
-                  column={1} 
+                  column={1}
                   labelStyle={{ paddingLeft:"10px", paddingTop:"5px" }}
                   contentStyle={{ paddingLeft:"10px" }}
                 >
-                  <Descriptions.Item label="登录密码">
+                  <Descriptions.Item label={t("common.loginPassword")}>
                     <span style={{ width:"200px" }}>********</span>
-                    <ChangePasswordModalButton>修改密码</ChangePasswordModalButton>
+                    <ChangePasswordModalButton>{t("common.changePassword")}</ChangePasswordModalButton>
                   </Descriptions.Item>
                 </Descriptions>
               </Part>
             </>
           ) : undefined
         }
-        <TitleText>修改邮箱</TitleText>
+        <TitleText>{t("common.changeEmail")}</TitleText>
         <Part title>
           <Descriptions
-            column={1} 
+            column={1}
             labelStyle={{ paddingLeft:"10px", paddingTop:"5px" }}
             contentStyle={{ paddingLeft:"10px" }}
           >
-            <Descriptions.Item label="邮箱">
-              <span style={{ width:"230px" }}>{email}</span> 
+            <Descriptions.Item label={t("common.email")}>
+              <span style={{ width:"230px" }}>{email}</span>
               {/* setEmail用于profile页面展示的邮箱同步修改后的邮箱 */}
-              <ChangeEmailModalButton setEmail={setEmail}>修改邮箱</ChangeEmailModalButton>
+              <ChangeEmailModalButton setEmail={setEmail}>{t("common.changeEmail")}</ChangeEmailModalButton>
             </Descriptions.Item>
           </Descriptions>
         </Part>
       </Container>
     </>
-    
+
   );
 });
 

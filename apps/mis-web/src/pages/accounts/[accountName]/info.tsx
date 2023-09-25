@@ -19,6 +19,7 @@ import { requireAuth } from "src/auth/requireAuth";
 import { ssrAuthenticate, SSRProps } from "src/auth/server";
 import { UnifiedErrorPage } from "src/components/errorPages/UnifiedErrorPage";
 import { PageTitle } from "src/components/PageTitle";
+import { useI18nTranslateToString } from "src/i18n";
 import { UserRole } from "src/models/User";
 import {
   checkQueryAccountNameIsAdmin } from "src/pageComponents/accounts/checkQueryAccountNameIsAdmin";
@@ -38,29 +39,31 @@ export const AccountInfoPage: NextPage<Props> = requireAuth(
   checkQueryAccountNameIsAdmin,
 )((props: Props) => {
 
+  const t = useI18nTranslateToString();
+
   if ("error" in props) {
     return <UnifiedErrorPage code={props.error} />;
   }
 
   const { accountName, balance, ownerId, ownerName, blocked } = props;
-  const title = "账户信息";
+  const title = t("common.tenantInfo");
 
   return (
     <div>
       <Head title={title} />
       <PageTitle titleText={title} />
       <Descriptions bordered column={1}>
-        <Descriptions.Item label="账户名">
+        <Descriptions.Item label={t("common.tenantName")}>
           {accountName}
         </Descriptions.Item>
-        <Descriptions.Item label="账户拥有者">
+        <Descriptions.Item label={t("common.accountOwner")}>
           {ownerName}（ID：{ownerId}）
         </Descriptions.Item>
-        <Descriptions.Item label="账户状态">
-          {blocked ? <Tag color="red">封锁</Tag> : <Tag color="green">正常</Tag>}
+        <Descriptions.Item label={t("common.accountOwner")}>
+          {blocked ? <Tag color="red">{t("common.block")}</Tag> : <Tag color="green">{t("common.normal")}</Tag>}
         </Descriptions.Item>
-        <Descriptions.Item label="账户余额">
-          {balance.toFixed(3)} 元
+        <Descriptions.Item label={t("common.accountBalance")}>
+          {balance.toFixed(3)} {t("common.unit")}
         </Descriptions.Item>
       </Descriptions>
     </div>

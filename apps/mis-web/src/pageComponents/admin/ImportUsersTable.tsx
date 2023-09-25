@@ -20,12 +20,18 @@ import { useStore } from "simstate";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { ClusterAccountInfo_ImportStatus } from "src/models/User";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { publicConfig } from "src/utils/config";
 
+const p = prefix("pageComp.admin.ImportUsersTable.");
+const pCommon = prefix("common.");
 
 export const ImportUsersTable: React.FC = () => {
+
+  const t = useI18nTranslateToString();
+
   const { message } = App.useApp();
 
   const qs = useQuerystring();
@@ -80,7 +86,7 @@ export const ImportUsersTable: React.FC = () => {
           );
 
           if (!importData || importData.length === 0) {
-            message.info("请选择账户！");
+            message.info(t(p("selectAccount")));
             setLoading(false);
             return;
           }
@@ -89,7 +95,7 @@ export const ImportUsersTable: React.FC = () => {
             account.importStatus !== ClusterAccountInfo_ImportStatus.NOT_EXISTING ||
             account.owner,
           )) {
-            message.error("请为每个账户指定拥有者");
+            message.error(t(p("specifyOwner")));
             setLoading(false);
             return;
           }
@@ -105,10 +111,10 @@ export const ImportUsersTable: React.FC = () => {
             } as ImportUsersData,
             whitelist,
           } })
-            .httpError(400, () => { message.error("数据格式不正确"); })
+            .httpError(400, () => { message.error(t(p("incorrectFormat"))); })
             .then(() => {
               setSelectedAccounts([]);
-              message.success("导入成功");
+              message.success(t(p("importSuccess")));
             })
             .finally(() => {
               setLoading(false);
@@ -118,7 +124,7 @@ export const ImportUsersTable: React.FC = () => {
       >
         <FilterFormContainer>
           <Space align="center">
-            选择集群，以账户为单位导入到默认租户中
+            {t(p("selectCluster"))}
             <SingleClusterSelector
               value={cluster}
               onChange={(value) => {
@@ -126,10 +132,10 @@ export const ImportUsersTable: React.FC = () => {
               }}
             />
             <Button type="primary" htmlType="submit" loading={loading}>
-              导入
+              {t(pCommon("import"))}
             </Button>
             <a onClick={reload}>
-              刷新
+              {t(pCommon("fresh"))}
             </a>
           </Space>
         </FilterFormContainer>
@@ -138,11 +144,11 @@ export const ImportUsersTable: React.FC = () => {
             type: "checkbox",
             renderCell(_checked, record, _index, node) {
               if (record.importStatus === ClusterAccountInfo_ImportStatus.EXISTING) {
-                return <Tooltip title="账户已经存在于SCOW中">{node}</Tooltip>;
+                return <Tooltip title={t(p("alreadyExist"))}>{node}</Tooltip>;
               } else if (record.importStatus === ClusterAccountInfo_ImportStatus.NOT_EXISTING) {
-                return <Tooltip title="账户不存在于SCOW中，将会导入SCOW">{node}</Tooltip>;
+                return <Tooltip title={t(p("notExist"))}>{node}</Tooltip>;
               } else if (record.importStatus === ClusterAccountInfo_ImportStatus.HAS_NEW_USERS) {
-                return <Tooltip title="账户中部分用户不存在于SCOW中，将会导入新的用户">{node}</Tooltip>;
+                return <Tooltip title={t(p("partNotExist"))}>{node}</Tooltip>;
               }
             },
             getCheckboxProps: (r) => ({
@@ -159,10 +165,10 @@ export const ImportUsersTable: React.FC = () => {
           rowKey="accountName"
           bordered
         >
-          <Table.Column<ClusterAccountInfo> dataIndex="accountName" title="账户名" />
+          <Table.Column<ClusterAccountInfo> dataIndex="accountName" title={t(pCommon("accountName"))} />
           <Table.Column<ClusterAccountInfo>
             dataIndex="owner"
-            title="拥有者"
+            title={t(pCommon("owner"))}
             render={(_, r) => {
               return r.importStatus === ClusterAccountInfo_ImportStatus.NOT_EXISTING
                 ? selectedAccounts?.includes(r)
@@ -171,7 +177,7 @@ export const ImportUsersTable: React.FC = () => {
                       defaultValue={r.owner || r.users[0]?.userId}
                       options={r.users.map((user) => ({ value: user.userId, label: user.userId }))}
                       style={{ width: "100%" }}
-                      placeholder={"请选择一个拥有者"}
+                      placeholder={t(p("selectOwner"))}
                       onChange={(value) => {
                         r.owner = value;
                       }}
@@ -185,38 +191,38 @@ export const ImportUsersTable: React.FC = () => {
           />
           <Table.Column<ClusterAccountInfo>
             dataIndex="importStatus"
-            title="导入状态"
+            title={t(p("importStatus"))}
             render={(value) => {
               if (value === ClusterAccountInfo_ImportStatus.EXISTING) {
-                return "已导入";
+                return t(p("alreadyImport"));
               } else if (value === ClusterAccountInfo_ImportStatus.HAS_NEW_USERS) {
-                return "账户已导入，部分用户未导入";
+                return t(p("partImport"));
               } else {
-                return "未导入";
+                return t(p("notImport"));
               }
             }}
           />
           <Table.Column<ClusterAccountInfo>
             dataIndex="users"
-            title="用户列表"
+            title={t(p("userList"))}
             render={(_, r) => (
-              <a onClick={() => setusersList(r.users)}>查看</a>
+              <a onClick={() => setusersList(r.users)}>{t("common.view")}</a>
             )}
           />
         </Table>
         <Form.Item name="whitelist" valuePropName="checked">
-          <Checkbox>将所有账户加入白名单</Checkbox>
+          <Checkbox>{t(p("addWhitelist"))}</Checkbox>
         </Form.Item>
         <Drawer
           placement="right"
           onClose={() => setusersList(undefined)}
           open={usersList !== undefined}
-          title="用户列表"
+          title={t(p("userList"))}
         >
           <Table
             dataSource={usersList}
           >
-            <Table.Column<UserInAccount> dataIndex="userId" title="用户ID" />
+            <Table.Column<UserInAccount> dataIndex="userId" title={t(pCommon("userId"))} />
           </Table>
         </Drawer>
       </Form>

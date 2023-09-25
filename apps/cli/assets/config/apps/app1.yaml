@@ -36,3 +36,13 @@ web:
     path: /login
     formData:
       password: "{{ PASSWORD }}"
+
+# 配置HTML表单
+# attributes:
+#   - type: text
+#     name: sbatchOptions
+#     # 此文本支持国际化
+#     label: 其他sbatch参数
+#     required: false
+#     # 此文本支持国际化
+#     placeholder: "比如：--gpus gres:2 --time 10"

@@ -13,6 +13,7 @@
 import { ClusterOutlined } from "@ant-design/icons";
 import { Space, Tooltip } from "antd";
 import React from "react";
+import { getCurrentLangLibWebText } from "src/utils/libWebI18n/libI18n";
 import { useTheme } from "styled-components";
 
 import { Cluster, SingleClusterSelector } from "../components/ClusterSelector";
@@ -30,22 +31,24 @@ interface Props {
   clusters: Cluster[];
   cluster: Cluster;
   setCluster: (cluster: Cluster) => void;
+  languageId: string;
 }
 
-export const DefaultClusterSelector: React.FC<Props> = ({ clusters, cluster, setCluster }) => {
+export const DefaultClusterSelector: React.FC<Props> = ({ clusters, cluster, setCluster, languageId }) => {
 
   return (
     <Space>
-      <Tooltip title="需要选择集群的功能将会默认选择默认集群">
+      <Tooltip title={getCurrentLangLibWebText(languageId, "defaultClusterSelectorTitle")}>
         <ThemeClusterOutlined />
       </Tooltip>
       <SingleClusterSelector
         clusters={clusters}
         value={cluster}
+        languageId={languageId}
         onChange={(cluster) => {
           setCluster(cluster);
         }}
-        label="选择默认集群"
+        label={getCurrentLangLibWebText(languageId, "defaultClusterSelectorLabel")}
       />
     </Space>
   );

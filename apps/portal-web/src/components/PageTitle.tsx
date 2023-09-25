@@ -13,6 +13,7 @@
 import { RefreshLink } from "@scow/lib-web/build/utils/refreshToken";
 import { Typography } from "antd";
 import React from "react";
+import { useI18n } from "src/i18n";
 import styled from "styled-components";
 
 const Container = styled.div`
@@ -38,6 +39,7 @@ export const TitleText = styled(Typography.Title)`
 export const PageTitle: React.FC<PageTitleProps> = ({
   beforeTitle, titleText, reload, children,
 }) => {
+  const languageId = useI18n().currentLanguage.id;
   return (
     <Container>
       <TitleText>
@@ -45,7 +47,7 @@ export const PageTitle: React.FC<PageTitleProps> = ({
         {titleText}
       </TitleText>
       {children}
-      { reload ? <RefreshLink refresh={reload} /> : undefined}
+      { reload ? <RefreshLink refresh={reload} languageId={languageId} /> : undefined}
     </Container>
   );
 
