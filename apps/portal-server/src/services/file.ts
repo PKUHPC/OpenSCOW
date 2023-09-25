@@ -584,7 +584,7 @@ export const fileServiceServer = plugin((server) => {
             "-b", "4096",
             "-C", "for scow-sync",
             "-f", privateKeyPath,
-            "-N", "",
+            "-N", " ",
           ];
           const genKeyCmd = "ssh-keygen";
           await loggedExec(ssh, logger, true, genKeyCmd, genKeyArgs);
