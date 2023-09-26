@@ -11,6 +11,7 @@
  */
 
 import { ArrowLeftOutlined, ArrowRightOutlined } from "@ant-design/icons";
+import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/i18n";
 import { App, Button, Col, Row } from "antd";
 import { NextPage } from "next";
 import { useState } from "react";
@@ -18,6 +19,7 @@ import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
 import { Redirect } from "src/components/Redirect";
+import { useI18n } from "src/i18n";
 import { ClusterFileTable } from "src/pageComponents/filemanager/ClusterFileTable";
 import { Cluster, publicConfig } from "src/utils/config";
 
@@ -32,7 +34,9 @@ interface ButtonProps {
   toPath: string;
 }
 
+
 const OperationButton: React.FC<ButtonProps> = (props) => {
+  const languageId = useI18n().currentLanguage.id;
   const { message, modal } = App.useApp();
   const {
     icon, disabled, srcCluster, dstCluster, selectedKeys, toPath,
@@ -43,9 +47,11 @@ const OperationButton: React.FC<ButtonProps> = (props) => {
       disabled={disabled}
       onClick={ async () => {
         if (srcCluster && dstCluster) {
+          const srcClusterName = getI18nConfigCurrentText(srcCluster.name, languageId);
+          const dstClusterName = getI18nConfigCurrentText(dstCluster.name, languageId);
           modal.confirm({
             title: "确认开启传输?",
-            content: `确认从${srcCluster.name}传输到${dstCluster.name}吗?`,
+            content: `确认从${srcClusterName}传输到${dstClusterName}吗?`,
             okText: "确认",
             onOk: async () => {
               await api.checkTransferKey({ body: { fromCluster:srcCluster.id, toCluster: dstCluster.id } });

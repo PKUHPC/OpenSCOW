@@ -25,9 +25,10 @@ interface SingleSelectionProps {
   label?: string;
 }
 
-const languageId = useI18n().currentLanguage.id;
 
 export const SingleCrossClusterTransferSelector: React.FC<SingleSelectionProps> = ({ value, onChange, label }) => {
+
+  const languageId = useI18n().currentLanguage.id;
 
   const { data: availableClusters = [], isLoading, reload } = useAsync({
     promiseFn: useCallback(async () => {

@@ -12,9 +12,9 @@
 
 import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/i18n";
+import { getLanguageCookie } from "@scow/lib-web/build/utils/languages";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
-import { useI18n } from "src/i18n";
 import { publicConfig, runtimeConfig } from "src/utils/config";
 import { route } from "src/utils/route";
 
@@ -25,7 +25,6 @@ export const Cluster = Type.Object({
 
 export type ClusterInfo = Static<typeof Cluster>;
 
-const languageId = useI18n().currentLanguage.id;
 
 export const ListAvailableTransferClustersSchema = typeboxRouteSchema({
   method: "GET",
@@ -44,6 +43,8 @@ export const ListAvailableTransferClustersSchema = typeboxRouteSchema({
 const auth = authenticate(() => true);
 
 export default route(ListAvailableTransferClustersSchema, async (req, res) => {
+
+  const languageId = getLanguageCookie(req);
 
   const info = await auth(req, res);
 
