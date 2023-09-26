@@ -238,12 +238,18 @@ export const jobServiceServer = plugin((server) => {
           if (jobIdList.length > 0) {
             const jobInfoList: AdapterJobInfo[] = [];
             for (const jobId of jobIdList) {
-              const jobInfo = await asyncClientCall(client.job, "getJobById", { fields, jobId: Number(jobId) })
+              const jobInfo = await asyncClientCall(client.job, "getJobById", {
+                fields,
+                jobId: Number(jobId),
+              })
                 .catch((e) => {
                   logger.info("GetJobById with JobId: %s failed", jobId, e);
                   return { job: undefined };
                 });
-              if (jobInfo.job) jobInfoList.push(jobInfo.job);
+              // TODO 确认能否返回两条同一id
+              if (jobInfo.job &&
+                (jobInfo.job.state === "RUNNING" || jobInfo.job.state === "PENDING"))
+                jobInfoList.push(jobInfo.job);
             }
             return jobInfoList;
           } else {

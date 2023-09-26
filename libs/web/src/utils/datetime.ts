@@ -66,3 +66,25 @@ export function parseTime(time: string) {
   return seconds! * 1000 + minutes! * 60000 + (hours * 3600000) + days * 86400000;
 
 }
+
+
+export enum TimeUnits {
+  MINUTE = "MINUTE",
+  HOUR = "HOUR",
+  DAY = "DAY",
+}
+// Parse the given number of time value and time unit, return number of minutes
+export const parseMinutes = (time: number, unit: TimeUnits): number => {
+
+  switch (unit) {
+  case TimeUnits.MINUTE:
+    return time;
+  case TimeUnits.HOUR:
+    return time * 60;
+  case TimeUnits.DAY:
+    return time * 60 * 24;
+  }
+
+};
+
+

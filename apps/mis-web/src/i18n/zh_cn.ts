@@ -50,7 +50,7 @@ export default {
     modify:"修改",
     cancel:"取消",
     cluster:"集群",
-    workId:"作业Id",
+    workId:"作业ID",
     minute:"分钟",
     name:"姓名",
     set:"设置",
@@ -94,6 +94,11 @@ export default {
     normal: "正常",
     view: "查看",
     waitingMessage: "操作所需时间较长，请耐心等待",
+    timeUnits: {
+      minute: "分钟",
+      hour: "小时",
+      day: "天",
+    },
   },
   dashboard: {
     title: "仪表盘",
@@ -391,12 +396,14 @@ export default {
     },
     job:{
       ChangeJobTimeLimitModal:{
+        currentTimeLimit: "当前作业时限",
         modifyLimit:"修改作业时限",
         success:"修改时限全部成功完成。",
         fail:"部分作业修改时限失败。",
         setLimit:"设置作业时限",
         modifyWork:"修改失败的作业",
         timeLimeError: "设置作业时限需要大于该作业的运行时长。",
+        timeExplanation: "此处设置的时间为作业执行的总时间",
       },
       editableJobBillingTable:{
         alreadyUsed:"此Id已经被使用",
