@@ -11,8 +11,10 @@
  */
 
 import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
+import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/i18n";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
+import { useI18n } from "src/i18n";
 import { publicConfig, runtimeConfig } from "src/utils/config";
 import { route } from "src/utils/route";
 
@@ -22,6 +24,8 @@ export const Cluster = Type.Object({
 });
 
 export type ClusterInfo = Static<typeof Cluster>;
+
+const languageId = useI18n().currentLanguage.id;
 
 export const ListAvailableTransferClustersSchema = typeboxRouteSchema({
   method: "GET",
@@ -45,8 +49,12 @@ export default route(ListAvailableTransferClustersSchema, async (req, res) => {
 
   if (!info) { return; }
 
-  const clusterList: ClusterInfo[] = publicConfig.CLUSTERS.filter(
-    (x) => runtimeConfig.CLUSTERS_CONFIG[x.id].crossClusterFileTransfer?.enabled);
+  const clusterList: ClusterInfo[] = publicConfig.CLUSTERS
+    .filter((x) => runtimeConfig.CLUSTERS_CONFIG[x.id].crossClusterFileTransfer?.enabled)
+    .map((x) => ({
+      id: x.id,
+      name: getI18nConfigCurrentText(x.name, languageId),
+    }));
 
 
   return { 200: { clusterList: clusterList } };

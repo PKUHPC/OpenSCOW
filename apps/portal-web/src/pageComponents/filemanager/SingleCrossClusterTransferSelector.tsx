@@ -10,10 +10,12 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/i18n";
 import { Select } from "antd";
 import React, { useCallback } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
+import { useI18n } from "src/i18n";
 import { Cluster } from "src/utils/config";
 
 
@@ -22,6 +24,8 @@ interface SingleSelectionProps {
   onChange?: (cluster: Cluster) => void;
   label?: string;
 }
+
+const languageId = useI18n().currentLanguage.id;
 
 export const SingleCrossClusterTransferSelector: React.FC<SingleSelectionProps> = ({ value, onChange, label }) => {
 
@@ -44,7 +48,8 @@ export const SingleCrossClusterTransferSelector: React.FC<SingleSelectionProps> 
       }}
       options={
         (label ? [{ value: label, label, disabled: true }] : [])
-          .concat(availableClusters.map((x) => ({ value: x.id, label: x.name.toString(), disabled: false })))
+          .concat(availableClusters.map((x) => (
+            { value: x.id, label: getI18nConfigCurrentText(x.name, languageId), disabled: false })))
 
       }
       dropdownMatchSelectWidth={false}
