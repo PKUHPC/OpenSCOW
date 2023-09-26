@@ -44,7 +44,8 @@ export const SingleCrossClusterTransferSelector: React.FC<SingleSelectionProps> 
       }}
       options={
         (label ? [{ value: label, label, disabled: true }] : [])
-          .concat(availableClusters.map((x) => ({ value: x.id, label: x.name, disabled: false })))
+          .concat(availableClusters.map((x) => ({ value: x.id, label: x.name.toString(), disabled: false })))
+
       }
       dropdownMatchSelectWidth={false}
       loading={isLoading}
