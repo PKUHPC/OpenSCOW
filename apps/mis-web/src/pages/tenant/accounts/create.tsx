@@ -17,8 +17,9 @@ import React, { useState } from "react";
 import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { TenantRole } from "src/models/User";
-import { publicConfig } from "src/utils/config";
+import { getRuntimeI18nConfigText, publicConfig } from "src/utils/config";
 import { getUserIdRule } from "src/utils/createUser";
 import { Head } from "src/utils/head";
 
@@ -33,8 +34,12 @@ interface CreateAccountFormProps {
   tenantName: string;
 }
 
+const p = prefix("page.tenant.accounts.create.");
 
 const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ tenantName }) => {
+
+  const languageId = useI18n().currentLanguage.id;
+  const t = useI18nTranslateToString();
 
   const [form] = Form.useForm<FormProps>();
 
@@ -45,13 +50,17 @@ const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ tenantName }) => 
   const submit = async () => {
     const { accountName, ownerId, ownerName, comment } = await form.validateFields();
     setLoading(true);
-    message.open({ type: "loading", content: "操作所需时间较长，请耐心等待", duration: 0, key: "createAccount" });
+    message.open({
+      type: "loading",
+      content: t("common.waitingMessage"),
+      duration: 0,
+      key: "createAccount" });
     await api.createAccount({ body: { accountName, ownerId, ownerName, comment } })
-      .httpError(404, () => { message.error(`租户 ${tenantName} 下不存在用户 ${ownerId}。`); })
-      .httpError(409, () => { message.error("账户名已经被占用"); })
-      .httpError(400, () => { message.error("用户ID和名字不匹配。"); })
+      .httpError(404, () => { message.error(t(p("tenantNotExistUser"), [tenantName, ownerId])); })
+      .httpError(409, () => { message.error(t(p("accountNameOccupied"))); })
+      .httpError(400, () => { message.error(t(p("userIdAndNameNotMatch"))); })
       .then(() => {
-        message.success("创建成功！");
+        message.success(t(p("createSuccess")));
       })
       .finally(() => {
         message.destroy("createAccount");
@@ -59,7 +68,8 @@ const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ tenantName }) => 
       });
   };
 
-  const userIdRule = getUserIdRule();
+
+  const userIdRule = getUserIdRule(languageId);
 
   return (
     <Form
@@ -71,19 +81,19 @@ const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ tenantName }) => 
     >
       <Form.Item
         name="accountName"
-        label="账户名"
+        label={t("common.accountName")}
         rules={[
           { required: true },
           ...(publicConfig.ACCOUNT_NAME_PATTERN ? [{
             pattern: new RegExp(publicConfig.ACCOUNT_NAME_PATTERN),
-            message: publicConfig.ACCOUNT_NAME_PATTERN_MESSAGE }] : []),
+            message:getRuntimeI18nConfigText(languageId, "accountNamePatternMessage") }] : []),
         ]}
       >
         <Input />
       </Form.Item>
       <Form.Item
         name="ownerId"
-        label="拥有者用户ID"
+        label={t(p("ownerUserId"))}
         rules={[
           { required: true },
           ...userIdRule ? [userIdRule] : [],
@@ -94,17 +104,17 @@ const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ tenantName }) => 
       </Form.Item>
       <Form.Item
         name="ownerName"
-        label="拥有者姓名"
+        label={t(p("ownerName"))}
         rules={[{ required: true }]}
       >
         <Input />
       </Form.Item>
-      <Form.Item<FormProps> name="comment" label="备注">
+      <Form.Item<FormProps> name="comment" label={t(p("remark"))}>
         <Input.TextArea />
       </Form.Item>
       <Form.Item wrapperCol={{ span: 6, offset: 4 }}>
         <Button type="primary" htmlType="submit" loading={loading}>
-          提交
+          {t("common.submit")}
         </Button>
       </Form.Item>
     </Form>
@@ -113,10 +123,12 @@ const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ tenantName }) => 
 
 export const CreateAccountPage: NextPage = requireAuth((i) => i.tenantRoles.includes(TenantRole.TENANT_ADMIN))(
   ({ userStore }) => {
+    const t = useI18nTranslateToString();
+
     return (
       <div>
-        <Head title="创建账户" />
-        <PageTitle titleText="创建账户" />
+        <Head title={t(p("createAccount"))} />
+        <PageTitle titleText={t(p("createAccount"))} />
         <FormLayout>
           <CreateAccountForm tenantName={userStore.user.tenant} />
         </FormLayout>

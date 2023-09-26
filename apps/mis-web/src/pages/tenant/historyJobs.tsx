@@ -13,16 +13,20 @@
 import { NextPage } from "next";
 import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
+import { useI18nTranslateToString } from "src/i18n";
 import { TenantRole } from "src/models/User";
 import { AdminJobTable } from "src/pageComponents/tenant/AdminJobTable";
 import { Head } from "src/utils/head";
 
 export const AdminJobsPage: NextPage = requireAuth((u) => u.tenantRoles.includes(TenantRole.TENANT_ADMIN))(
   () => {
+
+    const t = useI18nTranslateToString();
+
     return (
       <div>
-        <Head title="历史作业" />
-        <PageTitle titleText={"历史作业"} />
+        <Head title={t("common.historyJob")} />
+        <PageTitle titleText={t("common.historyJob")} />
         <AdminJobTable />
       </div>
     );

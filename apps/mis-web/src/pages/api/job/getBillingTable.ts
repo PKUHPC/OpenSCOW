@@ -20,7 +20,7 @@ import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { getBillingItems } from "src/pages/api/job/getBillingItems";
 import { getClient } from "src/utils/client";
-import { publicConfig, runtimeConfig } from "src/utils/config";
+import { runtimeConfig } from "src/utils/config";
 import { moneyToString } from "src/utils/money";
 
 import { getUserStatus } from "../dashboard/status";
@@ -71,17 +71,6 @@ export const ClusterPartitions = Type.Object({
 });
 export type ClusterPartitions = Static<typeof ClusterPartitions>;
 
-
-// get type from value of libs/config/src/clusterTexts.ts/ClusterTextsConfigSchema
-export const ClusterText = Type.Object({
-  clusterComment:Type.Optional(Type.String()),
-  extras: Type.Optional(Type.Array(Type.Object({
-    title: Type.String(),
-    content: Type.String(),
-  }))),
-});
-export type ClusterText = Static<typeof ClusterText>;
-
 export const GetBillingTableSchema = typeboxRouteSchema({
   method: "GET",
 
@@ -93,7 +82,6 @@ export const GetBillingTableSchema = typeboxRouteSchema({
   responses: {
     200: Type.Object({
       items: Type.Array(JobBillingTableItem),
-      text: Type.Optional(ClusterText),
     }),
   },
 });
@@ -187,7 +175,7 @@ export async function getBillingTableItems(
           index: count++,
           clusterItemIndex: clusterItemIndex++,
           partitionItemIndex: partitionItemIndex++,
-          cluster: publicConfig.CLUSTERS[cluster]?.name ?? cluster,
+          cluster: cluster,
           cores: partition.cores,
           gpus: partition.gpus,
           mem: partition.memMb,
@@ -214,15 +202,11 @@ export async function getBillingTableItems(
 
 export default /* #__PURE__*/typeboxRoute(GetBillingTableSchema, async (req, res) => {
   const { tenant, userId } = req.query;
-
   const auth = authenticate(() => true);
   const info = await auth(req, res);
   if (!info) { return; }
 
-  const clusterTexts = runtimeConfig.CLUSTER_TEXTS_CONFIG;
-  const text = clusterTexts && tenant ? (clusterTexts[tenant] ?? clusterTexts.default) : undefined;
-
   const items = await getBillingTableItems(tenant, userId);
 
-  return { 200: { items, text } };
+  return { 200: { items } };
 });

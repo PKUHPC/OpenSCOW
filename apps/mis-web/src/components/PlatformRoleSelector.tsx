@@ -13,7 +13,8 @@
 import { App, Select } from "antd";
 import { useState } from "react";
 import { api } from "src/apis";
-import { PlatformRole, PlatformRoleTexts } from "src/models/User";
+import { prefix, useI18nTranslateToString } from "src/i18n";
+import { PlatformRole } from "src/models/User";
 import { User } from "src/stores/UserStore";
 
 interface Props {
@@ -23,17 +24,27 @@ interface Props {
   currentUser?: User;
 }
 
+const p = prefix("component.others.");
+
 export const PlatformRoleSelector: React.FC<Props> = ({ roles, userId, reload, currentUser }) => {
+
+  const t = useI18nTranslateToString();
+
   const { message } = App.useApp();
 
   const [loading, setLoading] = useState(false);
+
+  const PlatformRoleI18nTexts = {
+    [PlatformRole.PLATFORM_FINANCE]: t("userRoles.platformFinance"),
+    [PlatformRole.PLATFORM_ADMIN]: t("userRoles.platformAdmin"),
+  };
 
   return (
     <Select
       disabled={loading}
       value={roles}
       style={{ width: "100%" }}
-      options={Object.values(PlatformRole).map((x) => ({ label: PlatformRoleTexts[x], value: x }))}
+      options={Object.values(PlatformRole).map((x) => ({ label: PlatformRoleI18nTexts[x], value: x }))}
       onSelect={
         async (value) => {
           setLoading(true);
@@ -41,11 +52,11 @@ export const PlatformRoleSelector: React.FC<Props> = ({ roles, userId, reload, c
             userId: userId,
             roleType: value,
           } })
-            .httpError(200, () => { message.error("用户已经是该角色"); })
-            .httpError(404, () => { message.error("用户不存在"); })
-            .httpError(403, () => { message.error("用户没有权限"); })
+            .httpError(200, () => { message.error(t(p("alreadyIs"))); })
+            .httpError(404, () => { message.error(t(p("notExist"))); })
+            .httpError(403, () => { message.error(t(p("notAuth"))); })
             .then(() => {
-              message.success("设置成功");
+              message.success(t(p("setSuccess")));
               setLoading(false);
               reload();
             });
@@ -55,7 +66,7 @@ export const PlatformRoleSelector: React.FC<Props> = ({ roles, userId, reload, c
         async (value) => {
 
           if (currentUser && value === PlatformRole.PLATFORM_ADMIN && currentUser.identityId === userId) {
-            message.error("不能取消自己的平台管理员角色");
+            message.error(t(p("cannotCancel")));
             return;
           }
 
@@ -64,18 +75,18 @@ export const PlatformRoleSelector: React.FC<Props> = ({ roles, userId, reload, c
             userId: userId,
             roleType: value,
           } })
-            .httpError(200, () => { message.error("用户已经不是该角色"); })
-            .httpError(404, () => { message.error("用户不存在"); })
-            .httpError(403, () => { message.error("用户没有权限"); })
+            .httpError(200, () => { message.error(t(p("alreadyNot"))); })
+            .httpError(404, () => { message.error(t(p("notExist"))); })
+            .httpError(403, () => { message.error(t(p("notAuth"))); })
             .then(() => {
-              message.success("设置成功");
+              message.success(t(p("setSuccess")));
               setLoading(false);
               reload();
             });
         }
       }
       mode="multiple"
-      placeholder="选择角色"
+      placeholder={t(p("selectRole"))}
     />
   );
 };

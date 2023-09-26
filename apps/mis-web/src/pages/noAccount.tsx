@@ -12,16 +12,20 @@
 
 import { Result } from "antd";
 import { NextPage } from "next";
+import { useI18nTranslateToString } from "src/i18n";
 
 export const NoAccountPage: NextPage = () => {
+
+  const t = useI18nTranslateToString();
+
   return (
     <Result
       status="warning"
-      title="没有可以管理的账户"
+      title={t("page.noAccount.resultTitle")}
       subTitle=""
       extra={(
         <p>
-          请访问 http://hpc.pku.edu.cn/guide.html 查看如何开户。
+          {t("page.noAccount.extraMessage")}
         </p>
       )}
     />

@@ -13,6 +13,7 @@
 import { GetConfigFn, getDirConfig } from "@scow/lib-config";
 import { Static, Type } from "@sinclair/typebox";
 import { DEFAULT_CONFIG_BASE_PATH } from "src/constants";
+import { createI18nStringSchema } from "src/type";
 
 export const AppConnectPropsSchema = Type.Object({
   method: Type.Enum({ GET: "GET", POST: "POST" }, { description: "连接所使用的HTTP方法" }),
@@ -69,16 +70,16 @@ export const AppConfigSchema = Type.Object({
   attributes: Type.Optional(Type.Array(
     Type.Object({
       type:  Type.Enum({ number: "number", text: "text", select: "select" }, { description: "表单类型" }),
-      label: Type.String({ description: "表单标签" }),
+      label: createI18nStringSchema("表单标签"),
       name: Type.String({ description: "表单字段名" }),
       required: Type.Boolean({ description: "是必填项", default: true }),
       defaultValue: Type.Optional(Type.Union([Type.String(), Type.Number()])),
-      placeholder: Type.Optional(Type.String({ description: "输入提示信息" })),
+      placeholder: Type.Optional(createI18nStringSchema("输入提示信息")),
       select: Type.Optional(
         Type.Array(
           Type.Object({
             value: Type.String({ description: "表单选项key，编程中使用" }),
-            label: Type.String({ description: "表单选项展示给用户的文本" }),
+            label: createI18nStringSchema("表单选项展示给用户的文本"),
             requireGpu: Type.Optional(Type.Boolean({ description: "表单选项是否只在分区为gpu时展示" })),
           }), { description:"表单选项" },
         )),

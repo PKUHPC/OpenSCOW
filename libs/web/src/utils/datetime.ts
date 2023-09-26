@@ -13,25 +13,36 @@
 import { TimeRangePickerProps } from "antd";
 import dayjs from "dayjs";
 
+import { getCurrentLangLibWebText } from "./libWebI18n/libI18n";
+
 export function formatDateTime(str: string): string {
   return dayjs(str)
     .format("YYYY-MM-DD HH:mm:ss");
 }
 
-export const defaultPresets: TimeRangePickerProps["presets"] = (() => {
+export const getDefaultPresets = (languageId: string): TimeRangePickerProps["presets"] => {
   const now = dayjs();
   const end = now.endOf("day");
 
+  const today = getCurrentLangLibWebText(languageId, "dateTimeToday");
+  const tWeek = getCurrentLangLibWebText(languageId, "dateTimeTWeek");
+  const tMonth = getCurrentLangLibWebText(languageId, "dateTimeTMonth");
+  const tYear = getCurrentLangLibWebText(languageId, "dateTimeTYear");
+  const threeMonths = getCurrentLangLibWebText(languageId, "dateTimeThreeMonths");
+  const sixMonths = getCurrentLangLibWebText(languageId, "dateTimeSixMonths");
+  const oneYear = getCurrentLangLibWebText(languageId, "dateTimeOneYear");
+
+
   return [
-    { label: "今天", value: [now.startOf("day"), end]},
-    { label: "本周", value: [now.startOf("week"), end]},
-    { label: "本月", value: [now.startOf("month"), end]},
-    { label: "今年", value: [now.startOf("year"), end]},
-    { label: "3个月", value: [now.subtract(3, "month").startOf("day"), end]},
-    { label: "6个月", value: [now.subtract(6, "month").startOf("day"), end]},
-    { label: "一年", value: [now.subtract(1, "year").startOf("day"), end]},
+    { label: today, value: [now.startOf("day"), end]},
+    { label: tWeek, value: [now.startOf("week"), end]},
+    { label: tMonth, value: [now.startOf("month"), end]},
+    { label: tYear, value: [now.startOf("year"), end]},
+    { label: threeMonths, value: [now.subtract(3, "month").startOf("day"), end]},
+    { label: sixMonths, value: [now.subtract(6, "month").startOf("day"), end]},
+    { label: oneYear, value: [now.subtract(1, "year").startOf("day"), end]},
   ];
-})();
+};
 
 export function compareDateTime(a: string, b: string): number {
   const aMoment = dayjs(a);

@@ -11,9 +11,11 @@
  */
 
 import { arrayContainsElement } from "@scow/lib-web/build/utils/array";
+import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/i18n";
 import { App, Divider, Form, InputNumber, Modal, Progress } from "antd";
 import { useRef, useState } from "react";
 import { api } from "src/apis";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { RunningJobInfo } from "src/models/job";
 import type { Cluster } from "src/utils/config";
 
@@ -33,9 +35,17 @@ interface CompletionStatus {
   total: number;
   success: number;
   failed: RunningJobInfo[];
+
 }
 
+const p = prefix("pageComp.job.ChangeJobTimeLimitModal.");
+const pCommon = prefix("common.");
+
 export const ChangeJobTimeLimitModal: React.FC<Props> = ({ open, onClose, data, reload }) => {
+
+  const t = useI18nTranslateToString();
+
+  const languageId = useI18n().currentLanguage.id;
 
   const { message } = App.useApp();
 
@@ -60,9 +70,9 @@ export const ChangeJobTimeLimitModal: React.FC<Props> = ({ open, onClose, data, 
   return (
     <Modal
       open={open}
-      title="修改作业时限"
-      okText="修改"
-      cancelText="取消"
+      title={t(p("modifyLimit"))}
+      okText={t(pCommon("modify"))}
+      cancelText={t(pCommon("cancel"))}
       onCancel={close}
       confirmLoading={loading}
       destroyOnClose
@@ -76,7 +86,7 @@ export const ChangeJobTimeLimitModal: React.FC<Props> = ({ open, onClose, data, 
           await api.changeJobTimeLimit({ body: { cluster: r.cluster.id, limitMinutes, jobId: r.jobId } })
             .httpError(400, (e) => {
               if (e.code === "TIME_LIME_NOT_VALID") {
-                message.error(e.message);
+                message.error(t(p("timeLimeError")));
               };
               throw e;
             })
@@ -93,11 +103,11 @@ export const ChangeJobTimeLimitModal: React.FC<Props> = ({ open, onClose, data, 
           .then(() => {
             if (completionStatus.current) {
               if (completionStatus.current.failed.length === 0) {
-                message.success("修改时限全部成功完成。");
+                message.success(t(p("success")));
                 reload();
                 close();
               } else {
-                message.error("部分作业修改时限失败。");
+                message.error(t(p("fail")));
                 reload();
               }
             }
@@ -110,19 +120,19 @@ export const ChangeJobTimeLimitModal: React.FC<Props> = ({ open, onClose, data, 
         {
           Array.from(dataGroupedByCluster.entries()).map(([cluster, data]) => (
             <>
-              <Form.Item label="集群">
-                <strong>{cluster.name}</strong>
+              <Form.Item label={t(pCommon("cluster"))}>
+                <strong>{getI18nConfigCurrentText(cluster.name, languageId)}</strong>
               </Form.Item>
-              <Form.Item label="作业ID">
+              <Form.Item label={t(pCommon("userId"))}>
                 <strong>{data.map((x) => x.jobId).join(", ")}</strong>
               </Form.Item>
               <Divider />
             </>
           ))
         }
-        <Form.Item<FormProps> label="设置作业时限" rules={[{ required: true }]}>
+        <Form.Item<FormProps> label={t(p("setLimit"))} rules={[{ required: true }]}>
           <Form.Item name="limitMinutes" noStyle>
-            <InputNumber min={1} step={1} addonAfter={"分钟"} />
+            <InputNumber min={1} step={1} addonAfter={t(pCommon("minute"))} />
           </Form.Item>
         </Form.Item>
       </Form>
@@ -147,7 +157,7 @@ export const ChangeJobTimeLimitModal: React.FC<Props> = ({ open, onClose, data, 
       {
         arrayContainsElement(completionStatus?.current?.failed)
           ? (
-            <Form.Item label="修改失败的作业">
+            <Form.Item label={t(p("modifyWork"))}>
               {completionStatus.current!.failed.map((x) => <strong key={x.jobId}>{x.jobId}</strong>)}
             </Form.Item>
           ) : undefined

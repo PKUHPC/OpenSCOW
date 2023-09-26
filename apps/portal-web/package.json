@@ -70,7 +70,8 @@
     "typescript": "5.1.6",
     "ws": "8.13.0",
     "xterm": "5.2.1",
-    "xterm-addon-fit": "0.7.0"
+    "xterm-addon-fit": "0.7.0",
+    "react-typed-i18n": "2.3.0"
   },
   "devDependencies": {
     "@ddadaal/next-typed-api-routes-cli": "0.9.1",

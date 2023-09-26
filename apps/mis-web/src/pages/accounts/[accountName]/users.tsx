@@ -18,11 +18,14 @@ import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { UserRole } from "src/models/User";
 import { useAccountPagesAccountName } from "src/pageComponents/accounts/checkQueryAccountNameIsAdmin";
 import { AddUserButton } from "src/pageComponents/users/AddUserButton";
 import { UserTable } from "src/pageComponents/users/UserTable";
 import { Head } from "src/utils/head";
+
+const p = prefix("page.accounts.accountName.users.");
 
 export const UsersPage: NextPage = requireAuth(
   (i) => i.accountAffiliations.some((x) => x.role !== UserRole.USER),
@@ -30,6 +33,8 @@ export const UsersPage: NextPage = requireAuth(
   ({ userStore }) => {
 
     const accountName = useAccountPagesAccountName();
+    const t = useI18nTranslateToString();
+    const languageId = useI18n().currentLanguage.id;
 
     const account = userStore.user.accountAffiliations.find((x) => x.accountName === accountName)!;
 
@@ -43,7 +48,7 @@ export const UsersPage: NextPage = requireAuth(
 
     const { data, isLoading, reload } = useAsync({ promiseFn, watch: refreshToken });
 
-    const title = `账户${accountName}用户管理`;
+    const title = t(p("title"), [accountName]);
 
     return (
       <div>
@@ -53,7 +58,7 @@ export const UsersPage: NextPage = requireAuth(
         >
           <Space split={<Divider type="vertical" />}>
             <AddUserButton refresh={reload} accountName={account.accountName} token={userStore.user.token} />
-            <RefreshLink refresh={update} />
+            <RefreshLink refresh={update} languageId={languageId} />
           </Space>
         </PageTitle>
         <UserTable

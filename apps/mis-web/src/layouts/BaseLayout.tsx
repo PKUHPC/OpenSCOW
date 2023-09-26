@@ -15,9 +15,12 @@ import { BaseLayout as LibBaseLayout } from "@scow/lib-web/build/layouts/base/Ba
 import { JumpToAnotherLink } from "@scow/lib-web/build/layouts/base/header/components";
 import { PropsWithChildren, useMemo } from "react";
 import { useStore } from "simstate";
+import { LanguageSwitcher } from "src/components/LanguageSwitcher";
+import { useI18n, useI18nTranslateToString } from "src/i18n";
 import { getAvailableRoutes } from "src/layouts/routes";
 import { UserStore } from "src/stores/UserStore";
 import { publicConfig } from "src/utils/config";
+
 
 interface Props {
   footerText: string;
@@ -28,7 +31,10 @@ export const BaseLayout = ({ footerText, versionTag, children }: PropsWithChildr
 
   const userStore = useStore(UserStore);
 
-  const routes = useMemo(() => getAvailableRoutes(userStore.user), [userStore.user]);
+  const t = useI18nTranslateToString();
+  const languageId = useI18n().currentLanguage.id;
+
+  const routes = useMemo(() => getAvailableRoutes(userStore.user, t), [userStore.user, t]);
 
   return (
     <LibBaseLayout
@@ -39,14 +45,16 @@ export const BaseLayout = ({ footerText, versionTag, children }: PropsWithChildr
       versionTag={versionTag}
       basePath={publicConfig.BASE_PATH}
       userLinks={publicConfig.USER_LINKS}
+      languageId={languageId}
       headerRightContent={(
         <>
           <JumpToAnotherLink
             user={userStore.user}
             icon={<DesktopOutlined style={{ paddingRight: 2 }} />}
             link={publicConfig.PORTAL_URL}
-            linkText="门户"
+            linkText={t("layouts.route.navLinkText")}
           />
+          <LanguageSwitcher />
         </>
       )}
     >

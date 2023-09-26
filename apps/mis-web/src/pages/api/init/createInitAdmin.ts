@@ -13,6 +13,7 @@
 import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Status } from "@grpc/grpc-js/build/src/constants";
+import { getLanguageCookie } from "@scow/lib-web/build/utils/languages";
 import { InitServiceClient } from "@scow/protos/build/server/init";
 import { Type } from "@sinclair/typebox";
 import { getClient } from "src/utils/client";
@@ -50,7 +51,9 @@ export default typeboxRoute(CreateInitAdminSchema, async (req) => {
 
   const { email, identityId, name, password } = req.body;
 
-  const userIdRule = getUserIdRule();
+  const languageId = getLanguageCookie(req);
+
+  const userIdRule = getUserIdRule(languageId);
 
   if (userIdRule && !userIdRule.pattern.test(identityId)) {
     return { 400: {

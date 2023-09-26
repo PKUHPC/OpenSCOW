@@ -129,12 +129,10 @@ const buildRuntimeConfig = async (phase, basePath) => {
     }, {}),
 
     ACCOUNT_NAME_PATTERN: misConfig.accountNamePattern?.regex,
-    ACCOUNT_NAME_PATTERN_MESSAGE: misConfig.accountNamePattern?.errorMessage,
 
     PORTAL_URL: config.PORTAL_DEPLOYED ? (config.PORTAL_URL || misConfig.portalUrl || "") : undefined,
 
     PASSWORD_PATTERN: commonConfig.passwordPattern?.regex,
-    PASSWORD_PATTERN_MESSAGE: commonConfig.passwordPattern?.errorMessage,
 
     BASE_PATH: basePath,
 
@@ -147,6 +145,13 @@ const buildRuntimeConfig = async (phase, basePath) => {
     VERSION_TAG: versionTag,
 
     AUDIT_DEPLOYED:  config.AUDIT_DEPLOYED,
+
+    RUNTIME_I18N_CONFIG_TEXTS: {
+      accountNamePatternMessage: misConfig.accountNamePattern?.errorMessage,
+      passwordPatternMessage: commonConfig.passwordPattern?.errorMessage,
+      createUserBuiltinErrorMessage: misConfig.createUser?.userIdPattern?.errorMessage,
+      createUserErrorMessage: misConfig.createUser?.builtin?.userIdPattern?.errorMessage,
+    },
 
     CHARGE_TYPE_LIST: [
       misConfig.jobChargeType,

@@ -15,6 +15,7 @@ import { Dropdown, Typography } from "antd";
 import Link from "next/link";
 import React from "react";
 import { antdBreakpoints } from "src/layouts/base/constants";
+import { getCurrentLangLibWebText } from "src/utils/libWebI18n/libI18n";
 import styled from "styled-components";
 
 import { EXTERNAL_URL_PREFIX } from "../common";
@@ -24,6 +25,7 @@ interface Props {
   user: UserInfo | undefined;
   logout: (() => void) | undefined;
   userLinks?: UserLink[];
+  languageId: string;
 }
 
 const Container = styled.div`
@@ -43,7 +45,7 @@ const HiddenOnSmallScreen = styled.span`
 `;
 
 export const UserIndicator: React.FC<Props> = ({
-  user, logout, userLinks,
+  user, logout, userLinks, languageId,
 }) => {
 
   return (
@@ -54,9 +56,18 @@ export const UserIndicator: React.FC<Props> = ({
             trigger={["click"]}
             menu={{
               items: [
-                ...user.name ? [{ key: "username", disabled: true, label: `用户姓名：${user.name}` }] : [],
-                { key: "userid", disabled: true, label: `用户ID：${user.identityId}` },
-                { key: "profileLink", label: <Link href="/profile">个人信息</Link> },
+                ...user.name ? [{
+                  key: "username",
+                  disabled: true,
+                  label:
+                  `${getCurrentLangLibWebText(languageId, "userIndicatorName")}${user.name}` }] : [],
+                { key: "userid",
+                  disabled: true,
+                  label:
+                  `${getCurrentLangLibWebText(languageId, "userIndicatorId")}${user.identityId}` },
+                { key: "profileLink", label: <Link href="/profile">
+                  {getCurrentLangLibWebText(languageId, "userIndicatorInfo")}
+                </Link> },
                 ...userLinks ? userLinks.map((link) => {
                   return ({
                     key: link.text,
@@ -69,7 +80,9 @@ export const UserIndicator: React.FC<Props> = ({
                     >{link.text}</Link>,
                   });
                 }) : [],
-                { key: "logout", onClick: logout, label: "退出登录" },
+                { key: "logout",
+                  onClick: logout,
+                  label: getCurrentLangLibWebText(languageId, "userIndicatorLogout") },
               ],
             }}
           >
@@ -83,7 +96,7 @@ export const UserIndicator: React.FC<Props> = ({
           </Dropdown>
         ) : (
           <Link href="/api/auth">
-            登录
+            {getCurrentLangLibWebText(languageId, "userIndicatorLogin")}
           </Link>
         )
       }

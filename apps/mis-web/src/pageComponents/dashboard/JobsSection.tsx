@@ -15,10 +15,12 @@ import React, { useCallback } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { Section } from "src/components/Section";
+import { Localized, useI18nTranslateToString } from "src/i18n";
 import { RunningJobInfo } from "src/models/job";
 import { RunningJobInfoTable } from "src/pageComponents/job/RunningJobTable";
 import { User } from "src/stores/UserStore";
 import { publicConfig } from "src/utils/config";
+
 
 interface Props {
   user: User;
@@ -41,12 +43,14 @@ export const JobsSection: React.FC<Props> = ({ user }) => {
 
   const { data, isLoading, reload } = useAsync({ promiseFn });
 
+  const t = useI18nTranslateToString();
+
   return (
     <Section
-      title="未结束作业列表"
+      title={t("dashboard.job.title")}
       extra={(
         <Link href="/user/runningJobs">
-        查看所有未结束作业
+          <Localized id="dashboard.job.extra"></Localized>
         </Link>
       )}
     >

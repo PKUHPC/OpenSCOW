@@ -11,8 +11,9 @@
  */
 
 import { ServiceError } from "@grpc/grpc-js";
+import { I18nStringType } from "@scow/lib-server";
 import { sftpWriteFile, sshRawConnect, sshRmrf } from "@scow/lib-ssh";
-import { SubmissionInfo } from "@scow/protos/build/portal/app";
+import { I18nStringProtoType, SubmissionInfo } from "@scow/protos/build/portal/app";
 import { randomBytes } from "crypto";
 import FormData from "form-data";
 import { NodeSSH } from "node-ssh";
@@ -161,3 +162,24 @@ export async function createDesktopsFile({ sftp, ssh }: TestSshServer) {
   await ssh.mkdir(testDesktopDirPath, undefined, sftp);
   await sftpWriteFile(sftp)(testDesktopsFilePath, JSON.stringify([testDesktopInfo, anotherHostDesktopInfo]));
 }
+
+// protobuf中定义的grpc返回值的类型映射到前端I18nStringType
+export const getI18nTypeFormat = (i18nProtoType: I18nStringProtoType | undefined): I18nStringType => {
+
+  if (!i18nProtoType?.value) return "";
+
+  if (i18nProtoType.value.$case === "directString") {
+    return i18nProtoType.value.directString;
+  } else {
+    const i18nObj = i18nProtoType.value.i18nObject.i18n;
+    if (!i18nObj) return "";
+    return {
+      i18n: {
+        default: i18nObj.default,
+        en: i18nObj.en,
+        zh_cn: i18nObj.zhCn,
+      },
+    };
+  }
+
+};
