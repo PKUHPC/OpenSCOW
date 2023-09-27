@@ -102,7 +102,10 @@ export const ChangeJobTimeLimitModal: React.FC<Props> = ({ open, onClose, data, 
 
         await Promise.all(data.map(async (r) => {
           await api.changeJobTimeLimit({ body: {
-            cluster: r.cluster.id, limitMinutes: limitTimeMinutes, jobId: r.jobId } })
+            cluster: r.cluster.id,
+            limitMinutes: limitTimeMinutes,
+            jobId: r.jobId,
+          } })
             .httpError(400, (e) => {
               if (e.code === "TIME_LIME_NOT_VALID") {
                 message.error(t(p("timeLimeError")));
@@ -193,7 +196,8 @@ export const ChangeJobTimeLimitModal: React.FC<Props> = ({ open, onClose, data, 
         arrayContainsElement(completionStatus?.current?.failed)
           ? (
             <Form.Item label={t(p("modifyWork"))}>
-              {completionStatus.current!.failed.map((x) => <strong key={x.jobId}>{x.jobId}</strong>)}
+              {/* {completionStatus.current!.failed.map((x) => <strong key={x.jobId}>{x.jobId}</strong>)} */}
+              <strong>{completionStatus.current!.failed.map((x) => x.jobId).join(", ")}</strong>
             </Form.Item>
           ) : undefined
       }

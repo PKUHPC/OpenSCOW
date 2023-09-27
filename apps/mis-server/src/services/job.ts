@@ -235,7 +235,7 @@ export const jobServiceServer = plugin((server) => {
             "nodes_alloc", "node_list", "reason", "account", "cpus_alloc", "gpus_alloc",
             "qos", "submit_time", "time_limit_minutes", "working_directory",
           ];
-          if (jobIdList.length > 0) {
+          if (jobIdList.length > 1) {
             const jobInfoList: AdapterJobInfo[] = [];
             for (const jobId of jobIdList) {
               const jobInfo = await asyncClientCall(client.job, "getJobById", {
@@ -246,12 +246,16 @@ export const jobServiceServer = plugin((server) => {
                   logger.info("GetJobById with JobId: %s failed", jobId, e);
                   return { job: undefined };
                 });
-              // TODO 确认能否返回两条同一id
-              if (jobInfo.job &&
-                (jobInfo.job.state === "RUNNING" || jobInfo.job.state === "PENDING"))
-                jobInfoList.push(jobInfo.job);
+              if (jobInfo.job) jobInfoList.push(jobInfo.job);
             }
             return jobInfoList;
+          // 修改作业时限时
+          } else if (jobIdList.length === 1) {
+            const jobId = parseInt(jobIdList[0]);
+            return await asyncClientCall(client.job, "getJobs", {
+              fields,
+              filter: { users: userId ? [userId] : [], accounts: accountNames, states: ["RUNNING", "PENDING"]},
+            }).then((x) => x.jobs.filter((job) => job.jobId === jobId));
           } else {
             return await asyncClientCall(client.job, "getJobs", {
               fields,

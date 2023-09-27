@@ -66,7 +66,6 @@ export default typeboxRoute(ChangeJobTimeLimitSchema,
     const client = getClient(JobServiceClient);
 
     // check if the user can change the job time limit
-
     const { job, jobAccessible } = await checkJobAccessible(jobId, cluster, info);
 
     if (jobAccessible === "NotAllowed") {
@@ -89,6 +88,7 @@ export default typeboxRoute(ChangeJobTimeLimitSchema,
         jobId: +jobId, accountName: job.account, limitMinutes,
       },
     };
+
     return await asyncClientCall(client, "changeJobTimeLimit", {
       cluster,
       limitMinutes,
