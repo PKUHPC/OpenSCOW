@@ -46,20 +46,20 @@ export const AccountInfoPage: NextPage<Props> = requireAuth(
   }
 
   const { accountName, balance, ownerId, ownerName, blocked } = props;
-  const title = t("common.tenantInfo");
+  const title = t("common.accountInfo");
 
   return (
     <div>
       <Head title={title} />
       <PageTitle titleText={title} />
       <Descriptions bordered column={1}>
-        <Descriptions.Item label={t("common.tenantName")}>
+        <Descriptions.Item label={t("common.accountName")}>
           {accountName}
         </Descriptions.Item>
         <Descriptions.Item label={t("common.accountOwner")}>
           {ownerName}（ID：{ownerId}）
         </Descriptions.Item>
-        <Descriptions.Item label={t("common.accountOwner")}>
+        <Descriptions.Item label={t("common.accountStatus")}>
           {blocked ? <Tag color="red">{t("common.block")}</Tag> : <Tag color="green">{t("common.normal")}</Tag>}
         </Descriptions.Item>
         <Descriptions.Item label={t("common.accountBalance")}>

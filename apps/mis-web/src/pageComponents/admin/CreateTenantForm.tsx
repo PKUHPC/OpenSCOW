@@ -46,7 +46,7 @@ export const CreateTenantForm: React.FC = () => {
         plain
       >{t(p("prompt"))}</Divider>
       <Form.Item
-        label={t(pCommon("tenantName"))}
+        label={t(pCommon("tenantFullName"))}
         name="tenantName"
         rules={[
           { required: true },
@@ -65,7 +65,7 @@ export const CreateTenantForm: React.FC = () => {
       >
         <Input placeholder={userIdRule?.message} />
       </Form.Item>
-      <Form.Item label={t(pCommon("userName"))} name="userName" rules={[{ required: true }]}>
+      <Form.Item label={t(pCommon("userFullName"))} name="userName" rules={[{ required: true }]}>
         <Input />
       </Form.Item>
       <Form.Item

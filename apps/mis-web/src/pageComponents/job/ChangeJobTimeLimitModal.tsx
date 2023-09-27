@@ -123,7 +123,7 @@ export const ChangeJobTimeLimitModal: React.FC<Props> = ({ open, onClose, data, 
               <Form.Item label={t(pCommon("cluster"))}>
                 <strong>{getI18nConfigCurrentText(cluster.name, languageId)}</strong>
               </Form.Item>
-              <Form.Item label={t(pCommon("userId"))}>
+              <Form.Item label={t(pCommon("workId"))}>
                 <strong>{data.map((x) => x.jobId).join(", ")}</strong>
               </Form.Item>
               <Divider />

@@ -151,7 +151,7 @@ export const ManageJobBillingTable: React.FC<Props> = ({ data, loading, tenant, 
         }}
       />
       <Table.Column
-        title={t(pCommon("price"))}
+        title={t(p("price"))}
         dataIndex={["priceItem", "price"]}
         render={(value) => value ? moneyToString(value) : undefined}
       />

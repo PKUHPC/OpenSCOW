@@ -107,7 +107,7 @@ export const TenantChargeForm: React.FC = () => {
     >
       <Form.Item
         name="tenantName"
-        label={t(pCommon("tenantName"))}
+        label={t(pCommon("tenant"))}
         rules={[{ required: true }]}
       >
         <TenantSelector
