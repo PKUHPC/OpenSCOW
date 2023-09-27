@@ -77,9 +77,10 @@ export const ChangeJobTimeLimitModal: React.FC<Props> = ({ open, onClose, data, 
 
   const selectAfter = (
     <Select
-      defaultValue={timeUnitsI18nTexts[TimeUnits.MINUTE]}
-      options={Object.values(timeUnitsI18nTexts).map((x) => ({ label: timeUnitsI18nTexts[x], value: x }))}
-      onChange={(value: TimeUnits) => setTimeUnit(value)}
+      labelInValue
+      defaultValue={{ value: TimeUnits.MINUTE, label: timeUnitsI18nTexts[TimeUnits.MINUTE] }}
+      options={Object.keys(timeUnitsI18nTexts).map((x) => ({ label: timeUnitsI18nTexts[x], value: x }))}
+      onChange={(v) => setTimeUnit(v.value)}
     />
   );
 
@@ -94,8 +95,8 @@ export const ChangeJobTimeLimitModal: React.FC<Props> = ({ open, onClose, data, 
       destroyOnClose
       onOk={async () => {
         const { limitValue } = await form.validateFields();
-
         const limitTimeMinutes = parseMinutes(limitValue, timeUnit);
+
         setLoading(true);
 
         completionStatus.current = { total: data.length, success: 0, failed: []};
@@ -196,7 +197,6 @@ export const ChangeJobTimeLimitModal: React.FC<Props> = ({ open, onClose, data, 
         arrayContainsElement(completionStatus?.current?.failed)
           ? (
             <Form.Item label={t(p("modifyWork"))}>
-              {/* {completionStatus.current!.failed.map((x) => <strong key={x.jobId}>{x.jobId}</strong>)} */}
               <strong>{completionStatus.current!.failed.map((x) => x.jobId).join(", ")}</strong>
             </Form.Item>
           ) : undefined
