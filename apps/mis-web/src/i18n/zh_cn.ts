@@ -785,7 +785,7 @@ export default {
           userIdAndNameNotMatch: "用户ID和名字不匹配。",
           createSuccess: "创建成功！",
           ownerUserId: "拥有者用户ID",
-          ownerName: "拥有着姓名",
+          ownerName: "拥有者姓名",
           remark: "备注",
           createAccount: "创建账户",
         },
