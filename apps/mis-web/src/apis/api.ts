@@ -51,8 +51,8 @@ import type { UnsetInitAdminSchema } from "src/pages/api/init/unsetInitAdmin";
 import type { UserExistsSchema } from "src/pages/api/init/userExists";
 import type { AddBillingItemSchema } from "src/pages/api/job/addBillingItem";
 import type { ChangeJobTimeLimitSchema } from "src/pages/api/job/changeJobTimeLimit";
+import type { GetAvailableBillingTableSchema } from "src/pages/api/job/getAvailableBillingTable";
 import type { GetBillingItemsSchema } from "src/pages/api/job/getBillingItems";
-import type { GetBillingTableSchema } from "src/pages/api/job/getBillingTable";
 import type { GetJobByBiJobIndexSchema } from "src/pages/api/job/getJobByBiJobIndex";
 import type { GetMissingDefaultPriceItemsSchema } from "src/pages/api/job/getMissingDefaultPriceItems";
 import type { GetJobInfoSchema } from "src/pages/api/job/jobInfo";
@@ -125,7 +125,7 @@ export const api = {
   addBillingItem: apiClient.fromTypeboxRoute<typeof AddBillingItemSchema>("POST", "/api/job/addBillingItem"),
   changeJobTimeLimit: apiClient.fromTypeboxRoute<typeof ChangeJobTimeLimitSchema>("PATCH", "/api/job/changeJobTimeLimit"),
   getBillingItems: apiClient.fromTypeboxRoute<typeof GetBillingItemsSchema>("GET", "/api/job/getBillingItems"),
-  getBillingTable: apiClient.fromTypeboxRoute<typeof GetBillingTableSchema>("GET", "/api/job/getBillingTable"),
+  getAvailableBillingTable: apiClient.fromTypeboxRoute<typeof GetAvailableBillingTableSchema>("GET", "/api/job/getAvailableBillingTable"),
   getJobByBiJobIndex: apiClient.fromTypeboxRoute<typeof GetJobByBiJobIndexSchema>("GET", "/api/job/getJobByBiJobIndex"),
   getMissingDefaultPriceItems: apiClient.fromTypeboxRoute<typeof GetMissingDefaultPriceItemsSchema>("GET", "/api/job/getMissingDefaultPriceItems"),
   getJobInfo: apiClient.fromTypeboxRoute<typeof GetJobInfoSchema>("GET", "/api/job/jobInfo"),

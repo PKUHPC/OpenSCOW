@@ -23,8 +23,9 @@ import { checkCookie } from "src/auth/server";
 import { JobBillingTable } from "src/components/JobBillingTable";
 import { PageTitle } from "src/components/PageTitle";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
+import { User } from "src/models/UserSchemaModel";
 import { UserStore } from "src/stores/UserStore";
-import { runtimeConfig } from "src/utils/config";
+import { publicConfig, runtimeConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
 import styled from "styled-components";
 
@@ -50,23 +51,38 @@ export const PartitionsPage: NextPage<Props> = requireAuth(() => true)((props: P
 
   const userStore = useStore(UserStore);
   const user = userStore.user;
+
   const { message } = App.useApp();
 
   const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
   const { text } = props;
 
-  const { data, isLoading } = useAsync({ promiseFn: useCallback(async () => {
-    return await api.getBillingTable({ query: { tenant: user?.tenant, userId: user?.identityId } })
-      .httpError(500, () => { message.error(t(p("getBillingTableErrorMessage"))); });
-  }, [userStore.user]) });
+  const clusters = Object.values(publicConfig.CLUSTERS);
 
   return (
     <div>
       <Head title={t(p("partitionInfo"))} />
       <PageTitle titleText={t(p("partitionInfo"))} />
-      <Spin spinning={isLoading}>
-        <JobBillingTable data={data?.items} />
+
+      {clusters.map((cluster) => {
+        const { data, isLoading } = useAsync({ promiseFn: useCallback(async () => {
+          return await api.getAvailableBillingTable({
+            query: { cluster: cluster.id, tenant: user?.tenant, userId: user?.identityId } })
+            .httpError(500, () => { message.error(t(p("getBillingTableErrorMessage"))); });
+        }, [userStore.user]) });
+        return (
+          <div key={cluster.id}>
+            <Spin spinning={isLoading}>
+              <JobBillingTable data={data?.items} />
+            </Spin>
+            <Divider />
+          </div>
+        );
+
+      })}
+
+      <div>
         {
           text?.clusterComment ? (
             <div>
@@ -86,7 +102,8 @@ export const PartitionsPage: NextPage<Props> = requireAuth(() => true)((props: P
             </div>
           ))
         }
-      </Spin>
+      </div>
+
     </div>
   );
 });
