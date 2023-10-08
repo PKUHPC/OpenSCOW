@@ -23,7 +23,6 @@ import { checkCookie } from "src/auth/server";
 import { JobBillingTable } from "src/components/JobBillingTable";
 import { PageTitle } from "src/components/PageTitle";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
-import { User } from "src/models/UserSchemaModel";
 import { UserStore } from "src/stores/UserStore";
 import { publicConfig, runtimeConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
