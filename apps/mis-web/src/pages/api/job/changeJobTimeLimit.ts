@@ -66,7 +66,7 @@ export default typeboxRoute(ChangeJobTimeLimitSchema,
     const client = getClient(JobServiceClient);
 
     // check if the user can change the job time limit
-    const { job, jobAccessible } = await checkJobAccessible(jobId, cluster, info);
+    const { job, jobAccessible } = await checkJobAccessible(jobId, cluster, info, limitMinutes);
 
     if (jobAccessible === "NotAllowed") {
       return { 403: null };
