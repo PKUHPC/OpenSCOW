@@ -14,7 +14,7 @@ import { ClusterTextsConfigSchema } from "@scow/config/build/clusterTexts";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/i18n";
 import { App, Divider, Spin, Typography } from "antd";
 import { GetServerSideProps, NextPage } from "next";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { useAsync } from "react-async";
 import { useStore } from "simstate";
 import { api } from "src/apis";
@@ -59,27 +59,41 @@ export const PartitionsPage: NextPage<Props> = requireAuth(() => true)((props: P
 
   const clusters = Object.values(publicConfig.CLUSTERS);
 
+  const [completeRequestCount, setCompleteRequestCount] = useState<number>(0);
+
   return (
     <div>
       <Head title={t(p("partitionInfo"))} />
       <PageTitle titleText={t(p("partitionInfo"))} />
 
-      {clusters.map((cluster) => {
-        const { data, isLoading } = useAsync({ promiseFn: useCallback(async () => {
-          return await api.getAvailableBillingTable({
-            query: { cluster: cluster.id, tenant: user?.tenant, userId: user?.identityId } })
-            .httpError(500, () => { message.error(t(p("getBillingTableErrorMessage"))); });
-        }, [userStore.user]) });
-        return (
-          <div key={cluster.id}>
-            <Spin spinning={isLoading}>
-              <JobBillingTable data={data?.items} />
-            </Spin>
-            <Divider />
-          </div>
-        );
+      <div>
+        <Spin spinning={completeRequestCount < clusters.length}>
+          {clusters.map((cluster) => {
 
-      })}
+            const { data } = useAsync({ promiseFn: useCallback(async () => {
+              return await api.getAvailableBillingTable({
+                query: { cluster: cluster.id, tenant: user?.tenant, userId: user?.identityId } })
+                .httpError(409, (e) => {
+                  setCompleteRequestCount(completeRequestCount + 1);
+                  message.error(e.message);
+                })
+                .then((data) => {
+                  setCompleteRequestCount(completeRequestCount + 1);
+                  return data;
+                });
+            }, [userStore.user]) });
+            return (
+              data ? (
+                <div key={cluster.id}>
+                  <JobBillingTable data={data.items} />
+                  <Divider />
+                </div>
+              ) : null
+            );
+
+          })}
+        </Spin>
+      </div>
 
       <div>
         {
