@@ -124,7 +124,7 @@ export const AdminJobTable: React.FC<Props> = () => {
                     <Form.Item label={t(pCommon("account"))} name="accountName">
                       <Input />
                     </Form.Item>
-                    <Form.Item label={t(pCommon("timeEnd"))} name="jobEndTime">
+                    <Form.Item label={t(p("jobEndTime"))} name="jobEndTime">
                       <DatePicker.RangePicker showTime allowClear={false} presets={getDefaultPresets(languageId)} />
                     </Form.Item>
                   </>
@@ -261,9 +261,9 @@ const JobInfoTable: React.FC<JobInfoTableProps> = ({
         } : false}
         scroll={{ x: true }}
       >
-        <Table.Column<JobInfo> dataIndex="idJob" title="集群作业ID" />
-        <Table.Column<JobInfo> dataIndex="account" title="账户" />
-        <Table.Column<JobInfo> dataIndex="user" title="用户" />
+        <Table.Column<JobInfo> dataIndex="idJob" title={t(pCommon("clusterWorkId"))} />
+        <Table.Column<JobInfo> dataIndex="account" title={t(pCommon("account"))} />
+        <Table.Column<JobInfo> dataIndex="user" title={t(pCommon("user"))} />
         <Table.Column<JobInfo>
           dataIndex="cluster"
           title={t(pCommon("cluster"))}

@@ -26,7 +26,7 @@ export const AdminJobsPage: NextPage = requireAuth((u) => u.tenantRoles.includes
     return (
       <div>
         <Head title={t("common.historyJob")} />
-        <PageTitle titleText={t("common.historyJob")} />
+        <PageTitle titleText={t("common.finishedJobs")} />
         <AdminJobTable />
       </div>
     );

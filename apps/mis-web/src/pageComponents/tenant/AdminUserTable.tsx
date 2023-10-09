@@ -148,7 +148,7 @@ export const AdminUserTable: React.FC<Props> = ({
         />
         <Table.Column<FullUserInfo>
           dataIndex="name"
-          title={t(pCommon("userName"))}
+          title={t(p("name"))}
           sorter={(a, b) => a.name.localeCompare(b.name)}
           sortDirections={["ascend", "descend"]}
           sortOrder={currentSortInfo.field === "name" ? currentSortInfo.order : null}

@@ -90,7 +90,7 @@ export const ProfilePage: NextPage = requireAuth(() => true)(({ userStore: { use
             <Descriptions.Item label={t("common.userId")}>
               {user.identityId}
             </Descriptions.Item>
-            <Descriptions.Item label={t("common.userName")}>
+            <Descriptions.Item label={t("common.userFullName")}>
               {user.name}
             </Descriptions.Item>
             {

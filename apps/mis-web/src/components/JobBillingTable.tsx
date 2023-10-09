@@ -75,7 +75,7 @@ export const JobBillingTable: React.FC<Props> = ({ data, loading }) => {
       children: getI18nConfigCurrentText(publicConfig.CLUSTERS[r.cluster]?.name, languageId) ?? r.cluster,
       props: { rowSpan: r.clusterItemIndex === 0 && clusterTotalQosCounts ? clusterTotalQosCounts[r.cluster] : 0 },
     }) },
-    { dataIndex: "partition", title: t(pCommon("partition")), key: "index", render: (_, r) => ({
+    { dataIndex: "partition", title: t(p("partitionFullName")), key: "index", render: (_, r) => ({
       children: r.partition,
       props: { rowSpan: r.partitionItemIndex === 0 ? r.qosCount : 0 },
     }) },

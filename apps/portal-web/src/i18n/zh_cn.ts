@@ -145,7 +145,7 @@ export default {
           qos: "QOS",
           nodes: "节点数",
           cores: "核心数",
-          gpus: "卡数",
+          gpus: "GPU卡数",
           state: "状态",
           runningOrQueueTime: "运行/排队时间",
           nodesOrReason: "说明",
@@ -311,7 +311,7 @@ export default {
       appSessionTable: {
         table: {
           sessionId: "作业名",
-          jobId: "作业Id",
+          jobId: "作业ID",
           appId: "应用",
           submitTime: "提交时间",
           state: "状态",
