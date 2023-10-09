@@ -28,6 +28,8 @@ import { publicConfig, runtimeConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
 import styled from "styled-components";
 
+import { JobBillingTableItem } from "../api/job/getAvailableBillingTable";
+
 const ClusterCommentTitle = styled(Typography.Title)`
   padding-top: 8px;
   font-weight: 600;
@@ -59,38 +61,44 @@ export const PartitionsPage: NextPage<Props> = requireAuth(() => true)((props: P
 
   const clusters = Object.values(publicConfig.CLUSTERS);
 
-  const [completeRequestCount, setCompleteRequestCount] = useState<number>(0);
+  const [completedRequestCount, setCompletedRequestCount] = useState<number>(0);
+  const [renderData, setRenderData] = useState<{ [cluster: string]: JobBillingTableItem[] }>({});
+
+  clusters.forEach((cluster) => {
+    useAsync({ promiseFn: useCallback(async () => {
+      return api.getAvailableBillingTable({
+        query: { cluster: cluster.id, tenant: user?.tenant, userId: user?.identityId } })
+        .httpError(409, (e) => {
+          message.error(e.message);
+          setCompletedRequestCount((prevCount) => prevCount + 1);
+        })
+        .then((data) => {
+          setRenderData((prevData) => ({
+            ...prevData,
+            [cluster.id]: data.items,
+          }));
+          setCompletedRequestCount((prevCount) => prevCount + 1);
+        });
+    }, [userStore.user]) });
+  });
 
   return (
     <div>
       <Head title={t(p("partitionInfo"))} />
       <PageTitle titleText={t(p("partitionInfo"))} />
 
-      <div>
-        <Spin spinning={completeRequestCount < clusters.length}>
+      <div style={{ marginBottom: "32px" }}>
+        <Spin spinning={completedRequestCount < clusters.length}>
           {clusters.map((cluster) => {
-
-            const { data } = useAsync({ promiseFn: useCallback(async () => {
-              return await api.getAvailableBillingTable({
-                query: { cluster: cluster.id, tenant: user?.tenant, userId: user?.identityId } })
-                .httpError(409, (e) => {
-                  setCompleteRequestCount(completeRequestCount + 1);
-                  message.error(e.message);
-                })
-                .then((data) => {
-                  setCompleteRequestCount(completeRequestCount + 1);
-                  return data;
-                });
-            }, [userStore.user]) });
+            const data = renderData[cluster.id];
             return (
               data ? (
                 <div key={cluster.id}>
-                  <JobBillingTable data={data.items} />
+                  <JobBillingTable data={data} />
                   <Divider />
                 </div>
               ) : null
             );
-
           })}
         </Spin>
       </div>
