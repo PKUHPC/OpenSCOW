@@ -81,6 +81,7 @@ export default {
     jobBillingTable: "Job Pricing Table",
     operationLog: "Operation Log",
     unfinishedJob: "Unfinished Jobs",
+    finishedJobs: "Finished Jobs",
     userList: "User List",
     platformInfo: "Platform Information",
     platformAdmin: "Platform Administrator",

@@ -81,6 +81,7 @@ export default {
     jobBillingTable: "作业价格表",
     operationLog: "操作日志",
     unfinishedJob: "未结束的作业",
+    finishedJobs: "已结束的作业",
     userList: "用户列表",
     platformInfo: "平台信息",
     platformAdmin: "平台管理员",
