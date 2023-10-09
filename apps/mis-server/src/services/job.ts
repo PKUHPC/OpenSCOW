@@ -23,7 +23,6 @@ import {
   JobFilter,
   JobServiceServer, JobServiceService,
 } from "@scow/protos/build/server/job";
-import { JobInfo as AdapterJobInfo } from "@scow/scheduler-adapter-protos/build/protos/job";
 import { charge, pay } from "src/bl/charging";
 import { getActiveBillingItems } from "src/bl/PriceMap";
 import { misConfig } from "src/config/mis";
@@ -235,22 +234,17 @@ export const jobServiceServer = plugin((server) => {
             "nodes_alloc", "node_list", "reason", "account", "cpus_alloc", "gpus_alloc",
             "qos", "submit_time", "time_limit_minutes", "working_directory",
           ];
+
+          const runningJobs = await asyncClientCall(client.job, "getJobs", {
+            fields,
+            filter: { users: userId ? [userId] : [], accounts: accountNames, states: ["RUNNING", "PENDING"]},
+          }).then((x) => x.jobs);
+
           if (jobIdList.length > 0) {
-            const jobInfoList: AdapterJobInfo[] = [];
-            for (const jobId of jobIdList) {
-              const jobInfo = await asyncClientCall(client.job, "getJobById", { fields, jobId: Number(jobId) })
-                .catch((e) => {
-                  logger.info("GetJobById with JobId: %s failed", jobId, e);
-                  return { job: undefined };
-                });
-              if (jobInfo.job) jobInfoList.push(jobInfo.job);
-            }
-            return jobInfoList;
+            const filteredJobs = runningJobs.filter((job) => jobIdList.includes(job.jobId.toString()));
+            return filteredJobs;
           } else {
-            return await asyncClientCall(client.job, "getJobs", {
-              fields,
-              filter: { users: userId ? [userId] : [], accounts: accountNames, states: ["RUNNING", "PENDING"]},
-            }).then((x) => x.jobs);
+            return runningJobs;
           }
         },
       );

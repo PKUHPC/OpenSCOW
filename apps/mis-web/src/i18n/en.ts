@@ -98,6 +98,11 @@ export default {
     normal: "Available",
     view: "View",
     waitingMessage: "The operation may take some time. Your patience is appreciated.",
+    timeUnits: {
+      minute: "MINUTE",
+      hour: "HOUR",
+      day: "DAY",
+    },
   },
   dashboard: {
     title: "Dashboard",
@@ -395,12 +400,14 @@ export default {
     },
     job: {
       ChangeJobTimeLimitModal: {
+        currentTimeLimit: "Current Job Time Limit",
         modifyLimit: "Modify Job Time Limit",
         success: "All modifications to time limits were successful.",
         fail: "Some modifications to job time limits failed.",
         setLimit: "Set Job Time Limit",
         modifyWork: "Failed Job Modifications",
         timeLimeError: "The job time limit must exceed the job's actual runtime.",
+        timeExplanation: "The time set here represents the total duration of the job execution.",
       },
       editableJobBillingTable: {
         alreadyUsed: "This ID has already been used.",
