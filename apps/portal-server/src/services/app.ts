@@ -209,7 +209,13 @@ export const appServiceServer = plugin((server) => {
         if (typeof i18nConfig === "string") {
           return { value: { $case: "directString", directString: i18nConfig } };
         } else {
-          return { value: { $case: "i18nObject", i18nObject: i18nConfig } };
+          return { value: { $case: "i18nObject", i18nObject: {
+            i18n: {
+              default: i18nConfig.i18n.default,
+              en: i18nConfig.i18n.en,
+              zhCn: i18nConfig.i18n.zh_cn,
+            },
+          } } };
         }
       };
 
@@ -242,7 +248,15 @@ export const appServiceServer = plugin((server) => {
         });
       }
 
-      return [{ appName: app.name, attributes: attributes }];
+      const comment = app.appComment ? getI18nSeverTypeFormat(app.appComment) : undefined;
+
+      console.log("【【app-server-metadata-appsConfig】】", app,
+        "\n【【app-server-metadata-appComment】】", app.appComment,
+        "\n【【app-server-metadata-commentFormat】】", getI18nSeverTypeFormat(app.appComment), comment);
+
+      console.log({ appName: app.name, attributes: attributes, appComment: comment });
+
+      return [{ appName: app.name, attributes: attributes, appComment: comment }];
     },
 
     listAvailableApps: async ({ request }) => {

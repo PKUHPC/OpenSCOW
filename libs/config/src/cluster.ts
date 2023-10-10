@@ -20,7 +20,7 @@ const CLUSTER_CONFIG_BASE_PATH = "clusters";
 const LoginNodeConfigSchema =
   Type.Object(
     {
-      name: createI18nStringSchema("登录节点展示名"), address: Type.String({ description: "集群的登录节点地址" }),
+      name: createI18nStringSchema({ description: "登录节点展示名" }), address: Type.String({ description: "集群的登录节点地址" }),
     },
   );
 
@@ -69,7 +69,7 @@ export type LoginDeskopConfigSchema = Static<typeof LoginDeskopConfigSchema>;
 type TurboVncConfigSchema = Static<typeof TurboVncConfigSchema>;
 
 export const ClusterConfigSchema = Type.Object({
-  displayName: createI18nStringSchema("集群的显示名称"),
+  displayName: createI18nStringSchema({ description: "集群的显示名称" }),
   priority: Type.Number({ description: "集群使用的优先级, 数字越小越先展示", default: Number.MAX_SAFE_INTEGER }),
   adapterUrl: Type.String({ description: "调度器适配器服务地址" }),
   proxyGateway: Type.Optional(Type.Object({

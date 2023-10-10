@@ -12,8 +12,8 @@
 
 import { Type } from "@sinclair/typebox";
 
-// 创建配置文件中显示文字项的配置类型
-export const createI18nStringSchema = (description: string, defaultValue?: string) => {
+// 创建配置文件中支持国际化文本文字项的配置类型
+export const createI18nStringSchema = ({ description, defaultValue }: {description: string, defaultValue?: string}) => {
   return Type.Union([
     Type.String(),
     Type.Object({

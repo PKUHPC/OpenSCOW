@@ -150,6 +150,7 @@ message AppCustomAttribute {
 message GetAppMetadataResponse {
   string app_name = 1;
   repeated AppCustomAttribute attributes = 2;
+  optional I18nStringProtoType app_comment = 3;
 }
 
 message ListAvailableAppsRequest {

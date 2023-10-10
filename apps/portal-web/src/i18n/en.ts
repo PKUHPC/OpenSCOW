@@ -355,6 +355,7 @@ export default {
         totalGpuCount: "Total GPU Cards",
         totalCpuCount: "Total CPU Cores",
         totalMemory: "Total Memory Capacity",
+        appCommentTitle: "Explanation",
       },
     },
   },
@@ -379,7 +380,7 @@ export default {
   pages: {
     apps: {
       create: {
-        title: "Create",
+        title: "Create ",
         error404: "This app does not exist",
       },
       createApps: {
