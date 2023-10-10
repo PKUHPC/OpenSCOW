@@ -250,12 +250,6 @@ export const appServiceServer = plugin((server) => {
 
       const comment = app.appComment ? getI18nSeverTypeFormat(app.appComment) : undefined;
 
-      console.log("【【app-server-metadata-appsConfig】】", app,
-        "\n【【app-server-metadata-appComment】】", app.appComment,
-        "\n【【app-server-metadata-commentFormat】】", getI18nSeverTypeFormat(app.appComment), comment);
-
-      console.log({ appName: app.name, attributes: attributes, appComment: comment });
-
       return [{ appName: app.name, attributes: attributes, appComment: comment }];
     },
 
