@@ -25,7 +25,8 @@ vnc:
 
 # 交互式应用说明，选填。
 # 类型为string或国际化文本类型
-appComment: "<p>对上方交互式应用进行说明</p><pre style=\"width: 40%;\"><code># 利用代码块说明</code></pre>"
+# appComment: "对上方交互式应用进行说明<pre style='width: 40%'><code># 利用代码块说明</code></pre>"
+# 国际化类型
 # appComment:
 #   i18n:
 #     default: |
