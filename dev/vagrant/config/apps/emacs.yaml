@@ -31,10 +31,10 @@ vnc:
 #   i18n:
 #     default: |
 #       <p>对上方交互式应用进行说明</p>
-#       <pre style="width: 40%;"><code># 利用代码块说明</code></pre>
+#       <pre style='width: 40%;'><code># 利用代码块说明</code></pre>
 #     en: |
 #       <p>Explanation of the app above</p>
-#       <pre style="width: 40%;"><code># explanation with code</code></pre>
+#       <pre style='width: 40%;'><code># explanation with code</code></pre>
 #     zh_cn: |
 #       <p>对上方交互式应用进行说明</p>
-#       <pre style="width: 40%;"><code># 利用代码块说明</code></pre>
+#       <pre style='width: 40%;'><code># 利用代码块说明</code></pre>
