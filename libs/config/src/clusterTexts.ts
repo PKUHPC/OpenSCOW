@@ -19,10 +19,10 @@ import { createI18nStringSchema } from "./type";
 export const ClusterTextsConfigSchema = Type.Record(
   Type.String({ description: "租户，如果为default则是对所有租户" }),
   Type.Object({
-    clusterComment:Type.Optional(createI18nStringSchema("集群说明")),
+    clusterComment:Type.Optional(createI18nStringSchema({ description: "集群说明" })),
     extras: Type.Optional(Type.Array(Type.Object({
-      title: createI18nStringSchema("标题"),
-      content: createI18nStringSchema("内容"),
+      title: createI18nStringSchema({ description: "标题" }),
+      content: createI18nStringSchema({ description: "内容" }),
     }))) }, { description: "其他内容" },
   ),
 );

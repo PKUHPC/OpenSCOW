@@ -21,3 +21,20 @@ vnc:
   # 此X Session的xstartup脚本
   xstartup: |
     emacs -mm
+
+
+# 交互式应用说明，选填。
+# 类型为string或国际化文本类型
+# appComment: "对上方交互式应用进行说明<pre style='width: 40%'><code># 利用代码块说明</code></pre>"
+# 国际化类型
+# appComment:
+#   i18n:
+#     default: |
+#       <p>对上方交互式应用进行说明</p>
+#       <pre style='width: 40%;'><code># 利用代码块说明</code></pre>
+#     en: |
+#       <p>Explanation of the app above</p>
+#       <pre style='width: 40%;'><code># explanation with code</code></pre>
+#     zh_cn: |
+#       <p>对上方交互式应用进行说明</p>
+#       <pre style='width: 40%;'><code># 利用代码块说明</code></pre>

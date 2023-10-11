@@ -355,6 +355,7 @@ export default {
         totalGpuCount: "总GPU卡数",
         totalCpuCount: "总CPU核心数",
         totalMemory: "总内存容量",
+        appCommentTitle: "说明",
       },
     },
   },

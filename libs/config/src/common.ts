@@ -32,7 +32,10 @@ export const CommonConfigSchema = Type.Object({
       description: "用户密码的正则规则",
       default: "^(?=.*\d)(?=.*[a-zA-Z])(?=.*[`~!@#\$%^&*()_+\-[\];',./{}|:\"<>?]).{8,}$",
     }),
-    errorMessage: createI18nStringSchema("如果密码不符合规则显示什么", "必须包含字母、数字和符号，长度大于等于8位"),
+    errorMessage: createI18nStringSchema({
+      description: "如果密码不符合规则显示什么",
+      defaultValue: "必须包含字母、数字和符号，长度大于等于8位",
+    }),
 
   }, { description: "创建用户、修改密码时的密码的规则" }),
 
