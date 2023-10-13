@@ -57,4 +57,4 @@ SCOW 使用 [木兰宽松许可证, 第2版](http://license.coscl.org.cn/MulanPS
 
 ## 欢迎扫码加入SCOW技术交流群
 
-![SCOW技术交流群二维码](../SCOW/docs/static/img/scow_qrcode.png)
+![SCOW技术交流群二维码](docs/static/img/scow_qrcode.png)
