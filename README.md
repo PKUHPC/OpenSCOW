@@ -55,4 +55,6 @@ SCOW是一个面向超算使用员和管理员的、基于Web的超算门户(por
 
 SCOW 使用 [木兰宽松许可证, 第2版](http://license.coscl.org.cn/MulanPSL2) 开源协议。
 
+## 欢迎扫码加入SCOW技术交流群
 
+![SCOW技术交流群二维码](../SCOW/docs/static/img/scow_qrcode.png)

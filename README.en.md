@@ -55,3 +55,6 @@ Follow [Contribution Guide](https://pkuhpc.github.io/SCOW/docs/contribution) to 
 
 SCOW is distributed under [Mulan Permissive Software License, Version 2](http://license.coscl.org.cn/MulanPSL2).
 
+## Join SCOW Tech Group with a QR Scan
+
+![SCOW Tech Group](../SCOW/docs/static/img/scow_qrcode.png)
