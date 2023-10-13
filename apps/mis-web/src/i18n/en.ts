@@ -253,8 +253,8 @@ export default {
         roles: "Platform Roles",
         notExist: "User does not exist",
         notAvailable: "This feature is not available in the current configuration",
-        success: "Success in the current configuration",
-        fail: "Fail in the current configuration",
+        success: "Modification successful",
+        fail: "Modification failed",
         changePassword: "Change Password",
       },
       createTenantForm: {

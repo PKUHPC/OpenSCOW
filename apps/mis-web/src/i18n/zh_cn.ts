@@ -253,8 +253,8 @@ export default {
         roles:"平台角色",
         notExist:"用户不存在",
         notAvailable:"本功能在当前配置下不可用",
-        success:"本功能在当前配置下不可用",
-        fail:"本功能在当前配置下不可用",
+        success:"修改成功",
+        fail:"修改失败",
         changePassword:"修改密码",
       },
       createTenantForm:{
