@@ -234,6 +234,10 @@ export default {
           deleteConfirmContent: "确认删除{}?",
           deleteConfirmOk: "确认",
           deleteSuccessMessage: "删除成功",
+          submitConfirmTitle: "确认提交",
+          submitConfirmContent: "确认提交{}至{}?",
+          submitConfirmOk: "确认",
+          submitSuccessMessage: "删除成功",
         },
       },
       fileTable: {

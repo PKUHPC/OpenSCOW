@@ -218,6 +218,40 @@ export const jobServiceServer = plugin((server) => {
       return [{ jobId: reply.jobId }];
     },
 
+    submitFileAsJob: async ({ request }) => {
+      const { cluster, userId, fileDirectory } = request;
+
+      const client = getAdapterClient(cluster);
+      if (!client) { throw clusterNotFound(cluster); }
+
+      // make sure working directory exists
+      const host = getClusterLoginNode(cluster);
+      if (!host) { throw clusterNotFound(cluster); }
+      // await sshConnect(host, userId, logger, async (ssh) => {
+      //   const sftp = await ssh.requestSFTP();
+      //   await createDirectoriesRecursively(sftp, workingDirectory);
+      // });
+
+      const reply = await asyncClientCall(client.job, "submitFileAsJob", {
+        userId, fileDirectory,
+      }).catch((e) => {
+        const ex = e as ServiceError;
+        const errors = parseErrorDetails(ex.metadata);
+        if (errors[0] && errors[0].$type === "google.rpc.ErrorInfo" && errors[0].reason === "SBATCH_FAILED") {
+          throw <ServiceError> {
+            code: Status.INTERNAL,
+            message: "sbatch failed",
+            details: e.details,
+          };
+        } else {
+          throw e;
+        }
+      });
+
+      return [{ jobId: reply.jobId }];
+    },
+
+
   });
 
 });

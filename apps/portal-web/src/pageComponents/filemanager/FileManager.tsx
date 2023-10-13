@@ -506,6 +506,36 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
             >
               {t("button.deleteButton")}
             </a>
+            {
+              i.type === "FILE" ? (
+                <a onClick={() => {
+                  const fullPath = join(path, i.name);
+                  modal.confirm({
+                    title: t(p("tableInfo.submitConfirmTitle")),
+                    // icon: < />,
+                    content: t(p("tableInfo.submitConfirmContent"),
+                      [i.name, getI18nConfigCurrentText(cluster.name, languageId)]),
+                    okText: t(p("tableInfo.submitConfirmOk")),
+                    onOk: async () => {
+                      await api.submitFileAsJob({
+                        body: {
+                          cluster: cluster.id,
+                          fileDirectory: fullPath,
+                        },
+                      })
+                        .then(() => {
+                          message.success(t(p("tableInfo.submitSuccessMessage")));
+                          resetSelectedAndOperation();
+                          reload();
+                        });
+                    },
+                  });
+                }}
+                >
+                  {t("button.submitButton")}
+                </a>
+              ) : undefined
+            }
           </Space>
         )}
       />

@@ -159,6 +159,19 @@ message SubmitJobResponse {
   uint32 job_id = 1;
 }
 
+// fileDirectory: file's absolute path
+message SubmitFileAsJobRequest {
+  string cluster = 1;
+  string user_id = 2;
+  string file_directory = 3;
+}
+
+// NOT_FOUND: cluster is not found
+// INTERNAL: error raised from scheduler. details has the error message
+message SubmitFileAsJobResponse {
+  uint32 job_id = 1;
+}
+
 service JobService {
   rpc CancelJob(CancelJobRequest) returns (CancelJobResponse);
 
@@ -177,4 +190,6 @@ service JobService {
   rpc RenameJobTemplate(RenameJobTemplateRequest) returns (RenameJobTemplateResponse);
 
   rpc SubmitJob(SubmitJobRequest) returns (SubmitJobResponse);
+
+  rpc SubmitFileAsJob(SubmitFileAsJobRequest) returns (SubmitFileAsJobResponse);
 }

@@ -55,6 +55,10 @@ export const jobServiceServer = plugin((server) => {
       return [{ jobId: 1, generatedScript: "" }];
     },
 
+    submitFileAsJob: async () => {
+      return [{ jobId: 1 }];
+    },
+
     cancelJob: async () => {
       return [{}];
     },

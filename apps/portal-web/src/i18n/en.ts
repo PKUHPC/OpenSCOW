@@ -234,6 +234,10 @@ export default {
           deleteConfirmContent: "Confirm deletion of {}?",
           deleteConfirmOk: "Confirm",
           deleteSuccessMessage: "Deleted successfully",
+          submitConfirmTitle: "Submit Confirmation",
+          submitConfirmContent: "Confirm submission of {} to {}?",
+          submitConfirmOk: "Confirm",
+          submitSuccessMessage: "Submitted Successfully",
         },
       },
       fileTable: {
