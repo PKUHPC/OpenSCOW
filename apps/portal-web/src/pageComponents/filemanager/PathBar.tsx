@@ -13,7 +13,7 @@
 import { ReloadOutlined, RightOutlined } from "@ant-design/icons";
 import { Breadcrumb, Button, Input } from "antd";
 import { useEffect, useState } from "react";
-import styled from "styled-components";
+import { styled } from "styled-components";
 
 interface Props {
   path: string;

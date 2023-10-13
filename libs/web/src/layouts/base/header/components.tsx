@@ -14,7 +14,7 @@ import { Typography } from "antd";
 import { join } from "path";
 import { antdBreakpoints } from "src/layouts/base/constants";
 import { UserInfo } from "src/layouts/base/types";
-import styled from "styled-components";
+import { styled } from "styled-components";
 
 export const HeaderItem = styled.div`
   padding: 0 16px;

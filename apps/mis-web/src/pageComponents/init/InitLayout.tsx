@@ -18,7 +18,7 @@ import { api } from "src/apis";
 import { Centered } from "src/components/layouts";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 import { Head } from "src/utils/head";
-import styled from "styled-components";
+import { styled } from "styled-components";
 
 type DrawerProps = {
   children: React.ReactNode;

@@ -19,7 +19,7 @@ import { StatCard } from "src/components/StatCard";
 import { useI18nTranslateToString } from "src/i18n";
 import { UserStatus } from "src/models/User";
 import type { AccountInfo } from "src/pages/dashboard";
-import styled from "styled-components";
+import { styled } from "styled-components";
 
 
 

@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import styled from "styled-components";
+import { styled } from "styled-components";
 
 interface Props {
   sidebarShown: boolean;
