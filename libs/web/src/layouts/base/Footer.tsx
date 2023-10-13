@@ -11,7 +11,7 @@
  */
 
 import { Divider } from "antd";
-import styled from "styled-components";
+import { styled } from "styled-components";
 
 const FooterContainer = styled.div`
   display: flex;

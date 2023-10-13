@@ -18,7 +18,7 @@ import React, { useMemo } from "react";
 import { calcSelectedKeys, createMenuItems } from "src/layouts/base/common";
 import { antdBreakpoints } from "src/layouts/base/constants";
 import { NavItemProps } from "src/layouts/base/types";
-import styled from "styled-components";
+import { styled } from "styled-components";
 
 const Container = styled.div`
 

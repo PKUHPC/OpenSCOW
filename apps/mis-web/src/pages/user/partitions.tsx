@@ -26,7 +26,7 @@ import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { UserStore } from "src/stores/UserStore";
 import { runtimeConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
-import styled from "styled-components";
+import { styled } from "styled-components";
 
 const ClusterCommentTitle = styled(Typography.Title)`
   padding-top: 8px;

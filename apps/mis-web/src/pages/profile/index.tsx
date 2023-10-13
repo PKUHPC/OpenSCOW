@@ -24,7 +24,7 @@ import { ChangePasswordModal } from "src/pageComponents/profile/ChangePasswordMo
 import { antdBreakpoints } from "src/styles/constants";
 import { publicConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
-import styled from "styled-components";
+import { styled } from "styled-components";
 
 const Container = styled.div`
   display: flex;

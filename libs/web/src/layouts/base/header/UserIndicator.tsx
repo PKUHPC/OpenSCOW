@@ -16,7 +16,7 @@ import Link from "next/link";
 import React from "react";
 import { antdBreakpoints } from "src/layouts/base/constants";
 import { getCurrentLangLibWebText } from "src/utils/libWebI18n/libI18n";
-import styled from "styled-components";
+import { styled } from "styled-components";
 
 import { EXTERNAL_URL_PREFIX } from "../common";
 import { UserInfo, UserLink } from "../types";

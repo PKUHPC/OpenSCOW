@@ -41,7 +41,7 @@ import { UploadModal } from "src/pageComponents/filemanager/UploadModal";
 import { FileInfo } from "src/pages/api/file/list";
 import { LoginNodeStore } from "src/stores/LoginNodeStore";
 import { Cluster, publicConfig } from "src/utils/config";
-import styled from "styled-components";
+import { styled } from "styled-components";
 
 interface Props {
   cluster: Cluster;

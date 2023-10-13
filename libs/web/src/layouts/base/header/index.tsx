@@ -19,7 +19,7 @@ import { HeaderItem } from "src/layouts/base/header/components";
 import { Logo } from "src/layouts/base/header/Logo";
 import { UserIndicator } from "src/layouts/base/header/UserIndicator";
 import { NavItemProps, UserInfo, UserLink } from "src/layouts/base/types";
-import styled from "styled-components";
+import { styled } from "styled-components";
 
 interface ComponentProps {
   homepage?: boolean;

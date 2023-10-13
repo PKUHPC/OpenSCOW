@@ -20,7 +20,7 @@ import { DisabledA } from "src/components/DisabledA";
 import { StatCard } from "src/components/StatCard";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { publicConfig } from "src/utils/config";
-import styled from "styled-components";
+import { styled } from "styled-components";
 
 interface Props {
   cluster: string;

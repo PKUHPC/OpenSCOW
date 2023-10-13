@@ -12,7 +12,7 @@
 
 import { Alert, Typography } from "antd";
 import { prefix, useI18nTranslateToString } from "src/i18n";
-import styled from "styled-components";
+import { styled } from "styled-components";
 
 import { ImportUsersTable } from "../admin/ImportUsersTable";
 

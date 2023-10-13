@@ -17,7 +17,7 @@ import { Centered } from "src/components/layouts";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 import { CreateUserForm, CreateUserFormFields } from "src/pageComponents/users/CreateUserForm";
 import { useBuiltinCreateUser } from "src/utils/createUser";
-import styled from "styled-components";
+import { styled } from "styled-components";
 
 
 type FormFields = Omit<CreateUserFormFields, "confirmPassword">;

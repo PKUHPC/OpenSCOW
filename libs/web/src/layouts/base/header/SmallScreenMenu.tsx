@@ -18,7 +18,7 @@ import Link from "next/link";
 import React from "react";
 import { createMenuItems } from "src/layouts/base/common";
 import { getCurrentLangLibWebText } from "src/utils/libWebI18n/libI18n";
-import styled from "styled-components";
+import { styled } from "styled-components";
 
 import { NavItemProps, UserInfo } from "../types";
 
