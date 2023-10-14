@@ -73,7 +73,7 @@ import { dropDatabase } from "tests/data/helpers";
 afterEach(async () => {
   await dropDatabase(server.ext.orm);
   await server.close();
-  fs.rmSync(folderPath, { recursive: true });
+  await fs.promises.rm(folderPath, { recursive: true });
 });
 
 
