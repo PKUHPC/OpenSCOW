@@ -57,4 +57,4 @@ SCOW is distributed under [Mulan Permissive Software License, Version 2](http://
 
 ## Join SCOW Tech Group with a QR Scan
 
-![SCOW Tech Group](../SCOW/docs/static/img/scow_qrcode.png)
+![SCOW Tech Group](docs/static/img/scow_qrcode.png)
