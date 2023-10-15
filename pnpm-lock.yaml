@@ -126,16 +126,16 @@ importers:
     dependencies:
       '@ddadaal/tsgrpc-client':
         specifier: 0.17.6
-        version: 0.17.6(@grpc/grpc-js@1.8.21)
+        version: 0.17.6(@grpc/grpc-js@1.9.5)
       '@ddadaal/tsgrpc-common':
         specifier: 0.2.4
         version: 0.2.4
       '@ddadaal/tsgrpc-server':
         specifier: 0.19.4
-        version: 0.19.4(@grpc/grpc-js@1.8.21)
+        version: 0.19.4(@grpc/grpc-js@1.9.5)
       '@grpc/grpc-js':
-        specifier: 1.8.21
-        version: 1.8.21
+        specifier: 1.9.5
+        version: 1.9.5
       '@mikro-orm/cli':
         specifier: 5.7.14
         version: 5.7.14(@mikro-orm/migrations@5.7.14)(@mikro-orm/mysql@5.7.14)
@@ -346,16 +346,16 @@ importers:
     dependencies:
       '@ddadaal/tsgrpc-client':
         specifier: 0.17.6
-        version: 0.17.6(@grpc/grpc-js@1.8.21)
+        version: 0.17.6(@grpc/grpc-js@1.9.5)
       '@ddadaal/tsgrpc-common':
         specifier: 0.2.4
         version: 0.2.4
       '@ddadaal/tsgrpc-server':
         specifier: 0.19.4
-        version: 0.19.4(@grpc/grpc-js@1.8.21)
+        version: 0.19.4(@grpc/grpc-js@1.9.5)
       '@grpc/grpc-js':
-        specifier: 1.8.21
-        version: 1.8.21
+        specifier: 1.9.5
+        version: 1.9.5
       '@mikro-orm/cli':
         specifier: 5.7.14
         version: 5.7.14(@mikro-orm/mariadb@5.7.14)(@mikro-orm/migrations@5.7.14)(@mikro-orm/mysql@5.7.14)(@mikro-orm/seeder@5.7.14)
@@ -455,13 +455,13 @@ importers:
         version: 0.8.2(@sinclair/typebox@0.31.1)(next@13.4.10)(zod@3.22.2)
       '@ddadaal/tsgrpc-client':
         specifier: 0.17.6
-        version: 0.17.6(@grpc/grpc-js@1.8.21)
+        version: 0.17.6(@grpc/grpc-js@1.9.5)
       '@ddadaal/tsgrpc-common':
         specifier: 0.2.4
         version: 0.2.4
       '@grpc/grpc-js':
-        specifier: 1.8.21
-        version: 1.8.21
+        specifier: 1.9.5
+        version: 1.9.5
       '@scow/config':
         specifier: workspace:*
         version: link:../../libs/config
@@ -588,16 +588,16 @@ importers:
     dependencies:
       '@ddadaal/tsgrpc-client':
         specifier: 0.17.6
-        version: 0.17.6(@grpc/grpc-js@1.8.21)
+        version: 0.17.6(@grpc/grpc-js@1.9.5)
       '@ddadaal/tsgrpc-common':
         specifier: 0.2.4
         version: 0.2.4
       '@ddadaal/tsgrpc-server':
         specifier: 0.19.4
-        version: 0.19.4(@grpc/grpc-js@1.8.21)
+        version: 0.19.4(@grpc/grpc-js@1.9.5)
       '@grpc/grpc-js':
-        specifier: 1.8.21
-        version: 1.8.21
+        specifier: 1.9.5
+        version: 1.9.5
       '@scow/config':
         specifier: workspace:*
         version: link:../../libs/config
@@ -697,13 +697,13 @@ importers:
         version: 0.8.2(@sinclair/typebox@0.31.1)(next@13.4.10)(zod@3.22.2)
       '@ddadaal/tsgrpc-client':
         specifier: 0.17.6
-        version: 0.17.6(@grpc/grpc-js@1.8.21)
+        version: 0.17.6(@grpc/grpc-js@1.9.5)
       '@ddadaal/tsgrpc-common':
         specifier: 0.2.4
         version: 0.2.4
       '@grpc/grpc-js':
-        specifier: 1.8.21
-        version: 1.8.21
+        specifier: 1.9.5
+        version: 1.9.5
       '@scow/config':
         specifier: workspace:*
         version: link:../../libs/config
@@ -883,10 +883,10 @@ importers:
         version: 0.2.4
       '@ddadaal/tsgrpc-server':
         specifier: 0.19.4
-        version: 0.19.4(@grpc/grpc-js@1.8.21)
+        version: 0.19.4(@grpc/grpc-js@1.9.5)
       '@grpc/grpc-js':
-        specifier: 1.8.21
-        version: 1.8.21
+        specifier: 1.9.5
+        version: 1.9.5
       '@scow/lib-config':
         specifier: workspace:*
         version: link:../../libs/libconfig
@@ -977,10 +977,10 @@ importers:
     dependencies:
       '@ddadaal/tsgrpc-client':
         specifier: 0.17.6
-        version: 0.17.6(@grpc/grpc-js@1.8.21)
+        version: 0.17.6(@grpc/grpc-js@1.9.5)
       '@grpc/grpc-js':
-        specifier: 1.8.21
-        version: 1.8.21
+        specifier: 1.9.5
+        version: 1.9.5
       '@scow/protos':
         specifier: workspace:*
         version: link:../protos/scow
@@ -1024,10 +1024,10 @@ importers:
     dependencies:
       '@ddadaal/tsgrpc-client':
         specifier: 0.17.6
-        version: 0.17.6(@grpc/grpc-js@1.8.21)
+        version: 0.17.6(@grpc/grpc-js@1.9.5)
       '@grpc/grpc-js':
-        specifier: 1.8.21
-        version: 1.8.21
+        specifier: 1.9.5
+        version: 1.9.5
       '@scow/protos':
         specifier: workspace:*
         version: link:../protos/scow
@@ -1042,8 +1042,8 @@ importers:
   libs/protos/scheduler-adapter:
     dependencies:
       '@grpc/grpc-js':
-        specifier: 1.8.21
-        version: 1.8.21
+        specifier: 1.9.5
+        version: 1.9.5
       long:
         specifier: 5.2.3
         version: 5.2.3
@@ -1058,8 +1058,8 @@ importers:
   libs/protos/scow:
     dependencies:
       '@grpc/grpc-js':
-        specifier: 1.8.21
-        version: 1.8.21
+        specifier: 1.9.5
+        version: 1.9.5
       '@scow/grpc-api':
         specifier: workspace:*
         version: link:../../../protos
@@ -1077,8 +1077,8 @@ importers:
   libs/rich-error-model:
     dependencies:
       '@grpc/grpc-js':
-        specifier: 1.8.21
-        version: 1.8.21
+        specifier: 1.9.5
+        version: 1.9.5
       long:
         specifier: 5.2.3
         version: 5.2.3
@@ -1088,13 +1088,13 @@ importers:
     devDependencies:
       '@ddadaal/tsgrpc-client':
         specifier: 0.17.6
-        version: 0.17.6(@grpc/grpc-js@1.8.21)
+        version: 0.17.6(@grpc/grpc-js@1.9.5)
       '@ddadaal/tsgrpc-common':
         specifier: 0.2.4
         version: 0.2.4
       '@ddadaal/tsgrpc-server':
         specifier: 0.19.4
-        version: 0.19.4(@grpc/grpc-js@1.8.21)
+        version: 0.19.4(@grpc/grpc-js@1.9.5)
       '@scow/protos':
         specifier: workspace:*
         version: link:../protos/scow
@@ -1105,8 +1105,8 @@ importers:
   libs/scheduler-adapter:
     dependencies:
       '@grpc/grpc-js':
-        specifier: 1.8.21
-        version: 1.8.21
+        specifier: 1.9.5
+        version: 1.9.5
       '@scow/protos':
         specifier: workspace:*
         version: link:../protos/scow
@@ -1120,18 +1120,18 @@ importers:
         specifier: 0.2.4
         version: 0.2.4
       '@grpc/grpc-js':
-        specifier: 1.8.21
-        version: 1.8.21
+        specifier: 1.9.5
+        version: 1.9.5
       nookies:
         specifier: 2.5.2
         version: 2.5.2
     devDependencies:
       '@ddadaal/tsgrpc-client':
         specifier: 0.17.6
-        version: 0.17.6(@grpc/grpc-js@1.8.21)
+        version: 0.17.6(@grpc/grpc-js@1.9.5)
       '@ddadaal/tsgrpc-server':
         specifier: 0.19.4
-        version: 0.19.4(@grpc/grpc-js@1.8.21)
+        version: 0.19.4(@grpc/grpc-js@1.9.5)
       '@scow/config':
         specifier: workspace:*
         version: link:../config
@@ -1179,8 +1179,8 @@ importers:
         specifier: 5.2.5
         version: 5.2.5(react-dom@18.2.0)(react@18.2.0)
       '@grpc/grpc-js':
-        specifier: 1.8.21
-        version: 1.8.21
+        specifier: 1.9.5
+        version: 1.9.5
       '@types/mime-types':
         specifier: 2.1.1
         version: registry.npmmirror.com/@types/mime-types@2.1.1
@@ -4413,13 +4413,13 @@ packages:
       zod: 3.22.2
     dev: false
 
-  /@ddadaal/tsgrpc-client@0.17.6(@grpc/grpc-js@1.8.21):
+  /@ddadaal/tsgrpc-client@0.17.6(@grpc/grpc-js@1.9.5):
     resolution: {integrity: sha512-nOmaVcZbK8ZaCIUtjOaedqFgmE72m1GHVn6vXqw4y91TDLI5haKSNTaXVZGaF/sbVCXUxT3WXHlM3v8PKsTdmw==}
     peerDependencies:
       '@grpc/grpc-js': '>=1.7.0'
     dependencies:
       '@ddadaal/tsgrpc-common': 0.2.4
-      '@grpc/grpc-js': 1.8.21
+      '@grpc/grpc-js': 1.9.5
       tslib: 2.6.1
 
   /@ddadaal/tsgrpc-common@0.2.4:
@@ -4427,13 +4427,13 @@ packages:
     dependencies:
       tslib: 2.6.1
 
-  /@ddadaal/tsgrpc-server@0.19.4(@grpc/grpc-js@1.8.21):
+  /@ddadaal/tsgrpc-server@0.19.4(@grpc/grpc-js@1.9.5):
     resolution: {integrity: sha512-o3qPM7S5+CNzyhlIY8x38qR+54IoTdYbIEii76fOuUpMUl6jsyPXebELaME4Szui1mpGfmqZb3vEE87BxBGHAA==}
     peerDependencies:
       '@grpc/grpc-js': '>=1.7.0'
     dependencies:
       '@ddadaal/tsgrpc-common': 0.2.4
-      '@grpc/grpc-js': 1.8.21
+      '@grpc/grpc-js': 1.9.5
       pino: 8.15.0
       tslib: 2.6.1
 
@@ -5333,23 +5333,22 @@ packages:
       hashlru: 2.3.0
     dev: false
 
-  /@grpc/grpc-js@1.8.21:
-    resolution: {integrity: sha512-KeyQeZpxeEBSqFVTi3q2K7PiPXmgBfECc4updA1ejCLjYmoAlvvM3ZMp5ztTDUCUQmoY3CpDxvchjO1+rFkoHg==}
+  /@grpc/grpc-js@1.9.5:
+    resolution: {integrity: sha512-iouYNlPxRAwZ2XboDT+OfRKHuaKHiqjB5VFYZ0NFrHkbEF+AV3muIUY9olQsp8uxU4VvRCMiRk9ftzFDGb61aw==}
     engines: {node: ^8.13.0 || >=10.10.0}
     dependencies:
-      '@grpc/proto-loader': 0.7.3
+      '@grpc/proto-loader': 0.7.10
       '@types/node': 18.17.6
 
-  /@grpc/proto-loader@0.7.3:
-    resolution: {integrity: sha512-5dAvoZwna2Py3Ef96Ux9jIkp3iZ62TUsV00p3wVBPNX5K178UbNi8Q7gQVqwXT1Yq9RejIGG9G2IPEo93T6RcA==}
+  /@grpc/proto-loader@0.7.10:
+    resolution: {integrity: sha512-CAqDfoaQ8ykFd9zqBDn4k6iWT9loLAlc2ETmDFS9JCD70gDcnA4L3AFEo2iV7KyAtAAHFW9ftq1Fz+Vsgq80RQ==}
     engines: {node: '>=6'}
     hasBin: true
     dependencies:
-      '@types/long': 4.0.2
       lodash.camelcase: 4.3.0
-      long: 4.0.0
+      long: 5.2.3
       protobufjs: 7.2.4
-      yargs: 16.2.0
+      yargs: 17.7.2
 
   /@hapi/hoek@9.3.0:
     resolution: {integrity: sha512-/c6rf4UJlmHlC9b5BaNvzAcFv7HZ2QHaV0D4/HNlBdvFnvQq8RI4kYdhyPCl7Xj+oWvTWQ8ujhqS53LIgAe6KQ==}
@@ -7513,9 +7512,6 @@ packages:
       '@types/node': 18.16.14
     dev: true
 
-  /@types/long@4.0.2:
-    resolution: {integrity: sha512-MqTGEo5bj5t157U6fA/BiDynNkn0YknVdh48CMPkTSpFTVmvao5UQmm7uEF6xBEo7qIMAlY/JSleYaE6VOdpaA==}
-
   /@types/mdast@3.0.10:
     resolution: {integrity: sha512-W864tg/Osz1+9f4lrGTZpCSO5/z4608eUp19tbozkq2HJK6i3z1kT0H9tlADXuYIb1YYOBByU4Jsqkk75q48qA==}
     dependencies:
@@ -9322,6 +9318,7 @@ packages:
       string-width: 4.2.3
       strip-ansi: 6.0.1
       wrap-ansi: 7.0.0
+    dev: false
 
   /cliui@8.0.1:
     resolution: {integrity: sha512-BSeNnyus75C4//NQ9gQt1/csTXyo/8Sb+afLAkzAptFuMsod9HFokGNudZpi/oQV73hnVK+sR+5PVRMd+Dr7YQ==}
@@ -14003,9 +14000,6 @@ packages:
       chalk: 4.1.2
       is-unicode-supported: 0.1.0
     dev: true
-
-  /long@4.0.0:
-    resolution: {integrity: sha512-XsP+KhQif4bjX1kbuSiySJFNAehNxgLb6hPRGJ9QsUr8ajHkuXGdrHmFUTUUXhDwVX2R5bY4JNZEwbUiMhV+MA==}
 
   /long@5.2.3:
     resolution: {integrity: sha512-lcHwpNoggQTObv5apGNCTdJrO69eHOZMi4BNC+rTLER8iHAqGrUVeLh/irVIM7zTw2bOXA8T6uNPeujwOLg/2Q==}
@@ -20418,6 +20412,7 @@ packages:
   /yargs-parser@20.2.9:
     resolution: {integrity: sha512-y11nGElTIV+CT3Zv9t7VKl+Q3hTQoT9a1Qzezhhl6Rp21gJ/IVTW7Z3y9EWXhuUBC2Shnf+DX0antecpAwSP8w==}
     engines: {node: '>=10'}
+    dev: false
 
   /yargs-parser@21.1.1:
     resolution: {integrity: sha512-tVpsJW7DdjecAiFpbIB1e3qxIQsE6NoPc5/eTdrbbIC4h0LVsWhnoa3g+m2HclBIujHzsxZ4VJVA+GUuc2/LBw==}
@@ -20450,6 +20445,7 @@ packages:
       string-width: 4.2.3
       y18n: 5.0.8
       yargs-parser: 20.2.9
+    dev: false
 
   /yargs@17.6.2:
     resolution: {integrity: sha512-1/9UrdHjDZc0eOU0HxOHoS78C69UD3JRMvzlJ7S79S2nTaWRA/whGCTV8o9e/N/1Va9YIV7Q4sOxD8VV4pCWOw==}

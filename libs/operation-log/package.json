@@ -17,7 +17,7 @@
   "repository": "https://github.com/PKUHPC/SCOW",
   "dependencies": {
     "@ddadaal/tsgrpc-client": "0.17.6",
-    "@grpc/grpc-js": "1.8.21",
+    "@grpc/grpc-js": "1.9.5",
     "@scow/protos": "workspace:*"
   },
   "devDependencies": {
