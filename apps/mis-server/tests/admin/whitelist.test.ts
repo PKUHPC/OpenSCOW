@@ -63,7 +63,7 @@ it("unblocks account when added to whitelist", async () => {
 
   await reloadEntity(em, a);
 
-  expect(a.blocked).toBeFalse();
+  expect(a.blocked).toBeFalsy();
 });
 
 it("blocks account when it is dewhitelisted and balance is < 0", async () => {
@@ -88,12 +88,12 @@ it("blocks account when it is dewhitelisted and balance is < 0", async () => {
     accountName: a.accountName,
   });
 
-  expect(resp.executed).toBeTrue();
+  expect(resp.executed).toBeTruthy();
 
   await em.refresh(a);
   await reloadEntity(em, a);
 
-  expect(a.blocked).toBeTrue();
+  expect(a.blocked).toBeTruthy();
 });
 
 it("blocks account when it is dewhitelisted and balance is = 0", async () => {
@@ -118,12 +118,12 @@ it("blocks account when it is dewhitelisted and balance is = 0", async () => {
     accountName: a.accountName,
   });
 
-  expect(resp.executed).toBeTrue();
+  expect(resp.executed).toBeTruthy();
 
   await em.refresh(a);
   await reloadEntity(em, a);
 
-  expect(a.blocked).toBeTrue();
+  expect(a.blocked).toBeTruthy();
 });
 
 it("charges user but don't block account if account is whitelist", async () => {
@@ -150,7 +150,7 @@ it("charges user but don't block account if account is whitelist", async () => {
   expect(currentBalance.toNumber()).toBe(-1);
   expect(previousBalance.toNumber()).toBe(1);
 
-  expect(a.blocked).toBeFalse();
+  expect(a.blocked).toBeFalsy();
 
 });
 

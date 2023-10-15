@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Entity, IdentifiedReference, OneToOne, PrimaryKey, Property } from "@mikro-orm/core";
+import { Entity, OneToOne, PrimaryKey, Property, Ref } from "@mikro-orm/core";
 import { Account } from "src/entities/Account";
 import { EntityOrRef, toRef } from "src/utils/orm";
 
@@ -20,7 +20,7 @@ export class AccountWhitelist {
     id!: number;
 
   @OneToOne(() => Account, (a) => a.whitelist, { wrappedReference: true, nullable: false, unique: true })
-    account: IdentifiedReference<Account>;
+    account: Ref<Account>;
 
   @Property()
     time: Date;

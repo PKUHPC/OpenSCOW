@@ -10,9 +10,9 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Collection, Entity,
-  IdentifiedReference, ManyToOne, OneToMany, OneToOne, PrimaryKey, Property,
-} from "@mikro-orm/core";
+import { BooleanType, Collection, Entity,
+  ManyToOne, OneToMany, OneToOne, PrimaryKey, Property,
+  Ref } from "@mikro-orm/core";
 import { Decimal } from "@scow/lib-decimal";
 import { AccountWhitelist } from "src/entities/AccountWhitelist";
 import { Tenant } from "src/entities/Tenant";
@@ -29,7 +29,7 @@ export class Account {
     accountName: string;
 
   @ManyToOne(() => Tenant, { wrappedReference: true })
-    tenant: IdentifiedReference<Tenant>;
+    tenant: Ref<Tenant>;
 
   @Property()
     blocked: boolean;
@@ -40,7 +40,7 @@ export class Account {
   @OneToOne(() => AccountWhitelist, (u) => u.account, {
     nullable: true, wrappedReference: true, unique: true, owner: true,
   })
-    whitelist?: IdentifiedReference<AccountWhitelist>;
+    whitelist?: Ref<AccountWhitelist>;
 
   @Property({ default: "" })
     comment: string;
