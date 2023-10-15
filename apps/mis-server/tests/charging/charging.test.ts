@@ -130,7 +130,7 @@ it("pays account with negative amount to block account", async () => {
   expect(moneyToNumber(reply.currentBalance!)).toBe(0);
 
   await reloadEntity(em, account);
-  expect(account.blocked).toBe(true);
+  expect(account.blocked).toBeTruthy();
 });
 
 it("concurrently pays", async () => {
