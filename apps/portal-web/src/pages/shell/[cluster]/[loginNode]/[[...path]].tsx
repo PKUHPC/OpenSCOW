@@ -20,10 +20,10 @@ import Router, { useRouter } from "next/router";
 import { useRef } from "react";
 import { requireAuth } from "src/auth/requireAuth";
 import { NotFoundPage } from "src/components/errorPages/NotFoundPage";
-import { Localized, useI18n, useI18nTranslate, useI18nTranslateToString } from "src/i18n";
+import { Localized, useI18n, useI18nTranslateToString } from "src/i18n";
 import { publicConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
-import styled from "styled-components";
+import { styled } from "styled-components";
 
 const { Text } = Typography;
 

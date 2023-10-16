@@ -21,7 +21,7 @@ import { Head } from "src/utils/head";
 const p = prefix("page.tenant.finance.accountPayments.");
 
 export const PaymentsPage: NextPage = requireAuth((i) =>
-  i.tenantRoles.includes(TenantRole.TENANT_FINANCE),
+  i.tenantRoles.includes(TenantRole.TENANT_FINANCE) || i.tenantRoles.includes(TenantRole.TENANT_ADMIN),
 )(() => {
 
   const t = useI18nTranslateToString();

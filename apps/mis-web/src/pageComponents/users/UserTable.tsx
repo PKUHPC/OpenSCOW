@@ -64,7 +64,7 @@ export const UserTable: React.FC<Props> = ({
       pagination={{ showSizeChanger: true }}
     >
       <Table.Column<AccountUserInfo> dataIndex="userId" title={t(pCommon("userId"))} />
-      <Table.Column<AccountUserInfo> dataIndex="name" title={t(pCommon("userName"))} />
+      <Table.Column<AccountUserInfo> dataIndex="name" title={t(pCommon("name"))} />
       <Table.Column<AccountUserInfo>
         dataIndex="role"
         title={t(p("role"))}

@@ -95,7 +95,7 @@ export const CreateUserModal: React.FC<Props> = ({
         >
           <Input disabled placeholder={userIdRule?.message} />
         </Form.Item>
-        <Form.Item label={t(pCommon("userName"))} name="name" rules={[{ required: true }]}>
+        <Form.Item label={t(pCommon("userFullName"))} name="name" rules={[{ required: true }]}>
           <Input />
         </Form.Item>
         <Form.Item

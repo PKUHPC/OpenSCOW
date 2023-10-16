@@ -10,25 +10,31 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/i18n";
-import { App, Button, Col, Form, Input, InputNumber, Row, Select, Spin } from "antd";
+import { getI18nConfigCurrentText, I18nStringType } from "@scow/lib-web/build/utils/i18n";
+import { App, Button, Col, Divider, Form, Input, InputNumber, Row, Select, Spin, Typography } from "antd";
 import { Rule } from "antd/es/form";
 import dayjs from "dayjs";
 import Router from "next/router";
 import { useCallback, useMemo, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
+import { PageTitle } from "src/components/PageTitle";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { AccountSelector } from "src/pageComponents/job/AccountSelector";
 import { AppCustomAttribute } from "src/pages/api/app/getAppMetadata";
 import { Partition } from "src/pages/api/cluster";
 import { formatSize } from "src/utils/format";
+import { styled } from "styled-components";
+
+const Text = styled(Typography.Paragraph)`
+`;
 
 interface Props {
   appId: string;
   clusterId: string;
   appName: string;
   attributes: AppCustomAttribute[];
+  appComment?: I18nStringType;
 }
 
 interface FormFields {
@@ -61,12 +67,14 @@ const inputNumberFloorConfig = {
 
 const p = prefix("pageComp.app.launchAppForm.");
 
-export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, appName }) => {
+export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, appName, appComment }) => {
 
   const { message, modal } = App.useApp();
 
   const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
+
+  const appCommentI18nText = appComment ? getI18nConfigCurrentText(appComment, languageId) : undefined;
 
   const [form] = Form.useForm<FormFields>();
   const [loading, setLoading] = useState(false);
@@ -307,147 +315,163 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
     : nodeCount * coreCount;
 
   return (
-    <Form
-      form={form}
-      onFinish={onSubmit}
-      initialValues={{
-        ... initialValues,
-      }}
-    >
-      <Spin spinning={loading} tip={isSubmitting ? "" : t(p("loading"))}>
-        <Form.Item name="appJobName" label={t(p("appJobName"))} rules={[{ required: true }]}>
-          <Input />
-        </Form.Item>
-        <Form.Item
-          label={t(p("account"))}
-          name="account"
-          rules={[{ required: true }]}
-        >
-          <AccountSelector cluster={clusterId} />
-        </Form.Item>
+    <>
+      <Form
+        form={form}
+        onFinish={onSubmit}
+        initialValues={{
+          ... initialValues,
+        }}
+      >
+        <Spin spinning={loading} tip={isSubmitting ? "" : t(p("loading"))}>
+          <Form.Item name="appJobName" label={t(p("appJobName"))} rules={[{ required: true }]}>
+            <Input />
+          </Form.Item>
+          <Form.Item
+            label={t(p("account"))}
+            name="account"
+            rules={[{ required: true }]}
+          >
+            <AccountSelector cluster={clusterId} />
+          </Form.Item>
 
-        <Form.Item
-          label={t(p("partition"))}
-          name="partition"
-          rules={[{ required: true }]}
-        >
-          <Select
-            disabled={!currentPartitionInfo}
-            options={clusterInfoQuery.data
-              ? clusterInfoQuery.data.clusterInfo.scheduler.partitions
-                .map((x) => ({ label: x.name, value: x.name }))
-              : []
-            }
-            onChange={handlePartitionChange}
-          />
-        </Form.Item>
+          <Form.Item
+            label={t(p("partition"))}
+            name="partition"
+            rules={[{ required: true }]}
+          >
+            <Select
+              disabled={!currentPartitionInfo}
+              options={clusterInfoQuery.data
+                ? clusterInfoQuery.data.clusterInfo.scheduler.partitions
+                  .map((x) => ({ label: x.name, value: x.name }))
+                : []
+              }
+              onChange={handlePartitionChange}
+            />
+          </Form.Item>
 
-        <Form.Item
-          label={t(p("qos"))}
-          name="qos"
-          rules={[{ required: true }]}
-        >
-          <Select
-            disabled={(!currentPartitionInfo?.qos) || currentPartitionInfo.qos.length === 0}
-            options={currentPartitionInfo?.qos?.map((x) => ({ label: x, value: x }))}
-          />
-        </Form.Item>
-        <Form.Item
-          label={t(p("nodeCount"))}
-          name="nodeCount"
-          dependencies={["partition"]}
-          rules={[
-            { required: true, type: "integer", max: currentPartitionInfo?.nodes },
-          ]}
-        >
-          <InputNumber
-            min={1}
-            max={currentPartitionInfo?.nodes}
-            {...inputNumberFloorConfig}
-          />
-        </Form.Item>
-        {
-          currentPartitionInfo?.gpus ? (
-            <Form.Item
-              label={t(p("gpuCount"))}
-              name="gpuCount"
-              dependencies={["partition"]}
-              rules={[
-                {
-                  required: true,
-                  type: "integer",
-                  max: currentPartitionInfo?.gpus / currentPartitionInfo.nodes,
-                },
-              ]}
-            >
-              <InputNumber
-                min={1}
-                max={currentPartitionInfo?.gpus / currentPartitionInfo.nodes}
-                {...inputNumberFloorConfig}
-              />
-            </Form.Item>
-          ) : (
-            <Form.Item
-              label={t(p("coreCount"))}
-              name="coreCount"
-              dependencies={["partition"]}
-              rules={[
-                { required: true,
-                  type: "integer",
-                  max: currentPartitionInfo ?
-                    currentPartitionInfo.cores / currentPartitionInfo.nodes : undefined },
-              ]}
-            >
-              <InputNumber
-                min={1}
-                max={currentPartitionInfo ?
-                  currentPartitionInfo.cores / currentPartitionInfo.nodes : undefined }
-                {...inputNumberFloorConfig}
-              />
-            </Form.Item>
-          )
-        }
-        <Form.Item label={t(p("maxTime"))} name="maxTime" rules={[{ required: true }]}>
-          <InputNumber min={1} step={1} addonAfter={t(p("minute"))} />
-        </Form.Item>
-
-        {customFormItems}
-        <Row>
+          <Form.Item
+            label={t(p("qos"))}
+            name="qos"
+            rules={[{ required: true }]}
+          >
+            <Select
+              disabled={(!currentPartitionInfo?.qos) || currentPartitionInfo.qos.length === 0}
+              options={currentPartitionInfo?.qos?.map((x) => ({ label: x, value: x }))}
+            />
+          </Form.Item>
+          <Form.Item
+            label={t(p("nodeCount"))}
+            name="nodeCount"
+            dependencies={["partition"]}
+            rules={[
+              { required: true, type: "integer", max: currentPartitionInfo?.nodes },
+            ]}
+          >
+            <InputNumber
+              min={1}
+              max={currentPartitionInfo?.nodes}
+              {...inputNumberFloorConfig}
+            />
+          </Form.Item>
           {
-            currentPartitionInfo?.gpus
-              ?
-              (
-                <Col span={12} sm={6}>
-                  <Form.Item label={t(p("totalGpuCount"))}>
-                    {nodeCount * gpuCount}
-                  </Form.Item>
-                </Col>
-              ) : null
+            currentPartitionInfo?.gpus ? (
+              <Form.Item
+                label={t(p("gpuCount"))}
+                name="gpuCount"
+                dependencies={["partition"]}
+                rules={[
+                  {
+                    required: true,
+                    type: "integer",
+                    max: currentPartitionInfo?.gpus / currentPartitionInfo.nodes,
+                  },
+                ]}
+              >
+                <InputNumber
+                  min={1}
+                  max={currentPartitionInfo?.gpus / currentPartitionInfo.nodes}
+                  {...inputNumberFloorConfig}
+                />
+              </Form.Item>
+            ) : (
+              <Form.Item
+                label={t(p("coreCount"))}
+                name="coreCount"
+                dependencies={["partition"]}
+                rules={[
+                  { required: true,
+                    type: "integer",
+                    max: currentPartitionInfo ?
+                      currentPartitionInfo.cores / currentPartitionInfo.nodes : undefined },
+                ]}
+              >
+                <InputNumber
+                  min={1}
+                  max={currentPartitionInfo ?
+                    currentPartitionInfo.cores / currentPartitionInfo.nodes : undefined }
+                  {...inputNumberFloorConfig}
+                />
+              </Form.Item>
+            )
           }
-          <Col span={12} sm={6}>
-            <Form.Item label={t(p("totalCpuCount"))}>
-              {coreCountSum}
-            </Form.Item>
-          </Col>
-          <Col span={12} sm={6}>
-            <Form.Item label={t(p("totalMemory"))}>
-              {memoryDisplay}
-            </Form.Item>
-          </Col>
-        </Row>
-      </Spin>
+          <Form.Item label={t(p("maxTime"))} name="maxTime" rules={[{ required: true }]}>
+            <InputNumber min={1} step={1} addonAfter={t(p("minute"))} />
+          </Form.Item>
 
-      <Form.Item>
-        <Button
-          onClick={() => Router.push(`/apps/${clusterId}/createApps`)}
-          style={{ marginRight: "10px" }}
-        >
-          {t("button.cancelButton")}
-        </Button>
-        <Button type="primary" htmlType="submit" loading={loading}>
-          {t("button.submitButton")}
-        </Button>
-      </Form.Item>
-    </Form>
+          {customFormItems}
+          <Row>
+            {
+              currentPartitionInfo?.gpus
+                ?
+                (
+                  <Col span={12} sm={6}>
+                    <Form.Item label={t(p("totalGpuCount"))}>
+                      {nodeCount * gpuCount}
+                    </Form.Item>
+                  </Col>
+                ) : null
+            }
+            <Col span={12} sm={6}>
+              <Form.Item label={t(p("totalCpuCount"))}>
+                {coreCountSum}
+              </Form.Item>
+            </Col>
+            <Col span={12} sm={6}>
+              <Form.Item label={t(p("totalMemory"))}>
+                {memoryDisplay}
+              </Form.Item>
+            </Col>
+          </Row>
+        </Spin>
+
+        <Form.Item>
+          <Button
+            onClick={() => Router.push(`/apps/${clusterId}/createApps`)}
+            style={{ marginRight: "10px" }}
+          >
+            {t("button.cancelButton")}
+          </Button>
+          <Button type="primary" htmlType="submit" loading={loading}>
+            {t("button.submitButton")}
+          </Button>
+        </Form.Item>
+      </Form>
+      {
+        appCommentI18nText && (
+          <div style={{ marginTop: "64px" }}>
+            <Divider />
+            <PageTitle titleText={t(p("appCommentTitle"))} />
+            <Text>
+              <div
+                dangerouslySetInnerHTML={{ __html: appCommentI18nText }}
+              />
+            </Text>
+          </div>
+        )
+      }
+    </>
+
   );
 };

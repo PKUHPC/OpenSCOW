@@ -93,6 +93,7 @@ export const GetAppMetadataSchema = typeboxRouteSchema({
     200: Type.Object({
       appName: Type.String(),
       appCustomFormAttributes: Type.Array(AppCustomAttribute),
+      appComment: Type.Optional(I18nStringSchemaType),
     }),
 
     // appId not exists
@@ -133,7 +134,9 @@ export default /* #__PURE__*/typeboxRoute(GetAppMetadataSchema, async (req, res)
       placeholder: getI18nTypeFormat(item.placeholder),
     }));
 
-    return { 200: { appName: reply.appName, appCustomFormAttributes: attributes } };
+    const comment = getI18nTypeFormat(reply.appComment);
+
+    return { 200: { appName: reply.appName, appCustomFormAttributes: attributes, appComment: comment } };
   }, handlegRPCError({
     [status.NOT_FOUND]: () => ({ 404: { code: "APP_NOT_FOUND" } } as const),
   }));

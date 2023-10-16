@@ -18,7 +18,7 @@ import { useEffect, useState } from "react";
 import { useStore } from "simstate";
 import { languageInfo, useI18n } from "src/i18n";
 import { LoginNodeStore } from "src/stores/LoginNodeStore";
-import styled from "styled-components";
+import { styled } from "styled-components";
 
 
 const Container = styled.div`

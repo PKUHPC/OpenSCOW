@@ -11,7 +11,7 @@
  */
 
 import { Tabs } from "antd";
-import styled from "styled-components";
+import { styled } from "styled-components";
 
 export const FilterFormContainer = styled.div`
   padding: 8px 16px 16px 16px;

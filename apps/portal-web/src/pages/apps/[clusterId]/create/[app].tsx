@@ -54,6 +54,7 @@ export const AppIndexPage: NextPage = requireAuth(() => true)(() => {
         attributes={data.appCustomFormAttributes}
         appId={appId}
         clusterId={clusterId}
+        appComment={data.appComment}
       />
     </div>
   );

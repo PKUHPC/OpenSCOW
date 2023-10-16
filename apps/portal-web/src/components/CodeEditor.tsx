@@ -16,7 +16,7 @@ import { useDarkMode } from "@scow/lib-web/build/layouts/darkMode";
 import { githubDark, githubLight } from "@uiw/codemirror-theme-github";
 import CodeMirror from "@uiw/react-codemirror";
 import { useCallback } from "react";
-import styled from "styled-components";
+import { styled } from "styled-components";
 
 interface Props {
   value?: string;
