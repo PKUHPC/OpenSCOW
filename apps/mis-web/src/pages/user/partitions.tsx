@@ -12,7 +12,7 @@
 
 import { ClusterTextsConfigSchema } from "@scow/config/build/clusterTexts";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/i18n";
-import { App, Divider, Spin, Typography } from "antd";
+import { Collapse, Divider, Spin, Typography } from "antd";
 import { GetServerSideProps, NextPage } from "next";
 import { useCallback, useState } from "react";
 import { useAsync } from "react-async";
@@ -48,12 +48,12 @@ interface Props {
 
 const p = prefix("page.user.partitions.");
 
+const { Panel } = Collapse;
+
 export const PartitionsPage: NextPage<Props> = requireAuth(() => true)((props: Props) => {
 
   const userStore = useStore(UserStore);
   const user = userStore.user;
-
-  const { message } = App.useApp();
 
   const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
@@ -68,10 +68,6 @@ export const PartitionsPage: NextPage<Props> = requireAuth(() => true)((props: P
     useAsync({ promiseFn: useCallback(async () => {
       return api.getAvailableBillingTable({
         query: { cluster: cluster.id, tenant: user?.tenant, userId: user?.identityId } })
-        .httpError(409, (e) => {
-          message.error(e.message);
-          setCompletedRequestCount((prevCount) => prevCount + 1);
-        })
         .then((data) => {
           setRenderData((prevData) => ({
             ...prevData,
@@ -92,11 +88,18 @@ export const PartitionsPage: NextPage<Props> = requireAuth(() => true)((props: P
           {clusters.map((cluster) => {
             const data = renderData[cluster.id];
             return (
-              data ? (
-                <div key={cluster.id}>
-                  <JobBillingTable data={data} />
-                  <Divider />
-                </div>
+              data && data.length > 0 ? (
+                <Collapse defaultActiveKey={[cluster.id]}>
+                  <Panel
+                    header={getI18nConfigCurrentText(cluster.name, languageId)}
+                    collapsible="header"
+                    key={cluster.id}
+                  >
+                    <div key={cluster.id}>
+                      <JobBillingTable data={data} isUserPartitionsPage={true} />
+                    </div>
+                  </Panel>
+                </Collapse>
               ) : null
             );
           })}

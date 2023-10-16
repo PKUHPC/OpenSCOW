@@ -12,11 +12,9 @@
 
 import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
-import { ServiceError } from "@grpc/grpc-js";
 import { ConfigServiceClient as MisConfigServerClient } from "@scow/protos/build/server/config";
 import { JobBillingItem } from "@scow/protos/build/server/job";
 import { UserStatus } from "@scow/protos/build/server/user";
-import { parseErrorDetails } from "@scow/rich-error-model";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { getBillingItems } from "src/pages/api/job/getBillingItems";
@@ -85,11 +83,6 @@ export const GetAvailableBillingTableSchema = typeboxRouteSchema({
       items: Type.Array(JobBillingTableItem),
     }),
 
-    /** 用户或账户存在问题 */
-    409: Type.Object({
-      code: Type.Literal("ACCOUNT_OR_USER_ERROR"),
-      message: Type.Optional(Type.String()),
-    }),
   },
 });
 
@@ -108,15 +101,18 @@ export async function getAvailablePartitionForItems(
 
   const partitions: Partition[] = [];
 
-  await Promise.all(accountNames
+  await Promise.allSettled(accountNames
     .map(async (accountName) => {
-
-      const resp = await asyncClientCall(client, "getAvailablePartitions",
-        { cluster, accountName, userId }).then((resp) => {
-        return resp;
-      });
-      partitions.push(...resp.partitions);
-    }));
+      return await asyncClientCall(client, "getAvailablePartitions",
+        { cluster, accountName, userId });
+    }),
+  ).then((results) => {
+    results.forEach((result) => {
+      if (result.status === "fulfilled") {
+        partitions.push(...result.value.partitions);
+      }
+    });
+  });
 
   const result = removeDuplicatesByPName(partitions);
 
@@ -200,30 +196,6 @@ export default /* #__PURE__*/typeboxRoute(GetAvailableBillingTableSchema, async 
   return await getAvailableBillingTableItems(cluster, tenant, userId)
     .then((items) => {
       return { 200: { items } };
-    })
-    .catch((e) => {
-      const ex = e as ServiceError;
-      const errors = parseErrorDetails(ex.metadata);
-      if (errors[0] && errors[0].$type === "google.rpc.ErrorInfo") {
-        switch (errors[0].reason) {
-        case "ACCOUNT_NOT_FOUND":
-          return { 409: {
-            code: "ACCOUNT_OR_USER_ERROR" as const,
-            message: `Error occurred in ${cluster}. ${ex.details}` } };
-        case "USER_NOT_FOUND":
-          return { 409: {
-            code: "ACCOUNT_OR_USER_ERROR" as const,
-            message: `Error occurred in ${cluster}. ${ex.details}` } };
-        case "USER_ACCOUNT_NOT_FOUND":
-          return { 409: {
-            code: "ACCOUNT_OR_USER_ERROR" as const,
-            message: `Error occurred in ${cluster}. ${ex.details}` } };
-        default:
-          return e;
-        }
-      } else {
-        throw e;
-      }
     });
 
 });
