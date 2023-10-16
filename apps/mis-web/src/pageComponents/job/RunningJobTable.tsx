@@ -170,7 +170,7 @@ export const RunningJobQueryTable: React.FC<Props> = ({
                     <Form.Item label={t(pCommon("cluster"))} name="cluster">
                       <SingleClusterSelector />
                     </Form.Item>
-                    <Form.Item label={t(pCommon("clusterWorkId"))} name="jobId">
+                    <Form.Item label={t(pCommon("workId"))} name="jobId">
                       <InputNumber style={{ minWidth: "160px" }} min={1} />
                     </Form.Item>
                   </>

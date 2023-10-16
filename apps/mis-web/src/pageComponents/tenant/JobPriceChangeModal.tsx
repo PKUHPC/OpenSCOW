@@ -33,10 +33,7 @@ interface FormProps {
 const p = prefix("pageComp.tenant.jobPriceChangeModal.");
 const pCommon = prefix("common.");
 
-const text = {
-  "account": "tenantPrice",
-  "tenant": "platformPrice",
-};
+
 
 export const JobPriceChangeModal: React.FC<Props> = ({ open, onClose, jobCount, filter, target, reload }) => {
 
@@ -47,11 +44,16 @@ export const JobPriceChangeModal: React.FC<Props> = ({ open, onClose, jobCount, 
 
   const { message } = App.useApp();
 
+  const text = {
+    "account": t(p("tenantPrice")),
+    "tenant": t(p("platformPrice")),
+  };
+
   return (
     <Modal
       open={open}
       title={`${t(p("changeJob"))}${text[target]}`}
-      okText={`${t(pCommon("modify"))}${text[target]}`}
+      okText={`${t(p("modifyButton"))}${text[target]}`}
       cancelText={t(pCommon("cancel"))}
       onCancel={onClose}
       confirmLoading={loading}

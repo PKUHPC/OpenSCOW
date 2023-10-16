@@ -298,7 +298,7 @@ export const JobInfoTable: React.FC<JobInfoTableProps> = ({
         }
         <Table.Column<JobInfo>
           dataIndex="cluster"
-          title={t(pCommon("cluster"))}
+          title={t(pCommon("clusterName"))}
           render={(cluster) => getClusterName(cluster, languageId)}
         />
         <Table.Column<JobInfo> dataIndex="partition" title={t(pCommon("partition"))} />

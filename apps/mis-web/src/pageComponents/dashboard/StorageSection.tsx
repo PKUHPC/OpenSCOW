@@ -14,7 +14,7 @@ import React from "react";
 import { Section } from "src/components/Section";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 import { StorageCard } from "src/pageComponents/dashboard/StorageCard";
-import styled from "styled-components";
+import { styled } from "styled-components";
 
 interface Props {
   storageQuotas: Record<string, number>;

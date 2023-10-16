@@ -12,7 +12,7 @@
 
 import { RefreshLink } from "@scow/lib-web/build/utils/refreshToken";
 import { useI18n } from "src/i18n";
-import styled from "styled-components";
+import { styled } from "styled-components";
 
 type Props = React.PropsWithChildren<{
   isLoading: boolean;

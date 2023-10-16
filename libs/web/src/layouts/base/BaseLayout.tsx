@@ -21,7 +21,7 @@ import { Header } from "src/layouts/base/header";
 import { match } from "src/layouts/base/matchers";
 import { SideNav } from "src/layouts/base/SideNav";
 import { NavItemProps, UserInfo, UserLink } from "src/layouts/base/types";
-import styled from "styled-components";
+import { styled } from "styled-components";
 // import logo from "src/assets/logo-no-text.svg";
 const { useBreakpoint } = Grid;
 

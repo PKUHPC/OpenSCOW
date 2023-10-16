@@ -126,7 +126,7 @@ export const AccountWhitelistTable: React.FC<Props> = ({
         >
           <Table.Column<WhitelistedAccount>
             dataIndex="accountName"
-            title={t(pCommon("account"))}
+            title={t(pCommon("accountName"))}
             sorter={(a, b) => a.accountName.localeCompare(b.accountName)}
             sortDirections={["ascend", "descend"]}
             sortOrder={currentSortInfo.field === "accountName" ? currentSortInfo.order : null}

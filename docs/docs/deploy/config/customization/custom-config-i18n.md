@@ -64,3 +64,4 @@ homeTitle:
 | `{app}.yaml`         | `attributes:` **placeholder**                              |
 | `{app}.yaml`         | `attributes: select:`  **label**                           |
 | `{app}.yaml`         | `attributes: select:`  **placeholder**                     |
+| `{app}.yaml`         | **appComment**                     |

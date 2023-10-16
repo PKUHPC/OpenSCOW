@@ -311,7 +311,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
             </Form.Item>
           ) : (
             <Form.Item
-              label={t(p("gpuCount"))}
+              label={t(p("coreCount"))}
               name="coreCount"
               dependencies={["cluster", "partition"]}
               rules={[

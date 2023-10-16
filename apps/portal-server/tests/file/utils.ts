@@ -122,7 +122,7 @@ export async function createVscodeLastSubmitFile(sftp: SFTPWrapper, filePath: st
     nodeCount: 1,
     coreCount: 2,
     maxTime: 10,
-    submitTime: "2021-12-22T16:16:02",
+    submitTime: "2021-12-22T16:16:02.000Z",
     customAttributes: { selectVersion: "code-server/4.9.0", sbatchOptions: "--time 10" },
   };
 

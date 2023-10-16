@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { ArrayType, Entity, IdentifiedReference, ManyToOne, PrimaryKey, Property } from "@mikro-orm/core";
+import { ArrayType, Entity, ManyToOne, PrimaryKey, Property, Ref } from "@mikro-orm/core";
 import { Decimal } from "@scow/lib-decimal";
 import { Tenant } from "src/entities/Tenant";
 import { DecimalType } from "src/utils/decimal";
@@ -38,7 +38,7 @@ export class JobPriceItem {
     description: string;
 
   @ManyToOne(() => Tenant, { wrappedReference: true, nullable: true })
-    tenant?: IdentifiedReference<Tenant>;
+    tenant?: Ref<Tenant>;
 
   @Property({ type: DecimalType })
     price: Decimal;

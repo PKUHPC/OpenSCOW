@@ -70,7 +70,7 @@ const NewUserModal: React.FC<ModalProps> = ({
         >
           <Input placeholder={userIdRule?.message} />
         </Form.Item>
-        <Form.Item name="name" required label={t(pCommon("userName"))}>
+        <Form.Item name="name" required label={t(pCommon("userFullName"))}>
           <Input />
         </Form.Item>
       </Form>
