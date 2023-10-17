@@ -61,7 +61,7 @@ export async function renderBindOtpHtml(
     backgroundColor: uiConfig.primaryColor?.defaultColor ?? DEFAULT_PRIMARY_COLOR,
     err,
     callbackUrl,
-    footerText: (hostname && uiConfig?.footer?.hostnameTextMap?.[hostname]) ?? uiConfig?.footer?.defaultText ?? "",
+    footerText: (hostname && uiConfig?.footer?.hostnameMap?.[hostname]) ?? uiConfig?.footer?.defaultText ?? "",
     ...otp,
     otpBasePath: join(config.BASE_PATH, config.AUTH_BASE_PATH, "/public/otp"),
   });

@@ -192,10 +192,11 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
     }
 
     const hostname = getHostname(appContext.ctx.req);
+    console.log("hostname:", hostname);
 
     extra.primaryColor = (hostname && runtimeConfig.UI_CONFIG?.primaryColor?.hostnameMap?.[hostname])
       ?? runtimeConfig.UI_CONFIG?.primaryColor?.defaultColor ?? runtimeConfig.DEFAULT_PRIMARY_COLOR;
-    extra.footerText = (hostname && runtimeConfig.UI_CONFIG?.footer?.hostnameTextMap?.[hostname])
+    extra.footerText = (hostname && runtimeConfig.UI_CONFIG?.footer?.hostnameMap?.[hostname])
       ?? runtimeConfig.UI_CONFIG?.footer?.defaultText ?? "";
 
     extra.loginNodes = Object.keys(runtimeConfig.CLUSTERS_CONFIG).reduce((acc, cluster) => {

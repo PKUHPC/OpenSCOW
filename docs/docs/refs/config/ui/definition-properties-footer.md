@@ -7,7 +7,7 @@
 | Property                            | Type     | Required | Nullable       | Defined by                                                                                                                              |
 | :---------------------------------- | :------- | :------- | :------------- | :-------------------------------------------------------------------------------------------------------------------------------------- |
 | [defaultText](#defaulttext)         | `string` | Optional | cannot be null | [Untitled schema](definition-properties-footer-properties-defaulttext.md "undefined#/properties/footer/properties/defaultText")         |
-| [hostnameTextMap](#hostnametextmap) | `object` | Optional | cannot be null | [Untitled schema](definition-properties-footer-properties-hostnametextmap.md "undefined#/properties/footer/properties/hostnameTextMap") |
+| [hostnameMap](#hostnamemap) | `object` | Optional | cannot be null | [Untitled schema](definition-properties-footer-properties-hostnamemap.md "undefined#/properties/footer/properties/hostnameMap") |
 
 ## defaultText
 
@@ -27,20 +27,20 @@
 
 `string`
 
-## hostnameTextMap
+## hostnameMap
 
 根据域名（hostname，不包括port）不同，显示在footer上的文本
 
-`hostnameTextMap`
+`hostnameMap`
 
 *   is optional
 
-*   Type: `object` ([Details](definition-properties-footer-properties-hostnametextmap.md))
+*   Type: `object` ([Details](definition-properties-footer-properties-hostnamemap.md))
 
 *   cannot be null
 
-*   defined in: [Untitled schema](definition-properties-footer-properties-hostnametextmap.md "undefined#/properties/footer/properties/hostnameTextMap")
+*   defined in: [Untitled schema](definition-properties-footer-properties-hostnamemap.md "undefined#/properties/footer/properties/hostnameMap")
 
-### hostnameTextMap Type
+### hostnameMap Type
 
-`object` ([Details](definition-properties-footer-properties-hostnametextmap.md))
+`object` ([Details](definition-properties-footer-properties-hostnamemap.md))
