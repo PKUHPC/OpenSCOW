@@ -59,47 +59,35 @@ export default route(SubmitFileAsJobSchema, async (req, res) => {
 
   const client = getClient(JobServiceClient);
 
-  // TODO: log确认
-  // const logInfo = {
-  //   operatorUserId: info.identityId,
-  //   operatorIp: parseIp(req) ?? "",
-  //   operationTypePayload:{
-  //     accountName: account,
-  //   },
-  // };
+  const logInfo = {
+    operatorUserId: info.identityId,
+    operatorIp: parseIp(req) ?? "",
+    operationTypePayload:{
+      clusterId: cluster, path: fileDirectory,
+    },
+  };
 
   return await asyncUnaryCall(client, "submitFileAsJob", {
     cluster, userId: info.identityId, fileDirectory
     ,
   })
     .then(async ({ jobId }) => {
-      // TODO: log确认
-      // await callLog(
-      //   { ...logInfo,
-      //     operationTypeName: OperationType.submitJob,
-      //     operationTypePayload: { ... logInfo.operationTypePayload, jobId } },
-      //   OperationResult.SUCCESS,
-      // );
-      // if (save) {
-      //   await callLog(
-      //     {
-      //       ...logInfo,
-      //       operationTypeName: OperationType.addJobTemplate,
-      //       operationTypePayload: { ... logInfo.operationTypePayload, jobTemplateId: `${jobName}-${jobId}` },
-      //     },
-      //     OperationResult.SUCCESS,
-      //   );
-      // }
+      await callLog(
+        { ...logInfo,
+          operationTypeName: OperationType.submitFileItemAsJob,
+          operationTypePayload: { ... logInfo.operationTypePayload } },
+        OperationResult.SUCCESS,
+      );
       return { 201: { jobId } } as const;
     })
     .catch(handlegRPCError({
-      [status.INTERNAL]: (err) => ({ 500: { code: "SCHEDULER_FAILED", message: err.details } } as const),
-    }));
-  // async () => await callLog(
-  //   { ...logInfo,
-  //     operationTypeName: OperationType.submitJob,
-  //     operationTypePayload: { ... logInfo.operationTypePayload, jobId: -1 },
-  //   },
-  //   OperationResult.FAIL,
-  // )));
+      [status.INTERNAL]: (err) => ({ 500: { code: "SCHEDULER_FAILED" as const, message: err.details } }),
+    },
+    async () => await callLog(
+      { ...logInfo,
+        operationTypeName: OperationType.submitFileItemAsJob,
+        operationTypePayload: { ... logInfo.operationTypePayload },
+      },
+      OperationResult.FAIL,
+    )));
 });

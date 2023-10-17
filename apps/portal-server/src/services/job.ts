@@ -224,14 +224,6 @@ export const jobServiceServer = plugin((server) => {
       const client = getAdapterClient(cluster);
       if (!client) { throw clusterNotFound(cluster); }
 
-      // make sure working directory exists
-      const host = getClusterLoginNode(cluster);
-      if (!host) { throw clusterNotFound(cluster); }
-      // await sshConnect(host, userId, logger, async (ssh) => {
-      //   const sftp = await ssh.requestSFTP();
-      //   await createDirectoriesRecursively(sftp, workingDirectory);
-      // });
-
       const reply = await asyncClientCall(client.job, "submitFileAsJob", {
         userId, fileDirectory,
       }).catch((e) => {

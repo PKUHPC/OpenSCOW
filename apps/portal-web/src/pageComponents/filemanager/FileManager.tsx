@@ -512,7 +512,6 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
                   const fullPath = join(path, i.name);
                   modal.confirm({
                     title: t(p("tableInfo.submitConfirmTitle")),
-                    // icon: < />,
                     content: t(p("tableInfo.submitConfirmContent"),
                       [i.name, getI18nConfigCurrentText(cluster.name, languageId)]),
                     okText: t(p("tableInfo.submitConfirmOk")),
@@ -523,6 +522,9 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
                           fileDirectory: fullPath,
                         },
                       })
+                        .httpError(500, (e) => {
+                          e.code === "SCHEDULER_FAILED" ? message.error(e.message) : (() => { throw e; })();
+                        })
                         .then(() => {
                           message.success(t(p("tableInfo.submitSuccessMessage")));
                           resetSelectedAndOperation();
