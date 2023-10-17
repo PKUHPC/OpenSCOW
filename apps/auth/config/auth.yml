@@ -84,47 +84,110 @@ ssh:
 
 # auth 界面 ui 配置
 ui:
-  # 登录界面背景图
-  backgroundImage:
+  default:
+    # 登录界面背景图
+    backgroundImagePath: "./assets/background.png"
 
-    defaultPath: "./assets/background.png"
+    # 登录界面背景色，当背景图无法加载时，背景色起效
+    backgroundFallbackColor: "#8c8c8c"
 
-    # 对具体hostname生效的生效，可以不填
-    # hostnameMap:
-    #   a.com: "./assets/background1.png"
+    # 登录界面 logo 图,
+    logo:
+      # 如果没有配置自定义 logo, 则使用 type 选择 SCOW Logo
+      # light: 亮色模式下的 logo, dark: 黑暗模式下的 logo
+      scowLogoType: "dark"
+      # 自定义 logo, 默认为空
+      customLogoPath: ""
+      # 自定义点击 logo 跳转地址
+      customLogoLink: "https://icode.pku.edu.cn/SCOW/"
 
-  # 登录界面背景色，当背景图无法加载时，背景色起效
-  backgroundFallbackColor:
+    # 登录界面 slogan 配置
+    slogan:
+      # 登录界面 slogan 文字颜色
+      color: "white"
+      # 登录界面 slogan title
+      title: "开源算力中心门户和管理平台"
+      # title:
+      #   i18n:
+      #     default: "开源算力中心门户和管理平台"
+      #     zh_cn: "开源算力中心门户和管理平台"
+      # 多条 slogan 文本
+      texts:
+        - "图形化界面，使用方便"
+        - "功能丰富，管理简单"
+        - "一体化部署，开箱即用"
+        - "标准化平台，支持算力融合"
+        - "开源中立，独立自主"
+      #   texts:
+      #     - i18n:
+      #         default: "图形化界面，使用方便"
+      #         en: "Graphical user interface, user-friendly"
+      #         zh_cn: "图形化界面，使用方便"
+      #     - i18n:
+      #         default: "功能丰富，管理简单"
+      #         en: "Feature-rich, easy management"
+      #         zh_cn: "功能丰富，管理简单"
+      #     - i18n:
+      #         default: "一体化部署，开箱即用"
+      #         en: "Integrated deployment, ready to use out of the box"
+      #         zh_cn: "一体化部署，开箱即用"
+      #     - i18n:
+      #         default: "标准化平台，支持算力融合"
+      #         en: "Standardized platform, supporting compute integration"
+      #         zh_cn: "标准化平台，支持算力融合"
+      #     - i18n:
+      #         default: "开源中立，独立自主"
+      #         en: "Open-source neutrality, independent and autonomous"
+      #         zh_cn: "开源中立，独立自主"
+      #     - i18n:
+      #         default: "体验账号/密码如下，欢迎试用体验SCOW各项功能"
+      #         en: "Trial account details are as follows; you are welcome to try and experience the functionalities of SCOW."
+      #         zh_cn: "体验账号/密码如下，欢迎试用体验SCOW各项功能"
+      #     - i18n:
+      #         default: "管理员：demo_admin / demo_admin"
+      #         en: "Administrator: demo_admin / demo_admin"
+      #         zh_cn: "管理员：demo_admin / demo_admin"
+      #     - i18n:
+      #         default: "普通用户：demo_user / demo_user"
+      #         en: "Regular User: demo_user / demo_user"
+      #         zh_cn: "普通用户：demo_user / demo_user"
 
-    defaultColor: "#8c8c8c"
+    # 登陆界面底部 Power By 字体颜色配置
+    footerTextColor: "white"
 
-    # 对具体hostname生效的生效，可以不填
-    # hostnameMap:
-    #   a.com: "#fff"
-    
-  # 登录界面 logo 图,
-  logo:
-    # 如果没有配置自定义 logo, 则使用 type 选择 SCOW Logo
-    # light: 亮色模式下的 logo, dark: 黑暗模式下的 logo
-    scowLogoType: "dark"
-    # 自定义 logo, 默认为空
-    customLogoPath: ""
-    # 自定义点击 logo 跳转地址
-    customLogoLink: "https://icode.pku.edu.cn/SCOW/"
+  # 根据不域名进行不同的展示，对具体hostname生效的生效，可以不填
+  # hostnameMap:
 
-  # 登录界面 slogan 配置
-  slogan:
-    # 登录界面 slogan 文字颜色
-    color: "white"
-    # 登录界面 slogan title
-    title: "开源算力中心门户和管理平台"
-    # 多条 slogan 文本
-    texts:
-      - "图形化界面，使用方便"
-      - "功能丰富，管理简单"
-      - "一体化部署，开箱即用"
-      - "标准化平台，支持算力融合"
-      - "开源中立，独立自主"
+  #   a.com:
+  #     # 登录界面背景图
+  #     backgroundImagePath: "./assets/background1.png"
 
-  # 登陆界面底部 Power By 字体颜色配置
-  footerTextColor: "white"
+  #     # 登录界面背景色，当背景图无法加载时，背景色起效
+  #     backgroundFallbackColor: "#000"
+
+  #     # 登录界面 logo 图,
+  #     logo:
+  #       # 如果没有配置自定义 logo, 则使用 type 选择 SCOW Logo
+  #       # light: 亮色模式下的 logo, dark: 黑暗模式下的 logo
+  #       scowLogoType: "light"
+  #       # 自定义 logo, 默认为空
+  #       customLogoPath: ""
+  #       # 自定义点击 logo 跳转地址
+  #       customLogoLink: "https://icode.pku.edu.cn/SCOW/"
+
+  #     # 登录界面 slogan 配置
+  #     slogan:
+  #       # 登录界面 slogan 文字颜色
+  #       color: "black"
+  #       # 登录界面 slogan title
+  #       title: "开源算力中心门户和管理平台"
+  #       # 多条 slogan 文本
+  #       texts:
+  #         - "图形化界面，使用方便."
+  #         - "功能丰富，管理简单."
+  #         - "一体化部署，开箱即用."
+  #         - "标准化平台，支持算力融合."
+  #         - "开源中立，独立自主."
+
+  #     # 登陆界面底部 Power By 字体颜色配置
+  #     footerTextColor: "black"
