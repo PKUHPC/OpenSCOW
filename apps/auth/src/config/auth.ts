@@ -171,8 +171,16 @@ export const OtpLdapSchema = Type.Object({
 }, { description: "将otp密钥存在ldap需要配置信息" });
 
 export const UiConfigSchema = Type.Object({
-  backgroundImagePath: Type.String({ description: "默认背景图片", default: "./assets/background.png" }),
-  backgroundFallbackColor: Type.String({ description: "默认背景颜色", default: "#8c8c8c" }),
+  backgroundImage: Type.Object({
+    defaultPath: Type.String({ description: "默认背景图片", default: "./assets/background.png" }),
+    hostnameMap: Type.Optional(Type.Record(Type.String(), Type.String(),
+      { description: "根据不同域名（hostname,不包括port），显示的背景图片" })),
+  }),
+  backgroundFallbackColor: Type.Object({
+    defaultColor: Type.String({ description: "默认背景颜色", default: "#8c8c8c" }),
+    hostnameMap: Type.Optional(Type.Record(Type.String(), Type.String(),
+      { description: "根据不同域名（hostname,不包括port），显示的背景颜色" })),
+  }),
   logo: Type.Object({
     scowLogoType: Type.Enum(ScowLogoType, { description: "scow logo 类型", default: ScowLogoType.dark }),
     customLogoPath: Type.Optional(Type.String({ description: "用户自定义 logo 图片" })),

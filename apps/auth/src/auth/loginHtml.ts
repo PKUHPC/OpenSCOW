@@ -19,6 +19,7 @@ import { authConfig, OtpStatusOptions, ScowLogoType } from "src/config/auth";
 import { config, FAVICON_URL, LOGO_URL } from "src/config/env";
 import { uiConfig } from "src/config/ui";
 import { AuthTextsType, languages } from "src/i18n";
+import { parseHostname } from "src/utils/parseHostname";
 
 
 export async function serveLoginHtml(
@@ -26,6 +27,10 @@ export async function serveLoginHtml(
   verifyCaptchaFail?: boolean,
   verifyOtpFail?: boolean,
 ) {
+
+  const hostname = parseHostname(req);
+
+  console.log("123123", req.headers.referer);
 
   const enableCaptcha = authConfig.captcha.enabled;
   const enableTotp = authConfig.otp?.enabled;
@@ -55,8 +60,10 @@ export async function serveLoginHtml(
     eyeImagePath: join(config.BASE_PATH, config.AUTH_BASE_PATH, "/public/assets/icons/eye.png"),
     eyeCloseImagePath: join(config.BASE_PATH, config.AUTH_BASE_PATH, "/public/assets/icons/eye-close.png"),
     backgroundImagePath: join(config.BASE_PATH, config.PUBLIC_PATH,
-      authConfig.ui?.backgroundImagePath ?? "./assets/background.png"),
-    backgroundFallbackColor: authConfig.ui?.backgroundFallbackColor || "#8c8c8c",
+      (hostname && authConfig.ui?.backgroundImage.hostnameMap?.[hostname])
+      ?? authConfig.ui?.backgroundImage.defaultPath ?? "./assets/background.png"),
+    backgroundFallbackColor: (hostname && authConfig.ui?.backgroundFallbackColor.hostnameMap?.[hostname])
+      || authConfig.ui?.backgroundFallbackColor.defaultColor || "#8c8c8c",
     faviconUrl: join(config.BASE_PATH, FAVICON_URL),
     logoUrl: !!authConfig.ui?.logo.customLogoPath === false ?
       join(config.PORTAL_BASE_PATH, LOGO_URL + logoPreferDarkParam)

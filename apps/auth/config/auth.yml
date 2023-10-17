@@ -85,9 +85,23 @@ ssh:
 # auth 界面 ui 配置
 ui:
   # 登录界面背景图
-  backgroundImagePath: "./assets/background.png"
+  backgroundImage:
+
+    defaultPath: "./assets/background.png"
+
+    # 对具体hostname生效的生效，可以不填
+    # hostnameMap:
+    #   a.com: "./assets/background1.png"
+
   # 登录界面背景色，当背景图无法加载时，背景色起效
-  backgroundFallbackColor: "#8c8c8c"
+  backgroundFallbackColor:
+
+    defaultColor: "#8c8c8c"
+
+    # 对具体hostname生效的生效，可以不填
+    # hostnameMap:
+    #   a.com: "#fff"
+    
   # 登录界面 logo 图,
   logo:
     # 如果没有配置自定义 logo, 则使用 type 选择 SCOW Logo

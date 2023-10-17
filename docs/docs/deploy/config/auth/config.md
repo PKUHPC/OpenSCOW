@@ -16,10 +16,24 @@ title: 内置认证系统配置
 ui:
   # 登录界面背景图，设置为""(空字符串)则无背景图
   # 可选配置，默认加载 install.yml 同级的 /public/assets 目录下的 background.png 作为背景图
-  backgroundImagePath: "./assets/background.png"
+  backgroundImage:
+
+    defaultPath: "./assets/background.png"
+
+    # 对具体hostname生效的生效，可以不填
+    # hostnameMap:
+    #   a.com: "./assets/background1.png"
+
   # 登录界面背景色，当背景图无法加载时，背景色起效
   # 可选配置，默认为 #8c8c8c
-  backgroundFallbackColor: "#8c8c8c"
+  backgroundFallbackColor:
+
+    defaultColor: "#8c8c8c"
+
+    # 对具体hostname生效的生效，可以不填
+    # hostnameMap:
+    #   a.com: "#fff"
+    
   # 登录界面 logo，可选配置
   logo:
     # 未配置自定义 logo（customLogoPath） 时，默认使用 SCOW Logo
