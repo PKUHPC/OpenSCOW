@@ -129,7 +129,7 @@ export const JobBillingTable: React.FC<Props> = ({ data, loading, isUserPartitio
     <Table
       dataSource={data}
       columns={columns}
-      scroll={{ x: 800 }}
+      scroll={{ x: 800, y: 800 }}
       size="middle"
       bordered
       pagination={false}
