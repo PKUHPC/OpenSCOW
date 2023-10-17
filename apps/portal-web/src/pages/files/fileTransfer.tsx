@@ -96,7 +96,7 @@ export const FileTransferPage: NextPage = requireAuth(() => true)(() => {
   return (
     <>
       <PageTitle titleText={"跨集群文件传输"} />
-      <Row justify="space-around" align="middle">
+      <Row justify="space-around" align="top">
         <Col span={11}>
           <ClusterFileTable
             selectedCluster={ clusterLeft }
