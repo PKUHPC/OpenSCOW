@@ -13,45 +13,98 @@ title: 内置认证系统配置
 其中关于背景图片路径和自定义 logo 图片路径的设置可以参考[公共文件](https://pkuhpc.github.io/SCOW/docs/deploy/config/customization/public-files)进行配置。需要强调的是该路径是相对于公共文件的路径。
 ```yaml
 # auth 界面 ui 配置
+# 可根据不同域名进行不同的展示，当对应域名没有相应配置时采用 default 配置
 ui:
-  # 登录界面背景图，设置为""(空字符串)则无背景图
-  # 可选配置，默认加载 install.yml 同级的 /public/assets 目录下的 background.png 作为背景图
-  backgroundImagePath: "./assets/background.png"
-  # 登录界面背景色，当背景图无法加载时，背景色起效
-  # 可选配置，默认为 #8c8c8c
-  backgroundFallbackColor: "#8c8c8c"
-  # 登录界面 logo，可选配置
-  logo:
-    # 未配置自定义 logo（customLogoPath） 时，默认使用 SCOW Logo
-    # light: 亮色模式下的 logo, dark: 黑暗模式下的 logo
-    # 可选配置，默认为黑暗模式 logo
-    scowLogoType: "dark"
-    # 可选配置，自定义 logo 的图片路径。与背景图一致，路径时相对于公共文件的路径
-    customLogoPath: ""
-    # 可选配置，自定义点击 logo 跳转地址
-    customLogoLink: "https://icode.pku.edu.cn/SCOW/"
+  default:
+    # 登录界面背景图，设置为""(空字符串)则无背景图
+    # 可选配置，默认加载 install.yml 同级的 /public/assets 目录下的 background.png 作为背景图
+    backgroundImage:
 
-  # 登录界面 slogan 配置
-  # 可选配置，默认右侧无 slogan
-  slogan:
-    # 登录界面 slogan 文字颜色
+      defaultPath: "./assets/background.png"
+
+      # 对具体hostname生效的生效，可以不填
+      # hostnameMap:
+      #   a.com: "./assets/background1.png"
+
+    # 登录界面背景色，当背景图无法加载时，背景色起效
+    # 可选配置，默认为 #8c8c8c
+    backgroundFallbackColor:
+
+      defaultColor: "#8c8c8c"
+
+      # 对具体hostname生效的生效，可以不填
+      # hostnameMap:
+      #   a.com: "#fff"
+      
+    # 登录界面 logo，可选配置
+    logo:
+      # 未配置自定义 logo（customLogoPath） 时，默认使用 SCOW Logo
+      # light: 亮色模式下的 logo, dark: 黑暗模式下的 logo
+      # 可选配置，默认为黑暗模式 logo
+      scowLogoType: "dark"
+      # 可选配置，自定义 logo 的图片路径。与背景图一致，路径时相对于公共文件的路径
+      customLogoPath: ""
+      # 可选配置，自定义点击 logo 跳转地址
+      customLogoLink: "https://icode.pku.edu.cn/SCOW/"
+
+    # 登录界面 slogan 配置
+    # 可选配置，默认右侧无 slogan
+    slogan:
+      # 登录界面 slogan 文字颜色
+      # 可选配置，默认为白色字体
+      color: "white"
+      # 登录界面 slogan title
+      # 可选配置，默认无 slogan 标题
+      title: "开源算力中心门户和管理平台"
+      # 多条 slogan 文本
+      # 可选配置，默认 slogan 为空数组
+      texts:
+        - "图形化界面，使用方便"
+        - "功能丰富，管理简单"
+        - "一体化部署，开箱即用"
+        - "标准化平台，支持算力融合"
+        - "开源中立，独立自主"
+
+    # 登陆界面底部 Power By 字体颜色配置
     # 可选配置，默认为白色字体
-    color: "white"
-    # 登录界面 slogan title
-    # 可选配置，默认无 slogan 标题
-    title: "开源算力中心门户和管理平台"
-    # 多条 slogan 文本
-    # 可选配置，默认 slogan 为空数组
-    texts:
-      - "图形化界面，使用方便"
-      - "功能丰富，管理简单"
-      - "一体化部署，开箱即用"
-      - "标准化平台，支持算力融合"
-      - "开源中立，独立自主"
+    footerTextColor: "white"
 
-  # 登陆界面底部 Power By 字体颜色配置
-  # 可选配置，默认为白色字体
-  footerTextColor: "white"
+  # 根据不域名进行不同的展示，对具体hostname生效的生效，可以不填
+  # hostnameMap:
+
+  #   a.com:
+  #     # 登录界面背景图
+  #     backgroundImagePath: "./assets/background1.png"
+
+  #     # 登录界面背景色，当背景图无法加载时，背景色起效
+  #     backgroundFallbackColor: "#000"
+
+  #     # 登录界面 logo 图,
+  #     logo:
+  #       # 如果没有配置自定义 logo, 则使用 type 选择 SCOW Logo
+  #       # light: 亮色模式下的 logo, dark: 黑暗模式下的 logo
+  #       scowLogoType: "light"
+  #       # 自定义 logo, 默认为空
+  #       customLogoPath: ""
+  #       # 自定义点击 logo 跳转地址
+  #       customLogoLink: "https://icode.pku.edu.cn/SCOW/"
+
+  #     # 登录界面 slogan 配置
+  #     slogan:
+  #       # 登录界面 slogan 文字颜色
+  #       color: "black"
+  #       # 登录界面 slogan title
+  #       title: "开源算力中心门户和管理平台"
+  #       # 多条 slogan 文本
+  #       texts:
+  #         - "图形化界面，使用方便."
+  #         - "功能丰富，管理简单."
+  #         - "一体化部署，开箱即用."
+  #         - "标准化平台，支持算力融合."
+  #         - "开源中立，独立自主."
+
+  #     # 登陆界面底部 Power By 字体颜色配置
+  #     footerTextColor: "black"
 ```
 
 ## 允许回调主机名

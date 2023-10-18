@@ -19,7 +19,7 @@ import { authConfig, OtpStatusOptions, ScowLogoType } from "src/config/auth";
 import { config, FAVICON_URL, LOGO_URL } from "src/config/env";
 import { uiConfig } from "src/config/ui";
 import { AuthTextsType, languages } from "src/i18n";
-
+import { parseHostname } from "src/utils/parseHostname";
 
 export async function serveLoginHtml(
   err: boolean, callbackUrl: string, req: FastifyRequest, rep: FastifyReply,
@@ -27,9 +27,14 @@ export async function serveLoginHtml(
   verifyOtpFail?: boolean,
 ) {
 
+  const hostname = parseHostname(req);
+  const authUiHostnameConfig = (hostname && authConfig.ui?.hostnameMap?.[hostname]) || undefined;
+  const authUiDefaultConfig = authConfig.ui?.default;
+
   const enableCaptcha = authConfig.captcha.enabled;
   const enableTotp = authConfig.otp?.enabled;
-  const logoPreferDarkParam = authConfig.ui?.logo.scowLogoType === ScowLogoType.light ? "false" : "true";
+  const logoPreferDarkParam = (authUiHostnameConfig?.logo?.scowLogoType
+    || authUiDefaultConfig?.logo.scowLogoType) === ScowLogoType.light ? "false" : "true";
 
   // 显示绑定otp按钮：otp.enabled为true && (密钥存于ldap时 || (otp.type===remote && 配置了otp.remote.redirectUrl))
   const showBindOtpButton = authConfig.otp?.enabled && (authConfig.otp?.type === OtpStatusOptions.ldap
@@ -43,8 +48,9 @@ export async function serveLoginHtml(
   const authTexts: AuthTextsType = languages[languageId];
 
   // 获取sloganI18nText
-  const sloganTitle = getI18nConfigCurrentText(authConfig.ui?.slogan.title, languageId);
-  const sloganTextArr = authConfig.ui?.slogan.texts.map((text) => {
+  const sloganTitle = getI18nConfigCurrentText(
+    authUiHostnameConfig?.slogan?.title ?? authUiDefaultConfig?.slogan.title, languageId);
+  const sloganTextArr = (authUiHostnameConfig?.slogan?.texts ?? authUiDefaultConfig?.slogan.texts)?.map((text) => {
     return getI18nConfigCurrentText(text, languageId);
   });
 
@@ -55,18 +61,20 @@ export async function serveLoginHtml(
     eyeImagePath: join(config.BASE_PATH, config.AUTH_BASE_PATH, "/public/assets/icons/eye.png"),
     eyeCloseImagePath: join(config.BASE_PATH, config.AUTH_BASE_PATH, "/public/assets/icons/eye-close.png"),
     backgroundImagePath: join(config.BASE_PATH, config.PUBLIC_PATH,
-      authConfig.ui?.backgroundImagePath ?? "./assets/background.png"),
-    backgroundFallbackColor: authConfig.ui?.backgroundFallbackColor || "#8c8c8c",
+      authUiHostnameConfig?.backgroundImagePath
+      ?? authUiDefaultConfig?.backgroundImagePath ?? "./assets/background.png"),
+    backgroundFallbackColor: authUiHostnameConfig?.backgroundFallbackColor
+      || authUiDefaultConfig?.backgroundFallbackColor || "#8c8c8c",
     faviconUrl: join(config.BASE_PATH, FAVICON_URL),
-    logoUrl: !!authConfig.ui?.logo.customLogoPath === false ?
-      join(config.PORTAL_BASE_PATH, LOGO_URL + logoPreferDarkParam)
-      : join(config.BASE_PATH, config.PUBLIC_PATH, authConfig.ui?.logo.customLogoPath ?? ""),
-    logoLink: authConfig.ui?.logo.customLogoLink ?? "",
+    logoUrl: !!(authUiHostnameConfig?.logo?.customLogoPath || authUiDefaultConfig?.logo.customLogoPath) === false ?
+      join(config.PORTAL_BASE_PATH, LOGO_URL + logoPreferDarkParam) : join(config.BASE_PATH, config.PUBLIC_PATH,
+        (authUiHostnameConfig?.logo?.customLogoPath || authUiDefaultConfig?.logo.customLogoPath) ?? ""),
+    logoLink: authUiHostnameConfig?.logo?.customLogoLink ?? authUiDefaultConfig?.logo.customLogoLink ?? "",
     callbackUrl,
-    sloganColor: authConfig.ui?.slogan.color || "white",
+    sloganColor: authUiHostnameConfig?.slogan?.color || authUiDefaultConfig?.slogan?.color || "white",
     sloganTitle: sloganTitle || "",
     sloganTextArr: sloganTextArr || [],
-    footerTextColor: authConfig.ui?.footerTextColor || "white",
+    footerTextColor: authUiHostnameConfig?.footerTextColor || authUiDefaultConfig?.footerTextColor || "white",
     themeColor: uiConfig.primaryColor?.defaultColor ?? DEFAULT_PRIMARY_COLOR,
     err,
     ...captchaInfo,

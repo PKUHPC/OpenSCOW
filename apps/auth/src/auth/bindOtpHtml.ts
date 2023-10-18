@@ -17,21 +17,7 @@ import { join } from "path";
 import { config, FAVICON_URL } from "src/config/env";
 import { uiConfig } from "src/config/ui";
 import { AuthTextsType, languages } from "src/i18n";
-
-
-function parseHostname(req: FastifyRequest): string | undefined {
-
-  if (!req.headers.referer) {
-    return undefined;
-  }
-
-  try {
-    const url = new URL(req.headers.referer);
-    return url.hostname;
-  } catch {
-    return undefined;
-  }
-}
+import { parseHostname } from "src/utils/parseHostname";
 
 
 export async function renderBindOtpHtml(
