@@ -21,6 +21,11 @@ export const UiConfigSchema = Type.Object({
     defaultText: Type.Optional(Type.String({ description: "默认的footer文本" })),
     hostnameMap: Type.Optional(Type.Record(Type.String(), Type.String(),
       { description: "根据域名（hostname，即在网页控制台执行location.host返回的值）不同，显示在footer上的文本" })),
+    hostnameTextMap: Type.Optional(Type.Record(Type.String(), Type.String(),
+      {
+        description: "根据域名（hostname，即在网页控制台执行location.host返回的值）不同，显示在footer上的文本",
+        deprecated: true,
+      })),
   })),
 
   primaryColor: Type.Optional(Type.Object({

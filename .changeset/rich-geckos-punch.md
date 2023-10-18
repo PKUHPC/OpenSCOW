@@ -1,10 +1,9 @@
 ---
-"@scow/portal-web": patch
-"@scow/mis-web": patch
-"@scow/config": patch
-"@scow/auth": patch
-"@scow/cli": patch
-"@scow/docs": patch
+"@scow/portal-web": minor
+"@scow/mis-web": minor
+"@scow/auth": minor
+"@scow/cli": minor
+"@scow/docs": minor
 ---
 
-统一 config/ui.yaml 文件中的 hostname
+在ui.yaml下的footer增加hostnameMap，其作用与hostnameTextMap一致，根据不同hostname展示不同的footer文本
