@@ -102,7 +102,7 @@ export const ClusterFileTable: React.FC<Props> = ({
           onPathChange={(curPath) => { curPath === path ? reload() : setNewPath(curPath); }}
           breadcrumbItemRender={(pathSegment, index, path) =>
             (index === 0 ? (
-              <DatabaseOutlined />
+              <DatabaseOutlined onClick={toHome} />
             ) : (
               <a onClick={() => { setNewPath(join("/", path)); }}>
                 {pathSegment}
