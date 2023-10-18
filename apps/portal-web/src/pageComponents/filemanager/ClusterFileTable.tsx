@@ -54,6 +54,9 @@ export const ClusterFileTable: React.FC<Props> = ({
         .then((d) => {
           setFiles(d.items);
         })
+        .catch(() => {
+          toHome();
+        })
         .finally(() => {
           setLoading(false);
         })
