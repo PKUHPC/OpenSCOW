@@ -14,7 +14,6 @@ import { DatabaseOutlined, HomeOutlined, UpOutlined } from "@ant-design/icons";
 import { compareDateTime, formatDateTime } from "@scow/lib-web/build/utils/datetime";
 import { compareNumber } from "@scow/lib-web/build/utils/math";
 import { Button, Table, Tooltip } from "antd";
-import Link from "next/link";
 import { join } from "path";
 import React, { useEffect, useState } from "react";
 import { api } from "src/apis";
@@ -101,17 +100,13 @@ export const ClusterFileTable: React.FC<Props> = ({
           path={path ?? ""}
           loading={loading}
           onPathChange={(curPath) => { curPath === path ? reload() : setNewPath(curPath); }}
-          breadcrumbItemRender={(pathSegment, index) =>
+          breadcrumbItemRender={(pathSegment, index, path) =>
             (index === 0 ? (
               <DatabaseOutlined />
             ) : (
-              <Link
-                href={"/"}
-                key={index}
-                onClick={(e) => e.stopPropagation()}
-              >
+              <a onClick={() => { setNewPath(join("/", path)); }}>
                 {pathSegment}
-              </Link>
+              </a>
             ))
           }
         />
