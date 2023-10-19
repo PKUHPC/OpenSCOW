@@ -2,4 +2,4 @@
 "@scow/grpc-api": patch
 ---
 
-新增 submitFileAsJob 接口，连接 slurm 调度器，直接提交文件 sbatch 执行
+新增 submitFileAsJob 接口，直接把文件作为作业提交调度器执行
