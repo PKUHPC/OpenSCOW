@@ -192,7 +192,6 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
     }
 
     const hostname = getHostname(appContext.ctx.req);
-    console.log("hostname:", hostname);
 
     extra.primaryColor = (hostname && runtimeConfig.UI_CONFIG?.primaryColor?.hostnameMap?.[hostname])
       ?? runtimeConfig.UI_CONFIG?.primaryColor?.defaultColor ?? runtimeConfig.DEFAULT_PRIMARY_COLOR;

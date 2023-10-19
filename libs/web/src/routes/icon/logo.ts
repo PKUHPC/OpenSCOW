@@ -14,7 +14,7 @@ import { existsSync } from "fs";
 import { NextApiRequest, NextApiResponse } from "next";
 import { join } from "path";
 import { sendFile, validatePayload } from "src/routes/icon/utils";
-import { getHostname } from "src/utils/getHostname";
+import { getHost } from "src/utils/getHostname";
 import { z } from "zod";
 
 const QuerySchema = z.object({
@@ -61,7 +61,7 @@ export const serveLogo = async (
   }
 
   // find the domain icons
-  const domain = getHostname(req);
+  const domain = getHost(req);
 
   if (domain) {
 
