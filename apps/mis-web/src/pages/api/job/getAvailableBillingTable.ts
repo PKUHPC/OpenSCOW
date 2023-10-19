@@ -103,7 +103,7 @@ export async function getAvailablePartitionForItems(
 
   await Promise.allSettled(accountNames
     .map(async (accountName) => {
-      return await asyncClientCall(client, "getAvailablePartitions",
+      return await asyncClientCall(client, "getAvailablePartitionsForCluster",
         { cluster, accountName, userId });
     }),
   ).then((results) => {
