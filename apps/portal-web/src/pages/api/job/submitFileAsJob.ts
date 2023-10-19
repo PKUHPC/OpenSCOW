@@ -28,7 +28,7 @@ export const SubmitFileAsJobSchema = typeboxRouteSchema({
   body: Type.Object({
     cluster: Type.String(),
     // 文件绝对路径
-    fileDirectory: Type.String(),
+    filePath: Type.String(),
   }),
 
   responses: {
@@ -37,6 +37,10 @@ export const SubmitFileAsJobSchema = typeboxRouteSchema({
     }),
 
     400: Type.Object({
+      code: Type.Union([
+        Type.Literal("INVALID_ARGUMENT"),
+        Type.Literal("INVALID_PATH"),
+      ]),
       message: Type.String(),
     }),
 
@@ -55,7 +59,7 @@ export default route(SubmitFileAsJobSchema, async (req, res) => {
 
   if (!info) { return; }
 
-  const { cluster, fileDirectory } = req.body;
+  const { cluster, filePath } = req.body;
 
   const client = getClient(JobServiceClient);
 
@@ -63,12 +67,12 @@ export default route(SubmitFileAsJobSchema, async (req, res) => {
     operatorUserId: info.identityId,
     operatorIp: parseIp(req) ?? "",
     operationTypePayload:{
-      clusterId: cluster, path: fileDirectory,
+      clusterId: cluster, path: filePath,
     },
   };
 
   return await asyncUnaryCall(client, "submitFileAsJob", {
-    cluster, userId: info.identityId, fileDirectory
+    cluster, userId: info.identityId, filePath
     ,
   })
     .then(async ({ jobId }) => {
@@ -82,6 +86,8 @@ export default route(SubmitFileAsJobSchema, async (req, res) => {
     })
     .catch(handlegRPCError({
       [status.INTERNAL]: (err) => ({ 500: { code: "SCHEDULER_FAILED" as const, message: err.details } }),
+      [status.INVALID_ARGUMENT]: (err) => ({ 400: { code: "INVALID_ARGUMENT" as const, message: err.details } }),
+      [status.PERMISSION_DENIED]: (err) => ({ 400: { code: "INVALID_PATH" as const, message: err.details } }),
     },
     async () => await callLog(
       { ...logInfo,

@@ -15,7 +15,7 @@ import { ServiceError } from "@ddadaal/tsgrpc-common";
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { jobInfoToPortalJobInfo, jobInfoToRunningjob } from "@scow/lib-scheduler-adapter";
-import { createDirectoriesRecursively } from "@scow/lib-ssh";
+import { createDirectoriesRecursively, sftpReadFile, sftpStat } from "@scow/lib-ssh";
 import { JobServiceServer, JobServiceService } from "@scow/protos/build/portal/job";
 import { parseErrorDetails } from "@scow/rich-error-model";
 import { getClusterOps } from "src/clusterops";
@@ -218,14 +218,51 @@ export const jobServiceServer = plugin((server) => {
       return [{ jobId: reply.jobId }];
     },
 
-    submitFileAsJob: async ({ request }) => {
-      const { cluster, userId, fileDirectory } = request;
+    submitFileAsJob: async ({ request, logger }) => {
+      const { cluster, userId, filePath } = request;
 
       const client = getAdapterClient(cluster);
       if (!client) { throw clusterNotFound(cluster); }
 
+      const host = getClusterLoginNode(cluster);
+      if (!host) { throw clusterNotFound(cluster); }
+
+      const script = await sshConnect(host, userId, logger, async (ssh) => {
+
+        const sftp = await ssh.requestSFTP();
+
+        // 判断文件操作权限
+        const stat = await sftpStat(sftp)(filePath).catch((e) => {
+          logger.error(e, "stat %s as %s failed", filePath, userId);
+          throw <ServiceError> {
+            code: Status.PERMISSION_DENIED, message: `${filePath} is not accessible`,
+          };
+        });
+        // 文件SIZE大于1M不能提交sbatch执行
+        if (stat.size / (1024 * 1024) > 1) {
+          throw <ServiceError> {
+            code: Status.INVALID_ARGUMENT, message: `${filePath} is too large. Maximum file size is 1M`,
+          };
+        }
+
+        const isTextFile = await ssh.exec("file", [filePath]).then((res) => {
+          return res.match(/text/);
+        });
+        // 文件不是文本文件不能提交Sbatch执行
+        if (!isTextFile) {
+          throw <ServiceError> {
+            code: Status.INVALID_ARGUMENT, message: `${filePath} is not a text file`,
+          };
+        }
+
+        return await sftpReadFile(sftp)(filePath)
+          .then((buffer) => {
+            return buffer.toString("utf-8");
+          });
+      });
+
       const reply = await asyncClientCall(client.job, "submitFileAsJob", {
-        userId, fileDirectory,
+        userId, script,
       }).catch((e) => {
         const ex = e as ServiceError;
         const errors = parseErrorDetails(ex.metadata);

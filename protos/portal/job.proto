@@ -163,7 +163,7 @@ message SubmitJobResponse {
 message SubmitFileAsJobRequest {
   string cluster = 1;
   string user_id = 2;
-  string file_directory = 3;
+  string file_path = 3;
 }
 
 // NOT_FOUND: cluster is not found

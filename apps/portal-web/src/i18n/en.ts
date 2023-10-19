@@ -238,6 +238,7 @@ export default {
           submitConfirmContent: "Confirm submission of {} to {}?",
           submitConfirmOk: "Confirm",
           submitSuccessMessage: "Submitted Successfully",
+          submitFailedMessage: "Submitted Failed",
         },
       },
       fileTable: {

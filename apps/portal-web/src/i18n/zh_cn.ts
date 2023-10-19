@@ -238,6 +238,7 @@ export default {
           submitConfirmContent: "确认提交{}至{}?",
           submitConfirmOk: "确认",
           submitSuccessMessage: "提交成功",
+          submitFailedMessage: "提交失败",
         },
       },
       fileTable: {
