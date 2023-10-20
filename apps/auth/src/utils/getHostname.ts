@@ -12,16 +12,12 @@
 
 import { FastifyRequest } from "fastify";
 
-export function parseHostname(req: FastifyRequest): string | undefined {
 
-  if (!req.headers.referer) {
-    return undefined;
-  }
+export function getHostname(req: FastifyRequest | undefined) {
+  const host = getHost(req);
+  return host?.includes(":") ? host?.split(":")[0] : host;
+}
 
-  try {
-    const url = new URL(req.headers.referer);
-    return url.hostname;
-  } catch {
-    return undefined;
-  }
+export function getHost(req: FastifyRequest | undefined) {
+  return req?.headers?.host;
 }

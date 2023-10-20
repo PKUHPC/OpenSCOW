@@ -17,7 +17,7 @@ import { join } from "path";
 import { config, FAVICON_URL } from "src/config/env";
 import { uiConfig } from "src/config/ui";
 import { AuthTextsType, languages } from "src/i18n";
-import { parseHostname } from "src/utils/parseHostname";
+import { getHostname } from "src/utils/getHostname";
 
 
 export async function renderBindOtpHtml(
@@ -34,7 +34,7 @@ export async function renderBindOtpHtml(
   },
 ) {
 
-  const hostname = parseHostname(req);
+  const hostname = getHostname(req);
 
   // 获取当前语言ID及对应的绑定OTP页面文本
   const languageId = getLanguageCookie(req.raw);

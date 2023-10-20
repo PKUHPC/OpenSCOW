@@ -18,23 +18,11 @@ ui:
   default:
     # 登录界面背景图，设置为""(空字符串)则无背景图
     # 可选配置，默认加载 install.yml 同级的 /public/assets 目录下的 background.png 作为背景图
-    backgroundImage:
-
-      defaultPath: "./assets/background.png"
-
-      # 对具体hostname生效的生效，可以不填
-      # hostnameMap:
-      #   a.com: "./assets/background1.png"
+    backgroundImagePath: "./assets/background.png"
 
     # 登录界面背景色，当背景图无法加载时，背景色起效
     # 可选配置，默认为 #8c8c8c
-    backgroundFallbackColor:
-
-      defaultColor: "#8c8c8c"
-
-      # 对具体hostname生效的生效，可以不填
-      # hostnameMap:
-      #   a.com: "#fff"
+    backgroundFallbackColor: "#8c8c8c" 
       
     # 登录界面 logo，可选配置
     logo:
