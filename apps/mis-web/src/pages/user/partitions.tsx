@@ -12,9 +12,9 @@
 
 import { ClusterTextsConfigSchema } from "@scow/config/build/clusterTexts";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/i18n";
-import { App, Divider, Spin, Typography } from "antd";
+import { Collapse, Divider, Spin, Typography } from "antd";
 import { GetServerSideProps, NextPage } from "next";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { useAsync } from "react-async";
 import { useStore } from "simstate";
 import { api } from "src/apis";
@@ -24,9 +24,11 @@ import { JobBillingTable } from "src/components/JobBillingTable";
 import { PageTitle } from "src/components/PageTitle";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { UserStore } from "src/stores/UserStore";
-import { runtimeConfig } from "src/utils/config";
+import { publicConfig, runtimeConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
 import { styled } from "styled-components";
+
+import { JobBillingTableItem } from "../api/job/getAvailableBillingTable";
 
 const ClusterCommentTitle = styled(Typography.Title)`
   padding-top: 8px;
@@ -46,27 +48,65 @@ interface Props {
 
 const p = prefix("page.user.partitions.");
 
+const { Panel } = Collapse;
+
 export const PartitionsPage: NextPage<Props> = requireAuth(() => true)((props: Props) => {
 
   const userStore = useStore(UserStore);
   const user = userStore.user;
-  const { message } = App.useApp();
 
   const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
   const { text } = props;
 
-  const { data, isLoading } = useAsync({ promiseFn: useCallback(async () => {
-    return await api.getBillingTable({ query: { tenant: user?.tenant, userId: user?.identityId } })
-      .httpError(500, () => { message.error(t(p("getBillingTableErrorMessage"))); });
-  }, [userStore.user]) });
+  const clusters = Object.values(publicConfig.CLUSTERS);
+
+  const [completedRequestCount, setCompletedRequestCount] = useState<number>(0);
+  const [renderData, setRenderData] = useState<{ [cluster: string]: JobBillingTableItem[] }>({});
+
+  clusters.forEach((cluster) => {
+    useAsync({ promiseFn: useCallback(async () => {
+      return api.getAvailableBillingTable({
+        query: { cluster: cluster.id, tenant: user?.tenant, userId: user?.identityId } })
+        .then((data) => {
+          setRenderData((prevData) => ({
+            ...prevData,
+            [cluster.id]: data.items,
+          }));
+          setCompletedRequestCount((prevCount) => prevCount + 1);
+        });
+    }, [userStore.user]) });
+  });
 
   return (
     <div>
       <Head title={t(p("partitionInfo"))} />
       <PageTitle titleText={t(p("partitionInfo"))} />
-      <Spin spinning={isLoading}>
-        <JobBillingTable data={data?.items} />
+
+      <div style={{ marginBottom: "32px" }}>
+        <Spin spinning={completedRequestCount < clusters.length}>
+          {clusters.map((cluster) => {
+            const data = renderData[cluster.id];
+            return (
+              data && data.length > 0 ? (
+                <Collapse defaultActiveKey={[cluster.id]}>
+                  <Panel
+                    header={getI18nConfigCurrentText(cluster.name, languageId)}
+                    collapsible="header"
+                    key={cluster.id}
+                  >
+                    <div key={cluster.id}>
+                      <JobBillingTable data={data} isUserPartitionsPage={true} />
+                    </div>
+                  </Panel>
+                </Collapse>
+              ) : null
+            );
+          })}
+        </Spin>
+      </div>
+
+      <div>
         {
           text?.clusterComment ? (
             <div>
@@ -86,7 +126,8 @@ export const PartitionsPage: NextPage<Props> = requireAuth(() => true)((props: P
             </div>
           ))
         }
-      </Spin>
+      </div>
+
     </div>
   );
 });

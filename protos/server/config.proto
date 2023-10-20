@@ -15,6 +15,7 @@ syntax = "proto3";
 package scow.server;
 
 message GetAvailablePartitionsRequest {
+  option deprecated = true;
   string account_name = 1;
   string user_id = 2;
 }
@@ -36,14 +37,36 @@ message Partition {
 }
 
 message ClusterPartitions {
+  option deprecated = true;
   string cluster = 1;
   repeated Partition partitions = 2;
 }
 
 message GetAvailablePartitionsResponse {
+  option deprecated = true;
   repeated ClusterPartitions cluster_partitions = 1;
 }
 
+message GetAvailablePartitionsForClusterRequest {
+  string cluster = 1;
+  string account_name = 2;
+  string user_id = 3;
+}
+
+message GetAvailablePartitionsForClusterResponse {
+  repeated Partition partitions = 1;
+}
+
 service ConfigService {
-  rpc GetAvailablePartitions(GetAvailablePartitionsRequest) returns (GetAvailablePartitionsResponse);
+
+  /**
+   * Depracated Notice
+   * This API funcition GetAvailablePartitions has been deprecated.
+   * Use the new API function GetAvailablePartitionsForCluster instead.
+   */
+  rpc GetAvailablePartitions(GetAvailablePartitionsRequest) returns (GetAvailablePartitionsResponse) {
+    option deprecated = true;
+  };
+
+  rpc GetAvailablePartitionsForCluster(GetAvailablePartitionsForClusterRequest) returns (GetAvailablePartitionsForClusterResponse);
 }

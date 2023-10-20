@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { BooleanType, Collection, Entity,
+import { Collection, Entity,
   ManyToOne, OneToMany, OneToOne, PrimaryKey, Property,
   Ref } from "@mikro-orm/core";
 import { Decimal } from "@scow/lib-decimal";
