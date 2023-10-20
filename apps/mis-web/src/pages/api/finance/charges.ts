@@ -56,18 +56,30 @@ export const GetChargesSchema = typeboxRouteSchema({
 
     // 查询消费记录种类：平台账户消费记录或租户消费记录
     searchType: Type.Optional(Type.Enum(SearchType)),
+
+    /**
+     * @minimum 1
+     * @type integer
+     */
+    page: Type.Optional(Type.Integer({ minimum: 1 })),
+
+    /**
+     * @type integer
+     */
+    pageSize: Type.Optional(Type.Integer()),
   }),
 
   responses: {
     200: Type.Object({
       results: Type.Array(ChargeInfo),
       total: Type.Number(),
+      totalCount: Type.Number(),
     }),
   },
 });
 
 export default typeboxRoute(GetChargesSchema, async (req, res) => {
-  const { endTime, startTime, accountName, isPlatformRecords, searchType, type } = req.query;
+  const { endTime, startTime, accountName, isPlatformRecords, searchType, type, page, pageSize } = req.query;
 
   let info: UserInfo | undefined;
   // check whether the user can access the account
@@ -96,6 +108,8 @@ export default typeboxRoute(GetChargesSchema, async (req, res) => {
     startTime,
     endTime,
     type,
+    page,
+    pageSize,
     target: (() => {
       if (accountName) {
         // 如果 accountName 不为 undefined，则查询当前租户下该账户的消费记录
@@ -135,7 +149,8 @@ export default typeboxRoute(GetChargesSchema, async (req, res) => {
         }
       }
     })(),
-  }), ["total"]);
+  }), ["total", "totalCount"]);
+
 
   const accounts = reply.results.map((x) => {
     // 如果是查询平台账户消费记录或者查询账户下的消费记录时，确保accuntName存在
@@ -151,7 +166,8 @@ export default typeboxRoute(GetChargesSchema, async (req, res) => {
   return {
     200: {
       results: accounts,
-      total: moneyToNumber(reply.total),
+      total: reply.total ? moneyToNumber(reply.total) : 0,
+      totalCount: reply.totalCount,
     },
   };
 });

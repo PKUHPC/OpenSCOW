@@ -22,6 +22,7 @@ import { ChargeRecord } from "src/entities/ChargeRecord";
 import { PayRecord } from "src/entities/PayRecord";
 import { Tenant } from "src/entities/Tenant";
 import { CHARGE_TYPE_OTHERS } from "src/utils/constants";
+import { paginationProps } from "src/utils/orm";
 
 
 export const chargingServiceServer = plugin((server) => {
@@ -206,10 +207,10 @@ export const chargingServiceServer = plugin((server) => {
      * @returns
      */
     getChargeRecords: async ({ request, em }) => {
-      const { startTime, endTime, type, target }
+      const { startTime, endTime, type, target, page, pageSize }
         = ensureNotUndefined(request, ["startTime", "endTime"]);
 
-      let searchParam: { tenantName?: string, accountName?: string | { $ne: null } } = {};
+      let searchParam: { tenantName?: string | { $ne: null }, accountName?: string | { $ne: null } } = {};
       switch (target?.$case)
       {
       // 当前租户的租户消费记录
@@ -218,7 +219,7 @@ export const chargingServiceServer = plugin((server) => {
         break;
         // 所有租户的租户消费记录
       case "allTenants":
-        searchParam = { accountName: undefined };
+        searchParam = { tenantName: { $ne:null }, accountName: undefined };
         break;
         // 当前租户下当前账户的消费记录
       case "accountOfTenant":
@@ -230,7 +231,7 @@ export const chargingServiceServer = plugin((server) => {
         break;
         // 所有租户下所有账户的消费记录
       case "accountsOfAllTenants":
-        searchParam = { accountName: { $ne:null } };
+        searchParam = { tenantName: { $ne: null }, accountName: { $ne:null } };
         break;
       default:
         searchParam = {};
@@ -258,7 +259,21 @@ export const chargingServiceServer = plugin((server) => {
         time: { $gte: startTime, $lte: endTime },
         ...searchType,
         ...searchParam,
-      }, { orderBy: { time: QueryOrder.DESC } });
+      }, {
+        ...paginationProps(page, pageSize || 10),
+        orderBy: { time: QueryOrder.DESC },
+      });
+
+      const { total_count, total_amount }: { total_count: number, total_amount: string }
+       = await em.createQueryBuilder(ChargeRecord, "c")
+         .select("count(c.id) as total_count")
+         .addSelect("sum(c.amount) as total_amount")
+         .where({
+           time: { $gte: startTime, $lte: endTime },
+           ...searchType,
+           ...searchParam,
+         })
+         .execute("get");
 
       return [{
         results: records.map((x) => ({
@@ -270,7 +285,8 @@ export const chargingServiceServer = plugin((server) => {
           time: x.time.toISOString(),
           type: x.type,
         })),
-        total: decimalToMoney(records.reduce((prev, curr) => prev.plus(curr.amount), new Decimal(0))),
+        total: decimalToMoney(new Decimal(total_amount)),
+        totalCount: total_count,
       }];
     },
   });

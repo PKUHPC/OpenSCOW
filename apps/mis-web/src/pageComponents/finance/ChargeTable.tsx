@@ -52,6 +52,8 @@ export const ChargeTable: React.FC<Props> = ({
   const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
 
+  const [pageInfo, setPageInfo] = useState({ page: 1, pageSize: 10 });
+
   const [form] = Form.useForm<FilterForm>();
 
   const [query, setQuery] = useState<{
@@ -74,12 +76,15 @@ export const ChargeTable: React.FC<Props> = ({
         type: query.type,
         isPlatformRecords,
         searchType,
+        page: pageInfo.page,
+        pageSize: pageInfo.pageSize,
       } });
 
-    }, [query]),
+    }, [query, pageInfo]),
   });
 
   useDidUpdateEffect(() => {
+    setPageInfo({ page: 1, pageSize: pageInfo.pageSize });
     setQuery((q) => ({ ...q, name: accountName }));
   }, [accountName]);
 
@@ -93,6 +98,7 @@ export const ChargeTable: React.FC<Props> = ({
           onFinish={async () => {
             const { name, time, type } = await form.validateFields();
             setQuery({ name: accountName ?? name, time, type });
+            setPageInfo({ page: 1, pageSize: pageInfo.pageSize });
           }}
         >
           {
@@ -129,7 +135,7 @@ export const ChargeTable: React.FC<Props> = ({
           </Form.Item>
           <Form.Item label={t("common.total")}>
             <strong>
-              {data ? data.results.length : 0}
+              {data ? data.totalCount : 0}
             </strong>
           </Form.Item>
           <Form.Item label={t(pCommon("sum"))}>
@@ -146,7 +152,14 @@ export const ChargeTable: React.FC<Props> = ({
         dataSource={data?.results}
         loading={isLoading}
         scroll={{ x: true }}
-        pagination={{ showSizeChanger: true }}
+        pagination={{
+          showSizeChanger: true,
+          current: pageInfo.page,
+          pageSize: pageInfo.pageSize,
+          defaultPageSize: 10,
+          total: data?.totalCount,
+          onChange: (page, pageSize) => setPageInfo({ page, pageSize }),
+        }}
       >
         {
           showAccountName && (
