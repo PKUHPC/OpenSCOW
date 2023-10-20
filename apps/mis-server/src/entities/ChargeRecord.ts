@@ -17,23 +17,20 @@ import { Tenant } from "src/entities/Tenant";
 import { DecimalType } from "src/utils/decimal";
 
 @Entity()
+@Index({ name: "query_info", properties: ["time", "tenantName", "accountName", "type"] })
 export class ChargeRecord {
   @PrimaryKey()
     id!: number;
 
-  @Index({ name: "query_info" })
   @Property()
     time: Date;
 
-  @Index({ name: "query_info" })
   @Property()
     tenantName: string;
 
-  @Index({ name: "query_info" })
   @Property({ nullable: true })
     accountName?: string;
 
-  @Index({ name: "query_info" })
   @Property()
     type: string;
 
