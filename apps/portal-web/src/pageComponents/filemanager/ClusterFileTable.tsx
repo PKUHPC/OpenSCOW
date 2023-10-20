@@ -109,7 +109,7 @@ export const ClusterFileTable: React.FC<Props> = ({
             (index === 0 ? (
               <DatabaseOutlined onClick={toHome} />
             ) : (
-              <a onClick={() => { setNewPath(join("/", path)); }}>
+              <a onClick={(e) => { e.stopPropagation(); setNewPath(join("/", path)); }}>
                 {pathSegment}
               </a>
             ))
