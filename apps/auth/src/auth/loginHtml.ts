@@ -19,7 +19,7 @@ import { authConfig, OtpStatusOptions, ScowLogoType } from "src/config/auth";
 import { config, FAVICON_URL, LOGO_URL } from "src/config/env";
 import { uiConfig } from "src/config/ui";
 import { AuthTextsType, languages } from "src/i18n";
-import { parseHostname } from "src/utils/parseHostname";
+import { getHostname } from "src/utils/getHostname";
 
 export async function serveLoginHtml(
   err: boolean, callbackUrl: string, req: FastifyRequest, rep: FastifyReply,
@@ -27,7 +27,7 @@ export async function serveLoginHtml(
   verifyOtpFail?: boolean,
 ) {
 
-  const hostname = parseHostname(req);
+  const hostname = getHostname(req);
   const authUiHostnameConfig = (hostname && authConfig.ui?.hostnameMap?.[hostname]) || undefined;
   const authUiDefaultConfig = authConfig.ui?.default;
 

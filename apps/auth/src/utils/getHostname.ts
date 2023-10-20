@@ -25,3 +25,12 @@ export function parseHostname(req: FastifyRequest): string | undefined {
     return undefined;
   }
 }
+
+
+// export function parseHostname(req: FastifyRequest | undefined) {
+//   return getHost(req)?.includes(":") ? getHost(req)?.split(":")[0] : getHost(req);
+// }
+
+// export function getHost(req: FastifyRequest | undefined) {
+//   return req?.headers?.host;
+// }
