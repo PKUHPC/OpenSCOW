@@ -121,7 +121,7 @@ export const accountServiceServer = plugin((server) => {
       });
     },
 
-    getAccounts: async ({ request, em, logger }) => {
+    getAccounts: async ({ request, em }) => {
 
       const { accountName, tenantName } = request;
 
