@@ -17,7 +17,7 @@ import type { RunningJob } from "@scow/protos/build/common/job";
 import type { Account } from "@scow/protos/build/server/account";
 import type { AccountUserInfo, GetUserStatusResponse } from "@scow/protos/build/server/user";
 import { api } from "src/apis/api";
-import { OperationResult, OperationType } from "src/models/operationLog";
+import { OperationResult } from "src/models/operationLog";
 import { ClusterAccountInfo_ImportStatus, PlatformRole,
   TenantRole, UserInfo, UserRole, UserStatus } from "src/models/User";
 import { DEFAULT_TENANT_NAME } from "src/utils/constants";
@@ -237,7 +237,7 @@ export const mockApi: MockApi<typeof api> = {
 
   initGetUsers: async () => ({ users: mockUsers }),
 
-  getBillingTable: null,
+  getAvailableBillingTable: null,
 
   createInitAdmin: async () => ({ createdInAuth: false }),
 
@@ -292,6 +292,7 @@ export const mockApi: MockApi<typeof api> = {
   logout: async () => null,
 
   getCharges: async () => ({ results: [{
+    tenantName: "tenant",
     amount: 10,
     comment: "123",
     index: 1,
@@ -371,6 +372,8 @@ export const mockApi: MockApi<typeof api> = {
   },
   blockUserInAccount: async () => ({ executed: true }),
   unblockUserInAccount: async () => ({ executed: true }),
+  blockAccount: async () => ({ executed: true }),
+  unblockAccount: async () => ({ executed: true }),
   updateBlockStatus: async () => null,
   removeUserFromAccount: async () => null,
   setAdmin: async () => ({ executed: true }),
@@ -407,16 +410,14 @@ export const mockApi: MockApi<typeof api> = {
   createTenant: async () => ({ createdInAuth: true }),
   validateToken: async () => MOCK_USER_INFO,
 
-  getOperationLog: async () => ({ results: [{
+  getOperationLogs: async () => ({ results: [{
     operationLogId: 99,
     operatorUserId: "testUser",
     operatorUserName: "testUser",
     operatorIp: "localhost",
-    operationCode: "000000",
-    operationType: OperationType.login,
     operationResult: OperationResult.SUCCESS,
     operationTime: "2020-04-23T23:49:50.000Z",
-    operationDetail:"用户登录",
+    operationEvent: { $case: "login", login: {} },
   }], totalCount: 1 }),
 };
 

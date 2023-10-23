@@ -14,9 +14,10 @@ import { Alert, App, Button, Form, Typography } from "antd";
 import { useState } from "react";
 import { api } from "src/apis";
 import { Centered } from "src/components/layouts";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { CreateUserForm, CreateUserFormFields } from "src/pageComponents/users/CreateUserForm";
 import { useBuiltinCreateUser } from "src/utils/createUser";
-import styled from "styled-components";
+import { styled } from "styled-components";
 
 
 type FormFields = Omit<CreateUserFormFields, "confirmPassword">;
@@ -25,7 +26,13 @@ const AlertContainer = styled.div`
   margin-bottom: 16px;
 `;
 
+const p = prefix("pageComp.init.initAdminForm.");
+const pCommon = prefix("common.");
+
 export const InitAdminForm: React.FC = () => {
+
+  const t = useI18nTranslateToString();
+
   const [form] = Form.useForm<FormFields>();
 
   const { message, modal } = App.useApp();
@@ -38,9 +45,9 @@ export const InitAdminForm: React.FC = () => {
     if (result.existsInScow) {
       // 如果在scow中已经存在这个用户，则不用创建操作
       modal.error({
-        title: "用户已存在",
-        content: "用户已存在于SCOW数据库，无法再添加此用户",
-        okText: "确认",
+        title: t(p("alreadyExist")),
+        content:t(p("cannotAdd")),
+        okText: t(pCommon("ok")),
         onOk: async () => {
           setLoading(false);
         },
@@ -48,9 +55,9 @@ export const InitAdminForm: React.FC = () => {
     } else if (!result.existsInAuth && result.existsInAuth !== undefined && !useBuiltinCreateUser()) {
       // 用户不存在于scow: 且认证系统支持查询，且查询结果不存在于认证系统，且当前系统不支持创建用户
       modal.confirm({
-        title: "用户不存在于认证系统",
-        content: "用户不存在，请确认用户ID是否正确",
-        okText: "确认",
+        title: t(p("notExist")),
+        content: t(p("confirm")),
+        okText: t(pCommon("ok")),
         onOk: async () => {
           setLoading(false);
         },
@@ -66,17 +73,14 @@ export const InitAdminForm: React.FC = () => {
       // 情况3.用户不存在于scow && 认证系统不支持查询->判断认证系统是否支持创建用户 ->数据库创建->尝试->认证系统创建
       // result.existsInAuth ? "此用户存在于已经认证系统，确认添加为初始管理员？" : "用户不存在，是否确认创建此用户并添加为初始管理员？",
       modal.confirm({
-        title: "提示",
+        title: t(pCommon("prompt")),
         content: result.existsInAuth !== undefined ?
           // 认证系统支持查询
           result.existsInAuth ?
-            "用户已经在认证系统中存在，您此处输入的密码将会不起作用，新用户的密码将是认证系统中的已有用户的当前密码。确认添加为初始管理员？" : "用户不存在于认证系统，是否确认创建此用户并添加为初始管理员？"
+            t(p("existText")) : t(p("notExistText"))
           : // 认证系统不支持查询
-          useBuiltinCreateUser() ?
-            " 无法确认用户是否在认证系统中存在， 将会尝试在认证系统中创建。如果用户已经在认证系统中存在，您此处输入的密码将会不起作用，新用户的密码将是认证系统中的已有用户的当前密码"
-            : "无法确认用户是否在认证系统中存在，并且当前认证系统不支持创建用户，请您确认此用户已经在认证系统中存在，确认将会直接加入到数据库中"
-            + ", 并且您此处输入的密码将不会起作用，新用户的密码将是认证系统中的已有用户的当前密码。",
-        okText: "确认",
+          useBuiltinCreateUser() ? t(p("cannotConfirmText1")) : t(p("cannotConfirmText2")),
+        okText: t(pCommon("ok")),
         onCancel: () => {
           setLoading(false);
         },
@@ -86,23 +90,23 @@ export const InitAdminForm: React.FC = () => {
             .httpError(409, (e) => {
               if (e.code === "ALREADY_EXISTS_IN_SCOW")
                 modal.error({
-                  title: "添加失败",
-                  content: "此用户存在于scow数据库",
-                  okText: "确认",
+                  title: t(p("addFail")),
+                  content: t(p("userExist")),
+                  okText: t(pCommon("ok")),
                 });
             })
             .then((createdInAuth) => {
               !createdInAuth.createdInAuth ?
                 modal.info({
-                  title: "添加成功",
-                  content: "此用户存在于认证系统中，已成功添加到SCOW数据库",
-                  okText: "确认",
+                  title: t(p("addSuccess")),
+                  content: t(p("addDb")),
+                  okText: t(pCommon("ok")),
                 })
-                : message.success("添加完成！"); })
+                : message.success(t(p("addFinish"))); })
             .catch(() => {
               modal.error({
-                title: "添加失败",
-                content: "创建用户失败",
+                title:  t(p("addFail")),
+                content:t(p("createFail")),
               });
             })
             .finally(() => {
@@ -116,16 +120,15 @@ export const InitAdminForm: React.FC = () => {
   };
   return (
     <div>
-      <Typography.Paragraph>您可以在此创建初始管理员用户。</Typography.Paragraph>
+      <Typography.Paragraph>{t(p("initAdmin"))}</Typography.Paragraph>
       <Typography.Paragraph>
-          这里添加的用户为初始管理员，位于默认租户中，将会自动拥有<strong>平台管理员</strong>和<strong>默认租户的租户管理员</strong>角色。
+        {t(p("addAdmin"))}<strong>{t(p("platFormAdmin"))}</strong>{t(p("and"))}
+        <strong>{t(p("defaultTenant"))}</strong>{t(pCommon("role"))}。
       </Typography.Paragraph>
       <AlertContainer>
         <Alert
           type={useBuiltinCreateUser() ? "success" : "warning"}
-          message={useBuiltinCreateUser()
-            ? "当前认证系统支持创建用户，您可以选择加入一个已存在于认证系统的用户，或者创建一个全新的用户。系统将会在认证系统中创建此用户"
-            : "当前认证系统不支持创建用户，请确认要添加的用户必须已经存在于认证系统，且用户的ID必须和认证系统中的用户ID保持一致"
+          message={useBuiltinCreateUser() ? t(p("createText1")) : t(p("createText2"))
           }
         />
       </AlertContainer>
@@ -134,7 +137,7 @@ export const InitAdminForm: React.FC = () => {
         <Centered>
           <Form.Item>
             <Button type="primary" htmlType="submit" loading={loading}>
-              添加
+              {t(pCommon("add"))}
             </Button>
           </Form.Item>
         </Centered>

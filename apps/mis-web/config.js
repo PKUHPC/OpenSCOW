@@ -11,7 +11,7 @@
  */
 
 const { envConfig, str, bool } = require("@scow/lib-config");
-const { getClusterConfigs } = require("@scow/config/build/cluster");
+const { getClusterConfigs, getSortedClusters } = require("@scow/config/build/cluster");
 const { getMisConfig } = require("@scow/config/build/mis");
 const { getCommonConfig } = require("@scow/config/build/common");
 const { getClusterTextsConfig } = require("@scow/config/build/clusterTexts");
@@ -123,18 +123,16 @@ const buildRuntimeConfig = async (phase, basePath) => {
 
     PUBLIC_PATH: config.PUBLIC_PATH,
 
-    CLUSTERS: Object.keys(clusters).reduce((prev, curr) => {
-      prev[curr] = { id: curr, name: clusters[curr].displayName };
+    CLUSTERS: getSortedClusters(clusters).reduce((prev, curr) => {
+      prev[curr.id] = { id: curr.id, name: curr.displayName };
       return prev;
     }, {}),
 
     ACCOUNT_NAME_PATTERN: misConfig.accountNamePattern?.regex,
-    ACCOUNT_NAME_PATTERN_MESSAGE: misConfig.accountNamePattern?.errorMessage,
 
     PORTAL_URL: config.PORTAL_DEPLOYED ? (config.PORTAL_URL || misConfig.portalUrl || "") : undefined,
 
     PASSWORD_PATTERN: commonConfig.passwordPattern?.regex,
-    PASSWORD_PATTERN_MESSAGE: commonConfig.passwordPattern?.errorMessage,
 
     BASE_PATH: basePath,
 
@@ -147,6 +145,20 @@ const buildRuntimeConfig = async (phase, basePath) => {
     VERSION_TAG: versionTag,
 
     AUDIT_DEPLOYED:  config.AUDIT_DEPLOYED,
+
+    RUNTIME_I18N_CONFIG_TEXTS: {
+      accountNamePatternMessage: misConfig.accountNamePattern?.errorMessage,
+      passwordPatternMessage: commonConfig.passwordPattern?.errorMessage,
+      createUserBuiltinErrorMessage: misConfig.createUser?.userIdPattern?.errorMessage,
+      createUserErrorMessage: misConfig.createUser?.builtin?.userIdPattern?.errorMessage,
+    },
+
+    CHARGE_TYPE_LIST: [
+      misConfig.jobChargeType,
+      misConfig.changeJobPriceType,
+      ...(misConfig.customChargeTypes || []),
+    ],
+
   };
 
   if (!building) {

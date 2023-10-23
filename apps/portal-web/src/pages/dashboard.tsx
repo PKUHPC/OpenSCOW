@@ -11,14 +11,16 @@
  */
 
 import { getHostname } from "@scow/lib-web/build/utils/getHostname";
+import { getLanguageCookie } from "@scow/lib-web/build/utils/languages";
 import { GetServerSideProps, NextPage } from "next";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 import { useStore } from "simstate";
 import { requireAuth } from "src/auth/requireAuth";
+import { useI18nTranslateToString } from "src/i18n";
 import { CustomizableLogoAndText } from "src/pageComponents/dashboard/CustomizableLogoAndText";
 import { UserStore } from "src/stores/UserStore";
-import { runtimeConfig } from "src/utils/config";
+import { getServerI18nConfigText, runtimeConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
 
 interface Props {
@@ -35,9 +37,11 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)((props: Pr
     router.replace(router.asPath);
   }, [userStore.user]);
 
+  const t = useI18nTranslateToString();
+
   return (
     <div>
-      <Head title="仪表盘" />
+      <Head title={t("pages.dashboard.title")} />
       <CustomizableLogoAndText homeText={props.homeText} homeTitle={props.homeTitle} />
     </div>
   );
@@ -47,8 +51,12 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ req }) => 
 
   const hostname = getHostname(req);
 
-  const homeTitle = (hostname && runtimeConfig.HOME_TITLES[hostname]) ?? runtimeConfig.DEFAULT_HOME_TITLE;
-  const homeText = (hostname && runtimeConfig.HOME_TEXTS[hostname]) ?? runtimeConfig.DEFAULT_HOME_TEXT;
+  const languageId = getLanguageCookie(req);
+
+  const homeTitle = (hostname && runtimeConfig.HOME_TITLES[hostname])
+    ?? getServerI18nConfigText(languageId, "defaultHomeTitle");
+  const homeText = (hostname && runtimeConfig.HOME_TEXTS[hostname])
+    ?? getServerI18nConfigText(languageId, "defaultHomeText");
 
   return {
     props: {

@@ -10,8 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Collection, Entity, Enum, IdentifiedReference,
-  ManyToOne, OneToMany, PrimaryKey, Property } from "@mikro-orm/core";
+import { Collection, Entity, Enum, ManyToOne, OneToMany, PrimaryKey, Property, Ref } from "@mikro-orm/core";
 import { StorageQuota } from "src/entities/StorageQuota";
 import { Tenant } from "src/entities/Tenant";
 import { UserAccount } from "src/entities/UserAccount";
@@ -33,7 +32,7 @@ export class User {
     id!: number;
 
   @ManyToOne(() => Tenant, { wrappedReference: true })
-    tenant: IdentifiedReference<Tenant>;
+    tenant: Ref<Tenant>;
 
   @Property({ unique: true })
     userId: string;

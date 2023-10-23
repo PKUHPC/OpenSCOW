@@ -16,6 +16,7 @@ import { useCallback } from "react";
 import { useAsync } from "react-async";
 import { useStore } from "simstate";
 import { api } from "src/apis";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import type { AdminAccountInfo } from "src/pages/api/tenant/getAccounts";
 import { UserStore } from "src/stores/UserStore";
 
@@ -34,16 +35,25 @@ type Props = {
    * @param accounts all accounts
    */
   onAccountsFetched?: (accounts: AdminAccountInfo[]) => void;
+
+  /**
+   * 如果为真，则从所有租户下获取账户
+   */
+  fromAllTenants?: boolean;
 }
 
+const p = prefix("pageComp.finance.AccountSelector.");
+
 export const AccountSelector: React.FC<Props> = ({
-  onChange, value, placeholder, disabled, autoSelect, onAccountsFetched,
+  onChange, value, placeholder, disabled, autoSelect, onAccountsFetched, fromAllTenants,
 }) => {
+
+  const t = useI18nTranslateToString();
 
   const userStore = useStore(UserStore);
 
   const promiseFn = useCallback(async () => {
-    return api.getAccounts({ query: { } });
+    return fromAllTenants ? api.getAllAccounts({ query: { } }) : api.getAccounts({ query: { } });
   }, [userStore.user]);
 
   const { data, isLoading, reload } = useAsync({
@@ -68,7 +78,7 @@ export const AccountSelector: React.FC<Props> = ({
         onChange={(v) => onChange?.(v)}
         allowClear
       />
-      <Tooltip title="刷新账户列表">
+      <Tooltip title={t(p("freshList"))}>
         <Button icon={<ReloadOutlined spin={isLoading} />} disabled={disabled} onClick={reload} loading={isLoading} />
       </Tooltip>
     </Input.Group>

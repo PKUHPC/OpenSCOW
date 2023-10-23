@@ -9,7 +9,7 @@
 # See the Mulan PSL v2 for more details.
 
 
-FROM node:hydrogen-alpine@sha256:3482a20c97e401b56ac50ba8920cc7b5b2022bfc6aa7d4e4c231755770cf892f AS base
+FROM node:hydrogen-alpine@sha256:617b85a014faf7aabe0661885a245cf3022e39675661d5795ab6748bb2f20f0f AS base
 
 RUN apk update
 
@@ -21,6 +21,7 @@ RUN corepack enable
 
 WORKDIR /app
 COPY pnpm-lock.yaml .
+COPY patches ./patches
 
 RUN pnpm fetch
 
@@ -36,10 +37,12 @@ RUN node scripts/copyDist.mjs
 
 WORKDIR /app/dist
 
+COPY patches ./patches
+
 RUN pnpm i --offline --prod --frozen-lockfile
 
 # delete next.js build caches to reduce 200MB+ image size
-RUN rm -rf apps/mis-web/.next/cache apps/portal-web/.next/cache 
+RUN rm -rf apps/mis-web/.next/cache apps/portal-web/.next/cache
 
 FROM base AS runner
 

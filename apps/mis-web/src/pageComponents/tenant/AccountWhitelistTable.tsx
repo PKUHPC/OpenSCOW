@@ -21,6 +21,7 @@ import { SortOrder } from "antd/lib/table/interface";
 import React, { useMemo, useState } from "react";
 import { api } from "src/apis";
 import { TableTitle } from "src/components/TableTitle";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { Money } from "src/models/UserSchemaModel";
 import type {
   GetWhitelistedAccountsSchema } from "src/pages/api/tenant/accountWhitelist/getWhitelistedAccounts";
@@ -35,10 +36,14 @@ interface Props {
 interface FilterForm {
   accountName: string | undefined;
 }
+const p = prefix("pageComp.tenant.accountWhitelistTable.");
+const pCommon = prefix("common.");
 
 export const AccountWhitelistTable: React.FC<Props> = ({
   data, isLoading, reload,
 }) => {
+
+  const t = useI18nTranslateToString();
 
   const { message, modal } = App.useApp();
 
@@ -81,11 +86,11 @@ export const AccountWhitelistTable: React.FC<Props> = ({
             setCurrentSortInfo({ field: null, order: null });
           }}
         >
-          <Form.Item label="账户" name="accountName">
+          <Form.Item label={t(pCommon("account"))} name="accountName">
             <Input />
           </Form.Item>
           <Form.Item>
-            <Button type="primary" htmlType="submit">搜索</Button>
+            <Button type="primary" htmlType="submit">{t(pCommon("search"))}</Button>
           </Form.Item>
         </Form>
       </FilterFormContainer>
@@ -95,12 +100,12 @@ export const AccountWhitelistTable: React.FC<Props> = ({
             data ? (
               <div>
                 <span>
-                  白名单数量：<strong>{data.results.length ?? 0}</strong>
+                  {t(p("whiteList"))}：<strong>{data.results.length ?? 0}</strong>
                 </span>
                 <>
                   <Divider type="vertical" />
                   <span>
-                    白名单欠费合计：<strong>{getTotalDebtAmount(data).toFixed(3)} 元</strong>
+                    {t(p("debtSum"))}：<strong>{getTotalDebtAmount(data).toFixed(3)} {t(pCommon("unit"))}</strong>
                   </span>
                 </>
               </div>
@@ -121,53 +126,53 @@ export const AccountWhitelistTable: React.FC<Props> = ({
         >
           <Table.Column<WhitelistedAccount>
             dataIndex="accountName"
-            title="账户名"
+            title={t(pCommon("accountName"))}
             sorter={(a, b) => a.accountName.localeCompare(b.accountName)}
             sortDirections={["ascend", "descend"]}
             sortOrder={currentSortInfo.field === "accountName" ? currentSortInfo.order : null}
           />
           <Table.Column<WhitelistedAccount>
             dataIndex="ownerId"
-            title="拥有者"
+            title={t(pCommon("owner"))}
             render={(_, r) => `${r.ownerName} (ID: ${r.ownerId})`}
           />
           <Table.Column<WhitelistedAccount>
             dataIndex="balance"
-            title="余额"
+            title={t(pCommon("balance"))}
             sorter={(a, b) => (a.balance ? moneyToNumber(a.balance) : 0) - (b.balance ? moneyToNumber(b.balance) : 0)}
             sortDirections={["ascend", "descend"]}
             sortOrder={currentSortInfo.field === "balance" ? currentSortInfo.order : null}
-            render={(b: Money) => moneyToString(b) + " 元" }
+            render={(b: Money) => moneyToString(b) + " " + t(pCommon("unit")) }
           />
           <Table.Column
             dataIndex="addTime"
-            title="加入时间"
+            title={t(p("joinTime"))}
             render={(time: string) => formatDateTime(time) }
           />
-          <Table.Column<WhitelistedAccount> dataIndex="comment" title="备注" />
-          <Table.Column<WhitelistedAccount> dataIndex="operatorId" title="操作人" />
+          <Table.Column<WhitelistedAccount> dataIndex="comment" title={t(pCommon("comment"))} />
+          <Table.Column<WhitelistedAccount> dataIndex="operatorId" title={t(p("operatorId"))} />
           <Table.Column<WhitelistedAccount>
-            title="操作"
+            title={t(pCommon("operation"))}
             render={(_, r) => (
               <Space split={<Divider type="vertical" />}>
                 <a onClick={() => {
                   modal.confirm({
-                    title: "确认将账户移除白名单？",
+                    title: t(p("confirmRemoveWhite")),
                     icon: <ExclamationCircleOutlined />,
-                    content: `确认要将账户${r.accountName}从白名单移除？`,
+                    content: `${t(p("confirmRemoveWhiteText1"))}${r.accountName}${t(p("confirmRemoveWhiteText2"))}`,
                     onOk: async () => {
                       await api.dewhitelistAccount({ query: {
                         accountName: r.accountName,
                       } })
                         .then(() => {
-                          message.success("移出白名单成功！");
+                          message.success(t(p("removeWhiteSuccess")));
                           reload();
                         });
                     },
                   });
                 }}
                 >
-                  从白名单中去除
+                  {t(p("removeWhite"))}
                 </a>
               </Space>
             )}

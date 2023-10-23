@@ -12,6 +12,7 @@
 
 import { Button } from "antd";
 import { useState } from "react";
+import { Localized } from "src/i18n";
 import { RunningJobInfo } from "src/models/job";
 import { ChangeJobTimeLimitModal } from "src/pageComponents/job/ChangeJobTimeLimitModal";
 
@@ -29,7 +30,7 @@ export const BatchChangeJobTimeLimitButton: React.FC<ChangeJobTimeLimitButtonPro
   return (
     <>
       <Button disabled={disabled} onClick={() => setOpen(true)}>
-        延长所选作业时间限制
+        <Localized id={"pageComp.job.runningJobTable.extendLimit"}></Localized>
       </Button>
       <ChangeJobTimeLimitModal
         reload={reload}

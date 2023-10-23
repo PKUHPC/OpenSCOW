@@ -13,8 +13,9 @@
 import { QuestionCircleOutlined } from "@ant-design/icons";
 import { Popover, Space } from "antd";
 import React from "react";
-import { AmountStrategyAlgorithmDescriptions,
-  AmountStrategyDescription, AmountStrategyDescriptions, AmountStrategyText } from "src/models/job";
+import { prefix, useI18nTranslateToString } from "src/i18n";
+import { getAmountStrategyAlgorithmDescriptions,
+  getAmountStrategyDescription, getAmountStrategyDescriptions, getAmountStrategyText } from "src/models/job";
 import { publicConfig } from "src/utils/config";
 
 
@@ -31,9 +32,17 @@ publicConfig.CUSTOM_AMOUNT_STRATEGIES?.forEach((i) => {
   customAmountStrategiesIdToDescription[i.id] = i.comment || i.id;
 });
 
+const p = prefix("component.others.");
+
 export const AmountStrategyDescriptionsItem: React.FC<Props> = ({
   amount, isColTitle, isColContent,
 }) => {
+
+  const t = useI18nTranslateToString();
+  const AmountStrategyDescriptions = getAmountStrategyDescriptions(t);
+  const AmountStrategyAlgorithmDescriptions = getAmountStrategyAlgorithmDescriptions(t);
+  const AmountStrategyText = getAmountStrategyText(t);
+  const AmountStrategyDescription = getAmountStrategyDescription(t);
 
   if (isColContent && amount) {
     return (
@@ -61,7 +70,7 @@ export const AmountStrategyDescriptionsItem: React.FC<Props> = ({
                 {Object.entries({ ...AmountStrategyDescriptions, ...customAmountStrategiesIdToName })
                   .map((value) => <p key={value[0]}>{`${value[1]}(${value[0]})`}</p>)}
               </p>
-              <a href="https://pkuhpc.github.io/SCOW/docs/info/mis/business/billing">{"细节请查阅文档"}</a>
+              <a href="https://pkuhpc.github.io/SCOW/docs/info/mis/business/billing">{t(p("seeDetails"))}</a>
             </div>
           )}
         >

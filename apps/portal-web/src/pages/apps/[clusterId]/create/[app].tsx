@@ -20,6 +20,7 @@ import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
+import { useI18nTranslateToString } from "src/i18n";
 import { LaunchAppForm } from "src/pageComponents/app/LaunchAppForm";
 import { Head } from "src/utils/head";
 
@@ -31,12 +32,12 @@ export const AppIndexPage: NextPage = requireAuth(() => true)(() => {
   const clusterId = queryToString(router.query.clusterId);
 
   const { message } = App.useApp();
+  const t = useI18nTranslateToString();
 
   const { data, isLoading } = useAsync({
     promiseFn: useCallback(async () => {
       return await api.getAppMetadata({ query: { appId, cluster: clusterId } })
-        .httpError(404, () => { message.error("此应用不存在"); })
-        .then((res) => res);
+        .httpError(404, () => { message.error(t("pages.apps.create.error404")); });
     }, [appId]),
   });
 
@@ -46,13 +47,14 @@ export const AppIndexPage: NextPage = requireAuth(() => true)(() => {
 
   return (
     <div>
-      <Head title={`创建${data.appName}`} />
-      <PageTitle titleText={`创建${data.appName}`} />
+      <Head title={`${t("pages.apps.create.title")}${data.appName}`} />
+      <PageTitle titleText={`${t("pages.apps.create.title")}${data.appName}`} />
       <LaunchAppForm
         appName={data.appName}
         attributes={data.appCustomFormAttributes}
         appId={appId}
         clusterId={clusterId}
+        appComment={data.appComment}
       />
     </div>
   );

@@ -13,7 +13,7 @@
 import Link from "next/link";
 import { join } from "path";
 import { useDarkMode } from "src/layouts/darkMode";
-import styled from "styled-components";
+import { styled } from "styled-components";
 
 const LogoContainer = styled.h1`
   color: var(--ant-primary-color);

@@ -1,6 +1,6 @@
 {
   "name": "@scow/portal-server",
-  "version": "0.9.0",
+  "version": "1.0.0",
   "description": "",
   "main": "build/index.js",
   "private": true,
@@ -23,7 +23,7 @@
     "@ddadaal/tsgrpc-common": "0.2.4",
     "@ddadaal/tsgrpc-server": "0.19.4",
     "@ddadaal/tsgrpc-client": "0.17.6",
-    "@grpc/grpc-js": "1.8.21",
+    "@grpc/grpc-js": "1.9.5",
     "@scow/config": "workspace:*",
     "@scow/lib-config": "workspace:*",
     "@scow/lib-server": "workspace:*",

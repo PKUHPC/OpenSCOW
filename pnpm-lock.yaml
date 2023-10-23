@@ -3,6 +3,12 @@ lockfileVersion: '6.0'
 settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
+
+patchedDependencies:
+  react-typed-i18n@2.3.0:
+    hash: eybujl4up7xenffji6zpg43f3u
+    path: patches/react-typed-i18n@2.3.0.patch
+
 importers:
 
   .:
@@ -120,28 +126,28 @@ importers:
     dependencies:
       '@ddadaal/tsgrpc-client':
         specifier: 0.17.6
-        version: 0.17.6(@grpc/grpc-js@1.8.21)
+        version: 0.17.6(@grpc/grpc-js@1.9.5)
       '@ddadaal/tsgrpc-common':
         specifier: 0.2.4
         version: 0.2.4
       '@ddadaal/tsgrpc-server':
         specifier: 0.19.4
-        version: 0.19.4(@grpc/grpc-js@1.8.21)
+        version: 0.19.4(@grpc/grpc-js@1.9.5)
       '@grpc/grpc-js':
-        specifier: 1.8.21
-        version: 1.8.21
+        specifier: 1.9.5
+        version: 1.9.5
       '@mikro-orm/cli':
         specifier: 5.7.14
-        version: 5.7.14(@mikro-orm/mariadb@5.7.14)(@mikro-orm/migrations@5.7.14)(@mikro-orm/mysql@5.7.14)(@mikro-orm/seeder@5.7.14)
+        version: 5.7.14(@mikro-orm/migrations@5.7.14)(@mikro-orm/mysql@5.7.14)
       '@mikro-orm/core':
         specifier: 5.7.14
-        version: 5.7.14(@mikro-orm/mariadb@5.7.14)(@mikro-orm/migrations@5.7.14)(@mikro-orm/mysql@5.7.14)(@mikro-orm/seeder@5.7.14)
+        version: 5.7.14(@mikro-orm/migrations@5.7.14)(@mikro-orm/mysql@5.7.14)
       '@mikro-orm/migrations':
         specifier: 5.7.14
         version: 5.7.14(@mikro-orm/core@5.7.14)
       '@mikro-orm/mysql':
         specifier: 5.7.14
-        version: 5.7.14(@mikro-orm/core@5.7.14)(@mikro-orm/migrations@5.7.14)(@mikro-orm/seeder@5.7.14)
+        version: 5.7.14(@mikro-orm/core@5.7.14)(@mikro-orm/migrations@5.7.14)
       '@scow/config':
         specifier: workspace:*
         version: link:../../libs/config
@@ -188,6 +194,9 @@ importers:
       '@scow/lib-config':
         specifier: workspace:*
         version: link:../../libs/libconfig
+      '@scow/lib-server':
+        specifier: workspace:*
+        version: link:../../libs/server
       '@scow/lib-ssh':
         specifier: workspace:*
         version: link:../../libs/ssh
@@ -219,8 +228,8 @@ importers:
         specifier: 10.8.4
         version: 10.8.4
       nanoid:
-        specifier: 4.0.2
-        version: 4.0.2
+        specifier: 5.0.1
+        version: 5.0.1
       nodemailer:
         specifier: 6.9.4
         version: 6.9.4
@@ -233,6 +242,9 @@ importers:
       qrcode:
         specifier: 1.5.3
         version: 1.5.3
+      react-typed-i18n:
+        specifier: 2.3.0
+        version: 2.3.0(patch_hash=eybujl4up7xenffji6zpg43f3u)(react@18.2.0)
       speakeasy:
         specifier: 2.0.0
         version: 2.0.0
@@ -334,16 +346,16 @@ importers:
     dependencies:
       '@ddadaal/tsgrpc-client':
         specifier: 0.17.6
-        version: 0.17.6(@grpc/grpc-js@1.8.21)
+        version: 0.17.6(@grpc/grpc-js@1.9.5)
       '@ddadaal/tsgrpc-common':
         specifier: 0.2.4
         version: 0.2.4
       '@ddadaal/tsgrpc-server':
         specifier: 0.19.4
-        version: 0.19.4(@grpc/grpc-js@1.8.21)
+        version: 0.19.4(@grpc/grpc-js@1.9.5)
       '@grpc/grpc-js':
-        specifier: 1.8.21
-        version: 1.8.21
+        specifier: 1.9.5
+        version: 1.9.5
       '@mikro-orm/cli':
         specifier: 5.7.14
         version: 5.7.14(@mikro-orm/mariadb@5.7.14)(@mikro-orm/migrations@5.7.14)(@mikro-orm/mysql@5.7.14)(@mikro-orm/seeder@5.7.14)
@@ -398,6 +410,9 @@ importers:
       '@sinclair/typebox':
         specifier: 0.31.1
         version: 0.31.1
+      dayjs:
+        specifier: 1.11.9
+        version: 1.11.9
       dotenv:
         specifier: 16.3.1
         version: 16.3.1
@@ -440,13 +455,13 @@ importers:
         version: 0.8.2(@sinclair/typebox@0.31.1)(next@13.4.10)(zod@3.22.2)
       '@ddadaal/tsgrpc-client':
         specifier: 0.17.6
-        version: 0.17.6(@grpc/grpc-js@1.8.21)
+        version: 0.17.6(@grpc/grpc-js@1.9.5)
       '@ddadaal/tsgrpc-common':
         specifier: 0.2.4
         version: 0.2.4
       '@grpc/grpc-js':
-        specifier: 1.8.21
-        version: 1.8.21
+        specifier: 1.9.5
+        version: 1.9.5
       '@scow/config':
         specifier: workspace:*
         version: link:../../libs/config
@@ -468,6 +483,9 @@ importers:
       '@scow/protos':
         specifier: workspace:*
         version: link:../../libs/protos/scow
+      '@scow/rich-error-model':
+        specifier: workspace:*
+        version: link:../../libs/rich-error-model
       '@scow/utils':
         specifier: workspace:*
         version: link:../../libs/utils
@@ -516,6 +534,9 @@ importers:
       react-is:
         specifier: 18.2.0
         version: 18.2.0
+      react-typed-i18n:
+        specifier: 2.3.0
+        version: 2.3.0(patch_hash=eybujl4up7xenffji6zpg43f3u)(react@18.2.0)
       recharts:
         specifier: ^2.7.3
         version: 2.7.3(prop-types@15.8.1)(react-dom@18.2.0)(react@18.2.0)
@@ -573,16 +594,16 @@ importers:
     dependencies:
       '@ddadaal/tsgrpc-client':
         specifier: 0.17.6
-        version: 0.17.6(@grpc/grpc-js@1.8.21)
+        version: 0.17.6(@grpc/grpc-js@1.9.5)
       '@ddadaal/tsgrpc-common':
         specifier: 0.2.4
         version: 0.2.4
       '@ddadaal/tsgrpc-server':
         specifier: 0.19.4
-        version: 0.19.4(@grpc/grpc-js@1.8.21)
+        version: 0.19.4(@grpc/grpc-js@1.9.5)
       '@grpc/grpc-js':
-        specifier: 1.8.21
-        version: 1.8.21
+        specifier: 1.9.5
+        version: 1.9.5
       '@scow/config':
         specifier: workspace:*
         version: link:../../libs/config
@@ -682,13 +703,13 @@ importers:
         version: 0.8.2(@sinclair/typebox@0.31.1)(next@13.4.10)(zod@3.22.2)
       '@ddadaal/tsgrpc-client':
         specifier: 0.17.6
-        version: 0.17.6(@grpc/grpc-js@1.8.21)
+        version: 0.17.6(@grpc/grpc-js@1.9.5)
       '@ddadaal/tsgrpc-common':
         specifier: 0.2.4
         version: 0.2.4
       '@grpc/grpc-js':
-        specifier: 1.8.21
-        version: 1.8.21
+        specifier: 1.9.5
+        version: 1.9.5
       '@scow/config':
         specifier: workspace:*
         version: link:../../libs/config
@@ -776,6 +797,9 @@ importers:
       react-is:
         specifier: 18.2.0
         version: 18.2.0
+      react-typed-i18n:
+        specifier: 2.3.0
+        version: 2.3.0(patch_hash=eybujl4up7xenffji6zpg43f3u)(react@18.2.0)
       simstate:
         specifier: 3.0.1
         version: 3.0.1(react@18.2.0)
@@ -865,10 +889,10 @@ importers:
         version: 0.2.4
       '@ddadaal/tsgrpc-server':
         specifier: 0.19.4
-        version: 0.19.4(@grpc/grpc-js@1.8.21)
+        version: 0.19.4(@grpc/grpc-js@1.9.5)
       '@grpc/grpc-js':
-        specifier: 1.8.21
-        version: 1.8.21
+        specifier: 1.9.5
+        version: 1.9.5
       '@scow/lib-config':
         specifier: workspace:*
         version: link:../../libs/libconfig
@@ -959,10 +983,10 @@ importers:
     dependencies:
       '@ddadaal/tsgrpc-client':
         specifier: 0.17.6
-        version: 0.17.6(@grpc/grpc-js@1.8.21)
+        version: 0.17.6(@grpc/grpc-js@1.9.5)
       '@grpc/grpc-js':
-        specifier: 1.8.21
-        version: 1.8.21
+        specifier: 1.9.5
+        version: 1.9.5
       '@scow/protos':
         specifier: workspace:*
         version: link:../protos/scow
@@ -989,8 +1013,8 @@ importers:
         specifier: 2.1.1
         version: 2.1.1(ajv@8.12.0)
       envalid:
-        specifier: 7.3.1
-        version: 7.3.1
+        specifier: 8.0.0
+        version: 8.0.0
       js-yaml:
         specifier: 4.1.0
         version: 4.1.0
@@ -1006,10 +1030,10 @@ importers:
     dependencies:
       '@ddadaal/tsgrpc-client':
         specifier: 0.17.6
-        version: 0.17.6(@grpc/grpc-js@1.8.21)
+        version: 0.17.6(@grpc/grpc-js@1.9.5)
       '@grpc/grpc-js':
-        specifier: 1.8.21
-        version: 1.8.21
+        specifier: 1.9.5
+        version: 1.9.5
       '@scow/protos':
         specifier: workspace:*
         version: link:../protos/scow
@@ -1024,8 +1048,8 @@ importers:
   libs/protos/scheduler-adapter:
     dependencies:
       '@grpc/grpc-js':
-        specifier: 1.8.21
-        version: 1.8.21
+        specifier: 1.9.5
+        version: 1.9.5
       long:
         specifier: 5.2.3
         version: 5.2.3
@@ -1040,8 +1064,8 @@ importers:
   libs/protos/scow:
     dependencies:
       '@grpc/grpc-js':
-        specifier: 1.8.21
-        version: 1.8.21
+        specifier: 1.9.5
+        version: 1.9.5
       '@scow/grpc-api':
         specifier: workspace:*
         version: link:../../../protos
@@ -1059,8 +1083,8 @@ importers:
   libs/rich-error-model:
     dependencies:
       '@grpc/grpc-js':
-        specifier: 1.8.21
-        version: 1.8.21
+        specifier: 1.9.5
+        version: 1.9.5
       long:
         specifier: 5.2.3
         version: 5.2.3
@@ -1070,13 +1094,13 @@ importers:
     devDependencies:
       '@ddadaal/tsgrpc-client':
         specifier: 0.17.6
-        version: 0.17.6(@grpc/grpc-js@1.8.21)
+        version: 0.17.6(@grpc/grpc-js@1.9.5)
       '@ddadaal/tsgrpc-common':
         specifier: 0.2.4
         version: 0.2.4
       '@ddadaal/tsgrpc-server':
         specifier: 0.19.4
-        version: 0.19.4(@grpc/grpc-js@1.8.21)
+        version: 0.19.4(@grpc/grpc-js@1.9.5)
       '@scow/protos':
         specifier: workspace:*
         version: link:../protos/scow
@@ -1087,8 +1111,8 @@ importers:
   libs/scheduler-adapter:
     dependencies:
       '@grpc/grpc-js':
-        specifier: 1.8.21
-        version: 1.8.21
+        specifier: 1.9.5
+        version: 1.9.5
       '@scow/protos':
         specifier: workspace:*
         version: link:../protos/scow
@@ -1102,15 +1126,18 @@ importers:
         specifier: 0.2.4
         version: 0.2.4
       '@grpc/grpc-js':
-        specifier: 1.8.21
-        version: 1.8.21
+        specifier: 1.9.5
+        version: 1.9.5
+      nookies:
+        specifier: 2.5.2
+        version: 2.5.2
     devDependencies:
       '@ddadaal/tsgrpc-client':
         specifier: 0.17.6
-        version: 0.17.6(@grpc/grpc-js@1.8.21)
+        version: 0.17.6(@grpc/grpc-js@1.9.5)
       '@ddadaal/tsgrpc-server':
         specifier: 0.19.4
-        version: 0.19.4(@grpc/grpc-js@1.8.21)
+        version: 0.19.4(@grpc/grpc-js@1.9.5)
       '@scow/config':
         specifier: workspace:*
         version: link:../config
@@ -1158,8 +1185,8 @@ importers:
         specifier: 5.2.5
         version: 5.2.5(react-dom@18.2.0)(react@18.2.0)
       '@grpc/grpc-js':
-        specifier: 1.8.21
-        version: 1.8.21
+        specifier: 1.9.5
+        version: 1.9.5
       '@types/mime-types':
         specifier: 2.1.1
         version: registry.npmmirror.com/@types/mime-types@2.1.1
@@ -4392,13 +4419,13 @@ packages:
       zod: 3.22.2
     dev: false
 
-  /@ddadaal/tsgrpc-client@0.17.6(@grpc/grpc-js@1.8.21):
+  /@ddadaal/tsgrpc-client@0.17.6(@grpc/grpc-js@1.9.5):
     resolution: {integrity: sha512-nOmaVcZbK8ZaCIUtjOaedqFgmE72m1GHVn6vXqw4y91TDLI5haKSNTaXVZGaF/sbVCXUxT3WXHlM3v8PKsTdmw==}
     peerDependencies:
       '@grpc/grpc-js': '>=1.7.0'
     dependencies:
       '@ddadaal/tsgrpc-common': 0.2.4
-      '@grpc/grpc-js': 1.8.21
+      '@grpc/grpc-js': 1.9.5
       tslib: 2.6.1
 
   /@ddadaal/tsgrpc-common@0.2.4:
@@ -4406,13 +4433,13 @@ packages:
     dependencies:
       tslib: 2.6.1
 
-  /@ddadaal/tsgrpc-server@0.19.4(@grpc/grpc-js@1.8.21):
+  /@ddadaal/tsgrpc-server@0.19.4(@grpc/grpc-js@1.9.5):
     resolution: {integrity: sha512-o3qPM7S5+CNzyhlIY8x38qR+54IoTdYbIEii76fOuUpMUl6jsyPXebELaME4Szui1mpGfmqZb3vEE87BxBGHAA==}
     peerDependencies:
       '@grpc/grpc-js': '>=1.7.0'
     dependencies:
       '@ddadaal/tsgrpc-common': 0.2.4
-      '@grpc/grpc-js': 1.8.21
+      '@grpc/grpc-js': 1.9.5
       pino: 8.15.0
       tslib: 2.6.1
 
@@ -5312,23 +5339,22 @@ packages:
       hashlru: 2.3.0
     dev: false
 
-  /@grpc/grpc-js@1.8.21:
-    resolution: {integrity: sha512-KeyQeZpxeEBSqFVTi3q2K7PiPXmgBfECc4updA1ejCLjYmoAlvvM3ZMp5ztTDUCUQmoY3CpDxvchjO1+rFkoHg==}
+  /@grpc/grpc-js@1.9.5:
+    resolution: {integrity: sha512-iouYNlPxRAwZ2XboDT+OfRKHuaKHiqjB5VFYZ0NFrHkbEF+AV3muIUY9olQsp8uxU4VvRCMiRk9ftzFDGb61aw==}
     engines: {node: ^8.13.0 || >=10.10.0}
     dependencies:
-      '@grpc/proto-loader': 0.7.3
+      '@grpc/proto-loader': 0.7.10
       '@types/node': 18.17.6
 
-  /@grpc/proto-loader@0.7.3:
-    resolution: {integrity: sha512-5dAvoZwna2Py3Ef96Ux9jIkp3iZ62TUsV00p3wVBPNX5K178UbNi8Q7gQVqwXT1Yq9RejIGG9G2IPEo93T6RcA==}
+  /@grpc/proto-loader@0.7.10:
+    resolution: {integrity: sha512-CAqDfoaQ8ykFd9zqBDn4k6iWT9loLAlc2ETmDFS9JCD70gDcnA4L3AFEo2iV7KyAtAAHFW9ftq1Fz+Vsgq80RQ==}
     engines: {node: '>=6'}
     hasBin: true
     dependencies:
-      '@types/long': 4.0.2
       lodash.camelcase: 4.3.0
-      long: 4.0.0
+      long: 5.2.3
       protobufjs: 7.2.4
-      yargs: 16.2.0
+      yargs: 17.7.2
 
   /@hapi/hoek@9.3.0:
     resolution: {integrity: sha512-/c6rf4UJlmHlC9b5BaNvzAcFv7HZ2QHaV0D4/HNlBdvFnvQq8RI4kYdhyPCl7Xj+oWvTWQ8ujhqS53LIgAe6KQ==}
@@ -5808,6 +5834,63 @@ packages:
       - tedious
     dev: false
 
+  /@mikro-orm/cli@5.7.14(@mikro-orm/migrations@5.7.14)(@mikro-orm/mysql@5.7.14):
+    resolution: {integrity: sha512-+Npl7TGQvJBli8rVmFpBOJ/5ivWL8Ui2YxszMAK2n2hwFXxPomk3ySccG4E9KTsvEdph4KGA08UONlNB1VIquQ==}
+    engines: {node: '>= 14.0.0'}
+    hasBin: true
+    peerDependencies:
+      '@mikro-orm/better-sqlite': ^5.0.0
+      '@mikro-orm/entity-generator': ^5.0.0
+      '@mikro-orm/mariadb': ^5.0.0
+      '@mikro-orm/migrations': ^5.0.0
+      '@mikro-orm/migrations-mongodb': ^5.0.0
+      '@mikro-orm/mongodb': ^5.0.0
+      '@mikro-orm/mysql': ^5.0.0
+      '@mikro-orm/postgresql': ^5.0.0
+      '@mikro-orm/seeder': ^5.0.0
+      '@mikro-orm/sqlite': ^5.0.0
+    peerDependenciesMeta:
+      '@mikro-orm/better-sqlite':
+        optional: true
+      '@mikro-orm/entity-generator':
+        optional: true
+      '@mikro-orm/mariadb':
+        optional: true
+      '@mikro-orm/migrations':
+        optional: true
+      '@mikro-orm/migrations-mongodb':
+        optional: true
+      '@mikro-orm/mongodb':
+        optional: true
+      '@mikro-orm/mysql':
+        optional: true
+      '@mikro-orm/postgresql':
+        optional: true
+      '@mikro-orm/seeder':
+        optional: true
+      '@mikro-orm/sqlite':
+        optional: true
+    dependencies:
+      '@jercle/yargonaut': 1.1.5
+      '@mikro-orm/core': 5.7.14(@mikro-orm/migrations@5.7.14)(@mikro-orm/mysql@5.7.14)
+      '@mikro-orm/knex': 5.7.14(@mikro-orm/core@5.7.14)(@mikro-orm/migrations@5.7.14)(mysql2@3.5.2)
+      '@mikro-orm/migrations': 5.7.14(@mikro-orm/core@5.7.14)
+      '@mikro-orm/mysql': 5.7.14(@mikro-orm/core@5.7.14)(@mikro-orm/migrations@5.7.14)
+      fs-extra: 11.1.1
+      tsconfig-paths: 4.2.0
+      yargs: 17.7.2
+    transitivePeerDependencies:
+      - better-sqlite3
+      - mssql
+      - mysql
+      - mysql2
+      - pg
+      - pg-native
+      - sqlite3
+      - supports-color
+      - tedious
+    dev: false
+
   /@mikro-orm/core@5.7.14(@mikro-orm/mariadb@5.7.14)(@mikro-orm/migrations@5.7.14)(@mikro-orm/mysql@5.7.14)(@mikro-orm/seeder@5.7.14):
     resolution: {integrity: sha512-og2TJ4mRdGKF8ok/xSdGNbznm+WFF6VJosJnneulmY4VirRNfDfp7uNPBOinewigS4Q8Ntdirmponx4KrOoMBg==}
     engines: {node: '>= 14.0.0'}
@@ -5857,6 +5940,53 @@ packages:
       reflect-metadata: 0.1.13
     dev: false
 
+  /@mikro-orm/core@5.7.14(@mikro-orm/migrations@5.7.14)(@mikro-orm/mysql@5.7.14):
+    resolution: {integrity: sha512-og2TJ4mRdGKF8ok/xSdGNbznm+WFF6VJosJnneulmY4VirRNfDfp7uNPBOinewigS4Q8Ntdirmponx4KrOoMBg==}
+    engines: {node: '>= 14.0.0'}
+    peerDependencies:
+      '@mikro-orm/better-sqlite': ^5.0.0
+      '@mikro-orm/entity-generator': ^5.0.0
+      '@mikro-orm/mariadb': ^5.0.0
+      '@mikro-orm/migrations': ^5.0.0
+      '@mikro-orm/migrations-mongodb': ^5.0.0
+      '@mikro-orm/mongodb': ^5.0.0
+      '@mikro-orm/mysql': ^5.0.0
+      '@mikro-orm/postgresql': ^5.0.0
+      '@mikro-orm/seeder': ^5.0.0
+      '@mikro-orm/sqlite': ^5.0.0
+    peerDependenciesMeta:
+      '@mikro-orm/better-sqlite':
+        optional: true
+      '@mikro-orm/entity-generator':
+        optional: true
+      '@mikro-orm/mariadb':
+        optional: true
+      '@mikro-orm/migrations':
+        optional: true
+      '@mikro-orm/migrations-mongodb':
+        optional: true
+      '@mikro-orm/mongodb':
+        optional: true
+      '@mikro-orm/mysql':
+        optional: true
+      '@mikro-orm/postgresql':
+        optional: true
+      '@mikro-orm/seeder':
+        optional: true
+      '@mikro-orm/sqlite':
+        optional: true
+    dependencies:
+      '@mikro-orm/migrations': 5.7.14(@mikro-orm/core@5.7.14)
+      '@mikro-orm/mysql': 5.7.14(@mikro-orm/core@5.7.14)(@mikro-orm/migrations@5.7.14)
+      acorn-loose: 8.3.0
+      acorn-walk: 8.2.0
+      dotenv: 16.3.1
+      fs-extra: 11.1.1
+      globby: 11.1.0
+      mikro-orm: 5.7.14
+      reflect-metadata: 0.1.13
+    dev: false
+
   /@mikro-orm/knex@5.7.14(@mikro-orm/core@5.7.14)(@mikro-orm/migrations@5.7.14)(mysql2@3.5.2):
     resolution: {integrity: sha512-dLw80JiOfQ6YBtKXI3j0C31lYfbWlytZUpXFM4tEKlMbAMmSbPqDgZpiF3luxBKTg3JpsnGSK0urBOxL1c/m+g==}
     engines: {node: '>= 14.0.0'}
@@ -5888,7 +6018,7 @@ packages:
       sqlite3:
         optional: true
     dependencies:
-      '@mikro-orm/core': 5.7.14(@mikro-orm/mariadb@5.7.14)(@mikro-orm/migrations@5.7.14)(@mikro-orm/mysql@5.7.14)(@mikro-orm/seeder@5.7.14)
+      '@mikro-orm/core': 5.7.14(@mikro-orm/migrations@5.7.14)(@mikro-orm/mysql@5.7.14)
       '@mikro-orm/migrations': 5.7.14(@mikro-orm/core@5.7.14)
       fs-extra: 11.1.1
       knex: 2.5.1(mysql2@3.5.2)
@@ -5939,7 +6069,7 @@ packages:
     peerDependencies:
       '@mikro-orm/core': ^5.0.0
     dependencies:
-      '@mikro-orm/core': 5.7.14(@mikro-orm/mariadb@5.7.14)(@mikro-orm/migrations@5.7.14)(@mikro-orm/mysql@5.7.14)(@mikro-orm/seeder@5.7.14)
+      '@mikro-orm/core': 5.7.14(@mikro-orm/migrations@5.7.14)(@mikro-orm/mysql@5.7.14)
       '@mikro-orm/knex': 5.7.14(@mikro-orm/core@5.7.14)(@mikro-orm/migrations@5.7.14)(mysql2@3.5.2)
       fs-extra: 11.1.1
       knex: 2.5.1(mysql2@3.5.2)
@@ -5950,6 +6080,37 @@ packages:
       - mssql
       - mysql
       - mysql2
+      - pg
+      - pg-native
+      - sqlite3
+      - supports-color
+      - tedious
+    dev: false
+
+  /@mikro-orm/mysql@5.7.14(@mikro-orm/core@5.7.14)(@mikro-orm/migrations@5.7.14):
+    resolution: {integrity: sha512-6VfVOMhKcqM72p197G9n+3suWx7fuaoKD4Fcl3rjILkiSS8uFNutgCoRdrjg/2TMEZSgywkZdorwVfPyH+1kbw==}
+    engines: {node: '>= 14.0.0'}
+    peerDependencies:
+      '@mikro-orm/core': ^5.0.0
+      '@mikro-orm/entity-generator': ^5.0.0
+      '@mikro-orm/migrations': ^5.0.0
+      '@mikro-orm/seeder': ^5.0.0
+    peerDependenciesMeta:
+      '@mikro-orm/entity-generator':
+        optional: true
+      '@mikro-orm/migrations':
+        optional: true
+      '@mikro-orm/seeder':
+        optional: true
+    dependencies:
+      '@mikro-orm/core': 5.7.14(@mikro-orm/migrations@5.7.14)(@mikro-orm/mysql@5.7.14)
+      '@mikro-orm/knex': 5.7.14(@mikro-orm/core@5.7.14)(@mikro-orm/migrations@5.7.14)(mysql2@3.5.2)
+      '@mikro-orm/migrations': 5.7.14(@mikro-orm/core@5.7.14)
+      mysql2: 3.5.2
+    transitivePeerDependencies:
+      - better-sqlite3
+      - mssql
+      - mysql
       - pg
       - pg-native
       - sqlite3
@@ -7398,9 +7559,6 @@ packages:
     dependencies:
       '@types/node': 18.16.14
     dev: true
-
-  /@types/long@4.0.2:
-    resolution: {integrity: sha512-MqTGEo5bj5t157U6fA/BiDynNkn0YknVdh48CMPkTSpFTVmvao5UQmm7uEF6xBEo7qIMAlY/JSleYaE6VOdpaA==}
 
   /@types/mdast@3.0.10:
     resolution: {integrity: sha512-W864tg/Osz1+9f4lrGTZpCSO5/z4608eUp19tbozkq2HJK6i3z1kT0H9tlADXuYIb1YYOBByU4Jsqkk75q48qA==}
@@ -9208,6 +9366,7 @@ packages:
       string-width: 4.2.3
       strip-ansi: 6.0.1
       wrap-ansi: 7.0.0
+    dev: false
 
   /cliui@8.0.1:
     resolution: {integrity: sha512-BSeNnyus75C4//NQ9gQt1/csTXyo/8Sb+afLAkzAptFuMsod9HFokGNudZpi/oQV73hnVK+sR+5PVRMd+Dr7YQ==}
@@ -10560,11 +10719,11 @@ packages:
     resolution: {integrity: sha512-oYp7156SP8LkeGD0GF85ad1X9Ai79WtRsZ2gxJqtBuzH+98YUV6jkHEKlZkMbcrjJjIVJNIDP/3WL9wQkoPbWA==}
     engines: {node: '>=0.12'}
 
-  /envalid@7.3.1:
-    resolution: {integrity: sha512-KL1YRwn8WcoF/Ty7t+yLLtZol01xr9ZJMTjzoGRM8NaSU+nQQjSWOQKKJhJP2P57bpdakJ9jbxqQX4fGTOicZg==}
+  /envalid@8.0.0:
+    resolution: {integrity: sha512-PGeYJnJB5naN0ME6SH8nFcDj9HVbLpYIfg1p5lAyM9T4cH2lwtu2fLbozC/bq+HUUOIFxhX/LP0/GmlqPHT4tQ==}
     engines: {node: '>=8.12'}
     dependencies:
-      tslib: 2.3.1
+      tslib: 2.6.2
     dev: false
 
   /errno@0.1.8:
@@ -13985,9 +14144,6 @@ packages:
       is-unicode-supported: 0.1.0
     dev: true
 
-  /long@4.0.0:
-    resolution: {integrity: sha512-XsP+KhQif4bjX1kbuSiySJFNAehNxgLb6hPRGJ9QsUr8ajHkuXGdrHmFUTUUXhDwVX2R5bY4JNZEwbUiMhV+MA==}
-
   /long@5.2.3:
     resolution: {integrity: sha512-lcHwpNoggQTObv5apGNCTdJrO69eHOZMi4BNC+rTLER8iHAqGrUVeLh/irVIM7zTw2bOXA8T6uNPeujwOLg/2Q==}
 
@@ -14817,9 +14973,9 @@ packages:
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
 
-  /nanoid@4.0.2:
-    resolution: {integrity: sha512-7ZtY5KTCNheRGfEFxnedV5zFiORN1+Y1N6zvPTnHQd8ENUvfaDBeuJDZb2bN/oXwXxu3qkTXDzy57W5vAmDTBw==}
-    engines: {node: ^14 || ^16 || >=18}
+  /nanoid@5.0.1:
+    resolution: {integrity: sha512-vWeVtV5Cw68aML/QaZvqN/3QQXc6fBfIieAlu05m7FZW2Dgb+3f0xc0TTxuJW+7u30t7iSDTV/j3kVI0oJqIfQ==}
+    engines: {node: ^18 || >=20}
     hasBin: true
     dev: false
 
@@ -17332,6 +17488,15 @@ packages:
       - '@types/react'
     dev: false
 
+  /react-typed-i18n@2.3.0(patch_hash=eybujl4up7xenffji6zpg43f3u)(react@18.2.0):
+    resolution: {integrity: sha512-ap0/WlMz4iFwxha2nLPn3mWiUNO/f4PagXIbTznnpCzSTWOk4ifkWyI/iC4LiA7rF49aBsMqAUAmk65mzfWPkA==}
+    peerDependencies:
+      react: '>=16.8.0'
+    dependencies:
+      react: 18.2.0
+    dev: false
+    patched: true
+
   /react-transition-group@2.9.0(react-dom@18.2.0)(react@18.2.0):
     resolution: {integrity: sha512-+HzNTCHpeQyl4MJ/bdE0u6XRMe9+XG/+aL4mCxVN4DnPBQ0/5bfHWPDuOZUzYdMj94daZaZdCCc1Dzt9R/xSSg==}
     peerDependencies:
@@ -19257,10 +19422,6 @@ packages:
     resolution: {integrity: sha512-4krF8scpejhaOgqzBEcGM7yDIEfi0/8+8zDRZhNZZ2kjmHJ4hv3zCbQWxoJGz1iw5U0Jl0nma13xzHXcncMavQ==}
     dev: true
 
-  /tslib@2.3.1:
-    resolution: {integrity: sha512-77EbyPPpMz+FRFRuAFlWMtmgUWGe9UOG2Z25NqCwiIjRhOf5iKGuzSe5P2w1laq+FkRy4p+PCuVkJSGkzTEKVw==}
-    dev: false
-
   /tslib@2.6.1:
     resolution: {integrity: sha512-t0hLfiEKfMUoqhG+U1oid7Pva4bbDPHYfJNiB7BiIjRkj1pyC++4N3huJfqY6aRH6VTB0rvtzQwjM4K6qpfOig==}
 
@@ -20491,6 +20652,7 @@ packages:
   /yargs-parser@20.2.9:
     resolution: {integrity: sha512-y11nGElTIV+CT3Zv9t7VKl+Q3hTQoT9a1Qzezhhl6Rp21gJ/IVTW7Z3y9EWXhuUBC2Shnf+DX0antecpAwSP8w==}
     engines: {node: '>=10'}
+    dev: false
 
   /yargs-parser@21.1.1:
     resolution: {integrity: sha512-tVpsJW7DdjecAiFpbIB1e3qxIQsE6NoPc5/eTdrbbIC4h0LVsWhnoa3g+m2HclBIujHzsxZ4VJVA+GUuc2/LBw==}
@@ -20523,6 +20685,7 @@ packages:
       string-width: 4.2.3
       y18n: 5.0.8
       yargs-parser: 20.2.9
+    dev: false
 
   /yargs@17.6.2:
     resolution: {integrity: sha512-1/9UrdHjDZc0eOU0HxOHoS78C69UD3JRMvzlJ7S79S2nTaWRA/whGCTV8o9e/N/1Va9YIV7Q4sOxD8VV4pCWOw==}

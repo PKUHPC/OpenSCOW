@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { getLanguageCookie } from "@scow/lib-web/build/utils/languages";
 import { queryToString, useQuerystring } from "@scow/lib-web/build/utils/querystring";
 import { Spin } from "antd";
 import { GetServerSideProps, NextPage } from "next";
@@ -18,8 +19,9 @@ import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
+import { useI18nTranslateToString } from "src/i18n";
 import { SubmitJobForm } from "src/pageComponents/job/SubmitJobForm";
-import { publicConfig, runtimeConfig } from "src/utils/config";
+import { getServerI18nConfigText, publicConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
 
 interface Props {
@@ -64,13 +66,15 @@ export const SubmitJobPage: NextPage<Props> = requireAuth(() => true)(
       [cluster, jobTemplateId]),
     });
 
+    const t = useI18nTranslateToString();
+
     return (
       <div>
-        <Head title="提交作业" />
-        <PageTitle titleText={"提交作业"} />
+        <Head title={t("pages.jobs.submit.title")} />
+        <PageTitle titleText={t("pages.jobs.submit.pageTitle")} />
         {
           isLoading ? (
-            <Spin tip="正在加载作业模板" />
+            <Spin tip={t("pages.jobs.submit.spin")} />
           ) : (
             <SubmitJobForm initial={data} submitJobPromptText={props.submitJobPromptText} />
           )
@@ -80,9 +84,10 @@ export const SubmitJobPage: NextPage<Props> = requireAuth(() => true)(
 
   });
 
-export const getServerSideProps: GetServerSideProps = async () => {
+export const getServerSideProps: GetServerSideProps = async ({ req }) => {
 
-  const submitJobPromptText = runtimeConfig.SUBMIT_JOB_PROMPT_TEXT;
+  const languageId = getLanguageCookie(req);
+  const submitJobPromptText = getServerI18nConfigText(languageId, "submitJopPromptText");
 
   return {
     props: {

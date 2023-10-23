@@ -16,15 +16,12 @@ import { Alert, Col, Row, Statistic, StatisticProps } from "antd";
 import React from "react";
 import { Section } from "src/components/Section";
 import { StatCard } from "src/components/StatCard";
+import { useI18nTranslateToString } from "src/i18n";
 import { UserStatus } from "src/models/User";
 import type { AccountInfo } from "src/pages/dashboard";
-import styled from "styled-components";
+import { styled } from "styled-components";
 
-const statusTexts = {
-  blocked: ["封锁", "red", LockOutlined],
-  normal: ["正常", "green", UnlockOutlined],
 
-} as const;
 
 interface Props {
   info: Record<string, AccountInfo>;
@@ -52,11 +49,19 @@ export const AccountInfoSection: React.FC<Props> = ({ info }) => {
 
   const accounts = Object.entries(info);
 
+  const t = useI18nTranslateToString();
+
+  const statusTexts = {
+    blocked: [t("dashboard.account.status.blocked"), "red", LockOutlined],
+    normal: [t("dashboard.account.status.normal"), "green", UnlockOutlined],
+
+  } as const;
+
   return (
-    <Section title="账户信息">
+    <Section title={t("dashboard.account.title")}>
       {
         accounts.length === 0 ? (
-          <Alert message="您不属于任何一个账户。" type="warning" showIcon />
+          <Alert message={t("dashboard.account.alert")} type="warning" showIcon />
         ) : (
           <Container>
             {
@@ -80,13 +85,13 @@ export const AccountInfoSection: React.FC<Props> = ({ info }) => {
                     <StatCard title={`${accountName}`}>
                       <Row style={{ flex: 1, width: "100%" }}>
                         <Info
-                          title="状态"
+                          title={t("dashboard.account.state")}
                           valueStyle={{ color: textColor }}
                           prefix={<Icon />}
                           value={text}
                         />
                         <Info
-                          title={"可用余额"}
+                          title={t("dashboard.account.balance")}
                           valueStyle={{ color: minOne < 0 ? "red" : undefined }}
                           prefix={"￥"}
                           value={minOne.toFixed(3)}

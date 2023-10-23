@@ -6,7 +6,7 @@ footer:
   defaultText: ""
 
   # 对具体hostname生效的footer文本，可以不填
-  # hostnameTextMap:
+  # hostnameMap:
     # 从a.com的访问显示footer文本为a.com的文本
     # a.com: a.com的文本
 
@@ -18,7 +18,7 @@ primaryColor:
   defaultColor: "#94070A"
 
   # 对具体hostname生效的生效，可以不填
-  # hostnameTextMap:
+  # hostnameMap:
     # 从a.com的访问的主题色为#000000
     # a.com: "#000000"
 

@@ -1,12 +1,16 @@
 # 给默认租户以及未登录用户的集群说明
 default:
+    # 此文本支持国际化
     clusterComment: 集群说明
     extras:
+        # 此文本支持国际化
         - title: 其他内容1
+          # 此文本支持国际化
           content: 其他内容1内容
         - title: 其他内容2
           content: 其他内容2内容
 
 # tenant_1租户的用户的说明
 tenant_1:
+    # 此文本支持国际化
     clusterComment: tenant_1的内容

@@ -19,7 +19,7 @@ import { HeaderItem } from "src/layouts/base/header/components";
 import { Logo } from "src/layouts/base/header/Logo";
 import { UserIndicator } from "src/layouts/base/header/UserIndicator";
 import { NavItemProps, UserInfo, UserLink } from "src/layouts/base/types";
-import styled from "styled-components";
+import { styled } from "styled-components";
 
 interface ComponentProps {
   homepage?: boolean;
@@ -65,6 +65,7 @@ interface Props {
   right?: React.ReactNode;
   basePath: string;
   userLinks?: UserLink[];
+  languageId: string;
 }
 
 export const Header: React.FC<Props> = ({
@@ -72,7 +73,9 @@ export const Header: React.FC<Props> = ({
   setSidebarCollapsed, sidebarCollapsed,
   pathname, user, logout,
   right, basePath, userLinks,
+  languageId,
 }) => {
+
   return (
     <Container>
       <HeaderItem>
@@ -97,7 +100,7 @@ export const Header: React.FC<Props> = ({
       </MenuPart>
       {right}
       <IndicatorPart>
-        <UserIndicator user={user} logout={logout} userLinks={userLinks}/>
+        <UserIndicator user={user} logout={logout} userLinks={userLinks} languageId={languageId}/>
       </IndicatorPart>
     </Container>
   );

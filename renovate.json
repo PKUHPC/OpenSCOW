@@ -25,7 +25,6 @@
     },
     {
       "matchPackagePatterns": [
-        "@grpc/grpc-js",
         "next"
       ],
       "enabled": false

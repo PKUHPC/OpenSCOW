@@ -12,7 +12,8 @@
 
 import { RefreshLink } from "@scow/lib-web/build/utils/refreshToken";
 import { PropsWithChildren } from "react";
-import styled from "styled-components";
+import { useI18n } from "src/i18n";
+import { styled } from "styled-components";
 
 type Props = PropsWithChildren<{
   isLoading: boolean;
@@ -28,10 +29,11 @@ const Container = styled.div`
 export const FilterRow: React.FC<Props> = ({
   reload, children,
 }) => {
+  const languageId = useI18n().currentLanguage.id;
   return (
     <Container>
       {children}
-      <RefreshLink refresh={reload} />
+      <RefreshLink refresh={reload} languageId={languageId} />
     </Container>
   );
 };

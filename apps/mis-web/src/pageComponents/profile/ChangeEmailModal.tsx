@@ -10,12 +10,14 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { getEmailRule } from "@scow/lib-web/build/utils/form";
 import { App, Form, Input, Modal } from "antd";
 import React, { useState } from "react";
 import { useStore } from "simstate";
 import { api } from "src/apis";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { UserStore } from "src/stores/UserStore";
-import { emailRule } from "src/utils/form";
+
 
 export interface Props {
   open: boolean;
@@ -26,9 +28,10 @@ export interface Props {
 interface FormInfo {
   newEmail: string;
   oldEmail: string;
-  
+
 }
 
+const p = prefix("pageComp.profile.");
 
 export const ChangeEmailModal: React.FC<Props> = ({
   open,
@@ -36,23 +39,26 @@ export const ChangeEmailModal: React.FC<Props> = ({
   setEmail,
 }) => {
 
+  const t = useI18nTranslateToString();
+  const languageId = useI18n().currentLanguage.id;
+
   const [form] = Form.useForm<FormInfo>();
   const { message } = App.useApp();
   const [loading, setLoading] = useState(false);
 
   const userStore = useStore(UserStore);
-  
+
   const onFinish = async () => {
     const { newEmail } = await form.validateFields();
     setLoading(true);
 
     await api.changeEmail({ body: { userId:userStore.user?.identityId as string, newEmail } })
-      .httpError(500, () => { message.error("修改邮箱失败"); })
+      .httpError(500, () => { message.error(t(p("changeEmailFail"))); })
       .then(() => {
         form.resetFields();
         form.setFieldValue("oldEmail", newEmail);
         setEmail(newEmail);
-        message.success("邮箱更改成功！");
+        message.success(t(p("changeEmailSuccess")));
       })
       .finally(() => {
         setLoading(false);
@@ -61,7 +67,7 @@ export const ChangeEmailModal: React.FC<Props> = ({
 
   return (
     <Modal
-      title="修改邮箱"
+      title={t(p("changeEmail"))}
       open={open}
       onOk={form.submit}
       confirmLoading={loading}
@@ -75,18 +81,18 @@ export const ChangeEmailModal: React.FC<Props> = ({
         onFinish={onFinish}
       >
         <Form.Item
-          label="原邮箱"
+          label={t(p("oldEmail"))}
           name="oldEmail"
           initialValue={userStore.user?.email}
         >
           <Input disabled />
         </Form.Item>
         <Form.Item
-          rules={[{ required: true }, emailRule]}
-          label="新邮箱"
+          rules={[{ required: true }, getEmailRule(languageId)]}
+          label={t(p("newEmail"))}
           name="newEmail"
         >
-          <Input placeholder="请输入新邮箱" />
+          <Input placeholder={t(p("inputEmail"))} />
         </Form.Item>
       </Form>
     </Modal>

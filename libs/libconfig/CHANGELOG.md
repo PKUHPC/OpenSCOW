@@ -1,5 +1,11 @@
 # @scow/lib-config
 
+## 1.0.0
+
+### Major Changes
+
+- 11f94f716: 发布 1.0
+
 ## 0.2.2
 
 ### Patch Changes

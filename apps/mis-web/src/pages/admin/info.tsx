@@ -23,6 +23,7 @@ import { requireAuth } from "src/auth/requireAuth";
 import { ssrAuthenticate, SSRProps } from "src/auth/server";
 import { UnifiedErrorPage } from "src/components/errorPages/UnifiedErrorPage";
 import { PageTitle } from "src/components/PageTitle";
+import { useI18nTranslateToString } from "src/i18n";
 import { PlatformRole } from "src/models/User";
 import { DataBarChart } from "src/pageComponents/admin/DataBarChart";
 import { DataLineChart } from "src/pageComponents/admin/DataLineChart";
@@ -74,6 +75,8 @@ type Props = SSRProps<Info, 500>
 export const PlatformInfoPage: NextPage<Props> =
 requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
 ((props: Props) => {
+
+  const t = useI18nTranslateToString();
 
   if ("error" in props) {
     return <UnifiedErrorPage code={props.error} />;

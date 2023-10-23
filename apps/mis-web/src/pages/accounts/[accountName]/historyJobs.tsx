@@ -13,20 +13,24 @@
 import { NextPage } from "next";
 import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import {
   checkQueryAccountNameIsAdmin,
   useAccountPagesAccountName } from "src/pageComponents/accounts/checkQueryAccountNameIsAdmin";
 import { JobTable } from "src/pageComponents/job/HistoryJobTable";
 import { Head } from "src/utils/head";
+
+const p = prefix("page.accounts.accountName.historyJobs.");
+
 export const HistoryJobsPage: NextPage = requireAuth(
   (u) => u.accountAffiliations.length > 0,
   checkQueryAccountNameIsAdmin,
 )(
   () => {
-
+    const t = useI18nTranslateToString();
     const accountName = useAccountPagesAccountName();
 
-    const title = `账户${accountName}已结束的作业`;
+    const title = t(p("title"), [accountName]);
     return (
       <div>
         <Head title={title} />
@@ -37,7 +41,7 @@ export const HistoryJobsPage: NextPage = requireAuth(
           showAccount={false}
           showUser={true}
           showedPrices={["account"]}
-          priceTexts={{ account: "作业计费" }}
+          priceTexts={{ account: t("common.jobBilling") }}
         />
       </div>
 

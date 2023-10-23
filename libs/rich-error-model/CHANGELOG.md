@@ -1,5 +1,11 @@
 # @scow/rich-error-model
 
+## 2.0.0
+
+### Major Changes
+
+- 11f94f716: 发布 1.0
+
 ## 1.0.1
 
 ### Patch Changes

@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import styled from "styled-components";
+import { styled } from "styled-components";
 
 export const TableTitle = styled.div<{ justify?: string }>`
   display: flex;

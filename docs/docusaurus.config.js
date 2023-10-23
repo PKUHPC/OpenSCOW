@@ -123,13 +123,6 @@ const config = {
           },
           {
             type: "doc",
-            docId: "guide/index",
-            position: "left",
-            sidebarId: "guide",
-            label: "使用文档",
-          },
-          {
-            type: "doc",
             docId: "contribution/index",
             position: "left",
             sidebarId: "contribution",

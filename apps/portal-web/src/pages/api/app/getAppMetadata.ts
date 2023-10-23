@@ -13,15 +13,29 @@
 import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { status } from "@grpc/grpc-js";
-import { appCustomAttribute_AttributeTypeToJSON, AppServiceClient } from "@scow/protos/build/portal/app";
+import { I18nStringType } from "@scow/lib-web/build/utils/i18n";
+import { appCustomAttribute_AttributeTypeToJSON,
+  AppServiceClient, I18nStringProtoType } from "@scow/protos/build/portal/app";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { getClient } from "src/utils/client";
 import { handlegRPCError } from "src/utils/server";
 
+export const I18nStringSchemaType = Type.Union([
+  Type.String(),
+  Type.Object({
+    i18n: Type.Object({
+      default: Type.String(),
+      en: Type.Optional(Type.String()),
+      zh_cn: Type.Optional(Type.String()),
+    }),
+  }),
+]);
+export type I18nStringSchemaType = Static<typeof I18nStringSchemaType>;
+
 export const SelectOption = Type.Object({
   value: Type.String(),
-  label: Type.String(),
+  label: I18nStringSchemaType,
   requireGpu: Type.Optional(Type.Boolean()),
 });
 export type SelectOption = Static<typeof SelectOption>;
@@ -33,10 +47,10 @@ export const AppCustomAttribute = Type.Object({
     Type.Literal("SELECT"),
     Type.Literal("TEXT"),
   ]),
-  label: Type.String(),
+  label: I18nStringSchemaType,
   name: Type.String(),
   required: Type.Boolean(),
-  placeholder: Type.Optional(Type.String()),
+  placeholder: Type.Optional(I18nStringSchemaType),
   defaultValue: Type.Optional(Type.Union([
     Type.String(),
     Type.Number(),
@@ -45,6 +59,27 @@ export const AppCustomAttribute = Type.Object({
   select: Type.Array(SelectOption),
 });
 export type AppCustomAttribute = Static<typeof AppCustomAttribute>;
+
+// protobuf中定义的grpc返回值的类型映射到前端I18nStringType
+const getI18nTypeFormat = (i18nProtoType: I18nStringProtoType | undefined): I18nStringType => {
+
+  if (!i18nProtoType?.value) return "";
+
+  if (i18nProtoType.value.$case === "directString") {
+    return i18nProtoType.value.directString;
+  } else {
+    const i18nObj = i18nProtoType.value.i18nObject.i18n;
+    if (!i18nObj) return "";
+    return {
+      i18n: {
+        default: i18nObj.default,
+        en: i18nObj.en,
+        zh_cn: i18nObj.zhCn,
+      },
+    };
+  }
+
+};
 
 export const GetAppMetadataSchema = typeboxRouteSchema({
   method: "GET",
@@ -58,6 +93,7 @@ export const GetAppMetadataSchema = typeboxRouteSchema({
     200: Type.Object({
       appName: Type.String(),
       appCustomFormAttributes: Type.Array(AppCustomAttribute),
+      appComment: Type.Optional(I18nStringSchemaType),
     }),
 
     // appId not exists
@@ -79,18 +115,28 @@ export default /* #__PURE__*/typeboxRoute(GetAppMetadataSchema, async (req, res)
   const client = getClient(AppServiceClient);
 
   return asyncUnaryCall(client, "getAppMetadata", { appId, cluster }).then((reply) => {
+
     const attributes: AppCustomAttribute[] = reply.attributes.map((item) => ({
       type: appCustomAttribute_AttributeTypeToJSON(item.type) as AppCustomAttribute["type"],
-      label: item.label,
+      label: getI18nTypeFormat(item.label),
       name: item.name,
-      select: item.options,
+      select: item.options?.map((option) => {
+        return {
+          value: option.value,
+          label: getI18nTypeFormat(option.label),
+          requireGpu: option.requireGpu,
+        };
+      }),
       required: item.required,
       defaultValue: item.defaultInput
         ? (item.defaultInput?.$case === "text" ? item.defaultInput.text : item.defaultInput.number)
         : undefined,
-      placeholder: item.placeholder,
+      placeholder: getI18nTypeFormat(item.placeholder),
     }));
-    return { 200: { appName: reply.appName, appCustomFormAttributes: attributes } };
+
+    const comment = getI18nTypeFormat(reply.appComment);
+
+    return { 200: { appName: reply.appName, appCustomFormAttributes: attributes, appComment: comment } };
   }, handlegRPCError({
     [status.NOT_FOUND]: () => ({ 404: { code: "APP_NOT_FOUND" } } as const),
   }));

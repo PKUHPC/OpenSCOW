@@ -19,6 +19,7 @@ import { GlobalStyle } from "@scow/lib-web/build/layouts/globalStyle";
 import { getHostname } from "@scow/lib-web/build/utils/getHostname";
 import { useConstant } from "@scow/lib-web/build/utils/hooks";
 import { isServer } from "@scow/lib-web/build/utils/isServer";
+import { getLanguageCookie } from "@scow/lib-web/build/utils/languages";
 import { App as AntdApp } from "antd";
 import type { AppContext, AppProps } from "next/app";
 import NextApp from "next/app";
@@ -30,6 +31,9 @@ import { createStore, StoreProvider, useStore } from "simstate";
 import { api } from "src/apis";
 import { USE_MOCK } from "src/apis/useMock";
 import { getTokenFromCookie } from "src/auth/cookie";
+import { Provider, useI18nTranslateToString } from "src/i18n";
+import en from "src/i18n/en";
+import zh_cn from "src/i18n/zh_cn";
 import { AntdConfigProvider } from "src/layouts/AntdConfigProvider";
 import { BaseLayout } from "src/layouts/BaseLayout";
 import { FloatButtons } from "src/layouts/FloatButtons";
@@ -44,6 +48,7 @@ import { LoginNode, publicConfig, runtimeConfig } from "src/utils/config";
 const FailEventHandler: React.FC = () => {
   const { message } = AntdApp.useApp();
   const userStore = useStore(UserStore);
+  const t = useI18nTranslateToString();
 
   // 登出过程需要调用的几个方法（logout, useState等）都是immutable的
   // 所以不需要每次userStore变化时来重新注册handler
@@ -55,17 +60,17 @@ const FailEventHandler: React.FC = () => {
       }
 
       if (e.data?.code === "SSH_ERROR") {
-        message.error("无法以用户身份连接到登录节点。请确认您的家目录的权限为700、750或者755");
+        message.error(t("pages._app.sshError"));
         return;
       }
 
       if (e.data?.code === "SFTP_ERROR") {
         message.error(e.data?.details.length > 150 ? e.data?.details.substring(0, 150) + "..." :
-          e.data?.details || "SFTP操作失败，请确认您是否有操作的权限");
+          e.data?.details || t("pages._app.sftpError"));
         return;
       }
 
-      message.error(`服务器出错啦！(${e.status}, ${e.data?.code}))`);
+      message.error(`${t("pages._app.otherError")}(${e.status}, ${e.data?.code}))`);
     });
   }, []);
 
@@ -86,6 +91,7 @@ interface ExtraProps {
   footerText: string;
   loginNodes: Record<string, LoginNode[]>;
   darkModeCookieValue: DarkModeCookie | undefined;
+  languageId: string;
 }
 
 type Props = AppProps & { extra: ExtraProps };
@@ -93,15 +99,14 @@ type Props = AppProps & { extra: ExtraProps };
 function MyApp({ Component, pageProps, extra }: Props) {
 
   // remembers extra props from first load
-  const { current: { userInfo, primaryColor, footerText } } = useRef(extra);
+  const { current: { userInfo, primaryColor, footerText, loginNodes, languageId } } = useRef(extra);
 
   const userStore = useConstant(() => {
     const store = createStore(UserStore, userInfo);
     return store;
   });
 
-
-  const loginNodeStore = useConstant(() => createStore(LoginNodeStore, extra.loginNodes));
+  const loginNodeStore = useConstant(() => createStore(LoginNodeStore, loginNodes, languageId));
 
   const defaultClusterStore = useConstant(() => createStore(DefaultClusterStore));
 
@@ -128,20 +133,25 @@ function MyApp({ Component, pageProps, extra }: Props) {
           }}
         />
       </Head>
-      <StoreProvider stores={[userStore, defaultClusterStore, loginNodeStore]}>
-        <DarkModeProvider initial={extra.darkModeCookieValue}>
-          <AntdConfigProvider color={primaryColor}>
-            <FloatButtons />
-            <GlobalStyle />
-            <FailEventHandler />
-            <TopProgressBar />
-            <BaseLayout footerText={footerText} versionTag={publicConfig.VERSION_TAG}>
-              <Component {...pageProps} />
-            </BaseLayout>
-          </AntdConfigProvider>
-        </DarkModeProvider>
-      </StoreProvider>
-
+      <Provider initialLanguage={{
+        id: extra.languageId,
+        definitions: extra.languageId === "en" ? en : zh_cn,
+      }}
+      >
+        <StoreProvider stores={[userStore, defaultClusterStore, loginNodeStore]}>
+          <DarkModeProvider initial={extra.darkModeCookieValue}>
+            <AntdConfigProvider color={primaryColor} locale={extra.languageId}>
+              <FloatButtons languageId={extra.languageId} />
+              <GlobalStyle />
+              <FailEventHandler />
+              <TopProgressBar />
+              <BaseLayout footerText={footerText} versionTag={publicConfig.VERSION_TAG}>
+                <Component {...pageProps} />
+              </BaseLayout>
+            </AntdConfigProvider>
+          </DarkModeProvider>
+        </StoreProvider>
+      </Provider>
     </>
   );
 }
@@ -154,6 +164,7 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
     primaryColor: "",
     darkModeCookieValue: getDarkModeCookieValue(appContext.ctx.req),
     loginNodes: {},
+    languageId: "",
   };
 
   // This is called on server on first load, and on client on every page transition
@@ -184,13 +195,17 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
 
     extra.primaryColor = (hostname && runtimeConfig.UI_CONFIG?.primaryColor?.hostnameMap?.[hostname])
       ?? runtimeConfig.UI_CONFIG?.primaryColor?.defaultColor ?? runtimeConfig.DEFAULT_PRIMARY_COLOR;
-    extra.footerText = (hostname && runtimeConfig.UI_CONFIG?.footer?.hostnameTextMap?.[hostname])
+    extra.footerText = (hostname && runtimeConfig.UI_CONFIG?.footer?.hostnameMap?.[hostname])
+      ?? (hostname && runtimeConfig.UI_CONFIG?.footer?.hostnameTextMap?.[hostname])
       ?? runtimeConfig.UI_CONFIG?.footer?.defaultText ?? "";
 
     extra.loginNodes = Object.keys(runtimeConfig.CLUSTERS_CONFIG).reduce((acc, cluster) => {
       acc[cluster] = runtimeConfig.CLUSTERS_CONFIG[cluster].loginNodes;
       return acc;
     }, {});
+
+    // 从Cookies或header中获取语言id
+    extra.languageId = getLanguageCookie(appContext.ctx.req);
   }
 
   const appProps = await NextApp.getInitialProps(appContext);

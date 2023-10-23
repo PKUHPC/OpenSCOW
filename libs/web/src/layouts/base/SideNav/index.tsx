@@ -18,8 +18,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { calcSelectedKeys, createMenuItems } from "src/layouts/base/common";
 import { antdBreakpoints } from "src/layouts/base/constants";
 import { NavItemProps } from "src/layouts/base/types";
-import { useDidUpdateEffect } from "src/utils/hooks";
-import styled from "styled-components";
+import { styled } from "styled-components";
 
 import BodyMask from "./BodyMask";
 
@@ -92,9 +91,9 @@ export const SideNav: React.FC<Props> = ({
      * 点击菜单，收起其他展开的所有菜单，保持菜单聚焦简洁。
      * 仅在账户管理页面有效，且用户管理的账户数量超过三个
      */
-    // 
+    //
     menuFocusedRef.current = parentKeys.length > 3 && /^\/accounts/.test(parentKeys[0]);
-    
+
     if (menuFocusedRef.current) setOpenKeys([parentKeys[0]]);
     else setOpenKeys(parentKeys);
   }, [parentKeys]);
@@ -114,13 +113,13 @@ export const SideNav: React.FC<Props> = ({
       } else {
         setOpenKeys(latestOpenKey ? [latestOpenKey] : []);
       }
-    } 
+    }
     else setOpenKeys(keys);
 
-  }, [openKeys, parentKeys]); 
+  }, [openKeys, parentKeys]);
 
   const selectedKeys = useMemo(() => calcSelectedKeys(routes, pathname), [routes, pathname]);
-  
+
   // 账户管理页面，联动横向菜单栏展开相应的侧面菜单栏
   useEffect(() => {
     if (menuFocusedRef.current) {

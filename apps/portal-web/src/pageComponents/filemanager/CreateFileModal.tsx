@@ -14,6 +14,7 @@ import { App, Form, Input, Modal } from "antd";
 import { join } from "path";
 import { useState } from "react";
 import { api } from "src/apis";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 
 interface Props {
   open: boolean;
@@ -27,6 +28,8 @@ interface FormProps {
   newFileName: string;
 }
 
+const p = prefix("pageComp.fileManagerComp.createFileModal.");
+
 export const CreateFileModal: React.FC<Props> = ({ open, onClose, path, reload, cluster }) => {
 
   const { message } = App.useApp();
@@ -34,13 +37,15 @@ export const CreateFileModal: React.FC<Props> = ({ open, onClose, path, reload, 
   const [form] = Form.useForm<FormProps>();
   const [loading, setLoading] = useState(false);
 
+  const t = useI18nTranslateToString();
+
   const onSubmit = async () => {
     const { newFileName } = await form.validateFields();
     setLoading(true);
     await api.createFile({ body: { cluster, path: join(path, newFileName) } })
-      .httpError(409, () => { message.error("同名文件或者目录已经存在！"); })
+      .httpError(409, () => { message.error(t(p("createErrorMessage"))); })
       .then(() => {
-        message.success("创建成功");
+        message.success(t(p("createErrorMessage")));
         reload();
         onClose();
         form.resetFields();
@@ -51,19 +56,19 @@ export const CreateFileModal: React.FC<Props> = ({ open, onClose, path, reload, 
   return (
     <Modal
       open={open}
-      title="创建文件"
-      okText={"确认"}
-      cancelText="取消"
+      title={t(p("create"))}
+      okText={t("button.confirmButton")}
+      cancelText={t("button.cancelButton")}
       onCancel={onClose}
       confirmLoading={loading}
       destroyOnClose
       onOk={form.submit}
     >
       <Form form={form} onFinish={onSubmit}>
-        <Form.Item label="要创建的文件的目录">
+        <Form.Item label={t(p("fileDirectory"))}>
           <strong>{path}</strong>
         </Form.Item>
-        <Form.Item<FormProps> label="文件名" name="newFileName" rules={[{ required: true }]}>
+        <Form.Item<FormProps> label={t(p("fileName"))} name="newFileName" rules={[{ required: true }]}>
           <Input />
         </Form.Item>
       </Form>

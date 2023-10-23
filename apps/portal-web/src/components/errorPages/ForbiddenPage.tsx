@@ -12,6 +12,7 @@
 
 import { Result } from "antd";
 import React from "react";
+import { useI18nTranslate, useI18nTranslateToString } from "src/i18n";
 import { Head } from "src/utils/head";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -22,16 +23,21 @@ interface Props {
 }
 
 export const ForbiddenPage: React.FC<Props> = ({
-  title = "不允许访问此页面",
-  subTitle = "系统不允许您访问此页面。",
 }) => {
+
+  const tArgs = useI18nTranslate();
+  const t = useI18nTranslateToString();
+
+  const titleText = tArgs("component.errorPages.notAllowedPage");
+  const subTitleText = tArgs("component.errorPages.systemNotAllowed");
+
   return (
     <>
-      <Head title="不允许访问" />
+      <Head title={t("component.errorPages.notAllowed")} />
       <Result
         status="403"
-        title={title}
-        subTitle={subTitle}
+        title={titleText}
+        subTitle={subTitleText}
       />
     </>
   );

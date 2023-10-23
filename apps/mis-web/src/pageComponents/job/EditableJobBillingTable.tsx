@@ -11,14 +11,19 @@
  */
 
 import { numberToMoney } from "@scow/lib-decimal";
+import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/i18n";
 import { App, Form, Input, InputNumber, Modal, Select, Space, Table } from "antd";
 import { ColumnsType } from "antd/es/table";
 import { useState } from "react";
 import { api } from "src/apis";
 import { JobBillingTableItem } from "src/components/JobBillingTable";
 import { CommonModalProps, ModalLink } from "src/components/ModalLink";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { AmountStrategy } from "src/models/job";
 import { publicConfig } from "src/utils/config";
+
+const p = prefix("pageComp.job.editableJobBillingTable.");
+const pCommon = prefix("common.");
 
 const EditPriceModal: React.FC<CommonModalProps & {
   current: JobBillingTableItem["priceItem"]; path: string; tenant?: string; reload: () => void
@@ -26,6 +31,7 @@ const EditPriceModal: React.FC<CommonModalProps & {
   current, onClose, path, open, tenant, reload,
 }) => {
 
+  const t = useI18nTranslateToString();
 
   const { message } = App.useApp();
 
@@ -40,9 +46,9 @@ const EditPriceModal: React.FC<CommonModalProps & {
     await api.addBillingItem({ body: {
       amount, itemId, path, price: numberToMoney(price), description, tenant,
     } })
-      .httpError(409, () => { message.error("此ID已经被使用！"); })
+      .httpError(409, () => { message.error(t(p("alreadyUsed"))); })
       .then(() => {
-        message.success("添加成功！");
+        message.success(t(p("addSuccess")));
         reload();
         onClose();
       })
@@ -50,7 +56,7 @@ const EditPriceModal: React.FC<CommonModalProps & {
   };
 
   return (
-    <Modal title="编辑作业价格项" open={open} onCancel={onClose} onOk={onOk} destroyOnClose confirmLoading={loading}>
+    <Modal title={t(p("edit"))} open={open} onCancel={onClose} onOk={onOk} destroyOnClose confirmLoading={loading}>
       <Form
         form={form}
         initialValues={{
@@ -60,22 +66,22 @@ const EditPriceModal: React.FC<CommonModalProps & {
           description: "",
         }}
       >
-        <Form.Item label="租户">
-          <strong>{tenant ?? "默认价格项"}</strong>
+        <Form.Item label={t(pCommon("tenant"))}>
+          <strong>{tenant ?? t(p("defaultPrice"))}</strong>
         </Form.Item>
-        <Form.Item label="计费路径">
+        <Form.Item label={t(p("path"))}>
           <strong>{path}</strong>
         </Form.Item>
-        <Form.Item label="计费项ID" name="itemId" rules={[{ required: true }]}>
+        <Form.Item label={t(p("id"))} name="itemId" rules={[{ required: true }]}>
           <Input />
         </Form.Item>
-        <Form.Item label="计费策略" name="amount" rules={[{ required: true }]}>
+        <Form.Item label={t(p("strategy"))} name="amount" rules={[{ required: true }]}>
           <Select options={Object.values(AmountStrategy).map((x) => ({ label: x, value: x }))} />
         </Form.Item>
-        <Form.Item label="价格（元）" name="price" rules={[{ required: true }]}>
+        <Form.Item label={t(p("price"))} name="price" rules={[{ required: true }]}>
           <InputNumber precision={3} min={0} />
         </Form.Item>
-        <Form.Item label="备注" name="description">
+        <Form.Item label={t(pCommon("comment"))} name="description">
           <Input />
         </Form.Item>
       </Form>
@@ -94,6 +100,9 @@ interface Props {
 
 export const EditableJobBillingTable: React.FC<Props> = ({ data, loading, tenant, reload }) => {
 
+  const t = useI18nTranslateToString();
+  const languageId = useI18n().currentLanguage.id;
+
   const clusterTotalQosCounts = data && data.length ?
     data.reduce((totalQosCounts: { [cluster: string]: number }, item) => {
       const { cluster } = item;
@@ -106,37 +115,37 @@ export const EditableJobBillingTable: React.FC<Props> = ({ data, loading, tenant
     }, {}) : {};
 
   const columns: ColumnsType<JobBillingTableItem> = [
-    { dataIndex: "cluster", title: "集群", key: "index", render: (_, r) => ({
-      children: publicConfig.CLUSTERS[r.cluster]?.name ?? r.cluster,
+    { dataIndex: "cluster", title: t(pCommon("cluster")), key: "index", render: (_, r) => ({
+      children: getI18nConfigCurrentText(publicConfig.CLUSTERS[r.cluster]?.name, languageId) ?? r.cluster,
       props: { rowSpan: r.clusterItemIndex === 0 && clusterTotalQosCounts ? clusterTotalQosCounts[r.cluster] : 0 },
     }) },
-    { dataIndex: "partition", title: "分区全名", key: "index", render: (_, r) => ({
+    { dataIndex: "partition", title: t(p("name")), key: "index", render: (_, r) => ({
       children: r.partition,
       props: { rowSpan: r.partitionItemIndex === 0 ? r.qosCount : 0 },
     }) },
-    { dataIndex: "nodes", title: "分区节点数", key: "index", render: (_, r) => ({
+    { dataIndex: "nodes", title: t(p("nodes")), key: "index", render: (_, r) => ({
       children: r.nodes,
       props: { rowSpan: r.partitionItemIndex === 0 ? r.qosCount : 0 },
     }) },
-    { dataIndex: "cores", title: "单节点核心数", key: "index", render: (_, r) => ({
+    { dataIndex: "cores", title: t(p("cores")), key: "index", render: (_, r) => ({
       children: r.cores,
       props: { rowSpan: r.partitionItemIndex === 0 ? r.qosCount : 0 },
     }) },
-    { dataIndex: "gpus", title: "单节点GPU数", key: "index", render: (_, r) => ({
+    { dataIndex: "gpus", title: t(p("gpus")), key: "index", render: (_, r) => ({
       children: r.gpus,
       props: { rowSpan: r.partitionItemIndex === 0 ? r.qosCount : 0 },
     }) },
-    { dataIndex: "mem", title: "单节点内存（MB）", key: "index", render: (_, r) => ({
+    { dataIndex: "mem", title: t(p("memory")), key: "index", render: (_, r) => ({
       children: r.mem,
       props: { rowSpan: r.partitionItemIndex === 0 ? r.qosCount : 0 },
     }) },
     { dataIndex: "qos", title: "QOS", key: "index", render: (_, r) => ({
       children: r.qos,
     }) },
-    { dataIndex: "priceItem", title: "当前计费项", key: "index", render: (_, r) => ({
+    { dataIndex: "priceItem", title: t(p("now")), key: "index", render: (_, r) => ({
       children: r.priceItem
         ? `${r.priceItem.itemId} (${r.priceItem.price}, ${r.priceItem.amount})`
-        : "未设置",
+        : t(p("unset")),
     }) },
   ];
 
@@ -145,12 +154,12 @@ export const EditableJobBillingTable: React.FC<Props> = ({ data, loading, tenant
       dataSource={data}
       columns={[
         ...columns,
-        { dataIndex: "price", title: "设置", key: "index", render: (_, r) => {
+        { dataIndex: "price", title: t(pCommon("set")), key: "index", render: (_, r) => {
           return {
             children: (
               <Space>
                 <EditPriceModalLink current={r.priceItem} path={r.path} reload={reload} tenant={tenant}>
-                设置
+                  {t(pCommon("set"))}
                 </EditPriceModalLink>
               </Space>
             ),

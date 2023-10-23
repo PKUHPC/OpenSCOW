@@ -1,5 +1,36 @@
 # @scow/mis-server
 
+## 1.0.0
+
+### Major Changes
+
+- 11f94f716: 发布 1.0
+
+### Patch Changes
+
+- cb1e3500d: 增加租户管理下和平台管理下的账户消费列表页面，优化账户消费列表显示
+- 1fc3688b8: 暴露操作集群时后端返回的错误信息
+- ffefb17b8: 修复账户添加用户提示语
+- 3610e95da: portal-web 和 mis-web 的个人信息页面调整
+- 1bdccd827: 限制创建账户时的拥有者仅为当前租户下的用户
+- 0fbba98dd: 用户、账户、作业称呼统一
+- 1269e3cef: 操作日志搜索时间精度到秒，展示操作者姓名以及每页默认展示 50 条记录
+- Updated dependencies [ee89b11b9]
+- Updated dependencies [ee89b11b9]
+- Updated dependencies [cb1e3500d]
+- Updated dependencies [11f94f716]
+  - @scow/config@1.0.0
+  - @scow/protos@1.0.0
+  - @scow/lib-auth@1.0.0
+  - @scow/lib-decimal@1.0.0
+  - @scow/lib-hook@1.0.0
+  - @scow/lib-config@1.0.0
+  - @scow/scheduler-adapter-protos@1.0.0
+  - @scow/lib-scheduler-adapter@1.0.0
+  - @scow/lib-server@1.0.0
+  - @scow/lib-ssh@1.0.0
+  - @scow/utils@1.0.0
+
 ## 0.9.0
 
 ### Minor Changes
