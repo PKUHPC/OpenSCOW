@@ -87,6 +87,7 @@ export const ChargeForm: React.FC = () => {
       })
       .then(() => {
         message.success(t(p("chargeFinished")));
+        form.resetFields();
       })
       .finally(() => {
         setLoading(false);

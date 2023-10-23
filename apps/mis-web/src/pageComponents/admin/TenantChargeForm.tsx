@@ -89,6 +89,7 @@ export const TenantChargeForm: React.FC = () => {
       })
       .then(() => {
         message.success(t(p("chargeFinish")));
+        form.resetFields();
       })
       .finally(() => {
         setLoading(false);
