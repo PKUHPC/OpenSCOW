@@ -14,7 +14,7 @@ import { formatDateTime } from "@scow/lib-web/build/utils/datetime";
 import { PlatformUserInfo } from "@scow/protos/build/server/user";
 import { Static } from "@sinclair/typebox";
 import { App, Button, Divider, Form, Input, Space, Table } from "antd";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { ChangePasswordModalLink } from "src/components/ChangePasswordModal";
@@ -81,28 +81,24 @@ export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
   }, [query, pageInfo, sortInfo, currentPlatformRole]);
   const { data, isLoading, reload: reloadAllUsers } = useAsync({ promiseFn, watch: refreshToken });
 
-  const { data: platformUsersCounts, isLoading: isCountLoading, reload: reloadUsersCounts } = useAsync({
-    promiseFn: useCallback(async () => await api.getPlatformUsersCounts({}), [refreshToken]),
-  });
-
-  const roleChangedHandlers = {
+  const roleChangedHandlers = useMemo(() => ({
     "ALL_USERS": {
       setCurrentPlatformRole: () => setCurrentPlatformRole(undefined),
-      getCount: () => platformUsersCounts?.totalCount ?? 0,
+      count: data?.totalCount ?? 0,
     },
     "PLATFORM_ADMIN": {
       setCurrentPlatformRole: () => setCurrentPlatformRole(PlatformRole.PLATFORM_ADMIN),
-      getCount: () => platformUsersCounts?.totalAdminCount ?? 0,
+      count: data?.platformUsers.filter((user) => {
+        return user.platformRoles.includes(PlatformRole.PLATFORM_ADMIN);
+      }).length ?? 0,
     },
     "PLATFORM_FINANCE": {
       setCurrentPlatformRole: () => setCurrentPlatformRole(PlatformRole.PLATFORM_FINANCE),
-      getCount: () => platformUsersCounts?.totalFinanceCount ?? 0,
+      count: data?.platformUsers.filter((user) => {
+        return user.platformRoles.includes(PlatformRole.PLATFORM_FINANCE);
+      }).length ?? 0,
     },
-  };
-
-  const getUsersRoleCount = (role: FilteredRole): number => {
-    return roleChangedHandlers[role].getCount();
-  };
+  }), [data]);
 
   const handleFilterRoleChange = (role: FilteredRole) => {
     roleChangedHandlers[role].setCurrentPlatformRole();
@@ -112,7 +108,6 @@ export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
 
   const reload = () => {
     reloadAllUsers();
-    reloadUsersCounts();
   };
 
   return (
@@ -139,7 +134,7 @@ export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
         <Space style={{ marginBottom: "-16px" }}>
           <FilterFormTabs
             tabs={Object.keys(filteredRoles).map((role) => ({
-              title: `${t(filteredRoles[role])}(${getUsersRoleCount(role as FilteredRole)})`,
+              title: `${t(filteredRoles[role])}(${roleChangedHandlers[(role as FilteredRole)].count})`,
               key: role,
             }))}
             onChange={(value) => handleFilterRoleChange(value as FilteredRole)}
@@ -153,7 +148,7 @@ export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
         setPageInfo={setPageInfo}
         sortInfo={sortInfo}
         setSortInfo={setSortInfo}
-        isLoading={isLoading && isCountLoading}
+        isLoading={isLoading}
         reload={reload}
         user={user}
       />
