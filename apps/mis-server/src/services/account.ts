@@ -121,7 +121,7 @@ export const accountServiceServer = plugin((server) => {
       });
     },
 
-    getAccounts: async ({ request, em }) => {
+    getAccounts: async ({ request, em, logger }) => {
 
       const { accountName, tenantName } = request;
 
@@ -147,7 +147,7 @@ export const accountServiceServer = plugin((server) => {
             accountName: x.accountName,
             tenantName: x.tenant.$.name,
             userCount: x.users.count(),
-            blocked: x.blocked,
+            blocked: Boolean(x.blocked),
             ownerId: ownerUser.userId,
             ownerName: ownerUser.name,
             comment: x.comment,
