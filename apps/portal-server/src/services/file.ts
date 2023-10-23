@@ -187,12 +187,9 @@ export const fileServiceServer = plugin((server) => {
         const list: FileInfo[] = [];
 
         // 通过head命令实现共享文件系统的缓存刷新
-        const fileSyncCmd = "head";
-        const fileSyncArgs = [
-          "-n", "1",
-          join(path, "*"), // 忽略报错
-        ];
-        await loggedExec(ssh, logger, false, fileSyncCmd, fileSyncArgs);
+        const allFilesPath = path.endsWith("/") ? (path + "*") : (path + "/*");
+        const fileSyncCmd = `head -n 1 ${allFilesPath}`;
+        await loggedExec(ssh, logger, false, fileSyncCmd, []);
 
 
         for (const file of files) {
