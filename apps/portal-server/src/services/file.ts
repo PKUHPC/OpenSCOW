@@ -17,6 +17,7 @@ import { loggedExec, sftpAppendFile, sftpExists, sftpMkdir, sftpReaddir,
   sftpReadFile, sftpRealPath, sftpRename, sftpStat, sftpUnlink, sftpWriteFile, sshRmrf } from "@scow/lib-ssh";
 import { FileInfo, FileInfo_FileType,
   FileServiceServer, FileServiceService, TransferInfo } from "@scow/protos/build/portal/file";
+import { join } from "path";
 import { clusters } from "src/config/clusters";
 import { config } from "src/config/env";
 import { clusterNotFound } from "src/utils/errors";
@@ -184,6 +185,15 @@ export const fileServiceServer = plugin((server) => {
         const files = await sftpReaddir(sftp)(path);
 
         const list: FileInfo[] = [];
+
+        // 通过head命令实现共享文件系统的缓存刷新
+        const fileSyncCmd = "head";
+        const fileSyncArgs = [
+          "-n", "1",
+          join(path, "*"), // 忽略报错
+        ];
+        await loggedExec(ssh, logger, false, fileSyncCmd, fileSyncArgs);
+
 
         for (const file of files) {
 
