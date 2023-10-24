@@ -109,9 +109,9 @@ const CreateUserPageForm: React.FC = () => {
     <Form
       form={form}
       wrapperCol={{ span: 20 }}
-      labelCol={{ span: 4 }}
-      labelAlign="right"
+      labelAlign="left"
       onFinish={onOk}
+      labelCol={{ span:4, style: { whiteSpace:"normal", textAlign:"left", lineHeight:"16px" } }}
     >
       <CreateUserForm />
       <Form.Item wrapperCol={{ span: 6, offset: 4 }}>

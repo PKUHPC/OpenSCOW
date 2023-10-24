@@ -17,7 +17,7 @@ export default {
     username: "Username",
     password: "Password",
     otpVCode: "OTP Verification Code",
-    inputVCode: "Please enter the verification code",
+    inputVCode: "verification code",
     refreshError: "Refresh failed, please click to retry.",
     invalidVCode: "Invalid verification code, please re-enter.",
     invalidInput: "Invalid username / password, please check.",
