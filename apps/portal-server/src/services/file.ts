@@ -183,7 +183,6 @@ export const fileServiceServer = plugin((server) => {
         }
 
         const files = await sftpReaddir(sftp)(path);
-        console.log(files);
         const list: FileInfo[] = [];
 
         // 通过touch -a命令实现共享文件系统的缓存刷新
