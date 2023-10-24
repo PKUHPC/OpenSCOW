@@ -186,10 +186,13 @@ export const fileServiceServer = plugin((server) => {
 
         const list: FileInfo[] = [];
 
-        // 通过head命令实现共享文件系统的缓存刷新
+        // 通过touch -a命令实现共享文件系统的缓存刷新
         const allFilesPath = path.endsWith("/") ? (path + "*") : (path + "/*");
-        const fileSyncCmd = `head -n 1 ${allFilesPath}`;
-        await loggedExec(ssh, logger, false, fileSyncCmd, []);
+        const fileSyncCmd = "touch";
+        const fileSyncArgs = [
+          "-a", allFilesPath,
+        ];
+        await loggedExec(ssh, logger, false, fileSyncCmd, fileSyncArgs);
 
 
         for (const file of files) {
