@@ -183,14 +183,19 @@ export const fileServiceServer = plugin((server) => {
         }
 
         const files = await sftpReaddir(sftp)(path);
-
+        console.log(files);
         const list: FileInfo[] = [];
 
         // 通过touch -a命令实现共享文件系统的缓存刷新
-        const allFilesPath = path.endsWith("/") ? (path + "*") : (path + "/*");
-        const fileSyncCmd = `touch -a ${allFilesPath}`;
-        await loggedExec(ssh, logger, false, fileSyncCmd, []);
+        const pureFiles = files.filter((file) => !file.longname.startsWith("d"));
 
+        if (pureFiles.length > 0) {
+          const filePaths = pureFiles.map((file) => join(path, file.filename)).join(" ");
+
+          const fileSyncCmd = `touch -a ${filePaths}`;
+
+          await loggedExec(ssh, logger, false, fileSyncCmd, []);
+        }
 
         for (const file of files) {
 
