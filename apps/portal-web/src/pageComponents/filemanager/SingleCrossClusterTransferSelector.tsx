@@ -23,11 +23,13 @@ interface SingleSelectionProps {
   value?: Cluster;
   onChange?: (cluster: Cluster) => void;
   label?: string;
+  exclude?: Cluster;
 }
 
 
-export const SingleCrossClusterTransferSelector: React.FC<SingleSelectionProps> = ({ value, onChange, label }) => {
-
+export const SingleCrossClusterTransferSelector: React.FC<SingleSelectionProps> = ({
+  value, onChange, label, exclude,
+}) => {
   const languageId = useI18n().currentLanguage.id;
 
   const { data: availableClusters = [], isLoading, reload } = useAsync({
@@ -49,8 +51,10 @@ export const SingleCrossClusterTransferSelector: React.FC<SingleSelectionProps> 
       }}
       options={
         (label ? [{ value: label, label, disabled: true }] : [])
-          .concat(availableClusters.map((x) => (
-            { value: x.id, label: getI18nConfigCurrentText(x.name, languageId), disabled: false })))
+          .concat(availableClusters
+            .filter((x) => !exclude || (x.id !== exclude.id))
+            .map((x) => (
+              { value: x.id, label: getI18nConfigCurrentText(x.name, languageId), disabled: false })))
 
       }
       dropdownMatchSelectWidth={false}

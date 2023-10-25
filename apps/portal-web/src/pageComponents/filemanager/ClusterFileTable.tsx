@@ -33,10 +33,11 @@ interface Props {
   setPath: (path: string) => void;
   selectedKeys: FileInfoKey[];
   setSelectedKeys: (keys: FileInfoKey[]) => void;
+  excludeCluster?: Cluster;
 }
 
 export const ClusterFileTable: React.FC<Props> = ({
-  selectedCluster, setSelectedCluster, path, setPath, selectedKeys, setSelectedKeys,
+  selectedCluster, setSelectedCluster, path, setPath, selectedKeys, setSelectedKeys, excludeCluster,
 }) => {
 
   const setNewPath = (newPath: string) => {
@@ -97,6 +98,7 @@ export const ClusterFileTable: React.FC<Props> = ({
               });
           }
         }}
+        exclude={ excludeCluster }
       />
       <TopBar>
         <Button disabled={!selectedCluster} onClick={toHome} icon={<HomeOutlined />} shape="circle" />

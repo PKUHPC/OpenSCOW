@@ -105,6 +105,7 @@ export const FileTransferPage: NextPage = requireAuth(() => true)(() => {
             setPath={ setPathLeft }
             selectedKeys={ selectedKeysLeft }
             setSelectedKeys={ setSelectedKeysLeft }
+            excludeCluster={ clusterRight }
           />
         </Col>
 
@@ -142,6 +143,7 @@ export const FileTransferPage: NextPage = requireAuth(() => true)(() => {
             setPath={ setPathRight }
             selectedKeys={ selectedKeysRight }
             setSelectedKeys={ setSelectedKeysRight }
+            excludeCluster={ clusterLeft }
           />
         </Col>
 
