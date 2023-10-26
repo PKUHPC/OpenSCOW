@@ -859,7 +859,7 @@ export default {
       systemDebug: {
         slurmBlockStatus: {
           syncUserAccountBlockingStatus: "用户账户封锁状态同步",
-          alertInfo: "在调度器重新启动后，集群与SCOW中用户的封锁状态可能出现不同步的情况，您可以点击刷新调度器用户封锁状态，手动刷新同步所有用户状态。",
+          alertInfo: "SCOW会定期向集群同步账户和用户的封锁状态，您可以点击立刻同步执行一次手动同步",
 
 
           slurmScheduler: "slurm调度器",
@@ -876,11 +876,20 @@ export default {
           otherScheduler: "其他调度器",
           otherSchedulerMessage: "如果您使用的是slurm之外的调度器，在调度器和SCOW间用户封锁状态不同步时，可以手动执行一下本页面的刷新调度器用户封锁状态的功能。",
 
-
-          lastRunTime: "上次运行时间",
-          notBlocked: "未封锁过",
-          refreshSuccess: "刷新成功",
-          refreshSchedulerUserBlockingStatus: "刷新调度器用户封锁状态",
+          periodicSyncBlockStatusInfo:"周期性同步向集群同步账户和用户的封锁状态",
+          turnedOn: "已开启",
+          paused: "已暂停",
+          stopSync: "停止同步",
+          startSync: "开始同步",
+          jobSyncCycle: "同步周期",
+          lastSyncTime: "上次同步时间",
+          notSynced: "未同步过",
+          syncSuccess: "同步成功",
+          partialSyncSuccess: "部分用户/账户同步失败：",
+          syncBlockedFailedAccount: "同步封锁失败的账户：",
+          syncUnblockedFailedAccount: "同步解封失败的账户：",
+          syncBlockedFailedUserAccount: "在账户中同步封锁用户失败的数据：",
+          syncSchedulerUserBlockingStatusNow: "立刻同步调度器账户和用户封锁状态",
         },
         fetchJobs: {
           jobInfoSync: "作业信息同步",
