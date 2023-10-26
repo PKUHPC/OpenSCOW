@@ -18,12 +18,20 @@ import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { NotFoundPage } from "src/components/errorPages/NotFoundPage";
 import { PageTitle } from "src/components/PageTitle";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { TenantRole } from "src/models/User";
 import { CreateUserForm, CreateUserFormFields } from "src/pageComponents/users/CreateUserForm";
-import { useBuiltinCreateUser } from "src/utils/createUser";
+import { getRuntimeI18nConfigText } from "src/utils/config";
+import { getUserIdRule, useBuiltinCreateUser } from "src/utils/createUser";
 import { Head } from "src/utils/head";
 
+const p = prefix("page.tenant.users.create.");
+
 const CreateUserPageForm: React.FC = () => {
+
+  const t = useI18nTranslateToString();
+  const languageId = useI18n().currentLanguage.id;
+  const userIdRule = getUserIdRule(languageId);
 
   const [form] = Form.useForm<CreateUserFormFields>();
   const { message, modal } = App.useApp();
@@ -37,9 +45,9 @@ const CreateUserPageForm: React.FC = () => {
     const result = await api.userExists({ body: { identityId } });
     if (result.existsInScow) {
       modal.error({
-        title: "用户已存在",
-        content: "用户已存在于SCOW数据库，无法再添加此用户",
-        okText: "确认",
+        title: t(p("userExist")),
+        content: t(p("userExistMessage")),
+        okText: t("common.ok"),
         onOk: async () => {
           setLoading(false);
         },
@@ -47,33 +55,42 @@ const CreateUserPageForm: React.FC = () => {
     } else {
       modal.confirm({
         title: result.existsInAuth !== undefined ?
-          result.existsInAuth ? "用户已存在于认证系统" : "用户未存在于认证系统"
-          : "无法确定用户是否存在于认证系统",
+          result.existsInAuth ? t(p("userExistAuth")) : t(p("userNotExistAuth"))
+          : t(p("unableDetermineUserExistAuth")),
         content: result.existsInAuth ?
-          "用户已经在认证系统中存在，您此处输入的密码将会不起作用，新用户的密码将是认证系统中的已有用户的当前密码。点击“确认”将会将此用户直接添加到SCOW数据库,"
-          : "点击“确认”将会同时在SCOW数据库和认证系统创建此用户",
-        okText: "确认",
+          t(p("userExistAuthMessage"))
+          : t(p("userNotExistAuthMessage")),
+        okText: t("common.ok"),
         onOk: async () => {
           await api.createUser({ body: { email, identityId, name, password } })
             .httpError(409, () => {
               modal.error({
-                title: "添加失败",
-                content: "此用户存在于scow数据库",
-                okText: "确认",
+                title: t("common.addFail"),
+                content: t(p("userExistInSCOWDatabaseMessage")),
+                okText: t("common.ok"),
               });
+            })
+            .httpError(400, (e) => {
+              if (e.code === "USERID_NOT_VALID") {
+                message.error(userIdRule?.message);
+              };
+              if (e.code === "PASSWORD_NOT_VALID") {
+                message.error(getRuntimeI18nConfigText(languageId, "passwordPatternMessage"));
+              };
+              throw e;
             })
             .then((createdInAuth) => {
               !createdInAuth.createdInAuth ?
                 modal.info({
-                  title: "添加成功",
-                  content: "此用户存在于认证系统中，已成功添加到SCOW数据库",
-                  okText: "确认",
+                  title: t("common.addSuccess"),
+                  content: t(p("userExistAndAddToSCOWDatabaseMessage")),
+                  okText: t("common.ok"),
                 })
-                : message.success("添加完成！"); })
+                : message.success(t(p("addCompleted"))); })
             .catch(() => {
               modal.error({
-                title: "添加失败",
-                content: "创建用户失败",
+                title: t("common.addFail"),
+                content: t(p("createUserFail")),
               });
             })
             .finally(() => {
@@ -92,14 +109,14 @@ const CreateUserPageForm: React.FC = () => {
     <Form
       form={form}
       wrapperCol={{ span: 20 }}
-      labelCol={{ span: 4 }}
-      labelAlign="right"
+      labelAlign="left"
       onFinish={onOk}
+      labelCol={{ span:4, style: { whiteSpace:"normal", textAlign:"left", lineHeight:"16px" } }}
     >
       <CreateUserForm />
       <Form.Item wrapperCol={{ span: 6, offset: 4 }}>
         <Button type="primary" htmlType="submit" loading={loading}>
-          提交
+          {t("common.submit")}
         </Button>
       </Form.Item>
     </Form>
@@ -109,14 +126,16 @@ const CreateUserPageForm: React.FC = () => {
 export const CreateUserPage: NextPage = requireAuth((i) => i.tenantRoles.includes(TenantRole.TENANT_ADMIN))(
   () => {
 
+    const t = useI18nTranslateToString();
+
     if (!useBuiltinCreateUser()) {
       return <NotFoundPage />;
     }
 
     return (
       <div>
-        <Head title="创建用户" />
-        <PageTitle titleText="创建用户" />
+        <Head title={t(p("crateUser"))} />
+        <PageTitle titleText={t(p("crateUser"))} />
         <FormLayout>
           <CreateUserPageForm />
         </FormLayout>

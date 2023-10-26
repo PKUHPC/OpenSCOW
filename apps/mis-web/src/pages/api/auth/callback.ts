@@ -23,6 +23,7 @@ export const AuthCallbackSchema = typeboxRouteSchema({
 
   query: Type.Object({
     token: Type.String(),
+    fromAuth: Type.Optional(Type.Boolean()),
   }),
 
   responses: {
@@ -35,19 +36,21 @@ export const AuthCallbackSchema = typeboxRouteSchema({
 
 export default typeboxRoute(AuthCallbackSchema, async (req, res) => {
 
-  const { token } = req.query;
+  const { token, fromAuth = false } = req.query;
 
   const info = await validateToken(token);
 
   if (info) {
     // set token cache
     setTokenCookie({ res }, token);
-    const logInfo = {
-      operatorUserId: info.identityId,
-      operatorIp: parseIp(req) ?? "",
-      operationTypeName: OperationType.login,
-    };
-    await callLog(logInfo, OperationResult.SUCCESS);
+    if (fromAuth) {
+      const logInfo = {
+        operatorUserId: info.identityId,
+        operatorIp: parseIp(req) ?? "",
+        operationTypeName: OperationType.login,
+      };
+      await callLog(logInfo, OperationResult.SUCCESS);
+    }
     res.redirect(publicConfig.BASE_PATH);
   } else {
     return { 403: null };

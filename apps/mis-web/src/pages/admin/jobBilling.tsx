@@ -20,22 +20,26 @@ import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { PageTitle } from "src/components/PageTitle";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { PlatformRole } from "src/models/User";
 import { ManageJobBillingTable } from "src/pageComponents/job/ManageJobBillingTable";
 import { PlatformOrTenantRadio } from "src/pageComponents/job/PlatformOrTenantRadio";
 import { Head } from "src/utils/head";
 
+const p = prefix("page.admin.jobBilling.");
+
 export const AdminJobBillingTablePage: NextPage =
   requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))(
     () => {
       const query = useQuerystring();
+      const t = useI18nTranslateToString();
 
       const tenant = queryToString(query.tenant) || undefined;
 
       return (
         <div>
-          <Head title="作业计费价格表" />
-          <PageTitle titleText={"作业计费价格表"} />
+          <Head title={t(p("jobBillingPriceTable"))} />
+          <PageTitle titleText={t(p("jobBillingPriceTable"))} />
           <AdminJobBillingTable tenant={tenant} />
         </div>
       );
@@ -44,6 +48,7 @@ export const AdminJobBillingTablePage: NextPage =
 
 export const AdminJobBillingTable: React.FC<{ tenant?: string }> = ({ tenant }) => {
 
+  const t = useI18nTranslateToString();
   const { data, isLoading, reload } = useAsync({ promiseFn: useCallback(async () => {
     return await api.getBillingItems({ query: { tenant, activeOnly: false } });
   }, [tenant]) });
@@ -52,7 +57,7 @@ export const AdminJobBillingTable: React.FC<{ tenant?: string }> = ({ tenant }) 
     <div>
       <FilterFormContainer>
         <Form layout="inline">
-          <Form.Item label="管理对象">
+          <Form.Item label={t(p("managementObject"))}>
             <PlatformOrTenantRadio
               value={tenant || null}
               onChange={(tenant) => Router.push({
@@ -61,7 +66,7 @@ export const AdminJobBillingTable: React.FC<{ tenant?: string }> = ({ tenant }) 
           </Form.Item>
           <Form.Item>
             <Space>
-              <Button loading={isLoading} onClick={reload}>刷新</Button>
+              <Button loading={isLoading} onClick={reload}>{t("common.fresh")}</Button>
             </Space>
           </Form.Item>
         </Form>

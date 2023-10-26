@@ -15,7 +15,7 @@ import { Divider, Typography } from "antd";
 import { join } from "path";
 import React from "react";
 import { publicConfig } from "src/utils/config";
-import styled from "styled-components";
+import { styled } from "styled-components";
 
 interface Props {
   homeTitle: string;

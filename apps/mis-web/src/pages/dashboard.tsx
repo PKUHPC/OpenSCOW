@@ -23,6 +23,7 @@ import { USE_MOCK } from "src/apis/useMock";
 import { requireAuth } from "src/auth/requireAuth";
 import { AuthResultError, ssrAuthenticate } from "src/auth/server";
 import { UnifiedErrorPage } from "src/components/errorPages/UnifiedErrorPage";
+import { useI18nTranslateToString } from "src/i18n";
 import { AccountInfoSection } from "src/pageComponents/dashboard/AccountInfoSection";
 import { JobsSection } from "src/pageComponents/dashboard/JobsSection";
 import { getUserStatus, GetUserStatusSchema } from "src/pages/api/dashboard/status";
@@ -60,9 +61,11 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)((props: Pr
   const { accounts } = props;
   const noAccounts = Object.keys(accounts).length === 0;
 
+  const t = useI18nTranslateToString();
+
   return (
     <div>
-      <Head title="仪表盘" />
+      <Head title={t("dashboard.title")} />
       <AccountInfoSection info={accounts} />
       {/* <Divider /> */}
       {/* <StorageSection storageQuotas={storageQuotas} /> */}
@@ -108,7 +111,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ req }) => 
     prev[accountName] = {
       ...validated,
       balance: moneyToNumber(balance),
-      
+
       // 不能使用undefined，NextJs中：`undefined` cannot be serialized as JSON
       jobChargeLimit: validated.jobChargeLimit ?? null,
       usedJobCharge: validated.usedJobCharge ?? null,

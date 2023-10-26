@@ -10,7 +10,26 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/i18n";
+import { useState } from "react";
 import { LoginNode } from "src/utils/config";
-export function LoginNodeStore(loginNodes: Record<string, LoginNode[]>) {
-  return loginNodes;
+export function LoginNodeStore(initLoginNodes: Record<string, LoginNode[]>, initLanguageId: string) {
+
+  const [languageId, setLanguageId] = useState<string>(initLanguageId);
+  const [loginNodes] = useState<Record<string, LoginNode[]>>(initLoginNodes);
+
+  const getI18LoginNode = (loginNodes: Record<string, LoginNode[]>, languageId: string) => {
+    const newLoginNodes: Record<string, LoginNode[]> = {};
+
+    Object.keys(loginNodes).forEach((clusterId) => {
+      const curLoginNodes = loginNodes[clusterId];
+      newLoginNodes[clusterId] = curLoginNodes.map((loginNode) => ({
+        name: getI18nConfigCurrentText(loginNode.name, languageId),
+        address: loginNode.address,
+      }));
+    });
+    return newLoginNodes;
+  };
+
+  return { loginNodes: getI18LoginNode(loginNodes, languageId), setLanguageId };
 }

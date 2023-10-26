@@ -19,12 +19,13 @@ import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { ModalButton } from "src/components/ModalLink";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { FileTable } from "src/pageComponents/filemanager/FileTable";
 import { MkdirModal } from "src/pageComponents/filemanager/MkdirModal";
 import { PathBar } from "src/pageComponents/filemanager/PathBar";
 import { FileInfo } from "src/pages/api/file/list";
 import { Cluster } from "src/utils/config";
-import styled from "styled-components";
+import { styled } from "styled-components";
 
 
 const ModalContainer = styled.div`
@@ -112,14 +113,17 @@ export const FileSelectModal: React.FC<Props> = ({ cluster, onSubmit }) => {
 
   const isLoading = isFileLoading;
 
+  const t = useI18nTranslateToString();
+  const p = prefix("pageComp.job.fileSelectModal.");
+
   return (
     <>
-      <Button size="small" onClick={() => { setVisible(true); }}>选择</Button>
+      <Button size="small" onClick={() => { setVisible(true); }}>{t("button.selectButton")}</Button>
       <Modal
         width={600}
         open={visible}
         onCancel={() => { closeModal(); }}
-        title="文件目录选择框"
+        title={t(p("title"))}
         footer={[
           <MkdirButton
             key="new"
@@ -127,10 +131,10 @@ export const FileSelectModal: React.FC<Props> = ({ cluster, onSubmit }) => {
             path={join("/", path)}
             reload={reload}
           >
-            新目录
+            {t(p("newPath"))}
           </MkdirButton>,
-          <Button key="cancel" onClick={() => { closeModal(); }}>取消</Button>,
-          <Button key="ok" type="primary" onClick={onOkClick}>确定</Button>,
+          <Button key="cancel" onClick={() => { closeModal(); }}>{t("button.cancelButton")}</Button>,
+          <Button key="ok" type="primary" onClick={onOkClick}>{t("button.confirmButton")}</Button>,
         ]}
       >
         <ModalContainer>

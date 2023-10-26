@@ -1,5 +1,11 @@
 # @scow/lib-ssh
 
+## 1.0.0
+
+### Major Changes
+
+- 11f94f716: 发布 1.0
+
 ## 0.4.0
 
 ### Minor Changes

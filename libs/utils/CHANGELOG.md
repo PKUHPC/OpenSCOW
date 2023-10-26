@@ -1,5 +1,11 @@
 # @scow/utils
 
+## 1.0.0
+
+### Major Changes
+
+- 11f94f716: 发布 1.0
+
 ## 0.1.2
 
 ### Patch Changes

@@ -13,40 +13,11 @@
 import { formatDateTime } from "@scow/lib-web/build/utils/datetime";
 import { JobInfo } from "@scow/protos/build/common/ended_job";
 import { Descriptions, Drawer } from "antd";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { getClusterName } from "src/utils/config";
 import { moneyToString } from "src/utils/money";
 
-const drawerItems = [
-  ["作业ID", "biJobIndex"],
-  ["集群作业ID", "idJob"],
-  ["分区", "partition"],
-  ["使用节点列表", "nodelist"],
-  ["作业名", "jobName"],
-  ["集群名", "cluster", getClusterName],
-  ["提交时间", "timeSubmit", formatDateTime],
-  ["开始时间", "timeStart", formatDateTime],
-  ["结束时间", "timeEnd", formatDateTime],
-  ["使用GPU数（个）", "gpu"],
-  ["申请CPU数（个）", "cpusReq"],
-  ["分配CPU数（个）", "cpusAlloc"],
-  ["申请的内存（MB）", "memReq"],
-  ["分配的内存（MB）", "memAlloc"],
-  ["申请节点数（个）", "nodesReq"],
-  ["分配节点数（个）", "nodesAlloc"],
-  ["作业时间限制（分钟）", "timelimit"],
-  ["作业执行时间（秒）", "timeUsed"],
-  ["作业等待时间（秒）", "timeWait"],
-  ["QOS", "qos"],
-  ["记录时间", "recordTime", formatDateTime],
-  [
-    (p) => p.showedPrices.length === 1 ? "作业计费（元）" : "租户计费（元）", "accountPrice",
-    moneyToString, (p: Props) => p.showedPrices.includes("account")],
-  [
-    (p) => p.showedPrices.length === 1 ? "作业计费（元）" : "平台计费（元）", "tenantPrice",
-    moneyToString, (p: Props) => p.showedPrices.includes("tenant")],
-] as (
-  | [string | ((p: Props) => string), keyof JobInfo, (v: any) => string, (p: Props) => boolean]
-)[];
+
 
 interface Props {
   open: boolean;
@@ -55,15 +26,56 @@ interface Props {
   showedPrices: ("tenant" | "account")[];
 }
 
+const p = prefix("pageComp.job.historyJobDrawer.");
+const pCommon = prefix("common.");
+
 export const HistoryJobDrawer: React.FC<Props> = (props) => {
+
+  const t = useI18nTranslateToString();
+  const languageId = useI18n().currentLanguage.id;
+
+  const drawerItems = [
+    [t(pCommon("workId")), "biJobIndex"],
+    [t(pCommon("clusterWorkId")), "idJob"],
+    [t(pCommon("partition")), "partition"],
+    [t(p("list")), "nodelist"],
+    [t(pCommon("workName")), "jobName"],
+    [t(pCommon("clusterName")), "cluster", getClusterName],
+    [t(p("timeSubmit")), "timeSubmit", formatDateTime],
+    [t(p("timeStart")), "timeStart", formatDateTime],
+    [t(p("timeEnd")), "timeEnd", formatDateTime],
+    [t(p("gpus")), "gpu"],
+    [t(p("cpusReq")), "cpusReq"],
+    [t(p("cpusAlloc")), "cpusAlloc"],
+    [t(p("memReq")), "memReq"],
+    [t(p("memAlloc")), "memAlloc"],
+    [t(p("nodesReq")), "nodesReq"],
+    [t(p("nodesAlloc")), "nodesAlloc"],
+    [t(p("timeLimit")), "timelimit"],
+    [t(p("timeUsed")), "timeUsed"],
+    [t(p("timeWait")), "timeWait"],
+    ["QOS", "qos"],
+    [t(p("recordTime")), "recordTime", formatDateTime],
+    [
+      (pr) => pr.showedPrices.length === 1 ? t(p("workFee")) : t(p("tenantFee")), "accountPrice",
+      moneyToString, (pr: Props) => pr.showedPrices.includes("account")],
+    [
+      (pr) => pr.showedPrices.length === 1 ? t(p("workFee")) : t(p("platformFee")), "tenantPrice",
+      moneyToString, (pr: Props) => pr.showedPrices.includes("tenant")],
+  ] as (
+  | [string | ((pr: Props) => string), keyof JobInfo, (v: any) => string, (pr: Props) => boolean]
+)[];
+
+
   const { item, onClose, open } = props;
+
   return (
     <Drawer
       width={500}
       placement="right"
       onClose={onClose}
       open={open}
-      title="作业详细信息"
+      title={t(p("detail"))}
     >
       {
         item ? (
@@ -75,7 +87,10 @@ export const HistoryJobDrawer: React.FC<Props> = (props) => {
             {drawerItems.map((([label, key, format, show]) => (
               (!show || show(props)) ? (
                 <Descriptions.Item key={item.idJob} label={typeof label === "string" ? label : label(props)}>
-                  {format ? format(item[key]) : item[key] as string}
+                  {/* 如果是集群项展示，则根据当前语言id获取集群名称 */}
+                  {format ?
+                    (key === "cluster" ? getClusterName(item[key], languageId) : format(item[key]))
+                    : item[key] as string}
                 </Descriptions.Item>
               ) : undefined
             ))).filter((x) => x)}

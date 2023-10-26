@@ -15,11 +15,12 @@ import { NextPage } from "next";
 import { requireAuth } from "src/auth/requireAuth";
 import { ModalButton } from "src/components/ModalLink";
 import { Section } from "src/components/Section";
+import { Localized, useI18nTranslateToString } from "src/i18n";
 import { ChangePasswordModal } from "src/pageComponents/profile/ChangePasswordModal";
 import { antdBreakpoints } from "src/styles/constants";
 import { publicConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
-import styled from "styled-components";
+import { styled } from "styled-components";
 
 const Container = styled.div`
   display: flex;
@@ -56,37 +57,45 @@ const ChangePasswordModalButton = ModalButton(ChangePasswordModal, { type: "link
 
 export const ProfilePage: NextPage = requireAuth(() => true)(({ userStore: { user } }) => {
 
+  const t = useI18nTranslateToString();
+
   return (
     <Container>
-      <Head title="账号信息" />
-      <TitleText>用户信息</TitleText>
+      <Head title={t("pages.profile.title")} />
+      <TitleText>
+        <Localized id="pages.profile.userInfo"></Localized>
+      </TitleText>
       <Part title>
         <Descriptions
-          column={1} 
+          column={1}
           labelStyle={{ paddingLeft:"10px", marginBottom:"10px" }}
           contentStyle={{ paddingLeft:"10px" }}
         >
-          <Descriptions.Item label="用户ID">
+          <Descriptions.Item label={t("pages.profile.identityId")}>
             {user.identityId}
           </Descriptions.Item>
-          <Descriptions.Item label="用户姓名">
+          <Descriptions.Item label={t("pages.profile.name")}>
             {user.name}
           </Descriptions.Item>
         </Descriptions>
       </Part>
       {
         publicConfig.ENABLE_CHANGE_PASSWORD ? (
-          <>            
-            <TitleText>修改密码</TitleText>
+          <>
+            <TitleText>
+              <Localized id="pages.profile.changePassword"></Localized>
+            </TitleText>
             <Part title>
               <Descriptions
-                column={1} 
+                column={1}
                 labelStyle={{ paddingLeft:"10px", paddingTop:"5px" }}
                 contentStyle={{ paddingLeft:"10px" }}
               >
-                <Descriptions.Item label="登录密码">
+                <Descriptions.Item label={t("pages.profile.loginPassword")}>
                   <span style={{ width:"200px" }}>********</span>
-                  <ChangePasswordModalButton>修改密码</ChangePasswordModalButton>
+                  <ChangePasswordModalButton>
+                    <Localized id="pages.profile.changePassword"></Localized>
+                  </ChangePasswordModalButton>
                 </Descriptions.Item>
               </Descriptions>
             </Part>

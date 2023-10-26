@@ -12,8 +12,9 @@
 
 import React from "react";
 import { Section } from "src/components/Section";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { StorageCard } from "src/pageComponents/dashboard/StorageCard";
-import styled from "styled-components";
+import { styled } from "styled-components";
 
 interface Props {
   storageQuotas: Record<string, number>;
@@ -30,11 +31,14 @@ const Container = styled.div`
   flex-wrap: wrap;
 `;
 
+const p = prefix("pageComp.dashboard.storageSection.");
 
 export const StorageSection: React.FC<Props> = ({ storageQuotas }) => {
 
+  const t = useI18nTranslateToString();
+
   return (
-    <Section title="存储状态">
+    <Section title={t(p("storageStatus"))}>
       <Container>
         {
           Object.entries(storageQuotas).map(([cluster, quota]) => (

@@ -9,7 +9,7 @@
 # See the Mulan PSL v2 for more details.
 
 
-FROM node:hydrogen-alpine@sha256:3482a20c97e401b56ac50ba8920cc7b5b2022bfc6aa7d4e4c231755770cf892f AS base
+FROM node:hydrogen-alpine@sha256:435dcad253bb5b7f347ebc69c8cc52de7c912eb7241098b920f2fc2d7843183d AS base
 
 RUN apk update && apk add libc6-compat python3 make gcc g++ git
 
@@ -17,6 +17,7 @@ RUN corepack enable
 
 WORKDIR /app
 COPY pnpm-lock.yaml .
+COPY patches ./patches
 
 RUN pnpm fetch
 
@@ -40,7 +41,7 @@ COPY protos ./protos
 
 RUN pnpm build
 
-FROM nginx:alpine@sha256:16164a43b5faec40adb521e98272edc528e74f31c1352719132b8f7e53418d70 as runner
+FROM nginx:alpine@sha256:7272a6e0f728e95c8641d219676605f3b9e4759abbdb6b39e5bbd194ce55ebaf as runner
 
 COPY docs/nginx.conf /etc/nginx/templates/default.conf.template
 COPY --from=builder --chown=nginx:nginx /app/docs/build /etc/nginx/html/

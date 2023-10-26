@@ -13,6 +13,7 @@
 import { GetConfigFn, getConfigFromFile } from "@scow/lib-config";
 import { Static, Type } from "@sinclair/typebox";
 import { DEFAULT_CONFIG_BASE_PATH } from "src/constants";
+import { createI18nStringSchema } from "src/type";
 
 export enum JobTableType {
   mariadb = "mariadb",
@@ -37,7 +38,7 @@ export const MisConfigSchema = Type.Object({
 
   accountNamePattern: Type.Optional(Type.Object({
     regex: Type.String({ description: "账户名的正则规则" }),
-    errorMessage: Type.Optional(Type.String({ description: "如果账户名不符合规则显示什么" })),
+    errorMessage: Type.Optional(createI18nStringSchema({ description: "如果账户名不符合规则显示什么" })),
   })),
 
   createUser: Type.Object({
@@ -53,13 +54,13 @@ export const MisConfigSchema = Type.Object({
 
     userIdPattern: Type.Optional(Type.Object({
       regex: Type.String({ description: "用户ID的正则规则" }),
-      errorMessage: Type.Optional(Type.String({ description: "如果用户ID不符合规则显示什么" })),
+      errorMessage: Type.Optional(createI18nStringSchema({ description: "如果用户ID不符合规则显示什么" })),
     }, { deprecated: true, description: "请使用createUser.builtin.userIdPattern" })),
 
     builtin: Type.Optional(Type.Object({
       userIdPattern: Type.Optional(Type.Object({
         regex: Type.String({ description: "用户ID的正则规则" }),
-        errorMessage: Type.Optional(Type.String({ description: "如果用户ID不符合规则显示什么" })),
+        errorMessage: Type.Optional(createI18nStringSchema({ description: "如果用户ID不符合规则显示什么" })),
       }, { description: "从管理系统里创建用户时，用户ID的验证规则" })),
     }, { default: {}, description: "通过内置页面创建用户时的配置。要使用内置页面，认证系统需要支持创建用户" })),
   }, { default: {}, description: "SCOW的创建用户相关配置" }),
@@ -111,6 +112,10 @@ export const MisConfigSchema = Type.Object({
       script: Type.String({
         description: "脚本文件路径，不包含config/scripts前缀，如my-strategy.js即等于config/scripts/my-strategy.js" }),
     }),
+  )),
+
+  customChargeTypes: Type.Optional(Type.Array(
+    Type.String(), { description: "用户自定义可查询的消费类型列表" },
   )),
 });
 

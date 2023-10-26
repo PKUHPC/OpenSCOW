@@ -12,8 +12,9 @@
 
 import { formatDateTime } from "@scow/lib-web/build/utils/datetime";
 import { Descriptions, Drawer } from "antd";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { RunningJobInfo } from "src/models/job";
-import { Cluster } from "src/utils/config";
+import { getClusterName } from "src/utils/config";
 
 interface Props {
   open: boolean;
@@ -21,34 +22,40 @@ interface Props {
   onClose: () => void;
 }
 
+const p = prefix("pageComp.job.runningJobDrawer.");
 
-const drawerItems = [
-  ["集群", "cluster", (v: Cluster) => v.name],
-  ["作业ID", "jobId"],
-  ["账户", "account"],
-  ["作业名", "name"],
-  ["分区", "partition"],
-  ["QOS", "qos"],
-  ["节点数（个）", "nodes"],
-  ["核心数（个）", "cores"],
-  ["GPU卡数（个）", "gpus"],
-  ["状态", "state"],
-  ["说明", "nodesOrReason"],
-  ["运行/排队时间", "runningOrQueueTime"],
-  ["提交时间", "submissionTime", formatDateTime],
-  ["作业时限（分钟）", "timeLimit"],
-] as ([string, keyof RunningJobInfo] | [string, keyof RunningJobInfo, (v: any, r: RunningJobInfo) => string])[];
 
 export const RunningJobDrawer: React.FC<Props> = ({
   item, onClose, open,
 }) => {
+
+  const t = useI18nTranslateToString();
+  const languageId = useI18n().currentLanguage.id;
+
+  const drawerItems = [
+    [t(p("cluster")), "cluster", getClusterName],
+    [t(p("jobId")), "jobId"],
+    [t(p("account")), "account"],
+    [t(p("jobName")), "name"],
+    [t(p("partition")), "partition"],
+    [t(p("qos")), "qos"],
+    [t(p("nodes")), "nodes"],
+    [t(p("cores")), "cores"],
+    [t(p("gpus")), "gpus"],
+    [t(p("state")), "state"],
+    [t(p("nodesOrReason")), "nodesOrReason"],
+    [t(p("runningOrQueueTime")), "runningOrQueueTime"],
+    [t(p("submissionTime")), "submissionTime", formatDateTime],
+    [t(p("timeLimit")), "timeLimit"],
+  ] as ([string, keyof RunningJobInfo] | [string, keyof RunningJobInfo, (v: any, r: RunningJobInfo) => string])[];
+
   return (
     <Drawer
       width={500}
       placement="right"
       onClose={onClose}
       open={open}
-      title="未结束的作业详细信息"
+      title={t(p("drawerTitle"))}
     >
       {
         item ? (
@@ -59,7 +66,10 @@ export const RunningJobDrawer: React.FC<Props> = ({
           >
             {drawerItems.map(([label, key, format]) => (
               <Descriptions.Item key={item.jobId} label={label}>
-                {format ? format(item[key], item) : item[key] as string}
+                {/* 如果是集群项展示，则根据当前语言id获取集群名称 */}
+                {format ?
+                  (key === "cluster" ? getClusterName(item[key].id, languageId) : format(item[key], item))
+                  : item[key] as string}
               </Descriptions.Item>
             ))}
           </Descriptions>

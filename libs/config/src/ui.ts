@@ -19,14 +19,19 @@ export const DEFAULT_PRIMARY_COLOR = "#94070A";
 export const UiConfigSchema = Type.Object({
   footer: Type.Optional(Type.Object({
     defaultText: Type.Optional(Type.String({ description: "默认的footer文本" })),
+    hostnameMap: Type.Optional(Type.Record(Type.String(), Type.String(),
+      { description: "根据域名(hostname，不包括port)不同，显示在footer上的文本" })),
     hostnameTextMap: Type.Optional(Type.Record(Type.String(), Type.String(),
-      { description: "根据域名（hostname，不包括port）不同，显示在footer上的文本" })),
+      {
+        description: "根据域名(hostname，不包括port)不同，显示在footer上的文本",
+        deprecated: true,
+      })),
   })),
 
   primaryColor: Type.Optional(Type.Object({
     defaultColor: Type.String({ description: "默认主题色", default: DEFAULT_PRIMARY_COLOR }),
     hostnameMap: Type.Optional(Type.Record(Type.String(), Type.String(),
-      { description: "根据域名（hostname，不包括port）不同，应用的主题色" })),
+      { description: "根据域名(hostname，不包括port)不同，应用的主题色" })),
   })),
 });
 

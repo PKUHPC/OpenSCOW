@@ -22,6 +22,7 @@ import { requireAuth } from "src/auth/requireAuth";
 import { ssrAuthenticate, SSRProps } from "src/auth/server";
 import { UnifiedErrorPage } from "src/components/errorPages/UnifiedErrorPage";
 import { PageTitle } from "src/components/PageTitle";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { TenantRole } from "src/models/User";
 import { ensureNotUndefined } from "src/utils/checkNull";
 import { getClient } from "src/utils/client";
@@ -32,25 +33,29 @@ type Info = GetTenantInfoResponse & { tenantName: string };
 
 type Props = SSRProps<Info, 404>
 
+const p = prefix("page.tenant.info.");
+
 export const TenantInfoPage: NextPage<Props> = requireAuth((u) => u.tenantRoles.includes(TenantRole.TENANT_ADMIN))
 ((props: Props) => {
+
+  const t = useI18nTranslateToString();
 
   if ("error" in props) {
     return <UnifiedErrorPage code={props.error} />;
   }
 
-  const { balance, accountCount, admins, 
+  const { balance, accountCount, admins,
     userCount, tenantName, financialStaff } = ensureNotUndefined(props, ["balance"]);
-    
+
   return (
     <div>
-      <Head title="租户信息" />
-      <PageTitle titleText={"租户信息"} />
+      <Head title={t("common.tenantInfo")} />
+      <PageTitle titleText={t("common.tenantInfo")} />
       <Descriptions bordered column={1}>
-        <Descriptions.Item label="租户名">
+        <Descriptions.Item label={t("common.tenantName")}>
           {tenantName}
         </Descriptions.Item>
-        <Descriptions.Item label="管理员">
+        <Descriptions.Item label={t("common.admin")}>
           {
             admins.map(({ userId, userName }) => (
               <Tag key={userId}>
@@ -59,7 +64,7 @@ export const TenantInfoPage: NextPage<Props> = requireAuth((u) => u.tenantRoles.
             ))
           }
         </Descriptions.Item>
-        <Descriptions.Item label="租户财务人员">
+        <Descriptions.Item label={t(p("tenantFinanceOfficer"))}>
           {
             financialStaff.map(({ userId, userName }) => (
               <Tag key={userId}>
@@ -68,14 +73,14 @@ export const TenantInfoPage: NextPage<Props> = requireAuth((u) => u.tenantRoles.
             ))
           }
         </Descriptions.Item>
-        <Descriptions.Item label="账户数量">
+        <Descriptions.Item label={t("common.accountCount")}>
           {accountCount}
         </Descriptions.Item>
-        <Descriptions.Item label="用户数量">
+        <Descriptions.Item label={t("common.userCount")}>
           {userCount}
         </Descriptions.Item>
-        <Descriptions.Item label="租户余额">
-          {moneyToNumber(balance).toFixed(3)} 元
+        <Descriptions.Item label={t("common.tenantBalance")}>
+          {moneyToNumber(balance).toFixed(3)} {t("common.unit")}
         </Descriptions.Item>
       </Descriptions>
     </div>

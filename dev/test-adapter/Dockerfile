@@ -9,14 +9,17 @@
 # See the Mulan PSL v2 for more details.
 
 
-FROM node:hydrogen-alpine@sha256:3482a20c97e401b56ac50ba8920cc7b5b2022bfc6aa7d4e4c231755770cf892f AS base
+FROM node:hydrogen-alpine@sha256:435dcad253bb5b7f347ebc69c8cc52de7c912eb7241098b920f2fc2d7843183d AS base
 
 RUN apk update && apk add libc6-compat python3 make gcc g++ git
 
 RUN corepack enable
 
 WORKDIR /app
+
 COPY pnpm-lock.yaml .
+
+COPY patches ./patches
 
 RUN pnpm fetch
 

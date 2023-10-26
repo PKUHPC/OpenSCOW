@@ -1,6 +1,6 @@
 {
   "name": "@scow/portal-web",
-  "version": "0.9.0",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "dev": "cross-env NEXT_PUBLIC_USE_MOCK=1 TS_NODE_PROJECT=tsconfig.server.json node --watch -r ts-node/register -r tsconfig-paths/register server/index.ts",
@@ -33,7 +33,7 @@
     "@ddadaal/next-typed-api-routes-runtime": "0.8.2",
     "@ddadaal/tsgrpc-client": "0.17.6",
     "@ddadaal/tsgrpc-common": "0.2.4",
-    "@grpc/grpc-js": "1.8.21",
+    "@grpc/grpc-js": "1.9.5",
     "@scow/config": "workspace:*",
     "@scow/lib-auth": "workspace:*",
     "@scow/lib-config": "workspace:*",
@@ -70,7 +70,8 @@
     "typescript": "5.1.6",
     "ws": "8.13.0",
     "xterm": "5.2.1",
-    "xterm-addon-fit": "0.7.0"
+    "xterm-addon-fit": "0.7.0",
+    "react-typed-i18n": "2.3.0"
   },
   "devDependencies": {
     "@ddadaal/next-typed-api-routes-cli": "0.9.1",

@@ -15,6 +15,7 @@ import { App, Button, Form, Input, Modal } from "antd";
 import React, { useState } from "react";
 import { api } from "src/apis";
 import { CountdownText } from "src/components/CountdownText";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { CreateUserModal } from "src/pageComponents/users/CreateUserModal";
 import { publicConfig } from "src/utils/config";
 import { addUserToAccountParams, getUserIdRule, useBuiltinCreateUser } from "src/utils/createUser";
@@ -32,18 +33,23 @@ interface ModalProps {
   refresh: () => void;
   onAddUser: (identityId: string, name: string) => Promise<void>;
 }
+const p = prefix("pageComp.user.addUserButton.");
+const pCommon = prefix("common.");
 
 const NewUserModal: React.FC<ModalProps> = ({
   open, close, onAddUser: onAddingUser,
 }) => {
+
+  const t = useI18nTranslateToString();
+
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm<FormProps>();
-
-  const userIdRule = getUserIdRule();
+  const languageId = useI18n().currentLanguage.id;
+  const userIdRule = getUserIdRule(languageId);
 
   return (
     <Modal
-      title="添加用户"
+      title={t(p("addUser"))}
       open={open}
       onCancel={close}
       onOk={async () => {
@@ -56,7 +62,7 @@ const NewUserModal: React.FC<ModalProps> = ({
       <Form form={form}>
         <Form.Item
           name="identityId"
-          label="用户ID"
+          label={t(pCommon("userId"))}
           rules={[
             { required: true },
             ...userIdRule ? [userIdRule] : [],
@@ -64,7 +70,7 @@ const NewUserModal: React.FC<ModalProps> = ({
         >
           <Input placeholder={userIdRule?.message} />
         </Form.Item>
-        <Form.Item name="name" required label="用户姓名">
+        <Form.Item name="name" required label={t(pCommon("userFullName"))}>
           <Input />
         </Form.Item>
       </Form>
@@ -78,8 +84,9 @@ interface Props {
   token: string;
 }
 
-
 export const AddUserButton: React.FC<Props> = ({ refresh, accountName, token }) => {
+
+  const t = useI18nTranslateToString();
 
   const { message } = App.useApp();
 
@@ -91,16 +98,16 @@ export const AddUserButton: React.FC<Props> = ({ refresh, accountName, token }) 
     await api.addUserToAccount({ body: { identityId, name, accountName } })
       .httpError(400, ({ code }) => {
         if (code === "ID_NAME_NOT_MATCH") {
-          message.error("您输入的用户ID和姓名不匹配。");
+          message.error(t(p("notMatch")));
         }
       })
       .httpError(404, ({ code }) => {
         if (code === "USER_ALREADY_EXIST_IN_OTHER_TENANT") {
-          message.error(`用户${name}已属于其他租户`);
+          message.error(`${t(pCommon("user"))} ${name} ${t(p("alreadyBelonged"))}`);
         }
         else if (code === "ACCOUNT_OR_TENANT_NOT_FOUND") {
-          message.error("租户或账户不存在");
-        } 
+          message.error(t(p("notExist")));
+        }
         else if (code === "USER_NOT_FOUND") {
           if (useBuiltinCreateUser()) {
             setModalShow(false);
@@ -111,9 +118,9 @@ export const AddUserButton: React.FC<Props> = ({ refresh, accountName, token }) 
 
             message.info((
               <>
-              将在
+                {t(p("will"))}
                 <CountdownText seconds={TIMEOUT_SECONDS} />
-              秒后打开创建用户界面
+                {t(p("createModal"))}
               </>
             ), TIMEOUT_SECONDS, () => {
               window.open(
@@ -125,7 +132,7 @@ export const AddUserButton: React.FC<Props> = ({ refresh, accountName, token }) 
               setModalShow(false);
             });
           } else {
-            message.error("用户不存在。请先创建用户");
+            message.error(t(p("createFirst")));
           }
         }
       })
@@ -133,7 +140,7 @@ export const AddUserButton: React.FC<Props> = ({ refresh, accountName, token }) 
         message.error(e.message);
       })
       .then(() => {
-        message.success("添加成功！");
+        message.success(t(p("addSuccess")));
         refresh();
         setModalShow(false);
         setNewUserInfo(undefined);
@@ -161,7 +168,7 @@ export const AddUserButton: React.FC<Props> = ({ refresh, accountName, token }) 
         }}
       />
       <Button type="primary" icon={<PlusOutlined />} onClick={() => setModalShow(true)}>
-      添加用户
+        {t(p("addUser"))}
       </Button>
     </>
   );

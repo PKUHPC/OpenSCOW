@@ -13,7 +13,8 @@
 import { App, Select } from "antd";
 import { useState } from "react";
 import { api } from "src/apis";
-import { TenantRole, TenantRoleTexts } from "src/models/User";
+import { prefix, useI18nTranslateToString } from "src/i18n";
+import { TenantRole } from "src/models/User";
 import { User } from "src/stores/UserStore";
 
 interface Props {
@@ -23,18 +24,27 @@ interface Props {
   currentUser?: User;
 }
 
+const p = prefix("component.others.");
+
 export const TenantRoleSelector: React.FC<Props> = ({ roles, userId, reload, currentUser }) => {
 
   const { message } = App.useApp();
 
   const [loading, setLoading] = useState(false);
 
+  const t = useI18nTranslateToString();
+
+  const TenantRoleI18nTexts = {
+    [TenantRole.TENANT_FINANCE]: t("userRoles.tenantFinance"),
+    [TenantRole.TENANT_ADMIN]: t("userRoles.tenantAdmin"),
+  };
+
   return (
     <Select
       disabled={loading}
       value={roles}
       style={{ width: "100%" }}
-      options={Object.values(TenantRole).map((x) => ({ label: TenantRoleTexts[x], value: x }))}
+      options={Object.values(TenantRole).map((x) => ({ label: TenantRoleI18nTexts[x], value: x }))}
       onSelect={
         async (value) => {
           setLoading(true);
@@ -42,11 +52,11 @@ export const TenantRoleSelector: React.FC<Props> = ({ roles, userId, reload, cur
             userId: userId,
             roleType: value,
           } })
-            .httpError(200, () => { message.error("用户已经是该角色"); })
-            .httpError(404, () => { message.error("用户不存在"); })
-            .httpError(403, () => { message.error("用户没有权限"); })
+            .httpError(200, () => { message.error(t(p("alreadyIs"))); })
+            .httpError(404, () => { message.error(t(p("notExist"))); })
+            .httpError(403, () => { message.error(t(p("notAuth"))); })
             .then(() => {
-              message.success("设置成功");
+              message.success(t(p("setSuccess")));
               setLoading(false);
               reload();
             });
@@ -55,7 +65,7 @@ export const TenantRoleSelector: React.FC<Props> = ({ roles, userId, reload, cur
       onDeselect={
         async (value) => {
           if (currentUser && value === TenantRole.TENANT_ADMIN && currentUser.identityId === userId) {
-            message.error("不能取消自己的租户管理员角色");
+            message.error(t(p("cannotCancel")));
             return;
           }
 
@@ -64,18 +74,18 @@ export const TenantRoleSelector: React.FC<Props> = ({ roles, userId, reload, cur
             userId: userId,
             roleType: value,
           } })
-            .httpError(200, () => { message.error("用户已经不是该角色"); })
-            .httpError(404, () => { message.error("用户不存在"); })
-            .httpError(403, () => { message.error("用户没有权限"); })
+            .httpError(200, () => { message.error(t(p("alreadyNot"))); })
+            .httpError(404, () => { message.error(t(p("notExist"))); })
+            .httpError(403, () => { message.error(t(p("notAuth"))); })
             .then(() => {
-              message.success("设置成功");
+              message.success(t(p("setSuccess")));
               setLoading(false);
               reload();
             });
         }
       }
       mode="multiple"
-      placeholder="选择角色"
+      placeholder={t(p("selectRole"))}
     />
   );
 };

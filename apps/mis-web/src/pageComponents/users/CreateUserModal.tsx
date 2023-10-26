@@ -13,9 +13,11 @@
 import { App, Form, Input, Modal } from "antd";
 import React, { useEffect, useState } from "react";
 import { api } from "src/apis";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { CreateUserFormFields } from "src/pageComponents/users/CreateUserForm";
+import { getRuntimeI18nConfigText } from "src/utils/config";
 import { getUserIdRule } from "src/utils/createUser";
-import { confirmPasswordFormItemProps, emailRule, passwordRule } from "src/utils/form";
+import { confirmPasswordFormItemProps, getEmailRule, passwordRule } from "src/utils/form";
 
 export interface NewUserInfo {
   identityId: string;
@@ -29,10 +31,15 @@ interface Props {
   onCreated: (newUserInfo: NewUserInfo) => Promise<void>;
   onClose: () => void;
 }
+const p = prefix("pageComp.user.createUserModal.");
+const pCommon = prefix("common.");
 
 export const CreateUserModal: React.FC<Props> = ({
   onCreated, onClose, open, newUserInfo, accountName,
 }) => {
+
+  const t = useI18nTranslateToString();
+
   const [form] = Form.useForm<CreateUserFormFields>();
   const [loading, setLoading] = useState(false);
 
@@ -42,7 +49,16 @@ export const CreateUserModal: React.FC<Props> = ({
     const { password, email, identityId, name } = await form.validateFields();
     setLoading(true);
     await api.createUser({ body: { email, identityId, name, password } })
-      .httpError(409, () => { message.error("此用户ID已经存在！"); })
+      .httpError(409, () => { message.error(t(p("alreadyExist"))); })
+      .httpError(400, (e) => {
+        if (e.code === "USERID_NOT_VALID") {
+          message.error(userIdRule?.message);
+        };
+        if (e.code === "PASSWORD_NOT_VALID") {
+          message.error(getRuntimeI18nConfigText(languageId, "passwordPatternMessage"));
+        };
+        throw e;
+      })
       .then(() => {
         return onCreated({ identityId, name });
       })
@@ -56,20 +72,21 @@ export const CreateUserModal: React.FC<Props> = ({
     }
   }, [newUserInfo]);
 
-  const userIdRule = getUserIdRule();
+  const languageId = useI18n().currentLanguage.id;
+  const userIdRule = getUserIdRule(languageId);
 
   return (
     <Modal
-      title="创建用户"
+      title={t(p("createUser"))}
       open={open}
       onCancel={onClose}
       confirmLoading={loading}
       onOk={onOk}
     >
-      <p>用户不存在，请输入新用户信息以创建用户并添加进账户{accountName}。</p>
+      <p>{t(p("notExist"))} {accountName}。</p>
       <Form form={form} initialValues={newUserInfo}>
         <Form.Item
-          label="用户ID"
+          label={t(pCommon("userId"))}
           name="identityId"
           rules={[
             { required: true },
@@ -78,30 +95,30 @@ export const CreateUserModal: React.FC<Props> = ({
         >
           <Input disabled placeholder={userIdRule?.message} />
         </Form.Item>
-        <Form.Item label="用户姓名" name="name" rules={[{ required: true }]}>
+        <Form.Item label={t(pCommon("userFullName"))} name="name" rules={[{ required: true }]}>
           <Input />
         </Form.Item>
         <Form.Item
-          label="用户邮箱"
+          label={t(p("email"))}
           name="email"
-          rules={[{ required: true }, emailRule]}
+          rules={[{ required: true }, getEmailRule(languageId)]}
         >
           <Input />
         </Form.Item>
         <Form.Item
-          label="用户密码"
+          label={t(p("password"))}
           name="password"
-          rules={[{ required: true }, passwordRule]}
+          rules={[{ required: true }, passwordRule(languageId)]}
         >
-          <Input.Password placeholder={passwordRule.message} />
+          <Input.Password placeholder={passwordRule(languageId).message} />
         </Form.Item>
         <Form.Item
-          label="确认密码"
+          label={t(p("confirm"))}
           name="confirmPassword"
           hasFeedback
-          {...confirmPasswordFormItemProps(form, "password")}
+          {...confirmPasswordFormItemProps(form, "password", languageId)}
         >
-          <Input.Password placeholder={passwordRule.message} />
+          <Input.Password placeholder={passwordRule(languageId).message} />
         </Form.Item>
       </Form>
     </Modal>

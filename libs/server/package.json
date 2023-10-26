@@ -1,6 +1,6 @@
 {
   "name": "@scow/lib-server",
-  "version": "0.2.0",
+  "version": "1.0.0",
   "description": "Server libraries",
   "private": true,
   "main": "build/index.js",
@@ -18,7 +18,8 @@
   "repository": "https://github.com/PKUHPC/SCOW",
   "dependencies": {
     "@ddadaal/tsgrpc-common": "0.2.4",
-    "@grpc/grpc-js": "1.8.21"
+    "@grpc/grpc-js": "1.9.5",
+    "nookies": "2.5.2"
   },
   "devDependencies": {
     "@ddadaal/tsgrpc-server": "0.19.4",

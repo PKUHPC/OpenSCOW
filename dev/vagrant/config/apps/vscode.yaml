@@ -32,8 +32,18 @@ attributes:
   - type: select
     name: selectVersion
     label: 选择版本
+    # label:
+    #   i18n:
+    #     default: 选择版本
+    #     en: Select Version
+    #     zh_cn: 选择版本
     required: true  # 用户必须选择一个版本
     placeholder: 选择code-server的版本  # 提示信息
+    # placeholder:
+    #   i18n:
+    #     default: 选择code-server的版本
+    #     en: Choose the version of the code-server
+    #     zh_cn: 选择code-server的版本
     select:
       - value: code-server/4.8.0
         label: version 4.8.0
@@ -43,5 +53,15 @@ attributes:
   - type: text
     name: sbatchOptions
     label: 其他sbatch参数
+    # label:
+    #   i18n:
+    #     default: 其他sbatch参数
+    #     en: Other sbatch parameters
+    #     zh_cn: 其他sbatch参数
     required: false
     placeholder: "比如：--gpus gres:2 --time 10"
+    # placeholder:
+    #   i18n:
+    #     default: "比如：--gpus gres:2 --time 10"
+    #     en: "For example: --gpus gres:2 --time 10"
+    #     zh_cn: "比如：--gpus gres:2 --time 10"

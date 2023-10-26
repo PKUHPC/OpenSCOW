@@ -109,4 +109,9 @@ export const UsersSortFieldType = Type.Union([
 ]);
 export type UsersSortFieldType = Static<typeof UsersSortFieldType>;
 
+// 查询类型，平台账户或租户
+export enum SearchType {
+  ACCOUNT = "ACCOUNT",
+  TENANT = "TENANT",
+}
 

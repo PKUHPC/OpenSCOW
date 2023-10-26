@@ -25,6 +25,7 @@ predefinedChargingTypes:
   # regex: ""
 
   # 出错时的消息
+  # 此文本支持国际化
   # errorMessage: ""
 
 # 创建用户相关配置
@@ -45,6 +46,7 @@ predefinedChargingTypes:
       # regex: ""
 
       # 出错时的消息
+      # 此文本支持国际化
       # errorMessage: ""
 
   # 外置页面配置

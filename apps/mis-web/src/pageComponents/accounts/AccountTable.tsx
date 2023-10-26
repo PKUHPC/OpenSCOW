@@ -10,14 +10,17 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { moneyToNumber } from "@scow/lib-decimal";
 import { Money } from "@scow/protos/build/common/money";
 import { Static } from "@sinclair/typebox";
-import { Button, Divider, Form, Input, Space, Table, Tag } from "antd";
+import { App, Button, Divider, Form, Input, Space, Table, Tag } from "antd";
 import { SortOrder } from "antd/es/table/interface";
 import Link from "next/link";
 import React, { useMemo, useState } from "react";
+import { api } from "src/apis";
 import { FilterFormContainer, FilterFormTabs } from "src/components/FilterFormContainer";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import type { AdminAccountInfo, GetAccountsSchema } from "src/pages/api/tenant/getAccounts";
 import { moneyToString } from "src/utils/money";
 
@@ -34,17 +37,23 @@ interface FilterForm {
 }
 
 const filteredStatuses = {
-  "ALL": "所有账户",
-  "DEBT": "欠费账户",
-  "BLOCKED": "封锁账户",
+  "ALL": "pageComp.accounts.accountTable.allAccount",
+  "DEBT": "pageComp.accounts.accountTable.debtAccount",
+  "BLOCKED": "pageComp.accounts.accountTable.blockedAccount",
 };
 type FilteredStatus = keyof typeof filteredStatuses;
 
+const p = prefix("pageComp.accounts.accountTable.");
+const pCommon = prefix("common.");
+
 export const AccountTable: React.FC<Props> = ({
-  data, isLoading, showedTab,
+  data, isLoading, showedTab, reload,
 }) => {
 
+  const { message, modal } = App.useApp();
   const [form] = Form.useForm<FilterForm>();
+
+  const t = useI18nTranslateToString();
 
   const [rangeSearchStatus, setRangeSearchStatus] = useState<FilteredStatus>("ALL");
   const [currentPageNum, setCurrentPageNum] = useState<number>(1);
@@ -61,14 +70,14 @@ export const AccountTable: React.FC<Props> = ({
   )) : undefined, [data, query, rangeSearchStatus]);
 
   const usersStatusCount = useMemo(() => {
-    if (!data || !data.results) return { BLOCKED : 0, DEBT : 0, ALL : 0 };
+    if (!filteredData) return { BLOCKED : 0, DEBT : 0, ALL : 0 };
     const counts = {
-      BLOCKED: data.results.filter((user) => user.blocked).length,
-      DEBT: data.results.filter((user) => !user.balance.positive).length,
-      ALL: data.results.length,
+      BLOCKED: filteredData.filter((user) => user.blocked).length,
+      DEBT: filteredData.filter((user) => !user.balance.positive).length,
+      ALL: filteredData.length,
     };
     return counts;
-  }, [data]);
+  }, [filteredData]);
 
   const handleTableChange = (_, __, sortInfo) => {
     setCurrentSortInfo({ field: sortInfo.field, order: sortInfo.order });
@@ -93,17 +102,17 @@ export const AccountTable: React.FC<Props> = ({
             setCurrentSortInfo({ field: null, order: null });
           }}
         >
-          <Form.Item label="账户" name="accountName">
+          <Form.Item label={t(p("account"))} name="accountName">
             <Input />
           </Form.Item>
           <Form.Item>
-            <Button type="primary" htmlType="submit">搜索</Button>
+            <Button type="primary" htmlType="submit">{t(pCommon("search"))}</Button>
           </Form.Item>
         </Form>
         <Space style={{ marginBottom: "-16px" }}>
           <FilterFormTabs
             tabs={Object.keys(filteredStatuses).map((status) => ({
-              title: `${filteredStatuses[status]}(${usersStatusCount[status as FilteredStatus]})`,
+              title: `${t(filteredStatuses[status])}(${usersStatusCount[status as FilteredStatus]})`,
               key: status,
             }))}
             onChange={(value) => handleFilterStatusChange(value as FilteredStatus)}
@@ -125,60 +134,124 @@ export const AccountTable: React.FC<Props> = ({
       >
         <Table.Column<AdminAccountInfo>
           dataIndex="accountName"
-          title="账户名"
+          title={t(p("accountName"))}
           sorter={(a, b) => a.accountName.localeCompare(b.accountName)}
           sortDirections={["ascend", "descend"]}
           sortOrder={currentSortInfo.field === "accountName" ? currentSortInfo.order : null}
         />
         <Table.Column<AdminAccountInfo>
           dataIndex="ownerName"
-          title="拥有者"
+          title={t(p("owner"))}
           render={(_, r) => `${r.ownerName}（ID: ${r.ownerId}）`}
         />
         <Table.Column<AdminAccountInfo>
           dataIndex="userCount"
-          title="用户数量"
+          title={t(pCommon("userCount"))}
         />
         {/* 只在平台管理下的账户列表中显示 */}
         {showedTab === "PLATFORM" && (
           <Table.Column<AdminAccountInfo>
             dataIndex="tenantName"
-            title="租户"
+            title={t(p("tenant"))}
           />
         )}
         <Table.Column<AdminAccountInfo>
           dataIndex="comment"
-          title="备注"
+          title={t(p("comment"))}
         />
         <Table.Column<AdminAccountInfo>
           dataIndex="balance"
-          title="余额"
+          title={t(pCommon("balance"))}
           sorter={(a, b) => (moneyToNumber(a.balance)) - (moneyToNumber(b.balance))}
           sortDirections={["ascend", "descend"]}
           sortOrder={currentSortInfo.field === "balance" ? currentSortInfo.order : null}
-          render={(b: Money) => moneyToString(b) + " 元" }
+          render={(b: Money) => moneyToString(b) + t(p("unit")) }
         />
         <Table.Column<AdminAccountInfo>
           dataIndex="blocked"
-          title="状态"
+          title={t(p("status"))}
           sorter={(a, b) => (a.blocked ? 1 : 0) - (b.blocked ? 1 : 0)}
           sortDirections={["ascend", "descend"]}
           sortOrder={currentSortInfo.field === "blocked" ? currentSortInfo.order : null}
-          render={(blocked) => blocked ? <Tag color="red">封锁</Tag> : <Tag color="green">正常</Tag>}
+          render={(blocked) => blocked ? <Tag color="red">{t(p("block"))}</Tag> :
+            <Tag color="green">{t(p("normal"))}</Tag>}
         />
-        {/* 只在租户管理下的账户列表中显示 */}
-        {showedTab === "TENANT" && (
-          <Table.Column<AdminAccountInfo>
-            title="操作"
-            render={(_, r) => (
-              <Space split={<Divider type="vertical" />}>
+        <Table.Column<AdminAccountInfo>
+          title={t(pCommon("operation"))}
+          render={(_, r) => (
+            <Space split={<Divider type="vertical" />}>
+              {/* 只在租户管理下的账户列表中显示管理成员 */}
+              {showedTab === "TENANT" && (
                 <Link href={{ pathname: `/tenant/accounts/${r.accountName}/users` }}>
-                管理成员
+                  {t(p("mangerMember"))}
                 </Link>
-              </Space>
-            )}
-          />
-        )}
+              )}
+              {
+                r.blocked
+                  ? (
+                    <a onClick={() => {
+                      if (moneyToNumber(r.balance) > 0) {
+                        modal.confirm({
+                          title: t(p("unblockConfirmTitle")),
+                          icon: <ExclamationCircleOutlined />,
+                          content: t(p("unblockConfirmContent"), [r.tenantName, r.accountName]),
+                          onOk: async () => {
+                            await api.unblockAccount({
+                              body: {
+                                tenantName: r.tenantName,
+                                accountName: r.accountName,
+                              },
+                            })
+                              .then((res) => {
+                                if (res.executed) {
+                                  message.success(t(p("unblockSuccess")));
+                                  reload();
+                                } else {
+                                  message.error(res.reason || t(p("unblockFail")));
+                                }
+                              });
+                          },
+                        });
+                      } else {
+                        message.error(t(p("unblockError"), [r.accountName]));
+                      }
+
+                    }}
+                    >
+                      {t(p("unblock"))}
+                    </a>
+                  ) : (
+                    <a onClick={() => {
+                      modal.confirm({
+                        title: t(p("blockConfirmTitle")),
+                        icon: <ExclamationCircleOutlined />,
+                        content: t(p("blockConfirmContent"), [r.tenantName, r.accountName]),
+                        onOk: async () => {
+                          await api.blockAccount({
+                            body: {
+                              tenantName: r.tenantName,
+                              accountName: r.accountName,
+                            },
+                          })
+                            .then((res) => {
+                              if (res.executed) {
+                                message.success(t(p("blockSuccess")));
+                                reload();
+                              } else {
+                                message.error(res.reason || t(p("blockFail")));
+                              }
+                            });
+                        },
+                      });
+                    }}
+                    >
+                      {t(p("block"))}
+                    </a>
+                  )
+              }
+            </Space>
+          )}
+        />
       </Table>
     </div>
   );

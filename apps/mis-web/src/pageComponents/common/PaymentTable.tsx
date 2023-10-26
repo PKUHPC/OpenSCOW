@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { defaultPresets, formatDateTime } from "@scow/lib-web/build/utils/datetime";
+import { formatDateTime, getDefaultPresets } from "@scow/lib-web/build/utils/datetime";
 import { useDidUpdateEffect } from "@scow/lib-web/build/utils/hooks";
 import { Button, DatePicker, Form, Table } from "antd";
 import dayjs from "dayjs";
@@ -18,8 +18,9 @@ import { useCallback, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { AccountSelector } from "src/pageComponents/finance/AccountSelector";
-import { TenantSelector } from "src/pageComponents/tenant/TenantSelector"; 
+import { TenantSelector } from "src/pageComponents/tenant/TenantSelector";
 
 export enum SearchType {
     account = "account",
@@ -31,11 +32,11 @@ interface Props {
   accountName?: string;
   // 展示账户或租户下拉搜索，不传就不展示,同时区分后端接口，值为tenant时，获取租户的记录
   searchType?: SearchType;
-  // 列表中是否展示账户 
+  // 列表中是否展示账户
   showAccountName?: boolean;
-  // 列表中是否展示租户 
+  // 列表中是否展示租户
   showTenantName?: boolean;
-  // 列表中是否展示IP地址和操作者ID 
+  // 列表中是否展示IP地址和操作者ID
   showAuditInfo?: boolean;
 }
 
@@ -60,10 +61,16 @@ interface FilterForm {
 
 const today = dayjs().endOf("day");
 
+const p = prefix("pageComp.commonComponent.paymentTable.");
+const pCommon = prefix("common.");
+
 export const PaymentTable: React.FC<Props> = ({
   accountName, searchType, showAccountName,
   showTenantName, showAuditInfo,
 }) => {
+
+  const t = useI18nTranslateToString();
+  const languageId = useI18n().currentLanguage.id;
 
   const [form] = Form.useForm<FilterForm>();
 
@@ -99,7 +106,7 @@ export const PaymentTable: React.FC<Props> = ({
   });
 
   useDidUpdateEffect(() => {
-    setQuery((q) => ({ ...q, accountName: accountName }));
+    setQuery((q) => ({ ...q, name: accountName }));
   }, [accountName]);
 
   return (
@@ -115,13 +122,17 @@ export const PaymentTable: React.FC<Props> = ({
           }}
         >
           {searchType ? (
-            <Form.Item label={searchType === SearchType.account ? "账户" : "租户" } name="name">
+            <Form.Item
+              label={searchType === SearchType.account ?
+                t(pCommon("account")) : t(pCommon("tenant"))}
+              name="name"
+            >
               {searchType === SearchType.account ? (
                 <AccountSelector
                   onChange={(item) => {
                     setQuery({ ...query, name:item });
                   }}
-                  placeholder="请选择账户"
+                  placeholder={t(pCommon("selectAccount"))}
                 />
               ) : (
                 <TenantSelector
@@ -129,27 +140,27 @@ export const PaymentTable: React.FC<Props> = ({
                     setQuery({ ...query, name:item });
 
                   }}
-                  placeholder="请选择租户"
+                  placeholder={t(pCommon("selectTenant"))}
                 />
               )}
             </Form.Item>
           )
             : undefined}
-          <Form.Item label="时间" name="time">
-            <DatePicker.RangePicker allowClear={false} presets={defaultPresets} />
+          <Form.Item label={t(pCommon("time"))} name="time">
+            <DatePicker.RangePicker allowClear={false} presets={getDefaultPresets(languageId)} />
           </Form.Item>
-          <Form.Item label="总数">
+          <Form.Item label={t(p("total"))}>
             <strong>
               {data ? data.results.length : 0}
             </strong>
           </Form.Item>
-          <Form.Item label="合计">
+          <Form.Item label={t(p("sum"))}>
             <strong>
               {data ? data.total.toFixed(3) : 0}
             </strong>
           </Form.Item>
           <Form.Item>
-            <Button type="primary" htmlType="submit">搜索</Button>
+            <Button type="primary" htmlType="submit">{t(pCommon("search"))}</Button>
           </Form.Item>
         </Form>
       </FilterFormContainer>
@@ -160,20 +171,20 @@ export const PaymentTable: React.FC<Props> = ({
         pagination={{ showSizeChanger: true }}
       >
         {
-          showAccountName ? <Table.Column dataIndex="accountName" title="账户" /> : undefined
+          showAccountName ? <Table.Column dataIndex="accountName" title={t(pCommon("account"))} /> : undefined
         }
         {
-          showTenantName ? <Table.Column dataIndex="tenantName" title="租户" /> : undefined
+          showTenantName ? <Table.Column dataIndex="tenantName" title={t(pCommon("tenant"))} /> : undefined
         }
-        <Table.Column dataIndex="time" title="交费日期" render={(v) => formatDateTime(v)} />
-        <Table.Column dataIndex="amount" title="交费金额" render={(v) => v.toFixed(3)} />
-        <Table.Column dataIndex="type" title="类型" />
-        <Table.Column dataIndex="comment" title="备注" />
+        <Table.Column dataIndex="time" title={t(p("paymentDate"))} render={(v) => formatDateTime(v)} />
+        <Table.Column dataIndex="amount" title={t(p("paymentAmount"))} render={(v) => v.toFixed(3)} />
+        <Table.Column dataIndex="type" title={t(pCommon("type"))} />
+        <Table.Column dataIndex="comment" title={t(pCommon("comment"))} />
         {
           showAuditInfo ? (
             <>
-              <Table.Column dataIndex="ipAddress" title="IP地址" />
-              <Table.Column dataIndex="operatorId" title="操作者ID" />
+              <Table.Column dataIndex="ipAddress" title={t(p("ipAddress"))} />
+              <Table.Column dataIndex="operatorId" title={t(p("operatorId"))} />
             </>
           ) : undefined
         }

@@ -14,11 +14,12 @@ import { compareDateTime, formatDateTime } from "@scow/lib-web/build/utils/datet
 import { Static } from "@sinclair/typebox";
 import { App, Button, Divider, Form, Input, Space, Table } from "antd";
 import { SortOrder } from "antd/es/table/interface";
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { api } from "src/apis";
 import { ChangePasswordModalLink } from "src/components/ChangePasswordModal";
 import { FilterFormContainer, FilterFormTabs } from "src/components/FilterFormContainer";
 import { TenantRoleSelector } from "src/components/TenantRoleSelector";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { FullUserInfo, TenantRole } from "src/models/User";
 import { GetTenantUsersSchema } from "src/pages/api/admin/getTenantUsers";
 import { User } from "src/stores/UserStore";
@@ -34,16 +35,23 @@ interface FilterForm {
   idOrName: string | undefined;
 }
 
+const p = prefix("pageComp.tenant.adminUserTable.");
+const pCommon = prefix("common.");
+
 const filteredRoles = {
-  "ALL_USERS": "所有用户",
-  "TENANT_ADMIN": "租户管理员",
-  "TENANT_FINANCE": "财务人员",
-};
+  "ALL_USERS": "allUsers",
+  "TENANT_ADMIN": "tenantAdmin",
+  "TENANT_FINANCE": "tenantFinance",
+} as const;
 type FilteredRole = keyof typeof filteredRoles;
+
+
 
 export const AdminUserTable: React.FC<Props> = ({
   data, isLoading, reload, user,
 }) => {
+
+  const t = useI18nTranslateToString();
 
   const { message } = App.useApp();
   const [form] = Form.useForm<FilterForm>();
@@ -63,18 +71,20 @@ export const AdminUserTable: React.FC<Props> = ({
         rangeSearchRole === "TENANT_ADMIN" ? TenantRole.TENANT_ADMIN : TenantRole.TENANT_FINANCE))
   )) : undefined, [data, query, rangeSearchRole]);
 
-  const getUsersRoleCount = (role: FilteredRole): number => {
+  const getUsersRoleCount = useCallback((role: FilteredRole): number => {
 
     switch (role) {
     case "TENANT_ADMIN":
-      return data ? data.results.filter((user) => user.tenantRoles.includes(TenantRole.TENANT_ADMIN)).length : 0;
+      return filteredData
+        ? filteredData.filter((user) => user.tenantRoles.includes(TenantRole.TENANT_ADMIN)).length : 0;
     case "TENANT_FINANCE":
-      return data ? data.results.filter((user) => user.tenantRoles.includes(TenantRole.TENANT_FINANCE)).length : 0;
+      return filteredData
+        ? filteredData.filter((user) => user.tenantRoles.includes(TenantRole.TENANT_FINANCE)).length : 0;
     case "ALL_USERS":
     default:
-      return data ? data.results.length : 0;
+      return filteredData ? filteredData.length : 0;
     }
-  };
+  }, [filteredData]);
 
   const handleTableChange = (_, __, sortInfo) => {
     setCurrentSortInfo({ field: sortInfo.field, order: sortInfo.order });
@@ -101,17 +111,17 @@ export const AdminUserTable: React.FC<Props> = ({
             setCurrentSortInfo({ field: null, order: null });
           }}
         >
-          <Form.Item label="用户ID或者姓名" name="idOrName">
+          <Form.Item label={t(p("idOrName"))} name="idOrName">
             <Input />
           </Form.Item>
           <Form.Item>
-            <Button type="primary" htmlType="submit">搜索</Button>
+            <Button type="primary" htmlType="submit">{t(pCommon("search"))}</Button>
           </Form.Item>
         </Form>
         <Space style={{ marginBottom: "-16px" }}>
           <FilterFormTabs
             tabs={Object.keys(filteredRoles).map((role) => ({
-              title: `${filteredRoles[role]}(${getUsersRoleCount(role as FilteredRole)})`,
+              title: `${t(p(filteredRoles[role]))}(${getUsersRoleCount(role as FilteredRole)})`,
               key: role,
             }))}
             onChange={(value) => handleFilterRoleChange(value as FilteredRole)}
@@ -133,35 +143,35 @@ export const AdminUserTable: React.FC<Props> = ({
       >
         <Table.Column<FullUserInfo>
           dataIndex="id"
-          title="用户ID"
+          title={t(pCommon("userId"))}
           sorter={(a, b) => a.id.localeCompare(b.id)}
           sortDirections={["ascend", "descend"]}
           sortOrder={currentSortInfo.field === "id" ? currentSortInfo.order : null}
         />
         <Table.Column<FullUserInfo>
           dataIndex="name"
-          title="姓名"
+          title={t(p("name"))}
           sorter={(a, b) => a.name.localeCompare(b.name)}
           sortDirections={["ascend", "descend"]}
           sortOrder={currentSortInfo.field === "name" ? currentSortInfo.order : null}
         />
         <Table.Column<FullUserInfo>
           dataIndex="email"
-          title="邮箱"
+          title={t(pCommon("email"))}
           sorter={(a, b) => a.email.localeCompare(b.email)}
           sortDirections={["ascend", "descend"]}
           sortOrder={currentSortInfo.field === "email" ? currentSortInfo.order : null}
         />
         <Table.Column<FullUserInfo>
           dataIndex="tenantRoles"
-          title="租户角色"
+          title={t(p("tenantRole"))}
           render={(_, r) => (
             <TenantRoleSelector reload={reload} roles={r.tenantRoles} userId={r.id} currentUser={user} />
           )}
         />
         <Table.Column<FullUserInfo>
           dataIndex="createTime"
-          title="创建时间"
+          title={t(pCommon("createTime"))}
           sorter={(a, b) => compareDateTime(a.createTime, b.createTime)}
           sortDirections={["ascend", "descend"]}
           sortOrder={currentSortInfo.field === "createTime" ? currentSortInfo.order : null}
@@ -169,12 +179,12 @@ export const AdminUserTable: React.FC<Props> = ({
         />
         <Table.Column<FullUserInfo>
           dataIndex="affiliatedAccountNames"
-          title="可用账户"
+          title={t(p("affiliatedAccountName"))}
           render={(_, r) => r.accountAffiliations.map((x) => x.accountName).join(", ")}
         />
         <Table.Column<FullUserInfo>
           dataIndex="changePassword"
-          title="操作"
+          title={t(pCommon("operation"))}
           render={(_, r) => (
             <Space split={<Divider type="vertical" />}>
               <ChangePasswordModalLink
@@ -185,13 +195,13 @@ export const AdminUserTable: React.FC<Props> = ({
                     identityId: r.id,
                     newPassword: newPassword,
                   } })
-                    .httpError(404, () => { message.error("用户不存在"); })
-                    .httpError(501, () => { message.error("本功能在当前配置下不可用"); })
-                    .then(() => { message.success("修改成功"); })
-                    .catch(() => { message.error("修改失败"); });
+                    .httpError(404, () => { message.error(t(p("notExist"))); })
+                    .httpError(501, () => { message.error(t(p("notAvailable"))); })
+                    .then(() => { message.success(t(p("changeSuccess"))); })
+                    .catch(() => { message.error(t(p("changeFail"))); });
                 }}
               >
-              修改密码
+                {t(p("changePassword"))}
               </ChangePasswordModalLink>
             </Space>
           )}

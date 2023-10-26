@@ -10,11 +10,15 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { publicConfig } from "src/utils/config";
+import { getRuntimeI18nConfigText, publicConfig } from "src/utils/config";
 
-export const passwordRule = {
-  pattern: publicConfig.PASSWORD_PATTERN ? new RegExp(publicConfig.PASSWORD_PATTERN) : undefined,
-  message: publicConfig.PASSWORD_PATTERN_MESSAGE,
+export const passwordRule = (languageId: string) => {
+
+
+  return {
+    pattern: publicConfig.PASSWORD_PATTERN ? new RegExp(publicConfig.PASSWORD_PATTERN) : undefined,
+    message: getRuntimeI18nConfigText(languageId, "passwordPatternMessage"),
+  };
 };
 
-export { confirmPasswordFormItemProps, emailRule } from "@scow/lib-web/build/utils/form";
+export { confirmPasswordFormItemProps, getEmailRule } from "@scow/lib-web/build/utils/form";
