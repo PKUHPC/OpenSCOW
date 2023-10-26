@@ -29,6 +29,7 @@ import type { KillDesktopSchema } from "src/pages/api/desktop/killDesktop";
 import type { LaunchDesktopSchema } from "src/pages/api/desktop/launchDesktop";
 import type { ListAvailableWmsSchema } from "src/pages/api/desktop/listAvailableWms";
 import type { ListDesktopsSchema } from "src/pages/api/desktop/listDesktops";
+import type { CheckTransferKeySchema } from "src/pages/api/file/checkTransferKey";
 import type { CopyFileItemSchema } from "src/pages/api/file/copy";
 import type { CreateFileSchema } from "src/pages/api/file/createFile";
 import type { DeleteDirSchema } from "src/pages/api/file/deleteDir";
@@ -38,8 +39,12 @@ import type { FileExistSchema } from "src/pages/api/file/fileExist";
 import type { GetFileTypeSchema } from "src/pages/api/file/getFileType";
 import type { GetHomeDirectorySchema } from "src/pages/api/file/getHome";
 import type { ListFileSchema } from "src/pages/api/file/list";
+import type { ListAvailableTransferClustersSchema } from "src/pages/api/file/listAvailableTransferClusters";
 import type { MkdirSchema } from "src/pages/api/file/mkdir";
 import type { MoveFileItemSchema } from "src/pages/api/file/move";
+import type { QueryFileTransferProgressSchema } from "src/pages/api/file/queryFileTransferProgress";
+import type { StartFileTransferSchema } from "src/pages/api/file/startFileTransfer";
+import type { TerminateFileTransferSchema } from "src/pages/api/file/terminateFileTransfer";
 import type { UploadFileSchema } from "src/pages/api/file/upload";
 import type { CancelJobSchema } from "src/pages/api/job/cancelJob";
 import type { DeleteJobTemplateSchema } from "src/pages/api/job/deleteJobTemplate";
@@ -94,4 +99,9 @@ export const api = {
   submitJob: apiClient.fromTypeboxRoute<typeof SubmitJobSchema>("POST", "/api/job/submitJob"),
   changePassword: apiClient.fromTypeboxRoute<typeof ChangePasswordSchema>("PATCH", "/api/profile/changePassword"),
   checkPassword: apiClient.fromTypeboxRoute<typeof CheckPasswordSchema>("GET", "/api/profile/checkPassword"),
+  startFileTransfer: apiClient.fromTypeboxRoute<typeof StartFileTransferSchema>("PATCH", "/api/file/startFileTransfer"),
+  queryFileTransferProgress: apiClient.fromTypeboxRoute<typeof QueryFileTransferProgressSchema>("GET", "/api/file/queryFileTransferProgress"),
+  terminateFileTransfer: apiClient.fromTypeboxRoute<typeof TerminateFileTransferSchema>("POST", "/api/file/terminateFileTransfer"),
+  listAvailableTransferClusters: apiClient.fromTypeboxRoute<typeof ListAvailableTransferClustersSchema>("GET", "/api/file/listAvailableTransferClusters"),
+  checkTransferKey: apiClient.fromTypeboxRoute<typeof CheckTransferKeySchema>("POST", "/api/file/checkTransferKey"),
 };

@@ -82,6 +82,10 @@ export const ClusterConfigSchema = Type.Object({
   ]),
   loginDesktop: Type.Optional(LoginDeskopConfigSchema),
   turboVNCPath: Type.Optional(TurboVncConfigSchema),
+  crossClusterFileTransfer: Type.Optional(Type.Object({
+    enabled: Type.Boolean({ description: "是否开启跨集群传输功能", default: false }),
+    transferNode: Type.Optional(Type.String({ description: "跨集群传输文件的节点" })),
+  })),
 });
 
 
