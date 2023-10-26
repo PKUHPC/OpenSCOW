@@ -192,7 +192,7 @@ export default {
         whitelist: "账户白名单",
         financeManagement: "财务管理",
         accountPay: "账户充值",
-        financePayments: "充值记录",
+        financePayments: "租户充值记录",
         accountPayments: "账户充值记录",
         accountChargeRecords: "账户消费记录",
       },
@@ -767,7 +767,7 @@ export default {
       },
       finance: {
         payments: {
-          title: "充值记录",
+          title: "租户充值记录",
         },
         payAccount: {
           title: "账户充值",
