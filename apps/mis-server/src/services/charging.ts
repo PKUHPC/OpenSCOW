@@ -21,6 +21,7 @@ import { Account } from "src/entities/Account";
 import { ChargeRecord } from "src/entities/ChargeRecord";
 import { PayRecord } from "src/entities/PayRecord";
 import { Tenant } from "src/entities/Tenant";
+import { getChargesSearchType, getChargesTargetSearchParam } from "src/utils/chargesQuery";
 import { CHARGE_TYPE_OTHERS } from "src/utils/constants";
 import { paginationProps } from "src/utils/orm";
 
@@ -204,13 +205,17 @@ export const chargingServiceServer = plugin((server) => {
      * case accountsOfTenant: 返回这个租户（tenantName）下所有账户的消费记录
      * case accountsOfAllTenants: 返回所有租户下所有账户的消费记录
      *
-     * @returns
+     * Deprecated Notice
+     * This API function GetChargeRecords has been deprecated.
+     * Use the new API function GetPaginatedChargeRecords and GetChargeRecordsTotalCount instead.
+     *
+     * @deprecated
      */
     getChargeRecords: async ({ request, em }) => {
-      const { startTime, endTime, type, target, page, pageSize }
+      const { startTime, endTime, type, target }
         = ensureNotUndefined(request, ["startTime", "endTime"]);
 
-      let searchParam: { tenantName?: string | { $ne: null }, accountName?: string | { $ne: null } } = {};
+      let searchParam: { tenantName?: string, accountName?: string | { $ne: null } } = {};
       switch (target?.$case)
       {
       // 当前租户的租户消费记录
@@ -219,7 +224,7 @@ export const chargingServiceServer = plugin((server) => {
         break;
         // 所有租户的租户消费记录
       case "allTenants":
-        searchParam = { tenantName: { $ne:null }, accountName: undefined };
+        searchParam = { accountName: undefined };
         break;
         // 当前租户下当前账户的消费记录
       case "accountOfTenant":
@@ -231,7 +236,7 @@ export const chargingServiceServer = plugin((server) => {
         break;
         // 所有租户下所有账户的消费记录
       case "accountsOfAllTenants":
-        searchParam = { tenantName: { $ne: null }, accountName: { $ne:null } };
+        searchParam = { accountName: { $ne:null } };
         break;
       default:
         searchParam = {};
@@ -259,21 +264,7 @@ export const chargingServiceServer = plugin((server) => {
         time: { $gte: startTime, $lte: endTime },
         ...searchType,
         ...searchParam,
-      }, {
-        ...paginationProps(page, pageSize || 10),
-        orderBy: { time: QueryOrder.DESC },
-      });
-
-      const { total_count, total_amount }: { total_count: number, total_amount: string }
-       = await em.createQueryBuilder(ChargeRecord, "c")
-         .select("count(c.id) as total_count")
-         .addSelect("sum(c.amount) as total_amount")
-         .where({
-           time: { $gte: startTime, $lte: endTime },
-           ...searchType,
-           ...searchParam,
-         })
-         .execute("get");
+      }, { orderBy: { time: QueryOrder.DESC } });
 
       return [{
         results: records.map((x) => ({
@@ -285,10 +276,85 @@ export const chargingServiceServer = plugin((server) => {
           time: x.time.toISOString(),
           type: x.type,
         })),
-        total: decimalToMoney(new Decimal(total_amount)),
+        total: decimalToMoney(records.reduce((prev, curr) => prev.plus(curr.amount), new Decimal(0))),
+      }];
+    },
+
+
+    /**
+       *
+       * case tenant:返回这个租户（tenantName）的消费记录
+       * case allTenants: 返回所有租户消费记录
+       * case accountOfTenant: 返回这个租户（tenantName）下这个账户（accountName）的消费记录
+       * case accountsOfTenant: 返回这个租户（tenantName）下所有账户的消费记录
+       * case accountsOfAllTenants: 返回所有租户下所有账户的消费记录
+       *
+       * @returns
+       */
+    getPaginatedChargeRecords: async ({ request, em }) => {
+      const { startTime, endTime, type, target, page, pageSize }
+      = ensureNotUndefined(request, ["startTime", "endTime"]);
+
+      const searchParam = getChargesTargetSearchParam(target);
+
+      const searchType = getChargesSearchType(type);
+
+      const records = await em.find(ChargeRecord, {
+        time: { $gte: startTime, $lte: endTime },
+        ...searchType,
+        ...searchParam,
+      }, {
+        ...paginationProps(page, pageSize || 10),
+        orderBy: { time: QueryOrder.DESC },
+      });
+
+      return [{
+        results: records.map((x) => ({
+          tenantName: x.tenantName,
+          accountName: x.accountName,
+          amount: decimalToMoney(x.amount),
+          comment: x.comment,
+          index: x.id,
+          time: x.time.toISOString(),
+          type: x.type,
+        })),
+      }];
+    },
+
+    /**
+   *
+   * case tenant:返回这个租户（tenantName）的消费记录
+   * case allTenants: 返回所有租户消费记录
+   * case accountOfTenant: 返回这个租户（tenantName）下这个账户（accountName）的消费记录
+   * case accountsOfTenant: 返回这个租户（tenantName）下所有账户的消费记录
+   * case accountsOfAllTenants: 返回所有租户下所有账户的消费记录
+   *
+   * @returns
+   */
+    getChargeRecordsTotalCount: async ({ request, em }) => {
+      const { startTime, endTime, type, target }
+      = ensureNotUndefined(request, ["startTime", "endTime"]);
+
+      const searchParam = getChargesTargetSearchParam(target);
+
+      const searchType = getChargesSearchType(type);
+
+      const { total_count, total_amount }: { total_count: number, total_amount: string }
+        = await em.createQueryBuilder(ChargeRecord, "c")
+          .select("count(c.id) as total_count")
+          .addSelect("sum(c.amount) as total_amount")
+          .where({
+            time: { $gte: startTime, $lte: endTime },
+            ...searchType,
+            ...searchParam,
+          })
+          .execute("get");
+
+      return [{
+        totalAmount: decimalToMoney(new Decimal(total_amount)),
         totalCount: total_count,
       }];
     },
-  });
 
+  });
 });

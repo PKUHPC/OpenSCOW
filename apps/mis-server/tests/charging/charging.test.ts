@@ -435,7 +435,7 @@ it("returns charge records with query of accountOfTenant", async () => {
   queryEndTime.setDate(startTime.getDate() + 1);
 
   // accountOfTenant
-  const reply1 = await asyncClientCall(client, "getChargeRecords", {
+  const reply1 = await asyncClientCall(client, "getPaginatedChargeRecords", {
     startTime: queryStartTime.toISOString(),
     endTime: queryEndTime.toISOString(),
     target:{ $case:"accountOfTenant", accountOfTenant:{ accountName: account.accountName,
@@ -451,9 +451,6 @@ it("returns charge records with query of accountOfTenant", async () => {
     comment: request1.comment,
     amount: request1.amount,
   } as Partial<ChargeRecord>);
-
-  expect(reply1.total).toStrictEqual(numberToMoney(10));
-  expect(reply1.totalCount).toEqual(1);
 
   em.clear();
 });
@@ -494,7 +491,7 @@ it("returns charge records with query of tenant", async () => {
   queryEndTime.setDate(startTime.getDate() + 1);
 
   // tenant
-  const reply = await asyncClientCall(client, "getChargeRecords", {
+  const reply = await asyncClientCall(client, "getPaginatedChargeRecords", {
     target:{ $case:"tenant", tenant:{ tenantName: tenant.name } },
     startTime: queryStartTime.toISOString(),
     endTime: queryEndTime.toISOString(),
@@ -516,9 +513,6 @@ it("returns charge records with query of tenant", async () => {
       amount: request2.amount,
       type: request2.type,
     } ] as Partial<ChargeRecord>);
-
-  expect(reply.total).toStrictEqual(numberToMoney(30));
-  expect(reply.totalCount).toEqual(2);
 
   em.clear();
 });
@@ -586,7 +580,7 @@ it("returns charge records with query of allTenants", async () => {
   queryEndTime.setDate(startTime.getDate() + 1);
 
   // allTenants
-  const reply = await asyncClientCall(client, "getChargeRecords", {
+  const reply = await asyncClientCall(client, "getPaginatedChargeRecords", {
     target:{ $case: "allTenants", allTenants:{} },
     startTime: queryStartTime.toISOString(),
     endTime: queryEndTime.toISOString(),
@@ -603,9 +597,6 @@ it("returns charge records with query of allTenants", async () => {
       amount: request2.amount,
       type: "test1",
     } as Partial<ChargeRecord>);
-
-  expect(reply.total).toStrictEqual(numberToMoney(20));
-  expect(reply.totalCount).toEqual(1);
 
   em.clear();
 });
@@ -653,7 +644,7 @@ it("returns charge records with query of accountsOfTenant", async () => {
   queryEndTime.setDate(startTime.getDate() + 1);
 
   // accountsOfTenant
-  const reply = await asyncClientCall(client, "getChargeRecords", {
+  const reply = await asyncClientCall(client, "getPaginatedChargeRecords", {
     startTime: queryStartTime.toISOString(),
     endTime: queryEndTime.toISOString(),
     target:{ $case:"accountsOfTenant", accountsOfTenant:{
@@ -681,9 +672,6 @@ it("returns charge records with query of accountsOfTenant", async () => {
       type: request2.type,
     },
   ]as Partial<ChargeRecord>);
-
-  expect(reply.total).toStrictEqual(numberToMoney(40));
-  expect(reply.totalCount).toEqual(2);
 
   em.clear();
 });
@@ -750,7 +738,7 @@ it("returns charge records with query allAccountOfAllTenants", async () => {
   queryEndTime.setDate(startTime.getDate() + 1);
 
   // accountsOfAllTenants
-  const reply = await asyncClientCall(client, "getChargeRecords", {
+  const reply = await asyncClientCall(client, "getPaginatedChargeRecords", {
     startTime: queryStartTime.toISOString(),
     endTime: queryEndTime.toISOString(),
     target:{ $case:"accountsOfAllTenants", accountsOfAllTenants:{ } },
@@ -775,13 +763,10 @@ it("returns charge records with query allAccountOfAllTenants", async () => {
     },
   ]as Partial<ChargeRecord>);
 
-  expect(reply.total).toStrictEqual(numberToMoney(40));
-  expect(reply.totalCount).toEqual(2);
-
   em.clear();
 });
 
-it("returns charge records with query allAccountOfAllTenants and pageInfo", async () => {
+it("returns charge records' total results", async () => {
   const tenant = await em.findOne(Tenant, { name:"test" }) as Tenant;
   const tenant2 = new Tenant({ name: "test2" });
   const account2 = new Account({ accountName: "1234", tenant, blocked: false, comment: "test" });
@@ -925,27 +910,13 @@ it("returns charge records with query allAccountOfAllTenants and pageInfo", asyn
   queryEndTime.setDate(startTime.getDate() + 1);
 
   // accountsOfAllTenants
-  const reply = await asyncClientCall(client, "getChargeRecords", {
+  const reply = await asyncClientCall(client, "getChargeRecordsTotalCount", {
     startTime: queryStartTime.toISOString(),
     endTime: queryEndTime.toISOString(),
     target:{ $case:"accountsOfAllTenants", accountsOfAllTenants:{ } },
-    page: 2,
-    pageSize: 10,
   });
 
-  expect(reply.results).toHaveLength(1);
-
-  expect(reply.results).toMatchObject([
-    {
-      accountName: request13.accountName,
-      tenantName: request13.tenantName,
-      comment: request13.comment,
-      amount: request13.amount,
-      type: request13.type,
-    },
-  ]as Partial<ChargeRecord>);
-
-  expect(reply.total).toStrictEqual(numberToMoney(130));
+  expect(reply.totalAmount).toStrictEqual(numberToMoney(130));
   expect(reply.totalCount).toEqual(11);
 
   em.clear();

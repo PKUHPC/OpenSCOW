@@ -12,7 +12,7 @@
 
 import { formatDateTime, getDefaultPresets } from "@scow/lib-web/build/utils/datetime";
 import { useDidUpdateEffect } from "@scow/lib-web/build/utils/hooks";
-import { Button, DatePicker, Form, Select, Table } from "antd";
+import { Button, DatePicker, Form, Select, Spin, Table } from "antd";
 import dayjs from "dayjs";
 import { useCallback, useState } from "react";
 import { useAsync } from "react-async";
@@ -24,7 +24,6 @@ import { publicConfig } from "src/utils/config";
 import { CHARGE_TYPE_OTHERS } from "src/utils/constants";
 
 import { AccountSelector } from "./AccountSelector";
-
 
 interface Props {
   accountName?: string;
@@ -42,7 +41,6 @@ interface FilterForm {
 
 const now = dayjs();
 
-
 const p = prefix("pageComp.finance.chargeTable.");
 const pCommon = prefix("common.");
 
@@ -51,11 +49,11 @@ export const ChargeTable: React.FC<Props> = ({
 
   const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
-
   const [pageInfo, setPageInfo] = useState({ page: 1, pageSize: 10 });
+  const [selectedAccountName, setSelectedAccountName] = useState<string | undefined>(accountName);
+  const [selectedType, setSelectedType] = useState<typeof filteredTypes[number] | undefined>(undefined);
 
   const [form] = Form.useForm<FilterForm>();
-
   const [query, setQuery] = useState<{
     name: string | undefined,
     time: [ dayjs.Dayjs, dayjs.Dayjs ]
@@ -67,115 +65,153 @@ export const ChargeTable: React.FC<Props> = ({
 
   const filteredTypes = [...publicConfig.CHARGE_TYPE_LIST, CHARGE_TYPE_OTHERS];
 
-  const { data, isLoading } = useAsync({
-    promiseFn: useCallback(async () => {
-      return api.getCharges({ query: {
+  // 在账户管理下切换不同账户消费记录页面时
+  useDidUpdateEffect(() => {
+    form.setFieldsValue({
+      name: accountName,
+      time: [now.subtract(1, "week").startOf("day"), now.endOf("day")],
+      type: undefined,
+    });
+    setPageInfo({ page: 1, pageSize: pageInfo.pageSize });
+    setQuery({
+      name: accountName,
+      time: [now.subtract(1, "week").startOf("day"), now.endOf("day")],
+      type: undefined,
+    });
+    setSelectedAccountName(accountName);
+  }, [accountName]);
+
+  const recordsPromiseFn = useCallback(async () => {
+    return await api.getCharges({ query: {
+      accountName: query.name,
+      startTime: query.time[0].clone().startOf("day").toISOString(),
+      endTime: query.time[1].clone().endOf("day").toISOString(),
+      type: query.type,
+      isPlatformRecords,
+      searchType,
+      page: pageInfo.page,
+      pageSize: pageInfo.pageSize,
+    } });
+  }, [query, pageInfo]);
+
+  const totalResultPromiseFn = useCallback(async () => {
+    return await api.getChargeRecordsTotalCount({
+      query: {
         accountName: query.name,
         startTime: query.time[0].clone().startOf("day").toISOString(),
         endTime: query.time[1].clone().endOf("day").toISOString(),
         type: query.type,
         isPlatformRecords,
         searchType,
-        page: pageInfo.page,
-        pageSize: pageInfo.pageSize,
-      } });
+      },
+    });
+  }, [query]);
 
-    }, [query, pageInfo]),
+  const { data: recordsData, isLoading: isRecordsLoading } = useAsync({
+    promiseFn: recordsPromiseFn,
   });
 
-  useDidUpdateEffect(() => {
-    setPageInfo({ page: 1, pageSize: pageInfo.pageSize });
-    setQuery((q) => ({ ...q, name: accountName }));
-  }, [accountName]);
+  const { data: totalResultData, isLoading: isTotalResultLoading } = useAsync({
+    promiseFn: totalResultPromiseFn,
+  });
 
   return (
     <div>
-      <FilterFormContainer>
-        <Form<FilterForm>
-          layout="inline"
-          form={form}
-          initialValues={query}
-          onFinish={async () => {
-            const { name, time, type } = await form.validateFields();
-            setQuery({ name: accountName ?? name, time, type });
-            setPageInfo({ page: 1, pageSize: pageInfo.pageSize });
+      <Spin spinning={isRecordsLoading || isTotalResultLoading}>
+        <FilterFormContainer>
+          <Form<FilterForm>
+            layout="inline"
+            form={form}
+            initialValues={query}
+            onFinish={async () => {
+              const { name, time, type } = await form.validateFields();
+              setQuery({ name: selectedAccountName ?? name, time, type: selectedType ?? type });
+              setPageInfo({ page: 1, pageSize: pageInfo.pageSize });
+            }}
+          >
+            {
+              showAccountName && (
+                <Form.Item label={t("common.account")} name="name">
+                  <AccountSelector
+                    onChange={(value) => {
+                      setSelectedAccountName(value);
+                    }}
+                    placeholder={t("common.selectAccount")}
+                    fromAllTenants={showTenantName ? true : false}
+                  />
+                </Form.Item>
+              )
+            }
+            <Form.Item label={t(pCommon("time"))} name="time">
+              <DatePicker.RangePicker allowClear={false} presets={getDefaultPresets(languageId)} />
+            </Form.Item>
+            <Form.Item label={t("common.type")} name="type">
+              <Select
+                style={{ minWidth: "100px" }}
+                allowClear
+                onChange={(value) => {
+                  setSelectedType(value);
+                }}
+                placeholder={t("common.selectType")}
+              >
+                {(filteredTypes).map((x) => (
+                  <Select.Option key={x} value={x}>
+                    {x}
+                  </Select.Option>
+                ))}
+              </Select>
+            </Form.Item>
+            <Form.Item label={t("common.total")}>
+              <strong>
+                {totalResultData ? totalResultData.totalCount : 0}
+              </strong>
+            </Form.Item>
+            <Form.Item label={t(pCommon("sum"))}>
+              <strong>
+                {totalResultData ? totalResultData.totalAmount.toFixed(3) : 0}
+              </strong>
+            </Form.Item>
+            <Form.Item>
+              <Button type="primary" htmlType="submit">{t(pCommon("search"))}</Button>
+            </Form.Item>
+          </Form>
+        </FilterFormContainer>
+        <Table
+          dataSource={recordsData?.results}
+          scroll={{ x: true }}
+          pagination={{
+            showSizeChanger: true,
+            current: pageInfo.page,
+            pageSize: pageInfo.pageSize,
+            defaultPageSize: 10,
+            total: totalResultData?.totalCount,
+            onChange: (page, pageSize) => {
+              // 页码切换时让页面显示的值为上一次query的查询条件
+              form.setFieldsValue({
+                name: query.name,
+                time: query.time,
+                type: query.type,
+              });
+              setPageInfo({ page, pageSize });
+            },
           }}
         >
           {
             showAccountName && (
-              <Form.Item label={t("common.account")} name="name">
-                <AccountSelector
-                  onChange={(value) => {
-                    setQuery({ ...query, name: value });
-                  }}
-                  placeholder={t("common.selectAccount")}
-                  fromAllTenants={showTenantName ? true : false}
-                />
-              </Form.Item>
+              <Table.Column dataIndex="accountName" title={t(pCommon("account"))} />
             )
           }
-          <Form.Item label={t(pCommon("time"))} name="time">
-            <DatePicker.RangePicker allowClear={false} presets={getDefaultPresets(languageId)} />
-          </Form.Item>
-          <Form.Item label={t("common.type")} name="type">
-            <Select
-              style={{ minWidth: "100px" }}
-              allowClear
-              onChange={(value) => {
-                setQuery({ ...query, type: value });
-              }}
-              placeholder={t("common.selectType")}
-            >
-              {(filteredTypes).map((x) => (
-                <Select.Option key={x} value={x}>
-                  {x}
-                </Select.Option>
-              ))}
-            </Select>
-          </Form.Item>
-          <Form.Item label={t("common.total")}>
-            <strong>
-              {data ? data.totalCount : 0}
-            </strong>
-          </Form.Item>
-          <Form.Item label={t(pCommon("sum"))}>
-            <strong>
-              {data ? data.total.toFixed(3) : 0}
-            </strong>
-          </Form.Item>
-          <Form.Item>
-            <Button type="primary" htmlType="submit">{t(pCommon("search"))}</Button>
-          </Form.Item>
-        </Form>
-      </FilterFormContainer>
-      <Table
-        dataSource={data?.results}
-        loading={isLoading}
-        scroll={{ x: true }}
-        pagination={{
-          showSizeChanger: true,
-          current: pageInfo.page,
-          pageSize: pageInfo.pageSize,
-          defaultPageSize: 10,
-          total: data?.totalCount,
-          onChange: (page, pageSize) => setPageInfo({ page, pageSize }),
-        }}
-      >
-        {
-          showAccountName && (
-            <Table.Column dataIndex="accountName" title={t(pCommon("account"))} />
-          )
-        }
-        {
-          showTenantName && (
-            <Table.Column dataIndex="tenantName" title={t("common.tenant")} />
-          )
-        }
-        <Table.Column dataIndex="time" title={t(p("time"))} render={(v) => formatDateTime(v)} />
-        <Table.Column dataIndex="amount" title={t(p("amount"))} render={(v) => v.toFixed(3)} />
-        <Table.Column dataIndex="type" title={t(pCommon("type"))} />
-        <Table.Column dataIndex="comment" title={t(pCommon("comment"))} />
-      </Table>
+          {
+            showTenantName && (
+              <Table.Column dataIndex="tenantName" title={t("common.tenant")} />
+            )
+          }
+          <Table.Column dataIndex="time" title={t(p("time"))} render={(v) => formatDateTime(v)} />
+          <Table.Column dataIndex="amount" title={t(p("amount"))} render={(v) => v.toFixed(3)} />
+          <Table.Column dataIndex="type" title={t(pCommon("type"))} />
+          <Table.Column dataIndex="comment" title={t(pCommon("comment"))} />
+        </Table>
+      </Spin>
     </div>
 
   );

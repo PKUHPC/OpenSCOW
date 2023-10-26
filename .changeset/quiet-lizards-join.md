@@ -1,5 +1,5 @@
 ---
-"@scow/grpc-api": patch
+"@scow/grpc-api": minor
 ---
 
-修改消费记录列表为后端分页，在获取消费记录的 getChargeRecords 接口中增加可选查询参数 page,pageSize,在 response 中增加 totalCount
+标记原有getChargeRecords接口为已过时，将在下一个大版本发布后被删除，新增getPaginatedChargeRecords与getChargeRecordsTotalCount接口，分别获取当前消费记录页面的详细信息与消费记录的总量，总额

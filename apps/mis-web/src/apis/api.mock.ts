@@ -301,7 +301,13 @@ export const mockApi: MockApi<typeof api> = {
     ipAddress: "127.0.0.1",
     operatorId: "123",
     type: "Task",
-  }], total: 10, totalCount: 10 }),
+  }],
+  }),
+
+  getChargeRecordsTotalCount: async () => ({
+    totalAmount: 10,
+    totalCount: 10,
+  }),
 
   getPayments: async () => ({ results: [{
     amount: 10,
