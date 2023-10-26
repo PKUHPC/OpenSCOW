@@ -237,7 +237,7 @@ export default {
           submitConfirmTitle: "Submit Confirmation",
           submitConfirmContent: "Confirm submission of {} to {}?",
           submitConfirmOk: "Confirm",
-          submitSuccessMessage: "Submitted Successfully",
+          submitSuccessMessage: "Submitted successfully! Your new job ID is: {}",
           submitFailedMessage: "Submitted Failed",
         },
       },

@@ -523,6 +523,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
                         },
                       })
                         .httpError(500, (e) => {
+                          console.log("eeeeeee", e);
                           e.code === "SCHEDULER_FAILED" ? modal.error({
                             title: t(p("tableInfo.submitFailedMessage")),
                             content: e.message,
@@ -534,8 +535,8 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
                             content: e.message,
                           }) : (() => { throw e; })();
                         })
-                        .then(() => {
-                          message.success(t(p("tableInfo.submitSuccessMessage")));
+                        .then((result) => {
+                          message.success(t(p("tableInfo.submitSuccessMessage"), [result.jobId]));
                           resetSelectedAndOperation();
                           reload();
                         });
