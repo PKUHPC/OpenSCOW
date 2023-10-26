@@ -374,7 +374,16 @@ export const mockApi: MockApi<typeof api> = {
   unblockUserInAccount: async () => ({ executed: true }),
   blockAccount: async () => ({ executed: true }),
   unblockAccount: async () => ({ executed: true }),
-  updateBlockStatus: async () => null,
+  syncBlockStatus: async () => ({
+    blockedFailedAccounts: [],
+    unblockedFailedAccounts:[],
+    blockedFailedUserAccounts: [],
+  }),
+  getSyncBlockStatusJobInfo: async () => ({
+    syncStarted: false,
+    schedule: "0 4 * * *",
+  }),
+  setSyncBlockStatusState:  async () => null,
   removeUserFromAccount: async () => null,
   setAdmin: async () => ({ executed: true }),
   unsetAdmin: async () => ({ executed: false }),
