@@ -16,7 +16,7 @@ import { updateBlockStatusInSlurm, updateUnblockStatusInSlurm } from "src/bl/blo
 import { SystemState } from "src/entities/SystemState";
 import { ClusterPlugin } from "src/plugins/clusters";
 
-export let lastSyncBlockStatus: Date | null = null;
+export let lastSyncTime: Date | null = null;
 
 export async function synchronizeBlockStatus(
   em: SqlEntityManager<MySqlDriver>,
@@ -27,7 +27,7 @@ export async function synchronizeBlockStatus(
    await updateBlockStatusInSlurm(em, clusterPlugin.clusters, logger);
   const { unblockedFailedAccounts } = await updateUnblockStatusInSlurm(em, clusterPlugin.clusters, logger);
 
-  lastSyncBlockStatus = new Date();
+  lastSyncTime = new Date();
 
   const updateBlockTime = await em.upsert(SystemState, {
     key: SystemState.KEYS.UPDATE_SLURM_BLOCK_STATUS,

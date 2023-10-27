@@ -11,10 +11,10 @@
  */
 
 import { plugin } from "@ddadaal/tsgrpc-server";
-import { UpdateBlockStatusResponse } from "@scow/protos/build/server/admin";
+import { SyncBlockStatusResponse } from "@scow/protos/build/server/admin";
 import cron from "node-cron";
 import { misConfig } from "src/config/mis";
-import { lastSyncBlockStatus, synchronizeBlockStatus } from "src/tasks/syncBlockStatus";
+import { lastSyncTime, synchronizeBlockStatus } from "src/tasks/syncBlockStatus";
 
 export interface SyncBlockStatusPlugin {
   syncBlockStatus: {
@@ -22,8 +22,8 @@ export interface SyncBlockStatusPlugin {
     start: () => void;
     stop: () => void;
     schedule: string;
-    lastSyncBlockStatus: () => Date | null;
-    sync: () => Promise<UpdateBlockStatusResponse>;
+    lastSyncTime: () => Date | null;
+    sync: () => Promise<SyncBlockStatusResponse>;
   }
 }
 
@@ -79,7 +79,7 @@ export const syncBlockStatusPlugin = plugin(async (f) => {
       }
     },
     schedule: synchronizeCron,
-    lastSyncBlockStatus: () => lastSyncBlockStatus,
+    lastSyncTime: () => lastSyncTime,
     sync: trigger,
   });
 });

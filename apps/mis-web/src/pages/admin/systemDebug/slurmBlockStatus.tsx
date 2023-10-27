@@ -78,27 +78,6 @@ export const SlurmBlockStatusPage: NextPage = requireAuth((u) => u.platformRoles
           {
             data ? (
               <Descriptions bordered column={1}>
-                {/* <Descriptions.Item label={t(p("lastRunTime"))}>
-                  <Space>
-                    <span>
-                      {data.lastSynchronizeTime ? formatDateTime(data.lastSynchronizeTime) : t(p("notBlocked"))}
-                    </span>
-                    <DisabledA
-                      onClick={async () => {
-                        setRunning(true);
-                        await api.updateBlockStatus({})
-                          .then(() => {
-                            message.success(t(p("refreshSuccess")));
-                          })
-                          .finally(() => setRunning(false));
-                        setRunning(false);
-                      }}
-                      disabled={running}
-                    >
-                      {t(p("refreshSchedulerUserBlockingStatus"))}
-                    </DisabledA>
-                  </Space>
-                </Descriptions.Item> */}
                 <Descriptions.Item label={t(p("periodicSyncBlockStatusInfo"))}>
                   <Space>
                     {data.syncStarted
@@ -108,7 +87,7 @@ export const SlurmBlockStatusPage: NextPage = requireAuth((u) => u.platformRoles
                     <DisabledA
                       onClick={() => {
                         setChangingState(true);
-                        api.setFetchState({ query: { started: !data.syncStarted } })
+                        api.setSyncBlockStatusState({ query: { started: !data.syncStarted } })
                           .then(() => reload())
                           .finally(() => setChangingState(false));
                       }}
@@ -124,7 +103,7 @@ export const SlurmBlockStatusPage: NextPage = requireAuth((u) => u.platformRoles
                 <Descriptions.Item label={t(p("lastSyncTime"))}>
                   <Space>
                     <span>
-                      {data.lastSyncBlockStatusTime ? formatDateTime(data.lastSyncBlockStatusTime) : t(p("notSynced"))}
+                      {data.lastSyncTime ? formatDateTime(data.lastSyncTime) : t(p("notSynced"))}
                     </span>
                     <DisabledA
                       onClick={() => {

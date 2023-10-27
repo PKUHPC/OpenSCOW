@@ -22,7 +22,7 @@ import { getClient } from "src/utils/client";
 export const GetSyncBlockStatusInfoResponse = Type.Object({
   syncStarted: Type.Boolean(),
   schedule: Type.String(),
-  lastSyncBlockStatusTime: Type.Optional(Type.String()),
+  lastSyncTime: Type.Optional(Type.String()),
 });
 
 export type GetSyncBlockStatusInfoResponse = Static<typeof GetSyncBlockStatusInfoResponse>;

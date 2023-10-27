@@ -145,12 +145,17 @@ message BlockedFailedUserAccount {
   string account_name = 1;
   string user_id= 2;
 }
-message UpdateBlockStatusRequest{
+message SyncBlockStatusRequest{
 }
-message UpdateBlockStatusResponse{
+message SyncBlockStatusResponse{
   repeated string blocked_failed_accounts = 1;
   repeated BlockedFailedUserAccount blocked_failed_user_accounts = 2;
   repeated string unblocked_failed_accounts = 3;
+}
+
+message UpdateBlockStatusRequest{
+}
+message UpdateBlockStatusResponse{
 }
 
 message GetAdminInfoRequest {
@@ -176,7 +181,9 @@ service AdminService {
   rpc FetchJobs(FetchJobsRequest) returns (FetchJobsResponse);
   rpc GetSyncBlockStatusInfo(GetSyncBlockStatusInfoRequest) returns (GetSyncBlockStatusInfoResponse);
   rpc SetSyncBlockStatusState(SetSyncBlockStatusStateRequest) returns (SetSyncBlockStatusStateResponse);
-  rpc UpdateBlockStatus(UpdateBlockStatusRequest)
-    returns (UpdateBlockStatusResponse);
+  rpc SyncBlockStatus(SyncBlockStatusRequest) returns (SyncBlockStatusResponse);
+  rpc UpdateBlockStatus(UpdateBlockStatusRequest) returns (UpdateBlockStatusResponse) {
+    option deprecated = true;
+  };
   rpc GetAdminInfo(GetAdminInfoRequest) returns (GetAdminInfoResponse);
 }

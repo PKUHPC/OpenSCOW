@@ -42,6 +42,6 @@ export default typeboxRoute(SyncBlockStatusSchema,
 
     const client = getClient(AdminServiceClient);
 
-    return await asyncClientCall(client, "updateBlockStatus", {}).then((x) => ({ 200: x }));
+    return await asyncClientCall(client, "syncBlockStatus", {}).then((x) => ({ 200: x }));
 
   });

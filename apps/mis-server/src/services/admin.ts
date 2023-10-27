@@ -19,6 +19,7 @@ import {
   ClusterAccountInfo,
   ClusterAccountInfo_ImportStatus,
 } from "@scow/protos/build/server/admin";
+import { updateBlockStatusInSlurm } from "src/bl/block";
 import { importUsers, ImportUsersData } from "src/bl/importUsers";
 import { Account } from "src/entities/Account";
 import { StorageQuota } from "src/entities/StorageQuota";
@@ -198,7 +199,7 @@ export const adminServiceServer = plugin((server) => {
       return [{
         syncStarted: server.ext.syncBlockStatus.started(),
         schedule: server.ext.syncBlockStatus.schedule,
-        lastSyncBlockStatusTime: server.ext.syncBlockStatus.lastSyncBlockStatus()?.toISOString() ?? undefined,
+        lastSyncTime: server.ext.syncBlockStatus.lastSyncTime()?.toISOString() ?? undefined,
       }];
     },
 
@@ -214,9 +215,14 @@ export const adminServiceServer = plugin((server) => {
       return [{}];
     },
 
-    updateBlockStatus: async () => {
+    syncBlockStatus: async () => {
       const reply = await server.ext.syncBlockStatus.sync();
       return [reply];
+    },
+
+    updateBlockStatus: async ({ em, logger }) => {
+      await updateBlockStatusInSlurm(em, server.ext.clusters, logger);
+      return [{}];
     },
 
     getAdminInfo: async ({ em }) => {
