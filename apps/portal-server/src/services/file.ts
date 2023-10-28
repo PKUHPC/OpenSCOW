@@ -13,14 +13,16 @@
 import { createWriterExtensions } from "@ddadaal/tsgrpc-common";
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError, status } from "@grpc/grpc-js";
-import { sftpExists,
-  sftpMkdir, sftpReaddir, sftpRealPath, sftpRename, sftpStat, sftpUnlink, sftpWriteFile, sshRmrf } from "@scow/lib-ssh";
+import { loggedExec, sftpAppendFile, sftpExists, sftpMkdir, sftpReaddir,
+  sftpReadFile, sftpRealPath, sftpRename, sftpStat, sftpUnlink, sftpWriteFile, sshRmrf } from "@scow/lib-ssh";
 import { FileInfo, FileInfo_FileType,
-  FileServiceServer, FileServiceService } from "@scow/protos/build/portal/file";
+  FileServiceServer, FileServiceService, TransferInfo } from "@scow/protos/build/portal/file";
+import { join } from "path";
+import { clusters } from "src/config/clusters";
 import { config } from "src/config/env";
 import { clusterNotFound } from "src/utils/errors";
 import { pipeline } from "src/utils/pipeline";
-import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
+import { getClusterLoginNode, getClusterTransferNode, sshConnect, tryGetClusterTransferNode } from "src/utils/ssh";
 import { once } from "stream";
 
 export const fileServiceServer = plugin((server) => {
@@ -181,8 +183,18 @@ export const fileServiceServer = plugin((server) => {
         }
 
         const files = await sftpReaddir(sftp)(path);
-
         const list: FileInfo[] = [];
+
+        // 通过touch -a命令实现共享文件系统的缓存刷新
+        const pureFiles = files.filter((file) => !file.longname.startsWith("d"));
+
+        if (pureFiles.length > 0) {
+          const filePaths = pureFiles.map((file) => join(path, file.filename)).join(" ");
+
+          const fileSyncCmd = `touch -a ${filePaths}`;
+
+          await loggedExec(ssh, logger, false, fileSyncCmd, []);
+        }
 
         for (const file of files) {
 
@@ -362,5 +374,261 @@ export const fileServiceServer = plugin((server) => {
       });
     },
 
+    startFileTransfer: async ({ request, logger }) => {
+
+      const { fromCluster, toCluster, userId, fromPath, toPath } = request;
+      const fromTransferNodeAddress = getClusterTransferNode(fromCluster).address;
+      const {
+        host: toTransferNodeHost,
+        port: toTransferNodePort,
+      } = getClusterTransferNode(toCluster);
+
+      // 执行scow-sync-start
+      return await sshConnect(fromTransferNodeAddress, userId, logger, async (ssh) => {
+        // 密钥路径
+        const sftp = await ssh.requestSFTP();
+        const homePath = await sftpRealPath(sftp)(".");
+        const privateKeyPath = `${homePath}/scow/.scow-sync-ssh/id_rsa`;
+
+        const cmd = "scow-sync-start";
+        const args = [
+          "-a", toTransferNodeHost,
+          "-u", userId,
+          "-s", fromPath,
+          "-d", toPath,
+          "-m", "2",
+          "-p", toTransferNodePort.toString(),
+          "-k", privateKeyPath,
+        ];
+
+        const resp = await loggedExec(ssh, logger, true, cmd, args);
+        if (resp.code !== 0) {
+          throw <ServiceError> {
+            code: status.INTERNAL,
+            message: "scow-sync-start command failed",
+            details: resp.stderr,
+          };
+        }
+        return [{}];
+      });
+    },
+
+    queryFileTransfer: async ({ request, logger }) => {
+
+      const { cluster, userId } = request;
+
+      const transferNodeAddress = getClusterTransferNode(cluster).address;
+
+      return await sshConnect(transferNodeAddress, userId, logger, async (ssh) => {
+        const cmd = "scow-sync-query";
+
+        const resp = await loggedExec(ssh, logger, true, cmd, []);
+        if (resp.code !== 0) {
+          throw <ServiceError> {
+            code: status.INTERNAL,
+            message: "scow-sync-query command failed",
+            details: resp.stderr,
+          };
+        }
+
+        interface TransferInfosJson {
+          recvAddress: string,
+          filePath: string,
+          transferSize: string,
+          progress: string,
+          speed: string,
+          leftTime: string
+        }
+
+        // 解析scow-sync-query返回的json数组
+        const transferInfosJsons: TransferInfosJson[] = JSON.parse(resp.stdout);
+        const transferInfos: TransferInfo[] = [];
+
+        // 根据host确定clusterId
+        transferInfosJsons.forEach((info) => {
+          let toCluster = info.recvAddress;
+          for (const key in clusters) {
+            const transferNode = tryGetClusterTransferNode(key);
+            if (transferNode) {
+              const clusterHost = transferNode.host;
+              if (clusterHost === info.recvAddress) {
+                toCluster = key;
+              }
+            }
+            else {
+              continue;
+            }
+          }
+
+          // 将json数组中的string类型解析成protos中定义的格式
+          let speedInKB = 0;
+          const speedMatch = info.speed.match(/([\d\.]+)([kMGB]?B\/s)/);
+          if (speedMatch) {
+            const speed = Number(speedMatch[1]);
+            switch (speedMatch[2]) {
+            case "B/s":
+              speedInKB = speed / 1024;
+              break;
+            case "kB/s":
+              speedInKB = speed;
+              break;
+            case "MB/s":
+              speedInKB = speed * 1024;
+              break;
+            case "GB/s":
+              speedInKB = speed * 1024 * 1024;
+              break;
+            }
+          }
+
+          const [hours, minutes, seconds] = info.leftTime.split(":").map(Number);
+          const leftTimeSeconds = hours * 3600 + minutes * 60 + seconds;
+          transferInfos.push({
+            toCluster: toCluster,
+            filePath: info.filePath,
+            transferSizeKb: Math.floor(Number(info.transferSize.replace(/,/g, "")) / 1024),
+            progress: Number(info.progress.split("%")[0]),
+            speedKBps: speedInKB,
+            remainingTimeSeconds: leftTimeSeconds,
+          });
+        });
+
+        return [{ transferInfos:transferInfos }];
+      });
+    },
+
+    terminateFileTransfer: async ({ request, logger }) => {
+      const { fromCluster, toCluster, userId, fromPath } = request;
+      const fromTransferNodeAddress = getClusterTransferNode(fromCluster).address;
+      const toTransferNodeHost = getClusterTransferNode(toCluster).host;
+
+      return await sshConnect(fromTransferNodeAddress, userId, logger, async (ssh) => {
+
+        const cmd = "scow-sync-terminate";
+        const args = [
+          "-a", toTransferNodeHost,
+          "-u", userId,
+          "-s", fromPath,
+        ];
+
+        const resp = await loggedExec(ssh, logger, true, cmd, args);
+
+        if (resp.code !== 0) {
+          throw <ServiceError> {
+            code: status.INTERNAL,
+            message: "scow-sync-terminate command failed",
+            details: resp.stderr,
+          };
+        }
+
+        return [{}];
+      });
+    },
+
+    checkTransferKey: async ({ request, logger }) => {
+
+      const { fromCluster, toCluster, userId } = request;
+
+      const fromTransferNodeAddress = getClusterTransferNode(fromCluster).address;
+
+      const {
+        address: toTransferNodeAddress,
+        host: toTransferNodeHost,
+        port: toTransferNodePort,
+      } = getClusterTransferNode(toCluster);
+
+      // 检查fromTransferNode -> toTransferNode是否已经免密
+      const { keyConfigured, scowDir, keyDir, privateKeyPath } = await sshConnect(
+        fromTransferNodeAddress, userId, logger, async (ssh) => {
+          // 获取密钥路径
+          const sftp = await ssh.requestSFTP();
+          const homePath = await sftpRealPath(sftp)(".");
+          const scowDir = `${homePath}/scow`;
+          const keyDir = `${scowDir}/.scow-sync-ssh`;
+          const privateKeyPath = `${keyDir}/id_rsa`;
+
+          const cmd = "scow-sync-start";
+          const args = [
+            "-a", toTransferNodeHost,
+            "-u", userId,
+            "-p", toTransferNodePort.toString(),
+            "-k", privateKeyPath,
+            "-c", // -c,--check参数检查是否免密，并stdout返回true/false
+          ];
+
+          const resp = await loggedExec(ssh, logger, true, cmd, args);
+
+          if (resp.code !== 0) {
+            throw <ServiceError> {
+              code: status.INTERNAL,
+              message: "check the key of transferring cross clusters failed",
+              details: resp.stderr,
+            };
+          }
+          const lines = resp.stdout.trim().split("\n");
+          const keyConfigured = lines[lines.length - 1] === "true";
+
+          return {
+            keyConfigured: keyConfigured,
+            scowDir: scowDir,
+            keyDir: keyDir,
+            privateKeyPath: privateKeyPath,
+          };
+        });
+
+      // 如果没有配置免密，则生成密钥并配置免密
+      if (!keyConfigured) {
+        // 随机生成密钥并复制公钥
+        const publicKey = await sshConnect(fromTransferNodeAddress, userId, logger, async (ssh) => {
+          const sftp = await ssh.requestSFTP();
+
+          if (!await sftpExists(sftp, scowDir)) {
+            await sftpMkdir(sftp)(scowDir);
+          }
+          if (await sftpExists(sftp, keyDir)) {
+            await sshRmrf(ssh, keyDir);
+          }
+          await sftpMkdir(sftp)(keyDir);
+
+          const genKeyArgs = [
+            "-t", "rsa",
+            "-b", "4096",
+            "-C", "for scow-sync",
+            "-f", privateKeyPath,
+          ];
+          // eslint-disable-next-line quotes
+          const genKeyCmd = `ssh-keygen -N ""`;
+          await loggedExec(ssh, logger, true, genKeyCmd, genKeyArgs);
+
+          // 读公钥
+          const fileData = await sftpReadFile(sftp)(`${privateKeyPath}.pub`);
+          return fileData.toString();
+        });
+
+        // 配置fromTransferNode -> toTransferNode的免密登录
+        await sshConnect(toTransferNodeAddress, userId, logger, async (ssh) => {
+          const sftp = await ssh.requestSFTP();
+          const homePath = await sftpRealPath(sftp)(".");
+          // 将公钥写入到authorized_keys中
+          const authorizedKeysPath = `${homePath}/.ssh/authorized_keys`;
+          await sftpAppendFile(sftp)(authorizedKeysPath, `\n${publicKey}\n`);
+        });
+
+        // 尽管copy了公钥，但第一次ssh连接时，会默认需要输入“yes”。以避免潜在的中间人攻击，但是这导致无法自动化，所以这里需要以非交互的方式ssh短连接一次。
+        await sshConnect(fromTransferNodeAddress, userId, logger, async (ssh) => {
+          const firstSshArgs = [
+            "-i", privateKeyPath,
+            "-o", "StrictHostKeyChecking=no",
+            "-p", toTransferNodePort.toString(),
+            toTransferNodeHost,
+            ":",
+          ];
+          const firstSshCmd = "ssh";
+          await loggedExec(ssh, logger, true, firstSshCmd, firstSshArgs);
+        });
+
+      }
+      return [{}];
+    },
   });
 });
