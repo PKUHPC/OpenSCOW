@@ -30,7 +30,7 @@ portal:
 
 在`config/portal.yaml`文件中，根据备注修改所需要的配置
 
-```yaml title="config/mis.yaml"
+```yaml title="config/portal.yaml"
 # 是否启用作业管理功能
 jobManagement: true
 
@@ -88,28 +88,32 @@ shell: true
 # TurboVNC的安装路径
 # turboVNCPath: /opt/TurboVNC
 
-# 新增导航链接相关配置
+# # 新增导航链接相关配置
 # navLinks:
-
-  # 链接名
-  # text: ""
-
-  # 链接地址，一级导航链接地址为可选填，二级导航链接地址为必填
-  # url: ""
-
-  # 是否打开新的页面，可选填，默认值为false
-  # openInNewPage: true
-
-  # 自定义图标地址,可选填
-  # iconPath: ""
-
-  # 二级导航,可选填
-  # children:
-    # 二级导航相关配置，与一级导航相同，但是url为必填配置，同时不允许再设置children
-    # text: ""
-    # url: ""
-    # openInNewPage: true
-    # iconPath: ""
+#   # 链接名
+#   - text: "一级导航1"
+#     # 链接地址，一级导航链接地址为可选填，二级导航链接地址为必填
+#     url: ""
+#     # 是否打开新的页面，可选填，默认值为false
+#     # openInNewPage: true
+#     # 自定义图标地址,可选填
+#     # iconPath: ""
+#     # 可以看到这个链接的用户,可选填
+#     # 用户类型： user, accountUser, accountAdmin, accountOwner, tenantFinance, tenantAdmin, platformAdmin, platformFinance
+#     allowedRoles: []
+#     # 二级导航,可选填
+#     children:
+#       # 二级导航相关配置，与一级导航相同，但是url为必填配置，同时不允许再设置children
+#       - text: "二级导航1"
+#         url: "https://hahahaha1.1.com"
+#         # openInNewPage: true
+#         iconPath: ""
+#         allowedRoles: [accountAdmin, accountOwner]
+#       - text: "二级导航2"
+#         url: "https://hahahaha1.2.com"
+#         allowedRoles: [tenantAdmin, platformAdmin]
+#   - text: "一级导航2"
+#     url: "https://hahahaha2.com"
 
 
 ```
