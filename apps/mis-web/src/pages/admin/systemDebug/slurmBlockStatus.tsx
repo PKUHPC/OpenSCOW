@@ -11,7 +11,7 @@
  */
 
 import { formatDateTime } from "@scow/lib-web/build/utils/datetime";
-import { Alert, App, Badge, Collapse, Descriptions, Space, Spin } from "antd";
+import { Alert, App, Badge, Descriptions, Space, Spin } from "antd";
 import { NextPage } from "next";
 import { useState } from "react";
 import { useAsync } from "react-async";
@@ -22,8 +22,6 @@ import { PageTitle } from "src/components/PageTitle";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 import { PlatformRole } from "src/models/User";
 import { Head } from "src/utils/head";
-
-const { Panel } = Collapse;
 
 const promiseFn = async () => api.getSyncBlockStatusJobInfo({});
 const p = prefix("page.admin.systemDebug.slurmBlockStatus.");
@@ -57,22 +55,6 @@ export const SlurmBlockStatusPage: NextPage = requireAuth((u) => u.platformRoles
             </div>
           )}
         />
-
-        {/* <Collapse defaultActiveKey={["1"]}>
-          <Panel header={t(p("slurmScheduler"))} key="1">
-            <p>
-              {t(p("slurmSchedulerMessage1"))}<br />
-              {t(p("slurmSchedulerMessage2"))}<br />
-              {t(p("slurmSchedulerMessage3"))}
-            </p>
-          </Panel>
-          <Panel header={t(p("otherScheduler"))} key="2">
-            <p>
-              {t(p("otherSchedulerMessage"))}
-            </p>
-          </Panel>
-
-        </Collapse> */}
 
         <Spin spinning={isLoading}>
           {
