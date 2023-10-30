@@ -542,6 +542,7 @@ export const userServiceServer = plugin((server) => {
         platformUsers: users.map((x) => ({
           userId: x.userId,
           name: x.name,
+          email: x.email,
           availableAccounts: x.accounts.getItems()
             .filter((ua) => ua.status === UserStatus.UNBLOCKED)
             .map((ua) => {
