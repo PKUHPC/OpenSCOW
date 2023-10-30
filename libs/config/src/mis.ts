@@ -78,7 +78,7 @@ export const MisConfigSchema = Type.Object({
     }, { default: {} }),
   }, { default: {}, description: "获取作业功能的相关配置" }),
 
-  periodicSyncBlockStatus: Type.Optional(Type.Object({
+  periodicSyncUserAccountBlockStatus: Type.Optional(Type.Object({
     enabled: Type.Boolean({ description:"是否默认打开", default: true }),
     cron: Type.String({ description: "获取信息的周期的cron表达式", default: "0 4 * * *" }),
   }, { default: {}, description: "用户账户封锁状态同步" })),

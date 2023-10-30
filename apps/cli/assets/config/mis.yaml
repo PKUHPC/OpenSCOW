@@ -16,7 +16,7 @@ fetchJobs:
     cron: "10 */10 * * * *"
 
 # 周期性同步scow与调度器(如slurm)账户用户封锁状态的配置
-periodicSynchronizeStatus:
+periodicSyncUserAccountBlockStatus:
   # 是否开启
   enabled: true
   # 周期的cron表达式

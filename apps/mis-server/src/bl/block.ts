@@ -60,15 +60,15 @@ export async function updateBlockStatusInSlurm(
     try {
       await clusterPlugin.callOnAll(logger, async (client) =>
         await asyncClientCall(client.user, "blockUserInAccount", {
-          accountName: ua.account.getProperty("accountName"),
-          userId: ua.user.getProperty("userId"),
+          accountName: ua.account.$.accountName,
+          userId: ua.user.$.userId,
         }),
       );
       blockedUserAccounts.push([ua.user.getProperty("userId"), ua.account.getProperty("accountName")]);
     } catch (error) {
       blockedFailedUserAccounts.push({
-        userId: ua.user.getProperty("userId"),
-        accountName: ua.account.getProperty("accountName"),
+        userId: ua.user.$.userId,
+        accountName: ua.account.$.accountName,
       });
     }
   }

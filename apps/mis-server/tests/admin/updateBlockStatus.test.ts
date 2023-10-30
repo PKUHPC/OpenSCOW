@@ -76,8 +76,8 @@ it("gets current sync block status info", async () => {
   const client = new AdminServiceClient(server.serverAddress, ChannelCredentials.createInsecure());
   const info = await asyncClientCall(client, "getSyncBlockStatusInfo", {});
 
-  expect(info.syncStarted).toEqual(misConfig.periodicSyncBlockStatus?.enabled);
-  expect(info.schedule).toEqual(misConfig.periodicSyncBlockStatus?.cron ?? "0 4 * * *");
+  expect(info.syncStarted).toEqual(misConfig.periodicSyncUserAccountBlockStatus?.enabled);
+  expect(info.schedule).toEqual(misConfig.periodicSyncUserAccountBlockStatus?.cron ?? "0 4 * * *");
 
 });
 

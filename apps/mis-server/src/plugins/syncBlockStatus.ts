@@ -28,12 +28,12 @@ export interface SyncBlockStatusPlugin {
 }
 
 export const syncBlockStatusPlugin = plugin(async (f) => {
-  const synchronizeCron = misConfig.periodicSyncBlockStatus?.cron ?? "0 4 * * *";
-  let synchronizeStarted = !!misConfig.periodicSyncBlockStatus?.enabled;
+  const synchronizeCron = misConfig.periodicSyncUserAccountBlockStatus?.cron ?? "0 4 * * *";
+  let synchronizeStarted = !!misConfig.periodicSyncUserAccountBlockStatus?.enabled;
   let synchronizeIsRunning = false;
 
   const logger = f.logger.child({ plugin: "syncBlockStatus" });
-  logger.info("misConfig.periodicSyncStatus?.cron: %s", misConfig.periodicSyncBlockStatus?.cron);
+  logger.info("misConfig.periodicSyncStatus?.cron: %s", misConfig.periodicSyncUserAccountBlockStatus?.cron);
 
   const trigger = () => {
     if (synchronizeIsRunning) return;
@@ -47,7 +47,7 @@ export const syncBlockStatusPlugin = plugin(async (f) => {
     trigger,
     {
       timezone: "Asia/Shanghai",
-      scheduled: misConfig.periodicSyncBlockStatus?.enabled,
+      scheduled: misConfig.periodicSyncUserAccountBlockStatus?.enabled,
     },
   );
 

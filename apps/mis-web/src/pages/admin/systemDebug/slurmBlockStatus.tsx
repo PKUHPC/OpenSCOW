@@ -60,7 +60,7 @@ export const SlurmBlockStatusPage: NextPage = requireAuth((u) => u.platformRoles
           {
             data ? (
               <Descriptions bordered column={1}>
-                <Descriptions.Item label={t(p("periodicSyncBlockStatusInfo"))}>
+                <Descriptions.Item label={t(p("periodicSyncUserAccountBlockStatusInfo"))}>
                   <Space>
                     {data.syncStarted
                       ? <Badge status="success" text={t(p("turnedOn"))} />

@@ -16,7 +16,7 @@ description: 同步调度器账户、用户封锁状态
 
 ```yaml title="config/mis.yaml"
 # 周期性同步scow与调度器(如slurm)账户用户封锁状态的配置
-periodicSynchronizeStatus:
+periodicSyncUserAccountBlockStatus:
   # 是否开启
   enabled: true
   # 周期的cron表达式
