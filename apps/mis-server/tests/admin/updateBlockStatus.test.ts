@@ -49,8 +49,10 @@ it("update block status", async () => {
   const blockedData = await updateBlockStatusInSlurm(
     server.ext.orm.em.fork(), server.ext.clusters, server.logger);
 
-  expect(blockedData.blockedAccounts).toEqual([data.blockedAccountB.id]);
-  expect(blockedData.blockedUserAccounts).toEqual([data.uaAA.id]);
+  expect(blockedData.blockedAccounts).toEqual([data.blockedAccountB.accountName]);
+  expect(blockedData.blockedUserAccounts).toEqual([
+    [data.uaAA.user.getProperty("userId"), data.uaAA.account.getProperty("accountName")],
+  ]);
 });
 
 it("update block status with whitelist accounts", async () => {
