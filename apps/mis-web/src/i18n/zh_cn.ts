@@ -859,8 +859,8 @@ export default {
       systemDebug: {
         slurmBlockStatus: {
           syncUserAccountBlockingStatus: "用户账户封锁状态同步",
-          alertInfo: "SCOW会定期向调度器同步账户和用户的封锁状态，您可以点击立刻同步执行一次手动同步",
-          periodicSyncBlockStatusInfo:"周期性同步向集群同步账户和用户的封锁状态",
+          alertInfo: "SCOW会定期向调度器同步SCOW数据库中账户和用户的封锁状态，您可以点击立刻同步执行一次手动同步",
+          periodicSyncBlockStatusInfo:"周期性同步调度器账户和用户的封锁状态",
           turnedOn: "已开启",
           paused: "已暂停",
           stopSync: "停止同步",

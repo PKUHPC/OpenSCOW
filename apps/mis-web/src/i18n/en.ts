@@ -861,7 +861,7 @@ export default {
           syncUserAccountBlockingStatus: "Synchronize User Account Blocking Status",
           alertInfo: "SCOW will regularly synchronize the blocking status of accounts and users to the scheduler. "
           + "You can click Sync Now to perform a manual synchronization.",
-          periodicSyncBlockStatusInfo: "Periodic Job Info Synchronization",
+          periodicSyncBlockStatusInfo: "Periodically Synchronize Scheduler Account And User Blocked status",
           turnedOn: "Turned On",
           paused: "Paused",
           stopSync: "Stop Synchronization",
