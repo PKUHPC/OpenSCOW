@@ -861,21 +861,6 @@ export default {
           syncUserAccountBlockingStatus: "Synchronize User Account Blocking Status",
           alertInfo: "SCOW will regularly synchronize the blocking status of accounts and users to the cluster. "
           + "You can click Sync Now to perform a manual synchronization.",
-          slurmScheduler: "Slurm Scheduler",
-          slurmSchedulerMessage1: "If you are using the Slurm scheduler, due to technical limitations, "
-          + "when you run slurm.sh nodes and the slurm management node are not on the same node, "
-          + " blocked users, accounts, and user accounts will be unblocked after the slurm cluster restarts.",
-          slurmSchedulerMessage2: "SCOW will automatically refresh the slurm blocking status once "
-          + "when starting, but the slurm cluster may restart during SCOW operation, and SCOW cannot react "
-          + "to this temporarily.",
-          slurmSchedulerMessage3: "So, if you run slurm.sh nodes and the slurm management node are not "
-          + "on the same node, you need to manually execute the 'Refresh Scheduler User Blocking Status' "
-          + "function on this page after the slurm cluster restarts."
-          + " If slurm.sh nodes and the slurm management node are on the same node, you can ignore this function.",
-          otherScheduler: "Other Schedulers",
-          otherSchedulerMessage: "If you are using a scheduler other than Slurm, when the user blocking status "
-          + "is unsynchronized between the scheduler and SCOW, you can manually execute the "
-          + "'Refresh Scheduler User Blocking Status' function on this page.",
           periodicSyncBlockStatusInfo: "Periodic Job Info Synchronization",
           turnedOn: "Turned On",
           paused: "Paused",
@@ -889,7 +874,7 @@ export default {
           syncBlockedFailedAccount: "Accounts that failed to be synchronously blocked:",
           syncUnblockedFailedAccount: "Accounts that failed to be synchronously unblocked:",
           syncBlockedFailedUserAccount: "Synchronize the data of failed blocked users in the account:",
-          syncSchedulerUserBlockingStatusNow: "Refresh Scheduler User Blocking Status",
+          syncUserBlockingStatusNow: "Refresh Scheduler User Blocking Status",
         },
         fetchJobs: {
           jobInfoSync: "Job Information Synchronization",

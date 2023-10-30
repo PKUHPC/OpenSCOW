@@ -860,22 +860,6 @@ export default {
         slurmBlockStatus: {
           syncUserAccountBlockingStatus: "用户账户封锁状态同步",
           alertInfo: "SCOW会定期向集群同步账户和用户的封锁状态，您可以点击立刻同步执行一次手动同步",
-
-
-          slurmScheduler: "slurm调度器",
-          slurmSchedulerMessage1: "如果您使用的是slurm调度器，由于技术限制，当您运行slurm.sh节点和slurm管理节点并非同一节点时，" +
-          "已封锁的用户、账户和用户账户将会在slurm集群重启后被解封。",
-
-          slurmSchedulerMessage2: "SCOW在启动时将会自动刷新一次slurm封锁状态，但是slurm集群可能在SCOW运行时重启，SCOW暂时不能对这种情况做出反应。",
-
-
-          slurmSchedulerMessage3: "所以，如果您运行slurm.sh节点和slurm管理节点并非同一节点时，您需要在slurm集群重启后手动执行一下本页面的刷新调度器用户封锁状态的功能。" +
-          "如果slurm.sh节点和slurm管理节点为同一节点，您可以忽略本功能。",
-
-
-          otherScheduler: "其他调度器",
-          otherSchedulerMessage: "如果您使用的是slurm之外的调度器，在调度器和SCOW间用户封锁状态不同步时，可以手动执行一下本页面的刷新调度器用户封锁状态的功能。",
-
           periodicSyncBlockStatusInfo:"周期性同步向集群同步账户和用户的封锁状态",
           turnedOn: "已开启",
           paused: "已暂停",
@@ -889,7 +873,7 @@ export default {
           syncBlockedFailedAccount: "同步封锁失败的账户：",
           syncUnblockedFailedAccount: "同步解封失败的账户：",
           syncBlockedFailedUserAccount: "在账户中同步封锁用户失败的数据：",
-          syncSchedulerUserBlockingStatusNow: "立刻同步调度器账户和用户封锁状态",
+          syncUserBlockingStatusNow: "立刻同步集群账户和用户封锁状态",
         },
         fetchJobs: {
           jobInfoSync: "作业信息同步",

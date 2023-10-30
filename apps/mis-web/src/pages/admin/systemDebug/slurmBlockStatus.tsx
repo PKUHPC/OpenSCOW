@@ -58,7 +58,7 @@ export const SlurmBlockStatusPage: NextPage = requireAuth((u) => u.platformRoles
           )}
         />
 
-        <Collapse defaultActiveKey={["1"]}>
+        {/* <Collapse defaultActiveKey={["1"]}>
           <Panel header={t(p("slurmScheduler"))} key="1">
             <p>
               {t(p("slurmSchedulerMessage1"))}<br />
@@ -72,7 +72,7 @@ export const SlurmBlockStatusPage: NextPage = requireAuth((u) => u.platformRoles
             </p>
           </Panel>
 
-        </Collapse>
+        </Collapse> */}
 
         <Spin spinning={isLoading}>
           {
@@ -133,7 +133,7 @@ export const SlurmBlockStatusPage: NextPage = requireAuth((u) => u.platformRoles
                       }}
                       disabled={fetching}
                     >
-                      {t(p("syncSchedulerUserBlockingStatusNow"))}
+                      {t(p("syncUserBlockingStatusNow"))}
                     </DisabledA>
                   </Space>
                 </Descriptions.Item>
