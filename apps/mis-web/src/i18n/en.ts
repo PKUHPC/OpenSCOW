@@ -859,7 +859,7 @@ export default {
       systemDebug: {
         slurmBlockStatus: {
           syncUserAccountBlockingStatus: "Synchronize User Account Blocking Status",
-          alertInfo: "SCOW will regularly synchronize the blocking status of accounts and users to the cluster. "
+          alertInfo: "SCOW will regularly synchronize the blocking status of accounts and users to the scheduler. "
           + "You can click Sync Now to perform a manual synchronization.",
           periodicSyncBlockStatusInfo: "Periodic Job Info Synchronization",
           turnedOn: "Turned On",
@@ -874,7 +874,7 @@ export default {
           syncBlockedFailedAccount: "Accounts that failed to be synchronously blocked:",
           syncUnblockedFailedAccount: "Accounts that failed to be synchronously unblocked:",
           syncBlockedFailedUserAccount: "Synchronize the data of failed blocked users in the account:",
-          syncUserBlockingStatusNow: "Refresh Scheduler User Blocking Status",
+          syncSchedulerBlockingStatusNow: "Refresh Scheduler User Blocking Status",
         },
         fetchJobs: {
           jobInfoSync: "Job Information Synchronization",

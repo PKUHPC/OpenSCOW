@@ -115,7 +115,7 @@ export const SlurmBlockStatusPage: NextPage = requireAuth((u) => u.platformRoles
                       }}
                       disabled={fetching}
                     >
-                      {t(p("syncUserBlockingStatusNow"))}
+                      {t(p("syncSchedulerBlockingStatusNow"))}
                     </DisabledA>
                   </Space>
                 </Descriptions.Item>

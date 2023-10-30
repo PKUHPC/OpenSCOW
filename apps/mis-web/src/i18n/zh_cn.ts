@@ -859,7 +859,7 @@ export default {
       systemDebug: {
         slurmBlockStatus: {
           syncUserAccountBlockingStatus: "用户账户封锁状态同步",
-          alertInfo: "SCOW会定期向集群同步账户和用户的封锁状态，您可以点击立刻同步执行一次手动同步",
+          alertInfo: "SCOW会定期向调度器同步账户和用户的封锁状态，您可以点击立刻同步执行一次手动同步",
           periodicSyncBlockStatusInfo:"周期性同步向集群同步账户和用户的封锁状态",
           turnedOn: "已开启",
           paused: "已暂停",
@@ -873,7 +873,7 @@ export default {
           syncBlockedFailedAccount: "同步封锁失败的账户：",
           syncUnblockedFailedAccount: "同步解封失败的账户：",
           syncBlockedFailedUserAccount: "在账户中同步封锁用户失败的数据：",
-          syncUserBlockingStatusNow: "立刻同步集群账户和用户封锁状态",
+          syncSchedulerBlockingStatusNow: "立刻同步调度器账户和用户封锁状态",
         },
         fetchJobs: {
           jobInfoSync: "作业信息同步",
