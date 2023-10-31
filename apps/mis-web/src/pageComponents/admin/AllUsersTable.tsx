@@ -67,7 +67,7 @@ export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
   const [pageInfo, setPageInfo] = useState<PageInfo>({ page: 1, pageSize: 10 });
   const [sortInfo, setSortInfo] = useState<SortInfo>({ sortField: undefined, sortOrder: undefined });
   const [currentPlatformRole, setCurrentPlatformRole] = useState<PlatformRole | undefined>(undefined);
-  const [allUsers, setAllUsers] = useState<Omit<PlatformUserInfo, "email">[] | undefined>(undefined);
+  const [allUsers, setAllUsers] = useState<PlatformUserInfo[] | undefined>(undefined);
 
   const promiseFn = useCallback(async () => {
 
