@@ -58,7 +58,7 @@ it("create operation log", async () => {
   expect(operationLogs[0].operatorIp).toEqual(operationLog.operatorIp);
   expect(operationLogs[0].operationResult).toEqual(operationLog.operationResult);
   expect(operationLogs[0].metaData?.$case).toEqual(operationLog.operationEvent.$case);
-  expect(operationLogs[0].metaData?.submitJob).toEqual(operationLog.operationEvent.submitJob);
+  expect(operationLogs[0].metaData?.[operationLogs[0].metaData?.$case]).toEqual(operationLog.operationEvent.submitJob);
   expect(operationLogs[0].metaData?.targetAccountName).toEqual(operationLog.operationEvent.submitJob.accountName);
 });
 
