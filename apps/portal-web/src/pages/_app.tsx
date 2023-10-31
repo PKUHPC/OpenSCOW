@@ -19,7 +19,7 @@ import { GlobalStyle } from "@scow/lib-web/build/layouts/globalStyle";
 import { getHostname } from "@scow/lib-web/build/utils/getHostname";
 import { useConstant } from "@scow/lib-web/build/utils/hooks";
 import { isServer } from "@scow/lib-web/build/utils/isServer";
-import { getLanguageCookie } from "@scow/lib-web/build/utils/languages";
+import { getInitialLanguage, getLanguageCookie } from "@scow/lib-web/build/utils/systemLanguage";
 import { App as AntdApp } from "antd";
 import type { AppContext, AppProps } from "next/app";
 import NextApp from "next/app";
@@ -91,7 +91,7 @@ interface ExtraProps {
   footerText: string;
   loginNodes: Record<string, LoginNode[]>;
   darkModeCookieValue: DarkModeCookie | undefined;
-  languageId: string;
+  languageCookie: string | undefined;
 }
 
 type Props = AppProps & { extra: ExtraProps };
@@ -99,14 +99,19 @@ type Props = AppProps & { extra: ExtraProps };
 function MyApp({ Component, pageProps, extra }: Props) {
 
   // remembers extra props from first load
-  const { current: { userInfo, primaryColor, footerText, loginNodes, languageId } } = useRef(extra);
+  const { current: { userInfo, primaryColor, footerText, loginNodes } } = useRef(extra);
 
   const userStore = useConstant(() => {
     const store = createStore(UserStore, userInfo);
     return store;
   });
 
-  const loginNodeStore = useConstant(() => createStore(LoginNodeStore, loginNodes, languageId));
+
+  const systemLanguageConfig = publicConfig.SYSTEM_LANGUAGE_CONFIG;
+  const initialLanguage = getInitialLanguage(extra.languageCookie, systemLanguageConfig);
+
+  const loginNodeStore = useConstant(() => createStore(LoginNodeStore, loginNodes,
+    initialLanguage));
 
   const defaultClusterStore = useConstant(() => createStore(DefaultClusterStore));
 
@@ -134,18 +139,23 @@ function MyApp({ Component, pageProps, extra }: Props) {
         />
       </Head>
       <Provider initialLanguage={{
-        id: extra.languageId,
-        definitions: extra.languageId === "en" ? en : zh_cn,
+        id: initialLanguage,
+        definitions: initialLanguage === "en" ? en : zh_cn,
       }}
       >
         <StoreProvider stores={[userStore, defaultClusterStore, loginNodeStore]}>
           <DarkModeProvider initial={extra.darkModeCookieValue}>
-            <AntdConfigProvider color={primaryColor} locale={extra.languageId}>
-              <FloatButtons languageId={extra.languageId} />
+            <AntdConfigProvider color={primaryColor} locale={ initialLanguage}>
+              <FloatButtons languageId={ initialLanguage } />
               <GlobalStyle />
               <FailEventHandler />
               <TopProgressBar />
-              <BaseLayout footerText={footerText} versionTag={publicConfig.VERSION_TAG}>
+              <BaseLayout
+                footerText={footerText}
+                versionTag={publicConfig.VERSION_TAG}
+                isUsingI18n={systemLanguageConfig.isUsingI18n}
+                initialLanguage={initialLanguage}
+              >
                 <Component {...pageProps} />
               </BaseLayout>
             </AntdConfigProvider>
@@ -164,7 +174,7 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
     primaryColor: "",
     darkModeCookieValue: getDarkModeCookieValue(appContext.ctx.req),
     loginNodes: {},
-    languageId: "",
+    languageCookie: "",
   };
 
   // This is called on server on first load, and on client on every page transition
@@ -205,7 +215,7 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
     }, {});
 
     // 从Cookies或header中获取语言id
-    extra.languageId = getLanguageCookie(appContext.ctx.req);
+    extra.languageCookie = getLanguageCookie(appContext.ctx.req);
   }
 
   const appProps = await NextApp.getInitialProps(appContext);

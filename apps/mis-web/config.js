@@ -13,7 +13,7 @@
 const { envConfig, str, bool } = require("@scow/lib-config");
 const { getClusterConfigs, getSortedClusters } = require("@scow/config/build/cluster");
 const { getMisConfig } = require("@scow/config/build/mis");
-const { getCommonConfig } = require("@scow/config/build/common");
+const { getCommonConfig, getSystemLanguageConfig } = require("@scow/config/build/common");
 const { getClusterTextsConfig } = require("@scow/config/build/clusterTexts");
 const { DEFAULT_PRIMARY_COLOR, getUiConfig } = require("@scow/config/build/ui");
 const { getAuditConfig } = require("@scow/config/build/audit");
@@ -94,6 +94,9 @@ const buildRuntimeConfig = async (phase, basePath) => {
 
   const versionTag = readVersionFile()?.tag;
 
+  const systemLanguageConfig = getSystemLanguageConfig(getCommonConfig().systemLanguage);
+
+
   /**
    * @type {import ("./src/utils/config").ServerRuntimeConfig}
    */
@@ -158,6 +161,8 @@ const buildRuntimeConfig = async (phase, basePath) => {
       misConfig.changeJobPriceType,
       ...(misConfig.customChargeTypes || []),
     ],
+
+    SYSTEM_LANGUAGE_CONFIG: systemLanguageConfig,
 
   };
 

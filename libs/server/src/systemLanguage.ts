@@ -10,14 +10,10 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { SystemLanguageConfig } from "@scow/config/build/common";
 import { IncomingMessage } from "http";
 import { parseCookies } from "nookies";
 
-// 系统支持语言列表
-export const SYSTEM_VALID_LANGUAGES = {
-  ZH_CN: "zh_cn",
-  EN: "en",
-};
 
 // 当前系统支持的header中可接受语言
 export const HEADER_ACCEPT_VALID_LANGUAGES = {
@@ -27,6 +23,17 @@ export const HEADER_ACCEPT_VALID_LANGUAGES = {
   EN_US: "en-US",
 };
 
+// 系统支持语言列表
+export const SYSTEM_VALID_LANGUAGES = {
+  ZH_CN: "zh_cn",
+  EN: "en",
+};
+
+// 系统合法语言的枚举值
+export enum SYSTEM_VALID_LANGUAGE_ENUM {
+  "zh_cn" = "zh_cn",
+  "en" = "en"
+}
 
 export type I18nStringType = string | {
   i18n: {
@@ -36,8 +43,9 @@ export type I18nStringType = string | {
   }
 }
 
-export const getI18nConfigCurrentText =
-(i18nConfigText: I18nStringType | undefined, languageId: string | undefined): string => {
+
+export function getI18nConfigCurrentText(
+  i18nConfigText: I18nStringType | undefined, languageId: string | undefined): string {
   if (!i18nConfigText) {
     return "";
   }
@@ -47,7 +55,6 @@ export const getI18nConfigCurrentText =
 
     // 当语言id或者对应的配置文本中某种语言不存在时，显示default的值
     if (!languageId) return i18nConfigText.i18n.default;
-
     switch (languageId) {
     case SYSTEM_VALID_LANGUAGES.EN:
       return i18nConfigText.i18n.en || i18nConfigText.i18n.default;
@@ -59,16 +66,18 @@ export const getI18nConfigCurrentText =
   }
 };
 
-// 系统默认语言：简体中文
-export const SYSTEM_DEFAULT_LANGUAGE = "zh_cn";
-
-export function getLanguageCookie(req: IncomingMessage | undefined): string {
+/**
+ * 获取当前语cookie中保存的语言信息或浏览器语言偏好
+ *
+ * @param req
+ * @returns
+ */
+export function getLanguageCookie(req: IncomingMessage | undefined): string | undefined {
 
   // 检查 Cookie 中的语言是否合法
   const cookies = parseCookies({ req });
 
-
-  if (cookies && cookies?.language) {
+  if (cookies && cookies.language) {
     const currentCookieLang = cookies.language;
     if (Object.values(SYSTEM_VALID_LANGUAGES).includes(currentCookieLang)) {
       return currentCookieLang;
@@ -103,6 +112,32 @@ export function getLanguageCookie(req: IncomingMessage | undefined): string {
     }
   }
 
-  // 系统默认语言
-  return SYSTEM_DEFAULT_LANGUAGE;
+  return undefined;
 }
+
+/**
+ * 根据系统语言自定义配置信息返回系统初始语言
+ *
+ * @param cookieLanguage
+ * @param systemLanguageConfig
+ * @returns
+ */
+export function getInitialLanguage(cookieLanguage: string | undefined,
+  systemLanguageConfig: SystemLanguageConfig): string {
+
+  // 使用国际化，且跟随系统语言
+  // 则优先使用cookie中保存的语言或浏览器偏好，若前者皆不合法则使用default
+  if (systemLanguageConfig.isUsingI18n) {
+
+    if ((systemLanguageConfig.autoDetect || typeof systemLanguageConfig.autoDetect === "undefined") && cookieLanguage) {
+      return cookieLanguage;
+    }
+
+    return systemLanguageConfig.defaultLanguage;
+
+  // 不使用国际化，则使用指定的默认语言
+  } else {
+
+    return systemLanguageConfig.defaultLanguage;
+  }
+};

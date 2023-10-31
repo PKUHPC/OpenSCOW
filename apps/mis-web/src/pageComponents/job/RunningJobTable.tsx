@@ -11,7 +11,7 @@
  */
 
 import { useDidUpdateEffect } from "@scow/lib-web/build/utils/hooks";
-import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/i18n";
+import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { Button, Form, Input, InputNumber, Select, Space, Table } from "antd";
 import React, { useCallback, useMemo, useRef, useState } from "react";
 import { useAsync } from "react-async";

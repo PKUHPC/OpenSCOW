@@ -19,7 +19,7 @@ import { GlobalStyle } from "@scow/lib-web/build/layouts/globalStyle";
 import { getHostname } from "@scow/lib-web/build/utils/getHostname";
 import { useConstant } from "@scow/lib-web/build/utils/hooks";
 import { isServer } from "@scow/lib-web/build/utils/isServer";
-import { getLanguageCookie } from "@scow/lib-web/build/utils/languages";
+import { getInitialLanguage, getLanguageCookie } from "@scow/lib-web/build/utils/systemLanguage";
 import { App as AntdApp } from "antd";
 import type { AppContext, AppProps } from "next/app";
 import App from "next/app";
@@ -91,7 +91,7 @@ interface ExtraProps {
   primaryColor: string;
   footerText: string;
   darkModeCookieValue: DarkModeCookie | undefined;
-  languageId: string;
+  languageCookie: string | undefined;
 }
 
 type Props = AppProps & { extra: ExtraProps };
@@ -109,6 +109,9 @@ function MyApp({ Component, pageProps, extra }: Props) {
     const store = createStore(DefaultClusterStore, Object.values(publicConfig.CLUSTERS)[0]);
     return store;
   });
+
+  const systemLanguageConfig = publicConfig.SYSTEM_LANGUAGE_CONFIG;
+  const initialLanguage = getInitialLanguage(extra.languageCookie, systemLanguageConfig);
 
   return (
     <>
@@ -133,18 +136,23 @@ function MyApp({ Component, pageProps, extra }: Props) {
         />
       </Head>
       <Provider initialLanguage={{
-        id: extra.languageId,
-        definitions: extra.languageId === "en" ? en : zh_cn,
+        id: initialLanguage,
+        definitions: initialLanguage === "en" ? en : zh_cn,
       }}
       >
         <StoreProvider stores={[userStore, defaultClusterStore]}>
           <DarkModeProvider initial={extra.darkModeCookieValue}>
-            <AntdConfigProvider color={primaryColor} locale={extra.languageId}>
-              <FloatButtons languageId={extra.languageId} />
+            <AntdConfigProvider color={primaryColor} locale={initialLanguage}>
+              <FloatButtons languageId={initialLanguage} />
               <GlobalStyle />
               <FailEventHandler />
               <TopProgressBar />
-              <BaseLayout footerText={footerText} versionTag={publicConfig.VERSION_TAG}>
+              <BaseLayout
+                footerText={footerText}
+                versionTag={publicConfig.VERSION_TAG}
+                isUsingI18n={systemLanguageConfig.isUsingI18n}
+                initialLanguage={initialLanguage}
+              >
                 <Component {...pageProps} />
               </BaseLayout>
             </AntdConfigProvider>
@@ -161,7 +169,7 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
     footerText: "",
     primaryColor: "",
     darkModeCookieValue: getDarkModeCookieValue(appContext.ctx.req),
-    languageId: "",
+    languageCookie: "",
   };
 
   // This is called on server on first load, and on client on every page transition
@@ -197,7 +205,7 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
     ?? runtimeConfig.UI_CONFIG?.footer?.defaultText ?? "";
 
     // 从Cookies或header中获取语言id
-    extra.languageId = getLanguageCookie(appContext.ctx.req);
+    extra.languageCookie = getLanguageCookie(appContext.ctx.req);
   }
 
   const appProps = await App.getInitialProps(appContext);

@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { getI18nConfigCurrentText, I18nStringType } from "@scow/lib-web/build/utils/i18n";
+import { getI18nConfigCurrentText, I18nStringType } from "@scow/lib-web/build/utils/systemLanguage";
 import { App, Button, Col, Divider, Form, Input, InputNumber, Row, Select, Spin, Typography } from "antd";
 import { Rule } from "antd/es/form";
 import dayjs from "dayjs";

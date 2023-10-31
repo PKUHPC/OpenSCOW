@@ -15,7 +15,8 @@ import type { ClusterConfigSchema } from "@scow/config/build/cluster";
 import type { PortalConfigSchema } from "@scow/config/build/portal";
 import type { UiConfigSchema } from "@scow/config/build/ui";
 import { UserLink } from "@scow/lib-web/build/layouts/base/types";
-import { getI18nConfigCurrentText, I18nStringType } from "@scow/lib-web/build/utils/i18n";
+import { getI18nConfigCurrentText, I18nStringType,
+  SystemLanguageConfig } from "@scow/lib-web/build/utils/systemLanguage";
 import getConfig from "next/config";
 
 export interface ServerRuntimeConfig {
@@ -89,6 +90,8 @@ export interface PublicRuntimeConfig {
   RUNTIME_I18N_CONFIG_TEXTS: {
     passwordPatternMessage: I18nStringType | undefined,
   }
+
+  SYSTEM_LANGUAGE_CONFIG: SystemLanguageConfig;
 
 }
 

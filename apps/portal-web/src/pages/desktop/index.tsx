@@ -10,8 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/i18n";
-import { getLanguageCookie } from "@scow/lib-web/build/utils/languages";
+import { getI18nConfigCurrentText, getServerCurrentLanguageId } from "@scow/lib-web/build/utils/systemLanguage";
 import { GetServerSideProps, NextPage } from "next";
 import { requireAuth } from "src/auth/requireAuth";
 import { NotFoundPage } from "src/components/errorPages/NotFoundPage";
@@ -45,7 +44,7 @@ export const DesktopIndexPage: NextPage<Props> = requireAuth(() => true)
 
 export const getServerSideProps: GetServerSideProps<Props> = async ({ req }) => {
 
-  const languageId = getLanguageCookie(req);
+  const languageId = getServerCurrentLanguageId(req, publicConfig.SYSTEM_LANGUAGE_CONFIG);
 
   const loginDesktopEnabledClusters = Object.keys(runtimeConfig.CLUSTERS_CONFIG)
     .filter((clusterId) => getLoginDesktopEnabled(clusterId))

@@ -13,6 +13,7 @@
 import { DatabaseOutlined } from "@ant-design/icons";
 import { BaseLayout as LibBaseLayout } from "@scow/lib-web/build/layouts/base/BaseLayout";
 import { JumpToAnotherLink } from "@scow/lib-web/build/layouts/base/header/components";
+import { setCookie } from "nookies";
 import { PropsWithChildren, useMemo } from "react";
 import { useStore } from "simstate";
 import { LanguageSwitcher } from "src/components/LanguageSwitcher";
@@ -26,9 +27,12 @@ import { publicConfig } from "src/utils/config";
 interface Props {
   footerText: string;
   versionTag: string | undefined;
+  isUsingI18n: boolean;
+  initialLanguage: string;
 }
 
-export const BaseLayout = ({ footerText, versionTag, children }: PropsWithChildren<Props>) => {
+export const BaseLayout = ({ footerText, versionTag,
+  isUsingI18n, initialLanguage, children }: PropsWithChildren<Props>) => {
 
   const userStore = useStore(UserStore);
   const { loginNodes } = useStore(LoginNodeStore);
@@ -36,6 +40,14 @@ export const BaseLayout = ({ footerText, versionTag, children }: PropsWithChildr
 
   const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
+
+  // 如果不使用国际化，语言cookie保存为默认初始语言
+  if (!isUsingI18n) {
+    setCookie(null, "language", initialLanguage, {
+      maxAge: 30 * 24 * 60 * 60,
+      path: "/",
+    });
+  };
 
   const routes = useMemo(() => userRoutes(
     userStore.user, defaultCluster, loginNodes, setDefaultCluster,
@@ -64,7 +76,11 @@ export const BaseLayout = ({ footerText, versionTag, children }: PropsWithChildr
             link={publicConfig.MIS_URL}
             linkText={t("baseLayout.linkText")}
           />
-          <LanguageSwitcher />
+          {
+            isUsingI18n ? (
+              <LanguageSwitcher initialLanguage={initialLanguage} />
+            ) : undefined
+          }
         </>
       )}
     >
