@@ -11,7 +11,7 @@
  */
 
 const { envConfig, str, bool } = require("@scow/lib-config");
-const { getClusterConfigs } = require("@scow/config/build/cluster");
+const { getClusterConfigs, getSortedClusters } = require("@scow/config/build/cluster");
 const { getMisConfig } = require("@scow/config/build/mis");
 const { getCommonConfig } = require("@scow/config/build/common");
 const { getClusterTextsConfig } = require("@scow/config/build/clusterTexts");
@@ -123,8 +123,8 @@ const buildRuntimeConfig = async (phase, basePath) => {
 
     PUBLIC_PATH: config.PUBLIC_PATH,
 
-    CLUSTERS: Object.keys(clusters).reduce((prev, curr) => {
-      prev[curr] = { id: curr, name: clusters[curr].displayName };
+    CLUSTERS: getSortedClusters(clusters).reduce((prev, curr) => {
+      prev[curr.id] = { id: curr.id, name: curr.displayName };
       return prev;
     }, {}),
 

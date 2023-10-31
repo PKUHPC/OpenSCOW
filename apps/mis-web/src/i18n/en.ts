@@ -192,7 +192,7 @@ export default {
         whitelist: "Account Whitelist",
         financeManagement: "Finance Management",
         accountPay: "Account Recharge",
-        financePayments: "Recharge Records",
+        financePayments: "Tenant Recharge Records",
         accountPayments: "Account Recharge Records",
         accountChargeRecords: "Account Consumption Records",
       },
@@ -767,7 +767,7 @@ export default {
       },
       finance: {
         payments: {
-          title: "Payment Records",
+          title: "Tenant Payment Records",
         },
         payAccount: {
           title: "Account Payment",

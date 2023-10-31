@@ -237,7 +237,7 @@ export const mockApi: MockApi<typeof api> = {
 
   initGetUsers: async () => ({ users: mockUsers }),
 
-  getBillingTable: null,
+  getAvailableBillingTable: null,
 
   createInitAdmin: async () => ({ createdInAuth: false }),
 

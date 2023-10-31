@@ -70,14 +70,14 @@ export const AccountTable: React.FC<Props> = ({
   )) : undefined, [data, query, rangeSearchStatus]);
 
   const usersStatusCount = useMemo(() => {
-    if (!data || !data.results) return { BLOCKED : 0, DEBT : 0, ALL : 0 };
+    if (!filteredData) return { BLOCKED : 0, DEBT : 0, ALL : 0 };
     const counts = {
-      BLOCKED: data.results.filter((user) => user.blocked).length,
-      DEBT: data.results.filter((user) => !user.balance.positive).length,
-      ALL: data.results.length,
+      BLOCKED: filteredData.filter((user) => user.blocked).length,
+      DEBT: filteredData.filter((user) => !user.balance.positive).length,
+      ALL: filteredData.length,
     };
     return counts;
-  }, [data]);
+  }, [filteredData]);
 
   const handleTableChange = (_, __, sortInfo) => {
     setCurrentSortInfo({ field: sortInfo.field, order: sortInfo.order });

@@ -20,8 +20,8 @@ importers:
         specifier: 2.26.2
         version: 2.26.2
       '@commitlint/config-conventional':
-        specifier: 17.7.0
-        version: 17.7.0
+        specifier: 18.0.0
+        version: 18.0.0
       '@ddadaal/eslint-config':
         specifier: 1.9.0
         version: 1.9.0(@typescript-eslint/eslint-plugin@6.4.0)(eslint-import-resolver-typescript@3.6.0)(eslint-plugin-import@2.28.1)(eslint-plugin-simple-import-sort@10.0.0)(eslint@8.47.0)(typescript@5.1.6)
@@ -483,6 +483,9 @@ importers:
       '@scow/protos':
         specifier: workspace:*
         version: link:../../libs/protos/scow
+      '@scow/rich-error-model':
+        specifier: workspace:*
+        version: link:../../libs/rich-error-model
       '@scow/utils':
         specifier: workspace:*
         version: link:../../libs/utils
@@ -4283,11 +4286,11 @@ packages:
     dev: false
     optional: true
 
-  /@commitlint/config-conventional@17.7.0:
-    resolution: {integrity: sha512-iicqh2o6et+9kWaqsQiEYZzfLbtoWv9uZl8kbI8EGfnc0HeGafQBF7AJ0ylN9D/2kj6txltsdyQs8+2fTMwWEw==}
-    engines: {node: '>=v14'}
+  /@commitlint/config-conventional@18.0.0:
+    resolution: {integrity: sha512-XZW3MDwhMWwr7pf+jO5F18ohBwrJ8mt+1OPhkVyO8bYrY0dKPE5tPpdXlDt+JCFurl4VnUDPmu6xZ4/cKCH7cA==}
+    engines: {node: '>=v18'}
     dependencies:
-      conventional-changelog-conventionalcommits: 6.1.0
+      conventional-changelog-conventionalcommits: 7.0.2
     dev: true
 
   /@commitlint/config-validator@17.1.0:
@@ -8418,6 +8421,7 @@ packages:
 
   /array-buffer-byte-length@1.0.0:
     resolution: {integrity: sha512-LPuwb2P+NrQw3XhxGc36+XSvuBPopovXYTR9Ew++Du9Yb/bx5AzBfrIsBoj0EZUifjQU+sHL21sseZ3jerWO/A==}
+    requiresBuild: true
     dependencies:
       call-bind: 1.0.2
       is-array-buffer: 3.0.2
@@ -8487,6 +8491,7 @@ packages:
   /arraybuffer.prototype.slice@1.0.1:
     resolution: {integrity: sha512-09x0ZWFEjj4WD8PDbykUwo3t9arLn8NIzmmYEJFpYekOAQjpkGSyrQhNoRTcwwcFRu+ycWF78QZ63oWTqSjBcw==}
     engines: {node: '>= 0.4'}
+    requiresBuild: true
     dependencies:
       array-buffer-byte-length: 1.0.0
       call-bind: 1.0.2
@@ -9592,9 +9597,9 @@ packages:
       emitter-listener: 1.1.2
     dev: true
 
-  /conventional-changelog-conventionalcommits@6.1.0:
-    resolution: {integrity: sha512-3cS3GEtR78zTfMzk0AizXKKIdN4OvSh7ibNz6/DPbhWWQu7LqE/8+/GqSodV+sywUR2gpJAdP/1JFf4XtN7Zpw==}
-    engines: {node: '>=14'}
+  /conventional-changelog-conventionalcommits@7.0.2:
+    resolution: {integrity: sha512-NKXYmMR/Hr1DevQegFB4MwfM5Vv0m4UIxKZTTYuD98lpTknaZlSRrDOG4X7wIXpGkfsYxZTghUN+Qq+T0YQI7w==}
+    engines: {node: '>=16'}
     dependencies:
       compare-func: 2.0.0
     dev: true
@@ -10671,6 +10676,7 @@ packages:
   /es-set-tostringtag@2.0.1:
     resolution: {integrity: sha512-g3OMbtlwY3QewlqAiMLI47KywjWZoEytKr8pf6iTC8uJq5bIAH52Z9pnQ8pVL6whrCto53JZDuUIsifGeLorTg==}
     engines: {node: '>= 0.4'}
+    requiresBuild: true
     dependencies:
       get-intrinsic: 1.2.1
       has: 1.0.3
@@ -10686,6 +10692,7 @@ packages:
   /es-to-primitive@1.2.1:
     resolution: {integrity: sha512-QCOllgZJtaUo9miYBcLChTUaHNjJF3PYs1VidD7AwiEj1kYxKeQTctLAezAOH5ZKRH0g2IgPn6KwB4IT8iRpvA==}
     engines: {node: '>= 0.4'}
+    requiresBuild: true
     dependencies:
       is-callable: 1.2.7
       is-date-object: 1.0.5
@@ -11708,6 +11715,7 @@ packages:
   /function.prototype.name@1.1.5:
     resolution: {integrity: sha512-uN7m/BzVKQnCUF/iW8jYea67v++2u7m5UgENbHRtdDVclOUP+FMPlCNdmk0h/ysGyo2tavMJEDqJAkJdRa1vMA==}
     engines: {node: '>= 0.4'}
+    requiresBuild: true
     dependencies:
       call-bind: 1.0.2
       define-properties: 1.2.0
@@ -11778,6 +11786,7 @@ packages:
   /get-symbol-description@1.0.0:
     resolution: {integrity: sha512-2EmdH1YvIQiZpltCNgkuiUnyukzxM/R6NDJX31Ke3BG1Nq5b0S2PhX59UKi9vZpPDQVdqn+1IcaAwnzTT5vCjw==}
     engines: {node: '>= 0.4'}
+    requiresBuild: true
     dependencies:
       call-bind: 1.0.2
       get-intrinsic: 1.2.1
@@ -11948,6 +11957,7 @@ packages:
   /globalthis@1.0.3:
     resolution: {integrity: sha512-sFdI5LyBiNTHjRd7cGPWapiHWMOXKyuBNX/cWJ3NfzrZQVa8GI/8cofCl74AOVqq9W5kNmguTIzJ/1s2gyI9wA==}
     engines: {node: '>= 0.4'}
+    requiresBuild: true
     dependencies:
       define-properties: 1.2.0
     dev: true
@@ -12527,6 +12537,7 @@ packages:
   /internal-slot@1.0.5:
     resolution: {integrity: sha512-Y+R5hJrzs52QCG2laLn4udYVnxsfny9CpOhNhUvk/SSSVyF6T27FzRbF0sroPidSu3X8oEAkOn2K804mjpt6UQ==}
     engines: {node: '>= 0.4'}
+    requiresBuild: true
     dependencies:
       get-intrinsic: 1.2.1
       has: 1.0.3
@@ -12612,6 +12623,7 @@ packages:
 
   /is-array-buffer@3.0.2:
     resolution: {integrity: sha512-y+FyyR/w8vfIRq4eQcM1EYgSTnmHXPqaF+IgzgraytCFq5Xh8lllDVmAZolPJiZttZLeFSINPYMaEJ7/vWUa1w==}
+    requiresBuild: true
     dependencies:
       call-bind: 1.0.2
       get-intrinsic: 1.2.1
@@ -12740,6 +12752,7 @@ packages:
   /is-negative-zero@2.0.2:
     resolution: {integrity: sha512-dqJvarLawXsFbNDeJW7zAz8ItJ9cd28YufuuFzh0G8pNHjJMnY08Dv7sYX2uF5UpQOwieAeOExEYAWWfu7ZZUA==}
     engines: {node: '>= 0.4'}
+    requiresBuild: true
     dev: true
 
   /is-npm@5.0.0:
@@ -12838,6 +12851,7 @@ packages:
 
   /is-shared-array-buffer@1.0.2:
     resolution: {integrity: sha512-sqN2UDu1/0y6uvXyStCOzyhAjCSlHceFoMKJW8W9EU9cvic/QdsZ0kEU93HEy3IUEFZIiH/3w+AH/UQbPHNdhA==}
+    requiresBuild: true
     dependencies:
       call-bind: 1.0.2
     dev: true
@@ -12897,6 +12911,7 @@ packages:
 
   /is-weakref@1.0.2:
     resolution: {integrity: sha512-qctsuLZmIQ0+vSSMfoVvyFe2+GSEvnmZ2ezTup1SBse9+twCCeial6EEi3Nc2KFcf6+qz2FBPnjXsk8xhKSaPQ==}
+    requiresBuild: true
     dependencies:
       call-bind: 1.0.2
     dev: true
@@ -17500,6 +17515,7 @@ packages:
   /regexp.prototype.flags@1.5.0:
     resolution: {integrity: sha512-0SutC3pNudRKgquxGoRGIz946MZVHqbNfPjBdxeOhBrdgDKlRoXmYLQN9xRbrR09ZXWeGAdPuif7egofn6v5LA==}
     engines: {node: '>= 0.4'}
+    requiresBuild: true
     dependencies:
       call-bind: 1.0.2
       define-properties: 1.2.0
@@ -17860,6 +17876,7 @@ packages:
   /safe-array-concat@1.0.0:
     resolution: {integrity: sha512-9dVEFruWIsnie89yym+xWTAYASdpw3CJV7Li/6zBewGf9z2i1j31rP6jnY0pHEO4QZh6N0K11bFjWmdR8UGdPQ==}
     engines: {node: '>=0.4'}
+    requiresBuild: true
     dependencies:
       call-bind: 1.0.2
       get-intrinsic: 1.2.1
@@ -17885,6 +17902,7 @@ packages:
 
   /safe-regex-test@1.0.0:
     resolution: {integrity: sha512-JBUUzyOgEwXQY1NuPtvcj/qcBDbDmEvWufhlnXZIm75DEHp+afM1r1ujJpJsV/gSM4t59tpDyPi1sd6ZaPFfsA==}
+    requiresBuild: true
     dependencies:
       call-bind: 1.0.2
       get-intrinsic: 1.2.1
@@ -18573,6 +18591,7 @@ packages:
   /string.prototype.trim@1.2.7:
     resolution: {integrity: sha512-p6TmeT1T3411M8Cgg9wBTMRtY2q9+PNy9EV1i2lIXUN/btt763oIfxwN3RR8VU6wHX8j/1CFy0L+YuThm6bgOg==}
     engines: {node: '>= 0.4'}
+    requiresBuild: true
     dependencies:
       call-bind: 1.0.2
       define-properties: 1.2.0
@@ -18581,6 +18600,7 @@ packages:
 
   /string.prototype.trimend@1.0.6:
     resolution: {integrity: sha512-JySq+4mrPf9EsDBEDYMOb/lM7XQLulwg5R/m1r0PXEFqrV0qHvl58sdTilSXtKOflCsK2E8jxf+GKC0T07RWwQ==}
+    requiresBuild: true
     dependencies:
       call-bind: 1.0.2
       define-properties: 1.2.0
@@ -18589,6 +18609,7 @@ packages:
 
   /string.prototype.trimstart@1.0.6:
     resolution: {integrity: sha512-omqjMDaY92pbn5HOX7f9IccLA+U1tA9GvtU4JrodiXFfYB7jPzzHpRzpglLAjtUV6bB557zwClJezTqnAiYnQA==}
+    requiresBuild: true
     dependencies:
       call-bind: 1.0.2
       define-properties: 1.2.0
@@ -19362,6 +19383,7 @@ packages:
   /typed-array-buffer@1.0.0:
     resolution: {integrity: sha512-Y8KTSIglk9OZEr8zywiIHG/kmQ7KWyjseXs1CbSo8vC42w7hg2HgYTxSWwP0+is7bWDc1H+Fo026CpHFwm8tkw==}
     engines: {node: '>= 0.4'}
+    requiresBuild: true
     dependencies:
       call-bind: 1.0.2
       get-intrinsic: 1.2.1
@@ -19371,6 +19393,7 @@ packages:
   /typed-array-byte-length@1.0.0:
     resolution: {integrity: sha512-Or/+kvLxNpeQ9DtSydonMxCx+9ZXOswtwJn17SNLvhptaXYDJvkFFP5zbfU/uLmvnBJlI4yrnXRxpdWH/M5tNA==}
     engines: {node: '>= 0.4'}
+    requiresBuild: true
     dependencies:
       call-bind: 1.0.2
       for-each: 0.3.3
@@ -19381,6 +19404,7 @@ packages:
   /typed-array-byte-offset@1.0.0:
     resolution: {integrity: sha512-RD97prjEt9EL8YgAgpOkf3O4IF9lhJFr9g0htQkm0rchFp/Vx7LW5Q8fSXXub7BXAODyUQohRMyOc3faCPd0hg==}
     engines: {node: '>= 0.4'}
+    requiresBuild: true
     dependencies:
       available-typed-arrays: 1.0.5
       call-bind: 1.0.2
@@ -19391,6 +19415,7 @@ packages:
 
   /typed-array-length@1.0.4:
     resolution: {integrity: sha512-KjZypGq+I/H7HI5HlOoGHkWUUGq+Q0TPhQurLbyrVrvnKTBgzLhIJ7j6J/XTQOi0d1RjyZ0wdas8bKs2p0x3Ng==}
+    requiresBuild: true
     dependencies:
       call-bind: 1.0.2
       for-each: 0.3.3
@@ -19432,6 +19457,7 @@ packages:
 
   /unbox-primitive@1.0.2:
     resolution: {integrity: sha512-61pPlCD9h51VoreyJ0BReideM3MDKMKnh6+V9L08331ipq6Q8OFXZYiqP6n/tbHx4s5I9uRhcye6BrbkizkBDw==}
+    requiresBuild: true
     dependencies:
       call-bind: 1.0.2
       has-bigints: 1.0.2
@@ -20181,6 +20207,7 @@ packages:
   /which-typed-array@1.1.11:
     resolution: {integrity: sha512-qe9UWWpkeG5yzZ0tNYxDmd7vo58HDBc39mZ0xWWpolAGADdFOzkfamWLDxkOWcvHQKVmdTyQdLD4NOfjLWTKew==}
     engines: {node: '>= 0.4'}
+    requiresBuild: true
     dependencies:
       available-typed-arrays: 1.0.5
       call-bind: 1.0.2

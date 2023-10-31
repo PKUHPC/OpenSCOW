@@ -17,21 +17,7 @@ import { join } from "path";
 import { config, FAVICON_URL } from "src/config/env";
 import { uiConfig } from "src/config/ui";
 import { AuthTextsType, languages } from "src/i18n";
-
-
-function parseHostname(req: FastifyRequest): string | undefined {
-
-  if (!req.headers.referer) {
-    return undefined;
-  }
-
-  try {
-    const url = new URL(req.headers.referer);
-    return url.hostname;
-  } catch {
-    return undefined;
-  }
-}
+import { getHostname } from "src/utils/getHostname";
 
 
 export async function renderBindOtpHtml(
@@ -48,7 +34,7 @@ export async function renderBindOtpHtml(
   },
 ) {
 
-  const hostname = parseHostname(req);
+  const hostname = getHostname(req);
 
   // 获取当前语言ID及对应的绑定OTP页面文本
   const languageId = getLanguageCookie(req.raw);
@@ -58,10 +44,13 @@ export async function renderBindOtpHtml(
     authTexts: authTexts,
     cssUrl: join(config.BASE_PATH, config.AUTH_BASE_PATH, "/public/assets/tailwind.min.css"),
     faviconUrl: join(config.BASE_PATH, FAVICON_URL),
-    backgroundColor: uiConfig.primaryColor?.defaultColor ?? DEFAULT_PRIMARY_COLOR,
+    backgroundColor: (hostname && uiConfig.primaryColor?.hostnameMap?.[hostname])
+      ?? uiConfig.primaryColor?.defaultColor ?? DEFAULT_PRIMARY_COLOR,
     err,
     callbackUrl,
-    footerText: (hostname && uiConfig?.footer?.hostnameTextMap?.[hostname]) ?? uiConfig?.footer?.defaultText ?? "",
+    footerText: (hostname && uiConfig?.footer?.hostnameMap?.[hostname])
+     ?? (hostname && uiConfig?.footer?.hostnameTextMap?.[hostname])
+     ?? uiConfig?.footer?.defaultText ?? "",
     ...otp,
     otpBasePath: join(config.BASE_PATH, config.AUTH_BASE_PATH, "/public/otp"),
   });

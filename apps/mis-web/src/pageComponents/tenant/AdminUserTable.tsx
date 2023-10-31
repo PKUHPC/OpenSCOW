@@ -14,7 +14,7 @@ import { compareDateTime, formatDateTime } from "@scow/lib-web/build/utils/datet
 import { Static } from "@sinclair/typebox";
 import { App, Button, Divider, Form, Input, Space, Table } from "antd";
 import { SortOrder } from "antd/es/table/interface";
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { api } from "src/apis";
 import { ChangePasswordModalLink } from "src/components/ChangePasswordModal";
 import { FilterFormContainer, FilterFormTabs } from "src/components/FilterFormContainer";
@@ -71,18 +71,20 @@ export const AdminUserTable: React.FC<Props> = ({
         rangeSearchRole === "TENANT_ADMIN" ? TenantRole.TENANT_ADMIN : TenantRole.TENANT_FINANCE))
   )) : undefined, [data, query, rangeSearchRole]);
 
-  const getUsersRoleCount = (role: FilteredRole): number => {
+  const getUsersRoleCount = useCallback((role: FilteredRole): number => {
 
     switch (role) {
     case "TENANT_ADMIN":
-      return data ? data.results.filter((user) => user.tenantRoles.includes(TenantRole.TENANT_ADMIN)).length : 0;
+      return filteredData
+        ? filteredData.filter((user) => user.tenantRoles.includes(TenantRole.TENANT_ADMIN)).length : 0;
     case "TENANT_FINANCE":
-      return data ? data.results.filter((user) => user.tenantRoles.includes(TenantRole.TENANT_FINANCE)).length : 0;
+      return filteredData
+        ? filteredData.filter((user) => user.tenantRoles.includes(TenantRole.TENANT_FINANCE)).length : 0;
     case "ALL_USERS":
     default:
-      return data ? data.results.length : 0;
+      return filteredData ? filteredData.length : 0;
     }
-  };
+  }, [filteredData]);
 
   const handleTableChange = (_, __, sortInfo) => {
     setCurrentSortInfo({ field: sortInfo.field, order: sortInfo.order });

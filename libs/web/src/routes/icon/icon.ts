@@ -14,7 +14,7 @@ import { existsSync } from "fs";
 import { NextApiRequest, NextApiResponse } from "next";
 import { join } from "path";
 import { sendFile, validatePayload } from "src/routes/icon/utils";
-import { getHostname } from "src/utils/getHostname";
+import { getHost } from "src/utils/getHostname";
 import { z } from "zod";
 
 const filenameMap = {
@@ -39,7 +39,7 @@ export const serveIcon = async (
   if (!query) { return; }
 
   // find the domain icons
-  const domain = getHostname(req);
+  const domain = getHost(req);
 
   if (domain) {
     const domainIconPath = join(configIconPath, domain, filenameMap[query.type]);

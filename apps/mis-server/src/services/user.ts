@@ -97,7 +97,7 @@ export const userServiceServer = plugin((server) => {
           const account = curr.account.getEntity();
           prev[account.accountName] = {
             userStatus: PFUserStatus[curr.status],
-            accountBlocked: account.blocked,
+            accountBlocked: Boolean(account.blocked),
             jobChargeLimit: curr.jobChargeLimit ? decimalToMoney(curr.jobChargeLimit) : undefined,
             usedJobCharge: curr.usedJobCharge ? decimalToMoney(curr.usedJobCharge) : undefined,
             balance: decimalToMoney(curr.account.getEntity().balance),
@@ -542,6 +542,7 @@ export const userServiceServer = plugin((server) => {
         platformUsers: users.map((x) => ({
           userId: x.userId,
           name: x.name,
+          email: x.email,
           availableAccounts: x.accounts.getItems()
             .filter((ua) => ua.status === UserStatus.UNBLOCKED)
             .map((ua) => {
