@@ -133,21 +133,17 @@ export function getLanguageCookie(req: IncomingMessage | undefined): string | un
 export function getInitialLanguage(cookieLanguage: string | undefined,
   systemLanguageConfig: SystemLanguageConfig): string {
 
-  // 使用国际化，且跟随系统语言
-  // 则优先使用cookie中保存的语言或浏览器偏好，若前者皆不合法则使用default
-  if (systemLanguageConfig.isUsingI18n) {
-
-    if ((systemLanguageConfig.autoDetect || typeof systemLanguageConfig.autoDetect === "undefined") && cookieLanguage) {
-      return cookieLanguage;
-    }
-
-    return systemLanguageConfig.defaultLanguage;
-
-  // 不使用国际化，则使用指定的默认语言
-  } else {
-
-    return systemLanguageConfig.defaultLanguage;
+  // 使用国际化，且跟随系统语言， 且cookie中保存的语言或浏览器偏好为合法语言
+  // 则使用cookie中保存的语言或浏览器偏好
+  if (systemLanguageConfig.isUsingI18n &&
+    (systemLanguageConfig.autoDetect || typeof systemLanguageConfig.autoDetect === "undefined") &&
+    cookieLanguage) {
+    return cookieLanguage;
   }
+
+  // 其他情况，则使用指定的默认语言
+  return systemLanguageConfig.defaultLanguage;
+
 };
 
 /**
