@@ -499,19 +499,19 @@ it("returns charge records with query of tenant", async () => {
 
   expect(reply.results).toHaveLength(2);
 
-  expect(reply.results).toMatchObject([
+  expect(reply.results.sort((a, b) => new Date(b.time!).getTime() - new Date(a.time!).getTime())).toMatchObject([
     {
-      tenantName: tenant.name,
-      accountName: undefined,
-      comment: request1.comment,
-      amount: request1.amount,
-      type: request1.type,
-    }, {
       tenantName: tenant.name,
       accountName: undefined,
       comment: request2.comment,
       amount: request2.amount,
       type: request2.type,
+    }, {
+      tenantName: tenant.name,
+      accountName: undefined,
+      comment: request1.comment,
+      amount: request1.amount,
+      type: request1.type,
     } ] as Partial<ChargeRecord>);
 
   em.clear();
@@ -656,20 +656,20 @@ it("returns charge records with query of accountsOfTenant", async () => {
 
   expect(reply.results).toHaveLength(2);
 
-  expect(reply.results).toMatchObject([
-    {
-      accountName: request1.accountName,
-      tenantName: account.tenant.getProperty("name"),
-      comment: request1.comment,
-      amount: request1.amount,
-      type: request1.type,
-    },
+  expect(reply.results.sort((a, b) => new Date(b.time!).getTime() - new Date(a.time!).getTime())).toMatchObject([
     {
       accountName: request2.accountName,
       tenantName: account.tenant.getProperty("name"),
       comment: request2.comment,
       amount: request2.amount,
       type: request2.type,
+    },
+    {
+      accountName: request1.accountName,
+      tenantName: account.tenant.getProperty("name"),
+      comment: request1.comment,
+      amount: request1.amount,
+      type: request1.type,
     },
   ]as Partial<ChargeRecord>);
 
@@ -746,14 +746,7 @@ it("returns charge records with query allAccountOfAllTenants", async () => {
 
   expect(reply.results).toHaveLength(2);
 
-  expect(reply.results).toMatchObject([
-    {
-      accountName: request1.accountName,
-      tenantName: request1.tenantName,
-      comment: request1.comment,
-      amount: request1.amount,
-      type: request1.type,
-    },
+  expect(reply.results.sort((a, b) => new Date(b.time!).getTime() - new Date(a.time!).getTime())).toMatchObject([
     {
       accountName: request3.accountName,
       tenantName: request3.tenantName,
@@ -761,7 +754,14 @@ it("returns charge records with query allAccountOfAllTenants", async () => {
       amount: request3.amount,
       type: request3.type,
     },
-  ]as Partial<ChargeRecord>);
+    {
+      accountName: request1.accountName,
+      tenantName: request1.tenantName,
+      comment: request1.comment,
+      amount: request1.amount,
+      type: request1.type,
+    },
+  ] as Partial<ChargeRecord>);
 
   em.clear();
 });
