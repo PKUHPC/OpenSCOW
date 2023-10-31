@@ -75,7 +75,7 @@ const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ tenantName }) => 
     <Form
       form={form}
       wrapperCol={{ span: 20 }}
-      labelCol={{ span: 4 }}
+      labelCol={{ span:4, style: { whiteSpace:"normal", textAlign:"left", lineHeight:"16px" } }}
       labelAlign="right"
       onFinish={submit}
     >

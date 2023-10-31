@@ -16,7 +16,7 @@ import { useDidUpdateEffect } from "@scow/lib-web/build/utils/hooks";
 import { JobInfo } from "@scow/protos/build/common/ended_job";
 import { Money } from "@scow/protos/build/common/money";
 import { Static } from "@sinclair/typebox";
-import { App, Button, DatePicker, Divider, Form, Input, InputNumber, Select, Space, Table } from "antd";
+import { App, AutoComplete, Button, DatePicker, Divider, Form, Input, InputNumber, Space, Table } from "antd";
 import dayjs from "dayjs";
 import React, { useCallback, useRef, useState } from "react";
 import { useAsync } from "react-async";
@@ -66,6 +66,7 @@ export const JobTable: React.FC<Props> = ({
   const rangeSearch = useRef(true);
 
   const [pageInfo, setPageInfo] = useState({ page: 1, pageSize: 10 });
+  const [selectedAccountName, setSelectedAccountName] = useState<string | undefined>(undefined);
 
   const [query, setQuery] = useState<FilterForm>(() => {
     const now = dayjs();
@@ -94,7 +95,7 @@ export const JobTable: React.FC<Props> = ({
     // accountName 根据accountNames是否数组来判断顶部导航类型，如是用户空间用输入值，账户管理则用props中的accountNames限制搜索范围
     const diffQuery = rangeSearch.current ? {
       userId: userId || query.userId,
-      accountName: Array.isArray(accountNames) ? query.accountName : accountNames,
+      accountName: Array.isArray(accountNames) ? selectedAccountName : accountNames,
       jobEndTimeStart: query.jobEndTime[0].toISOString(),
       jobEndTimeEnd: query.jobEndTime[1].toISOString(),
     } : {
@@ -147,12 +148,21 @@ export const JobTable: React.FC<Props> = ({
                   </Form.Item>
                   {
                     filterAccountName ? (
-                      <Form.Item label={t(pCommon("account"))} name="accountName">
-                        <Select style={{ minWidth: 96 }} allowClear>
-                          {(Array.isArray(accountNames) ? accountNames : [accountNames]).map((x) => (
-                            <Select.Option key={x} value={x}>{x}</Select.Option>
-                          ))}
-                        </Select>
+                      <Form.Item label={t("common.account")} name="name">
+                        <AutoComplete
+                          style={{ minWidth: 150 }}
+                          allowClear
+                          options={
+                            (Array.isArray(accountNames) ? accountNames : [accountNames]).map((x) => ({ value: x }))
+                          }
+                          placeholder={t("common.selectAccount")}
+                          filterOption={(inputValue, option) =>
+                            option!.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
+                          }
+                          onChange={(value) => {
+                            setSelectedAccountName(value || undefined);
+                          }}
+                        />
                       </Form.Item>
                     ) : undefined
                   }

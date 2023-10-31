@@ -48,6 +48,14 @@ loginDesktop:
 
 # TurboVNC的安装路径
 turboVNCPath: /opt/TurboVNC
+
+# 跨集群传输模块，可选功能
+crossClusterFileTransfer:
+  # 不启用跨集群传输功能可以设置为false
+  enabled: true
+  # 传输节点的地址(ip地址:端口号)
+  transferNode: localhost:22222
+  
 ```
 
 ## 注意

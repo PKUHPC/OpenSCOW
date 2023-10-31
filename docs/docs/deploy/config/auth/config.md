@@ -10,6 +10,12 @@ title: 内置认证系统配置
 
 在`auth.yaml`配置中，可以配置关于登录界面 UI 的部分内容。
 
+:::note
+
+注意：登录框中登录按钮颜色跟随主题色配置，配置文件为 `ui.yaml`
+
+:::
+
 其中关于背景图片路径和自定义 logo 图片路径的设置可以参考[公共文件](https://pkuhpc.github.io/SCOW/docs/deploy/config/customization/public-files)进行配置。需要强调的是该路径是相对于公共文件的路径。
 ```yaml
 # auth 界面 ui 配置

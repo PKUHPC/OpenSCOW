@@ -63,7 +63,7 @@ export async function importUsers(data: ImportUsersData, em: SqlEntityManager,
   const accountMap: Record<string, Account> = {};
   data.accounts.forEach((account) => {
     accountMap[account.accountName] = new Account({
-      accountName: account.accountName, comment: "", blocked: account.blocked,
+      accountName: account.accountName, comment: "", blocked:Boolean(account.blocked),
       tenant,
     });
   });

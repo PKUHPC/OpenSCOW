@@ -86,6 +86,8 @@ export interface PublicRuntimeConfig {
 
   VERSION_TAG: string | undefined;
 
+  CROSS_CLUSTER_FILE_TRANSFER_ENABLED: boolean;
+
   RUNTIME_I18N_CONFIG_TEXTS: {
     passwordPatternMessage: I18nStringType | undefined,
   }
