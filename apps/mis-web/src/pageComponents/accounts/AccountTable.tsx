@@ -69,15 +69,19 @@ export const AccountTable: React.FC<Props> = ({
       && (rangeSearchStatus === "ALL" || (rangeSearchStatus === "BLOCKED" ? x.blocked : !x.balance.positive))
   )) : undefined, [data, query, rangeSearchStatus]);
 
+  const searchData = useMemo(() => data ? data.results.filter((x) => (
+    !query.accountName || x.accountName.includes(query.accountName)
+  )) : undefined, [data, query]);
+
   const usersStatusCount = useMemo(() => {
-    if (!filteredData) return { BLOCKED : 0, DEBT : 0, ALL : 0 };
+    if (!searchData) return { BLOCKED : 0, DEBT : 0, ALL : 0 };
     const counts = {
-      BLOCKED: filteredData.filter((user) => user.blocked).length,
-      DEBT: filteredData.filter((user) => !user.balance.positive).length,
-      ALL: filteredData.length,
+      BLOCKED: searchData.filter((user) => user.blocked).length,
+      DEBT: searchData.filter((user) => !user.balance.positive).length,
+      ALL: searchData.length,
     };
     return counts;
-  }, [filteredData]);
+  }, [searchData]);
 
   const handleTableChange = (_, __, sortInfo) => {
     setCurrentSortInfo({ field: sortInfo.field, order: sortInfo.order });
