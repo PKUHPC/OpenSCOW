@@ -10,13 +10,17 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { Empty, Spin } from "antd";
+import React from "react";
 import { Bar, BarChart,
   ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { styled } from "styled-components";
 
 interface Props {
+  isLoading: boolean
   title: string
   data: {x: string, y: string | number}[]
+  xLabel?: string
 }
 
 export const StatisticContainer = styled.div`
@@ -24,7 +28,6 @@ export const StatisticContainer = styled.div`
   flex-direction: column;
   justify-content: flex-start;
   height: 300px;
-  width: 50%;
 `;
 
 
@@ -33,21 +36,39 @@ export const StatisticTitle = styled.div<{ justify?: string }>`
   margin: 8px 0;
 `;
 
-export const DataBarChart: React.FC<Props> = ({ title, data }) => {
+export const DataBarChart: React.FC<Props> = ({
+  title,
+  data,
+  isLoading,
+  xLabel = "",
+}) => {
 
   return (
     <StatisticContainer>
-      <StatisticTitle>{title}</StatisticTitle>
-      <ResponsiveContainer height="100%">
-        <BarChart
-          data={data}
-        >
-          <XAxis dataKey="x" padding={{ left: 20, right: 20 }} />
-          <YAxis padding={{ top: 20 }} />
-          <Tooltip />
-          <Bar dataKey="y" fill="#8884d8" barSize={ 40 } />
-        </BarChart>
-      </ResponsiveContainer>
+      {isLoading ? <Spin /> : (
+        <>
+          <StatisticTitle>{ title }</StatisticTitle>
+          {data.length === 0 ?
+            <Empty />
+            : (
+              <ResponsiveContainer height="100%">
+                <BarChart
+                  data={data}
+                >
+                  <XAxis
+                    dataKey="x"
+                    padding={{ left: 20, right: 20 }}
+                    label={{ value: xLabel, position: "insideBottom", offset: 0 }}
+                    height={40}
+                  />
+                  <YAxis padding={{ top: 20 }} />
+                  <Tooltip />
+                  <Bar dataKey="y" fill="#8884d8" barSize={ 40 } />
+                </BarChart>
+              </ResponsiveContainer>
+            )}
+        </>
+      )}
     </StatisticContainer>
 
   );

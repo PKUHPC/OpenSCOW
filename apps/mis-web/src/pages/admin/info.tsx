@@ -12,78 +12,262 @@
 
 import { MoneyCollectOutlined, PlayCircleOutlined, ProjectOutlined,
   TeamOutlined, UserOutlined, WalletOutlined } from "@ant-design/icons";
-import { asyncClientCall } from "@ddadaal/tsgrpc-client";
-import { defaultPresets } from "@scow/lib-web/build/utils/datetime";
-import type { GetAdminInfoResponse } from "@scow/protos/build/server/admin";
-import { AdminServiceClient } from "@scow/protos/build/server/admin";
+import { moneyToNumber } from "@scow/lib-decimal";
+import { getDefaultPresets } from "@scow/lib-web/build/utils/datetime";
 import { Card, Col, DatePicker, Row, Space } from "antd";
-import { GetServerSideProps, NextPage } from "next";
-import { USE_MOCK } from "src/apis/useMock";
+import dayjs from "dayjs";
+import { NextPage } from "next";
+import { useCallback, useMemo, useState } from "react";
+import { useAsync } from "react-async";
+import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
-import { ssrAuthenticate, SSRProps } from "src/auth/server";
-import { UnifiedErrorPage } from "src/components/errorPages/UnifiedErrorPage";
 import { PageTitle } from "src/components/PageTitle";
-import { useI18nTranslateToString } from "src/i18n";
+import { useI18n, useI18nTranslateToString } from "src/i18n";
+import { getOperationTypeTexts } from "src/models/operationLog";
 import { PlatformRole } from "src/models/User";
 import { DataBarChart } from "src/pageComponents/admin/DataBarChart";
 import { DataLineChart } from "src/pageComponents/admin/DataLineChart";
 import StatisticCard from "src/pageComponents/admin/StatisticCard";
-import { getClient } from "src/utils/client";
 import { Head } from "src/utils/head";
 import { styled } from "styled-components";
 
-const data = [
-  {
-    "x": "a_admin",
-    "y": 102,
-  },
-  {
-    "x": "b_admin",
-    "y": 32,
-  },
-  {
-    "x": "c_admin",
-    "y": 401,
-  },
-  {
-    "x": "d_admin",
-    "y": 678,
-  },
-  {
-    "x": "e_admin",
-    "y": 190,
-  },
-  {
-    "x": "f_admin",
-    "y": 12,
-  },
-  {
-    "x": "g_admin",
-    "y": 8,
-  },
-];
 
+const formateData = (data: Array<{ date: string, count: number }>, dateRange: [dayjs.Dayjs, dayjs.Dayjs]) => {
+  const input = data.map((d) => ({
+    date: new Date(d.date),
+    count: d.count,
+  }));
+  const countData: {date: dayjs.Dayjs, count: number}[] = [];
+  const [startDate, endDate] = dateRange;
+  const days = endDate.diff(startDate, "day");
+  let curDate = startDate.clone();
+  for (let i = 0; i < days; i++) {
+    const v = input?.find((x) => {
+      return curDate.isSame(x.date, "day");
+    });
+    if (v) {
+      countData[i] = {
+        date: curDate.clone(),
+        count: v.count,
+      };
+    } else {
+      countData[i] = {
+        date: curDate.clone(),
+        count: 0,
+      };
+    }
+    curDate = curDate.add(1, "day");
+  }
+  return countData;
+};
 const TitleText = styled.span`
   font-size: 24px;
   font-weight: bold;
 `;
 
-type Info = GetAdminInfoResponse
-
-type Props = SSRProps<Info, 500>
-
-export const PlatformInfoPage: NextPage<Props> =
+export const PlatformInfoPage: NextPage =
 requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
-((props: Props) => {
+(() => {
 
   const t = useI18nTranslateToString();
+  const languageId = useI18n().currentLanguage.id;
 
-  if ("error" in props) {
-    return <UnifiedErrorPage code={props.error} />;
-  }
+  const OperationTypeTexts = getOperationTypeTexts(t);
 
-  const { tenantCount, accountCount, userCount } = props;
+  const today = dayjs().endOf("day");
+  const [query, setQuery] = useState<{filterTime: [dayjs.Dayjs, dayjs.Dayjs],}>({
+    filterTime: [today.clone().subtract(7, "day"), today],
+  });
 
+  const getStatisticInfoFn = useCallback(async () => {
+    return await api.getStatisticInfo({ query: {
+      startTime: query.filterTime[0].toISOString(),
+      endTime: query.filterTime[1].toISOString(),
+    } });
+  }, [query]);
+
+  const { data: statisticInfo, isLoading: statisticInfoLoading } = useAsync({ promiseFn: getStatisticInfoFn });
+
+  const getJobTotalCountFn = useCallback(async () => {
+    return await api.getJobTotalCount({});
+  }, []);
+
+  const { data: jobTotalCount, isLoading: jobTotalCountLoading } = useAsync({ promiseFn: getJobTotalCountFn });
+
+  const promiseFn1 = useCallback(async () => {
+    return await api.getNewUserCount({ query: {
+      startTime: query.filterTime[0].toISOString(),
+      endTime: query.filterTime[1].toISOString(),
+    } });
+  }, [query]);
+
+  const { data: newUserCount, isLoading: newUserLoading } = useAsync({ promiseFn: promiseFn1 });
+
+  const promiseFn2 = useCallback(async () => {
+    return await api.getActiveUserCount({ query: {
+      startTime: query.filterTime[0].toISOString(),
+      endTime: query.filterTime[1].toISOString(),
+    } });
+  }, [query]);
+
+  const { data: activeUserCount, isLoading: activeUserLoading } = useAsync({ promiseFn: promiseFn2 });
+
+  const promiseFn3 = useCallback(async () => {
+    return await api.getTopChargeAccount({ query: {
+      startTime: query.filterTime[0].toISOString(),
+      endTime: query.filterTime[1].toISOString(),
+    } });
+  }, [query]);
+
+  const { data: topChargeAccount, isLoading: topChargeAccountLoading } = useAsync({ promiseFn: promiseFn3 });
+
+  const promiseFn4 = useCallback(async () => {
+    return await api.getTopPayAccount({ query: {
+      startTime: query.filterTime[0].toISOString(),
+      endTime: query.filterTime[1].toISOString(),
+    } });
+  }, [query]);
+
+  const { data: topPayAccount, isLoading: topPayAccountLoading } = useAsync({ promiseFn: promiseFn4 });
+
+  const promiseFn5 = useCallback(async () => {
+    return await api.getDailyCharge({ query: {
+      startTime: query.filterTime[0].toISOString(),
+      endTime: query.filterTime[1].toISOString(),
+    } });
+  }, [query]);
+
+  const { data: dailyCharge, isLoading: dailyChargeLoading } = useAsync({ promiseFn: promiseFn5 });
+
+  const promiseFn6 = useCallback(async () => {
+    return await api.getDailyPay({ query: {
+      startTime: query.filterTime[0].toISOString(),
+      endTime: query.filterTime[1].toISOString(),
+    } });
+  }, [query]);
+
+  const { data: dailyPay, isLoading: dailyPayLoading } = useAsync({ promiseFn: promiseFn6 });
+
+  const promiseFn7 = useCallback(async () => {
+    return await api.getTopSubmitJobUser({ query: {
+      startTime: query.filterTime[0].toISOString(),
+      endTime: query.filterTime[1].toISOString(),
+    } });
+  }, [query]);
+
+  const { data: topSubmitJobUser, isLoading: topSubmitJobUserLoading } = useAsync({ promiseFn: promiseFn7 });
+
+  const promiseFn8 = useCallback(async () => {
+    return await api.getNewJobCount({ query: {
+      startTime: query.filterTime[0].toISOString(),
+      endTime: query.filterTime[1].toISOString(),
+    } });
+  }, [query]);
+
+  const { data: dailyNewJobCount, isLoading: dailyNewJobCountLoading } = useAsync({ promiseFn: promiseFn8 });
+
+
+  const promiseFn9 = useCallback(async () => {
+    return await api.getPortalUsageCount({ query: {
+      startTime: query.filterTime[0].toISOString(),
+      endTime: query.filterTime[1].toISOString(),
+    } });
+  }, [query]);
+
+  const { data: portalUsageCount, isLoading: portalUsageCountLoading } = useAsync({ promiseFn: promiseFn9 });
+
+  const promiseFn10 = useCallback(async () => {
+    return await api.getMisUsageCount({ query: {
+      startTime: query.filterTime[0].toISOString(),
+      endTime: query.filterTime[1].toISOString(),
+    } });
+  }, [query]);
+
+  const { data: misUsageCount, isLoading: misUsageCountLoading } = useAsync({ promiseFn: promiseFn10 });
+
+  const newUserCountData = useMemo(() => {
+    if (newUserCount) {
+      return formateData(newUserCount?.results, query.filterTime);
+    }
+    return [];
+  }, [query, newUserCount]);
+
+  const activeUserCountData = useMemo(() => {
+
+    if (activeUserCount) {
+      return formateData(activeUserCount?.results, query.filterTime);
+    }
+    return [];
+  }, [query, activeUserCount]);
+
+
+  const topChargeAccountData = useMemo(() => {
+
+    return topChargeAccount?.results.map((r) => ({
+      x: r.accountName,
+      y: moneyToNumber(r.chargedAmount),
+    })) || [];
+  }, [query, topChargeAccount]);
+
+  const topPayAccountData = useMemo(() => {
+
+    return topPayAccount?.results.map((r) => ({
+      x: r.accountName,
+      y: moneyToNumber(r.payAmount),
+    })) || [];
+  }, [query, topPayAccount]);
+
+  const dailyChargeData = useMemo(() => {
+    if (dailyCharge) {
+      return formateData(dailyCharge?.results
+        .map((d) => ({ date: d.date, count: moneyToNumber(d.amount) })), query.filterTime);
+    }
+    return [];
+  }, [query, dailyCharge]);
+
+  const dailyPayData = useMemo(() => {
+    if (dailyPay) {
+      return formateData(dailyPay?.results
+        .map((d) => ({ date: d.date, count: moneyToNumber(d.amount) })), query.filterTime);
+    }
+    return [];
+  }, [query, dailyPay]);
+
+  const topSubmitJobUserData = useMemo(() => {
+
+    return topSubmitJobUser?.results.map((r) => ({
+      x: r.userId,
+      y: r.count,
+    })) || [];
+  }, [query, topSubmitJobUser]);
+
+  const newJobCountData = useMemo(() => {
+    if (dailyNewJobCount) {
+      return formateData(dailyNewJobCount?.results, query.filterTime);
+    }
+    return [];
+  }, [query, dailyNewJobCount]);
+
+  const totalNewJobCount = useMemo(() => {
+    if (dailyNewJobCount) {
+      return dailyNewJobCount?.results.reduce((pre, cur) => pre + cur.count, 0);
+    }
+    return 0;
+  }, [dailyNewJobCount]);
+
+  const portalUsageCountData = useMemo(() => {
+    if (portalUsageCount) {
+      return portalUsageCount.results;
+    }
+    return [];
+  }, [query, portalUsageCount]);
+
+  const misUsageCountData = useMemo(() => {
+    if (misUsageCount) {
+      return misUsageCount.results;
+    }
+    return [];
+  }, [query, misUsageCount]);
 
   return (
     <>
@@ -92,22 +276,33 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
       <Row gutter={[16, 16]}>
         <Col span={24} style={{ textAlign: "right" }}>
           <span>日期筛选：</span>
-          <DatePicker.RangePicker allowClear={false} presets={defaultPresets} />
+          <DatePicker.RangePicker
+            allowClear={false}
+            presets={getDefaultPresets(languageId)}
+            defaultValue={[query.filterTime?.[0], query.filterTime?.[1]]}
+            onChange={(dates) => {
+              if (dates && dates[0] && dates[1]) {
+                setQuery({ filterTime: [dates[0], dates[1]]});
+              }
+            }}
+          />
         </Col>
         <Col flex={4}>
           <StatisticCard
             title="用户"
-            newAddValue={99}
-            totalValue={userCount}
+            newAddValue={statisticInfo?.newUser}
+            totalValue={statisticInfo?.totalUser}
+            loading={statisticInfoLoading}
             icon={UserOutlined}
-            iconColor="red"
+            iconColor="#94070A"
           />
         </Col>
         <Col flex={4}>
           <StatisticCard
             title="账户"
-            newAddValue={99}
-            totalValue={accountCount}
+            newAddValue={statisticInfo?.newAccount}
+            totalValue={statisticInfo?.totalAccount}
+            loading={statisticInfoLoading}
             icon={WalletOutlined}
             iconColor="blue"
           />
@@ -115,8 +310,9 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
         <Col flex={4}>
           <StatisticCard
             title="租户"
-            newAddValue={99}
-            totalValue={tenantCount}
+            newAddValue={statisticInfo?.newTenant}
+            totalValue={statisticInfo?.totalTenant}
+            loading={statisticInfoLoading}
             icon={TeamOutlined}
             iconColor="green"
           />
@@ -124,8 +320,9 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
         <Col flex={4}>
           <StatisticCard
             title="作业"
-            newAddValue={99}
-            totalValue={999}
+            newAddValue={totalNewJobCount}
+            totalValue={jobTotalCount?.count}
+            loading={jobTotalCountLoading || dailyNewJobCountLoading}
             icon={ProjectOutlined}
             iconColor="greyBlue"
           />
@@ -135,6 +332,7 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
             title="消费"
             newAddValue={99}
             totalValue={999}
+            loading={false}
             icon={MoneyCollectOutlined}
             iconColor="yellow"
           />
@@ -148,10 +346,30 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
               </Space>
             )}
             bordered={false}
-            bodyStyle={{ display: "flex", flexDirection: "row" }}
           >
-            <DataLineChart data={data} title="新增用户数"></DataLineChart>
-            <DataLineChart data={data} title="活跃用户数"></DataLineChart>
+            <Row>
+              <Col span={12}>
+                <DataLineChart
+                  data={
+                    newUserCountData.map((d) => ({
+                      x: d.date.format("YYYY-MM-DD"),
+                      y: d.count,
+                    }))}
+                  isLoading={newUserLoading}
+                  title="新增用户数"
+                ></DataLineChart>
+              </Col>
+              <Col span={12}>
+                <DataLineChart
+                  data={activeUserCountData.map((d) => ({
+                    x: d.date.format("YYYY-MM-DD"),
+                    y: d.count,
+                  }))}
+                  title="活跃用户数"
+                  isLoading={activeUserLoading}
+                ></DataLineChart>
+              </Col>
+            </Row>
           </Card>
         </Col>
         <Col span={24}>
@@ -163,12 +381,51 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
               </Space>
             )}
             bordered={false}
-            bodyStyle={{ display: "flex", flexDirection: "row" }}
           >
-            <DataBarChart data={data} title="消费账户TOP10"></DataBarChart>
-            <DataLineChart data={data} title="消费金额"></DataLineChart>
+            <Row>
+              <Col span={12}>
+                <DataBarChart
+                  data={topChargeAccountData}
+                  title="消费账户TOP10"
+                  isLoading={topChargeAccountLoading}
+                  xLabel="账户名"
+                />
+              </Col>
+              <Col span={12}>
+                <DataLineChart
+                  data={dailyChargeData.map((d) => ({
+                    x: d.date.format("YYYY-MM-DD"),
+                    y: d.count,
+                  }))}
+                  title="消费金额"
+                  isLoading={dailyChargeLoading}
+                />
+              </Col>
+            </Row>
+            <Row>
+              <Col span={12}>
+                <DataBarChart
+                  data={topPayAccountData}
+                  title="充值账户TOP10"
+                  isLoading={topPayAccountLoading}
+                  xLabel="账户名"
+                />
+              </Col>
+              <Col span={12}>
+                <DataLineChart
+                  data={dailyPayData.map((d) => ({
+                    x: d.date.format("YYYY-MM-DD"),
+                    y: d.count,
+                  }))}
+                  title="充值金额"
+                  isLoading={dailyPayLoading}
+                />
+              </Col>
+            </Row>
           </Card>
         </Col>
+
+
         <Col span={24}>
           <Card
             title={(
@@ -178,10 +435,27 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
               </Space>
             )}
             bordered={false}
-            bodyStyle={{ display: "flex", flexDirection: "row" }}
           >
-            <DataBarChart data={data} title="作业提交用户TOP10"></DataBarChart>
-            <DataLineChart data={data} title="新增作业数量"></DataLineChart>
+            <Row>
+              <Col span={12}>
+                <DataBarChart
+                  data={topSubmitJobUserData}
+                  title="作业提交用户TOP10"
+                  isLoading={topSubmitJobUserLoading}
+                  xLabel="用户名"
+                />
+              </Col>
+              <Col span={12}>
+                <DataLineChart
+                  data={newJobCountData.map((d) => ({
+                    x: d.date.format("YYYY-MM-DD"),
+                    y: d.count,
+                  }))}
+                  title="新增作业数量"
+                  isLoading={dailyNewJobCountLoading}
+                />
+              </Col>
+            </Row>
           </Card>
         </Col>
         <Col span={24}>
@@ -193,10 +467,29 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
               </Space>
             )}
             bordered={false}
-            bodyStyle={{ display: "flex", flexDirection: "row" }}
           >
-            <DataBarChart data={data} title="门户系统使用功能次数"></DataBarChart>
-            <DataBarChart data={data} title="管理系统使用功能次数"></DataBarChart>
+            <Row>
+              <Col span={12}>
+                <DataBarChart
+                  data={portalUsageCountData.map((d) => ({
+                    x: OperationTypeTexts[d.operationType],
+                    y: d.count,
+                  }))}
+                  title="门户系统使用功能次数"
+                  isLoading={portalUsageCountLoading}
+                />
+              </Col>
+              <Col span={12}>
+                <DataBarChart
+                  data={misUsageCountData.map((d) => ({
+                    x: OperationTypeTexts[d.operationType],
+                    y: d.count,
+                  }))}
+                  title="管理系统使用功能次数"
+                  isLoading={misUsageCountLoading}
+                />
+              </Col>
+            </Row>
           </Card>
         </Col>
       </Row>
@@ -204,33 +497,5 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
   );
 });
 
-export const getServerSideProps: GetServerSideProps<Props> = async (ctx) => {
-  const auth = ssrAuthenticate(
-    (i) => i.platformRoles.includes(PlatformRole.PLATFORM_FINANCE)
-      || i.platformRoles.includes(PlatformRole.PLATFORM_ADMIN),
-  );
-
-  const info = await auth(ctx.req);
-  if (typeof info === "number") {
-    return { props: { error: info } };
-  }
-
-  if (USE_MOCK) {
-    return {
-      props: {
-        platformAdmins: [{ userId: "demo_admin", userName: "demo_admin" }],
-        platformFinancialStaff: [{ userId: "demo_admin", userName: "demo_admin" }],
-        tenantCount: 10,
-        accountCount: 20,
-        userCount: 100,
-      },
-    };
-  }
-
-  const client = getClient(AdminServiceClient);
-  return await asyncClientCall(client, "getAdminInfo", {})
-    .then((response) => ({ props: response }))
-    .catch(() => ({ props: { error: 500 as const } }));
-};
 
 export default PlatformInfoPage;

@@ -200,6 +200,12 @@ export const adminServiceServer = plugin((server) => {
       return [{}];
     },
 
+    /**
+     * Deprecated Notice
+     * This API function getAdminInfo has been deprecated.
+     * Use the new API function getStatisticInfo instead.
+     * @deprecated
+     */
     getAdminInfo: async ({ em }) => {
       const userCount = await em.count(User, {});
       const accountCount = await em.count(Account, {});
@@ -214,6 +220,22 @@ export const adminServiceServer = plugin((server) => {
         tenantCount,
         accountCount,
         userCount,
+      }];
+    },
+
+    getStatisticInfo: async ({ request, em }) => {
+      const { startTime, endTime } = request;
+
+      const totalUser = await em.count(User, {});
+      const totalAccount = await em.count(Account, {});
+      const totalTenant = await em.count(Tenant, {});
+
+      const newUser = await em.count(User, { createTime: { $gte: startTime, $lte: endTime } });
+      const newAccount = await em.count(Account, { createTime: { $gte: startTime, $lte: endTime } });
+      const newTenant = await em.count(Tenant, { createTime: { $gte: startTime, $lte: endTime } });
+
+      return [{
+        totalUser, totalAccount, totalTenant, newUser, newAccount, newTenant,
       }];
     },
   });

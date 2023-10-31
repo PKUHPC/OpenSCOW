@@ -16,6 +16,7 @@ import { readVersionFile } from "@scow/utils/build/version";
 import { config } from "src/config/env";
 import { plugins } from "src/plugins";
 import { operationLogServiceServer } from "src/services/operationLog";
+import { statisticServiceServer } from "src/services/statistic";
 import { logger } from "src/utils/logger";
 
 export async function createServer() {
@@ -34,6 +35,6 @@ export async function createServer() {
     await server.register(plugin);
   }
   await server.register(operationLogServiceServer);
-
+  await server.register(statisticServiceServer);
   return server;
 }

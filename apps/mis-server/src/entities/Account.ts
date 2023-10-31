@@ -18,7 +18,7 @@ import { AccountWhitelist } from "src/entities/AccountWhitelist";
 import { Tenant } from "src/entities/Tenant";
 import { UserAccount } from "src/entities/UserAccount";
 import { DECIMAL_DEFAULT_RAW, DecimalType } from "src/utils/decimal";
-import { EntityOrRef, toRef } from "src/utils/orm";
+import { CURRENT_TIMESTAMP, DATETIME_TYPE, EntityOrRef, toRef } from "src/utils/orm";
 
 @Entity()
 export class Account {
@@ -48,12 +48,16 @@ export class Account {
   @Property({ type: DecimalType, defaultRaw: DECIMAL_DEFAULT_RAW })
     balance: Decimal = new Decimal(0);
 
+  @Property({ columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP, nullable: true })
+    createTime: Date;
+
   constructor(init: {
     accountName: string;
     whitelist?: EntityOrRef<AccountWhitelist>;
     tenant: EntityOrRef<Tenant>;
     blocked: boolean;
     comment?: string;
+    createTime?: Date;
   }) {
     this.accountName = init.accountName;
     this.blocked = init.blocked;
@@ -62,6 +66,7 @@ export class Account {
       this.whitelist = toRef(init.whitelist);
     }
     this.comment = init.comment || "";
+    this.createTime = init.createTime ?? new Date();
   }
 
 

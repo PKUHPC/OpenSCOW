@@ -11,6 +11,7 @@
  */
 
 import { FilterQuery } from "@mikro-orm/core";
+import { OperationEvent } from "@scow/lib-operation-log";
 import {
   OperationLog,
   OperationLogFilter,
@@ -37,7 +38,9 @@ export async function filterOperationLogs(
     ],
     ...(operationType || operationTargetAccountName ? {
       metaData: {
-        ...((operationType) ? { $case: operationType } : {}),
+        ...((operationType) ?
+        { $case: operationType } as OperationEvent
+          : {}),
         ...((operationTargetAccountName) ? { targetAccountName: operationTargetAccountName } : {}),
       },
     } : {}),
@@ -54,15 +57,7 @@ export function toGrpcOperationLog(x: OperationLogEntity): OperationLog {
     operatorIp: x.operatorIp,
     operationTime: x.operationTime?.toISOString(),
     operationResult: operationResultFromJSON(x.operationResult),
+    operationEvent: (x.metaData),
   };
-  if (x.metaData && x.metaData.$case) {
-    // @ts-ignore
-    grpcOperationLog.operationEvent = {
-      $case: x.metaData.$case,
-      [x.metaData.$case]: x.metaData[x.metaData.$case],
-    };
-
-  }
-
   return grpcOperationLog;
 }

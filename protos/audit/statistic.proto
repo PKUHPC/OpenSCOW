@@ -4,18 +4,10 @@ package scow.audit;
 
 import "google/protobuf/timestamp.proto";
 
-message GetNewUserCountRequest {
-  google.protobuf.Timestamp start_time = 1;
-  google.protobuf.Timestamp end_time = 2;
-}
 
 message Data {
   google.protobuf.Timestamp date = 1;
   uint32 count = 2;
-}
-
-message GetNewUserCountResponse {
-  repeated Data results = 1;
 }
 
 message GetActiveUserCountRequest {
@@ -27,35 +19,35 @@ message GetActiveUserCountResponse {
   repeated Data results = 1;
 }
 
-message GetTopSubmitJobUsersRequest {
+message GetPortalUsageCountRequest {
   google.protobuf.Timestamp start_time = 1;
   google.protobuf.Timestamp end_time = 2;
-
-  //如果不传，默认取top10的用户
-  optional uint32 top_rank = 3;
 }
 
-message GetTopSubmitJobUsersResponse {
-  message SubmitJobUser {
-    string user_id = 1;
-    uint32 submit_job_count = 2;
+message GetPortalUsageCountResponse {
+  message Data {
+    string operation_type = 1;
+    uint32 count = 2;
   }
-  repeated SubmitJobUser results = 1;
+  repeated Data results = 1;
 }
 
-message GetNewJobCountRequest {
+message GetMisUsageCountRequest {
   google.protobuf.Timestamp start_time = 1;
   google.protobuf.Timestamp end_time = 2;
 }
 
-message GetNewJobCountResponse {
+message GetMisUsageCountResponse {
+  message Data {
+    string operation_type = 1;
+    uint32 count = 2;
+  }
   repeated Data results = 1;
 }
 
 service StatisticService {
-  rpc GetNewUserCount(GetNewUserCountRequest) returns (GetNewUserCountResponse);
   rpc GetActiveUserCount(GetActiveUserCountRequest) returns (GetActiveUserCountResponse);
-  rpc GetTopSubmitJobUsers(GetTopSubmitJobUsersRequest) returns (GetTopSubmitJobUsersResponse);
-  rpc GetNewJobCount(GetNewJobCountRequest) returns (GetNewJobCountResponse);
+  rpc GetPortalUsageCount(GetPortalUsageCountRequest) returns (GetPortalUsageCountResponse);
+  rpc GetMisUsageCount(GetMisUsageCountRequest) returns (GetMisUsageCountResponse);
 
 }

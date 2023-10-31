@@ -34,9 +34,11 @@ export const operationLogServiceServer = plugin((server) => {
         operationEvent,
       } = request;
 
-      const metaData = operationEvent || {};
+      if (!operationEvent) {
+        return [];
+      }
       const operationType = operationEvent?.$case;
-      const targetAccountName = (operationEvent && operationType)
+      const targetAccountName: string | undefined = (operationEvent && operationType)
         ? operationEvent[operationType].accountName
         : undefined;
 
@@ -46,7 +48,7 @@ export const operationLogServiceServer = plugin((server) => {
         operatorUserId,
         operatorIp,
         operationResult: dbOperationResult,
-        metaData: { ...metaData, targetAccountName },
+        metaData: targetAccountName ? { ...operationEvent, targetAccountName } : operationEvent,
       });
       await em.persistAndFlush(operationLog);
       return [];

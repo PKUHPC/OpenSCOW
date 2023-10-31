@@ -190,7 +190,8 @@
           "primary": false,
           "nullable": false,
           "length": 255,
-          "comment": "分区"
+          "comment": "分区",
+          "mappedType": "unknown"
         },
         "nodelist": {
           "name": "nodelist",
@@ -210,7 +211,8 @@
           "primary": false,
           "nullable": false,
           "length": 255,
-          "comment": "作业名"
+          "comment": "作业名",
+          "mappedType": "unknown"
         },
         "cluster": {
           "name": "cluster",
@@ -1026,6 +1028,17 @@
           "scale": 4,
           "default": "0.0000",
           "mappedType": "decimal"
+        },
+        "create_time": {
+          "name": "create_time",
+          "type": "DATETIME(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 0,
+          "default": "current_timestamp(0)",
+          "mappedType": "datetime"
         }
       },
       "name": "account",

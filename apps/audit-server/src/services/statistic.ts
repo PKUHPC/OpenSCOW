@@ -12,113 +12,131 @@
 
 import { ensureNotUndefined, plugin } from "@ddadaal/tsgrpc-server";
 import { QueryOrder } from "@mikro-orm/core";
+import { OperationType } from "@scow/lib-operation-log";
 import { StatisticServiceServer, StatisticServiceService } from "@scow/protos/build/audit/statistic";
 import { OperationLog } from "src/entities/OperationLog";
-import { generateDateRangeArray } from "src/utils/statistic";
 
 
 export const statisticServiceServer = plugin((server) => {
 
   server.addService<StatisticServiceServer>(StatisticServiceService, {
 
-    getNewUserCount: async ({ request, em }) => {
-
-      const { startTime, endTime } = ensureNotUndefined(request, ["startTime", "endTime"]);
-
-      const days = generateDateRangeArray(startTime, endTime);
-
-      const results = await Promise.all(days.map(async ({ startDate, endDate }) => {
-        const count = await em.count(OperationLog, {
-          $and: [
-            ...([{ operationTime: { $gte: startDate } }]),
-            ...([{ operationTime: { $lte: endDate } }]),
-          ],
-        });
-        return {
-          date: startDate,
-          count,
-        };
-      }));
-
-      return [{
-        results,
-      }];
-    },
-
     getActiveUserCount: async ({ request, em }) => {
 
       const { startTime, endTime } = ensureNotUndefined(request, ["startTime", "endTime"]);
 
-      const days = generateDateRangeArray(startTime, endTime);
+      const qb = em.createQueryBuilder(OperationLog, "o");
 
-      const qb = em.createQueryBuilder(OperationLog);
-
-      const results = await Promise.all(days.map(async ({ startDate, endDate }) => {
-
-        const [{ count }] = await qb.count("operator_user_id", true)
-          .where({ operationTime: { $gte: startDate } })
-          .andWhere({ operationTime: { $lte: endDate } }).execute();
-
-        return {
-          date: startDate,
-          count,
-        };
-
-      }));
-
-      return [{
-        results,
-      }];
-    },
-
-
-    getTopSubmitJobUsers: async ({ request, em }) => {
-      const { startTime, endTime, topRank = 10 } = ensureNotUndefined(request, ["startTime", "endTime"]);
-      const qb = em.createQueryBuilder(OperationLog);
-      const results: {userId: string, submitJobCount: number}[]
-      = await qb
-        .select(["`operator_user_id` as `userId`", "count(`operator_user_id`) as `submit_count`"])
+      qb
+        .select("DATE(o.operation_time) as date, COUNT(o.operator_user_id) as userCount")
         .where({ operationTime: { $gte: startTime } })
         .andWhere({ operationTime: { $lte: endTime } })
-        .andWhere({ metaData: { submitJob: { $ne: null } } })
-        .groupBy("o.operator_user_id")
-        .orderBy({ submitCount: QueryOrder.DESC })
-        .limit(topRank)
-        .execute();
+        .groupBy("DATE(o.operation_time)")
+        .orderBy({ "DATE(o.operation_time)": QueryOrder.DESC });
+
+      const records: {date: string, userCount: number}[] = await qb.execute();
 
       return [{
-        results,
+        results: records.map((record) => ({
+          date: record.date,
+          count: record.userCount,
+        })),
       }];
     },
 
-    getNewJobCount: async ({ request, em }) => {
-
+    getPortalUsageCount: async ({ request, em }) => {
       const { startTime, endTime } = ensureNotUndefined(request, ["startTime", "endTime"]);
 
-      const days = generateDateRangeArray(startTime, endTime);
+      const portalOperationType: OperationType[] = [
+        "submitJob",
+        "endJob",
+        "addJobTemplate",
+        "deleteJobTemplate",
+        "updateJobTemplate",
+        "shellLogin",
+        "createDesktop",
+        "deleteDesktop",
+        "createApp",
+        "createFile",
+        "deleteFile",
+        "uploadFile",
+        "createDirectory",
+        "deleteDirectory",
+        "moveFileItem",
+        "copyFileItem",
+      ];
 
-      const results = await Promise.all(days.map(async ({ startDate, endDate }) => {
-        const count = await em.count(OperationLog, {
-          $and: [
-            ...([{ operationTime: { $gte: startDate } }]),
-            ...([{ operationTime: { $lte: endDate } }]),
-          ],
-          metaData: {
-            submitJob: { $ne: null },
-          },
-        });
-        return {
-          date: startDate,
-          count,
-        };
-      }));
+      const qb = em.createQueryBuilder(OperationLog, "o");
+      qb
+        .select("JSON_EXTRACT(meta_data, '$.$case') as operationType, COUNT(*) as count")
+        .where({ operationTime: { $gte: startTime } })
+        .andWhere({ operationTime: { $lte: endTime } })
+        .andWhere({ "JSON_EXTRACT(meta_data, '$.$case')": { $in: portalOperationType } })
+        .groupBy("JSON_EXTRACT(meta_data, '$.$case')")
+        .orderBy({ "JSON_EXTRACT(meta_data, '$.$case')": QueryOrder.DESC });
+
+      const results: {operationType: string, count: number}[] = await qb.execute();
 
       return [{
         results,
       }];
 
-    },
 
+    },
+    getMisUsageCount: async ({ request, em }) => {
+      const { startTime, endTime } = ensureNotUndefined(request, ["startTime", "endTime"]);
+
+      const misOperationType: OperationType[] = [
+        "setJobTimeLimit",
+        "createUser",
+        "addUserToAccount",
+        "removeUserFromAccount",
+        "setAccountAdmin",
+        "unsetAccountAdmin",
+        "blockUser",
+        "unblockUser",
+        "accountSetChargeLimit",
+        "accountUnsetChargeLimit",
+        "setTenantBilling",
+        "setTenantAdmin",
+        "unsetTenantAdmin",
+        "setTenantFinance",
+        "unsetTenantFinance",
+        "tenantChangePassword",
+        "createAccount",
+        "addAccountToWhitelist",
+        "removeAccountFromWhitelist",
+        "accountPay",
+        "blockAccount",
+        "unblockAccount",
+        "importUsers",
+        "setPlatformAdmin",
+        "unsetPlatformAdmin",
+        "setPlatformFinance",
+        "unsetPlatformFinance",
+        "platformChangePassword",
+        "setPlatformBilling",
+        "createTenant",
+        "tenantPay",
+      ];
+
+      const qb = em.createQueryBuilder(OperationLog, "o");
+      qb
+        .select("JSON_EXTRACT(meta_data, '$.$case') as operationType, COUNT(*) as count")
+        .where({ operationTime: { $gte: startTime } })
+        .andWhere({ operationTime: { $lte: endTime } })
+        .andWhere({ "JSON_EXTRACT(meta_data, '$.$case')": { $in: misOperationType } })
+        .groupBy("JSON_EXTRACT(meta_data, '$.$case')")
+        .orderBy({ "JSON_EXTRACT(meta_data, '$.$case')": QueryOrder.DESC });
+
+      const results: {operationType: string, count: number}[] = await qb.execute();
+
+      return [{
+        results,
+      }];
+
+
+    },
   });
 
 });

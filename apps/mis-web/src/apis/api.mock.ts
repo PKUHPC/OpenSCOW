@@ -287,6 +287,10 @@ export const mockApi: MockApi<typeof api> = {
 
   getRunningJobs: async () => ({ results: [runningJob]}),
 
+  getTopSubmitJobUser: async () => ({ results: [{ userId: "test", count:10 }]}),
+
+  getNewJobCount: async () => ({ results: [{ date: new Date().toISOString(), count: 10 }]}),
+
   getTenantUsers: async () => ({ results: mockUsers }),
 
   logout: async () => null,
@@ -375,6 +379,17 @@ export const mockApi: MockApi<typeof api> = {
   blockAccount: async () => ({ executed: true }),
   unblockAccount: async () => ({ executed: true }),
   updateBlockStatus: async () => null,
+  getNewUserCount: async () => ({ results: [{ date: new Date().toISOString(), count: 10 }]}),
+  getActiveUserCount: async () => ({ results: [{ date: new Date().toISOString(), count: 10 }]}),
+  getTopChargeAccount: async () => ({ results: [{ accountName: "test", chargedAmount: numberToMoney(10) }]}),
+  getDailyCharge: async () => ({ results: [{ date: new Date().toISOString(), amount: numberToMoney(10) }]}),
+  getTopPayAccount: async () => ({ results: [{ accountName: "test", payAmount: numberToMoney(10) }]}),
+  getDailyPay: async () => ({ results: [{ date: new Date().toISOString(), amount: numberToMoney(10) }]}),
+  getPortalUsageCount: async () => ({ results: [{ operationType: "submitJob", count: 10 }]}),
+  getMisUsageCount: async () => ({ results: [{ operationType: "createAccount", count: 10 }]}),
+  getStatisticInfo: async () =>
+    ({ totalUser: 10, totalAccount: 10, totalTenant: 10, newUser: 10, newAccount: 10, newTenant: 10 }),
+  getJobTotalCount: async () => ({ count: 10 }),
   removeUserFromAccount: async () => null,
   setAdmin: async () => ({ executed: true }),
   unsetAdmin: async () => ({ executed: false }),

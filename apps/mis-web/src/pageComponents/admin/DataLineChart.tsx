@@ -10,13 +10,17 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { Spin } from "antd";
 import { Line, LineChart,
   ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { CurveType } from "recharts/types/shape/Curve";
 import { styled } from "styled-components";
 
 interface Props {
+  isLoading: boolean
   title: string
   data: {x: string, y: string | number}[]
+  lineType?: CurveType
 }
 
 export const StatisticContainer = styled.div`
@@ -24,7 +28,6 @@ export const StatisticContainer = styled.div`
   flex-direction: column;
   justify-content: flex-start;
   height: 300px;
-  width: 50%;
 `;
 
 
@@ -33,21 +36,25 @@ export const StatisticTitle = styled.div<{ justify?: string }>`
   margin: 8px 0;
 `;
 
-export const DataLineChart: React.FC<Props> = ({ title, data }) => {
+export const DataLineChart: React.FC<Props> = ({ title, data, isLoading, lineType = "linear" }) => {
 
   return (
     <StatisticContainer>
-      <StatisticTitle>{ title }</StatisticTitle>
-      <ResponsiveContainer height="100%">
-        <LineChart
-          data={data}
-        >
-          <XAxis dataKey="x" padding={{ left: 20, right: 20 }} type="category" />
-          <YAxis padding={{ top: 20 }} />
-          <Tooltip />
-          <Line type="monotone" dataKey="y" stroke="#8884d8" />
-        </LineChart>
-      </ResponsiveContainer>
+      {isLoading ? <Spin /> : (
+        <>
+          <StatisticTitle>{ title }</StatisticTitle>
+          <ResponsiveContainer height="100%">
+            <LineChart
+              data={data}
+            >
+              <XAxis dataKey="x" padding={{ left: 20, right: 20 }} type="category" />
+              <YAxis padding={{ top: 20 }} />
+              <Tooltip />
+              <Line type={ lineType } dataKey="y" stroke="#8884d8" connectNulls={true} />
+            </LineChart>
+          </ResponsiveContainer>
+        </>
+      )}
     </StatisticContainer>
 
   );

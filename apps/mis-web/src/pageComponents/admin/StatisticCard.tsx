@@ -16,8 +16,9 @@ import { styled } from "styled-components"; ;
 
 interface Props {
   title: string
-  newAddValue: number
-  totalValue: number
+  newAddValue: number | undefined
+  totalValue: number | undefined
+  loading: boolean
   icon: React.ReactNode | React.ForwardRefExoticComponent<{}>;
   iconColor?: string
 }
@@ -28,10 +29,7 @@ const Container = styled.div`
   flex: 1;
 `;
 
-const TotalCount = styled.div`
-  align-self: flex-end;
-  margin-left: 30px;
-`;
+
 
 const iconToNode = (Icon: any, color?: string) => {
   return React.isValidElement(Icon)
@@ -40,7 +38,7 @@ const iconToNode = (Icon: any, color?: string) => {
 };
 
 
-const StatisticCard: React.FC<Props> = ({ title, newAddValue, totalValue, icon, iconColor }) => {
+const StatisticCard: React.FC<Props> = ({ title, newAddValue = 0, totalValue = 0, loading, icon, iconColor }) => {
 
   return (
     <Card bodyStyle={{ display: "flex", flexDirection: "row", justifyContent: "space-between", padding: "15px" } }>
@@ -51,11 +49,19 @@ const StatisticCard: React.FC<Props> = ({ title, newAddValue, totalValue, icon, 
             title={title}
             value={newAddValue}
             precision={0}
-            valueStyle={{ color: "red" }}
+            loading={loading}
+            valueStyle={{ color: "#94070A" }}
           />
         </Space>
       </Container>
-      <TotalCount>总{title}: {totalValue}</TotalCount>
+      <Statistic
+        style={{ display: "flex", alignItems: "flex-end" }}
+        title={`总${title}: `}
+        value={totalValue}
+        loading={loading}
+        precision={0}
+        valueStyle={{ color: "#94070A", marginLeft: "10px" }}
+      />
     </Card>
   );
 

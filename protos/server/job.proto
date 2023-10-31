@@ -142,6 +142,43 @@ message GetMissingDefaultPriceItemsResponse {
   repeated string items = 1;
 }
 
+message GetTopSubmitJobUsersRequest {
+  google.protobuf.Timestamp start_time = 1;
+  google.protobuf.Timestamp end_time = 2;
+
+  //如果不传，默认取top10的用户
+  optional uint32 top_rank = 3;
+}
+
+message GetTopSubmitJobUsersResponse {
+  message SubmitJobUser {
+    string user_id = 1;
+    uint32 count = 2;
+  }
+  repeated SubmitJobUser results = 1;
+}
+
+message GetNewJobCountRequest {
+  google.protobuf.Timestamp start_time = 1;
+  google.protobuf.Timestamp end_time = 2;
+}
+
+message GetNewJobCountResponse {
+  message DailyJobCount {
+    google.protobuf.Timestamp date = 1;
+    uint64 count = 2;
+  }
+  repeated DailyJobCount results = 1;
+}
+
+message GetJobTotalCountRequest {
+
+}
+
+message GetJobTotalCountResponse {
+  uint64 count = 1;
+}
+
 service JobService {
   rpc GetJobs(GetJobsRequest) returns (GetJobsResponse);
   rpc GetJobByBiJobIndex(GetJobByBiJobIndexRequest) returns (GetJobByBiJobIndexResponse);
@@ -160,4 +197,10 @@ service JobService {
   rpc AddBillingItem(AddBillingItemRequest) returns (AddBillingItemResponse);
 
   rpc GetMissingDefaultPriceItems(GetMissingDefaultPriceItemsRequest) returns (GetMissingDefaultPriceItemsResponse);
+
+  rpc GetTopSubmitJobUsers(GetTopSubmitJobUsersRequest) returns (GetTopSubmitJobUsersResponse);
+
+  rpc GetNewJobCount(GetNewJobCountRequest) returns (GetNewJobCountResponse);
+
+  rpc GetJobTotalCount(GetJobTotalCountRequest) returns (GetJobTotalCountResponse);
 }

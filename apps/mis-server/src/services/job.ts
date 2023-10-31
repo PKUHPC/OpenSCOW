@@ -375,5 +375,49 @@ export const jobServiceServer = plugin((server) => {
       }
 
     },
+
+    getTopSubmitJobUsers: async ({ request, em }) => {
+      const { startTime, endTime, topRank = 10 } = ensureNotUndefined(request, ["startTime", "endTime"]);
+
+      const qb = em.createQueryBuilder(JobInfoEntity, "j");
+      const results: {userId: string, count: number}[] = await qb
+        .select("j.user as userId, COUNT(*) as count")
+        .where({ timeSubmit: { $gte: startTime } })
+        .andWhere({ timeSubmit: { $lte: endTime } })
+        .groupBy("j.user")
+        .orderBy({ "COUNT(*)": QueryOrder.DESC })
+        .limit(topRank)
+        .execute();
+
+      return [
+        {
+          results,
+        },
+      ];
+    },
+
+    getNewJobCount: async ({ request, em }) => {
+      const { startTime, endTime } = ensureNotUndefined(request, ["startTime", "endTime"]);
+
+      const qb = em.createQueryBuilder(JobInfoEntity, "j");
+      const results: {date: string, count: number}[] = await qb
+        .select("DATE(j.time_submit) as date, COUNT(*) as count")
+        .where({ timeSubmit: { $gte: startTime } })
+        .andWhere({ timeSubmit: { $lte: endTime } })
+        .groupBy("DATE(j.time_submit)")
+        .orderBy({ "DATE(j.time_submit)": QueryOrder.DESC })
+        .execute();
+
+      return [
+        {
+          results,
+        },
+      ];
+    },
+
+    getJobTotalCount: async ({ em }) => {
+      const count = await em.count(JobInfoEntity, {});
+      return [{ count }];
+    },
   });
 });

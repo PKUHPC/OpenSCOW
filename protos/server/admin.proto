@@ -133,14 +133,30 @@ message UpdateBlockStatusResponse{
 }
 
 message GetAdminInfoRequest {
+  option deprecated = true;
 }
 
 message GetAdminInfoResponse {
+  option deprecated = true;
   repeated PlatFormAdminInfo platform_admins = 1;
   uint64 tenant_count = 2;
   uint64 account_count = 3;
   uint64 user_count = 4;
   repeated PlatFormFinancialStaffInfo platform_financial_staff = 5;
+}
+
+message GetStatisticInfoRequest {
+  google.protobuf.Timestamp start_time = 1;
+  google.protobuf.Timestamp end_time = 2;
+}
+
+message GetStatisticInfoResponse {
+  uint64 total_user = 1;
+  uint64 total_account = 2;
+  uint64 total_tenant = 3;
+  uint64 new_user = 4;
+  uint64 new_account = 5;
+  uint64 new_tenant = 6;
 }
 
 service AdminService {
@@ -155,5 +171,15 @@ service AdminService {
   rpc FetchJobs(FetchJobsRequest) returns (FetchJobsResponse);
   rpc UpdateBlockStatus(UpdateBlockStatusRequest)
     returns (UpdateBlockStatusResponse);
-  rpc GetAdminInfo(GetAdminInfoRequest) returns (GetAdminInfoResponse);
+  /**
+   * Depracated Notice
+   * This API funcition GetAdminInfo has been deprecated.
+   * Use the new API function GetStatisticInfo instead.
+   */
+  rpc GetAdminInfo(GetAdminInfoRequest) returns (GetAdminInfoResponse) {
+    option deprecated = true;
+  };
+
+  rpc GetStatisticInfo(GetStatisticInfoRequest)
+    returns (GetStatisticInfoResponse);
 }

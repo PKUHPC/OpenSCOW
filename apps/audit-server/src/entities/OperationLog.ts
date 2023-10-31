@@ -10,8 +10,10 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Entity, Enum, OptionalProps, PrimaryKey, Property } from "@mikro-orm/core";
-import { CURRENT_TIMESTAMP, DATETIME_TYPE } from "src/utils/orm";
+import { Entity, Enum, PrimaryKey, Property } from "@mikro-orm/core";
+import { OperationEvent } from "@scow/lib-operation-log";
+import { CURRENT_TIMESTAMP, DATETIME_TYPE } from "src/utils/orm"; ;
+
 
 export enum OperationResult {
   UNKNOWN = "UNKNOWN",
@@ -21,8 +23,6 @@ export enum OperationResult {
 
 @Entity()
 export class OperationLog {
-
-  [OptionalProps]?: "submitCount";
 
   @PrimaryKey()
     id!: number;
@@ -40,30 +40,27 @@ export class OperationLog {
     operationResult: OperationResult;
 
   @Property({ type: "json", nullable: true })
-    metaData?: { [key: string]: any; };
+    metaData?: OperationEvent & { targetAccountName?: string };
 
-    @Property({ persist: false })
-      submitCount!: number;
-
-    constructor(init: {
+  constructor(init: {
       operationLogId?: number;
       operatorUserId: string;
       operatorIp: string;
       operationTime?: Date;
       operationResult: OperationResult;
-      metaData: { [key: string]: any };
+      metaData: OperationEvent & { targetAccountName?: string };
     }) {
-      if (init.operationLogId) {
-        this.id = init.operationLogId;
-      }
-      this.operatorUserId = init.operatorUserId;
-      this.operatorIp = init.operatorIp;
-      if (init.operationTime) {
-        this.operationTime = init.operationTime;
-      }
-      this.operationResult = init.operationResult;
-      this.metaData = init.metaData;
+    if (init.operationLogId) {
+      this.id = init.operationLogId;
     }
+    this.operatorUserId = init.operatorUserId;
+    this.operatorIp = init.operatorIp;
+    if (init.operationTime) {
+      this.operationTime = init.operationTime;
+    }
+    this.operationResult = init.operationResult;
+    this.metaData = init.metaData;
+  }
 
 }
 

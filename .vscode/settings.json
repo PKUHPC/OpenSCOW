@@ -5,5 +5,25 @@
       "--proto_path=./protos"
     ],
   },
-  "buf.binaryPath": "node_modules/@bufbuild/buf/bin/buf"
+  "buf.binaryPath": "node_modules/@bufbuild/buf/bin/buf",
+  "cSpell.words": [
+    "bufbuild",
+    "dbaeumer",
+    "ddadaal",
+    "devcontainer",
+    "devcontainers",
+    "drawio",
+    "Expt",
+    "hediet",
+    "intellicode",
+    "mikro",
+    "Mulan",
+    "pino",
+    "PKUHPC",
+    "proto",
+    "protobuf",
+    "protos",
+    "tsgrpc",
+    "vscodeintellicode"
+  ]
 }
