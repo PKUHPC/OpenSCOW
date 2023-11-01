@@ -45,7 +45,7 @@ export const CreateFileModal: React.FC<Props> = ({ open, onClose, path, reload, 
     await api.createFile({ body: { cluster, path: join(path, newFileName) } })
       .httpError(409, () => { message.error(t(p("createErrorMessage"))); })
       .then(() => {
-        message.success(t(p("createErrorMessage")));
+        message.success(t(p("createSuccessMessage")));
         reload();
         onClose();
         form.resetFields();

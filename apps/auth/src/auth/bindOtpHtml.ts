@@ -46,7 +46,8 @@ export async function renderBindOtpHtml(
     authTexts: authTexts,
     cssUrl: join(config.BASE_PATH, config.AUTH_BASE_PATH, "/public/assets/tailwind.min.css"),
     faviconUrl: join(config.BASE_PATH, FAVICON_URL),
-    backgroundColor: uiConfig.primaryColor?.defaultColor ?? DEFAULT_PRIMARY_COLOR,
+    backgroundColor: (hostname && uiConfig.primaryColor?.hostnameMap?.[hostname])
+      ?? uiConfig.primaryColor?.defaultColor ?? DEFAULT_PRIMARY_COLOR,
     err,
     callbackUrl,
     footerText: (hostname && uiConfig?.footer?.hostnameMap?.[hostname])
