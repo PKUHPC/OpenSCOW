@@ -1037,7 +1037,6 @@
           "primary": false,
           "nullable": true,
           "length": 0,
-          "default": "current_timestamp(0)",
           "mappedType": "datetime"
         }
       },

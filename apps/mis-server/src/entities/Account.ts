@@ -48,7 +48,7 @@ export class Account {
   @Property({ type: DecimalType, defaultRaw: DECIMAL_DEFAULT_RAW })
     balance: Decimal = new Decimal(0);
 
-  @Property({ columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP, nullable: true })
+  @Property({ columnType: DATETIME_TYPE, nullable: true })
     createTime: Date;
 
   constructor(init: {
