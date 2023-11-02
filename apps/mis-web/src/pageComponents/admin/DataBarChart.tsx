@@ -63,7 +63,7 @@ export const DataBarChart: React.FC<Props> = ({
                   />
                   <YAxis padding={{ top: 20 }} />
                   <Tooltip />
-                  <Bar dataKey="y" fill="#8884d8" barSize={ 40 } />
+                  <Bar dataKey="y" fill="#54a0ff" barSize={ 40 } />
                 </BarChart>
               </ResponsiveContainer>
             )}

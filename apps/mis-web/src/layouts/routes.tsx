@@ -11,9 +11,9 @@
  */
 
 import {
-  AccountBookOutlined, BookOutlined, CloudServerOutlined,
-  DashboardOutlined,
-  InfoOutlined, LinkOutlined, LockOutlined, MoneyCollectOutlined, PartitionOutlined,
+  AccountBookOutlined, BookOutlined, CloudServerOutlined, DashboardOutlined,
+  InfoOutlined, LineChartOutlined,
+  LinkOutlined, LockOutlined, MoneyCollectOutlined, PartitionOutlined,
   PlusOutlined, PlusSquareOutlined, ProfileOutlined,
   StarOutlined, ToolOutlined, UserAddOutlined,
   UserOutlined } from "@ant-design/icons";
@@ -139,7 +139,7 @@ export const platformAdminRoutes: (platformRoles: PlatformRole[], t: TransType) 
         }] : []),
       ...(platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ?
         [{
-          Icon: BookOutlined,
+          Icon: LineChartOutlined,
           text: t("layouts.route.common.statistics"),
           path: "/admin/statistics",
         }] : []),

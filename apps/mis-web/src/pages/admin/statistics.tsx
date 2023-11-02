@@ -255,6 +255,13 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
     return 0;
   }, [dailyNewJobCount]);
 
+  const totalChargeAmount = useMemo(() => {
+    if (dailyCharge) {
+      return dailyCharge?.results.reduce((pre, cur) => pre + moneyToNumber(cur.amount), 0);
+    }
+    return 0;
+  }, [dailyCharge]);
+
   const portalUsageCountData = useMemo(() => {
     if (portalUsageCount) {
       return portalUsageCount.results;
@@ -304,7 +311,7 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
             totalValue={statisticInfo?.totalAccount}
             loading={statisticInfoLoading}
             icon={WalletOutlined}
-            iconColor="blue"
+            iconColor="#2e86de"
           />
         </Col>
         <Col flex={4}>
@@ -314,7 +321,7 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
             totalValue={statisticInfo?.totalTenant}
             loading={statisticInfoLoading}
             icon={TeamOutlined}
-            iconColor="green"
+            iconColor="#1dd1a1"
           />
         </Col>
         <Col flex={4}>
@@ -324,24 +331,24 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
             totalValue={jobTotalCount?.count}
             loading={jobTotalCountLoading || dailyNewJobCountLoading}
             icon={ProjectOutlined}
-            iconColor="greyBlue"
+            iconColor="#8395a7"
           />
         </Col>
         <Col flex={4}>
           <StatisticCard
             title="消费"
-            newAddValue={99}
+            newAddValue={totalChargeAmount}
             totalValue={999}
             loading={false}
             icon={MoneyCollectOutlined}
-            iconColor="yellow"
+            iconColor="#feca57"
           />
         </Col>
         <Col span={24}>
           <Card
             title={(
-              <Space>
-                <UserOutlined style={{ fontSize: "24px", color: "red" }} />
+              <Space align="baseline">
+                <UserOutlined style={{ fontSize: "24px", color: "#94070A" }} />
                 <TitleText>用户数量</TitleText>
               </Space>
             )}
@@ -375,8 +382,8 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
         <Col span={24}>
           <Card
             title={(
-              <Space>
-                <MoneyCollectOutlined style={{ fontSize: "24px", color: "yellow" }} />
+              <Space align="baseline">
+                <MoneyCollectOutlined style={{ fontSize: "24px", color: "#feca57" }} />
                 <TitleText>消费/充值金额</TitleText>
               </Space>
             )}
@@ -429,8 +436,8 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
         <Col span={24}>
           <Card
             title={(
-              <Space>
-                <ProjectOutlined style={{ fontSize: "24px", color: "blue" }} />
+              <Space align="baseline">
+                <ProjectOutlined style={{ fontSize: "24px", color: "#8395a7" }} />
                 <TitleText>作业</TitleText>
               </Space>
             )}
@@ -461,7 +468,7 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
         <Col span={24}>
           <Card
             title={(
-              <Space>
+              <Space align="baseline">
                 <PlayCircleOutlined style={{ fontSize: "24px", color: "black" }} />
                 <TitleText>系统功能使用统计</TitleText>
               </Space>

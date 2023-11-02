@@ -34,7 +34,7 @@ const Container = styled.div`
 const iconToNode = (Icon: any, color?: string) => {
   return React.isValidElement(Icon)
     ? Icon
-    : <Icon style={{ fontSize: 40, color }} />;
+    : <Icon style={{ fontSize: 64, color }} />;
 };
 
 
@@ -60,7 +60,7 @@ const StatisticCard: React.FC<Props> = ({ title, newAddValue = 0, totalValue = 0
         value={totalValue}
         loading={loading}
         precision={0}
-        valueStyle={{ color: "#94070A", marginLeft: "10px" }}
+        valueStyle={{ color: "grey", marginLeft: "10px", fontSize: 14, marginBottom: 4 }}
       />
     </Card>
   );

@@ -50,7 +50,7 @@ export const DataLineChart: React.FC<Props> = ({ title, data, isLoading, lineTyp
               <XAxis dataKey="x" padding={{ left: 20, right: 20 }} type="category" />
               <YAxis padding={{ top: 20 }} />
               <Tooltip />
-              <Line type={ lineType } dataKey="y" stroke="#8884d8" connectNulls={true} />
+              <Line type={ lineType } dataKey="y" stroke="#54a0ff" connectNulls={true} />
             </LineChart>
           </ResponsiveContainer>
         </>
