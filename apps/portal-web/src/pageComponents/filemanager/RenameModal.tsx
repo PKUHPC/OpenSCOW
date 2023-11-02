@@ -12,7 +12,7 @@
 
 import { App, Form, Input, Modal } from "antd";
 import { dirname, join } from "path";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { api } from "src/apis";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 
@@ -37,6 +37,8 @@ export const RenameModal: React.FC<Props> = ({ open, onClose, path, reload, clus
   const [form] = Form.useForm<FormProps>();
   const [loading, setLoading] = useState(false);
 
+  const containerRef = useRef(null);
+
   const t = useI18nTranslateToString();
 
   const onSubmit = async () => {
@@ -54,24 +56,27 @@ export const RenameModal: React.FC<Props> = ({ open, onClose, path, reload, clus
   };
 
   return (
-    <Modal
-      open={open}
-      title={t(p("title"))}
-      okText={t("button.confirmButton")}
-      cancelText={t("button.cancelButton")}
-      onCancel={onClose}
-      confirmLoading={loading}
-      destroyOnClose
-      onOk={form.submit}
-    >
-      <Form form={form} onFinish={onSubmit}>
-        <Form.Item label={t(p("renameLabel"))}>
-          <strong>{path}</strong>
-        </Form.Item>
-        <Form.Item<FormProps> label={t(p("newFileName"))} name="newFileName" rules={[{ required: true }]}>
-          <Input />
-        </Form.Item>
-      </Form>
-    </Modal>
+    <div ref={containerRef} onDoubleClick={(event) => event.stopPropagation()}>
+      <Modal
+        open={open}
+        title={t(p("title"))}
+        okText={t("button.confirmButton")}
+        cancelText={t("button.cancelButton")}
+        onCancel={onClose}
+        confirmLoading={loading}
+        destroyOnClose
+        onOk={form.submit}
+        getContainer={containerRef.current || false}
+      >
+        <Form form={form} onFinish={onSubmit}>
+          <Form.Item label={t(p("renameLabel"))}>
+            <strong>{path}</strong>
+          </Form.Item>
+          <Form.Item<FormProps> label={t(p("newFileName"))} name="newFileName" rules={[{ required: true }]}>
+            <Input />
+          </Form.Item>
+        </Form>
+      </Modal>
+    </div>
   );
 };
