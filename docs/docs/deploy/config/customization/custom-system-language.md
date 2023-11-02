@@ -19,7 +19,7 @@ title: 自定义系统语言
 当管理员通过配置项systemLanguage自定义系统语言时，无论是指定系统唯一语言或者是指定页面文本国际化的默认语言，
 都需要确保配置的语言为当前系统的合法语言，否则系统无法启动。
 
-目前SCOW系统下支持的合法语言字符串为`"zh_cn"`和`"en"`。
+目前SCOW系统下支持的合法语言为简体中文与英文，字符串枚举值为`"zh_cn"`和`"en"`。
 
 :::
 
@@ -27,16 +27,15 @@ title: 自定义系统语言
 
 ```yaml title="config/common.yml"
 
-# # 设置系统语言 可选配置 类型为对象或字符串，默认值为对象类型
-# # 1.systemLanguage对象类型
+# 设置系统语言 可选配置 类型为对象或字符串，默认值为对象类型
+# 1.systemLanguage对象类型
 systemLanguage:
-#   # 可选，类型为boolean，默认为true。
-#   # 如果true，则SCOW在用户未手动选择语言时，自动根据cookie, header等判断语言，如判断失败使用default语言
-#   # 如果为false，则SCOW首次进入系统时使用下方配置的default语言
+  # 跟随系统判断初始语言。可选填，类型为boolean，默认为true。
+  # 如果true，则SCOW在用户未手动选择语言时，自动根据cookie, header等判断语言，如判断失败使用default语言
+  # 如果为false，则SCOW首次进入系统时使用下方配置的default语言
   autoDetect: true
-#   # 默认语言，当systemLanguage为对象类型时必须设置。
-#   # 类型必须为当前系统合法语言["zh_cn"，"en"]的字符串枚举值
-#   # 若没有配置systemLanguage，则默认为"zh_cn"
+  # 默认语言，可选填，默认值为"zh_cn"。
+  # 类型必须为当前系统合法语言["zh_cn"，"en"]的字符串枚举值
   default: "zh_cn"
 
 # 2.systemLanguage字符串类型
@@ -48,21 +47,12 @@ systemLanguage:
 
 ## 配置结果示例
 
-1.如果没有配置`systemLanguage`，则等同于下方类似配置。
+1.如果没有配置`systemLanguage`，或配置为`systemLanguage: {}`，则等同于下方类似配置。
 
 ```yaml title="config/common.yml"
 
 systemLanguage:
   autoDetect: true 
-  default: "zh_cn"
-
-```
-
-或者
-
-```yaml title="config/common.yml"
-
-systemLanguage:
   default: "zh_cn"
 
 ```
@@ -85,7 +75,7 @@ systemLanguage:
 其含义为使用系统的页面国际化功能，允许用户在使用时手动切换语言。初始语言不跟随系统判断。
 即不考虑浏览器`Cookie`中保存的语言信息和浏览器偏好语言，每次进入SCOW系统时默认初始语言均为配置的`default: "zh_cn"`。
 
-3.如果不使用国际化功能。则需满足下列类似配置。
+3.如果不使用国际化功能。则需满足下方类似配置。
 
 ```yaml title="config/common.yml"
 

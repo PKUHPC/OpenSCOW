@@ -29,9 +29,9 @@ passwordPattern:
 #   # 如果true，则SCOW在用户未手动选择语言时，自动根据cookie, header等判断语言，如判断失败使用default语言
 #   # 如果为false，则SCOW首次进入系统时使用下方配置的default语言
 #   autoDetect: true
-#   # 默认语言，当systemLanguage为对象类型时必须设置。
+#   # 默认语言，选填。
 #   # 类型必须为当前系统合法语言["zh_cn"，"en"]的字符串枚举值
-#   # 若没有配置systemLanguage，则默认为"zh_cn"
+#   # 若没有配置，则默认为"zh_cn"
 #   default: "zh_cn"
 
 # 2.systemLanguage字符串类型

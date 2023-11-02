@@ -52,8 +52,8 @@ export const CommonConfigSchema = Type.Object({
   systemLanguage: Type.Optional(Type.Union([
     Type.Object({
       autoDetect: Type.Optional(Type.Boolean({ description: "是否跟随系统进行语言选择" })),
-      default: Type.Enum(SYSTEM_VALID_LANGUAGE_ENUM,
-        { description: "系统默认语言" }),
+      default: Type.Optional(Type.Enum(SYSTEM_VALID_LANGUAGE_ENUM,
+        { description: "系统默认语言" })),
     }, {
       description: "允许手动切换SCOW支持的合法语言，可以指定系统默认语言" }),
     Type.Enum(SYSTEM_VALID_LANGUAGE_ENUM, { description: "SCOW使用的文本语言，不再允许手动切换" }),
@@ -62,6 +62,7 @@ export const CommonConfigSchema = Type.Object({
 });
 
 export const getSystemLanguageConfig = (systemLanguage: SystemLanguage): SystemLanguageConfig => {
+
   if (typeof systemLanguage === "string") {
     return { defaultLanguage: systemLanguage, isUsingI18n: false };
   }
