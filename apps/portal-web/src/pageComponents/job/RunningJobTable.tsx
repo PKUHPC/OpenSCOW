@@ -139,12 +139,13 @@ export const RunningJobInfoTable: React.FC<JobInfoTableProps> = ({
         loading={isLoading}
         pagination={{ showSizeChanger: true }}
         rowKey={runningJobId}
-        scroll={{ x: true }}
+        scroll={{ x: 1850 }}
       >
         {
           showCluster && (
             <Table.Column<RunningJobInfo>
               dataIndex="cluster"
+              width={150}
               title={t(p("jobInfoTable.cluster"))}
               render={(_, r) => getI18nConfigCurrentText(r.cluster.name, languageId)}
             />
@@ -152,38 +153,47 @@ export const RunningJobInfoTable: React.FC<JobInfoTableProps> = ({
         }
         <Table.Column<RunningJobInfo>
           dataIndex="jobId"
+          width={80}
           title={t(p("jobInfoTable.jobId"))}
           sorter={(a, b) => a.jobId.localeCompare(b.jobId)}
         />
         {
           showUser && (
-            <Table.Column<RunningJobInfo> dataIndex="user" title={t(p("jobInfoTable.user"))} />
+            <Table.Column<RunningJobInfo> dataIndex="user" width={120} title={t(p("jobInfoTable.user"))} />
           )
         }
         {
           showAccount && (
-            <Table.Column<RunningJobInfo> dataIndex="account" title={t(p("jobInfoTable.account"))} />
+            <Table.Column<RunningJobInfo> dataIndex="account" width={120} title={t(p("jobInfoTable.account"))} />
           )
         }
-        <Table.Column<RunningJobInfo> dataIndex="name" title={t(p("jobInfoTable.name"))} />
-        <Table.Column<RunningJobInfo> dataIndex="partition" title={t(p("jobInfoTable.partition"))} />
-        <Table.Column<RunningJobInfo> dataIndex="qos" title={t(p("jobInfoTable.qos"))} />
-        <Table.Column<RunningJobInfo> dataIndex="nodes" title={t(p("jobInfoTable.nodes"))} />
-        <Table.Column<RunningJobInfo> dataIndex="cores" title={t(p("jobInfoTable.cores"))} />
-        <Table.Column<RunningJobInfo> dataIndex="gpus" title={t(p("jobInfoTable.gpus"))} />
-        <Table.Column<RunningJobInfo> dataIndex="state" title={t(p("jobInfoTable.state"))} />
+        <Table.Column<RunningJobInfo>
+          dataIndex="name"
+          title={t(p("jobInfoTable.name"))}
+          width={200}
+          ellipsis={true}
+        />
+        <Table.Column<RunningJobInfo> dataIndex="partition" width={80} title={t(p("jobInfoTable.partition"))} />
+        <Table.Column<RunningJobInfo> dataIndex="qos" width={80} title={t(p("jobInfoTable.qos"))} />
+        <Table.Column<RunningJobInfo> dataIndex="nodes" width={80} title={t(p("jobInfoTable.nodes"))} />
+        <Table.Column<RunningJobInfo> dataIndex="cores" width={80} title={t(p("jobInfoTable.cores"))} />
+        <Table.Column<RunningJobInfo> dataIndex="gpus" width={90} title={t(p("jobInfoTable.gpus"))} />
+        <Table.Column<RunningJobInfo> dataIndex="state" width={110} title={t(p("jobInfoTable.state"))} />
         <Table.Column
           dataIndex="runningOrQueueTime"
+          width={120}
           title={t(p("jobInfoTable.runningOrQueueTime"))}
         />
         <Table.Column<RunningJobInfo>
           dataIndex="nodesOrReason"
+          ellipsis={true}
           title={t(p("jobInfoTable.nodesOrReason"))}
           render={(d: string) => d.startsWith("(") && d.endsWith(")") ? d.substring(1, d.length - 1) : d}
         />
-        <Table.Column<RunningJobInfo> dataIndex="timeLimit" title={t(p("jobInfoTable.timeLimit"))} />
+        <Table.Column<RunningJobInfo> dataIndex="timeLimit" width={120} title={t(p("jobInfoTable.timeLimit"))} />
         <Table.Column<RunningJobInfo>
           title={t(p("jobInfoTable.more"))}
+          width={180}
           render={(_, r) => (
             <Space>
               <a onClick={() => Router.push(join("/files", r.cluster.id, r.workingDir))}>

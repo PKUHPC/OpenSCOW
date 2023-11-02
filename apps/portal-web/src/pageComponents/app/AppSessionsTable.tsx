@@ -83,6 +83,7 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster }) => {
     {
       title: t(p("table.sessionId")),
       dataIndex: "sessionId",
+      width:"30%",
     },
     {
       title: t(p("table.jobId")),

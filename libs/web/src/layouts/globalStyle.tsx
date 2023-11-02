@@ -31,5 +31,10 @@ export const GlobalStyle = createGlobalStyle`
     overflow-y: scroll;
   }
  // 对日期组件在手机端展示做样式兼容处理(止)
+
+ //  对表格组件样式统一处理
+  .ant-table-wrapper .ant-table-thead >tr>th, .ant-table-wrapper .ant-table-thead >tr>td {
+    white-space: nowrap;
+  }
 `;
 
