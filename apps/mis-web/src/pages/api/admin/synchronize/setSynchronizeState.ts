@@ -18,16 +18,20 @@ import { authenticate } from "src/auth/server";
 import { PlatformRole } from "src/models/User";
 import { getClient } from "src/utils/client";
 
-export const UpdateBlockStatusSchema = typeboxRouteSchema({
-  method: "PUT",
+export const SetSyncBlockStatusStateSchema = typeboxRouteSchema({
+  method: "POST",
+
+  query: Type.Object({
+    started: Type.Boolean(),
+  }),
 
   responses: {
-    200: Type.Null(),
+    204: Type.Null(),
   },
 });
 const auth = authenticate((info) => info.platformRoles.includes(PlatformRole.PLATFORM_ADMIN));
 
-export default typeboxRoute(UpdateBlockStatusSchema,
+export default typeboxRoute(SetSyncBlockStatusStateSchema,
   async (req, res) => {
 
     const info = await auth(req, res);
@@ -35,6 +39,8 @@ export default typeboxRoute(UpdateBlockStatusSchema,
 
     const client = getClient(AdminServiceClient);
 
-    return await asyncClientCall(client, "updateBlockStatus", {}).then(() => ({ 200: null }));
+    await asyncClientCall(client, "setSyncBlockStatusState", { started: req.query.started });
+
+    return { 204: null };
 
   });
