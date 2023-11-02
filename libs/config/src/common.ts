@@ -48,6 +48,7 @@ export const CommonConfigSchema = Type.Object({
       openInNewPage: Type.Optional(Type.Boolean({ description:"一级导航是否默认在新页面打开", default: false })),
     }),
   )),
+  redisUrl: Type.String({ description: "redis服务的URL", default: "redis:6379" }),
 });
 
 const COMMON_CONFIG_NAME = "common";

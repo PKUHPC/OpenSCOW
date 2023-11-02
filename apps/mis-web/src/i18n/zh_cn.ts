@@ -148,6 +148,7 @@ export default {
     route: {
       common:{
         operationLog:"操作日志",
+        statistics: "平台数据统计",
       },
       navLinkText: "门户",
       dashboard: "仪表盘",

@@ -133,11 +133,9 @@ message UpdateBlockStatusResponse{
 }
 
 message GetAdminInfoRequest {
-  option deprecated = true;
 }
 
 message GetAdminInfoResponse {
-  option deprecated = true;
   repeated PlatFormAdminInfo platform_admins = 1;
   uint64 tenant_count = 2;
   uint64 account_count = 3;
@@ -171,11 +169,6 @@ service AdminService {
   rpc FetchJobs(FetchJobsRequest) returns (FetchJobsResponse);
   rpc UpdateBlockStatus(UpdateBlockStatusRequest)
     returns (UpdateBlockStatusResponse);
-  /**
-   * Depracated Notice
-   * This API funcition GetAdminInfo has been deprecated.
-   * Use the new API function GetStatisticInfo instead.
-   */
   rpc GetAdminInfo(GetAdminInfoRequest) returns (GetAdminInfoResponse) {
     option deprecated = true;
   };

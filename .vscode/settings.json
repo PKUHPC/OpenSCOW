@@ -5,5 +5,5 @@
       "--proto_path=./protos"
     ],
   },
-  "buf.binaryPath": "node_modules/@bufbuild/buf/bin/buf",
+  "buf.binaryPath": "node_modules/@bufbuild/buf/bin/buf"
 }

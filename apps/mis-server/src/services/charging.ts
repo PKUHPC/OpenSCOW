@@ -21,6 +21,7 @@ import { Account } from "src/entities/Account";
 import { ChargeRecord } from "src/entities/ChargeRecord";
 import { PayRecord } from "src/entities/PayRecord";
 import { Tenant } from "src/entities/Tenant";
+import { queryWithRedisCache } from "src/plugins/redis";
 import { CHARGE_TYPE_OTHERS } from "src/utils/constants"; ;
 
 
@@ -277,8 +278,10 @@ export const chargingServiceServer = plugin((server) => {
     getTopChargeAccount: async ({ request, em }) => {
       const { startTime, endTime, topRank = 10 } = ensureNotUndefined(request, ["startTime", "endTime"]);
 
+      const redisKey = `{get_top_charge_account:${startTime}:${endTime}:${topRank}`;
+
       const qb = em.createQueryBuilder(ChargeRecord, "cr");
-      const results: {accountName: string, totalAmount: number}[] = await qb
+      qb
         .select("cr.accountName")
         .addSelect(["SUM(cr.amount) as `totalAmount`"])
         .where({ time: { $gte: startTime } })
@@ -286,8 +289,13 @@ export const chargingServiceServer = plugin((server) => {
         .andWhere({ accountName: { $ne: null } })
         .groupBy("accountName")
         .orderBy({ "SUM(cr.amount)": QueryOrder.DESC })
-        .limit(topRank)
-        .execute();
+        .limit(topRank);
+
+      const results: {accountName: string, totalAmount: number}[] = await queryWithRedisCache({
+        redisKey,
+        queryQb: qb,
+        expireTime: 24 * 60 * 60,
+      });
 
       return [
         {
@@ -303,6 +311,8 @@ export const chargingServiceServer = plugin((server) => {
 
       const { startTime, endTime } = ensureNotUndefined(request, ["startTime", "endTime"]);
 
+      const redisKey = `{get_daily_charge:${startTime}:${endTime}`;
+
       const qb = em.createQueryBuilder(ChargeRecord, "cr");
 
       qb
@@ -313,7 +323,11 @@ export const chargingServiceServer = plugin((server) => {
         .groupBy("DATE(cr.time)")
         .orderBy({ "DATE(cr.time)": QueryOrder.DESC });
 
-      const records: {date: string, totalAmount: number}[] = await qb.execute();
+      const records: {date: string, totalAmount: number}[] = await queryWithRedisCache({
+        redisKey,
+        queryQb: qb,
+        expireTime: 24 * 60 * 60,
+      });
 
       return [{
         results: records.map((record) => ({
@@ -326,8 +340,10 @@ export const chargingServiceServer = plugin((server) => {
     getTopPayAccount: async ({ request, em }) => {
       const { startTime, endTime, topRank = 10 } = ensureNotUndefined(request, ["startTime", "endTime"]);
 
+      const redisKey = `{get_top_pay_account:${startTime}:${endTime}:${topRank}`;
+
       const qb = em.createQueryBuilder(PayRecord, "p");
-      const results: {accountName: string, totalAmount: number}[] = await qb
+      qb
         .select("p.accountName")
         .addSelect(["SUM(p.amount) as `totalAmount`"])
         .where({ time: { $gte: startTime } })
@@ -335,8 +351,13 @@ export const chargingServiceServer = plugin((server) => {
         .andWhere({ accountName: { $ne: null } })
         .groupBy("accountName")
         .orderBy({ "SUM(p.amount)": QueryOrder.DESC })
-        .limit(topRank)
-        .execute();
+        .limit(topRank);
+
+      const results: {accountName: string, totalAmount: number}[] = await queryWithRedisCache({
+        redisKey,
+        queryQb: qb,
+        expireTime: 24 * 60 * 60,
+      });
 
       return [
         {
@@ -352,6 +373,8 @@ export const chargingServiceServer = plugin((server) => {
 
       const { startTime, endTime } = ensureNotUndefined(request, ["startTime", "endTime"]);
 
+      const redisKey = `{get_daily_charge:${startTime}:${endTime}`;
+
       const qb = em.createQueryBuilder(PayRecord, "pr");
 
       qb
@@ -362,7 +385,11 @@ export const chargingServiceServer = plugin((server) => {
         .groupBy("DATE(pr.time)")
         .orderBy({ "DATE(pr.time)": QueryOrder.DESC });
 
-      const records: {date: string, totalAmount: number}[] = await qb.execute();
+      const records: {date: string, totalAmount: number}[] = await queryWithRedisCache({
+        redisKey,
+        queryQb: qb,
+        expireTime: 24 * 60 * 60,
+      });
 
       return [{
         results: records.map((record) => ({

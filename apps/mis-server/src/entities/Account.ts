@@ -18,7 +18,7 @@ import { AccountWhitelist } from "src/entities/AccountWhitelist";
 import { Tenant } from "src/entities/Tenant";
 import { UserAccount } from "src/entities/UserAccount";
 import { DECIMAL_DEFAULT_RAW, DecimalType } from "src/utils/decimal";
-import { CURRENT_TIMESTAMP, DATETIME_TYPE, EntityOrRef, toRef } from "src/utils/orm";
+import { DATETIME_TYPE, EntityOrRef, toRef } from "src/utils/orm";
 
 @Entity()
 export class Account {

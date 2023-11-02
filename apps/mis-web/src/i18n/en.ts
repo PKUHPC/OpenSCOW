@@ -148,6 +148,7 @@ export default {
     route: {
       common: {
         operationLog: "Operation Log",
+        statistics: "Statistics",
       },
       navLinkText: "Portal",
       dashboard: "Dashboard",

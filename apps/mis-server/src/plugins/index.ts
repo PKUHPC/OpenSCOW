@@ -25,6 +25,7 @@ import { ClusterPlugin, clustersPlugin } from "src/plugins/clusters";
 import { FetchPlugin, fetchPlugin } from "src/plugins/fetch";
 import { ormPlugin } from "src/plugins/orm";
 import { PricePlugin, pricePlugin } from "src/plugins/price";
+import { redisPlugin } from "src/plugins/redis";
 
 declare module "@ddadaal/tsgrpc-server" {
   interface Extensions extends ClusterPlugin, PricePlugin, FetchPlugin {
@@ -43,6 +44,7 @@ export const plugins = [
   pricePlugin,
   fetchPlugin,
   authServicePlugin,
+  redisPlugin,
 ];
 
 if (commonConfig.scowApi) {
