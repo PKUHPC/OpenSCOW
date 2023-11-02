@@ -479,6 +479,7 @@ it.skip("returns charge records with query of tenant", async () => {
   const client = new ChargingServiceClient(server.serverAddress, ChannelCredentials.createInsecure());
 
   await asyncClientCall(client, "charge", request1);
+  await delay(1000);
   await asyncClientCall(client, "charge", request2);
 
   await reloadEntity(em, tenant);
@@ -503,15 +504,15 @@ it.skip("returns charge records with query of tenant", async () => {
     {
       tenantName: tenant.name,
       accountName: undefined,
-      comment: request1.comment,
-      amount: request1.amount,
-      type: request1.type,
-    }, {
-      tenantName: tenant.name,
-      accountName: undefined,
       comment: request2.comment,
       amount: request2.amount,
       type: request2.type,
+    }, {
+      tenantName: tenant.name,
+      accountName: undefined,
+      comment: request1.comment,
+      amount: request1.amount,
+      type: request1.type,
     } ] as Partial<ChargeRecord>);
 
   expect(reply.total).toStrictEqual(numberToMoney(30));
@@ -566,8 +567,11 @@ it("returns charge records with query of allTenants", async () => {
   const client = new ChargingServiceClient(server.serverAddress, ChannelCredentials.createInsecure());
 
   await asyncClientCall(client, "charge", request1);
+  await delay(1000);
   await asyncClientCall(client, "charge", request2);
+  await delay(1000);
   await asyncClientCall(client, "charge", request3);
+  await delay(1000);
   await asyncClientCall(client, "charge", request4);
 
   await reloadEntity(em, account);
@@ -634,6 +638,7 @@ it.skip("returns charge records with query of accountsOfTenant", async () => {
   const client = new ChargingServiceClient(server.serverAddress, ChannelCredentials.createInsecure());
 
   await asyncClientCall(client, "charge", request1);
+  await delay(1000);
   await asyncClientCall(client, "charge", request2);
 
   await reloadEntity(em, account);
@@ -660,18 +665,18 @@ it.skip("returns charge records with query of accountsOfTenant", async () => {
 
   expect(reply.results).toMatchObject([
     {
-      accountName: request1.accountName,
-      tenantName: account.tenant.getProperty("name"),
-      comment: request1.comment,
-      amount: request1.amount,
-      type: request1.type,
-    },
-    {
       accountName: request2.accountName,
       tenantName: account.tenant.getProperty("name"),
       comment: request2.comment,
       amount: request2.amount,
       type: request2.type,
+    },
+    {
+      accountName: request1.accountName,
+      tenantName: account.tenant.getProperty("name"),
+      comment: request1.comment,
+      amount: request1.amount,
+      type: request1.type,
     },
   ]as Partial<ChargeRecord>);
 
@@ -726,8 +731,11 @@ it.skip("returns charge records with query allAccountOfAllTenants", async () => 
   const client = new ChargingServiceClient(server.serverAddress, ChannelCredentials.createInsecure());
 
   await asyncClientCall(client, "charge", request1);
+  await delay(1000);
   await asyncClientCall(client, "charge", request2);
+  await delay(1000);
   await asyncClientCall(client, "charge", request3);
+  await delay(1000);
   await asyncClientCall(client, "charge", request4);
 
   await reloadEntity(em, account);
@@ -752,18 +760,18 @@ it.skip("returns charge records with query allAccountOfAllTenants", async () => 
 
   expect(reply.results).toMatchObject([
     {
-      accountName: request1.accountName,
-      tenantName: request1.tenantName,
-      comment: request1.comment,
-      amount: request1.amount,
-      type: request1.type,
-    },
-    {
       accountName: request3.accountName,
       tenantName: request3.tenantName,
       comment: request3.comment,
       amount: request3.amount,
       type: request3.type,
+    },
+    {
+      accountName: request1.accountName,
+      tenantName: request1.tenantName,
+      comment: request1.comment,
+      amount: request1.amount,
+      type: request1.type,
     },
   ]as Partial<ChargeRecord>);
 
@@ -773,3 +781,9 @@ it.skip("returns charge records with query allAccountOfAllTenants", async () => 
 });
 
 
+
+export function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
