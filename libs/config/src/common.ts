@@ -13,12 +13,7 @@
 import { GetConfigFn, getConfigFromFile } from "@scow/lib-config";
 import { Static, Type } from "@sinclair/typebox";
 import { DEFAULT_CONFIG_BASE_PATH } from "src/constants";
-import { createI18nStringSchema } from "src/type";
-
-export enum SYSTEM_VALID_LANGUAGE_ENUM {
-  "zh_cn" = "zh_cn",
-  "en" = "en"
-}
+import { createI18nStringSchema, SYSTEM_VALID_LANGUAGE_ENUM, SystemLanguage, SystemLanguageConfig } from "src/type";
 
 export const ScowApiConfigSchema = Type.Object({
   auth: Type.Optional(Type.Object({
@@ -54,7 +49,7 @@ export const CommonConfigSchema = Type.Object({
     }),
   )),
 
-  systemLanguage: Type.Union([
+  systemLanguage: Type.Optional(Type.Union([
     Type.Object({
       autoDetect: Type.Optional(Type.Boolean({ description: "是否跟随系统进行语言选择" })),
       default: Type.Enum(SYSTEM_VALID_LANGUAGE_ENUM,
@@ -62,24 +57,16 @@ export const CommonConfigSchema = Type.Object({
     }, {
       description: "允许手动切换SCOW支持的合法语言，可以指定系统默认语言" }),
     Type.Enum(SYSTEM_VALID_LANGUAGE_ENUM, { description: "SCOW使用的文本语言，不再允许手动切换" }),
-  ]),
+  ], { description: "", default: { autoDetect: true, default: SYSTEM_VALID_LANGUAGE_ENUM.zh_cn } })),
 
 });
-
-export type SystemLanguage =
-  SYSTEM_VALID_LANGUAGE_ENUM |
-  {
-    autoDetect?: boolean | undefined;
-    default: SYSTEM_VALID_LANGUAGE_ENUM;
-  };
-
-export type SystemLanguageConfig = {defaultLanguage: string, isUsingI18n: boolean, autoDetect?: boolean}
 
 export const getSystemLanguageConfig = (systemLanguage: SystemLanguage): SystemLanguageConfig => {
   if (typeof systemLanguage === "string") {
     return { defaultLanguage: systemLanguage, isUsingI18n: false };
   }
-  return { defaultLanguage: systemLanguage.default, isUsingI18n: true, autoDetect: systemLanguage.autoDetect };
+  return { defaultLanguage: systemLanguage?.default ?? SYSTEM_VALID_LANGUAGE_ENUM.zh_cn,
+    isUsingI18n: true, autoDetect: systemLanguage?.autoDetect ?? true };
 };
 
 

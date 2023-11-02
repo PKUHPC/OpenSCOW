@@ -6,17 +6,20 @@ passwordPattern:
   # 出错时的消息。下面为默认值
   errorMessage: 必须包含字母、数字和符号，长度大于等于8位
 
-# 设置系统语言
+
+# 设置系统语言 可选配置 类型为对象或字符串，默认值为对象类型
+# 1.systemLanguage对象类型
 systemLanguage:
-  # 对象类型
   # 可选，默认为true。
   # 如果true，则SCOW在用户未手动选择语言时，自动根据cookie, header等判断语言，如判断失败使用default语言
-  # 如果为false，则SCOW首次进入系统时使用配置的默认语言
+  # 如果为false，则SCOW首次进入系统时使用下方配置的default语言
   autoDetect: true
-  # 默认语言，必须设置。类型必须为当前系统合法语言["zh_cn"，"en"]的枚举值
+  # 默认语言，当systemLanguage为对象类型时必须设置。
+  # 类型必须为当前系统合法语言["zh_cn"，"en"]的字符串枚举值
+  # 若没有配置systemLanguage，则默认为"zh_cn"
   default: "zh_cn"
 
-# 设置系统语言，字符串类型
-# 类型必须为当前系统合法语言["zh_cn"，"en"]的枚举值
-# 若设置此类型，SCOW直接使用此语言，不允许用户再进行语言切换
+# 2.systemLanguage字符串类型
+# 若systemLanguage配置为字符串，类型必须指定为当前系统合法语言["zh_cn"，"en"]的字符串枚举值
+# SCOW直接使用此语言，不允许用户再进行语言切换
 # systemLanguage: "zh_cn"

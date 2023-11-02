@@ -455,7 +455,7 @@ it("returns charge records with query of accountOfTenant", async () => {
   em.clear();
 });
 
-it.skip("returns charge records with query of tenant", async () => {
+it("returns charge records with query of tenant", async () => {
   const tenant = await em.findOne(Tenant, { name:"test" }) as Tenant;
 
   const amount1 = numberToMoney(10);
@@ -609,7 +609,7 @@ it("returns charge records with query of allTenants", async () => {
   em.clear();
 });
 
-it.skip("returns charge records with query of accountsOfTenant", async () => {
+it("returns charge records with query of accountsOfTenant", async () => {
   const tenant = await em.findOne(Tenant, { name:"test" }) as Tenant;
   const tenant2 = new Tenant({ name: "test2" });
   const account2 = new Account({ accountName: "1234", tenant, blocked: false, comment: "test" });
@@ -685,7 +685,7 @@ it.skip("returns charge records with query of accountsOfTenant", async () => {
   em.clear();
 });
 
-it.skip("returns charge records with query allAccountOfAllTenants", async () => {
+it("returns charge records with query allAccountOfAllTenants", async () => {
   const tenant = await em.findOne(Tenant, { name:"test" }) as Tenant;
   const tenant2 = new Tenant({ name: "test2" });
   const account2 = new Account({ accountName: "1234", tenant, blocked: false, comment: "test" });

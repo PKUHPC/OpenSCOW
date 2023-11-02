@@ -68,6 +68,7 @@ export default /* #__PURE__*/typeboxRoute(CreateUserSchema, async (req, res) => 
 
   if (!useBuiltinCreateUser()) { return { 501: null }; }
 
+
   const { email, identityId, name, password } = req.body;
 
   const auth = authenticate((u) =>

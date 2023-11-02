@@ -43,7 +43,10 @@ import {
 } from "src/stores/UserStore";
 import { publicConfig, runtimeConfig } from "src/utils/config";
 
-
+const languagesMap = {
+  "zh_cn": zh_cn,
+  "en": en,
+};
 
 const FailEventHandler: React.FC = () => {
   const { message, modal } = AntdApp.useApp();
@@ -91,7 +94,7 @@ interface ExtraProps {
   primaryColor: string;
   footerText: string;
   darkModeCookieValue: DarkModeCookie | undefined;
-  languageCookie: string | undefined;
+  initialLanguage: string;
 }
 
 type Props = AppProps & { extra: ExtraProps };
@@ -109,9 +112,6 @@ function MyApp({ Component, pageProps, extra }: Props) {
     const store = createStore(DefaultClusterStore, Object.values(publicConfig.CLUSTERS)[0]);
     return store;
   });
-
-  const systemLanguageConfig = publicConfig.SYSTEM_LANGUAGE_CONFIG;
-  const initialLanguage = getInitialLanguage(extra.languageCookie, systemLanguageConfig);
 
   return (
     <>
@@ -136,22 +136,21 @@ function MyApp({ Component, pageProps, extra }: Props) {
         />
       </Head>
       <Provider initialLanguage={{
-        id: initialLanguage,
-        definitions: initialLanguage === "en" ? en : zh_cn,
+        id: extra.initialLanguage,
+        definitions: languagesMap[extra.initialLanguage],
       }}
       >
         <StoreProvider stores={[userStore, defaultClusterStore]}>
           <DarkModeProvider initial={extra.darkModeCookieValue}>
-            <AntdConfigProvider color={primaryColor} locale={initialLanguage}>
-              <FloatButtons languageId={initialLanguage} />
+            <AntdConfigProvider color={primaryColor} locale={extra.initialLanguage}>
+              <FloatButtons languageId={extra.initialLanguage} />
               <GlobalStyle />
               <FailEventHandler />
               <TopProgressBar />
               <BaseLayout
                 footerText={footerText}
                 versionTag={publicConfig.VERSION_TAG}
-                isUsingI18n={systemLanguageConfig.isUsingI18n}
-                initialLanguage={initialLanguage}
+                initialLanguage={extra.initialLanguage}
               >
                 <Component {...pageProps} />
               </BaseLayout>
@@ -169,7 +168,7 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
     footerText: "",
     primaryColor: "",
     darkModeCookieValue: getDarkModeCookieValue(appContext.ctx.req),
-    languageCookie: "",
+    initialLanguage: "",
   };
 
   // This is called on server on first load, and on client on every page transition
@@ -204,8 +203,8 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
     ?? (hostname && runtimeConfig.UI_CONFIG?.footer?.hostnameTextMap?.[hostname])
     ?? runtimeConfig.UI_CONFIG?.footer?.defaultText ?? "";
 
-    // 从Cookies或header中获取语言id
-    extra.languageCookie = getLanguageCookie(appContext.ctx.req);
+    const languageCookie = getLanguageCookie(appContext.ctx.req);
+    extra.initialLanguage = getInitialLanguage(languageCookie, publicConfig.SYSTEM_LANGUAGE_CONFIG);
   }
 
   const appProps = await App.getInitialProps(appContext);

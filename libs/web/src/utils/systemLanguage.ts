@@ -10,47 +10,25 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { HEADER_ACCEPT_VALID_LANGUAGES,
+  I18nStringType, SYSTEM_VALID_LANGUAGES, SystemLanguageConfig } from "@scow/config/build/type";
 import { IncomingMessage } from "http";
 import { parseCookies } from "nookies";
 
 
-// 当前系统支持的header中可接受语言
-export const HEADER_ACCEPT_VALID_LANGUAGES = {
-  ZH: "zh",
-  ZH_CN: "zh_cn",
-  EN: "en",
-  EN_US: "en-US",
-};
+// // 当前系统支持的header中可接受语言
+// export const HEADER_ACCEPT_VALID_LANGUAGES = {
+//   ZH: "zh",
+//   ZH_CN: "zh_cn",
+//   EN: "en",
+//   EN_US: "en-US",
+// };
 
-// 系统支持语言列表
-export const SYSTEM_VALID_LANGUAGES = {
-  ZH_CN: "zh_cn",
-  EN: "en",
-};
-
-// 系统合法语言的枚举值
-export enum SYSTEM_VALID_LANGUAGE_ENUM {
-  "zh_cn" = "zh_cn",
-  "en" = "en"
-}
-
-export type SystemLanguage =
-  SYSTEM_VALID_LANGUAGE_ENUM |
-  {
-    autoDetect?: boolean | undefined;
-    default: SYSTEM_VALID_LANGUAGE_ENUM;
-  };
-
-export type SystemLanguageConfig = {defaultLanguage: string, isUsingI18n: boolean, autoDetect?: boolean}
-
-
-export type I18nStringType = string | {
-  i18n: {
-    default: string,
-    en?: string,
-    zh_cn?: string,
-  }
-}
+// // 系统支持语言列表
+// export const SYSTEM_VALID_LANGUAGES = {
+//   ZH_CN: "zh_cn",
+//   EN: "en",
+// };
 
 export function getI18nConfigCurrentText(
   i18nConfigText: I18nStringType | undefined, languageId: string | undefined): string {
@@ -135,12 +113,9 @@ export function getInitialLanguage(cookieLanguage: string | undefined,
 
   // 使用国际化，且跟随系统语言， 且cookie中保存的语言或浏览器偏好为合法语言
   // 则使用cookie中保存的语言或浏览器偏好
-  if (systemLanguageConfig.isUsingI18n &&
-    (systemLanguageConfig.autoDetect || typeof systemLanguageConfig.autoDetect === "undefined") &&
-    cookieLanguage) {
+  if (systemLanguageConfig.isUsingI18n && systemLanguageConfig.autoDetect && cookieLanguage) {
     return cookieLanguage;
   }
-
   // 其他情况，则使用指定的默认语言
   return systemLanguageConfig.defaultLanguage;
 
@@ -166,5 +141,6 @@ export function getServerCurrentLanguageId(req: IncomingMessage | undefined,
     }
   }
   const defaultLanguage = systemLanguageConfig.defaultLanguage;
+
   return cookieLanguage ? cookieLanguage : defaultLanguage;
 };

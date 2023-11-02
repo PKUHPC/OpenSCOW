@@ -1180,6 +1180,9 @@ importers:
       '@grpc/grpc-js':
         specifier: 1.9.5
         version: 1.9.5
+      '@scow/config':
+        specifier: workspace:*
+        version: link:../config
       '@types/mime-types':
         specifier: 2.1.1
         version: registry.npmmirror.com/@types/mime-types@2.1.1
