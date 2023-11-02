@@ -71,20 +71,25 @@ export const AdminUserTable: React.FC<Props> = ({
         rangeSearchRole === "TENANT_ADMIN" ? TenantRole.TENANT_ADMIN : TenantRole.TENANT_FINANCE))
   )) : undefined, [data, query, rangeSearchRole]);
 
+  const searchData = useMemo(() => data ? data.results.filter((x) => (
+    !query.idOrName || x.id.includes(query.idOrName) || x.name.includes(query.idOrName)
+  )) : undefined, [data, query]);
+
+
   const getUsersRoleCount = useCallback((role: FilteredRole): number => {
 
     switch (role) {
     case "TENANT_ADMIN":
-      return filteredData
-        ? filteredData.filter((user) => user.tenantRoles.includes(TenantRole.TENANT_ADMIN)).length : 0;
+      return searchData
+        ? searchData.filter((user) => user.tenantRoles.includes(TenantRole.TENANT_ADMIN)).length : 0;
     case "TENANT_FINANCE":
-      return filteredData
-        ? filteredData.filter((user) => user.tenantRoles.includes(TenantRole.TENANT_FINANCE)).length : 0;
+      return searchData
+        ? searchData.filter((user) => user.tenantRoles.includes(TenantRole.TENANT_FINANCE)).length : 0;
     case "ALL_USERS":
     default:
-      return filteredData ? filteredData.length : 0;
+      return searchData ? searchData.length : 0;
     }
-  }, [filteredData]);
+  }, [searchData]);
 
   const handleTableChange = (_, __, sortInfo) => {
     setCurrentSortInfo({ field: sortInfo.field, order: sortInfo.order });
