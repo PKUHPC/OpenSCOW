@@ -186,6 +186,18 @@ export default {
       },
     },
     fileManagerComp: {
+      fileEditModal: {
+        prompt: "Prompt",
+        save: "Save",
+        doNotSave: "Do Not Save",
+        notSaved: "Not Saved",
+        notSavePrompt: "The file has not been saved, do you want to save this file?",
+        fileEdit: "File Edit",
+        failedGetFile: "Failed to get file: {}",
+        cantReadFile: "Cannot read file: {}",
+        saveFileFail: "File save failed: {}",
+        saveFileSuccess: "File saved successfully",
+      },
       createFileModal: {
         createErrorMessage: "File or directory with the same name already exists!",
         createSuccessMessage: "Created successfully",
@@ -194,6 +206,10 @@ export default {
         fileName: "File Name",
       },
       fileManager: {
+        edit: {
+          edit: "Edit",
+          fileSizeExceeded: "Exceeds editable file size: {}",
+        },
         moveCopy: {
           copy: "Copy",
           move: "Move",

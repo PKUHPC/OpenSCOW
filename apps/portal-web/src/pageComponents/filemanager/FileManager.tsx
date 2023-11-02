@@ -27,6 +27,7 @@ import { join } from "path";
 import React, { useEffect, useRef, useState } from "react";
 import { useStore } from "simstate";
 import { api } from "src/apis/api";
+import { DisabledA } from "src/components/DisabledA";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { ModalButton, ModalLink } from "src/components/ModalLink";
 import { TitleText } from "src/components/PageTitle";
@@ -34,6 +35,7 @@ import { TableTitle } from "src/components/TableTitle";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { urlToDownload } from "src/pageComponents/filemanager/api";
 import { CreateFileModal } from "src/pageComponents/filemanager/CreateFileModal";
+import { FileEditModal } from "src/pageComponents/filemanager/FileEditModal";
 import { FileTable } from "src/pageComponents/filemanager/FileTable";
 import { MkdirModal } from "src/pageComponents/filemanager/MkdirModal";
 import { PathBar } from "src/pageComponents/filemanager/PathBar";
@@ -42,6 +44,8 @@ import { UploadModal } from "src/pageComponents/filemanager/UploadModal";
 import { FileInfo } from "src/pages/api/file/list";
 import { LoginNodeStore } from "src/stores/LoginNodeStore";
 import { Cluster, publicConfig } from "src/utils/config";
+import { convertToBytes } from "src/utils/format";
+import { isNotImage } from "src/utils/staticFiles";
 import { styled } from "styled-components";
 
 interface Props {
@@ -473,11 +477,30 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
         actionRender={(_, i: FileInfo) => (
           <Space>
             {
-              i.type === "FILE" ? (
+              i.type === "FILE" && isNotImage(i.name) && (i.size <= convertToBytes(publicConfig.FILE_EDIT_SIZE)
+                ? (
+                  <FileEditModalButton
+                    filename={i.name}
+                    filePath={join(path, i.name)}
+                    clusterId={cluster.id}
+                  >{t(p("edit.edit"))}</FileEditModalButton>
+                )
+                : (
+                  <DisabledA
+                    disabled={true}
+                    message={t(p("edit.fileSizeExceeded"), [publicConfig.FILE_EDIT_SIZE])}
+                  >
+                    <span style={{ color: "gray" }}>{t(p("edit.edit"))}</span>
+                  </DisabledA>
+                )
+              )
+            }
+            {
+              i.type === "FILE" && (
                 <a href={urlToDownload(cluster.id, join(path, i.name), true)}>
                   {t(p("tableInfo.download"))}
                 </a>
-              ) : undefined
+              )
             }
             <RenameLink
               cluster={cluster.id}
@@ -559,11 +582,12 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
   );
 };
 
+
 const RenameLink = ModalLink(RenameModal);
 const CreateFileButton = ModalButton(CreateFileModal, { icon: <FileAddOutlined /> });
 const MkdirButton = ModalButton(MkdirModal, { icon: <FolderAddOutlined /> });
 const UploadButton = ModalButton(UploadModal, { icon: <UploadOutlined /> });
-
+const FileEditModalButton = ModalLink(FileEditModal);
 
 function openPreviewLink(href: string) {
   window.open(href, "ViewFile", "location=yes,resizable=yes,scrollbars=yes,status=yes");
