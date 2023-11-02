@@ -150,6 +150,7 @@ export const mockApi: MockApi<typeof api> = {
       {
         userId: "123",
         name: "testuser",
+        email: "testuser@test.com",
         availableAccounts: ["a_123"],
         tenantName: "tenant1",
         createTime: "2022-10-05T23:49:50.000Z",
@@ -158,6 +159,7 @@ export const mockApi: MockApi<typeof api> = {
       {
         userId: "test01",
         name: "test01",
+        email: "test01@test.com",
         availableAccounts: ["a_test", "a_test01"],
         tenantName: "tenant2",
         createTime: "2022-10-05T23:49:50.000Z",
@@ -166,6 +168,7 @@ export const mockApi: MockApi<typeof api> = {
       {
         userId: "test02",
         name: "test02",
+        email: "test02@test.com",
         availableAccounts: ["a_test", "a_test02"],
         tenantName: "tenant2",
         createTime: "2022-10-05T23:49:50.000Z",
@@ -174,6 +177,7 @@ export const mockApi: MockApi<typeof api> = {
       {
         userId: "test03",
         name: "test03",
+        email: "test03@test.com",
         availableAccounts: ["a_test", "a_test03"],
         tenantName: "tenant2",
         createTime: "2022-10-05T23:49:50.000Z",

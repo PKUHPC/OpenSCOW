@@ -94,7 +94,7 @@ message FileInfo {
   FileType type = 2;
   string mtime = 3;
   uint32 mode = 4;
-  uint32 size = 5;
+  uint64 size = 5;
 }
 
 // PERMISSION_DENIED: directory is not accessible

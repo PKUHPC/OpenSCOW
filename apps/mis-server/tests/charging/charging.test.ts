@@ -479,6 +479,7 @@ it("returns charge records with query of tenant", async () => {
   const client = new ChargingServiceClient(server.serverAddress, ChannelCredentials.createInsecure());
 
   await asyncClientCall(client, "charge", request1);
+  await delay(1000);
   await asyncClientCall(client, "charge", request2);
 
   await reloadEntity(em, tenant);
@@ -499,7 +500,7 @@ it("returns charge records with query of tenant", async () => {
 
   expect(reply.results).toHaveLength(2);
 
-  expect(reply.results.sort((a, b) => new Date(b.time!).getTime() - new Date(a.time!).getTime())).toMatchObject([
+  expect(reply.results).toMatchObject([
     {
       tenantName: tenant.name,
       accountName: undefined,
@@ -564,8 +565,11 @@ it("returns charge records with query of allTenants", async () => {
   const client = new ChargingServiceClient(server.serverAddress, ChannelCredentials.createInsecure());
 
   await asyncClientCall(client, "charge", request1);
+  await delay(1000);
   await asyncClientCall(client, "charge", request2);
+  await delay(1000);
   await asyncClientCall(client, "charge", request3);
+  await delay(1000);
   await asyncClientCall(client, "charge", request4);
 
   await reloadEntity(em, account);
@@ -630,6 +634,7 @@ it("returns charge records with query of accountsOfTenant", async () => {
   const client = new ChargingServiceClient(server.serverAddress, ChannelCredentials.createInsecure());
 
   await asyncClientCall(client, "charge", request1);
+  await delay(1000);
   await asyncClientCall(client, "charge", request2);
 
   await reloadEntity(em, account);
@@ -656,7 +661,7 @@ it("returns charge records with query of accountsOfTenant", async () => {
 
   expect(reply.results).toHaveLength(2);
 
-  expect(reply.results.sort((a, b) => new Date(b.time!).getTime() - new Date(a.time!).getTime())).toMatchObject([
+  expect(reply.results).toMatchObject([
     {
       accountName: request2.accountName,
       tenantName: account.tenant.getProperty("name"),
@@ -722,8 +727,11 @@ it("returns charge records with query allAccountOfAllTenants", async () => {
   const client = new ChargingServiceClient(server.serverAddress, ChannelCredentials.createInsecure());
 
   await asyncClientCall(client, "charge", request1);
+  await delay(1000);
   await asyncClientCall(client, "charge", request2);
+  await delay(1000);
   await asyncClientCall(client, "charge", request3);
+  await delay(1000);
   await asyncClientCall(client, "charge", request4);
 
   await reloadEntity(em, account);
@@ -746,7 +754,7 @@ it("returns charge records with query allAccountOfAllTenants", async () => {
 
   expect(reply.results).toHaveLength(2);
 
-  expect(reply.results.sort((a, b) => new Date(b.time!).getTime() - new Date(a.time!).getTime())).toMatchObject([
+  expect(reply.results).toMatchObject([
     {
       accountName: request3.accountName,
       tenantName: request3.tenantName,
@@ -761,7 +769,7 @@ it("returns charge records with query allAccountOfAllTenants", async () => {
       amount: request1.amount,
       type: request1.type,
     },
-  ] as Partial<ChargeRecord>);
+  ]as Partial<ChargeRecord>);
 
   em.clear();
 });
@@ -923,3 +931,9 @@ it("returns charge records' total results", async () => {
 });
 
 
+
+export function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
