@@ -41,7 +41,7 @@ export const BaseLayout = ({ footerText, versionTag, initialLanguage, children }
 
   const systemLanguageConfig = publicConfig.SYSTEM_LANGUAGE_CONFIG;
   useEffect(() => {
-    // 如果不使用国际化或者不跟随系统自动简直语言
+    // 如果不使用国际化或者不跟随系统自动判断语言
     // 则删除cookies中的语言信息
     if (!systemLanguageConfig.isUsingI18n || !systemLanguageConfig.autoDetect) {
       setCookie(null, "language", "", {

@@ -15,21 +15,6 @@ import { HEADER_ACCEPT_VALID_LANGUAGES,
 import { IncomingMessage } from "http";
 import { parseCookies } from "nookies";
 
-
-// // 当前系统支持的header中可接受语言
-// export const HEADER_ACCEPT_VALID_LANGUAGES = {
-//   ZH: "zh",
-//   ZH_CN: "zh_cn",
-//   EN: "en",
-//   EN_US: "en-US",
-// };
-
-// // 系统支持语言列表
-// export const SYSTEM_VALID_LANGUAGES = {
-//   ZH_CN: "zh_cn",
-//   EN: "en",
-// };
-
 export function getI18nConfigCurrentText(
   i18nConfigText: I18nStringType | undefined, languageId: string | undefined): string {
   if (!i18nConfigText) {
