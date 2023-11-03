@@ -1,10 +1,11 @@
 # 管理系统数据库的信息。可以不修改
 db:
-  host: 192.168.88.100
+  host: 172.16.20.121
   password: must!chang3this
   port: 3308
   user: root
   dbName: scow
+  debug: true
 
 authUrl: http://localhost:5000
 
@@ -111,3 +112,5 @@ createUser:
 
 # 自定义可查询消费类型
 # customChargeTypes: ["月租", "存储费"]
+
+redisUrl: 192.168.88.100:6379

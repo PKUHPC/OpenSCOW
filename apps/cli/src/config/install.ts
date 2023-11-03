@@ -70,6 +70,22 @@ export const InstallConfigSchema = Type.Object({
         description: "mis-server映射出来的端口",
       })),
     })),
+
+    redis: Type.Object({
+      type: Type.Union([Type.Literal("builtin"), Type.Literal("external")], {
+        description: "使用内置还是自定义redis", default: "builtin",
+      }),
+      external: Type.Optional(Type.Object({
+        connection: Type.Object({
+          port: Type.String({ description: "redis端口号" }),
+          host: Type.String({ description: "redis地址" }),
+          username: Type.Optional(Type.String({ description: "redis用户名" })),
+          password: Type.Optional(Type.String({ description: "redis密码" })),
+          db: Type.Optional(Type.String({ description: "redis数据库" })),
+        }, { description: "创建用户的页面" }),
+      }, { description: "使用自定义redis的连接配置" })),
+    }),
+
   })),
 
   auth: Type.Object({

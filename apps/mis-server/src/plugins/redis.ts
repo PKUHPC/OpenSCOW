@@ -13,9 +13,17 @@
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { QueryBuilder } from "@mikro-orm/mysql";
 import Redis from "ioredis";
-import { commonConfig } from "src/config/common";
+import { config } from "src/config/env";
+import { misConfig } from "src/config/mis";
 
-export const redis = new Redis(commonConfig.redisUrl, { keyPrefix: "mis:server" });
+export const redis = config.REDIS_BUILTIN ? new Redis(misConfig.redisUrl) : new Redis({
+  port: config.REDIS_PORT,
+  host:config.REDIS_HOST,
+  username: config.REDIS_USER_NAME ?? undefined,
+  password: config.REDIS_PASSWORD ?? undefined,
+  db: +config.REDIS_DB ?? undefined,
+  keyPrefix: "mis:server",
+});
 
 export const redisPlugin = plugin(async (server) => {
 
