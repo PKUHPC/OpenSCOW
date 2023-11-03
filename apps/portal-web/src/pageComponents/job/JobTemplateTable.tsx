@@ -227,6 +227,7 @@ const InfoTable: React.FC<InfoTableProps> = ({
         reload={reload}
       />
       <Table
+        tableLayout="fixed"
         columns={columns}
         dataSource={data}
         loading={isLoading}

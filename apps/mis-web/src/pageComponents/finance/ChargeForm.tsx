@@ -119,7 +119,7 @@ export const ChargeForm: React.FC = () => {
         label={t(pCommon("type"))}
         rules={[
           { required: true },
-          { max: 255 },
+          { max: 50 },
         ]}
         extra={(
           <div style={{ margin: "8px 0" }}>
