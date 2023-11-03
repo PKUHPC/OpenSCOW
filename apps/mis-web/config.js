@@ -100,7 +100,11 @@ const buildRuntimeConfig = async (phase, basePath) => {
   const serverRuntimeConfig = {
     AUTH_EXTERNAL_URL: config.AUTH_EXTERNAL_URL,
     AUTH_INTERNAL_URL: config.AUTH_INTERNAL_URL,
-    CLUSTERS_CONFIG: clusters,
+    CLUSTERS_CONFIG: getSortedClusters(clusters).reduce((prev, curr) => {
+      const { id, ...rest } = curr;
+      prev[curr.id] = rest;
+      return prev;
+    }, {}),
     CLUSTER_TEXTS_CONFIG: clusterTexts,
     UI_CONFIG: uiConfig,
     DEFAULT_PRIMARY_COLOR,
