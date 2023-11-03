@@ -26,9 +26,10 @@ import { FetchPlugin, fetchPlugin } from "src/plugins/fetch";
 import { ormPlugin } from "src/plugins/orm";
 import { PricePlugin, pricePlugin } from "src/plugins/price";
 import { redisPlugin } from "src/plugins/redis";
+import { SyncBlockStatusPlugin, syncBlockStatusPlugin } from "src/plugins/syncBlockStatus";
 
 declare module "@ddadaal/tsgrpc-server" {
-  interface Extensions extends ClusterPlugin, PricePlugin, FetchPlugin {
+  interface Extensions extends ClusterPlugin, PricePlugin, FetchPlugin, SyncBlockStatusPlugin {
     orm: MikroORM<MySqlDriver>;
     capabilities: Capabilities;
   }
@@ -45,6 +46,7 @@ export const plugins = [
   fetchPlugin,
   authServicePlugin,
   redisPlugin,
+  syncBlockStatusPlugin,
 ];
 
 if (commonConfig.scowApi) {

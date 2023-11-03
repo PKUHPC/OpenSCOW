@@ -382,7 +382,6 @@ export const mockApi: MockApi<typeof api> = {
   unblockUserInAccount: async () => ({ executed: true }),
   blockAccount: async () => ({ executed: true }),
   unblockAccount: async () => ({ executed: true }),
-  updateBlockStatus: async () => null,
   getNewUserCount: async () => ({ results: [{ date: new Date().toISOString(), count: 10 }]}),
   getActiveUserCount: async () => ({ results: [{ date: new Date().toISOString(), count: 10 }]}),
   getTopChargeAccount: async () => ({ results: [{ accountName: "test", chargedAmount: numberToMoney(10) }]}),
@@ -394,6 +393,16 @@ export const mockApi: MockApi<typeof api> = {
   getStatisticInfo: async () =>
     ({ totalUser: 10, totalAccount: 10, totalTenant: 10, newUser: 10, newAccount: 10, newTenant: 10 }),
   getJobTotalCount: async () => ({ count: 10 }),
+  syncBlockStatus: async () => ({
+    blockedFailedAccounts: [],
+    unblockedFailedAccounts:[],
+    blockedFailedUserAccounts: [],
+  }),
+  getSyncBlockStatusJobInfo: async () => ({
+    syncStarted: false,
+    schedule: "0 4 * * *",
+  }),
+  setSyncBlockStatusState:  async () => null,
   removeUserFromAccount: async () => null,
   setAdmin: async () => ({ executed: true }),
   unsetAdmin: async () => ({ executed: false }),

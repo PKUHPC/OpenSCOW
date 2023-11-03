@@ -13,7 +13,6 @@
 import { Server } from "@ddadaal/tsgrpc-server";
 import { omitConfigSpec } from "@scow/lib-config";
 import { readVersionFile } from "@scow/utils/build/version";
-import { updateBlockStatusInSlurm } from "src/bl/block";
 import { config } from "src/config/env";
 import { plugins } from "src/plugins";
 import { accountServiceServer } from "src/services/account";
@@ -53,8 +52,7 @@ export async function createServer() {
   await server.register(configServiceServer);
   await server.register(misConfigServiceServer);
 
-  const em = server.ext.orm.em.fork();
-  await updateBlockStatusInSlurm(em, server.ext.clusters, server.logger);
+  await server.ext.syncBlockStatus.sync();
 
   return server;
 }

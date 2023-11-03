@@ -43,9 +43,11 @@ import type { ImportUsersSchema } from "src/pages/api/admin/importUsers";
 import type { QueryStorageQuotaSchema } from "src/pages/api/admin/queryStorageQuota";
 import type { SetPlatformRoleSchema } from "src/pages/api/admin/setPlatformRole";
 import type { SetTenantRoleSchema } from "src/pages/api/admin/setTenantRole";
+import type { GetSyncBlockStatusJobInfoSchema } from "src/pages/api/admin/synchronize/getSyncBlockStateInfo";
+import type { SetSyncBlockStatusStateSchema } from "src/pages/api/admin/synchronize/setSynchronizeState";
+import type { SyncBlockStatusSchema } from "src/pages/api/admin/synchronize/syncBlockStatus";
 import type { UnsetPlatformRoleSchema } from "src/pages/api/admin/unsetPlatformRole";
 import type { UnsetTenantRoleSchema } from "src/pages/api/admin/unsetTenantRole";
-import type { UpdateBlockStatusSchema } from "src/pages/api/admin/updateBlockStatus";
 import type { AuthCallbackSchema } from "src/pages/api/auth/callback";
 import type { LogoutSchema } from "src/pages/api/auth/logout";
 import type { ValidateTokenSchema } from "src/pages/api/auth/validateToken";
@@ -115,9 +117,11 @@ export const api = {
   queryStorageQuota: apiClient.fromTypeboxRoute<typeof QueryStorageQuotaSchema>("GET", "/api/admin/queryStorageQuota"),
   setPlatformRole: apiClient.fromTypeboxRoute<typeof SetPlatformRoleSchema>("PUT", "/api/admin/setPlatformRole"),
   setTenantRole: apiClient.fromTypeboxRoute<typeof SetTenantRoleSchema>("PUT", "/api/admin/setTenantRole"),
+  getSyncBlockStatusJobInfo: apiClient.fromTypeboxRoute<typeof GetSyncBlockStatusJobInfoSchema>("GET", "/api/admin/synchronize/getSyncBlockStateInfo"),
+  setSyncBlockStatusState: apiClient.fromTypeboxRoute<typeof SetSyncBlockStatusStateSchema>("POST", "/api/admin/synchronize/setSynchronizeState"),
+  syncBlockStatus: apiClient.fromTypeboxRoute<typeof SyncBlockStatusSchema>("PUT", "/api/admin/synchronize/syncBlockStatus"),
   unsetPlatformRole: apiClient.fromTypeboxRoute<typeof UnsetPlatformRoleSchema>("PUT", "/api/admin/unsetPlatformRole"),
   unsetTenantRole: apiClient.fromTypeboxRoute<typeof UnsetTenantRoleSchema>("PUT", "/api/admin/unsetTenantRole"),
-  updateBlockStatus: apiClient.fromTypeboxRoute<typeof UpdateBlockStatusSchema>("PUT", "/api/admin/updateBlockStatus"),
   getNewUserCount: apiClient.fromTypeboxRoute<typeof GetNewUserCountSchema>("GET", "/api/admin/getNewUserCount"),
   getActiveUserCount:apiClient.fromTypeboxRoute<typeof GetActiveUserCountSchema>("GET", "/api/admin/getActiveUserCount"),
   getTopChargeAccount: apiClient.fromTypeboxRoute<typeof GetTopChargeAccountSchema>("GET", "/api/admin/getTopChargeAccount"),
@@ -145,8 +149,8 @@ export const api = {
   userExists: apiClient.fromTypeboxRoute<typeof UserExistsSchema>("POST", "/api/init/userExists"),
   addBillingItem: apiClient.fromTypeboxRoute<typeof AddBillingItemSchema>("POST", "/api/job/addBillingItem"),
   changeJobTimeLimit: apiClient.fromTypeboxRoute<typeof ChangeJobTimeLimitSchema>("PATCH", "/api/job/changeJobTimeLimit"),
-  getBillingItems: apiClient.fromTypeboxRoute<typeof GetBillingItemsSchema>("GET", "/api/job/getBillingItems"),
   getAvailableBillingTable: apiClient.fromTypeboxRoute<typeof GetAvailableBillingTableSchema>("GET", "/api/job/getAvailableBillingTable"),
+  getBillingItems: apiClient.fromTypeboxRoute<typeof GetBillingItemsSchema>("GET", "/api/job/getBillingItems"),
   getJobByBiJobIndex: apiClient.fromTypeboxRoute<typeof GetJobByBiJobIndexSchema>("GET", "/api/job/getJobByBiJobIndex"),
   getMissingDefaultPriceItems: apiClient.fromTypeboxRoute<typeof GetMissingDefaultPriceItemsSchema>("GET", "/api/job/getMissingDefaultPriceItems"),
   getJobInfo: apiClient.fromTypeboxRoute<typeof GetJobInfoSchema>("GET", "/api/job/jobInfo"),
