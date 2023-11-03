@@ -159,7 +159,7 @@ message SubmitJobResponse {
   uint32 job_id = 1;
 }
 
-// fileDirectory: file's absolute path
+// filePath: file's absolute path
 message SubmitFileAsJobRequest {
   string cluster = 1;
   string user_id = 2;
