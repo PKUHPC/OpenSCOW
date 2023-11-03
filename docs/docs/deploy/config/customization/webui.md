@@ -39,7 +39,7 @@ footer:
     # 文本支持HTML的标签，将会被放在一个div中。
     defaultText: ""
     # 对某特定来访域名生效的footer文本，可以不填
-    hostnameTextMap: 
+    hostnameMap: 
         # 从a.com的访问显示footer文本为a.com的文本
         a.com: a.com的文本
 
@@ -49,7 +49,7 @@ primaryColor:
     # 对所有域名生效的主题色。默认为#9B0000
     defaultColor: string
     # 对某特定来访域名生效的主题色，可以不填
-    hostnameTextMap: 
+    hostnameMap: 
         # 从a.com的访问的主题色为#000000
         a.com: #000000
 ```

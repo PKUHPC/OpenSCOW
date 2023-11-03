@@ -49,12 +49,13 @@ export interface JobBillingTableItem {
 interface Props {
   data: JobBillingTableItem[] | undefined;
   loading?: boolean;
+  isUserPartitionsPage?: boolean;
 }
 
 const p = prefix("component.others.");
 const pCommon = prefix("common.");
 
-export const JobBillingTable: React.FC<Props> = ({ data, loading }) => {
+export const JobBillingTable: React.FC<Props> = ({ data, loading, isUserPartitionsPage }) => {
 
   const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
@@ -71,10 +72,13 @@ export const JobBillingTable: React.FC<Props> = ({ data, loading }) => {
     }, {}) : {};
 
   const columns: ColumnsType<JobBillingTableItem> = [
-    { dataIndex: "cluster", title: t(pCommon("cluster")), key: "index", render: (_, r) => ({
-      children: getI18nConfigCurrentText(publicConfig.CLUSTERS[r.cluster]?.name, languageId) ?? r.cluster,
-      props: { rowSpan: r.clusterItemIndex === 0 && clusterTotalQosCounts ? clusterTotalQosCounts[r.cluster] : 0 },
-    }) },
+    ...(isUserPartitionsPage ? [] : [
+      { dataIndex: "cluster", title: t(pCommon("cluster")), key: "index", render: (_, r) => ({
+        children: getI18nConfigCurrentText(publicConfig.CLUSTERS[r.cluster]?.name, languageId) ?? r.cluster,
+        props: { rowSpan: r.clusterItemIndex === 0 && clusterTotalQosCounts ? clusterTotalQosCounts[r.cluster] : 0 },
+      }) },
+    ])
+    ,
     { dataIndex: "partition", title: t(p("partitionFullName")), key: "index", render: (_, r) => ({
       children: r.partition,
       props: { rowSpan: r.partitionItemIndex === 0 ? r.qosCount : 0 },
@@ -125,7 +129,7 @@ export const JobBillingTable: React.FC<Props> = ({ data, loading }) => {
     <Table
       dataSource={data}
       columns={columns}
-      scroll={{ x: 800 }}
+      scroll={{ x: 800, y: 500 }}
       size="middle"
       bordered
       pagination={false}

@@ -82,7 +82,8 @@ export const ChangePasswordModal: React.FC<Props> = ({
         form={form}
         onFinish={onFinish}
         wrapperCol={{ span: 20 }}
-        labelCol={{ span: 4 }}
+        labelCol={{ span:4, style: { whiteSpace:"normal", textAlign:"left", lineHeight:"16px" } }}
+
       >
         <Form.Item
           rules={[{ required: true }]}

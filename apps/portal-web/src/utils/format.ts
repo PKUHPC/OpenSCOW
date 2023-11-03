@@ -42,3 +42,15 @@ export const formatSize = (size: number, unitMap: string[] = DEFAULT_UNIT_MAP): 
   const fixedNumber = size < 9.996 ? 2 : (size < 99.95 ? 1 : 0);
   return `${size.toFixed(fixedNumber)} ${unitMap[carryCount]}`;
 };
+
+export function convertToBytes(sizeStr: string): number {
+  const units = {
+    K: 1024,
+    M: 1024 * 1024,
+    G: 1024 * 1024 * 1024,
+  };
+  const unit = sizeStr.slice(-1).toUpperCase();
+  const size = parseFloat(sizeStr);
+
+  return size * units[unit];
+}

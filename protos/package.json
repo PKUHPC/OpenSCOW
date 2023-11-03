@@ -8,6 +8,7 @@
   "license": "Mulan PSL v2",
   "repository": "https://github.com/PKUHPC/SCOW",
   "scripts": {
-    "lint": "buf lint"
+    "lint": "buf lint",
+    "breaking": "buf breaking --against '../.git#subdir=protos'"
   }
 }

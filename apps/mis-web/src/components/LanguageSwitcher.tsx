@@ -16,7 +16,7 @@ import { useRouter } from "next/router";
 import { setCookie } from "nookies";
 import { useEffect, useState } from "react";
 import { languageInfo, useI18n } from "src/i18n";
-import styled from "styled-components";
+import { styled } from "styled-components";
 
 
 const Container = styled.div`

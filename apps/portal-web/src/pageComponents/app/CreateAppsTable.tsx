@@ -19,7 +19,7 @@ import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 import { publicConfig } from "src/utils/config";
-import styled from "styled-components";
+import { styled } from "styled-components";
 
 const CardContainer = styled.div`
   flex: 1;

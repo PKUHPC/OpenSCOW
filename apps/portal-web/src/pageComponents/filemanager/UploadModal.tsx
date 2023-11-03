@@ -18,6 +18,7 @@ import { api } from "src/apis";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 import { urlToUpload } from "src/pageComponents/filemanager/api";
 import { publicConfig } from "src/utils/config";
+import { convertToBytes } from "src/utils/format";
 
 interface Props {
   open: boolean;
@@ -87,7 +88,7 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
           }
         }}
         beforeUpload={(file) => {
-          const fileMaxSize = parseInt(publicConfig.CLIENT_MAX_BODY_SIZE.slice(0, -1)) * (1024 ** 3);
+          const fileMaxSize = convertToBytes(publicConfig.CLIENT_MAX_BODY_SIZE);
 
           if (file.size > fileMaxSize) {
             message.error(t(p("maxSizeErrorMessage"), [file.name, publicConfig.CLIENT_MAX_BODY_SIZE]));

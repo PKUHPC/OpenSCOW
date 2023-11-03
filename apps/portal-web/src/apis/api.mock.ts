@@ -63,18 +63,8 @@ export const job: JobInfo = {
 
 export const mockApi: MockApi<typeof api> = {
 
-  getClusterInfo: async ({ query: { cluster } }) => ({ clusterInfo: {
-    submitJobDirTemplate: "/home/ddadaal/Code/{{ name }}",
-    scheduler: {
-      name: "slurm",
-      partitions: [
-        { cores: 123, name: "123", nodes: 123, qos: ["123"], gpus: 10, memMb: 1000 },
-        { cores: 1234, name: cluster, nodes: 1234, qos: ["1234"], gpus: 10, memMb: 1000 },
-        { name : "compute", memMb: 2048, cores:2, gpus:0, nodes: 1, qos: ["normal"], comment: "两个计算节点分区" },
-        { name : "GPU", memMb: 2048, cores:2, gpus:2, nodes: 1, qos: ["normal"], comment: "GPU" },
-      ],
-    },
-  } }),
+  getClusterInfo: null,
+  listAvailableTransferClusters: null,
 
   checkAppConnectivity: async () => ({
     ok: Math.random() < 0.5,
@@ -241,6 +231,11 @@ export const mockApi: MockApi<typeof api> = {
       customAttributes: { selectVersion: "code-server/4.9.0", sbatchOptions: "--time 10" },
     },
   }),
+
+  startFileTransfer: null,
+  queryFileTransferProgress: null,
+  terminateFileTransfer: null,
+  checkTransferKey: null,
 
 };
 

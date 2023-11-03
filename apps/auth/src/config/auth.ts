@@ -171,19 +171,36 @@ export const OtpLdapSchema = Type.Object({
 }, { description: "将otp密钥存在ldap需要配置信息" });
 
 export const UiConfigSchema = Type.Object({
-  backgroundImagePath: Type.String({ description: "默认背景图片", default: "./assets/background.png" }),
-  backgroundFallbackColor: Type.String({ description: "默认背景颜色", default: "#8c8c8c" }),
-  logo: Type.Object({
-    scowLogoType: Type.Enum(ScowLogoType, { description: "scow logo 类型", default: ScowLogoType.dark }),
-    customLogoPath: Type.Optional(Type.String({ description: "用户自定义 logo 图片" })),
-    customLogoLink: Type.Optional(Type.String({ description: "用户自定义点击 logo 跳转链接" })),
-  }, { default: {} }),
-  slogan: Type.Object({
-    color: Type.String({ description: "默认标语文字颜色", default: "white" }),
-    title: createI18nStringSchema("默认标语标题", ""),
-    texts: Type.Array(createI18nStringSchema(""), { description: "默认 slogan 正文数组", default: []}),
-  }, { default: {} }),
-  footerTextColor: Type.String({ description: "默认 footer 文字颜色", default: "white" }),
+  default: Type.Object({
+    backgroundImagePath: Type.String({ description: "默认背景图片", default: "./assets/background.png" }),
+    backgroundFallbackColor: Type.String({ description: "默认背景颜色", default: "#8c8c8c" }),
+    logo: Type.Object({
+      scowLogoType: Type.Enum(ScowLogoType, { description: "scow logo 类型", default: ScowLogoType.dark }),
+      customLogoPath: Type.Optional(Type.String({ description: "用户自定义 logo 图片" })),
+      customLogoLink: Type.Optional(Type.String({ description: "用户自定义点击 logo 跳转链接" })),
+    }, { default: {} }),
+    slogan: Type.Object({
+      color: Type.String({ description: "默认标语文字颜色", default: "white" }),
+      title: createI18nStringSchema("默认标语标题", ""),
+      texts: Type.Array(createI18nStringSchema(""), { description: "默认 slogan 正文数组", default: []}),
+    }, { default: {} }),
+    footerTextColor: Type.String({ description: "默认 footer 文字颜色", default: "white" }),
+  }),
+  hostnameMap: Type.Optional(Type.Record(Type.String(), Type.Object({
+    backgroundImagePath: Type.Optional(Type.String({ description: "默认背景图片" })),
+    backgroundFallbackColor: Type.Optional(Type.String({ description: "默认背景颜色" })),
+    logo: Type.Optional(Type.Object({
+      scowLogoType: Type.Optional(Type.Enum(ScowLogoType, { description: "scow logo 类型" })),
+      customLogoPath: Type.Optional(Type.String({ description: "用户自定义 logo 图片" })),
+      customLogoLink: Type.Optional(Type.String({ description: "用户自定义点击 logo 跳转链接" })),
+    })),
+    slogan: Type.Optional(Type.Object({
+      color: Type.String({ description: "默认标语文字颜色" }),
+      title: createI18nStringSchema("默认标语标题", ""),
+      texts: Type.Array(createI18nStringSchema(""), { description: "默认 slogan 正文数组" }),
+    })),
+    footerTextColor: Type.Optional(Type.String({ description: "默认 footer 文字颜色" })),
+  }))),
 });
 
 export const OtpConfigSchema = Type.Object({

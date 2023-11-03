@@ -17,7 +17,7 @@ import { urlToDownload } from "src/pageComponents/filemanager/api";
 import { ShellInputData, ShellOutputData } from "src/pages/api/shell";
 import { User } from "src/stores/UserStore";
 import { publicConfig } from "src/utils/config";
-import styled from "styled-components";
+import { styled } from "styled-components";
 import { Terminal } from "xterm";
 import { FitAddon } from "xterm-addon-fit";
 

@@ -25,7 +25,7 @@
     "@ddadaal/tsgrpc-server": "0.19.4",
     "@ddadaal/tsgrpc-common": "0.2.4",
     "@ddadaal/tsgrpc-client": "0.17.6",
-    "@grpc/grpc-js": "1.8.21",
+    "@grpc/grpc-js": "1.9.5",
     "@mikro-orm/cli": "5.7.14",
     "@mikro-orm/core": "5.7.14",
     "@mikro-orm/migrations": "5.7.14",

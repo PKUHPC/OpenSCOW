@@ -16,6 +16,13 @@ import { ConfigServiceServer, ConfigServiceService } from "@scow/protos/build/se
 
 export const misConfigServiceServer = plugin((server) => {
   server.addService<ConfigServiceServer>(ConfigServiceService, {
+
+    /**
+     * Deprecated Notice
+     * This API function GetAvailablePartitions has been deprecated.
+     * Use the new API function GetAvailablePartitionsForCluster instead.
+     * @deprecated
+     */
     getAvailablePartitions: async ({ request, logger }) => {
 
       const { accountName, userId } = request;
@@ -31,6 +38,21 @@ export const misConfigServiceServer = plugin((server) => {
       });
 
       return [{ clusterPartitions: wrappedResult } ];
+    },
+
+
+    getAvailablePartitionsForCluster: async ({ request, logger }) => {
+
+      const { cluster, accountName, userId } = request;
+      const reply = await server.ext.clusters.callOnOne(
+        cluster,
+        logger,
+        async (client) => await asyncClientCall(client.config, "getAvailablePartitions", {
+          accountName, userId,
+        }),
+      );
+
+      return [reply];
     },
   });
 });
