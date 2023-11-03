@@ -195,6 +195,31 @@ export const adminServiceServer = plugin((server) => {
       return [reply ? reply : { newJobsCount: 0 }];
     },
 
+    getSyncBlockStatusInfo: async () => {
+      return [{
+        syncStarted: server.ext.syncBlockStatus.started(),
+        schedule: server.ext.syncBlockStatus.schedule,
+        lastSyncTime: server.ext.syncBlockStatus.lastSyncTime()?.toISOString() ?? undefined,
+      }];
+    },
+
+    setSyncBlockStatusState: async ({ request }) => {
+      const { started } = request;
+
+      if (started) {
+        server.ext.syncBlockStatus.start();
+      } else {
+        server.ext.syncBlockStatus.stop();
+      }
+
+      return [{}];
+    },
+
+    syncBlockStatus: async () => {
+      const reply = await server.ext.syncBlockStatus.sync();
+      return [reply];
+    },
+
     updateBlockStatus: async ({ em, logger }) => {
       await updateBlockStatusInSlurm(em, server.ext.clusters, logger);
       return [{}];

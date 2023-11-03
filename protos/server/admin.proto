@@ -127,6 +127,32 @@ message FetchJobsResponse {
   uint32 new_jobs_count = 1;
 }
 
+message GetSyncBlockStatusInfoRequest {
+}
+message GetSyncBlockStatusInfoResponse {
+  bool sync_started = 1;
+  string schedule = 2;
+  optional google.protobuf.Timestamp last_sync_time = 3;
+}
+
+message SetSyncBlockStatusStateRequest {
+  bool started = 1;
+}
+message SetSyncBlockStatusStateResponse {
+}
+
+message BlockedFailedUserAccount {
+  string account_name = 1;
+  string user_id= 2;
+}
+message SyncBlockStatusRequest{
+}
+message SyncBlockStatusResponse{
+  repeated string blocked_failed_accounts = 1;
+  repeated BlockedFailedUserAccount blocked_failed_user_accounts = 2;
+  repeated string unblocked_failed_accounts = 3;
+}
+
 message UpdateBlockStatusRequest{
 }
 message UpdateBlockStatusResponse{
@@ -153,7 +179,11 @@ service AdminService {
   rpc GetFetchInfo(GetFetchInfoRequest) returns (GetFetchInfoResponse);
   rpc SetFetchState(SetFetchStateRequest) returns (SetFetchStateResponse);
   rpc FetchJobs(FetchJobsRequest) returns (FetchJobsResponse);
-  rpc UpdateBlockStatus(UpdateBlockStatusRequest)
-    returns (UpdateBlockStatusResponse);
+  rpc GetSyncBlockStatusInfo(GetSyncBlockStatusInfoRequest) returns (GetSyncBlockStatusInfoResponse);
+  rpc SetSyncBlockStatusState(SetSyncBlockStatusStateRequest) returns (SetSyncBlockStatusStateResponse);
+  rpc SyncBlockStatus(SyncBlockStatusRequest) returns (SyncBlockStatusResponse);
+  rpc UpdateBlockStatus(UpdateBlockStatusRequest) returns (UpdateBlockStatusResponse) {
+    option deprecated = true;
+  };
   rpc GetAdminInfo(GetAdminInfoRequest) returns (GetAdminInfoResponse);
 }
