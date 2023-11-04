@@ -117,10 +117,7 @@ export const ChargeForm: React.FC = () => {
       <Form.Item
         name="type"
         label={t(pCommon("type"))}
-        rules={[
-          { required: true },
-          { max: 50 },
-        ]}
+        required
         extra={(
           <div style={{ margin: "8px 0" }}>
             <UsedType
@@ -131,7 +128,7 @@ export const ChargeForm: React.FC = () => {
       >
         <Input />
       </Form.Item>
-      <Form.Item name="comment" label={t(pCommon("comment"))} rules={[{ max: 255 }]}>
+      <Form.Item name="comment" label={t(pCommon("comment"))}>
         <Input.TextArea />
       </Form.Item>
       <Form.Item wrapperCol={{ span: 6, offset: 4 }}>

@@ -50,7 +50,6 @@ export const CreateTenantForm: React.FC = () => {
         name="tenantName"
         rules={[
           { required: true },
-          { max: 255 },
         ]}
       >
         <Input />
