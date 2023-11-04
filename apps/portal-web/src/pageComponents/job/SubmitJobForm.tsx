@@ -215,7 +215,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
           </Form.Item>
         </Col>
         <Col span={24} sm={12}>
-          <Form.Item<JobForm> label={t(p("jobName"))} name="jobName" rules={[{ required: true }]}>
+          <Form.Item<JobForm> label={t(p("jobName"))} name="jobName" rules={[{ required: true }, { max: 50 }]}>
             <Input />
           </Form.Item>
         </Col>
