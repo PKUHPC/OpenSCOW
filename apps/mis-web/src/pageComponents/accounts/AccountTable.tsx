@@ -134,7 +134,7 @@ export const AccountTable: React.FC<Props> = ({
           onChange: (page) => setCurrentPageNum(page),
         }}
         rowKey="userId"
-        scroll={{ x: 1200 }}
+        scroll={{ x: filteredData?.length ? 1200 : true }}
         onChange={handleTableChange}
       >
         <Table.Column<AdminAccountInfo>

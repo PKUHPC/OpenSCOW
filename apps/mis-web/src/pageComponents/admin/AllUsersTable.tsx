@@ -206,7 +206,7 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
           onChange: (page, pageSize) => setPageInfo({ page, pageSize }),
         } : false}
         onChange={handleTableChange}
-        scroll={{ x: 1200 }}
+        scroll={{ x: data?.platformUsers?.length ? 1200 : true }}
       >
         <Table.Column<PlatformUserInfo>
           dataIndex="userId"

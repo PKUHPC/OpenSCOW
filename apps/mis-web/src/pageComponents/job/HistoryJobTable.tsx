@@ -293,7 +293,7 @@ export const JobInfoTable: React.FC<JobInfoTableProps> = ({
           total: data?.totalCount,
           onChange: (page, pageSize) => setPageInfo({ page, pageSize }),
         } : false}
-        scroll={{ x: 1200 }}
+        scroll={{ x: data?.jobs?.length ? 1200 : true }}
       >
         <Table.Column<JobInfo> dataIndex="idJob" width={100} title={t(pCommon("clusterWorkId"))} />
         {

@@ -156,7 +156,7 @@ export const JobInfoTable: React.FC<JobInfoTableProps> = ({
       loading={isLoading}
       pagination={{ showSizeChanger: true }}
       rowKey={(x) => x.jobId}
-      scroll={{ x: 1750 }}
+      scroll={{ x: data?.length ? 1750 : true }}
     >
       <Table.Column<JobInfo>
         dataIndex="jobId"
