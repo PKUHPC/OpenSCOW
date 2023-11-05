@@ -29,12 +29,12 @@ createUser:
 
   # 内置创建用户功能配置
   builtin:
-    # 新用户ID的格式
+    # 创建用户时，用户ID的规则。不设置就没有限制
     userIdPattern:
       # 正则表达式
-      regex: "[a-zA-Z0-9]+"
-      # 出错时的消息，可选
-      message: 用户ID应仅包含字母和数字
+      regex: "^[a-z][a-z0-9_]{2,19}$"
+      # 出错时的消息
+      errorMessage: "要求输入长度为3-20位，由小写字母、数字、下划线组成，且以小写字母开头的字符串"
 ```
 
 创建时对密码的要求，请参考[用户密码正则配置](../../customization/password-pattern.md)
