@@ -14,6 +14,7 @@ import { Empty, Spin } from "antd";
 import React from "react";
 import { Bar, BarChart,
   ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { Formatter } from "recharts/types/component/DefaultTooltipContent";
 import { styled } from "styled-components";
 
 interface Props {
@@ -21,6 +22,7 @@ interface Props {
   title: string
   data: {x: string, y: string | number}[]
   xLabel?: string
+  toolTipFormatter?: Formatter<number | string, string>
 }
 
 export const StatisticContainer = styled.div`
@@ -41,6 +43,7 @@ export const DataBarChart: React.FC<Props> = ({
   data,
   isLoading,
   xLabel = "",
+  toolTipFormatter = (value) => value,
 }) => {
 
   return (
@@ -62,7 +65,9 @@ export const DataBarChart: React.FC<Props> = ({
                     height={40}
                   />
                   <YAxis padding={{ top: 20 }} />
-                  <Tooltip />
+                  <Tooltip
+                    formatter={toolTipFormatter}
+                  />
                   <Bar dataKey="y" fill="#54a0ff" barSize={ 40 } />
                 </BarChart>
               </ResponsiveContainer>

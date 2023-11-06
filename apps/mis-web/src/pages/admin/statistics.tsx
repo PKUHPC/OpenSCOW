@@ -60,6 +60,7 @@ const formateData = (data: Array<{ date: string, count: number }>, dateRange: [d
   }
   return countData;
 };
+
 const TitleText = styled.span`
   font-size: 24px;
   font-weight: bold;
@@ -94,96 +95,96 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
 
   const { data: jobTotalCount, isLoading: jobTotalCountLoading } = useAsync({ promiseFn: getJobTotalCountFn });
 
-  const promiseFn1 = useCallback(async () => {
+  const getNewUserCountFn = useCallback(async () => {
     return await api.getNewUserCount({ query: {
       startTime: query.filterTime[0].toISOString(),
       endTime: query.filterTime[1].toISOString(),
     } });
   }, [query]);
 
-  const { data: newUserCount, isLoading: newUserLoading } = useAsync({ promiseFn: promiseFn1 });
+  const { data: newUserCount, isLoading: newUserLoading } = useAsync({ promiseFn: getNewUserCountFn });
 
-  const promiseFn2 = useCallback(async () => {
+  const getActiveUserCountFn = useCallback(async () => {
     return await api.getActiveUserCount({ query: {
       startTime: query.filterTime[0].toISOString(),
       endTime: query.filterTime[1].toISOString(),
     } });
   }, [query]);
 
-  const { data: activeUserCount, isLoading: activeUserLoading } = useAsync({ promiseFn: promiseFn2 });
+  const { data: activeUserCount, isLoading: activeUserLoading } = useAsync({ promiseFn: getActiveUserCountFn });
 
-  const promiseFn3 = useCallback(async () => {
+  const getTopChargeAccountFn = useCallback(async () => {
     return await api.getTopChargeAccount({ query: {
       startTime: query.filterTime[0].toISOString(),
       endTime: query.filterTime[1].toISOString(),
     } });
   }, [query]);
 
-  const { data: topChargeAccount, isLoading: topChargeAccountLoading } = useAsync({ promiseFn: promiseFn3 });
+  const { data: topChargeAccount, isLoading: topChargeAccountLoading } = useAsync({ promiseFn: getTopChargeAccountFn });
 
-  const promiseFn4 = useCallback(async () => {
+  const getTopPayAccountFn = useCallback(async () => {
     return await api.getTopPayAccount({ query: {
       startTime: query.filterTime[0].toISOString(),
       endTime: query.filterTime[1].toISOString(),
     } });
   }, [query]);
 
-  const { data: topPayAccount, isLoading: topPayAccountLoading } = useAsync({ promiseFn: promiseFn4 });
+  const { data: topPayAccount, isLoading: topPayAccountLoading } = useAsync({ promiseFn: getTopPayAccountFn });
 
-  const promiseFn5 = useCallback(async () => {
+  const getDailyChargeFn = useCallback(async () => {
     return await api.getDailyCharge({ query: {
       startTime: query.filterTime[0].toISOString(),
       endTime: query.filterTime[1].toISOString(),
     } });
   }, [query]);
 
-  const { data: dailyCharge, isLoading: dailyChargeLoading } = useAsync({ promiseFn: promiseFn5 });
+  const { data: dailyCharge, isLoading: dailyChargeLoading } = useAsync({ promiseFn: getDailyChargeFn });
 
-  const promiseFn6 = useCallback(async () => {
+  const getDailyPayFn = useCallback(async () => {
     return await api.getDailyPay({ query: {
       startTime: query.filterTime[0].toISOString(),
       endTime: query.filterTime[1].toISOString(),
     } });
   }, [query]);
 
-  const { data: dailyPay, isLoading: dailyPayLoading } = useAsync({ promiseFn: promiseFn6 });
+  const { data: dailyPay, isLoading: dailyPayLoading } = useAsync({ promiseFn: getDailyPayFn });
 
-  const promiseFn7 = useCallback(async () => {
+  const getTopSubmitJobUserFn = useCallback(async () => {
     return await api.getTopSubmitJobUser({ query: {
       startTime: query.filterTime[0].toISOString(),
       endTime: query.filterTime[1].toISOString(),
     } });
   }, [query]);
 
-  const { data: topSubmitJobUser, isLoading: topSubmitJobUserLoading } = useAsync({ promiseFn: promiseFn7 });
+  const { data: topSubmitJobUser, isLoading: topSubmitJobUserLoading } = useAsync({ promiseFn: getTopSubmitJobUserFn });
 
-  const promiseFn8 = useCallback(async () => {
+  const getNewJobCountFn = useCallback(async () => {
     return await api.getNewJobCount({ query: {
       startTime: query.filterTime[0].toISOString(),
       endTime: query.filterTime[1].toISOString(),
     } });
   }, [query]);
 
-  const { data: dailyNewJobCount, isLoading: dailyNewJobCountLoading } = useAsync({ promiseFn: promiseFn8 });
+  const { data: dailyNewJobCount, isLoading: dailyNewJobCountLoading } = useAsync({ promiseFn: getNewJobCountFn });
 
 
-  const promiseFn9 = useCallback(async () => {
+  const getPortalUsageCountFn = useCallback(async () => {
     return await api.getPortalUsageCount({ query: {
       startTime: query.filterTime[0].toISOString(),
       endTime: query.filterTime[1].toISOString(),
     } });
   }, [query]);
 
-  const { data: portalUsageCount, isLoading: portalUsageCountLoading } = useAsync({ promiseFn: promiseFn9 });
+  const { data: portalUsageCount, isLoading: portalUsageCountLoading } = useAsync({ promiseFn: getPortalUsageCountFn });
 
-  const promiseFn10 = useCallback(async () => {
+  const getMisUsageCountFn = useCallback(async () => {
     return await api.getMisUsageCount({ query: {
       startTime: query.filterTime[0].toISOString(),
       endTime: query.filterTime[1].toISOString(),
     } });
   }, [query]);
 
-  const { data: misUsageCount, isLoading: misUsageCountLoading } = useAsync({ promiseFn: promiseFn10 });
+  const { data: misUsageCount, isLoading: misUsageCountLoading } = useAsync({ promiseFn: getMisUsageCountFn });
 
   const newUserCountData = useMemo(() => {
     if (newUserCount) {
@@ -276,6 +277,8 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
     return [];
   }, [query, misUsageCount]);
 
+  const amountToolTipFormatter = (value: number) => [`${value}(元)`, "金额"];
+
   return (
     <>
       <Head title="平台信息" />
@@ -364,6 +367,7 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
                     }))}
                   isLoading={newUserLoading}
                   title="新增用户数"
+                  toolTipFormatter={(value) => [value, "用户数"]}
                 ></DataLineChart>
               </Col>
               <Col span={12}>
@@ -373,6 +377,7 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
                     y: d.count,
                   }))}
                   title="活跃用户数"
+                  toolTipFormatter={(value) => [value, "用户数"]}
                   isLoading={activeUserLoading}
                 ></DataLineChart>
               </Col>
@@ -396,6 +401,7 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
                   title="消费账户TOP10"
                   isLoading={topChargeAccountLoading}
                   xLabel="账户名"
+                  toolTipFormatter={amountToolTipFormatter}
                 />
               </Col>
               <Col span={12}>
@@ -406,6 +412,7 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
                   }))}
                   title="消费金额"
                   isLoading={dailyChargeLoading}
+                  toolTipFormatter={amountToolTipFormatter}
                 />
               </Col>
             </Row>
@@ -416,6 +423,7 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
                   title="充值账户TOP10"
                   isLoading={topPayAccountLoading}
                   xLabel="账户名"
+                  toolTipFormatter={amountToolTipFormatter}
                 />
               </Col>
               <Col span={12}>
@@ -425,6 +433,7 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
                     y: d.count,
                   }))}
                   title="充值金额"
+                  toolTipFormatter={amountToolTipFormatter}
                   isLoading={dailyPayLoading}
                 />
               </Col>
@@ -450,6 +459,7 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
                   title="作业提交用户TOP10"
                   isLoading={topSubmitJobUserLoading}
                   xLabel="用户名"
+                  toolTipFormatter={(value) => [value, "作业数"]}
                 />
               </Col>
               <Col span={12}>
@@ -459,6 +469,7 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
                     y: d.count,
                   }))}
                   title="新增作业数量"
+                  toolTipFormatter={(value) => [value, "作业数"]}
                   isLoading={dailyNewJobCountLoading}
                 />
               </Col>
@@ -483,6 +494,7 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
                     y: d.count,
                   }))}
                   title="门户系统使用功能次数"
+                  toolTipFormatter={(value) => [value, "次数"]}
                   isLoading={portalUsageCountLoading}
                 />
               </Col>
@@ -493,6 +505,7 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
                     y: d.count,
                   }))}
                   title="管理系统使用功能次数"
+                  toolTipFormatter={(value) => [value, "次数"]}
                   isLoading={misUsageCountLoading}
                 />
               </Col>
