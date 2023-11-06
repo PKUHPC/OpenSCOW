@@ -1,5 +1,48 @@
 # @scow/mis-web
 
+## 1.1.0
+
+### Minor Changes
+
+- ccbde14304: 实现 SCOW 门户系统与管理系统的页面国际化功能
+- b33a2bd6bc: 在 ui.yaml 下的 footer 增加 hostnameMap，其作用与 hostnameTextMap 一致，根据不同 hostname 展示不同的 footer 文本
+- 50d34d6ae3: 增加 scow 定时同步调度器用户封锁、账户封锁/解封状态的功能
+
+### Patch Changes
+
+- 639b77a103: 修复了一些因国际化英文 label 太长被输入框遮挡；修复了登录页的验证码 placeholder 太长和文字超出屏幕的问题。
+- 7fd6a5cfa0: 修复 mis-web 中用户和账户列表 tab 数量会随 tab 切换而变化的问题
+- 5a9bda6f4a: 对提交作业和应用的作业名，创建用户时的姓名、创建租户时租户名、充值时的类型、备注输入做长度控制，避免用户输入过长
+- 24a037e800: 补充租户管理员权限也可以查看租户管理下的账户充值记录页面
+- 9b7bff2bf0: 修复平台管理下用户列表修改用户密码成功与错误时的提示文字错误
+- 1bb1e07f1b: 修复一些 ESLINT 规则检查时的警告
+- 9180882615: 修复 mis-web 中账户列表和用户列表页面统计数量不随搜索而变化的问题
+- ec1f96ad7b: 充值完成后清空充值表单；修改租户充值记录导航栏文本:租户管理->财务管理->充值记录：改为租户充值记录.
+- 6bf6a6e726: 优化修改作业时限，修复修改作业时限 bug 让修改作业时限时指定查询运行中状态的作业
+- 914f6c85f8: 修改管理系统用户可见分区为按不同集群响应分开展示，页面展示顺序为按集群优先级顺序
+- 4fb0881e89: 优化了 web 页面部分 table 超长连续字段（长数字和长单词）破坏表格布局的问题
+- 51903e0732: 登录操作判断由 referer 改为 queryString 传 fromAuth 参数
+- ac3396c66c: 修改用户空间搜索已结束的作业时，账户选择框除现在所属账户外可以输入其他账户值进行搜索
+- c50b18e255: 修改 mis-web 下后端返回的操作日志内容，在 mis-web 前端处理操作类型，操作行为，操作详细的展示
+- f4f14ba51a: 新增创建用户和从账户中移除用户操作等待提示语
+- fdff28b2ef: 修改了国际化的中文显示差异，中文符号的全角，补充了部分漏项
+- Updated dependencies [b33a2bd6bc]
+- Updated dependencies [b7f01512eb]
+- Updated dependencies [29e4b1880a]
+- Updated dependencies [5bb922fe99]
+- Updated dependencies [ccbde14304]
+- Updated dependencies [6bf6a6e726]
+- Updated dependencies [50d34d6ae3]
+- Updated dependencies [29e4b1880a]
+- Updated dependencies [ccbde14304]
+- Updated dependencies [8fc4c21f07]
+- Updated dependencies [4fb0881e89]
+  - @scow/config@1.1.0
+  - @scow/lib-web@1.1.0
+  - @scow/lib-operation-log@2.0.1
+  - @scow/protos@1.0.1
+  - @scow/rich-error-model@2.0.0
+
 ## 1.0.0
 
 ### Major Changes

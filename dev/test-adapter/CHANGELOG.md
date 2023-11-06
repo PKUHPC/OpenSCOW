@@ -1,5 +1,11 @@
 # @scow/test-adapter
 
+## 1.0.1
+
+### Patch Changes
+
+- ccbde14304: 实现 SCOW 门户系统与管理系统的页面国际化功能
+
 ## 1.0.0
 
 ### Major Changes

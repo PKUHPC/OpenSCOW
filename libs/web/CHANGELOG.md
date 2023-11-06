@@ -1,5 +1,17 @@
 # @scow/lib-web
 
+## 1.1.0
+
+### Minor Changes
+
+- ccbde14304: 实现 SCOW 门户系统与管理系统的页面国际化功能
+
+### Patch Changes
+
+- 29e4b1880a: 将 web 获取的 hostname 由 host 变为 hostname，不带 port
+- 6bf6a6e726: 优化修改作业时限，修复修改作业时限 bug 让修改作业时限时指定查询运行中状态的作业
+- 4fb0881e89: 优化了 web 页面部分 table 超长连续字段（长数字和长单词）破坏表格布局的问题
+
 ## 1.0.0
 
 ### Major Changes
