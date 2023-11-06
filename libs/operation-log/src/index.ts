@@ -11,7 +11,7 @@
  */
 
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
-import { ChannelCredentials } from "@grpc/grpc-js";
+import { ChannelCredentials, Metadata } from "@grpc/grpc-js";
 import { AuditConfigSchema } from "@scow/config/build/audit";
 import {
   CreateOperationLogRequest,
@@ -44,16 +44,19 @@ export const createOperationLogClient = (
     : undefined;
 
   if (!config || !client) {
-    logger.debug("Operation Log Server disabled");
+    logger.log("Operation Log Server disabled");
   }
 
   return {
     getLog: async (request: GetOperationLogsRequest): Promise<GetOperationLogsResponse> => {
 
+      logger.log("start getLog", client);
       if (!client) {
-        logger.debug("Attempt to get Log with %o", request);
+        logger.log("Attempt to get Log with %o", request);
         return { results: [], totalCount: 0 };
       }
+
+      logger.log("start asyncUnaryCall");
 
       return await asyncUnaryCall(client, "getOperationLogs", request);
     },
@@ -66,10 +69,13 @@ export const createOperationLogClient = (
       logger,
     }: LogCallParams<TName>) => {
 
+      logger.log("start callLog");
       if (!client) {
-        logger.debug("Attempt to call Log %s with %o", operationTypeName, operationTypePayload);
+        logger.log("Attempt to call Log %s with %o", operationTypeName, operationTypePayload);
         return;
       }
+
+      logger.log("start getLog", client);
 
       return await asyncUnaryCall(client, "createOperationLog", {
         operatorUserId,
