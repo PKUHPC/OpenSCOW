@@ -125,6 +125,7 @@ export const AccountTable: React.FC<Props> = ({
       </FilterFormContainer>
 
       <Table
+        tableLayout="fixed"
         dataSource={filteredData}
         loading={isLoading}
         pagination={{
@@ -133,7 +134,7 @@ export const AccountTable: React.FC<Props> = ({
           onChange: (page) => setCurrentPageNum(page),
         }}
         rowKey="userId"
-        scroll={{ x: true }}
+        scroll={{ x: filteredData?.length ? 1200 : true }}
         onChange={handleTableChange}
       >
         <Table.Column<AdminAccountInfo>
@@ -145,17 +146,20 @@ export const AccountTable: React.FC<Props> = ({
         />
         <Table.Column<AdminAccountInfo>
           dataIndex="ownerName"
+          width={280}
           title={t(p("owner"))}
           render={(_, r) => `${r.ownerName}（ID: ${r.ownerId}）`}
         />
         <Table.Column<AdminAccountInfo>
           dataIndex="userCount"
+          width={90}
           title={t(pCommon("userCount"))}
         />
         {/* 只在平台管理下的账户列表中显示 */}
         {showedTab === "PLATFORM" && (
           <Table.Column<AdminAccountInfo>
             dataIndex="tenantName"
+            width={110}
             title={t(p("tenant"))}
           />
         )}
@@ -165,6 +169,7 @@ export const AccountTable: React.FC<Props> = ({
         />
         <Table.Column<AdminAccountInfo>
           dataIndex="balance"
+          width={150}
           title={t(pCommon("balance"))}
           sorter={(a, b) => (moneyToNumber(a.balance)) - (moneyToNumber(b.balance))}
           sortDirections={["ascend", "descend"]}
@@ -173,6 +178,7 @@ export const AccountTable: React.FC<Props> = ({
         />
         <Table.Column<AdminAccountInfo>
           dataIndex="blocked"
+          width={80}
           title={t(p("status"))}
           sorter={(a, b) => (a.blocked ? 1 : 0) - (b.blocked ? 1 : 0)}
           sortDirections={["ascend", "descend"]}
@@ -182,6 +188,7 @@ export const AccountTable: React.FC<Props> = ({
         />
         <Table.Column<AdminAccountInfo>
           title={t(pCommon("operation"))}
+          width={180}
           render={(_, r) => (
             <Space split={<Divider type="vertical" />}>
               {/* 只在租户管理下的账户列表中显示管理成员 */}
