@@ -12,6 +12,7 @@
 
 import { Card, Space, Statistic } from "antd";
 import React from "react";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { styled } from "styled-components"; ;
 
 interface Props {
@@ -37,8 +38,11 @@ const iconToNode = (Icon: any, color?: string) => {
     : <Icon style={{ fontSize: 64, color }} />;
 };
 
+const p = prefix("pageComp.admin.statisticCard.");
 
 const StatisticCard: React.FC<Props> = ({ title, newAddValue = 0, totalValue = 0, loading, icon, iconColor }) => {
+
+  const t = useI18nTranslateToString();
 
   return (
     <Card bodyStyle={{ display: "flex", flexDirection: "row", justifyContent: "space-between", padding: "15px" } }>
@@ -56,7 +60,7 @@ const StatisticCard: React.FC<Props> = ({ title, newAddValue = 0, totalValue = 0
       </Container>
       <Statistic
         style={{ display: "flex", alignItems: "flex-end" }}
-        title={`总${title}: `}
+        title={`${t(p("total"))}${title}: `}
         value={totalValue}
         loading={loading}
         precision={0}

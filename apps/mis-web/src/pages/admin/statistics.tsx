@@ -22,7 +22,7 @@ import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
-import { useI18n, useI18nTranslateToString } from "src/i18n";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { getOperationTypeTexts } from "src/models/operationLog";
 import { PlatformRole } from "src/models/User";
 import { DataBarChart } from "src/pageComponents/admin/DataBarChart";
@@ -31,6 +31,8 @@ import StatisticCard from "src/pageComponents/admin/StatisticCard";
 import { Head } from "src/utils/head";
 import { styled } from "styled-components";
 
+
+const p = prefix("page.admin.statistics.");
 
 const formateData = (data: Array<{ date: string, count: number }>, dateRange: [dayjs.Dayjs, dayjs.Dayjs]) => {
   const input = data.map((d) => ({
@@ -277,15 +279,15 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
     return [];
   }, [query, misUsageCount]);
 
-  const amountToolTipFormatter = (value: number) => [`${value}(元)`, "金额"];
+  const amountToolTipFormatter = (value: number) => [`${value}(${t(p("yuan"))})`, t(p("amount"))];
 
   return (
     <>
-      <Head title="平台信息" />
-      <PageTitle titleText={"数据总览"} />
+      <Head title={t("layouts.route.common.statistics")} />
+      <PageTitle titleText={t(p("dataOverview"))} />
       <Row gutter={[16, 16]}>
         <Col span={24} style={{ textAlign: "right" }}>
-          <span>日期筛选：</span>
+          <span>{t(p("dateRange"))}：</span>
           <DatePicker.RangePicker
             allowClear={false}
             presets={getDefaultPresets(languageId)}
@@ -299,7 +301,7 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
         </Col>
         <Col flex={4}>
           <StatisticCard
-            title="用户"
+            title={t(p("user"))}
             newAddValue={statisticInfo?.newUser}
             totalValue={statisticInfo?.totalUser}
             loading={statisticInfoLoading}
@@ -309,7 +311,7 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
         </Col>
         <Col flex={4}>
           <StatisticCard
-            title="账户"
+            title={t(p("account"))}
             newAddValue={statisticInfo?.newAccount}
             totalValue={statisticInfo?.totalAccount}
             loading={statisticInfoLoading}
@@ -319,7 +321,7 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
         </Col>
         <Col flex={4}>
           <StatisticCard
-            title="租户"
+            title={t(p("tenant"))}
             newAddValue={statisticInfo?.newTenant}
             totalValue={statisticInfo?.totalTenant}
             loading={statisticInfoLoading}
@@ -329,7 +331,7 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
         </Col>
         <Col flex={4}>
           <StatisticCard
-            title="作业"
+            title={t(p("job"))}
             newAddValue={totalNewJobCount}
             totalValue={jobTotalCount?.count}
             loading={jobTotalCountLoading || dailyNewJobCountLoading}
@@ -339,7 +341,7 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
         </Col>
         <Col flex={4}>
           <StatisticCard
-            title="消费"
+            title={t(p("charge"))}
             newAddValue={totalChargeAmount}
             totalValue={999}
             loading={false}
@@ -352,7 +354,7 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
             title={(
               <Space align="baseline">
                 <UserOutlined style={{ fontSize: "24px", color: "#94070A" }} />
-                <TitleText>用户数量</TitleText>
+                <TitleText>{t(p("userCount"))}</TitleText>
               </Space>
             )}
             bordered={false}
@@ -366,8 +368,8 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
                       y: d.count,
                     }))}
                   isLoading={newUserLoading}
-                  title="新增用户数"
-                  toolTipFormatter={(value) => [value, "用户数"]}
+                  title={t(p("newUserCount"))}
+                  toolTipFormatter={(value) => [value, t(p("userCount"))]}
                 ></DataLineChart>
               </Col>
               <Col span={12}>
@@ -376,8 +378,8 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
                     x: d.date.format("YYYY-MM-DD"),
                     y: d.count,
                   }))}
-                  title="活跃用户数"
-                  toolTipFormatter={(value) => [value, "用户数"]}
+                  title={t(p("activeUserCount"))}
+                  toolTipFormatter={(value) => [value, t(p("userCount"))]}
                   isLoading={activeUserLoading}
                 ></DataLineChart>
               </Col>
@@ -389,7 +391,7 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
             title={(
               <Space align="baseline">
                 <MoneyCollectOutlined style={{ fontSize: "24px", color: "#feca57" }} />
-                <TitleText>消费/充值金额</TitleText>
+                <TitleText>{t(p("chargeOrPayAmount"))}</TitleText>
               </Space>
             )}
             bordered={false}
@@ -398,9 +400,9 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
               <Col span={12}>
                 <DataBarChart
                   data={topChargeAccountData}
-                  title="消费账户TOP10"
+                  title={t(p("topTenChargedAccount"))}
                   isLoading={topChargeAccountLoading}
-                  xLabel="账户名"
+                  xLabel={t(p("accountName"))}
                   toolTipFormatter={amountToolTipFormatter}
                 />
               </Col>
@@ -410,7 +412,7 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
                     x: d.date.format("YYYY-MM-DD"),
                     y: d.count,
                   }))}
-                  title="消费金额"
+                  title={t(p("chargeAmount"))}
                   isLoading={dailyChargeLoading}
                   toolTipFormatter={amountToolTipFormatter}
                 />
@@ -420,9 +422,9 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
               <Col span={12}>
                 <DataBarChart
                   data={topPayAccountData}
-                  title="充值账户TOP10"
+                  title={t(p("topTenPayAccount"))}
                   isLoading={topPayAccountLoading}
-                  xLabel="账户名"
+                  xLabel={t(p("accountName"))}
                   toolTipFormatter={amountToolTipFormatter}
                 />
               </Col>
@@ -432,7 +434,7 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
                     x: d.date.format("YYYY-MM-DD"),
                     y: d.count,
                   }))}
-                  title="充值金额"
+                  title={t(p("payAmount"))}
                   toolTipFormatter={amountToolTipFormatter}
                   isLoading={dailyPayLoading}
                 />
@@ -447,7 +449,7 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
             title={(
               <Space align="baseline">
                 <ProjectOutlined style={{ fontSize: "24px", color: "#8395a7" }} />
-                <TitleText>作业</TitleText>
+                <TitleText>{t(p("job"))}</TitleText>
               </Space>
             )}
             bordered={false}
@@ -456,10 +458,10 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
               <Col span={12}>
                 <DataBarChart
                   data={topSubmitJobUserData}
-                  title="作业提交用户TOP10"
+                  title={t(p("topTenSubmitJobUser"))}
                   isLoading={topSubmitJobUserLoading}
-                  xLabel="用户名"
-                  toolTipFormatter={(value) => [value, "作业数"]}
+                  xLabel={t(p("userName"))}
+                  toolTipFormatter={(value) => [value, t(p("jobCount"))]}
                 />
               </Col>
               <Col span={12}>
@@ -468,8 +470,8 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
                     x: d.date.format("YYYY-MM-DD"),
                     y: d.count,
                   }))}
-                  title="新增作业数量"
-                  toolTipFormatter={(value) => [value, "作业数"]}
+                  title={t(p("newJobCount"))}
+                  toolTipFormatter={(value) => [value, t(p("jobCount"))]}
                   isLoading={dailyNewJobCountLoading}
                 />
               </Col>
@@ -481,7 +483,7 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
             title={(
               <Space align="baseline">
                 <PlayCircleOutlined style={{ fontSize: "24px", color: "black" }} />
-                <TitleText>系统功能使用统计</TitleText>
+                <TitleText>{t(p("systemFeatureUsageCount"))}</TitleText>
               </Space>
             )}
             bordered={false}
@@ -493,8 +495,8 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
                     x: OperationTypeTexts[d.operationType],
                     y: d.count,
                   }))}
-                  title="门户系统使用功能次数"
-                  toolTipFormatter={(value) => [value, "次数"]}
+                  title={t(p("portalFeatureUsageCount"))}
+                  toolTipFormatter={(value) => [value, t(p("usageCount"))]}
                   isLoading={portalUsageCountLoading}
                 />
               </Col>
@@ -504,8 +506,8 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
                     x: OperationTypeTexts[d.operationType],
                     y: d.count,
                   }))}
-                  title="管理系统使用功能次数"
-                  toolTipFormatter={(value) => [value, "次数"]}
+                  title={t(p("misFeatureUsageCount"))}
+                  toolTipFormatter={(value) => [value, t(p("usageCount"))]}
                   isLoading={misUsageCountLoading}
                 />
               </Col>
