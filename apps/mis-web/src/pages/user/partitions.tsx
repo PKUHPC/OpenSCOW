@@ -59,13 +59,14 @@ export const PartitionsPage: NextPage<Props> = requireAuth(() => true)((props: P
   const languageId = useI18n().currentLanguage.id;
   const { text } = props;
 
-  const clusters = Object.values(publicConfig.CLUSTERS);
-
   const [completedRequestCount, setCompletedRequestCount] = useState<number>(0);
   const [renderData, setRenderData] = useState<{ [cluster: string]: JobBillingTableItem[] }>({});
 
-  clusters.forEach((cluster) => {
+  const clusters = Object.values(publicConfig.CLUSTERS);
+
+  publicConfig.CLUSTER_SORTED_ID_LIST.forEach((clusterId) => {
     useAsync({ promiseFn: useCallback(async () => {
+      const cluster = publicConfig.CLUSTERS[clusterId];
       return api.getAvailableBillingTable({
         query: { cluster: cluster.id, tenant: user?.tenant, userId: user?.identityId } })
         .then((data) => {

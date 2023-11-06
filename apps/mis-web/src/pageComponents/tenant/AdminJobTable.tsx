@@ -26,8 +26,9 @@ import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { HistoryJobDrawer } from "src/pageComponents/job/HistoryJobDrawer";
 import { JobPriceChangeModal } from "src/pageComponents/tenant/JobPriceChangeModal";
 import type { GetJobFilter, GetJobInfoSchema } from "src/pages/api/job/jobInfo";
+import { getSortedClusterValues } from "src/utils/cluster";
 import type { Cluster } from "src/utils/config";
-import { getClusterName, publicConfig } from "src/utils/config";
+import { getClusterName } from "src/utils/config";
 import { moneyToString, nullableMoneyToString } from "src/utils/money";
 
 interface PageInfo {
@@ -75,7 +76,7 @@ export const AdminJobTable: React.FC<Props> = () => {
       userId: "",
       accountName: "",
       jobEndTime: [now.subtract(1, "week").startOf("day"), now.endOf("day")],
-      clusters: Object.values(publicConfig.CLUSTERS),
+      clusters: getSortedClusterValues(),
     };
   });
   const [form] = Form.useForm<FilterForm>();

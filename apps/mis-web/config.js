@@ -11,7 +11,7 @@
  */
 
 const { envConfig, str, bool } = require("@scow/lib-config");
-const { getClusterConfigs, getSortedClusters } = require("@scow/config/build/cluster");
+const { getClusterConfigs, getSortedClusters, getSortedClusterIds } = require("@scow/config/build/cluster");
 const { getMisConfig } = require("@scow/config/build/mis");
 const { getCommonConfig } = require("@scow/config/build/common");
 const { getClusterTextsConfig } = require("@scow/config/build/clusterTexts");
@@ -131,6 +131,8 @@ const buildRuntimeConfig = async (phase, basePath) => {
       prev[curr.id] = { id: curr.id, name: curr.displayName };
       return prev;
     }, {}),
+
+    CLUSTER_SORTED_ID_LIST: getSortedClusterIds(clusters),
 
     ACCOUNT_NAME_PATTERN: misConfig.accountNamePattern?.regex,
 

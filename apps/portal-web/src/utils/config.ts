@@ -70,6 +70,8 @@ export interface PublicRuntimeConfig {
 
   CLUSTERS: Cluster[];
 
+  CLUSTER_SORTED_ID_LIST: string[];
+
   NOVNC_CLIENT_URL: string;
 
   PASSWORD_PATTERN: string | undefined;
