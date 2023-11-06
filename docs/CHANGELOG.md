@@ -1,5 +1,25 @@
 # @scow/docs
 
+## 1.1.0
+
+### Minor Changes
+
+- b7f01512eb: 实现了跨集群传输模块
+- b33a2bd6bc: 在 ui.yaml 下的 footer 增加 hostnameMap，其作用与 hostnameTextMap 一致，根据不同 hostname 展示不同的 footer 文本
+
+### Patch Changes
+
+- 5a9bda6f4a: 对提交作业和应用的作业名，创建用户时的姓名、创建租户时租户名、充值时的类型、备注输入做长度控制，避免用户输入过长
+- 01c54f2cbf: 将使用文档从文档网站移出
+- d8a50f63ab: 登录界面 UI 新增根据不同域名展示不同内容
+- 01c54f2cbf: 修改文档网站架构图和说明
+- 95341b2a91: 在 README 中添加 SCOW 技术交流群二维码
+- 75abd18806: 添加 v0.4.0 到 v1.0.0 升级说明文档
+- ccbde14304: 实现 SCOW 门户系统与管理系统的页面国际化功能
+- 24308f7d68: 修复 mis、portal 错误的文档，修复 cli 中 navLinks 错误的配置示例
+- d8a50f63ab: 登录界面新增根据域名显示不同的背景颜色和背景图片
+- f3537808a9: 修改 README 中二维码图片的相对路径地址
+
 ## 1.0.0
 
 ### Major Changes

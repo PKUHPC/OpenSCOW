@@ -1,5 +1,34 @@
 # @scow/mis-server
 
+## 1.1.0
+
+### Minor Changes
+
+- b7f01512eb: 实现了跨集群传输模块
+- 50d34d6ae3: 增加 scow 定时同步调度器用户封锁、账户封锁/解封状态的功能
+
+### Patch Changes
+
+- 998dcff881: getAllUsers 接口增加 email 字段
+- 6bf6a6e726: 优化修改作业时限，修复修改作业时限 bug 让修改作业时限时指定查询运行中状态的作业
+- 914f6c85f8: 修改管理系统用户可见分区为按不同集群响应分开展示，页面展示顺序为按集群优先级顺序
+- 3e775b5e15: 解决账户封锁信息展示、导入错误的问题
+- 8822114c9b: 修复管理系统消费记录的测试用例中，查询结果按时间倒序排序随机性的问题
+- Updated dependencies [b33a2bd6bc]
+- Updated dependencies [b7f01512eb]
+- Updated dependencies [eca87eaeb6]
+- Updated dependencies [5bb922fe99]
+- Updated dependencies [ccbde14304]
+- Updated dependencies [50d34d6ae3]
+- Updated dependencies [29e4b1880a]
+- Updated dependencies [ccbde14304]
+- Updated dependencies [8fc4c21f07]
+  - @scow/config@1.1.0
+  - @scow/lib-scheduler-adapter@1.0.1
+  - @scow/lib-server@1.0.1
+  - @scow/lib-hook@1.0.1
+  - @scow/protos@1.0.1
+
 ## 1.0.0
 
 ### Major Changes
