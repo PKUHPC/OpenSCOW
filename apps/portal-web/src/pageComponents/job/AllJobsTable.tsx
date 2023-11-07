@@ -203,7 +203,6 @@ export const JobInfoTable: React.FC<JobInfoTableProps> = ({
       <Table.Column<JobInfo>
         title={t(p("more"))}
         width={100}
-        fixed="right"
         render={(_, r) => (
           <Space>
             <a onClick={() => Router.push(join("/files", cluster.id, r.workingDirectory))}>

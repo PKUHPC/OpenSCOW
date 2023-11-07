@@ -312,8 +312,8 @@ export const JobInfoTable: React.FC<JobInfoTableProps> = ({
           width={150}
           render={(cluster) => getClusterName(cluster, languageId)}
         />
-        <Table.Column<JobInfo> dataIndex="partition" width={80} title={t(pCommon("partition"))} />
-        <Table.Column<JobInfo> dataIndex="qos" width={80} title="QOS" />
+        <Table.Column<JobInfo> dataIndex="partition" width={100} title={t(pCommon("partition"))} />
+        <Table.Column<JobInfo> dataIndex="qos" width={100} title="QOS" />
         <Table.Column<JobInfo> dataIndex="jobName" ellipsis={true} title={t(pCommon("workName"))} />
         <Table.Column
           dataIndex="timeSubmit"
