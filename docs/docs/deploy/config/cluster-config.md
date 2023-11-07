@@ -55,7 +55,10 @@ crossClusterFileTransfer:
   enabled: true
   # 传输节点的地址(ip地址:端口号)
   transferNode: localhost:22222
-  
+
+# # 是否为K8S集群，默认为false，为true时将在提交作业页面增加镜像url输入框
+# K8S: true  
+
 ```
 
 ## 注意

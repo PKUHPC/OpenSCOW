@@ -151,6 +151,7 @@ message SubmitJobRequest {
   optional string memory = 15;
   optional string comment = 16;
   bool save_as_template = 17;
+  optional string extra_options = 18;
 }
 
 // NOT_FOUND: cluster is not found

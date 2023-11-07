@@ -16,7 +16,7 @@ import { ConfigServiceClient } from "@scow/protos/build/common/config";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { getClient } from "src/utils/client";
-import { runtimeConfig } from "src/utils/config";
+import { publicConfig, runtimeConfig } from "src/utils/config";
 import { route } from "src/utils/route";
 
 export const Partition = Type.Object({
@@ -37,6 +37,7 @@ export const PublicClusterConfig = Type.Object({
     name: Type.String(),
     partitions: Type.Array(Partition),
   }),
+  K8S: Type.Optional(Type.Boolean()),
 });
 
 export type PublicClusterConfig = Static<typeof PublicClusterConfig>;
@@ -79,6 +80,7 @@ export default route(GetClusterInfoSchema, async (req, res) => {
       name: reply.schedulerName,
       partitions: reply.partitions,
     },
+    K8S: runtimeConfig.CLUSTERS_CONFIG[cluster]?.K8S,
   } } };
 
 });

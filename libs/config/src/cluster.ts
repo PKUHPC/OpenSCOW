@@ -86,6 +86,7 @@ export const ClusterConfigSchema = Type.Object({
     enabled: Type.Boolean({ description: "是否开启跨集群传输功能", default: false }),
     transferNode: Type.Optional(Type.String({ description: "跨集群传输文件的节点" })),
   })),
+  K8S: Type.Boolean({ description: "是否为K8S集群", default: false }),
 });
 
 

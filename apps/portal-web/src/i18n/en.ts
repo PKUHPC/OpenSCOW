@@ -178,6 +178,7 @@ export default {
         + "the job submission or execution will fail.",
         output: "Standard Output File",
         errorOutput: "Error Output File",
+        imageUrl: "Image Url",
         totalNodeCount: "Total Nodes: ",
         totalGpuCount: "Total GPU Cards: ",
         totalCoreCount: "Total CPU Cores: ",

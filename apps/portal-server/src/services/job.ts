@@ -155,7 +155,7 @@ export const jobServiceServer = plugin((server) => {
     },
 
     submitJob: async ({ request, logger }) => {
-      const { cluster, command, jobName, coreCount, gpuCount, maxTime, saveAsTemplate, userId,
+      const { cluster, command, jobName, coreCount, gpuCount, maxTime, saveAsTemplate, userId, extraOptions,
         nodeCount, partition, qos, account, comment, workingDirectory, output, errorOutput, memory } = request;
 
 
@@ -173,7 +173,8 @@ export const jobServiceServer = plugin((server) => {
       const reply = await asyncClientCall(client.job, "submitJob", {
         userId, jobName, account, partition: partition!, qos, nodeCount, gpuCount: gpuCount || 0,
         memoryMb: Number(memory?.split("M")[0]), coreCount, timeLimitMinutes: maxTime,
-        script: command, workingDirectory, stdout: output, stderr: errorOutput, extraOptions: [],
+        script: command, workingDirectory, stdout: output, stderr: errorOutput,
+        extraOptions: extraOptions ? [extraOptions] : [],
       }).catch((e) => {
         const ex = e as ServiceError;
         const errors = parseErrorDetails(ex.metadata);
