@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-const languageMap = {
+export const languageMap = {
   js: "javascript",
   jsx: "javascript",
   ts: "typescript",
@@ -42,5 +42,3 @@ const languageMap = {
   swift: "swift",
   m: "objective-c",
 };
-
-export default languageMap;

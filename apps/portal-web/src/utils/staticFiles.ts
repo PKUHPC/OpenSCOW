@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import languageMap from "src/utils/languageMap";
+import { languageMap } from "src/utils/languageMap";
 
 
 export function basename(path: string) {
@@ -24,10 +24,10 @@ export function getExtension(filename: string) {
   return extension ? extension.toLowerCase() : "";
 }
 
-export function isNotImage(filename: string): boolean {
+export function isImage(filename: string): boolean {
   const imageExtensions = ["jpg", "jpeg", "png", "gif", "bmp", "tiff", "svg", "webp"];
   const extension = getExtension(filename);
-  return !imageExtensions.includes(extension);
+  return imageExtensions.includes(extension);
 }
 
 export function getLanguage(filename) {
