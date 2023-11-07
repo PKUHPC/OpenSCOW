@@ -221,9 +221,7 @@ export const userServiceServer = plugin((server) => {
       const jobs = await server.ext.clusters.callOnAll(
         logger,
         async (client) => {
-          const fields = [
-            "job_id", "user", "state", "account",
-          ];
+          const fields = ["job_id", "user", "state", "account"];
 
           return await asyncClientCall(client.job, "getJobs", {
             fields,
@@ -235,7 +233,8 @@ export const userServiceServer = plugin((server) => {
       if (jobs.filter((i) => i.result.jobs.length > 0).length > 0) {
         throw <ServiceError>{
           code: Status.FAILED_PRECONDITION,
-          message: `User ${userId}  has jobs running or pending and cannot remove. `,
+          message: `User ${userId}  has jobs running or pending and cannot remove.
+          Please wait for the job to end or end the job manually before moving out.`,
         };
       }
 
