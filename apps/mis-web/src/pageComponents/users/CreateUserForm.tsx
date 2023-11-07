@@ -48,7 +48,14 @@ export const CreateUserForm: React.FC = () => {
       >
         <Input placeholder={userIdRule?.message} />
       </Form.Item>
-      <Form.Item label={t(pCommon("userFullName"))} name="name" rules={[{ required: true }]}>
+      <Form.Item
+        label={t(pCommon("userFullName"))}
+        name="name"
+        rules={[
+          { required: true },
+          { max: 50 },
+        ]}
+      >
         <Input />
       </Form.Item>
       <Form.Item

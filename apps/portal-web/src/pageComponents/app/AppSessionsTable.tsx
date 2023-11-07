@@ -61,7 +61,8 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster }) => {
 
       return sessions.map((x) => ({
         ...x,
-        remainingTime: x.state === "RUNNING" ? calculateAppRemainingTime(x.runningTime, x.timeLimit) : x.timeLimit,
+        remainingTime: x.state === "RUNNING" ? calculateAppRemainingTime(x.runningTime, x.timeLimit) :
+          x.state === "PENDING" ? "" : x.timeLimit,
       }));
 
     }, [cluster]),
@@ -83,6 +84,7 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster }) => {
     {
       title: t(p("table.sessionId")),
       dataIndex: "sessionId",
+      width:"30%",
     },
     {
       title: t(p("table.jobId")),

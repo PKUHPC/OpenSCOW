@@ -252,48 +252,52 @@ export const RunningJobInfoTable: React.FC<JobInfoTableProps> = ({
         loading={isLoading}
         pagination={{ showSizeChanger: true }}
         rowKey={runningJobId}
-        scroll={{ x: true }}
+        scroll={{ x: data?.length ? 1800 : true }}
       >
         {
           showCluster && (
             <Table.Column<RunningJobInfo>
               dataIndex="cluster"
+              width={150}
               title={t(pCommon("cluster"))}
               render={(_, r) => getI18nConfigCurrentText(r.cluster.name, languageId)}
             />
           )
         }
-        <Table.Column<RunningJobInfo> dataIndex="jobId" title={t(pCommon("workId"))} />
+        <Table.Column<RunningJobInfo> dataIndex="jobId" width={80} title={t(pCommon("workId"))} />
         {
           showUser && (
-            <Table.Column<RunningJobInfo> dataIndex="user" title={t(pCommon("user"))} />
+            <Table.Column<RunningJobInfo> dataIndex="user" width={120} title={t(pCommon("user"))} />
           )
         }
         {
           showAccount && (
-            <Table.Column<RunningJobInfo> dataIndex="account" title={t(pCommon("account"))} />
+            <Table.Column<RunningJobInfo> dataIndex="account" width={120} title={t(pCommon("account"))} />
           )
         }
-        <Table.Column<RunningJobInfo> dataIndex="name" title={t(pCommon("workName"))} />
-        <Table.Column<RunningJobInfo> dataIndex="partition" title={t(pCommon("partition"))} />
-        <Table.Column<RunningJobInfo> dataIndex="qos" title="QOS" />
-        <Table.Column<RunningJobInfo> dataIndex="nodes" title={t(p("nodes"))} />
-        <Table.Column<RunningJobInfo> dataIndex="cores" title={t(p("cores"))} />
-        <Table.Column<RunningJobInfo> dataIndex="gpus" title={t(p("gpus"))} />
-        <Table.Column<RunningJobInfo> dataIndex="state" title={t(pCommon("status"))} />
+        <Table.Column<RunningJobInfo> dataIndex="name" width={200} ellipsis={true} title={t(pCommon("workName"))} />
+        <Table.Column<RunningJobInfo> dataIndex="partition" width={80} title={t(pCommon("partition"))} />
+        <Table.Column<RunningJobInfo> dataIndex="qos" width={80} title="QOS" />
+        <Table.Column<RunningJobInfo> dataIndex="nodes" width={80} title={t(p("nodes"))} />
+        <Table.Column<RunningJobInfo> dataIndex="cores" width={80} title={t(p("cores"))} />
+        <Table.Column<RunningJobInfo> dataIndex="gpus" width={90} title={t(p("gpus"))} />
+        <Table.Column<RunningJobInfo> dataIndex="state" width={110} title={t(pCommon("status"))} />
         <Table.Column
           dataIndex="runningOrQueueTime"
+          width={120}
           title={t(p("time"))}
         />
         <Table.Column
           dataIndex="nodesOrReason"
+          ellipsis={true}
           title={t(p("reason"))}
           render={(d: string) => d.startsWith("(") && d.endsWith(")") ? d.substring(1, d.length - 1) : d}
         />
-        <Table.Column<RunningJobInfo> dataIndex="timeLimit" title={t(p("limit"))} />
+        <Table.Column<RunningJobInfo> dataIndex="timeLimit" width={120} title={t(p("limit"))} />
 
         <Table.Column<RunningJobInfo>
           title={t(pCommon("more"))}
+          width={180}
           render={(_, r) => (
             <Space>
               <a onClick={() => setPreviewItem(r)}>{t(pCommon("detail"))}</a>

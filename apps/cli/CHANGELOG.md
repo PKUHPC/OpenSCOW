@@ -1,5 +1,24 @@
 # @scow/cli
 
+## 1.1.0
+
+### Minor Changes
+
+- b33a2bd6bc: 在 ui.yaml 下的 footer 增加 hostnameMap，其作用与 hostnameTextMap 一致，根据不同 hostname 展示不同的 footer 文本
+
+### Patch Changes
+
+- 5a9bda6f4a: 修改了示例配置文件，新的示例配置文件中默认配置了账户和用户的 ID 的格式，皆改为： 3-20 位数字、小写字母、下划线，以小写字母开头
+- 24308f7d68: 修复 mis、portal 错误的文档，修复 cli 中 navLinks 错误的配置示例
+- Updated dependencies [b33a2bd6bc]
+- Updated dependencies [b7f01512eb]
+- Updated dependencies [5bb922fe99]
+- Updated dependencies [ccbde14304]
+- Updated dependencies [50d34d6ae3]
+- Updated dependencies [29e4b1880a]
+- Updated dependencies [8fc4c21f07]
+  - @scow/config@1.1.0
+
 ## 1.0.0
 
 ### Major Changes

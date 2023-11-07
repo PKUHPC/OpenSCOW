@@ -11,9 +11,10 @@
  */
 
 import { formatDateTime } from "@scow/lib-web/build/utils/datetime";
-import { Alert, App, Collapse, Descriptions, Space, Spin } from "antd";
+import { Alert, App, Badge, Descriptions, Space, Spin } from "antd";
 import { NextPage } from "next";
 import { useState } from "react";
+import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { DisabledA } from "src/components/DisabledA";
@@ -22,8 +23,7 @@ import { prefix, useI18nTranslateToString } from "src/i18n";
 import { PlatformRole } from "src/models/User";
 import { Head } from "src/utils/head";
 
-const { Panel } = Collapse;
-
+const promiseFn = async () => api.getSyncBlockStatusJobInfo({});
 const p = prefix("page.admin.systemDebug.slurmBlockStatus.");
 
 export const SlurmBlockStatusPage: NextPage = requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))(
@@ -31,13 +31,14 @@ export const SlurmBlockStatusPage: NextPage = requireAuth((u) => u.platformRoles
 
     const t = useI18nTranslateToString();
 
-    const isLoading = false;
-    const reload = () => {};
-    const data = { lastRun: new Date().toISOString() };
+    const { isLoading, data, reload } = useAsync({
+      promiseFn,
+    });
 
     const { message } = App.useApp();
 
-    const [running, setRunning] = useState(false);
+    const [fetching, setFetching] = useState(false);
+    const [changingState, setChangingState] = useState(false);
 
     return (
       <div>
@@ -55,44 +56,66 @@ export const SlurmBlockStatusPage: NextPage = requireAuth((u) => u.platformRoles
           )}
         />
 
-        <Collapse defaultActiveKey={["1"]}>
-          <Panel header={t(p("slurmScheduler"))} key="1">
-            <p>
-              {t(p("slurmSchedulerMessage1"))}<br />
-              {t(p("slurmSchedulerMessage2"))}<br />
-              {t(p("slurmSchedulerMessage3"))}
-            </p>
-          </Panel>
-          <Panel header={t(p("otherScheduler"))} key="2">
-            <p>
-              {t(p("otherSchedulerMessage"))}
-            </p>
-          </Panel>
-
-        </Collapse>
-
         <Spin spinning={isLoading}>
           {
             data ? (
               <Descriptions bordered column={1}>
-                <Descriptions.Item label={t(p("lastRunTime"))}>
+                <Descriptions.Item label={t(p("periodicSyncUserAccountBlockStatusInfo"))}>
+                  <Space>
+                    {data.syncStarted
+                      ? <Badge status="success" text={t(p("turnedOn"))} />
+                      : <Badge status="error" text={t(p("paused"))} />
+                    }
+                    <DisabledA
+                      onClick={() => {
+                        setChangingState(true);
+                        api.setSyncBlockStatusState({ query: { started: !data.syncStarted } })
+                          .then(() => reload())
+                          .finally(() => setChangingState(false));
+                      }}
+                      disabled={changingState}
+                    >
+                      {data.syncStarted ? t(p("stopSync")) : t(p("startSync"))}
+                    </DisabledA>
+                  </Space>
+                </Descriptions.Item>
+                <Descriptions.Item label={t(p("jobSyncCycle"))}>
+                  {data.schedule}
+                </Descriptions.Item>
+                <Descriptions.Item label={t(p("lastSyncTime"))}>
                   <Space>
                     <span>
-                      {data.lastRun ? formatDateTime(data.lastRun) : t(p("notBlocked"))}
+                      {data.lastSyncTime ? formatDateTime(data.lastSyncTime) : t(p("notSynced"))}
                     </span>
                     <DisabledA
-                      onClick={async () => {
-                        setRunning(true);
-                        await api.updateBlockStatus({})
-                          .then(() => {
-                            message.success(t(p("refreshSuccess")));
+                      onClick={() => {
+                        setFetching(true);
+                        api.syncBlockStatus({})
+                          .then(({ blockedFailedAccounts, unblockedFailedAccounts, blockedFailedUserAccounts }) => {
+                            if (!(blockedFailedAccounts.length || unblockedFailedAccounts.length
+                              || blockedFailedUserAccounts.length)) {
+                              message.success(t(p("syncSuccess")));
+                            } else {
+                              let errorMessage = t(p("partialSyncSuccess"));
+                              if (blockedFailedAccounts.length) {
+                                errorMessage += t(p("syncBlockedFailedAccount")) + blockedFailedAccounts.join(",");
+                              }
+                              if (unblockedFailedAccounts.length) {
+                                errorMessage += t(p("syncBlockedFailedAccount")) + unblockedFailedAccounts.join(",");
+                              }
+                              if (blockedFailedUserAccounts.length) {
+                                errorMessage += t(p("syncBlockedFailedAccount"))
+                                + JSON.stringify(blockedFailedUserAccounts);
+                              }
+                              message.error(errorMessage);
+                            }
+                            reload();
                           })
-                          .finally(() => setRunning(false));
-                        setRunning(false);
+                          .finally(() => setFetching(false));
                       }}
-                      disabled={running}
+                      disabled={fetching}
                     >
-                      {t(p("refreshSchedulerUserBlockingStatus"))}
+                      {t(p("syncSchedulerBlockingStatusNow"))}
                     </DisabledA>
                   </Space>
                 </Descriptions.Item>
