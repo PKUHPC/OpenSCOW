@@ -194,6 +194,7 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
   return (
     <>
       <Table
+        tableLayout="fixed"
         dataSource={data?.platformUsers}
         loading={isLoading}
         pagination={setPageInfo ? {
@@ -204,8 +205,8 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
           total: data?.totalCount,
           onChange: (page, pageSize) => setPageInfo({ page, pageSize }),
         } : false}
-        scroll={{ x: true }}
         onChange={handleTableChange}
+        scroll={{ x: data?.platformUsers?.length ? 1200 : true }}
       >
         <Table.Column<PlatformUserInfo>
           dataIndex="userId"
@@ -224,11 +225,13 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
         <Table.Column<PlatformUserInfo> dataIndex="tenantName" title={t(p("tenant"))} />
         <Table.Column<PlatformUserInfo>
           dataIndex="availableAccounts"
+          width="25%"
           title={t(p("availableAccounts"))}
           render={(accounts) => accounts.join(",")}
         />
         <Table.Column<PlatformUserInfo>
           dataIndex="createTime"
+          width={160}
           title={t(pCommon("createTime"))}
           sorter={true}
           sortDirections={["ascend", "descend"]}
@@ -237,6 +240,7 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
         />
         <Table.Column<PlatformUserInfo>
           dataIndex="roles"
+          width={175}
           title={t(p("roles"))}
           render={(_, r) => (
             <PlatformRoleSelector reload={reload} roles={r.platformRoles} userId={r.userId} currentUser={user} />
@@ -245,6 +249,7 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
 
         <Table.Column<PlatformUserInfo>
           dataIndex="changePassword"
+          width={90}
           title={t(pCommon("operation"))}
           render={(_, r) => (
             <Space split={<Divider type="vertical" />}>

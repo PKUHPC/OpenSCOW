@@ -293,34 +293,37 @@ export const JobInfoTable: React.FC<JobInfoTableProps> = ({
           total: data?.totalCount,
           onChange: (page, pageSize) => setPageInfo({ page, pageSize }),
         } : false}
-        scroll={{ x: true }}
+        scroll={{ x: data?.jobs?.length ? 1200 : true }}
       >
-        <Table.Column<JobInfo> dataIndex="idJob" title={t(pCommon("clusterWorkId"))} />
+        <Table.Column<JobInfo> dataIndex="idJob" width={100} title={t(pCommon("clusterWorkId"))} />
         {
           showAccount ? (
-            <Table.Column<JobInfo> dataIndex="account" title={t(pCommon("account"))} />
+            <Table.Column<JobInfo> dataIndex="account" width={120} title={t(pCommon("account"))} />
           ) : undefined
         }
         {
           showUser ? (
-            <Table.Column<JobInfo> dataIndex="user" title={t(pCommon("user"))} />
+            <Table.Column<JobInfo> dataIndex="user" width={120} title={t(pCommon("user"))} />
           ) : undefined
         }
         <Table.Column<JobInfo>
           dataIndex="cluster"
           title={t(pCommon("clusterName"))}
+          width={150}
           render={(cluster) => getClusterName(cluster, languageId)}
         />
-        <Table.Column<JobInfo> dataIndex="partition" title={t(pCommon("partition"))} />
-        <Table.Column<JobInfo> dataIndex="qos" title="QOS" />
-        <Table.Column<JobInfo> dataIndex="jobName" title={t(pCommon("workName"))} />
+        <Table.Column<JobInfo> dataIndex="partition" width={80} title={t(pCommon("partition"))} />
+        <Table.Column<JobInfo> dataIndex="qos" width={80} title="QOS" />
+        <Table.Column<JobInfo> dataIndex="jobName" ellipsis={true} title={t(pCommon("workName"))} />
         <Table.Column
           dataIndex="timeSubmit"
+          width={160}
           title={t(pCommon("timeSubmit"))}
           render={(time: string) => formatDateTime(time)}
         />
         <Table.Column<JobInfo>
           dataIndex="timeEnd"
+          width={160}
           title={t(pCommon("timeEnd"))}
           render={(time: string) => formatDateTime(time)}
         />
@@ -329,6 +332,7 @@ export const JobInfoTable: React.FC<JobInfoTableProps> = ({
             <Table.Column<JobInfo>
               key={i}
               dataIndex={`${v}Price`}
+              width={110}
               title={finalPriceText[v]}
               render={(price: Money) => moneyToString(price) + " " + t(pCommon("unit"))}
             />
@@ -336,6 +340,7 @@ export const JobInfoTable: React.FC<JobInfoTableProps> = ({
         }
         <Table.Column<JobInfo>
           title={t(pCommon("more"))}
+          width={60}
           render={(_, r) => <a onClick={() => setPreviewItem(r)}>{t(pCommon("detail"))}</a>}
         />
       </Table>

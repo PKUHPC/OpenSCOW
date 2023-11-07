@@ -165,9 +165,9 @@ export const PaymentTable: React.FC<Props> = ({
         </Form>
       </FilterFormContainer>
       <Table
+        tableLayout="fixed"
         dataSource={data?.results as Array<TableProps>}
         loading={isLoading}
-        scroll={{ x: true }}
         pagination={{ showSizeChanger: true }}
       >
         {
@@ -178,8 +178,16 @@ export const PaymentTable: React.FC<Props> = ({
         }
         <Table.Column dataIndex="time" title={t(p("paymentDate"))} render={(v) => formatDateTime(v)} />
         <Table.Column dataIndex="amount" title={t(p("paymentAmount"))} render={(v) => v.toFixed(3)} />
-        <Table.Column dataIndex="type" title={t(pCommon("type"))} />
-        <Table.Column dataIndex="comment" title={t(pCommon("comment"))} />
+        <Table.Column
+          dataIndex="type"
+          title={t(pCommon("type"))}
+          width="15%"
+        />
+        <Table.Column
+          dataIndex="comment"
+          title={t(pCommon("comment"))}
+          width="25%"
+        />
         {
           showAuditInfo ? (
             <>
