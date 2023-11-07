@@ -1,5 +1,43 @@
 # @scow/portal-web
 
+## 1.1.0
+
+### Minor Changes
+
+- b7f01512eb: 实现了跨集群传输模块
+- ccbde14304: 实现 SCOW 门户系统与管理系统的页面国际化功能
+- b33a2bd6bc: 在 ui.yaml 下的 footer 增加 hostnameMap，其作用与 hostnameTextMap 一致，根据不同 hostname 展示不同的 footer 文本
+
+### Patch Changes
+
+- 639b77a103: 修复了一些因国际化英文 label 太长被输入框遮挡；修复了登录页的验证码 placeholder 太长和文字超出屏幕的问题。
+- 5a9bda6f4a: 对提交作业和应用的作业名，创建用户时的姓名、创建租户时租户名、充值时的类型、备注输入做长度控制，避免用户输入过长
+- 8fc4c21f07: 在{app}.yaml 中增加对交互式应用说明的配置项
+- 1bb1e07f1b: 修复一些 ESLINT 规则检查时的警告
+- 29e4b1880a: 将 web 获取的 hostname 由 host 变为 hostname，不带 port
+- ee48e8c2da: 修改交互式应用列表作业在 PENDING 状态时不显示剩余时间
+- 5bb922fe99: 修改门户系统连接 shell 时 url 只显示登录节点的 address
+- 4fb0881e89: 优化了 web 页面部分 table 超长连续字段（长数字和长单词）破坏表格布局的问题
+- 51903e0732: 登录操作判断由 referer 改为 queryString 传 fromAuth 参数
+- ee0545adf3: 修复文件大小上传限制只考虑单位为 G 的问题
+- fdff28b2ef: 修改了国际化的中文显示差异，中文符号的全角，补充了部分漏项
+- Updated dependencies [b33a2bd6bc]
+- Updated dependencies [b7f01512eb]
+- Updated dependencies [29e4b1880a]
+- Updated dependencies [5bb922fe99]
+- Updated dependencies [ccbde14304]
+- Updated dependencies [6bf6a6e726]
+- Updated dependencies [50d34d6ae3]
+- Updated dependencies [29e4b1880a]
+- Updated dependencies [ccbde14304]
+- Updated dependencies [8fc4c21f07]
+- Updated dependencies [4fb0881e89]
+  - @scow/config@1.1.0
+  - @scow/lib-web@1.1.0
+  - @scow/lib-operation-log@2.0.1
+  - @scow/protos@1.0.1
+  - @scow/rich-error-model@2.0.0
+
 ## 1.0.0
 
 ### Major Changes

@@ -1,5 +1,23 @@
 # @scow/grpc-api
 
+## 1.1.0
+
+### Minor Changes
+
+- b7f01512eb: 实现了跨集群传输模块
+- 914f6c85f8: 新增 getAvailablePartitionsForPartitions 接口获取某个集群下可见分区信息，getAvailablePartitions 变更为 deprecated 将在下一个大版本中被删除
+- 50d34d6ae3: 增加 scow 定时同步调度器用户封锁、账户封锁/解封状态的接口，返回失败的账户、用户的信息
+  增加获取 scow 定时同步调度器用户封锁、账户封锁/解封状态配置信息的接口
+  增加设置 scow 定时同步调度器用户封锁、账户封锁/解封状态配置启动/关闭的接口
+  后续版本版本将会删除 updateBlockStatus 接口
+
+### Patch Changes
+
+- bd6783e89e: 修改 FILEINFO 中文件 size 的类型为 unit 64
+- ccbde14304: 修改交互式应用的 html 配置表单的 lable 与 placeholder 的 grpc 类型为 i18nStringType
+- 8fc4c21f07: 在 getAppMetadata 的返回值中增加交互式应用说明 app_comment
+- 998dcff881: getAllUsers 接口增加 email 字段
+
 ## 1.0.0
 
 ### Major Changes

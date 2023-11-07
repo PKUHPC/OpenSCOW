@@ -143,9 +143,9 @@ export const ChargeTable: React.FC<Props> = ({
         </Form>
       </FilterFormContainer>
       <Table
+        tableLayout="fixed"
         dataSource={data?.results}
         loading={isLoading}
-        scroll={{ x: true }}
         pagination={{ showSizeChanger: true }}
       >
         {
@@ -160,8 +160,8 @@ export const ChargeTable: React.FC<Props> = ({
         }
         <Table.Column dataIndex="time" title={t(p("time"))} render={(v) => formatDateTime(v)} />
         <Table.Column dataIndex="amount" title={t(p("amount"))} render={(v) => v.toFixed(3)} />
-        <Table.Column dataIndex="type" title={t(pCommon("type"))} />
-        <Table.Column dataIndex="comment" title={t(pCommon("comment"))} />
+        <Table.Column dataIndex="type" title={t(pCommon("type"))} width="20%" />
+        <Table.Column dataIndex="comment" title={t(pCommon("comment"))} width="25%" />
       </Table>
     </div>
 
