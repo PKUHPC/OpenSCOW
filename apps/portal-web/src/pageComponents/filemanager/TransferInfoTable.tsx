@@ -25,7 +25,7 @@ interface TransferData {
 export const TransferInfoTable: React.FC = () => {
   const { message, modal } = App.useApp();
 
-  const { data: transferData, isLoading, reload } = useAsync({
+  const { data: transferData, reload } = useAsync({
     promiseFn: useCallback(async () => {
       const newTransferData: TransferData[] = [];
       const listClustersResponse = await api.listAvailableTransferClusters({ query: {} });

@@ -61,6 +61,7 @@ const TenantInfoTable: React.FC<TenantInfoTableProps> = ({
     {
       dataIndex: "tenantName",
       title: t(p("tenantName")),
+      width: "35%",
     },
     {
       dataIndex: "userCount",
@@ -85,10 +86,10 @@ const TenantInfoTable: React.FC<TenantInfoTableProps> = ({
 
   return (
     <Table
+      tableLayout="fixed"
       dataSource={data?.platformTenants}
       columns={columns}
       loading={isLoading}
-      scroll={{ x: true }}
       pagination={false}
     />
   );

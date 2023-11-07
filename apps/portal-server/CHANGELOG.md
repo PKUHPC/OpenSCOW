@@ -1,5 +1,31 @@
 # @scow/portal-server
 
+## 1.1.0
+
+### Minor Changes
+
+- b7f01512eb: 实现了跨集群传输模块
+
+### Patch Changes
+
+- 8fc4c21f07: 在{app}.yaml 中增加对交互式应用说明的配置项
+- eca87eaeb6: 修复当作业相关的时间为 0 时，返回空字符串的情况
+- ccbde14304: 实现 SCOW 门户系统与管理系统的页面国际化功能
+- Updated dependencies [b33a2bd6bc]
+- Updated dependencies [b7f01512eb]
+- Updated dependencies [eca87eaeb6]
+- Updated dependencies [5bb922fe99]
+- Updated dependencies [ccbde14304]
+- Updated dependencies [50d34d6ae3]
+- Updated dependencies [29e4b1880a]
+- Updated dependencies [ccbde14304]
+- Updated dependencies [8fc4c21f07]
+  - @scow/config@1.1.0
+  - @scow/lib-scheduler-adapter@1.0.1
+  - @scow/lib-server@1.0.1
+  - @scow/protos@1.0.1
+  - @scow/rich-error-model@2.0.0
+
 ## 1.0.0
 
 ### Major Changes
