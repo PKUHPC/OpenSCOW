@@ -195,6 +195,8 @@ export default {
         fileName: "文件名",
       },
       fileManager: {
+        sftpError:"sftp错误",
+        textExceedsLength:"终端登录欢迎提示信息过多，请减少不必要的信息输出！",
         moveCopy: {
           copy: "复制",
           move: "移动",

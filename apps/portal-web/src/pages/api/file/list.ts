@@ -48,6 +48,7 @@ export const ListFileSchema = typeboxRouteSchema({
     200: Type.Object({ items: Type.Array(FileInfo) }),
     400: Type.Object({ code: Type.Literal("INVALID_CLUSTER") }),
     403: Type.Object({ code: Type.Literal("NOT_ACCESSIBLE") }),
+    409:Type.Object({ code: Type.Literal("FATAL_SFTP_ERROR"), message:Type.String() }),
     412: Type.Object({ code: Type.Literal("DIRECTORY_NOT_FOUND") }),
   },
 });
@@ -78,6 +79,7 @@ export default route(ListFileSchema, async (req, res) => {
     })) } }), handlegRPCError({
     [status.NOT_FOUND]: () => ({ 400: { code: "INVALID_CLUSTER" as const } }),
     [status.PERMISSION_DENIED]: () => ({ 403: { code: "NOT_ACCESSIBLE" as const } }),
+    [status.UNKNOWN]: (e) => ({ 409: { code: "FATAL_SFTP_ERROR" as const, message:e.details } }),
     [status.INVALID_ARGUMENT]: () => ({ 412: { code: "DIRECTORY_NOT_FOUND" as const } }),
   }));
 

@@ -195,6 +195,9 @@ export default {
         fileName: "File Name",
       },
       fileManager: {
+        sftpError:"sftpError",
+        textExceedsLength:"There are too many welcome messages for terminal login."
+                         + "Please reduce unnecessary information output!",
         moveCopy: {
           copy: "Copy",
           move: "Move",
