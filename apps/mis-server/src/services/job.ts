@@ -31,7 +31,7 @@ import { JobInfo as JobInfoEntity } from "src/entities/JobInfo";
 import { JobPriceChange } from "src/entities/JobPriceChange";
 import { AmountStrategy, JobPriceItem } from "src/entities/JobPriceItem";
 import { Tenant } from "src/entities/Tenant";
-import { queryWithRedisCache } from "src/plugins/redis";
+import { queryWithCache } from "src/utils/cache";
 import { toGrpc } from "src/utils/job";
 import { logger } from "src/utils/logger";
 import { paginationProps } from "src/utils/orm";
@@ -380,7 +380,7 @@ export const jobServiceServer = plugin((server) => {
     getTopSubmitJobUsers: async ({ request, em }) => {
       const { startTime, endTime, topRank = 10 } = ensureNotUndefined(request, ["startTime", "endTime"]);
 
-      const redisKey = `{top_submit_job_users:${startTime}:${endTime}:${topRank}`;
+      const queryKey = `{top_submit_job_users:${startTime}:${endTime}:${topRank}`;
       const qb = em.createQueryBuilder(JobInfoEntity, "j");
       qb
         .select("j.user as userId, COUNT(*) as count")
@@ -390,10 +390,10 @@ export const jobServiceServer = plugin((server) => {
         .orderBy({ "COUNT(*)": QueryOrder.DESC })
         .limit(topRank);
 
-      const results: {userId: string, count: number}[] = await queryWithRedisCache({
-        redisKey,
+      const results: {userId: string, count: number}[] = await queryWithCache({
+        em,
+        queryKey,
         queryQb: qb,
-        expireTime: 24 * 60 * 60,
       });
       return [
         {
@@ -404,7 +404,7 @@ export const jobServiceServer = plugin((server) => {
 
     getNewJobCount: async ({ request, em }) => {
       const { startTime, endTime } = ensureNotUndefined(request, ["startTime", "endTime"]);
-      const redisKey = `{new_job_count:${startTime}:${endTime}`;
+      const queryKey = `{new_job_count:${startTime}:${endTime}`;
       const qb = em.createQueryBuilder(JobInfoEntity, "j");
       qb
         .select("DATE(j.time_submit) as date, COUNT(*) as count")
@@ -413,10 +413,10 @@ export const jobServiceServer = plugin((server) => {
         .groupBy("DATE(j.time_submit)")
         .orderBy({ "DATE(j.time_submit)": QueryOrder.DESC });
 
-      const results: {date: string, count: number}[] = await queryWithRedisCache({
-        redisKey,
+      const results: {date: string, count: number}[] = await queryWithCache({
+        em,
+        queryKey,
         queryQb: qb,
-        expireTime: 24 * 60 * 60,
       });
       return [
         {

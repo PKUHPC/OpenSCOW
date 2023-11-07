@@ -25,7 +25,6 @@ import { ClusterPlugin, clustersPlugin } from "src/plugins/clusters";
 import { FetchPlugin, fetchPlugin } from "src/plugins/fetch";
 import { ormPlugin } from "src/plugins/orm";
 import { PricePlugin, pricePlugin } from "src/plugins/price";
-import { redisPlugin } from "src/plugins/redis";
 import { SyncBlockStatusPlugin, syncBlockStatusPlugin } from "src/plugins/syncBlockStatus";
 
 declare module "@ddadaal/tsgrpc-server" {
@@ -45,7 +44,6 @@ export const plugins = [
   pricePlugin,
   fetchPlugin,
   authServicePlugin,
-  redisPlugin,
   syncBlockStatusPlugin,
 ];
 

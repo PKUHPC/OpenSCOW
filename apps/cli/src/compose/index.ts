@@ -232,12 +232,6 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
       environment: {
         "SCOW_LAUNCH_APP": "mis-server",
         "DB_PASSWORD": config.mis.dbPassword,
-        "REDIS_BUILTIN": config.mis.redis.type === "builtin" ? "true" : "false",
-        "REDIS_HOST": config.mis.redis.external?.connection.host ?? "",
-        "REDIS_PORT": config.mis.redis.external?.connection.port ?? "",
-        "REDIS_USER_NAME": config.mis.redis.external?.connection.username ?? "",
-        "REDIS_PASSWORD": config.mis.redis.external?.connection.password ?? "",
-        "REDIS_DB": config.mis.redis.external?.connection.db ?? "",
         ...serviceLogEnv,
       },
       volumes: {

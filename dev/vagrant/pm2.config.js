@@ -100,7 +100,6 @@ module.exports = {
       interpreter_args,
       env: {
         PORT: "5004",
-        REDIS_BUILTIN: 1,
         ...PRODUCTION_ENV,
         ...SCOW_CONFIG_PATH_ENV,
       },

@@ -21,7 +21,7 @@ import { Account } from "src/entities/Account";
 import { ChargeRecord } from "src/entities/ChargeRecord";
 import { PayRecord } from "src/entities/PayRecord";
 import { Tenant } from "src/entities/Tenant";
-import { queryWithRedisCache } from "src/plugins/redis";
+import { queryWithCache } from "src/utils/cache";
 import { CHARGE_TYPE_OTHERS } from "src/utils/constants"; ;
 
 
@@ -278,7 +278,7 @@ export const chargingServiceServer = plugin((server) => {
     getTopChargeAccount: async ({ request, em }) => {
       const { startTime, endTime, topRank = 10 } = ensureNotUndefined(request, ["startTime", "endTime"]);
 
-      const redisKey = `{get_top_charge_account:${startTime}:${endTime}:${topRank}`;
+      const queryKey = `{get_top_charge_account:${startTime}:${endTime}:${topRank}`;
 
       const qb = em.createQueryBuilder(ChargeRecord, "cr");
       qb
@@ -291,10 +291,10 @@ export const chargingServiceServer = plugin((server) => {
         .orderBy({ "SUM(cr.amount)": QueryOrder.DESC })
         .limit(topRank);
 
-      const results: {accountName: string, totalAmount: number}[] = await queryWithRedisCache({
-        redisKey,
+      const results: {accountName: string, totalAmount: number}[] = await queryWithCache({
+        em,
+        queryKey,
         queryQb: qb,
-        expireTime: 24 * 60 * 60,
       });
 
       return [
@@ -311,7 +311,7 @@ export const chargingServiceServer = plugin((server) => {
 
       const { startTime, endTime } = ensureNotUndefined(request, ["startTime", "endTime"]);
 
-      const redisKey = `{get_daily_charge:${startTime}:${endTime}`;
+      const queryKey = `{get_daily_charge:${startTime}:${endTime}`;
 
       const qb = em.createQueryBuilder(ChargeRecord, "cr");
 
@@ -323,10 +323,10 @@ export const chargingServiceServer = plugin((server) => {
         .groupBy("DATE(cr.time)")
         .orderBy({ "DATE(cr.time)": QueryOrder.DESC });
 
-      const records: {date: string, totalAmount: number}[] = await queryWithRedisCache({
-        redisKey,
+      const records: {date: string, totalAmount: number}[] = await queryWithCache({
+        em,
+        queryKey,
         queryQb: qb,
-        expireTime: 24 * 60 * 60,
       });
 
       return [{
@@ -340,7 +340,7 @@ export const chargingServiceServer = plugin((server) => {
     getTopPayAccount: async ({ request, em }) => {
       const { startTime, endTime, topRank = 10 } = ensureNotUndefined(request, ["startTime", "endTime"]);
 
-      const redisKey = `{get_top_pay_account:${startTime}:${endTime}:${topRank}`;
+      const queryKey = `{get_top_pay_account:${startTime}:${endTime}:${topRank}`;
 
       const qb = em.createQueryBuilder(PayRecord, "p");
       qb
@@ -353,10 +353,10 @@ export const chargingServiceServer = plugin((server) => {
         .orderBy({ "SUM(p.amount)": QueryOrder.DESC })
         .limit(topRank);
 
-      const results: {accountName: string, totalAmount: number}[] = await queryWithRedisCache({
-        redisKey,
+      const results: {accountName: string, totalAmount: number}[] = await queryWithCache({
+        em,
+        queryKey,
         queryQb: qb,
-        expireTime: 24 * 60 * 60,
       });
 
       return [
@@ -373,7 +373,7 @@ export const chargingServiceServer = plugin((server) => {
 
       const { startTime, endTime } = ensureNotUndefined(request, ["startTime", "endTime"]);
 
-      const redisKey = `{get_daily_charge:${startTime}:${endTime}`;
+      const queryKey = `{get_daily_charge:${startTime}:${endTime}`;
 
       const qb = em.createQueryBuilder(PayRecord, "pr");
 
@@ -385,10 +385,10 @@ export const chargingServiceServer = plugin((server) => {
         .groupBy("DATE(pr.time)")
         .orderBy({ "DATE(pr.time)": QueryOrder.DESC });
 
-      const records: {date: string, totalAmount: number}[] = await queryWithRedisCache({
-        redisKey,
+      const records: {date: string, totalAmount: number}[] = await queryWithCache({
+        em,
+        queryKey,
         queryQb: qb,
-        expireTime: 24 * 60 * 60,
       });
 
       return [{
