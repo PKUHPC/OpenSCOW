@@ -16,7 +16,7 @@ import { ConfigServiceClient } from "@scow/protos/build/common/config";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { getClient } from "src/utils/client";
-import { publicConfig, runtimeConfig } from "src/utils/config";
+import { runtimeConfig } from "src/utils/config";
 import { route } from "src/utils/route";
 
 export const Partition = Type.Object({
