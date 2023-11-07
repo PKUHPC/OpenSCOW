@@ -13,7 +13,7 @@
 import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Status } from "@grpc/grpc-js/build/src/constants";
-import { getServerCurrentLanguageId } from "@scow/lib-web/build/utils/systemLanguage";
+import { getCurrentLanguageId } from "@scow/lib-web/build/utils/systemLanguage";
 import { InitServiceClient } from "@scow/protos/build/server/init";
 import { Type } from "@sinclair/typebox";
 import { getClient } from "src/utils/client";
@@ -52,7 +52,7 @@ export default typeboxRoute(CreateInitAdminSchema, async (req) => {
 
   const { email, identityId, name, password } = req.body;
 
-  const languageId = getServerCurrentLanguageId(req, publicConfig.SYSTEM_LANGUAGE_CONFIG);
+  const languageId = getCurrentLanguageId(req, publicConfig.SYSTEM_LANGUAGE_CONFIG);
 
   const userIdRule = getUserIdRule(languageId);
 

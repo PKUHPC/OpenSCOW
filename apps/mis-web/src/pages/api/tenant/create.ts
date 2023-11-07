@@ -13,7 +13,7 @@
 import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { status } from "@grpc/grpc-js";
-import { getServerCurrentLanguageId } from "@scow/lib-web/build/utils/systemLanguage";
+import { getCurrentLanguageId } from "@scow/lib-web/build/utils/systemLanguage";
 import { TenantServiceClient } from "@scow/protos/build/server/tenant";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
@@ -67,7 +67,7 @@ export default /* #__PURE__*/typeboxRoute(CreateTenantSchema, async (req, res) =
 
   const { tenantName, userId, userName, userEmail, userPassword } = req.body;
 
-  const languageId = getServerCurrentLanguageId(req, publicConfig.SYSTEM_LANGUAGE_CONFIG);
+  const languageId = getCurrentLanguageId(req, publicConfig.SYSTEM_LANGUAGE_CONFIG);
 
   const userIdRule = getUserIdRule(languageId);
 

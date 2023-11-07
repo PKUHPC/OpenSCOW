@@ -11,7 +11,7 @@
  */
 
 import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
-import { getI18nConfigCurrentText, getServerCurrentLanguageId } from "@scow/lib-web/build/utils/systemLanguage";
+import { getCurrentLanguageId, getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { publicConfig, runtimeConfig } from "src/utils/config";
@@ -43,7 +43,7 @@ const auth = authenticate(() => true);
 
 export default route(ListAvailableTransferClustersSchema, async (req, res) => {
 
-  const languageId = getServerCurrentLanguageId(req, publicConfig.SYSTEM_LANGUAGE_CONFIG);
+  const languageId = getCurrentLanguageId(req, publicConfig.SYSTEM_LANGUAGE_CONFIG);
 
   const info = await auth(req, res);
 

@@ -50,7 +50,7 @@ export enum SYSTEM_VALID_LANGUAGE_ENUM {
 
 export type SystemLanguage = CommonConfigSchema["systemLanguage"];
 
-export type SystemLanguageConfig = {defaultLanguage: string, isUsingI18n: boolean, autoDetect?: boolean}
+export type SystemLanguageConfig = {defaultLanguage: string, isUsingI18n: boolean, autoDetectWhenUserNotSet?: boolean}
 
 
 // 配置项文本国际化类型

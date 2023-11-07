@@ -19,7 +19,8 @@ import { GlobalStyle } from "@scow/lib-web/build/layouts/globalStyle";
 import { getHostname } from "@scow/lib-web/build/utils/getHostname";
 import { useConstant } from "@scow/lib-web/build/utils/hooks";
 import { isServer } from "@scow/lib-web/build/utils/isServer";
-import { getInitialLanguage, getLanguageCookie } from "@scow/lib-web/build/utils/systemLanguage";
+import { getCurrentLanguageId } from "@scow/lib-web/build/utils/systemLanguage";
+// import { getInitialLanguage, getLanguageCookie } from "@scow/lib-web/build/utils/systemLanguage";
 import { App as AntdApp } from "antd";
 import type { AppContext, AppProps } from "next/app";
 import App from "next/app";
@@ -203,8 +204,7 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
     ?? (hostname && runtimeConfig.UI_CONFIG?.footer?.hostnameTextMap?.[hostname])
     ?? runtimeConfig.UI_CONFIG?.footer?.defaultText ?? "";
 
-    const languageCookie = getLanguageCookie(appContext.ctx.req);
-    extra.initialLanguage = getInitialLanguage(languageCookie, publicConfig.SYSTEM_LANGUAGE_CONFIG);
+    extra.initialLanguage = getCurrentLanguageId(appContext.ctx.req, publicConfig.SYSTEM_LANGUAGE_CONFIG);
   }
 
   const appProps = await App.getInitialProps(appContext);

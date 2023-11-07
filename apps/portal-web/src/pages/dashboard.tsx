@@ -11,7 +11,7 @@
  */
 
 import { getHostname } from "@scow/lib-web/build/utils/getHostname";
-import { getServerCurrentLanguageId } from "@scow/lib-web/build/utils/systemLanguage";
+import { getCurrentLanguageId } from "@scow/lib-web/build/utils/systemLanguage";
 import { GetServerSideProps, NextPage } from "next";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
@@ -51,10 +51,11 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ req }) => 
 
   const hostname = getHostname(req);
 
-  const languageId = getServerCurrentLanguageId(req, publicConfig.SYSTEM_LANGUAGE_CONFIG);
+  const languageId = getCurrentLanguageId(req, publicConfig.SYSTEM_LANGUAGE_CONFIG);
 
   const homeTitle = (hostname && runtimeConfig.HOME_TITLES[hostname])
     ?? getServerI18nConfigText(languageId, "defaultHomeTitle");
+
   const homeText = (hostname && runtimeConfig.HOME_TEXTS[hostname])
     ?? getServerI18nConfigText(languageId, "defaultHomeText");
 

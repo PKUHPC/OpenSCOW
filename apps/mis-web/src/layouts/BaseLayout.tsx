@@ -13,8 +13,7 @@
 import { DesktopOutlined } from "@ant-design/icons";
 import { BaseLayout as LibBaseLayout } from "@scow/lib-web/build/layouts/base/BaseLayout";
 import { JumpToAnotherLink } from "@scow/lib-web/build/layouts/base/header/components";
-import { setCookie } from "nookies";
-import { PropsWithChildren, useEffect, useMemo } from "react";
+import { PropsWithChildren, useMemo } from "react";
 import { useStore } from "simstate";
 import { LanguageSwitcher } from "src/components/LanguageSwitcher";
 import { useI18n, useI18nTranslateToString } from "src/i18n";
@@ -38,17 +37,6 @@ export const BaseLayout =
   const languageId = useI18n().currentLanguage.id;
 
   const systemLanguageConfig = publicConfig.SYSTEM_LANGUAGE_CONFIG;
-  useEffect(() => {
-    // 如果不使用国际化或者不跟随系统自动判断语言
-    // 则删除cookies中的语言信息
-    if (!systemLanguageConfig.isUsingI18n || !systemLanguageConfig.autoDetect) {
-      setCookie(null, "language", "", {
-        maxAge: -1,
-        path: "/",
-      });
-    };
-
-  }, [systemLanguageConfig.isUsingI18n, systemLanguageConfig.autoDetect]);
 
   const routes = useMemo(() => getAvailableRoutes(userStore.user, t), [userStore.user, t]);
 

@@ -11,7 +11,7 @@
  */
 
 import { queryToString, useQuerystring } from "@scow/lib-web/build/utils/querystring";
-import { getServerCurrentLanguageId } from "@scow/lib-web/build/utils/systemLanguage";
+import { getCurrentLanguageId } from "@scow/lib-web/build/utils/systemLanguage";
 import { Spin } from "antd";
 import { GetServerSideProps, NextPage } from "next";
 import { useCallback } from "react";
@@ -86,7 +86,7 @@ export const SubmitJobPage: NextPage<Props> = requireAuth(() => true)(
 
 export const getServerSideProps: GetServerSideProps = async ({ req }) => {
 
-  const languageId = getServerCurrentLanguageId(req, publicConfig.SYSTEM_LANGUAGE_CONFIG);
+  const languageId = getCurrentLanguageId(req, publicConfig.SYSTEM_LANGUAGE_CONFIG);
   const submitJobPromptText = getServerI18nConfigText(languageId, "submitJopPromptText");
 
   return {

@@ -19,7 +19,7 @@ import { GlobalStyle } from "@scow/lib-web/build/layouts/globalStyle";
 import { getHostname } from "@scow/lib-web/build/utils/getHostname";
 import { useConstant } from "@scow/lib-web/build/utils/hooks";
 import { isServer } from "@scow/lib-web/build/utils/isServer";
-import { getInitialLanguage, getLanguageCookie } from "@scow/lib-web/build/utils/systemLanguage";
+import { getCurrentLanguageId } from "@scow/lib-web/build/utils/systemLanguage";
 import { App as AntdApp } from "antd";
 import type { AppContext, AppProps } from "next/app";
 import NextApp from "next/app";
@@ -214,8 +214,7 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
     }, {});
 
     // 从Cookies或header中获取语言id
-    const languageCookie = getLanguageCookie(appContext.ctx.req);
-    extra.initialLanguage = getInitialLanguage(languageCookie, publicConfig.SYSTEM_LANGUAGE_CONFIG);
+    extra.initialLanguage = getCurrentLanguageId(appContext.ctx.req, publicConfig.SYSTEM_LANGUAGE_CONFIG);
   }
 
   const appProps = await NextApp.getInitialProps(appContext);

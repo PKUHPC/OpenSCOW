@@ -40,71 +40,53 @@ export function getI18nConfigCurrentText(
 };
 
 /**
- * 获取当前语cookie中保存的语言信息或浏览器语言偏好
+ * 返回系统当前语言
  *
  * @param req
+ * @param systemLanguageConfig
  * @returns
  */
-export function getLanguageCookie(req: IncomingMessage | undefined): string | undefined {
+export function getCurrentLanguageId(req: IncomingMessage | undefined,
+  systemLanguageConfig: SystemLanguageConfig): string {
+  // 如果系统不使用i18n，则直接使用defaultLanguage
+  if (!systemLanguageConfig.isUsingI18n) {
+    return systemLanguageConfig.defaultLanguage;
+  }
 
-  // 检查 Cookie 中的语言是否合法
   const cookies = parseCookies({ req });
-
+  // 如果cookie设置了而且有效，就使用cookie
   if (cookies && cookies.language) {
     const currentCookieLang = cookies.language;
     if (Object.values(SYSTEM_VALID_LANGUAGES).includes(currentCookieLang)) {
       return currentCookieLang;
     }
   }
-
-  // 如果 Cookie 不合法或不存在，尝试从请求头中获取语言偏好
-  const acceptLanguageHeader = req?.headers["accept-language"];
-  if (acceptLanguageHeader) {
-
-    const preferredLanguages = acceptLanguageHeader.split(",");
-    if (preferredLanguages.length > 0) {
+  // 如果cookies不合法且autoDetectWhenUserNotSet为true则优先判断浏览器偏好
+  if (systemLanguageConfig.autoDetectWhenUserNotSet) {
+    const acceptLanguageHeader = req?.headers["accept-language"];
+    if (acceptLanguageHeader) {
+      const preferredLanguages = acceptLanguageHeader.split(",");
+      if (preferredLanguages.length > 0) {
       // 遍历语言偏好列表
-      for (const preferredLanguage of preferredLanguages) {
+        for (const preferredLanguage of preferredLanguages) {
         // 判断偏好语言中的语言是否合法
-        if (Object.values(HEADER_ACCEPT_VALID_LANGUAGES).includes(preferredLanguage)) {
-          switch (preferredLanguage) {
-
-          case HEADER_ACCEPT_VALID_LANGUAGES.ZH_CN:
-          case HEADER_ACCEPT_VALID_LANGUAGES.ZH:
-            return SYSTEM_VALID_LANGUAGES.ZH_CN;
-
-          case HEADER_ACCEPT_VALID_LANGUAGES.EN_US:
-          case HEADER_ACCEPT_VALID_LANGUAGES.EN:
-            return SYSTEM_VALID_LANGUAGES.EN;
-
-          default:
-            break;
+          if (Object.values(HEADER_ACCEPT_VALID_LANGUAGES).includes(preferredLanguage)) {
+            switch (preferredLanguage) {
+            case HEADER_ACCEPT_VALID_LANGUAGES.ZH_CN:
+            case HEADER_ACCEPT_VALID_LANGUAGES.ZH:
+              return SYSTEM_VALID_LANGUAGES.ZH_CN;
+            case HEADER_ACCEPT_VALID_LANGUAGES.EN_US:
+            case HEADER_ACCEPT_VALID_LANGUAGES.EN:
+              return SYSTEM_VALID_LANGUAGES.EN;
+            default:
+              break;
+            }
           }
         }
       }
     }
   }
-
-  return undefined;
-}
-
-/**
- * 根据系统语言自定义配置信息返回系统初始语言
- *
- * @param cookieLanguage
- * @param systemLanguageConfig
- * @returns
- */
-export function getInitialLanguage(cookieLanguage: string | undefined,
-  systemLanguageConfig: SystemLanguageConfig): string {
-
-  // 使用国际化，且跟随系统语言， 且cookie中保存的语言或浏览器偏好为合法语言
-  // 则使用cookie中保存的语言或浏览器偏好
-  if (systemLanguageConfig.isUsingI18n && systemLanguageConfig.autoDetect && cookieLanguage) {
-    return cookieLanguage;
-  }
-
-  // 其他情况，则使用指定的默认语言
+  // 如果判断不出，或者autoDetectWhenUserNotSet为false则直接使用默认语言
   return systemLanguageConfig.defaultLanguage;
-
 };
+
