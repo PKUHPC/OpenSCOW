@@ -10,13 +10,14 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Entity, PrimaryKey, Property } from "@mikro-orm/core";
+import { Entity, Index, PrimaryKey, Property } from "@mikro-orm/core";
 import { Decimal } from "@scow/lib-decimal";
 import { Account } from "src/entities/Account";
 import { Tenant } from "src/entities/Tenant";
 import { DecimalType } from "src/utils/decimal";
 
 @Entity()
+@Index({ name: "query_info", properties: ["time", "tenantName", "accountName", "type"] })
 export class ChargeRecord {
   @PrimaryKey()
     id!: number;

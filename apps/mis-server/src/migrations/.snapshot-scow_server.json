@@ -128,6 +128,18 @@
       "name": "charge_record",
       "indexes": [
         {
+          "keyName": "query_info",
+          "columnNames": [
+            "time",
+            "tenant_name",
+            "account_name",
+            "type"
+          ],
+          "composite": true,
+          "primary": false,
+          "unique": false
+        },
+        {
           "keyName": "PRIMARY",
           "columnNames": [
             "id"
@@ -190,7 +202,8 @@
           "primary": false,
           "nullable": false,
           "length": 255,
-          "comment": "分区"
+          "comment": "分区",
+          "mappedType": "unknown"
         },
         "nodelist": {
           "name": "nodelist",
@@ -210,7 +223,8 @@
           "primary": false,
           "nullable": false,
           "length": 255,
-          "comment": "作业名"
+          "comment": "作业名",
+          "mappedType": "unknown"
         },
         "cluster": {
           "name": "cluster",
