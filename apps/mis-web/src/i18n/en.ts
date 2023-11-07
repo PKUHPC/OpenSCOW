@@ -642,6 +642,8 @@ export default {
         confirmRemoveText: "Confirm removing user from account",
         removeSuccess: "User removed successfully!",
         removerUser: "Remove User",
+        cannotRemoverUserWhoHaveRunningJobFromAccount: "The user still has a job running, "
+          + " and the user has been blocked. Please wait for the job to end or end the job manually before moving out.",
       },
     },
   },

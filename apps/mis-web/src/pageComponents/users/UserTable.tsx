@@ -214,6 +214,7 @@ export const UserTable: React.FC<Props> = ({
                       identityId: r.userId,
                       accountName: accountName,
                     } })
+                      .httpError(409, () => { message.error(t(p("cannotRemoverUserWhoHaveRunningJobFromAccount"))); })
                       .then(() => {
                         message.destroy("removeUser");
                         message.success(t(p("removeSuccess")));
