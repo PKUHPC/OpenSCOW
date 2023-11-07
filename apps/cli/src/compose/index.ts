@@ -49,6 +49,12 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
     LOG_PRETTY: String(config.log.pretty),
   };
 
+  const grpcDebugEnv = {
+    GRPC_TRACE: "all",
+    GRPC_VERBOSITY: "DEBUG",
+  };
+
+
   const composeSpec = {
     version: "3",
     services: {} as Record<string, ServiceSpec>,
@@ -251,6 +257,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
         "AUTH_EXTERNAL_URL": join(BASE_PATH, "/auth"),
         "PUBLIC_PATH": join(BASE_PATH, publicPath),
         "AUDIT_DEPLOYED": config.audit ? "true" : "false",
+        ...grpcDebugEnv,
       },
       ports: {},
       volumes: {
@@ -283,6 +290,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
         "SCOW_LAUNCH_APP": "audit-server",
         "DB_PASSWORD": config.audit.dbPassword,
         ...serviceLogEnv,
+        ...grpcDebugEnv,
       },
       volumes: {
         "./config": "/etc/scow",
