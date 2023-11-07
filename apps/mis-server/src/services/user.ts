@@ -214,6 +214,7 @@ export const userServiceServer = plugin((server) => {
       // 如果要从账户中移出用户，先封锁，先将用户封锁，保证用户无法提交作业
       if (userAccount.status === UserStatus.UNBLOCKED) {
         await blockUserInAccount(userAccount, server.ext, logger);
+        await em.flush();
       }
 
       // 查询用户是否有RUNNING、PENDING的作业，如果有，抛出异常
