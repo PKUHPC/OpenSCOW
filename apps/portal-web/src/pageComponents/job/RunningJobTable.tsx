@@ -164,7 +164,7 @@ export const RunningJobInfoTable: React.FC<JobInfoTableProps> = ({
         }
         {
           showAccount && (
-            <Table.Column<RunningJobInfo> dataIndex="account" width={120} title={t(p("jobInfoTable.account"))} />
+            <Table.Column<RunningJobInfo> dataIndex="account" width={150} title={t(p("jobInfoTable.account"))} />
           )
         }
         <Table.Column<RunningJobInfo>
@@ -173,8 +173,8 @@ export const RunningJobInfoTable: React.FC<JobInfoTableProps> = ({
           width={200}
           ellipsis={true}
         />
-        <Table.Column<RunningJobInfo> dataIndex="partition" width={80} title={t(p("jobInfoTable.partition"))} />
-        <Table.Column<RunningJobInfo> dataIndex="qos" width={80} title={t(p("jobInfoTable.qos"))} />
+        <Table.Column<RunningJobInfo> dataIndex="partition" width={100} title={t(p("jobInfoTable.partition"))} />
+        <Table.Column<RunningJobInfo> dataIndex="qos" width={100} title={t(p("jobInfoTable.qos"))} />
         <Table.Column<RunningJobInfo> dataIndex="nodes" width={80} title={t(p("jobInfoTable.nodes"))} />
         <Table.Column<RunningJobInfo> dataIndex="cores" width={80} title={t(p("jobInfoTable.cores"))} />
         <Table.Column<RunningJobInfo> dataIndex="gpus" width={90} title={t(p("jobInfoTable.gpus"))} />
@@ -194,6 +194,7 @@ export const RunningJobInfoTable: React.FC<JobInfoTableProps> = ({
         <Table.Column<RunningJobInfo>
           title={t(p("jobInfoTable.more"))}
           width={180}
+          fixed="right"
           render={(_, r) => (
             <Space>
               <a onClick={() => Router.push(join("/files", r.cluster.id, r.workingDir))}>

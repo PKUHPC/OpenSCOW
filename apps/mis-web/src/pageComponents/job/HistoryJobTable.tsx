@@ -295,10 +295,10 @@ export const JobInfoTable: React.FC<JobInfoTableProps> = ({
         } : false}
         scroll={{ x: data?.jobs?.length ? 1200 : true }}
       >
-        <Table.Column<JobInfo> dataIndex="idJob" width={100} title={t(pCommon("clusterWorkId"))} />
+        <Table.Column<JobInfo> dataIndex="idJob" width={90} title={t(pCommon("clusterWorkId"))} />
         {
           showAccount ? (
-            <Table.Column<JobInfo> dataIndex="account" width={120} title={t(pCommon("account"))} />
+            <Table.Column<JobInfo> dataIndex="account" width={150} title={t(pCommon("account"))} />
           ) : undefined
         }
         {

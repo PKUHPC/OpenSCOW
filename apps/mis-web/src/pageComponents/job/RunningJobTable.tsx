@@ -272,12 +272,12 @@ export const RunningJobInfoTable: React.FC<JobInfoTableProps> = ({
         }
         {
           showAccount && (
-            <Table.Column<RunningJobInfo> dataIndex="account" width={120} title={t(pCommon("account"))} />
+            <Table.Column<RunningJobInfo> dataIndex="account" width={150} title={t(pCommon("account"))} />
           )
         }
         <Table.Column<RunningJobInfo> dataIndex="name" width={200} ellipsis={true} title={t(pCommon("workName"))} />
-        <Table.Column<RunningJobInfo> dataIndex="partition" width={80} title={t(pCommon("partition"))} />
-        <Table.Column<RunningJobInfo> dataIndex="qos" width={80} title="QOS" />
+        <Table.Column<RunningJobInfo> dataIndex="partition" width={100} title={t(pCommon("partition"))} />
+        <Table.Column<RunningJobInfo> dataIndex="qos" width={100} title="QOS" />
         <Table.Column<RunningJobInfo> dataIndex="nodes" width={80} title={t(p("nodes"))} />
         <Table.Column<RunningJobInfo> dataIndex="cores" width={80} title={t(p("cores"))} />
         <Table.Column<RunningJobInfo> dataIndex="gpus" width={90} title={t(p("gpus"))} />

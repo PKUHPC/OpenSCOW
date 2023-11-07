@@ -166,9 +166,9 @@ export const JobInfoTable: React.FC<JobInfoTableProps> = ({
         defaultSortOrder="descend"
       />
       <Table.Column<JobInfo> dataIndex="name" width={200} ellipsis={true} title={t(p("jobName"))} />
-      <Table.Column<JobInfo> dataIndex="account" width={120} title={t(p("account"))} />
-      <Table.Column<JobInfo> dataIndex="partition" width={80} title={t(p("partition"))} />
-      <Table.Column<JobInfo> dataIndex="qos" width={80} title={t(p("qos"))} />
+      <Table.Column<JobInfo> dataIndex="account" width={150} title={t(p("account"))} />
+      <Table.Column<JobInfo> dataIndex="partition" width={100} title={t(p("partition"))} />
+      <Table.Column<JobInfo> dataIndex="qos" width={100} title={t(p("qos"))} />
       <Table.Column<JobInfo> dataIndex="state" width={110} title={t(p("state"))} />
       <Table.Column<JobInfo>
         dataIndex="submitTime"
@@ -203,6 +203,7 @@ export const JobInfoTable: React.FC<JobInfoTableProps> = ({
       <Table.Column<JobInfo>
         title={t(p("more"))}
         width={100}
+        fixed="right"
         render={(_, r) => (
           <Space>
             <a onClick={() => Router.push(join("/files", cluster.id, r.workingDirectory))}>
