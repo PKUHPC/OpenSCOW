@@ -15,7 +15,7 @@ import { MoneyCollectOutlined, PlayCircleOutlined, ProjectOutlined,
 import { moneyToNumber } from "@scow/lib-decimal";
 import { getDefaultPresets } from "@scow/lib-web/build/utils/datetime";
 import { Card, Col, DatePicker, Row, Space } from "antd";
-import dayjs, { Dayjs } from "dayjs";
+import dayjs from "dayjs";
 import { NextPage } from "next";
 import { useCallback, useMemo, useState } from "react";
 import { useAsync } from "react-async";
@@ -24,7 +24,7 @@ import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { getOperationTypeTexts } from "src/models/operationLog";
-import { PlatformRole } from "src/models/User";
+import { PlatformRole, SearchType } from "src/models/User";
 import { DataBarChart } from "src/pageComponents/admin/DataBarChart";
 import { DataLineChart } from "src/pageComponents/admin/DataLineChart";
 import StatisticCard from "src/pageComponents/admin/StatisticCard";
@@ -101,8 +101,10 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
   const getChargeTotalAmountFn = useCallback(async () => {
     return await api.getChargeRecordsTotalCount({
       query: {
-        startTime: new Dayjs(0).toISOString(),
-        endTime: new Dayjs().endOf("day").toISOString(),
+        startTime: new Date(0).toISOString(),
+        endTime: new Date().toISOString(),
+        isPlatformRecords: true,
+        searchType: SearchType.ACCOUNT,
       },
     });
   }, []);
