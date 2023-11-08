@@ -46,7 +46,7 @@ const FullScreenModalStyle = styled.div`
 
   &.fullscreen {
     .ant-modal {
-      width: 99vw !important;
+      width: 98vw !important;
       height: 100vh !important;
       top: 0 !important;
       padding: 0 !important;
@@ -349,7 +349,7 @@ export const FileEditModal: React.FC<Props> = ({ previewFile, setPreviewFile }) 
           )
           : (
             <Tooltip
-              title={downloading ? t(p("fileLoading")) : t(p("fileSizeExceeded"), [publicConfig.FILE_EDIT_SIZE])}
+              title={downloading ? t(p("fileLoading")) : t(p("fileSizeExceeded"))}
             >
               <Button disabled={true}>{t(p("edit"))}</Button>
             </Tooltip>

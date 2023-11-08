@@ -201,7 +201,7 @@ export default {
         cantReadFile: "无法读取文件: {}",
         saveFileFail: "文件保存失败: {}",
         saveFileSuccess: "文件保存成功",
-        fileSizeExceeded: "超出可编辑文件大小: {}",
+        fileSizeExceeded: "文件过大，请下载后编辑",
       },
       createFileModal: {
         createErrorMessage: "同名文件或者目录已经存在！",

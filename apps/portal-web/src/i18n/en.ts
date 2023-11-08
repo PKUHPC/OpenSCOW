@@ -201,7 +201,7 @@ export default {
         cantReadFile: "Cannot read file: {}",
         saveFileFail: "File save failed: {}",
         saveFileSuccess: "File saved successfully",
-        fileSizeExceeded: "Exceeds editable file size: {}",
+        fileSizeExceeded: "The file is too large, please download and edit it.",
       },
       createFileModal: {
         createErrorMessage: "File or directory with the same name already exists!",
