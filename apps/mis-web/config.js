@@ -11,7 +11,7 @@
  */
 
 const { envConfig, str, bool } = require("@scow/lib-config");
-const { getClusterConfigs, getSortedClusters, getSortedClusterIds } = require("@scow/config/build/cluster");
+const { getClusterConfigs, getSortedClusterIds } = require("@scow/config/build/cluster");
 const { getMisConfig } = require("@scow/config/build/mis");
 const { getCommonConfig } = require("@scow/config/build/common");
 const { getClusterTextsConfig } = require("@scow/config/build/clusterTexts");
@@ -100,11 +100,7 @@ const buildRuntimeConfig = async (phase, basePath) => {
   const serverRuntimeConfig = {
     AUTH_EXTERNAL_URL: config.AUTH_EXTERNAL_URL,
     AUTH_INTERNAL_URL: config.AUTH_INTERNAL_URL,
-    CLUSTERS_CONFIG: getSortedClusters(clusters).reduce((prev, curr) => {
-      const { id, ...rest } = curr;
-      prev[curr.id] = rest;
-      return prev;
-    }, {}),
+    CLUSTERS_CONFIG: clusters,
     CLUSTER_TEXTS_CONFIG: clusterTexts,
     UI_CONFIG: uiConfig,
     DEFAULT_PRIMARY_COLOR,
@@ -127,8 +123,8 @@ const buildRuntimeConfig = async (phase, basePath) => {
 
     PUBLIC_PATH: config.PUBLIC_PATH,
 
-    CLUSTERS: getSortedClusters(clusters).reduce((prev, curr) => {
-      prev[curr.id] = { id: curr.id, name: curr.displayName };
+    CLUSTERS: Object.keys(clusters).reduce((prev, curr) => {
+      prev[curr] = { id: curr, name: clusters[curr].displayName };
       return prev;
     }, {}),
 

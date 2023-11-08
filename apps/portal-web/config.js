@@ -139,11 +139,7 @@ const buildRuntimeConfig = async (phase, basePath) => {
   const serverRuntimeConfig = {
     AUTH_EXTERNAL_URL: config.AUTH_EXTERNAL_URL,
     AUTH_INTERNAL_URL: config.AUTH_INTERNAL_URL,
-    CLUSTERS_CONFIG: getSortedClusters(clusters).reduce((prev, curr) => {
-      const { id, ...rest } = curr;
-      prev[curr.id] = rest;
-      return prev;
-    }, {}),
+    CLUSTERS_CONFIG: clusters,
     PORTAL_CONFIG: portalConfig,
     DEFAULT_PRIMARY_COLOR,
     MOCK_USER_ID: config.MOCK_USER_ID,
