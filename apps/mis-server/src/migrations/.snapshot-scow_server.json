@@ -128,6 +128,17 @@
       "name": "charge_record",
       "indexes": [
         {
+          "keyName": "static_info",
+          "columnNames": [
+            "time",
+            "account_name",
+            "amount"
+          ],
+          "composite": true,
+          "primary": false,
+          "unique": false
+        },
+        {
           "keyName": "query_info",
           "columnNames": [
             "time",
@@ -728,6 +739,17 @@
       },
       "name": "pay_record",
       "indexes": [
+        {
+          "keyName": "static_info",
+          "columnNames": [
+            "time",
+            "account_name",
+            "amount"
+          ],
+          "composite": true,
+          "primary": false,
+          "unique": false
+        },
         {
           "keyName": "PRIMARY",
           "columnNames": [

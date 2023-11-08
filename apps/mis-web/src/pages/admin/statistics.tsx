@@ -15,7 +15,7 @@ import { MoneyCollectOutlined, PlayCircleOutlined, ProjectOutlined,
 import { moneyToNumber } from "@scow/lib-decimal";
 import { getDefaultPresets } from "@scow/lib-web/build/utils/datetime";
 import { Card, Col, DatePicker, Row, Space } from "antd";
-import dayjs from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 import { NextPage } from "next";
 import { useCallback, useMemo, useState } from "react";
 import { useAsync } from "react-async";
@@ -96,6 +96,19 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
   }, []);
 
   const { data: jobTotalCount, isLoading: jobTotalCountLoading } = useAsync({ promiseFn: getJobTotalCountFn });
+
+
+  const getChargeTotalAmountFn = useCallback(async () => {
+    return await api.getChargeRecordsTotalCount({
+      query: {
+        startTime: new Dayjs(0).toISOString(),
+        endTime: new Dayjs().endOf("day").toISOString(),
+      },
+    });
+  }, []);
+
+  const { data: totalCharge, isLoading: totalChargeAmountLoading } =
+    useAsync({ promiseFn: getChargeTotalAmountFn });
 
   const getNewUserCountFn = useCallback(async () => {
     return await api.getNewUserCount({ query: {
@@ -258,7 +271,7 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
     return 0;
   }, [dailyNewJobCount]);
 
-  const totalChargeAmount = useMemo(() => {
+  const totalNewChargeAmount = useMemo(() => {
     if (dailyCharge) {
       return dailyCharge?.results.reduce((pre, cur) => pre + moneyToNumber(cur.amount), 0);
     }
@@ -342,9 +355,9 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
         <Col flex={4}>
           <StatisticCard
             title={t(p("charge"))}
-            newAddValue={totalChargeAmount}
-            totalValue={999}
-            loading={false}
+            newAddValue={totalNewChargeAmount}
+            totalValue={totalCharge?.totalAmount}
+            loading={totalChargeAmountLoading || dailyChargeLoading}
             icon={MoneyCollectOutlined}
             iconColor="#feca57"
           />
