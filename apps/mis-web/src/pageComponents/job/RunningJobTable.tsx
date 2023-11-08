@@ -11,6 +11,7 @@
  */
 
 import { useDidUpdateEffect } from "@scow/lib-web/build/utils/hooks";
+import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/i18n";
 import { Button, Form, Input, InputNumber, Select, Space, Table } from "antd";
 import React, { useCallback, useMemo, useRef, useState } from "react";
 import { useAsync } from "react-async";
@@ -20,7 +21,7 @@ import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer, FilterFormTabs } from "src/components/FilterFormContainer";
 import { ModalLink } from "src/components/ModalLink";
 import { TableTitle } from "src/components/TableTitle";
-import { prefix, useI18nTranslateToString } from "src/i18n";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { runningJobId, RunningJobInfo } from "src/models/job";
 import { BatchChangeJobTimeLimitButton } from "src/pageComponents/job/BatchChangeJobTimeLimitButton";
 import { ChangeJobTimeLimitModal } from "src/pageComponents/job/ChangeJobTimeLimitModal";
@@ -184,6 +185,7 @@ export const RunningJobQueryTable: React.FC<Props> = ({
         isLoading={isLoading}
         showAccount={showAccount}
         showUser={showUser}
+        showCluster={false}
         reload={reload}
         selection={{
           selected, setSelected,
@@ -200,6 +202,7 @@ type JobInfoTableProps = {
   data: RunningJobInfo[] | undefined;
   isLoading: boolean;
   showAccount: boolean;
+  showCluster: boolean;
   showUser: boolean;
   reload: () => void;
   selection?: {
@@ -211,12 +214,13 @@ type JobInfoTableProps = {
 const ChangeJobTimeLimitModalLink = ModalLink(ChangeJobTimeLimitModal);
 
 export const RunningJobInfoTable: React.FC<JobInfoTableProps> = ({
-  data, isLoading, reload, showAccount, showUser, selection,
+  data, isLoading, reload, showAccount, showUser, showCluster, selection,
 }) => {
 
   const [previewItem, setPreviewItem] = useState<RunningJobInfo | undefined>(undefined);
 
   const t = useI18nTranslateToString();
+  const languageId = useI18n().currentLanguage.id;
 
   return (
     <>
@@ -248,10 +252,19 @@ export const RunningJobInfoTable: React.FC<JobInfoTableProps> = ({
         loading={isLoading}
         pagination={{ showSizeChanger: true }}
         rowKey={runningJobId}
-        scroll={{ x: data?.length ? 1900 : true }}
+        scroll={{ x: data?.length ? 1800 : true }}
         tableLayout="fixed"
       >
-
+        {
+          showCluster && (
+            <Table.Column<RunningJobInfo>
+              dataIndex="cluster"
+              width="95%"
+              title={t(pCommon("cluster"))}
+              render={(_, r) => getI18nConfigCurrentText(r.cluster.name, languageId)}
+            />
+          )
+        }
         <Table.Column<RunningJobInfo> dataIndex="jobId" width="5%" title={t(pCommon("workId"))} />
         {
           showUser && (
