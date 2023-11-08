@@ -214,7 +214,7 @@ type JobInfoTableProps = {
 const ChangeJobTimeLimitModalLink = ModalLink(ChangeJobTimeLimitModal);
 
 export const RunningJobInfoTable: React.FC<JobInfoTableProps> = ({
-  data, isLoading, reload, showAccount, showCluster, showUser, selection,
+  data, isLoading, reload, showAccount, showUser, showCluster, selection,
 }) => {
 
   const [previewItem, setPreviewItem] = useState<RunningJobInfo | undefined>(undefined);
@@ -253,38 +253,39 @@ export const RunningJobInfoTable: React.FC<JobInfoTableProps> = ({
         pagination={{ showSizeChanger: true }}
         rowKey={runningJobId}
         scroll={{ x: data?.length ? 1800 : true }}
+        tableLayout="fixed"
       >
         {
           showCluster && (
             <Table.Column<RunningJobInfo>
               dataIndex="cluster"
-              width={150}
+              width="9.5%"
               title={t(pCommon("cluster"))}
               render={(_, r) => getI18nConfigCurrentText(r.cluster.name, languageId)}
             />
           )
         }
-        <Table.Column<RunningJobInfo> dataIndex="jobId" width={80} title={t(pCommon("workId"))} />
+        <Table.Column<RunningJobInfo> dataIndex="jobId" width="5%" title={t(pCommon("workId"))} />
         {
           showUser && (
-            <Table.Column<RunningJobInfo> dataIndex="user" width={120} title={t(pCommon("user"))} />
+            <Table.Column<RunningJobInfo> dataIndex="user" width="8%" ellipsis title={t(pCommon("user"))} />
           )
         }
         {
           showAccount && (
-            <Table.Column<RunningJobInfo> dataIndex="account" width={120} title={t(pCommon("account"))} />
+            <Table.Column<RunningJobInfo> dataIndex="account" width="9.5%" ellipsis title={t(pCommon("account"))} />
           )
         }
-        <Table.Column<RunningJobInfo> dataIndex="name" width={200} ellipsis={true} title={t(pCommon("workName"))} />
-        <Table.Column<RunningJobInfo> dataIndex="partition" width={80} title={t(pCommon("partition"))} />
-        <Table.Column<RunningJobInfo> dataIndex="qos" width={80} title="QOS" />
-        <Table.Column<RunningJobInfo> dataIndex="nodes" width={80} title={t(p("nodes"))} />
-        <Table.Column<RunningJobInfo> dataIndex="cores" width={80} title={t(p("cores"))} />
-        <Table.Column<RunningJobInfo> dataIndex="gpus" width={90} title={t(p("gpus"))} />
-        <Table.Column<RunningJobInfo> dataIndex="state" width={110} title={t(pCommon("status"))} />
+        <Table.Column<RunningJobInfo> dataIndex="name" ellipsis title={t(pCommon("workName"))} />
+        <Table.Column<RunningJobInfo> dataIndex="partition" width="6.3%" ellipsis title={t(pCommon("partition"))} />
+        <Table.Column<RunningJobInfo> dataIndex="qos" width="6.3%" ellipsis title="QOS" />
+        <Table.Column<RunningJobInfo> dataIndex="nodes" width="4.4%" title={t(p("nodes"))} />
+        <Table.Column<RunningJobInfo> dataIndex="cores" width="4.4%" title={t(p("cores"))} />
+        <Table.Column<RunningJobInfo> dataIndex="gpus" width="4.4%" title={t(p("gpus"))} />
+        <Table.Column<RunningJobInfo> dataIndex="state" width="6%" title={t(pCommon("status"))} />
         <Table.Column
           dataIndex="runningOrQueueTime"
-          width={120}
+          width="6.3%"
           title={t(p("time"))}
         />
         <Table.Column
@@ -293,11 +294,12 @@ export const RunningJobInfoTable: React.FC<JobInfoTableProps> = ({
           title={t(p("reason"))}
           render={(d: string) => d.startsWith("(") && d.endsWith(")") ? d.substring(1, d.length - 1) : d}
         />
-        <Table.Column<RunningJobInfo> dataIndex="timeLimit" width={120} title={t(p("limit"))} />
+        <Table.Column<RunningJobInfo> dataIndex="timeLimit" width="6.5%" title={t(p("limit"))} />
 
         <Table.Column<RunningJobInfo>
           title={t(pCommon("more"))}
-          width={180}
+          width="9%"
+          fixed="right"
           render={(_, r) => (
             <Space>
               <a onClick={() => setPreviewItem(r)}>{t(pCommon("detail"))}</a>

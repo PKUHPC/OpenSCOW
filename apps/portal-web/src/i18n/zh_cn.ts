@@ -138,7 +138,6 @@ export default {
         jobInfoTable: {
           cluster: "集群",
           jobId: "作业ID",
-          user: "用户",
           account: "账户",
           name: "作业名",
           partition: "分区",

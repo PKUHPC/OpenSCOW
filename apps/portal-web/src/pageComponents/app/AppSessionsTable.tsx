@@ -84,11 +84,13 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster }) => {
     {
       title: t(p("table.sessionId")),
       dataIndex: "sessionId",
-      width:"30%",
+      width: "25%",
+      ellipsis: true,
     },
     {
       title: t(p("table.jobId")),
       dataIndex: "jobId",
+      width: "8%",
       sorter: (a, b) => compareNumber(a.jobId, b.jobId),
     },
     {
@@ -100,11 +102,13 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster }) => {
     {
       title: t(p("table.submitTime")),
       dataIndex: "submitTime",
+      width: "15%",
       render: (_, record) => record.submitTime ? formatDateTime(record.submitTime) : "",
     },
     {
       title: t(p("table.state")),
       dataIndex: "state",
+      width: "12%",
       render: (_, record) => (
         record.reason ? (
           <Tooltip title={record.reason}>
@@ -131,7 +135,8 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster }) => {
     {
       title: t("button.actionButton"),
       key: "action",
-      width: "20%",
+      fixed:"right",
+      width: "10%",
       render: (_, record) => (
         <Space>
           {
@@ -257,10 +262,12 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster }) => {
         </Form>
       </FilterFormContainer>
       <Table
+        tableLayout="fixed"
         dataSource={onlyNotEnded ? filteredData?.filter((x) => x.state !== "ENDED") : filteredData}
         columns={columns}
         rowKey={(record) => record.sessionId}
         loading={!filteredData && isLoading}
+        scroll={{ x: filteredData?.length ? 1200 : true }}
       />
     </div>
   );
