@@ -148,7 +148,7 @@ export default {
     route: {
       common:{
         operationLog:"操作日志",
-        statistics: "平台数据统计",
+        statistic: "平台数据统计",
       },
       navLinkText: "门户",
       dashboard: "仪表盘",
@@ -907,7 +907,7 @@ export default {
           title: "账户消费记录",
         },
       },
-      statistics: {
+      statistic: {
         dataOverview: "数据总览",
         dateRange: "日期筛选",
         user: "用户",

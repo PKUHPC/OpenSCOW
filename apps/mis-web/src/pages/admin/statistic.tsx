@@ -32,7 +32,7 @@ import { Head } from "src/utils/head";
 import { styled } from "styled-components";
 
 
-const p = prefix("page.admin.statistics.");
+const p = prefix("page.admin.statistic.");
 
 const formateData = (data: Array<{ date: string, count: number }>, dateRange: [dayjs.Dayjs, dayjs.Dayjs]) => {
   const input = data.map((d) => ({
@@ -294,11 +294,11 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
     return [];
   }, [query, misUsageCount]);
 
-  const amountToolTipFormatter = (value: number) => [`${value}(${t(p("yuan"))})`, t(p("amount"))];
+  const amountToolTipFormatter = (value: number) => [`${value.toLocaleString()}(${t(p("yuan"))})`, t(p("amount"))];
 
   return (
     <>
-      <Head title={t("layouts.route.common.statistics")} />
+      <Head title={t("layouts.route.common.statistic")} />
       <PageTitle titleText={t(p("dataOverview"))} />
       <Row gutter={[16, 16]}>
         <Col span={24} style={{ textAlign: "right" }}>
@@ -357,8 +357,8 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
         <Col flex={4}>
           <StatisticCard
             title={t(p("charge"))}
-            newAddValue={totalNewChargeAmount}
-            totalValue={totalCharge?.totalAmount}
+            newAddValue={totalNewChargeAmount.toLocaleString()}
+            totalValue={totalCharge?.totalAmount.toLocaleString()}
             loading={totalChargeAmountLoading || dailyChargeLoading}
             icon={MoneyCollectOutlined}
             iconColor="#feca57"

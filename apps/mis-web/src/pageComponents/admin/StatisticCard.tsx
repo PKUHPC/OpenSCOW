@@ -17,8 +17,8 @@ import { styled } from "styled-components"; ;
 
 interface Props {
   title: string
-  newAddValue: number | undefined
-  totalValue: number | undefined
+  newAddValue: string | number | undefined
+  totalValue: string | number | undefined
   loading: boolean
   icon: React.ReactNode | React.ForwardRefExoticComponent<{}>;
   iconColor?: string

@@ -140,8 +140,8 @@ export const platformAdminRoutes: (platformRoles: PlatformRole[], t: TransType) 
       ...(platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ?
         [{
           Icon: LineChartOutlined,
-          text: t("layouts.route.common.statistics"),
-          path: "/admin/statistics",
+          text: t("layouts.route.common.statistic"),
+          path: "/admin/statistic",
         }] : []),
     ],
   },

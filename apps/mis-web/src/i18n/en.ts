@@ -148,7 +148,7 @@ export default {
     route: {
       common: {
         operationLog: "Operation Log",
-        statistics: "Statistics",
+        statistic: "Statistic",
       },
       navLinkText: "Portal",
       dashboard: "Dashboard",
@@ -907,7 +907,7 @@ export default {
           title: "Account Consumption Records",
         },
       },
-      statistics: {
+      statistic: {
         dataOverview: "Data Overview",
         dateRange: "Date Range",
         user: "User",
