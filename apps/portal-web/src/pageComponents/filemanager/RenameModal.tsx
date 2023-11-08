@@ -12,7 +12,7 @@
 
 import { App, Form, Input, Modal } from "antd";
 import { dirname, join } from "path";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { api } from "src/apis";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 
@@ -37,8 +37,6 @@ export const RenameModal: React.FC<Props> = ({ open, onClose, path, reload, clus
   const [form] = Form.useForm<FormProps>();
   const [loading, setLoading] = useState(false);
 
-  const containerRef = useRef(null);
-
   const t = useI18nTranslateToString();
 
   const onSubmit = async () => {
@@ -56,7 +54,7 @@ export const RenameModal: React.FC<Props> = ({ open, onClose, path, reload, clus
   };
 
   return (
-    <div ref={containerRef} onDoubleClick={(event) => event.stopPropagation()}>
+    <div onDoubleClick={(event) => event.stopPropagation()}>
       <Modal
         open={open}
         title={t(p("title"))}
@@ -66,7 +64,7 @@ export const RenameModal: React.FC<Props> = ({ open, onClose, path, reload, clus
         confirmLoading={loading}
         destroyOnClose
         onOk={form.submit}
-        getContainer={containerRef.current || false}
+        getContainer={false}
       >
         <Form form={form} onFinish={onSubmit}>
           <Form.Item label={t(p("renameLabel"))}>
