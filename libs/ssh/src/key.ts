@@ -57,6 +57,7 @@ export async function insertKeyAsRoot(
 
     // make sure user home directory exists.
     await ssh.mkdir(userHomeDir, undefined, sftp);
+    await sftpChmod(sftp)(userHomeDir, "740");
     // root create the directory, so we need to change the owner
     await sftpChown(sftp)(userHomeDir, uid, gid);
 
