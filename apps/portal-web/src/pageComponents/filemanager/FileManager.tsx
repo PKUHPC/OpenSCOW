@@ -27,7 +27,6 @@ import { join } from "path";
 import React, { useEffect, useRef, useState } from "react";
 import { useStore } from "simstate";
 import { api } from "src/apis/api";
-import { DisabledA } from "src/components/DisabledA";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { ModalButton, ModalLink } from "src/components/ModalLink";
 import { TitleText } from "src/components/PageTitle";
@@ -37,6 +36,7 @@ import { urlToDownload } from "src/pageComponents/filemanager/api";
 import { CreateFileModal } from "src/pageComponents/filemanager/CreateFileModal";
 import { FileEditModal } from "src/pageComponents/filemanager/FileEditModal";
 import { FileTable } from "src/pageComponents/filemanager/FileTable";
+import { ImagePreviewer } from "src/pageComponents/filemanager/ImagePreviewer";
 import { MkdirModal } from "src/pageComponents/filemanager/MkdirModal";
 import { PathBar } from "src/pageComponents/filemanager/PathBar";
 import { RenameModal } from "src/pageComponents/filemanager/RenameModal";
@@ -45,7 +45,7 @@ import { FileInfo } from "src/pages/api/file/list";
 import { LoginNodeStore } from "src/stores/LoginNodeStore";
 import { Cluster, publicConfig } from "src/utils/config";
 import { convertToBytes } from "src/utils/format";
-import { isNotImage } from "src/utils/staticFiles";
+import { canPreviewWithEditor, isImage } from "src/utils/staticFiles";
 import { styled } from "styled-components";
 
 interface Props {
@@ -75,6 +75,8 @@ const OperationBar = styled(TableTitle)`
   gap: 4px;
 `;
 
+const DEFAULT_FILE_PREVIEW_LIMIT_SIZE = "50m";
+
 type FileInfoKey = React.Key;
 
 const fileInfoKey = (f: FileInfo, path: string): FileInfoKey => join(path, f.name);
@@ -90,7 +92,6 @@ interface Operation {
 const p = prefix("pageComp.fileManagerComp.fileManager.");
 
 export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
-
 
   const t = useI18nTranslateToString();
 
@@ -108,6 +109,19 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
   const [files, setFiles] = useState<FileInfo[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedKeys, setSelectedKeys] = useState<FileInfoKey[]>([]);
+
+  const [previewFile, setPreviewFile] = useState({
+    open: false,
+    filename: "",
+    fileSize: 0,
+    filePath: "",
+    clusterId: "",
+  });
+  const [previewImage, setPreviewImage] = useState({
+    visible: false,
+    src: "",
+    scaleStep: 0.5,
+  });
 
   const [operation, setOperation] = useState<Operation | undefined>(undefined);
   const [showHiddenFile, setShowHiddenFile] = useState(false);
@@ -277,7 +291,6 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
               message.success(t(p("delete.successMessage"), [allCount]));
               resetSelectedAndOperation();
             } else {
-              // message.error(`删除成功${allCount - failedCount}项，失败${failedCount}项`);
               message.error(t(p("delete.errorMessage"), [(allCount - failedCount), failedCount])),
               setOperation((o) => o && ({ ...o, started: false }));
             }
@@ -301,6 +314,28 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
 
   const onHiddenClick = () => {
     setShowHiddenFile(!showHiddenFile);
+  };
+
+  const handlePreview = (filename: string, fileSize: number) => {
+
+    if (isImage(filename)) {
+      setPreviewImage({
+        ...previewImage,
+        visible: true,
+        src: urlToDownload(cluster.id, join(path, filename), false),
+      });
+    } else if (canPreviewWithEditor(filename)
+      && fileSize <= convertToBytes(publicConfig.FILE_PREVIEW_SIZE || DEFAULT_FILE_PREVIEW_LIMIT_SIZE)) {
+      setPreviewFile({
+        open: true,
+        filename,
+        fileSize: fileSize,
+        filePath: join(path, filename),
+        clusterId: cluster.id,
+      });
+    } else {
+      message.error(t(p("preview.cantPreview")));
+    }
   };
 
   return (
@@ -454,8 +489,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
             if (r.type === "DIR") {
               Router.push(fullUrl(join(path, r.name)));
             } else if (r.type === "FILE") {
-              const href = urlToDownload(cluster.id, join(path, r.name), false);
-              openPreviewLink(href);
+              handlePreview(r.name, r.size);
             }
           },
         })}
@@ -466,8 +500,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
             </Link>
           ) : (
             <a onClick={() => {
-              const href = urlToDownload(cluster.id, join(path, r.name), false);
-              openPreviewLink(href);
+              handlePreview(r.name, r.size);
             }}
             >
               {r.name}
@@ -476,25 +509,6 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
         )}
         actionRender={(_, i: FileInfo) => (
           <Space>
-            {
-              i.type === "FILE" && isNotImage(i.name) && (i.size <= convertToBytes(publicConfig.FILE_EDIT_SIZE)
-                ? (
-                  <FileEditModalButton
-                    filename={i.name}
-                    filePath={join(path, i.name)}
-                    clusterId={cluster.id}
-                  >{t(p("edit.edit"))}</FileEditModalButton>
-                )
-                : (
-                  <DisabledA
-                    disabled={true}
-                    message={t(p("edit.fileSizeExceeded"), [publicConfig.FILE_EDIT_SIZE])}
-                  >
-                    <span style={{ color: "gray" }}>{t(p("edit.edit"))}</span>
-                  </DisabledA>
-                )
-              )
-            }
             {
               i.type === "FILE" && (
                 <a href={urlToDownload(cluster.id, join(path, i.name), true)}>
@@ -578,6 +592,8 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
           </Space>
         )}
       />
+      <ImagePreviewer previewImage={previewImage} setPreviewImage={setPreviewImage} />
+      <FileEditModal previewFile={previewFile} setPreviewFile={setPreviewFile} />
     </div>
   );
 };
@@ -587,8 +603,7 @@ const RenameLink = ModalLink(RenameModal);
 const CreateFileButton = ModalButton(CreateFileModal, { icon: <FileAddOutlined /> });
 const MkdirButton = ModalButton(MkdirModal, { icon: <FolderAddOutlined /> });
 const UploadButton = ModalButton(UploadModal, { icon: <UploadOutlined /> });
-const FileEditModalButton = ModalLink(FileEditModal);
 
-function openPreviewLink(href: string) {
-  window.open(href, "ViewFile", "location=yes,resizable=yes,scrollbars=yes,status=yes");
-}
+// function openPreviewLink(href: string) {
+//   window.open(href, "ViewFile", "location=yes,resizable=yes,scrollbars=yes,status=yes");
+// }

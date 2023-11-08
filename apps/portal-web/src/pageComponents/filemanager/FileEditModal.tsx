@@ -10,22 +10,71 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { CloseOutlined, FullscreenExitOutlined, FullscreenOutlined } from "@ant-design/icons";
 import Editor, { loader } from "@monaco-editor/react";
-import { App, Badge, Modal, Space, Spin, Tabs, Tooltip } from "antd";
-import { useState } from "react";
+import { App, Badge, Button, Modal, Space, Spin, Tabs, Tooltip } from "antd";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { api } from "src/apis";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 import { publicConfig } from "src/utils/config";
+import { convertToBytes } from "src/utils/format";
 import { getLanguage } from "src/utils/staticFiles";
+import { styled } from "styled-components";
 
 import { urlToUpload } from "./api";
 
-interface Props {
+const StyledTabs = styled(Tabs)`
+  .ant-tabs-nav {
+    margin: 0 !important;
+  }
+`;
+
+enum Mode {
+  EDIT = "EDIT",
+  PREVIEW = "PREVIEW",
+};
+
+enum ExitType {
+  EXIT_EDIT,
+  CLOSE,
+}
+
+const FullScreenModalStyle = styled.div`
+  .ant-modal {
+    transition: width 0.3s ease, height 0.3s ease;
+  }
+
+  &.fullscreen {
+    .ant-modal {
+      width: 99vw !important;
+      height: 100vh !important;
+      top: 0 !important;
+      padding: 0 !important;
+      margin: auto !important;
+      max-width: 100vw !important;
+    }
+
+    .ant-modal-content {
+      height: 100%;
+    }
+
+    .ant-modal-body {
+      height: calc(100% - 100px);
+      overflow-y: auto;
+    }
+  }
+`;
+
+interface PreviewFileProps {
   open: boolean;
-  onClose: () => void;
-  clusterId: string
   filename: string;
+  fileSize: number;
   filePath: string;
+  clusterId: string;
+}
+interface Props {
+  previewFile: PreviewFileProps;
+  setPreviewFile: Dispatch<SetStateAction<PreviewFileProps>>;
 }
 
 interface ConfirmModalProps {
@@ -40,6 +89,8 @@ interface FilenameProps {
   filename: string;
 }
 
+const DEFAULT_FILE_EDIT_LIMIT_SIZE = "1m";
+
 const p = prefix("pageComp.fileManagerComp.fileEditModal.");
 
 loader.config({
@@ -52,6 +103,11 @@ function ConfirmModal({ open, saving, onSave, onClose }: ConfirmModalProps) {
 
   const t = useI18nTranslateToString();
 
+  const handleSave = async () => {
+    await onSave();
+    onClose();
+  };
+
   return (
     <Modal
       title={t(p("prompt"))}
@@ -60,9 +116,10 @@ function ConfirmModal({ open, saving, onSave, onClose }: ConfirmModalProps) {
       closeIcon={null}
       cancelText={t(p("doNotSave"))}
       cancelButtonProps={{ disabled: saving }}
-      onOk={onSave}
+      onOk={handleSave}
       confirmLoading={saving}
       onCancel={onClose}
+      maskClosable={false}
     >
       {t(p("notSavePrompt"))}
     </Modal>
@@ -85,44 +142,92 @@ const FilenameComponent: React.FC<FilenameProps> = ({ isEdit, filename }) => {
   );
 };
 
-export const FileEditModal: React.FC<Props> = ({ open, onClose, clusterId, filename, filePath }) => {
+export const FileEditModal: React.FC<Props> = ({ previewFile, setPreviewFile }) => {
 
   const t = useI18nTranslateToString();
 
+  const { open, filename, fileSize, filePath, clusterId } = previewFile;
+
+  const [mode, setMode] = useState<Mode>(Mode.PREVIEW);
   const [fileContent, setFileContent] = useState("");
   const [isEdit, setIsEdit] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [downloading, setDownloading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [confirm, setConfirm] = useState(false);
+  const [exitType, setExitType] = useState<ExitType>(ExitType.CLOSE);
+  const [isFullScreen, setIsFullScreen] = useState(false);
+
+
+  const [options, setOptions] = useState({
+    readOnly: true,
+    lineNumbersMinChars: 7,
+  });
+
+  useEffect(() => {
+    if (open) {
+      downloadFile();
+    }
+  }, [open]);
 
   const { message } = App.useApp();
 
   const handleEdit = (content) => {
-    setIsEdit(true);
-    setFileContent(content);
+    if (content && !downloading) {
+      setIsEdit(true);
+      setFileContent(content);
+    }
   };
 
   const closeProcess = () => {
     setConfirm(false);
     setIsEdit(false);
+    setMode(Mode.PREVIEW);
     setFileContent("");
-    onClose();
+    setIsFullScreen(false);
+    setOptions({
+      ...options,
+      readOnly: true,
+    });
+    setPreviewFile({
+      ...previewFile,
+      open: false,
+    });
   };
 
-  const handleCancel = () => {
+  const handleClose = () => {
     if (!isEdit) {
       closeProcess();
       return;
     }
 
+    setExitType(ExitType.CLOSE);
+    setConfirm(true);
+  };
+
+  const exitEditModeProcess = () => {
+    downloadFile();
+    setConfirm(false);
+    setIsEdit(false);
+    setIsFullScreen(false);
+    setMode(Mode.PREVIEW);
+    setOptions({
+      ...options,
+      readOnly: true,
+    });
+  };
+
+  const handleExitEditMode = () => {
+    if (!isEdit) {
+      exitEditModeProcess();
+      return;
+    }
+
+    setExitType(ExitType.EXIT_EDIT);
     setConfirm(true);
   };
 
   const handleSave = async () => {
-    if (!isEdit) {
-      closeProcess();
-      return;
-    }
 
     setSaving(true);
     const blob = new Blob([fileContent], { type: "text/plain" });
@@ -130,7 +235,7 @@ export const FileEditModal: React.FC<Props> = ({ open, onClose, clusterId, filen
     const formData = new FormData();
     formData.append("file", blob);
 
-    await fetch(urlToUpload(clusterId, filePath), {
+    await fetch(urlToUpload(clusterId, filename), {
       method: "POST",
       body: formData,
     }).then((response) => {
@@ -138,19 +243,22 @@ export const FileEditModal: React.FC<Props> = ({ open, onClose, clusterId, filen
         return Promise.reject(response.statusText);
       }
       message.success(t(p("saveFileSuccess")));
-      closeProcess();
+      setIsEdit(false);
     }).catch((error) => {
       message.error(t(p("saveFileFail"), [error]));
-    }).finally(() => setSaving(false));
+    }).finally(() => {
+      setSaving(false);
+    });
+
   };
 
   const downloadFile = () => {
-
     if (!open) {
       return;
     }
 
     setLoading(true);
+    setDownloading(true);
     api.downloadFile({
       query: { download: false, path: filePath, cluster: clusterId },
     }).then((json) => {
@@ -162,46 +270,118 @@ export const FileEditModal: React.FC<Props> = ({ open, onClose, clusterId, filen
         return;
       }
 
-      setLoading(false);
       const reader = res.body?.getReader();
       if (reader) {
+        let accumulatedChunks = "";
+        let accumulatedSize = 0;
+        const CHUNK_SIZE = 3 * 1024 * 1024;
+        const decoder = new TextDecoder();
 
-        let fileContent = "";
         while (true) {
           const { done, value } = await reader.read();
           if (done) {
+            setFileContent(() => {
+              return accumulatedChunks;
+            });
             break;
           }
-          fileContent += new TextDecoder().decode(value);
-          setFileContent(fileContent);
-        }
+          const chunk = decoder.decode(value, { stream: true });
+          accumulatedChunks += chunk;
+          accumulatedSize += chunk.length;
 
+          if (accumulatedSize > CHUNK_SIZE) {
+            setFileContent(() => {
+              return accumulatedChunks;
+            });
+            accumulatedSize = 0;
+            setLoading(false);
+          }
+        }
       } else {
         message.error(t(p("cantReadFile"), [filename]));
       }
 
     }).finally(() => {
       setLoading(false);
+      setDownloading(false);
     });
 
   };
 
+  const modalTitle = (
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <span>{mode === "PREVIEW" ? t(p("filePreview")) : t(p("fileEdit"))}</span>
+      <div style={{ position: "relative", top: "-2px" }}>
+        <Button
+          style={{ marginBottom: 2, color: "#8c8c8c" }}
+          type="text"
+          onClick={() => setIsFullScreen(!isFullScreen)}
+          icon={isFullScreen ? <FullscreenExitOutlined /> : <FullscreenOutlined />}
+        />
+        <Button
+          style={{ color: "#8c8c8c" }}
+          type="text"
+          onClick={handleClose}
+          icon={<CloseOutlined />}
+        />
+      </div>
+
+    </div>
+  );
+
+  const modalFooterRender = () => {
+    return (
+      mode === Mode.PREVIEW ? (
+        fileSize <= convertToBytes(publicConfig.FILE_EDIT_SIZE || DEFAULT_FILE_EDIT_LIMIT_SIZE)
+          ? (
+            <Button
+              type="primary"
+              onClick={() => {
+                setMode(Mode.EDIT);
+                setOptions({
+                  ...options,
+                  readOnly: false,
+                });
+              }}
+            >
+              {t(p("edit"))}
+            </Button>
+          )
+          : (
+            <Tooltip
+              title={downloading ? t(p("fileLoading")) : t(p("fileSizeExceeded"), [publicConfig.FILE_EDIT_SIZE])}
+            >
+              <Button disabled={true}>{t(p("edit"))}</Button>
+            </Tooltip>
+          )
+      ) : (
+        <Space>
+          <Button type="primary" disabled={!isEdit} loading={saving} onClick={handleSave}>{t(p("save"))}</Button>
+          <Button
+            disabled={saving}
+            onClick={() => {
+              handleExitEditMode();
+            }}
+          >{t(p("exitEdit"))}</Button>
+        </Space>
+
+      )
+    );
+  };
+
   return (
-    <div>
+    <FullScreenModalStyle className={isFullScreen ? "fullscreen" : ""}>
       <Modal
         open={open}
-        afterOpenChange={downloadFile}
-        title={t(p("fileEdit"))}
-        okText={t(p("save"))}
-        closeIcon={null}
-        onOk={handleSave}
-        confirmLoading={saving}
-        onCancel={handleCancel}
-        cancelButtonProps={{ disabled: saving }}
+        onCancel={handleClose}
+        title={modalTitle}
+        footer={modalFooterRender()}
+        getContainer={false}
         width={1000}
         maskClosable={false}
+        closeIcon={null}
       >
-        <Tabs
+        <StyledTabs
           type="card"
           items={[{
             label: <FilenameComponent isEdit={isEdit} filename={filename} />,
@@ -209,8 +389,9 @@ export const FileEditModal: React.FC<Props> = ({ open, onClose, clusterId, filen
             children: (
               <Spin spinning={loading}>
                 <Editor
-                  height="60vh"
+                  height={isFullScreen ? "78vh" : "60vh"}
                   defaultLanguage={getLanguage(filename)}
+                  options={options}
                   value={fileContent}
                   onChange={handleEdit}
                 />
@@ -223,8 +404,8 @@ export const FileEditModal: React.FC<Props> = ({ open, onClose, clusterId, filen
         open={confirm}
         saving={saving}
         onSave={handleSave}
-        onClose={closeProcess}
+        onClose={() => exitType === ExitType.CLOSE ? closeProcess() : exitEditModeProcess()}
       />
-    </div>
+    </FullScreenModalStyle>
   );
 };

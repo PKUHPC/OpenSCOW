@@ -187,16 +187,21 @@ export default {
     },
     fileManagerComp: {
       fileEditModal: {
+        edit: "Edit",
         prompt: "Prompt",
         save: "Save",
         doNotSave: "Do Not Save",
         notSaved: "Not Saved",
         notSavePrompt: "The file has not been saved, do you want to save this file?",
         fileEdit: "File Edit",
+        filePreview: "File Preview",
+        fileLoading: "File is loading...",
+        exitEdit: "Exit Edit Mode",
         failedGetFile: "Failed to get file: {}",
         cantReadFile: "Cannot read file: {}",
         saveFileFail: "File save failed: {}",
         saveFileSuccess: "File saved successfully",
+        fileSizeExceeded: "Exceeds editable file size: {}",
       },
       createFileModal: {
         createErrorMessage: "File or directory with the same name already exists!",
@@ -206,9 +211,8 @@ export default {
         fileName: "File Name",
       },
       fileManager: {
-        edit: {
-          edit: "Edit",
-          fileSizeExceeded: "Exceeds editable file size: {}",
+        preview: {
+          cantPreview: "文件过大或者格式不支持，请下载后查看",
         },
         moveCopy: {
           copy: "Copy",

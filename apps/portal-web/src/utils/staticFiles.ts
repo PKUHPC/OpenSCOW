@@ -11,6 +11,7 @@
  */
 
 import { languageMap } from "src/utils/languageMap";
+import { nonEditableExtensions } from "src/utils/nonEditableExtensions";
 
 
 export function basename(path: string) {
@@ -34,4 +35,10 @@ export function getLanguage(filename) {
   const ext = filename.split(".").pop().toLowerCase();
   return languageMap[ext] || "plaintext";
 }
+
+export function canPreviewWithEditor(filename: string): boolean {
+  const extension = `.${filename.split(".").pop()}`;
+  return !nonEditableExtensions.has(extension.toLowerCase());
+}
+
 
