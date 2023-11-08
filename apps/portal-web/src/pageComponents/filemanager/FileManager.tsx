@@ -334,7 +334,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
         clusterId: cluster.id,
       });
     } else {
-      message.error(t(p("preview.cantPreview")));
+      message.info(t(p("preview.cantPreview")));
     }
   };
 
