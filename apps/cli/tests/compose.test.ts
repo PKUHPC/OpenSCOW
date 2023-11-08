@@ -36,7 +36,7 @@ it("generate correct paths", async () => {
   const config = getInstallConfig(configPath);
 
   config.portal = { basePath: "/", novncClientImage: "" };
-  config.mis = { basePath: "/mis", dbPassword: "must!chang3this", mysqlImage: "", redis: { type: "builtin" } };
+  config.mis = { basePath: "/mis", dbPassword: "must!chang3this", mysqlImage: "" };
 
   const composeConfig = createComposeSpec(config);
 
@@ -99,7 +99,7 @@ it("deploy audit", async () => {
   const config = getInstallConfig(configPath);
   config.audit = { dbPassword: "must!chang3this", mysqlImage: "" };
   config.portal = { basePath: "/", novncClientImage: "" };
-  config.mis = { basePath: "/mis", dbPassword: "must!chang3this", mysqlImage: "", redis: { type: "builtin" } };
+  config.mis = { basePath: "/mis", dbPassword: "must!chang3this", mysqlImage: "" };
 
   const composeConfig = createComposeSpec(config);
 
