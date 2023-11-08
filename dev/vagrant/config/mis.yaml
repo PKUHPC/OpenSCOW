@@ -113,4 +113,3 @@ createUser:
 # 自定义可查询消费类型
 # customChargeTypes: ["月租", "存储费"]
 
-redisUrl: 192.168.88.100:6379
