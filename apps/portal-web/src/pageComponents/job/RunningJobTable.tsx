@@ -139,7 +139,7 @@ export const RunningJobInfoTable: React.FC<JobInfoTableProps> = ({
         loading={isLoading}
         pagination={{ showSizeChanger: true }}
         rowKey={runningJobId}
-        scroll={{ x: data?.length ? 1850 : true }}
+        scroll={{ x: data?.length ? 1950 : true }}
       >
         {
           showCluster && (

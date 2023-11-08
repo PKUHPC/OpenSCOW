@@ -176,7 +176,7 @@ export const PaymentTable: React.FC<Props> = ({
         {
           showTenantName ? <Table.Column dataIndex="tenantName" title={t(pCommon("tenant"))} /> : undefined
         }
-        <Table.Column dataIndex="time" title={t(p("paymentDate"))} render={(v) => formatDateTime(v)} />
+        <Table.Column dataIndex="time" title={t(p("paymentDate"))} width={160} render={(v) => formatDateTime(v)} />
         <Table.Column dataIndex="amount" title={t(p("paymentAmount"))} render={(v) => v.toFixed(3)} />
         <Table.Column
           dataIndex="type"

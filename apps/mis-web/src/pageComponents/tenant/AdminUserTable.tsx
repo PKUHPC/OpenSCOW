@@ -190,6 +190,7 @@ export const AdminUserTable: React.FC<Props> = ({
         <Table.Column<FullUserInfo>
           dataIndex="changePassword"
           title={t(pCommon("operation"))}
+          width={90}
           render={(_, r) => (
             <Space split={<Divider type="vertical" />}>
               <ChangePasswordModalLink
