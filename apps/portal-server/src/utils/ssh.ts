@@ -100,7 +100,6 @@ export async function sshConnect<T>(
         metadata: scowErrorMetadata(SFTP_ERROR_CODE),
       });
     }
-    console.log("e111", e);
 
     throw e;
   });
