@@ -113,15 +113,6 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
   const reload = async (signal?: AbortSignal) => {
     setLoading(true);
     await api.listFile({ query: { cluster: cluster.id, path } }, signal)
-      .httpError(409, (e) => {
-        // 如果终端登录欢迎语过长会报错：Packet length xxxx exceeds max length of 262144
-        if (e.message.endsWith("exceeds max length of 262144")) {
-          message.error(t(p("textExceedsLength")));
-        }
-        else {
-          message.error(t(p("sftpError")));
-        }
-      })
       .then((d) => {
         setFiles(d.items);
       })

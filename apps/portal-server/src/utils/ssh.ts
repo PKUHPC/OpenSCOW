@@ -88,7 +88,7 @@ export async function sshConnect<T>(
         code: status.INTERNAL,
         details: e.message,
         message: e.message,
-        metadata: scowErrorMetadata(SSH_ERROR_CODE),
+        metadata: scowErrorMetadata(SSH_ERROR_CODE, typeof e.cause === "string" ? { cause:e.cause } : undefined),
       });
     }
 
@@ -100,6 +100,7 @@ export async function sshConnect<T>(
         metadata: scowErrorMetadata(SFTP_ERROR_CODE),
       });
     }
+    console.log("e111", e);
 
     throw e;
   });
