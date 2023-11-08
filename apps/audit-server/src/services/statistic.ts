@@ -73,7 +73,7 @@ export const statisticServiceServer = plugin((server) => {
         .andWhere({ operationTime: { $lte: endTime } })
         .andWhere({ "JSON_EXTRACT(meta_data, '$.$case')": { $in: portalOperationType } })
         .groupBy("JSON_EXTRACT(meta_data, '$.$case')")
-        .orderBy({ "JSON_EXTRACT(meta_data, '$.$case')": QueryOrder.DESC });
+        .orderBy({ "COUNT(*)": QueryOrder.DESC });
 
       const results: {operationType: string, count: number}[] = await qb.execute();
 
@@ -127,7 +127,7 @@ export const statisticServiceServer = plugin((server) => {
         .andWhere({ operationTime: { $lte: endTime } })
         .andWhere({ "JSON_EXTRACT(meta_data, '$.$case')": { $in: misOperationType } })
         .groupBy("JSON_EXTRACT(meta_data, '$.$case')")
-        .orderBy({ "JSON_EXTRACT(meta_data, '$.$case')": QueryOrder.DESC });
+        .orderBy({ "COUNT(*)": QueryOrder.DESC });
 
       const results: {operationType: string, count: number}[] = await qb.execute();
 

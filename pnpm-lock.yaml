@@ -162,6 +162,9 @@ importers:
       '@scow/utils':
         specifier: workspace:*
         version: link:../../libs/utils
+      dayjs:
+        specifier: 1.11.9
+        version: 1.11.9
       pino:
         specifier: 8.15.0
         version: 8.15.0
