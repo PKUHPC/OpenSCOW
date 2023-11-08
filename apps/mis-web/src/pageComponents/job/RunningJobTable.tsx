@@ -259,7 +259,7 @@ export const RunningJobInfoTable: React.FC<JobInfoTableProps> = ({
           showCluster && (
             <Table.Column<RunningJobInfo>
               dataIndex="cluster"
-              width="95%"
+              width="9.5%"
               title={t(pCommon("cluster"))}
               render={(_, r) => getI18nConfigCurrentText(r.cluster.name, languageId)}
             />
