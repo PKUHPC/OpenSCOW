@@ -21,7 +21,7 @@ export async function clearQueryCache(
 
   logger.info("Clearing query cache...");
   const result = await em.createQueryBuilder(QueryCache).delete()
-    .where({ timestamp: { $lt: new Date(Date.now() - 24 * 60 * 60 * 1000) } })
+    .where({ timestamp: { $lt: new Date() } })
     .execute();
   logger.info(`Query cache cleared. Rows deleted: ${result.affectedRows}.`);
   return;

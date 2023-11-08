@@ -225,12 +225,6 @@ export const adminServiceServer = plugin((server) => {
       return [{}];
     },
 
-    /**
-     * Deprecated Notice
-     * This API function getAdminInfo has been deprecated.
-     * Use the new API function getStatisticInfo instead.
-     * @deprecated
-     */
     getAdminInfo: async ({ em }) => {
       const userCount = await em.count(User, {});
       const accountCount = await em.count(Account, {});
