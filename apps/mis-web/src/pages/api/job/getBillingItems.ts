@@ -21,7 +21,7 @@ import { authenticate } from "src/auth/server";
 import { PlatformRole } from "src/models/User";
 import { Money } from "src/models/UserSchemaModel";
 import { getClient } from "src/utils/client";
-import { runtimeConfig } from "src/utils/config";
+import { publicConfig } from "src/utils/config";
 
 // Cannot use BillingItemType from pageComponents/job/ManageJobBillingTable
 export const BillingItemType = Type.Object({
@@ -145,7 +145,8 @@ export default /* #__PURE__*/typeboxRoute(GetBillingItemsSchema, async (req, res
 
   const result = { activeItems: [] as BillingItemType[], historyItems: [] as BillingItemType[], nextId };
 
-  for (const [cluster] of Object.entries(runtimeConfig.CLUSTERS_CONFIG)) {
+  for (const cluster of publicConfig.CLUSTER_SORTED_ID_LIST) {
+
     const client = getClient(ConfigServiceClient);
     const partitions = await asyncClientCall(client, "getClusterConfig", { cluster }).then((resp) => resp.partitions);
     for (const partition of partitions) {

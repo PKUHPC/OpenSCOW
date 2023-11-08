@@ -27,8 +27,9 @@ import { TableTitle } from "src/components/TableTitle";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { HistoryJobDrawer } from "src/pageComponents/job/HistoryJobDrawer";
 import type { GetJobInfoSchema } from "src/pages/api/job/jobInfo";
+import { getSortedClusterValues } from "src/utils/cluster";
 import type { Cluster } from "src/utils/config";
-import { getClusterName, publicConfig } from "src/utils/config";
+import { getClusterName } from "src/utils/config";
 import { moneyToString, nullableMoneyToString } from "src/utils/money";
 
 interface FilterForm {
@@ -73,7 +74,7 @@ export const JobTable: React.FC<Props> = ({
     return {
       jobEndTime: [now.subtract(1, "week").startOf("day"), now.endOf("day")],
       jobId: undefined,
-      clusters: Object.values(publicConfig.CLUSTERS),
+      clusters: getSortedClusterValues(),
       accountName: typeof accountNames === "string" ? accountNames : undefined,
     };
   });
