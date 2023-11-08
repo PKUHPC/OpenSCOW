@@ -259,41 +259,49 @@ const JobInfoTable: React.FC<JobInfoTableProps> = ({
           total: data?.totalCount,
           onChange: (page, pageSize) => setPageInfo({ page, pageSize }),
         } : false}
-        scroll={{ x: true }}
+        tableLayout="fixed"
+        scroll={{ x: data?.jobs?.length ? 1800 : true }}
       >
-        <Table.Column<JobInfo> dataIndex="idJob" title={t(pCommon("clusterWorkId"))} />
-        <Table.Column<JobInfo> dataIndex="account" title={t(pCommon("account"))} />
-        <Table.Column<JobInfo> dataIndex="user" title={t(pCommon("user"))} />
+        <Table.Column<JobInfo> dataIndex="idJob" width="5.2%" title={t(pCommon("clusterWorkId"))} />
+        <Table.Column<JobInfo> dataIndex="jobName" ellipsis title={t(pCommon("workName"))} />
+        <Table.Column<JobInfo> dataIndex="account" ellipsis title={t(pCommon("account"))} />
+        <Table.Column<JobInfo> dataIndex="user" ellipsis title={t(pCommon("user"))} />
         <Table.Column<JobInfo>
           dataIndex="cluster"
+          ellipsis
           title={t(pCommon("cluster"))}
           render={(cluster) => getClusterName(cluster, languageId)}
         />
-        <Table.Column<JobInfo> dataIndex="partition" title={t(pCommon("partition"))} />
-        <Table.Column<JobInfo> dataIndex="qos" title="QOS" />
-        <Table.Column<JobInfo> dataIndex="jobName" title={t(pCommon("workName"))} />
+        <Table.Column<JobInfo> dataIndex="partition" width="6.7%" ellipsis title={t(pCommon("partition"))} />
+        <Table.Column<JobInfo> dataIndex="qos" width="6.7%" ellipsis title="QOS" />
         <Table.Column<JobInfo>
           dataIndex="timeSubmit"
+          width="8.9%"
           title={t(pCommon("timeSubmit"))}
           render={(time: string) => formatDateTime(time)}
         />
         <Table.Column<JobInfo>
           dataIndex="timeEnd"
+          width="8.9%"
           title={t(pCommon("timeEnd"))}
           render={(time: string) => formatDateTime(time)}
         />
         <Table.Column<JobInfo>
           dataIndex="accountPrice"
+          width="6.1%"
           title={t(p("tenantPrice"))}
           render={(price: Money) => moneyToString(price)}
         />
         <Table.Column<JobInfo>
           dataIndex="tenantPrice"
+          width="6.1%"
           title={t(p("platformPrice"))}
           render={(price: Money) => moneyToString(price)}
         />
         <Table.Column<JobInfo>
           title={t(pCommon("more"))}
+          fixed="right"
+          width="4%"
           render={(_, r) => <a onClick={() => setPreviewItem(r)}>{t(pCommon("detail"))}</a>}
         />
       </Table>

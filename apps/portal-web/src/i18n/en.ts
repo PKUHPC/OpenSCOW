@@ -138,7 +138,6 @@ export default {
         jobInfoTable: {
           cluster: "Cluster",
           jobId: "Job ID",
-          user: "User",
           account: "Account",
           name: "Job Name",
           partition: "Partition",
