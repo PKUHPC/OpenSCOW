@@ -29,8 +29,8 @@ export const clearCachePlugin = plugin(async (f) => {
   let cacheClearStarted = false;
   let cacheClearIsRunning = false;
 
-  // const schedule = "0 0 * * *";
-  const schedule = "*/1 * * * *";
+  // 每天零点清空缓存
+  const schedule = "0 0 * * *";
 
   const logger = f.logger.child({ plugin: "cache" });
 
@@ -38,7 +38,7 @@ export const clearCachePlugin = plugin(async (f) => {
     if (cacheClearIsRunning) return;
 
     cacheClearIsRunning = true;
-    return await clearQueryCache(f.ext.orm.em.fork(), logger).finally(() => {
+    return await clearQueryCache(f.ext.orm.em.fork(), logger).finally(() => { 
       cacheClearIsRunning = false;
     });
   };
