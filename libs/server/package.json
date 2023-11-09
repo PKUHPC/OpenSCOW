@@ -19,12 +19,12 @@
   "dependencies": {
     "@ddadaal/tsgrpc-common": "0.2.4",
     "@grpc/grpc-js": "1.9.5",
-    "nookies": "2.5.2"
+    "nookies": "2.5.2",
+    "@scow/config": "workspace:*"
   },
   "devDependencies": {
     "@ddadaal/tsgrpc-server": "0.19.4",
     "@ddadaal/tsgrpc-client": "0.17.6",
-    "@scow/config": "workspace:*",
     "@scow/protos": "workspace:*"
   },
   "volta": {
