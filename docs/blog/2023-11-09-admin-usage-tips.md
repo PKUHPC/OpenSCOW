@@ -1,6 +1,6 @@
 ---
 slug: admin-usage-tips
-title: SCOW: 管理员使用技巧
+title: SCOW管理员使用技巧
 authors: [huangjun]
 tags: [scow, usage-tips]
 
