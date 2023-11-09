@@ -18,6 +18,7 @@ import { jobInfoToPortalJobInfo, jobInfoToRunningjob } from "@scow/lib-scheduler
 import { createDirectoriesRecursively, sftpReadFile, sftpStat } from "@scow/lib-ssh";
 import { JobServiceServer, JobServiceService } from "@scow/protos/build/portal/job";
 import { parseErrorDetails } from "@scow/rich-error-model";
+import { ApiVersion } from "@scow/utils/build/version";
 import { getClusterOps } from "src/clusterops";
 import { JobTemplate } from "src/clusterops/api/job";
 import { checkSchedulerApiVersion, getAdapterClient } from "src/utils/clusters";
@@ -225,8 +226,9 @@ export const jobServiceServer = plugin((server) => {
       const client = getAdapterClient(cluster);
       if (!client) { throw clusterNotFound(cluster); }
 
+      const interfaceApiVersion: ApiVersion = { major: 1, minor: 2, patch: 0 };
       // 检验scow与调度器的API版本是否一致
-      await checkSchedulerApiVersion(client);
+      await checkSchedulerApiVersion(client, interfaceApiVersion);
 
       const host = getClusterLoginNode(cluster);
       if (!host) { throw clusterNotFound(cluster); }
@@ -280,9 +282,10 @@ export const jobServiceServer = plugin((server) => {
           throw <ServiceError> {
             code: Status.FAILED_PRECONDITION,
             message: "precondition failed",
-            details: "The method submitScriptAsJob is not supported with your current scheduler adapter version. "
-              + "To use this method, you must upgrade to a scheduler adapter "
-              + "that complies with the 1.2.0 interface standard requirements or higher.",
+            details: "The method is not supported with the current scheduler adapter version. "
+            + "To use this method, the scheduler adapter must be upgraded to the version "
+            + `${interfaceApiVersion.major}.${interfaceApiVersion.minor}.${interfaceApiVersion.patch}`
+            + "or higher.",
           };
         } else {
           throw e;

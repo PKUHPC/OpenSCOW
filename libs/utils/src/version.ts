@@ -11,7 +11,7 @@
  */
 
 import { existsSync, readFileSync } from "fs";
-import { join } from "path";
+// import { join } from "path";
 
 interface VersionJsonInfo {
   tag?: string;
@@ -36,27 +36,27 @@ export type ApiVersion = {
   patch: number;
 }
 
-// 获取当前调度器适配器接口仓库的API版本号
-export function getCurrentScowSchedulerApiVersion(): ApiVersion | null {
+// // 获取当前调度器适配器接口仓库的API版本号
+// export function getCurrentScowSchedulerApiVersion(): ApiVersion | null {
 
-  const schedulerAdapterJsonFilePath = join(__dirname, "../../protos/scheduler-adapter/package.json");
-  const packageJsonContent = JSON.parse(readFileSync(schedulerAdapterJsonFilePath, "utf-8"));
+//   const schedulerAdapterJsonFilePath = join(__dirname, "../../protos/scheduler-adapter/package.json");
+//   const packageJsonContent = JSON.parse(readFileSync(schedulerAdapterJsonFilePath, "utf-8"));
 
-  const match = packageJsonContent.scripts.generate.match(/(?<=#tag=v)([\d.]+)/);
+//   const match = packageJsonContent.scripts.generate.match(/(?<=#tag=v)([\d.]+)/);
 
-  const version = match ? match[1] : undefined;
+//   const version = match ? match[1] : undefined;
 
-  if (version) {
-    const versionParts = version.split(".");
-    return {
-      major: parseInt(versionParts[0]),
-      minor: parseInt(versionParts[1]),
-      patch: parseInt(versionParts[2]),
-    };
-  } else {
-    return null;
-  }
-}
+//   if (version) {
+//     const versionParts = version.split(".");
+//     return {
+//       major: parseInt(versionParts[0]),
+//       minor: parseInt(versionParts[1]),
+//       patch: parseInt(versionParts[2]),
+//     };
+//   } else {
+//     return null;
+//   }
+// }
 
 /**
  * 比较Version1与Version2版本
