@@ -305,7 +305,13 @@ export const mockApi: MockApi<typeof api> = {
     ipAddress: "127.0.0.1",
     operatorId: "123",
     type: "Task",
-  }], total: 10 }),
+  }],
+  }),
+
+  getChargeRecordsTotalCount: async () => ({
+    totalAmount: 10,
+    totalCount: 10,
+  }),
 
   getPayments: async () => ({ results: [{
     amount: 10,
@@ -378,7 +384,16 @@ export const mockApi: MockApi<typeof api> = {
   unblockUserInAccount: async () => ({ executed: true }),
   blockAccount: async () => ({ executed: true }),
   unblockAccount: async () => ({ executed: true }),
-  updateBlockStatus: async () => null,
+  syncBlockStatus: async () => ({
+    blockedFailedAccounts: [],
+    unblockedFailedAccounts:[],
+    blockedFailedUserAccounts: [],
+  }),
+  getSyncBlockStatusJobInfo: async () => ({
+    syncStarted: false,
+    schedule: "0 4 * * *",
+  }),
+  setSyncBlockStatusState:  async () => null,
   removeUserFromAccount: async () => null,
   setAdmin: async () => ({ executed: true }),
   unsetAdmin: async () => ({ executed: false }),

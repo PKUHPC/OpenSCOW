@@ -325,7 +325,7 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
         }}
       >
         <Spin spinning={loading} tip={isSubmitting ? "" : t(p("loading"))}>
-          <Form.Item name="appJobName" label={t(p("appJobName"))} rules={[{ required: true }]}>
+          <Form.Item name="appJobName" label={t(p("appJobName"))} rules={[{ required: true }, { max: 50 }]}>
             <Input />
           </Form.Item>
           <Form.Item

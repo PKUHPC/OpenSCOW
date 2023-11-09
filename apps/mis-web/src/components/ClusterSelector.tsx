@@ -34,8 +34,8 @@ export const ClusterSelector: React.FC<Props> = ({ value, onChange }) => {
       placeholder={t(p("selectCluster"))}
       value={value?.map((v) => v.id)}
       onChange={(values) => onChange?.(values.map((x) => ({ id: x, name: publicConfig.CLUSTERS[x].name })))}
-      options={Object.values(publicConfig.CLUSTERS).map((x) => ({ value: x.id, label:
-        getI18nConfigCurrentText(x.name, languageId) }))}
+      options={publicConfig.CLUSTER_SORTED_ID_LIST.map((x) => ({ value: x, label:
+        getI18nConfigCurrentText(publicConfig.CLUSTERS[x].name, languageId) }))}
       style={{ minWidth: "96px" }}
     />
   );
@@ -59,9 +59,9 @@ export const SingleClusterSelector: React.FC<SingleSelectionProps> = ({ value, o
       onChange={(value) => onChange?.({ id: value, name: publicConfig.CLUSTERS[value].name })}
       options={
         (label ? [{ value: label, label, disabled: true }] : [])
-          .concat(Object.values(publicConfig.CLUSTERS).map((x) => ({
-            value: x.id,
-            label:  getI18nConfigCurrentText(x.name, languageId),
+          .concat(publicConfig.CLUSTER_SORTED_ID_LIST.map((x) => ({
+            value: x,
+            label:  getI18nConfigCurrentText(publicConfig.CLUSTERS[x].name, languageId),
             disabled: false,
           })))
       }

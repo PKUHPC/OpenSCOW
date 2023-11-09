@@ -11,7 +11,6 @@
  */
 
 import { NextPage } from "next";
-import { useRouter } from "next/router";
 import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
 import { Redirect } from "src/components/Redirect";

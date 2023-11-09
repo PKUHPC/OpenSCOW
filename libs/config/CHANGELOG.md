@@ -1,5 +1,20 @@
 # @scow/config
 
+## 1.1.0
+
+### Minor Changes
+
+- b33a2bd6bc: ui.yaml 下的 footer 增加 hostnameMap，其作用与 hostnameTextMap 一致，hostnameTextMap 在下一个大版本将会被删除
+- b7f01512eb: 实现了跨集群传输模块
+- 50d34d6ae3: 增加 scow 定时同步调度器用户封锁、账户封锁/解封状态的配置，可配置同步周期、是否启动
+
+### Patch Changes
+
+- 5bb922fe99: 增加集群配置文件中登录节点 LoginNode 地址唯一性验证
+- ccbde14304: 使配置文件中文本配置项兼容国际化类型，实现自定义配置文本的国际化展示
+- 29e4b1880a: ui.yaml 配置中的 hostnameMap 只可设置不带 port 的 hostname
+- 8fc4c21f07: 增加交互式应用 appConfigSchema 中的应用说明配置项 appComment
+
 ## 1.0.0
 
 ### Major Changes

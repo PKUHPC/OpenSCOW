@@ -1,5 +1,5 @@
 ---
-sidebar_position: 3
+sidebar_position: 1
 title: 配置管理系统
 ---
 
@@ -76,31 +76,46 @@ fetchJobs:
     # 周期的cron表达式
     cron: "10 */10 * * * *"
 
+# 周期性同步scow与调度器(如slurm)账户用户封锁状态的配置
+periodicSyncUserAccountBlockStatus:
+  # 是否开启
+  enabled: true
+  # 周期的cron表达式
+  cron: "0 4 * * *"
+
 # 预定义的充值类型
 predefinedChargingTypes:
   - 测试
 
-# 账户名的规则
-# accountNamePattern:
+# 创建账户时，账户名的规则。不设置就没有限制
+accountNamePattern:
   # 正则表达式
-  # regex: ""
+  regex: "^[a-z][a-z0-9_]{2,19}$"
 
-  # 出错时的消息
-  # errorMessage: ""
+  # 出错时的消息，对应上面的正则表达式
+  # 此文本支持国际化
+  errorMessage: "要求输入长度为3-20位，由小写字母、数字、下划线组成，且以小写字母开头的字符串"
 
-# 创建用户相关配置
-# createUser:
+createUser:
+  # 允许用户创建用户。默认为true
+  enabled: true
 
-  # 当认证系统允许创建用户时，是否启用SCOW中创建用户的配置
-  # enabled: true
+  # 使用SCOW内置的创建用户功能。默认为builtin
+  type: builtin
 
-  # 用户ID的规则
-  # userIdPattern:
-    # 正则表达式
-    # regex: ""
-
-    # 出错时的消息
-    # errorMessage: ""
+  # 内置创建用户功能配置
+  builtin:
+    # 创建用户时，用户ID的规则。不设置就没有限制
+    userIdPattern:
+      # 正则表达式
+      regex: "^[a-z][a-z0-9_]{2,19}$"
+      # 出错时的消息
+      errorMessage: "要求输入长度为3-20位，由小写字母、数字、下划线组成，且以小写字母开头的字符串"
+      # errorMessage:
+      #   i18n:
+      #     default: "要求输入长度为3-20位，小写字母、数字、下划线组成的字符串，且以小写字母开头"
+      #     en: "It is required to enter a string of 3-20 characters in length, consisting of lowercase letters, numbers,   and underscores, and starting with a lowercase letter."
+      #     zh_cn: "要求输入长度为3-20位，由小写字母、数字、下划线组成，且以小写字母开头的字符串"
 
 # # 新增导航链接相关配置
 # navLinks:

@@ -46,7 +46,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ req }) => 
 
   const languageId = getCurrentLanguageId(req, publicConfig.SYSTEM_LANGUAGE_CONFIG);
 
-  const loginDesktopEnabledClusters = Object.keys(runtimeConfig.CLUSTERS_CONFIG)
+  const loginDesktopEnabledClusters = publicConfig.CLUSTER_SORTED_ID_LIST
     .filter((clusterId) => getLoginDesktopEnabled(clusterId))
     .map((clusterId) => ({
       id: clusterId,

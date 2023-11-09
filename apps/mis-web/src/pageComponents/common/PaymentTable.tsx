@@ -165,9 +165,9 @@ export const PaymentTable: React.FC<Props> = ({
         </Form>
       </FilterFormContainer>
       <Table
+        tableLayout="fixed"
         dataSource={data?.results as Array<TableProps>}
         loading={isLoading}
-        scroll={{ x: true }}
         pagination={{ showSizeChanger: true }}
       >
         {
@@ -176,10 +176,13 @@ export const PaymentTable: React.FC<Props> = ({
         {
           showTenantName ? <Table.Column dataIndex="tenantName" title={t(pCommon("tenant"))} /> : undefined
         }
-        <Table.Column dataIndex="time" title={t(p("paymentDate"))} render={(v) => formatDateTime(v)} />
-        <Table.Column dataIndex="amount" title={t(p("paymentAmount"))} render={(v) => v.toFixed(3)} />
-        <Table.Column dataIndex="type" title={t(pCommon("type"))} />
-        <Table.Column dataIndex="comment" title={t(pCommon("comment"))} />
+        <Table.Column dataIndex="time" title={t(p("paymentDate"))} width="13.5%" render={(v) => formatDateTime(v)} />
+        <Table.Column dataIndex="amount" title={t(p("paymentAmount"))} width="10%" render={(v) => v.toFixed(3)} />
+        <Table.Column
+          dataIndex="type"
+          title={t(pCommon("type"))}
+          width="15%"
+        />
         {
           showAuditInfo ? (
             <>
@@ -188,6 +191,11 @@ export const PaymentTable: React.FC<Props> = ({
             </>
           ) : undefined
         }
+        <Table.Column
+          dataIndex="comment"
+          title={t(pCommon("comment"))}
+          width="20%"
+        />
       </Table>
     </div>
 

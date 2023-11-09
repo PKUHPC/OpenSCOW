@@ -30,6 +30,7 @@ export interface ServerRuntimeConfig {
   DEFAULT_PRIMARY_COLOR: string;
 
   CLUSTERS_CONFIG: {[clusterId: string]: ClusterConfigSchema};
+
   CLUSTER_TEXTS_CONFIG: ClusterTextsConfigSchema;
 
   SCOW_API_AUTH_TOKEN?: string;
@@ -42,7 +43,11 @@ export interface ServerRuntimeConfig {
 
 export interface PublicRuntimeConfig {
   BASE_PATH: string;
+
   CLUSTERS: { [clusterId: string]: Cluster };
+
+  CLUSTER_SORTED_ID_LIST: string[];
+
   PREDEFINED_CHARGING_TYPES: string[];
   CREATE_USER_CONFIG: {
     misConfig: MisConfigSchema["createUser"],

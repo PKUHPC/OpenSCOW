@@ -1,5 +1,31 @@
 # @scow/auth
 
+## 1.1.0
+
+### Minor Changes
+
+- ccbde14304: 实现 SCOW 门户系统与管理系统的页面国际化功能
+- b33a2bd6bc: 在 ui.yaml 下的 footer 增加 hostnameMap，其作用与 hostnameTextMap 一致，根据不同 hostname 展示不同的 footer 文本
+
+### Patch Changes
+
+- 639b77a103: 修复了一些因国际化英文 label 太长被输入框遮挡；修复了登录页的验证码 placeholder 太长和文字超出屏幕的问题。
+- d8a50f63ab: 登录界面 UI 新增根据不同域名展示不同内容
+- f808c35de7: 修复登录框中输入框长度不一致的问题
+- 51903e0732: 登录操作判断由 referer 改为 queryString 传 fromAuth 参数
+- 74764b4f42: 新增登录界面登录按钮颜色可根据域名进行不同配置
+- d8a50f63ab: 登录界面新增根据域名显示不同的背景颜色和背景图片
+- Updated dependencies [b33a2bd6bc]
+- Updated dependencies [b7f01512eb]
+- Updated dependencies [5bb922fe99]
+- Updated dependencies [ccbde14304]
+- Updated dependencies [50d34d6ae3]
+- Updated dependencies [29e4b1880a]
+- Updated dependencies [ccbde14304]
+- Updated dependencies [8fc4c21f07]
+  - @scow/config@1.1.0
+  - @scow/lib-server@1.0.1
+
 ## 1.0.0
 
 ### Major Changes

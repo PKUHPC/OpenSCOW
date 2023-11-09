@@ -110,7 +110,7 @@ function MyApp({ Component, pageProps, extra }: Props) {
   });
 
   const defaultClusterStore = useConstant(() => {
-    const store = createStore(DefaultClusterStore, Object.values(publicConfig.CLUSTERS)[0]);
+    const store = createStore(DefaultClusterStore, publicConfig.CLUSTERS[publicConfig.CLUSTER_SORTED_ID_LIST[0]]);
     return store;
   });
 

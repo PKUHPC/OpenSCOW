@@ -156,46 +156,54 @@ export const JobInfoTable: React.FC<JobInfoTableProps> = ({
       loading={isLoading}
       pagination={{ showSizeChanger: true }}
       rowKey={(x) => x.jobId}
-      scroll={{ x: true }}
+      scroll={{ x: data?.length ? 1850 : true }}
     >
       <Table.Column<JobInfo>
         dataIndex="jobId"
+        width="5.2%"
         title={t(p("jobId"))}
         sorter={(a, b) => compareNumber(+a.jobId, +b.jobId)}
         defaultSortOrder="descend"
       />
-      <Table.Column<JobInfo> dataIndex="name" title={t(p("jobName"))} />
-      <Table.Column<JobInfo> dataIndex="account" title={t(p("account"))} />
-      <Table.Column<JobInfo> dataIndex="partition" title={t(p("partition"))} />
-      <Table.Column<JobInfo> dataIndex="qos" title={t(p("qos"))} />
-      <Table.Column<JobInfo> dataIndex="state" title={t(p("state"))} />
+      <Table.Column<JobInfo> dataIndex="name" ellipsis title={t(p("jobName"))} />
+      <Table.Column<JobInfo> dataIndex="account" width="10%" ellipsis title={t(p("account"))} />
+      <Table.Column<JobInfo> dataIndex="partition" width="6.5%" ellipsis title={t(p("partition"))} />
+      <Table.Column<JobInfo> dataIndex="qos" width="6.5%" ellipsis title={t(p("qos"))} />
+      <Table.Column<JobInfo> dataIndex="state" width="6%" title={t(p("state"))} />
       <Table.Column<JobInfo>
         dataIndex="submitTime"
+        width="8.6%"
         title={t(p("submitTime"))}
         render={(t) => formatDateTime(t)}
       />
       <Table.Column<JobInfo>
         dataIndex="startTime"
+        width="8.6%"
         title={t(p("startTime"))}
         render={(t) => formatDateTime(t)}
       />
       <Table.Column<JobInfo>
         dataIndex="endTime"
+        width="8.6%"
         title={t(p("endTime"))}
         render={(t) => formatDateTime(t)}
       />
       <Table.Column<JobInfo>
         dataIndex="elapsed"
+        width="5.4%"
         title={t(p("elapsed"))}
       />
-      <Table.Column<JobInfo> dataIndex="timeLimit" title={t(p("timeLimit"))} />
+      <Table.Column<JobInfo> dataIndex="timeLimit" width="6.5%" title={t(p("timeLimit"))} />
       <Table.Column<JobInfo>
         dataIndex="reason"
+        ellipsis
         title={t(p("reason"))}
         render={(d: string) => d.startsWith("(") && d.endsWith(")") ? d.substring(1, d.length - 1) : d}
       />
       <Table.Column<JobInfo>
         title={t(p("more"))}
+        width="5%"
+        fixed="right"
         render={(_, r) => (
           <Space>
             <a onClick={() => Router.push(join("/files", cluster.id, r.workingDirectory))}>

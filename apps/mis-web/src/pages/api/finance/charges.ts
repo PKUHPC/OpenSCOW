@@ -13,7 +13,8 @@
 import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { moneyToNumber } from "@scow/lib-decimal";
-import { ChargingServiceClient } from "@scow/protos/build/server/charging";
+import { AccountOfTenantTarget, AccountsOfAllTenantsTarget, AccountsOfTenantTarget, AllTenantsTarget,
+  ChargingServiceClient, TenantTarget } from "@scow/protos/build/server/charging";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { PlatformRole, SearchType, TenantRole, UserInfo, UserRole } from "src/models/User";
@@ -30,7 +31,6 @@ export const ChargeInfo = Type.Object({
   tenantName: Type.String(),
 });
 export type ChargeInfo = Static<typeof ChargeInfo>;
-
 
 export const GetChargesSchema = typeboxRouteSchema({
   method: "GET",
@@ -56,86 +56,105 @@ export const GetChargesSchema = typeboxRouteSchema({
 
     // 查询消费记录种类：平台账户消费记录或租户消费记录
     searchType: Type.Optional(Type.Enum(SearchType)),
+
+    /**
+     * @minimum 1
+     * @type integer
+     */
+    page: Type.Optional(Type.Integer({ minimum: 1 })),
+
+    /**
+     * @type integer
+     */
+    pageSize: Type.Optional(Type.Integer()),
   }),
 
   responses: {
     200: Type.Object({
       results: Type.Array(ChargeInfo),
-      total: Type.Number(),
     }),
   },
 });
 
-export default typeboxRoute(GetChargesSchema, async (req, res) => {
-  const { endTime, startTime, accountName, isPlatformRecords, searchType, type } = req.query;
-
-  let info: UserInfo | undefined;
-  // check whether the user can access the account
+export async function getUserInfoForCharges(accountName: string | undefined, req, res): Promise<UserInfo | undefined> {
   if (accountName) {
-    info = await authenticate((i) =>
+    return await authenticate((i) =>
       i.platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ||
       i.platformRoles.includes(PlatformRole.PLATFORM_FINANCE) ||
       i.tenantRoles.includes(TenantRole.TENANT_FINANCE) ||
       i.tenantRoles.includes(TenantRole.TENANT_ADMIN) ||
       i.accountAffiliations.some((x) => x.accountName === accountName && x.role !== UserRole.USER),
     )(req, res);
-    if (!info) { return; }
   } else {
-    info = await authenticate((i) =>
+    return await authenticate((i) =>
       i.platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ||
       i.platformRoles.includes(PlatformRole.PLATFORM_FINANCE) ||
       i.tenantRoles.includes(TenantRole.TENANT_FINANCE) ||
       i.tenantRoles.includes(TenantRole.TENANT_ADMIN),
     )(req, res);
-    if (!info) { return; }
   }
+}
+
+export const buildChargesRequestTarget = (accountName: string | undefined, info: UserInfo,
+  searchType: SearchType | undefined, isPlatformRecords: boolean | undefined): (
+    { $case: "accountOfTenant"; accountOfTenant: AccountOfTenantTarget }
+    | { $case: "accountsOfTenant"; accountsOfTenant: AccountsOfTenantTarget }
+    | { $case: "accountsOfAllTenants"; accountsOfAllTenants: AccountsOfAllTenantsTarget }
+    | { $case: "tenant"; tenant: TenantTarget }
+    | { $case: "allTenants"; allTenants: AllTenantsTarget }
+    | undefined
+  ) => {
+  if (accountName) {
+    return {
+      $case: "accountOfTenant" as const,
+      accountOfTenant: { tenantName: info.tenant, accountName: accountName },
+    };
+  } else {
+    if (searchType === SearchType.ACCOUNT) {
+      if (isPlatformRecords) {
+        return {
+          $case: "accountsOfAllTenants" as const,
+          accountsOfAllTenants: {},
+        };
+      } else {
+        return {
+          $case: "accountsOfTenant" as const,
+          accountsOfTenant: { tenantName: info.tenant },
+        };
+      }
+    } else {
+      if (isPlatformRecords) {
+        return {
+          $case: "allTenants" as const,
+          allTenants: {},
+        };
+      } else {
+        return {
+          $case: "tenant" as const,
+          tenant: { tenantName: info.tenant },
+        };
+      }
+    }
+  }
+};
+
+export default typeboxRoute(GetChargesSchema, async (req, res) => {
+  const { endTime, startTime, accountName, isPlatformRecords, searchType, type, page, pageSize } = req.query;
+
+  const info = await getUserInfoForCharges(accountName, req, res);
+  if (!info) return;
 
   const client = getClient(ChargingServiceClient);
 
-  const reply = ensureNotUndefined(await asyncClientCall(client, "getChargeRecords", {
+  const reply = ensureNotUndefined(await asyncClientCall(client, "getPaginatedChargeRecords", {
     startTime,
     endTime,
     type,
-    target: (() => {
-      if (accountName) {
-        // 如果 accountName 不为 undefined，则查询当前租户下该账户的消费记录
-        return {
-          $case: "accountOfTenant" as const,
-          accountOfTenant: { tenantName: info.tenant, accountName: accountName },
-        };
-      } else {
-        if (searchType === SearchType.ACCOUNT) {
-          if (isPlatformRecords) {
-            // 查询平台下所有租户的账户消费记录
-            return {
-              $case: "accountsOfAllTenants" as const,
-              accountsOfAllTenants: { },
-            };
-          } else {
-            // 查询当前租户的账户消费记录
-            return {
-              $case: "accountsOfTenant" as const,
-              accountsOfTenant: { tenantName: info.tenant },
-            };
-          }
-        } else {
-          if (isPlatformRecords) {
-            // 查询平台下所有租户的租户消费记录
-            return {
-              $case: "allTenants" as const,
-              allTenants: { },
-            };
-          } else {
-            // 查询当前租户的租户消费记录
-            return {
-              $case: "tenant" as const,
-              tenant: { tenantName: info.tenant },
-            };
-          }
-        }
-      }
-    })(),
-  }), ["total"]);
+    target: buildChargesRequestTarget(accountName, info, searchType, isPlatformRecords),
+    page,
+    pageSize,
+  }), []);
+
 
   const accounts = reply.results.map((x) => {
     // 如果是查询平台账户消费记录或者查询账户下的消费记录时，确保accuntName存在
@@ -151,7 +170,6 @@ export default typeboxRoute(GetChargesSchema, async (req, res) => {
   return {
     200: {
       results: accounts,
-      total: moneyToNumber(reply.total),
     },
   };
 });
