@@ -66,8 +66,9 @@ export function getCurrentLanguageId(req: IncomingMessage | undefined,
       const preferredLanguages = acceptLanguageHeader.split(",");
       if (preferredLanguages.length > 0) {
       // 遍历语言偏好列表
-        for (const preferredLanguage of preferredLanguages) {
-        // 判断偏好语言中的语言是否合法
+        for (const lang of preferredLanguages) {
+          const preferredLanguage = lang.split(";")[0];
+          // 判断偏好语言中的语言是否合法
           if (Object.values(HEADER_ACCEPT_VALID_LANGUAGES).includes(preferredLanguage)) {
             switch (preferredLanguage) {
             case HEADER_ACCEPT_VALID_LANGUAGES.ZH_CN:
