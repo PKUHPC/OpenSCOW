@@ -31,7 +31,7 @@ export const createI18nStringSchema = ({ description, defaultValue }: {descripti
 // 当前系统支持的header中可接受语言
 export const HEADER_ACCEPT_VALID_LANGUAGES = {
   ZH: "zh",
-  ZH_CN: "zh_cn",
+  ZH_CN: "zh-CN",
   EN: "en",
   EN_US: "en-US",
 };
