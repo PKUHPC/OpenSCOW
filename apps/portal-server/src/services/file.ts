@@ -169,6 +169,7 @@ export const fileServiceServer = plugin((server) => {
       return await sshConnect(host, userId, logger, async (ssh) => {
         const sftp = await ssh.requestSFTP();
 
+
         const stat = await sftpStat(sftp)(path).catch((e) => {
           logger.error(e, "stat %s as %s failed", path, userId);
           throw <ServiceError> {
