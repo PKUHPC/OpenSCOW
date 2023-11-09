@@ -45,7 +45,10 @@ export const SubmitFileAsJobSchema = typeboxRouteSchema({
     }),
 
     500: Type.Object({
-      code: Type.Literal("SCHEDULER_FAILED"),
+      code: Type.Union([
+        Type.Literal("SCHEDULER_FAILED"),
+        Type.Literal("FAILED_PRECONDITION"),
+      ]),
       message: Type.String(),
     }),
   },
@@ -86,6 +89,9 @@ export default route(SubmitFileAsJobSchema, async (req, res) => {
     })
     .catch(handlegRPCError({
       [status.INTERNAL]: (err) => ({ 500: { code: "SCHEDULER_FAILED" as const, message: err.details } }),
+      [status.FAILED_PRECONDITION]: () => ({ 500: {
+        code: "FAILED_PRECONDITION" as const,
+        message: "The method submitScriptAsJob is not supported with your current scheduler adapter version." } }),
       [status.INVALID_ARGUMENT]: (err) => ({ 400: { code: "INVALID_ARGUMENT" as const, message: err.details } }),
       [status.PERMISSION_DENIED]: (err) => ({ 400: { code: "INVALID_PATH" as const, message: err.details } }),
     },

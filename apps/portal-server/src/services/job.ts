@@ -20,7 +20,7 @@ import { JobServiceServer, JobServiceService } from "@scow/protos/build/portal/j
 import { parseErrorDetails } from "@scow/rich-error-model";
 import { getClusterOps } from "src/clusterops";
 import { JobTemplate } from "src/clusterops/api/job";
-import { getAdapterClient } from "src/utils/clusters";
+import { checkSchedulerApiVersion, getAdapterClient } from "src/utils/clusters";
 import { clusterNotFound } from "src/utils/errors";
 import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
 
@@ -218,11 +218,15 @@ export const jobServiceServer = plugin((server) => {
       return [{ jobId: reply.jobId }];
     },
 
+
     submitFileAsJob: async ({ request, logger }) => {
       const { cluster, userId, filePath } = request;
 
       const client = getAdapterClient(cluster);
       if (!client) { throw clusterNotFound(cluster); }
+
+      // 检验scow与调度器的API版本是否一致
+      await checkSchedulerApiVersion(client);
 
       const host = getClusterLoginNode(cluster);
       if (!host) { throw clusterNotFound(cluster); }
@@ -271,6 +275,14 @@ export const jobServiceServer = plugin((server) => {
             code: Status.INTERNAL,
             message: "sbatch failed",
             details: e.details,
+          };
+        } else if (errors[0] && errors[0].$type === "google.rpc.ErrorInfo" && errors[0].reason === "UNIMPLEMENTED") {
+          throw <ServiceError> {
+            code: Status.FAILED_PRECONDITION,
+            message: "precondition failed",
+            details: "The method submitScriptAsJob is not supported with your current scheduler adapter version. "
+              + "To use this method, you must upgrade to a scheduler adapter "
+              + "that complies with the 1.2.0 interface standard requirements or higher.",
           };
         } else {
           throw e;

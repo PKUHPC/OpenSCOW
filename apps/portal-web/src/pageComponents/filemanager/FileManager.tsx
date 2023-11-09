@@ -523,8 +523,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
                         },
                       })
                         .httpError(500, (e) => {
-                          console.log("eeeeeee", e);
-                          e.code === "SCHEDULER_FAILED" ? modal.error({
+                          e.code === "SCHEDULER_FAILED" || e.code === "FAILED_PRECONDITION" ? modal.error({
                             title: t(p("tableInfo.submitFailedMessage")),
                             content: e.message,
                           }) : (() => { throw e; })();
