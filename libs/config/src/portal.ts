@@ -59,10 +59,10 @@ export const PortalConfigSchema = Type.Object({
   file: Type.Optional(Type.Object({
     preview: Type.Object({
       limitSize: Type.String({ description: "文件预览大小限制", default: "50m" }),
-    }, { description: "文件预览功能" }),
+    }, { description: "文件预览功能", default: {} }),
     edit: Type.Object({
       limitSize: Type.String({ description: "文件编辑大小限制", default: "1m" }),
-    }, { description: "文件编辑功能" }),
+    }, { description: "文件编辑功能", default: {} }),
   }, { description: "文件管理" })),
 
 

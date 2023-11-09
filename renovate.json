@@ -25,9 +25,7 @@
     },
     {
       "matchPackagePatterns": [
-        "next",
-        "@monaco-editor/react",
-        "monaco-editor"
+        "next"
       ],
       "enabled": false
     },
