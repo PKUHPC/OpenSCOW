@@ -455,8 +455,8 @@ export default {
       },
     },
     _app: {
+      textExceedsLength:"终端登录欢迎提示信息过多，请减少不必要的信息输出！",
       sshError:"无法以用户身份连接到登录节点。请确认您的家目录的权限为700、750或者755",
-
       sftpError:"SFTP操作失败，请确认您是否有操作的权限",
       otherError:"服务器出错啦！",
     },
