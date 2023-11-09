@@ -88,8 +88,7 @@ export async function sshConnect<T>(
         code: status.INTERNAL,
         details: e.message,
         message: e.message,
-        metadata: (e.cause && typeof e.cause === "string") ? scowErrorMetadata(SSH_ERROR_CODE, { cause:e.cause }) :
-          scowErrorMetadata(SSH_ERROR_CODE),
+        metadata: scowErrorMetadata(SSH_ERROR_CODE),
       });
     }
 

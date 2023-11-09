@@ -93,10 +93,12 @@ export async function sshConnect<T>(
 ) {
   const ssh = await sshRawConnect(address, username, rootKeyPair, logger);
 
-  return run(ssh).catch((e) => {
-    logger.info("Running ssh failed.");
-    throw new SshConnectError({ cause: e.message });
-  }).finally(() => { ssh.dispose(); });
+  return run(ssh)
+    // .catch((e) => {
+    //   logger.info("Running ssh failed.");
+    //   throw new SshConnectError({ cause: e.message });
+    // })
+    .finally(() => { ssh.dispose(); });
 }
 
 export async function sshConnectByPassword<T>(
