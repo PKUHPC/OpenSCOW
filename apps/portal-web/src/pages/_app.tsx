@@ -199,7 +199,7 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
       ?? (hostname && runtimeConfig.UI_CONFIG?.footer?.hostnameTextMap?.[hostname])
       ?? runtimeConfig.UI_CONFIG?.footer?.defaultText ?? "";
 
-    extra.loginNodes = Object.keys(runtimeConfig.CLUSTERS_CONFIG).reduce((acc, cluster) => {
+    extra.loginNodes = publicConfig.CLUSTER_SORTED_ID_LIST.reduce((acc, cluster) => {
       acc[cluster] = runtimeConfig.CLUSTERS_CONFIG[cluster].loginNodes;
       return acc;
     }, {});

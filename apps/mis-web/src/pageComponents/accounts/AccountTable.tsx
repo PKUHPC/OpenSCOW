@@ -146,30 +146,26 @@ export const AccountTable: React.FC<Props> = ({
         />
         <Table.Column<AdminAccountInfo>
           dataIndex="ownerName"
-          width={280}
+          width="25%"
           title={t(p("owner"))}
           render={(_, r) => `${r.ownerName}（ID: ${r.ownerId}）`}
         />
         <Table.Column<AdminAccountInfo>
           dataIndex="userCount"
-          width={90}
+          width="8%"
           title={t(pCommon("userCount"))}
         />
         {/* 只在平台管理下的账户列表中显示 */}
         {showedTab === "PLATFORM" && (
           <Table.Column<AdminAccountInfo>
             dataIndex="tenantName"
-            width={110}
+            width="10%"
             title={t(p("tenant"))}
           />
         )}
         <Table.Column<AdminAccountInfo>
-          dataIndex="comment"
-          title={t(p("comment"))}
-        />
-        <Table.Column<AdminAccountInfo>
           dataIndex="balance"
-          width={150}
+          width="13%"
           title={t(pCommon("balance"))}
           sorter={(a, b) => (moneyToNumber(a.balance)) - (moneyToNumber(b.balance))}
           sortDirections={["ascend", "descend"]}
@@ -178,7 +174,7 @@ export const AccountTable: React.FC<Props> = ({
         />
         <Table.Column<AdminAccountInfo>
           dataIndex="blocked"
-          width={80}
+          width="7%"
           title={t(p("status"))}
           sorter={(a, b) => (a.blocked ? 1 : 0) - (b.blocked ? 1 : 0)}
           sortDirections={["ascend", "descend"]}
@@ -187,8 +183,14 @@ export const AccountTable: React.FC<Props> = ({
             <Tag color="green">{t(p("normal"))}</Tag>}
         />
         <Table.Column<AdminAccountInfo>
+          dataIndex="comment"
+          ellipsis
+          title={t(p("comment"))}
+        />
+        <Table.Column<AdminAccountInfo>
           title={t(pCommon("operation"))}
-          width={180}
+          width="15%"
+          fixed="right"
           render={(_, r) => (
             <Space split={<Divider type="vertical" />}>
               {/* 只在租户管理下的账户列表中显示管理成员 */}
