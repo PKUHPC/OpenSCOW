@@ -15,10 +15,8 @@ import { ServiceError, status } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { getSchedulerAdapterClient, SchedulerAdapterClient } from "@scow/lib-scheduler-adapter";
 import { parseErrorDetails } from "@scow/rich-error-model";
-import { ApiVersion, compareSemVersion } from "@scow/utils/build/version";
+import { ApiVersion } from "@scow/utils/build/version";
 import { clusters } from "src/config/clusters";
-
-import { logger } from "./logger";
 
 const adapterClientForClusters = Object.entries(clusters).reduce((prev, [cluster, c]) => {
   const client = getSchedulerAdapterClient(c.adapterUrl);
@@ -30,62 +28,13 @@ export const getAdapterClient = (cluster: string) => {
   return adapterClientForClusters[cluster];
 };
 
-
-// /**
-//  * 判断当前集群下的API版本与调度器API版本
-//  * @param client
-//  * @returns
-//  */
-// export async function checkScowSchedulerApiVersion(client: SchedulerAdapterClient): Promise<void> {
-
-//   let scheduleApiVersion: ApiVersion | null;
-//   try {
-//     scheduleApiVersion = await asyncClientCall(client.version, "getVersion", {});
-//   } catch (e) {
-//     const ex = e as ServiceError;
-//     const errors = parseErrorDetails(ex.metadata);
-//     // 如果接口不存在
-//     if (errors[0] && errors[0].$type === "google.rpc.ErrorInfo" && errors[0].reason === "UNIMPLEMENTED") {
-//       scheduleApiVersion = { major: 1, minor: 1, patch: 0 };
-//     // 如果接口服务不存在
-//     } else if ((e as any).code === status.UNIMPLEMENTED) {
-//       scheduleApiVersion = { major: 1, minor: 1, patch: 0 };
-//     } else {
-//       scheduleApiVersion = null;
-//       logger.warn(
-//         "The scheduler API version can not be confirmed. Some functionalities may not operate as expected.");
-//     }
-//   }
-//   const scowSchedulerApiVersion = getCurrentScowSchedulerApiVersion();
-
-//   if (!scowSchedulerApiVersion && scheduleApiVersion) {
-//     logger.warn("The current scow scheduler API version can not be confirmed. Please ensure you are using "
-//     + "an API version that is compatible with the scheduler Api Version "
-//     + `${scheduleApiVersion.major}.${scheduleApiVersion.minor}.${scheduleApiVersion.patch}.`);
-//   }
-
-//   if (scowSchedulerApiVersion && scheduleApiVersion) {
-//     const compareResult = compareSemVersion(scowSchedulerApiVersion, scheduleApiVersion);
-//     if (compareResult === 1) {
-//       logger.warn("The current scheduler API version is outdated. Some functionalities may not operate as expected. "
-//       + "Please upgrade to version "
-//       +
-//      `${scowSchedulerApiVersion.major}.${scowSchedulerApiVersion.minor}.${scowSchedulerApiVersion.patch} or later.`);
-//     }
-//   }
-
-// };
-
-
-
-
 /**
  * 判断当前集群下的调度器API版本对比传入的接口是否已过时
  * @param client
- * @param comparedVersion
+ * @param minVersion
  */
 export async function checkSchedulerApiVersion(client: SchedulerAdapterClient,
-  comparedVersion: ApiVersion): Promise<void> {
+  minVersion: ApiVersion): Promise<void> {
 
   let scheduleApiVersion: ApiVersion | null;
   try {
@@ -93,28 +42,41 @@ export async function checkSchedulerApiVersion(client: SchedulerAdapterClient,
   } catch (e) {
     const ex = e as ServiceError;
     const errors = parseErrorDetails(ex.metadata);
-    // 如果接口不存在
-    if (errors[0] && errors[0].$type === "google.rpc.ErrorInfo" && errors[0].reason === "UNIMPLEMENTED") {
-      scheduleApiVersion = { major: 1, minor: 1, patch: 0 };
-    // 如果接口服务不存在
-    } else if ((e as any).code === status.UNIMPLEMENTED) {
-      scheduleApiVersion = { major: 1, minor: 1, patch: 0 };
+    // 如果找不到获取版本号的接口，指定版本为接口存在前的最新版1.0.0
+    if (((e as any).code === status.UNIMPLEMENTED) ||
+    (errors[0] && errors[0].$type === "google.rpc.ErrorInfo" && errors[0].reason === "UNIMPLEMENTED")) {
+      scheduleApiVersion = { major: 1, minor: 0, patch: 0 };
     } else {
-      scheduleApiVersion = null;
-      logger.warn(
-        "The scheduler API version can not be confirmed. Some functionalities may not operate as expected.");
+      throw <ServiceError> {
+        code: Status.UNIMPLEMENTED,
+        message: "unimplemented",
+        details: "The scheduler API version can not be confirmed."
+          + "To use this method, the scheduler adapter must be upgraded to the version "
+          + `${minVersion.major}.${minVersion.minor}.${minVersion.patch} `
+          + "or higher.",
+      };
     }
   }
 
   if (scheduleApiVersion) {
-    const compareResult = compareSemVersion(comparedVersion, scheduleApiVersion);
-    if (compareResult === 1) {
+
+    // 检查调度器接口版本是否大于等于最低要求版本
+    let geMinVersion: boolean;
+    if (scheduleApiVersion.major !== minVersion.major) {
+      geMinVersion = (scheduleApiVersion.major > minVersion.major);
+    } else if (scheduleApiVersion.minor !== minVersion.minor) {
+      geMinVersion = (scheduleApiVersion.minor > minVersion.minor);
+    } else {
+      geMinVersion = true;
+    }
+
+    if (!geMinVersion) {
       throw <ServiceError> {
         code: Status.FAILED_PRECONDITION,
         message: "precondition failed",
         details: "The method is not supported with the current scheduler adapter version. "
           + "To use this method, the scheduler adapter must be upgraded to the version "
-          + `${comparedVersion.major}.${comparedVersion.minor}.${comparedVersion.patch}`
+          + `${minVersion.major}.${minVersion.minor}.${minVersion.patch} `
           + "or higher.",
       };
     }

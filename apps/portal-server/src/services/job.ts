@@ -226,9 +226,10 @@ export const jobServiceServer = plugin((server) => {
       const client = getAdapterClient(cluster);
       if (!client) { throw clusterNotFound(cluster); }
 
-      const interfaceApiVersion: ApiVersion = { major: 1, minor: 2, patch: 0 };
-      // 检验scow与调度器的API版本是否一致
-      await checkSchedulerApiVersion(client, interfaceApiVersion);
+      // 当前接口要求的最低调度器接口版本
+      const minRequiredApiVersion: ApiVersion = { major: 1, minor: 2, patch: 0 };
+      // 检验调度器的API版本是否符合要求，不符合要求报错
+      await checkSchedulerApiVersion(client, minRequiredApiVersion);
 
       const host = getClusterLoginNode(cluster);
       if (!host) { throw clusterNotFound(cluster); }
@@ -277,15 +278,6 @@ export const jobServiceServer = plugin((server) => {
             code: Status.INTERNAL,
             message: "sbatch failed",
             details: e.details,
-          };
-        } else if (errors[0] && errors[0].$type === "google.rpc.ErrorInfo" && errors[0].reason === "UNIMPLEMENTED") {
-          throw <ServiceError> {
-            code: Status.FAILED_PRECONDITION,
-            message: "precondition failed",
-            details: "The method is not supported with the current scheduler adapter version. "
-            + "To use this method, the scheduler adapter must be upgraded to the version "
-            + `${interfaceApiVersion.major}.${interfaceApiVersion.minor}.${interfaceApiVersion.patch}`
-            + "or higher.",
           };
         } else {
           throw e;

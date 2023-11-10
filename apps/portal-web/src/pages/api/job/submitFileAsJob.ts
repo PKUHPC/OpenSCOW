@@ -48,6 +48,7 @@ export const SubmitFileAsJobSchema = typeboxRouteSchema({
       code: Type.Union([
         Type.Literal("SCHEDULER_FAILED"),
         Type.Literal("FAILED_PRECONDITION"),
+        Type.Literal("UNIMPLEMENTED"),
       ]),
       message: Type.String(),
     }),
@@ -92,6 +93,9 @@ export default route(SubmitFileAsJobSchema, async (req, res) => {
       [status.FAILED_PRECONDITION]: () => ({ 500: {
         code: "FAILED_PRECONDITION" as const,
         message: "The method submitScriptAsJob is not supported with your current scheduler adapter version." } }),
+      [status.UNIMPLEMENTED]: () => ({ 500: {
+        code: "UNIMPLEMENTED" as const,
+        message: "The scheduler API version can not be confirmed." } }),
       [status.INVALID_ARGUMENT]: (err) => ({ 400: { code: "INVALID_ARGUMENT" as const, message: err.details } }),
       [status.PERMISSION_DENIED]: (err) => ({ 400: { code: "INVALID_PATH" as const, message: err.details } }),
     },
