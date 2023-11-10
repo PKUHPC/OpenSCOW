@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { I18nStringType } from "@scow/config/build/type";
+import { I18nStringType } from "@scow/config/build/i18n";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { App, Button, Col, Divider, Form, Input, InputNumber, Row, Select, Spin, Typography } from "antd";
 import { Rule } from "antd/es/form";

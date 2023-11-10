@@ -13,7 +13,7 @@
 import { GetConfigFn, getConfigFromFile } from "@scow/lib-config";
 import { Static, Type } from "@sinclair/typebox";
 import { DEFAULT_CONFIG_BASE_PATH } from "src/constants";
-import { createI18nStringSchema, SYSTEM_VALID_LANGUAGE_ENUM, SystemLanguage, SystemLanguageConfig } from "src/type";
+import { createI18nStringSchema, SYSTEM_VALID_LANGUAGE_ENUM, SystemLanguage, SystemLanguageConfig } from "src/i18n";
 
 export const ScowApiConfigSchema = Type.Object({
   auth: Type.Optional(Type.Object({

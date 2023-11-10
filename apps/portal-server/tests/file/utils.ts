@@ -11,7 +11,7 @@
  */
 
 import { ServiceError } from "@grpc/grpc-js";
-import { I18nStringType } from "@scow/config/build/type";
+import { I18nStringType } from "@scow/config/build/i18n";
 import { sftpWriteFile, sshRawConnect, sshRmrf } from "@scow/lib-ssh";
 import { I18nStringProtoType, SubmissionInfo } from "@scow/protos/build/portal/app";
 import { randomBytes } from "crypto";

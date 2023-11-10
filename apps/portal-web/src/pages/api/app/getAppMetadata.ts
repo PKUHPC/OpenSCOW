@@ -13,7 +13,7 @@
 import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { status } from "@grpc/grpc-js";
-import { I18nStringType } from "@scow/config/build/type";
+import { I18nStringType } from "@scow/config/build/i18n";
 import { appCustomAttribute_AttributeTypeToJSON,
   AppServiceClient, I18nStringProtoType } from "@scow/protos/build/portal/app";
 import { Static, Type } from "@sinclair/typebox";

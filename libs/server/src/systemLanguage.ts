@@ -11,7 +11,7 @@
  */
 
 import { HEADER_ACCEPT_VALID_LANGUAGES,
-  I18nStringType, SYSTEM_VALID_LANGUAGES, SystemLanguageConfig } from "@scow/config/build/type";
+  I18nStringType, SYSTEM_VALID_LANGUAGES, SystemLanguageConfig } from "@scow/config/build/i18n";
 import { IncomingMessage } from "http";
 import { parseCookies } from "nookies";
 

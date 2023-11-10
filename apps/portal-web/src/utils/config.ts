@@ -12,8 +12,8 @@
 
 import { AuditConfigSchema } from "@scow/config/build/audit";
 import type { ClusterConfigSchema } from "@scow/config/build/cluster";
+import { I18nStringType, SystemLanguageConfig } from "@scow/config/build/i18n";
 import type { PortalConfigSchema } from "@scow/config/build/portal";
-import { I18nStringType, SystemLanguageConfig } from "@scow/config/build/type";
 import type { UiConfigSchema } from "@scow/config/build/ui";
 import { UserLink } from "@scow/lib-web/build/layouts/base/types";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
