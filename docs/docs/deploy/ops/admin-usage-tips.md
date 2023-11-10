@@ -1,8 +1,6 @@
 ---
-slug: admin-usage-tips
+sidebar_position: 2
 title: SCOW管理员使用技巧
-authors: [huangjun]
-tags: [scow, usage-tips]
 
 ---
 
@@ -36,11 +34,11 @@ tags: [scow, usage-tips]
 
 各组件日志：
 
-![img](./images/servers-log.png)
+![img](./servers-log.png)
 
 mis-web日志：
 
-![img](./images/mis-server-log.png)
+![img](./mis-server-log.png)
 
 ## 1.2 设置日志级别
 
@@ -60,11 +58,11 @@ log:
 
 当作业执行失败(状态为`FAILED`)时，可以通过查看`job.{job_id}.err` 文件内容分析错误的原因：所有作业列表->该作业行->进入目录：
 
-![img](./images/history-jobs.png)
+![img](./history-jobs.png)
 
-![img](./images/files.png)
+![img](./files.png)
 
-![img](./images/job-error.png)
+![img](./job-error.png)
 
 ## 2.2 交互式应用执行失败
 
@@ -104,9 +102,9 @@ SCOW支持可插拔的审计日志功能，配置审计日志的步骤如下：
 
 SCOW支持用户、账户、租户、平台级别操作日志查看：
 
-![img](./images/user-log.png)![img](./images/account-log.png)
+![img](./user-log.png)![img](./account-log.png)
 
-![img](./images/tenant-log.png)![img](./images/platform-log.png)
+![img](./tenant-log.png)![img](./platform-log.png)
 
 # 4. 解决特定环境问题：模仿用户登录
 
