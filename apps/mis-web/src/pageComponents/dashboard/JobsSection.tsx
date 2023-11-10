@@ -64,6 +64,7 @@ export const JobsSection: React.FC<Props> = ({ user }) => {
         showAccount={true}
         showUser={false}
         showCluster={true}
+        pagination={{ disabled: true }}
       />
     </Section>
   );

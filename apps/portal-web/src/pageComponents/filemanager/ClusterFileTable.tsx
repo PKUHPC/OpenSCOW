@@ -13,6 +13,7 @@
 import { DatabaseOutlined, HomeOutlined, UpOutlined } from "@ant-design/icons";
 import { compareDateTime, formatDateTime } from "@scow/lib-web/build/utils/datetime";
 import { compareNumber } from "@scow/lib-web/build/utils/math";
+import { DEFAULT_PAGE_SIZE } from "@scow/lib-web/build/utils/pagination";
 import { Button, Table, Tooltip } from "antd";
 import { join } from "path";
 import React, { useEffect, useState } from "react";
@@ -121,7 +122,10 @@ export const ClusterFileTable: React.FC<Props> = ({
       <Table
         dataSource={files}
         loading={loading}
-        pagination={false}
+        pagination={{
+          showSizeChanger: true,
+          defaultPageSize: DEFAULT_PAGE_SIZE,
+        }}
         size="small"
         rowKey={(r) => fileInfoKey(r, path)}
         scroll={{ x: true }}

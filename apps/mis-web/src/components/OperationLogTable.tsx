@@ -12,6 +12,7 @@
 
 import { OperationType } from "@scow/lib-operation-log/build/index";
 import { formatDateTime, getDefaultPresets } from "@scow/lib-web/build/utils/datetime";
+import { DEFAULT_PAGE_SIZE } from "@scow/lib-web/build/utils/pagination";
 import { Button, DatePicker, Form, Input, Select, Table } from "antd";
 import dayjs from "dayjs";
 import { useCallback, useState } from "react";
@@ -71,7 +72,7 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
 
   const [form] = Form.useForm<FilterForm>();
 
-  const [pageInfo, setPageInfo] = useState<PageInfo>({ page: 1, pageSize: 50 });
+  const [pageInfo, setPageInfo] = useState<PageInfo>({ page: 1, pageSize: DEFAULT_PAGE_SIZE });
 
   const getOperatorUserIds = () => {
     if (queryType === OperationLogQueryType.USER) {
@@ -167,7 +168,7 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
         pagination={{
           current: pageInfo.page,
           pageSize: pageInfo.pageSize,
-          defaultPageSize: 10,
+          defaultPageSize: DEFAULT_PAGE_SIZE,
           total: data?.totalCount,
           onChange: (page, pageSize) => setPageInfo({ page, pageSize }),
         }}
