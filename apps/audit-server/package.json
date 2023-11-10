@@ -36,7 +36,8 @@
     "@scow/utils": "workspace:*",
     "@scow/protos": "workspace:*",
     "pino": "8.15.0",
-    "pino-pretty": "10.2.0"
+    "pino-pretty": "10.2.0",
+    "dayjs": "1.11.9"
   },
   "devDependencies": {
     "@types/google-protobuf": "3.15.6"
