@@ -988,6 +988,7 @@ export default {
       setPlatformBilling: "设置平台作业计费",
       createTenant: "创建租户",
       tenantPay: "租户充值",
+      submitFileItemAsJob: "提交脚本",
     },
     operationDetails: {
       login: "用户登录",
@@ -1040,6 +1041,7 @@ export default {
       createTenant: "创建租户{}, 租户管理员为: {}",
       tenantPay: "为租户{}充值{}元",
       setPlatformBilling: "设置平台的计费项{}价格为{}元",
+      submitFileItemAsJob: "集群：{}，提交脚本：{}",
     },
   },
   userRoles: {

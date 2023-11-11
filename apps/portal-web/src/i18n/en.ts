@@ -233,6 +233,11 @@ export default {
           deleteConfirmContent: "Confirm deletion of {}?",
           deleteConfirmOk: "Confirm",
           deleteSuccessMessage: "Deleted successfully",
+          submitConfirmTitle: "Submit Confirmation",
+          submitConfirmContent: "Confirm submission of {} to {}?",
+          submitConfirmOk: "Confirm",
+          submitSuccessMessage: "Submitted successfully! Your new job ID is: {}",
+          submitFailedMessage: "Submitted Failed",
         },
       },
       fileTable: {

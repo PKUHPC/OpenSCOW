@@ -76,6 +76,7 @@ export const OperationType: OperationTypeEnum = {
   setPlatformBilling: "setPlatformBilling",
   createTenant: "createTenant",
   tenantPay: "tenantPay",
+  submitFileItemAsJob: "submitFileItemAsJob",
 };
 
 export const OperationLog = Type.Object({
@@ -163,6 +164,7 @@ export const getOperationTypeTexts = (t: OperationTextsTransType): { [key in Lib
     setPlatformBilling: t(pTypes("setPlatformBilling")),
     createTenant: t(pTypes("createTenant")),
     tenantPay: t(pTypes("tenantPay")),
+    submitFileItemAsJob: t(pTypes("submitFileItemAsJob")),
   };
 
 };
@@ -186,6 +188,7 @@ export const OperationCodeMap: { [key in LibOperationType]: string } = {
   deleteDirectory: "010505",
   moveFileItem: "010506",
   copyFileItem: "010507",
+  submitFileItemAsJob: "010508",
   setJobTimeLimit: "010601",
   createUser: "020201",
   addUserToAccount: "020202",
@@ -363,6 +366,8 @@ export const getOperationDetail = (
     case "setPlatformBilling":
       return t(pDetails("setPlatformBilling"),
         [operationEvent[logEvent].path, nullableMoneyToString(operationEvent[logEvent].price)]);
+    case "submitFileItemAsJob":
+      return t(pDetails("submitFileItemAsJob"), [operationEvent[logEvent].clusterId, operationEvent[logEvent].path]);
     default:
       return "-";
     }
