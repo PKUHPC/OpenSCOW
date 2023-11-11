@@ -12,7 +12,7 @@
 
 import { useDidUpdateEffect } from "@scow/lib-web/build/utils/hooks";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/i18n";
-import { Button, Form, Input, InputNumber, Select, Space, Table } from "antd";
+import { Button, Form, Input, InputNumber, message, Popconfirm, Select, Space, Table } from "antd";
 import React, { useCallback, useMemo, useRef, useState } from "react";
 import { useAsync } from "react-async";
 import { useStore } from "simstate";
@@ -298,11 +298,27 @@ export const RunningJobInfoTable: React.FC<JobInfoTableProps> = ({
 
         <Table.Column<RunningJobInfo>
           title={t(pCommon("more"))}
-          width="9%"
+          width="12%"
           fixed="right"
           render={(_, r) => (
             <Space>
               <a onClick={() => setPreviewItem(r)}>{t(pCommon("detail"))}</a>
+              <Popconfirm
+                title={t(p("finishJobConfirm"))}
+                onConfirm={async () =>
+                  api.cancelJob({
+                    query: {
+                      cluster: r.cluster.id,
+                      jobId: r.jobId,
+                    },
+                  }).then(() => {
+                    message.success(t(p("finishJobSuccess")));
+                    reload();
+                  })
+                }
+              >
+                <a>{t(p("finishJobButton"))}</a>
+              </Popconfirm>
               <ChangeJobTimeLimitModalLink
                 reload={reload}
                 data={[r]}

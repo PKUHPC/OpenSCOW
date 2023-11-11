@@ -499,6 +499,9 @@ export default {
         limit: "作业时间限制",
         changeLimit: "修改作业时限",
         gpus: "GPU卡数",
+        finishJobButton: "结束",
+        finishJobConfirm: "确定结束这个任务吗?",
+        finishJobSuccess: "任务结束请求已经提交!",
       },
     },
     profile:{

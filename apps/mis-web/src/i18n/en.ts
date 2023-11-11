@@ -499,6 +499,9 @@ export default {
         limit: "Job Time Limit",
         changeLimit: "Modify Job Time Limit",
         gpus: "Number of GPU Cards",
+        finishJobButton: "Finish",
+        finishJobConfirm: "Are you sure you want to finish this task?",
+        finishJobSuccess: "Request to finish the task has been submitted!",
       },
     },
     profile: {
