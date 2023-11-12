@@ -63,11 +63,18 @@ const FailEventHandler: React.FC = () => {
         return;
       }
 
+      const regex = /exceeds max length/;
+      // 如果终端登录欢迎语过长会报错：Packet length xxxx exceeds max length of 262144
+      if (regex.test(e.data?.message)) {
+        message.error(t("pages._app.textExceedsLength"));
+        return;
+      }
+
       if (e.data?.code === "SSH_ERROR") {
         message.error(t("pages._app.sshError"));
         return;
       }
-
+      
       if (e.data?.code === "SFTP_ERROR") {
         message.error(e.data?.details.length > 150 ? e.data?.details.substring(0, 150) + "..." :
           e.data?.details || t("pages._app.sftpError"));

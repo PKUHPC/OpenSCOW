@@ -15,6 +15,7 @@ import { AccountServiceClient } from "@scow/scheduler-adapter-protos/build/proto
 import { ConfigServiceClient } from "@scow/scheduler-adapter-protos/build/protos/config";
 import { JobServiceClient } from "@scow/scheduler-adapter-protos/build/protos/job";
 import { UserServiceClient } from "@scow/scheduler-adapter-protos/build/protos/user";
+import { VersionServiceClient } from "@scow/scheduler-adapter-protos/build/protos/version";
 
 type ClientConstructor<TClient> =
   new (address: string, credentials: ChannelCredentials) => TClient;
@@ -24,6 +25,7 @@ export interface SchedulerAdapterClient {
   user: UserServiceClient;
   job: JobServiceClient;
   config: ConfigServiceClient;
+  version: VersionServiceClient;
 }
 
 export function getClient<TClient>(
@@ -41,5 +43,6 @@ export const getSchedulerAdapterClient = (address: string) => {
     user: getClient(address, UserServiceClient),
     job: getClient(address, JobServiceClient),
     config: getClient(address, ConfigServiceClient),
+    version: getClient(address, VersionServiceClient),
   };
 };

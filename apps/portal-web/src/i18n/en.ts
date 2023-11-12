@@ -233,6 +233,11 @@ export default {
           deleteConfirmContent: "Confirm deletion of {}?",
           deleteConfirmOk: "Confirm",
           deleteSuccessMessage: "Deleted successfully",
+          submitConfirmTitle: "Submit Confirmation",
+          submitConfirmContent: "Confirm submission of {} to {}?",
+          submitConfirmOk: "Confirm",
+          submitSuccessMessage: "Submitted successfully! Your new job ID is: {}",
+          submitFailedMessage: "Submitted Failed",
         },
       },
       fileTable: {
@@ -457,6 +462,8 @@ export default {
     _app: {
       sshError: "Unable to connect as a user to the login node. Please make sure the permissions "
       + "of your home directory are 700, 750, or 755.",
+      textExceedsLength:"There are too many welcome messages for terminal login."
+                         + "Please reduce unnecessary information output!",
       sftpError: "SFTP operation failed. Please confirm if you have the necessary permissions.",
       otherError: "Server encountered an error!",
     },

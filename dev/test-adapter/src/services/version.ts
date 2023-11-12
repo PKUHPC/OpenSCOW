@@ -10,28 +10,16 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { existsSync, readFileSync } from "fs";
-// import { join } from "path";
+import { plugin } from "@ddadaal/tsgrpc-server";
+import { VersionServiceServer, VersionServiceService } from "@scow/scheduler-adapter-protos/build/protos/version";
 
-interface VersionJsonInfo {
-  tag?: string;
-  commit: string;
-}
+export const versionServiceServer = plugin((server) => {
+  server.addService<VersionServiceServer>(VersionServiceService, {
 
-export interface VersionInfo extends VersionJsonInfo {}
+    getVersion: async () => {
+      return [{ major: 0, minor: 0, patch: 0 }];
+    },
 
-export function readVersionFile(versionJsonFileName = "version.json") {
+  });
 
-  const jsonInfo: VersionJsonInfo = existsSync(versionJsonFileName)
-    ? JSON.parse(readFileSync(versionJsonFileName, "utf-8"))
-    : {};
-
-  return jsonInfo; }
-
-
-// SemVer类型version
-export type ApiVersion = {
-  major: number;
-  minor: number;
-  patch: number;
-}
+});
