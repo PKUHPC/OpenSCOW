@@ -13,7 +13,7 @@
 import { useDidUpdateEffect } from "@scow/lib-web/build/utils/hooks";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/i18n";
 import { DEFAULT_PAGE_SIZE } from "@scow/lib-web/build/utils/pagination";
-import { Button, Form, Input, InputNumber, PaginationProps, Select, Space, Table } from "antd";
+import { Button, Form, Input, InputNumber, Select, Space, Table } from "antd";
 import React, { useCallback, useMemo, useRef, useState } from "react";
 import { useAsync } from "react-async";
 import { useStore } from "simstate";
@@ -191,10 +191,6 @@ export const RunningJobQueryTable: React.FC<Props> = ({
         selection={{
           selected, setSelected,
         }}
-        pagination={{
-          showSizeChanger: true,
-          defaultPageSize: DEFAULT_PAGE_SIZE,
-        }}
       />
     </div>
   );
@@ -214,7 +210,6 @@ type JobInfoTableProps = {
     selected: RunningJobInfo[];
     setSelected: (d: RunningJobInfo[]) => void;
   }
-  pagination?: PaginationProps;
 };
 
 const ChangeJobTimeLimitModalLink = ModalLink(ChangeJobTimeLimitModal);
@@ -256,6 +251,10 @@ export const RunningJobInfoTable: React.FC<JobInfoTableProps> = ({
         } : {})}
         dataSource={data}
         loading={isLoading}
+        pagination={{
+          showSizeChanger: true,
+          defaultPageSize: DEFAULT_PAGE_SIZE,
+        }}
         rowKey={runningJobId}
         scroll={{ x: data?.length ? 1800 : true }}
         tableLayout="fixed"

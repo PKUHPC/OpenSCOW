@@ -169,6 +169,7 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
           current: pageInfo.page,
           pageSize: pageInfo.pageSize,
           defaultPageSize: DEFAULT_PAGE_SIZE,
+          showSizeChanger: true,
           total: data?.totalCount,
           onChange: (page, pageSize) => setPageInfo({ page, pageSize }),
         }}
