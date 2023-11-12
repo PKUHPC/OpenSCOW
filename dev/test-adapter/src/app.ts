@@ -16,6 +16,7 @@ import { accountServiceServer } from "src/services/account";
 import { configServiceServer } from "src/services/config";
 import { jobServiceServer } from "src/services/job";
 import { userServiceServer } from "src/services/user";
+import { versionServiceServer } from "src/services/version";
 
 export async function createServer() {
 
@@ -35,6 +36,7 @@ export async function createServer() {
   await server.register(userServiceServer);
   await server.register(jobServiceServer);
   await server.register(configServiceServer);
+  await server.register(versionServiceServer);
 
   return server;
 

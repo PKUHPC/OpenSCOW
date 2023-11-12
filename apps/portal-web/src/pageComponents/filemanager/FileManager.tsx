@@ -511,6 +511,47 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
             >
               {t("button.deleteButton")}
             </a>
+            {
+              i.type === "FILE" ? (
+                <a onClick={() => {
+                  const fullPath = join(path, i.name);
+                  modal.confirm({
+                    title: t(p("tableInfo.submitConfirmTitle")),
+                    content: t(p("tableInfo.submitConfirmContent"),
+                      [i.name, getI18nConfigCurrentText(cluster.name, languageId)]),
+                    okText: t(p("tableInfo.submitConfirmOk")),
+                    onOk: async () => {
+                      await api.submitFileAsJob({
+                        body: {
+                          cluster: cluster.id,
+                          filePath: fullPath,
+                        },
+                      })
+                        .httpError(500, (e) => {
+                          e.code === "SCHEDULER_FAILED" || e.code === "FAILED_PRECONDITION" ? modal.error({
+                            title: t(p("tableInfo.submitFailedMessage")),
+                            content: e.message,
+                          }) : (() => { throw e; })();
+                        })
+                        .httpError(400, (e) => {
+                          e.code === "INVALID_ARGUMENT" || e.code === "INVALID_PATH" ? modal.error({
+                            title: t(p("tableInfo.submitFailedMessage")),
+                            content: e.message,
+                          }) : (() => { throw e; })();
+                        })
+                        .then((result) => {
+                          message.success(t(p("tableInfo.submitSuccessMessage"), [result.jobId]));
+                          resetSelectedAndOperation();
+                          reload();
+                        });
+                    },
+                  });
+                }}
+                >
+                  {t("button.submitButton")}
+                </a>
+              ) : undefined
+            }
           </Space>
         )}
       />

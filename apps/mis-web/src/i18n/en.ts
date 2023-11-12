@@ -499,6 +499,9 @@ export default {
         limit: "Job Time Limit",
         changeLimit: "Modify Job Time Limit",
         gpus: "Number of GPU Cards",
+        finishJobButton: "Finish",
+        finishJobConfirm: "Are you sure you want to finish this task?",
+        finishJobSuccess: "Request to finish the task has been submitted!",
       },
     },
     profile: {
@@ -986,6 +989,7 @@ export default {
       setPlatformBilling: "Set Platform Job Billing",
       createTenant: "Create Tenant",
       tenantPay: "Tenant Recharge",
+      submitFileItemAsJob: "Script Submission",
     },
     operationDetails: {
       login: "User Login",
@@ -1038,6 +1042,7 @@ export default {
       createTenant: "Create tenant {}, administrator: {}",
       tenantPay: "Recharge tenant {} by {} yuan",
       setPlatformBilling: "Set platform billing item {} price to {} yuan",
+      submitFileItemAsJob: "Cluster: {}, Submit Script: {}",
     },
   },
   userRoles: {
