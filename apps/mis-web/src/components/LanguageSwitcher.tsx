@@ -10,7 +10,6 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { SYSTEM_DEFAULT_LANGUAGE } from "@scow/lib-web/build/utils/languages";
 import { Select } from "antd";
 import { useRouter } from "next/router";
 import { setCookie } from "nookies";
@@ -23,7 +22,11 @@ const Container = styled.div`
   white-space: nowrap;
 `;
 
-export const LanguageSwitcher = () => {
+interface LanguageSwitcherProps {
+  initialLanguage: string;
+}
+
+export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ initialLanguage }) => {
 
   const [selectedLanguage, setSelectedLanguage] = useState("");
 
@@ -32,11 +35,11 @@ export const LanguageSwitcher = () => {
   const router = useRouter();
 
   useEffect(() => {
-    const initialLanguage = i18n.currentLanguage.id;
-    if (initialLanguage) {
-      setSelectedLanguage(initialLanguage);
+    const init = i18n.currentLanguage.id;
+    if (init) {
+      setSelectedLanguage(init);
     } else {
-      const defaultLanguage = SYSTEM_DEFAULT_LANGUAGE;
+      const defaultLanguage = initialLanguage;
       setSelectedLanguage(defaultLanguage);
       setLanguageCookie(defaultLanguage);
     }

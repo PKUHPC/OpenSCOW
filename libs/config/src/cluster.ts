@@ -13,7 +13,7 @@
 import { GetConfigFn, getDirConfig } from "@scow/lib-config";
 import { Static, Type } from "@sinclair/typebox";
 import { DEFAULT_CONFIG_BASE_PATH } from "src/constants";
-import { createI18nStringSchema } from "src/type";
+import { createI18nStringSchema } from "src/i18n";
 
 const CLUSTER_CONFIG_BASE_PATH = "clusters";
 
