@@ -314,12 +314,6 @@ export const appOps = (cluster: string): AppOps => {
 
           // judge whether the app is ready
           if (runningJobInfo && runningJobInfo.state === "RUNNING") {
-            // get connection config
-            // for apps running in containers, it can provide real ip and port info
-            const connectionConfig = await asyncClientCall(client.app, "getConnectionConfig", {
-              jobId: sessionMetadata.jobId,
-            });
-
             // 对于k8s这种通过容器运行作业的集群，当把容器中的作业工作目录挂载到宿主机中时，目录中新生成的文件不会马上反映到宿主机中，
             // 具体体现为sftpExists无法找到新生成的SERVER_SESSION_INFO和VNC_SESSION_INFO文件，必须实际读取一次目录，才能识别到它们
             await sftpReaddir(sftp)(jobDir);
@@ -332,8 +326,8 @@ export const appOps = (cluster: string): AppOps => {
                 const content = await sftpReadFile(sftp)(infoFilePath);
                 const serverSessionInfo = JSON.parse(content.toString()) as ServerSessionInfoData;
 
-                host = connectionConfig.host ?? serverSessionInfo.HOST;
-                port = connectionConfig.port ?? serverSessionInfo.PORT;
+                host = serverSessionInfo.HOST;
+                port = serverSessionInfo.PORT;
               }
             } else {
             // for vnc apps,
@@ -351,9 +345,19 @@ export const appOps = (cluster: string): AppOps => {
                   }
                 }
 
-                host = connectionConfig.host ?? (await sftpReadFile(sftp)(vncSessionInfoPath)).toString().trim();
-                port = connectionConfig.port ?? port;
+                host = (await sftpReadFile(sftp)(vncSessionInfoPath)).toString().trim();
+                port = port;
               }
+            }
+
+            // get connection config
+            // for apps running in containers, it can provide real ip and port info
+            const connectionInfo = await asyncClientCall(client.app, "getAppConnectionInfo", {
+              jobId: sessionMetadata.jobId,
+            });
+            if (connectionInfo.response?.$case == "appConnectionInfo") {
+              host = connectionInfo.response.appConnectionInfo.host;
+              port = connectionInfo.response.appConnectionInfo.port;
             }
           }
 
@@ -408,16 +412,17 @@ export const appOps = (cluster: string): AppOps => {
         // get connection config
         // for apps running in containers, it can provide real ip and port info
         const client = getAdapterClient(cluster);
-        const connectionConfig = await asyncClientCall(client.app, "getConnectionConfig", {
+        const connectionInfo = await asyncClientCall(client.app, "getAppConnectionInfo", {
           jobId: sessionMetadata.jobId,
         });
-        if (connectionConfig.host && connectionConfig.port && connectionConfig.password) {
+        if (connectionInfo.response?.$case == "appConnectionInfo") {
           return {
             appId: sessionMetadata.appId,
-            host: connectionConfig.host,
-            port: connectionConfig.port,
-            password: connectionConfig.password,
+            host: connectionInfo.response.appConnectionInfo.host,
+            port: connectionInfo.response.appConnectionInfo.port,
+            password: connectionInfo.response.appConnectionInfo.password,
           };
+
         }
 
         if (app.type === "web") {

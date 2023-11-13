@@ -15,7 +15,7 @@ import { AppServiceServer, AppServiceService } from "@scow/scheduler-adapter-pro
 
 export const appServiceServer = plugin((server) => {
   server.addService<AppServiceServer>(AppServiceService, {
-    getConnectionConfig: async () => {
+    getAppConnectionInfo: async () => {
       return [{}];
     },
 
