@@ -70,6 +70,8 @@ export interface PublicRuntimeConfig {
 
   CLUSTERS: Cluster[];
 
+  CLUSTER_SORTED_ID_LIST: string[];
+
   NOVNC_CLIENT_URL: string;
 
   PASSWORD_PATTERN: string | undefined;
@@ -85,6 +87,8 @@ export interface PublicRuntimeConfig {
   USER_LINKS?: UserLink[];
 
   VERSION_TAG: string | undefined;
+
+  CROSS_CLUSTER_FILE_TRANSFER_ENABLED: boolean;
 
   RUNTIME_I18N_CONFIG_TEXTS: {
     passwordPatternMessage: I18nStringType | undefined,

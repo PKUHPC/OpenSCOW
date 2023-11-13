@@ -69,15 +69,19 @@ export const AccountTable: React.FC<Props> = ({
       && (rangeSearchStatus === "ALL" || (rangeSearchStatus === "BLOCKED" ? x.blocked : !x.balance.positive))
   )) : undefined, [data, query, rangeSearchStatus]);
 
+  const searchData = useMemo(() => data ? data.results.filter((x) => (
+    !query.accountName || x.accountName.includes(query.accountName)
+  )) : undefined, [data, query]);
+
   const usersStatusCount = useMemo(() => {
-    if (!filteredData) return { BLOCKED : 0, DEBT : 0, ALL : 0 };
+    if (!searchData) return { BLOCKED : 0, DEBT : 0, ALL : 0 };
     const counts = {
-      BLOCKED: filteredData.filter((user) => user.blocked).length,
-      DEBT: filteredData.filter((user) => !user.balance.positive).length,
-      ALL: filteredData.length,
+      BLOCKED: searchData.filter((user) => user.blocked).length,
+      DEBT: searchData.filter((user) => !user.balance.positive).length,
+      ALL: searchData.length,
     };
     return counts;
-  }, [filteredData]);
+  }, [searchData]);
 
   const handleTableChange = (_, __, sortInfo) => {
     setCurrentSortInfo({ field: sortInfo.field, order: sortInfo.order });
@@ -121,6 +125,7 @@ export const AccountTable: React.FC<Props> = ({
       </FilterFormContainer>
 
       <Table
+        tableLayout="fixed"
         dataSource={filteredData}
         loading={isLoading}
         pagination={{
@@ -129,7 +134,7 @@ export const AccountTable: React.FC<Props> = ({
           onChange: (page) => setCurrentPageNum(page),
         }}
         rowKey="userId"
-        scroll={{ x: true }}
+        scroll={{ x: filteredData?.length ? 1200 : true }}
         onChange={handleTableChange}
       >
         <Table.Column<AdminAccountInfo>
@@ -141,26 +146,26 @@ export const AccountTable: React.FC<Props> = ({
         />
         <Table.Column<AdminAccountInfo>
           dataIndex="ownerName"
+          width="25%"
           title={t(p("owner"))}
           render={(_, r) => `${r.ownerName}（ID: ${r.ownerId}）`}
         />
         <Table.Column<AdminAccountInfo>
           dataIndex="userCount"
+          width="8%"
           title={t(pCommon("userCount"))}
         />
         {/* 只在平台管理下的账户列表中显示 */}
         {showedTab === "PLATFORM" && (
           <Table.Column<AdminAccountInfo>
             dataIndex="tenantName"
+            width="10%"
             title={t(p("tenant"))}
           />
         )}
         <Table.Column<AdminAccountInfo>
-          dataIndex="comment"
-          title={t(p("comment"))}
-        />
-        <Table.Column<AdminAccountInfo>
           dataIndex="balance"
+          width="13%"
           title={t(pCommon("balance"))}
           sorter={(a, b) => (moneyToNumber(a.balance)) - (moneyToNumber(b.balance))}
           sortDirections={["ascend", "descend"]}
@@ -169,6 +174,7 @@ export const AccountTable: React.FC<Props> = ({
         />
         <Table.Column<AdminAccountInfo>
           dataIndex="blocked"
+          width="7%"
           title={t(p("status"))}
           sorter={(a, b) => (a.blocked ? 1 : 0) - (b.blocked ? 1 : 0)}
           sortDirections={["ascend", "descend"]}
@@ -177,7 +183,14 @@ export const AccountTable: React.FC<Props> = ({
             <Tag color="green">{t(p("normal"))}</Tag>}
         />
         <Table.Column<AdminAccountInfo>
+          dataIndex="comment"
+          ellipsis
+          title={t(p("comment"))}
+        />
+        <Table.Column<AdminAccountInfo>
           title={t(pCommon("operation"))}
+          width="15%"
+          fixed="right"
           render={(_, r) => (
             <Space split={<Divider type="vertical" />}>
               {/* 只在租户管理下的账户列表中显示管理成员 */}

@@ -14,7 +14,7 @@ import { formatDateTime } from "@scow/lib-web/build/utils/datetime";
 import { PlatformUserInfo } from "@scow/protos/build/server/user";
 import { Static } from "@sinclair/typebox";
 import { App, Button, Divider, Form, Input, Space, Table } from "antd";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { ChangePasswordModalLink } from "src/components/ChangePasswordModal";
@@ -67,6 +67,7 @@ export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
   const [pageInfo, setPageInfo] = useState<PageInfo>({ page: 1, pageSize: 10 });
   const [sortInfo, setSortInfo] = useState<SortInfo>({ sortField: undefined, sortOrder: undefined });
   const [currentPlatformRole, setCurrentPlatformRole] = useState<PlatformRole | undefined>(undefined);
+  const [allUsers, setAllUsers] = useState<PlatformUserInfo[] | undefined>(undefined);
 
   const promiseFn = useCallback(async () => {
 
@@ -81,24 +82,30 @@ export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
   }, [query, pageInfo, sortInfo, currentPlatformRole]);
   const { data, isLoading, reload: reloadAllUsers } = useAsync({ promiseFn, watch: refreshToken });
 
+  useEffect(() => {
+    if (currentPlatformRole === undefined) {
+      setAllUsers(data?.platformUsers);
+    }
+  }, [data]);
+
   const roleChangedHandlers = useMemo(() => ({
     "ALL_USERS": {
       setCurrentPlatformRole: () => setCurrentPlatformRole(undefined),
-      count: data?.totalCount ?? 0,
+      count: allUsers?.length ?? 0,
     },
     "PLATFORM_ADMIN": {
       setCurrentPlatformRole: () => setCurrentPlatformRole(PlatformRole.PLATFORM_ADMIN),
-      count: data?.platformUsers.filter((user) => {
+      count: allUsers?.filter((user) => {
         return user.platformRoles.includes(PlatformRole.PLATFORM_ADMIN);
       }).length ?? 0,
     },
     "PLATFORM_FINANCE": {
       setCurrentPlatformRole: () => setCurrentPlatformRole(PlatformRole.PLATFORM_FINANCE),
-      count: data?.platformUsers.filter((user) => {
+      count: allUsers?.filter((user) => {
         return user.platformRoles.includes(PlatformRole.PLATFORM_FINANCE);
       }).length ?? 0,
     },
-  }), [data]);
+  }), [allUsers]);
 
   const handleFilterRoleChange = (role: FilteredRole) => {
     roleChangedHandlers[role].setCurrentPlatformRole();
@@ -187,6 +194,7 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
   return (
     <>
       <Table
+        tableLayout="fixed"
         dataSource={data?.platformUsers}
         loading={isLoading}
         pagination={setPageInfo ? {
@@ -197,8 +205,8 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
           total: data?.totalCount,
           onChange: (page, pageSize) => setPageInfo({ page, pageSize }),
         } : false}
-        scroll={{ x: true }}
         onChange={handleTableChange}
+        scroll={{ x: data?.platformUsers?.length ? 1200 : true }}
       >
         <Table.Column<PlatformUserInfo>
           dataIndex="userId"
@@ -214,14 +222,16 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
           sortDirections={["ascend", "descend"]}
           sortOrder={sortInfo.sortField === "name" ? sortInfo.sortOrder : null}
         />
-        <Table.Column<PlatformUserInfo> dataIndex="tenantName" title={t(p("tenant"))} />
+        <Table.Column<PlatformUserInfo> dataIndex="tenantName" ellipsis title={t(p("tenant"))} />
         <Table.Column<PlatformUserInfo>
           dataIndex="availableAccounts"
+          width="25%"
           title={t(p("availableAccounts"))}
           render={(accounts) => accounts.join(",")}
         />
         <Table.Column<PlatformUserInfo>
           dataIndex="createTime"
+          width="13.5%"
           title={t(pCommon("createTime"))}
           sorter={true}
           sortDirections={["ascend", "descend"]}
@@ -230,6 +240,7 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
         />
         <Table.Column<PlatformUserInfo>
           dataIndex="roles"
+          width="15%"
           title={t(p("roles"))}
           render={(_, r) => (
             <PlatformRoleSelector reload={reload} roles={r.platformRoles} userId={r.userId} currentUser={user} />
@@ -238,6 +249,8 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
 
         <Table.Column<PlatformUserInfo>
           dataIndex="changePassword"
+          width="7.5%"
+          fixed="right"
           title={t(pCommon("operation"))}
           render={(_, r) => (
             <Space split={<Divider type="vertical" />}>

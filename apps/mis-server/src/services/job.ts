@@ -375,5 +375,21 @@ export const jobServiceServer = plugin((server) => {
       }
 
     },
+
+    cancelJob: async ({ request, logger }) => {
+      const { cluster, userId, jobId } = request;
+
+      await server.ext.clusters.callOnOne(
+        cluster,
+        logger,
+        async (client) => {
+          await asyncClientCall(client.job, "cancelJob", {
+            userId, jobId,
+          });
+        },
+      );
+
+      return [{}];
+    },
   });
 });

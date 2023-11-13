@@ -499,6 +499,9 @@ export default {
         limit: "Job Time Limit",
         changeLimit: "Modify Job Time Limit",
         gpus: "Number of GPU Cards",
+        finishJobButton: "Finish",
+        finishJobConfirm: "Are you sure you want to finish this task?",
+        finishJobSuccess: "Request to finish the task has been submitted!",
       },
     },
     profile: {
@@ -859,28 +862,22 @@ export default {
       systemDebug: {
         slurmBlockStatus: {
           syncUserAccountBlockingStatus: "Synchronize User Account Blocking Status",
-          alertInfo: "After the scheduler restarts, the blocking status of users between the cluster and SCOW "
-          + "may become unsynchronized. You can click 'Refresh Scheduler User Blocking Status' to "
-          + "manually refresh and synchronize all user statuses.",
-          slurmScheduler: "Slurm Scheduler",
-          slurmSchedulerMessage1: "If you are using the Slurm scheduler, due to technical limitations, "
-          + "when you run slurm.sh nodes and the slurm management node are not on the same node, "
-          + " blocked users, accounts, and user accounts will be unblocked after the slurm cluster restarts.",
-          slurmSchedulerMessage2: "SCOW will automatically refresh the slurm blocking status once "
-          + "when starting, but the slurm cluster may restart during SCOW operation, and SCOW cannot react "
-          + "to this temporarily.",
-          slurmSchedulerMessage3: "So, if you run slurm.sh nodes and the slurm management node are not "
-          + "on the same node, you need to manually execute the 'Refresh Scheduler User Blocking Status' "
-          + "function on this page after the slurm cluster restarts."
-          + " If slurm.sh nodes and the slurm management node are on the same node, you can ignore this function.",
-          otherScheduler: "Other Schedulers",
-          otherSchedulerMessage: "If you are using a scheduler other than Slurm, when the user blocking status "
-          + "is unsynchronized between the scheduler and SCOW, you can manually execute the "
-          + "'Refresh Scheduler User Blocking Status' function on this page.",
-          lastRunTime: "Last Run Time",
-          notBlocked: "Not Blocked",
-          refreshSuccess: "Refreshed Successfully",
-          refreshSchedulerUserBlockingStatus: "Refresh Scheduler User Blocking Status",
+          alertInfo: "SCOW will regularly synchronize the blocking status of accounts and users to the scheduler. "
+          + "You can click Sync Now to perform a manual synchronization.",
+          periodicSyncUserAccountBlockStatusInfo: "Periodically Synchronize Scheduler Account And User Blocked Status",
+          turnedOn: "Turned On",
+          paused: "Paused",
+          stopSync: "Stop Synchronization",
+          startSync: "Start Synchronization",
+          jobSyncCycle: "Block Status Synchronization Cycle",
+          lastSyncTime: "Last Run Time",
+          notSynced: "Not Synchronized",
+          syncSuccess: "Refreshed Successfully",
+          partialSyncSuccess: "Synchronization failed for some users/accounts:",
+          syncBlockedFailedAccount: "Accounts that failed to be synchronously blocked:",
+          syncUnblockedFailedAccount: "Accounts that failed to be synchronously unblocked:",
+          syncBlockedFailedUserAccount: "Synchronize the data of failed blocked users in the account:",
+          syncSchedulerBlockingStatusNow: "Refresh Scheduler User Blocking Status",
         },
         fetchJobs: {
           jobInfoSync: "Job Information Synchronization",
@@ -992,6 +989,7 @@ export default {
       setPlatformBilling: "Set Platform Job Billing",
       createTenant: "Create Tenant",
       tenantPay: "Tenant Recharge",
+      submitFileItemAsJob: "Script Submission",
     },
     operationDetails: {
       login: "User Login",
@@ -1044,6 +1042,7 @@ export default {
       createTenant: "Create tenant {}, administrator: {}",
       tenantPay: "Recharge tenant {} by {} yuan",
       setPlatformBilling: "Set platform billing item {} price to {} yuan",
+      submitFileItemAsJob: "Cluster: {}, Submit Script: {}",
     },
   },
   userRoles: {

@@ -37,6 +37,7 @@ export type PlatformTenantsInfo = Static<typeof PlatformTenantsInfo>;
 export const PlatformUserInfo = Type.Object({
   userId: Type.String(),
   name: Type.String(),
+  email: Type.String(),
   availableAccounts: Type.Array(Type.String()),
   tenantName: Type.String(),
   createTime: Type.Optional(Type.String()),

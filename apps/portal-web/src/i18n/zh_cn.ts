@@ -138,7 +138,6 @@ export default {
         jobInfoTable: {
           cluster: "集群",
           jobId: "作业ID",
-          user: "用户",
           account: "账户",
           name: "作业名",
           partition: "分区",
@@ -234,6 +233,11 @@ export default {
           deleteConfirmContent: "确认删除{}?",
           deleteConfirmOk: "确认",
           deleteSuccessMessage: "删除成功",
+          submitConfirmTitle: "确认提交",
+          submitConfirmContent: "确认提交{}至{}?",
+          submitConfirmOk: "确认",
+          submitSuccessMessage: "提交成功！您的新作业ID为：{}",
+          submitFailedMessage: "提交失败",
         },
       },
       fileTable: {
@@ -456,8 +460,8 @@ export default {
       },
     },
     _app: {
+      textExceedsLength:"终端登录欢迎提示信息过多，请减少不必要的信息输出！",
       sshError:"无法以用户身份连接到登录节点。请确认您的家目录的权限为700、750或者755",
-
       sftpError:"SFTP操作失败，请确认您是否有操作的权限",
       otherError:"服务器出错啦！",
     },

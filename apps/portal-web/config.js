@@ -22,7 +22,8 @@ const { readVersionFile } = require("@scow/utils/build/version");
 const { getCapabilities } = require("@scow/lib-auth");
 const { DEFAULT_PRIMARY_COLOR, getUiConfig } = require("@scow/config/build/ui");
 const { getPortalConfig } = require("@scow/config/build/portal");
-const { getClusterConfigs, getLoginNode, getSortedClusters } = require("@scow/config/build/cluster");
+const { getClusterConfigs, getLoginNode, getSortedClusters,
+  getSortedClusterIds } = require("@scow/config/build/cluster");
 const { getCommonConfig } = require("@scow/config/build/common");
 const { getAuditConfig } = require("@scow/config/build/audit");
 
@@ -182,6 +183,8 @@ const buildRuntimeConfig = async (phase, basePath) => {
 
     CLUSTERS: getSortedClusters(clusters).map((cluster) => ({ id: cluster.id, name: cluster.displayName })),
 
+    CLUSTER_SORTED_ID_LIST: getSortedClusterIds(clusters),
+
     NOVNC_CLIENT_URL: config.NOVNC_CLIENT_URL,
 
     PASSWORD_PATTERN: commonConfig.passwordPattern?.regex,
@@ -189,6 +192,10 @@ const buildRuntimeConfig = async (phase, basePath) => {
     BASE_PATH: basePath,
 
     CLIENT_MAX_BODY_SIZE: config.CLIENT_MAX_BODY_SIZE,
+
+    CROSS_CLUSTER_FILE_TRANSFER_ENABLED:
+      Object.values(clusters).filter(
+        (cluster) => cluster.crossClusterFileTransfer?.enabled).length > 1,
 
     PUBLIC_PATH: config.PUBLIC_PATH,
 

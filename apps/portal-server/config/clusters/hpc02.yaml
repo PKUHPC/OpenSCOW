@@ -3,6 +3,9 @@ adapterUrl: 0.0.0.0:6000
 loginNodes:
   - name: login
     address: localhost:22
+crossClusterFileTransfer:
+  enabled: true
+  transferNode: localhost:222
 # slurm:
 #   partitions:
 #       - name: GPU

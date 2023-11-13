@@ -12,7 +12,7 @@
 
 import { useDidUpdateEffect } from "@scow/lib-web/build/utils/hooks";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/i18n";
-import { Button, Form, Input, InputNumber, Select, Space, Table } from "antd";
+import { Button, Form, Input, InputNumber, message, Popconfirm, Select, Space, Table } from "antd";
 import React, { useCallback, useMemo, useRef, useState } from "react";
 import { useAsync } from "react-async";
 import { useStore } from "simstate";
@@ -214,7 +214,7 @@ type JobInfoTableProps = {
 const ChangeJobTimeLimitModalLink = ModalLink(ChangeJobTimeLimitModal);
 
 export const RunningJobInfoTable: React.FC<JobInfoTableProps> = ({
-  data, isLoading, reload, showAccount, showCluster, showUser, selection,
+  data, isLoading, reload, showAccount, showUser, showCluster, selection,
 }) => {
 
   const [previewItem, setPreviewItem] = useState<RunningJobInfo | undefined>(undefined);
@@ -252,51 +252,73 @@ export const RunningJobInfoTable: React.FC<JobInfoTableProps> = ({
         loading={isLoading}
         pagination={{ showSizeChanger: true }}
         rowKey={runningJobId}
-        scroll={{ x: true }}
+        scroll={{ x: data?.length ? 1800 : true }}
+        tableLayout="fixed"
       >
         {
           showCluster && (
             <Table.Column<RunningJobInfo>
               dataIndex="cluster"
+              width="9.5%"
               title={t(pCommon("cluster"))}
               render={(_, r) => getI18nConfigCurrentText(r.cluster.name, languageId)}
             />
           )
         }
-        <Table.Column<RunningJobInfo> dataIndex="jobId" title={t(pCommon("workId"))} />
+        <Table.Column<RunningJobInfo> dataIndex="jobId" width="5%" title={t(pCommon("workId"))} />
         {
           showUser && (
-            <Table.Column<RunningJobInfo> dataIndex="user" title={t(pCommon("user"))} />
+            <Table.Column<RunningJobInfo> dataIndex="user" width="8%" ellipsis title={t(pCommon("user"))} />
           )
         }
         {
           showAccount && (
-            <Table.Column<RunningJobInfo> dataIndex="account" title={t(pCommon("account"))} />
+            <Table.Column<RunningJobInfo> dataIndex="account" width="9.5%" ellipsis title={t(pCommon("account"))} />
           )
         }
-        <Table.Column<RunningJobInfo> dataIndex="name" title={t(pCommon("workName"))} />
-        <Table.Column<RunningJobInfo> dataIndex="partition" title={t(pCommon("partition"))} />
-        <Table.Column<RunningJobInfo> dataIndex="qos" title="QOS" />
-        <Table.Column<RunningJobInfo> dataIndex="nodes" title={t(p("nodes"))} />
-        <Table.Column<RunningJobInfo> dataIndex="cores" title={t(p("cores"))} />
-        <Table.Column<RunningJobInfo> dataIndex="gpus" title={t(p("gpus"))} />
-        <Table.Column<RunningJobInfo> dataIndex="state" title={t(pCommon("status"))} />
+        <Table.Column<RunningJobInfo> dataIndex="name" ellipsis title={t(pCommon("workName"))} />
+        <Table.Column<RunningJobInfo> dataIndex="partition" width="6.3%" ellipsis title={t(pCommon("partition"))} />
+        <Table.Column<RunningJobInfo> dataIndex="qos" width="6.3%" ellipsis title="QOS" />
+        <Table.Column<RunningJobInfo> dataIndex="nodes" width="4.4%" title={t(p("nodes"))} />
+        <Table.Column<RunningJobInfo> dataIndex="cores" width="4.4%" title={t(p("cores"))} />
+        <Table.Column<RunningJobInfo> dataIndex="gpus" width="4.4%" title={t(p("gpus"))} />
+        <Table.Column<RunningJobInfo> dataIndex="state" width="6%" title={t(pCommon("status"))} />
         <Table.Column
           dataIndex="runningOrQueueTime"
+          width="6.3%"
           title={t(p("time"))}
         />
         <Table.Column
           dataIndex="nodesOrReason"
+          ellipsis={true}
           title={t(p("reason"))}
           render={(d: string) => d.startsWith("(") && d.endsWith(")") ? d.substring(1, d.length - 1) : d}
         />
-        <Table.Column<RunningJobInfo> dataIndex="timeLimit" title={t(p("limit"))} />
+        <Table.Column<RunningJobInfo> dataIndex="timeLimit" width="6.5%" title={t(p("limit"))} />
 
         <Table.Column<RunningJobInfo>
           title={t(pCommon("more"))}
+          width="12%"
+          fixed="right"
           render={(_, r) => (
             <Space>
               <a onClick={() => setPreviewItem(r)}>{t(pCommon("detail"))}</a>
+              <Popconfirm
+                title={t(p("finishJobConfirm"))}
+                onConfirm={async () =>
+                  api.cancelJob({
+                    query: {
+                      cluster: r.cluster.id,
+                      jobId: r.jobId,
+                    },
+                  }).then(() => {
+                    message.success(t(p("finishJobSuccess")));
+                    reload();
+                  })
+                }
+              >
+                <a>{t(p("finishJobButton"))}</a>
+              </Popconfirm>
               <ChangeJobTimeLimitModalLink
                 reload={reload}
                 data={[r]}

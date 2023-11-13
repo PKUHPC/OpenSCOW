@@ -10,7 +10,6 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/i18n";
 import { App, Button, Form, InputNumber, Popconfirm, Space, Table } from "antd";
 import Router from "next/router";
 import { join } from "path";
@@ -20,7 +19,7 @@ import { useStore } from "simstate";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
-import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { runningJobId, RunningJobInfo } from "src/models/job";
 import { RunningJobDrawer } from "src/pageComponents/job/RunningJobDrawer";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
@@ -103,9 +102,6 @@ export const RunningJobQueryTable: React.FC<Props> = ({
       <RunningJobInfoTable
         data={filteredData}
         isLoading={isLoading}
-        showAccount={true}
-        showUser={true}
-        showCluster={false}
         reload={reload}
       />
     </div>
@@ -115,75 +111,74 @@ export const RunningJobQueryTable: React.FC<Props> = ({
 type JobInfoTableProps = {
   data: RunningJobInfo[] | undefined;
   isLoading: boolean;
-  showAccount: boolean;
-  showCluster: boolean;
-  showUser: boolean;
   reload: () => void;
 };
 
 export const RunningJobInfoTable: React.FC<JobInfoTableProps> = ({
-  data, isLoading, showAccount, showCluster, showUser, reload,
+  data, isLoading, reload,
 }) => {
 
   const { message } = App.useApp();
   const t = useI18nTranslateToString();
-
-  const languageId = useI18n().currentLanguage.id;
 
   const [previewItem, setPreviewItem] = useState<RunningJobInfo | undefined>(undefined);
 
   return (
     <>
       <Table
+        tableLayout="fixed"
         dataSource={data}
         loading={isLoading}
         pagination={{ showSizeChanger: true }}
         rowKey={runningJobId}
-        scroll={{ x: true }}
+        scroll={{ x: data?.length ? 1800 : true }}
       >
-        {
-          showCluster && (
-            <Table.Column<RunningJobInfo>
-              dataIndex="cluster"
-              title={t(p("jobInfoTable.cluster"))}
-              render={(_, r) => getI18nConfigCurrentText(r.cluster.name, languageId)}
-            />
-          )
-        }
         <Table.Column<RunningJobInfo>
           dataIndex="jobId"
+          width="5.2%"
           title={t(p("jobInfoTable.jobId"))}
           sorter={(a, b) => a.jobId.localeCompare(b.jobId)}
         />
-        {
-          showUser && (
-            <Table.Column<RunningJobInfo> dataIndex="user" title={t(p("jobInfoTable.user"))} />
-          )
-        }
-        {
-          showAccount && (
-            <Table.Column<RunningJobInfo> dataIndex="account" title={t(p("jobInfoTable.account"))} />
-          )
-        }
-        <Table.Column<RunningJobInfo> dataIndex="name" title={t(p("jobInfoTable.name"))} />
-        <Table.Column<RunningJobInfo> dataIndex="partition" title={t(p("jobInfoTable.partition"))} />
-        <Table.Column<RunningJobInfo> dataIndex="qos" title={t(p("jobInfoTable.qos"))} />
-        <Table.Column<RunningJobInfo> dataIndex="nodes" title={t(p("jobInfoTable.nodes"))} />
-        <Table.Column<RunningJobInfo> dataIndex="cores" title={t(p("jobInfoTable.cores"))} />
-        <Table.Column<RunningJobInfo> dataIndex="gpus" title={t(p("jobInfoTable.gpus"))} />
-        <Table.Column<RunningJobInfo> dataIndex="state" title={t(p("jobInfoTable.state"))} />
+        <Table.Column<RunningJobInfo>
+          dataIndex="name"
+          ellipsis
+          title={t(p("jobInfoTable.name"))}
+        />
+
+        <Table.Column<RunningJobInfo>
+          dataIndex="account"
+          width="10%"
+          ellipsis
+          title={t(p("jobInfoTable.account"))}
+        />
+
+        <Table.Column<RunningJobInfo>
+          dataIndex="partition"
+          width="6.7%"
+          ellipsis
+          title={t(p("jobInfoTable.partition"))}
+        />
+        <Table.Column<RunningJobInfo> dataIndex="qos" width="6.7%" ellipsis title={t(p("jobInfoTable.qos"))} />
+        <Table.Column<RunningJobInfo> dataIndex="nodes" width="4.5%" title={t(p("jobInfoTable.nodes"))} />
+        <Table.Column<RunningJobInfo> dataIndex="cores" width="4.5%" title={t(p("jobInfoTable.cores"))} />
+        <Table.Column<RunningJobInfo> dataIndex="gpus" width="5%" title={t(p("jobInfoTable.gpus"))} />
+        <Table.Column<RunningJobInfo> dataIndex="state" width="6.1%" title={t(p("jobInfoTable.state"))} />
         <Table.Column
           dataIndex="runningOrQueueTime"
+          width="6.7%"
           title={t(p("jobInfoTable.runningOrQueueTime"))}
         />
         <Table.Column<RunningJobInfo>
           dataIndex="nodesOrReason"
+          ellipsis
           title={t(p("jobInfoTable.nodesOrReason"))}
           render={(d: string) => d.startsWith("(") && d.endsWith(")") ? d.substring(1, d.length - 1) : d}
         />
-        <Table.Column<RunningJobInfo> dataIndex="timeLimit" title={t(p("jobInfoTable.timeLimit"))} />
+        <Table.Column<RunningJobInfo> dataIndex="timeLimit" width="6.7%" title={t(p("jobInfoTable.timeLimit"))} />
         <Table.Column<RunningJobInfo>
           title={t(p("jobInfoTable.more"))}
+          width="10%"
+          fixed="right"
           render={(_, r) => (
             <Space>
               <a onClick={() => Router.push(join("/files", r.cluster.id, r.workingDir))}>

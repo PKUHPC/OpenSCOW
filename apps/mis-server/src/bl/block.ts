@@ -14,61 +14,123 @@ import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Logger } from "@ddadaal/tsgrpc-server";
 import { Loaded } from "@mikro-orm/core";
 import { MySqlDriver, SqlEntityManager } from "@mikro-orm/mysql";
+import { BlockedFailedUserAccount } from "@scow/protos/build/server/admin";
 import { Account } from "src/entities/Account";
-import { SystemState } from "src/entities/SystemState";
 import { UserAccount, UserStatus } from "src/entities/UserAccount";
 import { ClusterPlugin } from "src/plugins/clusters";
 import { callHook } from "src/plugins/hookClient";
-
 
 /**
  * Update block status of accounts and users in the slurm.
  * If it is whitelisted, it doesn't block.
  *
- * @returns Updated number of blocked accounts and users
+ * @returns  Block successful and failed accounts and users
  **/
 export async function updateBlockStatusInSlurm(
   em: SqlEntityManager<MySqlDriver>, clusterPlugin: ClusterPlugin["clusters"], logger: Logger,
 ) {
+  const blockedAccounts: string[] = [];
+  const blockedFailedAccounts: string[] = [];
   const accounts = await em.find(Account, { blocked: true });
+
   for (const account of accounts) {
     if (account.whitelist) {
       continue;
     }
-    await clusterPlugin.callOnAll(logger, async (client) =>
-      await asyncClientCall(client.account, "blockAccount", {
-        accountName: account.accountName,
-      }),
-    );
+
+    try {
+      await clusterPlugin.callOnAll(logger, async (client) =>
+        await asyncClientCall(client.account, "blockAccount", {
+          accountName: account.accountName,
+        }),
+      );
+      blockedAccounts.push(account.accountName);
+    } catch (error) {
+      blockedFailedAccounts.push(account.accountName);
+    }
   }
 
+  const blockedUserAccounts: [string, string][] = [];
+  const blockedFailedUserAccounts: BlockedFailedUserAccount[] = [];
   const userAccounts = await em.find(UserAccount, {
     status: UserStatus.BLOCKED,
   }, { populate: ["user", "account"]});
-  for (const ua of userAccounts) {
-    await clusterPlugin.callOnAll(logger, async (client) =>
-      await asyncClientCall(client.user, "blockUserInAccount", {
-        accountName: ua.account.getProperty("accountName"),
-        userId: ua.user.getProperty("userId"),
-      }),
-    );
-  }
-  const updateBlockTime = await em.upsert(SystemState, {
-    key: SystemState.KEYS.UPDATE_SLURM_BLOCK_STATUS,
-    value: new Date().toISOString(),
-  });
-  await em.persistAndFlush(updateBlockTime);
 
-  logger.info("Updated block status in slurm of the following accounts: %o", accounts.map((x) => x.accountName));
-  logger.info("Updated block status in slurm of the following user account: %o",
-    userAccounts.map((x) => [x.user.getProperty("userId"), x.account.getProperty("accountName")]));
+  for (const ua of userAccounts) {
+    try {
+      await clusterPlugin.callOnAll(logger, async (client) =>
+        await asyncClientCall(client.user, "blockUserInAccount", {
+          accountName: ua.account.$.accountName,
+          userId: ua.user.$.userId,
+        }),
+      );
+      blockedUserAccounts.push([ua.user.getProperty("userId"), ua.account.getProperty("accountName")]);
+    } catch (error) {
+      blockedFailedUserAccounts.push({
+        userId: ua.user.$.userId,
+        accountName: ua.account.$.accountName,
+      });
+    }
+  }
+
+  logger.info("Updated block status in slurm of the following accounts: %o", blockedAccounts);
+  logger.info("Updated block status failed in slurm of the following accounts: %o", blockedFailedAccounts);
+
+  logger.info("Updated block status in slurm of the following user account: %o", blockedUserAccounts);
+  logger.info("Updated block status failed in slurm of the following user account: %o", blockedFailedUserAccounts);
 
   return {
-    blockedAccounts: accounts.map((x) => x.id),
-    blockedUserAccounts: userAccounts.map((x) => x.id),
+    blockedAccounts,
+    blockedFailedAccounts,
+    blockedUserAccounts,
+    blockedFailedUserAccounts,
   };
 
 }
+
+
+/**
+ * Update unblock status of accounts in the slurm.
+ * In order to ensure the stability of the service, serial is selected here.
+ *
+ * @returns Unblocked Block successful and failed accounts
+ **/
+export async function updateUnblockStatusInSlurm(
+  em: SqlEntityManager<MySqlDriver>, clusterPlugin: ClusterPlugin["clusters"], logger: Logger,
+) {
+  const accounts = await em.find(Account, {
+    $or: [
+      { blocked: false },
+      { whitelist: { $ne: null } },
+    ],
+  });
+
+  const unblockedAccounts: string[] = [];
+  const unblockedFailedAccounts: string[] = [];
+
+  for (const account of accounts) {
+    try {
+      await clusterPlugin.callOnAll(logger, async (client) =>
+        await asyncClientCall(client.account, "unblockAccount", {
+          accountName: account.accountName,
+        }),
+      );
+      unblockedAccounts.push(account.accountName);
+    } catch (error) {
+      unblockedFailedAccounts.push(account.accountName);
+    }
+  }
+
+  logger.info("Updated unblock status in slurm of the following accounts: %o", unblockedAccounts);
+  logger.info("Updated unblock status failed in slurm of the following accounts: %o", unblockedFailedAccounts);
+
+  return {
+    unblockedAccounts,
+    unblockedFailedAccounts,
+  };
+
+}
+
 
 /**
  * Blocks the account in the slurm.

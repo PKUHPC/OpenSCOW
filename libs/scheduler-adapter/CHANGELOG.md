@@ -1,5 +1,12 @@
 # @scow/lib-scheduler-adapter
 
+## 1.0.1
+
+### Patch Changes
+
+- eca87eaeb6: 修复当作业相关的时间为 0 时，返回空字符串的情况
+  - @scow/protos@1.0.1
+
 ## 1.0.0
 
 ### Major Changes

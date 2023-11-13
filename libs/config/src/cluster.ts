@@ -55,6 +55,15 @@ export const getSortedClusters = (clusters: Record<string, ClusterConfigSchema>)
     ).map((id) => ({ id, ...clusters[id] }));
 };
 
+export const getSortedClusterIds = (clusters: Record<string, ClusterConfigSchema>): string[] => {
+  return Object.keys(clusters)
+    .sort(
+      (a, b) => {
+        return clusters[a].priority - clusters[b].priority;
+      },
+    );
+};
+
 export const LoginDeskopConfigSchema = Type.Object({
   enabled: Type.Boolean({ description: "是否启动登录节点上的桌面功能" }),
   wms: Type.Array(
@@ -82,6 +91,10 @@ export const ClusterConfigSchema = Type.Object({
   ]),
   loginDesktop: Type.Optional(LoginDeskopConfigSchema),
   turboVNCPath: Type.Optional(TurboVncConfigSchema),
+  crossClusterFileTransfer: Type.Optional(Type.Object({
+    enabled: Type.Boolean({ description: "是否开启跨集群传输功能", default: false }),
+    transferNode: Type.Optional(Type.String({ description: "跨集群传输文件的节点" })),
+  })),
 });
 
 
