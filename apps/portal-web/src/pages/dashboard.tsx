@@ -10,17 +10,14 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { getHostname } from "@scow/lib-web/build/utils/getHostname";
-import { getLanguageCookie } from "@scow/lib-web/build/utils/languages";
-import { GetServerSideProps, NextPage } from "next";
+import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 import { useStore } from "simstate";
 import { requireAuth } from "src/auth/requireAuth";
 import { useI18nTranslateToString } from "src/i18n";
-import { CustomizableLogoAndText } from "src/pageComponents/dashboard/CustomizableLogoAndText";
+import { OveriewTable } from "src/pageComponents/dashboard/OveriewTable";
 import { UserStore } from "src/stores/UserStore";
-import { getServerI18nConfigText, runtimeConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
 
 interface Props {
@@ -39,31 +36,79 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)((props: Pr
 
   const t = useI18nTranslateToString();
 
+  const data = [
+    {
+      clusterName:"集群1",
+      partitionName:"分区1",
+      nodes:20,
+      runningNodes:4,
+      idleNodes:10,
+      noAviailableNodes:6,
+      cpuCores:10,
+      runningCpus:5,
+      idleCpus:3,
+      noAviailableCpus:2,
+      gpuCores:12,
+      runningGpus:5,
+      idleGpus:3,
+      noAviailableGpus:4,
+      jobNum:100,
+      runningJob:80,
+      pendingJob:20,
+      usageRate:"40%",
+      status:"可用",
+    },
+    {
+      clusterName:"集群2",
+      partitionName:"分区1",
+      nodes:7,
+      runningNodes:5,
+      idleNodes:1,
+      noAviailableNodes:1,
+      cpuCores:10,
+      runningCpus:5,
+      idleCpus:3,
+      noAviailableCpus:2,
+      gpuCores:14,
+      runningGpus:7,
+      idleGpus:3,
+      noAviailableGpus:4,
+      jobNum:100,
+      runningJob:80,
+      pendingJob:20,
+      usageRate:"40%",
+      status:"可用",
+    },
+    {
+      clusterName:"集群3",
+      partitionName:"分区1",
+      nodes:19,
+      runningNodes:15,
+      idleNodes:2,
+      noAviailableNodes:2,
+      cpuCores:10,
+      runningCpus:5,
+      idleCpus:3,
+      noAviailableCpus:2,
+      gpuCores:12,
+      runningGpus:5,
+      idleGpus:3,
+      noAviailableGpus:4,
+      jobNum:120,
+      runningJob:90,
+      pendingJob:30,
+      usageRate:"50%",
+      status:"不可用",
+    },
+  ];
+
   return (
     <div>
       <Head title={t("pages.dashboard.title")} />
-      <CustomizableLogoAndText homeText={props.homeText} homeTitle={props.homeTitle} />
+      {/* <CustomizableLogoAndText homeText={props.homeText} homeTitle={props.homeTitle} /> */}
+      <OveriewTable clusterInfo={data.map((item, idx) => ({ ...item, id:idx }))} />
     </div>
   );
 });
-
-export const getServerSideProps: GetServerSideProps<Props> = async ({ req }) => {
-
-  const hostname = getHostname(req);
-
-  const languageId = getLanguageCookie(req);
-
-  const homeTitle = (hostname && runtimeConfig.HOME_TITLES[hostname])
-    ?? getServerI18nConfigText(languageId, "defaultHomeTitle");
-  const homeText = (hostname && runtimeConfig.HOME_TEXTS[hostname])
-    ?? getServerI18nConfigText(languageId, "defaultHomeText");
-
-  return {
-    props: {
-      homeText, homeTitle,
-    },
-  };
-};
-
 
 export default DashboardPage;

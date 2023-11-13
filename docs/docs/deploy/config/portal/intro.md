@@ -54,22 +54,6 @@ loginDesktop:
 # 是否启用交互式任务功能
 apps: true
 
-# 主页标题
-homeTitle: 
-  # 默认文本
-  defaultText: "Super Computing on Web"
-  # 从不同域名访问，显示的不同的文本
-  hostnameMap: 
-    a.com: "a.com's SCOW Deployment"
-
-# 主页文本
-homeText: 
-  # 默认文本
-  defaultText: "SCOW"
-  # 从不同域名访问，显示的不同的文本
-  hostnameMap: 
-    a.com: "a.com's SCOW"
-
 # 提交作业命令框中的提示语，可选配置
 submitJobPromptText: "#此处参数设置的优先级高于页面其它地方，两者冲突时以此处为准"
 
