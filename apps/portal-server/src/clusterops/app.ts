@@ -365,7 +365,7 @@ export const appOps = (cluster: string): AppOps => {
               }
             } catch (e: any) {
               if (e.code === Status.UNIMPLEMENTED || e.code === Status.FAILED_PRECONDITION) {
-                logger.info(e.details);
+                logger.warn(e.details);
               } else {
                 throw e;
               }
@@ -440,7 +440,7 @@ export const appOps = (cluster: string): AppOps => {
           }
         } catch (e: any) {
           if (e.code === Status.UNIMPLEMENTED || e.code === Status.FAILED_PRECONDITION) {
-            logger.info(e.details);
+            logger.warn(e.details);
           } else {
             throw e;
           }
