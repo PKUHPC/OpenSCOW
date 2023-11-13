@@ -65,6 +65,7 @@ import type { SetAsInitAdminSchema } from "src/pages/api/init/setAsInitAdmin";
 import type { UnsetInitAdminSchema } from "src/pages/api/init/unsetInitAdmin";
 import type { UserExistsSchema } from "src/pages/api/init/userExists";
 import type { AddBillingItemSchema } from "src/pages/api/job/addBillingItem";
+import type { CancelJobSchema } from "src/pages/api/job/cancelJob";
 import type { ChangeJobTimeLimitSchema } from "src/pages/api/job/changeJobTimeLimit";
 import type { GetAvailableBillingTableSchema } from "src/pages/api/job/getAvailableBillingTable";
 import type { GetBillingItemsSchema } from "src/pages/api/job/getBillingItems";
@@ -100,6 +101,7 @@ import type { UnblockUserInAccountSchema } from "src/pages/api/users/unblockInAc
 import type { UnsetAdminSchema } from "src/pages/api/users/unsetAdmin"; ;
 
 export const api = {
+  cancelJob: apiClient.fromTypeboxRoute<typeof CancelJobSchema>("DELETE", "/api/job/cancelJob"),
   changeJobPrice: apiClient.fromTypeboxRoute<typeof ChangeJobPriceSchema>("PATCH", "/api/admin/changeJobPrice"),
   changePasswordAsPlatformAdmin: apiClient.fromTypeboxRoute<typeof ChangePasswordAsPlatformAdminSchema>("PATCH", "/api/admin/changePassword"),
   changeStorageQuota: apiClient.fromTypeboxRoute<typeof ChangeStorageQuotaSchema>("PUT", "/api/admin/changeStorage"),

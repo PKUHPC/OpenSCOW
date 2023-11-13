@@ -54,24 +54,27 @@ export const RenameModal: React.FC<Props> = ({ open, onClose, path, reload, clus
   };
 
   return (
-    <Modal
-      open={open}
-      title={t(p("title"))}
-      okText={t("button.confirmButton")}
-      cancelText={t("button.cancelButton")}
-      onCancel={onClose}
-      confirmLoading={loading}
-      destroyOnClose
-      onOk={form.submit}
-    >
-      <Form form={form} onFinish={onSubmit}>
-        <Form.Item label={t(p("renameLabel"))}>
-          <strong>{path}</strong>
-        </Form.Item>
-        <Form.Item<FormProps> label={t(p("newFileName"))} name="newFileName" rules={[{ required: true }]}>
-          <Input />
-        </Form.Item>
-      </Form>
-    </Modal>
+    <div onDoubleClick={(event) => event.stopPropagation()}>
+      <Modal
+        open={open}
+        title={t(p("title"))}
+        okText={t("button.confirmButton")}
+        cancelText={t("button.cancelButton")}
+        onCancel={onClose}
+        confirmLoading={loading}
+        destroyOnClose
+        onOk={form.submit}
+        getContainer={false}
+      >
+        <Form form={form} onFinish={onSubmit}>
+          <Form.Item label={t(p("renameLabel"))}>
+            <strong>{path}</strong>
+          </Form.Item>
+          <Form.Item<FormProps> label={t(p("newFileName"))} name="newFileName" rules={[{ required: true }]}>
+            <Input />
+          </Form.Item>
+        </Form>
+      </Modal>
+    </div>
   );
 };

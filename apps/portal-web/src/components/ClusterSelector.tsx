@@ -35,7 +35,7 @@ export const ClusterSelector: React.FC<Props> = ({ value, onChange }) => {
       onChange={(values) => onChange?.(values.map((x) => ({
         id: x,
         name: publicConfig.CLUSTERS.find((cluster) => cluster.id === x)?.name ?? x })))}
-      options={Object.values(publicConfig.CLUSTERS).map((x) => ({ value: x.id, label:
+      options={publicConfig.CLUSTERS.map((x) => ({ value: x.id, label:
         getI18nConfigCurrentText(x.name, languageId) }))}
       key={languageId}
     />

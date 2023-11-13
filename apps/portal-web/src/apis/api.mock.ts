@@ -213,6 +213,8 @@ export const mockApi: MockApi<typeof api> = {
 
   submitJob: async () => ({ jobId: 10 }),
 
+  submitFileAsJob: async () => ({ jobId: 10 }),
+
   getAppLastSubmission: async () => ({
     lastSubmissionInfo: {
       userId: "test123",

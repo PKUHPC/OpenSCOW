@@ -11,6 +11,7 @@
  */
 
 import { existsSync, readFileSync } from "fs";
+// import { join } from "path";
 
 interface VersionJsonInfo {
   tag?: string;
@@ -28,3 +29,9 @@ export function readVersionFile(versionJsonFileName = "version.json") {
   return jsonInfo; }
 
 
+// SemVer类型version
+export type ApiVersion = {
+  major: number;
+  minor: number;
+  patch: number;
+}

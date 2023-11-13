@@ -428,5 +428,21 @@ export const jobServiceServer = plugin((server) => {
       const count = await em.count(JobInfoEntity, {});
       return [{ count }];
     },
+
+    cancelJob: async ({ request, logger }) => {
+      const { cluster, userId, jobId } = request;
+
+      await server.ext.clusters.callOnOne(
+        cluster,
+        logger,
+        async (client) => {
+          await asyncClientCall(client.job, "cancelJob", {
+            userId, jobId,
+          });
+        },
+      );
+
+      return [{}];
+    },
   });
 });

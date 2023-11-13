@@ -71,4 +71,5 @@ export const OperationType: OperationTypeEnum = {
   tenantPay: "tenantPay",
   blockAccount: "blockAccount",
   unblockAccount: "unblockAccount",
+  submitFileItemAsJob: "submitFileItemAsJob",
 };

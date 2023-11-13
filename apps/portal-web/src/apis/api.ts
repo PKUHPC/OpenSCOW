@@ -54,6 +54,7 @@ import type { GetJobTemplateSchema } from "src/pages/api/job/getJobTemplate";
 import type { GetRunningJobsSchema } from "src/pages/api/job/getRunningJobs";
 import type { ListJobTemplatesSchema } from "src/pages/api/job/listJobTemplates";
 import type { RenameJobTemplateSchema } from "src/pages/api/job/renameJobTemplate";
+import { SubmitFileAsJobSchema } from "src/pages/api/job/submitFileAsJob";
 import type { SubmitJobSchema } from "src/pages/api/job/submitJob";
 import type { ChangePasswordSchema } from "src/pages/api/profile/changePassword";
 import type { CheckPasswordSchema } from "src/pages/api/profile/checkPassword";
@@ -97,6 +98,7 @@ export const api = {
   listJobTemplates: apiClient.fromTypeboxRoute<typeof ListJobTemplatesSchema>("GET", "/api/job/listJobTemplates"),
   renameJobTemplate: apiClient.fromTypeboxRoute<typeof RenameJobTemplateSchema>("POST", "/api/job/renameJobTemplate"),
   submitJob: apiClient.fromTypeboxRoute<typeof SubmitJobSchema>("POST", "/api/job/submitJob"),
+  submitFileAsJob: apiClient.fromTypeboxRoute<typeof SubmitFileAsJobSchema>("POST", "/api/job/submitFileAsJob"),
   changePassword: apiClient.fromTypeboxRoute<typeof ChangePasswordSchema>("PATCH", "/api/profile/changePassword"),
   checkPassword: apiClient.fromTypeboxRoute<typeof CheckPasswordSchema>("GET", "/api/profile/checkPassword"),
   startFileTransfer: apiClient.fromTypeboxRoute<typeof StartFileTransferSchema>("PATCH", "/api/file/startFileTransfer"),

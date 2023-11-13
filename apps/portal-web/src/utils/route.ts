@@ -21,11 +21,13 @@ export const route: typeof typeboxRoute = (schema, handler) => {
         if (!(e.metadata instanceof Metadata)) { throw e; }
 
         const SCOW_ERROR = (e.metadata as Metadata).get("IS_SCOW_ERROR");
+        const SCOW_CAUSE = (e.metadata as Metadata).get("cause");
         if (SCOW_ERROR.length === 0) { throw e; }
 
         const code = e.metadata.get("SCOW_ERROR_CODE")[0].toString();
         const details = e.details;
-        return { 500: { code, details } } as any;
+        const message = SCOW_CAUSE[0];
+        return { 500: { code, details, message } } as any;
       });
     }
   });
