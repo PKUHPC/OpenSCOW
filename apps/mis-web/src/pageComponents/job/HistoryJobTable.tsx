@@ -27,8 +27,9 @@ import { TableTitle } from "src/components/TableTitle";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { HistoryJobDrawer } from "src/pageComponents/job/HistoryJobDrawer";
 import type { GetJobInfoSchema } from "src/pages/api/job/jobInfo";
+import { getSortedClusterValues } from "src/utils/cluster";
 import type { Cluster } from "src/utils/config";
-import { getClusterName, publicConfig } from "src/utils/config";
+import { getClusterName } from "src/utils/config";
 import { moneyToString, nullableMoneyToString } from "src/utils/money";
 
 interface FilterForm {
@@ -73,7 +74,7 @@ export const JobTable: React.FC<Props> = ({
     return {
       jobEndTime: [now.subtract(1, "week").startOf("day"), now.endOf("day")],
       jobId: undefined,
-      clusters: Object.values(publicConfig.CLUSTERS),
+      clusters: getSortedClusterValues(),
       accountName: typeof accountNames === "string" ? accountNames : undefined,
     };
   });
@@ -293,37 +294,39 @@ export const JobInfoTable: React.FC<JobInfoTableProps> = ({
           total: data?.totalCount,
           onChange: (page, pageSize) => setPageInfo({ page, pageSize }),
         } : false}
-        scroll={{ x: data?.jobs?.length ? 1200 : true }}
+        tableLayout="fixed"
+        scroll={{ x: data?.jobs?.length ? 1450 : true }}
       >
-        <Table.Column<JobInfo> dataIndex="idJob" width={100} title={t(pCommon("clusterWorkId"))} />
+        <Table.Column<JobInfo> dataIndex="idJob" width="7%" title={t(pCommon("clusterWorkId"))} />
+        <Table.Column<JobInfo> dataIndex="jobName" ellipsis title={t(pCommon("workName"))} />
         {
           showAccount ? (
-            <Table.Column<JobInfo> dataIndex="account" width={120} title={t(pCommon("account"))} />
+            <Table.Column<JobInfo> dataIndex="account" width="13%" ellipsis title={t(pCommon("account"))} />
           ) : undefined
         }
         {
           showUser ? (
-            <Table.Column<JobInfo> dataIndex="user" width={120} title={t(pCommon("user"))} />
+            <Table.Column<JobInfo> dataIndex="user" width="12%" ellipsis title={t(pCommon("user"))} />
           ) : undefined
         }
         <Table.Column<JobInfo>
           dataIndex="cluster"
           title={t(pCommon("clusterName"))}
-          width={150}
+          width="12%"
+          ellipsis
           render={(cluster) => getClusterName(cluster, languageId)}
         />
-        <Table.Column<JobInfo> dataIndex="partition" width={80} title={t(pCommon("partition"))} />
-        <Table.Column<JobInfo> dataIndex="qos" width={80} title="QOS" />
-        <Table.Column<JobInfo> dataIndex="jobName" ellipsis={true} title={t(pCommon("workName"))} />
+        <Table.Column<JobInfo> dataIndex="partition" width="8.5%" ellipsis title={t(pCommon("partition"))} />
+        <Table.Column<JobInfo> dataIndex="qos" width="8.5%" ellipsis title="QOS" />
         <Table.Column
           dataIndex="timeSubmit"
-          width={160}
+          width="11.5%"
           title={t(pCommon("timeSubmit"))}
           render={(time: string) => formatDateTime(time)}
         />
         <Table.Column<JobInfo>
           dataIndex="timeEnd"
-          width={160}
+          width="11.5%"
           title={t(pCommon("timeEnd"))}
           render={(time: string) => formatDateTime(time)}
         />
@@ -332,7 +335,7 @@ export const JobInfoTable: React.FC<JobInfoTableProps> = ({
             <Table.Column<JobInfo>
               key={i}
               dataIndex={`${v}Price`}
-              width={110}
+              width="8%"
               title={finalPriceText[v]}
               render={(price: Money) => moneyToString(price) + " " + t(pCommon("unit"))}
             />
@@ -340,7 +343,8 @@ export const JobInfoTable: React.FC<JobInfoTableProps> = ({
         }
         <Table.Column<JobInfo>
           title={t(pCommon("more"))}
-          width={60}
+          width="4.5%"
+          fixed="right"
           render={(_, r) => <a onClick={() => setPreviewItem(r)}>{t(pCommon("detail"))}</a>}
         />
       </Table>

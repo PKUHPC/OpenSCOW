@@ -41,6 +41,7 @@ import type { LogoutSchema } from "src/pages/api/auth/logout";
 import type { ValidateTokenSchema } from "src/pages/api/auth/validateToken";
 import type { GetUserStatusSchema } from "src/pages/api/dashboard/status";
 import type { GetChargesSchema } from "src/pages/api/finance/charges";
+import { GetChargeRecordsTotalCountSchema } from "src/pages/api/finance/getChargeRecordsTotalCount";
 import type { GetUsedPayTypesSchema } from "src/pages/api/finance/getUsedPayTypes";
 import type { FinancePaySchema } from "src/pages/api/finance/pay";
 import type { GetPaymentsSchema } from "src/pages/api/finance/payments";
@@ -52,6 +53,7 @@ import type { SetAsInitAdminSchema } from "src/pages/api/init/setAsInitAdmin";
 import type { UnsetInitAdminSchema } from "src/pages/api/init/unsetInitAdmin";
 import type { UserExistsSchema } from "src/pages/api/init/userExists";
 import type { AddBillingItemSchema } from "src/pages/api/job/addBillingItem";
+import type { CancelJobSchema } from "src/pages/api/job/cancelJob";
 import type { ChangeJobTimeLimitSchema } from "src/pages/api/job/changeJobTimeLimit";
 import type { GetAvailableBillingTableSchema } from "src/pages/api/job/getAvailableBillingTable";
 import type { GetBillingItemsSchema } from "src/pages/api/job/getBillingItems";
@@ -88,6 +90,7 @@ import type { UnsetAdminSchema } from "src/pages/api/users/unsetAdmin";
 
 
 export const api = {
+  cancelJob: apiClient.fromTypeboxRoute<typeof CancelJobSchema>("DELETE", "/api/job/cancelJob"),
   changeJobPrice: apiClient.fromTypeboxRoute<typeof ChangeJobPriceSchema>("PATCH", "/api/admin/changeJobPrice"),
   changePasswordAsPlatformAdmin: apiClient.fromTypeboxRoute<typeof ChangePasswordAsPlatformAdminSchema>("PATCH", "/api/admin/changePassword"),
   changeStorageQuota: apiClient.fromTypeboxRoute<typeof ChangeStorageQuotaSchema>("PUT", "/api/admin/changeStorage"),
@@ -116,6 +119,7 @@ export const api = {
   validateToken: apiClient.fromTypeboxRoute<typeof ValidateTokenSchema>("GET", "/api/auth/validateToken"),
   getUserStatus: apiClient.fromTypeboxRoute<typeof GetUserStatusSchema>("GET", "/api/dashboard/status"),
   getCharges: apiClient.fromTypeboxRoute<typeof GetChargesSchema>("GET", "/api/finance/charges"),
+  getChargeRecordsTotalCount: apiClient.fromTypeboxRoute<typeof GetChargeRecordsTotalCountSchema>("GET", "/api/finance/getChargeRecordsTotalCount"),
   getUsedPayTypes: apiClient.fromTypeboxRoute<typeof GetUsedPayTypesSchema>("GET", "/api/finance/getUsedPayTypes"),
   financePay: apiClient.fromTypeboxRoute<typeof FinancePaySchema>("POST", "/api/finance/pay"),
   getPayments: apiClient.fromTypeboxRoute<typeof GetPaymentsSchema>("GET", "/api/finance/payments"),

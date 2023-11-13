@@ -305,7 +305,13 @@ export const mockApi: MockApi<typeof api> = {
     ipAddress: "127.0.0.1",
     operatorId: "123",
     type: "Task",
-  }], total: 10 }),
+  }],
+  }),
+
+  getChargeRecordsTotalCount: async () => ({
+    totalAmount: 10,
+    totalCount: 10,
+  }),
 
   getPayments: async () => ({ results: [{
     amount: 10,
@@ -398,6 +404,7 @@ export const mockApi: MockApi<typeof api> = {
   getAllAccounts: async () => ({ totalCount: mockAccounts.length, results: mockAccounts }),
   changeJobTimeLimit: async () => null,
   queryJobTimeLimit: async () => ({ result: 10 }),
+  cancelJob: async () => null,
   createAccount: async () => { return {}; },
   dewhitelistAccount: async () => null,
   whitelistAccount: async () => null,

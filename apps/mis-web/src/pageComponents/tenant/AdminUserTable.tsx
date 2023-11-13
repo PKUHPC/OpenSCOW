@@ -135,6 +135,7 @@ export const AdminUserTable: React.FC<Props> = ({
       </FilterFormContainer>
 
       <Table
+        tableLayout="fixed"
         dataSource={filteredData}
         loading={isLoading}
         pagination={{
@@ -143,7 +144,7 @@ export const AdminUserTable: React.FC<Props> = ({
           onChange: (page) => setCurrentPageNum(page),
         }}
         rowKey="id"
-        scroll={{ x: true }}
+        scroll={{ x: filteredData?.length ? 1200 : true }}
         onChange={handleTableChange}
       >
         <Table.Column<FullUserInfo>
@@ -190,6 +191,8 @@ export const AdminUserTable: React.FC<Props> = ({
         <Table.Column<FullUserInfo>
           dataIndex="changePassword"
           title={t(pCommon("operation"))}
+          width="8%"
+          fixed="right"
           render={(_, r) => (
             <Space split={<Divider type="vertical" />}>
               <ChangePasswordModalLink

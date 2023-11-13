@@ -29,7 +29,10 @@ interface Props {
 export const JobsSection: React.FC<Props> = ({ user }) => {
 
   const promiseFn = useCallback(() => {
-    return Promise.all(Object.values(publicConfig.CLUSTERS).map(async ({ id, name }) => {
+    return Promise.all(publicConfig.CLUSTER_SORTED_ID_LIST.map(async (clusterId) => {
+
+      const { id, name } = publicConfig.CLUSTERS[clusterId];
+
       return api.getRunningJobs({
         query: {
           cluster: id,
