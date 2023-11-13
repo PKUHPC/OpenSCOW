@@ -11,7 +11,7 @@
  */
 
 import { ClusterTextsConfigSchema } from "@scow/config/build/clusterTexts";
-import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/i18n";
+import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { Collapse, Divider, Spin, Typography } from "antd";
 import { GetServerSideProps, NextPage } from "next";
 import { useCallback, useState } from "react";

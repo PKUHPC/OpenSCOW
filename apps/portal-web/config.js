@@ -24,7 +24,7 @@ const { DEFAULT_PRIMARY_COLOR, getUiConfig } = require("@scow/config/build/ui");
 const { getPortalConfig } = require("@scow/config/build/portal");
 const { getClusterConfigs, getLoginNode, getSortedClusters,
   getSortedClusterIds } = require("@scow/config/build/cluster");
-const { getCommonConfig } = require("@scow/config/build/common");
+const { getCommonConfig, getSystemLanguageConfig } = require("@scow/config/build/common");
 const { getAuditConfig } = require("@scow/config/build/audit");
 
 /**
@@ -132,7 +132,6 @@ const buildRuntimeConfig = async (phase, basePath) => {
   const auditConfig = getAuditConfig(configPath, console);
 
   const versionTag = readVersionFile()?.tag;
-
   /**
    * @type {import("./src/utils/config").ServerRuntimeConfig}
    */
@@ -163,6 +162,8 @@ const buildRuntimeConfig = async (phase, basePath) => {
   const capabilities = await queryCapabilities(config.AUTH_INTERNAL_URL, phase);
 
   const enableLoginDesktop = getDesktopEnabled(clusters, portalConfig);
+
+  const systemLanguageConfig = getSystemLanguageConfig(getCommonConfig().systemLanguage);
 
   /**
    * @type {import("./src/utils/config").PublicRuntimeConfig}
@@ -208,6 +209,9 @@ const buildRuntimeConfig = async (phase, basePath) => {
     RUNTIME_I18N_CONFIG_TEXTS: {
       passwordPatternMessage: commonConfig.passwordPattern?.errorMessage,
     },
+
+    SYSTEM_LANGUAGE_CONFIG: systemLanguageConfig,
+
   };
 
   if (!building && !testenv) {

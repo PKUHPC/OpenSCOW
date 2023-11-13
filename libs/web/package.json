@@ -34,6 +34,7 @@
   "devDependencies": {
     "antd": "5.8.4",
     "next": "13.4.10",
+    "@scow/config": "workspace:*",
     "styled-components": "6.0.7",
     "@grpc/grpc-js": "1.9.5",
     "@types/mime-types": "2.1.1",

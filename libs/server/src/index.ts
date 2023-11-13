@@ -11,4 +11,4 @@
  */
 
 export * from "./apiAuthPlugin";
-export * from "./i18n";
+export * from "./systemLanguage";

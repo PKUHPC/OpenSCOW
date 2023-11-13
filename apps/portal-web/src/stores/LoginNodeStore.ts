@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/i18n";
+import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { useState } from "react";
 import { LoginNode } from "src/utils/config";
 export function LoginNodeStore(initLoginNodes: Record<string, LoginNode[]>, initLanguageId: string) {

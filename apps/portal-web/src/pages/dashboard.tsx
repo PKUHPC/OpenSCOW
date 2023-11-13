@@ -11,7 +11,7 @@
  */
 
 import { getHostname } from "@scow/lib-web/build/utils/getHostname";
-import { getLanguageCookie } from "@scow/lib-web/build/utils/languages";
+import { getCurrentLanguageId } from "@scow/lib-web/build/utils/systemLanguage";
 import { GetServerSideProps, NextPage } from "next";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
@@ -20,7 +20,7 @@ import { requireAuth } from "src/auth/requireAuth";
 import { useI18nTranslateToString } from "src/i18n";
 import { CustomizableLogoAndText } from "src/pageComponents/dashboard/CustomizableLogoAndText";
 import { UserStore } from "src/stores/UserStore";
-import { getServerI18nConfigText, runtimeConfig } from "src/utils/config";
+import { getServerI18nConfigText, publicConfig, runtimeConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
 
 interface Props {
@@ -51,10 +51,11 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ req }) => 
 
   const hostname = getHostname(req);
 
-  const languageId = getLanguageCookie(req);
+  const languageId = getCurrentLanguageId(req, publicConfig.SYSTEM_LANGUAGE_CONFIG);
 
   const homeTitle = (hostname && runtimeConfig.HOME_TITLES[hostname])
     ?? getServerI18nConfigText(languageId, "defaultHomeTitle");
+
   const homeText = (hostname && runtimeConfig.HOME_TEXTS[hostname])
     ?? getServerI18nConfigText(languageId, "defaultHomeText");
 
