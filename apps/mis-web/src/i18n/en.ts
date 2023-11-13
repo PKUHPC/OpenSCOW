@@ -989,6 +989,7 @@ export default {
       setPlatformBilling: "Set Platform Job Billing",
       createTenant: "Create Tenant",
       tenantPay: "Tenant Recharge",
+      submitFileItemAsJob: "Script Submission",
     },
     operationDetails: {
       login: "User Login",
@@ -1041,6 +1042,7 @@ export default {
       createTenant: "Create tenant {}, administrator: {}",
       tenantPay: "Recharge tenant {} by {} yuan",
       setPlatformBilling: "Set platform billing item {} price to {} yuan",
+      submitFileItemAsJob: "Cluster: {}, Submit Script: {}",
     },
   },
   userRoles: {
