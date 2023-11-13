@@ -10,18 +10,13 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import dayjs from "dayjs";
-import timezone from "dayjs/plugin/timezone";
-import utc from "dayjs/plugin/utc";
 import pino from "pino";
 import { config } from "src/config/env";
 
-dayjs.extend(timezone);
-dayjs.extend(utc);
 
 export const loggerOptions: pino.LoggerOptions = {
   level: config.LOG_LEVEL,
-  timestamp: () => `,"time":"${dayjs().tz("Asia/Shanghai").format("YYYY-MM-DD HH:mm:ss")}"`,
+  timestamp: pino.stdTimeFunctions.isoTime,
   ...config.LOG_PRETTY ? {
     transport: { target: "pino-pretty" },
   } : {},

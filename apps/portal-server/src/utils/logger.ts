@@ -12,11 +12,10 @@
 
 import pino from "pino";
 import { config } from "src/config/env";
-import dayjs from "src/utils/dayjs";
 
 export const loggerOptions: pino.LoggerOptions = {
   level: config.LOG_LEVEL,
-  timestamp: () => `,"time":"${dayjs().tz("Asia/Shanghai").format("YYYY-MM-DD HH:mm:ss")}"`,
+  timestamp: pino.stdTimeFunctions.isoTime,
   ...config.LOG_PRETTY ? {
     transport: { target: "pino-pretty" },
   } : {},
