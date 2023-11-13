@@ -34,14 +34,8 @@ export const GetNewJobCountSchema = typeboxRouteSchema({
 
   query: Type.Object({
 
-    /**
-     * @format date-time
-     */
     startTime: Type.String({ format: "date-time" }),
 
-    /**
-     * @format date-time
-     */
     endTime: Type.String({ format: "date-time" }),
 
   }),

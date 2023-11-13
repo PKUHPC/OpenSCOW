@@ -10,9 +10,11 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { plugin } from "@ddadaal/tsgrpc-server";
+import { Logger, plugin } from "@ddadaal/tsgrpc-server";
+import { MySqlDriver, SqlEntityManager } from "@mikro-orm/mysql";
 import cron from "node-cron";
-import { clearQueryCache } from "src/tasks/clearQueryCache";
+import { QueryCache } from "src/entities/QueryCache";
+
 
 export interface ClearCachePlugin {
   cache: {
@@ -22,6 +24,19 @@ export interface ClearCachePlugin {
     lastCleared: () => Date | null;
     clear: () => Promise<void>;
   }
+}
+
+async function clearQueryCache(
+  em: SqlEntityManager<MySqlDriver>,
+  logger: Logger,
+) {
+
+  logger.info("Clearing query cache...");
+  const result = await em.createQueryBuilder(QueryCache).delete()
+    .where({ timestamp: { $lt: new Date() } })
+    .execute();
+  logger.info(`Query cache cleared. Rows deleted: ${result.affectedRows}.`);
+  return;
 }
 
 export const clearCachePlugin = plugin(async (f) => {
@@ -38,7 +53,7 @@ export const clearCachePlugin = plugin(async (f) => {
     if (cacheClearIsRunning) return;
 
     cacheClearIsRunning = true;
-    return await clearQueryCache(f.ext.orm.em.fork(), logger).finally(() => { 
+    return await clearQueryCache(f.ext.orm.em.fork(), logger).finally(() => {
       cacheClearIsRunning = false;
     });
   };

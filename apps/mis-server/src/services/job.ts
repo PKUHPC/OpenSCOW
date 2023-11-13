@@ -380,7 +380,6 @@ export const jobServiceServer = plugin((server) => {
     getTopSubmitJobUsers: async ({ request, em }) => {
       const { startTime, endTime, topRank = 10 } = ensureNotUndefined(request, ["startTime", "endTime"]);
 
-      const queryKey = `{top_submit_job_users:${startTime}:${endTime}:${topRank}`;
       const qb = em.createQueryBuilder(JobInfoEntity, "j");
       qb
         .select("j.user as userId, COUNT(*) as count")
@@ -392,7 +391,7 @@ export const jobServiceServer = plugin((server) => {
 
       const results: {userId: string, count: number}[] = await queryWithCache({
         em,
-        queryKey,
+        queryKeys: ["top_submit_job_users", `${startTime}`, `${endTime}`, `${topRank}`],
         queryQb: qb,
       });
       return [
@@ -404,7 +403,7 @@ export const jobServiceServer = plugin((server) => {
 
     getNewJobCount: async ({ request, em }) => {
       const { startTime, endTime } = ensureNotUndefined(request, ["startTime", "endTime"]);
-      const queryKey = `{new_job_count:${startTime}:${endTime}`;
+
       const qb = em.createQueryBuilder(JobInfoEntity, "j");
       qb
         .select("DATE(j.time_submit) as date, COUNT(*) as count")
@@ -415,7 +414,7 @@ export const jobServiceServer = plugin((server) => {
 
       const results: {date: string, count: number}[] = await queryWithCache({
         em,
-        queryKey,
+        queryKeys: ["new_job_count", `${startTime}`, `${endTime}`],
         queryQb: qb,
       });
       return [

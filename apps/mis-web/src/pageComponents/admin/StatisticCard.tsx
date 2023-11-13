@@ -40,8 +40,8 @@ const iconToNode = (Icon: any, color?: string) => {
 
 const p = prefix("pageComp.admin.statisticCard.");
 
-const StatisticCard: React.FC<Props> = ({ title, newAddValue = 0, totalValue = 0, loading, icon, iconColor }) => {
-
+export const StatisticCard: React.FC<Props> = ({ title, newAddValue = 0, totalValue = 0, loading, icon, iconColor }) =>
+{
   const t = useI18nTranslateToString();
 
   return (
@@ -70,5 +70,3 @@ const StatisticCard: React.FC<Props> = ({ title, newAddValue = 0, totalValue = 0
   );
 
 };
-
-export default StatisticCard;

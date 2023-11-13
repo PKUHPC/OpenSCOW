@@ -13,12 +13,13 @@
 import { MySqlDriver, QueryBuilder, SqlEntityManager } from "@mikro-orm/mysql";
 import { QueryCache } from "src/entities/QueryCache";
 
-
-export const queryWithCache = async ({ em, queryKey, queryQb }: {
+export const queryWithCache = async ({ em, queryKeys, queryQb }: {
   em: SqlEntityManager<MySqlDriver>
-  queryKey: string,
+  queryKeys: string[],
   queryQb: QueryBuilder<any>,
 }) => {
+
+  const queryKey = queryKeys.join(":");
 
   const queryCache = await em.findOne(QueryCache, {
     queryKey,

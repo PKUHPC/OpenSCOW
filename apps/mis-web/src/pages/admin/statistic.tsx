@@ -27,7 +27,7 @@ import { getOperationTypeTexts } from "src/models/operationLog";
 import { PlatformRole, SearchType } from "src/models/User";
 import { DataBarChart } from "src/pageComponents/admin/DataBarChart";
 import { DataLineChart } from "src/pageComponents/admin/DataLineChart";
-import StatisticCard from "src/pageComponents/admin/StatisticCard";
+import { StatisticCard } from "src/pageComponents/admin/StatisticCard";
 import { Head } from "src/utils/head";
 import { styled } from "styled-components";
 

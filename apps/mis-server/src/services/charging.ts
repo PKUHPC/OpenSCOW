@@ -284,8 +284,6 @@ export const chargingServiceServer = plugin((server) => {
     getTopChargeAccount: async ({ request, em }) => {
       const { startTime, endTime, topRank = 10 } = ensureNotUndefined(request, ["startTime", "endTime"]);
 
-      const queryKey = `{get_top_charge_account:${startTime}:${endTime}:${topRank}`;
-
       const qb = em.createQueryBuilder(ChargeRecord, "cr");
       qb
         .select("cr.accountName")
@@ -299,7 +297,7 @@ export const chargingServiceServer = plugin((server) => {
 
       const results: {accountName: string, totalAmount: number}[] = await queryWithCache({
         em,
-        queryKey,
+        queryKeys: ["get_top_charge_account", `${startTime}`, `${endTime}`, `${topRank}`],
         queryQb: qb,
       });
 
@@ -317,8 +315,6 @@ export const chargingServiceServer = plugin((server) => {
 
       const { startTime, endTime } = ensureNotUndefined(request, ["startTime", "endTime"]);
 
-      const queryKey = `{get_daily_charge:${startTime}:${endTime}`;
-
       const qb = em.createQueryBuilder(ChargeRecord, "cr");
 
       qb
@@ -331,7 +327,7 @@ export const chargingServiceServer = plugin((server) => {
 
       const records: {date: string, totalAmount: number}[] = await queryWithCache({
         em,
-        queryKey,
+        queryKeys: ["get_daily_charge", `${startTime}`, `${endTime}`],
         queryQb: qb,
       });
 
@@ -346,8 +342,6 @@ export const chargingServiceServer = plugin((server) => {
     getTopPayAccount: async ({ request, em }) => {
       const { startTime, endTime, topRank = 10 } = ensureNotUndefined(request, ["startTime", "endTime"]);
 
-      const queryKey = `{get_top_pay_account:${startTime}:${endTime}:${topRank}`;
-
       const qb = em.createQueryBuilder(PayRecord, "p");
       qb
         .select("p.accountName")
@@ -361,7 +355,7 @@ export const chargingServiceServer = plugin((server) => {
 
       const results: {accountName: string, totalAmount: number}[] = await queryWithCache({
         em,
-        queryKey,
+        queryKeys: ["get_top_pay_account", `${startTime}`, `${endTime}`, `${topRank}`],
         queryQb: qb,
       });
 
@@ -379,8 +373,6 @@ export const chargingServiceServer = plugin((server) => {
 
       const { startTime, endTime } = ensureNotUndefined(request, ["startTime", "endTime"]);
 
-      const queryKey = `{get_daily_charge:${startTime}:${endTime}`;
-
       const qb = em.createQueryBuilder(PayRecord, "pr");
 
       qb
@@ -393,7 +385,7 @@ export const chargingServiceServer = plugin((server) => {
 
       const records: {date: string, totalAmount: number}[] = await queryWithCache({
         em,
-        queryKey,
+        queryKeys: ["get_daily_charge", `${startTime}`, `${endTime}`],
         queryQb: qb,
       });
 

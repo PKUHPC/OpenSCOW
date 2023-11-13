@@ -202,6 +202,7 @@ message GetTopChargeAccountRequest {
   google.protobuf.Timestamp start_time = 1;
   google.protobuf.Timestamp end_time = 2;
 
+  //需要获取top 多少
   //如果不传，默认取top10的用户
   optional uint32 top_rank = 3;
 }
@@ -232,6 +233,7 @@ message GetTopPayAccountRequest {
   google.protobuf.Timestamp start_time = 1;
   google.protobuf.Timestamp end_time = 2;
 
+  //需要获取top 多少
   //如果不传，默认取top10的用户
   optional uint32 top_rank = 3;
 }
