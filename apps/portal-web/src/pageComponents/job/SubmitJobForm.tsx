@@ -375,7 +375,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
           </Form.Item>
         </Col>
 
-        {clusterInfoQuery.data?.clusterInfo.K8S ? (
+        {clusterInfoQuery.data?.clusterInfo.scheduler.name === "k8s" ? (
           <Col span={24}>
             <Form.Item
               label={t(p("imageUrl"))}

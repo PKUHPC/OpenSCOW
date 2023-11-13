@@ -37,7 +37,6 @@ export const PublicClusterConfig = Type.Object({
     name: Type.String(),
     partitions: Type.Array(Partition),
   }),
-  K8S: Type.Optional(Type.Boolean()),
 });
 
 export type PublicClusterConfig = Static<typeof PublicClusterConfig>;
@@ -80,7 +79,6 @@ export default route(GetClusterInfoSchema, async (req, res) => {
       name: reply.schedulerName,
       partitions: reply.partitions,
     },
-    K8S: runtimeConfig.CLUSTERS_CONFIG[cluster]?.K8S,
   } } };
 
 });
