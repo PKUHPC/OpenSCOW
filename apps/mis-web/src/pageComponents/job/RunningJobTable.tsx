@@ -11,6 +11,7 @@
  */
 
 import { useDidUpdateEffect } from "@scow/lib-web/build/utils/hooks";
+import { DEFAULT_PAGE_SIZE } from "@scow/lib-web/build/utils/pagination";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { Button, Form, Input, InputNumber, message, Popconfirm, Select, Space, Table } from "antd";
 import React, { useCallback, useMemo, useRef, useState } from "react";
@@ -250,7 +251,10 @@ export const RunningJobInfoTable: React.FC<JobInfoTableProps> = ({
         } : {})}
         dataSource={data}
         loading={isLoading}
-        pagination={{ showSizeChanger: true }}
+        pagination={{
+          showSizeChanger: true,
+          defaultPageSize: DEFAULT_PAGE_SIZE,
+        }}
         rowKey={runningJobId}
         scroll={{ x: data?.length ? 1800 : true }}
         tableLayout="fixed"

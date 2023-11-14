@@ -12,6 +12,7 @@
 
 import { formatDateTime, getDefaultPresets } from "@scow/lib-web/build/utils/datetime";
 import { useDidUpdateEffect } from "@scow/lib-web/build/utils/hooks";
+import { DEFAULT_PAGE_SIZE } from "@scow/lib-web/build/utils/pagination";
 import { Button, DatePicker, Form, Table } from "antd";
 import dayjs from "dayjs";
 import { useCallback, useState } from "react";
@@ -171,7 +172,10 @@ export const PaymentTable: React.FC<Props> = ({
         tableLayout="fixed"
         dataSource={data?.results as Array<TableProps>}
         loading={isLoading}
-        pagination={{ showSizeChanger: true }}
+        pagination={{
+          showSizeChanger: true,
+          defaultPageSize: DEFAULT_PAGE_SIZE,
+        }}
       >
         {
           showAccountName ? <Table.Column dataIndex="accountName" title={t(pCommon("account"))} /> : undefined
