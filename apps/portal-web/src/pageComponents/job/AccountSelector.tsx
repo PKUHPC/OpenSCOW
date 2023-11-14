@@ -23,15 +23,22 @@ interface Props {
   cluster?: string;
   value?: string;
   onChange?: (value: string) => void;
+  onlyNormalAccounts?: boolean;
 }
 
-export const AccountSelector: React.FC<Props> = ({ cluster, onChange, value }) => {
+export const AccountSelector: React.FC<Props> = ({ cluster, onChange, value, onlyNormalAccounts }) => {
   const userStore = useStore(UserStore);
   const { message } = App.useApp();
 
   const promiseFn = useCallback(async () => {
-    return cluster ? api.getAccounts({ query: { cluster } })
+    const result = cluster ? await api.getAccounts({ query: { cluster } })
       .httpError(404, (error) => { message.error(error.message); }) : { accounts: [] as string[] };
+
+    return onlyNormalAccounts ?
+      (cluster && result.accounts ?
+        await api.getAvailableAccounts({ query:
+        { cluster, accounts: result.accounts } }) : { accounts: [] as string[] }) :
+      (result);
   }, [cluster, userStore.user]);
 
   const { data, isLoading, reload } = useAsync({

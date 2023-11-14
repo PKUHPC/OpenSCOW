@@ -172,6 +172,20 @@ message SubmitFileAsJobResponse {
   uint32 job_id = 1;
 }
 
+// get user's availableAccounts
+// accounts status is not blocked
+// user status in account is not blocked
+message GetAvailableAccountsRequest {
+  string cluster = 1;
+  string user_id = 2;
+  repeated string accounts = 3;
+}
+
+message GetAvailableAccountsResponse {
+  repeated string accounts = 1;
+}
+
+
 service JobService {
   rpc CancelJob(CancelJobRequest) returns (CancelJobResponse);
 
@@ -192,4 +206,6 @@ service JobService {
   rpc SubmitJob(SubmitJobRequest) returns (SubmitJobResponse);
 
   rpc SubmitFileAsJob(SubmitFileAsJobRequest) returns (SubmitFileAsJobResponse);
+
+  rpc GetAvailableAccounts(GetAvailableAccountsRequest) returns (GetAvailableAccountsResponse);
 }

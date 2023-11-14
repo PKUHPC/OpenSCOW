@@ -287,6 +287,44 @@ export const jobServiceServer = plugin((server) => {
       return [{ jobId: reply.jobId }];
     },
 
+    getAvailableAccounts: async ({ request, logger }) => {
+      const { cluster, accounts, userId } = request;
+
+      const client = getAdapterClient(cluster);
+      if (!client) { throw clusterNotFound(cluster); }
+
+      let availableAccounts: string[] = [];
+      const filteredStatusAccounts: string[] = [];
+      const filteredUserStatusAccounts: string[] = [];
+
+      const filterAccountPromise = Promise.allSettled(accounts.map(async (account) => {
+        try {
+          const resp = await asyncClientCall(client.account, "queryAccountBlockStatus", { accountName: account });
+          if (!resp.blocked) {
+            filteredStatusAccounts.push(account); }
+        } catch (error) {
+          logger.error(`Error occured when query the block status of ${account}.`);
+        }
+      }));
+
+      const filterUserStatusPromise = Promise.allSettled(accounts.map(async (account) => {
+        try {
+          const resp = await asyncClientCall(client.user, "queryUserInAccountBlockStatus", {
+            accountName: account, userId });
+          if (!resp.blocked) {
+            filteredUserStatusAccounts.push(account); }
+        } catch (error) {
+          logger.error(`Error occured when query the block status of ${userId} in ${account}.`);
+        }
+      }));
+
+      await Promise.all([filterAccountPromise, filterUserStatusPromise]).then(() => {
+        availableAccounts = filteredStatusAccounts.filter((account) => filteredUserStatusAccounts.includes(account));
+      });
+
+      return [ { accounts: availableAccounts } ];
+    },
+
 
   });
 

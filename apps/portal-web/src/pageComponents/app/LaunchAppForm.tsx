@@ -332,7 +332,7 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
             name="account"
             rules={[{ required: true }]}
           >
-            <AccountSelector cluster={clusterId} />
+            <AccountSelector cluster={clusterId} onlyNormalAccounts={true} />
           </Form.Item>
 
           <Form.Item

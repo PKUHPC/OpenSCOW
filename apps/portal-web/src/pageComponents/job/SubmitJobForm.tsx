@@ -132,6 +132,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
     promiseFn: useCallback(async () => cluster
       ? api.getClusterInfo({ query: { cluster:  cluster?.id } }) : undefined, [cluster]),
     onResolve: (data) => {
+
       if (data) {
         // 如果是从模板导入，则判断当前选中的分区中是否仍有模板中的partition，若有，则将默认值设为模板值；
         const setValueFromTemplate = initial.partition &&
@@ -239,7 +240,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
             dependencies={["cluster"]}
           >
             {/* 加载完集群后再加载账户，保证initial值能被赋值成功 */}
-            {cluster?.id && <AccountSelector cluster={cluster.id} />}
+            {cluster?.id && <AccountSelector cluster={cluster.id} onlyNormalAccounts={true} />}
           </Form.Item>
         </Col>
         <Col span={24} sm={6}>

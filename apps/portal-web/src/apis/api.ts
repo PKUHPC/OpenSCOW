@@ -50,11 +50,12 @@ import type { CancelJobSchema } from "src/pages/api/job/cancelJob";
 import type { DeleteJobTemplateSchema } from "src/pages/api/job/deleteJobTemplate";
 import type { GetAccountsSchema } from "src/pages/api/job/getAccounts";
 import type { GetAllJobsSchema } from "src/pages/api/job/getAllJobs";
+import type { GetAvailableAccountsSchema } from "src/pages/api/job/getAvailableAccounts";
 import type { GetJobTemplateSchema } from "src/pages/api/job/getJobTemplate";
 import type { GetRunningJobsSchema } from "src/pages/api/job/getRunningJobs";
 import type { ListJobTemplatesSchema } from "src/pages/api/job/listJobTemplates";
 import type { RenameJobTemplateSchema } from "src/pages/api/job/renameJobTemplate";
-import { SubmitFileAsJobSchema } from "src/pages/api/job/submitFileAsJob";
+import type { SubmitFileAsJobSchema } from "src/pages/api/job/submitFileAsJob";
 import type { SubmitJobSchema } from "src/pages/api/job/submitJob";
 import type { ChangePasswordSchema } from "src/pages/api/profile/changePassword";
 import type { CheckPasswordSchema } from "src/pages/api/profile/checkPassword";
@@ -77,6 +78,7 @@ export const api = {
   launchDesktop: apiClient.fromTypeboxRoute<typeof LaunchDesktopSchema>("POST", "/api/desktop/launchDesktop"),
   listAvailableWms: apiClient.fromTypeboxRoute<typeof ListAvailableWmsSchema>("GET", "/api/desktop/listAvailableWms"),
   listDesktops: apiClient.fromTypeboxRoute<typeof ListDesktopsSchema>("GET", "/api/desktop/listDesktops"),
+  checkTransferKey: apiClient.fromTypeboxRoute<typeof CheckTransferKeySchema>("POST", "/api/file/checkTransferKey"),
   copyFileItem: apiClient.fromTypeboxRoute<typeof CopyFileItemSchema>("PATCH", "/api/file/copy"),
   createFile: apiClient.fromTypeboxRoute<typeof CreateFileSchema>("POST", "/api/file/createFile"),
   deleteDir: apiClient.fromTypeboxRoute<typeof DeleteDirSchema>("DELETE", "/api/file/deleteDir"),
@@ -86,24 +88,24 @@ export const api = {
   getFileType: apiClient.fromTypeboxRoute<typeof GetFileTypeSchema>("GET", "/api/file/getFileType"),
   getHomeDirectory: apiClient.fromTypeboxRoute<typeof GetHomeDirectorySchema>("GET", "/api/file/getHome"),
   listFile: apiClient.fromTypeboxRoute<typeof ListFileSchema>("GET", "/api/file/list"),
+  listAvailableTransferClusters: apiClient.fromTypeboxRoute<typeof ListAvailableTransferClustersSchema>("GET", "/api/file/listAvailableTransferClusters"),
   mkdir: apiClient.fromTypeboxRoute<typeof MkdirSchema>("POST", "/api/file/mkdir"),
   moveFileItem: apiClient.fromTypeboxRoute<typeof MoveFileItemSchema>("PATCH", "/api/file/move"),
+  queryFileTransferProgress: apiClient.fromTypeboxRoute<typeof QueryFileTransferProgressSchema>("GET", "/api/file/queryFileTransferProgress"),
+  startFileTransfer: apiClient.fromTypeboxRoute<typeof StartFileTransferSchema>("POST", "/api/file/startFileTransfer"),
+  terminateFileTransfer: apiClient.fromTypeboxRoute<typeof TerminateFileTransferSchema>("POST", "/api/file/terminateFileTransfer"),
   uploadFile: apiClient.fromTypeboxRoute<typeof UploadFileSchema>("POST", "/api/file/upload"),
   cancelJob: apiClient.fromTypeboxRoute<typeof CancelJobSchema>("DELETE", "/api/job/cancelJob"),
   deleteJobTemplate: apiClient.fromTypeboxRoute<typeof DeleteJobTemplateSchema>("DELETE", "/api/job/deleteJobTemplate"),
   getAccounts: apiClient.fromTypeboxRoute<typeof GetAccountsSchema>("GET", "/api/job/getAccounts"),
   getAllJobs: apiClient.fromTypeboxRoute<typeof GetAllJobsSchema>("GET", "/api/job/getAllJobs"),
+  getAvailableAccounts: apiClient.fromTypeboxRoute<typeof GetAvailableAccountsSchema>("GET", "/api/job/getAvailableAccounts"),
   getJobTemplate: apiClient.fromTypeboxRoute<typeof GetJobTemplateSchema>("GET", "/api/job/getJobTemplate"),
   getRunningJobs: apiClient.fromTypeboxRoute<typeof GetRunningJobsSchema>("GET", "/api/job/getRunningJobs"),
   listJobTemplates: apiClient.fromTypeboxRoute<typeof ListJobTemplatesSchema>("GET", "/api/job/listJobTemplates"),
   renameJobTemplate: apiClient.fromTypeboxRoute<typeof RenameJobTemplateSchema>("POST", "/api/job/renameJobTemplate"),
-  submitJob: apiClient.fromTypeboxRoute<typeof SubmitJobSchema>("POST", "/api/job/submitJob"),
   submitFileAsJob: apiClient.fromTypeboxRoute<typeof SubmitFileAsJobSchema>("POST", "/api/job/submitFileAsJob"),
+  submitJob: apiClient.fromTypeboxRoute<typeof SubmitJobSchema>("POST", "/api/job/submitJob"),
   changePassword: apiClient.fromTypeboxRoute<typeof ChangePasswordSchema>("PATCH", "/api/profile/changePassword"),
   checkPassword: apiClient.fromTypeboxRoute<typeof CheckPasswordSchema>("GET", "/api/profile/checkPassword"),
-  startFileTransfer: apiClient.fromTypeboxRoute<typeof StartFileTransferSchema>("PATCH", "/api/file/startFileTransfer"),
-  queryFileTransferProgress: apiClient.fromTypeboxRoute<typeof QueryFileTransferProgressSchema>("GET", "/api/file/queryFileTransferProgress"),
-  terminateFileTransfer: apiClient.fromTypeboxRoute<typeof TerminateFileTransferSchema>("POST", "/api/file/terminateFileTransfer"),
-  listAvailableTransferClusters: apiClient.fromTypeboxRoute<typeof ListAvailableTransferClustersSchema>("GET", "/api/file/listAvailableTransferClusters"),
-  checkTransferKey: apiClient.fromTypeboxRoute<typeof CheckTransferKeySchema>("POST", "/api/file/checkTransferKey"),
 };

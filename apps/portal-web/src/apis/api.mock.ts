@@ -237,5 +237,10 @@ export const mockApi: MockApi<typeof api> = {
   terminateFileTransfer: null,
   checkTransferKey: null,
 
+
+  getAvailableAccounts: async () => ({ accounts: ["123"]}),
+
 };
+
+
 
