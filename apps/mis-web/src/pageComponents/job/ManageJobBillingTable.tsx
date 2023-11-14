@@ -87,7 +87,10 @@ export const ManageJobBillingTable: React.FC<Props> = ({ data, loading, tenant, 
                 .filter((x) => x.cluster === record.cluster && x.partition === record.partition && x.qos === record.qos)
                 .reverse()
             }
-            pagination={false}
+            pagination={{
+              defaultPageSize: 10,
+              hideOnSinglePage: true,
+            }}
           >
             <Table.Column title={t(p("itemId"))} dataIndex={["priceItem", "itemId"]} />
             <Table.Column
