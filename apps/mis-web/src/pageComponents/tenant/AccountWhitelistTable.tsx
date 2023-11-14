@@ -14,6 +14,7 @@ import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { moneyToNumber } from "@scow/lib-decimal";
 import { FilterFormContainer } from "@scow/lib-web/build/components/FilterFormContainer";
 import { formatDateTime } from "@scow/lib-web/build/utils/datetime";
+import { DEFAULT_PAGE_SIZE } from "@scow/lib-web/build/utils/pagination";
 import { WhitelistedAccount } from "@scow/protos/build/server/account";
 import { Static } from "@sinclair/typebox";
 import { App, Button, Divider, Form, Input, Space, Table } from "antd";
@@ -119,6 +120,7 @@ export const AccountWhitelistTable: React.FC<Props> = ({
           scroll={{ x: true }}
           pagination={{
             showSizeChanger: true,
+            defaultPageSize: DEFAULT_PAGE_SIZE,
             current: currentPageNum,
             onChange: (page) => setCurrentPageNum(page),
           }}

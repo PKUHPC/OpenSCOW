@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { DEFAULT_PAGE_SIZE } from "@scow/lib-web/build/utils/pagination";
 import { JobTemplateInfo } from "@scow/protos/build/portal/job";
 import { App, Button, Form, Input, Modal, Popconfirm, Space, Table } from "antd";
 import { ColumnsType } from "antd/es/table";
@@ -231,7 +232,10 @@ const InfoTable: React.FC<InfoTableProps> = ({
         columns={columns}
         dataSource={data}
         loading={isLoading}
-        pagination={{ showSizeChanger: true }}
+        pagination={{
+          showSizeChanger: true,
+          defaultPageSize: DEFAULT_PAGE_SIZE,
+        }}
         rowKey={(x) => x.jobName}
       />
     </>

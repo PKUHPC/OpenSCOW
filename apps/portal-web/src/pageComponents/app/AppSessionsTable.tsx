@@ -13,6 +13,7 @@
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { compareDateTime, formatDateTime } from "@scow/lib-web/build/utils/datetime";
 import { compareNumber } from "@scow/lib-web/build/utils/math";
+import { DEFAULT_PAGE_SIZE } from "@scow/lib-web/build/utils/pagination";
 import type { AppSession } from "@scow/protos/build/portal/app";
 import { App, Button, Checkbox, Form, Input, Popconfirm, Space, Table, TableColumnsType, Tooltip } from "antd";
 import type { CheckboxChangeEvent } from "antd/es/checkbox";
@@ -268,6 +269,10 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster }) => {
         rowKey={(record) => record.sessionId}
         loading={!filteredData && isLoading}
         scroll={{ x: filteredData?.length ? 1200 : true }}
+        pagination={{
+          showSizeChanger: true,
+          defaultPageSize: DEFAULT_PAGE_SIZE,
+        }}
       />
     </div>
   );
