@@ -28,19 +28,13 @@ export const GetOperationLogFilter = Type.Object({
 
   operatorUserIds: Type.String(),
 
-  /**
-   * @format date-time
-   */
   startTime: Type.Optional(Type.String({ format: "date-time" })),
 
-  /**
-   * @format date-time
-   */
   endTime: Type.Optional(Type.String({ format: "date-time" })),
 
   operationType: Type.Optional(Type.Enum(OperationType)),
   operationResult: Type.Optional(Type.Enum(OperationResult)),
-
+  operationDetail: Type.Optional(Type.String()),
   operationTargetAccountName: Type.Optional(Type.String()),
 });
 
@@ -56,15 +50,10 @@ export const GetOperationLogsSchema = typeboxRouteSchema({
     type: Type.Enum(OperationLogQueryType),
 
     ...GetOperationLogFilter.properties,
-    /**
-     * @minimum 1
-     * @type integer
-     */
+
     page: Type.Integer({ minimum: 1 }),
 
-    /**
-     * @type integer
-     */
+
     pageSize: Type.Optional(Type.Integer()),
   }),
 
@@ -88,12 +77,13 @@ export default typeboxRoute(GetOperationLogsSchema, async (req, res) => {
 
   const {
     type, operatorUserIds, startTime, endTime,
-    operationType, operationResult, operationTargetAccountName, page, pageSize } = req.query;
+    operationType, operationResult, operationDetail, operationTargetAccountName, page, pageSize } = req.query;
 
   const filter = {
     operatorUserIds: operatorUserIds ? operatorUserIds.split(",") : [],
     startTime, endTime, operationType,
     operationResult, operationTargetAccountName,
+    operationDetail,
   };
   // 用户请求
   if (type === OperationLogQueryType.USER) {
