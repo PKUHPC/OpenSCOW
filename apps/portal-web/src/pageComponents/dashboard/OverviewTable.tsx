@@ -26,15 +26,15 @@ export interface ClusterInfo {
   nodes: number;
   runningNodes: number;
   idleNodes: number;
-  noAviailableNodes: number;
+  noAvailableNodes: number;
   cpuCores: number;
   runningCpus: number;
   idleCpus: number;
-  noAviailableCpus: number;
+  noAvailableCpus: number;
   gpuCores: number;
   runningGpus: number;
   idleGpus: number;
-  noAviailableGpus: number;
+  noAvailableGpus: number;
   jobNum: number;
   runningJob: number;
   pendingJob: number;
@@ -54,9 +54,25 @@ interface TableProps {
   status: string;
 }
 const Container = styled.div`
+  /* 修改滚动条样式 */
+  .ant-table-body{
+    &::-webkit-scrollbar {
+    width: 5px !important;
+    overflow-y: auto !important;
+    }
+    &::-webkit-scrollbar-thumb {
+    border-radius: 5px !important;
+    background: #ccc !important;
+    }
+    &::-webkit-scrollbar-track {
+    -webkit-box-shadow: 0 !important;
+    border-radius: 0 !important;
+    background: #fff !important;
+    }
+  }
 `;
 
-export const OveriewTable: React.FC<Props> = ({ clusterInfo }) => {
+export const OverviewTable: React.FC<Props> = ({ clusterInfo }) => {
 
   const [selectId, setSelectId] = useState(0);
 

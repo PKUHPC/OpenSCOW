@@ -24,6 +24,7 @@ import type { ListAvailableAppsSchema } from "src/pages/api/app/listAvailableApp
 import type { AuthCallbackSchema } from "src/pages/api/auth/callback";
 import type { LogoutSchema } from "src/pages/api/auth/logout";
 import type { ValidateTokenSchema } from "src/pages/api/auth/validateToken";
+import type { GetClusterRunningInfoSchema } from "src/pages/api/dashboard/getClusterInfo";
 import type { CreateDesktopSchema } from "src/pages/api/desktop/createDesktop";
 import type { KillDesktopSchema } from "src/pages/api/desktop/killDesktop";
 import type { LaunchDesktopSchema } from "src/pages/api/desktop/launchDesktop";
@@ -71,11 +72,13 @@ export const api = {
   logout: apiClient.fromTypeboxRoute<typeof LogoutSchema>("DELETE", "/api/auth/logout"),
   validateToken: apiClient.fromTypeboxRoute<typeof ValidateTokenSchema>("GET", "/api/auth/validateToken"),
   getClusterInfo: apiClient.fromTypeboxRoute<typeof GetClusterInfoSchema>("GET", "/api//cluster"),
+  getClusterRunningInfo: apiClient.fromTypeboxRoute<typeof GetClusterRunningInfoSchema>("GET", "/api/dashboard/getClusterInfo"),
   createDesktop: apiClient.fromTypeboxRoute<typeof CreateDesktopSchema>("POST", "/api/desktop/createDesktop"),
   killDesktop: apiClient.fromTypeboxRoute<typeof KillDesktopSchema>("POST", "/api/desktop/killDesktop"),
   launchDesktop: apiClient.fromTypeboxRoute<typeof LaunchDesktopSchema>("POST", "/api/desktop/launchDesktop"),
   listAvailableWms: apiClient.fromTypeboxRoute<typeof ListAvailableWmsSchema>("GET", "/api/desktop/listAvailableWms"),
   listDesktops: apiClient.fromTypeboxRoute<typeof ListDesktopsSchema>("GET", "/api/desktop/listDesktops"),
+  checkTransferKey: apiClient.fromTypeboxRoute<typeof CheckTransferKeySchema>("POST", "/api/file/checkTransferKey"),
   copyFileItem: apiClient.fromTypeboxRoute<typeof CopyFileItemSchema>("PATCH", "/api/file/copy"),
   createFile: apiClient.fromTypeboxRoute<typeof CreateFileSchema>("POST", "/api/file/createFile"),
   deleteDir: apiClient.fromTypeboxRoute<typeof DeleteDirSchema>("DELETE", "/api/file/deleteDir"),
@@ -85,8 +88,12 @@ export const api = {
   getFileType: apiClient.fromTypeboxRoute<typeof GetFileTypeSchema>("GET", "/api/file/getFileType"),
   getHomeDirectory: apiClient.fromTypeboxRoute<typeof GetHomeDirectorySchema>("GET", "/api/file/getHome"),
   listFile: apiClient.fromTypeboxRoute<typeof ListFileSchema>("GET", "/api/file/list"),
+  listAvailableTransferClusters: apiClient.fromTypeboxRoute<typeof ListAvailableTransferClustersSchema>("GET", "/api/file/listAvailableTransferClusters"),
   mkdir: apiClient.fromTypeboxRoute<typeof MkdirSchema>("POST", "/api/file/mkdir"),
   moveFileItem: apiClient.fromTypeboxRoute<typeof MoveFileItemSchema>("PATCH", "/api/file/move"),
+  queryFileTransferProgress: apiClient.fromTypeboxRoute<typeof QueryFileTransferProgressSchema>("GET", "/api/file/queryFileTransferProgress"),
+  startFileTransfer: apiClient.fromTypeboxRoute<typeof StartFileTransferSchema>("POST", "/api/file/startFileTransfer"),
+  terminateFileTransfer: apiClient.fromTypeboxRoute<typeof TerminateFileTransferSchema>("POST", "/api/file/terminateFileTransfer"),
   uploadFile: apiClient.fromTypeboxRoute<typeof UploadFileSchema>("POST", "/api/file/upload"),
   cancelJob: apiClient.fromTypeboxRoute<typeof CancelJobSchema>("DELETE", "/api/job/cancelJob"),
   deleteJobTemplate: apiClient.fromTypeboxRoute<typeof DeleteJobTemplateSchema>("DELETE", "/api/job/deleteJobTemplate"),
@@ -99,9 +106,4 @@ export const api = {
   submitJob: apiClient.fromTypeboxRoute<typeof SubmitJobSchema>("POST", "/api/job/submitJob"),
   changePassword: apiClient.fromTypeboxRoute<typeof ChangePasswordSchema>("PATCH", "/api/profile/changePassword"),
   checkPassword: apiClient.fromTypeboxRoute<typeof CheckPasswordSchema>("GET", "/api/profile/checkPassword"),
-  startFileTransfer: apiClient.fromTypeboxRoute<typeof StartFileTransferSchema>("PATCH", "/api/file/startFileTransfer"),
-  queryFileTransferProgress: apiClient.fromTypeboxRoute<typeof QueryFileTransferProgressSchema>("GET", "/api/file/queryFileTransferProgress"),
-  terminateFileTransfer: apiClient.fromTypeboxRoute<typeof TerminateFileTransferSchema>("POST", "/api/file/terminateFileTransfer"),
-  listAvailableTransferClusters: apiClient.fromTypeboxRoute<typeof ListAvailableTransferClustersSchema>("GET", "/api/file/listAvailableTransferClusters"),
-  checkTransferKey: apiClient.fromTypeboxRoute<typeof CheckTransferKeySchema>("POST", "/api/file/checkTransferKey"),
 };

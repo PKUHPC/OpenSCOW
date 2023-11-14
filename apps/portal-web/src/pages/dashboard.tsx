@@ -12,12 +12,15 @@
 
 import { NextPage } from "next";
 import { useRouter } from "next/router";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
+import { useAsync } from "react-async";
 import { useStore } from "simstate";
+import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { useI18nTranslateToString } from "src/i18n";
-import { OveriewTable } from "src/pageComponents/dashboard/OveriewTable";
+import { OverviewTable } from "src/pageComponents/dashboard/OverviewTable";
 import { UserStore } from "src/stores/UserStore";
+import { publicConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
 
 interface Props {
@@ -41,15 +44,15 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
       nodes:20,
       runningNodes:4,
       idleNodes:10,
-      noAviailableNodes:6,
+      noAvailableNodes:6,
       cpuCores:10,
       runningCpus:5,
       idleCpus:3,
-      noAviailableCpus:2,
+      noAvailableCpus:2,
       gpuCores:12,
       runningGpus:5,
       idleGpus:3,
-      noAviailableGpus:4,
+      noAvailableGpus:4,
       jobNum:100,
       runningJob:80,
       pendingJob:20,
@@ -62,15 +65,15 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
       nodes:7,
       runningNodes:5,
       idleNodes:1,
-      noAviailableNodes:1,
+      noAvailableNodes:1,
       cpuCores:10,
       runningCpus:5,
       idleCpus:3,
-      noAviailableCpus:2,
+      noAvailableCpus:2,
       gpuCores:14,
       runningGpus:7,
       idleGpus:3,
-      noAviailableGpus:4,
+      noAvailableGpus:4,
       jobNum:100,
       runningJob:80,
       pendingJob:20,
@@ -83,15 +86,15 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
       nodes:19,
       runningNodes:15,
       idleNodes:2,
-      noAviailableNodes:2,
+      noAvailableNodes:2,
       cpuCores:10,
       runningCpus:5,
       idleCpus:3,
-      noAviailableCpus:2,
+      noAvailableCpus:2,
       gpuCores:12,
       runningGpus:5,
       idleGpus:3,
-      noAviailableGpus:4,
+      noAvailableGpus:4,
       jobNum:120,
       runningJob:90,
       pendingJob:30,
@@ -99,12 +102,25 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
       status:"不可用",
     },
   ];
+  const { data:clusterInfo, isLoading } = useAsync({
+    promiseFn: useCallback(async () => {
+      const clusters = publicConfig.CLUSTERS;
+
+      // const { sessions } = await api.getAppSessions({});
+
+      // return sessions.map((x) => ({
+      //   ...x,
+      //   remainingTime: x.state === "RUNNING" ? calculateAppRemainingTime(x.runningTime, x.timeLimit) :
+      //     x.state === "PENDING" ? "" : x.timeLimit,
+      // }));
+
+    }, []),
+  });
 
   return (
     <div>
       <Head title={t("pages.dashboard.title")} />
-      {/* <CustomizableLogoAndText homeText={props.homeText} homeTitle={props.homeTitle} /> */}
-      <OveriewTable clusterInfo={data.map((item, idx) => ({ ...item, id:idx }))} />
+      <OverviewTable clusterInfo={data.map((item, idx) => ({ ...item, id:idx }))} />
     </div>
   );
 });

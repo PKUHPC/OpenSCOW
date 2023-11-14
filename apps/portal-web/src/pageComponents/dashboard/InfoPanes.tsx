@@ -13,7 +13,7 @@
 import React from "react";
 import { InfoPane } from "src/pageComponents/dashboard/InfoPane";
 import { styled } from "styled-components"; ;
-import { ClusterInfo } from "src/pageComponents/dashboard/OveriewTable";
+import { ClusterInfo } from "src/pageComponents/dashboard/OverviewTable";
 
 interface Props {
   selectItem: ClusterInfo
@@ -32,9 +32,9 @@ const InfoPaneContainer = styled.div`
 
 export const InfoPanes: React.FC<Props> = ({ selectItem }) => {
 
-  const { clusterName, partitionName, nodes, runningNodes, idleNodes, noAviailableNodes,
-    cpuCores, runningCpus, idleCpus, noAviailableCpus,
-    gpuCores, runningGpus, idleGpus, noAviailableGpus,
+  const { clusterName, partitionName, nodes, runningNodes, idleNodes, noAvailableNodes,
+    cpuCores, runningCpus, idleCpus, noAvailableCpus,
+    gpuCores, runningGpus, idleGpus, noAvailableGpus,
     jobNum, runningJob, pendingJob,
   } = selectItem;
   return (
@@ -44,7 +44,7 @@ export const InfoPanes: React.FC<Props> = ({ selectItem }) => {
         tag={{ itemName:"节点", num:nodes }}
         data={ [{ itemName:"运行中", num:runningNodes, color:"#00C49F" },
           { itemName:"空闲", num:idleNodes, color:"#0088FE" },
-          { itemName:"不可用", num:noAviailableNodes, color:"#c04851" }]}
+          { itemName:"不可用", num:noAvailableNodes, color:"#c04851" }]}
       ></InfoPane>
       <InfoPaneContainer>
         <InfoPane
@@ -52,14 +52,14 @@ export const InfoPanes: React.FC<Props> = ({ selectItem }) => {
           tag={{ itemName:"CPU", num:cpuCores, unit:"核" }}
           data={ [{ itemName:"运行中", num:runningCpus, color:"#00C49F" },
             { itemName:"空闲", num:idleCpus, color:"#0088FE" },
-            { itemName:"不可用", num:noAviailableCpus, color:"#c04851" }]}
+            { itemName:"不可用", num:noAvailableCpus, color:"#c04851" }]}
         ></InfoPane>
         <InfoPane
           title={{ title:"", subTitle:"" }}
           tag={{ itemName:"GPU", num:gpuCores, unit:"卡" }}
           data={ [{ itemName:"运行中", num:runningGpus, color:"#00C49F" },
             { itemName:"空闲", num:idleGpus, color:"#0088FE" },
-            { itemName:"不可用", num:noAviailableGpus, color:"#c04851" }]}
+            { itemName:"不可用", num:noAvailableGpus, color:"#c04851" }]}
         ></InfoPane>
       </InfoPaneContainer>
       <InfoPane
