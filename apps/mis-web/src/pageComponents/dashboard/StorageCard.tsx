@@ -11,7 +11,7 @@
  */
 
 import { ReloadOutlined } from "@ant-design/icons";
-import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/i18n";
+import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { Progress, Space } from "antd";
 import React, { useCallback } from "react";
 import { useAsync } from "react-async";

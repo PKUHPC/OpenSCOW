@@ -13,7 +13,7 @@
 import { GetConfigFn, getConfigFromFile } from "@scow/lib-config";
 import { Static, Type } from "@sinclair/typebox";
 import { DEFAULT_CONFIG_BASE_PATH } from "src/constants";
-import { createI18nStringSchema } from "src/type";
+import { createI18nStringSchema } from "src/i18n";
 
 export const PortalConfigSchema = Type.Object({
   jobManagement: Type.Boolean({ description: "是否启动作业管理功能", default: true }),

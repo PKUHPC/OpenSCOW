@@ -11,8 +11,8 @@
  */
 
 import { useDidUpdateEffect } from "@scow/lib-web/build/utils/hooks";
-import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/i18n";
 import { DEFAULT_PAGE_SIZE } from "@scow/lib-web/build/utils/pagination";
+import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { Button, Form, Input, InputNumber, message, Popconfirm, Select, Space, Table } from "antd";
 import React, { useCallback, useMemo, useRef, useState } from "react";
 import { useAsync } from "react-async";

@@ -18,8 +18,8 @@ import {
   HomeOutlined, LeftOutlined, MacCommandOutlined, RightOutlined,
   ScissorOutlined, SnippetsOutlined, UploadOutlined, UpOutlined,
 } from "@ant-design/icons";
-import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/i18n";
 import { DEFAULT_PAGE_SIZE } from "@scow/lib-web/build/utils/pagination";
+import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { App, Button, Divider, Space } from "antd";
 import Link from "next/link";
 import Router from "next/router";

@@ -69,8 +69,9 @@ export default /* #__PURE__*/route(CancelJobSchema, async (req, res) => {
     },
   };
 
+  // Cancel the job for the user who submitted the job
   return asyncUnaryCall(client, "cancelJob", {
-    jobId: +jobId, userId: info.identityId, cluster,
+    jobId: +jobId, userId: job.user, cluster,
   }).then(async () => {
     await callLog(logInfo, OperationResult.SUCCESS);
     return { 204: null };

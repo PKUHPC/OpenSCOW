@@ -11,7 +11,7 @@
  */
 
 import { ArrowLeftOutlined, ArrowRightOutlined } from "@ant-design/icons";
-import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/i18n";
+import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { App, Button, Col, Row } from "antd";
 import { NextPage } from "next";
 import { useState } from "react";
