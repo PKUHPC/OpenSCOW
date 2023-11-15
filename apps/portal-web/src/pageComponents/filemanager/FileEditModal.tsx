@@ -209,7 +209,6 @@ export const FileEditModal: React.FC<Props> = ({ previewFile, setPreviewFile }) 
     downloadFile();
     setConfirm(false);
     setIsEdit(false);
-    setIsFullScreen(false);
     setMode(Mode.PREVIEW);
     setOptions({
       ...options,
