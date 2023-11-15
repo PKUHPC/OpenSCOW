@@ -15,6 +15,11 @@ import { Static, Type } from "@sinclair/typebox";
 import { join } from "path";
 import { logger } from "src/log";
 
+export enum AuthCustomType {
+  external = "external",
+  image = "image"
+}
+
 export const InstallConfigSchema = Type.Object({
   port: Type.Integer({ description: "端口号", default: 80 }),
   basePath: Type.String({ description: "整个系统的部署路径", default: "/" }),
@@ -84,6 +89,10 @@ export const InstallConfigSchema = Type.Object({
     })),
 
     custom: Type.Optional(Type.Object({
+      type: Type.Enum(AuthCustomType, { description: "自定义认证系统类型" }),
+      external: Type.Optional(Type.Object({
+        url: Type.String({ description: "自定义认证系统的 URL" }),
+      })),
       image: Type.String({ description: "认证系统镜像" }),
       ports: Type.Optional(Type.Array(Type.String(), { description: "端口映射" })),
       environment: Type.Optional(Type.Union([
