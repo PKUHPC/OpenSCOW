@@ -33,6 +33,7 @@ interface FilterForm {
   operationType?: OperationType;
   operationTime?: [dayjs.Dayjs, dayjs.Dayjs],
   operationResult?: OperationResult;
+  operationDetail?: string;
 }
 
 interface PageInfo {
@@ -67,6 +68,7 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
       operationType: undefined,
       operationTime: [today.clone().subtract(30, "day"), today],
       operationResult: undefined,
+      operationDetail: undefined,
     };
   });
 
@@ -91,6 +93,7 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
       startTime: query.operationTime?.[0].toISOString(),
       endTime: query.operationTime?.[1].toISOString(),
       operationTargetAccountName: accountName,
+      operationDetail: query.operationDetail,
       page: pageInfo.page,
       pageSize: pageInfo.pageSize,
     } });
@@ -121,8 +124,8 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
           initialValues={query}
           onFinish={async () => {
             const { operationType, operatorUserId,
-              operationResult, operationTime } = await form.validateFields();
-            setQuery({ operationType, operatorUserId, operationResult, operationTime });
+              operationResult, operationTime, operationDetail } = await form.validateFields();
+            setQuery({ operationType, operatorUserId, operationResult, operationTime, operationDetail });
             setPageInfo({ page: 1, pageSize: pageInfo.pageSize });
           }}
         >
@@ -154,6 +157,9 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
               <Input style={{ width: 150 }} />
             </Form.Item>
           )}
+          <Form.Item label="操作内容" name="operationDetail">
+            <Input style={{ width: 150 }} />
+          </Form.Item>
           <Form.Item label={t(p("operationTime"))} name="operationTime">
             <DatePicker.RangePicker showTime allowClear={false} presets={getDefaultPresets(languageId)} />
           </Form.Item>

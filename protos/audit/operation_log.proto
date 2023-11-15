@@ -415,6 +415,9 @@ message OperationLogFilter {
   optional google.protobuf.Timestamp start_time = 4;
   optional google.protobuf.Timestamp end_time = 5;
   optional OperationResult operation_result = 6;
+
+  // 对operation_event里的信息进行搜索
+  optional string operation_detail = 7;
 }
 
 message GetOperationLogsRequest {
