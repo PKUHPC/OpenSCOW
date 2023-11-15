@@ -13,7 +13,7 @@
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { Server } from "@ddadaal/tsgrpc-server";
 import { credentials } from "@grpc/grpc-js";
-import { I18nStringType } from "@scow/lib-server";
+import { I18nStringType } from "@scow/config/build/i18n";
 import { appCustomAttribute_AttributeTypeToJSON, AppServiceClient } from "@scow/protos/build/portal/app";
 import { createServer } from "src/app";
 import { getI18nTypeFormat } from "tests/file/utils";

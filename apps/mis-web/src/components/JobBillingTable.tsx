@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/i18n";
+import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { Table } from "antd";
 import { ColumnsType } from "antd/es/table";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";

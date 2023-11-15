@@ -11,6 +11,7 @@
  */
 
 import { formatDateTime, getDefaultPresets } from "@scow/lib-web/build/utils/datetime";
+import { DEFAULT_PAGE_SIZE } from "@scow/lib-web/build/utils/pagination";
 import { JobInfo } from "@scow/protos/build/common/ended_job";
 import { Money } from "@scow/protos/build/common/money";
 import { Static } from "@sinclair/typebox";
@@ -81,7 +82,7 @@ export const AdminJobTable: React.FC<Props> = () => {
   });
   const [form] = Form.useForm<FilterForm>();
 
-  const [pageInfo, setPageInfo] = useState<PageInfo>({ page: 1, pageSize: 10 });
+  const [pageInfo, setPageInfo] = useState<PageInfo>({ page: 1, pageSize: DEFAULT_PAGE_SIZE });
 
   const promiseFn = useCallback(async () => {
     return await api.getJobInfo({ query: {
@@ -254,7 +255,7 @@ const JobInfoTable: React.FC<JobInfoTableProps> = ({
         loading={isLoading}
         pagination={setPageInfo ? {
           current: pageInfo.page,
-          defaultPageSize: 10,
+          defaultPageSize: DEFAULT_PAGE_SIZE,
           pageSize: pageInfo.pageSize,
           showSizeChanger: true,
           total: data?.totalCount,
