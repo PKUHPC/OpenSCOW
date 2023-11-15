@@ -13,7 +13,7 @@
 import { chmodSync, mkdirSync } from "fs";
 import path from "path";
 import { LoggingOption, ServiceSpec } from "src/compose/spec";
-import { InstallConfigSchema } from "src/config/install";
+import { AuthCustomType, InstallConfigSchema } from "src/config/install";
 
 const IMAGE: string = "mirrors.pku.edu.cn/pkuhpc-icode/scow";
 
@@ -154,10 +154,17 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
       authVolumes[key] = config.auth.custom.volumes[key];
     }
 
+    const authUrl = config.auth.custom.type === AuthCustomType.external
+      && config.auth.custom.external?.url !== undefined
+      ? config.auth.custom.external.url : "http://auth:5000";
+
     addService("auth", {
       image: config.auth.custom.image,
       ports: config.auth.custom.ports ?? {},
-      environment: config.auth.custom.environment ?? {},
+      environment: {
+        ...config.auth.custom.environment,
+        "AUTH_URL": authUrl,
+      },
       volumes: authVolumes,
     });
   } else {
