@@ -116,28 +116,26 @@ export async function fetchJobs(
           continue;
         }
 
-        // add job charge for user account
-        const ua = await em.findOne(UserAccount, {
-          account: { accountName: pricedJob.account },
-          user: { userId: pricedJob.user },
+        const account = await em.findOne(Account, {
+          accountName: pricedJob.account,
         }, {
-          populate: ["user", "account", "account.tenant"],
+          populate: ["tenant"],
         });
 
-        if (!ua) {
+        if (!account) {
           logger.warn({ biJobIndex: pricedJob.biJobIndex },
-            "User %s in account %s is not found. Don't charge the job.", pricedJob.user, pricedJob.account);
+            "Account %s is not found. Don't charge the job.", pricedJob.account);
         }
 
         const comment = parsePlaceholder(misConfig.jobChargeComment, pricedJob);
 
-        if (ua) {
+        if (account) {
           // charge account
           await charge({
             amount: pricedJob.accountPrice,
             type: misConfig.jobChargeType,
             comment,
-            target: ua.account.$,
+            target: account,
           }, em, logger, clusterPlugin);
 
           // charge tenant
@@ -145,10 +143,24 @@ export async function fetchJobs(
             amount: pricedJob.tenantPrice,
             type: misConfig.jobChargeType,
             comment,
-            target: ua.account.$.tenant.getEntity(),
+            target: account.tenant.$,
           }, em, logger, clusterPlugin);
 
-          await addJobCharge(ua, pricedJob.accountPrice, clusterPlugin, logger);
+          const ua = await em.findOne(UserAccount, {
+            account: { accountName: pricedJob.account },
+            user: { userId: pricedJob.user },
+          }, {
+            populate: ["user", "account"],
+          });
+
+          if (!ua) {
+            logger.warn({ biJobIndex: pricedJob.biJobIndex },
+              "User %s in account %s is not found.", pricedJob.user, pricedJob.account);
+          } else {
+            // 用户限额及相关操作
+            await addJobCharge(ua, pricedJob.accountPrice, clusterPlugin, logger);
+          }
+
         }
 
         pricedJobs.push(pricedJob);
