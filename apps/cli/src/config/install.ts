@@ -89,7 +89,7 @@ export const InstallConfigSchema = Type.Object({
     })),
 
     custom: Type.Optional(Type.Object({
-      type: Type.Enum(AuthCustomType, { description: "自定义认证系统类型" }),
+      type: Type.Enum(AuthCustomType, { description: "自定义认证系统类型", default: AuthCustomType.image }),
       external: Type.Optional(Type.Object({
         url: Type.String({ description: "自定义认证系统的 URL" }),
       })),
