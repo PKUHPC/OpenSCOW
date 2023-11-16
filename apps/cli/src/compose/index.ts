@@ -161,7 +161,10 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
     addService("auth", {
       image: config.auth.custom.image,
       ports: config.auth.custom.ports ?? {},
-      environment: {
+      environment: Array.isArray(config.auth.custom.environment) ? [
+        ...config.auth.custom.environment,
+        `AUTH_URL=${authUrl}`,
+      ] : {
         ...config.auth.custom.environment,
         "AUTH_URL": authUrl,
       },
