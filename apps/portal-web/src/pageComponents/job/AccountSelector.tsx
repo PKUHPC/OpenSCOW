@@ -24,9 +24,10 @@ interface Props {
   value?: string;
   onChange?: (value: string) => void;
   onlyNormalAccounts?: boolean;
+  onOptionsChange?: (options: string[]) => void;
 }
 
-export const AccountSelector: React.FC<Props> = ({ cluster, onChange, value, onlyNormalAccounts }) => {
+export const AccountSelector: React.FC<Props> = ({ cluster, onChange, value, onlyNormalAccounts, onOptionsChange }) => {
   const userStore = useStore(UserStore);
   const { message } = App.useApp();
 
@@ -52,8 +53,11 @@ export const AccountSelector: React.FC<Props> = ({ cluster, onChange, value, onl
       if (!value || !data.accounts.includes(value)) {
         onChange?.(data.accounts[0]);
       }
+      if (onOptionsChange) {
+        onOptionsChange(data.accounts);
+      }
     }
-  }, [data, value]);
+  }, [data, value, onOptionsChange]);
 
   const t = useI18nTranslateToString();
   const p = prefix("pageComp.job.accountSelector.");

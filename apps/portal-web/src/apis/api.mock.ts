@@ -240,6 +240,8 @@ export const mockApi: MockApi<typeof api> = {
 
   getAvailableAccounts: async () => ({ accounts: ["123"]}),
 
+  getAvailablePartitionsForCluster: async () => ({ partitions: []}),
+
 };
 
 

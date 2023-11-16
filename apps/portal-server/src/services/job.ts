@@ -325,7 +325,6 @@ export const jobServiceServer = plugin((server) => {
       return [ { accounts: availableAccounts } ];
     },
 
-
   });
 
 });

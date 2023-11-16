@@ -22,11 +22,13 @@ import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { CodeEditor } from "src/components/CodeEditor";
 import { prefix, useI18nTranslateToString } from "src/i18n";
-import { AccountSelector } from "src/pageComponents/job/AccountSelector";
 import { FileSelectModal } from "src/pageComponents/job/FileSelectModal";
+import { Partition } from "src/pages/api/cluster";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { Cluster, publicConfig } from "src/utils/config";
 import { formatSize } from "src/utils/format";
+
+import { AccountListSelector } from "./AccountListSelector";
 
 interface JobForm {
   cluster: Cluster;
@@ -125,31 +127,79 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
 
   const gpuCount = Form.useWatch("gpuCount", form) as number;
 
+
+  const [selectedAccount, setSelectedAccount] = useState<string>(initial.account ?? "");
+  const [accountsReloadTrigger, setAccountsReloadTrigger] = useState(false);
+  const handleAccountsReload = () => {
+    setAccountsReloadTrigger((prev) => prev = !prev);
+  };
+
+  // 获取可以使用的账户名及对应可用分区
+  const availableAccountsPartitionsInfo = useAsync({
+
+    promiseFn: useCallback(async () => {
+      const availableAccountsPartitionsMap: Record<string, Partition[]> = {};
+      if (cluster) {
+        const resp = await api.getAccounts({ query: { cluster: cluster.id } })
+          .httpError(404, (error) => { message.error(error.message); });
+        const availableAccounts = resp && resp.accounts.length ? await api.getAvailableAccounts({ query:
+          { cluster: cluster.id, accounts: resp.accounts } }) : { accounts: []};
+
+        if (availableAccounts.accounts) {
+          await Promise.allSettled(availableAccounts.accounts.map(async (account) => {
+            await api.getAvailablePartitionsForCluster({ query: {
+              cluster: cluster?.id,
+              accountName: account,
+            } })
+              .then((data) => {
+                availableAccountsPartitionsMap[account] = data.partitions;
+              });
+          }));
+        }
+        return availableAccountsPartitionsMap;
+      }
+    }, [cluster, accountsReloadTrigger]),
+  });
+
+
+  const [currentAccountPartitions, setCurrentAccountPartitions] = useState<Partition[]>([]);
+
+  useEffect(() => {
+    if (selectedAccount &&
+      availableAccountsPartitionsInfo.data &&
+      Object.keys(availableAccountsPartitionsInfo.data).includes(selectedAccount)) {
+
+      setCurrentAccountPartitions(availableAccountsPartitionsInfo.data[selectedAccount]);
+
+      // 如果是从模板导入，判断模板中的账户是否仍然在可用账户分区列表中
+      // 并且判断当前选中的分区中是否仍有模板中的partition，若有，则将默认值设为模板值；
+      const setValueFromTemplate = initial.account === selectedAccount && initial.partition &&
+    availableAccountsPartitionsInfo.data[selectedAccount].some((item) => { return item.name === initial.partition; });
+      const partition = availableAccountsPartitionsInfo.data[selectedAccount][0];
+      const setInitialValues = setValueFromTemplate ? {
+        partition: initial.partition,
+        qos: initial.qos,
+      } : {
+        partition: partition.name,
+        qos: partition.qos?.[0],
+      };
+      form.setFieldsValue(setInitialValues);
+    }
+
+    const jobInitialName = genJobName();
+    form.setFieldValue("jobName", jobInitialName);
+
+  }, [selectedAccount, availableAccountsPartitionsInfo.data]);
+
   const calculateWorkingDirectory = (template: string, homePath: string = "") =>
     join(homePath + "/", parsePlaceholder(template, { name: jobName }));
 
+  // TODO调度器类别
   const clusterInfoQuery = useAsync({
     promiseFn: useCallback(async () => cluster
       ? api.getClusterInfo({ query: { cluster:  cluster?.id } }) : undefined, [cluster]),
     onResolve: (data) => {
-
-      if (data) {
-        // 如果是从模板导入，则判断当前选中的分区中是否仍有模板中的partition，若有，则将默认值设为模板值；
-        const setValueFromTemplate = initial.partition &&
-          data.clusterInfo.scheduler.partitions.some((item) => { return item.name === initial.partition; });
-        const partition = data.clusterInfo.scheduler.partitions[0];
-        const setInitialValues = setValueFromTemplate ? {
-          partition: initial.partition,
-          qos: initial.qos,
-        } : {
-          partition: partition.name,
-          qos: partition.qos?.[0],
-        };
-        form.setFieldsValue(setInitialValues);
-      }
-
-      const jobInitialName = genJobName();
-      form.setFieldValue("jobName", jobInitialName);
+      const schedulerName = data?.clusterInfo.scheduler.name;
     },
   });
 
@@ -170,10 +220,10 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
   }, [jobName, clusterInfoQuery.data, homePath?.path]);
 
   const currentPartitionInfo = useMemo(() =>
-    clusterInfoQuery.data
-      ? clusterInfoQuery.data.clusterInfo.scheduler.partitions.find((x) => x.name === partition)
+    currentAccountPartitions
+      ? currentAccountPartitions.find((x) => x.name === partition)
       : undefined,
-  [clusterInfoQuery.data, partition],
+  [currentAccountPartitions, partition],
   );
 
   useEffect(() => {
@@ -240,7 +290,16 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
             dependencies={["cluster"]}
           >
             {/* 加载完集群后再加载账户，保证initial值能被赋值成功 */}
-            {cluster?.id && <AccountSelector cluster={cluster.id} onlyNormalAccounts={true} />}
+            { cluster?.id &&
+              (
+                <AccountListSelector
+                  selectableAccounts={availableAccountsPartitionsInfo?.data ?
+                    Object.keys(availableAccountsPartitionsInfo?.data) : []}
+                  isLoading={availableAccountsPartitionsInfo.isLoading}
+                  onReload={handleAccountsReload}
+                  onChange={(value) => setSelectedAccount(value)}
+                />
+              )}
           </Form.Item>
         </Col>
         <Col span={24} sm={6}>
@@ -252,7 +311,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
           >
             <Select
               loading={clusterInfoQuery.isLoading}
-              disabled={!currentPartitionInfo}
+              disabled={!currentPartitionInfo || availableAccountsPartitionsInfo.isLoading}
               options={clusterInfoQuery.data
                 ? clusterInfoQuery.data.clusterInfo.scheduler.partitions
                   .map((x) => ({ label: x.name, value: x.name }))
@@ -269,7 +328,11 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
             rules={[{ required: true }]}
           >
             <Select
-              disabled={(!currentPartitionInfo?.qos) || currentPartitionInfo.qos.length === 0}
+              disabled={
+                (!currentPartitionInfo?.qos) ||
+                currentPartitionInfo.qos.length === 0 ||
+                availableAccountsPartitionsInfo.isLoading
+              }
               options={currentPartitionInfo?.qos?.map((x) => ({ label: x, value: x }))}
             />
           </Form.Item>
