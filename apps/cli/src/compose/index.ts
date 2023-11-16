@@ -126,6 +126,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
       "PUBLIC_PATH": publicPath,
       "PUBLIC_DIR": publicDir,
       "EXTRA": config.gateway.extra,
+      "AUTH_URL": config.auth.custom?.external?.url || "http://auth:5000",
     },
     ports: { [config.port]: 80 },
     volumes: {
@@ -163,30 +164,10 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
     addService("auth", {
       image,
       ports: (config.auth.custom.imageConfig?.ports || config.auth.custom.ports) ?? {},
-      environment: Array.isArray(config.auth.custom.environment) ? [
-        ...config.auth.custom.environment,
-        `AUTH_URL=${"http://auth:5000"}`,
-      ] : {
-        ...config.auth.custom.environment,
-        "AUTH_URL": "http://auth:5000",
-      },
+      environment: config.auth.custom.environment ?? {},
       volumes: authVolumes,
     });
-  } else if (config.auth.custom?.type === AuthCustomType.external) {
-    
-    addService("auth", {
-      image: "",
-      ports: {},
-      environment: Array.isArray(config.auth.custom.environment) ? [
-        ...config.auth.custom.environment,
-        `AUTH_URL=${config.auth.custom.external?.url || "http://auth:5000"}`,
-      ] : {
-        ...config.auth.custom.environment,
-        "AUTH_URL": config.auth.custom.external?.url || "http://auth:5000",
-      },
-      volumes: authVolumes,
-    });
-  } else {
+  } else if (config.auth.custom === undefined) {
     const portalBasePath = join(BASE_PATH, PORTAL_PATH);
 
     addService("auth", {
