@@ -56,7 +56,6 @@ crossClusterFileTransfer:
   # 传输节点的地址(ip地址:端口号)
   transferNode: localhost:22222
 
-
 ```
 
 ## 注意
