@@ -114,6 +114,11 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
   const publicDir = "/app/apps/gateway/public/";
 
   // GATEWAY
+  const authUrl = config.auth.custom?.type === AuthCustomType.external
+    ? config.auth.custom.external?.url : "http://auth:5000";
+  if (authUrl === undefined) {
+    throw new Error("Invalid config: when /auth/custom/type is external, /auth/custom/external/url is required");
+  }
   addService("gateway", {
     image: scowImage,
     environment: {
@@ -126,7 +131,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
       "PUBLIC_PATH": publicPath,
       "PUBLIC_DIR": publicDir,
       "EXTRA": config.gateway.extra,
-      "AUTH_URL": config.auth.custom?.external?.url || "http://auth:5000",
+      "AUTH_URL": authUrl,
     },
     ports: { [config.port]: 80 },
     volumes: {
@@ -211,6 +216,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
         "MIS_URL": join(BASE_PATH, MIS_PATH),
         "MIS_DEPLOYED": config.mis ? "true" : "false",
         "AUTH_EXTERNAL_URL": join(BASE_PATH, "/auth"),
+        "AUTH_INTERNAL_URL": authUrl,
         "NOVNC_CLIENT_URL": join(BASE_PATH, "/vnc"),
         "CLIENT_MAX_BODY_SIZE": config.gateway.uploadFileSizeLimit,
         "PUBLIC_PATH": join(BASE_PATH, publicPath),
@@ -256,6 +262,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
         "PORTAL_URL": join(BASE_PATH, PORTAL_PATH),
         "PORTAL_DEPLOYED": config.portal ? "true" : "false",
         "AUTH_EXTERNAL_URL": join(BASE_PATH, "/auth"),
+        "AUTH_INTERNAL_URL": authUrl,
         "PUBLIC_PATH": join(BASE_PATH, publicPath),
         "AUDIT_DEPLOYED": config.audit ? "true" : "false",
       },
