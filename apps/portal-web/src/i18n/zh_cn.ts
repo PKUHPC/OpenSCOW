@@ -201,7 +201,7 @@ export default {
         cantReadFile: "无法读取文件: {}",
         saveFileFail: "文件保存失败: {}",
         saveFileSuccess: "文件保存成功",
-        fileSizeExceeded: "文件过大，请下载后编辑",
+        fileSizeExceeded: "文件过大（最大{}），请下载后编辑",
       },
       createFileModal: {
         createErrorMessage: "同名文件或者目录已经存在！",
@@ -212,7 +212,7 @@ export default {
       },
       fileManager: {
         preview: {
-          cantPreview: "文件过大或者格式不支持，请下载后查看",
+          cantPreview: "文件过大（最大{}）或者格式不支持，请下载后查看",
         },
         moveCopy: {
           copy: "复制",

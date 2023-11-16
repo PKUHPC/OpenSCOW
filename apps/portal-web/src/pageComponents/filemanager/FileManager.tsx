@@ -318,14 +318,20 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
 
   const handlePreview = (filename: string, fileSize: number) => {
 
+    const filePreviewLimitSize = publicConfig.FILE_PREVIEW_SIZE || DEFAULT_FILE_PREVIEW_LIMIT_SIZE;
+    if (fileSize > convertToBytes(filePreviewLimitSize)) {
+      message.info(t(p("preview.cantPreview"), [filePreviewLimitSize]));
+      return;
+    }
+
     if (isImage(filename)) {
       setPreviewImage({
         ...previewImage,
         visible: true,
         src: urlToDownload(cluster.id, join(path, filename), false),
       });
-    } else if (canPreviewWithEditor(filename)
-      && fileSize <= convertToBytes(publicConfig.FILE_PREVIEW_SIZE || DEFAULT_FILE_PREVIEW_LIMIT_SIZE)) {
+      return;
+    } else if (canPreviewWithEditor(filename)) {
       setPreviewFile({
         open: true,
         filename,
@@ -333,8 +339,10 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
         filePath: join(path, filename),
         clusterId: cluster.id,
       });
+      return;
     } else {
-      message.info(t(p("preview.cantPreview")));
+      message.info(t(p("preview.cantPreview"), [filePreviewLimitSize]));
+      return;
     }
   };
 

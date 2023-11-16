@@ -201,7 +201,7 @@ export default {
         cantReadFile: "Cannot read file: {}",
         saveFileFail: "File save failed: {}",
         saveFileSuccess: "File saved successfully",
-        fileSizeExceeded: "The file is too large, please download and edit it.",
+        fileSizeExceeded: "File too large (maximum {}), please download and edit",
       },
       createFileModal: {
         createErrorMessage: "File or directory with the same name already exists!",
@@ -212,7 +212,7 @@ export default {
       },
       fileManager: {
         preview: {
-          cantPreview: "文件过大或者格式不支持，请下载后查看",
+          cantPreview: "File too large (maximum {}) or format not supported, please download to view",
         },
         moveCopy: {
           copy: "Copy",

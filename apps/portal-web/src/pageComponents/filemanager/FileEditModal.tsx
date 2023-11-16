@@ -184,7 +184,6 @@ export const FileEditModal: React.FC<Props> = ({ previewFile, setPreviewFile }) 
     setIsEdit(false);
     setMode(Mode.PREVIEW);
     setFileContent("");
-    setIsFullScreen(false);
     setOptions({
       ...options,
       readOnly: true,
@@ -193,6 +192,7 @@ export const FileEditModal: React.FC<Props> = ({ previewFile, setPreviewFile }) 
       ...previewFile,
       open: false,
     });
+    setIsFullScreen(false);
   };
 
   const handleClose = () => {
@@ -329,9 +329,10 @@ export const FileEditModal: React.FC<Props> = ({ previewFile, setPreviewFile }) 
   );
 
   const modalFooterRender = () => {
+    const fileEditLimitSize = publicConfig.FILE_EDIT_SIZE || DEFAULT_FILE_EDIT_LIMIT_SIZE;
     return (
       mode === Mode.PREVIEW ? (
-        fileSize <= convertToBytes(publicConfig.FILE_EDIT_SIZE || DEFAULT_FILE_EDIT_LIMIT_SIZE)
+        fileSize <= convertToBytes(fileEditLimitSize)
           ? (
             <Button
               type="primary"
@@ -348,7 +349,7 @@ export const FileEditModal: React.FC<Props> = ({ previewFile, setPreviewFile }) 
           )
           : (
             <Tooltip
-              title={downloading ? t(p("fileLoading")) : t(p("fileSizeExceeded"))}
+              title={downloading ? t(p("fileLoading")) : t(p("fileSizeExceeded"), [fileEditLimitSize])}
             >
               <Button disabled={true}>{t(p("edit"))}</Button>
             </Tooltip>
