@@ -61,7 +61,9 @@ describe("sets custom auth environment", () => {
     const configPath = await createInstallYaml({
       auth: {
         custom: {
-          image: "",
+          image: {
+            imageName: "",
+          },
           environment: {
             "CUSTOM_AUTH_KEY": "CUSTOM_AUTH_VALUE",
           },
@@ -79,7 +81,9 @@ describe("sets custom auth environment", () => {
     const configPath = await createInstallYaml({
       auth: {
         custom: {
-          image: "",
+          image: {
+            imageName: "",
+          },
           environment: [
             "CUSTOM_AUTH_KEY=CUSTOM_AUTH_VALUE",
           ],
