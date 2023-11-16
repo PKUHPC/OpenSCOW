@@ -150,8 +150,8 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
   };
 
   if (config.auth.custom) {
-    for (const key in config.auth.custom.volumes) {
-      authVolumes[key] = config.auth.custom.volumes[key];
+    for (const key in config.auth.custom.image?.volumes) {
+      authVolumes[key] = config.auth.custom.image?.volumes[key];
     }
 
     const authUrl = config.auth.custom.type === AuthCustomType.external
@@ -159,8 +159,8 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
       ? config.auth.custom.external.url : "http://auth:5000";
 
     addService("auth", {
-      image: config.auth.custom.image,
-      ports: config.auth.custom.ports ?? {},
+      image: config.auth.custom.image?.imageName ?? "",
+      ports: config.auth.custom.image?.ports ?? {},
       environment: Array.isArray(config.auth.custom.environment) ? [
         ...config.auth.custom.environment,
         `AUTH_URL=${authUrl}`,

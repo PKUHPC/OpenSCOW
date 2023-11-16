@@ -91,17 +91,19 @@ export const InstallConfigSchema = Type.Object({
     custom: Type.Optional(Type.Object({
       type: Type.Enum(AuthCustomType, { description: "自定义认证系统类型", default: AuthCustomType.image }),
       external: Type.Optional(Type.Object({
-        url: Type.String({ description: "自定义认证系统的 URL" }),
+        url: Type.String({ description: "认证系统的 URL" }),
       })),
-      image: Type.String({ description: "认证系统镜像" }),
-      ports: Type.Optional(Type.Array(Type.String(), { description: "端口映射" })),
+      image: Type.Optional(Type.Object({
+        imageName: Type.String({ description: "认证系统镜像名" }),
+        ports: Type.Optional(Type.Array(Type.String(), { description: "端口映射" })),
+        volumes: Type.Optional(Type.Array(Type.String(), {
+          description: "更多挂载卷。默认添加/etc/hosts:/etc/hosts和./config:/etc/scow",
+        })),
+      }, { description: "认证系统镜像" })),
       environment: Type.Optional(Type.Union([
         Type.Array(Type.String({ description: "格式：变量名=变量值" })),
         Type.Record(Type.String(), Type.String(), { description: "格式：字符串: 字符串" }),
       ], { description: "环境变量配置" })),
-      volumes: Type.Optional(Type.Array(Type.String(), {
-        description: "更多挂载卷。默认添加/etc/hosts:/etc/hosts和./config:/etc/scow",
-      })),
     }, { description: "自定义认证系统配置" })),
   }, { default: {} }),
 
