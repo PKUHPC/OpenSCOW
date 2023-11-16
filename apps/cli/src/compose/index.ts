@@ -172,7 +172,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
       environment: config.auth.custom.environment ?? {},
       volumes: authVolumes,
     });
-  } else if (config.auth.custom === undefined) {
+  } else if (config.auth.custom === undefined || config.auth.custom.type !== AuthCustomType.external) {
     const portalBasePath = join(BASE_PATH, PORTAL_PATH);
 
     addService("auth", {
