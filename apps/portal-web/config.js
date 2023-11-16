@@ -194,6 +194,10 @@ const buildRuntimeConfig = async (phase, basePath) => {
 
     CLIENT_MAX_BODY_SIZE: config.CLIENT_MAX_BODY_SIZE,
 
+    FILE_EDIT_SIZE: portalConfig.file?.edit.limitSize,
+
+    FILE_PREVIEW_SIZE: portalConfig.file?.preview.limitSize,
+
     CROSS_CLUSTER_FILE_TRANSFER_ENABLED:
       Object.values(clusters).filter(
         (cluster) => cluster.crossClusterFileTransfer?.enabled).length > 1,

@@ -6,11 +6,12 @@
     "dev": "cross-env NEXT_PUBLIC_USE_MOCK=1 TS_NODE_PROJECT=tsconfig.server.json node --watch -r ts-node/register -r tsconfig-paths/register server/index.ts",
     "dev:server": "cross-env NEXT_PUBLIC_USE_MOCK=0 TS_NODE_PROJECT=tsconfig.server.json node --watch -r ts-node/register -r tsconfig-paths/register server/index.ts",
     "serve": "node build/server/index.js",
-    "build": "npm run build:next && npm run build:ts",
+    "build": "node scripts/copyMonacoToPublic.js && npm run build:next && npm run build:ts",
     "build:next": "next build",
     "build:ts": "rimraf build && tsc -p tsconfig.server.json && tsc-alias -p tsconfig.server.json",
     "test": "jest --passWithNoTests",
-    "client": "ntar client"
+    "client": "ntar client",
+    "prepareDev": "node scripts/copyMonacoToPublic.js"
   },
   "files": [
     ".next",
@@ -26,6 +27,7 @@
   "license": "Mulan PSL v2",
   "repository": "https://glithub.com/PKUHPC/SCOW",
   "dependencies": {
+    "@ant-design/cssinjs": "1.16.2",
     "@ant-design/icons": "5.2.5",
     "@codemirror/language": "6.9.0",
     "@codemirror/legacy-modes": "6.3.3",
@@ -34,18 +36,18 @@
     "@ddadaal/tsgrpc-client": "0.17.6",
     "@ddadaal/tsgrpc-common": "0.2.4",
     "@grpc/grpc-js": "1.9.5",
+    "@monaco-editor/react": "^4.6.0",
     "@scow/config": "workspace:*",
     "@scow/lib-auth": "workspace:*",
     "@scow/lib-config": "workspace:*",
     "@scow/lib-decimal": "workspace:*",
+    "@scow/lib-operation-log": "workspace:*",
     "@scow/lib-ssh": "workspace:*",
     "@scow/lib-web": "workspace:*",
     "@scow/protos": "workspace:*",
-    "@scow/utils": "workspace:*",
-    "@scow/lib-operation-log": "workspace:*",
     "@scow/rich-error-model": "workspace:*",
+    "@scow/utils": "workspace:*",
     "@sinclair/typebox": "0.31.1",
-    "@ant-design/cssinjs": "1.16.2",
     "@uiw/codemirror-theme-github": "4.21.9",
     "@uiw/react-codemirror": "4.21.9",
     "antd": "5.8.4",
@@ -64,14 +66,14 @@
     "react-async": "10.0.1",
     "react-dom": "18.2.0",
     "react-is": "18.2.0",
+    "react-typed-i18n": "2.3.0",
     "simstate": "3.0.1",
     "styled-components": "6.0.7",
     "tslib": "2.6.2",
     "typescript": "5.1.6",
     "ws": "8.13.0",
     "xterm": "5.2.1",
-    "xterm-addon-fit": "0.7.0",
-    "react-typed-i18n": "2.3.0"
+    "xterm-addon-fit": "0.7.0"
   },
   "devDependencies": {
     "@ddadaal/next-typed-api-routes-cli": "0.9.1",
@@ -93,6 +95,9 @@
     "postcss": "8.4.28",
     "ts-log": "2.2.5",
     "webpack": "5.88.2"
+  },
+  "peerDependencies": {
+    "monaco-editor": "0.44.0"
   },
   "browserslist": {
     "production": [
