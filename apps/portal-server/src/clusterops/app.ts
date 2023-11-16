@@ -32,6 +32,7 @@ import { getIpFromProxyGateway } from "src/utils/proxy";
 import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
 import { displayIdToPort, getTurboVNCBinPath, parseDisplayId,
   refreshPassword, refreshPasswordByProxyGateway } from "src/utils/turbovnc";
+import { Logger } from "ts-log";
 
 interface SessionMetadata {
   sessionId: string;
@@ -63,6 +64,27 @@ const BIN_BASH_SCRIPT_HEADER = "#!/bin/bash -l\n";
 
 const errorInfo = (reason: string) =>
   ErrorInfo.create({ domain: "", reason: reason, metadata: {} });
+
+const getAppConnectionInfoFromAdapter = async (cluster: string, jobId: number, logger: Logger) => {
+  const client = getAdapterClient(cluster);
+  const minRequiredApiVersion: ApiVersion = { major: 1, minor: 3, patch: 0 };
+  try {
+    await checkSchedulerApiVersion(client, minRequiredApiVersion);
+    // get connection info
+    // for apps running in containers, it can provide real ip and port info
+    const connectionInfo = await asyncClientCall(client.app, "getAppConnectionInfo", {
+      jobId: jobId,
+    });
+    return connectionInfo;
+  } catch (e: any) {
+    if (e.code === Status.UNIMPLEMENTED || e.code === Status.FAILED_PRECONDITION) {
+      logger.warn(e.details);
+    } else {
+      throw e;
+    }
+  }
+
+};
 
 export const appOps = (cluster: string): AppOps => {
 
@@ -351,25 +373,10 @@ export const appOps = (cluster: string): AppOps => {
               }
             }
 
-            const minRequiredApiVersion: ApiVersion = { major: 1, minor: 3, patch: 0 };
-            try {
-              await checkSchedulerApiVersion(client, minRequiredApiVersion);
-              // get connection info
-              // for apps running in containers, it can provide real ip and port info
-              const connectionInfo = await asyncClientCall(client.app, "getAppConnectionInfo", {
-                jobId: sessionMetadata.jobId,
-              });
-              if (connectionInfo.response?.$case == "appConnectionInfo") {
-                host = connectionInfo.response.appConnectionInfo.host;
-                port = connectionInfo.response.appConnectionInfo.port;
-              }
-            } catch (e: any) {
-              if (e.code === Status.UNIMPLEMENTED || e.code === Status.FAILED_PRECONDITION) {
-                logger.warn(e.details);
-              } else {
-                throw e;
-              }
-
+            const connectionInfo = await getAppConnectionInfoFromAdapter(cluster, sessionMetadata.jobId, logger);
+            if (connectionInfo?.response?.$case === "appConnectionInfo") {
+              host = connectionInfo.response.appConnectionInfo.host;
+              port = connectionInfo.response.appConnectionInfo.port;
             }
           }
 
@@ -421,29 +428,14 @@ export const appOps = (cluster: string): AppOps => {
 
         const app = apps[sessionMetadata.appId];
 
-        const client = getAdapterClient(cluster);
-        const minRequiredApiVersion: ApiVersion = { major: 1, minor: 3, patch: 0 };
-        try {
-          await checkSchedulerApiVersion(client, minRequiredApiVersion);
-          // get connection info
-          // for apps running in containers, it can provide real ip and port info
-          const connectionInfo = await asyncClientCall(client.app, "getAppConnectionInfo", {
-            jobId: sessionMetadata.jobId,
-          });
-          if (connectionInfo.response?.$case == "appConnectionInfo") {
-            return {
-              appId: sessionMetadata.appId,
-              host: connectionInfo.response.appConnectionInfo.host,
-              port: connectionInfo.response.appConnectionInfo.port,
-              password: connectionInfo.response.appConnectionInfo.password,
-            };
-          }
-        } catch (e: any) {
-          if (e.code === Status.UNIMPLEMENTED || e.code === Status.FAILED_PRECONDITION) {
-            logger.warn(e.details);
-          } else {
-            throw e;
-          }
+        const connectionInfo = await getAppConnectionInfoFromAdapter(cluster, sessionMetadata.jobId, logger);
+        if (connectionInfo?.response?.$case === "appConnectionInfo") {
+          return {
+            appId: sessionMetadata.appId,
+            host: connectionInfo.response.appConnectionInfo.host,
+            port: connectionInfo.response.appConnectionInfo.port,
+            password: connectionInfo.response.appConnectionInfo.password,
+          };
         }
 
         if (app.type === "web") {
