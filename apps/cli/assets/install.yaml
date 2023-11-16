@@ -69,7 +69,7 @@
 #       url: http://custom-url:port
 
 #     # 容器相关配置
-#     image:
+#     imageConfig:
 #       # 自定义认证系统镜像名。必填
 #       # imageName: my-custom-auth:v1.0
 
@@ -77,10 +77,23 @@
 #       # ports:
 #       #   - "5000:5000"
 
-  #     # 更多挂载卷。可选
-  #     # 默认添加/etc/hosts:/etc/hosts和./config:/etc/scow
-  #     # volumes:
-  #     #   - "./myfile:/etc/myfile"
+#       # 更多挂载卷。可选
+#       # 默认添加/etc/hosts:/etc/hosts和./config:/etc/scow
+#       # volumes:
+#       #   - "./myfile:/etc/myfile"
+
+#     # 兼容老版本
+#     # 定义认证系统镜像名。必填
+#     # image: my-custom-auth:v1.0
+
+#     # 端口映射。可选
+#     # ports:
+#     #   - "5000:5000"
+
+#     # 更多挂载卷。可选
+#     # 默认添加/etc/hosts:/etc/hosts和./config:/etc/scow
+#     # volumes:
+#     #   - "./myfile:/etc/myfile"
 
 #     # 环境变量，可选。
 #     # environment:

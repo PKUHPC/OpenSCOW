@@ -149,24 +149,40 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
     "~/.ssh": "/root/.ssh",
   };
 
-  if (config.auth.custom) {
-    for (const key in config.auth.custom.image?.volumes) {
-      authVolumes[key] = config.auth.custom.image?.volumes[key];
+  if (config.auth.custom?.type === AuthCustomType.image) {
+    const volumes = config.auth.custom.imageConfig?.volumes || config.auth.custom.volumes;
+    for (const key in volumes) {
+      authVolumes[key] = volumes[key];
     }
 
-    const authUrl = config.auth.custom.type === AuthCustomType.external
-      && config.auth.custom.external?.url !== undefined
-      ? config.auth.custom.external.url : "http://auth:5000";
+    const image = config.auth.custom.imageConfig?.imageName || config.auth.custom.image;
+    if (image === undefined) {
+      throw new Error("Invalid config: must have /auth/custom/image or /auth/custom/imageConfig/imageName");
+    }
 
     addService("auth", {
-      image: config.auth.custom.image?.imageName ?? "",
-      ports: config.auth.custom.image?.ports ?? {},
+      image,
+      ports: (config.auth.custom.imageConfig?.ports || config.auth.custom.ports) ?? {},
       environment: Array.isArray(config.auth.custom.environment) ? [
         ...config.auth.custom.environment,
-        `AUTH_URL=${authUrl}`,
+        `AUTH_URL=${"http://auth:5000"}`,
       ] : {
         ...config.auth.custom.environment,
-        "AUTH_URL": authUrl,
+        "AUTH_URL": "http://auth:5000",
+      },
+      volumes: authVolumes,
+    });
+  } else if (config.auth.custom?.type === AuthCustomType.external) {
+    
+    addService("auth", {
+      image: "",
+      ports: {},
+      environment: Array.isArray(config.auth.custom.environment) ? [
+        ...config.auth.custom.environment,
+        `AUTH_URL=${config.auth.custom.external?.url || "http://auth:5000"}`,
+      ] : {
+        ...config.auth.custom.environment,
+        "AUTH_URL": config.auth.custom.external?.url || "http://auth:5000",
       },
       volumes: authVolumes,
     });
