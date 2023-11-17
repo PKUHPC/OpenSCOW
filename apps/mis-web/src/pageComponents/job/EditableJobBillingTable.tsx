@@ -11,7 +11,7 @@
  */
 
 import { numberToMoney } from "@scow/lib-decimal";
-import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/i18n";
+import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { App, Form, Input, InputNumber, Modal, Select, Space, Table } from "antd";
 import { ColumnsType } from "antd/es/table";
 import { useState } from "react";

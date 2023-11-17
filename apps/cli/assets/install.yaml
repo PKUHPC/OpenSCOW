@@ -60,7 +60,30 @@
 #   # 自定义认证系统。默认使用内置认证系统
 #   # 如果使用内置认证系统，将此部分注释掉
 #   custom:
-#     # 自定义认证系统镜像名。必填
+#     # 自定义认证系统类型
+#     # external（使用外部系统） | image（使用自定义认证系统镜像），默认为 image
+#     type: image
+#     # 自定义外部认证系统配置
+#     # 如果 type 为 external 则需要配置 external 选项，否则仍然使用默认认证系统 URL
+#     external:
+#       url: http://custom-url:port
+
+#     # 容器相关配置
+#     imageConfig:
+#       # 自定义认证系统镜像名。必填
+#       # imageName: my-custom-auth:v1.0
+
+#       # 端口映射。可选
+#       # ports:
+#       #   - "5000:5000"
+
+#       # 更多挂载卷。可选
+#       # 默认添加/etc/hosts:/etc/hosts和./config:/etc/scow
+#       # volumes:
+#       #   - "./myfile:/etc/myfile"
+
+#     # 兼容老版本
+#     # 定义认证系统镜像名。必填
 #     # image: my-custom-auth:v1.0
 
 #     # 端口映射。可选

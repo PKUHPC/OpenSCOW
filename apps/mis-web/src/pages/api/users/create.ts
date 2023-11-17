@@ -13,7 +13,7 @@
 import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { status } from "@grpc/grpc-js";
-import { getLanguageCookie } from "@scow/lib-web/build/utils/languages";
+import { getCurrentLanguageId } from "@scow/lib-web/build/utils/systemLanguage";
 import { UserServiceClient } from "@scow/protos/build/server/user";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
@@ -68,6 +68,7 @@ export default /* #__PURE__*/typeboxRoute(CreateUserSchema, async (req, res) => 
 
   if (!useBuiltinCreateUser()) { return { 501: null }; }
 
+
   const { email, identityId, name, password } = req.body;
 
   const auth = authenticate((u) =>
@@ -80,7 +81,8 @@ export default /* #__PURE__*/typeboxRoute(CreateUserSchema, async (req, res) => 
 
   if (!info) { return; }
 
-  const languageId = getLanguageCookie(req);
+  const languageId = getCurrentLanguageId(req, publicConfig.SYSTEM_LANGUAGE_CONFIG);
+
   const userIdRule = getUserIdRule(languageId);
 
 

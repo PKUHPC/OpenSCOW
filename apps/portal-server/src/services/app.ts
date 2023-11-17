@@ -14,7 +14,7 @@ import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { AppType } from "@scow/config/build/app";
-import { I18nStringType } from "@scow/lib-server";
+import { I18nStringType } from "@scow/config/build/i18n";
 import {
   AppCustomAttribute,
   appCustomAttribute_AttributeTypeFromJSON,

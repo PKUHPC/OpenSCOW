@@ -12,9 +12,9 @@
 
 import "dayjs/locale/zh-cn";
 
+import { SYSTEM_VALID_LANGUAGES } from "@scow/config/build/i18n";
 import { AntdConfigProvider as LibAntdConfigProvider } from "@scow/lib-web/build/layouts/AntdConfigProvider";
 import { useDarkMode } from "@scow/lib-web/build/layouts/darkMode";
-import { SYSTEM_VALID_LANGUAGES } from "@scow/lib-web/build/utils/languages";
 import { App, ConfigProvider, theme } from "antd";
 import { Locale } from "antd/lib/locale";
 import enUSlocale from "antd/locale/en_US";

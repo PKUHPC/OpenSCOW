@@ -10,8 +10,9 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { getCommonConfig, getSystemLanguageConfig } from "@scow/config/build/common";
 import { DEFAULT_PRIMARY_COLOR } from "@scow/config/build/ui";
-import { getI18nConfigCurrentText, getLanguageCookie } from "@scow/lib-server/build/i18n";
+import { getCurrentLanguageId, getI18nConfigCurrentText } from "@scow/lib-server";
 import { FastifyReply, FastifyRequest } from "fastify";
 import { join } from "path";
 import { createCaptcha } from "src/auth/captcha";
@@ -44,7 +45,7 @@ export async function serveLoginHtml(
     : undefined;
 
   // 获取当前语言ID及对应的登录页面文本
-  const languageId = getLanguageCookie(req.raw);
+  const languageId = getCurrentLanguageId(req.raw, getSystemLanguageConfig(getCommonConfig().systemLanguage));
   const authTexts: AuthTextsType = languages[languageId];
 
   // 获取sloganI18nText

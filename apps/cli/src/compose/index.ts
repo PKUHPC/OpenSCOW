@@ -13,7 +13,7 @@
 import { chmodSync, mkdirSync } from "fs";
 import path from "path";
 import { LoggingOption, ServiceSpec } from "src/compose/spec";
-import { InstallConfigSchema } from "src/config/install";
+import { AuthCustomType, InstallConfigSchema } from "src/config/install";
 
 const IMAGE: string = "mirrors.pku.edu.cn/pkuhpc-icode/scow";
 
@@ -114,6 +114,11 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
   const publicDir = "/app/apps/gateway/public/";
 
   // GATEWAY
+  const authUrl = config.auth.custom?.type === AuthCustomType.external
+    ? config.auth.custom.external?.url : "http://auth:5000";
+  if (authUrl === undefined) {
+    throw new Error("Invalid config: when /auth/custom/type is external, /auth/custom/external/url is required");
+  }
   addService("gateway", {
     image: scowImage,
     environment: {
@@ -126,6 +131,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
       "PUBLIC_PATH": publicPath,
       "PUBLIC_DIR": publicDir,
       "EXTRA": config.gateway.extra,
+      "AUTH_URL": authUrl,
     },
     ports: { [config.port]: 80 },
     volumes: {
@@ -149,18 +155,24 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
     "~/.ssh": "/root/.ssh",
   };
 
-  if (config.auth.custom) {
-    for (const key in config.auth.custom.volumes) {
-      authVolumes[key] = config.auth.custom.volumes[key];
+  if (config.auth.custom?.type === AuthCustomType.image) {
+    const volumes = config.auth.custom.imageConfig?.volumes || config.auth.custom.volumes;
+    for (const key in volumes) {
+      authVolumes[key] = volumes[key];
+    }
+
+    const image = config.auth.custom.imageConfig?.imageName || config.auth.custom.image;
+    if (image === undefined) {
+      throw new Error("Invalid config: must have /auth/custom/image or /auth/custom/imageConfig/imageName");
     }
 
     addService("auth", {
-      image: config.auth.custom.image,
-      ports: config.auth.custom.ports ?? {},
+      image,
+      ports: (config.auth.custom.imageConfig?.ports || config.auth.custom.ports) ?? {},
       environment: config.auth.custom.environment ?? {},
       volumes: authVolumes,
     });
-  } else {
+  } else if (config.auth.custom === undefined || config.auth.custom.type !== AuthCustomType.external) {
     const portalBasePath = join(BASE_PATH, PORTAL_PATH);
 
     addService("auth", {
@@ -204,6 +216,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
         "MIS_URL": join(BASE_PATH, MIS_PATH),
         "MIS_DEPLOYED": config.mis ? "true" : "false",
         "AUTH_EXTERNAL_URL": join(BASE_PATH, "/auth"),
+        "AUTH_INTERNAL_URL": authUrl,
         "NOVNC_CLIENT_URL": join(BASE_PATH, "/vnc"),
         "CLIENT_MAX_BODY_SIZE": config.gateway.uploadFileSizeLimit,
         "PUBLIC_PATH": join(BASE_PATH, publicPath),
@@ -249,6 +262,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
         "PORTAL_URL": join(BASE_PATH, PORTAL_PATH),
         "PORTAL_DEPLOYED": config.portal ? "true" : "false",
         "AUTH_EXTERNAL_URL": join(BASE_PATH, "/auth"),
+        "AUTH_INTERNAL_URL": authUrl,
         "PUBLIC_PATH": join(BASE_PATH, publicPath),
         "AUDIT_DEPLOYED": config.audit ? "true" : "false",
       },

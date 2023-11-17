@@ -12,6 +12,7 @@
 
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { moneyToNumber } from "@scow/lib-decimal";
+import { DEFAULT_PAGE_SIZE } from "@scow/lib-web/build/utils/pagination";
 import { Money } from "@scow/protos/build/common/money";
 import { Static } from "@sinclair/typebox";
 import { App, Button, Divider, Form, Input, Space, Table, Tag } from "antd";
@@ -130,6 +131,7 @@ export const AccountTable: React.FC<Props> = ({
         loading={isLoading}
         pagination={{
           showSizeChanger: true,
+          defaultPageSize: DEFAULT_PAGE_SIZE,
           current: currentPageNum,
           onChange: (page) => setCurrentPageNum(page),
         }}

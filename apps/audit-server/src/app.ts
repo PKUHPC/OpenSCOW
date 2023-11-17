@@ -16,7 +16,7 @@ import { readVersionFile } from "@scow/utils/build/version";
 import { config } from "src/config/env";
 import { plugins } from "src/plugins";
 import { operationLogServiceServer } from "src/services/operationLog";
-import { logger } from "src/utils/logger";
+import { loggerOptions } from "src/utils/logger";
 
 export async function createServer() {
 
@@ -24,7 +24,7 @@ export async function createServer() {
     host: config.HOST,
     port: config.PORT,
 
-    logger,
+    logger: loggerOptions,
   });
 
   server.logger.info({ version: readVersionFile() }, "@scow/audit-server: ");
