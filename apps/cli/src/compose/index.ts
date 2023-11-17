@@ -268,6 +268,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
       },
       ports: {},
       volumes: {
+        "/etc/hosts": "/etc/hosts",
         "./config": "/etc/scow",
       },
     });
@@ -299,6 +300,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
         ...serviceLogEnv,
       },
       volumes: {
+        "/etc/hosts": "/etc/hosts",
         "./config": "/etc/scow",
       },
     });
