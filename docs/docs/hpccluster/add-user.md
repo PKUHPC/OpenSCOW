@@ -4,11 +4,11 @@ title: LDAP新建用户
 sidebar_position: 7
 ---
 
-部署LDAP后台管理后，访问http://{LDAP服务节点ip}:8080/ ，登录DN: cn=Manager,ou=hpc,o=pku Password: LDAP服务端安装脚本adminPasswd的值。
+部署LDAP后台管理后，访问http://\{LDAP服务节点ip\}:8080/ ，登录DN: cn=Manager,ou=hpc,o=pku Password: LDAP服务端安装脚本adminPasswd的值。
 
 ## 1. 界面添加LDAP用户
 
-部署LDAP后台管理后，访问http://{LDAP服务节点ip}:8080/ ，登录DN: cn=Manager,ou=hpc,o=pku Password: LDAP服务端安装脚本adminPasswd的值。
+部署LDAP后台管理后，访问http://\{LDAP服务节点ip\}:8080/ ，登录DN: cn=Manager,ou=hpc,o=pku Password: LDAP服务端安装脚本adminPasswd的值。
 
 登录成功后，新建Group：
 
