@@ -18,6 +18,7 @@ import { createUser } from "@scow/lib-auth";
 import { decimalToMoney } from "@scow/lib-decimal";
 import { TenantServiceClient } from "@scow/protos/build/server/tenant";
 import { createServer } from "src/app";
+import { config } from "src/config/env";
 import { misConfig } from "src/config/mis";
 import { Tenant } from "src/entities/Tenant";
 import { TenantRole, User } from "src/entities/User";
@@ -119,7 +120,7 @@ it("create a new tenant", async () => {
 
   expect(createUser).toHaveBeenNthCalledWith(
     1,
-    misConfig.authUrl,
+    config.AUTH_URL || misConfig.authUrl,
     {
       identityId: userId,
       id: user.id,

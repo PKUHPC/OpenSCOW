@@ -18,6 +18,7 @@ import { createUser } from "@scow/lib-auth";
 import { GetAllUsersRequest_UsersSortField, PlatformRole, platformRoleFromJSON,
   SortDirection, TenantRole, UserServiceClient } from "@scow/protos/build/server/user";
 import { createServer } from "src/app";
+import { config } from "src/config/env";
 import { misConfig } from "src/config/mis";
 import { Tenant } from "src/entities/Tenant";
 import { PlatformRole as pRole, TenantRole as tRole, User } from "src/entities/User";
@@ -69,7 +70,7 @@ it("creates user", async () => {
 
   expect(createUser).toHaveBeenNthCalledWith(
     1,
-    misConfig.authUrl,
+    config.AUTH_URL || misConfig.authUrl,
     {
       identityId: userId,
       id: user.id,

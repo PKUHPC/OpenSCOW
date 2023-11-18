@@ -12,11 +12,12 @@
 
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { getCapabilities } from "@scow/lib-auth";
+import { config } from "src/config/env";
 import { misConfig } from "src/config/mis";
 
 export const authServicePlugin = plugin(async (f) => {
 
-  const capabilities = await getCapabilities(misConfig.authUrl);
+  const capabilities = await getCapabilities(config.AUTH_URL || misConfig.authUrl);
 
   f.addExtension("capabilities", capabilities);
 
