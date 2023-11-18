@@ -17,14 +17,14 @@
   "license": "Mulan PSL v2",
   "repository": "https://github.com/PKUHPC/SCOW",
   "dependencies": {
-    "@ddadaal/tsgrpc-common": "0.2.4",
-    "@grpc/grpc-js": "1.9.5",
+    "@ddadaal/tsgrpc-common": "0.2.5",
+    "@grpc/grpc-js": "1.9.11",
     "nookies": "2.5.2",
     "@scow/config": "workspace:*"
   },
   "devDependencies": {
-    "@ddadaal/tsgrpc-server": "0.19.4",
-    "@ddadaal/tsgrpc-client": "0.17.6",
+    "@ddadaal/tsgrpc-server": "0.19.5",
+    "@ddadaal/tsgrpc-client": "0.17.7",
     "@scow/protos": "workspace:*"
   },
   "volta": {
