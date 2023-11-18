@@ -20,6 +20,7 @@ import { decimalToMoney } from "@scow/lib-decimal";
 import { AccountServiceServer, AccountServiceService,
   BlockAccountResponse_Result } from "@scow/protos/build/server/account";
 import { blockAccount, unblockAccount } from "src/bl/block";
+import { config } from "src/config/env";
 import { misConfig } from "src/config/mis";
 import { Account } from "src/entities/Account";
 import { AccountWhitelist } from "src/entities/AccountWhitelist";
@@ -228,7 +229,7 @@ export const accountServiceServer = plugin((server) => {
       await callHook("accountCreated", { accountName, comment, ownerId, tenantName }, logger);
 
       if (server.ext.capabilities.accountUserRelation) {
-        await createAccount(misConfig.authUrl, { accountName, ownerUserId: ownerId }, logger);
+        await createAccount(config.AUTH_URL || misConfig.authUrl, { accountName, ownerUserId: ownerId }, logger);
       }
 
       return [{}];

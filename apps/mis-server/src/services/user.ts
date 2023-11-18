@@ -30,6 +30,7 @@ import {
   UserServiceService,
   UserStatus as PFUserStatus } from "@scow/protos/build/server/user";
 import { blockUserInAccount, unblockUserInAccount } from "src/bl/block";
+import { config } from "src/config/env";
 import { misConfig } from "src/config/mis";
 import { Account } from "src/entities/Account";
 import { PlatformRole, TenantRole, User } from "src/entities/User";
@@ -184,7 +185,7 @@ export const userServiceServer = plugin((server) => {
       await em.persistAndFlush([account, user, newUserAccount]);
 
       if (server.ext.capabilities.accountUserRelation) {
-        await addUserToAccount(misConfig.authUrl, { accountName, userId }, logger);
+        await addUserToAccount(config.AUTH_URL || misConfig.authUrl, { accountName, userId }, logger);
       }
 
       return [{}];
@@ -218,7 +219,7 @@ export const userServiceServer = plugin((server) => {
       await em.removeAndFlush(userAccount);
 
       if (server.ext.capabilities.accountUserRelation) {
-        await removeUserFromAccount(misConfig.authUrl, { accountName, userId }, logger);
+        await removeUserFromAccount(config.AUTH_URL || misConfig.authUrl, { accountName, userId }, logger);
       }
 
       return [{}];
@@ -355,7 +356,7 @@ export const userServiceServer = plugin((server) => {
             message: `Error creating user with userId ${identityId} in database.` };
         });
       // call auth
-      const createdInAuth = await createUser(misConfig.authUrl,
+      const createdInAuth = await createUser(config.AUTH_URL || misConfig.authUrl,
         { identityId: user.userId, id: user.id, mail: user.email, name: user.name, password },
         server.logger)
         .then(async () => {
@@ -444,7 +445,7 @@ export const userServiceServer = plugin((server) => {
 
       // query auth
       if (server.ext.capabilities.getUser) {
-        const authUser = await getUser(misConfig.authUrl, { identityId: userId }, server.logger);
+        const authUser = await getUser(config.AUTH_URL || misConfig.authUrl, { identityId: userId }, server.logger);
 
         if (!authUser) {
           throw <ServiceError> { code: Status.NOT_FOUND, message:`User ${userId} is not found from auth` };
@@ -694,11 +695,11 @@ export const userServiceServer = plugin((server) => {
       user.email = newEmail;
       await em.flush();
 
-      const ldapCapabilities = await getCapabilities(misConfig.authUrl);
+      const ldapCapabilities = await getCapabilities(config.AUTH_URL || misConfig.authUrl);
 
       // 看LDAP是否有修改邮箱的权限
       if (ldapCapabilities.changeEmail) {
-        await libChangeEmail(misConfig.authUrl, {
+        await libChangeEmail(config.AUTH_URL || misConfig.authUrl, {
           identityId: userId,
           newEmail,
         }, logger)
