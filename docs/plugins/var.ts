@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-// @ts-check
+import { visit } from "unist-util-visit";
 
 const ORGANIZATION_NAME = "PKUHPC";
 const PROJECT_NAME = "SCOW";
@@ -22,7 +22,7 @@ const REPO_FILE_URL = `${REPO_URL}/blob/master`;
 const DOCS_URL = `https://${ORGANIZATION_NAME}.${GIT_PLATFORM}.io`;
 const BASE_PATH = process.env.BASE_PATH || `/${PROJECT_NAME}/`;
 
-const variables = {
+export const variables = {
   BASE_PATH,
   ORGANIZATION_NAME,
   PROJECT_NAME,
@@ -38,11 +38,9 @@ const variables = {
  * @param {string} template template string
  * @returns replaced string
  */
-const replace = (template) => {
+const replace = (template: string) => {
   return template.replace(/%([a-zA-Z0-9_]+)%/g, (_, p1) => variables[p1] ?? "");
 };
-
-const visit = require("unist-util-visit");
 
 const types = [
   { type: "link", property: "url" },
@@ -50,7 +48,7 @@ const types = [
   { type: "inlineCode", property: "value" },
 ];
 
-const plugin = () => {
+export const plugin = () => {
   const transformer = async (ast) => {
     visit(ast, types.map((x) => x.type), (node) => {
       const selected = types.find((x) => x.type === node.type);
@@ -60,9 +58,4 @@ const plugin = () => {
     });
   };
   return transformer;
-};
-
-module.exports = {
-  plugin,
-  variables,
 };

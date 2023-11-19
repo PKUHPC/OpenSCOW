@@ -187,6 +187,23 @@ export default {
       },
     },
     fileManagerComp: {
+      fileEditModal: {
+        edit: "编辑",
+        prompt: "提示",
+        save: "保存",
+        doNotSave: "不保存",
+        notSaved: "未保存",
+        notSavePrompt: "文件未保存，是否保存该文件？",
+        fileEdit: "文件编辑",
+        filePreview: "文件预览",
+        fileLoading: "文件正在加载...",
+        exitEdit: "退出编辑",
+        failedGetFile: "获取文件: {} 失败",
+        cantReadFile: "无法读取文件: {}",
+        saveFileFail: "文件保存失败: {}",
+        saveFileSuccess: "文件保存成功",
+        fileSizeExceeded: "文件过大（最大{}），请下载后编辑",
+      },
       createFileModal: {
         createErrorMessage: "同名文件或者目录已经存在！",
         createSuccessMessage: "创建成功",
@@ -195,6 +212,9 @@ export default {
         fileName: "文件名",
       },
       fileManager: {
+        preview: {
+          cantPreview: "文件过大（最大{}）或者格式不支持，请下载后查看",
+        },
         moveCopy: {
           copy: "复制",
           move: "移动",

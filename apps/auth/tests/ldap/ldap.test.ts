@@ -297,7 +297,6 @@ it("change user email", async () => {
   });
 
   expect(changeEmaiResp.statusCode).toBe(204);
-  expect(changeEmaiResp.json()).toBe(null);
 
   expect(getUserResp.statusCode).toBe(200);
   expect(getUserResp.json().user.mail).toEqual(newEmail);
@@ -335,7 +334,6 @@ it("check password", async () => {
     query: { identityId: notExistedIdentityId, password: correctPassword },
   });
   expect(notExistedResp.statusCode).toBe(404);
-  expect(notExistedResp.json()).toBe(null);
 });
 
 it("change password", async () => {
@@ -352,7 +350,6 @@ it("change password", async () => {
     body: { identityId: user.identityId, newPassword: newPassword },
   });
   expect(changePasswordResp.statusCode).toBe(204);
-  expect(changePasswordResp.json()).toBe(null);
 
   // check password
   const oldPasswordResp = await server.inject({

@@ -187,6 +187,23 @@ export default {
       },
     },
     fileManagerComp: {
+      fileEditModal: {
+        edit: "Edit",
+        prompt: "Prompt",
+        save: "Save",
+        doNotSave: "Do Not Save",
+        notSaved: "Not Saved",
+        notSavePrompt: "The file has not been saved, do you want to save this file?",
+        fileEdit: "File Edit",
+        filePreview: "File Preview",
+        fileLoading: "File is loading...",
+        exitEdit: "Exit Edit Mode",
+        failedGetFile: "Failed to get file: {}",
+        cantReadFile: "Cannot read file: {}",
+        saveFileFail: "File save failed: {}",
+        saveFileSuccess: "File saved successfully",
+        fileSizeExceeded: "File too large (maximum {}), please download and edit",
+      },
       createFileModal: {
         createErrorMessage: "File or directory with the same name already exists!",
         createSuccessMessage: "Created successfully",
@@ -195,6 +212,9 @@ export default {
         fileName: "File Name",
       },
       fileManager: {
+        preview: {
+          cantPreview: "File too large (maximum {}) or format not supported, please download to view",
+        },
         moveCopy: {
           copy: "Copy",
           move: "Move",

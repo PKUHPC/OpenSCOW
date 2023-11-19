@@ -10,18 +10,14 @@
  * See the Mulan PSL v2 for more details.
  */
 
-// @ts-check
-// Note: type annotations allow type checking and IDEs autocompletion
+import { Options } from "@docusaurus/preset-classic";
+import { Config } from "@docusaurus/types";
+import { join, resolve } from "path";
+import { themes } from "prism-react-renderer";
 
-const lightCodeTheme = require("prism-react-renderer/themes/github");
-const darkCodeTheme = require("prism-react-renderer/themes/dracula");
-const { join, resolve } = require("path");
-const { plugin, variables } = require("./plugins/var");
+import { plugin, variables } from "./plugins/var";
 
-
-
-/** @type {import("@docusaurus/types").Config} */
-const config = {
+const config: Config = {
   title: "SCOW",
   tagline: "Super Computing On Web",
   url: variables.DOCS_URL,
@@ -63,7 +59,6 @@ const config = {
   presets: [
     [
       "@docusaurus/preset-classic",
-      /** @type {import('@docusaurus/preset-classic').Options} */
       ({
         docs: {
           sidebarPath: require.resolve("./sidebars.js"),
@@ -78,7 +73,7 @@ const config = {
         theme: {
           customCss: require.resolve("./src/css/custom.css"),
         },
-      }),
+      }) satisfies Options,
     ],
   ],
 
@@ -180,10 +175,10 @@ const config = {
         copyright: `Copyright © ${new Date().getFullYear()} 北京大学计算与数字经济研究院. Built with Docusaurus.`,
       },
       prism: {
-        theme: lightCodeTheme,
-        darkTheme: darkCodeTheme,
+        theme: themes.github,
+        darkTheme: themes.dracula,
       },
     }),
 };
 
-module.exports = config;
+export default config;

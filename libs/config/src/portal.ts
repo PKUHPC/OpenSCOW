@@ -56,6 +56,16 @@ export const PortalConfigSchema = Type.Object({
 
   shell: Type.Boolean({ description: "是否启用终端功能", default: true }),
 
+  file: Type.Optional(Type.Object({
+    preview: Type.Object({
+      limitSize: Type.String({ description: "文件预览大小限制", default: "50m" }),
+    }, { description: "文件预览功能", default: {} }),
+    edit: Type.Object({
+      limitSize: Type.String({ description: "文件编辑大小限制", default: "1m" }),
+    }, { description: "文件编辑功能", default: {} }),
+  }, { description: "文件管理" })),
+
+
   submitJobDefaultPwd: Type.String({
     description: "提交作业的默认工作目录。使用{{ name }}代替作业名称。相对于用户的家目录", default: "scow/jobs/{{ name }}" }),
 
