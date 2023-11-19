@@ -19,7 +19,6 @@ import { createDirectoriesRecursively, sftpReadFile, sftpStat } from "@scow/lib-
 import { JobServiceServer, JobServiceService } from "@scow/protos/build/portal/job";
 import { parseErrorDetails } from "@scow/rich-error-model";
 import { ApiVersion } from "@scow/utils/build/version";
-import { log } from "console";
 import { getClusterOps } from "src/clusterops";
 import { JobTemplate } from "src/clusterops/api/job";
 import { checkSchedulerApiVersion, getAdapterClient } from "src/utils/clusters";
@@ -175,7 +174,7 @@ export const jobServiceServer = plugin((server) => {
         userId, jobName, account, partition: partition!, qos, nodeCount, gpuCount: gpuCount || 0,
         memoryMb: Number(memory?.split("M")[0]), coreCount, timeLimitMinutes: maxTime,
         script: command, workingDirectory, stdout: output, stderr: errorOutput,
-        extraOptions,
+        extraOptions: Object.values(extraOptions).length ? Object.values(extraOptions) : [],
       }).catch((e) => {
         const ex = e as ServiceError;
         const errors = parseErrorDetails(ex.metadata);
@@ -206,6 +205,7 @@ export const jobServiceServer = plugin((server) => {
           output,
           errorOutput,
           memory,
+          extraOptions,
         };
 
         const clusterOps = getClusterOps(cluster);

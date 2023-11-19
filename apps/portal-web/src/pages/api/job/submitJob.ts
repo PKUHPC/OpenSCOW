@@ -39,7 +39,7 @@ export const SubmitJobInfo = Type.Object({
   memory: Type.Optional(Type.String()),
   comment: Type.Optional(Type.String()),
   save: Type.Boolean(),
-  extraOptions: Type.Array(Type.String()),
+  extraOptions: Type.Record(Type.String(), Type.String()),
 });
 
 export type SubmitJobInfo = Static<typeof SubmitJobInfo>;
