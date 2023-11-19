@@ -17,14 +17,14 @@
   "license": "Mulan PSL v2",
   "repository": "https://github.com/PKUHPC/SCOW",
   "dependencies": {
-    "@sinclair/typebox": "0.31.1",
+    "@sinclair/typebox": "0.31.26",
     "ajv": "8.12.0",
     "ajv-formats": "2.1.1",
     "envalid": "8.0.0",
     "js-yaml": "4.1.0"
   },
   "devDependencies": {
-    "@types/js-yaml": "4.0.5",
+    "@types/js-yaml": "4.0.9",
     "ts-log": "2.2.5"
   },
   "volta": {
