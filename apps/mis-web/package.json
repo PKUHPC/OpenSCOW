@@ -7,7 +7,7 @@
     "dev:server": "cross-env NEXT_PUBLIC_USE_MOCK=0 next dev",
     "serve": "next start",
     "build": "npm run build:next",
-    "build:next": "next build",
+    "build:next": "cross-env BUILDING=1 next build",
     "client": "ntar client"
   },
   "files": [

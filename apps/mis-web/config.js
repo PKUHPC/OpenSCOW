@@ -17,7 +17,7 @@ const { getCommonConfig, getSystemLanguageConfig } = require("@scow/config/build
 const { getClusterTextsConfig } = require("@scow/config/build/clusterTexts");
 const { DEFAULT_PRIMARY_COLOR, getUiConfig } = require("@scow/config/build/ui");
 const { getAuditConfig } = require("@scow/config/build/audit");
-const { PHASE_DEVELOPMENT_SERVER, PHASE_PRODUCTION_BUILD, PHASE_PRODUCTION_SERVER } = require("next/constants");
+const { PHASE_DEVELOPMENT_SERVER, PHASE_PRODUCTION_SERVER } = require("next/constants");
 const { join } = require("path");
 const { getCapabilities } = require("@scow/lib-auth");
 const { readVersionFile } = require("@scow/utils/build/version");
@@ -65,7 +65,10 @@ const config = envConfig(specs, process.env);
  */
 const buildRuntimeConfig = async (phase, basePath) => {
 
-  const building = phase === PHASE_PRODUCTION_BUILD;
+  // https://github.com/vercel/next.js/issues/57927
+  // const building = phase === PHASE_PRODUCTION_BUILD;
+  const building = process.env.BUILDING === "1";
+
   const dev = phase === PHASE_DEVELOPMENT_SERVER;
   // const production = phase === PHASE_PRODUCTION_SERVER;
 

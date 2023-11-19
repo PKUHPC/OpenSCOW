@@ -15,7 +15,7 @@
 const { envConfig, str, bool, parseKeyValue } = require("@scow/lib-config");
 const { join } = require("path");
 const { homedir } = require("os");
-const { PHASE_DEVELOPMENT_SERVER, PHASE_PRODUCTION_BUILD,
+const { PHASE_DEVELOPMENT_SERVER,
   PHASE_PRODUCTION_SERVER, PHASE_TEST } = require("next/constants");
 
 const { readVersionFile } = require("@scow/utils/build/version");
@@ -104,11 +104,12 @@ const config = { _specs: specs };
  */
 const buildRuntimeConfig = async (phase, basePath) => {
 
-  const building = phase === PHASE_PRODUCTION_BUILD;
+  // https://github.com/vercel/next.js/issues/57927
+  // const building = phase === PHASE_PRODUCTION_BUILD;
+  const building = process.env.BUILDING === "1";
+
   const dev = phase === PHASE_DEVELOPMENT_SERVER;
   const testenv = phase === PHASE_TEST;
-
-  console.log(phase, PHASE_PRODUCTION_BUILD, building);
 
   // load .env.build if in build
   if (building) {

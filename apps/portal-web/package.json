@@ -7,7 +7,7 @@
     "dev:server": "cross-env NEXT_PUBLIC_USE_MOCK=0 next dev",
     "serve": "next start",
     "build": "node scripts/copyMonacoToPublic.js && npm run build:next",
-    "build:next": "next build",
+    "build:next": "cross-env BUILDING=1 next build",
     "test": "jest --passWithNoTests",
     "client": "ntar client",
     "prepareDev": "node scripts/copyMonacoToPublic.js"
