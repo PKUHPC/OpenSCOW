@@ -108,6 +108,8 @@ const buildRuntimeConfig = async (phase, basePath) => {
   const dev = phase === PHASE_DEVELOPMENT_SERVER;
   const testenv = phase === PHASE_TEST;
 
+  console.log(phase, PHASE_PRODUCTION_BUILD, building);
+
   // load .env.build if in build
   if (building) {
     return { serverRuntimeConfig: {}, publicRuntimeConfig: {} };
@@ -223,9 +225,20 @@ const buildRuntimeConfig = async (phase, basePath) => {
     console.log("Version", readVersionFile());
     console.log("Server Runtime Config", serverRuntimeConfig);
     console.log("Public Runtime Config", publicRuntimeConfig);
+
+    // HACK setup ws proxy
+    setTimeout(() => {
+      const url = `http://localhost:${process.env.PORT || 3000}${join(basePath, "/api/setup")}`;
+      console.log("Calling setup url to initialize proxy and shell server", url);
+
+      fetch(url).then(async (res) => {
+        console.log("Call completed. Response: ", await res.text());
+      }).catch((e) => {
+        console.error("Error when calling proxy url to initialize ws proxy server", e);
+      });
+    });
+
   }
-
-
 
   return {
     serverRuntimeConfig,
