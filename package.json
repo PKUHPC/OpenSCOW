@@ -55,7 +55,7 @@
     "ts-node": "10.9.1",
     "tsc-alias": "1.8.8",
     "tsconfig-paths": "4.2.0",
-    "turbo": "1.10.16",
+    "turbo": "1.10.12",
     "typescript": "5.2.2"
   },
   "volta": {
