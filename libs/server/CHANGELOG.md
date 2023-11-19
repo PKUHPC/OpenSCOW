@@ -1,5 +1,18 @@
 # @scow/lib-server
 
+## 1.1.0
+
+### Minor Changes
+
+- 5d2b75ccec: 增加用户指定系统语言功能，可以指定系统唯一语言不再进行语言切换，也可以指定进入 SCOW 时的默认初始语言
+
+### Patch Changes
+
+- Updated dependencies [a3d2f44af6]
+- Updated dependencies [5d2b75ccec]
+- Updated dependencies [f577d9d1e4]
+  - @scow/config@1.2.0
+
 ## 1.0.1
 
 ### Patch Changes
