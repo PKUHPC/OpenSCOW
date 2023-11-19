@@ -28,7 +28,7 @@
     "@pnpm/lockfile-file": "8.1.4",
     "@pnpm/logger": "5.0.0",
     "@types/jest": "29.5.8",
-    "@types/node": "18.18.10",
+    "@types/node": "20.9.2",
     "@typescript-eslint/eslint-plugin": "6.11.0",
     "@typescript-eslint/parser": "6.11.0",
     "concurrently": "8.2.2",
@@ -59,7 +59,7 @@
     "typescript": "5.2.2"
   },
   "volta": {
-    "node": "18.18.2"
+    "node": "20.9.0"
   },
   "packageManager": "pnpm@8.10.5",
   "pnpm": {
