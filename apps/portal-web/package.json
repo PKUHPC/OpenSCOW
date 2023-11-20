@@ -67,7 +67,7 @@
     "react-dom": "18.2.0",
     "react-is": "18.2.0",
     "react-typed-i18n": "2.3.0",
-    "recharts": "^2.9.3",
+    "recharts": "^2.10.1",
     "simstate": "3.0.1",
     "styled-components": "6.1.1",
     "tslib": "2.6.2",
