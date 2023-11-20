@@ -102,7 +102,7 @@ it("delete job template", async () => {
     cluster, userId, templateId,
   });
 
-  expect(templateInfo?.template?.jobName).toBeInstanceOf(String);
+  expect(templateInfo?.template?.jobName).toBe("testJob");
 
   await asyncUnaryCall(client, "deleteJobTemplate", {
     cluster, userId, templateId,
