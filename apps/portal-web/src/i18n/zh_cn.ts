@@ -31,7 +31,12 @@ export default {
       appSessions: "已创建的应用",
       createApp: "创建应用",
     },
-    file: "文件管理",
+    file: {
+      fileManager: "文件管理",
+      crossClusterFileTransfer: "跨集群文件传输",
+      clusterFileManager: "集群文件管理",
+      transferProgress: "传输进度",
+    },
   },
   // button
   button: {

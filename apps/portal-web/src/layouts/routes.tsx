@@ -139,14 +139,14 @@ export const userRoutes: (
     } as NavItemProps] : []),
     ...(publicConfig.CLUSTERS.length > 0 ? [{
       Icon: FolderOutlined,
-      text: t("routes.file"),
+      text: t("routes.file.fileManager"),
       path: "/files",
       clickToPath: `/files/${defaultCluster.id}/~`,
       clickable: true,
       children: [
         {
           Icon: FolderOutlined,
-          text: "集群文件管理",
+          text: t("routes.file.clusterFileManager"),
           path: "/files/",
           clickToPath: `/files/${defaultCluster.id}/~`,
           children: publicConfig.CLUSTERS.map((cluster) => ({
@@ -157,15 +157,15 @@ export const userRoutes: (
             handleClick: () => { setDefaultCluster(cluster); },
           } as NavItemProps)),
         },
-        ...(publicConfig.CROSS_CLUSTER_FILE_TRANSFER_ENABLED || true ? [
+        ...(publicConfig.CROSS_CLUSTER_FILE_TRANSFER_ENABLED ? [
           {
             Icon: CloudSyncOutlined,
-            text: "文件传输",
+            text: t("routes.file.crossClusterFileTransfer"),
             path: "/files/fileTransfer",
           },
           {
             Icon: CloudServerOutlined,
-            text: "传输进度",
+            text: t("routes.file.transferProgress"),
             path: "/files/currentTransferInfo",
           },
         ] : []),

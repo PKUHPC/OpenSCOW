@@ -94,7 +94,7 @@ export const FileTransferPage: NextPage = requireAuth(() => true)(() => {
   const [selectedKeysLeft, setSelectedKeysLeft] = useState<FileInfoKey[]>([]);
   const [selectedKeysRight, setSelectedKeysRight] = useState<FileInfoKey[]>([]);
 
-  if (!publicConfig.CROSS_CLUSTER_FILE_TRANSFER_ENABLED && false) {
+  if (!publicConfig.CROSS_CLUSTER_FILE_TRANSFER_ENABLED) {
     return <Redirect url="/dashboard" />;
   }
 

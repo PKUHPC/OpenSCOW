@@ -31,7 +31,12 @@ export default {
       appSessions: "Created Apps",
       createApp: "Create App",
     },
-    file: "File Management",
+    file: {
+      fileManager: "File Manager",
+      crossClusterFileTransfer: "File Transfer",
+      clusterFileManager: "Cluster File Manager",
+      transferProgress: "Transfer Progress",
+    },
   },
   // button
   button: {
